@@ -608,60 +608,30 @@ document.querySelectorAll('a.deck').forEach(a => {
 </script>
 
 <!-- ── Week routing ── -->
-<script>
-(function () {
-  const params = new URLSearchParams(window.location.search);
-  const week   = params.get('week');
 
-  /* No week param → back to index */
-  if (!week) {
-  window.location.href = 'https://booha-adventure-studios.github.io/booha-adventure-2027/';
-  return;
+<script type="module">
+import { getWeekParam, getPageContext, prettyWeekLabel } from '../../js/nav.js';
+
+const week = getWeekParam();
+const ctx = getPageContext();
+
+if (!week || !ctx) {
+  window.location.href = '../../index.html';
 }
 
-  /* Build a readable week label from the folder name.
-     e.g. "2027_w09_mar_w1" → "Mar Week 1 · 3月第1週" */
-  function prettyWeek(folder) {
-    const m = folder.match(/_([a-z]{3})_w(\d)$/i);
-    if (!m) return folder;
-    const MONTHS = {
-      jan:'January',feb:'February',mar:'March',apr:'April',
-      may:'May',jun:'June',jul:'July',aug:'August',
-      sep:'September',oct:'October',nov:'November',dec:'December'
-    };
-    const MONTHS_JP = {
-      jan:'1月',feb:'2月',mar:'3月',apr:'4月',
-      may:'5月',jun:'6月',jul:'7月',aug:'8月',
-      sep:'9月',oct:'10月',nov:'11月',dec:'12月'
-    };
-    const mo = m[1].toLowerCase();
-    const wn = m[2];
-    return `${MONTHS[mo] || mo} Week ${wn} &middot; ${MONTHS_JP[mo] || mo}第${wn}週`;
-  }
+document.getElementById('week-label').innerHTML = prettyWeekLabel(week);
 
-  document.getElementById('week-label').innerHTML = prettyWeek(week);
-
-  /* Wire up tile hrefs */
-    /* Derive month folder from week param for template paths */
-  const MONTH_MAP = {jan:'january',feb:'february',mar:'march',apr:'april',may:'may',jun:'june',jul:'july',aug:'august',sep:'september',oct:'october',nov:'november',dec:'december'};
-  const mKey = (week.match(/_([a-z]{3})_w\d$/i)||[])[1] || '';
-  const monthDir = MONTH_MAP[mKey.toLowerCase()] || mKey.toLowerCase();
-
-  /* Wire up tile hrefs → template/{month}/br_*.html?week=FOLDER */
-  document.getElementById("vocab").href     = `${monthDir}/br_vocab.html?week=${week}`;
-  document.getElementById("sentences").href = `${monthDir}/br_sentences.html?week=${week}`;
-  document.getElementById("questions").href = `${monthDir}/br_questions.html?week=${week}`;
-  document.getElementById("stream").href    = `${monthDir}/br_stream.html?week=${week}`;
-})();
+document.getElementById('vocab').href =
+  `${ctx.monthDir}/br_vocab.html?week=${week}`;
+document.getElementById('sentences').href =
+  `${ctx.monthDir}/br_sentences.html?week=${week}`;
+document.getElementById('questions').href =
+  `${ctx.monthDir}/br_questions.html?week=${week}`;
+document.getElementById('stream').href =
+  `${ctx.monthDir}/br_stream.html?week=${week}`;
 </script>
 
-<!-- ── Close button routing ── -->
-<script>
-document.getElementById('btn-close').addEventListener('click', () => {
-  sessionStorage.setItem('booha_return_to_hub', '1');
-  window.location.assign('https://booha-adventure-studios.github.io/booha-adventure-2027/');
-});
-</script>
+  
   
 
 </div>
