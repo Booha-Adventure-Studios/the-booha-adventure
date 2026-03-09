@@ -808,76 +808,150 @@ function navigateToCurriculum(weekId, curr) {
 /* ════════════════════════════════════════════════════════════
    WEEK CALCULATION — always based on real Japan time (JST)
 ════════════════════════════════════════════════════════════ */
-const MONTH_ABBR = ['Jan','Feb','Mar','Apr','May','Jun',
-                    'Jul','Aug','Sep','Oct','Nov','Dec'];
-const MONTH_JP   = ['1月','2月','3月','4月','5月','6月',
-                    '7月','8月','9月','10月','11月','12月'];
-const MONTH_FULL = ['January','February','March','April','May','June',
-                    'July','August','September','October','November','December'];
 
-function tokyoToday() {
-  const parts = new Intl.DateTimeFormat('en-US', {
-    timeZone: 'Asia/Tokyo',
-    year: 'numeric', month: '2-digit', day: '2-digit'
-  }).formatToParts(new Date());
-  const map = {};
-  parts.forEach(p => { if (p.type !== 'literal') map[p.type] = +p.value; });
-  return { y: map.year, m: map.month, d: map.day };
+function addDaysToIso(iso, days) {
+  const dt = new Date(`${iso}T00:00:00Z`);
+  dt.setUTCDate(dt.getUTCDate() + days);
+  return dt.toISOString().slice(0, 10);
 }
 
-function toMs({ y, m, d }) { return Date.UTC(y, m - 1, d); }
-function addDays(ymd, n) {
-  const dt = new Date(toMs(ymd) + n * 86400000);
-  return { y: dt.getUTCFullYear(), m: dt.getUTCMonth() + 1, d: dt.getUTCDate() };
+function isoToParts(iso) {
+  const [y, m, d] = iso.split('-').map(Number);
+  return { y, m, d };
 }
-function dow(ymd) { return new Date(toMs(ymd)).getUTCDay(); }
-function weekSunday(ymd) { return addDays(ymd, -dow(ymd)); }
 
-function fmtRange(sun, sat) {
+function formatRangeFromIso(startIso, endIso) {
+  const start = isoToParts(startIso);
+  const end   = isoToParts(endIso);
+
+  const MONTH_ABBR = ['Jan','Feb','Mar','Apr','May','Jun',
+                      'Jul','Aug','Sep','Oct','Nov','Dec'];
+  const MONTH_JP   = ['1月','2月','3月','4月','5月','6月',
+                      '7月','8月','9月','10月','11月','12月'];
+
   const en = d => `${MONTH_ABBR[d.m - 1]} ${d.d}`;
   const jp = d => `${MONTH_JP[d.m - 1]}${d.d}日`;
-  return `${en(sun)} – ${en(sat)}（${jp(sun)}–${jp(sat)}）`;
+
+  return `${en(start)} – ${en(end)}（${jp(start)}–${jp(end)}）`;
 }
 
-function weekLabel(sun) {
-  let count = 0;
-  let cur = { y: sun.y, m: sun.m, d: 1 };
-  const sunMs = toMs(sun);
-  while (toMs(cur) <= sunMs) {
-    if (dow(cur) === 0) count++;
-    cur = addDays(cur, 1);
-  }
-  return `${MONTH_FULL[sun.m - 1]} Week ${Math.min(count, 4)}`;
+function fullMonthLabelFromSlug(slug) {
+  const map = {
+    january: 'January',
+    february: 'February',
+    march: 'March',
+    april: 'April',
+    may: 'May',
+    june: 'June',
+    july: 'July',
+    august: 'August',
+    september: 'September',
+    october: 'October',
+    november: 'November',
+    december: 'December'
+  };
+  return map[slug] || slug;
 }
 
-function weekIdFor(sun) {
-  const mo = ['jan','feb','mar','apr','may','jun',
-              'jul','aug','sep','oct','nov','dec'][sun.m - 1];
-  let count = 0;
-  let cur = { y: sun.y, m: sun.m, d: 1 };
-  const sunMs = toMs(sun);
-  while (toMs(cur) <= sunMs) {
-    if (dow(cur) === 0) count++;
-    cur = addDays(cur, 1);
+function shortMonthKeyFromSlug(slug) {
+  const map = {
+    january: 'jan',
+    february: 'feb',
+    march: 'mar',
+    april: 'apr',
+    may: 'may',
+    june: 'jun',
+    july: 'jul',
+    august: 'aug',
+    september: 'sep',
+    october: 'oct',
+    november: 'nov',
+    december: 'dec'
+  };
+  return map[slug] || slug;
+}
+
+function makeWeekIdFromCalendarWeek(cal) {
+  return `${ACADEMIC_YEAR}_${shortMonthKeyFromSlug(cal.monthSlug)}_w${cal.weekNumber}`;
+}
+
+function shiftCurriculumWeek(base, delta) {
+  let month = base.month;
+  let year = base.year;
+  let weekNumber = base.weekNumber + delta;
+
+  while (weekNumber < 1) {
+    month -= 1;
+    if (month < 1) {
+      month = 12;
+      year -= 1;
+    }
+    weekNumber += 4;
   }
-  return `${ACADEMIC_YEAR}_${mo}_w${Math.min(count, 4)}`;
+
+  while (weekNumber > 4) {
+    weekNumber -= 4;
+    month += 1;
+    if (month > 12) {
+      month = 1;
+      year += 1;
+    }
+  }
+
+  const slugMap = [
+    'january','february','march','april','may','june',
+    'july','august','september','october','november','december'
+  ];
+
+  const monthSlug = slugMap[month - 1];
+  const monthLabel = fullMonthLabelFromSlug(monthSlug);
+
+  const weekStart = addDaysToIso(base.weekStart, delta * 7);
+  const weekEnd   = addDaysToIso(base.weekEnd,   delta * 7);
+
+  return {
+    year,
+    month,
+    monthSlug,
+    monthLabel,
+    weekNumber,
+    weekId: `${monthSlug}-w${weekNumber}`,
+    weekStart,
+    weekEnd
+  };
 }
 
 function buildWeekData() {
-  const today   = tokyoToday();
-  const thisSun = weekSunday(today);
-  const thisSat = addDays(thisSun, 6);
-  const lastSun = addDays(thisSun, -7);
-  const lastSat = addDays(lastSun, 6);
-  const nextSun = addDays(thisSun,  7);
-  const nextSat = addDays(nextSun,  6);
-  return [
-    { tagEn:'LAST WEEK', tagJp:'先週', title:weekLabel(lastSun), range:fmtRange(lastSun,lastSat), weekId:weekIdFor(lastSun) },
-    { tagEn:'THIS WEEK', tagJp:'今週', title:weekLabel(thisSun), range:fmtRange(thisSun,thisSat), weekId:weekIdFor(thisSun) },
-    { tagEn:'NEXT WEEK', tagJp:'来週', title:weekLabel(nextSun), range:fmtRange(nextSun,nextSat), weekId:weekIdFor(nextSun) }
-  ];
-}
+  const current = getCurrentCurriculumWeek();
+  const last = shiftCurriculumWeek(current, -1);
+  const next = shiftCurriculumWeek(current, 1);
 
+  return [
+    {
+      tagEn: 'LAST WEEK',
+      tagJp: '先週',
+      title: `${last.monthLabel} Week ${last.weekNumber}`,
+      range: formatRangeFromIso(last.weekStart, last.weekEnd),
+      weekId: makeWeekIdFromCalendarWeek(last)
+    },
+    {
+      tagEn: 'THIS WEEK',
+      tagJp: '今週',
+      title: `${current.monthLabel} Week ${current.weekNumber}`,
+      range: formatRangeFromIso(current.weekStart, current.weekEnd),
+      weekId: makeWeekIdFromCalendarWeek(current)
+    },
+    {
+      tagEn: 'NEXT WEEK',
+      tagJp: '来週',
+      title: `${next.monthLabel} Week ${next.weekNumber}`,
+      range: formatRangeFromIso(next.weekStart, next.weekEnd),
+      weekId: makeWeekIdFromCalendarWeek(next)
+    }
+  ];
+}  
+
+  
 /* ════════════════════════════════════════════════════════════
    ORIENTATION
 ════════════════════════════════════════════════════════════ */
