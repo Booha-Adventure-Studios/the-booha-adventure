@@ -1275,28 +1275,29 @@ function showPopupAtCP(cp){
   cpPopupDate.innerHTML = `${en}<br><span style="font-size:0.88em;opacity:0.7">${jp}</span>`;
 
   // Week badge
-  const diff = cp.w - CURRENT_WEEK;
-  cpWeekBadge.classList.remove('visible');
-  cpWeekBadge.style.background = '';
-  cpWeekBadge.style.color = '';
-  cpWeekBadge.textContent = '';
+ const diff = cp.w - CURRENT_WEEK;
 
-  if(diff===0){
-    cpWeekBadge.textContent = '★ THIS WEEK / 今週 ★';
-    cpWeekBadge.style.background = `linear-gradient(90deg,${col1},${col2})`;
-    cpWeekBadge.style.color = '#000';
-    cpWeekBadge.classList.add('visible');
-  } else if(diff===-1){
-    cpWeekBadge.textContent = '← LAST WEEK / 先週';
-    cpWeekBadge.style.background = 'rgba(255,255,255,0.12)';
-    cpWeekBadge.style.color = 'rgba(255,255,255,0.75)';
-    cpWeekBadge.classList.add('visible');
-  } else if(diff===1){
-    cpWeekBadge.textContent = 'NEXT WEEK / 来週 →';
-    cpWeekBadge.style.background = 'rgba(255,255,255,0.12)';
-    cpWeekBadge.style.color = 'rgba(255,255,255,0.75)';
-    cpWeekBadge.classList.add('visible');
-  }
+ cpWeekBadge.classList.remove('visible');
+ cpWeekBadge.style.background = '';
+ cpWeekBadge.style.color = '';
+ cpWeekBadge.textContent = '';
+
+if (diff === 0) {
+  cpWeekBadge.textContent = '★ THIS WEEK / 今週 ★';
+  cpWeekBadge.style.background = `linear-gradient(90deg,${col1},${col2})`;
+  cpWeekBadge.style.color = '#000';
+  cpWeekBadge.classList.add('visible');
+} else if (diff < 0) {
+  cpWeekBadge.textContent = '← LAST WEEK / 先週';
+  cpWeekBadge.style.background = 'rgba(255,255,255,0.12)';
+  cpWeekBadge.style.color = 'rgba(255,255,255,0.75)';
+  cpWeekBadge.classList.add('visible');
+} else if (diff > 0) {
+  cpWeekBadge.textContent = 'NEXT WEEK / 来週 →';
+  cpWeekBadge.style.background = 'rgba(255,255,255,0.12)';
+  cpWeekBadge.style.color = 'rgba(255,255,255,0.75)';
+  cpWeekBadge.classList.add('visible');
+}
 
   // Wire the Games icon to br_games.html inside template/
   // The other icons remain as before (no-ops until wired)
