@@ -16,37 +16,60 @@ const MONTH_MAP = {
   dec: 'december'
 };
 
+const MONTHS_EN = {
+  jan: 'January',
+  feb: 'February',
+  mar: 'March',
+  apr: 'April',
+  may: 'May',
+  jun: 'June',
+  jul: 'July',
+  aug: 'August',
+  sep: 'September',
+  oct: 'October',
+  nov: 'November',
+  dec: 'December'
+};
+
+const MONTHS_JP = {
+  jan: '1月',
+  feb: '2月',
+  mar: '3月',
+  apr: '4月',
+  may: '5月',
+  jun: '6月',
+  jul: '7月',
+  aug: '8月',
+  sep: '9月',
+  oct: '10月',
+  nov: '11月',
+  dec: '12月'
+};
+
 export function getWeekParam() {
   const params = new URLSearchParams(window.location.search);
   return params.get('week') || '';
 }
 
-export function parseWeekSlug(weekSlug = '') {
-  const match = weekSlug.match(/^(pb|br|bc)_([a-z]{3})_w([1-4])$/i);
+export function parseWeekSlug(week) {
+  const m = week.match(/^(?:\d{4}_w\d{2}_)?([a-z]{3})_w([1-4])$/i);
+  if (!m) return null;
 
-  if (!match) {
-    return null;
-  }
-
-  const curriculum = match[1].toLowerCase();
-  const monthShort = match[2].toLowerCase();
-  const weekNumber = Number(match[3]);
-  const monthSlug = MONTH_MAP[monthShort];
-
-  if (!monthSlug) {
-    return null;
-  }
+  const monthShort = m[1].toLowerCase();
+  const weekNumber = Number(m[2]);
 
   return {
-    curriculum,
+    rawWeek: week,
     monthShort,
-    monthSlug,
-    weekNumber,
-    weekSlug: `${curriculum}_${monthShort}_w${weekNumber}`
+    monthDir: MONTH_MAP[monthShort] || monthShort,
+    monthLabel: MONTHS_EN[monthShort] || monthShort,
+    monthLabelJp: MONTHS_JP[monthShort] || monthShort,
+    weekNumber
   };
 }
 
-export function getPageContext() {
-  const week = getWeekParam();
-  return parseWeekSlug(week);
+export function prettyWeekLabel(week) {
+  const parsed = parseWeekSlug(week);
+  if (!parsed) return week;
+  return `${parsed.monthLabel} Week ${parsed.weekNumber} &middot; ${parsed.monthLabelJp}第${parsed.weekNumber}週`;
 }
