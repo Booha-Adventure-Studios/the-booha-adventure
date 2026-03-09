@@ -162,3 +162,14 @@ export function getCurrentCurriculumWeek(now = new Date()) {
     weekEnd: formatDateUTC(result.weekEnd)
   };
 }
+
+export function getAcademicWeekNumber(curriculumWeek) {
+  const cw = curriculumWeek || getCurrentCurriculumWeek();
+  return ((cw.month - 1) * 4) + cw.weekNumber;
+}
+
+export function getAcademicWeekKey(curriculumWeek) {
+  const cw = curriculumWeek || getCurrentCurriculumWeek();
+  const n = getAcademicWeekNumber(cw);
+  return `w${String(n).padStart(2, "0")}`;
+}
