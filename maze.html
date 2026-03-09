@@ -520,15 +520,12 @@ function monthColors(w) {
 function monthPrimary(w)   { return monthColors(w)[0]; }
 function monthSecondary(w) { return monthColors(w)[1]; }  
 
-function getWeekSlug(prefix, w){
-  const MONTH_ABBR = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov'];
-  const mo = MONTH_ABBR[WEEK_MONTH[w - 1]] || 'jan';
+function getWeekSlug(prefix, w) {
+  const MONTH_ABBR = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+  const monthIndex = Math.max(0, Math.min(11, Math.floor((w - 1) / 4)));
+  const mo = MONTH_ABBR[monthIndex] || 'jan';
 
-  let weekInMonth = 0;
-  for(let i = 0; i < w; i++){
-    if(WEEK_MONTH[i] === WEEK_MONTH[w - 1]) weekInMonth++;
-  }
-  weekInMonth = Math.min(weekInMonth, 4);
+  const weekInMonth = ((w - 1) % 4) + 1;
 
   return `${prefix}_${mo}_w${weekInMonth}`;
 }
