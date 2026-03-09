@@ -465,6 +465,7 @@ const OPEN_WEEKS = [
 const GHOST_TRAVEL_MS = 3800;
 const INTRO_GLOW_MS   = 2600;
 const INTRO_TRAVEL_MS = 3200;
+const INTRO_TOP_CENTER_START = { ix: IMG_W / 2, iy: -140 };  
   
 
 // ── Ghost images — index 0 is the "active" (Booha) one ──────────────────────
@@ -930,15 +931,19 @@ function drawFrame(now){
     CHECKPOINTS.forEach(cp=>{
       cpState[cp.w]={alpha:OPEN_WEEKS.includes(cp.w)?1:baseA*.78,extra:1.5};
     });
-    if(el>=INTRO_GLOW_MS){
-      introPhase='traveling'; introTravelStart=now;
-      introSrcIX = startCP.ix;
-      introSrcIY = startCP.iy;
-      ghostIX = introSrcIX;
-      ghostIY = introSrcIY;
-      
-      setTravelLock(true);
-    }
+
+  if(el>=INTRO_GLOW_MS){
+    introPhase = 'traveling';
+    introTravelStart = now;
+
+    introSrcIX = INTRO_TOP_CENTER_START.ix;
+    introSrcIY = INTRO_TOP_CENTER_START.iy;
+ 
+    ghostIX = introSrcIX;
+    ghostIY = introSrcIY;
+
+    setTravelLock(true);
+  }
 
   // ── Intro: ghost traveling ───────────────────────────
   } else if(introPhase==='traveling'){
