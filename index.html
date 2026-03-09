@@ -1,1 +1,1106 @@
 
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Booha Adventure</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bowlby+One&display=swap" rel="stylesheet" />
+  <style>
+    :root{
+      --bg:#000;
+      --pink:#ff3bbd;
+      --pink2:#ff79d7;
+      --text:#ffffff;
+      --muted:rgba(255,255,255,.7);
+      --safe-top:    env(safe-area-inset-top,    0px);
+      --safe-right:  env(safe-area-inset-right,  0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-left:   env(safe-area-inset-left,   0px);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial,
+        "Noto Sans","Hiragino Kaku Gothic ProN","Yu Gothic", sans-serif;
+      overscroll-behavior: none;
+    }
+
+    #app {
+      position: fixed;
+      inset: 0;
+      background: var(--bg) url('assets/img/background-1.png') center/cover no-repeat;
+      overflow: hidden;
+    }
+
+    #app::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at center,
+        rgba(0,0,0,.10) 0%,
+        rgba(0,0,0,.48) 100%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ══════════════════════════════════════════
+       LANDSCAPE OVERLAY
+    ══════════════════════════════════════════ */
+    #landscapeOverlay {
+      position: fixed; inset: 0;
+      display: none;
+      flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 28px 24px;
+      text-align: center;
+      background: rgba(0,0,0,.97);
+      z-index: 9999;
+    }
+    #landscapeOverlay.show { display: flex; }
+
+    .ls-phone {
+      font-size: clamp(56px, 16vmin, 88px);
+      line-height: 1;
+      margin-bottom: 14px;
+      display: block;
+      animation: wobblePhone 1.6s ease-in-out infinite;
+      transform-origin: center center;
+    }
+    @keyframes wobblePhone {
+      0%   { transform: rotate(-15deg); }
+      50%  { transform: rotate(15deg); }
+      100% { transform: rotate(-15deg); }
+    }
+
+    .ls-main-jp {
+      font-size: clamp(26px, 7vmin, 44px);
+      font-weight: 900;
+      color: var(--pink2);
+      margin: 0 0 10px;
+      line-height: 1.3;
+      text-shadow: 0 0 24px rgba(255,100,220,.5);
+    }
+
+    .ls-sub-jp {
+      font-size: clamp(15px, 4vmin, 22px);
+      color: rgba(255,255,255,.65);
+      margin: 0;
+      line-height: 1.6;
+    }
+
+    /* ══ SCENES ══ */
+    .scene {
+      position: absolute; inset: 0;
+      display: none;
+      z-index: 1;
+    }
+    .scene.active { display: flex; }
+
+    /* ── START ── */
+    #startScene {
+      background: #000;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(12px, 3vw, 22px);
+      padding:
+        calc(clamp(16px,3vw,24px) + var(--safe-top))
+        calc(clamp(16px,3vw,24px) + var(--safe-right))
+        calc(clamp(16px,3vw,24px) + var(--safe-bottom))
+        calc(clamp(16px,3vw,24px) + var(--safe-left));
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .ghostOuter {
+      position: relative;
+      width:  clamp(110px, 22vmin, 200px);
+      height: clamp(110px, 22vmin, 200px);
+      flex-shrink: 0;
+    }
+
+    .ghostWrap {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      pointer-events: none;
+      animation: floaty 3.8s ease-in-out infinite;
+      filter: drop-shadow(0 12px 24px rgba(0,0,0,.75));
+      will-change: transform, opacity;
+    }
+
+    .ghostWrap.flyAway {
+      animation: none;
+      transition:
+        transform 1800ms cubic-bezier(.15,.8,.25,1),
+        opacity   1600ms ease 200ms;
+      transform: translate3d(0,-85vh,0) scale(.7) rotate(-4deg);
+      opacity: 0;
+    }
+
+    @keyframes floaty {
+      0%   { transform: translateY(0px); }
+      50%  { transform: translateY(-12px); }
+      100% { transform: translateY(0px); }
+    }
+
+    .sparkleField {
+      position: absolute;
+      inset: -50px;
+      pointer-events: none;
+    }
+
+    .sp {
+      position: absolute;
+      border-radius: 50%;
+      background: #fff;
+      opacity: 0;
+      animation: sparkleLife var(--dur) ease-in-out var(--delay) infinite;
+      width: var(--size); height: var(--size);
+      top: var(--y); left: var(--x);
+      box-shadow:
+        0 0 4px 1px rgba(255,255,255,.9),
+        0 0 10px 3px rgba(255,100,220,.6);
+    }
+
+    @keyframes sparkleLife {
+      0%   { opacity: 0;    transform: scale(.4) translateY(0); }
+      20%  { opacity: 1;    transform: scale(1)  translateY(-6px); }
+      60%  { opacity: .85;  transform: scale(.9) translateY(-13px); }
+      100% { opacity: 0;    transform: scale(.3) translateY(-20px); }
+    }
+
+    #boohaGhost {
+      width: 100%; height: 100%;
+      object-fit: contain;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    /* ── VIDEO ── */
+    #videoScene {
+      background: #000;
+      align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    #introVideo {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      background: #000;
+    }
+
+    /* ══════════════════════════════════════════
+       HUB
+    ══════════════════════════════════════════ */
+    #hubScene {
+      background: transparent;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      display: none;
+    }
+    #hubScene.active { display: block; }
+
+    .hubScroll {
+      min-height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding:
+        calc(clamp(10px,2vw,18px) + var(--safe-top))
+        calc(clamp(10px,2vw,18px) + var(--safe-right))
+        calc(clamp(10px,2vw,18px) + var(--safe-bottom))
+        calc(clamp(10px,2vw,18px) + var(--safe-left));
+    }
+
+    .hub {
+      width: min(1100px, 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: clamp(8px, 1.8vw, 16px);
+    }
+
+    .hubHeading {
+      text-align: center;
+      font-family: 'Bowlby One', system-ui, sans-serif;
+      font-size: clamp(20px, 4.5vw, 48px);
+      font-weight: 400;
+      letter-spacing: 3px;
+      color: #fff;
+      text-shadow:
+        0 0 32px rgba(255,140,255,.65),
+        0 0 80px rgba(255,80,200,.3),
+        0 2px 8px rgba(0,0,0,.9);
+      line-height: 1.1;
+    }
+
+    .hubRow {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap: clamp(8px, 1.6vw, 14px);
+      width: 100%;
+    }
+
+    @media (orientation: portrait), (max-width: 600px) {
+      .hubRow {
+        grid-template-columns: 1fr;
+      }
+      .weekCard {
+        height: auto !important;
+        min-height: 80px;
+        padding: 14px 16px 12px !important;
+      }
+    }
+
+    /* ── Week card ── */
+    .weekCard {
+      position: relative;
+      border-radius: clamp(14px,2vw,22px);
+      overflow: hidden;
+      padding: clamp(10px,1.6vw,16px) clamp(10px,1.6vw,16px) clamp(8px,1.2vw,12px);
+      height: clamp(100px, 14vw, 140px);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      text-align: center;
+      cursor: pointer;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      transform: translateZ(0);
+      will-change: transform;
+      backface-visibility: hidden;
+      transition: transform 220ms ease, box-shadow 220ms ease;
+
+      background: rgba(255,255,255,.09);
+      backdrop-filter: blur(18px) saturate(160%);
+      -webkit-backdrop-filter: blur(18px) saturate(160%);
+
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,.22),
+        0 6px 24px rgba(0,0,0,.35),
+        0 0 0 2px hsl(var(--hue,0deg) 90% 65% / .7),
+        0 0 18px 4px hsl(var(--hue,0deg) 90% 65% / .30);
+
+      animation: rainbowHue var(--rainbow-speed,5s) linear infinite;
+      animation-delay: var(--rainbow-offset,0s);
+    }
+
+    @property --hue {
+      syntax: '<angle>';
+      inherits: false;
+      initial-value: 0deg;
+    }
+    @keyframes rainbowHue {
+      from { --hue: 0deg; }
+      to   { --hue: 360deg; }
+    }
+
+    .weekCard:nth-child(1) { --rainbow-offset: 0s;     --rainbow-speed: 5s; }
+    .weekCard:nth-child(2) { --rainbow-offset: -1.67s; --rainbow-speed: 5s; }
+    .weekCard:nth-child(3) { --rainbow-offset: -3.33s; --rainbow-speed: 5s; }
+
+    .weekCard::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(
+        120deg,
+        transparent 30%,
+        rgba(255,255,255,.18) 50%,
+        transparent 70%
+      );
+      transform: translateX(-100%);
+      animation: shimmerSweep 3.8s ease-in-out infinite;
+      animation-delay: var(--shimmer-offset,0s);
+      pointer-events: none;
+    }
+    .weekCard:nth-child(1)::before { --shimmer-offset: 0s; }
+    .weekCard:nth-child(2)::before { --shimmer-offset: 1.2s; }
+    .weekCard:nth-child(3)::before { --shimmer-offset: 2.4s; }
+
+    @keyframes shimmerSweep {
+      0%   { transform: translateX(-100%) skewX(-12deg); opacity: 0; }
+      20%  { opacity: 1; }
+      60%  { transform: translateX(200%)  skewX(-12deg); opacity: 0; }
+      100% { transform: translateX(200%)  skewX(-12deg); opacity: 0; }
+    }
+
+    .weekCard:hover {
+      transform: translateY(-3px) scale(1.015) translateZ(0);
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,.32),
+        0 12px 32px rgba(0,0,0,.45),
+        0 0 0 2px hsl(var(--hue,0deg) 90% 70% / .9),
+        0 0 28px 6px hsl(var(--hue,0deg) 90% 65% / .45);
+    }
+    .weekCard:active { transform: scale(.99) translateZ(0); }
+
+    .weekTag {
+      font-weight: 900; letter-spacing: 1.5px;
+      font-size: clamp(9px,1.2vw,12px);
+      text-transform: uppercase;
+      color: rgba(255,255,255,.6);
+    }
+    .weekTag span { color: rgba(255,255,255,.9); margin-left: 4px; }
+
+    .weekTitle {
+      font-size: clamp(12px, 2vw, 19px);
+      font-weight: 900; letter-spacing: .4px;
+      color: #fff;
+      text-shadow: 0 2px 12px rgba(0,0,0,.6);
+      margin-top: 4px;
+      line-height: 1.2;
+    }
+
+    .weekDates {
+      font-size: clamp(9px, 1.2vw, 12px);
+      color: rgba(255,255,255,.65);
+      margin-top: 3px;
+      line-height: 1.3;
+    }
+
+    .weekHint {
+      font-size: clamp(8px,1vw,10px);
+      letter-spacing: 1.5px;
+      color: rgba(255,255,255,.40);
+      text-transform: uppercase;
+    }
+
+    .hubBottom {
+      display: flex;
+      justify-content: center;
+      padding-top: 2px;
+    }
+
+    /* ── Shared button ── */
+    .btn {
+      appearance: none; border: 0;
+      border-radius: 999px;
+      padding: clamp(10px,1.6vw,13px) clamp(16px,2.5vw,22px);
+      font-size: clamp(13px,1.8vw,17px);
+      font-weight: 900; letter-spacing: .6px;
+      cursor: pointer; color: #000;
+      background: linear-gradient(180deg, var(--pink2), var(--pink));
+      box-shadow:
+        0 8px 18px rgba(255,59,189,.28),
+        0 0 0 2px rgba(255,59,189,.15),
+        0 0 22px rgba(255,59,189,.30);
+      transform: translateZ(0);
+      -webkit-tap-highlight-color: transparent;
+      white-space: nowrap;
+    }
+    .btn:active { transform: scale(.98) translateZ(0); }
+    .btnSmall {
+      padding: clamp(8px,1.2vw,11px) clamp(12px,2vw,18px);
+      font-size: clamp(12px,1.5vw,14px);
+    }
+
+    /* ── Fade layer ── */
+    #fade {
+      position: absolute; inset: 0;
+      background: #000; opacity: 0;
+      pointer-events: none;
+      will-change: opacity;
+      transition: opacity 520ms ease;
+      z-index: 40;
+    }
+    #fade.on { opacity: 1; pointer-events: all; }
+
+    /* ══════════════════════════════════════════
+       PICKER
+    ══════════════════════════════════════════ */
+    .picker {
+      position: absolute; inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding:
+        calc(clamp(10px,2vw,16px) + var(--safe-top))
+        calc(clamp(10px,2vw,16px) + var(--safe-right))
+        calc(clamp(10px,2vw,16px) + var(--safe-bottom))
+        calc(clamp(10px,2vw,16px) + var(--safe-left));
+      background:
+        radial-gradient(ellipse at center,
+          rgba(0,0,0,.55) 0%,
+          rgba(0,0,0,.82) 65%,
+          rgba(0,0,0,.92) 100%);
+      backdrop-filter: blur(10px) saturate(130%);
+      -webkit-backdrop-filter: blur(10px) saturate(130%);
+      z-index: 60;
+    }
+    .picker.show { display: flex; }
+
+    .pickerPanel {
+      position: relative;
+      width: min(420px, 92%);
+      border-radius: clamp(20px,3vw,28px);
+      overflow: hidden;
+      padding: clamp(14px,2.5vw,20px) clamp(14px,2vw,18px);
+      margin: auto;
+
+      background: rgba(255,255,255,.09);
+      backdrop-filter: blur(22px) saturate(160%);
+      -webkit-backdrop-filter: blur(22px) saturate(160%);
+      will-change: transform;
+
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,.22),
+        0 26px 70px rgba(0,0,0,.75),
+        0 0 0 2px hsl(var(--hue,0deg) 90% 65% / .75),
+        0 0 34px 8px hsl(var(--hue,0deg) 90% 65% / .35);
+
+      animation: rainbowHue 5s linear infinite;
+    }
+
+    .pickerPanel::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(
+        120deg,
+        transparent 35%,
+        rgba(255,255,255,.14) 50%,
+        transparent 65%
+      );
+      transform: translateX(-110%) skewX(-12deg);
+      animation: shimmerSweep 4.2s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    .pickerTop {
+      display: flex; align-items: center;
+      justify-content: space-between; gap: 8px;
+      position: relative; z-index: 1;
+    }
+
+    .pickerTitle {
+      font-family: 'Bowlby One', system-ui, sans-serif;
+      font-size: clamp(13px, 2.2vw, 20px);
+      letter-spacing: 2px;
+      text-align: center; flex: 1;
+      text-shadow:
+        0 0 24px rgba(255,140,255,.55),
+        0 2px 10px rgba(0,0,0,.85);
+    }
+
+    .ghostBtn {
+      appearance: none;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(0,0,0,.22);
+      color: rgba(255,255,255,.92);
+      border-radius: 999px;
+      padding: clamp(6px,1vw,9px) clamp(10px,1.6vw,14px);
+      font-size: clamp(10px,1.4vw,13px);
+      font-weight: 900; letter-spacing: .4px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      white-space: nowrap;
+      flex-shrink: 0;
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,.10),
+        0 8px 18px rgba(0,0,0,.30);
+    }
+    .ghostBtn:hover  { background: rgba(255,255,255,.10); }
+    .ghostBtn:active { transform: scale(.99); }
+
+    .pickerSub {
+      margin-top: 6px;
+      color: rgba(255,255,255,.72);
+      font-size: clamp(10px,1.5vw,13px);
+      text-align: center;
+      position: relative; z-index: 1;
+    }
+
+    .pickerSub2 {
+      margin-top: 4px;
+      font-size: clamp(9px,1.2vw,12px);
+      color: rgba(255,255,255,.45);
+      text-align: center;
+      position: relative; z-index: 1;
+    }
+
+    .pickerGrid {
+      display: flex;
+      flex-direction: column;
+      gap: clamp(7px,1.2vw,10px);
+      margin-top: clamp(10px,1.8vw,14px);
+      position: relative; z-index: 1;
+    }
+
+    .pickTile {
+      appearance: none; border: 0;
+      border-radius: clamp(12px,2vw,18px);
+      padding: clamp(10px,1.6vw,14px) clamp(14px,2vw,18px);
+      cursor: pointer;
+      text-align: left;
+      color: #fff;
+      width: 100%;
+      background: rgba(0,0,0,.16);
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,.18),
+        0 12px 24px rgba(0,0,0,.30),
+        0 0 0 2px hsl(var(--tileHue,210deg) 90% 65% / .50),
+        0 0 20px 4px hsl(var(--tileHue,210deg) 90% 65% / .18);
+      transition: transform 160ms ease, box-shadow 200ms ease, background 200ms ease;
+      -webkit-tap-highlight-color: transparent;
+      will-change: transform;
+    }
+
+    .pickTile:hover {
+      transform: translateY(-2px) translateZ(0);
+      background: rgba(255,255,255,.08);
+    }
+    .pickTile:active { transform: scale(.99) translateZ(0); }
+
+    .pickTile[data-curr="preboo"]       { --tileHue: 315deg; }
+    .pickTile[data-curr="booriculum"]   { --tileHue: 190deg; }
+    .pickTile[data-curr="boocontinuum"] { --tileHue: 120deg; }
+
+    .tileTop {
+      display: flex;
+      align-items: center;
+      gap: clamp(8px,1.4vw,12px);
+    }
+
+    .tileIcon {
+      flex-shrink: 0;
+      width:  clamp(32px,4.5vw,48px);
+      height: clamp(32px,4.5vw,48px);
+      border-radius: clamp(8px,1.4vw,14px);
+      display: grid; place-items: center;
+      background: rgba(255,255,255,.08);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.18);
+    }
+
+    .tileIcon img {
+      width: 70%; height: 70%;
+      object-fit: contain;
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-drag: none;
+      filter: drop-shadow(0 0 8px rgba(255,255,255,.35));
+      transition: transform 200ms ease;
+    }
+    .pickTile:hover .tileIcon img { transform: scale(1.10); }
+
+    .tileName {
+      font-size: clamp(13px,1.8vw,17px);
+      font-weight: 900; letter-spacing: .3px; line-height: 1.1;
+    }
+
+    .tileJp {
+      display: block;
+      margin-top: 3px;
+      font-size: clamp(10px,1.2vw,12px);
+      color: rgba(255,255,255,.65);
+    }
+
+    .pickerNote {
+      margin-top: clamp(8px,1.4vw,12px);
+      font-size: clamp(9px,1.1vw,11px);
+      color: rgba(255,255,255,.45);
+      text-align: center;
+      position: relative; z-index: 1;
+    }
+
+    /* ══ REDUCED MOTION ══ */
+    @media (prefers-reduced-motion: reduce) {
+      .ghostWrap, .ls-phone { animation: none; }
+      #fade { transition: none; }
+      .weekCard, .weekCard::before,
+      .pickerPanel, .pickerPanel::before { animation: none; }
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <!-- Landscape overlay -->
+  <div id="landscapeOverlay" aria-hidden="true">
+    <span class="ls-phone">📱</span>
+    <p class="ls-main-jp">よこむきにしてね！</p>
+    <p class="ls-sub-jp">
+      スマホをよこにむけると<br>
+      ブーハアドベンチャーが<br>
+      はじまるよ！
+    </p>
+  </div>
+
+  <!-- ── START ── -->
+  <section id="startScene" class="scene active" aria-label="Start">
+    <div class="ghostOuter">
+      <div class="sparkleField" aria-hidden="true"></div>
+      <div class="ghostWrap" aria-hidden="true">
+        <img id="boohaGhost" src="assets/img/booha_ghost.png" alt="Booha" />
+      </div>
+    </div>
+    <button id="startBtn" class="btn" type="button">スタート</button>
+  </section>
+
+  <!-- ── VIDEO ── -->
+  <section id="videoScene" class="scene" aria-label="Intro video">
+    <video id="introVideo" preload="auto" playsinline webkit-playsinline>
+      <source src="assets/video/intro.mp4" type="video/mp4" />
+    </video>
+  </section>
+
+  <!-- ── HUB ── -->
+  <section id="hubScene" class="scene" aria-label="Week Hub">
+    <div class="hubScroll">
+      <div class="hub">
+        <div class="hubHeading">BOOHA ADVENTURE</div>
+        <div class="hubRow" id="weekCards"></div>
+        <div class="hubBottom">
+          <button id="mazeBtn" class="btn btnSmall" type="button">めいろへ（Maze）</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Curriculum picker ── -->
+  <div id="picker" class="picker" aria-hidden="true">
+    <div class="pickerPanel" role="dialog" aria-modal="true" aria-label="Choose Curriculum">
+      <div class="pickerTop">
+        <div style="width:52px;flex-shrink:0;"></div>
+        <div class="pickerTitle" id="pickerTitle">THIS WEEK（今週）</div>
+        <button id="pickerClose" class="ghostBtn" type="button">戻る</button>
+      </div>
+      <div class="pickerSub" id="pickerDates"></div>
+      <div class="pickerSub2">カリキュラムをえらんでね</div>
+
+      <div class="pickerGrid">
+        <button class="pickTile" type="button" data-curr="preboo">
+          <div class="tileTop">
+            <div class="tileIcon"><img src="assets/img/pre-boo.png" alt="Pre-Boo" /></div>
+            <div>
+              <div class="tileName">Pre-Boo</div>
+              <span class="tileJp">プレブー</span>
+            </div>
+          </div>
+        </button>
+        <button class="pickTile" type="button" data-curr="booriculum">
+          <div class="tileTop">
+            <div class="tileIcon"><img src="assets/img/boo-tree.png" alt="Boo-riculum" /></div>
+            <div>
+              <div class="tileName">Boo-riculum</div>
+              <span class="tileJp">ブーリキュラム</span>
+            </div>
+          </div>
+        </button>
+        <button class="pickTile" type="button" data-curr="boocontinuum">
+          <div class="tileTop">
+            <div class="tileIcon"><img src="assets/img/cont-tree.png" alt="Boo-continuum" /></div>
+            <div>
+              <div class="tileName">Boo-continuum</div>
+              <span class="tileJp">ブーコンティニューム</span>
+            </div>
+          </div>
+        </button>
+      </div>
+
+      <div class="pickerNote">※ 利用できる週のみリンクが有効です</div>
+    </div>
+  </div>
+
+  <div id="fade" aria-hidden="true"></div>
+</div>
+
+<script type="module">
+import { getCurrentCurriculumWeek } from './js/calendar.js';
+
+console.log('CURRENT CURRICULUM WEEK:', getCurrentCurriculumWeek());  
+/* ════════════════════════════════════════════════════════════
+   WEEK FOLDER MAPPING
+   48 weeks per year: Jan w1 = w01 … Dec w4 = w48
+   Folder format: YYYY_wNN_mmm_wN
+   (year is the academic year, currently 2027)
+════════════════════════════════════════════════════════════ */
+const ACADEMIC_YEAR = 2027; // ★ UPDATE EACH ACADEMIC YEAR ★
+
+const WEEK_FOLDERS = {
+  'jan_w1': `${ACADEMIC_YEAR}_w01_jan_w1`,
+  'jan_w2': `${ACADEMIC_YEAR}_w02_jan_w2`,
+  'jan_w3': `${ACADEMIC_YEAR}_w03_jan_w3`,
+  'jan_w4': `${ACADEMIC_YEAR}_w04_jan_w4`,
+  'feb_w1': `${ACADEMIC_YEAR}_w05_feb_w1`,
+  'feb_w2': `${ACADEMIC_YEAR}_w06_feb_w2`,
+  'feb_w3': `${ACADEMIC_YEAR}_w07_feb_w3`,
+  'feb_w4': `${ACADEMIC_YEAR}_w08_feb_w4`,
+  'mar_w1': `${ACADEMIC_YEAR}_w09_mar_w1`,
+  'mar_w2': `${ACADEMIC_YEAR}_w10_mar_w2`,
+  'mar_w3': `${ACADEMIC_YEAR}_w11_mar_w3`,
+  'mar_w4': `${ACADEMIC_YEAR}_w12_mar_w4`,
+  'apr_w1': `${ACADEMIC_YEAR}_w13_apr_w1`,
+  'apr_w2': `${ACADEMIC_YEAR}_w14_apr_w2`,
+  'apr_w3': `${ACADEMIC_YEAR}_w15_apr_w3`,
+  'apr_w4': `${ACADEMIC_YEAR}_w16_apr_w4`,
+  'may_w1': `${ACADEMIC_YEAR}_w17_may_w1`,
+  'may_w2': `${ACADEMIC_YEAR}_w18_may_w2`,
+  'may_w3': `${ACADEMIC_YEAR}_w19_may_w3`,
+  'may_w4': `${ACADEMIC_YEAR}_w20_may_w4`,
+  'jun_w1': `${ACADEMIC_YEAR}_w21_jun_w1`,
+  'jun_w2': `${ACADEMIC_YEAR}_w22_jun_w2`,
+  'jun_w3': `${ACADEMIC_YEAR}_w23_jun_w3`,
+  'jun_w4': `${ACADEMIC_YEAR}_w24_jun_w4`,
+  'jul_w1': `${ACADEMIC_YEAR}_w25_jul_w1`,
+  'jul_w2': `${ACADEMIC_YEAR}_w26_jul_w2`,
+  'jul_w3': `${ACADEMIC_YEAR}_w27_jul_w3`,
+  'jul_w4': `${ACADEMIC_YEAR}_w28_jul_w4`,
+  'aug_w1': `${ACADEMIC_YEAR}_w29_aug_w1`,
+  'aug_w2': `${ACADEMIC_YEAR}_w30_aug_w2`,
+  'aug_w3': `${ACADEMIC_YEAR}_w31_aug_w3`,
+  'aug_w4': `${ACADEMIC_YEAR}_w32_aug_w4`,
+  'sep_w1': `${ACADEMIC_YEAR}_w33_sep_w1`,
+  'sep_w2': `${ACADEMIC_YEAR}_w34_sep_w2`,
+  'sep_w3': `${ACADEMIC_YEAR}_w35_sep_w3`,
+  'sep_w4': `${ACADEMIC_YEAR}_w36_sep_w4`,
+  'oct_w1': `${ACADEMIC_YEAR}_w37_oct_w1`,
+  'oct_w2': `${ACADEMIC_YEAR}_w38_oct_w2`,
+  'oct_w3': `${ACADEMIC_YEAR}_w39_oct_w3`,
+  'oct_w4': `${ACADEMIC_YEAR}_w40_oct_w4`,
+  'nov_w1': `${ACADEMIC_YEAR}_w41_nov_w1`,
+  'nov_w2': `${ACADEMIC_YEAR}_w42_nov_w2`,
+  'nov_w3': `${ACADEMIC_YEAR}_w43_nov_w3`,
+  'nov_w4': `${ACADEMIC_YEAR}_w44_nov_w4`,
+  'dec_w1': `${ACADEMIC_YEAR}_w45_dec_w1`,
+  'dec_w2': `${ACADEMIC_YEAR}_w46_dec_w2`,
+  'dec_w3': `${ACADEMIC_YEAR}_w47_dec_w3`,
+  'dec_w4': `${ACADEMIC_YEAR}_w48_dec_w4`,
+};
+
+/**
+ * Convert a weekId (e.g. "2026_mar_w1") to the folder key used
+ * in WEEK_FOLDERS (e.g. "mar_w1"). The weekId from buildWeekData()
+ * is formatted as "YYYY_mmm_wN".
+ */
+function weekIdToFolderKey(weekId) {
+  // weekId = "2026_mar_w1" → strip the year prefix → "mar_w1"
+  return weekId.replace(/^\d{4}_/, '');
+}
+
+/**
+ * Navigate to the shared curriculum template, passing the week folder
+ * as a query param. The template wires up the deck links dynamically.
+ * Path: template/CURR.html?week=FOLDER_NAME
+ */
+function navigateToCurriculum(weekId, curr) {
+  const key    = weekIdToFolderKey(weekId);
+  const folder = WEEK_FOLDERS[key];
+
+  if (!folder) {
+    alert('このコンテンツはまだ準備中です。\nThis content isn\'t available yet.');
+    return;
+  }
+
+  const url = `template/${curr}.html?week=${folder}`;
+  fadeToBlack(true);
+  setTimeout(() => { window.location.href = url; }, 520);
+}
+
+/* ════════════════════════════════════════════════════════════
+   WEEK CALCULATION — always based on real Japan time (JST)
+════════════════════════════════════════════════════════════ */
+const MONTH_ABBR = ['Jan','Feb','Mar','Apr','May','Jun',
+                    'Jul','Aug','Sep','Oct','Nov','Dec'];
+const MONTH_JP   = ['1月','2月','3月','4月','5月','6月',
+                    '7月','8月','9月','10月','11月','12月'];
+const MONTH_FULL = ['January','February','March','April','May','June',
+                    'July','August','September','October','November','December'];
+
+function tokyoToday() {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Asia/Tokyo',
+    year: 'numeric', month: '2-digit', day: '2-digit'
+  }).formatToParts(new Date());
+  const map = {};
+  parts.forEach(p => { if (p.type !== 'literal') map[p.type] = +p.value; });
+  return { y: map.year, m: map.month, d: map.day };
+}
+
+function toMs({ y, m, d }) { return Date.UTC(y, m - 1, d); }
+function addDays(ymd, n) {
+  const dt = new Date(toMs(ymd) + n * 86400000);
+  return { y: dt.getUTCFullYear(), m: dt.getUTCMonth() + 1, d: dt.getUTCDate() };
+}
+function dow(ymd) { return new Date(toMs(ymd)).getUTCDay(); }
+function weekSunday(ymd) { return addDays(ymd, -dow(ymd)); }
+
+function fmtRange(sun, sat) {
+  const en = d => `${MONTH_ABBR[d.m - 1]} ${d.d}`;
+  const jp = d => `${MONTH_JP[d.m - 1]}${d.d}日`;
+  return `${en(sun)} – ${en(sat)}（${jp(sun)}–${jp(sat)}）`;
+}
+
+function weekLabel(sun) {
+  let count = 0;
+  let cur = { y: sun.y, m: sun.m, d: 1 };
+  const sunMs = toMs(sun);
+  while (toMs(cur) <= sunMs) {
+    if (dow(cur) === 0) count++;
+    cur = addDays(cur, 1);
+  }
+  return `${MONTH_FULL[sun.m - 1]} Week ${Math.min(count, 4)}`;
+}
+
+function weekIdFor(sun) {
+  const mo = ['jan','feb','mar','apr','may','jun',
+              'jul','aug','sep','oct','nov','dec'][sun.m - 1];
+  let count = 0;
+  let cur = { y: sun.y, m: sun.m, d: 1 };
+  const sunMs = toMs(sun);
+  while (toMs(cur) <= sunMs) {
+    if (dow(cur) === 0) count++;
+    cur = addDays(cur, 1);
+  }
+  return `${ACADEMIC_YEAR}_${mo}_w${Math.min(count, 4)}`;
+}
+
+function buildWeekData() {
+  const today   = tokyoToday();
+  const thisSun = weekSunday(today);
+  const thisSat = addDays(thisSun, 6);
+  const lastSun = addDays(thisSun, -7);
+  const lastSat = addDays(lastSun, 6);
+  const nextSun = addDays(thisSun,  7);
+  const nextSat = addDays(nextSun,  6);
+  return [
+    { tagEn:'LAST WEEK', tagJp:'先週', title:weekLabel(lastSun), range:fmtRange(lastSun,lastSat), weekId:weekIdFor(lastSun) },
+    { tagEn:'THIS WEEK', tagJp:'今週', title:weekLabel(thisSun), range:fmtRange(thisSun,thisSat), weekId:weekIdFor(thisSun) },
+    { tagEn:'NEXT WEEK', tagJp:'来週', title:weekLabel(nextSun), range:fmtRange(nextSun,nextSat), weekId:weekIdFor(nextSun) }
+  ];
+}
+
+/* ════════════════════════════════════════════════════════════
+   ORIENTATION
+════════════════════════════════════════════════════════════ */
+const lsOverlay  = document.getElementById('landscapeOverlay');
+const startScene = document.getElementById('startScene');
+const videoScene = document.getElementById('videoScene');
+const hubScene   = document.getElementById('hubScene');
+
+function checkOrientation() {
+  const portrait = window.matchMedia('(orientation: portrait)').matches;
+  const onBlockedScene =
+    startScene.classList.contains('active') ||
+    videoScene.classList.contains('active');
+  const show = portrait && onBlockedScene;
+  lsOverlay.classList.toggle('show', show);
+  lsOverlay.setAttribute('aria-hidden', show ? 'false' : 'true');
+}
+
+window.addEventListener('resize',            checkOrientation, { passive: true });
+window.addEventListener('orientationchange', checkOrientation, { passive: true });
+
+function showScene(el) {
+  [startScene, videoScene, hubScene].forEach(s => s.classList.remove('active'));
+  el.classList.add('active');
+  if (el === hubScene) hubScene.scrollTop = 0;
+  checkOrientation();
+}
+
+const fade = document.getElementById('fade');
+function fadeToBlack(on) { fade.classList.toggle('on', !!on); }
+
+checkOrientation();
+
+/* ════════════════════════════════════════════════════════════
+   SPARKLES
+════════════════════════════════════════════════════════════ */
+(function () {
+  const field = document.querySelector('.sparkleField');
+  if (!field) return;
+  for (let i = 0; i < 32; i++) {
+    const sp = document.createElement('div');
+    sp.className = 'sp';
+    const angle  = (i / 32) * Math.PI * 2;
+    const r      = 28 + Math.random() * 22;
+    const cx     = 50 + Math.cos(angle) * r;
+    const cy     = 50 + Math.sin(angle) * r;
+    const size   = 2 + Math.random() * 3;
+    const dur    = 1.4 + Math.random() * 2;
+    const delay  = -(Math.random() * dur);
+    sp.style.cssText = `--size:${size}px;--x:${cx}%;--y:${cy}%;--dur:${dur}s;--delay:${delay}s;`;
+    field.appendChild(sp);
+  }
+})();
+
+/* ════════════════════════════════════════════════════════════
+   HUB CARDS
+════════════════════════════════════════════════════════════ */
+function renderHub() {
+  const container = document.getElementById('weekCards');
+  container.innerHTML = '';
+  buildWeekData().forEach(wk => {
+    const card = document.createElement('div');
+    card.className      = 'weekCard';
+    card.dataset.weekId = wk.weekId;
+    card.innerHTML = `
+      <div>
+        <div class="weekTag">${wk.tagEn}<span>（${wk.tagJp}）</span></div>
+        <div class="weekTitle">${wk.title}</div>
+        <div class="weekDates">${wk.range}</div>
+      </div>
+      <div class="weekHint">TAP TO OPEN</div>`;
+    card.addEventListener('click', () =>
+      openPicker(wk.tagEn, wk.tagJp, wk.range, wk.weekId));
+    container.appendChild(card);
+  });
+}
+
+/* ════════════════════════════════════════════════════════════
+   PICKER — opens curriculum selector for a week
+════════════════════════════════════════════════════════════ */
+const picker      = document.getElementById('picker');
+const pickerTitle = document.getElementById('pickerTitle');
+const pickerDates = document.getElementById('pickerDates');
+const pickerClose = document.getElementById('pickerClose');
+
+let currentWeekId = '';
+
+function openPicker(tagEn, tagJp, dates, weekId) {
+  if (!weekId) return;
+  currentWeekId = weekId;
+  pickerTitle.textContent = `${tagEn}（${tagJp}）`;
+  pickerDates.textContent = dates;
+  picker.scrollTop = 0;
+  picker.classList.add('show');
+  picker.setAttribute('aria-hidden', 'false');
+}
+
+function closePicker() {
+  picker.classList.remove('show');
+  picker.setAttribute('aria-hidden', 'true');
+}
+
+pickerClose.addEventListener('click', closePicker);
+picker.addEventListener('click', e => { if (e.target === picker) closePicker(); });
+
+/* Curriculum tile → navigate to the correct week folder */
+document.querySelectorAll('.pickTile').forEach(btn => {
+  btn.addEventListener('click', e => {
+    e.stopPropagation();          // prevent backdrop click firing closePicker twice
+    const weekId = currentWeekId; // capture before any state changes
+    const curr   = btn.dataset.curr;
+    closePicker();
+    navigateToCurriculum(weekId, curr);
+  });
+});
+
+/* ════════════════════════════════════════════════════════════
+   MAZE BUTTON — direct navigation
+════════════════════════════════════════════════════════════ */
+const mazeBtn = document.getElementById('mazeBtn');
+mazeBtn.addEventListener('click', () => {
+  sessionStorage.setItem('booha_return_to_hub', '1');
+  fadeToBlack(true);
+  setTimeout(() => { window.location.href = 'maze.html'; }, 520);
+});
+
+/* ════════════════════════════════════════════════════════════
+   START FLOW
+════════════════════════════════════════════════════════════ */
+const startBtn   = document.getElementById('startBtn');
+const introVideo = document.getElementById('introVideo');
+const ghostWrap  = document.querySelector('.ghostWrap');
+
+let started = false, fadingOut = false;
+
+async function startIntro() {
+  if (started) return;
+  started = true;
+  ghostWrap.classList.add('flyAway');
+  fadeToBlack(true);
+  await new Promise(r => setTimeout(r, 900));
+  showScene(videoScene);
+  try { introVideo.currentTime = 0; } catch(e) {}
+  requestAnimationFrame(() => requestAnimationFrame(() => fadeToBlack(false)));
+  try {
+    await introVideo.play();
+  } catch (err) {
+    started = false; fadingOut = false;
+    ghostWrap.classList.remove('flyAway');
+    showScene(startScene);
+    fadeToBlack(false);
+    alert('もう一度「スタート」をタップしてください。');
+  }
+}
+
+startBtn.addEventListener('click', startIntro);
+
+/* ════════════════════════════════════════════════════════════
+   VIDEO → HUB
+════════════════════════════════════════════════════════════ */
+const FADE_MS = 520;
+let hubRendered = false;
+
+try { renderHub(); hubRendered = true; } catch(e) { console.error(e); }
+
+async function goToHub() {
+  if (fadingOut) return;
+  fadingOut = true;
+  fadeToBlack(true);
+  await new Promise(r => setTimeout(r, FADE_MS));
+  try { introVideo.pause(); } catch(e) {}
+  showScene(hubScene);
+  if (!hubRendered) { try { renderHub(); hubRendered = true; } catch(e) {} }
+  requestAnimationFrame(() => requestAnimationFrame(() => fadeToBlack(false)));
+}
+
+introVideo.addEventListener('timeupdate', () => {
+  const d = introVideo.duration;
+  if (!isFinite(d) || d <= 0) return;
+  if (d - introVideo.currentTime <= 0.85) goToHub();
+});
+introVideo.addEventListener('ended', goToHub);
+introVideo.addEventListener('error', goToHub);
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) try { introVideo.pause(); } catch(e) {}
+});
+
+/* ════════════════════════════════════════════════════════════
+   BACK-BUTTON / BFCACHE HUB RESTORE
+   Three ways we can return here from a study-deck page:
+   1. bfcache restore  (ev.persisted = true)
+   2. sessionStorage flag set by any deck/index page on load
+   3. #hub hash in URL (legacy/fallback)
+   All three jump straight to the hub scene.
+════════════════════════════════════════════════════════════ */
+function jumpToHub() {
+  try { introVideo.pause(); } catch(e2) {}
+  closePicker();
+  ghostWrap.classList.remove('flyAway');
+  [startScene, videoScene, hubScene].forEach(s => s.classList.remove('active'));
+  hubScene.classList.add('active');
+  fade.classList.remove('on');
+  fadingOut = false;
+  started   = false;
+  if (!hubRendered) { try { renderHub(); hubRendered = true; } catch(e2) {} }
+  sessionStorage.removeItem('booha_return_to_hub');
+  if (window.location.hash === '#hub') {
+    history.replaceState(null, '', window.location.pathname + window.location.search);
+  }
+}
+
+/* On every page load: check sessionStorage flag */
+if (sessionStorage.getItem('booha_return_to_hub')) {
+  jumpToHub();
+}
+
+/* On bfcache restore or hash-based return */
+window.addEventListener('pageshow', ev => {
+  if (ev.persisted || window.location.hash === '#hub' ||
+      sessionStorage.getItem('booha_return_to_hub')) {
+    jumpToHub();
+  }
+});
+</script>
+</body>
+</html>
