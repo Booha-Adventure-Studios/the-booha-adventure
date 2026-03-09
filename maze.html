@@ -211,13 +211,17 @@ const OPEN_WEEKS = [
 
 const GHOST_TRAVEL_MS = 3800;
 
-// ── Ghost intro phases: allGlow → dropping → bouncing → settling → done ──
+// ── Ghost intro: slow elegant descent then glide to checkpoint ──
+// One smooth continuous animation, no abrupt phase switches.
+// Phase 1 (dropping): ghost floats down from above with gentle horizontal sway — slow & dreamlike
+// Phase 2 (hovering): brief pause floating at center, gently bobbing
+// Phase 3 (settling): smooth cubic ease glide to checkpoint
 const INTRO_GLOW_MS   = 2600;
-const INTRO_DROP_MS   = 2400;   // slower drop from sky
-const INTRO_BOUNCE_MS = 1900;   // playful loop/spin at center
-const INTRO_SETTLE_MS = 1500;   // glide to checkpoint
-const INTRO_TOP_CENTER_START = { ix: IMG_W / 2, iy: -180 };
-const INTRO_BOUNCE_LAND = { ix: IMG_W / 2, iy: 290 };
+const INTRO_DROP_MS   = 3800;   // phase 1: slow dreamy descent
+const INTRO_HOVER_MS  = 1200;   // phase 2: hover & breathe at center
+const INTRO_SETTLE_MS = 2200;   // phase 3: long smooth glide to CP
+const INTRO_TOP_CENTER_START = { ix: IMG_W / 2, iy: -100 };
+const INTRO_HOVER_LAND = { ix: IMG_W / 2, iy: 300 }; // where ghost hovers
 
 const GHOSTS = [
   'assets/img/booha_ghost.png',
@@ -227,10 +231,12 @@ const GHOSTS = [
   'assets/img/purple-boo.png'
 ];
 
-// ── Trees — image-space coords, drawn on canvas ──
-// Ghost diameter = 56px (gR*2=28*2). Trees = 2.5× = 140px logical.
-const TREE_HALF = 70;   // half of 140
-const TREE_H    = 140;
+// ── Trees — drawn preserving natural aspect ratio ──
+// Target width in image-space pixels (scales with map).
+// 2.5× ghost diameter in image-space = 2.5 * (56px / coverScale) but we keep
+// it simple: define a target IMAGE-SPACE width and let getCover do the rest.
+const HW_TREE_IW = 88;   // homework tree target width in image-space px
+const KR_TREE_IW = 78;   // karasuki tree target width in image-space px
 
 const MONTH_COLORS = [
   ['#ff3bbd','#ff79d7'],['#ff6b3b','#ffaa5e'],['#3bc8ff','#a8edff'],
@@ -325,23 +331,71 @@ const homeworkImg=new Image(); homeworkImg.src='assets/img/homework-tree.png';
 const karasuki1Img=new Image(); karasuki1Img.src='assets/img/karasuki1-tree.png';
 const karasuki2Img=new Image(); karasuki2Img.src='assets/img/karasuki2-tree.png';
 
-// Karasuki crossfade state
-let karasukiPhase=0, karasukiBlend=0, karasukiLastSwap=0;
-const KARASUKI_SWAP_MS=25000, KARASUKI_FADE_MS=1200;
+// Karasuki state machine:
+// Phase 0: show img1, wait 25s
+// Phase 1: crossfade img1→img2 (1.2s)
+// Phase 2: show img2, wait 25s
+// Phase 3: crossfade img2→img1 (1.2s)
+// Phase 4: visible img1, slowly fade OUT (1.5s) — puff of crosses
+// Phase 5: INVISIBLE, wait 15s
+// Phase 6: fade back IN (1.5s)
+// → back to phase 0
+let karasukiPhase=0, karasukiBlend=0, karasukiOpacity=1, karasukiLastSwap=0;
+const KARASUKI_SWAP_MS=25000, KARASUKI_FADE_MS=1200, KARASUKI_GONE_MS=15000, KARASUKI_PUFF_MS=1500;
+// Puff particles: burst when tree disappears
+let karasukiPuffParticles=[];
 
-function tickKarasuki(now){
+function spawnKarasukiPuff(cx,cy){
+  karasukiPuffParticles=[];
+  for(let i=0;i<28;i++){
+    const angle=Math.random()*Math.PI*2;
+    const speed=1.2+Math.random()*2.8;
+    karasukiPuffParticles.push({
+      x:cx,y:cy,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed-1.5,
+      life:1,size:3+Math.random()*5,
+      color:i%3===0?'#aaffcc':i%3===1?'#dd99ff':'#9933ff'
+    });
+  }
+}
+
+function tickKarasuki(now,cx,cy){
   if(karasukiLastSwap===0){karasukiLastSwap=now;return;}
   const el=now-karasukiLastSwap;
-  if(karasukiPhase===0){ if(el>=KARASUKI_SWAP_MS){karasukiPhase=1;karasukiLastSwap=now;karasukiBlend=0;} }
-  else if(karasukiPhase===1){ karasukiBlend=Math.min(el/KARASUKI_FADE_MS,1); if(karasukiBlend>=1){karasukiPhase=2;karasukiLastSwap=now;karasukiBlend=1;} }
-  else if(karasukiPhase===2){ if(el>=KARASUKI_SWAP_MS){karasukiPhase=3;karasukiLastSwap=now;karasukiBlend=1;} }
-  else if(karasukiPhase===3){ karasukiBlend=Math.max(1-el/KARASUKI_FADE_MS,0); if(karasukiBlend<=0){karasukiPhase=0;karasukiLastSwap=now;karasukiBlend=0;} }
+  if(karasukiPhase===0){
+    karasukiOpacity=1;karasukiBlend=0;
+    if(el>=KARASUKI_SWAP_MS){karasukiPhase=1;karasukiLastSwap=now;}
+  } else if(karasukiPhase===1){
+    karasukiBlend=Math.min(el/KARASUKI_FADE_MS,1);
+    if(karasukiBlend>=1){karasukiPhase=2;karasukiLastSwap=now;}
+  } else if(karasukiPhase===2){
+    karasukiOpacity=1;karasukiBlend=1;
+    if(el>=KARASUKI_SWAP_MS){karasukiPhase=3;karasukiLastSwap=now;}
+  } else if(karasukiPhase===3){
+    karasukiBlend=Math.max(1-el/KARASUKI_FADE_MS,0);
+    if(karasukiBlend<=0){karasukiPhase=4;karasukiLastSwap=now;}
+  } else if(karasukiPhase===4){
+    // Fade out with puff
+    karasukiOpacity=Math.max(1-el/KARASUKI_PUFF_MS,0);
+    if(el>50&&karasukiPuffParticles.length===0) spawnKarasukiPuff(cx,cy);
+    if(karasukiOpacity<=0){karasukiPhase=5;karasukiLastSwap=now;karasukiOpacity=0;}
+  } else if(karasukiPhase===5){
+    karasukiOpacity=0;
+    if(el>=KARASUKI_GONE_MS){karasukiPhase=6;karasukiLastSwap=now;}
+  } else if(karasukiPhase===6){
+    karasukiOpacity=Math.min(el/KARASUKI_PUFF_MS,1);
+    if(karasukiOpacity>=1){karasukiPhase=0;karasukiLastSwap=now;karasukiPuffParticles=[];}
+  }
+  // Tick puff particles
+  for(const p of karasukiPuffParticles){
+    p.x+=p.vx;p.y+=p.vy;p.vy+=0.04;p.life-=0.018;
+  }
+  karasukiPuffParticles=karasukiPuffParticles.filter(p=>p.life>0);
 }
 
 // State
 let mazeStarted=false,bryanOn=false,activeWeek=CURRENT_WEEK,ghostLocked=false;
-let introPhase='idle',introGlowStart=0,introDropStart=0,introBounceStart=0,introSettleStart=0;
-let introBounceIX=0,introBounceIY=0;
+let introPhase='idle',introGlowStart=0,introDropStart=0,introHoverStart=0,introSettleStart=0;
+let introHoverIX=0,introHoverIY=0; // position where ghost arrived when hovering began
 const startCP=CHECKPOINTS.find(c=>c.w===CURRENT_WEEK);
 let ghostIX=INTRO_TOP_CENTER_START.ix,ghostIY=INTRO_TOP_CENTER_START.iy;
 let ghostSrcIX=ghostIX,ghostSrcIY=ghostIY,ghostDstIX=ghostIX,ghostDstIY=ghostIY;
@@ -462,8 +516,8 @@ function setTravelLock(on){
 
 // Easing functions
 function ease(t){ return t<.5?2*t*t:-1+(4-2*t)*t; }
-function easeOutBack(t,s=1.70158){ return 1+(s+1)*Math.pow(t-1,3)+s*Math.pow(t-1,2); }
-function sineWobble(t,freq=2.5,amp=1){ return Math.sin(t*Math.PI*freq)*amp*(1-t); }
+function easeOutCubic(t){ return 1-Math.pow(1-t,3); }
+function easeInOutCubic(t){ return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2; }
 
 function addTrail(ix,iy){
   const c=Math.random()>.55?monthSecondary(activeWeek):monthPrimary(activeWeek);
@@ -475,106 +529,143 @@ function addTrail(ix,iy){
 function drawTrees(now){
   if(!mazeStarted)return;
   const sec=now/1000;
+  const{scale:cvScale}=getCover();
 
-  // Homework tree — welcoming warm glow
-  {
-    const{x,y}=imgToCSS(1086,202);
-    const pulse=.5+.5*Math.sin(sec*1.4),pulse2=.5+.5*Math.sin(sec*.9+1.1);
+  // Helper: get CSS draw rect for a tree image, centered on image-space point (ix,iy)
+  // targetIW = desired width in image-space units (preserves aspect ratio)
+  function treeRect(img,ix,iy,targetIW){
+    const{x,y}=imgToCSS(ix,iy);
+    const nat=img.naturalWidth&&img.naturalHeight?img.naturalWidth/img.naturalHeight:1;
+    const cssW=targetIW*cvScale;
+    const cssH=cssW/nat;
+    return{x,y,w:cssW,h:cssH};
+  }
+
+  // ── Homework tree (x979, y305) — welcoming warm glow ──────────────────────
+  if(homeworkImg.complete&&homeworkImg.naturalWidth>0){
+    const r=treeRect(homeworkImg,979,305,HW_TREE_IW);
+    const cx=r.x, cy=r.y;
+    const pulse=.5+.5*Math.sin(sec*1.4), pulse2=.5+.5*Math.sin(sec*.9+1.1);
     ctx.save();
-    // Ground shadow
-    ctx.globalAlpha=.16+pulse*.05;
-    const sg=ctx.createRadialGradient(x,y+TREE_H*.4,0,x,y+TREE_H*.4,TREE_HALF*1.5);
+    // Soft ground shadow ellipse
+    ctx.globalAlpha=.14+pulse*.04;
+    const sg=ctx.createRadialGradient(cx,cy+r.h*.42,0,cx,cy+r.h*.42,r.w*.9);
     sg.addColorStop(0,'rgba(0,0,0,.5)');sg.addColorStop(1,'transparent');
-    ctx.fillStyle=sg;ctx.beginPath();ctx.ellipse(x,y+TREE_H*.42,TREE_HALF*1.1,TREE_HALF*.32,0,0,Math.PI*2);ctx.fill();
-    // Wide warm aura
-    ctx.globalAlpha=.09+pulse*.06;
-    const a1=ctx.createRadialGradient(x,y,0,x,y,TREE_HALF*3.2);
+    ctx.fillStyle=sg;ctx.beginPath();ctx.ellipse(cx,cy+r.h*.44,r.w*.7,r.h*.18,0,0,Math.PI*2);ctx.fill();
+    // Wide warm amber aura
+    ctx.globalAlpha=.08+pulse*.05;
+    const a1=ctx.createRadialGradient(cx,cy,0,cx,cy,r.w*2.2);
     a1.addColorStop(0,'#ffe066');a1.addColorStop(.4,'#ffbb33');a1.addColorStop(1,'transparent');
-    ctx.fillStyle=a1;ctx.beginPath();ctx.arc(x,y,TREE_HALF*3.2,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle=a1;ctx.beginPath();ctx.arc(cx,cy,r.w*2.2,0,Math.PI*2);ctx.fill();
     // Mid warm glow
-    ctx.globalAlpha=.20+pulse2*.13;
-    const a2=ctx.createRadialGradient(x,y-TREE_H*.15,0,x,y-TREE_H*.15,TREE_HALF*2.0);
+    ctx.globalAlpha=.18+pulse2*.12;
+    const a2=ctx.createRadialGradient(cx,cy-r.h*.2,0,cx,cy-r.h*.2,r.w*1.4);
     a2.addColorStop(0,'#fff9a0');a2.addColorStop(.5,'#ffdd55');a2.addColorStop(1,'transparent');
-    ctx.fillStyle=a2;ctx.beginPath();ctx.arc(x,y-TREE_H*.15,TREE_HALF*2.0,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle=a2;ctx.beginPath();ctx.arc(cx,cy-r.h*.2,r.w*1.4,0,Math.PI*2);ctx.fill();
     // Inner lantern core
-    ctx.globalAlpha=.28+pulse*.18;
-    const a3=ctx.createRadialGradient(x,y-TREE_H*.2,0,x,y-TREE_H*.2,TREE_HALF*1.05);
+    ctx.globalAlpha=.25+pulse*.16;
+    const a3=ctx.createRadialGradient(cx,cy-r.h*.25,0,cx,cy-r.h*.25,r.w*.72);
     a3.addColorStop(0,'#ffffff');a3.addColorStop(.35,'#ffe888');a3.addColorStop(1,'transparent');
-    ctx.fillStyle=a3;ctx.beginPath();ctx.arc(x,y-TREE_H*.2,TREE_HALF*1.05,0,Math.PI*2);ctx.fill();
-    // Sparkle twinkles
+    ctx.fillStyle=a3;ctx.beginPath();ctx.arc(cx,cy-r.h*.25,r.w*.72,0,Math.PI*2);ctx.fill();
+    // Twinkling sparkle crosses
     for(let i=0;i<6;i++){
-      const angle=(i/6)*Math.PI*2+sec*.4,twinkle=.4+.6*Math.abs(Math.sin(sec*2.2+i*1.1));
-      const r=TREE_HALF*(.75+.15*Math.sin(sec*.8+i));
-      const fx=x+Math.cos(angle)*r,fy=(y-TREE_H*.22)+Math.sin(angle)*r*.65;
-      ctx.globalAlpha=twinkle*.6;ctx.strokeStyle='#fff8c0';ctx.lineWidth=1.1;
-      ctx.shadowBlur=7;ctx.shadowColor='#ffe566';
-      const sl=4+twinkle*3;
+      const angle=(i/6)*Math.PI*2+sec*.4;
+      const twinkle=.4+.6*Math.abs(Math.sin(sec*2.2+i*1.1));
+      const orb=r.w*(.65+.12*Math.sin(sec*.8+i));
+      const fx=cx+Math.cos(angle)*orb, fy=(cy-r.h*.2)+Math.sin(angle)*orb*.6;
+      ctx.globalAlpha=twinkle*.58;ctx.strokeStyle='#fff8c0';ctx.lineWidth=1.0;
+      ctx.shadowBlur=6;ctx.shadowColor='#ffe566';
+      const sl=3+twinkle*2.5;
       ctx.beginPath();ctx.moveTo(fx,fy-sl);ctx.lineTo(fx,fy+sl);ctx.moveTo(fx-sl,fy);ctx.lineTo(fx+sl,fy);ctx.stroke();
       ctx.shadowBlur=0;
     }
-    ctx.globalAlpha=1.0;
-    if(homeworkImg.complete&&homeworkImg.naturalWidth>0)
-      ctx.drawImage(homeworkImg,x-TREE_HALF,y-TREE_H*.55,TREE_HALF*2,TREE_H);
+    // Draw image at natural ratio
+    ctx.globalAlpha=1;
+    ctx.drawImage(homeworkImg, cx-r.w/2, cy-r.h/2, r.w, r.h);
     ctx.restore();
   }
 
-  // Karasuki tree — spooky glow + crossfade
-  tickKarasuki(now);
+  // ── Karasuki tree (x535, y300) — spooky glow + crossfade + disappear ──────
   {
-    const{x,y}=imgToCSS(389,262);
+    const refImg = karasuki1Img.complete&&karasuki1Img.naturalWidth>0 ? karasuki1Img
+                 : karasuki2Img.complete&&karasuki2Img.naturalWidth>0 ? karasuki2Img : null;
+    const{x:cx,y:cy}=imgToCSS(535,300);
+    // Compute draw rect using the available image
+    let drawW=KR_TREE_IW*cvScale, drawH=drawW;
+    if(refImg) drawH=drawW/( refImg.naturalWidth/refImg.naturalHeight );
+
+    // Tick state machine (pass CSS center for puff spawn)
+    tickKarasuki(now,cx,cy);
+
     const flicker=.82+.18*Math.sin(sec*7.3)*Math.sin(sec*4.1+.7);
-    const pulse=.5+.5*Math.sin(sec*.85),pulse2=.5+.5*Math.sin(sec*1.7+2.0);
+    const pulse=.5+.5*Math.sin(sec*.85), pulse2=.5+.5*Math.sin(sec*1.7+2.0);
+    // All spooky glow and particles use karasukiOpacity so they fade with the tree
+    const kOp=karasukiOpacity;
+
     ctx.save();
-    // Ground mist
-    ctx.globalAlpha=.20+pulse*.07;
-    const sg=ctx.createRadialGradient(x,y+TREE_H*.38,0,x,y+TREE_H*.38,TREE_HALF*1.8);
-    sg.addColorStop(0,'rgba(40,0,60,.75)');sg.addColorStop(1,'transparent');
-    ctx.fillStyle=sg;ctx.beginPath();ctx.ellipse(x,y+TREE_H*.40,TREE_HALF*1.3,TREE_HALF*.36,0,0,Math.PI*2);ctx.fill();
-    // Far purple fog
-    ctx.globalAlpha=(.08+pulse*.05)*flicker;
-    const s1=ctx.createRadialGradient(x,y,0,x,y,TREE_HALF*3.8);
-    s1.addColorStop(0,'#6600aa');s1.addColorStop(.45,'#330066');s1.addColorStop(1,'transparent');
-    ctx.fillStyle=s1;ctx.beginPath();ctx.arc(x,y,TREE_HALF*3.8,0,Math.PI*2);ctx.fill();
-    // Sickly green mid
-    ctx.globalAlpha=(.15+pulse2*.11)*flicker;
-    const s2=ctx.createRadialGradient(x,y-TREE_H*.18,0,x,y-TREE_H*.18,TREE_HALF*2.0);
-    s2.addColorStop(0,'#44ff66');s2.addColorStop(.4,'#00aa33');s2.addColorStop(1,'transparent');
-    ctx.fillStyle=s2;ctx.beginPath();ctx.arc(x,y-TREE_H*.18,TREE_HALF*2.0,0,Math.PI*2);ctx.fill();
-    // Inner purple core
-    ctx.globalAlpha=(.22+pulse*.16)*flicker;
-    const s3=ctx.createRadialGradient(x,y-TREE_H*.22,0,x,y-TREE_H*.22,TREE_HALF*1.0);
-    s3.addColorStop(0,'#ddaaff');s3.addColorStop(.4,'#8833cc');s3.addColorStop(1,'transparent');
-    ctx.fillStyle=s3;ctx.beginPath();ctx.arc(x,y-TREE_H*.22,TREE_HALF*1.0,0,Math.PI*2);ctx.fill();
-    // Rising wisps
-    for(let i=0;i<5;i++){
-      const wt=((sec*.22+i*.2)%1);
-      const wx=x+Math.sin(sec*1.4+i*1.25)*TREE_HALF*.7;
-      const wy=(y+TREE_H*.3)-wt*TREE_H*1.3;
-      const wa=wt<.2?wt/.2:wt>.7?(1-wt)/.3:1;
-      ctx.globalAlpha=wa*.25*flicker;
-      const wg=ctx.createRadialGradient(wx,wy,0,wx,wy,12+Math.sin(sec+i)*4);
-      wg.addColorStop(0,i%2===0?'#88ffaa':'#cc88ff');wg.addColorStop(1,'transparent');
-      ctx.fillStyle=wg;ctx.beginPath();ctx.arc(wx,wy,12+Math.sin(sec+i)*4,0,Math.PI*2);ctx.fill();
+    if(kOp>0){
+      // Ground mist
+      ctx.globalAlpha=(.18+pulse*.06)*kOp;
+      const sg=ctx.createRadialGradient(cx,cy+drawH*.42,0,cx,cy+drawH*.42,drawW*1.2);
+      sg.addColorStop(0,'rgba(40,0,60,.75)');sg.addColorStop(1,'transparent');
+      ctx.fillStyle=sg;ctx.beginPath();ctx.ellipse(cx,cy+drawH*.44,drawW*.8,drawH*.17,0,0,Math.PI*2);ctx.fill();
+      // Far purple fog
+      ctx.globalAlpha=(.07+pulse*.04)*flicker*kOp;
+      const s1=ctx.createRadialGradient(cx,cy,0,cx,cy,drawW*2.6);
+      s1.addColorStop(0,'#6600aa');s1.addColorStop(.45,'#330066');s1.addColorStop(1,'transparent');
+      ctx.fillStyle=s1;ctx.beginPath();ctx.arc(cx,cy,drawW*2.6,0,Math.PI*2);ctx.fill();
+      // Sickly green mid
+      ctx.globalAlpha=(.13+pulse2*.10)*flicker*kOp;
+      const s2=ctx.createRadialGradient(cx,cy-drawH*.2,0,cx,cy-drawH*.2,drawW*1.4);
+      s2.addColorStop(0,'#44ff66');s2.addColorStop(.4,'#00aa33');s2.addColorStop(1,'transparent');
+      ctx.fillStyle=s2;ctx.beginPath();ctx.arc(cx,cy-drawH*.2,drawW*1.4,0,Math.PI*2);ctx.fill();
+      // Inner purple core
+      ctx.globalAlpha=(.20+pulse*.14)*flicker*kOp;
+      const s3=ctx.createRadialGradient(cx,cy-drawH*.25,0,cx,cy-drawH*.25,drawW*.68);
+      s3.addColorStop(0,'#ddaaff');s3.addColorStop(.4,'#8833cc');s3.addColorStop(1,'transparent');
+      ctx.fillStyle=s3;ctx.beginPath();ctx.arc(cx,cy-drawH*.25,drawW*.68,0,Math.PI*2);ctx.fill();
+      // Rising wisps
+      for(let i=0;i<5;i++){
+        const wt=((sec*.22+i*.2)%1);
+        const wx=cx+Math.sin(sec*1.4+i*1.25)*drawW*.6;
+        const wy=(cy+drawH*.3)-wt*drawH*1.3;
+        const wa=(wt<.2?wt/.2:wt>.7?(1-wt)/.3:1)*kOp;
+        ctx.globalAlpha=wa*.22*flicker;
+        const wg=ctx.createRadialGradient(wx,wy,0,wx,wy,10+Math.sin(sec+i)*3);
+        wg.addColorStop(0,i%2===0?'#88ffaa':'#cc88ff');wg.addColorStop(1,'transparent');
+        ctx.fillStyle=wg;ctx.beginPath();ctx.arc(wx,wy,10+Math.sin(sec+i)*3,0,Math.PI*2);ctx.fill();
+      }
+      // Orbiting spooky crosses (burst outward when disappearing)
+      const crossR = karasukiPhase===4 ? drawW*(.80+(1-kOp)*2.5)
+                   : karasukiPhase===6 ? drawW*(.80+(1-kOp)*2.5)
+                   : drawW*.80;
+      for(let i=0;i<4;i++){
+        const angle=(i/4)*Math.PI*2+sec*.55, twinkle=.3+.7*Math.abs(Math.sin(sec*1.8+i*.9));
+        const r=crossR*(1+.12*Math.sin(sec*.6+i));
+        const fx=cx+Math.cos(angle)*r, fy=(cy-drawH*.2)+Math.sin(angle)*r*.7;
+        ctx.globalAlpha=twinkle*.50*flicker*kOp;
+        ctx.strokeStyle=i%2===0?'#aaffcc':'#dd99ff';ctx.lineWidth=1.0;
+        ctx.shadowBlur=8;ctx.shadowColor=i%2===0?'#00ff66':'#9933ff';
+        const sl=3+twinkle*2.8;
+        ctx.beginPath();ctx.moveTo(fx,fy-sl);ctx.lineTo(fx,fy+sl);ctx.moveTo(fx-sl,fy);ctx.lineTo(fx+sl,fy);ctx.stroke();
+        ctx.shadowBlur=0;
+      }
+      // Draw tree images with crossfade, modulated by karasukiOpacity
+      if(karasuki1Img.complete&&karasuki1Img.naturalWidth>0&&karasukiBlend<1){
+        ctx.globalAlpha=(1-karasukiBlend)*kOp;
+        ctx.drawImage(karasuki1Img,cx-drawW/2,cy-drawH/2,drawW,drawH);
+      }
+      if(karasuki2Img.complete&&karasuki2Img.naturalWidth>0&&karasukiBlend>0){
+        ctx.globalAlpha=karasukiBlend*kOp;
+        ctx.drawImage(karasuki2Img,cx-drawW/2,cy-drawH/2,drawW,drawH);
+      }
     }
-    // Orbiting spooky crosses
-    for(let i=0;i<4;i++){
-      const angle=(i/4)*Math.PI*2+sec*.55,twinkle=.3+.7*Math.abs(Math.sin(sec*1.8+i*.9));
-      const r=TREE_HALF*(.80+.12*Math.sin(sec*.6+i));
-      const fx=x+Math.cos(angle)*r,fy=(y-TREE_H*.18)+Math.sin(angle)*r*.7;
-      ctx.globalAlpha=twinkle*.52*flicker;ctx.strokeStyle=i%2===0?'#aaffcc':'#dd99ff';ctx.lineWidth=1.0;
-      ctx.shadowBlur=9;ctx.shadowColor=i%2===0?'#00ff66':'#9933ff';
-      const sl=3.5+twinkle*3;
-      ctx.beginPath();ctx.moveTo(fx,fy-sl);ctx.lineTo(fx,fy+sl);ctx.moveTo(fx-sl,fy);ctx.lineTo(fx+sl,fy);ctx.stroke();
-      ctx.shadowBlur=0;
-    }
-    // Crossfade trees
-    if(karasuki1Img.complete&&karasuki1Img.naturalWidth>0&&karasukiBlend<1){
-      ctx.globalAlpha=1-karasukiBlend;
-      ctx.drawImage(karasuki1Img,x-TREE_HALF,y-TREE_H*.55,TREE_HALF*2,TREE_H);
-    }
-    if(karasuki2Img.complete&&karasuki2Img.naturalWidth>0&&karasukiBlend>0){
-      ctx.globalAlpha=karasukiBlend;
-      ctx.drawImage(karasuki2Img,x-TREE_HALF,y-TREE_H*.55,TREE_HALF*2,TREE_H);
+    // Puff particles (drawn even when kOp=0, they have their own life)
+    for(const p of karasukiPuffParticles){
+      const pg=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.size*2);
+      pg.addColorStop(0,p.color);pg.addColorStop(1,'transparent');
+      ctx.globalAlpha=p.life*.7;ctx.fillStyle=pg;ctx.beginPath();ctx.arc(p.x,p.y,p.size*2,0,Math.PI*2);ctx.fill();
+      ctx.globalAlpha=p.life*.9;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(p.x,p.y,p.size*.3,0,Math.PI*2);ctx.fill();
     }
     ctx.globalAlpha=1;ctx.restore();
   }
@@ -599,31 +690,36 @@ function drawFrame(now){
   } else if(introPhase==='dropping'){
     OPEN_WEEKS.forEach(w=>{cpState[w]={alpha:1,extra:1.0};});
     const prog=Math.min((now-introDropStart)/INTRO_DROP_MS,1);
-    const et=easeOutBack(prog,1.2);
-    const wobble=sineWobble(prog,2.5,52);
-    ghostIX=INTRO_TOP_CENTER_START.ix+wobble;
-    ghostIY=INTRO_TOP_CENTER_START.iy+(INTRO_BOUNCE_LAND.iy-INTRO_TOP_CENTER_START.iy)*et;
-    if(Math.random()<.38)addTrail(ghostIX,ghostIY);
-    if(prog>=1){ introBounceIX=ghostIX;introBounceIY=ghostIY;introPhase='bouncing';introBounceStart=now; }
+    // Smooth cubic ease — no overshoot, dreamy float down
+    const et=easeOutCubic(prog);
+    // Very gentle lateral sway — one slow, smooth sine wave
+    const sway=Math.sin(prog*Math.PI)*30;
+    ghostIX=INTRO_TOP_CENTER_START.ix+sway;
+    ghostIY=INTRO_TOP_CENTER_START.iy+(INTRO_HOVER_LAND.iy-INTRO_TOP_CENTER_START.iy)*et;
+    if(Math.random()<.25)addTrail(ghostIX,ghostIY);
+    if(prog>=1){
+      introHoverIX=ghostIX;introHoverIY=ghostIY;
+      introPhase='hovering';introHoverStart=now;
+    }
 
-  } else if(introPhase==='bouncing'){
+  } else if(introPhase==='hovering'){
     OPEN_WEEKS.forEach(w=>{cpState[w]={alpha:1,extra:1.0};});
-    const prog=Math.min((now-introBounceStart)/INTRO_BOUNCE_MS,1);
-    const loopAngle=prog*Math.PI*2.5;
-    const loopR=58*(1-prog);
-    const bobBounce=Math.abs(Math.sin(prog*Math.PI*3))*30*(1-prog);
-    ghostIX=introBounceIX+Math.sin(loopAngle)*loopR;
-    ghostIY=introBounceIY+Math.cos(loopAngle*.5)*loopR*.5-bobBounce;
-    if(Math.random()<.48)addTrail(ghostIX,ghostIY);
-    if(prog>=1){ introBounceIX=ghostIX;introBounceIY=ghostIY;introPhase='settling';introSettleStart=now; }
+    const prog=Math.min((now-introHoverStart)/INTRO_HOVER_MS,1);
+    // Just breathe in place — tiny vertical bob, no position change
+    ghostIX=introHoverIX;
+    ghostIY=introHoverIY; // bob is applied in the draw section already
+    if(prog>=1){
+      introPhase='settling';introSettleStart=now;
+    }
 
   } else if(introPhase==='settling'){
     OPEN_WEEKS.forEach(w=>{cpState[w]={alpha:1,extra:1.0};});
     const prog=Math.min((now-introSettleStart)/INTRO_SETTLE_MS,1);
-    const et=ease(prog);
-    ghostIX=introBounceIX+(startCP.ix-introBounceIX)*et;
-    ghostIY=introBounceIY+(startCP.iy-introBounceIY)*et;
-    if(Math.random()<.3)addTrail(ghostIX,ghostIY);
+    // Smooth cubic — glides elegantly to checkpoint
+    const et=easeInOutCubic(prog);
+    ghostIX=introHoverIX+(startCP.ix-introHoverIX)*et;
+    ghostIY=introHoverIY+(startCP.iy-introHoverIY)*et;
+    if(Math.random()<.22)addTrail(ghostIX,ghostIY);
     if(prog>=1){
       introPhase='done';ghostIX=startCP.ix;ghostIY=startCP.iy;
       ghostSrcIX=ghostIX;ghostSrcIY=ghostIY;ghostDstIX=ghostIX;ghostDstIY=ghostIY;ghostT=1;
@@ -762,7 +858,7 @@ function hitTest(clientX,clientY){
 
 canvas.addEventListener('click',e=>{
   if(!mazeStarted||ghostLocked)return;
-  if(['allGlow','dropping','bouncing','settling'].includes(introPhase))return;
+  if(['allGlow','dropping','hovering','settling'].includes(introPhase))return;
   if(bryanOn){
     const rect=canvas.getBoundingClientRect();const{ix,iy}=cssToImg(e.clientX-rect.left,e.clientY-rect.top);
     coordText.textContent=`x: ${ix}  y: ${iy}`;
@@ -773,7 +869,7 @@ canvas.addEventListener('click',e=>{
 
 canvas.addEventListener('touchend',e=>{
   if(!mazeStarted||ghostLocked)return;
-  if(['allGlow','dropping','bouncing','settling'].includes(introPhase))return;
+  if(['allGlow','dropping','hovering','settling'].includes(introPhase))return;
   if(!e.changedTouches.length)return;
   const t0=e.changedTouches[0];const cp=hitTest(t0.clientX,t0.clientY);
   if(cp){startGhostTravel(cp);e.preventDefault();}
