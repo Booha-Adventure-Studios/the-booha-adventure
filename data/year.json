@@ -1,1 +1,34 @@
 
+{
+  "timezone": "Asia/Tokyo",
+  "weekStartsOn": "sunday",
+  "weeksPerMonth": 4,
+  "repeatWeek4UntilNextFullWeek": true,
+  "currentSchoolDateMode": "tokyo",
+  "weeks": [
+    {
+      "id": "mar_w1",
+      "month": "March",
+      "week": 1,
+      "path": "curriculum/march/"
+    },
+    {
+      "id": "mar_w2",
+      "month": "March",
+      "week": 2,
+      "path": "curriculum/march/"
+    },
+    {
+      "id": "mar_w3",
+      "month": "March",
+      "week": 3,
+      "path": "curriculum/march/"
+    },
+    {
+      "id": "mar_w4",
+      "month": "March",
+      "week": 4,
+      "path": "curriculum/march/"
+    }
+  ]
+}
