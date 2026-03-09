@@ -52,20 +52,27 @@ export function getWeekParam() {
 }
 
 export function parseWeekSlug(week) {
-  const m = week.match(/^(?:\d{4}_w\d{2}_)?([a-z]{3})_w([1-4])$/i);
+  const m = week.match(/^(pb|br|bc)_([a-z]{3})_w([1-4])$/i);
   if (!m) return null;
 
-  const monthShort = m[1].toLowerCase();
-  const weekNumber = Number(m[2]);
+  const curriculum = m[1].toLowerCase();
+  const monthShort = m[2].toLowerCase();
+  const weekNumber = Number(m[3]);
 
   return {
     rawWeek: week,
+    curriculum,
     monthShort,
     monthDir: MONTH_MAP[monthShort] || monthShort,
     monthLabel: MONTHS_EN[monthShort] || monthShort,
     monthLabelJp: MONTHS_JP[monthShort] || monthShort,
     weekNumber
   };
+}
+
+export function getPageContext() {
+  const week = getWeekParam();
+  return parseWeekSlug(week);
 }
 
 export function prettyWeekLabel(week) {
