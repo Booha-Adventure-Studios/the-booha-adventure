@@ -1257,9 +1257,22 @@ function showPopupAtCP(cp){
   cpTitle.textContent = 'GAMES';
 
   // Date: English + Japanese
-  const enDate = WEEK_DATES_EN[cp.w-1] || '';
-  const jpDate = WEEK_DATES_JP[cp.w-1] || '';
-  cpPopupDate.innerHTML = `${enDate}<br><span style="font-size:0.88em;opacity:0.7">${jpDate}</span>`;
+  const weekStart = new Date(CURRENT_WEEK_DATA.weekStart);
+  const start = new Date(weekStart);
+  start.setDate(start.getDate() + (cp.w - CURRENT_WEEK) * 7);
+
+  const end = new Date(start);
+  end.setDate(end.getDate() + 6);
+
+  const en = start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) +
+           ' – ' +
+           end.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+  const jp = start.toLocaleDateString('ja-JP', { month: 'numeric', day: 'numeric' }) +
+           '–' +
+           end.toLocaleDateString('ja-JP', { month: 'numeric', day: 'numeric' });
+
+  cpPopupDate.innerHTML = `${en}<br><span style="font-size:0.88em;opacity:0.7">${jp}</span>`;
 
   // Week badge
   const diff = cp.w - CURRENT_WEEK;
