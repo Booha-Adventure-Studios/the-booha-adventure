@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Booha Adventure 2026 — Maze</title>
+  <title>Booha Adventure — Maze</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bowlby+One&display=swap" rel="stylesheet" />
@@ -932,8 +932,11 @@ function drawFrame(now){
     });
     if(el>=INTRO_GLOW_MS){
       introPhase='traveling'; introTravelStart=now;
-      introSrcIX=CHECKPOINTS[0].ix; introSrcIY=CHECKPOINTS[0].iy;
-      ghostIX=introSrcIX; ghostIY=introSrcIY;
+      introSrcIX = startCP.ix;
+      introSrcIY = startCP.iy;
+      ghostIX = introSrcIX;
+      ghostIY = introSrcIY;
+      
       setTravelLock(true);
     }
 
@@ -1439,7 +1442,10 @@ mazeStartBtn.addEventListener('click',async()=>{
   overlay2.addEventListener('transitionend',()=>overlay2.remove(),{once:true});
   app.classList.remove('inTransition');
   mazeStarted=true;
-  ghostIX=CHECKPOINTS[0].ix; ghostIY=CHECKPOINTS[0].iy;
+  ghostIX = startCP.ix;
+  ghostIY = startCP.iy;
+
+  
   introPhase='allGlow'; introGlowStart=performance.now();
   resizeCanvas();
   buildWanderers();   // start wandering ghosts after maze launches
