@@ -630,7 +630,13 @@ document.getElementById('questions').href =
 document.getElementById('stream').href =
   `${ctx.monthDir}/br_stream.html?week=${week}`;
 </script>
-
+  
+<script>
+document.getElementById('btn-close').addEventListener('click', () => {
+  sessionStorage.setItem('booha_return_to_hub', '1');
+  window.location.assign('../../index.html#hub');
+});
+</script>
   
   
 
