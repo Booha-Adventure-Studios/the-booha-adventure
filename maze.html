@@ -412,7 +412,7 @@
   <!-- POPUP — fixed, always centered -->
   <div id="cpPopup" role="dialog" aria-modal="true" aria-labelledby="cpPopupTitle">
     <div id="cpPopupBar"></div>
-    <p class="cp-week-label">今週のブーハー</p>
+    <p class="cp-week-label" id="cpWeekLabel">今週のブーハー</p>
     <!-- Title is now always "GAMES" -->
     <h2 id="cpPopupTitle">GAMES</h2>
     <!-- English date + Japanese date -->
@@ -451,13 +451,17 @@ import { getCurrentCurriculumWeek, getAcademicWeekNumber } from './js/calendar.j
 const BRYAN_PASS      = 'him141amra803';
 const IMG_W           = 1600;
 const IMG_H           = 900;
+
 const CURRENT_WEEK_DATA = getCurrentCurriculumWeek();
+// Real current curriculum week in Tokyo → converted to 1–48 academic week
 const CURRENT_WEEK = getAcademicWeekNumber(CURRENT_WEEK_DATA);
+
 const OPEN_WEEKS = [
   Math.max(1, CURRENT_WEEK - 1),
   CURRENT_WEEK,
   Math.min(48, CURRENT_WEEK + 1)
 ];
+
 const GHOST_TRAVEL_MS = 3800;
 const INTRO_GLOW_MS   = 2600;
 const INTRO_TRAVEL_MS = 3200;
@@ -569,6 +573,7 @@ const cpTitle       = document.getElementById('cpPopupTitle');
 const cpPopupBar    = document.getElementById('cpPopupBar');
 const cpCloseBtn    = document.getElementById('cpCloseBtn');
 const cpWeekBadge   = document.getElementById('cpWeekBadge');
+const cpWeekLabel   = document.getElementById('cpWeekLabel');  
 const FADE_MS       = 520;
 const iconPreBoo    = document.getElementById('iconPreBoo');
 const iconBooTree   = document.getElementById('iconBooTree');
@@ -1208,6 +1213,17 @@ function startGhostTravel(cp){
 //  POPUP — "GAMES" title, English+JP date, week badge
 // ─────────────────────────────────────────────────────────
 function showPopupAtCP(cp){
+
+  const diff = cp.w - CURRENT_WEEK;
+
+  if (diff === 0) {
+    cpWeekLabel.textContent = '今週のブーハー';
+  } else if (diff < 0) {
+    cpWeekLabel.textContent = '先週のブーハー';
+  } else {
+    cpWeekLabel.textContent = '来週のブーハー';
+  }
+  
   const col1=monthPrimary(cp.w), col2=monthSecondary(cp.w);
   cpPopupBar.style.background=`linear-gradient(90deg,${col1},${col2})`;
   cpPopupBar.style.boxShadow=`0 0 14px ${col1}88,0 0 28px ${col2}55`;
