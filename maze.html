@@ -22,8 +22,6 @@
       font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,
         "Noto Sans","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif; }
     #app{ position:fixed; inset:0; background:#000; overflow:hidden; }
-
-    /* ══ ROTATE OVERLAY ══ */
     #rotateOverlay{
       position:fixed; inset:0; display:none; flex-direction:column;
       align-items:center; justify-content:center; gap:20px;
@@ -34,323 +32,96 @@
       #rotateOverlay{ display:flex !important; }
     }
     .rotateIcon{ font-size:72px; display:block; transform-origin:center; animation:rotateHint 2.2s ease-in-out infinite; }
-    @keyframes rotateHint{
-      0%,100%{ transform:rotate(0deg); } 35%,65%{ transform:rotate(-90deg); }
-    }
-    .rotateTitle{
-      font-family:'Bowlby One',sans-serif; font-size:clamp(22px,6vw,34px);
-      letter-spacing:2px; color:#fff; margin:0;
-      text-shadow:0 0 30px rgba(255,140,255,.8),0 0 60px rgba(255,80,200,.4);
-    }
+    @keyframes rotateHint{ 0%,100%{ transform:rotate(0deg); } 35%,65%{ transform:rotate(-90deg); } }
+    .rotateTitle{ font-family:'Bowlby One',sans-serif; font-size:clamp(22px,6vw,34px); letter-spacing:2px; color:#fff; margin:0; text-shadow:0 0 30px rgba(255,140,255,.8),0 0 60px rgba(255,80,200,.4); }
     .rotateSub{ font-size:16px; color:rgba(255,255,255,.65); margin:0; line-height:1.7; }
-    .rotateGlow{
-      width:140px; height:4px; border-radius:999px; margin:0 auto;
-      background:linear-gradient(90deg,var(--pink),var(--blue),var(--pink));
-      background-size:200%; animation:shimmer 2s linear infinite;
-      box-shadow:0 0 16px rgba(255,59,189,.5);
-    }
+    .rotateGlow{ width:140px; height:4px; border-radius:999px; margin:0 auto; background:linear-gradient(90deg,var(--pink),var(--blue),var(--pink)); background-size:200%; animation:shimmer 2s linear infinite; box-shadow:0 0 16px rgba(255,59,189,.5); }
     @keyframes shimmer{ 0%{ background-position:0% } 100%{ background-position:200% } }
-
-    /* ══ SHARED OVERLAY ══ */
-    .overlay{
-      position:absolute; inset:0; display:flex; flex-direction:column;
-      align-items:center; justify-content:center; gap:clamp(14px,3.5vmin,30px);
-      padding: calc(28px + var(--safe-top)) calc(28px + var(--safe-right))
-               calc(28px + var(--safe-bottom)) calc(28px + var(--safe-left));
-      background:radial-gradient(ellipse at center,rgba(0,0,0,.50) 0%,rgba(0,0,0,.84) 62%,rgba(0,0,0,.97) 100%);
-      backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
-      text-align:center; z-index:40; transition:opacity 550ms ease;
-    }
+    .overlay{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:clamp(14px,3.5vmin,30px); padding: calc(28px + var(--safe-top)) calc(28px + var(--safe-right)) calc(28px + var(--safe-bottom)) calc(28px + var(--safe-left)); background:radial-gradient(ellipse at center,rgba(0,0,0,.50) 0%,rgba(0,0,0,.84) 62%,rgba(0,0,0,.97) 100%); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); text-align:center; z-index:40; transition:opacity 550ms ease; }
     .overlay.hidden{ opacity:0; pointer-events:none; }
     .overlay.gone{ display:none; }
-    .overlayHeading{
-      font-family:'Bowlby One',sans-serif; font-size:clamp(20px,4.5vw,46px);
-      letter-spacing:2px; margin:0; color:#fff; line-height:1.2;
-      text-shadow:0 0 32px rgba(255,140,255,.7),0 0 80px rgba(255,80,200,.35),0 2px 8px rgba(0,0,0,.9);
-    }
+    .overlayHeading{ font-family:'Bowlby One',sans-serif; font-size:clamp(20px,4.5vw,46px); letter-spacing:2px; margin:0; color:#fff; line-height:1.2; text-shadow:0 0 32px rgba(255,140,255,.7),0 0 80px rgba(255,80,200,.35),0 2px 8px rgba(0,0,0,.9); }
     .btnRow{ display:flex; gap:clamp(10px,3vmin,20px); flex-wrap:wrap; justify-content:center; align-items:center; }
-    .btnPink,.btnBlue{
-      appearance:none; border:0; border-radius:999px;
-      padding:clamp(11px,2.5vmin,15px) clamp(20px,5vmin,30px);
-      font-size:clamp(15px,3.8vmin,20px); font-weight:1000; letter-spacing:.5px;
-      cursor:pointer; color:#000; -webkit-tap-highlight-color:transparent;
-      transform:translateZ(0); min-width:80px;
-    }
-    .btnPink{
-      background:linear-gradient(180deg,var(--pink2),var(--pink));
-      box-shadow:0 8px 20px rgba(255,59,189,.28),0 0 0 2px rgba(255,59,189,.18),0 0 26px rgba(255,59,189,.38);
-    }
+    .btnPink,.btnBlue{ appearance:none; border:0; border-radius:999px; padding:clamp(11px,2.5vmin,15px) clamp(20px,5vmin,30px); font-size:clamp(15px,3.8vmin,20px); font-weight:1000; letter-spacing:.5px; cursor:pointer; color:#000; -webkit-tap-highlight-color:transparent; transform:translateZ(0); min-width:80px; }
+    .btnPink{ background:linear-gradient(180deg,var(--pink2),var(--pink)); box-shadow:0 8px 20px rgba(255,59,189,.28),0 0 0 2px rgba(255,59,189,.18),0 0 26px rgba(255,59,189,.38); }
     .btnPink:active{ transform:scale(.96); }
-    .btnBlue{
-      background:linear-gradient(180deg,var(--blue2),var(--blue));
-      box-shadow:0 8px 20px rgba(59,200,255,.28),0 0 0 2px rgba(59,200,255,.18),0 0 26px rgba(59,200,255,.38);
-    }
+    .btnBlue{ background:linear-gradient(180deg,var(--blue2),var(--blue)); box-shadow:0 8px 20px rgba(59,200,255,.28),0 0 0 2px rgba(59,200,255,.18),0 0 26px rgba(59,200,255,.38); }
     .btnBlue:active{ transform:scale(.96); }
-
-    /* ══ DOM SPARKLES ══ */
     .sparkleWrap{ position:relative; display:inline-flex; align-items:center; justify-content:center; }
     .sparkleField{ position:absolute; inset:-50px; pointer-events:none; }
-    .sp{
-      position:absolute; border-radius:50%; background:#fff; opacity:0;
-      animation:sparkleLife var(--dur) ease-in-out var(--delay) infinite;
-      width:var(--size); height:var(--size); top:var(--y); left:var(--x);
-      box-shadow:0 0 4px 1px rgba(255,255,255,.9),0 0 10px 3px rgba(255,100,220,.6);
-    }
-    @keyframes sparkleLife{
-      0%  { opacity:0; transform:scale(.4) translateY(0); }
-      20% { opacity:1; transform:scale(1) translateY(-6px); }
-      60% { opacity:.85; transform:scale(.9) translateY(-14px); }
-      100%{ opacity:0; transform:scale(.3) translateY(-22px); }
-    }
+    .sp{ position:absolute; border-radius:50%; background:#fff; opacity:0; animation:sparkleLife var(--dur) ease-in-out var(--delay) infinite; width:var(--size); height:var(--size); top:var(--y); left:var(--x); box-shadow:0 0 4px 1px rgba(255,255,255,.9),0 0 10px 3px rgba(255,100,220,.6); }
+    @keyframes sparkleLife{ 0%{ opacity:0; transform:scale(.4) translateY(0); } 20%{ opacity:1; transform:scale(1) translateY(-6px); } 60%{ opacity:.85; transform:scale(.9) translateY(-14px); } 100%{ opacity:0; transform:scale(.3) translateY(-22px); } }
     #overlay1{ z-index:50; }
-
-    /* ══ VIDEO ══ */
     #videoWrap{ position:absolute; inset:0; display:none; background:#000; z-index:20; }
     #videoWrap.show{ display:block; }
     #toMazeVideo{ width:100%; height:100%; object-fit:cover; background:#000; }
-
-    /* ══ OVERLAY 2 ══ */
     #overlay2{ z-index:45; display:none; }
     #overlay2.show{ display:flex; }
-    .ghostBtnWrap{
-      position:relative; display:inline-flex; align-items:center; justify-content:center;
-      background:none; border:none; padding:0; cursor:pointer; -webkit-tap-highlight-color:transparent;
-    }
-    .ghostBtnWrap:active #startGhost{
-      transform:scale(.88) translateY(-5px);
-      filter:drop-shadow(0 0 44px rgba(255,100,220,1)) drop-shadow(0 14px 30px rgba(0,0,0,.7));
-    }
+    .ghostBtnWrap{ position:relative; display:inline-flex; align-items:center; justify-content:center; background:none; border:none; padding:0; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+    .ghostBtnWrap:active #startGhost{ transform:scale(.88) translateY(-5px); filter:drop-shadow(0 0 44px rgba(255,100,220,1)) drop-shadow(0 14px 30px rgba(0,0,0,.7)); }
     .ghostSparkleField{ position:absolute; inset:-70px; pointer-events:none; z-index:0; }
     .ghostSparkleField .sp{ box-shadow:0 0 6px 2px rgba(255,255,255,.95),0 0 16px 5px rgba(255,100,220,.75); }
-    #startGhost{
-      width:clamp(100px,28vmin,200px); height:clamp(100px,28vmin,200px);
-      object-fit:contain; user-select:none; -webkit-user-drag:none;
-      filter:drop-shadow(0 0 26px rgba(255,100,220,.6)) drop-shadow(0 14px 30px rgba(0,0,0,.7));
-      animation:floaty 3.6s ease-in-out infinite;
-      transform-origin:50% 60%; transition:transform 120ms ease,filter 120ms ease;
-      position:relative; z-index:1;
-    }
+    #startGhost{ width:clamp(100px,28vmin,200px); height:clamp(100px,28vmin,200px); object-fit:contain; user-select:none; -webkit-user-drag:none; filter:drop-shadow(0 0 26px rgba(255,100,220,.6)) drop-shadow(0 14px 30px rgba(0,0,0,.7)); animation:floaty 3.6s ease-in-out infinite; transform-origin:50% 60%; transition:transform 120ms ease,filter 120ms ease; position:relative; z-index:1; }
     @keyframes floaty{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-8px); } }
-
-    /* ══ MAZE SCENE ══ */
     #mazeScene{ position:absolute; inset:0; background:#000; }
     #stage{ position:absolute; inset:0; overflow:hidden; }
-    #mazeImg{
-      display:block; position:absolute; inset:0; width:100%; height:100%;
-      object-fit:cover; object-position:center center;
-      user-select:none; -webkit-user-drag:none; pointer-events:none;
-    }
+    #mazeImg{ display:block; position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center center; user-select:none; -webkit-user-drag:none; pointer-events:none; }
     #mazeCanvas{ position:absolute; left:0; top:0; z-index:6; cursor:default; }
     #mazeCanvas.bryan{ cursor:crosshair; }
-
-    /* Travel lock cursor — no pointer events visually */
     #mazeCanvas.locked{ cursor:not-allowed; pointer-events:none; }
-
-    /* Travel lock overlay — covers entire scene, eats all clicks */
-    #travelLock{
-      position:absolute; inset:0; z-index:30;
-      display:none; cursor:not-allowed;
-    }
+    #travelLock{ position:absolute; inset:0; z-index:30; display:none; cursor:not-allowed; }
     #travelLock.active{ display:block; }
-
-    #grid{
-      position:absolute; inset:0; display:none; pointer-events:none; z-index:7;
-      background-image:linear-gradient(to right,rgba(255,255,255,.12) 1px,transparent 1px),
-        linear-gradient(to bottom,rgba(255,255,255,.12) 1px,transparent 1px);
-      background-size:80px 80px; mix-blend-mode:screen; opacity:.55;
-    }
+    #grid{ position:absolute; inset:0; display:none; pointer-events:none; z-index:7; background-image:linear-gradient(to right,rgba(255,255,255,.12) 1px,transparent 1px),linear-gradient(to bottom,rgba(255,255,255,.12) 1px,transparent 1px); background-size:80px 80px; mix-blend-mode:screen; opacity:.55; }
     #grid.show{ display:block; }
-
-    /* ══ HUD ══ */
-    .hudTitle{
-      font-family:'Bowlby One',sans-serif; font-size:clamp(13px,1.8vw,18px);
-      letter-spacing:2px; line-height:1.15; color:#fff;
-      text-shadow:0 0 22px rgba(255,140,255,.7),0 0 60px rgba(255,80,200,.35),0 2px 6px rgba(0,0,0,.9);
-      user-select:none; pointer-events:none;
-    }
-    #hud{
-      position:absolute; left:calc(12px + var(--safe-left)); top:calc(12px + var(--safe-top));
-      display:flex; gap:10px; align-items:flex-start; z-index:10;
-    }
-    .pill{
-      border-radius:999px; padding:10px 14px; font-weight:900; letter-spacing:.4px;
-      background:rgba(0,0,0,.28); border:1px solid rgba(255,255,255,.16);
-      backdrop-filter:blur(14px) saturate(140%); -webkit-backdrop-filter:blur(14px) saturate(140%);
-      box-shadow:inset 0 0 0 1px rgba(255,255,255,.08),0 14px 30px rgba(0,0,0,.35);
-      color:rgba(255,255,255,.92); user-select:none;
-    }
+    .hudTitle{ font-family:'Bowlby One',sans-serif; font-size:clamp(13px,1.8vw,18px); letter-spacing:2px; line-height:1.15; color:#fff; text-shadow:0 0 22px rgba(255,140,255,.7),0 0 60px rgba(255,80,200,.35),0 2px 6px rgba(0,0,0,.9); user-select:none; pointer-events:none; }
+    #hud{ position:absolute; left:calc(12px + var(--safe-left)); top:calc(12px + var(--safe-top)); display:flex; gap:10px; align-items:flex-start; z-index:10; }
+    .pill{ border-radius:999px; padding:10px 14px; font-weight:900; letter-spacing:.4px; background:rgba(0,0,0,.28); border:1px solid rgba(255,255,255,.16); backdrop-filter:blur(14px) saturate(140%); -webkit-backdrop-filter:blur(14px) saturate(140%); box-shadow:inset 0 0 0 1px rgba(255,255,255,.08),0 14px 30px rgba(0,0,0,.35); color:rgba(255,255,255,.92); user-select:none; }
     #coordPill{ display:none; } #coordPill.show{ display:block; }
     .coordSmall{ font-size:12px; color:rgba(255,255,255,.7); font-weight:800; letter-spacing:1px; }
     .coordBig{ font-size:14px; margin-top:4px; }
-
-    /* Bryan tip banner */
-    #bryanTip{
-      position:absolute; left:50%; top:calc(10px + var(--safe-top));
-      transform:translateX(-50%);
-      z-index:10; display:none;
-      background:rgba(0,0,0,.72); border:1px solid rgba(255,59,189,.3);
-      border-radius:12px; padding:8px 16px;
-      font-size:12px; font-weight:700; letter-spacing:.3px;
-      color:rgba(255,255,255,.7); text-align:center; line-height:1.6;
-      backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
-      pointer-events:none; white-space:nowrap;
-    }
+    #bryanTip{ position:absolute; left:50%; top:calc(10px + var(--safe-top)); transform:translateX(-50%); z-index:10; display:none; background:rgba(0,0,0,.72); border:1px solid rgba(255,59,189,.3); border-radius:12px; padding:8px 16px; font-size:12px; font-weight:700; letter-spacing:.3px; color:rgba(255,255,255,.7); text-align:center; line-height:1.6; backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); pointer-events:none; white-space:nowrap; }
     #bryanTip.show{ display:block; }
-
-    /* ══ BRYAN BUTTON ══ */
-    #bryanBtn{
-      position:absolute; left:calc(10px + var(--safe-left)); bottom:calc(10px + var(--safe-bottom));
-      z-index:20; border-radius:999px; padding:6px 10px; font-size:9px; font-weight:1000;
-      letter-spacing:1.4px; text-transform:uppercase; color:rgba(255,255,255,.45);
-      background:rgba(0,0,0,.30); border:1px solid rgba(255,255,255,.10);
-      backdrop-filter:blur(10px) saturate(140%); -webkit-backdrop-filter:blur(10px) saturate(140%);
-      cursor:pointer; -webkit-tap-highlight-color:transparent;
-    }
+    #bryanBtn{ position:absolute; left:calc(10px + var(--safe-left)); bottom:calc(10px + var(--safe-bottom)); z-index:20; border-radius:999px; padding:6px 10px; font-size:9px; font-weight:1000; letter-spacing:1.4px; text-transform:uppercase; color:rgba(255,255,255,.45); background:rgba(0,0,0,.30); border:1px solid rgba(255,255,255,.10); backdrop-filter:blur(10px) saturate(140%); -webkit-backdrop-filter:blur(10px) saturate(140%); cursor:pointer; -webkit-tap-highlight-color:transparent; }
     #bryanBtn.on{ color:#fff; border-color:rgba(255,255,255,.22); box-shadow:0 0 0 2px rgba(255,59,189,.18),0 0 18px rgba(255,59,189,.25); }
     #bryanBtn:active{ transform:scale(.96); }
-
-    /* ══ BACK BUTTON ══ */
-    #backBtn{
-      position:absolute; right:calc(8px + var(--safe-right)); bottom:calc(8px + var(--safe-bottom));
-      z-index:20; appearance:none; border:0; border-radius:999px;
-      padding:5px 12px; font-size:11px; font-weight:1000; letter-spacing:.5px;
-      cursor:pointer; color:#000;
-      background:linear-gradient(180deg,var(--pink2),var(--pink));
-      box-shadow:0 4px 10px rgba(255,59,189,.28),0 0 0 1px rgba(255,59,189,.15),0 0 14px rgba(255,59,189,.28);
-      opacity:0.75; -webkit-tap-highlight-color:transparent; transform:translateZ(0); transition:opacity 200ms;
-    }
+    #backBtn{ position:absolute; right:calc(8px + var(--safe-right)); bottom:calc(8px + var(--safe-bottom)); z-index:20; appearance:none; border:0; border-radius:999px; padding:5px 12px; font-size:11px; font-weight:1000; letter-spacing:.5px; cursor:pointer; color:#000; background:linear-gradient(180deg,var(--pink2),var(--pink)); box-shadow:0 4px 10px rgba(255,59,189,.28),0 0 0 1px rgba(255,59,189,.15),0 0 14px rgba(255,59,189,.28); opacity:0.75; -webkit-tap-highlight-color:transparent; transform:translateZ(0); transition:opacity 200ms; }
     #backBtn:hover{ opacity:1; }
     #backBtn:active{ transform:scale(.96); opacity:1; }
-    @media (min-width:900px) and (pointer:fine){
-      #backBtn{ padding:7px 14px; font-size:12px; opacity:0.85; }
-      #bryanBtn{ padding:8px 12px; font-size:10px; color:rgba(255,255,255,.6); }
-    }
+    @media (min-width:900px) and (pointer:fine){ #backBtn{ padding:7px 14px; font-size:12px; opacity:0.85; } #bryanBtn{ padding:8px 12px; font-size:10px; color:rgba(255,255,255,.6); } }
     @media (pointer:coarse){ .hudTitle{ display:none; } #bryanBtn{ display:none; } #hud{ display:none; } }
     #app.inTransition #bryanBtn,#app.inTransition #hud,#app.inTransition #backBtn{ display:none !important; }
-
-    /* ══ SCRIM ══ */
-    #cpScrim{
-      position:fixed; inset:0; z-index:55;
-      background:rgba(0,0,0,.48);
-      backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px);
-      display:none;
-    }
+    #cpScrim{ position:fixed; inset:0; z-index:55; background:rgba(0,0,0,.48); backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px); display:none; }
     #cpScrim.show{ display:block; }
-
-    /* ══ POPUP — always screen-centered ══ */
-    #cpPopup{
-      position:fixed;
-      left:50%; top:50%;
-      transform:translate(-50%,-50%);
-      z-index:60;
-      min-width:260px; max-width:360px; width:min(92vw,360px);
-      background:linear-gradient(150deg,rgba(8,3,26,.98) 0%,rgba(3,8,34,.98) 100%);
-      border-radius:24px; padding:22px 24px 20px;
-      backdrop-filter:blur(28px); -webkit-backdrop-filter:blur(28px);
-      text-align:center;
-      border:1px solid rgba(255,255,255,.12);
-      box-shadow:0 0 0 1px rgba(255,255,255,.05),0 32px 90px rgba(0,0,0,.85),
-        0 0 80px rgba(160,60,255,.14), inset 0 1px 0 rgba(255,255,255,.10);
-      display:none; pointer-events:auto;
-    }
-    #cpPopup.show{
-      display:block;
-      animation:popIn 300ms cubic-bezier(.34,1.46,.64,1) both;
-    }
-    @keyframes popIn{
-      from{ opacity:0; transform:translate(-50%,-50%) scale(.80); }
-      to  { opacity:1; transform:translate(-50%,-50%) scale(1); }
-    }
-    #cpPopupBar{
-      height:3px; border-radius:999px; margin:0 auto 16px; width:55%; opacity:.92;
-    }
-
-    /* Popup text */
-    .cp-week-label{
-      font-family:'Bowlby One',sans-serif;
-      font-size:clamp(9px,1.5vw,11px); letter-spacing:2px; text-transform:uppercase;
-      color:rgba(255,255,255,.38); margin:0 0 3px;
-    }
-    #cpPopupTitle{
-      font-family:'Bowlby One',sans-serif; font-size:clamp(18px,3vw,26px);
-      letter-spacing:.5px; margin:0 0 4px; color:#fff; line-height:1.2;
-    }
-    #cpPopupDate{
-      font-size:clamp(11px,1.8vw,14px); font-weight:700;
-      color:rgba(255,255,255,.55); margin:0 0 4px; letter-spacing:.3px;
-    }
-    /* ── "This week / last week / next week" badge ── */
-    #cpWeekBadge{
-      display:inline-block;
-      font-size:clamp(10px,1.6vw,12px); font-weight:900; letter-spacing:1.2px;
-      text-transform:uppercase; border-radius:999px;
-      padding:3px 11px; margin-bottom:16px;
-      opacity:0;
-      transition:opacity .25s ease;
-    }
+    #cpPopup{ position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); z-index:60; min-width:260px; max-width:360px; width:min(92vw,360px); background:linear-gradient(150deg,rgba(8,3,26,.98) 0%,rgba(3,8,34,.98) 100%); border-radius:24px; padding:22px 24px 20px; backdrop-filter:blur(28px); -webkit-backdrop-filter:blur(28px); text-align:center; border:1px solid rgba(255,255,255,.12); box-shadow:0 0 0 1px rgba(255,255,255,.05),0 32px 90px rgba(0,0,0,.85),0 0 80px rgba(160,60,255,.14), inset 0 1px 0 rgba(255,255,255,.10); display:none; pointer-events:auto; }
+    #cpPopup.show{ display:block; animation:popIn 300ms cubic-bezier(.34,1.46,.64,1) both; }
+    @keyframes popIn{ from{ opacity:0; transform:translate(-50%,-50%) scale(.80); } to{ opacity:1; transform:translate(-50%,-50%) scale(1); } }
+    #cpPopupBar{ height:3px; border-radius:999px; margin:0 auto 16px; width:55%; opacity:.92; }
+    .cp-week-label{ font-family:'Bowlby One',sans-serif; font-size:clamp(9px,1.5vw,11px); letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,.38); margin:0 0 3px; }
+    #cpPopupTitle{ font-family:'Bowlby One',sans-serif; font-size:clamp(18px,3vw,26px); letter-spacing:.5px; margin:0 0 4px; color:#fff; line-height:1.2; }
+    #cpPopupDate{ font-size:clamp(11px,1.8vw,14px); font-weight:700; color:rgba(255,255,255,.55); margin:0 0 4px; letter-spacing:.3px; }
+    #cpWeekBadge{ display:inline-block; font-size:clamp(10px,1.6vw,12px); font-weight:900; letter-spacing:1.2px; text-transform:uppercase; border-radius:999px; padding:3px 11px; margin-bottom:16px; opacity:0; transition:opacity .25s ease; }
     #cpWeekBadge.visible{ opacity:1; }
-
-    /* Icon buttons */
-    .cp-icons{
-      display:flex; justify-content:center; gap:clamp(10px,3vw,18px); margin-bottom:18px;
-    }
-    .cp-icon-btn{
-      display:flex; flex-direction:column; align-items:center; gap:7px;
-      background:none; border:none; cursor:pointer; padding:0;
-      -webkit-tap-highlight-color:transparent; transition:transform 120ms ease;
-    }
+    .cp-icons{ display:flex; justify-content:center; gap:clamp(10px,3vw,18px); margin-bottom:18px; }
+    .cp-icon-btn{ display:flex; flex-direction:column; align-items:center; gap:7px; background:none; border:none; cursor:pointer; padding:0; -webkit-tap-highlight-color:transparent; transition:transform 120ms ease; }
     .cp-icon-btn:active{ transform:scale(.90); }
-    .cp-icon-img{
-      width:clamp(52px,12vw,70px); height:clamp(52px,12vw,70px);
-      object-fit:contain; border-radius:16px;
-      background:rgba(255,255,255,.05);
-      border:1px solid rgba(255,255,255,.14);
-      padding:7px;
-      box-shadow:0 4px 20px rgba(0,0,0,.55),0 0 28px rgba(180,100,255,.10);
-      transition:box-shadow 140ms ease,border-color 140ms ease,transform 140ms ease;
-    }
-    .cp-icon-btn:hover .cp-icon-img{
-      border-color:rgba(255,255,255,.30);
-      box-shadow:0 6px 28px rgba(0,0,0,.65),0 0 36px rgba(180,100,255,.28);
-      transform:translateY(-2px);
-    }
-    .cp-icon-label{
-      font-size:clamp(8px,1.4vw,10px); font-weight:900; letter-spacing:.7px;
-      text-transform:uppercase; color:rgba(255,255,255,.48);
-      line-height:1.25; text-align:center; max-width:76px;
-    }
-    #cpCloseBtn{
-      appearance:none; border:0; border-radius:999px;
-      padding:9px 26px; font-size:13px; font-weight:900; cursor:pointer; color:#000;
-      background:linear-gradient(180deg,var(--pink2),var(--pink));
-      box-shadow:0 4px 18px rgba(255,59,189,.42),0 0 28px rgba(255,59,189,.18);
-      transition:transform 100ms;
-    }
+    .cp-icon-img{ width:clamp(52px,12vw,70px); height:clamp(52px,12vw,70px); object-fit:contain; border-radius:16px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.14); padding:7px; box-shadow:0 4px 20px rgba(0,0,0,.55),0 0 28px rgba(180,100,255,.10); transition:box-shadow 140ms ease,border-color 140ms ease,transform 140ms ease; }
+    .cp-icon-btn:hover .cp-icon-img{ border-color:rgba(255,255,255,.30); box-shadow:0 6px 28px rgba(0,0,0,.65),0 0 36px rgba(180,100,255,.28); transform:translateY(-2px); }
+    .cp-icon-label{ font-size:clamp(8px,1.4vw,10px); font-weight:900; letter-spacing:.7px; text-transform:uppercase; color:rgba(255,255,255,.48); line-height:1.25; text-align:center; max-width:76px; }
+    #cpCloseBtn{ appearance:none; border:0; border-radius:999px; padding:9px 26px; font-size:13px; font-weight:900; cursor:pointer; color:#000; background:linear-gradient(180deg,var(--pink2),var(--pink)); box-shadow:0 4px 18px rgba(255,59,189,.42),0 0 28px rgba(255,59,189,.18); transition:transform 100ms; }
     #cpCloseBtn:active{ transform:scale(.95); }
-
-    /* ══ FADE ══ */
     #fade{ position:fixed; inset:0; background:#000; opacity:0; pointer-events:none; transition:opacity 520ms ease; z-index:200; }
     #fade.on{ opacity:1; }
-    @media (prefers-reduced-motion:reduce){
-      #startGhost{ animation:none; }
-      .rotateIcon{ animation:none; transform:rotate(-90deg); }
-      #fade{ transition:none; }
-      .sp{ animation:none; opacity:.6; }
-    }
+    @media (prefers-reduced-motion:reduce){ #startGhost{ animation:none; } .rotateIcon{ animation:none; transform:rotate(-90deg); } #fade{ transition:none; } .sp{ animation:none; opacity:.6; } }
   </style>
 </head>
 <body>
 <div id="app">
-
-  <!-- ROTATE OVERLAY -->
   <div id="rotateOverlay" role="alert" aria-live="polite">
     <span class="rotateIcon">📱</span>
     <div class="rotateGlow"></div>
     <h1 class="rotateTitle">よこにしてね！</h1>
     <p class="rotateSub">めいろをあそぶには<br>スマホを<strong style="color:#ff79d7">よこむき</strong>にしてください</p>
   </div>
-
-  <!-- OVERLAY 1 -->
   <div id="overlay1" class="overlay" aria-label="めいろへいく？">
     <h1 class="overlayHeading">ブーハーめいろにいく？</h1>
     <div class="btnRow">
@@ -361,15 +132,11 @@
       </div>
     </div>
   </div>
-
-  <!-- VIDEO -->
   <div id="videoWrap" aria-hidden="true">
     <video id="toMazeVideo" preload="auto" playsinline webkit-playsinline>
       <source src="assets/video/ttmaze.mp4" type="video/mp4" />
     </video>
   </div>
-
-  <!-- OVERLAY 2 -->
   <div id="overlay2" class="overlay" aria-label="スタート">
     <h1 class="overlayHeading">ブーハーをタッチしてはじめよう！</h1>
     <button id="mazeStartBtn" class="ghostBtnWrap" type="button" aria-label="スタート">
@@ -377,17 +144,13 @@
       <img id="startGhost" alt="ブーハー" />
     </button>
   </div>
-
-  <!-- MAZE -->
   <section id="mazeScene" aria-label="めいろ">
     <div id="stage">
       <img id="mazeImg" src="assets/img/maze.png" alt="めいろ" />
       <canvas id="mazeCanvas"></canvas>
-      <!-- Travel lock: absorbs all pointer input while ghost is moving -->
       <div id="travelLock"></div>
       <div id="grid"></div>
     </div>
-
     <div id="hud">
       <div class="hudTitle">BOOHA<br>ADVENTURE</div>
       <div id="coordPill" class="pill">
@@ -396,28 +159,19 @@
         <div class="coordSmall" style="margin-top:6px;opacity:.85;">クリックでコピー</div>
       </div>
     </div>
-
     <div id="bryanTip">
       座標は <strong>画像サイズ 1600×900</strong> で固定されています。<br>
       マウスを動かして座標を確認し、クリックでコピーできます。
     </div>
-
     <button id="bryanBtn" type="button" aria-label="Bryan mode">BRYAN</button>
     <button id="backBtn" type="button" aria-label="もどる">もどる</button>
   </section>
-
-  <!-- SCRIM -->
   <div id="cpScrim"></div>
-
-  <!-- POPUP — fixed, always centered -->
   <div id="cpPopup" role="dialog" aria-modal="true" aria-labelledby="cpPopupTitle">
     <div id="cpPopupBar"></div>
     <p class="cp-week-label" id="cpWeekLabel">今週のブーハー</p>
-    <!-- Title is now always "GAMES" -->
     <h2 id="cpPopupTitle">GAMES</h2>
-    <!-- English date + Japanese date -->
     <p id="cpPopupDate"></p>
-    <!-- This week / last week / next week badge -->
     <div id="cpWeekBadge"></div>
     <div class="cp-icons">
       <button class="cp-icon-btn" id="iconPreBoo" type="button" aria-label="プレブー">
@@ -435,25 +189,18 @@
     </div>
     <button id="cpCloseBtn" type="button">とじる ✕</button>
   </div>
-
   <div id="fade" aria-hidden="true"></div>
 </div>
-
 <audio id="bgMusic" src="assets/audio/sneaky.mp3" loop preload="auto"></audio>
-
-<script type="module">  
+<script type="module">
 
 import { getCurrentCurriculumWeek, getAcademicWeekNumber } from './js/calendar.js';
 
-// ─────────────────────────────────────────────────────────
-//  CONFIG
-// ─────────────────────────────────────────────────────────
-const BRYAN_PASS      = 'him141amra803';
-const IMG_W           = 1600;
-const IMG_H           = 900;
+const BRYAN_PASS = 'him141amra803';
+const IMG_W = 1600;
+const IMG_H = 900;
 
 const CURRENT_WEEK_DATA = getCurrentCurriculumWeek();
-// Real current curriculum week in Tokyo → converted to 1–48 academic week
 const CURRENT_WEEK = getAcademicWeekNumber(CURRENT_WEEK_DATA);
 
 const OPEN_WEEKS = [
@@ -463,37 +210,35 @@ const OPEN_WEEKS = [
 ];
 
 const GHOST_TRAVEL_MS = 3800;
+
+// ── Ghost intro phases: allGlow → dropping → bouncing → settling → done ──
 const INTRO_GLOW_MS   = 2600;
-const INTRO_TRAVEL_MS = 3200;
-const INTRO_TOP_CENTER_START = { ix: IMG_W / 2, iy: -140 };  
-  
+const INTRO_DROP_MS   = 2400;   // slower drop from sky
+const INTRO_BOUNCE_MS = 1900;   // playful loop/spin at center
+const INTRO_SETTLE_MS = 1500;   // glide to checkpoint
+const INTRO_TOP_CENTER_START = { ix: IMG_W / 2, iy: -180 };
+const INTRO_BOUNCE_LAND = { ix: IMG_W / 2, iy: 290 };
 
-// ── Ghost images — index 0 is the "active" (Booha) one ──────────────────────
 const GHOSTS = [
-  'assets/img/booha_ghost.png',  // index 0 — main playable ghost
-  'assets/img/blue-boo.png',     // index 1
-  'assets/img/green-boo.png',    // index 2
-  'assets/img/pink-boo.png',     // index 3
-  'assets/img/purple-boo.png'    // index 4
+  'assets/img/booha_ghost.png',
+  'assets/img/blue-boo.png',
+  'assets/img/green-boo.png',
+  'assets/img/pink-boo.png',
+  'assets/img/purple-boo.png'
 ];
 
+// ── Trees — image-space coords, drawn on canvas ──
+// Ghost diameter = 56px (gR*2=28*2). Trees = 2.5× = 140px logical.
+const TREE_HALF = 70;   // half of 140
+const TREE_H    = 140;
 
-// Each calendar month: [primary, secondary]
 const MONTH_COLORS = [
-  ['#ff3bbd','#ff79d7'],
-  ['#ff6b3b','#ffaa5e'],
-  ['#3bc8ff','#a8edff'],
-  ['#3bff8a','#b2ffda'],
-  ['#ffd700','#fff176'],
-  ['#3b6fff','#90aaff'],
-  ['#a03bff','#d49aff'],
-  ['#ff9f3b','#ffd08a'],
-  ['#3bffee','#a8fff8'],
-  ['#c8ff3b','#e8ffaa'],
-  ['#ff3b6f','#ff85a1'],
+  ['#ff3bbd','#ff79d7'],['#ff6b3b','#ffaa5e'],['#3bc8ff','#a8edff'],
+  ['#3bff8a','#b2ffda'],['#ffd700','#fff176'],['#3b6fff','#90aaff'],
+  ['#a03bff','#d49aff'],['#ff9f3b','#ffd08a'],['#3bffee','#a8fff8'],
+  ['#c8ff3b','#e8ffaa'],['#ff3b6f','#ff85a1'],
 ];
 
-// Checkpoints — image-space coords (1600×900)
 const CHECKPOINTS = [
   {w: 1, ix: 493, iy:350},{w: 2, ix:891, iy:402},{w: 3, ix:1156, iy:354},
   {w: 4, ix: 952, iy:453},{w: 5, ix: 635, iy:377},{w: 6, ix: 624, iy:576},
@@ -513,330 +258,170 @@ const CHECKPOINTS = [
   {w:46, ix: 836, iy:561},{w:47, ix: 442, iy:428},{w:48, ix:1259, iy:462}
 ];
 
-function getMonthIndexFromWeekNumber(w) {
-  return Math.max(0, Math.min(11, Math.floor((w - 1) / 4)));
-}
+function getMonthIndexFromWeekNumber(w){ return Math.max(0,Math.min(11,Math.floor((w-1)/4))); }
+function monthColors(w){ const m=getMonthIndexFromWeekNumber(w); return MONTH_COLORS[m]||['#fff','#ccc']; }
+function monthPrimary(w){ return monthColors(w)[0]; }
+function monthSecondary(w){ return monthColors(w)[1]; }
 
-function monthColors(w) {
-  const m = getMonthIndexFromWeekNumber(w);
-  return MONTH_COLORS[m] || ['#fff', '#ccc'];
-}
-
-function monthPrimary(w)   { return monthColors(w)[0]; }
-function monthSecondary(w) { return monthColors(w)[1]; }  
-
-function getWeekSlug(prefix, w) {
-  const MONTH_ABBR = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
-  const monthIndex = Math.max(0, Math.min(11, Math.floor((w - 1) / 4)));
-  const mo = MONTH_ABBR[monthIndex] || 'jan';
-
-  const weekInMonth = ((w - 1) % 4) + 1;
-
+function getWeekSlug(prefix,w){
+  const MONTH_ABBR=['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+  const monthIndex=Math.max(0,Math.min(11,Math.floor((w-1)/4)));
+  const mo=MONTH_ABBR[monthIndex]||'jan';
+  const weekInMonth=((w-1)%4)+1;
   return `${prefix}_${mo}_w${weekInMonth}`;
 }
 
 function goToHub(){
-  sessionStorage.setItem('booha_return_to_hub', '1');
-  window.location.href = 'index.html#hub';
+  sessionStorage.setItem('booha_return_to_hub','1');
+  window.location.href='index.html#hub';
 }
-  
-  
-// ─────────────────────────────────────────────────────────
-//  DOM
-// ─────────────────────────────────────────────────────────
-const app           = document.getElementById('app');
-const rotateOverlay = document.getElementById('rotateOverlay');
-const overlay1      = document.getElementById('overlay1');
-const overlay2      = document.getElementById('overlay2');
-const videoWrap     = document.getElementById('videoWrap');
-const toMazeVideo   = document.getElementById('toMazeVideo');
-const returnBtn     = document.getElementById('returnBtn');
-const continueBtn   = document.getElementById('continueBtn');
-const mazeStartBtn  = document.getElementById('mazeStartBtn');
-const startGhost    = document.getElementById('startGhost');
-const confirmSp     = document.getElementById('confirmSparkles');
-const startSp       = document.getElementById('startSparkles');
-const fade          = document.getElementById('fade');
-const bgMusic       = document.getElementById('bgMusic');
-const mazeImg       = document.getElementById('mazeImg');
-const canvas        = document.getElementById('mazeCanvas');
-const travelLock    = document.getElementById('travelLock');
-const gridEl        = document.getElementById('grid');
-const bryanBtn      = document.getElementById('bryanBtn');
-const bryanTip      = document.getElementById('bryanTip');
-const backBtn       = document.getElementById('backBtn');
-const coordPill     = document.getElementById('coordPill');
-const coordText     = document.getElementById('coordText');
-const cpScrim       = document.getElementById('cpScrim');
-const cpPopup       = document.getElementById('cpPopup');
-const cpPopupDate   = document.getElementById('cpPopupDate');
-const cpTitle       = document.getElementById('cpPopupTitle');
-const cpPopupBar    = document.getElementById('cpPopupBar');
-const cpCloseBtn    = document.getElementById('cpCloseBtn');
-const cpWeekBadge   = document.getElementById('cpWeekBadge');
-const cpWeekLabel   = document.getElementById('cpWeekLabel');  
-const FADE_MS       = 520;
-const iconPreBoo    = document.getElementById('iconPreBoo');
-const iconBooTree   = document.getElementById('iconBooTree');
-const iconContTree  = document.getElementById('iconContTree');
-  
 
-// ─────────────────────────────────────────────────────────
-//  CANVAS — DPR applied once per resize only
-// ─────────────────────────────────────────────────────────
-const ctx = canvas.getContext('2d');
-let cssW = 1, cssH = 1;
+// DOM refs
+const app=document.getElementById('app'),rotateOverlay=document.getElementById('rotateOverlay'),
+  overlay1=document.getElementById('overlay1'),overlay2=document.getElementById('overlay2'),
+  videoWrap=document.getElementById('videoWrap'),toMazeVideo=document.getElementById('toMazeVideo'),
+  returnBtn=document.getElementById('returnBtn'),continueBtn=document.getElementById('continueBtn'),
+  mazeStartBtn=document.getElementById('mazeStartBtn'),startGhost=document.getElementById('startGhost'),
+  confirmSp=document.getElementById('confirmSparkles'),startSp=document.getElementById('startSparkles'),
+  fade=document.getElementById('fade'),bgMusic=document.getElementById('bgMusic'),
+  mazeImg=document.getElementById('mazeImg'),canvas=document.getElementById('mazeCanvas'),
+  travelLock=document.getElementById('travelLock'),gridEl=document.getElementById('grid'),
+  bryanBtn=document.getElementById('bryanBtn'),bryanTip=document.getElementById('bryanTip'),
+  backBtn=document.getElementById('backBtn'),coordPill=document.getElementById('coordPill'),
+  coordText=document.getElementById('coordText'),cpScrim=document.getElementById('cpScrim'),
+  cpPopup=document.getElementById('cpPopup'),cpPopupDate=document.getElementById('cpPopupDate'),
+  cpTitle=document.getElementById('cpPopupTitle'),cpPopupBar=document.getElementById('cpPopupBar'),
+  cpCloseBtn=document.getElementById('cpCloseBtn'),cpWeekBadge=document.getElementById('cpWeekBadge'),
+  cpWeekLabel=document.getElementById('cpWeekLabel'),
+  iconPreBoo=document.getElementById('iconPreBoo'),iconBooTree=document.getElementById('iconBooTree'),
+  iconContTree=document.getElementById('iconContTree');
+const FADE_MS=520;
+
+// Canvas
+const ctx=canvas.getContext('2d');
+let cssW=1,cssH=1;
 
 function resizeCanvas(){
-  const dpr  = window.devicePixelRatio || 1;
-  const rect = document.getElementById('stage').getBoundingClientRect();
-  cssW = rect.width  || window.innerWidth;
-  cssH = rect.height || window.innerHeight;
-  canvas.style.width  = cssW + 'px';
-  canvas.style.height = cssH + 'px';
-  canvas.width  = Math.round(cssW * dpr);
-  canvas.height = Math.round(cssH * dpr);
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const dpr=window.devicePixelRatio||1;
+  const rect=document.getElementById('stage').getBoundingClientRect();
+  cssW=rect.width||window.innerWidth; cssH=rect.height||window.innerHeight;
+  canvas.style.width=cssW+'px'; canvas.style.height=cssH+'px';
+  canvas.width=Math.round(cssW*dpr); canvas.height=Math.round(cssH*dpr);
+  ctx.setTransform(dpr,0,0,dpr,0,0);
 }
 
-// ─────────────────────────────────────────────────────────
-//  COORDINATE TRANSFORMS — object-fit:cover
-// ─────────────────────────────────────────────────────────
-function getCover(){
-  const scale = Math.max(cssW/IMG_W, cssH/IMG_H);
-  return { scale, ox:(IMG_W*scale-cssW)/2, oy:(IMG_H*scale-cssH)/2 };
-}
-function imgToCSS(ix,iy){
-  const {scale,ox,oy}=getCover();
-  return { x:ix*scale-ox, y:iy*scale-oy };
-}
-function cssToImg(cx,cy){
-  const {scale,ox,oy}=getCover();
-  return {
-    ix:Math.round(Math.max(0,Math.min((cx+ox)/scale,IMG_W))),
-    iy:Math.round(Math.max(0,Math.min((cy+oy)/scale,IMG_H)))
-  };
-}
+function getCover(){ const scale=Math.max(cssW/IMG_W,cssH/IMG_H); return{scale,ox:(IMG_W*scale-cssW)/2,oy:(IMG_H*scale-cssH)/2}; }
+function imgToCSS(ix,iy){ const{scale,ox,oy}=getCover(); return{x:ix*scale-ox,y:iy*scale-oy}; }
+function cssToImg(cx,cy){ const{scale,ox,oy}=getCover(); return{ix:Math.round(Math.max(0,Math.min((cx+ox)/scale,IMG_W))),iy:Math.round(Math.max(0,Math.min((cy+oy)/scale,IMG_H)))}; }
 
-// ─────────────────────────────────────────────────────────
-//  GHOST IMAGES — preload all
-// ─────────────────────────────────────────────────────────
-const ghostImgs = GHOSTS.map(src=>{ const i=new Image(); i.src=src; return i; });
-// activeGhostIdx — which ghost the player chose (index into GHOSTS)
-let activeGhostIdx = 0;
-
-function assignRandomGhost(){
-  activeGhostIdx = Math.floor(Math.random()*GHOSTS.length);
-  startGhost.src = GHOSTS[activeGhostIdx];
-}
+// Ghost images
+const ghostImgs=GHOSTS.map(src=>{const i=new Image();i.src=src;return i;});
+let activeGhostIdx=0;
+function assignRandomGhost(){ activeGhostIdx=Math.floor(Math.random()*GHOSTS.length); startGhost.src=GHOSTS[activeGhostIdx]; }
 assignRandomGhost();
 
-// ─────────────────────────────────────────────────────────
-//  STATE
-// ─────────────────────────────────────────────────────────
-let mazeStarted=false, bryanOn=false, activeWeek=CURRENT_WEEK;
-let ghostLocked=false;   // true while ghost is traveling → blocks all interaction
+// Tree images
+const homeworkImg=new Image(); homeworkImg.src='assets/img/homework-tree.png';
+const karasuki1Img=new Image(); karasuki1Img.src='assets/img/karasuki1-tree.png';
+const karasuki2Img=new Image(); karasuki2Img.src='assets/img/karasuki2-tree.png';
 
-let introPhase='idle', introGlowStart=0, introTravelStart=0;
-let introSrcIX=0, introSrcIY=0;
+// Karasuki crossfade state
+let karasukiPhase=0, karasukiBlend=0, karasukiLastSwap=0;
+const KARASUKI_SWAP_MS=25000, KARASUKI_FADE_MS=1200;
 
+function tickKarasuki(now){
+  if(karasukiLastSwap===0){karasukiLastSwap=now;return;}
+  const el=now-karasukiLastSwap;
+  if(karasukiPhase===0){ if(el>=KARASUKI_SWAP_MS){karasukiPhase=1;karasukiLastSwap=now;karasukiBlend=0;} }
+  else if(karasukiPhase===1){ karasukiBlend=Math.min(el/KARASUKI_FADE_MS,1); if(karasukiBlend>=1){karasukiPhase=2;karasukiLastSwap=now;karasukiBlend=1;} }
+  else if(karasukiPhase===2){ if(el>=KARASUKI_SWAP_MS){karasukiPhase=3;karasukiLastSwap=now;karasukiBlend=1;} }
+  else if(karasukiPhase===3){ karasukiBlend=Math.max(1-el/KARASUKI_FADE_MS,0); if(karasukiBlend<=0){karasukiPhase=0;karasukiLastSwap=now;karasukiBlend=0;} }
+}
+
+// State
+let mazeStarted=false,bryanOn=false,activeWeek=CURRENT_WEEK,ghostLocked=false;
+let introPhase='idle',introGlowStart=0,introDropStart=0,introBounceStart=0,introSettleStart=0;
+let introBounceIX=0,introBounceIY=0;
 const startCP=CHECKPOINTS.find(c=>c.w===CURRENT_WEEK);
-let ghostIX=startCP.ix, ghostIY=startCP.iy;
-let ghostSrcIX=ghostIX, ghostSrcIY=ghostIY;
-let ghostDstIX=ghostIX, ghostDstIY=ghostIY;
-let ghostT=1, ghostAnimStart=0, pendingPopupCP=null;
-
+let ghostIX=INTRO_TOP_CENTER_START.ix,ghostIY=INTRO_TOP_CENTER_START.iy;
+let ghostSrcIX=ghostIX,ghostSrcIY=ghostIY,ghostDstIX=ghostIX,ghostDstIY=ghostIY;
+let ghostT=1,ghostAnimStart=0,pendingPopupCP=null,ghostVisible=false;
 let trail=[];
 
-// Pre-generate fairy particle offsets for each checkpoint
-const CP_FAIRIES=CHECKPOINTS.map(()=>
-  Array.from({length:8},(_,i)=>({
-    angle:(i/8)*Math.PI*2+Math.random()*.5,
-    orbit:11+Math.random()*10,
-    speed:.35+Math.random()*.5,
-    phase:Math.random()*Math.PI*2,
-    size:.9+Math.random()*1.1,
-    twinkleSpeed:1.9+Math.random()*2.4,
-    twinklePhase:Math.random()*Math.PI*2,
-    useSecondary:i%3===2
-  }))
-);
+const CP_FAIRIES=CHECKPOINTS.map(()=>Array.from({length:8},(_,i)=>({
+  angle:(i/8)*Math.PI*2+Math.random()*.5,orbit:11+Math.random()*10,speed:.35+Math.random()*.5,
+  phase:Math.random()*Math.PI*2,size:.9+Math.random()*1.1,twinkleSpeed:1.9+Math.random()*2.4,
+  twinklePhase:Math.random()*Math.PI*2,useSecondary:i%3===2
+})));
 
-let bMouseX=-1, bMouseY=-1, rafHandle=null;
+let bMouseX=-1,bMouseY=-1,rafHandle=null;
 
 function restoreMazeFromCheckpoint(){
-  const returnWeek = parseInt(sessionStorage.getItem('booha_return_week') || '', 10);
-  const returnGhost = parseInt(sessionStorage.getItem('booha_return_ghost') || '', 10);
-
+  const returnWeek=parseInt(sessionStorage.getItem('booha_return_week')||'',10);
+  const returnGhost=parseInt(sessionStorage.getItem('booha_return_ghost')||'',10);
   sessionStorage.removeItem('booha_return_to_checkpoint');
   sessionStorage.removeItem('booha_return_week');
   sessionStorage.removeItem('booha_return_ghost');
-
-  if (Number.isInteger(returnGhost) && returnGhost >= 0 && returnGhost < GHOSTS.length) {
-    activeGhostIdx = returnGhost;
-    startGhost.src = GHOSTS[activeGhostIdx];
-  }
-
-  if (Number.isInteger(returnWeek) && returnWeek >= 1 && returnWeek <= CHECKPOINTS.length) {
-    activeWeek = returnWeek;
-  } else {
-    activeWeek = CURRENT_WEEK;
-  }
-
-  const cp = CHECKPOINTS.find(c => c.w === activeWeek) || startCP;
-
-  mazeStarted = true;
-  mazeLaunched = true;
-  videoPlayed = true;
-  o2shown = true;
-  introPhase = 'done';
-
-  ghostIX = cp.ix;
-  ghostIY = cp.iy;
-  ghostSrcIX = cp.ix;
-  ghostSrcIY = cp.iy;
-  ghostDstIX = cp.ix;
-  ghostDstIY = cp.iy;
-  ghostT = 1;
-  pendingPopupCP = null;
-
-  overlay1.classList.add('hidden');
-  overlay1.classList.add('gone');
-  overlay2.classList.remove('show');
-  overlay2.classList.add('hidden');
-  overlay2.classList.add('gone');
-  videoWrap.classList.remove('show');
-  cpPopup.classList.remove('show');
-  cpScrim.classList.remove('show');
+  if(Number.isInteger(returnGhost)&&returnGhost>=0&&returnGhost<GHOSTS.length){activeGhostIdx=returnGhost;startGhost.src=GHOSTS[activeGhostIdx];}
+  if(Number.isInteger(returnWeek)&&returnWeek>=1&&returnWeek<=CHECKPOINTS.length)activeWeek=returnWeek;
+  else activeWeek=CURRENT_WEEK;
+  const cp=CHECKPOINTS.find(c=>c.w===activeWeek)||startCP;
+  mazeStarted=true;mazeLaunched=true;videoPlayed=true;o2shown=true;introPhase='done';ghostVisible=true;
+  ghostIX=cp.ix;ghostIY=cp.iy;ghostSrcIX=cp.ix;ghostSrcIY=cp.iy;ghostDstIX=cp.ix;ghostDstIY=cp.iy;ghostT=1;pendingPopupCP=null;
+  overlay1.classList.add('hidden','gone');overlay2.classList.remove('show');overlay2.classList.add('hidden','gone');
+  videoWrap.classList.remove('show');cpPopup.classList.remove('show');cpScrim.classList.remove('show');
   app.classList.remove('inTransition');
+  karasukiLastSwap=performance.now();
+  resizeCanvas();buildWanderers();startLoop();
+  try{bgMusic.volume=.65;bgMusic.play();}catch(e){}
+}
 
-  resizeCanvas();
-  buildWanderers();
-  startLoop();
-
-  try{
-    bgMusic.volume = .65;
-    bgMusic.play();
-  }catch(e){}
-}  
-
-// ─────────────────────────────────────────────────────────
-//  WANDERING GHOST SYSTEM
-// ─────────────────────────────────────────────────────────
-// Each wandering ghost moves slowly across / around the screen edge
-// only uses ghost images NOT chosen as the active ghost
-// They share the same glow+trail style as the active ghost
-
-const GHOST_SIZE = 56;   // px — same as active ghost diameter (28*2)
-
-// One wander entry per non-active ghost (max 4 possible)
-let wanderers = [];
-
-// We keep a small per-wanderer trail
-const WANDER_TRAIL_MAX = 60;
+// Wanderers
+const GHOST_SIZE=56,WANDER_TRAIL_MAX=60;
+let wanderers=[];
 
 function buildWanderers(){
-  wanderers = [];
+  wanderers=[];
   for(let gi=0;gi<GHOSTS.length;gi++){
-    if(gi===activeGhostIdx) continue;
-    const w = createWanderer(gi, wanderers.length * 1400);
-    wanderers.push(w);
+    if(gi===activeGhostIdx)continue;
+    wanderers.push(createWanderer(gi,wanderers.length*1400));
   }
 }
 
-function createWanderer(ghostIdx, delayMs){
-  // Start off-screen at a random edge
-  const side = Math.floor(Math.random()*4); // 0=top,1=right,2=bottom,3=left
-  let sx, sy;
-  switch(side){
-    case 0: sx=Math.random()*window.innerWidth;  sy=-GHOST_SIZE; break;
-    case 1: sx=window.innerWidth+GHOST_SIZE;      sy=Math.random()*window.innerHeight; break;
-    case 2: sx=Math.random()*window.innerWidth;  sy=window.innerHeight+GHOST_SIZE; break;
-    default:sx=-GHOST_SIZE;                       sy=Math.random()*window.innerHeight; break;
-  }
-  // Target: a random point near/off a different edge (so they drift through)
-  const exitSide = (side+2)%4;
-  let tx, ty;
-  switch(exitSide){
-    case 0: tx=Math.random()*window.innerWidth;  ty=-GHOST_SIZE; break;
-    case 1: tx=window.innerWidth+GHOST_SIZE;     ty=Math.random()*window.innerHeight; break;
-    case 2: tx=Math.random()*window.innerWidth;  ty=window.innerHeight+GHOST_SIZE; break;
-    default:tx=-GHOST_SIZE;                      ty=Math.random()*window.innerHeight; break;
-  }
-  // Duration: 14s–26s
-  const dur = 14000 + Math.random()*12000;
-  const wobbleAmp   = 18 + Math.random()*24;   // px lateral wobble
-  const wobbleFreq  = 0.25 + Math.random()*0.35;
-  const wobblePhase = Math.random()*Math.PI*2;
-  const bobAmp      = 5 + Math.random()*6;
-  const bobFreq     = 1.2 + Math.random()*0.8;
-
-  return {
-    ghostIdx,
-    sx, sy, tx, ty,
-    startTime: null,
-    delayMs,
-    dur,
-    wobbleAmp, wobbleFreq, wobblePhase,
-    bobAmp, bobFreq,
-    trail: [],
-    done: false,
-    cx: sx, cy: sy,  // current position (CSS px, not image space)
-    opacity: 0,
-  };
+function createWanderer(ghostIdx,delayMs){
+  const side=Math.floor(Math.random()*4);
+  let sx,sy;
+  switch(side){ case 0:sx=Math.random()*window.innerWidth;sy=-GHOST_SIZE;break; case 1:sx=window.innerWidth+GHOST_SIZE;sy=Math.random()*window.innerHeight;break; case 2:sx=Math.random()*window.innerWidth;sy=window.innerHeight+GHOST_SIZE;break; default:sx=-GHOST_SIZE;sy=Math.random()*window.innerHeight; }
+  const exitSide=(side+2)%4;
+  let tx,ty;
+  switch(exitSide){ case 0:tx=Math.random()*window.innerWidth;ty=-GHOST_SIZE;break; case 1:tx=window.innerWidth+GHOST_SIZE;ty=Math.random()*window.innerHeight;break; case 2:tx=Math.random()*window.innerWidth;ty=window.innerHeight+GHOST_SIZE;break; default:tx=-GHOST_SIZE;ty=Math.random()*window.innerHeight; }
+  const dur=14000+Math.random()*12000;
+  return{ghostIdx,sx,sy,tx,ty,startTime:null,delayMs,dur,wobbleAmp:18+Math.random()*24,wobbleFreq:.25+Math.random()*.35,wobblePhase:Math.random()*Math.PI*2,bobAmp:5+Math.random()*6,bobFreq:1.2+Math.random()*.8,trail:[],done:false,cx:sx,cy:sy,opacity:0};
 }
 
 function tickWanderers(nowMs){
   for(let i=0;i<wanderers.length;i++){
-    const w = wanderers[i];
-    if(w.done){ continue; }
-    if(w.startTime===null){
-      if(nowMs < w.delayMs){ continue; }
-      w.startTime = nowMs;
+    const w=wanderers[i];
+    if(w.done)continue;
+    if(w.startTime===null){if(nowMs<w.delayMs)continue;w.startTime=nowMs;}
+    const elapsed=nowMs-w.startTime,t=Math.min(elapsed/w.dur,1),et=easeInOut(t);
+    const dx=w.tx-w.sx,dy=w.ty-w.sy,len=Math.hypot(dx,dy)||1,nx=-dy/len,ny=dx/len;
+    const sec=nowMs/1000,wob=Math.sin(sec*w.wobbleFreq*Math.PI*2+w.wobblePhase)*w.wobbleAmp,bob=Math.sin(sec*w.bobFreq*Math.PI*2)*w.bobAmp;
+    const bx=w.sx+dx*et+nx*wob,by=w.sy+dy*et+ny*wob+bob;
+    w.opacity=Math.min(t*6,1,(1-t)*6)*.82;
+    if(Math.random()<.35){
+      const col=MONTH_COLORS[Math.floor(Math.random()*MONTH_COLORS.length)];
+      w.trail.push({x:bx,y:by,life:1,size:2+Math.random()*3.5,color:col[Math.random()<.5?0:1],dx:(Math.random()-.5)*.3,dy:-Math.random()*.4});
+      if(w.trail.length>WANDER_TRAIL_MAX)w.trail.shift();
     }
-    const elapsed = nowMs - w.startTime;
-    const t = Math.min(elapsed / w.dur, 1);
-    const et = easeInOut(t);
-
-    // Perpendicular wobble
-    const dx = w.tx - w.sx, dy = w.ty - w.sy;
-    const len = Math.hypot(dx,dy)||1;
-    const nx = -dy/len, ny = dx/len;
-    const sec = nowMs/1000;
-    const wob = Math.sin(sec*w.wobbleFreq*Math.PI*2 + w.wobblePhase)*w.wobbleAmp;
-    const bob = Math.sin(sec*w.bobFreq*Math.PI*2)*w.bobAmp;
-
-    const bx = w.sx + dx*et + nx*wob;
-    const by = w.sy + dy*et + ny*wob + bob;
-
-    // Fade in/out at edges of journey
-    const fadeT = Math.min(t*6, 1, (1-t)*6);
-    w.opacity = fadeT * 0.82;
-
-    // Trail
-    if(Math.random()<0.35){
-      const col = MONTH_COLORS[Math.floor(Math.random()*MONTH_COLORS.length)];
-      const trailColor = col[Math.random()<0.5?0:1];
-      w.trail.push({ x:bx, y:by, life:1, size:2+Math.random()*3.5, color:trailColor,
-        dx:(Math.random()-.5)*.3, dy:-Math.random()*.4 });
-      if(w.trail.length>WANDER_TRAIL_MAX) w.trail.shift();
-    }
-
-    w.cx = bx; w.cy = by;
-
-    if(t>=1){ w.done=true; }
+    w.cx=bx;w.cy=by;
+    if(t>=1)w.done=true;
   }
-
-  // Respawn done wanderers after a random delay
   for(let i=0;i<wanderers.length;i++){
     if(wanderers[i].done){
-      const gi = wanderers[i].ghostIdx;
-      const delay = performance.now() + 3000 + Math.random()*8000;
-      wanderers[i] = createWanderer(gi, delay);
-      wanderers[i].startTime = null;
-      // Override delayMs with absolute time so we need to rework:
-      // Instead, use a flag
-      wanderers[i]._absoluteDelay = delay;
+      const gi=wanderers[i].ghostIdx;
+      const delay=performance.now()+3000+Math.random()*8000;
+      wanderers[i]=createWanderer(gi,delay);wanderers[i].startTime=null;
     }
   }
 }
@@ -845,580 +430,455 @@ function easeInOut(t){ return t<.5?2*t*t:-1+(4-2*t)*t; }
 
 function drawWanderers(nowMs){
   for(const w of wanderers){
-    if(w.opacity<=0) continue;
-    const img = ghostImgs[w.ghostIdx];
-    if(!img||!img.complete||!img.naturalWidth) continue;
-
-    const gR = GHOST_SIZE/2;
-    const gx = w.cx, gy = w.cy;
-    const col1 = MONTH_COLORS[w.ghostIdx % MONTH_COLORS.length][0];
-    const col2 = MONTH_COLORS[w.ghostIdx % MONTH_COLORS.length][1];
-    const sec = nowMs/1000;
-    const pulseG = .5+.5*Math.sin(sec*2.1+w.ghostIdx*.8);
-
+    if(w.opacity<=0)continue;
+    const img=ghostImgs[w.ghostIdx];
+    if(!img||!img.complete||!img.naturalWidth)continue;
+    const gR=GHOST_SIZE/2,gx=w.cx,gy=w.cy;
+    const col1=MONTH_COLORS[w.ghostIdx%MONTH_COLORS.length][0],col2=MONTH_COLORS[w.ghostIdx%MONTH_COLORS.length][1];
+    const sec=nowMs/1000,pulseG=.5+.5*Math.sin(sec*2.1+w.ghostIdx*.8);
     ctx.save();
-
-    // Trail particles
     for(let pi=w.trail.length-1;pi>=0;pi--){
       const p=w.trail[pi];
       const gr=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.size*2.3);
-      gr.addColorStop(0,p.color); gr.addColorStop(1,'transparent');
-      ctx.globalAlpha=p.life*.35*w.opacity; ctx.fillStyle=gr;
-      ctx.beginPath(); ctx.arc(p.x,p.y,p.size*2.3,0,Math.PI*2); ctx.fill();
-      ctx.globalAlpha=p.life*.70*w.opacity; ctx.fillStyle='#fff';
-      ctx.beginPath(); ctx.arc(p.x,p.y,p.size*.34,0,Math.PI*2); ctx.fill();
-      ctx.globalAlpha=1;
-      p.life-=.018; p.x+=p.dx; p.y+=p.dy;
+      gr.addColorStop(0,p.color);gr.addColorStop(1,'transparent');
+      ctx.globalAlpha=p.life*.35*w.opacity;ctx.fillStyle=gr;ctx.beginPath();ctx.arc(p.x,p.y,p.size*2.3,0,Math.PI*2);ctx.fill();
+      ctx.globalAlpha=p.life*.70*w.opacity;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(p.x,p.y,p.size*.34,0,Math.PI*2);ctx.fill();
+      ctx.globalAlpha=1;p.life-=.018;p.x+=p.dx;p.y+=p.dy;
     }
-    w.trail = w.trail.filter(p=>p.life>0);
-
-    // Glow haze
+    w.trail=w.trail.filter(p=>p.life>0);
     ctx.globalAlpha=w.opacity*(.18+pulseG*.09);
-    const ga=ctx.createRadialGradient(gx,gy+3,0,gx,gy+3,gR*2.0);
-    ga.addColorStop(0,col1); ga.addColorStop(.5,col2); ga.addColorStop(1,'transparent');
-    ctx.fillStyle=ga; ctx.beginPath(); ctx.arc(gx,gy+3,gR*2.0,0,Math.PI*2); ctx.fill();
-
-    // Ghost image
-    ctx.globalAlpha=w.opacity;
-    ctx.drawImage(img, gx-gR, gy-gR, gR*2, gR*2);
-
-    ctx.globalAlpha=1;
-    ctx.restore();
+    const ga=ctx.createRadialGradient(gx,gy+3,0,gx,gy+3,gR*2);
+    ga.addColorStop(0,col1);ga.addColorStop(.5,col2);ga.addColorStop(1,'transparent');
+    ctx.fillStyle=ga;ctx.beginPath();ctx.arc(gx,gy+3,gR*2,0,Math.PI*2);ctx.fill();
+    ctx.globalAlpha=w.opacity;ctx.drawImage(img,gx-gR,gy-gR,gR*2,gR*2);
+    ctx.globalAlpha=1;ctx.restore();
   }
 }
 
-// ─────────────────────────────────────────────────────────
-//  TRAVEL LOCK helper
-// ─────────────────────────────────────────────────────────
 function setTravelLock(on){
-  ghostLocked = on;
-  travelLock.classList.toggle('active', on);
-  // also lock back/bryan buttons during travel
-  backBtn.style.pointerEvents   = on ? 'none' : '';
-  bryanBtn.style.pointerEvents  = on ? 'none' : '';
+  ghostLocked=on;travelLock.classList.toggle('active',on);
+  backBtn.style.pointerEvents=on?'none':'';bryanBtn.style.pointerEvents=on?'none':'';
 }
 
-// ─────────────────────────────────────────────────────────
-//  EASING
-// ─────────────────────────────────────────────────────────
+// Easing functions
 function ease(t){ return t<.5?2*t*t:-1+(4-2*t)*t; }
+function easeOutBack(t,s=1.70158){ return 1+(s+1)*Math.pow(t-1,3)+s*Math.pow(t-1,2); }
+function sineWobble(t,freq=2.5,amp=1){ return Math.sin(t*Math.PI*freq)*amp*(1-t); }
 
-// ─────────────────────────────────────────────────────────
-//  TRAIL (active ghost)
-// ─────────────────────────────────────────────────────────
 function addTrail(ix,iy){
   const c=Math.random()>.55?monthSecondary(activeWeek):monthPrimary(activeWeek);
-  trail.push({ix,iy,life:1,size:1.8+Math.random()*4.5,color:c,
-    dx:(Math.random()-.5)*.28,dy:-Math.random()*.36});
-  if(trail.length>100) trail.shift();
+  trail.push({ix,iy,life:1,size:1.8+Math.random()*4.5,color:c,dx:(Math.random()-.5)*.28,dy:-Math.random()*.36});
+  if(trail.length>100)trail.shift();
 }
 
-// ─────────────────────────────────────────────────────────
-//  DRAW FRAME
-// ─────────────────────────────────────────────────────────
+// ── Draw trees ──────────────────────────────────────────────────────────────
+function drawTrees(now){
+  if(!mazeStarted)return;
+  const sec=now/1000;
+
+  // Homework tree — welcoming warm glow
+  {
+    const{x,y}=imgToCSS(1086,202);
+    const pulse=.5+.5*Math.sin(sec*1.4),pulse2=.5+.5*Math.sin(sec*.9+1.1);
+    ctx.save();
+    // Ground shadow
+    ctx.globalAlpha=.16+pulse*.05;
+    const sg=ctx.createRadialGradient(x,y+TREE_H*.4,0,x,y+TREE_H*.4,TREE_HALF*1.5);
+    sg.addColorStop(0,'rgba(0,0,0,.5)');sg.addColorStop(1,'transparent');
+    ctx.fillStyle=sg;ctx.beginPath();ctx.ellipse(x,y+TREE_H*.42,TREE_HALF*1.1,TREE_HALF*.32,0,0,Math.PI*2);ctx.fill();
+    // Wide warm aura
+    ctx.globalAlpha=.09+pulse*.06;
+    const a1=ctx.createRadialGradient(x,y,0,x,y,TREE_HALF*3.2);
+    a1.addColorStop(0,'#ffe066');a1.addColorStop(.4,'#ffbb33');a1.addColorStop(1,'transparent');
+    ctx.fillStyle=a1;ctx.beginPath();ctx.arc(x,y,TREE_HALF*3.2,0,Math.PI*2);ctx.fill();
+    // Mid warm glow
+    ctx.globalAlpha=.20+pulse2*.13;
+    const a2=ctx.createRadialGradient(x,y-TREE_H*.15,0,x,y-TREE_H*.15,TREE_HALF*2.0);
+    a2.addColorStop(0,'#fff9a0');a2.addColorStop(.5,'#ffdd55');a2.addColorStop(1,'transparent');
+    ctx.fillStyle=a2;ctx.beginPath();ctx.arc(x,y-TREE_H*.15,TREE_HALF*2.0,0,Math.PI*2);ctx.fill();
+    // Inner lantern core
+    ctx.globalAlpha=.28+pulse*.18;
+    const a3=ctx.createRadialGradient(x,y-TREE_H*.2,0,x,y-TREE_H*.2,TREE_HALF*1.05);
+    a3.addColorStop(0,'#ffffff');a3.addColorStop(.35,'#ffe888');a3.addColorStop(1,'transparent');
+    ctx.fillStyle=a3;ctx.beginPath();ctx.arc(x,y-TREE_H*.2,TREE_HALF*1.05,0,Math.PI*2);ctx.fill();
+    // Sparkle twinkles
+    for(let i=0;i<6;i++){
+      const angle=(i/6)*Math.PI*2+sec*.4,twinkle=.4+.6*Math.abs(Math.sin(sec*2.2+i*1.1));
+      const r=TREE_HALF*(.75+.15*Math.sin(sec*.8+i));
+      const fx=x+Math.cos(angle)*r,fy=(y-TREE_H*.22)+Math.sin(angle)*r*.65;
+      ctx.globalAlpha=twinkle*.6;ctx.strokeStyle='#fff8c0';ctx.lineWidth=1.1;
+      ctx.shadowBlur=7;ctx.shadowColor='#ffe566';
+      const sl=4+twinkle*3;
+      ctx.beginPath();ctx.moveTo(fx,fy-sl);ctx.lineTo(fx,fy+sl);ctx.moveTo(fx-sl,fy);ctx.lineTo(fx+sl,fy);ctx.stroke();
+      ctx.shadowBlur=0;
+    }
+    ctx.globalAlpha=1.0;
+    if(homeworkImg.complete&&homeworkImg.naturalWidth>0)
+      ctx.drawImage(homeworkImg,x-TREE_HALF,y-TREE_H*.55,TREE_HALF*2,TREE_H);
+    ctx.restore();
+  }
+
+  // Karasuki tree — spooky glow + crossfade
+  tickKarasuki(now);
+  {
+    const{x,y}=imgToCSS(389,262);
+    const flicker=.82+.18*Math.sin(sec*7.3)*Math.sin(sec*4.1+.7);
+    const pulse=.5+.5*Math.sin(sec*.85),pulse2=.5+.5*Math.sin(sec*1.7+2.0);
+    ctx.save();
+    // Ground mist
+    ctx.globalAlpha=.20+pulse*.07;
+    const sg=ctx.createRadialGradient(x,y+TREE_H*.38,0,x,y+TREE_H*.38,TREE_HALF*1.8);
+    sg.addColorStop(0,'rgba(40,0,60,.75)');sg.addColorStop(1,'transparent');
+    ctx.fillStyle=sg;ctx.beginPath();ctx.ellipse(x,y+TREE_H*.40,TREE_HALF*1.3,TREE_HALF*.36,0,0,Math.PI*2);ctx.fill();
+    // Far purple fog
+    ctx.globalAlpha=(.08+pulse*.05)*flicker;
+    const s1=ctx.createRadialGradient(x,y,0,x,y,TREE_HALF*3.8);
+    s1.addColorStop(0,'#6600aa');s1.addColorStop(.45,'#330066');s1.addColorStop(1,'transparent');
+    ctx.fillStyle=s1;ctx.beginPath();ctx.arc(x,y,TREE_HALF*3.8,0,Math.PI*2);ctx.fill();
+    // Sickly green mid
+    ctx.globalAlpha=(.15+pulse2*.11)*flicker;
+    const s2=ctx.createRadialGradient(x,y-TREE_H*.18,0,x,y-TREE_H*.18,TREE_HALF*2.0);
+    s2.addColorStop(0,'#44ff66');s2.addColorStop(.4,'#00aa33');s2.addColorStop(1,'transparent');
+    ctx.fillStyle=s2;ctx.beginPath();ctx.arc(x,y-TREE_H*.18,TREE_HALF*2.0,0,Math.PI*2);ctx.fill();
+    // Inner purple core
+    ctx.globalAlpha=(.22+pulse*.16)*flicker;
+    const s3=ctx.createRadialGradient(x,y-TREE_H*.22,0,x,y-TREE_H*.22,TREE_HALF*1.0);
+    s3.addColorStop(0,'#ddaaff');s3.addColorStop(.4,'#8833cc');s3.addColorStop(1,'transparent');
+    ctx.fillStyle=s3;ctx.beginPath();ctx.arc(x,y-TREE_H*.22,TREE_HALF*1.0,0,Math.PI*2);ctx.fill();
+    // Rising wisps
+    for(let i=0;i<5;i++){
+      const wt=((sec*.22+i*.2)%1);
+      const wx=x+Math.sin(sec*1.4+i*1.25)*TREE_HALF*.7;
+      const wy=(y+TREE_H*.3)-wt*TREE_H*1.3;
+      const wa=wt<.2?wt/.2:wt>.7?(1-wt)/.3:1;
+      ctx.globalAlpha=wa*.25*flicker;
+      const wg=ctx.createRadialGradient(wx,wy,0,wx,wy,12+Math.sin(sec+i)*4);
+      wg.addColorStop(0,i%2===0?'#88ffaa':'#cc88ff');wg.addColorStop(1,'transparent');
+      ctx.fillStyle=wg;ctx.beginPath();ctx.arc(wx,wy,12+Math.sin(sec+i)*4,0,Math.PI*2);ctx.fill();
+    }
+    // Orbiting spooky crosses
+    for(let i=0;i<4;i++){
+      const angle=(i/4)*Math.PI*2+sec*.55,twinkle=.3+.7*Math.abs(Math.sin(sec*1.8+i*.9));
+      const r=TREE_HALF*(.80+.12*Math.sin(sec*.6+i));
+      const fx=x+Math.cos(angle)*r,fy=(y-TREE_H*.18)+Math.sin(angle)*r*.7;
+      ctx.globalAlpha=twinkle*.52*flicker;ctx.strokeStyle=i%2===0?'#aaffcc':'#dd99ff';ctx.lineWidth=1.0;
+      ctx.shadowBlur=9;ctx.shadowColor=i%2===0?'#00ff66':'#9933ff';
+      const sl=3.5+twinkle*3;
+      ctx.beginPath();ctx.moveTo(fx,fy-sl);ctx.lineTo(fx,fy+sl);ctx.moveTo(fx-sl,fy);ctx.lineTo(fx+sl,fy);ctx.stroke();
+      ctx.shadowBlur=0;
+    }
+    // Crossfade trees
+    if(karasuki1Img.complete&&karasuki1Img.naturalWidth>0&&karasukiBlend<1){
+      ctx.globalAlpha=1-karasukiBlend;
+      ctx.drawImage(karasuki1Img,x-TREE_HALF,y-TREE_H*.55,TREE_HALF*2,TREE_H);
+    }
+    if(karasuki2Img.complete&&karasuki2Img.naturalWidth>0&&karasukiBlend>0){
+      ctx.globalAlpha=karasukiBlend;
+      ctx.drawImage(karasuki2Img,x-TREE_HALF,y-TREE_H*.55,TREE_HALF*2,TREE_H);
+    }
+    ctx.globalAlpha=1;ctx.restore();
+  }
+}
+
+// ── Draw frame ───────────────────────────────────────────────────────────────
 function drawFrame(now){
   ctx.clearRect(0,0,cssW,cssH);
-  if(!mazeStarted) return;
+  if(!mazeStarted)return;
+  const sec=now/1000,cpState={};
 
-  const sec=now/1000;
-  const cpState={};
-
-  // ── Intro: all glow ──────────────────────────────────
   if(introPhase==='allGlow'){
-    const el=now-introGlowStart;
-    const showEnd=INTRO_GLOW_MS*.62;
+    const el=now-introGlowStart,showEnd=INTRO_GLOW_MS*.62;
     let baseA=el<showEnd?1:Math.max(0,1-(el-showEnd)/(INTRO_GLOW_MS-showEnd));
-    CHECKPOINTS.forEach(cp=>{
-      cpState[cp.w]={alpha:OPEN_WEEKS.includes(cp.w)?1:baseA*.78,extra:1.5};
-    });
+    CHECKPOINTS.forEach(cp=>{cpState[cp.w]={alpha:OPEN_WEEKS.includes(cp.w)?1:baseA*.78,extra:1.5};});
+    if(el>=INTRO_GLOW_MS){
+      introPhase='dropping';introDropStart=now;
+      ghostIX=INTRO_TOP_CENTER_START.ix;ghostIY=INTRO_TOP_CENTER_START.iy;
+      ghostVisible=true;setTravelLock(true);
+    }
 
-  if(el>=INTRO_GLOW_MS){
-    introPhase = 'traveling';
-    introTravelStart = now;
+  } else if(introPhase==='dropping'){
+    OPEN_WEEKS.forEach(w=>{cpState[w]={alpha:1,extra:1.0};});
+    const prog=Math.min((now-introDropStart)/INTRO_DROP_MS,1);
+    const et=easeOutBack(prog,1.2);
+    const wobble=sineWobble(prog,2.5,52);
+    ghostIX=INTRO_TOP_CENTER_START.ix+wobble;
+    ghostIY=INTRO_TOP_CENTER_START.iy+(INTRO_BOUNCE_LAND.iy-INTRO_TOP_CENTER_START.iy)*et;
+    if(Math.random()<.38)addTrail(ghostIX,ghostIY);
+    if(prog>=1){ introBounceIX=ghostIX;introBounceIY=ghostIY;introPhase='bouncing';introBounceStart=now; }
 
-    introSrcIX = INTRO_TOP_CENTER_START.ix;
-    introSrcIY = INTRO_TOP_CENTER_START.iy;
- 
-    ghostIX = introSrcIX;
-    ghostIY = introSrcIY;
+  } else if(introPhase==='bouncing'){
+    OPEN_WEEKS.forEach(w=>{cpState[w]={alpha:1,extra:1.0};});
+    const prog=Math.min((now-introBounceStart)/INTRO_BOUNCE_MS,1);
+    const loopAngle=prog*Math.PI*2.5;
+    const loopR=58*(1-prog);
+    const bobBounce=Math.abs(Math.sin(prog*Math.PI*3))*30*(1-prog);
+    ghostIX=introBounceIX+Math.sin(loopAngle)*loopR;
+    ghostIY=introBounceIY+Math.cos(loopAngle*.5)*loopR*.5-bobBounce;
+    if(Math.random()<.48)addTrail(ghostIX,ghostIY);
+    if(prog>=1){ introBounceIX=ghostIX;introBounceIY=ghostIY;introPhase='settling';introSettleStart=now; }
 
-    setTravelLock(true);
-  }
-
-  // ── Intro: ghost traveling ───────────────────────────
-  } else if(introPhase==='traveling'){
-    OPEN_WEEKS.forEach(w=>{ cpState[w]={alpha:1,extra:1.0}; });
-    const prog=Math.min((now-introTravelStart)/INTRO_TRAVEL_MS,1);
+  } else if(introPhase==='settling'){
+    OPEN_WEEKS.forEach(w=>{cpState[w]={alpha:1,extra:1.0};});
+    const prog=Math.min((now-introSettleStart)/INTRO_SETTLE_MS,1);
     const et=ease(prog);
-    ghostIX=introSrcIX+(startCP.ix-introSrcIX)*et;
-    ghostIY=introSrcIY+(startCP.iy-introSrcIY)*et;
-    if(Math.random()<.3) addTrail(ghostIX,ghostIY);
+    ghostIX=introBounceIX+(startCP.ix-introBounceIX)*et;
+    ghostIY=introBounceIY+(startCP.iy-introBounceIY)*et;
+    if(Math.random()<.3)addTrail(ghostIX,ghostIY);
     if(prog>=1){
-      introPhase='done';
-      ghostIX=startCP.ix; ghostIY=startCP.iy;
-      ghostSrcIX=ghostIX; ghostSrcIY=ghostIY;
-      ghostDstIX=ghostIX; ghostDstIY=ghostIY; ghostT=1;
-      setTravelLock(false);
-      showPopupAtCP(startCP);
+      introPhase='done';ghostIX=startCP.ix;ghostIY=startCP.iy;
+      ghostSrcIX=ghostIX;ghostSrcIY=ghostIY;ghostDstIX=ghostIX;ghostDstIY=ghostIY;ghostT=1;
+      setTravelLock(false);showPopupAtCP(startCP);
     }
 
-  // ── Normal play ──────────────────────────────────────
-  } else {
-    OPEN_WEEKS.forEach(w=>{ cpState[w]={alpha:1,extra:0}; });
-    if(bryanOn){
-      CHECKPOINTS.forEach(cp=>{
-        if(!cpState[cp.w]) cpState[cp.w]={alpha:.65,extra:.15};
-      });
-    }
+  } else if(introPhase==='done'){
+    OPEN_WEEKS.forEach(w=>{cpState[w]={alpha:1,extra:0};});
+    if(bryanOn) CHECKPOINTS.forEach(cp=>{if(!cpState[cp.w])cpState[cp.w]={alpha:.65,extra:.15};});
     if(ghostT<1){
-      const el=now-ghostAnimStart;
-      ghostT=Math.min(el/GHOST_TRAVEL_MS,1);
+      const el=now-ghostAnimStart;ghostT=Math.min(el/GHOST_TRAVEL_MS,1);
       const et=ease(ghostT);
-      ghostIX=ghostSrcIX+(ghostDstIX-ghostSrcIX)*et;
-      ghostIY=ghostSrcIY+(ghostDstIY-ghostSrcIY)*et;
-      if(Math.random()<.28) addTrail(ghostIX,ghostIY);
-      if(ghostT>=1&&pendingPopupCP){
-        ghostIX=ghostDstIX; ghostIY=ghostDstIY;
-        setTravelLock(false);
-        showPopupAtCP(pendingPopupCP); pendingPopupCP=null;
-      }
+      ghostIX=ghostSrcIX+(ghostDstIX-ghostSrcIX)*et;ghostIY=ghostSrcIY+(ghostDstIY-ghostSrcIY)*et;
+      if(Math.random()<.28)addTrail(ghostIX,ghostIY);
+      if(ghostT>=1&&pendingPopupCP){ghostIX=ghostDstIX;ghostIY=ghostDstIY;setTravelLock(false);showPopupAtCP(pendingPopupCP);pendingPopupCP=null;}
     }
   }
 
-  // Tick + draw wanderers
-  tickWanderers(now);
-  drawWanderers(now);
+  // Trees (behind everything else)
+  drawTrees(now);
 
-  // ── Trail (active ghost) ─────────────────────────────
+  // Wanderers
+  tickWanderers(now);drawWanderers(now);
+
+  // Trail
   for(let i=trail.length-1;i>=0;i--){
-    const p=trail[i]; const {x,y}=imgToCSS(p.ix,p.iy);
+    const p=trail[i];const{x,y}=imgToCSS(p.ix,p.iy);
     const gr=ctx.createRadialGradient(x,y,0,x,y,p.size*2.3);
-    gr.addColorStop(0,p.color); gr.addColorStop(1,'transparent');
-    ctx.globalAlpha=p.life*.40; ctx.fillStyle=gr;
-    ctx.beginPath(); ctx.arc(x,y,p.size*2.3,0,Math.PI*2); ctx.fill();
-    ctx.globalAlpha=p.life*.80; ctx.fillStyle='#fff';
-    ctx.beginPath(); ctx.arc(x,y,p.size*.34,0,Math.PI*2); ctx.fill();
-    ctx.globalAlpha=1;
-    p.life-=.016; p.ix+=p.dx; p.iy+=p.dy;
+    gr.addColorStop(0,p.color);gr.addColorStop(1,'transparent');
+    ctx.globalAlpha=p.life*.40;ctx.fillStyle=gr;ctx.beginPath();ctx.arc(x,y,p.size*2.3,0,Math.PI*2);ctx.fill();
+    ctx.globalAlpha=p.life*.80;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(x,y,p.size*.34,0,Math.PI*2);ctx.fill();
+    ctx.globalAlpha=1;p.life-=.016;p.ix+=p.dx;p.iy+=p.dy;
   }
   trail=trail.filter(p=>p.life>0);
 
-  // ── Checkpoints ───────────────────────────────────────
-  const {scale:coverScale}=getCover();
-
+  // Checkpoints
+  const{scale:coverScale}=getCover();
   CHECKPOINTS.forEach((cp,cpIdx)=>{
-    const state=cpState[cp.w];
-    if(!state||state.alpha<=.01) return;
-
-    const {x,y}=imgToCSS(cp.ix,cp.iy);
-    const col1=monthPrimary(cp.w), col2=monthSecondary(cp.w);
-    const pulse =.5+.5*Math.sin(sec*2.1+cp.w*.73);
-    const pulse2=.5+.5*Math.sin(sec*1.35+cp.w*.41+1.3);
-    const baseR=7;
-    const glowR=baseR+pulse*3.5*(1+state.extra*.6);
-    const alpha=state.alpha;
-
+    const state=cpState[cp.w];if(!state||state.alpha<=.01)return;
+    const{x,y}=imgToCSS(cp.ix,cp.iy);
+    const col1=monthPrimary(cp.w),col2=monthSecondary(cp.w);
+    const pulse=.5+.5*Math.sin(sec*2.1+cp.w*.73),pulse2=.5+.5*Math.sin(sec*1.35+cp.w*.41+1.3);
+    const baseR=7,glowR=baseR+pulse*3.5*(1+state.extra*.6),alpha=state.alpha;
     ctx.save();
-
     ctx.globalAlpha=alpha*(.14+pulse*.10);
-    const hazeR=glowR*4.5;
-    const haze=ctx.createRadialGradient(x,y,0,x,y,hazeR);
-    haze.addColorStop(0,col1); haze.addColorStop(.5,col1); haze.addColorStop(1,'transparent');
-    ctx.fillStyle=haze; ctx.beginPath(); ctx.arc(x,y,hazeR,0,Math.PI*2); ctx.fill();
-
+    const hazeR=glowR*4.5,haze=ctx.createRadialGradient(x,y,0,x,y,hazeR);
+    haze.addColorStop(0,col1);haze.addColorStop(.5,col1);haze.addColorStop(1,'transparent');
+    ctx.fillStyle=haze;ctx.beginPath();ctx.arc(x,y,hazeR,0,Math.PI*2);ctx.fill();
     ctx.globalAlpha=alpha*(.10+pulse2*.09);
     const haze2=ctx.createRadialGradient(x+glowR*.3,y-glowR*.2,0,x,y,hazeR*.8);
-    haze2.addColorStop(0,col2); haze2.addColorStop(.5,col2); haze2.addColorStop(1,'transparent');
-    ctx.fillStyle=haze2; ctx.beginPath(); ctx.arc(x,y,hazeR*.8,0,Math.PI*2); ctx.fill();
-
+    haze2.addColorStop(0,col2);haze2.addColorStop(.5,col2);haze2.addColorStop(1,'transparent');
+    ctx.fillStyle=haze2;ctx.beginPath();ctx.arc(x,y,hazeR*.8,0,Math.PI*2);ctx.fill();
     ctx.globalAlpha=alpha*(.48+pulse2*.22);
-    const midR=glowR*2.0;
-    const midG=ctx.createRadialGradient(x,y,glowR*.28,x,y,midR);
-    midG.addColorStop(0,'transparent');
-    midG.addColorStop(.35,col1); midG.addColorStop(.65,col2); midG.addColorStop(1,'transparent');
-    ctx.fillStyle=midG; ctx.beginPath(); ctx.arc(x,y,midR,0,Math.PI*2); ctx.fill();
-
+    const midR=glowR*2.0,midG=ctx.createRadialGradient(x,y,glowR*.28,x,y,midR);
+    midG.addColorStop(0,'transparent');midG.addColorStop(.35,col1);midG.addColorStop(.65,col2);midG.addColorStop(1,'transparent');
+    ctx.fillStyle=midG;ctx.beginPath();ctx.arc(x,y,midR,0,Math.PI*2);ctx.fill();
     ctx.globalAlpha=alpha*(.85+pulse*.15);
-    const coronaR=glowR*1.10;
-    const corona=ctx.createRadialGradient(x,y,0,x,y,coronaR);
-    corona.addColorStop(0,'#fff'); corona.addColorStop(.2,col1);
-    corona.addColorStop(.62,col2); corona.addColorStop(1,'transparent');
-    ctx.fillStyle=corona; ctx.beginPath(); ctx.arc(x,y,coronaR,0,Math.PI*2); ctx.fill();
-
-    ctx.globalAlpha=alpha*(.95+pulse*.05);
-    ctx.shadowBlur=24; ctx.shadowColor=col1;
-    ctx.fillStyle=col1;
-    ctx.beginPath(); ctx.arc(x,y,glowR*.44,0,Math.PI*2); ctx.fill();
-    ctx.shadowBlur=14; ctx.shadowColor=col2;
-    ctx.fillStyle=col2;
-    ctx.beginPath(); ctx.arc(x,y,glowR*.26,0,Math.PI*2); ctx.fill();
-    ctx.shadowBlur=0;
-
+    const coronaR=glowR*1.10,corona=ctx.createRadialGradient(x,y,0,x,y,coronaR);
+    corona.addColorStop(0,'#fff');corona.addColorStop(.2,col1);corona.addColorStop(.62,col2);corona.addColorStop(1,'transparent');
+    ctx.fillStyle=corona;ctx.beginPath();ctx.arc(x,y,coronaR,0,Math.PI*2);ctx.fill();
+    ctx.globalAlpha=alpha*(.95+pulse*.05);ctx.shadowBlur=24;ctx.shadowColor=col1;ctx.fillStyle=col1;
+    ctx.beginPath();ctx.arc(x,y,glowR*.44,0,Math.PI*2);ctx.fill();
+    ctx.shadowBlur=14;ctx.shadowColor=col2;ctx.fillStyle=col2;ctx.beginPath();ctx.arc(x,y,glowR*.26,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
     ctx.globalAlpha=alpha;
     const coreG=ctx.createRadialGradient(x,y,0,x,y,glowR*.16);
-    coreG.addColorStop(0,'rgba(255,255,255,1)');
-    coreG.addColorStop(.7,'rgba(255,255,255,.75)');
-    coreG.addColorStop(1,'rgba(255,255,255,0)');
-    ctx.fillStyle=coreG; ctx.beginPath(); ctx.arc(x,y,glowR*.16,0,Math.PI*2); ctx.fill();
-
-    ctx.globalAlpha=alpha*(.42+pulse*.30);
-    ctx.strokeStyle='rgba(255,255,255,0.95)'; ctx.lineWidth=.9;
-    ctx.shadowBlur=9; ctx.shadowColor=col1;
-    const starLen=glowR*(.72+pulse*.28);
+    coreG.addColorStop(0,'rgba(255,255,255,1)');coreG.addColorStop(.7,'rgba(255,255,255,.75)');coreG.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.fillStyle=coreG;ctx.beginPath();ctx.arc(x,y,glowR*.16,0,Math.PI*2);ctx.fill();
+    ctx.globalAlpha=alpha*(.42+pulse*.30);ctx.strokeStyle='rgba(255,255,255,0.95)';ctx.lineWidth=.9;ctx.shadowBlur=9;ctx.shadowColor=col1;
+    const starLen=glowR*(.72+pulse*.28),dL=starLen*.38;
     ctx.beginPath();
-    ctx.moveTo(x,y-starLen*.18); ctx.lineTo(x,y-starLen);
-    ctx.moveTo(x,y+starLen*.18); ctx.lineTo(x,y+starLen);
-    ctx.moveTo(x-starLen*.18,y); ctx.lineTo(x-starLen,y);
-    ctx.moveTo(x+starLen*.18,y); ctx.lineTo(x+starLen,y);
-    const dL=starLen*.38;
-    ctx.moveTo(x-dL*.1,y-dL*.1); ctx.lineTo(x-dL,y-dL);
-    ctx.moveTo(x+dL*.1,y-dL*.1); ctx.lineTo(x+dL,y-dL);
-    ctx.moveTo(x-dL*.1,y+dL*.1); ctx.lineTo(x-dL,y+dL);
-    ctx.moveTo(x+dL*.1,y+dL*.1); ctx.lineTo(x+dL,y+dL);
-    ctx.stroke(); ctx.shadowBlur=0;
-
+    ctx.moveTo(x,y-starLen*.18);ctx.lineTo(x,y-starLen);ctx.moveTo(x,y+starLen*.18);ctx.lineTo(x,y+starLen);
+    ctx.moveTo(x-starLen*.18,y);ctx.lineTo(x-starLen,y);ctx.moveTo(x+starLen*.18,y);ctx.lineTo(x+starLen,y);
+    ctx.moveTo(x-dL*.1,y-dL*.1);ctx.lineTo(x-dL,y-dL);ctx.moveTo(x+dL*.1,y-dL*.1);ctx.lineTo(x+dL,y-dL);
+    ctx.moveTo(x-dL*.1,y+dL*.1);ctx.lineTo(x-dL,y+dL);ctx.moveTo(x+dL*.1,y+dL*.1);ctx.lineTo(x+dL,y+dL);
+    ctx.stroke();ctx.shadowBlur=0;
     CP_FAIRIES[cpIdx].forEach(f=>{
-      const angle=f.angle+sec*f.speed;
-      const twinkle=.35+.65*Math.abs(Math.sin(sec*f.twinkleSpeed+f.twinklePhase));
+      const angle=f.angle+sec*f.speed,twinkle=.35+.65*Math.abs(Math.sin(sec*f.twinkleSpeed+f.twinklePhase));
       const r=f.orbit*coverScale*(.82+state.extra*.08)*(.92+.08*Math.sin(sec*1.1+f.phase));
-      const fx=x+Math.cos(angle)*r, fy=y+Math.sin(angle)*r*.84;
-      const fColor=f.useSecondary?col2:col1;
-      const fAlpha=twinkle*alpha*(.70+state.extra*.15);
-      const fSize=f.size*coverScale*(.65+twinkle*.45);
-
+      const fx=x+Math.cos(angle)*r,fy=y+Math.sin(angle)*r*.84;
+      const fColor=f.useSecondary?col2:col1,fAlpha=twinkle*alpha*(.70+state.extra*.15),fSize=f.size*coverScale*(.65+twinkle*.45);
       ctx.globalAlpha=fAlpha*.42;
       const fg=ctx.createRadialGradient(fx,fy,0,fx,fy,fSize*3.2);
-      fg.addColorStop(0,fColor); fg.addColorStop(1,'transparent');
-      ctx.fillStyle=fg; ctx.beginPath(); ctx.arc(fx,fy,fSize*3.2,0,Math.PI*2); ctx.fill();
-
-      ctx.globalAlpha=fAlpha;
-      ctx.strokeStyle='#fff'; ctx.lineWidth=fSize*.55;
-      ctx.shadowBlur=6; ctx.shadowColor=fColor;
-      const sl=fSize*1.9;
-      ctx.beginPath();
-      ctx.moveTo(fx,fy-sl); ctx.lineTo(fx,fy+sl);
-      ctx.moveTo(fx-sl,fy); ctx.lineTo(fx+sl,fy);
-      ctx.stroke();
-
-      ctx.globalAlpha=fAlpha;
-      ctx.fillStyle='#fff'; ctx.shadowBlur=5; ctx.shadowColor=fColor;
-      ctx.beginPath(); ctx.arc(fx,fy,fSize*.48,0,Math.PI*2); ctx.fill();
-      ctx.shadowBlur=0;
+      fg.addColorStop(0,fColor);fg.addColorStop(1,'transparent');
+      ctx.fillStyle=fg;ctx.beginPath();ctx.arc(fx,fy,fSize*3.2,0,Math.PI*2);ctx.fill();
+      ctx.globalAlpha=fAlpha;ctx.strokeStyle='#fff';ctx.lineWidth=fSize*.55;ctx.shadowBlur=6;ctx.shadowColor=fColor;
+      const sl=fSize*1.9;ctx.beginPath();ctx.moveTo(fx,fy-sl);ctx.lineTo(fx,fy+sl);ctx.moveTo(fx-sl,fy);ctx.lineTo(fx+sl,fy);ctx.stroke();
+      ctx.globalAlpha=fAlpha;ctx.fillStyle='#fff';ctx.shadowBlur=5;ctx.shadowColor=fColor;ctx.beginPath();ctx.arc(fx,fy,fSize*.48,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
     });
-
-    ctx.globalAlpha=1;
-    ctx.restore();
+    ctx.globalAlpha=1;ctx.restore();
   });
 
-  // ── Active Ghost ──────────────────────────────────────
-  const bob=Math.sin(sec*1.85)*3.5;
-  const {x:gx,y:gy}=imgToCSS(ghostIX,ghostIY);
-  const gR=28, pulseG=.5+.5*Math.sin(sec*2.1);
-  const gcol1=monthPrimary(activeWeek), gcol2=monthSecondary(activeWeek);
-
-  ctx.save();
-  ctx.globalAlpha=.20+pulseG*.10;
-  const ga=ctx.createRadialGradient(gx,gy+3,0,gx,gy+3,gR*2.0);
-  ga.addColorStop(0,gcol1); ga.addColorStop(.5,gcol2); ga.addColorStop(1,'transparent');
-  ctx.fillStyle=ga; ctx.beginPath(); ctx.arc(gx,gy+3,gR*2.0,0,Math.PI*2); ctx.fill();
-  ctx.globalAlpha=.14+pulseG*.06;
-  const gs=ctx.createRadialGradient(gx,gy+gR*.7,0,gx,gy+gR*.7,gR*.85);
-  gs.addColorStop(0,'rgba(0,0,0,.5)'); gs.addColorStop(1,'transparent');
-  ctx.fillStyle=gs; ctx.beginPath(); ctx.arc(gx,gy+gR*.7,gR*.85,0,Math.PI*2); ctx.fill();
-  ctx.restore();
-
-  ctx.save();
-  const activeImg = ghostImgs[activeGhostIdx];
-  if(activeImg&&activeImg.complete&&activeImg.naturalWidth>0){
-    ctx.drawImage(activeImg,gx-gR,gy-gR+bob,gR*2,gR*2);
-  } else {
-    ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(gx,gy+bob,gR*.7,0,Math.PI*2); ctx.fill();
-  }
-  ctx.restore();
-
-  // ── Bryan crosshair ───────────────────────────────────
-  if(bryanOn&&bMouseX>=0){
+  // Active ghost
+  if(ghostVisible){
+    const bob=Math.sin(sec*1.85)*3.5;
+    const{x:gx,y:gy}=imgToCSS(ghostIX,ghostIY);
+    const gR=28,pulseG=.5+.5*Math.sin(sec*2.1),gcol1=monthPrimary(activeWeek),gcol2=monthSecondary(activeWeek);
     ctx.save();
-    ctx.strokeStyle='rgba(255,255,255,.50)'; ctx.lineWidth=1;
-    ctx.shadowBlur=8; ctx.shadowColor='rgba(255,255,255,.25)';
-    ctx.setLineDash([5,5]);
-    ctx.beginPath(); ctx.moveTo(0,bMouseY); ctx.lineTo(cssW,bMouseY); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(bMouseX,0); ctx.lineTo(bMouseX,cssH); ctx.stroke();
+    ctx.globalAlpha=.20+pulseG*.10;
+    const ga=ctx.createRadialGradient(gx,gy+3,0,gx,gy+3,gR*2.0);
+    ga.addColorStop(0,gcol1);ga.addColorStop(.5,gcol2);ga.addColorStop(1,'transparent');
+    ctx.fillStyle=ga;ctx.beginPath();ctx.arc(gx,gy+3,gR*2.0,0,Math.PI*2);ctx.fill();
+    ctx.globalAlpha=.14+pulseG*.06;
+    const gs=ctx.createRadialGradient(gx,gy+gR*.7,0,gx,gy+gR*.7,gR*.85);
+    gs.addColorStop(0,'rgba(0,0,0,.5)');gs.addColorStop(1,'transparent');
+    ctx.fillStyle=gs;ctx.beginPath();ctx.arc(gx,gy+gR*.7,gR*.85,0,Math.PI*2);ctx.fill();
+    ctx.restore();
+    ctx.save();
+    const activeImg=ghostImgs[activeGhostIdx];
+    if(activeImg&&activeImg.complete&&activeImg.naturalWidth>0)ctx.drawImage(activeImg,gx-gR,gy-gR+bob,gR*2,gR*2);
+    else{ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(gx,gy+bob,gR*.7,0,Math.PI*2);ctx.fill();}
+    ctx.restore();
+  }
+
+  // Bryan crosshair
+  if(bryanOn&&bMouseX>=0){
+    ctx.save();ctx.strokeStyle='rgba(255,255,255,.50)';ctx.lineWidth=1;ctx.shadowBlur=8;ctx.shadowColor='rgba(255,255,255,.25)';ctx.setLineDash([5,5]);
+    ctx.beginPath();ctx.moveTo(0,bMouseY);ctx.lineTo(cssW,bMouseY);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(bMouseX,0);ctx.lineTo(bMouseX,cssH);ctx.stroke();
     ctx.restore();
   }
 }
 
-// ─────────────────────────────────────────────────────────
-//  RAF LOOP
-// ─────────────────────────────────────────────────────────
-function loop(now){ drawFrame(now); rafHandle=requestAnimationFrame(loop); }
-function startLoop(){ if(!rafHandle) rafHandle=requestAnimationFrame(loop); }
+function loop(now){drawFrame(now);rafHandle=requestAnimationFrame(loop);}
+function startLoop(){if(!rafHandle)rafHandle=requestAnimationFrame(loop);}
 
-// ─────────────────────────────────────────────────────────
-//  HIT TEST — image-space distance
-// ─────────────────────────────────────────────────────────
 const HIT_R=40;
 function hitTest(clientX,clientY){
   const rect=canvas.getBoundingClientRect();
-  const cx=clientX-rect.left, cy=clientY-rect.top;
-  const {ix,iy}=cssToImg(cx,cy);
+  const cx=clientX-rect.left,cy=clientY-rect.top;
+  const{ix,iy}=cssToImg(cx,cy);
   const pool=bryanOn?CHECKPOINTS:CHECKPOINTS.filter(c=>OPEN_WEEKS.includes(c.w));
   let best=null,bestD=Infinity;
-  pool.forEach(cp=>{
-    const d=Math.hypot(cp.ix-ix,cp.iy-iy);
-    if(d<HIT_R&&d<bestD){bestD=d;best=cp;}
-  });
+  pool.forEach(cp=>{const d=Math.hypot(cp.ix-ix,cp.iy-iy);if(d<HIT_R&&d<bestD){bestD=d;best=cp;}});
   return best;
 }
 
-// ─────────────────────────────────────────────────────────
-//  CANVAS EVENTS  (all guarded by ghostLocked)
-// ─────────────────────────────────────────────────────────
 canvas.addEventListener('click',e=>{
-  if(!mazeStarted||ghostLocked) return;
-  if(introPhase==='allGlow'||introPhase==='traveling') return;
+  if(!mazeStarted||ghostLocked)return;
+  if(['allGlow','dropping','bouncing','settling'].includes(introPhase))return;
   if(bryanOn){
-    const rect=canvas.getBoundingClientRect();
-    const {ix,iy}=cssToImg(e.clientX-rect.left,e.clientY-rect.top);
+    const rect=canvas.getBoundingClientRect();const{ix,iy}=cssToImg(e.clientX-rect.left,e.clientY-rect.top);
     coordText.textContent=`x: ${ix}  y: ${iy}`;
-    copyText(`${ix},${iy}`).then(ok=>{
-      if(ok){coordPill.style.transform='scale(1.04)';setTimeout(()=>coordPill.style.transform='',130);}
-    });
+    copyText(`${ix},${iy}`).then(ok=>{if(ok){coordPill.style.transform='scale(1.04)';setTimeout(()=>coordPill.style.transform='',130);}});
   }
-  const cp=hitTest(e.clientX,e.clientY);
-  if(cp) startGhostTravel(cp);
+  const cp=hitTest(e.clientX,e.clientY);if(cp)startGhostTravel(cp);
 });
 
 canvas.addEventListener('touchend',e=>{
-  if(!mazeStarted||ghostLocked) return;
-  if(introPhase==='allGlow'||introPhase==='traveling') return;
-  if(!e.changedTouches.length) return;
-  const t0=e.changedTouches[0];
-  const cp=hitTest(t0.clientX,t0.clientY);
+  if(!mazeStarted||ghostLocked)return;
+  if(['allGlow','dropping','bouncing','settling'].includes(introPhase))return;
+  if(!e.changedTouches.length)return;
+  const t0=e.changedTouches[0];const cp=hitTest(t0.clientX,t0.clientY);
   if(cp){startGhostTravel(cp);e.preventDefault();}
 },{passive:false});
 
 canvas.addEventListener('mousemove',e=>{
-  if(!bryanOn) return;
-  const rect=canvas.getBoundingClientRect();
-  bMouseX=e.clientX-rect.left; bMouseY=e.clientY-rect.top;
-  const {ix,iy}=cssToImg(bMouseX,bMouseY);
-  coordText.textContent=`x: ${ix}  y: ${iy}`;
+  if(!bryanOn)return;
+  const rect=canvas.getBoundingClientRect();bMouseX=e.clientX-rect.left;bMouseY=e.clientY-rect.top;
+  const{ix,iy}=cssToImg(bMouseX,bMouseY);coordText.textContent=`x: ${ix}  y: ${iy}`;
 });
 canvas.addEventListener('mouseleave',()=>{bMouseX=-1;bMouseY=-1;});
 
 function startGhostTravel(cp){
-  if(ghostLocked) return;      // double-guard
-  closePopup();
-  ghostSrcIX=ghostIX; ghostSrcIY=ghostIY;
-  ghostDstIX=cp.ix; ghostDstIY=cp.iy;
-  ghostT=0; ghostAnimStart=performance.now();
-  activeWeek=cp.w; pendingPopupCP=cp;
-  setTravelLock(true);         // lock until arrival
+  if(ghostLocked)return;closePopup();
+  ghostSrcIX=ghostIX;ghostSrcIY=ghostIY;ghostDstIX=cp.ix;ghostDstIY=cp.iy;
+  ghostT=0;ghostAnimStart=performance.now();activeWeek=cp.w;pendingPopupCP=cp;setTravelLock(true);
 }
 
-// ─────────────────────────────────────────────────────────
-//  POPUP — "GAMES" title, English+JP date, week badge
-// ─────────────────────────────────────────────────────────
 function showPopupAtCP(cp){
-
-  const diff = cp.w - CURRENT_WEEK;
-
-  if (diff === 0) {
-    cpWeekLabel.textContent = '今週のブーハー';
-  } else if (diff < 0) {
-    cpWeekLabel.textContent = '先週のブーハー';
-  } else {
-    cpWeekLabel.textContent = '来週のブーハー';
-  }
-  
-  const col1=monthPrimary(cp.w), col2=monthSecondary(cp.w);
+  const diff=cp.w-CURRENT_WEEK;
+  cpWeekLabel.textContent=diff===0?'今週のブーハー':diff<0?'先週のブーハー':'来週のブーハー';
+  const col1=monthPrimary(cp.w),col2=monthSecondary(cp.w);
   cpPopupBar.style.background=`linear-gradient(90deg,${col1},${col2})`;
   cpPopupBar.style.boxShadow=`0 0 14px ${col1}88,0 0 28px ${col2}55`;
-
-  // Title is always "GAMES"
-  cpTitle.textContent = 'GAMES';
-
-  // Date: English + Japanese
-  const weekStart = new Date(CURRENT_WEEK_DATA.weekStart);
-  const start = new Date(weekStart);
-  start.setDate(start.getDate() + (cp.w - CURRENT_WEEK) * 7);
-
-  const end = new Date(start);
-  end.setDate(end.getDate() + 6);
-
-  const en = start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) +
-           ' – ' +
-           end.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-
-  const jp = start.toLocaleDateString('ja-JP', { month: 'numeric', day: 'numeric' }) +
-           '–' +
-           end.toLocaleDateString('ja-JP', { month: 'numeric', day: 'numeric' });
-
-  cpPopupDate.innerHTML = `${en}<br><span style="font-size:0.88em;opacity:0.7">${jp}</span>`;
-
-  // Week badge
- cpWeekBadge.classList.remove('visible');
- cpWeekBadge.style.background = '';
- cpWeekBadge.style.color = '';
- cpWeekBadge.textContent = '';
-
-if (diff === 0) {
-  cpWeekBadge.textContent = '★ THIS WEEK / 今週 ★';
-  cpWeekBadge.style.background = `linear-gradient(90deg,${col1},${col2})`;
-  cpWeekBadge.style.color = '#000';
-  cpWeekBadge.classList.add('visible');
-} else if (diff < 0) {
-  cpWeekBadge.textContent = '← LAST WEEK / 先週';
-  cpWeekBadge.style.background = 'rgba(255,255,255,0.12)';
-  cpWeekBadge.style.color = 'rgba(255,255,255,0.75)';
-  cpWeekBadge.classList.add('visible');
-} else if (diff > 0) {
-  cpWeekBadge.textContent = 'NEXT WEEK / 来週 →';
-  cpWeekBadge.style.background = 'rgba(255,255,255,0.12)';
-  cpWeekBadge.style.color = 'rgba(255,255,255,0.75)';
-  cpWeekBadge.classList.add('visible');
+  cpTitle.textContent='GAMES';
+  const weekStart=new Date(CURRENT_WEEK_DATA.weekStart);
+  const start=new Date(weekStart);start.setDate(start.getDate()+(cp.w-CURRENT_WEEK)*7);
+  const end=new Date(start);end.setDate(end.getDate()+6);
+  const en=start.toLocaleDateString('en-US',{month:'short',day:'numeric'})+' – '+end.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+  const jp=start.toLocaleDateString('ja-JP',{month:'numeric',day:'numeric'})+'–'+end.toLocaleDateString('ja-JP',{month:'numeric',day:'numeric'});
+  cpPopupDate.innerHTML=`${en}<br><span style="font-size:0.88em;opacity:0.7">${jp}</span>`;
+  cpWeekBadge.classList.remove('visible');cpWeekBadge.style.background='';cpWeekBadge.style.color='';cpWeekBadge.textContent='';
+  if(diff===0){cpWeekBadge.textContent='★ THIS WEEK / 今週 ★';cpWeekBadge.style.background=`linear-gradient(90deg,${col1},${col2})`;cpWeekBadge.style.color='#000';cpWeekBadge.classList.add('visible');}
+  else if(diff<0){cpWeekBadge.textContent='← LAST WEEK / 先週';cpWeekBadge.style.background='rgba(255,255,255,0.12)';cpWeekBadge.style.color='rgba(255,255,255,0.75)';cpWeekBadge.classList.add('visible');}
+  else{cpWeekBadge.textContent='NEXT WEEK / 来週 →';cpWeekBadge.style.background='rgba(255,255,255,0.12)';cpWeekBadge.style.color='rgba(255,255,255,0.75)';cpWeekBadge.classList.add('visible');}
+  cpScrim.classList.add('show');cpPopup.classList.remove('show');void cpPopup.offsetWidth;cpPopup.classList.add('show');
 }
 
-  // Wire the Games icon to br_games.html inside template/
-  // The other icons remain as before (no-ops until wired)
-  cpScrim.classList.add('show');
-  cpPopup.classList.remove('show');
-  void cpPopup.offsetWidth;
-  cpPopup.classList.add('show');
-}
+function closePopup(){cpPopup.classList.remove('show');cpScrim.classList.remove('show');}
+cpCloseBtn.addEventListener('click',closePopup);cpScrim.addEventListener('click',closePopup);
 
-function closePopup(){
-  cpPopup.classList.remove('show');
-  cpScrim.classList.remove('show');
-}
-
-cpCloseBtn.addEventListener('click',closePopup);
-cpScrim.addEventListener('click',closePopup);
-
-// ── Icon clicks ─────────────────────────────────────────
 iconPreBoo.addEventListener('click',()=>{
-  if (ghostLocked) return;
-  closePopup();
-  try{bgMusic.pause();}catch(e){}
-  fadeOut();
-
-  sessionStorage.setItem('booha_return_to_checkpoint', '1');
-  sessionStorage.setItem('booha_return_week', String(activeWeek));
-  sessionStorage.setItem('booha_return_ghost', String(activeGhostIdx));
-
-  const weekSlug = getWeekSlug('pb', activeWeek);
-  setTimeout(()=>{ window.location.href = `template/pb_games.html?week=${encodeURIComponent(weekSlug)}`; }, FADE_MS);
+  if(ghostLocked)return;closePopup();try{bgMusic.pause();}catch(e){}fadeOut();
+  sessionStorage.setItem('booha_return_to_checkpoint','1');sessionStorage.setItem('booha_return_week',String(activeWeek));sessionStorage.setItem('booha_return_ghost',String(activeGhostIdx));
+  const weekSlug=getWeekSlug('pb',activeWeek);setTimeout(()=>{window.location.href=`template/pb_games.html?week=${encodeURIComponent(weekSlug)}`;},FADE_MS);
 });
-
 iconBooTree.addEventListener('click',()=>{
-  if (ghostLocked) return;
-  closePopup();
-  try{bgMusic.pause();}catch(e){}
-  fadeOut();
-
-  sessionStorage.setItem('booha_return_to_checkpoint', '1');
-  sessionStorage.setItem('booha_return_week', String(activeWeek));
-  sessionStorage.setItem('booha_return_ghost', String(activeGhostIdx));
-
- const weekSlug = getWeekSlug('br', activeWeek);
- setTimeout(()=>{ window.location.href = `template/br_games.html?week=${encodeURIComponent(weekSlug)}`; }, FADE_MS);
+  if(ghostLocked)return;closePopup();try{bgMusic.pause();}catch(e){}fadeOut();
+  sessionStorage.setItem('booha_return_to_checkpoint','1');sessionStorage.setItem('booha_return_week',String(activeWeek));sessionStorage.setItem('booha_return_ghost',String(activeGhostIdx));
+  const weekSlug=getWeekSlug('br',activeWeek);setTimeout(()=>{window.location.href=`template/br_games.html?week=${encodeURIComponent(weekSlug)}`;},FADE_MS);
 });
-
 iconContTree.addEventListener('click',()=>{
-  if (ghostLocked) return;
-  closePopup();
-  try{bgMusic.pause();}catch(e){}
-  fadeOut();
-
-  sessionStorage.setItem('booha_return_to_checkpoint', '1');
-  sessionStorage.setItem('booha_return_week', String(activeWeek));
-  sessionStorage.setItem('booha_return_ghost', String(activeGhostIdx));
-
-  const weekSlug = getWeekSlug('bc', activeWeek);
-  setTimeout(()=>{ window.location.href = `template/bc_games.html?week=${encodeURIComponent(weekSlug)}`; }, FADE_MS);
+  if(ghostLocked)return;closePopup();try{bgMusic.pause();}catch(e){}fadeOut();
+  sessionStorage.setItem('booha_return_to_checkpoint','1');sessionStorage.setItem('booha_return_week',String(activeWeek));sessionStorage.setItem('booha_return_ghost',String(activeGhostIdx));
+  const weekSlug=getWeekSlug('bc',activeWeek);setTimeout(()=>{window.location.href=`template/bc_games.html?week=${encodeURIComponent(weekSlug)}`;},FADE_MS);
 });
-// ─────────────────────────────────────────────────────────
-//  BRYAN MODE
-// ─────────────────────────────────────────────────────────
+
 function applyBryan(){
-  bryanBtn.classList.toggle('on',bryanOn);
-  gridEl.classList.toggle('show',bryanOn);
-  coordPill.classList.toggle('show',bryanOn);
-  bryanTip.classList.toggle('show',bryanOn);
+  bryanBtn.classList.toggle('on',bryanOn);gridEl.classList.toggle('show',bryanOn);
+  coordPill.classList.toggle('show',bryanOn);bryanTip.classList.toggle('show',bryanOn);
   canvas.classList.toggle('bryan',bryanOn);
   if(!bryanOn){bMouseX=-1;bMouseY=-1;coordText.textContent='x: —  y: —';}
 }
 bryanBtn.addEventListener('click',()=>{
-  if(ghostLocked) return;
+  if(ghostLocked)return;
   if(bryanOn){bryanOn=false;applyBryan();return;}
-  const pw=prompt('Bryan mode password:');
-  if(pw===null) return;
-  if(String(pw).trim()===BRYAN_PASS){bryanOn=true;applyBryan();} else alert('Nope.');
+  const pw=prompt('Bryan mode password:');if(pw===null)return;
+  if(String(pw).trim()===BRYAN_PASS){bryanOn=true;applyBryan();}else alert('Nope.');
 });
-coordPill.addEventListener('click',()=>{
-  const m=coordText.textContent.match(/x:\s*(\d+)\s*y:\s*(\d+)/);
-  if(m) copyText(`${m[1]},${m[2]}`);
-});
+coordPill.addEventListener('click',()=>{const m=coordText.textContent.match(/x:\s*(\d+)\s*y:\s*(\d+)/);if(m)copyText(`${m[1]},${m[2]}`);});
 async function copyText(txt){
   try{await navigator.clipboard.writeText(txt);return true;}catch(e){}
-  try{
-    const ta=document.createElement('textarea');ta.value=txt;
-    ta.style.cssText='position:fixed;left:-9999px';document.body.appendChild(ta);
-    ta.focus();ta.select();document.execCommand('copy');document.body.removeChild(ta);return true;
-  }catch(e){return false;}
+  try{const ta=document.createElement('textarea');ta.value=txt;ta.style.cssText='position:fixed;left:-9999px';document.body.appendChild(ta);ta.focus();ta.select();document.execCommand('copy');document.body.removeChild(ta);return true;}catch(e){return false;}
 }
 
-// ─────────────────────────────────────────────────────────
-//  RESIZE / ORIENTATION
-// ─────────────────────────────────────────────────────────
 window.addEventListener('resize',resizeCanvas,{passive:true});
 window.addEventListener('orientationchange',()=>setTimeout(resizeCanvas,200),{passive:true});
-if(mazeImg.complete) setTimeout(resizeCanvas,0);
-else mazeImg.addEventListener('load',()=>setTimeout(resizeCanvas,0));
+if(mazeImg.complete)setTimeout(resizeCanvas,0);else mazeImg.addEventListener('load',()=>setTimeout(resizeCanvas,0));
 
-function checkOrientation(){
-  rotateOverlay.classList.toggle('show',window.innerHeight>window.innerWidth&&window.innerWidth<1024);
-}
+function checkOrientation(){rotateOverlay.classList.toggle('show',window.innerHeight>window.innerWidth&&window.innerWidth<1024);}
 window.addEventListener('resize',checkOrientation,{passive:true});
 window.addEventListener('orientationchange',()=>setTimeout(checkOrientation,150),{passive:true});
-if(window.visualViewport) window.visualViewport.addEventListener('resize',checkOrientation,{passive:true});
+if(window.visualViewport)window.visualViewport.addEventListener('resize',checkOrientation,{passive:true});
 checkOrientation();
 
-// ─────────────────────────────────────────────────────────
-//  DOM SPARKLES
-// ─────────────────────────────────────────────────────────
 function buildSparkles(container,count=24,wide=false){
   container.innerHTML='';
   for(let i=0;i<count;i++){
     const sp=document.createElement('div');sp.className='sp';
-    const angle=(i/count)*Math.PI*2;
-    const r=wide?35+Math.random()*28:28+Math.random()*18;
+    const angle=(i/count)*Math.PI*2,r=wide?35+Math.random()*28:28+Math.random()*18;
     const cx=50+Math.cos(angle)*r,cy=50+Math.sin(angle)*r;
-    const size=wide?3+Math.random()*4:2+Math.random()*3;
-    const dur=1.3+Math.random()*1.8,delay=-(Math.random()*dur);
+    const size=wide?3+Math.random()*4:2+Math.random()*3,dur=1.3+Math.random()*1.8,delay=-(Math.random()*dur);
     sp.style.cssText=`--size:${size}px;--x:${cx}%;--y:${cy}%;--dur:${dur}s;--delay:${delay}s;`;
     container.appendChild(sp);
   }
 }
-buildSparkles(confirmSp,24);
-buildSparkles(startSp,36,true);
+buildSparkles(confirmSp,24);buildSparkles(startSp,36,true);
 
-// ─────────────────────────────────────────────────────────
-//  OVERLAY FLOW
-// ─────────────────────────────────────────────────────────
-returnBtn.addEventListener('click',()=>{
-  fadeOut();
-  setTimeout(()=>goToHub(), FADE_MS);
-});
+returnBtn.addEventListener('click',()=>{fadeOut();setTimeout(()=>goToHub(),FADE_MS);});
 
 let videoPlayed=false;
 continueBtn.addEventListener('click',async()=>{
-  if(videoPlayed)return; videoPlayed=true;
-  overlay1.classList.add('hidden');
-  overlay1.addEventListener('transitionend',()=>overlay1.classList.add('gone'),{once:true});
-  app.classList.add('inTransition');
-  videoWrap.classList.add('show');
+  if(videoPlayed)return;videoPlayed=true;
+  overlay1.classList.add('hidden');overlay1.addEventListener('transitionend',()=>overlay1.classList.add('gone'),{once:true});
+  app.classList.add('inTransition');videoWrap.classList.add('show');
   try{toMazeVideo.currentTime=0;}catch(e){}
   try{await toMazeVideo.play();}catch(e){showOverlay2();}
 });
@@ -1427,68 +887,40 @@ let o2shown=false;
 function showOverlay2(){
   if(o2shown)return;o2shown=true;
   try{toMazeVideo.pause();toMazeVideo.currentTime=0;}catch(e){}
-  videoWrap.classList.remove('show');
-  overlay2.classList.add('show');
-  app.classList.add('inTransition');
-  resizeCanvas();
+  videoWrap.classList.remove('show');overlay2.classList.add('show');app.classList.add('inTransition');resizeCanvas();
 }
-toMazeVideo.addEventListener('ended',showOverlay2);
-toMazeVideo.addEventListener('error',showOverlay2);
-toMazeVideo.addEventListener('timeupdate',()=>{
-  const d=toMazeVideo.duration;
-  if(!isFinite(d)||d<=0)return;
-  if(d-toMazeVideo.currentTime<=.5)showOverlay2();
-});
+toMazeVideo.addEventListener('ended',showOverlay2);toMazeVideo.addEventListener('error',showOverlay2);
+toMazeVideo.addEventListener('timeupdate',()=>{const d=toMazeVideo.duration;if(!isFinite(d)||d<=0)return;if(d-toMazeVideo.currentTime<=.5)showOverlay2();});
 
 let mazeLaunched=false;
 mazeStartBtn.addEventListener('click',async()=>{
   if(mazeLaunched)return;mazeLaunched=true;
-  overlay2.classList.add('hidden');
-  overlay2.addEventListener('transitionend',()=>overlay2.remove(),{once:true});
+  overlay2.classList.add('hidden');overlay2.addEventListener('transitionend',()=>overlay2.remove(),{once:true});
   app.classList.remove('inTransition');
-  mazeStarted=true;
-  ghostIX = startCP.ix;
-  ghostIY = startCP.iy;
-
-  
-  introPhase='allGlow'; introGlowStart=performance.now();
-  resizeCanvas();
-  buildWanderers();   // start wandering ghosts after maze launches
-  startLoop();
+  mazeStarted=true;ghostVisible=false;
+  ghostIX=INTRO_TOP_CENTER_START.ix;ghostIY=INTRO_TOP_CENTER_START.iy;
+  karasukiLastSwap=performance.now();
+  introPhase='allGlow';introGlowStart=performance.now();
+  resizeCanvas();buildWanderers();startLoop();
   try{bgMusic.volume=.65;await bgMusic.play();}catch(e){console.warn('Music blocked',e);}
 });
 
-// ── Back button → always return to index hub ─────────────────
 backBtn.addEventListener('click',()=>{
-  if(ghostLocked) return;
+  if(ghostLocked)return;
   try{bgMusic.pause();bgMusic.currentTime=0;}catch(e){}
-  fadeOut();
-  setTimeout(()=>goToHub(), FADE_MS);
+  fadeOut();setTimeout(()=>goToHub(),FADE_MS);
 });
 
 function fadeOut(){fade.classList.add('on');}
 
 document.addEventListener('visibilitychange',()=>{
-  if(document.hidden){
-    try{toMazeVideo.pause();}catch(e){}
-    try{bgMusic.pause();}catch(e){}
-  } else {
-    if(videoPlayed&&!o2shown) try{toMazeVideo.play();}catch(e){}
-    if(mazeLaunched)          try{bgMusic.play();}catch(e){}
-  }
+  if(document.hidden){try{toMazeVideo.pause();}catch(e){}try{bgMusic.pause();}catch(e){}}
+  else{if(videoPlayed&&!o2shown)try{toMazeVideo.play();}catch(e){}if(mazeLaunched)try{bgMusic.play();}catch(e){}}
 });
 
+if(sessionStorage.getItem('booha_return_to_checkpoint')==='1') restoreMazeFromCheckpoint();
+else resizeCanvas();
 
-// ─────────────────────────────────────────────────────────
-//  INIT
-// ─────────────────────────────────────────────────────────
-if (sessionStorage.getItem('booha_return_to_checkpoint') === '1') {
-  restoreMazeFromCheckpoint();
-} else {
-  resizeCanvas();
-}
-
-  
 </script>
 </body>
 </html>
