@@ -439,33 +439,17 @@ function restoreMazeFromCheckpoint(){
   buildWanderers();
   startLoop();
 
-    try{
-    bgMusic.loop = true;
-    bgMusic.volume = .65;
-    bgMusic.currentTime = 0;
-    const playPromise = bgMusic.play();
-    if (playPromise && typeof playPromise.then === 'function') {
-      playPromise.catch(()=>{});
-    }
-  }catch(e){}
+    //restor
+try {
+  bgMusic.loop = true;
+  bgMusic.volume = .65;
+  bgMusic.play().catch(() => {});
+} catch(e) {}
 
   if (reopenPopup) {
     showPopupAtCP(cp);
   }
 
-  setTimeout(() => {
-    try{
-      bgMusic.loop = true;
-      bgMusic.volume = .65;
-      if (bgMusic.paused) {
-        const playPromise = bgMusic.play();
-        if (playPromise && typeof playPromise.then === 'function') {
-          playPromise.catch(()=>{});
-        }
-      }
-    }catch(e){}
-  }, 120);
-  
 }
 
 // Wanderers
@@ -1098,19 +1082,29 @@ document.addEventListener('visibilitychange',()=>{
 if(sessionStorage.getItem('booha_return_to_checkpoint')==='1') restoreMazeFromCheckpoint();
 else resizeCanvas();
 
-// Handle returning via bfcache (history.back) — reopen popup if flagged
+// PAGESHOW
 window.addEventListener('pageshow', (e) => {
-  if (e.persisted && sessionStorage.getItem('booha_reopen_popup') === '1') {
+  if (!e.persisted) return;
+  
+  // Always restart the RAF loop — bfcache suspends it
+  if (rafHandle) { cancelAnimationFrame(rafHandle); rafHandle = null; }
+  if (mazeStarted) startLoop();
+  
+  // Resume music — bfcache freezes audio context too
+  try {
+    bgMusic.volume = .65;
+    if (bgMusic.paused) bgMusic.play().catch(() => {});
+  } catch(err) {}
+  
+  // Reopen popup if flagged
+  if (sessionStorage.getItem('booha_reopen_popup') === '1') {
     sessionStorage.removeItem('booha_reopen_popup');
-    // Resume music seamlessly
-    try {
-      bgMusic.volume = .65;
-      if (bgMusic.paused) bgMusic.play().catch(() => {});
-    } catch(err) {}
-    // Re-show the popup for the active checkpoint
     const cp = CHECKPOINTS.find(c => c.w === activeWeek);
-    if (cp) showPopupAtCP(cp);
+    if (cp) setTimeout(() => showPopupAtCP(cp), 80);
   }
+  
+  // Clear the black fade overlay in case it was left on
+  fade.classList.remove('on');
 });
   
 </script>
