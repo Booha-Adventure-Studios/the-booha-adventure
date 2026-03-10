@@ -864,14 +864,18 @@ if (!week || !ctx) {
 
 document.getElementById('week-label').innerHTML = prettyWeekLabel(week);
 
+
 document.getElementById('vocab').href =
-  `${ctx.monthDir}/bc_vocab.html?week=${week}`;
+  `./study-deck.html?week=${week}&type=vocab`;
 document.getElementById('sentences').href =
-  `${ctx.monthDir}/bc_sentences.html?week=${week}`;
+  `./study-deck.html?week=${week}&type=sentences`;
 document.getElementById('questions').href =
-  `${ctx.monthDir}/bc_questions.html?week=${week}`;
+  `./study-deck.html?week=${week}&type=questions`;
 document.getElementById('stream').href =
-  `${ctx.monthDir}/bc_stream.html?week=${week}`;
+  `./study-deck.html?week=${week}&type=stories`;
+
+
+  
 </script>
 
 <script>
