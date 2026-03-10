@@ -193,31 +193,31 @@ body{
 </header>
 
 <div class="grid-wrap" id="gameGrid">
-  <a class="tile" href="#" data-game="br_vt.html"><div class="tile-content">
+  <a class="tile" href="#" data-game="vocab-tap"><div class="tile-content">
     <div class="tile-en">Vocabulary Tap</div><div class="tile-jp">たんごをタップ</div><div class="tile-kanji">単語タップ</div>
   </div></a>
-  <a class="tile" href="#" data-game="br_spell.html"><div class="tile-content">
+  <a class="tile" href="#" data-game="spell-word"><div class="tile-content">
     <div class="tile-en">Spell the Word</div><div class="tile-jp">もじをならべよう</div><div class="tile-kanji">文字並べ</div>
   </div></a>
-  <a class="tile" href="#" data-game="br_vs.html"><div class="tile-content">
+  <a class="tile" href="#" data-game="vocab-speed"><div class="tile-content">
     <div class="tile-en">Vocabulary Speed</div><div class="tile-jp">たんごスピード</div><div class="tile-kanji">単語速読</div>
   </div></a>
-  <a class="tile" href="#" data-game="br_st.html"><div class="tile-content">
+  <a class="tile" href="#" data-game="sentence-tap"><div class="tile-content">
     <div class="tile-en">Sentences Tap</div><div class="tile-jp">ぶんをタップ</div><div class="tile-kanji">文タップ</div>
   </div></a>
-  <a class="tile" href="#" data-game="br_so.html"><div class="tile-content">
+  <a class="tile" href="#" data-game="sentence-order"><div class="tile-content">
     <div class="tile-en">Sentence Order</div><div class="tile-jp">ぶんをならべよう</div><div class="tile-kanji">文の順番</div>
   </div></a>
-  <a class="tile" href="#" data-game="br_se.html"><div class="tile-content">
+  <a class="tile" href="#" data-game="sentence-speed"><div class="tile-content">
     <div class="tile-en">Sentence Speed</div><div class="tile-jp">ぶんのスピード</div><div class="tile-kanji">文速読</div>
   </div></a>
-  <a class="tile" href="#" data-game="br_stw.html"><div class="tile-content">
+  <a class="tile" href="#" data-game="say-word"><div class="tile-content">
     <div class="tile-en">Say the Word</div><div class="tile-jp">ことばをいおう</div><div class="tile-kanji">言葉を言おう</div>
   </div></a>
-  <a class="tile" href="#" data-game="br_sts.html"><div class="tile-content">
+  <a class="tile" href="#" data-game="say-sentence"><div class="tile-content">
     <div class="tile-en">Say the Sentence</div><div class="tile-jp">ぶんをいおう</div><div class="tile-kanji">文を言おう</div>
   </div></a>
-  <a class="tile" href="#" data-game="br_atq.html"><div class="tile-content">
+  <a class="tile" href="#" data-game="ask-sentence"><div class="tile-content">
     <div class="tile-en">Ask the Question</div><div class="tile-jp">しつもんしよう</div><div class="tile-kanji">質問しよう</div>
   </div></a>
 </div>
@@ -280,8 +280,8 @@ function getMonthFromWeek() {
   return m ? m[1].toLowerCase() : null;
 }
   
-function buildGameHref(baseHref) {
-  return `${ctx.monthDir}/${baseHref}?week=${encodeURIComponent(week)}`;
+function buildGameHref(gameName) {
+  return `game.html?week=${encodeURIComponent(week)}&game=${encodeURIComponent(gameName)}`;
 }
   
 
