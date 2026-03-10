@@ -49,7 +49,7 @@ html,body{
     const parsed = parseWeekSlug(week);
     if (!parsed) fail("Invalid week format.");
 
-    const gamesPath = `/content/${parsed.curriculum}/${parsed.monthDir}/games.json`;
+    const gamesPath = `../../content/${parsed.curriculum}/${parsed.monthDir}/games.json`;
     const res = await fetch(gamesPath, { cache: "no-store" });
 
     if (!res.ok) fail(`Could not load games.json: ${gamesPath}`);
