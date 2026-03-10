@@ -481,6 +481,17 @@ a.deck.playing .clip {
       </div>
     </a>
 
+    <a id="games" class="deck c1" href="#">
+  <div class="clip">
+    <div class="inner">
+      <span class="label">Games</span>
+      <span class="jp">ゲーム</span>
+    </div>
+    <div class="sparkles" aria-hidden="true"></div>
+  </div>
+</a>
+
+    
   </div>
 
 </section>
@@ -629,6 +640,9 @@ document.getElementById('questions').href =
   `${ctx.monthDir}/br_questions.html?week=${week}`;
 document.getElementById('stream').href =
   `${ctx.monthDir}/br_stream.html?week=${week}`;
+document.getElementById('games').href =
+  `./games-index.html?week=${week}`;
+  
 </script>
   
 <script>
