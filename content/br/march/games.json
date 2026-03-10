@@ -6,12 +6,6 @@
       "title": "Vocabulary Tap",
       "engine": "vocab-tap",
       "contentType": "vocab"
-    },
-    {
-      "id": "spell-word",
-      "title": "Spell the Word",
-      "engine": "spell-word",
-      "contentType": "vocab"
     }
   ]
 }
