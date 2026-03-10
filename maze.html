@@ -413,21 +413,42 @@ let bMouseX=-1,bMouseY=-1,rafHandle=null;
 function restoreMazeFromCheckpoint(){
   const returnWeek=parseInt(sessionStorage.getItem('booha_return_week')||'',10);
   const returnGhost=parseInt(sessionStorage.getItem('booha_return_ghost')||'',10);
+  
+  const reopenPopup = sessionStorage.getItem('booha_reopen_popup') === '1';
+
   sessionStorage.removeItem('booha_return_to_checkpoint');
   sessionStorage.removeItem('booha_return_week');
   sessionStorage.removeItem('booha_return_ghost');
+  sessionStorage.removeItem('booha_reopen_popup');
+  
   if(Number.isInteger(returnGhost)&&returnGhost>=0&&returnGhost<GHOSTS.length){activeGhostIdx=returnGhost;startGhost.src=GHOSTS[activeGhostIdx];}
   if(Number.isInteger(returnWeek)&&returnWeek>=1&&returnWeek<=CHECKPOINTS.length)activeWeek=returnWeek;
   else activeWeek=CURRENT_WEEK;
   const cp=CHECKPOINTS.find(c=>c.w===activeWeek)||startCP;
-  mazeStarted=true;mazeLaunched=true;videoPlayed=true;o2shown=true;introPhase='done';ghostVisible=true;
+  mazeStarted=true;mazeLaunched=true;videoPlayed=true;o2shown=true;
+  
+  introPhase='done';ghostVisible=true;
   ghostIX=cp.ix;ghostIY=cp.iy;ghostSrcIX=cp.ix;ghostSrcIY=cp.iy;ghostDstIX=cp.ix;ghostDstIY=cp.iy;ghostT=1;pendingPopupCP=null;
+  
   overlay1.classList.add('hidden','gone');overlay2.classList.remove('show');overlay2.classList.add('hidden','gone');
   videoWrap.classList.remove('show');cpPopup.classList.remove('show');cpScrim.classList.remove('show');
   app.classList.remove('inTransition');
   karasukiLastSwap=performance.now();
-  resizeCanvas();buildWanderers();startLoop();
-  try{bgMusic.volume=.65;bgMusic.play();}catch(e){}
+  
+  resizeCanvas();
+  buildWanderers();
+  startLoop();
+
+  try{
+    bgMusic.volume=.65;
+    bgMusic.currentTime = 0;
+    bgMusic.play();
+  }catch(e){}
+
+  if (reopenPopup) {
+    showPopupAtCP(cp);
+  }
+  
 }
 
 // Wanderers
