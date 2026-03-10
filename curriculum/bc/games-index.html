@@ -1,7 +1,6 @@
 
 
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -276,10 +275,28 @@ function kaboom(cx,cy,ringColor){
 let locked=false;
 const swipe=document.getElementById('swipeScreen');
   
-function getMonthFromWeek() {
-  const weekParam = new URLSearchParams(window.location.search).get('week') || '';
-  const m = weekParam.match(/_([a-z]{3})_w/i);
-  return m ? m[1].toLowerCase() : null;
+function safeNavigate(href, cx, cy, tileEl, ringColor){
+  if (locked) return;
+  locked = true;
+
+  const finalHref = buildGameHref(tileEl.dataset.game);
+
+  tileEl.classList.add('warp');
+  kaboom(cx, cy, ringColor);
+
+  setTimeout(() => {
+    document.body.style.transition = 'background 0.08s';
+    document.body.style.background = '#fff';
+  }, 280);
+
+  setTimeout(() => {
+    document.body.style.background = 'var(--bg)';
+    swipe.classList.add('go');
+  }, 380);
+
+  setTimeout(() => {
+    window.location.href = finalHref;
+  }, 560);
 }
   
 function buildGameHref(gameName) {
@@ -291,7 +308,7 @@ function safeNavigate(href, cx, cy, tileEl, ringColor){
   if (locked) return;
   locked = true;
 
-  const finalHref = buildGameHref(href);
+  const finalHref = buildGameHref(tileEl.dataset.game);
 
   tileEl.classList.add('warp');
   kaboom(cx, cy, ringColor);
