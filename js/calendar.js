@@ -6,7 +6,7 @@
 // - Weeks start on Sunday
 // - Each month has only 4 curriculum weeks
 // - If a month has a 5th week, it stays on Week 4
-// - New month begins on the first Sunday that starts a week fully inside that month
+// - New month begins on the first Sunday in that month
 
 // js/calendar.js
 
