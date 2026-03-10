@@ -186,10 +186,11 @@ body{
 <header class="header">
    <a class="close-btn" href="../maze.html" id="closeBtn" title="Back / もどる">✕</a>
   <div class="header-inner">
-    <div class="title-rainbow">BOO-RICULUM GAMES</div>
-    <div class="title-jp">ブー・リキュラム ゲームズ</div>
-    <div class="divider"></div>
-  </div>
+  <div class="title-rainbow">BOO-RICULUM GAMES</div>
+  <div class="title-jp">ブー・リキュラム ゲームズ</div>
+  <p class="title-jp" id="weekLabel"></p>
+  <div class="divider"></div>
+</div>
 </header>
 
 <div class="grid-wrap" id="gameGrid">
@@ -231,9 +232,12 @@ import { getWeekParam, getPageContext } from '../../js/nav.js';
 const week = getWeekParam();
 const ctx = getPageContext();
 
+const weekLabel = document.getElementById('weekLabel');
+if (weekLabel) weekLabel.textContent = week;
+
 if (!week || !ctx) {
   window.location.href = '../../index.html';
-}  
+}
   
 (function(){
   const COLORS=['#ff6b9d','#00d4ff','#ffe94a','#a855f7','#34d399','#ff8c42','#e879f9','#38bdf8','#86efac'];
@@ -274,30 +278,7 @@ function kaboom(cx,cy,ringColor){
 let locked=false;
 const swipe=document.getElementById('swipeScreen');
   
-function safeNavigate(href, cx, cy, tileEl, ringColor){
-  if (locked) return;
-  locked = true;
 
-  const finalHref = buildGameHref(tileEl.dataset.game);
-
-  tileEl.classList.add('warp');
-  kaboom(cx, cy, ringColor);
-
-  setTimeout(() => {
-    document.body.style.transition = 'background 0.08s';
-    document.body.style.background = '#fff';
-  }, 280);
-
-  setTimeout(() => {
-    document.body.style.background = 'var(--bg)';
-    swipe.classList.add('go');
-  }, 380);
-
-  setTimeout(() => {
-    window.location.href = finalHref;
-  }, 560);
-}
-  
 function buildGameHref(gameName) {
   return `game.html?week=${encodeURIComponent(week)}&game=${encodeURIComponent(gameName)}`;
 }
