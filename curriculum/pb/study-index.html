@@ -429,7 +429,7 @@ a.deck.playing .clip {
 
 <section id="welcome">
 
-  <img class="boo-icon" src="../assets/img/boo-tree.png" alt="Boo-riculum" onerror="this.style.display='none'">
+  <img class="boo-icon" src="../../assets/img/boo-tree.png" alt="Boo-riculum" onerror="this.style.display='none'">
 
   <h1 class="title-en">Pre-Boo</h1>
   <p class="title-deck">Study Decks</p>
@@ -481,7 +481,7 @@ a.deck.playing .clip {
         <div class="sparkles" aria-hidden="true"></div>
       </div>
     </a>
-
+    
   </div>
 
 </section>
@@ -623,15 +623,23 @@ if (!week || !ctx) {
 document.getElementById('week-label').innerHTML = prettyWeekLabel(week);
 
 document.getElementById('vocab').href =
-  `${ctx.monthDir}/pb_vocab.html?week=${week}`;
+  `${ctx.monthDir}/br_vocab.html?week=${week}`;
 document.getElementById('sentences').href =
-  `${ctx.monthDir}/pb_sentences.html?week=${week}`;
+  `${ctx.monthDir}/br_sentences.html?week=${week}`;
 document.getElementById('questions').href =
-  `${ctx.monthDir}/pb_questions.html?week=${week}`;
+  `${ctx.monthDir}/br_questions.html?week=${week}`;
 document.getElementById('stream').href =
-  `${ctx.monthDir}/pb_stream.html?week=${week}`;
-</script>
+  `${ctx.monthDir}/br_stream.html?week=${week}`;
 
+  
+</script>
+  
+<script>
+document.getElementById('btn-close').addEventListener('click', () => {
+  sessionStorage.setItem('booha_return_to_hub', '1');
+  window.location.assign('../../index.html#hub');
+});
+</script>
   
   
 
