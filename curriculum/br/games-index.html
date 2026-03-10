@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -232,6 +231,15 @@ import { getWeekParam, getPageContext } from '../../js/nav.js';
 const week = getWeekParam();
 const ctx = getPageContext();
 
+function getAcademicWeekFromSlug(ctx) {
+  const monthMap = {
+    jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6,
+    jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12
+  };
+  const month = monthMap[ctx.monthShort] || 1;
+  return ((month - 1) * 4) + ctx.contentWeek;
+}  
+
 const weekLabel = document.getElementById('weekLabel');
 if (weekLabel) weekLabel.textContent = week;
 
@@ -330,8 +338,11 @@ document.getElementById('closeBtn').addEventListener('click', function(e){
   setTimeout(() => { swipe.classList.add('go'); }, 280);
 
   setTimeout(() => {
-    sessionStorage.setItem('booha_return_to_hub', '1');
-    window.location.href = '../../index.html#hub';
+    sessionStorage.setItem('booha_return_to_checkpoint', '1');
+    sessionStorage.setItem('booha_return_week', String(getAcademicWeekFromSlug(ctx)));
+    sessionStorage.setItem('booha_return_ghost', '0');
+    sessionStorage.setItem('booha_reopen_popup', '1');
+    window.location.href = '../../maze.html';
   }, 480);
 });
   
