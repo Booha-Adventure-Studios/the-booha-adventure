@@ -910,22 +910,56 @@ function showPopupAtCP(cp){
 
 function closePopup(){cpPopup.classList.remove('show');cpScrim.classList.remove('show');}
 cpCloseBtn.addEventListener('click',closePopup);cpScrim.addEventListener('click',closePopup);
+  
 
 iconPreBoo.addEventListener('click',()=>{
-  if(ghostLocked)return;closePopup();try{bgMusic.pause();}catch(e){}fadeOut();
-  sessionStorage.setItem('booha_return_to_checkpoint','1');sessionStorage.setItem('booha_return_week',String(activeWeek));sessionStorage.setItem('booha_return_ghost',String(activeGhostIdx));
-  const weekSlug=getWeekSlug('pb',activeWeek);setTimeout(()=>{window.location.href=`template/pb_games.html?week=${encodeURIComponent(weekSlug)}`;},FADE_MS);
+  if(ghostLocked)return;
+  closePopup();
+  try{bgMusic.pause();}catch(e){}
+  fadeOut();
+
+  sessionStorage.setItem('booha_return_to_checkpoint','1');
+  sessionStorage.setItem('booha_return_week',String(activeWeek));
+  sessionStorage.setItem('booha_return_ghost',String(activeGhostIdx));
+
+  const weekSlug=getWeekSlug('pb',activeWeek);
+  setTimeout(()=>{
+    window.location.href=`curriculum/pb/games-index.html?week=${encodeURIComponent(weekSlug)}`;
+  },FADE_MS);
 });
+
 iconBooTree.addEventListener('click',()=>{
-  if(ghostLocked)return;closePopup();try{bgMusic.pause();}catch(e){}fadeOut();
-  sessionStorage.setItem('booha_return_to_checkpoint','1');sessionStorage.setItem('booha_return_week',String(activeWeek));sessionStorage.setItem('booha_return_ghost',String(activeGhostIdx));
-  const weekSlug=getWeekSlug('br',activeWeek);setTimeout(()=>{window.location.href=`template/br_games.html?week=${encodeURIComponent(weekSlug)}`;},FADE_MS);
+  if(ghostLocked)return;
+  closePopup();
+  try{bgMusic.pause();}catch(e){}
+  fadeOut();
+
+  sessionStorage.setItem('booha_return_to_checkpoint','1');
+  sessionStorage.setItem('booha_return_week',String(activeWeek));
+  sessionStorage.setItem('booha_return_ghost',String(activeGhostIdx));
+
+  const weekSlug=getWeekSlug('br',activeWeek);
+  setTimeout(()=>{
+    window.location.href=`curriculum/br/games-index.html?week=${encodeURIComponent(weekSlug)}`;
+  },FADE_MS);
 });
+
 iconContTree.addEventListener('click',()=>{
-  if(ghostLocked)return;closePopup();try{bgMusic.pause();}catch(e){}fadeOut();
-  sessionStorage.setItem('booha_return_to_checkpoint','1');sessionStorage.setItem('booha_return_week',String(activeWeek));sessionStorage.setItem('booha_return_ghost',String(activeGhostIdx));
-  const weekSlug=getWeekSlug('bc',activeWeek);setTimeout(()=>{window.location.href=`template/bc_games.html?week=${encodeURIComponent(weekSlug)}`;},FADE_MS);
+  if(ghostLocked)return;
+  closePopup();
+  try{bgMusic.pause();}catch(e){}
+  fadeOut();
+
+  sessionStorage.setItem('booha_return_to_checkpoint','1');
+  sessionStorage.setItem('booha_return_week',String(activeWeek));
+  sessionStorage.setItem('booha_return_ghost',String(activeGhostIdx));
+
+  const weekSlug=getWeekSlug('bc',activeWeek);
+  setTimeout(()=>{
+    window.location.href=`curriculum/bc/games-index.html?week=${encodeURIComponent(weekSlug)}`;
+  },FADE_MS);
 });
+  
 
 function applyBryan(){
   bryanBtn.classList.toggle('on',bryanOn);gridEl.classList.toggle('show',bryanOn);
