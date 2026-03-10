@@ -1,1 +1,8 @@
 
+{
+  "cards": [
+    { "n": 1, "week": 1, "en": "job", "jp": "仕事", "hira": "しごと", "mp3": "br_v01_job.mp3" },
+    { "n": 2, "week": 1, "en": "work", "jp": "仕事", "hira": "しごと", "mp3": "br_v02_work.mp3" },
+    { "n": 16, "week": 2, "en": "office", "jp": "会社", "hira": "かいしゃ", "mp3": "br_v16_office.mp3" }
+  ]
+}
