@@ -1,0 +1,241 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Study Deck</title>
+<meta name="theme-color" content="#0d1a09" id="meta-theme-color">
+<link rel="icon" type="image/png" href="/assets/img/boo-tree.png">
+<link href="https://fonts.googleapis.com/css2?family=Chau+Philomene+One&family=Nunito:wght@800;900&family=Noto+Sans+JP:wght@500;700;900&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/theme/decks.css" />
+</head>
+
+<body>
+<div id="app">
+
+  <canvas id="bg-canvas" aria-hidden="true"></canvas>
+
+  <button id="btn-close" aria-label="Back to menu">
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <line x1="5" y1="5" x2="19" y2="19"/>
+      <line x1="19" y1="5" x2="5" y2="19"/>
+    </svg>
+  </button>
+
+  <!-- ── FLASHCARD LAYOUT (hidden for stream) ── -->
+  <div id="flashcard-ui">
+
+    <div id="warning-toast" role="alert" aria-live="assertive">
+      <div class="warn-jp">まだ再生中です！<br>終わってから押してね。</div>
+      <div class="warn-en">Wait for the audio to finish.</div>
+    </div>
+
+    <header>
+      <div class="hdr-title" id="hdr-title"></div>
+      <div class="hdr-jp"    id="hdr-jp"></div>
+      <div class="divider"   aria-hidden="true"></div>
+      <div class="hdr-sub"   id="week-label">Loading…</div>
+    </header>
+
+    <div id="preload-bar">Loading audio…</div>
+    <div class="card-counter" id="card-counter">– / –</div>
+
+    <div class="card-area">
+      <div class="card-scene" id="card-scene">
+
+        <div class="card-face card-front">
+          <div class="stripe-layer" id="stripe-front"></div>
+          <div class="frosted"></div>
+          <div class="content" id="front-content">
+            <!-- en-word or en-sentence injected here by JS -->
+          </div>
+          <div class="flip-hint">Tap to flip</div>
+        </div>
+
+        <div class="card-face card-back">
+          <div class="stripe-layer" id="stripe-back"></div>
+          <div class="frosted"></div>
+          <div class="content">
+            <div class="jp-kanji" id="jp-kanji"></div>
+            <div class="jp-hira"  id="jp-hira"></div>
+          </div>
+        </div>
+
+      </div>
+      <div id="sparkle-layer" aria-hidden="true"></div>
+    </div>
+
+    <div class="controls">
+      <button class="btn" id="btn-prev" aria-label="Previous card">&#10094;</button>
+      <button class="btn" id="btn-flip" aria-label="Flip card">&#8635;</button>
+      <button class="btn" id="btn-next" aria-label="Next card">&#10095;</button>
+      <button class="btn" id="btn-play" aria-label="Play audio">&#9654;</button>
+    </div>
+
+  </div><!-- /flashcard-ui -->
+
+  <!-- ── STREAM LAYOUT (hidden for flashcard decks) ── -->
+  <div id="stream-ui" style="display:none; width:100%; display:none; flex-direction:column; align-items:center;">
+
+    <header>
+      <div class="hdr-title" id="stream-hdr-title"></div>
+      <div class="hdr-jp"    id="stream-hdr-jp"></div>
+      <div class="divider"   aria-hidden="true"></div>
+      <div class="hdr-sub"   id="week-label">Loading…</div>
+    </header>
+
+    <div id="preload-bar" style="display:none">Loading audio…</div>
+
+    <div class="stream-badge">
+      <div class="stream-dot"></div>
+      <span id="stream-label">Weekly Stream</span>
+      <span id="track-counter">– / –</span>
+    </div>
+
+    <div class="card-area" style="perspective:none">
+      <div class="card-face single" id="card-face">
+        <div class="stripe-layer" id="stripe-layer"></div>
+        <div class="frosted"></div>
+        <div class="card-content">
+          <div class="en-text" id="en-text">Press play to begin</div>
+          <div class="pause-ring-wrap" id="pause-ring">
+            <div class="pause-label">Your turn</div>
+            <svg class="ring-svg" viewBox="0 0 40 40" aria-hidden="true">
+              <circle class="ring-bg" cx="20" cy="20" r="18"/>
+              <circle class="ring-fg" id="ring-fg" cx="20" cy="20" r="18"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+      <div id="sparkle-layer" aria-hidden="true"></div>
+    </div>
+
+    <div class="progress-wrap">
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+      <div class="progress-labels">
+        <span id="progress-left">Start</span>
+        <span id="progress-right">Finish</span>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button class="btn" id="btn-prev"      aria-label="Previous track">&#10094;</button>
+      <button class="btn" id="btn-playpause" aria-label="Play / Pause">&#9654;</button>
+      <button class="btn" id="btn-next"      aria-label="Next track">&#10095;</button>
+      <button class="btn" id="btn-slow"      aria-label="Slow mode" aria-pressed="false">SLOW</button>
+    </div>
+
+  </div><!-- /stream-ui -->
+
+</div><!-- /app -->
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     ENGINE BOOTSTRAP
+     Reads URL params → looks up registry → sets data attributes
+     → injects the right front-face element → loads JS engines.
+══════════════════════════════════════════════════════════════ -->
+<script src="/js/curriculum-config.js"></script>
+<script>
+(function bootstrap() {
+
+  /* ── 1. Read URL params ── */
+  const params     = new URLSearchParams(window.location.search);
+  const curriculum = (params.get('curriculum') || 'booriculum').toLowerCase();
+  const type       = (params.get('type')       || 'vocab').toLowerCase();
+  const week       = params.get('week') || '';
+
+  /* ── 2. Look up registry ── */
+  const reg = window.CURRICULUM_REGISTRY[curriculum];
+  if (!reg) {
+    document.body.innerHTML = '<p style="color:#fff;padding:2rem">Unknown curriculum: ' + curriculum + '</p>';
+    return;
+  }
+  const typeCfg = reg.types[type];
+  if (!typeCfg) {
+    document.body.innerHTML = '<p style="color:#fff;padding:2rem">Unknown type: ' + type + '</p>';
+    return;
+  }
+
+  /* ── 3. Set data attributes (drives CSS theme) ── */
+  document.body.setAttribute('data-theme', curriculum);
+  document.body.setAttribute('data-type',  type);
+
+  /* ── 4. Update page title & meta-theme-color ── */
+  document.title = typeCfg.titleEn;
+  // theme-color: pull from CSS variable after paint — just leave default
+
+  /* ── 5. Build DECK_CONFIG for the JS engines ── */
+  window.DECK_CONFIG = {
+    // identity
+    curriculum:  curriculum,
+    type:        type,
+    deckMode:    typeCfg.deckMode,    // 'vocab' | 'sentence' | 'stream'
+
+    // data
+    jsonUrl:     '/data/' + curriculum + '/' + typeCfg.jsonFile,
+    errorLabel:  typeCfg.errorLabel,
+
+    // audio
+    audioFolder: reg.audioFolder,     // e.g. 'boo_riculum'
+    audioSub:    typeCfg.audioSub,    // e.g. 'vocab'  (null for stream)
+
+    // visuals
+    palettes:    typeCfg.palettes,
+    moteColors:  typeCfg.moteColors,
+
+    // navigation
+    navTarget:   reg.navTarget,
+    navKey:      reg.navKey,
+  };
+
+  /* ── 6. Set BG_COLORS for particles ── */
+  window.BG_COLORS = typeCfg.bgColors;
+
+  /* ── 7. Show the right layout, hide the other ── */
+  const isStream = (typeCfg.deckMode === 'stream');
+  document.getElementById('flashcard-ui').style.display = isStream ? 'none' : 'contents';
+  document.getElementById('stream-ui').style.display    = isStream ? 'flex'  : 'none';
+
+  /* ── 8. Populate header titles ── */
+  const titleEls = document.querySelectorAll('.hdr-title');
+  const jpEls    = document.querySelectorAll('.hdr-jp');
+  titleEls.forEach(el => el.textContent = typeCfg.titleEn);
+  jpEls.forEach(el    => el.textContent = typeCfg.titleJp);
+
+  /* ── 9. Inject the correct front-face text element ──
+     vocab  → <div class="en-word"     id="en-word">
+     others → <div class="en-sentence" id="en-sentence">      */
+  if (!isStream) {
+    const frontContent = document.getElementById('front-content');
+    const el = document.createElement('div');
+    if (typeCfg.deckMode === 'vocab') {
+      el.className = 'en-word';
+      el.id        = 'en-word';
+    } else {
+      el.className = 'en-sentence';
+      el.id        = 'en-sentence';
+    }
+    frontContent.appendChild(el);
+  }
+
+})();
+</script>
+
+<!-- ── Shared engines ── -->
+<script src="/js/bg-particles.js"></script>
+<script>
+  /* Load the correct deck engine after bootstrap sets DECK_CONFIG */
+  (function () {
+    const mode = window.DECK_CONFIG && window.DECK_CONFIG.deckMode;
+    const s    = document.createElement('script');
+    s.src      = mode === 'stream' ? '/js/stream-core.js' : '/js/deck-core.js';
+    document.body.appendChild(s);
+  })();
+</script>
+
+</body>
+</html>
