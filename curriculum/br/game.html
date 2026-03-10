@@ -27,53 +27,61 @@ html,body{
 <body>
 
 <div id="gameContainer"></div>
+<div id="app"></div>  
 
 <script type="module">
-import { getWeekParam, getPageContext } from '../../js/nav.js';
+  import { getWeekParam, getGameParam, parseWeekSlug } from "../../js/nav.js";
 
-const week = getWeekParam();
-const ctx = getPageContext();
+  const app = document.getElementById("app");
 
-const params = new URLSearchParams(window.location.search);
-const game = params.get('game');
+  function fail(message) {
+    app.innerHTML = `<div style="padding:24px;color:white;">${message}</div>`;
+    throw new Error(message);
+  }
 
-if (!week || !ctx || !game) {
-  window.location.href = '../../index.html';
-}
+  async function init() {
+    const week = getWeekParam();
+    const game = getGameParam();
 
-window.BOOHA_GAME_CONTEXT = {
-  week,
-  game,
-  curriculum: ctx.curriculum,
-  monthShort: ctx.monthShort,
-  monthDir: ctx.monthDir,
-  monthLabel: ctx.monthLabel,
-  monthLabelJp: ctx.monthLabelJp,
-  weekNumber: ctx.weekNumber
-};
+    if (!week) fail("Missing week parameter.");
+    if (!game) fail("Missing game parameter.");
 
-const script = document.createElement('script');
-script.type = 'module';
-script.src = `../../games/${game}.js`;
-document.body.appendChild(script);
-</script>
+    const parsed = parseWeekSlug(week);
+    if (!parsed) fail("Invalid week format.");
 
-const params = new URLSearchParams(window.location.search);
+    const gamesPath = `/content/${parsed.curriculum}/${parsed.monthDir}/games.json`;
+    const res = await fetch(gamesPath, { cache: "no-store" });
 
-const week = params.get("week");
-const game = params.get("game");
+    if (!res.ok) fail(`Could not load games.json: ${gamesPath}`);
 
-if(!week || !game){
-  window.location.href="../../index.html";
-}
+    const data = await res.json();
+    const gameConfig = (data.games || []).find(item => item.id === game);
 
-const script = document.createElement("script");
+    if (!gameConfig) fail(`Game not found: ${game}`);
 
-script.type = "module";
-script.src = `../../games/${game}.js`;
+    window.BOOHA_GAME_CONTEXT = {
+      weekId: week,
+      curriculum: parsed.curriculum,
+      monthShort: parsed.monthShort,
+      monthDir: parsed.monthDir,
+      weekNumber: parsed.weekNumber,
+      contentWeek: parsed.contentWeek,
+      gameId: gameConfig.id,
+      title: gameConfig.title,
+      engine: gameConfig.engine,
+      contentType: gameConfig.contentType,
+      contentPath: `/content/${parsed.curriculum}/${parsed.monthDir}/${gameConfig.contentType}.json`
+    };
 
-document.body.appendChild(script);
+    await import(`../../games/${gameConfig.engine}.js`);
+  }
 
+  init().catch(err => {
+    console.error(err);
+    if (app) {
+      app.innerHTML = `<div style="padding:24px;color:white;">Game failed to load.</div>`;
+    }
+  });
 </script>
 
 </body>
