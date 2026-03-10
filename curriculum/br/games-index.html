@@ -183,7 +183,7 @@ body{
 </div>
 
 <header class="header">
-   <a class="close-btn" href="../maze.html" id="closeBtn" title="Back / もどる">✕</a>
+  <a class="close-btn" href="#" id="closeBtn" title="Back / もどる">✕</a>
   <div class="header-inner">
   <div class="title-rainbow">BOO-RICULUM GAMES</div>
   <div class="title-jp">ブー・リキュラム ゲームズ</div>
@@ -327,6 +327,7 @@ document.getElementById('gameGrid').addEventListener('click',e=>{
   safeNavigate(tile.dataset.game,r.left+r.width/2,r.top+r.height/2,tile,RING_COLORS[idx]||'#fff');
 });
 
+// MUSIC RESUME
 document.getElementById('closeBtn').addEventListener('click', function(e){
   e.preventDefault();
   if (locked) return;
@@ -335,14 +336,14 @@ document.getElementById('closeBtn').addEventListener('click', function(e){
   const r = this.getBoundingClientRect();
   kaboom(r.left + r.width / 2, r.top + r.height / 2, '#ff6b9d');
 
+  // Set the reopen flag so maze knows to show the popup
+  sessionStorage.setItem('booha_reopen_popup', '1');
+
   setTimeout(() => { swipe.classList.add('go'); }, 280);
 
+  // Use history.back() — keeps maze.html in bfcache, music never stopped
   setTimeout(() => {
-    sessionStorage.setItem('booha_return_to_checkpoint', '1');
-    sessionStorage.setItem('booha_return_week', String(getAcademicWeekFromSlug(ctx)));
-    sessionStorage.setItem('booha_return_ghost', sessionStorage.getItem('booha_return_ghost') || '0');
-    sessionStorage.setItem('booha_reopen_popup', '1');
-    window.location.href = '../../maze.html';
+    history.back();
   }, 480);
 });
   
