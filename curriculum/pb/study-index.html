@@ -808,13 +808,15 @@ if (!week || !ctx) {
 document.getElementById('week-label').innerHTML = prettyWeekLabel(week);
 
 document.getElementById('vocab').href =
-  `${ctx.monthDir}/br_vocab.html?week=${week}`;
+  `./study-deck.html?week=${week}&type=vocab`;
 document.getElementById('sentences').href =
-  `${ctx.monthDir}/br_sentences.html?week=${week}`;
+  `./study-deck.html?week=${week}&type=sentences`;
 document.getElementById('questions').href =
-  `${ctx.monthDir}/br_questions.html?week=${week}`;
+  `./study-deck.html?week=${week}&type=questions`;
 document.getElementById('stream').href =
-  `${ctx.monthDir}/br_stream.html?week=${week}`;
+  `./study-deck.html?week=${week}&type=stories`;
+
+  
 </script>
 
 <script>
