@@ -953,7 +953,7 @@ cpCloseBtn.addEventListener('click',closePopup);cpScrim.addEventListener('click'
 iconPreBoo.addEventListener('click',()=>{
   if(ghostLocked)return;
   closePopup();
-  try{bgMusic.pause();}catch(e){}
+ 
   fadeOut();
 
   sessionStorage.setItem('booha_return_to_checkpoint','1');
@@ -969,7 +969,7 @@ iconPreBoo.addEventListener('click',()=>{
 iconBooTree.addEventListener('click',()=>{
   if(ghostLocked)return;
   closePopup();
-  try{bgMusic.pause();}catch(e){}
+
   fadeOut();
 
   sessionStorage.setItem('booha_return_to_checkpoint','1');
@@ -985,7 +985,7 @@ iconBooTree.addEventListener('click',()=>{
 iconContTree.addEventListener('click',()=>{
   if(ghostLocked)return;
   closePopup();
-  try{bgMusic.pause();}catch(e){}
+ 
   fadeOut();
 
   sessionStorage.setItem('booha_return_to_checkpoint','1');
@@ -1098,6 +1098,21 @@ document.addEventListener('visibilitychange',()=>{
 if(sessionStorage.getItem('booha_return_to_checkpoint')==='1') restoreMazeFromCheckpoint();
 else resizeCanvas();
 
+// Handle returning via bfcache (history.back) — reopen popup if flagged
+window.addEventListener('pageshow', (e) => {
+  if (e.persisted && sessionStorage.getItem('booha_reopen_popup') === '1') {
+    sessionStorage.removeItem('booha_reopen_popup');
+    // Resume music seamlessly
+    try {
+      bgMusic.volume = .65;
+      if (bgMusic.paused) bgMusic.play().catch(() => {});
+    } catch(err) {}
+    // Re-show the popup for the active checkpoint
+    const cp = CHECKPOINTS.find(c => c.w === activeWeek);
+    if (cp) showPopupAtCP(cp);
+  }
+});
+  
 </script>
 </body>
 </html>
