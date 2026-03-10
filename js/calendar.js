@@ -8,36 +8,18 @@
 // - If a month has a 5th week, it stays on Week 4
 // - New month begins on the first Sunday that starts a week fully inside that month
 
+// js/calendar.js
+
 const TOKYO_TZ = "Asia/Tokyo";
 
 const MONTHS = [
-  "january",
-  "february",
-  "march",
-  "april",
-  "may",
-  "june",
-  "july",
-  "august",
-  "september",
-  "october",
-  "november",
-  "december"
+  "january", "february", "march", "april", "may", "june",
+  "july", "august", "september", "october", "november", "december"
 ];
 
 const MONTH_LABELS = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December"
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"
 ];
 
 function getTokyoDateParts(date = new Date()) {
@@ -45,8 +27,7 @@ function getTokyoDateParts(date = new Date()) {
     timeZone: TOKYO_TZ,
     year: "numeric",
     month: "2-digit",
-    day: "2-digit",
-    weekday: "short"
+    day: "2-digit"
   });
 
   const parts = formatter.formatToParts(date);
@@ -59,8 +40,7 @@ function getTokyoDateParts(date = new Date()) {
   return {
     year: Number(map.year),
     month: Number(map.month),
-    day: Number(map.day),
-    weekday: map.weekday
+    day: Number(map.day)
   };
 }
 
@@ -85,67 +65,40 @@ function getSaturdayEnd(sundayDate) {
   return copy;
 }
 
-function getFirstFullWeekStart(year, month) {
-  // month = 1-12
-  // Find the first Sunday whose Saturday is still inside the same month
+function getFirstSundayOfMonth(year, month) {
   for (let day = 1; day <= 7; day++) {
     const date = makeUtcDate(year, month, day);
-    if (date.getUTCDay() === 0) {
-      const weekEnd = getSaturdayEnd(date);
-      const endMonth = weekEnd.getUTCMonth() + 1;
-      if (endMonth === month) return date;
-    }
+    if (date.getUTCDay() === 0) return date;
   }
-
-  // Fallback, should never happen
   return makeUtcDate(year, month, 1);
 }
 
-function getCurriculumMonthAnchor(year, month, day) {
+function resolveCurriculumWeek(year, month, day) {
   const targetDate = makeUtcDate(year, month, day);
-  const currentWeekStart = getSundayStart(targetDate);
+  const weekStart = getSundayStart(targetDate);
+  const weekEnd = getSaturdayEnd(weekStart);
 
-  const firstFullWeekThisMonth = getFirstFullWeekStart(year, month);
+  const anchorYear = weekStart.getUTCFullYear();
+  const anchorMonth = weekStart.getUTCMonth() + 1;
 
-  if (currentWeekStart >= firstFullWeekThisMonth) {
-    return { year, month };
-  }
-
-  // Belongs to previous curriculum month
-  if (month === 1) {
-    return { year: year - 1, month: 12 };
-  }
-
-  return { year, month: month - 1 };
-}
-
-function getWeekNumberInCurriculumMonth(realYear, realMonth, realDay) {
-  const anchor = getCurriculumMonthAnchor(realYear, realMonth, realDay);
-  const targetDate = makeUtcDate(realYear, realMonth, realDay);
-  const currentWeekStart = getSundayStart(targetDate);
-  const firstFullWeekStart = getFirstFullWeekStart(anchor.year, anchor.month);
-
-  const diffMs = currentWeekStart.getTime() - firstFullWeekStart.getTime();
+  const firstSunday = getFirstSundayOfMonth(anchorYear, anchorMonth);
+  const diffMs = weekStart.getTime() - firstSunday.getTime();
   const diffWeeks = Math.floor(diffMs / (7 * 24 * 60 * 60 * 1000));
   const rawWeek = diffWeeks + 1;
 
   return {
-    anchorYear: anchor.year,
-    anchorMonth: anchor.month,
+    anchorYear,
+    anchorMonth,
     weekNumber: Math.max(1, Math.min(rawWeek, 4)),
-    weekStart: currentWeekStart,
-    weekEnd: getSaturdayEnd(currentWeekStart)
+    weekStart,
+    weekEnd
   };
 }
 
 export function getCurrentCurriculumWeek(now = new Date()) {
   const tokyo = getTokyoDateParts(now);
 
-  const result = getWeekNumberInCurriculumMonth(
-    tokyo.year,
-    tokyo.month,
-    tokyo.day
-  );
+  const result = resolveCurriculumWeek(tokyo.year, tokyo.month, tokyo.day);
 
   const monthIndex = result.anchorMonth - 1;
   const monthSlug = MONTHS[monthIndex];
