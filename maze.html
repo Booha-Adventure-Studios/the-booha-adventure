@@ -439,15 +439,32 @@ function restoreMazeFromCheckpoint(){
   buildWanderers();
   startLoop();
 
-  try{
-    bgMusic.volume=.65;
+    try{
+    bgMusic.loop = true;
+    bgMusic.volume = .65;
     bgMusic.currentTime = 0;
-    bgMusic.play();
+    const playPromise = bgMusic.play();
+    if (playPromise && typeof playPromise.then === 'function') {
+      playPromise.catch(()=>{});
+    }
   }catch(e){}
 
   if (reopenPopup) {
     showPopupAtCP(cp);
   }
+
+  setTimeout(() => {
+    try{
+      bgMusic.loop = true;
+      bgMusic.volume = .65;
+      if (bgMusic.paused) {
+        const playPromise = bgMusic.play();
+        if (playPromise && typeof playPromise.then === 'function') {
+          playPromise.catch(()=>{});
+        }
+      }
+    }catch(e){}
+  }, 120);
   
 }
 
@@ -1065,10 +1082,19 @@ backBtn.addEventListener('click',()=>{
 function fadeOut(){fade.classList.add('on');}
 
 document.addEventListener('visibilitychange',()=>{
-  if(document.hidden){try{toMazeVideo.pause();}catch(e){}try{bgMusic.pause();}catch(e){}}
-  else{if(videoPlayed&&!o2shown)try{toMazeVideo.play();}catch(e){}if(mazeLaunched)try{bgMusic.play();}catch(e){}}
+  if(document.hidden){
+    try{toMazeVideo.pause();}catch(e){}
+    try{bgMusic.pause();}catch(e){}
+  } else {
+    if(videoPlayed && !o2shown){
+      try{toMazeVideo.play();}catch(e){}
+    }
+    if(mazeLaunched && !sessionStorage.getItem('booha_return_to_checkpoint')){
+      try{bgMusic.play();}catch(e){}
+    }
+  }
 });
-
+  
 if(sessionStorage.getItem('booha_return_to_checkpoint')==='1') restoreMazeFromCheckpoint();
 else resizeCanvas();
 
