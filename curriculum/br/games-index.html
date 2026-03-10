@@ -340,6 +340,7 @@ document.getElementById('closeBtn').addEventListener('click', function(e){
   setTimeout(() => {
     sessionStorage.setItem('booha_return_to_checkpoint', '1');
     sessionStorage.setItem('booha_return_week', String(getAcademicWeekFromSlug(ctx)));
+    sessionStorage.setItem('booha_return_ghost', sessionStorage.getItem('booha_return_ghost') || '0');
     sessionStorage.setItem('booha_reopen_popup', '1');
     window.location.href = '../../maze.html';
   }, 480);
