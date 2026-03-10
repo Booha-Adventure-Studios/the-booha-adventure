@@ -13,8 +13,8 @@ async function init() {
   if (!ctx) fail("Missing BOOHA_GAME_CONTEXT.");
   if (!ctx.contentPath) fail("Missing contentPath.");
 
-  const res = await fetch(ctx.contentPath, { cache: "no-store" });
-  if (!res.ok) fail(`Could not load content: ${ctx.contentPath}`);
+  const res = await fetch(`../../content/${ctx.curriculum}/${ctx.monthDir}/${ctx.contentType}.json`, { cache: "no-store" });
+  if (!res.ok) fail(`Could not load content: ../../content/${ctx.curriculum}/${ctx.monthDir}/${ctx.contentType}.json`);
 
   const data = await res.json();
   const allCards = Array.isArray(data.cards) ? data.cards : [];
