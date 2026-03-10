@@ -717,93 +717,32 @@
 import { getCurrentCurriculumWeek } from './js/calendar.js';
 
 console.log('CURRENT CURRICULUM WEEK:', getCurrentCurriculumWeek());  
-/* ════════════════════════════════════════════════════════════
-   WEEK FOLDER MAPPING
-   48 weeks per year: Jan w1 = w01 … Dec w4 = w48
-   Folder format: YYYY_wNN_mmm_wN
-   (year is the academic year, currently 2027)
-════════════════════════════════════════════════════════════ */
-const ACADEMIC_YEAR = 2027; // ★ UPDATE EACH ACADEMIC YEAR ★
 
-const WEEK_FOLDERS = {
-  'jan_w1': `${ACADEMIC_YEAR}_w01_jan_w1`,
-  'jan_w2': `${ACADEMIC_YEAR}_w02_jan_w2`,
-  'jan_w3': `${ACADEMIC_YEAR}_w03_jan_w3`,
-  'jan_w4': `${ACADEMIC_YEAR}_w04_jan_w4`,
-  'feb_w1': `${ACADEMIC_YEAR}_w05_feb_w1`,
-  'feb_w2': `${ACADEMIC_YEAR}_w06_feb_w2`,
-  'feb_w3': `${ACADEMIC_YEAR}_w07_feb_w3`,
-  'feb_w4': `${ACADEMIC_YEAR}_w08_feb_w4`,
-  'mar_w1': `${ACADEMIC_YEAR}_w09_mar_w1`,
-  'mar_w2': `${ACADEMIC_YEAR}_w10_mar_w2`,
-  'mar_w3': `${ACADEMIC_YEAR}_w11_mar_w3`,
-  'mar_w4': `${ACADEMIC_YEAR}_w12_mar_w4`,
-  'apr_w1': `${ACADEMIC_YEAR}_w13_apr_w1`,
-  'apr_w2': `${ACADEMIC_YEAR}_w14_apr_w2`,
-  'apr_w3': `${ACADEMIC_YEAR}_w15_apr_w3`,
-  'apr_w4': `${ACADEMIC_YEAR}_w16_apr_w4`,
-  'may_w1': `${ACADEMIC_YEAR}_w17_may_w1`,
-  'may_w2': `${ACADEMIC_YEAR}_w18_may_w2`,
-  'may_w3': `${ACADEMIC_YEAR}_w19_may_w3`,
-  'may_w4': `${ACADEMIC_YEAR}_w20_may_w4`,
-  'jun_w1': `${ACADEMIC_YEAR}_w21_jun_w1`,
-  'jun_w2': `${ACADEMIC_YEAR}_w22_jun_w2`,
-  'jun_w3': `${ACADEMIC_YEAR}_w23_jun_w3`,
-  'jun_w4': `${ACADEMIC_YEAR}_w24_jun_w4`,
-  'jul_w1': `${ACADEMIC_YEAR}_w25_jul_w1`,
-  'jul_w2': `${ACADEMIC_YEAR}_w26_jul_w2`,
-  'jul_w3': `${ACADEMIC_YEAR}_w27_jul_w3`,
-  'jul_w4': `${ACADEMIC_YEAR}_w28_jul_w4`,
-  'aug_w1': `${ACADEMIC_YEAR}_w29_aug_w1`,
-  'aug_w2': `${ACADEMIC_YEAR}_w30_aug_w2`,
-  'aug_w3': `${ACADEMIC_YEAR}_w31_aug_w3`,
-  'aug_w4': `${ACADEMIC_YEAR}_w32_aug_w4`,
-  'sep_w1': `${ACADEMIC_YEAR}_w33_sep_w1`,
-  'sep_w2': `${ACADEMIC_YEAR}_w34_sep_w2`,
-  'sep_w3': `${ACADEMIC_YEAR}_w35_sep_w3`,
-  'sep_w4': `${ACADEMIC_YEAR}_w36_sep_w4`,
-  'oct_w1': `${ACADEMIC_YEAR}_w37_oct_w1`,
-  'oct_w2': `${ACADEMIC_YEAR}_w38_oct_w2`,
-  'oct_w3': `${ACADEMIC_YEAR}_w39_oct_w3`,
-  'oct_w4': `${ACADEMIC_YEAR}_w40_oct_w4`,
-  'nov_w1': `${ACADEMIC_YEAR}_w41_nov_w1`,
-  'nov_w2': `${ACADEMIC_YEAR}_w42_nov_w2`,
-  'nov_w3': `${ACADEMIC_YEAR}_w43_nov_w3`,
-  'nov_w4': `${ACADEMIC_YEAR}_w44_nov_w4`,
-  'dec_w1': `${ACADEMIC_YEAR}_w45_dec_w1`,
-  'dec_w2': `${ACADEMIC_YEAR}_w46_dec_w2`,
-  'dec_w3': `${ACADEMIC_YEAR}_w47_dec_w3`,
-  'dec_w4': `${ACADEMIC_YEAR}_w48_dec_w4`,
-};
+ 
 
-/**
- * Convert a weekId (e.g. "2026_mar_w1") to the folder key used
- * in WEEK_FOLDERS (e.g. "mar_w1"). The weekId from buildWeekData()
- * is formatted as "YYYY_mmm_wN".
- */
-function weekIdToFolderKey(weekId) {
-  // weekId = "2026_mar_w1" → strip the year prefix → "mar_w1"
-  return weekId.replace(/^\d{4}_/, '');
-}
-
-/**
- * Navigate to the shared curriculum template, passing the week folder
- * as a query param. The template wires up the deck links dynamically.
- * Path: template/CURR.html?week=FOLDER_NAME
- */
 function navigateToCurriculum(weekId, curr) {
-  const key    = weekIdToFolderKey(weekId);
-  const folder = WEEK_FOLDERS[key];
+  let fullWeek = '';
+  let url = '';
 
-  if (!folder) {
+  if (curr === 'preboo') {
+    fullWeek = `pb_${weekId}`;
+    url = `curriculum/pb/study-index.html?week=${encodeURIComponent(fullWeek)}`;
+  } else if (curr === 'booriculum') {
+    fullWeek = `br_${weekId}`;
+    url = `curriculum/br/study-index.html?week=${encodeURIComponent(fullWeek)}`;
+  } else if (curr === 'boocontinuum') {
+    fullWeek = `bc_${weekId}`;
+    url = `curriculum/bc/study-index.html?week=${encodeURIComponent(fullWeek)}`;
+  } else {
     alert('このコンテンツはまだ準備中です。\nThis content isn\'t available yet.');
     return;
   }
 
-  const url = `template/${curr}.html?week=${folder}`;
   fadeToBlack(true);
   setTimeout(() => { window.location.href = url; }, 520);
 }
+  
+
 
 /* ════════════════════════════════════════════════════════════
    WEEK CALCULATION — always based on real Japan time (JST)
@@ -872,7 +811,7 @@ function shortMonthKeyFromSlug(slug) {
 }
 
 function makeWeekIdFromCalendarWeek(cal) {
-  return `${ACADEMIC_YEAR}_${shortMonthKeyFromSlug(cal.monthSlug)}_w${cal.weekNumber}`;
+  return `${shortMonthKeyFromSlug(cal.monthSlug)}_w${cal.weekNumber}`;
 }
 
 function shiftCurriculumWeek(base, delta) {
