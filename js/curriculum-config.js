@@ -1,29 +1,25 @@
 
 /* ═══════════════════════════════════════════════════════════════
    curriculum-config.js  —  Registry for all curricula & deck types
-   Loaded as a plain <script> (no ES modules) by study-deck.html.
 
-   FIXES applied:
-   - audioFolder keys corrected to match R2 audio server paths
-   - data-theme values corrected to match decks.css selectors
-     (br → "br", pb → "pb", bc → "bc"; CSS updated to match)
-   - jsonUrl now points to the correct /the-booha-adventure/content/ base
-     (populated at bootstrap time with the month segment)
-   - stream type added to every curriculum
-   - palettes & moteColors filled in (were empty arrays)
+   PALETTE DESIGN:
+   br  →  Jungle Expedition: electric lime, cobalt, amber, hot pink
+   pb  →  Candy Dream: strawberry, peach, mint, cotton candy lavender
+   bc  →  Midnight Signal: cyan, electric blue, violet, white signal
    ═══════════════════════════════════════════════════════════════ */
 
 window.CURRICULUM_REGISTRY = {
 
   /* ─────────────────────────────────────────────
-     BOO-RICULUM  (key: br)
-     data-theme="br"  →  green palette in decks.css
+     BOO-RICULUM  —  JUNGLE EXPEDITION
+     Wild, saturated, alive. No timid colors here.
   ───────────────────────────────────────────── */
   br: {
-    audioFolder: 'boo_riculum',          // R2 path segment
+    audioFolder: 'boo_riculum',
     navTarget:   '/the-booha-adventure/curriculum/br/study-index.html',
     navKey:      'br_scroll',
     types: {
+
       vocab: {
         deckMode:   'vocab',
         jsonFile:   'vocab.json',
@@ -31,15 +27,17 @@ window.CURRICULUM_REGISTRY = {
         titleJp:    'ブーリキュラム語彙',
         errorLabel: 'Could not load vocabulary.',
         audioSub:   'vocab',
+        /* Electric lime + cobalt + amber + hot magenta */
         palettes: [
-          ['#ff8fd8','#ffc04d','#7dd3fc','#86efac'],
-          ['#f9a8d4','#fde68a','#93c5fd','#c4b5fd'],
-          ['#fca5a5','#fdba74','#fcd34d','#86efac'],
-          ['#a5b4fc','#67e8f9','#f9a8d4','#fde68a']
+          ['#aaff22','#0088ff','#ffaa00','#ff2288'],
+          ['#66ff00','#0066dd','#ffcc00','#ff44aa'],
+          ['#ccff44','#22aaff','#ff8800','#ee00aa'],
+          ['#88ff00','#0044cc','#ffbb11','#ff1166']
         ],
-        moteColors: ['#ffffff','#ffe08a','#ffd1f4','#aee7ff'],
-        bgColors:   ['#0d1a09','#1d3520']
+        moteColors: ['#aaff44','#ffcc00','#00aaff','#ff44aa','#ffffff'],
+        bgColors:   ['#081a04','#0a2808','#04100a']
       },
+
       sentences: {
         deckMode:   'sentence',
         jsonFile:   'sentences.json',
@@ -47,15 +45,17 @@ window.CURRICULUM_REGISTRY = {
         titleJp:    'ブーリキュラム例文',
         errorLabel: 'Could not load sentences.',
         audioSub:   'sentences',
+        /* Cobalt + lime + amber + coral */
         palettes: [
-          ['#7dd3fc','#86efac','#fde68a','#f9a8d4'],
-          ['#93c5fd','#c4b5fd','#fca5a5','#fdba74'],
-          ['#67e8f9','#a5b4fc','#fde68a','#86efac'],
-          ['#bae6fd','#d9f99d','#fef08a','#fecdd3']
+          ['#0088ff','#aaff22','#ffaa00','#ff6644'],
+          ['#0066dd','#66ff00','#ff8800','#ff4422'],
+          ['#22aaff','#ccff44','#ffcc00','#ff8866'],
+          ['#1166ee','#88ff00','#ffbb11','#ff5533']
         ],
-        moteColors: ['#7dd3fc','#86efac','#fde68a','#ffffff'],
-        bgColors:   ['#0d1a09','#071828']
+        moteColors: ['#0088ff','#aaff44','#ffcc00','#ffffff','#ff6644'],
+        bgColors:   ['#030c18','#020814','#040c1c']
       },
+
       questions: {
         deckMode:   'sentence',
         jsonFile:   'questions.json',
@@ -63,43 +63,48 @@ window.CURRICULUM_REGISTRY = {
         titleJp:    'ブーリキュラム質問',
         errorLabel: 'Could not load questions.',
         audioSub:   'questions',
+        /* Amber + lime + hot pink + cobalt */
         palettes: [
-          ['#fde68a','#fca5a5','#f9a8d4','#c4b5fd'],
-          ['#fdba74','#fcd34d','#86efac','#67e8f9'],
-          ['#fef08a','#fecdd3','#bae6fd','#d9f99d'],
-          ['#ffd1f4','#ffe08a','#aee7ff','#ffffff']
+          ['#ffaa00','#aaff22','#ff2288','#0088ff'],
+          ['#ff8800','#66ff00','#ee0077','#0066dd'],
+          ['#ffcc44','#ccff44','#ff44aa','#22aaff'],
+          ['#ffbb11','#88ff00','#ff1166','#1166ee']
         ],
-        moteColors: ['#fde68a','#fca5a5','#ffffff','#aee7ff'],
-        bgColors:   ['#1a1200','#0d1a09']
+        moteColors: ['#ffaa00','#aaff44','#ff44aa','#ffffff','#0088ff'],
+        bgColors:   ['#100a00','#180e00','#0c0800']
       },
+
       stream: {
         deckMode:   'stream',
-        jsonFile:   'stream.json',          // combined 180-card JSON
+        jsonFile:   'stream.json',
         titleEn:    'Boo-riculum Stream',
         titleJp:    'ブーリキュラム ストリーム',
         errorLabel: 'Could not load stream data.',
         audioSub:   null,
         palettes: [
-          ['#5dd4c4','#86efac','#7dd3fc','#c4b5fd'],
-          ['#67e8f9','#a5b4fc','#f9a8d4','#fde68a'],
-          ['#86efac','#fcd34d','#93c5fd','#fca5a5'],
-          ['#aee7ff','#ffd1f4','#ffe08a','#d9f99d']
+          ['#aaff22','#0088ff','#ffaa00','#ff2288'],
+          ['#0088ff','#ffaa00','#ff2288','#aaff22'],
+          ['#ffaa00','#ff2288','#aaff22','#0088ff'],
+          ['#ff2288','#aaff22','#0088ff','#ffaa00']
         ],
-        moteColors: ['#5dd4c4','#86efac','#ffffff','#fde68a'],
-        bgColors:   ['#0d1a09','#071828']
+        moteColors: ['#aaff44','#0088ff','#ffcc00','#ff44aa','#ffffff'],
+        bgColors:   ['#081a04','#030c18','#100a00']
       }
     }
   },
 
+
   /* ─────────────────────────────────────────────
-     PRE-BOO  (key: pb)
-     data-theme="pb"  →  purple palette in decks.css
+     PRE-BOO  —  CANDY DREAM
+     Strawberry. Peach. Mint. Cotton candy.
+     Pastels that glow against deep berry-purple.
   ───────────────────────────────────────────── */
   pb: {
     audioFolder: 'pre_boo',
     navTarget:   '/the-booha-adventure/curriculum/pb/study-index.html',
     navKey:      'pb_scroll',
     types: {
+
       vocab: {
         deckMode:   'vocab',
         jsonFile:   'vocab.json',
@@ -107,15 +112,17 @@ window.CURRICULUM_REGISTRY = {
         titleJp:    'プレブー語彙',
         errorLabel: 'Could not load vocabulary.',
         audioSub:   'vocab',
+        /* Strawberry pink + lavender + peach + mint */
         palettes: [
-          ['#c4b5fd','#f9a8d4','#fde68a','#86efac'],
-          ['#a78bfa','#fb7185','#fbbf24','#34d399'],
-          ['#ddd6fe','#fecdd3','#fef08a','#d9f99d'],
-          ['#c084fc','#f472b6','#facc15','#4ade80']
+          ['#ff6eb4','#cc88ff','#ffb088','#88ffcc'],
+          ['#ff8ec8','#bb66ff','#ffa070','#66ffbb'],
+          ['#ff44aa','#dd99ff','#ffcc99','#aaffe8'],
+          ['#ff88cc','#aa55ee','#ff9966','#55ffaa']
         ],
-        moteColors: ['#c4b5fd','#f9a8d4','#ffffff','#fde68a'],
-        bgColors:   ['#120a1a','#24163a']
+        moteColors: ['#ff88cc','#cc88ff','#ffb088','#88ffcc','#ffffff'],
+        bgColors:   ['#16081f','#1a0824','#100618']
       },
+
       sentences: {
         deckMode:   'sentence',
         jsonFile:   'sentences.json',
@@ -123,15 +130,17 @@ window.CURRICULUM_REGISTRY = {
         titleJp:    'プレブー例文',
         errorLabel: 'Could not load sentences.',
         audioSub:   'sentences',
+        /* Peach creamsicle + lavender + mint + strawberry */
         palettes: [
-          ['#fdba74','#fcd34d','#86efac','#c4b5fd'],
-          ['#fb923c','#fbbf24','#34d399','#a78bfa'],
-          ['#fed7aa','#fef08a','#d9f99d','#ddd6fe'],
-          ['#f97316','#eab308','#22c55e','#8b5cf6']
+          ['#ffb088','#cc88ff','#88ffcc','#ff6eb4'],
+          ['#ffa070','#bb66ff','#66ffbb','#ff8ec8'],
+          ['#ffcc99','#dd99ff','#aaffe8','#ff44aa'],
+          ['#ff9966','#aa55ee','#55ffaa','#ff88cc']
         ],
-        moteColors: ['#fdba74','#c4b5fd','#ffffff','#86efac'],
-        bgColors:   ['#120a1a','#1a0a2a']
+        moteColors: ['#ffb088','#cc88ff','#88ffcc','#ffffff','#ff88cc'],
+        bgColors:   ['#180a10','#1c0c14','#120808']
       },
+
       questions: {
         deckMode:   'sentence',
         jsonFile:   'questions.json',
@@ -139,15 +148,17 @@ window.CURRICULUM_REGISTRY = {
         titleJp:    'プレブー質問',
         errorLabel: 'Could not load questions.',
         audioSub:   'questions',
+        /* Lemon drop + mint + lavender + strawberry */
         palettes: [
-          ['#fde68a','#fca5a5','#c4b5fd','#86efac'],
-          ['#fbbf24','#f87171','#a78bfa','#34d399'],
-          ['#fef08a','#fecdd3','#ddd6fe','#d9f99d'],
-          ['#eab308','#ef4444','#7c3aed','#16a34a']
+          ['#ffee66','#88ffcc','#cc88ff','#ff6eb4'],
+          ['#ffdd44','#66ffbb','#bb66ff','#ff8ec8'],
+          ['#ffff88','#aaffe8','#dd99ff','#ff44aa'],
+          ['#ffee55','#55ffaa','#aa55ee','#ff88cc']
         ],
-        moteColors: ['#fde68a','#c4b5fd','#ffffff','#f9a8d4'],
-        bgColors:   ['#1a1200','#120a1a']
+        moteColors: ['#ffee66','#88ffcc','#cc88ff','#ffffff','#ff88cc'],
+        bgColors:   ['#0e0c00','#140e00','#100a04']
       },
+
       stream: {
         deckMode:   'stream',
         jsonFile:   'stream.json',
@@ -156,26 +167,29 @@ window.CURRICULUM_REGISTRY = {
         errorLabel: 'Could not load stream data.',
         audioSub:   null,
         palettes: [
-          ['#c87aff','#f9a8d4','#fde68a','#86efac'],
-          ['#a78bfa','#fb7185','#fbbf24','#34d399'],
-          ['#ddd6fe','#fecdd3','#fef08a','#d9f99d'],
-          ['#c084fc','#f472b6','#facc15','#4ade80']
+          ['#ff6eb4','#cc88ff','#88ffcc','#ffb088'],
+          ['#cc88ff','#88ffcc','#ffb088','#ff6eb4'],
+          ['#88ffcc','#ffb088','#ff6eb4','#cc88ff'],
+          ['#ffb088','#ff6eb4','#cc88ff','#88ffcc']
         ],
-        moteColors: ['#c87aff','#f9a8d4','#ffffff','#fde68a'],
-        bgColors:   ['#120a1a','#1a0820']
+        moteColors: ['#ff88cc','#cc88ff','#88ffcc','#ffee66','#ffffff'],
+        bgColors:   ['#16081f','#180a10','#0e0c00']
       }
     }
   },
 
+
   /* ─────────────────────────────────────────────
-     BOO-CONTINUUM  (key: bc)
-     data-theme="bc"  →  teal palette in decks.css
+     BOO-CONTINUUM  —  MIDNIGHT SIGNAL
+     Cyan. Electric blue. Violet. White signal.
+     Data in the dark. Cold, sharp, satisfying.
   ───────────────────────────────────────────── */
   bc: {
     audioFolder: 'boo_continuum',
     navTarget:   '/the-booha-adventure/curriculum/bc/study-index.html',
     navKey:      'bc_scroll',
     types: {
+
       vocab: {
         deckMode:   'vocab',
         jsonFile:   'vocab.json',
@@ -183,15 +197,17 @@ window.CURRICULUM_REGISTRY = {
         titleJp:    'ブーコンティニュアム語彙',
         errorLabel: 'Could not load vocabulary.',
         audioSub:   'vocab',
+        /* Electric cyan + signal blue + violet + white */
         palettes: [
-          ['#00e5cc','#67e8f9','#86efac','#fde68a'],
-          ['#2dd4bf','#22d3ee','#4ade80','#fbbf24'],
-          ['#99f6e4','#a5f3fc','#d9f99d','#fef08a'],
-          ['#14b8a6','#06b6d4','#22c55e','#eab308']
+          ['#00f0ff','#0055ff','#aa00ff','#ffffff'],
+          ['#00d8ee','#0044dd','#8800ee','#eeeeff'],
+          ['#44f8ff','#2266ff','#cc22ff','#ccddff'],
+          ['#00ccee','#0033cc','#9900dd','#aabbff']
         ],
-        moteColors: ['#00e5cc','#67e8f9','#ffffff','#fde68a'],
-        bgColors:   ['#071818','#0a2828']
+        moteColors: ['#00f0ff','#0088ff','#aa44ff','#ffffff','#88ffff'],
+        bgColors:   ['#03080f','#020610','#050310']
       },
+
       sentences: {
         deckMode:   'sentence',
         jsonFile:   'sentences.json',
@@ -199,15 +215,17 @@ window.CURRICULUM_REGISTRY = {
         titleJp:    'ブーコンティニュアム例文',
         errorLabel: 'Could not load sentences.',
         audioSub:   'sentences',
+        /* Signal blue + cyan + violet + ice */
         palettes: [
-          ['#3cb4ff','#00e5cc','#86efac','#fde68a'],
-          ['#38bdf8','#2dd4bf','#4ade80','#fbbf24'],
-          ['#7dd3fc','#99f6e4','#d9f99d','#fef08a'],
-          ['#0ea5e9','#14b8a6','#22c55e','#eab308']
+          ['#0055ff','#00f0ff','#aa00ff','#aaccff'],
+          ['#0044dd','#00d8ee','#8800ee','#88bbff'],
+          ['#2266ff','#44f8ff','#cc22ff','#bbddff'],
+          ['#0033cc','#00ccee','#9900dd','#99ccff']
         ],
-        moteColors: ['#3cb4ff','#00e5cc','#ffffff','#86efac'],
-        bgColors:   ['#071818','#040c28']
+        moteColors: ['#0055ff','#00f0ff','#aaccff','#ffffff','#aa44ff'],
+        bgColors:   ['#02040e','#030610','#020408']
       },
+
       questions: {
         deckMode:   'sentence',
         jsonFile:   'questions.json',
@@ -215,15 +233,17 @@ window.CURRICULUM_REGISTRY = {
         titleJp:    'ブーコンティニュアム質問',
         errorLabel: 'Could not load questions.',
         audioSub:   'questions',
+        /* Violet + cyan + blue + white signal */
         palettes: [
-          ['#ffc832','#00e5cc','#67e8f9','#86efac'],
-          ['#fbbf24','#2dd4bf','#22d3ee','#4ade80'],
-          ['#fef08a','#99f6e4','#a5f3fc','#d9f99d'],
-          ['#eab308','#14b8a6','#06b6d4','#22c55e']
+          ['#aa00ff','#00f0ff','#0055ff','#ffffff'],
+          ['#8800ee','#00d8ee','#0044dd','#eeeeff'],
+          ['#cc22ff','#44f8ff','#2266ff','#ccddff'],
+          ['#9900dd','#00ccee','#0033cc','#aabbff']
         ],
-        moteColors: ['#ffc832','#00e5cc','#ffffff','#67e8f9'],
-        bgColors:   ['#071400','#071818']
+        moteColors: ['#aa44ff','#00f0ff','#ffffff','#0055ff','#dd88ff'],
+        bgColors:   ['#050010','#080018','#030008']
       },
+
       stream: {
         deckMode:   'stream',
         jsonFile:   'stream.json',
@@ -232,13 +252,13 @@ window.CURRICULUM_REGISTRY = {
         errorLabel: 'Could not load stream data.',
         audioSub:   null,
         palettes: [
-          ['#00e5cc','#3cb4ff','#86efac','#fde68a'],
-          ['#2dd4bf','#38bdf8','#4ade80','#fbbf24'],
-          ['#99f6e4','#7dd3fc','#d9f99d','#fef08a'],
-          ['#14b8a6','#0ea5e9','#22c55e','#eab308']
+          ['#00f0ff','#0055ff','#aa00ff','#ffffff'],
+          ['#0055ff','#aa00ff','#ffffff','#00f0ff'],
+          ['#aa00ff','#ffffff','#00f0ff','#0055ff'],
+          ['#ffffff','#00f0ff','#0055ff','#aa00ff']
         ],
-        moteColors: ['#00e5cc','#3cb4ff','#ffffff','#fde68a'],
-        bgColors:   ['#071818','#040c28']
+        moteColors: ['#00f0ff','#0055ff','#aa44ff','#ffffff','#44ffff'],
+        bgColors:   ['#03080f','#02040e','#050010']
       }
     }
   }
