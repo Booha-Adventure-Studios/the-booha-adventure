@@ -144,7 +144,7 @@
 
   /* ── 1. Read URL params ── */
   const params     = new URLSearchParams(window.location.search);
-  const curriculum = (params.get('curriculum') || 'booriculum').toLowerCase();
+  const curriculum = (params.get('curriculum') || 'br').toLowerCase();
   const type       = (params.get('type')       || 'vocab').toLowerCase();
   const week       = params.get('week') || '';
 
