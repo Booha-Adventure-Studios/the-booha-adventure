@@ -3,16 +3,20 @@
    deck-core.js  —  Flashcard engine (vocab, sentences, questions)
    Reads window.DECK_CONFIG which study-deck.html sets from the
    URL params + CURRICULUM_REGISTRY lookup.
+
+   FIXES applied:
+   - fetch() now uses CFG.jsonUrl (built by bootstrap with correct month path)
+     instead of a hardcoded path that duplicated/diverged from bootstrap
+   - console.log shows the actual URL being fetched
    ═══════════════════════════════════════════════════════════════ */
 (function () {
 
 const CFG        = window.DECK_CONFIG;
-
 const AUDIO_ROOT = 'https://pub-8d5941f302df44b899ce9d9a4606dcb7.r2.dev/audio-2027';
 
 const searchParams = new URLSearchParams(window.location.search);
 const weekParam    = searchParams.get('week') || '';
-   
+
 const monthMatch = weekParam.match(/_([a-z]{3})_w/i);
 
 const MONTH_MAP = {
@@ -22,14 +26,15 @@ const MONTH_MAP = {
 };
 
 const MONTH_CODE = monthMatch ? monthMatch[1].toLowerCase() : 'jan';
-const MONTH = MONTH_MAP[MONTH_CODE] || 'january';
+const MONTH      = MONTH_MAP[MONTH_CODE] || 'january';
 const AUDIO_BASE = `${AUDIO_ROOT}/${CFG.audioFolder}/${MONTH_CODE}/${CFG.audioSub}/`;
 
-   console.log('JSON PATH:', `content/${CFG.curriculum}/${MONTH}/${CFG.type}.json`);
-   console.log('AUDIO BASE:', AUDIO_BASE);
+/* FIX: log the actual URL that will be fetched (CFG.jsonUrl set by bootstrap) */
+console.log('[deck-core] JSON URL:', CFG.jsonUrl);
+console.log('[deck-core] Audio base:', AUDIO_BASE);
 
-const WEEK_RANGES  = { w1:[1,15], w2:[16,30], w3:[31,45], w4:[46,60] };
-   
+const WEEK_RANGES = { w1:[1,15], w2:[16,30], w3:[31,45], w4:[46,60] };
+
 const PALETTES = (CFG.palettes && CFG.palettes.length)
   ? CFG.palettes
   : [
@@ -43,7 +48,7 @@ const MOTE_COLORS = (CFG.moteColors && CFG.moteColors.length)
   ? CFG.moteColors
   : ['#ffffff','#ffe08a','#ffd1f4','#aee7ff'];
 
-   
+
 /* ── DOM refs ── */
 const scene      = document.getElementById('card-scene');
 const enEl       = document.getElementById('en-word') || document.getElementById('en-sentence');
@@ -298,13 +303,14 @@ window.addEventListener('resize', () => { if (CARDS.length) showCard(); });
 
 /* ════════════════════════════
    INIT
+   FIX: use CFG.jsonUrl (built by bootstrap) — no more hardcoded path
 ════════════════════════════ */
 (async function init() {
   const weekKey  = getWeekKey();
   const [lo, hi] = WEEK_RANGES[weekKey] || WEEK_RANGES.w1;
 
   try {
-    const res = await fetch(`/the-booha-adventure/content/${CFG.curriculum}/${MONTH}/${CFG.type}.json`);
+    const res  = await fetch(CFG.jsonUrl);
     const data = await res.json();
     CARDS = (data.cards || []).filter(c => c.n >= lo && c.n <= hi);
   } catch(e) {
