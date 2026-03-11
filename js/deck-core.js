@@ -23,7 +23,10 @@ const MONTH_MAP = {
 
 const MONTH_CODE = monthMatch ? monthMatch[1].toLowerCase() : 'jan';
 const MONTH = MONTH_MAP[MONTH_CODE] || 'january';
-const AUDIO_BASE = `${AUDIO_ROOT}/${MONTH_CODE}/${CFG.audioFolder}/${CFG.audioSub}/`;
+const AUDIO_BASE = `${AUDIO_ROOT}/${CFG.audioFolder}/${MONTH_CODE}/${CFG.audioSub}/`;
+
+   console.log('JSON PATH:', `content/${CFG.curriculum}/${MONTH}/${CFG.type}.json`);
+   console.log('AUDIO BASE:', AUDIO_BASE);
 
 const WEEK_RANGES  = { w1:[1,15], w2:[16,30], w3:[31,45], w4:[46,60] };
    
