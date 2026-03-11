@@ -38,6 +38,7 @@
       <div class="hdr-sub"   id="week-label">Loading…</div>
     </header>
 
+    <!-- FIX: unique ID — flashcard version -->
     <div id="preload-bar">Loading audio…</div>
     <div class="card-counter" id="card-counter">– / –</div>
 
@@ -63,6 +64,7 @@
         </div>
 
       </div>
+      <!-- FIX: unique ID — flashcard sparkle -->
       <div id="sparkle-layer" aria-hidden="true"></div>
     </div>
 
@@ -76,16 +78,18 @@
   </div><!-- /flashcard-ui -->
 
   <!-- ── STREAM LAYOUT (hidden for flashcard decks) ── -->
-  <div id="stream-ui" style="display:none; width:100%; display:none; flex-direction:column; align-items:center;">
+  <!-- FIX: removed duplicate/conflicting inline display styles; visibility toggled by bootstrap script -->
+  <div id="stream-ui" style="display:none">
 
     <header>
       <div class="hdr-title" id="stream-hdr-title"></div>
       <div class="hdr-jp"    id="stream-hdr-jp"></div>
       <div class="divider"   aria-hidden="true"></div>
-      <div class="hdr-sub"   id="week-label">Loading…</div>
+      <div class="hdr-sub"   id="stream-week-label">Loading…</div>
     </header>
 
-    <div id="preload-bar" style="display:none">Loading audio…</div>
+    <!-- FIX: unique ID — stream version -->
+    <div id="preload-bar-stream">Loading audio…</div>
 
     <div class="stream-badge">
       <div class="stream-dot"></div>
@@ -95,7 +99,8 @@
 
     <div class="card-area" style="perspective:none">
       <div class="card-face single" id="card-face">
-        <div class="stripe-layer" id="stripe-layer"></div>
+        <!-- FIX: unique ID — stream stripe -->
+        <div class="stripe-layer" id="stripe-layer-stream"></div>
         <div class="frosted"></div>
         <div class="card-content">
           <div class="en-text" id="en-text">Press play to begin</div>
@@ -108,7 +113,8 @@
           </div>
         </div>
       </div>
-      <div id="sparkle-layer" aria-hidden="true"></div>
+      <!-- FIX: unique ID — stream sparkle -->
+      <div id="sparkle-layer-stream" aria-hidden="true"></div>
     </div>
 
     <div class="progress-wrap">
@@ -164,19 +170,30 @@
   document.body.setAttribute('data-theme', curriculum);
   document.body.setAttribute('data-type',  type);
 
-  /* ── 4. Update page title & meta-theme-color ── */
+  /* ── 4. Update page title ── */
   document.title = typeCfg.titleEn;
-  // theme-color: pull from CSS variable after paint — just leave default
 
-  /* ── 5. Build DECK_CONFIG for the JS engines ── */
+  /* ── 5. Derive month from week param ─────────────────────────
+     week format: "2027_w09_mar_w1"  or  "mar_w1"
+     We need the full month name for the JSON folder path.      */
+  const MONTH_MAP = {
+    jan:'january', feb:'february', mar:'march',    apr:'april',
+    may:'may',     jun:'june',     jul:'july',     aug:'august',
+    sep:'september',oct:'october', nov:'november', dec:'december'
+  };
+  const monthMatch = week.match(/_([a-z]{3})_w/i);
+  const monthCode  = monthMatch ? monthMatch[1].toLowerCase() : 'jan';
+  const monthFull  = MONTH_MAP[monthCode] || 'january';
+
+  /* ── 6. Build DECK_CONFIG for the JS engines ── */
   window.DECK_CONFIG = {
     // identity
     curriculum:  curriculum,
     type:        type,
     deckMode:    typeCfg.deckMode,    // 'vocab' | 'sentence' | 'stream'
 
-    // data
-    jsonUrl:     '/data/' + curriculum + '/' + typeCfg.jsonFile,
+    // FIX: jsonUrl now includes the month segment so both engines can use it directly
+    jsonUrl:     '/the-booha-adventure/content/' + curriculum + '/' + monthFull + '/' + typeCfg.jsonFile,
     errorLabel:  typeCfg.errorLabel,
 
     // audio
@@ -192,21 +209,28 @@
     navKey:      reg.navKey,
   };
 
-  /* ── 6. Set BG_COLORS for particles ── */
+  /* ── 7. Set BG_COLORS for particles ── */
   window.BG_COLORS = typeCfg.bgColors;
 
-  /* ── 7. Show the right layout, hide the other ── */
+  /* ── 8. Show the right layout, hide the other ── */
   const isStream = (typeCfg.deckMode === 'stream');
-  document.getElementById('flashcard-ui').style.display = isStream ? 'none' : 'contents';
-  document.getElementById('stream-ui').style.display    = isStream ? 'flex'  : 'none';
+  document.getElementById('flashcard-ui').style.display = isStream ? 'none'     : 'contents';
+  document.getElementById('stream-ui').style.display    = isStream ? 'contents' : 'none';
 
-  /* ── 8. Populate header titles ── */
-  const titleEls = document.querySelectorAll('.hdr-title');
-  const jpEls    = document.querySelectorAll('.hdr-jp');
-  titleEls.forEach(el => el.textContent = typeCfg.titleEn);
-  jpEls.forEach(el    => el.textContent = typeCfg.titleJp);
+  /* ── 9. Populate header titles ──
+     Flashcard uses #hdr-title / #hdr-jp / #week-label
+     Stream uses its own header elements inside #stream-ui        */
+  if (!isStream) {
+    document.getElementById('hdr-title').textContent = typeCfg.titleEn;
+    document.getElementById('hdr-jp').textContent    = typeCfg.titleJp;
+    /* week-label text is set by deck-core.js from the week param */
+  } else {
+    document.getElementById('stream-hdr-title').textContent = typeCfg.titleEn;
+    document.getElementById('stream-hdr-jp').textContent    = typeCfg.titleJp;
+    /* stream-week-label text is set by stream-core.js */
+  }
 
-  /* ── 9. Inject the correct front-face text element ──
+  /* ── 10. Inject the correct front-face text element ──
      vocab  → <div class="en-word"     id="en-word">
      others → <div class="en-sentence" id="en-sentence">      */
   if (!isStream) {
@@ -222,6 +246,9 @@
     frontContent.appendChild(el);
   }
 
+  console.log('[bootstrap] curriculum=%s type=%s deckMode=%s month=%s', curriculum, type, typeCfg.deckMode, monthFull);
+  console.log('[bootstrap] jsonUrl:', window.DECK_CONFIG.jsonUrl);
+
 })();
 </script>
 
@@ -233,8 +260,8 @@
     const mode = window.DECK_CONFIG && window.DECK_CONFIG.deckMode;
     const s    = document.createElement('script');
     s.src = mode === 'stream'
-     ? '/the-booha-adventure/js/stream-core.js'
-     : '/the-booha-adventure/js/deck-core.js';
+      ? '/the-booha-adventure/js/stream-core.js'
+      : '/the-booha-adventure/js/deck-core.js';
     document.body.appendChild(s);
   })();
 </script>
