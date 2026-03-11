@@ -1,1 +1,76 @@
 
+{
+  "cards": [
+    { "n": 1, "en": "I want to build a meaningful career.", "jp": "意味のあるキャリアを築きたいです。", "hira": "いみ の ある きゃりあ を きずきたい です", "mp3": "br_s01_i_want_to_build_a_meaningful_career.mp3" },
+    { "n": 2, "en": "I want to work in an international company.", "jp": "国際的な会社で働きたいです。", "hira": "こくさいてき な かいしゃ で はたらきたい です", "mp3": "br_s02_i_want_to_work_in_an_international_company.mp3" },
+    { "n": 3, "en": "I want to develop new technology.", "jp": "新しい技術を開発したいです。", "hira": "あたらしい ぎじゅつ を かいはつ したい です", "mp3": "br_s03_i_want_to_develop_new_technology.mp3" },
+    { "n": 4, "en": "I want to become a respected professional.", "jp": "尊敬される専門家になりたいです。", "hira": "そんけい される せんもんか に なりたい です", "mp3": "br_s04_i_want_to_become_a_respected_professional.mp3" },
+    { "n": 5, "en": "I want to contribute to society through my work.", "jp": "仕事を通して社会に貢献したいです。", "hira": "しごと を とおして しゃかい に こうけん したい です", "mp3": "br_s05_i_want_to_contribute_to_society_through_my_work.mp3" },
+
+    { "n": 6, "en": "I want to manage a successful team.", "jp": "成功するチームを管理したいです。", "hira": "せいこう する ちーむ を かんり したい です", "mp3": "br_s06_i_want_to_manage_a_successful_team.mp3" },
+    { "n": 7, "en": "I want to solve difficult problems.", "jp": "難しい問題を解決したいです。", "hira": "むずかしい もんだい を かいけつ したい です", "mp3": "br_s07_i_want_to_solve_difficult_problems.mp3" },
+    { "n": 8, "en": "I want to improve people’s lives.", "jp": "人々の生活を良くしたいです。", "hira": "ひとびと の せいかつ を よく したい です", "mp3": "br_s08_i_want_to_improve_peoples_lives.mp3" },
+    { "n": 9, "en": "I want to lead important projects.", "jp": "重要なプロジェクトを率いたいです。", "hira": "じゅうよう な ぷろじぇくと を ひきいたい です", "mp3": "br_s09_i_want_to_lead_important_projects.mp3" },
+    { "n": 10, "en": "I want to create innovative ideas.", "jp": "革新的なアイデアを生み出したいです。", "hira": "かくしんてき な あいであ を うみだしたい です", "mp3": "br_s10_i_want_to_create_innovative_ideas.mp3" },
+
+    { "n": 11, "en": "I want to work with talented people.", "jp": "才能のある人と働きたいです。", "hira": "さいのう の ある ひと と はたらきたい です", "mp3": "br_s11_i_want_to_work_with_talented_people.mp3" },
+    { "n": 12, "en": "I want to gain valuable experience.", "jp": "貴重な経験を得たいです。", "hira": "きちょう な けいけん を えたい です", "mp3": "br_s12_i_want_to_gain_valuable_experience.mp3" },
+    { "n": 13, "en": "I want to develop my professional skills.", "jp": "仕事のスキルを伸ばしたいです。", "hira": "しごと の すきる を のばしたい です", "mp3": "br_s13_i_want_to_develop_my_professional_skills.mp3" },
+    { "n": 14, "en": "I want to achieve long-term success.", "jp": "長期的な成功を達成したいです。", "hira": "ちょうきてき な せいこう を たっせい したい です", "mp3": "br_s14_i_want_to_achieve_long_term_success.mp3" },
+    { "n": 15, "en": "I want to make a positive difference.", "jp": "良い変化を生み出したいです。", "hira": "よい へんか を うみだしたい です", "mp3": "br_s15_i_want_to_make_a_positive_difference.mp3" },
+
+    { "n": 16, "en": "I can analyze complex problems.", "jp": "複雑な問題を分析できます。", "hira": "ふくざつ な もんだい を ぶんせき できます", "mp3": "br_s16_i_can_analyze_complex_problems.mp3" },
+    { "n": 17, "en": "I can manage projects efficiently.", "jp": "プロジェクトを効率よく管理できます。", "hira": "ぷろじぇくと を こうりつ よく かんり できます", "mp3": "br_s17_i_can_manage_projects_efficiently.mp3" },
+    { "n": 18, "en": "I can communicate clearly with clients.", "jp": "顧客と分かりやすくコミュニケーションできます。", "hira": "こきゃく と わかりやすく こみゅにけーしょん できます", "mp3": "br_s18_i_can_communicate_clearly_with_clients.mp3" },
+    { "n": 19, "en": "I can lead a team effectively.", "jp": "チームを効果的に導けます。", "hira": "ちーむ を こうかてき に みちびけます", "mp3": "br_s19_i_can_lead_a_team_effectively.mp3" },
+    { "n": 20, "en": "I can develop practical solutions.", "jp": "実用的な解決策を作れます。", "hira": "じつようてき な かいけつさく を つくれます", "mp3": "br_s20_i_can_develop_practical_solutions.mp3" },
+
+    { "n": 21, "en": "I can learn new technology quickly.", "jp": "新しい技術をすぐに学べます。", "hira": "あたらしい ぎじゅつ を すぐ に まなべます", "mp3": "br_s21_i_can_learn_new_technology_quickly.mp3" },
+    { "n": 22, "en": "I can organize my schedule well.", "jp": "予定を上手に整理できます。", "hira": "よてい を じょうず に せいり できます", "mp3": "br_s22_i_can_organize_my_schedule_well.mp3" },
+    { "n": 23, "en": "I can make important decisions.", "jp": "重要な決定ができます。", "hira": "じゅうよう な けってい が できます", "mp3": "br_s23_i_can_make_important_decisions.mp3" },
+    { "n": 24, "en": "I can improve work efficiency.", "jp": "仕事の効率を改善できます。", "hira": "しごと の こうりつ を かいぜん できます", "mp3": "br_s24_i_can_improve_work_efficiency.mp3" },
+    { "n": 25, "en": "I can cooperate with my coworkers.", "jp": "同僚と協力できます。", "hira": "どうりょう と きょうりょく できます", "mp3": "br_s25_i_can_cooperate_with_my_coworkers.mp3" },
+
+    { "n": 26, "en": "I can negotiate with confidence.", "jp": "自信を持って交渉できます。", "hira": "じしん を もって こうしょう できます", "mp3": "br_s26_i_can_negotiate_with_confidence.mp3" },
+    { "n": 27, "en": "I can present my ideas clearly.", "jp": "自分の考えを分かりやすく発表できます。", "hira": "じぶん の かんがえ を わかりやすく はっぴょう できます", "mp3": "br_s27_i_can_present_my_ideas_clearly.mp3" },
+    { "n": 28, "en": "I can research useful information.", "jp": "役に立つ情報を調べられます。", "hira": "やく に たつ じょうほう を しらべられます", "mp3": "br_s28_i_can_research_useful_information.mp3" },
+    { "n": 29, "en": "I can adapt to new environments.", "jp": "新しい環境に適応できます。", "hira": "あたらしい かんきょう に てきおう できます", "mp3": "br_s29_i_can_adapt_to_new_environments.mp3" },
+    { "n": 30, "en": "I can keep learning throughout my career.", "jp": "キャリアを通して学び続けられます。", "hira": "きゃりあ を とおして まなび つづけられます", "mp3": "br_s30_i_can_keep_learning_throughout_my_career.mp3" },
+
+    { "n": 31, "en": "I’m going to improve my professional skills.", "jp": "仕事のスキルを向上させるつもりです。", "hira": "しごと の すきる を こうじょう させる つもり です", "mp3": "br_s31_im_going_to_improve_my_professional_skills.mp3" },
+    { "n": 32, "en": "I’m going to study business management.", "jp": "経営学を勉強するつもりです。", "hira": "けいえいがく を べんきょう する つもり です", "mp3": "br_s32_im_going_to_study_business_management.mp3" },
+    { "n": 33, "en": "I’m going to gain more work experience.", "jp": "もっと仕事の経験を積むつもりです。", "hira": "もっと しごと の けいけん を つむ つもり です", "mp3": "br_s33_im_going_to_gain_more_work_experience.mp3" },
+    { "n": 34, "en": "I’m going to apply for a new position.", "jp": "新しい職に応募するつもりです。", "hira": "あたらしい しょく に おうぼ する つもり です", "mp3": "br_s34_im_going_to_apply_for_a_new_position.mp3" },
+    { "n": 35, "en": "I’m going to develop a long-term strategy.", "jp": "長期的な戦略を立てるつもりです。", "hira": "ちょうきてき な せんりゃく を たてる つもり です", "mp3": "br_s35_im_going_to_develop_a_long_term_strategy.mp3" },
+
+    { "n": 36, "en": "I’m going to start an innovative project.", "jp": "革新的なプロジェクトを始めるつもりです。", "hira": "かくしんてき な ぷろじぇくと を はじめる つもり です", "mp3": "br_s36_im_going_to_start_an_innovative_project.mp3" },
+    { "n": 37, "en": "I’m going to improve my productivity.", "jp": "生産性を高めるつもりです。", "hira": "せいさんせい を たかめる つもり です", "mp3": "br_s37_im_going_to_improve_my_productivity.mp3" },
+    { "n": 38, "en": "I’m going to expand my knowledge.", "jp": "知識を広げるつもりです。", "hira": "ちしき を ひろげる つもり です", "mp3": "br_s38_im_going_to_expand_my_knowledge.mp3" },
+    { "n": 39, "en": "I’m going to explore new opportunities.", "jp": "新しい機会を探すつもりです。", "hira": "あたらしい きかい を さがす つもり です", "mp3": "br_s39_im_going_to_explore_new_opportunities.mp3" },
+    { "n": 40, "en": "I’m going to improve my communication skills.", "jp": "コミュニケーション能力を向上させるつもりです。", "hira": "こみゅにけーしょん のうりょく を こうじょう させる つもり です", "mp3": "br_s40_im_going_to_improve_my_communication_skills.mp3" },
+
+    { "n": 41, "en": "I’m going to work toward my career goals.", "jp": "キャリア目標に向かって努力するつもりです。", "hira": "きゃりあ もくひょう に むかって どりょく する つもり です", "mp3": "br_s41_im_going_to_work_toward_my_career_goals.mp3" },
+    { "n": 42, "en": "I’m going to create new solutions.", "jp": "新しい解決策を作るつもりです。", "hira": "あたらしい かいけつさく を つくる つもり です", "mp3": "br_s42_im_going_to_create_new_solutions.mp3" },
+    { "n": 43, "en": "I’m going to invest in my future.", "jp": "自分の未来に投資するつもりです。", "hira": "じぶん の みらい に とうし する つもり です", "mp3": "br_s43_im_going_to_invest_in_my_future.mp3" },
+    { "n": 44, "en": "I’m going to collaborate with other professionals.", "jp": "他の専門家と協力するつもりです。", "hira": "ほか の せんもんか と きょうりょく する つもり です", "mp3": "br_s44_im_going_to_collaborate_with_other_professionals.mp3" },
+    { "n": 45, "en": "I’m going to pursue long-term success.", "jp": "長期的な成功を追求するつもりです。", "hira": "ちょうきてき な せいこう を ついきゅう する つもり です", "mp3": "br_s45_im_going_to_pursue_long_term_success.mp3" },
+
+    { "n": 46, "en": "There is a modern office in the building.", "jp": "建物の中に現代的なオフィスがあります。", "hira": "たてもの の なか に げんだいてき な おふぃす が あります", "mp3": "br_s46_there_is_a_modern_office_in_the_building.mp3" },
+    { "n": 47, "en": "There are many employees in the company.", "jp": "会社には多くの社員がいます。", "hira": "かいしゃ に は おおく の しゃいん が います", "mp3": "br_s47_there_are_many_employees_in_the_company.mp3" },
+    { "n": 48, "en": "There is a research department here.", "jp": "ここには研究部門があります。", "hira": "ここ に は けんきゅう ぶもん が あります", "mp3": "br_s48_there_is_a_research_department_here.mp3" },
+    { "n": 49, "en": "There are several projects this year.", "jp": "今年はいくつかのプロジェクトがあります。", "hira": "ことし は いくつか の ぷろじぇくと が あります", "mp3": "br_s49_there_are_several_projects_this_year.mp3" },
+    { "n": 50, "en": "There is strong leadership in the team.", "jp": "チームには強いリーダーシップがあります。", "hira": "ちーむ に は つよい りーだーしっぷ が あります", "mp3": "br_s50_there_is_strong_leadership_in_the_team.mp3" },
+
+    { "n": 51, "en": "There are opportunities for growth here.", "jp": "ここには成長の機会があります。", "hira": "ここ に は せいちょう の きかい が あります", "mp3": "br_s51_there_are_opportunities_for_growth_here.mp3" },
+    { "n": 52, "en": "There is advanced technology in this office.", "jp": "このオフィスには高度な技術があります。", "hira": "この おふぃす に は こうど な ぎじゅつ が あります", "mp3": "br_s52_there_is_advanced_technology_in_this_office.mp3" },
+    { "n": 53, "en": "There are many ideas in this meeting.", "jp": "この会議には多くのアイデアがあります。", "hira": "この かいぎ に は おおく の あいであ が あります", "mp3": "br_s53_there_are_many_ideas_in_this_meeting.mp3" },
+    { "n": 54, "en": "There is a clear strategy for the project.", "jp": "プロジェクトには明確な戦略があります。", "hira": "ぷろじぇくと に は めいかく な せんりゃく が あります", "mp3": "br_s54_there_is_a_clear_strategy_for_the_project.mp3" },
+    { "n": 55, "en": "There are talented people in this industry.", "jp": "この業界には才能のある人がいます。", "hira": "この ぎょうかい に は さいのう の ある ひと が います", "mp3": "br_s55_there_are_talented_people_in_this_industry.mp3" },
+
+    { "n": 56, "en": "There is a strong sense of teamwork here.", "jp": "ここには強いチームワークがあります。", "hira": "ここ に は つよい ちーむわーく が あります", "mp3": "br_s56_there_is_a_strong_sense_of_teamwork_here.mp3" },
+    { "n": 57, "en": "There are many challenges in this job.", "jp": "この仕事には多くの課題があります。", "hira": "この しごと に は おおく の かだい が あります", "mp3": "br_s57_there_are_many_challenges_in_this_job.mp3" },
+    { "n": 58, "en": "There is great potential in this company.", "jp": "この会社には大きな可能性があります。", "hira": "この かいしゃ に は おおきな かのうせい が あります", "mp3": "br_s58_there_is_great_potential_in_this_company.mp3" },
+    { "n": 59, "en": "There are valuable resources in this organization.", "jp": "この組織には貴重な資源があります。", "hira": "この そしき に は きちょう な しげん が あります", "mp3": "br_s59_there_are_valuable_resources_in_this_organization.mp3" },
+    { "n": 60, "en": "There is a bright future for skilled workers.", "jp": "熟練した労働者には明るい未来があります。", "hira": "じゅくれん した ろうどうしゃ に は あかるい みらい が あります", "mp3": "br_s60_there_is_a_bright_future_for_skilled_workers.mp3" }
+  ]
+}
