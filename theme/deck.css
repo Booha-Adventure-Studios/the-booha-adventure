@@ -2,7 +2,12 @@
 /* ═══════════════════════════════════════════════════════════════
    decks.css  —  All curriculum themes + shared deck styles
    Three themes scoped under [data-theme="..."] on <body>.
-   Shared structural CSS applies to everything.
+
+   FIXES applied:
+   - data-theme selectors changed from long names to short registry keys:
+       "booriculum"   → "br"
+       "pre-boo"      → "pb"
+       "boo-continuum"→ "bc"
    ═══════════════════════════════════════════════════════════════ */
 
 
@@ -34,13 +39,13 @@
 
 
 /* ══════════════════════════════════════════════════════════════
-   THEME: BOO-RICULUM   (green)
+   THEME: BOO-RICULUM  (key: br)  —  green
 ══════════════════════════════════════════════════════════════ */
-[data-theme="booriculum"] {
+[data-theme="br"] {
   --bg:            #0d1a09;
   --stream-color:  #5dd4c4;
 }
-[data-theme="booriculum"][data-type="vocab"] {
+[data-theme="br"][data-type="vocab"] {
   --accent:        rgba(48,208,80,.5);
   --play-bg-a:     #1f8f35;
   --play-bg-b:     #0e4019;
@@ -52,7 +57,7 @@
   --play-border-h: #88ffaa;
   --frosted-alpha: .34;
 }
-[data-theme="booriculum"][data-type="sentences"] {
+[data-theme="br"][data-type="sentences"] {
   --accent:        rgba(91,163,217,.6);
   --play-bg-a:     #1070c0;
   --play-bg-b:     #073568;
@@ -64,7 +69,7 @@
   --play-border-h: #88d8ff;
   --frosted-alpha: .38;
 }
-[data-theme="booriculum"][data-type="questions"] {
+[data-theme="br"][data-type="questions"] {
   --accent:        rgba(255,204,68,.55);
   --play-bg-a:     #a06200;
   --play-bg-b:     #4a2c00;
@@ -76,7 +81,7 @@
   --play-border-h: #ffe878;
   --frosted-alpha: .38;
 }
-[data-theme="booriculum"][data-type="stream"] {
+[data-theme="br"][data-type="stream"] {
   --accent:        rgba(93,212,196,.6);
   --stream-color:  #5dd4c4;
   --frosted-alpha: .38;
@@ -84,14 +89,13 @@
 
 
 /* ══════════════════════════════════════════════════════════════
-   THEME: PRE-BOO   (purple / warm)
-   — placeholder colours, replace with your real Pre-Boo palette
+   THEME: PRE-BOO  (key: pb)  —  purple / warm
 ══════════════════════════════════════════════════════════════ */
-[data-theme="pre-boo"] {
+[data-theme="pb"] {
   --bg:            #120a1a;
   --stream-color:  #c87aff;
 }
-[data-theme="pre-boo"][data-type="vocab"] {
+[data-theme="pb"][data-type="vocab"] {
   --accent:        rgba(200,122,255,.55);
   --play-bg-a:     #6a1a9a;
   --play-bg-b:     #2e0a50;
@@ -103,7 +107,7 @@
   --play-border-h: #dda8ff;
   --frosted-alpha: .34;
 }
-[data-theme="pre-boo"][data-type="sentences"] {
+[data-theme="pb"][data-type="sentences"] {
   --accent:        rgba(255,160,100,.55);
   --play-bg-a:     #a04018;
   --play-bg-b:     #4a1a08;
@@ -115,7 +119,7 @@
   --play-border-h: #ffb870;
   --frosted-alpha: .38;
 }
-[data-theme="pre-boo"][data-type="questions"] {
+[data-theme="pb"][data-type="questions"] {
   --accent:        rgba(255,220,80,.55);
   --play-bg-a:     #906000;
   --play-bg-b:     #402800;
@@ -127,7 +131,7 @@
   --play-border-h: #ffe070;
   --frosted-alpha: .38;
 }
-[data-theme="pre-boo"][data-type="stream"] {
+[data-theme="pb"][data-type="stream"] {
   --accent:        rgba(200,122,255,.6);
   --stream-color:  #c87aff;
   --frosted-alpha: .38;
@@ -135,14 +139,13 @@
 
 
 /* ══════════════════════════════════════════════════════════════
-   THEME: BOO-CONTINUUM   (teal / cyan)
-   — placeholder colours, replace with your real Continuum palette
+   THEME: BOO-CONTINUUM  (key: bc)  —  teal / cyan
 ══════════════════════════════════════════════════════════════ */
-[data-theme="boo-continuum"] {
+[data-theme="bc"] {
   --bg:            #071818;
   --stream-color:  #00e5cc;
 }
-[data-theme="boo-continuum"][data-type="vocab"] {
+[data-theme="bc"][data-type="vocab"] {
   --accent:        rgba(0,229,204,.55);
   --play-bg-a:     #0a7060;
   --play-bg-b:     #032e28;
@@ -154,7 +157,7 @@
   --play-border-h: #60f8e8;
   --frosted-alpha: .34;
 }
-[data-theme="boo-continuum"][data-type="sentences"] {
+[data-theme="bc"][data-type="sentences"] {
   --accent:        rgba(60,180,255,.6);
   --play-bg-a:     #084888;
   --play-bg-b:     #021830;
@@ -166,7 +169,7 @@
   --play-border-h: #80ccff;
   --frosted-alpha: .38;
 }
-[data-theme="boo-continuum"][data-type="questions"] {
+[data-theme="bc"][data-type="questions"] {
   --accent:        rgba(255,200,50,.55);
   --play-bg-a:     #886000;
   --play-bg-b:     #382400;
@@ -178,7 +181,7 @@
   --play-border-h: #ffe060;
   --frosted-alpha: .38;
 }
-[data-theme="boo-continuum"][data-type="stream"] {
+[data-theme="bc"][data-type="stream"] {
   --accent:        rgba(0,229,204,.6);
   --stream-color:  #00e5cc;
   --frosted-alpha: .38;
@@ -370,8 +373,8 @@ header {
   will-change: auto;
   border-color: rgba(93,212,196,.45);
 }
-[data-theme="pre-boo"] .card-face.single      { border-color: rgba(200,122,255,.45); }
-[data-theme="boo-continuum"] .card-face.single { border-color: rgba(0,229,204,.45); }
+[data-theme="pb"] .card-face.single { border-color: rgba(200,122,255,.45); }
+[data-theme="bc"] .card-face.single { border-color: rgba(0,229,204,.45); }
 
 /* ── Stripe layer ── */
 .stripe-layer {
