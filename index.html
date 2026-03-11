@@ -713,8 +713,10 @@
   <div id="fade" aria-hidden="true"></div>
 </div>
 
-<script type="module">
-import { getCurrentCurriculumWeek } from './js/calendar.js';
+<script src="./js/calendar.js"></script>
+<script>
+const { getCurrentCurriculumWeek } = window.CALENDAR;
+
 
 console.log('CURRENT CURRICULUM WEEK:', getCurrentCurriculumWeek());  
 
