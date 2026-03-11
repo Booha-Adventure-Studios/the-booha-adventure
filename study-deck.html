@@ -6,9 +6,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Study Deck</title>
 <meta name="theme-color" content="#0d1a09" id="meta-theme-color">
-<link rel="icon" type="image/png" href="/assets/img/boo-tree.png">
+<link rel="icon" type="image/png" href="./assets/img/boo-tree.png">
 <link href="https://fonts.googleapis.com/css2?family=Chau+Philomene+One&family=Nunito:wght@800;900&family=Noto+Sans+JP:wght@500;700;900&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="/theme/decks.css" />
+<link rel="stylesheet" href="./theme/decks.css" />
 </head>
 
 <body>
@@ -138,7 +138,7 @@
      Reads URL params → looks up registry → sets data attributes
      → injects the right front-face element → loads JS engines.
 ══════════════════════════════════════════════════════════════ -->
-<script src="/js/curriculum-config.js"></script>
+<script src="./js/curriculum-config.js"></script>
 <script>
 (function bootstrap() {
 
@@ -232,7 +232,7 @@
   (function () {
     const mode = window.DECK_CONFIG && window.DECK_CONFIG.deckMode;
     const s    = document.createElement('script');
-    s.src      = mode === 'stream' ? '/js/stream-core.js' : '/js/deck-core.js';
+    s.src = mode === 'stream' ? './js/stream-core.js' : './js/deck-core.js';
     document.body.appendChild(s);
   })();
 </script>
