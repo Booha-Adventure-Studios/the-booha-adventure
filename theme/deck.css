@@ -514,10 +514,9 @@ header {
 .en-word, .en-sentence, .en-text {
   font-family: var(--font-en);
   font-weight: 900;
-  color: #fff;
-  text-shadow:
-    0 2px 12px rgba(0,0,0,.8),
-    0 0 30px var(--accent);
+  color: #ffffff;
+  filter: drop-shadow(0 0 8px rgba(255,255,255,.6));
+  text-shadow: 0 2px 14px rgba(0,0,0,.9);
   white-space: normal;
   word-break: normal;
   overflow-wrap: break-word;
