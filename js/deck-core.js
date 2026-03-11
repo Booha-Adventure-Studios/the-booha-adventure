@@ -304,7 +304,7 @@ window.addEventListener('resize', () => { if (CARDS.length) showCard(); });
   const [lo, hi] = WEEK_RANGES[weekKey] || WEEK_RANGES.w1;
 
   try {
-    const res = await fetch(`content/${CFG.curriculum}/${MONTH}/${CFG.type}.json`);
+    const res = await fetch(`/the-booha-adventure/content/${CFG.curriculum}/${MONTH}/${CFG.type}.json`);
     const data = await res.json();
     CARDS = (data.cards || []).filter(c => c.n >= lo && c.n <= hi);
   } catch(e) {
