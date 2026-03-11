@@ -1,1 +1,426 @@
 
+
+{
+  "cards": [
+    {
+      "n": 1,
+      "en": "I want to be a teacher.",
+      "jp": "先生になりたいです。",
+      "hira": "せんせい に なりたい です",
+      "mp3": "br_s01_i_want_to_be_a_teacher.mp3"
+    },
+    {
+      "n": 2,
+      "en": "I want to be a doctor because I like helping people.",
+      "jp": "人を助けるのが好きなので医者になりたいです。",
+      "hira": "ひと を たすける の が すき なので いしゃ に なりたい です",
+      "mp3": "br_s02_i_want_to_be_a_doctor_because_i_like_helping_people.mp3"
+    },
+    {
+      "n": 3,
+      "en": "I want to be a pilot and travel the world.",
+      "jp": "パイロットになって世界を旅したいです。",
+      "hira": "ぱいろっと に なって せかい を たび したい です",
+      "mp3": "br_s03_i_want_to_be_a_pilot_and_travel_the_world.mp3"
+    },
+    {
+      "n": 4,
+      "en": "I want to be an artist because I love drawing.",
+      "jp": "絵を描くのが大好きなので芸術家になりたいです。",
+      "hira": "え を かく の が だいすき なので げいじゅつか に なりたい です",
+      "mp3": "br_s04_i_want_to_be_an_artist_because_i_love_drawing.mp3"
+    },
+    {
+      "n": 5,
+      "en": "I want to work in an office.",
+      "jp": "オフィスで働きたいです。",
+      "hira": "おふぃす で はたらきたい です",
+      "mp3": "br_s05_i_want_to_work_in_an_office.mp3"
+    },
+    {
+      "n": 6,
+      "en": "I want to help my town.",
+      "jp": "町の役に立ちたいです。",
+      "hira": "まち の やく に たちたい です",
+      "mp3": "br_s06_i_want_to_help_my_town.mp3"
+    },
+    {
+      "n": 7,
+      "en": "I want to cook in a restaurant.",
+      "jp": "レストランで料理をしたいです。",
+      "hira": "れすとらん で りょうり を したい です",
+      "mp3": "br_s07_i_want_to_cook_in_a_restaurant.mp3"
+    },
+    {
+      "n": 8,
+      "en": "I want to study science in the future.",
+      "jp": "将来は科学を勉強したいです。",
+      "hira": "しょうらい は かがく を べんきょう したい です",
+      "mp3": "br_s08_i_want_to_study_science_in_the_future.mp3"
+    },
+    {
+      "n": 9,
+      "en": "I want to be a nurse like my mother.",
+      "jp": "母のように看護師になりたいです。",
+      "hira": "はは の よう に かんごし に なりたい です",
+      "mp3": "br_s09_i_want_to_be_a_nurse_like_my_mother.mp3"
+    },
+    {
+      "n": 10,
+      "en": "I want to design games someday.",
+      "jp": "いつかゲームを作りたいです。",
+      "hira": "いつか げーむ を つくりたい です",
+      "mp3": "br_s10_i_want_to_design_games_someday.mp3"
+    },
+    {
+      "n": 11,
+      "en": "I want to work outside.",
+      "jp": "外で働きたいです。",
+      "hira": "そと で はたらきたい です",
+      "mp3": "br_s11_i_want_to_work_outside.mp3"
+    },
+    {
+      "n": 12,
+      "en": "I want to use English in my job.",
+      "jp": "仕事で英語を使いたいです。",
+      "hira": "しごと で えいご を つかいたい です",
+      "mp3": "br_s12_i_want_to_use_english_in_my_job.mp3"
+    },
+    {
+      "n": 13,
+      "en": "I want to help children learn.",
+      "jp": "子どもたちが学ぶのを助けたいです。",
+      "hira": "こどもたち が まなぶ の を たすけたい です",
+      "mp3": "br_s13_i_want_to_help_children_learn.mp3"
+    },
+    {
+      "n": 14,
+      "en": "I want to work hard and be happy.",
+      "jp": "一生懸命働いて幸せになりたいです。",
+      "hira": "いっしょうけんめい はたらいて しあわせ に なりたい です",
+      "mp3": "br_s14_i_want_to_work_hard_and_be_happy.mp3"
+    },
+    {
+      "n": 15,
+      "en": "I don't know yet, but I want to try many things.",
+      "jp": "まだ分かりませんが、いろいろなことに挑戦したいです。",
+      "hira": "まだ わかりません が いろいろな こと に ちょうせん したい です",
+      "mp3": "br_s15_i_dont_know_yet_but_i_want_to_try_many_things.mp3"
+    },
+    {
+      "n": 16,
+      "en": "I can sing well.",
+      "jp": "上手に歌えます。",
+      "hira": "じょうず に うたえ ます",
+      "mp3": "br_s16_i_can_sing_well.mp3"
+    },
+    {
+      "n": 17,
+      "en": "I can draw animals.",
+      "jp": "動物の絵が描けます。",
+      "hira": "どうぶつ の え が かけ ます",
+      "mp3": "br_s17_i_can_draw_animals.mp3"
+    },
+    {
+      "n": 18,
+      "en": "I can cook Japanese food.",
+      "jp": "和食を作れます。",
+      "hira": "わしょく を つくれ ます",
+      "mp3": "br_s18_i_can_cook_japanese_food.mp3"
+    },
+    {
+      "n": 19,
+      "en": "I can use a computer.",
+      "jp": "コンピューターを使えます。",
+      "hira": "こんぴゅーたー を つかえ ます",
+      "mp3": "br_s19_i_can_use_a_computer.mp3"
+    },
+    {
+      "n": 20,
+      "en": "I can fix small things.",
+      "jp": "小さい物を直せます。",
+      "hira": "ちいさい もの を なおせ ます",
+      "mp3": "br_s20_i_can_fix_small_things.mp3"
+    },
+    {
+      "n": 21,
+      "en": "I can play the piano.",
+      "jp": "ピアノを弾けます。",
+      "hira": "ぴあの を ひけ ます",
+      "mp3": "br_s21_i_can_play_the_piano.mp3"
+    },
+    {
+      "n": 22,
+      "en": "I can speak a little English.",
+      "jp": "少し英語が話せます。",
+      "hira": "すこし えいご が はなせ ます",
+      "mp3": "br_s22_i_can_speak_a_little_english.mp3"
+    },
+    {
+      "n": 23,
+      "en": "I can ride a bike.",
+      "jp": "自転車に乗れます。",
+      "hira": "じてんしゃ に のれ ます",
+      "mp3": "br_s23_i_can_ride_a_bike.mp3"
+    },
+    {
+      "n": 24,
+      "en": "I can build with blocks.",
+      "jp": "ブロックで作れます。",
+      "hira": "ぶろっく で つくれ ます",
+      "mp3": "br_s24_i_can_build_with_blocks.mp3"
+    },
+    {
+      "n": 25,
+      "en": "I'm good at listening to others.",
+      "jp": "人の話を聞くのが得意です。",
+      "hira": "ひと の はなし を きく の が とくい です",
+      "mp3": "br_s25_im_good_at_listening_to_others.mp3"
+    },
+    {
+      "n": 26,
+      "en": "I'm good at sports.",
+      "jp": "スポーツが得意です。",
+      "hira": "すぽーつ が とくい です",
+      "mp3": "br_s26_im_good_at_sports.mp3"
+    },
+    {
+      "n": 27,
+      "en": "I'm not good at math.",
+      "jp": "数学は得意ではありません。",
+      "hira": "すうがく は とくい では ありません",
+      "mp3": "br_s27_im_not_good_at_math.mp3"
+    },
+    {
+      "n": 28,
+      "en": "He's good at drawing manga.",
+      "jp": "彼は漫画を描くのが得意です。",
+      "hira": "かれ は まんが を かく の が とくい です",
+      "mp3": "br_s28_hes_good_at_drawing_manga.mp3"
+    },
+    {
+      "n": 29,
+      "en": "She's good at singing.",
+      "jp": "彼女は歌うのが得意です。",
+      "hira": "かのじょ は うたう の が とくい です",
+      "mp3": "br_s29_shes_good_at_singing.mp3"
+    },
+    {
+      "n": 30,
+      "en": "We can learn new skills together.",
+      "jp": "いっしょに新しいスキルを学べます。",
+      "hira": "いっしょ に あたらしい すきる を まなべ ます",
+      "mp3": "br_s30_we_can_learn_new_skills_together.mp3"
+    },
+    {
+      "n": 31,
+      "en": "I'm going to study hard this year.",
+      "jp": "今年は一生懸命勉強するつもりです。",
+      "hira": "ことし は いっしょうけんめい べんきょう する つもり です",
+      "mp3": "br_s31_im_going_to_study_hard_this_year.mp3"
+    },
+    {
+      "n": 32,
+      "en": "I'm going to visit my grandparents.",
+      "jp": "祖父母を訪ねるつもりです。",
+      "hira": "そふぼ を たずねる つもり です",
+      "mp3": "br_s32_im_going_to_visit_my_grandparents.mp3"
+    },
+    {
+      "n": 33,
+      "en": "I'm going to join a new club.",
+      "jp": "新しいクラブに入るつもりです。",
+      "hira": "あたらしい くらぶ に はいる つもり です",
+      "mp3": "br_s33_im_going_to_join_a_new_club.mp3"
+    },
+    {
+      "n": 34,
+      "en": "I'm going to travel this summer.",
+      "jp": "この夏は旅行するつもりです。",
+      "hira": "この なつ は りょこう する つもり です",
+      "mp3": "br_s34_im_going_to_travel_this_summer.mp3"
+    },
+    {
+      "n": 35,
+      "en": "I'm going to buy a new bag.",
+      "jp": "新しいかばんを買うつもりです。",
+      "hira": "あたらしい かばん を かう つもり です",
+      "mp3": "br_s35_im_going_to_buy_a_new_bag.mp3"
+    },
+    {
+      "n": 36,
+      "en": "I'm going to save money.",
+      "jp": "お金を貯めるつもりです。",
+      "hira": "おかね を ためる つもり です",
+      "mp3": "br_s36_im_going_to_save_money.mp3"
+    },
+    {
+      "n": 37,
+      "en": "I'm going to move next month.",
+      "jp": "来月引っ越すつもりです。",
+      "hira": "らいげつ ひっこす つもり です",
+      "mp3": "br_s37_im_going_to_move_next_month.mp3"
+    },
+    {
+      "n": 38,
+      "en": "I'm going to learn English online.",
+      "jp": "オンラインで英語を学ぶつもりです。",
+      "hira": "おんらいん で えいご を まなぶ つもり です",
+      "mp3": "br_s38_im_going_to_learn_english_online.mp3"
+    },
+    {
+      "n": 39,
+      "en": "I'm going to graduate next year.",
+      "jp": "来年卒業するつもりです。",
+      "hira": "らいねん そつぎょう する つもり です",
+      "mp3": "br_s39_im_going_to_graduate_next_year.mp3"
+    },
+    {
+      "n": 40,
+      "en": "I'm going to help my family more.",
+      "jp": "もっと家族を手伝うつもりです。",
+      "hira": "もっと かぞく を てつだう つもり です",
+      "mp3": "br_s40_im_going_to_help_my_family_more.mp3"
+    },
+    {
+      "n": 41,
+      "en": "I'm going to meet my friends.",
+      "jp": "友だちに会うつもりです。",
+      "hira": "ともだち に あう つもり です",
+      "mp3": "br_s41_im_going_to_meet_my_friends.mp3"
+    },
+    {
+      "n": 42,
+      "en": "I'm going to change my study habits.",
+      "jp": "勉強の習慣を変えるつもりです。",
+      "hira": "べんきょう の しゅうかん を かえる つもり です",
+      "mp3": "br_s42_im_going_to_change_my_study_habits.mp3"
+    },
+    {
+      "n": 43,
+      "en": "I'm going to start a diary.",
+      "jp": "日記を始めるつもりです。",
+      "hira": "にっき を はじめる つもり です",
+      "mp3": "br_s43_im_going_to_start_a_diary.mp3"
+    },
+    {
+      "n": 44,
+      "en": "I'm going to read every night.",
+      "jp": "毎晩読むつもりです。",
+      "hira": "まいばん よむ つもり です",
+      "mp3": "br_s44_im_going_to_read_every_night.mp3"
+    },
+    {
+      "n": 45,
+      "en": "I'm going to keep trying.",
+      "jp": "これからも頑張り続けるつもりです。",
+      "hira": "これから も がんばり つづける つもり です",
+      "mp3": "br_s45_im_going_to_keep_trying.mp3"
+    },
+    {
+      "n": 46,
+      "en": "There is a computer on the desk.",
+      "jp": "机の上にコンピューターがあります。",
+      "hira": "つくえ の うえ に こんぴゅーたー が あります",
+      "mp3": "br_s46_there_is_a_computer_on_the_desk.mp3"
+    },
+    {
+      "n": 47,
+      "en": "There are many workers in the factory.",
+      "jp": "工場には働く人がたくさんいます。",
+      "hira": "こうじょう に は はたらく ひと が たくさん います",
+      "mp3": "br_s47_there_are_many_workers_in_the_factory.mp3"
+    },
+    {
+      "n": 48,
+      "en": "There is a kitchen in the restaurant.",
+      "jp": "レストランにはキッチンがあります。",
+      "hira": "れすとらん に は きっちん が あります",
+      "mp3": "br_s48_there_is_a_kitchen_in_the_restaurant.mp3"
+    },
+    {
+      "n": 49,
+      "en": "There are doctors in the hospital.",
+      "jp": "病院には医者がいます。",
+      "hira": "びょういん に は いしゃ が います",
+      "mp3": "br_s49_there_are_doctors_in_the_hospital.mp3"
+    },
+    {
+      "n": 50,
+      "en": "There is a big office in the city.",
+      "jp": "街には大きなオフィスがあります。",
+      "hira": "まち に は おおきな おふぃす が あります",
+      "mp3": "br_s50_there_is_a_big_office_in_the_city.mp3"
+    },
+    {
+      "n": 51,
+      "en": "There are tools on the table.",
+      "jp": "テーブルの上に道具があります。",
+      "hira": "てーぶる の うえ に どうぐ が あります",
+      "mp3": "br_s51_there_are_tools_on_the_table.mp3"
+    },
+    {
+      "n": 52,
+      "en": "There is a machine next to the window.",
+      "jp": "窓のとなりに機械があります。",
+      "hira": "まど の となり に きかい が あります",
+      "mp3": "br_s52_there_is_a_machine_next_to_the_window.mp3"
+    },
+    {
+      "n": 53,
+      "en": "There are students in the classroom.",
+      "jp": "教室には生徒がいます。",
+      "hira": "きょうしつ に は せいと が います",
+      "mp3": "br_s53_there_are_students_in_the_classroom.mp3"
+    },
+    {
+      "n": 54,
+      "en": "There is a shop near the station.",
+      "jp": "駅の近くに店があります。",
+      "hira": "えき の ちかく に みせ が あります",
+      "mp3": "br_s54_there_is_a_shop_near_the_station.mp3"
+    },
+    {
+      "n": 55,
+      "en": "There are uniforms for staff.",
+      "jp": "スタッフ用の制服があります。",
+      "hira": "すたっふ よう の せいふく が あります",
+      "mp3": "br_s55_there_are_uniforms_for_staff.mp3"
+    },
+    {
+      "n": 56,
+      "en": "There is a clock on the wall.",
+      "jp": "壁に時計があります。",
+      "hira": "かべ に とけい が あります",
+      "mp3": "br_s56_there_is_a_clock_on_the_wall.mp3"
+    },
+    {
+      "n": 57,
+      "en": "There are books on the shelf.",
+      "jp": "棚に本があります。",
+      "hira": "たな に ほん が あります",
+      "mp3": "br_s57_there_are_books_on_the_shelf.mp3"
+    },
+    {
+      "n": 58,
+      "en": "There is a teacher at the front.",
+      "jp": "前には先生がいます。",
+      "hira": "まえ に は せんせい が います",
+      "mp3": "br_s58_there_is_a_teacher_at_the_front.mp3"
+    },
+    {
+      "n": 59,
+      "en": "There are chairs for everyone.",
+      "jp": "みんなのためのいすがあります。",
+      "hira": "みんな の ため の いす が あります",
+      "mp3": "br_s59_there_are_chairs_for_everyone.mp3"
+    },
+    {
+      "n": 60,
+      "en": "There is an idea for every problem.",
+      "jp": "どんな問題にもアイデアがあります。",
+      "hira": "どんな もんだい に も あいであ が あります",
+      "mp3": "br_s60_there_is_an_idea_for_every_problem.mp3"
+    }
+  ]
+}
