@@ -1,14 +1,21 @@
 
 // js/calendar.js
-// Booha Adventure calendar logic
-// Tokyo-based curriculum week resolver
+// Booha Adventure calendar logic — Tokyo-based curriculum week resolver
+//
+// FIXES applied:
+// - Removed ES module `export` keywords (file is loaded as a plain <script>, not a module)
+// - Functions exposed on window.CALENDAR so other scripts can call them:
+//     window.CALENDAR.getCurrentCurriculumWeek()
+//     window.CALENDAR.getAcademicWeekNumber(cw)
+//     window.CALENDAR.getAcademicWeekKey(cw)
+//
 // Rule:
 // - Weeks start on Sunday
 // - Each month has only 4 curriculum weeks
 // - If a month has a 5th week, it stays on Week 4
 // - New month begins on the first Sunday in that month
 
-// js/calendar.js
+(function () {
 
 const TOKYO_TZ = "Asia/Tokyo";
 
@@ -22,25 +29,23 @@ const MONTH_LABELS = [
   "July", "August", "September", "October", "November", "December"
 ];
 
-function getTokyoDateParts(date = new Date()) {
+function getTokyoDateParts(date) {
+  date = date || new Date();
   const formatter = new Intl.DateTimeFormat("en-CA", {
     timeZone: TOKYO_TZ,
-    year: "numeric",
+    year:  "numeric",
     month: "2-digit",
-    day: "2-digit"
+    day:   "2-digit"
   });
-
   const parts = formatter.formatToParts(date);
   const map = {};
-
   for (const part of parts) {
     if (part.type !== "literal") map[part.type] = part.value;
   }
-
   return {
-    year: Number(map.year),
+    year:  Number(map.year),
     month: Number(map.month),
-    day: Number(map.day)
+    day:   Number(map.day)
   };
 }
 
@@ -54,7 +59,7 @@ function formatDateUTC(date) {
 
 function getSundayStart(date) {
   const copy = new Date(date);
-  const day = copy.getUTCDay(); // 0 = Sunday
+  const day  = copy.getUTCDay(); // 0 = Sunday
   copy.setUTCDate(copy.getUTCDate() - day);
   return copy;
 }
@@ -74,18 +79,15 @@ function getFirstSundayOfMonth(year, month) {
 }
 
 function resolveCurriculumWeek(year, month, day) {
-  const targetDate = makeUtcDate(year, month, day);
-  const weekStart = getSundayStart(targetDate);
-  const weekEnd = getSaturdayEnd(weekStart);
-
-  const anchorYear = weekStart.getUTCFullYear();
+  const targetDate  = makeUtcDate(year, month, day);
+  const weekStart   = getSundayStart(targetDate);
+  const weekEnd     = getSaturdayEnd(weekStart);
+  const anchorYear  = weekStart.getUTCFullYear();
   const anchorMonth = weekStart.getUTCMonth() + 1;
-
   const firstSunday = getFirstSundayOfMonth(anchorYear, anchorMonth);
-  const diffMs = weekStart.getTime() - firstSunday.getTime();
-  const diffWeeks = Math.floor(diffMs / (7 * 24 * 60 * 60 * 1000));
-  const rawWeek = diffWeeks + 1;
-
+  const diffMs      = weekStart.getTime() - firstSunday.getTime();
+  const diffWeeks   = Math.floor(diffMs / (7 * 24 * 60 * 60 * 1000));
+  const rawWeek     = diffWeeks + 1;
   return {
     anchorYear,
     anchorMonth,
@@ -95,34 +97,39 @@ function resolveCurriculumWeek(year, month, day) {
   };
 }
 
-export function getCurrentCurriculumWeek(now = new Date()) {
-  const tokyo = getTokyoDateParts(now);
-
+function getCurrentCurriculumWeek(now) {
+  now = now || new Date();
+  const tokyo  = getTokyoDateParts(now);
   const result = resolveCurriculumWeek(tokyo.year, tokyo.month, tokyo.day);
-
   const monthIndex = result.anchorMonth - 1;
-  const monthSlug = MONTHS[monthIndex];
-  const monthLabel = MONTH_LABELS[monthIndex];
-
   return {
-    year: result.anchorYear,
-    month: result.anchorMonth,
-    monthSlug,
-    monthLabel,
-    weekNumber: result.weekNumber,
-    weekId: `${monthSlug}-w${result.weekNumber}`,
-    weekStart: formatDateUTC(result.weekStart),
-    weekEnd: formatDateUTC(result.weekEnd)
+    year:        result.anchorYear,
+    month:       result.anchorMonth,
+    monthSlug:   MONTHS[monthIndex],
+    monthLabel:  MONTH_LABELS[monthIndex],
+    weekNumber:  result.weekNumber,
+    weekId:      MONTHS[monthIndex] + '-w' + result.weekNumber,
+    weekStart:   formatDateUTC(result.weekStart),
+    weekEnd:     formatDateUTC(result.weekEnd)
   };
 }
 
-export function getAcademicWeekNumber(curriculumWeek) {
+function getAcademicWeekNumber(curriculumWeek) {
   const cw = curriculumWeek || getCurrentCurriculumWeek();
   return ((cw.month - 1) * 4) + cw.weekNumber;
 }
 
-export function getAcademicWeekKey(curriculumWeek) {
+function getAcademicWeekKey(curriculumWeek) {
   const cw = curriculumWeek || getCurrentCurriculumWeek();
-  const n = getAcademicWeekNumber(cw);
-  return `w${String(n).padStart(2, "0")}`;
+  const n  = getAcademicWeekNumber(cw);
+  return 'w' + String(n).padStart(2, '0');
 }
+
+/* ── Expose on window.CALENDAR (plain-script safe, no ES module needed) ── */
+window.CALENDAR = {
+  getCurrentCurriculumWeek: getCurrentCurriculumWeek,
+  getAcademicWeekNumber:    getAcademicWeekNumber,
+  getAcademicWeekKey:       getAcademicWeekKey
+};
+
+})();
