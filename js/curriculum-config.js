@@ -3,7 +3,7 @@ window.CURRICULUM_REGISTRY = {
 
   pb: {
     audioFolder: "pb",
-    navTarget: "./curriculum/pb/study-index.html",
+    navTarget: "/the-booha-adventure/curriculum/pb/study-index.html",
     navKey: "pb",
 
     types: {
@@ -49,7 +49,7 @@ window.CURRICULUM_REGISTRY = {
 
   br: {
     audioFolder: "br",
-    navTarget: "./curriculum/br/study-index.html",
+    navTarget: "/the-booha-adventure/curriculum/br/study-index.html",
     navKey: "br",
 
     types: {
@@ -95,7 +95,7 @@ window.CURRICULUM_REGISTRY = {
 
   bc: {
     audioFolder: "bc",
-    navTarget: "./curriculum/bc/study-index.html",
+    navTarget: "/the-booha-adventure/curriculum/bc/study-index.html",
     navKey: "bc",
 
     types: {
