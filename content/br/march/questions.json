@@ -1,1 +1,426 @@
 
+
+{
+  "cards": [
+    {
+      "n": 1,
+      "en": "What do you want to be in the future?",
+      "jp": "将来は何になりたいですか。",
+      "hira": "しょうらい は なに に なりたい です か",
+      "mp3": "br_q01_what_do_you_want_to_be_in_the_future.mp3"
+    },
+    {
+      "n": 2,
+      "en": "Why do you want that job?",
+      "jp": "どうしてその仕事をしたいですか。",
+      "hira": "どうして その しごと を したい です か",
+      "mp3": "br_q02_why_do_you_want_that_job.mp3"
+    },
+    {
+      "n": 3,
+      "en": "Who inspires your dream?",
+      "jp": "だれがあなたの夢に影響を与えましたか。",
+      "hira": "だれ が あなた の ゆめ に えいきょう を あたえ ました か",
+      "mp3": "br_q03_who_inspires_your_dream.mp3"
+    },
+    {
+      "n": 4,
+      "en": "Do you know anyone with your dream job?",
+      "jp": "あなたの夢の仕事をしている人を知っていますか。",
+      "hira": "あなた の ゆめ の しごと を して いる ひと を しって います か",
+      "mp3": "br_q04_do_you_know_anyone_with_your_dream_job.mp3"
+    },
+    {
+      "n": 5,
+      "en": "What job looks fun to you?",
+      "jp": "楽しそうだと思う仕事は何ですか。",
+      "hira": "たのしそう だ と おもう しごと は なん です か",
+      "mp3": "br_q05_what_job_looks_fun_to_you.mp3"
+    },
+    {
+      "n": 6,
+      "en": "Do you want to work in Japan or abroad?",
+      "jp": "日本で働きたいですか、それとも海外で働きたいですか。",
+      "hira": "にほん で はたらきたい です か、それとも かいがい で はたらきたい です か",
+      "mp3": "br_q06_do_you_want_to_work_in_japan_or_abroad.mp3"
+    },
+    {
+      "n": 7,
+      "en": "Do you think your dream job is difficult?",
+      "jp": "夢の仕事は難しいと思いますか。",
+      "hira": "ゆめ の しごと は むずかしい と おもい ます か",
+      "mp3": "br_q07_do_you_think_your_dream_job_is_difficult.mp3"
+    },
+    {
+      "n": 8,
+      "en": "What do you want to learn for your future?",
+      "jp": "将来のために何を学びたいですか。",
+      "hira": "しょうらい の ため に なに を まなびたい です か",
+      "mp3": "br_q08_what_do_you_want_to_learn_for_your_future.mp3"
+    },
+    {
+      "n": 9,
+      "en": "What job helps people?",
+      "jp": "人を助ける仕事は何ですか。",
+      "hira": "ひと を たすける しごと は なん です か",
+      "mp3": "br_q09_what_job_helps_people.mp3"
+    },
+    {
+      "n": 10,
+      "en": "Do you like working in a team?",
+      "jp": "チームで働くのは好きですか。",
+      "hira": "ちーむ で はたらく の は すき です か",
+      "mp3": "br_q10_do_you_like_working_in_a_team.mp3"
+    },
+    {
+      "n": 11,
+      "en": "What job uses English?",
+      "jp": "英語を使う仕事は何ですか。",
+      "hira": "えいご を つかう しごと は なん です か",
+      "mp3": "br_q11_what_job_uses_english.mp3"
+    },
+    {
+      "n": 12,
+      "en": "What do you think is an easy job?",
+      "jp": "かんたんだと思う仕事は何ですか。",
+      "hira": "かんたん だ と おもう しごと は なん です か",
+      "mp3": "br_q12_what_do_you_think_is_an_easy_job.mp3"
+    },
+    {
+      "n": 13,
+      "en": "What do your parents do?",
+      "jp": "ご両親はどんな仕事をしていますか。",
+      "hira": "ごりょうしん は どんな しごと を して います か",
+      "mp3": "br_q13_what_do_your_parents_do.mp3"
+    },
+    {
+      "n": 14,
+      "en": "Would you like the same job as them?",
+      "jp": "ご両親と同じ仕事をしてみたいですか。",
+      "hira": "ごりょうしん と おなじ しごと を して みたい です か",
+      "mp3": "br_q14_would_you_like_the_same_job_as_them.mp3"
+    },
+    {
+      "n": 15,
+      "en": "What job do you think I have?",
+      "jp": "私の仕事は何だと思いますか。",
+      "hira": "わたし の しごと は なん だ と おもい ます か",
+      "mp3": "br_q15_what_job_do_you_think_i_have.mp3"
+    },
+    {
+      "n": 16,
+      "en": "What can you do well?",
+      "jp": "何が上手にできますか。",
+      "hira": "なに が じょうず に でき ます か",
+      "mp3": "br_q16_what_can_you_do_well.mp3"
+    },
+    {
+      "n": 17,
+      "en": "What are you good at?",
+      "jp": "何が得意ですか。",
+      "hira": "なに が とくい です か",
+      "mp3": "br_q17_what_are_you_good_at.mp3"
+    },
+    {
+      "n": 18,
+      "en": "What are you not good at?",
+      "jp": "何が苦手ですか。",
+      "hira": "なに が にがて です か",
+      "mp3": "br_q18_what_are_you_not_good_at.mp3"
+    },
+    {
+      "n": 19,
+      "en": "Can you play an instrument?",
+      "jp": "楽器は弾けますか。",
+      "hira": "がっき は ひけ ます か",
+      "mp3": "br_q19_can_you_play_an_instrument.mp3"
+    },
+    {
+      "n": 20,
+      "en": "Can you cook?",
+      "jp": "料理はできますか。",
+      "hira": "りょうり は でき ます か",
+      "mp3": "br_q20_can_you_cook.mp3"
+    },
+    {
+      "n": 21,
+      "en": "What skill do you want to learn?",
+      "jp": "どんなスキルを学びたいですか。",
+      "hira": "どんな すきる を まなびたい です か",
+      "mp3": "br_q21_what_skill_do_you_want_to_learn.mp3"
+    },
+    {
+      "n": 22,
+      "en": "Who is good at English in your class?",
+      "jp": "クラスで英語が得意な人はだれですか。",
+      "hira": "くらす で えいご が とくい な ひと は だれ です か",
+      "mp3": "br_q22_who_is_good_at_english_in_your_class.mp3"
+    },
+    {
+      "n": 23,
+      "en": "Can you use a computer?",
+      "jp": "コンピューターを使えますか。",
+      "hira": "こんぴゅーたー を つかえ ます か",
+      "mp3": "br_q23_can_you_use_a_computer.mp3"
+    },
+    {
+      "n": 24,
+      "en": "Can you swim?",
+      "jp": "泳げますか。",
+      "hira": "およげ ます か",
+      "mp3": "br_q24_can_you_swim.mp3"
+    },
+    {
+      "n": 25,
+      "en": "What talent do you want?",
+      "jp": "どんな才能がほしいですか。",
+      "hira": "どんな さいのう が ほしい です か",
+      "mp3": "br_q25_what_talent_do_you_want.mp3"
+    },
+    {
+      "n": 26,
+      "en": "Who can draw well?",
+      "jp": "だれが上手に絵を描けますか。",
+      "hira": "だれ が じょうず に え を かけ ます か",
+      "mp3": "br_q26_who_can_draw_well.mp3"
+    },
+    {
+      "n": 27,
+      "en": "Can you sing karaoke?",
+      "jp": "カラオケは歌えますか。",
+      "hira": "からおけ は うたえ ます か",
+      "mp3": "br_q27_can_you_sing_karaoke.mp3"
+    },
+    {
+      "n": 28,
+      "en": "Do you like learning new skills?",
+      "jp": "新しいスキルを学ぶのは好きですか。",
+      "hira": "あたらしい すきる を まなぶ の は すき です か",
+      "mp3": "br_q28_do_you_like_learning_new_skills.mp3"
+    },
+    {
+      "n": 29,
+      "en": "What can you teach your friends?",
+      "jp": "友だちに何を教えられますか。",
+      "hira": "ともだち に なに を おしえられ ます か",
+      "mp3": "br_q29_what_can_you_teach_your_friends.mp3"
+    },
+    {
+      "n": 30,
+      "en": "What skill do you think you will need in the future?",
+      "jp": "将来必要になるスキルは何だと思いますか。",
+      "hira": "しょうらい ひつよう に なる すきる は なん だ と おもい ます か",
+      "mp3": "br_q30_what_skill_do_you_think_you_will_need_in_the_future.mp3"
+    },
+    {
+      "n": 31,
+      "en": "What are you going to do this weekend?",
+      "jp": "今週末は何をするつもりですか。",
+      "hira": "こんしゅうまつ は なに を する つもり です か",
+      "mp3": "br_q31_what_are_you_going_to_do_this_weekend.mp3"
+    },
+    {
+      "n": 32,
+      "en": "What are you going to study next?",
+      "jp": "次は何を勉強するつもりですか。",
+      "hira": "つぎ は なに を べんきょう する つもり です か",
+      "mp3": "br_q32_what_are_you_going_to_study_next.mp3"
+    },
+    {
+      "n": 33,
+      "en": "Are you going to travel during vacation?",
+      "jp": "休みの間に旅行するつもりですか。",
+      "hira": "やすみ の あいだ に りょこう する つもり です か",
+      "mp3": "br_q33_are_you_going_to_travel_during_vacation.mp3"
+    },
+    {
+      "n": 34,
+      "en": "Who are you going to meet?",
+      "jp": "だれに会うつもりですか。",
+      "hira": "だれ に あう つもり です か",
+      "mp3": "br_q34_who_are_you_going_to_meet.mp3"
+    },
+    {
+      "n": 35,
+      "en": "What are you going to buy soon?",
+      "jp": "もうすぐ何を買うつもりですか。",
+      "hira": "もうすぐ なに を かう つもり です か",
+      "mp3": "br_q35_what_are_you_going_to_buy_soon.mp3"
+    },
+    {
+      "n": 36,
+      "en": "Are you going to join any clubs?",
+      "jp": "何かクラブに入るつもりですか。",
+      "hira": "なにか くらぶ に はいる つもり です か",
+      "mp3": "br_q36_are_you_going_to_join_any_clubs.mp3"
+    },
+    {
+      "n": 37,
+      "en": "What are you going to learn this year?",
+      "jp": "今年は何を学ぶつもりですか。",
+      "hira": "ことし は なに を まなぶ つもり です か",
+      "mp3": "br_q37_what_are_you_going_to_learn_this_year.mp3"
+    },
+    {
+      "n": 38,
+      "en": "Are you going to move to a new house?",
+      "jp": "引っ越すつもりですか。",
+      "hira": "ひっこす つもり です か",
+      "mp3": "br_q38_are_you_going_to_move_to_a_new_house.mp3"
+    },
+    {
+      "n": 39,
+      "en": "When are you going to graduate?",
+      "jp": "いつ卒業するつもりですか。",
+      "hira": "いつ そつぎょう する つもり です か",
+      "mp3": "br_q39_when_are_you_going_to_graduate.mp3"
+    },
+    {
+      "n": 40,
+      "en": "What are you going to eat tonight?",
+      "jp": "今夜は何を食べるつもりですか。",
+      "hira": "こんや は なに を たべる つもり です か",
+      "mp3": "br_q40_what_are_you_going_to_eat_tonight.mp3"
+    },
+    {
+      "n": 41,
+      "en": "Are you going to start something new?",
+      "jp": "何か新しいことを始めるつもりですか。",
+      "hira": "なにか あたらしい こと を はじめる つもり です か",
+      "mp3": "br_q41_are_you_going_to_start_something_new.mp3"
+    },
+    {
+      "n": 42,
+      "en": "What are you going to stop doing?",
+      "jp": "何をやめるつもりですか。",
+      "hira": "なに を やめる つもり です か",
+      "mp3": "br_q42_what_are_you_going_to_stop_doing.mp3"
+    },
+    {
+      "n": 43,
+      "en": "Who are you going to help?",
+      "jp": "だれを手伝うつもりですか。",
+      "hira": "だれ を てつだう つもり です か",
+      "mp3": "br_q43_who_are_you_going_to_help.mp3"
+    },
+    {
+      "n": 44,
+      "en": "How are you going to practice English?",
+      "jp": "どうやって英語を練習するつもりですか。",
+      "hira": "どうやって えいご を れんしゅう する つもり です か",
+      "mp3": "br_q44_how_are_you_going_to_practice_english.mp3"
+    },
+    {
+      "n": 45,
+      "en": "What are you going to do after school?",
+      "jp": "放課後は何をするつもりですか。",
+      "hira": "ほうかご は なに を する つもり です か",
+      "mp3": "br_q45_what_are_you_going_to_do_after_school.mp3"
+    },
+    {
+      "n": 46,
+      "en": "Where do you want to work?",
+      "jp": "どこで働きたいですか。",
+      "hira": "どこ で はたらきたい です か",
+      "mp3": "br_q46_where_do_you_want_to_work.mp3"
+    },
+    {
+      "n": 47,
+      "en": "What can you see in your school?",
+      "jp": "学校で何が見えますか。",
+      "hira": "がっこう で なに が みえ ます か",
+      "mp3": "br_q47_what_can_you_see_in_your_school.mp3"
+    },
+    {
+      "n": 48,
+      "en": "Is there a library in your school?",
+      "jp": "学校に図書室はありますか。",
+      "hira": "がっこう に としょしつ は あり ます か",
+      "mp3": "br_q48_is_there_a_library_in_your_school.mp3"
+    },
+    {
+      "n": 49,
+      "en": "How many computers are in your classroom?",
+      "jp": "教室にコンピューターはいくつありますか。",
+      "hira": "きょうしつ に こんぴゅーたー は いくつ あり ます か",
+      "mp3": "br_q49_how_many_computers_are_in_your_classroom.mp3"
+    },
+    {
+      "n": 50,
+      "en": "Is there a kitchen in your house?",
+      "jp": "家にキッチンはありますか。",
+      "hira": "いえ に きっちん は あり ます か",
+      "mp3": "br_q50_is_there_a_kitchen_in_your_house.mp3"
+    },
+    {
+      "n": 51,
+      "en": "What is on your desk?",
+      "jp": "机の上には何がありますか。",
+      "hira": "つくえ の うえ に は なに が あり ます か",
+      "mp3": "br_q51_what_is_on_your_desk.mp3"
+    },
+    {
+      "n": 52,
+      "en": "Are there many people at your workplace?",
+      "jp": "仕事場には人がたくさんいますか。",
+      "hira": "しごとば に は ひと が たくさん います か",
+      "mp3": "br_q52_are_there_many_people_at_your_workplace.mp3"
+    },
+    {
+      "n": 53,
+      "en": "What tools do you use every day?",
+      "jp": "毎日どんな道具を使いますか。",
+      "hira": "まいにち どんな どうぐ を つかい ます か",
+      "mp3": "br_q53_what_tools_do_you_use_every_day.mp3"
+    },
+    {
+      "n": 54,
+      "en": "Is there a train station near your home?",
+      "jp": "家の近くに駅はありますか。",
+      "hira": "いえ の ちかく に えき は あり ます か",
+      "mp3": "br_q54_is_there_a_train_station_near_your_home.mp3"
+    },
+    {
+      "n": 55,
+      "en": "What uniforms do you see?",
+      "jp": "どんな制服を見ますか。",
+      "hira": "どんな せいふく を み ます か",
+      "mp3": "br_q55_what_uniforms_do_you_see.mp3"
+    },
+    {
+      "n": 56,
+      "en": "Is there a restaurant you like?",
+      "jp": "好きなレストランはありますか。",
+      "hira": "すき な れすとらん は あり ます か",
+      "mp3": "br_q56_is_there_a_restaurant_you_like.mp3"
+    },
+    {
+      "n": 57,
+      "en": "Are there books in your bag?",
+      "jp": "かばんに本は入っていますか。",
+      "hira": "かばん に ほん は はいって います か",
+      "mp3": "br_q57_are_there_books_in_your_bag.mp3"
+    },
+    {
+      "n": 58,
+      "en": "What is near your office or school?",
+      "jp": "会社や学校の近くには何がありますか。",
+      "hira": "かいしゃ や がっこう の ちかく に は なに が あり ます か",
+      "mp3": "br_q58_what_is_near_your_office_or_school.mp3"
+    },
+    {
+      "n": 59,
+      "en": "Is there something you always bring to work?",
+      "jp": "仕事にいつも持っていくものはありますか。",
+      "hira": "しごと に いつも もって いく もの は あり ます か",
+      "mp3": "br_q59_is_there_something_you_always_bring_to_work.mp3"
+    },
+    {
+      "n": 60,
+      "en": "What is in your pencil case?",
+      "jp": "筆箱には何が入っていますか。",
+      "hira": "ふでばこ に は なに が はいって います か",
+      "mp3": "br_q60_what_is_in_your_pencil_case.mp3"
+    }
+  ]
+}
