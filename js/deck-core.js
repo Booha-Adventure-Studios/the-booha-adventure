@@ -12,7 +12,9 @@ const AUDIO_ROOT = 'https://pub-8d5941f302df44b899ce9d9a4606dcb7.r2.dev/audio-20
 
 const searchParams = new URLSearchParams(window.location.search);
 const weekParam    = searchParams.get('week') || '';
-const monthMatch   = weekParam.match(/_([a-z]{3})_w/i);
+   
+const monthMatch = weekParam.match(/_([a-z]{3})_w/i);
+
 const MONTH_MAP = {
   jan:'january', feb:'february', mar:'march', apr:'april',
   may:'may', jun:'june', jul:'july', aug:'august',
@@ -20,6 +22,7 @@ const MONTH_MAP = {
 };
 
 const MONTH_CODE = monthMatch ? monthMatch[1].toLowerCase() : 'jan';
+const MONTH = MONTH_MAP[MONTH_CODE] || 'january';
 const AUDIO_BASE = `${AUDIO_ROOT}/${MONTH_CODE}/${CFG.audioFolder}/${CFG.audioSub}/`;
 
 const WEEK_RANGES  = { w1:[1,15], w2:[16,30], w3:[31,45], w4:[46,60] };
@@ -298,7 +301,7 @@ window.addEventListener('resize', () => { if (CARDS.length) showCard(); });
   const [lo, hi] = WEEK_RANGES[weekKey] || WEEK_RANGES.w1;
 
   try {
-   const res = await fetch(`./content/${CFG.curriculum}/${MONTH}/${CFG.type}.json`);
+    const res = await fetch(`content/${CFG.curriculum}/${MONTH}/${CFG.type}.json`);
     const data = await res.json();
     CARDS = (data.cards || []).filter(c => c.n >= lo && c.n <= hi);
   } catch(e) {
