@@ -7,6 +7,7 @@
 (function () {
 
 const CFG        = window.DECK_CONFIG;
+
 const AUDIO_ROOT = 'https://pub-8d5941f302df44b899ce9d9a4606dcb7.r2.dev/audio-2027';
 
 const searchParams = new URLSearchParams(window.location.search);
@@ -279,7 +280,7 @@ window.addEventListener('resize', () => { if (CARDS.length) showCard(); });
   const [lo, hi] = WEEK_RANGES[weekKey] || WEEK_RANGES.w1;
 
   try {
-    const res  = await fetch(CFG.jsonUrl);
+   const res = await fetch(`./content/${CFG.curriculum}/${MONTH}/${CFG.type}.json`);
     const data = await res.json();
     CARDS = (data.cards || []).filter(c => c.n >= lo && c.n <= hi);
   } catch(e) {
