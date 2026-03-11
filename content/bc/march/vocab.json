@@ -68,7 +68,7 @@
 
     { "n": 56, "en": "negotiation", "jp": "交渉", "hira": "こうしょう", "mp3": "bc_v56_negotiation.mp3" },
     { "n": 57, "en": "career path", "jp": "キャリアパス", "hira": "きゃりあ ぱす", "mp3": "bc_v57_career_path.mp3" },
-    { "n": 58, "en": "long-term goal", "jp": "長期目標", "hira": "ちょうき もくひょう", "mp3": "bc_v58_long_term_goal.mp3" },
+    { "n": 58, "en": "long-term goal", "jp": "長期目標", "hira": "ちょうき もくひょう", "mp3": "bc_v58_longterm_goal.mp3" },
     { "n": 59, "en": "professional growth", "jp": "職業的成長", "hira": "しょくぎょうてき せいちょう", "mp3": "bc_v59_professional_growth.mp3" },
     { "n": 60, "en": "reputation", "jp": "評判", "hira": "ひょうばん", "mp3": "bc_v60_reputation.mp3" }
   ]
