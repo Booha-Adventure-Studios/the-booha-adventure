@@ -149,11 +149,11 @@
 (function bootstrap() {
 
   /* ── 1. Read URL params ── */
-  const params     = new URLSearchParams(window.location.search);
-  const curriculum = (params.get('curriculum') || 'br').toLowerCase();
-  const type       = (params.get('type')       || 'vocab').toLowerCase();
-  const week       = params.get('week') || '';
-
+ const params     = new URLSearchParams(window.location.search);
+ const week       = params.get('week') || '';
+ const type       = (params.get('type') || 'vocab').toLowerCase();
+ const currMatch  = week.match(/^(pb|br|bc)_/i);
+ const curriculum = currMatch ? currMatch[1].toLowerCase() : 'br';
   /* ── 2. Look up registry ── */
   const reg = window.CURRICULUM_REGISTRY[curriculum];
   if (!reg) {
