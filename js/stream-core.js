@@ -3,6 +3,13 @@
    stream-core.js  —  Stream engine (sequential audio play mode)
    Reads window.DECK_CONFIG which study-deck.html sets from the
    URL params + CURRICULUM_REGISTRY lookup.
+
+   FIXES applied:
+   - STREAM_ROOT path order corrected: audioFolder/monthCode/ (was monthCode/audioFolder/)
+   - jsonUrl now uses CFG.jsonUrl which bootstrap builds correctly
+   - sparkle-layer and preload-bar now reference the stream-ui versions by ID
+     (HTML IDs made unique: sparkle-layer-stream, preload-bar-stream)
+   - MONTH variable renamed MONTH_CODE for clarity (3-letter code, not full name)
    ═══════════════════════════════════════════════════════════════ */
 (function () {
 
@@ -12,15 +19,18 @@ const AUDIO_ROOT = 'https://pub-8d5941f302df44b899ce9d9a4606dcb7.r2.dev/audio-20
 const searchParams  = new URLSearchParams(window.location.search);
 const weekParam     = searchParams.get('week') || '';
 const monthMatch    = weekParam.match(/_([a-z]{3})_w/i);
-const MONTH         = monthMatch ? monthMatch[1] : 'jan';
-const STREAM_ROOT   = `${AUDIO_ROOT}/${MONTH}/${CFG.audioFolder}/`;
+const MONTH_CODE    = monthMatch ? monthMatch[1].toLowerCase() : 'jan';
+
+/* FIX: path order was reversed — must be audioFolder/monthCode/ */
+const STREAM_ROOT = `${AUDIO_ROOT}/${CFG.audioFolder}/${MONTH_CODE}/`;
 
 const STREAM_PALETTES = CFG.palettes;
 const MOTE_COLORS     = CFG.moteColors;
 
 /* ── DOM refs ── */
 const enTextEl      = document.getElementById('en-text');
-const stripeEl      = document.getElementById('stripe-layer');
+/* FIX: use unique IDs for stream-ui elements (see study-deck.html) */
+const stripeEl      = document.getElementById('stripe-layer-stream');
 const trackCounter  = document.getElementById('track-counter');
 const progressFill  = document.getElementById('progress-fill');
 const pauseRing     = document.getElementById('pause-ring');
@@ -29,10 +39,11 @@ const btnPlayPause  = document.getElementById('btn-playpause');
 const btnSlow       = document.getElementById('btn-slow');
 const btnPrev       = document.getElementById('btn-prev');
 const btnNext       = document.getElementById('btn-next');
-const preloadBar    = document.getElementById('preload-bar');
+const preloadBar    = document.getElementById('preload-bar-stream');
 const progressLeft  = document.getElementById('progress-left');
 const progressRight = document.getElementById('progress-right');
-const sparkL        = document.getElementById('sparkle-layer');
+/* FIX: use unique sparkle ID for stream-ui */
+const sparkL        = document.getElementById('sparkle-layer-stream');
 const streamLabel   = document.getElementById('stream-label');
 const streamDot     = document.querySelector('.stream-dot');
 
@@ -97,14 +108,15 @@ function buildWeekStream(allCards, weekNum) {
 /* ════════════════════════════
    AUDIO PATH
    Stream serves from multiple subfolders — detect by filename prefix.
-   Prefix convention must match what each curriculum uses.
-   Default: br_ prefix → vocab/sentences/questions
+   Prefix convention: br_v_ → vocab, br_s_ → sentences, br_q_ → questions
    Override CFG.getAudioSrc(mp3) in curriculum-config if needed.
 ════════════════════════════ */
 function getAudioSrc(mp3) {
   if (typeof CFG.getAudioSrc === 'function') return CFG.getAudioSrc(mp3, STREAM_ROOT);
-  // Default: detect by filename prefix (works for boo-riculum br_ files)
-  const prefix = mp3.split('_')[1] || '';
+  // Default: detect subfolder by filename segment after curriculum prefix
+  // e.g. "br_v_001.mp3" → vocab, "br_s_001.mp3" → sentences, "br_q_001.mp3" → questions
+  const parts  = mp3.split('_');
+  const prefix = parts[1] || '';
   if      (prefix === 'v') return STREAM_ROOT + 'vocab/'     + mp3;
   else if (prefix === 's') return STREAM_ROOT + 'sentences/' + mp3;
   else if (prefix === 'q') return STREAM_ROOT + 'questions/' + mp3;
@@ -147,6 +159,7 @@ function wrapWords(el, text) {
 }
 
 function burstMotes() {
+  if (!sparkL) return;
   sparkL.innerHTML = '';
   for (let i = 0; i < 18; i++) {
     const m  = document.createElement('div');
@@ -158,7 +171,7 @@ function burstMotes() {
     m.style.cssText=`width:${sz}px;height:${sz}px;left:${x}%;top:${y}%;--tx:${tx};--ty:${ty};--md:${md};--mc:${mc};animation-delay:${(Math.random()*.1).toFixed(2)}s`;
     sparkL.appendChild(m);
   }
-  setTimeout(()=>{ sparkL.innerHTML=''; },1400);
+  setTimeout(()=>{ if (sparkL) sparkL.innerHTML=''; },1400);
 }
 
 /* ════════════════════════════
@@ -173,13 +186,15 @@ function getSectionInfo(i) {
 
 function applySection(color) {
   document.documentElement.style.setProperty('--stream-color', color);
-  streamLabel.style.color       = color;
-  streamDot.style.background    = color;
-  streamDot.style.boxShadow     = '0 0 10px '+color;
-  progressFill.style.background = color;
-  progressFill.style.boxShadow  = '0 0 8px '+color;
-  // also update ring colour in SVG via CSS var
-  document.documentElement.style.setProperty('--stream-color', color);
+  if (streamLabel)  streamLabel.style.color    = color;
+  if (streamDot) {
+    streamDot.style.background  = color;
+    streamDot.style.boxShadow   = '0 0 10px '+color;
+  }
+  if (progressFill) {
+    progressFill.style.background = color;
+    progressFill.style.boxShadow  = '0 0 8px '+color;
+  }
 }
 
 /* ════════════════════════════
@@ -193,8 +208,10 @@ function preloadAudio(cards) {
     a.src = getAudioSrc(card.mp3);
     const done = () => {
       loaded++;
-      preloadBar.textContent = 'Audio '+loaded+' / '+cards.length;
-      if (loaded >= cards.length) preloadBar.classList.add('done');
+      if (preloadBar) {
+        preloadBar.textContent = 'Audio '+loaded+' / '+cards.length;
+        if (loaded >= cards.length) preloadBar.classList.add('done');
+      }
     };
     a.addEventListener('canplaythrough', done, {once:true});
     a.addEventListener('error',          done, {once:true});
@@ -207,12 +224,12 @@ function preloadAudio(cards) {
 ════════════════════════════ */
 function updateUI(track) {
   const sec = getSectionInfo(trackIdx);
-  stripeEl.style.backgroundImage = makeStripe(STREAM_PALETTES[trackIdx % STREAM_PALETTES.length]);
-  trackCounter.textContent        = (trackIdx+1)+' / '+TRACKS.length;
-  progressFill.style.width        = ((trackIdx+1)/TRACKS.length*100).toFixed(1)+'%';
-  streamLabel.textContent         = sec.label;
-  progressLeft.textContent        = 'Vocab';
-  progressRight.textContent       = 'Questions';
+  if (stripeEl)     stripeEl.style.backgroundImage = makeStripe(STREAM_PALETTES[trackIdx % STREAM_PALETTES.length]);
+  if (trackCounter) trackCounter.textContent       = (trackIdx+1)+' / '+TRACKS.length;
+  if (progressFill) progressFill.style.width       = ((trackIdx+1)/TRACKS.length*100).toFixed(1)+'%';
+  if (streamLabel)  streamLabel.textContent        = sec.label;
+  if (progressLeft)  progressLeft.textContent      = 'Vocab';
+  if (progressRight) progressRight.textContent     = 'Questions';
   applySection(sec.color);
   wrapWords(enTextEl, track.en);
   enTextEl.classList.remove('dancing');
@@ -327,6 +344,9 @@ window.addEventListener('resize', () => {
 
 /* ════════════════════════════
    INIT
+   FIX: use CFG.jsonUrl (set by bootstrap) instead of building a wrong path here.
+   Bootstrap sets: jsonUrl = '/the-booha-adventure/content/' + curriculum + '/' + MONTH + '/' + jsonFile
+   For stream, jsonFile = 'stream.json' (combined 180-card JSON).
 ════════════════════════════ */
 (async function init() {
   const weekNum = parseWeekInfo();
@@ -336,18 +356,21 @@ window.addEventListener('resize', () => {
     const data     = await res.json();
     const allCards = data.cards || [];
     if (allCards.length < 180) {
-      preloadBar.textContent = CFG.jsonFile + ' needs 180 items.';
+      if (preloadBar) preloadBar.textContent = (CFG.errorLabel || 'Stream JSON') + ' needs 180 items (got '+allCards.length+').';
       console.error('[stream-core] Expected 180 cards, got:', allCards.length);
       return;
     }
     TRACKS = buildWeekStream(allCards, weekNum);
   } catch(e) {
-    preloadBar.textContent = CFG.errorLabel || 'Could not load stream data.';
+    if (preloadBar) preloadBar.textContent = CFG.errorLabel || 'Could not load stream data.';
     console.error('[stream-core] fetch failed:', e);
     return;
   }
 
-  if (!TRACKS.length) { preloadBar.textContent = 'No stream tracks for this week.'; return; }
+  if (!TRACKS.length) {
+    if (preloadBar) preloadBar.textContent = 'No stream tracks for this week.';
+    return;
+  }
 
   preloadAudio(TRACKS);
   updateUI(TRACKS[0]);
