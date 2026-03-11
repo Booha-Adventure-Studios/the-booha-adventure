@@ -19,15 +19,25 @@ const MONTH_MAP = {
   sep:'september', oct:'october', nov:'november', dec:'december'
 };
 
-const MONTH = monthMatch ? MONTH_MAP[monthMatch[1]] : 'january';
-
-   
-const AUDIO_BASE   = `${AUDIO_ROOT}/${MONTH}/${CFG.audioFolder}/${CFG.audioSub}/`;
+const MONTH_CODE = monthMatch ? monthMatch[1].toLowerCase() : 'jan';
+const AUDIO_BASE = `${AUDIO_ROOT}/${MONTH_CODE}/${CFG.audioFolder}/${CFG.audioSub}/`;
 
 const WEEK_RANGES  = { w1:[1,15], w2:[16,30], w3:[31,45], w4:[46,60] };
-const PALETTES     = CFG.palettes;
-const MOTE_COLORS  = CFG.moteColors;
+   
+const PALETTES = (CFG.palettes && CFG.palettes.length)
+  ? CFG.palettes
+  : [
+      ['#ff8fd8','#ffc04d','#7dd3fc','#86efac'],
+      ['#f9a8d4','#fde68a','#93c5fd','#c4b5fd'],
+      ['#fca5a5','#fdba74','#fcd34d','#86efac'],
+      ['#a5b4fc','#67e8f9','#f9a8d4','#fde68a']
+    ];
 
+const MOTE_COLORS = (CFG.moteColors && CFG.moteColors.length)
+  ? CFG.moteColors
+  : ['#ffffff','#ffe08a','#ffd1f4','#aee7ff'];
+
+   
 /* ── DOM refs ── */
 const scene      = document.getElementById('card-scene');
 const enEl       = document.getElementById('en-word') || document.getElementById('en-sentence');
