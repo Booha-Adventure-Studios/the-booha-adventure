@@ -13,7 +13,15 @@ const AUDIO_ROOT = 'https://pub-8d5941f302df44b899ce9d9a4606dcb7.r2.dev/audio-20
 const searchParams = new URLSearchParams(window.location.search);
 const weekParam    = searchParams.get('week') || '';
 const monthMatch   = weekParam.match(/_([a-z]{3})_w/i);
-const MONTH        = monthMatch ? monthMatch[1] : 'jan';
+const MONTH_MAP = {
+  jan:'january', feb:'february', mar:'march', apr:'april',
+  may:'may', jun:'june', jul:'july', aug:'august',
+  sep:'september', oct:'october', nov:'november', dec:'december'
+};
+
+const MONTH = monthMatch ? MONTH_MAP[monthMatch[1]] : 'january';
+
+   
 const AUDIO_BASE   = `${AUDIO_ROOT}/${MONTH}/${CFG.audioFolder}/${CFG.audioSub}/`;
 
 const WEEK_RANGES  = { w1:[1,15], w2:[16,30], w3:[31,45], w4:[46,60] };
