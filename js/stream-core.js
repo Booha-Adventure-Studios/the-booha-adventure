@@ -351,12 +351,24 @@ window.addEventListener('resize', () => {
 (async function init() {
   const weekNum = parseWeekInfo();
 
+  const base = `/the-booha-adventure/content/${CFG.curriculum}/${CFG.monthDir}/`;
+
   try {
-    const res      = await fetch(CFG.jsonUrl);
-    const data     = await res.json();
-    const allCards = data.cards || [];
+    const [vocabRes, sentRes, questRes] = await Promise.all([
+      fetch(base + 'vocab.json'),
+      fetch(base + 'sentences.json'),
+      fetch(base + 'questions.json')
+    ]);
+    const [vocabData, sentData, questData] = await Promise.all([
+      vocabRes.json(), sentRes.json(), questRes.json()
+    ]);
+    const allCards = [
+      ...(vocabData.cards  || []),
+      ...(sentData.cards   || []),
+      ...(questData.cards  || [])
+    ];
     if (allCards.length < 180) {
-      if (preloadBar) preloadBar.textContent = (CFG.errorLabel || 'Stream JSON') + ' needs 180 items (got '+allCards.length+').';
+      if (preloadBar) preloadBar.textContent = 'Need 180 cards total (got '+allCards.length+').';
       console.error('[stream-core] Expected 180 cards, got:', allCards.length);
       return;
     }
