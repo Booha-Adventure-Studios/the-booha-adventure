@@ -348,6 +348,8 @@ window.addEventListener('resize', () => {
    Bootstrap sets: jsonUrl = '/the-booha-adventure/content/' + curriculum + '/' + MONTH + '/' + jsonFile
    For stream, jsonFile = 'stream.json' (combined 180-card JSON).
 ════════════════════════════ */
+
+console.log('[stream-core] CFG dump:', JSON.stringify(CFG));   
 (async function init() {
   const weekNum = parseWeekInfo();
 
