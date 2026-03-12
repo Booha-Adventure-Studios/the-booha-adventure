@@ -11,15 +11,50 @@
    CSS VARIABLES — set by [data-curriculum] on <html>
    ══════════════════════════════════════════════════════════════ */
 :root {
-  --game-bg:       #0a0014;
-  --game-primary:  #aaff22;
-  --game-secondary:#0088ff;
-  --game-accent:   #ff2288;
-  --game-amber:    #ffaa00;
-  --game-muted:    rgba(255,255,255,0.6);
-  --game-ink:      #ffffff;
+  /* core palette */
+  --game-bg:        #0a0014;
+  --game-primary:   #aaff22;
+  --game-secondary: #0088ff;
+  --game-accent:    #ff2288;
+  --game-amber:     #ffaa00;
+
+  /* text */
+  --game-ink:       #ffffff;
+  --game-muted:     rgba(255,255,255,0.6);
+
+  /* shared surfaces */
+  --game-surface:   rgba(255,255,255,0.07);
+  --game-surface-2: rgba(255,255,255,0.12);
+  --game-border:    rgba(255,255,255,0.15);
+
+  /* cards / panels */
+  --game-card-bg:      linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.03));
+  --game-card-border:  rgba(255,255,255,0.15);
+
+  /* tiles */
+  --game-tile-bg:       #ffffff;
+  --game-tile-border:   rgba(255,255,255,0.18);
+  --game-tile-text:     #0b1020;
+  --game-tile-subtext:  rgba(11,16,32,0.7);
+
+  /* hud pills */
+  --game-pill-bg:      rgba(255,255,255,0.08);
+  --game-pill-border:  rgba(255,255,255,0.15);
+  --game-pill-text:    #ffffff;
+
+  /* progress / heat */
+  --game-meter-bg:     rgba(255,255,255,0.10);
+  --game-meter-fill:   linear-gradient(90deg, var(--game-primary), var(--game-amber));
+
+  /* answer box */
+  --game-answer-bg:    #ffffff;
+  --game-answer-text:  #111111;
+
+  /* geometry / shadow */
   --game-radius:   22px;
   --game-shadow:   0 12px 40px rgba(0,0,0,0.5);
+
+  /* fonts */
   --game-font-title: 'Chau Philomene One', sans-serif;
   --game-font-body:  'Nunito', 'M PLUS Rounded 1c', sans-serif;
   --game-font-jp:    'M PLUS Rounded 1c', sans-serif;
@@ -42,8 +77,31 @@
   --game-secondary: #cc88ff;
   --game-accent:    #44ccff;
   --game-amber:     #ffcc44;
+
   --game-ink:       #3a1a2e;
   --game-muted:     rgba(58,26,46,0.55);
+
+  --game-surface:   rgba(255,255,255,0.82);
+  --game-surface-2: rgba(255,255,255,0.95);
+  --game-border:    rgba(255,110,180,0.28);
+
+  --game-card-bg:      #ffffff;
+  --game-card-border:  #ff8fc7;
+
+  --game-tile-bg:      #ffffff;
+  --game-tile-border:  rgba(255,110,180,0.30);
+  --game-tile-text:    #3a1a2e;
+  --game-tile-subtext: rgba(58,26,46,0.6);
+
+  --game-pill-bg:      #ffffff;
+  --game-pill-border:  #ff8fc7;
+  --game-pill-text:    #3a1a2e;
+
+  --game-meter-bg:     rgba(255,110,180,0.12);
+
+  --game-answer-bg:    #ffffff;
+  --game-answer-text:  #3a1a2e;
+
   --game-font-title:'Luckiest Guy', cursive;
 }
 
@@ -54,6 +112,28 @@
   --game-secondary: #4455ff;
   --game-accent:    #aa00ff;
   --game-amber:     #ff9900;
+
+  --game-surface:   rgba(0,240,255,0.06);
+  --game-surface-2: rgba(0,240,255,0.12);
+  --game-border:    rgba(0,240,255,0.18);
+
+  --game-card-bg:      linear-gradient(180deg, rgba(0,240,255,0.10), rgba(170,0,255,0.06));
+  --game-card-border:  rgba(0,240,255,0.25);
+
+  --game-tile-bg:      #0c1326;
+  --game-tile-border:  rgba(0,240,255,0.22);
+  --game-tile-text:    #ecfeff;
+  --game-tile-subtext: rgba(236,254,255,0.7);
+
+  --game-pill-bg:      rgba(0,240,255,0.08);
+  --game-pill-border:  rgba(0,240,255,0.25);
+  --game-pill-text:    #ecfeff;
+
+  --game-meter-bg:     rgba(0,240,255,0.10);
+
+  --game-answer-bg:    #0c1326;
+  --game-answer-text:  #ecfeff;
+
   --game-font-title:'Rammetto One', cursive;
 }
 
@@ -168,9 +248,9 @@ body {
 .hud-pill {
   padding: 6px 14px;
   border-radius: 999px;
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.15);
-  color: #fff;
+  background: var(--game-pill-bg);
+  border: 1px solid var(--game-pill-border);
+  color: var(--game-pill-text);
   display: flex;
   align-items: center;
   gap: 6px;
@@ -178,9 +258,6 @@ body {
 .hud-pill b { color: var(--game-primary); }
 
 [data-curriculum="pb"] .hud-pill {
-  background: white;
-  border-color: var(--game-primary);
-  color: #3a1a2e;
   box-shadow: 0 3px 0 #ffccdd;
 }
 
@@ -189,7 +266,7 @@ body {
    ══════════════════════════════════════════════════════════════ */
 .game-progress-track {
   height: 8px;
-  background: rgba(255,255,255,0.1);
+  background: var(--game-meter-bg);
   border-radius: 999px;
   margin: 0 1rem;
   overflow: hidden;
@@ -208,8 +285,8 @@ body {
 .game-card {
   position: relative;
   border-radius: var(--game-radius);
-  background: linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.03));
-  border: 1px solid rgba(255,255,255,0.15);
+  background: var(--game-card-bg);
+  border: 1px solid var(--game-card-border);
   box-shadow: var(--game-shadow);
   overflow: hidden;
 }
@@ -223,8 +300,6 @@ body {
 }
 
 [data-curriculum="pb"] .game-card {
-  background: white;
-  border: 2px solid var(--game-primary);
   box-shadow: 0 6px 0 #ffb0d8, 0 8px 20px rgba(255,110,180,0.15);
 }
 
@@ -238,7 +313,7 @@ body {
   border-radius: var(--game-radius);
   overflow: hidden;
   margin: 0 auto;
-  border: 1px solid rgba(255,255,255,0.1);
+  border: 1px solid var(--game-border);
   box-shadow: 0 12px 30px rgba(0,0,0,0.32);
 }
 
@@ -295,9 +370,9 @@ body {
   box-shadow: 0 0 20px var(--game-primary);
 }
 .game-btn-secondary {
-  background: rgba(255,255,255,0.1);
-  color: #fff;
-  border: 1px solid rgba(255,255,255,0.2);
+  background: var(--game-surface);
+  color: var(--game-ink);
+  border: 1px solid var(--game-border);
 }
 .game-btn-gold {
   background: linear-gradient(135deg, #ffd166, #ffaa00);
@@ -319,8 +394,8 @@ body {
   position: relative;
   border-radius: 18px;
   padding: 16px;
-  background: #ffffff;
-  border: 2px solid transparent;
+  background: var(--game-tile-bg);
+  border: 2px solid var(--game-tile-border);
   box-shadow: 0 8px 24px rgba(0,0,0,0.35);
   cursor: pointer;
   transition: transform 0.12s ease, box-shadow 0.12s ease;
@@ -354,14 +429,14 @@ body {
   font-family: var(--game-font-body);
   font-weight: 900;
   font-size: clamp(18px, 3.5vw, 26px);
-  color: #0b1020;
+  color: var(--game-tile-text);
   line-height: 1.2;
 }
 .tile-jp {
   font-family: var(--game-font-jp);
   font-weight: 700;
   font-size: clamp(13px, 2.5vw, 17px);
-  color: rgba(11,16,32,0.7);
+  color: var(--game-tile-subtext);
   margin-top: 4px;
 }
 
@@ -372,8 +447,8 @@ body {
   position: relative;
   height: 96px;
   border-radius: var(--game-radius);
-  background: #fff;
-  color: #111;
+  background: var(--game-answer-bg);
+  color: var(--game-answer-text);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -429,15 +504,15 @@ body {
 .heat-track {
   height: 12px;
   border-radius: 999px;
-  background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(255,255,255,0.14);
+  background: var(--game-meter-bg);
+  border: 1px solid var(--game-border);
   overflow: hidden;
   margin: 0 1rem;
 }
 .heat-fill {
   height: 100%;
   border-radius: 999px;
-  background: linear-gradient(90deg, var(--game-primary), var(--game-amber));
+  background: var(--game-meter-fill);
   transform-origin: left center;
   transform: scaleX(1);
   box-shadow: 0 0 12px var(--game-primary);
@@ -454,8 +529,8 @@ body {
   height: 52px;
   padding: 0 10px;
   border-radius: 12px;
-  background: #fff;
-  color: #111;
+  background: var(--game-tile-bg);
+  color: var(--game-tile-text);
   font-weight: 900;
   font-size: clamp(18px, 3.5vw, 24px);
   cursor: pointer;
@@ -496,6 +571,11 @@ body {
   background: rgba(255,110,180,0.08);
   border-color: rgba(255,110,180,0.35);
   color: #3a1a2e;
+}
+[data-curriculum="bc"] .slot {
+  background: rgba(0,240,255,0.06);
+  border-color: rgba(0,240,255,0.25);
+  color: #ecfeff;
 }
 .slot.filled {
   background: rgba(255,255,255,0.15);
@@ -561,8 +641,8 @@ body {
   margin: 2rem auto;
   padding: 2rem 1.5rem;
   border-radius: var(--game-radius);
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.12);
+  background: var(--game-surface);
+  border: 1px solid var(--game-border);
 }
 .results-panel.show { display: block; }
 
