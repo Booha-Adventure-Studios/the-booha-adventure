@@ -263,14 +263,13 @@ function stopEverything() {
 }
 
 function getPauseSeconds(track) {
-  if (Number.isFinite(track.pause)) return track.pause * (slowMode ? 2.5 : 1);
+  if (Number.isFinite(track.pause)) return track.pause;
   const words = (track.en||'').trim().split(/\s+/).filter(Boolean).length;
   const src   = getAudioSrc(track.mp3);
   let base = src.includes('/vocab/')     ? 1.8 :
              src.includes('/sentences/') ? 2.4 + words * .2 :
              src.includes('/questions/') ? 2.8 + words * .22 :
                                            2.4 + words * .2;
-  if (slowMode) base *= 2.5;
   return Math.max(1.6, Math.min(base, 10));
 }
 
