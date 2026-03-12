@@ -42,7 +42,7 @@ const weekLabelJP= `${MONTH_LABEL_JP[monthShort] || monthShort}第${weekNum}週`
 const REGISTRY = {
   br: {
     audioFolder: 'boo_riculum',
-    navTarget:   `${BASE}/curriculum/br/game-index.html`,
+    navTarget:   `${BASE}/curriculum/br/games-index.html`,
     navKey:      'booha_br_game_open',
     errorLabel:  'Boo-riculum data could not load.',
     theme: {
@@ -55,7 +55,7 @@ const REGISTRY = {
   },
   pb: {
     audioFolder: 'pre_boo',
-    navTarget:   `${BASE}/curriculum/pb/game-index.html`,
+    navTarget:   `${BASE}/curriculum/pb/games-index.html`,
     navKey:      'booha_pb_game_open',
     errorLabel:  'Pre-Boo data could not load.',
     theme: {
@@ -68,7 +68,7 @@ const REGISTRY = {
   },
   bc: {
     audioFolder: 'boo_continuum',
-    navTarget:   `${BASE}/curriculum/bc/game-index.html`,
+    navTarget:   `${BASE}/curriculum/bc/games-index.html`,
     navKey:      'booha_bc_game_open',
     errorLabel:  'Boo Continuum data could not load.',
     theme: {
