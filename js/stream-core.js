@@ -13,6 +13,8 @@
    ═══════════════════════════════════════════════════════════════ */
 (function () {
 
+console.log('[stream-core] CFG at load time:', JSON.stringify(window.DECK_CONFIG));   
+
 const CFG        = window.DECK_CONFIG;
 const AUDIO_ROOT = 'https://pub-8d5941f302df44b899ce9d9a4606dcb7.r2.dev/audio-2027';
 
