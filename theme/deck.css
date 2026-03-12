@@ -350,6 +350,18 @@ header {
     0 2px 8px rgba(0,0,0,.9);
   line-height: 1.05;
 }
+
+[data-theme="pb"] .hdr-title,
+[data-theme="pb"] .hdr-sub {
+  font-family: 'Ranchers', cursive;
+  letter-spacing: 3px;
+}
+[data-theme="bc"] .hdr-title,
+[data-theme="bc"] .hdr-sub {
+  font-family: 'Grenze', serif;
+  letter-spacing: 2px;
+}
+
 .hdr-jp {
   font-family: var(--font-jp);
   font-size: clamp(12px, 2vw, 17px);
