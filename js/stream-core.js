@@ -117,12 +117,12 @@ function getAudioSrc(mp3) {
   if (typeof CFG.getAudioSrc === 'function') return CFG.getAudioSrc(mp3, STREAM_ROOT);
   // Default: detect subfolder by filename segment after curriculum prefix
   // e.g. "br_v_001.mp3" → vocab, "br_s_001.mp3" → sentences, "br_q_001.mp3" → questions
-  const parts  = mp3.split('_');
-  const prefix = parts[1] || '';
-  if      (prefix === 'v') return STREAM_ROOT + 'vocab/'     + mp3;
-  else if (prefix === 's') return STREAM_ROOT + 'sentences/' + mp3;
-  else if (prefix === 'q') return STREAM_ROOT + 'questions/' + mp3;
-  return STREAM_ROOT + mp3;
+ const parts  = mp3.split('_');
+const prefix = (parts[1] || '')[0];
+if      (prefix === 'v') return STREAM_ROOT + 'vocab/'     + mp3;
+else if (prefix === 's') return STREAM_ROOT + 'sentences/' + mp3;
+else if (prefix === 'q') return STREAM_ROOT + 'questions/' + mp3;
+return STREAM_ROOT + mp3;
 }
 
 /* ════════════════════════════
