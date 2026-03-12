@@ -24,7 +24,7 @@ const monthMatch    = weekParam.match(/_([a-z]{3})_w/i);
 const MONTH_CODE    = monthMatch ? monthMatch[1].toLowerCase() : 'jan';
 
 /* FIX: path order was reversed — must be audioFolder/monthCode/ */
-const STREAM_ROOT = `${AUDIO_ROOT}/${CFG.audioFolder}/${MONTH_CODE}/`;
+const STREAM_ROOT = `${AUDIO_ROOT}/${MONTH_CODE}/${CFG.audioFolder}/`;
 
 const STREAM_PALETTES = CFG.palettes;
 const MOTE_COLORS     = CFG.moteColors;
