@@ -1,15 +1,12 @@
 
 /* ═══════════════════════════════════════════════════════════════
    stream-core.js  —  Stream engine (sequential audio play mode)
-   Reads window.DECK_CONFIG which study-deck.html sets from the
-   URL params + CURRICULUM_REGISTRY lookup.
-
-   FIXES applied:
-   - STREAM_ROOT path order corrected: audioFolder/monthCode/ (was monthCode/audioFolder/)
-   - jsonUrl now uses CFG.jsonUrl which bootstrap builds correctly
-   - sparkle-layer and preload-bar now reference the stream-ui versions by ID
-     (HTML IDs made unique: sparkle-layer-stream, preload-bar-stream)
-   - MONTH variable renamed MONTH_CODE for clarity (3-letter code, not full name)
+   FIXES:
+   - parseWeekInfo targets stream-week-label (not hidden week-label)
+   - fitText allows much larger font sizes
+   - prev/next work when paused
+   - slowMode uses playbackRate on audio element
+   - section colors use curriculum theme colors
    ═══════════════════════════════════════════════════════════════ */
 (function () {
 
@@ -21,15 +18,12 @@ const weekParam     = searchParams.get('week') || '';
 const monthMatch    = weekParam.match(/_([a-z]{3})_w/i);
 const MONTH_CODE    = monthMatch ? monthMatch[1].toLowerCase() : 'jan';
 
-/* FIX: path order was reversed — must be audioFolder/monthCode/ */
-const STREAM_ROOT = `${AUDIO_ROOT}/${CFG.audioFolder}/${MONTH_CODE}/`;
-
+const STREAM_ROOT     = `${AUDIO_ROOT}/${MONTH_CODE}/${CFG.audioFolder}/`;
 const STREAM_PALETTES = CFG.palettes;
 const MOTE_COLORS     = CFG.moteColors;
 
 /* ── DOM refs ── */
 const enTextEl      = document.getElementById('en-text');
-/* FIX: use unique IDs for stream-ui elements (see study-deck.html) */
 const stripeEl      = document.getElementById('stripe-layer-stream');
 const trackCounter  = document.getElementById('track-counter');
 const progressFill  = document.getElementById('progress-fill');
@@ -42,7 +36,6 @@ const btnNext       = document.getElementById('btn-next');
 const preloadBar    = document.getElementById('preload-bar-stream');
 const progressLeft  = document.getElementById('progress-left');
 const progressRight = document.getElementById('progress-right');
-/* FIX: use unique sparkle ID for stream-ui */
 const sparkL        = document.getElementById('sparkle-layer-stream');
 const streamLabel   = document.getElementById('stream-label');
 const streamDot     = document.querySelector('.stream-dot');
@@ -69,54 +62,52 @@ document.getElementById('btn-close').addEventListener('click', goBack);
 
 /* ════════════════════════════
    WEEK LABEL
+   FIX: target stream-week-label — week-label lives in hidden flashcard-ui
 ════════════════════════════ */
 const MO = {jan:'January',feb:'February',mar:'March',apr:'April',may:'May',jun:'June',jul:'July',aug:'August',sep:'September',oct:'October',nov:'November',dec:'December'};
 const JP = {jan:'1月',feb:'2月',mar:'3月',apr:'4月',may:'5月',jun:'6月',jul:'7月',aug:'8月',sep:'9月',oct:'10月',nov:'11月',dec:'12月'};
 
 function parseWeekInfo() {
-  // Full format: 2027_w09_mar_w1
-  let m = weekParam.match(/^(\d{4})_w\d{2}_([a-z]{3})_w(\d)$/i);
-  if (m) {
-    const mo = m[2].toLowerCase(), wn = Number(m[3]);
-    document.getElementById('week-label').innerHTML = `${MO[mo]||mo} Week ${wn} &middot; ${JP[mo]||mo}第${wn}週`;
-    return wn;
-  }
-  // Short format: mar_w1
-  m = weekParam.match(/^([a-z]{3})_w(\d)$/i);
+  const el = document.getElementById('stream-week-label');
+  if (!el) return 1;
+
+  // Standard format: br_mar_w2
+  let m = weekParam.match(/^(?:pb|br|bc)_([a-z]{3})_w(\d)$/i);
   if (m) {
     const mo = m[1].toLowerCase(), wn = Number(m[2]);
-    document.getElementById('week-label').innerHTML = `${MO[mo]||mo} Week ${wn} &middot; ${JP[mo]||mo}第${wn}週`;
+    el.innerHTML = `${MO[mo]||mo} Week ${wn} &middot; ${JP[mo]||mo}第${wn}週`;
     return wn;
   }
-  document.getElementById('week-label').textContent = 'Weekly Stream';
+  // Full format: 2027_w09_mar_w1
+  m = weekParam.match(/^(\d{4})_w\d{2}_([a-z]{3})_w(\d)$/i);
+  if (m) {
+    const mo = m[2].toLowerCase(), wn = Number(m[3]);
+    el.innerHTML = `${MO[mo]||mo} Week ${wn} &middot; ${JP[mo]||mo}第${wn}週`;
+    return wn;
+  }
+  el.textContent = 'Weekly Stream';
   return 1;
 }
 
 /* ════════════════════════════
    BUILD 45-ITEM WEEK STREAM
-   JSON layout: 0–59 vocab, 60–119 sentences, 120–179 questions
 ════════════════════════════ */
 function buildWeekStream(allCards, weekNum) {
   const base = (weekNum - 1) * 15;
   return [
-    ...allCards.slice(base,       base + 15),
-    ...allCards.slice(60 + base,  75 + base),
+    ...allCards.slice(base,        base + 15),
+    ...allCards.slice(60 + base,   75 + base),
     ...allCards.slice(120 + base, 135 + base),
   ];
 }
 
 /* ════════════════════════════
    AUDIO PATH
-   Stream serves from multiple subfolders — detect by filename prefix.
-   Prefix convention: br_v_ → vocab, br_s_ → sentences, br_q_ → questions
-   Override CFG.getAudioSrc(mp3) in curriculum-config if needed.
 ════════════════════════════ */
 function getAudioSrc(mp3) {
   if (typeof CFG.getAudioSrc === 'function') return CFG.getAudioSrc(mp3, STREAM_ROOT);
-  // Default: detect subfolder by filename segment after curriculum prefix
-  // e.g. "br_v_001.mp3" → vocab, "br_s_001.mp3" → sentences, "br_q_001.mp3" → questions
   const parts  = mp3.split('_');
-  const prefix = parts[1] || '';
+  const prefix = (parts[1] || '')[0];
   if      (prefix === 'v') return STREAM_ROOT + 'vocab/'     + mp3;
   else if (prefix === 's') return STREAM_ROOT + 'sentences/' + mp3;
   else if (prefix === 'q') return STREAM_ROOT + 'questions/' + mp3;
@@ -133,17 +124,20 @@ function makeStripe(colors) {
   return 'repeating-linear-gradient(180deg,'+doubled.join(',')+')';
 }
 
+/* FIX: much larger max font — sentences/questions need to be readable */
 function fitText(el) {
   el.style.fontSize = '';
-  const content = el.closest('.card-content');
+  const content  = el.closest('.card-content');
   if (!content) return;
-  const cardH = document.querySelector('.card-face').offsetHeight;
-  const padV  = parseFloat(getComputedStyle(content).paddingTop) * 2;
-  const ringH = pauseRing.offsetHeight + 10;
-  const avail = cardH - padV - ringH - 16;
-  const maxPx = Math.min(48, cardH * 0.13);
-  let lo = 15, hi = maxPx, best = 15;
-  for (let s = 0; s < 14; s++) {
+  const cardFace = document.querySelector('.card-face.single') || document.querySelector('.card-face');
+  const cardH    = cardFace ? cardFace.offsetHeight : 300;
+  const padV     = parseFloat(getComputedStyle(content).paddingTop) * 2;
+  const ringH    = pauseRing ? (pauseRing.offsetHeight + 10) : 0;
+  const avail    = cardH - padV - ringH - 20;
+  const maxPx    = Math.min(72, cardH * 0.22);
+  const minPx    = 16;
+  let lo = minPx, hi = maxPx, best = minPx;
+  for (let s = 0; s < 16; s++) {
     const mid = Math.round((lo+hi)/2);
     el.style.fontSize = mid+'px';
     if (el.scrollHeight <= avail) { best=mid; lo=mid+1; }
@@ -175,26 +169,26 @@ function burstMotes() {
 }
 
 /* ════════════════════════════
-   SECTION COLOURS
-   Sections: 0–14 vocab, 15–29 sentences, 30–44 questions
+   SECTION COLOURS — use curriculum theme colors
 ════════════════════════════ */
 function getSectionInfo(i) {
-  if (i < 15) return { label:'Vocab',     color:'#2ecc50' };
-  if (i < 30) return { label:'Sentences', color:'#1a8fe0' };
-  return             { label:'Questions', color:'#d98c00' };
+  const c = CFG.curriculum || 'br';
+  const COLS = {
+    br: { vocab:'#aaff22', sentences:'#28b4ff', questions:'#ffaa00' },
+    pb: { vocab:'#ff88cc', sentences:'#ffb088', questions:'#88ffcc' },
+    bc: { vocab:'#00f0ff', sentences:'#4090ff', questions:'#b040ff' },
+  };
+  const cols = COLS[c] || COLS.br;
+  if (i < 15) return { label:'Vocab',     color: cols.vocab };
+  if (i < 30) return { label:'Sentences', color: cols.sentences };
+  return             { label:'Questions', color: cols.questions };
 }
 
 function applySection(color) {
   document.documentElement.style.setProperty('--stream-color', color);
-  if (streamLabel)  streamLabel.style.color    = color;
-  if (streamDot) {
-    streamDot.style.background  = color;
-    streamDot.style.boxShadow   = '0 0 10px '+color;
-  }
-  if (progressFill) {
-    progressFill.style.background = color;
-    progressFill.style.boxShadow  = '0 0 8px '+color;
-  }
+  if (streamLabel)  { streamLabel.style.color = color; streamLabel.style.textShadow = '0 0 12px '+color; }
+  if (streamDot)    { streamDot.style.background = color; streamDot.style.boxShadow = '0 0 12px '+color+', 0 0 24px '+color; }
+  if (progressFill) { progressFill.style.background = color; progressFill.style.boxShadow = '0 0 10px '+color; }
 }
 
 /* ════════════════════════════
@@ -224,18 +218,18 @@ function preloadAudio(cards) {
 ════════════════════════════ */
 function updateUI(track) {
   const sec = getSectionInfo(trackIdx);
-  if (stripeEl)     stripeEl.style.backgroundImage = makeStripe(STREAM_PALETTES[trackIdx % STREAM_PALETTES.length]);
-  if (trackCounter) trackCounter.textContent       = (trackIdx+1)+' / '+TRACKS.length;
-  if (progressFill) progressFill.style.width       = ((trackIdx+1)/TRACKS.length*100).toFixed(1)+'%';
-  if (streamLabel)  streamLabel.textContent        = sec.label;
-  if (progressLeft)  progressLeft.textContent      = 'Vocab';
-  if (progressRight) progressRight.textContent     = 'Questions';
+  if (stripeEl)      stripeEl.style.backgroundImage = makeStripe(STREAM_PALETTES[trackIdx % STREAM_PALETTES.length]);
+  if (trackCounter)  trackCounter.textContent        = (trackIdx+1)+' / '+TRACKS.length;
+  if (progressFill)  progressFill.style.width        = ((trackIdx+1)/TRACKS.length*100).toFixed(1)+'%';
+  if (streamLabel)   streamLabel.textContent         = sec.label;
+  if (progressLeft)  progressLeft.textContent        = 'Vocab';
+  if (progressRight) progressRight.textContent       = 'Questions';
   applySection(sec.color);
   wrapWords(enTextEl, track.en);
   enTextEl.classList.remove('dancing');
   requestAnimationFrame(() => fitText(enTextEl));
-  pauseRing.classList.remove('visible');
-  ringFg.style.strokeDashoffset = '0';
+  if (pauseRing) pauseRing.classList.remove('visible');
+  if (ringFg)    ringFg.style.strokeDashoffset = '0';
 }
 
 /* ════════════════════════════
@@ -244,10 +238,10 @@ function updateUI(track) {
 function animateRing(durationMs) {
   const start = performance.now();
   cancelAnimationFrame(ringRAF);
-  ringFg.style.strokeDashoffset = '0';
+  if (ringFg) ringFg.style.strokeDashoffset = '0';
   function step(now) {
     const frac = Math.min((now-start)/durationMs, 1);
-    ringFg.style.strokeDashoffset = (113*frac).toFixed(2);
+    if (ringFg) ringFg.style.strokeDashoffset = (113*frac).toFixed(2);
     if (frac < 1) ringRAF = requestAnimationFrame(step);
   }
   ringRAF = requestAnimationFrame(step);
@@ -257,32 +251,35 @@ function animateRing(durationMs) {
    PLAYBACK
 ════════════════════════════ */
 function stopEverything() {
-  if (currentAudio) { try { currentAudio.pause(); currentAudio.currentTime=0; } catch(e){} }
+  if (currentAudio) {
+    try { currentAudio.pause(); currentAudio.currentTime=0; } catch(e){}
+    currentAudio.onended = null;
+    currentAudio.onerror = null;
+  }
   clearTimeout(pauseTimer);
   cancelAnimationFrame(ringRAF);
-  pauseRing.classList.remove('visible');
+  if (pauseRing) pauseRing.classList.remove('visible');
   enTextEl.classList.remove('dancing');
 }
 
 function getPauseSeconds(track) {
-  if (Number.isFinite(track.pause)) return track.pause * (slowMode ? 2 : 1);
+  if (Number.isFinite(track.pause)) return track.pause;
   const words = (track.en||'').trim().split(/\s+/).filter(Boolean).length;
   const src   = getAudioSrc(track.mp3);
-  let base = src.includes('/vocab/')     ? 1.6 :
-             src.includes('/sentences/') ? 2.2 + words*.22 :
-             src.includes('/questions/') ? 2.6 + words*.24 :
-                                           2.2 + words*.22;
-  if (slowMode) base *= 2;
-  return Math.max(1.4, Math.min(base, 8.5));
+  let base = src.includes('/vocab/')     ? 1.8 :
+             src.includes('/sentences/') ? 2.4 + words * .2 :
+             src.includes('/questions/') ? 2.8 + words * .22 :
+                                           2.4 + words * .2;
+  return Math.max(1.6, Math.min(base, 10));
 }
 
 function startPause(track) {
   const ms = getPauseSeconds(track) * 1000;
-  pauseRing.classList.add('visible');
+  if (pauseRing) pauseRing.classList.add('visible');
   animateRing(ms);
   pauseTimer = setTimeout(() => {
-    pauseRing.classList.remove('visible');
-    if (isPlaying) playTrack((trackIdx+1) % TRACKS.length);
+    if (pauseRing) pauseRing.classList.remove('visible');
+    if (isPlaying) playTrack((trackIdx + 1) % TRACKS.length);
   }, ms);
 }
 
@@ -294,6 +291,9 @@ function playTrack(i) {
 
   currentAudio = new Audio(getAudioSrc(track.mp3));
   currentAudio.preload = 'auto';
+  /* FIX: slow mode slows the audio itself via playbackRate */
+  if (slowMode) currentAudio.playbackRate = 0.75;
+
   currentAudio.onended = () => { enTextEl.classList.remove('dancing'); if (isPlaying) startPause(track); };
   currentAudio.onerror = () => { enTextEl.classList.remove('dancing'); if (isPlaying) startPause(track); };
   currentAudio.play().then(() => {
@@ -321,42 +321,59 @@ function togglePlay() {
 
 /* ════════════════════════════
    CONTROLS
+   FIX: prev/next now work when paused — just update display, don't play
 ════════════════════════════ */
-btnPrev.addEventListener('click', () => {
+if (btnPrev) btnPrev.addEventListener('click', () => {
   if (!TRACKS.length) return;
-  const i = ((trackIdx-1)+TRACKS.length) % TRACKS.length;
-  if (isPlaying) playTrack(i); else { trackIdx=i; updateUI(TRACKS[trackIdx]); }
+  const i = ((trackIdx - 1) + TRACKS.length) % TRACKS.length;
+  if (isPlaying) { playTrack(i); }
+  else           { trackIdx = i; updateUI(TRACKS[trackIdx]); }
 });
-btnNext.addEventListener('click', () => {
+
+if (btnNext) btnNext.addEventListener('click', () => {
   if (!TRACKS.length) return;
-  const i = (trackIdx+1) % TRACKS.length;
-  if (isPlaying) playTrack(i); else { trackIdx=i; updateUI(TRACKS[trackIdx]); }
+  const i = (trackIdx + 1) % TRACKS.length;
+  if (isPlaying) { playTrack(i); }
+  else           { trackIdx = i; updateUI(TRACKS[trackIdx]); }
 });
+
 btnPlayPause.addEventListener('click', togglePlay);
-btnSlow.addEventListener('click', () => {
+
+if (btnSlow) btnSlow.addEventListener('click', () => {
   slowMode = !slowMode;
   btnSlow.classList.toggle('active', slowMode);
   btnSlow.setAttribute('aria-pressed', slowMode);
+  /* Apply immediately to any currently playing audio */
+  if (currentAudio) currentAudio.playbackRate = slowMode ? 0.75 : 1.0;
 });
+
 window.addEventListener('resize', () => {
   if (TRACKS[trackIdx]) requestAnimationFrame(() => fitText(enTextEl));
 });
 
 /* ════════════════════════════
    INIT
-   FIX: use CFG.jsonUrl (set by bootstrap) instead of building a wrong path here.
-   Bootstrap sets: jsonUrl = '/the-booha-adventure/content/' + curriculum + '/' + MONTH + '/' + jsonFile
-   For stream, jsonFile = 'stream.json' (combined 180-card JSON).
 ════════════════════════════ */
 (async function init() {
   const weekNum = parseWeekInfo();
+  const base    = `/the-booha-adventure/content/${CFG.curriculum}/${CFG.monthDir}/`;
 
   try {
-    const res      = await fetch(CFG.jsonUrl);
-    const data     = await res.json();
-    const allCards = data.cards || [];
+    const [vocabRes, sentRes, questRes] = await Promise.all([
+      fetch(base + 'vocab.json'),
+      fetch(base + 'sentences.json'),
+      fetch(base + 'questions.json')
+    ]);
+    const [vocabData, sentData, questData] = await Promise.all([
+      vocabRes.json(), sentRes.json(), questRes.json()
+    ]);
+    const allCards = [
+      ...(vocabData.cards  || []),
+      ...(sentData.cards   || []),
+      ...(questData.cards  || [])
+    ];
     if (allCards.length < 180) {
-      if (preloadBar) preloadBar.textContent = (CFG.errorLabel || 'Stream JSON') + ' needs 180 items (got '+allCards.length+').';
+      if (preloadBar) preloadBar.textContent = 'Need 180 cards total (got '+allCards.length+').';
       console.error('[stream-core] Expected 180 cards, got:', allCards.length);
       return;
     }

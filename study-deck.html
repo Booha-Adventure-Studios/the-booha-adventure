@@ -7,8 +7,8 @@
 <title>Study Deck</title>
 <meta name="theme-color" content="#0d1a09" id="meta-theme-color">
 <link rel="icon" type="image/png" href="/the-booha-adventure/assets/img/boo-tree.png">
-<link href="https://fonts.googleapis.com/css2?family=Chau+Philomene+One&family=Nunito:wght@800;900&family=Noto+Sans+JP:wght@500;700;900&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="/the-booha-adventure/theme/decks.css" />
+<link href="https://fonts.googleapis.com/css2?family=Chau+Philomene+One&family=Ranchers&family=Grenze:wght@700;900&family=Nunito:wght@800;900&family=Noto+Sans+JP:wght@500;700;900&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/the-booha-adventure/theme/deck.css" />
 </head>
 
 <body>
@@ -149,11 +149,11 @@
 (function bootstrap() {
 
   /* ── 1. Read URL params ── */
-  const params     = new URLSearchParams(window.location.search);
-  const curriculum = (params.get('curriculum') || 'br').toLowerCase();
-  const type       = (params.get('type')       || 'vocab').toLowerCase();
-  const week       = params.get('week') || '';
-
+ const params     = new URLSearchParams(window.location.search);
+ const week       = params.get('week') || '';
+ const type       = (params.get('type') || 'vocab').toLowerCase();
+ const currMatch  = week.match(/^(pb|br|bc)_/i);
+ const curriculum = currMatch ? currMatch[1].toLowerCase() : 'br';
   /* ── 2. Look up registry ── */
   const reg = window.CURRICULUM_REGISTRY[curriculum];
   if (!reg) {
@@ -186,11 +186,12 @@
   const monthFull  = MONTH_MAP[monthCode] || 'january';
 
   /* ── 6. Build DECK_CONFIG for the JS engines ── */
-  window.DECK_CONFIG = {
+ window.DECK_CONFIG = {
     // identity
     curriculum:  curriculum,
     type:        type,
-    deckMode:    typeCfg.deckMode,    // 'vocab' | 'sentence' | 'stream'
+    deckMode:    typeCfg.deckMode,
+    monthDir:    monthFull,           // ← add this line
 
     // FIX: jsonUrl now includes the month segment so both engines can use it directly
     jsonUrl:     '/the-booha-adventure/content/' + curriculum + '/' + monthFull + '/' + typeCfg.jsonFile,

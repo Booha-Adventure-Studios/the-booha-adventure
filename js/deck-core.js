@@ -27,7 +27,7 @@ const MONTH_MAP = {
 
 const MONTH_CODE = monthMatch ? monthMatch[1].toLowerCase() : 'jan';
 const MONTH      = MONTH_MAP[MONTH_CODE] || 'january';
-const AUDIO_BASE = `${AUDIO_ROOT}/${CFG.audioFolder}/${MONTH_CODE}/${CFG.audioSub}/`;
+const AUDIO_BASE = `${AUDIO_ROOT}/${MONTH_CODE}/${CFG.audioFolder}/${CFG.audioSub}/`;
 
 /* FIX: log the actual URL that will be fetched (CFG.jsonUrl set by bootstrap) */
 console.log('[deck-core] JSON URL:', CFG.jsonUrl);

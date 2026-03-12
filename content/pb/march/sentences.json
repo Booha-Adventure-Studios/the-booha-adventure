@@ -1,1 +1,76 @@
 
+{
+  "cards": [
+    { "n": 1, "en": "I want to be a teacher.", "jp": "先生になりたい。", "hira": "せんせい に なりたい", "mp3": "pb_s01_i_want_to_be_a_teacher.mp3" },
+    { "n": 2, "en": "I want to be a doctor.", "jp": "医者になりたい。", "hira": "いしゃ に なりたい", "mp3": "pb_s02_i_want_to_be_a_doctor.mp3" },
+    { "n": 3, "en": "I want to be a pilot.", "jp": "パイロットになりたい。", "hira": "ぱいろっと に なりたい", "mp3": "pb_s03_i_want_to_be_a_pilot.mp3" },
+    { "n": 4, "en": "I want to be a farmer.", "jp": "農家になりたい。", "hira": "のうか に なりたい", "mp3": "pb_s04_i_want_to_be_a_farmer.mp3" },
+    { "n": 5, "en": "I want to be a chef.", "jp": "コックになりたい。", "hira": "こっく に なりたい", "mp3": "pb_s05_i_want_to_be_a_chef.mp3" },
+
+    { "n": 6, "en": "I want to help people.", "jp": "人を助けたい。", "hira": "ひと を たすけたい", "mp3": "pb_s06_i_want_to_help_people.mp3" },
+    { "n": 7, "en": "I want to cook food.", "jp": "料理をしたい。", "hira": "りょうり を したい", "mp3": "pb_s07_i_want_to_cook_food.mp3" },
+    { "n": 8, "en": "I want to teach children.", "jp": "子どもを教えたい。", "hira": "こども を おしえたい", "mp3": "pb_s08_i_want_to_teach_children.mp3" },
+    { "n": 9, "en": "I want to work in a city.", "jp": "町で働きたい。", "hira": "まち で はたらきたい", "mp3": "pb_s09_i_want_to_work_in_a_city.mp3" },
+    { "n": 10, "en": "I want to work in a shop.", "jp": "店で働きたい。", "hira": "みせ で はたらきたい", "mp3": "pb_s10_i_want_to_work_in_a_shop.mp3" },
+
+    { "n": 11, "en": "I want to help my family.", "jp": "家族を助けたい。", "hira": "かぞく を たすけたい", "mp3": "pb_s11_i_want_to_help_my_family.mp3" },
+    { "n": 12, "en": "I want to build things.", "jp": "物を作りたい。", "hira": "もの を つくりたい", "mp3": "pb_s12_i_want_to_build_things.mp3" },
+    { "n": 13, "en": "I want to make games.", "jp": "ゲームを作りたい。", "hira": "げーむ を つくりたい", "mp3": "pb_s13_i_want_to_make_games.mp3" },
+    { "n": 14, "en": "I want to learn many things.", "jp": "たくさん学びたい。", "hira": "たくさん まなびたい", "mp3": "pb_s14_i_want_to_learn_many_things.mp3" },
+    { "n": 15, "en": "I want to try new things.", "jp": "新しいことを試したい。", "hira": "あたらしい こと を ためしたい", "mp3": "pb_s15_i_want_to_try_new_things.mp3" },
+
+    { "n": 16, "en": "I can sing.", "jp": "歌える。", "hira": "うたえる", "mp3": "pb_s16_i_can_sing.mp3" },
+    { "n": 17, "en": "I can draw.", "jp": "絵が描ける。", "hira": "え が かける", "mp3": "pb_s17_i_can_draw.mp3" },
+    { "n": 18, "en": "I can dance.", "jp": "踊れる。", "hira": "おどれる", "mp3": "pb_s18_i_can_dance.mp3" },
+    { "n": 19, "en": "I can read.", "jp": "読める。", "hira": "よめる", "mp3": "pb_s19_i_can_read.mp3" },
+    { "n": 20, "en": "I can write.", "jp": "書ける。", "hira": "かける", "mp3": "pb_s20_i_can_write.mp3" },
+
+    { "n": 21, "en": "I can cook.", "jp": "料理できる。", "hira": "りょうり できる", "mp3": "pb_s21_i_can_cook.mp3" },
+    { "n": 22, "en": "I can teach.", "jp": "教えられる。", "hira": "おしえられる", "mp3": "pb_s22_i_can_teach.mp3" },
+    { "n": 23, "en": "I can help people.", "jp": "人を助けられる。", "hira": "ひと を たすけられる", "mp3": "pb_s23_i_can_help_people.mp3" },
+    { "n": 24, "en": "I can use a computer.", "jp": "コンピュータを使える。", "hira": "こんぴゅーた を つかえる", "mp3": "pb_s24_i_can_use_a_computer.mp3" },
+    { "n": 25, "en": "I can use tools.", "jp": "道具を使える。", "hira": "どうぐ を つかえる", "mp3": "pb_s25_i_can_use_tools.mp3" },
+
+    { "n": 26, "en": "I can make food.", "jp": "食べ物を作れる。", "hira": "たべもの を つくれる", "mp3": "pb_s26_i_can_make_food.mp3" },
+    { "n": 27, "en": "I can study English.", "jp": "英語を勉強できる。", "hira": "えいご を べんきょう できる", "mp3": "pb_s27_i_can_study_english.mp3" },
+    { "n": 28, "en": "I can work hard.", "jp": "一生懸命働ける。", "hira": "いっしょうけんめい はたらける", "mp3": "pb_s28_i_can_work_hard.mp3" },
+    { "n": 29, "en": "I can learn new things.", "jp": "新しいことを学べる。", "hira": "あたらしい こと を まなべる", "mp3": "pb_s29_i_can_learn_new_things.mp3" },
+    { "n": 30, "en": "I can help my team.", "jp": "チームを助けられる。", "hira": "ちーむ を たすけられる", "mp3": "pb_s30_i_can_help_my_team.mp3" },
+
+    { "n": 31, "en": "I will study today.", "jp": "今日は勉強する。", "hira": "きょう は べんきょう する", "mp3": "pb_s31_i_will_study_today.mp3" },
+    { "n": 32, "en": "I will read tonight.", "jp": "今夜読む。", "hira": "こんや よむ", "mp3": "pb_s32_i_will_read_tonight.mp3" },
+    { "n": 33, "en": "I will write a diary.", "jp": "日記を書く。", "hira": "にっき を かく", "mp3": "pb_s33_i_will_write_a_diary.mp3" },
+    { "n": 34, "en": "I will practice English.", "jp": "英語を練習する。", "hira": "えいご を れんしゅう する", "mp3": "pb_s34_i_will_practice_english.mp3" },
+    { "n": 35, "en": "I will help my family.", "jp": "家族を手伝う。", "hira": "かぞく を てつだう", "mp3": "pb_s35_i_will_help_my_family.mp3" },
+
+    { "n": 36, "en": "I will visit my friends.", "jp": "友だちを訪ねる。", "hira": "ともだち を たずねる", "mp3": "pb_s36_i_will_visit_my_friends.mp3" },
+    { "n": 37, "en": "I will travel someday.", "jp": "いつか旅行する。", "hira": "いつか りょこう する", "mp3": "pb_s37_i_will_travel_someday.mp3" },
+    { "n": 38, "en": "I will move someday.", "jp": "いつか引っ越す。", "hira": "いつか ひっこす", "mp3": "pb_s38_i_will_move_someday.mp3" },
+    { "n": 39, "en": "I will save money.", "jp": "お金をためる。", "hira": "おかね を ためる", "mp3": "pb_s39_i_will_save_money.mp3" },
+    { "n": 40, "en": "I will buy a computer.", "jp": "コンピュータを買う。", "hira": "こんぴゅーた を かう", "mp3": "pb_s40_i_will_buy_a_computer.mp3" },
+
+    { "n": 41, "en": "I will change my habits.", "jp": "習慣を変える。", "hira": "しゅうかん を かえる", "mp3": "pb_s41_i_will_change_my_habits.mp3" },
+    { "n": 42, "en": "I will grow and learn.", "jp": "成長して学ぶ。", "hira": "せいちょう して まなぶ", "mp3": "pb_s42_i_will_grow_and_learn.mp3" },
+    { "n": 43, "en": "I will reach my goal.", "jp": "目標を達成する。", "hira": "もくひょう を たっせい する", "mp3": "pb_s43_i_will_reach_my_goal.mp3" },
+    { "n": 44, "en": "I will follow my dream.", "jp": "夢を追う。", "hira": "ゆめ を おう", "mp3": "pb_s44_i_will_follow_my_dream.mp3" },
+    { "n": 45, "en": "I will work in the future.", "jp": "将来働く。", "hira": "しょうらい はたらく", "mp3": "pb_s45_i_will_work_in_the_future.mp3" },
+
+    { "n": 46, "en": "There is a desk in the room.", "jp": "部屋に机がある。", "hira": "へや に つくえ が ある", "mp3": "pb_s46_there_is_a_desk_in_the_room.mp3" },
+    { "n": 47, "en": "There is a computer on the desk.", "jp": "机にコンピュータがある。", "hira": "つくえ に こんぴゅーた が ある", "mp3": "pb_s47_there_is_a_computer_on_the_desk.mp3" },
+    { "n": 48, "en": "There is a door in the building.", "jp": "建物にドアがある。", "hira": "たてもの に どあ が ある", "mp3": "pb_s48_there_is_a_door_in_the_building.mp3" },
+    { "n": 49, "en": "There is a window in the room.", "jp": "部屋に窓がある。", "hira": "へや に まど が ある", "mp3": "pb_s49_there_is_a_window_in_the_room.mp3" },
+    { "n": 50, "en": "There is a shop in the city.", "jp": "町に店がある。", "hira": "まち に みせ が ある", "mp3": "pb_s50_there_is_a_shop_in_the_city.mp3" },
+
+    { "n": 51, "en": "There is a station in the city.", "jp": "町に駅がある。", "hira": "まち に えき が ある", "mp3": "pb_s51_there_is_a_station_in_the_city.mp3" },
+    { "n": 52, "en": "There is a hospital in the city.", "jp": "町に病院がある。", "hira": "まち に びょういん が ある", "mp3": "pb_s52_there_is_a_hospital_in_the_city.mp3" },
+    { "n": 53, "en": "There is a school in the city.", "jp": "町に学校がある。", "hira": "まち に がっこう が ある", "mp3": "pb_s53_there_is_a_school_in_the_city.mp3" },
+    { "n": 54, "en": "There is a kitchen in the restaurant.", "jp": "レストランに台所がある。", "hira": "れすとらん に だいどころ が ある", "mp3": "pb_s54_there_is_a_kitchen_in_the_restaurant.mp3" },
+    { "n": 55, "en": "There is a tool on the table.", "jp": "テーブルに道具がある。", "hira": "てーぶる に どうぐ が ある", "mp3": "pb_s55_there_is_a_tool_on_the_table.mp3" },
+
+    { "n": 56, "en": "There is a machine in the building.", "jp": "建物に機械がある。", "hira": "たてもの に きかい が ある", "mp3": "pb_s56_there_is_a_machine_in_the_building.mp3" },
+    { "n": 57, "en": "There is a worker in the shop.", "jp": "店に働く人がいる。", "hira": "みせ に はたらく ひと が いる", "mp3": "pb_s57_there_is_a_worker_in_the_shop.mp3" },
+    { "n": 58, "en": "There is a teacher in the school.", "jp": "学校に先生がいる。", "hira": "がっこう に せんせい が いる", "mp3": "pb_s58_there_is_a_teacher_in_the_school.mp3" },
+    { "n": 59, "en": "There is a doctor in the hospital.", "jp": "病院に医者がいる。", "hira": "びょういん に いしゃ が いる", "mp3": "pb_s59_there_is_a_doctor_in_the_hospital.mp3" },
+    { "n": 60, "en": "There is a nurse in the hospital.", "jp": "病院に看護師がいる。", "hira": "びょういん に かんごし が いる", "mp3": "pb_s60_there_is_a_nurse_in_the_hospital.mp3" }
+  ]
+}

@@ -1,1 +1,72 @@
 
+
+{
+  "cards": [
+    { "n": 1, "en": "work", "jp": "仕事", "hira": "しごと", "mp3": "pb_v01_work.mp3" },
+    { "n": 2, "en": "job", "jp": "仕事", "hira": "しごと", "mp3": "pb_v02_job.mp3" },
+    { "n": 3, "en": "worker", "jp": "働く人", "hira": "はたらく ひと", "mp3": "pb_v03_worker.mp3" },
+    { "n": 4, "en": "teacher", "jp": "先生", "hira": "せんせい", "mp3": "pb_v04_teacher.mp3" },
+    { "n": 5, "en": "doctor", "jp": "医者", "hira": "いしゃ", "mp3": "pb_v05_doctor.mp3" },
+    { "n": 6, "en": "nurse", "jp": "看護師", "hira": "かんごし", "mp3": "pb_v06_nurse.mp3" },
+    { "n": 7, "en": "chef", "jp": "コック", "hira": "こっく", "mp3": "pb_v07_chef.mp3" },
+    { "n": 8, "en": "artist", "jp": "絵を描く人", "hira": "え を かく ひと", "mp3": "pb_v08_artist.mp3" },
+    { "n": 9, "en": "pilot", "jp": "パイロット", "hira": "ぱいろっと", "mp3": "pb_v09_pilot.mp3" },
+    { "n": 10, "en": "farmer", "jp": "農家", "hira": "のうか", "mp3": "pb_v10_farmer.mp3" },
+
+    { "n": 11, "en": "cook", "jp": "料理する", "hira": "りょうり する", "mp3": "pb_v11_cook.mp3" },
+    { "n": 12, "en": "teach", "jp": "教える", "hira": "おしえる", "mp3": "pb_v12_teach.mp3" },
+    { "n": 13, "en": "help", "jp": "助ける", "hira": "たすける", "mp3": "pb_v13_help.mp3" },
+    { "n": 14, "en": "make", "jp": "作る", "hira": "つくる", "mp3": "pb_v14_make.mp3" },
+    { "n": 15, "en": "build", "jp": "作る", "hira": "つくる", "mp3": "pb_v15_build.mp3" },
+
+    { "n": 16, "en": "draw", "jp": "絵を描く", "hira": "え を かく", "mp3": "pb_v16_draw.mp3" },
+    { "n": 17, "en": "sing", "jp": "歌う", "hira": "うたう", "mp3": "pb_v17_sing.mp3" },
+    { "n": 18, "en": "dance", "jp": "踊る", "hira": "おどる", "mp3": "pb_v18_dance.mp3" },
+    { "n": 19, "en": "play", "jp": "遊ぶ", "hira": "あそぶ", "mp3": "pb_v19_play.mp3" },
+    { "n": 20, "en": "read", "jp": "読む", "hira": "よむ", "mp3": "pb_v20_read.mp3" },
+    { "n": 21, "en": "write", "jp": "書く", "hira": "かく", "mp3": "pb_v21_write.mp3" },
+    { "n": 22, "en": "learn", "jp": "学ぶ", "hira": "まなぶ", "mp3": "pb_v22_learn.mp3" },
+    { "n": 23, "en": "study", "jp": "勉強する", "hira": "べんきょう する", "mp3": "pb_v23_study.mp3" },
+    { "n": 24, "en": "practice", "jp": "練習する", "hira": "れんしゅう する", "mp3": "pb_v24_practice.mp3" },
+    { "n": 25, "en": "try", "jp": "試す", "hira": "ためす", "mp3": "pb_v25_try.mp3" },
+
+    { "n": 26, "en": "remember", "jp": "覚える", "hira": "おぼえる", "mp3": "pb_v26_remember.mp3" },
+    { "n": 27, "en": "forget", "jp": "忘れる", "hira": "わすれる", "mp3": "pb_v27_forget.mp3" },
+    { "n": 28, "en": "think", "jp": "考える", "hira": "かんがえる", "mp3": "pb_v28_think.mp3" },
+    { "n": 29, "en": "decide", "jp": "決める", "hira": "きめる", "mp3": "pb_v29_decide.mp3" },
+    { "n": 30, "en": "plan", "jp": "計画", "hira": "けいかく", "mp3": "pb_v30_plan.mp3" },
+
+    { "n": 31, "en": "dream", "jp": "夢", "hira": "ゆめ", "mp3": "pb_v31_dream.mp3" },
+    { "n": 32, "en": "future", "jp": "未来", "hira": "みらい", "mp3": "pb_v32_future.mp3" },
+    { "n": 33, "en": "goal", "jp": "目標", "hira": "もくひょう", "mp3": "pb_v33_goal.mp3" },
+    { "n": 34, "en": "hope", "jp": "希望", "hira": "きぼう", "mp3": "pb_v34_hope.mp3" },
+    { "n": 35, "en": "travel", "jp": "旅行", "hira": "りょこう", "mp3": "pb_v35_travel.mp3" },
+    { "n": 36, "en": "move", "jp": "引っ越す", "hira": "ひっこす", "mp3": "pb_v36_move.mp3" },
+    { "n": 37, "en": "visit", "jp": "訪ねる", "hira": "たずねる", "mp3": "pb_v37_visit.mp3" },
+    { "n": 38, "en": "save", "jp": "貯める", "hira": "ためる", "mp3": "pb_v38_save.mp3" },
+    { "n": 39, "en": "buy", "jp": "買う", "hira": "かう", "mp3": "pb_v39_buy.mp3" },
+    { "n": 40, "en": "change", "jp": "変わる", "hira": "かわる", "mp3": "pb_v40_change.mp3" },
+
+    { "n": 41, "en": "grow", "jp": "成長する", "hira": "せいちょう する", "mp3": "pb_v41_grow.mp3" },
+    { "n": 42, "en": "school", "jp": "学校", "hira": "がっこう", "mp3": "pb_v42_school.mp3" },
+    { "n": 43, "en": "office", "jp": "事務所", "hira": "じむしょ", "mp3": "pb_v43_office.mp3" },
+    { "n": 44, "en": "hospital", "jp": "病院", "hira": "びょういん", "mp3": "pb_v44_hospital.mp3" },
+    { "n": 45, "en": "shop", "jp": "店", "hira": "みせ", "mp3": "pb_v45_shop.mp3" },
+
+    { "n": 46, "en": "kitchen", "jp": "台所", "hira": "だいどころ", "mp3": "pb_v46_kitchen.mp3" },
+    { "n": 47, "en": "restaurant", "jp": "レストラン", "hira": "れすとらん", "mp3": "pb_v47_restaurant.mp3" },
+    { "n": 48, "en": "station", "jp": "駅", "hira": "えき", "mp3": "pb_v48_station.mp3" },
+    { "n": 49, "en": "computer", "jp": "コンピューター", "hira": "こんぴゅーたー", "mp3": "pb_v49_computer.mp3" },
+    { "n": 50, "en": "desk", "jp": "机", "hira": "つくえ", "mp3": "pb_v50_desk.mp3" },
+    { "n": 51, "en": "machine", "jp": "機械", "hira": "きかい", "mp3": "pb_v51_machine.mp3" },
+    { "n": 52, "en": "tool", "jp": "道具", "hira": "どうぐ", "mp3": "pb_v52_tool.mp3" },
+    { "n": 53, "en": "uniform", "jp": "制服", "hira": "せいふく", "mp3": "pb_v53_uniform.mp3" },
+    { "n": 54, "en": "door", "jp": "ドア", "hira": "どあ", "mp3": "pb_v54_door.mp3" },
+    { "n": 55, "en": "window", "jp": "窓", "hira": "まど", "mp3": "pb_v55_window.mp3" },
+    { "n": 56, "en": "room", "jp": "部屋", "hira": "へや", "mp3": "pb_v56_room.mp3" },
+    { "n": 57, "en": "building", "jp": "建物", "hira": "たてもの", "mp3": "pb_v57_building.mp3" },
+    { "n": 58, "en": "city", "jp": "町", "hira": "まち", "mp3": "pb_v58_city.mp3" },
+    { "n": 59, "en": "country", "jp": "国", "hira": "くに", "mp3": "pb_v59_country.mp3" },
+    { "n": 60, "en": "team", "jp": "チーム", "hira": "ちーむ", "mp3": "pb_v60_team.mp3" }
+  ]
+}
