@@ -10,7 +10,6 @@ const CFG = window.GAME_CONFIG;
 const U   = window.GAME_UTILS;
 if (!CFG || !U) return;
 
-U.setTitle('Vocabulary Tap');
 U.unlockAudio();
 
 /* ══════════════════════════════════════════════════════════════
@@ -159,19 +158,6 @@ function titleDateLabel() {
    ══════════════════════════════════════════════════════════════ */
 const S = document.createElement('style');
 S.textContent = `
-.vt-bg{
-  position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden;
-}
-.vt-blob{
-  position:absolute; border-radius:50%;
-  filter:blur(90px); opacity:0;
-  animation:vtBlobIn 1.4s ease forwards, vtBlobFloat var(--dur,14s) ease-in-out infinite alternate;
-}
-@keyframes vtBlobIn{ to{ opacity:.14; } }
-@keyframes vtBlobFloat{
-  from{ transform:translate(0,0) scale(1); }
-  to{ transform:translate(28px,34px) scale(1.1); }
-}
 
 .vt-wrap{
   position:relative; z-index:1;
@@ -626,30 +612,8 @@ S.textContent = `
 document.head.appendChild(S);
 
 /* ══════════════════════════════════════════════════════════════
-   BACKGROUND
+   BACKGROUND**removed**
    ══════════════════════════════════════════════════════════════ */
-const bgEl = document.createElement('div');
-bgEl.className = 'vt-bg';
-[
-  { size: 430, color: 'var(--game-primary)', top: '-110px', left: '-110px', dur: '13s' },
-  { size: 330, color: 'var(--game-accent)', bottom: '-80px', right: '-70px', dur: '16s' },
-  { size: 290, color: 'var(--game-secondary)', top: '42%', left: '46%', dur: '11s' },
-].forEach(b => {
-  const el = document.createElement('div');
-  el.className = 'vt-blob';
-  Object.assign(el.style, {
-    width: b.size + 'px',
-    height: b.size + 'px',
-    background: b.color,
-    top: b.top || '',
-    left: b.left || '',
-    bottom: b.bottom || '',
-    right: b.right || '',
-    '--dur': b.dur
-  });
-  bgEl.appendChild(el);
-});
-document.body.insertBefore(bgEl, document.body.firstChild);
 
 /* ══════════════════════════════════════════════════════════════
    HTML
@@ -673,17 +637,16 @@ U.mount(`
     <div class="vt-score-pill">Score <b id="vt-score">0</b> / 15</div>
   </div>
 
-  <div class="vt-instruction">英語をタップ → 日本語をタップ → Check</div>
-
   <div class="vt-columns" id="vt-game">
+
     <div class="vt-panel">
-      <div class="vt-panel-label">English</div>
       <div class="vt-stack" id="vt-en-bank"></div>
     </div>
+
     <div class="vt-panel">
-      <div class="vt-panel-label">Japanese</div>
       <div class="vt-stack" id="vt-jp-slots"></div>
     </div>
+
   </div>
 
   <div class="vt-check-row">
@@ -691,16 +654,20 @@ U.mount(`
   </div>
 
   <div class="vt-results" id="vt-results">
+
     <div class="vt-res-score" id="vt-rs"></div>
     <div class="vt-res-pct" id="vt-rp"></div>
     <div class="vt-res-label" id="vt-rl"></div>
+
     <div class="vt-res-en" id="vt-re"></div>
     <div class="vt-res-jp" id="vt-rj"></div>
     <div class="vt-res-kanji" id="vt-rk"></div>
+
     <div class="vt-res-actions">
       <button class="game-btn game-btn-primary" id="vt-replay">もう一度</button>
       <button class="game-btn game-btn-secondary" id="vt-back">メニューへ</button>
     </div>
+
   </div>
 
 </div>
@@ -803,7 +770,7 @@ function renderJpSlots() {
       <div class="vt-jp-text">${card.jp}</div>
       <div class="vt-jp-hira">${card.hira || ''}</div>
       <div class="vt-drop ${pairedCard ? ' filled' : ' empty'}">
-        ${pairedCard ? pairedCard.en : 'TAP TO PAIR'}
+      ${pairedCard ? pairedCard.en : ''}
       </div>
     `;
 
