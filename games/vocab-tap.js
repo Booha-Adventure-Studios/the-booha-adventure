@@ -307,11 +307,23 @@ S.textContent = `
 }
 
 .vt-en-card{
+  filter:hue-rotate(calc(var(--i) * 40deg));
+  animation:vtTileIn .35s ease backwards;
   position:relative;
   overflow:hidden;
   border-radius:18px;
   padding:12px 14px;
-  background:var(--game-tile-bg);
+  background:linear-gradient(
+  135deg,
+  color-mix(in srgb, var(--game-primary) 12%, #fff),
+  color-mix(in srgb, var(--game-secondary) 12%, #fff)
+);
+
+@keyframes vtTileIn{
+  from{ transform:translateY(10px); opacity:.0 }
+  to{ transform:none; opacity:1 }
+}
+  
   border:2px solid var(--game-tile-border);
   box-shadow:0 8px 24px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.16);
   cursor:pointer;
@@ -346,6 +358,12 @@ S.textContent = `
   pointer-events:none;
 }
 .vt-en-card:hover::after{ left:135%; }
+.vt-en-card:hover{
+  transform:translateY(-3px) scale(1.03);
+  box-shadow:
+    0 10px 28px rgba(0,0,0,.35),
+    0 0 20px color-mix(in srgb, var(--game-primary) 35%, transparent);
+}
 .vt-en-card:hover{ transform:translateY(-2px) scale(1.02); }
 .vt-en-card:active{ transform:scale(.97); }
 
@@ -386,6 +404,11 @@ S.textContent = `
   border-radius:18px;
   padding:10px 12px;
   background:var(--game-surface);
+  background:linear-gradient(
+  160deg,
+  rgba(255,255,255,.05),
+  rgba(255,255,255,.02)
+);
   border:2px dashed var(--game-border);
   display:grid;
   grid-template-rows:auto auto auto;
@@ -395,6 +418,9 @@ S.textContent = `
   -webkit-tap-highlight-color:transparent;
   transition:border-color .14s, background .14s, box-shadow .14s, transform .14s;
 }
+
+
+
 .vt-jp-slot:hover{ border-color:var(--game-primary); }
 
 .vt-jp-text{
@@ -409,6 +435,41 @@ S.textContent = `
   -webkit-box-orient:vertical;
   overflow:hidden;
 }
+
+.vt-jp-word{
+  position:relative;
+  text-align:center;
+  height:28px;
+}
+
+.vt-jp-word span{
+  position:absolute;
+  left:0;
+  right:0;
+  top:0;
+  transition:opacity .35s ease;
+}
+
+.vt-jp-word .kanji{
+  font-size:clamp(18px,2.7vw,24px);
+  opacity:1;
+}
+
+.vt-jp-word .hira{
+  font-size:clamp(12px,2vw,16px);
+  color:var(--game-muted);
+  opacity:0;
+}
+
+.vt-jp-slot:hover .kanji{
+  opacity:0;
+}
+
+.vt-jp-slot:hover .hira{
+  opacity:1;
+}
+
+
 .vt-jp-hira{
   margin-top:3px;
   font-family:var(--game-font-jp);
@@ -621,11 +682,10 @@ document.head.appendChild(S);
 U.mount(`
 <div class="vt-wrap">
 
-  <div class="vt-header">
-    <div class="vt-curriculum">${curriculumLabel()}</div>
-    <div class="vt-game-title">Vocabulary Tap</div>
-    <div class="vt-date">${titleDateLabel()}</div>
-  </div>
+ <div class="vt-header">
+  <div class="vt-curriculum">${curriculumLabel()}</div>
+  <div class="vt-date">${titleDateLabel()}</div>
+</div>
 
   <div class="vt-dots-row">
     <div class="vt-dot active" id="vt-d0"></div>
@@ -737,6 +797,7 @@ function renderEnBank() {
     const isSelected = selectedEnKey === card._key;
 
     const btn = document.createElement('button');
+    btn.style.setProperty('--i', Math.random()); 
     btn.type = 'button';
     btn.className = 'vt-en-card' + (isSelected ? ' selected' : '') + (isPaired ? ' leaving' : '');
     btn.innerHTML = `
@@ -767,8 +828,11 @@ function renderJpSlots() {
     slot.type = 'button';
     slot.className = 'vt-jp-slot' + (pairedCard ? ' has-pair' : '');
     slot.innerHTML = `
-      <div class="vt-jp-text">${card.jp}</div>
-      <div class="vt-jp-hira">${card.hira || ''}</div>
+      <div class="vt-jp-word">
+        <span class="kanji">${card.jp}</span>
+        <span class="hira">${card.hira || ''}</span>
+      </div>
+      
       <div class="vt-drop ${pairedCard ? ' filled' : ' empty'}">
       ${pairedCard ? pairedCard.en : ''}
       </div>
