@@ -1,0 +1,151 @@
+
+/* ══════════════════════════════════════════════════════════════
+   game-vt-patch.css  — Addons for vocab-tap v2
+   Append or @import this after game.css
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── enhanced EN card height on mobile ── */
+@media (max-width: 680px) {
+  .vt-en-card,
+  .vt-jp-slot {
+    min-height: 86px;
+    height: 86px;
+  }
+}
+
+/* ── richer rainbow title gradient ── */
+.vt-curriculum {
+  background: linear-gradient(90deg,
+    #ff2288, #ff6600, #ffcc00, #aaff22,
+    #22ddff, #4466ff, #cc88ff, #ff2288
+  );
+  background-size: 280% auto;
+}
+
+/* ── pb curriculum specific results ── */
+[data-curriculum="pb"] .vt-results {
+  background: color-mix(in srgb, var(--tier-color) 5%, #fff8fc);
+  box-shadow:
+    0 8px 0 color-mix(in srgb, var(--tier-color) 40%, #ffb0d8),
+    0 16px 40px rgba(255,110,180,.22),
+    0 0 50px color-mix(in srgb, var(--tier-color) 18%, transparent);
+}
+
+/* ── bc curriculum results ── */
+[data-curriculum="bc"] .vt-results {
+  background: color-mix(in srgb, var(--tier-color) 6%, #030810);
+}
+
+/* ── score pill pop on update ── */
+@keyframes vtScorePop {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.18); }
+  100% { transform: scale(1); }
+}
+.vt-score-pill.pop {
+  animation: vtScorePop .3s cubic-bezier(.34,1.56,.64,1);
+}
+
+/* ── bottom bar responsive ── */
+@media (max-width: 480px) {
+  .vt-bottom-bar {
+    gap: 10px;
+  }
+  .vt-check-btn {
+    padding: 13px 32px;
+    font-size: clamp(15px, 4vw, 20px);
+  }
+  .vt-hira-btn {
+    padding: 11px 14px;
+    font-size: 13px;
+  }
+}
+
+/* ── pb hira btn ── */
+[data-curriculum="pb"] .vt-hira-btn {
+  background: white;
+  border: 2px solid rgba(255,110,180,.35);
+  color: rgba(58,26,46,.7);
+  box-shadow: 0 3px 0 #ffccdd;
+}
+[data-curriculum="pb"] .vt-hira-btn:hover,
+[data-curriculum="pb"] body.hira-mode .vt-hira-btn {
+  border-color: var(--game-primary);
+  color: var(--game-primary);
+  box-shadow: 0 3px 0 #ffb0d8, 0 0 14px rgba(255,110,180,.3);
+}
+
+/* ── pb help btn ── */
+[data-curriculum="pb"] .vt-help-btn {
+  background: white;
+  border: 2px solid rgba(255,110,180,.35);
+  color: rgba(58,26,46,.6);
+  box-shadow: 0 3px 0 #ffccdd;
+}
+[data-curriculum="pb"] .vt-help-btn:hover {
+  border-color: var(--game-primary);
+  color: var(--game-primary);
+}
+
+/* ── pb modal ── */
+[data-curriculum="pb"] .vt-modal {
+  background: #fff8fc;
+  border-color: var(--game-primary);
+  box-shadow: 0 8px 0 #ffb0d8, 0 16px 40px rgba(255,110,180,.25);
+}
+[data-curriculum="pb"] .vt-modal-header {
+  background: linear-gradient(135deg, rgba(255,110,180,.12), rgba(204,136,255,.08));
+}
+
+/* ── bc panel depth ── */
+[data-curriculum="bc"] .vt-panel {
+  background: rgba(0,240,255,.04);
+  border-color: rgba(0,240,255,.15);
+  box-shadow: 0 8px 32px rgba(0,0,0,.35), 0 0 0 1px rgba(0,240,255,.08);
+}
+
+/* ── pb panel ── */
+[data-curriculum="pb"] .vt-panel {
+  background: rgba(255,255,255,.9);
+  border-color: rgba(255,110,180,.2);
+  box-shadow: 0 6px 0 #ffccdd, 0 8px 24px rgba(255,110,180,.12);
+}
+
+/* ── pb jp slot ── */
+[data-curriculum="pb"] .vt-jp-slot {
+  border-color: rgba(255,110,180,.24);
+  background: rgba(255,255,255,.7);
+}
+[data-curriculum="pb"] .vt-jp-kanji,
+[data-curriculum="pb"] .vt-jp-hira-text {
+  color: #3a1a2e;
+}
+[data-curriculum="pb"] .vt-jp-slot:hover {
+  border-color: var(--game-primary);
+}
+
+/* ── pb drop zone ── */
+[data-curriculum="pb"] .vt-drop.empty {
+  border-color: rgba(255,110,180,.2);
+  color: rgba(58,26,46,.25);
+}
+
+/* ── check button pb variant ── */
+[data-curriculum="pb"] .vt-check-btn {
+  box-shadow:
+    0 0 22px rgba(255,110,180,.4),
+    0 4px 0 #ffb0d8,
+    0 8px 20px rgba(255,110,180,.2);
+}
+
+/* ── mobile touch area boost ── */
+@media (pointer: coarse) {
+  .vt-en-card,
+  .vt-jp-slot {
+    min-height: 90px;
+  }
+  .vt-help-btn,
+  .vt-hira-btn {
+    min-height: 46px;
+  }
+}
