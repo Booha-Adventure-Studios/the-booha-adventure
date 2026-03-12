@@ -1,11 +1,11 @@
 
 /* ══════════════════════════════════════════════════════════════
    game.css  —  Shared game styles + per-curriculum themes
-   Used by curriculum/br/game.html, curriculum/pb/game.html, curriculum/bc/game.html
+   Used by game.html (root) for all curricula
    ══════════════════════════════════════════════════════════════ */
 
 /* ── Google Fonts ── */
-@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Chau+Philomene+One&family=Ranchers&family=Grenze:wght@700;900&family=Nunito:wght@800;900&family=Noto+Sans+JP:wght@500;700;900&family=M+PLUS+Rounded+1c:wght@400;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Wendy+One&family=Rammetto+One&family=Fredoka+One&family=Chau+Philomene+One&family=Ranchers&family=Grenze:wght@700;900&family=Nunito:wght@800;900&family=Noto+Sans+JP:wght@500;700;900&family=M+PLUS+Rounded+1c:wght@400;700;800&display=swap');
 
 /* ══════════════════════════════════════════════════════════════
    CSS VARIABLES — set by [data-curriculum] on <html>
@@ -21,38 +21,40 @@
   --game-radius:   22px;
   --game-shadow:   0 12px 40px rgba(0,0,0,0.5);
   --game-font-title: 'Chau Philomene One', sans-serif;
-  --game-font-body:  'Nunito', 'Noto Sans JP', sans-serif;
-  --game-font-jp:    'Noto Sans JP', sans-serif;
+  --game-font-body:  'Nunito', 'M PLUS Rounded 1c', sans-serif;
+  --game-font-jp:    'M PLUS Rounded 1c', sans-serif;
 }
 
 /* ── Boo-riculum: Jungle Arcade ── */
 [data-curriculum="br"] {
-  --game-bg:        #081a04;
+  --game-bg:        #060010;
   --game-primary:   #aaff22;
-  --game-secondary: #0088ff;
+  --game-secondary: #22ddff;
   --game-accent:    #ff2288;
-  --game-amber:     #ffaa00;
-  --game-font-title:'Chau Philomene One', sans-serif;
+  --game-amber:     #ffcc00;
+  --game-font-title:'Wendy One', sans-serif;
 }
 
 /* ── Pre-Boo: Candy Dream ── */
 [data-curriculum="pb"] {
-  --game-bg:        #16081f;
+  --game-bg:        #fff0f8;
   --game-primary:   #ff6eb4;
   --game-secondary: #cc88ff;
-  --game-accent:    #88ffcc;
-  --game-amber:     #ffb088;
-  --game-font-title:'Ranchers', sans-serif;
+  --game-accent:    #44ccff;
+  --game-amber:     #ffcc44;
+  --game-ink:       #3a1a2e;
+  --game-muted:     rgba(58,26,46,0.55);
+  --game-font-title:'Luckiest Guy', cursive;
 }
 
 /* ── Boo Continuum: Midnight Signal ── */
 [data-curriculum="bc"] {
-  --game-bg:        #03080f;
+  --game-bg:        #03060f;
   --game-primary:   #00f0ff;
-  --game-secondary: #0055ff;
+  --game-secondary: #4455ff;
   --game-accent:    #aa00ff;
   --game-amber:     #ff9900;
-  --game-font-title:'Grenze', serif;
+  --game-font-title:'Rammetto One', cursive;
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -89,6 +91,11 @@ body {
   line-height: 1.1;
 }
 
+/* pb gets dark text shadow instead of glow */
+[data-curriculum="pb"] .game-title {
+  text-shadow: 2px 3px 0 #ffb0d8, 0 0 20px rgba(255,110,180,0.3);
+}
+
 .game-week {
   font-family: var(--game-font-body);
   font-size: clamp(12px, 2.5vw, 16px);
@@ -123,6 +130,27 @@ body {
 }
 .game-close:hover { background: rgba(255,80,80,0.5); transform: scale(1.1) rotate(5deg); }
 
+[data-curriculum="pb"] .game-close {
+  background: white;
+  border: 3px solid var(--game-primary);
+  color: var(--game-primary);
+  box-shadow: 0 4px 0 #ffb0d8;
+}
+[data-curriculum="pb"] .game-close:hover {
+  background: #fff0f8;
+  transform: rotate(12deg) scale(1.1);
+}
+
+[data-curriculum="bc"] .game-close {
+  border-color: rgba(0,240,255,0.25);
+  box-shadow: 0 0 12px rgba(0,240,255,0.1);
+}
+[data-curriculum="bc"] .game-close:hover {
+  border-color: var(--game-primary);
+  box-shadow: 0 0 20px rgba(0,240,255,0.3);
+  background: rgba(0,240,255,0.08);
+}
+
 /* ══════════════════════════════════════════════════════════════
    SCORE HUD  (reusable across games)
    ══════════════════════════════════════════════════════════════ */
@@ -148,6 +176,13 @@ body {
   gap: 6px;
 }
 .hud-pill b { color: var(--game-primary); }
+
+[data-curriculum="pb"] .hud-pill {
+  background: white;
+  border-color: var(--game-primary);
+  color: #3a1a2e;
+  box-shadow: 0 3px 0 #ffccdd;
+}
 
 /* ══════════════════════════════════════════════════════════════
    SCORE BAR / PROGRESS
@@ -187,6 +222,12 @@ body {
   opacity: 0.5;
 }
 
+[data-curriculum="pb"] .game-card {
+  background: white;
+  border: 2px solid var(--game-primary);
+  box-shadow: 0 6px 0 #ffb0d8, 0 8px 20px rgba(255,110,180,0.15);
+}
+
 /* ══════════════════════════════════════════════════════════════
    STRIPE BAR (JP display — from saytheword)
    ══════════════════════════════════════════════════════════════ */
@@ -209,13 +250,13 @@ body {
 @keyframes stripeScroll { from { background-position: 0 0; } to { background-position: 0 96px; } }
 
 [data-curriculum="br"] .stripe-inner {
-  background-image: repeating-linear-gradient(0deg,#aaff22 0 18px,#0088ff 18px 36px,#ff2288 36px 54px);
+  background-image: repeating-linear-gradient(0deg,#aaff22 0 18px,#22ddff 18px 36px,#ff2288 36px 54px);
 }
 [data-curriculum="pb"] .stripe-inner {
-  background-image: repeating-linear-gradient(0deg,#ff6eb4 0 18px,#cc88ff 18px 36px,#88ffcc 36px 54px);
+  background-image: repeating-linear-gradient(0deg,#ff6eb4 0 18px,#cc88ff 18px 36px,#44ccff 36px 54px);
 }
 [data-curriculum="bc"] .stripe-inner {
-  background-image: repeating-linear-gradient(0deg,#00f0ff 0 18px,#0055ff 18px 36px,#aa00ff 36px 54px);
+  background-image: repeating-linear-gradient(0deg,#00f0ff 0 18px,#4455ff 18px 36px,#aa00ff 36px 54px);
 }
 
 .stripe-label {
@@ -262,6 +303,13 @@ body {
   background: linear-gradient(135deg, #ffd166, #ffaa00);
   color: #1a0a00;
   box-shadow: 0 0 16px rgba(255,209,102,0.6);
+}
+
+[data-curriculum="pb"] .game-btn-secondary {
+  background: white;
+  color: #3a1a2e;
+  border: 2px solid #ffb0d8;
+  box-shadow: 0 3px 0 #ffccdd;
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -444,6 +492,11 @@ body {
   transition: background 0.2s, border-color 0.2s;
   user-select: none;
 }
+[data-curriculum="pb"] .slot {
+  background: rgba(255,110,180,0.08);
+  border-color: rgba(255,110,180,0.35);
+  color: #3a1a2e;
+}
 .slot.filled {
   background: rgba(255,255,255,0.15);
   border-color: var(--game-primary);
@@ -513,6 +566,12 @@ body {
 }
 .results-panel.show { display: block; }
 
+[data-curriculum="pb"] .results-panel {
+  background: white;
+  border: 2px solid var(--game-primary);
+  box-shadow: 0 6px 0 #ffb0d8, 0 8px 24px rgba(255,110,180,0.15);
+}
+
 .results-msg {
   font-family: var(--game-font-title);
   font-size: clamp(22px, 5vw, 36px);
@@ -524,6 +583,8 @@ body {
   font-weight: 900;
   margin-bottom: 1.5rem;
 }
+[data-curriculum="pb"] .results-score { color: #3a1a2e; }
+
 .results-actions {
   display: flex;
   gap: 12px;
