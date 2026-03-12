@@ -1,81 +1,72 @@
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Booha Game</title>
+<meta name="theme-color" content="#081a04" />
 
-<style>
-html,body{
-  margin:0;
-  padding:0;
-  background:#000;
-  color:#fff;
-  font-family:sans-serif;
-  height:100%;
-}
+<!-- Game CSS -->
+<link rel="stylesheet" href="../../theme/game.css" />
 
-#gameContainer{
-  width:100%;
-  height:100%;
-  position:relative;
-}
-</style>
+<!-- SFX preload -->
+<link rel="preload" as="audio" href="../../assets/audio/ding.mp3" />
+<link rel="preload" as="audio" href="../../assets/audio/fart.mp3" />
 </head>
-
 <body>
 
-<div id="gameContainer"></div>
+<!-- ✕ Close button -->
+<a class="game-close" id="gameClose" href="#" title="Back / もどる">✕</a>
 
-<script type="module">
-import { getWeekParam, getPageContext } from '../../js/nav.js';
+<!-- Header (populated by game engines) -->
+<header class="game-header">
+  <div class="game-title" id="gameTitle">Loading…</div>
+  <div class="game-week"  id="gameWeek"  data-week-label></div>
+</header>
 
-const week = getWeekParam();
-const ctx = getPageContext();
+<!-- Loading state -->
+<div id="game-loading">Loading…</div>
 
-const params = new URLSearchParams(window.location.search);
-const game = params.get('game');
+<!-- Error state (hidden until needed) -->
+<div id="game-error"></div>
 
-if (!week || !ctx || !game) {
-  window.location.href = '../../index.html';
-}
+<!-- Game mount point — each engine renders into this -->
+<main id="game-mount"></main>
 
-window.BOOHA_GAME_CONTEXT = {
-  week,
-  game,
-  curriculum: ctx.curriculum,
-  monthShort: ctx.monthShort,
-  monthDir: ctx.monthDir,
-  monthLabel: ctx.monthLabel,
-  monthLabelJp: ctx.monthLabelJp,
-  weekNumber: ctx.weekNumber
-};
+<!-- iOS notice overlay (shared, engines show/hide as needed) -->
+<div id="ios-overlay" class="ios-overlay">
+  <div class="ios-dialog">
+    <div class="ios-dialog-title">iPad / iPhone をお使いの方へ</div>
+    <p id="ios-overlay-body"></p>
+    <div style="text-align:center;margin-top:14px;">
+      <button id="ios-overlay-ok" class="game-btn game-btn-gold">OK ／ はじめる</button>
+    </div>
+  </div>
+</div>
 
-const script = document.createElement('script');
-script.type = 'module';
-script.src = `../../games/${game}.js`;
-document.body.appendChild(script);
+<!-- Swipe-out transition screen -->
+<div id="swipe-screen"></div>
+
+<script>
+/* ── Close button: go back to game-index, keep history for music ── */
+document.getElementById('gameClose').addEventListener('click', function(e) {
+  e.preventDefault();
+  const cfg = window.GAME_CONFIG;
+  if (cfg) {
+    sessionStorage.setItem(cfg.navKey, '1');
+    window.location.assign(cfg.navTarget + '?week=' + encodeURIComponent(cfg.weekParam));
+  } else {
+    history.back();
+  }
+});
 </script>
 
-const params = new URLSearchParams(window.location.search);
+<!-- Shared utilities (must load before game-core) -->
+<script src="../../js/game-utils.js"></script>
 
-const week = params.get("week");
-const game = params.get("game");
-
-if(!week || !game){
-  window.location.href="../../index.html";
-}
-
-const script = document.createElement("script");
-
-script.type = "module";
-script.src = `../../games/${game}.js`;
-
-document.body.appendChild(script);
-
-</script>
+<!-- Bootstrap: reads URL params, fetches JSON, sets GAME_CONFIG, loads game engine -->
+<script src="../../js/game-core.js"></script>
 
 </body>
 </html>

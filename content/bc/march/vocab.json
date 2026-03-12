@@ -1,1 +1,75 @@
 
+{
+  "cards": [
+    { "n": 1, "en": "profession", "jp": "職業", "hira": "しょくぎょう", "mp3": "bc_v01_profession.mp3" },
+    { "n": 2, "en": "occupation", "jp": "職業", "hira": "しょくぎょう", "mp3": "bc_v02_occupation.mp3" },
+    { "n": 3, "en": "employment", "jp": "雇用", "hira": "こよう", "mp3": "bc_v03_employment.mp3" },
+    { "n": 4, "en": "workforce", "jp": "労働力", "hira": "ろうどうりょく", "mp3": "bc_v04_workforce.mp3" },
+    { "n": 5, "en": "industry", "jp": "産業", "hira": "さんぎょう", "mp3": "bc_v05_industry.mp3" },
+    { "n": 6, "en": "corporation", "jp": "企業", "hira": "きぎょう", "mp3": "bc_v06_corporation.mp3" },
+    { "n": 7, "en": "organization", "jp": "組織", "hira": "そしき", "mp3": "bc_v07_organization.mp3" },
+    { "n": 8, "en": "department", "jp": "部門", "hira": "ぶもん", "mp3": "bc_v08_department.mp3" },
+    { "n": 9, "en": "management", "jp": "経営", "hira": "けいえい", "mp3": "bc_v09_management.mp3" },
+    { "n": 10, "en": "leadership", "jp": "指導力", "hira": "しどうりょく", "mp3": "bc_v10_leadership.mp3" },
+
+    { "n": 11, "en": "responsibility", "jp": "責任", "hira": "せきにん", "mp3": "bc_v11_responsibility.mp3" },
+    { "n": 12, "en": "duty", "jp": "義務", "hira": "ぎむ", "mp3": "bc_v12_duty.mp3" },
+    { "n": 13, "en": "task", "jp": "任務", "hira": "にんむ", "mp3": "bc_v13_task.mp3" },
+    { "n": 14, "en": "assignment", "jp": "課題／任務", "hira": "かだい / にんむ", "mp3": "bc_v14_assignment.mp3" },
+    { "n": 15, "en": "project", "jp": "プロジェクト", "hira": "ぷろじぇくと", "mp3": "bc_v15_project.mp3" },
+
+    { "n": 16, "en": "deadline", "jp": "締め切り", "hira": "しめきり", "mp3": "bc_v16_deadline.mp3" },
+    { "n": 17, "en": "schedule", "jp": "予定表", "hira": "よていひょう", "mp3": "bc_v17_schedule.mp3" },
+    { "n": 18, "en": "efficiency", "jp": "効率", "hira": "こうりつ", "mp3": "bc_v18_efficiency.mp3" },
+    { "n": 19, "en": "productivity", "jp": "生産性", "hira": "せいさんせい", "mp3": "bc_v19_productivity.mp3" },
+    { "n": 20, "en": "performance", "jp": "業績", "hira": "ぎょうせき", "mp3": "bc_v20_performance.mp3" },
+
+    { "n": 21, "en": "qualification", "jp": "資格", "hira": "しかく", "mp3": "bc_v21_qualification.mp3" },
+    { "n": 22, "en": "experience", "jp": "経験", "hira": "けいけん", "mp3": "bc_v22_experience.mp3" },
+    { "n": 23, "en": "expertise", "jp": "専門知識", "hira": "せんもん ちしき", "mp3": "bc_v23_expertise.mp3" },
+    { "n": 24, "en": "competence", "jp": "能力", "hira": "のうりょく", "mp3": "bc_v24_competence.mp3" },
+    { "n": 25, "en": "specialty", "jp": "専門分野", "hira": "せんもん ぶんや", "mp3": "bc_v25_specialty.mp3" },
+
+    { "n": 26, "en": "training", "jp": "訓練", "hira": "くんれん", "mp3": "bc_v26_training.mp3" },
+    { "n": 27, "en": "education", "jp": "教育", "hira": "きょういく", "mp3": "bc_v27_education.mp3" },
+    { "n": 28, "en": "knowledge", "jp": "知識", "hira": "ちしき", "mp3": "bc_v28_knowledge.mp3" },
+    { "n": 29, "en": "innovation", "jp": "革新", "hira": "かくしん", "mp3": "bc_v29_innovation.mp3" },
+    { "n": 30, "en": "technology", "jp": "技術", "hira": "ぎじゅつ", "mp3": "bc_v30_technology.mp3" },
+
+    { "n": 31, "en": "research", "jp": "研究", "hira": "けんきゅう", "mp3": "bc_v31_research.mp3" },
+    { "n": 32, "en": "analysis", "jp": "分析", "hira": "ぶんせき", "mp3": "bc_v32_analysis.mp3" },
+    { "n": 33, "en": "strategy", "jp": "戦略", "hira": "せんりゃく", "mp3": "bc_v33_strategy.mp3" },
+    { "n": 34, "en": "planning", "jp": "計画立案", "hira": "けいかく りつあん", "mp3": "bc_v34_planning.mp3" },
+    { "n": 35, "en": "decision", "jp": "決定", "hira": "けってい", "mp3": "bc_v35_decision.mp3" },
+
+    { "n": 36, "en": "solution", "jp": "解決策", "hira": "かいけつさく", "mp3": "bc_v36_solution.mp3" },
+    { "n": 37, "en": "development", "jp": "発展", "hira": "はってん", "mp3": "bc_v37_development.mp3" },
+    { "n": 38, "en": "improvement", "jp": "改善", "hira": "かいぜん", "mp3": "bc_v38_improvement.mp3" },
+    { "n": 39, "en": "growth", "jp": "成長", "hira": "せいちょう", "mp3": "bc_v39_growth.mp3" },
+    { "n": 40, "en": "progress", "jp": "進歩", "hira": "しんぽ", "mp3": "bc_v40_progress.mp3" },
+
+    { "n": 41, "en": "promotion", "jp": "昇進", "hira": "しょうしん", "mp3": "bc_v41_promotion.mp3" },
+    { "n": 42, "en": "salary", "jp": "給与", "hira": "きゅうよ", "mp3": "bc_v42_salary.mp3" },
+    { "n": 43, "en": "income", "jp": "収入", "hira": "しゅうにゅう", "mp3": "bc_v43_income.mp3" },
+    { "n": 44, "en": "budget", "jp": "予算", "hira": "よさん", "mp3": "bc_v44_budget.mp3" },
+    { "n": 45, "en": "investment", "jp": "投資", "hira": "とうし", "mp3": "bc_v45_investment.mp3" },
+
+    { "n": 46, "en": "opportunity", "jp": "機会", "hira": "きかい", "mp3": "bc_v46_opportunity.mp3" },
+    { "n": 47, "en": "challenge", "jp": "課題", "hira": "かだい", "mp3": "bc_v47_challenge.mp3" },
+    { "n": 48, "en": "competition", "jp": "競争", "hira": "きょうそう", "mp3": "bc_v48_competition.mp3" },
+    { "n": 49, "en": "achievement", "jp": "達成", "hira": "たっせい", "mp3": "bc_v49_achievement.mp3" },
+    { "n": 50, "en": "success", "jp": "成功", "hira": "せいこう", "mp3": "bc_v50_success.mp3" },
+
+    { "n": 51, "en": "motivation", "jp": "動機", "hira": "どうき", "mp3": "bc_v51_motivation.mp3" },
+    { "n": 52, "en": "confidence", "jp": "自信", "hira": "じしん", "mp3": "bc_v52_confidence.mp3" },
+    { "n": 53, "en": "communication", "jp": "コミュニケーション", "hira": "こみゅにけーしょん", "mp3": "bc_v53_communication.mp3" },
+    { "n": 54, "en": "cooperation", "jp": "協力", "hira": "きょうりょく", "mp3": "bc_v54_cooperation.mp3" },
+    { "n": 55, "en": "teamwork", "jp": "チームワーク", "hira": "ちーむわーく", "mp3": "bc_v55_teamwork.mp3" },
+
+    { "n": 56, "en": "negotiation", "jp": "交渉", "hira": "こうしょう", "mp3": "bc_v56_negotiation.mp3" },
+    { "n": 57, "en": "career path", "jp": "キャリアパス", "hira": "きゃりあ ぱす", "mp3": "bc_v57_career_path.mp3" },
+    { "n": 58, "en": "long-term goal", "jp": "長期目標", "hira": "ちょうき もくひょう", "mp3": "bc_v58_longterm_goal.mp3" },
+    { "n": 59, "en": "professional growth", "jp": "職業的成長", "hira": "しょくぎょうてき せいちょう", "mp3": "bc_v59_professional_growth.mp3" },
+    { "n": 60, "en": "reputation", "jp": "評判", "hira": "ひょうばん", "mp3": "bc_v60_reputation.mp3" }
+  ]
+}
