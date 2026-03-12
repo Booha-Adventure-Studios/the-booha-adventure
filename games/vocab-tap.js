@@ -185,21 +185,11 @@ S.textContent = `
 }
 @keyframes vtRainbowShift{ to{ background-position:220% center; } }
 
-.vt-game-title{
-  margin-top:5px;
-  font-family:var(--game-font-title);
-  font-size:clamp(26px,5.5vw,44px);
-  line-height:1.04;
-  color:#fff;
-  text-shadow:0 0 20px var(--game-primary), 0 0 40px color-mix(in srgb, var(--game-primary) 45%, transparent);
-  letter-spacing:.02em;
-}
-[data-curriculum="pb"] .vt-game-title{
-  text-shadow:3px 4px 0 #ffb0d8, 0 0 22px rgba(255,110,180,.38);
-}
+/* hide any pre-existing game-header from the page shell */
+.game-header{ display:none !important; }
 
 .vt-date{
-  margin-top:5px;
+  margin-top:4px;
   font-family:var(--game-font-body);
   font-size:clamp(12px,2.2vw,16px);
   font-weight:800;
@@ -282,6 +272,20 @@ S.textContent = `
   backdrop-filter:blur(10px);
   box-shadow:0 8px 32px rgba(0,0,0,.22);
 }
+
+/* BR — warm dark green tint to panels */
+[data-curriculum="br"] .vt-panel{
+  background:rgba(170,255,34,.04);
+  border-color:rgba(170,255,34,.14);
+  box-shadow:0 8px 32px rgba(0,0,0,.3), 0 0 0 1px rgba(170,255,34,.06);
+}
+
+/* BC — deep cold blue tint to panels */
+[data-curriculum="bc"] .vt-panel{
+  background:rgba(0,240,255,.04);
+  border-color:rgba(0,240,255,.14);
+  box-shadow:0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,240,255,.06);
+}
 .vt-panel-label{
   text-align:center;
   margin-bottom:12px;
@@ -304,8 +308,6 @@ S.textContent = `
    ══════════════════════════════════════════════════════════════ */
 .vt-en-card{
   --card-hue: calc(var(--i,0) * 52deg);
-  animation:vtTileIn .38s ease backwards;
-  animation-delay:calc(var(--i,0) * 0.06s);
   position:relative;
   overflow:hidden;
   border-radius:20px;
@@ -346,6 +348,16 @@ S.textContent = `
     border-color .16s,
     opacity .2s;
   filter:hue-rotate(var(--card-hue));
+}
+
+/* one-time entrance animation — class removed after play */
+.vt-en-card.animating{
+  animation:vtTileIn .38s ease backwards;
+  animation-delay:calc(var(--i,0) * 0.06s);
+}
+@keyframes vtTileIn{
+  from{ transform:translateY(14px) scale(.95); opacity:0; }
+  to{   transform:none; opacity:1; }
 }
 
 /* stripe texture */
@@ -396,7 +408,7 @@ S.textContent = `
 .vt-en-text{
   font-family:var(--game-font-body);
   font-weight:900;
-  font-size:clamp(16px,2.5vw,22px);
+  font-size:clamp(19px,2.8vw,25px);
   color:var(--game-tile-text);
   line-height:1.15;
   display:-webkit-box;
@@ -434,9 +446,57 @@ S.textContent = `
   transition:opacity .22s, transform .22s;
 }
 
-@keyframes vtTileIn{
-  from{ transform:translateY(14px) scale(.95); opacity:0; }
-  to{   transform:none; opacity:1; }
+/* ── BR: warm electric green/yellow tiles ── */
+[data-curriculum="br"] .vt-en-card{
+  background:
+    linear-gradient(135deg, rgba(170,255,34,.18), rgba(255,204,0,.12)),
+    linear-gradient(145deg, rgba(255,255,255,.16) 0%, rgba(0,0,0,.06) 100%);
+  border-color:rgba(170,255,34,.28);
+}
+[data-curriculum="br"] .vt-en-card.selected{
+  border-color:#aaff22;
+  background:linear-gradient(135deg, rgba(170,255,34,.24), rgba(255,204,0,.16));
+}
+
+/* ── BC: cold blue/cyan tiles ── */
+[data-curriculum="bc"] .vt-en-card{
+  background:
+    linear-gradient(135deg, rgba(0,240,255,.14), rgba(68,85,255,.16)),
+    linear-gradient(145deg, rgba(255,255,255,.10) 0%, rgba(0,0,0,.10) 100%);
+  border-color:rgba(0,240,255,.22);
+  filter:none; /* override hue-rotate — bc has its own palette */
+}
+[data-curriculum="bc"] .vt-en-card .vt-en-text{
+  color:#ecfeff;
+  text-shadow:0 0 12px rgba(0,240,255,.35), 0 1px 0 rgba(0,0,0,.4);
+}
+[data-curriculum="bc"] .vt-en-card.selected{
+  border-color:#00f0ff;
+  background:linear-gradient(135deg, rgba(0,240,255,.22), rgba(68,85,255,.18));
+  box-shadow:0 0 0 3px rgba(0,240,255,.3), 0 0 28px rgba(0,240,255,.4), 0 8px 24px rgba(0,0,0,.4);
+}
+[data-curriculum="bc"] .vt-en-card.selected .vt-en-text{
+  color:#00f0ff;
+}
+
+/* ── PB: white pastel tiles (existing feel, tweak text) ── */
+[data-curriculum="pb"] .vt-en-card{
+  filter:none;
+  background:
+    linear-gradient(135deg, rgba(255,110,180,.14), rgba(204,136,255,.12)),
+    linear-gradient(145deg, rgba(255,255,255,.85) 0%, rgba(255,220,240,.6) 100%);
+  border-color:rgba(255,110,180,.3);
+}
+[data-curriculum="pb"] .vt-en-card .vt-en-text{
+  color:#3a1a2e;
+  text-shadow:none;
+}
+[data-curriculum="pb"] .vt-en-card.selected{
+  border-color:#ff6eb4;
+  background:linear-gradient(135deg, rgba(255,110,180,.22), rgba(204,136,255,.18));
+}
+[data-curriculum="pb"] .vt-en-card.selected .vt-en-text{
+  color:#c4006a;
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -479,26 +539,25 @@ S.textContent = `
   color:var(--game-ink);
   line-height:1.1;
   text-align:center;
-  transition:opacity .22s, transform .22s;
+  display:block;
 }
+/* hira is hidden by default — only shown when toggle is active */
 .vt-jp-hira-text{
   font-family:var(--game-font-jp);
-  font-size:clamp(13px,1.9vw,17px);
-  color:var(--game-muted);
-  line-height:1.2;
-  text-align:center;
-  transition:opacity .22s, transform .22s;
-}
-
-/* when hira-mode is active */
-body.hira-mode .vt-jp-kanji{
-  font-size:clamp(16px,2.4vw,20px);
-  opacity:.45;
-}
-body.hira-mode .vt-jp-hira-text{
-  color:var(--game-ink);
   font-size:clamp(17px,2.6vw,22px);
   font-weight:900;
+  color:var(--game-ink);
+  line-height:1.2;
+  text-align:center;
+  display:none;
+}
+
+/* when hira-mode is active: swap visibility */
+body.hira-mode .vt-jp-kanji{
+  display:none;
+}
+body.hira-mode .vt-jp-hira-text{
+  display:block;
 }
 
 /* drop zone */
@@ -1178,6 +1237,9 @@ function startRound(ri) {
   selectedEnKey = null;
   pairs         = {};
   globalLocked  = false;
+  _animatedKeys = new Set();
+  enBank.innerHTML  = '';  /* clear old cards so new round's cards are created fresh */
+  jpSlots.innerHTML = '';
   updateDots(ri);
   checkBtn.disabled = true;
   render();
@@ -1192,47 +1254,68 @@ function render() {
   checkBtn.disabled = Object.keys(pairs).length !== roundCards.length || globalLocked;
 }
 
+/* Track which card keys have been intro-animated already this round */
+let _animatedKeys = new Set();
+
 function renderEnBank() {
-  enBank.innerHTML = '';
   const pairedKeys = new Set(Object.values(pairs));
 
   roundCards.forEach((card, idx) => {
     const isPaired   = pairedKeys.has(card._key);
     const isSelected = selectedEnKey === card._key;
+    const domId      = `vt-en-${card._key.replace(/[^a-zA-Z0-9]/g,'_')}`;
 
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.style.setProperty('--i', idx);
+    let btn = document.getElementById(domId);
+
+    if (!btn) {
+      /* First render for this card this round — create it */
+      btn = document.createElement('button');
+      btn.type = 'button';
+      btn.id   = domId;
+      btn.style.setProperty('--i', idx);
+      btn.innerHTML = `<div class="vt-card-inner"><div class="vt-en-text">${card.en}</div></div>`;
+
+      /* Play on touchstart for mobile — fires in same gesture as audio unlock */
+      btn.addEventListener('touchstart', (e) => {
+        if (globalLocked || btn.classList.contains('leaving')) return;
+        e.preventDefault();
+        unlockAllAudio();
+        const curPaired = new Set(Object.values(pairs));
+        if (curPaired.has(card._key)) return;
+        const curSelected = selectedEnKey === card._key;
+        playWord(card.mp3);
+        selectedEnKey = curSelected ? null : card._key;
+        render();
+      }, { passive: false });
+
+      btn.addEventListener('click', (e) => {
+        /* Skip on touch — touchstart already handled it */
+        if (e.sourceCapabilities && e.sourceCapabilities.firesTouchEvents) return;
+        if (globalLocked || btn.classList.contains('leaving')) return;
+        const curPaired = new Set(Object.values(pairs));
+        if (curPaired.has(card._key)) return;
+        const curSelected = selectedEnKey === card._key;
+        playWord(card.mp3);
+        selectedEnKey = curSelected ? null : card._key;
+        render();
+      });
+
+      enBank.appendChild(btn);
+
+      /* Trigger intro animation only once per card per round */
+      if (!_animatedKeys.has(card._key)) {
+        _animatedKeys.add(card._key);
+        btn.classList.add('animating');
+        /* Remove after animation completes so it never re-triggers */
+        const dur = 380 + idx * 60 + 50;
+        setTimeout(() => btn.classList.remove('animating'), dur);
+      }
+    }
+
+    /* Surgically update classes without touching innerHTML */
     btn.className = 'vt-en-card'
       + (isSelected ? ' selected' : '')
       + (isPaired   ? ' leaving'  : '');
-
-    btn.innerHTML = `
-      <div class="vt-card-inner">
-        <div class="vt-en-text">${card.en}</div>
-      </div>
-    `;
-
-    /* Mobile-safe: play on touchstart so audio fires in same gesture */
-    btn.addEventListener('touchstart', (e) => {
-      if (globalLocked || isPaired) return;
-      e.preventDefault(); // prevent ghost click
-      unlockAllAudio();
-      playWord(card.mp3);
-      selectedEnKey = isSelected ? null : card._key;
-      render();
-    }, { passive: false });
-
-    btn.addEventListener('click', (e) => {
-      /* Only handle click on non-touch devices to avoid double-fire */
-      if (e.isTrusted && !e.detail) return; // touchstart already handled
-      if (globalLocked || isPaired) return;
-      playWord(card.mp3);
-      selectedEnKey = isSelected ? null : card._key;
-      render();
-    });
-
-    enBank.appendChild(btn);
   });
 }
 
