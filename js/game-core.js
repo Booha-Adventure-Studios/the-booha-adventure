@@ -155,7 +155,7 @@ document.querySelectorAll('[data-week-label]').forEach(el => el.textContent = we
 document.querySelectorAll('[data-week-label-jp]').forEach(el => el.textContent = weekLabelJP);
 
 /* ── Dynamically load the game engine ── */
-const scriptSrc = `${BASE}/js/games/${gameName}.js`;
+const scriptSrc = `${BASE}/games/${gameName}.js`;   
 const s = document.createElement('script');
 s.src = scriptSrc;
 s.onerror = () => showError(`Could not load game engine: ${gameName}.js`);
