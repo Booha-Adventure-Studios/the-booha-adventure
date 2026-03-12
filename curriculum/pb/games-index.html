@@ -1,355 +1,495 @@
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>PRE-BOO GAMES</title>
-<meta name="theme-color" content="#0a0014">
-<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=M+PLUS+Rounded+1c:wght@400;700;800&display=swap" rel="stylesheet" />
+<meta name="theme-color" content="#fff0f8">
+<link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=M+PLUS+Rounded+1c:wght@400;700;800&display=swap" rel="stylesheet" />
 <style>
 :root {
-  --bg:#0a0014;
-  --card-h:130px;
-}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-html{-webkit-text-size-adjust:100%;}
-body{
-  font-family:'Fredoka One','M PLUS Rounded 1c',sans-serif;
-  background:var(--bg);color:#fff;
-  min-height:100dvh;overflow-y:auto;overflow-x:hidden;padding-bottom:2rem;
-}
-
-.bg-layer{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
-.bg-blob{
-  position:absolute;border-radius:50%;
-  filter:blur(80px);opacity:0.18;
-  animation:blobDrift var(--dur,12s) ease-in-out infinite alternate;
-}
-.bg-blob:nth-child(1){width:500px;height:500px;background:#a855f7;top:-100px;left:-150px;--dur:13s;}
-.bg-blob:nth-child(2){width:420px;height:420px;background:#00d4ff;bottom:-80px;right:-100px;--dur:17s;}
-.bg-blob:nth-child(3){width:320px;height:320px;background:#ff6b9d;top:40%;left:58%;--dur:11s;}
-.bg-blob:nth-child(4){width:260px;height:260px;background:#ffe94a;bottom:20%;left:5%;--dur:19s;}
-@keyframes blobDrift{from{transform:translate(0,0) scale(1);}to{transform:translate(28px,36px) scale(1.08);}}
-
-.star{
-  position:fixed;border-radius:50%;background:#fff;opacity:0;
-  pointer-events:none;z-index:0;
-  animation:twinkle var(--td,3s) var(--td2,0s) ease-in-out infinite;
-}
-@keyframes twinkle{0%,100%{opacity:0;transform:scale(0.5);}50%{opacity:0.9;transform:scale(1.4);}}
-
-.header{position:relative;z-index:10;text-align:center;padding:1.6rem 1rem 0.6rem;}
-.header-inner{display:inline-flex;flex-direction:column;align-items:center;gap:0.15rem;}
-
-.close-btn{
-  position:absolute;top:1.2rem;right:1.2rem;
-  width:44px;height:44px;border-radius:50%;
-  background:rgba(255,255,255,0.1);border:2px solid rgba(255,255,255,0.25);
-  color:#fff;font-size:1.4rem;display:flex;align-items:center;justify-content:center;
-  cursor:pointer;text-decoration:none;z-index:20;
-  transition:background 0.2s,transform 0.2s;
-  backdrop-filter:blur(8px);line-height:1;
-}
-.close-btn:hover{background:rgba(255,80,80,0.5);transform:scale(1.12) rotate(5deg);}
-
-.title-rainbow{
-  font-family:'Fredoka One',sans-serif;
-  font-size:clamp(26px,6.5vw,50px);letter-spacing:0.05em;
-  background:linear-gradient(120deg,#ff6b9d,#ffe94a,#00d4ff,#a855f7,#34d399,#ff8c42);
-  background-size:200% auto;
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-  animation:rainbowShift 4s linear infinite;
-  line-height:1.1;filter:drop-shadow(0 0 12px rgba(255,107,157,0.5));
-}
-@keyframes rainbowShift{0%{background-position:0% center;}100%{background-position:200% center;}}
-
-.title-jp{
-  font-family:'M PLUS Rounded 1c',sans-serif;
-  font-size:clamp(13px,3vw,18px);color:rgba(255,255,255,0.6);font-weight:400;letter-spacing:0.08em;
-}
-.divider{
-  margin:0.8rem auto 0;height:4px;border-radius:9px;
-  background:linear-gradient(90deg,#ff6b9d,#00d4ff,#ffe94a);
-  animation:shimmerBar 2s ease-in-out infinite alternate;
-}
-@keyframes shimmerBar{from{width:60px;opacity:0.7;}to{width:120px;opacity:1;}}
-
-.grid-wrap{
-  position:relative;z-index:10;display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:14px;padding:1.2rem 1rem 2rem;max-width:680px;margin:0 auto;
+  --bg: #fff0f8;
+  --bg2: #ffe4f4;
+  --pink:    #ff6eb4;
+  --pink2:   #ff9ed2;
+  --pink3:   #ffcce8;
+  --lavender:#cc88ff;
+  --mint:    #88ffcc;
+  --sky:     #88ddff;
+  --peach:   #ffb088;
+  --lemon:   #fff088;
+  --coral:   #ff8899;
+  --lilac:   #ddaaff;
+  --card-h:  140px;
+  --font-title: 'Luckiest Guy', cursive;
+  --font-jp: 'M PLUS Rounded 1c', sans-serif;
 }
 
-.tile{
-  position:relative;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
-  height:var(--card-h);border-radius:22px;
-  text-decoration:none;cursor:pointer;overflow:hidden;
-  border:3px solid rgba(255,255,255,0.18);
-  transition:transform 0.18s ease,filter 0.18s ease;
-  -webkit-tap-highlight-color:transparent;
-}
-/* 9 unique gradients */
-.tile:nth-child(1){background:linear-gradient(145deg,#ff6b9d,#d63384);}
-.tile:nth-child(2){background:linear-gradient(145deg,#00d4ff,#0ea5e9);}
-.tile:nth-child(3){background:linear-gradient(145deg,#ffe94a,#f59e0b);}
-.tile:nth-child(4){background:linear-gradient(145deg,#a855f7,#7c3aed);}
-.tile:nth-child(5){background:linear-gradient(145deg,#34d399,#059669);}
-.tile:nth-child(6){background:linear-gradient(145deg,#ff8c42,#c2410c);}
-.tile:nth-child(7){background:linear-gradient(145deg,#e879f9,#a21caf);}
-.tile:nth-child(8){background:linear-gradient(145deg,#38bdf8,#1d4ed8);}
-.tile:nth-child(9){background:linear-gradient(145deg,#86efac,#15803d);}
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-text-size-adjust: 100%; }
 
-.tile:hover{transform:translateY(-4px) scale(1.03);filter:brightness(1.15);}
-.tile:active{transform:scale(0.96);}
-
-.tile::before{
-  content:'';position:absolute;top:-60%;left:-80%;
-  width:60%;height:220%;
-  background:linear-gradient(105deg,transparent 30%,rgba(255,255,255,0.35) 50%,transparent 70%);
-  transform:skewX(-20deg);transition:left 0.5s ease;pointer-events:none;z-index:2;
-}
-.tile:hover::before{left:140%;}
-.tile::after{
-  content:'';position:absolute;width:160%;height:160%;
-  border-radius:50%;border:3px solid rgba(255,255,255,0.12);
-  animation:tileRing 8s linear infinite;pointer-events:none;z-index:1;
-}
-@keyframes tileRing{to{transform:rotate(360deg);}}
-
-.tile-content{
-  position:relative;z-index:3;display:flex;flex-direction:column;
-  align-items:center;gap:2px;text-align:center;padding:0 6px;width:100%;
-}
-.tile-en{
-  font-family:'Fredoka One',sans-serif;
-  font-size:clamp(13px,2.8vw,17px);color:#fff;
-  text-shadow:0 2px 6px rgba(0,0,0,0.35);line-height:1.15;word-break:break-word;
-}
-.tile-jp{
-  font-family:'M PLUS Rounded 1c',sans-serif;
-  font-size:clamp(10px,2vw,13px);color:rgba(255,255,255,0.82);
-  font-weight:700;text-shadow:0 1px 4px rgba(0,0,0,0.3);line-height:1.2;
-}
-.tile-kanji{
-  font-family:'M PLUS Rounded 1c',sans-serif;
-  font-size:clamp(9px,1.8vw,12px);color:rgba(255,255,255,0.6);font-weight:400;line-height:1.1;
+body {
+  font-family: var(--font-jp);
+  background: var(--bg);
+  color: #3a1a2e;
+  min-height: 100dvh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-bottom: 3rem;
 }
 
-.kaboom-ring{
-  position:fixed;border-radius:50%;border:4px solid #fff;
-  pointer-events:none;z-index:9998;opacity:0.85;
-  animation:ringExpand 0.55s cubic-bezier(0.2,0.8,0.4,1) forwards;
-}
-@keyframes ringExpand{
-  from{transform:translate(-50%,-50%) scale(0);opacity:0.85;}
-  to  {transform:translate(-50%,-50%) scale(4.5);opacity:0;}
-}
-.burst-dot{
-  position:fixed;width:10px;height:10px;border-radius:50%;
-  pointer-events:none;z-index:9999;
-  animation:burstFly var(--dur,0.7s) ease-out forwards;
-}
-@keyframes burstFly{
-  0%  {transform:translate(-50%,-50%) translate(0,0) scale(1);opacity:1;}
-  100%{transform:translate(-50%,-50%) translate(var(--bx),var(--by)) scale(0.2);opacity:0;}
-}
-.tile.warp{animation:tileWarp 0.35s ease-out forwards;}
-@keyframes tileWarp{
-  0%  {transform:scale(1);}
-  45% {transform:scale(1.18);filter:brightness(1.4) saturate(1.5);}
-  100%{transform:scale(1);}
+/* ── POLKA DOT BACKGROUND ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: radial-gradient(circle, #ffb0d8 1.5px, transparent 1.5px);
+  background-size: 28px 28px;
+  opacity: 0.35;
+  pointer-events: none;
+  z-index: 0;
 }
 
-#swipeScreen{
-  position:fixed;inset:0;background:#000;z-index:9997;
-  transform:translateY(100%);transition:transform 0.12s ease-in;pointer-events:none;
+/* ── FLOATING CLOUDS ── */
+.cloud {
+  position: fixed;
+  border-radius: 50px;
+  background: rgba(255,255,255,0.7);
+  filter: blur(2px);
+  pointer-events: none;
+  z-index: 0;
 }
-#swipeScreen.go{transform:translateY(0);}
+.cloud::before,.cloud::after {
+  content:'';position:absolute;background:inherit;border-radius:50%;
+}
+.cloud-1 { width:120px;height:44px;top:8%;left:-20px;animation:cloudDrift 18s linear infinite; }
+.cloud-1::before { width:60px;height:60px;top:-28px;left:16px; }
+.cloud-1::after  { width:44px;height:44px;top:-18px;left:50px; }
+.cloud-2 { width:90px;height:34px;top:22%;right:-10px;animation:cloudDrift2 22s linear infinite; }
+.cloud-2::before { width:46px;height:46px;top:-22px;left:12px; }
+.cloud-2::after  { width:34px;height:34px;top:-14px;left:38px; }
+.cloud-3 { width:100px;height:38px;top:60%;left:-15px;animation:cloudDrift 26s linear infinite 4s; }
+.cloud-3::before { width:50px;height:50px;top:-24px;left:14px; }
+.cloud-3::after  { width:40px;height:40px;top:-16px;left:44px; }
+@keyframes cloudDrift  { from{transform:translateX(-10px);} to{transform:translateX(calc(100vw + 140px));} }
+@keyframes cloudDrift2 { from{transform:translateX(10px);}  to{transform:translateX(calc(-100vw - 110px));} }
 
-@media(max-width:500px){
-  .grid-wrap{grid-template-columns:repeat(2,1fr);gap:12px;padding:1rem 0.85rem 2rem;}
-  :root{--card-h:118px;}
+/* ── SPARKLES ── */
+.sparkle {
+  position: fixed;
+  pointer-events: none;
+  z-index: 1;
+  font-size: 0;
+  width: 8px; height: 8px;
+  background: var(--c, #ff6eb4);
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  animation: sparkleFloat var(--st, 4s) var(--sd, 0s) ease-in-out infinite;
+  opacity: 0;
+}
+@keyframes sparkleFloat {
+  0%   { opacity:0; transform:translateY(0) scale(0.5) rotate(0deg); }
+  20%  { opacity:1; }
+  80%  { opacity:0.8; }
+  100% { opacity:0; transform:translateY(-60px) scale(1.2) rotate(180deg); }
+}
+
+/* ── HEADER ── */
+.header {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  padding: 1.8rem 1rem 0.6rem;
+}
+
+/* ── CLOSE BTN ── */
+.close-btn {
+  position: absolute;
+  top: 1.2rem; right: 1.2rem;
+  width: 46px; height: 46px;
+  border-radius: 50%;
+  background: white;
+  border: 3px solid var(--pink);
+  color: var(--pink);
+  font-size: 1.2rem;
+  font-family: var(--font-title);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  text-decoration: none;
+  z-index: 20;
+  box-shadow: 0 4px 0 #ffb0d8, 0 6px 16px rgba(255,110,180,0.2);
+  transition: transform 0.15s, box-shadow 0.15s;
+  line-height: 1;
+}
+.close-btn:hover {
+  transform: rotate(12deg) scale(1.1);
+  box-shadow: 0 2px 0 #ffb0d8, 0 4px 12px rgba(255,110,180,0.3);
+}
+.close-btn:active { transform: scale(0.9); box-shadow: none; }
+
+/* ── TITLE ── */
+.title-main {
+  font-family: var(--font-title);
+  font-size: clamp(32px, 8vw, 62px);
+  letter-spacing: 0.04em;
+  color: var(--pink);
+  text-shadow:
+    3px 3px 0 #ffb0d8,
+    6px 6px 0 rgba(255,110,180,0.15);
+  line-height: 1;
+  animation: titleWobble 3s ease-in-out infinite;
+}
+@keyframes titleWobble {
+  0%,100% { transform: rotate(-1deg); }
+  50%     { transform: rotate(1deg); }
+}
+
+.title-sub {
+  font-family: var(--font-jp);
+  font-size: clamp(11px, 2.2vw, 15px);
+  color: #cc88aa;
+  letter-spacing: 0.1em;
+  margin-top: 4px;
+  font-weight: 700;
+}
+
+.week-pill {
+  display: inline-block;
+  margin: 8px auto 0;
+  padding: 5px 18px;
+  border-radius: 30px;
+  background: white;
+  border: 2.5px solid var(--pink2);
+  font-family: var(--font-title);
+  font-size: clamp(12px, 2.5vw, 16px);
+  color: var(--pink);
+  letter-spacing: 0.05em;
+  box-shadow: 0 3px 0 #ffccdd, 0 4px 12px rgba(255,110,180,0.15);
+}
+
+/* ── WAVY DIVIDER ── */
+.wavy-divider {
+  position: relative;
+  z-index: 5;
+  width: 100%;
+  overflow: hidden;
+  line-height: 0;
+  margin: 10px 0 0;
+  height: 20px;
+}
+.wavy-divider svg { display: block; width: 100%; height: 20px; }
+
+/* ── SELECT LABEL ── */
+.select-label {
+  text-align: center;
+  font-family: var(--font-title);
+  font-size: clamp(13px, 2.8vw, 18px);
+  color: var(--lavender);
+  letter-spacing: 0.15em;
+  padding: 6px 0 2px;
+  position: relative;
+  z-index: 10;
+  text-shadow: 2px 2px 0 rgba(204,136,255,0.2);
+}
+
+/* ── GRID ── */
+.grid-wrap {
+  position: relative;
+  z-index: 10;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  padding: 0.8rem 0.9rem 2.5rem;
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+/* ── TILES ── */
+.tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: var(--card-h);
+  border-radius: 22px;
+  text-decoration: none;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.18s cubic-bezier(.34,1.56,.64,1), box-shadow 0.18s;
+  -webkit-tap-highlight-color: transparent;
+  border: 3px solid rgba(255,255,255,0.9);
+}
+
+.tile:nth-child(1) { background: linear-gradient(145deg, #ffb8d8, #ff80c0); box-shadow: 0 6px 0 #e060a0, 0 8px 20px rgba(255,110,180,0.25); --tc: #fff; }
+.tile:nth-child(2) { background: linear-gradient(145deg, #c8aaff, #aa77ff); box-shadow: 0 6px 0 #8844cc, 0 8px 20px rgba(170,119,255,0.25); --tc: #fff; }
+.tile:nth-child(3) { background: linear-gradient(145deg, #88eeff, #44ccff); box-shadow: 0 6px 0 #2299cc, 0 8px 20px rgba(68,204,255,0.25); --tc: #1a3a4a; }
+.tile:nth-child(4) { background: linear-gradient(145deg, #ffeeaa, #ffcc44); box-shadow: 0 6px 0 #cc9900, 0 8px 20px rgba(255,204,68,0.3); --tc: #4a3000; }
+.tile:nth-child(5) { background: linear-gradient(145deg, #aaffdd, #44ddaa); box-shadow: 0 6px 0 #22aa77, 0 8px 20px rgba(68,221,170,0.25); --tc: #0a2e1e; }
+.tile:nth-child(6) { background: linear-gradient(145deg, #ffccaa, #ff9966); box-shadow: 0 6px 0 #cc5533, 0 8px 20px rgba(255,153,102,0.25); --tc: #3a1500; }
+.tile:nth-child(7) { background: linear-gradient(145deg, #ffaabb, #ff6688); box-shadow: 0 6px 0 #cc2244, 0 8px 20px rgba(255,102,136,0.25); --tc: #fff; }
+.tile:nth-child(8) { background: linear-gradient(145deg, #aaddff, #66bbff); box-shadow: 0 6px 0 #2277cc, 0 8px 20px rgba(102,187,255,0.25); --tc: #0a2040; }
+.tile:nth-child(9) { background: linear-gradient(145deg, #ddaaff, #bb77ff); box-shadow: 0 6px 0 #7733cc, 0 8px 20px rgba(187,119,255,0.25); --tc: #fff; }
+
+.tile:hover {
+  transform: translateY(-6px) scale(1.04) rotate(-1deg);
+  filter: brightness(1.08);
+}
+.tile:active { transform: translateY(2px) scale(0.96); box-shadow: 0 2px 0 transparent !important; }
+
+/* shine */
+.tile::before {
+  content: '';
+  position: absolute;
+  top: -50%; left: -70%;
+  width: 50%; height: 200%;
+  background: linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.5) 50%, transparent 70%);
+  transform: skewX(-15deg);
+  transition: left 0.5s ease;
+  pointer-events: none;
+  z-index: 2;
+}
+.tile:hover::before { left: 140%; }
+
+/* rounded inner highlight */
+.tile::after {
+  content: '';
+  position: absolute;
+  top: 4px; left: 8px; right: 8px;
+  height: 36%;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.3);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.tile-content {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  text-align: center;
+  padding: 0 6px;
+  width: 100%;
+}
+
+.tile-en {
+  font-family: var(--font-title);
+  font-size: clamp(13px, 2.8vw, 17px);
+  color: var(--tc, #fff);
+  text-shadow: 1px 2px 0 rgba(0,0,0,0.15);
+  line-height: 1.1;
+  letter-spacing: 0.03em;
+}
+.tile-hira {
+  font-family: var(--font-jp);
+  font-size: clamp(10px, 2vw, 13px);
+  color: var(--tc, #fff);
+  opacity: 0.9;
+  font-weight: 800;
+  line-height: 1.2;
+}
+.tile-jp {
+  font-family: var(--font-jp);
+  font-size: clamp(9px, 1.7vw, 11px);
+  color: var(--tc, #fff);
+  opacity: 0.7;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+/* ── EFFECTS ── */
+.kaboom-ring {
+  position: fixed; border-radius: 50%;
+  border: 3px solid #ff6eb4;
+  pointer-events: none; z-index: 9998; opacity: 0.9;
+  animation: ringExpand 0.55s cubic-bezier(0.2,0.8,0.4,1) forwards;
+}
+@keyframes ringExpand {
+  from { transform: translate(-50%,-50%) scale(0); opacity: 0.9; }
+  to   { transform: translate(-50%,-50%) scale(5); opacity: 0; }
+}
+.burst-dot {
+  position: fixed; border-radius: 50%;
+  pointer-events: none; z-index: 9999;
+  animation: burstFly var(--dur,0.7s) ease-out forwards;
+}
+@keyframes burstFly {
+  0%   { transform: translate(-50%,-50%) scale(1); opacity: 1; }
+  100% { transform: translate(-50%,-50%) translate(var(--bx),var(--by)) scale(0.1); opacity: 0; }
+}
+.tile.warp { animation: tileWarp 0.3s ease-out forwards; }
+@keyframes tileWarp {
+  0%  { transform: scale(1) rotate(0); }
+  45% { transform: scale(1.2) rotate(-3deg); filter: brightness(1.5); }
+  100%{ transform: scale(1) rotate(0); }
+}
+
+#swipeScreen {
+  position: fixed; inset: 0;
+  background: #fff0f8;
+  z-index: 9997;
+  transform: translateY(100%);
+  transition: transform 0.12s ease-in;
+  pointer-events: none;
+}
+#swipeScreen.go { transform: translateY(0); }
+
+@media (max-width: 500px) {
+  .grid-wrap { grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 0.7rem 0.8rem 2rem; }
+  :root { --card-h: 122px; }
 }
 </style>
 </head>
 <body>
 
-
-<div class="bg-layer">
-  <div class="bg-blob"></div><div class="bg-blob"></div>
-  <div class="bg-blob"></div><div class="bg-blob"></div>
-</div>
+<div class="cloud cloud-1"></div>
+<div class="cloud cloud-2"></div>
+<div class="cloud cloud-3"></div>
 
 <header class="header">
   <a class="close-btn" href="#" id="closeBtn" title="Back / もどる">✕</a>
-  <div class="header-inner">
-  <div class="title-rainbow">PRE-BOO GAMES</div>
-  <div class="title-jp">プレブー ゲームズ</div>
-  <p class="title-jp" id="weekLabel"></p>
-  <div class="divider"></div>
-</div>
+  <div class="title-main">PRE-BOO!</div>
+  <div class="title-sub">プレ・ブー ゲームズ</div>
+  <div class="week-pill" id="weekLabel">…</div>
 </header>
+
+<div class="wavy-divider">
+  <svg viewBox="0 0 400 20" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M0,10 C50,0 100,20 150,10 C200,0 250,20 300,10 C350,0 380,16 400,10 L400,20 L0,20 Z" fill="#ffe4f4"/>
+  </svg>
+</div>
+<div class="select-label">CHOOSE YOUR GAME!</div>
 
 <div class="grid-wrap" id="gameGrid">
   <a class="tile" href="#" data-game="vocab-tap"><div class="tile-content">
-    <div class="tile-en">Vocabulary Tap</div><div class="tile-jp">たんごをタップ</div><div class="tile-kanji">単語タップ</div>
+    <div class="tile-en">Vocabulary Tap</div>
+    <div class="tile-hira">たんごをタップ</div>
+    <div class="tile-jp">単語タップ</div>
   </div></a>
   <a class="tile" href="#" data-game="spell-word"><div class="tile-content">
-    <div class="tile-en">Spell the Word</div><div class="tile-jp">もじをならべよう</div><div class="tile-kanji">文字並べ</div>
+    <div class="tile-en">Spell the Word</div>
+    <div class="tile-hira">もじをならべよう</div>
+    <div class="tile-jp">文字並べ</div>
   </div></a>
   <a class="tile" href="#" data-game="vocab-speed"><div class="tile-content">
-    <div class="tile-en">Vocabulary Speed</div><div class="tile-jp">たんごスピード</div><div class="tile-kanji">単語速読</div>
+    <div class="tile-en">Vocab Speed</div>
+    <div class="tile-hira">たんごスピード</div>
+    <div class="tile-jp">単語速読</div>
   </div></a>
   <a class="tile" href="#" data-game="sentence-tap"><div class="tile-content">
-    <div class="tile-en">Sentences Tap</div><div class="tile-jp">ぶんをタップ</div><div class="tile-kanji">文タップ</div>
+    <div class="tile-en">Sentence Tap</div>
+    <div class="tile-hira">ぶんをタップ</div>
+    <div class="tile-jp">文タップ</div>
   </div></a>
   <a class="tile" href="#" data-game="sentence-order"><div class="tile-content">
-    <div class="tile-en">Sentence Order</div><div class="tile-jp">ぶんをならべよう</div><div class="tile-kanji">文の順番</div>
+    <div class="tile-en">Sentence Order</div>
+    <div class="tile-hira">ぶんをならべよう</div>
+    <div class="tile-jp">文の順番</div>
   </div></a>
   <a class="tile" href="#" data-game="sentence-speed"><div class="tile-content">
-    <div class="tile-en">Sentence Speed</div><div class="tile-jp">ぶんのスピード</div><div class="tile-kanji">文速読</div>
+    <div class="tile-en">Sentence Speed</div>
+    <div class="tile-hira">ぶんのスピード</div>
+    <div class="tile-jp">文速読</div>
   </div></a>
   <a class="tile" href="#" data-game="say-word"><div class="tile-content">
-    <div class="tile-en">Say the Word</div><div class="tile-jp">ことばをいおう</div><div class="tile-kanji">言葉を言おう</div>
+    <div class="tile-en">Say the Word</div>
+    <div class="tile-hira">ことばをいおう</div>
+    <div class="tile-jp">言葉を言おう</div>
   </div></a>
   <a class="tile" href="#" data-game="say-sentence"><div class="tile-content">
-    <div class="tile-en">Say the Sentence</div><div class="tile-jp">ぶんをいおう</div><div class="tile-kanji">文を言おう</div>
+    <div class="tile-en">Say the Sentence</div>
+    <div class="tile-hira">ぶんをいおう</div>
+    <div class="tile-jp">文を言おう</div>
   </div></a>
-  <a class="tile" href="#" data-game="ask-sentence"><div class="tile-content">
-    <div class="tile-en">Ask the Question</div><div class="tile-jp">しつもんしよう</div><div class="tile-kanji">質問しよう</div>
+  <a class="tile" href="#" data-game="ask-question"><div class="tile-content">
+    <div class="tile-en">Ask the Question</div>
+    <div class="tile-hira">しつもんしよう</div>
+    <div class="tile-jp">質問しよう</div>
   </div></a>
 </div>
 
 <div id="swipeScreen"></div>
 
 <script type="module">
-
 import { getWeekParam, getPageContext } from '../../js/nav.js';
 
 const week = getWeekParam();
-const ctx = getPageContext();
+const ctx  = getPageContext();
+if (!week || !ctx) { window.location.assign('../../index.html#hub'); }
 
-function getAcademicWeekFromSlug(ctx) {
-  const monthMap = {
-    jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6,
-    jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12
-  };
-  const month = monthMap[ctx.monthShort] || 1;
-  return ((month - 1) * 4) + ctx.contentWeek;
-}  
+document.getElementById('weekLabel').textContent = week;
 
-const weekLabel = document.getElementById('weekLabel');
-if (weekLabel) weekLabel.textContent = week;
-
-if (!week || !ctx) {
-  window.location.href = '../../index.html';
-}
-  
+/* sparkles */
 (function(){
-  const COLORS=['#ff6b9d','#00d4ff','#ffe94a','#a855f7','#34d399','#ff8c42','#e879f9','#38bdf8','#86efac'];
-  for(let i=0;i<55;i++){
-    const s=document.createElement('div');s.className='star';
-    s.style.left=Math.random()*100+'vw';s.style.top=Math.random()*100+'vh';
-    s.style.background=COLORS[i%COLORS.length];
-    s.style.width=s.style.height=(2+Math.random()*4)+'px';
-    s.style.setProperty('--td',(2+Math.random()*4)+'s');
-    s.style.setProperty('--td2',(Math.random()*4)+'s');
+  const C = ['#ff6eb4','#cc88ff','#88ffcc','#ffb088','#fff088','#ff8899','#88ddff'];
+  for (let i = 0; i < 20; i++) {
+    const s = document.createElement('div');
+    s.className = 'sparkle';
+    s.style.left = Math.random()*100+'vw';
+    s.style.top  = (20 + Math.random()*75)+'vh';
+    s.style.setProperty('--c',  C[i % C.length]);
+    s.style.setProperty('--st', (3+Math.random()*4)+'s');
+    s.style.setProperty('--sd', (Math.random()*5)+'s');
+    s.style.width = s.style.height = (6+Math.random()*8)+'px';
     document.body.appendChild(s);
   }
 })();
 
-const DOT_COLORS=['#ff6b9d','#00d4ff','#ffe94a','#a855f7','#34d399','#ff8c42','#e879f9','#38bdf8','#86efac'];
-function kaboom(cx,cy,ringColor){
-  const ring=document.createElement('div');
-  ring.className='kaboom-ring';
-  ring.style.cssText=`left:${cx}px;top:${cy}px;width:60px;height:60px;border-color:${ringColor||'#fff'};`;
+const DOT_C = ['#ff6eb4','#cc88ff','#44ccff','#ffcc44','#44ddaa','#ff9966','#ff6688','#66bbff','#bb77ff'];
+function kaboom(cx, cy, color) {
+  const ring = document.createElement('div');
+  ring.className = 'kaboom-ring';
+  ring.style.cssText = `left:${cx}px;top:${cy}px;width:52px;height:52px;border-color:${color};`;
   document.body.appendChild(ring);
-  ring.addEventListener('animationend',()=>ring.remove());
-  setTimeout(()=>{
-    const r2=ring.cloneNode();r2.style.borderColor='rgba(255,255,255,0.45)';
-    document.body.appendChild(r2);r2.addEventListener('animationend',()=>r2.remove());
-  },90);
-  const N=18;
-  for(let i=0;i<N;i++){
-    const a=(i/N)*Math.PI*2,d=52+Math.random()*72;
-    const dot=document.createElement('div');dot.className='burst-dot';
-    dot.style.cssText=`left:${cx}px;top:${cy}px;background:${DOT_COLORS[Math.floor(Math.random()*DOT_COLORS.length)]};`;
-    dot.style.setProperty('--bx',(Math.cos(a)*d).toFixed(1)+'px');
-    dot.style.setProperty('--by',(Math.sin(a)*d).toFixed(1)+'px');
-    dot.style.setProperty('--dur',(0.5+Math.random()*0.4)+'s');
-    document.body.appendChild(dot);dot.addEventListener('animationend',()=>dot.remove());
+  ring.addEventListener('animationend', () => ring.remove());
+  for (let i = 0; i < 16; i++) {
+    const a = (i/16)*Math.PI*2, d = 40+Math.random()*65;
+    const dot = document.createElement('div');
+    dot.className = 'burst-dot';
+    dot.style.cssText = `left:${cx}px;top:${cy}px;width:8px;height:8px;background:${DOT_C[i%DOT_C.length]};`;
+    dot.style.setProperty('--bx', (Math.cos(a)*d).toFixed(1)+'px');
+    dot.style.setProperty('--by', (Math.sin(a)*d).toFixed(1)+'px');
+    dot.style.setProperty('--dur', (0.4+Math.random()*0.4)+'s');
+    document.body.appendChild(dot);
+    dot.addEventListener('animationend', () => dot.remove());
   }
 }
 
-let locked=false;
-const swipe=document.getElementById('swipeScreen');
-  
+let locked = false;
+const swipe = document.getElementById('swipeScreen');
+const RING_C = ['#ff80c0','#aa77ff','#44ccff','#ffcc44','#44ddaa','#ff9966','#ff6688','#66bbff','#bb77ff'];
+const tiles = [...document.querySelectorAll('.tile')];
 
-// This bug: Replace buildGameHref with direct root-relative paths
-function buildGameHref(gameName) {
-  return `/the-booha-adventure/game.html?week=${encodeURIComponent(week)}&game=${encodeURIComponent(gameName)}`;
-}
-  
-
-function safeNavigate(href, cx, cy, tileEl, ringColor){
-  if (locked) return;
+document.getElementById('gameGrid').addEventListener('click', e => {
+  const tile = e.target.closest('.tile');
+  if (!tile || locked) return;
+  e.preventDefault();
   locked = true;
-
-  const finalHref = buildGameHref(tileEl.dataset.game);
-
-  tileEl.classList.add('warp');
-  kaboom(cx, cy, ringColor);
-
+  const idx = tiles.indexOf(tile);
+  const r = tile.getBoundingClientRect();
+  const cx = r.left+r.width/2, cy = r.top+r.height/2;
+  tile.classList.add('warp');
+  kaboom(cx, cy, RING_C[idx]||'#ff6eb4');
+  setTimeout(() => { document.body.style.transition='background 0.1s'; document.body.style.background='#fff'; }, 280);
+  setTimeout(() => { document.body.style.background='var(--bg)'; swipe.classList.add('go'); }, 380);
   setTimeout(() => {
-    document.body.style.transition = 'background 0.08s';
-    document.body.style.background = '#fff';
-  }, 280);
-
-  setTimeout(() => {
-    document.body.style.background = 'var(--bg)';
-    swipe.classList.add('go');
-  }, 380);
-
-  setTimeout(() => {
-    window.location.href = finalHref;
+    window.location.href = `/the-booha-adventure/game.html?week=${encodeURIComponent(week)}&game=${encodeURIComponent(tile.dataset.game)}`;
   }, 560);
-}
-
-const RING_COLORS=['#ff6b9d','#00d4ff','#ffe94a','#a855f7','#34d399','#ff8c42','#e879f9','#38bdf8','#86efac'];
-const tiles=[...document.querySelectorAll('.tile')];
-document.getElementById('gameGrid').addEventListener('click',e=>{
-  const tile=e.target.closest('.tile');
-  if(!tile||locked)return;
-  e.preventDefault();
-  const idx=tiles.indexOf(tile);
-  const r=tile.getBoundingClientRect();
-  safeNavigate(tile.dataset.game,r.left+r.width/2,r.top+r.height/2,tile,RING_COLORS[idx]||'#fff');
 });
 
-// MUSIC RESUME
-document.getElementById('closeBtn').addEventListener('click', function(e){
+document.getElementById('closeBtn').addEventListener('click', function(e) {
   e.preventDefault();
   if (locked) return;
   locked = true;
-
   const r = this.getBoundingClientRect();
-  kaboom(r.left + r.width / 2, r.top + r.height / 2, '#ff6b9d');
-
-  // Set the reopen flag so maze knows to show the popup
+  kaboom(r.left+r.width/2, r.top+r.height/2, '#ff6eb4');
   sessionStorage.setItem('booha_reopen_popup', '1');
-
   setTimeout(() => { swipe.classList.add('go'); }, 280);
-
-  // Use history.back() — keeps maze.html in bfcache, music never stopped
-  setTimeout(() => {
-    history.back();
-  }, 480);
+  setTimeout(() => { history.back(); }, 480);
 });
-  
 </script>
-  
 </body>
 </html>
