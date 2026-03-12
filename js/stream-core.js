@@ -353,6 +353,8 @@ window.addEventListener('resize', () => {
 
   const base = `/the-booha-adventure/content/${CFG.curriculum}/${CFG.monthDir}/`;
 
+ console.log('[stream-core] base:', base, 'CFG:', CFG.curriculum, CFG.monthDir);
+   
   try {
     const [vocabRes, sentRes, questRes] = await Promise.all([
       fetch(base + 'vocab.json'),
