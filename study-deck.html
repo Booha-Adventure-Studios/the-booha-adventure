@@ -186,11 +186,12 @@
   const monthFull  = MONTH_MAP[monthCode] || 'january';
 
   /* ── 6. Build DECK_CONFIG for the JS engines ── */
-  window.DECK_CONFIG = {
+ window.DECK_CONFIG = {
     // identity
     curriculum:  curriculum,
     type:        type,
-    deckMode:    typeCfg.deckMode,    // 'vocab' | 'sentence' | 'stream'
+    deckMode:    typeCfg.deckMode,
+    monthDir:    monthFull,           // ← add this line
 
     // FIX: jsonUrl now includes the month segment so both engines can use it directly
     jsonUrl:     '/the-booha-adventure/content/' + curriculum + '/' + monthFull + '/' + typeCfg.jsonFile,
