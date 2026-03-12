@@ -2,87 +2,71 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Booha Game</title>
+<meta name="theme-color" content="#081a04" />
 
-<style>
-html,body{
-  margin:0;
-  padding:0;
-  background:#000;
-  color:#fff;
-  font-family:sans-serif;
-  height:100%;
-}
+<!-- Game CSS -->
+<link rel="stylesheet" href="../../theme/game.css" />
 
-#gameContainer{
-  width:100%;
-  height:100%;
-  position:relative;
-}
-</style>
+<!-- SFX preload -->
+<link rel="preload" as="audio" href="../../assets/audio/ding.mp3" />
+<link rel="preload" as="audio" href="../../assets/audio/fart.mp3" />
 </head>
-
 <body>
 
-<div id="gameContainer"></div>
-<div id="app"></div>  
+<!-- ✕ Close button -->
+<a class="game-close" id="gameClose" href="#" title="Back / もどる">✕</a>
 
-<script type="module">
-  import { getWeekParam, getGameParam, parseWeekSlug } from "../../js/nav.js";
+<!-- Header (populated by game engines) -->
+<header class="game-header">
+  <div class="game-title" id="gameTitle">Loading…</div>
+  <div class="game-week"  id="gameWeek"  data-week-label></div>
+</header>
 
-  const app = document.getElementById("app");
+<!-- Loading state -->
+<div id="game-loading">Loading…</div>
 
-  function fail(message) {
-    app.innerHTML = `<div style="padding:24px;color:white;">${message}</div>`;
-    throw new Error(message);
+<!-- Error state (hidden until needed) -->
+<div id="game-error"></div>
+
+<!-- Game mount point — each engine renders into this -->
+<main id="game-mount"></main>
+
+<!-- iOS notice overlay (shared, engines show/hide as needed) -->
+<div id="ios-overlay" class="ios-overlay">
+  <div class="ios-dialog">
+    <div class="ios-dialog-title">iPad / iPhone をお使いの方へ</div>
+    <p id="ios-overlay-body"></p>
+    <div style="text-align:center;margin-top:14px;">
+      <button id="ios-overlay-ok" class="game-btn game-btn-gold">OK ／ はじめる</button>
+    </div>
+  </div>
+</div>
+
+<!-- Swipe-out transition screen -->
+<div id="swipe-screen"></div>
+
+<script>
+/* ── Close button: go back to game-index, keep history for music ── */
+document.getElementById('gameClose').addEventListener('click', function(e) {
+  e.preventDefault();
+  const cfg = window.GAME_CONFIG;
+  if (cfg) {
+    sessionStorage.setItem(cfg.navKey, '1');
+    window.location.assign(cfg.navTarget + '?week=' + encodeURIComponent(cfg.weekParam));
+  } else {
+    history.back();
   }
-
-  async function init() {
-    const week = getWeekParam();
-    const game = getGameParam();
-
-    if (!week) fail("Missing week parameter.");
-    if (!game) fail("Missing game parameter.");
-
-    const parsed = parseWeekSlug(week);
-    if (!parsed) fail("Invalid week format.");
-
-    const gamesPath = `../../content/${parsed.curriculum}/${parsed.monthDir}/games.json`;
-    const res = await fetch(gamesPath, { cache: "no-store" });
-
-    if (!res.ok) fail(`Could not load games.json: ${gamesPath}`);
-
-    const data = await res.json();
-    const gameConfig = (data.games || []).find(item => item.id === game);
-
-    if (!gameConfig) fail(`Game not found: ${game}`);
-
-    window.BOOHA_GAME_CONTEXT = {
-      weekId: week,
-      curriculum: parsed.curriculum,
-      monthShort: parsed.monthShort,
-      monthDir: parsed.monthDir,
-      weekNumber: parsed.weekNumber,
-      contentWeek: parsed.contentWeek,
-      gameId: gameConfig.id,
-      title: gameConfig.title,
-      engine: gameConfig.engine,
-      contentType: gameConfig.contentType,
-      contentPath: `/content/${parsed.curriculum}/${parsed.monthDir}/${gameConfig.contentType}.json`
-    };
-
-    await import(`../../games/${gameConfig.engine}.js`);
-  }
-
-  init().catch(err => {
-    console.error(err);
-    if (app) {
-      app.innerHTML = `<div style="padding:24px;color:white;">Game failed to load.</div>`;
-    }
-  });
+});
 </script>
+
+<!-- Shared utilities (must load before game-core) -->
+<script src="../../js/game-utils.js"></script>
+
+<!-- Bootstrap: reads URL params, fetches JSON, sets GAME_CONFIG, loads game engine -->
+<script src="../../js/game-core.js"></script>
 
 </body>
 </html>
