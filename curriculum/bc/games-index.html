@@ -288,8 +288,9 @@ let locked=false;
 const swipe=document.getElementById('swipeScreen');
   
 
+// This bug: Replace buildGameHref with direct root-relative paths
 function buildGameHref(gameName) {
-  return `game.html?week=${encodeURIComponent(week)}&game=${encodeURIComponent(gameName)}`;
+  return `/the-booha-adventure/game.html?week=${encodeURIComponent(week)}&game=${encodeURIComponent(gameName)}`;
 }
   
 
