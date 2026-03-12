@@ -192,10 +192,11 @@
   <div id="fade" aria-hidden="true"></div>
 </div>
 <audio id="bgMusic" src="assets/audio/sneaky.mp3" loop preload="auto"></audio>
-<script type="module">
-
-import { getCurrentCurriculumWeek, getAcademicWeekNumber } from './js/calendar.js';
-
+  
+<script src="./js/calendar.js"></script>
+<script>
+const { getCurrentCurriculumWeek, getAcademicWeekNumber } = window.CALENDAR;
+  
 const BRYAN_PASS = 'him141amra803';
 const IMG_W = 1600;
 const IMG_H = 900;
