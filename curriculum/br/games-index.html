@@ -342,9 +342,9 @@ document.getElementById('closeBtn').addEventListener('click', function(e){
 
   setTimeout(() => { swipe.classList.add('go'); }, 280);
 
-  // Use history.back() — keeps maze.html in bfcache, music never stopped
-  setTimeout(() => {
-  window.location.assign('../../index.html#hub');
+// Use history.go(-2) — skips game.html, lands on maze, keeps bfcache music
+setTimeout(() => {
+  history.go(-2);
 }, 480);
   
 </script>
