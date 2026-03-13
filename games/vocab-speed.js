@@ -20,47 +20,41 @@ await Promise.all([
   U.loadSFX('fart', CFG.sfxBase + 'fart.mp3'),
 ]);
 
-/* fire / level-4 loops — loaded as raw Audio for loop + instant stop */
-const fireAudio  = new Audio(CFG.sfxBase + 'fire.mp3');
-fireAudio.loop   = true;
-fireAudio.setAttribute('playsinline', '');
-try { fireAudio.load(); } catch {}
+/* fire sounds — one-shot per streak milestone, overlap naturally */
+/* level4.mp3 is tracked separately so it can be stopped instantly */
+let activeLvl4 = null;
 
-const lvl4Audio  = new Audio(CFG.sfxBase + 'level4.mp3');
-lvl4Audio.loop   = true;
-lvl4Audio.setAttribute('playsinline', '');
-try { lvl4Audio.load(); } catch {}
-
-let activeStreakAudio = null; /* tracks which loop is running */
-
-function startStreakAudio(level) {
-  const target = level >= 4 ? lvl4Audio : level >= 1 ? fireAudio : null;
-  if (activeStreakAudio === target) return; /* already playing correct one */
-  stopStreakAudio();
-  if (!target) return;
-  activeStreakAudio = target;
-  try { target.currentTime = 0; } catch {}
-  target.play().catch(() => {});
+function playFireSound(level) {
+  /* level4: stop any existing instance, play fresh */
+  if (level >= 4) {
+    stopLvl4();
+    const a = new Audio(CFG.sfxBase + 'level4.mp3');
+    a.setAttribute('playsinline', ''); a.loop = false;
+    a.play().catch(() => {});
+    activeLvl4 = a;
+    a.onended = () => { if (activeLvl4 === a) activeLvl4 = null; };
+    return;
+  }
+  /* levels 1-3: fire.mp3 one-shot, let overlap freely */
+  const a = new Audio(CFG.sfxBase + 'fire.mp3');
+  a.setAttribute('playsinline', ''); a.loop = false;
+  a.play().catch(() => {});
 }
 
-function stopStreakAudio() {
-  if (!activeStreakAudio) return;
-  try { activeStreakAudio.pause(); activeStreakAudio.currentTime = 0; } catch {}
-  activeStreakAudio = null;
+function stopLvl4() {
+  if (!activeLvl4) return;
+  try { activeLvl4.pause(); activeLvl4.currentTime = 0; } catch {}
+  activeLvl4 = null;
 }
 
-/* iOS audio unlock */
+/* kept as no-op alias so showResults/back calls still compile */
+function stopStreakAudio() { stopLvl4(); }
+
+/* iOS audio unlock — warms ding/fart via U.unlockAudio(); streak sounds are one-shot new Audio() so no pre-warm needed */
 let audioUnlocked = false;
 function unlockAllAudio() {
   if (audioUnlocked) return;
   audioUnlocked = true;
-  [fireAudio, lvl4Audio].forEach(a => {
-    try {
-      const p = a.play();
-      if (p && p.catch) p.catch(() => {});
-      setTimeout(() => { try { a.pause(); a.currentTime = 0; } catch {} }, 30);
-    } catch {}
-  });
 }
 document.addEventListener('touchstart', unlockAllAudio, { once: true, passive: true });
 document.addEventListener('mousedown',  unlockAllAudio, { once: true, passive: true });
@@ -92,13 +86,13 @@ const TIERS = [
 ];
 const getTier = s => TIERS.find(t => s >= t.min && s <= t.max) ?? TIERS[0];
 
-/* streak level thresholds */
+/* streak level thresholds — 3 streak=fire1, 4=fire2, 5=fire3, 6+=level4 */
 const STREAK_LEVELS = [
-  { min:0,  max:2,  level:0 },
-  { min:3,  max:5,  level:1 },
-  { min:6,  max:9,  level:2 },
-  { min:10, max:14, level:3 },
-  { min:15, max:99, level:4 },
+  { min:0, max:2, level:0 },
+  { min:3, max:3, level:1 },
+  { min:4, max:4, level:2 },
+  { min:5, max:5, level:3 },
+  { min:6, max:99, level:4 },
 ];
 function getStreakLevel(s) {
   return (STREAK_LEVELS.find(t => s >= t.min && s <= t.max) ?? STREAK_LEVELS[0]).level;
@@ -528,9 +522,10 @@ S.textContent = `
   display:flex; align-items:center; justify-content:center;
   text-align:center; padding:.9rem 1rem;
   border-radius:22px;
-  font-family:var(--game-font-title);
+  font-family:var(--game-font-body);
   font-size:clamp(18px,3vw,28px);
-  font-weight:900; line-height:1.15;
+  font-weight:700; line-height:1.15;
+  text-transform:lowercase;
   cursor:pointer; user-select:none;
   -webkit-tap-highlight-color:transparent;
   position:relative; overflow:hidden;
@@ -1354,20 +1349,15 @@ function onTimeout() {
 function updateStreakBanner() {
   const lv = getStreakLevel(streak);
 
-  /* stop level-4 audio immediately when streak drops from 4 */
-  if (lv < 4 && lastLevel >= 4) {
-    try { lvl4Audio.pause(); lvl4Audio.currentTime = 0; } catch {}
-    if (activeStreakAudio === lvl4Audio) activeStreakAudio = null;
+  /* stop level-4 immediately when streak drops below 4 */
+  if (lv < 4 && lastLevel >= 4) stopLvl4();
+
+  /* fire one-shot sound only when crossing into a new higher level */
+  if (lv > 0 && lv > lastLevel) {
+    playFireSound(lv);
   }
 
-  /* manage audio */
-  if (lv === 0) {
-    stopStreakAudio();
-  } else {
-    startStreakAudio(lv);
-  }
-
-  /* hide banner if no streak */
+  /* hide banner on zero streak */
   if (lv === 0) {
     streakBanner.classList.remove('show');
     streakBanner.className = 'vs-streak-banner';
@@ -1375,7 +1365,7 @@ function updateStreakBanner() {
     return;
   }
 
-  /* show / update banner */
+  /* update banner text */
   const msg = STREAK_MSG[lv];
   bannerEn.textContent    = msg.en;
   bannerJp.textContent    = msg.jp;
