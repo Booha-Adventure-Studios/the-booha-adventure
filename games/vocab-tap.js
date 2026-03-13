@@ -183,6 +183,31 @@ S.textContent = `
   background-clip:text;
   animation:vtRainbowShift 3s linear infinite;
 }
+
+/* BC — cold cyan label */
+[data-curriculum="bc"] .vt-curriculum{
+  background:linear-gradient(90deg,#00f0ff,#4455ff,#aa00ff,#00f0ff);
+  background-size:220% auto;
+  -webkit-background-clip:text;
+  background-clip:text;
+}
+/* PB — warm pink label */
+[data-curriculum="pb"] .vt-curriculum{
+  background:linear-gradient(90deg,#ff6eb4,#cc88ff,#44ccff,#ffcc44,#ff6eb4);
+  background-size:220% auto;
+  -webkit-background-clip:text;
+  background-clip:text;
+}
+/* PB date text — dark for light background */
+[data-curriculum="pb"] .vt-date{ color:rgba(58,26,46,.55); }
+/* PB score pill — white card */
+[data-curriculum="pb"] .vt-score-pill{
+  background:#fff;
+  border-color:#ffb0d8;
+  color:#2a1020;
+  box-shadow:0 3px 0 #ffccdd;
+}
+[data-curriculum="pb"] .vt-score-pill b{ text-shadow:none; }
 @keyframes vtRainbowShift{ to{ background-position:220% center; } }
 
 /* hide any pre-existing game-header from the page shell */
@@ -446,57 +471,195 @@ S.textContent = `
   transition:opacity .22s, transform .22s;
 }
 
-/* ── BR: warm electric green/yellow tiles ── */
+/* ══════════════════════════════════════════════════════════════
+   BR — each card is a vivid solid color, like the menu tiles.
+   5 bold colors cycling: green, magenta, teal, amber, pink.
+   ══════════════════════════════════════════════════════════════ */
 [data-curriculum="br"] .vt-en-card{
-  background:
-    linear-gradient(135deg, rgba(170,255,34,.18), rgba(255,204,0,.12)),
-    linear-gradient(145deg, rgba(255,255,255,.16) 0%, rgba(0,0,0,.06) 100%);
-  border-color:rgba(170,255,34,.28);
+  filter:none;
+  /* solid tile color set by --br-card-bg, defaulting to green */
+  background:var(--br-card-bg, linear-gradient(145deg,#1a4a00,#2d7a00));
+  border-color:var(--br-card-border, rgba(170,255,34,.5));
+  box-shadow:
+    0 6px 0 var(--br-card-shadow, rgba(0,0,0,.4)),
+    0 10px 24px rgba(0,0,0,.4),
+    inset 0 1px 0 rgba(255,255,255,.18);
+}
+[data-curriculum="br"] .vt-en-card .vt-en-text{
+  color:#fff;
+  text-shadow:0 1px 3px rgba(0,0,0,.5);
+}
+/* card 0: electric green */
+[data-curriculum="br"] .vt-en-card[data-ci="0"]{
+  --br-card-bg: linear-gradient(145deg,#1e5c00,#2e8800);
+  --br-card-border: rgba(170,255,34,.55);
+  --br-card-shadow: rgba(20,80,0,.6);
+}
+/* card 1: magenta / pink */
+[data-curriculum="br"] .vt-en-card[data-ci="1"]{
+  --br-card-bg: linear-gradient(145deg,#6a003a,#a0005a);
+  --br-card-border: rgba(255,60,160,.55);
+  --br-card-shadow: rgba(100,0,50,.6);
+}
+/* card 2: deep teal */
+[data-curriculum="br"] .vt-en-card[data-ci="2"]{
+  --br-card-bg: linear-gradient(145deg,#003a44,#005566);
+  --br-card-border: rgba(0,200,220,.5);
+  --br-card-shadow: rgba(0,50,60,.6);
+}
+/* card 3: warm amber/olive */
+[data-curriculum="br"] .vt-en-card[data-ci="3"]{
+  --br-card-bg: linear-gradient(145deg,#4a3000,#704800);
+  --br-card-border: rgba(255,180,0,.5);
+  --br-card-shadow: rgba(60,30,0,.6);
+}
+/* card 4: violet / purple */
+[data-curriculum="br"] .vt-en-card[data-ci="4"]{
+  --br-card-bg: linear-gradient(145deg,#2a0060,#440090);
+  --br-card-border: rgba(180,100,255,.55);
+  --br-card-shadow: rgba(30,0,80,.6);
+}
+[data-curriculum="br"] .vt-en-card:hover{
+  transform:translateY(-4px) scale(1.035);
+  filter:brightness(1.12);
 }
 [data-curriculum="br"] .vt-en-card.selected{
-  border-color:#aaff22;
-  background:linear-gradient(135deg, rgba(170,255,34,.24), rgba(255,204,0,.16));
+  filter:brightness(1.18);
+  transform:translateY(-3px) scale(1.04);
+  box-shadow:
+    0 0 0 3px var(--br-card-border, rgba(170,255,34,.5)),
+    0 0 28px var(--br-card-border, rgba(170,255,34,.4)),
+    0 6px 0 var(--br-card-shadow, rgba(0,0,0,.4));
 }
+[data-curriculum="br"] .vt-en-card.selected .vt-en-text{ color:#fff; }
 
-/* ── BC: cold blue/cyan tiles ── */
+/* ══════════════════════════════════════════════════════════════
+   BC — very dark cards with glowing neon borders, per menu.
+   5 hues: cyan, teal-green, purple, amber, blue.
+   ══════════════════════════════════════════════════════════════ */
 [data-curriculum="bc"] .vt-en-card{
-  background:
-    linear-gradient(135deg, rgba(0,240,255,.14), rgba(68,85,255,.16)),
-    linear-gradient(145deg, rgba(255,255,255,.10) 0%, rgba(0,0,0,.10) 100%);
-  border-color:rgba(0,240,255,.22);
-  filter:none; /* override hue-rotate — bc has its own palette */
+  filter:none;
+  background:var(--bc-card-bg, linear-gradient(145deg,#040d1a,#071428));
+  border:2px solid var(--bc-card-border, rgba(0,240,255,.45));
+  box-shadow:
+    0 0 14px var(--bc-card-glow, rgba(0,240,255,.2)),
+    0 6px 20px rgba(0,0,0,.5),
+    inset 0 1px 0 rgba(255,255,255,.07);
 }
 [data-curriculum="bc"] .vt-en-card .vt-en-text{
   color:#ecfeff;
-  text-shadow:0 0 12px rgba(0,240,255,.35), 0 1px 0 rgba(0,0,0,.4);
+  text-shadow:0 0 10px var(--bc-card-border, rgba(0,240,255,.4));
+}
+/* card 0: cyan */
+[data-curriculum="bc"] .vt-en-card[data-ci="0"]{
+  --bc-card-bg: linear-gradient(145deg,#041820,#062430);
+  --bc-card-border: rgba(0,230,255,.55);
+  --bc-card-glow: rgba(0,230,255,.22);
+}
+/* card 1: teal-green */
+[data-curriculum="bc"] .vt-en-card[data-ci="1"]{
+  --bc-card-bg: linear-gradient(145deg,#04201a,#063028);
+  --bc-card-border: rgba(0,220,160,.5);
+  --bc-card-glow: rgba(0,220,160,.18);
+}
+/* card 2: purple */
+[data-curriculum="bc"] .vt-en-card[data-ci="2"]{
+  --bc-card-bg: linear-gradient(145deg,#180828,#24103a);
+  --bc-card-border: rgba(170,80,255,.55);
+  --bc-card-glow: rgba(170,80,255,.22);
+}
+/* card 3: amber */
+[data-curriculum="bc"] .vt-en-card[data-ci="3"]{
+  --bc-card-bg: linear-gradient(145deg,#201200,#301a00);
+  --bc-card-border: rgba(255,170,0,.5);
+  --bc-card-glow: rgba(255,170,0,.18);
+}
+/* card 4: deep blue */
+[data-curriculum="bc"] .vt-en-card[data-ci="4"]{
+  --bc-card-bg: linear-gradient(145deg,#060a20,#0a1238);
+  --bc-card-border: rgba(80,120,255,.55);
+  --bc-card-glow: rgba(80,120,255,.22);
+}
+[data-curriculum="bc"] .vt-en-card:hover{
+  transform:translateY(-4px) scale(1.035);
+  box-shadow:
+    0 0 24px var(--bc-card-glow, rgba(0,240,255,.3)),
+    0 10px 28px rgba(0,0,0,.55),
+    inset 0 1px 0 rgba(255,255,255,.09);
+  border-color:var(--bc-card-border, rgba(0,240,255,.7));
 }
 [data-curriculum="bc"] .vt-en-card.selected{
-  border-color:#00f0ff;
-  background:linear-gradient(135deg, rgba(0,240,255,.22), rgba(68,85,255,.18));
-  box-shadow:0 0 0 3px rgba(0,240,255,.3), 0 0 28px rgba(0,240,255,.4), 0 8px 24px rgba(0,0,0,.4);
+  transform:translateY(-3px) scale(1.04);
+  border-color:var(--bc-card-border, rgba(0,240,255,.9));
+  box-shadow:
+    0 0 0 3px var(--bc-card-glow, rgba(0,240,255,.25)),
+    0 0 32px var(--bc-card-glow, rgba(0,240,255,.3)),
+    0 8px 24px rgba(0,0,0,.5);
+  background:var(--bc-card-bg);
+  filter:brightness(1.3);
 }
 [data-curriculum="bc"] .vt-en-card.selected .vt-en-text{
-  color:#00f0ff;
+  color:#fff;
+  text-shadow:0 0 14px var(--bc-card-border, rgba(0,240,255,.6));
 }
 
-/* ── PB: white pastel tiles (existing feel, tweak text) ── */
+/* ══════════════════════════════════════════════════════════════
+   PB — white cards with thick colored pastel borders, per menu.
+   5 pastel border colors cycling.
+   ══════════════════════════════════════════════════════════════ */
 [data-curriculum="pb"] .vt-en-card{
   filter:none;
-  background:
-    linear-gradient(135deg, rgba(255,110,180,.14), rgba(204,136,255,.12)),
-    linear-gradient(145deg, rgba(255,255,255,.85) 0%, rgba(255,220,240,.6) 100%);
-  border-color:rgba(255,110,180,.3);
+  background:#ffffff;
+  border:3px solid var(--pb-card-border, #ff88bb);
+  box-shadow:
+    0 5px 0 var(--pb-card-shadow, #ffb0d0),
+    0 8px 20px rgba(255,110,180,.15);
 }
 [data-curriculum="pb"] .vt-en-card .vt-en-text{
-  color:#3a1a2e;
+  color:#2a1020;
   text-shadow:none;
 }
+/* card 0: pink */
+[data-curriculum="pb"] .vt-en-card[data-ci="0"]{
+  --pb-card-border: #ff6eb4;
+  --pb-card-shadow: #ffb0d8;
+}
+/* card 1: purple */
+[data-curriculum="pb"] .vt-en-card[data-ci="1"]{
+  --pb-card-border: #cc88ff;
+  --pb-card-shadow: #ddb8ff;
+}
+/* card 2: sky blue */
+[data-curriculum="pb"] .vt-en-card[data-ci="2"]{
+  --pb-card-border: #44ccff;
+  --pb-card-shadow: #99e8ff;
+}
+/* card 3: yellow */
+[data-curriculum="pb"] .vt-en-card[data-ci="3"]{
+  --pb-card-border: #ffcc44;
+  --pb-card-shadow: #ffe088;
+}
+/* card 4: mint/green */
+[data-curriculum="pb"] .vt-en-card[data-ci="4"]{
+  --pb-card-border: #44ddaa;
+  --pb-card-shadow: #88eedd;
+}
+[data-curriculum="pb"] .vt-en-card:hover{
+  transform:translateY(-4px) scale(1.035);
+  box-shadow:
+    0 7px 0 var(--pb-card-shadow, #ffb0d8),
+    0 12px 24px rgba(0,0,0,.12);
+}
 [data-curriculum="pb"] .vt-en-card.selected{
-  border-color:#ff6eb4;
-  background:linear-gradient(135deg, rgba(255,110,180,.22), rgba(204,136,255,.18));
+  transform:translateY(-2px) scale(1.03);
+  box-shadow:
+    0 0 0 3px var(--pb-card-border, #ff88bb),
+    0 5px 0 var(--pb-card-shadow, #ffb0d0),
+    0 8px 20px rgba(0,0,0,.12);
+  background:#fff8fc;
 }
 [data-curriculum="pb"] .vt-en-card.selected .vt-en-text{
-  color:#c4006a;
+  color:var(--pb-card-border, #ff6eb4);
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -521,6 +684,50 @@ S.textContent = `
   overflow:hidden;
 }
 .vt-jp-slot:hover{ border-color:var(--game-primary); }
+
+/* BR JP slots — dark with warm tint */
+[data-curriculum="br"] .vt-jp-slot{
+  background:linear-gradient(160deg,rgba(170,255,34,.06),rgba(0,0,0,.15));
+  border-color:rgba(170,255,34,.2);
+}
+[data-curriculum="br"] .vt-jp-slot:hover{ border-color:rgba(170,255,34,.55); }
+[data-curriculum="br"] .vt-jp-slot.has-pair{
+  border-color:#22ddff;
+  background:rgba(0,200,220,.08);
+  box-shadow:0 0 0 2px rgba(0,200,220,.18), 0 0 16px rgba(0,200,220,.25);
+}
+[data-curriculum="br"] .vt-drop.filled{ color:#22ddff; border-color:rgba(0,200,220,.4); background:rgba(0,200,220,.08); }
+
+/* BC JP slots — very dark with cyan dashes */
+[data-curriculum="bc"] .vt-jp-slot{
+  background:linear-gradient(160deg,rgba(0,240,255,.05),rgba(0,0,0,.25));
+  border-color:rgba(0,240,255,.18);
+}
+[data-curriculum="bc"] .vt-jp-slot:hover{ border-color:rgba(0,240,255,.5); }
+[data-curriculum="bc"] .vt-jp-slot.has-pair{
+  border-color:#00f0ff;
+  background:rgba(0,240,255,.07);
+  box-shadow:0 0 0 2px rgba(0,240,255,.15), 0 0 18px rgba(0,240,255,.2);
+}
+[data-curriculum="bc"] .vt-drop.filled{ color:#00f0ff; border-color:rgba(0,240,255,.4); background:rgba(0,240,255,.07); }
+
+/* PB JP slots — white card with pink dash border */
+[data-curriculum="pb"] .vt-jp-slot{
+  background:#ffffff;
+  border:2px dashed rgba(255,110,180,.35);
+  box-shadow:0 3px 12px rgba(255,110,180,.08);
+}
+[data-curriculum="pb"] .vt-jp-slot:hover{ border-color:#ff6eb4; }
+[data-curriculum="pb"] .vt-jp-slot.has-pair{
+  border-style:solid;
+  border-color:#cc88ff;
+  background:#fdf5ff;
+  box-shadow:0 0 0 2px rgba(204,136,255,.2), 0 4px 0 #ddb8ff;
+}
+[data-curriculum="pb"] .vt-drop.empty{ border-color:rgba(255,110,180,.2); color:rgba(58,26,46,.25); }
+[data-curriculum="pb"] .vt-drop.filled{ color:#aa44cc; border-color:rgba(204,136,255,.5); background:rgba(204,136,255,.1); }
+[data-curriculum="pb"] .vt-jp-kanji,
+[data-curriculum="pb"] .vt-jp-hira-text{ color:#2a1020; }
 
 /* jp text toggle area */
 .vt-jp-word-wrap{
@@ -579,10 +786,6 @@ body.hira-mode .vt-jp-hira-text{
   border:2px dashed rgba(255,255,255,.15);
   color:rgba(255,255,255,.22);
   letter-spacing:.06em;
-}
-[data-curriculum="pb"] .vt-drop.empty{
-  border-color:rgba(255,110,180,.2);
-  color:rgba(58,26,46,.28);
 }
 
 .vt-jp-slot.has-pair{
@@ -1272,6 +1475,7 @@ function renderEnBank() {
       btn = document.createElement('button');
       btn.type = 'button';
       btn.id   = domId;
+      btn.setAttribute('data-ci', idx);
       btn.style.setProperty('--i', idx);
       btn.innerHTML = `<div class="vt-card-inner"><div class="vt-en-text">${card.en}</div></div>`;
 
