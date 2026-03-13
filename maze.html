@@ -111,7 +111,118 @@
     #cpCloseBtn:active{ transform:scale(.95); }
     #fade{ position:fixed; inset:0; background:#000; opacity:0; pointer-events:none; transition:opacity 520ms ease; z-index:200; }
     #fade.on{ opacity:1; }
-    @media (prefers-reduced-motion:reduce){ #startGhost{ animation:none; } .rotateIcon{ animation:none; transform:rotate(-90deg); } #fade{ transition:none; } .sp{ animation:none; opacity:.6; } }
+
+        #hwPromptScrim{
+      position:fixed; inset:0; z-index:210;
+      background:rgba(0,0,0,.48);
+      backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px);
+      display:none;
+    }
+    #hwPromptScrim.show{ display:block; }
+
+    #hwPrompt{
+      position:fixed; left:50%; top:50%; transform:translate(-50%,-50%);
+      z-index:215;
+      min-width:260px; max-width:360px; width:min(92vw,360px);
+      background:linear-gradient(150deg,rgba(8,3,26,.98) 0%,rgba(3,8,34,.98) 100%);
+      border-radius:24px;
+      padding:22px 24px 20px;
+      backdrop-filter:blur(28px); -webkit-backdrop-filter:blur(28px);
+      text-align:center;
+      border:1px solid rgba(255,255,255,.12);
+      box-shadow:0 0 0 1px rgba(255,255,255,.05),0 32px 90px rgba(0,0,0,.85),0 0 80px rgba(160,60,255,.14), inset 0 1px 0 rgba(255,255,255,.10);
+      display:none;
+      pointer-events:auto;
+    }
+    #hwPrompt.show{ display:block; animation:popIn 300ms cubic-bezier(.34,1.46,.64,1) both; }
+
+    #hwPromptBar{
+      height:3px; border-radius:999px; margin:0 auto 16px; width:55%; opacity:.92;
+      background:linear-gradient(90deg,#ffe066,#ffbb33);
+      box-shadow:0 0 14px #ffe06688,0 0 28px #ffbb3355;
+    }
+
+    .hw-week-label{
+      font-family:'Bowlby One',sans-serif;
+      font-size:clamp(9px,1.5vw,11px);
+      letter-spacing:2px;
+      text-transform:uppercase;
+      color:rgba(255,255,255,.38);
+      margin:0 0 3px;
+    }
+
+    #hwPromptTitle{
+      font-family:'Bowlby One',sans-serif;
+      font-size:clamp(18px,3vw,26px);
+      letter-spacing:.5px;
+      margin:0 0 8px;
+      color:#fff;
+      line-height:1.3;
+    }
+
+    #hwPromptSub{
+      font-size:clamp(11px,1.8vw,14px);
+      font-weight:700;
+      color:rgba(255,255,255,.55);
+      margin:0 0 16px;
+      letter-spacing:.3px;
+      line-height:1.5;
+    }
+
+    .hw-actions{
+      display:flex;
+      justify-content:center;
+      gap:12px;
+    }
+
+    #hwNoBtn,#hwYesBtn{
+      appearance:none; border:0; border-radius:999px;
+      padding:10px 24px;
+      font-size:13px; font-weight:900;
+      cursor:pointer;
+      transition:transform 100ms;
+    }
+    #hwNoBtn{
+      color:#fff;
+      background:rgba(255,255,255,.12);
+      box-shadow:0 4px 12px rgba(0,0,0,.25);
+    }
+    #hwYesBtn{
+      color:#000;
+      background:linear-gradient(180deg,#ffe066,#ffbb33);
+      box-shadow:0 4px 18px rgba(255,187,51,.35),0 0 28px rgba(255,187,51,.18);
+    }
+    #hwNoBtn:active,#hwYesBtn:active{ transform:scale(.95); }
+
+    #hwVideoWrap{
+      position:fixed; inset:0;
+      display:none;
+      background:#000;
+      z-index:220;
+      opacity:0;
+      transition:opacity 420ms ease;
+    }
+    #hwVideoWrap.show{
+      display:block;
+      opacity:1;
+    }
+
+    #hwTreeVideo{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      background:#000;
+      display:block;
+    }
+
+     @media (prefers-reduced-motion:reduce){
+      #startGhost{ animation:none; }
+      .rotateIcon{ animation:none; transform:rotate(-90deg); }
+      #fade{ transition:none; }
+      #hwVideoWrap{ transition:none; }
+      .sp{ animation:none; opacity:.6; }
+    }
+    
   </style>
 </head>
 <body>
@@ -190,6 +301,25 @@
     <button id="cpCloseBtn" type="button">とじる ✕</button>
   </div>
   <div id="fade" aria-hidden="true"></div>
+
+    <div id="hwPromptScrim"></div>
+  <div id="hwPrompt" role="dialog" aria-modal="true" aria-labelledby="hwPromptTitle">
+    <div id="hwPromptBar"></div>
+    <p class="hw-week-label">しゅくだい</p>
+    <h2 id="hwPromptTitle">しゅくだいの木に はいりますか？</h2>
+    <p id="hwPromptSub">Homework Tree に いきますか？</p>
+    <div class="hw-actions">
+      <button id="hwNoBtn" type="button">いいえ</button>
+      <button id="hwYesBtn" type="button">はい</button>
+    </div>
+  </div>
+
+  <div id="hwVideoWrap" aria-hidden="true">
+    <video id="hwTreeVideo" preload="auto" playsinline webkit-playsinline>
+      <source src="assets/video/homework.mp4" type="video/mp4" />
+    </video>
+  </div>
+  
 </div>
 <audio id="bgMusic" src="assets/audio/sneaky.mp3" loop preload="auto"></audio>
   
@@ -301,7 +431,16 @@ const app=document.getElementById('app'),rotateOverlay=document.getElementById('
   cpCloseBtn=document.getElementById('cpCloseBtn'),cpWeekBadge=document.getElementById('cpWeekBadge'),
   cpWeekLabel=document.getElementById('cpWeekLabel'),
   iconPreBoo=document.getElementById('iconPreBoo'),iconBooTree=document.getElementById('iconBooTree'),
-  iconContTree=document.getElementById('iconContTree');
+  iconPreBoo=document.getElementById('iconPreBoo'),iconBooTree=document.getElementById('iconBooTree'),
+  iconContTree=document.getElementById('iconContTree'),
+  hwPromptScrim=document.getElementById('hwPromptScrim'),
+  hwPrompt=document.getElementById('hwPrompt'),
+  hwNoBtn=document.getElementById('hwNoBtn'),
+  hwYesBtn=document.getElementById('hwYesBtn'),
+  hwVideoWrap=document.getElementById('hwVideoWrap'),
+  hwTreeVideo=document.getElementById('hwTreeVideo');
+
+  
 const FADE_MS=520;
 
 // Canvas
@@ -432,7 +571,10 @@ function restoreMazeFromCheckpoint(){
   ghostIX=cp.ix;ghostIY=cp.iy;ghostSrcIX=cp.ix;ghostSrcIY=cp.iy;ghostDstIX=cp.ix;ghostDstIY=cp.iy;ghostT=1;pendingPopupCP=null;
   
   overlay1.classList.add('hidden','gone');overlay2.classList.remove('show');overlay2.classList.add('hidden','gone');
+  
   videoWrap.classList.remove('show');cpPopup.classList.remove('show');cpScrim.classList.remove('show');
+  hwPrompt.classList.remove('show');hwPromptScrim.classList.remove('show');hwVideoWrap.classList.remove('show');
+  
   app.classList.remove('inTransition');
   karasukiLastSwap=performance.now();
   
@@ -879,24 +1021,55 @@ function hitTest(clientX,clientY){
   return best;
 }
 
+  function hitHomeworkTree(clientX,clientY){
+  const rect=canvas.getBoundingClientRect();
+  const cx=clientX-rect.left,cy=clientY-rect.top;
+  const {ix,iy}=cssToImg(cx,cy);
+  const d = Math.hypot(ix-979, iy-305);
+  return d < 52;
+}
+
 canvas.addEventListener('click',e=>{
   if(!mazeStarted||ghostLocked)return;
   if(['allGlow','dropping','hovering','settling'].includes(introPhase))return;
+
+  if(hitHomeworkTree(e.clientX,e.clientY)){
+    showHomeworkPrompt();
+    return;
+  }
+
   if(bryanOn){
     const rect=canvas.getBoundingClientRect();const{ix,iy}=cssToImg(e.clientX-rect.left,e.clientY-rect.top);
     coordText.textContent=`x: ${ix}  y: ${iy}`;
     copyText(`${ix},${iy}`).then(ok=>{if(ok){coordPill.style.transform='scale(1.04)';setTimeout(()=>coordPill.style.transform='',130);}});
   }
-  const cp=hitTest(e.clientX,e.clientY);if(cp)startGhostTravel(cp);
+
+  const cp=hitTest(e.clientX,e.clientY);
+  if(cp)startGhostTravel(cp);
 });
+
+  
 
 canvas.addEventListener('touchend',e=>{
   if(!mazeStarted||ghostLocked)return;
   if(['allGlow','dropping','hovering','settling'].includes(introPhase))return;
   if(!e.changedTouches.length)return;
-  const t0=e.changedTouches[0];const cp=hitTest(t0.clientX,t0.clientY);
-  if(cp){startGhostTravel(cp);e.preventDefault();}
+
+  const t0=e.changedTouches[0];
+
+  if(hitHomeworkTree(t0.clientX,t0.clientY)){
+    showHomeworkPrompt();
+    e.preventDefault();
+    return;
+  }
+
+  const cp=hitTest(t0.clientX,t0.clientY);
+  if(cp){
+    startGhostTravel(cp);
+    e.preventDefault();
+  }
 },{passive:false});
+  
 
 canvas.addEventListener('mousemove',e=>{
   if(!bryanOn)return;
@@ -933,7 +1106,50 @@ function showPopupAtCP(cp){
 
 function closePopup(){cpPopup.classList.remove('show');cpScrim.classList.remove('show');}
 cpCloseBtn.addEventListener('click',closePopup);cpScrim.addEventListener('click',closePopup);
-  
+
+  function showHomeworkPrompt(){
+  hwPromptScrim.classList.add('show');
+  hwPrompt.classList.add('show');
+}
+
+function closeHomeworkPrompt(){
+  hwPrompt.classList.remove('show');
+  hwPromptScrim.classList.remove('show');
+}
+
+function playHomeworkVideoAndGo(){
+  closeHomeworkPrompt();
+  hwVideoWrap.classList.add('show');
+
+  try{ hwTreeVideo.currentTime = 0; }catch(e){}
+
+  let left = false;
+  function leaveNow(){
+    if(left) return;
+    left = true;
+    hwVideoWrap.classList.remove('show');
+    setTimeout(()=>{
+      window.location.href = 'homework.html';
+    }, 420);
+  }
+
+  hwTreeVideo.onended = leaveNow;
+  hwTreeVideo.onerror = leaveNow;
+  hwTreeVideo.ontimeupdate = () => {
+    const d = hwTreeVideo.duration;
+    if(!isFinite(d) || d <= 0) return;
+    if(d - hwTreeVideo.currentTime <= 0.5) leaveNow();
+  };
+
+  const p = hwTreeVideo.play();
+  if(p && p.catch){
+    p.catch(()=>leaveNow());
+  }
+}
+
+hwPromptScrim.addEventListener('click',closeHomeworkPrompt);
+hwNoBtn.addEventListener('click',closeHomeworkPrompt);
+hwYesBtn.addEventListener('click',playHomeworkVideoAndGo);
 
 iconPreBoo.addEventListener('click',()=>{
   if(ghostLocked)return;
@@ -1064,7 +1280,10 @@ backBtn.addEventListener('click',()=>{
   fadeOut();setTimeout(()=>goToHub(),FADE_MS);
 });
 
-function fadeOut(){fade.classList.add('on');}
+function fadeOut(){
+  closeHomeworkPrompt();
+  fade.classList.add('on');
+}
 
 document.addEventListener('visibilitychange',()=>{
   if(document.hidden){
@@ -1106,6 +1325,11 @@ window.addEventListener('pageshow', (e) => {
   
   // Clear the black fade overlay in case it was left on
   fade.classList.remove('on');
+  hwPrompt.classList.remove('show');
+  hwPromptScrim.classList.remove('show');
+  hwVideoWrap.classList.remove('show');
+
+  
 });
   
 </script>
