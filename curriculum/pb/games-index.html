@@ -420,7 +420,31 @@ const week = getWeekParam();
 const ctx  = getPageContext();
 if (!week || !ctx) { window.location.assign('../../index.html#hub'); }
 
-document.getElementById('weekLabel').textContent = week;
+function formatWeekLabel(id) {
+  const parts = id.split('_');
+
+  const monthMap = {
+    jan:"January",
+    feb:"February",
+    mar:"March",
+    apr:"April",
+    may:"May",
+    jun:"June",
+    jul:"July",
+    aug:"August",
+    sep:"September",
+    oct:"October",
+    nov:"November",
+    dec:"December"
+  };
+
+  const month = monthMap[parts[1]] || parts[1];
+  const week  = (parts[2] || "").replace('w','');
+
+  return `${month} Week ${week}`;
+}  
+
+document.getElementById('weekLabel').textContent = formatWeekLabel(week);
 
 /* sparkles */
 (function(){
