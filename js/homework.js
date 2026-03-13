@@ -277,10 +277,9 @@ async function renderSheet(week,curr,type,hideKnown){
 
     const n=i+1;
 
-    if(hideKnown && known.has(n)) return;
-
+  
     const el=document.createElement("div");
-    el.className="hw-item";
+    el.className = "hw-item" + ((hideKnown && known.has(n)) ? " hidden-known" : "");
 
         el.innerHTML=`
     <div class="hw-top">
