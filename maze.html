@@ -1175,7 +1175,7 @@ function playHomeworkVideoAndGo(){
   hwTreeVideo.ontimeupdate = () => {
     const d = hwTreeVideo.duration;
     if(!isFinite(d) || d <= 0) return;
-    if(d - hwTreeVideo.currentTime <= 0.7) leaveNow();
+    if(d - hwTreeVideo.currentTime <= 1.0) leaveNow();
   };
 
   const p = hwTreeVideo.play();
