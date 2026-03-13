@@ -304,16 +304,6 @@ S.textContent = `
   border-color:rgba(170,80,255,.14);
   box-shadow:0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(170,80,255,.06);
 }
-.st-panel-label{
-  text-align:center;
-  margin-bottom:12px;
-  font-family:var(--game-font-title);
-  font-size:clamp(10px,1.8vw,13px);
-  letter-spacing:.2em;
-  text-transform:uppercase;
-  color:var(--game-primary);
-  opacity:.8;
-}
 
 .st-stack{
   display:grid;
@@ -329,8 +319,8 @@ S.textContent = `
   position:relative;
   overflow:hidden;
   border-radius:20px;
-  padding:12px 14px;
-  min-height:80px;
+  padding:11px 13px;
+  min-height:110px;
 
   background:
     linear-gradient(135deg,
@@ -1087,11 +1077,9 @@ U.mount(`
 
   <div class="st-columns" id="st-game">
     <div class="st-panel">
-      <div class="st-panel-label">English</div>
       <div class="st-stack" id="st-en-bank"></div>
     </div>
     <div class="st-panel">
-      <div class="st-panel-label">日本語</div>
       <div class="st-stack" id="st-jp-slots"></div>
     </div>
   </div>
