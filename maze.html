@@ -112,7 +112,7 @@
     #fade{ position:fixed; inset:0; background:#000; opacity:0; pointer-events:none; transition:opacity 520ms ease; z-index:200; }
     #fade.on{ opacity:1; }
 
-        #hwPromptScrim{
+      #hwPromptScrim{
       position:fixed; inset:0; z-index:210;
       background:rgba(0,0,0,.48);
       backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px);
@@ -182,35 +182,41 @@
       cursor:pointer;
       transition:transform 100ms;
     }
+
+    
     #hwNoBtn{
       color:#fff;
       background:rgba(255,255,255,.12);
       box-shadow:0 4px 12px rgba(0,0,0,.25);
     }
-    #hwYesBtn{
-      color:#000;
-      background:linear-gradient(180deg,#ffe066,#ffbb33);
-      box-shadow:0 4px 18px rgba(255,187,51,.35),0 0 28px rgba(255,187,51,.18);
-    }
-    #hwNoBtn:active,#hwYesBtn:active{ transform:scale(.95); }
 
-    #hwVideoWrap{
-      position:fixed; inset:0;
-      display:none;
-      background:#000;
+    
+        #hwVideoWrap{
+      position:fixed;
+      inset:0;
       z-index:220;
+      background:
+        linear-gradient(rgba(0,0,0,.10),rgba(0,0,0,.22)),
+        #000;
       opacity:0;
-      transition:opacity 420ms ease;
+      pointer-events:none;
+      visibility:hidden;
+      transition:opacity 520ms ease, visibility 0s linear 520ms;
     }
     #hwVideoWrap.show{
-      display:block;
       opacity:1;
+      visibility:visible;
+      pointer-events:auto;
+      transition:opacity 520ms ease;
     }
 
     #hwTreeVideo{
+      position:absolute;
+      inset:0;
       width:100%;
       height:100%;
       object-fit:cover;
+      object-position:center center;
       background:#000;
       display:block;
     }
@@ -1118,18 +1124,26 @@ function closeHomeworkPrompt(){
 
 function playHomeworkVideoAndGo(){
   closeHomeworkPrompt();
-  hwVideoWrap.classList.add('show');
 
+  try{ bgMusic.pause(); }catch(e){}
+  try{ hwTreeVideo.pause(); }catch(e){}
   try{ hwTreeVideo.currentTime = 0; }catch(e){}
 
+  hwVideoWrap.classList.remove('hidden');
+  void hwVideoWrap.offsetWidth;
+  hwVideoWrap.classList.add('show');
+
   let left = false;
+
   function leaveNow(){
     if(left) return;
     left = true;
+
     hwVideoWrap.classList.remove('show');
+
     setTimeout(()=>{
       window.location.href = 'homework.html';
-    }, 420);
+    }, 520);
   }
 
   hwTreeVideo.onended = leaveNow;
@@ -1137,14 +1151,13 @@ function playHomeworkVideoAndGo(){
   hwTreeVideo.ontimeupdate = () => {
     const d = hwTreeVideo.duration;
     if(!isFinite(d) || d <= 0) return;
-    if(d - hwTreeVideo.currentTime <= 0.5) leaveNow();
+    if(d - hwTreeVideo.currentTime <= 0.7) leaveNow();
   };
 
   const p = hwTreeVideo.play();
-  if(p && p.catch){
-    p.catch(()=>leaveNow());
-  }
+  if(p && p.catch) p.catch(()=>leaveNow());
 }
+  
 
 hwPromptScrim.addEventListener('click',closeHomeworkPrompt);
 hwNoBtn.addEventListener('click',closeHomeworkPrompt);
