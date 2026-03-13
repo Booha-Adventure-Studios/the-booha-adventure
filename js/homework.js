@@ -282,15 +282,18 @@ async function renderSheet(week,curr,type,hideKnown){
     const el=document.createElement("div");
     el.className="hw-item";
 
-    el.innerHTML=`
+        el.innerHTML=`
     <div class="hw-top">
-      <div class="hw-num">${n}.</div>
+      <div style="display:flex; align-items:flex-start; gap:10px; flex:1;">
+        <div class="hw-num">${n}.</div>
+        <div style="flex:1;">
+          <div class="hw-en">${card.en||""}</div>
+          <div class="hw-hira">${card.hira||""}</div>
+          <div class="hw-jp">${card.jp||""}</div>
+        </div>
+      </div>
       <button class="hw-toggle">${known.has(n)?"Known ✓":"Hide"}</button>
     </div>
-
-    <div class="hw-en">${card.en||""}</div>
-    <div class="hw-hira">${card.hira||""}</div>
-    <div class="hw-jp">${card.jp||""}</div>
     `;
 
     const btn=el.querySelector(".hw-toggle");
