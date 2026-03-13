@@ -1,5 +1,5 @@
 
-/* ══════════════════════════════════════════════════════════════
+  /* ══════════════════════════════════════════════════════════════
    sentence-order.js  —  Sentence Order  v2
    Show JP sentence + scrambled EN word tiles. Tap to build it.
    15 sentences, first-try correct = 1 point, 15 max.
@@ -47,27 +47,11 @@ document.addEventListener('touchstart', unlockAllAudio, { once: true, passive: t
 document.addEventListener('mousedown',  unlockAllAudio, { once: true, passive: true });
 
 let activeSent = null;
-const lastPlayedAt = {};
-const AUDIO_DEBOUNCE_MS = 500;
 
 function stopSent() {
   if (!activeSent) return;
   try { activeSent.pause(); activeSent.currentTime = 0; } catch {}
   activeSent = null;
-}
-
-function playSent(mp3) {
-  if (!mp3) return;
-  const a = sentCache[mp3];
-  if (!a) return;
-  const now = Date.now();
-  if (lastPlayedAt[mp3] && now - lastPlayedAt[mp3] < AUDIO_DEBOUNCE_MS) return;
-  lastPlayedAt[mp3] = now;
-  stopSent();
-  activeSent = a;
-  try { a.currentTime = 0; } catch {}
-  const p = a.play();
-  if (p && p.catch) p.catch(() => {});
 }
 
 function playSentOnCorrect(mp3, onEnd) {
@@ -253,11 +237,8 @@ S.textContent = `
   background:var(--game-surface); border:2px solid var(--game-border);
   backdrop-filter:blur(12px); box-shadow:0 8px 32px rgba(0,0,0,.22);
   transition:border-color .3s, box-shadow .3s;
-  cursor:pointer; user-select:none;
-  -webkit-tap-highlight-color:transparent;
 }
-.so-jp-box:hover{ filter:brightness(1.06); }
-.so-jp-box:active{ transform:scale(.99); }
+
 /* BR — warm orange/amber panel */
 [data-curriculum="br"] .so-jp-box{
   background:linear-gradient(145deg,rgba(255,140,0,.09),rgba(255,80,0,.05),rgba(0,0,0,.18));
@@ -284,16 +265,6 @@ S.textContent = `
 [data-curriculum="pb"] .so-jp-box::before{
   background:linear-gradient(90deg,#ff6eb4,#cc88ff,#44ccff,#ffcc44,#ff6eb4);
   background-size:220% auto;
-}
-/* audio pulse ring when tapped */
-.so-jp-box.playing::after{
-  content:''; position:absolute; inset:-4px; border-radius:26px;
-  border:2px solid var(--game-primary); opacity:.6;
-  animation:soRing .7s ease-out forwards; pointer-events:none;
-}
-@keyframes soRing{
-  from{ transform:scale(1); opacity:.6; }
-  to{ transform:scale(1.03); opacity:0; }
 }
 
 .so-jp-label{
@@ -322,13 +293,6 @@ S.textContent = `
 [data-curriculum="pb"] .so-jp-hira{ color:#2a1020; }
 body.hira-mode .so-jp-kanji{ display:none; }
 body.hira-mode .so-jp-hira{ display:block; }
-
-.so-play-hint{
-  font-family:var(--game-font-body);
-  font-size:clamp(9px,1.5vw,11px); letter-spacing:.12em; text-transform:uppercase;
-  color:var(--game-muted); opacity:.55; margin-top:.5rem;
-}
-[data-curriculum="pb"] .so-play-hint{ color:rgba(58,26,46,.4); }
 
 /* ══════════════════════════════════════════════════════════════
    ANSWER ZONE — tapped words appear here as chips
@@ -658,7 +622,46 @@ body.hira-mode .so-hira-icon{ transform:rotate(180deg); }
 }
 .so-clear-btn:active{ transform:scale(.93); }
 
-/* HELP button */
+/* SHOW ANSWER button — glowing, appears after 3 wrong tries */
+.so-show-btn{
+  font-family:var(--game-font-title);
+  font-size:clamp(13px,2.4vw,17px); letter-spacing:.06em;
+  padding:12px 24px; border-radius:999px; border:none;
+  background:linear-gradient(135deg,#ffaa00,#ff6600);
+  color:#1a0800; font-weight:900;
+  cursor:pointer; position:relative; overflow:hidden;
+  transition:transform .15s, box-shadow .2s;
+  -webkit-tap-highlight-color:transparent;
+  display:none;
+  box-shadow:0 0 0 3px rgba(255,160,0,.4), 0 4px 0 rgba(120,50,0,.5), 0 8px 20px rgba(0,0,0,.3);
+  animation:soShowGlow 1.6s ease-in-out infinite;
+  white-space:nowrap;
+}
+.so-show-btn.visible{ display:block; }
+@keyframes soShowGlow{
+  0%,100%{ box-shadow:0 0 8px 2px rgba(255,160,0,.5), 0 4px 0 rgba(120,50,0,.5), 0 8px 20px rgba(0,0,0,.3); }
+  50%{     box-shadow:0 0 26px 6px rgba(255,160,0,.9), 0 4px 0 rgba(120,50,0,.5), 0 8px 24px rgba(255,130,0,.4); }
+}
+.so-show-btn:hover{ transform:scale(1.06); }
+.so-show-btn:active{ transform:scale(.93); }
+[data-curriculum="pb"] .so-show-btn{
+  background:linear-gradient(135deg,#ff88cc,#ff44aa);
+  color:#fff; box-shadow:0 0 8px 2px rgba(255,100,180,.5), 0 5px 0 #cc0077, 0 8px 18px rgba(255,100,180,.2);
+  animation:soShowGlowPb 1.6s ease-in-out infinite;
+}
+@keyframes soShowGlowPb{
+  0%,100%{ box-shadow:0 0 8px 2px rgba(255,100,180,.5), 0 5px 0 #cc0077, 0 8px 18px rgba(255,100,180,.2); }
+  50%{     box-shadow:0 0 26px 6px rgba(255,100,180,.9), 0 5px 0 #cc0077, 0 8px 24px rgba(255,100,180,.5); }
+}
+[data-curriculum="bc"] .so-show-btn{
+  background:linear-gradient(135deg,#00ddb0,#0099cc);
+  color:#001a14;
+  animation:soShowGlowBc 1.6s ease-in-out infinite;
+}
+@keyframes soShowGlowBc{
+  0%,100%{ box-shadow:0 0 8px 2px rgba(0,200,180,.5), 0 4px 0 rgba(0,60,50,.6), 0 8px 20px rgba(0,0,0,.3); }
+  50%{     box-shadow:0 0 26px 6px rgba(0,220,180,.9), 0 4px 0 rgba(0,60,50,.6), 0 8px 24px rgba(0,200,180,.4); }
+}
 .so-help-btn{
   width:46px; height:46px; border-radius:50%;
   border:2px solid var(--game-border); background:var(--game-surface);
@@ -902,11 +905,10 @@ U.mount(`
     <div class="so-pill">Score <b id="so-score">0</b> / 15</div>
   </div>
 
-  <div class="so-jp-box" id="so-jp-box" title="Tap to hear the sentence">
-    <div class="so-jp-label">ORDER THE SENTENCE / ことばをならべよう</div>
+  <div class="so-jp-box" id="so-jp-box">
+    <div class="so-jp-label">ことばをならべよう</div>
     <div class="so-jp-kanji" id="so-jp"></div>
     <div class="so-jp-hira"  id="so-hira"></div>
-    <div class="so-play-hint">▶ TAP TO LISTEN</div>
   </div>
 
   <div class="so-answer-zone" id="so-answer">
@@ -920,9 +922,10 @@ U.mount(`
       <span class="so-hira-icon">あ</span>
       <span id="so-hira-label">ひらがな</span>
     </button>
-    <button class="so-clear-btn" id="so-clear">CLEAR</button>
-    <button class="so-check-btn" id="so-check" disabled>CHECK</button>
-    <button class="so-help-btn"  id="so-help">？</button>
+    <button class="so-clear-btn"  id="so-clear">CLEAR</button>
+    <button class="so-show-btn"   id="so-show">答えを見る</button>
+    <button class="so-check-btn"  id="so-check" disabled>CHECK</button>
+    <button class="so-help-btn"   id="so-help">？</button>
   </div>
 
   <div class="so-feedback" id="so-feedback"></div>
@@ -956,36 +959,36 @@ U.mount(`
       <div class="so-how-step">
         <div class="so-how-num">1</div>
         <div>
-          <div class="so-how-en">Tap the Japanese box to hear the sentence!</div>
-          <div class="so-how-jp">日本語をタップ → 文が聞こえるよ！</div>
+          <div class="so-how-en">Read the Japanese sentence above.</div>
+          <div class="so-how-jp">日本語の文を読もう。</div>
         </div>
       </div>
       <div class="so-how-step">
         <div class="so-how-num">2</div>
         <div>
           <div class="so-how-en">Tap word tiles to build the English sentence in order.</div>
-          <div class="so-how-jp">単語タイルをタップして英文を作ろう。</div>
+          <div class="so-how-jp">単語を順番にタップして英語の文を作ろう。</div>
         </div>
       </div>
       <div class="so-how-step">
         <div class="so-how-num">3</div>
         <div>
-          <div class="so-how-en">Tap a placed word to remove it from the sentence.</div>
-          <div class="so-how-jp">並べた単語をタップすると元に戻るよ。</div>
+          <div class="so-how-en">Tap a placed word to put it back. Press CHECK when ready.</div>
+          <div class="so-how-jp">置いた単語をタップすると戻るよ。できたらCHECK！</div>
         </div>
       </div>
       <div class="so-how-step">
         <div class="so-how-num">4</div>
         <div>
-          <div class="so-how-en">Press CHECK when done. First try = a point!</div>
-          <div class="so-how-jp">CHECKボタンを押そう。一発正解でポイントゲット！</div>
+          <div class="so-how-en">After 3 wrong tries, a hint button will appear.</div>
+          <div class="so-how-jp">3回まちがえると、ヒントボタンが出るよ。</div>
         </div>
       </div>
       <div class="so-how-step">
         <div class="so-how-num">あ</div>
         <div>
           <div class="so-how-en">Press あ to switch between kanji and hiragana.</div>
-          <div class="so-how-jp">「あ」で漢字・ひらがなを切りかえられるよ！</div>
+          <div class="so-how-jp">「あ」で漢字とひらがなを切りかえられるよ。</div>
         </div>
       </div>
       <button class="so-modal-close" id="so-modal-ok">Got it! / わかった！</button>
@@ -1008,6 +1011,7 @@ const tilesEl    = document.getElementById('so-tiles');
 const feedbackEl = document.getElementById('so-feedback');
 const checkBtn   = document.getElementById('so-check');
 const clearBtn   = document.getElementById('so-clear');
+const showBtn    = document.getElementById('so-show');
 const helpBtn    = document.getElementById('so-help');
 const hiraBtn    = document.getElementById('so-hira-toggle');
 const hiraLabel  = document.getElementById('so-hira-label');
@@ -1042,28 +1046,6 @@ modalOverlay.addEventListener('click', e => { if (e.target === modalOverlay) mod
 document.addEventListener('keydown', e => { if (e.key === 'Escape') modalOverlay.classList.remove('open'); });
 
 /* ══════════════════════════════════════════════════════════════
-   JP BOX — tap to play sentence audio
-   ══════════════════════════════════════════════════════════════ */
-jpBox.addEventListener('touchstart', e => {
-  e.preventDefault();
-  unlockAllAudio();
-  fireJpBoxPlay();
-}, { passive: false });
-jpBox.addEventListener('click', e => {
-  if (e.sourceCapabilities && e.sourceCapabilities.firesTouchEvents) return;
-  fireJpBoxPlay();
-});
-
-function fireJpBoxPlay() {
-  if (!currentCard) return;
-  playSent(currentCard.mp3);
-  jpBox.classList.remove('playing');
-  void jpBox.offsetWidth;
-  jpBox.classList.add('playing');
-  jpBox.addEventListener('animationend', () => jpBox.classList.remove('playing'), { once: true });
-}
-
-/* ══════════════════════════════════════════════════════════════
    STATE
    ══════════════════════════════════════════════════════════════ */
 let idx        = 0;
@@ -1075,6 +1057,7 @@ let tileEls    = [];    /* parallel array of tile DOM elements */
 let firstTry   = true;
 let locked     = false;
 let hasMadeWrongAttempt = false;
+let wrongCount = 0;     /* wrong attempts this card; show hint btn at 3 */
 
 /* button smash guard */
 let lastCheckAt = 0;
@@ -1098,10 +1081,12 @@ function showCard() {
   locked = false;
   firstTry = true;
   hasMadeWrongAttempt = false;
+  wrongCount = 0;
   placed = [];
   feedbackEl.textContent = '';
   feedbackEl.style.color = '';
   clearBtn.classList.remove('visible');
+  showBtn.classList.remove('visible');
   checkBtn.disabled = true;
 
   currentCard = allCards[idx];
@@ -1144,13 +1129,10 @@ function buildTiles() {
     tile.addEventListener('touchstart', e => {
       e.preventDefault();
       unlockAllAudio();
-      /* play sentence audio on tile tap */
-      playSent(currentCard.mp3);
       handleTileTap(tile, origIdx);
     }, { passive: false });
     tile.addEventListener('click', e => {
       if (e.sourceCapabilities && e.sourceCapabilities.firesTouchEvents) return;
-      playSent(currentCard.mp3);
       handleTileTap(tile, origIdx);
     });
 
@@ -1236,6 +1218,52 @@ clearBtn.addEventListener('click', () => {
 });
 
 /* ══════════════════════════════════════════════════════════════
+   SHOW ANSWER — fills correct order, plays audio, advances
+   (no point awarded — firstTry is already false by this point)
+   ══════════════════════════════════════════════════════════════ */
+showBtn.addEventListener('click', () => {
+  if (locked) return;
+  locked = true;
+  showBtn.classList.remove('visible');
+
+  /* return all tiles to bank silently */
+  placed.forEach(origIdx => {
+    if (tileEls[origIdx]) tileEls[origIdx].classList.remove('used');
+  });
+  placed = [];
+
+  /* place tokens in correct order 0..n-1 */
+  const n = tokens.length;
+  for (let i = 0; i < n; i++) {
+    placed.push(i);
+    if (tileEls[i]) tileEls[i].classList.add('used');
+  }
+  renderAnswer();
+
+  /* flash all chips green */
+  const chips = Array.from(answerEl.querySelectorAll('.so-placed-chip'));
+  chips.forEach((chip, i) => {
+    setTimeout(() => chip.classList.add('so-correct'), i * 55);
+  });
+
+  const targetWords = tokens.map((t, i) => displayWord(t, i === 0, i === n - 1));
+  feedbackEl.textContent = targetWords.join(' ') + '!';
+  feedbackEl.style.color = '#22c55e';
+  U.playSFX('ding');
+
+  /* play audio then advance */
+  setTimeout(() => {
+    playSentOnCorrect(currentCard.mp3, () => {
+      setTimeout(() => {
+        idx++;
+        if (idx >= allCards.length) showResults();
+        else showCard();
+      }, 400);
+    });
+  }, chips.length * 55 + 200);
+});
+
+/* ══════════════════════════════════════════════════════════════
    CHECK
    ══════════════════════════════════════════════════════════════ */
 checkBtn.addEventListener('click', () => {
@@ -1277,7 +1305,7 @@ checkBtn.addEventListener('click', () => {
       }, i * 55);
     });
 
-    feedbackEl.textContent = targetStr + '!';
+    feedbackEl.textContent = 'せいかい！ ' + targetStr;
     feedbackEl.style.color = '#22c55e';
     U.playSFX('ding');
 
@@ -1304,8 +1332,10 @@ checkBtn.addEventListener('click', () => {
     /* wrong — grade per word position */
     locked = true;
     firstTry = false;
+    wrongCount++;
     hasMadeWrongAttempt = true;
     clearBtn.classList.add('visible');
+    if (wrongCount >= 3) showBtn.classList.add('visible');
 
     chips.forEach((chip, pi) => {
       const placedOrigIdx = placed[pi];
@@ -1320,7 +1350,7 @@ checkBtn.addEventListener('click', () => {
       }, pi * 55);
     });
 
-    feedbackEl.textContent = 'Not quite — try again!';
+    feedbackEl.textContent = 'もう一度！ Try again!';
     feedbackEl.style.color = '#ef4444';
     U.playSFX('fart');
 
