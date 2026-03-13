@@ -280,8 +280,11 @@ body::before {
   font-size: clamp(13px, 2.8vw, 17px);
   color: var(--tc, #fff);
   text-shadow:
-  2px 2px 0 rgba(0,0,0,0.45),
-  0 0 6px rgba(0,0,0,0.25);
+    -2px -2px 0 #fff,
+     2px -2px 0 #fff,
+    -2px  2px 0 #fff,
+     2px  2px 0 #fff,
+     0px  3px 4px rgba(0,0,0,0.35);
   line-height: 1.1;
   letter-spacing: 0.03em;
 }
@@ -293,7 +296,12 @@ body::before {
   opacity: 0.9;
   font-weight: 800;
   line-height: 1.2;
-  text-shadow: 1px 2px 0 rgba(0,0,0,0.35);
+  text-shadow:
+  -1px -1px 0 #fff,
+   1px -1px 0 #fff,
+  -1px  1px 0 #fff,
+   1px  1px 0 #fff,
+   0px  2px 3px rgba(0,0,0,0.35);
 }
 
 .tile-jp {
@@ -303,7 +311,12 @@ body::before {
   opacity: 0.7;
   font-weight: 400;
   line-height: 1.2;
-  text-shadow: 1px 2px 0 rgba(0,0,0,0.35);
+  text-shadow:
+  -1px -1px 0 #fff,
+   1px -1px 0 #fff,
+  -1px  1px 0 #fff,
+   1px  1px 0 #fff,
+   0px  2px 3px rgba(0,0,0,0.35);
 }
 
 /* ── EFFECTS ── */
