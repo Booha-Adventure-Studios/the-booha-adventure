@@ -57,23 +57,26 @@ function stopWord() {
   wordLocked = false;
 }
 
+/* Per-card last-played timestamps — prevents audio restart on rapid re-tap */
+const lastPlayedAt = {};
+const AUDIO_DEBOUNCE_MS = 600; /* ignore re-taps of same card within this window */
+
 function playWord(mp3) {
   if (!mp3) return;
   const a = wordCache[mp3];
   if (!a) return;
 
+  /* If this exact clip is already playing and was started very recently, ignore */
+  const now = Date.now();
+  if (lastPlayedAt[mp3] && now - lastPlayedAt[mp3] < AUDIO_DEBOUNCE_MS) return;
+  lastPlayedAt[mp3] = now;
+
   stopWord();
-  wordLocked = true;
   activeWord = a;
 
   try { a.currentTime = 0; } catch {}
   const p = a.play();
-  if (p && p.catch) p.catch(() => { wordLocked = false; });
-
-  const unlock = () => { wordLocked = false; };
-  a.onended = unlock;
-  a.onerror = unlock;
-  setTimeout(unlock, 2400);
+  if (p && p.catch) p.catch(() => {});
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -168,13 +171,13 @@ S.textContent = `
 /* ── header ── */
 .vt-header{
   text-align:center;
-  padding:.5rem 3rem .6rem;
+  padding:.6rem 3rem .8rem;
 }
 .vt-curriculum{
   font-family:var(--game-font-title);
-  font-size:clamp(11px,2vw,15px);
+  font-size:clamp(28px,6vw,52px);
   font-weight:900;
-  letter-spacing:.24em;
+  letter-spacing:.12em;
   text-transform:uppercase;
   background:linear-gradient(90deg,#ff2288,#ffcc00,#aaff22,#22ddff,#cc88ff,#ff2288);
   background-size:220% auto;
