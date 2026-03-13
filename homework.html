@@ -381,6 +381,51 @@
       border-color: rgba(41,182,255,.22);
     }
 
+    /* Selected state — bold highlight per card type */
+    .week-card.selected {
+      transform: translateY(-4px) scale(1.03);
+    }
+    .week-card.last.selected {
+      background: rgba(220,220,230,.18);
+      border-color: rgba(255,255,255,.70);
+      box-shadow:
+        0 12px 32px rgba(0,0,0,.30),
+        0 0 36px rgba(255,255,255,.22),
+        inset 0 1px 0 rgba(255,255,255,.30);
+    }
+    .week-card.this.selected {
+      background: rgba(57,224,122,.22);
+      border-color: var(--green);
+      box-shadow:
+        0 12px 32px rgba(0,0,0,.30),
+        0 0 40px rgba(57,224,122,.50),
+        0 0 80px rgba(57,224,122,.18),
+        inset 0 1px 0 rgba(255,255,255,.24);
+    }
+    .week-card.next.selected {
+      background: rgba(41,182,255,.18);
+      border-color: var(--blue);
+      box-shadow:
+        0 12px 32px rgba(0,0,0,.30),
+        0 0 40px rgba(41,182,255,.46),
+        0 0 80px rgba(41,182,255,.16),
+        inset 0 1px 0 rgba(255,255,255,.22);
+    }
+    /* Checkmark indicator on selected card */
+    .week-card.selected::after {
+      content: '';
+      position: absolute;
+      top: 10px; right: 12px;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.90);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpolyline points='2,6 5,9 10,3' fill='none' stroke='%23111' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-size: 70%;
+      background-position: center;
+      background-repeat: no-repeat;
+      box-shadow: 0 2px 8px rgba(0,0,0,.30);
+    }
+
     /* ══════════════════════════════════════════════════════════
        CURRICULUM TREE CARDS (combined on week screen)
     ══════════════════════════════════════════════════════════ */
@@ -1052,8 +1097,8 @@
     setRoot(`
     <div class="panel">
       <div class="panel-head">
-        <h2 class="panel-title">Choose a Week<br><span style="font-size:.6em;letter-spacing:.03em">しゅうをえらぼう / 週を選ぼう</span></h2>
-        <p class="panel-sub">Select last, this, or next week<br>先週・今週・来週から選んでください</p>
+        <h2 class="panel-title">CHOOSE A WEEK</h2>
+        <p class="panel-sub">しゅうをえらぼう &nbsp;|&nbsp; 週を選ぼう</p>
       </div>
 
       <div class="week-row">
@@ -1104,18 +1149,19 @@
     let selectedMonth = thisW.monthSlug;
     let selectedWeek  = thisW.weekNumber;
 
-    // Highlight this-week card by default
-    root.querySelector('.week-card.this').style.boxShadow =
-      '0 10px 30px rgba(0,0,0,.28), 0 0 32px rgba(57,224,122,.28), inset 0 1px 0 rgba(255,255,255,.18)';
+    function selectWeekCard(btn) {
+      root.querySelectorAll('.week-card').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      selectedMonth = btn.dataset.month;
+      selectedWeek  = Number(btn.dataset.week);
+    }
+
+    // Default: highlight THIS WEEK card
+    const thisCard = root.querySelector('.week-card.this');
+    if (thisCard) selectWeekCard(thisCard);
 
     root.querySelectorAll('.week-card').forEach(btn => {
-      btn.addEventListener('click', () => {
-        // Visual selection
-        root.querySelectorAll('.week-card').forEach(b => b.style.boxShadow = '');
-        btn.style.boxShadow = '0 10px 30px rgba(0,0,0,.28), 0 0 32px rgba(255,255,255,.18), inset 0 1px 0 rgba(255,255,255,.18)';
-        selectedMonth = btn.dataset.month;
-        selectedWeek  = Number(btn.dataset.week);
-      });
+      btn.addEventListener('click', () => selectWeekCard(btn));
     });
 
     root.querySelectorAll('.curr-card').forEach(btn => {
