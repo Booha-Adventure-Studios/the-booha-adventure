@@ -112,10 +112,10 @@
     #fade{ position:fixed; inset:0; background:#000; opacity:0; pointer-events:none; transition:opacity 520ms ease; z-index:200; }
     #fade.on{ opacity:1; }
 
-      #hwPromptScrim{
+        #hwPromptScrim{
       position:fixed; inset:0; z-index:210;
-      background:rgba(0,0,0,.48);
-      backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px);
+      background:rgba(0,0,0,.52);
+      backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px);
       display:none;
     }
     #hwPromptScrim.show{ display:block; }
@@ -123,72 +123,96 @@
     #hwPrompt{
       position:fixed; left:50%; top:50%; transform:translate(-50%,-50%);
       z-index:215;
-      min-width:260px; max-width:360px; width:min(92vw,360px);
+      min-width:280px; max-width:420px; width:min(92vw,420px);
       background:linear-gradient(150deg,rgba(8,3,26,.98) 0%,rgba(3,8,34,.98) 100%);
-      border-radius:24px;
-      padding:22px 24px 20px;
+      border-radius:26px;
+      padding:24px 24px 22px;
       backdrop-filter:blur(28px); -webkit-backdrop-filter:blur(28px);
       text-align:center;
       border:1px solid rgba(255,255,255,.12);
-      box-shadow:0 0 0 1px rgba(255,255,255,.05),0 32px 90px rgba(0,0,0,.85),0 0 80px rgba(160,60,255,.14), inset 0 1px 0 rgba(255,255,255,.10);
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,.05),
+        0 32px 90px rgba(0,0,0,.85),
+        0 0 80px rgba(255,210,80,.10),
+        inset 0 1px 0 rgba(255,255,255,.10);
       display:none;
       pointer-events:auto;
+      overflow:hidden;
     }
     #hwPrompt.show{ display:block; animation:popIn 300ms cubic-bezier(.34,1.46,.64,1) both; }
 
     #hwPromptBar{
-      height:3px; border-radius:999px; margin:0 auto 16px; width:55%; opacity:.92;
-      background:linear-gradient(90deg,#ffe066,#ffbb33);
+      height:3px; border-radius:999px; margin:0 auto 16px; width:58%; opacity:.95;
+      background:linear-gradient(90deg,#ffe066,#ffbb33,#fff0a8,#ffbb33);
       box-shadow:0 0 14px #ffe06688,0 0 28px #ffbb3355;
     }
 
     .hw-week-label{
       font-family:'Bowlby One',sans-serif;
-      font-size:clamp(9px,1.5vw,11px);
+      font-size:clamp(10px,1.6vw,12px);
       letter-spacing:2px;
       text-transform:uppercase;
-      color:rgba(255,255,255,.38);
-      margin:0 0 3px;
+      color:rgba(255,255,255,.42);
+      margin:0 0 4px;
     }
 
     #hwPromptTitle{
       font-family:'Bowlby One',sans-serif;
-      font-size:clamp(18px,3vw,26px);
-      letter-spacing:.5px;
+      font-size:clamp(18px,3vw,28px);
+      letter-spacing:.4px;
       margin:0 0 8px;
       color:#fff;
-      line-height:1.3;
+      line-height:1.35;
+      text-shadow:
+        0 0 22px rgba(255,220,120,.22),
+        0 2px 8px rgba(0,0,0,.65);
     }
 
     #hwPromptSub{
-      font-size:clamp(11px,1.8vw,14px);
+      font-size:clamp(12px,1.9vw,14px);
       font-weight:700;
-      color:rgba(255,255,255,.55);
-      margin:0 0 16px;
-      letter-spacing:.3px;
-      line-height:1.5;
+      color:rgba(255,255,255,.62);
+      margin:0 0 18px;
+      letter-spacing:.2px;
+      line-height:1.65;
     }
 
     .hw-actions{
       display:flex;
       justify-content:center;
       gap:12px;
+      flex-wrap:wrap;
     }
 
     #hwNoBtn,#hwYesBtn{
-      appearance:none; border:0; border-radius:999px;
-      padding:10px 24px;
-      font-size:13px; font-weight:900;
+      appearance:none;
+      border:0;
+      border-radius:999px;
+      padding:10px 26px;
+      font-size:13px;
+      font-weight:900;
       cursor:pointer;
-      transition:transform 100ms;
+      transition:transform 100ms ease, box-shadow 140ms ease, opacity 140ms ease;
     }
 
-    
     #hwNoBtn{
       color:#fff;
       background:rgba(255,255,255,.12);
-      box-shadow:0 4px 12px rgba(0,0,0,.25);
+      box-shadow:
+        0 4px 12px rgba(0,0,0,.25),
+        inset 0 0 0 1px rgba(255,255,255,.10);
     }
+
+    #hwYesBtn{
+      color:#000;
+      background:linear-gradient(180deg,#ffe066,#ffbb33);
+      box-shadow:
+        0 4px 18px rgba(255,187,51,.35),
+        0 0 28px rgba(255,187,51,.18);
+    }
+
+    #hwNoBtn:hover,#hwYesBtn:hover{ transform:translateY(-1px); }
+    #hwNoBtn:active,#hwYesBtn:active{ transform:scale(.95); }
 
     
         #hwVideoWrap{
