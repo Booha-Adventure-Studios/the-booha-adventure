@@ -29,58 +29,80 @@
       min-height:100dvh;
     }
 
-    #app{
-     max-width:980px;
-     margin:0 auto;
-     padding:18px 14px 60px;
-     min-height:100dvh;
-     background:
-     linear-gradient(rgba(0,0,0,.18),rgba(0,0,0,.28)),
-      url('/the-booha-adventure/assets/img/hw-background-1.png') center/cover no-repeat;
-   }
+   #app{
+  width:100%;
+  min-height:100dvh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:28px 16px 48px;
+  background:
+    linear-gradient(rgba(0,0,0,.18),rgba(0,0,0,.30)),
+    url('/the-booha-adventure/assets/img/hw-background-1.png') center center / cover no-repeat;
+}
 
-    .topbar{
+       .topbar{
       display:flex;
-      justify-content:space-between;
+      flex-direction:column;
+      justify-content:center;
       align-items:center;
-      gap:12px;
-      margin-bottom:16px;
+      text-align:center;
+      gap:8px;
+      margin-bottom:18px;
     }
 
     .title{
       font-family:'Chau Philomene One',sans-serif;
-      font-size:clamp(28px,6vw,48px);
-      letter-spacing:.04em;
+      font-size:clamp(34px,7vw,64px);
+      letter-spacing:.05em;
       margin:0;
+      color:#fff;
+      text-shadow:
+        0 0 18px rgba(255,255,255,.18),
+        0 0 38px rgba(255,210,100,.18),
+        0 6px 20px rgba(0,0,0,.35);
     }
 
     .subtitle{
-      color:var(--muted);
+      color:rgba(255,255,255,.90);
       font-size:14px;
       font-weight:800;
-      margin-top:4px;
+      margin-top:0;
+      line-height:1.75;
+      text-shadow:0 2px 8px rgba(0,0,0,.28);
     }
 
-    .panel{
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:var(--radius);
-      box-shadow:0 10px 30px rgba(0,0,0,.06);
-      padding:18px;
+       .panel{
+      width:min(980px,100%);
+      background:rgba(255,255,255,.14);
+      border:1px solid rgba(255,255,255,.24);
+      border-radius:28px;
+      box-shadow:
+        0 18px 44px rgba(0,0,0,.20),
+        inset 0 1px 0 rgba(255,255,255,.20);
+      backdrop-filter:blur(14px);
+      -webkit-backdrop-filter:blur(14px);
+      padding:22px 20px 20px;
       margin-bottom:16px;
     }
 
-    .section-title{
+       .section-title{
       font-family:'Chau Philomene One',sans-serif;
-      font-size:clamp(20px,4vw,30px);
-      margin:0 0 10px;
+      font-size:clamp(24px,4.2vw,34px);
+      margin:0 0 8px;
+      color:#fff;
+      text-align:center;
+      text-shadow:0 2px 10px rgba(0,0,0,.28);
     }
 
     .section-sub{
-      color:var(--muted);
+      color:rgba(255,255,255,.88);
       font-size:14px;
-      margin-bottom:14px;
-      font-weight:700;
+      margin-bottom:16px;
+      font-weight:800;
+      text-align:center;
+      line-height:1.7;
+      text-shadow:0 2px 10px rgba(0,0,0,.22);
     }
 
     .grid{
@@ -93,25 +115,33 @@
       grid-template-columns:repeat(2,1fr);
     }
 
-    .choice-btn{
+       .choice-btn{
       border:none;
-      border-radius:20px;
-      padding:18px 14px;
+      border-radius:24px;
+      padding:20px 16px;
       font-family:'Nunito',sans-serif;
       font-weight:900;
-      font-size:18px;
+      font-size:19px;
       cursor:pointer;
-      background:#fff;
-      border:2px solid var(--line);
-      box-shadow:0 4px 12px rgba(0,0,0,.05);
-      transition:transform .15s, box-shadow .15s, border-color .15s;
+      color:#fff;
+      background:rgba(255,255,255,.10);
+      border:2px solid rgba(255,255,255,.22);
+      box-shadow:
+        0 10px 24px rgba(0,0,0,.18),
+        inset 0 1px 0 rgba(255,255,255,.16);
+      backdrop-filter:blur(12px);
+      -webkit-backdrop-filter:blur(12px);
+      transition:transform .15s, box-shadow .15s, border-color .15s, background .15s;
+      text-align:center;
     }
 
     .choice-btn:hover{
-      transform:translateY(-2px);
-      box-shadow:0 10px 18px rgba(0,0,0,.08);
+      transform:translateY(-3px) scale(1.02);
+      box-shadow:
+        0 16px 28px rgba(0,0,0,.20),
+        inset 0 1px 0 rgba(255,255,255,.18);
     }
-
+    
     .choice-btn.week-last{ border-color:#d1d5db; }
     .choice-btn.week-this{ border-color:var(--green); }
     .choice-btn.week-next{ border-color:var(--blue); }
@@ -124,12 +154,13 @@
     .choice-btn.sentences{ border-color:var(--blue); }
     .choice-btn.questions{ border-color:var(--gold); }
 
-    .small-label{
+       .small-label{
       display:block;
       font-size:12px;
-      color:var(--muted);
-      margin-top:4px;
+      color:rgba(255,255,255,.88);
+      margin-top:6px;
       font-weight:800;
+      line-height:1.5;
     }
 
     .crumbs{
@@ -171,20 +202,20 @@
       color:#111827;
     }
 
-   .sheet{
-  background:
-    repeating-linear-gradient(
-      to bottom,
-      #ffffff 0px,
-      #ffffff 34px,
-      #e5e7eb 35px,
-      #ffffff 36px
-    );
-  border:1px solid var(--line);
-  border-radius:24px;
-  padding:10px 18px 28px;
-  box-shadow:0 12px 30px rgba(0,0,0,.06);
-}
+    .sheet{
+      background:
+        repeating-linear-gradient(
+          to bottom,
+          #ffffff 0px,
+          #ffffff 34px,
+          #e5e7eb 35px,
+          #ffffff 36px
+        );
+      border:1px solid var(--line);
+      border-radius:26px;
+      padding:10px 22px 28px;
+      box-shadow:0 14px 34px rgba(0,0,0,.10);
+    }
 
     .sheet-head{
       padding:14px 0 10px;
@@ -222,19 +253,21 @@
       display:none;
     }
 
-    .hw-top{
+       .hw-top{
       display:flex;
-      align-items:center;
+      align-items:flex-start;
       justify-content:space-between;
       gap:12px;
-      margin-bottom:6px;
+      margin-bottom:4px;
     }
 
     .hw-num{
       font-size:20px;
       font-weight:900;
+      min-width:36px;
+      color:#111827;
+      line-height:1.35;
     }
-
     .hw-toggle{
       border:none;
       border-radius:999px;
@@ -290,7 +323,11 @@
     <div class="topbar">
       <div>
         <h1 class="title">HOMEWORK</h1>
-        <div class="subtitle">Copy practice for last, this, and next week</div>
+        <div class="subtitle">
+          Copy practice for last, this, and next week<br>
+          さいしょ・こんしゅう・らいしゅう の れんしゅう<br>
+          先週・今週・来週の練習
+        </div>
       </div>
     </div>
 
