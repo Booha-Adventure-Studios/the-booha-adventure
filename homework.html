@@ -249,10 +249,18 @@
     
  
     
-    .hw-item.hidden-known{
-      display:none;
+        .hw-item.hidden-known{
+      opacity:.14;
+      filter:grayscale(1);
+    }
+    .hw-item.hidden-known .hw-en,
+    .hw-item.hidden-known .hw-hira,
+    .hw-item.hidden-known .hw-jp,
+    .hw-item.hidden-known .hw-num{
+      color:#b8bcc4 !important;
     }
 
+    
        .hw-top{
       display:flex;
       align-items:flex-start;
@@ -287,22 +295,24 @@
       margin-bottom:6px;
     }
 
-    .hw-hira{
+       .hw-hira{
       font-family:'Noto Sans JP',sans-serif;
       font-size:18px;
       line-height:1.6;
-      color:#4b5563;
+      color:#cc5aa2;
+      margin-top:4px;
       margin-bottom:2px;
+      font-weight:700;
     }
 
     .hw-jp{
       font-family:'Noto Sans JP',sans-serif;
       font-size:20px;
       line-height:1.6;
-      color:#111827;
-      font-weight:700;
+      color:#7c4dff;
+      font-weight:800;
     }
-
+    
     .empty{
       text-align:center;
       color:var(--muted);
