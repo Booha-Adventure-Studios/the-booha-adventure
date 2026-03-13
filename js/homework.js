@@ -131,25 +131,28 @@ function renderWeekPicker(){
 
   root.innerHTML = `
   <div class="panel">
-    <h2 class="section-title">Choose a Week</h2>
+    <h2 class="section-title">Choose a Week<br><span style="font-size:.62em;">しゅうを えらぼう / 週を選ぼう</span></h2>
 
     <div class="grid">
 
       <button class="choice-btn week-last"
       data-week="${last.monthSlug}|${last.weekNumber}">
-      LAST WEEK
+            LAST WEEK
+      <span class="small-label">せんしゅう<br>先週</span>
       <span class="small-label">${last.monthLabel} Week ${last.weekNumber}</span>
       </button>
 
       <button class="choice-btn week-this"
-      data-week="${thisW.monthSlug}|${thisW.weekNumber}">
-      THIS WEEK
+      data-week="${thisW.monthSlug}|${thisW.weekNumber}"> 
       <span class="small-label">${thisW.monthLabel} Week ${thisW.weekNumber}</span>
       </button>
-
+            THIS WEEK
+      <span class="small-label">こんしゅう<br>今週</span>
+      
       <button class="choice-btn week-next"
       data-week="${next.monthSlug}|${next.weekNumber}">
-      NEXT WEEK
+            NEXT WEEK
+      <span class="small-label">らいしゅう<br>来週</span>
       <span class="small-label">${next.monthLabel} Week ${next.weekNumber}</span>
       </button>
 
@@ -178,7 +181,7 @@ function renderCurriculum(month,week){
   <div class="crumb">${month} Week ${week}</div>
   </div>
 
-  <h2 class="section-title">Choose Curriculum</h2>
+  <h2 class="section-title">Choose Curriculum<br><span style="font-size:.62em;">カリキュラムを えらぼう</span></h2>
 
   <div class="grid">
   <button class="choice-btn pb" data-curr="pb">PRE-BOO</button>
@@ -212,7 +215,7 @@ function renderTypePicker(weekCode,curr){
   <div class="crumb">${CURR_LABEL[curr]}</div>
   </div>
 
-  <h2 class="section-title">Choose Homework</h2>
+  <h2 class="section-title">Choose Homework<br><span style="font-size:.62em;">しゅくだいを えらぼう / 宿題を選ぼう</span></h2>
 
   <div class="grid">
   <button class="choice-btn vocab" data-type="vocab">VOCABULARY</button>
