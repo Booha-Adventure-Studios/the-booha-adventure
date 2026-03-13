@@ -385,7 +385,7 @@ S.textContent = `
   height:clamp(58px,11vw,76px);
   border-radius:16px;
   display:flex; align-items:center; justify-content:center;
-  font-family:var(--game-font-title);
+  font-family:'Nunito', sans-serif;
   font-size:clamp(22px,5vw,34px);
   font-weight:900;
   cursor:pointer;
@@ -1021,7 +1021,7 @@ function buildTiles(card) {
     const tile = document.createElement('button');
     tile.type = 'button';
     tile.className = 'sw-tile sw-tile-in';
-    tile.textContent = letter.toUpperCase();
+    tile.textContent = letter;
     tile.dataset.ti = ti;
     tile.dataset.letter = letter;
     tile.style.setProperty('--ti', ti);
