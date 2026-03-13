@@ -1051,6 +1051,11 @@ function playHomeworkVideoAndGo(){
   void hwVideoWrap.offsetWidth;
   hwVideoWrap.classList.add('show');
 
+  // Save restore state so X button in homework.html returns mid-maze
+  sessionStorage.setItem('booha_return_to_checkpoint','1');
+  sessionStorage.setItem('booha_return_week',String(activeWeek));
+  sessionStorage.setItem('booha_return_ghost',String(activeGhostIdx));
+
   let left=false;
   function leaveNow(){
     if(left)return;left=true;
