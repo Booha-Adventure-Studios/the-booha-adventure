@@ -112,147 +112,269 @@
     #fade{ position:fixed; inset:0; background:#000; opacity:0; pointer-events:none; transition:opacity 520ms ease; z-index:200; }
     #fade.on{ opacity:1; }
 
-        #hwPromptScrim{
+    /* ═══════════════════════════════════════
+       HOMEWORK PROMPT — magical redesign
+    ═══════════════════════════════════════ */
+    #hwPromptScrim{
       position:fixed; inset:0; z-index:210;
-      background:rgba(0,0,0,.52);
-      backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px);
+      background:rgba(0,0,0,0);
+      backdrop-filter:blur(0px); -webkit-backdrop-filter:blur(0px);
       display:none;
+      transition:background 600ms ease, backdrop-filter 600ms ease, -webkit-backdrop-filter 600ms ease;
     }
     #hwPromptScrim.show{ display:block; }
+    #hwPromptScrim.active{
+      background:rgba(3,0,20,.78);
+      backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+    }
 
     #hwPrompt{
-      position:fixed; left:50%; top:50%; transform:translate(-50%,-50%);
+      position:fixed; left:50%; top:50%;
+      transform:translate(-50%,-50%) scale(0.78) translateY(18px);
       z-index:215;
-      min-width:280px; max-width:420px; width:min(92vw,420px);
-      background:linear-gradient(150deg,rgba(8,3,26,.98) 0%,rgba(3,8,34,.98) 100%);
-      border-radius:26px;
-      padding:24px 24px 22px;
-      backdrop-filter:blur(28px); -webkit-backdrop-filter:blur(28px);
+      min-width:300px; max-width:500px; width:min(92vw,500px);
+      background:
+        radial-gradient(ellipse at 50% -8%, rgba(255,215,80,.20) 0%, transparent 55%),
+        radial-gradient(ellipse at 15% 115%, rgba(255,145,55,.12) 0%, transparent 50%),
+        radial-gradient(ellipse at 85% 115%, rgba(255,110,200,.08) 0%, transparent 50%),
+        linear-gradient(155deg, rgba(20,9,48,.99) 0%, rgba(5,14,42,.99) 100%);
+      border-radius:36px;
+      padding:36px 32px 32px;
+      backdrop-filter:blur(36px); -webkit-backdrop-filter:blur(36px);
       text-align:center;
-      border:1px solid rgba(255,255,255,.12);
+      border:1px solid rgba(255,215,80,.24);
       box-shadow:
-        0 0 0 1px rgba(255,255,255,.05),
-        0 32px 90px rgba(0,0,0,.85),
-        0 0 80px rgba(255,210,80,.10),
-        inset 0 1px 0 rgba(255,255,255,.10);
+        0 0 0 1px rgba(255,255,255,.07),
+        0 48px 120px rgba(0,0,0,.92),
+        0 0 140px rgba(255,195,50,.14),
+        0 0 70px rgba(255,130,35,.09),
+        inset 0 1px 0 rgba(255,255,255,.14),
+        inset 0 -1px 0 rgba(255,210,60,.09);
       display:none;
       pointer-events:auto;
       overflow:hidden;
+      opacity:0;
+      transition:opacity 480ms cubic-bezier(.22,1,.36,1), transform 520ms cubic-bezier(.34,1.42,.64,1);
     }
-    #hwPrompt.show{ display:block; animation:popIn 300ms cubic-bezier(.34,1.46,.64,1) both; }
+    #hwPrompt.show{ display:block; }
+    #hwPrompt.visible{
+      opacity:1;
+      transform:translate(-50%,-50%) scale(1) translateY(0);
+    }
 
+    /* Animated shimmer top bar */
     #hwPromptBar{
-      height:3px; border-radius:999px; margin:0 auto 16px; width:58%; opacity:.95;
-      background:linear-gradient(90deg,#ffe066,#ffbb33,#fff0a8,#ffbb33);
-      box-shadow:0 0 14px #ffe06688,0 0 28px #ffbb3355;
+      height:3px; border-radius:999px; margin:0 auto 22px; width:60%; opacity:1;
+      background:linear-gradient(90deg,#cc7700,#ffe566,#fff9c0,#ffe566,#ffaa22,#ffe566,#fff9c0,#cc7700);
+      background-size:300% 100%;
+      animation:hwBarShimmer 2.8s linear infinite;
+      box-shadow:0 0 20px #ffe06688, 0 0 40px #ffbb3344, 0 0 8px #fffde0;
+    }
+    @keyframes hwBarShimmer{
+      0%{ background-position:0% 0% }
+      100%{ background-position:300% 0% }
     }
 
-    .hw-week-label{
+    /* Floating tree emoji with golden glow */
+    #hwTreeEmoji{
+      font-size:clamp(56px,12vmin,80px);
+      display:block;
+      margin:0 auto 14px;
+      animation:hwTreeFloat 3.4s ease-in-out infinite;
+      filter:
+        drop-shadow(0 0 22px rgba(255,210,60,.60))
+        drop-shadow(0 0 50px rgba(255,160,40,.30))
+        drop-shadow(0 10px 28px rgba(0,0,0,.75));
+      line-height:1;
+    }
+    @keyframes hwTreeFloat{
+      0%,100%{ transform:translateY(0) rotate(-2.5deg) scale(1); }
+      45%{ transform:translateY(-11px) rotate(2.5deg) scale(1.04); }
+    }
+
+    .hw-eyebrow{
       font-family:'Bowlby One',sans-serif;
-      font-size:clamp(10px,1.6vw,12px);
-      letter-spacing:2px;
+      font-size:clamp(9px,1.6vw,11px);
+      letter-spacing:3.5px;
       text-transform:uppercase;
-      color:rgba(255,255,255,.42);
-      margin:0 0 4px;
+      color:rgba(255,205,70,.60);
+      margin:0 0 10px;
     }
 
     #hwPromptTitle{
       font-family:'Bowlby One',sans-serif;
-      font-size:clamp(18px,3vw,28px);
-      letter-spacing:.4px;
+      font-size:clamp(24px,4.5vw,38px);
+      letter-spacing:.2px;
       margin:0 0 8px;
       color:#fff;
-      line-height:1.35;
+      line-height:1.25;
       text-shadow:
-        0 0 22px rgba(255,220,120,.22),
-        0 2px 8px rgba(0,0,0,.65);
+        0 0 50px rgba(255,225,100,.28),
+        0 0 100px rgba(255,165,40,.14),
+        0 2px 12px rgba(0,0,0,.85);
     }
 
     #hwPromptSub{
-      font-size:clamp(12px,1.9vw,14px);
+      font-size:clamp(13px,2.1vw,16px);
       font-weight:700;
-      color:rgba(255,255,255,.62);
-      margin:0 0 18px;
-      letter-spacing:.2px;
+      color:rgba(255,255,255,.48);
+      margin:0 0 20px;
+      letter-spacing:.3px;
       line-height:1.65;
+    }
+
+    /* Pulsing dots row */
+    .hw-dots{
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      gap:10px;
+      margin-bottom:26px;
+    }
+    .hw-dot{
+      border-radius:50%;
+      animation:hwDotPulse 2s ease-in-out infinite;
+    }
+    .hw-dot:nth-child(1){ width:8px;height:8px; background:#ffe566; animation-delay:0s; }
+    .hw-dot:nth-child(2){ width:6px;height:6px; background:#ffbb33; animation-delay:.25s; }
+    .hw-dot:nth-child(3){ width:10px;height:10px; background:#fff5b0; animation-delay:.5s; }
+    .hw-dot:nth-child(4){ width:6px;height:6px; background:#ffbb33; animation-delay:.75s; }
+    .hw-dot:nth-child(5){ width:8px;height:8px; background:#ffe566; animation-delay:1s; }
+    @keyframes hwDotPulse{
+      0%,100%{ transform:scale(1); opacity:.55; box-shadow:none; }
+      50%{ transform:scale(1.6); opacity:1; box-shadow:0 0 10px currentColor; }
     }
 
     .hw-actions{
       display:flex;
       justify-content:center;
-      gap:12px;
+      gap:16px;
       flex-wrap:wrap;
     }
 
-    #hwNoBtn,#hwYesBtn{
-      appearance:none;
-      border:0;
+    #hwNoBtn{
+      appearance:none; border:0;
       border-radius:999px;
-      padding:10px 26px;
-      font-size:13px;
+      padding:14px 32px;
+      font-size:clamp(14px,2.5vw,17px);
       font-weight:900;
       cursor:pointer;
-      transition:transform 100ms ease, box-shadow 140ms ease, opacity 140ms ease;
-    }
-
-    #hwNoBtn{
-      color:#fff;
-      background:rgba(255,255,255,.12);
+      color:rgba(255,255,255,.68);
+      background:rgba(255,255,255,.09);
       box-shadow:
-        0 4px 12px rgba(0,0,0,.25),
-        inset 0 0 0 1px rgba(255,255,255,.10);
+        0 4px 18px rgba(0,0,0,.32),
+        inset 0 0 0 1px rgba(255,255,255,.13);
+      transition:transform 120ms ease, box-shadow 140ms ease, background 140ms ease, color 140ms ease;
+      letter-spacing:.3px;
     }
+    #hwNoBtn:hover{
+      background:rgba(255,255,255,.15);
+      color:rgba(255,255,255,.88);
+      transform:translateY(-2px);
+    }
+    #hwNoBtn:active{ transform:scale(.93); }
 
     #hwYesBtn{
-      color:#000;
-      background:linear-gradient(180deg,#ffe066,#ffbb33);
+      appearance:none; border:0;
+      border-radius:999px;
+      padding:14px 42px;
+      font-size:clamp(16px,2.8vw,20px);
+      font-weight:900;
+      cursor:pointer;
+      color:#1c0b00;
+      background:linear-gradient(160deg,#fff9c0 0%,#ffe566 28%,#ffba30 65%,#ff9900 100%);
       box-shadow:
-        0 4px 18px rgba(255,187,51,.35),
-        0 0 28px rgba(255,187,51,.18);
+        0 7px 28px rgba(255,185,48,.52),
+        0 0 50px rgba(255,185,48,.24),
+        0 0 0 1px rgba(255,225,100,.32),
+        inset 0 1px 0 rgba(255,255,255,.58);
+      transition:transform 120ms ease, box-shadow 140ms ease;
+      letter-spacing:.5px;
+      position:relative;
+      overflow:hidden;
     }
+    #hwYesBtn::after{
+      content:'';
+      position:absolute; inset:0;
+      background:linear-gradient(180deg,rgba(255,255,255,.24) 0%,transparent 55%);
+      border-radius:inherit;
+      pointer-events:none;
+    }
+    #hwYesBtn:hover{
+      transform:translateY(-2px);
+      box-shadow:0 12px 38px rgba(255,185,48,.65),0 0 70px rgba(255,185,48,.30),0 0 0 1px rgba(255,225,100,.42),inset 0 1px 0 rgba(255,255,255,.58);
+    }
+    #hwYesBtn:active{ transform:scale(.93); }
 
-    #hwNoBtn:hover,#hwYesBtn:hover{ transform:translateY(-1px); }
-    #hwNoBtn:active,#hwYesBtn:active{ transform:scale(.95); }
+    /* Sparkle crosses in corners */
+    .hw-corner{
+      position:absolute;
+      width:32px; height:32px;
+      pointer-events:none;
+    }
+    .hw-corner.tl{ top:16px; left:16px; animation:hwCornerSpin 5s linear infinite; }
+    .hw-corner.tr{ top:16px; right:16px; animation:hwCornerSpin 5s linear infinite reverse; animation-delay:.9s; }
+    @keyframes hwCornerSpin{
+      0%{ transform:rotate(0deg) scale(1); opacity:.50; }
+      50%{ transform:rotate(180deg) scale(1.25); opacity:.85; }
+      100%{ transform:rotate(360deg) scale(1); opacity:.50; }
+    }
+    .hw-corner svg{ width:100%; height:100%; }
 
-    
-        #hwVideoWrap{
-      position:fixed;
-      inset:0;
-      z-index:220;
-      background:
-        linear-gradient(rgba(0,0,0,.10),rgba(0,0,0,.22)),
-        #000;
+    /* ═══════════════════════════════════════
+       HOMEWORK VIDEO — cinematic
+    ═══════════════════════════════════════ */
+    #hwVideoWrap{
+      position:fixed; inset:0; z-index:220;
+      background:#000;
       opacity:0;
       pointer-events:none;
       visibility:hidden;
-      transition:opacity 520ms ease, visibility 0s linear 520ms;
+      transition:opacity 750ms cubic-bezier(.4,0,.2,1), visibility 0s linear 750ms;
     }
     #hwVideoWrap.show{
       opacity:1;
       visibility:visible;
       pointer-events:auto;
-      transition:opacity 520ms ease;
+      transition:opacity 750ms cubic-bezier(.4,0,.2,1);
     }
+    /* Letterbox bars */
+    #hwVideoWrap::before,
+    #hwVideoWrap::after{
+      content:'';
+      position:absolute; left:0; right:0; height:0;
+      background:#000; z-index:2;
+      transition:height 900ms cubic-bezier(.4,0,.2,1) 300ms;
+    }
+    #hwVideoWrap::before{ top:0; }
+    #hwVideoWrap::after{ bottom:0; }
+    #hwVideoWrap.show::before,
+    #hwVideoWrap.show::after{ height:9vh; }
 
     #hwTreeVideo{
-      position:absolute;
-      inset:0;
-      width:100%;
-      height:100%;
-      object-fit:cover;
-      object-position:center center;
-      background:#000;
-      display:block;
+      position:absolute; inset:0;
+      width:100%; height:100%;
+      object-fit:cover; object-position:center center;
+      background:#000; display:block;
+    }
+    #hwVideoCinema{
+      position:absolute; inset:0; z-index:3;
+      background:radial-gradient(ellipse at center,transparent 48%,rgba(0,0,0,.60) 100%);
+      pointer-events:none;
     }
 
-     @media (prefers-reduced-motion:reduce){
+    @media (prefers-reduced-motion:reduce){
       #startGhost{ animation:none; }
       .rotateIcon{ animation:none; transform:rotate(-90deg); }
       #fade{ transition:none; }
       #hwVideoWrap{ transition:none; }
+      #hwTreeEmoji{ animation:none; }
+      #hwPrompt{ transition:none; }
+      .hw-dot{ animation:none; opacity:.7; }
+      #hwPromptBar{ animation:none; }
+      .hw-corner{ animation:none; opacity:.6; }
       .sp{ animation:none; opacity:.6; }
     }
-    
   </style>
 </head>
 <body>
@@ -332,31 +454,58 @@
   </div>
   <div id="fade" aria-hidden="true"></div>
 
-    <div id="hwPromptScrim"></div>
+  <!-- HOMEWORK PROMPT -->
+  <div id="hwPromptScrim"></div>
   <div id="hwPrompt" role="dialog" aria-modal="true" aria-labelledby="hwPromptTitle">
+    <div class="hw-corner tl" aria-hidden="true">
+      <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <line x1="16" y1="3" x2="16" y2="29" stroke="#ffe566" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="3" y1="16" x2="29" y2="16" stroke="#ffe566" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="7" y1="7" x2="25" y2="25" stroke="#ffcc44" stroke-width="1.1" stroke-linecap="round" opacity=".55"/>
+        <line x1="25" y1="7" x2="7" y2="25" stroke="#ffcc44" stroke-width="1.1" stroke-linecap="round" opacity=".55"/>
+      </svg>
+    </div>
+    <div class="hw-corner tr" aria-hidden="true">
+      <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <line x1="16" y1="3" x2="16" y2="29" stroke="#ffe566" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="3" y1="16" x2="29" y2="16" stroke="#ffe566" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="7" y1="7" x2="25" y2="25" stroke="#ffcc44" stroke-width="1.1" stroke-linecap="round" opacity=".55"/>
+        <line x1="25" y1="7" x2="7" y2="25" stroke="#ffcc44" stroke-width="1.1" stroke-linecap="round" opacity=".55"/>
+      </svg>
+    </div>
     <div id="hwPromptBar"></div>
-    <p class="hw-week-label">しゅくだい</p>
-    <h2 id="hwPromptTitle">しゅくだいの木に はいりますか？</h2>
-    <p id="hwPromptSub">Homework Tree に いきますか？</p>
+    <span id="hwTreeEmoji" role="img" aria-label="しゅくだいの木">🌳</span>
+    <p class="hw-eyebrow">しゅくだい</p>
+    <h2 id="hwPromptTitle">しゅくだいの木に<br>はいりますか？</h2>
+    <p id="hwPromptSub">Homework Tree へ いきますか？</p>
+    <div class="hw-dots" aria-hidden="true">
+      <div class="hw-dot"></div>
+      <div class="hw-dot"></div>
+      <div class="hw-dot"></div>
+      <div class="hw-dot"></div>
+      <div class="hw-dot"></div>
+    </div>
     <div class="hw-actions">
-      <button id="hwNoBtn" type="button">いいえ</button>
-      <button id="hwYesBtn" type="button">はい</button>
+      <button id="hwNoBtn" type="button">🙅 いいえ</button>
+      <button id="hwYesBtn" type="button">✨ はい！</button>
     </div>
   </div>
 
+  <!-- HOMEWORK VIDEO — cinematic -->
   <div id="hwVideoWrap" aria-hidden="true">
     <video id="hwTreeVideo" preload="auto" playsinline webkit-playsinline>
       <source src="assets/video/homework.mp4" type="video/mp4" />
     </video>
+    <div id="hwVideoCinema"></div>
   </div>
-  
+
 </div>
 <audio id="bgMusic" src="assets/audio/sneaky.mp3" loop preload="auto"></audio>
-  
+
 <script src="./js/calendar.js"></script>
 <script>
 const { getCurrentCurriculumWeek, getAcademicWeekNumber } = window.CALENDAR;
-  
+
 const BRYAN_PASS = 'him141amra803';
 const IMG_W = 1600;
 const IMG_H = 900;
@@ -372,17 +521,17 @@ const OPEN_WEEKS = [
 
 const GHOST_TRAVEL_MS = 3800;
 
-// ── Ghost intro: slow elegant descent then glide to checkpoint ──
-// One smooth continuous animation, no abrupt phase switches.
-// Phase 1 (dropping): ghost floats down from above with gentle horizontal sway — slow & dreamlike
-// Phase 2 (hovering): brief pause floating at center, gently bobbing
-// Phase 3 (settling): smooth cubic ease glide to checkpoint
 const INTRO_GLOW_MS   = 2600;
-const INTRO_DROP_MS   = 3800;   // phase 1: slow dreamy descent
-const INTRO_HOVER_MS  = 1200;   // phase 2: hover & breathe at center
-const INTRO_SETTLE_MS = 2200;   // phase 3: long smooth glide to CP
+const INTRO_DROP_MS   = 3800;
+const INTRO_HOVER_MS  = 1200;
+const INTRO_SETTLE_MS = 2200;
 const INTRO_TOP_CENTER_START = { ix: IMG_W / 2, iy: -100 };
-const INTRO_HOVER_LAND = { ix: IMG_W / 2, iy: 300 }; // where ghost hovers
+const INTRO_HOVER_LAND = { ix: IMG_W / 2, iy: 300 };
+
+// Homework tree image-space position & hit radius
+const HW_TREE_IX = 979;
+const HW_TREE_IY = 305;
+const HW_TREE_HIT_R = 52;
 
 const GHOSTS = [
   'assets/img/booha_ghost.png',
@@ -392,12 +541,8 @@ const GHOSTS = [
   'assets/img/purple-boo.png'
 ];
 
-// ── Trees — drawn preserving natural aspect ratio ──
-// Target width in image-space pixels (scales with map).
-// 2.5× ghost diameter in image-space = 2.5 * (56px / coverScale) but we keep
-// it simple: define a target IMAGE-SPACE width and let getCover do the rest.
-const HW_TREE_IW = 100;   // homework tree target width in image-space px
-const KR_TREE_IW = 78;   // karasuki tree target width in image-space px
+const HW_TREE_IW = 100;
+const KR_TREE_IW = 78;
 
 const MONTH_COLORS = [
   ['#ff3bbd','#ff79d7'],['#ff6b3b','#ffaa5e'],['#3bc8ff','#a8edff'],
@@ -469,7 +614,6 @@ const app=document.getElementById('app'),rotateOverlay=document.getElementById('
   hwVideoWrap=document.getElementById('hwVideoWrap'),
   hwTreeVideo=document.getElementById('hwTreeVideo');
 
-  
 const FADE_MS=520;
 
 // Canvas
@@ -500,75 +644,44 @@ const homeworkImg=new Image(); homeworkImg.src='assets/img/homework-tree.png';
 const karasuki1Img=new Image(); karasuki1Img.src='assets/img/karasuki1-tree.png';
 const karasuki2Img=new Image(); karasuki2Img.src='assets/img/karasuki2-tree.png';
 
-// Karasuki state machine:
-// Phase 0: show img1, wait 25s
-// Phase 1: crossfade img1→img2 (1.2s)
-// Phase 2: show img2, wait 25s
-// Phase 3: crossfade img2→img1 (1.2s)
-// Phase 4: visible img1, slowly fade OUT (1.5s) — puff of crosses
-// Phase 5: INVISIBLE, wait 15s
-// Phase 6: fade back IN (1.5s)
-// → back to phase 0
-let karasukiPhase=0, karasukiBlend=0, karasukiOpacity=1, karasukiLastSwap=0;
-const KARASUKI_SWAP_MS=25000, KARASUKI_FADE_MS=1200, KARASUKI_GONE_MS=15000, KARASUKI_PUFF_MS=1500;
-// Puff particles: burst when tree disappears
+// Karasuki state machine
+let karasukiPhase=0,karasukiBlend=0,karasukiOpacity=1,karasukiLastSwap=0;
+const KARASUKI_SWAP_MS=25000,KARASUKI_FADE_MS=1200,KARASUKI_GONE_MS=15000,KARASUKI_PUFF_MS=1500;
 let karasukiPuffParticles=[];
 
 function spawnKarasukiPuff(cx,cy){
   karasukiPuffParticles=[];
   for(let i=0;i<28;i++){
-    const angle=Math.random()*Math.PI*2;
-    const speed=1.2+Math.random()*2.8;
-    karasukiPuffParticles.push({
-      x:cx,y:cy,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed-1.5,
-      life:1,size:3+Math.random()*5,
-      color:i%3===0?'#aaffcc':i%3===1?'#dd99ff':'#9933ff'
-    });
+    const angle=Math.random()*Math.PI*2,speed=1.2+Math.random()*2.8;
+    karasukiPuffParticles.push({x:cx,y:cy,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed-1.5,life:1,size:3+Math.random()*5,color:i%3===0?'#aaffcc':i%3===1?'#dd99ff':'#9933ff'});
   }
 }
-
 function tickKarasuki(now,cx,cy){
   if(karasukiLastSwap===0){karasukiLastSwap=now;return;}
   const el=now-karasukiLastSwap;
-  if(karasukiPhase===0){
-    karasukiOpacity=1;karasukiBlend=0;
-    if(el>=KARASUKI_SWAP_MS){karasukiPhase=1;karasukiLastSwap=now;}
-  } else if(karasukiPhase===1){
-    karasukiBlend=Math.min(el/KARASUKI_FADE_MS,1);
-    if(karasukiBlend>=1){karasukiPhase=2;karasukiLastSwap=now;}
-  } else if(karasukiPhase===2){
-    karasukiOpacity=1;karasukiBlend=1;
-    if(el>=KARASUKI_SWAP_MS){karasukiPhase=3;karasukiLastSwap=now;}
-  } else if(karasukiPhase===3){
-    karasukiBlend=Math.max(1-el/KARASUKI_FADE_MS,0);
-    if(karasukiBlend<=0){karasukiPhase=4;karasukiLastSwap=now;}
-  } else if(karasukiPhase===4){
-    // Fade out with puff
-    karasukiOpacity=Math.max(1-el/KARASUKI_PUFF_MS,0);
-    if(el>50&&karasukiPuffParticles.length===0) spawnKarasukiPuff(cx,cy);
-    if(karasukiOpacity<=0){karasukiPhase=5;karasukiLastSwap=now;karasukiOpacity=0;}
-  } else if(karasukiPhase===5){
-    karasukiOpacity=0;
-    if(el>=KARASUKI_GONE_MS){karasukiPhase=6;karasukiLastSwap=now;}
-  } else if(karasukiPhase===6){
-    karasukiOpacity=Math.min(el/KARASUKI_PUFF_MS,1);
-    if(karasukiOpacity>=1){karasukiPhase=0;karasukiLastSwap=now;karasukiPuffParticles=[];}
-  }
-  // Tick puff particles
-  for(const p of karasukiPuffParticles){
-    p.x+=p.vx;p.y+=p.vy;p.vy+=0.04;p.life-=0.018;
-  }
+  if(karasukiPhase===0){karasukiOpacity=1;karasukiBlend=0;if(el>=KARASUKI_SWAP_MS){karasukiPhase=1;karasukiLastSwap=now;}}
+  else if(karasukiPhase===1){karasukiBlend=Math.min(el/KARASUKI_FADE_MS,1);if(karasukiBlend>=1){karasukiPhase=2;karasukiLastSwap=now;}}
+  else if(karasukiPhase===2){karasukiOpacity=1;karasukiBlend=1;if(el>=KARASUKI_SWAP_MS){karasukiPhase=3;karasukiLastSwap=now;}}
+  else if(karasukiPhase===3){karasukiBlend=Math.max(1-el/KARASUKI_FADE_MS,0);if(karasukiBlend<=0){karasukiPhase=4;karasukiLastSwap=now;}}
+  else if(karasukiPhase===4){karasukiOpacity=Math.max(1-el/KARASUKI_PUFF_MS,0);if(el>50&&karasukiPuffParticles.length===0)spawnKarasukiPuff(cx,cy);if(karasukiOpacity<=0){karasukiPhase=5;karasukiLastSwap=now;karasukiOpacity=0;}}
+  else if(karasukiPhase===5){karasukiOpacity=0;if(el>=KARASUKI_GONE_MS){karasukiPhase=6;karasukiLastSwap=now;}}
+  else if(karasukiPhase===6){karasukiOpacity=Math.min(el/KARASUKI_PUFF_MS,1);if(karasukiOpacity>=1){karasukiPhase=0;karasukiLastSwap=now;karasukiPuffParticles=[];}}
+  for(const p of karasukiPuffParticles){p.x+=p.vx;p.y+=p.vy;p.vy+=0.04;p.life-=0.018;}
   karasukiPuffParticles=karasukiPuffParticles.filter(p=>p.life>0);
 }
 
 // State
 let mazeStarted=false,bryanOn=false,activeWeek=CURRENT_WEEK,ghostLocked=false;
 let introPhase='idle',introGlowStart=0,introDropStart=0,introHoverStart=0,introSettleStart=0;
-let introHoverIX=0,introHoverIY=0; // position where ghost arrived when hovering began
+let introHoverIX=0,introHoverIY=0;
 const startCP=CHECKPOINTS.find(c=>c.w===CURRENT_WEEK);
 let ghostIX=INTRO_TOP_CENTER_START.ix,ghostIY=INTRO_TOP_CENTER_START.iy;
 let ghostSrcIX=ghostIX,ghostSrcIY=ghostIY,ghostDstIX=ghostIX,ghostDstIY=ghostIY;
 let ghostT=1,ghostAnimStart=0,pendingPopupCP=null,ghostVisible=false;
+
+// pendingHomework: ghost is travelling to the HW tree; open prompt when it arrives
+let pendingHomework=false;
+
 let trail=[];
 
 const CP_FAIRIES=CHECKPOINTS.map(()=>Array.from({length:8},(_,i)=>({
@@ -582,49 +695,29 @@ let bMouseX=-1,bMouseY=-1,rafHandle=null;
 function restoreMazeFromCheckpoint(){
   const returnWeek=parseInt(sessionStorage.getItem('booha_return_week')||'',10);
   const returnGhost=parseInt(sessionStorage.getItem('booha_return_ghost')||'',10);
-  
-  const reopenPopup = sessionStorage.getItem('booha_reopen_popup') === '1';
-
+  const reopenPopup=sessionStorage.getItem('booha_reopen_popup')==='1';
   sessionStorage.removeItem('booha_return_to_checkpoint');
   sessionStorage.removeItem('booha_return_week');
   sessionStorage.removeItem('booha_return_ghost');
   sessionStorage.removeItem('booha_reopen_popup');
-  
   if(Number.isInteger(returnGhost)&&returnGhost>=0&&returnGhost<GHOSTS.length){activeGhostIdx=returnGhost;startGhost.src=GHOSTS[activeGhostIdx];}
   if(Number.isInteger(returnWeek)&&returnWeek>=1&&returnWeek<=CHECKPOINTS.length)activeWeek=returnWeek;
   else activeWeek=CURRENT_WEEK;
   const cp=CHECKPOINTS.find(c=>c.w===activeWeek)||startCP;
   mazeStarted=true;mazeLaunched=true;videoPlayed=true;o2shown=true;
-  
   introPhase='done';ghostVisible=true;
-  ghostIX=cp.ix;ghostIY=cp.iy;ghostSrcIX=cp.ix;ghostSrcIY=cp.iy;ghostDstIX=cp.ix;ghostDstIY=cp.iy;ghostT=1;pendingPopupCP=null;
-  
+  ghostIX=cp.ix;ghostIY=cp.iy;ghostSrcIX=cp.ix;ghostSrcIY=cp.iy;ghostDstIX=cp.ix;ghostDstIY=cp.iy;ghostT=1;pendingPopupCP=null;pendingHomework=false;
   overlay1.classList.add('hidden','gone');overlay2.classList.remove('show');overlay2.classList.add('hidden','gone');
-  
   videoWrap.classList.remove('show');cpPopup.classList.remove('show');cpScrim.classList.remove('show');
-  hwPrompt.classList.remove('show');hwPromptScrim.classList.remove('show');hwVideoWrap.classList.remove('show');
-  
+  hwPrompt.classList.remove('show','visible');hwPromptScrim.classList.remove('show','active');
+  hwVideoWrap.classList.remove('show');
   app.classList.remove('inTransition');
   karasukiLastSwap=performance.now();
-  
-  resizeCanvas();
-  buildWanderers();
-  startLoop();
-
-    //restor
-try {
-  bgMusic.loop = true;
-  bgMusic.volume = .65;
-  bgMusic.play().catch(() => {});
-} catch(e) {}
-
-  if (reopenPopup) {
-    showPopupAtCP(cp);
-  }
-
+  resizeCanvas();buildWanderers();startLoop();
+  try{bgMusic.loop=true;bgMusic.volume=.65;bgMusic.play().catch(()=>{});}catch(e){}
+  if(reopenPopup)showPopupAtCP(cp);
 }
 
-// Wanderers
 const GHOST_SIZE=56,WANDER_TRAIL_MAX=60;
 let wanderers=[];
 
@@ -635,71 +728,42 @@ function buildWanderers(){
     wanderers.push(createWanderer(gi,wanderers.length*1400));
   }
 }
-
 function createWanderer(ghostIdx,delayMs){
   const side=Math.floor(Math.random()*4);
   let sx,sy;
-  switch(side){ case 0:sx=Math.random()*window.innerWidth;sy=-GHOST_SIZE;break; case 1:sx=window.innerWidth+GHOST_SIZE;sy=Math.random()*window.innerHeight;break; case 2:sx=Math.random()*window.innerWidth;sy=window.innerHeight+GHOST_SIZE;break; default:sx=-GHOST_SIZE;sy=Math.random()*window.innerHeight; }
+  switch(side){case 0:sx=Math.random()*window.innerWidth;sy=-GHOST_SIZE;break;case 1:sx=window.innerWidth+GHOST_SIZE;sy=Math.random()*window.innerHeight;break;case 2:sx=Math.random()*window.innerWidth;sy=window.innerHeight+GHOST_SIZE;break;default:sx=-GHOST_SIZE;sy=Math.random()*window.innerHeight;}
   const exitSide=(side+2)%4;
   let tx,ty;
-  switch(exitSide){ case 0:tx=Math.random()*window.innerWidth;ty=-GHOST_SIZE;break; case 1:tx=window.innerWidth+GHOST_SIZE;ty=Math.random()*window.innerHeight;break; case 2:tx=Math.random()*window.innerWidth;ty=window.innerHeight+GHOST_SIZE;break; default:tx=-GHOST_SIZE;ty=Math.random()*window.innerHeight; }
+  switch(exitSide){case 0:tx=Math.random()*window.innerWidth;ty=-GHOST_SIZE;break;case 1:tx=window.innerWidth+GHOST_SIZE;ty=Math.random()*window.innerHeight;break;case 2:tx=Math.random()*window.innerWidth;ty=window.innerHeight+GHOST_SIZE;break;default:tx=-GHOST_SIZE;ty=Math.random()*window.innerHeight;}
   const dur=14000+Math.random()*12000;
   return{ghostIdx,sx,sy,tx,ty,startTime:null,delayMs,dur,wobbleAmp:18+Math.random()*24,wobbleFreq:.25+Math.random()*.35,wobblePhase:Math.random()*Math.PI*2,bobAmp:5+Math.random()*6,bobFreq:1.2+Math.random()*.8,trail:[],done:false,cx:sx,cy:sy,opacity:0};
 }
-
 function tickWanderers(nowMs){
   for(let i=0;i<wanderers.length;i++){
-    const w=wanderers[i];
-    if(w.done)continue;
+    const w=wanderers[i];if(w.done)continue;
     if(w.startTime===null){if(nowMs<w.delayMs)continue;w.startTime=nowMs;}
     const elapsed=nowMs-w.startTime,t=Math.min(elapsed/w.dur,1),et=easeInOut(t);
     const dx=w.tx-w.sx,dy=w.ty-w.sy,len=Math.hypot(dx,dy)||1,nx=-dy/len,ny=dx/len;
     const sec=nowMs/1000,wob=Math.sin(sec*w.wobbleFreq*Math.PI*2+w.wobblePhase)*w.wobbleAmp,bob=Math.sin(sec*w.bobFreq*Math.PI*2)*w.bobAmp;
     const bx=w.sx+dx*et+nx*wob,by=w.sy+dy*et+ny*wob+bob;
     w.opacity=Math.min(t*6,1,(1-t)*6)*.82;
-    if(Math.random()<.35){
-      const col=MONTH_COLORS[Math.floor(Math.random()*MONTH_COLORS.length)];
-      w.trail.push({x:bx,y:by,life:1,size:2+Math.random()*3.5,color:col[Math.random()<.5?0:1],dx:(Math.random()-.5)*.3,dy:-Math.random()*.4});
-      if(w.trail.length>WANDER_TRAIL_MAX)w.trail.shift();
-    }
-    w.cx=bx;w.cy=by;
-    if(t>=1)w.done=true;
+    if(Math.random()<.35){const col=MONTH_COLORS[Math.floor(Math.random()*MONTH_COLORS.length)];w.trail.push({x:bx,y:by,life:1,size:2+Math.random()*3.5,color:col[Math.random()<.5?0:1],dx:(Math.random()-.5)*.3,dy:-Math.random()*.4});if(w.trail.length>WANDER_TRAIL_MAX)w.trail.shift();}
+    w.cx=bx;w.cy=by;if(t>=1)w.done=true;
   }
-  for(let i=0;i<wanderers.length;i++){
-    if(wanderers[i].done){
-      const gi=wanderers[i].ghostIdx;
-      const delay=performance.now()+3000+Math.random()*8000;
-      wanderers[i]=createWanderer(gi,delay);wanderers[i].startTime=null;
-    }
-  }
+  for(let i=0;i<wanderers.length;i++){if(wanderers[i].done){const gi=wanderers[i].ghostIdx;const delay=performance.now()+3000+Math.random()*8000;wanderers[i]=createWanderer(gi,delay);wanderers[i].startTime=null;}}
 }
-
-function easeInOut(t){ return t<.5?2*t*t:-1+(4-2*t)*t; }
-
+function easeInOut(t){return t<.5?2*t*t:-1+(4-2*t)*t;}
 function drawWanderers(nowMs){
   for(const w of wanderers){
-    if(w.opacity<=0)continue;
-    const img=ghostImgs[w.ghostIdx];
-    if(!img||!img.complete||!img.naturalWidth)continue;
+    if(w.opacity<=0)continue;const img=ghostImgs[w.ghostIdx];if(!img||!img.complete||!img.naturalWidth)continue;
     const gR=GHOST_SIZE/2,gx=w.cx,gy=w.cy;
     const col1=MONTH_COLORS[w.ghostIdx%MONTH_COLORS.length][0],col2=MONTH_COLORS[w.ghostIdx%MONTH_COLORS.length][1];
     const sec=nowMs/1000,pulseG=.5+.5*Math.sin(sec*2.1+w.ghostIdx*.8);
     ctx.save();
-    for(let pi=w.trail.length-1;pi>=0;pi--){
-      const p=w.trail[pi];
-      const gr=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.size*2.3);
-      gr.addColorStop(0,p.color);gr.addColorStop(1,'transparent');
-      ctx.globalAlpha=p.life*.35*w.opacity;ctx.fillStyle=gr;ctx.beginPath();ctx.arc(p.x,p.y,p.size*2.3,0,Math.PI*2);ctx.fill();
-      ctx.globalAlpha=p.life*.70*w.opacity;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(p.x,p.y,p.size*.34,0,Math.PI*2);ctx.fill();
-      ctx.globalAlpha=1;p.life-=.018;p.x+=p.dx;p.y+=p.dy;
-    }
+    for(let pi=w.trail.length-1;pi>=0;pi--){const p=w.trail[pi];const gr=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.size*2.3);gr.addColorStop(0,p.color);gr.addColorStop(1,'transparent');ctx.globalAlpha=p.life*.35*w.opacity;ctx.fillStyle=gr;ctx.beginPath();ctx.arc(p.x,p.y,p.size*2.3,0,Math.PI*2);ctx.fill();ctx.globalAlpha=p.life*.70*w.opacity;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(p.x,p.y,p.size*.34,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;p.life-=.018;p.x+=p.dx;p.y+=p.dy;}
     w.trail=w.trail.filter(p=>p.life>0);
-    ctx.globalAlpha=w.opacity*(.18+pulseG*.09);
-    const ga=ctx.createRadialGradient(gx,gy+3,0,gx,gy+3,gR*2);
-    ga.addColorStop(0,col1);ga.addColorStop(.5,col2);ga.addColorStop(1,'transparent');
-    ctx.fillStyle=ga;ctx.beginPath();ctx.arc(gx,gy+3,gR*2,0,Math.PI*2);ctx.fill();
-    ctx.globalAlpha=w.opacity;ctx.drawImage(img,gx-gR,gy-gR,gR*2,gR*2);
-    ctx.globalAlpha=1;ctx.restore();
+    ctx.globalAlpha=w.opacity*(.18+pulseG*.09);const ga=ctx.createRadialGradient(gx,gy+3,0,gx,gy+3,gR*2);ga.addColorStop(0,col1);ga.addColorStop(.5,col2);ga.addColorStop(1,'transparent');ctx.fillStyle=ga;ctx.beginPath();ctx.arc(gx,gy+3,gR*2,0,Math.PI*2);ctx.fill();
+    ctx.globalAlpha=w.opacity;ctx.drawImage(img,gx-gR,gy-gR,gR*2,gR*2);ctx.globalAlpha=1;ctx.restore();
   }
 }
 
@@ -708,10 +772,9 @@ function setTravelLock(on){
   backBtn.style.pointerEvents=on?'none':'';bryanBtn.style.pointerEvents=on?'none':'';
 }
 
-// Easing functions
-function ease(t){ return t<.5?2*t*t:-1+(4-2*t)*t; }
-function easeOutCubic(t){ return 1-Math.pow(1-t,3); }
-function easeInOutCubic(t){ return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2; }
+function ease(t){return t<.5?2*t*t:-1+(4-2*t)*t;}
+function easeOutCubic(t){return 1-Math.pow(1-t,3);}
+function easeInOutCubic(t){return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;}
 
 function addTrail(ix,iy){
   const c=Math.random()>.55?monthSecondary(activeWeek):monthPrimary(activeWeek);
@@ -719,153 +782,51 @@ function addTrail(ix,iy){
   if(trail.length>100)trail.shift();
 }
 
-// ── Draw trees ──────────────────────────────────────────────────────────────
 function drawTrees(now){
   if(!mazeStarted)return;
   const sec=now/1000;
   const{scale:cvScale}=getCover();
-
-  // Helper: get CSS draw rect for a tree image, centered on image-space point (ix,iy)
-  // targetIW = desired width in image-space units (preserves aspect ratio)
   function treeRect(img,ix,iy,targetIW){
-    const{x,y}=imgToCSS(ix,iy);
-    const nat=img.naturalWidth&&img.naturalHeight?img.naturalWidth/img.naturalHeight:1;
-    const cssW=targetIW*cvScale;
-    const cssH=cssW/nat;
-    return{x,y,w:cssW,h:cssH};
+    const{x,y}=imgToCSS(ix,iy);const nat=img.naturalWidth&&img.naturalHeight?img.naturalWidth/img.naturalHeight:1;
+    const w=targetIW*cvScale;return{x,y,w,h:w/nat};
   }
 
-  // ── Homework tree (x979, y305) — welcoming warm glow ──────────────────────
+  // Homework tree
   if(homeworkImg.complete&&homeworkImg.naturalWidth>0){
-    const r=treeRect(homeworkImg,979,305,HW_TREE_IW);
-    const cx=r.x, cy=r.y;
-    const pulse=.5+.5*Math.sin(sec*1.4), pulse2=.5+.5*Math.sin(sec*.9+1.1);
+    const r=treeRect(homeworkImg,HW_TREE_IX,HW_TREE_IY,HW_TREE_IW);
+    const cx=r.x,cy=r.y;const pulse=.5+.5*Math.sin(sec*1.4),pulse2=.5+.5*Math.sin(sec*.9+1.1);
     ctx.save();
-    // Soft ground shadow ellipse
-    ctx.globalAlpha=.14+pulse*.04;
-    const sg=ctx.createRadialGradient(cx,cy+r.h*.42,0,cx,cy+r.h*.42,r.w*.9);
-    sg.addColorStop(0,'rgba(0,0,0,.5)');sg.addColorStop(1,'transparent');
-    ctx.fillStyle=sg;ctx.beginPath();ctx.ellipse(cx,cy+r.h*.44,r.w*.7,r.h*.18,0,0,Math.PI*2);ctx.fill();
-    // Wide warm amber aura
-    ctx.globalAlpha=.08+pulse*.05;
-    const a1=ctx.createRadialGradient(cx,cy,0,cx,cy,r.w*2.2);
-    a1.addColorStop(0,'#ffe066');a1.addColorStop(.4,'#ffbb33');a1.addColorStop(1,'transparent');
-    ctx.fillStyle=a1;ctx.beginPath();ctx.arc(cx,cy,r.w*2.2,0,Math.PI*2);ctx.fill();
-    // Mid warm glow
-    ctx.globalAlpha=.18+pulse2*.12;
-    const a2=ctx.createRadialGradient(cx,cy-r.h*.2,0,cx,cy-r.h*.2,r.w*1.4);
-    a2.addColorStop(0,'#fff9a0');a2.addColorStop(.5,'#ffdd55');a2.addColorStop(1,'transparent');
-    ctx.fillStyle=a2;ctx.beginPath();ctx.arc(cx,cy-r.h*.2,r.w*1.4,0,Math.PI*2);ctx.fill();
-    // Inner lantern core
-    ctx.globalAlpha=.25+pulse*.16;
-    const a3=ctx.createRadialGradient(cx,cy-r.h*.25,0,cx,cy-r.h*.25,r.w*.72);
-    a3.addColorStop(0,'#ffffff');a3.addColorStop(.35,'#ffe888');a3.addColorStop(1,'transparent');
-    ctx.fillStyle=a3;ctx.beginPath();ctx.arc(cx,cy-r.h*.25,r.w*.72,0,Math.PI*2);ctx.fill();
-    // Twinkling sparkle crosses
-    for(let i=0;i<6;i++){
-      const angle=(i/6)*Math.PI*2+sec*.4;
-      const twinkle=.4+.6*Math.abs(Math.sin(sec*2.2+i*1.1));
-      const orb=r.w*(.65+.12*Math.sin(sec*.8+i));
-      const fx=cx+Math.cos(angle)*orb, fy=(cy-r.h*.2)+Math.sin(angle)*orb*.6;
-      ctx.globalAlpha=twinkle*.58;ctx.strokeStyle='#fff8c0';ctx.lineWidth=1.0;
-      ctx.shadowBlur=6;ctx.shadowColor='#ffe566';
-      const sl=3+twinkle*2.5;
-      ctx.beginPath();ctx.moveTo(fx,fy-sl);ctx.lineTo(fx,fy+sl);ctx.moveTo(fx-sl,fy);ctx.lineTo(fx+sl,fy);ctx.stroke();
-      ctx.shadowBlur=0;
-    }
-    // Draw image at natural ratio
-    ctx.globalAlpha=1;
-    ctx.drawImage(homeworkImg, cx-r.w/2, cy-r.h/2, r.w, r.h);
-    ctx.restore();
+    ctx.globalAlpha=.14+pulse*.04;const sg=ctx.createRadialGradient(cx,cy+r.h*.42,0,cx,cy+r.h*.42,r.w*.9);sg.addColorStop(0,'rgba(0,0,0,.5)');sg.addColorStop(1,'transparent');ctx.fillStyle=sg;ctx.beginPath();ctx.ellipse(cx,cy+r.h*.44,r.w*.7,r.h*.18,0,0,Math.PI*2);ctx.fill();
+    ctx.globalAlpha=.08+pulse*.05;const a1=ctx.createRadialGradient(cx,cy,0,cx,cy,r.w*2.2);a1.addColorStop(0,'#ffe066');a1.addColorStop(.4,'#ffbb33');a1.addColorStop(1,'transparent');ctx.fillStyle=a1;ctx.beginPath();ctx.arc(cx,cy,r.w*2.2,0,Math.PI*2);ctx.fill();
+    ctx.globalAlpha=.18+pulse2*.12;const a2=ctx.createRadialGradient(cx,cy-r.h*.2,0,cx,cy-r.h*.2,r.w*1.4);a2.addColorStop(0,'#fff9a0');a2.addColorStop(.5,'#ffdd55');a2.addColorStop(1,'transparent');ctx.fillStyle=a2;ctx.beginPath();ctx.arc(cx,cy-r.h*.2,r.w*1.4,0,Math.PI*2);ctx.fill();
+    ctx.globalAlpha=.25+pulse*.16;const a3=ctx.createRadialGradient(cx,cy-r.h*.25,0,cx,cy-r.h*.25,r.w*.72);a3.addColorStop(0,'#ffffff');a3.addColorStop(.35,'#ffe888');a3.addColorStop(1,'transparent');ctx.fillStyle=a3;ctx.beginPath();ctx.arc(cx,cy-r.h*.25,r.w*.72,0,Math.PI*2);ctx.fill();
+    for(let i=0;i<6;i++){const angle=(i/6)*Math.PI*2+sec*.4;const twinkle=.4+.6*Math.abs(Math.sin(sec*2.2+i*1.1));const orb=r.w*(.65+.12*Math.sin(sec*.8+i));const fx=cx+Math.cos(angle)*orb,fy=(cy-r.h*.2)+Math.sin(angle)*orb*.6;ctx.globalAlpha=twinkle*.58;ctx.strokeStyle='#fff8c0';ctx.lineWidth=1.0;ctx.shadowBlur=6;ctx.shadowColor='#ffe566';const sl=3+twinkle*2.5;ctx.beginPath();ctx.moveTo(fx,fy-sl);ctx.lineTo(fx,fy+sl);ctx.moveTo(fx-sl,fy);ctx.lineTo(fx+sl,fy);ctx.stroke();ctx.shadowBlur=0;}
+    ctx.globalAlpha=1;ctx.drawImage(homeworkImg,cx-r.w/2,cy-r.h/2,r.w,r.h);ctx.restore();
   }
 
-  // ── Karasuki tree (x535, y300) — spooky glow + crossfade + disappear ──────
+  // Karasuki tree
   {
-    const refImg = karasuki1Img.complete&&karasuki1Img.naturalWidth>0 ? karasuki1Img
-                 : karasuki2Img.complete&&karasuki2Img.naturalWidth>0 ? karasuki2Img : null;
-    const{x:cx,y:cy}=imgToCSS(535,300);
-    // Compute draw rect using the available image
-    let drawW=KR_TREE_IW*cvScale, drawH=drawW;
-    if(refImg) drawH=drawW/( refImg.naturalWidth/refImg.naturalHeight );
-
-    // Tick state machine (pass CSS center for puff spawn)
+    const refImg=karasuki1Img.complete&&karasuki1Img.naturalWidth>0?karasuki1Img:karasuki2Img.complete&&karasuki2Img.naturalWidth>0?karasuki2Img:null;
+    const{x:cx,y:cy}=imgToCSS(535,300);let drawW=KR_TREE_IW*cvScale,drawH=drawW;if(refImg)drawH=drawW/(refImg.naturalWidth/refImg.naturalHeight);
     tickKarasuki(now,cx,cy);
-
-    const flicker=.82+.18*Math.sin(sec*7.3)*Math.sin(sec*4.1+.7);
-    const pulse=.5+.5*Math.sin(sec*.85), pulse2=.5+.5*Math.sin(sec*1.7+2.0);
-    // All spooky glow and particles use karasukiOpacity so they fade with the tree
-    const kOp=karasukiOpacity;
-
+    const flicker=.82+.18*Math.sin(sec*7.3)*Math.sin(sec*4.1+.7);const pulse=.5+.5*Math.sin(sec*.85),pulse2=.5+.5*Math.sin(sec*1.7+2.0);const kOp=karasukiOpacity;
     ctx.save();
     if(kOp>0){
-      // Ground mist
-      ctx.globalAlpha=(.18+pulse*.06)*kOp;
-      const sg=ctx.createRadialGradient(cx,cy+drawH*.42,0,cx,cy+drawH*.42,drawW*1.2);
-      sg.addColorStop(0,'rgba(40,0,60,.75)');sg.addColorStop(1,'transparent');
-      ctx.fillStyle=sg;ctx.beginPath();ctx.ellipse(cx,cy+drawH*.44,drawW*.8,drawH*.17,0,0,Math.PI*2);ctx.fill();
-      // Far purple fog
-      ctx.globalAlpha=(.07+pulse*.04)*flicker*kOp;
-      const s1=ctx.createRadialGradient(cx,cy,0,cx,cy,drawW*2.6);
-      s1.addColorStop(0,'#6600aa');s1.addColorStop(.45,'#330066');s1.addColorStop(1,'transparent');
-      ctx.fillStyle=s1;ctx.beginPath();ctx.arc(cx,cy,drawW*2.6,0,Math.PI*2);ctx.fill();
-      // Sickly green mid
-      ctx.globalAlpha=(.13+pulse2*.10)*flicker*kOp;
-      const s2=ctx.createRadialGradient(cx,cy-drawH*.2,0,cx,cy-drawH*.2,drawW*1.4);
-      s2.addColorStop(0,'#44ff66');s2.addColorStop(.4,'#00aa33');s2.addColorStop(1,'transparent');
-      ctx.fillStyle=s2;ctx.beginPath();ctx.arc(cx,cy-drawH*.2,drawW*1.4,0,Math.PI*2);ctx.fill();
-      // Inner purple core
-      ctx.globalAlpha=(.20+pulse*.14)*flicker*kOp;
-      const s3=ctx.createRadialGradient(cx,cy-drawH*.25,0,cx,cy-drawH*.25,drawW*.68);
-      s3.addColorStop(0,'#ddaaff');s3.addColorStop(.4,'#8833cc');s3.addColorStop(1,'transparent');
-      ctx.fillStyle=s3;ctx.beginPath();ctx.arc(cx,cy-drawH*.25,drawW*.68,0,Math.PI*2);ctx.fill();
-      // Rising wisps
-      for(let i=0;i<5;i++){
-        const wt=((sec*.22+i*.2)%1);
-        const wx=cx+Math.sin(sec*1.4+i*1.25)*drawW*.6;
-        const wy=(cy+drawH*.3)-wt*drawH*1.3;
-        const wa=(wt<.2?wt/.2:wt>.7?(1-wt)/.3:1)*kOp;
-        ctx.globalAlpha=wa*.22*flicker;
-        const wg=ctx.createRadialGradient(wx,wy,0,wx,wy,10+Math.sin(sec+i)*3);
-        wg.addColorStop(0,i%2===0?'#88ffaa':'#cc88ff');wg.addColorStop(1,'transparent');
-        ctx.fillStyle=wg;ctx.beginPath();ctx.arc(wx,wy,10+Math.sin(sec+i)*3,0,Math.PI*2);ctx.fill();
-      }
-      // Orbiting spooky crosses (burst outward when disappearing)
-      const crossR = karasukiPhase===4 ? drawW*(.80+(1-kOp)*2.5)
-                   : karasukiPhase===6 ? drawW*(.80+(1-kOp)*2.5)
-                   : drawW*.80;
-      for(let i=0;i<4;i++){
-        const angle=(i/4)*Math.PI*2+sec*.55, twinkle=.3+.7*Math.abs(Math.sin(sec*1.8+i*.9));
-        const r=crossR*(1+.12*Math.sin(sec*.6+i));
-        const fx=cx+Math.cos(angle)*r, fy=(cy-drawH*.2)+Math.sin(angle)*r*.7;
-        ctx.globalAlpha=twinkle*.50*flicker*kOp;
-        ctx.strokeStyle=i%2===0?'#aaffcc':'#dd99ff';ctx.lineWidth=1.0;
-        ctx.shadowBlur=8;ctx.shadowColor=i%2===0?'#00ff66':'#9933ff';
-        const sl=3+twinkle*2.8;
-        ctx.beginPath();ctx.moveTo(fx,fy-sl);ctx.lineTo(fx,fy+sl);ctx.moveTo(fx-sl,fy);ctx.lineTo(fx+sl,fy);ctx.stroke();
-        ctx.shadowBlur=0;
-      }
-      // Draw tree images with crossfade, modulated by karasukiOpacity
-      if(karasuki1Img.complete&&karasuki1Img.naturalWidth>0&&karasukiBlend<1){
-        ctx.globalAlpha=(1-karasukiBlend)*kOp;
-        ctx.drawImage(karasuki1Img,cx-drawW/2,cy-drawH/2,drawW,drawH);
-      }
-      if(karasuki2Img.complete&&karasuki2Img.naturalWidth>0&&karasukiBlend>0){
-        ctx.globalAlpha=karasukiBlend*kOp;
-        ctx.drawImage(karasuki2Img,cx-drawW/2,cy-drawH/2,drawW,drawH);
-      }
+      ctx.globalAlpha=(.18+pulse*.06)*kOp;const sg=ctx.createRadialGradient(cx,cy+drawH*.42,0,cx,cy+drawH*.42,drawW*1.2);sg.addColorStop(0,'rgba(40,0,60,.75)');sg.addColorStop(1,'transparent');ctx.fillStyle=sg;ctx.beginPath();ctx.ellipse(cx,cy+drawH*.44,drawW*.8,drawH*.17,0,0,Math.PI*2);ctx.fill();
+      ctx.globalAlpha=(.07+pulse*.04)*flicker*kOp;const s1=ctx.createRadialGradient(cx,cy,0,cx,cy,drawW*2.6);s1.addColorStop(0,'#6600aa');s1.addColorStop(.45,'#330066');s1.addColorStop(1,'transparent');ctx.fillStyle=s1;ctx.beginPath();ctx.arc(cx,cy,drawW*2.6,0,Math.PI*2);ctx.fill();
+      ctx.globalAlpha=(.13+pulse2*.10)*flicker*kOp;const s2=ctx.createRadialGradient(cx,cy-drawH*.2,0,cx,cy-drawH*.2,drawW*1.4);s2.addColorStop(0,'#44ff66');s2.addColorStop(.4,'#00aa33');s2.addColorStop(1,'transparent');ctx.fillStyle=s2;ctx.beginPath();ctx.arc(cx,cy-drawH*.2,drawW*1.4,0,Math.PI*2);ctx.fill();
+      ctx.globalAlpha=(.20+pulse*.14)*flicker*kOp;const s3=ctx.createRadialGradient(cx,cy-drawH*.25,0,cx,cy-drawH*.25,drawW*.68);s3.addColorStop(0,'#ddaaff');s3.addColorStop(.4,'#8833cc');s3.addColorStop(1,'transparent');ctx.fillStyle=s3;ctx.beginPath();ctx.arc(cx,cy-drawH*.25,drawW*.68,0,Math.PI*2);ctx.fill();
+      for(let i=0;i<5;i++){const wt=((sec*.22+i*.2)%1);const wx=cx+Math.sin(sec*1.4+i*1.25)*drawW*.6;const wy=(cy+drawH*.3)-wt*drawH*1.3;const wa=(wt<.2?wt/.2:wt>.7?(1-wt)/.3:1)*kOp;ctx.globalAlpha=wa*.22*flicker;const wg=ctx.createRadialGradient(wx,wy,0,wx,wy,10+Math.sin(sec+i)*3);wg.addColorStop(0,i%2===0?'#88ffaa':'#cc88ff');wg.addColorStop(1,'transparent');ctx.fillStyle=wg;ctx.beginPath();ctx.arc(wx,wy,10+Math.sin(sec+i)*3,0,Math.PI*2);ctx.fill();}
+      const crossR=karasukiPhase===4?drawW*(.80+(1-kOp)*2.5):karasukiPhase===6?drawW*(.80+(1-kOp)*2.5):drawW*.80;
+      for(let i=0;i<4;i++){const angle=(i/4)*Math.PI*2+sec*.55,twinkle=.3+.7*Math.abs(Math.sin(sec*1.8+i*.9));const r=crossR*(1+.12*Math.sin(sec*.6+i));const fx=cx+Math.cos(angle)*r,fy=(cy-drawH*.2)+Math.sin(angle)*r*.7;ctx.globalAlpha=twinkle*.50*flicker*kOp;ctx.strokeStyle=i%2===0?'#aaffcc':'#dd99ff';ctx.lineWidth=1.0;ctx.shadowBlur=8;ctx.shadowColor=i%2===0?'#00ff66':'#9933ff';const sl=3+twinkle*2.8;ctx.beginPath();ctx.moveTo(fx,fy-sl);ctx.lineTo(fx,fy+sl);ctx.moveTo(fx-sl,fy);ctx.lineTo(fx+sl,fy);ctx.stroke();ctx.shadowBlur=0;}
+      if(karasuki1Img.complete&&karasuki1Img.naturalWidth>0&&karasukiBlend<1){ctx.globalAlpha=(1-karasukiBlend)*kOp;ctx.drawImage(karasuki1Img,cx-drawW/2,cy-drawH/2,drawW,drawH);}
+      if(karasuki2Img.complete&&karasuki2Img.naturalWidth>0&&karasukiBlend>0){ctx.globalAlpha=karasukiBlend*kOp;ctx.drawImage(karasuki2Img,cx-drawW/2,cy-drawH/2,drawW,drawH);}
     }
-    // Puff particles (drawn even when kOp=0, they have their own life)
-    for(const p of karasukiPuffParticles){
-      const pg=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.size*2);
-      pg.addColorStop(0,p.color);pg.addColorStop(1,'transparent');
-      ctx.globalAlpha=p.life*.7;ctx.fillStyle=pg;ctx.beginPath();ctx.arc(p.x,p.y,p.size*2,0,Math.PI*2);ctx.fill();
-      ctx.globalAlpha=p.life*.9;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(p.x,p.y,p.size*.3,0,Math.PI*2);ctx.fill();
-    }
+    for(const p of karasukiPuffParticles){const pg=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.size*2);pg.addColorStop(0,p.color);pg.addColorStop(1,'transparent');ctx.globalAlpha=p.life*.7;ctx.fillStyle=pg;ctx.beginPath();ctx.arc(p.x,p.y,p.size*2,0,Math.PI*2);ctx.fill();ctx.globalAlpha=p.life*.9;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(p.x,p.y,p.size*.3,0,Math.PI*2);ctx.fill();}
     ctx.globalAlpha=1;ctx.restore();
   }
 }
 
-// ── Draw frame ───────────────────────────────────────────────────────────────
 function drawFrame(now){
   ctx.clearRect(0,0,cssW,cssH);
   if(!mazeStarted)return;
@@ -875,164 +836,100 @@ function drawFrame(now){
     const el=now-introGlowStart,showEnd=INTRO_GLOW_MS*.62;
     let baseA=el<showEnd?1:Math.max(0,1-(el-showEnd)/(INTRO_GLOW_MS-showEnd));
     CHECKPOINTS.forEach(cp=>{cpState[cp.w]={alpha:OPEN_WEEKS.includes(cp.w)?1:baseA*.78,extra:1.5};});
-    if(el>=INTRO_GLOW_MS){
-      introPhase='dropping';introDropStart=now;
-      ghostIX=INTRO_TOP_CENTER_START.ix;ghostIY=INTRO_TOP_CENTER_START.iy;
-      ghostVisible=true;setTravelLock(true);
-    }
-
+    if(el>=INTRO_GLOW_MS){introPhase='dropping';introDropStart=now;ghostIX=INTRO_TOP_CENTER_START.ix;ghostIY=INTRO_TOP_CENTER_START.iy;ghostVisible=true;setTravelLock(true);}
   } else if(introPhase==='dropping'){
     OPEN_WEEKS.forEach(w=>{cpState[w]={alpha:1,extra:1.0};});
-    const prog=Math.min((now-introDropStart)/INTRO_DROP_MS,1);
-    // Smooth cubic ease — no overshoot, dreamy float down
-    const et=easeOutCubic(prog);
-    // Very gentle lateral sway — one slow, smooth sine wave
-    const sway=Math.sin(prog*Math.PI)*30;
-    ghostIX=INTRO_TOP_CENTER_START.ix+sway;
-    ghostIY=INTRO_TOP_CENTER_START.iy+(INTRO_HOVER_LAND.iy-INTRO_TOP_CENTER_START.iy)*et;
+    const prog=Math.min((now-introDropStart)/INTRO_DROP_MS,1);const et=easeOutCubic(prog);const sway=Math.sin(prog*Math.PI)*30;
+    ghostIX=INTRO_TOP_CENTER_START.ix+sway;ghostIY=INTRO_TOP_CENTER_START.iy+(INTRO_HOVER_LAND.iy-INTRO_TOP_CENTER_START.iy)*et;
     if(Math.random()<.25)addTrail(ghostIX,ghostIY);
-    if(prog>=1){
-      introHoverIX=ghostIX;introHoverIY=ghostIY;
-      introPhase='hovering';introHoverStart=now;
-    }
-
+    if(prog>=1){introHoverIX=ghostIX;introHoverIY=ghostIY;introPhase='hovering';introHoverStart=now;}
   } else if(introPhase==='hovering'){
     OPEN_WEEKS.forEach(w=>{cpState[w]={alpha:1,extra:1.0};});
     const prog=Math.min((now-introHoverStart)/INTRO_HOVER_MS,1);
-    // Just breathe in place — tiny vertical bob, no position change
-    ghostIX=introHoverIX;
-    ghostIY=introHoverIY; // bob is applied in the draw section already
-    if(prog>=1){
-      introPhase='settling';introSettleStart=now;
-    }
-
+    ghostIX=introHoverIX;ghostIY=introHoverIY;
+    if(prog>=1){introPhase='settling';introSettleStart=now;}
   } else if(introPhase==='settling'){
     OPEN_WEEKS.forEach(w=>{cpState[w]={alpha:1,extra:1.0};});
-    const prog=Math.min((now-introSettleStart)/INTRO_SETTLE_MS,1);
-    // Smooth cubic — glides elegantly to checkpoint
-    const et=easeInOutCubic(prog);
-    ghostIX=introHoverIX+(startCP.ix-introHoverIX)*et;
-    ghostIY=introHoverIY+(startCP.iy-introHoverIY)*et;
+    const prog=Math.min((now-introSettleStart)/INTRO_SETTLE_MS,1);const et=easeInOutCubic(prog);
+    ghostIX=introHoverIX+(startCP.ix-introHoverIX)*et;ghostIY=introHoverIY+(startCP.iy-introHoverIY)*et;
     if(Math.random()<.22)addTrail(ghostIX,ghostIY);
-    if(prog>=1){
-      introPhase='done';ghostIX=startCP.ix;ghostIY=startCP.iy;
-      ghostSrcIX=ghostIX;ghostSrcIY=ghostIY;ghostDstIX=ghostIX;ghostDstIY=ghostIY;ghostT=1;
-      setTravelLock(false);showPopupAtCP(startCP);
-    }
-
+    if(prog>=1){introPhase='done';ghostIX=startCP.ix;ghostIY=startCP.iy;ghostSrcIX=ghostIX;ghostSrcIY=ghostIY;ghostDstIX=ghostIX;ghostDstIY=ghostIY;ghostT=1;setTravelLock(false);showPopupAtCP(startCP);}
   } else if(introPhase==='done'){
     OPEN_WEEKS.forEach(w=>{cpState[w]={alpha:1,extra:0};});
-    if(bryanOn) CHECKPOINTS.forEach(cp=>{if(!cpState[cp.w])cpState[cp.w]={alpha:.65,extra:.15};});
+    if(bryanOn)CHECKPOINTS.forEach(cp=>{if(!cpState[cp.w])cpState[cp.w]={alpha:.65,extra:.15};});
     if(ghostT<1){
-      const el=now-ghostAnimStart;ghostT=Math.min(el/GHOST_TRAVEL_MS,1);
-      const et=ease(ghostT);
+      const el=now-ghostAnimStart;ghostT=Math.min(el/GHOST_TRAVEL_MS,1);const et=ease(ghostT);
       ghostIX=ghostSrcIX+(ghostDstIX-ghostSrcIX)*et;ghostIY=ghostSrcIY+(ghostDstIY-ghostSrcIY)*et;
       if(Math.random()<.28)addTrail(ghostIX,ghostIY);
-      if(ghostT>=1&&pendingPopupCP){ghostIX=ghostDstIX;ghostIY=ghostDstIY;setTravelLock(false);showPopupAtCP(pendingPopupCP);pendingPopupCP=null;}
+      if(ghostT>=1){
+        ghostIX=ghostDstIX;ghostIY=ghostDstIY;
+        setTravelLock(false);
+        if(pendingHomework){
+          pendingHomework=false;
+          openHomeworkPrompt();
+        } else if(pendingPopupCP){
+          showPopupAtCP(pendingPopupCP);pendingPopupCP=null;
+        }
+      }
     }
   }
 
-  // Trees (behind everything else)
   drawTrees(now);
-
-  // Wanderers
   tickWanderers(now);drawWanderers(now);
 
-  // Trail
   for(let i=trail.length-1;i>=0;i--){
     const p=trail[i];const{x,y}=imgToCSS(p.ix,p.iy);
-    const gr=ctx.createRadialGradient(x,y,0,x,y,p.size*2.3);
-    gr.addColorStop(0,p.color);gr.addColorStop(1,'transparent');
+    const gr=ctx.createRadialGradient(x,y,0,x,y,p.size*2.3);gr.addColorStop(0,p.color);gr.addColorStop(1,'transparent');
     ctx.globalAlpha=p.life*.40;ctx.fillStyle=gr;ctx.beginPath();ctx.arc(x,y,p.size*2.3,0,Math.PI*2);ctx.fill();
     ctx.globalAlpha=p.life*.80;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(x,y,p.size*.34,0,Math.PI*2);ctx.fill();
     ctx.globalAlpha=1;p.life-=.016;p.ix+=p.dx;p.iy+=p.dy;
   }
   trail=trail.filter(p=>p.life>0);
 
-  // Checkpoints
   const{scale:coverScale}=getCover();
   CHECKPOINTS.forEach((cp,cpIdx)=>{
     const state=cpState[cp.w];if(!state||state.alpha<=.01)return;
-    const{x,y}=imgToCSS(cp.ix,cp.iy);
-    const col1=monthPrimary(cp.w),col2=monthSecondary(cp.w);
+    const{x,y}=imgToCSS(cp.ix,cp.iy);const col1=monthPrimary(cp.w),col2=monthSecondary(cp.w);
     const pulse=.5+.5*Math.sin(sec*2.1+cp.w*.73),pulse2=.5+.5*Math.sin(sec*1.35+cp.w*.41+1.3);
     const baseR=7,glowR=baseR+pulse*3.5*(1+state.extra*.6),alpha=state.alpha;
     ctx.save();
-    ctx.globalAlpha=alpha*(.14+pulse*.10);
-    const hazeR=glowR*4.5,haze=ctx.createRadialGradient(x,y,0,x,y,hazeR);
-    haze.addColorStop(0,col1);haze.addColorStop(.5,col1);haze.addColorStop(1,'transparent');
-    ctx.fillStyle=haze;ctx.beginPath();ctx.arc(x,y,hazeR,0,Math.PI*2);ctx.fill();
-    ctx.globalAlpha=alpha*(.10+pulse2*.09);
-    const haze2=ctx.createRadialGradient(x+glowR*.3,y-glowR*.2,0,x,y,hazeR*.8);
-    haze2.addColorStop(0,col2);haze2.addColorStop(.5,col2);haze2.addColorStop(1,'transparent');
-    ctx.fillStyle=haze2;ctx.beginPath();ctx.arc(x,y,hazeR*.8,0,Math.PI*2);ctx.fill();
-    ctx.globalAlpha=alpha*(.48+pulse2*.22);
-    const midR=glowR*2.0,midG=ctx.createRadialGradient(x,y,glowR*.28,x,y,midR);
-    midG.addColorStop(0,'transparent');midG.addColorStop(.35,col1);midG.addColorStop(.65,col2);midG.addColorStop(1,'transparent');
-    ctx.fillStyle=midG;ctx.beginPath();ctx.arc(x,y,midR,0,Math.PI*2);ctx.fill();
-    ctx.globalAlpha=alpha*(.85+pulse*.15);
-    const coronaR=glowR*1.10,corona=ctx.createRadialGradient(x,y,0,x,y,coronaR);
-    corona.addColorStop(0,'#fff');corona.addColorStop(.2,col1);corona.addColorStop(.62,col2);corona.addColorStop(1,'transparent');
-    ctx.fillStyle=corona;ctx.beginPath();ctx.arc(x,y,coronaR,0,Math.PI*2);ctx.fill();
-    ctx.globalAlpha=alpha*(.95+pulse*.05);ctx.shadowBlur=24;ctx.shadowColor=col1;ctx.fillStyle=col1;
-    ctx.beginPath();ctx.arc(x,y,glowR*.44,0,Math.PI*2);ctx.fill();
-    ctx.shadowBlur=14;ctx.shadowColor=col2;ctx.fillStyle=col2;ctx.beginPath();ctx.arc(x,y,glowR*.26,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
-    ctx.globalAlpha=alpha;
-    const coreG=ctx.createRadialGradient(x,y,0,x,y,glowR*.16);
-    coreG.addColorStop(0,'rgba(255,255,255,1)');coreG.addColorStop(.7,'rgba(255,255,255,.75)');coreG.addColorStop(1,'rgba(255,255,255,0)');
-    ctx.fillStyle=coreG;ctx.beginPath();ctx.arc(x,y,glowR*.16,0,Math.PI*2);ctx.fill();
+    ctx.globalAlpha=alpha*(.14+pulse*.10);const hazeR=glowR*4.5,haze=ctx.createRadialGradient(x,y,0,x,y,hazeR);haze.addColorStop(0,col1);haze.addColorStop(.5,col1);haze.addColorStop(1,'transparent');ctx.fillStyle=haze;ctx.beginPath();ctx.arc(x,y,hazeR,0,Math.PI*2);ctx.fill();
+    ctx.globalAlpha=alpha*(.10+pulse2*.09);const haze2=ctx.createRadialGradient(x+glowR*.3,y-glowR*.2,0,x,y,hazeR*.8);haze2.addColorStop(0,col2);haze2.addColorStop(.5,col2);haze2.addColorStop(1,'transparent');ctx.fillStyle=haze2;ctx.beginPath();ctx.arc(x,y,hazeR*.8,0,Math.PI*2);ctx.fill();
+    ctx.globalAlpha=alpha*(.48+pulse2*.22);const midR=glowR*2.0,midG=ctx.createRadialGradient(x,y,glowR*.28,x,y,midR);midG.addColorStop(0,'transparent');midG.addColorStop(.35,col1);midG.addColorStop(.65,col2);midG.addColorStop(1,'transparent');ctx.fillStyle=midG;ctx.beginPath();ctx.arc(x,y,midR,0,Math.PI*2);ctx.fill();
+    ctx.globalAlpha=alpha*(.85+pulse*.15);const coronaR=glowR*1.10,corona=ctx.createRadialGradient(x,y,0,x,y,coronaR);corona.addColorStop(0,'#fff');corona.addColorStop(.2,col1);corona.addColorStop(.62,col2);corona.addColorStop(1,'transparent');ctx.fillStyle=corona;ctx.beginPath();ctx.arc(x,y,coronaR,0,Math.PI*2);ctx.fill();
+    ctx.globalAlpha=alpha*(.95+pulse*.05);ctx.shadowBlur=24;ctx.shadowColor=col1;ctx.fillStyle=col1;ctx.beginPath();ctx.arc(x,y,glowR*.44,0,Math.PI*2);ctx.fill();ctx.shadowBlur=14;ctx.shadowColor=col2;ctx.fillStyle=col2;ctx.beginPath();ctx.arc(x,y,glowR*.26,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
+    ctx.globalAlpha=alpha;const coreG=ctx.createRadialGradient(x,y,0,x,y,glowR*.16);coreG.addColorStop(0,'rgba(255,255,255,1)');coreG.addColorStop(.7,'rgba(255,255,255,.75)');coreG.addColorStop(1,'rgba(255,255,255,0)');ctx.fillStyle=coreG;ctx.beginPath();ctx.arc(x,y,glowR*.16,0,Math.PI*2);ctx.fill();
     ctx.globalAlpha=alpha*(.42+pulse*.30);ctx.strokeStyle='rgba(255,255,255,0.95)';ctx.lineWidth=.9;ctx.shadowBlur=9;ctx.shadowColor=col1;
     const starLen=glowR*(.72+pulse*.28),dL=starLen*.38;
-    ctx.beginPath();
-    ctx.moveTo(x,y-starLen*.18);ctx.lineTo(x,y-starLen);ctx.moveTo(x,y+starLen*.18);ctx.lineTo(x,y+starLen);
-    ctx.moveTo(x-starLen*.18,y);ctx.lineTo(x-starLen,y);ctx.moveTo(x+starLen*.18,y);ctx.lineTo(x+starLen,y);
-    ctx.moveTo(x-dL*.1,y-dL*.1);ctx.lineTo(x-dL,y-dL);ctx.moveTo(x+dL*.1,y-dL*.1);ctx.lineTo(x+dL,y-dL);
-    ctx.moveTo(x-dL*.1,y+dL*.1);ctx.lineTo(x-dL,y+dL);ctx.moveTo(x+dL*.1,y+dL*.1);ctx.lineTo(x+dL,y+dL);
-    ctx.stroke();ctx.shadowBlur=0;
+    ctx.beginPath();ctx.moveTo(x,y-starLen*.18);ctx.lineTo(x,y-starLen);ctx.moveTo(x,y+starLen*.18);ctx.lineTo(x,y+starLen);ctx.moveTo(x-starLen*.18,y);ctx.lineTo(x-starLen,y);ctx.moveTo(x+starLen*.18,y);ctx.lineTo(x+starLen,y);ctx.moveTo(x-dL*.1,y-dL*.1);ctx.lineTo(x-dL,y-dL);ctx.moveTo(x+dL*.1,y-dL*.1);ctx.lineTo(x+dL,y-dL);ctx.moveTo(x-dL*.1,y+dL*.1);ctx.lineTo(x-dL,y+dL);ctx.moveTo(x+dL*.1,y+dL*.1);ctx.lineTo(x+dL,y+dL);ctx.stroke();ctx.shadowBlur=0;
     CP_FAIRIES[cpIdx].forEach(f=>{
       const angle=f.angle+sec*f.speed,twinkle=.35+.65*Math.abs(Math.sin(sec*f.twinkleSpeed+f.twinklePhase));
       const r=f.orbit*coverScale*(.82+state.extra*.08)*(.92+.08*Math.sin(sec*1.1+f.phase));
       const fx=x+Math.cos(angle)*r,fy=y+Math.sin(angle)*r*.84;
       const fColor=f.useSecondary?col2:col1,fAlpha=twinkle*alpha*(.70+state.extra*.15),fSize=f.size*coverScale*(.65+twinkle*.45);
-      ctx.globalAlpha=fAlpha*.42;
-      const fg=ctx.createRadialGradient(fx,fy,0,fx,fy,fSize*3.2);
-      fg.addColorStop(0,fColor);fg.addColorStop(1,'transparent');
-      ctx.fillStyle=fg;ctx.beginPath();ctx.arc(fx,fy,fSize*3.2,0,Math.PI*2);ctx.fill();
-      ctx.globalAlpha=fAlpha;ctx.strokeStyle='#fff';ctx.lineWidth=fSize*.55;ctx.shadowBlur=6;ctx.shadowColor=fColor;
-      const sl=fSize*1.9;ctx.beginPath();ctx.moveTo(fx,fy-sl);ctx.lineTo(fx,fy+sl);ctx.moveTo(fx-sl,fy);ctx.lineTo(fx+sl,fy);ctx.stroke();
+      ctx.globalAlpha=fAlpha*.42;const fg=ctx.createRadialGradient(fx,fy,0,fx,fy,fSize*3.2);fg.addColorStop(0,fColor);fg.addColorStop(1,'transparent');ctx.fillStyle=fg;ctx.beginPath();ctx.arc(fx,fy,fSize*3.2,0,Math.PI*2);ctx.fill();
+      ctx.globalAlpha=fAlpha;ctx.strokeStyle='#fff';ctx.lineWidth=fSize*.55;ctx.shadowBlur=6;ctx.shadowColor=fColor;const sl=fSize*1.9;ctx.beginPath();ctx.moveTo(fx,fy-sl);ctx.lineTo(fx,fy+sl);ctx.moveTo(fx-sl,fy);ctx.lineTo(fx+sl,fy);ctx.stroke();
       ctx.globalAlpha=fAlpha;ctx.fillStyle='#fff';ctx.shadowBlur=5;ctx.shadowColor=fColor;ctx.beginPath();ctx.arc(fx,fy,fSize*.48,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
     });
     ctx.globalAlpha=1;ctx.restore();
   });
 
-  // Active ghost
   if(ghostVisible){
-    const bob=Math.sin(sec*1.85)*3.5;
-    const{x:gx,y:gy}=imgToCSS(ghostIX,ghostIY);
+    const bob=Math.sin(sec*1.85)*3.5;const{x:gx,y:gy}=imgToCSS(ghostIX,ghostIY);
     const gR=28,pulseG=.5+.5*Math.sin(sec*2.1),gcol1=monthPrimary(activeWeek),gcol2=monthSecondary(activeWeek);
     ctx.save();
-    ctx.globalAlpha=.20+pulseG*.10;
-    const ga=ctx.createRadialGradient(gx,gy+3,0,gx,gy+3,gR*2.0);
-    ga.addColorStop(0,gcol1);ga.addColorStop(.5,gcol2);ga.addColorStop(1,'transparent');
-    ctx.fillStyle=ga;ctx.beginPath();ctx.arc(gx,gy+3,gR*2.0,0,Math.PI*2);ctx.fill();
-    ctx.globalAlpha=.14+pulseG*.06;
-    const gs=ctx.createRadialGradient(gx,gy+gR*.7,0,gx,gy+gR*.7,gR*.85);
-    gs.addColorStop(0,'rgba(0,0,0,.5)');gs.addColorStop(1,'transparent');
-    ctx.fillStyle=gs;ctx.beginPath();ctx.arc(gx,gy+gR*.7,gR*.85,0,Math.PI*2);ctx.fill();
-    ctx.restore();
-    ctx.save();
+    ctx.globalAlpha=.20+pulseG*.10;const ga=ctx.createRadialGradient(gx,gy+3,0,gx,gy+3,gR*2.0);ga.addColorStop(0,gcol1);ga.addColorStop(.5,gcol2);ga.addColorStop(1,'transparent');ctx.fillStyle=ga;ctx.beginPath();ctx.arc(gx,gy+3,gR*2.0,0,Math.PI*2);ctx.fill();
+    ctx.globalAlpha=.14+pulseG*.06;const gs=ctx.createRadialGradient(gx,gy+gR*.7,0,gx,gy+gR*.7,gR*.85);gs.addColorStop(0,'rgba(0,0,0,.5)');gs.addColorStop(1,'transparent');ctx.fillStyle=gs;ctx.beginPath();ctx.arc(gx,gy+gR*.7,gR*.85,0,Math.PI*2);ctx.fill();
+    ctx.restore();ctx.save();
     const activeImg=ghostImgs[activeGhostIdx];
     if(activeImg&&activeImg.complete&&activeImg.naturalWidth>0)ctx.drawImage(activeImg,gx-gR,gy-gR+bob,gR*2,gR*2);
     else{ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(gx,gy+bob,gR*.7,0,Math.PI*2);ctx.fill();}
     ctx.restore();
   }
 
-  // Bryan crosshair
   if(bryanOn&&bMouseX>=0){
     ctx.save();ctx.strokeStyle='rgba(255,255,255,.50)';ctx.lineWidth=1;ctx.shadowBlur=8;ctx.shadowColor='rgba(255,255,255,.25)';ctx.setLineDash([5,5]);
-    ctx.beginPath();ctx.moveTo(0,bMouseY);ctx.lineTo(cssW,bMouseY);ctx.stroke();
-    ctx.beginPath();ctx.moveTo(bMouseX,0);ctx.lineTo(bMouseX,cssH);ctx.stroke();
-    ctx.restore();
+    ctx.beginPath();ctx.moveTo(0,bMouseY);ctx.lineTo(cssW,bMouseY);ctx.stroke();ctx.beginPath();ctx.moveTo(bMouseX,0);ctx.lineTo(bMouseX,cssH);ctx.stroke();ctx.restore();
   }
 }
 
@@ -1041,74 +938,55 @@ function startLoop(){if(!rafHandle)rafHandle=requestAnimationFrame(loop);}
 
 const HIT_R=40;
 function hitTest(clientX,clientY){
-  const rect=canvas.getBoundingClientRect();
-  const cx=clientX-rect.left,cy=clientY-rect.top;
-  const{ix,iy}=cssToImg(cx,cy);
+  const rect=canvas.getBoundingClientRect();const cx=clientX-rect.left,cy=clientY-rect.top;const{ix,iy}=cssToImg(cx,cy);
   const pool=bryanOn?CHECKPOINTS:CHECKPOINTS.filter(c=>OPEN_WEEKS.includes(c.w));
-  let best=null,bestD=Infinity;
-  pool.forEach(cp=>{const d=Math.hypot(cp.ix-ix,cp.iy-iy);if(d<HIT_R&&d<bestD){bestD=d;best=cp;}});
-  return best;
+  let best=null,bestD=Infinity;pool.forEach(cp=>{const d=Math.hypot(cp.ix-ix,cp.iy-iy);if(d<HIT_R&&d<bestD){bestD=d;best=cp;}});return best;
+}
+function hitHomeworkTree(clientX,clientY){
+  const rect=canvas.getBoundingClientRect();const{ix,iy}=cssToImg(clientX-rect.left,clientY-rect.top);
+  return Math.hypot(ix-HW_TREE_IX,iy-HW_TREE_IY)<HW_TREE_HIT_R;
 }
 
-  function hitHomeworkTree(clientX,clientY){
-  const rect=canvas.getBoundingClientRect();
-  const cx=clientX-rect.left,cy=clientY-rect.top;
-  const {ix,iy}=cssToImg(cx,cy);
-  const d = Math.hypot(ix-979, iy-305);
-  return d < 52;
+// Ghost travels to the homework tree, then opens the prompt
+function startGhostTravelToTree(){
+  if(ghostLocked)return;
+  closePopup();
+  ghostSrcIX=ghostIX;ghostSrcIY=ghostIY;
+  ghostDstIX=HW_TREE_IX;ghostDstIY=HW_TREE_IY;
+  ghostT=0;ghostAnimStart=performance.now();
+  pendingPopupCP=null;
+  pendingHomework=true;
+  setTravelLock(true);
 }
 
 canvas.addEventListener('click',e=>{
   if(!mazeStarted||ghostLocked)return;
   if(['allGlow','dropping','hovering','settling'].includes(introPhase))return;
-
-  if(hitHomeworkTree(e.clientX,e.clientY)){
-    showHomeworkPrompt();
-    return;
-  }
-
+  if(hitHomeworkTree(e.clientX,e.clientY)){ startGhostTravelToTree(); return; }
   if(bryanOn){
     const rect=canvas.getBoundingClientRect();const{ix,iy}=cssToImg(e.clientX-rect.left,e.clientY-rect.top);
     coordText.textContent=`x: ${ix}  y: ${iy}`;
     copyText(`${ix},${iy}`).then(ok=>{if(ok){coordPill.style.transform='scale(1.04)';setTimeout(()=>coordPill.style.transform='',130);}});
   }
-
-  const cp=hitTest(e.clientX,e.clientY);
-  if(cp)startGhostTravel(cp);
+  const cp=hitTest(e.clientX,e.clientY);if(cp)startGhostTravel(cp);
 });
-
-  
-
 canvas.addEventListener('touchend',e=>{
   if(!mazeStarted||ghostLocked)return;
   if(['allGlow','dropping','hovering','settling'].includes(introPhase))return;
   if(!e.changedTouches.length)return;
-
   const t0=e.changedTouches[0];
-
-  if(hitHomeworkTree(t0.clientX,t0.clientY)){
-    showHomeworkPrompt();
-    e.preventDefault();
-    return;
-  }
-
-  const cp=hitTest(t0.clientX,t0.clientY);
-  if(cp){
-    startGhostTravel(cp);
-    e.preventDefault();
-  }
+  if(hitHomeworkTree(t0.clientX,t0.clientY)){startGhostTravelToTree();e.preventDefault();return;}
+  const cp=hitTest(t0.clientX,t0.clientY);if(cp){startGhostTravel(cp);e.preventDefault();}
 },{passive:false});
-  
-
 canvas.addEventListener('mousemove',e=>{
-  if(!bryanOn)return;
-  const rect=canvas.getBoundingClientRect();bMouseX=e.clientX-rect.left;bMouseY=e.clientY-rect.top;
+  if(!bryanOn)return;const rect=canvas.getBoundingClientRect();bMouseX=e.clientX-rect.left;bMouseY=e.clientY-rect.top;
   const{ix,iy}=cssToImg(bMouseX,bMouseY);coordText.textContent=`x: ${ix}  y: ${iy}`;
 });
 canvas.addEventListener('mouseleave',()=>{bMouseX=-1;bMouseY=-1;});
 
 function startGhostTravel(cp){
   if(ghostLocked)return;closePopup();
+  pendingHomework=false;
   ghostSrcIX=ghostIX;ghostSrcIY=ghostIY;ghostDstIX=cp.ix;ghostDstIY=cp.iy;
   ghostT=0;ghostAnimStart=performance.now();activeWeek=cp.w;pendingPopupCP=cp;setTravelLock(true);
 }
@@ -1117,8 +995,7 @@ function showPopupAtCP(cp){
   const diff=cp.w-CURRENT_WEEK;
   cpWeekLabel.textContent=diff===0?'今週のブーハー':diff<0?'先週のブーハー':'来週のブーハー';
   const col1=monthPrimary(cp.w),col2=monthSecondary(cp.w);
-  cpPopupBar.style.background=`linear-gradient(90deg,${col1},${col2})`;
-  cpPopupBar.style.boxShadow=`0 0 14px ${col1}88,0 0 28px ${col2}55`;
+  cpPopupBar.style.background=`linear-gradient(90deg,${col1},${col2})`;cpPopupBar.style.boxShadow=`0 0 14px ${col1}88,0 0 28px ${col2}55`;
   cpTitle.textContent='GAMES';
   const weekStart=new Date(CURRENT_WEEK_DATA.weekStart);
   const start=new Date(weekStart);start.setDate(start.getDate()+(cp.w-CURRENT_WEEK)*7);
@@ -1136,105 +1013,93 @@ function showPopupAtCP(cp){
 function closePopup(){cpPopup.classList.remove('show');cpScrim.classList.remove('show');}
 cpCloseBtn.addEventListener('click',closePopup);cpScrim.addEventListener('click',closePopup);
 
-  function showHomeworkPrompt(){
+// ── Homework prompt ──────────────────────────────────────────────────────────
+function openHomeworkPrompt(){
   hwPromptScrim.classList.add('show');
   hwPrompt.classList.add('show');
+  // Two rAFs ensure display:block has been painted before triggering transitions
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    hwPromptScrim.classList.add('active');
+    hwPrompt.classList.add('visible');
+  }));
 }
 
 function closeHomeworkPrompt(){
-  hwPrompt.classList.remove('show');
-  hwPromptScrim.classList.remove('show');
+  hwPrompt.classList.remove('visible');
+  hwPromptScrim.classList.remove('active');
+  setTimeout(()=>{
+    hwPrompt.classList.remove('show');
+    hwPromptScrim.classList.remove('show');
+  },520);
 }
 
 function playHomeworkVideoAndGo(){
   closeHomeworkPrompt();
 
-  try{ bgMusic.pause(); }catch(e){}
-  try{ hwTreeVideo.pause(); }catch(e){}
-  try{ hwTreeVideo.currentTime = 0; }catch(e){}
+  // Graceful music fade-out (1.3 s)
+  const fadeMs=1300, startVol=bgMusic.volume, t0=performance.now();
+  (function fadeTick(){
+    const p=Math.min((performance.now()-t0)/fadeMs,1);
+    try{bgMusic.volume=startVol*(1-p);}catch(e){}
+    if(p<1)requestAnimationFrame(fadeTick);
+    else{try{bgMusic.pause();bgMusic.volume=startVol;}catch(e){}}
+  })();
 
-  hwVideoWrap.classList.remove('hidden');
+  try{hwTreeVideo.pause();hwTreeVideo.currentTime=0;}catch(e){}
+
+  // Cinematic reveal — CSS handles opacity + letterbox bars
   void hwVideoWrap.offsetWidth;
   hwVideoWrap.classList.add('show');
 
-  let left = false;
-
+  let left=false;
   function leaveNow(){
-    if(left) return;
-    left = true;
-
-    hwVideoWrap.classList.remove('show');
-
-    setTimeout(()=>{
-      window.location.href = 'homework.html';
-    }, 520);
+    if(left)return;left=true;
+    // Black fade before navigation
+    fade.classList.add('on');
+    setTimeout(()=>{ window.location.href='homework.html'; },FADE_MS+100);
   }
 
-  hwTreeVideo.onended = leaveNow;
-  hwTreeVideo.onerror = leaveNow;
-  hwTreeVideo.ontimeupdate = () => {
-    const d = hwTreeVideo.duration;
-    if(!isFinite(d) || d <= 0) return;
-    if(d - hwTreeVideo.currentTime <= 1.0) leaveNow();
+  hwTreeVideo.onended=leaveNow;
+  hwTreeVideo.onerror=leaveNow;
+  hwTreeVideo.ontimeupdate=()=>{
+    const d=hwTreeVideo.duration;
+    if(!isFinite(d)||d<=0)return;
+    if(d-hwTreeVideo.currentTime<=1.2)leaveNow();
   };
 
-  const p = hwTreeVideo.play();
-  if(p && p.catch) p.catch(()=>leaveNow());
+  const p=hwTreeVideo.play();
+  if(p&&p.catch)p.catch(()=>leaveNow());
 }
-  
 
 hwPromptScrim.addEventListener('click',closeHomeworkPrompt);
 hwNoBtn.addEventListener('click',closeHomeworkPrompt);
 hwYesBtn.addEventListener('click',playHomeworkVideoAndGo);
 
+// ────────────────────────────────────────────────────────────────────────────
 iconPreBoo.addEventListener('click',()=>{
-  if(ghostLocked)return;
-  closePopup();
- 
-  fadeOut();
-
+  if(ghostLocked)return;closePopup();fadeOut();
   sessionStorage.setItem('booha_return_to_checkpoint','1');
   sessionStorage.setItem('booha_return_week',String(activeWeek));
   sessionStorage.setItem('booha_return_ghost',String(activeGhostIdx));
-
   const weekSlug=getWeekSlug('pb',activeWeek);
-  setTimeout(()=>{
-    window.location.href=`curriculum/pb/games-index.html?week=${encodeURIComponent(weekSlug)}`;
-  },FADE_MS);
+  setTimeout(()=>{window.location.href=`curriculum/pb/games-index.html?week=${encodeURIComponent(weekSlug)}`;},FADE_MS);
 });
-
 iconBooTree.addEventListener('click',()=>{
-  if(ghostLocked)return;
-  closePopup();
-
-  fadeOut();
-
+  if(ghostLocked)return;closePopup();fadeOut();
   sessionStorage.setItem('booha_return_to_checkpoint','1');
   sessionStorage.setItem('booha_return_week',String(activeWeek));
   sessionStorage.setItem('booha_return_ghost',String(activeGhostIdx));
-
   const weekSlug=getWeekSlug('br',activeWeek);
-  setTimeout(()=>{
-    window.location.href=`curriculum/br/games-index.html?week=${encodeURIComponent(weekSlug)}`;
-  },FADE_MS);
+  setTimeout(()=>{window.location.href=`curriculum/br/games-index.html?week=${encodeURIComponent(weekSlug)}`;},FADE_MS);
 });
-
 iconContTree.addEventListener('click',()=>{
-  if(ghostLocked)return;
-  closePopup();
- 
-  fadeOut();
-
+  if(ghostLocked)return;closePopup();fadeOut();
   sessionStorage.setItem('booha_return_to_checkpoint','1');
   sessionStorage.setItem('booha_return_week',String(activeWeek));
   sessionStorage.setItem('booha_return_ghost',String(activeGhostIdx));
-
   const weekSlug=getWeekSlug('bc',activeWeek);
-  setTimeout(()=>{
-    window.location.href=`curriculum/bc/games-index.html?week=${encodeURIComponent(weekSlug)}`;
-  },FADE_MS);
+  setTimeout(()=>{window.location.href=`curriculum/bc/games-index.html?week=${encodeURIComponent(weekSlug)}`;},FADE_MS);
 });
-  
 
 function applyBryan(){
   bryanBtn.classList.toggle('on',bryanOn);gridEl.classList.toggle('show',bryanOn);
@@ -1326,48 +1191,30 @@ document.addEventListener('visibilitychange',()=>{
     try{toMazeVideo.pause();}catch(e){}
     try{bgMusic.pause();}catch(e){}
   } else {
-    if(videoPlayed && !o2shown){
-      try{toMazeVideo.play();}catch(e){}
-    }
-    if(mazeLaunched && !sessionStorage.getItem('booha_return_to_checkpoint')){
-      try{bgMusic.play();}catch(e){}
-    }
+    if(videoPlayed&&!o2shown)try{toMazeVideo.play();}catch(e){}
+    if(mazeLaunched&&!sessionStorage.getItem('booha_return_to_checkpoint'))try{bgMusic.play();}catch(e){}
   }
 });
-  
-if(sessionStorage.getItem('booha_return_to_checkpoint')==='1') restoreMazeFromCheckpoint();
+
+if(sessionStorage.getItem('booha_return_to_checkpoint')==='1')restoreMazeFromCheckpoint();
 else resizeCanvas();
 
-// PAGESHOW
-window.addEventListener('pageshow', (e) => {
-  if (!e.persisted) return;
-  
-  // Always restart the RAF loop — bfcache suspends it
-  if (rafHandle) { cancelAnimationFrame(rafHandle); rafHandle = null; }
-  if (mazeStarted) startLoop();
-  
-  // Resume music — bfcache freezes audio context too
-  try {
-    bgMusic.volume = .65;
-    if (bgMusic.paused) bgMusic.play().catch(() => {});
-  } catch(err) {}
-  
-  // Reopen popup if flagged
-  if (sessionStorage.getItem('booha_reopen_popup') === '1') {
+// bfcache pageshow
+window.addEventListener('pageshow',(e)=>{
+  if(!e.persisted)return;
+  if(rafHandle){cancelAnimationFrame(rafHandle);rafHandle=null;}
+  if(mazeStarted)startLoop();
+  try{bgMusic.volume=.65;if(bgMusic.paused)bgMusic.play().catch(()=>{});}catch(err){}
+  if(sessionStorage.getItem('booha_reopen_popup')==='1'){
     sessionStorage.removeItem('booha_reopen_popup');
-    const cp = CHECKPOINTS.find(c => c.w === activeWeek);
-    if (cp) setTimeout(() => showPopupAtCP(cp), 80);
+    const cp=CHECKPOINTS.find(c=>c.w===activeWeek);
+    if(cp)setTimeout(()=>showPopupAtCP(cp),80);
   }
-  
-  // Clear the black fade overlay in case it was left on
   fade.classList.remove('on');
-  hwPrompt.classList.remove('show');
-  hwPromptScrim.classList.remove('show');
+  hwPrompt.classList.remove('show','visible');
+  hwPromptScrim.classList.remove('show','active');
   hwVideoWrap.classList.remove('show');
-
-  
 });
-  
 </script>
 </body>
 </html>
