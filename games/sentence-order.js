@@ -1,5 +1,5 @@
 
-  /* ══════════════════════════════════════════════════════════════
+ /* ══════════════════════════════════════════════════════════════
    sentence-order.js  —  Sentence Order  v2
    Show JP sentence + scrambled EN word tiles. Tap to build it.
    15 sentences, first-try correct = 1 point, 15 max.
@@ -47,11 +47,27 @@ document.addEventListener('touchstart', unlockAllAudio, { once: true, passive: t
 document.addEventListener('mousedown',  unlockAllAudio, { once: true, passive: true });
 
 let activeSent = null;
+const lastListenAt = {};
+const LISTEN_DEBOUNCE_MS = 600;
 
 function stopSent() {
   if (!activeSent) return;
   try { activeSent.pause(); activeSent.currentTime = 0; } catch {}
   activeSent = null;
+}
+
+function playSent(mp3) {
+  if (!mp3) return;
+  const a = sentCache[mp3];
+  if (!a) return;
+  const now = Date.now();
+  if (lastListenAt[mp3] && now - lastListenAt[mp3] < LISTEN_DEBOUNCE_MS) return;
+  lastListenAt[mp3] = now;
+  stopSent();
+  activeSent = a;
+  try { a.currentTime = 0; } catch {}
+  const p = a.play();
+  if (p && p.catch) p.catch(() => {});
 }
 
 function playSentOnCorrect(mp3, onEnd) {
@@ -622,8 +638,8 @@ body.hira-mode .so-hira-icon{ transform:rotate(180deg); }
 }
 .so-clear-btn:active{ transform:scale(.93); }
 
-/* SHOW ANSWER button — glowing, appears after 3 wrong tries */
-.so-show-btn{
+/* LISTEN button — glowing play button, appears after 3 wrong tries */
+.so-listen-btn{
   font-family:var(--game-font-title);
   font-size:clamp(13px,2.4vw,17px); letter-spacing:.06em;
   padding:12px 24px; border-radius:999px; border:none;
@@ -633,32 +649,31 @@ body.hira-mode .so-hira-icon{ transform:rotate(180deg); }
   transition:transform .15s, box-shadow .2s;
   -webkit-tap-highlight-color:transparent;
   display:none;
-  box-shadow:0 0 0 3px rgba(255,160,0,.4), 0 4px 0 rgba(120,50,0,.5), 0 8px 20px rgba(0,0,0,.3);
-  animation:soShowGlow 1.6s ease-in-out infinite;
   white-space:nowrap;
+  animation:soListenGlow 1.6s ease-in-out infinite;
 }
-.so-show-btn.visible{ display:block; }
-@keyframes soShowGlow{
+.so-listen-btn.visible{ display:block; }
+@keyframes soListenGlow{
   0%,100%{ box-shadow:0 0 8px 2px rgba(255,160,0,.5), 0 4px 0 rgba(120,50,0,.5), 0 8px 20px rgba(0,0,0,.3); }
   50%{     box-shadow:0 0 26px 6px rgba(255,160,0,.9), 0 4px 0 rgba(120,50,0,.5), 0 8px 24px rgba(255,130,0,.4); }
 }
-.so-show-btn:hover{ transform:scale(1.06); }
-.so-show-btn:active{ transform:scale(.93); }
-[data-curriculum="pb"] .so-show-btn{
+.so-listen-btn:hover{ transform:scale(1.06); }
+.so-listen-btn:active{ transform:scale(.93); }
+[data-curriculum="pb"] .so-listen-btn{
   background:linear-gradient(135deg,#ff88cc,#ff44aa);
-  color:#fff; box-shadow:0 0 8px 2px rgba(255,100,180,.5), 0 5px 0 #cc0077, 0 8px 18px rgba(255,100,180,.2);
-  animation:soShowGlowPb 1.6s ease-in-out infinite;
+  color:#fff;
+  animation:soListenGlowPb 1.6s ease-in-out infinite;
 }
-@keyframes soShowGlowPb{
+@keyframes soListenGlowPb{
   0%,100%{ box-shadow:0 0 8px 2px rgba(255,100,180,.5), 0 5px 0 #cc0077, 0 8px 18px rgba(255,100,180,.2); }
   50%{     box-shadow:0 0 26px 6px rgba(255,100,180,.9), 0 5px 0 #cc0077, 0 8px 24px rgba(255,100,180,.5); }
 }
-[data-curriculum="bc"] .so-show-btn{
+[data-curriculum="bc"] .so-listen-btn{
   background:linear-gradient(135deg,#00ddb0,#0099cc);
   color:#001a14;
-  animation:soShowGlowBc 1.6s ease-in-out infinite;
+  animation:soListenGlowBc 1.6s ease-in-out infinite;
 }
-@keyframes soShowGlowBc{
+@keyframes soListenGlowBc{
   0%,100%{ box-shadow:0 0 8px 2px rgba(0,200,180,.5), 0 4px 0 rgba(0,60,50,.6), 0 8px 20px rgba(0,0,0,.3); }
   50%{     box-shadow:0 0 26px 6px rgba(0,220,180,.9), 0 4px 0 rgba(0,60,50,.6), 0 8px 24px rgba(0,200,180,.4); }
 }
@@ -875,14 +890,19 @@ body.hira-mode .so-hira-icon{ transform:rotate(180deg); }
   to{ transform:none; opacity:1; }
 }
 
-/* confetti */
-@keyframes soConfetti{
-  0%{ transform:translate(0,0) rotate(0deg) scale(1); opacity:1; }
-  100%{ transform:translate(var(--cx),var(--cy)) rotate(var(--cr)) scale(0); opacity:0; }
+/* sparkles — star particles, scale+glow, no tumbling */
+@keyframes soSparkle{
+  0%{   transform:translate(0,0) scale(1);   opacity:1; }
+  60%{  transform:translate(var(--sx),var(--sy)) scale(var(--ss,.5)); opacity:.9; }
+  100%{ transform:translate(var(--sx2),var(--sy2)) scale(0); opacity:0; }
 }
-.so-confetti-piece{
-  position:fixed; pointer-events:none; z-index:9999; border-radius:2px;
-  animation:soConfetti 1.1s ease-out forwards;
+.so-sparkle{
+  position:fixed; pointer-events:none; z-index:9999;
+  font-size:var(--sz,18px); line-height:1;
+  filter:drop-shadow(0 0 4px var(--sc,#ffcc00));
+  animation:soSparkle var(--sd,1s) ease-out forwards;
+  animation-delay:var(--sdel,0s);
+  user-select:none;
 }
 `;
 document.head.appendChild(S);
@@ -922,10 +942,10 @@ U.mount(`
       <span class="so-hira-icon">あ</span>
       <span id="so-hira-label">ひらがな</span>
     </button>
-    <button class="so-clear-btn"  id="so-clear">CLEAR</button>
-    <button class="so-show-btn"   id="so-show">答えを見る</button>
-    <button class="so-check-btn"  id="so-check" disabled>CHECK</button>
-    <button class="so-help-btn"   id="so-help">？</button>
+    <button class="so-clear-btn"   id="so-clear">CLEAR</button>
+    <button class="so-listen-btn"  id="so-listen">▶ きく</button>
+    <button class="so-check-btn"   id="so-check" disabled>CHECK</button>
+    <button class="so-help-btn"    id="so-help">？</button>
   </div>
 
   <div class="so-feedback" id="so-feedback"></div>
@@ -980,8 +1000,8 @@ U.mount(`
       <div class="so-how-step">
         <div class="so-how-num">4</div>
         <div>
-          <div class="so-how-en">After 3 wrong tries, a hint button will appear.</div>
-          <div class="so-how-jp">3回まちがえると、ヒントボタンが出るよ。</div>
+          <div class="so-how-en">After 3 wrong tries, a ▶ listen button appears. Use it to hear the sentence!</div>
+          <div class="so-how-jp">3回まちがえると「▶ きく」ボタンが出るよ。文を聞いてみよう！</div>
         </div>
       </div>
       <div class="so-how-step">
@@ -1011,7 +1031,7 @@ const tilesEl    = document.getElementById('so-tiles');
 const feedbackEl = document.getElementById('so-feedback');
 const checkBtn   = document.getElementById('so-check');
 const clearBtn   = document.getElementById('so-clear');
-const showBtn    = document.getElementById('so-show');
+const listenBtn  = document.getElementById('so-listen');
 const helpBtn    = document.getElementById('so-help');
 const hiraBtn    = document.getElementById('so-hira-toggle');
 const hiraLabel  = document.getElementById('so-hira-label');
@@ -1086,7 +1106,7 @@ function showCard() {
   feedbackEl.textContent = '';
   feedbackEl.style.color = '';
   clearBtn.classList.remove('visible');
-  showBtn.classList.remove('visible');
+  listenBtn.classList.remove('visible');
   checkBtn.disabled = true;
 
   currentCard = allCards[idx];
@@ -1218,50 +1238,26 @@ clearBtn.addEventListener('click', () => {
 });
 
 /* ══════════════════════════════════════════════════════════════
-   SHOW ANSWER — fills correct order, plays audio, advances
-   (no point awarded — firstTry is already false by this point)
+   LISTEN BUTTON — plays sentence audio so student can hear it.
+   Does NOT reveal the answer. Student must still build correctly.
    ══════════════════════════════════════════════════════════════ */
-showBtn.addEventListener('click', () => {
-  if (locked) return;
-  locked = true;
-  showBtn.classList.remove('visible');
-
-  /* return all tiles to bank silently */
-  placed.forEach(origIdx => {
-    if (tileEls[origIdx]) tileEls[origIdx].classList.remove('used');
-  });
-  placed = [];
-
-  /* place tokens in correct order 0..n-1 */
-  const n = tokens.length;
-  for (let i = 0; i < n; i++) {
-    placed.push(i);
-    if (tileEls[i]) tileEls[i].classList.add('used');
-  }
-  renderAnswer();
-
-  /* flash all chips green */
-  const chips = Array.from(answerEl.querySelectorAll('.so-placed-chip'));
-  chips.forEach((chip, i) => {
-    setTimeout(() => chip.classList.add('so-correct'), i * 55);
-  });
-
-  const targetWords = tokens.map((t, i) => displayWord(t, i === 0, i === n - 1));
-  feedbackEl.textContent = targetWords.join(' ') + '!';
-  feedbackEl.style.color = '#22c55e';
-  U.playSFX('ding');
-
-  /* play audio then advance */
-  setTimeout(() => {
-    playSentOnCorrect(currentCard.mp3, () => {
-      setTimeout(() => {
-        idx++;
-        if (idx >= allCards.length) showResults();
-        else showCard();
-      }, 400);
-    });
-  }, chips.length * 55 + 200);
+listenBtn.addEventListener('touchstart', e => {
+  e.preventDefault();
+  unlockAllAudio();
+  fireListen();
+}, { passive: false });
+listenBtn.addEventListener('click', e => {
+  if (e.sourceCapabilities && e.sourceCapabilities.firesTouchEvents) return;
+  fireListen();
 });
+
+function fireListen() {
+  if (!currentCard) return;
+  playSent(currentCard.mp3);
+  /* brief visual pulse on the button */
+  listenBtn.style.transform = 'scale(.93)';
+  setTimeout(() => { listenBtn.style.transform = ''; }, 140);
+}
 
 /* ══════════════════════════════════════════════════════════════
    CHECK
@@ -1297,7 +1293,7 @@ checkBtn.addEventListener('click', () => {
   const chips = Array.from(answerEl.querySelectorAll('.so-placed-chip'));
 
   if (correct) {
-    locked = true;
+    locked = true;   /* locked for entire ding+audio+advance — no smashing */
     chips.forEach((chip, i) => {
       setTimeout(() => {
         chip.classList.remove('so-wrong');
@@ -1307,7 +1303,6 @@ checkBtn.addEventListener('click', () => {
 
     feedbackEl.textContent = 'せいかい！ ' + targetStr;
     feedbackEl.style.color = '#22c55e';
-    U.playSFX('ding');
 
     if (firstTry) {
       score++;
@@ -1315,10 +1310,12 @@ checkBtn.addEventListener('click', () => {
     }
     updateDots();
 
-    if (firstTry) fireConfetti(false);
-
-    /* play audio then advance */
+    /* ding first, then audio, then sparkles, then advance */
+    const chipDelay = chips.length * 55;
     setTimeout(() => {
+      U.playSFX('ding');
+      if (firstTry) fireSparkles(answerEl, false);
+      /* play sentence audio — locked stays true until we advance */
       playSentOnCorrect(currentCard.mp3, () => {
         setTimeout(() => {
           idx++;
@@ -1326,7 +1323,7 @@ checkBtn.addEventListener('click', () => {
           else showCard();
         }, 400);
       });
-    }, chips.length * 55 + 200);
+    }, chipDelay + 120);
 
   } else {
     /* wrong — grade per word position */
@@ -1335,7 +1332,7 @@ checkBtn.addEventListener('click', () => {
     wrongCount++;
     hasMadeWrongAttempt = true;
     clearBtn.classList.add('visible');
-    if (wrongCount >= 3) showBtn.classList.add('visible');
+    if (wrongCount >= 3) listenBtn.classList.add('visible');
 
     chips.forEach((chip, pi) => {
       const placedOrigIdx = placed[pi];
@@ -1361,29 +1358,40 @@ checkBtn.addEventListener('click', () => {
 });
 
 /* ══════════════════════════════════════════════════════════════
-   CONFETTI
+   SPARKLES — glowing star particles, no tumbling squares
    ══════════════════════════════════════════════════════════════ */
-function fireConfetti(big = false) {
-  const colors = ['#ffcc00','#aaff22','#ff2288','#22ddff','#cc88ff','#ff6600','#ffffff'];
-  const cx = window.innerWidth / 2;
-  const cy = window.innerHeight * 0.4;
-  const count = big ? 80 : 38;
+function fireSparkles(originEl, big = false) {
+  const chars  = ['✦','✧','★','✸','✺','·','✼','✻'];
+  const colors = ['#ffcc00','#ffffff','#aaff22','#22ddff','#ff88cc','#cc88ff','#ffaa44'];
+  const rect   = originEl ? originEl.getBoundingClientRect() : null;
+  const cx = rect ? rect.left + rect.width  / 2 : window.innerWidth  / 2;
+  const cy = rect ? rect.top  + rect.height / 2 : window.innerHeight * 0.45;
+  const count  = big ? 70 : 32;
+
   for (let i = 0; i < count; i++) {
     const el = document.createElement('div');
-    el.className = 'so-confetti-piece';
+    el.className = 'so-sparkle';
     const angle = Math.random() * Math.PI * 2;
-    const dist  = (big ? 180 : 100) + Math.random() * 220;
+    const dist1 = (big ? 80 : 40)  + Math.random() * (big ? 200 : 120);
+    const dist2 = (big ? 160 : 80) + Math.random() * (big ? 280 : 180);
+    const sz    = (big ? 14 : 10) + Math.random() * (big ? 20 : 14);
+    const col   = colors[Math.floor(Math.random() * colors.length)];
+    const dur   = (.55 + Math.random() * .6).toFixed(2);
+    const del   = (Math.random() * .25).toFixed(2);
+    const scale = (.2 + Math.random() * .5).toFixed(2);
+    el.textContent = chars[Math.floor(Math.random() * chars.length)];
     el.style.cssText = `
       left:${cx}px; top:${cy}px;
-      background:${colors[i % colors.length]};
-      --cx:${Math.cos(angle)*dist}px;
-      --cy:${Math.sin(angle)*dist}px;
-      --cr:${(Math.random()-.5)*720}deg;
-      animation-delay:${Math.random()*.2}s;
-      animation-duration:${.85+Math.random()*.5}s;
-      border-radius:${Math.random()>.5?'50%':'2px'};
-      width:${5+Math.random()*8}px;
-      height:${5+Math.random()*8}px;
+      --sx:${(Math.cos(angle)*dist1).toFixed(1)}px;
+      --sy:${(Math.sin(angle)*dist1).toFixed(1)}px;
+      --sx2:${(Math.cos(angle)*dist2).toFixed(1)}px;
+      --sy2:${(Math.sin(angle)*dist2 + 30).toFixed(1)}px;
+      --ss:${scale};
+      --sz:${sz.toFixed(0)}px;
+      --sc:${col};
+      --sd:${dur}s;
+      --sdel:${del}s;
+      color:${col};
     `;
     document.body.appendChild(el);
     el.addEventListener('animationend', () => el.remove());
@@ -1416,10 +1424,10 @@ function showResults() {
   document.getElementById('so-rk').textContent = tier.kanji;
 
   if (score >= 15) {
-    setTimeout(() => fireConfetti(true), 400);
-    setTimeout(() => fireConfetti(true), 900);
+    setTimeout(() => fireSparkles(results, true), 400);
+    setTimeout(() => fireSparkles(results, true), 950);
   } else if (score >= 11) {
-    setTimeout(() => fireConfetti(false), 500);
+    setTimeout(() => fireSparkles(results, false), 500);
   }
 
   const snd = new Audio(CFG.sfxBase + tier.sound);
