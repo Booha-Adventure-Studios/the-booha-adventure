@@ -389,14 +389,24 @@
       padding-top: 22px;
       border-top: 1px solid rgba(255,255,255,.10);
     }
-    .curr-section-label {
-      font-family: 'Bowlby One', sans-serif;
-      font-size: clamp(13px, 2.8vw, 16px);
-      letter-spacing: .1em;
-      color: rgba(255,255,255,.45);
+    .curr-section-header {
       text-align: center;
-      margin-bottom: 14px;
-      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .curr-section-title {
+      font-family: 'Bowlby One', sans-serif;
+      font-size: clamp(18px, 3.5vw, 24px);
+      letter-spacing: .06em;
+      color: #fff;
+      margin: 0 0 5px;
+      text-shadow: 0 0 24px rgba(255,191,47,.30), 0 2px 8px rgba(0,0,0,.50);
+    }
+    .curr-section-sub {
+      font-size: clamp(11px, 2vw, 13px);
+      font-weight: 800;
+      color: rgba(255,255,255,.52);
+      letter-spacing: .03em;
+      line-height: 1.7;
     }
     .curr-row {
       display: grid;
@@ -912,7 +922,8 @@
      BACK TO MAZE
   ──────────────────────────────────────────────────────────────── */
   document.getElementById('mazeBackBtn').addEventListener('click', () => {
-    // Return to maze.html — the ghost is already waiting at the homework tree
+    // booha_return_to_checkpoint + week + ghost were saved by maze.html before navigating here.
+    // They are still in sessionStorage — maze.html will read them and call restoreMazeFromCheckpoint().
     window.location.href = 'maze.html';
   });
 
@@ -1064,7 +1075,10 @@
       </div>
 
       <div class="curr-section">
-        <div class="curr-section-label">Choose Curriculum &nbsp;/&nbsp; カリキュラム を えらぼう</div>
+        <div class="curr-section-header">
+          <div class="curr-section-title">CHOOSE CURRICULUM</div>
+          <div class="curr-section-sub">カリキュラム を えらぼう / カリキュラムを選ぼう</div>
+        </div>
         <div class="curr-row">
           <button class="curr-card pb" data-curr="pb">
             <img class="curr-tree-img" src="assets/img/pre-boo.png" alt="Pre-Boo tree" />
@@ -1135,7 +1149,7 @@
 
       <div class="type-row">
         <button class="type-card vocab" data-type="vocab">
-          <div class="tc-icon">A</div>
+          <div class="tc-icon">V</div>
           <div class="tc-name">VOCABULARY</div>
           <div class="tc-jp">たんご<br>単語</div>
         </button>
@@ -1152,7 +1166,7 @@
       </div>
 
       <div style="text-align:center;margin-top:20px;">
-        <button class="glow-btn dark" id="backToWeek">Back / もどる</button>
+        <button class="glow-btn gold-glow" id="backToWeek">Back / もどる</button>
       </div>
     </div>
     `);
@@ -1198,7 +1212,7 @@
         ${breadcrumbsHTML([weekLabel, cl.en, tl.en])}
 
         <div class="sheet-actions">
-          <button class="glow-btn dark" id="backToType">Back / もどる</button>
+          <button class="glow-btn gold-glow" id="backToType">Back / もどる</button>
           <button class="glow-btn ${hideKnown ? 'gold-glow' : 'green-glow'}" id="toggleHide">
             ${hideKnown ? 'Show All / ぜんぶみる' : 'Hide Known / おぼえたをかくす'}
           </button>
