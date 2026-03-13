@@ -465,12 +465,22 @@ document.getElementById('closeBtn').addEventListener('click', function(e) {
   e.preventDefault();
   if (locked) return;
   locked = true;
+
   const r = this.getBoundingClientRect();
-  kaboom(r.left+r.width/2, r.top+r.height/2, '#00f0ff');
+  kaboom(r.left + r.width / 2, r.top + r.height / 2, '#ff2288');
+
   sessionStorage.setItem('booha_reopen_popup', '1');
+  sessionStorage.setItem('booha_return_week', week);
+
   setTimeout(() => { swipe.classList.add('go'); }, 280);
-  setTimeout(() => { history.back(); }, 480);
+
+  setTimeout(() => {
+    window.location.href = `/the-booha-adventure/maze.html?week=${encodeURIComponent(week)}`;
+  }, 480);
 });
+
+
+  
 </script>
 </body>
 </html>
