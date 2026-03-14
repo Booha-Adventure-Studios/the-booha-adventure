@@ -205,6 +205,42 @@
     };
   }
 
+  function pointInRect(px, py, r) {
+    return px >= r.x && px <= r.x + r.w && py >= r.y && py <= r.y + r.h;
+  }
+
+  function canMoveTo(nx, ny) {
+    const room = getRoom();
+    const rects = room?.collisions || [];
+
+    if (!rects.length) return true;
+
+    for (const r of rects) {
+      if (pointInRect(nx, ny, r)) return true;
+    }
+    return false;
+  }
+
+  function tryMove(nx, ny) {
+    const clamped = clampToWorld(nx, ny);
+
+    if (canMoveTo(clamped.x, clamped.y)) {
+      placeGhost(clamped.x, clamped.y);
+      return;
+    }
+
+    const tryX = clampToWorld(nx, state.y);
+    if (canMoveTo(tryX.x, tryX.y)) {
+      placeGhost(tryX.x, tryX.y);
+      return;
+    }
+
+    const tryY = clampToWorld(state.x, ny);
+    if (canMoveTo(tryY.x, tryY.y)) {
+      placeGhost(tryY.x, tryY.y);
+    }
+  }
+
   function handleMovement() {
     let dx = 0;
     let dy = 0;
@@ -224,9 +260,7 @@
 
     const nx = state.x + dx * SPEED;
     const ny = state.y + dy * SPEED;
-    const clamped = clampToWorld(nx, ny);
-
-    placeGhost(clamped.x, clamped.y);
+    tryMove(nx, ny);
   }
 
   function setKey(code, isDown) {
