@@ -6,211 +6,135 @@
   /* ── constants ── */
   const WORLD_W        = 960;
   const WORLD_H        = 540;
-  const GHOST_SIZE     = 38;
-  const GHOST_RADIUS   = 16;
-  const SPEED          = 1.8;           // slightly slower for spooky feel
-  const FADE_MS        = 600;           // spooky fade duration
+  const GHOST_R        = 22;          // draw radius (half-size) of ghost PNG
+  const GHOST_RADIUS   = 16;          // collision radius
+  const SPEED          = 1.8;
+  const FADE_MS        = 600;
   const CLICK_STOP_DIST= 6;
-  const SPARKLE_COUNT  = 6;
-  const HOVER_AMP      = 5;            // px bob amplitude
-  const HOVER_PERIOD   = 2200;         // ms per bob cycle
+  const HOVER_AMP      = 5;           // px bob
+  const HOVER_PERIOD   = 2200;        // ms full bob cycle
+  const TRAIL_MAX      = 80;
+
+  /* ── month color ramps — matches maze.html exactly ── */
+  const MONTH_COLORS = [
+    ['#ff3bbd','#ff79d7'],['#ff6b3b','#ffaa5e'],['#3bc8ff','#a8edff'],
+    ['#3bff8a','#b2ffda'],['#ffd700','#fff176'],['#3b6fff','#90aaff'],
+    ['#a03bff','#d49aff'],['#ff9f3b','#ffd08a'],['#3bffee','#a8fff8'],
+    ['#c8ff3b','#e8ffaa'],['#ff3b6f','#ff85a1'],['#ff3bbd','#ff79d7'],
+  ];
+
+  /* Pick a color pair from the room number so each room has a distinct hue */
+  function roomColorPair(roomId) {
+    const n = parseInt((roomId || "room_01").replace(/\D/g, ""), 10) || 1;
+    return MONTH_COLORS[(n - 1) % MONTH_COLORS.length];
+  }
 
   /* ── state ── */
   const state = {
-    roomId     : DATA.startRoom,
-    spawnId    : "default",
-    x          : 480, y: 270,
-    px         : 480, py: 270,         // previous position for trail direction
-    keys       : { up:false, down:false, left:false, right:false },
+    roomId        : DATA.startRoom,
+    spawnId       : "default",
+    x             : 480,
+    y             : 270,
     transitioning : false,
     clickTarget   : null,
     moving        : false,
     showCoords    : false,
-    lastSparkleT  : 0,
-    hoverT        : 0
+    musicStarted  : false,
+    lastTrailT    : 0
   };
 
-  let app, stage, roomLayer, ghostEl, coordDisplay, coordToggle;
-  let currentBg;
-  let sparklePool = [];
-  let lastRAF = 0;
+  /* ── assets ── */
+  const ghostImg = new Image();
+  ghostImg.src   = "assets/img/booha_ghost.png";
 
-  /* ═══════════════════════════════════════
+  const music    = new Audio("assets/audio/karasuki-music.mp3");
+  music.loop     = true;
+  music.volume   = 0.65;
+
+  /* ── particle list ── */
+  let trail   = [];
+  let ripples = [];
+
+  /* ── DOM refs ── */
+  let app, stage, canvas, ctx, roomLayer, coordDisplay, coordToggle;
+  let currentBg;
+  const cssW = WORLD_W, cssH = WORLD_H;
+
+  /* ═══════════════════════════════════
      STYLES
-  ═══════════════════════════════════════ */
+  ═══════════════════════════════════ */
   function injectStyles() {
     const s = document.createElement("style");
     s.textContent = `
       html,body{margin:0;padding:0;width:100%;height:100%;background:#000;overflow:hidden;}
       body{display:grid;place-items:center;}
-
-      #karasuki-app{
-        position:relative;width:100vw;height:100vh;
-        overflow:hidden;background:#000;
-      }
+      #karasuki-app{position:relative;width:100vw;height:100vh;overflow:hidden;background:#000;}
       #karasuki-stage{
         position:absolute;left:50%;top:50%;
         width:${WORLD_W}px;height:${WORLD_H}px;
-        transform-origin:50% 50%;
-        overflow:hidden;cursor:crosshair;
+        transform-origin:50% 50%;overflow:hidden;cursor:crosshair;
       }
       #karasuki-room-layer{position:absolute;inset:0;}
       .karasuki-bg{
         position:absolute;inset:0;width:100%;height:100%;
         object-fit:fill;display:block;pointer-events:none;user-select:none;
       }
-
-      /* ── ghost ── */
-      #booha-ghost{
-        position:absolute;
-        width:${GHOST_SIZE}px;height:${GHOST_SIZE}px;
-        margin-left:-${GHOST_SIZE/2}px;margin-top:-${GHOST_SIZE/2}px;
-        border-radius:50%;
-        background:radial-gradient(circle at 35% 35%,
-          #ffffff 0 18%,#f8f8f8 19% 28%,
-          #ffd9ff 29% 48%,#ff8ae2 49% 68%,
-          #ff4fc8 69% 100%);
-        box-shadow:
-          0 0 10px rgba(255,255,255,.75),
-          0 0 24px rgba(255,105,214,.7),
-          0 0 44px rgba(255,0,170,.4);
-        z-index:10;pointer-events:none;
-        will-change:transform,left,top;
-        transition:left .08s linear, top .08s linear;
-      }
-      #booha-ghost::before,#booha-ghost::after{
-        content:"";position:absolute;top:12px;
-        width:5px;height:7px;border-radius:50%;background:#000;
-      }
-      #booha-ghost::before{left:11px;}
-      #booha-ghost::after{right:11px;}
-      #booha-ghost .pupil-left,#booha-ghost .pupil-right{
-        position:absolute;top:13px;width:2px;height:3px;
-        border-radius:50%;background:#f8f8f8;
-      }
-      #booha-ghost .pupil-left{left:12px;}
-      #booha-ghost .pupil-right{right:12px;}
-      #booha-ghost .tail{
-        position:absolute;left:8px;right:8px;bottom:-4px;height:12px;
-        background:inherit;
-        clip-path:polygon(0 20%,18% 60%,35% 18%,50% 70%,65% 18%,82% 60%,100% 20%,100% 100%,0 100%);
-      }
-
-      /* ── sparkle ── */
-      .sparkle{
-        position:absolute;
-        width:6px;height:6px;
-        border-radius:50%;
-        pointer-events:none;
-        z-index:9;
-        background:radial-gradient(circle,#fff 0%,#ff8ae2 60%,transparent 100%);
-        animation:sparkle-fade .55s ease-out forwards;
-      }
-      @keyframes sparkle-fade{
-        0%{opacity:.9;transform:scale(1);}
-        100%{opacity:0;transform:scale(0.1) translate(var(--sx),var(--sy));}
-      }
-
-      /* ── black-void fade overlay ── */
+      #kara-canvas{position:absolute;inset:0;z-index:10;pointer-events:none;}
       #kara-fade{
         position:absolute;inset:0;background:#000;
         opacity:0;pointer-events:none;z-index:20;
       }
-
-      /* ── coord display ── */
       #coord-display{
-        position:absolute;bottom:10px;left:50%;
-        transform:translateX(-50%);
-        background:rgba(0,0,0,.72);
-        color:#ff8ae2;
-        font:700 13px/1 monospace;
-        padding:5px 12px;border-radius:20px;
-        z-index:30;pointer-events:none;
-        letter-spacing:.06em;
-        opacity:0;transition:opacity .2s;
+        position:absolute;bottom:10px;left:50%;transform:translateX(-50%);
+        background:rgba(0,0,0,.72);color:#ff8ae2;
+        font:700 13px/1 monospace;padding:5px 12px;border-radius:20px;
+        z-index:30;pointer-events:none;letter-spacing:.06em;
+        opacity:0;transition:opacity .2s;white-space:nowrap;
       }
       #coord-display.show{opacity:1;}
-
-      /* ── toggle ── */
       #coord-toggle{
         position:fixed;bottom:18px;right:18px;z-index:100;
         display:flex;align-items:center;gap:8px;
-        background:rgba(0,0,0,.75);
-        color:#ff8ae2;font:700 11px/1 monospace;
-        padding:7px 12px;border-radius:20px;
-        cursor:pointer;border:1px solid rgba(255,138,226,.35);
-        user-select:none;letter-spacing:.05em;
+        background:rgba(0,0,0,.75);color:#ff8ae2;font:700 11px/1 monospace;
+        padding:7px 12px;border-radius:20px;cursor:pointer;
+        border:1px solid rgba(255,138,226,.35);user-select:none;letter-spacing:.05em;
       }
-      #coord-toggle .toggle-pill{
+      .toggle-pill{
         width:30px;height:16px;border-radius:8px;
-        background:rgba(255,138,226,.2);
-        position:relative;transition:background .2s;
+        background:rgba(255,138,226,.2);position:relative;transition:background .2s;
       }
-      #coord-toggle .toggle-pill::after{
-        content:"";position:absolute;
-        top:3px;left:3px;width:10px;height:10px;
-        border-radius:50%;background:#ff8ae2;
-        transition:transform .2s;
+      .toggle-pill::after{
+        content:"";position:absolute;top:3px;left:3px;
+        width:10px;height:10px;border-radius:50%;
+        background:#ff8ae2;transition:transform .2s;
       }
       #coord-toggle.active .toggle-pill{background:rgba(255,138,226,.55);}
       #coord-toggle.active .toggle-pill::after{transform:translateX(14px);}
-
-      /* ── click ripple ── */
-      .click-ripple{
-        position:absolute;
-        width:24px;height:24px;
-        border-radius:50%;
-        margin-left:-12px;margin-top:-12px;
-        border:2px solid rgba(255,138,226,.7);
-        pointer-events:none;z-index:15;
-        animation:ripple-out .5s ease-out forwards;
-      }
-      @keyframes ripple-out{
-        0%{opacity:1;transform:scale(.3);}
-        100%{opacity:0;transform:scale(1.8);}
-      }
     `;
     document.head.appendChild(s);
   }
 
-  /* ═══════════════════════════════════════
-     DOM BUILD
-  ═══════════════════════════════════════ */
+  /* ═══════════════════════════════════
+     DOM
+  ═══════════════════════════════════ */
   function buildApp() {
-    app = document.createElement("div");
-    app.id = "karasuki-app";
+    app       = document.createElement("div");  app.id = "karasuki-app";
+    stage     = document.createElement("div");  stage.id = "karasuki-stage";
+    roomLayer = document.createElement("div");  roomLayer.id = "karasuki-room-layer";
+    canvas    = document.createElement("canvas"); canvas.id = "kara-canvas";
 
-    stage = document.createElement("div");
-    stage.id = "karasuki-stage";
+    const fade = document.createElement("div"); fade.id = "kara-fade";
 
-    roomLayer = document.createElement("div");
-    roomLayer.id = "karasuki-room-layer";
-
-    /* fade overlay */
-    const fade = document.createElement("div");
-    fade.id = "kara-fade";
-
-    /* ghost */
-    ghostEl = document.createElement("div");
-    ghostEl.id = "booha-ghost";
-    ["pupil-left","pupil-right","tail"].forEach(cls => {
-      const d = document.createElement("div");
-      d.className = cls;
-      ghostEl.appendChild(d);
-    });
-
-    /* coord readout */
     coordDisplay = document.createElement("div");
     coordDisplay.id = "coord-display";
     coordDisplay.textContent = "0, 0";
 
     stage.appendChild(roomLayer);
+    stage.appendChild(canvas);
     stage.appendChild(fade);
-    stage.appendChild(ghostEl);
     stage.appendChild(coordDisplay);
     app.appendChild(stage);
 
-    /* coord toggle (outside stage, fixed) */
     coordToggle = document.createElement("div");
     coordToggle.id = "coord-toggle";
     coordToggle.innerHTML = `<span>COORDS</span><div class="toggle-pill"></div>`;
@@ -223,33 +147,42 @@
     document.body.innerHTML = "";
     document.body.appendChild(app);
     document.body.appendChild(coordToggle);
+
+    ctx = canvas.getContext("2d");
   }
 
-  /* ═══════════════════════════════════════
-     FIT
-  ═══════════════════════════════════════ */
+  /* ═══════════════════════════════════
+     CANVAS SIZE
+  ═══════════════════════════════════ */
+  function resizeCanvas() {
+    const dpr = window.devicePixelRatio || 1;
+    canvas.style.width  = cssW + "px";
+    canvas.style.height = cssH + "px";
+    canvas.width  = Math.round(cssW * dpr);
+    canvas.height = Math.round(cssH * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  /* ═══════════════════════════════════
+     STAGE FIT
+  ═══════════════════════════════════ */
   function fitStage() {
     const scale = Math.min(window.innerWidth / WORLD_W, window.innerHeight / WORLD_H);
     stage.style.transform = `translate(-50%, -50%) scale(${scale})`;
   }
 
-  /* ═══════════════════════════════════════
+  /* ═══════════════════════════════════
      ROOM HELPERS
-  ═══════════════════════════════════════ */
-  function getRoom() { return DATA.rooms[state.roomId]; }
+  ═══════════════════════════════════ */
+  function getRoom()  { return DATA.rooms[state.roomId]; }
 
   function getSpawn(room, spawnId) {
-    return room.spawns?.[spawnId] || room.spawns?.default || { x:480, y:270 };
+    return room.spawns?.[spawnId] || room.spawns?.default || { x: 480, y: 270 };
   }
 
   function placeGhost(x, y) {
-    state.px = state.x; state.py = state.y;
     state.x = x; state.y = y;
-    ghostEl.style.left = `${x}px`;
-    ghostEl.style.top  = `${y}px`;
-    if (state.showCoords) {
-      coordDisplay.textContent = `${Math.round(x)}, ${Math.round(y)}`;
-    }
+    if (state.showCoords) coordDisplay.textContent = `${Math.round(x)}, ${Math.round(y)}`;
   }
 
   function makeBg(src) {
@@ -267,9 +200,9 @@
     placeGhost(spawn.x, spawn.y);
   }
 
-  /* ═══════════════════════════════════════
+  /* ═══════════════════════════════════
      COLLISION
-  ═══════════════════════════════════════ */
+  ═══════════════════════════════════ */
   function clampToWorld(nx, ny) {
     return {
       x: Math.max(GHOST_RADIUS, Math.min(WORLD_W - GHOST_RADIUS, nx)),
@@ -289,20 +222,18 @@
   }
 
   function tryMove(nx, ny) {
-    const c = clampToWorld(nx, ny);
-    if (canMoveTo(c.x, c.y))       { placeGhost(c.x, c.y); return true; }
+    const c  = clampToWorld(nx, ny);
+    if (canMoveTo(c.x, c.y))             { placeGhost(c.x, c.y); return true; }
     const tx = clampToWorld(nx, state.y);
-    if (canMoveTo(tx.x, tx.y))     { placeGhost(tx.x, tx.y); return true; }
+    if (canMoveTo(tx.x, tx.y))           { placeGhost(tx.x, tx.y); return true; }
     const ty = clampToWorld(state.x, ny);
-    if (canMoveTo(ty.x, ty.y))     { placeGhost(ty.x, ty.y); return true; }
+    if (canMoveTo(ty.x, ty.y))           { placeGhost(ty.x, ty.y); return true; }
     return false;
   }
 
-  /* ═══════════════════════════════════════
+  /* ═══════════════════════════════════
      SPOOKY FADE TRANSITION
-  ═══════════════════════════════════════ */
-  function getFadeEl() { return document.getElementById("kara-fade"); }
-
+  ═══════════════════════════════════ */
   function transitionTo(exit) {
     if (!exit?.to || state.transitioning) return;
     const nextRoom = DATA.rooms[exit.to];
@@ -311,13 +242,11 @@
     state.transitioning = true;
     state.clickTarget   = null;
 
-    const fadeEl = getFadeEl();
-    // Fade to black
-    fadeEl.style.transition = `opacity ${FADE_MS/2}ms ease-in`;
+    const fadeEl = document.getElementById("kara-fade");
+    fadeEl.style.transition = `opacity ${FADE_MS / 2}ms ease-in`;
     fadeEl.style.opacity    = "1";
 
     setTimeout(() => {
-      // swap room
       const nextBg = makeBg(nextRoom.bg);
       roomLayer.innerHTML = "";
       roomLayer.appendChild(nextBg);
@@ -328,98 +257,168 @@
 
       const spawn = getSpawn(nextRoom, state.spawnId);
       placeGhost(spawn.x, spawn.y);
+      trail = [];   // clear trail on room change
 
-      // Fade back in
-      fadeEl.style.transition = `opacity ${FADE_MS/2}ms ease-out`;
+      fadeEl.style.transition = `opacity ${FADE_MS / 2}ms ease-out`;
       fadeEl.style.opacity    = "0";
 
-      setTimeout(() => {
-        state.transitioning = false;
-      }, FADE_MS / 2 + 30);
+      setTimeout(() => { state.transitioning = false; }, FADE_MS / 2 + 30);
     }, FADE_MS / 2 + 20);
   }
 
   function getExitAtEdge() {
     const exits = getRoom()?.exits || {};
-    if (state.x <= GHOST_RADIUS + 2    && exits.left)  return exits.left;
-    if (state.x >= WORLD_W-GHOST_RADIUS-2 && exits.right) return exits.right;
-    if (state.y <= GHOST_RADIUS + 2    && exits.up)   return exits.up;
-    if (state.y >= WORLD_H-GHOST_RADIUS-2 && exits.down) return exits.down;
+    if (state.x <= GHOST_RADIUS + 2           && exits.left)  return exits.left;
+    if (state.x >= WORLD_W - GHOST_RADIUS - 2 && exits.right) return exits.right;
+    if (state.y <= GHOST_RADIUS + 2           && exits.up)    return exits.up;
+    if (state.y >= WORLD_H - GHOST_RADIUS - 2 && exits.down)  return exits.down;
     return null;
   }
 
-  /* ═══════════════════════════════════════
-     SPARKLE TRAIL
-  ═══════════════════════════════════════ */
-  function spawnSparkle(x, y, now) {
-    if (now - state.lastSparkleT < 60) return;
-    state.lastSparkleT = now;
-
-    const s = document.createElement("div");
-    s.className = "sparkle";
-    const dx = (Math.random() - .5) * 22;
-    const dy = (Math.random() - .5) * 22 + 6;
-    s.style.setProperty("--sx", `${dx}px`);
-    s.style.setProperty("--sy", `${dy}px`);
-    s.style.left  = `${x + (Math.random()-0.5)*8}px`;
-    s.style.top   = `${y + GHOST_SIZE/2 - 4 + (Math.random()-0.5)*6}px`;
-    s.style.width  = `${3 + Math.random()*5}px`;
-    s.style.height = s.style.width;
-    stage.appendChild(s);
-    setTimeout(() => s.remove(), 600);
+  /* ═══════════════════════════════════
+     TRAIL PARTICLES
+  ═══════════════════════════════════ */
+  function addTrailParticle(x, y, now) {
+    if (now - state.lastTrailT < 45) return;
+    state.lastTrailT = now;
+    const [col1, col2] = roomColorPair(state.roomId);
+    trail.push({
+      x    : x + (Math.random() - 0.5) * 10,
+      y    : y + GHOST_R * 0.55 + (Math.random() - 0.5) * 8,
+      vx   : (Math.random() - 0.5) * 0.4,
+      vy   : -Math.random() * 0.5,
+      life : 1,
+      size : 2 + Math.random() * 4.5,
+      color: Math.random() > 0.5 ? col1 : col2
+    });
+    if (trail.length > TRAIL_MAX) trail.shift();
   }
 
-  /* ═══════════════════════════════════════
-     HOVER ANIMATION
-  ═══════════════════════════════════════ */
-  function applyHoverTransform(now) {
-    const phase  = (now % HOVER_PERIOD) / HOVER_PERIOD;
-    const bob    = Math.sin(phase * Math.PI * 2) * HOVER_AMP;
-    const wobble = Math.sin(phase * Math.PI * 4) * 1.5;
-    ghostEl.style.transform = `translateY(${bob}px) rotate(${wobble}deg)`;
+  /* ═══════════════════════════════════
+     DRAW
+  ═══════════════════════════════════ */
+  function drawFrame(now) {
+    ctx.clearRect(0, 0, cssW, cssH);
+    const sec = now / 1000;
+    const [col1, col2] = roomColorPair(state.roomId);
+
+    /* ── ripples (click feedback) ── */
+    for (let i = ripples.length - 1; i >= 0; i--) {
+      const rp = ripples[i];
+      rp.life -= 0.038;
+      if (rp.life <= 0) { ripples.splice(i, 1); continue; }
+      const radius = (1 - rp.life) * 40 + 5;
+      ctx.save();
+      ctx.globalAlpha  = rp.life * 0.75;
+      ctx.strokeStyle  = "rgba(255,138,226,.95)";
+      ctx.lineWidth    = 1.5;
+      ctx.beginPath();
+      ctx.arc(rp.x, rp.y, radius, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    /* ── sparkle trail ── */
+    for (let i = trail.length - 1; i >= 0; i--) {
+      const p = trail[i];
+      const gr = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size * 2.4);
+      gr.addColorStop(0, p.color);
+      gr.addColorStop(1, "transparent");
+      ctx.globalAlpha = p.life * 0.48;
+      ctx.fillStyle   = gr;
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.size * 2.4, 0, Math.PI * 2); ctx.fill();
+      ctx.globalAlpha = p.life * 0.90;
+      ctx.fillStyle   = "#fff";
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.size * 0.3,  0, Math.PI * 2); ctx.fill();
+      ctx.globalAlpha = 1;
+      p.life -= 0.022; p.x += p.vx; p.y += p.vy;
+    }
+    trail = trail.filter(p => p.life > 0);
+
+    /* ── ghost ── */
+    const bobFreq  = (Math.PI * 2) / (HOVER_PERIOD / 1000);
+    const bob      = Math.sin(sec * bobFreq) * HOVER_AMP;
+    const wobble   = Math.sin(sec * bobFreq * 2) * 1.5;   // gentle tilt
+    const gx = state.x;
+    const gy = state.y + bob;
+    const pulse = 0.5 + 0.5 * Math.sin(sec * 2.1);
+
+    /* colored glow halo */
+    ctx.save();
+    ctx.globalAlpha = 0.22 + pulse * 0.12;
+    const halo = ctx.createRadialGradient(gx, gy + 3, 0, gx, gy + 3, GHOST_R * 2.2);
+    halo.addColorStop(0, col1);
+    halo.addColorStop(0.5, col2);
+    halo.addColorStop(1, "transparent");
+    ctx.fillStyle = halo;
+    ctx.beginPath(); ctx.arc(gx, gy + 3, GHOST_R * 2.2, 0, Math.PI * 2); ctx.fill();
+
+    /* soft drop shadow */
+    ctx.globalAlpha = 0.18 + pulse * 0.07;
+    const shd = ctx.createRadialGradient(gx, gy + GHOST_R * 0.85, 0, gx, gy + GHOST_R * 0.85, GHOST_R * 0.9);
+    shd.addColorStop(0, "rgba(0,0,0,.65)");
+    shd.addColorStop(1, "transparent");
+    ctx.fillStyle = shd;
+    ctx.beginPath(); ctx.arc(gx, gy + GHOST_R * 0.85, GHOST_R * 0.9, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+
+    /* PNG ghost — rotate by wobble, bob handled by gy offset */
+    ctx.save();
+    ctx.translate(gx, gy);
+    ctx.rotate(wobble * Math.PI / 180);
+    if (ghostImg.complete && ghostImg.naturalWidth > 0) {
+      ctx.drawImage(ghostImg, -GHOST_R, -GHOST_R, GHOST_R * 2, GHOST_R * 2);
+    } else {
+      ctx.fillStyle = "#fff";
+      ctx.beginPath(); ctx.arc(0, 0, GHOST_R * 0.7, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.restore();
   }
 
-  /* ═══════════════════════════════════════
+  /* ═══════════════════════════════════
      MOVEMENT
-  ═══════════════════════════════════════ */
+  ═══════════════════════════════════ */
   function handleClickMovement(now) {
     if (!state.clickTarget) { state.moving = false; return; }
-    const tx = state.clickTarget.x;
-    const ty = state.clickTarget.y;
-    const dx = tx - state.x;
-    const dy = ty - state.y;
+    const tx = state.clickTarget.x, ty = state.clickTarget.y;
+    const dx = tx - state.x,        dy = ty - state.y;
     const dist = Math.hypot(dx, dy);
 
     if (dist <= CLICK_STOP_DIST) {
-      state.clickTarget = null;
-      state.moving = false;
-      return;
+      state.clickTarget = null; state.moving = false; return;
     }
 
-    const ux = dx / dist; const uy = dy / dist;
-    const moved = tryMove(state.x + ux * SPEED, state.y + uy * SPEED);
+    const moved = tryMove(state.x + (dx / dist) * SPEED, state.y + (dy / dist) * SPEED);
     state.moving = moved;
-
-    if (!moved) { state.clickTarget = null; state.moving = false; }
-    else spawnSparkle(state.x, state.y, now);
+    if (!moved)  { state.clickTarget = null; state.moving = false; }
+    else          addTrailParticle(state.x, state.y, now);
   }
 
-  /* ═══════════════════════════════════════
-     MAIN TICK
-  ═══════════════════════════════════════ */
+  /* ═══════════════════════════════════
+     MAIN LOOP
+  ═══════════════════════════════════ */
   function tick(now) {
     if (!state.transitioning) {
       handleClickMovement(now);
       const exit = getExitAtEdge();
       if (exit) transitionTo(exit);
     }
-    applyHoverTransform(now);
+    drawFrame(now);
     requestAnimationFrame(tick);
   }
 
-  /* ═══════════════════════════════════════
+  /* ═══════════════════════════════════
+     MUSIC — unlocked on first interaction
+  ═══════════════════════════════════ */
+  function startMusic() {
+    if (state.musicStarted) return;
+    state.musicStarted = true;
+    music.play().catch(() => {});
+  }
+
+  /* ═══════════════════════════════════
      INPUT
-  ═══════════════════════════════════════ */
+  ═══════════════════════════════════ */
   function stagePointToWorld(clientX, clientY) {
     const rect = stage.getBoundingClientRect();
     const x = ((clientX - rect.left) / rect.width)  * WORLD_W;
@@ -427,23 +426,28 @@
     return clampToWorld(x, y);
   }
 
-  function spawnRipple(wx, wy) {
-    const r = document.createElement("div");
-    r.className = "click-ripple";
-    r.style.left = `${wx}px`;
-    r.style.top  = `${wy}px`;
-    stage.appendChild(r);
-    setTimeout(() => r.remove(), 520);
-  }
-
-  function bindMouse() {
+  function bindInput() {
+    /* click */
     stage.addEventListener("click", (e) => {
+      startMusic();
       if (state.transitioning) return;
       const p = stagePointToWorld(e.clientX, e.clientY);
       state.clickTarget = { x: p.x, y: p.y };
-      spawnRipple(p.x, p.y);
+      ripples.push({ x: p.x, y: p.y, life: 1 });
     });
 
+    /* touch */
+    stage.addEventListener("touchend", (e) => {
+      startMusic();
+      if (state.transitioning || !e.changedTouches.length) return;
+      const t0 = e.changedTouches[0];
+      const p  = stagePointToWorld(t0.clientX, t0.clientY);
+      state.clickTarget = { x: p.x, y: p.y };
+      ripples.push({ x: p.x, y: p.y, life: 1 });
+      e.preventDefault();
+    }, { passive: false });
+
+    /* hover coords */
     stage.addEventListener("mousemove", (e) => {
       if (!state.showCoords) return;
       const p = stagePointToWorld(e.clientX, e.clientY);
@@ -451,16 +455,17 @@
     });
   }
 
-  /* ═══════════════════════════════════════
+  /* ═══════════════════════════════════
      INIT
-  ═══════════════════════════════════════ */
+  ═══════════════════════════════════ */
   function init() {
     injectStyles();
     buildApp();
     fitStage();
+    resizeCanvas();
     renderInitialRoom();
-    bindMouse();
-    window.addEventListener("resize", fitStage);
+    bindInput();
+    window.addEventListener("resize", () => { fitStage(); resizeCanvas(); });
     requestAnimationFrame(tick);
   }
 
