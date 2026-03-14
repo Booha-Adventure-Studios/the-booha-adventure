@@ -6,16 +6,16 @@
   /* ═══════════════════════════════════════════
      CONSTANTS
   ═══════════════════════════════════════════ */
-  const WORLD_W         = 1536;   // matches source image width
-  const WORLD_H         = 1024;   // matches source image height  (3:2 ratio)
-  const GHOST_R         = 22;
-  const GHOST_RADIUS    = 16;
-  const SPEED           = 1.8;
+  const WORLD_W         = 1536;
+  const WORLD_H         = 1024;
+  const GHOST_R         = 26;     // slightly bigger
+  const GHOST_RADIUS    = 18;
+  const SPEED           = 3.2;    // faster
   const FADE_MS         = 600;
   const CLICK_STOP_DIST = 6;
-  const HOVER_AMP       = 5;
-  const HOVER_PERIOD    = 2200;
-  const TRAIL_MAX       = 80;
+  const HOVER_AMP       = 9;      // bouncier
+  const HOVER_PERIOD    = 1500;   // faster cycle
+  const TRAIL_MAX       = 90;
 
   /* color ramps — same as maze.html */
   const MONTH_COLORS = [
@@ -32,102 +32,131 @@
   /* ═══════════════════════════════════════════
      NPP — NEXT PAGE POINTS
      ─────────────────────────────────────────
-     Each entry is one exit for a room.
+     dir   : arrow direction ("left/right/up/down")
+             omit entirely = no arrow, still triggers
+     x, y  : exact trigger dot coordinate (world px)
+     to    : destination room key
+     spawn : spawn id in the destination room
 
-       dir   : "left" | "right" | "up" | "down"
-                Used to aim the arrow. Delete the
-                whole entry if you don't want an
-                arrow (ghost still triggers on proximity).
-       x, y  : world-space coordinate of the glowing
-                dot. Ghost triggers the exit when it
-                reaches this point (within NPP_RADIUS px).
-       to    : room key to transition into
-       spawn : spawn id inside the destination room
+     Grid layout  (row × col):
+       01  02  03  04  05
+       06  07  08  09  10
+       11  12  13  14  15
 
-     To tune: turn on COORDS mode, click the exact
-     spot, paste the coords here, done.
+     No-exit rules baked in:
+       No DOWN  → rooms 01-04  (and 05 has no right or down)
+       No LEFT  → rooms 01, 06, 11
+       No UP    → rooms 11-15
+       No RIGHT → rooms 05, 10, 15
   ═══════════════════════════════════════════ */
-  const NPP_RADIUS = 36;   // px — how close ghost must get to trigger
+  const NPP_RADIUS = 40;   // px — proximity to trigger transition
 
   const NPP = {
+    // ── ROW 1 ─────────────────────────────
     room_01: [
-      { dir: "right", x: 840,  y: 270,  to: "room_02", spawn: "fromLeft"  },
-      { dir: "up",    x: 480,  y: 90,   to: "room_06", spawn: "fromDown"  }
+      { dir: "right", x: 1455, y: 658,  to: "room_02", spawn: "fromLeft"  },
+      { dir: "up",    x: 1084, y: 162,  to: "room_06", spawn: "fromDown"  }
+      // no left, no down
     ],
     room_02: [
-      { dir: "left",  x: 147,  y: 220,  to: "room_01", spawn: "fromRight" },
-      { dir: "up",    x: 493,  y: 89,   to: "room_07", spawn: "fromDown"  },
-      { dir: "right", x: 529,  y: 117,  to: "room_03", spawn: "fromLeft"  }
+      { dir: "left",  x: 149,  y: 255,  to: "room_01", spawn: "fromRight" },
+      { dir: "right", x: 1458, y: 727,  to: "room_03", spawn: "fromLeft"  },
+      { dir: "up",    x: 765,  y: 126,  to: "room_07", spawn: "fromDown"  }
+      // no down
     ],
     room_03: [
       { dir: "left",  x: 218,  y: 328,  to: "room_02", spawn: "fromRight" },
-      { dir: "up",    x: 785,  y: 171,  to: "room_08", spawn: "fromDown"  },
-      { dir: "right", x: 1216, y: 237,  to: "room_04", spawn: "fromLeft"  }
+      { dir: "right", x: 1216, y: 237,  to: "room_04", spawn: "fromLeft"  },
+      { dir: "up",    x: 785,  y: 171,  to: "room_08", spawn: "fromDown"  }
+      // no down
     ],
     room_04: [
-      { dir: "left",  x: 120,  y: 270,  to: "room_03", spawn: "fromRight" },
-      { dir: "right", x: 840,  y: 270,  to: "room_05", spawn: "fromLeft"  },
-      { dir: "up",    x: 480,  y: 90,   to: "room_09", spawn: "fromDown"  }
+      // coords not yet supplied — mirrors room_03 right↔left and room_05 left
+      { dir: "left",  x: 218,  y: 328,  to: "room_03", spawn: "fromRight" },
+      { dir: "right", x: 1455, y: 658,  to: "room_05", spawn: "fromLeft"  },
+      { dir: "up",    x: 785,  y: 171,  to: "room_09", spawn: "fromDown"  }
+      // no down — UPDATE x,y when you pin room_04
     ],
     room_05: [
-      { dir: "left",  x: 120,  y: 270,  to: "room_04", spawn: "fromRight" },
-      { dir: "up",    x: 480,  y: 90,   to: "room_10", spawn: "fromDown"  }
+      { dir: "left",  x: 218,  y: 328,  to: "room_04", spawn: "fromRight" },
+      { dir: "up",    x: 785,  y: 171,  to: "room_10", spawn: "fromDown"  }
+      // no right, no down — UPDATE x,y when you pin room_05
     ],
+
+    // ── ROW 2 ─────────────────────────────
     room_06: [
-      { dir: "right", x: 840,  y: 270,  to: "room_07", spawn: "fromLeft"  },
-      { dir: "up",    x: 480,  y: 90,   to: "room_11", spawn: "fromDown"  },
-      { dir: "down",  x: 480,  y: 470,  to: "room_01", spawn: "fromUp"    }
+      // no left
+      { dir: "right", x: 1468, y: 684,  to: "room_07", spawn: "fromLeft"  },
+      { dir: "up",    x: 1096, y: 136,  to: "room_11", spawn: "fromDown"  },
+      { dir: "down",  x: 1468, y: 684,  to: "room_01", spawn: "fromUp"    }
+      // NOTE: right+down share coords here — split them once you pin room_06 properly
     ],
     room_07: [
-      { dir: "left",  x: 120,  y: 270,  to: "room_06", spawn: "fromRight" },
-      { dir: "right", x: 840,  y: 270,  to: "room_08", spawn: "fromLeft"  },
-      { dir: "up",    x: 480,  y: 90,   to: "room_12", spawn: "fromDown"  },
-      { dir: "down",  x: 480,  y: 470,  to: "room_02", spawn: "fromUp"    }
+      { dir: "left",  x: 28,   y: 687,  to: "room_06", spawn: "fromRight" },
+      { dir: "right", x: 1484, y: 615,  to: "room_08", spawn: "fromLeft"  },
+      { dir: "up",    x: 555,  y: 157,  to: "room_12", spawn: "fromDown"  },
+      { dir: "down",  x: 901,  y: 892,  to: "room_02", spawn: "fromUp"    }
     ],
     room_08: [
-      { dir: "left",  x: 120,  y: 270,  to: "room_07", spawn: "fromRight" },
-      { dir: "right", x: 840,  y: 270,  to: "room_09", spawn: "fromLeft"  },
-      { dir: "up",    x: 480,  y: 90,   to: "room_13", spawn: "fromDown"  },
-      { dir: "down",  x: 480,  y: 470,  to: "room_03", spawn: "fromUp"    }
+      { dir: "left",  x: 47,   y: 809,  to: "room_07", spawn: "fromRight" },
+      { dir: "right", x: 1520, y: 597,  to: "room_09", spawn: "fromLeft"  },
+      { dir: "up",    x: 992,  y: 160,  to: "room_13", spawn: "fromDown"  },
+      { dir: "down",  x: 860,  y: 874,  to: "room_03", spawn: "fromUp"    }
     ],
     room_09: [
-      { dir: "left",  x: 120,  y: 270,  to: "room_08", spawn: "fromRight" },
-      { dir: "right", x: 840,  y: 270,  to: "room_10", spawn: "fromLeft"  },
-      { dir: "up",    x: 480,  y: 90,   to: "room_14", spawn: "fromDown"  },
-      { dir: "down",  x: 480,  y: 470,  to: "room_04", spawn: "fromUp"    }
+      { dir: "left",  x: 50,   y: 702,  to: "room_08", spawn: "fromRight" },
+      { dir: "right", x: 1484, y: 615,  to: "room_10", spawn: "fromLeft"  },
+      { dir: "up",    x: 449,  y: 169,  to: "room_14", spawn: "fromDown"  },
+      { dir: "down",  x: 989,  y: 886,  to: "room_04", spawn: "fromUp"    }
+      // right mirrors room_07 right — UPDATE once you pin room_09
     ],
     room_10: [
-      { dir: "left",  x: 120,  y: 270,  to: "room_09", spawn: "fromRight" },
-      { dir: "up",    x: 480,  y: 90,   to: "room_15", spawn: "fromDown"  },
-      { dir: "down",  x: 480,  y: 470,  to: "room_05", spawn: "fromUp"    }
+      { dir: "left",  x: 50,   y: 702,  to: "room_09", spawn: "fromRight" },
+      // no right
+      { dir: "up",    x: 838,  y: 173,  to: "room_15", spawn: "fromDown"  },
+      { dir: "down",  x: 776,  y: 891,  to: "room_05", spawn: "fromUp"    }
     ],
+
+    // ── ROW 3 ─────────────────────────────
     room_11: [
-      { dir: "right", x: 840,  y: 270,  to: "room_12", spawn: "fromLeft"  },
-      { dir: "down",  x: 480,  y: 470,  to: "room_06", spawn: "fromUp"    }
+      // no left, no up
+      { dir: "right", x: 1364, y: 312,  to: "room_12", spawn: "fromLeft"  },
+      { dir: "down",  x: 804,  y: 881,  to: "room_06", spawn: "fromUp"    }
     ],
     room_12: [
-      { dir: "left",  x: 120,  y: 270,  to: "room_11", spawn: "fromRight" },
-      { dir: "right", x: 840,  y: 270,  to: "room_13", spawn: "fromLeft"  },
-      { dir: "down",  x: 480,  y: 470,  to: "room_07", spawn: "fromUp"    }
+      { dir: "left",  x: 173,  y: 344,  to: "room_11", spawn: "fromRight" },
+      { dir: "right", x: 1485, y: 716,  to: "room_13", spawn: "fromLeft"  },
+      // no up
+      { dir: "down",  x: 751,  y: 914,  to: "room_07", spawn: "fromUp"    }
     ],
     room_13: [
-      { dir: "left",  x: 120,  y: 270,  to: "room_12", spawn: "fromRight" },
-      { dir: "right", x: 840,  y: 270,  to: "room_14", spawn: "fromLeft"  },
-      { dir: "down",  x: 480,  y: 470,  to: "room_08", spawn: "fromUp"    }
+      // no up — mirrors neighbors until you pin
+      { dir: "left",  x: 173,  y: 344,  to: "room_12", spawn: "fromRight" },
+      { dir: "right", x: 1485, y: 716,  to: "room_14", spawn: "fromLeft"  },
+      { dir: "down",  x: 751,  y: 914,  to: "room_08", spawn: "fromUp"    }
+      // UPDATE x,y when you pin room_13
     ],
     room_14: [
-      { dir: "left",  x: 120,  y: 270,  to: "room_13", spawn: "fromRight" },
-      { dir: "right", x: 840,  y: 270,  to: "room_15", spawn: "fromLeft"  },
-      { dir: "down",  x: 480,  y: 470,  to: "room_09", spawn: "fromUp"    }
+      // no up — mirrors neighbors
+      { dir: "left",  x: 173,  y: 344,  to: "room_13", spawn: "fromRight" },
+      { dir: "right", x: 1485, y: 716,  to: "room_15", spawn: "fromLeft"  },
+      { dir: "down",  x: 751,  y: 914,  to: "room_09", spawn: "fromUp"    }
+      // UPDATE x,y when you pin room_14
     ],
     room_15: [
-      { dir: "left",  x: 120,  y: 270,  to: "room_14", spawn: "fromRight" },
-      { dir: "down",  x: 480,  y: 470,  to: "room_10", spawn: "fromUp"    }
+      // no right, no up
+      { dir: "left",  x: 173,  y: 344,  to: "room_14", spawn: "fromRight" },
+      { dir: "down",  x: 751,  y: 914,  to: "room_10", spawn: "fromUp"    }
+      // UPDATE x,y when you pin room_15
     ]
   };
 
   /* Arrow angle: direction → radians (0 = pointing right) */
   const DIR_ANGLE = { right: 0, down: Math.PI / 2, left: Math.PI, up: -Math.PI / 2 };
+
+  /* ── Per-room: which NPP dir was used to ARRIVE (set on transition) ── */
+  /* Arrow for that exit is hidden until ghost has moved away from the spawn */
+  const ARRIVE_HIDE_DIST = 120;  // px — how far ghost must travel before arrival arrow shows
 
   /* ═══════════════════════════════════════════
      STATE
@@ -136,11 +165,14 @@
     roomId        : DATA.startRoom,
     spawnId       : "default",
     x             : 721,    // room_03 start x
-    y             : 985,    // room_03 start y
+    y             : 876,    // room_03 start y  (updated to 732,876)
+    spawnX        : 721,    // where ghost spawned this room (for arrival-arrow hiding)
+    spawnY        : 876,
+    arrivalDir    : null,   // dir string of the exit used to arrive ("left"/"right"/"up"/"down")
     transitioning : false,
     clickTarget   : null,
     moving        : false,
-    coordMode     : false,   // coord-marking mode toggle
+    coordMode     : false,
     musicStarted  : false,
     lastTrailT    : 0
   };
@@ -527,6 +559,9 @@
       state.spawnId = exit.spawn || "default";
       const spawn   = getSpawn(nextRoom, state.spawnId);
       placeGhost(spawn.x, spawn.y);
+      state.spawnX     = spawn.x;
+      state.spawnY     = spawn.y;
+      state.arrivalDir = exit.dir || null;  // the dir we came IN through
       trail = []; pins = [];  // clear pins when room changes
       // update pin log header
       const lh = pinLog.querySelector(".log-header span");
@@ -577,50 +612,64 @@
     const sec = now / 1000;
     const [col1, col2] = roomColorPair(state.roomId);
 
+    /* opposite direction: if ghost arrived "right" it came from the right exit */
+    const OPPOSITE = { left: "right", right: "left", up: "down", down: "up" };
+    const arrivalExit = state.arrivalDir ? OPPOSITE[state.arrivalDir] : null;
+    const distFromSpawn = Math.hypot(state.x - state.spawnX, state.y - state.spawnY);
+    const arrivalRevealed = distFromSpawn >= ARRIVE_HIDE_DIST;
+
     npps.forEach((npp, i) => {
-      if (!npp.dir) return;   // no dir = no arrow, just proximity trigger
+      if (!npp.dir) return;  // no dir = no arrow
+
+      /* hide the exit we arrived through until ghost has walked away */
+      if (npp.dir === arrivalExit && !arrivalRevealed) return;
+
       const angle  = DIR_ANGLE[npp.dir] ?? 0;
       const pulse  = 0.5 + 0.5 * Math.sin(sec * 2.2 + i * 1.3);
-      const bounce = Math.sin(sec * 2.2 + i * 1.3) * 5;
+      const bounce = Math.sin(sec * 2.2 + i * 1.3) * 6;
       const ax = npp.x + Math.cos(angle) * bounce;
       const ay = npp.y + Math.sin(angle) * bounce;
 
+      /* fade in smoothly when revealed */
+      const fadeAlpha = (npp.dir === arrivalExit)
+        ? Math.min((distFromSpawn - ARRIVE_HIDE_DIST) / 60, 1)
+        : 1;
+
       ctx.save();
+      ctx.globalAlpha = fadeAlpha;
       ctx.translate(ax, ay);
       ctx.rotate(angle);
 
       /* outer glow */
-      ctx.globalAlpha = 0.08 + pulse * 0.07;
-      const glow = ctx.createRadialGradient(0, 0, 0, 0, 0, 36);
-      glow.addColorStop(0, col1); glow.addColorStop(1, "transparent");
-      ctx.fillStyle = glow;
-      ctx.beginPath(); ctx.arc(0, 0, 36, 0, Math.PI * 2); ctx.fill();
+      const ga = ctx.createRadialGradient(0, 0, 0, 0, 0, 40);
+      ga.addColorStop(0, col1); ga.addColorStop(1, "transparent");
+      ctx.globalAlpha = fadeAlpha * (0.10 + pulse * 0.08);
+      ctx.fillStyle = ga;
+      ctx.beginPath(); ctx.arc(0, 0, 40, 0, Math.PI * 2); ctx.fill();
 
       /* double chevron */
-      const drawChevron = (offsetX, alpha) => {
-        ctx.globalAlpha = alpha * (0.35 + pulse * 0.30);
+      [{ ox: -11, a: 0.65 }, { ox: 4, a: 1.0 }].forEach(({ ox, a }) => {
+        ctx.globalAlpha = fadeAlpha * a * (0.38 + pulse * 0.32);
         ctx.strokeStyle = col1;
-        ctx.lineWidth   = 2.2;
+        ctx.lineWidth   = 2.5;
         ctx.lineCap     = "round";
         ctx.lineJoin    = "round";
-        ctx.shadowBlur  = 10;
+        ctx.shadowBlur  = 12;
         ctx.shadowColor = col2;
         ctx.beginPath();
-        ctx.moveTo(offsetX - 6, -9);
-        ctx.lineTo(offsetX + 6,  0);
-        ctx.lineTo(offsetX - 6,  9);
+        ctx.moveTo(ox - 7, -10);
+        ctx.lineTo(ox + 7,   0);
+        ctx.lineTo(ox - 7,  10);
         ctx.stroke();
         ctx.shadowBlur = 0;
-      };
-      drawChevron(-10, 0.7);
-      drawChevron(  4, 1.0);
+      });
 
-      /* glowing dot at the NPP trigger point (origin before translate) */
-      ctx.globalAlpha = 0.55 + pulse * 0.35;
+      /* glowing dot at the exact NPP trigger point (at origin = npp.x, npp.y) */
+      ctx.globalAlpha = fadeAlpha * (0.60 + pulse * 0.38);
       ctx.fillStyle   = "#fff";
-      ctx.shadowBlur  = 12;
+      ctx.shadowBlur  = 14;
       ctx.shadowColor = col1;
-      ctx.beginPath(); ctx.arc(0, 0, 4, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(0, 0, 5, 0, Math.PI * 2); ctx.fill();
       ctx.shadowBlur  = 0;
 
       ctx.restore();
@@ -710,12 +759,21 @@
     /* exit arrows */
     drawExitArrows(now);
 
-    /* ghost */
-    const bobFreq = (Math.PI * 2) / (HOVER_PERIOD / 1000);
-    const bob     = Math.sin(sec * bobFreq) * HOVER_AMP;
-    const wobble  = Math.sin(sec * bobFreq * 2) * 1.5;
+    /* ghost — squash & stretch based on movement and bob */
+    const bobFreq  = (Math.PI * 2) / (HOVER_PERIOD / 1000);
+    const bobPhase = sec * bobFreq;
+    const bob      = Math.sin(bobPhase) * HOVER_AMP;
+    const wobble   = Math.sin(bobPhase * 2) * 2.2;
     const gx = state.x, gy = state.y + bob;
     const pulse = 0.5 + 0.5 * Math.sin(sec * 2.1);
+
+    /* squash when bob is going down (sin negative), stretch when going up */
+    const stretchY = 1 + Math.sin(bobPhase) * 0.10;
+    const stretchX = 1 - Math.sin(bobPhase) * 0.07;
+    /* extra squash when moving fast */
+    const movingStretch = state.moving ? 1.08 : 1.0;
+    const sx = stretchX;
+    const sy = stretchY * movingStretch;
 
     ctx.save();
     ctx.globalAlpha = 0.22 + pulse * 0.12;
@@ -734,6 +792,7 @@
     ctx.save();
     ctx.translate(gx, gy);
     ctx.rotate(wobble * Math.PI / 180);
+    ctx.scale(sx, sy);
     if (ghostImg.complete && ghostImg.naturalWidth > 0) {
       ctx.drawImage(ghostImg, -GHOST_R, -GHOST_R, GHOST_R * 2, GHOST_R * 2);
     } else {
