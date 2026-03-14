@@ -6,8 +6,8 @@
   /* ═══════════════════════════════════════════
      CONSTANTS
   ═══════════════════════════════════════════ */
-  const WORLD_W         = 960;
-  const WORLD_H         = 540;
+  const WORLD_W         = 1536;   // matches source image width
+  const WORLD_H         = 1024;   // matches source image height  (3:2 ratio)
   const GHOST_R         = 22;
   const GHOST_RADIUS    = 16;
   const SPEED           = 1.8;
@@ -156,6 +156,8 @@
       html,body{margin:0;padding:0;width:100%;height:100%;background:#000;overflow:hidden;}
       body{display:grid;place-items:center;}
       #karasuki-app{position:relative;width:100vw;height:100vh;overflow:hidden;background:#000;}
+
+      /* Stage is always 1536×1024 (3:2) in logical px, scaled via transform */
       #karasuki-stage{
         position:absolute;left:50%;top:50%;
         width:${WORLD_W}px;height:${WORLD_H}px;
@@ -164,12 +166,52 @@
       #karasuki-room-layer{position:absolute;inset:0;}
       .karasuki-bg{
         position:absolute;inset:0;width:100%;height:100%;
-        object-fit:fill;display:block;pointer-events:none;user-select:none;
+        object-fit:cover;object-position:center center;
+        display:block;pointer-events:none;user-select:none;
       }
       #kara-canvas{position:absolute;inset:0;z-index:10;pointer-events:none;}
       #kara-fade{
         position:absolute;inset:0;background:#000;
         opacity:0;pointer-events:none;z-index:20;
+      }
+
+      /* ── Landscape lock overlay ── */
+      #rotate-overlay{
+        display:none;
+        position:fixed;inset:0;z-index:9999;
+        background:#000;
+        flex-direction:column;align-items:center;justify-content:center;gap:18px;
+        text-align:center;padding:32px;
+      }
+      /* Show on portrait mobile */
+      @media screen and (orientation:portrait) and (max-width:1023px){
+        #rotate-overlay{ display:flex !important; }
+      }
+      .rotate-phone{
+        font-size:64px;display:block;
+        animation:rotatehint 2.4s ease-in-out infinite;
+        transform-origin:center;
+      }
+      @keyframes rotatehint{
+        0%,100%{transform:rotate(0deg);}
+        40%,60%{transform:rotate(-90deg);}
+      }
+      .rotate-bar{
+        width:120px;height:3px;border-radius:999px;
+        background:linear-gradient(90deg,#ff3bbd,#ff79d7,#ff3bbd);
+        background-size:200%;
+        animation:barshimmer 2s linear infinite;
+        box-shadow:0 0 14px rgba(255,59,189,.5);
+      }
+      @keyframes barshimmer{0%{background-position:0%}100%{background-position:200%}}
+      .rotate-title{
+        font-family:system-ui,-apple-system,sans-serif;
+        font-size:clamp(18px,5vw,28px);font-weight:900;
+        letter-spacing:1px;color:#fff;margin:0;
+        text-shadow:0 0 28px rgba(255,140,255,.7);
+      }
+      .rotate-sub{
+        font-size:14px;color:rgba(255,255,255,.55);margin:0;line-height:1.7;
       }
 
       /* ── coord toggle pill ── */
@@ -300,6 +342,17 @@
     document.body.appendChild(pinLog);
     document.body.appendChild(toast);
 
+    /* ── landscape lock overlay ── */
+    const rotateOverlay = document.createElement("div");
+    rotateOverlay.id = "rotate-overlay";
+    rotateOverlay.innerHTML = `
+      <span class="rotate-phone">📱</span>
+      <div class="rotate-bar"></div>
+      <p class="rotate-title">Rotate to play!</p>
+      <p class="rotate-sub">Karasuki works best in<br><strong style="color:#ff79d7">landscape mode</strong></p>
+    `;
+    document.body.appendChild(rotateOverlay);
+
     ctx = canvas.getContext("2d");
 
     document.getElementById("clear-pins").addEventListener("click", () => {
@@ -320,7 +373,9 @@
   }
 
   function fitStage() {
-    const scale = Math.min(window.innerWidth / WORLD_W, window.innerHeight / WORLD_H);
+    // Cover: scale up so stage fills the viewport on both axes — no bars ever.
+    // On a 16:9 screen viewing 3:2 content, ~5% of top/bottom is cropped — acceptable.
+    const scale = Math.max(window.innerWidth / WORLD_W, window.innerHeight / WORLD_H);
     stage.style.transform = `translate(-50%, -50%) scale(${scale})`;
   }
 
