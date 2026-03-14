@@ -5,7 +5,6 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Booha Adventure — Maze</title>
-  <link rel="icon" type="image/png" href="purple-boo.png">  
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bowlby+One&display=swap" rel="stylesheet" />
@@ -70,8 +69,8 @@
     #mazeCanvas{ position:absolute; left:0; top:0; z-index:6; cursor:default; }
     #mazeCanvas.bryan{ cursor:crosshair; }
     #mazeCanvas.locked{ cursor:not-allowed; pointer-events:none; }
-    #travelLock{ position:absolute; inset:0; z-index:30; display:none; cursor:default; }
-    #travelLock.active{ display:block; }
+    #travelLock{ position:absolute; inset:0; z-index:30; display:none; cursor:wait; pointer-events:none; }
+    #travelLock.active{ display:block; pointer-events:all; }
     #grid{ position:absolute; inset:0; display:none; pointer-events:none; z-index:7; background-image:linear-gradient(to right,rgba(255,255,255,.12) 1px,transparent 1px),linear-gradient(to bottom,rgba(255,255,255,.12) 1px,transparent 1px); background-size:80px 80px; mix-blend-mode:screen; opacity:.55; }
     #grid.show{ display:block; }
     .hudTitle{ font-family:'Bowlby One',sans-serif; font-size:clamp(13px,1.8vw,18px); letter-spacing:2px; line-height:1.15; color:#fff; text-shadow:0 0 22px rgba(255,140,255,.7),0 0 60px rgba(255,80,200,.35),0 2px 6px rgba(0,0,0,.9); user-select:none; pointer-events:none; }
@@ -1052,8 +1051,22 @@ function restoreMazeFromCheckpoint(){
   app.classList.remove('inTransition');
   karasukiLastSwap=performance.now();
   resizeCanvas();buildWanderers();startLoop();
-  // Music always plays and loops in the maze
-  try{bgMusic.loop=true;bgMusic.volume=.65;bgMusic.play().catch(()=>{});}catch(e){}
+  // Music always plays and loops in the maze.
+  // After navigation the browser may block autoplay until a user gesture —
+  // so we attempt play immediately and register a one-time any-interaction
+  // listener to resume it if it's still paused.
+  bgMusic.loop=true;bgMusic.volume=.65;
+  const _musicResume=()=>{
+    if(bgMusic.paused)bgMusic.play().catch(()=>{});
+  };
+  bgMusic.play().catch(()=>{});
+  // Any touch/click/key will unlock audio context and restart music
+  ['click','touchstart','keydown','pointerdown'].forEach(ev=>{
+    document.addEventListener(ev,function _once(){
+      if(bgMusic.paused)bgMusic.play().catch(()=>{});
+      document.removeEventListener(ev,_once);
+    },{once:true,passive:true});
+  });
   if(reopenPopup)showPopupAtCP(cp);
 }
 
@@ -1107,6 +1120,13 @@ function drawWanderers(nowMs){
     ctx.globalAlpha=w.opacity*(.18+pulseG*.09);const ga=ctx.createRadialGradient(gx,gy+3,0,gx,gy+3,drawR*2);ga.addColorStop(0,col1);ga.addColorStop(.5,col2);ga.addColorStop(1,'transparent');ctx.fillStyle=ga;ctx.beginPath();ctx.arc(gx,gy+3,drawR*2,0,Math.PI*2);ctx.fill();
     ctx.globalAlpha=w.opacity;ctx.drawImage(img,gx-drawR,gy-drawR,drawR*2,drawR*2);ctx.globalAlpha=1;ctx.restore();
   }
+}
+
+// Returns true if any modal/popup is currently visible — canvas clicks should be ignored
+function popupOpen(){
+  return cpPopup.classList.contains('show')
+    || hwPrompt.classList.contains('show')
+    || krPrompt.classList.contains('show');
 }
 
 function setTravelLock(on){
@@ -1330,8 +1350,8 @@ function startGhostTravelToKRTree(){
 
 canvas.addEventListener('click',e=>{
   if(!mazeStarted)return;
-  // Block retargeting while ghost is travelling
-  if(ghostLocked)return;
+  // Block retargeting while ghost is travelling or a popup is open
+  if(ghostLocked||popupOpen())return;
   if(['allGlow','dropping','hovering','settling'].includes(introPhase))return;
   if(hitHomeworkTree(e.clientX,e.clientY)){ startGhostTravelToHWTree(); return; }
   if(hitKarasukiTree(e.clientX,e.clientY)){ startGhostTravelToKRTree(); return; }
@@ -1344,8 +1364,8 @@ canvas.addEventListener('click',e=>{
 });
 canvas.addEventListener('touchend',e=>{
   if(!mazeStarted)return;
-  // Block retargeting while ghost is travelling
-  if(ghostLocked)return;
+  // Block retargeting while ghost is travelling or a popup is open
+  if(ghostLocked||popupOpen())return;
   if(['allGlow','dropping','hovering','settling'].includes(introPhase))return;
   if(!e.changedTouches.length)return;
   const t0=e.changedTouches[0];
@@ -1410,7 +1430,8 @@ function closeHomeworkPrompt(){
 function playHomeworkVideoAndGo(){
   closeHomeworkPrompt();
 
-  // Music keeps playing — no fade-out
+  // Stop sneaky.mp3 — the homework video has its own music
+  try{bgMusic.pause();bgMusic.currentTime=0;}catch(e){}
 
   try{hwTreeVideo.pause();hwTreeVideo.currentTime=0;}catch(e){}
 
@@ -1470,7 +1491,8 @@ function closeKarasukiPrompt(){
 function playKarasukiVideoAndGo(){
   closeKarasukiPrompt();
 
-  // Music keeps playing — no fade-out
+  // Stop sneaky.mp3 — the karasuki video has its own music
+  try{bgMusic.pause();bgMusic.currentTime=0;}catch(e){}
 
   try{krVideo.pause();krVideo.currentTime=0;}catch(e){}
 
@@ -1640,7 +1662,14 @@ window.addEventListener('pageshow',(e)=>{
   if(!e.persisted)return;
   if(rafHandle){cancelAnimationFrame(rafHandle);rafHandle=null;}
   if(mazeStarted)startLoop();
-  try{bgMusic.volume=.65;if(bgMusic.paused)bgMusic.play().catch(()=>{});}catch(err){}
+  bgMusic.loop=true;bgMusic.volume=.65;
+  bgMusic.play().catch(()=>{});
+  ['click','touchstart','keydown','pointerdown'].forEach(ev=>{
+    document.addEventListener(ev,function _once(){
+      if(bgMusic.paused)bgMusic.play().catch(()=>{});
+      document.removeEventListener(ev,_once);
+    },{once:true,passive:true});
+  });
   if(sessionStorage.getItem('booha_reopen_popup')==='1'){
     sessionStorage.removeItem('booha_reopen_popup');
     const cp=CHECKPOINTS.find(c=>c.w===activeWeek);
