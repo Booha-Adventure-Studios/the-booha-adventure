@@ -1,10 +1,10 @@
 
 window.KARASUKI_DATA = {
-  startRoom: "entrance",
+  startRoom: "room_03",
 
   rooms: {
-    entrance: {
-      bg: "assets/karasuki/rooms/entrance.png",
+    room_03: {
+      bg: "assets/karasuki/rooms/room_03.webp",
 
       spawns: {
         default: { x: 180, y: 390 },
@@ -49,7 +49,7 @@ window.KARASUKI_DATA = {
       },
 
       exits: {
-        left: { to: "entrance", spawn: "fromRight", dir: "left" }
+        left: { to: "room_03", spawn: "fromRight", dir: "left" }
       },
 
       collisions: [
@@ -83,7 +83,7 @@ window.KARASUKI_DATA = {
       },
 
       exits: {
-        down: { to: "entrance", spawn: "fromUp", dir: "down" }
+        down: { to: "room_03", spawn: "fromUp", dir: "down" }
       },
 
       collisions: [
