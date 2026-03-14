@@ -1,8 +1,17 @@
 
 /* ══════════════════════════════════════════════════════════════
-   spell-word.js  —  Spell the Word  v2
+   spell-word.js  —  Spell the Word  v3
    Show JP/hira, tap letter tiles to spell the English word.
    3 curricula: br / pb / bc  — same engine, themed per context.
+
+   CHANGES v3:
+   - No audio on tile/slot clicks
+   - Wrong x3 → glowing LISTEN button (debounced, no smashing)
+   - Tiles stay LOWERCASE always
+   - Correct: answer word appears under check, then ding → confetti
+     → dance animation on slots → then audio plays
+   - Results panel: centered, vivid multi-color, header stays visible
+   - Fully responsive / mobile-safe
    ══════════════════════════════════════════════════════════════ */
 (async function () {
 
@@ -13,7 +22,7 @@ if (!CFG || !U) return;
 U.unlockAudio();
 
 /* ══════════════════════════════════════════════════════════════
-   AUDIO — mobile-safe
+   AUDIO — mobile-safe, NO audio on tile taps
    ══════════════════════════════════════════════════════════════ */
 await Promise.all([
   U.loadSFX('ding',  CFG.sfxBase + 'ding.mp3'),
@@ -47,8 +56,10 @@ document.addEventListener('touchstart', unlockAllAudio, { once: true, passive: t
 document.addEventListener('mousedown',  unlockAllAudio, { once: true, passive: true });
 
 let activeWord = null;
-const lastPlayedAt = {};
-const AUDIO_DEBOUNCE_MS = 500;
+/* listen button debounce */
+let lastListenAt = 0;
+const LISTEN_DEBOUNCE_MS = 800;
+let listenLocked = false;
 
 function stopWord() {
   if (!activeWord) return;
@@ -60,22 +71,34 @@ function playWord(mp3, onEnd) {
   if (!mp3) { if (onEnd) onEnd(); return; }
   const a = wordCache[mp3];
   if (!a) { if (onEnd) onEnd(); return; }
-  const now = Date.now();
-  if (lastPlayedAt[mp3] && now - lastPlayedAt[mp3] < AUDIO_DEBOUNCE_MS) {
-    if (onEnd) onEnd();
-    return;
-  }
-  lastPlayedAt[mp3] = now;
   stopWord();
   activeWord = a;
   try { a.currentTime = 0; } catch {}
   if (onEnd) {
     a.onended = () => { activeWord = null; onEnd(); };
     a.onerror = () => { activeWord = null; onEnd(); };
-    setTimeout(() => { if (activeWord === a) { activeWord = null; onEnd(); } }, 3000);
+    setTimeout(() => { if (activeWord === a) { activeWord = null; onEnd(); } }, 4000);
   }
   const p = a.play();
   if (p && p.catch) p.catch(() => { if (onEnd) onEnd(); });
+}
+
+function playWordListen(mp3) {
+  /* Debounced play for the LISTEN button — no callback needed */
+  if (listenLocked) return;
+  const now = Date.now();
+  if (now - lastListenAt < LISTEN_DEBOUNCE_MS) return;
+  lastListenAt = now;
+  listenLocked = true;
+  setTimeout(() => { listenLocked = false; }, LISTEN_DEBOUNCE_MS + 200);
+  if (!mp3) return;
+  const a = wordCache[mp3];
+  if (!a) return;
+  stopWord();
+  activeWord = a;
+  try { a.currentTime = 0; } catch {}
+  const p = a.play();
+  if (p && p.catch) p.catch(() => {});
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -130,18 +153,18 @@ const S = document.createElement('style');
 S.textContent = `
 
 /* ── base ── */
-.game-header{ display:none !important; }
 .sw-wrap{
   position:relative; z-index:1;
   max-width:680px; margin:0 auto;
   padding:0 1rem 6rem;
+  box-sizing:border-box;
 }
 
 /* ── header ── */
 .sw-header{ text-align:center; padding:.6rem 3rem .8rem; }
 .sw-curriculum{
   font-family:var(--game-font-title);
-  font-size:clamp(28px,6vw,52px);
+  font-size:clamp(22px,5vw,48px);
   font-weight:900;
   letter-spacing:.12em;
   text-transform:uppercase;
@@ -166,18 +189,19 @@ S.textContent = `
 .sw-date{
   margin-top:4px;
   font-family:var(--game-font-body);
-  font-size:clamp(12px,2.2vw,16px);
+  font-size:clamp(11px,2vw,15px);
   font-weight:800; color:var(--game-muted); letter-spacing:.06em;
 }
 [data-curriculum="pb"] .sw-date{ color:rgba(58,26,46,.55); }
 
 /* ── progress dots ── */
 .sw-dots-row{
-  display:flex; justify-content:center; gap:6px;
+  display:flex; justify-content:center; gap:5px;
   margin:.5rem 0 .4rem; flex-wrap:wrap;
+  padding:0 .5rem;
 }
 .sw-dot{
-  width:10px; height:10px; border-radius:50%;
+  width:9px; height:9px; border-radius:50%;
   background:rgba(255,255,255,.12);
   border:1.5px solid rgba(255,255,255,.18);
   transition:all .3s;
@@ -198,14 +222,14 @@ S.textContent = `
 /* ── score pill ── */
 .sw-hud{
   display:flex; justify-content:center; gap:10px;
-  margin-bottom:.6rem;
+  margin-bottom:.6rem; flex-wrap:wrap;
 }
 .sw-pill{
-  padding:6px 18px; border-radius:999px;
+  padding:5px 14px; border-radius:999px;
   background:var(--game-pill-bg);
   border:1.5px solid var(--game-pill-border);
   color:var(--game-pill-text);
-  font-size:clamp(13px,2.2vw,16px);
+  font-size:clamp(12px,2vw,15px);
   font-weight:900; letter-spacing:.03em;
   box-shadow:0 2px 12px rgba(0,0,0,.2);
 }
@@ -217,12 +241,12 @@ S.textContent = `
 [data-curriculum="pb"] .sw-pill b{ text-shadow:none; }
 
 /* ══════════════════════════════════════════════════════════════
-   JP WORD CONTAINER — themed per curriculum
+   JP WORD CONTAINER
    ══════════════════════════════════════════════════════════════ */
 .sw-jp-box{
-  border-radius:24px;
-  padding:1.1rem 1.4rem 1rem;
-  margin-bottom:1.2rem;
+  border-radius:20px;
+  padding:1rem 1.2rem .9rem;
+  margin-bottom:1rem;
   text-align:center;
   position:relative;
   overflow:hidden;
@@ -232,26 +256,21 @@ S.textContent = `
   box-shadow:0 8px 32px rgba(0,0,0,.22);
   transition:border-color .3s, box-shadow .3s;
 }
-/* BR — warm dark green panel (matches menu) */
 [data-curriculum="br"] .sw-jp-box{
   background:linear-gradient(145deg,rgba(170,255,34,.07),rgba(255,204,0,.04),rgba(0,0,0,.18));
   border-color:rgba(170,255,34,.22);
   box-shadow:0 8px 32px rgba(0,0,0,.35),0 0 0 1px rgba(170,255,34,.08);
 }
-/* BC — deep cold space panel (matches menu) */
 [data-curriculum="bc"] .sw-jp-box{
   background:linear-gradient(145deg,rgba(0,240,255,.06),rgba(68,85,255,.08),rgba(0,0,0,.28));
   border-color:rgba(0,240,255,.22);
   box-shadow:0 8px 32px rgba(0,0,0,.5),0 0 24px rgba(0,240,255,.08);
 }
-/* PB — white bubbly card with pink border (matches menu) */
 [data-curriculum="pb"] .sw-jp-box{
   background:#ffffff;
   border:3px solid #ff6eb4;
   box-shadow:0 5px 0 #ffb0d8, 0 10px 24px rgba(255,110,180,.15);
 }
-
-/* shimmer top bar on jp box */
 .sw-jp-box::before{
   content:'';
   position:absolute; top:0; left:0; right:0; height:3px;
@@ -266,18 +285,18 @@ S.textContent = `
 
 .sw-jp-label{
   font-family:var(--game-font-title);
-  font-size:clamp(9px,1.6vw,12px);
+  font-size:clamp(8px,1.5vw,11px);
   letter-spacing:.22em;
   text-transform:uppercase;
   color:var(--game-primary);
   opacity:.7;
-  margin-bottom:.55rem;
+  margin-bottom:.45rem;
 }
 [data-curriculum="pb"] .sw-jp-label{ color:#ff6eb4; }
 
 .sw-jp-kanji{
   font-family:var(--game-font-jp);
-  font-size:clamp(28px,6vw,44px);
+  font-size:clamp(26px,5.5vw,42px);
   font-weight:900;
   color:var(--game-ink);
   line-height:1.15;
@@ -287,9 +306,9 @@ S.textContent = `
 
 .sw-jp-hira{
   font-family:var(--game-font-jp);
-  font-size:clamp(15px,2.8vw,20px);
+  font-size:clamp(13px,2.5vw,18px);
   color:var(--game-muted);
-  margin-top:4px;
+  margin-top:3px;
   letter-spacing:.03em;
 }
 [data-curriculum="pb"] .sw-jp-hira{ color:rgba(58,26,46,.55); }
@@ -299,17 +318,18 @@ S.textContent = `
    ══════════════════════════════════════════════════════════════ */
 .sw-slots{
   display:flex; flex-wrap:wrap;
-  gap:8px; justify-content:center;
-  margin:0 0 .8rem; min-height:68px;
+  gap:6px; justify-content:center;
+  margin:0 0 .7rem; min-height:62px;
 }
 .sw-slot{
-  width:clamp(46px,9vw,62px);
-  height:clamp(52px,10vw,68px);
-  border-radius:14px;
+  width:clamp(42px,8.5vw,58px);
+  height:clamp(48px,9.5vw,64px);
+  border-radius:12px;
   display:flex; align-items:center; justify-content:center;
   font-family:var(--game-font-title);
-  font-size:clamp(20px,4.5vw,30px);
+  font-size:clamp(18px,4vw,27px);
   font-weight:900;
+  text-transform:lowercase;
   cursor:pointer;
   user-select:none;
   -webkit-tap-highlight-color:transparent;
@@ -354,6 +374,19 @@ S.textContent = `
   box-shadow:0 0 0 3px rgba(34,197,94,.25), 0 0 18px rgba(34,197,94,.4) !important;
   animation:swSlotPop .3s cubic-bezier(.34,1.56,.64,1);
 }
+/* dance animation on correct */
+.sw-slot.sw-dance{
+  animation:swSlotDance .55s cubic-bezier(.34,1.56,.64,1) both !important;
+}
+@keyframes swSlotDance{
+  0%  { transform:translateY(0) scale(1) rotate(0deg); }
+  20% { transform:translateY(-10px) scale(1.12) rotate(-6deg); }
+  40% { transform:translateY(-6px) scale(1.08) rotate(5deg); }
+  60% { transform:translateY(-10px) scale(1.1) rotate(-4deg); }
+  80% { transform:translateY(-4px) scale(1.05) rotate(2deg); }
+  100%{ transform:translateY(0) scale(1) rotate(0deg); }
+}
+
 /* wrong slot */
 .sw-slot.sw-wrong{
   background:rgba(239,68,68,.15) !important;
@@ -372,22 +405,23 @@ S.textContent = `
 }
 
 /* ══════════════════════════════════════════════════════════════
-   LETTER TILES — big, colorful per curriculum like the menu
+   LETTER TILES — always lowercase
    ══════════════════════════════════════════════════════════════ */
 .sw-tiles{
   display:flex; flex-wrap:wrap;
-  gap:10px; justify-content:center;
-  margin:0 0 1rem;
-  min-height:74px;
+  gap:8px; justify-content:center;
+  margin:0 0 .9rem;
+  min-height:68px;
 }
 .sw-tile{
-  width:clamp(52px,10vw,70px);
-  height:clamp(58px,11vw,76px);
-  border-radius:16px;
+  width:clamp(48px,9.5vw,66px);
+  height:clamp(54px,10.5vw,72px);
+  border-radius:14px;
   display:flex; align-items:center; justify-content:center;
   font-family:'Nunito', sans-serif;
-  font-size:clamp(22px,5vw,34px);
+  font-size:clamp(20px,4.2vw,31px);
   font-weight:900;
+  text-transform:lowercase;
   cursor:pointer;
   user-select:none;
   -webkit-tap-highlight-color:transparent;
@@ -395,7 +429,6 @@ S.textContent = `
   overflow:hidden;
   transition:transform .14s cubic-bezier(.34,1.56,.64,1), box-shadow .14s, opacity .18s;
 
-  /* default (BR) rich gradient tiles */
   background:var(--sw-tile-bg, linear-gradient(145deg,rgba(255,255,255,.18),rgba(255,255,255,.07)));
   border:2px solid var(--sw-tile-border, rgba(255,255,255,.28));
   color:var(--sw-tile-text, var(--game-tile-text));
@@ -405,7 +438,6 @@ S.textContent = `
     inset 0 1px 0 rgba(255,255,255,.2);
   text-shadow:0 1px 2px rgba(0,0,0,.4);
 }
-/* shimmer sweep */
 .sw-tile::after{
   content:'';
   position:absolute; top:-60%; left:-80%;
@@ -430,28 +462,12 @@ S.textContent = `
   transform:scale(.8);
 }
 
-/* ── BR tiles: solid vivid colors cycling (5 hues like menu) ── */
-[data-curriculum="br"] .sw-tile[data-ti="0"]{
-  --sw-tile-bg:linear-gradient(145deg,#1e5c00,#2e8800);
-  --sw-tile-border:rgba(170,255,34,.55); --sw-tile-shadow:rgba(20,80,0,.6); --sw-tile-text:#fff;
-}
-[data-curriculum="br"] .sw-tile[data-ti="1"]{
-  --sw-tile-bg:linear-gradient(145deg,#6a003a,#a0005a);
-  --sw-tile-border:rgba(255,60,160,.55); --sw-tile-shadow:rgba(100,0,50,.6); --sw-tile-text:#fff;
-}
-[data-curriculum="br"] .sw-tile[data-ti="2"]{
-  --sw-tile-bg:linear-gradient(145deg,#003a44,#005566);
-  --sw-tile-border:rgba(0,200,220,.5); --sw-tile-shadow:rgba(0,50,60,.6); --sw-tile-text:#fff;
-}
-[data-curriculum="br"] .sw-tile[data-ti="3"]{
-  --sw-tile-bg:linear-gradient(145deg,#4a3000,#704800);
-  --sw-tile-border:rgba(255,180,0,.5); --sw-tile-shadow:rgba(60,30,0,.6); --sw-tile-text:#fff;
-}
-[data-curriculum="br"] .sw-tile[data-ti="4"]{
-  --sw-tile-bg:linear-gradient(145deg,#2a0060,#440090);
-  --sw-tile-border:rgba(180,100,255,.55); --sw-tile-shadow:rgba(30,0,80,.6); --sw-tile-text:#fff;
-}
-/* cycle mod-5 for longer words */
+/* ── BR tiles ── */
+[data-curriculum="br"] .sw-tile[data-ti="0"]{ --sw-tile-bg:linear-gradient(145deg,#1e5c00,#2e8800); --sw-tile-border:rgba(170,255,34,.55); --sw-tile-shadow:rgba(20,80,0,.6); --sw-tile-text:#fff; }
+[data-curriculum="br"] .sw-tile[data-ti="1"]{ --sw-tile-bg:linear-gradient(145deg,#6a003a,#a0005a); --sw-tile-border:rgba(255,60,160,.55); --sw-tile-shadow:rgba(100,0,50,.6); --sw-tile-text:#fff; }
+[data-curriculum="br"] .sw-tile[data-ti="2"]{ --sw-tile-bg:linear-gradient(145deg,#003a44,#005566); --sw-tile-border:rgba(0,200,220,.5); --sw-tile-shadow:rgba(0,50,60,.6); --sw-tile-text:#fff; }
+[data-curriculum="br"] .sw-tile[data-ti="3"]{ --sw-tile-bg:linear-gradient(145deg,#4a3000,#704800); --sw-tile-border:rgba(255,180,0,.5); --sw-tile-shadow:rgba(60,30,0,.6); --sw-tile-text:#fff; }
+[data-curriculum="br"] .sw-tile[data-ti="4"]{ --sw-tile-bg:linear-gradient(145deg,#2a0060,#440090); --sw-tile-border:rgba(180,100,255,.55); --sw-tile-shadow:rgba(30,0,80,.6); --sw-tile-text:#fff; }
 [data-curriculum="br"] .sw-tile[data-ti="5"]{ --sw-tile-bg:linear-gradient(145deg,#1e5c00,#2e8800); --sw-tile-border:rgba(170,255,34,.55); --sw-tile-shadow:rgba(20,80,0,.6); --sw-tile-text:#fff; }
 [data-curriculum="br"] .sw-tile[data-ti="6"]{ --sw-tile-bg:linear-gradient(145deg,#6a003a,#a0005a); --sw-tile-border:rgba(255,60,160,.55); --sw-tile-shadow:rgba(100,0,50,.6); --sw-tile-text:#fff; }
 [data-curriculum="br"] .sw-tile[data-ti="7"]{ --sw-tile-bg:linear-gradient(145deg,#003a44,#005566); --sw-tile-border:rgba(0,200,220,.5); --sw-tile-shadow:rgba(0,50,60,.6); --sw-tile-text:#fff; }
@@ -461,7 +477,7 @@ S.textContent = `
 [data-curriculum="br"] .sw-tile[data-ti="11"]{ --sw-tile-bg:linear-gradient(145deg,#6a003a,#a0005a); --sw-tile-border:rgba(255,60,160,.55); --sw-tile-shadow:rgba(100,0,50,.6); --sw-tile-text:#fff; }
 [data-curriculum="br"] .sw-tile[data-ti="12"]{ --sw-tile-bg:linear-gradient(145deg,#003a44,#005566); --sw-tile-border:rgba(0,200,220,.5); --sw-tile-shadow:rgba(0,50,60,.6); --sw-tile-text:#fff; }
 
-/* ── BC tiles: very dark with glowing neon borders ── */
+/* ── BC tiles ── */
 [data-curriculum="bc"] .sw-tile[data-ti="0"]{ --sw-tile-bg:linear-gradient(145deg,#041820,#062430); --sw-tile-border:rgba(0,230,255,.55); --sw-tile-shadow:rgba(0,20,40,.7); --sw-tile-text:#ecfeff; }
 [data-curriculum="bc"] .sw-tile[data-ti="1"]{ --sw-tile-bg:linear-gradient(145deg,#04201a,#063028); --sw-tile-border:rgba(0,220,160,.5); --sw-tile-shadow:rgba(0,20,20,.7); --sw-tile-text:#ecfeff; }
 [data-curriculum="bc"] .sw-tile[data-ti="2"]{ --sw-tile-bg:linear-gradient(145deg,#180828,#24103a); --sw-tile-border:rgba(170,80,255,.55); --sw-tile-shadow:rgba(20,0,40,.7); --sw-tile-text:#ecfeff; }
@@ -476,7 +492,7 @@ S.textContent = `
 [data-curriculum="bc"] .sw-tile[data-ti="11"]{ --sw-tile-bg:linear-gradient(145deg,#04201a,#063028); --sw-tile-border:rgba(0,220,160,.5); --sw-tile-shadow:rgba(0,20,20,.7); --sw-tile-text:#ecfeff; }
 [data-curriculum="bc"] .sw-tile[data-ti="12"]{ --sw-tile-bg:linear-gradient(145deg,#180828,#24103a); --sw-tile-border:rgba(170,80,255,.55); --sw-tile-shadow:rgba(20,0,40,.7); --sw-tile-text:#ecfeff; }
 
-/* ── PB tiles: white with thick pastel borders ── */
+/* ── PB tiles ── */
 [data-curriculum="pb"] .sw-tile{
   background:#ffffff !important;
   box-shadow:0 5px 0 var(--sw-tile-shadow,#ffb0d8), 0 8px 16px rgba(255,110,180,.15) !important;
@@ -496,9 +512,7 @@ S.textContent = `
 [data-curriculum="pb"] .sw-tile[data-ti="10"]{ --sw-tile-border:#ff6eb4; --sw-tile-shadow:#ffb0d8; }
 [data-curriculum="pb"] .sw-tile[data-ti="11"]{ --sw-tile-border:#cc88ff; --sw-tile-shadow:#ddb8ff; }
 [data-curriculum="pb"] .sw-tile[data-ti="12"]{ --sw-tile-border:#44ccff; --sw-tile-shadow:#99e8ff; }
-[data-curriculum="pb"] .sw-tile .vt-en-text{ color:#2a1020; }
 
-/* tile entrance animation */
 .sw-tile.sw-tile-in{
   animation:swTileIn .34s ease backwards;
   animation-delay:calc(var(--ti,0) * 0.055s);
@@ -513,15 +527,15 @@ S.textContent = `
    ══════════════════════════════════════════════════════════════ */
 .sw-bottom-bar{
   display:flex; justify-content:center; align-items:center;
-  gap:12px; margin-top:16px; flex-wrap:wrap;
+  gap:10px; margin-top:14px; flex-wrap:wrap;
 }
 
-/* CHECK button — gradient shimmer pill like vocab-tap */
+/* CHECK button */
 .sw-check-btn{
   font-family:var(--game-font-title);
-  font-size:clamp(17px,3.2vw,22px);
+  font-size:clamp(15px,3vw,20px);
   letter-spacing:.08em;
-  padding:14px 44px;
+  padding:13px 38px;
   border:none; border-radius:999px;
   cursor:pointer; position:relative; overflow:hidden;
   background:linear-gradient(135deg, var(--game-primary), var(--game-secondary));
@@ -552,12 +566,12 @@ S.textContent = `
 .sw-check-btn:active{ transform:scale(.96); box-shadow:none; }
 .sw-check-btn:disabled{ opacity:.32; pointer-events:none; box-shadow:none; }
 
-/* CLEAR button — fun danger style, hidden until first wrong attempt */
+/* CLEAR button */
 .sw-clear-btn{
   font-family:var(--game-font-title);
-  font-size:clamp(14px,2.8vw,18px);
+  font-size:clamp(13px,2.5vw,16px);
   letter-spacing:.06em;
-  padding:12px 28px;
+  padding:11px 24px;
   border-radius:999px;
   border:2.5px solid rgba(239,68,68,.5);
   background:rgba(239,68,68,.12);
@@ -566,7 +580,7 @@ S.textContent = `
   cursor:pointer; position:relative; overflow:hidden;
   transition:transform .15s, background .18s, box-shadow .15s, border-color .15s;
   -webkit-tap-highlight-color:transparent;
-  display:none; /* hidden until needed */
+  display:none;
 }
 .sw-clear-btn.visible{ display:block; animation:swClearIn .3s cubic-bezier(.34,1.56,.64,1); }
 @keyframes swClearIn{
@@ -581,13 +595,63 @@ S.textContent = `
 }
 .sw-clear-btn:active{ transform:scale(.93); }
 
+/* LISTEN button — appears after 3 wrong, debounced */
+.sw-listen-btn{
+  font-family:var(--game-font-title);
+  font-size:clamp(12px,2.2vw,15px);
+  letter-spacing:.06em;
+  padding:11px 20px;
+  border-radius:999px;
+  border:none;
+  background:linear-gradient(135deg,#ffaa00,#ff6600);
+  color:#1a0800;
+  font-weight:900;
+  cursor:pointer;
+  transition:transform .15s, box-shadow .2s, opacity .2s;
+  -webkit-tap-highlight-color:transparent;
+  display:none;
+  white-space:nowrap;
+  animation:swListenGlow 1.6s ease-in-out infinite;
+  box-shadow:0 0 8px 2px rgba(255,160,0,.5), 0 4px 0 rgba(120,50,0,.5);
+}
+.sw-listen-btn.visible{ display:block; }
+.sw-listen-btn:disabled{
+  opacity:.45;
+  pointer-events:none;
+  animation:none;
+}
+@keyframes swListenGlow{
+  0%,100%{ box-shadow:0 0 8px 2px rgba(255,160,0,.5), 0 4px 0 rgba(120,50,0,.5); }
+  50%{     box-shadow:0 0 26px 6px rgba(255,160,0,.9), 0 4px 0 rgba(120,50,0,.5); }
+}
+.sw-listen-btn:hover:not(:disabled){ transform:scale(1.06); }
+.sw-listen-btn:active:not(:disabled){ transform:scale(.93); }
+[data-curriculum="pb"] .sw-listen-btn{
+  background:linear-gradient(135deg,#ff88cc,#ff44aa);
+  color:#fff;
+  animation:swListenGlowPb 1.6s ease-in-out infinite;
+}
+@keyframes swListenGlowPb{
+  0%,100%{ box-shadow:0 0 8px 2px rgba(255,100,180,.5),0 5px 0 #cc0077; }
+  50%{     box-shadow:0 0 26px 6px rgba(255,100,180,.9),0 5px 0 #cc0077; }
+}
+[data-curriculum="bc"] .sw-listen-btn{
+  background:linear-gradient(135deg,#00ddb0,#0099cc);
+  color:#001a14;
+  animation:swListenGlowBc 1.6s ease-in-out infinite;
+}
+@keyframes swListenGlowBc{
+  0%,100%{ box-shadow:0 0 8px 2px rgba(0,200,180,.5),0 4px 0 rgba(0,60,50,.6); }
+  50%{     box-shadow:0 0 26px 6px rgba(0,220,180,.9),0 4px 0 rgba(0,60,50,.6); }
+}
+
 /* HELP button */
 .sw-help-btn{
-  width:46px; height:46px; border-radius:50%;
+  width:44px; height:44px; border-radius:50%;
   border:2px solid var(--game-border);
   background:var(--game-surface);
   color:var(--game-muted);
-  font-size:1.3rem; font-weight:900;
+  font-size:1.2rem; font-weight:900;
   cursor:pointer;
   display:flex; align-items:center; justify-content:center;
   transition:all .2s;
@@ -604,13 +668,13 @@ S.textContent = `
   box-shadow:0 3px 0 #ddb8ff;
 }
 
-/* ── CLOSE / X button ── */
+/* CLOSE / X */
 .game-close{
   position:fixed; top:1rem; right:1rem; z-index:50;
-  width:50px; height:50px; border-radius:50%;
+  width:48px; height:48px; border-radius:50%;
   background:rgba(255,255,255,.1);
   border:2px solid rgba(255,255,255,.22);
-  color:#fff; font-size:1.25rem;
+  color:#fff; font-size:1.2rem;
   display:flex; align-items:center; justify-content:center;
   cursor:pointer; backdrop-filter:blur(10px);
   transition:all .22s cubic-bezier(.34,1.56,.64,1);
@@ -621,28 +685,19 @@ S.textContent = `
 .game-close:hover{
   background:rgba(239,68,68,.55); border-color:rgba(239,68,68,.7);
   transform:scale(1.18) rotate(12deg);
-  box-shadow:0 0 22px rgba(239,68,68,.45), 0 6px 20px rgba(0,0,0,.3);
 }
 .game-close:active{ transform:scale(.9) rotate(0deg); }
 [data-curriculum="pb"] .game-close{
   background:#fff; border:3px solid #ff6eb4; color:#ff6eb4;
   box-shadow:0 4px 0 #ffb0d8;
 }
-[data-curriculum="pb"] .game-close:hover{
-  background:#fff0f8; transform:rotate(15deg) scale(1.18);
-  box-shadow:0 4px 0 #ffb0d8, 0 0 16px rgba(255,110,180,.4);
-}
 [data-curriculum="bc"] .game-close{ border-color:rgba(0,240,255,.22); }
-[data-curriculum="bc"] .game-close:hover{
-  background:rgba(0,240,255,.14); border-color:#00f0ff;
-  box-shadow:0 0 24px rgba(0,240,255,.4); transform:scale(1.12) rotate(10deg);
-}
 
 /* ── feedback text ── */
 .sw-feedback{
-  text-align:center; min-height:2rem; margin-top:.6rem;
+  text-align:center; min-height:1.8rem; margin-top:.5rem;
   font-family:var(--game-font-body);
-  font-size:clamp(14px,2.6vw,18px); font-weight:900;
+  font-size:clamp(13px,2.4vw,17px); font-weight:900;
   transition:color .2s;
 }
 [data-curriculum="pb"] .sw-feedback{ color:#2a1020; }
@@ -655,93 +710,89 @@ S.textContent = `
   background:rgba(0,0,0,.72); backdrop-filter:blur(6px);
   display:flex; align-items:center; justify-content:center;
   opacity:0; pointer-events:none; transition:opacity .25s;
+  padding:1rem;
 }
 .sw-modal-overlay.open{ opacity:1; pointer-events:all; }
 .sw-modal{
-  max-width:480px; width:calc(100% - 2rem);
-  border-radius:28px; overflow:hidden;
+  max-width:460px; width:100%;
+  border-radius:24px; overflow:hidden;
   background:var(--game-bg);
   border:2px solid var(--game-primary);
   box-shadow:0 0 48px color-mix(in srgb, var(--game-primary) 30%, transparent), 0 24px 48px rgba(0,0,0,.5);
   transform:scale(.88) translateY(16px);
   transition:transform .3s cubic-bezier(.34,1.56,.64,1);
+  max-height:90vh; overflow-y:auto;
 }
 .sw-modal-overlay.open .sw-modal{ transform:none; }
-[data-curriculum="pb"] .sw-modal{ background:#fff8fc; border-color:#ff6eb4; box-shadow:0 8px 0 #ffb0d8, 0 16px 40px rgba(255,110,180,.25); }
+[data-curriculum="pb"] .sw-modal{ background:#fff8fc; border-color:#ff6eb4; }
 [data-curriculum="bc"] .sw-modal{ background:#030810; }
 
 .sw-modal-header{
-  padding:1.2rem 1.4rem .8rem;
-  background:linear-gradient(135deg, color-mix(in srgb,var(--game-primary) 14%,transparent), color-mix(in srgb,var(--game-secondary) 8%,transparent));
+  padding:1rem 1.2rem .7rem;
   border-bottom:1px solid var(--game-border);
   text-align:center;
 }
 .sw-modal-title{
   font-family:var(--game-font-title);
-  font-size:clamp(20px,4vw,26px); letter-spacing:.06em;
+  font-size:clamp(18px,3.5vw,24px); letter-spacing:.06em;
   color:var(--game-primary);
-  text-shadow:0 0 16px color-mix(in srgb,var(--game-primary) 55%,transparent);
 }
-[data-curriculum="pb"] .sw-modal-title{ color:#ff6eb4; text-shadow:none; }
+[data-curriculum="pb"] .sw-modal-title{ color:#ff6eb4; }
 .sw-modal-title-jp{
   font-family:var(--game-font-jp);
-  font-size:clamp(12px,2vw,15px); color:var(--game-muted); margin-top:4px;
+  font-size:clamp(11px,1.8vw,14px); color:var(--game-muted); margin-top:3px;
 }
-[data-curriculum="pb"] .sw-modal-title-jp{ color:rgba(58,26,46,.55); }
 
-.sw-modal-body{ padding:1.2rem 1.4rem 1.4rem; }
+.sw-modal-body{ padding:1rem 1.2rem 1.2rem; }
 .sw-how-step{
-  display:grid; grid-template-columns:36px 1fr;
-  gap:10px; align-items:start; margin-bottom:.9rem;
+  display:grid; grid-template-columns:32px 1fr;
+  gap:8px; align-items:start; margin-bottom:.75rem;
 }
 .sw-how-step:last-child{ margin-bottom:0; }
 .sw-how-num{
-  width:36px; height:36px; border-radius:50%;
+  width:32px; height:32px; border-radius:50%;
   background:linear-gradient(135deg,var(--game-primary),var(--game-secondary));
   color:#000;
   font-family:var(--game-font-title);
-  font-size:clamp(14px,2.5vw,18px); font-weight:900;
+  font-size:clamp(13px,2.2vw,16px); font-weight:900;
   display:flex; align-items:center; justify-content:center;
   flex-shrink:0;
-  box-shadow:0 0 12px color-mix(in srgb,var(--game-primary) 45%,transparent);
 }
 .sw-how-en{
   font-family:var(--game-font-body);
-  font-size:clamp(13px,2.2vw,15px); font-weight:800;
+  font-size:clamp(12px,2vw,14px); font-weight:800;
   color:var(--game-ink); line-height:1.35; padding-top:2px;
 }
 [data-curriculum="pb"] .sw-how-en{ color:#2a1020; }
 .sw-how-jp{
   font-family:var(--game-font-jp);
-  font-size:clamp(11px,1.8vw,13px); color:var(--game-muted); margin-top:3px; line-height:1.4;
+  font-size:clamp(10px,1.6vw,12px); color:var(--game-muted); margin-top:2px; line-height:1.4;
 }
-[data-curriculum="pb"] .sw-how-jp{ color:rgba(58,26,46,.55); }
 .sw-modal-close{
-  display:block; width:100%; margin-top:1.1rem;
+  display:block; width:100%; margin-top:1rem;
   font-family:var(--game-font-title);
-  font-size:clamp(15px,2.8vw,19px); letter-spacing:.06em;
-  padding:12px; border-radius:999px; border:none; cursor:pointer;
+  font-size:clamp(14px,2.5vw,17px); letter-spacing:.06em;
+  padding:11px; border-radius:999px; border:none; cursor:pointer;
   background:linear-gradient(135deg,var(--game-primary),var(--game-secondary));
   color:#000; font-weight:900;
-  box-shadow:0 0 20px color-mix(in srgb,var(--game-primary) 45%,transparent);
   transition:transform .15s;
 }
 .sw-modal-close:hover{ transform:scale(1.03); }
-.sw-modal-close:active{ transform:scale(.96); }
 
 /* ══════════════════════════════════════════════════════════════
-   RESULTS PANEL
+   RESULTS PANEL — centered, vivid multi-color, header stays
    ══════════════════════════════════════════════════════════════ */
 .sw-results{
   display:none;
-  text-align:center; max-width:560px;
-  margin:1.5rem auto;
-  padding:2.6rem 1.6rem 2rem;
-  border-radius:32px; position:relative; overflow:hidden;
+  text-align:center;
+  max-width:520px;
+  margin:1rem auto 2rem;
+  padding:2.2rem 1.4rem 1.8rem;
+  border-radius:28px; position:relative; overflow:hidden;
   border:2.5px solid var(--tier-color, var(--game-primary));
-  background:color-mix(in srgb, var(--tier-color,var(--game-primary)) 6%, var(--game-bg));
+  background:color-mix(in srgb, var(--tier-color,var(--game-primary)) 7%, var(--game-bg));
   box-shadow:
-    0 0 60px color-mix(in srgb,var(--tier-color,var(--game-primary)) 22%,transparent),
+    0 0 60px color-mix(in srgb,var(--tier-color,var(--game-primary)) 28%,transparent),
     0 24px 48px rgba(0,0,0,.4);
 }
 .sw-results.show{
@@ -752,25 +803,28 @@ S.textContent = `
   from{ opacity:0; transform:scale(.82) translateY(28px); }
   to{ opacity:1; transform:none; }
 }
+/* rainbow top bar */
 .sw-results::before{
   content:''; position:absolute; top:0; left:0; right:0; height:5px;
-  background:linear-gradient(90deg,var(--game-primary),var(--game-secondary),var(--game-accent),var(--game-primary));
+  background:linear-gradient(90deg,#ff2288,#ffcc00,#aaff22,#22ddff,#cc88ff,#ff2288);
   background-size:220% auto; animation:swRainbow 2.4s linear infinite;
 }
+/* ambient glow blobs */
 .sw-results::after{
   content:''; position:absolute; inset:0; z-index:0; pointer-events:none;
   background:
-    radial-gradient(circle at 20% 80%, color-mix(in srgb,var(--tier-color,var(--game-primary)) 12%,transparent) 0%,transparent 50%),
-    radial-gradient(circle at 80% 20%, color-mix(in srgb,var(--game-secondary) 8%,transparent) 0%,transparent 50%);
+    radial-gradient(circle at 20% 80%, color-mix(in srgb,var(--tier-color,var(--game-primary)) 14%,transparent) 0%,transparent 55%),
+    radial-gradient(circle at 80% 20%, color-mix(in srgb,#22ddff 10%,transparent) 0%,transparent 55%),
+    radial-gradient(circle at 50% 50%, color-mix(in srgb,#cc88ff 5%,transparent) 0%,transparent 70%);
 }
 .sw-res-inner{ position:relative; z-index:1; }
 
 .sw-res-score{
   font-family:var(--game-font-title);
-  font-size:clamp(62px,16vw,98px);
+  font-size:clamp(56px,14vw,90px);
   line-height:1;
   color:var(--tier-color,var(--game-primary));
-  text-shadow:0 0 28px var(--tier-color,var(--game-primary));
+  text-shadow:0 0 32px var(--tier-color,var(--game-primary)), 0 0 60px var(--tier-color,var(--game-primary));
   margin-bottom:4px;
   animation:swScorePop .55s cubic-bezier(.22,.8,.36,1) .3s both;
 }
@@ -780,40 +834,42 @@ S.textContent = `
   to{ transform:none; opacity:1; }
 }
 .sw-res-pct{
-  font-size:clamp(14px,2.6vw,19px); color:var(--game-muted);
-  font-weight:700; margin-bottom:12px;
+  font-size:clamp(13px,2.4vw,17px); color:var(--game-muted);
+  font-weight:700; margin-bottom:10px;
   animation:swFadeUp .4s ease .5s both;
 }
 .sw-res-label{
   font-family:var(--game-font-title);
-  font-size:clamp(26px,5.5vw,40px);
-  color:var(--tier-color,var(--game-primary));
-  margin-bottom:10px; letter-spacing:.05em;
-  text-shadow:0 0 18px color-mix(in srgb,var(--tier-color,var(--game-primary)) 55%,transparent);
-  animation:swFadeUp .4s ease .52s both;
+  font-size:clamp(24px,5vw,38px);
+  /* vivid rainbow label */
+  background:linear-gradient(90deg,#ff2288,#ffcc00,#aaff22,#22ddff,#cc88ff,#ff2288);
+  background-size:200% auto;
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+  animation:swRainbow 2s linear infinite, swFadeUp .4s ease .52s both;
+  margin-bottom:10px; letter-spacing:.06em;
 }
 .sw-res-divider{
-  width:60px; height:3px; border-radius:99px;
-  background:linear-gradient(90deg,var(--game-primary),var(--game-secondary));
-  margin:0 auto 12px; opacity:.6;
+  width:80px; height:3px; border-radius:99px;
+  background:linear-gradient(90deg,#ff2288,#ffcc00,#aaff22,#22ddff,#cc88ff);
+  margin:0 auto 12px; opacity:.8;
   animation:swFadeUp .4s ease .56s both;
 }
 .sw-res-en{
   font-family:var(--game-font-body); font-weight:900;
-  font-size:clamp(14px,2.4vw,18px); color:var(--game-ink);
+  font-size:clamp(13px,2.2vw,17px); color:var(--game-ink);
   margin-bottom:4px; animation:swFadeUp .4s ease .6s both;
 }
 .sw-res-jp{
-  font-family:var(--game-font-jp); font-size:clamp(14px,2.2vw,17px);
+  font-family:var(--game-font-jp); font-size:clamp(13px,2vw,16px);
   color:var(--game-muted); margin-bottom:3px; animation:swFadeUp .4s ease .64s both;
 }
 .sw-res-kanji{
-  font-family:var(--game-font-jp); font-size:clamp(11px,1.8vw,14px);
-  color:var(--game-muted); opacity:.7; margin-bottom:1.4rem;
+  font-family:var(--game-font-jp); font-size:clamp(10px,1.6vw,13px);
+  color:var(--game-muted); opacity:.7; margin-bottom:1.2rem;
   animation:swFadeUp .4s ease .68s both;
 }
 .sw-res-actions{
-  display:flex; gap:12px; justify-content:center; flex-wrap:wrap;
+  display:flex; gap:10px; justify-content:center; flex-wrap:wrap;
   animation:swFadeUp .4s ease .76s both;
 }
 @keyframes swFadeUp{
@@ -862,9 +918,10 @@ U.mount(`
   <div class="sw-tiles" id="sw-tiles"></div>
 
   <div class="sw-bottom-bar">
-    <button class="sw-clear-btn" id="sw-clear">CLEAR</button>
-    <button class="sw-check-btn" id="sw-check" disabled>CHECK</button>
-    <button class="sw-help-btn"  id="sw-help">？</button>
+    <button class="sw-clear-btn"  id="sw-clear">CLEAR</button>
+    <button class="sw-listen-btn" id="sw-listen">LISTEN</button>
+    <button class="sw-check-btn"  id="sw-check" disabled>CHECK</button>
+    <button class="sw-help-btn"   id="sw-help">?</button>
   </div>
 
   <div class="sw-feedback" id="sw-feedback"></div>
@@ -923,6 +980,13 @@ U.mount(`
           <div class="sw-how-jp">CHECKボタンを押そう。一発正解でポイントゲット！</div>
         </div>
       </div>
+      <div class="sw-how-step">
+        <div class="sw-how-num">5</div>
+        <div>
+          <div class="sw-how-en">After 3 wrong tries, a LISTEN button appears so you can hear the word.</div>
+          <div class="sw-how-jp">3回まちがえるとLISTENボタンで言葉を聞けるよ。</div>
+        </div>
+      </div>
       <button class="sw-modal-close" id="sw-modal-ok">Got it! / わかった！</button>
     </div>
   </div>
@@ -941,6 +1005,7 @@ const tilesEl    = document.getElementById('sw-tiles');
 const feedbackEl = document.getElementById('sw-feedback');
 const checkBtn   = document.getElementById('sw-check');
 const clearBtn   = document.getElementById('sw-clear');
+const listenBtn  = document.getElementById('sw-listen');
 const helpBtn    = document.getElementById('sw-help');
 const dotsRow    = document.getElementById('sw-dots');
 const results    = document.getElementById('sw-results');
@@ -964,20 +1029,40 @@ modalOverlay.addEventListener('click', e => { if (e.target === modalOverlay) mod
 document.addEventListener('keydown', e => { if (e.key === 'Escape') modalOverlay.classList.remove('open'); });
 
 /* ══════════════════════════════════════════════════════════════
+   LISTEN BUTTON — debounced, no smashing
+   ══════════════════════════════════════════════════════════════ */
+listenBtn.addEventListener('touchstart', e => {
+  e.preventDefault();
+  unlockAllAudio();
+  fireListenBtn();
+}, { passive: false });
+listenBtn.addEventListener('click', e => {
+  if (e.sourceCapabilities && e.sourceCapabilities.firesTouchEvents) return;
+  fireListenBtn();
+});
+
+function fireListenBtn() {
+  if (listenLocked) return;
+  const card = allCards[idx];
+  if (!card) return;
+  playWordListen(card.mp3);
+  /* brief visual pulse */
+  listenBtn.disabled = true;
+  setTimeout(() => { listenBtn.disabled = false; }, 1000);
+}
+
+/* ══════════════════════════════════════════════════════════════
    STATE
    ══════════════════════════════════════════════════════════════ */
 let idx      = 0;
 let score    = 0;
-/* placed[i] = { letter, tileEl } or null */
 let placed   = [];
 let firstTry = true;
-/* locked: true while grading, playing audio, or after correct before advance */
 let locked   = false;
-/* smashGuard: timestamp of last check press */
+let wrongCount = 0;
+
 let lastCheckAt = 0;
 const CHECK_DEBOUNCE_MS = 800;
-/* hasMadeWrongAttempt: controls Clear button visibility */
-let hasMadeWrongAttempt = false;
 
 function updateDots() {
   for (let i = 0; i < 15; i++) {
@@ -993,11 +1078,13 @@ function updateDots() {
 function showCard() {
   locked = false;
   firstTry = true;
-  hasMadeWrongAttempt = false;
+  wrongCount = 0;
   placed = [];
   feedbackEl.textContent = '';
   feedbackEl.style.color = '';
   clearBtn.classList.remove('visible');
+  listenBtn.classList.remove('visible');
+  listenBtn.disabled = false;
   checkBtn.disabled = true;
 
   const card = allCards[idx];
@@ -1011,7 +1098,7 @@ function showCard() {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   BUILD TILES
+   BUILD TILES — all lowercase display
    ══════════════════════════════════════════════════════════════ */
 function buildTiles(card) {
   tilesEl.innerHTML = '';
@@ -1021,12 +1108,11 @@ function buildTiles(card) {
     const tile = document.createElement('button');
     tile.type = 'button';
     tile.className = 'sw-tile sw-tile-in';
-    tile.textContent = letter;
+    tile.textContent = letter; /* always lowercase */
     tile.dataset.ti = ti;
     tile.dataset.letter = letter;
     tile.style.setProperty('--ti', ti);
 
-    /* touch: fire in same gesture for iOS audio */
     tile.addEventListener('touchstart', e => {
       e.preventDefault();
       unlockAllAudio();
@@ -1042,7 +1128,7 @@ function buildTiles(card) {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   BUILD SLOTS
+   BUILD SLOTS — lowercase display
    ══════════════════════════════════════════════════════════════ */
 function buildSlots(card) {
   slotsEl.innerHTML = '';
@@ -1069,13 +1155,12 @@ function buildSlots(card) {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   TILE TAP — place letter in first empty slot
+   TILE TAP
    ══════════════════════════════════════════════════════════════ */
 function handleTileTap(tile) {
   if (locked) return;
   if (tile.classList.contains('used')) return;
 
-  /* find first empty slot */
   let emptyIdx = -1;
   for (let i = 0; i < placed.length; i++) {
     if (!placed[i]) { emptyIdx = i; break; }
@@ -1089,7 +1174,7 @@ function handleTileTap(tile) {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   SLOT TAP — remove placed letter, return tile
+   SLOT TAP
    ══════════════════════════════════════════════════════════════ */
 function handleSlotTap(i) {
   if (locked) return;
@@ -1101,17 +1186,16 @@ function handleSlotTap(i) {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   RENDER SLOTS
+   RENDER SLOTS — always lowercase
    ══════════════════════════════════════════════════════════════ */
 function renderSlots() {
   const slotEls = slotsEl.querySelectorAll('.sw-slot');
   slotEls.forEach((slot, i) => {
-    slot.classList.remove('sw-correct', 'sw-wrong');
+    slot.classList.remove('sw-correct', 'sw-wrong', 'sw-dance');
     if (placed[i]) {
-      slot.textContent = placed[i].letter.toUpperCase();
+      slot.textContent = placed[i].letter.toLowerCase(); /* always lowercase */
       slot.className = 'sw-slot filled';
       slot.dataset.idx = i;
-      /* re-attach listeners after className wipe */
       attachSlotListeners(slot, i);
     } else {
       slot.textContent = '';
@@ -1123,7 +1207,6 @@ function renderSlots() {
 }
 
 function attachSlotListeners(slot, i) {
-  /* Clone to remove old listeners, then re-add */
   const fresh = slot.cloneNode(true);
   fresh.addEventListener('touchstart', e => {
     e.preventDefault();
@@ -1172,48 +1255,68 @@ checkBtn.addEventListener('click', () => {
 
   if (correct) {
     locked = true;
-    /* show all slots green */
+
+    /* 1. Show all slots green with pop animation */
     slotEls.forEach((sl, i) => {
-      /* stagger pop-in */
       setTimeout(() => {
         sl.classList.remove('sw-wrong', 'filled', 'empty');
         sl.classList.add('sw-correct');
       }, i * 60);
     });
 
-    feedbackEl.textContent = card.en.toUpperCase() + '!';
-    feedbackEl.style.color = '#22c55e';
-    U.playSFX('ding');
+    const slotDelay = slotEls.length * 60;
 
+    /* 2. Feedback text */
+    feedbackEl.textContent = card.en.toLowerCase();
+    feedbackEl.style.color = '#22c55e';
+
+    /* 3. Score update */
     if (firstTry) {
       score++;
       scoreEl.textContent = score;
     }
     updateDots();
 
-    /* fire confetti on perfect-so-far */
-    if (score === 15 || firstTry) fireConfetti(false);
+    /* 4. Ding first */
+    setTimeout(() => {
+      U.playSFX('ding');
+    }, slotDelay);
 
-    /* play word audio ONCE, then advance */
-    const advanceDelay = 300;
+    /* 5. Confetti after ding */
+    setTimeout(() => {
+      fireConfetti(false);
+    }, slotDelay + 120);
+
+    /* 6. Dance animation on slots */
+    setTimeout(() => {
+      const currentSlots = Array.from(slotsEl.querySelectorAll('.sw-slot'));
+      currentSlots.forEach((sl, i) => {
+        setTimeout(() => {
+          sl.classList.add('sw-dance');
+          sl.addEventListener('animationend', () => sl.classList.remove('sw-dance'), { once: true });
+        }, i * 55);
+      });
+    }, slotDelay + 200);
+
+    /* 7. Play word audio after ding + dance have had a moment */
     setTimeout(() => {
       playWord(card.mp3, () => {
         setTimeout(() => {
           idx++;
           if (idx >= allCards.length) showResults();
           else showCard();
-        }, 400);
+        }, 350);
       });
-    }, advanceDelay);
+    }, slotDelay + 500);
 
   } else {
     /* wrong answer */
     locked = true;
     firstTry = false;
-    hasMadeWrongAttempt = true;
+    wrongCount++;
     clearBtn.classList.add('visible');
+    if (wrongCount >= 3) listenBtn.classList.add('visible');
 
-    /* per-slot: green if correct position, red if wrong */
     const target = card.en.toLowerCase();
     slotEls.forEach((sl, i) => {
       setTimeout(() => {
@@ -1230,11 +1333,8 @@ checkBtn.addEventListener('click', () => {
     feedbackEl.style.color = '#ef4444';
     U.playSFX('fart');
 
-    /* after showing the result, unlock so student can clear + retry */
     const totalDelay = slotEls.length * 55 + 700;
-    setTimeout(() => {
-      locked = false;
-    }, totalDelay);
+    setTimeout(() => { locked = false; }, totalDelay);
   }
 });
 
@@ -1273,8 +1373,8 @@ function fireConfetti(big = false) {
    ══════════════════════════════════════════════════════════════ */
 function showResults() {
   updateDots();
-  const gameContent = wrap.querySelector('.sw-jp-box');
-  /* hide gameplay UI */
+
+  /* hide gameplay UI but keep game header */
   [
     document.getElementById('sw-jp-box'),
     slotsEl, tilesEl,
