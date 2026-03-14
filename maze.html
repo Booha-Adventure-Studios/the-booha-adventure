@@ -61,7 +61,7 @@
     .ghostBtnWrap:active #startGhost{ transform:scale(.88) translateY(-5px); filter:drop-shadow(0 0 44px rgba(255,100,220,1)) drop-shadow(0 14px 30px rgba(0,0,0,.7)); }
     .ghostSparkleField{ position:absolute; inset:-70px; pointer-events:none; z-index:0; }
     .ghostSparkleField .sp{ box-shadow:0 0 6px 2px rgba(255,255,255,.95),0 0 16px 5px rgba(255,100,220,.75); }
-    #startGhost{ width:clamp(100px,28vmin,200px); height:clamp(100px,28vmin,200px); object-fit:contain; user-select:none; -webkit-user-drag:none; filter:drop-shadow(0 0 26px rgba(255,100,220,.6)) drop-shadow(0 14px 30px rgba(0,0,0,.7)); animation:floaty 3.6s ease-in-out infinite; transform-origin:50% 60%; transition:transform 120ms ease,filter 120ms ease; position:relative; z-index:1; }
+    #startGhost{ width:clamp(80px,20vmin,200px); height:clamp(80px,20vmin,200px); object-fit:contain; user-select:none; -webkit-user-drag:none; filter:drop-shadow(0 0 26px rgba(255,100,220,.6)) drop-shadow(0 14px 30px rgba(0,0,0,.7)); animation:floaty 3.6s ease-in-out infinite; transform-origin:50% 60%; transition:transform 120ms ease,filter 120ms ease; position:relative; z-index:1; }
     @keyframes floaty{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-8px); } }
     #mazeScene{ position:absolute; inset:0; background:#000; }
     #stage{ position:absolute; inset:0; overflow:hidden; }
@@ -69,7 +69,7 @@
     #mazeCanvas{ position:absolute; left:0; top:0; z-index:6; cursor:default; }
     #mazeCanvas.bryan{ cursor:crosshair; }
     #mazeCanvas.locked{ cursor:not-allowed; pointer-events:none; }
-    #travelLock{ position:absolute; inset:0; z-index:30; display:none; cursor:not-allowed; }
+    #travelLock{ position:absolute; inset:0; z-index:30; display:none; cursor:default; }
     #travelLock.active{ display:block; }
     #grid{ position:absolute; inset:0; display:none; pointer-events:none; z-index:7; background-image:linear-gradient(to right,rgba(255,255,255,.12) 1px,transparent 1px),linear-gradient(to bottom,rgba(255,255,255,.12) 1px,transparent 1px); background-size:80px 80px; mix-blend-mode:screen; opacity:.55; }
     #grid.show{ display:block; }
@@ -132,14 +132,15 @@
       position:fixed; left:50%; top:50%;
       transform:translate(-50%,-50%) scale(0.78) translateY(18px);
       z-index:215;
-      min-width:300px; max-width:500px; width:min(92vw,500px);
+      min-width:280px; max-width:460px; width:min(90vw,460px);
+      max-height:90vh; overflow-y:auto;
       background:
         radial-gradient(ellipse at 50% -8%, rgba(255,215,80,.20) 0%, transparent 55%),
         radial-gradient(ellipse at 15% 115%, rgba(255,145,55,.12) 0%, transparent 50%),
         radial-gradient(ellipse at 85% 115%, rgba(255,110,200,.08) 0%, transparent 50%),
         linear-gradient(155deg, rgba(20,9,48,.99) 0%, rgba(5,14,42,.99) 100%);
-      border-radius:36px;
-      padding:36px 32px 32px;
+      border-radius:28px;
+      padding:clamp(24px,4vw,36px) clamp(20px,4vw,32px) clamp(20px,4vw,32px);
       backdrop-filter:blur(36px); -webkit-backdrop-filter:blur(36px);
       text-align:center;
       border:1px solid rgba(255,215,80,.24);
@@ -164,7 +165,7 @@
 
     /* Animated shimmer top bar */
     #hwPromptBar{
-      height:3px; border-radius:999px; margin:0 auto 22px; width:60%; opacity:1;
+      height:3px; border-radius:999px; margin:0 auto 18px; width:60%; opacity:1;
       background:linear-gradient(90deg,#cc7700,#ffe566,#fff9c0,#ffe566,#ffaa22,#ffe566,#fff9c0,#cc7700);
       background-size:300% 100%;
       animation:hwBarShimmer 2.8s linear infinite;
@@ -177,11 +178,11 @@
 
     /* Floating tree image with golden glow */
     #hwTreeEmoji{
-      width:clamp(72px,16vmin,108px);
-      height:clamp(72px,16vmin,108px);
+      width:clamp(60px,14vmin,108px);
+      height:clamp(60px,14vmin,108px);
       object-fit:contain;
       display:block;
-      margin:0 auto 14px;
+      margin:0 auto 12px;
       animation:hwTreeFloat 3.4s ease-in-out infinite;
       filter:
         drop-shadow(0 0 22px rgba(255,210,60,.60))
@@ -199,14 +200,14 @@
       letter-spacing:3.5px;
       text-transform:uppercase;
       color:rgba(255,205,70,.60);
-      margin:0 0 10px;
+      margin:0 0 8px;
     }
 
     #hwPromptTitle{
       font-family:'Bowlby One',sans-serif;
-      font-size:clamp(24px,4.5vw,38px);
+      font-size:clamp(20px,4vw,38px);
       letter-spacing:.2px;
-      margin:0 0 8px;
+      margin:0 0 6px;
       color:#fff;
       line-height:1.25;
       text-shadow:
@@ -216,10 +217,10 @@
     }
 
     #hwPromptSub{
-      font-size:clamp(13px,2.1vw,16px);
+      font-size:clamp(12px,2vw,16px);
       font-weight:700;
       color:rgba(255,255,255,.48);
-      margin:0 0 20px;
+      margin:0 0 16px;
       letter-spacing:.3px;
       line-height:1.65;
     }
@@ -230,7 +231,7 @@
       justify-content:center;
       align-items:center;
       gap:10px;
-      margin-bottom:26px;
+      margin-bottom:20px;
     }
     .hw-dot{
       border-radius:50%;
@@ -249,14 +250,14 @@
     .hw-actions{
       display:flex;
       justify-content:center;
-      gap:16px;
+      gap:clamp(10px,3vw,16px);
       flex-wrap:wrap;
     }
 
     #hwNoBtn{
       appearance:none; border:0;
       border-radius:999px;
-      padding:14px 32px;
+      padding:clamp(11px,2.5vw,14px) clamp(22px,5vw,32px);
       font-size:clamp(14px,2.5vw,17px);
       font-weight:900;
       cursor:pointer;
@@ -278,8 +279,8 @@
     #hwYesBtn{
       appearance:none; border:0;
       border-radius:999px;
-      padding:14px 42px;
-      font-size:clamp(16px,2.8vw,20px);
+      padding:clamp(11px,2.5vw,14px) clamp(28px,6vw,42px);
+      font-size:clamp(15px,2.8vw,20px);
       font-weight:900;
       cursor:pointer;
       color:#1c0b00;
@@ -310,11 +311,11 @@
     /* Sparkle crosses in corners */
     .hw-corner{
       position:absolute;
-      width:32px; height:32px;
+      width:28px; height:28px;
       pointer-events:none;
     }
-    .hw-corner.tl{ top:16px; left:16px; animation:hwCornerSpin 5s linear infinite; }
-    .hw-corner.tr{ top:16px; right:16px; animation:hwCornerSpin 5s linear infinite reverse; animation-delay:.9s; }
+    .hw-corner.tl{ top:14px; left:14px; animation:hwCornerSpin 5s linear infinite; }
+    .hw-corner.tr{ top:14px; right:14px; animation:hwCornerSpin 5s linear infinite reverse; animation-delay:.9s; }
     @keyframes hwCornerSpin{
       0%{ transform:rotate(0deg) scale(1); opacity:.50; }
       50%{ transform:rotate(180deg) scale(1.25); opacity:.85; }
@@ -323,7 +324,7 @@
     .hw-corner svg{ width:100%; height:100%; }
 
     /* ═══════════════════════════════════════
-       HOMEWORK VIDEO — cinematic
+       HOMEWORK VIDEO — simple fade
     ═══════════════════════════════════════ */
     #hwVideoWrap{
       position:fixed; inset:0; z-index:220;
@@ -331,26 +332,14 @@
       opacity:0;
       pointer-events:none;
       visibility:hidden;
-      transition:opacity 750ms cubic-bezier(.4,0,.2,1), visibility 0s linear 750ms;
+      transition:opacity 600ms ease, visibility 0s linear 600ms;
     }
     #hwVideoWrap.show{
       opacity:1;
       visibility:visible;
       pointer-events:auto;
-      transition:opacity 750ms cubic-bezier(.4,0,.2,1);
+      transition:opacity 600ms ease;
     }
-    /* Letterbox bars */
-    #hwVideoWrap::before,
-    #hwVideoWrap::after{
-      content:'';
-      position:absolute; left:0; right:0; height:0;
-      background:#000; z-index:2;
-      transition:height 900ms cubic-bezier(.4,0,.2,1) 300ms;
-    }
-    #hwVideoWrap::before{ top:0; }
-    #hwVideoWrap::after{ bottom:0; }
-    #hwVideoWrap.show::before,
-    #hwVideoWrap.show::after{ height:9vh; }
 
     #hwTreeVideo{
       position:absolute; inset:0;
@@ -358,10 +347,275 @@
       object-fit:cover; object-position:center center;
       background:#000; display:block;
     }
-    #hwVideoCinema{
-      position:absolute; inset:0; z-index:3;
-      background:radial-gradient(ellipse at center,transparent 48%,rgba(0,0,0,.60) 100%);
+
+    /* ═══════════════════════════════════════
+       KARASUKI PROMPT — dark & spooky
+    ═══════════════════════════════════════ */
+    #krPromptScrim{
+      position:fixed; inset:0; z-index:210;
+      background:rgba(0,0,0,0);
+      backdrop-filter:blur(0px); -webkit-backdrop-filter:blur(0px);
+      display:none;
+      transition:background 600ms ease, backdrop-filter 600ms ease, -webkit-backdrop-filter 600ms ease;
+    }
+    #krPromptScrim.show{ display:block; }
+    #krPromptScrim.active{
+      background:rgba(0,0,5,.85);
+      backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+    }
+
+    #krPrompt{
+      position:fixed; left:50%; top:50%;
+      transform:translate(-50%,-50%) scale(0.78) translateY(18px);
+      z-index:215;
+      min-width:280px; max-width:420px; width:min(90vw,420px);
+      max-height:90vh; overflow-y:auto;
+      background:
+        radial-gradient(ellipse at 50% 0%, rgba(80,20,120,.25) 0%, transparent 60%),
+        radial-gradient(ellipse at 20% 100%, rgba(30,80,30,.12) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 100%, rgba(60,0,80,.15) 0%, transparent 50%),
+        linear-gradient(160deg, rgba(4,2,14,.99) 0%, rgba(6,14,6,.99) 55%, rgba(8,2,18,.99) 100%);
+      border-radius:28px;
+      padding:clamp(24px,4vw,36px) clamp(20px,4vw,32px) clamp(20px,4vw,32px);
+      backdrop-filter:blur(36px); -webkit-backdrop-filter:blur(36px);
+      text-align:center;
+      border:1px solid rgba(100,60,140,.35);
+      box-shadow:
+        0 0 0 1px rgba(80,30,110,.20),
+        0 48px 120px rgba(0,0,0,.97),
+        0 0 100px rgba(60,180,60,.06),
+        0 0 80px rgba(120,40,180,.10),
+        inset 0 1px 0 rgba(180,140,220,.08),
+        inset 0 -1px 0 rgba(40,120,40,.06);
+      display:none;
+      pointer-events:auto;
+      overflow:hidden;
+      opacity:0;
+      transition:opacity 500ms cubic-bezier(.22,1,.36,1), transform 550ms cubic-bezier(.34,1.28,.64,1);
+    }
+    #krPrompt.show{ display:block; }
+    #krPrompt.visible{
+      opacity:1;
+      transform:translate(-50%,-50%) scale(1) translateY(0);
+    }
+
+    /* Spooky shimmer bar — green/purple */
+    #krPromptBar{
+      height:2px; border-radius:999px; margin:0 auto 18px; width:55%; opacity:1;
+      background:linear-gradient(90deg,#1a0030,#4a1a7a,#2d8c2d,#7a2a9a,#1e5c1e,#4a1a7a,#1a0030);
+      background-size:300% 100%;
+      animation:krBarShimmer 3.5s linear infinite;
+      box-shadow:0 0 14px rgba(80,200,80,.25), 0 0 28px rgba(120,40,180,.20);
+    }
+    @keyframes krBarShimmer{
+      0%{ background-position:0% 0% }
+      100%{ background-position:300% 0% }
+    }
+
+    /* Floating Karasuki tree logo */
+    #krTreeLogo{
+      width:clamp(64px,14vmin,100px);
+      height:clamp(64px,14vmin,100px);
+      object-fit:contain;
+      display:block;
+      margin:0 auto 14px;
+      animation:krLogoFloat 4.2s ease-in-out infinite;
+      filter:
+        drop-shadow(0 0 18px rgba(80,200,80,.35))
+        drop-shadow(0 0 40px rgba(100,30,160,.30))
+        drop-shadow(0 10px 24px rgba(0,0,0,.90));
+    }
+    @keyframes krLogoFloat{
+      0%,100%{ transform:translateY(0) scale(1); }
+      30%{ transform:translateY(-8px) scale(1.03); }
+      65%{ transform:translateY(-4px) scale(.98); }
+    }
+
+    .kr-eyebrow{
+      font-family:'Bowlby One',sans-serif;
+      font-size:clamp(8px,1.4vw,10px);
+      letter-spacing:4px;
+      text-transform:uppercase;
+      color:rgba(140,200,140,.45);
+      margin:0 0 8px;
+    }
+
+    #krPromptTitle{
+      font-family:'Bowlby One',sans-serif;
+      font-size:clamp(18px,3.8vw,32px);
+      letter-spacing:.2px;
+      margin:0 0 8px;
+      color:rgba(230,215,245,1);
+      line-height:1.3;
+      text-shadow:
+        0 0 40px rgba(100,40,160,.55),
+        0 0 80px rgba(60,180,60,.15),
+        0 2px 10px rgba(0,0,0,.95);
+    }
+
+    #krPromptSub{
+      font-size:clamp(11px,1.9vw,15px);
+      font-weight:700;
+      color:rgba(180,210,180,.38);
+      margin:0 0 18px;
+      letter-spacing:.3px;
+      line-height:1.7;
+    }
+
+    /* Spooky drip ornament */
+    .kr-drip{
+      display:flex;
+      justify-content:center;
+      align-items:flex-end;
+      gap:clamp(6px,2vw,12px);
+      margin-bottom:18px;
+    }
+    .kr-drip-bar{
+      width:2px;
+      border-radius:2px;
+      background:linear-gradient(to bottom, rgba(80,200,80,.6), rgba(40,100,60,.0));
+      animation:krDripGrow 2.8s ease-in-out infinite;
+    }
+    .kr-drip-bar:nth-child(1){ height:clamp(10px,2.5vw,18px); animation-delay:0s; }
+    .kr-drip-bar:nth-child(2){ height:clamp(16px,3.5vw,28px); animation-delay:.2s; }
+    .kr-drip-bar:nth-child(3){ height:clamp(22px,4.5vw,36px); animation-delay:.4s; }
+    .kr-drip-bar:nth-child(4){ height:clamp(14px,3vw,22px); animation-delay:.6s; }
+    .kr-drip-bar:nth-child(5){ height:clamp(28px,5.5vw,44px); animation-delay:.8s; }
+    .kr-drip-bar:nth-child(6){ height:clamp(14px,3vw,22px); animation-delay:1s; }
+    .kr-drip-bar:nth-child(7){ height:clamp(22px,4.5vw,36px); animation-delay:1.2s; }
+    .kr-drip-bar:nth-child(8){ height:clamp(16px,3.5vw,28px); animation-delay:1.4s; }
+    .kr-drip-bar:nth-child(9){ height:clamp(10px,2.5vw,18px); animation-delay:1.6s; }
+    @keyframes krDripGrow{
+      0%,100%{ opacity:.35; transform:scaleY(1); }
+      50%{ opacity:.85; transform:scaleY(1.18); }
+    }
+
+    .kr-actions{
+      display:flex;
+      justify-content:center;
+      gap:clamp(10px,3vw,16px);
+      flex-wrap:wrap;
+    }
+
+    #krNoBtn{
+      appearance:none; border:0;
+      border-radius:999px;
+      padding:clamp(11px,2.5vw,14px) clamp(22px,5vw,32px);
+      font-size:clamp(14px,2.4vw,17px);
+      font-weight:900;
+      cursor:pointer;
+      color:rgba(200,180,220,.55);
+      background:rgba(255,255,255,.05);
+      box-shadow:
+        0 4px 18px rgba(0,0,0,.55),
+        inset 0 0 0 1px rgba(140,100,180,.20);
+      transition:transform 120ms ease, background 140ms ease, color 140ms ease;
+      letter-spacing:.3px;
+    }
+    #krNoBtn:hover{
+      background:rgba(255,255,255,.10);
+      color:rgba(200,180,220,.80);
+      transform:translateY(-2px);
+    }
+    #krNoBtn:active{ transform:scale(.93); }
+
+    #krYesBtn{
+      appearance:none; border:0;
+      border-radius:999px;
+      padding:clamp(11px,2.5vw,14px) clamp(28px,6vw,40px);
+      font-size:clamp(14px,2.6vw,18px);
+      font-weight:900;
+      cursor:pointer;
+      color:rgba(230,245,230,.95);
+      background:linear-gradient(160deg,#2a0a44 0%,#1e0638 30%,#0a2a0a 70%,#162816 100%);
+      box-shadow:
+        0 6px 24px rgba(0,0,0,.75),
+        0 0 0 1px rgba(80,200,80,.22),
+        0 0 30px rgba(80,200,80,.10),
+        0 0 50px rgba(100,30,160,.14),
+        inset 0 1px 0 rgba(180,220,180,.12);
+      transition:transform 120ms ease, box-shadow 140ms ease;
+      letter-spacing:.5px;
+      position:relative;
+      overflow:hidden;
+    }
+    #krYesBtn::after{
+      content:'';
+      position:absolute; inset:0;
+      background:linear-gradient(180deg,rgba(100,200,100,.08) 0%,transparent 50%);
+      border-radius:inherit;
       pointer-events:none;
+    }
+    #krYesBtn:hover{
+      transform:translateY(-2px);
+      box-shadow:0 10px 32px rgba(0,0,0,.80),0 0 0 1px rgba(80,200,80,.35),0 0 50px rgba(80,200,80,.18),0 0 70px rgba(100,30,160,.20),inset 0 1px 0 rgba(180,220,180,.15);
+    }
+    #krYesBtn:active{ transform:scale(.93); }
+
+    /* Corner rune marks */
+    .kr-corner{
+      position:absolute;
+      width:24px; height:24px;
+      pointer-events:none;
+      opacity:.40;
+    }
+    .kr-corner.tl{ top:14px; left:14px; animation:krCornerPulse 4.5s ease-in-out infinite; }
+    .kr-corner.tr{ top:14px; right:14px; animation:krCornerPulse 4.5s ease-in-out infinite; animation-delay:1.2s; }
+    .kr-corner.bl{ bottom:14px; left:14px; animation:krCornerPulse 4.5s ease-in-out infinite; animation-delay:2.4s; }
+    .kr-corner.br{ bottom:14px; right:14px; animation:krCornerPulse 4.5s ease-in-out infinite; animation-delay:3.6s; }
+    @keyframes krCornerPulse{
+      0%,100%{ opacity:.25; transform:scale(1); }
+      50%{ opacity:.65; transform:scale(1.15); }
+    }
+    .kr-corner svg{ width:100%; height:100%; }
+
+    /* ═══════════════════════════════════════
+       KARASUKI VIDEO — simple fade
+    ═══════════════════════════════════════ */
+    #krVideoWrap{
+      position:fixed; inset:0; z-index:220;
+      background:#000;
+      opacity:0;
+      pointer-events:none;
+      visibility:hidden;
+      transition:opacity 600ms ease, visibility 0s linear 600ms;
+    }
+    #krVideoWrap.show{
+      opacity:1;
+      visibility:visible;
+      pointer-events:auto;
+      transition:opacity 600ms ease;
+    }
+
+    #krVideo{
+      position:absolute; inset:0;
+      width:100%; height:100%;
+      object-fit:cover; object-position:center center;
+      background:#000; display:block;
+    }
+
+    /* ═══════════════════════════════════════
+       MOBILE FIXES
+    ═══════════════════════════════════════ */
+    @media (max-width:767px),(pointer:coarse) and (max-width:900px){
+      #cpPopup{
+        max-width:min(88vw,320px);
+        padding:16px 16px 14px;
+        border-radius:20px;
+      }
+      .cp-icons{ gap:8px; }
+      .cp-icon-img{ width:44px; height:44px; padding:5px; border-radius:12px; }
+      .cp-icon-label{ font-size:8px; max-width:56px; }
+      #cpCloseBtn{ padding:8px 22px; font-size:12px; }
+
+      #hwPrompt{
+        border-radius:22px;
+        padding:22px 18px 20px;
+      }
+      #krPrompt{
+        border-radius:22px;
+        padding:22px 18px 20px;
+      }
     }
 
     @media (prefers-reduced-motion:reduce){
@@ -369,11 +623,17 @@
       .rotateIcon{ animation:none; transform:rotate(-90deg); }
       #fade{ transition:none; }
       #hwVideoWrap{ transition:none; }
+      #krVideoWrap{ transition:none; }
       #hwTreeEmoji{ animation:none; }
       #hwPrompt{ transition:none; }
+      #krPrompt{ transition:none; }
       .hw-dot{ animation:none; opacity:.7; }
       #hwPromptBar{ animation:none; }
       .hw-corner{ animation:none; opacity:.6; }
+      #krPromptBar{ animation:none; }
+      .kr-drip-bar{ animation:none; opacity:.5; }
+      .kr-corner{ animation:none; }
+      #krTreeLogo{ animation:none; }
       .sp{ animation:none; opacity:.6; }
     }
   </style>
@@ -492,12 +752,66 @@
     </div>
   </div>
 
-  <!-- HOMEWORK VIDEO — cinematic -->
+  <!-- HOMEWORK VIDEO — simple fade -->
   <div id="hwVideoWrap" aria-hidden="true">
     <video id="hwTreeVideo" preload="auto" playsinline webkit-playsinline>
       <source src="assets/video/homework.mp4" type="video/mp4" />
     </video>
-    <div id="hwVideoCinema"></div>
+  </div>
+
+  <!-- KARASUKI PROMPT -->
+  <div id="krPromptScrim"></div>
+  <div id="krPrompt" role="dialog" aria-modal="true" aria-labelledby="krPromptTitle">
+    <!-- Rune corner marks -->
+    <div class="kr-corner tl" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2 L12 22 M2 12 L22 12" stroke="#4ab870" stroke-width="1.4" stroke-linecap="round"/>
+        <circle cx="12" cy="12" r="4" stroke="#7a3a9a" stroke-width="1" opacity=".7"/>
+      </svg>
+    </div>
+    <div class="kr-corner tr" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2 L12 22 M2 12 L22 12" stroke="#4ab870" stroke-width="1.4" stroke-linecap="round"/>
+        <circle cx="12" cy="12" r="4" stroke="#7a3a9a" stroke-width="1" opacity=".7"/>
+      </svg>
+    </div>
+    <div class="kr-corner bl" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M4 4 L20 20 M20 4 L4 20" stroke="#3a6a3a" stroke-width="1.2" stroke-linecap="round" opacity=".8"/>
+      </svg>
+    </div>
+    <div class="kr-corner br" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M4 4 L20 20 M20 4 L4 20" stroke="#3a6a3a" stroke-width="1.2" stroke-linecap="round" opacity=".8"/>
+      </svg>
+    </div>
+    <div id="krPromptBar"></div>
+    <img id="krTreeLogo" src="assets/img/karasuki1-tree.png" alt="からすき" />
+    <p class="kr-eyebrow">からすき</p>
+    <h2 id="krPromptTitle">からすきの木に<br>はいりますか？</h2>
+    <p id="krPromptSub">ほんとうに はいりますか？</p>
+    <div class="kr-drip" aria-hidden="true">
+      <div class="kr-drip-bar"></div>
+      <div class="kr-drip-bar"></div>
+      <div class="kr-drip-bar"></div>
+      <div class="kr-drip-bar"></div>
+      <div class="kr-drip-bar"></div>
+      <div class="kr-drip-bar"></div>
+      <div class="kr-drip-bar"></div>
+      <div class="kr-drip-bar"></div>
+      <div class="kr-drip-bar"></div>
+    </div>
+    <div class="kr-actions">
+      <button id="krNoBtn" type="button">いいえ</button>
+      <button id="krYesBtn" type="button">はい</button>
+    </div>
+  </div>
+
+  <!-- KARASUKI VIDEO — simple fade -->
+  <div id="krVideoWrap" aria-hidden="true">
+    <video id="krVideo" preload="auto" playsinline webkit-playsinline>
+      <source src="assets/video/karasuki.mp4" type="video/mp4" />
+    </video>
   </div>
 
 </div>
@@ -533,6 +847,11 @@ const INTRO_HOVER_LAND = { ix: IMG_W / 2, iy: 300 };
 const HW_TREE_IX = 979;
 const HW_TREE_IY = 305;
 const HW_TREE_HIT_R = 52;
+
+// Karasuki tree image-space position & hit radius
+const KR_TREE_IX = 535;
+const KR_TREE_IY = 300;
+const KR_TREE_HIT_R = 52;
 
 const GHOSTS = [
   'assets/img/booha_ghost.png',
@@ -613,7 +932,13 @@ const app=document.getElementById('app'),rotateOverlay=document.getElementById('
   hwNoBtn=document.getElementById('hwNoBtn'),
   hwYesBtn=document.getElementById('hwYesBtn'),
   hwVideoWrap=document.getElementById('hwVideoWrap'),
-  hwTreeVideo=document.getElementById('hwTreeVideo');
+  hwTreeVideo=document.getElementById('hwTreeVideo'),
+  krPromptScrim=document.getElementById('krPromptScrim'),
+  krPrompt=document.getElementById('krPrompt'),
+  krNoBtn=document.getElementById('krNoBtn'),
+  krYesBtn=document.getElementById('krYesBtn'),
+  krVideoWrap=document.getElementById('krVideoWrap'),
+  krVideo=document.getElementById('krVideo');
 
 const FADE_MS=520;
 
@@ -680,8 +1005,10 @@ let ghostIX=INTRO_TOP_CENTER_START.ix,ghostIY=INTRO_TOP_CENTER_START.iy;
 let ghostSrcIX=ghostIX,ghostSrcIY=ghostIY,ghostDstIX=ghostIX,ghostDstIY=ghostIY;
 let ghostT=1,ghostAnimStart=0,pendingPopupCP=null,ghostVisible=false;
 
-// pendingHomework: ghost is travelling to the HW tree; open prompt when it arrives
+// pendingHomework: ghost travelling to HW tree
 let pendingHomework=false;
+// pendingKarasuki: ghost travelling to Karasuki tree
+let pendingKarasuki=false;
 
 let trail=[];
 
@@ -707,11 +1034,13 @@ function restoreMazeFromCheckpoint(){
   const cp=CHECKPOINTS.find(c=>c.w===activeWeek)||startCP;
   mazeStarted=true;mazeLaunched=true;videoPlayed=true;o2shown=true;
   introPhase='done';ghostVisible=true;
-  ghostIX=cp.ix;ghostIY=cp.iy;ghostSrcIX=cp.ix;ghostSrcIY=cp.iy;ghostDstIX=cp.ix;ghostDstIY=cp.iy;ghostT=1;pendingPopupCP=null;pendingHomework=false;
+  ghostIX=cp.ix;ghostIY=cp.iy;ghostSrcIX=cp.ix;ghostSrcIY=cp.iy;ghostDstIX=cp.ix;ghostDstIY=cp.iy;ghostT=1;pendingPopupCP=null;pendingHomework=false;pendingKarasuki=false;
   overlay1.classList.add('hidden','gone');overlay2.classList.remove('show');overlay2.classList.add('hidden','gone');
   videoWrap.classList.remove('show');cpPopup.classList.remove('show');cpScrim.classList.remove('show');
   hwPrompt.classList.remove('show','visible');hwPromptScrim.classList.remove('show','active');
   hwVideoWrap.classList.remove('show');
+  krPrompt.classList.remove('show','visible');krPromptScrim.classList.remove('show','active');
+  krVideoWrap.classList.remove('show');
   app.classList.remove('inTransition');
   karasukiLastSwap=performance.now();
   resizeCanvas();buildWanderers();startLoop();
@@ -758,18 +1087,23 @@ function drawWanderers(nowMs){
   for(const w of wanderers){
     if(w.opacity<=0)continue;const img=ghostImgs[w.ghostIdx];if(!img||!img.complete||!img.naturalWidth)continue;
     const gR=GHOST_SIZE/2,gx=w.cx,gy=w.cy;
+    // Smaller on mobile
+    const isMobile=window.innerWidth<768;
+    const drawR=isMobile?gR*.65:gR;
     const col1=MONTH_COLORS[w.ghostIdx%MONTH_COLORS.length][0],col2=MONTH_COLORS[w.ghostIdx%MONTH_COLORS.length][1];
     const sec=nowMs/1000,pulseG=.5+.5*Math.sin(sec*2.1+w.ghostIdx*.8);
     ctx.save();
     for(let pi=w.trail.length-1;pi>=0;pi--){const p=w.trail[pi];const gr=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.size*2.3);gr.addColorStop(0,p.color);gr.addColorStop(1,'transparent');ctx.globalAlpha=p.life*.35*w.opacity;ctx.fillStyle=gr;ctx.beginPath();ctx.arc(p.x,p.y,p.size*2.3,0,Math.PI*2);ctx.fill();ctx.globalAlpha=p.life*.70*w.opacity;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(p.x,p.y,p.size*.34,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;p.life-=.018;p.x+=p.dx;p.y+=p.dy;}
     w.trail=w.trail.filter(p=>p.life>0);
-    ctx.globalAlpha=w.opacity*(.18+pulseG*.09);const ga=ctx.createRadialGradient(gx,gy+3,0,gx,gy+3,gR*2);ga.addColorStop(0,col1);ga.addColorStop(.5,col2);ga.addColorStop(1,'transparent');ctx.fillStyle=ga;ctx.beginPath();ctx.arc(gx,gy+3,gR*2,0,Math.PI*2);ctx.fill();
-    ctx.globalAlpha=w.opacity;ctx.drawImage(img,gx-gR,gy-gR,gR*2,gR*2);ctx.globalAlpha=1;ctx.restore();
+    ctx.globalAlpha=w.opacity*(.18+pulseG*.09);const ga=ctx.createRadialGradient(gx,gy+3,0,gx,gy+3,drawR*2);ga.addColorStop(0,col1);ga.addColorStop(.5,col2);ga.addColorStop(1,'transparent');ctx.fillStyle=ga;ctx.beginPath();ctx.arc(gx,gy+3,drawR*2,0,Math.PI*2);ctx.fill();
+    ctx.globalAlpha=w.opacity;ctx.drawImage(img,gx-drawR,gy-drawR,drawR*2,drawR*2);ctx.globalAlpha=1;ctx.restore();
   }
 }
 
 function setTravelLock(on){
   ghostLocked=on;travelLock.classList.toggle('active',on);
+  // travelLock should be transparent / non-blocking of the popup interactions
+  // but still blocking ghost retargeting — handled in click handlers
   backBtn.style.pointerEvents=on?'none':'';bryanBtn.style.pointerEvents=on?'none':'';
 }
 
@@ -868,6 +1202,9 @@ function drawFrame(now){
         if(pendingHomework){
           pendingHomework=false;
           openHomeworkPrompt();
+        } else if(pendingKarasuki){
+          pendingKarasuki=false;
+          openKarasukiPrompt();
         } else if(pendingPopupCP){
           showPopupAtCP(pendingPopupCP);pendingPopupCP=null;
         }
@@ -888,6 +1225,10 @@ function drawFrame(now){
   trail=trail.filter(p=>p.life>0);
 
   const{scale:coverScale}=getCover();
+  // Smaller ghost radius on mobile
+  const isMobile=cssW<768;
+  const activeGhostR=isMobile?20:28;
+
   CHECKPOINTS.forEach((cp,cpIdx)=>{
     const state=cpState[cp.w];if(!state||state.alpha<=.01)return;
     const{x,y}=imgToCSS(cp.ix,cp.iy);const col1=monthPrimary(cp.w),col2=monthSecondary(cp.w);
@@ -917,7 +1258,7 @@ function drawFrame(now){
 
   if(ghostVisible){
     const bob=Math.sin(sec*1.85)*3.5;const{x:gx,y:gy}=imgToCSS(ghostIX,ghostIY);
-    const gR=28,pulseG=.5+.5*Math.sin(sec*2.1),gcol1=monthPrimary(activeWeek),gcol2=monthSecondary(activeWeek);
+    const gR=activeGhostR,pulseG=.5+.5*Math.sin(sec*2.1),gcol1=monthPrimary(activeWeek),gcol2=monthSecondary(activeWeek);
     ctx.save();
     ctx.globalAlpha=.20+pulseG*.10;const ga=ctx.createRadialGradient(gx,gy+3,0,gx,gy+3,gR*2.0);ga.addColorStop(0,gcol1);ga.addColorStop(.5,gcol2);ga.addColorStop(1,'transparent');ctx.fillStyle=ga;ctx.beginPath();ctx.arc(gx,gy+3,gR*2.0,0,Math.PI*2);ctx.fill();
     ctx.globalAlpha=.14+pulseG*.06;const gs=ctx.createRadialGradient(gx,gy+gR*.7,0,gx,gy+gR*.7,gR*.85);gs.addColorStop(0,'rgba(0,0,0,.5)');gs.addColorStop(1,'transparent');ctx.fillStyle=gs;ctx.beginPath();ctx.arc(gx,gy+gR*.7,gR*.85,0,Math.PI*2);ctx.fill();
@@ -947,9 +1288,13 @@ function hitHomeworkTree(clientX,clientY){
   const rect=canvas.getBoundingClientRect();const{ix,iy}=cssToImg(clientX-rect.left,clientY-rect.top);
   return Math.hypot(ix-HW_TREE_IX,iy-HW_TREE_IY)<HW_TREE_HIT_R;
 }
+function hitKarasukiTree(clientX,clientY){
+  const rect=canvas.getBoundingClientRect();const{ix,iy}=cssToImg(clientX-rect.left,clientY-rect.top);
+  return Math.hypot(ix-KR_TREE_IX,iy-KR_TREE_IY)<KR_TREE_HIT_R;
+}
 
 // Ghost travels to the homework tree, then opens the prompt
-function startGhostTravelToTree(){
+function startGhostTravelToHWTree(){
   if(ghostLocked)return;
   closePopup();
   ghostSrcIX=ghostIX;ghostSrcIY=ghostIY;
@@ -957,13 +1302,30 @@ function startGhostTravelToTree(){
   ghostT=0;ghostAnimStart=performance.now();
   pendingPopupCP=null;
   pendingHomework=true;
+  pendingKarasuki=false;
+  setTravelLock(true);
+}
+
+// Ghost travels to the Karasuki tree, then opens the prompt
+function startGhostTravelToKRTree(){
+  if(ghostLocked)return;
+  closePopup();
+  ghostSrcIX=ghostIX;ghostSrcIY=ghostIY;
+  ghostDstIX=KR_TREE_IX;ghostDstIY=KR_TREE_IY;
+  ghostT=0;ghostAnimStart=performance.now();
+  pendingPopupCP=null;
+  pendingHomework=false;
+  pendingKarasuki=true;
   setTravelLock(true);
 }
 
 canvas.addEventListener('click',e=>{
-  if(!mazeStarted||ghostLocked)return;
+  if(!mazeStarted)return;
+  // Block retargeting while ghost is travelling
+  if(ghostLocked)return;
   if(['allGlow','dropping','hovering','settling'].includes(introPhase))return;
-  if(hitHomeworkTree(e.clientX,e.clientY)){ startGhostTravelToTree(); return; }
+  if(hitHomeworkTree(e.clientX,e.clientY)){ startGhostTravelToHWTree(); return; }
+  if(hitKarasukiTree(e.clientX,e.clientY)){ startGhostTravelToKRTree(); return; }
   if(bryanOn){
     const rect=canvas.getBoundingClientRect();const{ix,iy}=cssToImg(e.clientX-rect.left,e.clientY-rect.top);
     coordText.textContent=`x: ${ix}  y: ${iy}`;
@@ -972,11 +1334,14 @@ canvas.addEventListener('click',e=>{
   const cp=hitTest(e.clientX,e.clientY);if(cp)startGhostTravel(cp);
 });
 canvas.addEventListener('touchend',e=>{
-  if(!mazeStarted||ghostLocked)return;
+  if(!mazeStarted)return;
+  // Block retargeting while ghost is travelling
+  if(ghostLocked)return;
   if(['allGlow','dropping','hovering','settling'].includes(introPhase))return;
   if(!e.changedTouches.length)return;
   const t0=e.changedTouches[0];
-  if(hitHomeworkTree(t0.clientX,t0.clientY)){startGhostTravelToTree();e.preventDefault();return;}
+  if(hitHomeworkTree(t0.clientX,t0.clientY)){startGhostTravelToHWTree();e.preventDefault();return;}
+  if(hitKarasukiTree(t0.clientX,t0.clientY)){startGhostTravelToKRTree();e.preventDefault();return;}
   const cp=hitTest(t0.clientX,t0.clientY);if(cp){startGhostTravel(cp);e.preventDefault();}
 },{passive:false});
 canvas.addEventListener('mousemove',e=>{
@@ -987,7 +1352,7 @@ canvas.addEventListener('mouseleave',()=>{bMouseX=-1;bMouseY=-1;});
 
 function startGhostTravel(cp){
   if(ghostLocked)return;closePopup();
-  pendingHomework=false;
+  pendingHomework=false;pendingKarasuki=false;
   ghostSrcIX=ghostIX;ghostSrcIY=ghostIY;ghostDstIX=cp.ix;ghostDstIY=cp.iy;
   ghostT=0;ghostAnimStart=performance.now();activeWeek=cp.w;pendingPopupCP=cp;setTravelLock(true);
 }
@@ -1018,7 +1383,6 @@ cpCloseBtn.addEventListener('click',closePopup);cpScrim.addEventListener('click'
 function openHomeworkPrompt(){
   hwPromptScrim.classList.add('show');
   hwPrompt.classList.add('show');
-  // Two rAFs ensure display:block has been painted before triggering transitions
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
     hwPromptScrim.classList.add('active');
     hwPrompt.classList.add('visible');
@@ -1038,7 +1402,7 @@ function playHomeworkVideoAndGo(){
   closeHomeworkPrompt();
 
   // Graceful music fade-out (1.3 s)
-  const fadeMs=1300, startVol=bgMusic.volume, t0=performance.now();
+  const fadeMs=1300,startVol=bgMusic.volume,t0=performance.now();
   (function fadeTick(){
     const p=Math.min((performance.now()-t0)/fadeMs,1);
     try{bgMusic.volume=startVol*(1-p);}catch(e){}
@@ -1048,11 +1412,10 @@ function playHomeworkVideoAndGo(){
 
   try{hwTreeVideo.pause();hwTreeVideo.currentTime=0;}catch(e){}
 
-  // Cinematic reveal — CSS handles opacity + letterbox bars
+  // Simple fade in
   void hwVideoWrap.offsetWidth;
   hwVideoWrap.classList.add('show');
 
-  // Save restore state so X button in homework.html returns mid-maze
   sessionStorage.setItem('booha_return_to_checkpoint','1');
   sessionStorage.setItem('booha_return_week',String(activeWeek));
   sessionStorage.setItem('booha_return_ghost',String(activeGhostIdx));
@@ -1060,7 +1423,6 @@ function playHomeworkVideoAndGo(){
   let left=false;
   function leaveNow(){
     if(left)return;left=true;
-    // Black fade before navigation
     fade.classList.add('on');
     setTimeout(()=>{ window.location.href='homework.html'; },FADE_MS+100);
   }
@@ -1070,7 +1432,7 @@ function playHomeworkVideoAndGo(){
   hwTreeVideo.ontimeupdate=()=>{
     const d=hwTreeVideo.duration;
     if(!isFinite(d)||d<=0)return;
-    if(d-hwTreeVideo.currentTime<=1.2)leaveNow();
+    if(d-hwTreeVideo.currentTime<=0.8)leaveNow();
   };
 
   const p=hwTreeVideo.play();
@@ -1080,6 +1442,70 @@ function playHomeworkVideoAndGo(){
 hwPromptScrim.addEventListener('click',closeHomeworkPrompt);
 hwNoBtn.addEventListener('click',closeHomeworkPrompt);
 hwYesBtn.addEventListener('click',playHomeworkVideoAndGo);
+
+// ── Karasuki prompt ──────────────────────────────────────────────────────────
+function openKarasukiPrompt(){
+  krPromptScrim.classList.add('show');
+  krPrompt.classList.add('show');
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    krPromptScrim.classList.add('active');
+    krPrompt.classList.add('visible');
+  }));
+}
+
+function closeKarasukiPrompt(){
+  krPrompt.classList.remove('visible');
+  krPromptScrim.classList.remove('active');
+  setTimeout(()=>{
+    krPrompt.classList.remove('show');
+    krPromptScrim.classList.remove('show');
+  },520);
+}
+
+function playKarasukiVideoAndGo(){
+  closeKarasukiPrompt();
+
+  // Graceful music fade-out (1.3 s)
+  const fadeMs=1300,startVol=bgMusic.volume,t0=performance.now();
+  (function fadeTick(){
+    const p=Math.min((performance.now()-t0)/fadeMs,1);
+    try{bgMusic.volume=startVol*(1-p);}catch(e){}
+    if(p<1)requestAnimationFrame(fadeTick);
+    else{try{bgMusic.pause();bgMusic.volume=startVol;}catch(e){}}
+  })();
+
+  try{krVideo.pause();krVideo.currentTime=0;}catch(e){}
+
+  // Simple fade in
+  void krVideoWrap.offsetWidth;
+  krVideoWrap.classList.add('show');
+
+  sessionStorage.setItem('booha_return_to_checkpoint','1');
+  sessionStorage.setItem('booha_return_week',String(activeWeek));
+  sessionStorage.setItem('booha_return_ghost',String(activeGhostIdx));
+
+  let left=false;
+  function leaveNow(){
+    if(left)return;left=true;
+    fade.classList.add('on');
+    setTimeout(()=>{ window.location.href='karasuki.html'; },FADE_MS+100);
+  }
+
+  krVideo.onended=leaveNow;
+  krVideo.onerror=leaveNow;
+  krVideo.ontimeupdate=()=>{
+    const d=krVideo.duration;
+    if(!isFinite(d)||d<=0)return;
+    if(d-krVideo.currentTime<=0.8)leaveNow();
+  };
+
+  const p=krVideo.play();
+  if(p&&p.catch)p.catch(()=>leaveNow());
+}
+
+krPromptScrim.addEventListener('click',closeKarasukiPrompt);
+krNoBtn.addEventListener('click',closeKarasukiPrompt);
+krYesBtn.addEventListener('click',playKarasukiVideoAndGo);
 
 // ────────────────────────────────────────────────────────────────────────────
 iconPreBoo.addEventListener('click',()=>{
@@ -1189,6 +1615,7 @@ backBtn.addEventListener('click',()=>{
 
 function fadeOut(){
   closeHomeworkPrompt();
+  closeKarasukiPrompt();
   fade.classList.add('on');
 }
 
@@ -1220,6 +1647,9 @@ window.addEventListener('pageshow',(e)=>{
   hwPrompt.classList.remove('show','visible');
   hwPromptScrim.classList.remove('show','active');
   hwVideoWrap.classList.remove('show');
+  krPrompt.classList.remove('show','visible');
+  krPromptScrim.classList.remove('show','active');
+  krVideoWrap.classList.remove('show');
 });
 </script>
 </body>
