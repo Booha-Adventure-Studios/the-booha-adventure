@@ -4,6 +4,20 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+<!-- PWA manifest — locks orientation to landscape at OS level -->
+<link rel="manifest" href="manifest.json">
+
+<!-- Fallback meta orientation hints -->
+<meta name="screen-orientation" content="landscape">
+<meta name="x5-orientation" content="landscape">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+
+<!-- iOS home screen icon (uses your ghost image as a fallback) -->
+<link rel="apple-touch-icon" href="assets/img/booha_ghost.png">
+
 <title>Karasuki</title>
 </head>
 <body>
