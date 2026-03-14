@@ -8,10 +8,16 @@
 
   const WORLD_W = 960;
   const WORLD_H = 540;
+  const GHOST_SIZE = 38;
+  const GHOST_RADIUS = 16;
+  const SPEED = 2.6;
 
   const state = {
     roomId: DATA.startRoom,
-    spawnId: "default"
+    spawnId: "default",
+    x: 480,
+    y: 270,
+    keys: { up: false, down: false, left: false, right: false }
   };
 
   let app, stage, bg, ghost;
@@ -47,7 +53,6 @@
         width: ${WORLD_W}px;
         height: ${WORLD_H}px;
         transform-origin: 50% 50%;
-        image-rendering: auto;
         overflow: hidden;
       }
 
@@ -64,10 +69,10 @@
 
       #booha-ghost {
         position: absolute;
-        width: 38px;
-        height: 38px;
-        margin-left: -19px;
-        margin-top: -19px;
+        width: ${GHOST_SIZE}px;
+        height: ${GHOST_SIZE}px;
+        margin-left: -${GHOST_SIZE / 2}px;
+        margin-top: -${GHOST_SIZE / 2}px;
         border-radius: 50%;
         background:
           radial-gradient(circle at 35% 35%, #ffffff 0 18%, #f8f8f8 19% 28%, #ffd9ff 29% 48%, #ff8ae2 49% 68%, #ff4fc8 69% 100%);
@@ -170,6 +175,8 @@
   }
 
   function placeGhost(x, y) {
+    state.x = x;
+    state.y = y;
     ghost.style.left = `${x}px`;
     ghost.style.top = `${y}px`;
   }
@@ -182,9 +189,79 @@
     }
 
     bg.src = room.bg;
-
     const spawn = getSpawn(room, state.spawnId);
     placeGhost(spawn.x, spawn.y);
+  }
+
+  function clampToWorld(nx, ny) {
+    const minX = GHOST_RADIUS;
+    const maxX = WORLD_W - GHOST_RADIUS;
+    const minY = GHOST_RADIUS;
+    const maxY = WORLD_H - GHOST_RADIUS;
+
+    return {
+      x: Math.max(minX, Math.min(maxX, nx)),
+      y: Math.max(minY, Math.min(maxY, ny))
+    };
+  }
+
+  function handleMovement() {
+    let dx = 0;
+    let dy = 0;
+
+    if (state.keys.left) dx -= 1;
+    if (state.keys.right) dx += 1;
+    if (state.keys.up) dy -= 1;
+    if (state.keys.down) dy += 1;
+
+    if (!dx && !dy) return;
+
+    if (dx && dy) {
+      const inv = 1 / Math.sqrt(2);
+      dx *= inv;
+      dy *= inv;
+    }
+
+    const nx = state.x + dx * SPEED;
+    const ny = state.y + dy * SPEED;
+    const clamped = clampToWorld(nx, ny);
+
+    placeGhost(clamped.x, clamped.y);
+  }
+
+  function setKey(code, isDown) {
+    if (code === "ArrowUp" || code === "KeyW") state.keys.up = isDown;
+    if (code === "ArrowDown" || code === "KeyS") state.keys.down = isDown;
+    if (code === "ArrowLeft" || code === "KeyA") state.keys.left = isDown;
+    if (code === "ArrowRight" || code === "KeyD") state.keys.right = isDown;
+  }
+
+  function bindKeys() {
+    window.addEventListener("keydown", (e) => {
+      if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "KeyW", "KeyA", "KeyS", "KeyD"].includes(e.code)) {
+        e.preventDefault();
+        setKey(e.code, true);
+      }
+    });
+
+    window.addEventListener("keyup", (e) => {
+      if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "KeyW", "KeyA", "KeyS", "KeyD"].includes(e.code)) {
+        e.preventDefault();
+        setKey(e.code, false);
+      }
+    });
+
+    window.addEventListener("blur", () => {
+      state.keys.up = false;
+      state.keys.down = false;
+      state.keys.left = false;
+      state.keys.right = false;
+    });
+  }
+
+  function tick() {
+    handleMovement();
+    requestAnimationFrame(tick);
   }
 
   function init() {
@@ -192,7 +269,9 @@
     buildApp();
     fitStage();
     renderRoom();
+    bindKeys();
     window.addEventListener("resize", fitStage);
+    requestAnimationFrame(tick);
   }
 
   init();
