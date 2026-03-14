@@ -30,89 +30,103 @@
   }
 
   /* ═══════════════════════════════════════════
-     EXIT ARROW DATA
-     Each room lists its exits with a world-space
-     point (where the arrow sits) and a direction
-     the arrow should point (toward the edge).
+     NPP — NEXT PAGE POINTS
+     ─────────────────────────────────────────
+     Each entry is one exit for a room.
+
+       dir   : "left" | "right" | "up" | "down"
+                Used to aim the arrow. Delete the
+                whole entry if you don't want an
+                arrow (ghost still triggers on proximity).
+       x, y  : world-space coordinate of the glowing
+                dot. Ghost triggers the exit when it
+                reaches this point (within NPP_RADIUS px).
+       to    : room key to transition into
+       spawn : spawn id inside the destination room
+
+     To tune: turn on COORDS mode, click the exact
+     spot, paste the coords here, done.
   ═══════════════════════════════════════════ */
-  const EXIT_ARROWS = {
+  const NPP_RADIUS = 36;   // px — how close ghost must get to trigger
+
+  const NPP = {
     room_01: [
-      { dir: "right", x: 840, y: 270 },
-      { dir: "up",    x: 480, y: 90  }
+      { dir: "right", x: 840,  y: 270,  to: "room_02", spawn: "fromLeft"  },
+      { dir: "up",    x: 480,  y: 90,   to: "room_06", spawn: "fromDown"  }
     ],
     room_02: [
-      { dir: "left",  x: 147, y: 220 },
-      { dir: "up",    x: 493, y: 89  },
-      { dir: "right", x: 529, y: 117 }
+      { dir: "left",  x: 147,  y: 220,  to: "room_01", spawn: "fromRight" },
+      { dir: "up",    x: 493,  y: 89,   to: "room_07", spawn: "fromDown"  },
+      { dir: "right", x: 529,  y: 117,  to: "room_03", spawn: "fromLeft"  }
     ],
     room_03: [
-      { dir: "left",  x: 147, y: 220 },
-      { dir: "up",    x: 493, y: 89  },
-      { dir: "right", x: 529, y: 117 }
+      { dir: "left",  x: 218,  y: 328,  to: "room_02", spawn: "fromRight" },
+      { dir: "up",    x: 785,  y: 171,  to: "room_08", spawn: "fromDown"  },
+      { dir: "right", x: 1216, y: 237,  to: "room_04", spawn: "fromLeft"  }
     ],
     room_04: [
-      { dir: "left",  x: 120, y: 270 },
-      { dir: "right", x: 840, y: 270 },
-      { dir: "up",    x: 480, y: 90  }
+      { dir: "left",  x: 120,  y: 270,  to: "room_03", spawn: "fromRight" },
+      { dir: "right", x: 840,  y: 270,  to: "room_05", spawn: "fromLeft"  },
+      { dir: "up",    x: 480,  y: 90,   to: "room_09", spawn: "fromDown"  }
     ],
     room_05: [
-      { dir: "left",  x: 120, y: 270 },
-      { dir: "up",    x: 480, y: 90  }
+      { dir: "left",  x: 120,  y: 270,  to: "room_04", spawn: "fromRight" },
+      { dir: "up",    x: 480,  y: 90,   to: "room_10", spawn: "fromDown"  }
     ],
     room_06: [
-      { dir: "right", x: 840, y: 270 },
-      { dir: "up",    x: 480, y: 90  },
-      { dir: "down",  x: 480, y: 470 }
+      { dir: "right", x: 840,  y: 270,  to: "room_07", spawn: "fromLeft"  },
+      { dir: "up",    x: 480,  y: 90,   to: "room_11", spawn: "fromDown"  },
+      { dir: "down",  x: 480,  y: 470,  to: "room_01", spawn: "fromUp"    }
     ],
     room_07: [
-      { dir: "left",  x: 120, y: 270 },
-      { dir: "right", x: 840, y: 270 },
-      { dir: "up",    x: 480, y: 90  },
-      { dir: "down",  x: 480, y: 470 }
+      { dir: "left",  x: 120,  y: 270,  to: "room_06", spawn: "fromRight" },
+      { dir: "right", x: 840,  y: 270,  to: "room_08", spawn: "fromLeft"  },
+      { dir: "up",    x: 480,  y: 90,   to: "room_12", spawn: "fromDown"  },
+      { dir: "down",  x: 480,  y: 470,  to: "room_02", spawn: "fromUp"    }
     ],
     room_08: [
-      { dir: "left",  x: 120, y: 270 },
-      { dir: "right", x: 840, y: 270 },
-      { dir: "up",    x: 480, y: 90  },
-      { dir: "down",  x: 480, y: 470 }
+      { dir: "left",  x: 120,  y: 270,  to: "room_07", spawn: "fromRight" },
+      { dir: "right", x: 840,  y: 270,  to: "room_09", spawn: "fromLeft"  },
+      { dir: "up",    x: 480,  y: 90,   to: "room_13", spawn: "fromDown"  },
+      { dir: "down",  x: 480,  y: 470,  to: "room_03", spawn: "fromUp"    }
     ],
     room_09: [
-      { dir: "left",  x: 120, y: 270 },
-      { dir: "right", x: 840, y: 270 },
-      { dir: "up",    x: 480, y: 90  },
-      { dir: "down",  x: 480, y: 470 }
+      { dir: "left",  x: 120,  y: 270,  to: "room_08", spawn: "fromRight" },
+      { dir: "right", x: 840,  y: 270,  to: "room_10", spawn: "fromLeft"  },
+      { dir: "up",    x: 480,  y: 90,   to: "room_14", spawn: "fromDown"  },
+      { dir: "down",  x: 480,  y: 470,  to: "room_04", spawn: "fromUp"    }
     ],
     room_10: [
-      { dir: "left",  x: 120, y: 270 },
-      { dir: "up",    x: 480, y: 90  },
-      { dir: "down",  x: 480, y: 470 }
+      { dir: "left",  x: 120,  y: 270,  to: "room_09", spawn: "fromRight" },
+      { dir: "up",    x: 480,  y: 90,   to: "room_15", spawn: "fromDown"  },
+      { dir: "down",  x: 480,  y: 470,  to: "room_05", spawn: "fromUp"    }
     ],
     room_11: [
-      { dir: "right", x: 840, y: 270 },
-      { dir: "down",  x: 480, y: 470 }
+      { dir: "right", x: 840,  y: 270,  to: "room_12", spawn: "fromLeft"  },
+      { dir: "down",  x: 480,  y: 470,  to: "room_06", spawn: "fromUp"    }
     ],
     room_12: [
-      { dir: "left",  x: 120, y: 270 },
-      { dir: "right", x: 840, y: 270 },
-      { dir: "down",  x: 480, y: 470 }
+      { dir: "left",  x: 120,  y: 270,  to: "room_11", spawn: "fromRight" },
+      { dir: "right", x: 840,  y: 270,  to: "room_13", spawn: "fromLeft"  },
+      { dir: "down",  x: 480,  y: 470,  to: "room_07", spawn: "fromUp"    }
     ],
     room_13: [
-      { dir: "left",  x: 120, y: 270 },
-      { dir: "right", x: 840, y: 270 },
-      { dir: "down",  x: 480, y: 470 }
+      { dir: "left",  x: 120,  y: 270,  to: "room_12", spawn: "fromRight" },
+      { dir: "right", x: 840,  y: 270,  to: "room_14", spawn: "fromLeft"  },
+      { dir: "down",  x: 480,  y: 470,  to: "room_08", spawn: "fromUp"    }
     ],
     room_14: [
-      { dir: "left",  x: 120, y: 270 },
-      { dir: "right", x: 840, y: 270 },
-      { dir: "down",  x: 480, y: 470 }
+      { dir: "left",  x: 120,  y: 270,  to: "room_13", spawn: "fromRight" },
+      { dir: "right", x: 840,  y: 270,  to: "room_15", spawn: "fromLeft"  },
+      { dir: "down",  x: 480,  y: 470,  to: "room_09", spawn: "fromUp"    }
     ],
     room_15: [
-      { dir: "left",  x: 120, y: 270 },
-      { dir: "down",  x: 480, y: 470 }
+      { dir: "left",  x: 120,  y: 270,  to: "room_14", spawn: "fromRight" },
+      { dir: "down",  x: 480,  y: 470,  to: "room_10", spawn: "fromUp"    }
     ]
   };
 
-  /* Arrow geometry: direction → angle (radians, 0 = pointing right) */
+  /* Arrow angle: direction → radians (0 = pointing right) */
   const DIR_ANGLE = { right: 0, down: Math.PI / 2, left: Math.PI, up: -Math.PI / 2 };
 
   /* ═══════════════════════════════════════════
@@ -121,8 +135,8 @@
   const state = {
     roomId        : DATA.startRoom,
     spawnId       : "default",
-    x             : 480,
-    y             : 270,
+    x             : 721,    // room_03 start x
+    y             : 985,    // room_03 start y
     transitioning : false,
     clickTarget   : null,
     moving        : false,
@@ -525,12 +539,13 @@
     }, FADE_MS / 2 + 20);
   }
 
-  function getExitAtEdge() {
-    const exits = getRoom()?.exits || {};
-    if (state.x <= GHOST_RADIUS + 2           && exits.left)  return exits.left;
-    if (state.x >= WORLD_W - GHOST_RADIUS - 2 && exits.right) return exits.right;
-    if (state.y <= GHOST_RADIUS + 2           && exits.up)    return exits.up;
-    if (state.y >= WORLD_H - GHOST_RADIUS - 2 && exits.down)  return exits.down;
+  /* ── NPP proximity check — replaces old edge detection ── */
+  function getNPPExit() {
+    const npps = NPP[state.roomId];
+    if (!npps) return null;
+    for (const npp of npps) {
+      if (Math.hypot(state.x - npp.x, state.y - npp.y) <= NPP_RADIUS) return npp;
+    }
     return null;
   }
 
@@ -557,30 +572,31 @@
      exit point. Pulse and breathe over time.
   ═══════════════════════════════════════════ */
   function drawExitArrows(now) {
-    const arrows = EXIT_ARROWS[state.roomId];
-    if (!arrows) return;
+    const npps = NPP[state.roomId];
+    if (!npps) return;
     const sec = now / 1000;
     const [col1, col2] = roomColorPair(state.roomId);
 
-    arrows.forEach((arrow, i) => {
-      const angle  = DIR_ANGLE[arrow.dir] ?? 0;
+    npps.forEach((npp, i) => {
+      if (!npp.dir) return;   // no dir = no arrow, just proximity trigger
+      const angle  = DIR_ANGLE[npp.dir] ?? 0;
       const pulse  = 0.5 + 0.5 * Math.sin(sec * 2.2 + i * 1.3);
-      const bounce = Math.sin(sec * 2.2 + i * 1.3) * 5;  // arrow bobs toward edge
-      const ax = arrow.x + Math.cos(angle) * bounce;
-      const ay = arrow.y + Math.sin(angle) * bounce;
+      const bounce = Math.sin(sec * 2.2 + i * 1.3) * 5;
+      const ax = npp.x + Math.cos(angle) * bounce;
+      const ay = npp.y + Math.sin(angle) * bounce;
 
       ctx.save();
       ctx.translate(ax, ay);
       ctx.rotate(angle);
 
       /* outer glow */
-      ctx.globalAlpha = (0.08 + pulse * 0.07);
+      ctx.globalAlpha = 0.08 + pulse * 0.07;
       const glow = ctx.createRadialGradient(0, 0, 0, 0, 0, 36);
       glow.addColorStop(0, col1); glow.addColorStop(1, "transparent");
       ctx.fillStyle = glow;
       ctx.beginPath(); ctx.arc(0, 0, 36, 0, Math.PI * 2); ctx.fill();
 
-      /* draw two stacked chevrons (›› style) pointing right, rotated by angle */
+      /* double chevron */
       const drawChevron = (offsetX, alpha) => {
         ctx.globalAlpha = alpha * (0.35 + pulse * 0.30);
         ctx.strokeStyle = col1;
@@ -599,12 +615,12 @@
       drawChevron(-10, 0.7);
       drawChevron(  4, 1.0);
 
-      /* tiny dot at the tip */
+      /* glowing dot at the NPP trigger point (origin before translate) */
       ctx.globalAlpha = 0.55 + pulse * 0.35;
       ctx.fillStyle   = "#fff";
-      ctx.shadowBlur  = 8;
+      ctx.shadowBlur  = 12;
       ctx.shadowColor = col1;
-      ctx.beginPath(); ctx.arc(8, 0, 2.5, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(0, 0, 4, 0, Math.PI * 2); ctx.fill();
       ctx.shadowBlur  = 0;
 
       ctx.restore();
@@ -751,7 +767,7 @@
   function tick(now) {
     if (!state.transitioning) {
       handleClickMovement(now);
-      const exit = getExitAtEdge();
+      const exit = getNPPExit();
       if (exit) transitionTo(exit);
     }
     drawFrame(now);
