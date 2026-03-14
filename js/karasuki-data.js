@@ -20,7 +20,10 @@ window.KARASUKI_DATA = {
         up:    { to: "room_08", spawn: "fromDown", dir: "up" }
       },
 
-      collisions: [],
+      collisions: [
+        { x: 430, y: 0,   w: 100, h: 540 },
+        { x: 0,   y: 220, w: 960, h: 100 }
+      ],
 
       hotspots: []
     }
