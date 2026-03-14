@@ -1,1 +1,128 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Karasuki</title>
+
+<style>
+
+html,body{
+  margin:0;
+  padding:0;
+  background:#000;
+  overflow:hidden;
+  height:100%;
+}
+
+/* main container */
+
+#karasukiApp{
+  position:relative;
+  width:100vw;
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:#000;
+}
+
+/* room stage */
+
+#roomStage{
+  position:relative;
+  width:960px;
+  height:540px;
+  overflow:hidden;
+}
+
+/* room layers */
+
+.room{
+  position:absolute;
+  width:960px;
+  height:540px;
+  top:0;
+  left:0;
+  background-size:cover;
+  background-position:center;
+  image-rendering:auto;
+}
+
+/* player */
+
+#player{
+  position:absolute;
+  width:48px;
+  height:48px;
+  background:url("assets/karasuki/player/booha_idle.png") center/contain no-repeat;
+  pointer-events:none;
+}
+
+/* overlay */
+
+#overlay{
+  position:absolute;
+  inset:0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:rgba(0,0,0,.85);
+  z-index:20;
+}
+
+#overlay.hidden{
+  display:none;
+}
+
+#overlay img{
+  max-width:90%;
+  max-height:90%;
+}
+
+/* fade transition */
+
+#fade{
+  position:absolute;
+  inset:0;
+  background:#000;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .4s;
+  z-index:15;
+}
+
+#fade.active{
+  opacity:1;
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="karasukiApp">
+
+  <div id="roomStage">
+
+    <div id="roomA" class="room"></div>
+    <div id="roomB" class="room"></div>
+
+    <div id="player"></div>
+
+  </div>
+
+  <div id="fade"></div>
+
+  <div id="overlay" class="hidden">
+    <img id="overlayImage">
+  </div>
+
+</div>
+
+<script src="js/karasuki-data.js"></script>
+<script src="js/karasuki.js"></script>
+
+</body>
+</html>
