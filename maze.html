@@ -5,6 +5,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Booha Adventure — Maze</title>
+  <link rel="icon" type="image/png" href="purple-boo.png">  
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bowlby+One&display=swap" rel="stylesheet" />
@@ -1023,18 +1024,25 @@ let bMouseX=-1,bMouseY=-1,rafHandle=null;
 function restoreMazeFromCheckpoint(){
   const returnWeek=parseInt(sessionStorage.getItem('booha_return_week')||'',10);
   const returnGhost=parseInt(sessionStorage.getItem('booha_return_ghost')||'',10);
+  const returnIX=parseInt(sessionStorage.getItem('booha_return_ix')||'',10);
+  const returnIY=parseInt(sessionStorage.getItem('booha_return_iy')||'',10);
   const reopenPopup=sessionStorage.getItem('booha_reopen_popup')==='1';
   sessionStorage.removeItem('booha_return_to_checkpoint');
   sessionStorage.removeItem('booha_return_week');
   sessionStorage.removeItem('booha_return_ghost');
+  sessionStorage.removeItem('booha_return_ix');
+  sessionStorage.removeItem('booha_return_iy');
   sessionStorage.removeItem('booha_reopen_popup');
   if(Number.isInteger(returnGhost)&&returnGhost>=0&&returnGhost<GHOSTS.length){activeGhostIdx=returnGhost;startGhost.src=GHOSTS[activeGhostIdx];}
   if(Number.isInteger(returnWeek)&&returnWeek>=1&&returnWeek<=CHECKPOINTS.length)activeWeek=returnWeek;
   else activeWeek=CURRENT_WEEK;
   const cp=CHECKPOINTS.find(c=>c.w===activeWeek)||startCP;
+  // Use stored exact position (tree coords) if available, otherwise fall back to week CP
+  const spawnIX=(Number.isInteger(returnIX)&&returnIX>0)?returnIX:cp.ix;
+  const spawnIY=(Number.isInteger(returnIY)&&returnIY>0)?returnIY:cp.iy;
   mazeStarted=true;mazeLaunched=true;videoPlayed=true;o2shown=true;
   introPhase='done';ghostVisible=true;
-  ghostIX=cp.ix;ghostIY=cp.iy;ghostSrcIX=cp.ix;ghostSrcIY=cp.iy;ghostDstIX=cp.ix;ghostDstIY=cp.iy;ghostT=1;pendingPopupCP=null;pendingHomework=false;pendingKarasuki=false;
+  ghostIX=spawnIX;ghostIY=spawnIY;ghostSrcIX=spawnIX;ghostSrcIY=spawnIY;ghostDstIX=spawnIX;ghostDstIY=spawnIY;ghostT=1;pendingPopupCP=null;pendingHomework=false;pendingKarasuki=false;
   overlay1.classList.add('hidden','gone');overlay2.classList.remove('show');overlay2.classList.add('hidden','gone');
   videoWrap.classList.remove('show');cpPopup.classList.remove('show');cpScrim.classList.remove('show');
   hwPrompt.classList.remove('show','visible');hwPromptScrim.classList.remove('show','active');
@@ -1044,6 +1052,7 @@ function restoreMazeFromCheckpoint(){
   app.classList.remove('inTransition');
   karasukiLastSwap=performance.now();
   resizeCanvas();buildWanderers();startLoop();
+  // Music always plays and loops in the maze
   try{bgMusic.loop=true;bgMusic.volume=.65;bgMusic.play().catch(()=>{});}catch(e){}
   if(reopenPopup)showPopupAtCP(cp);
 }
@@ -1401,14 +1410,7 @@ function closeHomeworkPrompt(){
 function playHomeworkVideoAndGo(){
   closeHomeworkPrompt();
 
-  // Graceful music fade-out (1.3 s)
-  const fadeMs=1300,startVol=bgMusic.volume,t0=performance.now();
-  (function fadeTick(){
-    const p=Math.min((performance.now()-t0)/fadeMs,1);
-    try{bgMusic.volume=startVol*(1-p);}catch(e){}
-    if(p<1)requestAnimationFrame(fadeTick);
-    else{try{bgMusic.pause();bgMusic.volume=startVol;}catch(e){}}
-  })();
+  // Music keeps playing — no fade-out
 
   try{hwTreeVideo.pause();hwTreeVideo.currentTime=0;}catch(e){}
 
@@ -1419,6 +1421,9 @@ function playHomeworkVideoAndGo(){
   sessionStorage.setItem('booha_return_to_checkpoint','1');
   sessionStorage.setItem('booha_return_week',String(activeWeek));
   sessionStorage.setItem('booha_return_ghost',String(activeGhostIdx));
+  // Store exact ghost position so it returns to the tree, not the week CP
+  sessionStorage.setItem('booha_return_ix',String(HW_TREE_IX));
+  sessionStorage.setItem('booha_return_iy',String(HW_TREE_IY));
 
   let left=false;
   function leaveNow(){
@@ -1465,14 +1470,7 @@ function closeKarasukiPrompt(){
 function playKarasukiVideoAndGo(){
   closeKarasukiPrompt();
 
-  // Graceful music fade-out (1.3 s)
-  const fadeMs=1300,startVol=bgMusic.volume,t0=performance.now();
-  (function fadeTick(){
-    const p=Math.min((performance.now()-t0)/fadeMs,1);
-    try{bgMusic.volume=startVol*(1-p);}catch(e){}
-    if(p<1)requestAnimationFrame(fadeTick);
-    else{try{bgMusic.pause();bgMusic.volume=startVol;}catch(e){}}
-  })();
+  // Music keeps playing — no fade-out
 
   try{krVideo.pause();krVideo.currentTime=0;}catch(e){}
 
@@ -1483,6 +1481,9 @@ function playKarasukiVideoAndGo(){
   sessionStorage.setItem('booha_return_to_checkpoint','1');
   sessionStorage.setItem('booha_return_week',String(activeWeek));
   sessionStorage.setItem('booha_return_ghost',String(activeGhostIdx));
+  // Store exact ghost position so it returns to the tree, not the week CP
+  sessionStorage.setItem('booha_return_ix',String(KR_TREE_IX));
+  sessionStorage.setItem('booha_return_iy',String(KR_TREE_IY));
 
   let left=false;
   function leaveNow(){
@@ -1622,10 +1623,12 @@ function fadeOut(){
 document.addEventListener('visibilitychange',()=>{
   if(document.hidden){
     try{toMazeVideo.pause();}catch(e){}
-    try{bgMusic.pause();}catch(e){}
+    // Only pause music if we're still on the intro video; once maze is launched music loops forever
+    if(!mazeLaunched)try{bgMusic.pause();}catch(e){}
   } else {
     if(videoPlayed&&!o2shown)try{toMazeVideo.play();}catch(e){}
-    if(mazeLaunched&&!sessionStorage.getItem('booha_return_to_checkpoint'))try{bgMusic.play();}catch(e){}
+    // Always resume music when maze is active
+    if(mazeLaunched)try{bgMusic.loop=true;bgMusic.volume=.65;bgMusic.play().catch(()=>{});}catch(e){}
   }
 });
 
