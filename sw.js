@@ -8,33 +8,34 @@ const CACHE_NAME   = 'booha-adventure-v1';
 const ASSET_CACHE  = 'booha-assets-v1';
 const DECK_CACHE   = 'booha-decks-v1';
 
+const BASE = '/the-booha-adventure';
+
 // ── Core pages ───────────────────────────────────────────────
 const CORE_FILES = [
-  '/',
-  '/index.html',
-  '/maze.html',
-  '/karasuki.html',
-  '/homework.html',
-  '/manifest.json',
-  '/icons/icon-192.png',
-  '/icons/icon-512.png',
-  '/icons/icon-maskable-512.png',
+  `${BASE}/`,
+  `${BASE}/index.html`,
+  `${BASE}/maze.html`,
+  `${BASE}/karasuki.html`,
+  `${BASE}/homework.html`,
+  `${BASE}/manifest.json`,
+  `${BASE}/icons/icon-192.png`,
+  `${BASE}/icons/icon-512.png`,
+  `${BASE}/icons/icon-maskable-512.png`,
 ];
 
 // ── Asset folder prefixes (matched at runtime) ───────────────
 const ASSET_PREFIXES = [
-  '/js/',
-  '/theme/',
-  '/audio/',
-  '/content/',
-  '/icons/',
+  `${BASE}/js/`,
+  `${BASE}/theme/`,
+  `${BASE}/audio/`,
+  `${BASE}/content/`,
+  `${BASE}/icons/`,
+  `${BASE}/assets/`,
 ];
 
 // ── Study deck URL patterns ──────────────────────────────────
 const DECK_PATTERNS = [
-  /\/decks\//,
-  /\/content\/decks\//,
-  /\/content\/cards\//,
+  /\/the-booha-adventure\/content\//,
   /\.json$/,
 ];
 
@@ -46,7 +47,6 @@ self.addEventListener('install', event => {
     caches.open(CACHE_NAME).then(cache => {
       console.log('[SW] Pre-caching core files');
       return cache.addAll(CORE_FILES).catch(err => {
-        // Don't fail install if some optional pages are missing yet
         console.warn('[SW] Some core files could not be cached:', err);
       });
     })
@@ -86,7 +86,10 @@ self.addEventListener('fetch', event => {
 
   const path = url.pathname;
 
-  // ── Study decks → Cache-first, then network ──────────────
+  // Only handle requests under our base path
+  if (!path.startsWith(BASE)) return;
+
+  // ── Study decks / JSON → Cache-first, then network ───────
   if (DECK_PATTERNS.some(p => p.test(path))) {
     event.respondWith(cacheFirst(request, DECK_CACHE));
     return;
@@ -99,7 +102,7 @@ self.addEventListener('fetch', event => {
   }
 
   // ── HTML pages → Network-first, fall back to cache ───────
-  if (request.headers.get('accept')?.includes('text/html') || path.endsWith('.html') || path === '/') {
+  if (request.headers.get('accept')?.includes('text/html') || path.endsWith('.html') || path === `${BASE}/`) {
     event.respondWith(networkFirst(request, CACHE_NAME));
     return;
   }
@@ -112,10 +115,9 @@ self.addEventListener('fetch', event => {
 //  Strategy helpers
 // ============================================================
 
-/** Return cached version instantly; update cache in background */
 async function staleWhileRevalidate(request, cacheName) {
-  const cache    = await caches.open(cacheName);
-  const cached   = await cache.match(request);
+  const cache = await caches.open(cacheName);
+  const cached = await cache.match(request);
   const fetchPromise = fetch(request).then(response => {
     if (response.ok) cache.put(request, response.clone());
     return response;
@@ -124,7 +126,6 @@ async function staleWhileRevalidate(request, cacheName) {
   return cached || await fetchPromise || offlineFallback(request);
 }
 
-/** Serve from cache; only hit network on a miss */
 async function cacheFirst(request, cacheName) {
   const cache  = await caches.open(cacheName);
   const cached = await cache.match(request);
@@ -139,7 +140,6 @@ async function cacheFirst(request, cacheName) {
   }
 }
 
-/** Always try network first; fall back to cache */
 async function networkFirst(request, cacheName) {
   const cache = await caches.open(cacheName);
   try {
@@ -152,11 +152,10 @@ async function networkFirst(request, cacheName) {
   }
 }
 
-/** Last-resort offline page */
 async function offlineFallback(request) {
   if (request.headers.get('accept')?.includes('text/html')) {
     const cache = await caches.open(CACHE_NAME);
-    return (await cache.match('/index.html')) || new Response(
+    return (await cache.match(`${BASE}/index.html`)) || new Response(
       '<h1>Booha Adventure — Offline</h1><p>Please connect to the internet to load this page for the first time.</p>',
       { headers: { 'Content-Type': 'text/html' } }
     );
@@ -165,8 +164,7 @@ async function offlineFallback(request) {
 }
 
 // ============================================================
-//  MESSAGE — allow pages to trigger cache refresh
-//  Usage: navigator.serviceWorker.controller.postMessage({ type: 'SKIP_WAITING' })
+//  MESSAGE
 // ============================================================
 self.addEventListener('message', event => {
   if (event.data?.type === 'SKIP_WAITING') self.skipWaiting();
