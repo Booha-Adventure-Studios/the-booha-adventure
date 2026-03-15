@@ -1,0 +1,391 @@
+
+/**
+ * save-ui.css
+ * The Booha Adventure — Save UI Styles
+ * Covers: floating toggle button, slide-in save panel,
+ *         memory code modal, unlock toast, shared tokens.
+ *
+ * Design language: playful-retro pixel-adjacent adventure feel.
+ * Warm amber & deep teal palette. Chunky borders. Pixel-friendly font stack.
+ */
+
+/* ── Design tokens ───────────────────────────────────────────────────────── */
+:root {
+  --booha-bg:           #1a1a2e;
+  --booha-panel-bg:     #16213e;
+  --booha-surface:      #0f3460;
+  --booha-accent:       #f5a623;
+  --booha-accent-dim:   #c47d0e;
+  --booha-teal:         #00b4d8;
+  --booha-teal-dim:     #0077a8;
+  --booha-danger:       #e63946;
+  --booha-danger-dim:   #a4262f;
+  --booha-text:         #f0e6d3;
+  --booha-text-muted:   #9da3b4;
+  --booha-border:       #f5a62344;
+  --booha-border-solid: #f5a623;
+  --booha-radius:       6px;
+  --booha-panel-w:      300px;
+  --booha-shadow:       0 8px 32px #00000088;
+  --booha-font:         'Courier New', 'Lucida Console', monospace;
+  --booha-font-ui:      system-ui, sans-serif;
+  --booha-transition:   0.25s ease;
+  --booha-z-overlay:    9000;
+  --booha-z-panel:      9001;
+  --booha-z-modal:      9002;
+  --booha-z-toast:      9003;
+  --booha-z-toggle:     8999;
+}
+
+/* ── Overlay ─────────────────────────────────────────────────────────────── */
+.booha-overlay {
+  position:   fixed;
+  inset:      0;
+  background: #00000066;
+  opacity:    0;
+  pointer-events: none;
+  transition: opacity var(--booha-transition);
+  z-index:    var(--booha-z-overlay);
+}
+.booha-overlay--visible {
+  opacity:        1;
+  pointer-events: auto;
+}
+
+/* ── Floating toggle button ──────────────────────────────────────────────── */
+.booha-save-toggle-btn {
+  position:   fixed;
+  bottom:     1.25rem;
+  right:      1.25rem;
+  z-index:    var(--booha-z-toggle);
+  width:      3rem;
+  height:     3rem;
+  font-size:  1.4rem;
+  line-height: 1;
+  border:     3px solid var(--booha-border-solid);
+  border-radius: 50%;
+  background: var(--booha-panel-bg);
+  color:      var(--booha-text);
+  cursor:     pointer;
+  box-shadow: var(--booha-shadow);
+  transition: transform 0.15s ease, background 0.15s ease;
+  display:    flex;
+  align-items: center;
+  justify-content: center;
+}
+.booha-save-toggle-btn:hover {
+  background: var(--booha-surface);
+  transform:  scale(1.12);
+}
+.booha-save-toggle-btn:active {
+  transform: scale(0.95);
+}
+
+/* ── Save panel ──────────────────────────────────────────────────────────── */
+.booha-save-panel {
+  position:   fixed;
+  top:        0;
+  right:      0;
+  width:      var(--booha-panel-w);
+  max-width:  100vw;
+  height:     100dvh;
+  background: var(--booha-panel-bg);
+  border-left: 3px solid var(--booha-border-solid);
+  box-shadow: var(--booha-shadow);
+  z-index:    var(--booha-z-panel);
+  transform:  translateX(100%);
+  transition: transform var(--booha-transition);
+  overflow-y: auto;
+  padding:    1.5rem 1.25rem 2rem;
+  font-family: var(--booha-font);
+  color:      var(--booha-text);
+  display:    flex;
+  flex-direction: column;
+  gap:        0.25rem;
+}
+.booha-save-panel--open {
+  transform: translateX(0);
+}
+
+/* Panel header */
+.booha-panel-header {
+  display:    flex;
+  align-items: center;
+  gap:        0.5rem;
+  margin-bottom: 1.25rem;
+}
+.booha-panel-icon { font-size: 1.6rem; }
+.booha-panel-title {
+  font-size:   1.2rem;
+  font-weight: 700;
+  color:       var(--booha-accent);
+  margin:      0;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Close button */
+.booha-close-btn {
+  position:   absolute;
+  top:        0.75rem;
+  right:      0.75rem;
+  background: transparent;
+  border:     none;
+  color:      var(--booha-text-muted);
+  font-size:  1.2rem;
+  cursor:     pointer;
+  padding:    0.25rem 0.4rem;
+  border-radius: var(--booha-radius);
+  transition: color 0.15s, background 0.15s;
+  font-family: var(--booha-font-ui);
+}
+.booha-close-btn:hover {
+  color:      var(--booha-text);
+  background: #ffffff18;
+}
+
+/* ── Save sections ───────────────────────────────────────────────────────── */
+.booha-save-section {
+  background: var(--booha-surface);
+  border:     2px solid var(--booha-border);
+  border-radius: var(--booha-radius);
+  padding:    1rem 0.9rem;
+  display:    flex;
+  flex-direction: column;
+  gap:        0.6rem;
+  margin-bottom: 0.75rem;
+}
+.booha-section-title {
+  font-size:  0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color:      var(--booha-accent);
+  margin:     0 0 0.25rem;
+}
+.booha-section-hint {
+  font-size:  0.75rem;
+  color:      var(--booha-text-muted);
+  margin:     -0.25rem 0 0.25rem;
+}
+.booha-danger-zone {
+  border-color: var(--booha-danger);
+}
+.booha-danger-zone .booha-section-title {
+  color: var(--booha-danger);
+}
+
+/* ── Buttons ─────────────────────────────────────────────────────────────── */
+.booha-btn {
+  display:    flex;
+  align-items: center;
+  gap:        0.5rem;
+  padding:    0.55rem 0.85rem;
+  border:     2px solid var(--booha-teal);
+  border-radius: var(--booha-radius);
+  background: transparent;
+  color:      var(--booha-teal);
+  font-family: var(--booha-font);
+  font-size:  0.82rem;
+  cursor:     pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  text-align: left;
+  width:      100%;
+}
+.booha-btn:hover {
+  background: var(--booha-teal);
+  color:      var(--booha-bg);
+}
+.booha-btn:active {
+  opacity: 0.8;
+}
+.booha-btn-icon { font-size: 1rem; flex-shrink: 0; }
+
+.booha-btn-primary {
+  border-color: var(--booha-accent);
+  color:        var(--booha-accent);
+}
+.booha-btn-primary:hover {
+  background: var(--booha-accent);
+  color:      var(--booha-bg);
+}
+
+.booha-btn-danger {
+  border-color: var(--booha-danger);
+  color:        var(--booha-danger);
+}
+.booha-btn-danger:hover {
+  background: var(--booha-danger);
+  color:      #fff;
+}
+
+/* ── Status line ─────────────────────────────────────────────────────────── */
+.booha-save-status {
+  font-size:  0.78rem;
+  min-height: 1.1em;
+  color:      var(--booha-text-muted);
+  text-align: center;
+  margin-top: auto;
+  padding-top: 0.5rem;
+}
+.booha-status--ok    { color: #4ade80; }
+.booha-status--error { color: var(--booha-danger); }
+.booha-status--warn  { color: var(--booha-accent); }
+
+/* ── Modal ───────────────────────────────────────────────────────────────── */
+.booha-modal {
+  position:   fixed;
+  inset:      0;
+  background: #00000088;
+  display:    flex;
+  align-items: center;
+  justify-content: center;
+  z-index:    var(--booha-z-modal);
+  opacity:    0;
+  transition: opacity var(--booha-transition);
+  padding:    1rem;
+}
+.booha-modal--visible { opacity: 1; }
+
+.booha-modal-inner {
+  background: var(--booha-panel-bg);
+  border:     3px solid var(--booha-border-solid);
+  border-radius: var(--booha-radius);
+  padding:    1.75rem 1.5rem 1.5rem;
+  max-width:  480px;
+  width:      100%;
+  position:   relative;
+  font-family: var(--booha-font);
+  color:      var(--booha-text);
+  box-shadow: var(--booha-shadow);
+}
+.booha-modal-title {
+  font-size:  1rem;
+  color:      var(--booha-accent);
+  margin:     0 0 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.booha-modal-close {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+}
+
+/* Memory code display */
+.booha-code-instructions {
+  font-size:  0.82rem;
+  color:      var(--booha-text-muted);
+  margin:     0 0 0.75rem;
+  line-height: 1.5;
+}
+.booha-code-display {
+  background:   #0a0a1a;
+  border:       2px solid var(--booha-border);
+  border-radius: var(--booha-radius);
+  padding:      0.75rem;
+  font-size:    0.72rem;
+  color:        var(--booha-teal);
+  white-space:  pre-wrap;
+  word-break:   break-all;
+  line-height:  1.6;
+  max-height:   10rem;
+  overflow-y:   auto;
+  margin-bottom: 0.75rem;
+  user-select:  all;
+}
+.booha-code-input {
+  width:        100%;
+  box-sizing:   border-box;
+  background:   #0a0a1a;
+  border:       2px solid var(--booha-border);
+  border-radius: var(--booha-radius);
+  padding:      0.65rem;
+  color:        var(--booha-teal);
+  font-family:  var(--booha-font);
+  font-size:    0.72rem;
+  resize:       vertical;
+  margin-bottom: 0.75rem;
+}
+.booha-code-input:focus {
+  outline:      none;
+  border-color: var(--booha-accent);
+}
+.booha-code-actions {
+  display:   flex;
+  gap:       0.5rem;
+  flex-wrap: wrap;
+}
+.booha-code-status {
+  font-size:  0.78rem;
+  min-height: 1.1em;
+  margin-top: 0.5rem;
+  color:      var(--booha-text-muted);
+}
+
+/* ── Unlock toast ────────────────────────────────────────────────────────── */
+.booha-unlock-toast {
+  position:   fixed;
+  bottom:     5rem;
+  right:      1.25rem;
+  z-index:    var(--booha-z-toast);
+  display:    flex;
+  align-items: flex-start;
+  gap:        0.75rem;
+  background: var(--booha-panel-bg);
+  border:     2px solid var(--booha-accent);
+  border-radius: var(--booha-radius);
+  padding:    0.85rem 1rem;
+  max-width:  280px;
+  box-shadow: var(--booha-shadow);
+  font-family: var(--booha-font);
+  color:      var(--booha-text);
+  transform:  translateY(1rem);
+  opacity:    0;
+  transition: transform 0.35s ease, opacity 0.35s ease;
+}
+.booha-unlock-toast--visible {
+  transform: translateY(0);
+  opacity:   1;
+}
+.booha-unlock-icon { font-size: 1.5rem; flex-shrink: 0; }
+.booha-unlock-toast strong {
+  display:    block;
+  color:      var(--booha-accent);
+  font-size:  0.85rem;
+  margin-bottom: 0.2rem;
+}
+.booha-unlock-toast p {
+  font-size:  0.75rem;
+  color:      var(--booha-text-muted);
+  margin:     0;
+  line-height: 1.4;
+}
+
+/* ── Reduced-motion ──────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .booha-save-panel,
+  .booha-overlay,
+  .booha-modal,
+  .booha-unlock-toast,
+  .booha-save-toggle-btn {
+    transition: none;
+  }
+}
+
+/* ── Mobile ──────────────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .booha-save-panel {
+    width: 100vw;
+    border-left: none;
+    border-top: 3px solid var(--booha-border-solid);
+    height: 80dvh;
+    top: auto;
+    bottom: 0;
+    right: 0;
+    transform: translateY(100%);
+    border-radius: 12px 12px 0 0;
+  }
+  .booha-save-panel--open {
+    transform: translateY(0);
+  }
+}
