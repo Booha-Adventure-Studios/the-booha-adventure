@@ -10,91 +10,112 @@ const BoohaUnlockSystem = (() => {
   'use strict';
 
   /**
-   * UNLOCK DEFINITIONS
-   * id          — unique key stored in save.unlocks
-   * name        — human-readable label
-   * description — shown in UI
-   * condition() — returns true when this unlock should trigger
+   * UNLOCK DEFINITIONS — completion-only triggers.
    *
-   * All unlocks are triggered by game completion only.
+   * Since scores are per-curriculum, completion checks use the full saveId
+   * e.g. "bc:vocab_tap". Milestone unlocks count across all curriculums.
+   *
+   * Helper: isGameDone(curriculum, baseId)
    */
+  function _done(curriculum, baseId) {
+    return BoohaAdventure.scores.isCompleted(
+      BoohaAdventure.registry.saveId(curriculum, baseId)
+    );
+  }
+
+  function _totalCompleted() {
+    return BoohaAdventure.scores.totalCompleted();
+  }
+
   const UNLOCKS = [
-    // ── First completion ──────────────────────────────────────────────────
+    // ── First ever completion ─────────────────────────────────────────────
     {
       id:          'first_game',
       name:        'Adventure Begins!',
       description: 'Complete your first game.',
-      condition()  { return BoohaAdventure.scores.totalCompleted() >= 1; },
+      condition()  { return _totalCompleted() >= 1; },
     },
 
-    // ── Individual game completions ───────────────────────────────────────
+    // ── BC curriculum ─────────────────────────────────────────────────────
+    { id: 'bc:ask_sentence',  name: 'BC: Ask a Sentence',  description: 'Complete Ask a Sentence (BC).',  condition() { return _done('bc','ask_sentence'); } },
+    { id: 'bc:say_sentence',  name: 'BC: Say a Sentence',  description: 'Complete Say a Sentence (BC).',  condition() { return _done('bc','say_sentence'); } },
+    { id: 'bc:say_word',      name: 'BC: Say a Word',      description: 'Complete Say a Word (BC).',      condition() { return _done('bc','say_word'); } },
+    { id: 'bc:sentence_order',name: 'BC: Sentence Order',  description: 'Complete Sentence Order (BC).',  condition() { return _done('bc','sentence_order'); } },
+    { id: 'bc:sentence_speed',name: 'BC: Sentence Speed',  description: 'Complete Sentence Speed (BC).',  condition() { return _done('bc','sentence_speed'); } },
+    { id: 'bc:sentence_tap',  name: 'BC: Sentence Tap',    description: 'Complete Sentence Tap (BC).',    condition() { return _done('bc','sentence_tap'); } },
+    { id: 'bc:spell_word',    name: 'BC: Spell a Word',    description: 'Complete Spell a Word (BC).',    condition() { return _done('bc','spell_word'); } },
+    { id: 'bc:vocab_speed',   name: 'BC: Vocab Speed',     description: 'Complete Vocab Speed (BC).',     condition() { return _done('bc','vocab_speed'); } },
+    { id: 'bc:vocab_tap',     name: 'BC: Vocab Tap',       description: 'Complete Vocab Tap (BC).',       condition() { return _done('bc','vocab_tap'); } },
+
+    // ── BR curriculum ─────────────────────────────────────────────────────
+    { id: 'br:ask_sentence',  name: 'BR: Ask a Sentence',  description: 'Complete Ask a Sentence (BR).',  condition() { return _done('br','ask_sentence'); } },
+    { id: 'br:say_sentence',  name: 'BR: Say a Sentence',  description: 'Complete Say a Sentence (BR).',  condition() { return _done('br','say_sentence'); } },
+    { id: 'br:say_word',      name: 'BR: Say a Word',      description: 'Complete Say a Word (BR).',      condition() { return _done('br','say_word'); } },
+    { id: 'br:sentence_order',name: 'BR: Sentence Order',  description: 'Complete Sentence Order (BR).',  condition() { return _done('br','sentence_order'); } },
+    { id: 'br:sentence_speed',name: 'BR: Sentence Speed',  description: 'Complete Sentence Speed (BR).',  condition() { return _done('br','sentence_speed'); } },
+    { id: 'br:sentence_tap',  name: 'BR: Sentence Tap',    description: 'Complete Sentence Tap (BR).',    condition() { return _done('br','sentence_tap'); } },
+    { id: 'br:spell_word',    name: 'BR: Spell a Word',    description: 'Complete Spell a Word (BR).',    condition() { return _done('br','spell_word'); } },
+    { id: 'br:vocab_speed',   name: 'BR: Vocab Speed',     description: 'Complete Vocab Speed (BR).',     condition() { return _done('br','vocab_speed'); } },
+    { id: 'br:vocab_tap',     name: 'BR: Vocab Tap',       description: 'Complete Vocab Tap (BR).',       condition() { return _done('br','vocab_tap'); } },
+
+    // ── PB curriculum ─────────────────────────────────────────────────────
+    { id: 'pb:ask_sentence',  name: 'PB: Ask a Sentence',  description: 'Complete Ask a Sentence (PB).',  condition() { return _done('pb','ask_sentence'); } },
+    { id: 'pb:say_sentence',  name: 'PB: Say a Sentence',  description: 'Complete Say a Sentence (PB).',  condition() { return _done('pb','say_sentence'); } },
+    { id: 'pb:say_word',      name: 'PB: Say a Word',      description: 'Complete Say a Word (PB).',      condition() { return _done('pb','say_word'); } },
+    { id: 'pb:sentence_order',name: 'PB: Sentence Order',  description: 'Complete Sentence Order (PB).',  condition() { return _done('pb','sentence_order'); } },
+    { id: 'pb:sentence_speed',name: 'PB: Sentence Speed',  description: 'Complete Sentence Speed (PB).',  condition() { return _done('pb','sentence_speed'); } },
+    { id: 'pb:sentence_tap',  name: 'PB: Sentence Tap',    description: 'Complete Sentence Tap (PB).',    condition() { return _done('pb','sentence_tap'); } },
+    { id: 'pb:spell_word',    name: 'PB: Spell a Word',    description: 'Complete Spell a Word (PB).',    condition() { return _done('pb','spell_word'); } },
+    { id: 'pb:vocab_speed',   name: 'PB: Vocab Speed',     description: 'Complete Vocab Speed (PB).',     condition() { return _done('pb','vocab_speed'); } },
+    { id: 'pb:vocab_tap',     name: 'PB: Vocab Tap',       description: 'Complete Vocab Tap (PB).',       condition() { return _done('pb','vocab_tap'); } },
+
+    // ── Curriculum completion milestones ──────────────────────────────────
     {
-      id:          'complete_maze',
-      name:        'Maze Cleared',
-      description: 'Complete Maze Adventure.',
-      condition()  { return BoohaAdventure.scores.isCompleted('maze'); },
+      id:          'bc:all_complete',
+      name:        'BC Champion!',
+      description: 'Complete all 9 BC games.',
+      condition()  {
+        return BoohaAdventure.registry.getForCurriculum('bc')
+          .every(g => BoohaAdventure.scores.isCompleted(g.saveId));
+      },
     },
     {
-      id:          'complete_karasuki',
-      name:        'Karasuki Clear!',
-      description: 'Complete Karasuki.',
-      condition()  { return BoohaAdventure.scores.isCompleted('karasuki'); },
+      id:          'br:all_complete',
+      name:        'BR Champion!',
+      description: 'Complete all 9 BR games.',
+      condition()  {
+        return BoohaAdventure.registry.getForCurriculum('br')
+          .every(g => BoohaAdventure.scores.isCompleted(g.saveId));
+      },
     },
     {
-      id:          'complete_homework',
-      name:        'Homework Done!',
-      description: 'Complete Homework Challenge.',
-      condition()  { return BoohaAdventure.scores.isCompleted('homework'); },
-    },
-    {
-      id:          'complete_study_deck',
-      name:        'Deck Mastered',
-      description: 'Complete Study Deck.',
-      condition()  { return BoohaAdventure.scores.isCompleted('study_deck'); },
-    },
-    {
-      id:          'complete_game_5',
-      name:        'Game 5 Clear',
-      description: 'Complete Game 5.',
-      condition()  { return BoohaAdventure.scores.isCompleted('game_5'); },
-    },
-    {
-      id:          'complete_game_6',
-      name:        'Game 6 Clear',
-      description: 'Complete Game 6.',
-      condition()  { return BoohaAdventure.scores.isCompleted('game_6'); },
-    },
-    {
-      id:          'complete_game_7',
-      name:        'Game 7 Clear',
-      description: 'Complete Game 7.',
-      condition()  { return BoohaAdventure.scores.isCompleted('game_7'); },
-    },
-    {
-      id:          'complete_game_8',
-      name:        'Game 8 Clear',
-      description: 'Complete Game 8.',
-      condition()  { return BoohaAdventure.scores.isCompleted('game_8'); },
-    },
-    {
-      id:          'complete_game_9',
-      name:        'Game 9 Clear',
-      description: 'Complete Game 9.',
-      condition()  { return BoohaAdventure.scores.isCompleted('game_9'); },
+      id:          'pb:all_complete',
+      name:        'PB Champion!',
+      description: 'Complete all 9 PB games.',
+      condition()  {
+        return BoohaAdventure.registry.getForCurriculum('pb')
+          .every(g => BoohaAdventure.scores.isCompleted(g.saveId));
+      },
     },
 
-    // ── Milestone completions ─────────────────────────────────────────────
+    // ── Core milestone — any one curriculum fully cleared ─────────────────
     {
-      id:          'half_complete',
-      name:        'Halfway There',
-      description: 'Complete 5 out of 9 games.',
-      condition()  { return BoohaAdventure.scores.totalCompleted() >= 5; },
+      id:          'any_curriculum_complete',
+      name:        'Curriculum Complete!',
+      description: 'Complete all 9 games in any curriculum.',
+      condition()  {
+        return BoohaAdventure.registry.CURRICULUMS.some(c =>
+          BoohaAdventure.scores.totalCompletedFor(c) >= 9
+        );
+      },
     },
+
+    // ── Bonus milestone — all curriculums ─────────────────────────────────
     {
       id:          'all_complete',
-      name:        'Adventure Complete!',
-      description: 'Complete all 9 games.',
-      condition()  { return BoohaAdventure.scores.totalCompleted() >= 9; },
+      name:        'Booha Master!',
+      description: 'Complete all 27 games across all curriculums.',
+      condition()  { return _totalCompleted() >= 27; },
     },
   ];
 
