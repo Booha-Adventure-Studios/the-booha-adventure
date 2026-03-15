@@ -1,6 +1,4 @@
 
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,6 +6,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Boo-Continuum</title>
 <meta name="theme-color" content="#07080f">
+
+<!-- ═══ PWA ═══════════════════════════════════════════════ -->
+<link rel="manifest" href="/manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Booha Adventure">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
+<!-- ═════════════════════════════════════════════════════════ -->
+
 <link href="https://fonts.googleapis.com/css2?family=Grenze:ital,wght@0,400;0,600;0,700;1,400&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet" />
 
 <style>
@@ -92,8 +100,6 @@ html, body {
 }
 
 /* ── Atmospheric depth layers ── */
-
-/* Faint vignette to deepen corners */
 body::after {
   content: '';
   position: fixed;
@@ -106,7 +112,6 @@ body::after {
   );
 }
 
-/* Cross-hatched parchment grain */
 body::before {
   content: '';
   position: fixed;
@@ -132,7 +137,6 @@ body::before {
   background-size: 32px 32px;
 }
 
-/* Moody ambient glows — slow, heavy */
 .bg-glow {
   position: fixed;
   border-radius: 50%;
@@ -191,7 +195,6 @@ body::before {
   margin-bottom: 18px;
 }
 
-/* Slow-rotating rune ring around the icon */
 .boo-icon-wrap::before {
   content: '';
   position: absolute;
@@ -244,7 +247,6 @@ body::before {
   line-height: 1;
   color: var(--white);
   text-transform: uppercase;
-  /* Engraved feel — inner shadow + outer glow */
   text-shadow:
     0 0 40px rgba(212,64,76,.4),
     0 0 12px rgba(212,64,76,.2),
@@ -252,7 +254,6 @@ body::before {
     0 -1px 0 rgba(240,236,228,.08);
 }
 
-/* Thin rule with crimson centre spark */
 .title-rule {
   display: flex;
   align-items: center;
@@ -288,7 +289,7 @@ body::before {
   font-style: italic;
 }
 
-/* ── Week badge — minimal, archival ── */
+/* ── Week badge ── */
 .week-badge {
   display: inline-flex;
   align-items: center;
@@ -302,7 +303,6 @@ body::before {
   -webkit-backdrop-filter: blur(8px);
   position: relative;
 }
-/* Corner ticks — manuscript-style */
 .week-badge::before,
 .week-badge::after {
   content: '';
@@ -356,7 +356,6 @@ a.deck.c2 { --tile-bg:var(--c2-bg); --border-c:var(--c2-border); --halo:var(--c2
 a.deck.c3 { --tile-bg:var(--c3-bg); --border-c:var(--c3-border); --halo:var(--c3-halo); --ring-a:var(--c3-ring-a); --ring-b:var(--c3-ring-b); --mote-c:var(--c3-mote); }
 a.deck.c4 { --tile-bg:var(--c4-bg); --border-c:var(--c4-border); --halo:var(--c4-halo); --ring-a:var(--c4-ring-a); --ring-b:var(--c4-ring-b); --mote-c:var(--c4-mote); }
 
-/* Slow conic ring — more restrained than Pre-Boo */
 a.deck::before {
   content: "";
   position: absolute;
@@ -375,7 +374,6 @@ a.deck::before {
   pointer-events: none;
 }
 
-/* Halo — appears on hover only */
 a.deck::after {
   content: "";
   position: absolute;
@@ -393,7 +391,6 @@ a.deck:hover::after {
   transform: scale(1) translateZ(0);
 }
 
-/* Tile face */
 a.deck .clip {
   position: absolute;
   inset: 0;
@@ -421,7 +418,6 @@ a.deck .inner {
   text-align: center;
 }
 
-/* Subtle top gloss — less glossy than Pre-Boo */
 a.deck .inner::before {
   content: '';
   position: absolute;
@@ -432,7 +428,6 @@ a.deck .inner::before {
   pointer-events: none;
 }
 
-/* Slow shimmer on hover */
 a.deck .inner::after {
   content: "";
   position: absolute;
@@ -446,7 +441,7 @@ a.deck .inner::after {
 }
 a.deck:hover .inner::after { background-position: -60% 100%; }
 
-/* ── Three-layer label (same structure as Pre-Boo) ── */
+/* ── Three-layer label ── */
 .tile-label-wrap {
   display: flex;
   flex-direction: column;
@@ -454,7 +449,6 @@ a.deck:hover .inner::after { background-position: -60% 100%; }
   gap: 4px;
 }
 
-/* English — Grenze, authoritative */
 .label-en {
   font-family: var(--font-head);
   font-weight: 700;
@@ -466,7 +460,6 @@ a.deck:hover .inner::after { background-position: -60% 100%; }
   text-transform: uppercase;
 }
 
-/* Hiragana reading — airy, thin */
 .label-hira {
   font-family: var(--font-jp);
   font-weight: 400;
@@ -476,7 +469,6 @@ a.deck:hover .inner::after { background-position: -60% 100%; }
   line-height: 1;
 }
 
-/* Kanji — medium weight, warm parchment */
 .label-kanji {
   font-family: var(--font-jp);
   font-weight: 700;
@@ -574,7 +566,7 @@ a.deck.playing .clip  { animation: borderFlash .21s ease-in-out infinite; }
 .deck-links a.deck:nth-child(3) { animation-delay: .48s; }
 .deck-links a.deck:nth-child(4) { animation-delay: .60s; }
 
-/* ── Close button — quieter than Pre-Boo ── */
+/* ── Close button ── */
 #btn-close {
   position: fixed;
   top: 18px; right: 18px;
@@ -723,18 +715,17 @@ a.deck.playing .clip  { animation: borderFlash .21s ease-in-out infinite; }
 
 </section>
 
-<!-- ── Background particles — ember-like, slow ── -->
+<!-- ── Background particles ── -->
 <script>
 (function () {
   const canvas = document.getElementById('bg-canvas');
   const ctx    = canvas.getContext('2d');
-  /* Jewel tones from the tile palette — no pastels */
   const COLORS = [
-    '#c03040','#e89090','#d4404c',      /* crimson */
-    '#c08820','#e8cc80','#d4a040',      /* amber */
-    '#6644b8','#b8a0e8','#8868cc',      /* violet */
-    '#2080a8','#80c4d8','#3898b8',      /* teal */
-    'rgba(240,236,228,.7)'              /* parchment white */
+    '#c03040','#e89090','#d4404c',
+    '#c08820','#e8cc80','#d4a040',
+    '#6644b8','#b8a0e8','#8868cc',
+    '#2080a8','#80c4d8','#3898b8',
+    'rgba(240,236,228,.7)'
   ];
   function resize() {
     canvas.width  = window.innerWidth;
@@ -747,11 +738,11 @@ a.deck.playing .clip  { animation: borderFlash .21s ease-in-out infinite; }
     return {
       x:     Math.random() * (canvas.width  || 400),
       y:     scatter ? Math.random() * (canvas.height || 700) : (canvas.height || 700) + 12,
-      r:     .4 + Math.random() * 1.6,      /* smaller, ember-like */
-      vx:    (Math.random() - .5) * .15,    /* slower drift */
+      r:     .4 + Math.random() * 1.6,
+      vx:    (Math.random() - .5) * .15,
       vy:    -.03 - Math.random() * .12,
       color: COLORS[Math.floor(Math.random() * COLORS.length)],
-      alpha: .06 + Math.random() * .18,     /* dimmer */
+      alpha: .06 + Math.random() * .18,
       life:  scatter ? Math.random() : 0,
     };
   }
@@ -866,7 +857,6 @@ if (!week || !ctx) {
 
 document.getElementById('week-label').innerHTML = prettyWeekLabel(week);
 
-
 document.getElementById('vocab').href =
   `/the-booha-adventure/study-deck.html?week=${week}&type=vocab`;
 document.getElementById('sentences').href =
@@ -875,9 +865,6 @@ document.getElementById('questions').href =
   `/the-booha-adventure/study-deck.html?week=${week}&type=questions`;
 document.getElementById('stream').href =
   `/the-booha-adventure/study-deck.html?week=${week}&type=stream`;
-
-
-  
 </script>
 
 <script>
