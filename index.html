@@ -5,6 +5,17 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Booha Adventure</title>
+
+  <!-- ═══ PWA ═══════════════════════════════════════════════ -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#000000">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Booha Adventure">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+  <!-- ═══════════════════════════════════════════════════════ -->
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bowlby+One&display=swap" rel="stylesheet" />
@@ -376,6 +387,7 @@
     .hubBottom {
       display: flex;
       justify-content: center;
+      gap: 12px;
       padding-top: 2px;
     }
 
@@ -400,6 +412,11 @@
     .btnSmall {
       padding: clamp(8px,1.2vw,11px) clamp(12px,2vw,18px);
       font-size: clamp(12px,1.5vw,14px);
+    }
+
+    /* ── Install button ── */
+    #pwa-install-btn {
+      display: none; /* shown by pwa-init.js when prompt is available */
     }
 
     /* ── Fade layer ── */
@@ -660,6 +677,10 @@
         <div class="hubRow" id="weekCards"></div>
         <div class="hubBottom">
           <button id="mazeBtn" class="btn btnSmall" type="button">めいろへ（Maze）</button>
+          <!-- ═══ PWA: Install button (hidden until browser fires beforeinstallprompt) ═══ -->
+          <button id="pwa-install-btn" class="btn btnSmall" type="button" onclick="boohaInstallPWA()">
+            📲 インストール
+          </button>
         </div>
       </div>
     </div>
@@ -1117,5 +1138,10 @@ window.addEventListener('pageshow', ev => {
   }
 });
 </script>
+
+<!-- ═══ PWA: Service worker registration + install prompt ═══ -->
+<script src="/pwa-init.js"></script>
+<!-- ═════════════════════════════════════════════════════════ -->
+
 </body>
 </html>
