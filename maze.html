@@ -5,6 +5,17 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Booha Adventure — Maze</title>
+
+  <!-- ═══ PWA ═══════════════════════════════════════════════ -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#000000">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Booha Adventure">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+  <!-- ═════════════════════════════════════════════════════════ -->
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bowlby+One&display=swap" rel="stylesheet" />
@@ -1051,16 +1062,11 @@ function restoreMazeFromCheckpoint(){
   app.classList.remove('inTransition');
   karasukiLastSwap=performance.now();
   resizeCanvas();buildWanderers();startLoop();
-  // Music always plays and loops in the maze.
-  // After navigation the browser may block autoplay until a user gesture —
-  // so we attempt play immediately and register a one-time any-interaction
-  // listener to resume it if it's still paused.
   bgMusic.loop=true;bgMusic.volume=.65;
   const _musicResume=()=>{
     if(bgMusic.paused)bgMusic.play().catch(()=>{});
   };
   bgMusic.play().catch(()=>{});
-  // Any touch/click/key will unlock audio context and restart music
   ['click','touchstart','keydown','pointerdown'].forEach(ev=>{
     document.addEventListener(ev,function _once(){
       if(bgMusic.paused)bgMusic.play().catch(()=>{});
@@ -1105,11 +1111,15 @@ function tickWanderers(nowMs){
   for(let i=0;i<wanderers.length;i++){if(wanderers[i].done){const gi=wanderers[i].ghostIdx;const delay=performance.now()+3000+Math.random()*8000;wanderers[i]=createWanderer(gi,delay);wanderers[i].startTime=null;}}
 }
 function easeInOut(t){return t<.5?2*t*t:-1+(4-2*t)*t;}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// drawWanderers: renders wandering ghosts — called AFTER checkpoints so they
+// appear on top of orbs, trees, and trail particles.
+// ─────────────────────────────────────────────────────────────────────────────
 function drawWanderers(nowMs){
   for(const w of wanderers){
     if(w.opacity<=0)continue;const img=ghostImgs[w.ghostIdx];if(!img||!img.complete||!img.naturalWidth)continue;
     const gR=GHOST_SIZE/2,gx=w.cx,gy=w.cy;
-    // Smaller on mobile
     const isMobile=window.innerWidth<768;
     const drawR=isMobile?gR*.65:gR;
     const col1=MONTH_COLORS[w.ghostIdx%MONTH_COLORS.length][0],col2=MONTH_COLORS[w.ghostIdx%MONTH_COLORS.length][1];
@@ -1122,7 +1132,7 @@ function drawWanderers(nowMs){
   }
 }
 
-// Returns true if any modal/popup is currently visible — canvas clicks should be ignored
+// Returns true if any modal/popup is currently visible
 function popupOpen(){
   return cpPopup.classList.contains('show')
     || hwPrompt.classList.contains('show')
@@ -1131,8 +1141,6 @@ function popupOpen(){
 
 function setTravelLock(on){
   ghostLocked=on;travelLock.classList.toggle('active',on);
-  // travelLock should be transparent / non-blocking of the popup interactions
-  // but still blocking ghost retargeting — handled in click handlers
   backBtn.style.pointerEvents=on?'none':'';bryanBtn.style.pointerEvents=on?'none':'';
 }
 
@@ -1241,9 +1249,10 @@ function drawFrame(now){
     }
   }
 
+  // ── Layer 1: trees (behind everything) ──────────────────────────────────
   drawTrees(now);
-  tickWanderers(now);drawWanderers(now);
 
+  // ── Layer 2: trail particles ─────────────────────────────────────────────
   for(let i=trail.length-1;i>=0;i--){
     const p=trail[i];const{x,y}=imgToCSS(p.ix,p.iy);
     const gr=ctx.createRadialGradient(x,y,0,x,y,p.size*2.3);gr.addColorStop(0,p.color);gr.addColorStop(1,'transparent');
@@ -1253,8 +1262,8 @@ function drawFrame(now){
   }
   trail=trail.filter(p=>p.life>0);
 
+  // ── Layer 3: checkpoint orbs ─────────────────────────────────────────────
   const{scale:coverScale}=getCover();
-  // Smaller ghost radius on mobile
   const isMobile=cssW<768;
   const activeGhostR=isMobile?20:28;
 
@@ -1285,6 +1294,11 @@ function drawFrame(now){
     ctx.globalAlpha=1;ctx.restore();
   });
 
+  // ── Layer 4: wandering ghosts (on top of orbs & trees) ──────────────────
+  tickWanderers(now);
+  drawWanderers(now);
+
+  // ── Layer 5: active ghost (always topmost) ───────────────────────────────
   if(ghostVisible){
     const bob=Math.sin(sec*1.85)*3.5;const{x:gx,y:gy}=imgToCSS(ghostIX,ghostIY);
     const gR=activeGhostR,pulseG=.5+.5*Math.sin(sec*2.1),gcol1=monthPrimary(activeWeek),gcol2=monthSecondary(activeWeek);
@@ -1322,7 +1336,6 @@ function hitKarasukiTree(clientX,clientY){
   return Math.hypot(ix-KR_TREE_IX,iy-KR_TREE_IY)<KR_TREE_HIT_R;
 }
 
-// Ghost travels to the homework tree, then opens the prompt
 function startGhostTravelToHWTree(){
   if(ghostLocked)return;
   closePopup();
@@ -1335,7 +1348,6 @@ function startGhostTravelToHWTree(){
   setTravelLock(true);
 }
 
-// Ghost travels to the Karasuki tree, then opens the prompt
 function startGhostTravelToKRTree(){
   if(ghostLocked)return;
   closePopup();
@@ -1350,7 +1362,6 @@ function startGhostTravelToKRTree(){
 
 canvas.addEventListener('click',e=>{
   if(!mazeStarted)return;
-  // Block retargeting while ghost is travelling or a popup is open
   if(ghostLocked||popupOpen())return;
   if(['allGlow','dropping','hovering','settling'].includes(introPhase))return;
   if(hitHomeworkTree(e.clientX,e.clientY)){ startGhostTravelToHWTree(); return; }
@@ -1364,7 +1375,6 @@ canvas.addEventListener('click',e=>{
 });
 canvas.addEventListener('touchend',e=>{
   if(!mazeStarted)return;
-  // Block retargeting while ghost is travelling or a popup is open
   if(ghostLocked||popupOpen())return;
   if(['allGlow','dropping','hovering','settling'].includes(introPhase))return;
   if(!e.changedTouches.length)return;
@@ -1429,30 +1439,21 @@ function closeHomeworkPrompt(){
 
 function playHomeworkVideoAndGo(){
   closeHomeworkPrompt();
-
-  // Stop sneaky.mp3 — the homework video has its own music
   try{bgMusic.pause();bgMusic.currentTime=0;}catch(e){}
-
   try{hwTreeVideo.pause();hwTreeVideo.currentTime=0;}catch(e){}
-
-  // Simple fade in
   void hwVideoWrap.offsetWidth;
   hwVideoWrap.classList.add('show');
-
   sessionStorage.setItem('booha_return_to_checkpoint','1');
   sessionStorage.setItem('booha_return_week',String(activeWeek));
   sessionStorage.setItem('booha_return_ghost',String(activeGhostIdx));
-  // Store exact ghost position so it returns to the tree, not the week CP
   sessionStorage.setItem('booha_return_ix',String(HW_TREE_IX));
   sessionStorage.setItem('booha_return_iy',String(HW_TREE_IY));
-
   let left=false;
   function leaveNow(){
     if(left)return;left=true;
     fade.classList.add('on');
     setTimeout(()=>{ window.location.href='homework.html'; },FADE_MS+100);
   }
-
   hwTreeVideo.onended=leaveNow;
   hwTreeVideo.onerror=leaveNow;
   hwTreeVideo.ontimeupdate=()=>{
@@ -1460,7 +1461,6 @@ function playHomeworkVideoAndGo(){
     if(!isFinite(d)||d<=0)return;
     if(d-hwTreeVideo.currentTime<=0.8)leaveNow();
   };
-
   const p=hwTreeVideo.play();
   if(p&&p.catch)p.catch(()=>leaveNow());
 }
@@ -1490,30 +1490,21 @@ function closeKarasukiPrompt(){
 
 function playKarasukiVideoAndGo(){
   closeKarasukiPrompt();
-
-  // Stop sneaky.mp3 — the karasuki video has its own music
   try{bgMusic.pause();bgMusic.currentTime=0;}catch(e){}
-
   try{krVideo.pause();krVideo.currentTime=0;}catch(e){}
-
-  // Simple fade in
   void krVideoWrap.offsetWidth;
   krVideoWrap.classList.add('show');
-
   sessionStorage.setItem('booha_return_to_checkpoint','1');
   sessionStorage.setItem('booha_return_week',String(activeWeek));
   sessionStorage.setItem('booha_return_ghost',String(activeGhostIdx));
-  // Store exact ghost position so it returns to the tree, not the week CP
   sessionStorage.setItem('booha_return_ix',String(KR_TREE_IX));
   sessionStorage.setItem('booha_return_iy',String(KR_TREE_IY));
-
   let left=false;
   function leaveNow(){
     if(left)return;left=true;
     fade.classList.add('on');
     setTimeout(()=>{ window.location.href='karasuki.html'; },FADE_MS+100);
   }
-
   krVideo.onended=leaveNow;
   krVideo.onerror=leaveNow;
   krVideo.ontimeupdate=()=>{
@@ -1521,7 +1512,6 @@ function playKarasukiVideoAndGo(){
     if(!isFinite(d)||d<=0)return;
     if(d-krVideo.currentTime<=0.8)leaveNow();
   };
-
   const p=krVideo.play();
   if(p&&p.catch)p.catch(()=>leaveNow());
 }
@@ -1645,11 +1635,9 @@ function fadeOut(){
 document.addEventListener('visibilitychange',()=>{
   if(document.hidden){
     try{toMazeVideo.pause();}catch(e){}
-    // Only pause music if we're still on the intro video; once maze is launched music loops forever
     if(!mazeLaunched)try{bgMusic.pause();}catch(e){}
   } else {
     if(videoPlayed&&!o2shown)try{toMazeVideo.play();}catch(e){}
-    // Always resume music when maze is active
     if(mazeLaunched)try{bgMusic.loop=true;bgMusic.volume=.65;bgMusic.play().catch(()=>{});}catch(e){}
   }
 });
