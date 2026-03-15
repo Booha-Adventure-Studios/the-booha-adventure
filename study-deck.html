@@ -6,6 +6,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Study Deck</title>
 <meta name="theme-color" content="#0d1a09" id="meta-theme-color">
+
+<!-- ═══ PWA ═══════════════════════════════════════════════ -->
+<link rel="manifest" href="/manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Booha Adventure">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
+<!-- ═════════════════════════════════════════════════════════ -->
+
 <link rel="icon" type="image/png" href="/the-booha-adventure/assets/img/boo-tree.png">
 <link href="https://fonts.googleapis.com/css2?family=Chau+Philomene+One&family=Ranchers&family=Grenze:wght@700;900&family=Nunito:wght@800;900&family=Noto+Sans+JP:wght@500;700;900&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/the-booha-adventure/theme/deck.css" />
@@ -38,7 +48,6 @@
       <div class="hdr-sub"   id="week-label">Loading…</div>
     </header>
 
-    <!-- FIX: unique ID — flashcard version -->
     <div id="preload-bar">Loading audio…</div>
     <div class="card-counter" id="card-counter">– / –</div>
 
@@ -64,7 +73,6 @@
         </div>
 
       </div>
-      <!-- FIX: unique ID — flashcard sparkle -->
       <div id="sparkle-layer" aria-hidden="true"></div>
     </div>
 
@@ -78,7 +86,6 @@
   </div><!-- /flashcard-ui -->
 
   <!-- ── STREAM LAYOUT (hidden for flashcard decks) ── -->
-  <!-- FIX: removed duplicate/conflicting inline display styles; visibility toggled by bootstrap script -->
   <div id="stream-ui" style="display:none">
 
     <header>
@@ -88,7 +95,6 @@
       <div class="hdr-sub"   id="stream-week-label">Loading…</div>
     </header>
 
-    <!-- FIX: unique ID — stream version -->
     <div id="preload-bar-stream">Loading audio…</div>
 
     <div class="stream-badge">
@@ -99,7 +105,6 @@
 
     <div class="card-area" style="perspective:none">
       <div class="card-face single" id="card-face">
-        <!-- FIX: unique ID — stream stripe -->
         <div class="stripe-layer" id="stripe-layer-stream"></div>
         <div class="frosted"></div>
         <div class="card-content">
@@ -113,7 +118,6 @@
           </div>
         </div>
       </div>
-      <!-- FIX: unique ID — stream sparkle -->
       <div id="sparkle-layer-stream" aria-hidden="true"></div>
     </div>
 
@@ -191,7 +195,7 @@
     curriculum:  curriculum,
     type:        type,
     deckMode:    typeCfg.deckMode,
-    monthDir:    monthFull,           // ← add this line
+    monthDir:    monthFull,
 
     // FIX: jsonUrl now includes the month segment so both engines can use it directly
     jsonUrl:     '/the-booha-adventure/content/' + curriculum + '/' + monthFull + '/' + typeCfg.jsonFile,
