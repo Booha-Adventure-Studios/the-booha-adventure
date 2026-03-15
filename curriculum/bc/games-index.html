@@ -6,6 +6,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>BOO CONTINUUM GAMES</title>
 <meta name="theme-color" content="#03060f">
+
+<!-- ═══ PWA ═══════════════════════════════════════════════ -->
+<link rel="manifest" href="/manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Booha Adventure">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
+<!-- ═════════════════════════════════════════════════════════ -->
+
 <link href="https://fonts.googleapis.com/css2?family=Rammetto+One&family=M+PLUS+Rounded+1c:wght@400;700;800&display=swap" rel="stylesheet" />
 <style>
 :root {
@@ -25,10 +35,8 @@
   --font-title: 'Rammetto One', cursive;
   --font-jp: 'M PLUS Rounded 1c', sans-serif;
 }
-
 *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { -webkit-text-size-adjust: 100%; }
-
 body {
   font-family: var(--font-jp);
   background: var(--bg);
@@ -38,7 +46,6 @@ body {
   overflow-x: hidden;
   padding-bottom: 3rem;
 }
-
 /* ── DEEP SPACE BACKGROUND ── */
 .space-bg {
   position: fixed; inset: 0; z-index: 0; pointer-events: none;
@@ -47,7 +54,6 @@ body {
     radial-gradient(ellipse 60% 50% at 80% 80%, rgba(170,0,255,0.1) 0%, transparent 60%),
     radial-gradient(ellipse 50% 40% at 50% 50%, rgba(0,240,255,0.04) 0%, transparent 60%);
 }
-
 /* nebula wisps */
 .nebula {
   position: fixed; border-radius: 50%;
@@ -62,7 +68,6 @@ body {
   from{transform:translate(0,0) scale(1);}
   to  {transform:translate(20px,30px) scale(1.15);}
 }
-
 /* ── STARS ── */
 .star {
   position: fixed; border-radius: 50%;
@@ -74,7 +79,6 @@ body {
   0%,100%{opacity:0;transform:scale(0.5);}
   50%{opacity:0.9;transform:scale(1.3);}
 }
-
 /* ── SLOW DRIFT ORBS ── */
 .drift {
   position: fixed; border-radius: 50%;
@@ -89,14 +93,12 @@ body {
   66%  {transform:translate(-10px,10px) rotate(240deg);}
   100% {transform:translate(0,0) rotate(360deg);}
 }
-
 /* ── HEADER ── */
 .header {
   position: relative; z-index: 10;
   text-align: center;
   padding: 2rem 1rem 0.5rem;
 }
-
 .close-btn {
   position: absolute; top:1.2rem; right:1.2rem;
   width:46px; height:46px; border-radius:50%;
@@ -115,7 +117,6 @@ body {
   box-shadow:0 0 20px rgba(0,240,255,0.3), inset 0 0 12px rgba(0,240,255,0.08);
   transform:scale(1.1);
 }
-
 /* rune ring around close button */
 .close-btn::before {
   content:'';position:absolute;inset:-6px;border-radius:50%;
@@ -123,7 +124,6 @@ body {
   animation:runeRotate 8s linear infinite;
 }
 @keyframes runeRotate{to{transform:rotate(360deg);}}
-
 .sigil {
   font-family: var(--font-title);
   font-size: clamp(13px, 2.5vw, 18px);
@@ -134,7 +134,6 @@ body {
   animation: sigilPulse 4s ease-in-out infinite;
 }
 @keyframes sigilPulse{0%,100%{opacity:0.4;letter-spacing:0.3em;}50%{opacity:0.8;letter-spacing:0.4em;}}
-
 .title-main {
   font-family: var(--font-title);
   font-size: clamp(26px, 6.5vw, 52px);
@@ -151,7 +150,6 @@ body {
   from { text-shadow: 0 0 20px rgba(0,240,255,0.3), 0 0 40px rgba(68,85,255,0.2), 0 2px 8px rgba(0,0,0,0.8); }
   to   { text-shadow: 0 0 40px rgba(0,240,255,0.6), 0 0 80px rgba(68,85,255,0.4), 0 2px 8px rgba(0,0,0,0.8); }
 }
-
 .title-sub {
   font-family: var(--font-jp);
   font-size: clamp(11px, 2vw, 14px);
@@ -160,7 +158,6 @@ body {
   margin-top: 4px;
   opacity: 0.7;
 }
-
 .week-pill {
   display: inline-block;
   margin: 8px auto 0;
@@ -174,7 +171,6 @@ body {
   letter-spacing: 0.1em;
   box-shadow: 0 0 14px rgba(0,240,255,0.08);
 }
-
 /* arcane divider */
 .arcane-divider {
   display: flex; align-items: center; justify-content: center;
@@ -195,7 +191,6 @@ body {
 .arc-diamond:nth-child(2){background:var(--violet);box-shadow:0 0 8px var(--violet);animation-delay:0.5s;}
 .arc-diamond:nth-child(4){background:var(--indigo);box-shadow:0 0 8px var(--indigo);animation-delay:1s;}
 @keyframes diamondPulse{0%,100%{transform:rotate(45deg) scale(1);}50%{transform:rotate(45deg) scale(1.5);}}
-
 .select-label {
   text-align:center;
   font-family: var(--font-title);
@@ -206,7 +201,6 @@ body {
   padding: 8px 0 2px;
   position: relative; z-index: 10;
 }
-
 /* ── GRID ── */
 .grid-wrap {
   position:relative; z-index:10;
@@ -216,7 +210,6 @@ body {
   padding:0.7rem 0.9rem 2.5rem;
   max-width:700px; margin:0 auto;
 }
-
 /* ── TILES ── */
 .tile {
   position:relative; display:flex; flex-direction:column;
@@ -227,7 +220,6 @@ body {
   -webkit-tap-highlight-color:transparent;
   border:1px solid var(--tb, rgba(255,255,255,0.08));
 }
-
 /* moody jewel tones */
 .tile:nth-child(1){background:linear-gradient(145deg,#050d28,#0a1840);--tb:rgba(68,85,255,0.4);box-shadow:0 0 18px rgba(68,85,255,0.15),inset 0 1px 0 rgba(255,255,255,0.06);}
 .tile:nth-child(2){background:linear-gradient(145deg,#0d0520,#1a0840);--tb:rgba(170,0,255,0.4);box-shadow:0 0 18px rgba(170,0,255,0.15),inset 0 1px 0 rgba(255,255,255,0.06);}
@@ -238,13 +230,11 @@ body {
 .tile:nth-child(7){background:linear-gradient(145deg,#080516,#100830);--tb:rgba(100,80,255,0.5);box-shadow:0 0 18px rgba(100,80,255,0.18),inset 0 1px 0 rgba(255,255,255,0.06);}
 .tile:nth-child(8){background:linear-gradient(145deg,#031218,#061f28);--tb:rgba(0,200,220,0.4);box-shadow:0 0 18px rgba(0,200,220,0.15),inset 0 1px 0 rgba(255,255,255,0.06);}
 .tile:nth-child(9){background:linear-gradient(145deg,#120412,#200620);--tb:rgba(200,100,255,0.4);box-shadow:0 0 18px rgba(200,100,255,0.15),inset 0 1px 0 rgba(255,255,255,0.06);}
-
 .tile:hover {
   transform: translateY(-4px) scale(1.03);
   filter: brightness(1.3);
 }
 .tile:active { transform: scale(0.95); }
-
 /* mystical shimmer */
 .tile::before {
   content:'';position:absolute;inset:0;
@@ -255,7 +245,6 @@ body {
   pointer-events:none; z-index:2;
 }
 .tile:hover::before{background-position:-50% -50%;}
-
 /* top edge highlight */
 .tile::after {
   content:'';position:absolute;
@@ -263,9 +252,7 @@ body {
   background:linear-gradient(90deg,transparent,rgba(255,255,255,0.15),transparent);
   pointer-events:none;z-index:3;
 }
-
 .tile-content{position:relative;z-index:3;display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center;padding:0 6px;width:100%;}
-
 .tile-en {
   font-family:var(--font-title);
   font-size:clamp(12px,2.6vw,16px);
@@ -277,7 +264,6 @@ body {
   line-height:1.1;
   letter-spacing:0.03em;
 }
-  
 .tile-hira {
   font-family:var(--font-jp);
   font-size:clamp(10px,2vw,13px);
@@ -286,7 +272,6 @@ body {
   line-height:1.2;
   text-shadow:0 0 8px rgba(0,240,255,0.45);
 }
-  
 .tile-jp {
   font-family:var(--font-jp);
   font-size:clamp(9px,1.7vw,11px);
@@ -295,7 +280,6 @@ body {
   line-height:1.2;
   text-shadow:0 0 6px rgba(120,180,255,0.35);
 }
-
 /* ── EFFECTS ── */
 .kaboom-ring{position:fixed;border-radius:50%;border:2px solid var(--cyan);pointer-events:none;z-index:9998;opacity:0.9;animation:ringExpand 0.6s cubic-bezier(0.2,0.8,0.4,1) forwards;}
 @keyframes ringExpand{from{transform:translate(-50%,-50%) scale(0);opacity:0.9;}to{transform:translate(-50%,-50%) scale(6);opacity:0;}}
@@ -303,10 +287,8 @@ body {
 @keyframes burstFly{0%{transform:translate(-50%,-50%) scale(1);opacity:1;}100%{transform:translate(-50%,-50%) translate(var(--bx),var(--by)) scale(0.1);opacity:0;}}
 .tile.warp{animation:tileWarp 0.35s ease-out forwards;}
 @keyframes tileWarp{0%{transform:scale(1);}50%{transform:scale(1.15);filter:brightness(1.8) saturate(2);}100%{transform:scale(1);}}
-
 #swipeScreen{position:fixed;inset:0;background:#03060f;z-index:9997;transform:translateY(100%);transition:transform 0.14s ease-in;pointer-events:none;}
 #swipeScreen.go{transform:translateY(0);}
-
 @media(max-width:500px){
   .grid-wrap{grid-template-columns:repeat(2,1fr);gap:10px;padding:0.6rem 0.75rem 2rem;}
   :root{--card-h:124px;}
@@ -314,13 +296,11 @@ body {
 </style>
 </head>
 <body>
-
 <div class="space-bg"></div>
 <div class="nebula nebula-1"></div>
 <div class="nebula nebula-2"></div>
 <div class="nebula nebula-3"></div>
 <div class="nebula nebula-4"></div>
-
 <header class="header">
   <a class="close-btn" href="#" id="closeBtn" title="Back / もどる">✕</a>
   <div class="sigil">* * * * *</div>
@@ -336,7 +316,6 @@ body {
   </div>
   <div class="select-label">Choose Your Challenge</div>
 </header>
-
 <div class="grid-wrap" id="gameGrid">
   <a class="tile" href="#" data-game="vocab-tap"><div class="tile-content">
     <div class="tile-en">Vocabulary Tap</div>
@@ -384,42 +363,24 @@ body {
     <div class="tile-jp">質問しよう</div>
   </div></a>
 </div>
-
 <div id="swipeScreen"></div>
-
 <script type="module">
 import { getWeekParam, getPageContext } from '../../js/nav.js';
-
 const week = getWeekParam();
 const ctx  = getPageContext();
 if (!week || !ctx) { window.location.assign('../../index.html#hub'); }
-
 function formatWeekLabel(id) {
   const parts = id.split('_');
-
   const monthMap = {
-    jan:"January",
-    feb:"February",
-    mar:"March",
-    apr:"April",
-    may:"May",
-    jun:"June",
-    jul:"July",
-    aug:"August",
-    sep:"September",
-    oct:"October",
-    nov:"November",
-    dec:"December"
+    jan:"January", feb:"February", mar:"March",    apr:"April",
+    may:"May",     jun:"June",     jul:"July",     aug:"August",
+    sep:"September",oct:"October", nov:"November", dec:"December"
   };
-
   const month = monthMap[parts[1]] || parts[1];
   const week  = (parts[2] || "").replace('w','');
-
   return `${month} Week ${week}`;
-}  
-
-document.getElementById('weekLabel').textContent = formatWeekLabel(week);  
-
+}
+document.getElementById('weekLabel').textContent = formatWeekLabel(week);
 /* stars */
 (function(){
   const C = ['#aabbdd','#00f0ff','#aa00ff','#4455ff','#00ddbb','#ff9900','#7788bb'];
@@ -446,7 +407,6 @@ document.getElementById('weekLabel').textContent = formatWeekLabel(week);
     document.body.appendChild(d);
   }
 })();
-
 const DOT_C = ['#00f0ff','#aa00ff','#4455ff','#00ddbb','#ff9900','#ff3366','#aabbdd'];
 function kaboom(cx, cy, color) {
   const ring = document.createElement('div');
@@ -454,7 +414,6 @@ function kaboom(cx, cy, color) {
   ring.style.cssText = `left:${cx}px;top:${cy}px;width:50px;height:50px;border-color:${color};`;
   document.body.appendChild(ring);
   ring.addEventListener('animationend', () => ring.remove());
-  /* second ring, delayed */
   setTimeout(() => {
     const r2 = ring.cloneNode();
     r2.style.borderColor = 'rgba(0,240,255,0.3)';
@@ -473,12 +432,10 @@ function kaboom(cx, cy, color) {
     dot.addEventListener('animationend', () => dot.remove());
   }
 }
-
 let locked = false;
 const swipe = document.getElementById('swipeScreen');
 const RING_C = ['#4455ff','#aa00ff','#00ddbb','#00f0ff','#ff9900','#ff3366','#6450ff','#00c8dc','#c864ff'];
 const tiles = [...document.querySelectorAll('.tile')];
-
 document.getElementById('gameGrid').addEventListener('click', e => {
   const tile = e.target.closest('.tile');
   if (!tile || locked) return;
@@ -494,27 +451,19 @@ document.getElementById('gameGrid').addEventListener('click', e => {
     window.location.href = `/the-booha-adventure/game.html?week=${encodeURIComponent(week)}&game=${encodeURIComponent(tile.dataset.game)}`;
   }, 600);
 });
-
 document.getElementById('closeBtn').addEventListener('click', function(e) {
   e.preventDefault();
   if (locked) return;
   locked = true;
-
   const r = this.getBoundingClientRect();
   kaboom(r.left + r.width / 2, r.top + r.height / 2, '#ff2288');
-
   sessionStorage.setItem('booha_reopen_popup', '1');
   sessionStorage.setItem('booha_return_week', week);
-
   setTimeout(() => { swipe.classList.add('go'); }, 280);
-
   setTimeout(() => {
     window.location.href = `/the-booha-adventure/maze.html?week=${encodeURIComponent(week)}`;
   }, 480);
 });
-
-
-  
 </script>
 </body>
 </html>
