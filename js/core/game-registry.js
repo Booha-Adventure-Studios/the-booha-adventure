@@ -2,129 +2,170 @@
 /**
  * game-registry.js
  * The Booha Adventure — Game Registry
- * Single source of truth for all games.
- * Add new games here without touching save code.
+ * Single source of truth for all 9 games × 3 curriculums (27 total entries).
+ *
+ * Save IDs are scoped per curriculum: e.g. "bc:ask_sentence"
+ * This keeps scores separate per curriculum as intended.
+ *
+ * Curriculums: 'bc' | 'br' | 'pb'
  */
 
 const BoohaGameRegistry = (() => {
   'use strict';
 
+  const CURRICULUMS = ['bc', 'br', 'pb'];
+
   /**
-   * GAME DEFINITIONS
-   * id          — unique string key used in save data
+   * BASE GAME DEFINITIONS (curriculum-agnostic)
+   * id          — base key; final save key = "{curriculum}:{id}"
    * name        — display name
-   * file        — HTML page (relative to repo root)
-   * week        — which curriculum week this game belongs to (1–9+)
-   * category    — type of game for filtering / theming
-   * scoreMax    — maximum achievable score (for star calculation)
+   * file        — JS file in games/ (each curriculum loads its own data)
+   * category    — game mechanic type
+   * scoreMax    — maximum achievable score
    * starThresholds — [1-star min, 2-star min, 3-star min]
    */
-  const GAMES = [
+  const BASE_GAMES = [
     {
-      id:             'maze',
-      name:           'Maze Adventure',
-      file:           'maze.html',
-      week:           1,
-      category:       'navigation',
-      scoreMax:       100,
-      starThresholds: [30, 60, 90],
-    },
-    {
-      id:             'karasuki',
-      name:           'Karasuki',
-      file:           'karasuki.html',
-      week:           2,
-      category:       'language',
-      scoreMax:       100,
-      starThresholds: [30, 60, 90],
-    },
-    {
-      id:             'homework',
-      name:           'Homework Challenge',
-      file:           'homework.html',
-      week:           3,
-      category:       'quiz',
+      id:             'ask_sentence',
+      name:           'Ask a Sentence',
+      file:           'games/ask-sentence.js',
+      category:       'speaking',
       scoreMax:       100,
       starThresholds: [40, 70, 90],
     },
     {
-      id:             'study_deck',
-      name:           'Study Deck',
-      file:           'study-deck.html',
-      week:           4,
-      category:       'flashcard',
+      id:             'say_sentence',
+      name:           'Say a Sentence',
+      file:           'games/say-sentence.js',
+      category:       'speaking',
+      scoreMax:       100,
+      starThresholds: [40, 70, 90],
+    },
+    {
+      id:             'say_word',
+      name:           'Say a Word',
+      file:           'games/say-word.js',
+      category:       'speaking',
+      scoreMax:       100,
+      starThresholds: [40, 70, 90],
+    },
+    {
+      id:             'sentence_order',
+      name:           'Sentence Order',
+      file:           'games/sentence-order.js',
+      category:       'ordering',
+      scoreMax:       100,
+      starThresholds: [40, 70, 90],
+    },
+    {
+      id:             'sentence_speed',
+      name:           'Sentence Speed',
+      file:           'games/sentence-speed.js',
+      category:       'speed',
       scoreMax:       100,
       starThresholds: [30, 60, 90],
     },
     {
-      id:             'game_5',
-      name:           'Game 5',        // ← update when named
-      file:           'games/game5.html',
-      week:           5,
-      category:       'unknown',
+      id:             'sentence_tap',
+      name:           'Sentence Tap',
+      file:           'games/sentence-tap.js',
+      category:       'tap',
+      scoreMax:       100,
+      starThresholds: [40, 70, 90],
+    },
+    {
+      id:             'spell_word',
+      name:           'Spell a Word',
+      file:           'games/spell-word.js',
+      category:       'spelling',
+      scoreMax:       100,
+      starThresholds: [40, 70, 90],
+    },
+    {
+      id:             'vocab_speed',
+      name:           'Vocab Speed',
+      file:           'games/vocab-speed.js',
+      category:       'speed',
       scoreMax:       100,
       starThresholds: [30, 60, 90],
     },
     {
-      id:             'game_6',
-      name:           'Game 6',
-      file:           'games/game6.html',
-      week:           6,
-      category:       'unknown',
+      id:             'vocab_tap',
+      name:           'Vocab Tap',
+      file:           'games/vocab-tap.js',
+      category:       'tap',
       scoreMax:       100,
-      starThresholds: [30, 60, 90],
-    },
-    {
-      id:             'game_7',
-      name:           'Game 7',
-      file:           'games/game7.html',
-      week:           7,
-      category:       'unknown',
-      scoreMax:       100,
-      starThresholds: [30, 60, 90],
-    },
-    {
-      id:             'game_8',
-      name:           'Game 8',
-      file:           'games/game8.html',
-      week:           8,
-      category:       'unknown',
-      scoreMax:       100,
-      starThresholds: [30, 60, 90],
-    },
-    {
-      id:             'game_9',
-      name:           'Game 9',
-      file:           'games/game9.html',
-      week:           9,
-      category:       'unknown',
-      scoreMax:       100,
-      starThresholds: [30, 60, 90],
+      starThresholds: [40, 70, 90],
     },
   ];
 
-  // ── Internal index ────────────────────────────────────────────────────────
-  const _byId   = {};
-  const _byWeek = {};
+  // ── Build full entries (9 games × 3 curriculums = 27) ────────────────────
+  const GAMES = [];
+  CURRICULUMS.forEach(curriculum => {
+    BASE_GAMES.forEach(base => {
+      GAMES.push({
+        ...base,
+        curriculum,
+        saveId: `${curriculum}:${base.id}`,   // e.g. "bc:ask_sentence"
+        indexFile: `curriculum/${curriculum}/games-index.html`,
+      });
+    });
+  });
+
+  // ── Internal indexes ──────────────────────────────────────────────────────
+  const _bySaveId     = {};   // "bc:ask_sentence" → entry
+  const _byBaseId     = {};   // "ask_sentence"    → [bc entry, br entry, pb entry]
+  const _byCurriculum = {};   // "bc"              → [9 entries]
 
   GAMES.forEach(g => {
-    _byId[g.id] = g;
-    if (!_byWeek[g.week]) _byWeek[g.week] = [];
-    _byWeek[g.week].push(g);
+    _bySaveId[g.saveId] = g;
+
+    if (!_byBaseId[g.id])         _byBaseId[g.id] = [];
+    _byBaseId[g.id].push(g);
+
+    if (!_byCurriculum[g.curriculum]) _byCurriculum[g.curriculum] = [];
+    _byCurriculum[g.curriculum].push(g);
   });
 
   // ── Public API ────────────────────────────────────────────────────────────
-  function getAll()         { return [...GAMES]; }
-  function getById(id)      { return _byId[id] || null; }
-  function getByWeek(week)  { return _byWeek[week] || []; }
-  function getAllIds()       { return GAMES.map(g => g.id); }
+
+  /** All 27 expanded entries */
+  function getAll() { return [...GAMES]; }
+
+  /** Lookup by full save ID e.g. "bc:ask_sentence" */
+  function getById(saveId) { return _bySaveId[saveId] || null; }
+
+  /** All entries for one curriculum e.g. getForCurriculum('bc') */
+  function getForCurriculum(curriculum) { return _byCurriculum[curriculum] || []; }
+
+  /** All curriculum variants of one base game e.g. getAllVariants('vocab_tap') */
+  function getAllVariants(baseId) { return _byBaseId[baseId] || []; }
+
+  /** All base game definitions (9, curriculum-agnostic) */
+  function getBaseGames() { return [...BASE_GAMES]; }
+
+  /** All valid save IDs (27 total) */
+  function getAllSaveIds() { return GAMES.map(g => g.saveId); }
 
   /**
-   * Calculate star rating for a given score on a given game.
+   * Build the save ID from parts — use this in game pages instead of
+   * hardcoding strings, so typos are caught early.
+   * @param {'bc'|'br'|'pb'} curriculum
+   * @param {string} baseId  e.g. 'vocab_tap'
+   */
+  function saveId(curriculum, baseId) {
+    return `${curriculum}:${baseId}`;
+  }
+
+  /**
+   * Calculate star rating for a given score.
+   * Accepts either a full saveId or a base game id (thresholds are the same).
    * @returns {0|1|2|3}
    */
-  function starsForScore(gameId, score) {
-    const game = getById(gameId);
+  function starsForScore(gameIdOrSaveId, score) {
+    const game = _bySaveId[gameIdOrSaveId]
+      || (_byBaseId[gameIdOrSaveId] && _byBaseId[gameIdOrSaveId][0])
+      || null;
     if (!game) return 0;
     const [s1, s2, s3] = game.starThresholds;
     if (score >= s3) return 3;
@@ -135,10 +176,15 @@ const BoohaGameRegistry = (() => {
 
   // ── System interface ──────────────────────────────────────────────────────
   const api = {
+    CURRICULUMS,
+    BASE_GAMES,
     getAll,
     getById,
-    getByWeek,
-    getAllIds,
+    getForCurriculum,
+    getAllVariants,
+    getBaseGames,
+    getAllSaveIds,
+    saveId,
     starsForScore,
     init() { /* static data, no async init needed */ }
   };
