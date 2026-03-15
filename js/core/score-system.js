@@ -124,7 +124,7 @@ const BoohaScoreSystem = (() => {
   }
 
   /**
-   * Total stars across all games (for scoreboard / progress displays).
+   * Total stars across all games and all curriculums combined.
    */
   function totalStars() {
     const scores = _getScores();
@@ -132,11 +132,71 @@ const BoohaScoreSystem = (() => {
   }
 
   /**
-   * Number of completed games.
+   * Total stars for one curriculum only. e.g. totalStarsFor('bc')
+   */
+  function totalStarsFor(curriculum) {
+    const scores = _getScores();
+    return Object.entries(scores)
+      .filter(([id]) => id.startsWith(`${curriculum}:`))
+      .reduce((sum, [, e]) => sum + (e.stars || 0), 0);
+  }
+
+  /**
+   * Number of completed games across all curriculums.
    */
   function totalCompleted() {
     const scores = _getScores();
     return Object.values(scores).filter(e => e.completed).length;
+  }
+
+  /**
+   * Number of completed games for one curriculum only. e.g. totalCompletedFor('br')
+   */
+  function totalCompletedFor(curriculum) {
+    const scores = _getScores();
+    return Object.entries(scores)
+      .filter(([id]) => id.startsWith(`${curriculum}:`))
+      .filter(([, e]) => e.completed)
+      .length;
+  }
+
+  /**
+   * Full summary for one curriculum — useful for games-index.html displays.
+   * Returns { completed, totalGames, stars, totalStars, entries }
+   */
+  function summaryFor(curriculum) {
+    const scores   = _getScores();
+    const registry = BoohaAdventure.registry;
+    const games    = registry ? registry.getForCurriculum(curriculum) : [];
+    const entries  = games.map(g => ({
+      ...g,
+      ...(scores[g.saveId] || _defaultEntry(g.saveId)),
+    }));
+    return {
+      curriculum,
+      completed:  entries.filter(e => e.completed).length,
+      totalGames: entries.length,
+      stars:      entries.reduce((sum, e) => sum + (e.stars || 0), 0),
+      totalStars: entries.length * 3,
+      entries,
+    };
+  }
+
+  /**
+   * Combined summary across all three curriculums.
+   */
+  function summaryAll() {
+    const curriculums = BoohaAdventure.registry
+      ? BoohaAdventure.registry.CURRICULUMS
+      : ['bc', 'br', 'pb'];
+    const perCurriculum = curriculums.map(summaryFor);
+    return {
+      perCurriculum,
+      completed:  totalCompleted(),
+      totalGames: perCurriculum.reduce((s, c) => s + c.totalGames, 0),
+      stars:      totalStars(),
+      totalStars: perCurriculum.reduce((s, c) => s + c.totalStars, 0),
+    };
   }
 
   // ── System interface ──────────────────────────────────────────────────────
@@ -151,7 +211,11 @@ const BoohaScoreSystem = (() => {
     formatTime,
     getAll,
     totalStars,
+    totalStarsFor,
     totalCompleted,
+    totalCompletedFor,
+    summaryFor,
+    summaryAll,
     init() { /* reads from save, no setup needed */ }
   };
 
