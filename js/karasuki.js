@@ -23,18 +23,29 @@
   /* ── Arrival arrow delay (ms) before showing the back-direction arrow ── */
   const ARRIVAL_ARROW_DELAY_MS = 2000;
 
-  /* color ramps */
-  const MONTH_COLORS = [
-    ['#ff3bbd','#ff79d7'],['#ff6b3b','#ffaa5e'],['#3bc8ff','#a8edff'],
-    ['#3bff8a','#b2ffda'],['#ffd700','#fff176'],['#3b6fff','#90aaff'],
-    ['#a03bff','#d49aff'],['#ff9f3b','#ffd08a'],['#3bffee','#a8fff8'],
-    ['#c8ff3b','#e8ffaa'],['#ff3b6f','#ff85a1'],['#ff3bbd','#ff79d7'],
-  ];
-  function roomColorPair(roomId) {
-    const n = parseInt((roomId || "room_01").replace(/\D/g, ""), 10) || 1;
-    return MONTH_COLORS[(n - 1) % MONTH_COLORS.length];
-  }
+ const MONTH_COLORS = [
+  ['#ff3bbd','#ff79d7'],['#ff6b3b','#ffaa5e'],['#3bc8ff','#a8edff'],
+  ['#3bff8a','#b2ffda'],['#ffd700','#fff176'],['#3b6fff','#90aaff'],
+  ['#a03bff','#d49aff'],['#ff9f3b','#ffd08a'],['#3bffee','#a8fff8'],
+  ['#c8ff3b','#e8ffaa'],['#ff3b6f','#ff85a1'],['#ff3bbd','#ff79d7'],
+];
 
+function monthPrimary(w) {
+  return MONTH_COLORS[Math.max(0, Math.min(11, Math.floor((w - 1) / 4)))][0];
+}
+function monthSecondary(w) {
+  return MONTH_COLORS[Math.max(0, Math.min(11, Math.floor((w - 1) / 4)))][1];
+}
+
+function roomColorPair(roomId) {
+  const n = parseInt((roomId || "room_01").replace(/\D/g, ""), 10) || 1;
+  return MONTH_COLORS[(n - 1) % MONTH_COLORS.length];
+}
+
+// Read the active week the player arrived from
+const boohaWeek = parseInt(sessionStorage.getItem('booha_active_week') || '1', 10);
+const primary   = monthPrimary(boohaWeek);
+const secondary = monthSecondary(boohaWeek);
   /* ═══════════════════════════════════════════
      NPP — NEXT PAGE POINTS
      (nudged inward from edges for mobile)
