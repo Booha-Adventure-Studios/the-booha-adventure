@@ -2,6 +2,7 @@
 /* ─────────────────────────────────────────────
    UHIBON CHAT  ·  Magical Moody Theme
    Supports: English / Japanese (CJK)
+   v2 — iPhone safe + language toggle
 ───────────────────────────────────────────── */
 
 @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Philosopher:ital,wght@0,400;0,700;1,400&family=Noto+Serif+JP:wght@400;600&family=Noto+Sans+JP:wght@400;500&display=swap');
@@ -27,35 +28,41 @@
 }
 
 /* ════════════════════════════════════════════
-   ROOT WRAPPER  — size-to-content so it never
-   blocks taps on the hub cards behind it
+   ROOT WRAPPER
+   CRITICAL: pointer-events none by default so
+   it NEVER blocks taps on hub cards behind it.
+   Only the actual visible UI parts get events.
 ════════════════════════════════════════════ */
 #uhibon-chat-root {
   position: fixed;
   bottom: 0;
   left: 0;
   z-index: 50;
+  /* fit-content so the element is exactly as big as its children */
   width: fit-content;
   height: fit-content;
   display: flex;
   align-items: flex-end;
+  /* CRITICAL for iPhone: block NO pointer events at root level */
+  pointer-events: none;
 }
 
 /* ════════════════════════════════════════════
-   LAUNCHER WRAPPER  — no position/z-index here;
-   those live on #uhibon-chat-root in index.html
+   LAUNCHER WRAPPER
 ════════════════════════════════════════════ */
 #uhibon-launcher {
   display: flex;
   align-items: flex-end;
   gap: 14px;
   padding: 18px;
-  width:  fit-content;   /* CRITICAL: never stretch beyond contents */
-  height: fit-content;   /* CRITICAL: never stretch beyond contents */
+  width:  fit-content;
+  height: fit-content;
+  /* CRITICAL: launcher itself also passes through by default */
+  pointer-events: none;
 }
 
 /* ════════════════════════════════════════════
-   ICON BUTTON  – golden halo
+   ICON BUTTON — re-enable pointer events only here
 ════════════════════════════════════════════ */
 #uhibon-icon-btn {
   appearance: none;
@@ -67,6 +74,8 @@
   display: block;
   position: relative;
   border-radius: 50%;
+  /* ONLY the button itself catches clicks */
+  pointer-events: auto;
 
   filter:
     drop-shadow(0 0  6px var(--uhi-gold-glow))
@@ -87,7 +96,7 @@
 
 #uhibon-icon-btn img {
   display: block;
-  width: 88px;
+  width: 76px;
   height: auto;
   border-radius: 50%;
   user-select: none;
@@ -107,6 +116,8 @@
 
 /* ════════════════════════════════════════════
    POPOUT CONTAINER
+   Re-enable pointer events when open so the
+   chat UI is interactive but nothing leaks out.
 ════════════════════════════════════════════ */
 #uhibon-popout {
   display: flex;
@@ -123,7 +134,7 @@
 
 #uhibon-popout.open {
   opacity: 1;
-  pointer-events: auto;
+  pointer-events: auto;   /* whole popout catches events when open */
   transform: translateY(0) scale(1);
 }
 
@@ -131,7 +142,7 @@
    CHARACTER  – dark glow, no background
 ════════════════════════════════════════════ */
 #uhibon-character {
-  width: 120px;
+  width: 100px;
   flex: 0 0 auto;
   position: relative;
 }
@@ -196,7 +207,8 @@
    CHATBOX SHELL
 ════════════════════════════════════════════ */
 #uhibon-chatbox {
-  width: min(320px, calc(100vw - 180px));
+  /* Tighter width on small screens, comfortable on desktop */
+  width: min(300px, calc(100vw - 148px));
   background:
     linear-gradient(160deg,
       rgba(22, 12, 42, 0.97) 0%,
@@ -231,9 +243,9 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 14px 9px;
+  padding: 9px 12px 8px;
   font-family: var(--font-spooky);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: .12em;
   text-transform: uppercase;
@@ -247,12 +259,35 @@
   text-shadow: 0 0 12px var(--uhi-gold-glow);
 }
 
+/* Language toggle */
+#uhibon-lang-toggle {
+  appearance: none;
+  border: 1px solid rgba(245, 200, 66, 0.35);
+  background: rgba(245, 200, 66, 0.08);
+  color: rgba(245, 200, 66, 0.75);
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  border-radius: 6px;
+  padding: 3px 7px;
+  cursor: pointer;
+  transition: background .18s, color .18s, border-color .18s;
+  white-space: nowrap;
+}
+
+#uhibon-lang-toggle:hover {
+  background: rgba(245, 200, 66, 0.18);
+  color: var(--uhi-gold);
+  border-color: var(--uhi-gold-dim);
+}
+
 #uhibon-close-btn {
   appearance: none;
   border: 0;
   background: transparent;
   color: rgba(245, 200, 66, 0.55);
-  font-size: 22px;
+  font-size: 20px;
   line-height: 1;
   cursor: pointer;
   padding: 0 2px;
@@ -266,12 +301,12 @@
 
 /* ── Messages ── */
 #uhibon-messages {
-  height: 260px;
+  height: 220px;
   overflow-y: auto;
-  padding: 14px 12px;
+  padding: 12px 10px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 9px;
   position: relative;
   z-index: 1;
 
@@ -288,11 +323,11 @@
 
 /* ── Individual messages ── */
 .uhibon-msg {
-  max-width: 86%;
-  padding: 9px 13px;
+  max-width: 88%;
+  padding: 8px 12px;
   border-radius: 14px;
   line-height: 1.55;
-  font-size: 14px;
+  font-size: 13px;
   font-family: var(--font-body);
   animation: uhi-msg-in .28s cubic-bezier(.22,.68,0,1.1) both;
 }
@@ -305,7 +340,7 @@
 .uhibon-msg.bot {
   align-self: flex-start;
   font-family: var(--font-bot);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 400;
   letter-spacing: .01em;
   line-height: 1.6;
@@ -318,20 +353,10 @@
     0 0  18px rgba(123, 79, 207, 0.12) inset;
 }
 
-.uhibon-en {
-  display: block;
-  font-weight: 700;
-  font-family: var(--font-bot);
-  margin-bottom: 4px;
-}
-
-.uhibon-jp {
-  display: block;
-  font-size: 13px;
-  opacity: .92;
-  line-height: 1.45;
+/* Japanese bot messages */
+.uhibon-msg.bot[lang="ja"] {
   font-family: 'Noto Serif JP', serif;
-  font-weight: 400;
+  font-size: 12px;
 }
 
 .uhibon-msg.user {
@@ -341,13 +366,14 @@
   background: rgba(180, 140, 255, 0.14);
   border: 1px solid rgba(180, 140, 255, 0.22);
   box-shadow: 0 2px 10px rgba(0,0,0,.25);
+  font-size: 13px;
 }
 
 /* ── Input row ── */
 #uhibon-input-row {
   display: flex;
-  gap: 8px;
-  padding: 10px 12px 12px;
+  gap: 6px;
+  padding: 8px 10px 10px;
   border-top: 1px solid rgba(123, 79, 207, 0.25);
   background: rgba(0, 0, 0, 0.18);
   position: relative;
@@ -358,14 +384,25 @@
   flex: 1;
   min-width: 0;
   font-family: var(--font-body);
-  font-size: 14px;
+  font-size: 13px;
   border: 1px solid rgba(123, 79, 207, 0.38);
   background: rgba(13, 8, 26, 0.70);
   color: var(--uhi-text-user);
-  border-radius: 11px;
-  padding: 9px 12px;
+  border-radius: 10px;
+  padding: 8px 10px;
   outline: none;
   transition: border-color .2s, box-shadow .2s;
+  /* Prevent iOS zoom on focus — font must be >= 16px OR we set this */
+  font-size: max(13px, 16px);
+  /* But cap displayed size visually */
+  transform-origin: left;
+}
+
+/* iOS zoom prevention trick — keeps visual size at 13px equivalent */
+@supports (-webkit-touch-callout: none) {
+  #uhibon-input {
+    font-size: 16px;
+  }
 }
 
 #uhibon-input::placeholder {
@@ -383,13 +420,13 @@
 #uhibon-send-btn {
   appearance: none;
   border: 1px solid var(--uhi-gold-dim);
-  border-radius: 11px;
-  padding: 9px 14px;
+  border-radius: 10px;
+  padding: 8px 12px;
   cursor: pointer;
   font-family: var(--font-spooky);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
-  letter-spacing: .08em;
+  letter-spacing: .06em;
   background: linear-gradient(135deg, #2e1a5e 0%, #1a0f3a 100%);
   color: var(--uhi-gold);
   text-shadow: 0 0 8px var(--uhi-gold-glow);
@@ -397,6 +434,8 @@
     0 0  8px rgba(245, 200, 66, 0.18),
     0 2px 6px rgba(0,0,0,.35);
   transition: background .2s, box-shadow .2s, transform .15s;
+  white-space: nowrap;
+  /* pointer-events already on since we're inside .open popout */
 }
 
 #uhibon-send-btn:hover {
@@ -412,14 +451,20 @@
 }
 
 /* ════════════════════════════════════════════
-   RESPONSIVE
+   RESPONSIVE — small phones
 ════════════════════════════════════════════ */
-@media (max-width: 700px) {
-  /* No position/left/bottom here — root handles that */
-  #uhibon-launcher  { padding: 12px; }
-  #uhibon-popout    { gap: 8px; }
-  #uhibon-character { width: 94px; }
-  #uhibon-chatbox   { width: min(280px, calc(100vw - 130px)); }
-  #uhibon-icon-btn img { width: 74px; }
+@media (max-width: 420px) {
+  #uhibon-launcher  { padding: 10px; gap: 8px; }
+  #uhibon-character { width: 80px; }
+  #uhibon-chatbox   { width: min(250px, calc(100vw - 118px)); }
+  #uhibon-icon-btn img { width: 62px; }
+  #uhibon-messages  { height: 190px; }
+  .uhibon-msg       { font-size: 12px; }
   .uhibon-msg.bot   { font-size: 12px; }
+}
+
+@media (max-width: 360px) {
+  #uhibon-chatbox   { width: min(220px, calc(100vw - 106px)); }
+  #uhibon-character { width: 72px; }
+  #uhibon-icon-btn img { width: 56px; }
 }
