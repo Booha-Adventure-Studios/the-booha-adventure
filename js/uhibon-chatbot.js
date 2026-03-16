@@ -1,5 +1,7 @@
 
-(function () {
+window.uhibonInit = function () {
+  if (document.getElementById('uhibon-launcher')) return; // guard
+  (function () {
   const IMG_BASE = 'assets/img/uhibon/';
   const IMG_ICON = IMG_BASE + 'chat-uhi.png';
   const IMG_OPEN = IMG_BASE + 'uhi-w.png';
