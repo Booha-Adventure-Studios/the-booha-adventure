@@ -4,13 +4,6 @@
    Supports: English / Japanese (CJK)
 ───────────────────────────────────────────── */
 
-/*
-  Fonts chosen for readability + atmosphere:
-  • Philosopher  — elegant serif with great CJK fallback, clear at small sizes
-  • Noto Serif JP — beautiful Japanese serif that pairs with Philosopher
-  • Cinzel Decorative — kept only for the header title (decorative, not body)
-  • Noto Sans JP — clean JP sans for user input & user messages
-*/
 @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Philosopher:ital,wght@0,400;0,700;1,400&family=Noto+Serif+JP:wght@400;600&family=Noto+Sans+JP:wght@400;500&display=swap');
 
 /* ── Tokens ── */
@@ -24,27 +17,37 @@
   --uhi-purple-accent: #7b4fcf;
   --uhi-purple-soft:   rgba(123, 79, 207, 0.35);
   --uhi-fog:           rgba(180, 140, 255, 0.10);
-  --uhi-text-bot:      #f5c842;   /* Uhibon speaks in gold */
-  --uhi-text-user:     #f0ecff;   /* Player speaks in white-lavender */
+  --uhi-text-bot:      #f5c842;
+  --uhi-text-user:     #f0ecff;
   --uhi-radius:        18px;
 
-  /* Font stacks — CJK-aware
-     Philosopher is a clear, characterful serif that stays legible at 13-14 px.
-     Noto Serif JP fills in all Japanese glyphs with matching weight. */
-  --font-spooky: 'Cinzel Decorative', 'Noto Serif JP', serif;  /* header only */
-  --font-bot:    'Philosopher', 'Noto Serif JP', serif;          /* Uhibon's voice */
-  --font-body:   'Philosopher', 'Noto Sans JP', sans-serif;      /* user / UI */
+  --font-spooky: 'Cinzel Decorative', 'Noto Serif JP', serif;
+  --font-bot:    'Philosopher', 'Noto Serif JP', serif;
+  --font-body:   'Philosopher', 'Noto Sans JP', sans-serif;
 }
 
 /* ════════════════════════════════════════════
-   LAUNCHER WRAPPER
+   ROOT WRAPPER  — size-to-content so it never
+   blocks taps on the hub cards behind it
+════════════════════════════════════════════ */
+#uhibon-chat-root {
+  display: flex;
+  align-items: flex-end;
+  width:  fit-content;   /* CRITICAL: collapse to actual content */
+  height: fit-content;   /* CRITICAL: collapse to actual content */
+}
 
-/* AFTER — remove position/left/bottom/z-index from launcher since root handles it */
+/* ════════════════════════════════════════════
+   LAUNCHER WRAPPER  — no position/z-index here;
+   those live on #uhibon-chat-root in index.html
+════════════════════════════════════════════ */
 #uhibon-launcher {
   display: flex;
   align-items: flex-end;
   gap: 14px;
-  padding: 18px;        /* keeps the 18px spacing from the corner */
+  padding: 18px;
+  width:  fit-content;   /* CRITICAL: never stretch beyond contents */
+  height: fit-content;   /* CRITICAL: never stretch beyond contents */
 }
 
 /* ════════════════════════════════════════════
@@ -61,7 +64,6 @@
   position: relative;
   border-radius: 50%;
 
-  /* Soft gold glow — layered so it breathes */
   filter:
     drop-shadow(0 0  6px var(--uhi-gold-glow))
     drop-shadow(0 0 14px var(--uhi-gold-glow))
@@ -88,7 +90,6 @@
   -webkit-user-drag: none;
 }
 
-/* breathing pulse on the icon */
 @keyframes uhi-icon-pulse {
   0%,100% { filter:
     drop-shadow(0 0  6px var(--uhi-gold-glow))
@@ -138,22 +139,15 @@
   user-select: none;
   -webkit-user-drag: none;
 
-  /* Dark atmospheric glow — makes the skeleton "pop"
-     without any background box                      */
   filter:
     drop-shadow(0 0  8px rgba(123,  79, 207, 0.6))
     drop-shadow(0 0 20px rgba( 60,  20, 100, 0.7))
     drop-shadow(0 4px 32px rgba(  0,   0,   0, 0.8));
 
-  /* Smooth idle float */
   animation: uhi-char-float 4s ease-in-out infinite;
-
-  /* opacity: state-change cross-fade
-     filter:  slow drift between glow colours (idle colour loop) */
   transition: opacity .2s ease, filter 1.6s ease;
 }
 
-/* Talking state — warm amber tint on the glow */
 #uhibon-character img.is-talking {
   filter:
     drop-shadow(0 0 10px rgba(245, 200, 66, 0.50))
@@ -161,16 +155,13 @@
     drop-shadow(0 4px 32px rgba(  0,   0,   0, 0.8));
 }
 
-/* Gentle bob when idle */
 @keyframes uhi-char-float {
-  0%,100% { transform: translateY(0);   }
+  0%,100% { transform: translateY(0);    }
   45%     { transform: translateY(-7px); }
 }
 
-/* When talking, override float with a faster shimmy */
 #uhibon-character img.is-talking {
-  animation:
-    uhi-char-talk 0.36s ease-in-out infinite;
+  animation: uhi-char-talk 0.36s ease-in-out infinite;
 }
 
 @keyframes uhi-char-talk {
@@ -178,10 +169,6 @@
   50%     { transform: translateY(-4px) rotate( 1deg); }
 }
 
-/* ── Upgrade 1: Idle micro-actions ──────────────────────────
-   .idle-blink  — quick vertical squint (scaleY)
-   .idle-look   — slight head-tilt glance
-   Both are class-based, applied momentarily by JS.         */
 #uhibon-character img.idle-blink {
   animation: uhi-blink .28s ease-in-out forwards;
 }
@@ -219,11 +206,9 @@
     0 20px 60px rgba(0,0,0,.40);
   backdrop-filter: blur(14px);
   overflow: hidden;
-  /* subtle noise-grain texture via SVG data URI */
   position: relative;
 }
 
-/* faint arcane shimmer along the top edge */
 #uhibon-chatbox::before {
   content: '';
   position: absolute;
@@ -305,7 +290,6 @@
   line-height: 1.55;
   font-size: 14px;
   font-family: var(--font-body);
-  /* entrance */
   animation: uhi-msg-in .28s cubic-bezier(.22,.68,0,1.1) both;
 }
 
@@ -314,7 +298,6 @@
   to   { opacity: 1; transform: translateY(0)   scale(1); }
 }
 
-/* BOT message — Uhibon in gold, Philosopher serif */
 .uhibon-msg.bot {
   align-self: flex-start;
   font-family: var(--font-bot);
@@ -331,7 +314,6 @@
     0 0  18px rgba(123, 79, 207, 0.12) inset;
 }
 
-/* Bilingual spans inside bot messages */
 .uhibon-en {
   display: block;
   font-weight: 700;
@@ -348,7 +330,6 @@
   font-weight: 400;
 }
 
-/* USER message — white-lavender */
 .uhibon-msg.user {
   align-self: flex-end;
   font-family: var(--font-body);
@@ -430,17 +411,11 @@
    RESPONSIVE
 ════════════════════════════════════════════ */
 @media (max-width: 700px) {
-  #uhibon-launcher { left: 12px; bottom: 12px; }
-  #uhibon-popout   { gap: 8px; }
+  /* No position/left/bottom here — root handles that */
+  #uhibon-launcher  { padding: 12px; }
+  #uhibon-popout    { gap: 8px; }
   #uhibon-character { width: 94px; }
-  #uhibon-chatbox  { width: min(280px, calc(100vw - 130px)); }
+  #uhibon-chatbox   { width: min(280px, calc(100vw - 130px)); }
   #uhibon-icon-btn img { width: 74px; }
-  .uhibon-msg.bot  { font-size: 12px; }
-}
-
-/* Ensure launcher sits flush inside the root wrapper */
-#uhibon-chat-root {
-  /* layout only — position/pointer-events come from index.html */
-  display: flex;
-  align-items: flex-end;
+  .uhibon-msg.bot   { font-size: 12px; }
 }
