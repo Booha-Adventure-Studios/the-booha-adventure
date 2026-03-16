@@ -38,15 +38,13 @@
 
 /* ════════════════════════════════════════════
    LAUNCHER WRAPPER
-════════════════════════════════════════════ */
+
+/* AFTER — remove position/left/bottom/z-index from launcher since root handles it */
 #uhibon-launcher {
-  position: fixed;
-  left: 18px;
-  bottom: 18px;
-  z-index: 9999;
   display: flex;
   align-items: flex-end;
   gap: 14px;
+  padding: 18px;        /* keeps the 18px spacing from the corner */
 }
 
 /* ════════════════════════════════════════════
@@ -438,4 +436,11 @@
   #uhibon-chatbox  { width: min(280px, calc(100vw - 130px)); }
   #uhibon-icon-btn img { width: 74px; }
   .uhibon-msg.bot  { font-size: 12px; }
+}
+
+/* Ensure launcher sits flush inside the root wrapper */
+#uhibon-chat-root {
+  /* layout only — position/pointer-events come from index.html */
+  display: flex;
+  align-items: flex-end;
 }
