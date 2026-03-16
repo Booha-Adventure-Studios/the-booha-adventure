@@ -4,21 +4,16 @@
  * The Booha Adventure — Core System Hub
  * Initializes and connects all subsystems. Include this first on every page.
  */
-
 const BoohaAdventure = (() => {
   'use strict';
-
   const VERSION = '1.0.0';
   let _initialized = false;
-
   // ── Subsystem registry ────────────────────────────────────────────────────
   const _systems = {};
-
   function registerSystem(name, instance) {
     _systems[name] = instance;
     if (_initialized) _bootSystem(name, instance);
   }
-
   function getSystem(name) {
     if (!_systems[name]) {
       console.warn(`[BoohaAdventure] System "${name}" not found.`);
@@ -26,7 +21,6 @@ const BoohaAdventure = (() => {
     }
     return _systems[name];
   }
-
   function _bootSystem(name, instance) {
     if (typeof instance.init === 'function') {
       try {
@@ -36,12 +30,10 @@ const BoohaAdventure = (() => {
       }
     }
   }
-
   // ── Init ─────────────────────────────────────────────────────────────────
   function init() {
     if (_initialized) return;
     _initialized = true;
-
     // Boot all registered systems in order
     const bootOrder = [
       'saveFile', 'saveUtils', 'saveCode',
@@ -50,20 +42,44 @@ const BoohaAdventure = (() => {
       'pageState',
       'saveMenu', 'memoryCodeUI'
     ];
-
     bootOrder.forEach(name => {
       if (_systems[name]) _bootSystem(name, _systems[name]);
     });
-
     // Boot any remaining systems not in the explicit order
     Object.keys(_systems).forEach(name => {
       if (!bootOrder.includes(name)) _bootSystem(name, _systems[name]);
     });
 
+    // ── Auto-submit scores when any game fires 'booha:gameEnd' ──────────────
+    // Games dispatch this event at their game-over / results moment.
+    // Required detail fields: saveId {string}, score {number}
+    // Optional detail fields: completed {boolean}, time {number} (ms)
+    //
+    // Example (in any game file):
+    //   document.dispatchEvent(new CustomEvent('booha:gameEnd', {
+    //     detail: {
+    //       saveId:    BoohaAdventure.registry.saveId('bc', 'vocab_tap'),
+    //       score:     finalScore,
+    //       completed: true,
+    //       time:      elapsedMs   // omit if not tracked
+    //     }
+    //   }));
+    document.addEventListener('booha:gameEnd', (e) => {
+      const { saveId, score, completed, time } = e.detail || {};
+      if (!saveId || score == null) {
+        console.warn('[BoohaAdventure] booha:gameEnd fired but missing saveId or score.', e.detail);
+        return;
+      }
+      if (BoohaAdventure.scores) {
+        BoohaAdventure.scores.submit(saveId, score, { completed, time });
+      } else {
+        console.warn('[BoohaAdventure] booha:gameEnd fired before scoreSystem was ready.');
+      }
+    });
+
     console.log(`[BoohaAdventure] v${VERSION} ready. Systems: ${Object.keys(_systems).join(', ')}`);
     document.dispatchEvent(new CustomEvent('booha:ready', { detail: { version: VERSION } }));
   }
-
   // ── Auto-init on DOM ready ────────────────────────────────────────────────
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
@@ -71,14 +87,12 @@ const BoohaAdventure = (() => {
     // DOM already loaded (script added late)
     setTimeout(init, 0);
   }
-
   // ── Public API ────────────────────────────────────────────────────────────
   return {
     VERSION,
     registerSystem,
     getSystem,
     init,
-
     // Convenience getters
     get save()        { return getSystem('saveFile'); },
     get scores()      { return getSystem('scoreSystem'); },
@@ -90,6 +104,5 @@ const BoohaAdventure = (() => {
     get weeks()       { return getSystem('weekSystem'); },
   };
 })();
-
 // Make globally available
 window.BoohaAdventure = BoohaAdventure;
