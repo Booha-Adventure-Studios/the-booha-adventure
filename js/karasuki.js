@@ -20,14 +20,34 @@
   /* ── Profile portal (room_08) ── */
   const PORTAL = { x: 357, y: 342, r: 40, href: "adventure-profile.html" };
 
+  /* ── Maze exit (room_03) — special glowing down-arrow back to maze ──
+     Sits at the same x as the "up" NPP (785) but at the bottom of the room.
+     Triggering it sets sessionStorage so the maze restores the ghost
+     on the karasuki tree at KR_TREE_IX=535, KR_TREE_IY=300.           */
+  const MAZE_EXIT = {
+    roomId  : "room_03",
+    x       : 785,
+    y       : 870,        /* bottom edge, matches fromDown spawn y roughly */
+    r       : 44,         /* trigger radius */
+    /* maze sessionStorage keys mirror playKarasukiVideoAndGo() */
+    mazeUrl : "maze.html",
+    treeIX  : 535,
+    treeIY  : 300,
+  };
+
   /* ── Arrival arrow delay (ms) before showing the back-direction arrow ── */
   const ARRIVAL_ARROW_DELAY_MS = 2000;
 
   /* ── How long after a transition before the ghost can trigger another one.
-        This is the key fix for the blinking/stuck loop: the ghost spawns
-        close to an NPP edge, so without this guard it immediately fires
-        another transition on the very next tick. ── */
-  const TRANSITION_COOLDOWN_MS = 1200;
+        Primary defence against the blinking loop. ── */
+  const TRANSITION_COOLDOWN_MS = 1400;
+
+  /* ── How many world-pixels the ghost must travel before exit arrows appear.
+        Prevents arrows flashing immediately on room entry. ── */
+  const ARROW_MOVE_THRESHOLD = 30;
+
+  /* ── How close (px) the ghost centre must get to the portal orb to trigger it ── */
+  const PORTAL_TRIGGER_R = 36;
 
   const MONTH_COLORS = [
     ['#ff3bbd','#ff79d7'],['#ff6b3b','#ffaa5e'],['#3bc8ff','#a8edff'],
@@ -152,11 +172,12 @@
     spawnY            : 876,
     arrivalDir        : null,
     transitioning     : false,
-    /* FIX: timestamp after which NPP triggers are allowed.
-       Set to now + TRANSITION_COOLDOWN_MS on every room entry. */
     transitionReadyAt : 0,
     clickTarget       : null,
     moving            : false,
+    /* distance walked since last room entry — gates arrow visibility */
+    distMovedSinceSpawn : 0,
+    mazeExiting       : false,   /* true while fading out to maze */
     coordMode         : false,
     musicStarted      : false,
     lastTrailT        : 0
@@ -462,6 +483,34 @@
   function closePortal() { portalOverlay.classList.remove("active"); }
   function isPortalOpen(){ return portalOverlay.classList.contains("active"); }
 
+  /* ── Exit karasuki back to maze, spawning on the karasuki tree ── */
+  function exitToMaze() {
+    if (state.mazeExiting) return;
+    state.mazeExiting  = true;
+    state.clickTarget  = null;
+
+    /* Stop music gracefully */
+    try { music.pause(); music.currentTime = 0; } catch (_) {}
+
+    /* Write the same sessionStorage keys the maze's restoreMazeFromCheckpoint reads */
+    try {
+      sessionStorage.setItem('booha_return_to_checkpoint', '1');
+      /* preserve week & ghost index if they were stashed on entry */
+      const storedWeek  = sessionStorage.getItem('booha_active_week');
+      const storedGhost = sessionStorage.getItem('booha_active_ghost');
+      if (storedWeek)  sessionStorage.setItem('booha_return_week',  storedWeek);
+      if (storedGhost) sessionStorage.setItem('booha_return_ghost', storedGhost);
+      sessionStorage.setItem('booha_return_ix', String(MAZE_EXIT.treeIX));
+      sessionStorage.setItem('booha_return_iy', String(MAZE_EXIT.treeIY));
+    } catch (_) {}
+
+    /* Fade to black then navigate */
+    const fadeEl = document.getElementById("kara-fade");
+    fadeEl.style.transition = `opacity ${FADE_MS}ms ease-in`;
+    fadeEl.style.opacity    = "1";
+    setTimeout(() => { window.location.href = MAZE_EXIT.mazeUrl; }, FADE_MS + 60);
+  }
+
   /* ═══════════════════════════════════════════
      CANVAS / FIT
   ═══════════════════════════════════════════ */
@@ -561,8 +610,9 @@
     /* FIX: set the cooldown so the ghost can't immediately fire an NPP
        on the very first frames (handles startRoom being near an edge) */
     const now = performance.now();
-    state.transitionReadyAt  = now + TRANSITION_COOLDOWN_MS;
-    arrivalArrowHiddenUntil  = now + ARRIVAL_ARROW_DELAY_MS;
+    state.transitionReadyAt     = now + TRANSITION_COOLDOWN_MS;
+    arrivalArrowHiddenUntil     = now + ARRIVAL_ARROW_DELAY_MS;
+    state.distMovedSinceSpawn   = 0;
   }
 
   /* ═══════════════════════════════════════════
@@ -621,10 +671,11 @@
       trail = []; pins = [];
 
       const now = performance.now();
-      /* FIX: arm the cooldown so the ghost can't immediately re-trigger
+      /* arm the cooldown so the ghost can't immediately re-trigger
          the NPP it just arrived near (the back-blink bug) */
-      state.transitionReadyAt  = now + TRANSITION_COOLDOWN_MS;
-      arrivalArrowHiddenUntil  = now + ARRIVAL_ARROW_DELAY_MS;
+      state.transitionReadyAt     = now + TRANSITION_COOLDOWN_MS;
+      arrivalArrowHiddenUntil     = now + ARRIVAL_ARROW_DELAY_MS;
+      state.distMovedSinceSpawn   = 0;
 
       const lh = pinLog.querySelector(".log-header span");
       if (lh) lh.textContent = `PINS — ${state.roomId}`;
@@ -672,16 +723,21 @@
   function drawExitArrows(now) {
     const npps = NPP[state.roomId];
     if (!npps) return;
+
+    /* Don't show any arrows until the ghost has actually moved */
+    const moved = state.distMovedSinceSpawn;
+    const moveReveal = Math.min(1, moved / ARROW_MOVE_THRESHOLD);
+    if (moveReveal <= 0) return;
+
     const sec = now / 1000;
     const [col1, col2] = roomColorPair(state.roomId);
     const OPPOSITE = { left: "right", right: "left", up: "down", down: "up" };
     const arrivalExit = state.arrivalDir ? OPPOSITE[state.arrivalDir] : null;
 
     const delayRemaining = arrivalArrowHiddenUntil - now;
-    const arrivalAlpha   = delayRemaining <= 0
-      ? 1
-      : Math.max(0, 1 - (delayRemaining / ARRIVAL_ARROW_DELAY_MS));
-    const revealFade = delayRemaining > 400 ? 0 : arrivalAlpha;
+    const revealFade = delayRemaining > 400
+      ? 0
+      : Math.min(1, Math.max(0, 1 - (delayRemaining / ARRIVAL_ARROW_DELAY_MS)));
 
     npps.forEach((npp, i) => {
       if (!npp.dir) return;
@@ -693,10 +749,12 @@
       const bounce = Math.sin(sec * 2.2 + i * 1.3) * 6;
       const ax = npp.x + Math.cos(angle) * bounce;
       const ay = npp.y + Math.sin(angle) * bounce;
-      const fadeAlpha = isArrivalDir ? revealFade : 1;
+
+      /* Combine the move-reveal fade with the arrival-dir fade */
+      const baseFade  = isArrivalDir ? revealFade : 1;
+      const fadeAlpha = baseFade * moveReveal;
 
       ctx.save();
-      ctx.globalAlpha = fadeAlpha;
       ctx.translate(ax, ay);
       ctx.rotate(angle);
 
@@ -715,7 +773,7 @@
         ctx.beginPath();
         ctx.moveTo(ox - 7, -10); ctx.lineTo(ox + 7, 0); ctx.lineTo(ox - 7, 10);
         ctx.stroke();
-        ctx.shadowBlur  = 0;
+        ctx.shadowBlur = 0;
       });
 
       ctx.globalAlpha = fadeAlpha * (0.60 + pulse * 0.38);
@@ -743,55 +801,159 @@
     const idx1   = (idx0 + 1) % PORTAL_COLORS.length;
     const t      = cycleT - Math.floor(cycleT);
     const col    = lerpHex(PORTAL_COLORS[idx0], PORTAL_COLORS[idx1], t);
+    const col2   = lerpHex(PORTAL_COLORS[(idx1 + 1) % PORTAL_COLORS.length],
+                            PORTAL_COLORS[(idx1 + 2) % PORTAL_COLORS.length], t);
     const pulse  = 0.5 + 0.5 * Math.sin(sec * 2.6);
-    const r      = 8 + pulse * 4;
+    const pulse2 = 0.5 + 0.5 * Math.sin(sec * 1.8 + 1.2);
 
     ctx.save();
 
-    /* wide ambient halo */
-    const ambient = ctx.createRadialGradient(PORTAL.x, PORTAL.y, 0, PORTAL.x, PORTAL.y, 70);
-    ambient.addColorStop(0, col + "44");
-    ambient.addColorStop(0.5, col + "18");
-    ambient.addColorStop(1, "transparent");
-    ctx.globalAlpha = 0.5 + pulse * 0.4;
+    /* ── Outer ambient cloud ── */
+    const ambient = ctx.createRadialGradient(PORTAL.x, PORTAL.y, 0, PORTAL.x, PORTAL.y, 72);
+    ambient.addColorStop(0,   col + "00");   /* transparent at centre */
+    ambient.addColorStop(0.3, col + "28");
+    ambient.addColorStop(0.6, col + "44");
+    ambient.addColorStop(1,   "transparent");
+    ctx.globalAlpha = 0.55 + pulse * 0.35;
     ctx.fillStyle   = ambient;
-    ctx.beginPath(); ctx.arc(PORTAL.x, PORTAL.y, 70, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(PORTAL.x, PORTAL.y, 72, 0, Math.PI * 2); ctx.fill();
 
-    /* mid halo */
-    const halo = ctx.createRadialGradient(PORTAL.x, PORTAL.y, 0, PORTAL.x, PORTAL.y, 38);
-    halo.addColorStop(0, col + "88");
-    halo.addColorStop(0.5, col + "33");
-    halo.addColorStop(1, "transparent");
-    ctx.globalAlpha = 0.7 + pulse * 0.25;
-    ctx.fillStyle   = halo;
-    ctx.beginPath(); ctx.arc(PORTAL.x, PORTAL.y, 38, 0, Math.PI * 2); ctx.fill();
+    /* ── Second colour cloud, slightly offset phase ── */
+    const cloud2 = ctx.createRadialGradient(PORTAL.x, PORTAL.y, 0, PORTAL.x, PORTAL.y, 52);
+    cloud2.addColorStop(0,   col2 + "00");
+    cloud2.addColorStop(0.25, col2 + "22");
+    cloud2.addColorStop(0.55, col2 + "38");
+    cloud2.addColorStop(1,   "transparent");
+    ctx.globalAlpha = 0.4 + pulse2 * 0.3;
+    ctx.fillStyle   = cloud2;
+    ctx.beginPath(); ctx.arc(PORTAL.x, PORTAL.y, 52, 0, Math.PI * 2); ctx.fill();
 
-    /* bright core orb */
-    const ring = ctx.createRadialGradient(PORTAL.x, PORTAL.y, r * 0.2, PORTAL.x, PORTAL.y, r * 2.4);
-    ring.addColorStop(0, "#fff");
-    ring.addColorStop(0.3, col);
-    ring.addColorStop(1, "transparent");
-    ctx.globalAlpha = 0.9 + pulse * 0.08;
-    ctx.shadowBlur  = 22 + pulse * 14;
+    /* ── Inner energy ring — brightest at mid-radius, dark/transparent at core ── */
+    const innerR = 10 + pulse * 6;
+    const energy = ctx.createRadialGradient(PORTAL.x, PORTAL.y, 0, PORTAL.x, PORTAL.y, innerR * 2.8);
+    energy.addColorStop(0,    "transparent");           /* void at very centre */
+    energy.addColorStop(0.25, col + "55");
+    energy.addColorStop(0.55, col + "cc");              /* peak brightness ring */
+    energy.addColorStop(0.75, col + "66");
+    energy.addColorStop(1,    "transparent");
+    ctx.globalAlpha = 0.85 + pulse * 0.13;
+    ctx.shadowBlur  = 18 + pulse * 16;
     ctx.shadowColor = col;
-    ctx.fillStyle   = ring;
-    ctx.beginPath(); ctx.arc(PORTAL.x, PORTAL.y, r, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle   = energy;
+    ctx.beginPath(); ctx.arc(PORTAL.x, PORTAL.y, innerR * 2.8, 0, Math.PI * 2); ctx.fill();
     ctx.shadowBlur  = 0;
 
-    /* sparkling ring of dots */
-    const dotCount = 6;
-    const ringR    = 22 + pulse * 3;
+    /* ── Orbiting energy sparks ── */
+    const dotCount = 8;
     for (let d = 0; d < dotCount; d++) {
-      const angle   = (sec * 0.9) + (d / dotCount) * Math.PI * 2;
-      const dx = PORTAL.x + Math.cos(angle) * ringR;
-      const dy = PORTAL.y + Math.sin(angle) * ringR;
-      const dotAlpha = 0.4 + 0.6 * Math.sin(sec * 3 + d * 1.2);
-      ctx.globalAlpha = dotAlpha;
-      ctx.fillStyle   = "#ffffff";
-      ctx.shadowBlur  = 6; ctx.shadowColor = col;
-      ctx.beginPath(); ctx.arc(dx, dy, 2, 0, Math.PI * 2); ctx.fill();
+      const ringR    = 18 + pulse * 4 + (d % 2) * 8;
+      const speed    = d % 2 === 0 ? 0.7 : -0.5;
+      const angle    = (sec * speed) + (d / dotCount) * Math.PI * 2;
+      const dx       = PORTAL.x + Math.cos(angle) * ringR;
+      const dy       = PORTAL.y + Math.sin(angle) * ringR;
+      const sparkA   = 0.3 + 0.7 * Math.abs(Math.sin(sec * 2.5 + d * 0.8));
+      const sparkR   = 1.2 + pulse * 1.0;
+      ctx.globalAlpha = sparkA;
+      /* spark colour alternates between the two cycling hues */
+      const sparkCol = d % 2 === 0 ? col : col2;
+      ctx.fillStyle   = sparkCol;
+      ctx.shadowBlur  = 8; ctx.shadowColor = sparkCol;
+      ctx.beginPath(); ctx.arc(dx, dy, sparkR, 0, Math.PI * 2); ctx.fill();
       ctx.shadowBlur  = 0;
     }
+
+    /* ── Slow rotating energy wisps (arcs) ── */
+    const wispCount = 3;
+    for (let w = 0; w < wispCount; w++) {
+      const wAngle  = (sec * 0.4) + (w / wispCount) * Math.PI * 2;
+      const wR      = 14 + pulse2 * 5;
+      ctx.globalAlpha = 0.18 + pulse * 0.14;
+      ctx.strokeStyle = w % 2 === 0 ? col : col2;
+      ctx.lineWidth   = 1.5;
+      ctx.shadowBlur  = 10; ctx.shadowColor = col;
+      ctx.beginPath();
+      ctx.arc(PORTAL.x, PORTAL.y, wR, wAngle, wAngle + Math.PI * 0.7);
+      ctx.stroke();
+      ctx.shadowBlur  = 0;
+    }
+
+    ctx.restore();
+  }
+
+  /* ═══════════════════════════════════════════
+     DRAW MAZE EXIT ARROW (room_03 only)
+     — special green/teal glowing down-arrow distinct from normal NPP arrows.
+       Only appears after the ghost has moved (same move-threshold gate).
+       Pulses with a "come back down" feel — brighter than normal exits.
+  ═══════════════════════════════════════════ */
+  function drawMazeExitArrow(now) {
+    if (state.roomId !== MAZE_EXIT.roomId) return;
+
+    const moveReveal = Math.min(1, state.distMovedSinceSpawn / ARROW_MOVE_THRESHOLD);
+    if (moveReveal <= 0) return;
+
+    const sec   = now / 1000;
+    const pulse = 0.5 + 0.5 * Math.sin(sec * 2.4);
+    const bounce= Math.sin(sec * 2.4) * 7;
+    const ax    = MAZE_EXIT.x;
+    const ay    = MAZE_EXIT.y + bounce;           /* bounces downward */
+
+    /* Colours: karasuki-tree greens/purples from the maze palette */
+    const col1  = "#44ff88";   /* bright green */
+    const col2  = "#aa44ff";   /* purple accent */
+    const col3  = "#aaffcc";   /* pale mint highlight */
+
+    ctx.save();
+    ctx.globalAlpha = moveReveal;
+
+    /* ── Wide ambient glow ── */
+    const ambient = ctx.createRadialGradient(ax, ay, 0, ax, ay, 56);
+    ambient.addColorStop(0,   col1 + "44");
+    ambient.addColorStop(0.5, col2 + "22");
+    ambient.addColorStop(1,   "transparent");
+    ctx.globalAlpha = moveReveal * (0.18 + pulse * 0.14);
+    ctx.fillStyle   = ambient;
+    ctx.beginPath(); ctx.arc(ax, ay, 56, 0, Math.PI * 2); ctx.fill();
+
+    /* ── Double chevron pointing DOWN ── */
+    ctx.save();
+    ctx.translate(ax, ay);
+    /* dir: down = Math.PI/2 rotation */
+    ctx.rotate(Math.PI / 2);
+
+    [{ ox: -12, a: 0.55 }, { ox: 5, a: 1.0 }].forEach(({ ox, a }) => {
+      ctx.globalAlpha = moveReveal * a * (0.42 + pulse * 0.38);
+      ctx.strokeStyle = col1;
+      ctx.lineWidth   = 3.0;
+      ctx.lineCap     = "round"; ctx.lineJoin = "round";
+      ctx.shadowBlur  = 16; ctx.shadowColor = col2;
+      ctx.beginPath();
+      ctx.moveTo(ox - 9, -12); ctx.lineTo(ox + 9, 0); ctx.lineTo(ox - 9, 12);
+      ctx.stroke();
+      ctx.shadowBlur  = 0;
+    });
+    ctx.restore();
+
+    /* ── Bright centre dot ── */
+    ctx.globalAlpha = moveReveal * (0.70 + pulse * 0.28);
+    ctx.shadowBlur  = 18; ctx.shadowColor = col1;
+    const dotG = ctx.createRadialGradient(ax, ay, 0, ax, ay, 7);
+    dotG.addColorStop(0,   col3);
+    dotG.addColorStop(0.5, col1);
+    dotG.addColorStop(1,   "transparent");
+    ctx.fillStyle = dotG;
+    ctx.beginPath(); ctx.arc(ax, ay, 7, 0, Math.PI * 2); ctx.fill();
+    ctx.shadowBlur = 0;
+
+    /* ── Small "maze" label above the arrow ── */
+    ctx.globalAlpha = moveReveal * (0.55 + pulse * 0.25);
+    ctx.font        = "bold 13px monospace";
+    ctx.fillStyle   = col3;
+    ctx.textAlign   = "center";
+    ctx.shadowBlur  = 10; ctx.shadowColor = col1;
+    ctx.fillText("MAZE", ax, ay - 28);
+    ctx.shadowBlur  = 0;
+    ctx.textAlign   = "left";  /* reset */
 
     ctx.restore();
   }
@@ -876,8 +1038,11 @@
     /* portal orb — drawn before arrows */
     drawPortalOrb(now);
 
-    /* exit arrows */
+    /* exit arrows — room colour arrows to neighbouring rooms */
     drawExitArrows(now);
+
+    /* maze exit arrow — special green arrow in room_03 back to maze */
+    drawMazeExitArrow(now);
 
     /* ghost */
     const bobFreq  = (Math.PI * 2) / (HOVER_PERIOD / 1000);
@@ -930,21 +1095,48 @@
     const dx = tx - state.x, dy = ty - state.y;
     const dist = Math.hypot(dx, dy);
     if (dist <= CLICK_STOP_DIST) { state.clickTarget = null; state.moving = false; return; }
+    const prevX = state.x, prevY = state.y;
     const moved = tryMove(state.x + (dx / dist) * SPEED, state.y + (dy / dist) * SPEED);
     state.moving = moved;
-    if (!moved) { state.clickTarget = null; state.moving = false; }
-    else        addTrailParticle(state.x, state.y, now);
+    if (!moved) {
+      state.clickTarget = null; state.moving = false;
+    } else {
+      state.distMovedSinceSpawn += Math.hypot(state.x - prevX, state.y - prevY);
+      addTrailParticle(state.x, state.y, now);
+    }
   }
 
   /* ═══════════════════════════════════════════
      MAIN LOOP
   ═══════════════════════════════════════════ */
   function tick(now) {
-    if (!state.transitioning && !isPortalOpen()) {
+    if (!state.transitioning && !isPortalOpen() && !state.mazeExiting) {
       handleClickMovement(now);
-      /* FIX: pass `now` so getNPPExit can honour the cooldown */
-      const exit = getNPPExit(now);
-      if (exit) transitionTo(exit);
+
+      /* Portal proximity trigger — ghost walks up to the orb to open popup */
+      if (state.roomId === "room_08" && state.moving) {
+        const dPortal = Math.hypot(state.x - PORTAL.x, state.y - PORTAL.y);
+        if (dPortal <= PORTAL_TRIGGER_R) {
+          state.clickTarget = null;
+          openPortal();
+        }
+      }
+
+      /* Maze exit — room_03 down arrow, ghost walks into it */
+      if (state.roomId === MAZE_EXIT.roomId &&
+          state.distMovedSinceSpawn >= ARROW_MOVE_THRESHOLD) {
+        const dMaze = Math.hypot(state.x - MAZE_EXIT.x, state.y - MAZE_EXIT.y);
+        if (dMaze <= MAZE_EXIT.r) {
+          exitToMaze();
+        }
+      }
+
+      /* NPP exits — require cooldown elapsed AND ghost has moved a little,
+         so arriving near an edge never fires immediately */
+      if (state.distMovedSinceSpawn >= ARROW_MOVE_THRESHOLD) {
+        const exit = getNPPExit(now);
+        if (exit) transitionTo(exit);
+      }
     }
     drawFrame(now);
     requestAnimationFrame(tick);
@@ -993,6 +1185,7 @@
         return;
       }
 
+      /* Clicking directly on the orb still works as a shortcut */
       if (isNearPortal(p)) {
         openPortal();
         ripples.push({ x: p.x, y: p.y, life: 1 });
