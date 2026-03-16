@@ -1,0 +1,179 @@
+
+#uhibon-launcher{
+  position:fixed;
+  left:18px;
+  bottom:18px;
+  z-index:9999;
+  display:flex;
+  align-items:flex-end;
+  gap:14px;
+}
+
+#uhibon-icon-btn{
+  appearance:none;
+  border:0;
+  background:transparent;
+  padding:0;
+  margin:0;
+  cursor:pointer;
+  display:block;
+}
+
+#uhibon-icon-btn img,
+#uhibon-character img{
+  display:block;
+  user-select:none;
+  -webkit-user-drag:none;
+}
+
+#uhibon-icon-btn img{
+  width:88px;
+  height:auto;
+}
+
+#uhibon-popout{
+  display:flex;
+  align-items:flex-end;
+  gap:12px;
+  opacity:0;
+  pointer-events:none;
+  transform:translateY(16px) scale(.96);
+  transform-origin:bottom left;
+  transition:
+    opacity .22s ease,
+    transform .22s ease;
+}
+
+#uhibon-popout.open{
+  opacity:1;
+  pointer-events:auto;
+  transform:translateY(0) scale(1);
+}
+
+#uhibon-character{
+  width:120px;
+  flex:0 0 auto;
+}
+
+#uhibon-character img{
+  width:100%;
+  height:auto;
+}
+
+#uhibon-chatbox{
+  width:min(320px, calc(100vw - 180px));
+  background:rgba(16,16,24,.92);
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:18px;
+  box-shadow:
+    0 10px 30px rgba(0,0,0,.35),
+    0 0 0 1px rgba(255,255,255,.04) inset;
+  backdrop-filter:blur(10px);
+  overflow:hidden;
+}
+
+#uhibon-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:10px 12px;
+  font-weight:800;
+  color:#fff;
+  background:rgba(255,255,255,.06);
+}
+
+#uhibon-close-btn{
+  appearance:none;
+  border:0;
+  background:transparent;
+  color:#fff;
+  font-size:20px;
+  line-height:1;
+  cursor:pointer;
+}
+
+#uhibon-messages{
+  height:260px;
+  overflow:auto;
+  padding:12px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.uhibon-msg{
+  max-width:86%;
+  padding:10px 12px;
+  border-radius:14px;
+  line-height:1.4;
+  font-size:14px;
+}
+
+.uhibon-msg.bot{
+  align-self:flex-start;
+  background:rgba(200,184,255,.16);
+  color:#fff;
+}
+
+.uhibon-msg.user{
+  align-self:flex-end;
+  background:rgba(255,255,255,.12);
+  color:#fff;
+}
+
+#uhibon-input-row{
+  display:flex;
+  gap:8px;
+  padding:12px;
+  border-top:1px solid rgba(255,255,255,.08);
+  background:rgba(0,0,0,.12);
+}
+
+#uhibon-input{
+  flex:1;
+  min-width:0;
+  border:1px solid rgba(255,255,255,.14);
+  background:rgba(255,255,255,.08);
+  color:#fff;
+  border-radius:12px;
+  padding:10px 12px;
+  outline:none;
+}
+
+#uhibon-input::placeholder{
+  color:rgba(255,255,255,.6);
+}
+
+#uhibon-send-btn{
+  appearance:none;
+  border:0;
+  border-radius:12px;
+  padding:10px 14px;
+  cursor:pointer;
+  font-weight:800;
+  background:#c8b8ff;
+  color:#181421;
+}
+
+@media (max-width: 700px){
+  #uhibon-launcher{
+    left:12px;
+    bottom:12px;
+  }
+
+  #uhibon-popout{
+    gap:8px;
+  }
+
+  #uhibon-character{
+    width:94px;
+  }
+
+  #uhibon-chatbox{
+    width:min(280px, calc(100vw - 130px));
+  }
+
+  #uhibon-icon-btn img{
+    width:74px;
+  }
+}
