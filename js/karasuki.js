@@ -18,7 +18,10 @@
   const TRAIL_MAX       = 90;
 
   /* ── Profile portal (room_08) ── */
-  const PORTAL = { x: 357, y: 342, r: 28, href: "adventure-profile.html" };
+  const PORTAL = { x: 357, y: 342, r: 40, href: "adventure-profile.html" };
+
+  /* ── Arrival arrow delay (ms) before showing the back-direction arrow ── */
+  const ARRIVAL_ARROW_DELAY_MS = 2000;
 
   /* color ramps */
   const MONTH_COLORS = [
@@ -34,90 +37,95 @@
 
   /* ═══════════════════════════════════════════
      NPP — NEXT PAGE POINTS
+     (nudged inward from edges for mobile)
   ═══════════════════════════════════════════ */
   const NPP_RADIUS = 40;
 
   const NPP = {
     room_01: [
-      { dir: "right", x: 1455, y: 658,  to: "room_02", spawn: "fromLeft"  },
-      { dir: "up",    x: 1084, y: 162,  to: "room_06", spawn: "fromDown"  }
+      { dir: "right", x: 1410, y: 658,  to: "room_02", spawn: "fromLeft"  },
+      { dir: "up",    x: 1084, y: 185,  to: "room_06", spawn: "fromDown"  }
     ],
     room_02: [
-      { dir: "left",  x: 149,  y: 255,  to: "room_01", spawn: "fromRight" },
-      { dir: "right", x: 1458, y: 727,  to: "room_03", spawn: "fromLeft"  },
-      { dir: "up",    x: 765,  y: 126,  to: "room_07", spawn: "fromDown"  }
+      { dir: "left",  x: 180,  y: 255,  to: "room_01", spawn: "fromRight" },
+      { dir: "right", x: 1410, y: 727,  to: "room_03", spawn: "fromLeft"  },
+      { dir: "up",    x: 765,  y: 155,  to: "room_07", spawn: "fromDown"  }
     ],
     room_03: [
-      { dir: "left",  x: 218,  y: 328,  to: "room_02", spawn: "fromRight" },
-      { dir: "right", x: 1216, y: 237,  to: "room_04", spawn: "fromLeft"  },
-      { dir: "up",    x: 785,  y: 171,  to: "room_08", spawn: "fromDown"  }
+      { dir: "left",  x: 250,  y: 328,  to: "room_02", spawn: "fromRight" },
+      { dir: "right", x: 1170, y: 237,  to: "room_04", spawn: "fromLeft"  },
+      { dir: "up",    x: 785,  y: 200,  to: "room_08", spawn: "fromDown"  }
     ],
     room_04: [
-      { dir: "left",  x: 94,   y: 635,  to: "room_03", spawn: "fromRight" },
-      { dir: "right", x: 1443, y: 734,  to: "room_05", spawn: "fromLeft"  },
-      { dir: "up",    x: 548,  y: 169,  to: "room_09", spawn: "fromDown"  }
+      { dir: "left",  x: 130,  y: 635,  to: "room_03", spawn: "fromRight" },
+      { dir: "right", x: 1400, y: 734,  to: "room_05", spawn: "fromLeft"  },
+      { dir: "up",    x: 548,  y: 200,  to: "room_09", spawn: "fromDown"  }
     ],
     room_05: [
-      { dir: "left",  x: 218,  y: 328,  to: "room_04", spawn: "fromRight" },
-      { dir: "up",    x: 785,  y: 171,  to: "room_10", spawn: "fromDown"  }
+      { dir: "left",  x: 250,  y: 328,  to: "room_04", spawn: "fromRight" },
+      { dir: "up",    x: 785,  y: 200,  to: "room_10", spawn: "fromDown"  }
     ],
 
     room_06: [
-      { dir: "right", x: 1468, y: 684,  to: "room_07", spawn: "fromLeft"  },
-      { dir: "up",    x: 1096, y: 136,  to: "room_11", spawn: "fromDown"  },
-      { dir: "down",  x: 623,  y: 937,  to: "room_01", spawn: "fromUp"    }
+      { dir: "right", x: 1410, y: 684,  to: "room_07", spawn: "fromLeft"  },
+      { dir: "up",    x: 1096, y: 165,  to: "room_11", spawn: "fromDown"  },
+      { dir: "down",  x: 623,  y: 910,  to: "room_01", spawn: "fromUp"    }
     ],
     room_07: [
-      { dir: "left",  x: 28,   y: 687,  to: "room_06", spawn: "fromRight" },
-      { dir: "right", x: 1484, y: 615,  to: "room_08", spawn: "fromLeft"  },
-      { dir: "up",    x: 555,  y: 157,  to: "room_12", spawn: "fromDown"  },
-      { dir: "down",  x: 901,  y: 892,  to: "room_02", spawn: "fromUp"    }
+      { dir: "left",  x: 80,   y: 687,  to: "room_06", spawn: "fromRight" },
+      { dir: "right", x: 1440, y: 615,  to: "room_08", spawn: "fromLeft"  },
+      { dir: "up",    x: 555,  y: 185,  to: "room_12", spawn: "fromDown"  },
+      { dir: "down",  x: 901,  y: 865,  to: "room_02", spawn: "fromUp"    }
     ],
     room_08: [
-      { dir: "left",  x: 47,   y: 809,  to: "room_07", spawn: "fromRight" },
-      { dir: "right", x: 1520, y: 597,  to: "room_09", spawn: "fromLeft"  },
-      { dir: "up",    x: 992,  y: 160,  to: "room_13", spawn: "fromDown"  },
-      { dir: "down",  x: 860,  y: 874,  to: "room_03", spawn: "fromUp"    }
+      { dir: "left",  x: 109,  y: 776,  to: "room_07", spawn: "fromRight" },
+      { dir: "right", x: 1460, y: 592,  to: "room_09", spawn: "fromLeft"  },
+      { dir: "up",    x: 984,  y: 168,  to: "room_13", spawn: "fromDown"  },
+      { dir: "down",  x: 848,  y: 917,  to: "room_03", spawn: "fromUp"    }
     ],
     room_09: [
-      { dir: "left",  x: 50,   y: 702,  to: "room_08", spawn: "fromRight" },
+      { dir: "left",  x: 80,   y: 702,  to: "room_08", spawn: "fromRight" },
       { dir: "right", x: 1365, y: 224,  to: "room_10", spawn: "fromLeft"  },
-      { dir: "up",    x: 449,  y: 169,  to: "room_14", spawn: "fromDown"  },
-      { dir: "down",  x: 918,  y: 883,  to: "room_04", spawn: "fromUp"    }
+      { dir: "up",    x: 449,  y: 200,  to: "room_14", spawn: "fromDown"  },
+      { dir: "down",  x: 918,  y: 860,  to: "room_04", spawn: "fromUp"    }
     ],
     room_10: [
-      { dir: "left",  x: 50,   y: 702,  to: "room_09", spawn: "fromRight" },
-      { dir: "up",    x: 838,  y: 173,  to: "room_15", spawn: "fromDown"  },
-      { dir: "down",  x: 776,  y: 891,  to: "room_05", spawn: "fromUp"    }
+      { dir: "left",  x: 80,   y: 702,  to: "room_09", spawn: "fromRight" },
+      { dir: "up",    x: 838,  y: 200,  to: "room_15", spawn: "fromDown"  },
+      { dir: "down",  x: 776,  y: 865,  to: "room_05", spawn: "fromUp"    }
     ],
 
     room_11: [
-      { dir: "right", x: 1364, y: 312,  to: "room_12", spawn: "fromLeft"  },
-      { dir: "down",  x: 804,  y: 881,  to: "room_06", spawn: "fromUp"    }
+      { dir: "right", x: 1320, y: 312,  to: "room_12", spawn: "fromLeft"  },
+      { dir: "down",  x: 804,  y: 855,  to: "room_06", spawn: "fromUp"    }
     ],
     room_12: [
-      { dir: "left",  x: 173,  y: 344,  to: "room_11", spawn: "fromRight" },
-      { dir: "right", x: 1485, y: 716,  to: "room_13", spawn: "fromLeft"  },
-      { dir: "down",  x: 751,  y: 914,  to: "room_07", spawn: "fromUp"    }
+      { dir: "left",  x: 210,  y: 344,  to: "room_11", spawn: "fromRight" },
+      { dir: "right", x: 1440, y: 716,  to: "room_13", spawn: "fromLeft"  },
+      { dir: "down",  x: 751,  y: 888,  to: "room_07", spawn: "fromUp"    }
     ],
     room_13: [
-      { dir: "left",  x: 88,   y: 568,  to: "room_12", spawn: "fromRight" },
-      { dir: "right", x: 1421, y: 242,  to: "room_14", spawn: "fromLeft"  },
-      { dir: "down",  x: 910,  y: 913,  to: "room_08", spawn: "fromUp"    }
+      { dir: "left",  x: 120,  y: 568,  to: "room_12", spawn: "fromRight" },
+      { dir: "right", x: 1380, y: 242,  to: "room_14", spawn: "fromLeft"  },
+      { dir: "down",  x: 910,  y: 888,  to: "room_08", spawn: "fromUp"    }
     ],
     room_14: [
-      { dir: "left",  x: 173,  y: 344,  to: "room_13", spawn: "fromRight" },
-      { dir: "right", x: 1485, y: 716,  to: "room_15", spawn: "fromLeft"  },
-      { dir: "down",  x: 751,  y: 914,  to: "room_09", spawn: "fromUp"    }
+      { dir: "left",  x: 210,  y: 344,  to: "room_13", spawn: "fromRight" },
+      { dir: "right", x: 1440, y: 716,  to: "room_15", spawn: "fromLeft"  },
+      { dir: "down",  x: 751,  y: 888,  to: "room_09", spawn: "fromUp"    }
     ],
     room_15: [
-      { dir: "left",  x: 88,   y: 568,  to: "room_14", spawn: "fromRight" },
-      { dir: "down",  x: 663,  y: 894,  to: "room_10", spawn: "fromUp"    }
+      { dir: "left",  x: 120,  y: 568,  to: "room_14", spawn: "fromRight" },
+      { dir: "down",  x: 663,  y: 868,  to: "room_10", spawn: "fromUp"    }
     ]
   };
 
   const DIR_ANGLE = { right: 0, down: Math.PI / 2, left: Math.PI, up: -Math.PI / 2 };
-  const ARRIVE_HIDE_DIST = 120;
+
+  /* ── Arrival arrow behaviour ──
+     Instead of hiding the back-dir arrow by distance, we hide it for
+     ARRIVAL_ARROW_DELAY_MS after entering a room, then fade it in.      */
+  let arrivalArrowHiddenUntil = 0;   // timestamp when the arrival arrow can show
 
   /* ═══════════════════════════════════════════
      STATE
@@ -125,9 +133,9 @@
   const state = {
     roomId        : DATA.startRoom,
     spawnId       : "default",
-    x             : 721,
+    x             : 732,
     y             : 876,
-    spawnX        : 721,
+    spawnX        : 732,
     spawnY        : 876,
     arrivalDir    : null,
     transitioning : false,
@@ -137,6 +145,18 @@
     musicStarted  : false,
     lastTrailT    : 0
   };
+
+  /* ── On return from adventure-profile, spawn at checkpoint ── */
+  (function checkReturnFromProfile() {
+    try {
+      const ret = sessionStorage.getItem('karasuki_return_room');
+      if (ret === 'room_08') {
+        state.roomId  = 'room_08';
+        state.spawnId = 'default';   // room_08 default is now the checkpoint
+        sessionStorage.removeItem('karasuki_return_room');
+      }
+    } catch (_) {}
+  })();
 
   let pins    = [];
   let trail   = [];
@@ -149,7 +169,7 @@
   music.volume   = 0.65;
 
   let app, stage, canvas, ctx, roomLayer, coordToggle, coordReadout, pinLog;
-  let portalOverlay = null;   // DOM popup for profile portal
+  let portalOverlay = null;
 
   /* ═══════════════════════════════════════════
      STYLES
@@ -252,7 +272,7 @@
       }
       #copy-toast.show{opacity:1;}
 
-      /* ── Profile portal popup ── */
+      /* ── Profile portal popup — bright glow, readable text, mobile-scaled ── */
       #portal-overlay{
         display:none;position:fixed;inset:0;z-index:9000;
         align-items:center;justify-content:center;
@@ -261,69 +281,87 @@
       }
       #portal-overlay.active{
         display:flex;
-        background:rgba(0,0,0,0.78);
+        background:rgba(0,0,0,0.82);
       }
       #portal-box{
-        background:#0a0a0f;
-        border:1px solid #1e0e2a;
-        border-radius:3px;
-        padding:40px 50px 34px;
-        max-width:400px;width:88%;
+        background:#080810;
+        border:1px solid #3a1055;
+        border-radius:6px;
+        padding:clamp(24px,5vw,44px) clamp(20px,6vw,52px) clamp(20px,4vw,36px);
+        max-width:min(440px, 92vw);
+        width:92vw;
         text-align:center;
         box-shadow:
-          0 0 0 1px rgba(80,0,110,.4),
-          0 0 30px rgba(80,0,110,.45),
-          0 0 80px rgba(60,0,90,.25),
-          inset 0 0 40px rgba(0,0,0,.6);
+          0 0 0 1px rgba(160,40,220,.6),
+          0 0 40px rgba(160,40,220,.7),
+          0 0 90px rgba(120,0,180,.45),
+          0 0 160px rgba(100,0,160,.2),
+          inset 0 0 50px rgba(0,0,0,.5);
         font-family:'Georgia',serif;
         position:relative;
         animation:portalAppear 0.25s ease-out;
       }
       @keyframes portalAppear{
-        from{opacity:0;transform:scale(0.94) translateY(6px);}
+        from{opacity:0;transform:scale(0.92) translateY(8px);}
         to{opacity:1;transform:scale(1) translateY(0);}
       }
-      /* faint corner accents */
       #portal-box::before,#portal-box::after{
-        content:"";position:absolute;width:18px;height:18px;
-        border-color:rgba(120,40,160,.5);border-style:solid;
+        content:"";position:absolute;width:20px;height:20px;
+        border-color:rgba(180,80,220,.7);border-style:solid;
       }
-      #portal-box::before{top:10px;left:10px;border-width:1px 0 0 1px;}
-      #portal-box::after{bottom:10px;right:10px;border-width:0 1px 1px 0;}
+      #portal-box::before{top:10px;left:10px;border-width:1.5px 0 0 1.5px;}
+      #portal-box::after{bottom:10px;right:10px;border-width:0 1.5px 1.5px 0;}
       #portal-en{
-        font-size:1rem;margin:0 0 8px;letter-spacing:.04em;
-        color:#d4c8de;line-height:1.55;
+        font-size:clamp(.9rem,3.5vw,1.1rem);
+        margin:0 0 10px;
+        letter-spacing:.04em;
+        color:#f0e8ff;
+        line-height:1.55;
+        text-shadow:0 0 20px rgba(200,180,255,.5);
       }
       #portal-ja{
-        font-size:.84rem;margin:0 0 5px;color:#9a85aa;
+        font-size:clamp(.78rem,3vw,.92rem);
+        margin:0 0 6px;
+        color:#cdb8e8;
         letter-spacing:.05em;
       }
       #portal-kanji{
-        font-size:.77rem;margin:0 0 30px;color:#6a5478;
+        font-size:clamp(.72rem,2.5vw,.84rem);
+        margin:0 0 clamp(18px,4vw,32px);
+        color:#a888cc;
         letter-spacing:.08em;
       }
       .portal-btn{
         background:transparent;
         font-family:'Georgia',serif;
-        font-size:.88rem;letter-spacing:.12em;
+        font-size:clamp(.82rem,3vw,.95rem);
+        letter-spacing:.12em;
         cursor:pointer;
-        transition:color .18s, border-color .18s, box-shadow .18s;
-        padding:8px 30px;border-radius:2px;
+        transition:color .18s, border-color .18s, box-shadow .18s, background .18s;
+        padding:clamp(6px,2vw,10px) clamp(20px,5vw,34px);
+        border-radius:3px;
       }
       #portal-yes{
-        border:1px solid rgba(110,40,150,.7);
-        color:#c0a8d0;margin-right:14px;
+        border:1.5px solid rgba(160,70,210,.9);
+        color:#e8d8ff;
+        margin-right:16px;
+        background:rgba(100,30,150,.15);
       }
       #portal-yes:hover{
-        color:#fff;border-color:rgba(160,80,200,.9);
-        box-shadow:0 0 12px rgba(140,40,180,.4);
+        color:#fff;
+        border-color:rgba(210,120,255,1);
+        background:rgba(140,50,200,.3);
+        box-shadow:0 0 20px rgba(180,80,240,.6),0 0 40px rgba(140,40,200,.3);
       }
       #portal-no{
-        border:1px solid rgba(50,35,60,.7);
-        color:#5a4a64;
+        border:1.5px solid rgba(70,45,90,.8);
+        color:#b8a8c8;
+        background:rgba(40,25,60,.2);
       }
       #portal-no:hover{
-        color:#9a8aaa;border-color:rgba(80,55,100,.8);
+        color:#ddd0ff;
+        border-color:rgba(130,90,160,.9);
+        background:rgba(70,45,100,.3);
       }
     `;
     document.head.appendChild(s);
@@ -397,6 +435,8 @@
 
     /* portal button events */
     document.getElementById("portal-yes").addEventListener("click", () => {
+      // Mark that we came from room_08 so we return to checkpoint
+      try { sessionStorage.setItem('karasuki_return_room', 'room_08'); } catch (_) {}
       window.location.href = PORTAL.href;
     });
     document.getElementById("portal-no").addEventListener("click", closePortal);
@@ -509,6 +549,10 @@
     roomLayer.appendChild(currentBg);
     const spawn = getSpawn(room, state.spawnId);
     placeGhost(spawn.x, spawn.y);
+    state.spawnX = spawn.x;
+    state.spawnY = spawn.y;
+    // On first load, set arrival arrow timer so it doesn't show immediately
+    arrivalArrowHiddenUntil = performance.now() + ARRIVAL_ARROW_DELAY_MS;
   }
 
   /* ═══════════════════════════════════════════
@@ -565,6 +609,10 @@
       state.spawnY     = spawn.y;
       state.arrivalDir = exit.dir || null;
       trail = []; pins = [];
+
+      // Start the 2-second delay before showing the arrival-direction arrow
+      arrivalArrowHiddenUntil = performance.now() + ARRIVAL_ARROW_DELAY_MS;
+
       const lh = pinLog.querySelector(".log-header span");
       if (lh) lh.textContent = `PINS — ${state.roomId}`;
       renderPinLog();
@@ -603,6 +651,8 @@
 
   /* ═══════════════════════════════════════════
      DRAW EXIT ARROWS
+     — arrival-direction arrow is hidden for
+       ARRIVAL_ARROW_DELAY_MS after entering a room
   ═══════════════════════════════════════════ */
   function drawExitArrows(now) {
     const npps = NPP[state.roomId];
@@ -611,12 +661,23 @@
     const [col1, col2] = roomColorPair(state.roomId);
     const OPPOSITE = { left: "right", right: "left", up: "down", down: "up" };
     const arrivalExit  = state.arrivalDir ? OPPOSITE[state.arrivalDir] : null;
-    const distFromSpawn = Math.hypot(state.x - state.spawnX, state.y - state.spawnY);
-    const arrivalRevealed = distFromSpawn >= ARRIVE_HIDE_DIST;
+
+    // How far through the delay are we? 0 = just arrived, 1 = fully revealed
+    const delayRemaining = arrivalArrowHiddenUntil - now;
+    const arrivalAlpha   = delayRemaining <= 0
+      ? 1
+      : Math.max(0, 1 - (delayRemaining / ARRIVAL_ARROW_DELAY_MS));
+    // Smooth the reveal with a short fade window at the end of the delay
+    const revealFade = delayRemaining > 400
+      ? 0
+      : arrivalAlpha;
 
     npps.forEach((npp, i) => {
       if (!npp.dir) return;
-      if (npp.dir === arrivalExit && !arrivalRevealed) return;
+
+      const isArrivalDir = (npp.dir === arrivalExit);
+      // Skip drawing entirely if we're still in the hidden window
+      if (isArrivalDir && delayRemaining > 400) return;
 
       const angle  = DIR_ANGLE[npp.dir] ?? 0;
       const pulse  = 0.5 + 0.5 * Math.sin(sec * 2.2 + i * 1.3);
@@ -624,9 +685,7 @@
       const ax = npp.x + Math.cos(angle) * bounce;
       const ay = npp.y + Math.sin(angle) * bounce;
 
-      const fadeAlpha = (npp.dir === arrivalExit)
-        ? Math.min((distFromSpawn - ARRIVE_HIDE_DIST) / 60, 1)
-        : 1;
+      const fadeAlpha = isArrivalDir ? revealFade : 1;
 
       ctx.save();
       ctx.globalAlpha = fadeAlpha;
@@ -661,8 +720,8 @@
   }
 
   /* ═══════════════════════════════════════════
-     DRAW PORTAL ORB  (room_08 only)
-     — color-cycling glow, no text, no arrows
+     DRAW PORTAL ORB (room_08)
+     — glowing checkpoint so students know to go there
   ═══════════════════════════════════════════ */
   const PORTAL_COLORS = [
     '#8b00ff','#00bfff','#ff007f','#00ff99','#ffaa00','#aa00ff'
@@ -672,7 +731,6 @@
     if (state.roomId !== "room_08") return;
 
     const sec   = now / 1000;
-    /* slow cycle through hue palette */
     const cycleT = (sec * 0.28) % PORTAL_COLORS.length;
     const idx0   = Math.floor(cycleT) % PORTAL_COLORS.length;
     const idx1   = (idx0 + 1) % PORTAL_COLORS.length;
@@ -680,30 +738,54 @@
     const col    = lerpHex(PORTAL_COLORS[idx0], PORTAL_COLORS[idx1], t);
 
     const pulse  = 0.5 + 0.5 * Math.sin(sec * 2.6);
-    const r      = 6 + pulse * 3;   /* small orb */
+    const r      = 8 + pulse * 4;
 
     ctx.save();
 
-    /* outer soft halo */
+    /* wide ambient halo — makes it easy to spot on mobile */
+    const ambient = ctx.createRadialGradient(PORTAL.x, PORTAL.y, 0, PORTAL.x, PORTAL.y, 70);
+    ambient.addColorStop(0, col + "44");
+    ambient.addColorStop(0.5, col + "18");
+    ambient.addColorStop(1, "transparent");
+    ctx.globalAlpha = 0.5 + pulse * 0.4;
+    ctx.fillStyle   = ambient;
+    ctx.beginPath(); ctx.arc(PORTAL.x, PORTAL.y, 70, 0, Math.PI * 2); ctx.fill();
+
+    /* mid halo */
     const halo = ctx.createRadialGradient(PORTAL.x, PORTAL.y, 0, PORTAL.x, PORTAL.y, 38);
-    halo.addColorStop(0, col + "55");
-    halo.addColorStop(0.45, col + "22");
+    halo.addColorStop(0, col + "88");
+    halo.addColorStop(0.5, col + "33");
     halo.addColorStop(1, "transparent");
-    ctx.globalAlpha = 0.6 + pulse * 0.35;
+    ctx.globalAlpha = 0.7 + pulse * 0.25;
     ctx.fillStyle   = halo;
     ctx.beginPath(); ctx.arc(PORTAL.x, PORTAL.y, 38, 0, Math.PI * 2); ctx.fill();
 
-    /* inner glow ring */
-    const ring = ctx.createRadialGradient(PORTAL.x, PORTAL.y, r * 0.3, PORTAL.x, PORTAL.y, r * 2.2);
+    /* bright core orb */
+    const ring = ctx.createRadialGradient(PORTAL.x, PORTAL.y, r * 0.2, PORTAL.x, PORTAL.y, r * 2.4);
     ring.addColorStop(0, "#fff");
-    ring.addColorStop(0.35, col);
+    ring.addColorStop(0.3, col);
     ring.addColorStop(1, "transparent");
-    ctx.globalAlpha = 0.85 + pulse * 0.12;
-    ctx.shadowBlur  = 18 + pulse * 10;
+    ctx.globalAlpha = 0.9 + pulse * 0.08;
+    ctx.shadowBlur  = 22 + pulse * 14;
     ctx.shadowColor = col;
     ctx.fillStyle   = ring;
     ctx.beginPath(); ctx.arc(PORTAL.x, PORTAL.y, r, 0, Math.PI * 2); ctx.fill();
     ctx.shadowBlur  = 0;
+
+    /* sparkling ring of dots around the checkpoint */
+    const dotCount = 6;
+    const ringR    = 22 + pulse * 3;
+    for (let d = 0; d < dotCount; d++) {
+      const angle = (sec * 0.9) + (d / dotCount) * Math.PI * 2;
+      const dx = PORTAL.x + Math.cos(angle) * ringR;
+      const dy = PORTAL.y + Math.sin(angle) * ringR;
+      const dotAlpha = 0.4 + 0.6 * Math.sin(sec * 3 + d * 1.2);
+      ctx.globalAlpha = dotAlpha;
+      ctx.fillStyle = "#ffffff";
+      ctx.shadowBlur = 6; ctx.shadowColor = col;
+      ctx.beginPath(); ctx.arc(dx, dy, 2, 0, Math.PI * 2); ctx.fill();
+      ctx.shadowBlur = 0;
+    }
 
     ctx.restore();
   }
@@ -785,7 +867,7 @@
     }
     trail = trail.filter(p => p.life > 0);
 
-    /* portal orb — drawn before arrows so arrows are on top */
+    /* portal orb — drawn before arrows */
     drawPortalOrb(now);
 
     /* exit arrows */
@@ -862,7 +944,7 @@
   }
 
   /* ═══════════════════════════════════════════
-     MUSIC
+     MUSIC — starts on any click/touch anywhere
   ═══════════════════════════════════════════ */
   function startMusic() {
     if (state.musicStarted) return;
@@ -904,7 +986,6 @@
         return;
       }
 
-      /* portal tap — open popup, don't move ghost */
       if (isNearPortal(p)) {
         openPortal();
         ripples.push({ x: p.x, y: p.y, life: 1 });
@@ -940,6 +1021,10 @@
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") closePortal();
     });
+
+    /* Any interaction anywhere on the document restarts music (handles return from profile) */
+    document.addEventListener("click",    startMusic, { once: false });
+    document.addEventListener("touchend", startMusic, { once: false, passive: true });
   }
 
   /* ═══════════════════════════════════════════
@@ -958,4 +1043,3 @@
 
   init();
 })();
-
