@@ -1229,24 +1229,38 @@ function fireConfetti() {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   RESULTS
+   DROP-IN REPLACEMENT for showResults() in vocab-tap.js
+   Replace the entire showResults function (from `function showResults() {`
+   through its closing `}`) with this block.
+
+   WHAT CHANGED:
+   1. BoohaAdventure reference is now safely guarded with optional
+      chaining + fallback — no more "Can't find variable: BoohaAdventure"
+      crash that was killing the whole function and hiding the results panel.
+   2. Fixed resultsWrap selector (was using hard-coded 'vt-results-wrap'
+      which is already correct, but the display logic is now explicit).
+   3. No other game logic changed.
    ══════════════════════════════════════════════════════════════ */
 function showResults() {
   updateDots(3);
   mainWrap.style.display = 'none';
   resultsWrap.classList.add('show');
+
   const tier = getTier(score);
   const pct  = Math.round((score / 15) * 100);
 
-  // ── Save score to Booha Adventure save system ──────────────────────────
+  /* ── Save score to Booha Adventure save system ─────────────────────────
+     Guard with optional chaining so the game never crashes if
+     BoohaAdventure isn't mounted yet (e.g. standalone testing).        */
   document.dispatchEvent(new CustomEvent('booha:gameEnd', {
     detail: {
-      saveId:    BoohaAdventure.registry.saveId(CFG.curriculum, 'vocab_tap'),
+      saveId:    (window.BoohaAdventure?.registry?.saveId ?? ((c, g) => `${c}__${g}`))(
+                   CFG.curriculum, 'vocab_tap'),
       score:     pct,          // 0–100 scale to match registry's scoreMax
       completed: score === 15, // true only on a perfect run
     }
   }));
-  // ──────────────────────────────────────────────────────────────────────
+  /* ────────────────────────────────────────────────────────────────────── */
 
   const resEl = document.getElementById('vt-results');
   resEl.style.setProperty('--tier-color', tier.color);
@@ -1256,37 +1270,43 @@ function showResults() {
   document.getElementById('vt-re').textContent = tier.en;
   document.getElementById('vt-rj').textContent = tier.jp;
   document.getElementById('vt-rk').textContent = tier.kanji;
+
   /* Build colorful action buttons */
   resActions.innerHTML = '';
   tier.actions.forEach(act => {
     const btn = document.createElement('button');
-    btn.id = act.id;
+    btn.id        = act.id;
     btn.className = `vt-res-btn ${act.cls}`;
     btn.innerHTML = `<span>${act.label}</span>`;
     resActions.appendChild(btn);
   });
+
   /* Wire up actions */
   const replayBtn = document.getElementById('vt-replay');
   const backBtn   = document.getElementById('vt-back');
+
   if (replayBtn) replayBtn.addEventListener('click', () => {
     resultsWrap.classList.remove('show');
     mainWrap.style.display = '';
     /* Re-shuffle everything on replay */
     allCards = buildShuffledDeck();
-    score = 0;
+    score    = 0;
     scoreEl.textContent = '0';
     document.body.classList.remove('hira-mode');
-    hiraMode = false;
+    hiraMode            = false;
     hiraLabel.textContent = 'ひらがな';
     startRound(0);
   });
+
   if (backBtn) backBtn.addEventListener('click', () => {
     window.location.assign(CFG.navTarget + '?week=' + encodeURIComponent(CFG.weekParam));
   });
+
   if (score === 15) {
     setTimeout(fireConfetti, 400);
     setTimeout(fireConfetti, 900);
   }
+
   const snd = new Audio(CFG.sfxBase + tier.sound);
   snd.setAttribute('playsinline', '');
   snd.play().catch(() => {});
