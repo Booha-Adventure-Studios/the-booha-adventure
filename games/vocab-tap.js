@@ -1234,21 +1234,28 @@ function fireConfetti() {
 function showResults() {
   updateDots(3);
   mainWrap.style.display = 'none';
-
   resultsWrap.classList.add('show');
-
   const tier = getTier(score);
   const pct  = Math.round((score / 15) * 100);
+
+  // ── Save score to Booha Adventure save system ──────────────────────────
+  document.dispatchEvent(new CustomEvent('booha:gameEnd', {
+    detail: {
+      saveId:    BoohaAdventure.registry.saveId(CFG.curriculum, 'vocab_tap'),
+      score:     pct,          // 0–100 scale to match registry's scoreMax
+      completed: score === 15, // true only on a perfect run
+    }
+  }));
+  // ──────────────────────────────────────────────────────────────────────
+
   const resEl = document.getElementById('vt-results');
   resEl.style.setProperty('--tier-color', tier.color);
-
   document.getElementById('vt-rs').textContent = `${score} / 15`;
   document.getElementById('vt-rp').textContent = `${pct}%`;
   document.getElementById('vt-rl').textContent = tier.label;
   document.getElementById('vt-re').textContent = tier.en;
   document.getElementById('vt-rj').textContent = tier.jp;
   document.getElementById('vt-rk').textContent = tier.kanji;
-
   /* Build colorful action buttons */
   resActions.innerHTML = '';
   tier.actions.forEach(act => {
@@ -1258,11 +1265,9 @@ function showResults() {
     btn.innerHTML = `<span>${act.label}</span>`;
     resActions.appendChild(btn);
   });
-
   /* Wire up actions */
   const replayBtn = document.getElementById('vt-replay');
   const backBtn   = document.getElementById('vt-back');
-
   if (replayBtn) replayBtn.addEventListener('click', () => {
     resultsWrap.classList.remove('show');
     mainWrap.style.display = '';
@@ -1275,21 +1280,17 @@ function showResults() {
     hiraLabel.textContent = 'ひらがな';
     startRound(0);
   });
-
   if (backBtn) backBtn.addEventListener('click', () => {
     window.location.assign(CFG.navTarget + '?week=' + encodeURIComponent(CFG.weekParam));
   });
-
   if (score === 15) {
     setTimeout(fireConfetti, 400);
     setTimeout(fireConfetti, 900);
   }
-
   const snd = new Audio(CFG.sfxBase + tier.sound);
   snd.setAttribute('playsinline', '');
   snd.play().catch(() => {});
 }
-
 /* ══════════════════════════════════════════════════════════════
    GO
    ══════════════════════════════════════════════════════════════ */
