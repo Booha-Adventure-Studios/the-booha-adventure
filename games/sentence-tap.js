@@ -1032,37 +1032,43 @@ function showResults() {
   updateDots(3);
   mainWrap.style.display = 'none';
   resultsWrap.classList.add('show');
-
   const tier = getTier(score);
   const pct  = Math.round((score / 15) * 100);
-  const resEl = document.getElementById('st-results');
+
+  // ── Save score to Booha Adventure save system ──────────────────────────
+  document.dispatchEvent(new CustomEvent('booha:gameEnd', {
+    detail: {
+      saveId:    BoohaAdventure.registry.saveId(CFG.curriculum, 'sentence_tap'),
+      score:     pct,          // 0–100 scale to match registry's scoreMax
+      completed: score === 15, // true only on a perfect run
+    }
+  }));
+  // ──────────────────────────────────────────────────────────────────────
+
+  const resEl = document.getElementById('vt-results');
   resEl.style.setProperty('--tier-color', tier.color);
-
-  document.getElementById('st-rs').textContent = `${score} / 15`;
-  document.getElementById('st-rp').textContent = `${pct}%`;
-  document.getElementById('st-rl').textContent = tier.label;
-  document.getElementById('st-re').textContent = tier.en;
-  document.getElementById('st-rj').textContent = tier.jp;
-  document.getElementById('st-rk').textContent = tier.kanji;
-
+  document.getElementById('vt-rs').textContent = `${score} / 15`;
+  document.getElementById('vt-rp').textContent = `${pct}%`;
+  document.getElementById('vt-rl').textContent = tier.label;
+  document.getElementById('vt-re').textContent = tier.en;
+  document.getElementById('vt-rj').textContent = tier.jp;
+  document.getElementById('vt-rk').textContent = tier.kanji;
   /* Build colorful action buttons */
   resActions.innerHTML = '';
   tier.actions.forEach(act => {
     const btn = document.createElement('button');
     btn.id = act.id;
-    btn.className = act.cls;
+    btn.className = `vt-res-btn ${act.cls}`;
     btn.innerHTML = `<span>${act.label}</span>`;
     resActions.appendChild(btn);
   });
-
-  /* Wire actions */
-  const replayBtn = document.getElementById('st-replay');
-  const backBtn   = document.getElementById('st-back');
-
+  /* Wire up actions */
+  const replayBtn = document.getElementById('vt-replay');
+  const backBtn   = document.getElementById('vt-back');
   if (replayBtn) replayBtn.addEventListener('click', () => {
     resultsWrap.classList.remove('show');
     mainWrap.style.display = '';
-    /* Reshuffle everything on replay */
+    /* Re-shuffle everything on replay */
     allCards = buildShuffledDeck();
     score = 0;
     scoreEl.textContent = '0';
@@ -1071,16 +1077,13 @@ function showResults() {
     hiraLabel.textContent = 'ひらがな';
     startRound(0);
   });
-
   if (backBtn) backBtn.addEventListener('click', () => {
     window.location.assign(CFG.navTarget + '?week=' + encodeURIComponent(CFG.weekParam));
   });
-
   if (score === 15) {
     setTimeout(fireConfetti, 400);
     setTimeout(fireConfetti, 900);
   }
-
   const snd = new Audio(CFG.sfxBase + tier.sound);
   snd.setAttribute('playsinline', '');
   snd.play().catch(() => {});
