@@ -179,7 +179,7 @@ window.KARASUKI_DATA = {
       spawns: {
         default:   { x: 732,  y: 700  },
         fromLeft:  { x: 220,  y: 568  },
-        fromRight: { x: 1300, y: 340  },
+        fromRight: { x: 1340, y: 46  },
         fromUp:    { x: 732,  y: 340  },
         fromDown:  { x: 910,  y: 740  }
       }
@@ -189,7 +189,7 @@ window.KARASUKI_DATA = {
       bg: "assets/img/karasuki/room_14.webp",
       spawns: {
         default:   { x: 732,  y: 700  },
-        fromLeft:  { x: 310,  y: 344  },
+        fromLeft:  { x: 154,  y: 656  },
         fromRight: { x: 1340, y: 716  },
         fromUp:    { x: 732,  y: 340  },
         fromDown:  { x: 751,  y: 740  }
