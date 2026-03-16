@@ -4,7 +4,14 @@
    Supports: English / Japanese (CJK)
 ───────────────────────────────────────────── */
 
-@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=MedievalSharp&family=Noto+Serif+JP:wght@400;600&family=IM+Fell+English:ital@0;1&family=Noto+Sans+JP:wght@400;700&display=swap');
+/*
+  Fonts chosen for readability + atmosphere:
+  • Philosopher  — elegant serif with great CJK fallback, clear at small sizes
+  • Noto Serif JP — beautiful Japanese serif that pairs with Philosopher
+  • Cinzel Decorative — kept only for the header title (decorative, not body)
+  • Noto Sans JP — clean JP sans for user input & user messages
+*/
+@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Philosopher:ital,wght@0,400;0,700;1,400&family=Noto+Serif+JP:wght@400;600&family=Noto+Sans+JP:wght@400;500&display=swap');
 
 /* ── Tokens ── */
 :root {
@@ -21,9 +28,12 @@
   --uhi-text-user:     #f0ecff;   /* Player speaks in white-lavender */
   --uhi-radius:        18px;
 
-  /* Font stacks — CJK-aware */
-  --font-spooky: 'Cinzel Decorative', 'Noto Serif JP', serif;
-  --font-body:   'IM Fell English', 'Noto Sans JP', serif;
+  /* Font stacks — CJK-aware
+     Philosopher is a clear, characterful serif that stays legible at 13-14 px.
+     Noto Serif JP fills in all Japanese glyphs with matching weight. */
+  --font-spooky: 'Cinzel Decorative', 'Noto Serif JP', serif;  /* header only */
+  --font-bot:    'Philosopher', 'Noto Serif JP', serif;          /* Uhibon's voice */
+  --font-body:   'Philosopher', 'Noto Sans JP', sans-serif;      /* user / UI */
 }
 
 /* ════════════════════════════════════════════
@@ -169,6 +179,29 @@
   50%     { transform: translateY(-4px) rotate( 1deg); }
 }
 
+/* ── Upgrade 1: Idle micro-actions ──────────────────────────
+   .idle-blink  — quick vertical squint (scaleY)
+   .idle-look   — slight head-tilt glance
+   Both are class-based, applied momentarily by JS.         */
+#uhibon-character img.idle-blink {
+  animation: uhi-blink .28s ease-in-out forwards;
+}
+
+@keyframes uhi-blink {
+  0%,100% { transform: scaleY(1)    translateY(0); }
+  40%     { transform: scaleY(0.82) translateY(2px); }
+}
+
+#uhibon-character img.idle-look {
+  animation: uhi-look .55s ease-in-out forwards;
+}
+
+@keyframes uhi-look {
+  0%,100% { transform: translateY(0)    rotate(0deg); }
+  35%     { transform: translateY(-3px) rotate(3deg); }
+  65%     { transform: translateY(-3px) rotate(2deg); }
+}
+
 /* ════════════════════════════════════════════
    CHATBOX SHELL
 ════════════════════════════════════════════ */
@@ -282,20 +315,38 @@
   to   { opacity: 1; transform: translateY(0)   scale(1); }
 }
 
-/* BOT message — Uhibon in gold spooky font */
+/* BOT message — Uhibon in gold, Philosopher serif */
 .uhibon-msg.bot {
   align-self: flex-start;
-  font-family: var(--font-spooky);
-  font-size: 13px;
+  font-family: var(--font-bot);
+  font-size: 14px;
   font-weight: 400;
-  letter-spacing: .03em;
+  letter-spacing: .01em;
+  line-height: 1.6;
   color: var(--uhi-text-bot);
   background: rgba(60, 20, 100, 0.45);
   border: 1px solid rgba(123, 79, 207, 0.35);
-  text-shadow: 0 0 8px rgba(245, 200, 66, 0.40);
+  text-shadow: 0 0 8px rgba(245, 200, 66, 0.35);
   box-shadow:
     0 2px 12px rgba(0,0,0,.30),
     0 0  18px rgba(123, 79, 207, 0.12) inset;
+}
+
+/* Bilingual spans inside bot messages */
+.uhibon-en {
+  display: block;
+  font-weight: 700;
+  font-family: var(--font-bot);
+  margin-bottom: 4px;
+}
+
+.uhibon-jp {
+  display: block;
+  font-size: 13px;
+  opacity: .92;
+  line-height: 1.45;
+  font-family: 'Noto Serif JP', serif;
+  font-weight: 400;
 }
 
 /* USER message — white-lavender */
