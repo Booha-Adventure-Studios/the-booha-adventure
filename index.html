@@ -207,6 +207,21 @@
       background: #000;
     }
 
+   /* Chatbot: hidden and non-interactive until hub is shown */
+#uhibon-chat-root {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  z-index: 50;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 400ms ease;
+}
+#uhibon-chat-root.hub-active {
+  pointer-events: auto;
+  opacity: 1;
+}
+    
     /* ══════════════════════════════════════════
        HUB
     ══════════════════════════════════════════ */
@@ -1088,6 +1103,8 @@ async function goToHub() {
   await new Promise(r => setTimeout(r, FADE_MS));
   try { introVideo.pause(); } catch(e) {}
   showScene(hubScene);
+  document.getElementById('uhibon-chat-root').classList.add('hub-active'); // ← add this
+  
   if (!hubRendered) { try { renderHub(); hubRendered = true; } catch(e) {} }
   requestAnimationFrame(() => requestAnimationFrame(() => fadeToBlack(false)));
 }
@@ -1117,6 +1134,8 @@ function jumpToHub() {
   ghostWrap.classList.remove('flyAway');
   [startScene, videoScene, hubScene].forEach(s => s.classList.remove('active'));
   hubScene.classList.add('active');
+  document.getElementById('uhibon-chat-root').classList.add('hub-active'); // ← add this
+  
   fade.classList.remove('on');
   fadingOut = false;
   started   = false;
