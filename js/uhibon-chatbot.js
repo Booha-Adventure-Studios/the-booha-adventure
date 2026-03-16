@@ -12,6 +12,10 @@ window.uhibonInit = function () {
   const root = document.getElementById('uhibon-chat-root');
   if (!root) return;
 
+  // ── Language state ──
+  // 'en' or 'jp' — user can toggle, persists in sessionStorage
+  let currentLang = sessionStorage.getItem('uhibon-lang') || 'en';
+
   let isOpen = false;
   let idleTimer = null;
   let talkingAnimTimer = null;
@@ -32,20 +36,23 @@ window.uhibonInit = function () {
 
   buildUhibonUI();
 
-  const iconBtn = document.getElementById('uhibon-icon-btn');
-  const popout = document.getElementById('uhibon-popout');
-  const charImg = document.getElementById('uhibon-char-img');
-  const closeBtn = document.getElementById('uhibon-close-btn');
-  const form = document.getElementById('uhibon-input-row');
-  const input = document.getElementById('uhibon-input');
-  const messages = document.getElementById('uhibon-messages');
+  const iconBtn   = document.getElementById('uhibon-icon-btn');
+  const popout    = document.getElementById('uhibon-popout');
+  const charImg   = document.getElementById('uhibon-char-img');
+  const closeBtn  = document.getElementById('uhibon-close-btn');
+  const langBtn   = document.getElementById('uhibon-lang-toggle');
+  const form      = document.getElementById('uhibon-input-row');
+  const input     = document.getElementById('uhibon-input');
+  const messages  = document.getElementById('uhibon-messages');
 
-  if (!iconBtn || !popout || !charImg || !closeBtn || !form || !input || !messages) return;
+  if (!iconBtn || !popout || !charImg || !closeBtn || !langBtn || !form || !input || !messages) return;
 
   charImg.style.filter = GLOW_COLORS[glowIndex];
+  updateLangBtn();
 
   iconBtn.addEventListener('click', openUhibonChat);
   closeBtn.addEventListener('click', closeUhibonChat);
+  langBtn.addEventListener('click', toggleLang);
 
   input.addEventListener('input', () => {
     if (!isOpen) return;
@@ -71,6 +78,26 @@ window.uhibonInit = function () {
     await botSpeak(reply);
   });
 
+  // ── Language toggle ──────────────────────────────────────
+  function toggleLang() {
+    currentLang = currentLang === 'en' ? 'jp' : 'en';
+    sessionStorage.setItem('uhibon-lang', currentLang);
+    updateLangBtn();
+  }
+
+  function updateLangBtn() {
+    langBtn.textContent = currentLang === 'en' ? 'JP' : 'EN';
+    langBtn.title = currentLang === 'en' ? 'Switch to Japanese' : 'Switch to English';
+  }
+
+  // Extract the right string from a bilingual payload
+  function pickLang(payload) {
+    if (!payload || typeof payload === 'string') return payload || '';
+    if (currentLang === 'jp') return payload.jp || payload.en || '';
+    return payload.en || payload.jp || '';
+  }
+
+  // ── UI builder ───────────────────────────────────────────
   function buildUhibonUI() {
     root.innerHTML = `
       <div id="uhibon-launcher">
@@ -86,7 +113,8 @@ window.uhibonInit = function () {
           <div id="uhibon-chatbox">
             <div id="uhibon-header">
               <span>Uhibon</span>
-              <button id="uhibon-close-btn" type="button" aria-label="Close chat">×</button>
+              <button id="uhibon-lang-toggle" type="button" aria-label="Toggle language">JP</button>
+              <button id="uhibon-close-btn" type="button" aria-label="Close chat">x</button>
             </div>
 
             <div id="uhibon-messages" aria-live="polite" aria-label="Chat messages"></div>
@@ -95,9 +123,8 @@ window.uhibonInit = function () {
               <input
                 id="uhibon-input"
                 type="text"
-                placeholder="Ask Uhibon / はなしかけて"
+                placeholder="Ask Uhibon..."
                 autocomplete="off"
-                lang="ja"
               >
               <button id="uhibon-send-btn" type="submit">Send</button>
             </form>
@@ -107,6 +134,7 @@ window.uhibonInit = function () {
     `;
   }
 
+  // ── Open / close ─────────────────────────────────────────
   function openUhibonChat() {
     if (isOpen) return;
 
@@ -155,6 +183,7 @@ window.uhibonInit = function () {
     setStaticChar(IMG_OPEN);
   }
 
+  // ── Idle loop ────────────────────────────────────────────
   function startIdleLoop() {
     stopIdleLoop();
     scheduleNextIdle();
@@ -197,6 +226,7 @@ window.uhibonInit = function () {
     }
   }
 
+  // ── Character state ───────────────────────────────────────
   function setStaticChar(src) {
     clearTimeout(charSwapTimer);
     charSwapTimer = null;
@@ -259,37 +289,21 @@ window.uhibonInit = function () {
     return !!talkingAnimTimer || !!talkingEndTimer;
   }
 
+  // ── Message rendering ─────────────────────────────────────
+  // Messages are now always single-language strings
   function addMessage(sender, payload) {
     const div = document.createElement('div');
     div.className = `uhibon-msg ${sender}`;
 
-    if (
-      sender === 'bot' &&
-      payload &&
-      typeof payload === 'object' &&
-      (payload.en || payload.jp)
-    ) {
-      if (payload.en) {
-        const en = document.createElement('span');
-        en.className = 'uhibon-en';
-        en.textContent = payload.en;
-        div.appendChild(en);
-      }
+    // Resolve to a plain string in the active language
+    const text = (sender === 'bot') ? pickLang(payload) : (typeof payload === 'string' ? payload : pickLang(payload));
 
-      if (payload.jp) {
-        const jp = document.createElement('span');
-        jp.className = 'uhibon-jp';
-        jp.lang = 'ja';
-        jp.textContent = payload.jp;
-        div.appendChild(jp);
-      }
+    div.textContent = text;
+
+    // Set lang attr for correct font rendering
+    if (sender === 'bot') {
+      div.lang = currentLang === 'jp' ? 'ja' : 'en';
     } else {
-      const text =
-        typeof payload === 'string'
-          ? payload
-          : (payload && (payload.en || payload.jp)) || '';
-
-      div.textContent = text;
       div.lang = /[\u3040-\u9FFF\uF900-\uFAFF]/.test(text) ? 'ja' : 'en';
     }
 
@@ -298,14 +312,8 @@ window.uhibonInit = function () {
   }
 
   function talkDuration(payload) {
-    let len = 0;
-
-    if (typeof payload === 'string') {
-      len = payload.length;
-    } else if (payload && typeof payload === 'object') {
-      len = (payload.en || '').length + (payload.jp || '').length * 0.6;
-    }
-
+    const text = pickLang(payload);
+    const len = typeof text === 'string' ? text.length : 0;
     return Math.min(4500, Math.max(600, Math.round(len * 38)));
   }
 
@@ -328,394 +336,253 @@ window.uhibonInit = function () {
     }
   }
 
+  // ── Page knowledge ────────────────────────────────────────
+  /*
+    Each entry has { en, jp } strings.
+    Uhibon's voice: playful, curious, a little strange and silly.
+    Short sentences. Friendly but odd. No emoji. No long explanations.
+    More like a friendly forest creature than a helpful assistant.
+  */
+
   const PAGE_CONTEXTS = {
+
     maze: {
       intro: {
-        en: "Uuu-hi-hi-hi-hi. You are in the Maze now. Good place for wandering. Good place for finding things too.",
-        jp: "うーひひひひ。いまは めいろの なかだよ。まようのに いいし、みつけるのにも いい ばしょだよ。"
+        en: "Uuu-hi-hi-hi-hi. You found the Maze. Good. Very twisty in here.",
+        jp: "うーひひひひ。めいろを みつけたね。よかった。ここは くねくねしてるよ。"
       },
-
       quickReplies: [
-        {
-          en: "Need help in the Maze?",
-          jp: "めいろで こまってる？"
-        },
-        {
-          en: "Heehee. The Maze likes twisty feet.",
-          jp: "えへへ。めいろは くねくね あしが すきなんだ。"
-        },
-        {
-          en: "Ask me about paths, getting lost, or where to go.",
-          jp: "みち、まよったとき、どこへ いくかを きいてね。"
-        }
+        { en: "What is the Maze, anyway?", jp: "めいろって なに？" },
+        { en: "I think I am lost in here.", jp: "まよったかも。" },
+        { en: "Where should I go first?",  jp: "さいしょに どこへ いけばいい？" }
       ],
-
       entries: [
         {
-          keywords: ["maze", "what is the maze", "めいろ"],
-          answer: {
-            en: "The Maze is the main walking-around place. It connects lots of things in Booha Adventure.",
-            jp: "めいろは メインの たんけんばしょだよ。Booha Adventure の いろんな ばしょに つながっているよ。"
-          }
+          keywords: ["maze", "what is the maze", "what is this", "めいろ", "なに"],
+          en: "The Maze is the main walking-around place. Lots of paths. Some of them go somewhere interesting.",
+          jp: "めいろは メインの ちずのない たんけんばしょだよ。みちが いっぱいあって、おもしろい ところに つながってるのも あるよ。"
         },
         {
           keywords: ["lost", "i'm lost", "i am lost", "where am i", "迷子", "まよった"],
-          answer: {
-            en: "Getting a little lost in the Maze is normal.",
-            jp: "めいろで ちょっと まようのは ふつうだよ。"
-          }
+          en: "Getting a little lost is fine. The Maze is used to it.",
+          jp: "ちょっと まよっても だいじょうぶ。めいろは なれてるから。"
         },
         {
-          keywords: ["where do i go", "which way", "where now", "direction", "どこ", "みち", "どっち"],
-          answer: {
-            en: "Try the path that looks interesting first. The Maze likes curious people.",
-            jp: "さいしょは きになる みちに いってみて。めいろは きになる ひとが すきなんだ。"
-          }
+          keywords: ["where do i go", "which way", "direction", "どこ", "みち", "どっち", "where now"],
+          en: "Pick the path that looks interesting. Boring paths are less fun.",
+          jp: "きになる みちを えらんで。つまらない みちは つまらないよ。"
         },
         {
           keywords: ["help", "maze help", "can you help", "たすけて", "てつだって"],
-          answer: {
-            en: "Yes. In the Maze, the best first step is just to move and look carefully.",
-            jp: "うん。めいろでは まず うごいて、よく みるのが だいじだよ。"
-          }
+          en: "The best move in the Maze is to just start walking and look carefully.",
+          jp: "めいろでは まず あるいて、よく みるのが だいいちだよ。"
         },
         {
           keywords: ["exit", "goal", "finish", "clear", "出口", "ゴール", "クリア"],
-          answer: {
-            en: "The goal is not always just getting out. Sometimes the Maze wants you to find something.",
-            jp: "ゴールは ただ でることじゃ ないときも あるよ。なにかを みつけてほしいのかも。"
-          }
+          en: "Getting out is one thing. But sometimes the Maze wants you to find something first.",
+          jp: "でることも いいけど、なにかを みつけてから のほうが いいかもね。"
         },
         {
-          keywords: ["map", "layout", "floor", "地図", "マップ"],
-          answer: {
-            en: "The Maze is better to explore than to overthink.",
-            jp: "めいろは かんがえすぎるより、たんけんしたほうが いいよ。"
-          }
+          keywords: ["map", "layout", "地図", "マップ"],
+          en: "No map. Sorry. That would ruin it a little.",
+          jp: "ちずは ないよ。ごめんね。あったら ちょっと つまらなくなるもん。"
         },
         {
-          keywords: ["scary", "is it scary", "creepy", "こわい"],
-          answer: {
-            en: "A little spooky maybe. But spooky can still be fun.",
-            jp: "ちょっと こわいかも。でも こわいのも たのしいよ。"
-          }
+          keywords: ["scary", "creepy", "こわい"],
+          en: "A bit spooky maybe. But the spooky kind that is still fun.",
+          jp: "ちょっと こわいかも。でも たのしい こわさだよ。"
         },
         {
-          keywords: ["why is there a maze", "why maze", "なんで めいろ"],
-          answer: {
-            en: "Because straight lines are boring.",
-            jp: "まっすぐだけだと つまらないからだよ。"
-          }
-        },
-        {
-          keywords: ["can i go anywhere", "everywhere", "all places"],
-          answer: {
-            en: "Some places are easy to spot. Some hide a little better.",
-            jp: "すぐ みつかる ばしょも あるし、ちょっと かくれる ばしょも あるよ。"
-          }
-        },
-        {
-          keywords: ["what should i do here", "what do i do in the maze"],
-          answer: {
-            en: "Walk, explore, notice things, and see where the paths lead.",
-            jp: "あるいて、たんけんして、いろいろ みつけて、みちの さきを みてみよう。"
-          }
-        },
-        {
-          keywords: ["secret", "hidden", "something hidden", "ひみつ", "かくし"],
-          answer: {
-            en: "Mazes are good at keeping little secrets.",
-            jp: "めいろは ちいさい ひみつを かくすのが とくいだよ。"
-          }
+          keywords: ["secret", "hidden", "ひみつ", "かくし"],
+          en: "Mazes are quite good at hiding small things.",
+          jp: "めいろは ちいさい ものを かくすのが とくいなんだ。"
         },
         {
           keywords: ["wall", "walls", "tree", "trees", "かべ", "き"],
-          answer: {
-            en: "Sometimes walls feel like walls. Sometimes they feel like a hint.",
-            jp: "かべみたいな ときも あるし、ヒントみたいな ときも あるよ。"
-          }
+          en: "Walls are walls. Sometimes they are also a hint. Hard to tell.",
+          jp: "かべは かべだよ。でも ヒントのときも あるかも。わかんないけど。"
         },
         {
-          keywords: ["start", "begin", "first", "さいしょ"],
-          answer: {
-            en: "In the Maze, starting is easy. Just pick a direction and go.",
-            jp: "めいろでは はじめるのは かんたんだよ。みちを きめて いけば いいんだ。"
-          }
+          keywords: ["start", "begin", "first", "さいしょ", "はじめ"],
+          en: "Starting is easy. Just pick a direction.",
+          jp: "はじめるのは かんたん。みちを きめて いくだけ。"
+        },
+        {
+          keywords: ["why maze", "why is there a maze", "なんで めいろ"],
+          en: "Because straight lines are boring.",
+          jp: "まっすぐだけだと つまらないからだよ。"
         }
       ]
     },
 
     karasuki: {
       intro: {
-        en: "Uuu-hi-hi-hi-hi. Karasuki is stranger than the Maze. Softer, darker, and a little more mysterious.",
-        jp: "うーひひひひ。カラスキは めいろより もっと へんだよ。やわらかくて、くらくて、もっと ふしぎなんだ。"
+        en: "Uuu-hi-hi-hi-hi. Karasuki is a strange place. Darker. Quieter. A bit more mysterious than usual.",
+        jp: "うーひひひひ。カラスキは ふしぎな ばしょだよ。くらくて しずかで、いつもより ちょっと なぞめいてるんだ。"
       },
-
       quickReplies: [
-        {
-          en: "Ask me about Karasuki, where it is, or why it feels so strange.",
-          jp: "カラスキのこと、どんな ばしょか、なんで へんなのかを きいてね。"
-        },
-        {
-          en: "Heehee. Karasuki likes mystery.",
-          jp: "えへへ。カラスキは ふしぎが すきなんだ。"
-        },
-        {
-          en: "Some places want to be understood. Karasuki mostly wants to be explored.",
-          jp: "わかってほしい ばしょも あるけど、カラスキは たんけんしてほしい ばしょなんだ。"
-        }
+        { en: "What even is Karasuki?",       jp: "カラスキって なに？" },
+        { en: "Why does it feel so strange?", jp: "なんで こんなに へんな かんじがするの？" },
+        { en: "Is it okay to explore here?",  jp: "ここを たんけんしても いい？" }
       ],
-
       entries: [
         {
-          keywords: ["karasuki", "what is karasuki", "カラスキ"],
-          answer: {
-            en: "Karasuki is a strange place. Darker than usual. Quieter too.",
-            jp: "カラスキは ふしぎな ばしょだよ。いつもより くらくて、しずかな ばしょなんだ。"
-          }
+          keywords: ["karasuki", "what is karasuki", "カラスキ", "なに"],
+          en: "Karasuki is a strange place. Darker than usual. Quieter too. Not scary exactly. Just different.",
+          jp: "カラスキは ふしぎな ばしょだよ。いつもより くらくて しずか。こわいわけじゃないけど、なんか ちがうんだ。"
         },
         {
-          keywords: ["where am i", "where is this", "this place", "ここは", "どこ"],
-          answer: {
-            en: "You are in Karasuki. A place that feels a little lost and a little alive.",
-            jp: "いまは カラスキに いるよ。ちょっと まよったみたいで、ちょっと いきてる みたいな ばしょだよ。"
-          }
+          keywords: ["where am i", "where is this", "ここは", "どこ"],
+          en: "You are in Karasuki. It feels a little lost and a little alive at the same time.",
+          jp: "カラスキに いるよ。ちょっと まよったみたいで、でも ちょっと いきてる みたいな ばしょなんだ。"
         },
         {
-          keywords: ["why is karasuki dark", "dark", "dim", "くらい"],
-          answer: {
-            en: "Because Karasuki likes mystery more than brightness.",
-            jp: "カラスキは あかるさより ふしぎが すきだからだよ。"
-          }
+          keywords: ["why dark", "dark", "dim", "くらい"],
+          en: "Karasuki likes mystery more than brightness. They do not agree on that point.",
+          jp: "カラスキは あかるさより ふしぎが すきなんだ。そこは なかよくできないみたい。"
         },
         {
-          keywords: ["is karasuki scary", "scary", "creepy", "こわい"],
-          answer: {
-            en: "A little spooky, yes. But not the shouty kind of spooky.",
-            jp: "ちょっと こわいよ。でも びっくりする こわさじゃ ないよ。"
-          }
+          keywords: ["scary", "creepy", "こわい"],
+          en: "A little spooky. But not the loud kind. More like a quiet strange feeling.",
+          jp: "ちょっと こわい。でも うるさい こわさじゃなくて、しずかに へんな かんじ。"
         },
         {
-          keywords: ["what do i do here", "what should i do here"],
-          answer: {
-            en: "Look around carefully. Karasuki is better when you take your time.",
-            jp: "よく まわりを みてみて。カラスキは ゆっくり みると もっと いいよ。"
-          }
+          keywords: ["what do i do here", "what should i do", "なにをする", "どうする"],
+          en: "Look around carefully. Karasuki is better if you take your time.",
+          jp: "まわりを よく みてみて。カラスキは ゆっくり みると もっと いいんだよ。"
         },
         {
-          keywords: ["why is it strange", "weird", "strange", "へん"],
-          answer: {
-            en: "Because normal places do not become Karasuki.",
-            jp: "ふつうの ばしょは カラスキに ならないからだよ。"
-          }
+          keywords: ["weird", "strange", "why strange", "へん", "ふしぎ"],
+          en: "Because normal places do not become Karasuki.",
+          jp: "ふつうの ばしょは カラスキに ならないからだよ。"
         },
         {
           keywords: ["lost", "i'm lost", "i am lost", "まよった"],
-          answer: {
-            en: "In Karasuki, being a little lost may be part of seeing it properly.",
-            jp: "カラスキでは ちょっと まようのも ちゃんと みるための ひとつかもね。"
-          }
+          en: "Being a little lost in Karasuki is maybe part of seeing it properly.",
+          jp: "カラスキで ちょっと まようのも、ちゃんと みるための ひとつかもね。"
         },
         {
-          keywords: ["secret", "secrets", "hidden", "ひみつ"],
-          answer: {
-            en: "Karasuki feels full of secrets, even when nothing is talking.",
-            jp: "カラスキは なにも しゃべってなくても ひみつが いっぱい ありそうな かんじが するよ。"
-          }
-        },
-        {
-          keywords: ["village", "town", "place", "むら"],
-          answer: {
-            en: "Karasuki feels like a place with old thoughts still hanging around.",
-            jp: "カラスキは ふるい かんがえが まだ ただよってる みたいな ばしょだよ。"
-          }
+          keywords: ["secret", "hidden", "ひみつ"],
+          en: "Karasuki feels full of secrets even when nothing is speaking.",
+          jp: "カラスキは なにも しゃべってなくても、ひみつが いっぱい ありそうな かんじがするよ。"
         },
         {
           keywords: ["crow", "crows", "bird", "からす", "とり"],
-          answer: {
-            en: "Karasuki and crows feel like they understand each other.",
-            jp: "カラスキと からすは なんだか なかよしみたいだね。"
-          }
+          en: "Karasuki and crows seem to understand each other.",
+          jp: "カラスキと からすは なんとなく わかりあってるみたい。"
         },
         {
           keywords: ["can i leave", "go back", "exit", "でられる", "もどれる"],
-          answer: {
-            en: "Usually yes. But Karasuki prefers not to be rushed.",
-            jp: "たぶん だいじょうぶ。でも カラスキは いそがれるのが すきじゃ ないよ。"
-          }
-        },
-        {
-          keywords: ["why do i like this place", "i like karasuki"],
-          answer: {
-            en: "Maybe because strange places feel interesting when they do not explain everything.",
-            jp: "たぶん なんでも せつめいしない へんな ばしょは おもしろいからだね。"
-          }
+          en: "Probably yes. But Karasuki prefers not to be rushed.",
+          jp: "たぶん だいじょうぶ。でも カラスキは いそがれるのが すきじゃないんだ。"
         },
         {
           keywords: ["who lives here", "who is here", "だれが いる"],
-          answer: {
-            en: "Karasuki feels like the kind of place where something is always nearby.",
-            jp: "カラスキは いつも なにかが ちかくに いそうな ばしょだよ。"
-          }
+          en: "Karasuki feels like the kind of place where something is always nearby.",
+          jp: "カラスキは なんか いつも なにかが ちかくに いそうな ばしょだよ。"
         }
       ]
     },
 
     homework: {
       intro: {
-        en: "Uuu-hi-hi-hi-hi. Homework Tree time. I can help you think, practice, and understand.",
-        jp: "うーひひひひ。しゅくだいの木の じかんだよ。かんがえたり、れんしゅうしたり、わかるように てつだえるよ。"
+        en: "Uuu-hi-hi-hi-hi. Homework Tree time. I can help you think and practice.",
+        jp: "うーひひひひ。しゅくだいの木だよ。かんがえたり れんしゅうしたり、てつだえるよ。"
       },
-
       quickReplies: [
-        {
-          en: "Ask me what Homework Tree is, why homework matters, or what to do next.",
-          jp: "しゅくだいの木って なにか、なんで しゅくだいを するのか、つぎに なにを するかを きいてね。"
-        },
-        {
-          en: "Heehee. Practice helps things stick.",
-          jp: "えへへ。れんしゅうすると あたまに のこりやすいよ。"
-        },
-        {
-          en: "I can help you think. Not just guess.",
-          jp: "こたえを てきとうに いうんじゃなくて、いっしょに かんがえるのを てつだえるよ。"
-        }
+        { en: "What is Homework Tree?",     jp: "しゅくだいの木って なに？" },
+        { en: "I am stuck on something.",   jp: "わからないところが あるよ。" },
+        { en: "Why do I even do homework?", jp: "なんで しゅくだいするの？" }
       ],
-
       entries: [
         {
           keywords: ["homework", "what is homework tree", "homework tree", "しゅくだい", "しゅくだいの木"],
-          answer: {
-            en: "Homework Tree is the place for practice and review.",
-            jp: "しゅくだいの木は れんしゅうと ふくしゅうの ばしょだよ。"
-          }
+          en: "Homework Tree is the place for practice and review. You come here to get better at things.",
+          jp: "しゅくだいの木は れんしゅうと ふくしゅうの ばしょだよ。ここで じょうずになれるんだ。"
         },
         {
-          keywords: ["what do i do here", "what should i do here", "now what"],
-          answer: {
-            en: "Practice a little, review a little, and try again.",
-            jp: "すこし れんしゅうして、すこし ふくしゅうして、もういちど やってみよう。"
-          }
+          keywords: ["what do i do here", "now what", "どうする", "なにをする"],
+          en: "Practice a little. Review a little. Try again. That is the whole thing.",
+          jp: "すこし れんしゅうして、すこし ふくしゅうして、もういちど やってみよう。それだけだよ。"
         },
         {
           keywords: ["help", "help me", "can you help", "たすけて", "おしえて"],
-          answer: {
-            en: "Yes. Tell me which part feels tricky.",
-            jp: "うん。どこが むずかしいか いってみて。"
-          }
+          en: "Yes. Tell me which part feels tricky.",
+          jp: "うん。どこが むずかしいか おしえて。"
         },
         {
           keywords: ["i don't understand", "confused", "stuck", "わからない", "こまった"],
-          answer: {
-            en: "That is okay. We can make it smaller and easier.",
-            jp: "だいじょうぶ。もっと ちいさくして、もっと やさしく できるよ。"
-          }
+          en: "That is okay. We can make it smaller and easier to look at.",
+          jp: "だいじょうぶ。もっと ちいさく わけて かんがえてみよう。"
         },
         {
           keywords: ["answer", "just tell me", "tell me the answer", "答え", "せいかい"],
-          answer: {
-            en: "I would rather help you get there.",
-            jp: "こたえだけより、そこまで いくのを てつだいたいな。"
-          }
+          en: "I would rather help you get there yourself. More fun that way.",
+          jp: "じぶんで たどりつくのを てつだいたいな。そっちのほうが おもしろいから。"
         },
         {
           keywords: ["why homework", "why do homework", "なんで しゅくだい"],
-          answer: {
-            en: "Because practice helps English get stronger.",
-            jp: "れんしゅうすると えいごが つよくなるからだよ。"
-          }
+          en: "Practice helps English get stronger. Small bits every day add up.",
+          jp: "れんしゅうすると えいごが つよくなるよ。まいにち すこしずつで ちゃんと のびるんだ。"
         },
         {
           keywords: ["boring", "homework is boring", "つまらない"],
-          answer: {
-            en: "A little bit boring is okay. Finishing still feels good.",
-            jp: "ちょっと つまらなくても いいんだよ。おわると きもちいいからね。"
-          }
+          en: "A little boring is okay. Finishing still feels pretty good.",
+          jp: "ちょっと つまらなくても いいよ。おわると きもちいいからね。"
         },
         {
           keywords: ["hard", "too hard", "difficult", "むずかしい"],
-          answer: {
-            en: "Then do one small part first.",
-            jp: "じゃあ まず ちいさい ひとつから やってみよう。"
-          }
+          en: "Then do one small part first. Just one.",
+          jp: "じゃあ まず ちいさい ひとつだけ やってみよう。ひとつだけ。"
         },
         {
           keywords: ["easy", "too easy", "かんたん"],
-          answer: {
-            en: "Then do it neatly and do it well.",
-            jp: "じゃあ ていねいに きれいに やってみよう。"
-          }
+          en: "Then do it neatly. Neat is its own kind of hard.",
+          jp: "じゃあ ていねいに やってみよう。ていねいって それなりに むずかしいんだよ。"
         },
         {
           keywords: ["reading", "read", "よみ", "読む"],
-          answer: {
-            en: "Read slowly first. Fast can come later.",
-            jp: "さいしょは ゆっくり よんでみて。はやくは あとでも できるよ。"
-          }
+          en: "Read slowly first. Fast reading can come later.",
+          jp: "さいしょは ゆっくり よんで。はやく よむのは あとでも できるよ。"
         },
         {
           keywords: ["writing", "write", "かく", "書く"],
-          answer: {
-            en: "Writing by hand helps your brain remember.",
-            jp: "てで かくと あたまに のこりやすいよ。"
-          }
+          en: "Writing by hand helps your brain remember things.",
+          jp: "てで かくと あたまに のこりやすいよ。"
         },
         {
           keywords: ["english", "eigo", "えいご"],
-          answer: {
-            en: "Little by little is good. English grows with practice.",
-            jp: "すこしずつで いいよ。えいごは れんしゅうで のびるんだ。"
-          }
-        },
-        {
-          keywords: ["kanji", "漢字"],
-          answer: {
-            en: "Try looking at the parts carefully. Tiny pieces help.",
-            jp: "ぶぶんを よく みてみて。ちいさい パーツが ヒントになるよ。"
-          }
+          en: "Little by little is good. English grows with practice.",
+          jp: "すこしずつ でいいよ。えいごは れんしゅうで のびるんだ。"
         },
         {
           keywords: ["math", "number", "numbers", "計算", "すうがく", "かず"],
-          answer: {
-            en: "Go one step at a time. Fast mistakes are sneaky.",
-            jp: "ひとつずつ すすめよう。いそぐ ミスは こっそり くるからね。"
-          }
-        },
-        {
-          keywords: ["check my work", "is this right", "なおして", "あってる"],
-          answer: {
-            en: "Look at it one more time slowly. Slow eyes catch more.",
-            jp: "もういちど ゆっくり みてみて。ゆっくりの めは よく みつけるよ。"
-          }
+          en: "One step at a time. Rushing makes sneaky mistakes.",
+          jp: "ひとつずつ やっていこう。いそぐと こっそり まちがえるから。"
         },
         {
           keywords: ["finished", "done", "i'm done", "おわった"],
-          answer: {
-            en: "Good. Finished is better than floating around forever.",
-            jp: "いいね。いつまでも ふわふわしてるより、おわるのが いちばん いいよ。"
-          }
+          en: "Good. Finished is better than floating around forever.",
+          jp: "いいね。いつまでも ふわふわしてるより、おわるのが いちばん いいよ。"
         },
         {
           keywords: ["don't want to", "i don't want homework", "やりたくない"],
-          answer: {
-            en: "Do one tiny part anyway.",
-            jp: "それでも ちいさい ひとつだけ やってみよう。"
-          }
+          en: "Do one tiny part anyway. Just the tiniest part.",
+          jp: "それでも ちいさい ひとつだけ やってみよう。ほんの ちいさいやつだけ。"
         }
       ]
     }
   };
 
+  // ── Context detection ─────────────────────────────────────
   function detectUhibonPageContext() {
     const bodyPage = document.body?.dataset?.uhibonPage?.trim()?.toLowerCase();
     if (bodyPage && PAGE_CONTEXTS[bodyPage]) return bodyPage;
 
     const href = `${window.location.pathname} ${window.location.search}`.toLowerCase();
-
     if (href.includes('karasuki')) return 'karasuki';
     if (href.includes('homework')) return 'homework';
-    if (href.includes('maze')) return 'maze';
-
+    if (href.includes('maze'))     return 'maze';
     return null;
   }
 
@@ -740,6 +607,7 @@ window.uhibonInit = function () {
     return (pageKey && PAGE_CONTEXTS[pageKey]?.quickReplies) || [];
   }
 
+  // ── Knowledge matching ────────────────────────────────────
   function normalizeText(str) {
     return String(str || '')
       .toLowerCase()
@@ -752,13 +620,18 @@ window.uhibonInit = function () {
     const norm = normalizeText(inputText);
     const data = window.UHIBON_KNOWLEDGE || {};
 
+    // Check page-specific entries first
     for (const entry of getUhibonPageEntries()) {
       for (const key of entry.keywords || []) {
         const k = normalizeText(key);
-        if (k && norm.includes(k)) return entry.answer;
+        if (k && norm.includes(k)) {
+          // Page context entries store en/jp as flat strings (not nested objects)
+          return { en: entry.en, jp: entry.jp };
+        }
       }
     }
 
+    // Then global knowledge
     for (const entry of data.entries || []) {
       for (const key of entry.keywords || []) {
         const k = normalizeText(key);
@@ -766,12 +639,13 @@ window.uhibonInit = function () {
       }
     }
 
+    // Fallback
     const fallback =
       Array.isArray(data.unknown) && data.unknown.length
         ? data.unknown
         : [
             {
-              en: "Ask me in a different way.",
+              en: "Try asking me in a different way.",
               jp: "ちがう ききかたで きいてみて。"
             }
           ];
