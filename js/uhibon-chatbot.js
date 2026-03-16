@@ -710,99 +710,89 @@ const PAGE_CONTEXTS = {
 
 };
 
-
 /* ════════════════════════════════════════════════════════════
-   OPTIONAL HELPERS
-   These are a little better than the original boring version.
-   Use if you want the page system to feel more alive.
+   PAGE HELPERS + KNOWLEDGE MATCHING
+   Single clean page-detection path.
+   No duplicate context functions.
+   Uses global unknown[] fallback from UHIBON_KNOWLEDGE.
    ════════════════════════════════════════════════════════════ */
 
 function detectUhibonPageContext() {
   const bodyPage = document.body?.dataset?.uhibonPage?.trim()?.toLowerCase();
   if (bodyPage && PAGE_CONTEXTS[bodyPage]) return bodyPage;
 
-  const href = (location.pathname + " " + location.search).toLowerCase();
+  const href = (window.location.pathname + " " + window.location.search).toLowerCase();
 
-  if (href.includes("maze")) return "maze";
   if (href.includes("karasuki")) return "karasuki";
   if (href.includes("homework")) return "homework";
+  if (href.includes("maze")) return "maze";
 
   return null;
 }
 
 function getUhibonPageIntro() {
   const pageKey = detectUhibonPageContext();
-  if (!pageKey) return window.UHIBON_KNOWLEDGE?.intro || null;
-  return PAGE_CONTEXTS[pageKey]?.intro || window.UHIBON_KNOWLEDGE?.intro || null;
+  return (pageKey && PAGE_CONTEXTS[pageKey]?.intro)
+    || window.UHIBON_KNOWLEDGE?.intro
+    || { en: "うーひひひひ。", jp: "うーひひひひ。" };
 }
 
 function getUhibonPageEntries() {
   const pageKey = detectUhibonPageContext();
-  if (!pageKey) return [];
-  return PAGE_CONTEXTS[pageKey]?.entries || [];
+  return (pageKey && PAGE_CONTEXTS[pageKey]?.entries) || [];
 }
 
 function getUhibonPageQuickReplies() {
   const pageKey = detectUhibonPageContext();
-  if (!pageKey) return [];
-  return PAGE_CONTEXTS[pageKey]?.quickReplies || [];
+  return (pageKey && PAGE_CONTEXTS[pageKey]?.quickReplies) || [];
 }
-  
 
-  function getPageContext() {
-    const url      = (window.location.pathname + window.location.search).toLowerCase();
-    const dataPage = (document.body.dataset.uhibonPage || '').toLowerCase();
+/* ── Knowledge matching ── */
+function normalizeText(str) {
+  return String(str || '')
+    .toLowerCase()
+    .replace(/[^\w\s\u3040-\u30ff\u3400-\u9fff\uF900-\uFAFF-]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
 
-    for (const [key, ctx] of Object.entries(PAGE_CONTEXTS)) {
-      if (dataPage === key || url.includes(key)) return ctx;
+function matchKnowledge(inputText) {
+  const norm = normalizeText(inputText);
+  const data = window.UHIBON_KNOWLEDGE || {};
+
+  // 1 — page-specific first
+  for (const entry of getUhibonPageEntries()) {
+    for (const key of (entry.keywords || [])) {
+      const k = normalizeText(key);
+      if (k && norm.includes(k)) return entry.answer;
     }
-    return {};
   }
 
-  /* ── Knowledge matching ── */
-  function normalizeText(str) {
-    return String(str || '')
-      .toLowerCase()
-      .replace(/[^\w\s\u3040-\u9FFF-]/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim();
-  }
-
-  function matchKnowledge(inputText) {
-    const norm    = normalizeText(inputText);
-    const pageCtx = getPageContext();
-
-    // 1 — page-specific (higher priority)
-    for (const entry of (pageCtx.entries || [])) {
-      for (const key of (entry.keywords || [])) {
-        if (normalizeText(key) && norm.includes(normalizeText(key)))
-          return entry.answer;
-      }
+  // 2 — global knowledge
+  for (const entry of (data.entries || [])) {
+    for (const key of (entry.keywords || [])) {
+      const k = normalizeText(key);
+      if (k && norm.includes(k)) return entry.answer;
     }
-
-    // 2 — global knowledge base
-    const data = window.UHIBON_KNOWLEDGE || {};
-    for (const entry of (data.entries || [])) {
-      for (const key of (entry.keywords || [])) {
-        const k = normalizeText(key);
-        if (k && norm.includes(k)) return entry.answer;
-      }
-    }
-
-    // 3 — fallback
-    const fallback = Array.isArray(data.fallback)
-      ? data.fallback
-      : [{ en: "The spirits are silent on that… try asking differently. 🕯️",
-           jp: "その問いには霊も黙っているよ…言い方を変えてみて。" }];
-    return fallback[Math.floor(Math.random() * fallback.length)];
   }
 
-  function getUhibonReply(inputText) {
-    return matchKnowledge(inputText);
-  }
+  // 3 — fallback
+  const fallback = Array.isArray(data.unknown) && data.unknown.length
+    ? data.unknown
+    : [{
+        en: "Uuu-hi-hi-hi-hi! Ask me in a different way.",
+        jp: "うーひひひひ！ちがう ききかたで きいてみて。"
+      }];
 
-  function wait(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
+  return fallback[Math.floor(Math.random() * fallback.length)];
+}
+
+function getUhibonReply(inputText) {
+  return matchKnowledge(inputText);
+}
+
+function wait(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 })();
