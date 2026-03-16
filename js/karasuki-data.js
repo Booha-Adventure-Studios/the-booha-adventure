@@ -32,7 +32,9 @@ window.KARASUKI_DATA = {
         default:   { x: 732,  y: 876  },
         fromLeft:  { x: 280,  y: 328  },
         fromRight: { x: 1150, y: 237  },
-        fromUp:    { x: 785,  y: 240  },
+        // FIX: was { x: 785, y: 240 } — too close to the "up" NPP at y:200.
+        // Moved the ghost further down so the cooldown has room to breathe.
+        fromUp:    { x: 785,  y: 360  },
         fromDown:  { x: 732,  y: 820  }
       }
     },
@@ -48,7 +50,7 @@ window.KARASUKI_DATA = {
         default:   { x: 732,  y: 700  },
         fromLeft:  { x: 124,  y: 642  },
         fromRight: { x: 1390, y: 658  },
-        fromUp:    { x: 436,  y: 218  },
+        fromUp:    { x: 436,  y: 320  },
         fromDown:  { x: 732,  y: 876  }
       }
     },
@@ -59,7 +61,7 @@ window.KARASUKI_DATA = {
         default:   { x: 732,  y: 700  },
         fromLeft:  { x: 280,  y: 328  },
         fromRight: { x: 1390, y: 658  },
-        fromUp:    { x: 785,  y: 240  },
+        fromUp:    { x: 785,  y: 360  },
         fromDown:  { x: 732,  y: 876  }
       }
     },
@@ -74,8 +76,8 @@ window.KARASUKI_DATA = {
         default:   { x: 732,  y: 700  },
         fromLeft:  { x: 200,  y: 684  },
         fromRight: { x: 1400, y: 684  },
-        fromUp:    { x: 1096, y: 200  },
-        fromDown:  { x: 623,  y: 620  }
+        fromUp:    { x: 1096, y: 300  },
+        fromDown:  { x: 623,  y: 700  }
       }
     },
 
@@ -83,21 +85,24 @@ window.KARASUKI_DATA = {
       bg: "assets/img/karasuki/room_07.webp",
       spawns: {
         default:   { x: 732,  y: 700  },
-        fromLeft:  { x: 100,  y: 687  },
-        fromRight: { x: 1420, y: 615  },
-        fromUp:    { x: 555,  y: 220  },
-        fromDown:  { x: 901,  y: 820  }
+        fromLeft:  { x: 200,  y: 687  },
+        fromRight: { x: 1330, y: 615  },
+        fromUp:    { x: 555,  y: 340  },
+        fromDown:  { x: 901,  y: 720  }
       }
     },
 
     room_08: {
       bg: "assets/img/karasuki/room_08.webp",
       spawns: {
-        default:   { x: 357,  y: 342  },
-        fromLeft:  { x: 160,  y: 776  },
-        fromRight: { x: 1410, y: 592  },
-        fromUp:    { x: 984,  y: 220  },
-        fromDown:  { x: 848,  y: 860  }
+        // FIX: default was { x:357, y:342 } — exactly on the portal orb.
+        // Moved to centre of room so returning from profile doesn't
+        // immediately re-open the portal popup.
+        default:   { x: 732,  y: 600  },
+        fromLeft:  { x: 200,  y: 776  },
+        fromRight: { x: 1380, y: 592  },
+        fromUp:    { x: 984,  y: 320  },
+        fromDown:  { x: 848,  y: 760  }
       },
       hotspots: [
         {
@@ -123,10 +128,10 @@ window.KARASUKI_DATA = {
       },
       spawns: {
         default:   { x: 732,  y: 700  },
-        fromLeft:  { x: 120,  y: 702  },
-        fromRight: { x: 1365, y: 224  },
-        fromUp:    { x: 449,  y: 240  },
-        fromDown:  { x: 918,  y: 820  }
+        fromLeft:  { x: 200,  y: 702  },
+        fromRight: { x: 1260, y: 320  },
+        fromUp:    { x: 449,  y: 360  },
+        fromDown:  { x: 918,  y: 720  }
       }
     },
 
@@ -134,10 +139,10 @@ window.KARASUKI_DATA = {
       bg: "assets/img/karasuki/room_10.webp",
       spawns: {
         default:   { x: 732,  y: 700  },
-        fromLeft:  { x: 120,  y: 702  },
+        fromLeft:  { x: 200,  y: 702  },
         fromRight: { x: 1400, y: 700  },
-        fromUp:    { x: 838,  y: 240  },
-        fromDown:  { x: 776,  y: 820  }
+        fromUp:    { x: 838,  y: 360  },
+        fromDown:  { x: 776,  y: 720  }
       }
     },
 
@@ -146,10 +151,10 @@ window.KARASUKI_DATA = {
       bg: "assets/img/karasuki/room_11.webp",
       spawns: {
         default:   { x: 732,  y: 700  },
-        fromLeft:  { x: 200,  y: 312  },
-        fromRight: { x: 1300, y: 312  },
-        fromUp:    { x: 732,  y: 200  },
-        fromDown:  { x: 804,  y: 820  }
+        fromLeft:  { x: 300,  y: 312  },
+        fromRight: { x: 1220, y: 312  },
+        fromUp:    { x: 732,  y: 340  },
+        fromDown:  { x: 804,  y: 720  }
       }
     },
 
@@ -157,10 +162,10 @@ window.KARASUKI_DATA = {
       bg: "assets/img/karasuki/room_12.webp",
       spawns: {
         default:   { x: 732,  y: 700  },
-        fromLeft:  { x: 240,  y: 344  },
-        fromRight: { x: 1420, y: 716  },
-        fromUp:    { x: 732,  y: 200  },
-        fromDown:  { x: 751,  y: 840  }
+        fromLeft:  { x: 310,  y: 344  },
+        fromRight: { x: 1340, y: 716  },
+        fromUp:    { x: 732,  y: 340  },
+        fromDown:  { x: 751,  y: 740  }
       }
     },
 
@@ -173,10 +178,10 @@ window.KARASUKI_DATA = {
       },
       spawns: {
         default:   { x: 732,  y: 700  },
-        fromLeft:  { x: 88,   y: 568  },
-        fromRight: { x: 1421, y: 242  },
-        fromUp:    { x: 732,  y: 200  },
-        fromDown:  { x: 910,  y: 840  }
+        fromLeft:  { x: 220,  y: 568  },
+        fromRight: { x: 1300, y: 340  },
+        fromUp:    { x: 732,  y: 340  },
+        fromDown:  { x: 910,  y: 740  }
       }
     },
 
@@ -184,10 +189,10 @@ window.KARASUKI_DATA = {
       bg: "assets/img/karasuki/room_14.webp",
       spawns: {
         default:   { x: 732,  y: 700  },
-        fromLeft:  { x: 240,  y: 344  },
-        fromRight: { x: 1420, y: 716  },
-        fromUp:    { x: 732,  y: 200  },
-        fromDown:  { x: 751,  y: 840  }
+        fromLeft:  { x: 310,  y: 344  },
+        fromRight: { x: 1340, y: 716  },
+        fromUp:    { x: 732,  y: 340  },
+        fromDown:  { x: 751,  y: 740  }
       }
     },
 
@@ -199,10 +204,10 @@ window.KARASUKI_DATA = {
       },
       spawns: {
         default:   { x: 732,  y: 700  },
-        fromLeft:  { x: 88,   y: 568  },
-        fromRight: { x: 1420, y: 716  },
-        fromUp:    { x: 732,  y: 200  },
-        fromDown:  { x: 663,  y: 840  }
+        fromLeft:  { x: 220,  y: 568  },
+        fromRight: { x: 1340, y: 716  },
+        fromUp:    { x: 732,  y: 340  },
+        fromDown:  { x: 663,  y: 740  }
       }
     }
   },
