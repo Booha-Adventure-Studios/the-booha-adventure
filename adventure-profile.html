@@ -138,6 +138,19 @@
       animation-duration: 6s;
       animation-delay: 2s;
     }
+    /* ── STAR BURST on accordion open ───────────── */
+    .bg-stars.star-burst::before,
+    .bg-stars.star-burst::after,
+    .bg-stars-extra.star-burst::before {
+      animation: starBurst .7s ease-out forwards;
+    }
+    @keyframes starBurst {
+      0%   { opacity: .55; filter: brightness(1); }
+      25%  { opacity: 1;   filter: brightness(3.5) saturate(1.8); }
+      65%  { opacity: 1;   filter: brightness(2.2) saturate(1.4); }
+      100% { opacity: .55; filter: brightness(1); }
+    }
+
     /* Extra star layer for density */
     .bg-stars-extra {
       position: fixed; inset: 0; z-index: 1; pointer-events: none; overflow: hidden;
@@ -212,57 +225,30 @@
 
     /* ── BOO-MOON IMAGE ──────────────────────────── */
     .moon-orb {
-      width: 88px; height: 88px; border-radius: 50%;
+      width: 140px; height: 140px;
       margin: 0 auto 1.2rem;
       position: relative;
       display: flex; align-items: center; justify-content: center;
       animation: orbFloat 5s ease-in-out infinite;
     }
     .moon-orb img {
-      width: 88px; height: 88px;
-      border-radius: 50%;
+      width: 140px; height: 140px;
       object-fit: contain;
       display: block;
-      position: relative; z-index: 1;
-      filter: drop-shadow(0 0 18px #c8b8ffbb) drop-shadow(0 0 40px #c8b8ff66);
+      animation: moonImgGlow 5s ease-in-out infinite;
     }
-    /* Pulsating glow rings */
-    .moon-orb::before {
-      content: '';
-      position: absolute;
-      inset: -8px;
-      border-radius: 50%;
-      background: transparent;
-      box-shadow:
-        0 0 0 2px #c8b8ff33,
-        0 0 22px 6px #c8b8ff55,
-        0 0 60px 12px #c8b8ff22;
-      animation: moonGlowPulse 5s ease-in-out infinite;
-      z-index: 0;
-    }
-    .moon-orb::after {
-      content: '';
-      position: absolute;
-      inset: -18px;
-      border-radius: 50%;
-      background: radial-gradient(circle, #c8b8ff18 0%, transparent 70%);
-      animation: moonGlowPulse 5s ease-in-out infinite reverse;
-      z-index: 0;
-    }
-    @keyframes moonGlowPulse {
+    @keyframes moonImgGlow {
       0%,100% {
-        box-shadow:
-          0 0 0 2px #c8b8ff33,
-          0 0 22px 6px #c8b8ff55,
-          0 0 60px 12px #c8b8ff22;
-        opacity: .75;
+        filter:
+          drop-shadow(0 0 12px #c8b8ffcc)
+          drop-shadow(0 0 28px #c8b8ff88)
+          drop-shadow(0 0 55px #c8b8ff44);
       }
       50% {
-        box-shadow:
-          0 0 0 3px #c8b8ff55,
-          0 0 38px 14px #c8b8ff88,
-          0 0 90px 24px #c8b8ff44;
-        opacity: 1;
+        filter:
+          drop-shadow(0 0 22px #ddd0ffff)
+          drop-shadow(0 0 50px #c8b8ffcc)
+          drop-shadow(0 0 90px #c8b8ff77);
       }
     }
     @keyframes orbFloat {
@@ -788,13 +774,27 @@
 <script src="js/ui/save-menu.js"></script>
 
 <script>
+/* ── STAR BURST helper ───────────────────────────────────────────────── */
+function triggerStarBurst() {
+  const stars = [
+    document.querySelector('.bg-stars'),
+    document.querySelector('.bg-stars-extra'),
+  ];
+  stars.forEach(el => {
+    if (!el) return;
+    el.classList.remove('star-burst');
+    el.offsetHeight; // reflow
+    el.classList.add('star-burst');
+    el.addEventListener('animationend', () => el.classList.remove('star-burst'), { once: true });
+  });
+}
+
 /* ── ACCORDION LOGIC ─────────────────────────────────────────────────── */
 function initAccordion(triggerId, bodyId) {
   const trigger = document.getElementById(triggerId);
   const body    = document.getElementById(bodyId);
   if (!trigger || !body) return;
 
-  // Find shimmer within the same card
   const card    = trigger.closest('.glass');
   const shimmer = card ? card.querySelector('.accordion-shimmer') : null;
 
@@ -803,11 +803,14 @@ function initAccordion(triggerId, bodyId) {
     trigger.setAttribute('aria-expanded', String(!expanded));
     body.classList.toggle('open', !expanded);
 
-    // Replay shimmer animation on open
-    if (!expanded && shimmer) {
-      shimmer.style.animation = 'none';
-      shimmer.offsetHeight; // reflow
-      shimmer.style.animation = '';
+    if (!expanded) {
+      // Opening: replay shimmer + burst stars
+      if (shimmer) {
+        shimmer.style.animation = 'none';
+        shimmer.offsetHeight;
+        shimmer.style.animation = '';
+      }
+      triggerStarBurst();
     }
   });
 }
