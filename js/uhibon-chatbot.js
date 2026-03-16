@@ -10,7 +10,7 @@
   const root = document.getElementById('uhibon-chat-root');
   if (!root) return;
 
-  let isOpen = false;
+  let isOpen    = false;
   let talkTimer = null;
   let idleTimer = null;
 
@@ -24,7 +24,7 @@
   const input    = document.getElementById('uhibon-input');
   const messages = document.getElementById('uhibon-messages');
 
-  iconBtn.addEventListener('click', openUhibonChat);
+  iconBtn .addEventListener('click', openUhibonChat);
   closeBtn.addEventListener('click', closeUhibonChat);
 
   input.addEventListener('input', () => {
@@ -34,18 +34,18 @@
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-
     const text = input.value.trim();
     if (!text) return;
-
     addMessage('user', text);
     input.value = '';
     setCharState('idle');
-
     const reply = getUhibonReply(text);
-    await botSpeak(reply, text);
+    await botSpeak(reply);
   });
 
+  /* ════════════════════════════════════════════════════════════
+     BUILD DOM
+  ════════════════════════════════════════════════════════════ */
   function buildUhibonUI() {
     root.innerHTML = `
       <div id="uhibon-launcher">
@@ -74,9 +74,11 @@
     `;
   }
 
+  /* ════════════════════════════════════════════════════════════
+     OPEN / CLOSE
+  ════════════════════════════════════════════════════════════ */
   function openUhibonChat() {
     if (isOpen) return;
-
     isOpen = true;
     popout.classList.add('open');
     iconBtn.style.display = 'none';
@@ -84,17 +86,12 @@
 
     if (!messages.children.length) {
       const pageCtx = getPageContext();
-      const intro =
-        pageCtx.intro ||
-        (window.UHIBON_KNOWLEDGE && window.UHIBON_KNOWLEDGE.intro) ||
-        {
-          en: "うーひひひ Hello! I’m Uhibon.",
-          jp: "うーひひひ こんにちは！ウヒボンだよ。"
-        };
-
-      botSpeak(intro, '');
+      const intro   = pageCtx.intro
+        || (window.UHIBON_KNOWLEDGE && window.UHIBON_KNOWLEDGE.intro)
+        || { en: "I am Uhibon… welcome, wanderer. 🕯️",
+             jp: "ウヒボンじゃ。ようこそ、旅人よ。" };
+      botSpeak(intro);
     }
-
     setTimeout(() => input.focus(), 50);
   }
 
@@ -106,21 +103,37 @@
     iconBtn.style.display = '';
   }
 
+  /* ════════════════════════════════════════════════════════════
+     UPGRADE 1 — IDLE ANIMATION LOOP
+     Uhibon fidgets organically every 3-6 s while waiting.
+     Two CSS classes drive the micro-actions:
+       .idle-blink  — quick squint (CSS scale Y on the img)
+       .idle-look   — brief glance using a src swap + tilt
+     Everything is class-based; no rapid timers.
+  ════════════════════════════════════════════════════════════ */
+  // Glow colour palette — each idle tick shifts to the next hue.
+  // Pure CSS filter, no src swap, no opacity flicker.
+  const GLOW_COLORS = [
+    'drop-shadow(0 0 10px rgba(123, 79,207,.80)) drop-shadow(0 0 26px rgba( 60, 20,100,.75)) drop-shadow(0 4px 32px rgba(0,0,0,.8))',
+    'drop-shadow(0 0 10px rgba( 56,200,190,.75)) drop-shadow(0 0 26px rgba( 20, 80, 90,.75)) drop-shadow(0 4px 32px rgba(0,0,0,.8))',
+    'drop-shadow(0 0 10px rgba(220, 80,180,.75)) drop-shadow(0 0 26px rgba(100, 20, 70,.75)) drop-shadow(0 4px 32px rgba(0,0,0,.8))',
+    'drop-shadow(0 0 10px rgba(245,200, 66,.75)) drop-shadow(0 0 26px rgba(120, 80, 10,.75)) drop-shadow(0 4px 32px rgba(0,0,0,.8))',
+    'drop-shadow(0 0 10px rgba( 80,140,255,.75)) drop-shadow(0 0 26px rgba( 20, 40,120,.75)) drop-shadow(0 4px 32px rgba(0,0,0,.8))',
+  ];
+  let glowIndex = 0;
+
   function startIdleLoop() {
     stopIdleLoop();
     scheduleNextIdle();
   }
 
   function stopIdleLoop() {
-    if (idleTimer) {
-      clearTimeout(idleTimer);
-      idleTimer = null;
-    }
+    if (idleTimer) { clearTimeout(idleTimer); idleTimer = null; }
     if (charImg) charImg.classList.remove('idle-blink', 'idle-look');
   }
 
   function scheduleNextIdle() {
-    const delay = 3000 + Math.random() * 3000;
+    const delay = 3200 + Math.random() * 2800;
     idleTimer = setTimeout(() => {
       if (!isOpen) return;
       doIdleAction();
@@ -128,35 +141,43 @@
   }
 
   function doIdleAction() {
+    // Shift glow colour — CSS transition on filter handles the blend smoothly
+    glowIndex = (glowIndex + 1) % GLOW_COLORS.length;
+    charImg.style.filter = GLOW_COLORS[glowIndex];
+
     const pick = Math.random();
 
     if (pick < 0.5) {
+      // Blink — pure CSS scaleY squeeze, zero src swap
       charImg.classList.add('idle-blink');
       setTimeout(() => {
         charImg.classList.remove('idle-blink');
         scheduleNextIdle();
-      }, 300);
+      }, 320);
     } else {
-      setCharSrc(IMG_TALK_1);
+      // Glance — pure CSS tilt, zero src swap
       charImg.classList.add('idle-look');
       setTimeout(() => {
         charImg.classList.remove('idle-look');
-        setCharSrc(IMG_OPEN);
         scheduleNextIdle();
-      }, 650);
+      }, 680);
     }
   }
 
+  /* ════════════════════════════════════════════════════════════
+     CHARACTER STATE
+  ════════════════════════════════════════════════════════════ */
   function setCharSrc(src) {
     const file = src.replace(/^.*\//, '');
     if (charImg.src.endsWith(file)) return;
-
+    // Soft cross-fade only on deliberate state changes (idle→talk, etc.)
+    // The idle glow/pose loop never calls this, so no strobe.
+    charImg.style.transition = 'opacity .2s ease, filter 1.6s ease';
     charImg.style.opacity = '0';
     setTimeout(() => {
       charImg.src = src;
       charImg.style.opacity = '1';
-      charImg.style.transition = 'opacity .15s ease';
-    }, 80);
+    }, 130);
   }
 
   function setCharState(state) {
@@ -164,120 +185,164 @@
 
     if (state === 'talking') {
       stopIdleLoop();
-      startTalkingAnimation();
+      setCharSrc(IMG_TALK_1);
+      charImg.classList.add('is-talking');
     } else if (state === 'student') {
-      stopTalkingAnimationOnly();
       stopIdleLoop();
       setCharSrc(IMG_STUDENT);
     } else {
-      stopTalkingAnimationOnly();
+      // idle
       setCharSrc(IMG_OPEN);
       if (isOpen) startIdleLoop();
     }
   }
 
-  function startTalkingAnimation() {
-    stopTalkingAnimationOnly();
-    let frame = 1;
-    setCharSrc(IMG_TALK_1);
-
-    talkTimer = setInterval(() => {
-      frame = frame === 1 ? 2 : 1;
-      setCharSrc(frame === 1 ? IMG_TALK_1 : IMG_TALK_2);
-    }, 180);
-  }
-
-  function stopTalkingAnimationOnly() {
-    if (talkTimer) {
-      clearInterval(talkTimer);
-      talkTimer = null;
-    }
-  }
-
+  /* ════════════════════════════════════════════════════════════
+     MESSAGES — bilingual rendering
+     reply can be a plain string OR { en, jp } object.
+     Bot messages render two stacked spans so each language
+     gets its own CSS class (.uhibon-en / .uhibon-jp).
+  ════════════════════════════════════════════════════════════ */
   function addMessage(sender, payload) {
     const div = document.createElement('div');
     div.className = `uhibon-msg ${sender}`;
 
-    if (typeof payload === 'string') {
-      div.textContent = payload;
-      div.lang = containsJapanese(payload) ? 'ja' : 'en';
+    if (sender === 'bot' && payload && typeof payload === 'object'
+        && (payload.en || payload.jp)) {
+
+      if (payload.en) {
+        const en = document.createElement('span');
+        en.className  = 'uhibon-en';
+        en.textContent = payload.en;
+        div.appendChild(en);
+      }
+      if (payload.jp) {
+        const jp = document.createElement('span');
+        jp.className  = 'uhibon-jp';
+        jp.lang       = 'ja';
+        jp.textContent = payload.jp;
+        div.appendChild(jp);
+      }
+
     } else {
-      const text = payload && payload.text ? payload.text : '';
+      const text = typeof payload === 'string' ? payload
+                 : (payload.en || payload.jp || '');
       div.textContent = text;
-      div.lang = payload && payload.lang ? payload.lang : (containsJapanese(text) ? 'ja' : 'en');
+      div.lang = /[\u3040-\u9FFF\uF900-\uFAFF]/.test(text) ? 'ja' : 'en';
     }
 
     messages.appendChild(div);
     messages.scrollTop = messages.scrollHeight;
   }
 
+  /* ════════════════════════════════════════════════════════════
+     UPGRADE 2 — TALKING SPEED TIED TO SENTENCE LENGTH
+     38 ms per character → short lines snap in fast,
+     long replies feel weighty. Hard floor/ceiling keeps
+     the experience comfortable.
+       < 20 chars  → ~600 ms  (one-word answers)
+       ~80 chars   → ~3 000 ms (a couple of sentences)
+       cap at 4 500 ms so nothing overstays its welcome
+  ════════════════════════════════════════════════════════════ */
+  function talkDuration(payload) {
+    let len = 0;
+    if (typeof payload === 'string') {
+      len = payload.length;
+    } else if (payload && typeof payload === 'object') {
+      // Japanese characters are denser to read — weight them slightly less
+      len = (payload.en || '').length + (payload.jp || '').length * 0.6;
+    }
+    return Math.min(4500, Math.max(600, Math.round(len * 38)));
+  }
+
+  async function botSpeak(payload) {
+    setCharState('talking');
+    await wait(talkDuration(payload));
+    stopTalking();
+    addMessage('bot', payload);
+  }
+
+  function stopTalking() {
+    if (talkTimer) { clearInterval(talkTimer); talkTimer = null; }
+    setCharState('idle');
+  }
+
+  /* ════════════════════════════════════════════════════════════
+     UPGRADE 3 — PAGE-AWARE KNOWLEDGE
+     Detects current page via:
+       1. <body data-uhibon-page="maze|karasuki|homework">
+       2. URL path / query string keyword match
+     Injects page-specific entries + a tailored intro greeting
+     before falling back to the global UHIBON_KNOWLEDGE base.
+
+     Extend: add more keys to PAGE_CONTEXTS, or set the body
+     attribute on any page. Answers can be { en, jp } objects
+     or plain strings — both render correctly.
+  ════════════════════════════════════════════════════════════ */
   const PAGE_CONTEXTS = {
+
     maze: {
-      intro: {
-        en: "うーひひひ You found the maze. I can help with the main paths and where things lead.",
-        jp: "うーひひひ めいろにきたね。みちや いきさきを すこし おしえられるよ。"
-      },
+      intro: { en: "You've wandered into the maze… stay close and I'll guide you. 🗺️",
+               jp: "迷宮へようこそ。迷ったら何でも聞いてね。" },
       entries: [
-        {
-          keywords: ['lost', 'where', 'direction', 'help', '道', '迷子', 'どこ'],
-          answer: {
-            en: "うーひひひ Try following the glowing path first.",
-            jp: "うーひひひ まずは ひかる みちを たどってみて。"
-          }
-        },
-        {
-          keywords: ['exit', 'goal', 'finish', 'ゴール', '出口', 'クリア'],
-          answer: {
-            en: "うーひひひ Keep exploring. The way out is part of the adventure.",
-            jp: "うーひひひ たんけんを つづけてね。でぐちは ぼうけんの いちぶだよ。"
-          }
-        }
-      ]
+        { keywords: ['lost','where','direction','help','道','迷子','どこ'],
+          answer: { en: "Follow the glowing tiles — they mark the safe path. Don't trust the moving walls.",
+                    jp: "光るタイルに沿って進んで。動く壁には近づかないで。" } },
+        { keywords: ['exit','escape','goal','finish','ゴール','出口','クリア'],
+          answer: { en: "The exit shifts at midnight. Watch the top-right corner of the map.",
+                    jp: "出口は真夜中に移動するよ。マップの右上を確認して。" } },
+        { keywords: ['monster','enemy','danger','chase','敵','モンスター','危険'],
+          answer: { en: "Stand still when the lanterns flicker. It can't see you if you don't move.",
+                    jp: "ランタンが揺れたら動かないで。動かなければ見えないはず。" } },
+        { keywords: ['map','layout','floor','マップ','地図','フロア'],
+          answer: { en: "The map redraws itself each run. Trust your memory — not the walls.",
+                    jp: "マップは毎回変わるよ。壁じゃなく自分の記憶を信じて。" } },
+      ],
     },
 
     karasuki: {
-      intro: {
-        en: "うーひひひ Welcome to Karasuki. It is darker, stranger, and more mysterious here.",
-        jp: "うーひひひ カラスキへ ようこそ。ここは もっと くらくて ふしぎな ばしょだよ。"
-      },
+      intro: { en: "Ah — you stand in Karasuki village. The crows know many secrets here. 🐦‍⬛",
+               jp: "烏鋤村へようこそ。烏たちは多くの秘密を知っているよ。" },
       entries: [
-        {
-          keywords: ['karasuki', 'crow', 'dark', 'カラスキ', 'からす', 'くらい'],
-          answer: {
-            en: "うーひひひ Karasuki is a strange place for wandering and discovery.",
-            jp: "うーひひひ カラスキは まよったり みつけたりする ふしぎな ばしょだよ。"
-          }
-        }
-      ]
+        { keywords: ['shop','store','buy','item','売','店','購入','アイテム'],
+          answer: { en: "Hagura's shop opens after the second bell. Bring crow feathers to trade.",
+                    jp: "二の鐘の後にハグラの店が開くよ。烏の羽を持ってきてね。" } },
+        { keywords: ['elder','chief','leader','village','村長','長老','村'],
+          answer: { en: "The Elder lives beyond the torii gate. Bow before you speak.",
+                    jp: "長老は鳥居の奥に住んでいる。話す前にお辞儀してね。" } },
+        { keywords: ['quest','mission','task','request','クエスト','任務','依頼'],
+          answer: { en: "Post your request on the crow-board by the well. Someone always answers.",
+                    jp: "井戸そばの烏板に依頼を貼ってみて。必ず誰かが答えてくれるよ。" } },
+        { keywords: ['festival','event','celebration','祭り','イベント','お祭り'],
+          answer: { en: "The Kara Festival begins when three crows land on the shrine roof simultaneously.",
+                    jp: "三羽の烏が同時に社の屋根に止まると、烏祭りが始まるよ。" } },
+      ],
     },
 
     homework: {
-      intro: {
-        en: "うーひひひ Homework time. I can help you think about what to do next.",
-        jp: "うーひひひ しゅくだいの じかんだね。つぎに なにをするか いっしょに かんがえよう。"
-      },
+      intro: { en: "Study time! I'll help you understand — not just hand you the answer. 📖",
+               jp: "勉強の時間！答えをあげるだけじゃなく、理解を助けるよ。" },
       entries: [
-        {
-          keywords: ['stuck', 'confused', 'help', 'わからない', '教えて', 'こまった'],
-          answer: {
-            en: "うーひひひ Tell me which part is hard.",
-            jp: "うーひひひ どの ぶぶんが むずかしいか おしえて。"
-          }
-        },
-        {
-          keywords: ['answer', '答え', '正解'],
-          answer: {
-            en: "うーひひひ I want to help you understand, not only give the answer.",
-            jp: "うーひひひ こたえだけじゃなくて、わかるように てつだいたいな。"
-          }
-        }
-      ]
-    }
+        { keywords: ['stuck','confused','help','don\'t understand','わからない','教えて','困ってる'],
+          answer: { en: "Tell me exactly which part is tricky — the question itself, or what to do next?",
+                    jp: "どの部分が分からない？問題の意味？それとも次のステップ？" } },
+        { keywords: ['answer','just tell me','give me','答え','正解','教えて'],
+          answer: { en: "Let's get there together — what have you tried so far?",
+                    jp: "一緒に考えよう。今まで何を試してみた？" } },
+        { keywords: ['kanji','reading','writing','meaning','漢字','読み','書き','意味'],
+          answer: { en: "Break the kanji into radicals — the left side usually hints at the meaning.",
+                    jp: "漢字を部首に分けてみよう。左側が意味のヒントになることが多いよ。" } },
+        { keywords: ['math','number','calculate','equation','数学','計算','方程式','数'],
+          answer: { en: "Write out each step by hand — rushing past them is where mistakes hide.",
+                    jp: "ひとつずつ手で書き出してみて。急ぐとそこにミスが潜むよ。" } },
+      ],
+    },
+
   };
 
   function getPageContext() {
-    const url = (window.location.pathname + window.location.search).toLowerCase();
-    const dataPage = ((document.body && document.body.dataset && document.body.dataset.uhibonPage) || '').toLowerCase();
+    const url      = (window.location.pathname + window.location.search).toLowerCase();
+    const dataPage = (document.body.dataset.uhibonPage || '').toLowerCase();
 
     for (const [key, ctx] of Object.entries(PAGE_CONTEXTS)) {
       if (dataPage === key || url.includes(key)) return ctx;
@@ -285,130 +350,29 @@
     return {};
   }
 
-  function containsJapanese(text) {
-    return /[\u3000-\u30ff\u4e00-\u9fff\uf900-\ufaff]/.test(String(text || ''));
-  }
-
+  /* ── Knowledge matching ── */
   function normalizeText(str) {
     return String(str || '')
       .toLowerCase()
-      .replace(/[^\w\s\u3040-\u30ff\u4e00-\u9fff\uf900-\ufaff-]/g, ' ')
+      .replace(/[^\w\s\u3040-\u9FFF-]/g, ' ')
       .replace(/\s+/g, ' ')
       .trim();
   }
 
-  function wantsJapaneseReply(userText) {
-    return containsJapanese(userText);
-  }
-
-  function normalizePayload(payload, userText) {
-    const wantsJapanese = wantsJapaneseReply(userText);
-
-    if (typeof payload === 'string') {
-      return {
-        text: payload,
-        lang: wantsJapanese ? 'ja' : 'en'
-      };
-    }
-
-    const jaText = payload && payload.jp ? payload.jp : '';
-    const enText = payload && payload.en ? payload.en : '';
-
-    return {
-      text: wantsJapanese ? jaText : enText,
-      lang: wantsJapanese ? 'ja' : 'en'
-    };
-  }
-
-  function pickRandom(arr, fallback) {
-    if (!Array.isArray(arr) || !arr.length) return fallback;
-    return arr[Math.floor(Math.random() * arr.length)];
-  }
-
-  function includesAny(input, list) {
-    const norm = normalizeText(input);
-    return list.some(item => {
-      const k = normalizeText(item);
-      return k && norm.includes(k);
-    });
-  }
-
-  function matchPleasantry(inputText) {
-    const data = window.UHIBON_KNOWLEDGE || {};
-    const p = data.pleasantries || {};
-
-    const GREETINGS = [
-      'hi', 'hello', 'hey', 'good morning', 'good afternoon', 'good evening',
-      'こんにちは', 'こんばんは', 'やあ', 'もしもし'
-    ];
-
-    const HOW_ARE_YOU = [
-      'how are you', 'how are you doing', '元気', 'げんき', 'おげんき'
-    ];
-
-    const THANKS = [
-      'thanks', 'thank you', 'arigato', 'ありがとう', 'ありがと'
-    ];
-
-    const BYE = [
-      'bye', 'goodbye', 'see you', 'later', 'またね', 'ばいばい', 'さようなら'
-    ];
-
-    const PRAISE = [
-      'good job', 'nice', 'great', 'cute', 'cool', 'すごい', 'かわいい', 'えらい'
-    ];
-
-    if (includesAny(inputText, GREETINGS)) {
-      return pickRandom(p.hello, {
-        en: "うーひひひ Hello!",
-        jp: "うーひひひ こんにちは！"
-      });
-    }
-
-    if (includesAny(inputText, HOW_ARE_YOU)) {
-      return pickRandom(p.howAreYou, {
-        en: "うーひひひ I’m doing well!",
-        jp: "うーひひひ げんきだよ！"
-      });
-    }
-
-    if (includesAny(inputText, THANKS)) {
-      return pickRandom(p.thanks, {
-        en: "うーひひひ You’re welcome!",
-        jp: "うーひひひ どういたしまして！"
-      });
-    }
-
-    if (includesAny(inputText, BYE)) {
-      return pickRandom(p.bye, {
-        en: "うーひひひ See you later!",
-        jp: "うーひひひ またね！"
-      });
-    }
-
-    if (includesAny(inputText, PRAISE)) {
-      return pickRandom(p.praise, {
-        en: "うーひひひ Heehee! Thank you!",
-        jp: "うーひひひ えへへ！ありがとう！"
-      });
-    }
-
-    return null;
-  }
-
   function matchKnowledge(inputText) {
-    const norm = normalizeText(inputText);
+    const norm    = normalizeText(inputText);
     const pageCtx = getPageContext();
 
+    // 1 — page-specific (higher priority)
     for (const entry of (pageCtx.entries || [])) {
       for (const key of (entry.keywords || [])) {
-        const k = normalizeText(key);
-        if (k && norm.includes(k)) return entry.answer;
+        if (normalizeText(key) && norm.includes(normalizeText(key)))
+          return entry.answer;
       }
     }
 
+    // 2 — global knowledge base
     const data = window.UHIBON_KNOWLEDGE || {};
-
     for (const entry of (data.entries || [])) {
       for (const key of (entry.keywords || [])) {
         const k = normalizeText(key);
@@ -416,60 +380,20 @@
       }
     }
 
-    return null;
+    // 3 — fallback
+    const fallback = Array.isArray(data.fallback)
+      ? data.fallback
+      : [{ en: "The spirits are silent on that… try asking differently. 🕯️",
+           jp: "その問いには霊も黙っているよ…言い方を変えてみて。" }];
+    return fallback[Math.floor(Math.random() * fallback.length)];
   }
 
   function getUhibonReply(inputText) {
-    const data = window.UHIBON_KNOWLEDGE || {};
-    const norm = normalizeText(inputText);
-
-    if (!norm) {
-      return pickRandom(data.confusion, {
-        en: "うーひひひ Say something to me.",
-        jp: "うーひひひ なにか いってみて。"
-      });
-    }
-
-    const pleasantry = matchPleasantry(inputText);
-    if (pleasantry) return pleasantry;
-
-    const knowledge = matchKnowledge(inputText);
-    if (knowledge) return knowledge;
-
-    if (norm.length <= 2) {
-      return pickRandom(data.confusion, {
-        en: "うーひひひ Hmmm... I’m not sure what you mean.",
-        jp: "うーひひひ うーん… ちょっと わからないな。"
-      });
-    }
-
-    return pickRandom(data.unknown, {
-      en: "うーひひひ Hmmm, what’s that?",
-      jp: "うーひひひ うーん、それ なあに？"
-    });
-  }
-
-  function talkDuration(payload, userText) {
-    const reply = normalizePayload(payload, userText);
-    const len = reply.text.length;
-    return Math.min(4500, Math.max(600, Math.round(len * 38)));
-  }
-
-  async function botSpeak(payload, userText) {
-    const reply = normalizePayload(payload, userText);
-
-    setCharState('talking');
-    await wait(talkDuration(payload, userText));
-    stopTalking();
-    addMessage('bot', reply);
-  }
-
-  function stopTalking() {
-    stopTalkingAnimationOnly();
-    setCharState('idle');
+    return matchKnowledge(inputText);
   }
 
   function wait(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
+
 })();
