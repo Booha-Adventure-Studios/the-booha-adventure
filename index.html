@@ -207,20 +207,7 @@
       background: #000;
     }
 
-   /* Chatbot: hidden and non-interactive until hub is shown */
-#uhibon-chat-root {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  z-index: 50;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 400ms ease;
-}
-#uhibon-chat-root.hub-active {
-  pointer-events: auto;
-  opacity: 1;
-}
+
     
     /* ══════════════════════════════════════════
        HUB
@@ -650,6 +637,24 @@
       .weekCard, .weekCard::before,
       .pickerPanel, .pickerPanel::before { animation: none; }
     }
+
+ /* ── Uhibon chatbot: hidden + non-interactive until hub is shown ── */
+#uhibon-chat-root {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  z-index: 50;          /* below picker (60) and fade (40 is fine, this is above) */
+  pointer-events: none; /* CRITICAL: stops iPhone tap-blocking on start/video screens */
+  opacity: 0;
+  transition: opacity 500ms ease;
+}
+#uhibon-chat-root.hub-active {
+  pointer-events: auto;
+  opacity: 1;
+}
+
+
+     
   </style>
 </head>
 <body>
