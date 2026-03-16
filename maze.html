@@ -629,6 +629,40 @@
       }
     }
 
+    /* Karasuki popup — compact at small viewport HEIGHT */
+@media (max-height: 700px), (max-width: 767px) {
+  #krPrompt {
+    padding: 14px 16px 14px;
+    border-radius: 18px;
+  }
+  #krTreeLogo {
+    width: 44px;
+    height: 44px;
+    margin-bottom: 8px;
+  }
+  #krPromptBar {
+    margin-bottom: 10px;
+  }
+  #krPromptTitle {
+    font-size: clamp(15px, 3.5vw, 22px);
+    margin-bottom: 5px;
+  }
+  #krPromptSub {
+    font-size: 11px;
+    margin-bottom: 10px;
+  }
+  .kr-drip {
+    margin-bottom: 10px;
+  }
+  .kr-drip-bar:nth-child(n) {
+    height: clamp(7px, 1.8vw, 14px) !important;
+  }
+  #krNoBtn, #krYesBtn {
+    padding: 9px 20px;
+    font-size: 13px;
+  }
+}
+
     @media (prefers-reduced-motion:reduce){
       #startGhost{ animation:none; }
       .rotateIcon{ animation:none; transform:rotate(-90deg); }
@@ -1076,7 +1110,7 @@ function restoreMazeFromCheckpoint(){
   if(reopenPopup)showPopupAtCP(cp);
 }
 
-const GHOST_SIZE=56,WANDER_TRAIL_MAX=60;
+const GHOST_SIZE=48,WANDER_TRAIL_MAX=60;
 let wanderers=[];
 
 function buildWanderers(){
@@ -1120,8 +1154,11 @@ function drawWanderers(nowMs){
   for(const w of wanderers){
     if(w.opacity<=0)continue;const img=ghostImgs[w.ghostIdx];if(!img||!img.complete||!img.naturalWidth)continue;
     const gR=GHOST_SIZE/2,gx=w.cx,gy=w.cy;
-    const isMobile=window.innerWidth<768;
-    const drawR=isMobile?gR*.65:gR;
+    
+    const isSmallPhone = window.innerWidth < 430;
+    const isMobile = window.innerWidth < 768;
+    const drawR = isSmallPhone ? gR * .45 : isMobile ? gR * .65 : gR;
+    
     const col1=MONTH_COLORS[w.ghostIdx%MONTH_COLORS.length][0],col2=MONTH_COLORS[w.ghostIdx%MONTH_COLORS.length][1];
     const sec=nowMs/1000,pulseG=.5+.5*Math.sin(sec*2.1+w.ghostIdx*.8);
     ctx.save();
@@ -1264,8 +1301,10 @@ function drawFrame(now){
 
   // ── Layer 3: checkpoint orbs ─────────────────────────────────────────────
   const{scale:coverScale}=getCover();
-  const isMobile=cssW<768;
-  const activeGhostR=isMobile?20:28;
+  
+  const isMobile = cssW < 768;
+  const isSmallPhone = cssW < 430;          // iPhone SE / small phones
+  const activeGhostR = isSmallPhone ? 15 : isMobile ? 20 : 28;
 
   CHECKPOINTS.forEach((cp,cpIdx)=>{
     const state=cpState[cp.w];if(!state||state.alpha<=.01)return;
