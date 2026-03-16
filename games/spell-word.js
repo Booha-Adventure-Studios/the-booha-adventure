@@ -1050,24 +1050,47 @@ function fireConfetti(big = false) {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   DROP-IN REPLACEMENT for showResults() in sentence-tap.js
+   DROP-IN REPLACEMENT for showResults() in spell-word.js
 
-   REPLACE from `function showResults() {` through the final
-   `startRound(0);` and `})();` with this entire block.
+   REPLACE everything from `function showResults() {` through
+   the final `showCard();` and `})();` with this block.
 
-   WHAT WAS BROKEN:
+   BUGS THAT WERE THERE:
    1. BoohaAdventure direct reference → ReferenceError crash.
-   2. getElementById('vt-results') — wrong prefix, should be 'st-results'.
-      All other IDs (st-rs, st-rp … st-rk) were already correct.
+   2. mainWrap.style.display = 'none' → mainWrap doesn't exist
+      in this game. Results live inside .sw-wrap, not a separate
+      wrapper. The card elements hide individually.
+   3. resultsWrap.classList.add('show') → resultsWrap doesn't
+      exist. #sw-results hides/shows itself directly.
+   4. resActions.innerHTML / tier.actions → this game uses
+      hardcoded game-btn buttons in the HTML, not a dynamic
+      resActions container. Wired by getElementById directly.
+   5. buildShuffledDeck(), startRound(), hiraMode, hiraLabel →
+      none of these exist in spell-word. Replay uses allCards,
+      idx, score, showCard().
    ══════════════════════════════════════════════════════════════ */
 
 /* ══════════════════════════════════════════════════════════════
    RESULTS
    ══════════════════════════════════════════════════════════════ */
 function showResults() {
-  updateDots(3);
-  mainWrap.style.display = 'none';
-  resultsWrap.classList.add('show');
+  /* Hide the gameplay elements individually — this game has no mainWrap */
+  document.getElementById('sw-jp-box').style.display  = 'none';
+  document.getElementById('sw-slots').style.display   = 'none';
+  document.getElementById('sw-tiles').style.display   = 'none';
+  document.getElementById('sw-feedback').style.display = 'none';
+  document.querySelector('.sw-bottom-bar').style.display = 'none';
+  document.querySelector('.sw-hud').style.display     = 'none';
+  document.querySelector('.sw-dots-row').style.display = 'none';
+
+  /* Mark all dots done */
+  for (let i = 0; i < 15; i++) {
+    const d = document.getElementById(`sw-d${i}`);
+    if (d) d.className = 'sw-dot done';
+  }
+
+  /* Show results card */
+  results.classList.add('show');
 
   const tier = getTier(score);
   const pct  = Math.round((score / 15) * 100);
@@ -1082,9 +1105,8 @@ function showResults() {
     }
   }));
 
-  /* ✅ Fixed: was 'vt-results' (vocab-tap leftover), now 'st-results' */
-  const resEl = document.getElementById('sw-results');
-  resEl.style.setProperty('--tier-color', tier.color);
+  /* Populate scorecard — sw-* IDs matching this game's HTML */
+  results.style.setProperty('--tier-color', tier.color);
   document.getElementById('sw-rs').textContent = `${score} / 15`;
   document.getElementById('sw-rp').textContent = `${pct}%`;
   document.getElementById('sw-rl').textContent = tier.label;
@@ -1092,30 +1114,28 @@ function showResults() {
   document.getElementById('sw-rj').textContent = tier.jp;
   document.getElementById('sw-rk').textContent = tier.kanji;
 
-  /* Build colorful action buttons */
-  resActions.innerHTML = '';
-  tier.actions.forEach(act => {
-    const btn = document.createElement('button');
-    btn.id        = act.id;
-    btn.className = `sw-res-btn ${act.cls}`;
-    btn.innerHTML = `<span>${act.label}</span>`;
-    resActions.appendChild(btn);
-  });
-
-  /* Wire up actions */
+  /* Wire the hardcoded buttons already in the HTML */
   const replayBtn = document.getElementById('sw-replay');
   const backBtn   = document.getElementById('sw-back');
 
   if (replayBtn) replayBtn.addEventListener('click', () => {
-    resultsWrap.classList.remove('show');
-    mainWrap.style.display = '';
-    allCards = buildShuffledDeck();
-    score    = 0;
-    scoreEl.textContent   = '0';
-    document.body.classList.remove('hira-mode');
-    hiraMode              = false;
-    hiraLabel.textContent = 'ひらがな';
-    startRound(0);
+    /* Show all gameplay elements again */
+    document.getElementById('sw-jp-box').style.display  = '';
+    document.getElementById('sw-slots').style.display   = '';
+    document.getElementById('sw-tiles').style.display   = '';
+    document.getElementById('sw-feedback').style.display = '';
+    document.querySelector('.sw-bottom-bar').style.display = '';
+    document.querySelector('.sw-hud').style.display     = '';
+    document.querySelector('.sw-dots-row').style.display = '';
+
+    results.classList.remove('show');
+
+    /* Reset state — spell-word uses idx/score/allCards/showCard */
+    idx   = 0;
+    score = 0;
+    scoreEl.textContent = '0';
+    U.shuffle(allCards);
+    showCard();
   });
 
   if (backBtn) backBtn.addEventListener('click', () => {
@@ -1123,8 +1143,8 @@ function showResults() {
   });
 
   if (score === 15) {
-    setTimeout(fireConfetti, 400);
-    setTimeout(fireConfetti, 900);
+    setTimeout(() => fireConfetti(false), 400);
+    setTimeout(() => fireConfetti(true),  900);
   }
 
   const snd = new Audio(CFG.sfxBase + tier.sound);
@@ -1135,5 +1155,5 @@ function showResults() {
 /* ══════════════════════════════════════════════════════════════
    GO
    ══════════════════════════════════════════════════════════════ */
-startRound(0);
+showCard();
 })();
