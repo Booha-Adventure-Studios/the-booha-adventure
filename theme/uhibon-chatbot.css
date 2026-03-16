@@ -1,179 +1,389 @@
 
-#uhibon-launcher{
-  position:fixed;
-  left:18px;
-  bottom:18px;
-  z-index:9999;
-  display:flex;
-  align-items:flex-end;
-  gap:14px;
+/* ─────────────────────────────────────────────
+   UHIBON CHAT  ·  Magical Moody Theme
+   Supports: English / Japanese (CJK)
+───────────────────────────────────────────── */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=MedievalSharp&family=Noto+Serif+JP:wght@400;600&family=IM+Fell+English:ital@0;1&family=Noto+Sans+JP:wght@400;700&display=swap');
+
+/* ── Tokens ── */
+:root {
+  --uhi-gold:          #f5c842;
+  --uhi-gold-dim:      #c9993a;
+  --uhi-gold-glow:     rgba(245, 200, 66, 0.55);
+  --uhi-purple-deep:   #0d0a1a;
+  --uhi-purple-mid:    #1a1130;
+  --uhi-purple-rim:    #3b2568;
+  --uhi-purple-accent: #7b4fcf;
+  --uhi-purple-soft:   rgba(123, 79, 207, 0.35);
+  --uhi-fog:           rgba(180, 140, 255, 0.10);
+  --uhi-text-bot:      #f5c842;   /* Uhibon speaks in gold */
+  --uhi-text-user:     #f0ecff;   /* Player speaks in white-lavender */
+  --uhi-radius:        18px;
+
+  /* Font stacks — CJK-aware */
+  --font-spooky: 'Cinzel Decorative', 'Noto Serif JP', serif;
+  --font-body:   'IM Fell English', 'Noto Sans JP', serif;
 }
 
-#uhibon-icon-btn{
-  appearance:none;
-  border:0;
-  background:transparent;
-  padding:0;
-  margin:0;
-  cursor:pointer;
-  display:block;
+/* ════════════════════════════════════════════
+   LAUNCHER WRAPPER
+════════════════════════════════════════════ */
+#uhibon-launcher {
+  position: fixed;
+  left: 18px;
+  bottom: 18px;
+  z-index: 9999;
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
 }
 
-#uhibon-icon-btn img,
-#uhibon-character img{
-  display:block;
-  user-select:none;
-  -webkit-user-drag:none;
+/* ════════════════════════════════════════════
+   ICON BUTTON  – golden halo
+════════════════════════════════════════════ */
+#uhibon-icon-btn {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  display: block;
+  position: relative;
+  border-radius: 50%;
+
+  /* Soft gold glow — layered so it breathes */
+  filter:
+    drop-shadow(0 0  6px var(--uhi-gold-glow))
+    drop-shadow(0 0 14px var(--uhi-gold-glow))
+    drop-shadow(0 0 28px rgba(245, 200, 66, 0.28));
+
+  animation: uhi-icon-pulse 3.2s ease-in-out infinite;
+  transition: filter .25s ease, transform .2s ease;
 }
 
-#uhibon-icon-btn img{
-  width:88px;
-  height:auto;
+#uhibon-icon-btn:hover {
+  filter:
+    drop-shadow(0 0  8px var(--uhi-gold))
+    drop-shadow(0 0 22px var(--uhi-gold-glow))
+    drop-shadow(0 0 40px rgba(245, 200, 66, 0.45));
+  transform: scale(1.07) translateY(-3px);
 }
 
-#uhibon-popout{
-  display:flex;
-  align-items:flex-end;
-  gap:12px;
-  opacity:0;
-  pointer-events:none;
-  transform:translateY(16px) scale(.96);
-  transform-origin:bottom left;
+#uhibon-icon-btn img {
+  display: block;
+  width: 88px;
+  height: auto;
+  border-radius: 50%;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* breathing pulse on the icon */
+@keyframes uhi-icon-pulse {
+  0%,100% { filter:
+    drop-shadow(0 0  6px var(--uhi-gold-glow))
+    drop-shadow(0 0 14px var(--uhi-gold-glow))
+    drop-shadow(0 0 28px rgba(245, 200, 66, 0.28)); }
+  50%      { filter:
+    drop-shadow(0 0  9px var(--uhi-gold))
+    drop-shadow(0 0 22px var(--uhi-gold-glow))
+    drop-shadow(0 0 42px rgba(245, 200, 66, 0.40)); }
+}
+
+/* ════════════════════════════════════════════
+   POPOUT CONTAINER
+════════════════════════════════════════════ */
+#uhibon-popout {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(20px) scale(.94);
+  transform-origin: bottom left;
   transition:
-    opacity .22s ease,
-    transform .22s ease;
+    opacity  .32s cubic-bezier(.22,.68,0,1.2),
+    transform .32s cubic-bezier(.22,.68,0,1.2);
 }
 
-#uhibon-popout.open{
-  opacity:1;
-  pointer-events:auto;
-  transform:translateY(0) scale(1);
+#uhibon-popout.open {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
 }
 
-#uhibon-character{
-  width:120px;
-  flex:0 0 auto;
+/* ════════════════════════════════════════════
+   CHARACTER  – dark glow, no background
+════════════════════════════════════════════ */
+#uhibon-character {
+  width: 120px;
+  flex: 0 0 auto;
+  position: relative;
 }
 
-#uhibon-character img{
-  width:100%;
-  height:auto;
+#uhibon-character img {
+  display: block;
+  width: 100%;
+  height: auto;
+  user-select: none;
+  -webkit-user-drag: none;
+
+  /* Dark atmospheric glow — makes the skeleton "pop"
+     without any background box                      */
+  filter:
+    drop-shadow(0 0  8px rgba(123,  79, 207, 0.6))
+    drop-shadow(0 0 20px rgba( 60,  20, 100, 0.7))
+    drop-shadow(0 4px 32px rgba(  0,   0,   0, 0.8));
+
+  /* Smooth idle float */
+  animation: uhi-char-float 4s ease-in-out infinite;
+
+  /* CSS transition so image-swap isn't jarring */
+  transition: opacity .12s ease;
 }
 
-#uhibon-chatbox{
-  width:min(320px, calc(100vw - 180px));
-  background:rgba(16,16,24,.92);
-  border:1px solid rgba(255,255,255,.14);
-  border-radius:18px;
+/* Talking state — warm amber tint on the glow */
+#uhibon-character img.is-talking {
+  filter:
+    drop-shadow(0 0 10px rgba(245, 200, 66, 0.50))
+    drop-shadow(0 0 24px rgba(123,  79, 207, 0.55))
+    drop-shadow(0 4px 32px rgba(  0,   0,   0, 0.8));
+}
+
+/* Gentle bob when idle */
+@keyframes uhi-char-float {
+  0%,100% { transform: translateY(0);   }
+  45%     { transform: translateY(-7px); }
+}
+
+/* When talking, override float with a faster shimmy */
+#uhibon-character img.is-talking {
+  animation:
+    uhi-char-talk 0.36s ease-in-out infinite;
+}
+
+@keyframes uhi-char-talk {
+  0%,100% { transform: translateY(0)    rotate(-1deg); }
+  50%     { transform: translateY(-4px) rotate( 1deg); }
+}
+
+/* ════════════════════════════════════════════
+   CHATBOX SHELL
+════════════════════════════════════════════ */
+#uhibon-chatbox {
+  width: min(320px, calc(100vw - 180px));
+  background:
+    linear-gradient(160deg,
+      rgba(22, 12, 42, 0.97) 0%,
+      rgba(13,  8, 26, 0.97) 100%);
+  border: 1px solid var(--uhi-purple-rim);
+  border-radius: var(--uhi-radius);
   box-shadow:
-    0 10px 30px rgba(0,0,0,.35),
-    0 0 0 1px rgba(255,255,255,.04) inset;
-  backdrop-filter:blur(10px);
-  overflow:hidden;
+    0  0   0 1px rgba(123, 79, 207, 0.18) inset,
+    0  8px 28px rgba(0,0,0,.55),
+    0  0  40px rgba(60, 20, 100, 0.30),
+    0 20px 60px rgba(0,0,0,.40);
+  backdrop-filter: blur(14px);
+  overflow: hidden;
+  /* subtle noise-grain texture via SVG data URI */
+  position: relative;
 }
 
-#uhibon-header{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:10px 12px;
-  font-weight:800;
-  color:#fff;
-  background:rgba(255,255,255,.06);
+/* faint arcane shimmer along the top edge */
+#uhibon-chatbox::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background:
+    radial-gradient(ellipse 80% 30% at 50% 0%,
+      rgba(123, 79, 207, 0.18) 0%,
+      transparent 70%);
+  z-index: 0;
 }
 
-#uhibon-close-btn{
-  appearance:none;
-  border:0;
-  background:transparent;
-  color:#fff;
-  font-size:20px;
-  line-height:1;
-  cursor:pointer;
+/* ── Header ── */
+#uhibon-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px 9px;
+  font-family: var(--font-spooky);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--uhi-gold);
+  background: linear-gradient(90deg,
+    rgba(123, 79, 207, 0.22) 0%,
+    rgba(60, 20, 100, 0.22) 100%);
+  border-bottom: 1px solid rgba(123, 79, 207, 0.30);
+  position: relative;
+  z-index: 1;
+  text-shadow: 0 0 12px var(--uhi-gold-glow);
 }
 
-#uhibon-messages{
-  height:260px;
-  overflow:auto;
-  padding:12px;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
+#uhibon-close-btn {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: rgba(245, 200, 66, 0.55);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 2px;
+  transition: color .18s, text-shadow .18s;
 }
 
-.uhibon-msg{
-  max-width:86%;
-  padding:10px 12px;
-  border-radius:14px;
-  line-height:1.4;
-  font-size:14px;
+#uhibon-close-btn:hover {
+  color: var(--uhi-gold);
+  text-shadow: 0 0 10px var(--uhi-gold-glow);
 }
 
-.uhibon-msg.bot{
-  align-self:flex-start;
-  background:rgba(200,184,255,.16);
-  color:#fff;
+/* ── Messages ── */
+#uhibon-messages {
+  height: 260px;
+  overflow-y: auto;
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: relative;
+  z-index: 1;
+
+  scrollbar-width: thin;
+  scrollbar-color: var(--uhi-purple-accent) transparent;
 }
 
-.uhibon-msg.user{
-  align-self:flex-end;
-  background:rgba(255,255,255,.12);
-  color:#fff;
+#uhibon-messages::-webkit-scrollbar       { width: 4px; }
+#uhibon-messages::-webkit-scrollbar-track { background: transparent; }
+#uhibon-messages::-webkit-scrollbar-thumb {
+  background: var(--uhi-purple-accent);
+  border-radius: 4px;
 }
 
-#uhibon-input-row{
-  display:flex;
-  gap:8px;
-  padding:12px;
-  border-top:1px solid rgba(255,255,255,.08);
-  background:rgba(0,0,0,.12);
+/* ── Individual messages ── */
+.uhibon-msg {
+  max-width: 86%;
+  padding: 9px 13px;
+  border-radius: 14px;
+  line-height: 1.55;
+  font-size: 14px;
+  font-family: var(--font-body);
+  /* entrance */
+  animation: uhi-msg-in .28s cubic-bezier(.22,.68,0,1.1) both;
 }
 
-#uhibon-input{
-  flex:1;
-  min-width:0;
-  border:1px solid rgba(255,255,255,.14);
-  background:rgba(255,255,255,.08);
-  color:#fff;
-  border-radius:12px;
-  padding:10px 12px;
-  outline:none;
+@keyframes uhi-msg-in {
+  from { opacity: 0; transform: translateY(8px) scale(.97); }
+  to   { opacity: 1; transform: translateY(0)   scale(1); }
 }
 
-#uhibon-input::placeholder{
-  color:rgba(255,255,255,.6);
+/* BOT message — Uhibon in gold spooky font */
+.uhibon-msg.bot {
+  align-self: flex-start;
+  font-family: var(--font-spooky);
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: .03em;
+  color: var(--uhi-text-bot);
+  background: rgba(60, 20, 100, 0.45);
+  border: 1px solid rgba(123, 79, 207, 0.35);
+  text-shadow: 0 0 8px rgba(245, 200, 66, 0.40);
+  box-shadow:
+    0 2px 12px rgba(0,0,0,.30),
+    0 0  18px rgba(123, 79, 207, 0.12) inset;
 }
 
-#uhibon-send-btn{
-  appearance:none;
-  border:0;
-  border-radius:12px;
-  padding:10px 14px;
-  cursor:pointer;
-  font-weight:800;
-  background:#c8b8ff;
-  color:#181421;
+/* USER message — white-lavender */
+.uhibon-msg.user {
+  align-self: flex-end;
+  font-family: var(--font-body);
+  color: var(--uhi-text-user);
+  background: rgba(180, 140, 255, 0.14);
+  border: 1px solid rgba(180, 140, 255, 0.22);
+  box-shadow: 0 2px 10px rgba(0,0,0,.25);
 }
 
-@media (max-width: 700px){
-  #uhibon-launcher{
-    left:12px;
-    bottom:12px;
-  }
+/* ── Input row ── */
+#uhibon-input-row {
+  display: flex;
+  gap: 8px;
+  padding: 10px 12px 12px;
+  border-top: 1px solid rgba(123, 79, 207, 0.25);
+  background: rgba(0, 0, 0, 0.18);
+  position: relative;
+  z-index: 1;
+}
 
-  #uhibon-popout{
-    gap:8px;
-  }
+#uhibon-input {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-body);
+  font-size: 14px;
+  border: 1px solid rgba(123, 79, 207, 0.38);
+  background: rgba(13, 8, 26, 0.70);
+  color: var(--uhi-text-user);
+  border-radius: 11px;
+  padding: 9px 12px;
+  outline: none;
+  transition: border-color .2s, box-shadow .2s;
+}
 
-  #uhibon-character{
-    width:94px;
-  }
+#uhibon-input::placeholder {
+  color: rgba(180, 140, 255, 0.45);
+  font-style: italic;
+}
 
-  #uhibon-chatbox{
-    width:min(280px, calc(100vw - 130px));
-  }
+#uhibon-input:focus {
+  border-color: var(--uhi-purple-accent);
+  box-shadow:
+    0 0  0 2px rgba(123, 79, 207, 0.20),
+    0 0 12px rgba(123, 79, 207, 0.18);
+}
 
-  #uhibon-icon-btn img{
-    width:74px;
-  }
+#uhibon-send-btn {
+  appearance: none;
+  border: 1px solid var(--uhi-gold-dim);
+  border-radius: 11px;
+  padding: 9px 14px;
+  cursor: pointer;
+  font-family: var(--font-spooky);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  background: linear-gradient(135deg, #2e1a5e 0%, #1a0f3a 100%);
+  color: var(--uhi-gold);
+  text-shadow: 0 0 8px var(--uhi-gold-glow);
+  box-shadow:
+    0 0  8px rgba(245, 200, 66, 0.18),
+    0 2px 6px rgba(0,0,0,.35);
+  transition: background .2s, box-shadow .2s, transform .15s;
+}
+
+#uhibon-send-btn:hover {
+  background: linear-gradient(135deg, #3d2580 0%, #241450 100%);
+  box-shadow:
+    0 0 16px rgba(245, 200, 66, 0.30),
+    0 2px 8px rgba(0,0,0,.40);
+  transform: translateY(-1px);
+}
+
+#uhibon-send-btn:active {
+  transform: translateY(0);
+}
+
+/* ════════════════════════════════════════════
+   RESPONSIVE
+════════════════════════════════════════════ */
+@media (max-width: 700px) {
+  #uhibon-launcher { left: 12px; bottom: 12px; }
+  #uhibon-popout   { gap: 8px; }
+  #uhibon-character { width: 94px; }
+  #uhibon-chatbox  { width: min(280px, calc(100vw - 130px)); }
+  #uhibon-icon-btn img { width: 74px; }
+  .uhibon-msg.bot  { font-size: 12px; }
 }
