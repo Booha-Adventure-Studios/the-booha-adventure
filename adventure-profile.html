@@ -26,16 +26,16 @@
       --void:        #070710;
       --fog:         #1a1530;
       --mist:        #241d3f;
-      --glow-moon:   #c8b8ff;
+      --glow-moon:   #ddd0ff;
       --glow-teal:   #7fffd4;
       --glow-amber:  #ffcc66;
       --glow-rose:   #ff9eb5;
       --glow-bc:     #a8edcc;
       --glow-br:     #a8d4ff;
       --glow-pb:     #e8a8ff;
-      --text:        #e8e0f8;
-      --text-dim:    #9d93c0;
-      --text-ghost:  #5a5278;
+      --text:        #f0eaff;
+      --text-dim:    #c4bce0;
+      --text-ghost:  #7a7098;
       --radius:      12px;
       --radius-lg:   20px;
       --font-title:  'Cinzel Decorative', serif;
@@ -74,6 +74,7 @@
       50%      { opacity:1;  transform:translateX(-50%) scaleX(1.2); }
     }
 
+    /* ── MORE STARS ─────────────────────────────── */
     .bg-stars {
       position: fixed; inset: 0; z-index: 1; pointer-events: none; overflow: hidden;
     }
@@ -83,30 +84,86 @@
     }
     .bg-stars::before {
       background-image:
-        radial-gradient(1.5px 1.5px at  8% 12%, #fff       0%, transparent 100%),
-        radial-gradient(1px   1px   at 15% 45%, #c8b8ff    0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at  5%  7%, #fff       0%, transparent 100%),
+        radial-gradient(1px   1px   at  8% 12%, #fff       0%, transparent 100%),
+        radial-gradient(1px   1px   at 12% 28%, #c8b8ff    0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 15% 45%, #c8b8ff    0%, transparent 100%),
+        radial-gradient(1px   1px   at 18% 62%, #fff       0%, transparent 100%),
         radial-gradient(1.5px 1.5px at 22% 78%, #fff       0%, transparent 100%),
-        radial-gradient(1px   1px   at 35% 25%, #7fffd4    0%, transparent 100%),
+        radial-gradient(1px   1px   at 26% 14%, #7fffd4    0%, transparent 100%),
+        radial-gradient(1px   1px   at 30% 52%, #c8b8ff    0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 35% 25%, #7fffd4    0%, transparent 100%),
+        radial-gradient(1px   1px   at 38% 85%, #fff       0%, transparent 100%),
         radial-gradient(1.5px 1.5px at 42%  8%, #fff       0%, transparent 100%),
-        radial-gradient(1px   1px   at 55% 60%, #c8b8ff    0%, transparent 100%),
+        radial-gradient(1px   1px   at 46% 40%, #ffcc66    0%, transparent 100%),
+        radial-gradient(1px   1px   at 50% 70%, #c8b8ff    0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 55% 60%, #c8b8ff    0%, transparent 100%),
+        radial-gradient(1px   1px   at 58% 20%, #fff       0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 63%  5%, #7fffd4    0%, transparent 100%),
         radial-gradient(1.5px 1.5px at 68% 35%, #fff       0%, transparent 100%),
+        radial-gradient(1px   1px   at 71% 55%, #c8b8ff    0%, transparent 100%),
         radial-gradient(1px   1px   at 75% 88%, #7fffd4    0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 79% 10%, #fff       0%, transparent 100%),
         radial-gradient(1.5px 1.5px at 82% 18%, #fff       0%, transparent 100%),
-        radial-gradient(2px   2px   at 95% 30%, #ffcc66    0%, transparent 100%);
+        radial-gradient(1px   1px   at 86% 48%, #ffcc66    0%, transparent 100%),
+        radial-gradient(1px   1px   at 90% 72%, #c8b8ff    0%, transparent 100%),
+        radial-gradient(2px   2px   at 95% 30%, #ffcc66    0%, transparent 100%),
+        radial-gradient(1px   1px   at 98% 60%, #fff       0%, transparent 100%);
     }
     .bg-stars::after {
       background-image:
-        radial-gradient(1px 1px at 12% 33%, #fff       0%, transparent 100%),
+        radial-gradient(1px 1px at  3% 22%, #fff       0%, transparent 100%),
+        radial-gradient(1px 1px at  7% 50%, #c8b8ff    0%, transparent 100%),
+        radial-gradient(1px 1px at 11% 75%, #fff       0%, transparent 100%),
+        radial-gradient(1px 1px at 16%  4%, #7fffd4    0%, transparent 100%),
+        radial-gradient(1px 1px at 20% 38%, #fff       0%, transparent 100%),
+        radial-gradient(1px 1px at 24% 65%, #c8b8ff    0%, transparent 100%),
         radial-gradient(1px 1px at 28% 55%, #c8b8ff    0%, transparent 100%),
+        radial-gradient(1px 1px at 33% 18%, #fff       0%, transparent 100%),
+        radial-gradient(1px 1px at 40% 82%, #ffcc66    0%, transparent 100%),
+        radial-gradient(1px 1px at 44% 44%, #c8b8ff    0%, transparent 100%),
         radial-gradient(1px 1px at 47% 90%, #fff       0%, transparent 100%),
+        radial-gradient(1px 1px at 52%  3%, #7fffd4    0%, transparent 100%),
+        radial-gradient(1px 1px at 56% 30%, #fff       0%, transparent 100%),
         radial-gradient(1px 1px at 60% 15%, #7fffd4    0%, transparent 100%),
+        radial-gradient(1px 1px at 65% 68%, #c8b8ff    0%, transparent 100%),
+        radial-gradient(1px 1px at 69% 92%, #fff       0%, transparent 100%),
         radial-gradient(1px 1px at 73% 70%, #fff       0%, transparent 100%),
-        radial-gradient(1px 1px at 88% 42%, #ffcc66    0%, transparent 100%);
+        radial-gradient(1px 1px at 77% 25%, #c8b8ff    0%, transparent 100%),
+        radial-gradient(1px 1px at 81% 55%, #fff       0%, transparent 100%),
+        radial-gradient(1px 1px at 85% 12%, #ffcc66    0%, transparent 100%),
+        radial-gradient(1px 1px at 88% 42%, #ffcc66    0%, transparent 100%),
+        radial-gradient(1px 1px at 92% 80%, #c8b8ff    0%, transparent 100%),
+        radial-gradient(1px 1px at 96%  5%, #fff       0%, transparent 100%);
       animation-duration: 6s;
       animation-delay: 2s;
     }
+    /* Extra star layer for density */
+    .bg-stars-extra {
+      position: fixed; inset: 0; z-index: 1; pointer-events: none; overflow: hidden;
+      animation: twinkle 5s 1s ease-in-out infinite;
+    }
+    .bg-stars-extra::before {
+      content: ''; position: absolute; inset: 0;
+      background-image:
+        radial-gradient(1px 1px at  9% 33%, #fff8    0%, transparent 100%),
+        radial-gradient(1px 1px at 17% 18%, #c8b8ff88 0%, transparent 100%),
+        radial-gradient(1px 1px at 23% 91%, #fff8    0%, transparent 100%),
+        radial-gradient(1px 1px at 31% 44%, #7fffd488 0%, transparent 100%),
+        radial-gradient(1px 1px at 37% 67%, #fff8    0%, transparent 100%),
+        radial-gradient(1px 1px at 43% 11%, #c8b8ff88 0%, transparent 100%),
+        radial-gradient(1px 1px at 49% 58%, #fff8    0%, transparent 100%),
+        radial-gradient(1px 1px at 54% 77%, #ffcc6688 0%, transparent 100%),
+        radial-gradient(1px 1px at 59% 22%, #fff8    0%, transparent 100%),
+        radial-gradient(1px 1px at 64% 46%, #c8b8ff88 0%, transparent 100%),
+        radial-gradient(1px 1px at 70% 84%, #fff8    0%, transparent 100%),
+        radial-gradient(1px 1px at 76% 13%, #7fffd488 0%, transparent 100%),
+        radial-gradient(1px 1px at 83% 62%, #fff8    0%, transparent 100%),
+        radial-gradient(1px 1px at 89% 35%, #c8b8ff88 0%, transparent 100%),
+        radial-gradient(1px 1px at 94% 88%, #fff8    0%, transparent 100%);
+    }
     @keyframes twinkle {
-      0%,100% { opacity:.65; } 50% { opacity:1; }
+      0%,100% { opacity:.55; } 50% { opacity:1; }
     }
 
     .bg-forest {
@@ -153,53 +210,111 @@
       animation: riseIn .9s cubic-bezier(.16,1,.3,1) both;
     }
 
+    /* ── BOO-MOON IMAGE ──────────────────────────── */
     .moon-orb {
-      width: 78px; height: 78px; border-radius: 50%; margin: 0 auto 1.2rem;
-      background: radial-gradient(circle at 35% 35%, #e8e0ff, #9d80ff 55%, #4a2d8a);
-      box-shadow: 0 0 0 2px #c8b8ff22, 0 0 30px #c8b8ff77, 0 0 80px #c8b8ff33,
-                  inset 0 -6px 18px #2a1a5a55;
-      animation: orbFloat 5s ease-in-out infinite;
+      width: 88px; height: 88px; border-radius: 50%;
+      margin: 0 auto 1.2rem;
       position: relative;
+      display: flex; align-items: center; justify-content: center;
+      animation: orbFloat 5s ease-in-out infinite;
+    }
+    .moon-orb img {
+      width: 88px; height: 88px;
+      border-radius: 50%;
+      object-fit: contain;
+      display: block;
+      position: relative; z-index: 1;
+      filter: drop-shadow(0 0 18px #c8b8ffbb) drop-shadow(0 0 40px #c8b8ff66);
+    }
+    /* Pulsating glow rings */
+    .moon-orb::before {
+      content: '';
+      position: absolute;
+      inset: -8px;
+      border-radius: 50%;
+      background: transparent;
+      box-shadow:
+        0 0 0 2px #c8b8ff33,
+        0 0 22px 6px #c8b8ff55,
+        0 0 60px 12px #c8b8ff22;
+      animation: moonGlowPulse 5s ease-in-out infinite;
+      z-index: 0;
     }
     .moon-orb::after {
-      content: ''; position: absolute; inset: 12px; border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%, #ffffff2a, transparent 60%);
+      content: '';
+      position: absolute;
+      inset: -18px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #c8b8ff18 0%, transparent 70%);
+      animation: moonGlowPulse 5s ease-in-out infinite reverse;
+      z-index: 0;
+    }
+    @keyframes moonGlowPulse {
+      0%,100% {
+        box-shadow:
+          0 0 0 2px #c8b8ff33,
+          0 0 22px 6px #c8b8ff55,
+          0 0 60px 12px #c8b8ff22;
+        opacity: .75;
+      }
+      50% {
+        box-shadow:
+          0 0 0 3px #c8b8ff55,
+          0 0 38px 14px #c8b8ff88,
+          0 0 90px 24px #c8b8ff44;
+        opacity: 1;
+      }
     }
     @keyframes orbFloat {
-      0%,100% { transform:translateY(0); box-shadow:0 0 0 2px #c8b8ff22,0 0 30px #c8b8ff77,0 0 80px #c8b8ff33,inset 0 -6px 18px #2a1a5a55; }
-      50%      { transform:translateY(-9px); box-shadow:0 0 0 2px #c8b8ff44,0 0 50px #c8b8ffaa,0 0 100px #c8b8ff55,inset 0 -6px 18px #2a1a5a55; }
+      0%,100% { transform: translateY(0); }
+      50%      { transform: translateY(-9px); }
     }
 
+    /* ── HEADER TEXT — BOLDER + WHITER ───────────── */
     .h-en {
       font-family: var(--font-title); font-size: clamp(1.3rem,5vw,2rem);
-      color: var(--glow-moon);
-      text-shadow: 0 0 30px #c8b8ff99, 0 0 60px #c8b8ff33;
+      color: #ffffff;
+      font-weight: 700;
+      text-shadow: 0 0 30px #c8b8ffbb, 0 0 60px #c8b8ff55, 0 2px 4px rgba(0,0,0,.6);
       line-height: 1.2; letter-spacing: .06em;
     }
-    .h-jp    { font-size: 1rem;  color: var(--text-dim); margin-top:.25rem; letter-spacing:.12em; }
-    .h-kanji { font-size: .72rem; color: var(--text-ghost); letter-spacing:.2em; margin-top:.1rem; }
+    .h-jp    { font-size: 1.05rem; font-weight: 700; color: #d8d0f0; margin-top:.25rem; letter-spacing:.12em; }
+    .h-kanji { font-size: .78rem; color: #a89ec8; font-weight: 700; letter-spacing:.2em; margin-top:.1rem; }
 
+    /* ── BACK BUTTON — GLOWING ───────────────────── */
     .back-btn {
       display: inline-flex; align-items: center; gap: .4rem;
-      margin-top: 1.1rem; padding: .4rem .9rem; border-radius: 99px;
-      border: 1px solid #c8b8ff33; background: #c8b8ff08;
-      color: var(--text-dim); font-family: var(--font-jp); font-size: .78rem;
-      cursor: pointer; text-decoration: none; transition: all .2s;
+      margin-top: 1.1rem; padding: .5rem 1.2rem; border-radius: 99px;
+      border: 1.5px solid #c8b8ff77;
+      background: linear-gradient(135deg, #c8b8ff18, #9d80ff0a);
+      color: #ddd0ff;
+      font-family: var(--font-jp); font-size: .82rem; font-weight: 700;
+      cursor: pointer; text-decoration: none;
+      transition: all .25s;
+      box-shadow: 0 0 14px #c8b8ff33, 0 0 28px #c8b8ff11, inset 0 1px 0 #c8b8ff22;
     }
-    .back-btn:hover { border-color: var(--glow-moon); color: var(--glow-moon); box-shadow: 0 0 12px #c8b8ff44; }
+    .back-btn:hover {
+      border-color: #ddd0ff;
+      color: #fff;
+      background: linear-gradient(135deg, #c8b8ff2e, #9d80ff18);
+      box-shadow: 0 0 22px #c8b8ff66, 0 0 50px #c8b8ff22, inset 0 1px 0 #c8b8ff44;
+      transform: translateY(-1px);
+    }
+    .back-btn:active { transform: scale(.96); }
 
     /* ── SECTION EYEBROW ─────────────────────────── */
     .eyebrow {
       display: flex; align-items: baseline; gap: .55rem; margin-bottom: 1rem;
     }
     .ey-en {
-      font-family: var(--font-title); font-size: .58rem;
+      font-family: var(--font-title); font-size: .62rem;
       letter-spacing: .18em; text-transform: uppercase;
-      color: var(--glow-moon); text-shadow: 0 0 10px #c8b8ff77;
+      color: #ddd0ff; font-weight: 700;
+      text-shadow: 0 0 12px #c8b8ffaa;
     }
-    .ey-jp    { font-family: var(--font-jp); font-size: .7rem; color: var(--text-dim); }
-    .ey-kanji { font-family: var(--font-jp); font-size: .6rem; color: var(--text-ghost); }
-    .ey-line  { flex:1; height:1px; background: linear-gradient(90deg,#c8b8ff22,transparent); }
+    .ey-jp    { font-family: var(--font-jp); font-size: .75rem; font-weight: 700; color: #c4bce0; }
+    .ey-kanji { font-family: var(--font-jp); font-size: .65rem; font-weight: 700; color: #9d93c0; }
+    .ey-line  { flex:1; height:1px; background: linear-gradient(90deg,#c8b8ff44,transparent); }
 
     /* ── TOTALS ──────────────────────────────────── */
     .totals-bar {
@@ -223,52 +338,131 @@
 
     .tv {
       font-family: var(--font-title); font-size: clamp(1.2rem,4vw,1.9rem); line-height:1.1; margin-bottom:.35rem;
+      font-weight: 700;
     }
-    .tc-stars  .tv { color:var(--glow-amber); text-shadow:0 0 20px #ffcc6677; }
-    .tc-done   .tv { color:var(--glow-teal);  text-shadow:0 0 20px #7fffd477; }
-    .tc-unlock .tv { color:var(--glow-moon);  text-shadow:0 0 20px #c8b8ff77; }
+    .tc-stars  .tv { color:#ffd966; text-shadow:0 0 22px #ffcc6699; }
+    .tc-done   .tv { color:#5cffd0; text-shadow:0 0 22px #7fffd499; }
+    .tc-unlock .tv { color:#ddd0ff; text-shadow:0 0 22px #c8b8ff99; }
 
     .t-icon { font-size:1.05rem; margin-bottom:.25rem; }
     .t-tri  { display:flex; flex-direction:column; gap:.05rem; align-items:center; }
-    .t-en   { font-family:var(--font-title); font-size:.58rem; letter-spacing:.1em; text-transform:uppercase; }
-    .t-jp   { font-size:.72rem; }
-    .t-k    { font-size:.6rem; color:var(--text-ghost); }
-    .tc-stars  .t-en { color:var(--glow-amber); }
-    .tc-done   .t-en { color:var(--glow-teal); }
-    .tc-unlock .t-en { color:var(--glow-moon); }
+    .t-en   { font-family:var(--font-title); font-size:.6rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; }
+    .t-jp   { font-size:.75rem; font-weight:700; color: #d0c8ee; }
+    .t-k    { font-size:.63rem; color:#a89ec8; font-weight:700; }
+    .tc-stars  .t-en { color:#ffd966; }
+    .tc-done   .t-en { color:#5cffd0; }
+    .tc-unlock .t-en { color:#ddd0ff; }
 
-    /* ── CURRICULUM ──────────────────────────────── */
-    .curr-section { margin-bottom:2rem; animation:riseIn .9s .2s cubic-bezier(.16,1,.3,1) both; }
-    .curr-card    { padding:1.35rem; margin-bottom:.85rem; }
+    /* ── ACCORDION BASE ──────────────────────────── */
+    .accordion-wrap { margin-bottom: .85rem; }
 
-    .curr-head {
-      display:flex; align-items:center; justify-content:space-between; margin-bottom:.8rem;
+    .accordion-trigger {
+      width: 100%; text-align: left;
+      background: transparent; border: none; cursor: pointer;
+      padding: 0; display: block;
+      -webkit-tap-highlight-color: transparent;
     }
+
+    .accordion-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.1rem 1.35rem; border-radius: var(--radius-lg);
+      transition: background .2s;
+    }
+    .accordion-trigger[aria-expanded="true"] .accordion-header {
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    }
+    .accordion-trigger:hover .accordion-header { background: #c8b8ff0a; }
+
+    .acc-chevron {
+      font-size: .75rem; color: #9d93c0; flex-shrink: 0; margin-left: .5rem;
+      transition: transform .32s cubic-bezier(.34,1.56,.64,1), color .2s;
+      display: inline-block;
+    }
+    .accordion-trigger[aria-expanded="true"] .acc-chevron {
+      transform: rotate(180deg); color: #ddd0ff;
+    }
+
+    .accordion-body {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows .38s cubic-bezier(.16,1,.3,1);
+      overflow: hidden;
+    }
+    .accordion-body.open {
+      grid-template-rows: 1fr;
+    }
+    .accordion-inner {
+      overflow: hidden;
+      min-height: 0;
+    }
+
+    /* ── ACCORDION SHIMMER ON OPEN ───────────────── */
+    @keyframes accordionShimmer {
+      0%   { left: -100%; }
+      60%, 100% { left: 160%; }
+    }
+    .accordion-body.open .accordion-shimmer {
+      animation: accordionShimmer .8s .05s ease-out both;
+    }
+    .accordion-shimmer {
+      position: absolute; top: 0; left: -100%;
+      width: 55%; height: 100%; pointer-events: none;
+      background: linear-gradient(90deg, transparent, #c8b8ff18, #fff10a, #c8b8ff18, transparent);
+      z-index: 2; border-radius: inherit;
+    }
+
+    /* ── CURRICULUM ACCORDION ────────────────────── */
+    .curr-section { margin-bottom:2rem; animation:riseIn .9s .2s cubic-bezier(.16,1,.3,1) both; }
+
+    .curr-card-acc {
+      margin-bottom: 0;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      position: relative;
+    }
+    .curr-card-acc .accordion-body .accordion-inner {
+      padding: 0 1.35rem 1.15rem;
+    }
+
     .curr-badge { display:flex; align-items:center; gap:.65rem; }
 
     .orb {
-      width:34px; height:34px; border-radius:50%; display:flex;
-      align-items:center; justify-content:center;
-      font-family:var(--font-title); font-size:.62rem; font-weight:700; flex-shrink:0;
+      width: 36px; height: 36px; border-radius: 50%; display: flex;
+      align-items: center; justify-content: center;
+      font-family: var(--font-title); font-size: .62rem; font-weight: 700; flex-shrink: 0;
     }
-    .orb-bc { background:radial-gradient(circle at 35% 35%,#d4fce9,#4aaa7a); box-shadow:0 0 14px #a8edcc77; color:#0a2a1a; }
-    .orb-br { background:radial-gradient(circle at 35% 35%,#d4e8ff,#4a82cc); box-shadow:0 0 14px #a8d4ff77; color:#0a1a2a; }
-    .orb-pb { background:radial-gradient(circle at 35% 35%,#f0d4ff,#a04acc); box-shadow:0 0 14px #e8a8ff77; color:#1a0a2a; }
+    /* BOLDER curriculum colors */
+    .orb-bc {
+      background: radial-gradient(circle at 35% 35%, #d4fce9, #2ecc7a);
+      box-shadow: 0 0 18px #a8edccaa, 0 0 36px #a8edcc44;
+      color: #082215;
+    }
+    .orb-br {
+      background: radial-gradient(circle at 35% 35%, #d4e8ff, #2e72ee);
+      box-shadow: 0 0 18px #a8d4ffaa, 0 0 36px #a8d4ff44;
+      color: #080e22;
+    }
+    .orb-pb {
+      background: radial-gradient(circle at 35% 35%, #f0d4ff, #9922ee);
+      box-shadow: 0 0 18px #e8a8ffaa, 0 0 36px #e8a8ff44;
+      color: #180822;
+    }
 
-    .curr-name-en { font-family:var(--font-title); font-size:.68rem; letter-spacing:.08em; }
-    .curr-name-jp { font-size:.7rem; color:var(--text-dim); }
-    .curr-name-k  { font-size:.6rem; color:var(--text-ghost); }
-    .c-bc { color:var(--glow-bc); text-shadow:0 0 10px #a8edcc55; }
-    .c-br { color:var(--glow-br); text-shadow:0 0 10px #a8d4ff55; }
-    .c-pb { color:var(--glow-pb); text-shadow:0 0 10px #e8a8ff55; }
+    .curr-name-en { font-family:var(--font-title); font-size:.72rem; font-weight:700; letter-spacing:.08em; }
+    .curr-name-jp { font-size:.75rem; font-weight:700; color: #c4bce0; }
+    .curr-name-k  { font-size:.63rem; color: #9d93c0; font-weight:700; }
 
-    .curr-stars { font-family:var(--font-title); font-size:.76rem; color:var(--glow-amber); text-shadow:0 0 10px #ffcc6655; }
+    .c-bc { color: #4dffa0; text-shadow: 0 0 14px #4dffa077; }
+    .c-br { color: #66bfff; text-shadow: 0 0 14px #66bfff77; }
+    .c-pb { color: #dd88ff; text-shadow: 0 0 14px #dd88ff77; }
 
-    .prog-track { height:4px; background:#c8b8ff14; border-radius:99px; overflow:hidden; margin-bottom:.85rem; }
+    .curr-stars { font-family:var(--font-title); font-size:.78rem; font-weight:700; color:#ffd966; text-shadow:0 0 12px #ffcc6677; }
+
+    .prog-track { height:5px; background:#c8b8ff14; border-radius:99px; overflow:hidden; margin-bottom:.85rem; }
     .prog-fill  { height:100%; border-radius:99px; width:0%; transition:width 1.1s cubic-bezier(.34,1.56,.64,1); }
-    .pf-bc { background:linear-gradient(90deg,#4aaa7a,#a8edcc); box-shadow:0 0 5px #a8edcc77; }
-    .pf-br { background:linear-gradient(90deg,#4a82cc,#a8d4ff); box-shadow:0 0 5px #a8d4ff77; }
-    .pf-pb { background:linear-gradient(90deg,#a04acc,#e8a8ff); box-shadow:0 0 5px #e8a8ff77; }
+    .pf-bc { background:linear-gradient(90deg,#2ecc7a,#a8edcc); box-shadow:0 0 7px #a8edccaa; }
+    .pf-br { background:linear-gradient(90deg,#2e72ee,#a8d4ff); box-shadow:0 0 7px #a8d4ffaa; }
+    .pf-pb { background:linear-gradient(90deg,#9922ee,#e8a8ff); box-shadow:0 0 7px #e8a8ffaa; }
 
     .game-rows  { display:flex; flex-direction:column; gap:.28rem; }
     .game-row   {
@@ -284,26 +478,35 @@
     .row-chk { font-size:.82rem; text-align:center; line-height:1; }
     .row-names { overflow:hidden; }
     .rn-en {
-      font-family:var(--font-title); font-size:.62rem; letter-spacing:.04em;
-      color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+      font-family:var(--font-title); font-size:.64rem; font-weight:700; letter-spacing:.04em;
+      color: #f0eaff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     }
     .game-row.done .rn-en { color:var(--glow-teal); }
     .rn-jp {
-      font-size:.62rem; color:var(--text-ghost);
+      font-size:.64rem; font-weight:700; color: #9d93c0;
       white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     }
     .row-stars { display:flex; gap:1px; }
     .sp { font-size:.62rem; opacity:.18; transition:opacity .2s; }
     .sp.lit { opacity:1; filter:drop-shadow(0 0 3px #ffcc66); }
     .row-sc {
-      font-family:var(--font-title); font-size:.6rem;
-      color:var(--text-ghost); min-width:2rem; text-align:right;
+      font-family:var(--font-title); font-size:.62rem; font-weight:700;
+      color: #9d93c0; min-width:2rem; text-align:right;
     }
-    .game-row.done .row-sc { color:var(--text-dim); }
+    .game-row.done .row-sc { color: #c4bce0; }
 
-    /* ── UNLOCKS ─────────────────────────────────── */
+    /* ── ACHIEVEMENTS ACCORDION ──────────────────── */
     .unlock-section { margin-bottom:2rem; animation:riseIn .9s .3s cubic-bezier(.16,1,.3,1) both; }
-    .unlocks-grid   { display:grid; grid-template-columns:repeat(auto-fill,minmax(205px,1fr)); gap:.55rem; }
+
+    .unlocks-acc-card {
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      position: relative;
+    }
+    .unlocks-acc-card .accordion-body .accordion-inner {
+      padding: 0 1rem 1rem;
+    }
+    .unlocks-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(205px,1fr)); gap:.55rem; }
 
     .u-chip {
       display:flex; align-items:center; gap:.6rem;
@@ -313,7 +516,7 @@
       position:relative; overflow:hidden;
     }
     .u-chip.earned {
-      filter:none; opacity:1; border-color:#c8b8ff44;
+      filter:none; opacity:1; border-color:#c8b8ff55;
       background:#c8b8ff0c; box-shadow:0 0 20px #c8b8ff14,inset 0 0 20px #c8b8ff05;
     }
     .u-chip.earned:hover { border-color:var(--glow-moon); box-shadow:0 0 28px #c8b8ff2a; transform:translateY(-2px); }
@@ -326,10 +529,10 @@
 
     .u-icon  { font-size:1.2rem; flex-shrink:0; }
     .u-text  { overflow:hidden; min-width:0; }
-    .u-en    { font-family:var(--font-title); font-size:.6rem; letter-spacing:.05em; color:var(--glow-moon); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .u-chip:not(.earned) .u-en { color:var(--text-ghost); }
-    .u-jp    { font-size:.63rem; color:var(--text-ghost); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .u-desc  { font-size:.6rem; color:var(--text-ghost); margin-top:.08rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .u-en    { font-family:var(--font-title); font-size:.62rem; font-weight:700; letter-spacing:.05em; color: #ddd0ff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .u-chip:not(.earned) .u-en { color: #7a7098; }
+    .u-jp    { font-size:.65rem; font-weight:700; color: #9d93c0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .u-desc  { font-size:.62rem; font-weight:700; color: #9d93c0; margin-top:.08rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
     /* ── SAVE CONTROLS ───────────────────────────── */
     .save-section { padding:1.4rem; animation:riseIn .9s .4s cubic-bezier(.16,1,.3,1) both; }
@@ -349,19 +552,19 @@
     .spell-btn:active { transform:scale(.97); }
 
     .sb-icon  { font-size:1.25rem; }
-    .sb-en    { font-family:var(--font-title); font-size:.54rem; letter-spacing:.1em; text-transform:uppercase; }
-    .sb-jp    { font-size:.7rem; }
-    .sb-kanji { font-size:.58rem; }
+    .sb-en    { font-family:var(--font-title); font-size:.56rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; }
+    .sb-jp    { font-size:.72rem; font-weight:700; }
+    .sb-kanji { font-size:.6rem; font-weight:700; }
 
-    .sb-moon   { border-color:#c8b8ff55; color:var(--glow-moon); }
+    .sb-moon   { border-color:#c8b8ff55; color: #ddd0ff; }
     .sb-moon::before   { background:radial-gradient(ellipse at 50% 0%,#c8b8ff14,transparent 70%); }
     .sb-moon:hover     { border-color:var(--glow-moon); box-shadow:0 0 20px #c8b8ff33,0 0 40px #c8b8ff11; }
 
-    .sb-teal   { border-color:#7fffd455; color:var(--glow-teal); }
+    .sb-teal   { border-color:#7fffd455; color: #5cffd0; }
     .sb-teal::before   { background:radial-gradient(ellipse at 50% 0%,#7fffd414,transparent 70%); }
     .sb-teal:hover     { border-color:var(--glow-teal); box-shadow:0 0 20px #7fffd433; }
 
-    .sb-amber  { border-color:#ffcc6655; color:var(--glow-amber); }
+    .sb-amber  { border-color:#ffcc6655; color: #ffd966; }
     .sb-amber::before  { background:radial-gradient(ellipse at 50% 0%,#ffcc6614,transparent 70%); }
     .sb-amber:hover    { border-color:var(--glow-amber); box-shadow:0 0 20px #ffcc6633; }
 
@@ -370,12 +573,12 @@
     .sb-danger:hover   { border-color:#ff9eb5; box-shadow:0 0 20px #ff6b6b33; }
 
     .prof-status {
-      text-align:center; font-size:.76rem; min-height:1.2em;
-      margin-top:.8rem; color:var(--text-ghost); transition:color .2s;
+      text-align:center; font-size:.78rem; font-weight:700; min-height:1.2em;
+      margin-top:.8rem; color: #9d93c0; transition:color .2s;
     }
-    .s-ok   { color:var(--glow-teal);  text-shadow:0 0 10px #7fffd455; }
+    .s-ok   { color: #5cffd0;  text-shadow:0 0 10px #7fffd455; }
     .s-err  { color:var(--glow-rose);  text-shadow:0 0 10px #ff9eb555; }
-    .s-warn { color:var(--glow-amber); text-shadow:0 0 10px #ffcc6655; }
+    .s-warn { color: #ffd966; text-shadow:0 0 10px #ffcc6655; }
 
     /* ── ANIMATION ───────────────────────────────── */
     @keyframes riseIn {
@@ -397,6 +600,7 @@
 <div class="bg-cosmos"></div>
 <div class="bg-moon-shaft"></div>
 <div class="bg-stars"></div>
+<div class="bg-stars-extra"></div>
 
 <!-- Forest silhouette -->
 <svg class="bg-forest" viewBox="0 0 1440 230" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
@@ -406,7 +610,6 @@
       <stop offset="100%" stop-color="#070710"/>
     </linearGradient>
   </defs>
-  <!-- distant trees, dimmed -->
   <g opacity="0.45">
     <polygon points="60,190 82,82 104,190"    fill="url(#tg)"/>
     <polygon points="115,190 148,58 181,190"  fill="url(#tg)"/>
@@ -415,7 +618,6 @@
     <polygon points="1265,190 1298,52 1331,190" fill="url(#tg)"/>
     <polygon points="1355,190 1382,88 1409,190" fill="url(#tg)"/>
   </g>
-  <!-- foreground trees -->
   <polygon points="0,230 32,18 64,230"      fill="url(#tg)"/>
   <polygon points="52,230 98,0 144,230"     fill="url(#tg)"/>
   <polygon points="132,230 170,42 208,230"  fill="url(#tg)"/>
@@ -428,12 +630,10 @@
   <polygon points="1238,230 1275,22 1312,230" fill="url(#tg)"/>
   <polygon points="1328,230 1368,58 1408,230" fill="url(#tg)"/>
   <polygon points="1395,230 1418,82 1441,230" fill="url(#tg)"/>
-  <!-- twisted branches -->
   <path d="M98 30 Q128 10 148 28"  stroke="#0d0a1e" stroke-width="4" fill="none" opacity="0.9"/>
   <path d="M388 20 Q415 4 432 22"  stroke="#0d0a1e" stroke-width="3" fill="none" opacity="0.9"/>
   <path d="M1055 18 Q1080 2 1100 20" stroke="#0d0a1e" stroke-width="3" fill="none" opacity="0.9"/>
   <path d="M170 55 Q195 40 210 58"  stroke="#0d0a1e" stroke-width="3" fill="none" opacity="0.7"/>
-  <!-- ground fill -->
   <rect x="0" y="205" width="1440" height="25" fill="#070710"/>
 </svg>
 
@@ -444,7 +644,9 @@
 
   <!-- Header -->
   <header class="profile-header">
-    <div class="moon-orb"></div>
+    <div class="moon-orb">
+      <img src="assets/img/boo-moon.png" alt="Boo Moon" />
+    </div>
     <div class="h-en">My Adventure</div>
     <div class="h-jp">ぼくのぼうけん</div>
     <div class="h-kanji">冒険の記録</div>
@@ -493,7 +695,7 @@
     <div id="curr-cards"><!-- injected --></div>
   </section>
 
-  <!-- Unlocks -->
+  <!-- Unlocks / Achievements -->
   <section class="unlock-section">
     <div class="eyebrow">
       <span class="ey-en">Achievements</span>
@@ -501,7 +703,28 @@
       <span class="ey-kanji">実績</span>
       <div class="ey-line"></div>
     </div>
-    <div class="unlocks-grid" id="unlocks-grid"><!-- injected --></div>
+    <div class="accordion-wrap">
+      <div class="glass unlocks-acc-card">
+        <div class="accordion-shimmer"></div>
+        <button class="accordion-trigger" aria-expanded="false" id="acc-achievements-trigger">
+          <div class="accordion-header">
+            <div class="curr-badge">
+              <div class="orb" style="background:radial-gradient(circle at 35% 35%,#fff8e0,#ffcc44);box-shadow:0 0 16px #ffcc6688;color:#1a0e00;font-size:.9rem;">🏆</div>
+              <div>
+                <div class="curr-name-en" style="color:#ffd966;text-shadow:0 0 12px #ffcc6677;">Achievements</div>
+                <div class="curr-name-jp">じっせき <span class="curr-name-k">実績</span></div>
+              </div>
+            </div>
+            <span class="acc-chevron">▼</span>
+          </div>
+        </button>
+        <div class="accordion-body" id="acc-achievements-body">
+          <div class="accordion-inner">
+            <div class="unlocks-grid" id="unlocks-grid"><!-- injected --></div>
+          </div>
+        </div>
+      </div>
+    </div>
   </section>
 
   <!-- Save controls -->
@@ -565,6 +788,31 @@
 <script src="js/ui/save-menu.js"></script>
 
 <script>
+/* ── ACCORDION LOGIC ─────────────────────────────────────────────────── */
+function initAccordion(triggerId, bodyId) {
+  const trigger = document.getElementById(triggerId);
+  const body    = document.getElementById(bodyId);
+  if (!trigger || !body) return;
+
+  // Find shimmer within the same card
+  const card    = trigger.closest('.glass');
+  const shimmer = card ? card.querySelector('.accordion-shimmer') : null;
+
+  trigger.addEventListener('click', () => {
+    const expanded = trigger.getAttribute('aria-expanded') === 'true';
+    trigger.setAttribute('aria-expanded', String(!expanded));
+    body.classList.toggle('open', !expanded);
+
+    // Replay shimmer animation on open
+    if (!expanded && shimmer) {
+      shimmer.style.animation = 'none';
+      shimmer.offsetHeight; // reflow
+      shimmer.style.animation = '';
+    }
+  });
+}
+
+/* ── GAME DATA ───────────────────────────────────────────────────────── */
 const GAME_JP = {
   ask_sentence:   { jp:'しつもんをする',   k:'質問文' },
   say_sentence:   { jp:'ぶんをいう',       k:'文を言う' },
@@ -619,45 +867,62 @@ function render() {
   document.getElementById('total-completed').textContent = `${summary.completed}/${summary.totalGames}`;
   document.getElementById('total-unlocks').textContent   = `${earned}/${allUnlocks.length}`;
 
-  // Curriculum cards
+  // Curriculum cards — each one its own accordion
   const cont = document.getElementById('curr-cards');
   cont.innerHTML = '';
-  R.CURRICULUMS.forEach(c => {
+  R.CURRICULUMS.forEach((c, idx) => {
     const ci  = CURR_INFO[c];
     const cs  = S.summaryFor(c);
     const pct = cs.totalGames > 0 ? Math.round(cs.completed/cs.totalGames*100) : 0;
+    const accId = `acc-curr-${c}`;
+    const bodyId = `acc-curr-body-${c}`;
 
-    const card = document.createElement('div');
-    card.className = 'glass curr-card';
-    card.innerHTML = `
-      <div class="curr-head">
-        <div class="curr-badge">
-          <div class="orb ${ci.oc}">${c.toUpperCase()}</div>
-          <div>
-            <div class="curr-name-en ${ci.cc}">${ci.en}</div>
-            <div class="curr-name-jp">${ci.jp} <span class="curr-name-k">${ci.k}</span></div>
+    const wrap = document.createElement('div');
+    wrap.className = 'accordion-wrap';
+    wrap.innerHTML = `
+      <div class="glass curr-card-acc">
+        <div class="accordion-shimmer"></div>
+        <button class="accordion-trigger" aria-expanded="false" id="${accId}">
+          <div class="accordion-header">
+            <div class="curr-badge">
+              <div class="orb ${ci.oc}">${c.toUpperCase()}</div>
+              <div>
+                <div class="curr-name-en ${ci.cc}">${ci.en}</div>
+                <div class="curr-name-jp">${ci.jp} <span class="curr-name-k">${ci.k}</span></div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:.7rem;">
+              <span class="curr-stars">⭐ ${cs.stars}/${cs.totalStars}</span>
+              <span class="acc-chevron">▼</span>
+            </div>
+          </div>
+        </button>
+        <div class="accordion-body" id="${bodyId}">
+          <div class="accordion-inner">
+            <div class="prog-track">
+              <div class="prog-fill ${ci.fc}" data-target="${pct}"></div>
+            </div>
+            <div class="game-rows">
+              ${cs.entries.map(e=>{
+                const gj = GAME_JP[e.id]||{jp:e.name,k:''};
+                return `<div class="game-row ${e.completed?'done':''}">
+                  <span class="row-chk">${e.completed?'✅':'☐'}</span>
+                  <div class="row-names">
+                    <div class="rn-en">${e.name}</div>
+                    <div class="rn-jp">${gj.jp}　${gj.k}</div>
+                  </div>
+                  <div class="row-stars">${starsHTML(e.stars)}</div>
+                  <div class="row-sc">${e.highScore>0?e.highScore:'—'}</div>
+                </div>`;
+              }).join('')}
+            </div>
           </div>
         </div>
-        <span class="curr-stars">⭐ ${cs.stars}/${cs.totalStars}</span>
-      </div>
-      <div class="prog-track">
-        <div class="prog-fill ${ci.fc}" data-target="${pct}"></div>
-      </div>
-      <div class="game-rows">
-        ${cs.entries.map(e=>{
-          const gj = GAME_JP[e.id]||{jp:e.name,k:''};
-          return `<div class="game-row ${e.completed?'done':''}">
-            <span class="row-chk">${e.completed?'✅':'☐'}</span>
-            <div class="row-names">
-              <div class="rn-en">${e.name}</div>
-              <div class="rn-jp">${gj.jp}　${gj.k}</div>
-            </div>
-            <div class="row-stars">${starsHTML(e.stars)}</div>
-            <div class="row-sc">${e.highScore>0?e.highScore:'—'}</div>
-          </div>`;
-        }).join('')}
       </div>`;
-    cont.appendChild(card);
+    cont.appendChild(wrap);
+
+    // Init accordion after DOM insertion
+    initAccordion(accId, bodyId);
   });
 
   requestAnimationFrame(()=>{
@@ -666,7 +931,7 @@ function render() {
     });
   });
 
-  // Unlocks
+  // Achievements accordion content
   const grid = document.getElementById('unlocks-grid');
   grid.innerHTML = '';
   [...allUnlocks].sort((a,b)=>b.unlocked-a.unlocked).forEach(u=>{
@@ -686,6 +951,9 @@ function render() {
 
 document.addEventListener('booha:ready', ()=>{
   render();
+
+  // Init achievements accordion
+  initAccordion('acc-achievements-trigger', 'acc-achievements-body');
 
   document.getElementById('btn-show-code').onclick  = ()=> BoohaMemoryCodeUI.showCode();
   document.getElementById('btn-enter-code').onclick = ()=> BoohaMemoryCodeUI.promptEnterCode();
