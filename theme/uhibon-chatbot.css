@@ -150,8 +150,9 @@
   /* Smooth idle float */
   animation: uhi-char-float 4s ease-in-out infinite;
 
-  /* CSS transition so image-swap isn't jarring */
-  transition: opacity .12s ease;
+  /* opacity: state-change cross-fade
+     filter:  slow drift between glow colours (idle colour loop) */
+  transition: opacity .2s ease, filter 1.6s ease;
 }
 
 /* Talking state — warm amber tint on the glow */
