@@ -23,32 +23,37 @@
   /* ── Arrival arrow delay (ms) before showing the back-direction arrow ── */
   const ARRIVAL_ARROW_DELAY_MS = 2000;
 
- const MONTH_COLORS = [
-  ['#ff3bbd','#ff79d7'],['#ff6b3b','#ffaa5e'],['#3bc8ff','#a8edff'],
-  ['#3bff8a','#b2ffda'],['#ffd700','#fff176'],['#3b6fff','#90aaff'],
-  ['#a03bff','#d49aff'],['#ff9f3b','#ffd08a'],['#3bffee','#a8fff8'],
-  ['#c8ff3b','#e8ffaa'],['#ff3b6f','#ff85a1'],['#ff3bbd','#ff79d7'],
-];
+  /* ── How long after a transition before the ghost can trigger another one.
+        This is the key fix for the blinking/stuck loop: the ghost spawns
+        close to an NPP edge, so without this guard it immediately fires
+        another transition on the very next tick. ── */
+  const TRANSITION_COOLDOWN_MS = 1200;
 
-function monthPrimary(w) {
-  return MONTH_COLORS[Math.max(0, Math.min(11, Math.floor((w - 1) / 4)))][0];
-}
-function monthSecondary(w) {
-  return MONTH_COLORS[Math.max(0, Math.min(11, Math.floor((w - 1) / 4)))][1];
-}
+  const MONTH_COLORS = [
+    ['#ff3bbd','#ff79d7'],['#ff6b3b','#ffaa5e'],['#3bc8ff','#a8edff'],
+    ['#3bffee','#b2ffda'],['#ffd700','#fff176'],['#3b6fff','#90aaff'],
+    ['#a03bff','#d49aff'],['#ff9f3b','#ffd08a'],['#3bffee','#a8fff8'],
+    ['#c8ff3b','#e8ffaa'],['#ff3b6f','#ff85a1'],['#ff3bbd','#ff79d7'],
+  ];
 
-function roomColorPair(roomId) {
-  const n = parseInt((roomId || "room_01").replace(/\D/g, ""), 10) || 1;
-  return MONTH_COLORS[(n - 1) % MONTH_COLORS.length];
-}
+  function monthPrimary(w)   { return MONTH_COLORS[Math.max(0,Math.min(11,Math.floor((w-1)/4)))][0]; }
+  function monthSecondary(w) { return MONTH_COLORS[Math.max(0,Math.min(11,Math.floor((w-1)/4)))][1]; }
 
-// Read the active week the player arrived from
-const boohaWeek = parseInt(sessionStorage.getItem('booha_active_week') || '1', 10);
-const primary   = monthPrimary(boohaWeek);
-const secondary = monthSecondary(boohaWeek);
+  function roomColorPair(roomId) {
+    const n = parseInt((roomId || "room_01").replace(/\D/g,""), 10) || 1;
+    return MONTH_COLORS[(n - 1) % MONTH_COLORS.length];
+  }
+
+  const boohaWeek = parseInt(sessionStorage.getItem('booha_active_week') || '1', 10);
+  const primary   = monthPrimary(boohaWeek);
+  const secondary = monthSecondary(boohaWeek);
+
   /* ═══════════════════════════════════════════
      NPP — NEXT PAGE POINTS
-     (nudged inward from edges for mobile)
+     IMPORTANT: NPP trigger coords must NOT coincide with any spawn position.
+     Each spawn is placed safely inside the walkable area; NPPs sit at the
+     room edges.  The TRANSITION_COOLDOWN_MS guard below is the primary
+     defence against the ghost immediately re-triggering after arriving.
   ═══════════════════════════════════════════ */
   const NPP_RADIUS = 40;
 
@@ -133,28 +138,28 @@ const secondary = monthSecondary(boohaWeek);
 
   const DIR_ANGLE = { right: 0, down: Math.PI / 2, left: Math.PI, up: -Math.PI / 2 };
 
-  /* ── Arrival arrow behaviour ──
-     Instead of hiding the back-dir arrow by distance, we hide it for
-     ARRIVAL_ARROW_DELAY_MS after entering a room, then fade it in.      */
-  let arrivalArrowHiddenUntil = 0;   // timestamp when the arrival arrow can show
+  let arrivalArrowHiddenUntil = 0;
 
   /* ═══════════════════════════════════════════
      STATE
   ═══════════════════════════════════════════ */
   const state = {
-    roomId        : DATA.startRoom,
-    spawnId       : "default",
-    x             : 732,
-    y             : 876,
-    spawnX        : 732,
-    spawnY        : 876,
-    arrivalDir    : null,
-    transitioning : false,
-    clickTarget   : null,
-    moving        : false,
-    coordMode     : false,
-    musicStarted  : false,
-    lastTrailT    : 0
+    roomId            : DATA.startRoom,
+    spawnId           : "default",
+    x                 : 732,
+    y                 : 876,
+    spawnX            : 732,
+    spawnY            : 876,
+    arrivalDir        : null,
+    transitioning     : false,
+    /* FIX: timestamp after which NPP triggers are allowed.
+       Set to now + TRANSITION_COOLDOWN_MS on every room entry. */
+    transitionReadyAt : 0,
+    clickTarget       : null,
+    moving            : false,
+    coordMode         : false,
+    musicStarted      : false,
+    lastTrailT        : 0
   };
 
   /* ── On return from adventure-profile, spawn at checkpoint ── */
@@ -163,7 +168,7 @@ const secondary = monthSecondary(boohaWeek);
       const ret = sessionStorage.getItem('karasuki_return_room');
       if (ret === 'room_08') {
         state.roomId  = 'room_08';
-        state.spawnId = 'default';   // room_08 default is now the checkpoint
+        state.spawnId = 'default';
         sessionStorage.removeItem('karasuki_return_room');
       }
     } catch (_) {}
@@ -283,7 +288,7 @@ const secondary = monthSecondary(boohaWeek);
       }
       #copy-toast.show{opacity:1;}
 
-      /* ── Profile portal popup — bright glow, readable text, mobile-scaled ── */
+      /* ── Profile portal popup ── */
       #portal-overlay{
         display:none;position:fixed;inset:0;z-index:9000;
         align-items:center;justify-content:center;
@@ -446,7 +451,6 @@ const secondary = monthSecondary(boohaWeek);
 
     /* portal button events */
     document.getElementById("portal-yes").addEventListener("click", () => {
-      // Mark that we came from room_08 so we return to checkpoint
       try { sessionStorage.setItem('karasuki_return_room', 'room_08'); } catch (_) {}
       window.location.href = PORTAL.href;
     });
@@ -454,16 +458,9 @@ const secondary = monthSecondary(boohaWeek);
     portalOverlay.addEventListener("click", (e) => { if (e.target === portalOverlay) closePortal(); });
   }
 
-  function openPortal()  {
-    portalOverlay.classList.add("active");
-    state.clickTarget = null;
-  }
-  function closePortal() {
-    portalOverlay.classList.remove("active");
-  }
-  function isPortalOpen() {
-    return portalOverlay.classList.contains("active");
-  }
+  function openPortal()  { portalOverlay.classList.add("active"); state.clickTarget = null; }
+  function closePortal() { portalOverlay.classList.remove("active"); }
+  function isPortalOpen(){ return portalOverlay.classList.contains("active"); }
 
   /* ═══════════════════════════════════════════
      CANVAS / FIT
@@ -521,8 +518,7 @@ const secondary = monthSecondary(boohaWeek);
   let toastTimer = null;
   function showToast(msg) {
     const t = document.getElementById("copy-toast");
-    t.textContent = msg;
-    t.classList.add("show");
+    t.textContent = msg; t.classList.add("show");
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => t.classList.remove("show"), 1400);
   }
@@ -562,8 +558,11 @@ const secondary = monthSecondary(boohaWeek);
     placeGhost(spawn.x, spawn.y);
     state.spawnX = spawn.x;
     state.spawnY = spawn.y;
-    // On first load, set arrival arrow timer so it doesn't show immediately
-    arrivalArrowHiddenUntil = performance.now() + ARRIVAL_ARROW_DELAY_MS;
+    /* FIX: set the cooldown so the ghost can't immediately fire an NPP
+       on the very first frames (handles startRoom being near an edge) */
+    const now = performance.now();
+    state.transitionReadyAt  = now + TRANSITION_COOLDOWN_MS;
+    arrivalArrowHiddenUntil  = now + ARRIVAL_ARROW_DELAY_MS;
   }
 
   /* ═══════════════════════════════════════════
@@ -586,11 +585,11 @@ const secondary = monthSecondary(boohaWeek);
   }
   function tryMove(nx, ny) {
     const c = clampToWorld(nx, ny);
-    if (canMoveTo(c.x, c.y))           { placeGhost(c.x, c.y); return true; }
+    if (canMoveTo(c.x, c.y))       { placeGhost(c.x, c.y); return true; }
     const tx = clampToWorld(nx, state.y);
-    if (canMoveTo(tx.x, tx.y))         { placeGhost(tx.x, tx.y); return true; }
+    if (canMoveTo(tx.x, tx.y))     { placeGhost(tx.x, tx.y); return true; }
     const ty = clampToWorld(state.x, ny);
-    if (canMoveTo(ty.x, ty.y))         { placeGhost(ty.x, ty.y); return true; }
+    if (canMoveTo(ty.x, ty.y))     { placeGhost(ty.x, ty.y); return true; }
     return false;
   }
 
@@ -621,8 +620,11 @@ const secondary = monthSecondary(boohaWeek);
       state.arrivalDir = exit.dir || null;
       trail = []; pins = [];
 
-      // Start the 2-second delay before showing the arrival-direction arrow
-      arrivalArrowHiddenUntil = performance.now() + ARRIVAL_ARROW_DELAY_MS;
+      const now = performance.now();
+      /* FIX: arm the cooldown so the ghost can't immediately re-trigger
+         the NPP it just arrived near (the back-blink bug) */
+      state.transitionReadyAt  = now + TRANSITION_COOLDOWN_MS;
+      arrivalArrowHiddenUntil  = now + ARRIVAL_ARROW_DELAY_MS;
 
       const lh = pinLog.querySelector(".log-header span");
       if (lh) lh.textContent = `PINS — ${state.roomId}`;
@@ -634,7 +636,11 @@ const secondary = monthSecondary(boohaWeek);
     }, FADE_MS / 2 + 20);
   }
 
-  function getNPPExit() {
+  function getNPPExit(now) {
+    /* FIX: honour the cooldown — don't check NPPs until the ghost has
+       been in the room long enough to have moved away from the spawn edge */
+    if (now < state.transitionReadyAt) return null;
+
     const npps = NPP[state.roomId];
     if (!npps) return null;
     for (const npp of npps) {
@@ -662,8 +668,6 @@ const secondary = monthSecondary(boohaWeek);
 
   /* ═══════════════════════════════════════════
      DRAW EXIT ARROWS
-     — arrival-direction arrow is hidden for
-       ARRIVAL_ARROW_DELAY_MS after entering a room
   ═══════════════════════════════════════════ */
   function drawExitArrows(now) {
     const npps = NPP[state.roomId];
@@ -671,23 +675,17 @@ const secondary = monthSecondary(boohaWeek);
     const sec = now / 1000;
     const [col1, col2] = roomColorPair(state.roomId);
     const OPPOSITE = { left: "right", right: "left", up: "down", down: "up" };
-    const arrivalExit  = state.arrivalDir ? OPPOSITE[state.arrivalDir] : null;
+    const arrivalExit = state.arrivalDir ? OPPOSITE[state.arrivalDir] : null;
 
-    // How far through the delay are we? 0 = just arrived, 1 = fully revealed
     const delayRemaining = arrivalArrowHiddenUntil - now;
     const arrivalAlpha   = delayRemaining <= 0
       ? 1
       : Math.max(0, 1 - (delayRemaining / ARRIVAL_ARROW_DELAY_MS));
-    // Smooth the reveal with a short fade window at the end of the delay
-    const revealFade = delayRemaining > 400
-      ? 0
-      : arrivalAlpha;
+    const revealFade = delayRemaining > 400 ? 0 : arrivalAlpha;
 
     npps.forEach((npp, i) => {
       if (!npp.dir) return;
-
       const isArrivalDir = (npp.dir === arrivalExit);
-      // Skip drawing entirely if we're still in the hidden window
       if (isArrivalDir && delayRemaining > 400) return;
 
       const angle  = DIR_ANGLE[npp.dir] ?? 0;
@@ -695,7 +693,6 @@ const secondary = monthSecondary(boohaWeek);
       const bounce = Math.sin(sec * 2.2 + i * 1.3) * 6;
       const ax = npp.x + Math.cos(angle) * bounce;
       const ay = npp.y + Math.sin(angle) * bounce;
-
       const fadeAlpha = isArrivalDir ? revealFade : 1;
 
       ctx.save();
@@ -718,7 +715,7 @@ const secondary = monthSecondary(boohaWeek);
         ctx.beginPath();
         ctx.moveTo(ox - 7, -10); ctx.lineTo(ox + 7, 0); ctx.lineTo(ox - 7, 10);
         ctx.stroke();
-        ctx.shadowBlur = 0;
+        ctx.shadowBlur  = 0;
       });
 
       ctx.globalAlpha = fadeAlpha * (0.60 + pulse * 0.38);
@@ -732,7 +729,6 @@ const secondary = monthSecondary(boohaWeek);
 
   /* ═══════════════════════════════════════════
      DRAW PORTAL ORB (room_08)
-     — glowing checkpoint so students know to go there
   ═══════════════════════════════════════════ */
   const PORTAL_COLORS = [
     '#8b00ff','#00bfff','#ff007f','#00ff99','#ffaa00','#aa00ff'
@@ -741,19 +737,18 @@ const secondary = monthSecondary(boohaWeek);
   function drawPortalOrb(now) {
     if (state.roomId !== "room_08") return;
 
-    const sec   = now / 1000;
+    const sec    = now / 1000;
     const cycleT = (sec * 0.28) % PORTAL_COLORS.length;
     const idx0   = Math.floor(cycleT) % PORTAL_COLORS.length;
     const idx1   = (idx0 + 1) % PORTAL_COLORS.length;
     const t      = cycleT - Math.floor(cycleT);
     const col    = lerpHex(PORTAL_COLORS[idx0], PORTAL_COLORS[idx1], t);
-
     const pulse  = 0.5 + 0.5 * Math.sin(sec * 2.6);
     const r      = 8 + pulse * 4;
 
     ctx.save();
 
-    /* wide ambient halo — makes it easy to spot on mobile */
+    /* wide ambient halo */
     const ambient = ctx.createRadialGradient(PORTAL.x, PORTAL.y, 0, PORTAL.x, PORTAL.y, 70);
     ambient.addColorStop(0, col + "44");
     ambient.addColorStop(0.5, col + "18");
@@ -783,25 +778,24 @@ const secondary = monthSecondary(boohaWeek);
     ctx.beginPath(); ctx.arc(PORTAL.x, PORTAL.y, r, 0, Math.PI * 2); ctx.fill();
     ctx.shadowBlur  = 0;
 
-    /* sparkling ring of dots around the checkpoint */
+    /* sparkling ring of dots */
     const dotCount = 6;
     const ringR    = 22 + pulse * 3;
     for (let d = 0; d < dotCount; d++) {
-      const angle = (sec * 0.9) + (d / dotCount) * Math.PI * 2;
+      const angle   = (sec * 0.9) + (d / dotCount) * Math.PI * 2;
       const dx = PORTAL.x + Math.cos(angle) * ringR;
       const dy = PORTAL.y + Math.sin(angle) * ringR;
       const dotAlpha = 0.4 + 0.6 * Math.sin(sec * 3 + d * 1.2);
       ctx.globalAlpha = dotAlpha;
-      ctx.fillStyle = "#ffffff";
-      ctx.shadowBlur = 6; ctx.shadowColor = col;
+      ctx.fillStyle   = "#ffffff";
+      ctx.shadowBlur  = 6; ctx.shadowColor = col;
       ctx.beginPath(); ctx.arc(dx, dy, 2, 0, Math.PI * 2); ctx.fill();
-      ctx.shadowBlur = 0;
+      ctx.shadowBlur  = 0;
     }
 
     ctx.restore();
   }
 
-  /* simple hex color lerp */
   function lerpHex(a, b, t) {
     const ah = parseInt(a.replace('#',''), 16);
     const bh = parseInt(b.replace('#',''), 16);
@@ -947,7 +941,8 @@ const secondary = monthSecondary(boohaWeek);
   function tick(now) {
     if (!state.transitioning && !isPortalOpen()) {
       handleClickMovement(now);
-      const exit = getNPPExit();
+      /* FIX: pass `now` so getNPPExit can honour the cooldown */
+      const exit = getNPPExit(now);
       if (exit) transitionTo(exit);
     }
     drawFrame(now);
@@ -955,7 +950,7 @@ const secondary = monthSecondary(boohaWeek);
   }
 
   /* ═══════════════════════════════════════════
-     MUSIC — starts on any click/touch anywhere
+     MUSIC
   ═══════════════════════════════════════════ */
   function startMusic() {
     if (state.musicStarted) return;
@@ -1028,12 +1023,10 @@ const secondary = monthSecondary(boohaWeek);
       e.preventDefault();
     }, { passive: false });
 
-    /* Esc closes popup */
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") closePortal();
     });
 
-    /* Any interaction anywhere on the document restarts music (handles return from profile) */
     document.addEventListener("click",    startMusic, { once: false });
     document.addEventListener("touchend", startMusic, { once: false, passive: true });
   }
