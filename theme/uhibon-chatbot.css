@@ -4,7 +4,7 @@
    Supports: English / Japanese (CJK)
 ───────────────────────────────────────────── */
 
-@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=MedievalSharp&family=Noto+Serif+JP:wght@400;600&family=IM+Fell+English:ital@0;1&family=Noto+Sans+JP:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Philosopher:ital,wght@0,400;0,700;1,400&family=Noto+Serif+JP:wght@400;600&family=Noto+Sans+JP:wght@400;500&display=swap');
 
 /* ── Tokens ── */
 :root {
@@ -17,26 +17,41 @@
   --uhi-purple-accent: #7b4fcf;
   --uhi-purple-soft:   rgba(123, 79, 207, 0.35);
   --uhi-fog:           rgba(180, 140, 255, 0.10);
-  --uhi-text-bot:      #f5c842;   /* Uhibon speaks in gold */
-  --uhi-text-user:     #f0ecff;   /* Player speaks in white-lavender */
+  --uhi-text-bot:      #f5c842;
+  --uhi-text-user:     #f0ecff;
   --uhi-radius:        18px;
 
-  /* Font stacks — CJK-aware */
   --font-spooky: 'Cinzel Decorative', 'Noto Serif JP', serif;
-  --font-body:   'IM Fell English', 'Noto Sans JP', serif;
+  --font-bot:    'Philosopher', 'Noto Serif JP', serif;
+  --font-body:   'Philosopher', 'Noto Sans JP', sans-serif;
 }
 
 /* ════════════════════════════════════════════
-   LAUNCHER WRAPPER
+   ROOT WRAPPER  — size-to-content so it never
+   blocks taps on the hub cards behind it
+════════════════════════════════════════════ */
+#uhibon-chat-root {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  z-index: 50;
+  width: fit-content;
+  height: fit-content;
+  display: flex;
+  align-items: flex-end;
+}
+
+/* ════════════════════════════════════════════
+   LAUNCHER WRAPPER  — no position/z-index here;
+   those live on #uhibon-chat-root in index.html
 ════════════════════════════════════════════ */
 #uhibon-launcher {
-  position: fixed;
-  left: 18px;
-  bottom: 18px;
-  z-index: 9999;
   display: flex;
   align-items: flex-end;
   gap: 14px;
+  padding: 18px;
+  width:  fit-content;   /* CRITICAL: never stretch beyond contents */
+  height: fit-content;   /* CRITICAL: never stretch beyond contents */
 }
 
 /* ════════════════════════════════════════════
@@ -53,7 +68,6 @@
   position: relative;
   border-radius: 50%;
 
-  /* Soft gold glow — layered so it breathes */
   filter:
     drop-shadow(0 0  6px var(--uhi-gold-glow))
     drop-shadow(0 0 14px var(--uhi-gold-glow))
@@ -80,7 +94,6 @@
   -webkit-user-drag: none;
 }
 
-/* breathing pulse on the icon */
 @keyframes uhi-icon-pulse {
   0%,100% { filter:
     drop-shadow(0 0  6px var(--uhi-gold-glow))
@@ -130,21 +143,15 @@
   user-select: none;
   -webkit-user-drag: none;
 
-  /* Dark atmospheric glow — makes the skeleton "pop"
-     without any background box                      */
   filter:
     drop-shadow(0 0  8px rgba(123,  79, 207, 0.6))
     drop-shadow(0 0 20px rgba( 60,  20, 100, 0.7))
     drop-shadow(0 4px 32px rgba(  0,   0,   0, 0.8));
 
-  /* Smooth idle float */
   animation: uhi-char-float 4s ease-in-out infinite;
-
-  /* CSS transition so image-swap isn't jarring */
-  transition: opacity .12s ease;
+  transition: opacity .2s ease, filter 1.6s ease;
 }
 
-/* Talking state — warm amber tint on the glow */
 #uhibon-character img.is-talking {
   filter:
     drop-shadow(0 0 10px rgba(245, 200, 66, 0.50))
@@ -152,21 +159,37 @@
     drop-shadow(0 4px 32px rgba(  0,   0,   0, 0.8));
 }
 
-/* Gentle bob when idle */
 @keyframes uhi-char-float {
-  0%,100% { transform: translateY(0);   }
+  0%,100% { transform: translateY(0);    }
   45%     { transform: translateY(-7px); }
 }
 
-/* When talking, override float with a faster shimmy */
 #uhibon-character img.is-talking {
-  animation:
-    uhi-char-talk 0.36s ease-in-out infinite;
+  animation: uhi-char-talk 0.36s ease-in-out infinite;
 }
 
 @keyframes uhi-char-talk {
   0%,100% { transform: translateY(0)    rotate(-1deg); }
   50%     { transform: translateY(-4px) rotate( 1deg); }
+}
+
+#uhibon-character img.idle-blink {
+  animation: uhi-blink .28s ease-in-out forwards;
+}
+
+@keyframes uhi-blink {
+  0%,100% { transform: scaleY(1)    translateY(0); }
+  40%     { transform: scaleY(0.82) translateY(2px); }
+}
+
+#uhibon-character img.idle-look {
+  animation: uhi-look .55s ease-in-out forwards;
+}
+
+@keyframes uhi-look {
+  0%,100% { transform: translateY(0)    rotate(0deg); }
+  35%     { transform: translateY(-3px) rotate(3deg); }
+  65%     { transform: translateY(-3px) rotate(2deg); }
 }
 
 /* ════════════════════════════════════════════
@@ -187,11 +210,9 @@
     0 20px 60px rgba(0,0,0,.40);
   backdrop-filter: blur(14px);
   overflow: hidden;
-  /* subtle noise-grain texture via SVG data URI */
   position: relative;
 }
 
-/* faint arcane shimmer along the top edge */
 #uhibon-chatbox::before {
   content: '';
   position: absolute;
@@ -273,7 +294,6 @@
   line-height: 1.55;
   font-size: 14px;
   font-family: var(--font-body);
-  /* entrance */
   animation: uhi-msg-in .28s cubic-bezier(.22,.68,0,1.1) both;
 }
 
@@ -282,23 +302,38 @@
   to   { opacity: 1; transform: translateY(0)   scale(1); }
 }
 
-/* BOT message — Uhibon in gold spooky font */
 .uhibon-msg.bot {
   align-self: flex-start;
-  font-family: var(--font-spooky);
-  font-size: 13px;
+  font-family: var(--font-bot);
+  font-size: 14px;
   font-weight: 400;
-  letter-spacing: .03em;
+  letter-spacing: .01em;
+  line-height: 1.6;
   color: var(--uhi-text-bot);
   background: rgba(60, 20, 100, 0.45);
   border: 1px solid rgba(123, 79, 207, 0.35);
-  text-shadow: 0 0 8px rgba(245, 200, 66, 0.40);
+  text-shadow: 0 0 8px rgba(245, 200, 66, 0.35);
   box-shadow:
     0 2px 12px rgba(0,0,0,.30),
     0 0  18px rgba(123, 79, 207, 0.12) inset;
 }
 
-/* USER message — white-lavender */
+.uhibon-en {
+  display: block;
+  font-weight: 700;
+  font-family: var(--font-bot);
+  margin-bottom: 4px;
+}
+
+.uhibon-jp {
+  display: block;
+  font-size: 13px;
+  opacity: .92;
+  line-height: 1.45;
+  font-family: 'Noto Serif JP', serif;
+  font-weight: 400;
+}
+
 .uhibon-msg.user {
   align-self: flex-end;
   font-family: var(--font-body);
@@ -380,10 +415,11 @@
    RESPONSIVE
 ════════════════════════════════════════════ */
 @media (max-width: 700px) {
-  #uhibon-launcher { left: 12px; bottom: 12px; }
-  #uhibon-popout   { gap: 8px; }
+  /* No position/left/bottom here — root handles that */
+  #uhibon-launcher  { padding: 12px; }
+  #uhibon-popout    { gap: 8px; }
   #uhibon-character { width: 94px; }
-  #uhibon-chatbox  { width: min(280px, calc(100vw - 130px)); }
+  #uhibon-chatbox   { width: min(280px, calc(100vw - 130px)); }
   #uhibon-icon-btn img { width: 74px; }
-  .uhibon-msg.bot  { font-size: 12px; }
+  .uhibon-msg.bot   { font-size: 12px; }
 }
