@@ -1050,86 +1050,90 @@ function fireConfetti(big = false) {
 }
 
 /* ══════════════════════════════════════════════════════════════
+   DROP-IN REPLACEMENT for showResults() in sentence-tap.js
+
+   REPLACE from `function showResults() {` through the final
+   `startRound(0);` and `})();` with this entire block.
+
+   WHAT WAS BROKEN:
+   1. BoohaAdventure direct reference → ReferenceError crash.
+   2. getElementById('vt-results') — wrong prefix, should be 'st-results'.
+      All other IDs (st-rs, st-rp … st-rk) were already correct.
+   ══════════════════════════════════════════════════════════════ */
+
+/* ══════════════════════════════════════════════════════════════
    RESULTS
    ══════════════════════════════════════════════════════════════ */
 function showResults() {
   updateDots(3);
   mainWrap.style.display = 'none';
   resultsWrap.classList.add('show');
+
   const tier = getTier(score);
   const pct  = Math.round((score / 15) * 100);
 
-  // ── Save score to Booha Adventure save system ──────────────────────────
+  /* ── Save score to Booha Adventure save system ── */
   document.dispatchEvent(new CustomEvent('booha:gameEnd', {
     detail: {
-      saveId:    BoohaAdventure.registry.saveId(CFG.curriculum, 'spell_word'),
-      score:     pct,          // 0–100 scale to match registry's scoreMax
-      completed: score === 15, // true only on a perfect run
+      saveId:    (window.BoohaAdventure?.registry?.saveId ?? ((c, g) => `${c}__${g}`))(
+                   CFG.curriculum, 'spell_word'),
+      score:     pct,
+      completed: score === 15,
     }
   }));
-  // ──────────────────────────────────────────────────────────────────────
 
-  const resEl = document.getElementById('vt-results');
+  /* ✅ Fixed: was 'vt-results' (vocab-tap leftover), now 'st-results' */
+  const resEl = document.getElementById('sw-results');
   resEl.style.setProperty('--tier-color', tier.color);
-  document.getElementById('vt-rs').textContent = `${score} / 15`;
-  document.getElementById('vt-rp').textContent = `${pct}%`;
-  document.getElementById('vt-rl').textContent = tier.label;
-  document.getElementById('vt-re').textContent = tier.en;
-  document.getElementById('vt-rj').textContent = tier.jp;
-  document.getElementById('vt-rk').textContent = tier.kanji;
+  document.getElementById('sw-rs').textContent = `${score} / 15`;
+  document.getElementById('sw-rp').textContent = `${pct}%`;
+  document.getElementById('sw-rl').textContent = tier.label;
+  document.getElementById('sw-re').textContent = tier.en;
+  document.getElementById('sw-rj').textContent = tier.jp;
+  document.getElementById('sw-rk').textContent = tier.kanji;
+
   /* Build colorful action buttons */
   resActions.innerHTML = '';
   tier.actions.forEach(act => {
     const btn = document.createElement('button');
-    btn.id = act.id;
-    btn.className = `vt-res-btn ${act.cls}`;
+    btn.id        = act.id;
+    btn.className = `st-res-btn ${act.cls}`;
     btn.innerHTML = `<span>${act.label}</span>`;
     resActions.appendChild(btn);
   });
+
   /* Wire up actions */
-  const replayBtn = document.getElementById('vt-replay');
-  const backBtn   = document.getElementById('vt-back');
+  const replayBtn = document.getElementById('sw-replay');
+  const backBtn   = document.getElementById('sw-back');
+
   if (replayBtn) replayBtn.addEventListener('click', () => {
     resultsWrap.classList.remove('show');
     mainWrap.style.display = '';
-    /* Re-shuffle everything on replay */
     allCards = buildShuffledDeck();
-    score = 0;
-    scoreEl.textContent = '0';
+    score    = 0;
+    scoreEl.textContent   = '0';
     document.body.classList.remove('hira-mode');
-    hiraMode = false;
+    hiraMode              = false;
     hiraLabel.textContent = 'ひらがな';
     startRound(0);
   });
+
   if (backBtn) backBtn.addEventListener('click', () => {
     window.location.assign(CFG.navTarget + '?week=' + encodeURIComponent(CFG.weekParam));
   });
+
   if (score === 15) {
     setTimeout(fireConfetti, 400);
     setTimeout(fireConfetti, 900);
   }
+
   const snd = new Audio(CFG.sfxBase + tier.sound);
   snd.setAttribute('playsinline', '');
   snd.play().catch(() => {});
 }
 
 /* ══════════════════════════════════════════════════════════════
-   REPLAY / BACK
+   GO
    ══════════════════════════════════════════════════════════════ */
-document.getElementById('sw-replay').addEventListener('click', () => {
-  results.classList.remove('show');
-  [document.getElementById('sw-jp-box'), slotsEl, tilesEl,
-   document.querySelector('.sw-bottom-bar'), feedbackEl,
-   document.querySelector('.sw-hud'), dotsRow,
-  ].forEach(el => { if (el) el.style.display = ''; });
-  idx = 0; score = 0; scoreEl.textContent = '0';
-  U.shuffle(allCards); showCard();
-});
-
-document.getElementById('sw-back').addEventListener('click', () => {
-  window.location.assign(CFG.navTarget + '?week=' + encodeURIComponent(CFG.weekParam));
-});
-
-showCard();
-
+startRound(0);
 })();
