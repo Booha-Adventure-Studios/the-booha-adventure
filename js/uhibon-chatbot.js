@@ -74,34 +74,41 @@
     `;
   }
 
+
   /* ════════════════════════════════════════════════════════════
-     OPEN / CLOSE
-  ════════════════════════════════════════════════════════════ */
-  function openUhibonChat() {
-    if (isOpen) return;
-    isOpen = true;
-    popout.classList.add('open');
-    iconBtn.style.display = 'none';
-    setCharState('idle');
+   OPEN / CLOSE
+════════════════════════════════════════════════════════════ */
+function openUhibonChat() {
+  if (isOpen) return;
 
-    if (!messages.children.length) {
-      const pageCtx = getPageContext();
-      const intro   = pageCtx.intro
-        || (window.UHIBON_KNOWLEDGE && window.UHIBON_KNOWLEDGE.intro)
-        || { en: "I am Uhibon… welcome, wanderer. 🕯️",
-             jp: "ウヒボンじゃ。ようこそ、旅人よ。" };
-      botSpeak(intro);
+  isOpen = true;
+  popout.classList.add('open');
+  iconBtn.style.display = 'none';
+  setCharState('idle');
+
+  if (!messages.children.length) {
+    const intro = getUhibonPageIntro();
+    botSpeak(intro);
+
+    const quick = getUhibonPageQuickReplies();
+    if (quick.length) {
+      const hint = quick[Math.floor(Math.random() * quick.length)];
+      setTimeout(() => {
+        if (isOpen) addMessage('bot', hint);
+      }, 500);
     }
-    setTimeout(() => input.focus(), 50);
   }
 
-  function closeUhibonChat() {
-    isOpen = false;
-    stopTalking();
-    stopIdleLoop();
-    popout.classList.remove('open');
-    iconBtn.style.display = '';
-  }
+  setTimeout(() => input.focus(), 50);
+}
+
+function closeUhibonChat() {
+  isOpen = false;
+  stopIdleLoop();
+  stopTalkingAnim();
+  popout.classList.remove('open');
+  iconBtn.style.display = '';
+}
 
   /* ════════════════════════════════════════════════════════════
      UPGRADE 1 — IDLE ANIMATION LOOP
