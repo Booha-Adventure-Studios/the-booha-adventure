@@ -1,6 +1,6 @@
 
 /* ══════════════════════════════════════════════════════════════
-   vocab-speed.js — Vocabulary Speed  v2
+   vocab-speed.js — Vocabulary Speed  v3
    JP prompt → pick the correct English word. Heat-bar timer.
    3 curricula: br / pb / bc — themed per context.
    ══════════════════════════════════════════════════════════════ */
@@ -20,12 +20,9 @@ await Promise.all([
   U.loadSFX('fart', CFG.sfxBase + 'fart.mp3'),
 ]);
 
-/* fire sounds — one-shot per streak milestone, overlap naturally */
-/* level4.mp3 is tracked separately so it can be stopped instantly */
 let activeLvl4 = null;
 
 function playFireSound(level) {
-  /* level4: stop any existing instance, play fresh */
   if (level >= 4) {
     stopLvl4();
     const a = new Audio(CFG.sfxBase + 'level4.mp3');
@@ -35,7 +32,6 @@ function playFireSound(level) {
     a.onended = () => { if (activeLvl4 === a) activeLvl4 = null; };
     return;
   }
-  /* levels 1-3: fire.mp3 one-shot, let overlap freely */
   const a = new Audio(CFG.sfxBase + 'fire.mp3');
   a.setAttribute('playsinline', ''); a.loop = false;
   a.play().catch(() => {});
@@ -47,10 +43,8 @@ function stopLvl4() {
   activeLvl4 = null;
 }
 
-/* kept as no-op alias so showResults/back calls still compile */
 function stopStreakAudio() { stopLvl4(); }
 
-/* iOS audio unlock — warms ding/fart via U.unlockAudio(); streak sounds are one-shot new Audio() so no pre-warm needed */
 let audioUnlocked = false;
 function unlockAllAudio() {
   if (audioUnlocked) return;
@@ -59,7 +53,6 @@ function unlockAllAudio() {
 document.addEventListener('touchstart', unlockAllAudio, { once: true, passive: true });
 document.addEventListener('mousedown',  unlockAllAudio, { once: true, passive: true });
 
-/* button-smash guard */
 let lastPickAt = 0;
 const PICK_DEBOUNCE_MS = 320;
 
@@ -86,7 +79,6 @@ const TIERS = [
 ];
 const getTier = s => TIERS.find(t => s >= t.min && s <= t.max) ?? TIERS[0];
 
-/* streak level thresholds — 3 streak=fire1, 4=fire2, 5=fire3, 6+=level4 */
 const STREAK_LEVELS = [
   { min:0, max:2, level:0 },
   { min:3, max:3, level:1 },
@@ -98,7 +90,6 @@ function getStreakLevel(s) {
   return (STREAK_LEVELS.find(t => s >= t.min && s <= t.max) ?? STREAK_LEVELS[0]).level;
 }
 
-/* streak messages: level 1-4 */
 const STREAK_MSG = {
   1: { en:'Great start! Keep going!',        jp:'いいね！続けよう！',         kanji:'好調！続けよう！' },
   2: { en:"On fire! You're on a roll!",      jp:'すごい！どんどんいこう！',    kanji:'絶好調！どんどん行こう！' },
@@ -106,7 +97,6 @@ const STREAK_MSG = {
   4: { en:'LEGENDARY! You are the fastest!', jp:'最強！世界一速い！',          kanji:'最強！世界最速！' },
 };
 
-/* timer durations per streak level (ms) */
 const HEAT_DURATIONS = [5000, 4200, 3200, 2400, 1600];
 
 /* ══════════════════════════════════════════════════════════════
@@ -341,7 +331,6 @@ S.textContent = `
 }
 [data-curriculum="pb"] .vs-pill b{ text-shadow:none; }
 
-/* streak pill — dynamically changes color via --streak-color */
 .vs-streak-pill{
   padding:6px 20px; border-radius:999px;
   background:color-mix(in srgb, var(--streak-color,var(--game-primary)) 14%, var(--game-pill-bg));
@@ -363,7 +352,7 @@ S.textContent = `
 }
 
 /* ══════════════════════════════════════════════════════════════
-   HEAT TIMER BAR — animated + curriculum-aware
+   HEAT TIMER BAR
    ══════════════════════════════════════════════════════════════ */
 .vs-timer-wrap{
   padding:0 .25rem; margin-bottom:.6rem;
@@ -392,7 +381,6 @@ S.textContent = `
   position:relative;
   overflow:hidden;
 }
-/* default fill: green to yellow to red based on --heat-pct CSS var */
 .vs-timer-fill{
   background:linear-gradient(90deg,
     var(--timer-lo, #22c55e) 0%,
@@ -400,19 +388,15 @@ S.textContent = `
     var(--timer-hi, #ef4444) 100%
   );
 }
-/* BR — warm neon green/yellow/magenta */
 [data-curriculum="br"] .vs-timer-fill{
   --timer-lo:#aaff22; --timer-mid:#ffcc00; --timer-hi:#ff2288;
 }
-/* BC — cold cyan/blue/purple */
 [data-curriculum="bc"] .vs-timer-fill{
   --timer-lo:#22ddff; --timer-mid:#4455ff; --timer-hi:#cc00ff;
 }
-/* PB — pink/purple/coral */
 [data-curriculum="pb"] .vs-timer-fill{
   --timer-lo:#44ddaa; --timer-mid:#cc88ff; --timer-hi:#ff6eb4;
 }
-/* shimmer pulse on the bar */
 .vs-timer-fill::after{
   content:''; position:absolute; inset:0;
   background:linear-gradient(90deg, transparent 20%, rgba(255,255,255,.3) 50%, transparent 80%);
@@ -421,7 +405,6 @@ S.textContent = `
 }
 @keyframes vsTimerShimmer{ from{ background-position:200% 0; } to{ background-position:-200% 0; } }
 
-/* warning pulse when timer is low */
 .vs-timer-fill.warning{
   animation:vsTimerPulse .55s ease-in-out infinite;
 }
@@ -442,24 +425,20 @@ S.textContent = `
   box-shadow:0 8px 32px rgba(0,0,0,.22);
   transition:border-color .4s, box-shadow .4s, background .4s;
 }
-/* BR */
 [data-curriculum="br"] .vs-prompt-box{
   background:linear-gradient(145deg,rgba(170,255,34,.07),rgba(255,204,0,.04),rgba(0,0,0,.18));
   border-color:rgba(170,255,34,.22);
   box-shadow:0 8px 32px rgba(0,0,0,.35),0 0 0 1px rgba(170,255,34,.08);
 }
-/* BC */
 [data-curriculum="bc"] .vs-prompt-box{
   background:linear-gradient(145deg,rgba(0,240,255,.06),rgba(68,85,255,.08),rgba(0,0,0,.28));
   border-color:rgba(0,240,255,.22);
   box-shadow:0 8px 32px rgba(0,0,0,.5),0 0 24px rgba(0,240,255,.08);
 }
-/* PB */
 [data-curriculum="pb"] .vs-prompt-box{
   background:#ffffff; border:3px solid #ff6eb4;
   box-shadow:0 5px 0 #ffb0d8, 0 10px 24px rgba(255,110,180,.15);
 }
-/* rainbow top bar */
 .vs-prompt-box::before{
   content:''; position:absolute; top:0; left:0; right:0; height:3px;
   background:linear-gradient(90deg,var(--game-primary),var(--game-secondary),var(--game-accent),var(--game-primary));
@@ -470,7 +449,6 @@ S.textContent = `
   background-size:220% auto;
 }
 
-/* streak level 1-4: progressively change prompt box feel */
 .vs-prompt-box.streak-1{ box-shadow:0 8px 32px rgba(255,204,0,.15); }
 .vs-prompt-box.streak-2{ box-shadow:0 8px 40px rgba(255,120,0,.22); }
 .vs-prompt-box.streak-3{
@@ -531,14 +509,12 @@ S.textContent = `
   position:relative; overflow:hidden;
   transition:transform .14s cubic-bezier(.34,1.56,.64,1), box-shadow .14s, border-color .14s, filter .14s;
 
-  /* default dark tile */
   background:linear-gradient(145deg,rgba(255,255,255,.11),rgba(255,255,255,.04));
   border:2px solid rgba(255,255,255,.2);
   color:var(--game-tile-text);
   box-shadow:0 5px 0 rgba(0,0,0,.3), 0 8px 18px rgba(0,0,0,.22),
              inset 0 1px 0 rgba(255,255,255,.12);
 }
-/* shimmer */
 .vs-choice::after{
   content:''; position:absolute; top:-60%; left:-80%;
   width:50%; height:200%;
@@ -553,7 +529,6 @@ S.textContent = `
 }
 .vs-choice:active{ transform:scale(.94); }
 
-/* ── BR choice tiles: 4 vivid solid colors cycling ── */
 [data-curriculum="br"] .vs-choice[data-ci="0"]{
   background:linear-gradient(145deg,#1e5c00,#2e8800);
   border-color:rgba(170,255,34,.5); color:#fff;
@@ -576,7 +551,6 @@ S.textContent = `
 }
 [data-curriculum="br"] .vs-choice:hover{ filter:brightness(1.14); }
 
-/* ── BC choice tiles: dark with neon borders cycling ── */
 [data-curriculum="bc"] .vs-choice[data-ci="0"]{
   background:linear-gradient(145deg,#041820,#062430);
   border:2px solid rgba(0,230,255,.5); color:#ecfeff;
@@ -599,7 +573,6 @@ S.textContent = `
 }
 [data-curriculum="bc"] .vs-choice:hover{ filter:brightness(1.25); }
 
-/* ── PB choice tiles: white with thick pastel borders cycling ── */
 [data-curriculum="pb"] .vs-choice{
   background:#ffffff; color:#2a1020;
   box-shadow:0 5px 0 var(--pb-choice-shadow,#ffb0d8), 0 8px 18px rgba(255,110,180,.12);
@@ -613,7 +586,6 @@ S.textContent = `
   box-shadow:0 9px 0 var(--pb-choice-shadow,#ffb0d8), 0 14px 24px rgba(0,0,0,.1);
 }
 
-/* ── CORRECT answer state — vivid green burst ── */
 .vs-choice.vs-correct{
   background:linear-gradient(135deg, #0a3d1a, #0d5e28) !important;
   border-color:#22c55e !important;
@@ -636,7 +608,6 @@ S.textContent = `
   from{ transform:scale(.9); } 60%{ transform:scale(1.1); } to{ transform:scale(1.06); }
 }
 
-/* ── WRONG answer state — vivid red shake ── */
 .vs-choice.vs-wrong{
   background:linear-gradient(135deg, #3d0a0a, #5e1010) !important;
   border-color:#ef4444 !important;
@@ -660,7 +631,6 @@ S.textContent = `
   55%{ transform:translateX(-5px); } 75%{ transform:translateX(5px); }
 }
 
-/* locked (non-selected) choices */
 .vs-choice.vs-locked{
   opacity:.42;
   pointer-events:none;
@@ -668,7 +638,7 @@ S.textContent = `
 }
 
 /* ══════════════════════════════════════════════════════════════
-   STREAK BANNER — progressive levels
+   STREAK BANNER
    ══════════════════════════════════════════════════════════════ */
 .vs-streak-banner{
   max-width:680px; margin:.7rem auto 0;
@@ -685,7 +655,6 @@ S.textContent = `
   from{ transform:scale(.88) translateY(8px); opacity:0; }
   to{ transform:none; opacity:1; }
 }
-/* streak level overrides */
 .vs-streak-banner.slvl-1{
   --banner-border:rgba(255,204,0,.4);
   --banner-bg:rgba(255,204,0,.1);
@@ -721,7 +690,6 @@ S.textContent = `
   0%,100%{ box-shadow:0 0 60px rgba(255,200,0,.5), 0 0 110px rgba(255,100,0,.2); border-color:rgba(255,200,0,.8); }
   50%{     box-shadow:0 0 100px rgba(255,200,0,.9),0 0 160px rgba(255,100,0,.4); border-color:rgba(255,255,100,1); }
 }
-/* banner text */
 .vs-banner-en{
   font-family:var(--game-font-title);
   font-size:clamp(16px,3.2vw,24px);
@@ -946,7 +914,7 @@ document.head.appendChild(S);
    MOUNT HTML
    ══════════════════════════════════════════════════════════════ */
 U.mount(`
-<div class="vs-wrap">
+<div class="vs-wrap" id="vs-main-wrap">
 
   <div class="vs-header">
     <div class="vs-curriculum">${curriculumLabel()}</div>
@@ -981,22 +949,23 @@ U.mount(`
     <div id="vs-banner-kanji" class="vs-banner-kanji"></div>
   </div>
 
-  <div class="vs-results" id="vs-results">
-    <div class="vs-res-inner">
-      <div class="vs-res-score"  id="vs-rs"></div>
-      <div class="vs-res-pct"    id="vs-rp"></div>
-      <div class="vs-res-label"  id="vs-rl"></div>
-      <div class="vs-res-divider"></div>
-      <div class="vs-res-en"     id="vs-re"></div>
-      <div class="vs-res-jp"     id="vs-rj"></div>
-      <div class="vs-res-kanji"  id="vs-rk"></div>
-      <div class="vs-res-actions">
-        <button class="game-btn game-btn-primary"   id="vs-replay">もう一度</button>
-        <button class="game-btn game-btn-secondary" id="vs-back">メニューへ</button>
-      </div>
+</div>
+
+<!-- RESULTS — separate from main wrap so header stays visible above it -->
+<div class="vs-results" id="vs-results">
+  <div class="vs-res-inner">
+    <div class="vs-res-score"  id="vs-rs"></div>
+    <div class="vs-res-pct"    id="vs-rp"></div>
+    <div class="vs-res-label"  id="vs-rl"></div>
+    <div class="vs-res-divider"></div>
+    <div class="vs-res-en"     id="vs-re"></div>
+    <div class="vs-res-jp"     id="vs-rj"></div>
+    <div class="vs-res-kanji"  id="vs-rk"></div>
+    <div class="vs-res-actions">
+      <button class="game-btn game-btn-primary"   id="vs-replay">もう一度</button>
+      <button class="game-btn game-btn-secondary" id="vs-back">メニューへ</button>
     </div>
   </div>
-
 </div>
 
 <!-- HELP BUTTON (fixed) -->
@@ -1081,6 +1050,7 @@ U.mount(`
 /* ══════════════════════════════════════════════════════════════
    DOM REFS
    ══════════════════════════════════════════════════════════════ */
+const mainWrap    = document.getElementById('vs-main-wrap');
 const qnumEl      = document.getElementById('vs-qnum');
 const scoreEl     = document.getElementById('vs-score');
 const streakEl    = document.getElementById('vs-streak');
@@ -1139,7 +1109,7 @@ const order   = U.shuffle(CFG.cards.slice(0, 15));
 let idx       = 0;
 let score     = 0;
 let streak    = 0;
-let lastLevel = 0;   /* last displayed streak level */
+let lastLevel = 0;
 let locked    = false;
 let firstTry  = true;
 let heatRAF   = 0;
@@ -1158,7 +1128,7 @@ function updateDots() {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   STREAK COLORS — changes streak pill dynamically
+   STREAK COLORS
    ══════════════════════════════════════════════════════════════ */
 const STREAK_COLORS = ['','#ffcc00','#ff9900','#ff4400','#ffe000'];
 function updateStreakUI() {
@@ -1167,7 +1137,6 @@ function updateStreakUI() {
   streakPill.style.setProperty('--streak-color', col);
   streakEl.textContent = streak;
 
-  /* prompt box streak class */
   promptBox.classList.remove('streak-0','streak-1','streak-2','streak-3','streak-4');
   if (lv > 0) promptBox.classList.add(`streak-${lv}`);
 }
@@ -1194,7 +1163,6 @@ function startHeat() {
     const p = 1 - (t - heatStart) / heatDur;
     const pct = Math.max(0, p);
     heatEl.style.width = `${pct * 100}%`;
-    /* warning pulse when < 20% remaining */
     if (pct < 0.2) heatEl.classList.add('warning');
     else heatEl.classList.remove('warning');
     if (pct <= 0) { onTimeout(); return; }
@@ -1219,10 +1187,9 @@ function renderQ() {
   hiraEl.textContent = card.hira || '';
   updateDots();
 
-  /* Build 4 choices — correct + 3 distractors */
-  const pool      = order.filter((_, i) => i !== idx);
+  const pool        = order.filter((_, i) => i !== idx);
   const distractors = U.shuffle(pool).slice(0, 3);
-  const choices   = U.shuffle([card, ...distractors]);
+  const choices     = U.shuffle([card, ...distractors]);
 
   choices.forEach((c, ci) => {
     const btn = document.createElement('button');
@@ -1245,7 +1212,6 @@ function renderQ() {
     grid.appendChild(btn);
   });
 
-  /* entrance stagger */
   Array.from(grid.children).forEach((btn, i) => {
     btn.style.opacity = '0';
     btn.style.transform = 'translateY(12px) scale(.95)';
@@ -1271,7 +1237,6 @@ function handlePick(btn, en) {
   locked = true;
   stopHeat();
 
-  /* lock all other choices */
   Array.from(grid.children).forEach(b => {
     if (b !== btn) b.classList.add('vs-locked');
   });
@@ -1304,13 +1269,12 @@ function handlePick(btn, en) {
     firstTry = false;
     streak   = 0;
     updateStreakUI();
-    updateStreakBanner(); /* may hide banner */
+    updateStreakBanner();
     U.playSFX('fart');
 
     setTimeout(() => {
       locked = false;
-      firstTry = false; /* keep false so re-pick doesn't score */
-      /* unlock choices, remove wrong state, let player try again */
+      firstTry = false;
       Array.from(grid.children).forEach(b => {
         b.classList.remove('vs-locked', 'vs-wrong');
         b.style.transition = '';
@@ -1332,7 +1296,6 @@ function onTimeout() {
   updateStreakBanner();
   U.playSFX('fart');
 
-  /* briefly flash all choices red */
   Array.from(grid.children).forEach(b => b.classList.add('vs-locked'));
 
   setTimeout(() => {
@@ -1349,15 +1312,12 @@ function onTimeout() {
 function updateStreakBanner() {
   const lv = getStreakLevel(streak);
 
-  /* stop level-4 immediately when streak drops below 4 */
   if (lv < 4 && lastLevel >= 4) stopLvl4();
 
-  /* fire one-shot sound only when crossing into a new higher level */
   if (lv > 0 && lv > lastLevel) {
     playFireSound(lv);
   }
 
-  /* hide banner on zero streak */
   if (lv === 0) {
     streakBanner.classList.remove('show');
     streakBanner.className = 'vs-streak-banner';
@@ -1365,13 +1325,11 @@ function updateStreakBanner() {
     return;
   }
 
-  /* update banner text */
   const msg = STREAK_MSG[lv];
   bannerEn.textContent    = msg.en;
   bannerJp.textContent    = msg.jp;
   bannerKanji.textContent = msg.kanji;
 
-  /* swap streak level class */
   streakBanner.className = `vs-streak-banner slvl-${lv}`;
   if (!streakBanner.classList.contains('show')) {
     streakBanner.classList.add('show');
@@ -1411,81 +1369,65 @@ function fireConfetti(big = false) {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   RESULTS
+   RESULTS  ← FIXED: uses vs-* IDs, hides main wrap, dispatches
+             booha:gameEnd with correct saveId for vocab_speed
    ══════════════════════════════════════════════════════════════ */
 function showResults() {
-  updateDots(3);
+  stopHeat();
+  stopStreakAudio();
+
+  /* Mark all dots done */
+  for (let i = 0; i < 15; i++) {
+    const d = document.getElementById(`vs-d${i}`);
+    if (d) d.className = 'vs-dot done';
+  }
+
+  /* Hide the gameplay area */
   mainWrap.style.display = 'none';
-  resultsWrap.classList.add('show');
+
+  /* Show results card */
+  results.classList.add('show');
+
   const tier = getTier(score);
   const pct  = Math.round((score / 15) * 100);
 
-  // ── Save score to Booha Adventure save system ──────────────────────────
+  /* ── Dispatch to Booha Adventure save system ── */
   document.dispatchEvent(new CustomEvent('booha:gameEnd', {
     detail: {
-      saveId:    BoohaAdventure.registry.saveId(CFG.curriculum, 'vocab_speed'),
-      score:     pct,          // 0–100 scale to match registry's scoreMax
-      completed: score === 15, // true only on a perfect run
+      saveId:    (window.BoohaAdventure?.registry?.saveId ?? ((c, g) => `${c}__${g}`))(
+                   CFG.curriculum, 'vocab_speed'),
+      score:     pct,
+      completed: score === 15,
     }
   }));
-  // ──────────────────────────────────────────────────────────────────────
 
-  const resEl = document.getElementById('vt-results');
-  resEl.style.setProperty('--tier-color', tier.color);
-  document.getElementById('vt-rs').textContent = `${score} / 15`;
-  document.getElementById('vt-rp').textContent = `${pct}%`;
-  document.getElementById('vt-rl').textContent = tier.label;
-  document.getElementById('vt-re').textContent = tier.en;
-  document.getElementById('vt-rj').textContent = tier.jp;
-  document.getElementById('vt-rk').textContent = tier.kanji;
-  /* Build colorful action buttons */
-  resActions.innerHTML = '';
-  tier.actions.forEach(act => {
-    const btn = document.createElement('button');
-    btn.id = act.id;
-    btn.className = `vt-res-btn ${act.cls}`;
-    btn.innerHTML = `<span>${act.label}</span>`;
-    resActions.appendChild(btn);
-  });
-  /* Wire up actions */
-  const replayBtn = document.getElementById('vt-replay');
-  const backBtn   = document.getElementById('vt-back');
-  if (replayBtn) replayBtn.addEventListener('click', () => {
-    resultsWrap.classList.remove('show');
-    mainWrap.style.display = '';
-    /* Re-shuffle everything on replay */
-    allCards = buildShuffledDeck();
-    score = 0;
-    scoreEl.textContent = '0';
-    document.body.classList.remove('hira-mode');
-    hiraMode = false;
-    hiraLabel.textContent = 'ひらがな';
-    startRound(0);
-  });
-  if (backBtn) backBtn.addEventListener('click', () => {
-    window.location.assign(CFG.navTarget + '?week=' + encodeURIComponent(CFG.weekParam));
-  });
+  /* Populate scorecard */
+  results.style.setProperty('--tier-color', tier.color);
+  document.getElementById('vs-rs').textContent = `${score} / 15`;
+  document.getElementById('vs-rp').textContent = `${pct}%`;
+  document.getElementById('vs-rl').textContent = tier.label;
+  document.getElementById('vs-re').textContent = tier.en;
+  document.getElementById('vs-rj').textContent = tier.jp;
+  document.getElementById('vs-rk').textContent = tier.kanji;
+
+  /* Confetti + result sound */
   if (score === 15) {
-    setTimeout(fireConfetti, 400);
-    setTimeout(fireConfetti, 900);
+    setTimeout(() => fireConfetti(false), 400);
+    setTimeout(() => fireConfetti(true),  900);
   }
   const snd = new Audio(CFG.sfxBase + tier.sound);
   snd.setAttribute('playsinline', '');
   snd.play().catch(() => {});
 }
+
 /* ══════════════════════════════════════════════════════════════
    REPLAY / BACK
    ══════════════════════════════════════════════════════════════ */
 document.getElementById('vs-replay').addEventListener('click', () => {
   results.classList.remove('show');
-  [
-    document.querySelector('.vs-header'),
-    dotsRow,
-    document.querySelector('.vs-hud'),
-    document.querySelector('.vs-timer-wrap'),
-    promptBox, grid,
-  ].forEach(el => { if (el) el.style.display = ''; });
-  streakBanner.className = 'vs-streak-banner'; /* hide without show class */
+  mainWrap.style.display = '';
+
+  streakBanner.className = 'vs-streak-banner';
 
   idx = 0; score = 0; streak = 0; lastLevel = 0;
   scoreEl.textContent  = '0';
@@ -1501,8 +1443,8 @@ document.getElementById('vs-back').addEventListener('click', () => {
 });
 
 /* ══════════════════════════════════════════════════════════════
-   NOTE: renderQ() is NOT called here — it's triggered by the
-   start overlay's START button click.
+   NOTE: renderQ() is triggered by the START button, not here.
    ══════════════════════════════════════════════════════════════ */
 
 })();
+    
