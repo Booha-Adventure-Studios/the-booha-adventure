@@ -285,22 +285,24 @@
       animation: moonHalo 3.5s ease-in-out infinite;
       z-index: 1;
     }
-    @keyframes moonImgGlow {
-      0%,100% {
-        filter:
-          drop-shadow(0 0 14px #c8b8ffdd)
-          drop-shadow(0 0 35px #c8b8ffaa)
-          drop-shadow(0 0 70px #c8b8ff55)
-          drop-shadow(0 0 5px #ffffff88);
-      }
-      50% {
-        filter:
-          drop-shadow(0 0 28px #ffffffee)
-          drop-shadow(0 0 60px #ddd0ffff)
-          drop-shadow(0 0 110px #c8b8ffaa)
-          drop-shadow(0 0 10px #fff);
-      }
-    }
+
+   @keyframes moonImgGlow {
+     0%,100% {
+      filter:
+        drop-shadow(0 0 8px #c8b8ffaa)
+        drop-shadow(0 0 18px #c8b8ff88)
+        drop-shadow(0 0 35px #c8b8ff33)
+        drop-shadow(0 0 3px #ffffff55);
+   }
+     50% {
+      filter:
+        drop-shadow(0 0 14px #ffffffcc)
+        drop-shadow(0 0 30px #ddd0ffbb)
+        drop-shadow(0 0 55px #c8b8ff66)
+        drop-shadow(0 0 5px #ffffff88);
+   }
+ }
+    
     @keyframes moonHalo {
       0%,100% { opacity: 0.4; transform: scale(1); }
       50%      { opacity: 0.9; transform: scale(1.15); }
