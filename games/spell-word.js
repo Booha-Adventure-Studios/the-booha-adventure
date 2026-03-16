@@ -1097,7 +1097,7 @@ function showResults() {
   tier.actions.forEach(act => {
     const btn = document.createElement('button');
     btn.id        = act.id;
-    btn.className = `st-res-btn ${act.cls}`;
+    btn.className = `sw-res-btn ${act.cls}`;
     btn.innerHTML = `<span>${act.label}</span>`;
     resActions.appendChild(btn);
   });
