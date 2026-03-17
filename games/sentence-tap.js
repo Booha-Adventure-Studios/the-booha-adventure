@@ -641,12 +641,12 @@ document.head.appendChild(S);
    HTML
    ══════════════════════════════════════════════════════════════ */
 U.mount(`
-<div class="st-wrap" id="st-main-wrap">
-
   <div class="st-header">
     <div class="st-curriculum">${curriculumLabel()}</div>
     <div class="st-date">${titleDateLabel()}</div>
   </div>
+
+  <div class="st-wrap" id="st-main-wrap">
 
   <div class="st-dots-row">
     <div class="st-dot active" id="st-d0"></div>
