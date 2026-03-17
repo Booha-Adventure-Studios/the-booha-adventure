@@ -873,15 +873,11 @@ const videoScene = document.getElementById('videoScene');
 const hubScene   = document.getElementById('hubScene');
 
 function isPortrait() {
-  // Primary: screen.orientation API (reliable in PWA standalone)
-  if (screen.orientation && screen.orientation.type) {
-    return screen.orientation.type.startsWith('portrait');
+  // Use raw pixel dimensions only — never trust PWA orientation APIs
+  // visualViewport is most accurate in standalone PWA on Android
+  if (window.visualViewport) {
+    return window.visualViewport.height > window.visualViewport.width;
   }
-  // Fallback 1: window.orientation legacy (0/180 = portrait, 90/-90 = landscape)
-  if (typeof window.orientation === 'number') {
-    return window.orientation === 0 || window.orientation === 180;
-  }
-  // Fallback 2: visual dimensions
   return window.innerHeight > window.innerWidth;
 }
 
@@ -895,25 +891,14 @@ function checkOrientation() {
   lsOverlay.setAttribute('aria-hidden', show ? 'false' : 'true');
 }
 
-// resize fires reliably in browser; also catches PWA rotation
+// All three fire in different contexts — cover all bases
 window.addEventListener('resize', checkOrientation, { passive: true });
-// orientationchange fires in browser and some PWA contexts
 window.addEventListener('orientationchange', () => {
   setTimeout(checkOrientation, 150);
 }, { passive: true });
-// screen.orientation change — most reliable in PWA standalone on Android
-if (screen.orientation) {
-  screen.orientation.addEventListener('change', () => {
-    setTimeout(checkOrientation, 150);
-  });
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', checkOrientation);
 }
-// PWA cold-launch: poll a few times in case orientation settles late
-(function pwaOrientationPoll(attempts) {
-  setTimeout(() => {
-    checkOrientation();
-    if (attempts > 1) pwaOrientationPoll(attempts - 1);
-  }, 300);
-})(4);
 
 function showScene(el) {
   [startScene, videoScene, hubScene].forEach(s => s.classList.remove('active'));
@@ -1062,17 +1047,22 @@ function activateUhibon() {
   const root = document.getElementById('uhibon-chat-root');
   if (!root) return;
   root.classList.add('hub-active');
-  // If launcher already exists (returning from a curriculum page),
-  // just restore the icon button visibility — do not re-init.
-  if (document.getElementById('uhibon-launcher')) {
-    const iconBtn = document.getElementById('uhibon-icon-btn');
-    if (iconBtn) iconBtn.style.display = '';
+
+  // If icon button exists, just make sure it is visible (return from curriculum)
+  const iconBtn = document.getElementById('uhibon-icon-btn');
+  if (iconBtn) {
+    iconBtn.style.display = '';
     return;
   }
-  // First visit — build the chatbot UI
-  if (typeof window.uhibonInit === 'function') {
-    window.uhibonInit();
+
+  // uhibonInit not ready yet (script still parsing) — retry shortly
+  if (typeof window.uhibonInit !== 'function') {
+    setTimeout(activateUhibon, 80);
+    return;
   }
+
+  // First visit — build the chatbot UI
+  window.uhibonInit();
 }
 
 async function goToHub() {
@@ -1130,11 +1120,10 @@ window.addEventListener('pageshow', ev => {
 });
 </script>
 
-<script src="pwa-init.js"></script>
-
 <link rel="stylesheet" href="theme/uhibon-chatbot.css">
 <script src="js/uhibon-knowledge.js"></script>
 <script src="js/uhibon-chatbot.js"></script>
+<script src="pwa-init.js"></script>
   
 </body>
 </html>
