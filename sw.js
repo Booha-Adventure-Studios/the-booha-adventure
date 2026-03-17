@@ -4,9 +4,9 @@
 //  sw.js
 // ============================================================
 
-const CACHE_NAME   = 'booha-adventure-v1';
-const ASSET_CACHE  = 'booha-assets-v1';
-const DECK_CACHE   = 'booha-decks-v1';
+const CACHE_NAME   = 'booha-adventure-v2';
+const ASSET_CACHE  = 'booha-assets-v2';
+const DECK_CACHE   = 'booha-decks-v2';
 
 const BASE = '/the-booha-adventure';
 
@@ -17,7 +17,6 @@ const CORE_FILES = [
   `${BASE}/maze.html`,
   `${BASE}/karasuki.html`,
   `${BASE}/homework.html`,
-  `${BASE}/manifest.json`,
   `${BASE}/icons/icon-192.png`,
   `${BASE}/icons/icon-512.png`,
   `${BASE}/icons/icon-maskable-512.png`,
