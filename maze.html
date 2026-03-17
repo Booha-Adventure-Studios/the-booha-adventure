@@ -1302,9 +1302,10 @@ function drawFrame(now){
   // ── Layer 3: checkpoint orbs ─────────────────────────────────────────────
   const{scale:coverScale}=getCover();
   
-  const isMobile = cssW < 768;
-  const isSmallPhone = cssW < 430;          // iPhone SE / small phones
-  const activeGhostR = isSmallPhone ? 15 : isMobile ? 20 : 28;
+ const isMobile = cssW < 768;
+ const isSmallPhone = cssW < 430;
+ const baseGhostR = GHOST_SIZE / 2;
+ const activeGhostR = isSmallPhone ? baseGhostR * .45 : isMobile ? baseGhostR * .65 : baseGhostR;
 
   CHECKPOINTS.forEach((cp,cpIdx)=>{
     const state=cpState[cp.w];if(!state||state.alpha<=.01)return;
