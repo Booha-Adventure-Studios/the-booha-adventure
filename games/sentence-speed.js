@@ -705,41 +705,34 @@ document.head.appendChild(S);
    MOUNT HTML
    ══════════════════════════════════════════════════════════════ */
 U.mount(`
+<div class="ssp-header">
+  <div class="ssp-curriculum">${curriculumLabel()}</div>
+  <div class="ssp-date">${titleDateLabel()}</div>
+</div>
+
 <div class="ssp-wrap" id="ssp-main-wrap">
-
-  <div class="ssp-header">
-    <div class="ssp-curriculum">${curriculumLabel()}</div>
-    <div class="ssp-date">${titleDateLabel()}</div>
-  </div>
-
   <div class="ssp-dots-row" id="ssp-dots"></div>
-
   <div class="ssp-hud">
     <div class="ssp-pill">Q <b id="ssp-qnum">1</b> / 15</div>
     <div class="ssp-pill">Score <b id="ssp-score">0</b> / 15</div>
     <div class="ssp-streak-pill" id="ssp-streak-pill">Streak <b id="ssp-streak">0</b></div>
   </div>
-
   <div class="ssp-timer-wrap">
     <div class="ssp-timer-label">READING TIMER / よむタイムアタック</div>
     <div class="ssp-timer-track">
       <div class="ssp-timer-fill" id="ssp-heat" style="width:100%"></div>
     </div>
   </div>
-
   <div class="ssp-prompt-box" id="ssp-prompt-box">
     <div id="ssp-jp"   class="ssp-jp"></div>
     <div id="ssp-hira" class="ssp-hira"></div>
   </div>
-
   <div id="ssp-grid" class="ssp-grid"></div>
-
   <div id="ssp-streak-banner" class="ssp-streak-banner">
     <div id="ssp-banner-en"    class="ssp-banner-en"></div>
     <div id="ssp-banner-jp"    class="ssp-banner-jp"></div>
     <div id="ssp-banner-kanji" class="ssp-banner-kanji"></div>
   </div>
-
 </div>
 
 <!-- RESULTS — separate from main so header stays visible above it -->
