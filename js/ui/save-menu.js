@@ -25,7 +25,7 @@ const BoohaSaveMenu = (() => {
       // Try to fetch the external panel (works when served, not file://)
       const depth = window.location.pathname.split('/').filter(Boolean).length;
       const prefix = depth > 0 ? '../'.repeat(depth) : './';
-      const res    = await fetch(`${prefix}ui/save-panel.html`);
+      const res = await fetch('/the-booha-adventure/ui/save-panel.html');
       if (res.ok) {
         const html = await res.text();
         document.body.insertAdjacentHTML('beforeend', html);
