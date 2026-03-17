@@ -1040,7 +1040,14 @@ function activateUhibon() {
   const root = document.getElementById('uhibon-chat-root');
   if (!root) return;
   root.classList.add('hub-active');
-  // Init the chatbot only once, after the hub is visible
+  // If launcher already exists (returning from a curriculum page),
+  // just restore the icon button visibility — do not re-init.
+  if (document.getElementById('uhibon-launcher')) {
+    const iconBtn = document.getElementById('uhibon-icon-btn');
+    if (iconBtn) iconBtn.style.display = '';
+    return;
+  }
+  // First visit — build the chatbot UI
   if (typeof window.uhibonInit === 'function') {
     window.uhibonInit();
   }
