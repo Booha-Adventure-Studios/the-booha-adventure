@@ -1393,13 +1393,12 @@ function showResults() {
 
   /* ── Dispatch to Booha Adventure save system ── */
   document.dispatchEvent(new CustomEvent('booha:gameEnd', {
-    detail: {
-      saveId:    (window.BoohaAdventure?.registry?.saveId ?? ((c, g) => `${c}__${g}`))(
-                   CFG.curriculum, 'vocab_speed'),
-      score:     pct,
-      completed: score === 15,
-    }
-  }));
+  detail: {
+    saveId:    `${CFG.curriculum}:vocab_speed`,
+    score:     pct,
+    completed: pct >= 40,
+  }
+}));
 
   /* Populate scorecard */
   results.style.setProperty('--tier-color', tier.color);
