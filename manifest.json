@@ -6,7 +6,6 @@
   "start_url": "/the-booha-adventure/index.html",
   "scope": "/the-booha-adventure/",
   "display": "standalone",
-  "orientation": "portrait-primary",
   "background_color": "#000000",
   "theme_color": "#000000",
   "categories": ["education", "games"],
