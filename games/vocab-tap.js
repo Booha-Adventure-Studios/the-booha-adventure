@@ -1253,13 +1253,12 @@ function showResults() {
      Guard with optional chaining so the game never crashes if
      BoohaAdventure isn't mounted yet (e.g. standalone testing).        */
   document.dispatchEvent(new CustomEvent('booha:gameEnd', {
-    detail: {
-      saveId:    (window.BoohaAdventure?.registry?.saveId ?? ((c, g) => `${c}__${g}`))(
-                   CFG.curriculum, 'vocab_tap'),
-      score:     pct,          // 0–100 scale to match registry's scoreMax
-      completed: score === 15, // true only on a perfect run
-    }
-  }));
+  detail: {
+    saveId:    `${CFG.curriculum}:vocab_tap`,
+    score:     pct,
+    completed: score === 15,
+  }
+}));
   /* ────────────────────────────────────────────────────────────────────── */
 
   const resEl = document.getElementById('vt-results');
