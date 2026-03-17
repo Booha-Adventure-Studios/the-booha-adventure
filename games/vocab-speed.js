@@ -914,41 +914,34 @@ document.head.appendChild(S);
    MOUNT HTML
    ══════════════════════════════════════════════════════════════ */
 U.mount(`
+<div class="vs-header">
+  <div class="vs-curriculum">${curriculumLabel()}</div>
+  <div class="vs-date">${titleDateLabel()}</div>
+</div>
+
 <div class="vs-wrap" id="vs-main-wrap">
-
-  <div class="vs-header">
-    <div class="vs-curriculum">${curriculumLabel()}</div>
-    <div class="vs-date">${titleDateLabel()}</div>
-  </div>
-
   <div class="vs-dots-row" id="vs-dots"></div>
-
   <div class="vs-hud">
     <div class="vs-pill">Q <b id="vs-qnum">1</b> / 15</div>
     <div class="vs-pill">Score <b id="vs-score">0</b> / 15</div>
     <div class="vs-streak-pill" id="vs-streak-pill">Streak <b id="vs-streak">0</b></div>
   </div>
-
   <div class="vs-timer-wrap">
     <div class="vs-timer-label">SPEED TIMER / タイムアタック</div>
     <div class="vs-timer-track">
       <div class="vs-timer-fill" id="vs-heat" style="width:100%"></div>
     </div>
   </div>
-
   <div class="vs-prompt-box" id="vs-prompt-box">
     <div id="vs-jp"   class="vs-jp"></div>
     <div id="vs-hira" class="vs-hira"></div>
   </div>
-
   <div id="vs-grid" class="vs-grid"></div>
-
   <div id="vs-streak-banner" class="vs-streak-banner">
     <div id="vs-banner-en"    class="vs-banner-en"></div>
     <div id="vs-banner-jp"    class="vs-banner-jp"></div>
     <div id="vs-banner-kanji" class="vs-banner-kanji"></div>
   </div>
-
 </div>
 
 <!-- RESULTS — separate from main wrap so header stays visible above it -->
