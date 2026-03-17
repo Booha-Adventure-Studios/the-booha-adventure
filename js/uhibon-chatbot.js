@@ -656,4 +656,6 @@ window.uhibonInit = function () {
   function getUhibonReply(inputText) {
     return matchKnowledge(inputText);
   }
-})();
+
+})(); // end IIFE
+};   // end window.uhibonInit
