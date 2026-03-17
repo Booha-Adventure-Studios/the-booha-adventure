@@ -1049,14 +1049,13 @@ function showResults() {
   const pct  = Math.round((score / 15) * 100);
 
   /* ── Save score to Booha Adventure save system ── */
-  document.dispatchEvent(new CustomEvent('booha:gameEnd', {
-    detail: {
-      saveId:    (window.BoohaAdventure?.registry?.saveId ?? ((c, g) => `${c}__${g}`))(
-                   CFG.curriculum, 'sentence_tap'),
-      score:     pct,
-      completed: score === 15,
-    }
-  }));
+ document.dispatchEvent(new CustomEvent('booha:gameEnd', {
+  detail: {
+    saveId:    `${CFG.curriculum}:sentence_speed`,
+    score:     pct,
+    completed: pct >= 40,
+  }
+}));
 
   /* ✅ Fixed: was 'vt-results' (vocab-tap leftover), now 'st-results' */
   const resEl = document.getElementById('st-results');
