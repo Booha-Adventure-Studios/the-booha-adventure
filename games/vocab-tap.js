@@ -1256,7 +1256,7 @@ function showResults() {
   detail: {
     saveId:    `${CFG.curriculum}:vocab_tap`,
     score:     pct,
-    completed: score === 15,
+    completed: score === 40,
   }
 }));
   /* ────────────────────────────────────────────────────────────────────── */
