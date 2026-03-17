@@ -783,6 +783,8 @@ function navigateToCurriculum(weekId, curr) {
     return;
   }
 
+  // Tell index.html to jump straight to hub when we return
+  sessionStorage.setItem('booha_return_to_hub', '1');
   fadeToBlack(true);
   setTimeout(() => { window.location.href = url; }, 520);
 }
@@ -871,7 +873,15 @@ const videoScene = document.getElementById('videoScene');
 const hubScene   = document.getElementById('hubScene');
 
 function isPortrait() {
-  // Use visual dimensions — reliable across PWA, browser, rotations
+  // Primary: screen.orientation API (reliable in PWA standalone)
+  if (screen.orientation && screen.orientation.type) {
+    return screen.orientation.type.startsWith('portrait');
+  }
+  // Fallback 1: window.orientation legacy (0/180 = portrait, 90/-90 = landscape)
+  if (typeof window.orientation === 'number') {
+    return window.orientation === 0 || window.orientation === 180;
+  }
+  // Fallback 2: visual dimensions
   return window.innerHeight > window.innerWidth;
 }
 
@@ -885,13 +895,25 @@ function checkOrientation() {
   lsOverlay.setAttribute('aria-hidden', show ? 'false' : 'true');
 }
 
-// Use resize (fires on rotation in all contexts including PWA)
+// resize fires reliably in browser; also catches PWA rotation
 window.addEventListener('resize', checkOrientation, { passive: true });
-// Keep orientationchange as a backup
+// orientationchange fires in browser and some PWA contexts
 window.addEventListener('orientationchange', () => {
-  // Small delay — dimensions may not update instantly on some devices
-  setTimeout(checkOrientation, 120);
+  setTimeout(checkOrientation, 150);
 }, { passive: true });
+// screen.orientation change — most reliable in PWA standalone on Android
+if (screen.orientation) {
+  screen.orientation.addEventListener('change', () => {
+    setTimeout(checkOrientation, 150);
+  });
+}
+// PWA cold-launch: poll a few times in case orientation settles late
+(function pwaOrientationPoll(attempts) {
+  setTimeout(() => {
+    checkOrientation();
+    if (attempts > 1) pwaOrientationPoll(attempts - 1);
+  }, 300);
+})(4);
 
 function showScene(el) {
   [startScene, videoScene, hubScene].forEach(s => s.classList.remove('active'));
