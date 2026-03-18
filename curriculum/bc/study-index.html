@@ -417,6 +417,7 @@ a.deck .inner {
   gap: 4px;
   background: var(--tile-bg);
   text-align: center;
+  container-type: inline-size;
 }
 
 a.deck .inner::before {
@@ -453,7 +454,7 @@ a.deck:hover .inner::after { background-position: -60% 100%; }
 .label-en {
   font-family: var(--font-head);
   font-weight: 700;
-  font-size: clamp(16px, 2vw, 19px);
+  font-size: clamp(12px, 12cqi, 22px);
   letter-spacing: 1.5px;
   color: var(--white);
   text-shadow: 0 1px 10px rgba(0,0,0,.8), 0 0 14px rgba(0,0,0,.5);
@@ -464,7 +465,7 @@ a.deck:hover .inner::after { background-position: -60% 100%; }
 .label-hira {
   font-family: var(--font-jp);
   font-weight: 400;
-  font-size: clamp(9px, 1.05vw, 11px);
+  font-size: clamp(9px, 4cqi, 12px);
   color: rgba(240,236,228,.6);
   letter-spacing: 2.5px;
   line-height: 1;
@@ -472,8 +473,8 @@ a.deck:hover .inner::after { background-position: -60% 100%; }
 
 .label-kanji {
   font-family: var(--font-jp);
-  font-weight: 700;
-  font-size: clamp(11px, 1.4vw, 14px);
+  font-weight: 900;
+  font-size: clamp(13px, 6.5cqi, 17px);
   color: rgba(240,236,228,.85);
   letter-spacing: 1px;
   line-height: 1;
