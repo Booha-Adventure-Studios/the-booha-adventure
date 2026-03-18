@@ -286,9 +286,10 @@ S.textContent = `
 .vt-columns{
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:14px;
+  gap:clamp(8px, 2vw, 14px);
   align-items:start;
 }
+
 @media(max-width:600px){
   .vt-columns{ grid-template-columns:1fr; gap:10px; }
 }
@@ -296,7 +297,7 @@ S.textContent = `
 /* ── panel ── */
 .vt-panel{
   border-radius:20px;
-  padding:12px 10px;
+  padding:clamp(8px, 1.5vw, 12px) clamp(7px, 1.2vw, 10px);
   background:var(--game-surface);
   border:1px solid var(--game-border);
   backdrop-filter:blur(10px);
@@ -310,7 +311,7 @@ S.textContent = `
   background:rgba(0,240,255,.04);
   border-color:rgba(0,240,255,.14);
 }
-.vt-stack{ display:grid; grid-template-columns:1fr; gap:10px; }
+.vt-stack{ display:grid; grid-template-columns:1fr; gap:clamp(7px, 1.4vw, 10px); }
 
 /* ══════════════════════════════════════════════════════════════
    ENGLISH CARDS
@@ -319,8 +320,8 @@ S.textContent = `
   --card-hue: calc(var(--i,0) * 52deg);
   position:relative; overflow:hidden;
   border-radius:18px;
-  padding:0 12px;
-  min-height:82px; height:82px;
+  padding:10px 12px;
+  min-height:72px; height:auto;
   background:
     linear-gradient(135deg,
       hsl(from var(--game-primary) h calc(s + 10%) l / 0.22),
@@ -443,7 +444,7 @@ S.textContent = `
    JAPANESE SLOTS
    ══════════════════════════════════════════════════════════════ */
 .vt-jp-slot{
-  min-height:82px; height:82px;
+  min-height:72px; height:auto;
   border-radius:18px;
   padding:8px 11px;
   background:linear-gradient(160deg,rgba(255,255,255,.055),rgba(255,255,255,.02));
@@ -581,6 +582,8 @@ body.hira-mode .vt-jp-hira-text{ display:block; }
 .vt-bottom-bar{
   display:flex; justify-content:center; align-items:center;
   gap:12px; margin-top:18px; flex-wrap:wrap;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  margin-bottom:  env(safe-area-inset-bottom, 0px);
 }
 
 .vt-hira-btn{
@@ -826,10 +829,17 @@ body.hira-mode .vt-hira-icon{ transform:rotate(180deg); }
 /* ── mobile safe touch ── */
 @media(max-width:480px){
   .vt-wrap{ padding:0 .5rem 5rem; }
-  .vt-check-btn{ padding:12px 32px; }
-  .vt-hira-btn{ padding:9px 13px; }
+  .vt-bottom-bar{ gap:8px; flex-wrap:nowrap; }
+  .vt-check-btn{ padding:12px 20px; min-width:110px; }
+  .vt-hira-btn{ padding:9px 10px; gap:5px; }
   .vt-columns{ gap:8px; }
   .vt-panel{ padding:9px 8px; }
+}
+
+/* Hide the text label on the very smallest phones — icon alone is enough */
+@media(max-width:360px){
+  #vt-hira-label{ display:none; }
+  .vt-hira-btn{ padding:9px 12px; }
 }
 `;
 document.head.appendChild(S);
@@ -1204,8 +1214,11 @@ checkBtn.addEventListener('click', () => {
    ══════════════════════════════════════════════════════════════ */
 function fireConfetti() {
   const colors = ['#ffcc00','#aaff22','#ff2288','#22ddff','#cc88ff','#ff6600','#ffffff'];
-  const cx = window.innerWidth  / 2;
-  const cy = window.innerHeight / 2;
+  const vv = window.visualViewport || window;
+  const cx = (vv.width  ?? vv.innerWidth)  / 2;
+  const cy = (vv.height ?? vv.innerHeight) / 2;
+
+   
   for (let i = 0; i < 70; i++) {
     const el    = document.createElement('div');
     el.className = 'vt-confetti-piece';
