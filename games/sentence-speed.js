@@ -108,7 +108,7 @@ const STREAK_MSG = {
 };
 
 /* Heat durations — slightly longer than vocab (sentences need more thinking) */
-const HEAT_DURATIONS = [7000, 5600, 4400, 3200, 2200];
+const HEAT_DURATIONS = [12000, 9500, 7500, 5500, 3500];
 
 /* ══════════════════════════════════════════════════════════════
    LABEL HELPERS
@@ -377,6 +377,34 @@ S.textContent = `
   background-size:220% auto;
 }
 
+/* Level-up flash — fires once when crossing a new streak threshold */
+.ssp-prompt-box.levelup-flash{
+  animation:sspLevelUpFlash .55s cubic-bezier(.34,1.56,.64,1) !important;
+}
+@keyframes sspLevelUpFlash{
+  0%  { transform:scale(1);    filter:brightness(1); }
+  20% { transform:scale(1.04); filter:brightness(1.6) saturate(2); }
+  50% { transform:scale(.99);  filter:brightness(1.2); }
+  75% { transform:scale(1.02); filter:brightness(1.4); }
+  100%{ transform:scale(1);    filter:brightness(1); }
+}
+
+.ssp-levelup-label{
+  position:fixed; left:50%; z-index:9999;
+  transform:translateX(-50%) translateY(0);
+  font-family:var(--game-font-title);
+  font-size:clamp(22px,5vw,38px); font-weight:900; letter-spacing:.1em;
+  color:#fff; text-shadow:0 0 20px var(--lul-color,#00ddff), 0 0 40px var(--lul-color,#00ddff);
+  pointer-events:none; white-space:nowrap;
+  animation:sspLevelUpLabel .9s cubic-bezier(.22,.8,.36,1) forwards;
+}
+@keyframes sspLevelUpLabel{
+  0%  { opacity:0; transform:translateX(-50%) translateY(20px) scale(.7); }
+  25% { opacity:1; transform:translateX(-50%) translateY(-18px) scale(1.1); }
+  60% { opacity:1; transform:translateX(-50%) translateY(-28px) scale(1); }
+  100%{ opacity:0; transform:translateX(-50%) translateY(-60px) scale(.85); }
+}
+
 /* streak animation on box — teal family */
 .ssp-prompt-box.streak-1{ box-shadow:0 8px 32px rgba(0,200,220,.15); }
 .ssp-prompt-box.streak-2{ box-shadow:0 8px 40px rgba(0,150,255,.22); }
@@ -403,26 +431,24 @@ S.textContent = `
 }
 [data-curriculum="pb"] .ssp-hira{ color:rgba(58,26,46,.55); }
 
-/* ══ CHOICE TILES (stacked — sentences are long) ══ */
+/* ══ CHOICE TILES ══ */
 .ssp-grid{ display:flex; flex-direction:column; gap:11px; margin-bottom:.8rem; }
 
 .ssp-choice{
   width:100%; min-height:64px; padding:.85rem 1.1rem;
   display:flex; align-items:center; justify-content:flex-start;
-  text-align:left;
-  border-radius:18px; cursor:pointer; user-select:none;
-  -webkit-tap-highlight-color:transparent;
+  text-align:left; border-radius:18px;
+  cursor:pointer; user-select:none; -webkit-tap-highlight-color:transparent;
   position:relative; overflow:hidden;
   font-family:var(--game-font-body);
-  font-size:clamp(14px,2.6vw,18px);
-  font-weight:700; line-height:1.4;
+  font-size:clamp(13px,2.3vw,17px);
+  font-weight:700; line-height:1.45;
   transition:transform .14s cubic-bezier(.34,1.56,.64,1), box-shadow .14s, filter .14s;
-
+  /* default — overridden per-card below */
   background:linear-gradient(145deg,rgba(0,220,255,.1),rgba(0,160,200,.05),rgba(0,0,0,.18));
-  border:2px solid rgba(0,200,240,.18);
+  border:2px solid rgba(0,200,240,.22);
   color:var(--game-tile-text);
-  box-shadow:0 4px 0 rgba(0,0,0,.3), 0 6px 16px rgba(0,0,0,.2),
-             inset 0 1px 0 rgba(255,255,255,.1);
+  box-shadow:0 4px 0 rgba(0,0,0,.3),0 6px 16px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.1);
 }
 .ssp-choice::after{
   content:''; position:absolute; top:-60%; left:-80%; width:50%; height:200%;
@@ -430,28 +456,75 @@ S.textContent = `
   transform:skewX(-16deg); transition:left .45s ease; pointer-events:none;
 }
 .ssp-choice:hover::after{ left:150%; }
-.ssp-choice:hover{
-  transform:translateY(-3px) scale(1.01);
-  box-shadow:0 7px 0 rgba(0,0,0,.3), 0 12px 22px rgba(0,0,0,.28),
-             inset 0 1px 0 rgba(255,255,255,.15);
-  filter:brightness(1.12);
-}
+.ssp-choice:hover{ transform:translateY(-3px) scale(1.01); filter:brightness(1.12); }
 .ssp-choice:active{ transform:scale(.97); }
 
-/* BC tiles get warm variant */
-[data-curriculum="bc"] .ssp-choice{
-  background:linear-gradient(145deg,rgba(255,120,0,.1),rgba(200,60,0,.05),rgba(0,0,0,.22));
-  border-color:rgba(255,100,0,.22);
+/* ── BR choice palette (amber/fire family — 5 cycling colors) ── */
+[data-curriculum="br"] .ssp-choice[data-ci="0"]{
+  background:linear-gradient(145deg,#4a2800,#703800);
+  border-color:rgba(255,170,0,.55); color:#fff;
+  box-shadow:0 5px 0 rgba(80,40,0,.6),0 7px 16px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.15);
 }
-/* PB tiles get white with warm border */
-[data-curriculum="pb"] .ssp-choice{
-  background:#ffffff; color:#2a1020;
-  border:2.5px solid #ffb84d;
-  box-shadow:0 4px 0 #ffd49a, 0 6px 16px rgba(255,160,50,.12);
+[data-curriculum="br"] .ssp-choice[data-ci="1"]{
+  background:linear-gradient(145deg,#5a1200,#8a1e00);
+  border-color:rgba(255,90,40,.55); color:#fff;
+  box-shadow:0 5px 0 rgba(80,10,0,.6),0 7px 16px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.15);
+}
+[data-curriculum="br"] .ssp-choice[data-ci="2"]{
+  background:linear-gradient(145deg,#3a3000,#5a4a00);
+  border-color:rgba(220,200,0,.5); color:#fff;
+  box-shadow:0 5px 0 rgba(50,40,0,.6),0 7px 16px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.15);
+}
+[data-curriculum="br"] .ssp-choice[data-ci="3"]{
+  background:linear-gradient(145deg,#40100a,#601814);
+  border-color:rgba(255,80,60,.55); color:#fff;
+  box-shadow:0 5px 0 rgba(60,10,8,.6),0 7px 16px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.15);
+}
+[data-curriculum="br"] .ssp-choice:hover{ filter:brightness(1.16); }
+
+/* ── BC choice palette (teal/cyan family) ── */
+[data-curriculum="bc"] .ssp-choice[data-ci="0"]{
+  background:linear-gradient(145deg,#041e18,#062e24);
+  border-color:rgba(0,220,180,.55); color:#e0fff8;
+  box-shadow:0 5px 0 rgba(0,20,15,.7),0 7px 16px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.08);
+}
+[data-curriculum="bc"] .ssp-choice[data-ci="1"]{
+  background:linear-gradient(145deg,#041820,#062430);
+  border-color:rgba(0,200,240,.5); color:#e0fff8;
+  box-shadow:0 5px 0 rgba(0,15,25,.7),0 7px 16px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.08);
+}
+[data-curriculum="bc"] .ssp-choice[data-ci="2"]{
+  background:linear-gradient(145deg,#042018,#063028);
+  border-color:rgba(40,230,160,.5); color:#e0fff8;
+  box-shadow:0 5px 0 rgba(0,20,15,.7),0 7px 16px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.08);
+}
+[data-curriculum="bc"] .ssp-choice[data-ci="3"]{
+  background:linear-gradient(145deg,#041a20,#062830);
+  border-color:rgba(0,210,220,.55); color:#e0fff8;
+  box-shadow:0 5px 0 rgba(0,15,20,.7),0 7px 16px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.08);
+}
+[data-curriculum="bc"] .ssp-choice:hover{ filter:brightness(1.18); }
+
+/* ── PB choice palette (white cards with colored borders, dark text) ── */
+[data-curriculum="pb"] .ssp-choice[data-ci="0"]{
+  background:#fff; border:2.5px solid #ff6eb4; color:#2a1020;
+  box-shadow:0 5px 0 #ffb0d8,0 7px 16px rgba(255,110,180,.12);
+}
+[data-curriculum="pb"] .ssp-choice[data-ci="1"]{
+  background:#fff; border:2.5px solid #cc88ff; color:#2a1020;
+  box-shadow:0 5px 0 #ddb8ff,0 7px 16px rgba(180,120,255,.12);
+}
+[data-curriculum="pb"] .ssp-choice[data-ci="2"]{
+  background:#fff; border:2.5px solid #44ccff; color:#2a1020;
+  box-shadow:0 5px 0 #99e8ff,0 7px 16px rgba(50,180,255,.1);
+}
+[data-curriculum="pb"] .ssp-choice[data-ci="3"]{
+  background:#fff; border:2.5px solid #ffcc44; color:#2a1020;
+  box-shadow:0 5px 0 #ffe088,0 7px 16px rgba(255,200,50,.1);
 }
 [data-curriculum="pb"] .ssp-choice:hover{
   transform:translateY(-4px) scale(1.01);
-  box-shadow:0 7px 0 #ffd49a, 0 12px 22px rgba(0,0,0,.1);
+  filter:brightness(1.02);
 }
 
 /* Correct / wrong states */
@@ -623,6 +696,12 @@ S.textContent = `
 .ssp-modal-close:active{ transform:scale(.96); }
 
 /* ══ RESULTS PANEL — cyan/teal palette ══ */
+
+.ssp-results-wrap{
+  max-width:760px; margin:0 auto;
+  padding:0 1rem; box-sizing:border-box;
+}
+
 .ssp-results{
   display:none; text-align:center;
   max-width:560px; margin:1.5rem auto;
@@ -736,6 +815,7 @@ U.mount(`
 </div>
 
 <!-- RESULTS — separate from main so header stays visible above it -->
+<div class="ssp-results-wrap" id="ssp-results-wrap">
 <div class="ssp-results" id="ssp-results">
   <div class="ssp-res-inner">
     <div class="ssp-res-score"  id="ssp-rs"></div>
@@ -749,7 +829,7 @@ U.mount(`
       <button class="game-btn game-btn-primary"   id="ssp-replay">もう一度</button>
       <button class="game-btn game-btn-secondary" id="ssp-back">メニューへ</button>
     </div>
-  </div>
+</div>
 </div>
 
 <!-- HELP BUTTON -->
@@ -972,10 +1052,11 @@ function renderQ() {
   const distractors = U.shuffle(pool).slice(0, 3);
   const choices     = U.shuffle([card, ...distractors]);
 
-  choices.forEach((c) => {
+ choices.forEach((c, ci) => {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'ssp-choice';
+    btn.setAttribute('data-ci', ci);
     btn.setAttribute('aria-label', c.en);
     btn.textContent = c.en;
 
@@ -1106,9 +1187,39 @@ function updateStreakBanner() {
     streakBanner.classList.add('show');
   }
 
+  if (lv > lastLevel && lv > 0) fireLevelUpEffect(lv);
   lastLevel = lv;
 }
 
+const LEVEL_UP_LABELS = {
+  1: { text:'ON FIRE!',      color:'#00ddff' },
+  2: { text:'HEATING UP!',   color:'#0099ff' },
+  3: { text:'UNSTOPPABLE!',  color:'#4466ff' },
+  4: { text:'LEGENDARY!!',   color:'#e8f8ff' },
+};
+
+function fireLevelUpEffect(newLevel) {
+  /* Flash the prompt box */
+  promptBox.classList.remove('levelup-flash');
+  void promptBox.offsetWidth; /* force reflow */
+  promptBox.classList.add('levelup-flash');
+  promptBox.addEventListener('animationend', () => {
+    promptBox.classList.remove('levelup-flash');
+  }, { once: true });
+
+  /* Floating level-up label */
+  const def = LEVEL_UP_LABELS[newLevel];
+  if (!def) return;
+  const rect = promptBox.getBoundingClientRect();
+  const label = document.createElement('div');
+  label.className = 'ssp-levelup-label';
+  label.textContent = def.text;
+  label.style.setProperty('--lul-color', def.color);
+  label.style.top = `${rect.top + window.scrollY + rect.height / 2}px`;
+  document.body.appendChild(label);
+  label.addEventListener('animationend', () => label.remove());
+}
+   
 /* ══════════════════════════════════════════════════════════════
    CONFETTI — cyan/teal pieces for sentence-speed
    ══════════════════════════════════════════════════════════════ */
@@ -1163,12 +1274,11 @@ function showResults() {
   const pct  = Math.round((score / 15) * 100);
 
   /* ── Dispatch to Booha Adventure save system ── */
-  document.dispatchEvent(new CustomEvent('booha:gameEnd', {
+document.dispatchEvent(new CustomEvent('booha:gameEnd', {
     detail: {
-      saveId:    (window.BoohaAdventure?.registry?.saveId ?? ((c, g) => `${c}__${g}`))(
-                   CFG.curriculum, 'sentence_speed'),
+      saveId:    `${CFG.curriculum}:sentence_speed`,
       score:     pct,
-      completed: score === 15,
+      completed: pct >= 40,
     }
   }));
 
@@ -1186,9 +1296,13 @@ function showResults() {
     setTimeout(() => fireConfetti(false), 400);
     setTimeout(() => fireConfetti(true),  900);
   }
-  const snd = new Audio(CFG.sfxBase + tier.sound);
-  snd.setAttribute('playsinline', '');
-  snd.play().catch(() => {});
+   
+  if (CFG.sfxBase && tier.sound) {
+    const snd = new Audio(CFG.sfxBase + tier.sound);
+    snd.setAttribute('playsinline', '');
+    snd.setAttribute('webkit-playsinline', '');
+    snd.play().catch(() => {});
+  }
 }
 
 /* ══════════════════════════════════════════════════════════════
