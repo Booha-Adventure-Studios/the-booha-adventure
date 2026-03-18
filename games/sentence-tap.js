@@ -263,7 +263,7 @@ S.textContent = `
 .st-en-card{
   --card-hue:calc(var(--i,0) * 52deg);
   position:relative; overflow:hidden; border-radius:18px;
-  padding:10px 12px; min-height:auto;
+  padding:10px 12px; min-height:90px;
   background:
     linear-gradient(135deg,
       hsl(from var(--game-primary) h calc(s + 10%) l / 0.22),
@@ -367,7 +367,7 @@ S.textContent = `
    JAPANESE SENTENCE SLOTS
    ══════════════════════════════════════════════════════════════ */
 .st-jp-slot{
-  min-height:auto; border-radius:18px; padding:10px 12px;
+  min-height:90px; border-radius:18px; padding:10px 12px;
   background:linear-gradient(160deg,rgba(255,255,255,.055),rgba(255,255,255,.02));
   border:2px dashed rgba(255,255,255,.18);
   display:grid; grid-template-rows:1fr auto; align-content:center; gap:5px;
@@ -395,7 +395,7 @@ S.textContent = `
 [data-curriculum="pb"] .st-jp-kanji,
 [data-curriculum="pb"] .st-jp-hira-text{ color:#2a1020; }
 
-.st-jp-word-wrap{ display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:3px; min-height:44px; }
+.st-jp-word-wrap{ display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:3px; min-height:0; }
 
 .st-jp-kanji{ font-family:var(--game-font-jp); font-weight:900; font-size:clamp(12px,2vw,17px); color:var(--game-ink); line-height:1.5; display:block; text-wrap:balance; }
 .st-jp-hira-text{ font-family:var(--game-font-jp); font-size:clamp(11px,1.7vw,15px); font-weight:900; color:var(--game-ink); line-height:1.5; display:none; text-wrap:balance; }
