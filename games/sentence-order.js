@@ -184,6 +184,8 @@ function titleDateLabel() {
 const S = document.createElement('style');
 S.textContent = `
 *,*::before,*::after{ box-sizing:border-box; }
+/* suppress the host-page injected header — so-wrap draws its own */
+.game-header{ display:none !important; }
 
 .so-wrap{
   position:relative; z-index:1;
@@ -1116,28 +1118,38 @@ function fireSparkles(originEl, big = false) {
    RESULTS
    ══════════════════════════════════════════════════════════════ */
 function showResults() {
-  updateDots(3);
-  mainWrap.style.display = 'none';
-  resultsWrap.classList.add('show');
+  /* Hide gameplay elements — leave .so-header and .so-dots-row visible */
+  document.getElementById('so-jp-box').style.display    = 'none';
+  document.getElementById('so-answer').style.display    = 'none';
+  document.getElementById('so-tiles').style.display     = 'none';
+  document.getElementById('so-feedback').style.display  = 'none';
+  document.querySelector('.so-bottom-bar').style.display = 'none';
+  document.querySelector('.so-hud').style.display       = 'none';
+  /* .so-dots-row intentionally kept visible — shows all-done state */
+
+  /* Mark all dots done */
+  for (let i = 0; i < 15; i++) {
+    const d = document.getElementById(`so-d${i}`);
+    if (d) d.className = 'so-dot done';
+  }
+
+  /* Show results card */
+  results.classList.add('show');
 
   const tier = getTier(score);
   const pct  = Math.round((score / 15) * 100);
 
-  /* ── Save score to Booha Adventure save system ─────────────────────
-     Optional-chain guard prevents ReferenceError crash when
-     BoohaAdventure isn't mounted (e.g. standalone testing).        */
+  /* ── Save score to Booha Adventure save system ── */
   document.dispatchEvent(new CustomEvent('booha:gameEnd', {
     detail: {
-      saveId:    (window.BoohaAdventure?.registry?.saveId ?? ((c, g) => `${c}__${g}`))(
-                   CFG.curriculum, 'sentence_order'),
+      saveId:    `${CFG.curriculum}:sentence_order`,
       score:     pct,
-      completed: score === 15,
+      completed: pct >= 40,
     }
   }));
 
-  /* Populate scorecard — so-* IDs match sentence-order's own HTML */
-  const resEl = document.getElementById('so-results');
-  resEl.style.setProperty('--tier-color', tier.color);
+  /* Populate scorecard */
+  results.style.setProperty('--tier-color', tier.color);
   document.getElementById('so-rs').textContent = `${score} / 15`;
   document.getElementById('so-rp').textContent = `${pct}%`;
   document.getElementById('so-rl').textContent = tier.label;
@@ -1145,30 +1157,30 @@ function showResults() {
   document.getElementById('so-rj').textContent = tier.jp;
   document.getElementById('so-rk').textContent = tier.kanji;
 
-  /* Build colorful action buttons */
-  resActions.innerHTML = '';
-  tier.actions.forEach(act => {
-    const btn = document.createElement('button');
-    btn.id        = act.id;
-    btn.className = `so-res-btn ${act.cls}`;
-    btn.innerHTML = `<span>${act.label}</span>`;
-    resActions.appendChild(btn);
-  });
-
-  /* Wire replay / back */
+  /* Wire the hardcoded buttons already in the HTML */
   const replayBtn = document.getElementById('so-replay');
   const backBtn   = document.getElementById('so-back');
 
   if (replayBtn) replayBtn.addEventListener('click', () => {
-    resultsWrap.classList.remove('show');
-    mainWrap.style.display = '';
-    allCards = buildShuffledDeck();
-    score    = 0;
+    /* Restore gameplay elements */
+    document.getElementById('so-jp-box').style.display    = '';
+    document.getElementById('so-answer').style.display    = '';
+    document.getElementById('so-tiles').style.display     = '';
+    document.getElementById('so-feedback').style.display  = '';
+    document.querySelector('.so-bottom-bar').style.display = '';
+    document.querySelector('.so-hud').style.display       = '';
+
+    results.classList.remove('show');
+
+    /* Reset state */
+    idx   = 0;
+    score = 0;
     scoreEl.textContent = '0';
     document.body.classList.remove('hira-mode');
-    hiraMode              = false;
+    hiraMode = false;
     hiraLabel.textContent = 'ひらがな';
-    startRound(0);
+    U.shuffle(allCards);
+    showCard();
   });
 
   if (backBtn) backBtn.addEventListener('click', () => {
@@ -1176,13 +1188,17 @@ function showResults() {
   });
 
   if (score === 15) {
-    setTimeout(fireConfetti, 400);
-    setTimeout(fireConfetti, 900);
+    setTimeout(() => fireSparkles(null, true),  400);
+    setTimeout(() => fireSparkles(null, true),  900);
   }
 
-  const snd = new Audio(CFG.sfxBase + tier.sound);
-  snd.setAttribute('playsinline', '');
-  snd.play().catch(() => {});
+  /* Results sound */
+  if (CFG.sfxBase && tier.sound) {
+    const snd = new Audio(CFG.sfxBase + tier.sound);
+    snd.setAttribute('playsinline', '');
+    snd.setAttribute('webkit-playsinline', '');
+    snd.play().catch(() => {});
+  }
 }
 
 /* ══════════════════════════════════════════════════════════════
