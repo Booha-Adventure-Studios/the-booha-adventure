@@ -176,6 +176,8 @@ const S = document.createElement('style');
 S.textContent = `
 *,*::before,*::after{ box-sizing:border-box; }
 
+/* suppress the host-page injected header — sw-wrap draws its own */
+.game-header{ display:none !important; }
 .sw-wrap{
   position:relative; z-index:1;
   max-width:640px; margin:0 auto;
@@ -1074,14 +1076,14 @@ function fireConfetti(big = false) {
    RESULTS
    ══════════════════════════════════════════════════════════════ */
 function showResults() {
-  /* Hide the gameplay elements individually — this game has no mainWrap */
-  document.getElementById('sw-jp-box').style.display  = 'none';
-  document.getElementById('sw-slots').style.display   = 'none';
-  document.getElementById('sw-tiles').style.display   = 'none';
+  /* Hide gameplay elements — leave .sw-header and .sw-dots-row visible */
+  document.getElementById('sw-jp-box').style.display   = 'none';
+  document.getElementById('sw-slots').style.display    = 'none';
+  document.getElementById('sw-tiles').style.display    = 'none';
   document.getElementById('sw-feedback').style.display = 'none';
   document.querySelector('.sw-bottom-bar').style.display = 'none';
-  document.querySelector('.sw-hud').style.display     = 'none';
-  document.querySelector('.sw-dots-row').style.display = 'none';
+  document.querySelector('.sw-hud').style.display      = 'none';
+  /* .sw-dots-row intentionally kept visible — shows all-done state */
 
   /* Mark all dots done */
   for (let i = 0; i < 15; i++) {
@@ -1089,6 +1091,7 @@ function showResults() {
     if (d) d.className = 'sw-dot done';
   }
 
+   
   /* Show results card */
   results.classList.add('show');
 
@@ -1096,12 +1099,11 @@ function showResults() {
   const pct  = Math.round((score / 15) * 100);
 
   /* ── Save score to Booha Adventure save system ── */
-  document.dispatchEvent(new CustomEvent('booha:gameEnd', {
+ document.dispatchEvent(new CustomEvent('booha:gameEnd', {
     detail: {
-      saveId:    (window.BoohaAdventure?.registry?.saveId ?? ((c, g) => `${c}__${g}`))(
-                   CFG.curriculum, 'spell_word'),
+      saveId:    `${CFG.curriculum}:spell_word`,
       score:     pct,
-      completed: score === 15,
+      completed: score === 40,
     }
   }));
 
@@ -1119,15 +1121,14 @@ function showResults() {
   const backBtn   = document.getElementById('sw-back');
 
   if (replayBtn) replayBtn.addEventListener('click', () => {
-    /* Show all gameplay elements again */
-    document.getElementById('sw-jp-box').style.display  = '';
-    document.getElementById('sw-slots').style.display   = '';
-    document.getElementById('sw-tiles').style.display   = '';
+    /* Restore all gameplay elements */
+    document.getElementById('sw-jp-box').style.display   = '';
+    document.getElementById('sw-slots').style.display    = '';
+    document.getElementById('sw-tiles').style.display    = '';
     document.getElementById('sw-feedback').style.display = '';
     document.querySelector('.sw-bottom-bar').style.display = '';
-    document.querySelector('.sw-hud').style.display     = '';
-    document.querySelector('.sw-dots-row').style.display = '';
-
+    document.querySelector('.sw-hud').style.display      = '';
+    /* .sw-dots-row was never hidden, no need to restore */
     results.classList.remove('show');
 
     /* Reset state — spell-word uses idx/score/allCards/showCard */
@@ -1147,10 +1148,12 @@ function showResults() {
     setTimeout(() => fireConfetti(true),  900);
   }
 
-  const snd = new Audio(CFG.sfxBase + tier.sound);
-  snd.setAttribute('playsinline', '');
-  snd.play().catch(() => {});
-}
+ if (CFG.sfxBase && tier.sound) {
+    const snd = new Audio(CFG.sfxBase + tier.sound);
+    snd.setAttribute('playsinline', '');
+    snd.setAttribute('webkit-playsinline', '');
+    snd.play().catch(() => {});
+  }
 
 /* ══════════════════════════════════════════════════════════════
    GO
