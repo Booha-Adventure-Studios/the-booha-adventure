@@ -1,12 +1,6 @@
 
 /* ═══════════════════════════════════════════════════════════════
    stream-core.js  —  Stream engine (sequential audio play mode)
-   FIXES:
-   - parseWeekInfo targets stream-week-label (not hidden week-label)
-   - fitText allows much larger font sizes
-   - prev/next work when paused
-   - slowMode uses playbackRate on audio element
-   - section colors use curriculum theme colors
    ═══════════════════════════════════════════════════════════════ */
 (function () {
 
@@ -49,6 +43,16 @@ let pauseTimer   = null;
 let ringRAF      = null;
 let currentAudio = null;
 
+/* ── FIX: Generation counter ──────────────────────────────────
+   Every call to playTrack() bumps this counter.
+   All async callbacks (onended, onerror, play().catch, setTimeout)
+   capture their generation at the moment they are created.
+   If the counter has moved on by the time they fire, they are
+   stale and do nothing. This completely eliminates the race
+   condition that caused tracks to be skipped.
+─────────────────────────────────────────────────────────────── */
+let playGen = 0;
+
 /* ════════════════════════════
    BACK BUTTON
 ════════════════════════════ */
@@ -62,7 +66,6 @@ document.getElementById('btn-close').addEventListener('click', goBack);
 
 /* ════════════════════════════
    WEEK LABEL
-   FIX: target stream-week-label — week-label lives in hidden flashcard-ui
 ════════════════════════════ */
 const MO = {jan:'January',feb:'February',mar:'March',apr:'April',may:'May',jun:'June',jul:'July',aug:'August',sep:'September',oct:'October',nov:'November',dec:'December'};
 const JP = {jan:'1月',feb:'2月',mar:'3月',apr:'4月',may:'5月',jun:'6月',jul:'7月',aug:'8月',sep:'9月',oct:'10月',nov:'11月',dec:'12月'};
@@ -71,14 +74,12 @@ function parseWeekInfo() {
   const el = document.getElementById('stream-week-label');
   if (!el) return 1;
 
-  // Standard format: br_mar_w2
   let m = weekParam.match(/^(?:pb|br|bc)_([a-z]{3})_w(\d)$/i);
   if (m) {
     const mo = m[1].toLowerCase(), wn = Number(m[2]);
     el.innerHTML = `${MO[mo]||mo} Week ${wn} &middot; ${JP[mo]||mo}第${wn}週`;
     return wn;
   }
-  // Full format: 2027_w09_mar_w1
   m = weekParam.match(/^(\d{4})_w\d{2}_([a-z]{3})_w(\d)$/i);
   if (m) {
     const mo = m[2].toLowerCase(), wn = Number(m[3]);
@@ -124,7 +125,6 @@ function makeStripe(colors) {
   return 'repeating-linear-gradient(180deg,'+doubled.join(',')+')';
 }
 
-/* FIX: much larger max font — sentences/questions need to be readable */
 function fitText(el) {
   el.style.fontSize = '';
   const content  = el.closest('.card-content');
@@ -169,7 +169,7 @@ function burstMotes() {
 }
 
 /* ════════════════════════════
-   SECTION COLOURS — use curriculum theme colors
+   SECTION COLOURS
 ════════════════════════════ */
 function getSectionInfo(i) {
   const c = CFG.curriculum || 'br';
@@ -251,12 +251,17 @@ function animateRing(durationMs) {
    PLAYBACK
 ════════════════════════════ */
 function stopEverything() {
+  /* Bump the generation so all in-flight callbacks become stale */
+  playGen++;
+
   if (currentAudio) {
-    try { currentAudio.pause(); currentAudio.currentTime=0; } catch(e){}
+    try { currentAudio.pause(); currentAudio.currentTime = 0; } catch(e){}
     currentAudio.onended = null;
     currentAudio.onerror = null;
+    currentAudio = null;
   }
   clearTimeout(pauseTimer);
+  pauseTimer = null;
   cancelAnimationFrame(ringRAF);
   if (pauseRing) pauseRing.classList.remove('visible');
   enTextEl.classList.remove('dancing');
@@ -273,33 +278,55 @@ function getPauseSeconds(track) {
   return Math.max(1.6, Math.min(base, 10));
 }
 
-function startPause(track) {
+function startPause(track, gen) {
+  /* ── FIX: guard against stale calls ── */
+  if (gen !== playGen) return;
+
   const ms = getPauseSeconds(track) * 1000;
   if (pauseRing) pauseRing.classList.add('visible');
   animateRing(ms);
   pauseTimer = setTimeout(() => {
+    /* ── FIX: check generation again when timer fires ── */
+    if (gen !== playGen) return;
     if (pauseRing) pauseRing.classList.remove('visible');
     if (isPlaying) playTrack((trackIdx + 1) % TRACKS.length);
   }, ms);
 }
 
 function playTrack(i) {
-  stopEverything();
+  stopEverything();  /* bumps playGen */
+  const gen = playGen;  /* capture this generation for all callbacks below */
+
   trackIdx = ((i % TRACKS.length) + TRACKS.length) % TRACKS.length;
   const track = TRACKS[trackIdx];
   updateUI(track);
 
-  currentAudio = new Audio(getAudioSrc(track.mp3));
-  currentAudio.preload = 'auto';
-  /* FIX: slow mode slows the audio itself via playbackRate */
-  if (slowMode) currentAudio.playbackRate = 0.75;
+  const audio = new Audio(getAudioSrc(track.mp3));
+  audio.preload = 'auto';
+  if (slowMode) audio.playbackRate = 0.75;
+  currentAudio = audio;
 
-  currentAudio.onended = () => { enTextEl.classList.remove('dancing'); if (isPlaying) startPause(track); };
-  currentAudio.onerror = () => { enTextEl.classList.remove('dancing'); if (isPlaying) startPause(track); };
-  currentAudio.play().then(() => {
+  audio.onended = () => {
+    enTextEl.classList.remove('dancing');
+    if (gen !== playGen) return;  /* stale — a newer playTrack has taken over */
+    if (isPlaying) startPause(track, gen);
+  };
+
+  audio.onerror = () => {
+    enTextEl.classList.remove('dancing');
+    if (gen !== playGen) return;
+    if (isPlaying) startPause(track, gen);
+  };
+
+  audio.play().then(() => {
+    if (gen !== playGen) return;  /* started playing but we've already moved on */
     enTextEl.classList.add('dancing');
     burstMotes();
-  }).catch(() => { enTextEl.classList.remove('dancing'); if (isPlaying) startPause(track); });
+  }).catch(() => {
+    enTextEl.classList.remove('dancing');
+    if (gen !== playGen) return;
+    if (isPlaying) startPause(track, gen);
+  });
 }
 
 function togglePlay() {
@@ -321,7 +348,6 @@ function togglePlay() {
 
 /* ════════════════════════════
    CONTROLS
-   FIX: prev/next now work when paused — just update display, don't play
 ════════════════════════════ */
 if (btnPrev) btnPrev.addEventListener('click', () => {
   if (!TRACKS.length) return;
@@ -343,7 +369,6 @@ if (btnSlow) btnSlow.addEventListener('click', () => {
   slowMode = !slowMode;
   btnSlow.classList.toggle('active', slowMode);
   btnSlow.setAttribute('aria-pressed', slowMode);
-  /* Apply immediately to any currently playing audio */
   if (currentAudio) currentAudio.playbackRate = slowMode ? 0.75 : 1.0;
 });
 
