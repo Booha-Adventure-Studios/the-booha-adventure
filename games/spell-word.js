@@ -1103,7 +1103,7 @@ function showResults() {
     detail: {
       saveId:    `${CFG.curriculum}:spell_word`,
       score:     pct,
-      completed: score === 40,
+      completed: pct >= 40,
     }
   }));
 
