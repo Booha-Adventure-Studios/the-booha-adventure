@@ -713,16 +713,16 @@
   <div class="totals-bar">
     <div class="total-card tc-stars glass">
       <div class="t-icon">⭐</div>
-      <div class="tv" id="total-stars">—</div>
+      <div class="tv" id="total-stars">--</div>
       <div class="t-tri">
-        <span class="t-en">Stars</span>
-        <span class="t-jp">スター</span>
-        <span class="t-k">星</span>
+        <span class="t-en">This Week</span>
+        <span class="t-jp">今週のスター</span>
+        <span class="t-k">週間星</span>
       </div>
     </div>
     <div class="total-card tc-done glass">
       <div class="t-icon">✅</div>
-      <div class="tv" id="total-completed">—</div>
+      <div class="tv" id="total-completed">--</div>
       <div class="t-tri">
         <span class="t-en">Complete</span>
         <span class="t-jp">クリア</span>
@@ -731,11 +731,11 @@
     </div>
     <div class="total-card tc-unlock glass">
       <div class="t-icon">🏆</div>
-      <div class="tv" id="total-unlocks">—</div>
+      <div class="tv" id="total-alltime">--</div>
       <div class="t-tri">
-        <span class="t-en">Unlocks</span>
-        <span class="t-jp">アンロック</span>
-        <span class="t-k">解除</span>
+        <span class="t-en">All-Time</span>
+        <span class="t-jp">ぜんぶのスター</span>
+        <span class="t-k">累計星</span>
       </div>
     </div>
   </div>
@@ -843,6 +843,8 @@
 <script src="js/ui/memory-code-ui.js"></script>
 <script src="js/ui/save-menu.js"></script>
 
+
+
 <script>
 /* ── STAR BURST helper ───────────────────────────────────────────────── */
 function triggerStarBurst() {
@@ -915,38 +917,45 @@ function uMeta(id) {
 }
 
 function starsHTML(n, max=3) {
-  return Array.from({length:max},(_,i)=>`<span class="sp ${i<n?'lit':''}">★</span>`).join('');
+  return Array.from({length:max}, (_,i) =>
+    `<span class="sp ${i < n ? 'lit' : ''}">★</span>`
+  ).join('');
 }
 
 function setStatus(msg, type='') {
   const el = document.getElementById('prof-status');
   el.textContent = msg;
-  el.className = `prof-status ${type?'s-'+type:''}`;
+  el.className = `prof-status ${type ? 's-'+type : ''}`;
   clearTimeout(el._t);
-  el._t = setTimeout(()=>{ el.textContent=''; el.className='prof-status'; }, 3500);
+  el._t = setTimeout(() => { el.textContent=''; el.className='prof-status'; }, 3500);
 }
 
+/* ── RENDER ──────────────────────────────────────────────────────────── */
 function render() {
   const S = BoohaAdventure.scores;
   const U = BoohaAdventure.unlocks;
   const R = BoohaAdventure.registry;
 
-  const summary    = S.summaryAll();
+  // ── Totals bar — Weekly Stars / Weekly Complete / All-Time Stars ──────
+  const wStars     = S.weeklyStars();
+  const wMax       = 27 * 3; // 27 games × 3 stars max
+  const wCompleted = S.weeklyCompleted();
+  const allTime    = S.allTimeStars();
   const allUnlocks = U.getAll();
-  const earned     = allUnlocks.filter(u=>u.unlocked).length;
 
-  document.getElementById('total-stars').textContent     = `${summary.stars}/${summary.totalStars}`;
-  document.getElementById('total-completed').textContent = `${summary.completed}/${summary.totalGames}`;
-  document.getElementById('total-unlocks').textContent   = `${earned}/${allUnlocks.length}`;
+  document.getElementById('total-stars').textContent     = `${wStars}/${wMax}`;
+  document.getElementById('total-completed').textContent = `${wCompleted}/27`;
+  document.getElementById('total-alltime').textContent   = allTime;
 
-  // Curriculum cards — each one its own accordion
+  // ── Curriculum cards — read from WEEKLY data ──────────────────────────
   const cont = document.getElementById('curr-cards');
   cont.innerHTML = '';
-  R.CURRICULUMS.forEach((c, idx) => {
-    const ci  = CURR_INFO[c];
-    const cs  = S.summaryFor(c);
-    const pct = cs.totalGames > 0 ? Math.round(cs.completed/cs.totalGames*100) : 0;
-    const accId = `acc-curr-${c}`;
+
+  R.CURRICULUMS.forEach(c => {
+    const ci    = CURR_INFO[c];
+    const cs    = S.weeklySummaryFor(c);   // ← weekly, not permanent
+    const pct   = cs.totalGames > 0 ? Math.round(cs.completed / cs.totalGames * 100) : 0;
+    const accId  = `acc-curr-${c}`;
     const bodyId = `acc-curr-body-${c}`;
 
     const wrap = document.createElement('div');
@@ -975,16 +984,16 @@ function render() {
               <div class="prog-fill ${ci.fc}" data-target="${pct}"></div>
             </div>
             <div class="game-rows">
-              ${cs.entries.map(e=>{
-                const gj = GAME_JP[e.id]||{jp:e.name,k:''};
-                return `<div class="game-row ${e.completed?'done':''}">
-                  <span class="row-chk">${e.completed?'✅':'☐'}</span>
+              ${cs.entries.map(e => {
+                const gj = GAME_JP[e.id] || { jp: e.name, k: '' };
+                return `<div class="game-row ${e.completed ? 'done' : ''}">
+                  <span class="row-chk">${e.completed ? '✅' : '☐'}</span>
                   <div class="row-names">
                     <div class="rn-en">${e.name}</div>
                     <div class="rn-jp">${gj.jp}　${gj.k}</div>
                   </div>
                   <div class="row-stars">${starsHTML(e.stars)}</div>
-                  <div class="row-sc">${e.highScore>0?e.highScore:'—'}</div>
+                  <div class="row-sc">${e.highScore > 0 ? e.highScore : '—'}</div>
                 </div>`;
               }).join('')}
             </div>
@@ -992,25 +1001,24 @@ function render() {
         </div>
       </div>`;
     cont.appendChild(wrap);
-
     initAccordion(accId, bodyId);
   });
 
-  requestAnimationFrame(()=>{
-    document.querySelectorAll('.prog-fill[data-target]').forEach(el=>{
-      el.style.width = el.dataset.target+'%';
+  requestAnimationFrame(() => {
+    document.querySelectorAll('.prog-fill[data-target]').forEach(el => {
+      el.style.width = el.dataset.target + '%';
     });
   });
 
-  // Achievements accordion content
+  // ── Achievements accordion — permanent, unchanged ─────────────────────
   const grid = document.getElementById('unlocks-grid');
   grid.innerHTML = '';
-  [...allUnlocks].sort((a,b)=>b.unlocked-a.unlocked).forEach(u=>{
+  [...allUnlocks].sort((a, b) => b.unlocked - a.unlocked).forEach(u => {
     const m = uMeta(u.id);
     const chip = document.createElement('div');
-    chip.className = `u-chip ${u.unlocked?'earned':''}`;
+    chip.className = `u-chip ${u.unlocked ? 'earned' : ''}`;
     chip.innerHTML = `
-      <span class="u-icon">${u.unlocked?m.icon:'🔒'}</span>
+      <span class="u-icon">${u.unlocked ? m.icon : '🔒'}</span>
       <div class="u-text">
         <div class="u-en">${u.name}</div>
         <div class="u-jp">${m.jp}　<span style="font-size:.56rem">${m.k}</span></div>
@@ -1020,30 +1028,34 @@ function render() {
   });
 }
 
-document.addEventListener('booha:ready', ()=>{
+/* ── BOOT ────────────────────────────────────────────────────────────── */
+document.addEventListener('booha:ready', () => {
   render();
 
   initAccordion('acc-achievements-trigger', 'acc-achievements-body');
 
-  document.getElementById('btn-show-code').onclick  = ()=> BoohaMemoryCodeUI.showCode();
-  document.getElementById('btn-enter-code').onclick = ()=> BoohaMemoryCodeUI.promptEnterCode();
-  document.getElementById('btn-export').onclick = ()=>{
+  document.getElementById('btn-show-code').onclick  = () => BoohaMemoryCodeUI.showCode();
+  document.getElementById('btn-enter-code').onclick = () => BoohaMemoryCodeUI.promptEnterCode();
+  document.getElementById('btn-export').onclick = () => {
     BoohaSaveUtils.downloadSaveFile();
-    setStatus('セーブファイルをダウンロードしました ✓','ok');
+    setStatus('セーブファイルをダウンロードしました ✓', 'ok');
   };
-  document.getElementById('btn-import').onclick = async ()=>{
-    const {ok,error} = await BoohaSaveUtils.uploadSaveFile();
-    if(ok){ setStatus('セーブをよみこみました ✓','ok'); render(); }
-    else  setStatus(`よみこみしっぱい: ${error}`,'err');
+  document.getElementById('btn-import').onclick = async () => {
+    const { ok, error } = await BoohaSaveUtils.uploadSaveFile();
+    if (ok) { setStatus('セーブをよみこみました ✓', 'ok'); render(); }
+    else     setStatus(`よみこみしっぱい: ${error}`, 'err');
   };
-  document.getElementById('btn-reset').onclick = ()=>{
+  document.getElementById('btn-reset').onclick = () => {
     const ok = BoohaSaveUtils.resetAll(true);
-    if(ok){ setStatus('ぼうけんをリセットしました','warn'); setTimeout(render,400); }
+    if (ok) { setStatus('ぼうけんをリセットしました', 'warn'); setTimeout(render, 400); }
   };
 
-  document.addEventListener('booha:saved', render);
-  document.addEventListener('booha:reset', render);
+  document.addEventListener('booha:saved',       render);
+  document.addEventListener('booha:reset',        render);
+  document.addEventListener('booha:weeklyReset',  render);
 });
-</script>
+</script>  
+
+
 </body>
 </html>
