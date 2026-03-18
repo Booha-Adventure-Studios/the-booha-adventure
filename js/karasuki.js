@@ -160,6 +160,550 @@
 
   let arrivalArrowHiddenUntil = 0;
 
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   KARASUKI WANDERER + BONUS TREE SYSTEM
+   Add this block to karasuki.js after the CONSTANTS section and before STATE.
+
+   HOW TO INTEGRATE:
+   1. Paste the WANDERER_DEFS array and BONUS_TREES array after the constants.
+   2. Add the wanderer state variables to the state object.
+   3. Call initWanderers() in the init() function after renderInitialRoom().
+   4. Call drawWanderers(now) and drawBonusTrees(now) inside drawFrame(now).
+   5. Call updateWanderers(now) inside tick() alongside handleClickMovement.
+   6. Wire the bonus tree click in the stage click/touch handlers.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════
+   WANDERER DEFINITIONS — 27 total
+   index 0–13:  wanderers (drift around home)
+   index 14–26: stayers   (fixed, wobble only)
+
+   Replace 'placeholder' with real PNG paths when assets are ready.
+   roomId:  which karasuki room they live in
+   x, y:    home coordinate (placeholder — adjust to taste)
+   type:    'wander' | 'stay'
+   img:     PNG path (placeholder colored orb until real assets exist)
+   color:   placeholder orb color
+   radius:  wander drift radius in world-pixels
+═══════════════════════════════════════════ */
+const WANDERER_DEFS = [
+  // ── Wanderers (drift) ─── rooms 1–14 ────────────────────────────────
+  { index:0,  roomId:'room_01', x:600,  y:400, type:'wander', img:null, color:'#ff79d7', radius:60  },
+  { index:1,  roomId:'room_02', x:900,  y:500, type:'wander', img:null, color:'#ffaa5e', radius:55  },
+  { index:2,  roomId:'room_03', x:500,  y:600, type:'wander', img:null, color:'#a8edff', radius:70  },
+  { index:3,  roomId:'room_04', x:800,  y:450, type:'wander', img:null, color:'#b2ffda', radius:65  },
+  { index:4,  roomId:'room_05', x:700,  y:550, type:'wander', img:null, color:'#fff176', radius:50  },
+  { index:5,  roomId:'room_06', x:400,  y:400, type:'wander', img:null, color:'#90aaff', radius:60  },
+  { index:6,  roomId:'room_07', x:1000, y:500, type:'wander', img:null, color:'#d49aff', radius:75  },
+  { index:7,  roomId:'room_08', x:700,  y:600, type:'wander', img:null, color:'#ffd08a', radius:55  },
+  { index:8,  roomId:'room_09', x:550,  y:480, type:'wander', img:null, color:'#a8fff8', radius:65  },
+  { index:9,  roomId:'room_10', x:850,  y:550, type:'wander', img:null, color:'#e8ffaa', radius:70  },
+  { index:10, roomId:'room_11', x:650,  y:420, type:'wander', img:null, color:'#ff85a1', radius:60  },
+  { index:11, roomId:'room_12', x:750,  y:500, type:'wander', img:null, color:'#ff79d7', radius:55  },
+  { index:12, roomId:'room_13', x:600,  y:560, type:'wander', img:null, color:'#7fffd4', radius:65  },
+  { index:13, roomId:'room_14', x:900,  y:480, type:'wander', img:null, color:'#ffcc66', radius:70  },
+  // ── Stayers (fixed) ─── rooms 1–13 (some rooms repeat) ─────────────
+  { index:14, roomId:'room_01', x:300,  y:300, type:'stay', img:null, color:'#c8b8ff', radius:0 },
+  { index:15, roomId:'room_02', x:1100, y:300, type:'stay', img:null, color:'#88ffcc', radius:0 },
+  { index:16, roomId:'room_03', x:400,  y:700, type:'stay', img:null, color:'#ffb088', radius:0 },
+  { index:17, roomId:'room_04', x:1200, y:600, type:'stay', img:null, color:'#ff9eb5', radius:0 },
+  { index:18, roomId:'room_05', x:350,  y:500, type:'stay', img:null, color:'#66bbff', radius:0 },
+  { index:19, roomId:'room_06', x:900,  y:300, type:'stay', img:null, color:'#ffcc66', radius:0 },
+  { index:20, roomId:'room_07', x:500,  y:600, type:'stay', img:null, color:'#c8b8ff', radius:0 },
+  { index:21, roomId:'room_08', x:1100, y:400, type:'stay', img:null, color:'#7fffd4', radius:0 },
+  { index:22, roomId:'room_09', x:700,  y:700, type:'stay', img:null, color:'#ff9eb5', radius:0 },
+  { index:23, roomId:'room_10', x:400,  y:400, type:'stay', img:null, color:'#ffb088', radius:0 },
+  { index:24, roomId:'room_11', x:1000, y:600, type:'stay', img:null, color:'#88ffcc', radius:0 },
+  { index:25, roomId:'room_12', x:600,  y:300, type:'stay', img:null, color:'#66bbff', radius:0 },
+  { index:26, roomId:'room_15', x:800,  y:450, type:'stay', img:null, color:'#ffcc66', radius:0 },
+];
+
+/* ═══════════════════════════════════════════
+   BONUS TREE DEFINITIONS — 5 total
+   Placeholder coordinates — adjust x, y, roomId when you know them.
+   url: the game page to open when unlocked
+   unlockId: matches BoohaUnlockSystem.BONUS_GAMES
+═══════════════════════════════════════════ */
+const BONUS_TREES = [
+  {
+    id:       'booha_invaders',
+    roomId:   'room_11',   // TODO: set real room
+    x:        800,         // TODO: set real x
+    y:        300,         // TODO: set real y
+    r:        44,
+    url:      'booha_invaders.html',
+    label:    'INVADERS',
+    color:    '#44ff88',
+    lockMsg:  'This game is locked. Better play some games in the maze.',
+  },
+  {
+    id:       'booha_blocks',
+    roomId:   'room_13',   // TODO: set real room
+    x:        700,         // TODO: set real x
+    y:        300,         // TODO: set real y
+    r:        44,
+    url:      'booha_blocks.html',
+    label:    'BLOCKS',
+    color:    '#44aaff',
+    lockMsg:  'This game is locked. Better play some games in the maze.',
+  },
+  {
+    id:       'bonus_placeholder_1',
+    roomId:   'room_12',   // TODO: set real room
+    x:        500,         // TODO: set real x
+    y:        200,         // TODO: set real y
+    r:        44,
+    url:      'bonus_game_1.html',
+    label:    '???',
+    color:    '#cc88ff',
+    lockMsg:  'This game is locked. Better play some games in the maze.',
+  },
+  {
+    id:       'bonus_placeholder_2',
+    roomId:   'room_14',   // TODO: set real room
+    x:        900,         // TODO: set real x
+    y:        250,         // TODO: set real y
+    r:        44,
+    url:      'bonus_game_2.html',
+    label:    '???',
+    color:    '#ffcc44',
+    lockMsg:  'This game is locked. Better play some games in the maze.',
+  },
+  {
+    id:       'bonus_placeholder_3',
+    roomId:   'room_15',   // TODO: set real room
+    x:        600,         // TODO: set real x
+    y:        300,         // TODO: set real y
+    r:        44,
+    url:      'bonus_game_3.html',
+    label:    '???',
+    color:    '#ff9966',
+    lockMsg:  'This game is locked. Better play some games in the maze.',
+  },
+];
+
+/* ═══════════════════════════════════════════
+   WANDERER RUNTIME STATE
+   Add this to the existing `state` object or alongside it.
+   activeWanderers: array of runtime wanderer objects for current room.
+   wandererImages:  preloaded Image objects keyed by index.
+═══════════════════════════════════════════ */
+let activeWanderers  = [];
+const wandererImages = {};
+
+/* ── Preload wanderer PNG images (called once at boot) ── */
+function preloadWandererImages() {
+  WANDERER_DEFS.forEach(def => {
+    if (!def.img) return; // placeholder — skip until real path is set
+    const img = new Image();
+    img.src = def.img;
+    wandererImages[def.index] = img;
+  });
+}
+
+/* ── Build runtime objects for wanderers in the current room ── */
+function initWanderers() {
+  preloadWandererImages();
+  refreshWanderersForRoom();
+}
+
+function refreshWanderersForRoom() {
+  // Read which wanderers are unlocked this week
+  let unlockedIndices = [];
+  try {
+    const data = window.BoohaAdventure && BoohaAdventure.save
+      ? BoohaAdventure.save.load()
+      : null;
+    if (data && data.weekly && data.weekly.wanderers) {
+      unlockedIndices = data.weekly.wanderers;
+    }
+  } catch (_) {}
+
+  activeWanderers = WANDERER_DEFS
+    .filter(def => def.roomId === state.roomId && unlockedIndices.includes(def.index))
+    .map(def => ({
+      ...def,
+      // Runtime position — starts at home
+      rx: def.x,
+      ry: def.y,
+      // Wander state
+      targetX: def.x,
+      targetY: def.y,
+      nextTargetAt: 0,
+      // Wobble phase (stayers)
+      wobblePhase: Math.random() * Math.PI * 2,
+      // Scatter state (reaction to ghost)
+      scattering:   false,
+      scatterVx:    0,
+      scatterVy:    0,
+      // Loaded image (if any)
+      image: wandererImages[def.index] || null,
+    }));
+}
+
+/* ── Update wanderers each tick ── */
+const WANDER_SPEED       = 0.55;   // world-px per frame
+const WANDER_TARGET_WAIT = 3000;   // ms between picking a new wander target
+const WANDER_REACT_DIST  = 120;    // ghost proximity that triggers scatter
+const SCATTER_SPEED      = 2.8;
+const SCATTER_DECAY      = 0.88;   // scatter velocity decays each frame
+
+function updateWanderers(now) {
+  if (!activeWanderers.length) return;
+
+  activeWanderers.forEach(w => {
+    // ── Scatter reaction — ghost too close ────────────────────────────
+    const ghostDist = Math.hypot(state.x - w.rx, state.y - w.ry);
+    if (ghostDist < WANDER_REACT_DIST && state.moving) {
+      if (!w.scattering) {
+        // Scatter away from ghost
+        const angle  = Math.atan2(w.ry - state.y, w.rx - state.x);
+        w.scatterVx  = Math.cos(angle) * SCATTER_SPEED;
+        w.scatterVy  = Math.sin(angle) * SCATTER_SPEED;
+        w.scattering = true;
+      }
+    }
+
+    if (w.scattering) {
+      w.rx += w.scatterVx;
+      w.ry += w.scatterVy;
+      w.scatterVx *= SCATTER_DECAY;
+      w.scatterVy *= SCATTER_DECAY;
+      // Clamp to world
+      w.rx = Math.max(40, Math.min(WORLD_W - 40, w.rx));
+      w.ry = Math.max(40, Math.min(WORLD_H - 40, w.ry));
+      if (Math.abs(w.scatterVx) < 0.05 && Math.abs(w.scatterVy) < 0.05) {
+        w.scattering = false;
+      }
+      return;
+    }
+
+    // ── Wanderers: drift toward current target ────────────────────────
+    if (w.type === 'wander') {
+      // Pick a new target if needed
+      if (now > w.nextTargetAt || Math.hypot(w.rx - w.targetX, w.ry - w.targetY) < 4) {
+        const angle  = Math.random() * Math.PI * 2;
+        const dist   = (Math.random() * 0.7 + 0.3) * w.radius;
+        w.targetX    = w.x + Math.cos(angle) * dist;
+        w.targetY    = w.y + Math.sin(angle) * dist;
+        w.targetX    = Math.max(40, Math.min(WORLD_W - 40, w.targetX));
+        w.targetY    = Math.max(40, Math.min(WORLD_H - 40, w.targetY));
+        w.nextTargetAt = now + WANDER_TARGET_WAIT + Math.random() * 2000;
+      }
+      const dx   = w.targetX - w.rx;
+      const dy   = w.targetY - w.ry;
+      const dist = Math.hypot(dx, dy);
+      if (dist > 1) {
+        w.rx += (dx / dist) * WANDER_SPEED;
+        w.ry += (dy / dist) * WANDER_SPEED;
+      }
+    }
+    // Stayers: rx/ry stay at home (x, y) — only wobble drawn
+  });
+}
+
+/* ── Draw wanderers ── */
+const WANDERER_SIZE = 22; // placeholder orb radius
+
+function drawWanderers(now) {
+  if (!activeWanderers.length) return;
+  const sec = now / 1000;
+
+  activeWanderers.forEach(w => {
+    const drawX = w.rx;
+    const drawY = w.ry + (w.type === 'stay'
+      ? Math.sin(sec * 1.6 + w.wobblePhase) * 5   // gentle float
+      : Math.sin(sec * 2.1 + w.wobblePhase) * 3); // subtle bob while wandering
+
+    ctx.save();
+
+    // ── Glow halo ─────────────────────────────────────────────────────
+    const pulse = 0.5 + 0.5 * Math.sin(sec * 2.4 + w.wobblePhase);
+    const halo  = ctx.createRadialGradient(drawX, drawY, 0, drawX, drawY, WANDERER_SIZE * 2.2);
+    halo.addColorStop(0,   w.color + '55');
+    halo.addColorStop(0.5, w.color + '22');
+    halo.addColorStop(1,   'transparent');
+    ctx.globalAlpha = 0.35 + pulse * 0.25;
+    ctx.fillStyle   = halo;
+    ctx.beginPath();
+    ctx.arc(drawX, drawY, WANDERER_SIZE * 2.2, 0, Math.PI * 2);
+    ctx.fill();
+
+    // ── Draw PNG if loaded, else placeholder orb ──────────────────────
+    const img = w.image;
+    if (img && img.complete && img.naturalWidth > 0) {
+      ctx.globalAlpha = 0.92;
+      ctx.drawImage(img,
+        drawX - WANDERER_SIZE,
+        drawY - WANDERER_SIZE,
+        WANDERER_SIZE * 2,
+        WANDERER_SIZE * 2
+      );
+    } else {
+      // Placeholder: colored orb with inner glow
+      const innerGrad = ctx.createRadialGradient(
+        drawX - WANDERER_SIZE * 0.3, drawY - WANDERER_SIZE * 0.3, 0,
+        drawX, drawY, WANDERER_SIZE
+      );
+      innerGrad.addColorStop(0, '#ffffff');
+      innerGrad.addColorStop(0.4, w.color);
+      innerGrad.addColorStop(1, w.color + 'aa');
+
+      ctx.globalAlpha = 0.88 + pulse * 0.1;
+      ctx.shadowBlur  = 14;
+      ctx.shadowColor = w.color;
+      ctx.fillStyle   = innerGrad;
+      ctx.beginPath();
+      ctx.arc(drawX, drawY, WANDERER_SIZE, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      // Tiny type indicator (w = wander, s = stay) — remove when real PNGs arrive
+      ctx.globalAlpha = 0.7;
+      ctx.fillStyle   = '#000';
+      ctx.font        = 'bold 10px monospace';
+      ctx.textAlign   = 'center';
+      ctx.fillText(w.type === 'wander' ? 'w' : 's', drawX, drawY + 4);
+      ctx.textAlign   = 'left';
+    }
+
+    ctx.restore();
+  });
+}
+
+/* ── Refresh wanderers when transitioning to a new room ──
+   Call this at the end of transitionTo() after state.roomId is updated. ── */
+function onRoomChanged() {
+  refreshWanderersForRoom();
+}
+
+/* ═══════════════════════════════════════════
+   BONUS TREE SYSTEM
+   Draw glowing bonus tree orbs in the current room.
+   When clicked/walked into: show lock overlay or navigate.
+═══════════════════════════════════════════ */
+
+/* ── Lock overlay (reuses portal overlay style) ──
+   Add this HTML to buildApp() alongside the portal overlay.
+   The injectBonusLockOverlay() function below creates it dynamically. ── */
+let bonusLockOverlay = null;
+
+function injectBonusLockOverlay() {
+  if (bonusLockOverlay) return;
+  bonusLockOverlay = document.createElement('div');
+  bonusLockOverlay.id = 'bonus-lock-overlay';
+  bonusLockOverlay.style.cssText = `
+    display:none; position:fixed; inset:0; z-index:9100;
+    align-items:center; justify-content:center;
+    background:rgba(0,0,0,0); transition:background 0.3s ease;
+  `;
+  bonusLockOverlay.innerHTML = `
+    <div id="bonus-lock-box" style="
+      background:#080810; border:1px solid #3a1055; border-radius:6px;
+      padding:36px 40px 28px; max-width:min(400px,90vw); width:90vw;
+      text-align:center; font-family:'Georgia',serif;
+      box-shadow:0 0 0 1px rgba(160,40,220,.6),0 0 40px rgba(160,40,220,.5),
+                 0 0 90px rgba(120,0,180,.3);
+      animation:portalAppear 0.25s ease-out;
+    ">
+      <div id="bonus-lock-icon" style="font-size:2.5rem;margin-bottom:12px;">🔒</div>
+      <p id="bonus-lock-msg" style="
+        font-size:clamp(.9rem,3vw,1.05rem); color:#f0e8ff;
+        margin:0 0 24px; line-height:1.6; letter-spacing:.03em;
+      "></p>
+      <button id="bonus-lock-ok" style="
+        background:transparent; border:1.5px solid rgba(160,70,210,.9);
+        color:#e8d8ff; font-family:'Georgia',serif;
+        font-size:.9rem; letter-spacing:.12em;
+        padding:8px 30px; border-radius:3px; cursor:pointer;
+        transition:all .18s;
+      ">OK</button>
+    </div>`;
+  document.body.appendChild(bonusLockOverlay);
+  document.getElementById('bonus-lock-ok').addEventListener('click', closeBonusLock);
+  bonusLockOverlay.addEventListener('click', e => {
+    if (e.target === bonusLockOverlay) closeBonusLock();
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeBonusLock();
+  });
+}
+
+function openBonusLock(msg) {
+  document.getElementById('bonus-lock-msg').textContent = msg;
+  bonusLockOverlay.style.display  = 'flex';
+  bonusLockOverlay.style.background = 'rgba(0,0,0,0.82)';
+  state.clickTarget = null;
+}
+function closeBonusLock() {
+  bonusLockOverlay.style.background = 'rgba(0,0,0,0)';
+  setTimeout(() => { bonusLockOverlay.style.display = 'none'; }, 300);
+}
+function isBonusLockOpen() {
+  return bonusLockOverlay && bonusLockOverlay.style.display === 'flex';
+}
+
+/* ── Check if a bonus game is unlocked this week ── */
+function _bonusUnlocked(bonusId) {
+  try {
+    if (window.BoohaAdventure && BoohaAdventure.unlocks) {
+      return BoohaAdventure.unlocks.isBonusGameUnlocked(bonusId);
+    }
+  } catch (_) {}
+  return false;
+}
+
+/* ── Handle bonus tree click/walk-in ── */
+function handleBonusTreeInteraction(tree) {
+  if (_bonusUnlocked(tree.id)) {
+    // Navigate to the bonus game
+    window.location.href = tree.url;
+  } else {
+    openBonusLock(tree.lockMsg);
+  }
+}
+
+/* ── Check if ghost is near any bonus tree in current room ──
+   Call this inside tick() alongside portal/NPP checks. ── */
+function checkBonusTrees() {
+  const trees = BONUS_TREES.filter(t => t.roomId === state.roomId);
+  if (!trees.length || state.distMovedSinceSpawn < ARROW_MOVE_THRESHOLD) return;
+
+  for (const tree of trees) {
+    if (Math.hypot(state.x - tree.x, state.y - tree.y) <= tree.r) {
+      handleBonusTreeInteraction(tree);
+      state.clickTarget = null;
+      return;
+    }
+  }
+}
+
+/* ── Direct click on a bonus tree ──
+   Call this inside the stage click/touchend handlers. ── */
+function clickBonusTree(worldX, worldY) {
+  const trees = BONUS_TREES.filter(t => t.roomId === state.roomId);
+  for (const tree of trees) {
+    if (Math.hypot(worldX - tree.x, worldY - tree.y) <= tree.r) {
+      handleBonusTreeInteraction(tree);
+      return true;
+    }
+  }
+  return false;
+}
+
+/* ── Draw bonus tree orbs ── */
+function drawBonusTrees(now) {
+  const trees = BONUS_TREES.filter(t => t.roomId === state.roomId);
+  if (!trees.length) return;
+
+  const sec      = now / 1000;
+  const moveReveal = Math.min(1, state.distMovedSinceSpawn / ARROW_MOVE_THRESHOLD);
+
+  trees.forEach(tree => {
+    const unlocked = _bonusUnlocked(tree.id);
+    const pulse    = 0.5 + 0.5 * Math.sin(sec * 1.8);
+    const bounce   = Math.sin(sec * 1.8) * 5;
+
+    ctx.save();
+    ctx.globalAlpha = moveReveal;
+
+    if (unlocked) {
+      // ── Glowing unlocked orb ─────────────────────────────────────────
+      const glow = ctx.createRadialGradient(tree.x, tree.y + bounce, 0, tree.x, tree.y + bounce, 48);
+      glow.addColorStop(0,   tree.color + '88');
+      glow.addColorStop(0.5, tree.color + '33');
+      glow.addColorStop(1,   'transparent');
+      ctx.globalAlpha = moveReveal * (0.5 + pulse * 0.35);
+      ctx.fillStyle   = glow;
+      ctx.beginPath();
+      ctx.arc(tree.x, tree.y + bounce, 48, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.globalAlpha = moveReveal * (0.85 + pulse * 0.13);
+      ctx.shadowBlur  = 20 + pulse * 14;
+      ctx.shadowColor = tree.color;
+      ctx.fillStyle   = tree.color;
+      ctx.beginPath();
+      ctx.arc(tree.x, tree.y + bounce, 16, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      // Label
+      ctx.globalAlpha = moveReveal * (0.75 + pulse * 0.2);
+      ctx.fillStyle   = '#fff';
+      ctx.font        = 'bold 11px monospace';
+      ctx.textAlign   = 'center';
+      ctx.shadowBlur  = 8; ctx.shadowColor = tree.color;
+      ctx.fillText(tree.label, tree.x, tree.y + bounce - 26);
+      ctx.shadowBlur = 0;
+      ctx.textAlign  = 'left';
+
+    } else {
+      // ── Locked: dim grey orb with lock icon ──────────────────────────
+      ctx.globalAlpha = moveReveal * 0.35;
+      ctx.fillStyle   = '#666';
+      ctx.shadowBlur  = 8; ctx.shadowColor = '#888';
+      ctx.beginPath();
+      ctx.arc(tree.x, tree.y, 16, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      ctx.globalAlpha = moveReveal * 0.55;
+      ctx.fillStyle   = '#aaa';
+      ctx.font        = 'bold 13px monospace';
+      ctx.textAlign   = 'center';
+      ctx.fillText('🔒', tree.x, tree.y + 5);
+      ctx.textAlign   = 'left';
+    }
+
+    ctx.restore();
+  });
+}
+
+/* ═══════════════════════════════════════════
+   INTEGRATION CHECKLIST
+   These are the exact lines to add/change in karasuki.js:
+
+   1. In buildApp(), after portalOverlay is appended:
+      injectBonusLockOverlay();
+
+   2. In renderInitialRoom() or init(), after renderInitialRoom():
+      initWanderers();
+
+   3. In transitionTo(), right after state.roomId = exit.to:
+      onRoomChanged();  // refreshes wanderers for new room
+
+   4. In drawFrame(now), after drawMazeExitArrow(now):
+      drawBonusTrees(now);
+      drawWanderers(now);
+
+   5. In tick(), alongside the portal proximity check:
+      if (!state.transitioning && !isPortalOpen() && !state.mazeExiting && !isBonusLockOpen()) {
+        checkBonusTrees();
+      }
+
+   6. In the stage 'click' handler, after the isNearPortal check:
+      if (clickBonusTree(p.x, p.y)) {
+        ripples.push({ x: p.x, y: p.y, life: 1 });
+        return;
+      }
+
+   7. In the stage 'touchend' handler, same place:
+      if (clickBonusTree(p.x, p.y)) {
+        ripples.push({ x: p.x, y: p.y, life: 1 });
+        e.preventDefault(); return;
+      }
+
+   8. Also update the tick() guard to include isBonusLockOpen():
+      if (!state.transitioning && !isPortalOpen() && !state.mazeExiting && !isBonusLockOpen()) {
+        handleClickMovement(now);
+        // ... rest of tick logic
+      }
+═══════════════════════════════════════════ */
+
+
+  
   /* ═══════════════════════════════════════════
      STATE
   ═══════════════════════════════════════════ */
