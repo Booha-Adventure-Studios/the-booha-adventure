@@ -379,6 +379,7 @@ a.deck .inner {
   gap: 3px;
   background: var(--tile-bg);
   text-align: center;
+  container-type: inline-size; 
 }
 
 /* Gloss top shine */
@@ -416,7 +417,8 @@ a.deck:hover .inner::after { background-position: -60% 100%; }
 
 .label-en {
   font-family: var(--font-head);
-  font-size: clamp(17px, 2.1vw, 20px);
+  font-weight: 700;
+  font-size: clamp(12px, 12cqi, 22px);
   letter-spacing: .5px;
   color: var(--white);
   text-shadow: 0 1px 8px rgba(0,0,0,.7), 2px 2px 0 rgba(0,0,0,.22);
@@ -428,7 +430,7 @@ a.deck:hover .inner::after { background-position: -60% 100%; }
 .label-hira {
   font-family: var(--font-jp);
   font-weight: 400;
-  font-size: clamp(9px, 1.05vw, 11px);
+  font-size: clamp(9px, 4cqi, 12px);
   color: rgba(255,255,255,.68);
   letter-spacing: 2.5px;
   line-height: 1;
@@ -437,8 +439,8 @@ a.deck:hover .inner::after { background-position: -60% 100%; }
 /* Kanji — bolder, slightly larger */
 .label-kanji {
   font-family: var(--font-jp);
-  font-weight: 700;
-  font-size: clamp(11px, 1.45vw, 14px);
+  font-weight: 900;
+  font-size: clamp(13px, 6.5cqi, 17px);
   color: rgba(255,255,255,.9);
   letter-spacing: 1px;
   line-height: 1;
