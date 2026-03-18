@@ -262,6 +262,7 @@ a.deck .inner {
   text-align: center;
   line-height: 1.1;
   transition: filter .2s;
+  container-type: inline-size;
 }
 
 a.deck .inner::after {
@@ -279,7 +280,7 @@ a.deck:hover .inner::after { background-position: -60% 100%; }
 
 a.deck .label {
   display: block;
-  font-size: clamp(15px, 1.9vw, 18px);
+  font-size: clamp(12px, 12cqi, 22px);
   letter-spacing: .5px;
   text-transform: uppercase;
   color: var(--white);
@@ -288,7 +289,7 @@ a.deck .label {
 }
 a.deck .jp {
   display: block;
-  font-size: clamp(11px, 1.3vw, 13px);
+  font-size: clamp(10px, 4.5cqi, 13px);
   color: rgba(255,255,255,.72);
   letter-spacing: 1px;
   text-shadow: 0 1px 4px rgba(0,0,0,.6);
