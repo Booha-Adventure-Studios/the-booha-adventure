@@ -263,7 +263,7 @@ S.textContent = `
 .st-en-card{
   --card-hue:calc(var(--i,0) * 52deg);
   position:relative; overflow:hidden; border-radius:18px;
-  padding:10px 12px; min-height:100px;
+  padding:10px 12px; min-height:auto;
   background:
     linear-gradient(135deg,
       hsl(from var(--game-primary) h calc(s + 10%) l / 0.22),
@@ -298,11 +298,12 @@ S.textContent = `
 .st-card-inner{ position:relative; z-index:2; width:100%; }
 .st-en-text{
   font-family:var(--game-font-body); font-weight:700;
-  font-size:clamp(12px,2vw,16px);
-  color:var(--game-tile-text); line-height:1.4;
-  display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;
+  font-size:clamp(11px,1.8vw,16px);
+  color:var(--game-tile-text); line-height:1.45;
+  display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical; overflow:hidden;
   text-wrap:balance; text-shadow:0 1px 0 rgba(255,255,255,.5);
 }
+
 .st-en-card.selected{
   border-color:var(--game-primary);
   background:linear-gradient(135deg,color-mix(in srgb, var(--game-primary) 18%, transparent),color-mix(in srgb, var(--game-secondary) 12%, transparent));
@@ -366,7 +367,7 @@ S.textContent = `
    JAPANESE SENTENCE SLOTS
    ══════════════════════════════════════════════════════════════ */
 .st-jp-slot{
-  min-height:100px; border-radius:18px; padding:10px 12px;
+  min-height:auto; border-radius:18px; padding:10px 12px;
   background:linear-gradient(160deg,rgba(255,255,255,.055),rgba(255,255,255,.02));
   border:2px dashed rgba(255,255,255,.18);
   display:grid; grid-template-rows:1fr auto; align-content:center; gap:5px;
@@ -395,8 +396,10 @@ S.textContent = `
 [data-curriculum="pb"] .st-jp-hira-text{ color:#2a1020; }
 
 .st-jp-word-wrap{ display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:3px; min-height:44px; }
-.st-jp-kanji{ font-family:var(--game-font-jp); font-weight:900; font-size:clamp(13px,2.1vw,18px); color:var(--game-ink); line-height:1.4; display:block; text-wrap:balance; }
-.st-jp-hira-text{ font-family:var(--game-font-jp); font-size:clamp(12px,1.8vw,16px); font-weight:900; color:var(--game-ink); line-height:1.4; display:none; text-wrap:balance; }
+
+.st-jp-kanji{ font-family:var(--game-font-jp); font-weight:900; font-size:clamp(12px,2vw,17px); color:var(--game-ink); line-height:1.5; display:block; text-wrap:balance; }
+.st-jp-hira-text{ font-family:var(--game-font-jp); font-size:clamp(11px,1.7vw,15px); font-weight:900; color:var(--game-ink); line-height:1.5; display:none; text-wrap:balance; }
+
 body.hira-mode .st-jp-kanji{ display:none; }
 body.hira-mode .st-jp-hira-text{ display:block; }
 
@@ -629,11 +632,19 @@ body.hira-mode .st-hira-icon{ transform:rotate(180deg); }
 /* ── mobile safe ── */
 @media(max-width:480px){
   .st-wrap{ padding:0 .5rem 5rem; }
-  .st-check-btn{ padding:12px 32px; }
-  .st-hira-btn{ padding:9px 13px; }
+  .st-bottom-bar{ gap:8px; flex-wrap:nowrap; }
+  .st-check-btn{ padding:12px 20px; min-width:110px; }
+  .st-hira-btn{ padding:9px 10px; gap:5px; }
   .st-columns{ gap:8px; }
   .st-panel{ padding:9px 8px; }
 }
+
+/* Hide text label on very small phones — icon alone is enough */
+@media(max-width:360px){
+  #st-hira-label{ display:none; }
+  .st-hira-btn{ padding:9px 12px; }
+}
+
 `;
 document.head.appendChild(S);
 
@@ -641,14 +652,15 @@ document.head.appendChild(S);
    HTML
    ══════════════════════════════════════════════════════════════ */
 U.mount(`
+  <div class="st-wrap" id="st-main-wrap">
+
   <div class="st-header">
     <div class="st-curriculum">${curriculumLabel()}</div>
     <div class="st-date">${titleDateLabel()}</div>
   </div>
 
-  <div class="st-wrap" id="st-main-wrap">
-
   <div class="st-dots-row">
+  
     <div class="st-dot active" id="st-d0"></div>
     <div class="st-dot" id="st-d1"></div>
     <div class="st-dot" id="st-d2"></div>
@@ -1049,13 +1061,13 @@ function showResults() {
   const pct  = Math.round((score / 15) * 100);
 
   /* ── Save score to Booha Adventure save system ── */
- document.dispatchEvent(new CustomEvent('booha:gameEnd', {
-  detail: {
-    saveId:    `${CFG.curriculum}:sentence_speed`,
-    score:     pct,
-    completed: pct >= 40,
-  }
-}));
+document.dispatchEvent(new CustomEvent('booha:gameEnd', {
+    detail: {
+      saveId:    `${CFG.curriculum}:sentence_tap`,
+      score:     pct,
+      completed: pct >= 40,
+    }
+  }));
 
   /* ✅ Fixed: was 'vt-results' (vocab-tap leftover), now 'st-results' */
   const resEl = document.getElementById('st-results');
@@ -1102,9 +1114,12 @@ function showResults() {
     setTimeout(fireConfetti, 900);
   }
 
-  const snd = new Audio(CFG.sfxBase + tier.sound);
-  snd.setAttribute('playsinline', '');
-  snd.play().catch(() => {});
+ if (CFG.sfxBase && tier.sound) {
+    const snd = new Audio(CFG.sfxBase + tier.sound);
+    snd.setAttribute('playsinline', '');
+    snd.setAttribute('webkit-playsinline', '');
+    snd.play().catch(() => {});
+  }
 }
 
 /* ══════════════════════════════════════════════════════════════
