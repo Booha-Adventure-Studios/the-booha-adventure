@@ -2,14 +2,14 @@
 /**
  * save-file.js
  * The Booha Adventure — Save File (localStorage layer)
- * Handles all direct read/write to localStorage with versioning & migration.
+ * v2: adds weekly, meta, and collection sections.
  */
 
 const BoohaSaveFile = (() => {
   'use strict';
 
   const STORAGE_KEY  = 'booha_save';
-  const SAVE_VERSION = 1;
+  const SAVE_VERSION = 2;
 
   // ── Default save structure ────────────────────────────────────────────────
   function _defaultSave() {
@@ -19,21 +19,63 @@ const BoohaSaveFile = (() => {
       updatedAt:   Date.now(),
       playerName:  '',
 
-      scores:      {},   // { [gameId]: { highScore, stars, completed, attempts } }
-      unlocks:     {},   // { [itemId]: true }
-      stats:       {},   // arbitrary stat counters
-      collectibles:{},   // { [collectibleId]: { found, foundAt } }
-      pageState:   {},   // { [pageId]: { visited, spawnPoint, returnPos, ... } }
-      weekData:    {},   // { currentWeek, lastVisited }
+      // ── Permanent (never reset) ──────────────────────────────────────────
+      scores:      {},   // { [saveId]: { highScore, stars, completed, attempts, ... } }
+      unlocks:     {},   // { [itemId]: { unlockedAt } }  — achievements only
+      stats:       {},   // arbitrary permanent stat counters
+      collectibles:{},   // { [id]: { found, foundAt } }
+      pageState:   {},   // { [pageId]: { visited, spawnPoint, ... } }
+      weekData:    {},   // legacy — kept for migration safety
+
+      // ── Meta — permanent counters ────────────────────────────────────────
+      meta: {
+        lastWeeklyKey:  '',      // e.g. "2026-march-w3" — used to detect Monday reset
+        allTimeStars:   0,       // running total, only goes up
+      },
+
+      // ── Weekly — resets every Monday midnight Tokyo ──────────────────────
+      weekly: {
+        completedGames:    {},   // { [saveId]: true }
+        gameScores:        {},   // { [saveId]: highScore this week }
+        gameStars:         {},   // { [saveId]: stars this week }
+        unlockedBonusGames:{},   // { booha_invaders: true, booha_blocks: true, ... }
+        wanderers:         [],   // [ wandererId, ... ] unlocked this week (index = order)
+      },
+
+      // ── Collection — permanent discoveries ──────────────────────────────
+      collection: {
+        wanderers: [],           // permanent pool — stays across resets
+      },
     };
   }
 
-  // ── Migrate older saves to current version ────────────────────────────────
+  // ── Migrate v1 → v2 ──────────────────────────────────────────────────────
   function _migrate(save) {
-    // v0 → v1: ensure all top-level keys exist
     if (!save.version || save.version < 1) {
       save = Object.assign(_defaultSave(), save);
       save.version = 1;
+    }
+    if (save.version < 2) {
+      // Add new sections without touching existing data
+      if (!save.meta) {
+        save.meta = { lastWeeklyKey: '', allTimeStars: 0 };
+      }
+      if (!save.meta.lastWeeklyKey) save.meta.lastWeeklyKey = '';
+      if (typeof save.meta.allTimeStars !== 'number') save.meta.allTimeStars = 0;
+
+      if (!save.weekly) {
+        save.weekly = {
+          completedGames:     {},
+          gameScores:         {},
+          gameStars:          {},
+          unlockedBonusGames: {},
+          wanderers:          [],
+        };
+      }
+      if (!save.collection) {
+        save.collection = { wanderers: [] };
+      }
+      save.version = 2;
     }
     return save;
   }
@@ -74,27 +116,49 @@ const BoohaSaveFile = (() => {
   }
 
   // ── Partial update helper ─────────────────────────────────────────────────
-  /**
-   * Update a nested section of the save without loading the whole object.
-   * @param {string} section  Top-level key (e.g. 'scores', 'unlocks')
-   * @param {object} patch    Key-value pairs to merge into that section
-   */
-  function patch(section, patch) {
+  function patch(section, patchObj) {
     const data = load();
     if (typeof data[section] !== 'object') data[section] = {};
-    Object.assign(data[section], patch);
+    Object.assign(data[section], patchObj);
     return save(data);
   }
 
-  // ── Export raw JSON string ────────────────────────────────────────────────
+  // ── Deep patch for nested sections (e.g. weekly, meta) ───────────────────
+  function patchDeep(section, key, patchObj) {
+    const data = load();
+    if (typeof data[section] !== 'object') data[section] = {};
+    if (typeof data[section][key] !== 'object') data[section][key] = {};
+    Object.assign(data[section][key], patchObj);
+    return save(data);
+  }
+
+  // ── Weekly reset ──────────────────────────────────────────────────────────
+  /**
+   * Clears all weekly data. Called by adventure-core on week change.
+   * Does NOT touch scores, unlocks, meta.allTimeStars, or collection.
+   */
+  function resetWeekly() {
+    const data = load();
+    data.weekly = {
+      completedGames:     {},
+      gameScores:         {},
+      gameStars:          {},
+      unlockedBonusGames: {},
+      wanderers:          [],
+    };
+    const ok = save(data);
+    if (ok) {
+      document.dispatchEvent(new Event('booha:weeklyReset'));
+      console.log('[BoohaSaveFile] Weekly data reset.');
+    }
+    return ok;
+  }
+
+  // ── Export / Import ───────────────────────────────────────────────────────
   function exportJSON() {
     return JSON.stringify(load(), null, 2);
   }
 
-  /**
-   * Import a raw JSON string, validates version, merges into current save.
-   * Returns { ok, error }
-   */
   function importJSON(jsonString) {
     try {
       const incoming = JSON.parse(jsonString);
@@ -111,9 +175,11 @@ const BoohaSaveFile = (() => {
 
   // ── System interface ──────────────────────────────────────────────────────
   const api = {
-    load, save, clear, exists, patch, exportJSON, importJSON,
+    load, save, clear, exists,
+    patch, patchDeep,
+    resetWeekly,
+    exportJSON, importJSON,
     init() {
-      // Ensure a save record exists so all systems have a base to work from
       if (!exists()) save(_defaultSave());
     }
   };
