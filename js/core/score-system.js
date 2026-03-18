@@ -2,14 +2,12 @@
 /**
  * score-system.js
  * The Booha Adventure — Score System
- * Records high scores, star ratings, completion, and best time per game.
- * Fires unlock checks automatically after a score is submitted.
+ * v2: writes to weekly.* and updates meta.allTimeStars on every submit.
  */
 
 const BoohaScoreSystem = (() => {
   'use strict';
 
-  // ── Internal helpers ──────────────────────────────────────────────────────
   function _getScores() {
     return BoohaAdventure.save.load().scores || {};
   }
@@ -21,29 +19,20 @@ const BoohaScoreSystem = (() => {
       stars:        0,
       completed:    false,
       attempts:     0,
-      bestTime:     null,   // milliseconds — lower is better; null = never timed
-      lastTime:     null,   // time from the most recent run
+      bestTime:     null,
+      lastTime:     null,
       lastPlayedAt: null,
     };
   }
 
-  // ── Submit a score ────────────────────────────────────────────────────────
-  /**
-   * Record a new score for a game.
-   * Automatically recalculates stars from the registry.
-   * Fires 'booha:scoreSubmitted' and triggers unlock checks.
-   *
-   * @param {string} gameId
-   * @param {number} score        Raw score achieved this run
-   * @param {object} [opts]
-   *   opts.completed {boolean}   Mark the game as completed
-   *   opts.time      {number}    Completion time in milliseconds (lower = better)
-   * @returns {{ isHighScore, isBestTime, stars, wasCompleted }}
-   */
+  // ── Submit ────────────────────────────────────────────────────────────────
   function submit(gameId, score, opts = {}) {
-    const scores   = _getScores();
-    const entry    = scores[gameId] || _defaultEntry(gameId);
     const registry = BoohaAdventure.registry;
+
+    // ── 1. Update permanent scores ─────────────────────────────────────────
+    const scores      = _getScores();
+    const entry       = scores[gameId] || _defaultEntry(gameId);
+    const prevStars   = entry.stars;
 
     const isHighScore = score > entry.highScore;
     if (isHighScore) entry.highScore = score;
@@ -54,7 +43,6 @@ const BoohaScoreSystem = (() => {
     const wasCompleted = !entry.completed && opts.completed;
     if (opts.completed) entry.completed = true;
 
-    // Time tracking — only record if a time was passed
     let isBestTime = false;
     if (opts.time != null) {
       entry.lastTime = opts.time;
@@ -69,106 +57,197 @@ const BoohaScoreSystem = (() => {
 
     BoohaAdventure.save.patch('scores', { [gameId]: entry });
 
+    // ── 2. Update weekly data ──────────────────────────────────────────────
+    const data         = BoohaAdventure.save.load();
+    const weekly       = data.weekly || {};
+    const wScores      = weekly.gameScores      || {};
+    const wStars       = weekly.gameStars       || {};
+    const wCompleted   = weekly.completedGames  || {};
+    const wWanderers   = weekly.wanderers       || [];
+
+    // Weekly high score
+    if (!wScores[gameId] || score > wScores[gameId]) {
+      wScores[gameId] = score;
+    }
+
+    // Weekly stars (best this week)
+    const weeklyStars = registry ? registry.starsForScore(gameId, score) : 0;
+    if (!wStars[gameId] || weeklyStars > wStars[gameId]) {
+      wStars[gameId] = weeklyStars;
+    }
+
+    // Weekly completion
+    if (opts.completed) {
+      wCompleted[gameId] = true;
+    }
+
+    // ── 3. Unlock next wanderer ────────────────────────────────────────────
+    // One wanderer per game played this week (up to 27).
+    // Uses the total count of distinct games played this week as the index.
+    const distinctPlayed = Object.keys(wScores).length; // count after adding this game
+    const wandererIndex  = distinctPlayed - 1;           // 0-based
+    if (wandererIndex >= 0 && wandererIndex < 27 && !wWanderers.includes(wandererIndex)) {
+      wWanderers.push(wandererIndex);
+    }
+
+    data.weekly = {
+      ...weekly,
+      gameScores:     wScores,
+      gameStars:      wStars,
+      completedGames: wCompleted,
+      wanderers:      wWanderers,
+    };
+
+    // ── 4. Update meta.allTimeStars ────────────────────────────────────────
+    // Only add the improvement in stars (delta) to avoid double-counting.
+    const starDelta = entry.stars - prevStars;
+    if (starDelta > 0) {
+      if (!data.meta) data.meta = { lastWeeklyKey: '', allTimeStars: 0 };
+      if (typeof data.meta.allTimeStars !== 'number') data.meta.allTimeStars = 0;
+      data.meta.allTimeStars += starDelta;
+    }
+
+    BoohaAdventure.save.save(data);
+
+    // ── 5. Fire events ─────────────────────────────────────────────────────
     const detail = { gameId, score, isHighScore, isBestTime, stars: entry.stars, wasCompleted };
     document.dispatchEvent(new CustomEvent('booha:scoreSubmitted', { detail }));
 
-    // Trigger unlock checks
+    // Trigger unlock checks (achievements + bonus games)
     if (BoohaAdventure.unlocks) BoohaAdventure.unlocks.checkAll();
 
     return detail;
   }
 
-  // ── Read ──────────────────────────────────────────────────────────────────
+  // ── Permanent read helpers ────────────────────────────────────────────────
   function getEntry(gameId) {
-    const scores = _getScores();
-    return scores[gameId] || _defaultEntry(gameId);
+    return _getScores()[gameId] || _defaultEntry(gameId);
   }
+  function getHighScore(gameId)  { return getEntry(gameId).highScore; }
+  function getStars(gameId)      { return getEntry(gameId).stars; }
+  function isCompleted(gameId)   { return getEntry(gameId).completed; }
+  function getBestTime(gameId)   { return getEntry(gameId).bestTime; }
+  function getLastTime(gameId)   { return getEntry(gameId).lastTime; }
+  function getAll()              { return _getScores(); }
 
-  function getHighScore(gameId) {
-    return getEntry(gameId).highScore;
-  }
-
-  function getStars(gameId) {
-    return getEntry(gameId).stars;
-  }
-
-  function isCompleted(gameId) {
-    return getEntry(gameId).completed;
-  }
-
-  /** Best completion time in ms (null if never timed). */
-  function getBestTime(gameId) {
-    return getEntry(gameId).bestTime;
-  }
-
-  /** Last completion time in ms (null if never timed). */
-  function getLastTime(gameId) {
-    return getEntry(gameId).lastTime;
-  }
-
-  /**
-   * Format a time in ms as "mm:ss.xx" for display.
-   * e.g. 75430 → "1:15.43"
-   */
   function formatTime(ms) {
     if (ms == null) return '—';
     const totalSec = Math.floor(ms / 1000);
     const mins     = Math.floor(totalSec / 60);
     const secs     = totalSec % 60;
     const cents    = Math.floor((ms % 1000) / 10);
-    return `${mins}:${String(secs).padStart(2, '0')}.${String(cents).padStart(2, '0')}`;
+    return `${mins}:${String(secs).padStart(2,'0')}.${String(cents).padStart(2,'0')}`;
   }
 
-  function getAll() {
-    return _getScores();
-  }
-
-  /**
-   * Total stars across all games and all curriculums combined.
-   */
   function totalStars() {
-    const scores = _getScores();
-    return Object.values(scores).reduce((sum, e) => sum + (e.stars || 0), 0);
+    return Object.values(_getScores()).reduce((s, e) => s + (e.stars || 0), 0);
   }
-
-  /**
-   * Total stars for one curriculum only. e.g. totalStarsFor('bc')
-   */
   function totalStarsFor(curriculum) {
-    const scores = _getScores();
-    return Object.entries(scores)
+    return Object.entries(_getScores())
       .filter(([id]) => id.startsWith(`${curriculum}:`))
-      .reduce((sum, [, e]) => sum + (e.stars || 0), 0);
+      .reduce((s, [,e]) => s + (e.stars || 0), 0);
   }
-
-  /**
-   * Number of completed games across all curriculums.
-   */
   function totalCompleted() {
-    const scores = _getScores();
-    return Object.values(scores).filter(e => e.completed).length;
+    return Object.values(_getScores()).filter(e => e.completed).length;
   }
-
-  /**
-   * Number of completed games for one curriculum only. e.g. totalCompletedFor('br')
-   */
   function totalCompletedFor(curriculum) {
-    const scores = _getScores();
-    return Object.entries(scores)
+    return Object.entries(_getScores())
       .filter(([id]) => id.startsWith(`${curriculum}:`))
-      .filter(([, e]) => e.completed)
-      .length;
+      .filter(([,e]) => e.completed).length;
   }
 
+  // ── Weekly read helpers ───────────────────────────────────────────────────
+  function _getWeekly() {
+    const data = BoohaAdventure.save.load();
+    return data.weekly || {};
+  }
+
+  function weeklyStars() {
+    const wStars = _getWeekly().gameStars || {};
+    return Object.values(wStars).reduce((s, n) => s + (n || 0), 0);
+  }
+
+  function weeklyStarsFor(curriculum) {
+    const wStars = _getWeekly().gameStars || {};
+    return Object.entries(wStars)
+      .filter(([id]) => id.startsWith(`${curriculum}:`))
+      .reduce((s, [,n]) => s + (n || 0), 0);
+  }
+
+  function weeklyCompleted() {
+    return Object.keys(_getWeekly().completedGames || {}).length;
+  }
+
+  function weeklyCompletedFor(curriculum) {
+    return Object.keys(_getWeekly().completedGames || {})
+      .filter(id => id.startsWith(`${curriculum}:`)).length;
+  }
+
+  function weeklyStarsForGame(saveId) {
+    return (_getWeekly().gameStars || {})[saveId] || 0;
+  }
+
+  function weeklyScoreForGame(saveId) {
+    return (_getWeekly().gameScores || {})[saveId] || 0;
+  }
+
+  function isCompletedWeekly(saveId) {
+    return !!(_getWeekly().completedGames || {})[saveId];
+  }
+
+  function allTimeStars() {
+    const data = BoohaAdventure.save.load();
+    return (data.meta && data.meta.allTimeStars) || 0;
+  }
+
+  // ── Summary helpers ───────────────────────────────────────────────────────
   /**
-   * Full summary for one curriculum — useful for games-index.html displays.
-   * Returns { completed, totalGames, stars, totalStars, entries }
+   * Weekly summary for one curriculum — used by profile page.
    */
+  function weeklySummaryFor(curriculum) {
+    const registry  = BoohaAdventure.registry;
+    const games     = registry ? registry.getForCurriculum(curriculum) : [];
+    const wStars    = _getWeekly().gameStars    || {};
+    const wScores   = _getWeekly().gameScores   || {};
+    const wDone     = _getWeekly().completedGames || {};
+
+    const entries = games.map(g => ({
+      ...g,
+      stars:      wStars[g.saveId]  || 0,
+      highScore:  wScores[g.saveId] || 0,
+      completed:  !!wDone[g.saveId],
+    }));
+
+    return {
+      curriculum,
+      completed:  entries.filter(e => e.completed).length,
+      totalGames: entries.length,
+      stars:      entries.reduce((s, e) => s + e.stars, 0),
+      totalStars: entries.length * 3,
+      entries,
+    };
+  }
+
+  function weeklySummaryAll() {
+    const curriculums = BoohaAdventure.registry
+      ? BoohaAdventure.registry.CURRICULUMS
+      : ['bc', 'br', 'pb'];
+    const perCurriculum = curriculums.map(weeklySummaryFor);
+    return {
+      perCurriculum,
+      completed:  weeklyCompleted(),
+      totalGames: perCurriculum.reduce((s, c) => s + c.totalGames, 0),
+      stars:      weeklyStars(),
+      totalStars: perCurriculum.reduce((s, c) => s + c.totalStars, 0),
+    };
+  }
+
+  // Permanent summary (kept for compatibility)
   function summaryFor(curriculum) {
-    const scores   = _getScores();
+    const scores  = _getScores();
     const registry = BoohaAdventure.registry;
-    const games    = registry ? registry.getForCurriculum(curriculum) : [];
-    const entries  = games.map(g => ({
+    const games   = registry ? registry.getForCurriculum(curriculum) : [];
+    const entries = games.map(g => ({
       ...g,
       ...(scores[g.saveId] || _defaultEntry(g.saveId)),
     }));
@@ -176,15 +255,12 @@ const BoohaScoreSystem = (() => {
       curriculum,
       completed:  entries.filter(e => e.completed).length,
       totalGames: entries.length,
-      stars:      entries.reduce((sum, e) => sum + (e.stars || 0), 0),
+      stars:      entries.reduce((s, e) => s + (e.stars || 0), 0),
       totalStars: entries.length * 3,
       entries,
     };
   }
 
-  /**
-   * Combined summary across all three curriculums.
-   */
   function summaryAll() {
     const curriculums = BoohaAdventure.registry
       ? BoohaAdventure.registry.CURRICULUMS
@@ -202,21 +278,15 @@ const BoohaScoreSystem = (() => {
   // ── System interface ──────────────────────────────────────────────────────
   const api = {
     submit,
-    getEntry,
-    getHighScore,
-    getStars,
-    isCompleted,
-    getBestTime,
-    getLastTime,
-    formatTime,
-    getAll,
-    totalStars,
-    totalStarsFor,
-    totalCompleted,
-    totalCompletedFor,
-    summaryFor,
-    summaryAll,
-    init() { /* reads from save, no setup needed */ }
+    getEntry, getHighScore, getStars, isCompleted,
+    getBestTime, getLastTime, formatTime, getAll,
+    totalStars, totalStarsFor, totalCompleted, totalCompletedFor,
+    weeklyStars, weeklyStarsFor, weeklyCompleted, weeklyCompletedFor,
+    weeklyStarsForGame, weeklyScoreForGame, isCompletedWeekly,
+    allTimeStars,
+    weeklySummaryFor, weeklySummaryAll,
+    summaryFor, summaryAll,
+    init() {}
   };
 
   BoohaAdventure.registerSystem('scoreSystem', api);
