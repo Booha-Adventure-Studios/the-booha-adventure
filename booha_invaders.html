@@ -443,8 +443,76 @@ const WAVE_SCALE={
 };
 const WS={
   wave:1,groupIdx:0,targetCount:0,spawned:0,killed:0,spawnTimer:0,
-  phase:"intro",phaseT:0
+  phase:"intro",phaseT:0,
+  // ── SKILL MULTIPLIER ──
+  skillMult:1.0,   // 0.7 (struggling) → 1.0 (normal) → 2.0 (dominating)
+  groupStartT:0,   // stageTime snapshot when this group began
+  skillDisplay:1.0,// smoothed value for HUD
+  skillHeat:0,     // 0..1 visual heat level
 };
+
+// ── PAR TIME: expected seconds to clear N enemies at this wave ──
+// Faster clears push skillMult up; slower clears ease it back down.
+function parTimeSecs(count,wave){
+  // base: ~1.5s per enemy early game, tightens as waves increase
+  const perEnemy=clamp(1.5-wave*0.04,0.5,1.5);
+  return count*perEnemy;
+}
+
+// ── Called when a group finishes — update skillMult ──
+function evaluateGroupSkill(count){
+  if(count<=0) return;
+  const elapsed=stageTime-WS.groupStartT;
+  const par=parTimeSecs(count,WS.wave);
+  const ratio=elapsed/Math.max(0.1,par); // <1 = fast, >1 = slow
+
+  // ratio 0.0 (instant) → mult rises fast
+  // ratio 1.0 (par)     → neutral
+  // ratio 2.0+ (slow)   → mult falls
+  let delta;
+  if(ratio<1.0){
+    // cleared fast: +0.0 to +0.30 based on how much faster
+    delta=clamp((1-ratio)*0.30,0,0.30);
+  }else{
+    // cleared slow: -0.0 to -0.20
+    delta=-clamp((ratio-1)*0.20,0,0.20);
+  }
+
+  // combo streak bonus: high combo at clear time = extra push
+  if(combo>=15) delta+=0.08;
+  else if(combo>=7) delta+=0.04;
+
+  WS.skillMult=clamp(WS.skillMult+delta,0.70,2.0);
+  WS.skillHeat=clamp((WS.skillMult-1.0),0,1.0); // 0..1 for HUD color
+}
+
+// ── Skill-adjusted difficulty getters ──
+// All three respect both wave progression AND live skillMult
+function waveSpawnInterval(w){
+  const base=clamp(WAVE_SCALE.spawnIntervalBase-WAVE_SCALE.spawnIntervalDropPerWave*(w-1),WAVE_SCALE.spawnIntervalMin,99);
+  // skillMult 2.0 = spawns arrive 40% faster
+  return clamp(base/Math.sqrt(WS.skillMult),WAVE_SCALE.spawnIntervalMin,99);
+}
+function waveDriftSpeed(w){
+  const base=clamp(WAVE_SCALE.driftBase+WAVE_SCALE.driftGainPerWave*(w-1),0,WAVE_SCALE.driftMax);
+  // skillMult 2.0 = drift up to 60% wider
+  return clamp(base*WS.skillMult*0.7,0,WAVE_SCALE.driftMax*1.6);
+}
+function waveFireCooldown(w){
+  const base=clamp(WAVE_SCALE.fireCooldownBase-WAVE_SCALE.fireCooldownDropPerWave*(w-1),WAVE_SCALE.fireCooldownMin,99);
+  // skillMult 2.0 = fires up to 50% more often
+  return clamp(base/WS.skillMult,WAVE_SCALE.fireCooldownMin*0.7,99);
+}
+// Bonus HP on enemies when player is dominating
+function skillBonusHp(){
+  if(WS.skillMult<1.3) return 0;
+  if(WS.skillMult<1.6) return 1;
+  if(WS.skillMult<1.9) return 2;
+  return 3;
+}
+
+function isBossWave(w){return w%BOSS_EVERY===0;}
+function bossIndexForWave(w){return Math.floor((w-1)/BOSS_EVERY)+1;}
 
 function tierForWave(n){
   for(const t of WAVE_TIERS) if(n>=t.from&&n<=t.to) return t;
@@ -461,31 +529,26 @@ function groupCountForWave(wave,gi){
   const addMax=wave<=4?0:wave<=10?4:wave<=20?8:wave<=30?12:16;
   return base+Math.round(tp*addMax);
 }
-function waveSpawnInterval(w){return clamp(WAVE_SCALE.spawnIntervalBase-WAVE_SCALE.spawnIntervalDropPerWave*(w-1),WAVE_SCALE.spawnIntervalMin,99);}
-function waveDriftSpeed(w){return clamp(WAVE_SCALE.driftBase+WAVE_SCALE.driftGainPerWave*(w-1),0,WAVE_SCALE.driftMax);}
-function waveFireCooldown(w){return clamp(WAVE_SCALE.fireCooldownBase-WAVE_SCALE.fireCooldownDropPerWave*(w-1),WAVE_SCALE.fireCooldownMin,99);}
-
-function isBossWave(w){return w%BOSS_EVERY===0;}
-function bossIndexForWave(w){return Math.floor((w-1)/BOSS_EVERY)+1;}
 
 function startWave(n){
   WS.wave=n;
   WS.groupIdx=0;WS.phaseT=0;WS.phase="intro";
-
-  // BG hue shift per wave
+  // partial reset: keep skillMult but decay it slightly between waves
+  WS.skillMult=clamp(WS.skillMult*0.88+0.12,0.70,2.0);
   bgHue=(220+n*8)%360;
-
-  // unlock friends
   updateFriendUnlocks(n);
-
   beginGroup();
 }
 function beginGroup(){
   WS.spawned=0;WS.killed=0;
   WS.targetCount=groupCountForWave(WS.wave,WS.groupIdx);
   WS.spawnTimer=0;
+  WS.groupStartT=stageTime; // snapshot for par-time evaluation
 }
 function advanceGroupOrBoss(){
+  // evaluate skill BEFORE incrementing group
+  evaluateGroupSkill(WS.targetCount);
+
   WS.groupIdx++;
   if(WS.groupIdx>=4){
     if(!bossAlive){
@@ -503,6 +566,10 @@ function updateWaveSystem(dt){
   dt=Number.isFinite(dt)&&dt>0?Math.min(dt,0.05):1/60;
   if(!WS||WS.wave<1)WS.wave=1;
   WS.phaseT+=dt;
+
+  // smooth skillDisplay toward real value for HUD
+  WS.skillDisplay+=(WS.skillMult-WS.skillDisplay)*Math.min(1,dt*3);
+  WS.skillHeat=clamp((WS.skillMult-1.0),0,1.0);
 
   if(WS.phase==="boss"){
     const boss=bugs.find(b=>b.alive&&b.isBoss);
@@ -696,7 +763,8 @@ function spawnBug(){
   if(tp>0.45) hp=3;
   if(tp>0.7) hp=4;
   if(WS.groupIdx>=2) hp+=1;
-  hp=clamp(hp,1,5);
+  hp+=skillBonusHp();   // skill-driven bonus HP
+  hp=clamp(hp,1,7);
 
   // Color tinting by wave/group
   const tintHue=(bgHue+WS.groupIdx*30)%360;
@@ -1449,6 +1517,53 @@ function drawBoostIndicator(){
   }
 }
 
+function drawSkillHeat(){
+  if(!started) return;
+  const sm=WS.skillDisplay;
+  if(sm<1.05) return; // only show when above baseline
+
+  const heat=WS.skillHeat; // 0..1
+  const t=performance.now()/1000;
+
+  // position: right of energy bar
+  const x=16, barW=130;
+  const bx=x+barW+10;
+  const by=SAFE.top+HUD_PAD;
+
+  // label
+  const label=sm>=1.9?"★ CHAOS":sm>=1.6?"HOT!!":sm>=1.3?"HEATED":"WARM";
+  const sz=clamp(W()*0.028,11,18);
+
+  // pulsing glow intensity scales with heat
+  const pulse=0.5+0.5*Math.sin(t*(4+heat*6));
+  const r=Math.round(255);
+  const g=Math.round((1-heat)*180);
+  const col=`rgba(${r},${g},40,0.95)`;
+  const glow=`rgba(${r},${g},40,0.6)`;
+
+  ctx.save();
+  ctx.font=`900 ${sz}px system-ui,sans-serif`;
+  ctx.textBaseline="top";
+  ctx.shadowBlur=clamp(pulse*heat*28,0,32);
+  ctx.shadowColor=glow;
+  ctx.fillStyle=col;
+  ctx.globalAlpha=0.72+pulse*0.28;
+  ctx.fillText(`⚡ ${label}`,bx,by-1);
+
+  // small bar showing skillMult 1.0→2.0
+  const barW2=clamp(W()*0.10,50,90);
+  const barH=5;
+  const barY=by+sz+4;
+  ctx.globalAlpha=0.5;
+  ctx.fillStyle="rgba(0,0,0,0.5)";
+  ctx.fillRect(bx,barY,barW2,barH);
+  ctx.globalAlpha=0.85+pulse*0.15;
+  ctx.fillStyle=col;
+  ctx.shadowBlur=heat*14;
+  ctx.fillRect(bx,barY,barW2*heat,barH);
+  ctx.restore();
+}
+
 function drawPauseButton(){
   PAUSE_BTN.w=36;PAUSE_BTN.h=36;
   PAUSE_BTN.x=W()-SAFE.right-HUD_PAD-PAUSE_BTN.w;
@@ -1708,6 +1823,7 @@ function draw(){
   // HUD (no shake)
   drawEnergyBar();
   drawBoostIndicator();
+  drawSkillHeat();
   drawPauseButton();
   drawComboHUD();
   drawWaveBanner();
@@ -1884,6 +2000,7 @@ function resetGame(){
   combo=0;comboTimer=0;comboDisplay=0;comboPop=0;
   stageTime=0;candyTimer=8;
   bossAlive=false;
+  WS.skillMult=1.0;WS.skillDisplay=1.0;WS.skillHeat=0;WS.groupStartT=0;
   booFireTimer=0;booAutoCD=0;booPinkCD=0;booWeaponLevel=1;
   shakeDecay=0;shakeX=0;shakeY=0;
 }
