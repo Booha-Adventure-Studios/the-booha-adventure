@@ -169,7 +169,7 @@ const WANDERER_DEFS = [
   { index:23, roomId:'room_10', x:400,  y:400, type:'stay', frames:null,                                color:'#ffb088', radius:0, size:40 },
   { index:24, roomId:'room_11', x:1000, y:600, type:'stay', frames:null,                                color:'#88ffcc', radius:0, size:40 },
   { index:25, roomId:'room_12', x:600,  y:300, type:'stay', frames:null,                                color:'#66bbff', radius:0, size:40 },
-  { index:26, roomId:'room_15', x:1064, y:434, type:'stay', frames:['ji-1.png'],                        color:'#ffcc66', radius:0, size:52 },
+  { index:26, roomId:'room_15', x:1064, y:434, type:'stay', frames:['ji-1.png'],                        color:'#ffcc66', radius:0, size:65 },
 ];
 const WANDERER_IMG_BASE = 'https://booha-adventure-studios.github.io/the-booha-adventure/assets/img/wanderers/';
 const FRAME_MS          = 420; // milliseconds per animation frame
@@ -239,35 +239,31 @@ function onRoomChanged() {
 
 function updateWanderers(now) {
   if (!activeWanderers.length) return;
+
   activeWanderers.forEach(w => {
-    const ghostDist = Math.hypot(state.x - w.rx, state.y - w.ry);
-    if (ghostDist < WANDER_REACT_DIST && state.moving) {
-      if (!w.scattering) {
-        const angle = Math.atan2(w.ry - state.y, w.rx - state.x);
-        w.scatterVx = Math.cos(angle) * SCATTER_SPEED;
-        w.scatterVy = Math.sin(angle) * SCATTER_SPEED;
-        w.scattering = true;
+    const bubbleR = w.bubbleR || (w.size || WANDERER_SIZE) * 1.8;
+    const dx      = state.x - w.rx;
+    const dy      = state.y - w.ry;
+    const dist    = Math.hypot(dx, dy);
+
+    if (dist < bubbleR) {
+      // ghost is inside the bubble — push ghost back to the bubble edge
+      const angle  = Math.atan2(dy, dx);
+      state.x      = w.rx + Math.cos(angle) * bubbleR;
+      state.y      = w.ry + Math.sin(angle) * bubbleR;
+      state.clickTarget = null;
+
+      // fire sparkles at the contact point if not already sparkling
+      if (!w.sparkling) {
+        w.sparkling    = true;
+        w.sparkleAt    = now;
+        w.sparkleAngle = angle; // direction ghost came from
       }
-    }
-    if (w.scattering) {
-      w.rx += w.scatterVx; w.ry += w.scatterVy;
-      w.scatterVx *= SCATTER_DECAY; w.scatterVy *= SCATTER_DECAY;
-      w.rx = Math.max(40, Math.min(WORLD_W - 40, w.rx));
-      w.ry = Math.max(40, Math.min(WORLD_H - 40, w.ry));
-      if (Math.abs(w.scatterVx) < 0.05 && Math.abs(w.scatterVy) < 0.05) w.scattering = false;
-      return;
-    }
-    if (w.type === 'wander') {
-      if (now > w.nextTargetAt || Math.hypot(w.rx - w.targetX, w.ry - w.targetY) < 4) {
-        const angle = Math.random() * Math.PI * 2;
-        const dist  = (Math.random() * 0.7 + 0.3) * w.radius;
-        w.targetX = Math.max(40, Math.min(WORLD_W - 40, w.x + Math.cos(angle) * dist));
-        w.targetY = Math.max(40, Math.min(WORLD_H - 40, w.y + Math.sin(angle) * dist));
-        w.nextTargetAt = now + WANDER_TARGET_WAIT + Math.random() * 2000;
+    } else {
+      // ghost has cleared the bubble
+      if (w.sparkling && now - w.sparkleAt > 600) {
+        w.sparkling = false;
       }
-      const dx = w.targetX - w.rx, dy = w.targetY - w.ry;
-      const dist = Math.hypot(dx, dy);
-      if (dist > 1) { w.rx += (dx / dist) * WANDER_SPEED; w.ry += (dy / dist) * WANDER_SPEED; }
     }
   });
 }
@@ -277,13 +273,12 @@ function drawWanderers(now) {
   const sec = now / 1000;
 
   activeWanderers.forEach(w => {
-    const sz     = w.size || WANDERER_SIZE; // per-character size
-    const bob    = w.type === 'stay'
-      ? Math.sin(sec * 1.6 + w.wobblePhase) * 5
-      : Math.sin(sec * 2.1 + w.wobblePhase) * 3;
-    const drawX  = w.rx;
-    const drawY  = w.ry + bob;
-    const pulse  = 0.5 + 0.5 * Math.sin(sec * 2.4 + w.wobblePhase);
+    const sz      = w.size   || WANDERER_SIZE;
+    const bubbleR = w.bubbleR || sz * 1.8;
+    const bob     = Math.sin(sec * 1.6 + w.wobblePhase) * 5;
+    const drawX   = w.rx;
+    const drawY   = w.ry + bob;
+    const pulse   = 0.5 + 0.5 * Math.sin(sec * 2.4 + w.wobblePhase);
 
     // pick current animation frame
     let currentImg = null;
@@ -297,7 +292,51 @@ function drawWanderers(now) {
 
     ctx.save();
 
-    // ── shapeless ambient glow — no circle, just light bleeding outward ──
+    // ── bubble shimmer when ghost is nearby ──
+    const ghostDist = Math.hypot(state.x - w.rx, state.y - w.ry);
+    const bubbleTouched = ghostDist < bubbleR + 10;
+
+    if (bubbleTouched) {
+      // soft shimmer ring around bubble edge
+      const shimmerAlpha = 0.12 + 0.10 * Math.sin(sec * 8 + w.wobblePhase);
+      const shimmer = ctx.createRadialGradient(w.rx, w.ry, bubbleR - 6, w.rx, w.ry, bubbleR + 6);
+      shimmer.addColorStop(0,   'transparent');
+      shimmer.addColorStop(0.5, w.color + Math.round(shimmerAlpha * 255).toString(16).padStart(2,'0'));
+      shimmer.addColorStop(1,   'transparent');
+      ctx.globalAlpha = 1;
+      ctx.fillStyle   = shimmer;
+      ctx.beginPath();
+      ctx.arc(w.rx, w.ry, bubbleR + 6, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // ── sparkles at contact point ──
+    if (w.sparkling) {
+      const age      = (now - w.sparkleAt) / 600; // 0→1 over 600ms
+      const fadeOut  = 1 - age;
+      const contactX = w.rx + Math.cos(w.sparkleAngle) * bubbleR;
+      const contactY = w.ry + Math.sin(w.sparkleAngle) * bubbleR;
+
+      for (let i = 0; i < 8; i++) {
+        const sparkAngle = w.sparkleAngle + (i / 8) * Math.PI * 2;
+        // sparkles fly outward from contact point over time
+        const travel = age * 22;
+        const sx     = contactX + Math.cos(sparkAngle) * travel;
+        const sy     = contactY + Math.sin(sparkAngle) * travel;
+        const twinkle = Math.abs(Math.sin(sec * 14 + i * 0.9));
+
+        ctx.globalAlpha = fadeOut * twinkle * 0.85;
+        ctx.fillStyle   = w.color;
+        ctx.shadowBlur  = 8;
+        ctx.shadowColor = w.color;
+        ctx.beginPath();
+        ctx.arc(sx, sy, 2 + twinkle * 2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur  = 0;
+      }
+    }
+
+    // ── shapeless ambient glow ──
     const glowR = sz * 2.2;
     const halo  = ctx.createRadialGradient(drawX, drawY, sz * 0.3, drawX, drawY, glowR);
     halo.addColorStop(0,   w.color + '66');
@@ -306,7 +345,6 @@ function drawWanderers(now) {
     halo.addColorStop(1,   'transparent');
     ctx.globalAlpha = 0.5 + pulse * 0.3;
     ctx.fillStyle   = halo;
-    // draw as a soft square-ish blob — no arc, just a filled rect the glow bleeds from
     ctx.fillRect(drawX - glowR, drawY - glowR, glowR * 2, glowR * 2);
 
     // ── sprite or fallback orb ──
@@ -317,7 +355,6 @@ function drawWanderers(now) {
       ctx.drawImage(currentImg, drawX - sz, drawY - sz, sz * 2, sz * 2);
       ctx.shadowBlur  = 0;
     } else {
-      // fallback orb for wanderers without sprites yet
       const ig = ctx.createRadialGradient(
         drawX - sz * 0.3, drawY - sz * 0.3, 0,
         drawX, drawY, sz);
