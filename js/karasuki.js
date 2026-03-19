@@ -174,7 +174,7 @@ const WANDERER_DEFS = [
   { index:26, roomId:'room_15', x:1064, y:434, type:'stay',   frames:['ji-1.png'],          color:'#ffcc66', radius:0 },
 ];
 
-const WANDERER_IMG_BASE = 'the-booha-adventure/assets/img/wanderers/';
+const WANDERER_IMG_BASE = '/assets/img/wanderers/';
 const FRAME_MS          = 420; // milliseconds per animation frame
 
 /* ═══════════════════════════════════════════
