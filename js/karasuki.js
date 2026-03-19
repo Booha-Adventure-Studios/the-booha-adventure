@@ -143,11 +143,11 @@
    WANDERER DEFINITIONS
 ═══════════════════════════════════════════ */
 const WANDERER_DEFS = [
-  { index:0,  roomId:'room_01', x:982,  y:407, type:'stay', frames:['ichi-1.png','ichi-2.png'],        color:'#ff79d7', radius:0, size:52 },
+  { index:0,  roomId:'room_01', x:982,  y:407, type:'stay', frames:['ichi-1.png','ichi-2.png'],         color:'#ff79d7', radius:0, size:52 },
   { index:1,  roomId:'room_02', x:900,  y:500, type:'stay', frames:null,                                color:'#ffaa5e', radius:0, size:40 },
   { index:2,  roomId:'room_03', x:500,  y:600, type:'stay', frames:null,                                color:'#a8edff', radius:0, size:40 },
   { index:3,  roomId:'room_04', x:800,  y:450, type:'stay', frames:null,                                color:'#b2ffda', radius:0, size:40 },
-  { index:4,  roomId:'room_05', x:1054, y:354, type:'stay', frames:['jamariko-1.png','jamariko-2.png'], color:'#fff176', radius:0, size:52 },
+  { index:4,  roomId:'room_05', x:1054, y:354, type:'stay', frames:['jamariko-2.png'],                  color:'#fff176', radius:0, size:52 },
   { index:5,  roomId:'room_06', x:400,  y:400, type:'stay', frames:null,                                color:'#90aaff', radius:0, size:40 },
   { index:6,  roomId:'room_07', x:1000, y:500, type:'stay', frames:null,                                color:'#d49aff', radius:0, size:40 },
   { index:7,  roomId:'room_08', x:700,  y:600, type:'stay', frames:null,                                color:'#ffd08a', radius:0, size:40 },
@@ -155,7 +155,7 @@ const WANDERER_DEFS = [
   { index:9,  roomId:'room_10', x:1233, y:452, type:'stay', frames:['ni-1.png','ni-2.png'],             color:'#e8ffaa', radius:0, size:52 },
   { index:10, roomId:'room_11', x:650,  y:420, type:'stay', frames:null,                                color:'#ff85a1', radius:0, size:40 },
   { index:11, roomId:'room_12', x:750,  y:500, type:'stay', frames:null,                                color:'#ff79d7', radius:0, size:40 },
-  { index:12, roomId:'room_13', x:407,  y:387, type:'stay', frames:['takachika-1.png'],                 color:'#7fffd4', radius:0, size:65 },
+  { index:12, roomId:'room_13', x:407,  y:387, type:'stay', frames:['takachika-1.png'],                 color:'#7fffd4', radius:0, size:75 },
   { index:13, roomId:'room_14', x:900,  y:480, type:'stay', frames:null,                                color:'#ffcc66', radius:0, size:40 },
   { index:14, roomId:'room_01', x:300,  y:300, type:'stay', frames:null,                                color:'#c8b8ff', radius:0, size:40 },
   { index:15, roomId:'room_02', x:1100, y:300, type:'stay', frames:null,                                color:'#88ffcc', radius:0, size:40 },
@@ -169,7 +169,7 @@ const WANDERER_DEFS = [
   { index:23, roomId:'room_10', x:400,  y:400, type:'stay', frames:null,                                color:'#ffb088', radius:0, size:40 },
   { index:24, roomId:'room_11', x:1000, y:600, type:'stay', frames:null,                                color:'#88ffcc', radius:0, size:40 },
   { index:25, roomId:'room_12', x:600,  y:300, type:'stay', frames:null,                                color:'#66bbff', radius:0, size:40 },
-  { index:26, roomId:'room_15', x:1064, y:434, type:'stay', frames:['ji-1.png'],                        color:'#ffcc66', radius:0, size:75 },
+  { index:26, roomId:'room_15', x:1064, y:434, type:'stay', frames:['ji-1.png'],                        color:'#ffcc66', radius:0, size:80 },
 ];
 const WANDERER_IMG_BASE = 'https://booha-adventure-studios.github.io/the-booha-adventure/assets/img/wanderers/';
 const FRAME_MS          = 420; // milliseconds per animation frame
