@@ -139,39 +139,227 @@
 
   let arrivalArrowHiddenUntil = 0;
 
-  /* ═══════════════════════════════════════════
-     WANDERER DEFINITIONS — 27 total
-  ═══════════════════════════════════════════ */
-  const WANDERER_DEFS = [
-    { index:0,  roomId:'room_01', x:600,  y:400, type:'wander', img:null, color:'#ff79d7', radius:60 },
-    { index:1,  roomId:'room_02', x:900,  y:500, type:'wander', img:null, color:'#ffaa5e', radius:55 },
-    { index:2,  roomId:'room_03', x:500,  y:600, type:'wander', img:null, color:'#a8edff', radius:70 },
-    { index:3,  roomId:'room_04', x:800,  y:450, type:'wander', img:null, color:'#b2ffda', radius:65 },
-    { index:4,  roomId:'room_05', x:700,  y:550, type:'wander', img:null, color:'#fff176', radius:50 },
-    { index:5,  roomId:'room_06', x:400,  y:400, type:'wander', img:null, color:'#90aaff', radius:60 },
-    { index:6,  roomId:'room_07', x:1000, y:500, type:'wander', img:null, color:'#d49aff', radius:75 },
-    { index:7,  roomId:'room_08', x:700,  y:600, type:'wander', img:null, color:'#ffd08a', radius:55 },
-    { index:8,  roomId:'room_09', x:550,  y:480, type:'wander', img:null, color:'#a8fff8', radius:65 },
-    { index:9,  roomId:'room_10', x:850,  y:550, type:'wander', img:null, color:'#e8ffaa', radius:70 },
-    { index:10, roomId:'room_11', x:650,  y:420, type:'wander', img:null, color:'#ff85a1', radius:60 },
-    { index:11, roomId:'room_12', x:750,  y:500, type:'wander', img:null, color:'#ff79d7', radius:55 },
-    { index:12, roomId:'room_13', x:600,  y:560, type:'wander', img:null, color:'#7fffd4', radius:65 },
-    { index:13, roomId:'room_14', x:900,  y:480, type:'wander', img:null, color:'#ffcc66', radius:70 },
-    { index:14, roomId:'room_01', x:300,  y:300, type:'stay',   img:null, color:'#c8b8ff', radius:0  },
-    { index:15, roomId:'room_02', x:1100, y:300, type:'stay',   img:null, color:'#88ffcc', radius:0  },
-    { index:16, roomId:'room_03', x:400,  y:700, type:'stay',   img:null, color:'#ffb088', radius:0  },
-    { index:17, roomId:'room_04', x:1200, y:600, type:'stay',   img:null, color:'#ff9eb5', radius:0  },
-    { index:18, roomId:'room_05', x:350,  y:500, type:'stay',   img:null, color:'#66bbff', radius:0  },
-    { index:19, roomId:'room_06', x:900,  y:300, type:'stay',   img:null, color:'#ffcc66', radius:0  },
-    { index:20, roomId:'room_07', x:500,  y:600, type:'stay',   img:null, color:'#c8b8ff', radius:0  },
-    { index:21, roomId:'room_08', x:1100, y:400, type:'stay',   img:null, color:'#7fffd4', radius:0  },
-    { index:22, roomId:'room_09', x:700,  y:700, type:'stay',   img:null, color:'#ff9eb5', radius:0  },
-    { index:23, roomId:'room_10', x:400,  y:400, type:'stay',   img:null, color:'#ffb088', radius:0  },
-    { index:24, roomId:'room_11', x:1000, y:600, type:'stay',   img:null, color:'#88ffcc', radius:0  },
-    { index:25, roomId:'room_12', x:600,  y:300, type:'stay',   img:null, color:'#66bbff', radius:0  },
-    { index:26, roomId:'room_15', x:800,  y:450, type:'stay',   img:null, color:'#ffcc66', radius:0  },
-  ];
+/* ═══════════════════════════════════════════
+   WANDERER DEFINITIONS
+═══════════════════════════════════════════ */
+const WANDERER_DEFS = [
+  // — wander type (roam around their room) —
+  { index:0,  roomId:'room_01', x:982,  y:407, type:'wander', frames:['ichi-1.png','ichi-2.png'],       color:'#ff79d7', radius:60 },
+  { index:1,  roomId:'room_02', x:900,  y:500, type:'wander', frames:null,                               color:'#ffaa5e', radius:55 },
+  { index:2,  roomId:'room_03', x:500,  y:600, type:'wander', frames:null,                               color:'#a8edff', radius:70 },
+  { index:3,  roomId:'room_04', x:800,  y:450, type:'wander', frames:null,                               color:'#b2ffda', radius:65 },
+  { index:4,  roomId:'room_05', x:1054, y:354, type:'wander', frames:['jamariko-1.png','jamariko-2.png'],color:'#fff176', radius:50 },
+  { index:5,  roomId:'room_06', x:400,  y:400, type:'wander', frames:null,                               color:'#90aaff', radius:60 },
+  { index:6,  roomId:'room_07', x:1000, y:500, type:'wander', frames:null,                               color:'#d49aff', radius:75 },
+  { index:7,  roomId:'room_08', x:700,  y:600, type:'wander', frames:null,                               color:'#ffd08a', radius:55 },
+  { index:8,  roomId:'room_09', x:550,  y:480, type:'wander', frames:null,                               color:'#a8fff8', radius:65 },
+  { index:9,  roomId:'room_10', x:1233, y:452, type:'wander', frames:['ni-1.png','ni-2.png'],            color:'#e8ffaa', radius:70 },
+  { index:10, roomId:'room_11', x:650,  y:420, type:'wander', frames:null,                               color:'#ff85a1', radius:60 },
+  { index:11, roomId:'room_12', x:750,  y:500, type:'wander', frames:null,                               color:'#ff79d7', radius:55 },
+  { index:12, roomId:'room_13', x:407,  y:387, type:'wander', frames:['takachika.png'],                  color:'#7fffd4', radius:65 },
+  { index:13, roomId:'room_14', x:900,  y:480, type:'wander', frames:null,                               color:'#ffcc66', radius:70 },
+  // — stay type (hover in place) —
+  { index:14, roomId:'room_01', x:300,  y:300, type:'stay',   frames:null, color:'#c8b8ff', radius:0 },
+  { index:15, roomId:'room_02', x:1100, y:300, type:'stay',   frames:null, color:'#88ffcc', radius:0 },
+  { index:16, roomId:'room_03', x:400,  y:700, type:'stay',   frames:null, color:'#ffb088', radius:0 },
+  { index:17, roomId:'room_04', x:1200, y:600, type:'stay',   frames:null, color:'#ff9eb5', radius:0 },
+  { index:18, roomId:'room_05', x:350,  y:500, type:'stay',   frames:null, color:'#66bbff', radius:0 },
+  { index:19, roomId:'room_06', x:900,  y:300, type:'stay',   frames:null, color:'#ffcc66', radius:0 },
+  { index:20, roomId:'room_07', x:500,  y:600, type:'stay',   frames:null, color:'#c8b8ff', radius:0 },
+  { index:21, roomId:'room_08', x:1100, y:400, type:'stay',   frames:null, color:'#7fffd4', radius:0 },
+  { index:22, roomId:'room_09', x:700,  y:700, type:'stay',   frames:null, color:'#ff9eb5', radius:0 },
+  { index:23, roomId:'room_10', x:400,  y:400, type:'stay',   frames:null, color:'#ffb088', radius:0 },
+  { index:24, roomId:'room_11', x:1000, y:600, type:'stay',   frames:null, color:'#88ffcc', radius:0 },
+  { index:25, roomId:'room_12', x:600,  y:300, type:'stay',   frames:null, color:'#66bbff', radius:0 },
+  { index:26, roomId:'room_15', x:1064, y:434, type:'stay',   frames:['ji-1.png'],          color:'#ffcc66', radius:0 },
+];
 
+const WANDERER_IMG_BASE = 'the-booha-adventure/assets/img/wanderers/';
+const FRAME_MS          = 420; // milliseconds per animation frame
+
+/* ═══════════════════════════════════════════
+   WANDERER RUNTIME
+═══════════════════════════════════════════ */
+let activeWanderers  = [];
+const wandererImages = {}; // key: "filename" → HTMLImageElement
+
+const WANDER_SPEED       = 0.55;
+const WANDER_TARGET_WAIT = 3000;
+const WANDER_REACT_DIST  = 120;
+const SCATTER_SPEED      = 2.8;
+const SCATTER_DECAY      = 0.88;
+const WANDERER_SIZE      = 22;
+
+function preloadWandererImages() {
+  WANDERER_DEFS.forEach(def => {
+    if (!def.frames) return;
+    def.frames.forEach(filename => {
+      if (wandererImages[filename]) return; // already loaded
+      const img = new Image();
+      img.src = WANDERER_IMG_BASE + filename;
+      wandererImages[filename] = img;
+    });
+  });
+}
+
+function refreshWanderersForRoom() {
+  let unlockedIndices = [];
+
+  if (window.__devAllWanderers) {
+    unlockedIndices = WANDERER_DEFS.map(d => d.index);
+  } else {
+    try {
+      const data = window.BoohaAdventure && BoohaAdventure.save
+        ? BoohaAdventure.save.load() : null;
+      if (data && data.weekly && data.weekly.wanderers) {
+        unlockedIndices = data.weekly.wanderers;
+      }
+    } catch (_) {}
+  }
+
+  activeWanderers = WANDERER_DEFS
+    .filter(def => def.roomId === state.roomId && unlockedIndices.includes(def.index))
+    .map(def => ({
+      ...def,
+      rx: def.x, ry: def.y,
+      targetX: def.x, targetY: def.y,
+      nextTargetAt: 0,
+      wobblePhase: Math.random() * Math.PI * 2,
+      scattering: false, scatterVx: 0, scatterVy: 0,
+      // resolved HTMLImageElement array (may be empty for frames:null wanderers)
+      images: (def.frames || []).map(f => wandererImages[f]).filter(Boolean),
+    }));
+}
+
+function initWanderers() {
+  preloadWandererImages();
+  refreshWanderersForRoom();
+}
+
+function onRoomChanged() {
+  refreshWanderersForRoom();
+}
+
+function updateWanderers(now) {
+  if (!activeWanderers.length) return;
+  activeWanderers.forEach(w => {
+    const ghostDist = Math.hypot(state.x - w.rx, state.y - w.ry);
+    if (ghostDist < WANDER_REACT_DIST && state.moving) {
+      if (!w.scattering) {
+        const angle = Math.atan2(w.ry - state.y, w.rx - state.x);
+        w.scatterVx = Math.cos(angle) * SCATTER_SPEED;
+        w.scatterVy = Math.sin(angle) * SCATTER_SPEED;
+        w.scattering = true;
+      }
+    }
+    if (w.scattering) {
+      w.rx += w.scatterVx; w.ry += w.scatterVy;
+      w.scatterVx *= SCATTER_DECAY; w.scatterVy *= SCATTER_DECAY;
+      w.rx = Math.max(40, Math.min(WORLD_W - 40, w.rx));
+      w.ry = Math.max(40, Math.min(WORLD_H - 40, w.ry));
+      if (Math.abs(w.scatterVx) < 0.05 && Math.abs(w.scatterVy) < 0.05) w.scattering = false;
+      return;
+    }
+    if (w.type === 'wander') {
+      if (now > w.nextTargetAt || Math.hypot(w.rx - w.targetX, w.ry - w.targetY) < 4) {
+        const angle = Math.random() * Math.PI * 2;
+        const dist  = (Math.random() * 0.7 + 0.3) * w.radius;
+        w.targetX = Math.max(40, Math.min(WORLD_W - 40, w.x + Math.cos(angle) * dist));
+        w.targetY = Math.max(40, Math.min(WORLD_H - 40, w.y + Math.sin(angle) * dist));
+        w.nextTargetAt = now + WANDER_TARGET_WAIT + Math.random() * 2000;
+      }
+      const dx = w.targetX - w.rx, dy = w.targetY - w.ry;
+      const dist = Math.hypot(dx, dy);
+      if (dist > 1) { w.rx += (dx / dist) * WANDER_SPEED; w.ry += (dy / dist) * WANDER_SPEED; }
+    }
+  });
+}
+
+function drawWanderers(now) {
+  if (!activeWanderers.length) return;
+  const sec = now / 1000;
+
+  activeWanderers.forEach(w => {
+    const drawX = w.rx;
+    const drawY = w.ry + (w.type === 'stay'
+      ? Math.sin(sec * 1.6 + w.wobblePhase) * 5
+      : Math.sin(sec * 2.1 + w.wobblePhase) * 3);
+
+    const pulse = 0.5 + 0.5 * Math.sin(sec * 2.4 + w.wobblePhase);
+
+    // pick current animation frame
+    let currentImg = null;
+    if (w.images && w.images.length > 0) {
+      const frameIndex = Math.floor(now / FRAME_MS) % w.images.length;
+      const candidate  = w.images[frameIndex];
+      if (candidate && candidate.complete && candidate.naturalWidth > 0) {
+        currentImg = candidate;
+      }
+    }
+
+    ctx.save();
+
+    // ── spooky glow halo ──
+    const glowR  = WANDERER_SIZE * 2.8;
+    const halo   = ctx.createRadialGradient(drawX, drawY, 0, drawX, drawY, glowR);
+    halo.addColorStop(0,   w.color + 'aa');
+    halo.addColorStop(0.4, w.color + '55');
+    halo.addColorStop(0.8, w.color + '22');
+    halo.addColorStop(1,   'transparent');
+    ctx.globalAlpha = 0.45 + pulse * 0.35;
+    ctx.fillStyle   = halo;
+    ctx.beginPath();
+    ctx.arc(drawX, drawY, glowR, 0, Math.PI * 2);
+    ctx.fill();
+
+    // ── hard inner glow ring (gives the spooky outline feel) ──
+    ctx.globalAlpha = 0.18 + pulse * 0.22;
+    ctx.strokeStyle = w.color;
+    ctx.lineWidth   = 3 + pulse * 2;
+    ctx.shadowBlur  = 18;
+    ctx.shadowColor = w.color;
+    ctx.beginPath();
+    ctx.arc(drawX, drawY, WANDERER_SIZE + 4, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    // ── sprite or fallback orb ──
+    if (currentImg) {
+      ctx.globalAlpha = 0.92;
+      // apply a subtle color-tinted shadow behind the sprite for the glow effect
+      ctx.shadowBlur  = 22 + pulse * 14;
+      ctx.shadowColor = w.color;
+      ctx.drawImage(currentImg,
+        drawX - WANDERER_SIZE, drawY - WANDERER_SIZE,
+        WANDERER_SIZE * 2,     WANDERER_SIZE * 2);
+      ctx.shadowBlur = 0;
+    } else {
+      // fallback: colored orb with letter label
+      const ig = ctx.createRadialGradient(
+        drawX - WANDERER_SIZE * 0.3, drawY - WANDERER_SIZE * 0.3, 0,
+        drawX, drawY, WANDERER_SIZE);
+      ig.addColorStop(0,   '#ffffff');
+      ig.addColorStop(0.4, w.color);
+      ig.addColorStop(1,   w.color + 'aa');
+      ctx.globalAlpha = 0.88 + pulse * 0.1;
+      ctx.shadowBlur  = 14;
+      ctx.shadowColor = w.color;
+      ctx.fillStyle   = ig;
+      ctx.beginPath();
+      ctx.arc(drawX, drawY, WANDERER_SIZE, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur  = 0;
+      ctx.globalAlpha = 0.7;
+      ctx.fillStyle   = '#000';
+      ctx.font        = 'bold 10px monospace';
+      ctx.textAlign   = 'center';
+      ctx.fillText(w.type === 'wander' ? 'w' : 's', drawX, drawY + 4);
+      ctx.textAlign   = 'left';
+    }
+
+    ctx.restore();
+  });
+}
   /* ═══════════════════════════════════════════
      BONUS TREE DEFINITIONS — 5 total
   ═══════════════════════════════════════════ */
