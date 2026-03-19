@@ -206,7 +206,26 @@
   }
 
   function refreshWanderersForRoom() {
-    let unlockedIndices = [];
+  let unlockedIndices = [];
+
+  if (window.__devAllWanderers) {                 // ← add this block
+    unlockedIndices = WANDERER_DEFS.map(d => d.index);
+  } else {
+    try {
+      const data = window.BoohaAdventure && BoohaAdventure.save
+        ? BoohaAdventure.save.load() : null;
+      if (data && data.weekly && data.weekly.wanderers) {
+        unlockedIndices = data.weekly.wanderers;
+      }
+    } catch (_) {}
+  }
+
+  activeWanderers = WANDERER_DEFS
+    .filter(def => def.roomId === state.roomId && unlockedIndices.includes(def.index))
+    .map(def => ({ /* ... unchanged ... */ }));
+}
+
+    
     try {
       const data = window.BoohaAdventure && BoohaAdventure.save
         ? BoohaAdventure.save.load() : null;
@@ -348,6 +367,7 @@
   }
 
   function _bonusUnlocked(bonusId) {
+      if (window.__devAllGames) return true;          // ← add this line**TESTING
     try {
       if (window.BoohaAdventure && BoohaAdventure.unlocks) {
         return BoohaAdventure.unlocks.isBonusGameUnlocked(bonusId);
@@ -1212,5 +1232,60 @@
     requestAnimationFrame(tick);
   }
 
+/* ═══════════════════════════════════════════
+   DEV TESTING TOGGLE (remove before shipping)
+═══════════════════════════════════════════ */
+(function injectDevPanel() {
+  const panel = document.createElement('div');
+  panel.id = 'dev-panel';
+  panel.style.cssText = `
+    position:fixed; bottom:60px; right:18px; z-index:9999;
+    background:rgba(0,0,0,.88); border:1px solid rgba(255,200,0,.4);
+    border-radius:10px; padding:10px 14px; font:700 11px/1.8 monospace;
+    color:#ffd700; letter-spacing:.06em; min-width:160px;
+    box-shadow:0 0 20px rgba(255,200,0,.2);`;
+
+  panel.innerHTML = `
+    <div style="font-size:9px;color:rgba(255,200,0,.5);letter-spacing:.14em;margin-bottom:6px;">DEV MODE</div>
+    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:4px;">
+      <input type="checkbox" id="dev-all-wanderers"> All wanderers
+    </label>
+    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+      <input type="checkbox" id="dev-all-games"> All games unlocked
+    </label>
+    <div id="dev-room-info" style="font-size:9px;color:rgba(255,200,0,.45);margin-top:8px;"></div>`;
+
+  document.body.appendChild(panel);
+
+  // Patch _bonusUnlocked to check the override flag
+  const _origBonusUnlocked = window._bonusUnlocked || _bonusUnlocked;
+  // Since _bonusUnlocked is a closure, we override via the dev flag checked inside it.
+  // Instead, we shadow the check by monkey-patching handleBonusTreeInteraction:
+  const _origHandle = handleBonusTreeInteraction;
+  // Re-point handleBonusTreeInteraction using the outer-scope reference trick:
+  // (This works because handleBonusTreeInteraction is called by name in checkBonusTrees/clickBonusTree)
+
+  // Simpler: patch _bonusUnlocked's result via a global dev flag the IIFE can see
+  window.__devAllGames = false;
+  window.__devAllWanderers = false;
+
+  document.getElementById('dev-all-games').addEventListener('change', function() {
+    window.__devAllGames = this.checked;
+  });
+
+  document.getElementById('dev-all-wanderers').addEventListener('change', function() {
+    window.__devAllWanderers = this.checked;
+    refreshWanderersForRoom();
+  });
+
+  // Tick the room info display
+  setInterval(() => {
+    const el = document.getElementById('dev-room-info');
+    if (el) el.textContent = `room: ${state.roomId} | moved: ${Math.round(state.distMovedSinceSpawn)}`;
+  }, 200);
+})();
+
+
+  
   init();
 })();    
