@@ -251,7 +251,7 @@
     preloadWandererImages();
     refreshWanderersForRoom();
   }
-
+}
   function onRoomChanged() {
     refreshWanderersForRoom();
   }
