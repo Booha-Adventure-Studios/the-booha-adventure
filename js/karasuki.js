@@ -155,7 +155,7 @@ const WANDERER_DEFS = [
   { index:9,  roomId:'room_10', x:1233, y:452, type:'stay', frames:['ni-1.png','ni-2.png'],             color:'#e8ffaa', radius:0, size:52 },
   { index:10, roomId:'room_11', x:650,  y:420, type:'stay', frames:null,                                color:'#ff85a1', radius:0, size:40 },
   { index:11, roomId:'room_12', x:750,  y:500, type:'stay', frames:null,                                color:'#ff79d7', radius:0, size:40 },
-  { index:12, roomId:'room_13', x:407,  y:387, type:'stay', frames:['takachika-1.png'],                 color:'#7fffd4', radius:0, size:52 },
+  { index:12, roomId:'room_13', x:407,  y:387, type:'stay', frames:['takachika-1.png'],                 color:'#7fffd4', radius:0, size:65 },
   { index:13, roomId:'room_14', x:900,  y:480, type:'stay', frames:null,                                color:'#ffcc66', radius:0, size:40 },
   { index:14, roomId:'room_01', x:300,  y:300, type:'stay', frames:null,                                color:'#c8b8ff', radius:0, size:40 },
   { index:15, roomId:'room_02', x:1100, y:300, type:'stay', frames:null,                                color:'#88ffcc', radius:0, size:40 },
@@ -169,7 +169,7 @@ const WANDERER_DEFS = [
   { index:23, roomId:'room_10', x:400,  y:400, type:'stay', frames:null,                                color:'#ffb088', radius:0, size:40 },
   { index:24, roomId:'room_11', x:1000, y:600, type:'stay', frames:null,                                color:'#88ffcc', radius:0, size:40 },
   { index:25, roomId:'room_12', x:600,  y:300, type:'stay', frames:null,                                color:'#66bbff', radius:0, size:40 },
-  { index:26, roomId:'room_15', x:1064, y:434, type:'stay', frames:['ji-1.png'],                        color:'#ffcc66', radius:0, size:65 },
+  { index:26, roomId:'room_15', x:1064, y:434, type:'stay', frames:['ji-1.png'],                        color:'#ffcc66', radius:0, size:75 },
 ];
 const WANDERER_IMG_BASE = 'https://booha-adventure-studios.github.io/the-booha-adventure/assets/img/wanderers/';
 const FRAME_MS          = 420; // milliseconds per animation frame
@@ -247,126 +247,129 @@ function updateWanderers(now) {
     const dist    = Math.hypot(dx, dy);
 
     if (dist < bubbleR) {
-      // ghost is inside the bubble — push ghost back to the bubble edge
+      // push ghost to bubble edge — wanderer never moves
       const angle  = Math.atan2(dy, dx);
       state.x      = w.rx + Math.cos(angle) * bubbleR;
       state.y      = w.ry + Math.sin(angle) * bubbleR;
       state.clickTarget = null;
 
-      // fire sparkles at the contact point if not already sparkling
+      // trigger glitter if not already sparkling
       if (!w.sparkling) {
         w.sparkling    = true;
         w.sparkleAt    = now;
-        w.sparkleAngle = angle; // direction ghost came from
+        w.sparkleAngle = angle;
       }
-    } else {
-      // ghost has cleared the bubble
-      if (w.sparkling && now - w.sparkleAt > 600) {
-        w.sparkling = false;
-      }
+    } else if (w.sparkling && now - w.sparkleAt > 800) {
+      w.sparkling = false;
     }
   });
 }
-
+  
 function drawWanderers(now) {
   if (!activeWanderers.length) return;
   const sec = now / 1000;
 
   activeWanderers.forEach(w => {
-    const sz      = w.size   || WANDERER_SIZE;
+    const sz      = w.size    || WANDERER_SIZE;
     const bubbleR = w.bubbleR || sz * 1.8;
-    const bob     = Math.sin(sec * 1.6 + w.wobblePhase) * 5;
-    const drawX   = w.rx;
-    const drawY   = w.ry + bob;
     const pulse   = 0.5 + 0.5 * Math.sin(sec * 2.4 + w.wobblePhase);
 
-    // pick current animation frame
-    let currentImg = null;
-    if (w.images && w.images.length > 0) {
-      const frameIndex = Math.floor(now / FRAME_MS) % w.images.length;
-      const candidate  = w.images[frameIndex];
-      if (candidate && candidate.complete && candidate.naturalWidth > 0) {
-        currentImg = candidate;
-      }
+    // ── crossfade between frames ──
+    let imgA = null, imgB = null, crossfade = 0;
+    if (w.images && w.images.length > 1) {
+      const cycleDur  = FRAME_MS / 1000;          // seconds per frame
+      const cyclePos  = (sec / cycleDur) % w.images.length;
+      const frameA    = Math.floor(cyclePos) % w.images.length;
+      const frameB    = (frameA + 1)         % w.images.length;
+      crossfade       = cyclePos - Math.floor(cyclePos); // 0→1 blend
+      const ca = w.images[frameA];
+      const cb = w.images[frameB];
+      if (ca && ca.complete && ca.naturalWidth > 0) imgA = ca;
+      if (cb && cb.complete && cb.naturalWidth > 0) imgB = cb;
+    } else if (w.images && w.images.length === 1) {
+      const c = w.images[0];
+      if (c && c.complete && c.naturalWidth > 0) imgA = c;
+      crossfade = 0;
     }
 
     ctx.save();
 
-    // ── bubble shimmer when ghost is nearby ──
+    // ── glitter sparkles — only visual when ghost touches bubble ──
     const ghostDist = Math.hypot(state.x - w.rx, state.y - w.ry);
-    const bubbleTouched = ghostDist < bubbleR + 10;
-
-    if (bubbleTouched) {
-      // soft shimmer ring around bubble edge
-      const shimmerAlpha = 0.12 + 0.10 * Math.sin(sec * 8 + w.wobblePhase);
-      const shimmer = ctx.createRadialGradient(w.rx, w.ry, bubbleR - 6, w.rx, w.ry, bubbleR + 6);
-      shimmer.addColorStop(0,   'transparent');
-      shimmer.addColorStop(0.5, w.color + Math.round(shimmerAlpha * 255).toString(16).padStart(2,'0'));
-      shimmer.addColorStop(1,   'transparent');
-      ctx.globalAlpha = 1;
-      ctx.fillStyle   = shimmer;
-      ctx.beginPath();
-      ctx.arc(w.rx, w.ry, bubbleR + 6, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    // ── sparkles at contact point ──
     if (w.sparkling) {
-      const age      = (now - w.sparkleAt) / 600; // 0→1 over 600ms
-      const fadeOut  = 1 - age;
-      const contactX = w.rx + Math.cos(w.sparkleAngle) * bubbleR;
-      const contactY = w.ry + Math.sin(w.sparkleAngle) * bubbleR;
+      const age     = Math.min(1, (now - w.sparkleAt) / 800);
+      const fadeOut = 1 - age;
 
-      for (let i = 0; i < 8; i++) {
-        const sparkAngle = w.sparkleAngle + (i / 8) * Math.PI * 2;
-        // sparkles fly outward from contact point over time
-        const travel = age * 22;
-        const sx     = contactX + Math.cos(sparkAngle) * travel;
-        const sy     = contactY + Math.sin(sparkAngle) * travel;
-        const twinkle = Math.abs(Math.sin(sec * 14 + i * 0.9));
+      // seed a deterministic-ish set of glitter flecks from sparkleAt
+      for (let i = 0; i < 28; i++) {
+        // use sin/cos of prime multiples so each fleck has its own path
+        const seed   = i * 137.508;                          // golden angle spread
+        const angle  = (seed % 360) * Math.PI / 180;
+        const speed  = 18 + (i % 5) * 12;                   // varied travel distance
+        const travel = age * speed;
+        const sx     = w.rx + Math.cos(angle) * (bubbleR * 0.6 + travel);
+        const sy     = w.ry + Math.sin(angle) * (bubbleR * 0.6 + travel);
 
-        ctx.globalAlpha = fadeOut * twinkle * 0.85;
-        ctx.fillStyle   = w.color;
-        ctx.shadowBlur  = 8;
+        // each fleck twinkles at its own frequency
+        const twinkle = Math.pow(Math.abs(Math.sin(sec * (8 + i % 5) + i)), 2);
+        const fleckSz = (0.8 + (i % 3) * 0.7) * (1 - age * 0.6);
+
+        ctx.globalAlpha = fadeOut * twinkle * 0.9;
+        ctx.fillStyle   = i % 3 === 0 ? '#ffffff' : w.color;
+        ctx.shadowBlur  = 6;
         ctx.shadowColor = w.color;
         ctx.beginPath();
-        ctx.arc(sx, sy, 2 + twinkle * 2, 0, Math.PI * 2);
+        ctx.arc(sx, sy, fleckSz, 0, Math.PI * 2);
         ctx.fill();
         ctx.shadowBlur  = 0;
+      }
+
+      // re-trigger sparkles continuously while ghost is still touching
+      if (ghostDist < bubbleR && now - w.sparkleAt > 500) {
+        w.sparkleAt    = now;
+        w.sparkleAngle = Math.atan2(state.y - w.ry, state.x - w.rx);
       }
     }
 
     // ── shapeless ambient glow ──
-    const glowR = sz * 2.2;
-    const halo  = ctx.createRadialGradient(drawX, drawY, sz * 0.3, drawX, drawY, glowR);
-    halo.addColorStop(0,   w.color + '66');
-    halo.addColorStop(0.4, w.color + '33');
-    halo.addColorStop(0.8, w.color + '11');
+    const glowR = sz * 2.0;
+    const halo  = ctx.createRadialGradient(w.rx, w.ry, sz * 0.2, w.rx, w.ry, glowR);
+    halo.addColorStop(0,   w.color + '55');
+    halo.addColorStop(0.5, w.color + '22');
     halo.addColorStop(1,   'transparent');
-    ctx.globalAlpha = 0.5 + pulse * 0.3;
+    ctx.globalAlpha = 0.4 + pulse * 0.25;
     ctx.fillStyle   = halo;
-    ctx.fillRect(drawX - glowR, drawY - glowR, glowR * 2, glowR * 2);
+    ctx.fillRect(w.rx - glowR, w.ry - glowR, glowR * 2, glowR * 2);
 
-    // ── sprite or fallback orb ──
-    if (currentImg) {
-      ctx.globalAlpha = 0.94;
-      ctx.shadowBlur  = 28 + pulse * 18;
+    // ── draw sprite with crossfade ──
+    if (imgA) {
+      ctx.globalAlpha = (1 - crossfade) * 0.94;
+      ctx.shadowBlur  = 24 + pulse * 14;
       ctx.shadowColor = w.color;
-      ctx.drawImage(currentImg, drawX - sz, drawY - sz, sz * 2, sz * 2);
+      ctx.drawImage(imgA, w.rx - sz, w.ry - sz, sz * 2, sz * 2);
       ctx.shadowBlur  = 0;
-    } else {
+    }
+    if (imgB) {
+      ctx.globalAlpha = crossfade * 0.94;
+      ctx.shadowBlur  = 24 + pulse * 14;
+      ctx.shadowColor = w.color;
+      ctx.drawImage(imgB, w.rx - sz, w.ry - sz, sz * 2, sz * 2);
+      ctx.shadowBlur  = 0;
+    }
+    if (!imgA && !imgB) {
+      // fallback orb for wanderers without sprites
       const ig = ctx.createRadialGradient(
-        drawX - sz * 0.3, drawY - sz * 0.3, 0,
-        drawX, drawY, sz);
+        w.rx - sz * 0.3, w.ry - sz * 0.3, 0,
+        w.rx, w.ry, sz);
       ig.addColorStop(0,   '#ffffff');
       ig.addColorStop(0.4, w.color);
       ig.addColorStop(1,   w.color + 'aa');
       ctx.globalAlpha = 0.88 + pulse * 0.1;
-      ctx.shadowBlur  = 18 + pulse * 10;
+      ctx.shadowBlur  = 18;
       ctx.shadowColor = w.color;
       ctx.fillStyle   = ig;
       ctx.beginPath();
-      ctx.arc(drawX, drawY, sz, 0, Math.PI * 2);
+      ctx.arc(w.rx, w.ry, sz, 0, Math.PI * 2);
       ctx.fill();
       ctx.shadowBlur  = 0;
     }
@@ -374,7 +377,6 @@ function drawWanderers(now) {
     ctx.restore();
   });
 }
-
   /* ═══════════════════════════════════════════
      BONUS TREE DEFINITIONS — 5 total
   ═══════════════════════════════════════════ */
