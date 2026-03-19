@@ -234,28 +234,42 @@
       }
     } catch (_) {}
 
-    activeWanderers = WANDERER_DEFS
-      .filter(def => def.roomId === state.roomId && unlockedIndices.includes(def.index))
-      .map(def => ({
-        ...def,
-        rx: def.x, ry: def.y,
-        targetX: def.x, targetY: def.y,
-        nextTargetAt: 0,
-        wobblePhase: Math.random() * Math.PI * 2,
-        scattering: false, scatterVx: 0, scatterVy: 0,
-        image: wandererImages[def.index] || null,
-      }));
+   function refreshWanderersForRoom() {
+  let unlockedIndices = [];
+
+  if (window.__devAllWanderers) {
+    unlockedIndices = WANDERER_DEFS.map(d => d.index);
+  } else {
+    try {
+      const data = window.BoohaAdventure && BoohaAdventure.save
+        ? BoohaAdventure.save.load() : null;
+      if (data && data.weekly && data.weekly.wanderers) {
+        unlockedIndices = data.weekly.wanderers;
+      }
+    } catch (_) {}
   }
 
-  function initWanderers() {
-    preloadWandererImages();
-    refreshWanderersForRoom();
-  }
+  activeWanderers = WANDERER_DEFS
+    .filter(def => def.roomId === state.roomId && unlockedIndices.includes(def.index))
+    .map(def => ({
+      ...def,
+      rx: def.x, ry: def.y,
+      targetX: def.x, targetY: def.y,
+      nextTargetAt: 0,
+      wobblePhase: Math.random() * Math.PI * 2,
+      scattering: false, scatterVx: 0, scatterVy: 0,
+      image: wandererImages[def.index] || null,
+    }));
 }
-  function onRoomChanged() {
-    refreshWanderersForRoom();
-  }
 
+function initWanderers() {
+  preloadWandererImages();
+  refreshWanderersForRoom();
+}
+
+function onRoomChanged() {
+  refreshWanderersForRoom();
+}
   function updateWanderers(now) {
     if (!activeWanderers.length) return;
     activeWanderers.forEach(w => {
