@@ -156,7 +156,7 @@ const WANDERER_DEFS = [
   { index:9,  roomId:'room_10', x:1233, y:452, type:'wander', frames:['ni-1.png','ni-2.png'],            color:'#e8ffaa', radius:70 },
   { index:10, roomId:'room_11', x:650,  y:420, type:'wander', frames:null,                               color:'#ff85a1', radius:60 },
   { index:11, roomId:'room_12', x:750,  y:500, type:'wander', frames:null,                               color:'#ff79d7', radius:55 },
-  { index:12, roomId:'room_13', x:407,  y:387, type:'wander', frames:['takachika.png'],                  color:'#7fffd4', radius:65 },
+  { index:12, roomId:'room_13', x:407,  y:387, type:'wander', frames:['takachika-1.png'],                  color:'#7fffd4', radius:65 },
   { index:13, roomId:'room_14', x:900,  y:480, type:'wander', frames:null,                               color:'#ffcc66', radius:70 },
   // — stay type (hover in place) —
   { index:14, roomId:'room_01', x:300,  y:300, type:'stay',   frames:null, color:'#c8b8ff', radius:0 },
