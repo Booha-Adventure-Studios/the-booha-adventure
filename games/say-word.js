@@ -7,14 +7,35 @@
    Full themed results panel (speaking-focused messages).
    3 curricula: br / pb / bc
    ══════════════════════════════════════════════════════════════ */
+
 (async function () {
 
 const CFG = window.GAME_CONFIG;
 const U   = window.GAME_UTILS;
 if (!CFG || !U) return;
 
+/* Safe wrapper — falls back to a plain Audio play if U.playSage
+   isn't available in this version of GAME_UTILS               */
+function playSageOrFallback(url, delayMs) {
+  if (typeof U.playSage === 'function') {
+    return U.playSage(url, delayMs);
+  }
+  return new Promise(resolve => {
+    setTimeout(() => {
+      const a = new Audio(url);
+      a.setAttribute('playsinline', '');
+      a.setAttribute('webkit-playsinline', '');
+      a.onended = resolve;
+      a.onerror = resolve;
+      a.play().catch(resolve);
+    }, delayMs ?? 0);
+  });
+}
+
 U.setTitle('Say the Word');
-U.unlockAudio();
+U.unlockAudio();   
+
+
 
 const isIOS = U.isIOS();
 
@@ -326,15 +347,42 @@ S.textContent = `
 }
 
 /* Listening state — red + pulse ring */
+/* Listening state — green pulse (BR/PB) or cyan pulse (BC) */
 .stw-mic-btn.listening{
-  background:linear-gradient(135deg, #ef4444, #b91c1c);
-  box-shadow:0 0 0 0 rgba(239,68,68,.5), 0 6px 0 rgba(100,0,0,.4), 0 10px 24px rgba(0,0,0,.35);
+  background:linear-gradient(135deg, #22c55e, #15803d);
+  box-shadow:0 0 0 0 rgba(34,197,94,.6), 0 6px 0 rgba(10,80,30,.5), 0 10px 24px rgba(0,0,0,.35);
   animation:stwMicRing 1s ease-out infinite;
 }
+[data-curriculum="bc"] .stw-mic-btn.listening{
+  background:linear-gradient(135deg, #a78bfa, #7c3aed);
+  box-shadow:0 0 0 0 rgba(167,139,250,.6), 0 6px 0 rgba(60,10,160,.5), 0 10px 24px rgba(0,0,0,.35);
+  animation:stwMicRingPurple 1s ease-out infinite;
+}
 @keyframes stwMicRing{
-  0%{ box-shadow:0 0 0 0 rgba(239,68,68,.6), 0 6px 0 rgba(100,0,0,.4), 0 10px 24px rgba(0,0,0,.35); }
-  70%{ box-shadow:0 0 0 22px rgba(239,68,68,0), 0 6px 0 rgba(100,0,0,.4), 0 10px 24px rgba(0,0,0,.35); }
-  100%{ box-shadow:0 0 0 0 rgba(239,68,68,0), 0 6px 0 rgba(100,0,0,.4), 0 10px 24px rgba(0,0,0,.35); }
+  0%{  box-shadow:0 0 0 0   rgba(34,197,94,.7),  0 6px 0 rgba(10,80,30,.5),  0 10px 24px rgba(0,0,0,.35); }
+  70%{ box-shadow:0 0 0 26px rgba(34,197,94,0),  0 6px 0 rgba(10,80,30,.5),  0 10px 24px rgba(0,0,0,.35); }
+  100%{ box-shadow:0 0 0 0  rgba(34,197,94,0),   0 6px 0 rgba(10,80,30,.5),  0 10px 24px rgba(0,0,0,.35); }
+}
+@keyframes stwMicRingPurple{
+  0%{  box-shadow:0 0 0 0   rgba(167,139,250,.7), 0 6px 0 rgba(60,10,160,.5), 0 10px 24px rgba(0,0,0,.35); }
+  70%{ box-shadow:0 0 0 26px rgba(167,139,250,0), 0 6px 0 rgba(60,10,160,.5), 0 10px 24px rgba(0,0,0,.35); }
+  100%{ box-shadow:0 0 0 0  rgba(167,139,250,0),  0 6px 0 rgba(60,10,160,.5), 0 10px 24px rgba(0,0,0,.35); }
+}
+
+/* Also update the card listening pulse to green */
+.stw-jp-card.listening{
+  border-color:rgba(34,197,94,.6) !important;
+  animation:stwListenPulse 1s ease-in-out infinite;
+}
+@keyframes stwListenPulse{
+  0%,100%{ box-shadow:0 0 0 4px rgba(34,197,94,.15),  0 10px 40px rgba(0,0,0,.35); }
+  50%{     box-shadow:0 0 0 12px rgba(34,197,94,.28), 0 10px 50px rgba(0,0,0,.45); }
+}
+
+/* Badge dot while listening — green */
+.stw-jp-card.listening .stw-mode-dot{
+  background:#22c55e;
+  animation:stwDotBlink .7s ease-in-out infinite;
 }
 
 /* hint text */
@@ -413,6 +461,73 @@ S.textContent = `
   55%{ transform:translateX(-5px); } 75%{ transform:translateX(5px); }
 }
 .stw-ios-choice.ios-locked{ opacity:.42; pointer-events:none; transform:none !important; }
+
+/* ── BR iOS choice palette (amber/fire) ── */
+[data-curriculum="br"] .stw-ios-choice[data-ci="0"]{
+  background:linear-gradient(145deg,#4a2800,#703800);
+  border:2px solid rgba(255,170,0,.55); color:#fff;
+  box-shadow:0 5px 0 rgba(80,40,0,.6),0 8px 18px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.15);
+}
+[data-curriculum="br"] .stw-ios-choice[data-ci="1"]{
+  background:linear-gradient(145deg,#5a1200,#8a1e00);
+  border:2px solid rgba(255,90,40,.55); color:#fff;
+  box-shadow:0 5px 0 rgba(80,10,0,.6),0 8px 18px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.15);
+}
+[data-curriculum="br"] .stw-ios-choice[data-ci="2"]{
+  background:linear-gradient(145deg,#3a3000,#5a4a00);
+  border:2px solid rgba(220,200,0,.5); color:#fff;
+  box-shadow:0 5px 0 rgba(50,40,0,.6),0 8px 18px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.15);
+}
+[data-curriculum="br"] .stw-ios-choice[data-ci="3"]{
+  background:linear-gradient(145deg,#40100a,#601814);
+  border:2px solid rgba(255,80,60,.55); color:#fff;
+  box-shadow:0 5px 0 rgba(60,10,8,.6),0 8px 18px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.15);
+}
+[data-curriculum="br"] .stw-ios-choice:hover{ filter:brightness(1.16); }
+
+/* ── BC iOS choice palette (teal/cyan) ── */
+[data-curriculum="bc"] .stw-ios-choice[data-ci="0"]{
+  background:linear-gradient(145deg,#041e18,#062e24);
+  border:2px solid rgba(0,220,180,.55); color:#e0fff8;
+  box-shadow:0 5px 0 rgba(0,20,15,.7),0 8px 18px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.08);
+}
+[data-curriculum="bc"] .stw-ios-choice[data-ci="1"]{
+  background:linear-gradient(145deg,#041820,#062430);
+  border:2px solid rgba(0,200,240,.5); color:#e0fff8;
+  box-shadow:0 5px 0 rgba(0,15,25,.7),0 8px 18px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.08);
+}
+[data-curriculum="bc"] .stw-ios-choice[data-ci="2"]{
+  background:linear-gradient(145deg,#180828,#24103a);
+  border:2px solid rgba(170,80,255,.55); color:#f5ecff;
+  box-shadow:0 5px 0 rgba(20,0,40,.7),0 8px 18px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.08);
+}
+[data-curriculum="bc"] .stw-ios-choice[data-ci="3"]{
+  background:linear-gradient(145deg,#042018,#063028);
+  border:2px solid rgba(40,230,160,.5); color:#e0fff8;
+  box-shadow:0 5px 0 rgba(0,20,15,.7),0 8px 18px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.08);
+}
+[data-curriculum="bc"] .stw-ios-choice:hover{ filter:brightness(1.18); }
+
+/* ── PB iOS choice palette (white + colored borders, dark text) ── */
+[data-curriculum="pb"] .stw-ios-choice[data-ci="0"]{
+  background:#fff; border:2.5px solid #ff6eb4; color:#2a1020;
+  box-shadow:0 5px 0 #ffb0d8,0 8px 18px rgba(255,110,180,.12);
+}
+[data-curriculum="pb"] .stw-ios-choice[data-ci="1"]{
+  background:#fff; border:2.5px solid #cc88ff; color:#2a1020;
+  box-shadow:0 5px 0 #ddb8ff,0 8px 18px rgba(180,120,255,.12);
+}
+[data-curriculum="pb"] .stw-ios-choice[data-ci="2"]{
+  background:#fff; border:2.5px solid #44ccff; color:#2a1020;
+  box-shadow:0 5px 0 #99e8ff,0 8px 18px rgba(50,180,255,.1);
+}
+[data-curriculum="pb"] .stw-ios-choice[data-ci="3"]{
+  background:#fff; border:2.5px solid #ffcc44; color:#2a1020;
+  box-shadow:0 5px 0 #ffe088,0 8px 18px rgba(255,200,50,.1);
+}
+[data-curriculum="pb"] .stw-ios-choice:hover{
+  transform:translateY(-4px) scale(1.02); filter:brightness(1.02);
+}
 
 /* ══════════════════════════════════════════════════════════════
    NEXT BUTTON  — glowing, pulsing when visible
@@ -691,14 +806,14 @@ const startStep3JP  = isIOS
   : 'はっきり英語で言おう！マイクが聞いているよ！';
 
 U.mount(`
+<div class="stw-header">
+  <div class="stw-curriculum">${curriculumLabel()}</div>
+  <div class="stw-date">${titleDateLabel()}</div>
+</div>
+
 <div class="stw-wrap" id="stw-main-wrap">
 
-  <div class="stw-header">
-    <div class="stw-curriculum">${curriculumLabel()}</div>
-    <div class="stw-date">${titleDateLabel()}</div>
-  </div>
-
-  <div class="stw-dots-row" id="stw-dots"></div>
+  <div class="stw-dots-row" id="stw-dots">
 
   <div class="stw-hud">
     <div class="stw-pill">Word <b id="stw-num">1</b> / 15</div>
@@ -747,15 +862,18 @@ U.mount(`
 </div>
 
 <!-- RESULTS -->
+<div class="stw-results-wrap" style="max-width:640px;margin:0 auto;padding:0 1rem;box-sizing:border-box;">
 <div class="stw-results" id="stw-results">
   <div class="stw-res-inner">
     <div class="stw-res-score"  id="stw-rs"></div>
     <div class="stw-res-pct"    id="stw-rp"></div>
     <div class="stw-res-label"  id="stw-rl"></div>
     <div class="stw-res-divider"></div>
+    
     <div class="stw-res-en"     id="stw-re"></div>
-    <div class="stw-res-jp"     id="stw-rj"></div>
     <div class="stw-res-kanji"  id="stw-rk"></div>
+    <div class="stw-res-jp"     id="stw-rj"></div>
+    
     <div class="stw-res-actions">
       <button class="game-btn game-btn-primary"   id="stw-replay">もう一度</button>
       <button class="game-btn game-btn-secondary" id="stw-back">メニューへ</button>
@@ -912,6 +1030,117 @@ document.getElementById('stw-start-btn').addEventListener('click', doStart);
 document.getElementById('stw-start-btn').addEventListener('touchstart', e => { e.preventDefault(); doStart(); }, { passive: false });
 
 /* ══════════════════════════════════════════════════════════════
+   HOMOPHONE MAP — expands target to all sound-alikes so SR
+   variants like "by/buy/bye" or "to/two/too" all count correct.
+   Keys are the canonical word (lowercase). Values include all
+   homophones AND the canonical word itself.
+   ══════════════════════════════════════════════════════════════ */
+const HOMOPHONES = {
+  'by':      ['by','buy','bye'],
+  'buy':     ['by','buy','bye'],
+  'bye':     ['by','buy','bye'],
+  'to':      ['to','too','two'],
+  'too':     ['to','too','two'],
+  'two':     ['to','too','two'],
+  'for':     ['for','four','fore'],
+  'four':    ['for','four','fore'],
+  'there':   ['there','their','they\'re'],
+  'their':   ['there','their','they\'re'],
+  'here':    ['here','hear'],
+  'hear':    ['here','hear'],
+  'know':    ['know','no'],
+  'no':      ['know','no'],
+  'new':     ['new','knew','gnu'],
+  'knew':    ['new','knew','gnu'],
+  'one':     ['one','won'],
+  'won':     ['one','won'],
+  'see':     ['see','sea'],
+  'sea':     ['see','sea'],
+  'be':      ['be','bee'],
+  'bee':     ['be','bee'],
+  'meet':    ['meet','meat'],
+  'meat':    ['meet','meat'],
+  'week':    ['week','weak'],
+  'weak':    ['week','weak'],
+  'write':   ['write','right','rite'],
+  'right':   ['write','right','rite'],
+  'sun':     ['sun','son'],
+  'son':     ['sun','son'],
+  'flower':  ['flower','flour'],
+  'flour':   ['flower','flour'],
+  'hair':    ['hair','hare','here'],
+  'hare':    ['hair','hare'],
+  'bare':    ['bare','bear'],
+  'bear':    ['bare','bear'],
+  'pair':    ['pair','pear','pare'],
+  'pear':    ['pair','pear'],
+  'read':    ['read','red'],   /* past tense read */
+  'blue':    ['blue','blew'],
+  'blew':    ['blue','blew'],
+  'night':   ['night','knight'],
+  'knight':  ['night','knight'],
+  'wear':    ['wear','where','ware'],
+  'where':   ['wear','where','ware'],
+  'whole':   ['whole','hole'],
+  'hole':    ['whole','hole'],
+  'plain':   ['plain','plane'],
+  'plane':   ['plain','plane'],
+  'made':    ['made','maid'],
+  'maid':    ['made','maid'],
+  'waist':   ['waist','waste'],
+  'waste':   ['waist','waste'],
+  'peace':   ['peace','piece'],
+  'piece':   ['peace','piece'],
+  'sale':    ['sale','sail'],
+  'sail':    ['sale','sail'],
+  'tale':    ['tale','tail'],
+  'tail':    ['tale','tail'],
+  'mail':    ['mail','male'],
+  'male':    ['mail','male'],
+};
+
+/**
+ * matchesWord(heard, target)
+ * Returns true if any speech-recognition alternative matches the
+ * target, accounting for homophones and loose punctuation/case.
+ *
+ * @param {string[]} alternatives - array of SR transcript strings
+ * @param {string}   target       - the correct English word/phrase
+ */
+function matchesWord(alternatives, target) {
+  const clean    = s => s.toLowerCase().replace(/[.?!,'"]/g, '').trim();
+  const tClean   = clean(target);
+  const tWords   = tClean.split(/\s+/);
+
+  /* Build the set of acceptable heard strings for this target.
+     For single-word targets, expand via homophone map.
+     For multi-word targets, check each word. */
+  const acceptSet = new Set([tClean]);
+
+  if (tWords.length === 1) {
+    const extras = HOMOPHONES[tWords[0]] || [];
+    extras.forEach(h => acceptSet.add(h));
+  } else {
+    /* Multi-word: also try swapping each word through homophones */
+    const variants = [tWords];
+    tWords.forEach((w, wi) => {
+      const phones = HOMOPHONES[w];
+      if (!phones) return;
+      phones.forEach(p => {
+        const v = [...tWords];
+        v[wi] = p;
+        variants.push(v);
+      });
+    });
+    variants.forEach(v => acceptSet.add(v.join(' ')));
+  }
+
+  return alternatives.some(alt => acceptSet.has(clean(alt)));
+}
+
+
+   
+/* ══════════════════════════════════════════════════════════════
    STATE
    ══════════════════════════════════════════════════════════════ */
 const order  = U.shuffle(CFG.cards.slice(0, 15));
@@ -971,10 +1200,11 @@ function buildIosChoices(card) {
   const distractors = U.shuffle(pool).slice(0, 3);
   const choices     = U.shuffle([card, ...distractors]);
 
-  choices.forEach(c => {
+  choices.forEach((c, ci) => {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'stw-ios-choice';
+    btn.setAttribute('data-ci', ci);
     btn.textContent = c.en;
 
     btn.addEventListener('touchstart', e => { e.preventDefault(); U.unlockAudio(); handleIosPick(btn, c.en); }, { passive: false });
@@ -1024,13 +1254,15 @@ function handleIosPick(btn, en) {
     /* play audio after ding settles, then show next */
     const card = order[idx];
     const afterDance = () => {
+       
       if (card.mp3) {
-        U.playSage(CFG.audioBase + card.mp3, 600).then(() => {
+        playSageOrFallback(CFG.audioBase + card.mp3, 600).then(() => {
           nextBtn.style.display = '';
         });
       } else {
         setTimeout(() => { nextBtn.style.display = ''; }, 600);
       }
+       
     };
     setTimeout(afterDance, 500);
 
@@ -1075,13 +1307,12 @@ if (SR && !isIOS) {
     jpCard.classList.remove('listening');
     badgeText.textContent = 'TAP MIC / マイクをタップ';
 
-    /* Check all alternatives */
-    const alts = Array.from(e.results[0]).map(r => r.transcript);
-    const heard = alts[0].toLowerCase().replace(/[.?!,]/g, '').trim();
+    const alts  = Array.from(e.results[0]).map(r => r.transcript);
+    const heard = alts[0].toLowerCase().replace(/[.?!,'"]/g, '').trim();
     if (heardText) heardText.textContent = `"${heard}"`;
 
-    const target = order[idx].en;
-    const matched = alts.some(t => U.matchesTarget(t, target));
+    const target  = order[idx].en;
+    const matched = matchesWord(alts, target);
 
     if (matched) {
       onMicCorrect(target);
@@ -1119,13 +1350,15 @@ function onMicCorrect(target) {
 
   const card = order[idx];
   const afterDance = () => {
+     
     if (card.mp3) {
-      U.playSage(CFG.audioBase + card.mp3, 600).then(() => {
+      playSageOrFallback(CFG.audioBase + card.mp3, 600).then(() => {
         nextBtn.style.display = '';
       });
     } else {
       setTimeout(() => { nextBtn.style.display = ''; }, 600);
     }
+     
   };
   setTimeout(afterDance, 500);
 }
@@ -1232,10 +1465,9 @@ function showResults() {
   /* ── Dispatch to Booha Adventure save system ── */
   document.dispatchEvent(new CustomEvent('booha:gameEnd', {
     detail: {
-      saveId:    (window.BoohaAdventure?.registry?.saveId ?? ((c, g) => `${c}__${g}`))(
-                   CFG.curriculum, 'say_word'),
+      saveId:    `${CFG.curriculum}:say_word`,
       score:     pct,
-      completed: score === 15,
+      completed: pct >= 40,
     }
   }));
 
@@ -1252,9 +1484,12 @@ function showResults() {
     setTimeout(() => fireConfetti(false), 400);
     setTimeout(() => fireConfetti(true),  900);
   }
-  const snd = new Audio(CFG.sfxBase + tier.sound);
-  snd.setAttribute('playsinline', '');
-  snd.play().catch(() => {});
+  if (CFG.sfxBase && tier.sound) {
+    const snd = new Audio(CFG.sfxBase + tier.sound);
+    snd.setAttribute('playsinline', '');
+    snd.setAttribute('webkit-playsinline', '');
+    snd.play().catch(() => {});
+  }
 }
 
 /* ══════════════════════════════════════════════════════════════
