@@ -604,6 +604,54 @@ function drawWanderers(now) {
     document.head.appendChild(s);
   }
 
+
+/* ═══════════════════════════════════════════
+   DEV TESTING TOGGLE (remove before shipping)
+═══════════════════════════════════════════ */
+function injectDevPanel() {
+  if (document.getElementById('dev-panel')) return; // guard against double-inject
+
+  const panel = document.createElement('div');
+  panel.id = 'dev-panel';
+  panel.style.cssText = `
+    position:fixed; bottom:60px; right:18px; z-index:9999;
+    pointer-events:auto;
+    background:rgba(0,0,0,.88); border:1px solid rgba(255,200,0,.4);
+    border-radius:10px; padding:10px 14px; font:700 11px/1.8 monospace;
+    color:#ffd700; letter-spacing:.06em; min-width:160px;
+    box-shadow:0 0 20px rgba(255,200,0,.2);`;
+
+  panel.innerHTML = `
+    <div style="font-size:9px;color:rgba(255,200,0,.5);letter-spacing:.14em;margin-bottom:6px;">DEV MODE</div>
+    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:4px;">
+      <input type="checkbox" id="dev-all-wanderers"> All wanderers
+    </label>
+    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+      <input type="checkbox" id="dev-all-games"> All games unlocked
+    </label>
+    <div id="dev-room-info" style="font-size:9px;color:rgba(255,200,0,.45);margin-top:8px;"></div>`;
+
+  document.body.appendChild(panel);
+
+  window.__devAllGames     = false;
+  window.__devAllWanderers = false;
+
+  document.getElementById('dev-all-games').addEventListener('change', function() {
+    window.__devAllGames = this.checked;
+  });
+
+  document.getElementById('dev-all-wanderers').addEventListener('change', function() {
+    window.__devAllWanderers = this.checked;
+    refreshWanderersForRoom();
+  });
+
+  setInterval(() => {
+    const el = document.getElementById('dev-room-info');
+    if (el) el.textContent = `room: ${state.roomId} | moved: ${Math.round(state.distMovedSinceSpawn)}`;
+  }, 200);
+}
+
+  
   /* ═══════════════════════════════════════════
      DOM BUILD
   ═══════════════════════════════════════════ */
@@ -657,6 +705,8 @@ function drawWanderers(now) {
 
     /* ── Step 1: inject bonus lock overlay ── */
     injectBonusLockOverlay();
+     // ADD THIS LINE:
+    injectDevPanel();
 
     const rotateOverlay = document.createElement("div");
     rotateOverlay.id = "rotate-overlay";
@@ -1282,60 +1332,6 @@ function drawWanderers(now) {
     requestAnimationFrame(tick);
   }
 
-/* ═══════════════════════════════════════════
-   DEV TESTING TOGGLE (remove before shipping)
-═══════════════════════════════════════════ */
-(function injectDevPanel() {
-  const panel = document.createElement('div');
-  panel.id = 'dev-panel';
-  panel.style.cssText = `
-    position:fixed; bottom:60px; right:18px; z-index:9999;
-    background:rgba(0,0,0,.88); border:1px solid rgba(255,200,0,.4);
-    border-radius:10px; padding:10px 14px; font:700 11px/1.8 monospace;
-    color:#ffd700; letter-spacing:.06em; min-width:160px;
-    box-shadow:0 0 20px rgba(255,200,0,.2);`;
 
-  panel.innerHTML = `
-    <div style="font-size:9px;color:rgba(255,200,0,.5);letter-spacing:.14em;margin-bottom:6px;">DEV MODE</div>
-    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:4px;">
-      <input type="checkbox" id="dev-all-wanderers"> All wanderers
-    </label>
-    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
-      <input type="checkbox" id="dev-all-games"> All games unlocked
-    </label>
-    <div id="dev-room-info" style="font-size:9px;color:rgba(255,200,0,.45);margin-top:8px;"></div>`;
-
-  document.body.appendChild(panel);
-
-  // Patch _bonusUnlocked to check the override flag
-  const _origBonusUnlocked = window._bonusUnlocked || _bonusUnlocked;
-  // Since _bonusUnlocked is a closure, we override via the dev flag checked inside it.
-  // Instead, we shadow the check by monkey-patching handleBonusTreeInteraction:
-  const _origHandle = handleBonusTreeInteraction;
-  // Re-point handleBonusTreeInteraction using the outer-scope reference trick:
-  // (This works because handleBonusTreeInteraction is called by name in checkBonusTrees/clickBonusTree)
-
-  // Simpler: patch _bonusUnlocked's result via a global dev flag the IIFE can see
-  window.__devAllGames = false;
-  window.__devAllWanderers = false;
-
-  document.getElementById('dev-all-games').addEventListener('change', function() {
-    window.__devAllGames = this.checked;
-  });
-
-  document.getElementById('dev-all-wanderers').addEventListener('change', function() {
-    window.__devAllWanderers = this.checked;
-    refreshWanderersForRoom();
-  });
-
-  // Tick the room info display
-  setInterval(() => {
-    const el = document.getElementById('dev-room-info');
-    if (el) el.textContent = `room: ${state.roomId} | moved: ${Math.round(state.distMovedSinceSpawn)}`;
-  }, 200);
-})();
-
-
-  
   init();
 })();    
