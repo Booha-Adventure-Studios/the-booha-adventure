@@ -688,9 +688,18 @@ function handleIosPick(btn, card) {
 
 /* ═══ PLAY BUTTON ═══ */
 playBtn.addEventListener('click', () => {
-  if (listening) return;
+  if (listening || playBtn.disabled) return;
   const card = order[idx]; if (!card.mp3) return;
-  try { const a = new Audio(CFG.audioBase+card.mp3); a.setAttribute('playsinline',''); a.setAttribute('webkit-playsinline',''); a.play().catch(()=>{}); } catch(e) {}
+  try {
+    const a = new Audio(CFG.audioBase + card.mp3);
+    a.setAttribute('playsinline',''); a.setAttribute('webkit-playsinline','');
+    playBtn.disabled = true;
+    a.onended = () => { playBtn.disabled = false; };
+    a.onerror = () => { playBtn.disabled = false; };
+    /* Safety re-enable in case onended never fires */
+    setTimeout(() => { playBtn.disabled = false; }, 8000);
+    a.play().catch(() => { playBtn.disabled = false; });
+  } catch(e) { playBtn.disabled = false; }
 });
 
 /* ═══ MIC BUTTON ═══ */
