@@ -1151,14 +1151,18 @@ function handleIosPick(btn, card) {
    PLAY BUTTON
    ══════════════════════════════════════════════════════════════ */
 playBtn.addEventListener('click', () => {
-  if (isBusy || listening) return;
-  const card = order[idx];
-  if (!card.mp3) return;
+  if (listening || playBtn.disabled) return;
+  const card = order[idx]; if (!card.mp3) return;
   try {
     const a = new Audio(CFG.audioBase + card.mp3);
     a.setAttribute('playsinline',''); a.setAttribute('webkit-playsinline','');
-    a.play().catch(()=>{});
-  } catch(e) {}
+    playBtn.disabled = true;
+    a.onended = () => { playBtn.disabled = false; };
+    a.onerror = () => { playBtn.disabled = false; };
+    /* Safety re-enable in case onended never fires */
+    setTimeout(() => { playBtn.disabled = false; }, 8000);
+    a.play().catch(() => { playBtn.disabled = false; });
+  } catch(e) { playBtn.disabled = false; }
 });
 
 /* ══════════════════════════════════════════════════════════════
