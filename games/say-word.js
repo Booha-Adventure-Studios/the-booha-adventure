@@ -46,6 +46,25 @@ await Promise.all([
   U.loadSFX('fart', CFG.sfxBase + 'fart.mp3'),
 ]);
 
+function playSfxSafe(name, fallbackFile) {
+  try {
+    if (typeof U.playSFX === 'function') {
+      U.playSFX(name);
+      return;
+    }
+    if (typeof U.playSfx === 'function') {
+      U.playSfx(name);
+      return;
+    }
+  } catch (e) {}
+
+  const a = new Audio(CFG.sfxBase + fallbackFile);
+  a.setAttribute('playsinline', '');
+  a.setAttribute('webkit-playsinline', '');
+  a.play().catch(() => {});
+}
+
+   
 /* ══════════════════════════════════════════════════════════════
    LABEL HELPERS
    ══════════════════════════════════════════════════════════════ */
