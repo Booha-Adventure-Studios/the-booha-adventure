@@ -510,6 +510,8 @@ let idx=0, score=0, streak=0;
 let firstScores = new Array(15).fill(null);
 let isBusy=false, listening=false, collecting=false, heard='', SR_inst=null;
 let iosAnswered=false, iosFirstTry=true;
+let iosPickCooldown = false;
+   
 
 function updateStreak(n) {
   streak = n;
@@ -666,7 +668,10 @@ function buildIosChoices(card) {
   });
 }
 function handleIosPick(btn, card) {
-  if (iosAnswered) return;
+  if (iosAnswered || iosPickCooldown) return;
+  iosPickCooldown = true;
+  setTimeout(() => { iosPickCooldown = false; }, 600);
+   
   const correct = card.en === order[idx].en;
   if (correct) {
     iosAnswered = true;
@@ -696,7 +701,6 @@ playBtn.addEventListener('click', () => {
     playBtn.disabled = true;
     a.onended = () => { playBtn.disabled = false; };
     a.onerror = () => { playBtn.disabled = false; };
-    /* Safety re-enable in case onended never fires */
     setTimeout(() => { playBtn.disabled = false; }, 8000);
     a.play().catch(() => { playBtn.disabled = false; });
   } catch(e) { playBtn.disabled = false; }
@@ -715,7 +719,9 @@ if (micBtn) {
 }
 
 retryBtn.addEventListener('click', () => {
+  if (isBusy) return;
   retryBtn.style.display = 'none'; skipBtn.style.display = 'none';
+   
   if (enEl) mountWords(order[idx].en);
   beginRound();
 });
@@ -724,6 +730,7 @@ skipBtn.addEventListener('click', () => {
   idx++; scoreEl.textContent = score;
   if (idx >= order.length) { showResults(); return; }
   iosAnswered = false; iosFirstTry = true; showCard();
+  iosPickCooldown = false;   
 });
 
 /* ═══ CONFETTI ═══ */
@@ -761,6 +768,7 @@ document.getElementById('sas-replay').addEventListener('click', () => {
   scoreEl.textContent='0';
   const se=document.getElementById('sas-streak'); if(se) se.textContent='0';
   iosAnswered=false; iosFirstTry=true;
+  iosPickCooldown = false;   
   U.shuffle(order); showCard();
 });
 document.getElementById('sas-back').addEventListener('click', () => {
