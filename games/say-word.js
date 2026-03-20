@@ -25,9 +25,11 @@ function playSageOrFallback(url, delayMs) {
       const a = new Audio(url);
       a.setAttribute('playsinline', '');
       a.setAttribute('webkit-playsinline', '');
-      a.onended = resolve;
-      a.onerror = resolve;
-      a.play().catch(resolve);
+      /* Safety timeout — resolve after 4s max even if onended never fires */
+      const safety = setTimeout(resolve, 4000);
+      a.onended = () => { clearTimeout(safety); resolve(); };
+      a.onerror = () => { clearTimeout(safety); resolve(); };
+      a.play().catch(() => { clearTimeout(safety); resolve(); });
     }, delayMs ?? 0);
   });
 }
