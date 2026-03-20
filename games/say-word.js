@@ -1280,16 +1280,18 @@ function handleIosPick(btn, en) {
 
     /* play audio after ding settles, then show next */
     const card = order[idx];
+     
     const afterDance = () => {
-       
       if (card.mp3) {
-        playSageOrFallback(CFG.audioBase + card.mp3, 600).then(() => {
-          nextBtn.style.display = '';
-        });
-      } else {
-        setTimeout(() => { nextBtn.style.display = ''; }, 600);
+        setTimeout(() => {
+          const a = new Audio(CFG.audioBase + card.mp3);
+          a.setAttribute('playsinline', '');
+          a.setAttribute('webkit-playsinline', '');
+          a.play().catch(() => {});
+        }, 300);
       }
-       
+      /* Show next button after fixed delay — never blocks on audio */
+      setTimeout(() => { nextBtn.style.display = ''; }, 1800);
     };
     setTimeout(afterDance, 500);
 
