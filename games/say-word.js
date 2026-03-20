@@ -895,6 +895,7 @@ U.mount(`
     </div>
   </div>
 </div>
+</div>
 
 <!-- HELP BUTTON -->
 <button class="stw-help-btn" id="stw-help">？</button>
