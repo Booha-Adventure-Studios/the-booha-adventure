@@ -1279,7 +1279,9 @@ function handleIosPick(btn, en) {
   const card = order[idx];
      
 setTimeout(() => {
-  U.playSFX('ding');
+  const ding = new Audio(CFG.sfxBase + 'ding.mp3');
+  ding.setAttribute('playsinline',''); ding.setAttribute('webkit-playsinline','');
+  ding.play().catch(()=>{});
   if (card.mp3) {
 
      
@@ -1302,7 +1304,13 @@ setTimeout(() => {
      
     btn.classList.add('ios-wrong');
     jpCard.classList.add('wrong-state');
-    setTimeout(() => { U.playSFX('fart'); }, 50);
+     
+        setTimeout(() => {
+      const fart = new Audio(CFG.sfxBase + 'fart.mp3');
+      fart.setAttribute('playsinline',''); fart.setAttribute('webkit-playsinline','');
+      fart.play().catch(()=>{});
+    }, 50);
+
      
     setTimeout(() => {
       btn.classList.remove('ios-wrong');
@@ -1393,7 +1401,9 @@ function onMicCorrect(target) {
 const card = order[idx];
    
 setTimeout(() => {
-  U.playSFX('ding');
+  const ding = new Audio(CFG.sfxBase + 'ding.mp3');
+  ding.setAttribute('playsinline',''); ding.setAttribute('webkit-playsinline','');
+  ding.play().catch(()=>{});
   if (card.mp3) {
 
      
@@ -1420,7 +1430,12 @@ if (streakEl) streakEl.textContent = streak;
     setTimeout(() => heardBox.classList.remove('heard-wrong'), 500);
   }
    jpCard.classList.add('wrong-state');
-  setTimeout(() => { U.playSFX('fart'); }, 50);
+   
+    setTimeout(() => {
+      const fart = new Audio(CFG.sfxBase + 'fart.mp3');
+      fart.setAttribute('playsinline',''); fart.setAttribute('webkit-playsinline','');
+      fart.play().catch(()=>{});
+    }, 50);
 
   setTimeout(() => jpCard.classList.remove('wrong-state'), 500);
   micBtn.disabled = false;
