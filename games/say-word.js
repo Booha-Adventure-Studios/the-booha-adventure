@@ -813,12 +813,16 @@ U.mount(`
 
 <div class="stw-wrap" id="stw-main-wrap">
 
-  <div class="stw-dots-row" id="stw-dots">
+  <div class="stw-dots-row" id="stw-dots"></div>
 
+  
   <div class="stw-hud">
     <div class="stw-pill">Word <b id="stw-num">1</b> / 15</div>
     <div class="stw-pill">Score <b id="stw-score">0</b> / 15</div>
+    <div class="stw-pill">Streak <b id="stw-streak">0</b></div>
   </div>
+
+  <div class="stw-dots-row" id="stw-dots"></div>
 
   <!-- BIG JP CARD -->
   <div class="stw-jp-card" id="stw-jp-card" style="width:100%">
@@ -1146,6 +1150,7 @@ function matchesWord(alternatives, target) {
 const order  = U.shuffle(CFG.cards.slice(0, 15));
 let idx      = 0;
 let score    = 0;
+let streak = 0;   
 let firstTry = true;
 let answered = false;
 let iosLocked = false;
@@ -1168,6 +1173,7 @@ function showCard() {
   if (idx >= order.length) { showResults(); return; }
   answered  = false;
   firstTry  = true;
+  // streak is NOT reset on new card — only on wrong answer 
   iosLocked = false;
 
   const card = order[idx];
@@ -1245,7 +1251,13 @@ function handleIosPick(btn, en) {
     });
 
     U.playSFX('ding');
-    if (firstTry) { score++; scoreEl.textContent = score; }
+    if (firstTry) {
+  score++;
+  streak++;
+  scoreEl.textContent = score;
+  const streakEl = document.getElementById('stw-streak');
+  if (streakEl) streakEl.textContent = streak;
+}
 
     /* word dance */
     jpCard.classList.add('dancing', 'correct-state');
@@ -1269,6 +1281,9 @@ function handleIosPick(btn, en) {
   } else {
     /* wrong — shake the card, flash choice red, allow retry */
     firstTry = false;
+    streak = 0;
+    const streakEl = document.getElementById('stw-streak');
+   if (streakEl) streakEl.textContent = streak; 
     btn.classList.add('ios-wrong');
     jpCard.classList.add('wrong-state');
     U.playSFX('fart');
@@ -1500,6 +1515,8 @@ document.getElementById('stw-replay').addEventListener('click', () => {
   mainWrap.style.display = '';
 
   idx = 0; score = 0;
+  streak = 0;
+  document.getElementById('stw-streak').textContent = '0';
   scoreEl.textContent = '0';
   U.shuffle(order);
   showCard();
