@@ -101,6 +101,20 @@ const getTier = s => TIERS.find(t => s >= t.min && s <= t.max) ?? TIERS[0];
 const S = document.createElement('style');
 S.textContent = `
 
+/* Rainbow twinkle — fires on correct answer */
+.stw-heard-box.heard-correct{
+  background:rgba(34,197,94,.1); border-color:#22c55e;
+  animation:stwRainbowTwinkle .9s ease forwards;
+}
+@keyframes stwRainbowTwinkle{
+  0%  { background:rgba(167,139,250,.2); border-color:#a78bfa; box-shadow:0 0 0 3px rgba(167,139,250,.2); }
+  20% { background:rgba(255,44,136,.15); border-color:#ff2288; box-shadow:0 0 18px rgba(255,44,136,.5); }
+  40% { background:rgba(255,204,0,.15);  border-color:#ffcc00; box-shadow:0 0 18px rgba(255,204,0,.5); }
+  60% { background:rgba(170,255,34,.15); border-color:#aaff22; box-shadow:0 0 18px rgba(170,255,34,.5); }
+  80% { background:rgba(34,221,255,.15); border-color:#22ddff; box-shadow:0 0 18px rgba(34,221,255,.5); }
+  100%{ background:rgba(34,197,94,.12);  border-color:#22c55e; box-shadow:0 0 14px rgba(34,197,94,.4); }
+}
+
 .game-header{ display:none !important; }
 .stw-wrap{
   max-width:640px; margin:0 auto;
@@ -813,9 +827,6 @@ U.mount(`
 
 <div class="stw-wrap" id="stw-main-wrap">
 
-  <div class="stw-dots-row" id="stw-dots"></div>
-
-  
   <div class="stw-hud">
     <div class="stw-pill">Word <b id="stw-num">1</b> / 15</div>
     <div class="stw-pill">Score <b id="stw-score">0</b> / 15</div>
@@ -1190,6 +1201,7 @@ function showCard() {
   } else {
     /* reset mic */
     if (heardText) { heardText.textContent = '…'; }
+     
     if (heardBox)  { heardBox.className = 'stw-heard-box'; }
     if (micBtn)    { micBtn.disabled = false; micBtn.classList.remove('listening'); }
     badgeText.textContent = 'TAP MIC / マイクをタップ';
@@ -1324,7 +1336,8 @@ if (SR && !isIOS) {
 
     const alts  = Array.from(e.results[0]).map(r => r.transcript);
     const heard = alts[0].toLowerCase().replace(/[.?!,'"]/g, '').trim();
-    if (heardText) heardText.textContent = `"${heard}"`;
+     
+    if (heardText && !matched) heardText.textContent = `"${heard}"`;
 
     const target  = order[idx].en;
     const matched = matchesWord(alts, target);
@@ -1354,7 +1367,10 @@ if (SR && !isIOS) {
 
 function onMicCorrect(target) {
   answered = true;
-  if (heardBox) heardBox.classList.add('heard-correct');
+  if (heardBox) {
+  heardText.textContent = '✓';
+  heardBox.classList.add('heard-correct');
+}
   micBtn.disabled = true;
 
   U.playSFX('ding');
