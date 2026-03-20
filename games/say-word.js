@@ -1281,19 +1281,15 @@ function handleIosPick(btn, en) {
     /* play audio after ding settles, then show next */
     const card = order[idx];
      
-    const afterDance = () => {
+   setTimeout(() => {
       if (card.mp3) {
-        setTimeout(() => {
-          const a = new Audio(CFG.audioBase + card.mp3);
-          a.setAttribute('playsinline', '');
-          a.setAttribute('webkit-playsinline', '');
-          a.play().catch(() => {});
-        }, 300);
+        const a = new Audio(CFG.audioBase + card.mp3);
+        a.setAttribute('playsinline', '');
+        a.setAttribute('webkit-playsinline', '');
+        a.play().catch(() => {});
       }
-      /* Show next button after fixed delay — never blocks on audio */
-      setTimeout(() => { nextBtn.style.display = ''; }, 1800);
-    };
-    setTimeout(afterDance, 500);
+      setTimeout(() => { idx++; showCard(); }, 1400);
+    }, 500);
 
   } else {
     /* wrong — shake the card, flash choice red, allow retry */
@@ -1384,19 +1380,16 @@ function onMicCorrect(target) {
   updateDots();
 
   const card = order[idx];
-  const afterDance = () => {
-     
-    if (card.mp3) {
-      playSageOrFallback(CFG.audioBase + card.mp3, 600).then(() => {
-        nextBtn.style.display = '';
-      });
-    } else {
-      setTimeout(() => { nextBtn.style.display = ''; }, 600);
-    }
-     
-  };
-  setTimeout(afterDance, 500);
-}
+   
+ setTimeout(() => {
+      if (card.mp3) {
+        const a = new Audio(CFG.audioBase + card.mp3);
+        a.setAttribute('playsinline', '');
+        a.setAttribute('webkit-playsinline', '');
+        a.play().catch(() => {});
+      }
+      setTimeout(() => { idx++; showCard(); }, 1400);
+    }, 500);
 
 function onMicWrong() {
   firstTry = false;
