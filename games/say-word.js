@@ -848,9 +848,9 @@ function advanceAfterCorrect() {
       a.setAttribute('playsinline','');
       a.setAttribute('webkit-playsinline','');
       a.play().catch(()=>{});
-    }, 150);
+    }, 500);
   }
-  setTimeout(() => { idx++; showCard(); }, 1800);
+  setTimeout(() => { idx++; showCard(); }, 2200);
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -918,6 +918,7 @@ function handleIosPick(btn, en) {
     if (streakEl) streakEl.textContent = streak;
     btn.classList.add('ios-wrong');
     jpCard.classList.add('wrong-state');
+    U.unlockAudio();
     playSfx('fart');
     setTimeout(() => {
       btn.classList.remove('ios-wrong');
@@ -1009,6 +1010,7 @@ function onMicWrong() {
     setTimeout(() => heardBox.classList.remove('heard-wrong'), 500);
   }
   jpCard.classList.add('wrong-state');
+  U.unlockAudio();
   playSfx('fart');
   setTimeout(() => jpCard.classList.remove('wrong-state'), 500);
   if (micBtn) micBtn.disabled = false;
