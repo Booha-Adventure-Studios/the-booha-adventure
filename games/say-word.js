@@ -1278,9 +1278,11 @@ function handleIosPick(btn, en) {
 
   const card = order[idx];
      
-U.playSFX('ding');
 setTimeout(() => {
+  U.playSFX('ding');
   if (card.mp3) {
+
+     
     const a = new Audio(CFG.audioBase + card.mp3);
     a.setAttribute('playsinline', '');
     a.setAttribute('webkit-playsinline', '');
@@ -1297,9 +1299,11 @@ setTimeout(() => {
     streak = 0;
     const streakEl = document.getElementById('stw-streak');
    if (streakEl) streakEl.textContent = streak; 
+     
     btn.classList.add('ios-wrong');
     jpCard.classList.add('wrong-state');
-    U.playSFX('fart');
+    setTimeout(() => { U.playSFX('fart'); }, 50);
+     
     setTimeout(() => {
       btn.classList.remove('ios-wrong');
       jpCard.classList.remove('wrong-state');
@@ -1388,9 +1392,11 @@ function onMicCorrect(target) {
    
 const card = order[idx];
    
-U.playSFX('ding');
 setTimeout(() => {
+  U.playSFX('ding');
   if (card.mp3) {
+
+     
     const a = new Audio(CFG.audioBase + card.mp3);
     a.setAttribute('playsinline', '');
     a.setAttribute('webkit-playsinline', '');
@@ -1413,8 +1419,9 @@ if (streakEl) streakEl.textContent = streak;
     heardBox.classList.add('heard-wrong');
     setTimeout(() => heardBox.classList.remove('heard-wrong'), 500);
   }
-  jpCard.classList.add('wrong-state');
-  U.playSFX('fart');
+   jpCard.classList.add('wrong-state');
+  setTimeout(() => { U.playSFX('fart'); }, 50);
+
   setTimeout(() => jpCard.classList.remove('wrong-state'), 500);
   micBtn.disabled = false;
 }
