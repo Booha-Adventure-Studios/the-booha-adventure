@@ -1443,6 +1443,13 @@ nextBtn.addEventListener('click', () => {
   idx++;
   showCard();
 });
+nextBtn.addEventListener('touchstart', e => {
+  e.preventDefault();
+  jpCard.classList.remove('dancing','correct-state');
+  if (srListening && recognition) { try { recognition.stop(); } catch(e) {} }
+  idx++;
+  showCard();
+}, { passive: false });
 
 /* ══════════════════════════════════════════════════════════════
    CONFETTI
