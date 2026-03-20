@@ -1277,13 +1277,17 @@ function handleIosPick(btn, en) {
     updateDots();
 
   const card = order[idx];
+     
 U.playSFX('ding');
 setTimeout(() => {
   if (card.mp3) {
-    playSageOrFallback(CFG.audioBase + card.mp3, 0);
+    const a = new Audio(CFG.audioBase + card.mp3);
+    a.setAttribute('playsinline', '');
+    a.setAttribute('webkit-playsinline', '');
+    a.play().catch(() => {});
   }
-  setTimeout(() => { idx++; showCard(); }, 1200);
-}, 400);
+  setTimeout(() => { idx++; showCard(); }, 1400);
+}, 500);
 
 
      
@@ -1369,26 +1373,42 @@ function onMicCorrect(target) {
 }
   micBtn.disabled = true;
 
-    if (firstTry) { score++; scoreEl.textContent = score; }
+  if (firstTry) {
+  score++;
+  streak++;
+  scoreEl.textContent = score;
+  const streakEl = document.getElementById('stw-streak');
+  if (streakEl) streakEl.textContent = streak;
+}
+   
 
     jpCard.classList.add('dancing', 'correct-state');
     updateDots();
 
    
 const card = order[idx];
+   
 U.playSFX('ding');
 setTimeout(() => {
   if (card.mp3) {
-    playSageOrFallback(CFG.audioBase + card.mp3, 0);
+    const a = new Audio(CFG.audioBase + card.mp3);
+    a.setAttribute('playsinline', '');
+    a.setAttribute('webkit-playsinline', '');
+    a.play().catch(() => {});
   }
-  setTimeout(() => { idx++; showCard(); }, 1200);
-}, 400);
+  setTimeout(() => { idx++; showCard(); }, 1400);
+}, 500);
 
    
 }
 function onMicWrong() {
    
   firstTry = false;
+streak = 0;
+const streakEl = document.getElementById('stw-streak');
+if (streakEl) streakEl.textContent = streak;
+
+   
   if (heardBox) {
     heardBox.classList.add('heard-wrong');
     setTimeout(() => heardBox.classList.remove('heard-wrong'), 500);
