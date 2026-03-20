@@ -1265,7 +1265,6 @@ function handleIosPick(btn, en) {
       if (b !== btn) b.classList.add('ios-locked');
     });
 
-  U.playSFX('ding');
     if (firstTry) {
       score++;
       streak++;
@@ -1277,17 +1276,15 @@ function handleIosPick(btn, en) {
     jpCard.classList.add('dancing', 'correct-state');
     updateDots();
 
-    const card = order[idx];
-    setTimeout(() => {
+   const card = order[idx];
+    playSageOrFallback(CFG.sfxBase + 'ding.mp3').then(() => {
       if (card.mp3) {
-        const a = new Audio(CFG.audioBase + card.mp3);
-        a.setAttribute('playsinline', '');
-        a.setAttribute('webkit-playsinline', '');
-        a.play().catch(() => {});
+        return playSageOrFallback(CFG.audioBase + card.mp3, 0);
       }
-      setTimeout(() => { idx++; showCard(); }, 1400);
-    }, 500);
-
+    }).then(() => {
+      setTimeout(() => { idx++; showCard(); }, 600);
+    });
+     
   } else {
     /* wrong — shake the card, flash choice red, allow retry */
     firstTry = false;
@@ -1370,22 +1367,19 @@ function onMicCorrect(target) {
 }
   micBtn.disabled = true;
 
-U.playSFX('ding');
     if (firstTry) { score++; scoreEl.textContent = score; }
 
     jpCard.classList.add('dancing', 'correct-state');
     updateDots();
 
-  const card = order[idx];
-    setTimeout(() => {
-      if (card.mp3) {
-        const a = new Audio(CFG.audioBase + card.mp3);
-        a.setAttribute('playsinline', '');
-        a.setAttribute('webkit-playsinline', '');
-        a.play().catch(() => {});
-      }
-      setTimeout(() => { idx++; showCard(); }, 1400);
-    }, 500);
+ const card = order[idx];
+  playSageOrFallback(CFG.sfxBase + 'ding.mp3').then(() => {
+    if (card.mp3) {
+      return playSageOrFallback(CFG.audioBase + card.mp3, 0);
+    }
+  }).then(() => {
+    setTimeout(() => { idx++; showCard(); }, 600);
+  });
 }
 
 function onMicWrong() {
