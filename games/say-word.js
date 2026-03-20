@@ -1276,14 +1276,16 @@ function handleIosPick(btn, en) {
     jpCard.classList.add('dancing', 'correct-state');
     updateDots();
 
-   const card = order[idx];
-    playSageOrFallback(CFG.sfxBase + 'ding.mp3').then(() => {
-      if (card.mp3) {
-        return playSageOrFallback(CFG.audioBase + card.mp3, 0);
-      }
-    }).then(() => {
-      setTimeout(() => { idx++; showCard(); }, 600);
-    });
+  const card = order[idx];
+U.playSFX('ding');
+setTimeout(() => {
+  if (card.mp3) {
+    playSageOrFallback(CFG.audioBase + card.mp3, 0);
+  }
+  setTimeout(() => { idx++; showCard(); }, 1200);
+}, 400);
+
+
      
   } else {
     /* wrong — shake the card, flash choice red, allow retry */
@@ -1372,16 +1374,18 @@ function onMicCorrect(target) {
     jpCard.classList.add('dancing', 'correct-state');
     updateDots();
 
- const card = order[idx];
-  playSageOrFallback(CFG.sfxBase + 'ding.mp3').then(() => {
-    if (card.mp3) {
-      return playSageOrFallback(CFG.audioBase + card.mp3, 0);
-    }
-  }).then(() => {
-    setTimeout(() => { idx++; showCard(); }, 600);
-  });
-}
+   
+const card = order[idx];
+U.playSFX('ding');
+setTimeout(() => {
+  if (card.mp3) {
+    playSageOrFallback(CFG.audioBase + card.mp3, 0);
+  }
+  setTimeout(() => { idx++; showCard(); }, 1200);
+}, 400);
 
+   
+}
 function onMicWrong() {
    
   firstTry = false;
