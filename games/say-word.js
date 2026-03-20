@@ -718,12 +718,19 @@ document.getElementById('stw-modal-ok').addEventListener('click', () => modalOve
 modalOver.addEventListener('click', e => { if (e.target === modalOver) modalOver.classList.remove('open'); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') modalOver.classList.remove('open'); });
 
+// In doStart(), after U.unlockAudio():
 function doStart() {
   U.unlockAudio();
+  /* Pre-warm sfx so first play is always ready */
+  try {
+    const warm = SFX['fart'] ? SFX['fart'].cloneNode() : null;
+    if (warm) { warm.volume = 0; warm.play().catch(()=>{}); }
+  } catch(e) {}
   startOver.classList.add('hiding');
   setTimeout(() => { startOver.style.display = 'none'; }, 380);
   showCard();
 }
+   
 document.getElementById('stw-start-btn').addEventListener('click', doStart);
 document.getElementById('stw-start-btn').addEventListener('touchstart', e => { e.preventDefault(); doStart(); }, { passive: false });
 
