@@ -1161,7 +1161,8 @@ function matchesWord(alternatives, target) {
 /* ══════════════════════════════════════════════════════════════
    STATE
    ══════════════════════════════════════════════════════════════ */
-const order  = U.shuffle(CFG.cards.slice(0, 15));
+const order = U.shuffle(CFG.cards).slice(0, 15);
+   
 let idx      = 0;
 let score    = 0;
 let streak = 0;   
@@ -1279,9 +1280,7 @@ function handleIosPick(btn, en) {
   const card = order[idx];
      
 setTimeout(() => {
-  const ding = new Audio(CFG.sfxBase + 'ding.mp3');
-  ding.setAttribute('playsinline',''); ding.setAttribute('webkit-playsinline','');
-  ding.play().catch(()=>{});
+  playSfxSafe('ding', 'ding.mp3');
   if (card.mp3) {
 
      
@@ -1305,10 +1304,9 @@ setTimeout(() => {
     btn.classList.add('ios-wrong');
     jpCard.classList.add('wrong-state');
      
-        setTimeout(() => {
-      const fart = new Audio(CFG.sfxBase + 'fart.mp3');
-      fart.setAttribute('playsinline',''); fart.setAttribute('webkit-playsinline','');
-      fart.play().catch(()=>{});
+      setTimeout(() => {
+      playSfxSafe('fart', 'fart.mp3'); 
+
     }, 50);
 
      
@@ -1400,10 +1398,9 @@ function onMicCorrect(target) {
    
 const card = order[idx];
    
-setTimeout(() => {
-  const ding = new Audio(CFG.sfxBase + 'ding.mp3');
-  ding.setAttribute('playsinline',''); ding.setAttribute('webkit-playsinline','');
-  ding.play().catch(()=>{});
+   setTimeout(() => {
+   playSfxSafe('ding', 'ding.mp3');
+   
   if (card.mp3) {
 
      
@@ -1432,9 +1429,7 @@ if (streakEl) streakEl.textContent = streak;
    jpCard.classList.add('wrong-state');
    
     setTimeout(() => {
-      const fart = new Audio(CFG.sfxBase + 'fart.mp3');
-      fart.setAttribute('playsinline',''); fart.setAttribute('webkit-playsinline','');
-      fart.play().catch(()=>{});
+      playSfxSafe('fart', 'fart.mp3');
     }, 50);
 
   setTimeout(() => jpCard.classList.remove('wrong-state'), 500);
