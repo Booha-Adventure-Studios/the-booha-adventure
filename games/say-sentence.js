@@ -468,13 +468,30 @@ if (isIOS) {
 
 if (!isIOS && startOver) {
   const startBtn = document.getElementById('sas-start-btn');
-  const doStart = () => {
-    U.unlockAudio();
-    try { const w = SFX['fart'] ? SFX['fart'].cloneNode() : null; if (w) { w.volume=0; w.play().catch(()=>{}); } } catch(e) {}
-    try { const w = SFX['ding'] ? SFX['ding'].cloneNode() : null; if (w) { w.volume=0; w.play().catch(()=>{}); } } catch(e) {}
-    startOver.classList.add('hiding');
-    setTimeout(() => { startOver.style.display = 'none'; }, 380);
-  };
+   
+ const doStart = () => {
+  U.unlockAudio();
+  /* Pre-warm SFX */
+  try { const w = SFX['fart'] ? SFX['fart'].cloneNode() : null; if (w) { w.volume=0; w.play().catch(()=>{}); } } catch(e) {}
+  try { const w = SFX['ding'] ? SFX['ding'].cloneNode() : null; if (w) { w.volume=0; w.play().catch(()=>{}); } } catch(e) {}
+
+  /* Request mic permission now, before any timer starts */
+  if (SR && !isIOS) {
+    try {
+      const probe = new SR();
+      probe.lang = 'en-US';
+      probe.maxAlternatives = 1;
+      probe.onstart = () => { try { probe.stop(); } catch(e) {} };
+      probe.onerror = () => {};
+      probe.start();
+    } catch(e) {}
+  }
+
+  startOver.classList.add('hiding');
+  setTimeout(() => { startOver.style.display = 'none'; }, 380);
+};
+
+   
   startBtn.addEventListener('click', doStart);
   startBtn.addEventListener('touchstart', e => { e.preventDefault(); doStart(); }, { passive:false });
 }
