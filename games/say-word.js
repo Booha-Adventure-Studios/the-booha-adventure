@@ -1334,13 +1334,12 @@ if (SR && !isIOS) {
     jpCard.classList.remove('listening');
     badgeText.textContent = 'TAP MIC / マイクをタップ';
 
-    const alts  = Array.from(e.results[0]).map(r => r.transcript);
-    const heard = alts[0].toLowerCase().replace(/[.?!,'"]/g, '').trim();
-     
-    if (heardText && !matched) heardText.textContent = `"${heard}"`;
-
+    const alts    = Array.from(e.results[0]).map(r => r.transcript);
+    const heard   = alts[0].toLowerCase().replace(/[.?!,'"]/g, '').trim();
     const target  = order[idx].en;
     const matched = matchesWord(alts, target);
+
+    if (heardText && !matched) heardText.textContent = `"${heard}"`;
 
     if (matched) {
       onMicCorrect(target);
