@@ -21,8 +21,8 @@
 
   const MAZE_EXIT = {
     roomId  : "room_03",
-    x       : 785,
-    y       : 870,
+    x       : 738,
+    y       : 808,
     r       : 44,
     mazeUrl : "maze.html",
     treeIX  : 535,
@@ -79,8 +79,8 @@
       { dir: "up",    x: 548,  y: 200,  to: "room_09", spawn: "fromDown"  }
     ],
     room_05: [
-      { dir: "left",  x: 250,  y: 328,  to: "room_04", spawn: "fromRight" },
-      { dir: "up",    x: 785,  y: 200,  to: "room_10", spawn: "fromDown"  }
+      { dir: "left",  x: 132,  y: 642,  to: "room_04", spawn: "fromRight" },
+      { dir: "up",    x: 435,  y: 246,  to: "room_10", spawn: "fromDown"  }
     ],
     room_06: [
       { dir: "right", x: 1410, y: 684,  to: "room_07", spawn: "fromLeft"  },
@@ -125,7 +125,7 @@
       { dir: "down",  x: 910,  y: 888,  to: "room_08", spawn: "fromUp"    }
     ],
     room_14: [
-      { dir: "left",  x: 210,  y: 344,  to: "room_13", spawn: "fromRight" },
+      { dir: "left",  x: 223,  y: 631,  to: "room_13", spawn: "fromRight" },
       { dir: "right", x: 1440, y: 716,  to: "room_15", spawn: "fromLeft"  },
       { dir: "down",  x: 751,  y: 888,  to: "room_09", spawn: "fromUp"    }
     ],
@@ -381,8 +381,8 @@ function drawWanderers(now) {
      BONUS TREE DEFINITIONS — 5 total
   ═══════════════════════════════════════════ */
   const BONUS_TREES = [
-    { id:'booha_invaders',      roomId:'room_11', x:800, y:300, r:44, url:'booha_invaders.html',  label:'INVADERS', color:'#44ff88', lockMsg:'This game is locked. Better play some games in the maze.' },
-    { id:'booha_blocks',        roomId:'room_13', x:700, y:300, r:44, url:'booha_blocks.html',    label:'BLOCKS',   color:'#44aaff', lockMsg:'This game is locked. Better play some games in the maze.' },
+    { id:'booha_invaders',      roomId:'room_07', x:1019, y:381, r:44, url:'booha_invaders.html',  label:'INVADERS', color:'#44ff88', lockMsg:'This game is locked. Better play some games in the maze.' },
+    { id:'booha_blocks',        roomId:'room_13', x:1090, y:360, r:44, url:'booha_blocks.html',    label:'BLOCKS',   color:'#44aaff', lockMsg:'This game is locked. Better play some games in the maze.' },
     { id:'bonus_placeholder_1', roomId:'room_12', x:500, y:200, r:44, url:'bonus_game_1.html',    label:'???',      color:'#cc88ff', lockMsg:'This game is locked. Better play some games in the maze.' },
     { id:'bonus_placeholder_2', roomId:'room_14', x:900, y:250, r:44, url:'bonus_game_2.html',    label:'???',      color:'#ffcc44', lockMsg:'This game is locked. Better play some games in the maze.' },
     { id:'bonus_placeholder_3', roomId:'room_15', x:600, y:300, r:44, url:'bonus_game_3.html',    label:'???',      color:'#ff9966', lockMsg:'This game is locked. Better play some games in the maze.' },
