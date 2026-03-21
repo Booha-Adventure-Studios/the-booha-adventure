@@ -237,7 +237,7 @@ const TILT_DEAD=4, TILT_MAX=8, TILT_SPEED=380;
 // Audio
 let bgm=null, bossBgm=null, candySfx=null, lifelossSfx=null;
 // Boss music tracks
-const BOSS_MUSIC_SRCS=["dotty-boss-1.mp3","dotty-boss-2.mp3","dotty-boss-3.mp3"];
+const BOSS_MUSIC_SRCS=["the-booha-adventure/assets/invaders/dotty-boss-1.mp3","the-booha-adventure/assets/invaders/dotty-boss-2.mp3","the-booha-adventure/assets/invaders/dotty-boss-3.mp3"];
 let bossMusicIdx=0;
 
 // Boss
@@ -2491,20 +2491,21 @@ function tick(ts){
     loadImg(fd.src).then(img=>{fd.img=img;activeFriends.forEach(f=>{if(f.id===fd.id)f.img=img;});}).catch(()=>{});
   }
 
-  try{bgm=new Audio("the-booha-adventure/assets/invaders/invaders-bgm.mp3");bgm.loop=true;bgm.volume=0.6;}catch(_){}
-  try{candySfx=new Audio("the-booha-adventure/assets/invaders/candy-get.mp3");candySfx.volume=1;}catch(_){}
+  const A="the-booha-adventure/assets/invaders/"; // asset base path
+  try{bgm=new Audio(A+"invaders-bgm.mp3");bgm.loop=true;bgm.volume=0.6;}catch(_){}
+  try{candySfx=new Audio(A+"candy-get.mp3");candySfx.volume=1;}catch(_){}
 
   try{
     const [bg,b1,b2,bug,candy,r1,r2,r3,r4]=await Promise.all([
-      loadImg("the-booha-adventure/assets/invaders/background.png"),
-      loadImg("the-booha-adventure/assets/invaders/booha-invad-1.png"),
-      loadImg("the-booha-adventure/assets/invaders/booha-invad-2.png"),
-      loadImg("the-booha-adventure/assets/invaders/bug-1.png"),
-      loadImg("the-booha-adventure/assets/invaders/candy.png"),
-      loadImg("the-booha-adventure/assets/invaders/rock1.png"),
-      loadImg("the-booha-adventure/assets/invaders/rock2.png"),
-      loadImg("the-booha-adventure/assets/invaders/rock3.png"),
-      loadImg("the-booha-adventure/assets/invaders/rock4.png"),
+      loadImg(A+"background.png"),
+      loadImg(A+"booha-invad-1.png"),
+      loadImg(A+"booha-invad-2.png"),
+      loadImg(A+"bug-1.png"),
+      loadImg(A+"candy.png"),
+      loadImg(A+"rock1.png"),
+      loadImg(A+"rock2.png"),
+      loadImg(A+"rock3.png"),
+      loadImg(A+"rock4.png"),
     ]);
     IMG.bg=bg;IMG.booIdle=b1;IMG.booShoot=b2;IMG.bug=bug;IMG.candy=candy;
     IMG.rocks=[r1,r2,r3,r4];
