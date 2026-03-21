@@ -296,6 +296,9 @@ function weaponLevelFromCombo(c){
 
 // ── BG COLOR STATE ──
 let bgHue=240;
+// Smooth overlay state — transitions between wave/boss/milestone moods
+let bgOverlay={h:240,s:60,l:30,a:0,   // current (smoothed)
+               th:240,ts:60,tl:30,ta:0}; // target
 
 // ── BOSS CINEMATIC ──
 let bossCinematic={active:false,t:0,phase:"",bossRef:null};
@@ -1129,6 +1132,24 @@ function update(dt){
   // ── SCREEN FLASH DECAY ──
   if(screenFlash.alpha>0) screenFlash.alpha=Math.max(0,screenFlash.alpha-dt*4);
 
+  // ── BG OVERLAY SMOOTH TICK ──
+  // Set target based on game state
+  if(bossAlive||bossCinematic.active){
+    const phase=bugs.find(b=>b.alive&&b.isBoss)?.phase||1;
+    bgOverlay.th=phase>=3?0:phase===2?15:350; // phase3=orange-red, phase2=red-orange, phase1=crimson
+    bgOverlay.ts=90;bgOverlay.tl=25;bgOverlay.ta=0.22;
+  }else if(milestoneAnim.active){
+    bgOverlay.th=45;bgOverlay.ts=90;bgOverlay.tl=40;bgOverlay.ta=0.16;
+  }else{
+    bgOverlay.th=bgHue;bgOverlay.ts=65;bgOverlay.tl=28;bgOverlay.ta=0.13;
+  }
+  // Smooth toward target — slow for atmosphere, not jarring
+  const ols=Math.min(1,dt*1.2);
+  bgOverlay.h+=(bgOverlay.th-bgOverlay.h)*ols;
+  bgOverlay.s+=(bgOverlay.ts-bgOverlay.s)*ols;
+  bgOverlay.l+=(bgOverlay.tl-bgOverlay.l)*ols;
+  bgOverlay.a+=(bgOverlay.ta-bgOverlay.a)*ols;
+
   // ── SHIELD DECAY ──
   if(playerShield>0) playerShield=Math.max(0,playerShield-dt);
 
@@ -1527,20 +1548,31 @@ function roundRect(x,y,w,h,r){
 }
 
 function drawBackground(){
-  if(IMG.bg){drawCover(IMG.bg);return;}
-  const isBoss=bossAlive;
-  const h1=isBoss?(bgHue+120)%360:bgHue;
-  const h2=(h1+40)%360;
-  const grad=ctx.createLinearGradient(0,0,0,H());
-  grad.addColorStop(0,`hsl(${h1},35%,6%)`);
-  grad.addColorStop(1,`hsl(${h2},50%,3%)`);
-  ctx.fillStyle=grad;ctx.fillRect(0,0,W(),H());
-  ctx.fillStyle="rgba(255,255,255,0.5)";
-  const seed=WS.wave*1000;
-  for(let i=0;i<60;i++){
-    const x=((seed+i*173)%W());
-    const y=((seed+i*251+stageTime*20*(i%3+1)*0.3)%H());
-    ctx.fillRect(x,y,1,1);
+  // Always draw the forest image first
+  if(IMG.bg){
+    drawCover(IMG.bg);
+  }else{
+    // Fallback solid dark if no image
+    ctx.fillStyle=`hsl(${bgHue},30%,5%)`;
+    ctx.fillRect(0,0,W(),H());
+  }
+
+  // Smooth mood overlay — tints the forest without hiding it
+  // Uses a radial gradient so edges are more tinted than center
+  // keeping the action area readable
+  if(bgOverlay.a>0.005){
+    const cx=W()/2,cy=H()/2;
+    const rad=Math.max(W(),H())*0.85;
+    const hsl=`hsl(${Math.round(bgOverlay.h)},${Math.round(bgOverlay.s)}%,${Math.round(bgOverlay.l)}%)`;
+    const grad=ctx.createRadialGradient(cx,cy,rad*0.15,cx,cy,rad);
+    grad.addColorStop(0,`hsla(${Math.round(bgOverlay.h)},${Math.round(bgOverlay.s)}%,${Math.round(bgOverlay.l)}%,${(bgOverlay.a*0.4).toFixed(3)})`);
+    grad.addColorStop(1,`hsla(${Math.round(bgOverlay.h)},${Math.round(bgOverlay.s)}%,${Math.round(bgOverlay.l)}%,${(bgOverlay.a*1.4).toFixed(3)})`);
+    ctx.save();
+    ctx.globalCompositeOperation="multiply";
+    ctx.globalAlpha=1;
+    ctx.fillStyle=grad;
+    ctx.fillRect(0,0,W(),H());
+    ctx.restore();
   }
 }
 
@@ -2681,6 +2713,8 @@ function resetGame(){
   booFireTimer=0;booAutoCD=0;
   shakeDecay=0;shakeX=0;shakeY=0;
   screenFlash.alpha=0;
+  bgOverlay.h=240;bgOverlay.s=60;bgOverlay.l=30;bgOverlay.a=0;
+  bgOverlay.th=240;bgOverlay.ts=60;bgOverlay.tl=30;bgOverlay.ta=0;
   bossCinematic.active=false;bossCinematic.t=0;
   milestoneAnim.active=false;
   window._scorePopups=[];window._friendToast=null;window._candyToast=null;
