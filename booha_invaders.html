@@ -944,6 +944,7 @@ function spawnBossDotty(){
 // ════════════════════════════════════════
 let candyTimer=8;
 function addSpark(x,y,n=3,kind="gold"){
+  if(sparkles.length>200) return; // hard cap — prevent lag spiral
   for(let i=0;i<n;i++){
     sparkles.push({
       x,y,
@@ -1272,16 +1273,17 @@ function update(dt){
         b.diveT=(b.diveT||0)+dt;
         b.x+=b.diveVx*dt;
         b.y+=b.diveVy*dt;
-        b.diveVy=Math.min(b.diveVy+800*dt,900); // gravity pull
-        // clamp x
+        b.diveVy=Math.min(b.diveVy+800*dt,900);
         b.x=clamp(b.x,4,W()-b.w-4);
-        // hit bottom = reset to formation
+        // Sparse trail — only every ~4 frames to keep particle count low
+        b._trailT=(b._trailT||0)+dt;
+        if(b._trailT>0.06){b._trailT=0;addSpark(b.x+b.w/2,b.y+b.h*0.8,1,"boss");}
         if(b.y>H()-player.h*2.5){
           b.diving=false;b.diveT=0;
           b.y=b.ty;b.x=b.tx;
-          b.diveCD=rand(8,16); // cooldown before next dive
+          b.diveCD=rand(8,16);
         }
-        continue; // skip normal drift while diving
+        continue;
       }
 
       // Dive trigger: random chance after formation locked, not while shielded
@@ -1368,12 +1370,17 @@ function updateDiveCollisions(){
 // PROJECTILES
 // ════════════════════════════════════════
 function updateProjectiles(dt){
+  // Trail throttle counter — sparks every other frame max
+  const doTrail=((updateProjectiles._f=(updateProjectiles._f||0)+1)%2===0);
   for(const s of booShots){
     if(s.dead) continue;
     s.y+=s.vy*dt;s.x+=(s.vx||0)*dt;
-    if(s.isPink) addSpark(s.x+rand(-2,2),s.y+10+rand(-2,2),1,"pink");
-    else if(s.isFriend) addSpark(s.x+rand(-2,2),s.y+10+rand(-2,2),1,"friend");
-    else addSpark(s.x+rand(-2,2),s.y+10+rand(-2,2),1,"gold");
+    // Only trail on non-weak shots and only every other frame
+    if(doTrail&&!s.isWeak){
+      if(s.isFriend) addSpark(s.x,s.y+8,1,"friend");
+      else if(s.isPink) addSpark(s.x,s.y+8,1,"pink");
+      else addSpark(s.x,s.y+8,1,"gold");
+    }
 
     for(const b of bugs){
       if(!b.alive||s.dead) continue;
@@ -1468,13 +1475,16 @@ function updateProjectiles(dt){
 }
 
 function updateCandy(dt){
+  const doTrail=((updateCandy._f=(updateCandy._f||0)+1)%3===0);
   for(const c of candies){
     if(c.dead) continue;
     c.x+=c.vx*dt;c.y+=c.vy*dt;
-    if(c.type==="pink") addSpark(c.x+rand(-6,6),c.y+rand(-6,6),1,"pink");
-    else if(c.type==="blue") addSpark(c.x+rand(-6,6),c.y+rand(-6,6),1,"friend");
-    else if(c.type==="gold") addSpark(c.x+rand(-6,6),c.y+rand(-6,6),1,"gold");
-    else addSpark(c.x+rand(-6,6),c.y+rand(-6,6),1,"slime");
+    if(doTrail){
+      if(c.type==="pink") addSpark(c.x,c.y,1,"pink");
+      else if(c.type==="blue") addSpark(c.x,c.y,1,"friend");
+      else if(c.type==="gold"||c.type==="star") addSpark(c.x,c.y,1,"gold");
+      // green has no trail — clean look for shield
+    }
 
     const cm=candyScale(),cs=36*cm;
     if(aabb(c.x-cs/2,c.y-cs/2,cs,cs,player.x,player.y,player.w,player.h)){
@@ -1548,31 +1558,25 @@ function roundRect(x,y,w,h,r){
 }
 
 function drawBackground(){
-  // Always draw the forest image first
   if(IMG.bg){
     drawCover(IMG.bg);
   }else{
-    // Fallback solid dark if no image
     ctx.fillStyle=`hsl(${bgHue},30%,5%)`;
     ctx.fillRect(0,0,W(),H());
   }
 
-  // Smooth mood overlay — tints the forest without hiding it
-  // Uses a radial gradient so edges are more tinted than center
-  // keeping the action area readable
-  if(bgOverlay.a>0.005){
-    const cx=W()/2,cy=H()/2;
-    const rad=Math.max(W(),H())*0.85;
-    const hsl=`hsl(${Math.round(bgOverlay.h)},${Math.round(bgOverlay.s)}%,${Math.round(bgOverlay.l)}%)`;
-    const grad=ctx.createRadialGradient(cx,cy,rad*0.15,cx,cy,rad);
-    grad.addColorStop(0,`hsla(${Math.round(bgOverlay.h)},${Math.round(bgOverlay.s)}%,${Math.round(bgOverlay.l)}%,${(bgOverlay.a*0.4).toFixed(3)})`);
-    grad.addColorStop(1,`hsla(${Math.round(bgOverlay.h)},${Math.round(bgOverlay.s)}%,${Math.round(bgOverlay.l)}%,${(bgOverlay.a*1.4).toFixed(3)})`);
-    ctx.save();
-    ctx.globalCompositeOperation="multiply";
-    ctx.globalAlpha=1;
+  // Cheap mood overlay — simple rgba fill, no composite ops
+  // Radial: transparent center, tinted edges so gameplay stays readable
+  if(bgOverlay.a>0.01){
+    const h=Math.round(bgOverlay.h),s=Math.round(bgOverlay.s),l=Math.round(bgOverlay.l);
+    const aEdge=Math.min(bgOverlay.a*1.6,0.38);
+    const aCenter=bgOverlay.a*0.18;
+    const cx=W()/2,cy=H()/2,rad=Math.max(W(),H())*0.85;
+    const grad=ctx.createRadialGradient(cx,cy,rad*0.1,cx,cy,rad);
+    grad.addColorStop(0,`hsla(${h},${s}%,${l}%,${aCenter.toFixed(3)})`);
+    grad.addColorStop(1,`hsla(${h},${s}%,${l}%,${aEdge.toFixed(3)})`);
     ctx.fillStyle=grad;
     ctx.fillRect(0,0,W(),H());
-    ctx.restore();
   }
 }
 
@@ -2341,10 +2345,9 @@ function draw(){
     if(b.shakeT>0){const m=b.shakeMag||5;bsx=rand(-m,m);bsy=rand(-m,m);}
     const bx=b.x+bsx,by=b.y+bsy;
 
-    // Diving glow — red danger trail
+    // Diving glow — red danger trail (no addSpark in draw!)
     if(b.diving){
       drawGlow(bx+b.w/2,by+b.h/2,b.w*0.7,0.35,"rgba(255,50,50,0.8)");
-      addSpark(bx+b.w/2,by+b.h,2,"boss");
     }else if(b.glow>0){
       const gc=b.isBoss?"rgba(255,80,80,0.7)":"rgba(120,255,200,0.6)";
       drawGlow(bx+b.w/2,by+b.h/2,b.w*0.6,(b.glow/0.4)*0.28,gc);
