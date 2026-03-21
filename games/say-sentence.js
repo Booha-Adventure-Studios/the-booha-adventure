@@ -640,7 +640,7 @@ async function beginRound() {
     updateDots();
     const card = order[idx];
     if (card.mp3) { setTimeout(() => { const a = new Audio(CFG.audioBase + card.mp3); a.setAttribute('playsinline',''); a.setAttribute('webkit-playsinline',''); a.play().catch(()=>{}); }, 300); }
-    setTimeout(() => { idx++; isBusy = false; showCard(); }, 1800);
+    setTimeout(() => { idx++; isBusy = false; if (idx >= order.length) { showResults(); } else { showCard(); } }, 1800);
   } else {
     playSfx('fart'); updateStreak(0);
     sasCard.classList.add('wrong-state');
@@ -682,7 +682,7 @@ function handleIosPick(btn, card) {
     updateDots();
     const mp3 = order[idx].mp3;
     if (mp3) { const a = new Audio(CFG.audioBase+mp3); a.setAttribute('playsinline',''); a.setAttribute('webkit-playsinline',''); a.play().catch(()=>{}); }
-    setTimeout(() => { idx++; showCard(); }, 1800);
+    setTimeout(() => { idx++; if (idx >= order.length) { showResults(); } else { showCard(); } }, 1800);
   } else {
     iosFirstTry = false; updateStreak(0);
     btn.classList.add('ios-wrong'); U.unlockAudio(); playSfx('fart');
