@@ -2496,15 +2496,15 @@ function tick(ts){
 
   try{
     const [bg,b1,b2,bug,candy,r1,r2,r3,r4]=await Promise.all([
-      loadImg("the-booha-adventure/assets/invaders/assets/background.png"),
-      loadImg("the-booha-adventure/assets/invaders/assets/booha-invad-1.png"),
-      loadImg("the-booha-adventure/assets/invaders/assets/booha-invad-2.png"),
-      loadImg("the-booha-adventure/assets/invaders/assets/bug-1.png"),
-      loadImg("the-booha-adventure/assets/invaders/assets/candy.png"),
-      loadImg("the-booha-adventure/assets/invaders/assets/rock1.png"),
-      loadImg("the-booha-adventure/assets/invaders/assets/rock2.png"),
-      loadImg("the-booha-adventure/assets/invaders/assets/rock3.png"),
-      loadImg("the-booha-adventure/assets/invaders/assets/rock4.png"),
+      loadImg("the-booha-adventure/assets/invaders/background.png"),
+      loadImg("the-booha-adventure/assets/invaders/booha-invad-1.png"),
+      loadImg("the-booha-adventure/assets/invaders/booha-invad-2.png"),
+      loadImg("the-booha-adventure/assets/invaders/bug-1.png"),
+      loadImg("the-booha-adventure/assets/invaders/candy.png"),
+      loadImg("the-booha-adventure/assets/invaders/rock1.png"),
+      loadImg("the-booha-adventure/assets/invaders/rock2.png"),
+      loadImg("the-booha-adventure/assets/invaders/rock3.png"),
+      loadImg("the-booha-adventure/assets/invaders/rock4.png"),
     ]);
     IMG.bg=bg;IMG.booIdle=b1;IMG.booShoot=b2;IMG.bug=bug;IMG.candy=candy;
     IMG.rocks=[r1,r2,r3,r4];
