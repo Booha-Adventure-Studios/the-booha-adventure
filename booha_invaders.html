@@ -276,12 +276,21 @@ const FRIENDS_UNLOCK=[
 const activeFriends=[];
 
 // ── WEAPON LEVEL ──
+// timedWeapon: {level, remaining} — overrides combo-based level while active
+let timedWeapon={level:0,remaining:0};
+
+function weaponLevel(){
+  // timed power-up overrides combo if it gives a higher level
+  const comboLevel=weaponLevelFromCombo(combo);
+  return Math.max(comboLevel, timedWeapon.remaining>0?timedWeapon.level:0);
+}
 function weaponLevelFromCombo(c){
   if(c>=30) return 4;
   if(c>=15) return 3;
   if(c>=7)  return 2;
   return 1;
 }
+// Level 5 = only via star candy (9-way chaos + friends go wild)
 
 // ── BG COLOR STATE ──
 let bgHue=240;
@@ -460,11 +469,12 @@ function doShake(mag,dur){shakeX=mag;shakeY=mag;shakeDecay=dur||0.3;}
 // CANDY TYPES
 // ════════════════════════════════════════
 // pink=energy+boost, blue=triple shot, gold=score bomb, green=shield
-const CANDY_TYPES=["pink","blue","gold","green"];
+const CANDY_TYPES=["pink","blue","gold","green","star"];
 function candyWeight(wave){
-  // gold and green unlock at later waves
-  if(wave>=15) return ["pink","pink","blue","gold","green"];
-  if(wave>=10) return ["pink","pink","blue","blue","gold"];
+  // pink=energy+boost, blue=60s triple, star=60s five-way, gold=score bomb, green=shield
+  if(wave>=15) return ["pink","pink","blue","blue","star","gold","green"];
+  if(wave>=10) return ["pink","pink","blue","blue","blue","gold"];
+  if(wave>=5)  return ["pink","pink","pink","blue","blue"];
   return ["pink","pink","pink","blue"];
 }
 
@@ -774,7 +784,7 @@ function updateFriends(dt){
 function fireFriendShot(f){
   const sm=shotScale();
   const cx=f.x+f.w/2;
-  const wl=weaponLevelFromCombo(combo);
+  const wl=weaponLevel();
   const angles=wl>=3?[-300,-150,0,150,300]:wl>=2?[-200,0,200]:[0];
   for(const vx of angles){
     booShots.push({x:cx,y:f.y,vx:vx*sm,vy:-950*sm,isPink:true,isFriend:true,color:f.shotColor||"#a8e8ff",dead:false});
@@ -799,36 +809,39 @@ function pickFormationSlot(bw,bh,groupIdx,spawnedInGroup,totalInGroup){
   const baseY=clamp(U()*0.18+mobileYOff,62,130);
   const rows=[baseY,baseY+bh*0.70,baseY+bh*1.30,baseY+bh*2.0];
   const formation=groupIdx%4;
+  // Always clamp tx so Dotties stay fully on screen
+  const pad=8;
+  function cx(tx){return clamp(tx,pad,W()-bw-pad);}
 
   if(formation===0){
     const lane=(spawnedInGroup%lanes);
-    const tx=lane*laneW+laneW*0.5-bw/2;
+    const tx=cx(lane*laneW+laneW*0.5-bw/2);
     const ty=rows[Math.floor(spawnedInGroup/lanes)%rows.length];
     if(canPlaceTarget(tx,ty,bw,bh)) return {tx,ty};
   }else if(formation===1){
     const spread=(spawnedInGroup-totalInGroup/2);
-    const tx=W()/2+spread*(laneW*0.85)-bw/2;
+    const tx=cx(W()/2+spread*(laneW*0.85)-bw/2);
     const ty=rows[0]+Math.abs(spread)*bh*0.55;
     if(canPlaceTarget(tx,ty,bw,bh)) return {tx,ty};
   }else if(formation===2){
     const side=(spawnedInGroup%2===0)?0:1;
     const idx=Math.floor(spawnedInGroup/2);
-    const tx=side===0?laneW*idx+laneW*0.5-bw/2:W()-laneW*(idx+1)+laneW*0.5-bw/2;
+    const tx=cx(side===0?laneW*idx+laneW*0.5-bw/2:W()-laneW*(idx+1)+laneW*0.5-bw/2);
     const ty=rows[idx%rows.length];
     if(canPlaceTarget(tx,ty,bw,bh)) return {tx,ty};
   }else{
-    const tx=(spawnedInGroup*laneW*0.85)%(W()-bw);
+    const tx=cx((spawnedInGroup*laneW*0.85)%(W()-bw));
     const ty=rows[spawnedInGroup%rows.length];
     if(canPlaceTarget(tx,ty,bw,bh)) return {tx,ty};
   }
 
   for(let t=0;t<20;t++){
     const lane=(Math.random()*lanes)|0;
-    const tx=lane*laneW+laneW/2-bw/2;
+    const tx=cx(lane*laneW+laneW/2-bw/2);
     const ty=rows[(Math.random()*rows.length)|0]+rand(0,18);
     if(canPlaceTarget(tx,ty,bw,bh)) return {tx,ty};
   }
-  return {tx:W()*0.5-bw*0.5,ty:rows[0]};
+  return {tx:cx(W()*0.5-bw*0.5),ty:rows[0]};
 }
 
 function spawnBug(){
@@ -836,7 +849,7 @@ function spawnBug(){
   const bh=bw;
   const slot=pickFormationSlot(bw,bh,WS.groupIdx,WS.spawned,WS.targetCount);
   const {tx,ty}=slot;
-  const startX=tx+rand(-W()*0.06,W()*0.06);
+  const startX=clamp(tx+rand(-W()*0.06,W()*0.06),4,W()-bw-4);
   const startY=-bh-rand(20,100);
   const enterDur=rand(0.8,1.2);
   const tp=tierProgress01(WS.wave);
@@ -952,7 +965,7 @@ function fireBooShot(isPink){
   const sm=shotScale();
   const x0=player.x+player.w/2;
   const y0=player.y+6;
-  const wl=weaponLevelFromCombo(combo);
+  const wl=weaponLevel();
   const vy=(isPink?-1100:-920)*sm;
 
   function spawn(vx,col){
@@ -961,10 +974,15 @@ function fireBooShot(isPink){
   if(wl===1){ spawn(0); }
   else if(wl===2){ spawn(0);spawn(-230);spawn(230); }
   else if(wl===3){ spawn(0);spawn(-270);spawn(270);spawn(-140);spawn(140); }
-  else{
+  else if(wl===4){
     const cols=["#ffcc44","#ff66cc","#66ffcc","#cc88ff","#ffaa44"];
     for(let i=0;i<7;i++){spawn((i-3)*55,cols[i%cols.length]);}
     doShake(3,0.08);
+  }else{
+    // Level 5 — 9-way full spread, brighter rainbow
+    const cols=["#fff","#ffcc44","#ff66cc","#66ffcc","#cc88ff","#ffaa44","#ff4444","#44ffcc","#fff"];
+    for(let i=0;i<9;i++){spawn((i-4)*48,cols[i%cols.length]);}
+    doShake(5,0.10);
   }
   player.glow=isPink?0.12:0.15;
   booFireTimer=0.12;
@@ -1068,6 +1086,12 @@ function easeOutBack(t){const c=1.70158,p=c+1;return 1+p*Math.pow(t-1,3)+c*Math.
 function update(dt){
   if(player.energy<=0) return;
   stageTime+=dt;
+
+  // ── TIMED WEAPON COUNTDOWN ──
+  if(timedWeapon.remaining>0){
+    timedWeapon.remaining=Math.max(0,timedWeapon.remaining-dt);
+    if(timedWeapon.remaining===0) timedWeapon.level=0;
+  }
 
   // ── COMBO DECAY ──
   if(combo>0){comboTimer-=dt;if(comboTimer<=0)breakCombo();}
@@ -1207,6 +1231,8 @@ function update(dt){
         b.x=b.tx+Math.sin(b.bob*0.9)*b.driftSpeed;
         b.y=b.ty+Math.cos(b.bob*1.1)*(b.driftSpeed*0.32);
       }
+      // Hard clamp — never drift off-screen
+      b.x=clamp(b.x,4,W()-b.w-4);
     }
 
     const fireRamp=clamp((stageTime-12)/40,0,1);
@@ -1364,11 +1390,17 @@ function updateCandy(dt){
         player.boost=clamp((player.boost||0)+1,0,3);
         player.energy=Math.min(100,player.energy+30);
       }else if(c.type==="blue"){
-        // Triple shot boost
-        combo=Math.max(combo,7);
-        comboTimer=COMBO_DECAY;
-        comboDisplay=combo;comboPop=1;
+        // 60s triple-shot (weapon level 3)
+        timedWeapon.level=3;
+        timedWeapon.remaining=60;
         player.energy=Math.min(100,player.energy+15);
+        window._candyToast={msg:"💙 3× SHOT — 60s！",color:"rgba(100,200,255,1)",t:2.5};
+      }else if(c.type==="star"){
+        // 60s five-way (weapon level 5)
+        timedWeapon.level=5;
+        timedWeapon.remaining=60;
+        player.energy=Math.min(100,player.energy+15);
+        window._candyToast={msg:"⭐ 5× SHOT — 60s！",color:"rgba(255,255,100,1)",t:2.5};
       }else if(c.type==="gold"){
         // Score bomb: +500 points, kills all on-screen non-boss bugs
         score+=500;
@@ -1777,7 +1809,7 @@ function drawBossHealthBar(){
 // ════════════════════════════════════════
 function drawComboHUD(){
   if(!started||combo<2) return;
-  const wl=weaponLevelFromCombo(combo);
+  const wl=weaponLevel();
   const scale=1+0.15*Math.sin(comboPop*Math.PI);
   const cx=W()/2;
   const cy=SAFE.top+HUD_PAD+50;// below wave counter
@@ -1847,6 +1879,54 @@ function drawBoostIndicator(){
     if(filled){ctx.shadowBlur=12;ctx.shadowColor="rgba(255,100,220,.8)";ctx.fillStyle="rgba(255,100,220,.95)";}
     else ctx.fillStyle="rgba(255,255,255,0.20)";
     ctx.fill();ctx.restore();
+  }
+}
+
+// ════════════════════════════════════════
+// TIMED WEAPON HUD
+// ════════════════════════════════════════
+function drawTimedWeaponHUD(){
+  if(timedWeapon.remaining<=0) return;
+  const t=performance.now()/1000;
+  const pulse=0.5+0.5*Math.sin(t*6);
+  const isStar=timedWeapon.level>=5;
+  const col=isStar?"rgba(255,255,80,1)":"rgba(100,200,255,1)";
+  const glow=isStar?"rgba(255,255,80,0.7)":"rgba(100,200,255,0.7)";
+  const label=isStar?"⭐ 5× SHOT":"💙 3× SHOT";
+  const bx=16, by=SAFE.top+HUD_PAD+52;
+  const barW=110;
+  const pct=timedWeapon.remaining/60;
+  const secs=Math.ceil(timedWeapon.remaining);
+
+  ctx.save();
+  ctx.textBaseline="top";
+  ctx.font=`900 12px system-ui,sans-serif`;
+  ctx.shadowBlur=10+pulse*6;ctx.shadowColor=glow;
+  ctx.fillStyle=col;ctx.globalAlpha=0.9+pulse*0.1;
+  ctx.fillText(`${label}  ${secs}s`,bx,by);
+
+  const barY=by+15;
+  ctx.globalAlpha=1;
+  ctx.fillStyle="rgba(0,0,0,0.45)";
+  roundRect(bx,barY,barW,5,2);ctx.fill();
+  ctx.fillStyle=col;ctx.shadowBlur=isStar?14:8;
+  roundRect(bx,barY,barW*pct,5,2);ctx.fill();
+  ctx.restore();
+
+  // Toast for candy pickup
+  if(window._candyToast){
+    const ct=window._candyToast;
+    ct.t-=1/60;
+    if(ct.t<=0){window._candyToast=null;}else{
+      const a=Math.min(1,ct.t/0.5);
+      ctx.save();ctx.globalAlpha=a;
+      ctx.textAlign="center";ctx.textBaseline="middle";
+      ctx.font=`900 ${clamp(W()*0.042,17,26)}px system-ui,sans-serif`;
+      ctx.shadowBlur=20;ctx.shadowColor=ct.color;
+      ctx.fillStyle=ct.color;
+      ctx.fillText(ct.msg,W()/2,H()*0.55);
+      ctx.restore();
+    }
   }
 }
 
@@ -2144,24 +2224,34 @@ function draw(){
     if(c.type==="blue"){ctx.save();ctx.globalCompositeOperation="lighter";drawGlow(c.x,c.y,22,0.22,"rgba(100,200,255,.65)");ctx.restore();}
     else if(c.type==="gold"){ctx.save();ctx.globalCompositeOperation="lighter";drawGlow(c.x,c.y,24,0.25,"rgba(255,220,80,.7)");ctx.restore();}
     else if(c.type==="green"){ctx.save();ctx.globalCompositeOperation="lighter";drawGlow(c.x,c.y,22,0.22,"rgba(80,255,140,.65)");ctx.restore();}
+    else if(c.type==="star"){
+      const ts=performance.now()/1000;
+      const p=0.5+0.5*Math.sin(ts*8);
+      ctx.save();ctx.globalCompositeOperation="lighter";
+      drawGlow(c.x,c.y,28,0.18+p*0.12,"rgba(255,255,80,.8)");
+      drawGlow(c.x,c.y,16,0.25+p*0.1,"rgba(255,200,255,.9)");
+      ctx.restore();
+    }
     if(IMG.candy){
       ctx.save();
       if(c.type==="blue"){ctx.filter="hue-rotate(160deg) saturate(1.5)";}
       else if(c.type==="gold"){ctx.filter="hue-rotate(20deg) saturate(2) brightness(1.2)";}
       else if(c.type==="green"){ctx.filter="hue-rotate(90deg) saturate(1.5)";}
+      else if(c.type==="star"){ctx.filter="hue-rotate(50deg) saturate(3) brightness(1.4)";}
       ctx.drawImage(IMG.candy,c.x-cs/2,c.y-cs/2,cs,cs);
       ctx.restore();
     }else{
-      const cols={pink:"#ff88cc",blue:"#88ddff",gold:"#ffdd44",green:"#88ffaa"};
+      const cols={pink:"#ff88cc",blue:"#88ddff",gold:"#ffdd44",green:"#88ffaa",star:"#ffff66"};
       ctx.fillStyle=cols[c.type]||"#ff88cc";
       ctx.beginPath();ctx.arc(c.x,c.y,12,0,Math.PI*2);ctx.fill();
     }
     // candy label
-    const labels={blue:"×3","gold":"💥","green":"🛡",pink:""};
+    const labels={blue:"×3",gold:"💥",green:"🛡",pink:"",star:"×5"};
     if(labels[c.type]){
       ctx.save();ctx.textAlign="center";ctx.textBaseline="bottom";
       ctx.font=`900 ${clamp(cs*0.45,10,18)}px system-ui,sans-serif`;
-      ctx.fillStyle="#fff";ctx.shadowBlur=8;ctx.shadowColor="#000";
+      ctx.fillStyle=c.type==="star"?"#ffff44":"#fff";
+      ctx.shadowBlur=8;ctx.shadowColor="#000";
       ctx.fillText(labels[c.type],c.x,c.y-cs/2);ctx.restore();
     }
   }
@@ -2209,7 +2299,7 @@ function draw(){
   }
 
   // Player
-  const wl=weaponLevelFromCombo(combo);
+  const wl=weaponLevel();
   const isShoot=booFireTimer>0&&booFireTimer<0.10;
   const pimg=isShoot?IMG.booShoot:IMG.booIdle;
   if(player.hitIFrames>0) ctx.globalAlpha=0.75;
@@ -2241,6 +2331,7 @@ function draw(){
   if(started){
     drawEnergyBar();
     drawBoostIndicator();
+    drawTimedWeaponHUD();
     drawSkillHeat();
     drawWaveCounter();
     drawScoreHUD();
@@ -2417,6 +2508,7 @@ function resetGame(){
   score=0;totalKills=0;
   lives=MAX_LIVES;
   playerShield=0;
+  timedWeapon.level=0;timedWeapon.remaining=0;
   stageTime=0;candyTimer=8;
   bossAlive=false;
   bossMusicIdx=0;
