@@ -226,7 +226,7 @@ let _needRotateLast=null, _gateTimer=0;
 
 // Input
 let pointerDown=false, pointerX=null, dragOffsetX=0;
-let playerMoving=false, shootResumeDelay=0;
+let playerMoving=false;
 const keys=new Set();
 
 // Tilt
@@ -280,17 +280,19 @@ const activeFriends=[];
 let timedWeapon={level:0,remaining:0};
 
 function weaponLevel(){
-  // timed power-up overrides combo if it gives a higher level
   const comboLevel=weaponLevelFromCombo(combo);
-  return Math.max(comboLevel, timedWeapon.remaining>0?timedWeapon.level:0);
+  const timedLevel=timedWeapon.remaining>0?timedWeapon.level:0;
+  return clamp(Math.max(comboLevel,timedLevel),1,4);
 }
 function weaponLevelFromCombo(c){
+  // 1=single  2=triple(moving cap)  3=five-way  4=seven-chaos
   if(c>=30) return 4;
   if(c>=15) return 3;
   if(c>=7)  return 2;
   return 1;
 }
-// Level 5 = only via star candy (9-way chaos + friends go wild)
+// Blue candy → timed level 3 (five-way, 60s)
+// Star candy → timed level 4 (seven chaos, 60s)
 
 // ── BG COLOR STATE ──
 let bgHue=240;
@@ -420,7 +422,7 @@ function setBossMusic(on){
   try{
     if(on){
       if(bgm){bgm.pause();bgm.currentTime=0;}
-      const src="the-booha-adventure/assets/invaders/"+BOSS_MUSIC_SRCS[bossMusicIdx%BOSS_MUSIC_SRCS.length];
+      const src=BOSS_MUSIC_SRCS[bossMusicIdx%BOSS_MUSIC_SRCS.length];
       if(!bossBgm||bossBgm._src!==src){
         if(bossBgm){try{bossBgm.pause();}catch(_){}}
         bossBgm=new Audio(src);
@@ -458,8 +460,8 @@ function loadImg(src){
 const player={x:0,y:0,w:80,h:80,energy:100,glow:0,hitIFrames:0,boost:0};
 const rocks=[], bugs=[], booShots=[], bugShots=[], sparkles=[], candies=[];
 
-let booFireTimer=0, booAutoCD=0, booPinkCD=0;
-let booWeaponLevel=1;
+let booFireTimer=0, booAutoCD=0;
+// weapon level driven by combo + timedWeapon
 
 // FX: screen shake
 let shakeX=0, shakeY=0, shakeDecay=0;
@@ -708,7 +710,7 @@ function triggerMilestone(wave){
 
   screenFlash.alpha=0.7;
   screenFlash.color="rgba(255,220,80,1)";
-  doShake(16,0.6);
+  // no shake — milestone uses flash + particles only
 
   // Big explosion burst
   for(let i=0;i<5;i++){
@@ -748,7 +750,8 @@ function updateFriendUnlocks(wave){
           msg:`${names[fd.id]||fd.id} ／ ${namesJP[fd.id]||""}`,
           color:fd.color,t:4.0
         };
-        doShake(10,0.35);
+        // no shake — friend join uses flash color instead
+        screenFlash.alpha=0.25;screenFlash.color=fd.color;
       }
     }
   }
@@ -758,25 +761,39 @@ function updateFriends(dt){
   const cx=player.x+player.w/2;
   const cy=player.y+player.h/2;
   const n=activeFriends.length;
+  const isMoving=playerMoving;
+  const wl=weaponLevel();
 
   activeFriends.forEach((f,i)=>{
     if(!f.alive) return;
     if(f.joinAnim<1) f.joinAnim=Math.min(1,f.joinAnim+dt*0.8);
-    f.orbitR=clamp(player.w*0.90+i*player.w*0.55,50,200);
-    f.angle+=(0.9+i*0.25)*dt;
+
+    // Orbit speed: faster + tighter when player stands still, wider + slower when moving
+    const orbitSpeedMult=isMoving?0.55:1.2;
+    const orbitRMult=isMoving?1.5:0.85; // spread out while moving
+    f.orbitR=clamp((player.w*0.90+i*player.w*0.52)*orbitRMult,40,220);
+    f.angle+=(0.9+i*0.22)*dt*orbitSpeedMult;
+
+    // At high combo friends lean forward (toward enemies)
+    const forwardLean=isMoving?0:clamp((combo-7)/20,0,1)*player.h*0.6;
     const targetX=cx+Math.cos(f.angle+i*Math.PI*2/n)*f.orbitR-f.w/2;
-    const targetY=cy+Math.sin(f.angle+i*Math.PI*2/n)*f.orbitR*0.45-f.h/2;
+    const targetY=cy+Math.sin(f.angle+i*Math.PI*2/n)*f.orbitR*0.45-f.h/2-forwardLean;
+
+    // Ease speed: snap quickly when standing, float lazily when moving
+    const easeSpeed=isMoving?0.10:0.22;
     const ease=f.joinAnim;
-    f.x=f.x+(targetX-f.x)*0.18*ease;
-    f.y=f.y+(targetY-f.y)*0.18*ease;
-    f.w=player.w*0.72;
-    f.h=f.w;
+    f.x=f.x+(targetX-f.x)*easeSpeed*ease;
+    f.y=f.y+(targetY-f.y)*easeSpeed*ease;
+    f.w=player.w*0.72;f.h=f.w;
     f.glow=Math.max(0,f.glow-dt*2);
+
+    // Friends fire faster when player is standing still at high combo
+    const fireRateMult=(!isMoving&&combo>=7)?0.65:1.0;
     f.fireCD=Math.max(0,f.fireCD-dt);
-    if(f.fireCD<=0&&!playerMoving&&bugs.some(b=>b.alive)){
+    if(f.fireCD<=0&&bugs.some(b=>b.alive)){
       fireFriendShot(f);
-      f.fireCD=rand(0.5,1.1);
-      f.glow=0.18;
+      f.fireCD=rand(0.5,1.1)*fireRateMult;
+      f.glow=0.22;
     }
   });
 }
@@ -916,7 +933,7 @@ function spawnBossDotty(){
     atkPattern:0,atkTimer:0,
     tintHue:bgHue,
   });
-  doShake(18,0.8);
+  // boss spawn — shake handled by cinematic trigger, not here
 }
 
 // ════════════════════════════════════════
@@ -942,7 +959,7 @@ function addBigExplosion(x,y,color="gold"){
       life:0,ttl:rand(0.3,0.8),size:rand(3,7),kind:color
     });
   }
-  doShake(14,0.4);
+  // big explosion — visual only, caller decides if shake is warranted
 }
 
 function dropCandy(forcedType){
@@ -961,30 +978,50 @@ function dropCandy(forcedType){
 function shotScale(){return(IS_COARSE&&isLandscape()&&GAME_SCALE<0.999)?GAME_SCALE:1;}
 function candyScale(){return shotScale();}
 
-function fireBooShot(isPink){
+// ── NEAREST ENEMY SOFT TARGET ──
+function nearestBugLean(x0){
+  let best=null,bestD=Infinity;
+  for(const b of bugs){
+    if(!b.alive||b.isBoss) continue;
+    const dx=(b.x+b.w/2)-x0;
+    const d=Math.abs(dx)+(b.y<0?99999:0);
+    if(d<bestD){bestD=d;best=b;}
+  }
+  if(!best) return 0;
+  const dx=(best.x+best.w/2)-x0;
+  return clamp(dx*0.15,-200,200); // gentle lean, not homing
+}
+
+function fireBooShot(isMoving){
   const sm=shotScale();
   const x0=player.x+player.w/2;
   const y0=player.y+6;
   const wl=weaponLevel();
-  const vy=(isPink?-1100:-920)*sm;
+  const vy=-920*sm*(isMoving?0.80:1.0);
+  const lean=nearestBugLean(x0)*sm;
 
-  function spawn(vx,col){
-    booShots.push({x:x0,y:y0,vx:vx*sm,vy,isPink,isFriend:false,color:col||null,dead:false});
+  function spawn(vx,col,pink){
+    booShots.push({x:x0,y:y0,vx:vx,vy,isPink:pink||false,isFriend:false,color:col||null,dead:false,isWeak:isMoving});
   }
-  if(wl===1){ spawn(0); }
-  else if(wl===2){ spawn(0);spawn(-230);spawn(230); }
-  else if(wl===3){ spawn(0);spawn(-270);spawn(270);spawn(-140);spawn(140); }
-  else if(wl===4){
-    const cols=["#ffcc44","#ff66cc","#66ffcc","#cc88ff","#ffaa44"];
-    for(let i=0;i<7;i++){spawn((i-3)*55,cols[i%cols.length]);}
-    doShake(3,0.08);
+
+  // Moving caps at level 2 (triple), standing gets full level
+  const activeWl=isMoving?Math.min(wl,2):wl;
+
+  if(activeWl<=1){
+    spawn(lean*sm,null,false);
+  }else if(activeWl===2){
+    spawn(lean*sm,null,false);
+    spawn((-210+lean*0.4)*sm,null,false);
+    spawn((210+lean*0.4)*sm,null,false);
+  }else if(activeWl===3){
+    spawn(lean*sm,null,true);
+    spawn(-260*sm,null,true);spawn(260*sm,null,true);
+    spawn(-130*sm,null,false);spawn(130*sm,null,false);
   }else{
-    // Level 5 — 9-way full spread, brighter rainbow
-    const cols=["#fff","#ffcc44","#ff66cc","#66ffcc","#cc88ff","#ffaa44","#ff4444","#44ffcc","#fff"];
-    for(let i=0;i<9;i++){spawn((i-4)*48,cols[i%cols.length]);}
-    doShake(5,0.10);
+    const cols=["#ffcc44","#ff66cc","#66ffcc","#cc88ff","#ffaa44","#ff4444","#44ffcc"];
+    for(let i=0;i<7;i++) spawn(((i-3)*52+lean*0.3)*sm,cols[i%cols.length],true);
   }
-  player.glow=isPink?0.12:0.15;
+  player.glow=isMoving?0.05:0.15;
   booFireTimer=0.12;
 }
 
@@ -995,23 +1032,15 @@ function updateFiring(dt){
   if(!started) return;
   if(player.energy<=0||paused) return;
   booAutoCD=Math.max(0,booAutoCD-dt);
-  booPinkCD=Math.max(0,booPinkCD-dt);
-  if(playerMoving||shootResumeDelay>0) return;
-  const stack=clamp(player.boost||0,0,3);
-  const isPink=stack>0;
-  if(!isPink){
-    if(!canFireNormal()) return;
-    if(booAutoCD>0) return;
-    fireBooShot(false);
-    const comboSpeedup=clamp(combo/40,0,0.65);
-    booAutoCD=clamp(0.28-comboSpeedup*0.18,0.10,0.28);
-    return;
-  }
-  const cdPink=clamp(0.20-0.03*(stack-1),0.11,0.28);
-  if(booPinkCD>0) return;
-  if(booShots.filter(s=>!s.isFriend).length>=stack) return;
-  fireBooShot(true);
-  booPinkCD=cdPink;
+  if(booAutoCD>0) return;
+  // Fire always — moving = slower rate + weaker pattern
+  const isMoving=playerMoving;
+  if(!isMoving&&!canFireNormal()) return;
+  fireBooShot(isMoving);
+  const comboSpeedup=clamp(combo/40,0,0.55);
+  const stillBonus=isMoving?0:0.05;
+  const cd=clamp(0.30-comboSpeedup*0.16-stillBonus,0.09,0.30);
+  booAutoCD=isMoving?cd*1.4:cd;
 }
 
 function fireBugShot(b){
@@ -1048,7 +1077,7 @@ function fireBossSpiral(b){
     const a=b._spiralAngle+i*(Math.PI*2/count);
     bugShots.push({x:cx,y:cy,vx:Math.cos(a)*spd,vy:Math.sin(a)*spd,r:7*(IS_COARSE?0.7:1),t:0,dead:false,dmg:b.shotDmg||12});
   }
-  doShake(8,0.2);
+  b.glow=0.30;
 }
 
 // ════════════════════════════════════════
@@ -1143,15 +1172,8 @@ function update(dt){
   player.x=clamp(player.x,0,W()-player.w);
 
   const dx=Math.abs(player.x-prevX);
-  if(dx>0.35){
-    playerMoving=true;
-    shootResumeDelay=0.28;
-    booAutoCD=Math.max(booAutoCD,0.28);
-    booPinkCD=Math.max(booPinkCD,0.28);
-  }else{
-    playerMoving=false;
-    shootResumeDelay=Math.max(0,shootResumeDelay-dt);
-  }
+  playerMoving=dx>0.35;
+  // no more shootResumeDelay — movement just changes shot pattern
 
   player.y=H()-player.h-14;
   player.glow=Math.max(0,player.glow-dt*2.5);
@@ -1224,6 +1246,38 @@ function update(dt){
         if(b.x+b.w>W()-16){b.x=W()-16-b.w;b.moveDir=-1;}
       }
     }else{
+      // ── DIVE ATTACK ──
+      if(b.diving){
+        b.diveT=(b.diveT||0)+dt;
+        b.x+=b.diveVx*dt;
+        b.y+=b.diveVy*dt;
+        b.diveVy=Math.min(b.diveVy+800*dt,900); // gravity pull
+        // clamp x
+        b.x=clamp(b.x,4,W()-b.w-4);
+        // hit bottom = reset to formation
+        if(b.y>H()-player.h*2.5){
+          b.diving=false;b.diveT=0;
+          b.y=b.ty;b.x=b.tx;
+          b.diveCD=rand(8,16); // cooldown before next dive
+        }
+        continue; // skip normal drift while diving
+      }
+
+      // Dive trigger: random chance after formation locked, not while shielded
+      if(!b.panicking&&b.shieldT<=0&&b.hasShotOnce){
+        b.diveCD=Math.max(0,(b.diveCD||rand(6,14))-dt);
+        if(b.diveCD<=0&&Math.random()<0.004){
+          b.diving=true;b.diveT=0;
+          // aim at player with spread
+          const px=player.x+player.w/2;
+          const dx=(px-(b.x+b.w/2));
+          b.diveVx=dx*0.9+rand(-60,60);
+          b.diveVy=rand(280,420);
+          b.diveCD=rand(10,18);
+          b.glow=0.35;
+        }
+      }
+
       if(b.panicking){
         b.x=b.tx+Math.sin(b.bob*2.8+b.x)*b.driftSpeed*1.8;
         b.y=b.ty+Math.cos(b.bob*3.0)*b.driftSpeed*0.5;
@@ -1231,7 +1285,6 @@ function update(dt){
         b.x=b.tx+Math.sin(b.bob*0.9)*b.driftSpeed;
         b.y=b.ty+Math.cos(b.bob*1.1)*(b.driftSpeed*0.32);
       }
-      // Hard clamp — never drift off-screen
       b.x=clamp(b.x,4,W()-b.w-4);
     }
 
@@ -1267,6 +1320,29 @@ function update(dt){
   }
 }
 
+// ── DIVE COLLISION ──
+function updateDiveCollisions(){
+  if(player.hitIFrames>0) return;
+  for(const b of bugs){
+    if(!b.alive||!b.diving||b.isBoss) continue;
+    if(!aabb(b.x,b.y,b.w,b.h,player.x,player.y,player.w,player.h)) continue;
+    player.energy=Math.max(0,player.energy-18);
+    player.hitIFrames=0.7;
+    player.boost=0;
+    breakCombo();
+    b.alive=false;
+    WS.killed++;
+    addSpark(player.x+player.w/2,player.y+player.h/2,18,"slime");
+    addSpark(b.x+b.w/2,b.y+b.h/2,12,"boss");
+    doShake(10,0.3);
+    screenFlash.alpha=0.35;screenFlash.color="#ff2244";
+    if(player.energy<=0){
+      lives--;
+      if(lives>0){player.energy=40;player.hitIFrames=2.0;playLifeloss();doShake(22,1.0);screenFlash.alpha=0.9;screenFlash.color="#ff0000";bugShots.length=0;}
+    }
+  }
+}
+
 // ════════════════════════════════════════
 // PROJECTILES
 // ════════════════════════════════════════
@@ -1296,8 +1372,9 @@ function updateProjectiles(dt){
         registerKill(pts);
         if(b.isBoss){
           addBigExplosion(b.x+b.w/2,b.y+b.h/2,"boss");
-          screenFlash.alpha=0.8;screenFlash.color="#fff";
-          score+=WS.wave*100;// bonus for boss clear
+          screenFlash.alpha=0.9;screenFlash.color="#fff";
+          doShake(28,1.2); // ONLY meaningful shake — boss dies
+          score+=WS.wave*100;
         }else{
           addSpark(b.x+b.w/2,b.y+b.h/2,18,s.isFriend?"friend":s.isPink?"pink":"gold");
           for(const nb of bugs){
@@ -1396,16 +1473,15 @@ function updateCandy(dt){
         player.energy=Math.min(100,player.energy+15);
         window._candyToast={msg:"💙 3× SHOT — 60s！",color:"rgba(100,200,255,1)",t:2.5};
       }else if(c.type==="star"){
-        // 60s five-way (weapon level 5)
-        timedWeapon.level=5;
+        // 60s seven-chaos (weapon level 4)
+        timedWeapon.level=4;
         timedWeapon.remaining=60;
         player.energy=Math.min(100,player.energy+15);
-        window._candyToast={msg:"⭐ 5× SHOT — 60s！",color:"rgba(255,255,100,1)",t:2.5};
+        window._candyToast={msg:"⭐ CHAOS SHOT — 60s！",color:"rgba(255,255,100,1)",t:2.5};
       }else if(c.type==="gold"){
-        // Score bomb: +500 points, kills all on-screen non-boss bugs
         score+=500;
-        screenFlash.alpha=0.6;screenFlash.color="#ffdd44";
-        doShake(18,0.6);
+        screenFlash.alpha=0.7;screenFlash.color="#ffdd44";
+        // no shake — gold uses full-screen flash instead
         for(const b of bugs){
           if(!b.alive||b.isBoss) continue;
           addBigExplosion(b.x+b.w/2,b.y+b.h/2,"gold");
@@ -1414,10 +1490,9 @@ function updateCandy(dt){
           registerKill(10);
         }
       }else if(c.type==="green"){
-        // Shield: absorbs 1 hit
         playerShield=8.0;
         player.energy=Math.min(100,player.energy+20);
-        doShake(5,0.2);
+        screenFlash.alpha=0.2;screenFlash.color="rgba(80,255,160,1)";
       }
     }
     if(c.y>H()+60) c.dead=true;
@@ -1540,36 +1615,6 @@ function drawScoreHUD(){
 // ════════════════════════════════════════
 // HUD: LIVES
 // ════════════════════════════════════════
-function drawLivesHUD(){
-  if(!started) return;
-  const bx=16;
-  const by=SAFE.top+HUD_PAD+30;
-  const r=9;
-  const gap=22;
-
-  ctx.save();
-  for(let i=0;i<MAX_LIVES;i++){
-    const cx=bx+i*gap+r;
-    const cy=by;
-    const filled=i<lives;
-    ctx.shadowBlur=filled?16:0;
-    ctx.shadowColor="rgba(255,100,200,0.9)";
-    ctx.fillStyle=filled?"rgba(255,100,200,0.95)":"rgba(255,255,255,0.18)";
-    ctx.beginPath();
-    // heart shape via arc approximation
-    ctx.arc(cx,cy,r,0,Math.PI*2);
-    ctx.fill();
-    if(filled){
-      ctx.globalCompositeOperation="lighter";
-      ctx.globalAlpha=0.3;
-      ctx.fillStyle="white";
-      ctx.beginPath();ctx.arc(cx-2,cy-2,r*0.4,0,Math.PI*2);ctx.fill();
-      ctx.globalCompositeOperation="source-over";ctx.globalAlpha=1;
-    }
-  }
-  ctx.restore();
-}
-
 // ════════════════════════════════════════
 // NEXT WAVE BANNER (dramatically upgraded)
 // ════════════════════════════════════════
@@ -1805,81 +1850,186 @@ function drawBossHealthBar(){
 }
 
 // ════════════════════════════════════════
-// COMBO HUD
+// COMBO HUD — Street Fighter style
 // ════════════════════════════════════════
 function drawComboHUD(){
   if(!started||combo<2) return;
   const wl=weaponLevel();
-  const scale=1+0.15*Math.sin(comboPop*Math.PI);
+  const t=performance.now()/1000;
+
+  // Impact scale — slams in big then settles
+  const impactScale=1+comboPop*0.32*Math.exp(-comboPop*2);
   const cx=W()/2;
-  const cy=SAFE.top+HUD_PAD+50;// below wave counter
+  const cy=SAFE.top+HUD_PAD+48;
 
   ctx.save();
-  ctx.translate(cx,cy);ctx.scale(scale,scale);
+  ctx.translate(cx,cy);
+  ctx.scale(impactScale,impactScale);
   ctx.textAlign="center";ctx.textBaseline="top";
 
-  const big=clamp(W()*0.048,20,38);
-  ctx.font=`900 ${big}px system-ui,sans-serif`;
-  const colors=["#fff","#ffee44","#ff8833","#ff44aa"];
-  const col=colors[Math.min(wl-1,3)];
-  ctx.shadowBlur=24;ctx.shadowColor=col;
-  ctx.fillStyle=col;
-  ctx.fillText(`${combo}x`,0,0);
+  const wlColors=["#fff","#ffee44","#ff8833","#ff44aa","#cc44ff"];
+  const col=wlColors[Math.min(wl-1,4)];
 
+  // Shadow impact frame — dark outline slams in slightly offset
+  const big=clamp(W()*0.052,22,40);
+  ctx.font=`900 ${big}px system-ui,sans-serif`;
+
+  // Thick black stroke = SF impact feel
+  ctx.lineWidth=big*0.12;
+  ctx.strokeStyle="rgba(0,0,0,0.85)";
+  ctx.strokeText(`${combo}×`,0,0);
+
+  // Color fill with glow
+  ctx.shadowBlur=comboPop>0.1?32:16;
+  ctx.shadowColor=col;
+  ctx.fillStyle=col;
+  ctx.fillText(`${combo}×`,0,0);
+
+  // Weapon level label — slams in below
   if(wl>1){
-    const labels=["","DOUBLE!","TRIPLE!!","★ CHAOS ★"];
-    const sz=clamp(W()*0.024,10,17);
+    const labels=["","DOUBLE","TRIPLE","CHAOS","★ULTRA★"];
+    const lbl=labels[Math.min(wl-1,4)];
+    const sz=clamp(W()*0.022,9,16);
     ctx.font=`900 ${sz}px system-ui,sans-serif`;
-    ctx.shadowColor=col;ctx.shadowBlur=16;ctx.fillStyle=col;
-    ctx.fillText(labels[wl-1],0,big*1.05);
+
+    // Background pill
+    const lw=ctx.measureText(lbl).width+16;
+    ctx.fillStyle=col;ctx.globalAlpha=0.18;
+    roundRect(-lw/2,big*1.0,lw,sz+6,4);ctx.fill();
+    ctx.globalAlpha=1;
+
+    ctx.lineWidth=sz*0.14;
+    ctx.strokeStyle="rgba(0,0,0,0.7)";
+    ctx.strokeText(lbl,0,big*1.08);
+    ctx.shadowBlur=12;ctx.shadowColor=col;
+    ctx.fillStyle=col;
+    ctx.fillText(lbl,0,big*1.08);
   }
+
+  // Combo decay bar — thin strip below showing time left
+  if(combo>0&&comboTimer>0){
+    const barW=clamp(W()*0.10,44,90);
+    const barH=3;
+    const pct=comboTimer/COMBO_DECAY;
+    const barY=big*1.9;
+    ctx.globalAlpha=0.5;
+    ctx.fillStyle="rgba(255,255,255,0.15)";
+    roundRect(-barW/2,barY,barW,barH,1);ctx.fill();
+    ctx.globalAlpha=0.9;
+    ctx.fillStyle=col;
+    ctx.shadowBlur=6;
+    roundRect(-barW/2,barY,barW*pct,barH,1);ctx.fill();
+  }
+
   ctx.restore();
 }
 
 // ════════════════════════════════════════
-// ENERGY BAR
+// ENERGY BAR — Street Fighter style
 // ════════════════════════════════════════
 function drawEnergyBar(){
-  const bx=16,by=SAFE.top+HUD_PAD;
-  const bw=130,bh=10;
-  ctx.fillStyle="rgba(0,0,0,0.45)";
-  roundRect(bx,by,bw,bh,bh/2);ctx.fill();
+  const bx=16, by=SAFE.top+HUD_PAD;
+  const bw=140, bh=14;
+  const t=performance.now()/1000;
   const pct=player.energy/100;
-  const col=pct>0.5?"rgba(255,200,80,.95)":pct>0.2?"rgba(255,150,80,.95)":"rgba(255,80,120,.95)";
-  ctx.fillStyle=col;roundRect(bx,by,bw*pct,bh,bh/2);ctx.fill();
-  ctx.font="700 11px system-ui,sans-serif";
-  ctx.fillStyle="rgba(255,255,255,0.75)";
-  ctx.fillText("Booha",bx,by+24);
+  const SEGMENTS=5; // 5 health chunks like SF
+
+  // Track hit flash separately
+  if(!drawEnergyBar._hitFlash) drawEnergyBar._hitFlash=0;
+  if(!drawEnergyBar._prevEnergy) drawEnergyBar._prevEnergy=player.energy;
+  if(player.energy<drawEnergyBar._prevEnergy) drawEnergyBar._hitFlash=1.0;
+  drawEnergyBar._prevEnergy=player.energy;
+  drawEnergyBar._hitFlash=Math.max(0,drawEnergyBar._hitFlash-0.08);
+  const hf=drawEnergyBar._hitFlash;
+
+  // Danger pulse when low
+  const danger=pct<0.25;
+  const pulse=danger?(0.65+0.35*Math.sin(t*8)):1;
+
+  ctx.save();
+
+  // Background track
+  ctx.fillStyle="rgba(0,0,0,0.6)";
+  roundRect(bx-1,by-1,bw+2,bh+2,bh/2+1);ctx.fill();
+
+  // Segment dividers drawn under bar
+  const segW=bw/SEGMENTS;
+  for(let i=1;i<SEGMENTS;i++){
+    ctx.fillStyle="rgba(0,0,0,0.5)";
+    ctx.fillRect(bx+segW*i-1,by,2,bh);
+  }
+
+  // Hit flash ghost bar — shows where energy was
+  if(hf>0){
+    ctx.globalAlpha=hf*0.5;
+    ctx.fillStyle="rgba(255,255,255,0.9)";
+    roundRect(bx,by,bw*Math.max(pct,0),bh,bh/2);ctx.fill();
+    ctx.globalAlpha=1;
+  }
+
+  // Main bar
+  const col=pct>0.5?"#ffcc33":pct>0.25?"#ff8833":"#ff2244";
+  ctx.globalAlpha=pulse;
+  ctx.fillStyle=col;
+  ctx.shadowBlur=danger?12+8*Math.sin(t*8):6;
+  ctx.shadowColor=col;
+  if(pct>0){roundRect(bx,by,bw*pct,bh,bh/2);ctx.fill();}
+
+  // Segment notches on top of bar
+  ctx.shadowBlur=0;ctx.globalAlpha=1;
+  for(let i=1;i<SEGMENTS;i++){
+    const nx=bx+segW*i;
+    if(nx<bx+bw*pct){
+      ctx.fillStyle="rgba(0,0,0,0.4)";
+      ctx.fillRect(nx-1,by,2,bh);
+    }
+  }
+
+  // Outline
+  ctx.strokeStyle=danger?`rgba(255,80,80,${0.5+0.5*pulse})`:"rgba(255,255,255,0.18)";
+  ctx.lineWidth=1.5;
+  roundRect(bx,by,bw,bh,bh/2);ctx.stroke();
+
+  // Label
+  ctx.shadowBlur=0;
+  ctx.font=`700 10px system-ui,sans-serif`;
+  ctx.fillStyle=danger?`rgba(255,100,100,${pulse})`:"rgba(255,255,255,0.65)";
+  ctx.textBaseline="top";
+  ctx.fillText("BOOHA",bx,by+bh+3);
+
+  // Lives dots — right of label
+  for(let i=0;i<MAX_LIVES;i++){
+    const lx=bx+52+i*14;
+    const ly=by+bh+7;
+    const filled=i<lives;
+    ctx.beginPath();ctx.arc(lx,ly,4,0,Math.PI*2);
+    if(filled){
+      ctx.shadowBlur=filled?8:0;ctx.shadowColor="rgba(255,100,200,0.9)";
+      ctx.fillStyle="rgba(255,100,200,0.95)";
+    }else{
+      ctx.shadowBlur=0;ctx.fillStyle="rgba(255,255,255,0.18)";
+    }
+    ctx.fill();
+  }
 
   // Shield bar overlay
   if(playerShield>0){
     const sp=clamp(playerShield/8,0,1);
-    ctx.save();ctx.globalAlpha=0.5+0.3*Math.sin(performance.now()/150);
+    const shieldPulse=0.6+0.4*Math.sin(t*9);
+    ctx.globalAlpha=shieldPulse;
     ctx.strokeStyle="rgba(100,200,255,0.9)";ctx.lineWidth=2;
+    ctx.shadowBlur=10;ctx.shadowColor="rgba(100,200,255,0.8)";
     roundRect(bx,by,bw,bh,bh/2);ctx.stroke();
-    ctx.fillStyle="rgba(100,200,255,0.25)";
+    ctx.globalAlpha=0.22*shieldPulse;
+    ctx.fillStyle="rgba(100,200,255,1)";
     roundRect(bx,by,bw*sp,bh,bh/2);ctx.fill();
-    ctx.restore();
+    ctx.globalAlpha=1;ctx.shadowBlur=0;
     ctx.font="700 10px system-ui,sans-serif";
-    ctx.fillStyle="rgba(100,220,255,0.95)";
-    ctx.fillText("🛡 SHIELD",bx,by+34);
+    ctx.fillStyle=`rgba(100,220,255,${shieldPulse})`;
+    ctx.fillText("🛡",bx+bw+6,by+2);
   }
-}
 
-// ════════════════════════════════════════
-// BOOST INDICATOR
-// ════════════════════════════════════════
-function drawBoostIndicator(){
-  if(player.boost<=0) return;
-  const cx=160,cy=SAFE.top+HUD_PAD+5;
-  for(let i=0;i<3;i++){
-    const filled=i<player.boost;
-    ctx.save();
-    ctx.beginPath();ctx.arc(cx+i*18,cy,6,0,Math.PI*2);
-    if(filled){ctx.shadowBlur=12;ctx.shadowColor="rgba(255,100,220,.8)";ctx.fillStyle="rgba(255,100,220,.95)";}
-    else ctx.fillStyle="rgba(255,255,255,0.20)";
-    ctx.fill();ctx.restore();
-  }
+  ctx.restore();
 }
 
 // ════════════════════════════════════════
@@ -1889,28 +2039,28 @@ function drawTimedWeaponHUD(){
   if(timedWeapon.remaining<=0) return;
   const t=performance.now()/1000;
   const pulse=0.5+0.5*Math.sin(t*6);
-  const isStar=timedWeapon.level>=5;
+  const isStar=timedWeapon.level>=4;
   const col=isStar?"rgba(255,255,80,1)":"rgba(100,200,255,1)";
   const glow=isStar?"rgba(255,255,80,0.7)":"rgba(100,200,255,0.7)";
-  const label=isStar?"⭐ 5× SHOT":"💙 3× SHOT";
-  const bx=16, by=SAFE.top+HUD_PAD+52;
-  const barW=110;
+  const label=isStar?"⭐ CHAOS":"💙 5×";
+  const bx=16, by=SAFE.top+HUD_PAD+56; // below energy+lives row+skill heat
+  const barW=100;
   const pct=timedWeapon.remaining/60;
   const secs=Math.ceil(timedWeapon.remaining);
 
   ctx.save();
   ctx.textBaseline="top";
-  ctx.font=`900 12px system-ui,sans-serif`;
-  ctx.shadowBlur=10+pulse*6;ctx.shadowColor=glow;
+  ctx.font=`900 11px system-ui,sans-serif`;
+  ctx.shadowBlur=8+pulse*5;ctx.shadowColor=glow;
   ctx.fillStyle=col;ctx.globalAlpha=0.9+pulse*0.1;
-  ctx.fillText(`${label}  ${secs}s`,bx,by);
+  ctx.fillText(`${label} ${secs}s`,bx,by);
 
-  const barY=by+15;
+  const barY=by+14;
   ctx.globalAlpha=1;
   ctx.fillStyle="rgba(0,0,0,0.45)";
-  roundRect(bx,barY,barW,5,2);ctx.fill();
-  ctx.fillStyle=col;ctx.shadowBlur=isStar?14:8;
-  roundRect(bx,barY,barW*pct,5,2);ctx.fill();
+  roundRect(bx,barY,barW,4,2);ctx.fill();
+  ctx.fillStyle=col;ctx.shadowBlur=isStar?12:7;
+  roundRect(bx,barY,barW*pct,4,2);ctx.fill();
   ctx.restore();
 
   // Toast for candy pickup
@@ -1939,18 +2089,19 @@ function drawSkillHeat(){
   if(sm<1.05) return;
   const heat=WS.skillHeat;
   const t=performance.now()/1000;
-  const bx=16+130+10;
-  const by=SAFE.top+HUD_PAD;
+  // Sits below the energy bar + lives dots row
+  const bx=16;
+  const by=SAFE.top+HUD_PAD+38;
   const label=sm>=1.9?"★ CHAOS":sm>=1.6?"HOT!!":sm>=1.3?"HEATED":"WARM";
-  const sz=clamp(W()*0.024,10,16);
+  const sz=clamp(W()*0.022,9,15);
   const pulse=0.5+0.5*Math.sin(t*(4+heat*6));
   const r=255,g=Math.round((1-heat)*180);
   const col=`rgba(${r},${g},40,0.95)`;
   ctx.save();
   ctx.font=`900 ${sz}px system-ui,sans-serif`;ctx.textBaseline="top";
-  ctx.shadowBlur=clamp(pulse*heat*28,0,32);ctx.shadowColor=col;
-  ctx.fillStyle=col;ctx.globalAlpha=0.72+pulse*0.28;
-  ctx.fillText(`⚡ ${label}`,bx,by-1);
+  ctx.shadowBlur=clamp(pulse*heat*24,0,28);ctx.shadowColor=col;
+  ctx.fillStyle=col;ctx.globalAlpha=0.75+pulse*0.25;
+  ctx.fillText(`⚡${label}`,bx,by);
   ctx.restore();
 }
 
@@ -2158,7 +2309,11 @@ function draw(){
     if(b.shakeT>0){const m=b.shakeMag||5;bsx=rand(-m,m);bsy=rand(-m,m);}
     const bx=b.x+bsx,by=b.y+bsy;
 
-    if(b.glow>0){
+    // Diving glow — red danger trail
+    if(b.diving){
+      drawGlow(bx+b.w/2,by+b.h/2,b.w*0.7,0.35,"rgba(255,50,50,0.8)");
+      addSpark(bx+b.w/2,by+b.h,2,"boss");
+    }else if(b.glow>0){
       const gc=b.isBoss?"rgba(255,80,80,0.7)":"rgba(120,255,200,0.6)";
       drawGlow(bx+b.w/2,by+b.h/2,b.w*0.6,(b.glow/0.4)*0.28,gc);
     }
@@ -2171,14 +2326,26 @@ function draw(){
     if(IMG.bug){
       ctx.save();
       const hpPct=b.hp/b.maxHp;
-      ctx.drawImage(IMG.bug,bx,by,b.w,b.h);
-      if(hpPct<0.99){
-        ctx.globalCompositeOperation="multiply";ctx.globalAlpha=(1-hpPct)*0.55;
-        ctx.fillStyle=`hsl(${Math.round(hpPct*100)},100%,60%)`;ctx.fillRect(bx,by,b.w,b.h);
+      // Rotate diving Dotties to face downward
+      if(b.diving){
+        const cx2=bx+b.w/2,cy2=by+b.h/2;
+        const angle=Math.atan2(b.diveVy,b.diveVx||0.001)-Math.PI/2;
+        ctx.translate(cx2,cy2);ctx.rotate(angle);ctx.translate(-b.w/2,-b.h/2);
+        ctx.drawImage(IMG.bug,0,0,b.w,b.h);
+        // Red tint while diving
+        ctx.globalCompositeOperation="multiply";ctx.globalAlpha=0.5;
+        ctx.fillStyle="#ff4444";ctx.fillRect(0,0,b.w,b.h);
+      }else{
+        ctx.drawImage(IMG.bug,bx,by,b.w,b.h);
+        if(hpPct<0.99){
+          ctx.globalCompositeOperation="multiply";ctx.globalAlpha=(1-hpPct)*0.55;
+          ctx.fillStyle=`hsl(${Math.round(hpPct*100)},100%,60%)`;ctx.fillRect(bx,by,b.w,b.h);
+        }
       }
       ctx.restore();
     }else{
-      ctx.fillStyle=b.isBoss?"#ff4466":"#44ff88";ctx.fillRect(bx,by,b.w,b.h);
+      ctx.fillStyle=b.isBoss?"#ff4466":b.diving?"#ff2222":"#44ff88";
+      ctx.fillRect(bx,by,b.w,b.h);
     }
 
     if(b.shieldT>0){
@@ -2330,12 +2497,10 @@ function draw(){
   // ── HUD (no shake) ──
   if(started){
     drawEnergyBar();
-    drawBoostIndicator();
     drawTimedWeaponHUD();
     drawSkillHeat();
     drawWaveCounter();
     drawScoreHUD();
-    drawLivesHUD();
     drawPauseButton();
     drawComboHUD();
     drawWaveBanner();
@@ -2513,12 +2678,15 @@ function resetGame(){
   bossAlive=false;
   bossMusicIdx=0;
   WS.skillMult=1.0;WS.skillDisplay=1.0;WS.skillHeat=0;WS.groupStartT=0;
-  booFireTimer=0;booAutoCD=0;booPinkCD=0;booWeaponLevel=1;
+  booFireTimer=0;booAutoCD=0;
   shakeDecay=0;shakeX=0;shakeY=0;
   screenFlash.alpha=0;
   bossCinematic.active=false;bossCinematic.t=0;
   milestoneAnim.active=false;
-  window._scorePopups=[];window._friendToast=null;
+  window._scorePopups=[];window._friendToast=null;window._candyToast=null;
+  // reset SF meter state
+  drawEnergyBar._hitFlash=0;
+  drawEnergyBar._prevEnergy=100;
 }
 
 // ════════════════════════════════════════
@@ -2557,6 +2725,7 @@ function tick(ts){
       update(dt);
       updateFiring(dt);
       updateProjectiles(dt);
+      updateDiveCollisions();
       updateCandy(dt);
       updateParticles(dt);
       updateWaveSystem(dt);
