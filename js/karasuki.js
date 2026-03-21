@@ -154,15 +154,17 @@ const WANDERER_DEFS = [
   {
     index:0, roomId:'room_01', x:382, y:647, type:'stay',
     frames:['ichi-1.png','ichi-2.png'], color:'#ff79d7', radius:0, size:52,
-    name:'Ichi', nameJP:'イチ', nameKanji:'壱',
-    desc:'The first friend you\'ll meet. Always here, always watching.'
+    name:'Ichi', nameJP:'イチ', nameKanji:'一',
+    desc:'The first of three. Planted under the Karasuki tree by Mister Happy. He’s mean, but sometimes he’s right.',
+    descJP:'三つのうちの一つ。ミスター・ハッピーにカラスキの木の下に植えられた。いじわるだけど、ときどき正しい。'
   },
   /* ── index 1: Mr. Happy — room_01 ── */
   {
     index:1, roomId:'room_01', x:1081, y:477, type:'stay',
-    frames:['mr_happy-1.png'], color:'#ffe066', radius:0, size:110,
-    name:'Mr. Happy', nameJP:'ハッピー先生', nameKanji:'幸',
-    desc:'Always smiling, no matter what.'
+    frames:['mr_happy-1.png','mr_happy-2.png'], color:'#ffd166', radius:0, size:110,
+    name:'Mister Happy', nameJP:'ミスター・ハッピー',
+    desc:'Mister Happy lives in Karasuki and pretends he knows everything about it. And no—that’s not makeup. That’s his skin.',
+    descJP:'ミスター・ハッピーはカラスキに住んでいて、なんでも知っているふりをしている。それと、それはメイクじゃないよ。あれが肌。'
   },
   /* ── index 2: Tom Katsu — room_02 ── */
   {
@@ -174,9 +176,10 @@ const WANDERER_DEFS = [
   /* ── index 3: Uhibon — room_03 ── */
   {
     index:3, roomId:'room_03', x:546, y:308, type:'stay',
-    frames:['uhibon-1.png'], color:'#a8edff', radius:0, size:72,
-    name:'Uhibon', nameJP:'ウヒボン', nameKanji:'詩',
-    desc:'A wanderer of words.'
+   frames:['uhibon-1.png'], color:'#a8edff', radius:0, size:72,
+   name:'Uhibon', nameJP:'ウヒボン',
+   desc:'Nothing is really known about Uhibon. He appears as Takachika escapes into Karasuki.',
+   descJP:'ウヒボンについては、ほとんど何もわかっていない。タカチカがカラスキへ逃げ込むときに現れる。'
   },
   /* ── index 4: Jamariko — room_05 ── */
   {
