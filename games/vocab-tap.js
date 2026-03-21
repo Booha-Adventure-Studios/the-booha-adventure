@@ -18,9 +18,21 @@ U.unlockAudio();
    the first gesture. We avoid that by NOT pre-playing every file.
    Instead we decode/load them silently via load() only.
    ══════════════════════════════════════════════════════════════ */
+// AFTER
+const SFX = {};
+function loadSfx(name, url) {
+  return new Promise(resolve => {
+    const a = new Audio(url);
+    a.setAttribute('playsinline',''); a.setAttribute('webkit-playsinline','');
+    a.addEventListener('canplaythrough', () => { SFX[name] = a; resolve(); }, { once:true });
+    a.addEventListener('error', resolve, { once:true });
+    a.load();
+    setTimeout(() => { if (!SFX[name]) { SFX[name] = a; resolve(); } }, 2000);
+  });
+}
 await Promise.all([
-  U.loadSFX('ding', CFG.sfxBase + 'ding.mp3'),
-  U.loadSFX('fart', CFG.sfxBase + 'fart.mp3'),
+  loadSfx('ding', CFG.sfxBase + 'ding.mp3'),
+  loadSfx('fart', CFG.sfxBase + 'fart.mp3'),
 ]);
 
 /* Build audio cache — load() only, never play() during warm-up */
@@ -1186,12 +1198,16 @@ async function gradeRound() {
     if (correct) {
       el.classList.add('slot-correct');
       /* Stagger: play ding, wait a beat, then next */
-      U.playSFX('ding');
+      const dingClone = SFX['ding'] ? SFX['ding'].cloneNode() : null;
+      if (dingClone) { dingClone.setAttribute('playsinline',''); dingClone.setAttribute('webkit-playsinline',''); dingClone.play().catch(()=>{}); }
+       
       roundScore++;
       await new Promise(r => setTimeout(r, 700));
     } else {
       el.classList.add('slot-wrong');
-      U.playSFX('fart');
+      const fartClone = SFX['fart'] ? SFX['fart'].cloneNode() : null;
+      if (fartClone) { fartClone.setAttribute('playsinline',''); fartClone.setAttribute('webkit-playsinline',''); fartClone.play().catch(()=>{}); }
+       
       flashWrong();
       await new Promise(r => setTimeout(r, 750));
     }
