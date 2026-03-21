@@ -286,12 +286,13 @@ S.textContent = `
 .vt-columns{
   display:grid;
   grid-template-columns:1fr 1fr;
+  grid-template-rows:auto;
   gap:clamp(8px, 2vw, 14px);
-  align-items:start;
+  align-items:stretch;
 }
-
 @media(max-width:600px){
   .vt-columns{ grid-template-columns:1fr; gap:10px; }
+  .vt-panel{ grid-template-rows:repeat(5, auto); }
 }
 
 /* ── panel ── */
@@ -302,6 +303,12 @@ S.textContent = `
   border:1px solid var(--game-border);
   backdrop-filter:blur(10px);
   box-shadow:0 8px 32px rgba(0,0,0,.22);
+  display:grid;
+  grid-template-rows:repeat(5, 1fr);
+  gap:clamp(7px, 1.4vw, 10px);
+}
+.vt-stack{
+  display:contents; /* lets panel's grid control row sizing */
 }
 [data-curriculum="br"] .vt-panel{
   background:rgba(170,255,34,.04);
@@ -311,7 +318,8 @@ S.textContent = `
   background:rgba(0,240,255,.04);
   border-color:rgba(0,240,255,.14);
 }
-.vt-stack{ display:grid; grid-template-columns:1fr; gap:clamp(7px, 1.4vw, 10px); }
+
+
 
 /* ══════════════════════════════════════════════════════════════
    ENGLISH CARDS
@@ -321,7 +329,8 @@ S.textContent = `
   position:relative; overflow:hidden;
   border-radius:18px;
   padding:10px 12px;
-  min-height:72px; height:auto;
+  min-height:64px; height:100%;
+  box-sizing:border-box;
   background:
     linear-gradient(135deg,
       hsl(from var(--game-primary) h calc(s + 10%) l / 0.22),
@@ -444,7 +453,8 @@ S.textContent = `
    JAPANESE SLOTS
    ══════════════════════════════════════════════════════════════ */
 .vt-jp-slot{
-  min-height:72px; height:auto;
+  min-height:64px; height:100%;
+  box-sizing:border-box;
   border-radius:18px;
   padding:8px 11px;
   background:linear-gradient(160deg,rgba(255,255,255,.055),rgba(255,255,255,.02));
