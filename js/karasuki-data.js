@@ -29,7 +29,7 @@ window.KARASUKI_DATA = {
     room_03: {
       bg: "assets/img/karasuki/room_03.webp",
       spawns: {
-        default:   { x: 595,  y: 681  },
+        default:   { x: 747,  y: 663  },
         fromLeft:  { x: 280,  y: 328  },
         fromRight: { x: 1150, y: 237  },
         // FIX: was { x: 785, y: 240 } — too close to the "up" NPP at y:200.
