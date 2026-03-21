@@ -10,12 +10,17 @@
   const WORLD_H         = 1024;
   const GHOST_R         = 26;
   const GHOST_RADIUS    = 18;
-  const SPEED           = 3.2;
+  const BASE_SPEED      = 3.2;          // world-units per frame at 60 fps
   const FADE_MS         = 600;
   const CLICK_STOP_DIST = 6;
   const HOVER_AMP       = 9;
   const HOVER_PERIOD    = 1500;
   const TRAIL_MAX       = 90;
+
+  /* Delta-time speed: keeps movement frame-rate independent on Android */
+  const TARGET_DT       = 1000 / 60;   // 16.67 ms — reference frame time
+  let   lastTickTime    = 0;
+  let   SPEED           = BASE_SPEED;  // recalculated each tick
 
   const PORTAL = { x: 357, y: 342, r: 40, href: "adventure-profile.html" };
 
@@ -29,10 +34,11 @@
     treeIY  : 300,
   };
 
-  const ARRIVAL_ARROW_DELAY_MS  = 2000;
-  const TRANSITION_COOLDOWN_MS  = 1400;
-  const ARROW_MOVE_THRESHOLD    = 30;
-  const PORTAL_TRIGGER_R        = 36;
+  const ARRIVAL_ARROW_DELAY_MS        = 2000;
+  const ARRIVAL_ARROW_BACK_MULTIPLIER = 3;    // back-direction arrow delayed 3× longer
+  const TRANSITION_COOLDOWN_MS        = 1400;
+  const ARROW_MOVE_THRESHOLD          = 30;
+  const PORTAL_TRIGGER_R              = 36;
 
   const MONTH_COLORS = [
     ['#ff3bbd','#ff79d7'],['#ff6b3b','#ffaa5e'],['#3bc8ff','#a8edff'],
@@ -137,48 +143,75 @@
 
   const DIR_ANGLE = { right: 0, down: Math.PI / 2, left: Math.PI, up: -Math.PI / 2 };
 
-  let arrivalArrowHiddenUntil = 0;
+  let arrivalArrowHiddenUntil     = 0;
+  let arrivalArrowBackHiddenUntil = 0; // separate 3× timer for the back-direction arrow
 
 /* ═══════════════════════════════════════════
    WANDERER DEFINITIONS
 ═══════════════════════════════════════════ */
 const WANDERER_DEFS = [
-  { index:0,  roomId:'room_01', x:982,  y:407, type:'stay', frames:['ichi-1.png','ichi-2.png'],         color:'#ff79d7', radius:0, size:52 },
-  { index:1,  roomId:'room_02', x:900,  y:500, type:'stay', frames:null,                                color:'#ffaa5e', radius:0, size:40 },
-  { index:2,  roomId:'room_03', x:500,  y:600, type:'stay', frames:null,                                color:'#a8edff', radius:0, size:40 },
-  { index:3,  roomId:'room_04', x:800,  y:450, type:'stay', frames:null,                                color:'#b2ffda', radius:0, size:40 },
-  { index:4,  roomId:'room_05', x:1054, y:354, type:'stay', frames:['jamariko-2.png'],                  color:'#fff176', radius:0, size:52 },
-  { index:5,  roomId:'room_06', x:400,  y:400, type:'stay', frames:null,                                color:'#90aaff', radius:0, size:40 },
-  { index:6,  roomId:'room_07', x:1000, y:500, type:'stay', frames:null,                                color:'#d49aff', radius:0, size:40 },
-  { index:7,  roomId:'room_08', x:700,  y:600, type:'stay', frames:null,                                color:'#ffd08a', radius:0, size:40 },
-  { index:8,  roomId:'room_09', x:550,  y:480, type:'stay', frames:null,                                color:'#a8fff8', radius:0, size:40 },
-  { index:9,  roomId:'room_10', x:1233, y:452, type:'stay', frames:['ni-1.png','ni-2.png'],             color:'#e8ffaa', radius:0, size:52 },
-  { index:10, roomId:'room_11', x:650,  y:420, type:'stay', frames:null,                                color:'#ff85a1', radius:0, size:40 },
-  { index:11, roomId:'room_12', x:750,  y:500, type:'stay', frames:null,                                color:'#ff79d7', radius:0, size:40 },
-  { index:12, roomId:'room_13', x:407,  y:387, type:'stay', frames:['takachika-1.png'],                 color:'#7fffd4', radius:0, size:75 },
-  { index:13, roomId:'room_14', x:900,  y:480, type:'stay', frames:null,                                color:'#ffcc66', radius:0, size:40 },
-  { index:14, roomId:'room_01', x:300,  y:300, type:'stay', frames:null,                                color:'#c8b8ff', radius:0, size:40 },
-  { index:15, roomId:'room_02', x:1100, y:300, type:'stay', frames:null,                                color:'#88ffcc', radius:0, size:40 },
-  { index:16, roomId:'room_03', x:400,  y:700, type:'stay', frames:null,                                color:'#ffb088', radius:0, size:40 },
-  { index:17, roomId:'room_04', x:1200, y:600, type:'stay', frames:null,                                color:'#ff9eb5', radius:0, size:40 },
-  { index:18, roomId:'room_05', x:350,  y:500, type:'stay', frames:null,                                color:'#66bbff', radius:0, size:40 },
-  { index:19, roomId:'room_06', x:900,  y:300, type:'stay', frames:null,                                color:'#ffcc66', radius:0, size:40 },
-  { index:20, roomId:'room_07', x:500,  y:600, type:'stay', frames:null,                                color:'#c8b8ff', radius:0, size:40 },
-  { index:21, roomId:'room_08', x:1100, y:400, type:'stay', frames:null,                                color:'#7fffd4', radius:0, size:40 },
-  { index:22, roomId:'room_09', x:700,  y:700, type:'stay', frames:null,                                color:'#ff9eb5', radius:0, size:40 },
-  { index:23, roomId:'room_10', x:400,  y:400, type:'stay', frames:null,                                color:'#ffb088', radius:0, size:40 },
-  { index:24, roomId:'room_11', x:1000, y:600, type:'stay', frames:null,                                color:'#88ffcc', radius:0, size:40 },
-  { index:25, roomId:'room_12', x:600,  y:300, type:'stay', frames:null,                                color:'#66bbff', radius:0, size:40 },
-  { index:26, roomId:'room_15', x:1064, y:434, type:'stay', frames:['ji-1.png'],                        color:'#ffcc66', radius:0, size:80 },
+  {
+    index:0, roomId:'room_01', x:982, y:407, type:'stay',
+    frames:['ichi-1.png','ichi-2.png'], color:'#ff79d7', radius:0, size:52,
+    name:'Ichi', nameJP:'イチ', nameKanji:'壱',
+    desc:'The first friend you\'ll meet. Always here, always watching.'
+  },
+  { index:1,  roomId:'room_02', x:900,  y:500, type:'stay', frames:null, color:'#ffaa5e', radius:0, size:40 },
+  { index:2,  roomId:'room_03', x:500,  y:600, type:'stay', frames:null, color:'#a8edff', radius:0, size:40 },
+  { index:3,  roomId:'room_04', x:800,  y:450, type:'stay', frames:null, color:'#b2ffda', radius:0, size:40 },
+  {
+    index:4, roomId:'room_05', x:1054, y:354, type:'stay',
+    frames:['jamariko-2.png'], color:'#fff176', radius:0, size:52,
+    name:'Jamariko', nameJP:'ジャマリコ', nameKanji:'邪魔里子',
+    desc:'She stands in your way, but only out of love.'
+  },
+  { index:5,  roomId:'room_06', x:400,  y:400, type:'stay', frames:null, color:'#90aaff', radius:0, size:40 },
+  { index:6,  roomId:'room_07', x:1000, y:500, type:'stay', frames:null, color:'#d49aff', radius:0, size:40 },
+  { index:7,  roomId:'room_08', x:700,  y:600, type:'stay', frames:null, color:'#ffd08a', radius:0, size:40 },
+  { index:8,  roomId:'room_09', x:550,  y:480, type:'stay', frames:null, color:'#a8fff8', radius:0, size:40 },
+  {
+    index:9, roomId:'room_10', x:1233, y:452, type:'stay',
+    frames:['ni-1.png','ni-2.png'], color:'#e8ffaa', radius:0, size:52,
+    name:'Ni', nameJP:'ニ', nameKanji:'弐',
+    desc:'The second. Quiet, but always present.'
+  },
+  { index:10, roomId:'room_11', x:650,  y:420, type:'stay', frames:null, color:'#ff85a1', radius:0, size:40 },
+  { index:11, roomId:'room_12', x:750,  y:500, type:'stay', frames:null, color:'#ff79d7', radius:0, size:40 },
+  {
+    index:12, roomId:'room_13', x:407, y:387, type:'stay',
+    frames:['takachika-1.png'], color:'#7fffd4', radius:0, size:75,
+    name:'Takachika', nameJP:'タカチカ', nameKanji:'高近',
+    desc:'Big presence, soft heart.'
+  },
+  { index:13, roomId:'room_14', x:900,  y:480, type:'stay', frames:null, color:'#ffcc66', radius:0, size:40 },
+  { index:14, roomId:'room_01', x:300,  y:300, type:'stay', frames:null, color:'#c8b8ff', radius:0, size:40 },
+  { index:15, roomId:'room_02', x:1100, y:300, type:'stay', frames:null, color:'#88ffcc', radius:0, size:40 },
+  { index:16, roomId:'room_03', x:400,  y:700, type:'stay', frames:null, color:'#ffb088', radius:0, size:40 },
+  { index:17, roomId:'room_04', x:1200, y:600, type:'stay', frames:null, color:'#ff9eb5', radius:0, size:40 },
+  { index:18, roomId:'room_05', x:350,  y:500, type:'stay', frames:null, color:'#66bbff', radius:0, size:40 },
+  { index:19, roomId:'room_06', x:900,  y:300, type:'stay', frames:null, color:'#ffcc66', radius:0, size:40 },
+  { index:20, roomId:'room_07', x:500,  y:600, type:'stay', frames:null, color:'#c8b8ff', radius:0, size:40 },
+  { index:21, roomId:'room_08', x:1100, y:400, type:'stay', frames:null, color:'#7fffd4', radius:0, size:40 },
+  { index:22, roomId:'room_09', x:700,  y:700, type:'stay', frames:null, color:'#ff9eb5', radius:0, size:40 },
+  { index:23, roomId:'room_10', x:400,  y:400, type:'stay', frames:null, color:'#ffb088', radius:0, size:40 },
+  { index:24, roomId:'room_11', x:1000, y:600, type:'stay', frames:null, color:'#88ffcc', radius:0, size:40 },
+  { index:25, roomId:'room_12', x:600,  y:300, type:'stay', frames:null, color:'#66bbff', radius:0, size:40 },
+  {
+    index:26, roomId:'room_15', x:1064, y:434, type:'stay',
+    frames:['ji-1.png'], color:'#ffcc66', radius:0, size:80,
+    name:'Ji', nameJP:'ジ', nameKanji:'字',
+    desc:'Ancient and vast. A letter older than time.'
+  },
 ];
+
 const WANDERER_IMG_BASE = 'https://booha-adventure-studios.github.io/the-booha-adventure/assets/img/wanderers/';
-const FRAME_MS          = 420; // milliseconds per animation frame
+const FRAME_MS          = 420;
 
 /* ═══════════════════════════════════════════
    WANDERER RUNTIME
 ═══════════════════════════════════════════ */
 let activeWanderers  = [];
-const wandererImages = {}; // key: "filename" → HTMLImageElement
+const wandererImages = {};
 
 const WANDER_SPEED       = 0.55;
 const WANDER_TARGET_WAIT = 3000;
@@ -191,7 +224,7 @@ function preloadWandererImages() {
   WANDERER_DEFS.forEach(def => {
     if (!def.frames) return;
     def.frames.forEach(filename => {
-      if (wandererImages[filename]) return; // already loaded
+      if (wandererImages[filename]) return;
       const img = new Image();
       img.src = WANDERER_IMG_BASE + filename;
       wandererImages[filename] = img;
@@ -223,7 +256,6 @@ function refreshWanderersForRoom() {
       nextTargetAt: 0,
       wobblePhase: Math.random() * Math.PI * 2,
       scattering: false, scatterVx: 0, scatterVy: 0,
-      // resolved HTMLImageElement array (may be empty for frames:null wanderers)
       images: (def.frames || []).map(f => wandererImages[f]).filter(Boolean),
     }));
 }
@@ -247,13 +279,11 @@ function updateWanderers(now) {
     const dist    = Math.hypot(dx, dy);
 
     if (dist < bubbleR) {
-      // push ghost to bubble edge — wanderer never moves
       const angle  = Math.atan2(dy, dx);
       state.x      = w.rx + Math.cos(angle) * bubbleR;
       state.y      = w.ry + Math.sin(angle) * bubbleR;
       state.clickTarget = null;
 
-      // trigger glitter if not already sparkling
       if (!w.sparkling) {
         w.sparkling    = true;
         w.sparkleAt    = now;
@@ -264,7 +294,123 @@ function updateWanderers(now) {
     }
   });
 }
-  
+
+/* ─────────────────────────────────────────
+   WANDERER CHARACTER POP
+───────────────────────────────────────── */
+let wandererPopOverlay = null;
+
+function injectWandererPopOverlay() {
+  if (wandererPopOverlay) return;
+  wandererPopOverlay = document.createElement('div');
+  wandererPopOverlay.id = 'wanderer-pop-overlay';
+  wandererPopOverlay.style.cssText = `
+    display:none; position:fixed; inset:0; z-index:9200;
+    align-items:center; justify-content:center;
+    background:rgba(0,0,0,0); transition:background 0.3s ease;`;
+  wandererPopOverlay.innerHTML = `
+    <div id="wanderer-pop-box" style="
+      background:#080810; border-radius:8px;
+      padding:32px 36px 28px; max-width:min(380px,90vw); width:90vw;
+      text-align:center; font-family:'Georgia',serif; position:relative;
+      animation:portalAppear 0.25s ease-out;">
+      <button id="wanderer-pop-close" style="
+        position:absolute; top:10px; right:14px;
+        background:transparent; border:none; cursor:pointer;
+        font-size:1.1rem; line-height:1; padding:4px 8px;
+        color:rgba(255,255,255,.45); transition:color .18s;">✕</button>
+      <div id="wanderer-pop-orb" style="
+        width:64px; height:64px; border-radius:50%; margin:0 auto 16px;
+        position:relative; flex-shrink:0;"></div>
+      <h2 id="wanderer-pop-name" style="
+        font-size:clamp(1.2rem,4vw,1.5rem); margin:0 0 2px;
+        letter-spacing:.06em;"></h2>
+      <p id="wanderer-pop-jp" style="
+        font-size:clamp(.8rem,2.5vw,.95rem); margin:0 0 2px;
+        opacity:.75; letter-spacing:.08em;"></p>
+      <p id="wanderer-pop-kanji" style="
+        font-size:clamp(.7rem,2.2vw,.85rem); margin:0 0 18px;
+        opacity:.45; letter-spacing:.12em;"></p>
+      <p id="wanderer-pop-desc" style="
+        font-size:clamp(.82rem,2.8vw,.98rem); line-height:1.65;
+        opacity:.82; margin:0; font-family:'Georgia',serif;"></p>
+    </div>`;
+  document.body.appendChild(wandererPopOverlay);
+
+  document.getElementById('wanderer-pop-close').addEventListener('click', closeWandererPop);
+  wandererPopOverlay.addEventListener('click', e => {
+    if (e.target === wandererPopOverlay) closeWandererPop();
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeWandererPop(); });
+}
+
+function openWandererPop(w) {
+  if (!w.name) return; // only named sprite wanderers
+  const box     = document.getElementById('wanderer-pop-box');
+  const orb     = document.getElementById('wanderer-pop-orb');
+  const nameEl  = document.getElementById('wanderer-pop-name');
+  const jpEl    = document.getElementById('wanderer-pop-jp');
+  const kanjiEl = document.getElementById('wanderer-pop-kanji');
+  const descEl  = document.getElementById('wanderer-pop-desc');
+  const closeEl = document.getElementById('wanderer-pop-close');
+
+  // Themed colors from wanderer
+  const c = w.color;
+  box.style.border     = `1px solid ${c}55`;
+  box.style.boxShadow  = `0 0 0 1px ${c}44, 0 0 30px ${c}66, 0 0 70px ${c}33`;
+  closeEl.style.color  = c;
+  nameEl.style.color   = c;
+  nameEl.style.textShadow = `0 0 18px ${c}99`;
+  jpEl.style.color     = '#f0e8ff';
+  kanjiEl.style.color  = '#b8a8cc';
+  descEl.style.color   = '#e8e0f0';
+
+  // Glowing orb
+  orb.style.background    = `radial-gradient(circle at 35% 35%, #fff, ${c}, ${c}88)`;
+  orb.style.boxShadow     = `0 0 18px ${c}cc, 0 0 40px ${c}66, 0 0 70px ${c}33`;
+
+  // If the wanderer has a sprite image, show it inside the orb
+  if (w.images && w.images.length > 0 && w.images[0].complete && w.images[0].naturalWidth > 0) {
+    orb.style.backgroundImage = `url(${w.images[0].src})`;
+    orb.style.backgroundSize  = '80%';
+    orb.style.backgroundRepeat= 'no-repeat';
+    orb.style.backgroundPosition = 'center';
+  } else {
+    orb.style.backgroundImage = '';
+  }
+
+  nameEl.textContent  = w.name || '';
+  jpEl.textContent    = w.nameJP ? `「${w.nameJP}」` : '';
+  kanjiEl.textContent = w.nameKanji || '';
+  descEl.textContent  = w.desc || '';
+
+  wandererPopOverlay.style.display    = 'flex';
+  wandererPopOverlay.style.background = 'rgba(0,0,0,0.82)';
+  state.clickTarget = null;
+}
+
+function closeWandererPop() {
+  wandererPopOverlay.style.background = 'rgba(0,0,0,0)';
+  setTimeout(() => { wandererPopOverlay.style.display = 'none'; }, 300);
+}
+
+function isWandererPopOpen() {
+  return wandererPopOverlay && wandererPopOverlay.style.display === 'flex';
+}
+
+/* Check if a world-space click lands on a sprite wanderer */
+function clickCheckWanderers(worldX, worldY) {
+  for (const w of activeWanderers) {
+    if (!w.name || !w.frames) continue; // only named sprite wanderers
+    const sz = w.size || WANDERER_SIZE;
+    if (Math.abs(worldX - w.rx) <= sz && Math.abs(worldY - w.ry) <= sz) {
+      openWandererPop(w);
+      return true;
+    }
+  }
+  return false;
+}
+
 function drawWanderers(now) {
   if (!activeWanderers.length) return;
   const sec = now / 1000;
@@ -274,14 +420,13 @@ function drawWanderers(now) {
     const bubbleR = w.bubbleR || sz * 1.8;
     const pulse   = 0.5 + 0.5 * Math.sin(sec * 2.4 + w.wobblePhase);
 
-    // ── crossfade between frames ──
     let imgA = null, imgB = null, crossfade = 0;
     if (w.images && w.images.length > 1) {
-      const cycleDur  = FRAME_MS / 1000;          // seconds per frame
+      const cycleDur  = FRAME_MS / 1000;
       const cyclePos  = (sec / cycleDur) % w.images.length;
       const frameA    = Math.floor(cyclePos) % w.images.length;
       const frameB    = (frameA + 1)         % w.images.length;
-      crossfade       = cyclePos - Math.floor(cyclePos); // 0→1 blend
+      crossfade       = cyclePos - Math.floor(cyclePos);
       const ca = w.images[frameA];
       const cb = w.images[frameB];
       if (ca && ca.complete && ca.naturalWidth > 0) imgA = ca;
@@ -294,23 +439,19 @@ function drawWanderers(now) {
 
     ctx.save();
 
-    // ── glitter sparkles — only visual when ghost touches bubble ──
     const ghostDist = Math.hypot(state.x - w.rx, state.y - w.ry);
     if (w.sparkling) {
       const age     = Math.min(1, (now - w.sparkleAt) / 800);
       const fadeOut = 1 - age;
 
-      // seed a deterministic-ish set of glitter flecks from sparkleAt
       for (let i = 0; i < 28; i++) {
-        // use sin/cos of prime multiples so each fleck has its own path
-        const seed   = i * 137.508;                          // golden angle spread
+        const seed   = i * 137.508;
         const angle  = (seed % 360) * Math.PI / 180;
-        const speed  = 18 + (i % 5) * 12;                   // varied travel distance
+        const speed  = 18 + (i % 5) * 12;
         const travel = age * speed;
         const sx     = w.rx + Math.cos(angle) * (bubbleR * 0.6 + travel);
         const sy     = w.ry + Math.sin(angle) * (bubbleR * 0.6 + travel);
 
-        // each fleck twinkles at its own frequency
         const twinkle = Math.pow(Math.abs(Math.sin(sec * (8 + i % 5) + i)), 2);
         const fleckSz = (0.8 + (i % 3) * 0.7) * (1 - age * 0.6);
 
@@ -324,14 +465,12 @@ function drawWanderers(now) {
         ctx.shadowBlur  = 0;
       }
 
-      // re-trigger sparkles continuously while ghost is still touching
       if (ghostDist < bubbleR && now - w.sparkleAt > 500) {
         w.sparkleAt    = now;
         w.sparkleAngle = Math.atan2(state.y - w.ry, state.x - w.rx);
       }
     }
 
-    // ── shapeless ambient glow ──
     const glowR = sz * 2.0;
     const halo  = ctx.createRadialGradient(w.rx, w.ry, sz * 0.2, w.rx, w.ry, glowR);
     halo.addColorStop(0,   w.color + '55');
@@ -341,7 +480,6 @@ function drawWanderers(now) {
     ctx.fillStyle   = halo;
     ctx.fillRect(w.rx - glowR, w.ry - glowR, glowR * 2, glowR * 2);
 
-    // ── draw sprite with crossfade ──
     if (imgA) {
       ctx.globalAlpha = (1 - crossfade) * 0.94;
       ctx.shadowBlur  = 24 + pulse * 14;
@@ -357,7 +495,6 @@ function drawWanderers(now) {
       ctx.shadowBlur  = 0;
     }
     if (!imgA && !imgB) {
-      // fallback orb for wanderers without sprites
       const ig = ctx.createRadialGradient(
         w.rx - sz * 0.3, w.ry - sz * 0.3, 0,
         w.rx, w.ry, sz);
@@ -377,64 +514,326 @@ function drawWanderers(now) {
     ctx.restore();
   });
 }
+
   /* ═══════════════════════════════════════════
      BONUS TREE DEFINITIONS — 5 total
   ═══════════════════════════════════════════ */
   const BONUS_TREES = [
-    { id:'booha_invaders',      roomId:'room_07', x:1019, y:381, r:44, url:'booha_invaders.html',  label:'INVADERS', color:'#44ff88', lockMsg:'This game is locked. Better play some games in the maze.' },
-    { id:'booha_blocks',        roomId:'room_13', x:1090, y:360, r:44, url:'booha_blocks.html',    label:'BLOCKS',   color:'#44aaff', lockMsg:'This game is locked. Better play some games in the maze.' },
-    { id:'bonus_placeholder_1', roomId:'room_12', x:500, y:200, r:44, url:'bonus_game_1.html',    label:'???',      color:'#cc88ff', lockMsg:'This game is locked. Better play some games in the maze.' },
-    { id:'bonus_placeholder_2', roomId:'room_14', x:900, y:250, r:44, url:'bonus_game_2.html',    label:'???',      color:'#ffcc44', lockMsg:'This game is locked. Better play some games in the maze.' },
-    { id:'bonus_placeholder_3', roomId:'room_15', x:600, y:300, r:44, url:'bonus_game_3.html',    label:'???',      color:'#ff9966', lockMsg:'This game is locked. Better play some games in the maze.' },
+    {
+      id:'booha_invaders', roomId:'room_07', x:1019, y:381, r:44,
+      url:'booha_invaders.html', label:'INVADERS', color:'#44ff88',
+      theme:'invaders',
+      nameEN:'Booha Invaders',
+      nameJP:'ブーハ・インベーダーズ',
+      nameKanji:'侵略者',
+      descUnlocked:'You\'ve unlocked this game! Do you want to play?',
+      descUnlockedJP:'このゲームが使えます！遊びますか？',
+      descUnlockedKanji:'此の遊戯、解放済。参りますか？',
+      descLocked:'This game is locked. You need to play more games in the maze.',
+      descLockedJP:'このゲームはまだロックされています。迷路でもっとゲームをしてください。',
+      descLockedKanji:'此の遊戯、未だ封印。迷宮にて更なる試練を。',
+    },
+    {
+      id:'booha_blocks', roomId:'room_13', x:1090, y:360, r:44,
+      url:'booha_blocks.html', label:'BLOCKS', color:'#44aaff',
+      theme:'blocks',
+      nameEN:'Booha Blocks',
+      nameJP:'ブーハ・ブロック',
+      nameKanji:'積木',
+      descUnlocked:'You\'ve unlocked this game! Do you want to play?',
+      descUnlockedJP:'このゲームが使えます！遊びますか？',
+      descUnlockedKanji:'此の遊戯、解放済。参りますか？',
+      descLocked:'This game is locked. You need to play more games in the maze.',
+      descLockedJP:'このゲームはまだロックされています。迷路でもっとゲームをしてください。',
+      descLockedKanji:'此の遊戯、未だ封印。迷宮にて更なる試練を。',
+    },
+    {
+      id:'bonus_placeholder_1', roomId:'room_12', x:500, y:200, r:44,
+      url:'bonus_game_1.html', label:'???', color:'#cc88ff',
+      theme:'mystery',
+      nameEN:'???', nameJP:'？？？', nameKanji:'謎',
+      descUnlocked:'You\'ve unlocked this game! Do you want to play?',
+      descUnlockedJP:'このゲームが使えます！遊びますか？',
+      descUnlockedKanji:'此の遊戯、解放済。参りますか？',
+      descLocked:'This game is locked. You need to play more games in the maze.',
+      descLockedJP:'このゲームはまだロックされています。迷路でもっとゲームをしてください。',
+      descLockedKanji:'此の遊戯、未だ封印。迷宮にて更なる試練を。',
+    },
+    {
+      id:'bonus_placeholder_2', roomId:'room_14', x:900, y:250, r:44,
+      url:'bonus_game_2.html', label:'???', color:'#ffcc44',
+      theme:'mystery',
+      nameEN:'???', nameJP:'？？？', nameKanji:'謎',
+      descUnlocked:'You\'ve unlocked this game! Do you want to play?',
+      descUnlockedJP:'このゲームが使えます！遊びますか？',
+      descUnlockedKanji:'此の遊戯、解放済。参りますか？',
+      descLocked:'This game is locked. You need to play more games in the maze.',
+      descLockedJP:'このゲームはまだロックされています。迷路でもっとゲームをしてください。',
+      descLockedKanji:'此の遊戯、未だ封印。迷宮にて更なる試練を。',
+    },
+    {
+      id:'bonus_placeholder_3', roomId:'room_15', x:600, y:300, r:44,
+      url:'bonus_game_3.html', label:'???', color:'#ff9966',
+      theme:'mystery',
+      nameEN:'???', nameJP:'？？？', nameKanji:'謎',
+      descUnlocked:'You\'ve unlocked this game! Do you want to play?',
+      descUnlockedJP:'このゲームが使えます！遊びますか？',
+      descUnlockedKanji:'此の遊戯、解放済。参りますか？',
+      descLocked:'This game is locked. You need to play more games in the maze.',
+      descLockedJP:'このゲームはまだロックされています。迷路でもっとゲームをしてください。',
+      descLockedKanji:'此の遊戯、未だ封印。迷宮にて更なる試練を。',
+    },
   ];
 
- 
   /* ═══════════════════════════════════════════
-     BONUS TREE SYSTEM
+     BONUS TREE POPUP SYSTEM (themed)
   ═══════════════════════════════════════════ */
-  let bonusLockOverlay = null;
+  let bonusPopOverlay = null;
+  let bonusPopCurrentTree = null;
 
-  function injectBonusLockOverlay() {
-    if (bonusLockOverlay) return;
-    bonusLockOverlay = document.createElement('div');
-    bonusLockOverlay.id = 'bonus-lock-overlay';
-    bonusLockOverlay.style.cssText = `
-      display:none; position:fixed; inset:0; z-index:9100;
+  /* Theme palette lookup */
+  const BONUS_THEMES = {
+    invaders: {
+      bg:        '#060e0a',
+      border:    '#1a3d20',
+      accent1:   '#44ff88',
+      accent2:   '#ff9922',
+      accent3:   '#22ffcc',
+      glow1:     'rgba(68,255,136,.55)',
+      glow2:     'rgba(255,153,34,.35)',
+      btnBorder: 'rgba(68,255,136,.85)',
+      btnColor:  '#ccffdd',
+      decoration: '🌿', // jungle leaf emoji in corner accents
+      orbColors: ['#44ff88','#22bb55','#ff9922'],
+    },
+    blocks: {
+      bg:        '#060812',
+      border:    '#1a1a40',
+      accent1:   '#44aaff',
+      accent2:   '#aa44ff',
+      accent3:   '#88ddff',
+      glow1:     'rgba(68,170,255,.60)',
+      glow2:     'rgba(170,68,255,.40)',
+      btnBorder: 'rgba(68,170,255,.85)',
+      btnColor:  '#cce8ff',
+      decoration: '⬛',
+      orbColors: ['#44aaff','#aa44ff','#88ddff'],
+    },
+    mystery: {
+      bg:        '#080810',
+      border:    '#3a1055',
+      accent1:   '#cc88ff',
+      accent2:   '#ffcc44',
+      accent3:   '#ffaacc',
+      glow1:     'rgba(160,40,220,.55)',
+      glow2:     'rgba(255,200,68,.3)',
+      btnBorder: 'rgba(160,70,210,.9)',
+      btnColor:  '#e8d8ff',
+      orbColors: ['#cc88ff','#aa44cc','#ffcc44'],
+    },
+  };
+
+  function injectBonusPopOverlay() {
+    if (bonusPopOverlay) return;
+    bonusPopOverlay = document.createElement('div');
+    bonusPopOverlay.id = 'bonus-pop-overlay';
+    bonusPopOverlay.style.cssText = `
+      display:none; position:fixed; inset:0; z-index:9150;
       align-items:center; justify-content:center;
       background:rgba(0,0,0,0); transition:background 0.3s ease;`;
-    bonusLockOverlay.innerHTML = `
-      <div id="bonus-lock-box" style="
-        background:#080810; border:1px solid #3a1055; border-radius:6px;
-        padding:36px 40px 28px; max-width:min(400px,90vw); width:90vw;
-        text-align:center; font-family:'Georgia',serif;
-        box-shadow:0 0 0 1px rgba(160,40,220,.6),0 0 40px rgba(160,40,220,.5),0 0 90px rgba(120,0,180,.3);
+
+    bonusPopOverlay.innerHTML = `
+      <div id="bonus-pop-box" style="
+        border-radius:8px; padding:36px 40px 30px;
+        max-width:min(420px,92vw); width:92vw;
+        text-align:center; font-family:'Georgia',serif; position:relative;
         animation:portalAppear 0.25s ease-out;">
-        <div style="font-size:2.5rem;margin-bottom:12px;">🔒</div>
-        <p id="bonus-lock-msg" style="font-size:clamp(.9rem,3vw,1.05rem);color:#f0e8ff;margin:0 0 24px;line-height:1.6;letter-spacing:.03em;"></p>
-        <button id="bonus-lock-ok" style="background:transparent;border:1.5px solid rgba(160,70,210,.9);color:#e8d8ff;font-family:'Georgia',serif;font-size:.9rem;letter-spacing:.12em;padding:8px 30px;border-radius:3px;cursor:pointer;transition:all .18s;">OK</button>
+
+        <!-- corner brackets -->
+        <div id="bp-corner-tl" style="position:absolute;top:10px;left:10px;width:18px;height:18px;border-style:solid;border-width:1.5px 0 0 1.5px;"></div>
+        <div id="bp-corner-br" style="position:absolute;bottom:10px;right:10px;width:18px;height:18px;border-style:solid;border-width:0 1.5px 1.5px 0;"></div>
+
+        <!-- close button -->
+        <button id="bonus-pop-close" style="
+          position:absolute; top:10px; right:14px;
+          background:transparent; border:none; cursor:pointer;
+          font-size:1.1rem; line-height:1; padding:4px 8px;
+          opacity:.5; transition:opacity .18s;">✕</button>
+
+        <!-- glowing orb -->
+        <div id="bonus-pop-orb" style="
+          width:60px; height:60px; border-radius:50%;
+          margin:0 auto 18px; position:relative;"></div>
+
+        <!-- lock icon shown when locked -->
+        <div id="bonus-pop-lock" style="font-size:1.6rem;margin-bottom:8px;display:none;">🔒</div>
+
+        <!-- game name -->
+        <h2 id="bonus-pop-name" style="
+          font-size:clamp(1.1rem,3.5vw,1.4rem); margin:0 0 3px;
+          letter-spacing:.08em;"></h2>
+        <p id="bonus-pop-jp" style="
+          font-size:clamp(.78rem,2.4vw,.9rem); margin:0 0 2px;
+          opacity:.7; letter-spacing:.08em;"></p>
+        <p id="bonus-pop-kanji" style="
+          font-size:clamp(.68rem,2vw,.8rem); margin:0 0 20px;
+          opacity:.4; letter-spacing:.14em;"></p>
+
+        <!-- description -->
+        <p id="bonus-pop-desc" style="
+          font-size:clamp(.82rem,2.6vw,.95rem); line-height:1.65;
+          margin:0 0 8px; opacity:.88;"></p>
+        <p id="bonus-pop-desc-jp" style="
+          font-size:clamp(.74rem,2.2vw,.85rem); line-height:1.6;
+          margin:0 0 4px; opacity:.6;"></p>
+        <p id="bonus-pop-desc-kanji" style="
+          font-size:clamp(.66rem,1.9vw,.78rem); line-height:1.55;
+          margin:0 0 26px; opacity:.35;"></p>
+
+        <!-- buttons (only shown when unlocked) -->
+        <div id="bonus-pop-btns" style="display:none;gap:16px;justify-content:center;flex-wrap:wrap;">
+          <button id="bonus-pop-yes" class="bonus-pop-btn" style="
+            background:transparent; font-family:'Georgia',serif;
+            font-size:clamp(.8rem,2.6vw,.92rem); letter-spacing:.12em;
+            cursor:pointer; padding:8px 28px; border-radius:3px;
+            transition:all .18s;">はい / Yes</button>
+          <button id="bonus-pop-no" class="bonus-pop-btn" style="
+            background:transparent; font-family:'Georgia',serif;
+            font-size:clamp(.8rem,2.6vw,.92rem); letter-spacing:.12em;
+            cursor:pointer; padding:8px 28px; border-radius:3px;
+            transition:all .18s;">いいえ / No</button>
+        </div>
+        <!-- OK button (only shown when locked) -->
+        <button id="bonus-pop-ok" style="
+          background:transparent; font-family:'Georgia',serif;
+          font-size:.9rem; letter-spacing:.12em; cursor:pointer;
+          padding:8px 30px; border-radius:3px; display:none;
+          transition:all .18s;">OK</button>
       </div>`;
-    document.body.appendChild(bonusLockOverlay);
-    document.getElementById('bonus-lock-ok').addEventListener('click', closeBonusLock);
-    bonusLockOverlay.addEventListener('click', e => { if (e.target === bonusLockOverlay) closeBonusLock(); });
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeBonusLock(); });
+
+    document.body.appendChild(bonusPopOverlay);
+
+    document.getElementById('bonus-pop-close').addEventListener('click', closeBonusPop);
+    document.getElementById('bonus-pop-ok').addEventListener('click', closeBonusPop);
+    document.getElementById('bonus-pop-no').addEventListener('click', closeBonusPop);
+    document.getElementById('bonus-pop-yes').addEventListener('click', () => {
+      if (bonusPopCurrentTree) window.location.href = bonusPopCurrentTree.url;
+    });
+    bonusPopOverlay.addEventListener('click', e => {
+      if (e.target === bonusPopOverlay) closeBonusPop();
+    });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeBonusPop(); });
   }
 
-  function openBonusLock(msg) {
-    document.getElementById('bonus-lock-msg').textContent = msg;
-    bonusLockOverlay.style.display   = 'flex';
-    bonusLockOverlay.style.background = 'rgba(0,0,0,0.82)';
+  function openBonusPop(tree) {
+    bonusPopCurrentTree = tree;
+    const unlocked = _bonusUnlocked(tree.id);
+    const t = BONUS_THEMES[tree.theme] || BONUS_THEMES.mystery;
+
+    /* ── style the box ── */
+    const box = document.getElementById('bonus-pop-box');
+    box.style.background  = t.bg;
+    box.style.border      = `1px solid ${t.border}`;
+    box.style.boxShadow   = `0 0 0 1px ${t.accent1}44, 0 0 35px ${t.glow1}, 0 0 80px ${t.glow2}, inset 0 0 40px rgba(0,0,0,.5)`;
+
+    /* corner brackets */
+    ['bp-corner-tl','bp-corner-br'].forEach(id => {
+      document.getElementById(id).style.borderColor = `${t.accent1}88`;
+    });
+
+    /* close btn */
+    document.getElementById('bonus-pop-close').style.color = t.accent1;
+
+    /* orb */
+    const orb = document.getElementById('bonus-pop-orb');
+    orb.style.background = `radial-gradient(circle at 35% 35%, #fff, ${t.orbColors[0]}, ${t.orbColors[1]})`;
+    orb.style.boxShadow  = `0 0 14px ${t.orbColors[0]}cc, 0 0 32px ${t.orbColors[0]}88, 0 0 60px ${t.orbColors[1]}55`;
+
+    /* theme-specific orb decoration */
+    if (tree.theme === 'invaders') {
+      orb.textContent   = '👾';
+      orb.style.fontSize = '2rem';
+      orb.style.lineHeight = '60px';
+      orb.style.background = `radial-gradient(circle at 35% 35%, #ccffdd, #44ff88, #005522)`;
+    } else if (tree.theme === 'blocks') {
+      orb.textContent   = '🟦';
+      orb.style.fontSize = '1.8rem';
+      orb.style.lineHeight = '60px';
+      orb.style.background = `radial-gradient(circle at 35% 35%, #cce8ff, #44aaff, #002244)`;
+    } else {
+      orb.textContent   = '✨';
+      orb.style.fontSize = '1.8rem';
+      orb.style.lineHeight = '60px';
+    }
+
+    /* lock icon */
+    const lockEl = document.getElementById('bonus-pop-lock');
+    lockEl.style.display = unlocked ? 'none' : 'block';
+
+    /* name */
+    const nameEl = document.getElementById('bonus-pop-name');
+    nameEl.textContent   = tree.nameEN;
+    nameEl.style.color   = t.accent1;
+    nameEl.style.textShadow = `0 0 16px ${t.accent1}99`;
+
+    document.getElementById('bonus-pop-jp').textContent    = tree.nameJP;
+    document.getElementById('bonus-pop-jp').style.color    = t.accent3;
+    document.getElementById('bonus-pop-kanji').textContent = tree.nameKanji;
+
+    /* desc */
+    const descEl   = document.getElementById('bonus-pop-desc');
+    const descJpEl = document.getElementById('bonus-pop-desc-jp');
+    const descKEl  = document.getElementById('bonus-pop-desc-kanji');
+    if (unlocked) {
+      descEl.textContent   = tree.descUnlocked;
+      descJpEl.textContent = tree.descUnlockedJP;
+      descKEl.textContent  = tree.descUnlockedKanji;
+    } else {
+      descEl.textContent   = tree.descLocked;
+      descJpEl.textContent = tree.descLockedJP;
+      descKEl.textContent  = tree.descLockedKanji;
+    }
+    descEl.style.color   = '#f0e8ff';
+    descJpEl.style.color = '#cdb8e8';
+    descKEl.style.color  = '#a888cc';
+
+    /* buttons */
+    const btnsEl = document.getElementById('bonus-pop-btns');
+    const okEl   = document.getElementById('bonus-pop-ok');
+    const yesEl  = document.getElementById('bonus-pop-yes');
+    const noEl   = document.getElementById('bonus-pop-no');
+
+    if (unlocked) {
+      btnsEl.style.display = 'flex';
+      okEl.style.display   = 'none';
+      yesEl.style.border   = `1.5px solid ${t.btnBorder}`;
+      yesEl.style.color    = t.btnColor;
+      noEl.style.border    = `1.5px solid ${t.accent1}44`;
+      noEl.style.color     = `${t.accent3}99`;
+    } else {
+      btnsEl.style.display = 'none';
+      okEl.style.display   = 'inline-block';
+      okEl.style.border    = `1.5px solid ${t.btnBorder}`;
+      okEl.style.color     = t.btnColor;
+    }
+
+    bonusPopOverlay.style.display    = 'flex';
+    bonusPopOverlay.style.background = 'rgba(0,0,0,0.85)';
     state.clickTarget = null;
   }
-  function closeBonusLock() {
-    bonusLockOverlay.style.background = 'rgba(0,0,0,0)';
-    setTimeout(() => { bonusLockOverlay.style.display = 'none'; }, 300);
+
+  function closeBonusPop() {
+    bonusPopOverlay.style.background = 'rgba(0,0,0,0)';
+    setTimeout(() => { bonusPopOverlay.style.display = 'none'; }, 300);
+    bonusPopCurrentTree = null;
   }
-  function isBonusLockOpen() {
-    return bonusLockOverlay && bonusLockOverlay.style.display === 'flex';
+
+  function isBonusPopOpen() {
+    return bonusPopOverlay && bonusPopOverlay.style.display === 'flex';
   }
 
   function _bonusUnlocked(bonusId) {
-      if (window.__devAllGames) return true;          // ← add this line**TESTING
+    if (window.__devAllGames) return true;
     try {
       if (window.BoohaAdventure && BoohaAdventure.unlocks) {
         return BoohaAdventure.unlocks.isBonusGameUnlocked(bonusId);
@@ -444,11 +843,7 @@ function drawWanderers(now) {
   }
 
   function handleBonusTreeInteraction(tree) {
-    if (_bonusUnlocked(tree.id)) {
-      window.location.href = tree.url;
-    } else {
-      openBonusLock(tree.lockMsg);
-    }
+    openBonusPop(tree);
   }
 
   function checkBonusTrees() {
@@ -481,32 +876,66 @@ function drawWanderers(now) {
     const moveReveal = Math.min(1, state.distMovedSinceSpawn / ARROW_MOVE_THRESHOLD);
     trees.forEach(tree => {
       const unlocked = _bonusUnlocked(tree.id);
+      const t        = BONUS_THEMES[tree.theme] || BONUS_THEMES.mystery;
       const pulse    = 0.5 + 0.5 * Math.sin(sec * 1.8);
       const bounce   = Math.sin(sec * 1.8) * 5;
       ctx.save();
       ctx.globalAlpha = moveReveal;
+
       if (unlocked) {
-        const glow = ctx.createRadialGradient(tree.x, tree.y + bounce, 0, tree.x, tree.y + bounce, 48);
-        glow.addColorStop(0, tree.color + '88'); glow.addColorStop(0.5, tree.color + '33'); glow.addColorStop(1, 'transparent');
-        ctx.globalAlpha = moveReveal * (0.5 + pulse * 0.35); ctx.fillStyle = glow;
-        ctx.beginPath(); ctx.arc(tree.x, tree.y + bounce, 48, 0, Math.PI * 2); ctx.fill();
-        ctx.globalAlpha = moveReveal * (0.85 + pulse * 0.13);
-        ctx.shadowBlur = 20 + pulse * 14; ctx.shadowColor = tree.color; ctx.fillStyle = tree.color;
-        ctx.beginPath(); ctx.arc(tree.x, tree.y + bounce, 16, 0, Math.PI * 2); ctx.fill();
+        /* outer ambient cloud — larger, softer, double-layered */
+        const glow1 = ctx.createRadialGradient(tree.x, tree.y + bounce, 0, tree.x, tree.y + bounce, 64);
+        glow1.addColorStop(0,   t.accent1 + 'aa');
+        glow1.addColorStop(0.4, t.accent1 + '44');
+        glow1.addColorStop(1,   'transparent');
+        ctx.globalAlpha = moveReveal * (0.4 + pulse * 0.28);
+        ctx.fillStyle   = glow1;
+        ctx.beginPath(); ctx.arc(tree.x, tree.y + bounce, 64, 0, Math.PI * 2); ctx.fill();
+
+        const glow2 = ctx.createRadialGradient(tree.x, tree.y + bounce, 0, tree.x, tree.y + bounce, 44);
+        glow2.addColorStop(0,   t.accent2 + '66');
+        glow2.addColorStop(0.5, t.accent2 + '22');
+        glow2.addColorStop(1,   'transparent');
+        ctx.globalAlpha = moveReveal * (0.3 + pulse * 0.22);
+        ctx.fillStyle   = glow2;
+        ctx.beginPath(); ctx.arc(tree.x, tree.y + bounce, 44, 0, Math.PI * 2); ctx.fill();
+
+        /* inner orb */
+        ctx.globalAlpha = moveReveal * (0.88 + pulse * 0.1);
+        ctx.shadowBlur  = 24 + pulse * 18;
+        ctx.shadowColor = t.accent1;
+        const orbG = ctx.createRadialGradient(
+          tree.x - 5, tree.y + bounce - 5, 0,
+          tree.x, tree.y + bounce, 14);
+        orbG.addColorStop(0,   '#ffffff');
+        orbG.addColorStop(0.4, t.accent1);
+        orbG.addColorStop(1,   t.accent2);
+        ctx.fillStyle = orbG;
+        ctx.beginPath(); ctx.arc(tree.x, tree.y + bounce, 14, 0, Math.PI * 2); ctx.fill();
         ctx.shadowBlur = 0;
-        ctx.globalAlpha = moveReveal * (0.75 + pulse * 0.2); ctx.fillStyle = '#fff';
-        ctx.font = 'bold 11px monospace'; ctx.textAlign = 'center';
-        ctx.shadowBlur = 8; ctx.shadowColor = tree.color;
-        ctx.fillText(tree.label, tree.x, tree.y + bounce - 26);
-        ctx.shadowBlur = 0; ctx.textAlign = 'left';
+
+        /* label */
+        ctx.globalAlpha = moveReveal * (0.80 + pulse * 0.18);
+        ctx.fillStyle   = '#fff';
+        ctx.font        = 'bold 11px monospace';
+        ctx.textAlign   = 'center';
+        ctx.shadowBlur  = 10; ctx.shadowColor = t.accent1;
+        ctx.fillText(tree.label, tree.x, tree.y + bounce - 24);
+        ctx.shadowBlur  = 0; ctx.textAlign = 'left';
+
       } else {
-        ctx.globalAlpha = moveReveal * 0.35; ctx.fillStyle = '#666';
-        ctx.shadowBlur = 8; ctx.shadowColor = '#888';
-        ctx.beginPath(); ctx.arc(tree.x, tree.y, 16, 0, Math.PI * 2); ctx.fill();
-        ctx.shadowBlur = 0;
-        ctx.globalAlpha = moveReveal * 0.55; ctx.fillStyle = '#aaa';
-        ctx.font = 'bold 13px monospace'; ctx.textAlign = 'center';
-        ctx.fillText('🔒', tree.x, tree.y + 5); ctx.textAlign = 'left';
+        /* locked — dim grey orb */
+        ctx.globalAlpha = moveReveal * 0.35;
+        ctx.fillStyle   = '#666';
+        ctx.shadowBlur  = 8; ctx.shadowColor = '#888';
+        ctx.beginPath(); ctx.arc(tree.x, tree.y, 14, 0, Math.PI * 2); ctx.fill();
+        ctx.shadowBlur  = 0;
+        ctx.globalAlpha = moveReveal * 0.55;
+        ctx.fillStyle   = '#aaa';
+        ctx.font        = 'bold 13px monospace';
+        ctx.textAlign   = 'center';
+        ctx.fillText('🔒', tree.x, tree.y + 5);
+        ctx.textAlign   = 'left';
       }
       ctx.restore();
     });
@@ -518,10 +947,10 @@ function drawWanderers(now) {
   const state = {
     roomId            : DATA.startRoom,
     spawnId           : "default",
-    x                 : 732,
-    y                 : 876,
-    spawnX            : 732,
-    spawnY            : 876,
+    x                 : 751,    // ← updated start position
+    y                 : 672,    // ← updated start position
+    spawnX            : 751,
+    spawnY            : 672,
     arrivalDir        : null,
     transitioning     : false,
     transitionReadyAt : 0,
@@ -626,7 +1055,7 @@ function drawWanderers(now) {
    DEV TESTING TOGGLE (remove before shipping)
 ═══════════════════════════════════════════ */
 function injectDevPanel() {
-  if (document.getElementById('dev-panel')) return; // guard against double-inject
+  if (document.getElementById('dev-panel')) return;
 
   const panel = document.createElement('div');
   panel.id = 'dev-panel';
@@ -668,7 +1097,6 @@ function injectDevPanel() {
   }, 200);
 }
 
-  
   /* ═══════════════════════════════════════════
      DOM BUILD
   ═══════════════════════════════════════════ */
@@ -720,18 +1148,19 @@ function injectDevPanel() {
     document.body.appendChild(toast);
     document.body.appendChild(portalOverlay);
 
-    /* ── Step 1: inject bonus lock overlay ── */
-    injectBonusLockOverlay();
-     // ADD THIS LINE:
+    injectBonusLockOverlay_LEGACY(); // keep legacy overlay injected just in case (no-ops if unused)
+    injectBonusPopOverlay();
+    injectWandererPopOverlay();
     injectDevPanel();
 
+    /* ── Rotate overlay — Japanese ── */
     const rotateOverlay = document.createElement("div");
     rotateOverlay.id = "rotate-overlay";
     rotateOverlay.innerHTML = `
       <span class="rotate-phone">📱</span>
       <div class="rotate-bar"></div>
-      <p class="rotate-title">Rotate to play!</p>
-      <p class="rotate-sub">Karasuki works best in<br><strong style="color:#ff79d7">landscape mode</strong></p>`;
+      <p class="rotate-title">横にして遊ぼう！</p>
+      <p class="rotate-sub">カラスキは<strong style="color:#ff79d7">横画面</strong>で遊べるよ。<br>スマホを横にしてね。</p>`;
     document.body.appendChild(rotateOverlay);
 
     ctx = canvas.getContext("2d");
@@ -744,6 +1173,13 @@ function injectDevPanel() {
     });
     document.getElementById("portal-no").addEventListener("click", closePortal);
     portalOverlay.addEventListener("click", (e) => { if (e.target === portalOverlay) closePortal(); });
+  }
+
+  /* Legacy lock overlay — kept as a no-op stub so the reference in buildApp doesn't break */
+  let _legacyBonusLockOverlay = null;
+  function injectBonusLockOverlay_LEGACY() {
+    if (_legacyBonusLockOverlay) return;
+    _legacyBonusLockOverlay = true; // nothing to inject; new system handles everything
   }
 
   function openPortal()  { portalOverlay.classList.add("active"); state.clickTarget = null; }
@@ -867,6 +1303,7 @@ function injectDevPanel() {
     const now = performance.now();
     state.transitionReadyAt   = now + TRANSITION_COOLDOWN_MS;
     arrivalArrowHiddenUntil   = now + ARRIVAL_ARROW_DELAY_MS;
+    arrivalArrowBackHiddenUntil = now + ARRIVAL_ARROW_DELAY_MS * ARRIVAL_ARROW_BACK_MULTIPLIER;
     state.distMovedSinceSpawn = 0;
   }
 
@@ -917,7 +1354,6 @@ function injectDevPanel() {
       const nextBg = makeBg(nextRoom.bg);
       roomLayer.innerHTML = ""; roomLayer.appendChild(nextBg); currentBg = nextBg;
       state.roomId     = exit.to;
-      /* ── Step 3: refresh wanderers for new room ── */
       onRoomChanged();
       state.spawnId    = exit.spawn || "default";
       const spawn      = getSpawn(nextRoom, state.spawnId);
@@ -928,9 +1364,11 @@ function injectDevPanel() {
       trail = []; pins = [];
 
       const now = performance.now();
-      state.transitionReadyAt   = now + TRANSITION_COOLDOWN_MS;
-      arrivalArrowHiddenUntil   = now + ARRIVAL_ARROW_DELAY_MS;
-      state.distMovedSinceSpawn = 0;
+      state.transitionReadyAt     = now + TRANSITION_COOLDOWN_MS;
+      arrivalArrowHiddenUntil     = now + ARRIVAL_ARROW_DELAY_MS;
+      /* back-direction arrow delayed 3× */
+      arrivalArrowBackHiddenUntil = now + ARRIVAL_ARROW_DELAY_MS * ARRIVAL_ARROW_BACK_MULTIPLIER;
+      state.distMovedSinceSpawn   = 0;
 
       const lh = pinLog.querySelector(".log-header span");
       if (lh) lh.textContent = `PINS — ${state.roomId}`;
@@ -971,31 +1409,42 @@ function injectDevPanel() {
 
   /* ═══════════════════════════════════════════
      DRAW EXIT ARROWS
+     — Back-direction arrow uses arrivalArrowBackHiddenUntil (3× delay)
+     — All other arrows use arrivalArrowHiddenUntil (normal delay)
   ═══════════════════════════════════════════ */
   function drawExitArrows(now) {
     const npps = NPP[state.roomId];
     if (!npps) return;
-    const moved = state.distMovedSinceSpawn;
+    const moved      = state.distMovedSinceSpawn;
     const moveReveal = Math.min(1, moved / ARROW_MOVE_THRESHOLD);
     if (moveReveal <= 0) return;
     const sec = now / 1000;
     const [col1, col2] = roomColorPair(state.roomId);
     const OPPOSITE = { left: "right", right: "left", up: "down", down: "up" };
     const arrivalExit = state.arrivalDir ? OPPOSITE[state.arrivalDir] : null;
-    const delayRemaining = arrivalArrowHiddenUntil - now;
-    const revealFade = delayRemaining > 400
-      ? 0 : Math.min(1, Math.max(0, 1 - (delayRemaining / ARRIVAL_ARROW_DELAY_MS)));
+
     npps.forEach((npp, i) => {
       if (!npp.dir) return;
-      const isArrivalDir = (npp.dir === arrivalExit);
-      if (isArrivalDir && delayRemaining > 400) return;
+      const isBackDir = (npp.dir === arrivalExit);
+
+      /* choose the appropriate hidden-until timer */
+      const hiddenUntil     = isBackDir ? arrivalArrowBackHiddenUntil : arrivalArrowHiddenUntil;
+      const delayRemaining  = hiddenUntil - now;
+
+      /* skip completely if still in hard-hide window */
+      if (delayRemaining > 400) return;
+
+      const revealFade = Math.min(1, Math.max(0, 1 - (delayRemaining / (isBackDir
+        ? ARRIVAL_ARROW_DELAY_MS * ARRIVAL_ARROW_BACK_MULTIPLIER
+        : ARRIVAL_ARROW_DELAY_MS))));
+
       const angle  = DIR_ANGLE[npp.dir] ?? 0;
       const pulse  = 0.5 + 0.5 * Math.sin(sec * 2.2 + i * 1.3);
       const bounce = Math.sin(sec * 2.2 + i * 1.3) * 6;
       const ax = npp.x + Math.cos(angle) * bounce;
       const ay = npp.y + Math.sin(angle) * bounce;
-      const baseFade  = isArrivalDir ? revealFade : 1;
-      const fadeAlpha = baseFade * moveReveal;
+      const fadeAlpha = revealFade * moveReveal;
+
       ctx.save();
       ctx.translate(ax, ay); ctx.rotate(angle);
       const ga = ctx.createRadialGradient(0, 0, 0, 0, 0, 40);
@@ -1178,8 +1627,6 @@ function injectDevPanel() {
     drawPortalOrb(now);
     drawExitArrows(now);
     drawMazeExitArrow(now);
-
-    /* ── Step 4: draw bonus trees and wanderers ── */
     drawBonusTrees(now);
     drawWanderers(now);
 
@@ -1218,7 +1665,9 @@ function injectDevPanel() {
   }
 
   /* ═══════════════════════════════════════════
-     MOVEMENT
+     MOVEMENT  — delta-time corrected
+     SPEED is recalculated each tick so movement
+     is frame-rate independent (fixes Android lag)
   ═══════════════════════════════════════════ */
   function handleClickMovement(now) {
     if (!state.clickTarget) { state.moving = false; return; }
@@ -1241,11 +1690,19 @@ function injectDevPanel() {
      MAIN LOOP
   ═══════════════════════════════════════════ */
   function tick(now) {
-    /* ── Step 5 & 8: include isBonusLockOpen() in the guard ── */
-    if (!state.transitioning && !isPortalOpen() && !state.mazeExiting && !isBonusLockOpen()) {
-      handleClickMovement(now);
+    /* ── Delta-time SPEED correction ──
+       Clamp dt to [8, 50] ms to avoid huge jumps after tab-switch / focus-loss.
+       At 60 fps dt ≈ 16.67 ms → multiplier ≈ 1.0 (no change).
+       At 30 fps dt ≈ 33 ms   → multiplier ≈ 2.0 (doubles step to compensate).  */
+    const dt = Math.min(50, Math.max(8, now - (lastTickTime || now)));
+    lastTickTime = now;
+    SPEED = BASE_SPEED * (dt / TARGET_DT);
 
-      /* ── Step 5: update wanderers ── */
+    const anyModalOpen = state.transitioning || isPortalOpen() || state.mazeExiting
+                      || isBonusPopOpen()    || isWandererPopOpen();
+
+    if (!anyModalOpen) {
+      handleClickMovement(now);
       updateWanderers(now);
 
       if (state.roomId === "room_08" && state.moving) {
@@ -1263,7 +1720,6 @@ function injectDevPanel() {
         if (exit) transitionTo(exit);
       }
 
-      /* ── Step 5: check bonus trees by proximity ── */
       checkBonusTrees();
     }
     drawFrame(now);
@@ -1308,7 +1764,8 @@ function injectDevPanel() {
       const p = stagePointToWorld(e.clientX, e.clientY);
       if (state.coordMode) { dropPin(p.x, p.y); ripples.push({ x: p.x, y: p.y, life: 1 }); return; }
       if (isNearPortal(p)) { openPortal(); ripples.push({ x: p.x, y: p.y, life: 1 }); return; }
-      /* ── Step 6: bonus tree direct click ── */
+      /* wanderer sprite click check — before bonus tree so it takes priority */
+      if (clickCheckWanderers(p.x, p.y)) { ripples.push({ x: p.x, y: p.y, life: 1 }); return; }
       if (clickBonusTree(p.x, p.y)) { ripples.push({ x: p.x, y: p.y, life: 1 }); return; }
       state.clickTarget = { x: p.x, y: p.y };
       ripples.push({ x: p.x, y: p.y, life: 1 });
@@ -1321,7 +1778,8 @@ function injectDevPanel() {
       const p  = stagePointToWorld(t0.clientX, t0.clientY);
       if (state.coordMode) { dropPin(p.x, p.y); ripples.push({ x: p.x, y: p.y, life: 1 }); e.preventDefault(); return; }
       if (isNearPortal(p)) { openPortal(); ripples.push({ x: p.x, y: p.y, life: 1 }); e.preventDefault(); return; }
-      /* ── Step 7: bonus tree direct touch ── */
+      /* wanderer sprite tap check */
+      if (clickCheckWanderers(p.x, p.y)) { ripples.push({ x: p.x, y: p.y, life: 1 }); e.preventDefault(); return; }
       if (clickBonusTree(p.x, p.y)) { ripples.push({ x: p.x, y: p.y, life: 1 }); e.preventDefault(); return; }
       state.clickTarget = { x: p.x, y: p.y };
       ripples.push({ x: p.x, y: p.y, life: 1 });
@@ -1342,13 +1800,11 @@ function injectDevPanel() {
     fitStage();
     resizeCanvas();
     renderInitialRoom();
-    /* ── Step 2: init wanderers after room is ready ── */
     initWanderers();
     bindInput();
     window.addEventListener("resize", () => { fitStage(); resizeCanvas(); });
     requestAnimationFrame(tick);
   }
 
-
   init();
-})();    
+})();
