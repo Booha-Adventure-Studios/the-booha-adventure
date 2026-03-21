@@ -668,7 +668,7 @@ async function beginRound() {
       }, 300);
     }
     /* 2600ms total — ding + audio + breathing room before next card */
-    setTimeout(() => { idx++; isBusy = false; showCard(); }, 2600);
+    setTimeout(() => { idx++; if (idx >= order.length) { showResults(); } else { showCard(); } }, 2600);
   } else {
     playSfx('fart'); updateStreak(0);
     aqCard.classList.add('wrong-state');
@@ -717,7 +717,7 @@ function handleIosPick(btn, card) {
       a.play().catch(()=>{});
     }
     /* 2600ms breathing room before next card */
-    setTimeout(() => { idx++; showCard(); }, 2600);
+    setTimeout(() => { idx++; isBusy = false; if (idx >= order.length) { showResults(); } else { showCard(); } }, 2600);
   } else {
     iosFirstTry = false; updateStreak(0);
     btn.classList.add('ios-wrong'); U.unlockAudio(); playSfx('fart');
