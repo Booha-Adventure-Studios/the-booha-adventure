@@ -215,7 +215,7 @@ const WANDERER_DEFS = [
   /* ── index 11: October Moriyama — room_12 ── */
   {
     index:11, roomId:'room_12', x:700, y:270, type:'stay',
-    frames:['october_moriyama.png'], color:'#ff79d7', radius:0, size:73,
+    frames:['october-moriyama.png'], color:'#ff79d7', radius:0, size:73,
     name:'October Moriyama', nameJP:'オクトーバー・森山', nameKanji:'霜',
     desc:'Arrived with the autumn. Never left.'
   },
@@ -229,7 +229,7 @@ const WANDERER_DEFS = [
   /* ── index 13: Pugoo — room_13 ── */
   {
     index:13, roomId:'room_13', x:609, y:642, type:'stay',
-    frames:['pugoo.png'], color:'#ffcc66', radius:0, size:52,
+    frames:['pugoo-1.png'], color:'#ffcc66', radius:0, size:52,
     name:'Pugoo', nameJP:'プグー', nameKanji:'愛',
     desc:'Small but unforgettable.'
   },
