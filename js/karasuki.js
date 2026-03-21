@@ -947,10 +947,10 @@ function drawWanderers(now) {
   const state = {
     roomId            : DATA.startRoom,
     spawnId           : "default",
-    x                 : 731,    // ← updated start position
-    y                 : 772,    // ← updated start position
-    spawnX            : 751,
-    spawnY            : 672,
+    x                 : 742,    // ← start position
+    y                 : 717,    // ← start position
+    spawnX            : 742,
+    spawnY            : 717,
     arrivalDir        : null,
     transitioning     : false,
     transitionReadyAt : 0,
