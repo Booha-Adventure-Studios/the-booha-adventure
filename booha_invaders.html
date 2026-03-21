@@ -169,7 +169,8 @@ canvas{
         <li><b>ブーハーは じどうで うつ！</b><span class="en">Booha shoots automatically — build your streak!</span></li>
         <li><b>コンボで パワーアップ！</b><span class="en">Chain kills to power up your shot!</span></li>
         <li><b>あめを とると なかまが くる！</b><span class="en">Grab candy — friends join at wave milestones!</span></li>
-        <li><b>ボス に ちゅうい！</b><span class="en">Watch out for the BOSS every 5 waves!</span></li>
+        <li><b>ボスに ちゅうい！</b><span class="en">Watch out for the BOSS every 5 waves!</span></li>
+        <li><b>「！」を よけよう！ 岩を まもれ！</b><span class="en">Dodge the ！ bombers — they destroy your rocks!</span></li>
       </ul>
     </div>
     <div class="friend-preview">🔵 Blue-Boo • 🟢 Green-Boo • 🩷 Pink-Boo • 🟣 Purple-Boo joins the fight!</div>
@@ -414,7 +415,13 @@ function setPaused(on){
   if(paused)pauseAllMusic();else resumeAllMusic();
 }
 function playCandySfx(){
-  try{if(!candySfx)return;candySfx.currentTime=0;candySfx.play().catch(()=>{});}catch(_){}
+  try{
+    if(!candySfx) return;
+    // cloneNode allows overlapping plays without currentTime reset cutting previous
+    const s=candySfx.cloneNode();
+    s.volume=1;
+    s.play().catch(()=>{});
+  }catch(_){}
 }
 function playLifeloss(){
   try{if(!lifelossSfx)return;lifelossSfx.currentTime=0;lifelossSfx.play().catch(()=>{});}catch(_){}
@@ -500,7 +507,9 @@ const WAVE_SCALE={
   introDelaySec:1.5, waveCardSec:3.8,
   spawnIntervalBase:0.55, spawnIntervalMin:0.09, spawnIntervalDropPerWave:0.010,
   driftBase:10, driftGainPerWave:0.6, driftMax:48,
-  fireCooldownBase:3.2, fireCooldownMin:0.45, fireCooldownDropPerWave:0.06,
+  fireCooldownBase:5.0,  // was 3.2 — Dotties fire much less often early
+  fireCooldownMin:1.2,   // was 0.45 — hard floor on fire rate
+  fireCooldownDropPerWave:0.08,
 };
 const WS={
   wave:1,groupIdx:0,targetCount:0,spawned:0,killed:0,spawnTimer:0,
@@ -572,18 +581,34 @@ function isMilestoneWave(w){
   return (w===5||w===10||w===15||w===20||w%10===0)&&!isBossWave(w);
 }
 
+function spawnRocks(wave){
+  wave=wave||1;
+  rocks.length=0;
+  const rCount=4;
+  const rw=clamp(U()*0.34,80,150)*worldScale();
+  const rh=rw*0.72;
+  const gap=Math.max(10,(W()-rCount*rw)/(rCount+1));
+  const rPad=(IS_COARSE&&isLandscape())
+    ?clamp(U()*0.10,10,30)*worldScale()
+    :clamp(U()*0.18,24,60)*worldScale();
+  const ry=player.y-rh-rPad;
+  // HP scales with wave: starts at 8, gains 2 per wave, caps at 30
+  const hp=clamp(8+wave*2,8,30);
+  for(let i=0;i<rCount;i++){
+    rocks.push({x:gap+i*(rw+gap),y:ry,w:rw,h:rh,hp,maxHp:hp});
+  }
+}
+
 function startWave(n){
   WS.wave=n;
   WS.groupIdx=0;WS.phaseT=0;WS.phase="intro";
   WS.skillMult=clamp(WS.skillMult*0.88+0.12,0.70,2.0);
   bgHue=(220+n*8)%360;
   updateFriendUnlocks(n);
-
-  // check milestone
-  if(n>1&&isMilestoneWave(n)){
-    triggerMilestone(n);
-  }
-
+  spawnRocks(n);
+  droppers.length=0;
+  dropperTimer=dropperSpawnInterval(n)+rand(2,5); // staggered start so first dropper isn't instant
+  if(n>1&&isMilestoneWave(n)) triggerMilestone(n);
   beginGroup();
 }
 function beginGroup(){
@@ -662,6 +687,7 @@ function updateWaveSystem(dt){
 // ════════════════════════════════════════
 function triggerBossCinematic(){
   bossCinematic.active=true;
+  droppers.length=0; // no droppers during boss fight
   bossCinematic.t=0;
   bossCinematic.phase="flash";
   screenFlash.alpha=1;
@@ -902,6 +928,131 @@ function spawnBug(){
 }
 
 // ════════════════════════════════════════
+// DROPPERS — Invincible aimed bombers
+// ════════════════════════════════════════
+const droppers=[];
+let dropperTimer=0; // countdown to next dropper spawn
+
+function dropperSpawnInterval(wave){
+  // First dropper at wave 3, one every 12s early, down to 5s at wave 20
+  return clamp(12-wave*0.4,5,12);
+}
+
+function spawnDropper(){
+  if(!started||WS.phase!=="run") return;
+  const sm=worldScale();
+  const sz=clamp(U()*0.11,24,44)*sm;
+  // Aim slightly ahead of player with ±20% spread — curved not perfect
+  const px=player.x+player.w/2;
+  const spread=(rand(-0.20,0.20))*W();
+  const tx=clamp(px+spread,sz,W()-sz);
+  droppers.push({
+    x:rand(sz*2,W()-sz*2), y:-sz,
+    tx, // target x
+    w:sz, h:sz,
+    vy:rand(220,320), // fall speed
+    vx:0,            // calculated each frame toward tx
+    dead:false,
+    glowT:0,
+  });
+}
+
+function updateDroppers(dt){
+  if(!started) return;
+  // Droppers start wave 3
+  if(WS.wave>=3&&WS.phase==="run"&&!bossAlive){
+    dropperTimer=Math.max(0,dropperTimer-dt);
+    if(dropperTimer<=0){
+      spawnDropper();
+      dropperTimer=dropperSpawnInterval(WS.wave);
+    }
+  }
+
+  for(const d of droppers){
+    if(d.dead) continue;
+    d.glowT+=dt;
+
+    // Steer toward target x — soft curve, not teleport
+    const dx=(d.tx-d.x);
+    d.vx+=(dx*2.2-d.vx)*Math.min(1,dt*3.5);
+    d.x+=d.vx*dt;
+    d.y+=d.vy*dt;
+    d.x=clamp(d.x,0,W()-d.w);
+
+    // Hit a rock?
+    for(const r of rocks){
+      if(r.hp<=0) continue;
+      if(aabb(d.x,d.y,d.w,d.h,r.x,r.y,r.w,r.h)){
+        r.hp=0; // one-shot the rock
+        d.dead=true;
+        addBigExplosion(r.x+r.w/2,r.y+r.h/2,"boss");
+        screenFlash.alpha=0.25;screenFlash.color="#ff8844";
+        break;
+      }
+    }
+    if(d.dead) continue;
+
+    // Hit player?
+    if(player.hitIFrames<=0&&aabb(d.x,d.y,d.w,d.h,player.x,player.y,player.w,player.h)){
+      d.dead=true;
+      player.energy=Math.max(0,player.energy-22);
+      player.hitIFrames=0.6;
+      player.boost=0;
+      breakCombo();
+      addSpark(player.x+player.w/2,player.y+player.h/2,16,"boss");
+      doShake(10,0.3);
+      screenFlash.alpha=0.4;screenFlash.color="#ff2244";
+      if(player.energy<=0){
+        lives--;
+        if(lives>0){player.energy=40;player.hitIFrames=2.0;playLifeloss();doShake(22,1.0);screenFlash.alpha=0.9;screenFlash.color="#ff0000";bugShots.length=0;}
+      }
+    }
+
+    // Off bottom
+    if(d.y>H()+d.h) d.dead=true;
+  }
+  // Clean up
+  for(let i=droppers.length-1;i>=0;i--) if(droppers[i].dead) droppers.splice(i,1);
+}
+
+function drawDroppers(){
+  const t=performance.now()/1000;
+  for(const d of droppers){
+    if(d.dead) continue;
+    const cx=d.x+d.w/2, cy=d.y+d.h/2;
+    const pulse=0.6+0.4*Math.sin(t*10+d.glowT*3);
+
+    // Warning glow — orange/red
+    drawGlow(cx,cy,d.w*0.9,0.30+pulse*0.15,"rgba(255,100,30,0.9)");
+
+    // Body — spiky danger shape drawn as rotated square
+    ctx.save();
+    ctx.translate(cx,cy);
+    ctx.rotate(t*3+d.glowT);
+    ctx.fillStyle=`rgba(255,${Math.round(60+pulse*40)},20,0.95)`;
+    ctx.shadowBlur=16;ctx.shadowColor="rgba(255,80,20,0.9)";
+    const s=d.w*0.42;
+    ctx.fillRect(-s,-s,s*2,s*2);
+
+    // Inner bright core
+    ctx.rotate(Math.PI/4);
+    ctx.fillStyle=`rgba(255,220,80,${0.7+pulse*0.3})`;
+    ctx.shadowColor="rgba(255,220,80,0.8)";
+    const sc=d.w*0.22;
+    ctx.fillRect(-sc,-sc,sc*2,sc*2);
+    ctx.restore();
+
+    // "!" warning label
+    ctx.save();
+    ctx.textAlign="center";ctx.textBaseline="middle";
+    ctx.font=`900 ${Math.round(d.w*0.45)}px system-ui,sans-serif`;
+    ctx.fillStyle="#fff";ctx.shadowBlur=8;ctx.shadowColor="#000";
+    ctx.fillText("!",cx,cy);
+    ctx.restore();
+  }
+}
+
+// ════════════════════════════════════════
 // BOSS
 // ════════════════════════════════════════
 const BOSS_BASE_HP=35, BOSS_HP_GAIN=28;
@@ -1002,28 +1153,32 @@ function fireBooShot(isMoving){
   const y0=player.y+6;
   const wl=weaponLevel();
   const vy=-920*sm*(isMoving?0.80:1.0);
-  const lean=nearestBugLean(x0)*sm;
+  // Lean toward nearest: much gentler — max 80px lean, not 200
+  const lean=clamp(nearestBugLean(x0)*0.4,-80,80)*sm;
 
   function spawn(vx,col,pink){
     booShots.push({x:x0,y:y0,vx:vx,vy,isPink:pink||false,isFriend:false,color:col||null,dead:false,isWeak:isMoving});
   }
 
-  // Moving caps at level 2 (triple), standing gets full level
-  const activeWl=isMoving?Math.min(wl,2):wl;
-
-  if(activeWl<=1){
-    spawn(lean*sm,null,false);
-  }else if(activeWl===2){
-    spawn(lean*sm,null,false);
-    spawn((-210+lean*0.4)*sm,null,false);
-    spawn((210+lean*0.4)*sm,null,false);
-  }else if(activeWl===3){
-    spawn(lean*sm,null,true);
-    spawn(-260*sm,null,true);spawn(260*sm,null,true);
-    spawn(-130*sm,null,false);spawn(130*sm,null,false);
+  // Moving = single shot only with lean
+  // Standing = spread by level
+  if(isMoving){
+    spawn(lean,null,false);
+  }else if(wl<=1){
+    spawn(lean,null,false);
+  }else if(wl===2){
+    // tight triple — not screen-wide
+    spawn(lean,null,false);
+    spawn(-130*sm+lean*0.3,null,false);
+    spawn(130*sm+lean*0.3,null,false);
+  }else if(wl===3){
+    spawn(lean,null,true);
+    spawn(-170*sm,null,true);spawn(170*sm,null,true);
+    spawn(-85*sm,null,false);spawn(85*sm,null,false);
   }else{
+    // Level 4 chaos — tighter than before
     const cols=["#ffcc44","#ff66cc","#66ffcc","#cc88ff","#ffaa44","#ff4444","#44ffcc"];
-    for(let i=0;i<7;i++) spawn(((i-3)*52+lean*0.3)*sm,cols[i%cols.length],true);
+    for(let i=0;i<7;i++) spawn(((i-3)*38+lean*0.2)*sm,cols[i%cols.length],true);
   }
   player.glow=isMoving?0.05:0.15;
   booFireTimer=0.12;
@@ -1037,14 +1192,14 @@ function updateFiring(dt){
   if(player.energy<=0||paused) return;
   booAutoCD=Math.max(0,booAutoCD-dt);
   if(booAutoCD>0) return;
-  // Fire always — moving = slower rate + weaker pattern
   const isMoving=playerMoving;
   if(!isMoving&&!canFireNormal()) return;
   fireBooShot(isMoving);
-  const comboSpeedup=clamp(combo/40,0,0.55);
-  const stillBonus=isMoving?0:0.05;
-  const cd=clamp(0.30-comboSpeedup*0.16-stillBonus,0.09,0.30);
-  booAutoCD=isMoving?cd*1.4:cd;
+  const comboSpeedup=clamp(combo/50,0,0.45); // slower combo speedup
+  const stillBonus=isMoving?0:0.04;
+  // Base CD raised: 0.48 standing, 0.70 moving — was 0.30/0.42
+  const cd=clamp(0.48-comboSpeedup*0.20-stillBonus,0.18,0.48);
+  booAutoCD=isMoving?cd*1.45:cd;
 }
 
 function fireBugShot(b){
@@ -1426,7 +1581,7 @@ function updateProjectiles(dt){
     for(const r of rocks){
       if(r.hp<=0) continue;
       if(aabb(bl.x-bl.r,bl.y-bl.r,bl.r*2,bl.r*2,r.x,r.y,r.w,r.h)){
-        r.hp=Math.max(0,r.hp-1);bl.dead=true;addSpark(bl.x,bl.y,6,"slime");break;
+        r.hp=Math.max(0,r.hp-3);bl.dead=true;addSpark(bl.x,bl.y,4,"slime");break;
       }
     }
     if(!bl.dead&&player.hitIFrames<=0){
@@ -2332,10 +2487,18 @@ function draw(){
   // Rocks
   for(const r of rocks){
     if(r.hp<=0) continue;
-    const idx=clamp(4-Math.ceil(r.hp/5),0,3);
+    const pct=r.hp/(r.maxHp||20);
+    const idx=clamp(Math.floor((1-pct)*4),0,3);
     const img=IMG.rocks?.[idx];
     if(img) ctx.drawImage(img,r.x,r.y,r.w,r.h);
-    else{ctx.fillStyle=`rgba(${100+r.hp*10},80,60,0.9)`;roundRect(r.x,r.y,r.w,r.h,8);ctx.fill();}
+    else{ctx.fillStyle=`rgba(${Math.round(80+pct*80)},70,50,0.9)`;roundRect(r.x,r.y,r.w,r.h,8);ctx.fill();}
+    // HP bar under rock
+    if(pct<0.99){
+      const bx=r.x+r.w*0.1,bw=r.w*0.8,bh=4,by=r.y+r.h+3;
+      ctx.fillStyle="rgba(0,0,0,0.4)";roundRect(bx,by,bw,bh,2);ctx.fill();
+      const col=pct>0.5?"#88ff88":pct>0.25?"#ffcc44":"#ff4444";
+      ctx.fillStyle=col;roundRect(bx,by,bw*pct,bh,2);ctx.fill();
+    }
   }
 
   // Bugs
@@ -2399,6 +2562,7 @@ function draw(){
   }
 
   drawBossHealthBar();
+  drawDroppers();
 
   // Bug shots
   for(const bl of bugShots){
@@ -2693,16 +2857,10 @@ function resetGame(){
   player.y=H()-player.h-14;
   player.energy=100;player.glow=0;player.hitIFrames=0;player.boost=0;
 
-  rocks.length=0;
-  const rCount=4;
-  const rw=clamp(U()*0.34,80,150)*worldScale();
-  const rh=rw*0.72;
-  const gap=Math.max(10,(W()-rCount*rw)/(rCount+1));
-  const rPad=(IS_COARSE&&isLandscape())?clamp(U()*0.10,10,30)*worldScale():clamp(U()*0.18,24,60)*worldScale();
-  const ry=player.y-rh-rPad;
-  for(let i=0;i<rCount;i++) rocks.push({x:gap+i*(rw+gap),y:ry,w:rw,h:rh,hp:20});
+  spawnRocks(1); // wave 1 HP on reset
 
   bugs.length=0;booShots.length=0;bugShots.length=0;sparkles.length=0;candies.length=0;
+  droppers.length=0;dropperTimer=0;
   activeFriends.length=0;_seenFriends.clear();
   combo=0;comboTimer=0;comboDisplay=0;comboPop=0;
   score=0;totalKills=0;
@@ -2763,6 +2921,7 @@ function tick(ts){
       updateFiring(dt);
       updateProjectiles(dt);
       updateDiveCollisions();
+      updateDroppers(dt);
       updateCandy(dt);
       updateParticles(dt);
       updateWaveSystem(dt);
