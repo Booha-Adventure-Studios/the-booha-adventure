@@ -635,7 +635,8 @@ async function beginRound() {
   heard = ''; listening = false; collecting = false;
   if (statusEl) { statusEl.textContent = 'STARTING…'; statusEl.classList.remove('listening'); }
   SR_inst = makeSR();
-  if (SR_inst) { listening = true; try { SR_inst.start(); } catch(e) {} await U.wait(400); }
+   
+  if (SR_inst) { listening = true; try { SR_inst.start(); } catch(e) {} await U.wait(600); }
   if (statusEl) { statusEl.textContent = 'LISTENING…'; statusEl.classList.add('listening'); }
   if (micBtn) micBtn.classList.add('listening');
   aqCard.classList.add('listening');
@@ -659,16 +660,22 @@ async function beginRound() {
     if (firstScores[idx] === s) { score++; scoreEl.textContent = score; updateStreak(streak + 1); }
     updateDots();
     const card = order[idx];
+     
     /* Play word audio, then wait a full breath before advancing */
-    if (card.mp3) {
-      setTimeout(() => {
-        const a = new Audio(CFG.audioBase + card.mp3);
-        a.setAttribute('playsinline',''); a.setAttribute('webkit-playsinline','');
-        a.play().catch(()=>{});
-      }, 300);
+   if (card.mp3) {
+      const a = new Audio(CFG.audioBase + card.mp3);
+      a.setAttribute('playsinline',''); a.setAttribute('webkit-playsinline','');
+      a.setAttribute('preload','auto');
+      setTimeout(() => { a.play().catch(()=>{}); }, 300);
+      /* Wait for audio to actually finish before advancing */
+      a.onended = () => { setTimeout(() => { idx++; isBusy=false; if (idx >= order.length) { showResults(); } else { showCard(); } }, 800); };
+      /* Safety fallback if onended never fires */
+      setTimeout(() => { if (isBusy) { idx++; isBusy=false; if (idx >= order.length) { showResults(); } else { showCard(); } } }, 7000);
+    } else {
+      setTimeout(() => { idx++; isBusy=false; if (idx >= order.length) { showResults(); } else { showCard(); } }, 2000);
     }
-    /* 3000ms total — ding + audio + breathing room before next card */
-    setTimeout(() => { idx++; if (idx >= order.length) { showResults(); } else { showCard(); } }, 3000);
+
+     
   } else {
     playSfx('fart'); updateStreak(0);
     aqCard.classList.add('wrong-state');
@@ -716,8 +723,18 @@ function handleIosPick(btn, card) {
       a.setAttribute('playsinline',''); a.setAttribute('webkit-playsinline','');
       a.play().catch(()=>{});
     }
-    /* 3000ms breathing room before next card */
-    setTimeout(() => { idx++; isBusy = false; if (idx >= order.length) { showResults(); } else { showCard(); } }, 3000);
+    /* 3000ms**(fixed) breathing room before next card */
+   if (mp3) {
+  const a = new Audio(CFG.audioBase+mp3);
+  a.setAttribute('playsinline',''); a.setAttribute('webkit-playsinline','');
+  a.setAttribute('preload','auto');
+  setTimeout(() => { a.play().catch(()=>{}); }, 200);
+  a.onended = () => { setTimeout(() => { idx++; if (idx >= order.length) { showResults(); } else { showCard(); } }, 800); };
+  setTimeout(() => { if (iosAnswered) { idx++; if (idx >= order.length) { showResults(); } else { showCard(); } } }, 7000);
+} else {
+  setTimeout(() => { idx++; if (idx >= order.length) { showResults(); } else { showCard(); } }, 1500);
+}
+     
   } else {
     iosFirstTry = false; updateStreak(0);
     btn.classList.add('ios-wrong'); U.unlockAudio(); playSfx('fart');
