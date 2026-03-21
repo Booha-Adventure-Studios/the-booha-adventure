@@ -150,62 +150,104 @@
    WANDERER DEFINITIONS
 ═══════════════════════════════════════════ */
 const WANDERER_DEFS = [
+  /* ── index 0: Ichi — room_01 ── */
   {
-    index:0, roomId:'room_01', x:982, y:407, type:'stay',
+    index:0, roomId:'room_01', x:546, y:308, type:'stay',
     frames:['ichi-1.png','ichi-2.png'], color:'#ff79d7', radius:0, size:52,
     name:'Ichi', nameJP:'イチ', nameKanji:'壱',
     desc:'The first friend you\'ll meet. Always here, always watching.'
   },
-  { index:1,  roomId:'room_02', x:900,  y:500, type:'stay', frames:null, color:'#ffaa5e', radius:0, size:40 },
-  { index:2,  roomId:'room_03', x:500,  y:600, type:'stay', frames:null, color:'#a8edff', radius:0, size:40 },
-  { index:3,  roomId:'room_04', x:800,  y:450, type:'stay', frames:null, color:'#b2ffda', radius:0, size:40 },
+  /* ── index 1: Mr. Happy — room_01 ── */
+  {
+    index:1, roomId:'room_01', x:824, y:392, type:'stay',
+    frames:['mr_happy-1.png'], color:'#ffe066', radius:0, size:85,
+    name:'Mr. Happy', nameJP:'ハッピー先生', nameKanji:'幸',
+    desc:'Always smiling, no matter what.'
+  },
+  /* ── index 2: Tom Katsu — room_02 ── */
+  {
+    index:2, roomId:'room_02', x:882, y:263, type:'stay',
+    frames:['tom_katsu-1.png'], color:'#ffaa5e', radius:0, size:52,
+    name:'Tom Katsu', nameJP:'トムカツ', nameKanji:'勝',
+    desc:'Crispy on the outside, warm on the inside.'
+  },
+  /* ── index 3: Uhibon — room_03 ── */
+  {
+    index:3, roomId:'room_03', x:546, y:308, type:'stay',
+    frames:['uhibon-1.png'], color:'#a8edff', radius:0, size:75,
+    name:'Uhibon', nameJP:'ウヒボン', nameKanji:'詩',
+    desc:'A wanderer of words.'
+  },
+  /* ── index 4: Jamariko — room_05 ── */
   {
     index:4, roomId:'room_05', x:1054, y:354, type:'stay',
     frames:['jamariko-2.png'], color:'#fff176', radius:0, size:52,
     name:'Jamariko', nameJP:'ジャマリコ', nameKanji:'邪魔里子',
     desc:'She stands in your way, but only out of love.'
   },
-  { index:5,  roomId:'room_06', x:400,  y:400, type:'stay', frames:null, color:'#90aaff', radius:0, size:40 },
+  /* ── index 5: Sumiyo Yamakage — room_06 ── */
+  {
+    index:5, roomId:'room_06', x:1138, y:480, type:'stay',
+    frames:['sumiyo_yamakage-1.png'], color:'#90aaff', radius:0, size:65,
+    name:'Sumiyo Yamakage', nameJP:'山影すみよ', nameKanji:'影',
+    desc:'Quiet as a shadow, warm as afternoon light.'
+  },
+  /* ── index 6: placeholder — room_07 ── */
   { index:6,  roomId:'room_07', x:1000, y:500, type:'stay', frames:null, color:'#d49aff', radius:0, size:40 },
+  /* ── index 7: placeholder — room_08 ── */
   { index:7,  roomId:'room_08', x:700,  y:600, type:'stay', frames:null, color:'#ffd08a', radius:0, size:40 },
+  /* ── index 8: placeholder — room_09 ── */
   { index:8,  roomId:'room_09', x:550,  y:480, type:'stay', frames:null, color:'#a8fff8', radius:0, size:40 },
+  /* ── index 9: Ni — room_10 ── */
   {
     index:9, roomId:'room_10', x:1233, y:452, type:'stay',
     frames:['ni-1.png','ni-2.png'], color:'#e8ffaa', radius:0, size:52,
     name:'Ni', nameJP:'ニ', nameKanji:'弐',
     desc:'The second. Quiet, but always present.'
   },
-  { index:10, roomId:'room_11', x:650,  y:420, type:'stay', frames:null, color:'#ff85a1', radius:0, size:40 },
-  { index:11, roomId:'room_12', x:750,  y:500, type:'stay', frames:null, color:'#ff79d7', radius:0, size:40 },
+  /* ── index 10: Columbus — room_11 ── */
+  {
+    index:10, roomId:'room_11', x:461, y:621, type:'stay',
+    frames:['columbus-1.png'], color:'#ff85a1', radius:0, size:52,
+    name:'Columbus', nameJP:'コロンブス', nameKanji:'探',
+    desc:'Still exploring.'
+  },
+  /* ── index 11: October Moriyama — room_12 ── */
+  {
+    index:11, roomId:'room_12', x:700, y:270, type:'stay',
+    frames:['october_moriyama.png'], color:'#ff79d7', radius:0, size:75,
+    name:'October Moriyama', nameJP:'オクトーバー・森山', nameKanji:'霜',
+    desc:'Arrived with the autumn. Never left.'
+  },
+  /* ── index 12: Takachika Green — room_13 ── */
   {
     index:12, roomId:'room_13', x:407, y:387, type:'stay',
-    frames:['takachika-1.png'], color:'#7fffd4', radius:0, size:75,
-    name:'Takachika', nameJP:'タカチカ', nameKanji:'高近',
+    frames:['takachika_green-1.png'], color:'#7fffd4', radius:0, size:75,
+    name:'Takachika Green', nameJP:'タカチカ・グリーン', nameKanji:'高近',
     desc:'Big presence, soft heart.'
   },
-  { index:13, roomId:'room_14', x:900,  y:480, type:'stay', frames:null, color:'#ffcc66', radius:0, size:40 },
-  { index:14, roomId:'room_01', x:300,  y:300, type:'stay', frames:null, color:'#c8b8ff', radius:0, size:40 },
-  { index:15, roomId:'room_02', x:1100, y:300, type:'stay', frames:null, color:'#88ffcc', radius:0, size:40 },
-  { index:16, roomId:'room_03', x:400,  y:700, type:'stay', frames:null, color:'#ffb088', radius:0, size:40 },
-  { index:17, roomId:'room_04', x:1200, y:600, type:'stay', frames:null, color:'#ff9eb5', radius:0, size:40 },
-  { index:18, roomId:'room_05', x:350,  y:500, type:'stay', frames:null, color:'#66bbff', radius:0, size:40 },
-  { index:19, roomId:'room_06', x:900,  y:300, type:'stay', frames:null, color:'#ffcc66', radius:0, size:40 },
-  { index:20, roomId:'room_07', x:500,  y:600, type:'stay', frames:null, color:'#c8b8ff', radius:0, size:40 },
-  { index:21, roomId:'room_08', x:1100, y:400, type:'stay', frames:null, color:'#7fffd4', radius:0, size:40 },
-  { index:22, roomId:'room_09', x:700,  y:700, type:'stay', frames:null, color:'#ff9eb5', radius:0, size:40 },
-  { index:23, roomId:'room_10', x:400,  y:400, type:'stay', frames:null, color:'#ffb088', radius:0, size:40 },
-  { index:24, roomId:'room_11', x:1000, y:600, type:'stay', frames:null, color:'#88ffcc', radius:0, size:40 },
-  { index:25, roomId:'room_12', x:600,  y:300, type:'stay', frames:null, color:'#66bbff', radius:0, size:40 },
+  /* ── index 13: Pugoo — room_13 ── */
   {
-    index:26, roomId:'room_15', x:1064, y:434, type:'stay',
-    frames:['ji-1.png'], color:'#ffcc66', radius:0, size:80,
-    name:'Ji', nameJP:'ジ', nameKanji:'字',
+    index:13, roomId:'room_13', x:609, y:642, type:'stay',
+    frames:['pugoo.png'], color:'#ffcc66', radius:0, size:52,
+    name:'Pugoo', nameJP:'プグー', nameKanji:'愛',
+    desc:'Small but unforgettable.'
+  },
+  /* ── index 14: placeholder — room_04 ── */
+  { index:14, roomId:'room_04', x:800,  y:450, type:'stay', frames:null, color:'#b2ffda', radius:0, size:40 },
+  /* ── index 15: placeholder — room_14 ── */
+  { index:15, roomId:'room_14', x:900,  y:480, type:'stay', frames:null, color:'#ffcc66', radius:0, size:40 },
+  /* ── index 16: Jubei Tsukigase — room_15 ── */
+  {
+    index:16, roomId:'room_15', x:1064, y:434, type:'stay',
+    frames:['tsukigase_jubei.png'], color:'#ffcc66', radius:0, size:80,
+    name:'Jubei Tsukigase', nameJP:'月ヶ瀬・寿兵衛', nameKanji:'字',
     desc:'Ancient and vast. A letter older than time.'
   },
 ];
 
 const WANDERER_IMG_BASE = 'https://booha-adventure-studios.github.io/the-booha-adventure/assets/img/wanderers/';
-const FRAME_MS          = 420;
+const FRAME_MS          = 1200; // slow dreamy crossfade — 1.2 s per frame
 
 /* ═══════════════════════════════════════════
    WANDERER RUNTIME
@@ -289,8 +331,17 @@ function updateWanderers(now) {
         w.sparkleAt    = now;
         w.sparkleAngle = angle;
       }
-    } else if (w.sparkling && now - w.sparkleAt > 800) {
-      w.sparkling = false;
+
+      /* ── trigger character pop on first bubble contact ── */
+      if (w.name && !w.popShown && !isWandererPopOpen()) {
+        w.popShown = true;
+        openWandererPop(w);
+      }
+    } else {
+      /* ghost has left the bubble — allow pop again on next contact */
+      if (w.sparkling && now - w.sparkleAt > 800) w.sparkling = false;
+      /* reset popShown once ghost is clear so re-entry can trigger again */
+      if (dist > bubbleR + 40) w.popShown = false;
     }
   });
 }
@@ -391,6 +442,16 @@ function openWandererPop(w) {
 
 function closeWandererPop() {
   wandererPopOverlay.style.background = 'rgba(0,0,0,0)';
+  /* brief fade on the canvas layer so the transition feels intentional */
+  const fadeEl = document.getElementById('kara-fade');
+  if (fadeEl) {
+    fadeEl.style.transition = 'opacity 400ms ease-in';
+    fadeEl.style.opacity    = '0.55';
+    setTimeout(() => {
+      fadeEl.style.transition = 'opacity 400ms ease-out';
+      fadeEl.style.opacity    = '0';
+    }, 420);
+  }
   setTimeout(() => { wandererPopOverlay.style.display = 'none'; }, 300);
 }
 
@@ -1384,8 +1445,14 @@ function injectDevPanel() {
     if (now < state.transitionReadyAt) return null;
     const npps = NPP[state.roomId];
     if (!npps) return null;
+    const OPPOSITE = { left:'right', right:'left', up:'down', down:'up' };
+    const arrivalExit = state.arrivalDir ? OPPOSITE[state.arrivalDir] : null;
     for (const npp of npps) {
-      if (Math.hypot(state.x - npp.x, state.y - npp.y) <= NPP_RADIUS) return npp;
+      if (Math.hypot(state.x - npp.x, state.y - npp.y) <= NPP_RADIUS) {
+        /* hard-block the back-direction exit until the 3× delay expires */
+        if (npp.dir === arrivalExit && now < arrivalArrowBackHiddenUntil) return null;
+        return npp;
+      }
     }
     return null;
   }
