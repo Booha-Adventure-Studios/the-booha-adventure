@@ -160,7 +160,7 @@ const WANDERER_DEFS = [
   /* ── index 1: Mr. Happy — room_01 ── */
   {
     index:1, roomId:'room_01', x:824, y:392, type:'stay',
-    frames:['mr_happy-1.png'], color:'#ffe066', radius:0, size:85,
+    frames:['mr_happy-1.png'], color:'#ffe066', radius:0, size:86,
     name:'Mr. Happy', nameJP:'ハッピー先生', nameKanji:'幸',
     desc:'Always smiling, no matter what.'
   },
@@ -174,7 +174,7 @@ const WANDERER_DEFS = [
   /* ── index 3: Uhibon — room_03 ── */
   {
     index:3, roomId:'room_03', x:546, y:308, type:'stay',
-    frames:['uhibon-1.png'], color:'#a8edff', radius:0, size:75,
+    frames:['uhibon-1.png'], color:'#a8edff', radius:0, size:72,
     name:'Uhibon', nameJP:'ウヒボン', nameKanji:'詩',
     desc:'A wanderer of words.'
   },
@@ -188,7 +188,7 @@ const WANDERER_DEFS = [
   /* ── index 5: Sumiyo Yamakage — room_06 ── */
   {
     index:5, roomId:'room_06', x:1138, y:480, type:'stay',
-    frames:['sumiyo_yamakage-1.png'], color:'#90aaff', radius:0, size:65,
+    frames:['sumiyo_yamakage-1.png'], color:'#90aaff', radius:0, size:72,
     name:'Sumiyo Yamakage', nameJP:'山影すみよ', nameKanji:'影',
     desc:'Quiet as a shadow, warm as afternoon light.'
   },
@@ -215,7 +215,7 @@ const WANDERER_DEFS = [
   /* ── index 11: October Moriyama — room_12 ── */
   {
     index:11, roomId:'room_12', x:700, y:270, type:'stay',
-    frames:['october_moriyama.png'], color:'#ff79d7', radius:0, size:75,
+    frames:['october_moriyama.png'], color:'#ff79d7', radius:0, size:73,
     name:'October Moriyama', nameJP:'オクトーバー・森山', nameKanji:'霜',
     desc:'Arrived with the autumn. Never left.'
   },
@@ -240,7 +240,7 @@ const WANDERER_DEFS = [
   /* ── index 16: Jubei Tsukigase — room_15 ── */
   {
     index:16, roomId:'room_15', x:1064, y:434, type:'stay',
-    frames:['tsukigase_jubei.png'], color:'#ffcc66', radius:0, size:80,
+    frames:['tsukigase_jubei.png'], color:'#ffcc66', radius:0, size:83,
     name:'Jubei Tsukigase', nameJP:'月ヶ瀬・寿兵衛', nameKanji:'字',
     desc:'Ancient and vast. A letter older than time.'
   },
@@ -542,17 +542,23 @@ function drawWanderers(now) {
     ctx.fillRect(w.rx - glowR, w.ry - glowR, glowR * 2, glowR * 2);
 
     if (imgA) {
+      const ratA = imgA.naturalWidth / (imgA.naturalHeight || 1);
+      const dwA  = ratA >= 1 ? sz * 2 : sz * 2 * ratA;
+      const dhA  = ratA >= 1 ? sz * 2 / ratA : sz * 2;
       ctx.globalAlpha = (1 - crossfade) * 0.94;
       ctx.shadowBlur  = 24 + pulse * 14;
       ctx.shadowColor = w.color;
-      ctx.drawImage(imgA, w.rx - sz, w.ry - sz, sz * 2, sz * 2);
+      ctx.drawImage(imgA, w.rx - dwA / 2, w.ry - dhA / 2, dwA, dhA);
       ctx.shadowBlur  = 0;
     }
     if (imgB) {
+      const ratB = imgB.naturalWidth / (imgB.naturalHeight || 1);
+      const dwB  = ratB >= 1 ? sz * 2 : sz * 2 * ratB;
+      const dhB  = ratB >= 1 ? sz * 2 / ratB : sz * 2;
       ctx.globalAlpha = crossfade * 0.94;
       ctx.shadowBlur  = 24 + pulse * 14;
       ctx.shadowColor = w.color;
-      ctx.drawImage(imgB, w.rx - sz, w.ry - sz, sz * 2, sz * 2);
+      ctx.drawImage(imgB, w.rx - dwB / 2, w.ry - dhB / 2, dwB, dhB);
       ctx.shadowBlur  = 0;
     }
     if (!imgA && !imgB) {
