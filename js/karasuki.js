@@ -152,15 +152,15 @@
 const WANDERER_DEFS = [
   /* ── index 0: Ichi — room_01 ── */
   {
-    index:0, roomId:'room_01', x:546, y:308, type:'stay',
+    index:0, roomId:'room_01', x:382, y:647, type:'stay',
     frames:['ichi-1.png','ichi-2.png'], color:'#ff79d7', radius:0, size:52,
     name:'Ichi', nameJP:'イチ', nameKanji:'壱',
     desc:'The first friend you\'ll meet. Always here, always watching.'
   },
   /* ── index 1: Mr. Happy — room_01 ── */
   {
-    index:1, roomId:'room_01', x:824, y:392, type:'stay',
-    frames:['mr_happy-1.png'], color:'#ffe066', radius:0, size:86,
+    index:1, roomId:'room_01', x:1081, y:477, type:'stay',
+    frames:['mr_happy-1.png'], color:'#ffe066', radius:0, size:110,
     name:'Mr. Happy', nameJP:'ハッピー先生', nameKanji:'幸',
     desc:'Always smiling, no matter what.'
   },
