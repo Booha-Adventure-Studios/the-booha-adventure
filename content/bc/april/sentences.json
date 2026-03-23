@@ -1,1 +1,72 @@
 
+{
+  "cards": [
+    { "n": 1, "en": "I am from Japan, but I would like to live abroad in the future.", "jp": "私は日本出身ですが、将来は海外に住みたいです。", "hira": "わたし は にほん しゅっしん です が、しょうらい は かいがい に すみたい です", "mp3": "bc_s01_i_am_from_japan_but_i_would_like_to_live_abroad_in_the_future.mp3" },
+    { "n": 2, "en": "I think my country is safe because people follow the rules.", "jp": "人々がルールを守るので、日本は安全だと思います。", "hira": "ひとびと が るーる を まもる ので、にほん は あんぜん だ と おもいます", "mp3": "bc_s02_i_think_my_country_is_safe_because_people_follow_the_rules.mp3" },
+    { "n": 3, "en": "My city is becoming more popular because of tourism.", "jp": "観光のため、私の町はだんだん人気になっています。", "hira": "かんこう の ため、わたし の まち は だんだん にんき に なっています", "mp3": "bc_s03_my_city_is_becoming_more_popular_because_of_tourism.mp3" },
+    { "n": 4, "en": "I live in a quiet area, although the city center is busy.", "jp": "中心部はにぎやかですが、私は静かな地域に住んでいます。", "hira": "ちゅうしんぶ は にぎやか です が、わたし は しずかな ちいき に すんでいます", "mp3": "bc_s04_i_live_in_a_quiet_area_although_the_city_center_is_busy.mp3" },
+    { "n": 5, "en": "This place is famous because it has a long history.", "jp": "この場所は長い歴史があるので有名です。", "hira": "この ばしょ は ながい れきし が ある ので ゆうめい です", "mp3": "bc_s05_this_place_is_famous_because_it_has_a_long_history.mp3" },
+    { "n": 6, "en": "That building looks old, but it is still in use.", "jp": "あの建物は古く見えますが、まだ使われています。", "hira": "あの たてもの は ふるく みえます が、まだ つかわれています", "mp3": "bc_s06_that_building_looks_old_but_it_is_still_in_use.mp3" },
+    { "n": 7, "en": "I can see mountains in the distance when the weather is clear.", "jp": "天気が良いと遠くに山が見えます。", "hira": "てんき が よい と とおく に やま が みえます", "mp3": "bc_s07_i_can_see_mountains_in_the_distance_when_the_weather_is_clear.mp3" },
+    { "n": 8, "en": "The view is beautiful, especially in the evening.", "jp": "特に夕方の景色はとてもきれいです。", "hira": "とくに ゆうがた の けしき は とても きれい です", "mp3": "bc_s08_the_view_is_beautiful_especially_in_the_evening.mp3" },
+    { "n": 9, "en": "This area has a lot of nature, so it is very relaxing.", "jp": "この地域は自然が多いので、とても落ち着きます。", "hira": "この ちいき は しぜん が おおい ので、とても おちつきます", "mp3": "bc_s09_this_area_has_a_lot_of_nature_so_it_is_very_relaxing.mp3" },
+    { "n": 10, "en": "I enjoy being outside because it helps me feel refreshed.", "jp": "外にいると気分がリフレッシュできるので好きです。", "hira": "そと に いる と きぶん が りふれっしゅ できる ので すき です", "mp3": "bc_s10_i_enjoy_being_outside_because_it_helps_me_feel_refreshed.mp3" },
+
+    { "n": 11, "en": "There are many historical buildings, which attract tourists.", "jp": "観光客を引きつける歴史的な建物が多くあります。", "hira": "かんこうきゃく を ひきつける れきしてき な たてもの が おおく あります", "mp3": "bc_s11_there_are_many_historical_buildings_which_attract_tourists.mp3" },
+    { "n": 12, "en": "There is a temple near my house where many people visit.", "jp": "多くの人が訪れるお寺が家の近くにあります。", "hira": "おおく の ひと が おとずれる おてら が いえ の ちかく に あります", "mp3": "bc_s12_there_is_a_temple_near_my_house_where_many_people_visit.mp3" },
+    { "n": 13, "en": "There are several parks, so families often spend time there.", "jp": "公園がいくつかあるので、家族がよく過ごしています。", "hira": "こうえん が いくつか ある ので、かぞく が よく すごしています", "mp3": "bc_s13_there_are_several_parks_so_families_often_spend_time_there.mp3" },
+    { "n": 14, "en": "There is a garden behind the building, which is very peaceful.", "jp": "建物の後ろにとても静かな庭園があります。", "hira": "たてもの の うしろ に とても しずかな ていえん が あります", "mp3": "bc_s14_there_is_a_garden_behind_the_building_which_is_very_peaceful.mp3" },
+    { "n": 15, "en": "There are many tourists during summer, so it gets crowded.", "jp": "夏は観光客が多く、混雑します。", "hira": "なつ は かんこうきゃく が おおく、こんざつ します", "mp3": "bc_s15_there_are_many_tourists_during_summer_so_it_gets_crowded.mp3" },
+    { "n": 16, "en": "There is a good restaurant near the station that I often go to.", "jp": "よく行く良いレストランが駅の近くにあります。", "hira": "よく いく よい れすとらん が えき の ちかく に あります", "mp3": "bc_s16_there_is_a_good_restaurant_near_the_station_that_i_often_go_to.mp3" },
+    { "n": 17, "en": "There are many shops along the street, so it is convenient.", "jp": "通りには店が多くて便利です。", "hira": "とおり に は みせ が おおくて べんり です", "mp3": "bc_s17_there_are_many_shops_along_the_street_so_it_is_convenient.mp3" },
+    { "n": 18, "en": "There is a market every weekend where people sell local food.", "jp": "週末ごとに地元の食べ物を売る市場があります。", "hira": "しゅうまつ ごと に じもと の たべもの を うる いちば が あります", "mp3": "bc_s18_there_is_a_market_every_weekend_where_people_sell_local_food.mp3" },
+    { "n": 19, "en": "There are many people in the city center because it is lively.", "jp": "中心部はにぎやかなので人が多いです。", "hira": "ちゅうしんぶ は にぎやか なので ひと が おおい です", "mp3": "bc_s19_there_are_many_people_in_the_city_center_because_it_is_lively.mp3" },
+    { "n": 20, "en": "There is a bridge over the river that connects two areas.", "jp": "二つの地域をつなぐ橋が川の上にあります。", "hira": "ふたつ の ちいき を つなぐ はし が かわ の うえ に あります", "mp3": "bc_s20_there_is_a_bridge_over_the_river_that_connects_two_areas.mp3" },
+
+    { "n": 21, "en": "I usually go to school by train because it is faster.", "jp": "電車の方が速いので、ふだん電車で学校に行きます。", "hira": "でんしゃ の ほう が はやい ので、ふだん でんしゃ で がっこう に いきます", "mp3": "bc_s21_i_usually_go_to_school_by_train_because_it_is_faster.mp3" },
+    { "n": 22, "en": "I sometimes walk because I want to get some exercise.", "jp": "運動したいので時々歩きます。", "hira": "うんどう したい ので ときどき あるきます", "mp3": "bc_s22_i_sometimes_walk_because_i_want_to_get_some_exercise.mp3" },
+    { "n": 23, "en": "I like traveling by train because I can relax.", "jp": "リラックスできるので電車での旅行が好きです。", "hira": "りらっくす できる ので でんしゃ で の りょこう が すき です", "mp3": "bc_s23_i_like_traveling_by_train_because_i_can_relax.mp3" },
+    { "n": 24, "en": "I often buy food at markets because it is fresh.", "jp": "新鮮なのでよく市場で食べ物を買います。", "hira": "しんせん なので よく いちば で たべもの を かいます", "mp3": "bc_s24_i_often_buy_food_at_markets_because_it_is_fresh.mp3" },
+    { "n": 25, "en": "I try new food when I travel because I enjoy new experiences.", "jp": "新しい経験が好きなので旅行で新しい食べ物を試します。", "hira": "あたらしい けいけん が すき なので りょこう で あたらしい たべもの を ためします", "mp3": "bc_s25_i_try_new_food_when_i_travel_because_i_enjoy_new_experiences.mp3" },
+    { "n": 26, "en": "I take pictures so I can remember my trips later.", "jp": "後で思い出せるように写真を撮ります。", "hira": "あと で おもいだせる よう に しゃしん を とります", "mp3": "bc_s26_i_take_pictures_so_i_can_remember_my_trips_later.mp3" },
+    { "n": 27, "en": "I always carry my phone in case I need it.", "jp": "必要な時のためにいつも電話を持っています。", "hira": "ひつよう な とき の ため に いつも でんわ を もっています", "mp3": "bc_s27_i_always_carry_my_phone_in_case_i_need_it.mp3" },
+    { "n": 28, "en": "I have enough money, so I can travel comfortably.", "jp": "十分なお金があるので安心して旅行できます。", "hira": "じゅうぶん な おかね が ある ので あんしん して りょこう できます", "mp3": "bc_s28_i_have_enough_money_so_i_can_travel_comfortably.mp3" },
+    { "n": 29, "en": "I have a plan, but I may change it later.", "jp": "計画はありますが、後で変えるかもしれません。", "hira": "けいかく は あります が、あと で かえる かも しれません", "mp3": "bc_s29_i_have_a_plan_but_i_may_change_it_later.mp3" },
+    { "n": 30, "en": "I need to buy a ticket before it sells out.", "jp": "売り切れる前にチケットを買う必要があります。", "hira": "うりきれる まえ に ちけっと を かう ひつよう が あります", "mp3": "bc_s30_i_need_to_buy_a_ticket_before_it_sells_out.mp3" },
+
+    { "n": 31, "en": "This is an important decision because it affects my future.", "jp": "これは将来に影響する重要な決定です。", "hira": "これ は しょうらい に えいきょう する じゅうよう な けってい です", "mp3": "bc_s31_this_is_an_important_decision_because_it_affects_my_future.mp3" },
+    { "n": 32, "en": "This problem is difficult, but I will try to solve it.", "jp": "難しい問題ですが、解決しようと思います。", "hira": "むずかしい もんだい です が、かいけつ しよう と おもいます", "mp3": "bc_s32_this_problem_is_difficult_but_i_will_try_to_solve_it.mp3" },
+    { "n": 33, "en": "This is a good example because it is easy to understand.", "jp": "分かりやすいので良い例です。", "hira": "わかりやすい ので よい れい です", "mp3": "bc_s33_this_is_a_good_example_because_it_is_easy_to_understand.mp3" },
+    { "n": 34, "en": "This mistake happens when people are not careful.", "jp": "注意しないとこの間違いが起こります。", "hira": "ちゅうい しない と この まちがい が おこります", "mp3": "bc_s34_this_mistake_happens_when_people_are_not_careful.mp3" },
+    { "n": 35, "en": "This solution works well in many situations.", "jp": "この解決方法は多くの場合にうまくいきます。", "hira": "この かいけつ ほうほう は おおく の ばあい に うまく いきます", "mp3": "bc_s35_this_solution_works_well_in_many_situations.mp3" },
+    { "n": 36, "en": "This change will affect many people in society.", "jp": "この変化は多くの人に影響を与えます。", "hira": "この へんか は おおく の ひと に えいきょう を あたえます", "mp3": "bc_s36_this_change_will_affect_many_people_in_society.mp3" },
+    { "n": 37, "en": "This connection is important for communication.", "jp": "このつながりはコミュニケーションに重要です。", "hira": "この つながり は こみゅにけーしょん に じゅうよう です", "mp3": "bc_s37_this_connection_is_important_for_communication.mp3" },
+    { "n": 38, "en": "This difference is small, but it is meaningful.", "jp": "この違いは小さいですが意味があります。", "hira": "この ちがい は ちいさい ですが いみ が あります", "mp3": "bc_s38_this_difference_is_small_but_it_is_meaningful.mp3" },
+    { "n": 39, "en": "This pattern appears in many situations.", "jp": "このパターンはいろいろな場面で見られます。", "hira": "この ぱたーん は いろいろ な ばめん で みられます", "mp3": "bc_s39_this_pattern_appears_in_many_situations.mp3" },
+    { "n": 40, "en": "This system helps people work more efficiently.", "jp": "このシステムは人々の効率を高めます。", "hira": "この しすてむ は ひとびと の こうりつ を たかめます", "mp3": "bc_s40_this_system_helps_people_work_more_efficiently.mp3" },
+
+    { "n": 41, "en": "I want to learn about other cultures so I can understand people better.", "jp": "人をより理解するために他の文化を学びたいです。", "hira": "ひと を より りかい する ため に ほか の ぶんか を まなびたい です", "mp3": "bc_s41_i_want_to_learn_about_other_cultures_so_i_can_understand_people_better.mp3" },
+    { "n": 42, "en": "I want to improve my English so I can communicate with more people.", "jp": "多くの人と話せるように英語を伸ばしたいです。", "hira": "おおく の ひと と はなせる よう に えいご を のばしたい です", "mp3": "bc_s42_i_want_to_improve_my_english_so_i_can_communicate_with_more_people.mp3" },
+    { "n": 43, "en": "I want to compare cultures because I am interested in differences.", "jp": "違いに興味があるので文化を比べたいです。", "hira": "ちがい に きょうみ が ある ので ぶんか を くらべたい です", "mp3": "bc_s43_i_want_to_compare_cultures_because_i_am_interested_in_differences.mp3" },
+    { "n": 44, "en": "I want to travel around the world before I get older.", "jp": "年を取る前に世界中を旅行したいです。", "hira": "とし を とる まえ に せかいじゅう を りょこう したい です", "mp3": "bc_s44_i_want_to_travel_around_the_world_before_i_get_older.mp3" },
+    { "n": 45, "en": "I want to understand different ways of thinking.", "jp": "さまざまな考え方を理解したいです。", "hira": "さまざま な かんがえかた を りかい したい です", "mp3": "bc_s45_i_want_to_understand_different_ways_of_thinking.mp3" },
+
+    { "n": 46, "en": "I am going to visit a new country next year.", "jp": "来年新しい国を訪れるつもりです。", "hira": "らいねん あたらしい くに を おとずれる つもり です", "mp3": "bc_s46_i_am_going_to_visit_a_new_country_next_year.mp3" },
+    { "n": 47, "en": "I am going to study English every day to improve.", "jp": "上達するために毎日英語を勉強するつもりです。", "hira": "じょうたつ する ため に まいにち えいご を べんきょう する つもり です", "mp3": "bc_s47_i_am_going_to_study_english_every_day_to_improve.mp3" },
+    { "n": 48, "en": "I am going to meet new people and learn from them.", "jp": "新しい人に会って学ぶつもりです。", "hira": "あたらしい ひと に あって まなぶ つもり です", "mp3": "bc_s48_i_am_going_to_meet_new_people_and_learn_from_them.mp3" },
+    { "n": 49, "en": "I am going to try new things even if they are difficult.", "jp": "難しくても新しいことに挑戦するつもりです。", "hira": "むずかしくても あたらしい こと に ちょうせん する つもり です", "mp3": "bc_s49_i_am_going_to_try_new_things_even_if_they_are_difficult.mp3" },
+    { "n": 50, "en": "I am going to make a plan before I start.", "jp": "始める前に計画を立てるつもりです。", "hira": "はじめる まえ に けいかく を たてる つもり です", "mp3": "bc_s50_i_am_going_to_make_a_plan_before_i_start.mp3" },
+
+    { "n": 51, "en": "I am going to achieve my goal step by step.", "jp": "一歩ずつ目標を達成するつもりです。", "hira": "いっぽ ずつ もくひょう を たっせい する つもり です", "mp3": "bc_s51_i_am_going_to_achieve_my_goal_step_by_step.mp3" },
+    { "n": 52, "en": "I am going to solve problems by thinking carefully.", "jp": "よく考えて問題を解決するつもりです。", "hira": "よく かんがえて もんだい を かいけつ する つもり です", "mp3": "bc_s52_i_am_going_to_solve_problems_by_thinking_carefully.mp3" },
+    { "n": 53, "en": "I am going to think about my future seriously.", "jp": "将来について真剣に考えるつもりです。", "hira": "しょうらい について しんけん に かんがえる つもり です", "mp3": "bc_s53_i_am_going_to_think_about_my_future_seriously.mp3" },
+    { "n": 54, "en": "I am going to find opportunities and use them well.", "jp": "機会を見つけてうまく使うつもりです。", "hira": "きかい を みつけて うまく つかう つもり です", "mp3": "bc_s54_i_am_going_to_find_opportunities_and_use_them_well.mp3" },
+    { "n": 55, "en": "I am going to create new possibilities for myself.", "jp": "自分のために新しい可能性を作るつもりです。", "hira": "じぶん の ため に あたらしい かのうせい を つくる つもり です", "mp3": "bc_s55_i_am_going_to_create_new_possibilities_for_myself.mp3" },
+
+    { "n": 56, "en": "I believe people can grow if they keep learning.", "jp": "学び続ければ人は成長できると思います。", "hira": "まなび つづければ ひと は せいちょう できる と おもいます", "mp3": "bc_s56_i_believe_people_can_grow_if_they_keep_learning.mp3" },
+    { "n": 57, "en": "I think cultural differences can help us learn new ideas.", "jp": "文化の違いは新しい考えを学ぶ助けになると思います。", "hira": "ぶんか の ちがい は あたらしい かんがえ を まなぶ たすけ に なる と おもいます", "mp3": "bc_s57_i_think_cultural_differences_can_help_us_learn_new_ideas.mp3" },
+    { "n": 58, "en": "If I have the chance, I would like to study in another country.", "jp": "機会があれば、他の国で勉強したいです。", "hira": "きかい が あれば、ほか の くに で べんきょう したい です", "mp3": "bc_s58_if_i_have_the_chance_i_would_like_to_study_in_another_country.mp3" },
+    { "n": 59, "en": "Although learning a language is difficult, it is worth the effort.", "jp": "言語を学ぶのは難しいですが、その努力には価値があります。", "hira": "げんご を まなぶ の は むずかしい です が、その どりょく に は かち が あります", "mp3": "bc_s59_although_learning_a_language_is_difficult_it_is_worth_the_effort.mp3" },
+    { "n": 60, "en": "I want to build a future where I can connect with many people.", "jp": "多くの人とつながれる未来を築きたいです。", "hira": "おおく の ひと と つながれる みらい を きずきたい です", "mp3": "bc_s60_i_want_to_build_a_future_where_i_can_connect_with_many_people.mp3" }
+  ]
+}
