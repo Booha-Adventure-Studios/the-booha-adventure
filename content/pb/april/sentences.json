@@ -1,1 +1,72 @@
 
+{
+  "cards": [
+    { "n": 1, "en": "I am from Japan.", "jp": "私は日本の出身です。", "hira": "わたし は にほん の しゅっしん です", "mp3": "pb_s01_i_am_from_japan.mp3" },
+    { "n": 2, "en": "I am a student.", "jp": "私は学生です。", "hira": "わたし は がくせい です", "mp3": "pb_s02_i_am_a_student.mp3" },
+    { "n": 3, "en": "I live in Chiba.", "jp": "私は千葉に住んでいます。", "hira": "わたし は ちば に すんでいます", "mp3": "pb_s03_i_live_in_chiba.mp3" },
+    { "n": 4, "en": "I like my town.", "jp": "私は自分の町が好きです。", "hira": "わたし は じぶん の まち が すき です", "mp3": "pb_s04_i_like_my_town.mp3" },
+    { "n": 5, "en": "This is my school.", "jp": "これは私の学校です。", "hira": "これ は わたし の がっこう です", "mp3": "pb_s05_this_is_my_school.mp3" },
+    { "n": 6, "en": "That is my house.", "jp": "あれは私の家です。", "hira": "あれ は わたし の いえ です", "mp3": "pb_s06_that_is_my_house.mp3" },
+    { "n": 7, "en": "This is a map.", "jp": "これは地図です。", "hira": "これ は ちず です", "mp3": "pb_s07_this_is_a_map.mp3" },
+    { "n": 8, "en": "This is a flag.", "jp": "これは旗です。", "hira": "これ は はた です", "mp3": "pb_s08_this_is_a_flag.mp3" },
+    { "n": 9, "en": "I see a river.", "jp": "川が見えます。", "hira": "かわ が みえます", "mp3": "pb_s09_i_see_a_river.mp3" },
+    { "n": 10, "en": "I see the sea.", "jp": "海が見えます。", "hira": "うみ が みえます", "mp3": "pb_s10_i_see_the_sea.mp3" },
+
+    { "n": 11, "en": "There is a park.", "jp": "公園があります。", "hira": "こうえん が あります", "mp3": "pb_s11_there_is_a_park.mp3" },
+    { "n": 12, "en": "There is a school.", "jp": "学校があります。", "hira": "がっこう が あります", "mp3": "pb_s12_there_is_a_school.mp3" },
+    { "n": 13, "en": "There is a shop.", "jp": "店があります。", "hira": "みせ が あります", "mp3": "pb_s13_there_is_a_shop.mp3" },
+    { "n": 14, "en": "There is a station.", "jp": "駅があります。", "hira": "えき が あります", "mp3": "pb_s14_there_is_a_station.mp3" },
+    { "n": 15, "en": "There is a bridge.", "jp": "橋があります。", "hira": "はし が あります", "mp3": "pb_s15_there_is_a_bridge.mp3" },
+    { "n": 16, "en": "There is a tower.", "jp": "タワーがあります。", "hira": "たわー が あります", "mp3": "pb_s16_there_is_a_tower.mp3" },
+    { "n": 17, "en": "There is a temple.", "jp": "寺があります。", "hira": "てら が あります", "mp3": "pb_s17_there_is_a_temple.mp3" },
+    { "n": 18, "en": "There is a shrine.", "jp": "神社があります。", "hira": "じんじゃ が あります", "mp3": "pb_s18_there_is_a_shrine.mp3" },
+    { "n": 19, "en": "There is a hotel.", "jp": "ホテルがあります。", "hira": "ほてる が あります", "mp3": "pb_s19_there_is_a_hotel.mp3" },
+    { "n": 20, "en": "There is a restaurant.", "jp": "レストランがあります。", "hira": "れすとらん が あります", "mp3": "pb_s20_there_is_a_restaurant.mp3" },
+
+    { "n": 21, "en": "I go to school.", "jp": "学校に行きます。", "hira": "がっこう に いきます", "mp3": "pb_s21_i_go_to_school.mp3" },
+    { "n": 22, "en": "I go to the park.", "jp": "公園に行きます。", "hira": "こうえん に いきます", "mp3": "pb_s22_i_go_to_the_park.mp3" },
+    { "n": 23, "en": "I walk to school.", "jp": "学校まで歩きます。", "hira": "がっこう まで あるきます", "mp3": "pb_s23_i_walk_to_school.mp3" },
+    { "n": 24, "en": "I run in the park.", "jp": "公園で走ります。", "hira": "こうえん で はしります", "mp3": "pb_s24_i_run_in_the_park.mp3" },
+    { "n": 25, "en": "I ride the train.", "jp": "電車に乗ります。", "hira": "でんしゃ に のります", "mp3": "pb_s25_i_ride_the_train.mp3" },
+    { "n": 26, "en": "I buy a ticket.", "jp": "チケットを買います。", "hira": "ちけっと を かいます", "mp3": "pb_s26_i_buy_a_ticket.mp3" },
+    { "n": 27, "en": "I buy food.", "jp": "食べ物を買います。", "hira": "たべもの を かいます", "mp3": "pb_s27_i_buy_food.mp3" },
+    { "n": 28, "en": "I eat lunch.", "jp": "昼ご飯を食べます。", "hira": "ひるごはん を たべます", "mp3": "pb_s28_i_eat_lunch.mp3" },
+    { "n": 29, "en": "I drink water.", "jp": "水を飲みます。", "hira": "みず を のみます", "mp3": "pb_s29_i_drink_water.mp3" },
+    { "n": 30, "en": "I take a picture.", "jp": "写真を撮ります。", "hira": "しゃしん を とります", "mp3": "pb_s30_i_take_a_picture.mp3" },
+
+    { "n": 31, "en": "I have a bag.", "jp": "かばんを持っています。", "hira": "かばん を もっています", "mp3": "pb_s31_i_have_a_bag.mp3" },
+    { "n": 32, "en": "I have money.", "jp": "お金があります。", "hira": "おかね が あります", "mp3": "pb_s32_i_have_money.mp3" },
+    { "n": 33, "en": "I have a ticket.", "jp": "チケットがあります。", "hira": "ちけっと が あります", "mp3": "pb_s33_i_have_a_ticket.mp3" },
+    { "n": 34, "en": "This is my phone.", "jp": "これは私の電話です。", "hira": "これ は わたし の でんわ です", "mp3": "pb_s34_this_is_my_phone.mp3" },
+    { "n": 35, "en": "This is my camera.", "jp": "これは私のカメラです。", "hira": "これ は わたし の かめら です", "mp3": "pb_s35_this_is_my_camera.mp3" },
+    { "n": 36, "en": "This is my book.", "jp": "これは私の本です。", "hira": "これ は わたし の ほん です", "mp3": "pb_s36_this_is_my_book.mp3" },
+    { "n": 37, "en": "This is my friend.", "jp": "これは私の友だちです。", "hira": "これ は わたし の ともだち です", "mp3": "pb_s37_this_is_my_friend.mp3" },
+    { "n": 38, "en": "He is my teacher.", "jp": "彼は私の先生です。", "hira": "かれ は わたし の せんせい です", "mp3": "pb_s38_he_is_my_teacher.mp3" },
+    { "n": 39, "en": "She is a student.", "jp": "彼女は学生です。", "hira": "かのじょ は がくせい です", "mp3": "pb_s39_she_is_a_student.mp3" },
+    { "n": 40, "en": "They are tourists.", "jp": "彼らは観光客です。", "hira": "かれら は かんこうきゃく です", "mp3": "pb_s40_they_are_tourists.mp3" },
+
+    { "n": 41, "en": "Let’s go to the park.", "jp": "公園に行きましょう。", "hira": "こうえん に いきましょう", "mp3": "pb_s41_lets_go_to_the_park.mp3" },
+    { "n": 42, "en": "Let’s go by train.", "jp": "電車で行きましょう。", "hira": "でんしゃ で いきましょう", "mp3": "pb_s42_lets_go_by_train.mp3" },
+    { "n": 43, "en": "Let’s eat food.", "jp": "ご飯を食べましょう。", "hira": "ごはん を たべましょう", "mp3": "pb_s43_lets_eat_food.mp3" },
+    { "n": 44, "en": "Let’s take a picture.", "jp": "写真を撮りましょう。", "hira": "しゃしん を とりましょう", "mp3": "pb_s44_lets_take_a_picture.mp3" },
+    { "n": 45, "en": "Let’s walk together.", "jp": "一緒に歩きましょう。", "hira": "いっしょ に あるきましょう", "mp3": "pb_s45_lets_walk_together.mp3" },
+
+    { "n": 46, "en": "I want to go.", "jp": "行きたいです。", "hira": "いきたい です", "mp3": "pb_s46_i_want_to_go.mp3" },
+    { "n": 47, "en": "I want to eat.", "jp": "食べたいです。", "hira": "たべたい です", "mp3": "pb_s47_i_want_to_eat.mp3" },
+    { "n": 48, "en": "I want to drink.", "jp": "飲みたいです。", "hira": "のみたい です", "mp3": "pb_s48_i_want_to_drink.mp3" },
+    { "n": 49, "en": "I want to buy this.", "jp": "これを買いたいです。", "hira": "これ を かいたい です", "mp3": "pb_s49_i_want_to_buy_this.mp3" },
+    { "n": 50, "en": "I want to see that.", "jp": "あれを見たいです。", "hira": "あれ を みたい です", "mp3": "pb_s50_i_want_to_see_that.mp3" },
+
+    { "n": 51, "en": "I am going to go.", "jp": "行くつもりです。", "hira": "いく つもり です", "mp3": "pb_s51_i_am_going_to_go.mp3" },
+    { "n": 52, "en": "I am going to eat.", "jp": "食べるつもりです。", "hira": "たべる つもり です", "mp3": "pb_s52_i_am_going_to_eat.mp3" },
+    { "n": 53, "en": "I am going to travel.", "jp": "旅行するつもりです。", "hira": "りょこう する つもり です", "mp3": "pb_s53_i_am_going_to_travel.mp3" },
+    { "n": 54, "en": "I am going to take pictures.", "jp": "写真を撮るつもりです。", "hira": "しゃしん を とる つもり です", "mp3": "pb_s54_i_am_going_to_take_pictures.mp3" },
+    { "n": 55, "en": "I am going to have fun.", "jp": "楽しむつもりです。", "hira": "たのしむ つもり です", "mp3": "pb_s55_i_am_going_to_have_fun.mp3" },
+
+    { "n": 56, "en": "I am going to be safe.", "jp": "安全に過ごすつもりです。", "hira": "あんぜん に すごす つもり です", "mp3": "pb_s56_i_am_going_to_be_safe.mp3" },
+    { "n": 57, "en": "I’m going to have fun and stay safe.", "jp": "楽しんで、安全に過ごすつもりです。", "hira": "たのしんで あんぜん に すごす つもり です", "mp3": "pb_s57_im_going_to_have_fun_and_stay_safe.mp3" },
+    { "n": 58, "en": "I go home.", "jp": "家に帰ります。", "hira": "いえ に かえります", "mp3": "pb_s58_i_go_home.mp3" },
+    { "n": 59, "en": "I see my friend.", "jp": "友だちに会います。", "hira": "ともだち に あいます", "mp3": "pb_s59_i_see_my_friend.mp3" },
+    { "n": 60, "en": "I have fun.", "jp": "楽しみます。", "hira": "たのしみます", "mp3": "pb_s60_i_have_fun.mp3" }
+  ]
+}
