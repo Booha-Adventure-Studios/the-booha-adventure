@@ -1,1 +1,74 @@
 
+{
+  "cards": [
+    { "n": 1, "en": "Where are you from?", "jp": "どこから来ましたか。", "hira": "どこ から きました か", "mp3": "pb_q01_where_are_you_from.mp3" },
+    { "n": 2, "en": "Are you from Japan?", "jp": "日本出身ですか。", "hira": "にほん しゅっしん です か", "mp3": "pb_q02_are_you_from_japan.mp3" },
+    { "n": 3, "en": "Are you a student?", "jp": "学生ですか。", "hira": "がくせい です か", "mp3": "pb_q03_are_you_a_student.mp3" },
+    { "n": 4, "en": "Do you live in Chiba?", "jp": "千葉に住んでいますか。", "hira": "ちば に すんでいます か", "mp3": "pb_q04_do_you_live_in_chiba.mp3" },
+    { "n": 5, "en": "Do you like your town?", "jp": "自分の町は好きですか。", "hira": "じぶん の まち は すき です か", "mp3": "pb_q05_do_you_like_your_town.mp3" },
+    { "n": 6, "en": "Is this your school?", "jp": "これはあなたの学校ですか。", "hira": "これ は あなた の がっこう です か", "mp3": "pb_q06_is_this_your_school.mp3" },
+    { "n": 7, "en": "Is that your house?", "jp": "あれはあなたの家ですか。", "hira": "あれ は あなた の いえ です か", "mp3": "pb_q07_is_that_your_house.mp3" },
+    { "n": 8, "en": "Is this a map?", "jp": "これは地図ですか。", "hira": "これ は ちず です か", "mp3": "pb_q08_is_this_a_map.mp3" },
+    { "n": 9, "en": "Is this a flag?", "jp": "これは旗ですか。", "hira": "これ は はた です か", "mp3": "pb_q09_is_this_a_flag.mp3" },
+    { "n": 10, "en": "Do you see a river?", "jp": "川が見えますか。", "hira": "かわ が みえます か", "mp3": "pb_q10_do_you_see_a_river.mp3" },
+
+    { "n": 11, "en": "Do you see the sea?", "jp": "海が見えますか。", "hira": "うみ が みえます か", "mp3": "pb_q11_do_you_see_the_sea.mp3" },
+    { "n": 12, "en": "Is there a park?", "jp": "公園はありますか。", "hira": "こうえん は あります か", "mp3": "pb_q12_is_there_a_park.mp3" },
+    { "n": 13, "en": "Is there a school?", "jp": "学校はありますか。", "hira": "がっこう は あります か", "mp3": "pb_q13_is_there_a_school.mp3" },
+    { "n": 14, "en": "Is there a shop?", "jp": "店はありますか。", "hira": "みせ は あります か", "mp3": "pb_q14_is_there_a_shop.mp3" },
+    { "n": 15, "en": "Is there a station?", "jp": "駅はありますか。", "hira": "えき は あります か", "mp3": "pb_q15_is_there_a_station.mp3" },
+    { "n": 16, "en": "Is there a bridge?", "jp": "橋はありますか。", "hira": "はし は あります か", "mp3": "pb_q16_is_there_a_bridge.mp3" },
+    { "n": 17, "en": "Is there a tower?", "jp": "タワーはありますか。", "hira": "たわー は あります か", "mp3": "pb_q17_is_there_a_tower.mp3" },
+    { "n": 18, "en": "Is there a temple?", "jp": "寺はありますか。", "hira": "てら は あります か", "mp3": "pb_q18_is_there_a_temple.mp3" },
+    { "n": 19, "en": "Is there a shrine?", "jp": "神社はありますか。", "hira": "じんじゃ は あります か", "mp3": "pb_q19_is_there_a_shrine.mp3" },
+    { "n": 20, "en": "Is there a hotel?", "jp": "ホテルはありますか。", "hira": "ほてる は あります か", "mp3": "pb_q20_is_there_a_hotel.mp3" },
+
+    { "n": 21, "en": "Is there a restaurant?", "jp": "レストランはありますか。", "hira": "れすとらん は あります か", "mp3": "pb_q21_is_there_a_restaurant.mp3" },
+    { "n": 22, "en": "Do you go to school?", "jp": "学校に行きますか。", "hira": "がっこう に いきます か", "mp3": "pb_q22_do_you_go_to_school.mp3" },
+    { "n": 23, "en": "Do you go to the park?", "jp": "公園に行きますか。", "hira": "こうえん に いきます か", "mp3": "pb_q23_do_you_go_to_the_park.mp3" },
+    { "n": 24, "en": "Do you walk to school?", "jp": "学校まで歩きますか。", "hira": "がっこう まで あるきます か", "mp3": "pb_q24_do_you_walk_to_school.mp3" },
+    { "n": 25, "en": "Do you run in the park?", "jp": "公園で走りますか。", "hira": "こうえん で はしります か", "mp3": "pb_q25_do_you_run_in_the_park.mp3" },
+
+    { "n": 26, "en": "Do you ride the train?", "jp": "電車に乗りますか。", "hira": "でんしゃ に のります か", "mp3": "pb_q26_do_you_ride_the_train.mp3" },
+    { "n": 27, "en": "Do you buy a ticket?", "jp": "チケットを買いますか。", "hira": "ちけっと を かいます か", "mp3": "pb_q27_do_you_buy_a_ticket.mp3" },
+    { "n": 28, "en": "Do you buy food?", "jp": "食べ物を買いますか。", "hira": "たべもの を かいます か", "mp3": "pb_q28_do_you_buy_food.mp3" },
+    { "n": 29, "en": "Do you eat lunch?", "jp": "昼ご飯を食べますか。", "hira": "ひるごはん を たべます か", "mp3": "pb_q29_do_you_eat_lunch.mp3" },
+    { "n": 30, "en": "Do you drink water?", "jp": "水を飲みますか。", "hira": "みず を のみます か", "mp3": "pb_q30_do_you_drink_water.mp3" },
+
+    { "n": 31, "en": "Do you take pictures?", "jp": "写真を撮りますか。", "hira": "しゃしん を とります か", "mp3": "pb_q31_do_you_take_pictures.mp3" },
+    { "n": 32, "en": "Do you have a bag?", "jp": "かばんを持っていますか。", "hira": "かばん を もっています か", "mp3": "pb_q32_do_you_have_a_bag.mp3" },
+    { "n": 33, "en": "Do you have money?", "jp": "お金がありますか。", "hira": "おかね が あります か", "mp3": "pb_q33_do_you_have_money.mp3" },
+    { "n": 34, "en": "Do you have a ticket?", "jp": "チケットがありますか。", "hira": "ちけっと が あります か", "mp3": "pb_q34_do_you_have_a_ticket.mp3" },
+    { "n": 35, "en": "Is this your phone?", "jp": "これはあなたの電話ですか。", "hira": "これ は あなた の でんわ です か", "mp3": "pb_q35_is_this_your_phone.mp3" },
+
+    { "n": 36, "en": "Is this your camera?", "jp": "これはあなたのカメラですか。", "hira": "これ は あなた の かめら です か", "mp3": "pb_q36_is_this_your_camera.mp3" },
+    { "n": 37, "en": "Is this your book?", "jp": "これはあなたの本ですか。", "hira": "これ は あなた の ほん です か", "mp3": "pb_q37_is_this_your_book.mp3" },
+    { "n": 38, "en": "Is this your friend?", "jp": "これはあなたの友だちですか。", "hira": "これ は あなた の ともだち です か", "mp3": "pb_q38_is_this_your_friend.mp3" },
+    { "n": 39, "en": "Is he your teacher?", "jp": "彼はあなたの先生ですか。", "hira": "かれ は あなた の せんせい です か", "mp3": "pb_q39_is_he_your_teacher.mp3" },
+    { "n": 40, "en": "Is she a student?", "jp": "彼女は学生ですか。", "hira": "かのじょ は がくせい です か", "mp3": "pb_q40_is_she_a_student.mp3" },
+
+    { "n": 41, "en": "Are they tourists?", "jp": "彼らは観光客ですか。", "hira": "かれら は かんこうきゃく です か", "mp3": "pb_q41_are_they_tourists.mp3" },
+    { "n": 42, "en": "Do you want to go?", "jp": "行きたいですか。", "hira": "いきたい です か", "mp3": "pb_q42_do_you_want_to_go.mp3" },
+    { "n": 43, "en": "Do you want to eat?", "jp": "食べたいですか。", "hira": "たべたい です か", "mp3": "pb_q43_do_you_want_to_eat.mp3" },
+    { "n": 44, "en": "Do you want to drink?", "jp": "飲みたいですか。", "hira": "のみたい です か", "mp3": "pb_q44_do_you_want_to_drink.mp3" },
+    { "n": 45, "en": "Do you want to buy this?", "jp": "これを買いたいですか。", "hira": "これ を かいたい です か", "mp3": "pb_q45_do_you_want_to_buy_this.mp3" },
+
+    { "n": 46, "en": "Do you want to see that?", "jp": "あれを見たいですか。", "hira": "あれ を みたい です か", "mp3": "pb_q46_do_you_want_to_see_that.mp3" },
+    { "n": 47, "en": "Are you going to go?", "jp": "行くつもりですか。", "hira": "いく つもり です か", "mp3": "pb_q47_are_you_going_to_go.mp3" },
+    { "n": 48, "en": "Are you going to eat?", "jp": "食べるつもりですか。", "hira": "たべる つもり です か", "mp3": "pb_q48_are_you_going_to_eat.mp3" },
+    { "n": 49, "en": "Are you going to travel?", "jp": "旅行するつもりですか。", "hira": "りょこう する つもり です か", "mp3": "pb_q49_are_you_going_to_travel.mp3" },
+    { "n": 50, "en": "Are you going to take pictures?", "jp": "写真を撮るつもりですか。", "hira": "しゃしん を とる つもり です か", "mp3": "pb_q50_are_you_going_to_take_pictures.mp3" },
+
+    { "n": 51, "en": "Are you going to have fun?", "jp": "楽しむつもりですか。", "hira": "たのしむ つもり です か", "mp3": "pb_q51_are_you_going_to_have_fun.mp3" },
+    { "n": 52, "en": "Are you going to be safe?", "jp": "安全に過ごすつもりですか。", "hira": "あんぜん に すごす つもり です か", "mp3": "pb_q52_are_you_going_to_be_safe.mp3" },
+    { "n": 53, "en": "Are you going to have fun and stay safe?", "jp": "楽しんで、安全に過ごすつもりですか。", "hira": "たのしんで あんぜん に すごす つもり です か", "mp3": "pb_q53_are_you_going_to_have_fun_and_stay_safe.mp3" },
+    { "n": 54, "en": "Do you go home?", "jp": "家に帰りますか。", "hira": "いえ に かえります か", "mp3": "pb_q54_do_you_go_home.mp3" },
+    { "n": 55, "en": "Do you see your friend?", "jp": "友だちに会いますか。", "hira": "ともだち に あいます か", "mp3": "pb_q55_do_you_see_your_friend.mp3" },
+
+    { "n": 56, "en": "Do you have fun?", "jp": "楽しみますか。", "hira": "たのしみます か", "mp3": "pb_q56_do_you_have_fun.mp3" },
+    { "n": 57, "en": "Do you like this?", "jp": "これが好きですか。", "hira": "これ が すき です か", "mp3": "pb_q57_do_you_like_this.mp3" },
+    { "n": 58, "en": "Do you like that?", "jp": "あれが好きですか。", "hira": "あれ が すき です か", "mp3": "pb_q58_do_you_like_that.mp3" },
+    { "n": 59, "en": "Do you like it?", "jp": "それが好きですか。", "hira": "それ が すき です か", "mp3": "pb_q59_do_you_like_it.mp3" },
+    { "n": 60, "en": "Do you like school?", "jp": "学校が好きですか。", "hira": "がっこう が すき です か", "mp3": "pb_q60_do_you_like_school.mp3" }
+  ]
+}
