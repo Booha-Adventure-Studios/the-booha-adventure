@@ -1,1 +1,75 @@
 
+{
+  "cards": [
+    { "n": 1, "en": "I am from Japan.", "jp": "私は日本の出身です。", "hira": "わたし は にほん の しゅっしん です", "mp3": "br_s01_i_am_from_japan.mp3" },
+    { "n": 2, "en": "I am Japanese.", "jp": "私は日本人です。", "hira": "わたし は にほんじん です", "mp3": "br_s02_i_am_japanese.mp3" },
+    { "n": 3, "en": "My nationality is Japanese.", "jp": "私の国籍は日本です。", "hira": "わたし の こくせき は にほん です", "mp3": "br_s03_my_nationality_is_japanese.mp3" },
+    { "n": 4, "en": "I’m from a big city.", "jp": "私は大きな都市の出身です。", "hira": "わたし は おおきな とし の しゅっしん です", "mp3": "br_s04_im_from_a_big_city.mp3" },
+    { "n": 5, "en": "She is from Canada.", "jp": "彼女はカナダ出身です。", "hira": "かのじょ は かなだ しゅっしん です", "mp3": "br_s05_she_is_from_canada.mp3" },
+    { "n": 6, "en": "He is Korean.", "jp": "彼は韓国人です。", "hira": "かれ は かんこくじん です", "mp3": "br_s06_he_is_korean.mp3" },
+    { "n": 7, "en": "They are from the U.K.", "jp": "彼らはイギリス出身です。", "hira": "かれら は いぎりす しゅっしん です", "mp3": "br_s07_they_are_from_the_uk.mp3" },
+    { "n": 8, "en": "I speak Japanese and English.", "jp": "私は日本語と英語を話します。", "hira": "わたし は にほんご と えいご を はなします", "mp3": "br_s08_i_speak_japanese_and_english.mp3" },
+    { "n": 9, "en": "She speaks Spanish.", "jp": "彼女はスペイン語を話します。", "hira": "かのじょ は すぺいんご を はなします", "mp3": "br_s09_she_speaks_spanish.mp3" },
+    { "n": 10, "en": "Do you speak Chinese?", "jp": "中国語を話しますか。", "hira": "ちゅうごくご を はなします か", "mp3": "br_s10_do_you_speak_chinese.mp3" },
+
+    { "n": 11, "en": "What country are you from?", "jp": "どこの国の出身ですか。", "hira": "どこ の くに の しゅっしん です か", "mp3": "br_s11_what_country_are_you_from.mp3" },
+    { "n": 12, "en": "What is the capital of France?", "jp": "フランスの首都はどこですか。", "hira": "ふらんす の しゅと は どこ です か", "mp3": "br_s12_what_is_the_capital_of_france.mp3" },
+    { "n": 13, "en": "The flag is red and white.", "jp": "その旗は赤と白です。", "hira": "その はた は あか と しろ です", "mp3": "br_s13_the_flag_is_red_and_white.mp3" },
+    { "n": 14, "en": "My city is near the sea.", "jp": "私の町は海の近くにあります。", "hira": "わたし の まち は うみ の ちかく に あります", "mp3": "br_s14_my_city_is_near_the_sea.mp3" },
+    { "n": 15, "en": "There are many languages in the world.", "jp": "世界には多くの言語があります。", "hira": "せかい に は おおく の げんご が あります", "mp3": "br_s15_there_are_many_languages_in_the_world.mp3" },
+
+    { "n": 16, "en": "There is a castle in Himeji.", "jp": "姫路には城があります。", "hira": "ひめじ に は しろ が あります", "mp3": "br_s16_there_is_a_castle_in_himeji.mp3" },
+    { "n": 17, "en": "There are many temples in Kyoto.", "jp": "京都には寺がたくさんあります。", "hira": "きょうと に は てら が たくさん あります", "mp3": "br_s17_there_are_many_temples_in_kyoto.mp3" },
+    { "n": 18, "en": "There is a big tower near the river.", "jp": "川の近くに大きなタワーがあります。", "hira": "かわ の ちかく に おおきな たわー が あります", "mp3": "br_s18_there_is_a_big_tower_near_the_river.mp3" },
+    { "n": 19, "en": "There are gardens behind the palace.", "jp": "宮殿の後ろに庭園があります。", "hira": "きゅうでん の うしろ に ていえん が あります", "mp3": "br_s19_there_are_gardens_behind_the_palace.mp3" },
+    { "n": 20, "en": "There is a museum on this street.", "jp": "この通りに博物館があります。", "hira": "この とおり に はくぶつかん が あります", "mp3": "br_s20_there_is_a_museum_on_this_street.mp3" },
+
+    { "n": 21, "en": "There are shops around the square.", "jp": "広場のまわりに店があります。", "hira": "ひろば の まわり に みせ が あります", "mp3": "br_s21_there_are_shops_around_the_square.mp3" },
+    { "n": 22, "en": "There is a famous bridge in Osaka.", "jp": "大阪には有名な橋があります。", "hira": "おおさか に は ゆうめい な はし が あります", "mp3": "br_s22_there_is_a_famous_bridge_in_osaka.mp3" },
+    { "n": 23, "en": "There are tickets at the entrance.", "jp": "入口にチケットがあります。", "hira": "いりぐち に ちけっと が あります", "mp3": "br_s23_there_are_tickets_at_the_entrance.mp3" },
+    { "n": 24, "en": "There is a statue in the park.", "jp": "公園に像があります。", "hira": "こうえん に ぞう が あります", "mp3": "br_s24_there_is_a_statue_in_the_park.mp3" },
+    { "n": 25, "en": "There are cherry trees in the garden.", "jp": "庭園に桜の木があります。", "hira": "ていえん に さくら の き が あります", "mp3": "br_s25_there_are_cherry_trees_in_the_garden.mp3" },
+
+    { "n": 26, "en": "Is there a shrine near here?", "jp": "この近くに神社はありますか。", "hira": "この ちかく に じんじゃ は あります か", "mp3": "br_s26_is_there_a_shrine_near_here.mp3" },
+    { "n": 27, "en": "Are there any landmarks in your town?", "jp": "あなたの町に名所はありますか。", "hira": "あなた の まち に めいしょ は あります か", "mp3": "br_s27_are_there_any_landmarks_in_your_town.mp3" },
+    { "n": 28, "en": "There is a market on Sunday.", "jp": "日曜日に市場があります。", "hira": "にちようび に いちば が あります", "mp3": "br_s28_there_is_a_market_on_sunday.mp3" },
+    { "n": 29, "en": "There are many tourists in summer.", "jp": "夏には観光客がたくさんいます。", "hira": "なつ に は かんこうきゃく が たくさん います", "mp3": "br_s29_there_are_many_tourists_in_summer.mp3" },
+    { "n": 30, "en": "There is a good view from the tower.", "jp": "タワーからの景色は良いです。", "hira": "たわー から の けしき は よい です", "mp3": "br_s30_there_is_a_good_view_from_the_tower.mp3" },
+
+    { "n": 31, "en": "Japan is different from my friend’s country.", "jp": "日本は友だちの国と違います。", "hira": "にほん は ともだち の くに と ちがいます", "mp3": "br_s31_japan_is_different_from_my_friends_country.mp3" },
+    { "n": 32, "en": "People bow in Japan.", "jp": "日本ではおじぎをします。", "hira": "にほん では おじぎ を します", "mp3": "br_s32_people_bow_in_japan.mp3" },
+    { "n": 33, "en": "People shake hands in many countries.", "jp": "多くの国では握手をします。", "hira": "おおく の くに では あくしゅ を します", "mp3": "br_s33_people_shake_hands_in_many_countries.mp3" },
+    { "n": 34, "en": "We take off our shoes at the door.", "jp": "私たちは玄関で靴をぬぎます。", "hira": "わたしたち は げんかん で くつ を ぬぎます", "mp3": "br_s34_we_take_off_our_shoes_at_the_door.mp3" },
+    { "n": 35, "en": "Some people eat with chopsticks.", "jp": "箸で食べる人もいます。", "hira": "はし で たべる ひと も います", "mp3": "br_s35_some_people_eat_with_chopsticks.mp3" },
+
+    { "n": 36, "en": "I prefer rice to bread.", "jp": "私はパンよりご飯のほうが好きです。", "hira": "わたし は ぱん より ごはん の ほう が すき です", "mp3": "br_s36_i_prefer_rice_to_bread.mp3" },
+    { "n": 37, "en": "I prefer tea to coffee.", "jp": "私はコーヒーよりお茶のほうが好きです。", "hira": "わたし は こーひー より おちゃ の ほう が すき です", "mp3": "br_s37_i_prefer_tea_to_coffee.mp3" },
+    { "n": 38, "en": "Summer festivals are exciting.", "jp": "夏祭りは楽しいです。", "hira": "なつまつり は たのしい です", "mp3": "br_s38_summer_festivals_are_exciting.mp3" },
+    { "n": 39, "en": "New Year is an important holiday.", "jp": "お正月は大切な祝日です。", "hira": "おしょうがつ は たいせつ な しゅくじつ です", "mp3": "br_s39_new_year_is_an_important_holiday.mp3" },
+    { "n": 40, "en": "Gift-giving is part of the culture.", "jp": "贈り物は文化の一部です。", "hira": "おくりもの は ぶんか の いちぶ です", "mp3": "br_s40_giftgiving_is_part_of_the_culture.mp3" },
+
+    { "n": 41, "en": "It is polite to say “thank you.”", "jp": "「ありがとう」と言うのは丁寧です。", "hira": "ありがとう と いう の は ていねい です", "mp3": "br_s41_it_is_polite_to_say_thank_you.mp3" },
+    { "n": 42, "en": "Let’s compare two customs.", "jp": "二つの習慣を比べましょう。", "hira": "ふたつ の しゅうかん を くらべましょう", "mp3": "br_s42_lets_compare_two_customs.mp3" },
+    { "n": 43, "en": "This rule is the same at my school.", "jp": "このルールは私の学校でも同じです。", "hira": "この るーる は わたし の がっこう でも おなじ です", "mp3": "br_s43_this_rule_is_the_same_at_my_school.mp3" },
+    { "n": 44, "en": "Food is different in each country.", "jp": "国ごとに食べ物は違います。", "hira": "くに ごと に たべもの は ちがいます", "mp3": "br_s44_food_is_different_in_each_country.mp3" },
+    { "n": 45, "en": "I like learning about traditions.", "jp": "伝統について学ぶのが好きです。", "hira": "でんとう について まなぶ の が すき です", "mp3": "br_s45_i_like_learning_about_traditions.mp3" },
+
+    { "n": 46, "en": "I’d like to visit Okinawa.", "jp": "沖縄に行ってみたいです。", "hira": "おきなわ に いって みたい です", "mp3": "br_s46_id_like_to_visit_okinawa.mp3" },
+    { "n": 47, "en": "I’d like to try local food.", "jp": "その土地の食べ物を食べてみたいです。", "hira": "その とち の たべもの を たべて みたい です", "mp3": "br_s47_id_like_to_try_local_food.mp3" },
+    { "n": 48, "en": "I’d like to see a famous temple.", "jp": "有名なお寺を見てみたいです。", "hira": "ゆうめい な おてら を みて みたい です", "mp3": "br_s48_id_like_to_see_a_famous_temple.mp3" },
+    { "n": 49, "en": "I’d like to stay at a hotel near the station.", "jp": "駅の近くのホテルに泊まりたいです。", "hira": "えき の ちかく の ほてる に とまりたい です", "mp3": "br_s49_id_like_to_stay_at_a_hotel_near_the_station.mp3" },
+    { "n": 50, "en": "I want to travel by train.", "jp": "電車で旅行したいです。", "hira": "でんしゃ で りょこう したい です", "mp3": "br_s50_i_want_to_travel_by_train.mp3" },
+
+    { "n": 51, "en": "I want to make a reservation.", "jp": "予約をしたいです。", "hira": "よやく を したい です", "mp3": "br_s51_i_want_to_make_a_reservation.mp3" },
+    { "n": 52, "en": "I want to buy a ticket online.", "jp": "オンラインでチケットを買いたいです。", "hira": "おんらいん で ちけっと を かいたい です", "mp3": "br_s52_i_want_to_buy_a_ticket_online.mp3" },
+    { "n": 53, "en": "I want to pack a small suitcase.", "jp": "小さなスーツケースに荷物を入れたいです。", "hira": "ちいさな すーつけーす に にもつ を いれたい です", "mp3": "br_s53_i_want_to_pack_a_small_suitcase.mp3" },
+    { "n": 54, "en": "I’m going to check the schedule.", "jp": "予定を確認するつもりです。", "hira": "よてい を かくにん する つもり です", "mp3": "br_s54_im_going_to_check_the_schedule.mp3" },
+    { "n": 55, "en": "I’m going to bring my passport.", "jp": "パスポートを持っていくつもりです。", "hira": "ぱすぽーと を もって いく つもり です", "mp3": "br_s55_im_going_to_bring_my_passport.mp3" },
+
+    { "n": 56, "en": "I’m going to meet my friend at the airport.", "jp": "空港で友だちに会うつもりです。", "hira": "くうこう で ともだち に あう つもり です", "mp3": "br_s56_im_going_to_meet_my_friend_at_the_airport.mp3" },
+    { "n": 57, "en": "I’m going to take many photos.", "jp": "写真をたくさん撮るつもりです。", "hira": "しゃしん を たくさん とる つもり です", "mp3": "br_s57_im_going_to_take_many_photos.mp3" },
+    { "n": 58, "en": "I’m going to use a map app.", "jp": "地図アプリを使うつもりです。", "hira": "ちず あぷり を つかう つもり です", "mp3": "br_s58_im_going_to_use_a_map_app.mp3" },
+    { "n": 59, "en": "I’m going to practice English with tourists.", "jp": "観光客と英語を練習するつもりです。", "hira": "かんこうきゃく と えいご を れんしゅう する つもり です", "mp3": "br_s59_im_going_to_practice_english_with_tourists.mp3" },
+    { "n": 60, "en": "I’m going to have fun and stay safe.", "jp": "楽しんで、安全に過ごすつもりです。", "hira": "たのしんで あんぜん に すごす つもり です", "mp3": "br_s60_im_going_to_have_fun_and_stay_safe.mp3" }
+  ]
+}
