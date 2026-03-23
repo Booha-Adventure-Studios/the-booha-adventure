@@ -1,1 +1,76 @@
 
+{
+  "cards": [
+    { "n": 1, "en": "I usually check my email before starting work.", "jp": "私は仕事を始める前にたいていメールを確認します。", "hira": "わたし は しごと を はじめる まえ に たいてい めーる を かくにんします", "mp3": "bc_s01_i_usually_check_my_email_before_starting_work.mp3" },
+    { "n": 2, "en": "I need to finish this report by tomorrow.", "jp": "私はこのレポートを明日までに終わらせる必要があります。", "hira": "わたし は この れぽーと を あした まで に おわらせる ひつよう が あります", "mp3": "bc_s02_i_need_to_finish_this_report_by_tomorrow.mp3" },
+    { "n": 3, "en": "I often attend meetings in the afternoon.", "jp": "私は午後によく会議に出ます。", "hira": "わたし は ごご に よく かいぎ に でます", "mp3": "bc_s03_i_often_attend_meetings_in_the_afternoon.mp3" },
+    { "n": 4, "en": "I am responsible for managing this project.", "jp": "私はこのプロジェクトを管理する責任があります。", "hira": "わたし は この ぷろじぇくと を かんりする せきにん が あります", "mp3": "bc_s04_i_am_responsible_for_managing_this_project.mp3" },
+    { "n": 5, "en": "I try to improve my English every day.", "jp": "私は毎日英語を上達させようとしています。", "hira": "わたし は まいにち えいご を じょうたつ させよう と しています", "mp3": "bc_s05_i_try_to_improve_my_english_every_day.mp3" },
+
+    { "n": 6, "en": "I sometimes work late to meet deadlines.", "jp": "私は締め切りに間に合わせるためにときどき遅くまで働きます。", "hira": "わたし は しめきり に まにあわせる ため に ときどき おそく まで はたらきます", "mp3": "bc_s06_i_sometimes_work_late_to_meet_deadlines.mp3" },
+    { "n": 7, "en": "I usually prepare documents in advance.", "jp": "私はたいてい事前に資料を準備します。", "hira": "わたし は たいてい じぜん に しりょう を じゅんびします", "mp3": "bc_s07_i_usually_prepare_documents_in_advance.mp3" },
+    { "n": 8, "en": "I prefer working in a quiet environment.", "jp": "私は静かな環境で働くほうが好きです。", "hira": "わたし は しずかな かんきょう で はたらく ほう が すき です", "mp3": "bc_s08_i_prefer_working_in_a_quiet_environment.mp3" },
+    { "n": 9, "en": "I need to schedule a meeting with my team.", "jp": "私はチームと会議を予定する必要があります。", "hira": "わたし は ちーむ と かいぎ を よていする ひつよう が あります", "mp3": "bc_s09_i_need_to_schedule_a_meeting_with_my_team.mp3" },
+    { "n": 10, "en": "I often discuss ideas with my coworkers.", "jp": "私は同僚とよくアイデアについて話し合います。", "hira": "わたし は どうりょう と よく あいであ に ついて はなしあいます", "mp3": "bc_s10_i_often_discuss_ideas_with_my_coworkers.mp3" },
+
+    { "n": 11, "en": "I usually arrive at the office before nine.", "jp": "私はたいてい9時前にオフィスに到着します。", "hira": "わたし は たいてい くじ まえ に おふぃす に とうちゃくします", "mp3": "bc_s11_i_usually_arrive_at_the_office_before_nine.mp3" },
+    { "n": 12, "en": "I have to complete this task as soon as possible.", "jp": "私はこの仕事をできるだけ早く終わらせなければなりません。", "hira": "わたし は この しごと を できるだけ はやく おわらせなければ なりません", "mp3": "bc_s12_i_have_to_complete_this_task_as_soon_as_possible.mp3" },
+    { "n": 13, "en": "I always double-check my work for mistakes.", "jp": "私はいつもミスがないか確認します。", "hira": "わたし は いつも みす が ないか かくにんします", "mp3": "bc_s13_i_always_double_check_my_work_for_mistakes.mp3" },
+    { "n": 14, "en": "I am planning to take a business trip next month.", "jp": "私は来月出張に行く予定です。", "hira": "わたし は らいげつ しゅっちょう に いく よてい です", "mp3": "bc_s14_i_am_planning_to_take_a_business_trip_next_month.mp3" },
+    { "n": 15, "en": "I usually respond to emails within a day.", "jp": "私はたいてい1日以内にメールに返信します。", "hira": "わたし は たいてい いちにち いない に めーる に へんしんします", "mp3": "bc_s15_i_usually_respond_to_emails_within_a_day.mp3" },
+
+    { "n": 16, "en": "I need to confirm the schedule with the client.", "jp": "私は顧客とスケジュールを確認する必要があります。", "hira": "わたし は こきゃく と すけじゅーる を かくにんする ひつよう が あります", "mp3": "bc_s16_i_need_to_confirm_the_schedule_with_the_client.mp3" },
+    { "n": 17, "en": "I often make notes during meetings.", "jp": "私は会議中によくメモを取ります。", "hira": "わたし は かいぎちゅう に よく めも を とります", "mp3": "bc_s17_i_often_make_notes_during_meetings.mp3" },
+    { "n": 18, "en": "I try to manage my time efficiently.", "jp": "私は時間を効率よく使うようにしています。", "hira": "わたし は じかん を こうりつ よく つかう よう に しています", "mp3": "bc_s18_i_try_to_manage_my_time_efficiently.mp3" },
+    { "n": 19, "en": "I sometimes ask questions to clarify details.", "jp": "私は詳細を確認するためにときどき質問します。", "hira": "わたし は しょうさい を かくにんする ため に ときどき しつもんします", "mp3": "bc_s19_i_sometimes_ask_questions_to_clarify_details.mp3" },
+    { "n": 20, "en": "I usually review the data before making decisions.", "jp": "私は決定する前にたいていデータを確認します。", "hira": "わたし は けっていする まえ に たいてい でーた を かくにんします", "mp3": "bc_s20_i_usually_review_the_data_before_making_decisions.mp3" },
+
+    { "n": 21, "en": "I need to update the system regularly.", "jp": "私は定期的にシステムを更新する必要があります。", "hira": "わたし は ていきてき に しすてむ を こうしんする ひつよう が あります", "mp3": "bc_s21_i_need_to_update_the_system_regularly.mp3" },
+    { "n": 22, "en": "I often communicate with customers by email.", "jp": "私はよくメールで顧客とやり取りします。", "hira": "わたし は よく めーる で こきゃく と やりとりします", "mp3": "bc_s22_i_often_communicate_with_customers_by_email.mp3" },
+    { "n": 23, "en": "I am in charge of customer support.", "jp": "私はカスタマーサポートを担当しています。", "hira": "わたし は かすたまーさぽーと を たんとうしています", "mp3": "bc_s23_i_am_in_charge_of_customer_support.mp3" },
+    { "n": 24, "en": "I try to solve problems quickly.", "jp": "私は問題をすぐに解決しようとします。", "hira": "わたし は もんだい を すぐ に かいけつしよう と します", "mp3": "bc_s24_i_try_to_solve_problems_quickly.mp3" },
+    { "n": 25, "en": "I usually prepare a report after the meeting.", "jp": "私は会議の後にたいてい報告書を作ります。", "hira": "わたし は かいぎ の あと に たいてい ほうこくしょ を つくります", "mp3": "bc_s25_i_usually_prepare_a_report_after_the_meeting.mp3" },
+
+    { "n": 26, "en": "I need to improve my presentation skills.", "jp": "私はプレゼンテーション能力を向上させる必要があります。", "hira": "わたし は ぷれぜんてーしょん のうりょく を こうじょうさせる ひつよう が あります", "mp3": "bc_s26_i_need_to_improve_my_presentation_skills.mp3" },
+    { "n": 27, "en": "I often work with people from different countries.", "jp": "私はよくさまざまな国の人と働きます。", "hira": "わたし は よく さまざまな くに の ひと と はたらきます", "mp3": "bc_s27_i_often_work_with_people_from_different_countries.mp3" },
+    { "n": 28, "en": "I am used to working under pressure.", "jp": "私はプレッシャーの中で働くことに慣れています。", "hira": "わたし は ぷれっしゃー の なか で はたらく こと に なれています", "mp3": "bc_s28_i_am_used_to_working_under_pressure.mp3" },
+    { "n": 29, "en": "I need to adjust the schedule if necessary.", "jp": "必要であればスケジュールを調整する必要があります。", "hira": "ひつよう で あれば すけじゅーる を ちょうせいする ひつよう が あります", "mp3": "bc_s29_i_need_to_adjust_the_schedule_if_necessary.mp3" },
+    { "n": 30, "en": "I usually organize my tasks by priority.", "jp": "私はたいてい優先順位で仕事を整理します。", "hira": "わたし は たいてい ゆうせんじゅんい で しごと を せいりします", "mp3": "bc_s30_i_usually_organize_my_tasks_by_priority.mp3" },
+
+    { "n": 31, "en": "I often share information with my team.", "jp": "私はよくチームと情報を共有します。", "hira": "わたし は よく ちーむ と じょうほう を きょうゆうします", "mp3": "bc_s31_i_often_share_information_with_my_team.mp3" },
+    { "n": 32, "en": "I need to make a decision by the end of the day.", "jp": "私は今日中に決定をしなければなりません。", "hira": "わたし は きょうじゅう に けってい を しなければ なりません", "mp3": "bc_s32_i_need_to_make_a_decision_by_the_end_of_the_day.mp3" },
+    { "n": 33, "en": "I try to avoid making the same mistake twice.", "jp": "私は同じミスを繰り返さないようにしています。", "hira": "わたし は おなじ みす を くりかえさない よう に しています", "mp3": "bc_s33_i_try_to_avoid_making_the_same_mistake_twice.mp3" },
+    { "n": 34, "en": "I usually check the details carefully.", "jp": "私はたいてい詳細を注意深く確認します。", "hira": "わたし は たいてい しょうさい を ちゅういぶかく かくにんします", "mp3": "bc_s34_i_usually_check_the_details_carefully.mp3" },
+    { "n": 35, "en": "I need to follow the company rules.", "jp": "私は会社のルールに従う必要があります。", "hira": "わたし は かいしゃ の るーる に したがう ひつよう が あります", "mp3": "bc_s35_i_need_to_follow_the_company_rules.mp3" },
+
+    { "n": 36, "en": "I often collaborate with other departments.", "jp": "私はよく他の部署と協力します。", "hira": "わたし は よく ほか の ぶしょ と きょうりょくします", "mp3": "bc_s36_i_often_collaborate_with_other_departments.mp3" },
+    { "n": 37, "en": "I try to keep my work organized.", "jp": "私は仕事を整理された状態に保つようにしています。", "hira": "わたし は しごと を せいりされた じょうたい に たもつ よう に しています", "mp3": "bc_s37_i_try_to_keep_my_work_organized.mp3" },
+    { "n": 38, "en": "I usually take notes during training sessions.", "jp": "私は研修中にたいていメモを取ります。", "hira": "わたし は けんしゅうちゅう に たいてい めも を とります", "mp3": "bc_s38_i_usually_take_notes_during_training_sessions.mp3" },
+    { "n": 39, "en": "I need to improve my communication skills.", "jp": "私はコミュニケーション能力を向上させる必要があります。", "hira": "わたし は こみゅにけーしょん のうりょく を こうじょうさせる ひつよう が あります", "mp3": "bc_s39_i_need_to_improve_my_communication_skills.mp3" },
+    { "n": 40, "en": "I often review my progress at the end of the week.", "jp": "私は週の終わりによく進捗を確認します。", "hira": "わたし は しゅう の おわり に よく しんちょく を かくにんします", "mp3": "bc_s40_i_often_review_my_progress_at_the_end_of_the_week.mp3" },
+
+    { "n": 41, "en": "I usually arrive on time for meetings.", "jp": "私はたいてい会議に時間通りに出ます。", "hira": "わたし は たいてい かいぎ に じかんどおり に でます", "mp3": "bc_s41_i_usually_arrive_on_time_for_meetings.mp3" },
+    { "n": 42, "en": "I need to complete this task accurately.", "jp": "私はこの仕事を正確に終わらせる必要があります。", "hira": "わたし は この しごと を せいかく に おわらせる ひつよう が あります", "mp3": "bc_s42_i_need_to_complete_this_task_accurately.mp3" },
+    { "n": 43, "en": "I try to learn from my mistakes.", "jp": "私は自分のミスから学ぶようにしています。", "hira": "わたし は じぶん の みす から まなぶ よう に しています", "mp3": "bc_s43_i_try_to_learn_from_my_mistakes.mp3" },
+    { "n": 44, "en": "I often prepare for meetings in advance.", "jp": "私は会議の準備を事前によく行います。", "hira": "わたし は かいぎ の じゅんび を じぜん に よく おこないます", "mp3": "bc_s44_i_often_prepare_for_meetings_in_advance.mp3" },
+    { "n": 45, "en": "I usually communicate clearly with clients.", "jp": "私は顧客と明確にコミュニケーションを取ります。", "hira": "わたし は こきゃく と めいかく に こみゅにけーしょん を とります", "mp3": "bc_s45_i_usually_communicate_clearly_with_clients.mp3" },
+
+    { "n": 46, "en": "I need to meet the deadline without delay.", "jp": "私は遅れずに締め切りを守る必要があります。", "hira": "わたし は おくれず に しめきり を まもる ひつよう が あります", "mp3": "bc_s46_i_need_to_meet_the_deadline_without_delay.mp3" },
+    { "n": 47, "en": "I often suggest new ideas to my team.", "jp": "私はよくチームに新しいアイデアを提案します。", "hira": "わたし は よく ちーむ に あたらしい あいであ を ていあんします", "mp3": "bc_s47_i_often_suggest_new_ideas_to_my_team.mp3" },
+    { "n": 48, "en": "I try to stay focused during work.", "jp": "私は仕事中に集中するようにしています。", "hira": "わたし は しごとちゅう に しゅうちゅうする よう に しています", "mp3": "bc_s48_i_try_to_stay_focused_during_work.mp3" },
+    { "n": 49, "en": "I usually complete my tasks on time.", "jp": "私はたいてい仕事を時間通りに終わらせます。", "hira": "わたし は たいてい しごと を じかんどおり に おわらせます", "mp3": "bc_s49_i_usually_complete_my_tasks_on_time.mp3" },
+    { "n": 50, "en": "I need to improve my performance this year.", "jp": "私は今年の成果を向上させる必要があります。", "hira": "わたし は ことし の せいか を こうじょうさせる ひつよう が あります", "mp3": "bc_s50_i_need_to_improve_my_performance_this_year.mp3" },
+
+    { "n": 51, "en": "I am expected to submit the report by Friday.", "jp": "私は金曜日までにレポートを提出することが求められています。", "hira": "わたし は きんようび まで に れぽーと を ていしゅつする こと が もとめられています", "mp3": "bc_s51_i_am_expected_to_submit_the_report_by_friday.mp3" },
+    { "n": 52, "en": "I will follow up on this issue later today.", "jp": "私は今日中にこの問題についてフォローします。", "hira": "わたし は きょうじゅう に この もんだい に ついて ふぉろー します", "mp3": "bc_s52_i_will_follow_up_on_this_issue_later_today.mp3" },
+    { "n": 53, "en": "I need to gather more information before deciding.", "jp": "私は決定する前にさらに情報を集める必要があります。", "hira": "わたし は けっていする まえ に さらに じょうほう を あつめる ひつよう が あります", "mp3": "bc_s53_i_need_to_gather_more_information_before_deciding.mp3" },
+    { "n": 54, "en": "I am confident that we can achieve our goals.", "jp": "私は目標を達成できると確信しています。", "hira": "わたし は もくひょう を たっせいできる と かくしんしています", "mp3": "bc_s54_i_am_confident_that_we_can_achieve_our_goals.mp3" },
+    { "n": 55, "en": "I would like to discuss this matter in detail.", "jp": "私はこの件について詳しく話し合いたいです。", "hira": "わたし は この けん に ついて くわしく はなしあいたい です", "mp3": "bc_s55_i_would_like_to_discuss_this_matter_in_detail.mp3" },
+
+    { "n": 56, "en": "I need to prioritize my tasks more effectively.", "jp": "私はより効果的に仕事の優先順位をつける必要があります。", "hira": "わたし は より こうかてき に しごと の ゆうせんじゅんい を つける ひつよう が あります", "mp3": "bc_s56_i_need_to_prioritize_my_tasks_more_effectively.mp3" },
+    { "n": 57, "en": "I will make sure this problem does not happen again.", "jp": "私はこの問題が再び起こらないようにします。", "hira": "わたし は この もんだい が ふたたび おこらない よう に します", "mp3": "bc_s57_i_will_make_sure_this_problem_does_not_happen_again.mp3" },
+    { "n": 58, "en": "I am currently working on several important projects.", "jp": "私は現在いくつかの重要なプロジェクトに取り組んでいます。", "hira": "わたし は げんざい いくつか の じゅうよう な ぷろじぇくと に とりくんでいます", "mp3": "bc_s58_i_am_currently_working_on_several_important_projects.mp3" },
+    { "n": 59, "en": "I need to improve the quality of my work.", "jp": "私は仕事の質を向上させる必要があります。", "hira": "わたし は しごと の しつ を こうじょうさせる ひつよう が あります", "mp3": "bc_s59_i_need_to_improve_the_quality_of_my_work.mp3" },
+    { "n": 60, "en": "I try to communicate my ideas clearly and effectively.", "jp": "私は自分の考えを明確かつ効果的に伝えるようにしています。", "hira": "わたし は じぶん の かんがえ を めいかく かつ こうかてき に つたえる よう に しています", "mp3": "bc_s60_i_try_to_communicate_my_ideas_clearly_and_effectively.mp3" }
+  ]
+}
