@@ -1,1 +1,72 @@
 
+{
+  "cards": [
+    { "n": 1, "en": "Do you like summer?", "jp": "なつ が すき です か", "hira": "なつ が すき です か", "mp3": "pb_q01_do_you_like_summer.mp3" },
+    { "n": 2, "en": "Is it hot?", "jp": "あつい です か", "hira": "あつい です か", "mp3": "pb_q02_is_it_hot.mp3" },
+    { "n": 3, "en": "Do you like the sun?", "jp": "たいよう が すき です か", "hira": "たいよう が すき です か", "mp3": "pb_q03_do_you_like_the_sun.mp3" },
+    { "n": 4, "en": "Do you go to the pool?", "jp": "ぷーる に いきます か", "hira": "ぷーる に いきます か", "mp3": "pb_q04_do_you_go_to_the_pool.mp3" },
+    { "n": 5, "en": "Do you swim?", "jp": "およぎます か", "hira": "およぎます か", "mp3": "pb_q05_do_you_swim.mp3" },
+    { "n": 6, "en": "Do you like the sea?", "jp": "うみ が すき です か", "hira": "うみ が すき です か", "mp3": "pb_q06_do_you_like_the_sea.mp3" },
+    { "n": 7, "en": "Do you like sand?", "jp": "すな が すき です か", "hira": "すな が すき です か", "mp3": "pb_q07_do_you_like_sand.mp3" },
+    { "n": 8, "en": "Do you eat ice cream?", "jp": "あいす を たべます か", "hira": "あいす を たべます か", "mp3": "pb_q08_do_you_eat_ice_cream.mp3" },
+
+    { "n": 9, "en": "Do you like festivals?", "jp": "まつり が すき です か", "hira": "まつり が すき です か", "mp3": "pb_q09_do_you_like_festivals.mp3" },
+    { "n": 10, "en": "Do you see fireworks?", "jp": "はなび を みます か", "hira": "はなび を みます か", "mp3": "pb_q10_do_you_see_fireworks.mp3" },
+    { "n": 11, "en": "Do you go camping?", "jp": "きゃんぷ に いきます か", "hira": "きゃんぷ に いきます か", "mp3": "pb_q11_do_you_go_camping.mp3" },
+    { "n": 12, "en": "Do you eat meat?", "jp": "にく を たべます か", "hira": "にく を たべます か", "mp3": "pb_q12_do_you_eat_meat.mp3" },
+    { "n": 13, "en": "Do you wear a hat?", "jp": "ぼうし を かぶります か", "hira": "ぼうし を かぶります か", "mp3": "pb_q13_do_you_wear_a_hat.mp3" },
+    { "n": 14, "en": "Do you use a fan?", "jp": "うちわ を つかいます か", "hira": "うちわ を つかいます か", "mp3": "pb_q14_do_you_use_a_fan.mp3" },
+    { "n": 15, "en": "Is summer fun?", "jp": "なつ は たのしい です か", "hira": "なつ は たのしい です か", "mp3": "pb_q15_is_summer_fun.mp3" },
+
+    { "n": 16, "en": "Do you have a holiday?", "jp": "やすみ が あります か", "hira": "やすみ が あります か", "mp3": "pb_q16_do_you_have_a_holiday.mp3" },
+    { "n": 17, "en": "Do you go this summer?", "jp": "この なつ いきます か", "hira": "この なつ いきます か", "mp3": "pb_q17_do_you_go_this_summer.mp3" },
+    { "n": 18, "en": "Do you go on a trip?", "jp": "りょこう に いきます か", "hira": "りょこう に いきます か", "mp3": "pb_q18_do_you_go_on_a_trip.mp3" },
+    { "n": 19, "en": "Do you stay in a room?", "jp": "へや に とまります か", "hira": "へや に とまります か", "mp3": "pb_q19_do_you_stay_in_a_room.mp3" },
+    { "n": 20, "en": "Do you read books?", "jp": "ほん を よみます か", "hira": "ほん を よみます か", "mp3": "pb_q20_do_you_read_books.mp3" },
+    { "n": 21, "en": "Do you get gifts?", "jp": "ぷれぜんと を もらいます か", "hira": "ぷれぜんと を もらいます か", "mp3": "pb_q21_do_you_get_gifts.mp3" },
+    { "n": 22, "en": "Do you have a ticket?", "jp": "ちけっと が あります か", "hira": "ちけっと が あります か", "mp3": "pb_q22_do_you_have_a_ticket.mp3" },
+    { "n": 23, "en": "Do you go to the airport?", "jp": "くうこう に いきます か", "hira": "くうこう に いきます か", "mp3": "pb_q23_do_you_go_to_the_airport.mp3" },
+
+    { "n": 24, "en": "Do you go to the station?", "jp": "えき に いきます か", "hira": "えき に いきます か", "mp3": "pb_q24_do_you_go_to_the_station.mp3" },
+    { "n": 25, "en": "Do you ride the train?", "jp": "でんしゃ に のります か", "hira": "でんしゃ に のります か", "mp3": "pb_q25_do_you_ride_the_train.mp3" },
+    { "n": 26, "en": "Do you take a plane?", "jp": "ひこうき に のります か", "hira": "ひこうき に のります か", "mp3": "pb_q26_do_you_take_a_plane.mp3" },
+    { "n": 27, "en": "Do you have a bag?", "jp": "かばん が あります か", "hira": "かばん が あります か", "mp3": "pb_q27_do_you_have_a_bag.mp3" },
+    { "n": 28, "en": "Do you take pictures?", "jp": "しゃしん を とります か", "hira": "しゃしん を とります か", "mp3": "pb_q28_do_you_take_pictures.mp3" },
+    { "n": 29, "en": "Do you have money?", "jp": "おかね が あります か", "hira": "おかね が あります か", "mp3": "pb_q29_do_you_have_money.mp3" },
+    { "n": 30, "en": "Do you have time?", "jp": "じかん が あります か", "hira": "じかん が あります か", "mp3": "pb_q30_do_you_have_time.mp3" },
+
+    { "n": 31, "en": "Do you pack your bag?", "jp": "かばん に いれます か", "hira": "かばん に いれます か", "mp3": "pb_q31_do_you_pack_your_bag.mp3" },
+    { "n": 32, "en": "Do you make a plan?", "jp": "かんがえます か", "hira": "かんがえます か", "mp3": "pb_q32_do_you_make_a_plan.mp3" },
+    { "n": 33, "en": "Do you make a list?", "jp": "りすと を つくります か", "hira": "りすと を つくります か", "mp3": "pb_q33_do_you_make_a_list.mp3" },
+    { "n": 34, "en": "Do you have a bag?", "jp": "ばっぐ が あります か", "hira": "ばっぐ が あります か", "mp3": "pb_q34_do_you_have_a_bag.mp3" },
+    { "n": 35, "en": "Do you have a case?", "jp": "けーす が あります か", "hira": "けーす が あります か", "mp3": "pb_q35_do_you_have_a_case.mp3" },
+    { "n": 36, "en": "Do you wear clothes?", "jp": "ふく を きます か", "hira": "ふく を きます か", "mp3": "pb_q36_do_you_wear_clothes.mp3" },
+    { "n": 37, "en": "Do you wear shoes?", "jp": "くつ を はきます か", "hira": "くつ を はきます か", "mp3": "pb_q37_do_you_wear_shoes.mp3" },
+    { "n": 38, "en": "Do you use a towel?", "jp": "たおる を つかいます か", "hira": "たおる を つかいます か", "mp3": "pb_q38_do_you_use_a_towel.mp3" },
+
+    { "n": 39, "en": "Do you have a bottle?", "jp": "ぼとる が あります か", "hira": "ぼとる が あります か", "mp3": "pb_q39_do_you_have_a_bottle.mp3" },
+    { "n": 40, "en": "Do you take medicine?", "jp": "くすり を のみます か", "hira": "くすり を のみます か", "mp3": "pb_q40_do_you_take_medicine.mp3" },
+    { "n": 41, "en": "Do you use an umbrella?", "jp": "かさ を つかいます か", "hira": "かさ を つかいます か", "mp3": "pb_q41_do_you_use_an_umbrella.mp3" },
+    { "n": 42, "en": "Do you look at a map?", "jp": "ちず を みます か", "hira": "ちず を みます か", "mp3": "pb_q42_do_you_look_at_a_map.mp3" },
+    { "n": 43, "en": "Do you have a plan?", "jp": "よてい が あります か", "hira": "よてい が あります か", "mp3": "pb_q43_do_you_have_a_plan.mp3" },
+    { "n": 44, "en": "Is this important?", "jp": "だいじ です か", "hira": "だいじ です か", "mp3": "pb_q44_is_this_important.mp3" },
+    { "n": 45, "en": "Do you forget things?", "jp": "わすれます か", "hira": "わすれます か", "mp3": "pb_q45_do_you_forget_things.mp3" },
+
+    { "n": 46, "en": "Do you eat watermelon?", "jp": "すいか を たべます か", "hira": "すいか を たべます か", "mp3": "pb_q46_do_you_eat_watermelon.mp3" },
+    { "n": 47, "en": "Is ice cold?", "jp": "こおり は つめたい です か", "hira": "こおり は つめたい です か", "mp3": "pb_q47_is_ice_cold.mp3" },
+    { "n": 48, "en": "Do you drink?", "jp": "のみます か", "hira": "のみます か", "mp3": "pb_q48_do_you_drink.mp3" },
+    { "n": 49, "en": "Do you eat noodles?", "jp": "めん を たべます か", "hira": "めん を たべます か", "mp3": "pb_q49_do_you_eat_noodles.mp3" },
+    { "n": 50, "en": "Do you have a ball?", "jp": "ぼーる が あります か", "hira": "ぼーる が あります か", "mp3": "pb_q50_do_you_have_a_ball.mp3" },
+    { "n": 51, "en": "Do you eat corn?", "jp": "とうもろこし を たべます か", "hira": "とうもろこし を たべます か", "mp3": "pb_q51_do_you_eat_corn.mp3" },
+    { "n": 52, "en": "Do you eat cucumber?", "jp": "きゅうり を たべます か", "hira": "きゅうり を たべます か", "mp3": "pb_q52_do_you_eat_cucumber.mp3" },
+    { "n": 53, "en": "Do you eat tomato?", "jp": "とまと を たべます か", "hira": "とまと を たべます か", "mp3": "pb_q53_do_you_eat_tomato.mp3" },
+
+    { "n": 54, "en": "Do you drink juice?", "jp": "じゅーす を のみます か", "hira": "じゅーす を のみます か", "mp3": "pb_q54_do_you_drink_juice.mp3" },
+    { "n": 55, "en": "Is it sweet?", "jp": "あまい です か", "hira": "あまい です か", "mp3": "pb_q55_is_it_sweet.mp3" },
+    { "n": 56, "en": "Is it salty?", "jp": "しょっぱい です か", "hira": "しょっぱい です か", "mp3": "pb_q56_is_it_salty.mp3" },
+    { "n": 57, "en": "Are you hungry?", "jp": "おなか すいた です か", "hira": "おなか すいた です か", "mp3": "pb_q57_are_you_hungry.mp3" },
+    { "n": 58, "en": "Are you thirsty?", "jp": "のど かわいた です か", "hira": "のど かわいた です か", "mp3": "pb_q58_are_you_thirsty.mp3" },
+    { "n": 59, "en": "Do you eat?", "jp": "たべます か", "hira": "たべます か", "mp3": "pb_q59_do_you_eat.mp3" },
+    { "n": 60, "en": "Is summer the best?", "jp": "なつ が いちばん です か", "hira": "なつ が いちばん です か", "mp3": "pb_q60_is_summer_the_best.mp3" }
+  ]
+}
