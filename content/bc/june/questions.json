@@ -1,1 +1,72 @@
 
+{
+  "cards": [
+    { "n": 1, "en": "Which do you find more enjoyable, summer or winter?", "jp": "夏と冬では、どちらの方が楽しいと感じますか。", "hira": "なつ と ふゆ では どちら の ほう が たのしい と かんじます か", "mp3": "bc_q01_which_do_you_find_more_enjoyable_summer_or_winter.mp3" },
+    { "n": 2, "en": "What aspects of summer do you enjoy the most?", "jp": "夏のどのような点が一番好きですか。", "hira": "なつ の どのような てん が いちばん すき です か", "mp3": "bc_q02_what_aspects_of_summer_do_you_enjoy_the_most.mp3" },
+    { "n": 3, "en": "How do you usually cope with extremely hot weather?", "jp": "とても暑いとき、どのように対処しますか。", "hira": "とても あつい とき どのように たいしょ します か", "mp3": "bc_q03_how_do_you_usually_cope_with_extremely_hot_weather.mp3" },
+    { "n": 4, "en": "Do you think summer temperatures are becoming too extreme?", "jp": "夏の気温は高くなりすぎていると思いますか。", "hira": "なつ の きおん は たかく なりすぎている と おもいます か", "mp3": "bc_q04_do_you_think_summer_temperatures_are_becoming_too_extreme.mp3" },
+    { "n": 5, "en": "What kind of summer activities help you relax?", "jp": "どのような夏の活動がリラックスに役立ちますか。", "hira": "どのような なつ の かつどう が りらっくす に やくだちます か", "mp3": "bc_q05_what_kind_of_summer_activities_help_you_relax.mp3" },
+    { "n": 6, "en": "Do you prefer spending time indoors or outdoors in summer?", "jp": "夏は室内と屋外のどちらで過ごす方が好きですか。", "hira": "なつ は しつない と おくがい の どちら で すごす ほう が すき です か", "mp3": "bc_q06_do_you_prefer_spending_time_indoors_or_outdoors_in_summer.mp3" },
+    { "n": 7, "en": "How often do you go to the beach during summer?", "jp": "夏の間、どのくらいの頻度でビーチに行きますか。", "hira": "なつ の あいだ どのくらい の ひんど で びーち に いきます か", "mp3": "bc_q07_how_often_do_you_go_to_the_beach_during_summer.mp3" },
+    { "n": 8, "en": "Which do you prefer, the beach or the mountains?", "jp": "海と山では、どちらの方が好きですか。", "hira": "うみ と やま では どちら の ほう が すき です か", "mp3": "bc_q08_which_do_you_prefer_the_beach_or_the_mountains.mp3" },
+
+    { "n": 9, "en": "What kind of food do you tend to eat more in summer?", "jp": "夏にはどのような食べ物をよく食べますか。", "hira": "なつ には どのような たべもの を よく たべます か", "mp3": "bc_q09_what_kind_of_food_do_you_tend_to_eat_more_in_summer.mp3" },
+    { "n": 10, "en": "Why do you think cold foods are popular in summer?", "jp": "なぜ夏には冷たい食べ物が人気だと思いますか。", "hira": "なぜ なつ には つめたい たべもの が にんき だ と おもいます か", "mp3": "bc_q10_why_do_you_think_cold_foods_are_popular_in_summer.mp3" },
+    { "n": 11, "en": "Have you ever participated in a traditional summer festival?", "jp": "伝統的な夏祭りに参加したことがありますか。", "hira": "でんとうてき な なつまつり に さんか した こと が あります か", "mp3": "bc_q11_have_you_ever_participated_in_a_traditional_summer_festival.mp3" },
+    { "n": 12, "en": "What do you usually do at summer festivals?", "jp": "夏祭りでは普段何をしますか。", "hira": "なつまつり では ふだん なに を します か", "mp3": "bc_q12_what_do_you_usually_do_at_summer_festivals.mp3" },
+    { "n": 13, "en": "Do you think fireworks are an important part of summer culture?", "jp": "花火は夏の文化において重要だと思いますか。", "hira": "はなび は なつ の ぶんか に おいて じゅうよう だ と おもいます か", "mp3": "bc_q13_do_you_think_fireworks_are_an_important_part_of_summer_culture.mp3" },
+    { "n": 14, "en": "When did you last attend a fireworks event?", "jp": "最後に花火大会に行ったのはいつですか。", "hira": "さいご に はなび たいかい に いった の は いつ です か", "mp3": "bc_q14_when_did_you_last_attend_a_fireworks_event.mp3" },
+    { "n": 15, "en": "What makes summer different from other seasons for you?", "jp": "あなたにとって夏は他の季節とどう違いますか。", "hira": "あなた に とって なつ は ほか の きせつ と どう ちがいます か", "mp3": "bc_q15_what_makes_summer_different_from_other_seasons_for_you.mp3" },
+
+    { "n": 16, "en": "Do you usually take time off during the summer?", "jp": "夏に休暇を取ることが多いですか。", "hira": "なつ に きゅうか を とる こと が おおい です か", "mp3": "bc_q16_do_you_usually_take_time_off_during_the_summer.mp3" },
+    { "n": 17, "en": "What factors influence your travel decisions?", "jp": "旅行先を決める際、どのような要素を重視しますか。", "hira": "りょこうさき を きめる さい どのような ようそ を じゅうし します か", "mp3": "bc_q17_what_factors_influence_your_travel_decisions.mp3" },
+    { "n": 18, "en": "Do you prefer traveling alone or with others?", "jp": "一人での旅行と他の人との旅行、どちらが好きですか。", "hira": "ひとり で の りょこう と ほか の ひと と の りょこう どちら が すき です か", "mp3": "bc_q18_do_you_prefer_traveling_alone_or_with_others.mp3" },
+    { "n": 19, "en": "What is your ideal travel destination for summer?", "jp": "夏の理想的な旅行先はどこですか。", "hira": "なつ の りそうてき な りょこうさき は どこ です か", "mp3": "bc_q19_what_is_your_ideal_travel_destination_for_summer.mp3" },
+    { "n": 20, "en": "How do you usually plan your trips?", "jp": "普段どのように旅行の計画を立てますか。", "hira": "ふだん どのように りょこう の けいかく を たてます か", "mp3": "bc_q20_how_do_you_usually_plan_your_trips.mp3" },
+    { "n": 21, "en": "Do you prefer structured plans or flexible schedules?", "jp": "計画的な予定と柔軟な予定、どちらが好きですか。", "hira": "けいかくてき な よてい と じゅうなん な よてい どちら が すき です か", "mp3": "bc_q21_do_you_prefer_structured_plans_or_flexible_schedules.mp3" },
+    { "n": 22, "en": "What kind of transportation do you prefer when traveling?", "jp": "旅行の際、どのような交通手段を好みますか。", "hira": "りょこう の さい どのような こうつうしゅだん を このみます か", "mp3": "bc_q22_what_kind_of_transportation_do_you_prefer_when_traveling.mp3" },
+    { "n": 23, "en": "What are the advantages of traveling by train?", "jp": "電車で旅行する利点は何だと思いますか。", "hira": "でんしゃ で りょこう する りてん は なん だ と おもいます か", "mp3": "bc_q23_what_are_the_advantages_of_traveling_by_train.mp3" },
+
+    { "n": 24, "en": "What preparations do you usually make before a trip?", "jp": "旅行前にはどのような準備をしますか。", "hira": "りょこう まえ には どのような じゅんび を します か", "mp3": "bc_q24_what_preparations_do_you_usually_make_before_a_trip.mp3" },
+    { "n": 25, "en": "How important is planning before traveling?", "jp": "旅行前の計画はどのくらい重要だと思いますか。", "hira": "りょこう まえ の けいかく は どのくらい じゅうよう だ と おもいます か", "mp3": "bc_q25_how_important_is_planning_before_traveling.mp3" },
+    { "n": 26, "en": "What items do you consider essential when traveling?", "jp": "旅行の際に必須だと思う持ち物は何ですか。", "hira": "りょこう の さい に ひっす だ と おもう もちもの は なん です か", "mp3": "bc_q26_what_items_do_you_consider_essential_when_traveling.mp3" },
+    { "n": 27, "en": "Have you ever forgotten something important while traveling?", "jp": "旅行中に大事な物を忘れたことがありますか。", "hira": "りょこうちゅう に だいじ な もの を わすれた こと が あります か", "mp3": "bc_q27_have_you_ever_forgotten_something_important_while_traveling.mp3" },
+    { "n": 28, "en": "How do you avoid forgetting important items?", "jp": "大事な物を忘れないためにどうしていますか。", "hira": "だいじ な もの を わすれない ため に どう しています か", "mp3": "bc_q28_how_do_you_avoid_forgetting_important_items.mp3" },
+    { "n": 29, "en": "Do you prefer packing light or bringing many items?", "jp": "荷物は少なくする方と多く持つ方、どちらが好きですか。", "hira": "にもつ は すくなく する ほう と おおく もつ ほう どちら が すき です か", "mp3": "bc_q29_do_you_prefer_packing_light_or_bringing_many_items.mp3" },
+    { "n": 30, "en": "What is the most challenging part of packing?", "jp": "荷造りで一番難しいことは何ですか。", "hira": "にづくり で いちばん むずかしい こと は なん です か", "mp3": "bc_q30_what_is_the_most_challenging_part_of_packing.mp3" },
+
+    { "n": 31, "en": "How do you decide what clothes to bring?", "jp": "どのように持って行く服を決めますか。", "hira": "どのように もっていく ふく を きめます か", "mp3": "bc_q31_how_do_you_decide_what_clothes_to_bring.mp3" },
+    { "n": 32, "en": "Do you check the weather forecast before packing?", "jp": "荷造りの前に天気予報を確認しますか。", "hira": "にづくり の まえ に てんき よほう を かくにん します か", "mp3": "bc_q32_do_you_check_the_weather_forecast_before_packing.mp3" },
+    { "n": 33, "en": "How do you manage your schedule while traveling?", "jp": "旅行中の予定はどのように管理しますか。", "hira": "りょこうちゅう の よてい は どのように かんり します か", "mp3": "bc_q33_how_do_you_manage_your_schedule_while_traveling.mp3" },
+    { "n": 34, "en": "Do you prefer busy travel plans or relaxing ones?", "jp": "忙しい旅行とゆったりした旅行、どちらが好きですか。", "hira": "いそがしい りょこう と ゆったり した りょこう どちら が すき です か", "mp3": "bc_q34_do_you_prefer_busy_travel_plans_or_relaxing_ones.mp3" },
+    { "n": 35, "en": "What do you usually do when you have free time on a trip?", "jp": "旅行中の自由時間には何をしますか。", "hira": "りょこうちゅう の じゆうじかん には なに を します か", "mp3": "bc_q35_what_do_you_usually_do_when_you_have_free_time_on_a_trip.mp3" },
+
+    { "n": 36, "en": "What types of food do you associate with summer?", "jp": "夏といえばどのような食べ物を思い浮かべますか。", "hira": "なつ と いえば どのような たべもの を おもいうかべます か", "mp3": "bc_q36_what_types_of_food_do_you_associate_with_summer.mp3" },
+    { "n": 37, "en": "Why do people tend to eat lighter meals in summer?", "jp": "なぜ夏は軽い食事をする人が多いのでしょうか。", "hira": "なぜ なつ は かるい しょくじ を する ひと が おおい のでしょうか", "mp3": "bc_q37_why_do_people_tend_to_eat_lighter_meals_in_summer.mp3" },
+    { "n": 38, "en": "Do you prefer eating at home or dining out in summer?", "jp": "夏は家で食べるのと外食、どちらが好きですか。", "hira": "なつ は いえ で たべる の と がいしょく どちら が すき です か", "mp3": "bc_q38_do_you_prefer_eating_at_home_or_dining_out_in_summer.mp3" },
+    { "n": 39, "en": "What is your favorite summer dessert?", "jp": "夏の好きなデザートは何ですか。", "hira": "なつ の すき な でざーと は なん です か", "mp3": "bc_q39_what_is_your_favorite_summer_dessert.mp3" },
+    { "n": 40, "en": "Do you enjoy trying seasonal foods?", "jp": "季節の食べ物を試すのが好きですか。", "hira": "きせつ の たべもの を ためす の が すき です か", "mp3": "bc_q40_do_you_enjoy_trying_seasonal_foods.mp3" },
+
+    { "n": 41, "en": "How does your appetite change in hot weather?", "jp": "暑いとき、食欲はどのように変わりますか。", "hira": "あつい とき しょくよく は どのように かわります か", "mp3": "bc_q41_how_does_your_appetite_change_in_hot_weather.mp3" },
+    { "n": 42, "en": "Do you think summer food is healthier?", "jp": "夏の食べ物は健康的だと思いますか。", "hira": "なつ の たべもの は けんこうてき だ と おもいます か", "mp3": "bc_q42_do_you_think_summer_food_is_healthier.mp3" },
+    { "n": 43, "en": "What do you usually drink to stay hydrated?", "jp": "水分補給のために普段何を飲みますか。", "hira": "すいぶん ほきゅう の ため に ふだん なに を のみます か", "mp3": "bc_q43_what_do_you_usually_drink_to_stay_hydrated.mp3" },
+    { "n": 44, "en": "How important is hydration during summer?", "jp": "夏に水分補給はどのくらい重要だと思いますか。", "hira": "なつ に すいぶん ほきゅう は どのくらい じゅうよう だ と おもいます か", "mp3": "bc_q44_how_important_is_hydration_during_summer.mp3" },
+    { "n": 45, "en": "Do you think people eat differently depending on the season?", "jp": "人は季節によって食べ方が変わると思いますか。", "hira": "ひと は きせつ に よって たべかた が かわる と おもいます か", "mp3": "bc_q45_do_you_think_people_eat_differently_depending_on_the_season.mp3" },
+    { "n": 46, "en": "What makes a meal memorable for you?", "jp": "どのような食事が思い出に残りますか。", "hira": "どのような しょくじ が おもいで に のこります か", "mp3": "bc_q46_what_makes_a_meal_memorable_for_you.mp3" },
+
+    { "n": 47, "en": "What kind of travel experience would you like to have this summer?", "jp": "この夏、どのような旅行体験をしてみたいですか。", "hira": "この なつ どのような りょこう たいけん を してみたい です か", "mp3": "bc_q47_what_kind_of_travel_experience_would_you_like_to_have_this_summer.mp3" },
+    { "n": 48, "en": "Do you think traveling broadens your perspective?", "jp": "旅行は視野を広げると思いますか。", "hira": "りょこう は しや を ひろげる と おもいます か", "mp3": "bc_q48_do_you_think_traveling_broadens_your_perspective.mp3" },
+    { "n": 49, "en": "What do you value more, comfort or adventure, when traveling?", "jp": "旅行では快適さと冒険のどちらをより重視しますか。", "hira": "りょこう では かいてきさ と ぼうけん の どちら を より じゅうし します か", "mp3": "bc_q49_what_do_you_value_more_comfort_or_adventure_when_traveling.mp3" },
+    { "n": 50, "en": "How do you choose a place to stay when you travel?", "jp": "旅行するとき、宿泊先はどのように選びますか。", "hira": "りょこう するとき しゅくはくさき は どのように えらびます か", "mp3": "bc_q50_how_do_you_choose_a_place_to_stay_when_you_travel.mp3" },
+    { "n": 51, "en": "What is more important to you, convenience or cost?", "jp": "あなたにとって、便利さと費用ではどちらが重要ですか。", "hira": "あなた に とって べんりさ と ひよう では どちら が じゅうよう です か", "mp3": "bc_q51_what_is_more_important_to_you_convenience_or_cost.mp3" },
+    { "n": 52, "en": "Do you usually research a destination before visiting it?", "jp": "旅行先について、行く前にたいてい調べますか。", "hira": "りょこうさき について いく まえ に たいてい しらべます か", "mp3": "bc_q52_do_you_usually_research_a_destination_before_visiting_it.mp3" },
+    { "n": 53, "en": "What information do you look for before making a reservation?", "jp": "予約をする前に、どのような情報を確認しますか。", "hira": "よやく を する まえ に どのような じょうほう を かくにん します か", "mp3": "bc_q53_what_information_do_you_look_for_before_making_a_reservation.mp3" },
+    { "n": 54, "en": "How do you handle unexpected changes to your plans?", "jp": "予定外の変更があったとき、どのように対応しますか。", "hira": "よていがい の へんこう が あった とき どのように たいおう します か", "mp3": "bc_q54_how_do_you_handle_unexpected_changes_to_your_plans.mp3" },
+    { "n": 55, "en": "Do you think flexibility is important when traveling?", "jp": "旅行では柔軟さが重要だと思いますか。", "hira": "りょこう では じゅうなんさ が じゅうよう だ と おもいます か", "mp3": "bc_q55_do_you_think_flexibility_is_important_when_traveling.mp3" },
+    { "n": 56, "en": "What kind of souvenirs are the most meaningful to you?", "jp": "どのようなおみやげが一番意味があると思いますか。", "hira": "どのような おみやげ が いちばん いみ が ある と おもいます か", "mp3": "bc_q56_what_kind_of_souvenirs_are_the_most_meaningful_to_you.mp3" },
+    { "n": 57, "en": "Do you prefer practical souvenirs or memorable ones?", "jp": "実用的なおみやげと思い出に残るおみやげでは、どちらが好きですか。", "hira": "じつようてき な おみやげ と おもいで に のこる おみやげ では どちら が すき です か", "mp3": "bc_q57_do_you_prefer_practical_souvenirs_or_memorable_ones.mp3" },
+    { "n": 58, "en": "How do seasonal foods influence your impression of summer?", "jp": "季節の食べ物は夏の印象にどのような影響を与えますか。", "hira": "きせつ の たべもの は なつ の いんしょう に どのような えいきょう を あたえます か", "mp3": "bc_q58_how_do_seasonal_foods_influence_your_impression_of_summer.mp3" },
+    { "n": 59, "en": "What makes summer feel memorable to you?", "jp": "あなたにとって、夏が思い出に残るのはどのようなときですか。", "hira": "あなた に とって なつ が おもいで に のこる の は どのような とき です か", "mp3": "bc_q59_what_makes_summer_feel_memorable_to_you.mp3" },
+    { "n": 60, "en": "If you could design your ideal summer, what would it include?", "jp": "理想の夏をデザインできるとしたら、どのようなものを入れたいですか。", "hira": "りそう の なつ を でざいん できる と したら どのような もの を いれたい です か", "mp3": "bc_q60_if_you_could_design_your_ideal_summer_what_would_it_include.mp3" }
+  ]
+}

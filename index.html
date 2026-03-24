@@ -835,20 +835,16 @@ function makeWeekIdFromCalendarWeek(cal) {
   return `${shortMonthKeyFromSlug(cal.monthSlug)}_w${cal.weekNumber}`;
 }
 
+// REPLACE WITH:
 function shiftCurriculumWeek(base, delta) {
-  let month = base.month;
-  let year  = base.year;
-  let weekNumber = base.weekNumber + delta;
-  while (weekNumber < 1) { month -= 1; if (month < 1) { month = 12; year -= 1; } weekNumber += 4; }
-  while (weekNumber > 4) { weekNumber -= 4; month += 1; if (month > 12) { month = 1; year += 1; } }
-  const slugMap = ['january','february','march','april','may','june','july','august','september','october','november','december'];
-  const monthSlug  = slugMap[month - 1];
-  const monthLabel = fullMonthLabelFromSlug(monthSlug);
-  const weekStart  = addDaysToIso(base.weekStart, delta * 7);
-  const weekEnd    = addDaysToIso(base.weekEnd,   delta * 7);
-  return { year, month, monthSlug, monthLabel, weekNumber, weekId: `${monthSlug}-w${weekNumber}`, weekStart, weekEnd };
+  // Shift the actual week-start date by delta weeks, then resolve through
+  // the same calendar logic as getCurrentCurriculumWeek(). This correctly
+  // handles the repeat-week rule (week 4 repeats if the new month hasn't started).
+  const shiftedDate = new Date(base.weekStart + 'T12:00:00Z');
+  shiftedDate.setUTCDate(shiftedDate.getUTCDate() + delta * 7);
+  return window.CALENDAR.getCurrentCurriculumWeek(shiftedDate);
 }
-
+  
 function buildWeekData() {
   const current = getCurrentCurriculumWeek();
   const last    = shiftCurriculumWeek(current, -1);
