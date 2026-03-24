@@ -186,7 +186,7 @@
     /* ── index 4: Jamariko — room_05 ── */
     {
       index:4, roomId:'room_05', x:1054, y:354, type:'stay',
-      frames:['jamariko-1.png','jamariko-2.png'], color:'#fff176', size:52,
+      frames:['jamariko-1.png','jamariko-2.png'], color:'#fff176', size:65,
       name:'Jamariko', nameJP:'ジャマリコ', nameKanji:'邪魔里子',
       desc:'She stands in your way, but only out of love.'
     },
