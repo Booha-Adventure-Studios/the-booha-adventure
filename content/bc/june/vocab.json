@@ -1,1 +1,73 @@
 
+{
+  "cards": [
+    { "n": 1, "en": "seasonal", "jp": "季節の", "hira": "きせつ の", "mp3": "bc_v01_seasonal.mp3" },
+    { "n": 2, "en": "humid", "jp": "蒸し暑い", "hira": "むしあつい", "mp3": "bc_v02_humid.mp3" },
+    { "n": 3, "en": "temperature", "jp": "気温", "hira": "きおん", "mp3": "bc_v03_temperature.mp3" },
+    { "n": 4, "en": "forecast", "jp": "予報", "hira": "よほう", "mp3": "bc_v04_forecast.mp3" },
+    { "n": 5, "en": "sunlight", "jp": "日差し", "hira": "ひざし", "mp3": "bc_v05_sunlight.mp3" },
+    { "n": 6, "en": "climate", "jp": "気候", "hira": "きこう", "mp3": "bc_v06_climate.mp3" },
+    { "n": 7, "en": "environment", "jp": "環境", "hira": "かんきょう", "mp3": "bc_v07_environment.mp3" },
+    { "n": 8, "en": "condition", "jp": "状態", "hira": "じょうたい", "mp3": "bc_v08_condition.mp3" },
+
+    { "n": 9, "en": "refreshing", "jp": "さわやかな", "hira": "さわやか な", "mp3": "bc_v09_refreshing.mp3" },
+    { "n": 10, "en": "exhausting", "jp": "疲れる", "hira": "つかれる", "mp3": "bc_v10_exhausting.mp3" },
+    { "n": 11, "en": "comfortable", "jp": "快適な", "hira": "かいてき な", "mp3": "bc_v11_comfortable.mp3" },
+    { "n": 12, "en": "unbearable", "jp": "耐えられない", "hira": "たえられない", "mp3": "bc_v12_unbearable.mp3" },
+    { "n": 13, "en": "protect", "jp": "守る", "hira": "まもる", "mp3": "bc_v13_protect.mp3" },
+    { "n": 14, "en": "exposure", "jp": "露出", "hira": "ろしゅつ", "mp3": "bc_v14_exposure.mp3" },
+    { "n": 15, "en": "risk", "jp": "危険", "hira": "きけん", "mp3": "bc_v15_risk.mp3" },
+
+    { "n": 16, "en": "vacation", "jp": "休暇", "hira": "きゅうか", "mp3": "bc_v16_vacation.mp3" },
+    { "n": 17, "en": "destination", "jp": "目的地", "hira": "もくてきち", "mp3": "bc_v17_destination.mp3" },
+    { "n": 18, "en": "itinerary", "jp": "日程", "hira": "にってい", "mp3": "bc_v18_itinerary.mp3" },
+    { "n": 19, "en": "accommodation", "jp": "宿泊施設", "hira": "しゅくはく しせつ", "mp3": "bc_v19_accommodation.mp3" },
+    { "n": 20, "en": "reservation", "jp": "予約", "hira": "よやく", "mp3": "bc_v20_reservation.mp3" },
+    { "n": 21, "en": "availability", "jp": "空き状況", "hira": "あき じょうきょう", "mp3": "bc_v21_availability.mp3" },
+    { "n": 22, "en": "confirmation", "jp": "確認", "hira": "かくにん", "mp3": "bc_v22_confirmation.mp3" },
+    { "n": 23, "en": "cancellation", "jp": "キャンセル", "hira": "きゃんせる", "mp3": "bc_v23_cancellation.mp3" },
+
+    { "n": 24, "en": "transportation", "jp": "交通手段", "hira": "こうつう しゅだん", "mp3": "bc_v24_transportation.mp3" },
+    { "n": 25, "en": "departure", "jp": "出発", "hira": "しゅっぱつ", "mp3": "bc_v25_departure.mp3" },
+    { "n": 26, "en": "arrival", "jp": "到着", "hira": "とうちゃく", "mp3": "bc_v26_arrival.mp3" },
+    { "n": 27, "en": "delay", "jp": "遅れ", "hira": "おくれ", "mp3": "bc_v27_delay.mp3" },
+    { "n": 28, "en": "schedule", "jp": "予定", "hira": "よてい", "mp3": "bc_v28_schedule.mp3" },
+    { "n": 29, "en": "transfer", "jp": "乗り換え", "hira": "のりかえ", "mp3": "bc_v29_transfer.mp3" },
+    { "n": 30, "en": "fare", "jp": "運賃", "hira": "うんちん", "mp3": "bc_v30_fare.mp3" },
+
+    { "n": 31, "en": "luggage", "jp": "荷物", "hira": "にもつ", "mp3": "bc_v31_luggage.mp3" },
+    { "n": 32, "en": "baggage", "jp": "手荷物", "hira": "てにもつ", "mp3": "bc_v32_baggage.mp3" },
+    { "n": 33, "en": "packing", "jp": "荷造り", "hira": "にづくり", "mp3": "bc_v33_packing.mp3" },
+    { "n": 34, "en": "essential", "jp": "必須の", "hira": "ひっす の", "mp3": "bc_v34_essential.mp3" },
+    { "n": 35, "en": "item", "jp": "品物", "hira": "しなもの", "mp3": "bc_v35_item.mp3" },
+    { "n": 36, "en": "prepare", "jp": "準備する", "hira": "じゅんび する", "mp3": "bc_v36_prepare.mp3" },
+    { "n": 37, "en": "organize", "jp": "整理する", "hira": "せいり する", "mp3": "bc_v37_organize.mp3" },
+
+    { "n": 38, "en": "local", "jp": "地元の", "hira": "じもと の", "mp3": "bc_v38_local.mp3" },
+    { "n": 39, "en": "cuisine", "jp": "料理", "hira": "りょうり", "mp3": "bc_v39_cuisine.mp3" },
+    { "n": 40, "en": "ingredient", "jp": "材料", "hira": "ざいりょう", "mp3": "bc_v40_ingredient.mp3" },
+    { "n": 41, "en": "flavor", "jp": "風味", "hira": "ふうみ", "mp3": "bc_v41_flavor.mp3" },
+    { "n": 42, "en": "spicy", "jp": "辛い", "hira": "からい", "mp3": "bc_v42_spicy.mp3" },
+    { "n": 43, "en": "bitter", "jp": "苦い", "hira": "にがい", "mp3": "bc_v43_bitter.mp3" },
+    { "n": 44, "en": "fresh", "jp": "新鮮な", "hira": "しんせん な", "mp3": "bc_v44_fresh.mp3" },
+
+    { "n": 45, "en": "appetite", "jp": "食欲", "hira": "しょくよく", "mp3": "bc_v45_appetite.mp3" },
+    { "n": 46, "en": "satisfaction", "jp": "満足", "hira": "まんぞく", "mp3": "bc_v46_satisfaction.mp3" },
+    { "n": 47, "en": "nutrition", "jp": "栄養", "hira": "えいよう", "mp3": "bc_v47_nutrition.mp3" },
+    { "n": 48, "en": "hydrate", "jp": "水分補給する", "hira": "すいぶん ほきゅう する", "mp3": "bc_v48_hydrate.mp3" },
+    { "n": 49, "en": "consume", "jp": "消費する", "hira": "しょうひ する", "mp3": "bc_v49_consume.mp3" },
+    { "n": 50, "en": "portion", "jp": "一人前", "hira": "ひとりまえ", "mp3": "bc_v50_portion.mp3" },
+    { "n": 51, "en": "variety", "jp": "種類", "hira": "しゅるい", "mp3": "bc_v51_variety.mp3" },
+
+    { "n": 52, "en": "experience", "jp": "経験", "hira": "けいけん", "mp3": "bc_v52_experience.mp3" },
+    { "n": 53, "en": "activity", "jp": "活動", "hira": "かつどう", "mp3": "bc_v53_activity.mp3" },
+    { "n": 54, "en": "explore", "jp": "探検する", "hira": "たんけん する", "mp3": "bc_v54_explore.mp3" },
+    { "n": 55, "en": "relax", "jp": "リラックスする", "hira": "りらっくす する", "mp3": "bc_v55_relax.mp3" },
+    { "n": 56, "en": "enjoy", "jp": "楽しむ", "hira": "たのしむ", "mp3": "bc_v56_enjoy.mp3" },
+    { "n": 57, "en": "recommend", "jp": "おすすめする", "hira": "おすすめ する", "mp3": "bc_v57_recommend.mp3" },
+    { "n": 58, "en": "memorable", "jp": "思い出に残る", "hira": "おもいで に のこる", "mp3": "bc_v58_memorable.mp3" },
+
+    { "n": 59, "en": "opportunity", "jp": "機会", "hira": "きかい", "mp3": "bc_v59_opportunity.mp3" },
+    { "n": 60, "en": "impression", "jp": "印象", "hira": "いんしょう", "mp3": "bc_v60_impression.mp3" }
+  ]
+}
