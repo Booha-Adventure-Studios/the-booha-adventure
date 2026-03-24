@@ -873,11 +873,17 @@ const IMG_H = 900;
 const CURRENT_WEEK_DATA = getCurrentCurriculumWeek();
 const CURRENT_WEEK = getAcademicWeekNumber(CURRENT_WEEK_DATA);
 
-const OPEN_WEEKS = [
-  Math.max(1, CURRENT_WEEK - 1),
-  CURRENT_WEEK,
-  Math.min(48, CURRENT_WEEK + 1)
-];
+  
+const _lastData = window.CALENDAR.getCurrentCurriculumWeek(
+  new Date(new Date(CURRENT_WEEK_DATA.weekStart + 'T12:00:00Z').getTime() - 7*24*60*60*1000)
+);
+const _nextData = window.CALENDAR.getCurrentCurriculumWeek(
+  new Date(new Date(CURRENT_WEEK_DATA.weekStart + 'T12:00:00Z').getTime() + 7*24*60*60*1000)
+);
+const _lastW = getAcademicWeekNumber(_lastData);
+const _nextW = getAcademicWeekNumber(_nextData);
+const OPEN_WEEKS = [Math.max(1, _lastW), CURRENT_WEEK];
+if (_nextData.weekId !== CURRENT_WEEK_DATA.weekId) OPEN_WEEKS.push(Math.min(48, _nextW));
 
 const GHOST_TRAVEL_MS = 3800;
 
@@ -1436,22 +1442,35 @@ function startGhostTravel(cp){
   ghostT=0;ghostAnimStart=performance.now();activeWeek=cp.w;pendingPopupCP=cp;setTravelLock(true);
 }
 
+
+
 function showPopupAtCP(cp){
-  const diff=cp.w-CURRENT_WEEK;
+  // Resolve cp's actual week dates through calendar.js — handles repeat weeks correctly.
+  // Shift the current week's Sunday start by (cp.w - CURRENT_WEEK) * 7 days, then resolve.
+  const cpWeekData = window.CALENDAR.getCurrentCurriculumWeek(
+    new Date(new Date(CURRENT_WEEK_DATA.weekStart + 'T12:00:00Z').getTime()
+      + (cp.w - CURRENT_WEEK) * 7 * 24 * 60 * 60 * 1000)
+  );
+  // Diff based on resolved weekId strings, not raw week numbers
+  const sameWeek = cpWeekData.weekId === CURRENT_WEEK_DATA.weekId;
+  const isPast   = cp.w < CURRENT_WEEK;
+  const diff     = sameWeek ? 0 : isPast ? -1 : 1;
   cpWeekLabel.textContent=diff===0?'今週のブーハー':diff<0?'先週のブーハー':'来週のブーハー';
   const col1=monthPrimary(cp.w),col2=monthSecondary(cp.w);
   cpPopupBar.style.background=`linear-gradient(90deg,${col1},${col2})`;cpPopupBar.style.boxShadow=`0 0 14px ${col1}88,0 0 28px ${col2}55`;
   cpTitle.textContent='GAMES';
-  const weekStart=new Date(CURRENT_WEEK_DATA.weekStart);
-  const start=new Date(weekStart);start.setDate(start.getDate()+(cp.w-CURRENT_WEEK)*7);
-  const end=new Date(start);end.setDate(end.getDate()+6);
+  // Use the calendar-resolved dates — correct even during repeat weeks
+  const start=new Date(cpWeekData.weekStart+'T12:00:00Z');
+  const end=new Date(cpWeekData.weekEnd+'T12:00:00Z');
   const en=start.toLocaleDateString('en-US',{month:'short',day:'numeric'})+' – '+end.toLocaleDateString('en-US',{month:'short',day:'numeric'});
   const jp=start.toLocaleDateString('ja-JP',{month:'numeric',day:'numeric'})+'–'+end.toLocaleDateString('ja-JP',{month:'numeric',day:'numeric'});
   cpPopupDate.innerHTML=`${en}<br><span style="font-size:0.88em;opacity:0.7">${jp}</span>`;
   cpWeekBadge.classList.remove('visible');cpWeekBadge.style.background='';cpWeekBadge.style.color='';cpWeekBadge.textContent='';
   if(diff===0){cpWeekBadge.textContent='★ THIS WEEK / 今週 ★';cpWeekBadge.style.background=`linear-gradient(90deg,${col1},${col2})`;cpWeekBadge.style.color='#000';cpWeekBadge.classList.add('visible');}
   else if(diff<0){cpWeekBadge.textContent='← LAST WEEK / 先週';cpWeekBadge.style.background='rgba(255,255,255,0.12)';cpWeekBadge.style.color='rgba(255,255,255,0.75)';cpWeekBadge.classList.add('visible');}
-  else{cpWeekBadge.textContent='NEXT WEEK / 来週 →';cpWeekBadge.style.background='rgba(255,255,255,0.12)';cpWeekBadge.style.color='rgba(255,255,255,0.75)';cpWeekBadge.classList.add('visible');}
+  else{cpWeekBadge.textContent='NEXT WEEK / 来週 →';cpWeekBadge.style.background='rgba(255,255,255,0.12)';cpWeekBadge.style.color='rgba(255,255,255,0.75)';cpWeekBadge.classList.add('visible');}  
+
+  
   cpScrim.classList.add('show');cpPopup.classList.remove('show');void cpPopup.offsetWidth;cpPopup.classList.add('show');
 }
 

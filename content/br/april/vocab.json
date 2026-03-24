@@ -1,1 +1,72 @@
 
+{
+  "cards": [
+    { "n": 1, "en": "country", "jp": "国", "hira": "くに", "mp3": "br_v01_country.mp3" },
+    { "n": 2, "en": "world", "jp": "世界", "hira": "せかい", "mp3": "br_v02_world.mp3" },
+    { "n": 3, "en": "continent", "jp": "大陸", "hira": "たいりく", "mp3": "br_v03_continent.mp3" },
+    { "n": 4, "en": "map", "jp": "地図", "hira": "ちず", "mp3": "br_v04_map.mp3" },
+    { "n": 5, "en": "flag", "jp": "旗", "hira": "はた", "mp3": "br_v05_flag.mp3" },
+    { "n": 6, "en": "capital", "jp": "首都", "hira": "しゅと", "mp3": "br_v06_capital.mp3" },
+    { "n": 7, "en": "city", "jp": "都市", "hira": "とし", "mp3": "br_v07_city.mp3" },
+    { "n": 8, "en": "island", "jp": "島", "hira": "しま", "mp3": "br_v08_island.mp3" },
+    { "n": 9, "en": "mountain", "jp": "山", "hira": "やま", "mp3": "br_v09_mountain.mp3" },
+
+    { "n": 10, "en": "river", "jp": "川", "hira": "かわ", "mp3": "br_v10_river.mp3" },
+    { "n": 11, "en": "sea", "jp": "海", "hira": "うみ", "mp3": "br_v11_sea.mp3" },
+    { "n": 12, "en": "language", "jp": "言語", "hira": "げんご", "mp3": "br_v12_language.mp3" },
+    { "n": 13, "en": "nationality", "jp": "国籍", "hira": "こくせき", "mp3": "br_v13_nationality.mp3" },
+    { "n": 14, "en": "culture", "jp": "文化", "hira": "ぶんか", "mp3": "br_v14_culture.mp3" },
+    { "n": 15, "en": "tradition", "jp": "伝統", "hira": "でんとう", "mp3": "br_v15_tradition.mp3" },
+    { "n": 16, "en": "festival", "jp": "祭り", "hira": "まつり", "mp3": "br_v16_festival.mp3" },
+
+    { "n": 17, "en": "landmark", "jp": "名所", "hira": "めいしょ", "mp3": "br_v17_landmark.mp3" },
+    { "n": 18, "en": "castle", "jp": "城", "hira": "しろ", "mp3": "br_v18_castle.mp3" },
+    { "n": 19, "en": "temple", "jp": "寺", "hira": "てら", "mp3": "br_v19_temple.mp3" },
+    { "n": 20, "en": "shrine", "jp": "神社", "hira": "じんじゃ", "mp3": "br_v20_shrine.mp3" },
+    { "n": 21, "en": "tower", "jp": "タワー", "hira": "たわー", "mp3": "br_v21_tower.mp3" },
+    { "n": 22, "en": "bridge", "jp": "橋", "hira": "はし", "mp3": "br_v22_bridge.mp3" },
+    { "n": 23, "en": "museum", "jp": "博物館", "hira": "はくぶつかん", "mp3": "br_v23_museum.mp3" },
+    { "n": 24, "en": "statue", "jp": "像", "hira": "ぞう", "mp3": "br_v24_statue.mp3" },
+
+    { "n": 25, "en": "park", "jp": "公園", "hira": "こうえん", "mp3": "br_v25_park.mp3" },
+    { "n": 26, "en": "garden", "jp": "庭園", "hira": "ていえん", "mp3": "br_v26_garden.mp3" },
+    { "n": 27, "en": "palace", "jp": "宮殿", "hira": "きゅうでん", "mp3": "br_v27_palace.mp3" },
+    { "n": 28, "en": "square", "jp": "広場", "hira": "ひろば", "mp3": "br_v28_square.mp3" },
+    { "n": 29, "en": "market", "jp": "市場", "hira": "いちば", "mp3": "br_v29_market.mp3" },
+    { "n": 30, "en": "street", "jp": "通り", "hira": "とおり", "mp3": "br_v30_street.mp3" },
+    { "n": 31, "en": "ticket", "jp": "チケット", "hira": "ちけっと", "mp3": "br_v31_ticket.mp3" },
+
+    { "n": 32, "en": "custom", "jp": "習慣", "hira": "しゅうかん", "mp3": "br_v32_custom.mp3" },
+    { "n": 33, "en": "greeting", "jp": "あいさつ", "hira": "あいさつ", "mp3": "br_v33_greeting.mp3" },
+    { "n": 34, "en": "bow", "jp": "おじぎ", "hira": "おじぎ", "mp3": "br_v34_bow.mp3" },
+    { "n": 35, "en": "handshake", "jp": "握手", "hira": "あくしゅ", "mp3": "br_v35_handshake.mp3" },
+    { "n": 36, "en": "chopsticks", "jp": "箸", "hira": "はし", "mp3": "br_v36_chopsticks.mp3" },
+    { "n": 37, "en": "shoes", "jp": "靴", "hira": "くつ", "mp3": "br_v37_shoes.mp3" },
+    { "n": 38, "en": "gift", "jp": "贈り物", "hira": "おくりもの", "mp3": "br_v38_gift.mp3" },
+
+    { "n": 39, "en": "clothes", "jp": "服", "hira": "ふく", "mp3": "br_v39_clothes.mp3" },
+    { "n": 40, "en": "food", "jp": "食べ物", "hira": "たべもの", "mp3": "br_v40_food.mp3" },
+    { "n": 41, "en": "holiday", "jp": "祝日", "hira": "しゅくじつ", "mp3": "br_v41_holiday.mp3" },
+    { "n": 42, "en": "rule", "jp": "ルール", "hira": "るーる", "mp3": "br_v42_rule.mp3" },
+    { "n": 43, "en": "polite", "jp": "丁寧な", "hira": "ていねいな", "mp3": "br_v43_polite.mp3" },
+    { "n": 44, "en": "respect", "jp": "尊重する", "hira": "そんちょうする", "mp3": "br_v44_respect.mp3" },
+    { "n": 45, "en": "compare", "jp": "比べる", "hira": "くらべる", "mp3": "br_v45_compare.mp3" },
+
+    { "n": 46, "en": "airport", "jp": "空港", "hira": "くうこう", "mp3": "br_v46_airport.mp3" },
+    { "n": 47, "en": "station", "jp": "駅", "hira": "えき", "mp3": "br_v47_station.mp3" },
+    { "n": 48, "en": "passport", "jp": "パスポート", "hira": "ぱすぽーと", "mp3": "br_v48_passport.mp3" },
+    { "n": 49, "en": "baggage", "jp": "手荷物", "hira": "てにもつ", "mp3": "br_v49_baggage.mp3" },
+    { "n": 50, "en": "suitcase", "jp": "スーツケース", "hira": "すーつけーす", "mp3": "br_v50_suitcase.mp3" },
+    { "n": 51, "en": "hotel", "jp": "ホテル", "hira": "ほてる", "mp3": "br_v51_hotel.mp3" },
+    { "n": 52, "en": "hostel", "jp": "ホステル", "hira": "ほすてる", "mp3": "br_v52_hostel.mp3" },
+
+    { "n": 53, "en": "guidebook", "jp": "ガイドブック", "hira": "がいどぶっく", "mp3": "br_v53_guidebook.mp3" },
+    { "n": 54, "en": "plan", "jp": "計画", "hira": "けいかく", "mp3": "br_v54_plan.mp3" },
+    { "n": 55, "en": "schedule", "jp": "予定", "hira": "よてい", "mp3": "br_v55_schedule.mp3" },
+    { "n": 56, "en": "reservation", "jp": "予約", "hira": "よやく", "mp3": "br_v56_reservation.mp3" },
+    { "n": 57, "en": "train", "jp": "電車", "hira": "でんしゃ", "mp3": "br_v57_train.mp3" },
+    { "n": 58, "en": "flight", "jp": "便", "hira": "びん", "mp3": "br_v58_flight.mp3" },
+    { "n": 59, "en": "souvenir", "jp": "お土産", "hira": "おみやげ", "mp3": "br_v59_souvenir.mp3" },
+    { "n": 60, "en": "travel", "jp": "旅行", "hira": "りょこう", "mp3": "br_v60_travel.mp3" }
+  ]
+}
