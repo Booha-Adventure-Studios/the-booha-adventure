@@ -10,17 +10,16 @@
   const WORLD_H         = 1024;
   const GHOST_R         = 26;
   const GHOST_RADIUS    = 18;
-  const BASE_SPEED      = 3.2;          // world-units per frame at 60 fps
+  const BASE_SPEED      = 3.2;
   const FADE_MS         = 600;
   const CLICK_STOP_DIST = 6;
   const HOVER_AMP       = 9;
   const HOVER_PERIOD    = 1500;
   const TRAIL_MAX       = 90;
 
-  /* Delta-time speed: keeps movement frame-rate independent on Android */
-  const TARGET_DT       = 1000 / 60;   // 16.67 ms — reference frame time
+  const TARGET_DT       = 1000 / 60;
   let   lastTickTime    = 0;
-  let   SPEED           = BASE_SPEED;  // recalculated each tick
+  let   SPEED           = BASE_SPEED;
 
   const PORTAL = { x: 357, y: 342, r: 40, href: "adventure-profile.html" };
 
@@ -35,7 +34,7 @@
   };
 
   const ARRIVAL_ARROW_DELAY_MS        = 2000;
-  const ARRIVAL_ARROW_BACK_MULTIPLIER = 3;    // back-direction arrow delayed 3× longer
+  const ARRIVAL_ARROW_BACK_MULTIPLIER = 3;
   const TRANSITION_COOLDOWN_MS        = 1400;
   const ARROW_MOVE_THRESHOLD          = 30;
   const PORTAL_TRIGGER_R              = 36;
@@ -60,7 +59,7 @@
   const secondary = monthSecondary(boohaWeek);
 
   /* ═══════════════════════════════════════════
-     NPP
+     NPP  — updated exit coordinates
   ═══════════════════════════════════════════ */
   const NPP_RADIUS = 40;
 
@@ -89,13 +88,13 @@
       { dir: "up",    x: 435,  y: 246,  to: "room_10", spawn: "fromDown"  }
     ],
     room_06: [
-      { dir: "right", x: 1410, y: 684,  to: "room_07", spawn: "fromLeft"  },
+      { dir: "right", x: 1229, y: 652,  to: "room_07", spawn: "fromLeft"  }, // updated
       { dir: "up",    x: 1096, y: 165,  to: "room_11", spawn: "fromDown"  },
       { dir: "down",  x: 623,  y: 910,  to: "room_01", spawn: "fromUp"    }
     ],
     room_07: [
       { dir: "left",  x: 80,   y: 687,  to: "room_06", spawn: "fromRight" },
-      { dir: "right", x: 1440, y: 615,  to: "room_08", spawn: "fromLeft"  },
+      { dir: "right", x: 1220, y: 614,  to: "room_08", spawn: "fromLeft"  }, // updated
       { dir: "up",    x: 555,  y: 185,  to: "room_12", spawn: "fromDown"  },
       { dir: "down",  x: 901,  y: 865,  to: "room_02", spawn: "fromUp"    }
     ],
@@ -122,7 +121,7 @@
     ],
     room_12: [
       { dir: "left",  x: 210,  y: 344,  to: "room_11", spawn: "fromRight" },
-      { dir: "right", x: 1440, y: 716,  to: "room_13", spawn: "fromLeft"  },
+      { dir: "right", x: 1251, y: 671,  to: "room_13", spawn: "fromLeft"  }, // updated
       { dir: "down",  x: 751,  y: 888,  to: "room_07", spawn: "fromUp"    }
     ],
     room_13: [
@@ -144,458 +143,482 @@
   const DIR_ANGLE = { right: 0, down: Math.PI / 2, left: Math.PI, up: -Math.PI / 2 };
 
   let arrivalArrowHiddenUntil     = 0;
-  let arrivalArrowBackHiddenUntil = 0; // separate 3× timer for the back-direction arrow
+  let arrivalArrowBackHiddenUntil = 0;
 
-/* ═══════════════════════════════════════════
-   WANDERER DEFINITIONS
-═══════════════════════════════════════════ */
-const WANDERER_DEFS = [
-  /* ── index 0: Ichi — room_01 ── */
-  {
-    index:0, roomId:'room_01', x:382, y:647, type:'stay',
-    frames:['ichi-1.png','ichi-2.png'], color:'#ff79d7', radius:0, size:52,
-    name:'Ichi', nameJP:'イチ', nameKanji:'一',
-    desc:'The first of three. Planted under the Karasuki tree by Mister Happy. He’s mean, but sometimes he’s right.',
-    descJP:'三つのうちの一つ。ミスター・ハッピーにカラスキの木の下に植えられた。いじわるだけど、ときどき正しい。'
-  },
-  /* ── index 1: Mr. Happy — room_01 ── */
-  {
-    index:1, roomId:'room_01', x:1081, y:477, type:'stay',
-    frames:['mr_happy-1.png','mr_happy-2.png'], color:'#ffd166', radius:0, size:110,
-    name:'Mister Happy', nameJP:'ミスター・ハッピー',
-    desc:'Mister Happy lives in Karasuki and pretends he knows everything about it. And no—that’s not makeup. That’s his skin.',
-    descJP:'ミスター・ハッピーはカラスキに住んでいて、なんでも知っているふりをしている。それと、それはメイクじゃないよ。あれが肌。'
-  },
-  /* ── index 2: Tom Katsu — room_02 ── */
-  {
-    index:2, roomId:'room_02', x:882, y:263, type:'stay',
-    frames:['tom_katsu-1.png'], color:'#ffaa5e', radius:0, size:52,
-    name:'Tom Katsu', nameJP:'トムカツ', nameKanji:'勝',
-    desc:'Crispy on the outside, warm on the inside.'
-  },
-  /* ── index 3: Uhibon — room_03 ── */
-  {
-    index:3, roomId:'room_03', x:546, y:308, type:'stay',
-   frames:['uhibon-1.png'], color:'#a8edff', radius:0, size:72,
-   name:'Uhibon', nameJP:'ウヒボン',
-   desc:'Nothing is really known about Uhibon. He appears as Takachika escapes into Karasuki.',
-   descJP:'ウヒボンについては、ほとんど何もわかっていない。タカチカがカラスキへ逃げ込むときに現れる。'
-  },
-  /* ── index 4: Jamariko — room_05 ── */
-  {
-    index:4, roomId:'room_05', x:1054, y:354, type:'stay',
-    frames:['jamariko-2.png'], color:'#fff176', radius:0, size:52,
-    name:'Jamariko', nameJP:'ジャマリコ', nameKanji:'邪魔里子',
-    desc:'She stands in your way, but only out of love.'
-  },
-  /* ── index 5: Sumiyo Yamakage — room_06 ── */
-  {
-    index:5, roomId:'room_06', x:1138, y:480, type:'stay',
-    frames:['sumiyo_yamakage-1.png'], color:'#90aaff', radius:0, size:72,
-    name:'Sumiyo Yamakage', nameJP:'山影すみよ', nameKanji:'影',
-    desc:'Quiet as a shadow, warm as afternoon light.'
-  },
-  /* ── index 6: placeholder — room_07 ── */
-  { index:6,  roomId:'room_07', x:1000, y:500, type:'stay', frames:null, color:'#d49aff', radius:0, size:40 },
-  /* ── index 7: placeholder — room_08 ── */
-  { index:7,  roomId:'room_08', x:700,  y:600, type:'stay', frames:null, color:'#ffd08a', radius:0, size:40 },
-  /* ── index 8: placeholder — room_09 ── */
-  { index:8,  roomId:'room_09', x:550,  y:480, type:'stay', frames:null, color:'#a8fff8', radius:0, size:40 },
-  /* ── index 9: Ni — room_10 ── */
-  {
-    index:9, roomId:'room_10', x:1233, y:452, type:'stay',
-    frames:['ni-1.png','ni-2.png'], color:'#e8ffaa', radius:0, size:52,
-    name:'Ni', nameJP:'ニ', nameKanji:'弐',
-    desc:'The second. Quiet, but always present.'
-  },
-  /* ── index 10: Columbus — room_11 ── */
-  {
-    index:10, roomId:'room_11', x:461, y:621, type:'stay',
-    frames:['columbus-1.png'], color:'#ff85a1', radius:0, size:52,
-    name:'Columbus', nameJP:'コロンブス', nameKanji:'探',
-    desc:'Still exploring.'
-  },
-  /* ── index 11: October Moriyama — room_12 ── */
-  {
-    index:11, roomId:'room_12', x:700, y:270, type:'stay',
-    frames:['october-moriyama.png'], color:'#ff79d7', radius:0, size:73,
-    name:'October Moriyama', nameJP:'オクトーバー・森山', nameKanji:'霜',
-    desc:'Arrived with the autumn. Never left.'
-  },
-  /* ── index 12: Takachika Green — room_13 ── */
-  {
-    index:12, roomId:'room_13', x:407, y:387, type:'stay',
-    frames:['takachika_green-1.png'], color:'#7fffd4', radius:0, size:75,
-    name:'Takachika Green', nameJP:'タカチカ・グリーン', nameKanji:'高近',
-    desc:'Big presence, soft heart.'
-  },
-  /* ── index 13: Pugoo — room_13 ── */
-  {
-    index:13, roomId:'room_13', x:609, y:642, type:'stay',
-    frames:['pugoo-1.png'], color:'#ffcc66', radius:0, size:52,
-    name:'Pugoo', nameJP:'プグー', nameKanji:'愛',
-    desc:'Small but unforgettable.'
-  },
-  /* ── index 14: placeholder — room_04 ── */
-  { index:14, roomId:'room_04', x:800,  y:450, type:'stay', frames:null, color:'#b2ffda', radius:0, size:40 },
-  /* ── index 15: placeholder — room_14 ── */
-  { index:15, roomId:'room_14', x:900,  y:480, type:'stay', frames:null, color:'#ffcc66', radius:0, size:40 },
-  /* ── index 16: Jubei Tsukigase — room_15 ── */
-  {
-    index:16, roomId:'room_15', x:1064, y:434, type:'stay',
-    frames:['tsukigase_jubei.png'], color:'#ffcc66', radius:0, size:83,
-    name:'Jubei Tsukigase', nameJP:'月ヶ瀬・寿兵衛', nameKanji:'字',
-    desc:'Ancient and vast. A letter older than time.'
-  },
-];
+  /* ═══════════════════════════════════════════
+     WANDERER DEFINITIONS
+     — All wanderers have exactly two frames (-1 and -2)
+     — bubbleR removed (no collision pushing)
+     — type:'drift' added for Sumiyo and Tsukigase
+  ═══════════════════════════════════════════ */
+  const WANDERER_DEFS = [
+    /* ── index 0: Ichi — room_01 ── */
+    {
+      index:0, roomId:'room_01', x:642, y:496, type:'stay',
+      frames:['ichi-1.png','ichi-2.png'], color:'#ff79d7', size:52,
+      name:'Ichi', nameJP:'イチ', nameKanji:'一',
+      desc:'The first of three. Planted under the Karasuki tree by Mister Happy. He\'s mean, but sometimes he\'s right.',
+      descJP:'三つのうちの一つ。ミスター・ハッピーにカラスキの木の下に植えられた。いじわるだけど、ときどき正しい。'
+    },
+    /* ── index 1: Mr. Happy — room_01 ── */
+    {
+      index:1, roomId:'room_01', x:798, y:418, type:'stay',
+      frames:['mr_happy-1.png','mr_happy-2.png'], color:'#ffd166', size:110,
+      name:'Mister Happy', nameJP:'ミスター・ハッピー',
+      desc:'Mister Happy lives in Karasuki and pretends he knows everything about it. And no—that\'s not makeup. That\'s his skin.',
+      descJP:'ミスター・ハッピーはカラスキに住んでいて、なんでも知っているふりをしている。それと、それはメイクじゃないよ。あれが肌。'
+    },
+    /* ── index 2: Tom Katsu — room_02 ── */
+    {
+      index:2, roomId:'room_02', x:882, y:263, type:'stay',
+      frames:['tom_katsu-1.png','tom_katsu-2.png'], color:'#ffaa5e', size:52,
+      name:'Tom Katsu', nameJP:'トムカツ', nameKanji:'勝',
+      desc:'Crispy on the outside, warm on the inside.'
+    },
+    /* ── index 3: Uhibon — room_03 ── */
+    {
+      index:3, roomId:'room_03', x:546, y:308, type:'stay',
+      frames:['uhibon-1.png','uhibon-2.png'], color:'#a8edff', size:72,
+      name:'Uhibon', nameJP:'ウヒボン',
+      desc:'Nothing is really known about Uhibon. He appears as Takachika escapes into Karasuki.',
+      descJP:'ウヒボンについては、ほとんど何もわかっていない。タカチカがカラスキへ逃げ込むときに現れる。'
+    },
+    /* ── index 4: Jamariko — room_05 ── */
+    {
+      index:4, roomId:'room_05', x:1054, y:354, type:'stay',
+      frames:['jamariko-1.png','jamariko-2.png'], color:'#fff176', size:52,
+      name:'Jamariko', nameJP:'ジャマリコ', nameKanji:'邪魔里子',
+      desc:'She stands in your way, but only out of love.'
+    },
+    /* ── index 5: Sumiyo Yamakage — room_06 — drifts toward ghost ── */
+    {
+      index:5, roomId:'room_06', x:736, y:414, type:'drift',
+      frames:['sumiyo_yamakage-1.png','sumiyo_yamakage-2.png'], color:'#90aaff', size:72,
+      name:'Sumiyo Yamakage', nameJP:'山影すみよ', nameKanji:'影',
+      desc:'Quiet as a shadow, warm as afternoon light.'
+    },
+    /* ── index 6: Amekuro — room_07 ── */
+    {
+      index:6, roomId:'room_07', x:815, y:398, type:'stay',
+      frames:['amekuro-1.png','amekuro-2.png'], color:'#d49aff', size:52,
+      name:'Amekuro', nameJP:'アメクロ', nameKanji:'飴梟',
+      desc:'Amekuro are cute, owl-like cats that love candy. When they stand up, a hidden mouth on their stomach appears and eats sweets in seconds.',
+      descJP:'アメクロ（飴梟）は、おかしが大好きなフクロウのようなネコです。立つとおなかに口が現れ、おかしを一気に食べます。'
+    },
+    /* ── index 7: Columbus — room_11 ── */
+    {
+      index:7, roomId:'room_11', x:935, y:397, type:'stay',
+      frames:['columbus-1.png','columbus-2.png'], color:'#ff85a1', size:52,
+      name:'Columbus', nameJP:'コロンブス', nameKanji:'探',
+      desc:'Still exploring.'
+    },
+    /* ── index 8: placeholder — room_08 ── */
+    { index:8,  roomId:'room_08', x:700,  y:600, type:'stay', frames:['placeholder-1.png','placeholder-2.png'], color:'#ffd08a', size:40 },
+    /* ── index 9: Ni — room_10 ── */
+    {
+      index:9, roomId:'room_10', x:1233, y:452, type:'stay',
+      frames:['ni-1.png','ni-2.png'], color:'#e8ffaa', size:52,
+      name:'Ni', nameJP:'ニ', nameKanji:'弐',
+      desc:'The second. Quiet, but always present.'
+    },
+    /* ── index 10: placeholder — room_09 ── */
+    { index:10, roomId:'room_09', x:550,  y:480, type:'stay', frames:['placeholder-1.png','placeholder-2.png'], color:'#a8fff8', size:40 },
+    /* ── index 11: October Moriyama — room_12 ── */
+    {
+      index:11, roomId:'room_12', x:700, y:270, type:'stay',
+      frames:['october-moriyama-1.png','october-moriyama-2.png'], color:'#ff79d7', size:73,
+      name:'October Moriyama', nameJP:'オクトーバー・森山', nameKanji:'霜',
+      desc:'Arrived with the autumn. Never left.'
+    },
+    /* ── index 12: Takachika Green — room_13 ── */
+    {
+      index:12, roomId:'room_13', x:407, y:387, type:'stay',
+      frames:['takachika_green-1.png','takachika_green-2.png'], color:'#7fffd4', size:75,
+      name:'Takachika Green', nameJP:'タカチカ・グリーン', nameKanji:'高近',
+      desc:'Big presence, soft heart.'
+    },
+    /* ── index 13: Pugoo — room_13 ── */
+    {
+      index:13, roomId:'room_13', x:609, y:642, type:'stay',
+      frames:['pugoo-1.png','pugoo-2.png'], color:'#ffcc66', size:52,
+      name:'Pugoo', nameJP:'プグー', nameKanji:'愛',
+      desc:'Small but unforgettable.'
+    },
+    /* ── index 14: placeholder — room_04 ── */
+    { index:14, roomId:'room_04', x:800,  y:450, type:'stay', frames:['placeholder-1.png','placeholder-2.png'], color:'#b2ffda', size:40 },
+    /* ── index 15: placeholder — room_14 ── */
+    { index:15, roomId:'room_14', x:900,  y:480, type:'stay', frames:['placeholder-1.png','placeholder-2.png'], color:'#ffcc66', size:40 },
+    /* ── index 16: Jubei Tsukigase — room_15 — drifts toward ghost ── */
+    {
+      index:16, roomId:'room_15', x:1064, y:434, type:'drift',
+      frames:['tsukigase_jubei-1.png','tsukigase_jubei-2.png'], color:'#ffcc66', size:83,
+      name:'Jubei Tsukigase', nameJP:'月ヶ瀬・寿兵衛', nameKanji:'字',
+      desc:'Ancient and vast. A letter older than time.'
+    },
+  ];
 
-const WANDERER_IMG_BASE = 'https://booha-adventure-studios.github.io/the-booha-adventure/assets/img/wanderers/';
-const FRAME_MS          = 1200; // slow dreamy crossfade — 1.2 s per frame
+  const WANDERER_IMG_BASE = 'https://booha-adventure-studios.github.io/the-booha-adventure/assets/img/wanderers/';
 
-/* ═══════════════════════════════════════════
-   WANDERER RUNTIME
-═══════════════════════════════════════════ */
-let activeWanderers  = [];
-const wandererImages = {};
+  /* Dreamy crossfade — slow and smooth, 4 seconds per frame */
+  const FRAME_MS = 4000;
 
-const WANDER_SPEED       = 0.55;
-const WANDER_TARGET_WAIT = 3000;
-const WANDER_REACT_DIST  = 120;
-const SCATTER_SPEED      = 2.8;
-const SCATTER_DECAY      = 0.88;
-const WANDERER_SIZE      = 22;
+  /* Drift speed for Sumiyo / Tsukigase — very slow */
+  const DRIFT_SPEED      = 0.28;   // world-units per frame at 60fps
+  const DRIFT_STOP_DIST  = 90;     // stops this close to the ghost
 
-function preloadWandererImages() {
-  WANDERER_DEFS.forEach(def => {
-    if (!def.frames) return;
-    def.frames.forEach(filename => {
-      if (wandererImages[filename]) return;
-      const img = new Image();
-      img.src = WANDERER_IMG_BASE + filename;
-      wandererImages[filename] = img;
+  /* ═══════════════════════════════════════════
+     WANDERER RUNTIME
+  ═══════════════════════════════════════════ */
+  let activeWanderers  = [];
+  const wandererImages = {};
+
+  const WANDERER_SIZE = 22;
+
+  function preloadWandererImages() {
+    WANDERER_DEFS.forEach(def => {
+      if (!def.frames) return;
+      def.frames.forEach(filename => {
+        if (wandererImages[filename]) return;
+        const img = new Image();
+        img.src = WANDERER_IMG_BASE + filename;
+        wandererImages[filename] = img;
+      });
     });
-  });
-}
-
-function refreshWanderersForRoom() {
-  let unlockedIndices = [];
-
-  if (window.__devAllWanderers) {
-    unlockedIndices = WANDERER_DEFS.map(d => d.index);
-  } else {
-    try {
-      const data = window.BoohaAdventure && BoohaAdventure.save
-        ? BoohaAdventure.save.load() : null;
-      if (data && data.weekly && data.weekly.wanderers) {
-        unlockedIndices = data.weekly.wanderers;
-      }
-    } catch (_) {}
   }
 
-  activeWanderers = WANDERER_DEFS
-    .filter(def => def.roomId === state.roomId && unlockedIndices.includes(def.index))
-    .map(def => ({
-      ...def,
-      rx: def.x, ry: def.y,
-      targetX: def.x, targetY: def.y,
-      nextTargetAt: 0,
-      wobblePhase: Math.random() * Math.PI * 2,
-      scattering: false, scatterVx: 0, scatterVy: 0,
-      images: (def.frames || []).map(f => wandererImages[f]).filter(Boolean),
-    }));
-}
+  function refreshWanderersForRoom() {
+    let unlockedIndices = [];
 
-function initWanderers() {
-  preloadWandererImages();
-  refreshWanderersForRoom();
-}
-
-function onRoomChanged() {
-  refreshWanderersForRoom();
-}
-
-function updateWanderers(now) {
-  if (!activeWanderers.length) return;
-
-  activeWanderers.forEach(w => {
-    const bubbleR = w.bubbleR || (w.size || WANDERER_SIZE) * 1.8;
-    const dx      = state.x - w.rx;
-    const dy      = state.y - w.ry;
-    const dist    = Math.hypot(dx, dy);
-
-    if (dist < bubbleR) {
-      const angle  = Math.atan2(dy, dx);
-      state.x      = w.rx + Math.cos(angle) * bubbleR;
-      state.y      = w.ry + Math.sin(angle) * bubbleR;
-      state.clickTarget = null;
-
-      if (!w.sparkling) {
-        w.sparkling    = true;
-        w.sparkleAt    = now;
-        w.sparkleAngle = angle;
-      }
-
-      /* ── trigger character pop on first bubble contact ── */
-      if (w.name && !w.popShown && !isWandererPopOpen()) {
-        w.popShown = true;
-        openWandererPop(w);
-      }
+    if (window.__devAllWanderers) {
+      unlockedIndices = WANDERER_DEFS.map(d => d.index);
     } else {
-      /* ghost has left the bubble — allow pop again on next contact */
-      if (w.sparkling && now - w.sparkleAt > 800) w.sparkling = false;
-      /* reset popShown once ghost is clear so re-entry can trigger again */
-      if (dist > bubbleR + 40) w.popShown = false;
-    }
-  });
-}
-
-/* ─────────────────────────────────────────
-   WANDERER CHARACTER POP
-───────────────────────────────────────── */
-let wandererPopOverlay = null;
-
-function injectWandererPopOverlay() {
-  if (wandererPopOverlay) return;
-  wandererPopOverlay = document.createElement('div');
-  wandererPopOverlay.id = 'wanderer-pop-overlay';
-  wandererPopOverlay.style.cssText = `
-    display:none; position:fixed; inset:0; z-index:9200;
-    align-items:center; justify-content:center;
-    background:rgba(0,0,0,0); transition:background 0.3s ease;`;
-  wandererPopOverlay.innerHTML = `
-    <div id="wanderer-pop-box" style="
-      background:#080810; border-radius:8px;
-      padding:32px 36px 28px; max-width:min(380px,90vw); width:90vw;
-      text-align:center; font-family:'Georgia',serif; position:relative;
-      animation:portalAppear 0.25s ease-out;">
-      <button id="wanderer-pop-close" style="
-        position:absolute; top:10px; right:14px;
-        background:transparent; border:none; cursor:pointer;
-        font-size:1.1rem; line-height:1; padding:4px 8px;
-        color:rgba(255,255,255,.45); transition:color .18s;">✕</button>
-      <div id="wanderer-pop-orb" style="
-        width:64px; height:64px; border-radius:50%; margin:0 auto 16px;
-        position:relative; flex-shrink:0;"></div>
-      <h2 id="wanderer-pop-name" style="
-        font-size:clamp(1.2rem,4vw,1.5rem); margin:0 0 2px;
-        letter-spacing:.06em;"></h2>
-      <p id="wanderer-pop-jp" style="
-        font-size:clamp(.8rem,2.5vw,.95rem); margin:0 0 2px;
-        opacity:.75; letter-spacing:.08em;"></p>
-      <p id="wanderer-pop-kanji" style="
-        font-size:clamp(.7rem,2.2vw,.85rem); margin:0 0 18px;
-        opacity:.45; letter-spacing:.12em;"></p>
-      <p id="wanderer-pop-desc" style="
-        font-size:clamp(.82rem,2.8vw,.98rem); line-height:1.65;
-        opacity:.82; margin:0; font-family:'Georgia',serif;"></p>
-    </div>`;
-  document.body.appendChild(wandererPopOverlay);
-
-  document.getElementById('wanderer-pop-close').addEventListener('click', closeWandererPop);
-  wandererPopOverlay.addEventListener('click', e => {
-    if (e.target === wandererPopOverlay) closeWandererPop();
-  });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeWandererPop(); });
-}
-
-function openWandererPop(w) {
-  if (!w.name) return; // only named sprite wanderers
-  const box     = document.getElementById('wanderer-pop-box');
-  const orb     = document.getElementById('wanderer-pop-orb');
-  const nameEl  = document.getElementById('wanderer-pop-name');
-  const jpEl    = document.getElementById('wanderer-pop-jp');
-  const kanjiEl = document.getElementById('wanderer-pop-kanji');
-  const descEl  = document.getElementById('wanderer-pop-desc');
-  const closeEl = document.getElementById('wanderer-pop-close');
-
-  // Themed colors from wanderer
-  const c = w.color;
-  box.style.border     = `1px solid ${c}55`;
-  box.style.boxShadow  = `0 0 0 1px ${c}44, 0 0 30px ${c}66, 0 0 70px ${c}33`;
-  closeEl.style.color  = c;
-  nameEl.style.color   = c;
-  nameEl.style.textShadow = `0 0 18px ${c}99`;
-  jpEl.style.color     = '#f0e8ff';
-  kanjiEl.style.color  = '#b8a8cc';
-  descEl.style.color   = '#e8e0f0';
-
-  // Glowing orb
-  orb.style.background    = `radial-gradient(circle at 35% 35%, #fff, ${c}, ${c}88)`;
-  orb.style.boxShadow     = `0 0 18px ${c}cc, 0 0 40px ${c}66, 0 0 70px ${c}33`;
-
-  // If the wanderer has a sprite image, show it inside the orb
-  if (w.images && w.images.length > 0 && w.images[0].complete && w.images[0].naturalWidth > 0) {
-    orb.style.backgroundImage = `url(${w.images[0].src})`;
-    orb.style.backgroundSize  = '80%';
-    orb.style.backgroundRepeat= 'no-repeat';
-    orb.style.backgroundPosition = 'center';
-  } else {
-    orb.style.backgroundImage = '';
-  }
-
-  nameEl.textContent  = w.name || '';
-  jpEl.textContent    = w.nameJP ? `「${w.nameJP}」` : '';
-  kanjiEl.textContent = w.nameKanji || '';
-  descEl.textContent  = w.desc || '';
-
-  wandererPopOverlay.style.display    = 'flex';
-  wandererPopOverlay.style.background = 'rgba(0,0,0,0.82)';
-  state.clickTarget = null;
-}
-
-function closeWandererPop() {
-  wandererPopOverlay.style.background = 'rgba(0,0,0,0)';
-  /* brief fade on the canvas layer so the transition feels intentional */
-  const fadeEl = document.getElementById('kara-fade');
-  if (fadeEl) {
-    fadeEl.style.transition = 'opacity 400ms ease-in';
-    fadeEl.style.opacity    = '0.55';
-    setTimeout(() => {
-      fadeEl.style.transition = 'opacity 400ms ease-out';
-      fadeEl.style.opacity    = '0';
-    }, 420);
-  }
-  setTimeout(() => { wandererPopOverlay.style.display = 'none'; }, 300);
-}
-
-function isWandererPopOpen() {
-  return wandererPopOverlay && wandererPopOverlay.style.display === 'flex';
-}
-
-/* Check if a world-space click lands on a sprite wanderer */
-function clickCheckWanderers(worldX, worldY) {
-  for (const w of activeWanderers) {
-    if (!w.name || !w.frames) continue; // only named sprite wanderers
-    const sz = w.size || WANDERER_SIZE;
-    if (Math.abs(worldX - w.rx) <= sz && Math.abs(worldY - w.ry) <= sz) {
-      openWandererPop(w);
-      return true;
-    }
-  }
-  return false;
-}
-
-function drawWanderers(now) {
-  if (!activeWanderers.length) return;
-  const sec = now / 1000;
-
-  activeWanderers.forEach(w => {
-    const sz      = w.size    || WANDERER_SIZE;
-    const bubbleR = w.bubbleR || sz * 1.8;
-    const pulse   = 0.5 + 0.5 * Math.sin(sec * 2.4 + w.wobblePhase);
-
-    let imgA = null, imgB = null, crossfade = 0;
-    if (w.images && w.images.length > 1) {
-      const cycleDur  = FRAME_MS / 1000;
-      const cyclePos  = (sec / cycleDur) % w.images.length;
-      const frameA    = Math.floor(cyclePos) % w.images.length;
-      const frameB    = (frameA + 1)         % w.images.length;
-      crossfade       = cyclePos - Math.floor(cyclePos);
-      const ca = w.images[frameA];
-      const cb = w.images[frameB];
-      if (ca && ca.complete && ca.naturalWidth > 0) imgA = ca;
-      if (cb && cb.complete && cb.naturalWidth > 0) imgB = cb;
-    } else if (w.images && w.images.length === 1) {
-      const c = w.images[0];
-      if (c && c.complete && c.naturalWidth > 0) imgA = c;
-      crossfade = 0;
+      try {
+        const data = window.BoohaAdventure && BoohaAdventure.save
+          ? BoohaAdventure.save.load() : null;
+        if (data && data.weekly && data.weekly.wanderers) {
+          unlockedIndices = data.weekly.wanderers;
+        }
+      } catch (_) {}
     }
 
-    ctx.save();
+    activeWanderers = WANDERER_DEFS
+      .filter(def => def.roomId === state.roomId && unlockedIndices.includes(def.index))
+      .map(def => ({
+        ...def,
+        /* runtime position — starts at home */
+        rx: def.x, ry: def.y,
+        wobblePhase: Math.random() * Math.PI * 2,
+        /* pose: 0 = normal (-1 image), 1 = clicked (-2 image) */
+        pose: 0,
+        /* drift state */
+        frozen: false,   // true while popup is open for this wanderer
+        images: (def.frames || []).map(f => wandererImages[f]).filter(Boolean),
+      }));
+  }
 
-    const ghostDist = Math.hypot(state.x - w.rx, state.y - w.ry);
-    if (w.sparkling) {
-      const age     = Math.min(1, (now - w.sparkleAt) / 800);
-      const fadeOut = 1 - age;
+  function initWanderers() {
+    preloadWandererImages();
+    refreshWanderersForRoom();
+  }
 
-      for (let i = 0; i < 28; i++) {
-        const seed   = i * 137.508;
-        const angle  = (seed % 360) * Math.PI / 180;
-        const speed  = 18 + (i % 5) * 12;
-        const travel = age * speed;
-        const sx     = w.rx + Math.cos(angle) * (bubbleR * 0.6 + travel);
-        const sy     = w.ry + Math.sin(angle) * (bubbleR * 0.6 + travel);
+  function onRoomChanged() {
+    refreshWanderersForRoom();
+  }
 
-        const twinkle = Math.pow(Math.abs(Math.sin(sec * (8 + i % 5) + i)), 2);
-        const fleckSz = (0.8 + (i % 3) * 0.7) * (1 - age * 0.6);
+  /* Update drift-type wanderers — they move slowly toward the ghost */
+  function updateWanderers(now) {
+    if (!activeWanderers.length) return;
 
-        ctx.globalAlpha = fadeOut * twinkle * 0.9;
-        ctx.fillStyle   = i % 3 === 0 ? '#ffffff' : w.color;
-        ctx.shadowBlur  = 6;
+    activeWanderers.forEach(w => {
+      if (w.type !== 'drift' || w.frozen) return;
+
+      const dx   = state.x - w.rx;
+      const dy   = state.y - w.ry;
+      const dist = Math.hypot(dx, dy);
+
+      if (dist > DRIFT_STOP_DIST) {
+        const step = DRIFT_SPEED * (SPEED / BASE_SPEED); // frame-rate independent
+        w.rx += (dx / dist) * step;
+        w.ry += (dy / dist) * step;
+      }
+    });
+  }
+
+  /* ─────────────────────────────────────────
+     WANDERER CHARACTER POP
+  ───────────────────────────────────────── */
+  let wandererPopOverlay = null;
+  let currentPopWanderer = null;
+
+  function injectWandererPopOverlay() {
+    if (wandererPopOverlay) return;
+    wandererPopOverlay = document.createElement('div');
+    wandererPopOverlay.id = 'wanderer-pop-overlay';
+    wandererPopOverlay.style.cssText = `
+      display:none; position:fixed; inset:0; z-index:9200;
+      align-items:center; justify-content:center;
+      background:rgba(0,0,0,0); transition:background 0.3s ease;`;
+
+    wandererPopOverlay.innerHTML = `
+      <div id="wanderer-pop-box" style="
+        background:#080810; border-radius:8px;
+        padding:0 0 28px; max-width:min(360px,90vw); width:90vw;
+        text-align:center; font-family:'Georgia',serif; position:relative;
+        animation:portalAppear 0.25s ease-out;
+        max-height:85vh; overflow-y:auto; overflow-x:hidden;">
+
+        <button id="wanderer-pop-close" style="
+          position:sticky; top:10px; float:right; margin-right:12px;
+          background:transparent; border:none; cursor:pointer;
+          font-size:1.1rem; line-height:1; padding:4px 8px; z-index:10;
+          color:rgba(255,255,255,.45); transition:color .18s;">✕</button>
+
+        <!-- Portrait image area — top half of sprite, rectangular crop -->
+        <div id="wanderer-pop-portrait" style="
+          width:100%; height:140px; position:relative; overflow:hidden;
+          border-radius:8px 8px 0 0; flex-shrink:0; margin-bottom:18px;
+          background:#0a0a18;">
+          <img id="wanderer-pop-img" src="" alt="" style="
+            position:absolute; top:0; left:50%; transform:translateX(-50%);
+            width:auto; height:220px; object-fit:cover; object-position:top center;
+            display:none;" />
+          <!-- glow overlay at bottom of portrait to blend into card -->
+          <div id="wanderer-pop-portrait-fade" style="
+            position:absolute; bottom:0; left:0; right:0; height:60px;
+            background:linear-gradient(to bottom, transparent, #080810);
+            pointer-events:none;"></div>
+        </div>
+
+        <div style="padding:0 28px;">
+          <h2 id="wanderer-pop-name" style="
+            font-size:clamp(1.2rem,4vw,1.5rem); margin:0 0 4px;
+            letter-spacing:.06em;"></h2>
+          <p id="wanderer-pop-jp" style="
+            font-size:clamp(.82rem,2.6vw,.96rem); margin:0 0 2px;
+            opacity:.72; letter-spacing:.08em; font-family:'Georgia',serif;"></p>
+          <p id="wanderer-pop-kanji" style="
+            font-size:clamp(.7rem,2.2vw,.82rem); margin:0 0 20px;
+            opacity:.38; letter-spacing:.14em;"></p>
+          <p id="wanderer-pop-desc" style="
+            font-size:clamp(.84rem,2.8vw,.98rem); line-height:1.7;
+            opacity:.85; margin:0 0 12px; font-family:'Georgia',serif; text-align:left;"></p>
+          <p id="wanderer-pop-desc-jp" style="
+            font-size:clamp(.76rem,2.4vw,.88rem); line-height:1.7;
+            opacity:.55; margin:0; font-family:'Georgia',serif; text-align:left; display:none;"></p>
+        </div>
+      </div>`;
+
+    document.body.appendChild(wandererPopOverlay);
+
+    document.getElementById('wanderer-pop-close').addEventListener('click', closeWandererPop);
+    wandererPopOverlay.addEventListener('click', e => {
+      if (e.target === wandererPopOverlay) closeWandererPop();
+    });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeWandererPop(); });
+  }
+
+  function openWandererPop(w) {
+    if (!w.name) return;
+    currentPopWanderer = w;
+
+    /* lock pose to -2 image */
+    w.pose = 1;
+    /* freeze drift-type wanderers */
+    if (w.type === 'drift') w.frozen = true;
+
+    const box        = document.getElementById('wanderer-pop-box');
+    const portrait   = document.getElementById('wanderer-pop-portrait');
+    const imgEl      = document.getElementById('wanderer-pop-img');
+    const portraitFade = document.getElementById('wanderer-pop-portrait-fade');
+    const nameEl     = document.getElementById('wanderer-pop-name');
+    const jpEl       = document.getElementById('wanderer-pop-jp');
+    const kanjiEl    = document.getElementById('wanderer-pop-kanji');
+    const descEl     = document.getElementById('wanderer-pop-desc');
+    const descJpEl   = document.getElementById('wanderer-pop-desc-jp');
+    const closeEl    = document.getElementById('wanderer-pop-close');
+
+    const c = w.color;
+    box.style.border    = `1px solid ${c}44`;
+    box.style.boxShadow = `0 0 0 1px ${c}33, 0 0 30px ${c}55, 0 0 70px ${c}22`;
+
+    /* Portrait: show the -2 (pose 1) image, cropped to top half */
+    const poseImg = w.images && w.images.length > 1 ? w.images[1] : (w.images && w.images[0]);
+    portrait.style.background    = `#0a0a18`;
+    portrait.style.borderBottom  = `1px solid ${c}33`;
+    portraitFade.style.background = `linear-gradient(to bottom, transparent, #080810)`;
+
+    if (poseImg && poseImg.complete && poseImg.naturalWidth > 0) {
+      imgEl.src          = poseImg.src;
+      imgEl.style.display = 'block';
+      imgEl.style.filter  = `drop-shadow(0 0 18px ${c}cc) drop-shadow(0 0 8px ${c}88)`;
+    } else {
+      imgEl.style.display = 'none';
+      portrait.style.background = `radial-gradient(circle at 50% 60%, ${c}33, #0a0a18)`;
+    }
+
+    closeEl.style.color = c;
+    nameEl.style.color  = c;
+    nameEl.style.textShadow = `0 0 18px ${c}88`;
+
+    nameEl.textContent  = w.name  || '';
+    jpEl.textContent    = w.nameJP  ? `「${w.nameJP}」` : '';
+    kanjiEl.textContent = w.nameKanji || '';
+    descEl.textContent  = w.desc  || '';
+
+    if (w.descJP) {
+      descJpEl.textContent    = w.descJP;
+      descJpEl.style.display  = 'block';
+    } else {
+      descJpEl.style.display  = 'none';
+    }
+
+    wandererPopOverlay.style.display    = 'flex';
+    wandererPopOverlay.style.background = 'rgba(0,0,0,0.82)';
+    state.clickTarget = null;
+  }
+
+  function closeWandererPop() {
+    if (currentPopWanderer) {
+      /* revert to pose 0 (-1 image) */
+      currentPopWanderer.pose   = 0;
+      /* unfreeze drift wanderers */
+      if (currentPopWanderer.type === 'drift') currentPopWanderer.frozen = false;
+      currentPopWanderer = null;
+    }
+    wandererPopOverlay.style.background = 'rgba(0,0,0,0)';
+    setTimeout(() => { wandererPopOverlay.style.display = 'none'; }, 300);
+  }
+
+  function isWandererPopOpen() {
+    return wandererPopOverlay && wandererPopOverlay.style.display === 'flex';
+  }
+
+  /* Click check — click on sprite opens popup, no bubble/push physics */
+  function clickCheckWanderers(worldX, worldY) {
+    for (const w of activeWanderers) {
+      if (!w.name || !w.frames) continue;
+      const sz = w.size || WANDERER_SIZE;
+      /* generous hit area: 1.5× the drawn half-size */
+      if (Math.abs(worldX - w.rx) <= sz * 1.5 && Math.abs(worldY - w.ry) <= sz * 1.5) {
+        openWandererPop(w);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /* ─────────────────────────────────────────
+     DRAW WANDERERS
+     — No orb/bubble shape drawn
+     — Image glows via shadowBlur
+     — Dreamy slow crossfade between frame 0 and frame 1
+     — pose=1 locks to -2 image (no crossfade)
+  ───────────────────────────────────────── */
+  function drawWanderers(now) {
+    if (!activeWanderers.length) return;
+    const sec = now / 1000;
+
+    activeWanderers.forEach(w => {
+      const sz  = w.size || WANDERER_SIZE;
+
+      /* ── image selection with pose override ── */
+      let imgA = null, imgB = null, crossfade = 0;
+
+      if (w.pose === 1) {
+        /* locked to -2 image — no crossfade */
+        const img = w.images && w.images.length > 1 ? w.images[1] : (w.images && w.images[0]);
+        if (img && img.complete && img.naturalWidth > 0) imgA = img;
+        crossfade = 0;
+      } else if (w.images && w.images.length > 1) {
+        /* dreamy crossfade between frame 0 and frame 1 */
+        const cycleDur = FRAME_MS / 1000;
+        const cyclePos = (sec / cycleDur) % w.images.length;
+        const frameA   = Math.floor(cyclePos) % w.images.length;
+        const frameB   = (frameA + 1) % w.images.length;
+        crossfade      = cyclePos - Math.floor(cyclePos);
+        const ca = w.images[frameA];
+        const cb = w.images[frameB];
+        if (ca && ca.complete && ca.naturalWidth > 0) imgA = ca;
+        if (cb && cb.complete && cb.naturalWidth > 0) imgB = cb;
+      } else if (w.images && w.images.length === 1) {
+        const c = w.images[0];
+        if (c && c.complete && c.naturalWidth > 0) imgA = c;
+      }
+
+      /* ── ambient glow pulse — soft, behind the image ── */
+      const pulse = 0.5 + 0.5 * Math.sin(sec * 1.6 + w.wobblePhase);
+      const glowR = sz * 2.2;
+
+      ctx.save();
+
+      /* soft ambient glow cloud — no hard shape */
+      const halo = ctx.createRadialGradient(w.rx, w.ry, 0, w.rx, w.ry, glowR);
+      halo.addColorStop(0,   w.color + '44');
+      halo.addColorStop(0.5, w.color + '18');
+      halo.addColorStop(1,   'transparent');
+      ctx.globalAlpha = 0.35 + pulse * 0.2;
+      ctx.fillStyle   = halo;
+      ctx.beginPath();
+      ctx.arc(w.rx, w.ry, glowR, 0, Math.PI * 2);
+      ctx.fill();
+
+      /* ── draw image A ── */
+      if (imgA) {
+        const ratA = imgA.naturalWidth / (imgA.naturalHeight || 1);
+        const dwA  = ratA >= 1 ? sz * 2 : sz * 2 * ratA;
+        const dhA  = ratA >= 1 ? sz * 2 / ratA : sz * 2;
+        ctx.globalAlpha = (1 - crossfade) * 0.95;
+        ctx.shadowBlur  = 20 + pulse * 10;
         ctx.shadowColor = w.color;
+        ctx.drawImage(imgA, w.rx - dwA / 2, w.ry - dhA / 2, dwA, dhA);
+        ctx.shadowBlur  = 0;
+      }
+
+      /* ── draw image B (crossfade target) ── */
+      if (imgB && crossfade > 0) {
+        const ratB = imgB.naturalWidth / (imgB.naturalHeight || 1);
+        const dwB  = ratB >= 1 ? sz * 2 : sz * 2 * ratB;
+        const dhB  = ratB >= 1 ? sz * 2 / ratB : sz * 2;
+        ctx.globalAlpha = crossfade * 0.95;
+        ctx.shadowBlur  = 20 + pulse * 10;
+        ctx.shadowColor = w.color;
+        ctx.drawImage(imgB, w.rx - dwB / 2, w.ry - dhB / 2, dwB, dhB);
+        ctx.shadowBlur  = 0;
+      }
+
+      /* ── fallback: glowing circle if no image loaded ── */
+      if (!imgA && !imgB) {
+        const ig = ctx.createRadialGradient(
+          w.rx - sz * 0.3, w.ry - sz * 0.3, 0,
+          w.rx, w.ry, sz);
+        ig.addColorStop(0,   '#ffffff');
+        ig.addColorStop(0.4, w.color);
+        ig.addColorStop(1,   w.color + 'aa');
+        ctx.globalAlpha = 0.88 + pulse * 0.1;
+        ctx.shadowBlur  = 18;
+        ctx.shadowColor = w.color;
+        ctx.fillStyle   = ig;
         ctx.beginPath();
-        ctx.arc(sx, sy, fleckSz, 0, Math.PI * 2);
+        ctx.arc(w.rx, w.ry, sz, 0, Math.PI * 2);
         ctx.fill();
         ctx.shadowBlur  = 0;
       }
 
-      if (ghostDist < bubbleR && now - w.sparkleAt > 500) {
-        w.sparkleAt    = now;
-        w.sparkleAngle = Math.atan2(state.y - w.ry, state.x - w.rx);
-      }
-    }
-
-    const glowR = sz * 2.0;
-    const halo  = ctx.createRadialGradient(w.rx, w.ry, sz * 0.2, w.rx, w.ry, glowR);
-    halo.addColorStop(0,   w.color + '55');
-    halo.addColorStop(0.5, w.color + '22');
-    halo.addColorStop(1,   'transparent');
-    ctx.globalAlpha = 0.4 + pulse * 0.25;
-    ctx.fillStyle   = halo;
-    ctx.fillRect(w.rx - glowR, w.ry - glowR, glowR * 2, glowR * 2);
-
-    if (imgA) {
-      const ratA = imgA.naturalWidth / (imgA.naturalHeight || 1);
-      const dwA  = ratA >= 1 ? sz * 2 : sz * 2 * ratA;
-      const dhA  = ratA >= 1 ? sz * 2 / ratA : sz * 2;
-      ctx.globalAlpha = (1 - crossfade) * 0.94;
-      ctx.shadowBlur  = 24 + pulse * 14;
-      ctx.shadowColor = w.color;
-      ctx.drawImage(imgA, w.rx - dwA / 2, w.ry - dhA / 2, dwA, dhA);
-      ctx.shadowBlur  = 0;
-    }
-    if (imgB) {
-      const ratB = imgB.naturalWidth / (imgB.naturalHeight || 1);
-      const dwB  = ratB >= 1 ? sz * 2 : sz * 2 * ratB;
-      const dhB  = ratB >= 1 ? sz * 2 / ratB : sz * 2;
-      ctx.globalAlpha = crossfade * 0.94;
-      ctx.shadowBlur  = 24 + pulse * 14;
-      ctx.shadowColor = w.color;
-      ctx.drawImage(imgB, w.rx - dwB / 2, w.ry - dhB / 2, dwB, dhB);
-      ctx.shadowBlur  = 0;
-    }
-    if (!imgA && !imgB) {
-      const ig = ctx.createRadialGradient(
-        w.rx - sz * 0.3, w.ry - sz * 0.3, 0,
-        w.rx, w.ry, sz);
-      ig.addColorStop(0,   '#ffffff');
-      ig.addColorStop(0.4, w.color);
-      ig.addColorStop(1,   w.color + 'aa');
-      ctx.globalAlpha = 0.88 + pulse * 0.1;
-      ctx.shadowBlur  = 18;
-      ctx.shadowColor = w.color;
-      ctx.fillStyle   = ig;
-      ctx.beginPath();
-      ctx.arc(w.rx, w.ry, sz, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.shadowBlur  = 0;
-    }
-
-    ctx.restore();
-  });
-}
+      ctx.restore();
+    });
+  }
 
   /* ═══════════════════════════════════════════
      BONUS TREE DEFINITIONS — 5 total
+     — game in room_12 updated to 993, 362
+     — labels removed from draw (pure glow orbs)
   ═══════════════════════════════════════════ */
   const BONUS_TREES = [
     {
       id:'booha_invaders', roomId:'room_07', x:1019, y:381, r:44,
       url:'booha_invaders.html', label:'INVADERS', color:'#44ff88',
       theme:'invaders',
-      nameEN:'Booha Invaders',
-      nameJP:'ブーハ・インベーダーズ',
-      nameKanji:'侵略者',
+      nameEN:'Booha Invaders', nameJP:'ブーハ・インベーダーズ', nameKanji:'侵略者',
       descUnlocked:'You\'ve unlocked this game! Do you want to play?',
       descUnlockedJP:'このゲームが使えます！遊びますか？',
       descUnlockedKanji:'此の遊戯、解放済。参りますか？',
@@ -607,9 +630,7 @@ function drawWanderers(now) {
       id:'booha_blocks', roomId:'room_13', x:1090, y:360, r:44,
       url:'booha_blocks.html', label:'BLOCKS', color:'#44aaff',
       theme:'blocks',
-      nameEN:'Booha Blocks',
-      nameJP:'ブーハ・ブロック',
-      nameKanji:'積木',
+      nameEN:'Booha Blocks', nameJP:'ブーハ・ブロック', nameKanji:'積木',
       descUnlocked:'You\'ve unlocked this game! Do you want to play?',
       descUnlockedJP:'このゲームが使えます！遊びますか？',
       descUnlockedKanji:'此の遊戯、解放済。参りますか？',
@@ -618,7 +639,7 @@ function drawWanderers(now) {
       descLockedKanji:'此の遊戯、未だ封印。迷宮にて更なる試練を。',
     },
     {
-      id:'bonus_placeholder_1', roomId:'room_12', x:500, y:200, r:44,
+      id:'bonus_placeholder_1', roomId:'room_12', x:993, y:362, r:44, // updated
       url:'bonus_game_1.html', label:'???', color:'#cc88ff',
       theme:'mystery',
       nameEN:'???', nameJP:'？？？', nameKanji:'謎',
@@ -658,48 +679,27 @@ function drawWanderers(now) {
   /* ═══════════════════════════════════════════
      BONUS TREE POPUP SYSTEM (themed)
   ═══════════════════════════════════════════ */
-  let bonusPopOverlay = null;
+  let bonusPopOverlay     = null;
   let bonusPopCurrentTree = null;
 
-  /* Theme palette lookup */
   const BONUS_THEMES = {
     invaders: {
-      bg:        '#060e0a',
-      border:    '#1a3d20',
-      accent1:   '#44ff88',
-      accent2:   '#ff9922',
-      accent3:   '#22ffcc',
-      glow1:     'rgba(68,255,136,.55)',
-      glow2:     'rgba(255,153,34,.35)',
-      btnBorder: 'rgba(68,255,136,.85)',
-      btnColor:  '#ccffdd',
-      decoration: '🌿', // jungle leaf emoji in corner accents
-      orbColors: ['#44ff88','#22bb55','#ff9922'],
+      bg:'#060e0a', border:'#1a3d20', accent1:'#44ff88', accent2:'#ff9922', accent3:'#22ffcc',
+      glow1:'rgba(68,255,136,.55)', glow2:'rgba(255,153,34,.35)',
+      btnBorder:'rgba(68,255,136,.85)', btnColor:'#ccffdd',
+      orbColors:['#44ff88','#22bb55','#ff9922'],
     },
     blocks: {
-      bg:        '#060812',
-      border:    '#1a1a40',
-      accent1:   '#44aaff',
-      accent2:   '#aa44ff',
-      accent3:   '#88ddff',
-      glow1:     'rgba(68,170,255,.60)',
-      glow2:     'rgba(170,68,255,.40)',
-      btnBorder: 'rgba(68,170,255,.85)',
-      btnColor:  '#cce8ff',
-      decoration: '⬛',
-      orbColors: ['#44aaff','#aa44ff','#88ddff'],
+      bg:'#060812', border:'#1a1a40', accent1:'#44aaff', accent2:'#aa44ff', accent3:'#88ddff',
+      glow1:'rgba(68,170,255,.60)', glow2:'rgba(170,68,255,.40)',
+      btnBorder:'rgba(68,170,255,.85)', btnColor:'#cce8ff',
+      orbColors:['#44aaff','#aa44ff','#88ddff'],
     },
     mystery: {
-      bg:        '#080810',
-      border:    '#3a1055',
-      accent1:   '#cc88ff',
-      accent2:   '#ffcc44',
-      accent3:   '#ffaacc',
-      glow1:     'rgba(160,40,220,.55)',
-      glow2:     'rgba(255,200,68,.3)',
-      btnBorder: 'rgba(160,70,210,.9)',
-      btnColor:  '#e8d8ff',
-      orbColors: ['#cc88ff','#aa44cc','#ffcc44'],
+      bg:'#080810', border:'#3a1055', accent1:'#cc88ff', accent2:'#ffcc44', accent3:'#ffaacc',
+      glow1:'rgba(160,40,220,.55)', glow2:'rgba(255,200,68,.3)',
+      btnBorder:'rgba(160,70,210,.9)', btnColor:'#e8d8ff',
+      orbColors:['#cc88ff','#aa44cc','#ffcc44'],
     },
   };
 
@@ -718,27 +718,17 @@ function drawWanderers(now) {
         max-width:min(420px,92vw); width:92vw;
         text-align:center; font-family:'Georgia',serif; position:relative;
         animation:portalAppear 0.25s ease-out;">
-
-        <!-- corner brackets -->
         <div id="bp-corner-tl" style="position:absolute;top:10px;left:10px;width:18px;height:18px;border-style:solid;border-width:1.5px 0 0 1.5px;"></div>
         <div id="bp-corner-br" style="position:absolute;bottom:10px;right:10px;width:18px;height:18px;border-style:solid;border-width:0 1.5px 1.5px 0;"></div>
-
-        <!-- close button -->
         <button id="bonus-pop-close" style="
           position:absolute; top:10px; right:14px;
           background:transparent; border:none; cursor:pointer;
           font-size:1.1rem; line-height:1; padding:4px 8px;
           opacity:.5; transition:opacity .18s;">✕</button>
-
-        <!-- glowing orb -->
         <div id="bonus-pop-orb" style="
           width:60px; height:60px; border-radius:50%;
           margin:0 auto 18px; position:relative;"></div>
-
-        <!-- lock icon shown when locked -->
         <div id="bonus-pop-lock" style="font-size:1.6rem;margin-bottom:8px;display:none;">🔒</div>
-
-        <!-- game name -->
         <h2 id="bonus-pop-name" style="
           font-size:clamp(1.1rem,3.5vw,1.4rem); margin:0 0 3px;
           letter-spacing:.08em;"></h2>
@@ -748,8 +738,6 @@ function drawWanderers(now) {
         <p id="bonus-pop-kanji" style="
           font-size:clamp(.68rem,2vw,.8rem); margin:0 0 20px;
           opacity:.4; letter-spacing:.14em;"></p>
-
-        <!-- description -->
         <p id="bonus-pop-desc" style="
           font-size:clamp(.82rem,2.6vw,.95rem); line-height:1.65;
           margin:0 0 8px; opacity:.88;"></p>
@@ -759,8 +747,6 @@ function drawWanderers(now) {
         <p id="bonus-pop-desc-kanji" style="
           font-size:clamp(.66rem,1.9vw,.78rem); line-height:1.55;
           margin:0 0 26px; opacity:.35;"></p>
-
-        <!-- buttons (only shown when unlocked) -->
         <div id="bonus-pop-btns" style="display:none;gap:16px;justify-content:center;flex-wrap:wrap;">
           <button id="bonus-pop-yes" class="bonus-pop-btn" style="
             background:transparent; font-family:'Georgia',serif;
@@ -773,7 +759,6 @@ function drawWanderers(now) {
             cursor:pointer; padding:8px 28px; border-radius:3px;
             transition:all .18s;">いいえ / No</button>
         </div>
-        <!-- OK button (only shown when locked) -->
         <button id="bonus-pop-ok" style="
           background:transparent; font-family:'Georgia',serif;
           font-size:.9rem; letter-spacing:.12em; cursor:pointer;
@@ -800,91 +785,61 @@ function drawWanderers(now) {
     const unlocked = _bonusUnlocked(tree.id);
     const t = BONUS_THEMES[tree.theme] || BONUS_THEMES.mystery;
 
-    /* ── style the box ── */
     const box = document.getElementById('bonus-pop-box');
     box.style.background  = t.bg;
     box.style.border      = `1px solid ${t.border}`;
     box.style.boxShadow   = `0 0 0 1px ${t.accent1}44, 0 0 35px ${t.glow1}, 0 0 80px ${t.glow2}, inset 0 0 40px rgba(0,0,0,.5)`;
 
-    /* corner brackets */
     ['bp-corner-tl','bp-corner-br'].forEach(id => {
       document.getElementById(id).style.borderColor = `${t.accent1}88`;
     });
-
-    /* close btn */
     document.getElementById('bonus-pop-close').style.color = t.accent1;
 
-    /* orb */
     const orb = document.getElementById('bonus-pop-orb');
     orb.style.background = `radial-gradient(circle at 35% 35%, #fff, ${t.orbColors[0]}, ${t.orbColors[1]})`;
     orb.style.boxShadow  = `0 0 14px ${t.orbColors[0]}cc, 0 0 32px ${t.orbColors[0]}88, 0 0 60px ${t.orbColors[1]}55`;
 
-    /* theme-specific orb decoration */
     if (tree.theme === 'invaders') {
-      orb.textContent   = '👾';
-      orb.style.fontSize = '2rem';
-      orb.style.lineHeight = '60px';
+      orb.textContent = '👾'; orb.style.fontSize = '2rem'; orb.style.lineHeight = '60px';
       orb.style.background = `radial-gradient(circle at 35% 35%, #ccffdd, #44ff88, #005522)`;
     } else if (tree.theme === 'blocks') {
-      orb.textContent   = '🟦';
-      orb.style.fontSize = '1.8rem';
-      orb.style.lineHeight = '60px';
+      orb.textContent = '🟦'; orb.style.fontSize = '1.8rem'; orb.style.lineHeight = '60px';
       orb.style.background = `radial-gradient(circle at 35% 35%, #cce8ff, #44aaff, #002244)`;
     } else {
-      orb.textContent   = '✨';
-      orb.style.fontSize = '1.8rem';
-      orb.style.lineHeight = '60px';
+      orb.textContent = '✨'; orb.style.fontSize = '1.8rem'; orb.style.lineHeight = '60px';
     }
 
-    /* lock icon */
-    const lockEl = document.getElementById('bonus-pop-lock');
-    lockEl.style.display = unlocked ? 'none' : 'block';
+    document.getElementById('bonus-pop-lock').style.display = unlocked ? 'none' : 'block';
 
-    /* name */
     const nameEl = document.getElementById('bonus-pop-name');
-    nameEl.textContent   = tree.nameEN;
-    nameEl.style.color   = t.accent1;
+    nameEl.textContent = tree.nameEN;
+    nameEl.style.color = t.accent1;
     nameEl.style.textShadow = `0 0 16px ${t.accent1}99`;
-
     document.getElementById('bonus-pop-jp').textContent    = tree.nameJP;
     document.getElementById('bonus-pop-jp').style.color    = t.accent3;
     document.getElementById('bonus-pop-kanji').textContent = tree.nameKanji;
 
-    /* desc */
     const descEl   = document.getElementById('bonus-pop-desc');
     const descJpEl = document.getElementById('bonus-pop-desc-jp');
     const descKEl  = document.getElementById('bonus-pop-desc-kanji');
     if (unlocked) {
-      descEl.textContent   = tree.descUnlocked;
-      descJpEl.textContent = tree.descUnlockedJP;
-      descKEl.textContent  = tree.descUnlockedKanji;
+      descEl.textContent = tree.descUnlocked; descJpEl.textContent = tree.descUnlockedJP; descKEl.textContent = tree.descUnlockedKanji;
     } else {
-      descEl.textContent   = tree.descLocked;
-      descJpEl.textContent = tree.descLockedJP;
-      descKEl.textContent  = tree.descLockedKanji;
+      descEl.textContent = tree.descLocked; descJpEl.textContent = tree.descLockedJP; descKEl.textContent = tree.descLockedKanji;
     }
-    descEl.style.color   = '#f0e8ff';
-    descJpEl.style.color = '#cdb8e8';
-    descKEl.style.color  = '#a888cc';
+    descEl.style.color = '#f0e8ff'; descJpEl.style.color = '#cdb8e8'; descKEl.style.color = '#a888cc';
 
-    /* buttons */
     const btnsEl = document.getElementById('bonus-pop-btns');
     const okEl   = document.getElementById('bonus-pop-ok');
     const yesEl  = document.getElementById('bonus-pop-yes');
     const noEl   = document.getElementById('bonus-pop-no');
-
     if (unlocked) {
-      btnsEl.style.display = 'flex';
-      okEl.style.display   = 'none';
-      yesEl.style.border   = `1.5px solid ${t.btnBorder}`;
-      yesEl.style.color    = t.btnColor;
-      noEl.style.border    = `1.5px solid ${t.accent1}44`;
-      noEl.style.color     = `${t.accent3}99`;
+      btnsEl.style.display = 'flex'; okEl.style.display = 'none';
+      yesEl.style.border = `1.5px solid ${t.btnBorder}`; yesEl.style.color = t.btnColor;
+      noEl.style.border  = `1.5px solid ${t.accent1}44`; noEl.style.color  = `${t.accent3}99`;
     } else {
-      btnsEl.style.display = 'none';
-      okEl.style.display   = 'inline-block';
-      okEl.style.border    = `1.5px solid ${t.btnBorder}`;
-      okEl.style.color     = t.btnColor;
+      btnsEl.style.display = 'none'; okEl.style.display = 'inline-block';
+      okEl.style.border = `1.5px solid ${t.btnBorder}`; okEl.style.color = t.btnColor;
     }
 
     bonusPopOverlay.style.display    = 'flex';
@@ -912,9 +867,7 @@ function drawWanderers(now) {
     return false;
   }
 
-  function handleBonusTreeInteraction(tree) {
-    openBonusPop(tree);
-  }
+  function handleBonusTreeInteraction(tree) { openBonusPop(tree); }
 
   function checkBonusTrees() {
     const trees = BONUS_TREES.filter(t => t.roomId === state.roomId);
@@ -939,6 +892,11 @@ function drawWanderers(now) {
     return false;
   }
 
+  /* ─────────────────────────────────────────
+     DRAW BONUS TREES
+     — Pure glowing orbs, no labels, no outlines
+     — Locked state: dim grey fade-out circle
+  ───────────────────────────────────────── */
   function drawBonusTrees(now) {
     const trees = BONUS_TREES.filter(t => t.roomId === state.roomId);
     if (!trees.length) return;
@@ -949,64 +907,61 @@ function drawWanderers(now) {
       const t        = BONUS_THEMES[tree.theme] || BONUS_THEMES.mystery;
       const pulse    = 0.5 + 0.5 * Math.sin(sec * 1.8);
       const bounce   = Math.sin(sec * 1.8) * 5;
+
       ctx.save();
-      ctx.globalAlpha = moveReveal;
 
       if (unlocked) {
-        /* outer ambient cloud — larger, softer, double-layered */
-        const glow1 = ctx.createRadialGradient(tree.x, tree.y + bounce, 0, tree.x, tree.y + bounce, 64);
-        glow1.addColorStop(0,   t.accent1 + 'aa');
-        glow1.addColorStop(0.4, t.accent1 + '44');
+        /* outer ambient cloud — radial fade, no hard edge */
+        const glow1 = ctx.createRadialGradient(tree.x, tree.y + bounce, 0, tree.x, tree.y + bounce, 70);
+        glow1.addColorStop(0,   t.accent1 + '66');
+        glow1.addColorStop(0.5, t.accent1 + '22');
         glow1.addColorStop(1,   'transparent');
-        ctx.globalAlpha = moveReveal * (0.4 + pulse * 0.28);
+        ctx.globalAlpha = moveReveal * (0.5 + pulse * 0.3);
         ctx.fillStyle   = glow1;
-        ctx.beginPath(); ctx.arc(tree.x, tree.y + bounce, 64, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(tree.x, tree.y + bounce, 70, 0, Math.PI * 2); ctx.fill();
 
-        const glow2 = ctx.createRadialGradient(tree.x, tree.y + bounce, 0, tree.x, tree.y + bounce, 44);
-        glow2.addColorStop(0,   t.accent2 + '66');
-        glow2.addColorStop(0.5, t.accent2 + '22');
+        /* secondary color cloud */
+        const glow2 = ctx.createRadialGradient(tree.x, tree.y + bounce, 0, tree.x, tree.y + bounce, 50);
+        glow2.addColorStop(0,   t.accent2 + '44');
+        glow2.addColorStop(0.6, t.accent2 + '11');
         glow2.addColorStop(1,   'transparent');
-        ctx.globalAlpha = moveReveal * (0.3 + pulse * 0.22);
+        ctx.globalAlpha = moveReveal * (0.3 + pulse * 0.2);
         ctx.fillStyle   = glow2;
-        ctx.beginPath(); ctx.arc(tree.x, tree.y + bounce, 44, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(tree.x, tree.y + bounce, 50, 0, Math.PI * 2); ctx.fill();
 
-        /* inner orb */
-        ctx.globalAlpha = moveReveal * (0.88 + pulse * 0.1);
-        ctx.shadowBlur  = 24 + pulse * 18;
+        /* inner bright core — small, intense */
+        const core = ctx.createRadialGradient(
+          tree.x - 3, tree.y + bounce - 3, 0,
+          tree.x, tree.y + bounce, 12 + pulse * 4);
+        core.addColorStop(0,   '#ffffff');
+        core.addColorStop(0.3, t.accent1);
+        core.addColorStop(1,   'transparent');
+        ctx.globalAlpha = moveReveal * (0.9 + pulse * 0.08);
+        ctx.shadowBlur  = 18 + pulse * 14;
         ctx.shadowColor = t.accent1;
-        const orbG = ctx.createRadialGradient(
-          tree.x - 5, tree.y + bounce - 5, 0,
-          tree.x, tree.y + bounce, 14);
-        orbG.addColorStop(0,   '#ffffff');
-        orbG.addColorStop(0.4, t.accent1);
-        orbG.addColorStop(1,   t.accent2);
-        ctx.fillStyle = orbG;
-        ctx.beginPath(); ctx.arc(tree.x, tree.y + bounce, 14, 0, Math.PI * 2); ctx.fill();
-        ctx.shadowBlur = 0;
-
-        /* label */
-        ctx.globalAlpha = moveReveal * (0.80 + pulse * 0.18);
-        ctx.fillStyle   = '#fff';
-        ctx.font        = 'bold 11px monospace';
-        ctx.textAlign   = 'center';
-        ctx.shadowBlur  = 10; ctx.shadowColor = t.accent1;
-        ctx.fillText(tree.label, tree.x, tree.y + bounce - 24);
-        ctx.shadowBlur  = 0; ctx.textAlign = 'left';
+        ctx.fillStyle   = core;
+        ctx.beginPath(); ctx.arc(tree.x, tree.y + bounce, 12 + pulse * 4, 0, Math.PI * 2); ctx.fill();
+        ctx.shadowBlur  = 0;
 
       } else {
-        /* locked — dim grey orb */
-        ctx.globalAlpha = moveReveal * 0.35;
-        ctx.fillStyle   = '#666';
-        ctx.shadowBlur  = 8; ctx.shadowColor = '#888';
-        ctx.beginPath(); ctx.arc(tree.x, tree.y, 14, 0, Math.PI * 2); ctx.fill();
-        ctx.shadowBlur  = 0;
-        ctx.globalAlpha = moveReveal * 0.55;
-        ctx.fillStyle   = '#aaa';
-        ctx.font        = 'bold 13px monospace';
-        ctx.textAlign   = 'center';
-        ctx.fillText('🔒', tree.x, tree.y + 5);
-        ctx.textAlign   = 'left';
+        /* locked — dim radial grey, no hard shape */
+        const lockGlow = ctx.createRadialGradient(tree.x, tree.y, 0, tree.x, tree.y, 40);
+        lockGlow.addColorStop(0,   'rgba(120,120,120,0.28)');
+        lockGlow.addColorStop(0.5, 'rgba(90,90,90,0.10)');
+        lockGlow.addColorStop(1,   'transparent');
+        ctx.globalAlpha = moveReveal * 0.6;
+        ctx.fillStyle   = lockGlow;
+        ctx.beginPath(); ctx.arc(tree.x, tree.y, 40, 0, Math.PI * 2); ctx.fill();
+
+        /* tiny grey dot in centre */
+        const dotG = ctx.createRadialGradient(tree.x, tree.y, 0, tree.x, tree.y, 8);
+        dotG.addColorStop(0,   'rgba(180,180,180,0.55)');
+        dotG.addColorStop(1,   'transparent');
+        ctx.globalAlpha = moveReveal * 0.5;
+        ctx.fillStyle   = dotG;
+        ctx.beginPath(); ctx.arc(tree.x, tree.y, 8, 0, Math.PI * 2); ctx.fill();
       }
+
       ctx.restore();
     });
   }
@@ -1017,8 +972,8 @@ function drawWanderers(now) {
   const state = {
     roomId            : DATA.startRoom,
     spawnId           : "default",
-    x                 : 742,    // ← start position
-    y                 : 717,    // ← start position
+    x                 : 742,
+    y                 : 717,
     spawnX            : 742,
     spawnY            : 717,
     arrivalDir        : null,
@@ -1116,56 +1071,59 @@ function drawWanderers(now) {
       #portal-yes:hover{color:#fff;border-color:rgba(210,120,255,1);background:rgba(140,50,200,.3);box-shadow:0 0 20px rgba(180,80,240,.6),0 0 40px rgba(140,40,200,.3);}
       #portal-no{border:1.5px solid rgba(70,45,90,.8);color:#b8a8c8;background:rgba(40,25,60,.2);}
       #portal-no:hover{color:#ddd0ff;border-color:rgba(130,90,160,.9);background:rgba(70,45,100,.3);}
+
+      /* Wanderer popup scrollable */
+      #wanderer-pop-box::-webkit-scrollbar{width:4px;}
+      #wanderer-pop-box::-webkit-scrollbar-track{background:transparent;}
+      #wanderer-pop-box::-webkit-scrollbar-thumb{background:rgba(255,255,255,.18);border-radius:4px;}
     `;
     document.head.appendChild(s);
   }
 
+  /* ═══════════════════════════════════════════
+     DEV PANEL
+  ═══════════════════════════════════════════ */
+  function injectDevPanel() {
+    if (document.getElementById('dev-panel')) return;
 
-/* ═══════════════════════════════════════════
-   DEV TESTING TOGGLE (remove before shipping)
-═══════════════════════════════════════════ */
-function injectDevPanel() {
-  if (document.getElementById('dev-panel')) return;
+    const panel = document.createElement('div');
+    panel.id = 'dev-panel';
+    panel.style.cssText = `
+      position:fixed; bottom:60px; right:18px; z-index:9999;
+      pointer-events:auto;
+      background:rgba(0,0,0,.88); border:1px solid rgba(255,200,0,.4);
+      border-radius:10px; padding:10px 14px; font:700 11px/1.8 monospace;
+      color:#ffd700; letter-spacing:.06em; min-width:160px;
+      box-shadow:0 0 20px rgba(255,200,0,.2);`;
 
-  const panel = document.createElement('div');
-  panel.id = 'dev-panel';
-  panel.style.cssText = `
-    position:fixed; bottom:60px; right:18px; z-index:9999;
-    pointer-events:auto;
-    background:rgba(0,0,0,.88); border:1px solid rgba(255,200,0,.4);
-    border-radius:10px; padding:10px 14px; font:700 11px/1.8 monospace;
-    color:#ffd700; letter-spacing:.06em; min-width:160px;
-    box-shadow:0 0 20px rgba(255,200,0,.2);`;
+    panel.innerHTML = `
+      <div style="font-size:9px;color:rgba(255,200,0,.5);letter-spacing:.14em;margin-bottom:6px;">DEV MODE</div>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:4px;">
+        <input type="checkbox" id="dev-all-wanderers"> All wanderers
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+        <input type="checkbox" id="dev-all-games"> All games unlocked
+      </label>
+      <div id="dev-room-info" style="font-size:9px;color:rgba(255,200,0,.45);margin-top:8px;"></div>`;
 
-  panel.innerHTML = `
-    <div style="font-size:9px;color:rgba(255,200,0,.5);letter-spacing:.14em;margin-bottom:6px;">DEV MODE</div>
-    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:4px;">
-      <input type="checkbox" id="dev-all-wanderers"> All wanderers
-    </label>
-    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
-      <input type="checkbox" id="dev-all-games"> All games unlocked
-    </label>
-    <div id="dev-room-info" style="font-size:9px;color:rgba(255,200,0,.45);margin-top:8px;"></div>`;
+    document.body.appendChild(panel);
 
-  document.body.appendChild(panel);
+    window.__devAllGames     = false;
+    window.__devAllWanderers = false;
 
-  window.__devAllGames     = false;
-  window.__devAllWanderers = false;
+    document.getElementById('dev-all-games').addEventListener('change', function() {
+      window.__devAllGames = this.checked;
+    });
+    document.getElementById('dev-all-wanderers').addEventListener('change', function() {
+      window.__devAllWanderers = this.checked;
+      refreshWanderersForRoom();
+    });
 
-  document.getElementById('dev-all-games').addEventListener('change', function() {
-    window.__devAllGames = this.checked;
-  });
-
-  document.getElementById('dev-all-wanderers').addEventListener('change', function() {
-    window.__devAllWanderers = this.checked;
-    refreshWanderersForRoom();
-  });
-
-  setInterval(() => {
-    const el = document.getElementById('dev-room-info');
-    if (el) el.textContent = `room: ${state.roomId} | moved: ${Math.round(state.distMovedSinceSpawn)}`;
-  }, 200);
-}
+    setInterval(() => {
+      const el = document.getElementById('dev-room-info');
+      if (el) el.textContent = `room: ${state.roomId} | moved: ${Math.round(state.distMovedSinceSpawn)}`;
+    }, 200);
+  }
 
   /* ═══════════════════════════════════════════
      DOM BUILD
@@ -1218,12 +1176,11 @@ function injectDevPanel() {
     document.body.appendChild(toast);
     document.body.appendChild(portalOverlay);
 
-    injectBonusLockOverlay_LEGACY(); // keep legacy overlay injected just in case (no-ops if unused)
+    injectBonusLockOverlay_LEGACY();
     injectBonusPopOverlay();
     injectWandererPopOverlay();
     injectDevPanel();
 
-    /* ── Rotate overlay — Japanese ── */
     const rotateOverlay = document.createElement("div");
     rotateOverlay.id = "rotate-overlay";
     rotateOverlay.innerHTML = `
@@ -1236,7 +1193,6 @@ function injectDevPanel() {
     ctx = canvas.getContext("2d");
 
     document.getElementById("clear-pins").addEventListener("click", () => { pins = []; renderPinLog(); });
-
     document.getElementById("portal-yes").addEventListener("click", () => {
       try { sessionStorage.setItem('karasuki_return_room', 'room_08'); } catch (_) {}
       window.location.href = PORTAL.href;
@@ -1245,11 +1201,10 @@ function injectDevPanel() {
     portalOverlay.addEventListener("click", (e) => { if (e.target === portalOverlay) closePortal(); });
   }
 
-  /* Legacy lock overlay — kept as a no-op stub so the reference in buildApp doesn't break */
   let _legacyBonusLockOverlay = null;
   function injectBonusLockOverlay_LEGACY() {
     if (_legacyBonusLockOverlay) return;
-    _legacyBonusLockOverlay = true; // nothing to inject; new system handles everything
+    _legacyBonusLockOverlay = true;
   }
 
   function openPortal()  { portalOverlay.classList.add("active"); state.clickTarget = null; }
@@ -1436,7 +1391,6 @@ function injectDevPanel() {
       const now = performance.now();
       state.transitionReadyAt     = now + TRANSITION_COOLDOWN_MS;
       arrivalArrowHiddenUntil     = now + ARRIVAL_ARROW_DELAY_MS;
-      /* back-direction arrow delayed 3× */
       arrivalArrowBackHiddenUntil = now + ARRIVAL_ARROW_DELAY_MS * ARRIVAL_ARROW_BACK_MULTIPLIER;
       state.distMovedSinceSpawn   = 0;
 
@@ -1458,7 +1412,6 @@ function injectDevPanel() {
     const arrivalExit = state.arrivalDir ? OPPOSITE[state.arrivalDir] : null;
     for (const npp of npps) {
       if (Math.hypot(state.x - npp.x, state.y - npp.y) <= NPP_RADIUS) {
-        /* hard-block the back-direction exit until the 3× delay expires */
         if (npp.dir === arrivalExit && now < arrivalArrowBackHiddenUntil) return null;
         return npp;
       }
@@ -1485,8 +1438,6 @@ function injectDevPanel() {
 
   /* ═══════════════════════════════════════════
      DRAW EXIT ARROWS
-     — Back-direction arrow uses arrivalArrowBackHiddenUntil (3× delay)
-     — All other arrows use arrivalArrowHiddenUntil (normal delay)
   ═══════════════════════════════════════════ */
   function drawExitArrows(now) {
     const npps = NPP[state.roomId];
@@ -1502,12 +1453,8 @@ function injectDevPanel() {
     npps.forEach((npp, i) => {
       if (!npp.dir) return;
       const isBackDir = (npp.dir === arrivalExit);
-
-      /* choose the appropriate hidden-until timer */
-      const hiddenUntil     = isBackDir ? arrivalArrowBackHiddenUntil : arrivalArrowHiddenUntil;
-      const delayRemaining  = hiddenUntil - now;
-
-      /* skip completely if still in hard-hide window */
+      const hiddenUntil    = isBackDir ? arrivalArrowBackHiddenUntil : arrivalArrowHiddenUntil;
+      const delayRemaining = hiddenUntil - now;
       if (delayRemaining > 400) return;
 
       const revealFade = Math.min(1, Math.max(0, 1 - (delayRemaining / (isBackDir
@@ -1741,9 +1688,7 @@ function injectDevPanel() {
   }
 
   /* ═══════════════════════════════════════════
-     MOVEMENT  — delta-time corrected
-     SPEED is recalculated each tick so movement
-     is frame-rate independent (fixes Android lag)
+     MOVEMENT
   ═══════════════════════════════════════════ */
   function handleClickMovement(now) {
     if (!state.clickTarget) { state.moving = false; return; }
@@ -1766,10 +1711,6 @@ function injectDevPanel() {
      MAIN LOOP
   ═══════════════════════════════════════════ */
   function tick(now) {
-    /* ── Delta-time SPEED correction ──
-       Clamp dt to [8, 50] ms to avoid huge jumps after tab-switch / focus-loss.
-       At 60 fps dt ≈ 16.67 ms → multiplier ≈ 1.0 (no change).
-       At 30 fps dt ≈ 33 ms   → multiplier ≈ 2.0 (doubles step to compensate).  */
     const dt = Math.min(50, Math.max(8, now - (lastTickTime || now)));
     lastTickTime = now;
     SPEED = BASE_SPEED * (dt / TARGET_DT);
@@ -1840,7 +1781,7 @@ function injectDevPanel() {
       const p = stagePointToWorld(e.clientX, e.clientY);
       if (state.coordMode) { dropPin(p.x, p.y); ripples.push({ x: p.x, y: p.y, life: 1 }); return; }
       if (isNearPortal(p)) { openPortal(); ripples.push({ x: p.x, y: p.y, life: 1 }); return; }
-      /* wanderer sprite click check — before bonus tree so it takes priority */
+      /* wanderer click — takes priority over bonus tree */
       if (clickCheckWanderers(p.x, p.y)) { ripples.push({ x: p.x, y: p.y, life: 1 }); return; }
       if (clickBonusTree(p.x, p.y)) { ripples.push({ x: p.x, y: p.y, life: 1 }); return; }
       state.clickTarget = { x: p.x, y: p.y };
@@ -1854,7 +1795,6 @@ function injectDevPanel() {
       const p  = stagePointToWorld(t0.clientX, t0.clientY);
       if (state.coordMode) { dropPin(p.x, p.y); ripples.push({ x: p.x, y: p.y, life: 1 }); e.preventDefault(); return; }
       if (isNearPortal(p)) { openPortal(); ripples.push({ x: p.x, y: p.y, life: 1 }); e.preventDefault(); return; }
-      /* wanderer sprite tap check */
       if (clickCheckWanderers(p.x, p.y)) { ripples.push({ x: p.x, y: p.y, life: 1 }); e.preventDefault(); return; }
       if (clickBonusTree(p.x, p.y)) { ripples.push({ x: p.x, y: p.y, life: 1 }); e.preventDefault(); return; }
       state.clickTarget = { x: p.x, y: p.y };
