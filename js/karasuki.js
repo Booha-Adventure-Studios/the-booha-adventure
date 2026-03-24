@@ -171,7 +171,7 @@
     /* ── index 2: Tom Katsu — room_02 ── */
     {
       index:2, roomId:'room_02', x:882, y:263, type:'stay',
-      frames:['tom_katsu-1.png','tom_katsu-2.png'], color:'#ffaa5e', size:52,
+      frames:['tom_katsu-1.png','tom_katsu-2.png'], color:'#ffaa5e', size:60,
       name:'Tom Katsu', nameJP:'トムカツ', nameKanji:'勝',
       desc:'Crispy on the outside, warm on the inside.'
     },
@@ -190,17 +190,17 @@
       name:'Jamariko', nameJP:'ジャマリコ', nameKanji:'邪魔里子',
       desc:'She stands in your way, but only out of love.'
     },
-    /* ── index 5: Sumiyo Yamakage — room_06 — drifts toward ghost ── */
+    /* ── index 5: Sumiyo Yamagake — room_06 — drifts toward ghost ── */
     {
       index:5, roomId:'room_06', x:736, y:414, type:'drift',
-      frames:['sumiyo_yamakage-1.png','sumiyo_yamakage-2.png'], color:'#90aaff', size:72,
-      name:'Sumiyo Yamakage', nameJP:'山影すみよ', nameKanji:'影',
+      frames:['sumiyo_yamagake-1.png','sumiyo_yamagake-2.png'], color:'#90aaff', size:85,
+      name:'Sumiyo Yamagake', nameJP:'山影すみよ', nameKanji:'影',
       desc:'Quiet as a shadow, warm as afternoon light.'
     },
     /* ── index 6: Amekuro — room_07 ── */
     {
       index:6, roomId:'room_07', x:815, y:398, type:'stay',
-      frames:['amekuro-1.png','amekuro-2.png'], color:'#d49aff', size:52,
+      frames:['amekuro-1.png','amekuro-2.png'], color:'#d49aff', size:60,
       name:'Amekuro', nameJP:'アメクロ', nameKanji:'飴梟',
       desc:'Amekuro are cute, owl-like cats that love candy. When they stand up, a hidden mouth on their stomach appears and eats sweets in seconds.',
       descJP:'アメクロ（飴梟）は、おかしが大好きなフクロウのようなネコです。立つとおなかに口が現れ、おかしを一気に食べます。'
@@ -208,7 +208,7 @@
     /* ── index 7: Columbus — room_11 ── */
     {
       index:7, roomId:'room_11', x:935, y:397, type:'stay',
-      frames:['columbus-1.png','columbus-2.png'], color:'#ff85a1', size:52,
+      frames:['columbus-1.png','columbus-2.png'], color:'#ff85a1', size:55,
       name:'Columbus', nameJP:'コロンブス', nameKanji:'探',
       desc:'Still exploring.'
     },
@@ -226,21 +226,21 @@
     /* ── index 11: October Moriyama — room_12 ── */
     {
       index:11, roomId:'room_12', x:700, y:270, type:'stay',
-      frames:['october-moriyama-1.png','october-moriyama-2.png'], color:'#ff79d7', size:73,
+      frames:['october-moriyama-1.png','october-moriyama-2.png'], color:'#ff79d7', size:75,
       name:'October Moriyama', nameJP:'オクトーバー・森山', nameKanji:'霜',
       desc:'Arrived with the autumn. Never left.'
     },
     /* ── index 12: Takachika Green — room_13 ── */
     {
       index:12, roomId:'room_13', x:407, y:387, type:'stay',
-      frames:['takachika_green-1.png','takachika_green-2.png'], color:'#7fffd4', size:75,
+      frames:['takachika_green-1.png','takachika_green-2.png'], color:'#7fffd4', size:76,
       name:'Takachika Green', nameJP:'タカチカ・グリーン', nameKanji:'高近',
       desc:'Big presence, soft heart.'
     },
     /* ── index 13: Pugoo — room_13 ── */
     {
       index:13, roomId:'room_13', x:609, y:642, type:'stay',
-      frames:['pugoo-1.png','pugoo-2.png'], color:'#ffcc66', size:52,
+      frames:['pugoo-1.png','pugoo-2.png'], color:'#ffcc66', size:54,
       name:'Pugoo', nameJP:'プグー', nameKanji:'愛',
       desc:'Small but unforgettable.'
     },
@@ -251,7 +251,7 @@
     /* ── index 16: Jubei Tsukigase — room_15 — drifts toward ghost ── */
     {
       index:16, roomId:'room_15', x:1064, y:434, type:'drift',
-      frames:['tsukigase_jubei-1.png','tsukigase_jubei-2.png'], color:'#ffcc66', size:83,
+      frames:['tsukigase_jubei-1.png','tsukigase_jubei-2.png'], color:'#ffcc66', size:85,
       name:'Jubei Tsukigase', nameJP:'月ヶ瀬・寿兵衛', nameKanji:'字',
       desc:'Ancient and vast. A letter older than time.'
     },
@@ -259,12 +259,89 @@
 
   const WANDERER_IMG_BASE = 'https://booha-adventure-studios.github.io/the-booha-adventure/assets/img/wanderers/';
 
-  /* Dreamy crossfade — slow and smooth, 4 seconds per frame */
-  const FRAME_MS = 4000;
+  /* No animation in normal state — wanderers are static -1.png until popup opens */
 
   /* Drift speed for Sumiyo / Tsukigase — very slow */
   const DRIFT_SPEED      = 0.28;   // world-units per frame at 60fps
   const DRIFT_STOP_DIST  = 90;     // stops this close to the ghost
+
+  /* ═══════════════════════════════════════════
+     WANDERER GLITTER SYSTEM
+     — Very fine upward-drifting sparkle particles
+     — Per-wanderer pool, max 6 alive at once
+     — Spawn rate: ~1 every 380ms per wanderer
+  ═══════════════════════════════════════════ */
+  const GLITTER_MAX        = 6;    // max particles alive per wanderer
+  const GLITTER_SPAWN_MS   = 380;  // ms between spawns
+  const GLITTER_LIFE_MS    = 2200; // particle lifetime in ms
+  const GLITTER_SPEED_Y    = 0.18; // upward drift speed (world units / frame)
+  const GLITTER_WOBBLE     = 0.08; // lateral wobble amplitude
+
+  function spawnGlitter(w, now) {
+    if (!w.glitter) w.glitter = [];
+    if (!w.glitterNextAt) w.glitterNextAt = now;
+    if (now < w.glitterNextAt) return;
+    if (w.glitter.length >= GLITTER_MAX) return;
+
+    const sz     = w.size || WANDERER_SIZE;
+    // spawn within the sprite footprint, biased toward upper half
+    const ox     = (Math.random() - 0.5) * sz * 1.4;
+    const oy     = (Math.random() - 0.8) * sz * 1.2;
+    // colour: mostly white/gold with a hint of the character colour
+    const roll   = Math.random();
+    const color  = roll < 0.5 ? '#ffffff'
+                 : roll < 0.75 ? '#fff8d0'
+                 : w.color;
+
+    w.glitter.push({
+      x:       w.rx + ox,
+      y:       w.ry + oy,
+      vx:      (Math.random() - 0.5) * GLITTER_WOBBLE,
+      vy:      -(GLITTER_SPEED_Y + Math.random() * 0.12),
+      size:    0.6 + Math.random() * 1.1,   // very fine
+      color,
+      born:    now,
+      phase:   Math.random() * Math.PI * 2, // for twinkle
+    });
+
+    w.glitterNextAt = now + GLITTER_SPAWN_MS + Math.random() * 180;
+  }
+
+  function updateGlitter(w, now) {
+    if (!w.glitter) return;
+    w.glitter = w.glitter.filter(p => (now - p.born) < GLITTER_LIFE_MS);
+    w.glitter.forEach(p => {
+      p.x += p.vx;
+      p.y += p.vy;
+      // gentle lateral wobble
+      p.vx += (Math.random() - 0.5) * 0.012;
+      p.vx *= 0.96; // damp so it doesn't drift too far
+    });
+  }
+
+  function drawGlitter(w, now) {
+    if (!w.glitter || !w.glitter.length) return;
+    const sec = now / 1000;
+    w.glitter.forEach(p => {
+      const age     = (now - p.born) / GLITTER_LIFE_MS; // 0→1
+      const fadeIn  = Math.min(1, age * 6);              // quick fade in
+      const fadeOut = 1 - Math.pow(age, 1.8);            // gentle fade out
+      const alpha   = fadeIn * fadeOut;
+      // twinkle: rapid sin flicker
+      const twinkle = 0.55 + 0.45 * Math.abs(Math.sin(sec * 9 + p.phase));
+
+      ctx.save();
+      ctx.globalAlpha = alpha * twinkle * 0.88;
+      ctx.shadowBlur  = 4 + p.size * 2;
+      ctx.shadowColor = p.color;
+      ctx.fillStyle   = p.color;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur  = 0;
+      ctx.restore();
+    });
+  }
 
   /* ═══════════════════════════════════════════
      WANDERER RUNTIME
@@ -312,6 +389,9 @@
         pose: 0,
         /* drift state */
         frozen: false,   // true while popup is open for this wanderer
+        /* glitter particle pool */
+        glitter: [],
+        glitterNextAt: 0,
         images: (def.frames || []).map(f => wandererImages[f]).filter(Boolean),
       }));
   }
@@ -330,17 +410,22 @@
     if (!activeWanderers.length) return;
 
     activeWanderers.forEach(w => {
-      if (w.type !== 'drift' || w.frozen) return;
+      /* drift movement */
+      if (w.type === 'drift' && !w.frozen) {
+        const dx   = state.x - w.rx;
+        const dy   = state.y - w.ry;
+        const dist = Math.hypot(dx, dy);
 
-      const dx   = state.x - w.rx;
-      const dy   = state.y - w.ry;
-      const dist = Math.hypot(dx, dy);
-
-      if (dist > DRIFT_STOP_DIST) {
-        const step = DRIFT_SPEED * (SPEED / BASE_SPEED); // frame-rate independent
-        w.rx += (dx / dist) * step;
-        w.ry += (dy / dist) * step;
+        if (dist > DRIFT_STOP_DIST) {
+          const step = DRIFT_SPEED * (SPEED / BASE_SPEED);
+          w.rx += (dx / dist) * step;
+          w.ry += (dy / dist) * step;
+        }
       }
+
+      /* glitter — always running regardless of pose or drift state */
+      spawnGlitter(w, now);
+      updateGlitter(w, now);
     });
   }
 
@@ -373,18 +458,19 @@
           font-size:1.1rem; line-height:1; padding:4px 8px; z-index:10;
           color:rgba(255,255,255,.45); transition:color .18s;">✕</button>
 
-        <!-- Portrait image area — top half of sprite, rectangular crop -->
+        <!-- Portrait image area — contains full sprite, no crop -->
         <div id="wanderer-pop-portrait" style="
-          width:100%; height:140px; position:relative; overflow:hidden;
+          width:100%; height:160px; position:relative; overflow:hidden;
           border-radius:8px 8px 0 0; flex-shrink:0; margin-bottom:18px;
-          background:#0a0a18;">
+          background:#0a0a18; display:flex; align-items:center; justify-content:center;">
           <img id="wanderer-pop-img" src="" alt="" style="
-            position:absolute; top:0; left:50%; transform:translateX(-50%);
-            width:auto; height:220px; object-fit:cover; object-position:top center;
+            max-width:90%; max-height:150px;
+            width:auto; height:auto;
+            object-fit:contain;
             display:none;" />
           <!-- glow overlay at bottom of portrait to blend into card -->
           <div id="wanderer-pop-portrait-fade" style="
-            position:absolute; bottom:0; left:0; right:0; height:60px;
+            position:absolute; bottom:0; left:0; right:0; height:50px;
             background:linear-gradient(to bottom, transparent, #080810);
             pointer-events:none;"></div>
         </div>
@@ -441,19 +527,22 @@
     box.style.border    = `1px solid ${c}44`;
     box.style.boxShadow = `0 0 0 1px ${c}33, 0 0 30px ${c}55, 0 0 70px ${c}22`;
 
-    /* Portrait: show the -2 (pose 1) image, cropped to top half */
-    const poseImg = w.images && w.images.length > 1 ? w.images[1] : (w.images && w.images[0]);
+    /* Portrait: show the -2 image (index 1), fall back to -1 if not loaded */
+    const poseImg = (w.images && w.images.length > 1 && w.images[1].complete && w.images[1].naturalWidth > 0)
+                  ? w.images[1]
+                  : (w.images && w.images[0] && w.images[0].complete ? w.images[0] : null);
+
     portrait.style.background    = `#0a0a18`;
-    portrait.style.borderBottom  = `1px solid ${c}33`;
+    portrait.style.borderBottom  = `1px solid ${c}22`;
     portraitFade.style.background = `linear-gradient(to bottom, transparent, #080810)`;
 
-    if (poseImg && poseImg.complete && poseImg.naturalWidth > 0) {
-      imgEl.src          = poseImg.src;
+    if (poseImg) {
+      imgEl.src           = poseImg.src;
       imgEl.style.display = 'block';
-      imgEl.style.filter  = `drop-shadow(0 0 18px ${c}cc) drop-shadow(0 0 8px ${c}88)`;
+      imgEl.style.filter  = `drop-shadow(0 0 14px ${c}bb) drop-shadow(0 0 6px ${c}66)`;
     } else {
       imgEl.style.display = 'none';
-      portrait.style.background = `radial-gradient(circle at 50% 60%, ${c}33, #0a0a18)`;
+      portrait.style.background = `radial-gradient(circle at 50% 60%, ${c}22, #0a0a18)`;
     }
 
     closeEl.style.color = c;
@@ -509,85 +598,54 @@
 
   /* ─────────────────────────────────────────
      DRAW WANDERERS
-     — No orb/bubble shape drawn
-     — Image glows via shadowBlur
-     — Dreamy slow crossfade between frame 0 and frame 1
-     — pose=1 locks to -2 image (no crossfade)
+     — pose 0: static -1.png, no animation
+     — pose 1: static -2.png (popup open), clean cut
+     — Soft pulsing glow halo behind sprite
+     — Fine glitter particles floating upward
   ───────────────────────────────────────── */
   function drawWanderers(now) {
     if (!activeWanderers.length) return;
     const sec = now / 1000;
 
     activeWanderers.forEach(w => {
-      const sz  = w.size || WANDERER_SIZE;
+      const sz = w.size || WANDERER_SIZE;
 
-      /* ── image selection with pose override ── */
-      let imgA = null, imgB = null, crossfade = 0;
+      /* pick the correct image — no crossfade, clean cut */
+      const imgIdx  = w.pose === 1 ? 1 : 0;
+      const rawImg  = w.images && w.images.length > imgIdx
+                    ? w.images[imgIdx]
+                    : (w.images && w.images[0]);
+      const img     = (rawImg && rawImg.complete && rawImg.naturalWidth > 0) ? rawImg : null;
 
-      if (w.pose === 1) {
-        /* locked to -2 image — no crossfade */
-        const img = w.images && w.images.length > 1 ? w.images[1] : (w.images && w.images[0]);
-        if (img && img.complete && img.naturalWidth > 0) imgA = img;
-        crossfade = 0;
-      } else if (w.images && w.images.length > 1) {
-        /* dreamy crossfade between frame 0 and frame 1 */
-        const cycleDur = FRAME_MS / 1000;
-        const cyclePos = (sec / cycleDur) % w.images.length;
-        const frameA   = Math.floor(cyclePos) % w.images.length;
-        const frameB   = (frameA + 1) % w.images.length;
-        crossfade      = cyclePos - Math.floor(cyclePos);
-        const ca = w.images[frameA];
-        const cb = w.images[frameB];
-        if (ca && ca.complete && ca.naturalWidth > 0) imgA = ca;
-        if (cb && cb.complete && cb.naturalWidth > 0) imgB = cb;
-      } else if (w.images && w.images.length === 1) {
-        const c = w.images[0];
-        if (c && c.complete && c.naturalWidth > 0) imgA = c;
-      }
-
-      /* ── ambient glow pulse — soft, behind the image ── */
+      /* soft glow pulse */
       const pulse = 0.5 + 0.5 * Math.sin(sec * 1.6 + w.wobblePhase);
-      const glowR = sz * 2.2;
+      const glowR = sz * 2.4;
 
       ctx.save();
 
-      /* soft ambient glow cloud — no hard shape */
+      /* ambient halo — pure radial fade, no border */
       const halo = ctx.createRadialGradient(w.rx, w.ry, 0, w.rx, w.ry, glowR);
-      halo.addColorStop(0,   w.color + '44');
-      halo.addColorStop(0.5, w.color + '18');
+      halo.addColorStop(0,   w.color + '38');
+      halo.addColorStop(0.5, w.color + '14');
       halo.addColorStop(1,   'transparent');
-      ctx.globalAlpha = 0.35 + pulse * 0.2;
+      ctx.globalAlpha = 0.30 + pulse * 0.18;
       ctx.fillStyle   = halo;
       ctx.beginPath();
       ctx.arc(w.rx, w.ry, glowR, 0, Math.PI * 2);
       ctx.fill();
 
-      /* ── draw image A ── */
-      if (imgA) {
-        const ratA = imgA.naturalWidth / (imgA.naturalHeight || 1);
-        const dwA  = ratA >= 1 ? sz * 2 : sz * 2 * ratA;
-        const dhA  = ratA >= 1 ? sz * 2 / ratA : sz * 2;
-        ctx.globalAlpha = (1 - crossfade) * 0.95;
-        ctx.shadowBlur  = 20 + pulse * 10;
+      /* draw sprite — shadowBlur gives it a living glow */
+      if (img) {
+        const rat  = img.naturalWidth / (img.naturalHeight || 1);
+        const dw   = rat >= 1 ? sz * 2 : sz * 2 * rat;
+        const dh   = rat >= 1 ? sz * 2 / rat : sz * 2;
+        ctx.globalAlpha = 0.96;
+        ctx.shadowBlur  = 14 + pulse * 8;
         ctx.shadowColor = w.color;
-        ctx.drawImage(imgA, w.rx - dwA / 2, w.ry - dhA / 2, dwA, dhA);
+        ctx.drawImage(img, w.rx - dw / 2, w.ry - dh / 2, dw, dh);
         ctx.shadowBlur  = 0;
-      }
-
-      /* ── draw image B (crossfade target) ── */
-      if (imgB && crossfade > 0) {
-        const ratB = imgB.naturalWidth / (imgB.naturalHeight || 1);
-        const dwB  = ratB >= 1 ? sz * 2 : sz * 2 * ratB;
-        const dhB  = ratB >= 1 ? sz * 2 / ratB : sz * 2;
-        ctx.globalAlpha = crossfade * 0.95;
-        ctx.shadowBlur  = 20 + pulse * 10;
-        ctx.shadowColor = w.color;
-        ctx.drawImage(imgB, w.rx - dwB / 2, w.ry - dhB / 2, dwB, dhB);
-        ctx.shadowBlur  = 0;
-      }
-
-      /* ── fallback: glowing circle if no image loaded ── */
-      if (!imgA && !imgB) {
+      } else {
+        /* fallback orb if image not yet loaded */
         const ig = ctx.createRadialGradient(
           w.rx - sz * 0.3, w.ry - sz * 0.3, 0,
           w.rx, w.ry, sz);
@@ -595,7 +653,7 @@
         ig.addColorStop(0.4, w.color);
         ig.addColorStop(1,   w.color + 'aa');
         ctx.globalAlpha = 0.88 + pulse * 0.1;
-        ctx.shadowBlur  = 18;
+        ctx.shadowBlur  = 16;
         ctx.shadowColor = w.color;
         ctx.fillStyle   = ig;
         ctx.beginPath();
@@ -605,6 +663,9 @@
       }
 
       ctx.restore();
+
+      /* glitter drawn after the sprite so it sits on top */
+      drawGlitter(w, now);
     });
   }
 
