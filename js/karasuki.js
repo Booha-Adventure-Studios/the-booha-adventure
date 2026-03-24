@@ -171,7 +171,7 @@
     /* ── index 2: Tom Katsu — room_02 ── */
     {
       index:2, roomId:'room_02', x:882, y:263, type:'stay',
-      frames:['tom_katsu-1.png','tom_katsu-2.png'], color:'#ffaa5e', size:60,
+      frames:['tom_katsu-1.png','tom-katsu-2.png'], color:'#ffaa5e', size:60,
       name:'Tom Katsu', nameJP:'トムカツ', nameKanji:'勝',
       desc:'Crispy on the outside, warm on the inside.'
     },
