@@ -1,1 +1,72 @@
 
+{
+  "cards": [
+    { "n": 1, "en": "It is hot.", "jp": "あついです。", "hira": "あつい です", "mp3": "pb_s01_it_is_hot.mp3" },
+    { "n": 2, "en": "I like summer.", "jp": "なつがすきです。", "hira": "なつ が すき です", "mp3": "pb_s02_i_like_summer.mp3" },
+    { "n": 3, "en": "I swim.", "jp": "およぎます。", "hira": "およぎます", "mp3": "pb_s03_i_swim.mp3" },
+    { "n": 4, "en": "Let’s go to the pool.", "jp": "プールにいこう。", "hira": "ぷーる に いこう", "mp3": "pb_s04_lets_go_to_the_pool.mp3" },
+    { "n": 5, "en": "I have a swimsuit.", "jp": "みずぎがあります。", "hira": "みずぎ が あります", "mp3": "pb_s05_i_have_a_swimsuit.mp3" },
+    { "n": 6, "en": "The sea is fun.", "jp": "うみはたのしいです。", "hira": "うみ は たのしい です", "mp3": "pb_s06_the_sea_is_fun.mp3" },
+    { "n": 7, "en": "I eat ice cream.", "jp": "アイスをたべます。", "hira": "あいす を たべます", "mp3": "pb_s07_i_eat_ice_cream.mp3" },
+    { "n": 8, "en": "Let’s go to a festival.", "jp": "おまつりにいこう。", "hira": "おまつり に いこう", "mp3": "pb_s08_lets_go_to_a_festival.mp3" },
+
+    { "n": 9, "en": "I see fireworks.", "jp": "はなびをみます。", "hira": "はなび を みます", "mp3": "pb_s09_i_see_fireworks.mp3" },
+    { "n": 10, "en": "I go camping.", "jp": "キャンプにいきます。", "hira": "きゃんぷ に いきます", "mp3": "pb_s10_i_go_camping.mp3" },
+    { "n": 11, "en": "Let’s eat meat.", "jp": "にくをたべよう。", "hira": "にく を たべよう", "mp3": "pb_s11_lets_eat_meat.mp3" },
+    { "n": 12, "en": "I wear a hat.", "jp": "ぼうしをかぶります。", "hira": "ぼうし を かぶります", "mp3": "pb_s12_i_wear_a_hat.mp3" },
+    { "n": 13, "en": "The sun is big.", "jp": "たいようはおおきいです。", "hira": "たいよう は おおきい です", "mp3": "pb_s13_the_sun_is_big.mp3" },
+    { "n": 14, "en": "I use a fan.", "jp": "うちわをつかいます。", "hira": "うちわ を つかいます", "mp3": "pb_s14_i_use_a_fan.mp3" },
+    { "n": 15, "en": "Summer is fun.", "jp": "なつはたのしいです。", "hira": "なつ は たのしい です", "mp3": "pb_s15_summer_is_fun.mp3" },
+
+    { "n": 16, "en": "I am on holiday.", "jp": "やすみです。", "hira": "やすみ です", "mp3": "pb_s16_i_am_on_holiday.mp3" },
+    { "n": 17, "en": "I go this summer.", "jp": "このなつ、いきます。", "hira": "この なつ いきます", "mp3": "pb_s17_i_go_this_summer.mp3" },
+    { "n": 18, "en": "I want a trip.", "jp": "りょこうにいきたいです。", "hira": "りょこう に いきたい です", "mp3": "pb_s18_i_want_a_trip.mp3" },
+    { "n": 19, "en": "I stay in a room.", "jp": "へやにとまります。", "hira": "へや に とまります", "mp3": "pb_s19_i_stay_in_a_room.mp3" },
+    { "n": 20, "en": "I read a book.", "jp": "ほんをよみます。", "hira": "ほん を よみます", "mp3": "pb_s20_i_read_a_book.mp3" },
+    { "n": 21, "en": "I get a gift.", "jp": "プレゼントをもらいます。", "hira": "ぷれぜんと を もらいます", "mp3": "pb_s21_i_get_a_gift.mp3" },
+    { "n": 22, "en": "I have a ticket.", "jp": "チケットがあります。", "hira": "ちけっと が あります", "mp3": "pb_s22_i_have_a_ticket.mp3" },
+    { "n": 23, "en": "I go to the airport.", "jp": "くうこうにいきます。", "hira": "くうこう に いきます", "mp3": "pb_s23_i_go_to_the_airport.mp3" },
+
+    { "n": 24, "en": "I go to the station.", "jp": "えきにいきます。", "hira": "えき に いきます", "mp3": "pb_s24_i_go_to_the_station.mp3" },
+    { "n": 25, "en": "I ride the train.", "jp": "でんしゃにのります。", "hira": "でんしゃ に のります", "mp3": "pb_s25_i_ride_the_train.mp3" },
+    { "n": 26, "en": "I take a plane.", "jp": "ひこうきにのります。", "hira": "ひこうき に のります", "mp3": "pb_s26_i_take_a_plane.mp3" },
+    { "n": 27, "en": "I have a bag.", "jp": "かばんがあります。", "hira": "かばん が あります", "mp3": "pb_s27_i_have_a_bag.mp3" },
+    { "n": 28, "en": "I take pictures.", "jp": "しゃしんをとります。", "hira": "しゃしん を とります", "mp3": "pb_s28_i_take_pictures.mp3" },
+    { "n": 29, "en": "I have money.", "jp": "おかねがあります。", "hira": "おかね が あります", "mp3": "pb_s29_i_have_money.mp3" },
+    { "n": 30, "en": "I have time.", "jp": "じかんがあります。", "hira": "じかん が あります", "mp3": "pb_s30_i_have_time.mp3" },
+
+    { "n": 31, "en": "I pack my bag.", "jp": "かばんにいれます。", "hira": "かばん に いれます", "mp3": "pb_s31_i_pack_my_bag.mp3" },
+    { "n": 32, "en": "I make a plan.", "jp": "かんがえます。", "hira": "かんがえます", "mp3": "pb_s32_i_make_a_plan.mp3" },
+    { "n": 33, "en": "I make a list.", "jp": "リストをつくります。", "hira": "りすと を つくります", "mp3": "pb_s33_i_make_a_list.mp3" },
+    { "n": 34, "en": "I have a bag.", "jp": "バッグがあります。", "hira": "ばっぐ が あります", "mp3": "pb_s34_i_have_a_bag.mp3" },
+    { "n": 35, "en": "I have a case.", "jp": "ケースがあります。", "hira": "けーす が あります", "mp3": "pb_s35_i_have_a_case.mp3" },
+    { "n": 36, "en": "I wear clothes.", "jp": "ふくをきます。", "hira": "ふく を きます", "mp3": "pb_s36_i_wear_clothes.mp3" },
+    { "n": 37, "en": "I wear shoes.", "jp": "くつをはきます。", "hira": "くつ を はきます", "mp3": "pb_s37_i_wear_shoes.mp3" },
+    { "n": 38, "en": "I use a towel.", "jp": "タオルをつかいます。", "hira": "たおる を つかいます", "mp3": "pb_s38_i_use_a_towel.mp3" },
+
+    { "n": 39, "en": "I have a bottle.", "jp": "ボトルがあります。", "hira": "ぼとる が あります", "mp3": "pb_s39_i_have_a_bottle.mp3" },
+    { "n": 40, "en": "I take medicine.", "jp": "くすりをのみます。", "hira": "くすり を のみます", "mp3": "pb_s40_i_take_medicine.mp3" },
+    { "n": 41, "en": "I use an umbrella.", "jp": "かさをつかいます。", "hira": "かさ を つかいます", "mp3": "pb_s41_i_use_an_umbrella.mp3" },
+    { "n": 42, "en": "I look at a map.", "jp": "ちずをみます。", "hira": "ちず を みます", "mp3": "pb_s42_i_look_at_a_map.mp3" },
+    { "n": 43, "en": "I have a plan.", "jp": "よていがあります。", "hira": "よてい が あります", "mp3": "pb_s43_i_have_a_plan.mp3" },
+    { "n": 44, "en": "This is important.", "jp": "だいじです。", "hira": "だいじ です", "mp3": "pb_s44_this_is_important.mp3" },
+    { "n": 45, "en": "I forget.", "jp": "わすれます。", "hira": "わすれます", "mp3": "pb_s45_i_forget.mp3" },
+
+    { "n": 46, "en": "I eat watermelon.", "jp": "すいかをたべます。", "hira": "すいか を たべます", "mp3": "pb_s46_i_eat_watermelon.mp3" },
+    { "n": 47, "en": "The ice is cold.", "jp": "こおりはつめたいです。", "hira": "こおり は つめたい です", "mp3": "pb_s47_the_ice_is_cold.mp3" },
+    { "n": 48, "en": "I drink.", "jp": "のみます。", "hira": "のみます", "mp3": "pb_s48_i_drink.mp3" },
+    { "n": 49, "en": "I eat noodles.", "jp": "めんをたべます。", "hira": "めん を たべます", "mp3": "pb_s49_i_eat_noodles.mp3" },
+    { "n": 50, "en": "I have a ball.", "jp": "ボールがあります。", "hira": "ぼーる が あります", "mp3": "pb_s50_i_have_a_ball.mp3" },
+    { "n": 51, "en": "I eat corn.", "jp": "とうもろこしをたべます。", "hira": "とうもろこし を たべます", "mp3": "pb_s51_i_eat_corn.mp3" },
+    { "n": 52, "en": "I eat cucumber.", "jp": "きゅうりをたべます。", "hira": "きゅうり を たべます", "mp3": "pb_s52_i_eat_cucumber.mp3" },
+    { "n": 53, "en": "I eat tomato.", "jp": "トマトをたべます。", "hira": "とまと を たべます", "mp3": "pb_s53_i_eat_tomato.mp3" },
+
+    { "n": 54, "en": "I drink juice.", "jp": "ジュースをのみます。", "hira": "じゅーす を のみます", "mp3": "pb_s54_i_drink_juice.mp3" },
+    { "n": 55, "en": "This is sweet.", "jp": "あまいです。", "hira": "あまい です", "mp3": "pb_s55_this_is_sweet.mp3" },
+    { "n": 56, "en": "This is salty.", "jp": "しょっぱいです。", "hira": "しょっぱい です", "mp3": "pb_s56_this_is_salty.mp3" },
+    { "n": 57, "en": "I am hungry.", "jp": "おなかすいた。", "hira": "おなかすいた", "mp3": "pb_s57_i_am_hungry.mp3" },
+    { "n": 58, "en": "I am thirsty.", "jp": "のどかわいた。", "hira": "のどかわいた", "mp3": "pb_s58_i_am_thirsty.mp3" },
+    { "n": 59, "en": "Let’s eat.", "jp": "たべよう。", "hira": "たべよう", "mp3": "pb_s59_lets_eat.mp3" },
+    { "n": 60, "en": "Summer is the best.", "jp": "なつがいちばんです。", "hira": "なつ が いちばん です", "mp3": "pb_s60_summer_is_the_best.mp3" }
+  ]
+}
