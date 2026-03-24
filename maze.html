@@ -873,11 +873,17 @@ const IMG_H = 900;
 const CURRENT_WEEK_DATA = getCurrentCurriculumWeek();
 const CURRENT_WEEK = getAcademicWeekNumber(CURRENT_WEEK_DATA);
 
-const OPEN_WEEKS = [
-  Math.max(1, CURRENT_WEEK - 1),
-  CURRENT_WEEK,
-  Math.min(48, CURRENT_WEEK + 1)
-];
+  
+const _lastData = window.CALENDAR.getCurrentCurriculumWeek(
+  new Date(new Date(CURRENT_WEEK_DATA.weekStart + 'T12:00:00Z').getTime() - 7*24*60*60*1000)
+);
+const _nextData = window.CALENDAR.getCurrentCurriculumWeek(
+  new Date(new Date(CURRENT_WEEK_DATA.weekStart + 'T12:00:00Z').getTime() + 7*24*60*60*1000)
+);
+const _lastW = getAcademicWeekNumber(_lastData);
+const _nextW = getAcademicWeekNumber(_nextData);
+const OPEN_WEEKS = [Math.max(1, _lastW), CURRENT_WEEK];
+if (_nextData.weekId !== CURRENT_WEEK_DATA.weekId) OPEN_WEEKS.push(Math.min(48, _nextW));
 
 const GHOST_TRAVEL_MS = 3800;
 
