@@ -25,8 +25,8 @@ const pauseRing     = document.getElementById('pause-ring');
 const ringFg        = document.getElementById('ring-fg');
 const btnPlayPause  = document.getElementById('btn-playpause');
 const btnSlow       = document.getElementById('btn-slow');
-const btnPrev       = document.getElementById('btn-prev');
-const btnNext       = document.getElementById('btn-next');
+const btnPrev       = document.getElementById('stream-btn-prev');
+const btnNext       = document.getElementById('stream-btn-next');
 const preloadBar    = document.getElementById('preload-bar-stream');
 const progressLeft  = document.getElementById('progress-left');
 const progressRight = document.getElementById('progress-right');
@@ -41,16 +41,10 @@ let isPlaying    = false;
 let slowMode     = false;
 let pauseTimer   = null;
 let ringRAF      = null;
-let currentAudio = null;
+// FIX: one persistent Audio element, created once, never replaced
+const audioEl    = new Audio();
+audioEl.preload  = 'auto';
 
-/* ── FIX: Generation counter ──────────────────────────────────
-   Every call to playTrack() bumps this counter.
-   All async callbacks (onended, onerror, play().catch, setTimeout)
-   capture their generation at the moment they are created.
-   If the counter has moved on by the time they fire, they are
-   stale and do nothing. This completely eliminates the race
-   condition that caused tracks to be skipped.
-─────────────────────────────────────────────────────────────── */
 let playGen = 0;
 
 /* ════════════════════════════
@@ -251,15 +245,11 @@ function animateRing(durationMs) {
    PLAYBACK
 ════════════════════════════ */
 function stopEverything() {
-  /* Bump the generation so all in-flight callbacks become stale */
   playGen++;
-
-  if (currentAudio) {
-    try { currentAudio.pause(); currentAudio.currentTime = 0; } catch(e){}
-    currentAudio.onended = null;
-    currentAudio.onerror = null;
-    currentAudio = null;
-  }
+  // FIX: pause and reset the persistent element, don't null it out
+  try { audioEl.pause(); audioEl.currentTime = 0; } catch(e){}
+  audioEl.onended = null;
+  audioEl.onerror = null;
   clearTimeout(pauseTimer);
   pauseTimer = null;
   cancelAnimationFrame(ringRAF);
@@ -267,6 +257,7 @@ function stopEverything() {
   enTextEl.classList.remove('dancing');
 }
 
+   
 function getPauseSeconds(track) {
   if (Number.isFinite(track.pause)) return track.pause;
   const words = (track.en||'').trim().split(/\s+/).filter(Boolean).length;
@@ -301,25 +292,26 @@ function playTrack(i) {
   const track = TRACKS[trackIdx];
   updateUI(track);
 
-  const audio = new Audio(getAudioSrc(track.mp3));
-  audio.preload = 'auto';
-  if (slowMode) audio.playbackRate = 0.75;
-  currentAudio = audio;
+   
+// FIX: reuse persistent element — swap src instead of new Audio()
+  audioEl.src = getAudioSrc(track.mp3);
+  audioEl.playbackRate = slowMode ? 0.75 : 1.0;
 
-  audio.onended = () => {
-    enTextEl.classList.remove('dancing');
-    if (gen !== playGen) return;  /* stale — a newer playTrack has taken over */
-    if (isPlaying) startPause(track, gen);
-  };
-
-  audio.onerror = () => {
+  audioEl.onended = () => {
     enTextEl.classList.remove('dancing');
     if (gen !== playGen) return;
     if (isPlaying) startPause(track, gen);
   };
 
-  audio.play().then(() => {
-    if (gen !== playGen) return;  /* started playing but we've already moved on */
+  audioEl.onerror = () => {
+    enTextEl.classList.remove('dancing');
+    if (gen !== playGen) return;
+    if (isPlaying) startPause(track, gen);
+  };
+
+  audioEl.load();
+  audioEl.play().then(() => {
+    if (gen !== playGen) return;
     enTextEl.classList.add('dancing');
     burstMotes();
   }).catch(() => {
@@ -327,6 +319,8 @@ function playTrack(i) {
     if (gen !== playGen) return;
     if (isPlaying) startPause(track, gen);
   });
+
+   
 }
 
 function togglePlay() {
@@ -369,7 +363,7 @@ if (btnSlow) btnSlow.addEventListener('click', () => {
   slowMode = !slowMode;
   btnSlow.classList.toggle('active', slowMode);
   btnSlow.setAttribute('aria-pressed', slowMode);
-  if (currentAudio) currentAudio.playbackRate = slowMode ? 0.75 : 1.0;
+  audioEl.playbackRate = slowMode ? 0.75 : 1.0;  // FIX: always applies
 });
 
 window.addEventListener('resize', () => {

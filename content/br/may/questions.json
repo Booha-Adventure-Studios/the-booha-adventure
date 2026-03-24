@@ -1,1 +1,76 @@
 
+{
+  "cards": [
+    { "n": 1, "en": "What time do you wake up?", "jp": "あなたは何時に起きますか。", "hira": "あなた は なんじ に おきます か", "mp3": "br_q01_what_time_do_you_wake_up.mp3" },
+    { "n": 2, "en": "What do you do after school?", "jp": "放課後に何をしますか。", "hira": "ほうかご に なに を します か", "mp3": "br_q02_what_do_you_do_after_school.mp3" },
+    { "n": 3, "en": "Do you always eat breakfast?", "jp": "いつも朝ごはんを食べますか。", "hira": "いつも あさごはん を たべます か", "mp3": "br_q03_do_you_always_eat_breakfast.mp3" },
+    { "n": 4, "en": "When do you do your homework?", "jp": "いつ宿題をしますか。", "hira": "いつ しゅくだい を します か", "mp3": "br_q04_when_do_you_do_your_homework.mp3" },
+    { "n": 5, "en": "Do you watch TV every day?", "jp": "毎日テレビを見ますか。", "hira": "まいにち てれび を みます か", "mp3": "br_q05_do_you_watch_tv_every_day.mp3" },
+
+    { "n": 6, "en": "How often do you take a bath?", "jp": "どのくらいおふろに入りますか。", "hira": "どのくらい おふろ に はいります か", "mp3": "br_q06_how_often_do_you_take_a_bath.mp3" },
+    { "n": 7, "en": "Who cooks dinner at your home?", "jp": "家ではだれが夕ごはんを作りますか。", "hira": "いえ では だれ が ゆうごはん を つくります か", "mp3": "br_q07_who_cooks_dinner_at_your_home.mp3" },
+    { "n": 8, "en": "Do you walk a pet?", "jp": "ペットの散歩をしますか。", "hira": "ぺっと の さんぽ を します か", "mp3": "br_q08_do_you_walk_a_pet.mp3" },
+    { "n": 9, "en": "What time do you go to bed?", "jp": "何時に寝ますか。", "hira": "なんじ に ねます か", "mp3": "br_q09_what_time_do_you_go_to_bed.mp3" },
+    { "n": 10, "en": "What do you usually do in the evening?", "jp": "夕方はたいてい何をしますか。", "hira": "ゆうがた は たいてい なに を します か", "mp3": "br_q10_what_do_you_usually_do_in_the_evening.mp3" },
+
+    { "n": 11, "en": "Do you study every day?", "jp": "毎日勉強しますか。", "hira": "まいにち べんきょうします か", "mp3": "br_q11_do_you_study_every_day.mp3" },
+    { "n": 12, "en": "What do you do before bed?", "jp": "寝る前に何をしますか。", "hira": "ねる まえ に なに を します か", "mp3": "br_q12_what_do_you_do_before_bed.mp3" },
+    { "n": 13, "en": "Do you help clean your room?", "jp": "部屋のそうじを手伝いますか。", "hira": "へや の そうじ を てつだいます か", "mp3": "br_q13_do_you_help_clean_your_room.mp3" },
+    { "n": 14, "en": "What time does your family have dinner?", "jp": "家族は何時に夕ごはんを食べますか。", "hira": "かぞく は なんじ に ゆうごはん を たべます か", "mp3": "br_q14_what_time_does_your_family_have_dinner.mp3" },
+    { "n": 15, "en": "What is your favorite part of the day?", "jp": "一日の中でいちばん好きな時間は何ですか。", "hira": "いちにち の なか で いちばん すき な じかん は なん です か", "mp3": "br_q15_what_is_your_favorite_part_of_the_day.mp3" },
+
+    { "n": 16, "en": "What time do you start school?", "jp": "学校は何時に始まりますか。", "hira": "がっこう は なんじ に はじまります か", "mp3": "br_q16_what_time_do_you_start_school.mp3" },
+    { "n": 17, "en": "When is lunch time?", "jp": "昼休みはいつですか。", "hira": "ひるやすみ は いつ です か", "mp3": "br_q17_when_is_lunch_time.mp3" },
+    { "n": 18, "en": "Are you early or late today?", "jp": "今日は早いですか、それとも遅いですか。", "hira": "きょう は はやい です か それとも おそい です か", "mp3": "br_q18_are_you_early_or_late_today.mp3" },
+    { "n": 19, "en": "What time is it now?", "jp": "今何時ですか。", "hira": "いま なんじ です か", "mp3": "br_q19_what_time_is_it_now.mp3" },
+    { "n": 20, "en": "What time do you get up?", "jp": "何時に起きますか。", "hira": "なんじ に おきます か", "mp3": "br_q20_what_time_do_you_get_up.mp3" },
+
+    { "n": 21, "en": "What time do you go to bed?", "jp": "何時に寝ますか。", "hira": "なんじ に ねます か", "mp3": "br_q21_what_time_do_you_go_to_bed.mp3" },
+    { "n": 22, "en": "When do you do homework?", "jp": "いつ宿題をしますか。", "hira": "いつ しゅくだい を します か", "mp3": "br_q22_when_do_you_do_homework.mp3" },
+    { "n": 23, "en": "What time does your club start?", "jp": "部活は何時に始まりますか。", "hira": "ぶかつ は なんじ に はじまります か", "mp3": "br_q23_what_time_does_your_club_start.mp3" },
+    { "n": 24, "en": "Do you use an alarm clock?", "jp": "目覚まし時計を使いますか。", "hira": "めざましどけい を つかいます か", "mp3": "br_q24_do_you_use_an_alarm_clock.mp3" },
+    { "n": 25, "en": "When do you arrive at school?", "jp": "学校にはいつ着きますか。", "hira": "がっこう には いつ つきます か", "mp3": "br_q25_when_do_you_arrive_at_school.mp3" },
+
+    { "n": 26, "en": "What time is dinner at your home?", "jp": "家では夕ごはんは何時ですか。", "hira": "いえ では ゆうごはん は なんじ です か", "mp3": "br_q26_what_time_is_dinner_at_your_home.mp3" },
+    { "n": 27, "en": "Do you ever oversleep?", "jp": "寝坊することはありますか。", "hira": "ねぼう する こと は あります か", "mp3": "br_q27_do_you_ever_oversleep.mp3" },
+    { "n": 28, "en": "How long is your lunch break?", "jp": "昼休みはどのくらいですか。", "hira": "ひるやすみ は どのくらい です か", "mp3": "br_q28_how_long_is_your_lunch_break.mp3" },
+    { "n": 29, "en": "Can we meet at three fifteen?", "jp": "3時15分に会えますか。", "hira": "さんじ じゅうごふん に あえます か", "mp3": "br_q29_can_we_meet_at_three_fifteen.mp3" },
+    { "n": 30, "en": "What time do you finish school?", "jp": "学校は何時に終わりますか。", "hira": "がっこう は なんじ に おわります か", "mp3": "br_q30_what_time_do_you_finish_school.mp3" },
+
+    { "n": 31, "en": "What do you do in your free time?", "jp": "ひまなときに何をしますか。", "hira": "ひま な とき に なに を します か", "mp3": "br_q31_what_do_you_do_in_your_free_time.mp3" },
+    { "n": 32, "en": "Do you like playing sports?", "jp": "スポーツをするのは好きですか。", "hira": "すぽーつ を する の は すき です か", "mp3": "br_q32_do_you_like_playing_sports.mp3" },
+    { "n": 33, "en": "Can you play a musical instrument?", "jp": "楽器を演奏できますか。", "hira": "がっき を えんそう できます か", "mp3": "br_q33_can_you_play_a_musical_instrument.mp3" },
+    { "n": 34, "en": "Who do you hang out with?", "jp": "だれと遊びますか。", "hira": "だれ と あそびます か", "mp3": "br_q34_who_do_you_hang_out_with.mp3" },
+    { "n": 35, "en": "Where do you go shopping?", "jp": "どこへ買い物に行きますか。", "hira": "どこ へ かいもの に いきます か", "mp3": "br_q35_where_do_you_go_shopping.mp3" },
+
+    { "n": 36, "en": "What comics do you like?", "jp": "どんなまんがが好きですか。", "hira": "どんな まんが が すき です か", "mp3": "br_q36_what_comics_do_you_like.mp3" },
+    { "n": 37, "en": "Do you prefer movies or games?", "jp": "映画とゲームではどちらが好きですか。", "hira": "えいが と げーむ では どちら が すき です か", "mp3": "br_q37_do_you_prefer_movies_or_games.mp3" },
+    { "n": 38, "en": "When do you ride a bike?", "jp": "いつ自転車に乗りますか。", "hira": "いつ じてんしゃ に のります か", "mp3": "br_q38_when_do_you_ride_a_bike.mp3" },
+    { "n": 39, "en": "What music do you listen to?", "jp": "どんな音楽を聞きますか。", "hira": "どんな おんがく を ききます か", "mp3": "br_q39_what_music_do_you_listen_to.mp3" },
+    { "n": 40, "en": "Do you like cooking?", "jp": "料理は好きですか。", "hira": "りょうり は すき です か", "mp3": "br_q40_do_you_like_cooking.mp3" },
+
+    { "n": 41, "en": "What do you bake?", "jp": "何を作りますか。", "hira": "なに を つくります か", "mp3": "br_q41_what_do_you_bake.mp3" },
+    { "n": 42, "en": "Where do you like to relax?", "jp": "どこでリラックスするのが好きですか。", "hira": "どこ で りらっくす する の が すき です か", "mp3": "br_q42_where_do_you_like_to_relax.mp3" },
+    { "n": 43, "en": "Do you like camping?", "jp": "キャンプは好きですか。", "hira": "きゃんぷ は すき です か", "mp3": "br_q43_do_you_like_camping.mp3" },
+    { "n": 44, "en": "Can you play basketball well?", "jp": "バスケットボールは上手にできますか。", "hira": "ばすけっとぼーる は じょうず に できます か", "mp3": "br_q44_can_you_play_basketball_well.mp3" },
+    { "n": 45, "en": "What hobby do you want to try?", "jp": "どんなしゅみをやってみたいですか。", "hira": "どんな しゅみ を やってみたい です か", "mp3": "br_q45_what_hobby_do_you_want_to_try.mp3" },
+
+    { "n": 46, "en": "What do you do to stay healthy?", "jp": "健康のために何をしますか。", "hira": "けんこう の ため に なに を します か", "mp3": "br_q46_what_do_you_do_to_stay_healthy.mp3" },
+    { "n": 47, "en": "How much water do you drink?", "jp": "どのくらい水を飲みますか。", "hira": "どのくらい みず を のみます か", "mp3": "br_q47_how_much_water_do_you_drink.mp3" },
+    { "n": 48, "en": "How many hours do you sleep?", "jp": "何時間寝ますか。", "hira": "なんじかん ねます か", "mp3": "br_q48_how_many_hours_do_you_sleep.mp3" },
+    { "n": 49, "en": "Do you exercise every day?", "jp": "毎日運動しますか。", "hira": "まいにち うんどうします か", "mp3": "br_q49_do_you_exercise_every_day.mp3" },
+    { "n": 50, "en": "What healthy food do you like?", "jp": "どんな健康的な食べ物が好きですか。", "hira": "どんな けんこうてき な たべもの が すき です か", "mp3": "br_q50_what_healthy_food_do_you_like.mp3" },
+
+    { "n": 51, "en": "Do you avoid junk food?", "jp": "ジャンクフードをさけますか。", "hira": "じゃんくふーど を さけます か", "mp3": "br_q51_do_you_avoid_junk_food.mp3" },
+    { "n": 52, "en": "When do you wash your hands?", "jp": "いつ手を洗いますか。", "hira": "いつ て を あらいます か", "mp3": "br_q52_when_do_you_wash_your_hands.mp3" },
+    { "n": 53, "en": "Where do you relax?", "jp": "どこでリラックスしますか。", "hira": "どこ で りらっくす します か", "mp3": "br_q53_where_do_you_relax.mp3" },
+    { "n": 54, "en": "Do you go outside every day?", "jp": "毎日外に出ますか。", "hira": "まいにち そと に でます か", "mp3": "br_q54_do_you_go_outside_every_day.mp3" },
+    { "n": 55, "en": "What time do you go to bed?", "jp": "何時に寝ますか。", "hira": "なんじ に ねます か", "mp3": "br_q55_what_time_do_you_go_to_bed.mp3" },
+
+    { "n": 56, "en": "Do you stretch in the morning?", "jp": "朝にストレッチをしますか。", "hira": "あさ に すとれっち を します か", "mp3": "br_q56_do_you_stretch_in_the_morning.mp3" },
+    { "n": 57, "en": "When do you feel good?", "jp": "どんなときに気分がよいですか。", "hira": "どんな とき に きぶん が よい です か", "mp3": "br_q57_when_do_you_feel_good.mp3" },
+    { "n": 58, "en": "What is good posture?", "jp": "良い姿勢とは何ですか。", "hira": "よい しせい とは なん です か", "mp3": "br_q58_what_is_good_posture.mp3" },
+    { "n": 59, "en": "What time do you eat breakfast?", "jp": "何時に朝ごはんを食べますか。", "hira": "なんじ に あさごはん を たべます か", "mp3": "br_q59_what_time_do_you_eat_breakfast.mp3" },
+    { "n": 60, "en": "What healthy habit will you try this week?", "jp": "今週はどんな健康習慣をやってみますか。", "hira": "こんしゅう は どんな けんこうしゅうかん を やってみます か", "mp3": "br_q60_what_healthy_habit_will_you_try_this_week.mp3" }
+  ]
+}

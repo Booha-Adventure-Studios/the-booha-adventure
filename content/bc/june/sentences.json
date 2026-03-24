@@ -1,1 +1,72 @@
 
+{
+  "cards": [
+    { "n": 1, "en": "The weather is extremely humid today.", "jp": "今日はとても蒸し暑いです。", "hira": "きょう は とても むしあつい です", "mp3": "bc_s01_the_weather_is_extremely_humid_today.mp3" },
+    { "n": 2, "en": "I prefer summer to winter.", "jp": "私は冬より夏の方が好きです。", "hira": "わたし は ふゆ より なつ の ほう が すき です", "mp3": "bc_s02_i_prefer_summer_to_winter.mp3" },
+    { "n": 3, "en": "I plan to go swimming this weekend.", "jp": "今週末、泳ぎに行く予定です。", "hira": "こんしゅうまつ およぎ に いく よてい です", "mp3": "bc_s03_i_plan_to_go_swimming_this_weekend.mp3" },
+    { "n": 4, "en": "Let’s visit the beach this afternoon.", "jp": "今日の午後、ビーチに行きましょう。", "hira": "きょう の ごご びーち に いきましょう", "mp3": "bc_s04_lets_visit_the_beach_this_afternoon.mp3" },
+    { "n": 5, "en": "I bought a new swimsuit yesterday.", "jp": "昨日、新しい水着を買いました。", "hira": "きのう あたらしい みずぎ を かいました", "mp3": "bc_s05_i_bought_a_new_swimsuit_yesterday.mp3" },
+    { "n": 6, "en": "The beach is crowded during summer.", "jp": "夏はビーチが混んでいます。", "hira": "なつ は びーち が こんでいます", "mp3": "bc_s06_the_beach_is_crowded_during_summer.mp3" },
+    { "n": 7, "en": "I would like to have some ice cream.", "jp": "アイスクリームを食べたいです。", "hira": "あいすくりーむ を たべたい です", "mp3": "bc_s07_i_would_like_to_have_some_ice_cream.mp3" },
+    { "n": 8, "en": "We are planning to attend a festival.", "jp": "祭りに行く予定です。", "hira": "まつり に いく よてい です", "mp3": "bc_s08_we_are_planning_to_attend_a_festival.mp3" },
+
+    { "n": 9, "en": "We watched fireworks last night.", "jp": "昨夜、花火を見ました。", "hira": "さくや はなび を みました", "mp3": "bc_s09_we_watched_fireworks_last_night.mp3" },
+    { "n": 10, "en": "I am thinking about going camping.", "jp": "キャンプに行こうか考えています。", "hira": "きゃんぷ に いこう か かんがえています", "mp3": "bc_s10_i_am_thinking_about_going_camping.mp3" },
+    { "n": 11, "en": "Let’s organize a barbecue this weekend.", "jp": "今週末、バーベキューをしましょう。", "hira": "こんしゅうまつ ばーべきゅー を しましょう", "mp3": "bc_s11_lets_organize_a_barbecue_this_weekend.mp3" },
+    { "n": 12, "en": "I always apply sunscreen before going out.", "jp": "外出前に必ず日焼け止めをぬります。", "hira": "がいしゅつまえ に かならず ひやけどめ を ぬります", "mp3": "bc_s12_i_always_apply_sunscreen_before_going_out.mp3" },
+    { "n": 13, "en": "The sunlight is very strong today.", "jp": "今日は日差しがとても強いです。", "hira": "きょう は ひざし が とても つよい です", "mp3": "bc_s13_the_sunlight_is_very_strong_today.mp3" },
+    { "n": 14, "en": "I use a fan to stay cool.", "jp": "涼しくするためにうちわを使います。", "hira": "すずしく する ため に うちわ を つかいます", "mp3": "bc_s14_i_use_a_fan_to_stay_cool.mp3" },
+    { "n": 15, "en": "Summer is my favorite time of the year.", "jp": "夏は一年で一番好きな時期です。", "hira": "なつ は いちねん で いちばん すき な じき です", "mp3": "bc_s15_summer_is_my_favorite_time_of_the_year.mp3" },
+
+    { "n": 16, "en": "I am currently on vacation.", "jp": "今、休暇中です。", "hira": "いま きゅうかちゅう です", "mp3": "bc_s16_i_am_currently_on_vacation.mp3" },
+    { "n": 17, "en": "I plan to travel abroad this summer.", "jp": "この夏、海外旅行をする予定です。", "hira": "この なつ かいがい りょこう を する よてい です", "mp3": "bc_s17_i_plan_to_travel_abroad_this_summer.mp3" },
+    { "n": 18, "en": "I would like to go on a trip soon.", "jp": "近いうちに旅行に行きたいです。", "hira": "ちかいうち に りょこう に いきたい です", "mp3": "bc_s18_i_would_like_to_go_on_a_trip_soon.mp3" },
+    { "n": 19, "en": "We will stay at a hotel near the beach.", "jp": "ビーチの近くのホテルに泊まります。", "hira": "びーち の ちかく の ほてる に とまります", "mp3": "bc_s19_we_will_stay_at_a_hotel_near_the_beach.mp3" },
+    { "n": 20, "en": "I made a reservation in advance.", "jp": "事前に予約をしました。", "hira": "じぜん に よやく を しました", "mp3": "bc_s20_i_made_a_reservation_in_advance.mp3" },
+    { "n": 21, "en": "I purchased a ticket online.", "jp": "オンラインでチケットを購入しました。", "hira": "おんらいん で ちけっと を こうにゅう しました", "mp3": "bc_s21_i_purchased_a_ticket_online.mp3" },
+    { "n": 22, "en": "I will go to the airport by train.", "jp": "電車で空港に行く予定です。", "hira": "でんしゃ で くうこう に いく よてい です", "mp3": "bc_s22_i_will_go_to_the_airport_by_train.mp3" },
+    { "n": 23, "en": "We arrived at the station early.", "jp": "早く駅に到着しました。", "hira": "はやく えき に とうちゃく しました", "mp3": "bc_s23_we_arrived_at_the_station_early.mp3" },
+
+    { "n": 24, "en": "I would like to take the train.", "jp": "電車に乗りたいです。", "hira": "でんしゃ に のりたい です", "mp3": "bc_s24_i_would_like_to_take_the_train.mp3" },
+    { "n": 25, "en": "He plans to travel by plane.", "jp": "彼は飛行機で行く予定です。", "hira": "かれ は ひこうき で いく よてい です", "mp3": "bc_s25_he_plans_to_travel_by_plane.mp3" },
+    { "n": 26, "en": "I need to renew my passport.", "jp": "パスポートを更新する必要があります。", "hira": "ぱすぽーと を こうしん する ひつよう が あります", "mp3": "bc_s26_i_need_to_renew_my_passport.mp3" },
+    { "n": 27, "en": "I took many pictures with my camera.", "jp": "カメラでたくさん写真を撮りました。", "hira": "かめら で たくさん しゃしん を とりました", "mp3": "bc_s27_i_took_many_pictures_with_my_camera.mp3" },
+    { "n": 28, "en": "I will buy souvenirs for my family.", "jp": "家族におみやげを買う予定です。", "hira": "かぞく に おみやげ を かう よてい です", "mp3": "bc_s28_i_will_buy_souvenirs_for_my_family.mp3" },
+    { "n": 29, "en": "I need to prepare enough money.", "jp": "十分なお金を用意する必要があります。", "hira": "じゅうぶん な おかね を ようい する ひつよう が あります", "mp3": "bc_s29_i_need_to_prepare_enough_money.mp3" },
+    { "n": 30, "en": "I finally have some free time today.", "jp": "今日はやっと自由時間があります。", "hira": "きょう は やっと じゆう じかん が あります", "mp3": "bc_s30_i_finally_have_some_free_time_today.mp3" },
+
+    { "n": 31, "en": "I need to make a list first.", "jp": "まずリストを作る必要があります。", "hira": "まず りすと を つくる ひつよう が あります", "mp3": "bc_s31_i_need_to_make_a_list_first.mp3" },
+    { "n": 32, "en": "I am going to pack this evening.", "jp": "今夜、荷造りする予定です。", "hira": "こんや にづくり する よてい です", "mp3": "bc_s32_i_am_going_to_pack_this_evening.mp3" },
+    { "n": 33, "en": "I need to bring my bag.", "jp": "かばんを持って行く必要があります。", "hira": "かばん を もっていく ひつよう が あります", "mp3": "bc_s33_i_need_to_bring_my_bag.mp3" },
+    { "n": 34, "en": "I have already prepared my suitcase.", "jp": "すでにスーツケースを準備しました。", "hira": "すでに すーつけーす を じゅんび しました", "mp3": "bc_s34_i_have_already_prepared_my_suitcase.mp3" },
+    { "n": 35, "en": "I need clothes suitable for summer.", "jp": "夏に合った服が必要です。", "hira": "なつ に あった ふく が ひつよう です", "mp3": "bc_s35_i_need_clothes_suitable_for_summer.mp3" },
+    { "n": 36, "en": "I should bring a towel just in case.", "jp": "念のためタオルを持って行くべきです。", "hira": "ねんのため たおる を もっていく べき です", "mp3": "bc_s36_i_should_bring_a_towel_just_in_case.mp3" },
+    { "n": 37, "en": "I need a water bottle to stay hydrated.", "jp": "水分補給のため水筒が必要です。", "hira": "すいぶん ほきゅう の ため すいとう が ひつよう です", "mp3": "bc_s37_i_need_a_water_bottle_to_stay_hydrated.mp3" },
+    { "n": 38, "en": "I should take some medicine with me.", "jp": "薬を持って行くべきです。", "hira": "くすり を もっていく べき です", "mp3": "bc_s38_i_should_take_some_medicine_with_me.mp3" },
+
+    { "n": 39, "en": "I don’t need to bring too many items.", "jp": "あまり多くの物を持って行く必要はありません。", "hira": "あまり おおく の もの を もっていく ひつよう は ありません", "mp3": "bc_s39_i_dont_need_to_bring_too_many_items.mp3" },
+    { "n": 40, "en": "I might need an umbrella later.", "jp": "あとでかさが必要になるかもしれません。", "hira": "あとで かさ が ひつよう に なる かもしれません", "mp3": "bc_s40_i_might_need_an_umbrella_later.mp3" },
+    { "n": 41, "en": "I usually check a map before traveling.", "jp": "旅行の前に地図を確認します。", "hira": "りょこう の まえ に ちず を かくにん します", "mp3": "bc_s41_i_usually_check_a_map_before_traveling.mp3" },
+    { "n": 42, "en": "I checked my schedule carefully.", "jp": "予定をしっかり確認しました。", "hira": "よてい を しっかり かくにん しました", "mp3": "bc_s42_i_checked_my_schedule_carefully.mp3" },
+    { "n": 43, "en": "This is very important for the trip.", "jp": "これは旅行にとってとても大事です。", "hira": "これ は りょこう に とって とても だいじ です", "mp3": "bc_s43_this_is_very_important_for_the_trip.mp3" },
+    { "n": 44, "en": "Don’t forget your important items.", "jp": "大事な物を忘れないでください。", "hira": "だいじ な もの を わすれないで ください", "mp3": "bc_s44_dont_forget_your_important_items.mp3" },
+    { "n": 45, "en": "I planned the trip with my family.", "jp": "家族と旅行の計画を立てました。", "hira": "かぞく と りょこう の けいかく を たてました", "mp3": "bc_s45_i_planned_the_trip_with_my_family.mp3" },
+
+    { "n": 46, "en": "I would like to eat some watermelon.", "jp": "すいかを食べたいです。", "hira": "すいか を たべたい です", "mp3": "bc_s46_i_would_like_to_eat_some_watermelon.mp3" },
+    { "n": 47, "en": "Shaved ice is very refreshing.", "jp": "かき氷はとてもさっぱりしています。", "hira": "かきごおり は とても さっぱり しています", "mp3": "bc_s47_shaved_ice_is_very_refreshing.mp3" },
+    { "n": 48, "en": "I really enjoy drinking ramune.", "jp": "ラムネを飲むのが好きです。", "hira": "らむね を のむ の が すき です", "mp3": "bc_s48_i_really_enjoy_drinking_ramune.mp3" },
+    { "n": 49, "en": "Let’s eat yakisoba together.", "jp": "一緒に焼きそばを食べましょう。", "hira": "いっしょ に やきそば を たべましょう", "mp3": "bc_s49_lets_eat_yakisoba_together.mp3" },
+    { "n": 50, "en": "Takoyaki is one of my favorite foods.", "jp": "たこ焼きは大好きな食べ物の一つです。", "hira": "たこやき は だいすき な たべもの の ひとつ です", "mp3": "bc_s50_takoyaki_is_one_of_my_favorite_foods.mp3" },
+    { "n": 51, "en": "I want to eat grilled corn.", "jp": "焼きとうもろこしを食べたいです。", "hira": "やきとうもろこし を たべたい です", "mp3": "bc_s51_i_want_to_eat_grilled_corn.mp3" },
+    { "n": 52, "en": "Cucumber tastes very refreshing.", "jp": "きゅうりはとてもさっぱりしています。", "hira": "きゅうり は とても さっぱり しています", "mp3": "bc_s52_cucumber_tastes_very_refreshing.mp3" },
+    { "n": 53, "en": "Tomatoes are sweet and fresh.", "jp": "トマトは甘くて新鮮です。", "hira": "とまと は あまくて しんせん です", "mp3": "bc_s53_tomatoes_are_sweet_and_fresh.mp3" },
+
+    { "n": 54, "en": "I would like to eat cold noodles.", "jp": "冷たいめんを食べたいです。", "hira": "つめたい めん を たべたい です", "mp3": "bc_s54_i_would_like_to_eat_cold_noodles.mp3" },
+    { "n": 55, "en": "I am very thirsty, so I need juice.", "jp": "とても喉がかわいているのでジュースが必要です。", "hira": "とても のど が かわいている ので じゅーす が ひつよう です", "mp3": "bc_s55_i_am_very_thirsty_so_i_need_juice.mp3" },
+    { "n": 56, "en": "This dessert is very sweet.", "jp": "このデザートはとても甘いです。", "hira": "この でざーと は とても あまい です", "mp3": "bc_s56_this_dessert_is_very_sweet.mp3" },
+    { "n": 57, "en": "This snack is a little salty.", "jp": "このスナックは少ししょっぱいです。", "hira": "この すなっく は すこし しょっぱい です", "mp3": "bc_s57_this_snack_is_a_little_salty.mp3" },
+    { "n": 58, "en": "I am getting hungry now.", "jp": "だんだんおなかがすいてきました。", "hira": "だんだん おなか が すいてきました", "mp3": "bc_s58_i_am_getting_hungry_now.mp3" },
+    { "n": 59, "en": "I feel very thirsty after walking.", "jp": "歩いた後、とても喉がかわきました。", "hira": "あるいた あと とても のど が かわきました", "mp3": "bc_s59_i_feel_very_thirsty_after_walking.mp3" },
+    { "n": 60, "en": "Summer food is always the best.", "jp": "夏の食べ物はいつも最高です。", "hira": "なつ の たべもの は いつも さいこう です", "mp3": "bc_s60_summer_food_is_always_the_best.mp3" }
+  ]
+}

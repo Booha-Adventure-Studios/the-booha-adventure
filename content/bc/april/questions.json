@@ -1,1 +1,76 @@
 
+{
+  "cards": [
+    { "n": 1, "en": "What kind of work environment do you prefer?", "jp": "どのような職場環境が好きですか。", "hira": "どのよう な しょくば かんきょう が すき です か", "mp3": "bc_q01_what_kind_of_work_environment_do_you_prefer.mp3" },
+    { "n": 2, "en": "Why is teamwork important in the workplace?", "jp": "職場でチームワークが重要なのはなぜですか。", "hira": "しょくば で ちーむわーく が じゅうよう な の は なぜ です か", "mp3": "bc_q02_why_is_teamwork_important_in_the_workplace.mp3" },
+    { "n": 3, "en": "How do you usually solve problems at work?", "jp": "仕事で問題をどのように解決しますか。", "hira": "しごと で もんだい を どのよう に かいけつ します か", "mp3": "bc_q03_how_do_you_usually_solve_problems_at_work.mp3" },
+    { "n": 4, "en": "What skills are important for success?", "jp": "成功するために重要なスキルは何ですか。", "hira": "せいこう する ため に じゅうよう な すきる は なん です か", "mp3": "bc_q04_what_skills_are_important_for_success.mp3" },
+    { "n": 5, "en": "Do you prefer working alone or in a team?", "jp": "一人で働くのとチームで働くのはどちらが好きですか。", "hira": "ひとり で はたらく の と ちーむ で はたらく の は どちら が すき です か", "mp3": "bc_q05_do_you_prefer_working_alone_or_in_a_team.mp3" },
+
+    { "n": 6, "en": "How can companies improve communication?", "jp": "会社はどのようにコミュニケーションを改善できますか。", "hira": "かいしゃ は どのよう に こみゅにけーしょん を かいぜん できます か", "mp3": "bc_q06_how_can_companies_improve_communication.mp3" },
+    { "n": 7, "en": "What makes a good leader?", "jp": "良いリーダーとはどのような人ですか。", "hira": "よい りーだー と は どのよう な ひと です か", "mp3": "bc_q07_what_makes_a_good_leader.mp3" },
+    { "n": 8, "en": "How do you handle stress at work?", "jp": "仕事のストレスをどのように対処しますか。", "hira": "しごと の すとれす を どのよう に たいしょ します か", "mp3": "bc_q08_how_do_you_handle_stress_at_work.mp3" },
+    { "n": 9, "en": "What motivates you to work hard?", "jp": "一生懸命働く動機は何ですか。", "hira": "いっしょうけんめい はたらく どうき は なん です か", "mp3": "bc_q09_what_motivates_you_to_work_hard.mp3" },
+    { "n": 10, "en": "How do you manage your time effectively?", "jp": "どのように時間を効率よく管理しますか。", "hira": "どのよう に じかん を こうりつ よく かんり します か", "mp3": "bc_q10_how_do_you_manage_your_time_effectively.mp3" },
+
+    { "n": 11, "en": "What are the advantages of remote work?", "jp": "リモートワークの利点は何ですか。", "hira": "りもーとわーく の りてん は なん です か", "mp3": "bc_q11_what_are_the_advantages_of_remote_work.mp3" },
+    { "n": 12, "en": "What are the disadvantages of remote work?", "jp": "リモートワークの欠点は何ですか。", "hira": "りもーとわーく の けってん は なん です か", "mp3": "bc_q12_what_are_the_disadvantages_of_remote_work.mp3" },
+    { "n": 13, "en": "How has technology changed the workplace?", "jp": "テクノロジーは職場をどのように変えましたか。", "hira": "てくのろじー は しょくば を どのよう に かえました か", "mp3": "bc_q13_how_has_technology_changed_the_workplace.mp3" },
+    { "n": 14, "en": "What kind of job would you like in the future?", "jp": "将来どのような仕事をしたいですか。", "hira": "しょうらい どのよう な しごと を したい です か", "mp3": "bc_q14_what_kind_of_job_would_you_like_in_the_future.mp3" },
+    { "n": 15, "en": "How important is English in your career?", "jp": "あなたのキャリアにおいて英語はどのくらい重要ですか。", "hira": "あなた の きゃりあ に おいて えいご は どのくらい じゅうよう です か", "mp3": "bc_q15_how_important_is_english_in_your_career.mp3" },
+
+    { "n": 16, "en": "What do you think about working abroad?", "jp": "海外で働くことについてどう思いますか。", "hira": "かいがい で はたらく こと について どう おもいます か", "mp3": "bc_q16_what_do_you_think_about_working_abroad.mp3" },
+    { "n": 17, "en": "How can people improve their English skills?", "jp": "人々はどのように英語力を向上させることができますか。", "hira": "ひとびと は どのよう に えいごりょく を こうじょう させる こと が できます か", "mp3": "bc_q17_how_can_people_improve_their_english_skills.mp3" },
+    { "n": 18, "en": "What is the best way to learn new skills?", "jp": "新しいスキルを学ぶ最良の方法は何ですか。", "hira": "あたらしい すきる を まなぶ さいりょう の ほうほう は なん です か", "mp3": "bc_q18_what_is_the_best_way_to_learn_new_skills.mp3" },
+    { "n": 19, "en": "How do you stay motivated when learning?", "jp": "学習中どのようにやる気を保ちますか。", "hira": "がくしゅうちゅう どのよう に やるき を たもちます か", "mp3": "bc_q19_how_do_you_stay_motivated_when_learning.mp3" },
+    { "n": 20, "en": "What challenges do people face at work?", "jp": "人々は仕事でどのような課題に直面しますか。", "hira": "ひとびと は しごと で どのよう な かだい に ちょくめん します か", "mp3": "bc_q20_what_challenges_do_people_face_at_work.mp3" },
+
+    { "n": 21, "en": "How can companies support employees?", "jp": "会社はどのように従業員を支援できますか。", "hira": "かいしゃ は どのよう に じゅうぎょういん を しえん できます か", "mp3": "bc_q21_how_can_companies_support_employees.mp3" },
+    { "n": 22, "en": "What is a good work-life balance?", "jp": "良いワークライフバランスとは何ですか。", "hira": "よい わーくらいふ ばらんす と は なん です か", "mp3": "bc_q22_what_is_a_good_worklife_balance.mp3" },
+    { "n": 23, "en": "Why do people change jobs?", "jp": "なぜ人々は仕事を変えるのですか。", "hira": "なぜ ひとびと は しごと を かえる の です か", "mp3": "bc_q23_why_do_people_change_jobs.mp3" },
+    { "n": 24, "en": "How can you improve customer service?", "jp": "どのように顧客サービスを改善できますか。", "hira": "どのよう に こきゃく さーびす を かいぜん できます か", "mp3": "bc_q24_how_can_you_improve_customer_service.mp3" },
+    { "n": 25, "en": "What makes a company successful?", "jp": "会社を成功させる要因は何ですか。", "hira": "かいしゃ を せいこう させる よういん は なん です か", "mp3": "bc_q25_what_makes_a_company_successful.mp3" },
+
+    { "n": 26, "en": "How important is communication in business?", "jp": "ビジネスにおいてコミュニケーションはどれくらい重要ですか。", "hira": "びじねす に おいて こみゅにけーしょん は どれくらい じゅうよう です か", "mp3": "bc_q26_how_important_is_communication_in_business.mp3" },
+    { "n": 27, "en": "What are the benefits of teamwork?", "jp": "チームワークの利点は何ですか。", "hira": "ちーむわーく の りてん は なん です か", "mp3": "bc_q27_what_are_the_benefits_of_teamwork.mp3" },
+    { "n": 28, "en": "How do you build trust with coworkers?", "jp": "同僚とどのように信頼関係を築きますか。", "hira": "どうりょう と どのよう に しんらい かんけい を きずきます か", "mp3": "bc_q28_how_do_you_build_trust_with_coworkers.mp3" },
+    { "n": 29, "en": "What is the role of technology in education?", "jp": "教育におけるテクノロジーの役割は何ですか。", "hira": "きょういく に おける てくのろじー の やくわり は なん です か", "mp3": "bc_q29_what_is_the_role_of_technology_in_education.mp3" },
+    { "n": 30, "en": "How has online learning changed education?", "jp": "オンライン学習は教育をどのように変えましたか。", "hira": "おんらいん がくしゅう は きょういく を どのよう に かえました か", "mp3": "bc_q30_how_has_online_learning_changed_education.mp3" },
+
+    { "n": 31, "en": "What are the advantages of studying abroad?", "jp": "留学の利点は何ですか。", "hira": "りゅうがく の りてん は なん です か", "mp3": "bc_q31_what_are_the_advantages_of_studying_abroad.mp3" },
+    { "n": 32, "en": "What are the disadvantages of studying abroad?", "jp": "留学の欠点は何ですか。", "hira": "りゅうがく の けってん は なん です か", "mp3": "bc_q32_what_are_the_disadvantages_of_studying_abroad.mp3" },
+    { "n": 33, "en": "How can students prepare for the future?", "jp": "学生は将来のためにどのように準備できますか。", "hira": "がくせい は しょうらい の ため に どのよう に じゅんび できます か", "mp3": "bc_q33_how_can_students_prepare_for_the_future.mp3" },
+    { "n": 34, "en": "What is important when choosing a career?", "jp": "キャリアを選ぶときに重要なことは何ですか。", "hira": "きゃりあ を えらぶ とき に じゅうよう な こと は なん です か", "mp3": "bc_q34_what_is_important_when_choosing_a_career.mp3" },
+    { "n": 35, "en": "How do you define success?", "jp": "成功をどのように定義しますか。", "hira": "せいこう を どのよう に ていぎ します か", "mp3": "bc_q35_how_do_you_define_success.mp3" },
+
+    { "n": 36, "en": "What are the benefits of traveling?", "jp": "旅行の利点は何ですか。", "hira": "りょこう の りてん は なん です か", "mp3": "bc_q36_what_are_the_benefits_of_traveling.mp3" },
+    { "n": 37, "en": "How does travel change people?", "jp": "旅行は人をどのように変えますか。", "hira": "りょこう は ひと を どのよう に かえます か", "mp3": "bc_q37_how_does_travel_change_people.mp3" },
+    { "n": 38, "en": "What is the best way to plan a trip?", "jp": "旅行を計画する最良の方法は何ですか。", "hira": "りょこう を けいかく する さいりょう の ほうほう は なん です か", "mp3": "bc_q38_what_is_the_best_way_to_plan_a_trip.mp3" },
+    { "n": 39, "en": "How can people travel safely?", "jp": "どのように安全に旅行できますか。", "hira": "どのよう に あんぜん に りょこう できます か", "mp3": "bc_q39_how_can_people_travel_safely.mp3" },
+    { "n": 40, "en": "What problems can happen during travel?", "jp": "旅行中にどのような問題が起こりますか。", "hira": "りょこうちゅう に どのよう な もんだい が おこります か", "mp3": "bc_q40_what_problems_can_happen_during_travel.mp3" },
+
+    { "n": 41, "en": "How can we protect the environment?", "jp": "どのように環境を守ることができますか。", "hira": "どのよう に かんきょう を まもる こと が できます か", "mp3": "bc_q41_how_can_we_protect_the_environment.mp3" },
+    { "n": 42, "en": "What causes environmental problems?", "jp": "環境問題の原因は何ですか。", "hira": "かんきょう もんだい の げんいん は なん です か", "mp3": "bc_q42_what_causes_environmental_problems.mp3" },
+    { "n": 43, "en": "What can individuals do to help the environment?", "jp": "個人は環境のために何ができますか。", "hira": "こじん は かんきょう の ため に なに が できます か", "mp3": "bc_q43_what_can_individuals_do_to_help_the_environment.mp3" },
+    { "n": 44, "en": "How does technology affect the environment?", "jp": "テクノロジーは環境にどのような影響を与えますか。", "hira": "てくのろじー は かんきょう に どのよう な えいきょう を あたえます か", "mp3": "bc_q44_how_does_technology_affect_the_environment.mp3" },
+    { "n": 45, "en": "What is the future of technology?", "jp": "テクノロジーの未来はどうなると思いますか。", "hira": "てくのろじー の みらい は どう なる と おもいます か", "mp3": "bc_q45_what_is_the_future_of_technology.mp3" },
+
+    { "n": 46, "en": "How will jobs change in the future?", "jp": "将来仕事はどのように変わると思いますか。", "hira": "しょうらい しごと は どのよう に かわる と おもいます か", "mp3": "bc_q46_how_will_jobs_change_in_the_future.mp3" },
+    { "n": 47, "en": "What skills will be important in the future?", "jp": "将来重要になるスキルは何だと思いますか。", "hira": "しょうらい じゅうよう に なる すきる は なん だ と おもいます か", "mp3": "bc_q47_what_skills_will_be_important_in_the_future.mp3" },
+    { "n": 48, "en": "How can people prepare for future jobs?", "jp": "将来の仕事に向けてどのように準備できますか。", "hira": "しょうらい の しごと に むけて どのよう に じゅんび できます か", "mp3": "bc_q48_how_can_people_prepare_for_future_jobs.mp3" },
+    { "n": 49, "en": "What is the impact of AI on society?", "jp": "AIは社会にどのような影響を与えますか。", "hira": "えーあい は しゃかい に どのよう な えいきょう を あたえます か", "mp3": "bc_q49_what_is_the_impact_of_ai_on_society.mp3" },
+    { "n": 50, "en": "Do you think AI will change education?", "jp": "AIは教育を変えると思いますか。", "hira": "えーあい は きょういく を かえる と おもいます か", "mp3": "bc_q50_do_you_think_ai_will_change_education.mp3" },
+
+    { "n": 51, "en": "How can people keep learning throughout life?", "jp": "人はどのように生涯学び続けることができますか。", "hira": "ひと は どのよう に しょうがい まなびつづける こと が できます か", "mp3": "bc_q51_how_can_people_keep_learning_throughout_life.mp3" },
+    { "n": 52, "en": "What is important for lifelong learning?", "jp": "生涯学習に重要なことは何ですか。", "hira": "しょうがい がくしゅう に じゅうよう な こと は なん です か", "mp3": "bc_q52_what_is_important_for_lifelong_learning.mp3" },
+    { "n": 53, "en": "How do you improve your knowledge?", "jp": "どのように知識を高めますか。", "hira": "どのよう に ちしき を たかめます か", "mp3": "bc_q53_how_do_you_improve_your_knowledge.mp3" },
+    { "n": 54, "en": "What kind of future do you want to build?", "jp": "どのような未来を築きたいですか。", "hira": "どのよう な みらい を きずきたい です か", "mp3": "bc_q54_what_kind_of_future_do_you_want_to_build.mp3" },
+    { "n": 55, "en": "How can we create better opportunities?", "jp": "どのようにより良い機会を生み出せますか。", "hira": "どのよう に より よい きかい を うみだせます か", "mp3": "bc_q55_how_can_we_create_better_opportunities.mp3" },
+
+    { "n": 56, "en": "What is the biggest challenge in modern society?", "jp": "現代社会の最大の課題は何だと思いますか。", "hira": "げんだい しゃかい の さいだい の かだい は なん だ と おもいます か", "mp3": "bc_q56_what_is_the_biggest_challenge_in_modern_society.mp3" },
+    { "n": 57, "en": "How can education be improved in the future?", "jp": "将来教育はどのように改善できると思いますか。", "hira": "しょうらい きょういく は どのよう に かいぜん できる と おもいます か", "mp3": "bc_q57_how_can_education_be_improved_in_the_future.mp3" },
+    { "n": 58, "en": "What role should governments play in society?", "jp": "政府は社会でどのような役割を果たすべきだと思いますか。", "hira": "せいふ は しゃかい で どのよう な やくわり を はたす べき だ と おもいます か", "mp3": "bc_q58_what_role_should_governments_play_in_society.mp3" },
+    { "n": 59, "en": "How can people make better decisions?", "jp": "人々はどのようにより良い決断ができると思いますか。", "hira": "ひとびと は どのよう に より よい けつだん が できる と おもいます か", "mp3": "bc_q59_how_can_people_make_better_decisions.mp3" },
+    { "n": 60, "en": "What kind of world do you want to live in?", "jp": "どのような世界に住みたいですか。", "hira": "どのよう な せかい に すみたい です か", "mp3": "bc_q60_what_kind_of_world_do_you_want_to_live_in.mp3" }
+  ]
+}
