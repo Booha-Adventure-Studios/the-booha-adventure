@@ -1,1 +1,72 @@
 
+{
+  "cards": [
+    { "n": 1, "en": "summer", "jp": "なつ", "hira": "なつ", "mp3": "pb_v01_summer.mp3" },
+    { "n": 2, "en": "hot", "jp": "あつい", "hira": "あつい", "mp3": "pb_v02_hot.mp3" },
+    { "n": 3, "en": "sun", "jp": "たいよう", "hira": "たいよう", "mp3": "pb_v03_sun.mp3" },
+    { "n": 4, "en": "pool", "jp": "プール", "hira": "ぷーる", "mp3": "pb_v04_pool.mp3" },
+    { "n": 5, "en": "water", "jp": "みず", "hira": "みず", "mp3": "pb_v05_water.mp3" },
+    { "n": 6, "en": "swim", "jp": "およぐ", "hira": "およぐ", "mp3": "pb_v06_swim.mp3" },
+    { "n": 7, "en": "sea", "jp": "うみ", "hira": "うみ", "mp3": "pb_v07_sea.mp3" },
+    { "n": 8, "en": "sand", "jp": "すな", "hira": "すな", "mp3": "pb_v08_sand.mp3" },
+
+    { "n": 9, "en": "ice cream", "jp": "アイス", "hira": "あいす", "mp3": "pb_v09_ice_cream.mp3" },
+    { "n": 10, "en": "festival", "jp": "おまつり", "hira": "おまつり", "mp3": "pb_v10_festival.mp3" },
+    { "n": 11, "en": "fire", "jp": "ひ", "hira": "ひ", "mp3": "pb_v11_fire.mp3" },
+    { "n": 12, "en": "camp", "jp": "キャンプ", "hira": "きゃんぷ", "mp3": "pb_v12_camp.mp3" },
+    { "n": 13, "en": "meat", "jp": "にく", "hira": "にく", "mp3": "pb_v13_meat.mp3" },
+    { "n": 14, "en": "hat", "jp": "ぼうし", "hira": "ぼうし", "mp3": "pb_v14_hat.mp3" },
+    { "n": 15, "en": "fan", "jp": "うちわ", "hira": "うちわ", "mp3": "pb_v15_fan.mp3" },
+
+    { "n": 16, "en": "holiday", "jp": "やすみ", "hira": "やすみ", "mp3": "pb_v16_holiday.mp3" },
+    { "n": 17, "en": "go", "jp": "いく", "hira": "いく", "mp3": "pb_v17_go.mp3" },
+    { "n": 18, "en": "trip", "jp": "りょこう", "hira": "りょこう", "mp3": "pb_v18_trip.mp3" },
+    { "n": 19, "en": "room", "jp": "へや", "hira": "へや", "mp3": "pb_v19_room.mp3" },
+    { "n": 20, "en": "book", "jp": "ほん", "hira": "ほん", "mp3": "pb_v20_book.mp3" },
+    { "n": 21, "en": "gift", "jp": "プレゼント", "hira": "ぷれぜんと", "mp3": "pb_v21_gift.mp3" },
+    { "n": 22, "en": "ticket", "jp": "チケット", "hira": "ちけっと", "mp3": "pb_v22_ticket.mp3" },
+    { "n": 23, "en": "airport", "jp": "くうこう", "hira": "くうこう", "mp3": "pb_v23_airport.mp3" },
+
+    { "n": 24, "en": "station", "jp": "えき", "hira": "えき", "mp3": "pb_v24_station.mp3" },
+    { "n": 25, "en": "train", "jp": "でんしゃ", "hira": "でんしゃ", "mp3": "pb_v25_train.mp3" },
+    { "n": 26, "en": "plane", "jp": "ひこうき", "hira": "ひこうき", "mp3": "pb_v26_plane.mp3" },
+    { "n": 27, "en": "bag", "jp": "かばん", "hira": "かばん", "mp3": "pb_v27_bag.mp3" },
+    { "n": 28, "en": "camera", "jp": "カメラ", "hira": "かめら", "mp3": "pb_v28_camera.mp3" },
+    { "n": 29, "en": "money", "jp": "おかね", "hira": "おかね", "mp3": "pb_v29_money.mp3" },
+    { "n": 30, "en": "time", "jp": "じかん", "hira": "じかん", "mp3": "pb_v30_time.mp3" },
+
+    { "n": 31, "en": "pack", "jp": "いれる", "hira": "いれる", "mp3": "pb_v31_pack.mp3" },
+    { "n": 32, "en": "plan", "jp": "かんがえる", "hira": "かんがえる", "mp3": "pb_v32_plan.mp3" },
+    { "n": 33, "en": "list", "jp": "リスト", "hira": "りすと", "mp3": "pb_v33_list.mp3" },
+    { "n": 34, "en": "bag", "jp": "バッグ", "hira": "ばっぐ", "mp3": "pb_v34_bag.mp3" },
+    { "n": 35, "en": "case", "jp": "ケース", "hira": "けーす", "mp3": "pb_v35_case.mp3" },
+    { "n": 36, "en": "clothes", "jp": "ふく", "hira": "ふく", "mp3": "pb_v36_clothes.mp3" },
+    { "n": 37, "en": "shoes", "jp": "くつ", "hira": "くつ", "mp3": "pb_v37_shoes.mp3" },
+    { "n": 38, "en": "towel", "jp": "タオル", "hira": "たおる", "mp3": "pb_v38_towel.mp3" },
+
+    { "n": 39, "en": "bottle", "jp": "ボトル", "hira": "ぼとる", "mp3": "pb_v39_bottle.mp3" },
+    { "n": 40, "en": "medicine", "jp": "くすり", "hira": "くすり", "mp3": "pb_v40_medicine.mp3" },
+    { "n": 41, "en": "umbrella", "jp": "かさ", "hira": "かさ", "mp3": "pb_v41_umbrella.mp3" },
+    { "n": 42, "en": "map", "jp": "ちず", "hira": "ちず", "mp3": "pb_v42_map.mp3" },
+    { "n": 43, "en": "plan", "jp": "よてい", "hira": "よてい", "mp3": "pb_v43_plan.mp3" },
+    { "n": 44, "en": "important", "jp": "だいじ", "hira": "だいじ", "mp3": "pb_v44_important.mp3" },
+    { "n": 45, "en": "forget", "jp": "わすれる", "hira": "わすれる", "mp3": "pb_v45_forget.mp3" },
+
+    { "n": 46, "en": "watermelon", "jp": "すいか", "hira": "すいか", "mp3": "pb_v46_watermelon.mp3" },
+    { "n": 47, "en": "ice", "jp": "こおり", "hira": "こおり", "mp3": "pb_v47_ice.mp3" },
+    { "n": 48, "en": "drink", "jp": "のみもの", "hira": "のみもの", "mp3": "pb_v48_drink.mp3" },
+    { "n": 49, "en": "noodles", "jp": "めん", "hira": "めん", "mp3": "pb_v49_noodles.mp3" },
+    { "n": 50, "en": "ball", "jp": "ボール", "hira": "ぼーる", "mp3": "pb_v50_ball.mp3" },
+    { "n": 51, "en": "corn", "jp": "とうもろこし", "hira": "とうもろこし", "mp3": "pb_v51_corn.mp3" },
+    { "n": 52, "en": "cucumber", "jp": "きゅうり", "hira": "きゅうり", "mp3": "pb_v52_cucumber.mp3" },
+    { "n": 53, "en": "tomato", "jp": "トマト", "hira": "とまと", "mp3": "pb_v53_tomato.mp3" },
+
+    { "n": 54, "en": "juice", "jp": "ジュース", "hira": "じゅーす", "mp3": "pb_v54_juice.mp3" },
+    { "n": 55, "en": "sweet", "jp": "あまい", "hira": "あまい", "mp3": "pb_v55_sweet.mp3" },
+    { "n": 56, "en": "salty", "jp": "しょっぱい", "hira": "しょっぱい", "mp3": "pb_v56_salty.mp3" },
+    { "n": 57, "en": "hungry", "jp": "おなかすいた", "hira": "おなかすいた", "mp3": "pb_v57_hungry.mp3" },
+    { "n": 58, "en": "thirsty", "jp": "のどかわいた", "hira": "のどかわいた", "mp3": "pb_v58_thirsty.mp3" },
+    { "n": 59, "en": "yummy", "jp": "おいしい", "hira": "おいしい", "mp3": "pb_v59_yummy.mp3" },
+    { "n": 60, "en": "eat", "jp": "たべる", "hira": "たべる", "mp3": "pb_v60_eat.mp3" }
+  ]
+}
