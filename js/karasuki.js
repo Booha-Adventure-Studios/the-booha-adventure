@@ -972,7 +972,7 @@
     } else {
       descEl.textContent = tree.descLocked; descJpEl.textContent = tree.descLockedJP; descKEl.textContent = tree.descLockedKanji;
     }
-    descEl.style.color = '#ffffff'; descJpEl.style.color = '#ffffff'; descKEl.style.color = '#a888cc';
+    descEl.style.color = '#ffffff'; descJpEl.style.color = '#ffffff'; descKEl.style.color = '#ffffff';
 
     const btnsEl = document.getElementById('bonus-pop-btns');
     const okEl   = document.getElementById('bonus-pop-ok');
