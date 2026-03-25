@@ -570,12 +570,16 @@
           <p id="wanderer-pop-kanji" style="
             font-size:clamp(.7rem,2.2vw,.82rem); margin:0 0 20px;
             opacity:.38; letter-spacing:.14em;"></p>
-          <p id="wanderer-pop-desc" style="
+            
+        <p id="wanderer-pop-desc" style="
             font-size:clamp(.84rem,2.8vw,.98rem); line-height:1.7;
-            opacity:.85; margin:0 0 12px; font-family:'Georgia',serif; text-align:left;"></p>
+            opacity:.85; margin:0 0 12px; font-family:'Georgia',serif; text-align:left;
+            color:#ffffff;"></p>
           <p id="wanderer-pop-desc-jp" style="
             font-size:clamp(.76rem,2.4vw,.88rem); line-height:1.7;
-            opacity:.55; margin:0; font-family:'Georgia',serif; text-align:left; display:none;"></p>
+            opacity:.55; margin:0; font-family:'Georgia',serif; text-align:left;
+            color:#ffffff; display:none;"></p>
+            
         </div>
       </div>`;
 
