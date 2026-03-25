@@ -39,6 +39,18 @@
   const ARROW_MOVE_THRESHOLD          = 30;
   const PORTAL_TRIGGER_R              = 36;
 
+  /* ── Popup re-open cooldown — prevents close→immediate reopen loop ── */
+  const POPUP_COOLDOWN_MS = 900;
+  let   bonusPopCooldownUntil    = 0;
+  let   wandererPopCooldownUntil = 0;
+
+  /* ═══════════════════════════════════════════
+     DEV MODE — set false (or comment out block)
+     before going live. Gates ALL dev tools:
+     coord toggle, pin log, dev panel.
+  ═══════════════════════════════════════════ */
+  const DEV_MODE = true; // ← FLIP TO false BEFORE DEPLOYING
+
   const MONTH_COLORS = [
     ['#ff3bbd','#ff79d7'],['#ff6b3b','#ffaa5e'],['#3bc8ff','#a8edff'],
     ['#3bffee','#b2ffda'],['#ffd700','#fff176'],['#3b6fff','#90aaff'],
@@ -59,84 +71,85 @@
   const secondary = monthSecondary(boohaWeek);
 
   /* ═══════════════════════════════════════════
-     NPP  — updated exit coordinates
+     NPP — all edge-hugging arrows pulled ~80px
+     inward so they're visible on mobile screens
   ═══════════════════════════════════════════ */
   const NPP_RADIUS = 40;
 
   const NPP = {
     room_01: [
-      { dir: "right", x: 1410, y: 658,  to: "room_02", spawn: "fromLeft"  },
-      { dir: "up",    x: 1084, y: 185,  to: "room_06", spawn: "fromDown"  }
+      { dir: "right", x: 1340, y: 658,  to: "room_02", spawn: "fromLeft"  },
+      { dir: "up",    x: 1084, y: 250,  to: "room_06", spawn: "fromDown"  }
     ],
     room_02: [
-      { dir: "left",  x: 180,  y: 255,  to: "room_01", spawn: "fromRight" },
-      { dir: "right", x: 1410, y: 727,  to: "room_03", spawn: "fromLeft"  },
-      { dir: "up",    x: 765,  y: 155,  to: "room_07", spawn: "fromDown"  }
+      { dir: "left",  x: 260,  y: 255,  to: "room_01", spawn: "fromRight" },
+      { dir: "right", x: 1340, y: 727,  to: "room_03", spawn: "fromLeft"  },
+      { dir: "up",    x: 765,  y: 230,  to: "room_07", spawn: "fromDown"  }
     ],
     room_03: [
-      { dir: "left",  x: 250,  y: 328,  to: "room_02", spawn: "fromRight" },
+      { dir: "left",  x: 320,  y: 328,  to: "room_02", spawn: "fromRight" },
       { dir: "right", x: 1170, y: 237,  to: "room_04", spawn: "fromLeft"  },
-      { dir: "up",    x: 785,  y: 200,  to: "room_08", spawn: "fromDown"  }
+      { dir: "up",    x: 785,  y: 270,  to: "room_08", spawn: "fromDown"  }
     ],
     room_04: [
-      { dir: "left",  x: 130,  y: 635,  to: "room_03", spawn: "fromRight" },
-      { dir: "right", x: 1400, y: 734,  to: "room_05", spawn: "fromLeft"  },
-      { dir: "up",    x: 548,  y: 200,  to: "room_09", spawn: "fromDown"  }
+      { dir: "left",  x: 210,  y: 635,  to: "room_03", spawn: "fromRight" },
+      { dir: "right", x: 1330, y: 734,  to: "room_05", spawn: "fromLeft"  },
+      { dir: "up",    x: 548,  y: 270,  to: "room_09", spawn: "fromDown"  }
     ],
     room_05: [
-      { dir: "left",  x: 132,  y: 642,  to: "room_04", spawn: "fromRight" },
-      { dir: "up",    x: 435,  y: 246,  to: "room_10", spawn: "fromDown"  }
+      { dir: "left",  x: 212,  y: 642,  to: "room_04", spawn: "fromRight" },
+      { dir: "up",    x: 435,  y: 310,  to: "room_10", spawn: "fromDown"  }
     ],
     room_06: [
-      { dir: "right", x: 1229, y: 652,  to: "room_07", spawn: "fromLeft"  }, // updated
-      { dir: "up",    x: 1096, y: 165,  to: "room_11", spawn: "fromDown"  },
-      { dir: "down",  x: 623,  y: 910,  to: "room_01", spawn: "fromUp"    }
+      { dir: "right", x: 1229, y: 652,  to: "room_07", spawn: "fromLeft"  },
+      { dir: "up",    x: 1096, y: 240,  to: "room_11", spawn: "fromDown"  },
+      { dir: "down",  x: 623,  y: 840,  to: "room_01", spawn: "fromUp"    }
     ],
     room_07: [
-      { dir: "left",  x: 80,   y: 687,  to: "room_06", spawn: "fromRight" },
-      { dir: "right", x: 1220, y: 614,  to: "room_08", spawn: "fromLeft"  }, // updated
-      { dir: "up",    x: 555,  y: 185,  to: "room_12", spawn: "fromDown"  },
-      { dir: "down",  x: 901,  y: 865,  to: "room_02", spawn: "fromUp"    }
+      { dir: "left",  x: 160,  y: 687,  to: "room_06", spawn: "fromRight" },
+      { dir: "right", x: 1220, y: 614,  to: "room_08", spawn: "fromLeft"  },
+      { dir: "up",    x: 555,  y: 250,  to: "room_12", spawn: "fromDown"  },
+      { dir: "down",  x: 901,  y: 800,  to: "room_02", spawn: "fromUp"    }
     ],
     room_08: [
-      { dir: "left",  x: 109,  y: 776,  to: "room_07", spawn: "fromRight" },
-      { dir: "right", x: 1460, y: 592,  to: "room_09", spawn: "fromLeft"  },
-      { dir: "up",    x: 984,  y: 168,  to: "room_13", spawn: "fromDown"  },
-      { dir: "down",  x: 848,  y: 917,  to: "room_03", spawn: "fromUp"    }
+      { dir: "left",  x: 190,  y: 776,  to: "room_07", spawn: "fromRight" },
+      { dir: "right", x: 1390, y: 592,  to: "room_09", spawn: "fromLeft"  },
+      { dir: "up",    x: 984,  y: 240,  to: "room_13", spawn: "fromDown"  },
+      { dir: "down",  x: 848,  y: 847,  to: "room_03", spawn: "fromUp"    }
     ],
     room_09: [
-      { dir: "left",  x: 80,   y: 702,  to: "room_08", spawn: "fromRight" },
+      { dir: "left",  x: 160,  y: 702,  to: "room_08", spawn: "fromRight" },
       { dir: "right", x: 1365, y: 224,  to: "room_10", spawn: "fromLeft"  },
-      { dir: "up",    x: 449,  y: 200,  to: "room_14", spawn: "fromDown"  },
-      { dir: "down",  x: 918,  y: 860,  to: "room_04", spawn: "fromUp"    }
+      { dir: "up",    x: 449,  y: 270,  to: "room_14", spawn: "fromDown"  },
+      { dir: "down",  x: 918,  y: 800,  to: "room_04", spawn: "fromUp"    }
     ],
     room_10: [
-      { dir: "left",  x: 80,   y: 702,  to: "room_09", spawn: "fromRight" },
-      { dir: "up",    x: 838,  y: 200,  to: "room_15", spawn: "fromDown"  },
-      { dir: "down",  x: 776,  y: 865,  to: "room_05", spawn: "fromUp"    }
+      { dir: "left",  x: 160,  y: 702,  to: "room_09", spawn: "fromRight" },
+      { dir: "up",    x: 838,  y: 270,  to: "room_15", spawn: "fromDown"  },
+      { dir: "down",  x: 776,  y: 800,  to: "room_05", spawn: "fromUp"    }
     ],
     room_11: [
-      { dir: "right", x: 1320, y: 312,  to: "room_12", spawn: "fromLeft"  },
-      { dir: "down",  x: 804,  y: 855,  to: "room_06", spawn: "fromUp"    }
+      { dir: "right", x: 1250, y: 312,  to: "room_12", spawn: "fromLeft"  },
+      { dir: "down",  x: 804,  y: 800,  to: "room_06", spawn: "fromUp"    }
     ],
     room_12: [
-      { dir: "left",  x: 210,  y: 344,  to: "room_11", spawn: "fromRight" },
-      { dir: "right", x: 1251, y: 671,  to: "room_13", spawn: "fromLeft"  }, // updated
-      { dir: "down",  x: 751,  y: 888,  to: "room_07", spawn: "fromUp"    }
+      { dir: "left",  x: 290,  y: 344,  to: "room_11", spawn: "fromRight" },
+      { dir: "right", x: 1251, y: 671,  to: "room_13", spawn: "fromLeft"  },
+      { dir: "down",  x: 751,  y: 820,  to: "room_07", spawn: "fromUp"    }
     ],
     room_13: [
-      { dir: "left",  x: 120,  y: 568,  to: "room_12", spawn: "fromRight" },
-      { dir: "right", x: 1380, y: 242,  to: "room_14", spawn: "fromLeft"  },
-      { dir: "down",  x: 910,  y: 888,  to: "room_08", spawn: "fromUp"    }
+      { dir: "left",  x: 200,  y: 568,  to: "room_12", spawn: "fromRight" },
+      { dir: "right", x: 1310, y: 242,  to: "room_14", spawn: "fromLeft"  },
+      { dir: "down",  x: 910,  y: 820,  to: "room_08", spawn: "fromUp"    }
     ],
     room_14: [
-      { dir: "left",  x: 223,  y: 631,  to: "room_13", spawn: "fromRight" },
-      { dir: "right", x: 1440, y: 716,  to: "room_15", spawn: "fromLeft"  },
-      { dir: "down",  x: 751,  y: 888,  to: "room_09", spawn: "fromUp"    }
+      { dir: "left",  x: 303,  y: 631,  to: "room_13", spawn: "fromRight" },
+      { dir: "right", x: 1370, y: 716,  to: "room_15", spawn: "fromLeft"  },
+      { dir: "down",  x: 751,  y: 820,  to: "room_09", spawn: "fromUp"    }
     ],
     room_15: [
-      { dir: "left",  x: 120,  y: 568,  to: "room_14", spawn: "fromRight" },
-      { dir: "down",  x: 663,  y: 868,  to: "room_10", spawn: "fromUp"    }
+      { dir: "left",  x: 200,  y: 568,  to: "room_14", spawn: "fromRight" },
+      { dir: "down",  x: 663,  y: 800,  to: "room_10", spawn: "fromUp"    }
     ]
   };
 
@@ -147,12 +160,11 @@
 
   /* ═══════════════════════════════════════════
      WANDERER DEFINITIONS
-     — All wanderers have exactly two frames (-1 and -2)
-     — bubbleR removed (no collision pushing)
-     — type:'drift' added for Sumiyo and Tsukigase
+     All have -1.png (normal) and -2.png (popup)
+     type:'drift' = slowly follows the ghost
   ═══════════════════════════════════════════ */
   const WANDERER_DEFS = [
-    /* ── index 0: Ichi — room_01 ── */
+    /* ── 0: Ichi — room_01 ── */
     {
       index:0, roomId:'room_01', x:642, y:496, type:'stay',
       frames:['ichi-1.png','ichi-2.png'], color:'#ff79d7', size:52,
@@ -160,7 +172,7 @@
       desc:'The first of three. Planted under the Karasuki tree by Mister Happy. He\'s mean, but sometimes he\'s right.',
       descJP:'三つのうちの一つ。ミスター・ハッピーにカラスキの木の下に植えられた。いじわるだけど、ときどき正しい。'
     },
-    /* ── index 1: Mr. Happy — room_01 ── */
+    /* ── 1: Mr. Happy — room_01 ── */
     {
       index:1, roomId:'room_01', x:798, y:418, type:'stay',
       frames:['mr_happy-1.png','mr_happy-2.png'], color:'#ffd166', size:110,
@@ -168,14 +180,15 @@
       desc:'Mister Happy lives in Karasuki and pretends he knows everything about it. And no—that\'s not makeup. That\'s his skin.',
       descJP:'ミスター・ハッピーはカラスキに住んでいて、なんでも知っているふりをしている。それと、それはメイクじゃないよ。あれが肌。'
     },
-    /* ── index 2: Tom Katsu — room_02 ── */
+    /* ── 2: Tom Katsu — room_02 ── */
     {
       index:2, roomId:'room_02', x:882, y:263, type:'stay',
-      frames:['tom_katsu-1.png','tom-katsu-2.png'], color:'#ffaa5e', size:60,
+      frames:['tom_katsu-1.png','tom_katsu-2.png'], color:'#ffaa5e', size:62,
       name:'Tom Katsu', nameJP:'トムカツ', nameKanji:'勝',
-      desc:'Crispy on the outside, warm on the inside.'
+      desc:'Crispy on the outside, warm on the inside.',
+      descJP:'[日本語説明、準備中]'
     },
-    /* ── index 3: Uhibon — room_03 ── */
+    /* ── 3: Uhibon — room_03 ── */
     {
       index:3, roomId:'room_03', x:546, y:308, type:'stay',
       frames:['uhibon-1.png','uhibon-2.png'], color:'#a8edff', size:72,
@@ -183,77 +196,149 @@
       desc:'Nothing is really known about Uhibon. He appears as Takachika escapes into Karasuki.',
       descJP:'ウヒボンについては、ほとんど何もわかっていない。タカチカがカラスキへ逃げ込むときに現れる。'
     },
-    /* ── index 4: Jamariko — room_05 ── */
+    /* ── 4: Jacki — room_04 ── */
     {
-      index:4, roomId:'room_05', x:1054, y:354, type:'stay',
-      frames:['jamariko-1.png','jamariko-2.png'], color:'#fff176', size:65,
+      index:4, roomId:'room_04', x:888, y:422, type:'stay',
+      frames:['jacki-1.png','jacki-2.png'], color:'#b2ffda', size:110,
+      name:'Jacki', nameJP:'ジャッキ',
+      desc:'Jacki is from the side of Karasuki that October comes from. She has seen things October has not.',
+      descJP:'[日本語説明、準備中]'
+    },
+    /* ── 5: Jamariko — room_05 ── */
+    {
+      index:5, roomId:'room_05', x:1054, y:354, type:'stay',
+      frames:['jamariko-1.png','jamariko-2.png'], color:'#fff176', size:70,
       name:'Jamariko', nameJP:'ジャマリコ', nameKanji:'邪魔里子',
-      desc:'She stands in your way, but only out of love.'
+      desc:'She stands in your way, but only out of love.',
+      descJP:'[日本語説明、準備中]'
     },
-    /* ── index 5: Sumiyo Yamagake — room_06 — drifts toward ghost ── */
+    /* ── 6: San — room_05 ── */
     {
-      index:5, roomId:'room_06', x:736, y:414, type:'drift',
-      frames:['sumiyo_yamagake-1.png','sumiyo_yamagake-2.png'], color:'#90aaff', size:85,
-      name:'Sumiyo Yamagake', nameJP:'山影すみよ', nameKanji:'影',
-      desc:'Quiet as a shadow, warm as afternoon light.'
+      index:6, roomId:'room_05', x:1029, y:502, type:'stay',
+      frames:['san-1.png','san-2.png'], color:'#ffd08a', size:52,
+      name:'San', nameJP:'サン', nameKanji:'三',
+      desc:'[Description coming soon]',
+      descJP:'[日本語説明、準備中]'
     },
-    /* ── index 6: Amekuro — room_07 ── */
+    /* ── 7: Gorogane — room_06 ── */
     {
-      index:6, roomId:'room_07', x:815, y:398, type:'stay',
-      frames:['amekuro-1.png','amekuro-2.png'], color:'#d49aff', size:60,
+      index:7, roomId:'room_06', x:1256, y:306, type:'stay',
+      frames:['gorogane-1.png','gorogane-2.png'], color:'#a8fff8', size:120,
+      name:'Gorogane', nameJP:'ゴロガネ',
+      desc:'[Description coming soon]',
+      descJP:'[日本語説明、準備中]'
+    },
+    /* ── 8: Sumiyo Horaguchi — room_06 — drifts toward ghost ── */
+    {
+      index:8, roomId:'room_06', x:736, y:414, type:'drift',
+      frames:['sumiyo_horaguchi-1.png','sumiyo_horaguchi-2.png'], color:'#90aaff', size:72,
+      name:'Sumiyo Horaguchi', nameJP:'洞口すみよ',
+      desc:'Quiet as a shadow, warm as afternoon light.',
+      descJP:'[日本語説明、準備中]'
+    },
+    /* ── 9: Amekuro — room_07 ── */
+    {
+      index:9, roomId:'room_07', x:815, y:398, type:'stay',
+      frames:['amekuro-1.png','amekuro-2.png'], color:'#d49aff', size:52,
       name:'Amekuro', nameJP:'アメクロ', nameKanji:'飴梟',
       desc:'Amekuro are cute, owl-like cats that love candy. When they stand up, a hidden mouth on their stomach appears and eats sweets in seconds.',
       descJP:'アメクロ（飴梟）は、おかしが大好きなフクロウのようなネコです。立つとおなかに口が現れ、おかしを一気に食べます。'
     },
-    /* ── index 7: Columbus — room_11 ── */
+    /* ── 10: Snakuma — room_07 ── */
     {
-      index:7, roomId:'room_11', x:935, y:397, type:'stay',
-      frames:['columbus-1.png','columbus-2.png'], color:'#ff85a1', size:55,
-      name:'Columbus', nameJP:'コロンブス', nameKanji:'探',
-      desc:'Still exploring.'
+      index:10, roomId:'room_07', x:456, y:470, type:'stay',
+      frames:['snakuma-1.png','snakuma-2.png'], color:'#88ff88', size:150,
+      name:'Snakuma', nameJP:'スナクマ',
+      desc:'[Description coming soon]',
+      descJP:'[日本語説明、準備中]'
     },
-    /* ── index 8: placeholder — room_08 ── */
-    { index:8,  roomId:'room_08', x:700,  y:600, type:'stay', frames:['placeholder-1.png','placeholder-2.png'], color:'#ffd08a', size:40 },
-    /* ── index 9: Ni — room_10 ── */
+    /* ── 11: Robert — room_08 ── */
     {
-      index:9, roomId:'room_10', x:1233, y:452, type:'stay',
+      index:11, roomId:'room_08', x:979, y:397, type:'stay',
+      frames:['robert-1.png','robert-2.png'], color:'#ffaa88', size:72,
+      name:'Robert', nameJP:'ロバート',
+      desc:'One of the three shapeshifting tanuki brothers. Robert shifts the slowest, which makes him the most convincing.',
+      descJP:'[日本語説明、準備中]'
+    },
+    /* ── 12: Jeffrey — room_08 ── */
+    {
+      index:12, roomId:'room_08', x:1113, y:409, type:'stay',
+      frames:['jeffrey-1.png','jeffrey-2.png'], color:'#ffcc44', size:65,
+      name:'Jeffrey', nameJP:'ジェフリー',
+      desc:'One of the three shapeshifting tanuki brothers. Jeffrey shifts constantly, even when he\'s asleep.',
+      descJP:'[日本語説明、準備中]'
+    },
+    /* ── 13: Johnny — room_08 ── */
+    {
+      index:13, roomId:'room_08', x:1256, y:444, type:'stay',
+      frames:['johnny-1.png','johnny-2.png'], color:'#ff8844', size:70,
+      name:'Johnny', nameJP:'ジョニー',
+      desc:'One of the three shapeshifting tanuki brothers. Johnny refuses to shift into anything useful.',
+      descJP:'[日本語説明、準備中]'
+    },
+    /* ── 14: Nulvane — room_09 ── */
+    {
+      index:14, roomId:'room_09', x:843, y:413, type:'stay',
+      frames:['nulvane-1.png','nulvane-2.png'], color:'#c8aaff', size:80,
+      name:'Nulvane', nameJP:'ヌルヴェイン',
+      desc:'Ideas of people that never fully formed. Nulvane flickers between what they almost were.',
+      descJP:'[日本語説明、準備中]'
+    },
+    /* ── 15: Ni — room_10 ── */
+    {
+      index:15, roomId:'room_10', x:1233, y:452, type:'stay',
       frames:['ni-1.png','ni-2.png'], color:'#e8ffaa', size:52,
       name:'Ni', nameJP:'ニ', nameKanji:'弐',
-      desc:'The second. Quiet, but always present.'
+      desc:'The second. Quiet, but always present.',
+      descJP:'[日本語説明、準備中]'
     },
-    /* ── index 10: placeholder — room_09 ── */
-    { index:10, roomId:'room_09', x:550,  y:480, type:'stay', frames:['placeholder-1.png','placeholder-2.png'], color:'#a8fff8', size:40 },
-    /* ── index 11: October Moriyama — room_12 ── */
+    /* ── 16: Columbus — room_11 ── */
     {
-      index:11, roomId:'room_12', x:700, y:270, type:'stay',
-      frames:['october-moriyama-1.png','october-moriyama-2.png'], color:'#ff79d7', size:75,
+      index:16, roomId:'room_11', x:935, y:397, type:'stay',
+      frames:['columbus-1.png','columbus-2.png'], color:'#ff85a1', size:58,
+      name:'Columbus', nameJP:'コロンブス', nameKanji:'探',
+      desc:'Still exploring.',
+      descJP:'[日本語説明、準備中]'
+    },
+    /* ── 17: October Moriyama — room_12 ── */
+    {
+      index:17, roomId:'room_12', x:700, y:270, type:'stay',
+      frames:['october_moriyama-1.png','october_moriyama-2.png'], color:'#ff79d7', size:73,
       name:'October Moriyama', nameJP:'オクトーバー・森山', nameKanji:'霜',
-      desc:'Arrived with the autumn. Never left.'
+      desc:'Arrived with the autumn. Never left.',
+      descJP:'[日本語説明、準備中]'
     },
-    /* ── index 12: Takachika Green — room_13 ── */
+    /* ── 18: Takachika Green — room_13 ── */
     {
-      index:12, roomId:'room_13', x:407, y:387, type:'stay',
-      frames:['takachika_green-1.png','takachika_green-2.png'], color:'#7fffd4', size:76,
+      index:18, roomId:'room_13', x:407, y:387, type:'stay',
+      frames:['takachika_green-1.png','takachika_green-2.png'], color:'#7fffd4', size:75,
       name:'Takachika Green', nameJP:'タカチカ・グリーン', nameKanji:'高近',
-      desc:'Big presence, soft heart.'
+      desc:'Big presence, soft heart.',
+      descJP:'[日本語説明、準備中]'
     },
-    /* ── index 13: Pugoo — room_13 ── */
+    /* ── 19: Pugoo — room_13 ── */
     {
-      index:13, roomId:'room_13', x:609, y:642, type:'stay',
-      frames:['pugoo-1.png','pugoo-2.png'], color:'#ffcc66', size:54,
+      index:19, roomId:'room_13', x:609, y:642, type:'stay',
+      frames:['pugoo-1.png','pugoo-2.png'], color:'#ffcc66', size:55,
       name:'Pugoo', nameJP:'プグー', nameKanji:'愛',
-      desc:'Small but unforgettable.'
+      desc:'Small but unforgettable.',
+      descJP:'[日本語説明、準備中]'
     },
-    /* ── index 14: placeholder — room_04 ── */
-    { index:14, roomId:'room_04', x:800,  y:450, type:'stay', frames:['placeholder-1.png','placeholder-2.png'], color:'#b2ffda', size:40 },
-    /* ── index 15: placeholder — room_14 ── */
-    { index:15, roomId:'room_14', x:900,  y:480, type:'stay', frames:['placeholder-1.png','placeholder-2.png'], color:'#ffcc66', size:40 },
-    /* ── index 16: Jubei Tsukigase — room_15 — drifts toward ghost ── */
+    /* ── 20: Ena Yamakage — room_14 — drifts toward ghost ── */
     {
-      index:16, roomId:'room_15', x:1064, y:434, type:'drift',
-      frames:['tsukigase_jubei-1.png','tsukigase_jubei-2.png'], color:'#ffcc66', size:85,
+      index:20, roomId:'room_14', x:930, y:318, type:'drift',
+      frames:['ena_yamakage-1.png','ena_yamakage-2.png'], color:'#ffb3d9', size:75,
+      name:'Ena Yamakage', nameJP:'山影えな',
+      desc:'[Description coming soon]',
+      descJP:'[日本語説明、準備中]'
+    },
+    /* ── 21: Jubei Tsukigase — room_15 — drifts toward ghost ── */
+    {
+      index:21, roomId:'room_15', x:1064, y:434, type:'drift',
+      frames:['tsukigase_jubei-1.png','tsukigase_jubei-2.png'], color:'#ffcc66', size:90,
       name:'Jubei Tsukigase', nameJP:'月ヶ瀬・寿兵衛', nameKanji:'字',
-      desc:'Ancient and vast. A letter older than time.'
+      desc:'Ancient and vast. A letter older than time.',
+      descJP:'[日本語説明、準備中]'
     },
   ];
 
@@ -568,12 +653,11 @@
 
   function closeWandererPop() {
     if (currentPopWanderer) {
-      /* revert to pose 0 (-1 image) */
       currentPopWanderer.pose   = 0;
-      /* unfreeze drift wanderers */
       if (currentPopWanderer.type === 'drift') currentPopWanderer.frozen = false;
       currentPopWanderer = null;
     }
+    wandererPopCooldownUntil = performance.now() + POPUP_COOLDOWN_MS;
     wandererPopOverlay.style.background = 'rgba(0,0,0,0)';
     setTimeout(() => { wandererPopOverlay.style.display = 'none'; }, 300);
   }
@@ -584,10 +668,10 @@
 
   /* Click check — click on sprite opens popup, no bubble/push physics */
   function clickCheckWanderers(worldX, worldY) {
+    if (performance.now() < wandererPopCooldownUntil) return false;
     for (const w of activeWanderers) {
       if (!w.name || !w.frames) continue;
       const sz = w.size || WANDERER_SIZE;
-      /* generous hit area: 1.5× the drawn half-size */
       if (Math.abs(worldX - w.rx) <= sz * 1.5 && Math.abs(worldY - w.ry) <= sz * 1.5) {
         openWandererPop(w);
         return true;
@@ -912,6 +996,7 @@
     bonusPopOverlay.style.background = 'rgba(0,0,0,0)';
     setTimeout(() => { bonusPopOverlay.style.display = 'none'; }, 300);
     bonusPopCurrentTree = null;
+    bonusPopCooldownUntil = performance.now() + POPUP_COOLDOWN_MS;
   }
 
   function isBonusPopOpen() {
@@ -931,6 +1016,7 @@
   function handleBonusTreeInteraction(tree) { openBonusPop(tree); }
 
   function checkBonusTrees() {
+    if (performance.now() < bonusPopCooldownUntil) return;
     const trees = BONUS_TREES.filter(t => t.roomId === state.roomId);
     if (!trees.length || state.distMovedSinceSpawn < ARROW_MOVE_THRESHOLD) return;
     for (const tree of trees) {
@@ -943,6 +1029,7 @@
   }
 
   function clickBonusTree(worldX, worldY) {
+    if (performance.now() < bonusPopCooldownUntil) return false;
     const trees = BONUS_TREES.filter(t => t.roomId === state.roomId);
     for (const tree of trees) {
       if (Math.hypot(worldX - tree.x, worldY - tree.y) <= tree.r) {
@@ -955,8 +1042,9 @@
 
   /* ─────────────────────────────────────────
      DRAW BONUS TREES
-     — Pure glowing orbs, no labels, no outlines
-     — Locked state: dim grey fade-out circle
+     Unlocked: magical multi-layer glow with
+     orbiting sparks and rotating ring
+     Locked: dim grey radial fade only
   ───────────────────────────────────────── */
   function drawBonusTrees(now) {
     const trees = BONUS_TREES.filter(t => t.roomId === state.roomId);
@@ -966,61 +1054,79 @@
     trees.forEach(tree => {
       const unlocked = _bonusUnlocked(tree.id);
       const t        = BONUS_THEMES[tree.theme] || BONUS_THEMES.mystery;
-      const pulse    = 0.5 + 0.5 * Math.sin(sec * 1.8);
-      const bounce   = Math.sin(sec * 1.8) * 5;
+      const pulse    = 0.5 + 0.5 * Math.sin(sec * 2.1);
+      const pulse2   = 0.5 + 0.5 * Math.sin(sec * 1.4 + 1.1);
+      const bounce   = Math.sin(sec * 1.8) * 6;
 
       ctx.save();
 
       if (unlocked) {
-        /* outer ambient cloud — radial fade, no hard edge */
-        const glow1 = ctx.createRadialGradient(tree.x, tree.y + bounce, 0, tree.x, tree.y + bounce, 70);
-        glow1.addColorStop(0,   t.accent1 + '66');
-        glow1.addColorStop(0.5, t.accent1 + '22');
-        glow1.addColorStop(1,   'transparent');
-        ctx.globalAlpha = moveReveal * (0.5 + pulse * 0.3);
-        ctx.fillStyle   = glow1;
-        ctx.beginPath(); ctx.arc(tree.x, tree.y + bounce, 70, 0, Math.PI * 2); ctx.fill();
+        /* ── outer dreamy cloud — large, very soft ── */
+        const cloud = ctx.createRadialGradient(tree.x, tree.y + bounce, 0, tree.x, tree.y + bounce, 88);
+        cloud.addColorStop(0,   t.accent1 + '55');
+        cloud.addColorStop(0.4, t.accent1 + '22');
+        cloud.addColorStop(0.7, t.accent2 + '11');
+        cloud.addColorStop(1,   'transparent');
+        ctx.globalAlpha = moveReveal * (0.55 + pulse * 0.3);
+        ctx.fillStyle   = cloud;
+        ctx.beginPath(); ctx.arc(tree.x, tree.y + bounce, 88, 0, Math.PI * 2); ctx.fill();
 
-        /* secondary color cloud */
-        const glow2 = ctx.createRadialGradient(tree.x, tree.y + bounce, 0, tree.x, tree.y + bounce, 50);
-        glow2.addColorStop(0,   t.accent2 + '44');
-        glow2.addColorStop(0.6, t.accent2 + '11');
-        glow2.addColorStop(1,   'transparent');
-        ctx.globalAlpha = moveReveal * (0.3 + pulse * 0.2);
-        ctx.fillStyle   = glow2;
-        ctx.beginPath(); ctx.arc(tree.x, tree.y + bounce, 50, 0, Math.PI * 2); ctx.fill();
+        /* ── mid glow ring — second color ── */
+        const mid = ctx.createRadialGradient(tree.x, tree.y + bounce, 14, tree.x, tree.y + bounce, 52);
+        mid.addColorStop(0,   'transparent');
+        mid.addColorStop(0.4, t.accent2 + '33');
+        mid.addColorStop(0.7, t.accent2 + '55');
+        mid.addColorStop(1,   'transparent');
+        ctx.globalAlpha = moveReveal * (0.4 + pulse2 * 0.3);
+        ctx.fillStyle   = mid;
+        ctx.beginPath(); ctx.arc(tree.x, tree.y + bounce, 52, 0, Math.PI * 2); ctx.fill();
 
-        /* inner bright core — small, intense */
-        const core = ctx.createRadialGradient(
-          tree.x - 3, tree.y + bounce - 3, 0,
-          tree.x, tree.y + bounce, 12 + pulse * 4);
+        /* ── orbiting sparks — 6 sparks on two rings ── */
+        for (let i = 0; i < 6; i++) {
+          const ring    = i < 3 ? 28 : 42;
+          const speed   = i < 3 ? 0.9 : -0.6;
+          const angle   = sec * speed + (i / 3) * Math.PI * 2;
+          const sx      = tree.x + Math.cos(angle) * ring;
+          const sy      = tree.y + bounce + Math.sin(angle) * ring;
+          const twinkle = 0.4 + 0.6 * Math.abs(Math.sin(sec * 5.5 + i * 1.3));
+          const sCol    = i % 2 === 0 ? t.accent1 : t.accent2;
+          ctx.globalAlpha = moveReveal * twinkle * (0.7 + pulse * 0.25);
+          ctx.fillStyle   = sCol;
+          ctx.shadowBlur  = 8; ctx.shadowColor = sCol;
+          ctx.beginPath(); ctx.arc(sx, sy, 1.8 + pulse * 0.8, 0, Math.PI * 2); ctx.fill();
+          ctx.shadowBlur  = 0;
+        }
+
+        /* ── bright inner core ── */
+        const coreR = 10 + pulse * 5;
+        const core  = ctx.createRadialGradient(
+          tree.x - 2, tree.y + bounce - 2, 0,
+          tree.x,     tree.y + bounce,     coreR * 1.8);
         core.addColorStop(0,   '#ffffff');
-        core.addColorStop(0.3, t.accent1);
+        core.addColorStop(0.25, t.accent1);
+        core.addColorStop(0.6,  t.accent2 + 'aa');
         core.addColorStop(1,   'transparent');
-        ctx.globalAlpha = moveReveal * (0.9 + pulse * 0.08);
-        ctx.shadowBlur  = 18 + pulse * 14;
+        ctx.globalAlpha = moveReveal * (0.92 + pulse * 0.07);
+        ctx.shadowBlur  = 24 + pulse * 18;
         ctx.shadowColor = t.accent1;
         ctx.fillStyle   = core;
-        ctx.beginPath(); ctx.arc(tree.x, tree.y + bounce, 12 + pulse * 4, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(tree.x, tree.y + bounce, coreR * 1.8, 0, Math.PI * 2); ctx.fill();
         ctx.shadowBlur  = 0;
 
       } else {
-        /* locked — dim radial grey, no hard shape */
+        /* locked — barely visible dim radial grey */
         const lockGlow = ctx.createRadialGradient(tree.x, tree.y, 0, tree.x, tree.y, 40);
-        lockGlow.addColorStop(0,   'rgba(120,120,120,0.28)');
-        lockGlow.addColorStop(0.5, 'rgba(90,90,90,0.10)');
+        lockGlow.addColorStop(0,   'rgba(110,110,110,0.22)');
+        lockGlow.addColorStop(0.6, 'rgba(80,80,80,0.08)');
         lockGlow.addColorStop(1,   'transparent');
-        ctx.globalAlpha = moveReveal * 0.6;
+        ctx.globalAlpha = moveReveal * 0.55;
         ctx.fillStyle   = lockGlow;
         ctx.beginPath(); ctx.arc(tree.x, tree.y, 40, 0, Math.PI * 2); ctx.fill();
-
-        /* tiny grey dot in centre */
-        const dotG = ctx.createRadialGradient(tree.x, tree.y, 0, tree.x, tree.y, 8);
-        dotG.addColorStop(0,   'rgba(180,180,180,0.55)');
-        dotG.addColorStop(1,   'transparent');
-        ctx.globalAlpha = moveReveal * 0.5;
+        const dotG = ctx.createRadialGradient(tree.x, tree.y, 0, tree.x, tree.y, 7);
+        dotG.addColorStop(0, 'rgba(160,160,160,0.45)'); dotG.addColorStop(1, 'transparent');
+        ctx.globalAlpha = moveReveal * 0.45;
         ctx.fillStyle   = dotG;
-        ctx.beginPath(); ctx.arc(tree.x, tree.y, 8, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(tree.x, tree.y, 7, 0, Math.PI * 2); ctx.fill();
       }
 
       ctx.restore();
@@ -1204,7 +1310,7 @@
     coordToggle = document.createElement("div");
     coordToggle.id = "coord-toggle";
     coordToggle.innerHTML = `<span>COORDS</span><div class="toggle-pill"></div>`;
-    coordToggle.addEventListener("click", toggleCoordMode);
+    if (DEV_MODE) coordToggle.addEventListener("click", toggleCoordMode);
 
     coordReadout = document.createElement("div");
     coordReadout.id = "coord-readout";
@@ -1231,16 +1337,22 @@
 
     document.body.innerHTML = "";
     document.body.appendChild(app);
-    document.body.appendChild(coordToggle);
-    document.body.appendChild(coordReadout);
-    document.body.appendChild(pinLog);
+
+    /* ── DEV TOOLS — comment out DEV_MODE = true at top to hide all of these ── */
+    if (DEV_MODE) {
+      document.body.appendChild(coordToggle);
+      document.body.appendChild(coordReadout);
+      document.body.appendChild(pinLog);
+    }
+
     document.body.appendChild(toast);
     document.body.appendChild(portalOverlay);
 
     injectBonusLockOverlay_LEGACY();
     injectBonusPopOverlay();
     injectWandererPopOverlay();
-    injectDevPanel();
+
+    if (DEV_MODE) injectDevPanel();
 
     const rotateOverlay = document.createElement("div");
     rotateOverlay.id = "rotate-overlay";
@@ -1830,7 +1942,7 @@
 
   function bindInput() {
     stage.addEventListener("mousemove", (e) => {
-      if (!state.coordMode) return;
+      if (!DEV_MODE || !state.coordMode) return;
       const p = stagePointToWorld(e.clientX, e.clientY);
       const el = document.getElementById("coord-xy");
       if (el) el.textContent = `${Math.round(p.x)}, ${Math.round(p.y)}`;
