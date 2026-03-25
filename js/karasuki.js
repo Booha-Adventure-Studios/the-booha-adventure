@@ -564,12 +564,14 @@
           <h2 id="wanderer-pop-name" style="
             font-size:clamp(1.2rem,4vw,1.5rem); margin:0 0 4px;
             letter-spacing:.06em;"></h2>
-          <p id="wanderer-pop-jp" style="
+         <p id="wanderer-pop-jp" style="
             font-size:clamp(.82rem,2.6vw,.96rem); margin:0 0 2px;
-            opacity:.72; letter-spacing:.08em; font-family:'Georgia',serif;"></p>
+            opacity:.72; letter-spacing:.08em; font-family:'Georgia',serif;
+            color:#ffffff;"></p>
           <p id="wanderer-pop-kanji" style="
             font-size:clamp(.7rem,2.2vw,.82rem); margin:0 0 20px;
-            opacity:.38; letter-spacing:.14em;"></p>
+            opacity:.38; letter-spacing:.14em;
+            color:#ffffff;"></p>
             
         <p id="wanderer-pop-desc" style="
             font-size:clamp(.84rem,2.8vw,.98rem); line-height:1.7;
