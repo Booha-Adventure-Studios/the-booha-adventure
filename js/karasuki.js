@@ -279,7 +279,7 @@
     /* ── 14: Nulvane — room_09 ── */
     {
       index:14, roomId:'room_09', x:843, y:413, type:'stay',
-      frames:['nulvane-1.png','nulvane-2.png'], color:'#c8aaff', size:80,
+      frames:['nulvane-1.png','nulvane-2.png'], color:'#c8aaff', size:160,
       name:'Nulvane', nameJP:'ヌルヴェイン',
       desc:'Ideas of people that never fully formed. Nulvane flickers between what they almost were.',
       descJP:'[日本語説明、準備中]'
