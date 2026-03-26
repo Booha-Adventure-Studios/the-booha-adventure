@@ -1,1 +1,73 @@
 
+{
+  "cards": [
+    { "n": 1, "en": "story", "jp": "物語", "hira": "ものがたり", "mp3": "pb_v01_story.mp3" },
+    { "n": 2, "en": "hero", "jp": "ヒーロー", "hira": "ひーろー", "mp3": "pb_v02_hero.mp3" },
+    { "n": 3, "en": "bad guy", "jp": "悪者", "hira": "わるもの", "mp3": "pb_v03_bad_guy.mp3" },
+    { "n": 4, "en": "king", "jp": "王様", "hira": "おうさま", "mp3": "pb_v04_king.mp3" },
+    { "n": 5, "en": "queen", "jp": "女王", "hira": "じょおう", "mp3": "pb_v05_queen.mp3" },
+    { "n": 6, "en": "prince", "jp": "王子", "hira": "おうじ", "mp3": "pb_v06_prince.mp3" },
+    { "n": 7, "en": "princess", "jp": "お姫様", "hira": "おひめさま", "mp3": "pb_v07_princess.mp3" },
+    { "n": 8, "en": "dragon", "jp": "ドラゴン", "hira": "どらごん", "mp3": "pb_v08_dragon.mp3" },
+    { "n": 9, "en": "wolf", "jp": "オオカミ", "hira": "おおかみ", "mp3": "pb_v09_wolf.mp3" },
+    { "n": 10, "en": "witch", "jp": "魔女", "hira": "まじょ", "mp3": "pb_v10_witch.mp3" },
+
+    { "n": 11, "en": "giant", "jp": "巨人", "hira": "きょじん", "mp3": "pb_v11_giant.mp3" },
+    { "n": 12, "en": "fairy", "jp": "妖精", "hira": "ようせい", "mp3": "pb_v12_fairy.mp3" },
+    { "n": 13, "en": "monster", "jp": "モンスター", "hira": "もんすたー", "mp3": "pb_v13_monster.mp3" },
+    { "n": 14, "en": "castle", "jp": "城", "hira": "しろ", "mp3": "pb_v14_castle.mp3" },
+    { "n": 15, "en": "forest", "jp": "森", "hira": "もり", "mp3": "pb_v15_forest.mp3" },
+
+    { "n": 16, "en": "magic", "jp": "魔法", "hira": "まほう", "mp3": "pb_v16_magic.mp3" },
+    { "n": 17, "en": "spell", "jp": "呪文", "hira": "じゅもん", "mp3": "pb_v17_spell.mp3" },
+    { "n": 18, "en": "sword", "jp": "剣", "hira": "けん", "mp3": "pb_v18_sword.mp3" },
+    { "n": 19, "en": "shield", "jp": "盾", "hira": "たて", "mp3": "pb_v19_shield.mp3" },
+    { "n": 20, "en": "treasure", "jp": "宝物", "hira": "たからもの", "mp3": "pb_v20_treasure.mp3" },
+    { "n": 21, "en": "map", "jp": "地図", "hira": "ちず", "mp3": "pb_v21_map.mp3" },
+    { "n": 22, "en": "door", "jp": "ドア", "hira": "どあ", "mp3": "pb_v22_door.mp3" },
+    { "n": 23, "en": "key", "jp": "鍵", "hira": "かぎ", "mp3": "pb_v23_key.mp3" },
+    { "n": 24, "en": "cave", "jp": "洞窟", "hira": "どうくつ", "mp3": "pb_v24_cave.mp3" },
+    { "n": 25, "en": "tower", "jp": "塔", "hira": "とう", "mp3": "pb_v25_tower.mp3" },
+
+    { "n": 26, "en": "horse", "jp": "馬", "hira": "うま", "mp3": "pb_v26_horse.mp3" },
+    { "n": 27, "en": "friend", "jp": "友達", "hira": "ともだち", "mp3": "pb_v27_friend.mp3" },
+    { "n": 28, "en": "enemy", "jp": "敵", "hira": "てき", "mp3": "pb_v28_enemy.mp3" },
+    { "n": 29, "en": "team", "jp": "チーム", "hira": "ちーむ", "mp3": "pb_v29_team.mp3" },
+    { "n": 30, "en": "adventure", "jp": "冒険", "hira": "ぼうけん", "mp3": "pb_v30_adventure.mp3" },
+
+    { "n": 31, "en": "happy", "jp": "嬉しい", "hira": "うれしい", "mp3": "pb_v31_happy.mp3" },
+    { "n": 32, "en": "sad", "jp": "悲しい", "hira": "かなしい", "mp3": "pb_v32_sad.mp3" },
+    { "n": 33, "en": "angry", "jp": "怒っている", "hira": "おこっている", "mp3": "pb_v33_angry.mp3" },
+    { "n": 34, "en": "scared", "jp": "怖い", "hira": "こわい", "mp3": "pb_v34_scared.mp3" },
+    { "n": 35, "en": "brave", "jp": "勇敢な", "hira": "ゆうかんな", "mp3": "pb_v35_brave.mp3" },
+    { "n": 36, "en": "strong", "jp": "強い", "hira": "つよい", "mp3": "pb_v36_strong.mp3" },
+    { "n": 37, "en": "fast", "jp": "速い", "hira": "はやい", "mp3": "pb_v37_fast.mp3" },
+    { "n": 38, "en": "slow", "jp": "遅い", "hira": "おそい", "mp3": "pb_v38_slow.mp3" },
+    { "n": 39, "en": "big", "jp": "大きい", "hira": "おおきい", "mp3": "pb_v39_big.mp3" },
+    { "n": 40, "en": "small", "jp": "小さい", "hira": "ちいさい", "mp3": "pb_v40_small.mp3" },
+
+    { "n": 41, "en": "dark", "jp": "暗い", "hira": "くらい", "mp3": "pb_v41_dark.mp3" },
+    { "n": 42, "en": "light", "jp": "明るい", "hira": "あかるい", "mp3": "pb_v42_light.mp3" },
+    { "n": 43, "en": "funny", "jp": "面白い", "hira": "おもしろい", "mp3": "pb_v43_funny.mp3" },
+    { "n": 44, "en": "kind", "jp": "優しい", "hira": "やさしい", "mp3": "pb_v44_kind.mp3" },
+    { "n": 45, "en": "secret", "jp": "秘密", "hira": "ひみつ", "mp3": "pb_v45_secret.mp3" },
+
+    { "n": 46, "en": "once", "jp": "一度", "hira": "いちど", "mp3": "pb_v46_once.mp3" },
+    { "n": 47, "en": "today", "jp": "今日", "hira": "きょう", "mp3": "pb_v47_today.mp3" },
+    { "n": 48, "en": "first", "jp": "最初", "hira": "さいしょ", "mp3": "pb_v48_first.mp3" },
+    { "n": 49, "en": "next", "jp": "次", "hira": "つぎ", "mp3": "pb_v49_next.mp3" },
+    { "n": 50, "en": "then", "jp": "それから", "hira": "それから", "mp3": "pb_v50_then.mp3" },
+    { "n": 51, "en": "after", "jp": "後で", "hira": "あとで", "mp3": "pb_v51_after.mp3" },
+    { "n": 52, "en": "last", "jp": "最後", "hira": "さいご", "mp3": "pb_v52_last.mp3" },
+
+    { "n": 53, "en": "because", "jp": "なぜなら", "hira": "なぜなら", "mp3": "pb_v53_because.mp3" },
+    { "n": 54, "en": "but", "jp": "でも", "hira": "でも", "mp3": "pb_v54_but.mp3" },
+    { "n": 55, "en": "and", "jp": "そして", "hira": "そして", "mp3": "pb_v55_and.mp3" },
+
+    { "n": 56, "en": "help", "jp": "助ける", "hira": "たすける", "mp3": "pb_v56_help.mp3" },
+    { "n": 57, "en": "fight", "jp": "戦う", "hira": "たたかう", "mp3": "pb_v57_fight.mp3" },
+    { "n": 58, "en": "run", "jp": "走る", "hira": "はしる", "mp3": "pb_v58_run.mp3" },
+    { "n": 59, "en": "find", "jp": "見つける", "hira": "みつける", "mp3": "pb_v59_find.mp3" },
+    { "n": 60, "en": "win", "jp": "勝つ", "hira": "かつ", "mp3": "pb_v60_win.mp3" }
+  ]
+}
