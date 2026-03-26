@@ -1,1 +1,76 @@
 
+{
+  "cards": [
+    { "n": 1, "en": "What central theme does the narrative explore?", "jp": "その物語はどんな中心的な主題を探っていますか。", "hira": "その ものがたり は どんな ちゅうしんてき な しゅだい を さぐっていますか", "mp3": "bc_q01_what_central_theme_does_the_narrative_explore.mp3" },
+    { "n": 2, "en": "How does the setting influence the development of the plot?", "jp": "設定は物語の展開にどのような影響を与えますか。", "hira": "せってい は ものがたり の てんかい に どのような えいきょう を あたえますか", "mp3": "bc_q02_how_does_the_setting_influence_the_development_of_the_plot.mp3" },
+    { "n": 3, "en": "In what way does the protagonist evolve throughout the story?", "jp": "主人公は物語を通してどのように変化しますか。", "hira": "しゅじんこう は ものがたり を とおして どのように へんか しますか", "mp3": "bc_q03_in_what_way_does_the_protagonist_evolve_throughout_the_story.mp3" },
+    { "n": 4, "en": "What motivates the antagonist’s actions?", "jp": "敵対者の行動を動機づけているものは何ですか。", "hira": "てきたいしゃ の こうどう を どうきづけている もの は なに ですか", "mp3": "bc_q04_what_motivates_the_antagonists_actions.mp3" },
+    { "n": 5, "en": "How is foreshadowing used to build suspense?", "jp": "伏線はどのように使われて緊張感を高めていますか。", "hira": "ふくせん は どのように つかわれて きんちょうかん を たかめていますか", "mp3": "bc_q05_how_is_foreshadowing_used_to_build_suspense.mp3" },
+
+    { "n": 6, "en": "Does the climax effectively resolve the main conflict?", "jp": "クライマックスは主な対立を効果的に解決していますか。", "hira": "くらいまっくす は おもな たいりつ を こうかてき に かいけつ していますか", "mp3": "bc_q06_does_the_climax_effectively_resolve_the_main_conflict.mp3" },
+    { "n": 7, "en": "How does the narrative perspective shape the reader’s understanding?", "jp": "物語の視点は読者の理解をどのように形作りますか。", "hira": "ものがたり の してん は どくしゃ の りかい を どのように かたちづくりますか", "mp3": "bc_q07_how_does_the_narrative_perspective_shape_the_readers_understanding.mp3" },
+    { "n": 8, "en": "What role does symbolism play in reinforcing the theme?", "jp": "象徴は主題を強めるうえでどんな役割を果たしますか。", "hira": "しょうちょう は しゅだい を つよめる うえで どんな やくわり を はたしますか", "mp3": "bc_q08_what_role_does_symbolism_play_in_reinforcing_the_theme.mp3" },
+    { "n": 9, "en": "How does the tone shift between the beginning and the end?", "jp": "語調は始まりと終わりの間でどのように変化しますか。", "hira": "ごちょう は はじまり と おわり の あいだ で どのように へんか しますか", "mp3": "bc_q09_how_does_the_tone_shift_between_the_beginning_and_the_end.mp3" },
+    { "n": 10, "en": "Is the resolution satisfying, or does it leave ambiguity?", "jp": "結末は満足のいくものですか、それとも曖昧さを残しますか。", "hira": "けつまつ は まんぞく の いく もの ですか それとも あいまいさ を のこしますか", "mp3": "bc_q10_is_the_resolution_satisfying_or_does_it_leave_ambiguity.mp3" },
+
+    { "n": 11, "en": "What structural weaknesses, if any, can you identify?", "jp": "構成上の弱点があるとすれば、何が挙げられますか。", "hira": "こうせいじょう の じゃくてん が ある と すれば なに が あげられますか", "mp3": "bc_q11_what_structural_weaknesses_if_any_can_you_identify.mp3" },
+    { "n": 12, "en": "How effectively are transitions handled between scenes?", "jp": "場面転換はどの程度うまく処理されていますか。", "hira": "ばめんてんかん は どのていど うまく しょり されていますか", "mp3": "bc_q12_how_effectively_are_transitions_handled_between_scenes.mp3" },
+    { "n": 13, "en": "What narrative techniques enhance emotional impact?", "jp": "どんな物語技法が感情的な影響を高めていますか。", "hira": "どんな ものがたり ぎほう が かんじょうてき な えいきょう を たかめていますか", "mp3": "bc_q13_what_narrative_techniques_enhance_emotional_impact.mp3" },
+    { "n": 14, "en": "Could the story function differently if told from another perspective?", "jp": "別の視点から語られたら、この物語は違って機能するでしょうか。", "hira": "べつ の してん から かたられたら この ものがたり は ちがって きのう する でしょうか", "mp3": "bc_q14_could_the_story_function_differently_if_told_from_another_perspective.mp3" },
+    { "n": 15, "en": "What is the most pivotal turning point in the narrative?", "jp": "物語の中で最も重要な転機は何ですか。", "hira": "ものがたり の なか で もっとも じゅうよう な てんき は なに ですか", "mp3": "bc_q15_what_is_the_most_pivotal_turning_point_in_the_narrative.mp3" },
+
+    { "n": 16, "en": "How does internal conflict influence the protagonist’s decisions?", "jp": "内的葛藤は主人公の決断にどのような影響を与えますか。", "hira": "ないてき かっとう は しゅじんこう の けつだん に どのような えいきょう を あたえますか", "mp3": "bc_q16_how_does_internal_conflict_influence_the_protagonists_decisions.mp3" },
+    { "n": 17, "en": "What psychological factors drive the character’s transformation?", "jp": "どんな心理的要因がその人物の変化を動かしていますか。", "hira": "どんな しんりてき よういん が その じんぶつ の へんか を うごかしていますか", "mp3": "bc_q17_what_psychological_factors_drive_the_characters_transformation.mp3" },
+    { "n": 18, "en": "Is the antagonist portrayed as purely evil or morally complex?", "jp": "敵対者は単なる悪として描かれていますか、それとも道徳的に複雑ですか。", "hira": "てきたいしゃ は たんなる あく として えがかれていますか それとも どうとくてき に ふくざつ ですか", "mp3": "bc_q18_is_the_antagonist_portrayed_as_purely_evil_or_morally_complex.mp3" },
+    { "n": 19, "en": "How does the character’s background shape their identity?", "jp": "その人物の背景はどのようにアイデンティティを形作りますか。", "hira": "その じんぶつ の はいけい は どのように あいでんてぃてぃ を かたちづくりますか", "mp3": "bc_q19_how_does_the_characters_background_shape_their_identity.mp3" },
+    { "n": 20, "en": "In what way does fear affect the character’s behavior?", "jp": "恐れはどのようにその人物の行動に影響しますか。", "hira": "おそれ は どのように その じんぶつ の こうどう に えいきょう しますか", "mp3": "bc_q20_in_what_way_does_fear_affect_the_characters_behavior.mp3" },
+
+    { "n": 21, "en": "What evidence shows personal growth by the end?", "jp": "最後までに個人の成長を示す根拠は何ですか。", "hira": "さいご まで に こじん の せいちょう を しめす こんきょ は なに ですか", "mp3": "bc_q21_what_evidence_shows_personal_growth_by_the_end.mp3" },
+    { "n": 22, "en": "How does the relationship between characters evolve?", "jp": "登場人物同士の関係はどのように発展しますか。", "hira": "とうじょうじんぶつ どうし の かんけい は どのように はってん しますか", "mp3": "bc_q22_how_does_the_relationship_between_characters_evolve.mp3" },
+    { "n": 23, "en": "Does the protagonist take responsibility for their actions?", "jp": "主人公は自分の行動に責任を取りますか。", "hira": "しゅじんこう は じぶん の こうどう に せきにん を とりますか", "mp3": "bc_q23_does_the_protagonist_take_responsibility_for_their_actions.mp3" },
+    { "n": 24, "en": "How does subtle characterization add depth?", "jp": "繊細な人物描写はどのように深みを加えますか。", "hira": "せんさい な じんぶつびょうしゃ は どのように ふかみ を くわえますか", "mp3": "bc_q24_how_does_subtle_characterization_add_depth.mp3" },
+    { "n": 25, "en": "What moral dilemma does the character face?", "jp": "その人物はどんな道徳的ジレンマに直面しますか。", "hira": "その じんぶつ は どんな どうとくてき じれんま に ちょくめん しますか", "mp3": "bc_q25_what_moral_dilemma_does_the_character_face.mp3" },
+
+    { "n": 26, "en": "Is the transformation believable?", "jp": "その変化には説得力がありますか。", "hira": "その へんか に は せっとくりょく が ありますか", "mp3": "bc_q26_is_the_transformation_believable.mp3" },
+    { "n": 27, "en": "How do external pressures intensify the conflict?", "jp": "外的な圧力はどのように対立を激しくしますか。", "hira": "がいてき な あつりょく は どのように たいりつ を はげしく しますか", "mp3": "bc_q27_how_do_external_pressures_intensify_the_conflict.mp3" },
+    { "n": 28, "en": "What values does the protagonist ultimately represent?", "jp": "主人公は最終的にどんな価値観を表していますか。", "hira": "しゅじんこう は さいしゅうてき に どんな かちかん を あらわしていますか", "mp3": "bc_q28_what_values_does_the_protagonist_ultimately_represent.mp3" },
+    { "n": 29, "en": "Does the antagonist undergo any transformation?", "jp": "敵対者には何らかの変化がありますか。", "hira": "てきたいしゃ に は なんらか の へんか が ありますか", "mp3": "bc_q29_does_the_antagonist_undergo_any_transformation.mp3" },
+    { "n": 30, "en": "How does emotional restraint influence the reader’s perception?", "jp": "感情の抑制は読者の受け取り方にどのような影響を与えますか。", "hira": "かんじょう の よくせい は どくしゃ の うけとりかた に どのような えいきょう を あたえますか", "mp3": "bc_q30_how_does_emotional_restraint_influence_the_readers_perception.mp3" },
+
+    { "n": 31, "en": "How does the author establish credibility in the narrative?", "jp": "作者は物語の中でどのように信頼性を築いていますか。", "hira": "さくしゃ は ものがたり の なか で どのように しんらいせい を きずいていますか", "mp3": "bc_q31_how_does_the_author_establish_credibility_in_the_narrative.mp3" },
+    { "n": 32, "en": "What assumptions does the story challenge?", "jp": "この物語はどんな前提に疑問を投げかけていますか。", "hira": "この ものがたり は どんな ぜんてい に ぎもん を なげかけていますか", "mp3": "bc_q32_what_assumptions_does_the_story_challenge.mp3" },
+    { "n": 33, "en": "In contrast to the beginning, how does the ending redefine expectations?", "jp": "冒頭と比べて、結末は期待をどのように捉え直させますか。", "hira": "ぼうとう と くらべて けつまつ は きたい を どのように とらえなおさせますか", "mp3": "bc_q33_in_contrast_to_the_beginning_how_does_the_ending_redefine_expectations.mp3" },
+    { "n": 34, "en": "How does pacing contribute to overall tension?", "jp": "ペース配分は全体の緊張感にどう貢献していますか。", "hira": "ぺーす はいぶん は ぜんたい の きんちょうかん に どう こうけん していますか", "mp3": "bc_q34_how_does_pacing_contribute_to_overall_tension.mp3" },
+    { "n": 35, "en": "What evidence supports your interpretation of the theme?", "jp": "あなたの主題解釈を支える根拠は何ですか。", "hira": "あなた の しゅだい かいしゃく を ささえる こんきょ は なに ですか", "mp3": "bc_q35_what_evidence_supports_your_interpretation_of_the_theme.mp3" },
+
+    { "n": 36, "en": "Does the narrative avoid predictable outcomes?", "jp": "その物語は予想できる結末を避けていますか。", "hira": "その ものがたり は よそう できる けつまつ を さけていますか", "mp3": "bc_q36_does_the_narrative_avoid_predictable_outcomes.mp3" },
+    { "n": 37, "en": "How might the story differ in another cultural context?", "jp": "別の文化的背景では、この物語はどう異なるでしょうか。", "hira": "べつ の ぶんかてき はいけい では この ものがたり は どう ことなる でしょうか", "mp3": "bc_q37_how_might_the_story_differ_in_another_cultural_context.mp3" },
+    { "n": 38, "en": "What alternative ending could strengthen the message?", "jp": "どんな別の結末ならメッセージをより強められますか。", "hira": "どんな べつ の けつまつ なら めっせーじ を より つよめられますか", "mp3": "bc_q38_what_alternative_ending_could_strengthen_the_message.mp3" },
+    { "n": 39, "en": "How does ambiguity enhance interpretive depth?", "jp": "曖昧さはどのように解釈の深みを高めますか。", "hira": "あいまいさ は どのように かいしゃく の ふかみ を たかめますか", "mp3": "bc_q39_how_does_ambiguity_enhance_interpretive_depth.mp3" },
+    { "n": 40, "en": "In what way does irony alter the reader’s expectations?", "jp": "皮肉はどのように読者の期待を変えますか。", "hira": "ひにく は どのように どくしゃ の きたい を かえますか", "mp3": "bc_q40_in_what_way_does_irony_alter_the_readers_expectations.mp3" },
+
+    { "n": 41, "en": "How does the narrative balance action and reflection?", "jp": "その物語は行動と内省のバランスをどのように取っていますか。", "hira": "その ものがたり は こうどう と ないせい の ばらんす を どのように とっていますか", "mp3": "bc_q41_how_does_the_narrative_balance_action_and_reflection.mp3" },
+    { "n": 42, "en": "What ethical issues are raised by the conflict?", "jp": "その対立によってどんな倫理的問題が提起されますか。", "hira": "その たいりつ に よって どんな りんりてき もんだい が ていき されますか", "mp3": "bc_q42_what_ethical_issues_are_raised_by_the_conflict.mp3" },
+    { "n": 43, "en": "How does language choice influence tone?", "jp": "言葉の選び方は語調にどのような影響を与えますか。", "hira": "ことば の えらびかた は ごちょう に どのような えいきょう を あたえますか", "mp3": "bc_q43_how_does_language_choice_influence_tone.mp3" },
+    { "n": 44, "en": "What makes the climax emotionally compelling?", "jp": "何がクライマックスを感情的に強くしていますか。", "hira": "なに が くらいまっくす を かんじょうてき に つよく していますか", "mp3": "bc_q44_what_makes_the_climax_emotionally_compelling.mp3" },
+    { "n": 45, "en": "Ultimately, what insight does the story offer the reader?", "jp": "最終的に、この物語は読者にどんな洞察を与えますか。", "hira": "さいしゅうてき に この ものがたり は どくしゃ に どんな どうさつ を あたえますか", "mp3": "bc_q45_ultimately_what_insight_does_the_story_offer_the_reader.mp3" },
+
+    { "n": 46, "en": "To what extent is the protagonist responsible for the outcome?", "jp": "主人公は結果にどの程度責任がありますか。", "hira": "しゅじんこう は けっか に どのていど せきにん が ありますか", "mp3": "bc_q46_to_what_extent_is_the_protagonist_responsible_for_the_outcome.mp3" },
+    { "n": 47, "en": "If the conflict had not been resolved, how might the narrative have changed?", "jp": "もし対立が解決されていなければ、物語はどう変わっていたでしょうか。", "hira": "もし たいりつ が かいけつ されて いなければ ものがたり は どう かわっていた でしょうか", "mp3": "bc_q47_if_the_conflict_had_not_been_resolved_how_might_the_narrative_have_changed.mp3" },
+    { "n": 48, "en": "How does the author build credibility through descriptive detail?", "jp": "作者は描写の細部を通してどのように信頼性を築きますか。", "hira": "さくしゃ は びょうしゃ の さいぶ を とおして どのように しんらいせい を きずきますか", "mp3": "bc_q48_how_does_the_author_build_credibility_through_descriptive_detail.mp3" },
+    { "n": 49, "en": "What underlying assumptions does the narrative rely on?", "jp": "その物語はどんな根本的な前提に基づいていますか。", "hira": "その ものがたり は どんな こんぽんてき な ぜんてい に もとづいていますか", "mp3": "bc_q49_what_underlying_assumptions_does_the_narrative_rely_on.mp3" },
+    { "n": 50, "en": "How effectively does the author control the pacing of events?", "jp": "作者は出来事のペースをどの程度効果的にコントロールしていますか。", "hira": "さくしゃ は できごと の ぺーす を どのていど こうかてき に こんとろーる していますか", "mp3": "bc_q50_how_effectively_does_the_author_control_the_pacing_of_events.mp3" },
+
+    { "n": 51, "en": "Does the narrative encourage sympathy or criticism toward the antagonist?", "jp": "その物語は敵対者に対して共感と批判のどちらを促しますか。", "hira": "その ものがたり は てきたいしゃ に たいして きょうかん と ひはん の どちら を うながしますか", "mp3": "bc_q51_does_the_narrative_encourage_sympathy_or_criticism_toward_the_antagonist.mp3" },
+    { "n": 52, "en": "In what ways does the setting symbolize internal struggle?", "jp": "設定はどのような形で内面の葛藤を象徴していますか。", "hira": "せってい は どのような かたち で ないめん の かっとう を しょうちょう していますか", "mp3": "bc_q52_in_what_ways_does_the_setting_symbolize_internal_struggle.mp3" },
+    { "n": 53, "en": "How might readers from different generations interpret the ending differently?", "jp": "異なる世代の読者は結末をどのように異なって解釈するでしょうか。", "hira": "ことなる せだい の どくしゃ は けつまつ を どのように ことなって かいしゃく する でしょうか", "mp3": "bc_q53_how_might_readers_from_different_generations_interpret_the_ending_differently.mp3" },
+    { "n": 54, "en": "What narrative risks does the author take?", "jp": "作者はどんな物語上のリスクを取っていますか。", "hira": "さくしゃ は どんな ものがたりじょう の りすく を とっていますか", "mp3": "bc_q54_what_narrative_risks_does_the_author_take.mp3" },
+    { "n": 55, "en": "How does contrast between characters heighten dramatic tension?", "jp": "登場人物の対比はどのように劇的な緊張感を高めますか。", "hira": "とうじょうじんぶつ の たいひ は どのように げきてき な きんちょうかん を たかめますか", "mp3": "bc_q55_how_does_contrast_between_characters_heighten_dramatic_tension.mp3" },
+
+    { "n": 56, "en": "What unanswered questions remain at the conclusion?", "jp": "結末の時点でどんな未解決の問いが残りますか。", "hira": "けつまつ の じてん で どんな みかいけつ の とい が のこりますか", "mp3": "bc_q56_what_unanswered_questions_remain_at_the_conclusion.mp3" },
+    { "n": 57, "en": "How does the transformation of the protagonist affect supporting characters?", "jp": "主人公の変化は周囲の人物にどのような影響を与えますか。", "hira": "しゅじんこう の へんか は しゅうい の じんぶつ に どのような えいきょう を あたえますか", "mp3": "bc_q57_how_does_the_transformation_of_the_protagonist_affect_supporting_characters.mp3" },
+    { "n": 58, "en": "What narrative elements create a sense of inevitability?", "jp": "どんな物語要素が避けられなさの感覚を生み出しますか。", "hira": "どんな ものがたり ようそ が さけられなさ の かんかく を うみだしますか", "mp3": "bc_q58_what_narrative_elements_create_a_sense_of_inevitability.mp3" },
+    { "n": 59, "en": "If the story were adapted into film, what might need to change?", "jp": "もしこの物語が映画化されたら、何を変える必要があるでしょうか。", "hira": "もし この ものがたり が えいがか されたら なに を かえる ひつよう が ある でしょうか", "mp3": "bc_q59_if_the_story_were_adapted_into_film_what_might_need_to_change.mp3" },
+    { "n": 60, "en": "How does the ending redefine the meaning of earlier events?", "jp": "結末は以前の出来事の意味をどのように捉え直させますか。", "hira": "けつまつ は いぜん の できごと の いみ を どのように とらえなおさせますか", "mp3": "bc_q60_how_does_the_ending_redefine_the_meaning_of_earlier_events.mp3" }
+  ]
+}
