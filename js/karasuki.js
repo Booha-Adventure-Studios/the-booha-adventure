@@ -102,7 +102,7 @@
     ],
     room_06: [
       { dir: "right", x: 1229, y: 652,  to: "room_07", spawn: "fromLeft"  },
-      { dir: "up",    x: 1096, y: 240,  to: "room_11", spawn: "fromDown"  },
+      { dir: "up",    x: 1065, y: 239,  to: "room_11", spawn: "fromDown"  },
       { dir: "down",  x: 623,  y: 840,  to: "room_01", spawn: "fromUp"    }
     ],
     room_07: [
@@ -222,7 +222,7 @@
     },
     /* ── 7: Gorogane — room_06 ── */
     {
-      index:7, roomId:'room_06', x:1256, y:306, type:'stay',
+      index:7, roomId:'room_06', x:781, y:207, type:'stay',
       frames:['gorogane-1.png','gorogane-2.png'], color:'#a8fff8', size:120,
       name:'Gorogui', nameJP:'ゴロぐい',
       desc:'Once they were people with food on their mind, now hunger’s the only thing they can find. If you see one move, don’t trust what you see—something much worse is pulling the strings.',
@@ -230,8 +230,8 @@
     },
     /* ── 8: Sumiyo Horaguchi — room_06 — drifts toward ghost ── */
     {
-      index:8, roomId:'room_06', x:736, y:414, type:'drift',
-      frames:['sumiyo_horaguchi-1.png','sumiyo_horaguchi-2.png'], color:'#90aaff', size:72,
+      index:8, roomId:'room_06', x:522, y:350, type:'drift',
+      frames:['sumiyo_horaguchi-1.png','sumiyo_horaguchi-2.png'], color:'#90aaff', size:85,
       name:'Sumiyo Horaguchi', nameJP:'洞口すみよ',
       desc:'If you see one of these—don’t turn your back, one glance away and she’s on your track. If you don’t look, she’ll follow you through—and once she’s in, you’ll start losing you.',
       descJP:'もし みかけたら、ぜったいに せなかを むけちゃ だめだよ。ちょっと めを はなしただけで、すぐ うしろに いるんだ。みていないと、どこまでも ついてくる。そして いちど はいられたら、すこしずつ じぶんを なくしていくんだ。'
