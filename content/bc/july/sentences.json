@@ -1,1 +1,76 @@
 
+{
+  "cards": [
+    { "n": 1, "en": "The protagonist struggles with an internal conflict that shapes the entire narrative.", "jp": "主人公は物語全体を形作る内的葛藤に苦しんでいる。", "hira": "しゅじんこう は ものがたり ぜんたい を かたちづくる ないてき かっとう に くるしんでいる", "mp3": "bc_s01_the_protagonist_struggles_with_an_internal_conflict_that_shapes_the_entire_narrative.mp3" },
+    { "n": 2, "en": "The antagonist represents a contrasting worldview.", "jp": "敵対者は対照的な世界観を表している。", "hira": "てきたいしゃ は たいしょうてき な せかいかん を あらわしている", "mp3": "bc_s02_the_antagonist_represents_a_contrasting_worldview.mp3" },
+    { "n": 3, "en": "The narrative is told from a limited perspective.", "jp": "物語は限定された視点から語られている。", "hira": "ものがたり は げんてい された してん から かたられている", "mp3": "bc_s03_the_narrative_is_told_from_a_limited_perspective.mp3" },
+    { "n": 4, "en": "The theme becomes clear through repeated symbolism.", "jp": "主題は繰り返される象徴によって明らかになる。", "hira": "しゅだい は くりかえされる しょうちょう に よって あきらか に なる", "mp3": "bc_s04_the_theme_becomes_clear_through_repeated_symbolism.mp3" },
+    { "n": 5, "en": "Foreshadowing prepares the reader for the climax.", "jp": "伏線は読者をクライマックスへと導く。", "hira": "ふくせん は どくしゃ を くらいまっくす へ と みちびく", "mp3": "bc_s05_foreshadowing_prepares_the_reader_for_the_climax.mp3" },
+
+    { "n": 6, "en": "The plot gradually builds tension.", "jp": "物語の展開は徐々に緊張感を高める。", "hira": "ものがたり の てんかい は じょじょ に きんちょうかん を たかめる", "mp3": "bc_s06_the_plot_gradually_builds_tension.mp3" },
+    { "n": 7, "en": "The setting reflects the character’s emotional state.", "jp": "設定は登場人物の感情を反映している。", "hira": "せってい は とうじょうじんぶつ の かんじょう を はんえい している", "mp3": "bc_s07_the_setting_reflects_the_characters_emotional_state.mp3" },
+    { "n": 8, "en": "The tone shifts dramatically in the final chapter.", "jp": "最終章で語調が大きく変化する。", "hira": "さいしゅうしょう で ごちょう が おおきく へんか する", "mp3": "bc_s08_the_tone_shifts_dramatically_in_the_final_chapter.mp3" },
+    { "n": 9, "en": "The irony becomes apparent only at the end.", "jp": "皮肉は最後になって初めて明らかになる。", "hira": "ひにく は さいご に なって はじめて あきらか に なる", "mp3": "bc_s09_the_irony_becomes_apparent_only_at_the_end.mp3" },
+    { "n": 10, "en": "The manuscript requires substantial revision.", "jp": "原稿は大幅な修正を必要としている。", "hira": "げんこう は おおはば な しゅうせい を ひつよう と している", "mp3": "bc_s10_the_manuscript_requires_substantial_revision.mp3" },
+
+    { "n": 11, "en": "The transition between scenes feels abrupt.", "jp": "場面のつながりが急に感じられる。", "hira": "ばめん の つながり が きゅう に かんじられる", "mp3": "bc_s11_the_transition_between_scenes_feels_abrupt.mp3" },
+    { "n": 12, "en": "The structure lacks coherence in the middle section.", "jp": "中盤の構成には一貫性が欠けている。", "hira": "ちゅうばん の こうせい に は いっかんせい が かけている", "mp3": "bc_s12_the_structure_lacks_coherence_in_the_middle_section.mp3" },
+    { "n": 13, "en": "The climax resolves the central conflict effectively.", "jp": "クライマックスは中心的な対立を効果的に解決する。", "hira": "くらいまっくす は ちゅうしんてき な たいりつ を こうかてき に かいけつ する", "mp3": "bc_s13_the_climax_resolves_the_central_conflict_effectively.mp3" },
+    { "n": 14, "en": "The resolution leaves room for interpretation.", "jp": "結末には解釈の余地が残されている。", "hira": "けつまつ に は かいしゃく の よち が のこされている", "mp3": "bc_s14_the_resolution_leaves_room_for_interpretation.mp3" },
+    { "n": 15, "en": "The moral is implied rather than directly stated.", "jp": "教訓は直接述べられるのではなく暗示されている。", "hira": "きょうくん は ちょくせつ のべられる のではなく あんじ されている", "mp3": "bc_s15_the_moral_is_implied_rather_than_directly_stated.mp3" },
+
+    { "n": 16, "en": "The protagonist’s motivation remains ambiguous.", "jp": "主人公の動機は曖昧なままである。", "hira": "しゅじんこう の どうき は あいまい な まま で ある", "mp3": "bc_s16_the_protagonists_motivation_remains_ambiguous.mp3" },
+    { "n": 17, "en": "His transformation reflects personal growth.", "jp": "彼の変化は成長を表している。", "hira": "かれ の へんか は せいちょう を あらわしている", "mp3": "bc_s17_his_transformation_reflects_personal_growth.mp3" },
+    { "n": 18, "en": "Her identity evolves throughout the narrative.", "jp": "彼女のアイデンティティは物語を通して変化する。", "hira": "かのじょ の あいでんてぃてぃ は ものがたり を とおして へんか する", "mp3": "bc_s18_her_identity_evolves_throughout_the_narrative.mp3" },
+    { "n": 19, "en": "The antagonist acts out of fear rather than cruelty.", "jp": "敵対者は残酷さではなく恐れから行動する。", "hira": "てきたいしゃ は ざんこくさ ではなく おそれ から こうどう する", "mp3": "bc_s19_the_antagonist_acts_out_of_fear_rather_than_cruelty.mp3" },
+    { "n": 20, "en": "The character demonstrates remarkable resilience.", "jp": "その人物は驚くべき回復力を示す。", "hira": "その じんぶつ は おどろくべき かいふくりょく を しめす", "mp3": "bc_s20_the_character_demonstrates_remarkable_resilience.mp3" },
+
+    { "n": 21, "en": "Internal conflict drives his decisions.", "jp": "内的葛藤が彼の決断を動かす。", "hira": "ないてき かっとう が かれ の けつだん を うごかす", "mp3": "bc_s21_internal_conflict_drives_his_decisions.mp3" },
+    { "n": 22, "en": "Her external challenges reveal hidden strength.", "jp": "外的な試練が彼女の隠れた強さを明らかにする。", "hira": "がいてき な しれん が かのじょ の かくれた つよさ を あきらか に する", "mp3": "bc_s22_her_external_challenges_reveal_hidden_strength.mp3" },
+    { "n": 23, "en": "Their relationship develops gradually.", "jp": "彼らの関係は徐々に発展する。", "hira": "かれら の かんけい は じょじょ に はってん する", "mp3": "bc_s23_their_relationship_develops_gradually.mp3" },
+    { "n": 24, "en": "The side character provides emotional depth.", "jp": "脇役が物語に感情的な深みを与える。", "hira": "わきやく が ものがたり に かんじょうてき な ふかみ を あたえる", "mp3": "bc_s24_the_side_character_provides_emotional_depth.mp3" },
+    { "n": 25, "en": "The protagonist ultimately confronts his fear.", "jp": "主人公は最終的に自分の恐れと向き合う。", "hira": "しゅじんこう は さいしゅうてき に じぶん の おそれ と むきあう", "mp3": "bc_s25_the_protagonist_ultimately_confronts_his_fear.mp3" },
+
+    { "n": 26, "en": "His decision has long-term consequences.", "jp": "彼の決断は長期的な結果をもたらす。", "hira": "かれ の けつだん は ちょうきてき な けっか を もたらす", "mp3": "bc_s26_his_decision_has_longterm_consequences.mp3" },
+    { "n": 27, "en": "The narrative explores psychological complexity.", "jp": "物語は心理的な複雑さを探る。", "hira": "ものがたり は しんりてき な ふくざつさ を さぐる", "mp3": "bc_s27_the_narrative_explores_psychological_complexity.mp3" },
+    { "n": 28, "en": "The character’s subtle expressions reveal hidden emotions.", "jp": "繊細な表情が隠れた感情を示す。", "hira": "せんさい な ひょうじょう が かくれた かんじょう を しめす", "mp3": "bc_s28_the_characters_subtle_expressions_reveal_hidden_emotions.mp3" },
+    { "n": 29, "en": "The turning point alters his perception of reality.", "jp": "転機が彼の現実認識を変える。", "hira": "てんき が かれ の げんじつ にんしき を かえる", "mp3": "bc_s29_the_turning_point_alters_his_perception_of_reality.mp3" },
+    { "n": 30, "en": "Ultimately, he accepts responsibility for his actions.", "jp": "最終的に彼は自分の行動の責任を受け入れる。", "hira": "さいしゅうてき に かれ は じぶん の こうどう の せきにん を うけいれる", "mp3": "bc_s30_ultimately_he_accepts_responsibility_for_his_actions.mp3" },
+
+    { "n": 31, "en": "Initially, the situation appears stable.", "jp": "最初は状況は安定しているように見える。", "hira": "さいしょ は じょうきょう は あんてい している よう に みえる", "mp3": "bc_s31_initially_the_situation_appears_stable.mp3" },
+    { "n": 32, "en": "However, subtle hints suggest otherwise.", "jp": "しかし、微妙な兆しがそれを否定する。", "hira": "しかし びみょう な きざし が それ を ひてい する", "mp3": "bc_s32_however_subtle_hints_suggest_otherwise.mp3" },
+    { "n": 33, "en": "Consequently, tension begins to rise.", "jp": "その結果、緊張が高まり始める。", "hira": "そのけっか きんちょう が たかまり はじめる", "mp3": "bc_s33_consequently_tension_begins_to_rise.mp3" },
+    { "n": 34, "en": "Furthermore, the narrative introduces a new obstacle.", "jp": "さらに、物語は新たな障害を提示する。", "hira": "さらに ものがたり は あらた な しょうがい を ていじ する", "mp3": "bc_s34_furthermore_the_narrative_introduces_a_new_obstacle.mp3" },
+    { "n": 35, "en": "Nevertheless, the protagonist refuses to surrender.", "jp": "それにもかかわらず、主人公は屈しない。", "hira": "それにもかかわらず しゅじんこう は くっしない", "mp3": "bc_s35_nevertheless_the_protagonist_refuses_to_surrender.mp3" },
+
+    { "n": 36, "en": "Meanwhile, external pressures intensify.", "jp": "その一方で、外的な圧力が強まる。", "hira": "そのいっぽうで がいてき な あつりょく が つよまる", "mp3": "bc_s36_meanwhile_external_pressures_intensify.mp3" },
+    { "n": 37, "en": "In contrast, his attitude remains optimistic.", "jp": "対照的に、彼の態度は楽観的なままだ。", "hira": "たいしょうてき に かれ の たいど は らっかんてき な ままだ", "mp3": "bc_s37_in_contrast_his_attitude_remains_optimistic.mp3" },
+    { "n": 38, "en": "As a result, the outcome becomes inevitable.", "jp": "その結果、結末は避けられないものとなる。", "hira": "そのけっか けつまつ は さけられない もの と なる", "mp3": "bc_s38_as_a_result_the_outcome_becomes_inevitable.mp3" },
+    { "n": 39, "en": "Subsequently, the story shifts toward resolution.", "jp": "その後、物語は解決へと向かう。", "hira": "そのご ものがたり は かいけつ へ と むかう", "mp3": "bc_s39_subsequently_the_story_shifts_toward_resolution.mp3" },
+    { "n": 40, "en": "Arguably, the climax is the most powerful moment.", "jp": "おそらく、クライマックスが最も強い場面だ。", "hira": "おそらく くらいまっくす が もっとも つよい ばめん だ", "mp3": "bc_s40_arguably_the_climax_is_the_most_powerful_moment.mp3" },
+
+    { "n": 41, "en": "Notably, the author avoids a predictable ending.", "jp": "特に、作者は予想通りの結末を避けている。", "hira": "とくに さくしゃ は よそうどおり の けつまつ を さけている", "mp3": "bc_s41_notably_the_author_avoids_a_predictable_ending.mp3" },
+    { "n": 42, "en": "The narrative therefore challenges the reader’s expectations.", "jp": "そのため、物語は読者の期待に挑戦する。", "hira": "そのため ものがたり は どくしゃ の きたい に ちょうせん する", "mp3": "bc_s42_the_narrative_therefore_challenges_the_readers_expectations.mp3" },
+    { "n": 43, "en": "The development unfolds at a measured pace.", "jp": "展開は落ち着いたペースで進む。", "hira": "てんかい は おちついた ぺーす で すすむ", "mp3": "bc_s43_the_development_unfolds_at_a_measured_pace.mp3" },
+    { "n": 44, "en": "Eventually, clarity replaces confusion.", "jp": "やがて混乱は明確さに変わる。", "hira": "やがて こんらん は めいかくさ に かわる", "mp3": "bc_s44_eventually_clarity_replaces_confusion.mp3" },
+    { "n": 45, "en": "Thus, the narrative achieves emotional impact.", "jp": "このようにして物語は感情的な影響を与える。", "hira": "このようにして ものがたり は かんじょうてき な えいきょう を あたえる", "mp3": "bc_s45_thus_the_narrative_achieves_emotional_impact.mp3" },
+
+    { "n": 46, "en": "This story can be interpreted in multiple ways.", "jp": "この物語はいくつもの方法で解釈できる。", "hira": "この ものがたり は いくつも の ほうほう で かいしゃく できる", "mp3": "bc_s46_this_story_can_be_interpreted_in_multiple_ways.mp3" },
+    { "n": 47, "en": "The symbolism adds depth to the narrative.", "jp": "象徴が物語に深みを与える。", "hira": "しょうちょう が ものがたり に ふかみ を あたえる", "mp3": "bc_s47_the_symbolism_adds_depth_to_the_narrative.mp3" },
+    { "n": 48, "en": "The theme remains relevant to modern society.", "jp": "主題は現代社会にも関連している。", "hira": "しゅだい は げんだい しゃかい に も かんれん している", "mp3": "bc_s48_the_theme_remains_relevant_to_modern_society.mp3" },
+    { "n": 49, "en": "The character’s actions reflect moral complexity.", "jp": "人物の行動は道徳的な複雑さを示している。", "hira": "じんぶつ の こうどう は どうとくてき な ふくざつさ を しめしている", "mp3": "bc_s49_the_characters_actions_reflect_moral_complexity.mp3" },
+    { "n": 50, "en": "The author intentionally leaves certain details vague.", "jp": "作者は意図的にいくつかの詳細を曖昧にしている。", "hira": "さくしゃ は いとてき に いくつか の しょうさい を あいまい に している", "mp3": "bc_s50_the_author_intentionally_leaves_certain_details_vague.mp3" },
+
+    { "n": 51, "en": "The ending encourages further reflection.", "jp": "結末はさらなる考察を促す。", "hira": "けつまつ は さらなる こうさつ を うながす", "mp3": "bc_s51_the_ending_encourages_further_reflection.mp3" },
+    { "n": 52, "en": "The narrative challenges traditional expectations.", "jp": "物語は従来の期待に挑戦する。", "hira": "ものがたり は じゅうらい の きたい に ちょうせん する", "mp3": "bc_s52_the_narrative_challenges_traditional_expectations.mp3" },
+    { "n": 53, "en": "The emotional impact lingers after the final page.", "jp": "感情的な余韻が最後のページの後も残る。", "hira": "かんじょうてき な よいん が さいご の ぺーじ の あと も のこる", "mp3": "bc_s53_the_emotional_impact_lingers_after_the_final_page.mp3" },
+    { "n": 54, "en": "The pacing maintains the reader’s interest.", "jp": "テンポが読者の興味を維持する。", "hira": "てんぽ が どくしゃ の きょうみ を いじ する", "mp3": "bc_s54_the_pacing_maintains_the_readers_interest.mp3" },
+    { "n": 55, "en": "The conclusion provides a sense of closure.", "jp": "結論は完結した感覚を与える。", "hira": "けつろん は かんけつ した かんかく を あたえる", "mp3": "bc_s55_the_conclusion_provides_a_sense_of_closure.mp3" },
+
+    { "n": 56, "en": "The narrative raises ethical questions.", "jp": "物語は倫理的な問いを投げかける。", "hira": "ものがたり は りんりてき な とい を なげかける", "mp3": "bc_s56_the_narrative_raises_ethical_questions.mp3" },
+    { "n": 57, "en": "The transformation of the protagonist is convincing.", "jp": "主人公の変化は説得力がある。", "hira": "しゅじんこう の へんか は せっとくりょく が ある", "mp3": "bc_s57_the_transformation_of_the_protagonist_is_convincing.mp3" },
+    { "n": 58, "en": "The contrast between characters enhances tension.", "jp": "登場人物の対比が緊張感を高める。", "hira": "とうじょうじんぶつ の たいひ が きんちょうかん を たかめる", "mp3": "bc_s58_the_contrast_between_characters_enhances_tension.mp3" },
+    { "n": 59, "en": "The narrative ultimately emphasizes personal growth.", "jp": "物語は最終的に個人の成長を強調する。", "hira": "ものがたり は さいしゅうてき に こじん の せいちょう を きょうちょう する", "mp3": "bc_s59_the_narrative_ultimately_emphasizes_personal_growth.mp3" },
+    { "n": 60, "en": "In conclusion, the story offers lasting insight.", "jp": "結論として、この物語は長く残る洞察を与える。", "hira": "けつろん として この ものがたり は ながく のこる どうさつ を あたえる", "mp3": "bc_s60_in_conclusion_the_story_offers_lasting_insight.mp3" }
+  ]
+}
