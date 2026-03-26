@@ -1,1 +1,76 @@
 
+{
+  "cards": [
+    { "n": 1, "en": "Once upon a time, there was a brave hero.", "jp": "昔々、勇敢なヒーローがいました。", "hira": "むかしむかし ゆうかん な ひーろー が いました", "mp3": "br_s01_once_upon_a_time_there_was_a_brave_hero.mp3" },
+    { "n": 2, "en": "There was a big castle in the forest.", "jp": "森の中に大きな城がありました。", "hira": "もり の なか に おおきな しろ が ありました", "mp3": "br_s02_there_was_a_big_castle_in_the_forest.mp3" },
+    { "n": 3, "en": "The hero met a witch in the forest.", "jp": "ヒーローは森で魔女に会いました。", "hira": "ひーろー は もり で まじょ に あいました", "mp3": "br_s03_the_hero_met_a_witch_in_the_forest.mp3" },
+    { "n": 4, "en": "The witch gave him a magic spell.", "jp": "魔女は彼に魔法の呪文をあげました。", "hira": "まじょ は かれ に まほう の じゅもん を あげました", "mp3": "br_s04_the_witch_gave_him_a_magic_spell.mp3" },
+    { "n": 5, "en": "He fought a dragon and won the battle.", "jp": "彼はドラゴンと戦い、勝ちました。", "hira": "かれ は どらごん と たたかい かちました", "mp3": "br_s05_he_fought_a_dragon_and_won_the_battle.mp3" },
+
+    { "n": 6, "en": "The giant guarded the treasure.", "jp": "巨人は宝物を守っていました。", "hira": "きょじん は たからもの を まもっていました", "mp3": "br_s06_the_giant_guarded_the_treasure.mp3" },
+    { "n": 7, "en": "The wolf was hiding behind a tree.", "jp": "オオカミは木の後ろに隠れていました。", "hira": "おおかみ は き の うしろ に かくれていました", "mp3": "br_s07_the_wolf_was_hiding_behind_a_tree.mp3" },
+    { "n": 8, "en": "The princess lived in a tall tower.", "jp": "お姫様は高い塔に住んでいました。", "hira": "おひめさま は たかい とう に すんでいました", "mp3": "br_s08_the_princess_lived_in_a_tall_tower.mp3" },
+    { "n": 9, "en": "The hero opened the secret door.", "jp": "ヒーローは秘密のドアを開けました。", "hira": "ひーろー は ひみつ の どあ を あけました", "mp3": "br_s09_the_hero_opened_the_secret_door.mp3" },
+    { "n": 10, "en": "They found a map inside the castle.", "jp": "彼らは城の中で地図を見つけました。", "hira": "かれら は しろ の なか で ちず を みつけました", "mp3": "br_s10_they_found_a_map_inside_the_castle.mp3" },
+
+    { "n": 11, "en": "The spell broke at midnight.", "jp": "呪文は真夜中に解けました。", "hira": "じゅもん は まよなか に とけました", "mp3": "br_s11_the_spell_broke_at_midnight.mp3" },
+    { "n": 12, "en": "The hero saved the village.", "jp": "ヒーローは村を救いました。", "hira": "ひーろー は むら を すくいました", "mp3": "br_s12_the_hero_saved_the_village.mp3" },
+    { "n": 13, "en": "In the end, peace returned to the land.", "jp": "最後に、その地に平和が戻りました。", "hira": "さいご に その ち に へいわ が もどりました", "mp3": "br_s13_in_the_end_peace_returned_to_the_land.mp3" },
+    { "n": 14, "en": "This tale teaches an important lesson.", "jp": "この物語は大切な教訓を教えます。", "hira": "この ものがたり は たいせつ な きょうくん を おしえます", "mp3": "br_s14_this_tale_teaches_an_important_lesson.mp3" },
+    { "n": 15, "en": "Everyone celebrated the victory.", "jp": "みんなが勝利を祝いました。", "hira": "みんな が しょうり を いわいました", "mp3": "br_s15_everyone_celebrated_the_victory.mp3" },
+
+    { "n": 16, "en": "First, I choose a setting for my story.", "jp": "まず、物語の設定を選びます。", "hira": "まず ものがたり の せってい を えらびます", "mp3": "br_s16_first_i_choose_a_setting_for_my_story.mp3" },
+    { "n": 17, "en": "Next, I plan the plot.", "jp": "次に、あらすじを考えます。", "hira": "つぎ に あらすじ を かんがえます", "mp3": "br_s17_next_i_plan_the_plot.mp3" },
+    { "n": 18, "en": "Then I write a draft.", "jp": "それから下書きを書きます。", "hira": "それから したがき を かきます", "mp3": "br_s18_then_i_write_a_draft.mp3" },
+    { "n": 19, "en": "I add dialogue between the characters.", "jp": "登場人物の会話を書き加えます。", "hira": "とうじょうじんぶつ の かいわ を かきくわえます", "mp3": "br_s19_i_add_dialogue_between_the_characters.mp3" },
+    { "n": 20, "en": "I describe the setting clearly.", "jp": "設定をわかりやすく説明します。", "hira": "せってい を わかりやすく せつめい します", "mp3": "br_s20_i_describe_the_setting_clearly.mp3" },
+
+    { "n": 21, "en": "The narrator tells the story.", "jp": "語り手が物語を語ります。", "hira": "かたりて が ものがたり を かたります", "mp3": "br_s21_the_narrator_tells_the_story.mp3" },
+    { "n": 22, "en": "The conflict makes the story exciting.", "jp": "対立が物語を面白くします。", "hira": "たいりつ が ものがたり を おもしろく します", "mp3": "br_s22_the_conflict_makes_the_story_exciting.mp3" },
+    { "n": 23, "en": "The solution surprised the readers.", "jp": "解決は読者を驚かせました。", "hira": "かいけつ は どくしゃ を おどろかせました", "mp3": "br_s23_the_solution_surprised_the_readers.mp3" },
+    { "n": 24, "en": "Each paragraph has one main idea.", "jp": "各段落には一つの主な考えがあります。", "hira": "かく だんらく に は ひとつ の おもな かんがえ が あります", "mp3": "br_s24_each_paragraph_has_one_main_idea.mp3" },
+    { "n": 25, "en": "I checked my sentences carefully.", "jp": "文を注意して確認しました。", "hira": "ぶん を ちゅうい して かくにん しました", "mp3": "br_s25_i_checked_my_sentences_carefully.mp3" },
+
+    { "n": 26, "en": "After that, I edited my story.", "jp": "その後、物語を編集しました。", "hira": "そのあと ものがたり を へんしゅう しました", "mp3": "br_s26_after_that_i_edited_my_story.mp3" },
+    { "n": 27, "en": "Finally, I wrote the ending.", "jp": "最後に結末を書きました。", "hira": "さいご に けつまつ を かきました", "mp3": "br_s27_finally_i_wrote_the_ending.mp3" },
+    { "n": 28, "en": "My story has a happy ending.", "jp": "私の物語はハッピーエンドです。", "hira": "わたし の ものがたり は はっぴーえんど です", "mp3": "br_s28_my_story_has_a_happy_ending.mp3" },
+    { "n": 29, "en": "The climax was very dramatic.", "jp": "クライマックスはとても劇的でした。", "hira": "くらいまっくす は とても げきてき でした", "mp3": "br_s29_the_climax_was_very_dramatic.mp3" },
+    { "n": 30, "en": "Let’s share our stories with the class.", "jp": "クラスで物語を共有しましょう。", "hira": "くらす で ものがたり を きょうゆう しましょう", "mp3": "br_s30_lets_share_our_stories_with_the_class.mp3" },
+
+    { "n": 31, "en": "My character is brave and kind.", "jp": "私の登場人物は勇敢で優しいです。", "hira": "わたし の とうじょうじんぶつ は ゆうかん で やさしい です", "mp3": "br_s31_my_character_is_brave_and_kind.mp3" },
+    { "n": 32, "en": "He is shy but clever.", "jp": "彼は恥ずかしがり屋ですが賢いです。", "hira": "かれ は はずかしがりや ですが かしこい です", "mp3": "br_s32_he_is_shy_but_clever.mp3" },
+    { "n": 33, "en": "She has a strong personality.", "jp": "彼女は強い性格を持っています。", "hira": "かのじょ は つよい せいかく を もっています", "mp3": "br_s33_she_has_a_strong_personality.mp3" },
+    { "n": 34, "en": "He has a special power.", "jp": "彼は特別な力を持っています。", "hira": "かれ は とくべつ な ちから を もっています", "mp3": "br_s34_he_has_a_special_power.mp3" },
+    { "n": 35, "en": "They can talk to animals.", "jp": "彼らは動物と話せます。", "hira": "かれら は どうぶつ と はなせます", "mp3": "br_s35_they_can_talk_to_animals.mp3" },
+
+    { "n": 36, "en": "She was afraid of the dark.", "jp": "彼女は暗闇を怖がっていました。", "hira": "かのじょ は くらやみ を こわがっていました", "mp3": "br_s36_she_was_afraid_of_the_dark.mp3" },
+    { "n": 37, "en": "He learned from his mistake.", "jp": "彼は自分の間違いから学びました。", "hira": "かれ は じぶん の まちがい から まなびました", "mp3": "br_s37_he_learned_from_his_mistake.mp3" },
+    { "n": 38, "en": "They worked together as a team.", "jp": "彼らはチームとして協力しました。", "hira": "かれら は ちーむ として きょうりょく しました", "mp3": "br_s38_they_worked_together_as_a_team.mp3" },
+    { "n": 39, "en": "The sidekick helped the hero.", "jp": "相棒がヒーローを助けました。", "hira": "あいぼう が ひーろー を たすけました", "mp3": "br_s39_the_sidekick_helped_the_hero.mp3" },
+    { "n": 40, "en": "Her goal was to save her family.", "jp": "彼女の目標は家族を救うことでした。", "hira": "かのじょ の もくひょう は かぞく を すくう こと でした", "mp3": "br_s40_her_goal_was_to_save_her_family.mp3" },
+
+    { "n": 41, "en": "He never gave up.", "jp": "彼は決してあきらめませんでした。", "hira": "かれ は けっして あきらめませんでした", "mp3": "br_s41_he_never_gave_up.mp3" },
+    { "n": 42, "en": "She became stronger than before.", "jp": "彼女は前より強くなりました。", "hira": "かのじょ は まえ より つよく なりました", "mp3": "br_s42_she_became_stronger_than_before.mp3" },
+    { "n": 43, "en": "They trusted each other.", "jp": "彼らはお互いを信じていました。", "hira": "かれら は おたがい を しんじていました", "mp3": "br_s43_they_trusted_each_other.mp3" },
+    { "n": 44, "en": "Fear made him hesitate.", "jp": "恐れが彼をためらわせました。", "hira": "おそれ が かれ を ためらわせました", "mp3": "br_s44_fear_made_him_hesitate.mp3" },
+    { "n": 45, "en": "In the end, they achieved their goal.", "jp": "最後に、彼らは目標を達成しました。", "hira": "さいご に かれら は もくひょう を たっせい しました", "mp3": "br_s45_in_the_end_they_achieved_their_goal.mp3" },
+
+    { "n": 46, "en": "First, they prepared for the journey.", "jp": "まず、彼らは旅の準備をしました。", "hira": "まず かれら は たび の じゅんび を しました", "mp3": "br_s46_first_they_prepared_for_the_journey.mp3" },
+    { "n": 47, "en": "Next, they entered the dark forest.", "jp": "次に、暗い森に入りました。", "hira": "つぎ に くらい もり に はいりました", "mp3": "br_s47_next_they_entered_the_dark_forest.mp3" },
+    { "n": 48, "en": "Then they heard a strange sound.", "jp": "それから奇妙な音を聞きました。", "hira": "それから きみょう な おと を ききました", "mp3": "br_s48_then_they_heard_a_strange_sound.mp3" },
+    { "n": 49, "en": "Because it was late, they stopped.", "jp": "遅かったので、彼らは止まりました。", "hira": "おそかった ので かれら は とまりました", "mp3": "br_s49_because_it_was_late_they_stopped.mp3" },
+    { "n": 50, "en": "But they did not lose hope.", "jp": "しかし、彼らは希望を失いませんでした。", "hira": "しかし かれら は きぼう を うしないませんでした", "mp3": "br_s50_but_they_did_not_lose_hope.mp3" },
+
+    { "n": 51, "en": "Meanwhile, the villain was watching.", "jp": "その間に、悪役は見ていました。", "hira": "そのあいだ に あくやく は みていました", "mp3": "br_s51_meanwhile_the_villain_was_watching.mp3" },
+    { "n": 52, "en": "Suddenly, the door opened.", "jp": "突然、ドアが開きました。", "hira": "とつぜん どあ が あきました", "mp3": "br_s52_suddenly_the_door_opened.mp3" },
+    { "n": 53, "en": "After that, everything changed.", "jp": "その後、すべてが変わりました。", "hira": "そのあと すべて が かわりました", "mp3": "br_s53_after_that_everything_changed.mp3" },
+    { "n": 54, "en": "Therefore, they made a new plan.", "jp": "そのため、彼らは新しい計画を立てました。", "hira": "そのため かれら は あたらしい けいかく を たてました", "mp3": "br_s54_therefore_they_made_a_new_plan.mp3" },
+    { "n": 55, "en": "Finally, they returned home.", "jp": "最後に、彼らは家に帰りました。", "hira": "さいご に かれら は いえ に かえりました", "mp3": "br_s55_finally_they_returned_home.mp3" },
+
+    { "n": 56, "en": "In contrast, the villain felt lonely.", "jp": "対照的に、悪役は孤独を感じていました。", "hira": "たいしょうてき に あくやく は こどく を かんじていました", "mp3": "br_s56_in_contrast_the_villain_felt_lonely.mp3" },
+    { "n": 57, "en": "As a result, the village was safe.", "jp": "その結果、村は安全でした。", "hira": "そのけっか むら は あんぜん でした", "mp3": "br_s57_as_a_result_the_village_was_safe.mp3" },
+    { "n": 58, "en": "At first, they were confused.", "jp": "最初、彼らは混乱していました。", "hira": "さいしょ かれら は こんらん していました", "mp3": "br_s58_at_first_they_were_confused.mp3" },
+    { "n": 59, "en": "Later, they understood the truth.", "jp": "後で、彼らは真実を理解しました。", "hira": "あとで かれら は しんじつ を りかい しました", "mp3": "br_s59_later_they_understood_the_truth.mp3" },
+    { "n": 60, "en": "And so, a new adventure began.", "jp": "そして、新しい冒険が始まりました。", "hira": "そして あたらしい ぼうけん が はじまりました", "mp3": "br_s60_and_so_a_new_adventure_began.mp3" }
+  ]
+}
