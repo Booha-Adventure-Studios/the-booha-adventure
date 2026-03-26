@@ -2844,8 +2844,7 @@ if(IS_COARSE&&mobileControls){
       const ex=PAUSE_EXIT_BTN;
       if(e.clientX>=ex.x&&e.clientX<=ex.x+ex.w&&e.clientY>=ex.y&&e.clientY<=ex.y+ex.h){
         setPaused(false);started=false;pauseAllMusic();resetGame();
-        document.getElementById("startOverlay").style.display="flex";
-        if(window.BoohaAdventure?.navigate) window.BoohaAdventure.navigate("karasuki");
+        window.location.href="karasuki.html";
       }else{setPaused(false);}
       return;
     }
@@ -2878,13 +2877,7 @@ canvas.addEventListener("pointerdown",(e)=>{
       started=false;
       pauseAllMusic();
       resetGame();
-      document.getElementById("startOverlay").style.display="flex";
-      // Navigate to forest if we have the Booha app router
-      if(window.BoohaAdventure?.navigate) window.BoohaAdventure.navigate("karasuki");
-      else if(window.location.pathname.includes("booha_invaders")){
-        // fallback: go to parent index
-        window.location.href="../index.html";
-      }
+      window.location.href="karasuki.html";
       return;
     }
     // Anywhere else = resume
