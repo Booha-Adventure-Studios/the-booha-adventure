@@ -170,7 +170,7 @@
       frames:['ichi-1.png','ichi-2.png'], color:'#ff79d7', size:52,
       name:'Ichi', nameJP:'イチ', 
       desc:'The first of three and as mean as can be. Ichi was planted under the Karasuki tree by Mister Happy. He picks on everyone, as mean as can be.',
-      descJP:'さんにんの いちばんめで、とっても いじわるなんだ。イチは ミスター・ハッピーに カラスキの きの したに うえられたんだよ。みんなを いじわるして、いつも こまらせているんだ。'
+      descJP:'三人の最初で、とても意地悪なやつ。イチはミスター・ハッピーによってカラスキーの木の下に植えられた。誰にでもちょっかいを出して、いつも困らせている。'
     },
     /* ── 1: Mr. Happy — room_01 ── */
     {
@@ -178,7 +178,7 @@
       frames:['mr_happy-1.png','mr_happy-2.png'], color:'#ffd166', size:110,
       name:'Mister Happy', nameJP:'ミスター・ハッピー',
       desc:'Mister Happy lives in Karasuki, you see, and swears he knows it perfectly. And no, that shine is not makeup on his skin—that’s just the way he’s always been.',
-      descJP:'ミスター・ハッピーは カラスキに すんでいるんだよ。なんでも かんぺきに しっているって いうんだ。あとね、その ひかりは メイクじゃないよ。あれが もともとの はだなんだよ。'
+      descJP:'ミスター・ハッピーはカラスキーに住んでいて、すべてを完璧に知っていると言い張る。そして、その輝きは化粧ではない——それが彼の本来の姿なのだ。'
     },
     /* ── 2: Tom Katsu — room_02 ── */
     {
@@ -186,7 +186,7 @@
       frames:['tom_katsu-1.png','tom_katsu-2.png'], color:'#ffaa5e', size:62,
       name:'Tom Katsu', nameJP:'トムカツ', 
       desc:'Tom Katsu the pig from a circus past, watched bright balloons pop too fast. Now one floats with him wherever he goes—a quiet little fix for a sadness he knows.',
-      descJP:'むかし サーカスに いた ぶたの トムカツ。ふうせんが はじけるたびに、かなしくなっていたんだ。いまは いつも ふうせんが いっしょ。ちいさな かなしい きもちを そっと やわらげてくれるんだ。'
+      descJP:'かつてサーカスにいた豚、トムカツ。風船が弾けるたびに悲しみを覚えていた。今はいつも一つの風船がそばに浮かび、その小さな悲しみを静かに和らげている。'
     },
     /* ── 3: Uhibon — room_03 ── */
     {
@@ -194,7 +194,7 @@
       frames:['uhibon-1.png','uhibon-2.png'], color:'#a8edff', size:72,
       name:'Uhibon', nameJP:'ウヒボン',
       desc:'Nobody knows Uhibon—not even he, he came from somewhere beyond Karasuki. He knows there was a time before the bone… but that part of him is lost and gone.',
-      descJP:'だれも ウヒボンのことを しらないんだ。ウヒボン じしんも。カラスキの そとから きたみたいなんだ。ほねに なる まえの じかんが あったと しっているけど、その きおくは もう きえてしまったんだ。'
+      descJP:'誰もウヒボンのことを知らない。本人でさえも。彼はカラスキーの外から来たらしい。骨になる前の記憶があったことはわかっているが、その記憶はすでに失われている。'
     },
     /* ── 4: Jacki — room_04 ── */
     {
@@ -202,7 +202,7 @@
       frames:['jacki-1.png','jacki-2.png'], color:'#b2ffda', size:110,
       name:'Jacki', nameJP:'ジャッキ',
       desc:'Jacki’s from the West, where Karasuki still grows, a mirror to Mister Happy, or so the story goes. He wanders the paths where the lost things roam—watching, waiting, far from home.',
-      descJP:'ジャッキは にしの カラスキから きたんだ。ミスター・ハッピーに にているって いわれているよ。なくしたものが さまよう みちを あるいて、いつも そっと みまもっているんだ。'
+      descJP:'ジャッキは西のカラスキーから来た存在で、ミスター・ハッピーに似ているとも言われている。失われたものがさまよう道を歩きながら、静かに見守り続けている。'
     },
     /* ── 5: Jamariko — room_05 ── */
     {
@@ -210,7 +210,7 @@
       frames:['jamariko-1.png','jamariko-2.png'], color:'#fff176', size:70,
       name:'Jamariko', nameJP:'ジャマリコ', nameKanji:'邪魔里子',
       desc:'Jamariko’s the cutest, sweet as can be, but always stands where you need to see. Step to the left or step to the right—it’s still in your way, day or night.',
-      descJP:'ジャマリコは とっても かわいいんだよ。でもね、いつも ちょうど みたい ばしょに たってるんだ。ひだりに いっても、みぎに いっても、ひるでも よるでも、ずっと じゃまに なるんだ。'
+      descJP:'ジャマリコはとても可愛らしいが、必ず見たい場所に立っている。左に動いても右に動いても、昼でも夜でも、いつも邪魔になる。'
     },
     /* ── 6: San — room_05 ── */
     {
@@ -218,7 +218,7 @@
       frames:['san-1.png','san-2.png'], color:'#ffd08a', size:52,
       name:'San', nameJP:'サン', 
       desc:'The third of three and as crazy as can, San bit Karasuki before it began. He never turned orange, not even one day—just wild and laughing along the way.',
-      descJP:'さんにんの みっつめで、とっても クレイジーなんだ。サンは はじまるまえに カラスキを かじっちゃったんだ。オレンジに なることも なかったよ。ずっと ワイルドで、わらいながら あるいているんだ。'
+      descJP:'三人の最後で、とても狂っている。サンは始まる前にカラスキーをかじってしまった。オレンジ色になることもなく、ただ笑いながら荒々しく動き回っている。'
     },
     /* ── 7: Gorogane — room_06 ── */
     {
@@ -226,7 +226,7 @@
       frames:['gorogane-1.png','gorogane-2.png'], color:'#a8fff8', size:120,
       name:'Gorogui', nameJP:'ゴロぐい',
       desc:'Once they were people with food on their mind, now hunger’s the only thing they can find. If you see one move, don’t trust what you see—something much worse is pulling the strings.',
-      descJP:'むかしは たべもののことばかり かんがえていた ひとだったんだ。いまは はらぺこだけが のこっている。もし うごいているのを みても、しんじちゃ だめだよ。もっと こわい なにかに あやつられているんだ。'
+      descJP:'かつては食べ物のことばかり考えていた人間だった。しかし今は飢えだけが残っている。もし動いているのを見ても信じてはいけない——背後にはもっと恐ろしい何かが潜んでいる。'
     },
     /* ── 8: Sumiyo Horaguchi — room_06 — drifts toward ghost ── */
     {
@@ -234,7 +234,7 @@
       frames:['sumiyo_horaguchi-1.png','sumiyo_horaguchi-2.png'], color:'#90aaff', size:85,
       name:'Sumiyo Horaguchi', nameJP:'洞口すみよ',
       desc:'If you see one of these—don’t turn your back, one glance away and she’s on your track. If you don’t look, she’ll follow you through—and once she’s in, you’ll start losing you.',
-      descJP:'もし みかけたら、ぜったいに せなかを むけちゃ だめだよ。ちょっと めを はなしただけで、すぐ うしろに いるんだ。みていないと、どこまでも ついてくる。そして いちど はいられたら、すこしずつ じぶんを なくしていくんだ。'
+      descJP:'もし見かけたら、決して背を向けてはいけない。一瞬でも目を離せば、すぐ後ろにいる。見ていないとどこまでも追ってきて、一度入り込まれると、少しずつ自分を失っていく。'
     },
     /* ── 9: Amekuro — room_07 ── */
     {
@@ -242,7 +242,7 @@
       frames:['amekuro-1.png','amekuro-2.png'], color:'#d49aff', size:52,
       name:'Amekuro', nameJP:'アメクロ', 
       desc:'Amekuro are cute, owl-like cats, chatty and sweet, always talking to anyone they happen to meet. But show them some candy and it won’t last long—it’s gone in a second, and they’ll keep talking on.',
-      descJP:'アメクロは かわいい フクロウみたいな ねこで、おしゃべりで あまいものが だいすきなんだ。だれにでも ずっと はなしかけてくる。でも おかしを みせたら すぐに なくなっちゃう。あっというまに たべて、それでも ずっと はなしつづけるんだ。'
+      descJP:'アメクロはフクロウのような猫で、おしゃべりで甘いものが大好き。誰にでも話しかけてくるが、お菓子を見せると一瞬で食べ尽くし、それでも話し続ける。'
     },
     /* ── 10: Snakuma — room_07 ── */
     {
@@ -250,7 +250,7 @@
       frames:['snakuma-1.png','snakuma-2.png'], color:'#88ff88', size:150,
       name:'Snakuma', nameJP:'スナクマ',
       desc:'Snakuma are giant bears who gather what they see, wearing lost things like they’re meant to be. No one goes looking, no one asks why—the things just stay… as the bears pass by.',
-      descJP:'スナクマは おおきな クマで、みつけたものを あつめて みに つけるんだ。なくしたものが もともと そこに あったみたいに。だれも さがさないし、りゆうも きかない。ものは そのまま のこって、クマは すぎていくんだ。'
+      descJP:'スナクマは巨大な熊で、見つけたものを集めて身につける。まるでそれが元からそこにあったかのように。誰も探さず、理由も問わないまま、物だけが残り、熊は通り過ぎていく。'
     },
     /* ── 11: Robert — room_08 ── */
     {
@@ -258,7 +258,7 @@
       frames:['robert-1.png','robert-2.png'], color:'#ffaa88', size:72,
       name:'Robert', nameJP:'ロバート',
       desc:'Robert the eldest, old and worn, sees through the mask that others adorn. He tricks when he wants, helps when he may—but only if he cares that day.',
-      descJP:'ロバートは いちばん うえの たぬききょうだいで、ふるくて しずかなんだ。ほかのものが かぶっている かおの したまで みえてしまう。だましたり、たすけたりも するけれど、そのひの きぶんしだいなんだ。'
+      descJP:'ロバートは三兄弟の長男で、古く静かな存在。他人がかぶる仮面の奥まで見抜く。だますことも助けることもあるが、それはすべてその日の気分次第だ。'
     },
     /* ── 12: Jeffrey — room_08 ── */
     {
@@ -266,7 +266,7 @@
       frames:['jeffrey-1.png','jeffrey-2.png'], color:'#ffcc44', size:65,
       name:'Jeffrey', nameJP:'ジェフリー',
       desc:'Jeffrey the middle, sharp with a grin, says what he sees with a bite tucked in. He’ll twist what’s real just to make his point—then laugh when the truth feels out of joint.',
-      descJP:'ジェフリーは まんなかの たぬききょうだいで、ちょっと いやみな えがおなんだ。みえたことを そのまま いうけど、すこし ひねって いうんだ。ほんとうを くずして、くすっと わらうんだ。'
+      descJP:'ジェフリーは次男で、皮肉な笑みを浮かべる。見たものをそのまま言うが、少し歪めて伝える。真実をねじ曲げ、その違和感を楽しんでいる。'
     },
     /* ── 13: Johnny — room_08 ── */
     {
@@ -274,7 +274,7 @@
       frames:['johnny-1.png','johnny-2.png'], color:'#ff8844', size:70,
       name:'Johnny', nameJP:'ジョニー',
       desc:'Johnny the youngest, quick on his feet, hates standing still or waiting to meet. He’ll rush a trick or cut it in two—“Hurry it up… I’m done with you.”',
-      descJP:'ジョニーは いちばん したの たぬききょうだいで、いつも せかせかしているんだ。じっとしているのも まつのも だいきらい。トリックも いそいで やって、すぐに やめちゃう。「はやくして…もう いいや」って かんじなんだ。'
+      descJP:'ジョニーは末っ子で、落ち着きがない。立ち止まることも待つことも嫌いだ。すぐに行動し、すぐに飽きる。「早くしろよ…もういいや」と投げ出す。'
     },
     /* ── 14: Nulvane — room_09 ── */
     {
@@ -282,7 +282,7 @@
       frames:['nulvane-1.png','nulvane-2.png'], color:'#c8aaff', size:160,
       name:'Nulvane', nameJP:'ヌルヴェイン',
       desc:'Nulvane are people who never took form, caught in between what’s real and not born. They flicker through lives they almost knew—not quite someone, not quite you.',
-      descJP:'ヌルヴェインは かたちに なれなかった ひとなんだ。ほんとうと まだ ないものの あいだに いる。なりかけた じぶんを ゆらゆらと いききして、だれかのようで だれでもないんだ。'
+      descJP:'ヌルヴェインは形を得られなかった人間。現実と未完成のあいだを漂っている。なりかけた存在を揺らしながら、誰かのようで誰でもない存在だ。'
     },
     /* ── 15: Ni — room_10 ── */
     {
@@ -290,7 +290,7 @@
       frames:['ni-1.png','ni-2.png'], color:'#e8ffaa', size:52,
       name:'Ni', nameJP:'ニ', nameKanji:'弐',
       desc:'The second of three and as dumb as can be, always the last one to leave the tree. Covered in white from the crows up above—he doesn’t mind… he just sits there, dumb.',
-      descJP:'さんにんの ふたりめで、とっても にぶいんだ。いつも きから おりるのが いちばん さいご。うえの カラスに しろくされても、きにしない。ぼーっと すわっているんだ。'
+      descJP:'三人の二番目で、とても鈍い。いつも木から降りるのが最後で、上のカラスに汚されても気にしない。ただぼんやり座っている。'
     },
     /* ── 16: Columbus — room_11 ── */
     {
@@ -298,7 +298,7 @@
       frames:['columbus-1.png','columbus-2.png'], color:'#ff85a1', size:58,
       name:'Columbus', nameJP:'コロンバス', 
       desc:'Columbus the beagle loves belly-side scratches, but throw him a ball and he slips all your catches. He runs the wrong way, tail high in the air—a game of fetch… that goes nowhere.',
-      descJP:'コロンバスは おなかを なでられるのが だいすきなんだ。でも ボールを なげると、ちがう ほうへ はしっていく。しっぽを あげて どこかへ いっちゃうんだ。もってくるあそびなのに、ぜんぜん もどってこないんだよ。'
+      descJP:'コロンバスはお腹を撫でられるのが大好きなビーグル犬。しかしボールを投げると、まったく違う方向へ走っていく。取ってこいのはずなのに、どこかへ消えてしまう。'
     },
     /* ── 17: October Moriyama — room_12 ── */
     {
@@ -306,7 +306,7 @@
       frames:['october_moriyama-1.png','october_moriyama-2.png'], color:'#ff79d7', size:75,
       name:'October Moriyama', nameJP:'オクトーバー・森山',
       desc:'October Moriyama, never impressed, shrugs things off like she knows best. She says she’s not scared, not even a little—but something inside keeps things unsettled.',
-      descJP:'オクトーバー・もりやまは、なににも どうじない かんじなんだ。なんでも しっているみたいに かるく ながす。こわいものなんて ないって いうけど、こころの なかは ちょっと ざわざわしているんだ。'
+      descJP:'オクトーバー・森山は何事にも動じない様子で、すべてを見透かしているかのように振る舞う。怖くないと言い張るが、内側では何かがざわついている。'
     },
     /* ── 18: Takachika Green — room_13 ── */
     {
@@ -314,7 +314,7 @@
       frames:['takachika_green-1.png','takachika_green-2.png'], color:'#7fffd4', size:77,
       name:'Takachika Green', nameJP:'タカチカ・グリーン', 
       desc:'Takachika wished to see something more, so he opened a quiet, unseen door. He’s scared, but he walks where others won’t—because he wants to see… what others don’t.',
-      descJP:'タカチカは もっと なにかを みたかったんだ。だから しずかな、だれも しらない とびらを あけた。こわいけど、ほかの ひとが いかない みちを あるいていく。みえないものを、みたいと おもったから。'
+      descJP:'タカチカは「何か」を見たいと願い、静かな見えない扉を開いた。怖がりながらも、他の誰も行かない道を進む——見えないものを見るために。'
     },
     /* ── 19: Pugoo — room_13 ── */
     {
@@ -322,7 +322,7 @@
       frames:['pugoo-1.png','pugoo-2.png'], color:'#ffcc66', size:55,
       name:'Pugoo', nameJP:'プグー', 
       desc:'Pugoo the cat stays close behind, with quiet eyes that always find. He doesn’t stray, he doesn’t delay—and keeps the dark things far away.',
-      descJP:'プグーは いつも そばに いる ねこなんだ。しずかな めで、いろんなことを みつけている。まよったり、はなれたり しないで、くらいものから そっと まもってくれるんだ。'
+      descJP:'プグーはいつもそばにいる猫。静かな目であらゆるものを見つめている。離れることなく寄り添い、暗いものから守ってくれる存在だ。'
     },
     /* ── 20: Ena Yamakage — room_14 — drifts toward ghost ── */
     {
@@ -330,7 +330,7 @@
       frames:['ena_yamakage-1.png','ena_yamakage-2.png'], color:'#ffb3d9', size:81,
       name:'Ena Yamakage', nameJP:'山影えな',
       desc:'Ena appears when the night feels thin, and if she sees you, she’ll see within. She points and laughs at all you hide—and if it goes on… it won’t subside.',
-      descJP:'えなは よるに あらわれるんだ。もし みられたら、なかまで みぬかれてしまう。かくしていることを ゆびさして わらう。そして その わらいが つづいたら、ずっと きえなくなるんだ。'
+      descJP:'えなは夜が薄くなる頃に現れる。目が合えば、内側まで見抜かれてしまう。隠しているものを指差して笑い、その笑いは決して消えない。'
     },
     /* ── 21: Jubei Tsukigase — room_15 — drifts toward ghost ── */
     {
@@ -338,7 +338,7 @@
       frames:['tsukigase_jubei-1.png','tsukigase_jubei-2.png'], color:'#ffcc66', size:100,
       name:'Jubei Tsukigase', nameJP:'月ヶ瀬・寿兵衛', 
       desc:'Jubei worked and worked, he never would stop, no time for home, no time to drop. The years moved on and took it all—now something else begins to call.',
-      descJP:'じゅうべえは ずっと はたらきつづけて、やすむことを しらなかったんだ。いえにも もどらず、てを とめることも なかった。きがつけば じかんだけが すぎていて、すべてを うばっていった。いまは なにか べつのものに よばれているんだ。'
+     descJP:'寿兵衛は働き続け、休むことを知らなかった。家にも戻らず、手を止めることもなかった。気づけば時はすべてを奪い去り、今は何か別のものに呼ばれている。'
     },
   ];
 
