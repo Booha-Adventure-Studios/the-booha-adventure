@@ -1,1 +1,74 @@
 
+{
+  "cards": [
+    { "n": 1, "en": "protagonist", "jp": "主人公", "hira": "しゅじんこう", "mp3": "bc_v01_protagonist.mp3" },
+    { "n": 2, "en": "antagonist", "jp": "敵対者", "hira": "てきたいしゃ", "mp3": "bc_v02_antagonist.mp3" },
+    { "n": 3, "en": "narrative", "jp": "物語", "hira": "ものがたり", "mp3": "bc_v03_narrative.mp3" },
+    { "n": 4, "en": "perspective", "jp": "視点", "hira": "してん", "mp3": "bc_v04_perspective.mp3" },
+    { "n": 5, "en": "theme", "jp": "主題", "hira": "しゅだい", "mp3": "bc_v05_theme.mp3" },
+    { "n": 6, "en": "motif", "jp": "モチーフ", "hira": "もちーふ", "mp3": "bc_v06_motif.mp3" },
+    { "n": 7, "en": "symbolism", "jp": "象徴", "hira": "しょうちょう", "mp3": "bc_v07_symbolism.mp3" },
+
+    { "n": 8, "en": "foreshadowing", "jp": "伏線", "hira": "ふくせん", "mp3": "bc_v08_foreshadowing.mp3" },
+    { "n": 9, "en": "flashback", "jp": "回想", "hira": "かいそう", "mp3": "bc_v09_flashback.mp3" },
+    { "n": 10, "en": "irony", "jp": "皮肉", "hira": "ひにく", "mp3": "bc_v10_irony.mp3" },
+    { "n": 11, "en": "satire", "jp": "風刺", "hira": "ふうし", "mp3": "bc_v11_satire.mp3" },
+    { "n": 12, "en": "genre", "jp": "ジャンル", "hira": "じゃんる", "mp3": "bc_v12_genre.mp3" },
+    { "n": 13, "en": "tragedy", "jp": "悲劇", "hira": "ひげき", "mp3": "bc_v13_tragedy.mp3" },
+    { "n": 14, "en": "comedy", "jp": "喜劇", "hira": "きげき", "mp3": "bc_v14_comedy.mp3" },
+    { "n": 15, "en": "epic", "jp": "叙事詩", "hira": "じょじし", "mp3": "bc_v15_epic.mp3" },
+
+    { "n": 16, "en": "manuscript", "jp": "原稿", "hira": "げんこう", "mp3": "bc_v16_manuscript.mp3" },
+    { "n": 17, "en": "coherence", "jp": "一貫性", "hira": "いっかんせい", "mp3": "bc_v17_coherence.mp3" },
+    { "n": 18, "en": "consistency", "jp": "整合性", "hira": "せいごうせい", "mp3": "bc_v18_consistency.mp3" },
+    { "n": 19, "en": "structure", "jp": "構成", "hira": "こうせい", "mp3": "bc_v19_structure.mp3" },
+    { "n": 20, "en": "transition", "jp": "つながり", "hira": "つながり", "mp3": "bc_v20_transition.mp3" },
+    { "n": 21, "en": "tone", "jp": "語調", "hira": "ごちょう", "mp3": "bc_v21_tone.mp3" },
+    { "n": 22, "en": "style", "jp": "文体", "hira": "ぶんたい", "mp3": "bc_v22_style.mp3" },
+
+    { "n": 23, "en": "imagery", "jp": "描写", "hira": "びょうしゃ", "mp3": "bc_v23_imagery.mp3" },
+    { "n": 24, "en": "metaphor", "jp": "比喩", "hira": "ひゆ", "mp3": "bc_v24_metaphor.mp3" },
+    { "n": 25, "en": "analogy", "jp": "類推", "hira": "るいすい", "mp3": "bc_v25_analogy.mp3" },
+    { "n": 26, "en": "interpretation", "jp": "解釈", "hira": "かいしゃく", "mp3": "bc_v26_interpretation.mp3" },
+    { "n": 27, "en": "analysis", "jp": "分析", "hira": "ぶんせき", "mp3": "bc_v27_analysis.mp3" },
+    { "n": 28, "en": "critique", "jp": "批評", "hira": "ひひょう", "mp3": "bc_v28_critique.mp3" },
+    { "n": 29, "en": "revision", "jp": "修正", "hira": "しゅうせい", "mp3": "bc_v29_revision.mp3" },
+    { "n": 30, "en": "publication", "jp": "出版", "hira": "しゅっぱん", "mp3": "bc_v30_publication.mp3" },
+
+    { "n": 31, "en": "characterization", "jp": "人物描写", "hira": "じんぶつびょうしゃ", "mp3": "bc_v31_characterization.mp3" },
+    { "n": 32, "en": "motivation", "jp": "動機", "hira": "どうき", "mp3": "bc_v32_motivation.mp3" },
+    { "n": 33, "en": "internal conflict", "jp": "内的葛藤", "hira": "ないてきかっとう", "mp3": "bc_v33_internal_conflict.mp3" },
+    { "n": 34, "en": "external conflict", "jp": "外的葛藤", "hira": "がいてきかっとう", "mp3": "bc_v34_external_conflict.mp3" },
+
+    { "n": 35, "en": "resolution", "jp": "解決", "hira": "かいけつ", "mp3": "bc_v35_resolution.mp3" },
+    { "n": 36, "en": "climax", "jp": "クライマックス", "hira": "くらいまっくす", "mp3": "bc_v36_climax.mp3" },
+    { "n": 37, "en": "subtlety", "jp": "微妙さ", "hira": "びみょうさ", "mp3": "bc_v37_subtlety.mp3" },
+    { "n": 38, "en": "complexity", "jp": "複雑さ", "hira": "ふくざつさ", "mp3": "bc_v38_complexity.mp3" },
+    { "n": 39, "en": "ambiguity", "jp": "曖昧さ", "hira": "あいまいさ", "mp3": "bc_v39_ambiguity.mp3" },
+    { "n": 40, "en": "depth", "jp": "深さ", "hira": "ふかさ", "mp3": "bc_v40_depth.mp3" },
+
+    { "n": 41, "en": "development", "jp": "発展", "hira": "はってん", "mp3": "bc_v41_development.mp3" },
+    { "n": 42, "en": "evolution", "jp": "進化", "hira": "しんか", "mp3": "bc_v42_evolution.mp3" },
+    { "n": 43, "en": "transformation", "jp": "変化", "hira": "へんか", "mp3": "bc_v43_transformation.mp3" },
+    { "n": 44, "en": "identity", "jp": "アイデンティティ", "hira": "あいでんてぃてぃ", "mp3": "bc_v44_identity.mp3" },
+    { "n": 45, "en": "psychology", "jp": "心理", "hira": "しんり", "mp3": "bc_v45_psychology.mp3" },
+
+    { "n": 46, "en": "consequently", "jp": "その結果", "hira": "そのけっか", "mp3": "bc_v46_consequently.mp3" },
+    { "n": 47, "en": "therefore", "jp": "したがって", "hira": "したがって", "mp3": "bc_v47_therefore.mp3" },
+    { "n": 48, "en": "however", "jp": "しかしながら", "hira": "しかしながら", "mp3": "bc_v48_however.mp3" },
+    { "n": 49, "en": "nevertheless", "jp": "それにもかかわらず", "hira": "それにもかかわらず", "mp3": "bc_v49_nevertheless.mp3" },
+    { "n": 50, "en": "moreover", "jp": "さらに", "hira": "さらに", "mp3": "bc_v50_moreover.mp3" },
+
+    { "n": 51, "en": "furthermore", "jp": "その上", "hira": "そのうえ", "mp3": "bc_v51_furthermore.mp3" },
+    { "n": 52, "en": "meanwhile", "jp": "一方で", "hira": "いっぽうで", "mp3": "bc_v52_meanwhile.mp3" },
+    { "n": 53, "en": "ultimately", "jp": "最終的に", "hira": "さいしゅうてきに", "mp3": "bc_v53_ultimately.mp3" },
+    { "n": 54, "en": "initially", "jp": "最初は", "hira": "さいしょは", "mp3": "bc_v54_initially.mp3" },
+    { "n": 55, "en": "subsequently", "jp": "その後", "hira": "そのご", "mp3": "bc_v55_subsequently.mp3" },
+
+    { "n": 56, "en": "inevitably", "jp": "必然的に", "hira": "ひつぜんてきに", "mp3": "bc_v56_inevitably.mp3" },
+    { "n": 57, "en": "arguably", "jp": "おそらく", "hira": "おそらく", "mp3": "bc_v57_arguably.mp3" },
+    { "n": 58, "en": "notably", "jp": "特に", "hira": "とくに", "mp3": "bc_v58_notably.mp3" },
+    { "n": 59, "en": "in contrast", "jp": "対照的に", "hira": "たいしょうてきに", "mp3": "bc_v59_in_contrast.mp3" },
+    { "n": 60, "en": "as a result", "jp": "その結果として", "hira": "そのけっかとして", "mp3": "bc_v60_as_a_result.mp3" }
+  ]
+}
