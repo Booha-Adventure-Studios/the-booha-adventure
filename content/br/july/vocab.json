@@ -1,1 +1,72 @@
 
+{
+  "cards": [
+    { "n": 1, "en": "tale", "jp": "物語", "hira": "ものがたり", "mp3": "br_v01_tale.mp3" },
+    { "n": 2, "en": "hero", "jp": "ヒーロー", "hira": "ひーろー", "mp3": "br_v02_hero.mp3" },
+    { "n": 3, "en": "villain", "jp": "悪役", "hira": "あくやく", "mp3": "br_v03_villain.mp3" },
+    { "n": 4, "en": "prince", "jp": "王子", "hira": "おうじ", "mp3": "br_v04_prince.mp3" },
+    { "n": 5, "en": "princess", "jp": "お姫様", "hira": "おひめさま", "mp3": "br_v05_princess.mp3" },
+    { "n": 6, "en": "dragon", "jp": "ドラゴン", "hira": "どらごん", "mp3": "br_v06_dragon.mp3" },
+    { "n": 7, "en": "wolf", "jp": "オオカミ", "hira": "おおかみ", "mp3": "br_v07_wolf.mp3" },
+    { "n": 8, "en": "witch", "jp": "魔女", "hira": "まじょ", "mp3": "br_v08_witch.mp3" },
+    { "n": 9, "en": "giant", "jp": "巨人", "hira": "きょじん", "mp3": "br_v09_giant.mp3" },
+    { "n": 10, "en": "castle", "jp": "城", "hira": "しろ", "mp3": "br_v10_castle.mp3" },
+
+    { "n": 11, "en": "forest", "jp": "森", "hira": "もり", "mp3": "br_v11_forest.mp3" },
+    { "n": 12, "en": "magic", "jp": "魔法", "hira": "まほう", "mp3": "br_v12_magic.mp3" },
+    { "n": 13, "en": "spell", "jp": "呪文", "hira": "じゅもん", "mp3": "br_v13_spell.mp3" },
+    { "n": 14, "en": "quest", "jp": "冒険", "hira": "ぼうけん", "mp3": "br_v14_quest.mp3" },
+    { "n": 15, "en": "treasure", "jp": "宝物", "hira": "たからもの", "mp3": "br_v15_treasure.mp3" },
+
+    { "n": 16, "en": "plot", "jp": "あらすじ", "hira": "あらすじ", "mp3": "br_v16_plot.mp3" },
+    { "n": 17, "en": "setting", "jp": "設定", "hira": "せってい", "mp3": "br_v17_setting.mp3" },
+    { "n": 18, "en": "character", "jp": "登場人物", "hira": "とうじょうじんぶつ", "mp3": "br_v18_character.mp3" },
+    { "n": 19, "en": "narrator", "jp": "語り手", "hira": "かたりて", "mp3": "br_v19_narrator.mp3" },
+    { "n": 20, "en": "dialogue", "jp": "会話", "hira": "かいわ", "mp3": "br_v20_dialogue.mp3" },
+    { "n": 21, "en": "scene", "jp": "場面", "hira": "ばめん", "mp3": "br_v21_scene.mp3" },
+    { "n": 22, "en": "chapter", "jp": "章", "hira": "しょう", "mp3": "br_v22_chapter.mp3" },
+    { "n": 23, "en": "paragraph", "jp": "段落", "hira": "だんらく", "mp3": "br_v23_paragraph.mp3" },
+    { "n": 24, "en": "sentence", "jp": "文", "hira": "ぶん", "mp3": "br_v24_sentence.mp3" },
+    { "n": 25, "en": "draft", "jp": "下書き", "hira": "したがき", "mp3": "br_v25_draft.mp3" },
+
+    { "n": 26, "en": "edit", "jp": "編集する", "hira": "へんしゅうする", "mp3": "br_v26_edit.mp3" },
+    { "n": 27, "en": "conflict", "jp": "対立", "hira": "たいりつ", "mp3": "br_v27_conflict.mp3" },
+    { "n": 28, "en": "solution", "jp": "解決", "hira": "かいけつ", "mp3": "br_v28_solution.mp3" },
+    { "n": 29, "en": "ending", "jp": "結末", "hira": "けつまつ", "mp3": "br_v29_ending.mp3" },
+    { "n": 30, "en": "moral", "jp": "教訓", "hira": "きょうくん", "mp3": "br_v30_moral.mp3" },
+
+    { "n": 31, "en": "personality", "jp": "性格", "hira": "せいかく", "mp3": "br_v31_personality.mp3" },
+    { "n": 32, "en": "kind", "jp": "優しい", "hira": "やさしい", "mp3": "br_v32_kind.mp3" },
+    { "n": 33, "en": "brave", "jp": "勇敢な", "hira": "ゆうかんな", "mp3": "br_v33_brave.mp3" },
+    { "n": 34, "en": "shy", "jp": "恥ずかしがり屋", "hira": "はずかしがりや", "mp3": "br_v34_shy.mp3" },
+    { "n": 35, "en": "clever", "jp": "賢い", "hira": "かしこい", "mp3": "br_v35_clever.mp3" },
+    { "n": 36, "en": "funny", "jp": "面白い", "hira": "おもしろい", "mp3": "br_v36_funny.mp3" },
+    { "n": 37, "en": "strong", "jp": "強い", "hira": "つよい", "mp3": "br_v37_strong.mp3" },
+    { "n": 38, "en": "friendly", "jp": "フレンドリー", "hira": "ふれんどりー", "mp3": "br_v38_friendly.mp3" },
+    { "n": 39, "en": "goal", "jp": "目標", "hira": "もくひょう", "mp3": "br_v39_goal.mp3" },
+    { "n": 40, "en": "fear", "jp": "恐れ", "hira": "おそれ", "mp3": "br_v40_fear.mp3" },
+
+    { "n": 41, "en": "power", "jp": "力", "hira": "ちから", "mp3": "br_v41_power.mp3" },
+    { "n": 42, "en": "secret", "jp": "秘密", "hira": "ひみつ", "mp3": "br_v42_secret.mp3" },
+    { "n": 43, "en": "promise", "jp": "約束", "hira": "やくそく", "mp3": "br_v43_promise.mp3" },
+    { "n": 44, "en": "adventure", "jp": "冒険", "hira": "ぼうけん", "mp3": "br_v44_adventure.mp3" },
+    { "n": 45, "en": "journey", "jp": "旅", "hira": "たび", "mp3": "br_v45_journey.mp3" },
+
+    { "n": 46, "en": "once upon a time", "jp": "昔々", "hira": "むかしむかし", "mp3": "br_v46_once_upon_a_time.mp3" },
+    { "n": 47, "en": "suddenly", "jp": "突然", "hira": "とつぜん", "mp3": "br_v47_suddenly.mp3" },
+    { "n": 48, "en": "meanwhile", "jp": "その間に", "hira": "そのあいだに", "mp3": "br_v48_meanwhile.mp3" },
+    { "n": 49, "en": "because", "jp": "なぜなら", "hira": "なぜなら", "mp3": "br_v49_because.mp3" },
+    { "n": 50, "en": "so", "jp": "だから", "hira": "だから", "mp3": "br_v50_so.mp3" },
+    { "n": 51, "en": "but", "jp": "しかし", "hira": "しかし", "mp3": "br_v51_but.mp3" },
+    { "n": 52, "en": "first", "jp": "最初に", "hira": "さいしょに", "mp3": "br_v52_first.mp3" },
+    { "n": 53, "en": "next", "jp": "次に", "hira": "つぎに", "mp3": "br_v53_next.mp3" },
+    { "n": 54, "en": "then", "jp": "それから", "hira": "それから", "mp3": "br_v54_then.mp3" },
+    { "n": 55, "en": "after that", "jp": "その後", "hira": "そのあと", "mp3": "br_v55_after_that.mp3" },
+
+    { "n": 56, "en": "finally", "jp": "最後に", "hira": "さいごに", "mp3": "br_v56_finally.mp3" },
+    { "n": 57, "en": "climax", "jp": "クライマックス", "hira": "くらいまっくす", "mp3": "br_v57_climax.mp3" },
+    { "n": 58, "en": "cliffhanger", "jp": "クリフハンガー", "hira": "くりふはんがー", "mp3": "br_v58_cliffhanger.mp3" },
+    { "n": 59, "en": "quote", "jp": "引用", "hira": "いんよう", "mp3": "br_v59_quote.mp3" },
+    { "n": 60, "en": "sound effect", "jp": "効果音", "hira": "こうかおん", "mp3": "br_v60_sound_effect.mp3" }
+  ]
+}
