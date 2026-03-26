@@ -951,13 +951,13 @@
     orb.style.boxShadow  = `0 0 14px ${t.orbColors[0]}cc, 0 0 32px ${t.orbColors[0]}88, 0 0 60px ${t.orbColors[1]}55`;
 
     if (tree.theme === 'invaders') {
-      orb.textContent = '✦'; orb.style.fontSize = '2rem'; orb.style.lineHeight = '60px';
+      orb.textContent = '🧿'; orb.style.fontSize = '2rem'; orb.style.lineHeight = '60px';
       orb.style.background = `radial-gradient(circle at 35% 35%, #ccffdd, #44ff88, #005522)`;
     } else if (tree.theme === 'blocks') {
-      orb.textContent = '✦'; orb.style.fontSize = '1.8rem'; orb.style.lineHeight = '60px';
+      orb.textContent = '🧿'; orb.style.fontSize = '1.8rem'; orb.style.lineHeight = '60px';
       orb.style.background = `radial-gradient(circle at 35% 35%, #cce8ff, #44aaff, #002244)`;
     } else {
-      orb.textContent = '✦'; orb.style.fontSize = '1.8rem'; orb.style.lineHeight = '60px';
+      orb.textContent = '🧿'; orb.style.fontSize = '1.8rem'; orb.style.lineHeight = '60px';
     }
 
     document.getElementById('bonus-pop-lock').style.display = unlocked ? 'none' : 'block';
