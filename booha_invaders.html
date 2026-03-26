@@ -32,49 +32,56 @@ canvas{
 /* ── START OVERLAY ── */
 #startOverlay{
   position:fixed;inset:0;z-index:9999;
-  display:flex;align-items:center;justify-content:center;padding:18px;
-  background:radial-gradient(ellipse 120% 80% at 50% 30%,rgba(255,100,200,.22),rgba(0,0,0,.96));
-  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  display:flex;align-items:center;justify-content:center;
+  padding:max(12px,env(safe-area-inset-top)) 12px max(12px,env(safe-area-inset-bottom));
+  background:radial-gradient(ellipse 140% 100% at 50% 20%,rgba(255,80,180,.30),rgba(0,0,0,.97));
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
 }
 #startOverlay .panel{
-  width:min(600px,94vw);
+  width:min(520px,96vw);
   border-radius:24px;
-  padding:22px 20px 18px;
-  background:rgba(0,0,0,.72);
-  border:1px solid rgba(255,100,200,.35);
-  box-shadow:0 0 40px rgba(255,100,200,.25),0 0 80px rgba(255,100,200,.10);
+  padding:clamp(14px,3vw,24px) clamp(12px,3vw,22px) clamp(14px,3vw,20px);
+  background:linear-gradient(160deg,rgba(14,8,30,.92),rgba(6,4,20,.96));
+  border:1.5px solid rgba(255,80,180,.45);
+  box-shadow:0 0 50px rgba(255,80,180,.30),0 0 100px rgba(255,80,180,.12),inset 0 1px 0 rgba(255,255,255,.08);
   text-align:center;
   font-family:system-ui,-apple-system,'Noto Sans JP',sans-serif;
   color:#fff;
-  max-height:calc(100vh - 36px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  max-height:calc(100dvh - 24px);
   overflow-y:auto;-webkit-overflow-scrolling:touch;
 }
-.start-title-jp{font-weight:900;font-size:clamp(18px,5vw,26px);line-height:1.2;}
-.start-title-en{font-weight:800;font-size:clamp(13px,3.5vw,17px);opacity:.85;margin-top:3px;}
-.start-card{
-  margin:14px auto;padding:14px;border-radius:16px;
-  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.10);
+.start-logo{font-size:clamp(22px,6vw,34px);font-weight:900;line-height:1;margin-bottom:2px;letter-spacing:0.12em;background:linear-gradient(90deg,#ff6fca,#ffcc44);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.start-title-en{font-weight:900;font-size:clamp(20px,6vw,34px);letter-spacing:0.04em;background:linear-gradient(90deg,#ff6fca,#ffcc44,#ff6fca);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.1;}
+.start-title-jp{font-weight:800;font-size:clamp(11px,3vw,16px);opacity:.80;margin-top:3px;letter-spacing:0.06em;-webkit-text-fill-color:#fff;}
+.start-rules{margin:clamp(10px,2.5vw,16px) 0;text-align:left;display:flex;flex-direction:column;gap:clamp(6px,1.5vw,10px);}
+.rule-row{display:flex;align-items:flex-start;gap:8px;background:rgba(255,255,255,.05);border-radius:12px;padding:clamp(6px,1.5vw,10px) clamp(8px,2vw,12px);border:1px solid rgba(255,255,255,.08);}
+.rule-icon{font-size:clamp(16px,4vw,22px);flex-shrink:0;line-height:1.3;}
+.rule-text{display:flex;flex-direction:column;gap:2px;}
+.rule-text b{font-size:clamp(11px,2.8vw,14px);color:#fff;font-weight:800;}
+.rule-text .jp{font-size:clamp(9px,2.2vw,12px);color:rgba(255,220,120,.85);font-weight:600;}
+.start-friends{
+  margin:clamp(8px,2vw,14px) 0;
+  padding:clamp(8px,2vw,12px);
+  border-radius:14px;
+  background:rgba(100,200,255,.08);
+  border:1px solid rgba(100,200,255,.20);
+  display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;
 }
-.start-card h3{margin:0 0 4px;font-size:clamp(14px,3.5vw,18px);}
-.start-card .en{font-size:clamp(11px,2.8vw,13px);opacity:.8;margin-top:2px;}
-.start-card ul{list-style:none;padding:0;margin:10px 0 0;text-align:left;}
-.start-card li{margin:7px 0;font-size:clamp(12px,3vw,14px);}
-.start-card li .en{display:block;font-size:clamp(10px,2.5vw,12px);opacity:.75;margin-top:1px;}
+.start-friends span:first-child{font-size:clamp(18px,5vw,26px);}
+.friends-text{font-weight:800;font-size:clamp(11px,2.8vw,15px);color:rgba(180,230,255,.95);}
+.friends-jp{font-size:clamp(9px,2.2vw,12px);color:rgba(100,200,255,.80);width:100%;text-align:center;margin-top:2px;}
 #startBtn{
-  display:block;width:min(380px,88vw);margin:14px auto 0;
-  border:none;border-radius:999px;padding:15px 20px 13px;
+  display:block;width:min(360px,90vw);margin:clamp(10px,2.5vw,16px) auto 0;
+  border:none;border-radius:999px;padding:clamp(12px,3vw,16px) 20px clamp(10px,2.5vw,14px);
   cursor:pointer;
-  background:linear-gradient(90deg,rgba(255,100,200,.95),rgba(255,200,80,.98));
-  box-shadow:0 0 24px rgba(255,100,200,.45);
-  font-family:inherit;
+  background:linear-gradient(90deg,rgba(255,80,180,.95),rgba(255,200,60,.98));
+  box-shadow:0 0 30px rgba(255,80,180,.55),0 4px 20px rgba(0,0,0,.4);
+  font-family:inherit;transition:transform .1s,box-shadow .1s;
+  -webkit-tap-highlight-color:transparent;
 }
-#startBtn .jp{display:block;font-weight:900;font-size:clamp(16px,4vw,22px);color:#000;}
-#startBtn .en{display:block;font-weight:900;font-size:clamp(12px,3vw,15px);color:#000;opacity:.85;margin-top:2px;}
-.friend-preview{
-  display:flex;justify-content:center;gap:10px;margin:12px 0 0;
-  font-size:11px;opacity:.70;
-}
-.start-tagline{margin-top:8px;font-size:clamp(11px,2.8vw,13px);opacity:.75;}
+#startBtn:active{transform:scale(.97);}
+#startBtn .jp{display:block;font-weight:900;font-size:clamp(18px,5vw,26px);color:#000;letter-spacing:.04em;}
+#startBtn .en{display:block;font-weight:900;font-size:clamp(11px,2.8vw,14px);color:rgba(0,0,0,.75);margin-top:2px;letter-spacing:.06em;}
 
 /* ── ROTATE OVERLAY ── */
 #rotateOverlay{
@@ -108,33 +115,7 @@ canvas{
   background:#000;opacity:0;pointer-events:none;
   z-index:99998;transition:opacity 900ms ease;
 }
-/* ── TILT OVERLAY ── */
-#tiltOverlay{
-  position:fixed;inset:0;z-index:100000;display:none;pointer-events:auto;
-  align-items:center;justify-content:center;padding:18px;
-  background:radial-gradient(800px 500px at 50% 40%,rgba(255,180,220,.10),rgba(0,0,0,.84));
-  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-}
-#tiltOverlay .panel{
-  width:min(520px,92vw);border-radius:22px;padding:20px 16px;
-  background:rgba(8,10,18,.75);border:1px solid rgba(255,255,255,.10);
-  box-shadow:0 18px 50px rgba(0,0,0,.55);text-align:center;
-  font-family:system-ui,-apple-system,'Noto Sans JP',sans-serif;
-}
-.tilt-btns{display:flex;gap:12px;margin-top:16px;}
-.tilt-btn{
-  flex:1;padding:14px 10px;border-radius:16px;border:none;
-  font:900 16px system-ui,-apple-system,sans-serif;
-  line-height:1.15;cursor:pointer;
-}
-#tiltYesBtn{
-  background:linear-gradient(180deg,rgba(120,220,255,.95),rgba(90,120,255,.92));
-  color:#06101f;box-shadow:0 8px 24px rgba(80,140,255,.35);
-}
-#tiltNoBtn{
-  background:linear-gradient(180deg,rgba(255,210,120,.95),rgba(255,140,200,.90));
-  color:#1a0711;box-shadow:0 8px 24px rgba(255,140,200,.25);
-}
+/* tilt overlay removed */
 </style>
 </head>
 <body>
@@ -159,41 +140,43 @@ canvas{
 
 <div id="startOverlay">
   <div class="panel">
-    <div class="start-title-jp">ようこそ！ブーハー・インベーダーズへ！</div>
-    <div class="start-title-en">WELCOME TO BOOHA INVADERS!</div>
-    <div class="start-card">
-      <h3>ミッション１：ドッティ</h3>
-      <div class="en">Mission 1: Dotty</div>
-      <ul>
-        <li><b>左右にうごかして よけよう！</b><span class="en">Move left/right — dodge their shots!</span></li>
-        <li><b>ブーハーは じどうで うつ！</b><span class="en">Booha shoots automatically — build your streak!</span></li>
-        <li><b>コンボで パワーアップ！</b><span class="en">Chain kills to power up your shot!</span></li>
-        <li><b>あめを とると なかまが くる！</b><span class="en">Grab candy — friends join at wave milestones!</span></li>
-        <li><b>ボスに ちゅうい！</b><span class="en">Watch out for the BOSS every 5 waves!</span></li>
-        <li><b>「！」を よけよう！ 岩を まもれ！</b><span class="en">Dodge the ！ bombers — they destroy your rocks!</span></li>
-      </ul>
+    <div class="start-logo">BOOHA</div>
+    <div class="start-title-en">INVADERS</div>
+    <div class="start-title-jp">ブーハー・インベーダーズ</div>
+    <div class="start-rules">
+      <div class="rule-row">
+        <span class="rule-icon">&#8596;</span>
+        <span class="rule-text"><b>Move to dodge shots!</b><span class="jp">左右に動いて よけよう！</span></span>
+      </div>
+      <div class="rule-row">
+        <span class="rule-icon">&gt;&gt;</span>
+        <span class="rule-text"><b>Auto-fire — build your combo!</b><span class="jp">自動で撃つ — コンボをつなごう！</span></span>
+      </div>
+      <div class="rule-row">
+        <span class="rule-icon">&#9679;</span>
+        <span class="rule-text"><b>Grab candy for power-ups!</b><span class="jp">飴（あめ）を取ってパワーアップ！</span></span>
+      </div>
+      <div class="rule-row">
+        <span class="rule-icon">!!</span>
+        <span class="rule-text"><b>Boss every 5 waves!</b><span class="jp">５ウェーブごとにボス登場！気をつけて！</span></span>
+      </div>
+      <div class="rule-row">
+        <span class="rule-icon">!</span>
+        <span class="rule-text"><b>Dodge ! bombers — they destroy your rocks!</b><span class="jp">「！」爆弾をよけよう！岩（いわ）が壊される！</span></span>
+      </div>
     </div>
-    <div class="friend-preview">🔵 Blue-Boo • 🟢 Green-Boo • 🩷 Pink-Boo • 🟣 Purple-Boo joins the fight!</div>
+    <div class="start-friends">
+      <span class="friends-text">Your Booha Friends join the fight!</span>
+      <span class="friends-jp">なかまが くわわるよ！仲間（なかま）と戦え！</span>
+    </div>
     <button id="startBtn" type="button">
       <span class="jp">スタート！</span>
-      <span class="en">START THE CHAOS</span>
+      <span class="en">LET'S GO!</span>
     </button>
-    <div class="start-tagline">ドッティが多すぎる！<br><span style="opacity:.7;font-size:11px;">So many Dotty!</span></div>
   </div>
 </div>
 
-<div id="tiltOverlay">
-  <div class="panel">
-    <div style="font:900 22px system-ui,sans-serif;color:rgba(255,255,255,.95);">Tilt Controls?</div>
-    <div style="margin-top:4px;font:900 16px system-ui,sans-serif;color:rgba(255,230,120,.95);">たおして うごかす？</div>
-    <div style="margin-top:10px;font:800 14px system-ui,sans-serif;color:rgba(255,255,255,.78);line-height:1.4;">Move Booha by tilting your phone.<br><span style="color:rgba(185,255,207,.9);">スマホを たおして ブーハーを うごかすよ。</span></div>
-    <div class="tilt-btns">
-      <button id="tiltYesBtn" class="tilt-btn">YES (Tilt)<br><span style="font-size:13px;">はい（たおす）</span></button>
-      <button id="tiltNoBtn" class="tilt-btn">NO (Finger)<br><span style="font-size:13px;">いいえ（ゆび）</span></button>
-    </div>
-    <div id="tiltMsg" style="margin-top:10px;font:800 13px system-ui,sans-serif;color:rgba(255,255,255,.7);min-height:16px;"></div>
-  </div>
-</div>
+<div id="tiltOverlay" style="display:none"></div>
 
 <script>
 // ═══════════════════════════════════════════════════════════
@@ -292,8 +275,8 @@ function weaponLevelFromCombo(c){
   if(c>=7)  return 2;
   return 1;
 }
-// Blue candy → timed level 3 (five-way, 60s)
-// Star candy → timed level 4 (seven chaos, 60s)
+// Blue candy → timed level 2 (triple, 30s)
+// Star candy → timed level 3 (five-way, 30s)
 
 // ── BG COLOR STATE ──
 let bgHue=240;
@@ -773,7 +756,7 @@ function updateFriendUnlocks(wave){
       });
       if(!_seenFriends.has(fd.id)){
         _seenFriends.add(fd.id);
-        const names={blue:"💙 Blue-Boo joined!",green:"💚 Green-Boo joined!",pink:"🩷 Pink-Boo joined!",purple:"💜 Purple-Boo joined!"};
+        const names={blue:"Blue-Boo joined!",green:"Green-Boo joined!",pink:"Pink-Boo joined!",purple:"Purple-Boo joined!"};
         const namesJP={blue:"ブルー・ブーが なかまになった！",green:"グリーン・ブーが なかまになった！",pink:"ピンク・ブーが なかまになった！",purple:"パープル・ブーが なかまになった！"};
         window._friendToast={
           msg:`${names[fd.id]||fd.id} ／ ${namesJP[fd.id]||""}`,
@@ -1380,8 +1363,8 @@ function update(dt){
 
     if(b.isBoss){
       const pct=b.hp/b.maxHp;
-      if(b.phase===1&&pct<=0.6){b.phase=2;doShake(12,0.5);b.glow=0.4;screenFlash.alpha=0.3;screenFlash.color="#ff6644";}
-      if(b.phase===2&&pct<=0.25){b.phase=3;doShake(20,0.8);b.glow=0.6;screenFlash.alpha=0.5;screenFlash.color="#ff2244";}
+      if(b.phase===1&&pct<=0.6){b.phase=2;doShake(10,0.25);b.glow=0.4;screenFlash.alpha=0.3;screenFlash.color="#ff6644";}
+      if(b.phase===2&&pct<=0.25){b.phase=3;doShake(14,0.30);b.glow=0.6;screenFlash.alpha=0.5;screenFlash.color="#ff2244";}
     }
     if(!b.isBoss&&b.panicking){
       b.panicT=Math.max(0,b.panicT-dt);
@@ -1588,10 +1571,10 @@ function updateProjectiles(dt){
       if(aabb(bl.x-bl.r,bl.y-bl.r,bl.r*2,bl.r*2,player.x,player.y,player.w,player.h)){
         bl.dead=true;
         if(playerShield>0){
-          // shield absorbs hit
+          // shield absorbs hit — flash only, no shake
           playerShield=0;
           addSpark(player.x+player.w/2,player.y+player.h/2,20,"friend");
-          doShake(5,0.15);
+          screenFlash.alpha=0.3;screenFlash.color="rgba(100,200,255,1)";
           player.hitIFrames=0.4;
         }else{
           const dmg=bl.dmg||10;
@@ -1653,17 +1636,17 @@ function updateCandy(dt){
         player.boost=clamp((player.boost||0)+1,0,3);
         player.energy=Math.min(100,player.energy+30);
       }else if(c.type==="blue"){
-        // 60s triple-shot (weapon level 3)
-        timedWeapon.level=3;
-        timedWeapon.remaining=60;
+        // 30s triple-shot (weapon level 2 = exactly 3 shots)
+        timedWeapon.level=2;
+        timedWeapon.remaining=30;
         player.energy=Math.min(100,player.energy+15);
-        window._candyToast={msg:"💙 3× SHOT — 60s！",color:"rgba(100,200,255,1)",t:2.5};
+        window._candyToast={msg:"3x SHOT — 30秒（びょう）！",color:"rgba(100,200,255,1)",t:2.5};
       }else if(c.type==="star"){
-        // 60s seven-chaos (weapon level 4)
-        timedWeapon.level=4;
-        timedWeapon.remaining=60;
+        // 30s five-way (weapon level 3 = exactly 5 shots)
+        timedWeapon.level=3;
+        timedWeapon.remaining=30;
         player.energy=Math.min(100,player.energy+15);
-        window._candyToast={msg:"⭐ CHAOS SHOT — 60s！",color:"rgba(255,255,100,1)",t:2.5};
+        window._candyToast={msg:"5x SHOT — 30秒（びょう）！",color:"rgba(255,255,100,1)",t:2.5};
       }else if(c.type==="gold"){
         score+=500;
         screenFlash.alpha=0.7;screenFlash.color="#ffdd44";
@@ -1758,7 +1741,7 @@ function drawWaveCounter(){
     ctx.shadowColor="rgba(255,60,60,0.9)";
     ctx.fillStyle=`rgba(255,${Math.round(60+pulse*40)},60,1)`;
     const k=bossIndexForWave(WS.wave);
-    ctx.fillText(`⚡ BOSS WAVE ${WS.wave} ⚡`+("★".repeat(Math.min(k,4))),bx,by);
+    ctx.fillText(`BOSS WAVE ${WS.wave} `+("★".repeat(Math.min(k,4))),bx,by);
   }else{
     ctx.shadowBlur=8;
     ctx.shadowColor="rgba(255,200,80,0.6)";
@@ -1833,7 +1816,7 @@ function drawWaveBanner(){
 
   const isBoss=isBossWave(WS.wave);
 
-  const bigText=isBoss?`⚡ BOSS INCOMING ⚡`:`NEXT WAVE`;
+  const bigText=isBoss?`!! BOSS INCOMING !!`:`NEXT WAVE`;
   const waveNum=`${WS.wave}`;
   const sub=isBoss?`ボスが くるよ！きをつけて！`:`ドッティが くるよ！`;
 
@@ -1870,12 +1853,11 @@ function drawWaveBanner(){
   ctx.strokeStyle=borderColor;ctx.lineWidth=2;
   roundRect(cardX,cardY,cardW,cardH,22);ctx.stroke();
 
-  // Glow behind card
+  // Glow behind card — much brighter
   ctx.globalCompositeOperation="lighter";
-  const gc=isBoss?"rgba(255,60,60,0.18)":"rgba(100,80,255,0.18)";
+  const gc=isBoss?"rgba(255,80,80,0.35)":"rgba(120,100,255,0.32)";
   ctx.globalAlpha=dropP;
-  for(let r=cardH*0.8;r>0;r-=20){
-    const a=0.015*(r/cardH);
+  for(let r=cardH*0.9;r>0;r-=16){
     ctx.fillStyle=gc;
     ctx.beginPath();ctx.arc(W()/2,cardY+cardH/2,r,0,Math.PI*2);ctx.fill();
   }
@@ -1884,31 +1866,36 @@ function drawWaveBanner(){
   const innerX=W()/2;
   let iy=cardY+16;
 
-  // "NEXT WAVE" or "BOSS INCOMING" label
+  // "NEXT WAVE" / "BOSS INCOMING" — always WHITE with colored shadow for contrast
   ctx.textAlign="center";ctx.textBaseline="top";
   ctx.font=`900 ${bigSize}px system-ui,sans-serif`;
-  const labelColor=isBoss?"rgba(255,80,80,0.98)":"rgba(180,160,255,0.90)";
-  ctx.shadowBlur=20;ctx.shadowColor=labelColor;
-  ctx.fillStyle=labelColor;
+  const labelShadow=isBoss?"rgba(255,60,60,1)":"rgba(140,100,255,1)";
+  ctx.lineWidth=bigSize*0.09;
+  ctx.strokeStyle="rgba(0,0,0,0.85)";
+  ctx.strokeText(bigText,innerX,iy);
+  ctx.shadowBlur=28;ctx.shadowColor=labelShadow;
+  ctx.fillStyle="#ffffff"; // always white — never same hue as card
   ctx.fillText(bigText,innerX,iy);
   iy+=bigSize*1.15;
 
-  // Giant wave number
+  // Giant wave number — white with heavy black stroke
   ctx.font=`900 ${numSize}px system-ui,sans-serif`;
-  const numColor=isBoss?"rgba(255,255,255,1)":"rgba(255,240,80,1)";
-  ctx.shadowBlur=clamp(numSize*0.4,20,60);
-  ctx.shadowColor=isBoss?"rgba(255,60,60,0.95)":"rgba(255,200,80,0.95)";
-  // outline
-  ctx.lineWidth=numSize*0.06;ctx.strokeStyle="rgba(0,0,0,0.6)";
+  ctx.shadowBlur=clamp(numSize*0.55,28,80);
+  ctx.shadowColor=isBoss?"rgba(255,80,80,1)":"rgba(255,200,80,1)";
+  ctx.lineWidth=numSize*0.09;
+  ctx.strokeStyle="rgba(0,0,0,0.88)";
   ctx.strokeText(waveNum,innerX,iy);
-  ctx.fillStyle=numColor;
+  ctx.fillStyle="#ffffff";
   ctx.fillText(waveNum,innerX,iy);
   iy+=numSize*0.98;
 
-  // sub label
+  // JP sub label — bright mint on both card types
   ctx.font=`800 ${subSize}px system-ui,sans-serif`;
-  ctx.shadowBlur=12;ctx.shadowColor=isBoss?"rgba(255,100,100,.8)":"rgba(185,255,207,0.8)";
-  ctx.fillStyle=isBoss?"rgba(255,160,160,0.92)":"rgba(185,255,207,0.92)";
+  ctx.lineWidth=subSize*0.12;
+  ctx.strokeStyle="rgba(0,0,0,0.75)";
+  ctx.strokeText(sub,innerX,iy);
+  ctx.shadowBlur=14;ctx.shadowColor="rgba(180,255,200,0.9)";
+  ctx.fillStyle="rgba(210,255,220,0.96)"; // bright mint — readable on both red and blue cards
   ctx.fillText(sub,innerX,iy);
 
   ctx.restore();
@@ -1954,8 +1941,8 @@ function drawBossCinematic(){
   ctx.shadowBlur=40;ctx.shadowColor="rgba(255,40,40,0.95)";
   ctx.fillStyle=`rgba(255,${Math.round(flicker*60)},60,1)`;
   ctx.lineWidth=bigSize*0.04;ctx.strokeStyle="rgba(0,0,0,0.8)";
-  ctx.strokeText(`⚡ BOSS ${k>1?"★".repeat(Math.min(k,4)):"ARRIVES"} ⚡`,W()/2,H()/2-subSize*1.2);
-  ctx.fillText(`⚡ BOSS ${k>1?"★".repeat(Math.min(k,4)):"ARRIVES"} ⚡`,W()/2,H()/2-subSize*1.2);
+  ctx.strokeText(`!! BOSS ${k>1?"★".repeat(Math.min(k,4)):"ARRIVES"} !!`,W()/2,H()/2-subSize*1.2);
+  ctx.fillText(`!! BOSS ${k>1?"★".repeat(Math.min(k,4)):"ARRIVES"} !!`,W()/2,H()/2-subSize*1.2);
 
   ctx.font=`900 ${subSize}px system-ui,sans-serif`;
   ctx.shadowBlur=20;ctx.shadowColor="rgba(255,200,80,0.8)";
@@ -2048,68 +2035,83 @@ function drawComboHUD(){
   const wl=weaponLevel();
   const t=performance.now()/1000;
 
-  // Impact scale — slams in big then settles
-  const impactScale=1+comboPop*0.32*Math.exp(-comboPop*2);
+  // Slam scale — harder impact, settles with idle pulse
+  const impactScale=1+comboPop*0.55*Math.exp(-comboPop*2.5);
+  // Idle pulse when no recent kill
+  const idlePulse=comboPop<0.05?(1+0.06*Math.sin(t*5)):1;
+  const finalScale=impactScale*idlePulse;
+
   const cx=W()/2;
-  const cy=SAFE.top+HUD_PAD+48;
+  const cy=SAFE.top+HUD_PAD+46;
+
+  const wlColors=["#fff","#ffee22","#ff7700","#ff2299","#cc22ff"];
+  const col=wlColors[Math.min(wl-1,4)];
+  const big=clamp(W()*0.058,24,44);
+
+  // Level-up flash ring — brief halo when combo hits a threshold
+  if(comboPop>0.7){
+    ctx.save();
+    ctx.globalCompositeOperation="lighter";
+    ctx.globalAlpha=(comboPop-0.7)/0.3*0.5;
+    ctx.strokeStyle=col;ctx.lineWidth=clamp(big*0.3,4,10);
+    ctx.shadowBlur=30;ctx.shadowColor=col;
+    ctx.beginPath();ctx.arc(cx,cy+big*0.5,big*1.2,0,Math.PI*2);ctx.stroke();
+    ctx.restore();
+  }
 
   ctx.save();
   ctx.translate(cx,cy);
-  ctx.scale(impactScale,impactScale);
+  ctx.scale(finalScale,finalScale);
   ctx.textAlign="center";ctx.textBaseline="top";
-
-  const wlColors=["#fff","#ffee44","#ff8833","#ff44aa","#cc44ff"];
-  const col=wlColors[Math.min(wl-1,4)];
-
-  // Shadow impact frame — dark outline slams in slightly offset
-  const big=clamp(W()*0.052,22,40);
   ctx.font=`900 ${big}px system-ui,sans-serif`;
 
-  // Thick black stroke = SF impact feel
-  ctx.lineWidth=big*0.12;
-  ctx.strokeStyle="rgba(0,0,0,0.85)";
+  // Heavy black stroke — pops against any background
+  ctx.lineWidth=big*0.15;
+  ctx.strokeStyle="rgba(0,0,0,0.92)";
   ctx.strokeText(`${combo}×`,0,0);
 
-  // Color fill with glow
-  ctx.shadowBlur=comboPop>0.1?32:16;
+  // Glowing fill — brighter during impact
+  const glowMag=comboPop>0.1?48:20;
+  ctx.shadowBlur=glowMag;
   ctx.shadowColor=col;
   ctx.fillStyle=col;
   ctx.fillText(`${combo}×`,0,0);
 
-  // Weapon level label — slams in below
+  // Weapon level label
   if(wl>1){
     const labels=["","DOUBLE","TRIPLE","CHAOS","★ULTRA★"];
     const lbl=labels[Math.min(wl-1,4)];
-    const sz=clamp(W()*0.022,9,16);
+    const sz=clamp(W()*0.025,10,18);
     ctx.font=`900 ${sz}px system-ui,sans-serif`;
 
-    // Background pill
-    const lw=ctx.measureText(lbl).width+16;
-    ctx.fillStyle=col;ctx.globalAlpha=0.18;
-    roundRect(-lw/2,big*1.0,lw,sz+6,4);ctx.fill();
+    const lw=ctx.measureText(lbl).width+18;
+    // Pulsing pill background
+    ctx.fillStyle=col;
+    ctx.globalAlpha=0.22+0.10*Math.sin(t*6);
+    roundRect(-lw/2,big*1.05,lw,sz+8,5);ctx.fill();
     ctx.globalAlpha=1;
 
-    ctx.lineWidth=sz*0.14;
-    ctx.strokeStyle="rgba(0,0,0,0.7)";
-    ctx.strokeText(lbl,0,big*1.08);
-    ctx.shadowBlur=12;ctx.shadowColor=col;
+    ctx.lineWidth=sz*0.16;
+    ctx.strokeStyle="rgba(0,0,0,0.85)";
+    ctx.strokeText(lbl,0,big*1.14);
+    ctx.shadowBlur=18;ctx.shadowColor=col;
     ctx.fillStyle=col;
-    ctx.fillText(lbl,0,big*1.08);
+    ctx.fillText(lbl,0,big*1.14);
   }
 
-  // Combo decay bar — thin strip below showing time left
+  // Combo decay bar — thicker, more visible
   if(combo>0&&comboTimer>0){
-    const barW=clamp(W()*0.10,44,90);
-    const barH=3;
+    const barW=clamp(W()*0.12,50,100);
+    const barH=4;
     const pct=comboTimer/COMBO_DECAY;
-    const barY=big*1.9;
-    ctx.globalAlpha=0.5;
-    ctx.fillStyle="rgba(255,255,255,0.15)";
-    roundRect(-barW/2,barY,barW,barH,1);ctx.fill();
-    ctx.globalAlpha=0.9;
+    const barY=big*2.0+(wl>1?clamp(W()*0.025,10,18)*1.6:0);
+    ctx.globalAlpha=0.45;
+    ctx.fillStyle="rgba(255,255,255,0.12)";
+    roundRect(-barW/2,barY,barW,barH,2);ctx.fill();
+    ctx.globalAlpha=1;
     ctx.fillStyle=col;
-    ctx.shadowBlur=6;
-    roundRect(-barW/2,barY,barW*pct,barH,1);ctx.fill();
+    ctx.shadowBlur=pct>0.3?10:4;
+    roundRect(-barW/2,barY,barW*pct,barH,2);ctx.fill();
   }
 
   ctx.restore();
@@ -2230,13 +2232,13 @@ function drawTimedWeaponHUD(){
   if(timedWeapon.remaining<=0) return;
   const t=performance.now()/1000;
   const pulse=0.5+0.5*Math.sin(t*6);
-  const isStar=timedWeapon.level>=4;
+  const isStar=timedWeapon.level>=3;
   const col=isStar?"rgba(255,255,80,1)":"rgba(100,200,255,1)";
   const glow=isStar?"rgba(255,255,80,0.7)":"rgba(100,200,255,0.7)";
-  const label=isStar?"⭐ CHAOS":"💙 5×";
-  const bx=16, by=SAFE.top+HUD_PAD+56; // below energy+lives row+skill heat
+  const label=isStar?"5x SHOT":"3x SHOT";
+  const bx=16, by=SAFE.top+HUD_PAD+56;
   const barW=100;
-  const pct=timedWeapon.remaining/60;
+  const pct=timedWeapon.remaining/30;  // base is 30s now
   const secs=Math.ceil(timedWeapon.remaining);
 
   ctx.save();
@@ -2292,7 +2294,7 @@ function drawSkillHeat(){
   ctx.font=`900 ${sz}px system-ui,sans-serif`;ctx.textBaseline="top";
   ctx.shadowBlur=clamp(pulse*heat*24,0,28);ctx.shadowColor=col;
   ctx.fillStyle=col;ctx.globalAlpha=0.75+pulse*0.25;
-  ctx.fillText(`⚡${label}`,bx,by);
+  ctx.fillText(`!! ${label}`,bx,by);
   ctx.restore();
 }
 
@@ -2300,17 +2302,20 @@ function drawSkillHeat(){
 // PAUSE BUTTON
 // ════════════════════════════════════════
 function drawPauseButton(){
-  PAUSE_BTN.w=36;PAUSE_BTN.h=36;
-  PAUSE_BTN.x=W()-SAFE.right-HUD_PAD-PAUSE_BTN.w-60;// shifted left of score
-  PAUSE_BTN.y=SAFE.top+HUD_PAD;
+  const sz=clamp(W()*0.028,11,18); // match score font
+  const hsz=clamp(W()*0.020,9,13);
+  const killsY=SAFE.top+HUD_PAD+sz+hsz+7; // matches KILLS text y
+  PAUSE_BTN.w=34;PAUSE_BTN.h=34;
+  PAUSE_BTN.x=W()-SAFE.right-HUD_PAD-PAUSE_BTN.w;
+  PAUSE_BTN.y=killsY+hsz+10; // below KILLS line
   const cx=PAUSE_BTN.x+PAUSE_BTN.w/2,cy=PAUSE_BTN.y+PAUSE_BTN.h/2;
   ctx.save();
   ctx.shadowBlur=10;ctx.shadowColor="rgba(100,100,255,.5)";
-  const g=ctx.createRadialGradient(cx-4,cy-4,4,cx,cy,18);
+  const g=ctx.createRadialGradient(cx-3,cy-3,3,cx,cy,17);
   g.addColorStop(0,"#8fd3ff");g.addColorStop(1,"#7a5cff");
-  ctx.fillStyle=g;ctx.beginPath();ctx.arc(cx,cy,18,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=g;ctx.beginPath();ctx.arc(cx,cy,17,0,Math.PI*2);ctx.fill();
   ctx.shadowBlur=0;ctx.fillStyle="rgba(255,255,255,0.95)";
-  ctx.fillRect(cx-6,cy-7,4,14);ctx.fillRect(cx+2,cy-7,4,14);
+  ctx.fillRect(cx-5,cy-6,3,12);ctx.fillRect(cx+2,cy-6,3,12);
   ctx.restore();
 }
 
@@ -2370,22 +2375,133 @@ function drawFriends(){
 // ════════════════════════════════════════
 // PAUSE OVERLAY
 // ════════════════════════════════════════
+// Pause EXIT button hit area (canvas coords)
+const PAUSE_EXIT_BTN={x:0,y:0,w:0,h:0};
+
 function drawPauseOverlay(){
-  ctx.save();
-  ctx.fillStyle="rgba(0,0,0,0.65)";ctx.fillRect(0,0,W(),H());
-  ctx.textAlign="center";ctx.textBaseline="middle";
+  const t=performance.now()/1000;
   const cx=W()/2;
-  function gt(text,x,y,size,color,glow){
-    ctx.font=`900 ${size}px system-ui,sans-serif`;
-    ctx.shadowBlur=22;ctx.shadowColor=glow;ctx.fillStyle=color;ctx.fillText(text,x,y);
+
+  // Dark backdrop
+  ctx.save();
+  ctx.fillStyle="rgba(0,0,0,0.82)";
+  ctx.fillRect(0,0,W(),H());
+
+  // ── Chaos background rings ──
+  ctx.globalCompositeOperation="lighter";
+  for(let i=3;i>0;i--){
+    const r=W()*0.35*i+Math.sin(t*0.7+i)*18;
+    const a=0.04/i;
+    ctx.strokeStyle=`hsla(${(t*30+i*80)%360},100%,65%,${a})`;
+    ctx.lineWidth=clamp(W()*0.015,4,14)*i;
+    ctx.beginPath();ctx.arc(cx,H()*0.38,r,0,Math.PI*2);ctx.stroke();
   }
-  gt("PAUSED",cx,H()*0.22,40,"rgba(255,120,200,.98)","rgba(255,120,200,.8)");
-  gt("トイレきんきゅう中！！！",cx,H()*0.30,18,"rgba(255,230,120,.97)","rgba(255,230,120,.7)");
-  gt(`Score: ${score.toLocaleString()}`,cx,H()*0.38,22,"rgba(255,220,80,1)","rgba(255,200,80,.8)");
-  gt(`Wave: ${WS.wave}  |  Kills: ${totalKills}`,cx,H()*0.44,16,"rgba(255,255,255,.80)","rgba(255,255,255,.4)");
-  gt("Click / Tap anywhere to return",cx,H()*0.54,16,"rgba(255,255,255,.90)","rgba(255,255,255,.5)");
-  gt("どこでもタップ！",cx,H()*0.61,16,"rgba(255,230,120,.95)","rgba(255,230,120,.65)");
+  ctx.globalCompositeOperation="source-over";
+
+  // ── PAUSED title ──
+  const titleSize=clamp(W()*0.115,44,90);
+  const pulse=0.5+0.5*Math.sin(t*4);
+  ctx.save();
+  ctx.translate(cx,H()*0.18);
+  ctx.scale(1+pulse*0.04,1+pulse*0.04);
+  ctx.textAlign="center";ctx.textBaseline="middle";
+  ctx.font=`900 ${titleSize}px system-ui,sans-serif`;
+  // Rainbow stroke
+  ctx.lineWidth=titleSize*0.10;
+  ctx.strokeStyle=`hsl(${(t*60)%360},100%,50%)`;
+  ctx.shadowBlur=40+pulse*20;ctx.shadowColor=`hsl(${(t*60)%360},100%,65%)`;
+  ctx.strokeText("PAUSE",0,0);
+  // White fill
+  ctx.shadowBlur=20;ctx.shadowColor="#fff";
+  ctx.fillStyle="#fff";
+  ctx.fillText("PAUSE",0,0);
+  // JP subtitle
+  const subSize=clamp(W()*0.036,14,24);
+  ctx.font=`900 ${subSize}px system-ui,sans-serif`;
+  ctx.shadowBlur=14;ctx.shadowColor="rgba(255,220,80,.9)";
+  ctx.fillStyle="rgba(255,220,80,.95)";
+  ctx.fillText("一時停止（いちじていし）",0,titleSize*0.72);
   ctx.restore();
+
+  // ── Stats card ──
+  const cardW=clamp(W()*0.72,240,480);
+  const cardH=clamp(H()*0.16,62,96);
+  const cardX=cx-cardW/2;
+  const cardY=H()*0.34;
+  ctx.save();
+  ctx.fillStyle="rgba(255,255,255,0.06)";
+  roundRect(cardX,cardY,cardW,cardH,16);ctx.fill();
+  ctx.strokeStyle=`hsla(${(t*40+120)%360},80%,65%,0.4)`;ctx.lineWidth=1.5;
+  roundRect(cardX,cardY,cardW,cardH,16);ctx.stroke();
+
+  ctx.textAlign="center";ctx.textBaseline="middle";
+  const ssz=clamp(W()*0.040,16,28);
+  ctx.font=`900 ${ssx=ssz}px system-ui,sans-serif`;
+  ctx.shadowBlur=16;ctx.shadowColor="rgba(255,220,80,.9)";
+  ctx.fillStyle="rgba(255,220,80,1)";
+  ctx.fillText(score.toLocaleString(),cx,cardY+cardH*0.30);
+
+  const dtsz=clamp(W()*0.024,10,16);
+  ctx.font=`700 ${dtsz}px system-ui,sans-serif`;
+  ctx.shadowBlur=0;ctx.fillStyle="rgba(255,255,255,.75)";
+  ctx.fillText(`Wave ${WS.wave}（ウェーブ）  ·  ${totalKills} Kills（キル）`,cx,cardY+cardH*0.68);
+  ctx.restore();
+
+  // ── RESUME button ──
+  const btnW=clamp(W()*0.52,180,340);
+  const btnH=clamp(H()*0.075,44,58);
+  const btnX=cx-btnW/2;
+  const resumeY=H()*0.57;
+
+  const rg=ctx.createLinearGradient(btnX,resumeY,btnX+btnW,resumeY);
+  rg.addColorStop(0,`hsl(${(t*40)%360},100%,55%)`);
+  rg.addColorStop(0.5,`hsl(${(t*40+60)%360},100%,65%)`);
+  rg.addColorStop(1,`hsl(${(t*40+120)%360},100%,55%)`);
+  ctx.save();
+  ctx.shadowBlur=24+pulse*12;ctx.shadowColor=`hsl(${(t*40+60)%360},100%,65%)`;
+  ctx.fillStyle=rg;
+  roundRect(btnX,resumeY,btnW,btnH,btnH/2);ctx.fill();
+  ctx.textAlign="center";ctx.textBaseline="middle";
+  ctx.shadowBlur=0;
+  const rfsz=clamp(W()*0.038,15,24);
+  ctx.font=`900 ${rfsz}px system-ui,sans-serif`;
+  ctx.fillStyle="#000";
+  ctx.fillText("▶  RESUME  /  もどる",cx,resumeY+btnH/2);
+  ctx.restore();
+
+  // ── EXIT button ──
+  const exitW=clamp(W()*0.52,180,340);
+  const exitH=clamp(H()*0.065,38,52);
+  const exitX=cx-exitW/2;
+  const exitY=resumeY+btnH+clamp(H()*0.020,10,18);
+
+  // Store for hit detection
+  PAUSE_EXIT_BTN.x=exitX;PAUSE_EXIT_BTN.y=exitY;
+  PAUSE_EXIT_BTN.w=exitW;PAUSE_EXIT_BTN.h=exitH;
+
+  ctx.save();
+  ctx.fillStyle="rgba(255,255,255,0.07)";
+  ctx.strokeStyle="rgba(255,80,80,0.60)";ctx.lineWidth=1.5;
+  roundRect(exitX,exitY,exitW,exitH,exitH/2);
+  ctx.fill();ctx.stroke();
+  ctx.textAlign="center";ctx.textBaseline="middle";
+  const exsz=clamp(W()*0.030,12,20);
+  ctx.font=`900 ${exsz}px system-ui,sans-serif`;
+  ctx.shadowBlur=10;ctx.shadowColor="rgba(255,80,80,.8)";
+  ctx.fillStyle="rgba(255,120,120,.95)";
+  ctx.fillText("EXIT  /  森（もり）へもどる",cx,exitY+exitH/2);
+  ctx.restore();
+
+  // ── bottom hint ──
+  const hintsz=clamp(W()*0.022,9,14);
+  ctx.save();
+  ctx.textAlign="center";ctx.textBaseline="middle";
+  ctx.font=`600 ${hintsz}px system-ui,sans-serif`;
+  ctx.fillStyle="rgba(255,255,255,0.35)";
+  ctx.fillText("Tap anywhere else to resume  /  他をタップしてもどる",cx,exitY+exitH+clamp(H()*0.025,12,22));
+  ctx.restore();
+
+  ctx.restore(); // main save
 }
 
 // ════════════════════════════════════════
@@ -2723,7 +2839,16 @@ const mobileControls=document.getElementById("mobileHoldControls");
 if(IS_COARSE&&mobileControls){
   mobileControls.addEventListener("pointerdown",(e)=>{
     if(inEdgeZone(e.clientX,30)) return;
-    if(paused){e.preventDefault();setPaused(false);return;}
+    if(paused){
+      e.preventDefault();
+      const ex=PAUSE_EXIT_BTN;
+      if(e.clientX>=ex.x&&e.clientX<=ex.x+ex.w&&e.clientY>=ex.y&&e.clientY<=ex.y+ex.h){
+        setPaused(false);started=false;pauseAllMusic();resetGame();
+        document.getElementById("startOverlay").style.display="flex";
+        if(window.BoohaAdventure?.navigate) window.BoohaAdventure.navigate("karasuki");
+      }else{setPaused(false);}
+      return;
+    }
     if(!started) return;
     e.preventDefault();
     pointerDown=true;pointerX=e.clientX;
@@ -2743,7 +2868,29 @@ if(IS_COARSE&&mobileControls){
 canvas.addEventListener("pointerdown",(e)=>{
   if(IS_COARSE&&inEdgeZone(e.clientX,30)) return;
   if(IS_COARSE&&!paused&&!hitPauseBtn(e.clientX,e.clientY)) return;
-  if(paused){e.preventDefault();setPaused(false);return;}
+  if(paused){
+    e.preventDefault();
+    // Check EXIT button first
+    const ex=PAUSE_EXIT_BTN;
+    if(e.clientX>=ex.x&&e.clientX<=ex.x+ex.w&&e.clientY>=ex.y&&e.clientY<=ex.y+ex.h){
+      // EXIT — go back to Karasuki forest
+      setPaused(false);
+      started=false;
+      pauseAllMusic();
+      resetGame();
+      document.getElementById("startOverlay").style.display="flex";
+      // Navigate to forest if we have the Booha app router
+      if(window.BoohaAdventure?.navigate) window.BoohaAdventure.navigate("karasuki");
+      else if(window.location.pathname.includes("booha_invaders")){
+        // fallback: go to parent index
+        window.location.href="../index.html";
+      }
+      return;
+    }
+    // Anywhere else = resume
+    setPaused(false);
+    return;
+  }
   if(started&&player.energy>0&&hitPauseBtn(e.clientX,e.clientY)){e.preventDefault();setPaused(true);return;}
   // Tap to restart on game over
   if(player.energy<=0&&lives<=0){e.preventDefault();resetGame();startWave(1);return;}
@@ -2821,24 +2968,8 @@ function calibrateTilt(){tiltSmooth=tiltGamma;tiltBaseline=tiltGamma;}
 // ════════════════════════════════════════
 // TILT PROMPT
 // ════════════════════════════════════════
-function showTiltPrompt(cb){
-  if(!IS_COARSE){TILT_ENABLED=false;cb();return;}
-  const ov=document.getElementById("tiltOverlay");
-  const yb=document.getElementById("tiltYesBtn");
-  const nb=document.getElementById("tiltNoBtn");
-  if(!ov||!yb||!nb){cb();return;}
-  paused=true;ov.style.display="flex";
-  const cleanup=()=>{ov.style.display="none";paused=false;yb.onclick=null;nb.onclick=null;};
-  yb.onclick=async(e)=>{
-    e.preventDefault();e.stopPropagation();
-    if(typeof DeviceOrientationEvent!=="undefined"&&typeof DeviceOrientationEvent.requestPermission==="function"){
-      try{const res=await DeviceOrientationEvent.requestPermission();if(res!=="granted"){TILT_ENABLED=false;cleanup();cb();return;}}
-      catch(_){TILT_ENABLED=false;cleanup();cb();return;}
-    }
-    TILT_ENABLED=true;calibrateTilt();cleanup();cb();
-  };
-  nb.onclick=(e)=>{e.preventDefault();e.stopPropagation();TILT_ENABLED=false;cleanup();cb();};
-}
+// Tilt removed — just call through immediately
+function showTiltPrompt(cb){cb();}
 
 // ════════════════════════════════════════
 // GAME RESET
