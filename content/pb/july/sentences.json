@@ -1,1 +1,75 @@
 
+{
+  "cards": [
+    { "n": 1, "en": "This is a story.", "jp": "これは物語です。", "hira": "これは ものがたり です", "mp3": "pb_s01_this_is_a_story.mp3" },
+    { "n": 2, "en": "The hero is brave.", "jp": "ヒーローは勇敢です。", "hira": "ひーろー は ゆうかん です", "mp3": "pb_s02_the_hero_is_brave.mp3" },
+    { "n": 3, "en": "The bad guy is scary.", "jp": "悪者は怖いです。", "hira": "わるもの は こわい です", "mp3": "pb_s03_the_bad_guy_is_scary.mp3" },
+    { "n": 4, "en": "The king is in the castle.", "jp": "王様は城にいます。", "hira": "おうさま は しろ に います", "mp3": "pb_s04_the_king_is_in_the_castle.mp3" },
+    { "n": 5, "en": "The princess is kind.", "jp": "お姫様は優しいです。", "hira": "おひめさま は やさしい です", "mp3": "pb_s05_the_princess_is_kind.mp3" },
+    { "n": 6, "en": "The dragon is big.", "jp": "ドラゴンは大きいです。", "hira": "どらごん は おおきい です", "mp3": "pb_s06_the_dragon_is_big.mp3" },
+    { "n": 7, "en": "The wolf is hungry.", "jp": "オオカミはお腹が空いています。", "hira": "おおかみ は おなか が すいています", "mp3": "pb_s07_the_wolf_is_hungry.mp3" },
+    { "n": 8, "en": "The witch has magic.", "jp": "魔女は魔法を使います。", "hira": "まじょ は まほう を つかいます", "mp3": "pb_s08_the_witch_has_magic.mp3" },
+    { "n": 9, "en": "The giant is very tall.", "jp": "巨人はとても背が高いです。", "hira": "きょじん は とても せ が たかい です", "mp3": "pb_s09_the_giant_is_very_tall.mp3" },
+    { "n": 10, "en": "The fairy can fly.", "jp": "妖精は飛べます。", "hira": "ようせい は とべます", "mp3": "pb_s10_the_fairy_can_fly.mp3" },
+
+    { "n": 11, "en": "The monster is in the cave.", "jp": "モンスターは洞窟にいます。", "hira": "もんすたー は どうくつ に います", "mp3": "pb_s11_the_monster_is_in_the_cave.mp3" },
+    { "n": 12, "en": "The horse runs fast.", "jp": "馬は速く走ります。", "hira": "うま は はやく はしります", "mp3": "pb_s12_the_horse_runs_fast.mp3" },
+    { "n": 13, "en": "The treasure is gold.", "jp": "宝物は金です。", "hira": "たからもの は きん です", "mp3": "pb_s13_the_treasure_is_gold.mp3" },
+    { "n": 14, "en": "The map is old.", "jp": "地図は古いです。", "hira": "ちず は ふるい です", "mp3": "pb_s14_the_map_is_old.mp3" },
+    { "n": 15, "en": "The team is ready.", "jp": "チームは準備ができています。", "hira": "ちーむ は じゅんび が できています", "mp3": "pb_s15_the_team_is_ready.mp3" },
+
+    { "n": 16, "en": "The hero opens the door.", "jp": "ヒーローはドアを開けます。", "hira": "ひーろー は どあ を あけます", "mp3": "pb_s16_the_hero_opens_the_door.mp3" },
+    { "n": 17, "en": "The dragon breathes fire.", "jp": "ドラゴンは火を吐きます。", "hira": "どらごん は ひ を はきます", "mp3": "pb_s17_the_dragon_breathes_fire.mp3" },
+    { "n": 18, "en": "The bad guy laughs.", "jp": "悪者は笑います。", "hira": "わるもの は わらいます", "mp3": "pb_s18_the_bad_guy_laughs.mp3" },
+    { "n": 19, "en": "The hero fights the monster.", "jp": "ヒーローはモンスターと戦います。", "hira": "ひーろー は もんすたー と たたかいます", "mp3": "pb_s19_the_hero_fights_the_monster.mp3" },
+    { "n": 20, "en": "The princess calls for help.", "jp": "お姫様は助けを呼びます。", "hira": "おひめさま は たすけ を よびます", "mp3": "pb_s20_the_princess_calls_for_help.mp3" },
+
+    { "n": 21, "en": "The witch makes a spell.", "jp": "魔女は呪文を作ります。", "hira": "まじょ は じゅもん を つくります", "mp3": "pb_s21_the_witch_makes_a_spell.mp3" },
+    { "n": 22, "en": "The hero finds a key.", "jp": "ヒーローは鍵を見つけます。", "hira": "ひーろー は かぎ を みつけます", "mp3": "pb_s22_the_hero_finds_a_key.mp3" },
+    { "n": 23, "en": "The giant walks slowly.", "jp": "巨人はゆっくり歩きます。", "hira": "きょじん は ゆっくり あるきます", "mp3": "pb_s23_the_giant_walks_slowly.mp3" },
+    { "n": 24, "en": "The fairy helps the hero.", "jp": "妖精はヒーローを助けます。", "hira": "ようせい は ひーろー を たすけます", "mp3": "pb_s24_the_fairy_helps_the_hero.mp3" },
+    { "n": 25, "en": "The team enters the forest.", "jp": "チームは森に入ります。", "hira": "ちーむ は もり に はいります", "mp3": "pb_s25_the_team_enters_the_forest.mp3" },
+
+    { "n": 26, "en": "The monster runs away.", "jp": "モンスターは逃げます。", "hira": "もんすたー は にげます", "mp3": "pb_s26_the_monster_runs_away.mp3" },
+    { "n": 27, "en": "The hero wins the fight.", "jp": "ヒーローは戦いに勝ちます。", "hira": "ひーろー は たたかい に かちます", "mp3": "pb_s27_the_hero_wins_the_fight.mp3" },
+    { "n": 28, "en": "The king gives a reward.", "jp": "王様はごほうびをあげます。", "hira": "おうさま は ごほうび を あげます", "mp3": "pb_s28_the_king_gives_a_reward.mp3" },
+    { "n": 29, "en": "The castle door closes.", "jp": "城のドアが閉まります。", "hira": "しろ の どあ が しまります", "mp3": "pb_s29_the_castle_door_closes.mp3" },
+    { "n": 30, "en": "The adventure begins.", "jp": "冒険が始まります。", "hira": "ぼうけん が はじまります", "mp3": "pb_s30_the_adventure_begins.mp3" },
+
+    { "n": 31, "en": "The hero is happy.", "jp": "ヒーローは嬉しいです。", "hira": "ひーろー は うれしい です", "mp3": "pb_s31_the_hero_is_happy.mp3" },
+    { "n": 32, "en": "The princess is sad.", "jp": "お姫様は悲しいです。", "hira": "おひめさま は かなしい です", "mp3": "pb_s32_the_princess_is_sad.mp3" },
+    { "n": 33, "en": "The bad guy is angry.", "jp": "悪者は怒っています。", "hira": "わるもの は おこっています", "mp3": "pb_s33_the_bad_guy_is_angry.mp3" },
+    { "n": 34, "en": "The boy is scared.", "jp": "男の子は怖がっています。", "hira": "おとこのこ は こわがっています", "mp3": "pb_s34_the_boy_is_scared.mp3" },
+    { "n": 35, "en": "The girl is strong.", "jp": "女の子は強いです。", "hira": "おんなのこ は つよい です", "mp3": "pb_s35_the_girl_is_strong.mp3" },
+
+    { "n": 36, "en": "The hero is kind.", "jp": "ヒーローは優しいです。", "hira": "ひーろー は やさしい です", "mp3": "pb_s36_the_hero_is_kind.mp3" },
+    { "n": 37, "en": "The giant is slow.", "jp": "巨人は遅いです。", "hira": "きょじん は おそい です", "mp3": "pb_s37_the_giant_is_slow.mp3" },
+    { "n": 38, "en": "The fairy is small.", "jp": "妖精は小さいです。", "hira": "ようせい は ちいさい です", "mp3": "pb_s38_the_fairy_is_small.mp3" },
+    { "n": 39, "en": "The dragon is strong.", "jp": "ドラゴンは強いです。", "hira": "どらごん は つよい です", "mp3": "pb_s39_the_dragon_is_strong.mp3" },
+    { "n": 40, "en": "The team is brave.", "jp": "チームは勇敢です。", "hira": "ちーむ は ゆうかん です", "mp3": "pb_s40_the_team_is_brave.mp3" },
+
+    { "n": 41, "en": "The hero has a secret.", "jp": "ヒーローには秘密があります。", "hira": "ひーろー に は ひみつ が あります", "mp3": "pb_s41_the_hero_has_a_secret.mp3" },
+    { "n": 42, "en": "The boy has a dream.", "jp": "男の子には夢があります。", "hira": "おとこのこ に は ゆめ が あります", "mp3": "pb_s42_the_boy_has_a_dream.mp3" },
+    { "n": 43, "en": "The girl smiles again.", "jp": "女の子はまた笑います。", "hira": "おんなのこ は また わらいます", "mp3": "pb_s43_the_girl_smiles_again.mp3" },
+    { "n": 44, "en": "The hero feels proud.", "jp": "ヒーローは誇らしく思います。", "hira": "ひーろー は ほこらしく おもいます", "mp3": "pb_s44_the_hero_feels_proud.mp3" },
+    { "n": 45, "en": "They are friends.", "jp": "彼らは友達です。", "hira": "かれら は ともだち です", "mp3": "pb_s45_they_are_friends.mp3" },
+
+    { "n": 46, "en": "First, the hero wakes up.", "jp": "まず、ヒーローは起きます。", "hira": "まず ひーろー は おきます", "mp3": "pb_s46_first_the_hero_wakes_up.mp3" },
+    { "n": 47, "en": "Next, he eats breakfast.", "jp": "次に、朝ごはんを食べます。", "hira": "つぎ に あさごはん を たべます", "mp3": "pb_s47_next_he_eats_breakfast.mp3" },
+    { "n": 48, "en": "Then he goes outside.", "jp": "それから外に行きます。", "hira": "それから そと に いきます", "mp3": "pb_s48_then_he_goes_outside.mp3" },
+    { "n": 49, "en": "He sees a dragon.", "jp": "彼はドラゴンを見ます。", "hira": "かれ は どらごん を みます", "mp3": "pb_s49_he_sees_a_dragon.mp3" },
+    { "n": 50, "en": "Because he is brave, he fights.", "jp": "勇敢なので、彼は戦います。", "hira": "ゆうかん なので かれ は たたかいます", "mp3": "pb_s50_because_he_is_brave_he_fights.mp3" },
+
+    { "n": 51, "en": "But he is tired.", "jp": "でも、彼は疲れています。", "hira": "でも かれ は つかれています", "mp3": "pb_s51_but_he_is_tired.mp3" },
+    { "n": 52, "en": "He drinks water.", "jp": "彼は水を飲みます。", "hira": "かれ は みず を のみます", "mp3": "pb_s52_he_drinks_water.mp3" },
+    { "n": 53, "en": "After that, he runs.", "jp": "その後、彼は走ります。", "hira": "そのあと かれ は はしります", "mp3": "pb_s53_after_that_he_runs.mp3" },
+    { "n": 54, "en": "The dragon is surprised.", "jp": "ドラゴンは驚いています。", "hira": "どらごん は おどろいています", "mp3": "pb_s54_the_dragon_is_surprised.mp3" },
+    { "n": 55, "en": "He uses magic.", "jp": "彼は魔法を使います。", "hira": "かれ は まほう を つかいます", "mp3": "pb_s55_he_uses_magic.mp3" },
+
+    { "n": 56, "en": "The bad guy falls down.", "jp": "悪者は倒れます。", "hira": "わるもの は たおれます", "mp3": "pb_s56_the_bad_guy_falls_down.mp3" },
+    { "n": 57, "en": "The hero wins.", "jp": "ヒーローは勝ちます。", "hira": "ひーろー は かちます", "mp3": "pb_s57_the_hero_wins.mp3" },
+    { "n": 58, "en": "Everyone is happy.", "jp": "みんな嬉しいです。", "hira": "みんな うれしい です", "mp3": "pb_s58_everyone_is_happy.mp3" },
+    { "n": 59, "en": "The king says thank you.", "jp": "王様はありがとうと言います。", "hira": "おうさま は ありがとう と いいます", "mp3": "pb_s59_the_king_says_thank_you.mp3" },
+    { "n": 60, "en": "The story ends.", "jp": "物語は終わります。", "hira": "ものがたり は おわります", "mp3": "pb_s60_the_story_ends.mp3" }
+  ]
+}
