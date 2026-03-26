@@ -168,7 +168,7 @@
     {
       index:0, roomId:'room_01', x:642, y:496, type:'stay',
       frames:['ichi-1.png','ichi-2.png'], color:'#ff79d7', size:52,
-      name:'Ichi', nameJP:'イチ', nameKanji:'一',
+      name:'Ichi', nameJP:'イチ', 
       desc:'The first of three and as mean as can be. Ichi was planted under the Karasuki tree by Mister Happy. He picks on everyone, as mean as can be.',
       descJP:'さんにんの いちばんめで、とっても いじわるなんだ。イチは ミスター・ハッピーに カラスキの きの したに うえられたんだよ。みんなを いじわるして、いつも こまらせているんだ。'
     },
@@ -184,7 +184,7 @@
     {
       index:2, roomId:'room_02', x:882, y:263, type:'stay',
       frames:['tom_katsu-1.png','tom_katsu-2.png'], color:'#ffaa5e', size:62,
-      name:'Tom Katsu', nameJP:'トムカツ', nameKanji:'',
+      name:'Tom Katsu', nameJP:'トムカツ', 
       desc:'Tom Katsu the pig from a circus past, watched bright balloons pop too fast. Now one floats with him wherever he goes—a quiet little fix for a sadness he knows.',
       descJP:'むかし サーカスに いた ぶたの トムカツ。ふうせんが はじけるたびに、かなしくなっていたんだ。いまは いつも ふうせんが いっしょ。ちいさな かなしい きもちを そっと やわらげてくれるんだ。'
     },
@@ -216,7 +216,7 @@
     {
       index:6, roomId:'room_05', x:1029, y:502, type:'stay',
       frames:['san-1.png','san-2.png'], color:'#ffd08a', size:52,
-      name:'San', nameJP:'サン', nameKanji:'三',
+      name:'San', nameJP:'サン', 
       desc:'The third of three and as crazy as can, San bit Karasuki before it began. He never turned orange, not even one day—just wild and laughing along the way.',
       descJP:'さんにんの みっつめで、とっても クレイジーなんだ。サンは はじまるまえに カラスキを かじっちゃったんだ。オレンジに なることも なかったよ。ずっと ワイルドで、わらいながら あるいているんだ。'
     },
@@ -240,7 +240,7 @@
     {
       index:9, roomId:'room_07', x:815, y:398, type:'stay',
       frames:['amekuro-1.png','amekuro-2.png'], color:'#d49aff', size:52,
-      name:'Amekuro', nameJP:'アメクロ', nameKanji:'飴梟',
+      name:'Amekuro', nameJP:'アメクロ', 
       desc:'Amekuro are cute, owl-like cats, chatty and sweet, always talking to anyone they happen to meet. But show them some candy and it won’t last long—it’s gone in a second, and they’ll keep talking on.',
       descJP:'アメクロは かわいい フクロウみたいな ねこで、おしゃべりで あまいものが だいすきなんだ。だれにでも ずっと はなしかけてくる。でも おかしを みせたら すぐに なくなっちゃう。あっというまに たべて、それでも ずっと はなしつづけるんだ。'
     },
@@ -257,88 +257,88 @@
       index:11, roomId:'room_08', x:979, y:397, type:'stay',
       frames:['robert-1.png','robert-2.png'], color:'#ffaa88', size:72,
       name:'Robert', nameJP:'ロバート',
-      desc:'One of the three shapeshifting tanuki brothers. Robert shifts the slowest, which makes him the most convincing.',
-      descJP:'[日本語説明、準備中]'
+      desc:'Robert the eldest, old and worn, sees through the mask that others adorn. He tricks when he wants, helps when he may—but only if he cares that day.',
+      descJP:'ロバートは いちばん うえの たぬききょうだいで、ふるくて しずかなんだ。ほかのものが かぶっている かおの したまで みえてしまう。だましたり、たすけたりも するけれど、そのひの きぶんしだいなんだ。'
     },
     /* ── 12: Jeffrey — room_08 ── */
     {
       index:12, roomId:'room_08', x:1113, y:409, type:'stay',
       frames:['jeffrey-1.png','jeffrey-2.png'], color:'#ffcc44', size:65,
       name:'Jeffrey', nameJP:'ジェフリー',
-      desc:'One of the three shapeshifting tanuki brothers. Jeffrey shifts constantly, even when he\'s asleep.',
-      descJP:'[日本語説明、準備中]'
+      desc:'Jeffrey the middle, sharp with a grin, says what he sees with a bite tucked in. He’ll twist what’s real just to make his point—then laugh when the truth feels out of joint.',
+      descJP:'ジェフリーは まんなかの たぬききょうだいで、ちょっと いやみな えがおなんだ。みえたことを そのまま いうけど、すこし ひねって いうんだ。ほんとうを くずして、くすっと わらうんだ。'
     },
     /* ── 13: Johnny — room_08 ── */
     {
       index:13, roomId:'room_08', x:1256, y:444, type:'stay',
       frames:['johnny-1.png','johnny-2.png'], color:'#ff8844', size:70,
       name:'Johnny', nameJP:'ジョニー',
-      desc:'One of the three shapeshifting tanuki brothers. Johnny refuses to shift into anything useful.',
-      descJP:'[日本語説明、準備中]'
+      desc:'Johnny the youngest, quick on his feet, hates standing still or waiting to meet. He’ll rush a trick or cut it in two—“Hurry it up… I’m done with you.”',
+      descJP:'ジョニーは いちばん したの たぬききょうだいで、いつも せかせかしているんだ。じっとしているのも まつのも だいきらい。トリックも いそいで やって、すぐに やめちゃう。「はやくして…もう いいや」って かんじなんだ。'
     },
     /* ── 14: Nulvane — room_09 ── */
     {
       index:14, roomId:'room_09', x:843, y:413, type:'stay',
       frames:['nulvane-1.png','nulvane-2.png'], color:'#c8aaff', size:160,
       name:'Nulvane', nameJP:'ヌルヴェイン',
-      desc:'Ideas of people that never fully formed. Nulvane flickers between what they almost were.',
-      descJP:'[日本語説明、準備中]'
+      desc:'Nulvane are people who never took form, caught in between what’s real and not born. They flicker through lives they almost knew—not quite someone, not quite you.',
+      descJP:'ヌルヴェインは かたちに なれなかった ひとなんだ。ほんとうと まだ ないものの あいだに いる。なりかけた じぶんを ゆらゆらと いききして、だれかのようで だれでもないんだ。'
     },
     /* ── 15: Ni — room_10 ── */
     {
       index:15, roomId:'room_10', x:1233, y:452, type:'stay',
       frames:['ni-1.png','ni-2.png'], color:'#e8ffaa', size:52,
       name:'Ni', nameJP:'ニ', nameKanji:'弐',
-      desc:'The second. Quiet, but always present.',
-      descJP:'[日本語説明、準備中]'
+      desc:'The second of three and as dumb as can be, always the last one to leave the tree. Covered in white from the crows up above—he doesn’t mind… he just sits there, dumb.',
+      descJP:'さんにんの ふたりめで、とっても にぶいんだ。いつも きから おりるのが いちばん さいご。うえの カラスに しろくされても、きにしない。ぼーっと すわっているんだ。'
     },
     /* ── 16: Columbus — room_11 ── */
     {
       index:16, roomId:'room_11', x:935, y:397, type:'stay',
       frames:['columbus-1.png','columbus-2.png'], color:'#ff85a1', size:58,
-      name:'Columbus', nameJP:'コロンブス', nameKanji:'探',
-      desc:'Still exploring.',
-      descJP:'[日本語説明、準備中]'
+      name:'Columbus', nameJP:'コロンバス', 
+      desc:'Columbus the beagle loves belly-side scratches, but throw him a ball and he slips all your catches. He runs the wrong way, tail high in the air—a game of fetch… that goes nowhere.',
+      descJP:'コロンバスは おなかを なでられるのが だいすきなんだ。でも ボールを なげると、ちがう ほうへ はしっていく。しっぽを あげて どこかへ いっちゃうんだ。もってくるあそびなのに、ぜんぜん もどってこないんだよ。'
     },
     /* ── 17: October Moriyama — room_12 ── */
     {
       index:17, roomId:'room_12', x:700, y:270, type:'stay',
-      frames:['october_moriyama-1.png','october_moriyama-2.png'], color:'#ff79d7', size:73,
-      name:'October Moriyama', nameJP:'オクトーバー・森山', nameKanji:'霜',
-      desc:'Arrived with the autumn. Never left.',
-      descJP:'[日本語説明、準備中]'
+      frames:['october_moriyama-1.png','october_moriyama-2.png'], color:'#ff79d7', size:75,
+      name:'October Moriyama', nameJP:'オクトーバー・森山',
+      desc:'October Moriyama, never impressed, shrugs things off like she knows best. She says she’s not scared, not even a little—but something inside keeps things unsettled.',
+      descJP:'オクトーバー・もりやまは、なににも どうじない かんじなんだ。なんでも しっているみたいに かるく ながす。こわいものなんて ないって いうけど、こころの なかは ちょっと ざわざわしているんだ。'
     },
     /* ── 18: Takachika Green — room_13 ── */
     {
       index:18, roomId:'room_13', x:407, y:387, type:'stay',
-      frames:['takachika_green-1.png','takachika_green-2.png'], color:'#7fffd4', size:75,
-      name:'Takachika Green', nameJP:'タカチカ・グリーン', nameKanji:'高近',
-      desc:'Big presence, soft heart.',
-      descJP:'[日本語説明、準備中]'
+      frames:['takachika_green-1.png','takachika_green-2.png'], color:'#7fffd4', size:77,
+      name:'Takachika Green', nameJP:'タカチカ・グリーン', 
+      desc:'Takachika wished to see something more, so he opened a quiet, unseen door. He’s scared, but he walks where others won’t—because he wants to see… what others don’t.',
+      descJP:'タカチカは もっと なにかを みたかったんだ。だから しずかな、だれも しらない とびらを あけた。こわいけど、ほかの ひとが いかない みちを あるいていく。みえないものを、みたいと おもったから。'
     },
     /* ── 19: Pugoo — room_13 ── */
     {
       index:19, roomId:'room_13', x:609, y:642, type:'stay',
       frames:['pugoo-1.png','pugoo-2.png'], color:'#ffcc66', size:55,
-      name:'Pugoo', nameJP:'プグー', nameKanji:'愛',
-      desc:'Small but unforgettable.',
-      descJP:'[日本語説明、準備中]'
+      name:'Pugoo', nameJP:'プグー', 
+      desc:'Pugoo the cat stays close behind, with quiet eyes that always find. He doesn’t stray, he doesn’t delay—and keeps the dark things far away.',
+      descJP:'プグーは いつも そばに いる ねこなんだ。しずかな めで、いろんなことを みつけている。まよったり、はなれたり しないで、くらいものから そっと まもってくれるんだ。'
     },
     /* ── 20: Ena Yamakage — room_14 — drifts toward ghost ── */
     {
-      index:20, roomId:'room_14', x:930, y:318, type:'drift',
-      frames:['ena_yamakage-1.png','ena_yamakage-2.png'], color:'#ffb3d9', size:75,
+     index:20, roomId:'room_14', x:930, y:318, type:'drift',
+      frames:['ena_yamakage-1.png','ena_yamakage-2.png'], color:'#ffb3d9', size:81,
       name:'Ena Yamakage', nameJP:'山影えな',
-      desc:'[Description coming soon]',
-      descJP:'[日本語説明、準備中]'
+      desc:'Ena appears when the night feels thin, and if she sees you, she’ll see within. She points and laughs at all you hide—and if it goes on… it won’t subside.',
+      descJP:'えなは よるに あらわれるんだ。もし みられたら、なかまで みぬかれてしまう。かくしていることを ゆびさして わらう。そして その わらいが つづいたら、ずっと きえなくなるんだ。'
     },
     /* ── 21: Jubei Tsukigase — room_15 — drifts toward ghost ── */
     {
       index:21, roomId:'room_15', x:1064, y:434, type:'drift',
-      frames:['tsukigase_jubei-1.png','tsukigase_jubei-2.png'], color:'#ffcc66', size:90,
-      name:'Jubei Tsukigase', nameJP:'月ヶ瀬・寿兵衛', nameKanji:'字',
-      desc:'Ancient and vast. A letter older than time.',
-      descJP:'[日本語説明、準備中]'
+      frames:['tsukigase_jubei-1.png','tsukigase_jubei-2.png'], color:'#ffcc66', size:100,
+      name:'Jubei Tsukigase', nameJP:'月ヶ瀬・寿兵衛', 
+      desc:'Jubei worked and worked, he never would stop, no time for home, no time to drop. The years moved on and took it all—now something else begins to call.',
+      descJP:'じゅうべえは ずっと はたらきつづけて、やすむことを しらなかったんだ。いえにも もどらず、てを とめることも なかった。きがつけば じかんだけが すぎていて、すべてを うばっていった。いまは なにか べつのものに よばれているんだ。'
     },
   ];
 
