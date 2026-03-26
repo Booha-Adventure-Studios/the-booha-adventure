@@ -802,7 +802,7 @@
       descLockedKanji:'此の遊戯、未だ封印。迷宮にて更なる試練を。',
     },
     {
-      id:'bonus_placeholder_2', roomId:'room_14', x:491, y:388, r:44,
+      id:'bonus_placeholder_2', roomId:'room_14', x:491, y:328, r:44,
       url:'bonus_game_2.html', label:'???', color:'#ffcc44',
       theme:'mystery',
       nameEN:'???', nameJP:'？？？', nameKanji:'謎',
@@ -814,7 +814,7 @@
       descLockedKanji:'此の遊戯、未だ封印。迷宮にて更なる試練を。',
     },
     {
-      id:'bonus_placeholder_3', roomId:'room_10', x:344, y:329, r:44,
+      id:'bonus_placeholder_3', roomId:'room_10', x:344, y:392, r:44,
       url:'bonus_game_3.html', label:'???', color:'#ff9966',
       theme:'mystery',
       nameEN:'???', nameJP:'？？？', nameKanji:'謎',
@@ -951,13 +951,13 @@
     orb.style.boxShadow  = `0 0 14px ${t.orbColors[0]}cc, 0 0 32px ${t.orbColors[0]}88, 0 0 60px ${t.orbColors[1]}55`;
 
     if (tree.theme === 'invaders') {
-      orb.textContent = '👾'; orb.style.fontSize = '2rem'; orb.style.lineHeight = '60px';
+      orb.textContent = '✦'; orb.style.fontSize = '2rem'; orb.style.lineHeight = '60px';
       orb.style.background = `radial-gradient(circle at 35% 35%, #ccffdd, #44ff88, #005522)`;
     } else if (tree.theme === 'blocks') {
-      orb.textContent = '🟦'; orb.style.fontSize = '1.8rem'; orb.style.lineHeight = '60px';
+      orb.textContent = '✦'; orb.style.fontSize = '1.8rem'; orb.style.lineHeight = '60px';
       orb.style.background = `radial-gradient(circle at 35% 35%, #cce8ff, #44aaff, #002244)`;
     } else {
-      orb.textContent = '✨'; orb.style.fontSize = '1.8rem'; orb.style.lineHeight = '60px';
+      orb.textContent = '✦'; orb.style.fontSize = '1.8rem'; orb.style.lineHeight = '60px';
     }
 
     document.getElementById('bonus-pop-lock').style.display = unlocked ? 'none' : 'block';
