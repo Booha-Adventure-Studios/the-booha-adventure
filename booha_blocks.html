@@ -278,13 +278,10 @@ body {
     0 0 60px rgba(0,0,0,0.8);
   image-rendering: pixelated;
   touch-action: none;
-  height: min(60svh, 560px);
-  width: auto;
-  max-width: 100%;
-}
-
-@media (pointer: coarse) and (min-width: 768px) {
-  #game { height: min(65svh, 640px); }
+  /* Canvas is 300x600 — scale to fit the shell without distortion */
+  width: min(300px, 100%);
+  height: auto;
+  aspect-ratio: 1 / 2;
 }
 
 /* ── MOBILE CONTROLS ── */
@@ -872,7 +869,7 @@ body {
         <span class="title-blocks">ブーハー・ブロックス</span>
       </div>
       <div class="header-right">
-        <button class="hdr-btn" id="trophyBtn" type="button"></button>
+        <button class="hdr-btn" id="trophyBtn" type="button" aria-label="Leaderboard">★</button>
         <button class="hdr-btn" id="pauseBtn" type="button">II</button>
       </div>
     </div>
@@ -984,7 +981,7 @@ body {
 <div id="leaderboardOverlay">
   <div class="lb-card">
     <div class="lb-header">
-      <div class="lb-title"> スコアボード</div>
+      <div class="lb-title">★ スコアボード</div>
       <button class="lb-close" id="lbClose" type="button">✕</button>
     </div>
     <div class="lb-scroll">
@@ -1084,20 +1081,7 @@ const canvas = document.getElementById('game');
 const ctx    = canvas.getContext('2d');
 const COLS   = 10;
 const ROWS   = 20;
-let CELL;
-
-function calcCell(){
-  CELL = Math.floor(Math.min(
-    canvas.offsetWidth / COLS,
-    canvas.offsetHeight / ROWS
-  ));
-  if (CELL < 1) CELL = 28;
-}
-calcCell();
-
-window.addEventListener('resize', () => {
-  setTimeout(calcCell, 100);
-});
+const CELL   = 30; // fixed cell size — canvas is always 300x600
 
 /* ── STATE ── */
 let gameStarted      = false;
@@ -1121,19 +1105,23 @@ let shakeFrames = 0;
 let shakeMag    = 0;
 
 function triggerShake(mag, frames){
-  shakeMag    = Math.max(shakeMag, mag);
-  shakeFrames = Math.max(shakeFrames, frames);
+  shakeMag    = Math.max(shakeMag, Math.min(mag, 12)); // hard cap
+  shakeFrames = Math.max(shakeFrames, Math.min(frames, 22));
 }
 
 function tickShake(){
-  if (shakeFrames <= 0){ shakeMag = 0; return; }
+  if (shakeFrames <= 0){
+    if (shakeMag > 0) stopShake();
+    return;
+  }
   shakeFrames--;
-  const decay = shakeFrames / (shakeFrames + 6);
-  const m = shakeMag * decay;
+  const decay = shakeFrames / (shakeFrames + 4);
+  const m  = shakeMag * decay;
   const sx = (Math.random() - 0.5) * 2 * m;
-  const sy = (Math.random() - 0.5) * 2 * m;
+  const sy = (Math.random() - 0.5) * 1.2 * m;
   document.documentElement.style.setProperty('--shake-x', sx.toFixed(2) + 'px');
   document.documentElement.style.setProperty('--shake-y', sy.toFixed(2) + 'px');
+  if (shakeFrames === 0) stopShake();
 }
 
 function stopShake(){
@@ -1146,11 +1134,14 @@ function stopShake(){
 const flashEl = document.getElementById('screenFlash');
 let flashVal = 0;
 
-function triggerFlash(val){ flashVal = Math.max(flashVal, val); }
+function triggerFlash(val){
+  flashVal = Math.max(flashVal, Math.min(val, 1.0));
+}
 
 function tickFlash(){
-  flashVal *= 0.7;
-  if (flashVal < 0.005) flashVal = 0;
+  if (flashVal <= 0) return;
+  flashVal *= 0.45; // very fast decay — gone in ~4 frames, no strobe
+  if (flashVal < 0.01) { flashVal = 0; flashEl.style.opacity = '0'; return; }
   flashEl.style.opacity = flashVal.toFixed(3);
 }
 
