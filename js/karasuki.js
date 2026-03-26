@@ -802,7 +802,7 @@
       descLockedKanji:'此の遊戯、未だ封印。迷宮にて更なる試練を。',
     },
     {
-      id:'bonus_placeholder_2', roomId:'room_14', x:900, y:250, r:44,
+      id:'bonus_placeholder_2', roomId:'room_14', x:491, y:388, r:44,
       url:'bonus_game_2.html', label:'???', color:'#ffcc44',
       theme:'mystery',
       nameEN:'???', nameJP:'？？？', nameKanji:'謎',
@@ -814,7 +814,7 @@
       descLockedKanji:'此の遊戯、未だ封印。迷宮にて更なる試練を。',
     },
     {
-      id:'bonus_placeholder_3', roomId:'room_15', x:600, y:300, r:44,
+      id:'bonus_placeholder_3', roomId:'room_10', x:344, y:329, r:44,
       url:'bonus_game_3.html', label:'???', color:'#ff9966',
       theme:'mystery',
       nameEN:'???', nameJP:'？？？', nameKanji:'謎',
@@ -1916,7 +1916,7 @@
         if (exit) transitionTo(exit);
       }
 
-      checkBonusTrees();
+      
     }
     drawFrame(now);
     requestAnimationFrame(tick);
