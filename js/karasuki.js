@@ -170,7 +170,7 @@
       frames:['ichi-1.png','ichi-2.png'], color:'#ff79d7', size:52,
       name:'Ichi', nameJP:'イチ', 
       desc:'The first of three and as mean as can be. Ichi was planted under the Karasuki tree by Mister Happy. He picks on everyone, as mean as can be.',
-      descJP:'三人の最初で、とても意地悪なやつ。イチはミスター・ハッピーによってカラスキーの木の下に植えられた。誰にでもちょっかいを出して、いつも困らせている。'
+      descJP:'三人のうちの最初で、とても意地悪なやつ。イチはミスター・ハッピーによってカラスキーの木の下に植えられた。誰にでもちょっかいを出して、いつも困らせている。'
     },
     /* ── 1: Mr. Happy — room_01 ── */
     {
@@ -178,7 +178,7 @@
       frames:['mr_happy-1.png','mr_happy-2.png'], color:'#ffd166', size:110,
       name:'Mister Happy', nameJP:'ミスター・ハッピー',
       desc:'Mister Happy lives in Karasuki, you see, and swears he knows it perfectly. And no, that shine is not makeup on his skin—that’s just the way he’s always been.',
-      descJP:'ミスター・ハッピーはカラスキーに住んでいて、すべてを完璧に知っていると言い張る。そして、その輝きは化粧ではない——それが彼の本来の姿なのだ。'
+      descJP:'ミスター・ハッピーはカラスキーに住んでいて、すべてを完璧に知っていると言い張る。そして、その顔の色は化粧ではない——それが彼の本来の姿なのだ。'
     },
     /* ── 2: Tom Katsu — room_02 ── */
     {
@@ -200,15 +200,15 @@
     {
      index:4, roomId:'room_04', x:888, y:422, type:'stay',
       frames:['jacki-1.png','jacki-2.png'], color:'#b2ffda', size:110,
-      name:'Jacki', nameJP:'ジャッキ',
+      name:'Jacki', nameJP:'ジャッキー',
       desc:'Jacki’s from the West, where Karasuki still grows, a mirror to Mister Happy, or so the story goes. He wanders the paths where the lost things roam—watching, waiting, far from home.',
-      descJP:'ジャッキは西のカラスキーから来た存在で、ミスター・ハッピーに似ているとも言われている。失われたものがさまよう道を歩きながら、静かに見守り続けている。'
+      descJP:'ジャッキーは西のカラスキーから来た存在で、ミスター・ハッピーに似ているとも言われている。失われたものがさまよう道を歩きながら、静かに見守り続けている。'
     },
     /* ── 5: Jamariko — room_05 ── */
     {
       index:5, roomId:'room_05', x:1054, y:354, type:'stay',
       frames:['jamariko-1.png','jamariko-2.png'], color:'#fff176', size:70,
-      name:'Jamariko', nameJP:'ジャマリコ', nameKanji:'邪魔里子',
+      name:'Jamariko', nameJP:'ジャマリコ', 
       desc:'Jamariko’s the cutest, sweet as can be, but always stands where you need to see. Step to the left or step to the right—it’s still in your way, day or night.',
       descJP:'ジャマリコはとても可愛らしいが、必ず見たい場所に立っている。左に動いても右に動いても、昼でも夜でも、いつも邪魔になる。'
     },
@@ -216,15 +216,15 @@
     {
       index:6, roomId:'room_05', x:1029, y:502, type:'stay',
       frames:['san-1.png','san-2.png'], color:'#ffd08a', size:52,
-      name:'San', nameJP:'サン', 
+      name:'San', nameJP:'参', 
       desc:'The third of three and as crazy as can, San bit Karasuki before it began. He never turned orange, not even one day—just wild and laughing along the way.',
-      descJP:'三人の最後で、とても狂っている。サンは始まる前にカラスキーをかじってしまった。オレンジ色になることもなく、ただ笑いながら荒々しく動き回っている。'
+      descJP:'三人のうちの最後で、とても狂っている。参は始まる前にカラスキーをかじってしまった。オレンジ色になることもなく、ただ笑いながら荒々しく動き回っている。'
     },
     /* ── 7: Gorogane — room_06 ── */
     {
       index:7, roomId:'room_06', x:781, y:207, type:'stay',
       frames:['gorogane-1.png','gorogane-2.png'], color:'#a8fff8', size:120,
-      name:'Gorogui', nameJP:'ゴロぐい',
+      name:'Gorogui', nameJP:'ゴログイ',
       desc:'Once they were people with food on their mind, now hunger’s the only thing they can find. If you see one move, don’t trust what you see—something much worse is pulling the strings.',
       descJP:'かつては食べ物のことばかり考えていた人間だった。しかし今は飢えだけが残っている。もし動いているのを見ても信じてはいけない——背後にはもっと恐ろしい何かが潜んでいる。'
     },
@@ -290,7 +290,7 @@
       frames:['ni-1.png','ni-2.png'], color:'#e8ffaa', size:52,
       name:'Ni', nameJP:'ニ', nameKanji:'弐',
       desc:'The second of three and as dumb as can be, always the last one to leave the tree. Covered in white from the crows up above—he doesn’t mind… he just sits there, dumb.',
-      descJP:'三人の二番目で、とても鈍い。いつも木から降りるのが最後で、上のカラスに汚されても気にしない。ただぼんやり座っている。'
+      descJP:'三人のうちの二番目で、とても鈍い。いつも木から降りるのが最後で、上のカラスに汚されても気にしない。ただぼんやり座っている。'
     },
     /* ── 16: Columbus — room_11 ── */
     {
@@ -320,7 +320,7 @@
     {
       index:19, roomId:'room_13', x:609, y:642, type:'stay',
       frames:['pugoo-1.png','pugoo-2.png'], color:'#ffcc66', size:55,
-      name:'Pugoo', nameJP:'プグー', 
+      name:'Pugoo', nameJP:'パグー', 
       desc:'Pugoo the cat stays close behind, with quiet eyes that always find. He doesn’t stray, he doesn’t delay—and keeps the dark things far away.',
       descJP:'プグーはいつもそばにいる猫。静かな目であらゆるものを見つめている。離れることなく寄り添い、暗いものから守ってくれる存在だ。'
     },
@@ -330,13 +330,13 @@
       frames:['ena_yamakage-1.png','ena_yamakage-2.png'], color:'#ffb3d9', size:81,
       name:'Ena Yamakage', nameJP:'山影えな',
       desc:'Ena appears when the night feels thin, and if she sees you, she’ll see within. She points and laughs at all you hide—and if it goes on… it won’t subside.',
-      descJP:'えなは夜が薄くなる頃に現れる。目が合えば、内側まで見抜かれてしまう。隠しているものを指差して笑い、その笑いは決して消えない。'
+      descJP:'えなは不気味な夜に現れる。目が合えば、内側まで見抜かれてしまう。隠しているものを指差して笑い、その笑いは決して消えない。'
     },
     /* ── 21: Jubei Tsukigase — room_15 — drifts toward ghost ── */
     {
       index:21, roomId:'room_15', x:1064, y:434, type:'drift',
       frames:['tsukigase_jubei-1.png','tsukigase_jubei-2.png'], color:'#ffcc66', size:100,
-      name:'Jubei Tsukigase', nameJP:'月ヶ瀬・寿兵衛', 
+      name:'Jubei Tsukigase', nameJP:'月ヶ瀬 寿兵衛', 
       desc:'Jubei worked and worked, he never would stop, no time for home, no time to drop. The years moved on and took it all—now something else begins to call.',
      descJP:'寿兵衛は働き続け、休むことを知らなかった。家にも戻らず、手を止めることもなかった。気づけば時はすべてを奪い去り、今は何か別のものに呼ばれている。'
     },
