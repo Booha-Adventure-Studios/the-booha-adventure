@@ -169,88 +169,88 @@
       index:0, roomId:'room_01', x:642, y:496, type:'stay',
       frames:['ichi-1.png','ichi-2.png'], color:'#ff79d7', size:52,
       name:'Ichi', nameJP:'イチ', nameKanji:'一',
-      desc:'The first of three. Planted under the Karasuki tree by Mister Happy. He\'s mean, but sometimes he\'s right.',
-      descJP:'三つのうちの一つ。ミスター・ハッピーにカラスキの木の下に植えられた。いじわるだけど、ときどき正しい。'
+      desc:'The first of three and as mean as can be. Ichi was planted under the Karasuki tree by Mister Happy. He picks on everyone, as mean as can be.',
+      descJP:'さんにんの いちばんめで、とっても いじわるなんだ。イチは ミスター・ハッピーに カラスキの きの したに うえられたんだよ。みんなを いじわるして、いつも こまらせているんだ。'
     },
     /* ── 1: Mr. Happy — room_01 ── */
     {
       index:1, roomId:'room_01', x:798, y:418, type:'stay',
       frames:['mr_happy-1.png','mr_happy-2.png'], color:'#ffd166', size:110,
       name:'Mister Happy', nameJP:'ミスター・ハッピー',
-      desc:'Mister Happy lives in Karasuki and pretends he knows everything about it. And no—that\'s not makeup. That\'s his skin.',
-      descJP:'ミスター・ハッピーはカラスキに住んでいて、なんでも知っているふりをしている。それと、それはメイクじゃないよ。あれが肌。'
+      desc:'Mister Happy lives in Karasuki, you see, and swears he knows it perfectly. And no, that shine is not makeup on his skin—that’s just the way he’s always been.',
+      descJP:'ミスター・ハッピーは カラスキに すんでいるんだよ。なんでも かんぺきに しっているって いうんだ。あとね、その ひかりは メイクじゃないよ。あれが もともとの はだなんだよ。'
     },
     /* ── 2: Tom Katsu — room_02 ── */
     {
       index:2, roomId:'room_02', x:882, y:263, type:'stay',
       frames:['tom_katsu-1.png','tom_katsu-2.png'], color:'#ffaa5e', size:62,
-      name:'Tom Katsu', nameJP:'トムカツ', nameKanji:'勝',
-      desc:'Crispy on the outside, warm on the inside.',
-      descJP:'[日本語説明、準備中]'
+      name:'Tom Katsu', nameJP:'トムカツ', nameKanji:'',
+      desc:'Tom Katsu the pig from a circus past, watched bright balloons pop too fast. Now one floats with him wherever he goes—a quiet little fix for a sadness he knows.',
+      descJP:'むかし サーカスに いた ぶたの トムカツ。ふうせんが はじけるたびに、かなしくなっていたんだ。いまは いつも ふうせんが いっしょ。ちいさな かなしい きもちを そっと やわらげてくれるんだ。'
     },
     /* ── 3: Uhibon — room_03 ── */
     {
       index:3, roomId:'room_03', x:546, y:308, type:'stay',
       frames:['uhibon-1.png','uhibon-2.png'], color:'#a8edff', size:72,
       name:'Uhibon', nameJP:'ウヒボン',
-      desc:'Nothing is really known about Uhibon. He appears as Takachika escapes into Karasuki.',
-      descJP:'ウヒボンについては、ほとんど何もわかっていない。タカチカがカラスキへ逃げ込むときに現れる。'
+      desc:'Nobody knows Uhibon—not even he, he came from somewhere beyond Karasuki. He knows there was a time before the bone… but that part of him is lost and gone.',
+      descJP:'だれも ウヒボンのことを しらないんだ。ウヒボン じしんも。カラスキの そとから きたみたいなんだ。ほねに なる まえの じかんが あったと しっているけど、その きおくは もう きえてしまったんだ。'
     },
     /* ── 4: Jacki — room_04 ── */
     {
-      index:4, roomId:'room_04', x:888, y:422, type:'stay',
+     index:4, roomId:'room_04', x:888, y:422, type:'stay',
       frames:['jacki-1.png','jacki-2.png'], color:'#b2ffda', size:110,
       name:'Jacki', nameJP:'ジャッキ',
-      desc:'Jacki is from the side of Karasuki that October comes from. She has seen things October has not.',
-      descJP:'[日本語説明、準備中]'
+      desc:'Jacki’s from the West, where Karasuki still grows, a mirror to Mister Happy, or so the story goes. He wanders the paths where the lost things roam—watching, waiting, far from home.',
+      descJP:'ジャッキは にしの カラスキから きたんだ。ミスター・ハッピーに にているって いわれているよ。なくしたものが さまよう みちを あるいて、いつも そっと みまもっているんだ。'
     },
     /* ── 5: Jamariko — room_05 ── */
     {
       index:5, roomId:'room_05', x:1054, y:354, type:'stay',
       frames:['jamariko-1.png','jamariko-2.png'], color:'#fff176', size:70,
       name:'Jamariko', nameJP:'ジャマリコ', nameKanji:'邪魔里子',
-      desc:'She stands in your way, but only out of love.',
-      descJP:'[日本語説明、準備中]'
+      desc:'Jamariko’s the cutest, sweet as can be, but always stands where you need to see. Step to the left or step to the right—it’s still in your way, day or night.',
+      descJP:'ジャマリコは とっても かわいいんだよ。でもね、いつも ちょうど みたい ばしょに たってるんだ。ひだりに いっても、みぎに いっても、ひるでも よるでも、ずっと じゃまに なるんだ。'
     },
     /* ── 6: San — room_05 ── */
     {
       index:6, roomId:'room_05', x:1029, y:502, type:'stay',
       frames:['san-1.png','san-2.png'], color:'#ffd08a', size:52,
       name:'San', nameJP:'サン', nameKanji:'三',
-      desc:'[Description coming soon]',
-      descJP:'[日本語説明、準備中]'
+      desc:'The third of three and as crazy as can, San bit Karasuki before it began. He never turned orange, not even one day—just wild and laughing along the way.',
+      descJP:'さんにんの みっつめで、とっても クレイジーなんだ。サンは はじまるまえに カラスキを かじっちゃったんだ。オレンジに なることも なかったよ。ずっと ワイルドで、わらいながら あるいているんだ。'
     },
     /* ── 7: Gorogane — room_06 ── */
     {
       index:7, roomId:'room_06', x:1256, y:306, type:'stay',
       frames:['gorogane-1.png','gorogane-2.png'], color:'#a8fff8', size:120,
-      name:'Gorogane', nameJP:'ゴロガネ',
-      desc:'[Description coming soon]',
-      descJP:'[日本語説明、準備中]'
+      name:'Gorogui', nameJP:'ゴロぐい',
+      desc:'Once they were people with food on their mind, now hunger’s the only thing they can find. If you see one move, don’t trust what you see—something much worse is pulling the strings.',
+      descJP:'むかしは たべもののことばかり かんがえていた ひとだったんだ。いまは はらぺこだけが のこっている。もし うごいているのを みても、しんじちゃ だめだよ。もっと こわい なにかに あやつられているんだ。'
     },
     /* ── 8: Sumiyo Horaguchi — room_06 — drifts toward ghost ── */
     {
       index:8, roomId:'room_06', x:736, y:414, type:'drift',
       frames:['sumiyo_horaguchi-1.png','sumiyo_horaguchi-2.png'], color:'#90aaff', size:72,
       name:'Sumiyo Horaguchi', nameJP:'洞口すみよ',
-      desc:'Quiet as a shadow, warm as afternoon light.',
-      descJP:'[日本語説明、準備中]'
+      desc:'If you see one of these—don’t turn your back, one glance away and she’s on your track. If you don’t look, she’ll follow you through—and once she’s in, you’ll start losing you.',
+      descJP:'もし みかけたら、ぜったいに せなかを むけちゃ だめだよ。ちょっと めを はなしただけで、すぐ うしろに いるんだ。みていないと、どこまでも ついてくる。そして いちど はいられたら、すこしずつ じぶんを なくしていくんだ。'
     },
     /* ── 9: Amekuro — room_07 ── */
     {
       index:9, roomId:'room_07', x:815, y:398, type:'stay',
       frames:['amekuro-1.png','amekuro-2.png'], color:'#d49aff', size:52,
       name:'Amekuro', nameJP:'アメクロ', nameKanji:'飴梟',
-      desc:'Amekuro are cute, owl-like cats that love candy. When they stand up, a hidden mouth on their stomach appears and eats sweets in seconds.',
-      descJP:'アメクロ（飴梟）は、おかしが大好きなフクロウのようなネコです。立つとおなかに口が現れ、おかしを一気に食べます。'
+      desc:'Amekuro are cute, owl-like cats, chatty and sweet, always talking to anyone they happen to meet. But show them some candy and it won’t last long—it’s gone in a second, and they’ll keep talking on.',
+      descJP:'アメクロは かわいい フクロウみたいな ねこで、おしゃべりで あまいものが だいすきなんだ。だれにでも ずっと はなしかけてくる。でも おかしを みせたら すぐに なくなっちゃう。あっというまに たべて、それでも ずっと はなしつづけるんだ。'
     },
     /* ── 10: Snakuma — room_07 ── */
     {
       index:10, roomId:'room_07', x:456, y:470, type:'stay',
       frames:['snakuma-1.png','snakuma-2.png'], color:'#88ff88', size:150,
       name:'Snakuma', nameJP:'スナクマ',
-      desc:'[Description coming soon]',
-      descJP:'[日本語説明、準備中]'
+      desc:'Snakuma are giant bears who gather what they see, wearing lost things like they’re meant to be. No one goes looking, no one asks why—the things just stay… as the bears pass by.',
+      descJP:'スナクマは おおきな クマで、みつけたものを あつめて みに つけるんだ。なくしたものが もともと そこに あったみたいに。だれも さがさないし、りゆうも きかない。ものは そのまま のこって、クマは すぎていくんだ。'
     },
     /* ── 11: Robert — room_08 ── */
     {
