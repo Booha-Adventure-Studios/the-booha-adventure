@@ -657,23 +657,32 @@ async function beginRound() {
   const s = total > 0 ? Math.round((nHeard / total) * 100) : 0;
   if (firstScores[idx] === null) firstScores[idx] = s;
   if (s >= PASS) {
-    playSfx('ding');
-    if (firstScores[idx] === s) { score++; scoreEl.textContent = score; updateStreak(streak + 1); }
-    updateDots();
-    const card = order[idx];
      
-    /* Play word audio, then wait a full breath before advancing */
-   if (card.mp3) {
-      const a = new Audio(CFG.audioBase + card.mp3);
+    if (iosFirstTry) { score++; scoreEl.textContent = score; updateStreak(streak+1); }
+    updateDots();
+    const mp3 = order[idx].mp3;
+    const dingClone = SFX['ding'] ? SFX['ding'].cloneNode() : null;
+    if (dingClone) {
+      dingClone.setAttribute('playsinline',''); dingClone.setAttribute('webkit-playsinline','');
+      dingClone.play().catch(()=>{});
+      dingClone.onended = () => {
+        if (!mp3) { setTimeout(() => { idx++; if (idx >= order.length) { showResults(); } else { showCard(); } }, 800); return; }
+        const a = new Audio(CFG.audioBase+mp3);
+        a.setAttribute('playsinline',''); a.setAttribute('webkit-playsinline','');
+        a.setAttribute('preload','auto');
+        a.play().catch(()=>{});
+        a.onended = () => { setTimeout(() => { idx++; if (idx >= order.length) { showResults(); } else { showCard(); } }, 800); };
+        setTimeout(() => { if (iosAnswered) { idx++; if (idx >= order.length) { showResults(); } else { showCard(); } } }, 7000);
+      };
+    } else if (mp3) {
+      const a = new Audio(CFG.audioBase+mp3);
       a.setAttribute('playsinline',''); a.setAttribute('webkit-playsinline','');
       a.setAttribute('preload','auto');
-      setTimeout(() => { a.play().catch(()=>{}); }, 300);
-      /* Wait for audio to actually finish before advancing */
-      a.onended = () => { setTimeout(() => { idx++; isBusy=false; if (idx >= order.length) { showResults(); } else { showCard(); } }, 800); };
-      /* Safety fallback if onended never fires */
-      setTimeout(() => { if (isBusy) { idx++; isBusy=false; if (idx >= order.length) { showResults(); } else { showCard(); } } }, 7000);
+      a.play().catch(()=>{});
+      a.onended = () => { setTimeout(() => { idx++; if (idx >= order.length) { showResults(); } else { showCard(); } }, 800); };
+      setTimeout(() => { if (iosAnswered) { idx++; if (idx >= order.length) { showResults(); } else { showCard(); } } }, 7000);
     } else {
-      setTimeout(() => { idx++; isBusy=false; if (idx >= order.length) { showResults(); } else { showCard(); } }, 2000);
+      setTimeout(() => { idx++; if (idx >= order.length) { showResults(); } else { showCard(); } }, 1500);
     }
 
      
