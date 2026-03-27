@@ -513,18 +513,18 @@ const COLS   = 10, ROWS = 20;
 const CW = canvas.width, CH = canvas.height;  // 300 × 600
 const CELL   = CW / COLS;                     // 30 exact
 
-/* ── PIECE COLORS — fixed 5-color palette, never theme-shifted ── */
+/* ── PIECE COLORS — each piece has its own fixed color, always ── */
 const PIECE_COLORS = {
   I:'#7dd3fc',   // baby blue
   J:'#c084fc',   // violet
   L:'#ff7eb9',   // pink
   O:'#facc15',   // yellow
   S:'#a3e635',   // slime green
-  Z:'#a3e635',   // slime green (same family)
+  Z:'#a3e635',   // slime green
   T:'#c084fc',   // violet
-  BOMB:'#ef4444',  // red
-  X2:'#cbd5e1',    // silver
-  X3:'#fbbf24',    // gold
+  BOMB:'#ef4444', // red — always red, never overridden
+  X2:'#cbd5e1',   // silver
+  X3:'#fbbf24',   // gold
 };
 
 /* ── PIECES ── */
@@ -580,10 +580,12 @@ function tickColorOverride(){
   if(Date.now()>colorOverrideEnd) clearColorOverride();
 }
 
-/* Returns the display color for a cell — respects color override */
+/* Returns the display color for a locked cell — respects color override.
+   BOMB cells are always red regardless of override. */
 function cellColor(name){
+  if(name==='BOMB') return PIECE_COLORS.BOMB;
   if(colorOverride) return COLOR_OVERRIDE_VALS[colorOverride];
-  return PIECE_COLORS[name]||'#fff';
+  return PIECE_COLORS[name] || '#fff';
 }
 
 /* ── PLAYFIELD ── */
@@ -626,7 +628,7 @@ function applyTheme(lvl){
 }
 
 /* ── AUDIO ── */
-const BASE='the-booha-adventure/assets/blocks/';
+const BASE='../assets/blocks/';
 let audioUnlocked=false;
 const SFX={ bgm:['booha-tetris-january.mp3','booha-tetris-january-2.mp3','booha-tetris-january-3.mp3','bgm4.mp3'], line:'booha-tetris-sound.mp3', levelUp:'correct.mp3', danger:'too-high.mp3', gameOver:'game-over.mp3', bomb:'clear.mp3' };
 let bgmIdx=0;
@@ -868,19 +870,27 @@ function lockPiece(){
     return;
   }
 
-  if(piece.name==='X2'){ scoreMultiplier=2; setColorOverride('silver'); playSFX(SFX.levelUp,.8); piece=nextP; nextP=mkPiece(); updateHud(); return; }
-  if(piece.name==='X3'){ scoreMultiplier=3; setColorOverride('gold');   playSFX(SFX.levelUp,.9); piece=nextP; nextP=mkPiece(); updateHud(); return; }
+  /* X2 / X3 — lock into playfield normally, then trigger color override */
+  const isX2 = piece.name==='X2';
+  const isX3 = piece.name==='X3';
 
-  /* Normal lock */
+  /* Normal lock — write cells to playfield */
   for(let r=0;r<piece.matrix.length;r++) for(let c=0;c<piece.matrix[r].length;c++) if(piece.matrix[r][c]){
     const pr=piece.row+r, pc=piece.col+c;
-    if(pr<0){triggerGameOver();return;}
-    /* Store cell with name and current stackAge */
+    if(pr<0){ triggerGameOver(); return; }
     playfield[pr][pc]={ name:piece.name, age:stackAge };
     spawnLockAnim(pc,pr,piece.color);
   }
 
   spawnLockDust(piece.col+Math.floor(piece.matrix[0].length/2), piece.row);
+
+  /* Trigger special effect after locking */
+  if(isX2){ scoreMultiplier=2; setColorOverride('silver'); playSFX(SFX.levelUp,.8); }
+  if(isX3){ scoreMultiplier=3; setColorOverride('gold');   playSFX(SFX.levelUp,.9); }
+
+  if(isX2||isX3){
+    piece=nextP; nextP=mkPiece(); updateHud(); updateDanger(); return;
+  }
 
   const full=[];
   for(let r=0;r<ROWS;r++) if(playfield[r].every(c=>c!==0&&c!==null)) full.push(r);
@@ -1135,7 +1145,13 @@ function setPaused(v){
 }
 pauseBtn?.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(!gameStarted||isGameOver)return;setPaused(!isPaused);},{passive:false});
 document.getElementById('pauseResumeBtn')?.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();setPaused(false);},{passive:false});
-document.getElementById('pauseExitBtn')?.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();setPaused(false);window.location.href='karasuki.html';},{passive:false});
+document.getElementById('pauseExitBtn')?.addEventListener('pointerdown',e=>{
+  e.preventDefault(); e.stopPropagation();
+  setPaused(false);
+  /* Tell Karasuki to place the player at room_02 entry point */
+  try{ sessionStorage.setItem('karasuki_return_room','room_02'); }catch(_){}
+  window.location.href='karasuki.html';
+},{passive:false});
 
 /* ── HELP ── */
 const helpBtn=document.getElementById('helpBtn');
