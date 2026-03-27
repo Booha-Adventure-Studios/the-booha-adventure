@@ -320,10 +320,9 @@ U.mount(`
   </div>
   <div class="sas-status" id="sas-status">TAP MIC TO SPEAK</div>
   ` : `
-  <div style="display:flex;justify-content:center;margin-bottom:.25rem;">
-    <button class="sas-play-btn" id="sas-play" aria-label="Listen">▶</button>
-  </div>
+  
   <div class="sas-ios-grid" id="sas-ios-grid"></div>
+  
   `}
   <div class="sas-bottom-bar">
     <button class="sas-retry-btn" id="sas-retry" style="display:none">TRY AGAIN / もう一回</button>
@@ -692,8 +691,7 @@ function handleIosPick(btn, card) {
     playSfx('ding');
     if (iosFirstTry) { score++; scoreEl.textContent = score; updateStreak(streak+1); }
     updateDots();
-    const mp3 = order[idx].mp3;
-    if (mp3) { const a = new Audio(CFG.audioBase+mp3); a.setAttribute('playsinline',''); a.setAttribute('webkit-playsinline',''); a.play().catch(()=>{}); }
+     
      
     if (mp3) {
   const a = new Audio(CFG.audioBase+mp3);
@@ -715,7 +713,7 @@ function handleIosPick(btn, card) {
 }
 
 /* ═══ PLAY BUTTON ═══ */
-playBtn.addEventListener('click', () => {
+if (playBtn) playBtn.addEventListener('click', () => {
   if (listening || playBtn.disabled) return;
   const card = order[idx]; if (!card.mp3) return;
   try {
