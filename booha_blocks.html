@@ -453,43 +453,45 @@ body {
 
 <script>
 /* ═══════════════════════════════════════════════════════
-   BOOHA BLOCKS ENGINE
-   
-   KEY DECISIONS:
-   - Piece colors are FIXED — never change during play
-   - Locked cells track an "age" (row insertion time)
-     and are drawn progressively darker
-   - Special blocks: BOMB (3×3 clear), 2x, 3x multiplier
-   - Particles scaled to line count — 1 line = tidy,
-     4 lines = absolute chaos
-   - NO full-screen DOM flash overlays ever
-   - Gesture lock: touch-only, never blocks mouse/keyboard
-     so browser DevTools work normally
+   BOOHA BLOCKS ENGINE  — COLOR RULES:
+
+   PIECE COLORS ARE PERMANENT. Each piece type has one
+   fixed color that never changes for the life of the game:
+     I  = baby blue   J  = violet    L  = pink
+     O  = yellow      S  = slime     Z  = slime
+     T  = violet      BOMB = red     X2 = silver   X3 = gold
+
+   Locked cells store:
+     - name      : piece type (for natural color lookup)
+     - lockedColor: the color actually painted at lock time
+     - age       : for progressive darkening
+
+   The ONLY thing that changes lockedColor:
+     - X2/X3 color override: NEW pieces arriving during the
+       60s window are born silver/gold (lockedColor set to
+       override color at lock time).
+     - On override expiry: any cell whose lockedColor was
+       the override tint reverts to PIECE_COLORS[name].
+
+   Existing locked cells are NEVER repainted by an override.
+   BOMB cells are always red — override cannot touch them.
 ═══════════════════════════════════════════════════════ */
 
 /* ── GESTURE LOCK — touch devices only, never mouse ── */
 (function(){
-  /* Only apply on actual touch devices */
   if (!('ontouchstart' in window)) return;
-
   const o = { passive:false, capture:true };
   let lt = 0;
-
-  /* Safari pinch-to-zoom */
   document.addEventListener('gesturestart',  e => e.preventDefault(), o);
   document.addEventListener('gesturechange', e => e.preventDefault(), o);
   document.addEventListener('gestureend',    e => e.preventDefault(), o);
-
-  /* Multi-touch */
   document.addEventListener('touchstart', e => {
     if (e.touches.length > 1) { e.preventDefault(); return; }
-    /* Double-tap zoom suppression — only on non-input elements */
     if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
       const now = Date.now();
       if (now - lt < 280) e.preventDefault();
     }
   }, o);
-
   document.addEventListener('touchend', e => {
     if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
       const now = Date.now();
@@ -497,12 +499,9 @@ body {
       lt = now;
     }
   }, o);
-
   document.addEventListener('touchmove', e => {
     if (e.touches.length > 1) e.preventDefault();
   }, o);
-
-  /* Context menu on long-press — suppress on game canvas only */
   document.getElementById('game')?.addEventListener('contextmenu', e => e.preventDefault(), o);
 })();
 
@@ -513,18 +512,22 @@ const COLS   = 10, ROWS = 20;
 const CW = canvas.width, CH = canvas.height;  // 300 × 600
 const CELL   = CW / COLS;                     // 30 exact
 
-/* ── PIECE COLORS — each piece has its own fixed color, always ── */
+/* ══════════════════════════════════════════════════════
+   PIECE COLORS — FIXED FOREVER.
+   These are the one source of truth for each piece type.
+   Nothing in the engine ever reassigns these values.
+══════════════════════════════════════════════════════ */
 const PIECE_COLORS = {
-  I:'#7dd3fc',   // baby blue
-  J:'#c084fc',   // violet
-  L:'#ff7eb9',   // pink
-  O:'#facc15',   // yellow
-  S:'#a3e635',   // slime green
-  Z:'#a3e635',   // slime green
-  T:'#c084fc',   // violet
-  BOMB:'#ef4444', // red — always red, never overridden
-  X2:'#cbd5e1',   // silver
-  X3:'#fbbf24',   // gold
+  I:    '#7dd3fc',   // baby blue
+  J:    '#818cf8',   // indigo
+  L:    '#ff7eb9',   // pink
+  O:    '#facc15',   // yellow
+  S:    '#4ade80',   // green
+  Z:    '#f87171',   // red-orange (distinct from S)
+  T:    '#c084fc',   // violet
+  BOMB: '#ef4444',   // red  — ALWAYS red, override-immune
+  X2:   '#cbd5e1',   // silver — this IS the special block's own color
+  X3:   '#fbbf24',   // gold   — this IS the special block's own color
 };
 
 /* ── PIECES ── */
@@ -536,7 +539,6 @@ const PIECE_MATRICES = {
   S:[[0,1,1],[1,1,0],[0,0,0]],
   Z:[[1,1,0],[0,1,1],[0,0,0]],
   T:[[0,1,0],[1,1,1],[0,0,0]],
-  /* Special pieces — same shape as T */
   BOMB:[[0,1,0],[1,1,1],[0,0,0]],
   X2:  [[0,1,0],[1,1,1],[0,0,0]],
   X3:  [[0,1,0],[1,1,1],[0,0,0]],
@@ -548,53 +550,90 @@ let isEnding=false, endTimer=0;
 let score=0, linesTotal=0, currentLevel=1;
 let gameStartTime=0, elapsedMs=0;
 let gravityFrames=42, frameCounter=0, rafId=0;
-let scoreMultiplier=1;  // 1, 2, or 3 — set by special blocks
+let scoreMultiplier=1;
 
-/* ── COLOR OVERRIDE (X2=silver, X3=gold for 60 seconds) ── */
-let colorOverride=null;    // null | 'silver' | 'gold'
-let colorOverrideEnd=0;    // Date.now() timestamp when override expires
-const COLOR_OVERRIDE_VALS={ silver:'#cbd5e1', gold:'#fbbf24' };
+/* ── COLOR OVERRIDE ──────────────────────────────────────
+   null during normal play.
+   'silver' | 'gold' while an X2/X3 is active.
 
-function setColorOverride(type){
-  colorOverride=type;
-  colorOverrideEnd=Date.now()+60000;
-  /* Update badge to show time remaining */
-  multiBadge.textContent=type==='silver'?'2x SILVER':'3x GOLD';
-  multiBadge.style.display='flex';
-  multiBadge.style.background=type==='silver'?'rgba(203,213,225,.2)':'rgba(251,191,36,.2)';
-  multiBadge.style.borderColor=type==='silver'?'rgba(203,213,225,.5)':'rgba(251,191,36,.5)';
-  multiBadge.style.color=type==='silver'?'#cbd5e1':'#fbbf24';
+   WHAT IT DOES:
+   - Pieces that ARRIVE (are born) while override is active
+     get lockedColor = override color when they land.
+   - Pieces already locked are NOT affected.
+   - On expiry: scan playfield; any cell whose lockedColor
+     matches the override tint reverts to PIECE_COLORS[name].
+   - BOMB cells skip all override logic entirely.
+──────────────────────────────────────────────────────── */
+let colorOverride     = null;   // null | 'silver' | 'gold'
+let colorOverrideEnd  = 0;
+const OVERRIDE_COLORS = { silver: '#cbd5e1', gold: '#fbbf24' };
+
+/* Color a NEWLY ARRIVING piece respects override.
+   Returns the color the falling piece should display. */
+function pieceDisplayColor(name) {
+  if (name === 'BOMB') return PIECE_COLORS.BOMB;  // always red
+  // Special blocks always show their own color in-flight
+  if (name === 'X2' || name === 'X3') return PIECE_COLORS[name];
+  // Normal pieces: override tints them if active
+  if (colorOverride) return OVERRIDE_COLORS[colorOverride];
+  return PIECE_COLORS[name];
 }
 
-function clearColorOverride(){
-  colorOverride=null; colorOverrideEnd=0;
-  multiBadge.style.display='none';
-  multiBadge.style.background='';
-  multiBadge.style.borderColor='';
-  multiBadge.style.color='';
-  scoreMultiplier=1;
+/* Color to LOCK INTO the cell — same logic, called at lock time */
+function lockColor(name) {
+  if (name === 'BOMB') return PIECE_COLORS.BOMB;
+  if (name === 'X2' || name === 'X3') return PIECE_COLORS[name];
+  if (colorOverride) return OVERRIDE_COLORS[colorOverride];
+  return PIECE_COLORS[name];
 }
 
-function tickColorOverride(){
-  if(!colorOverride) return;
-  if(Date.now()>colorOverrideEnd) clearColorOverride();
+function setColorOverride(type) {
+  colorOverride    = type;
+  colorOverrideEnd = Date.now() + 60000;
+  const multiBadge = document.getElementById('multiBadge');
+  multiBadge.textContent  = type === 'silver' ? '2x SILVER' : '3x GOLD';
+  multiBadge.style.display       = 'flex';
+  multiBadge.style.background    = type === 'silver' ? 'rgba(203,213,225,.2)' : 'rgba(251,191,36,.2)';
+  multiBadge.style.borderColor   = type === 'silver' ? 'rgba(203,213,225,.5)' : 'rgba(251,191,36,.5)';
+  multiBadge.style.color         = type === 'silver' ? '#cbd5e1' : '#fbbf24';
 }
 
-/* Returns the display color for a locked cell — respects color override.
-   BOMB cells are always red regardless of override. */
-function cellColor(name){
-  if(name==='BOMB') return PIECE_COLORS.BOMB;
-  if(colorOverride) return COLOR_OVERRIDE_VALS[colorOverride];
-  return PIECE_COLORS[name] || '#fff';
+function clearColorOverride() {
+  if (!colorOverride) return;
+  const expiredColor = OVERRIDE_COLORS[colorOverride];
+  /* Revert any locked cell that was painted with the override tint
+     back to its piece's natural color. BOMB cells are immune. */
+  for (let r = 0; r < ROWS; r++) {
+    for (let c = 0; c < COLS; c++) {
+      const cell = playfield[r][c];
+      if (cell && typeof cell === 'object') {
+        if (cell.name !== 'BOMB' && cell.lockedColor === expiredColor) {
+          cell.lockedColor = PIECE_COLORS[cell.name] || '#fff';
+        }
+      }
+    }
+  }
+  colorOverride    = null;
+  colorOverrideEnd = 0;
+  scoreMultiplier  = 1;
+  const multiBadge = document.getElementById('multiBadge');
+  multiBadge.style.display    = 'none';
+  multiBadge.style.background = '';
+  multiBadge.style.borderColor= '';
+  multiBadge.style.color      = '';
+}
+
+function tickColorOverride() {
+  if (!colorOverride) return;
+  if (Date.now() > colorOverrideEnd) clearColorOverride();
 }
 
 /* ── PLAYFIELD ── */
-/* Each cell: 0 = empty, or { name, age }
-   age increments each time a line clear compacts rows */
+/* Each cell: null = empty, or { name, lockedColor, age } */
 const playfield = [];
-for (let r=0;r<ROWS;r++) playfield.push(Array(COLS).fill(null));
+for (let r = 0; r < ROWS; r++) playfield.push(Array(COLS).fill(null));
 
-let stackAge = 0; // increments on every line clear
+let stackAge = 0;
 
 /* ── CANVAS SHAKE ── */
 let shakeFrames=0, shakeMag=0, shakeX=0, shakeY=0;
@@ -610,11 +649,11 @@ function tickShake(){
   if(shakeFrames===0){ shakeMag=0; shakeX=shakeY=0; }
 }
 
-/* ── CANVAS FLASH (drawn inside draw, zero DOM) ── */
+/* ── CANVAS FLASH ── */
 let flashAlpha=0, flashColor='rgba(255,255,255,1)';
 function triggerFlash(a,c){ flashAlpha=Math.max(flashAlpha,Math.min(a,1)); flashColor=c||'rgba(255,255,255,1)'; }
 
-/* ── SLOW THEME (CSS vars, one write per level) ── */
+/* ── SLOW THEME ── */
 const THEMES=[
   {c0:'#7dd3fc',c1:'#c084fc'},{c0:'#f472b6',c1:'#fb7185'},
   {c0:'#34d399',c1:'#4ade80'},{c0:'#a855f7',c1:'#e879f9'},
@@ -653,9 +692,7 @@ function refillBag(){
   const k=[...NORMAL_PIECES];
   while(k.length){ const i=(Math.random()*k.length)|0; bag.push(k.splice(i,1)[0]); }
 }
-
 function pickNextName(){
-  /* Special block chance: 4% bomb, 3% x2, 2% x3 */
   const r = Math.random();
   if (r < 0.04) return 'BOMB';
   if (r < 0.07) return 'X2';
@@ -664,16 +701,28 @@ function pickNextName(){
   return bag.pop();
 }
 
+/* mkPiece — piece.color is the DISPLAY color (may be override-tinted for normal pieces).
+   The natural color is always recoverable via PIECE_COLORS[piece.name]. */
 function mkPiece(name){
   if(!name) name=pickNextName();
   const m = PIECE_MATRICES[name];
-  const c = PIECE_COLORS[name];
-  return { name, color:c, matrix:m.map(r=>r.slice()),
-    row:name==='I'?-1:-2,
-    col:Math.floor(COLS/2)-Math.ceil(m[0].length/2),
-    special: name==='BOMB'||name==='X2'||name==='X3' };
+  return {
+    name,
+    color: pieceDisplayColor(name),  // what to draw while falling
+    matrix: m.map(r=>r.slice()),
+    row: name==='I'?-1:-2,
+    col: Math.floor(COLS/2)-Math.ceil(m[0].length/2),
+    special: name==='BOMB'||name==='X2'||name==='X3',
+  };
 }
 let piece=mkPiece(), nextP=mkPiece();
+
+/* Refresh falling piece color when override state changes */
+function refreshPieceColor(){
+  if(!piece) return;
+  piece.color = pieceDisplayColor(piece.name);
+  if(nextP) nextP.color = pieceDisplayColor(nextP.name);
+}
 
 function valid(m,row,col){
   for(let r=0;r<m.length;r++) for(let c=0;c<m[r].length;c++)
@@ -685,23 +734,14 @@ function getGhost(){ let g=piece.row; while(valid(piece.matrix,g+1,piece.col))g+
 
 /* ── PARTICLES ── */
 const parts=[];
-
-/* 
-  PARTICLE PHILOSOPHY PER LINE COUNT:
-  1 line: small, same-color sparks, low speed, tidy burst
-  2 lines: bigger, two palette colors, more spread
-  3 lines: larger particles, full palette, trails
-  4 lines: CARNAGE — huge particles, all colors, violent
-*/
 const CLEAR_COLORS=[
-  ['#67e8f9','#a7f3d0'],          // 1 line — cool blue-green
-  ['#c084fc','#f472b6','#7dd3fc'],// 2 lines — purple-pink
-  ['#fb923c','#facc15','#f87171','#4ade80'], // 3 lines — warm chaos
-  ['#fff','#ffd166','#ff7eb9','#7dd3fc','#c084fc','#4ade80','#f87171'], // 4 lines
+  ['#67e8f9','#a7f3d0'],
+  ['#c084fc','#f472b6','#7dd3fc'],
+  ['#fb923c','#facc15','#f87171','#4ade80'],
+  ['#fff','#ffd166','#ff7eb9','#7dd3fc','#c084fc','#4ade80','#f87171'],
 ];
 
 function spawnLineClear(rows, n){
-  /* Silver/gold override: use sparkle particles instead */
   if(colorOverride){
     const sparkColor = colorOverride==='silver'
       ? ['#fff','#e2e8f0','#cbd5e1','#f8fafc','#94a3b8']
@@ -709,48 +749,28 @@ function spawnLineClear(rows, n){
     rows.forEach(r=>{
       for(let i=0;i<80;i++){
         const x=Math.random()*CW, y=r*CELL+Math.random()*CELL;
-        /* Sparkles: mostly upward, tight spread, small and glittery */
         const ang=-Math.PI/2+(Math.random()-.5)*Math.PI*.9;
         const spd=2+Math.random()*5;
-        parts.push({
-          x, y, vx:Math.cos(ang)*spd, vy:Math.sin(ang)*spd,
-          life:1, decay:.018+Math.random()*.02,
-          sz:.8+Math.random()*2.5,
-          color:sparkColor[(Math.random()*sparkColor.length)|0],
-          kind: Math.random()<.7?'star':'ci',
-          rot:Math.random()*Math.PI*2, spin:(Math.random()-.5)*.4,
-          glow:true,
-        });
+        parts.push({x,y,vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd,life:1,decay:.018+Math.random()*.02,sz:.8+Math.random()*2.5,color:sparkColor[(Math.random()*sparkColor.length)|0],kind:Math.random()<.7?'star':'ci',rot:Math.random()*Math.PI*2,spin:(Math.random()-.5)*.4,glow:true});
       }
     });
     return;
   }
-
   const colors = CLEAR_COLORS[Math.min(n,4)-1];
-  const countPerRow = [0, 30, 55, 85, 130][Math.min(n,4)];
-  const speedMult   = [0, 1.0, 1.4, 1.9, 2.8][Math.min(n,4)];
-  const sizeMult    = [0, 1.0, 1.3, 1.7, 2.4][Math.min(n,4)];
-  const lifeMult    = [0, 1.0, 1.2, 1.4, 1.8][Math.min(n,4)];
-
+  const countPerRow = [0,30,55,85,130][Math.min(n,4)];
+  const speedMult   = [0,1.0,1.4,1.9,2.8][Math.min(n,4)];
+  const sizeMult    = [0,1.0,1.3,1.7,2.4][Math.min(n,4)];
+  const lifeMult    = [0,1.0,1.2,1.4,1.8][Math.min(n,4)];
   rows.forEach(r => {
     for(let i=0;i<countPerRow;i++){
-      const x   = Math.random()*CW;
-      const y   = r*CELL + Math.random()*CELL;
-      const ang = Math.random()*Math.PI*2;
-      const spd = (1.8+Math.random()*5) * speedMult;
-      const sz  = (1.6+Math.random()*3.5) * sizeMult;
+      const x=Math.random()*CW, y=r*CELL+Math.random()*CELL;
+      const ang=Math.random()*Math.PI*2;
+      const spd=(1.8+Math.random()*5)*speedMult;
+      const sz=(1.6+Math.random()*3.5)*sizeMult;
       let kind='ci';
       if(n===4) kind=Math.random()<.5?'sq':'ci';
       else if(n===3) kind=Math.random()<.35?'sq':'ci';
-      parts.push({
-        x, y,
-        vx:Math.cos(ang)*spd, vy:Math.sin(ang)*spd - (n>2?2:0.5),
-        life:1.0,
-        decay:(0.018+Math.random()*.018) / lifeMult,
-        sz, color:colors[(Math.random()*colors.length)|0],
-        kind, rot:Math.random()*Math.PI*2, spin:(Math.random()-.5)*.25,
-        glow: n===4,
-      });
+      parts.push({x,y,vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd-(n>2?2:0.5),life:1.0,decay:(0.018+Math.random()*.018)/lifeMult,sz,color:colors[(Math.random()*colors.length)|0],kind,rot:Math.random()*Math.PI*2,spin:(Math.random()-.5)*.25,glow:n===4});
     }
   });
 }
@@ -784,7 +804,6 @@ function drawParts(){
       ctx.translate(p.x,p.y); ctx.rotate(p.rot);
       ctx.fillRect(-p.sz/2,-p.sz/2,p.sz,p.sz);
     } else if(p.kind==='star'){
-      /* 4-point sparkle */
       ctx.translate(p.x,p.y); ctx.rotate(p.rot);
       const s=p.sz;
       ctx.beginPath();
@@ -808,12 +827,8 @@ function spawnLockAnim(col,row,color){ lockAnims.push({col,row,t:1.0,color}); }
 const multiBadge=document.getElementById('multiBadge');
 function setMultiplier(n){
   scoreMultiplier=n;
-  if(n>1){
-    multiBadge.textContent=n+'x';
-    multiBadge.style.display='flex';
-  } else {
-    multiBadge.style.display='none';
-  }
+  if(n>1){ multiBadge.textContent=n+'x'; multiBadge.style.display='flex'; }
+  else multiBadge.style.display='none';
 }
 
 /* ── LINE CLEAR STATE ── */
@@ -824,32 +839,28 @@ const LINE_PTS=[0,100,300,500,800];
 function scoreLines(n){
   const pts=(LINE_PTS[n]||0)*currentLevel*scoreMultiplier;
   score+=pts;
-  if(scoreMultiplier>1 && !colorOverride) scoreMultiplier=1; // plain multiplier consumed
-  /* Color override keeps multiplier active for its duration */
+  /* Color override keeps multiplier alive for its duration.
+     Plain (non-override) multiplier is consumed on clear. */
+  if(scoreMultiplier>1 && !colorOverride) scoreMultiplier=1;
 }
 function updateGravity(){ gravityFrames=Math.max(5,42-currentLevel*3); }
 function calcLevel(){ return Math.max(1,1+Math.floor(linesTotal/10)); }
 
-/* ── BOMB HANDLER — clears up to 4 lines from the bottom ── */
+/* ── BOMB HANDLER ── */
 function activateBomb(landRow, landCol){
   playSFX(SFX.bomb,.95);
   triggerShake(9,18);
   triggerFlash(.75,'rgba(255,80,0,.9)');
-
   const cx=(landCol+1)*CELL, cy=landRow*CELL;
   spawnBombExplosion(cx,cy);
-
-  /* Find filled rows from bottom up */
   const filledRows=[];
   for(let r=ROWS-1;r>=0;r--){
     if(playfield[r].some(c=>c!==null)) filledRows.push(r);
     if(filledRows.length>=4) break;
   }
-
   if(filledRows.length>0){
-    /* Animate clear then remove */
     isClearing=true; clearRows=filledRows.slice(); clearTick=14; clearN=filledRows.length;
-    spawnLineClear(filledRows, 4); /* always use 4-line particle intensity */
+    spawnLineClear(filledRows, 4);
   } else {
     piece=nextP; nextP=mkPiece(); updateHud(); updateDanger();
   }
@@ -857,7 +868,6 @@ function activateBomb(landRow, landCol){
 
 /* ── LOCK PIECE ── */
 function lockPiece(){
-  /* Handle special pieces first */
   if(piece.name==='BOMB'){
     let landRow=piece.row, landCol=piece.col;
     for(let r=0;r<piece.matrix.length;r++) for(let c=0;c<piece.matrix[r].length;c++)
@@ -870,26 +880,35 @@ function lockPiece(){
     return;
   }
 
-  /* X2 / X3 — lock into playfield normally, then trigger color override */
   const isX2 = piece.name==='X2';
   const isX3 = piece.name==='X3';
 
-  /* Normal lock — write cells to playfield */
+  /* Write cells to playfield.
+     lockedColor is computed at this moment — captures any active override
+     for normal pieces, or the piece's own natural color for specials/bombs. */
   for(let r=0;r<piece.matrix.length;r++) for(let c=0;c<piece.matrix[r].length;c++) if(piece.matrix[r][c]){
     const pr=piece.row+r, pc=piece.col+c;
     if(pr<0){ triggerGameOver(); return; }
-    playfield[pr][pc]={ name:piece.name, age:stackAge };
+    playfield[pr][pc] = {
+      name:        piece.name,
+      lockedColor: lockColor(piece.name),  // permanent color for this cell
+      age:         stackAge,
+    };
     spawnLockAnim(pc,pr,piece.color);
   }
 
   spawnLockDust(piece.col+Math.floor(piece.matrix[0].length/2), piece.row);
 
-  /* Trigger special effect after locking */
+  /* X2/X3: activate color override AFTER locking (so the special block
+     itself locks in with its own color, not the override it just started) */
   if(isX2){ scoreMultiplier=2; setColorOverride('silver'); playSFX(SFX.levelUp,.8); }
   if(isX3){ scoreMultiplier=3; setColorOverride('gold');   playSFX(SFX.levelUp,.9); }
 
   if(isX2||isX3){
-    piece=nextP; nextP=mkPiece(); updateHud(); updateDanger(); return;
+    /* Refresh the next piece color immediately so it shows override tint */
+    piece=nextP; nextP=mkPiece();
+    refreshPieceColor();
+    updateHud(); updateDanger(); return;
   }
 
   const full=[];
@@ -897,13 +916,11 @@ function lockPiece(){
 
   if(full.length){
     isClearing=true; clearRows=full.slice(); clearTick=14; clearN=full.length;
-    stackAge++; /* age up on every clear */
-
+    stackAge++;
     if(clearN===4){ triggerShake(9,18); triggerFlash(.85,'rgba(255,230,100,.9)'); tetrisCelebration(); }
     else if(clearN===3){ triggerShake(5,13); triggerFlash(.55,'rgba(200,130,255,.85)'); }
     else if(clearN===2){ triggerShake(3,9);  triggerFlash(.30,'rgba(125,211,252,.8)'); }
     else              { triggerShake(1.5,5); triggerFlash(.12,'rgba(255,255,255,.7)'); }
-
     spawnLineClear(full, clearN);
     playSFX(SFX.line,.9);
     return;
@@ -961,12 +978,7 @@ function updateHud(){
   timeEl.textContent=fmtTime(elapsedMs);
 }
 
-/* ── DRAW CELL ──
-   age=0 → full brightness
-   age increases → progressively darker/more desaturated
-   This makes the bottom of old stacks look deep and aged
-   while fresh pieces are vivid.
-*/
+/* ── DRAW CELL ── */
 function drawCell(x,y,color,alpha=1,sx=1,sy=1,age=0){
   const s=CELL-1;
   const cx=x+(CELL-s*sx)/2, cy=y+(CELL-s*sy)/2;
@@ -984,12 +996,12 @@ function drawCell(x,y,color,alpha=1,sx=1,sy=1,age=0){
 
 /* Draw special piece label (BOMB / 2x / 3x) */
 function drawSpecialLabel(x,y,name){
-  const label = name==='BOMB'?'B':name==='X2'?'2x':'3x';
+  const label = name==='BOMB'?'💣':name==='X2'?'2x':'3x';
   const pulse = .7+.3*Math.sin(Date.now()/200);
   ctx.save();
   ctx.globalAlpha=pulse;
   ctx.fillStyle='#000';
-  ctx.font=`bold ${Math.floor(CELL*.42)}px monospace`;
+  ctx.font=`bold ${Math.floor(CELL*.38)}px monospace`;
   ctx.textAlign='center';
   ctx.textBaseline='middle';
   ctx.fillText(label, x+CELL/2, y+CELL/2);
@@ -1009,12 +1021,12 @@ function draw(){
   for(let c=1;c<COLS;c++){ctx.beginPath();ctx.moveTo(c*CELL,0);ctx.lineTo(c*CELL,CH);ctx.stroke();}
   for(let r=1;r<ROWS;r++){ctx.beginPath();ctx.moveTo(0,r*CELL);ctx.lineTo(CW,r*CELL);ctx.stroke();}
 
-  /* Locked cells — draw with age-based dimming, color override if active */
+  /* Locked cells — always drawn with their own lockedColor, never overridden here */
   for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
     const cell=playfield[r][c];
     if(cell && typeof cell === 'object'){
       const age=stackAge-cell.age;
-      drawCell(c*CELL, r*CELL, cellColor(cell.name), 1, 1, 1, age);
+      drawCell(c*CELL, r*CELL, cell.lockedColor, 1, 1, 1, age);
     }
   }
 
@@ -1054,7 +1066,6 @@ function draw(){
     if(v){
       const px=(piece.col+c)*CELL, py=(piece.row+r)*CELL;
       drawCell(px,py,piece.color,1,1,1,0);
-      /* Special piece label on top cell */
       if(piece.special && r===0 && v) drawSpecialLabel(px,py,piece.name);
     }
   }));
@@ -1149,7 +1160,8 @@ document.getElementById('pauseExitBtn')?.addEventListener('pointerdown',e=>{
   e.preventDefault(); e.stopPropagation();
   setPaused(false);
   pauseBGM(); stopDanger();
-  window.location.href='karasuki.html';
+  /* ── EXIT → room_02 ── */
+  window.location.href='karasuki.html?room=room_02';
 },{passive:false});
 
 /* ── HELP ── */
@@ -1230,7 +1242,10 @@ function hardReset(){
   currentLevel=1;gravityFrames=42;elapsedMs=0;endTimer=0;
   clearRows=[];clearTick=0;clearN=0;parts.length=0;lockAnims.length=0;
   flashAlpha=0;shakeMag=0;shakeFrames=0;stackAge=0;
-  clearColorOverride(); scoreMultiplier=1;
+  /* Clear override state — do NOT call clearColorOverride() here because
+     that scans the playfield; just zero the vars directly */
+  colorOverride=null; colorOverrideEnd=0; scoreMultiplier=1;
+  multiBadge.style.display='none';
   for(let r=0;r<ROWS;r++) playfield[r].fill(null);
   bag.length=0;piece=mkPiece();nextP=mkPiece();
   applyTheme(1);updateHud();
