@@ -724,23 +724,36 @@ function handleIosPick(btn, card) {
     iosAnswered = true;
     btn.classList.add('ios-correct');
     Array.from(iosGrid.children).forEach(b => { if (b !== btn) b.classList.add('ios-locked'); });
-    playSfx('ding');
-    if (iosFirstTry) { score++; scoreEl.textContent = score; updateStreak(streak+1); }
+     
+   if (iosFirstTry) { score++; scoreEl.textContent = score; updateStreak(streak+1); }
     updateDots();
-     
+    const mp3 = order[idx].mp3;
+    const dingClone = SFX['ding'] ? SFX['ding'].cloneNode() : null;
+    if (dingClone) {
+      dingClone.setAttribute('playsinline',''); dingClone.setAttribute('webkit-playsinline','');
+      dingClone.play().catch(()=>{});
+      dingClone.onended = () => {
+        if (!mp3) { setTimeout(() => { idx++; if (idx >= order.length) { showResults(); } else { showCard(); } }, 800); return; }
+        const a = new Audio(CFG.audioBase+mp3);
+        a.setAttribute('playsinline',''); a.setAttribute('webkit-playsinline','');
+        a.setAttribute('preload','auto');
+        a.play().catch(()=>{});
+        a.onended = () => { setTimeout(() => { idx++; if (idx >= order.length) { showResults(); } else { showCard(); } }, 800); };
+        setTimeout(() => { if (iosAnswered) { idx++; if (idx >= order.length) { showResults(); } else { showCard(); } } }, 7000);
+      };
+    } else if (mp3) {
+      const a = new Audio(CFG.audioBase+mp3);
+      a.setAttribute('playsinline',''); a.setAttribute('webkit-playsinline','');
+      a.setAttribute('preload','auto');
+      a.play().catch(()=>{});
+      a.onended = () => { setTimeout(() => { idx++; if (idx >= order.length) { showResults(); } else { showCard(); } }, 800); };
+       
+      setTimeout(() => { if (isBusy) { idx++; isBusy=false; if (idx >= order.length) { showResults(); } else { showCard(); } } }, 7000);
+       
+    } else {
+      setTimeout(() => { idx++; if (idx >= order.length) { showResults(); } else { showCard(); } }, 1500);
+    }
 
-    /* 3000ms**(fixed) breathing room before next card */
-     
-   if (mp3) {
-  const a = new Audio(CFG.audioBase+mp3);
-  a.setAttribute('playsinline',''); a.setAttribute('webkit-playsinline','');
-  a.setAttribute('preload','auto');
-  setTimeout(() => { a.play().catch(()=>{}); }, 200);
-  a.onended = () => { setTimeout(() => { idx++; if (idx >= order.length) { showResults(); } else { showCard(); } }, 800); };
-  setTimeout(() => { if (iosAnswered) { idx++; if (idx >= order.length) { showResults(); } else { showCard(); } } }, 7000);
-} else {
-  setTimeout(() => { idx++; if (idx >= order.length) { showResults(); } else { showCard(); } }, 1500);
-}
      
   } else {
     iosFirstTry = false; updateStreak(0);
