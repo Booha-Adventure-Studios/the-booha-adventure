@@ -691,8 +691,7 @@ function handleIosPick(btn, card) {
     playSfx('ding');
     if (iosFirstTry) { score++; scoreEl.textContent = score; updateStreak(streak+1); }
     updateDots();
-     
-     
+    const mp3 = order[idx].mp3;
     if (mp3) {
   const a = new Audio(CFG.audioBase+mp3);
   a.setAttribute('playsinline',''); a.setAttribute('webkit-playsinline','');
