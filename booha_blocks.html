@@ -452,6 +452,12 @@ body {
 </div>
 
 <script>
+/* ██████████████████████████████████████████████████████
+   BOOHA-BLOCKS-V2-FIXED
+   If you can find this text in View Source, this is the
+   correct patched file. Look for it before uploading.
+██████████████████████████████████████████████████████ */
+
 /* ═══════════════════════════════════════════════════════
    BOOHA BLOCKS ENGINE  — COLOR RULES:
 
@@ -566,24 +572,16 @@ let scoreMultiplier=1;
 ──────────────────────────────────────────────────────── */
 let colorOverride     = null;   // null | 'silver' | 'gold'
 let colorOverrideEnd  = 0;
-const OVERRIDE_COLORS = { silver: '#cbd5e1', gold: '#fbbf24' };
 
-/* Color a NEWLY ARRIVING piece respects override.
-   Returns the color the falling piece should display. */
+
+/* Every piece always shows its own natural color. No override tinting ever.
+   X2/X3 is a scoring mechanic only — visually just their own silver/gold. */
 function pieceDisplayColor(name) {
-  if (name === 'BOMB') return PIECE_COLORS.BOMB;  // always red
-  // Special blocks always show their own color in-flight
-  if (name === 'X2' || name === 'X3') return PIECE_COLORS[name];
-  // Normal pieces: override tints them if active
-  if (colorOverride) return OVERRIDE_COLORS[colorOverride];
   return PIECE_COLORS[name];
 }
 
-/* Color to LOCK INTO the cell — same logic, called at lock time */
+/* Lock color is also always the piece's natural color. */
 function lockColor(name) {
-  if (name === 'BOMB') return PIECE_COLORS.BOMB;
-  if (name === 'X2' || name === 'X3') return PIECE_COLORS[name];
-  if (colorOverride) return OVERRIDE_COLORS[colorOverride];
   return PIECE_COLORS[name];
 }
 
@@ -600,19 +598,6 @@ function setColorOverride(type) {
 
 function clearColorOverride() {
   if (!colorOverride) return;
-  const expiredColor = OVERRIDE_COLORS[colorOverride];
-  /* Revert any locked cell that was painted with the override tint
-     back to its piece's natural color. BOMB cells are immune. */
-  for (let r = 0; r < ROWS; r++) {
-    for (let c = 0; c < COLS; c++) {
-      const cell = playfield[r][c];
-      if (cell && typeof cell === 'object') {
-        if (cell.name !== 'BOMB' && cell.lockedColor === expiredColor) {
-          cell.lockedColor = PIECE_COLORS[cell.name] || '#fff';
-        }
-      }
-    }
-  }
   colorOverride    = null;
   colorOverrideEnd = 0;
   scoreMultiplier  = 1;
@@ -701,14 +686,14 @@ function pickNextName(){
   return bag.pop();
 }
 
-/* mkPiece — piece.color is the DISPLAY color (may be override-tinted for normal pieces).
-   The natural color is always recoverable via PIECE_COLORS[piece.name]. */
+/* mkPiece — NO color stored. Display color always computed at draw time
+   via pieceDisplayColor(piece.name). Lock color computed at lock time
+   via lockColor(piece.name). piece.name is the only source of truth. */
 function mkPiece(name){
   if(!name) name=pickNextName();
   const m = PIECE_MATRICES[name];
   return {
     name,
-    color: pieceDisplayColor(name),  // what to draw while falling
     matrix: m.map(r=>r.slice()),
     row: name==='I'?-1:-2,
     col: Math.floor(COLS/2)-Math.ceil(m[0].length/2),
@@ -716,13 +701,6 @@ function mkPiece(name){
   };
 }
 let piece=mkPiece(), nextP=mkPiece();
-
-/* Refresh falling piece color when override state changes */
-function refreshPieceColor(){
-  if(!piece) return;
-  piece.color = pieceDisplayColor(piece.name);
-  if(nextP) nextP.color = pieceDisplayColor(nextP.name);
-}
 
 function valid(m,row,col){
   for(let r=0;r<m.length;r++) for(let c=0;c<m[r].length;c++)
@@ -778,7 +756,7 @@ function spawnLineClear(rows, n){
 function spawnLockDust(col,row){
   for(let i=0;i<8;i++){
     const a=(i/8)*Math.PI*2;
-    parts.push({x:(col+.5)*CELL,y:(row+1)*CELL,vx:Math.cos(a)*.9,vy:Math.sin(a)*.9-.4,life:1,decay:.065,sz:1.4+Math.random()*2,color:piece.color,kind:'ci',rot:0,spin:0,glow:false});
+    parts.push({x:(col+.5)*CELL,y:(row+1)*CELL,vx:Math.cos(a)*.9,vy:Math.sin(a)*.9-.4,life:1,decay:.065,sz:1.4+Math.random()*2,color:lockColor(piece.name),kind:'ci',rot:0,spin:0,glow:false});
   }
 }
 
@@ -894,7 +872,7 @@ function lockPiece(){
       lockedColor: lockColor(piece.name),  // permanent color for this cell
       age:         stackAge,
     };
-    spawnLockAnim(pc,pr,piece.color);
+    spawnLockAnim(pc,pr,lockColor(piece.name));
   }
 
   spawnLockDust(piece.col+Math.floor(piece.matrix[0].length/2), piece.row);
@@ -905,9 +883,7 @@ function lockPiece(){
   if(isX3){ scoreMultiplier=3; setColorOverride('gold');   playSFX(SFX.levelUp,.9); }
 
   if(isX2||isX3){
-    /* Refresh the next piece color immediately so it shows override tint */
     piece=nextP; nextP=mkPiece();
-    refreshPieceColor();
     updateHud(); updateDanger(); return;
   }
 
@@ -983,14 +959,18 @@ function drawCell(x,y,color,alpha=1,sx=1,sy=1,age=0){
   const s=CELL-1;
   const cx=x+(CELL-s*sx)/2, cy=y+(CELL-s*sy)/2;
   const ageFactor=Math.max(0.45, 1-age*0.07);
+
   ctx.save();
-  ctx.globalAlpha=alpha*ageFactor;
-  ctx.fillStyle=color;
-  if(ctx.roundRect) ctx.roundRect(cx,cy,s*sx,s*sy,3);
-  else ctx.rect(cx,cy,s*sx,s*sy);
+  ctx.globalAlpha = alpha*ageFactor;
+  ctx.fillStyle = color;
+
+  ctx.beginPath();
+  if (ctx.roundRect) ctx.roundRect(cx, cy, s*sx, s*sy, 3);
+  else ctx.rect(cx, cy, s*sx, s*sy);
   ctx.fill();
-  ctx.fillStyle=`rgba(255,255,255,${0.14*ageFactor})`;
-  ctx.fillRect(cx+2,cy+2,s*.28*sx,s*.28*sy);
+
+  ctx.fillStyle = `rgba(255,255,255,${0.14*ageFactor})`;
+  ctx.fillRect(cx+2, cy+2, s*.28*sx, s*.28*sy);
   ctx.restore();
 }
 
@@ -1049,7 +1029,7 @@ function draw(){
   if(!isClearing){
     const gr=getGhost();
     if(gr!==piece.row) piece.matrix.forEach((row,r)=>row.forEach((v,c)=>{
-      if(v){ ctx.save();ctx.globalAlpha=.16;ctx.strokeStyle=piece.color;ctx.lineWidth=1.5;ctx.strokeRect((piece.col+c)*CELL+1,(gr+r)*CELL+1,CELL-2,CELL-2);ctx.restore(); }
+      if(v){ ctx.save();ctx.globalAlpha=.16;ctx.strokeStyle=pieceDisplayColor(piece.name);ctx.lineWidth=1.5;ctx.strokeRect((piece.col+c)*CELL+1,(gr+r)*CELL+1,CELL-2,CELL-2);ctx.restore(); }
     }));
   }
 
@@ -1065,7 +1045,7 @@ function draw(){
   piece.matrix.forEach((row,r)=>row.forEach((v,c)=>{
     if(v){
       const px=(piece.col+c)*CELL, py=(piece.row+r)*CELL;
-      drawCell(px,py,piece.color,1,1,1,0);
+      drawCell(px,py,pieceDisplayColor(piece.name),1,1,1,0);
       if(piece.special && r===0 && v) drawSpecialLabel(px,py,piece.name);
     }
   }));
