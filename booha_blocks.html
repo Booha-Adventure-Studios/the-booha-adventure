@@ -547,7 +547,7 @@ let scoreMultiplier=1;  // 1, 2, or 3 — set by special blocks
 /* Each cell: 0 = empty, or { name, age }
    age increments each time a line clear compacts rows */
 const playfield = [];
-for (let r=0;r<ROWS;r++) playfield.push(Array(COLS).fill(0));
+for (let r=0;r<ROWS;r++) playfield.push(Array(COLS).fill(null));
 
 let stackAge = 0; // increments on every line clear
 
@@ -583,7 +583,7 @@ function applyTheme(lvl){
 }
 
 /* ── AUDIO ── */
-const BASE='the-booha-adventure/assets/blocks/';
+const BASE='../assets/blocks/';
 let audioUnlocked=false;
 const SFX={ bgm:['booha-tetris-january.mp3','booha-tetris-january-2.mp3','booha-tetris-january-3.mp3','bgm4.mp3'], line:'booha-tetris-sound.mp3', levelUp:'correct.mp3', danger:'too-high.mp3', gameOver:'game-over.mp3', bomb:'clear.mp3' };
 let bgmIdx=0;
@@ -763,7 +763,7 @@ function activateBomb(landRow, landCol){
   /* Clear 3×3 area centred on the T's centre cell */
   for(let r=landRow-1; r<=landRow+1; r++){
     for(let c=landCol; c<=landCol+2; c++){
-      if(r>=0&&r<ROWS&&c>=0&&c<COLS) playfield[r][c]=0;
+      if(r>=0&&r<ROWS&&c>=0&&c<COLS) playfield[r][c]=null;
     }
   }
   piece=nextP; nextP=mkPiece();
@@ -800,7 +800,7 @@ function lockPiece(){
   spawnLockDust(piece.col+Math.floor(piece.matrix[0].length/2), piece.row);
 
   const full=[];
-  for(let r=0;r<ROWS;r++) if(playfield[r].every(c=>c!==0)) full.push(r);
+  for(let r=0;r<ROWS;r++) if(playfield[r].every(c=>c!==0&&c!==null)) full.push(r);
 
   if(full.length){
     isClearing=true; clearRows=full.slice(); clearTick=14; clearN=full.length;
@@ -821,7 +821,7 @@ function lockPiece(){
 function commitClear(){
   const n=clearRows.length;
   clearRows.sort((a,b)=>b-a).forEach(r=>playfield.splice(r,1));
-  for(let i=0;i<n;i++) playfield.unshift(Array(COLS).fill(0));
+  for(let i=0;i<n;i++) playfield.unshift(Array(COLS).fill(null));
   linesTotal+=n; scoreLines(n);
   const nl=calcLevel();
   if(nl!==currentLevel){ currentLevel=nl; playSFX(SFX.levelUp,.9); applyTheme(currentLevel); updateGravity(); }
@@ -883,8 +883,9 @@ function drawCell(x,y,color,alpha=1,sx=1,sy=1,age=0){
 
   ctx.save();
   ctx.globalAlpha=alpha*ageFactor;
-  ctx.shadowBlur=age===0?8:3;
-  ctx.shadowColor=color;
+  /* Only glow on fresh cells — older cells get no shadow (performance + visual) */
+  ctx.shadowBlur  = age === 0 ? 6 : 0;
+  ctx.shadowColor = color;
   ctx.fillStyle=color;
   if(ctx.roundRect) ctx.roundRect(cx,cy,s*sx,s*sy,3);
   else ctx.rect(cx,cy,s*sx,s*sy);
@@ -928,7 +929,7 @@ function draw(){
   /* Locked cells — draw with age-based dimming */
   for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
     const cell=playfield[r][c];
-    if(cell){
+    if(cell && typeof cell === 'object'){
       const age = stackAge - cell.age;
       drawCell(c*CELL, r*CELL, PIECE_COLORS[cell.name], 1, 1, 1, age);
     }
@@ -1061,7 +1062,7 @@ function setPaused(v){
 }
 pauseBtn?.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(!gameStarted||isGameOver)return;setPaused(!isPaused);},{passive:false});
 document.getElementById('pauseResumeBtn')?.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();setPaused(false);},{passive:false});
-document.getElementById('pauseExitBtn')?.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();setPaused(false);window.location.href='../maze.html';},{passive:false});
+document.getElementById('pauseExitBtn')?.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();setPaused(false);window.location.href='../karasuki.html?room=room_02';},{passive:false});
 
 /* ── HELP ── */
 const helpBtn=document.getElementById('helpBtn');
@@ -1142,7 +1143,7 @@ function hardReset(){
   clearRows=[];clearTick=0;clearN=0;parts.length=0;lockAnims.length=0;
   flashAlpha=0;shakeMag=0;shakeFrames=0;stackAge=0;
   setMultiplier(1);
-  for(let r=0;r<ROWS;r++) playfield[r].fill(0);
+  for(let r=0;r<ROWS;r++) playfield[r].fill(null);
   bag.length=0;piece=mkPiece();nextP=mkPiece();
   applyTheme(1);updateHud();
 }
