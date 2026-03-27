@@ -519,22 +519,25 @@ const CW = canvas.width, CH = canvas.height;  // 300 × 600
 const CELL   = CW / COLS;                     // 30 exact
 
 /* ══════════════════════════════════════════════════════
-   PIECE COLORS — FIXED FOREVER.
-   These are the one source of truth for each piece type.
-   Nothing in the engine ever reassigns these values.
+   PIECE COLORS — BOOHA PALETTE. Fixed forever.
+   Color is NEVER stored. Always computed at draw time
+   via displayBlockColor(name, lockedColor).
 ══════════════════════════════════════════════════════ */
 const PIECE_COLORS = {
-  I:    '#7dd3fc',   // baby blue
-  J:    '#818cf8',   // indigo
-  L:    '#ff7eb9',   // pink
-  O:    '#facc15',   // yellow
-  S:    '#4ade80',   // green
-  Z:    '#f87171',   // red-orange (distinct from S)
-  T:    '#c084fc',   // violet
-  BOMB: '#ef4444',   // red  — ALWAYS red, override-immune
-  X2:   '#cbd5e1',   // silver — this IS the special block's own color
-  X3:   '#fbbf24',   // gold   — this IS the special block's own color
+  I:    '#7dd3fc',   // sky
+  J:    '#c084fc',   // violet
+  L:    '#ff8dc7',   // pink
+  O:    '#ffd166',   // soft gold
+  S:    '#7ee7c1',   // mint
+  Z:    '#ff7a90',   // coral pink
+  T:    '#9b8cff',   // booha purple
+  BOMB: '#ff3b30',   // flashing red — override-immune
+  X2:   '#dfe7f2',   // silver
+  X3:   '#f6c453',   // gold
 };
+
+/* Override tints for Booha Fever mode */
+const OVERRIDE_COLORS = { silver: '#dfe7f2', gold: '#f6c453' };
 
 /* ── PIECES ── */
 const PIECE_MATRICES = {
@@ -558,32 +561,28 @@ let gameStartTime=0, elapsedMs=0;
 let gravityFrames=42, frameCounter=0, rafId=0;
 let scoreMultiplier=1;
 
-/* ── COLOR OVERRIDE ──────────────────────────────────────
-   null during normal play.
-   'silver' | 'gold' while an X2/X3 is active.
-
-   WHAT IT DOES:
-   - Pieces that ARRIVE (are born) while override is active
-     get lockedColor = override color when they land.
-   - Pieces already locked are NOT affected.
-   - On expiry: scan playfield; any cell whose lockedColor
-     matches the override tint reverts to PIECE_COLORS[name].
-   - BOMB cells skip all override logic entirely.
+/* ── COLOR OVERRIDE (Booha Fever) ───────────────────────
+   colorOverride = null | 'silver' | 'gold'
+   Active for 60 sec after X2/X3 lands.
+   Affects DISPLAY ONLY — no cell data ever mutated.
+   BOMB is always red regardless.
 ──────────────────────────────────────────────────────── */
-let colorOverride     = null;   // null | 'silver' | 'gold'
-let colorOverrideEnd  = 0;
+let colorOverride    = null;
+let colorOverrideEnd = 0;
 
-
-/* Every piece always shows its own natural color. No override tinting ever.
-   X2/X3 is a scoring mechanic only — visually just their own silver/gold. */
-function pieceDisplayColor(name) {
-  return PIECE_COLORS[name];
+/* Draw-time color resolver. Always returns the natural color.
+   Fever (X2/X3) is visual overlay only — never touches block color. */
+function displayBlockColor(name, naturalColor) {
+  if (name === 'BOMB') return PIECE_COLORS.BOMB;
+  if (name === 'X2' || name === 'X3') return naturalColor || PIECE_COLORS[name];
+  if (colorOverride) return OVERRIDE_COLORS[colorOverride];
+  return naturalColor || PIECE_COLORS[name];
 }
 
-/* Lock color is also always the piece's natural color. */
-function lockColor(name) {
-  return PIECE_COLORS[name];
-}
+  
+/* Convenience wrappers */
+function pieceDisplayColor(name) { return displayBlockColor(name, PIECE_COLORS[name]); }
+function lockColor(name)         { return PIECE_COLORS[name]; }
 
 function setColorOverride(type) {
   colorOverride    = type;
@@ -601,11 +600,18 @@ function clearColorOverride() {
   colorOverride    = null;
   colorOverrideEnd = 0;
   scoreMultiplier  = 1;
+  /* Hide multiplier badge */
   const multiBadge = document.getElementById('multiBadge');
   multiBadge.style.display    = 'none';
   multiBadge.style.background = '';
   multiBadge.style.borderColor= '';
   multiBadge.style.color      = '';
+  /* Restore HUD accent colors to normal CSS-driven state */
+  [document.getElementById('linesVal'),
+   document.getElementById('scoreVal'),
+   document.getElementById('levelVal')].forEach(el => {
+    if(el){ el.style.color = ''; el.style.textShadow = ''; }
+  });
 }
 
 function tickColorOverride() {
@@ -893,10 +899,13 @@ function lockPiece(){
   if(full.length){
     isClearing=true; clearRows=full.slice(); clearTick=14; clearN=full.length;
     stackAge++;
-    if(clearN===4){ triggerShake(9,18); triggerFlash(.85,'rgba(255,230,100,.9)'); tetrisCelebration(); }
-    else if(clearN===3){ triggerShake(5,13); triggerFlash(.55,'rgba(200,130,255,.85)'); }
-    else if(clearN===2){ triggerShake(3,9);  triggerFlash(.30,'rgba(125,211,252,.8)'); }
-    else              { triggerShake(1.5,5); triggerFlash(.12,'rgba(255,255,255,.7)'); }
+    /* During Booha Fever, flashes use the fever color and hit harder */
+    const feverFlash = colorOverride==='silver' ? 'rgba(220,230,242,' : colorOverride==='gold' ? 'rgba(246,196,83,' : null;
+    const fMult = colorOverride ? 1.4 : 1.0;  // fever boosts flash intensity
+    if(clearN===4){ triggerShake(9,18);         triggerFlash(Math.min(1,.85*fMult), feverFlash ? feverFlash+'.95)' : 'rgba(255,230,100,.9)'); tetrisCelebration(); }
+    else if(clearN===3){ triggerShake(5,13);    triggerFlash(Math.min(1,.55*fMult), feverFlash ? feverFlash+'.9)'  : 'rgba(200,130,255,.85)'); }
+    else if(clearN===2){ triggerShake(3,9);     triggerFlash(Math.min(1,.30*fMult), feverFlash ? feverFlash+'.85)' : 'rgba(125,211,252,.8)'); }
+    else              { triggerShake(1.5,5);    triggerFlash(Math.min(1,.12*fMult), feverFlash ? feverFlash+'.7)'  : 'rgba(255,255,255,.7)'); }
     spawnLineClear(full, clearN);
     playSFX(SFX.line,.9);
     return;
@@ -952,6 +961,12 @@ function updateHud(){
   linesEl.textContent=linesTotal; scoreEl.textContent=score; levelEl.textContent=currentLevel;
   if(gameStarted&&!isGameOver) elapsedMs=Date.now()-gameStartTime;
   timeEl.textContent=fmtTime(elapsedMs);
+  /* Booha Fever — HUD softly pulses silver or gold */
+  const feverColor = colorOverride==='silver' ? '#dfe7f2' : colorOverride==='gold' ? '#f6c453' : null;
+  [linesEl,scoreEl,levelEl].forEach(el=>{
+    el.style.color     = feverColor || '';
+    el.style.textShadow= feverColor ? '0 0 10px '+feverColor : '';
+  });
 }
 
 /* ── DRAW CELL ── */
@@ -964,27 +979,65 @@ function drawCell(x,y,color,alpha=1,sx=1,sy=1,age=0){
   ctx.globalAlpha = alpha*ageFactor;
   ctx.fillStyle = color;
 
-  ctx.beginPath();
-  if (ctx.roundRect) ctx.roundRect(cx, cy, s*sx, s*sy, 3);
-  else ctx.rect(cx, cy, s*sx, s*sy);
+  ctx.beginPath(); // ✅ ADD THIS
+  if (ctx.roundRect) ctx.roundRect(cx,cy,s*sx,s*sy,3);
+  else ctx.rect(cx,cy,s*sx,s*sy);
   ctx.fill();
 
   ctx.fillStyle = `rgba(255,255,255,${0.14*ageFactor})`;
-  ctx.fillRect(cx+2, cy+2, s*.28*sx, s*.28*sy);
+  ctx.fillRect(cx+2,cy+2,s*.28*sx,s*.28*sy);
   ctx.restore();
 }
 
-/* Draw special piece label (BOMB / 2x / 3x) */
+/* Draw special overlays on top of a cell.
+   BOMB  = no text/emoji, just a pulsing red glow border.
+   X2/X3 = strong glow + bright border + bold text label. */
 function drawSpecialLabel(x,y,name){
-  const label = name==='BOMB'?'💣':name==='X2'?'2x':'3x';
-  const pulse = .7+.3*Math.sin(Date.now()/200);
+  const s = CELL-1;
+  const cx = x+(CELL-s)/2, cy = y+(CELL-s)/2;
+  const t  = Date.now();
+
+  if(name==='BOMB'){
+    /* Pulsing red glow border — no text */
+    const pulse = 0.55 + 0.45*Math.sin(t/120);
+    ctx.save();
+    ctx.globalAlpha = pulse;
+    ctx.shadowBlur  = 14;
+    ctx.shadowColor = '#ff3b30';
+    ctx.strokeStyle = '#ff6b60';
+    ctx.lineWidth   = 2;
+    ctx.beginPath();
+    if(ctx.roundRect) ctx.roundRect(cx+1,cy+1,s-2,s-2,3);
+    else ctx.rect(cx+1,cy+1,s-2,s-2);
+    ctx.stroke();
+    ctx.restore();
+    return;
+  }
+
+  /* X2 / X3 */
+  const label = name==='X2' ? '2x' : '3x';
+  const color = PIECE_COLORS[name]; // silver or gold
+  const pulse = 0.8 + 0.2*Math.sin(t/180);
+
   ctx.save();
-  ctx.globalAlpha=pulse;
-  ctx.fillStyle='#000';
-  ctx.font=`bold ${Math.floor(CELL*.38)}px monospace`;
-  ctx.textAlign='center';
-  ctx.textBaseline='middle';
-  ctx.fillText(label, x+CELL/2, y+CELL/2);
+  /* Glow border */
+  ctx.globalAlpha = pulse;
+  ctx.shadowBlur  = 18;
+  ctx.shadowColor = color;
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth   = 1.5;
+  ctx.beginPath();
+  if(ctx.roundRect) ctx.roundRect(cx+1,cy+1,s-2,s-2,3);
+  else ctx.rect(cx+1,cy+1,s-2,s-2);
+  ctx.stroke();
+  /* Label text */
+  ctx.shadowBlur = 0;
+  ctx.globalAlpha = 0.92;
+  ctx.fillStyle = name==='X2' ? '#1a1a2e' : '#1a1000';
+  ctx.font = `bold ${Math.floor(CELL*.4)}px monospace`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(label, x+CELL/2, y+CELL/2+1);
   ctx.restore();
 }
 
@@ -1001,12 +1054,33 @@ function draw(){
   for(let c=1;c<COLS;c++){ctx.beginPath();ctx.moveTo(c*CELL,0);ctx.lineTo(c*CELL,CH);ctx.stroke();}
   for(let r=1;r<ROWS;r++){ctx.beginPath();ctx.moveTo(0,r*CELL);ctx.lineTo(CW,r*CELL);ctx.stroke();}
 
-  /* Locked cells — always drawn with their own lockedColor, never overridden here */
+  /* ── BOOHA FEVER — fog + sparkle drift overlay ──────── */
+  if(colorOverride){
+    const fc   = colorOverride==='silver' ? 'rgba(220,230,242,' : 'rgba(246,196,83,';
+    const t    = Date.now();
+    const fog  = 0.04 + 0.02*Math.sin(t/900);
+    ctx.save();
+    ctx.fillStyle = fc+fog+')';
+    ctx.fillRect(0,0,CW,CH);
+    /* Tiny sparkle drift — 3 random specks per frame */
+    ctx.globalCompositeOperation='screen';
+    for(let i=0;i<3;i++){
+      const sx=Math.random()*CW, sy=Math.random()*CH;
+      const sr=0.6+Math.random()*1.4;
+      const sa=0.15+0.35*Math.random();
+      ctx.globalAlpha=sa;
+      ctx.fillStyle=colorOverride==='silver'?'#fff':'#ffd166';
+      ctx.beginPath(); ctx.arc(sx,sy,sr,0,Math.PI*2); ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  /* Locked cells */
   for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
     const cell=playfield[r][c];
     if(cell && typeof cell === 'object'){
       const age=stackAge-cell.age;
-      drawCell(c*CELL, r*CELL, cell.lockedColor, 1, 1, 1, age);
+      drawCell(c*CELL, r*CELL, displayBlockColor(cell.name, cell.lockedColor), 1, 1, 1, age);
     }
   }
 
@@ -1029,7 +1103,7 @@ function draw(){
   if(!isClearing){
     const gr=getGhost();
     if(gr!==piece.row) piece.matrix.forEach((row,r)=>row.forEach((v,c)=>{
-      if(v){ ctx.save();ctx.globalAlpha=.16;ctx.strokeStyle=pieceDisplayColor(piece.name);ctx.lineWidth=1.5;ctx.strokeRect((piece.col+c)*CELL+1,(gr+r)*CELL+1,CELL-2,CELL-2);ctx.restore(); }
+      if(v){ ctx.save();ctx.globalAlpha=.16;ctx.strokeStyle=displayBlockColor(piece.name, PIECE_COLORS[piece.name]);ctx.lineWidth=1.5;ctx.strokeRect((piece.col+c)*CELL+1,(gr+r)*CELL+1,CELL-2,CELL-2);ctx.restore(); }
     }));
   }
 
@@ -1045,8 +1119,11 @@ function draw(){
   piece.matrix.forEach((row,r)=>row.forEach((v,c)=>{
     if(v){
       const px=(piece.col+c)*CELL, py=(piece.row+r)*CELL;
-      drawCell(px,py,pieceDisplayColor(piece.name),1,1,1,0);
-      if(piece.special && r===0 && v) drawSpecialLabel(px,py,piece.name);
+      drawCell(px,py,displayBlockColor(piece.name, PIECE_COLORS[piece.name]),1,1,1,0);
+      if(piece.special && v){
+        /* BOMB pulses on every cell; X2/X3 label only on top row */
+        if(piece.name==='BOMB' || r===0) drawSpecialLabel(px,py,piece.name);
+      }
     }
   }));
 
