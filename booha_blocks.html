@@ -586,7 +586,7 @@ function lockColor(name)         { return PIECE_COLORS[name]; }
 
 function setColorOverride(type) {
   colorOverride    = type;
-  colorOverrideEnd = Date.now() + 60000;
+  colorOverrideEnd = Date.now() + 45000;
   const multiBadge = document.getElementById('multiBadge');
   multiBadge.textContent  = type === 'silver' ? '2x SILVER' : '3x GOLD';
   multiBadge.style.display       = 'flex';
@@ -683,11 +683,14 @@ function refillBag(){
   const k=[...NORMAL_PIECES];
   while(k.length){ const i=(Math.random()*k.length)|0; bag.push(k.splice(i,1)[0]); }
 }
+
 function pickNextName(){
   const r = Math.random();
-  if (r < 0.04) return 'BOMB';
-  if (r < 0.07) return 'X2';
-  if (r < 0.09) return 'X3';
+
+  if (r < 0.02) return 'BOMB';              // 2%
+  if (r < 0.028) return 'X2';               // 0.8%
+  if (currentLevel >= 4 && r < 0.034) return 'X3'; // 0.6%, only level 4+
+
   if (!bag.length) refillBag();
   return bag.pop();
 }
