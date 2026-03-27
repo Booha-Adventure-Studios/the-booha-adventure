@@ -347,10 +347,9 @@ U.mount(`
   </div>
   <div class="aq-status" id="aq-status">TAP MIC TO ANSWER</div>
   ` : `
-  <div style="display:flex;justify-content:center;margin-bottom:.25rem;">
-    <button class="aq-play-btn" id="aq-play" aria-label="Listen">▶</button>
-  </div>
+  
   <div class="aq-ios-grid" id="aq-ios-grid"></div>
+  
   `}
   <div class="aq-bottom-bar">
     <button class="aq-retry-btn" id="aq-retry" style="display:none">TRY AGAIN / もう一回</button>
@@ -594,9 +593,11 @@ function showCard() {
   hiraEl.textContent = card.hira || '';
   aqCard.style.setProperty('--aq-jp-len', (card.jp || '').length);
   stopProgress(); progWrap.style.display = 'none';
+   
   retryBtn.style.display = 'none'; skipBtn.style.display = 'none';
-  playBtn.disabled = false;
+  if (playBtn) playBtn.disabled = false;
   aqCard.classList.remove('listening','wrong-state');
+   
   updateDots();
   if (!isIOS) {
     mountWords(card.en);
@@ -717,13 +718,10 @@ function handleIosPick(btn, card) {
     playSfx('ding');
     if (iosFirstTry) { score++; scoreEl.textContent = score; updateStreak(streak+1); }
     updateDots();
-    const mp3 = order[idx].mp3;
-    if (mp3) {
-      const a = new Audio(CFG.audioBase+mp3);
-      a.setAttribute('playsinline',''); a.setAttribute('webkit-playsinline','');
-      a.play().catch(()=>{});
-    }
+     
+
     /* 3000ms**(fixed) breathing room before next card */
+     
    if (mp3) {
   const a = new Audio(CFG.audioBase+mp3);
   a.setAttribute('playsinline',''); a.setAttribute('webkit-playsinline','');
@@ -744,7 +742,7 @@ function handleIosPick(btn, card) {
 }
 
 /* ═══ PLAY BUTTON — smash protection ═══ */
-playBtn.addEventListener('click', () => {
+if (playBtn) playBtn.addEventListener('click', () => {
   if (listening || playBtn.disabled) return;
   const card = order[idx]; if (!card.mp3) return;
   try {
