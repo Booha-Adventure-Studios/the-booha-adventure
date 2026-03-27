@@ -778,7 +778,7 @@
       descLockedKanji:'このゲームはまだロックされています。迷路でもっとゲームをして下さい。',
     },
     {
-      id:'booha_blocks', roomId:'room_13', x:1090, y:360, r:44,
+      id:'booha_blocks', roomId:'room_02', x:1084, y:365, r:44,
       url:'booha_blocks.html', label:'BLOCKS', color:'#44aaff',
       theme:'blocks',
       nameEN:'Booha Blocks', nameJP:'ブーハ・ブロック', nameKanji:'積木',
