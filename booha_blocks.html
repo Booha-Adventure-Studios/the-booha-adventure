@@ -513,11 +513,18 @@ const COLS   = 10, ROWS = 20;
 const CW = canvas.width, CH = canvas.height;  // 300 × 600
 const CELL   = CW / COLS;                     // 30 exact
 
-/* ── PIECE COLORS — fixed, never theme-shifted ── */
+/* ── PIECE COLORS — fixed 5-color palette, never theme-shifted ── */
 const PIECE_COLORS = {
-  I:'#67e8f9', J:'#818cf8', L:'#fb923c',
-  O:'#facc15', S:'#4ade80', Z:'#f87171', T:'#e879f9',
-  BOMB:'#ff4444', X2:'#ffd166', X3:'#ff9f1c',
+  I:'#7dd3fc',   // baby blue
+  J:'#c084fc',   // violet
+  L:'#ff7eb9',   // pink
+  O:'#facc15',   // yellow
+  S:'#a3e635',   // slime green
+  Z:'#a3e635',   // slime green (same family)
+  T:'#c084fc',   // violet
+  BOMB:'#ef4444',  // red
+  X2:'#cbd5e1',    // silver
+  X3:'#fbbf24',    // gold
 };
 
 /* ── PIECES ── */
@@ -542,6 +549,42 @@ let score=0, linesTotal=0, currentLevel=1;
 let gameStartTime=0, elapsedMs=0;
 let gravityFrames=42, frameCounter=0, rafId=0;
 let scoreMultiplier=1;  // 1, 2, or 3 — set by special blocks
+
+/* ── COLOR OVERRIDE (X2=silver, X3=gold for 60 seconds) ── */
+let colorOverride=null;    // null | 'silver' | 'gold'
+let colorOverrideEnd=0;    // Date.now() timestamp when override expires
+const COLOR_OVERRIDE_VALS={ silver:'#cbd5e1', gold:'#fbbf24' };
+
+function setColorOverride(type){
+  colorOverride=type;
+  colorOverrideEnd=Date.now()+60000;
+  /* Update badge to show time remaining */
+  multiBadge.textContent=type==='silver'?'2x SILVER':'3x GOLD';
+  multiBadge.style.display='flex';
+  multiBadge.style.background=type==='silver'?'rgba(203,213,225,.2)':'rgba(251,191,36,.2)';
+  multiBadge.style.borderColor=type==='silver'?'rgba(203,213,225,.5)':'rgba(251,191,36,.5)';
+  multiBadge.style.color=type==='silver'?'#cbd5e1':'#fbbf24';
+}
+
+function clearColorOverride(){
+  colorOverride=null; colorOverrideEnd=0;
+  multiBadge.style.display='none';
+  multiBadge.style.background='';
+  multiBadge.style.borderColor='';
+  multiBadge.style.color='';
+  scoreMultiplier=1;
+}
+
+function tickColorOverride(){
+  if(!colorOverride) return;
+  if(Date.now()>colorOverrideEnd) clearColorOverride();
+}
+
+/* Returns the display color for a cell — respects color override */
+function cellColor(name){
+  if(colorOverride) return COLOR_OVERRIDE_VALS[colorOverride];
+  return PIECE_COLORS[name]||'#fff';
+}
 
 /* ── PLAYFIELD ── */
 /* Each cell: 0 = empty, or { name, age }
@@ -583,7 +626,7 @@ function applyTheme(lvl){
 }
 
 /* ── AUDIO ── */
-const BASE='../assets/blocks/';
+const BASE='the-booha-adventure/assets/blocks/';
 let audioUnlocked=false;
 const SFX={ bgm:['booha-tetris-january.mp3','booha-tetris-january-2.mp3','booha-tetris-january-3.mp3','bgm4.mp3'], line:'booha-tetris-sound.mp3', levelUp:'correct.mp3', danger:'too-high.mp3', gameOver:'game-over.mp3', bomb:'clear.mp3' };
 let bgmIdx=0;
@@ -656,8 +699,32 @@ const CLEAR_COLORS=[
 ];
 
 function spawnLineClear(rows, n){
+  /* Silver/gold override: use sparkle particles instead */
+  if(colorOverride){
+    const sparkColor = colorOverride==='silver'
+      ? ['#fff','#e2e8f0','#cbd5e1','#f8fafc','#94a3b8']
+      : ['#fbbf24','#fde68a','#fff','#f59e0b','#fef3c7'];
+    rows.forEach(r=>{
+      for(let i=0;i<80;i++){
+        const x=Math.random()*CW, y=r*CELL+Math.random()*CELL;
+        /* Sparkles: mostly upward, tight spread, small and glittery */
+        const ang=-Math.PI/2+(Math.random()-.5)*Math.PI*.9;
+        const spd=2+Math.random()*5;
+        parts.push({
+          x, y, vx:Math.cos(ang)*spd, vy:Math.sin(ang)*spd,
+          life:1, decay:.018+Math.random()*.02,
+          sz:.8+Math.random()*2.5,
+          color:sparkColor[(Math.random()*sparkColor.length)|0],
+          kind: Math.random()<.7?'star':'ci',
+          rot:Math.random()*Math.PI*2, spin:(Math.random()-.5)*.4,
+          glow:true,
+        });
+      }
+    });
+    return;
+  }
+
   const colors = CLEAR_COLORS[Math.min(n,4)-1];
-  /* Scale everything to line count */
   const countPerRow = [0, 30, 55, 85, 130][Math.min(n,4)];
   const speedMult   = [0, 1.0, 1.4, 1.9, 2.8][Math.min(n,4)];
   const sizeMult    = [0, 1.0, 1.3, 1.7, 2.4][Math.min(n,4)];
@@ -670,12 +737,9 @@ function spawnLineClear(rows, n){
       const ang = Math.random()*Math.PI*2;
       const spd = (1.8+Math.random()*5) * speedMult;
       const sz  = (1.6+Math.random()*3.5) * sizeMult;
-
-      /* 4-line: mix of large squares and small circles for variety */
       let kind='ci';
       if(n===4) kind=Math.random()<.5?'sq':'ci';
       else if(n===3) kind=Math.random()<.35?'sq':'ci';
-
       parts.push({
         x, y,
         vx:Math.cos(ang)*spd, vy:Math.sin(ang)*spd - (n>2?2:0.5),
@@ -683,7 +747,6 @@ function spawnLineClear(rows, n){
         decay:(0.018+Math.random()*.018) / lifeMult,
         sz, color:colors[(Math.random()*colors.length)|0],
         kind, rot:Math.random()*Math.PI*2, spin:(Math.random()-.5)*.25,
-        /* 4-line: some particles have a trail/glow */
         glow: n===4,
       });
     }
@@ -713,10 +776,24 @@ function drawParts(){
     if(p.life<=0){parts.splice(i,1);continue;}
     ctx.save();
     ctx.globalAlpha=Math.max(0,p.life)*.88;
-    if(p.glow){ ctx.shadowBlur=12; ctx.shadowColor=p.color; }
     ctx.fillStyle=p.color;
-    if(p.kind==='sq'){ ctx.translate(p.x,p.y);ctx.rotate(p.rot);ctx.fillRect(-p.sz/2,-p.sz/2,p.sz,p.sz); }
-    else{ ctx.beginPath();ctx.arc(p.x,p.y,p.sz,0,Math.PI*2);ctx.fill(); }
+    if(p.glow){ ctx.shadowBlur=10; ctx.shadowColor=p.color; }
+    if(p.kind==='sq'){
+      ctx.translate(p.x,p.y); ctx.rotate(p.rot);
+      ctx.fillRect(-p.sz/2,-p.sz/2,p.sz,p.sz);
+    } else if(p.kind==='star'){
+      /* 4-point sparkle */
+      ctx.translate(p.x,p.y); ctx.rotate(p.rot);
+      const s=p.sz;
+      ctx.beginPath();
+      ctx.moveTo(0,-s*2); ctx.lineTo(s*.4,-s*.4);
+      ctx.lineTo(s*2,0);  ctx.lineTo(s*.4,s*.4);
+      ctx.lineTo(0,s*2);  ctx.lineTo(-s*.4,s*.4);
+      ctx.lineTo(-s*2,0); ctx.lineTo(-s*.4,-s*.4);
+      ctx.closePath(); ctx.fill();
+    } else {
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.sz,0,Math.PI*2); ctx.fill();
+    }
     ctx.restore();
   }
 }
@@ -745,29 +822,35 @@ const LINE_PTS=[0,100,300,500,800];
 function scoreLines(n){
   const pts=(LINE_PTS[n]||0)*currentLevel*scoreMultiplier;
   score+=pts;
-  if(scoreMultiplier>1) setMultiplier(1); // multiplier consumed
+  if(scoreMultiplier>1 && !colorOverride) scoreMultiplier=1; // plain multiplier consumed
+  /* Color override keeps multiplier active for its duration */
 }
 function updateGravity(){ gravityFrames=Math.max(5,42-currentLevel*3); }
 function calcLevel(){ return Math.max(1,1+Math.floor(linesTotal/10)); }
 
-/* ── BOMB HANDLER ── */
+/* ── BOMB HANDLER — clears up to 4 lines from the bottom ── */
 function activateBomb(landRow, landCol){
   playSFX(SFX.bomb,.95);
-  triggerShake(8,16);
-  triggerFlash(.7,'rgba(255,80,0,0.9)');
+  triggerShake(9,18);
+  triggerFlash(.75,'rgba(255,80,0,.9)');
 
-  const cx = (landCol + Math.floor(PIECE_MATRICES.BOMB[0].length/2)) * CELL;
-  const cy = landRow * CELL;
-  spawnBombExplosion(cx, cy);
+  const cx=(landCol+1)*CELL, cy=landRow*CELL;
+  spawnBombExplosion(cx,cy);
 
-  /* Clear 3×3 area centred on the T's centre cell */
-  for(let r=landRow-1; r<=landRow+1; r++){
-    for(let c=landCol; c<=landCol+2; c++){
-      if(r>=0&&r<ROWS&&c>=0&&c<COLS) playfield[r][c]=null;
-    }
+  /* Find filled rows from bottom up */
+  const filledRows=[];
+  for(let r=ROWS-1;r>=0;r--){
+    if(playfield[r].some(c=>c!==null)) filledRows.push(r);
+    if(filledRows.length>=4) break;
   }
-  piece=nextP; nextP=mkPiece();
-  updateHud(); updateDanger();
+
+  if(filledRows.length>0){
+    /* Animate clear then remove */
+    isClearing=true; clearRows=filledRows.slice(); clearTick=14; clearN=filledRows.length;
+    spawnLineClear(filledRows, 4); /* always use 4-line particle intensity */
+  } else {
+    piece=nextP; nextP=mkPiece(); updateHud(); updateDanger();
+  }
 }
 
 /* ── LOCK PIECE ── */
@@ -785,8 +868,8 @@ function lockPiece(){
     return;
   }
 
-  if(piece.name==='X2'){ setMultiplier(2); playSFX(SFX.levelUp,.8); piece=nextP; nextP=mkPiece(); updateHud(); return; }
-  if(piece.name==='X3'){ setMultiplier(3); playSFX(SFX.levelUp,.9); piece=nextP; nextP=mkPiece(); updateHud(); return; }
+  if(piece.name==='X2'){ scoreMultiplier=2; setColorOverride('silver'); playSFX(SFX.levelUp,.8); piece=nextP; nextP=mkPiece(); updateHud(); return; }
+  if(piece.name==='X3'){ scoreMultiplier=3; setColorOverride('gold');   playSFX(SFX.levelUp,.9); piece=nextP; nextP=mkPiece(); updateHud(); return; }
 
   /* Normal lock */
   for(let r=0;r<piece.matrix.length;r++) for(let c=0;c<piece.matrix[r].length;c++) if(piece.matrix[r][c]){
@@ -877,25 +960,15 @@ function updateHud(){
 function drawCell(x,y,color,alpha=1,sx=1,sy=1,age=0){
   const s=CELL-1;
   const cx=x+(CELL-s*sx)/2, cy=y+(CELL-s*sy)/2;
-
-  /* Age darkening: age 0=full, saturates at age 8 → 50% darker */
-  const ageFactor = Math.max(0.45, 1 - age*0.07);
-
+  const ageFactor=Math.max(0.45, 1-age*0.07);
   ctx.save();
   ctx.globalAlpha=alpha*ageFactor;
-  /* Only glow on fresh cells — older cells get no shadow (performance + visual) */
-  ctx.shadowBlur  = age === 0 ? 6 : 0;
-  ctx.shadowColor = color;
   ctx.fillStyle=color;
   if(ctx.roundRect) ctx.roundRect(cx,cy,s*sx,s*sy,3);
   else ctx.rect(cx,cy,s*sx,s*sy);
   ctx.fill();
-
-  /* Highlight — also fades with age */
-  ctx.shadowBlur=0;
-  ctx.fillStyle=`rgba(255,255,255,${0.16*ageFactor})`;
+  ctx.fillStyle=`rgba(255,255,255,${0.14*ageFactor})`;
   ctx.fillRect(cx+2,cy+2,s*.28*sx,s*.28*sy);
-
   ctx.restore();
 }
 
@@ -926,12 +999,12 @@ function draw(){
   for(let c=1;c<COLS;c++){ctx.beginPath();ctx.moveTo(c*CELL,0);ctx.lineTo(c*CELL,CH);ctx.stroke();}
   for(let r=1;r<ROWS;r++){ctx.beginPath();ctx.moveTo(0,r*CELL);ctx.lineTo(CW,r*CELL);ctx.stroke();}
 
-  /* Locked cells — draw with age-based dimming */
+  /* Locked cells — draw with age-based dimming, color override if active */
   for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
     const cell=playfield[r][c];
     if(cell && typeof cell === 'object'){
-      const age = stackAge - cell.age;
-      drawCell(c*CELL, r*CELL, PIECE_COLORS[cell.name], 1, 1, 1, age);
+      const age=stackAge-cell.age;
+      drawCell(c*CELL, r*CELL, cellColor(cell.name), 1, 1, 1, age);
     }
   }
 
@@ -1004,7 +1077,7 @@ function loop(){
     requestAnimationFrame(loop); return;
   }
   if(isGameOver||isPaused||!gameStarted) return;
-  tickShake(); updateHud();
+  tickShake(); tickColorOverride(); updateHud();
   if(isClearing){ clearTick--; draw(); if(clearTick<=0) commitClear(); rafId=requestAnimationFrame(loop); return; }
   frameCounter++;
   if(frameCounter>=gravityFrames){ frameCounter=0; if(valid(piece.matrix,piece.row+1,piece.col)) piece.row++; else lockPiece(); }
@@ -1062,7 +1135,7 @@ function setPaused(v){
 }
 pauseBtn?.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(!gameStarted||isGameOver)return;setPaused(!isPaused);},{passive:false});
 document.getElementById('pauseResumeBtn')?.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();setPaused(false);},{passive:false});
-document.getElementById('pauseExitBtn')?.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();setPaused(false);window.location.href='../karasuki.html?room=room_02';},{passive:false});
+document.getElementById('pauseExitBtn')?.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();setPaused(false);window.location.href='karasuki.html';},{passive:false});
 
 /* ── HELP ── */
 const helpBtn=document.getElementById('helpBtn');
@@ -1142,7 +1215,7 @@ function hardReset(){
   currentLevel=1;gravityFrames=42;elapsedMs=0;endTimer=0;
   clearRows=[];clearTick=0;clearN=0;parts.length=0;lockAnims.length=0;
   flashAlpha=0;shakeMag=0;shakeFrames=0;stackAge=0;
-  setMultiplier(1);
+  clearColorOverride(); scoreMultiplier=1;
   for(let r=0;r<ROWS;r++) playfield[r].fill(null);
   bag.length=0;piece=mkPiece();nextP=mkPiece();
   applyTheme(1);updateHud();
