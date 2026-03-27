@@ -1143,7 +1143,10 @@
      STATE
   ═══════════════════════════════════════════ */
   const state = {
-    roomId            : DATA.startRoom,
+   roomId: (() => {
+   const params = new URLSearchParams(window.location.search);
+   return params.get('room') || DATA.startRoom;
+})(),
     spawnId           : "default",
     x                 : 742,
     y                 : 717,
@@ -1479,37 +1482,46 @@
     } catch (_) {}
   }
 
-  /* ═══════════════════════════════════════════
-     ROOM HELPERS
-  ═══════════════════════════════════════════ */
-  function getRoom()  { return DATA.rooms[state.roomId]; }
+ /* ═══════════════════════════════════════════
+   ROOM HELPERS
+═══════════════════════════════════════════ */
+function getRoom()  { return DATA.rooms[state.roomId]; }
 
-  function getSpawn(room, spawnId) {
-    return room.spawns?.[spawnId] || room.spawns?.default || { x: 480, y: 270 };
-  }
+function getSpawn(room, spawnId) {
+  return room.spawns?.[spawnId] || room.spawns?.default || { x: 480, y: 270 };
+}
 
-  function placeGhost(x, y) { state.x = x; state.y = y; }
+function placeGhost(x, y) { state.x = x; state.y = y; }
 
-  function makeBg(src) {
-    const img = document.createElement("img");
-    img.className = "karasuki-bg"; img.src = src; return img;
-  }
+function makeBg(src) {
+  const img = document.createElement("img");
+  img.className = "karasuki-bg";
+  img.src = src;
+  return img;
+}
 
-  let currentBg;
-  function renderInitialRoom() {
-    const room  = getRoom();
-    currentBg   = makeBg(room.bg);
-    roomLayer.appendChild(currentBg);
-    const spawn = getSpawn(room, state.spawnId);
-    placeGhost(spawn.x, spawn.y);
-    state.spawnX = spawn.x;
-    state.spawnY = spawn.y;
-    const now = performance.now();
-    state.transitionReadyAt   = now + TRANSITION_COOLDOWN_MS;
-    arrivalArrowHiddenUntil   = now + ARRIVAL_ARROW_DELAY_MS;
-    arrivalArrowBackHiddenUntil = now + ARRIVAL_ARROW_DELAY_MS * ARRIVAL_ARROW_BACK_MULTIPLIER;
-    state.distMovedSinceSpawn = 0;
-  }
+let currentBg;
+function renderInitialRoom() {
+  const room  = getRoom();
+  currentBg   = makeBg(room.bg);
+  roomLayer.appendChild(currentBg);
+
+  const spawn = getSpawn(room, state.spawnId);
+  placeGhost(spawn.x, spawn.y);
+
+  state.spawnX = spawn.x;
+  state.spawnY = spawn.y;
+
+  const now = performance.now();
+  state.transitionReadyAt = now + TRANSITION_COOLDOWN_MS;
+  arrivalArrowHiddenUntil = now + ARRIVAL_ARROW_DELAY_MS;
+  arrivalArrowBackHiddenUntil = now + ARRIVAL_ARROW_DELAY_MS * ARRIVAL_ARROW_BACK_MULTIPLIER;
+
+  state.distMovedSinceSpawn = 0;
+  state.clickTarget = null;
+  state.moving = false;
+  state.spawnLockUntil = now + 500;
+}
 
   /* ═══════════════════════════════════════════
      COLLISION
@@ -1886,41 +1898,61 @@
     }
   }
 
-  /* ═══════════════════════════════════════════
-     MAIN LOOP
-  ═══════════════════════════════════════════ */
-  function tick(now) {
-    const dt = Math.min(50, Math.max(8, now - (lastTickTime || now)));
-    lastTickTime = now;
-    SPEED = BASE_SPEED * (dt / TARGET_DT);
+ /* ═══════════════════════════════════════════
+   MAIN LOOP
+═══════════════════════════════════════════ */
+function tick(now) {
+  const dt = Math.min(50, Math.max(8, now - (lastTickTime || now)));
+  lastTickTime = now;
+  SPEED = BASE_SPEED * (dt / TARGET_DT);
 
-    const anyModalOpen = state.transitioning || isPortalOpen() || state.mazeExiting
-                      || isBonusPopOpen()    || isWandererPopOpen();
+  const anyModalOpen =
+    state.transitioning ||
+    isPortalOpen() ||
+    state.mazeExiting ||
+    isBonusPopOpen() ||
+    isWandererPopOpen();
 
-    if (!anyModalOpen) {
-      handleClickMovement(now);
-      updateWanderers(now);
+  if (!anyModalOpen) {
+    handleClickMovement(now);
+    updateWanderers(now);
 
-      if (state.roomId === "room_08" && state.moving) {
-        const dPortal = Math.hypot(state.x - PORTAL.x, state.y - PORTAL.y);
-        if (dPortal <= PORTAL_TRIGGER_R) { state.clickTarget = null; openPortal(); }
+    // room-enter protection: do not allow instant re-exit
+    const spawnUnlocked =
+      now >= (state.spawnLockUntil || 0) &&
+      state.distMovedSinceSpawn >= ARROW_MOVE_THRESHOLD;
+
+    if (state.roomId === "room_08" && state.moving) {
+      const dPortal = Math.hypot(state.x - PORTAL.x, state.y - PORTAL.y);
+      if (dPortal <= PORTAL_TRIGGER_R) {
+        state.clickTarget = null;
+        state.moving = false;
+        openPortal();
       }
-
-      if (state.roomId === MAZE_EXIT.roomId && state.distMovedSinceSpawn >= ARROW_MOVE_THRESHOLD) {
-        const dMaze = Math.hypot(state.x - MAZE_EXIT.x, state.y - MAZE_EXIT.y);
-        if (dMaze <= MAZE_EXIT.r) exitToMaze();
-      }
-
-      if (state.distMovedSinceSpawn >= ARROW_MOVE_THRESHOLD) {
-        const exit = getNPPExit(now);
-        if (exit) transitionTo(exit);
-      }
-
-      
     }
-    drawFrame(now);
-    requestAnimationFrame(tick);
+
+    if (spawnUnlocked && state.roomId === MAZE_EXIT.roomId) {
+      const dMaze = Math.hypot(state.x - MAZE_EXIT.x, state.y - MAZE_EXIT.y);
+      if (dMaze <= MAZE_EXIT.r) {
+        state.clickTarget = null;
+        state.moving = false;
+        exitToMaze();
+      }
+    }
+
+    if (spawnUnlocked) {
+      const exit = getNPPExit(now);
+      if (exit) {
+        state.clickTarget = null;
+        state.moving = false;
+        transitionTo(exit);
+      }
+    }
   }
+
+  drawFrame(now);
+  requestAnimationFrame(tick);
+}
 
   /* ═══════════════════════════════════════════
      MUSIC
