@@ -573,9 +573,11 @@ function showCard() {
   hiraEl.textContent = card.hira || '';
   sasCard.style.setProperty('--sas-jp-len', (card.jp || '').length);
   stopProgress(); progWrap.style.display = 'none';
+   
   retryBtn.style.display = 'none'; skipBtn.style.display = 'none';
-  playBtn.disabled = false;
+  if (playBtn) playBtn.disabled = false;
   sasCard.classList.remove('listening','wrong-state');
+   
   updateDots();
   if (!isIOS) {
     mountWords(card.en);
