@@ -628,7 +628,7 @@ function applyTheme(lvl){
 }
 
 /* ── AUDIO ── */
-const BASE='../assets/blocks/';
+const BASE='assets/blocks/';
 let audioUnlocked=false;
 const SFX={ bgm:['booha-tetris-january.mp3','booha-tetris-january-2.mp3','booha-tetris-january-3.mp3','bgm4.mp3'], line:'booha-tetris-sound.mp3', levelUp:'correct.mp3', danger:'too-high.mp3', gameOver:'game-over.mp3', bomb:'clear.mp3' };
 let bgmIdx=0;
@@ -1148,8 +1148,7 @@ document.getElementById('pauseResumeBtn')?.addEventListener('pointerdown',e=>{e.
 document.getElementById('pauseExitBtn')?.addEventListener('pointerdown',e=>{
   e.preventDefault(); e.stopPropagation();
   setPaused(false);
-  /* Tell Karasuki to place the player at room_02 entry point */
-  try{ sessionStorage.setItem('karasuki_return_room','room_02'); }catch(_){}
+  pauseBGM(); stopDanger();
   window.location.href='karasuki.html';
 },{passive:false});
 
