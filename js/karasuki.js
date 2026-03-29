@@ -808,78 +808,103 @@
 
     utsurubaPopOverlay.innerHTML = `
       <div id="utsuroba-pop-box" style="
-        background:#04000a;
-        border:1px solid #2a0044;
-        border-radius:4px;
-        padding:clamp(28px,5vw,44px) clamp(24px,6vw,52px) clamp(22px,4vw,36px);
-        max-width:min(440px,92vw); width:92vw;
+        background:linear-gradient(160deg,#06000f 0%,#0c0018 60%,#04000a 100%);
+        border:1px solid rgba(120,0,200,.45);
+        border-radius:8px;
+        padding:0 0 clamp(22px,4vw,36px);
+        max-width:min(420px,94vw); width:94vw;
         text-align:center;
         box-shadow:
-          0 0 0 1px rgba(80,0,120,.55),
-          0 0 40px rgba(40,0,80,.80),
-          0 0 90px rgba(20,0,50,.55),
-          0 0 160px rgba(10,0,30,.35),
-          inset 0 0 60px rgba(0,0,0,.7);
+          0 0 0 1px rgba(100,0,160,.4),
+          0 0 50px rgba(60,0,110,.85),
+          0 0 110px rgba(30,0,70,.6),
+          0 0 200px rgba(15,0,40,.4),
+          inset 0 0 80px rgba(0,0,0,.6);
         font-family:'Georgia',serif;
         position:relative;
-        animation:portalAppear 0.3s ease-out;">
+        overflow:hidden;
+        animation:utsuPopAppear 0.4s cubic-bezier(.22,.8,.36,1) both;">
+
+        <!-- animated shimmer bar at very top -->
+        <div style="height:2px;width:100%;background:linear-gradient(90deg,transparent,rgba(180,80,255,.9),rgba(100,200,255,.7),rgba(180,80,255,.9),transparent);animation:utsuShimmer 2.4s ease-in-out infinite;"></div>
 
         <!-- corner brackets -->
-        <div style="position:absolute;top:10px;left:10px;width:16px;height:16px;border:1px solid rgba(80,0,120,.6);border-right:none;border-bottom:none;"></div>
-        <div style="position:absolute;top:10px;right:10px;width:16px;height:16px;border:1px solid rgba(80,0,120,.6);border-left:none;border-bottom:none;"></div>
-        <div style="position:absolute;bottom:10px;left:10px;width:16px;height:16px;border:1px solid rgba(80,0,120,.6);border-right:none;border-top:none;"></div>
-        <div style="position:absolute;bottom:10px;right:10px;width:16px;height:16px;border:1px solid rgba(80,0,120,.6);border-left:none;border-top:none;"></div>
+        <div style="position:absolute;top:12px;left:12px;width:18px;height:18px;border:1.5px solid rgba(160,60,255,.55);border-right:none;border-bottom:none;"></div>
+        <div style="position:absolute;top:12px;right:12px;width:18px;height:18px;border:1.5px solid rgba(160,60,255,.55);border-left:none;border-bottom:none;"></div>
+        <div style="position:absolute;bottom:12px;left:12px;width:18px;height:18px;border:1.5px solid rgba(160,60,255,.55);border-right:none;border-top:none;"></div>
+        <div style="position:absolute;bottom:12px;right:12px;width:18px;height:18px;border:1.5px solid rgba(160,60,255,.55);border-left:none;border-top:none;"></div>
 
         <button id="utsuroba-pop-close" style="
-          position:absolute; top:12px; right:14px;
-          background:transparent; border:none; cursor:pointer;
-          font-size:1rem; color:rgba(100,0,160,.55);
-          transition:color .18s; padding:4px 8px;">✕</button>
+          position:absolute;top:12px;right:14px;
+          background:transparent;border:none;cursor:pointer;
+          font-size:1rem;color:rgba(160,80,255,.4);
+          transition:color .18s;padding:4px 8px;z-index:2;">✕</button>
+
+        <!-- icon area -->
+        <div id="utsuroba-pop-icon-wrap" style="
+          padding:clamp(20px,4vw,32px) 0 clamp(10px,2vw,16px);
+          position:relative;">
+          <div style="
+            position:absolute;inset:0;
+            background:radial-gradient(ellipse at 50% 60%,rgba(120,0,200,.35),transparent 70%);
+            pointer-events:none;"></div>
+          <img id="utsuroba-pop-icon" src="assets/img/utsuroba_icon.png" alt=""
+            style="width:clamp(64px,16vw,96px);height:clamp(64px,16vw,96px);
+            object-fit:contain;position:relative;z-index:1;
+            filter:drop-shadow(0 0 18px rgba(180,80,255,.8)) drop-shadow(0 0 40px rgba(100,0,200,.5));
+            animation:utsuIconPulse 2.8s ease-in-out infinite;" />
+        </div>
 
         <!-- locked state -->
-        <div id="utsuroba-locked" style="display:none;">
+        <div id="utsuroba-locked" style="display:none;padding:0 clamp(20px,6vw,40px);">
+          <p style="font-size:clamp(.7rem,2vw,.78rem);color:rgba(140,80,200,.6);
+            letter-spacing:.22em;margin:0 0 14px;text-transform:uppercase;">— 封印 —</p>
           <p id="utsuroba-locked-en" style="
-            font-size:clamp(.88rem,3vw,1.05rem); color:#7a5a8a;
-            margin:0 0 12px; line-height:1.6; letter-spacing:.04em;"></p>
+            font-size:clamp(.86rem,2.8vw,1rem);color:#7a5a8a;
+            margin:0 0 10px;line-height:1.65;letter-spacing:.04em;white-space:pre-line;"></p>
           <p id="utsuroba-locked-jp" style="
-            font-size:clamp(.78rem,2.6vw,.92rem); color:#5a3a6a;
-            margin:0 0 8px; letter-spacing:.06em;"></p>
+            font-size:clamp(.76rem,2.4vw,.9rem);color:#5a3a6a;
+            margin:0 0 6px;letter-spacing:.06em;white-space:pre-line;"></p>
           <p id="utsuroba-locked-kanji" style="
-            font-size:clamp(.7rem,2.2vw,.82rem); color:#3a2044;
-            margin:0 0 24px; letter-spacing:.1em; opacity:.6;"></p>
+            font-size:clamp(.68rem,2vw,.8rem);color:#3a2044;
+            margin:0 0 22px;letter-spacing:.1em;opacity:.55;white-space:pre-line;"></p>
           <button id="utsuroba-locked-ok" style="
-            background:transparent; font-family:'Georgia',serif;
-            font-size:.88rem; letter-spacing:.12em; cursor:pointer;
-            padding:7px 26px; border-radius:2px;
-            border:1px solid rgba(80,0,120,.5); color:#6a3a8a;
-            transition:all .18s;">— 閉じる —</button>
+            background:transparent;font-family:'Georgia',serif;
+            font-size:clamp(.8rem,2.5vw,.9rem);letter-spacing:.14em;cursor:pointer;
+            padding:8px 28px;border-radius:2px;
+            border:1px solid rgba(80,0,120,.5);color:#6a3a8a;
+            transition:all .2s;">— 閉じる —</button>
         </div>
 
         <!-- unlocked state -->
-        <div id="utsuroba-unlocked" style="display:none;">
+        <div id="utsuroba-unlocked" style="display:none;padding:0 clamp(20px,6vw,40px);">
+          <p style="font-size:clamp(.68rem,1.9vw,.76rem);color:rgba(180,120,255,.7);
+            letter-spacing:.22em;margin:0 0 12px;text-transform:uppercase;
+            text-shadow:0 0 12px rgba(180,80,255,.4);">— 新しい世界 —</p>
           <p id="utsuroba-unlocked-en" style="
-            font-size:clamp(.9rem,3.2vw,1.08rem); color:#c8a0e8;
-            margin:0 0 10px; line-height:1.6; letter-spacing:.04em;
-            text-shadow:0 0 20px rgba(140,0,200,.4);"></p>
+            font-size:clamp(.9rem,3vw,1.08rem);color:#d8b8f8;
+            margin:0 0 8px;line-height:1.6;letter-spacing:.04em;
+            text-shadow:0 0 24px rgba(180,80,255,.45);white-space:pre-line;"></p>
           <p id="utsuroba-unlocked-jp" style="
-            font-size:clamp(.8rem,2.6vw,.94rem); color:#9a70ba;
-            margin:0 0 6px; letter-spacing:.07em;"></p>
+            font-size:clamp(.78rem,2.5vw,.92rem);color:#a880d0;
+            margin:0 0 4px;letter-spacing:.07em;white-space:pre-line;"></p>
           <p id="utsuroba-unlocked-kanji" style="
-            font-size:clamp(.72rem,2.2vw,.84rem); color:#6a4088;
-            margin:0 0 28px; letter-spacing:.12em; opacity:.7;"></p>
-          <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
+            font-size:clamp(.7rem,2.1vw,.82rem);color:#7050a8;
+            margin:0 0 24px;letter-spacing:.12em;opacity:.7;white-space:pre-line;"></p>
+          <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
             <button id="utsuroba-yes" style="
-              background:rgba(40,0,70,.3); font-family:'Georgia',serif;
-              font-size:clamp(.82rem,2.8vw,.94rem); letter-spacing:.12em;
-              cursor:pointer; padding:8px 30px; border-radius:2px;
-              border:1px solid rgba(120,0,180,.7); color:#d0a8f0;
-              transition:all .2s;">はい / Yes</button>
+              background:rgba(60,0,100,.35);font-family:'Georgia',serif;
+              font-size:clamp(.82rem,2.6vw,.94rem);letter-spacing:.12em;
+              cursor:pointer;padding:10px 32px;border-radius:3px;
+              border:1px solid rgba(160,60,255,.75);color:#e0c0ff;
+              box-shadow:0 0 18px rgba(140,40,220,.3);
+              transition:all .22s;">はい / Yes</button>
             <button id="utsuroba-no" style="
-              background:transparent; font-family:'Georgia',serif;
-              font-size:clamp(.82rem,2.8vw,.94rem); letter-spacing:.12em;
-              cursor:pointer; padding:8px 30px; border-radius:2px;
-              border:1px solid rgba(50,20,70,.6); color:#7a5a8a;
-              transition:all .2s;">いいえ / No</button>
+              background:transparent;font-family:'Georgia',serif;
+              font-size:clamp(.82rem,2.6vw,.94rem);letter-spacing:.12em;
+              cursor:pointer;padding:10px 32px;border-radius:3px;
+              border:1px solid rgba(60,20,80,.65);color:#7a5a8a;
+              transition:all .22s;">いいえ / No</button>
           </div>
         </div>
       </div>`;
@@ -902,9 +927,9 @@
   };
 
   const UTSUROBA_UNLOCKED_COPY = {
-    en    : 'Do you want to go to Utsuroba?',
-    jp    : 'うつろばに行きますか？',
-    kanji : '空洞場へ参りますか？',
+    en    : 'A new world has opened.\nDo you want to enter Utsuroba?',
+    jp    : '新しい世界が開いた。\nうつろばに入りますか？',
+    kanji : '新世界が開かれた。\n空洞場へ参りますか？',
   };
 
   function openUtsuobaPopup() {
@@ -1114,6 +1139,9 @@
       #portal-overlay.active{display:flex;background:rgba(0,0,0,0.82);}
       #portal-box{background:#080810;border:1px solid #3a1055;border-radius:6px;padding:clamp(24px,5vw,44px) clamp(20px,6vw,52px) clamp(20px,4vw,36px);max-width:min(440px,92vw);width:92vw;text-align:center;box-shadow:0 0 0 1px rgba(160,40,220,.6),0 0 40px rgba(160,40,220,.7),0 0 90px rgba(120,0,180,.45),0 0 160px rgba(100,0,160,.2),inset 0 0 50px rgba(0,0,0,.5);font-family:'Georgia',serif;position:relative;animation:portalAppear 0.25s ease-out;}
       @keyframes portalAppear{from{opacity:0;transform:scale(0.92) translateY(8px);}to{opacity:1;transform:scale(1) translateY(0);}}
+      @keyframes utsuPopAppear{from{opacity:0;transform:scale(0.88) translateY(12px);}to{opacity:1;transform:scale(1) translateY(0);}}
+      @keyframes utsuShimmer{0%,100%{opacity:.4;transform:translateX(-30%);}50%{opacity:1;transform:translateX(30%);}}
+      @keyframes utsuIconPulse{0%,100%{filter:drop-shadow(0 0 18px rgba(180,80,255,.8)) drop-shadow(0 0 40px rgba(100,0,200,.5));transform:scale(1);}50%{filter:drop-shadow(0 0 28px rgba(200,120,255,1)) drop-shadow(0 0 60px rgba(140,0,255,.7));transform:scale(1.06);}}
       #portal-box::before,#portal-box::after{content:"";position:absolute;width:20px;height:20px;border-color:rgba(180,80,220,.7);border-style:solid;}
       #portal-box::before{top:10px;left:10px;border-width:1.5px 0 0 1.5px;}
       #portal-box::after{bottom:10px;right:10px;border-width:0 1.5px 1.5px 0;}
