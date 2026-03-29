@@ -102,7 +102,7 @@
     ],
     room_06: [
       { dir: "right", x: 1229, y: 652,  to: "room_07", spawn: "fromLeft"  },
-      { dir: "up",    x: 1096, y: 240,  to: "room_11", spawn: "fromDown"  },
+      { dir: "up",    x: 1065, y: 239,  to: "room_11", spawn: "fromDown"  },
       { dir: "down",  x: 623,  y: 840,  to: "room_01", spawn: "fromUp"    }
     ],
     room_07: [
@@ -168,177 +168,177 @@
     {
       index:0, roomId:'room_01', x:642, y:496, type:'stay',
       frames:['ichi-1.png','ichi-2.png'], color:'#ff79d7', size:52,
-      name:'Ichi', nameJP:'イチ', nameKanji:'一',
-      desc:'The first of three. Planted under the Karasuki tree by Mister Happy. He\'s mean, but sometimes he\'s right.',
-      descJP:'三つのうちの一つ。ミスター・ハッピーにカラスキの木の下に植えられた。いじわるだけど、ときどき正しい。'
+      name:'Ichi', nameJP:'イチ', 
+      desc:'The first of three and as mean as can be. Ichi was planted under the Karasuki tree by Mister Happy. He picks on everyone, as mean as can be.',
+      descJP:'三人のうちの最初で、とても意地悪なやつ。イチはミスター・ハッピーによってカラスキーの木の下に植えられた。誰にでもちょっかいを出して、いつも困らせている。'
     },
     /* ── 1: Mr. Happy — room_01 ── */
     {
       index:1, roomId:'room_01', x:798, y:418, type:'stay',
       frames:['mr_happy-1.png','mr_happy-2.png'], color:'#ffd166', size:110,
       name:'Mister Happy', nameJP:'ミスター・ハッピー',
-      desc:'Mister Happy lives in Karasuki and pretends he knows everything about it. And no—that\'s not makeup. That\'s his skin.',
-      descJP:'ミスター・ハッピーはカラスキに住んでいて、なんでも知っているふりをしている。それと、それはメイクじゃないよ。あれが肌。'
+      desc:'Mister Happy lives in Karasuki, you see, and swears he knows it perfectly. And no, that shine is not makeup on his skin—that’s just the way he’s always been.',
+      descJP:'ミスター・ハッピーはカラスキーに住んでいて、すべてを完璧に知っていると言い張る。そして、その顔の色は化粧ではない——それが彼の本来の姿なのだ。'
     },
     /* ── 2: Tom Katsu — room_02 ── */
     {
       index:2, roomId:'room_02', x:882, y:263, type:'stay',
       frames:['tom_katsu-1.png','tom_katsu-2.png'], color:'#ffaa5e', size:62,
-      name:'Tom Katsu', nameJP:'トムカツ', nameKanji:'勝',
-      desc:'Crispy on the outside, warm on the inside.',
-      descJP:'[日本語説明、準備中]'
+      name:'Tom Katsu', nameJP:'トムカツ', 
+      desc:'Tom Katsu the pig from a circus past, watched bright balloons pop too fast. Now one floats with him wherever he goes—a quiet little fix for a sadness he knows.',
+      descJP:'かつてサーカスにいた豚、トムカツ。風船が弾けるたびに悲しみを覚えていた。今はいつも一つの風船がそばに浮かび、その小さな悲しみを静かに和らげている。'
     },
     /* ── 3: Uhibon — room_03 ── */
     {
       index:3, roomId:'room_03', x:546, y:308, type:'stay',
       frames:['uhibon-1.png','uhibon-2.png'], color:'#a8edff', size:72,
       name:'Uhibon', nameJP:'ウヒボン',
-      desc:'Nothing is really known about Uhibon. He appears as Takachika escapes into Karasuki.',
-      descJP:'ウヒボンについては、ほとんど何もわかっていない。タカチカがカラスキへ逃げ込むときに現れる。'
+      desc:'Nobody knows Uhibon—not even he, he came from somewhere beyond Karasuki. He knows there was a time before the bone… but that part of him is lost and gone.',
+      descJP:'誰もウヒボンのことを知らない。本人でさえも。彼はカラスキーの外から来たらしい。骨になる前の記憶があったことはわかっているが、その記憶はすでに失われている。'
     },
     /* ── 4: Jacki — room_04 ── */
     {
-      index:4, roomId:'room_04', x:888, y:422, type:'stay',
+     index:4, roomId:'room_04', x:888, y:422, type:'stay',
       frames:['jacki-1.png','jacki-2.png'], color:'#b2ffda', size:110,
-      name:'Jacki', nameJP:'ジャッキ',
-      desc:'Jacki is from the side of Karasuki that October comes from. She has seen things October has not.',
-      descJP:'[日本語説明、準備中]'
+      name:'Jacki', nameJP:'ジャッキー',
+      desc:'Jacki’s from the West, where Karasuki still grows, a mirror to Mister Happy, or so the story goes. He wanders the paths where the lost things roam—watching, waiting, far from home.',
+      descJP:'ジャッキーは西のカラスキーから来た存在で、ミスター・ハッピーに似ているとも言われている。失われたものがさまよう道を歩きながら、静かに見守り続けている。'
     },
     /* ── 5: Jamariko — room_05 ── */
     {
       index:5, roomId:'room_05', x:1054, y:354, type:'stay',
       frames:['jamariko-1.png','jamariko-2.png'], color:'#fff176', size:70,
-      name:'Jamariko', nameJP:'ジャマリコ', nameKanji:'邪魔里子',
-      desc:'She stands in your way, but only out of love.',
-      descJP:'[日本語説明、準備中]'
+      name:'Jamariko', nameJP:'ジャマリコ', 
+      desc:'Jamariko’s the cutest, sweet as can be, but always stands where you need to see. Step to the left or step to the right—it’s still in your way, day or night.',
+      descJP:'ジャマリコはとても可愛らしいが、必ず見たい場所に立っている。左に動いても右に動いても、昼でも夜でも、いつも邪魔になる。'
     },
     /* ── 6: San — room_05 ── */
     {
       index:6, roomId:'room_05', x:1029, y:502, type:'stay',
       frames:['san-1.png','san-2.png'], color:'#ffd08a', size:52,
-      name:'San', nameJP:'サン', nameKanji:'三',
-      desc:'[Description coming soon]',
-      descJP:'[日本語説明、準備中]'
+      name:'San', nameJP:'参', 
+      desc:'The third of three and as crazy as can, San bit Karasuki before it began. He never turned orange, not even one day—just wild and laughing along the way.',
+      descJP:'三人のうちの最後で、とても狂っている。参は始まる前にカラスキーをかじってしまった。オレンジ色になることもなく、ただ笑いながら荒々しく動き回っている。'
     },
     /* ── 7: Gorogane — room_06 ── */
     {
-      index:7, roomId:'room_06', x:1256, y:306, type:'stay',
+      index:7, roomId:'room_06', x:781, y:207, type:'stay',
       frames:['gorogane-1.png','gorogane-2.png'], color:'#a8fff8', size:120,
-      name:'Gorogane', nameJP:'ゴロガネ',
-      desc:'[Description coming soon]',
-      descJP:'[日本語説明、準備中]'
+      name:'Gorogui', nameJP:'ゴログイ',
+      desc:'Once they were people with food on their mind, now hunger’s the only thing they can find. If you see one move, don’t trust what you see—something much worse is pulling the strings.',
+      descJP:'かつては食べ物のことばかり考えていた人間だった。しかし今は飢えだけが残っている。もし動いているのを見ても信じてはいけない——背後にはもっと恐ろしい何かが潜んでいる。'
     },
     /* ── 8: Sumiyo Horaguchi — room_06 — drifts toward ghost ── */
     {
-      index:8, roomId:'room_06', x:736, y:414, type:'drift',
-      frames:['sumiyo_horaguchi-1.png','sumiyo_horaguchi-2.png'], color:'#90aaff', size:72,
+      index:8, roomId:'room_06', x:522, y:350, type:'drift',
+      frames:['sumiyo_horaguchi-1.png','sumiyo_horaguchi-2.png'], color:'#90aaff', size:85,
       name:'Sumiyo Horaguchi', nameJP:'洞口すみよ',
-      desc:'Quiet as a shadow, warm as afternoon light.',
-      descJP:'[日本語説明、準備中]'
+      desc:'If you see one of these—don’t turn your back, one glance away and she’s on your track. If you don’t look, she’ll follow you through—and once she’s in, you’ll start losing you.',
+      descJP:'もし見かけたら、決して背を向けてはいけない。一瞬でも目を離せば、すぐ後ろにいる。見ていないとどこまでも追ってきて、一度入り込まれると、少しずつ自分を失っていく。'
     },
     /* ── 9: Amekuro — room_07 ── */
     {
       index:9, roomId:'room_07', x:815, y:398, type:'stay',
       frames:['amekuro-1.png','amekuro-2.png'], color:'#d49aff', size:52,
-      name:'Amekuro', nameJP:'アメクロ', nameKanji:'飴梟',
-      desc:'Amekuro are cute, owl-like cats that love candy. When they stand up, a hidden mouth on their stomach appears and eats sweets in seconds.',
-      descJP:'アメクロ（飴梟）は、おかしが大好きなフクロウのようなネコです。立つとおなかに口が現れ、おかしを一気に食べます。'
+      name:'Amekuro', nameJP:'アメクロ', 
+      desc:'Amekuro are cute, owl-like cats, chatty and sweet, always talking to anyone they happen to meet. But show them some candy and it won’t last long—it’s gone in a second, and they’ll keep talking on.',
+      descJP:'アメクロはフクロウのような猫で、おしゃべりで甘いものが大好き。誰にでも話しかけてくるが、お菓子を見せると一瞬で食べ尽くし、それでも話し続ける。'
     },
     /* ── 10: Snakuma — room_07 ── */
     {
       index:10, roomId:'room_07', x:456, y:470, type:'stay',
       frames:['snakuma-1.png','snakuma-2.png'], color:'#88ff88', size:150,
       name:'Snakuma', nameJP:'スナクマ',
-      desc:'[Description coming soon]',
-      descJP:'[日本語説明、準備中]'
+      desc:'Snakuma are giant bears who gather what they see, wearing lost things like they’re meant to be. No one goes looking, no one asks why—the things just stay… as the bears pass by.',
+      descJP:'スナクマは巨大な熊で、見つけたものを集めて身につける。まるでそれが元からそこにあったかのように。誰も探さず、理由も問わないまま、物だけが残り、熊は通り過ぎていく。'
     },
     /* ── 11: Robert — room_08 ── */
     {
       index:11, roomId:'room_08', x:979, y:397, type:'stay',
       frames:['robert-1.png','robert-2.png'], color:'#ffaa88', size:72,
       name:'Robert', nameJP:'ロバート',
-      desc:'One of the three shapeshifting tanuki brothers. Robert shifts the slowest, which makes him the most convincing.',
-      descJP:'[日本語説明、準備中]'
+      desc:'Robert the eldest, old and worn, sees through the mask that others adorn. He tricks when he wants, helps when he may—but only if he cares that day.',
+      descJP:'ロバートは三兄弟の長男で、古く静かな存在。他人がかぶる仮面の奥まで見抜く。だますことも助けることもあるが、それはすべてその日の気分次第だ。'
     },
     /* ── 12: Jeffrey — room_08 ── */
     {
       index:12, roomId:'room_08', x:1113, y:409, type:'stay',
       frames:['jeffrey-1.png','jeffrey-2.png'], color:'#ffcc44', size:65,
       name:'Jeffrey', nameJP:'ジェフリー',
-      desc:'One of the three shapeshifting tanuki brothers. Jeffrey shifts constantly, even when he\'s asleep.',
-      descJP:'[日本語説明、準備中]'
+      desc:'Jeffrey the middle, sharp with a grin, says what he sees with a bite tucked in. He’ll twist what’s real just to make his point—then laugh when the truth feels out of joint.',
+      descJP:'ジェフリーは次男で、皮肉な笑みを浮かべる。見たものをそのまま言うが、少し歪めて伝える。真実をねじ曲げ、その違和感を楽しんでいる。'
     },
     /* ── 13: Johnny — room_08 ── */
     {
       index:13, roomId:'room_08', x:1256, y:444, type:'stay',
       frames:['johnny-1.png','johnny-2.png'], color:'#ff8844', size:70,
       name:'Johnny', nameJP:'ジョニー',
-      desc:'One of the three shapeshifting tanuki brothers. Johnny refuses to shift into anything useful.',
-      descJP:'[日本語説明、準備中]'
+      desc:'Johnny the youngest, quick on his feet, hates standing still or waiting to meet. He’ll rush a trick or cut it in two—“Hurry it up… I’m done with you.”',
+      descJP:'ジョニーは末っ子で、落ち着きがない。立ち止まることも待つことも嫌いだ。すぐに行動し、すぐに飽きる。「早くしろよ…もういいや」と投げ出す。'
     },
     /* ── 14: Nulvane — room_09 ── */
     {
       index:14, roomId:'room_09', x:843, y:413, type:'stay',
       frames:['nulvane-1.png','nulvane-2.png'], color:'#c8aaff', size:160,
       name:'Nulvane', nameJP:'ヌルヴェイン',
-      desc:'Ideas of people that never fully formed. Nulvane flickers between what they almost were.',
-      descJP:'[日本語説明、準備中]'
+      desc:'Nulvane are people who never took form, caught in between what’s real and not born. They flicker through lives they almost knew—not quite someone, not quite you.',
+      descJP:'ヌルヴェインは形を得られなかった人間。現実と未完成のあいだを漂っている。なりかけた存在を揺らしながら、誰かのようで誰でもない存在だ。'
     },
     /* ── 15: Ni — room_10 ── */
     {
       index:15, roomId:'room_10', x:1233, y:452, type:'stay',
       frames:['ni-1.png','ni-2.png'], color:'#e8ffaa', size:52,
       name:'Ni', nameJP:'ニ', nameKanji:'弐',
-      desc:'The second. Quiet, but always present.',
-      descJP:'[日本語説明、準備中]'
+      desc:'The second of three and as dumb as can be, always the last one to leave the tree. Covered in white from the crows up above—he doesn’t mind… he just sits there, dumb.',
+      descJP:'三人のうちの二番目で、とても鈍い。いつも木から降りるのが最後で、上のカラスに汚されても気にしない。ただぼんやり座っている。'
     },
     /* ── 16: Columbus — room_11 ── */
     {
       index:16, roomId:'room_11', x:935, y:397, type:'stay',
       frames:['columbus-1.png','columbus-2.png'], color:'#ff85a1', size:58,
-      name:'Columbus', nameJP:'コロンブス', nameKanji:'探',
-      desc:'Still exploring.',
-      descJP:'[日本語説明、準備中]'
+      name:'Columbus', nameJP:'コロンバス', 
+      desc:'Columbus the beagle loves belly-side scratches, but throw him a ball and he slips all your catches. He runs the wrong way, tail high in the air—a game of fetch… that goes nowhere.',
+      descJP:'コロンバスはお腹を撫でられるのが大好きなビーグル犬。しかしボールを投げると、まったく違う方向へ走っていく。取ってこいのはずなのに、どこかへ消えてしまう。'
     },
     /* ── 17: October Moriyama — room_12 ── */
     {
       index:17, roomId:'room_12', x:700, y:270, type:'stay',
-      frames:['october_moriyama-1.png','october_moriyama-2.png'], color:'#ff79d7', size:73,
-      name:'October Moriyama', nameJP:'オクトーバー・森山', nameKanji:'霜',
-      desc:'Arrived with the autumn. Never left.',
-      descJP:'[日本語説明、準備中]'
+      frames:['october_moriyama-1.png','october_moriyama-2.png'], color:'#ff79d7', size:75,
+      name:'October Moriyama', nameJP:'オクトーバー・森山',
+      desc:'October Moriyama, never impressed, shrugs things off like she knows best. She says she’s not scared, not even a little—but something inside keeps things unsettled.',
+      descJP:'オクトーバー・森山は何事にも動じない様子で、すべてを見透かしているかのように振る舞う。怖くないと言い張るが、内側では何かがざわついている。'
     },
     /* ── 18: Takachika Green — room_13 ── */
     {
       index:18, roomId:'room_13', x:407, y:387, type:'stay',
-      frames:['takachika_green-1.png','takachika_green-2.png'], color:'#7fffd4', size:75,
-      name:'Takachika Green', nameJP:'タカチカ・グリーン', nameKanji:'高近',
-      desc:'Big presence, soft heart.',
-      descJP:'[日本語説明、準備中]'
+      frames:['takachika_green-1.png','takachika_green-2.png'], color:'#7fffd4', size:77,
+      name:'Takachika Green', nameJP:'タカチカ・グリーン', 
+      desc:'Takachika wished to see something more, so he opened a quiet, unseen door. He’s scared, but he walks where others won’t—because he wants to see… what others don’t.',
+      descJP:'タカチカは「何か」を見たいと願い、静かな見えない扉を開いた。怖がりながらも、他の誰も行かない道を進む——見えないものを見るために。'
     },
     /* ── 19: Pugoo — room_13 ── */
     {
       index:19, roomId:'room_13', x:609, y:642, type:'stay',
       frames:['pugoo-1.png','pugoo-2.png'], color:'#ffcc66', size:55,
-      name:'Pugoo', nameJP:'プグー', nameKanji:'愛',
-      desc:'Small but unforgettable.',
-      descJP:'[日本語説明、準備中]'
+      name:'Pugoo', nameJP:'パグー', 
+      desc:'Pugoo the cat stays close behind, with quiet eyes that always find. He doesn’t stray, he doesn’t delay—and keeps the dark things far away.',
+      descJP:'プグーはいつもそばにいる猫。静かな目であらゆるものを見つめている。離れることなく寄り添い、暗いものから守ってくれる存在だ。'
     },
     /* ── 20: Ena Yamakage — room_14 — drifts toward ghost ── */
     {
-      index:20, roomId:'room_14', x:930, y:318, type:'drift',
-      frames:['ena_yamakage-1.png','ena_yamakage-2.png'], color:'#ffb3d9', size:75,
+     index:20, roomId:'room_14', x:930, y:318, type:'drift',
+      frames:['ena_yamakage-1.png','ena_yamakage-2.png'], color:'#ffb3d9', size:81,
       name:'Ena Yamakage', nameJP:'山影えな',
-      desc:'[Description coming soon]',
-      descJP:'[日本語説明、準備中]'
+      desc:'Ena appears when the night feels thin, and if she sees you, she’ll see within. She points and laughs at all you hide—and if it goes on… it won’t subside.',
+      descJP:'えなは不気味な夜に現れる。目が合えば、内側まで見抜かれてしまう。隠しているものを指差して笑い、その笑いは決して消えない。'
     },
     /* ── 21: Jubei Tsukigase — room_15 — drifts toward ghost ── */
     {
       index:21, roomId:'room_15', x:1064, y:434, type:'drift',
-      frames:['tsukigase_jubei-1.png','tsukigase_jubei-2.png'], color:'#ffcc66', size:90,
-      name:'Jubei Tsukigase', nameJP:'月ヶ瀬・寿兵衛', nameKanji:'字',
-      desc:'Ancient and vast. A letter older than time.',
-      descJP:'[日本語説明、準備中]'
+      frames:['tsukigase_jubei-1.png','tsukigase_jubei-2.png'], color:'#ffcc66', size:100,
+      name:'Jubei Tsukigase', nameJP:'月ヶ瀬 寿兵衛', 
+      desc:'Jubei worked and worked, he never would stop, no time for home, no time to drop. The years moved on and took it all—now something else begins to call.',
+     descJP:'寿兵衛は働き続け、休むことを知らなかった。家にも戻らず、手を止めることもなかった。気づけば時はすべてを奪い去り、今は何か別のものに呼ばれている。'
     },
   ];
 
@@ -771,23 +771,23 @@
       theme:'invaders',
       nameEN:'Booha Invaders', nameJP:'ブーハ・インベーダーズ', nameKanji:'侵略者',
       descUnlocked:'You\'ve unlocked this game! Do you want to play?',
-      descUnlockedJP:'このゲームが使えます！遊びますか？',
-      descUnlockedKanji:'此の遊戯、解放済。参りますか？',
+      descUnlockedJP:'このゲームがつかえます！あそびますか？',
+      descUnlockedKanji:'このゲームが使えます。遊びますか？',
       descLocked:'This game is locked. You need to play more games in the maze.',
-      descLockedJP:'このゲームはまだロックされています。迷路でもっとゲームをしてください。',
-      descLockedKanji:'此の遊戯、未だ封印。迷宮にて更なる試練を。',
+      descLockedJP:'このゲームはまだロックされています。めいろでもっとゲームをしてください。',
+      descLockedKanji:'このゲームはまだロックされています。迷路でもっとゲームをして下さい。',
     },
     {
-      id:'booha_blocks', roomId:'room_13', x:1090, y:360, r:44,
+      id:'booha_blocks', roomId:'room_02', x:1084, y:365, r:44,
       url:'booha_blocks.html', label:'BLOCKS', color:'#44aaff',
       theme:'blocks',
       nameEN:'Booha Blocks', nameJP:'ブーハ・ブロック', nameKanji:'積木',
       descUnlocked:'You\'ve unlocked this game! Do you want to play?',
-      descUnlockedJP:'このゲームが使えます！遊びますか？',
-      descUnlockedKanji:'此の遊戯、解放済。参りますか？',
+      descUnlockedJP:'このゲームがつかえます！あそびますか？',
+      descUnlockedKanji:'このゲームが使えます。遊びますか？',
       descLocked:'This game is locked. You need to play more games in the maze.',
-      descLockedJP:'このゲームはまだロックされています。迷路でもっとゲームをしてください。',
-      descLockedKanji:'此の遊戯、未だ封印。迷宮にて更なる試練を。',
+      descLockedJP:'このゲームはまだロックされています。めいろでもっとゲームをしてください。',
+      descLockedKanji:'このゲームはまだロックされています。迷路でもっとゲームをして下さい。',
     },
     {
       id:'bonus_placeholder_1', roomId:'room_12', x:993, y:362, r:44, // updated
@@ -795,35 +795,35 @@
       theme:'mystery',
       nameEN:'???', nameJP:'？？？', nameKanji:'謎',
       descUnlocked:'You\'ve unlocked this game! Do you want to play?',
-      descUnlockedJP:'このゲームが使えます！遊びますか？',
-      descUnlockedKanji:'此の遊戯、解放済。参りますか？',
+      descUnlockedJP:'このゲームがつかえます！あそびますか？',
+      descUnlockedKanji:'このゲームが使えます。遊びますか？',
       descLocked:'This game is locked. You need to play more games in the maze.',
-      descLockedJP:'このゲームはまだロックされています。迷路でもっとゲームをしてください。',
-      descLockedKanji:'此の遊戯、未だ封印。迷宮にて更なる試練を。',
+      descLockedJP:'このゲームはまだロックされています。めいろでもっとゲームをしてください。',
+      descLockedKanji:'このゲームはまだロックされています。迷路でもっとゲームをして下さい。',
     },
     {
-      id:'bonus_placeholder_2', roomId:'room_14', x:900, y:250, r:44,
+      id:'bonus_placeholder_2', roomId:'room_14', x:491, y:328, r:44,
       url:'bonus_game_2.html', label:'???', color:'#ffcc44',
       theme:'mystery',
       nameEN:'???', nameJP:'？？？', nameKanji:'謎',
-      descUnlocked:'You\'ve unlocked this game! Do you want to play?',
-      descUnlockedJP:'このゲームが使えます！遊びますか？',
-      descUnlockedKanji:'此の遊戯、解放済。参りますか？',
+    　 descUnlocked:'You\'ve unlocked this game! Do you want to play?',
+      descUnlockedJP:'このゲームがつかえます！あそびますか？',
+      descUnlockedKanji:'このゲームが使えます。遊びますか？',
       descLocked:'This game is locked. You need to play more games in the maze.',
-      descLockedJP:'このゲームはまだロックされています。迷路でもっとゲームをしてください。',
-      descLockedKanji:'此の遊戯、未だ封印。迷宮にて更なる試練を。',
+      descLockedJP:'このゲームはまだロックされています。めいろでもっとゲームをしてください。',
+      descLockedKanji:'このゲームはまだロックされています。迷路でもっとゲームをして下さい。',
     },
     {
-      id:'bonus_placeholder_3', roomId:'room_15', x:600, y:300, r:44,
+      id:'bonus_placeholder_3', roomId:'room_10', x:344, y:392, r:44,
       url:'bonus_game_3.html', label:'???', color:'#ff9966',
       theme:'mystery',
       nameEN:'???', nameJP:'？？？', nameKanji:'謎',
       descUnlocked:'You\'ve unlocked this game! Do you want to play?',
-      descUnlockedJP:'このゲームが使えます！遊びますか？',
-      descUnlockedKanji:'此の遊戯、解放済。参りますか？',
+      descUnlockedJP:'このゲームがつかえます！あそびますか？',
+      descUnlockedKanji:'このゲームが使えます。遊びますか？',
       descLocked:'This game is locked. You need to play more games in the maze.',
-      descLockedJP:'このゲームはまだロックされています。迷路でもっとゲームをしてください。',
-      descLockedKanji:'此の遊戯、未だ封印。迷宮にて更なる試練を。',
+      descLockedJP:'このゲームはまだロックされています。めいろでもっとゲームをしてください。',
+      descLockedKanji:'このゲームはまだロックされています。迷路でもっとゲームをして下さい。',
     },
   ];
 
@@ -951,13 +951,13 @@
     orb.style.boxShadow  = `0 0 14px ${t.orbColors[0]}cc, 0 0 32px ${t.orbColors[0]}88, 0 0 60px ${t.orbColors[1]}55`;
 
     if (tree.theme === 'invaders') {
-      orb.textContent = '👾'; orb.style.fontSize = '2rem'; orb.style.lineHeight = '60px';
+      orb.textContent = '🧿'; orb.style.fontSize = '2rem'; orb.style.lineHeight = '60px';
       orb.style.background = `radial-gradient(circle at 35% 35%, #ccffdd, #44ff88, #005522)`;
     } else if (tree.theme === 'blocks') {
-      orb.textContent = '🟦'; orb.style.fontSize = '1.8rem'; orb.style.lineHeight = '60px';
+      orb.textContent = '🧿'; orb.style.fontSize = '1.8rem'; orb.style.lineHeight = '60px';
       orb.style.background = `radial-gradient(circle at 35% 35%, #cce8ff, #44aaff, #002244)`;
     } else {
-      orb.textContent = '✨'; orb.style.fontSize = '1.8rem'; orb.style.lineHeight = '60px';
+      orb.textContent = '🧿'; orb.style.fontSize = '1.8rem'; orb.style.lineHeight = '60px';
     }
 
     document.getElementById('bonus-pop-lock').style.display = unlocked ? 'none' : 'block';
@@ -1143,7 +1143,10 @@
      STATE
   ═══════════════════════════════════════════ */
   const state = {
-    roomId            : DATA.startRoom,
+   roomId: (() => {
+   const params = new URLSearchParams(window.location.search);
+   return params.get('room') || DATA.startRoom;
+})(),
     spawnId           : "default",
     x                 : 742,
     y                 : 717,
@@ -1479,37 +1482,46 @@
     } catch (_) {}
   }
 
-  /* ═══════════════════════════════════════════
-     ROOM HELPERS
-  ═══════════════════════════════════════════ */
-  function getRoom()  { return DATA.rooms[state.roomId]; }
+ /* ═══════════════════════════════════════════
+   ROOM HELPERS
+═══════════════════════════════════════════ */
+function getRoom()  { return DATA.rooms[state.roomId]; }
 
-  function getSpawn(room, spawnId) {
-    return room.spawns?.[spawnId] || room.spawns?.default || { x: 480, y: 270 };
-  }
+function getSpawn(room, spawnId) {
+  return room.spawns?.[spawnId] || room.spawns?.default || { x: 480, y: 270 };
+}
 
-  function placeGhost(x, y) { state.x = x; state.y = y; }
+function placeGhost(x, y) { state.x = x; state.y = y; }
 
-  function makeBg(src) {
-    const img = document.createElement("img");
-    img.className = "karasuki-bg"; img.src = src; return img;
-  }
+function makeBg(src) {
+  const img = document.createElement("img");
+  img.className = "karasuki-bg";
+  img.src = src;
+  return img;
+}
 
-  let currentBg;
-  function renderInitialRoom() {
-    const room  = getRoom();
-    currentBg   = makeBg(room.bg);
-    roomLayer.appendChild(currentBg);
-    const spawn = getSpawn(room, state.spawnId);
-    placeGhost(spawn.x, spawn.y);
-    state.spawnX = spawn.x;
-    state.spawnY = spawn.y;
-    const now = performance.now();
-    state.transitionReadyAt   = now + TRANSITION_COOLDOWN_MS;
-    arrivalArrowHiddenUntil   = now + ARRIVAL_ARROW_DELAY_MS;
-    arrivalArrowBackHiddenUntil = now + ARRIVAL_ARROW_DELAY_MS * ARRIVAL_ARROW_BACK_MULTIPLIER;
-    state.distMovedSinceSpawn = 0;
-  }
+let currentBg;
+function renderInitialRoom() {
+  const room  = getRoom();
+  currentBg   = makeBg(room.bg);
+  roomLayer.appendChild(currentBg);
+
+  const spawn = getSpawn(room, state.spawnId);
+  placeGhost(spawn.x, spawn.y);
+
+  state.spawnX = spawn.x;
+  state.spawnY = spawn.y;
+
+  const now = performance.now();
+  state.transitionReadyAt = now + TRANSITION_COOLDOWN_MS;
+  arrivalArrowHiddenUntil = now + ARRIVAL_ARROW_DELAY_MS;
+  arrivalArrowBackHiddenUntil = now + ARRIVAL_ARROW_DELAY_MS * ARRIVAL_ARROW_BACK_MULTIPLIER;
+
+  state.distMovedSinceSpawn = 0;
+  state.clickTarget = null;
+  state.moving = false;
+  state.spawnLockUntil = now + 500;
+}
 
   /* ═══════════════════════════════════════════
      COLLISION
@@ -1886,41 +1898,61 @@
     }
   }
 
-  /* ═══════════════════════════════════════════
-     MAIN LOOP
-  ═══════════════════════════════════════════ */
-  function tick(now) {
-    const dt = Math.min(50, Math.max(8, now - (lastTickTime || now)));
-    lastTickTime = now;
-    SPEED = BASE_SPEED * (dt / TARGET_DT);
+ /* ═══════════════════════════════════════════
+   MAIN LOOP
+═══════════════════════════════════════════ */
+function tick(now) {
+  const dt = Math.min(50, Math.max(8, now - (lastTickTime || now)));
+  lastTickTime = now;
+  SPEED = BASE_SPEED * (dt / TARGET_DT);
 
-    const anyModalOpen = state.transitioning || isPortalOpen() || state.mazeExiting
-                      || isBonusPopOpen()    || isWandererPopOpen();
+  const anyModalOpen =
+    state.transitioning ||
+    isPortalOpen() ||
+    state.mazeExiting ||
+    isBonusPopOpen() ||
+    isWandererPopOpen();
 
-    if (!anyModalOpen) {
-      handleClickMovement(now);
-      updateWanderers(now);
+  if (!anyModalOpen) {
+    handleClickMovement(now);
+    updateWanderers(now);
 
-      if (state.roomId === "room_08" && state.moving) {
-        const dPortal = Math.hypot(state.x - PORTAL.x, state.y - PORTAL.y);
-        if (dPortal <= PORTAL_TRIGGER_R) { state.clickTarget = null; openPortal(); }
+    // room-enter protection: do not allow instant re-exit
+    const spawnUnlocked =
+      now >= (state.spawnLockUntil || 0) &&
+      state.distMovedSinceSpawn >= ARROW_MOVE_THRESHOLD;
+
+    if (state.roomId === "room_08" && state.moving) {
+      const dPortal = Math.hypot(state.x - PORTAL.x, state.y - PORTAL.y);
+      if (dPortal <= PORTAL_TRIGGER_R) {
+        state.clickTarget = null;
+        state.moving = false;
+        openPortal();
       }
-
-      if (state.roomId === MAZE_EXIT.roomId && state.distMovedSinceSpawn >= ARROW_MOVE_THRESHOLD) {
-        const dMaze = Math.hypot(state.x - MAZE_EXIT.x, state.y - MAZE_EXIT.y);
-        if (dMaze <= MAZE_EXIT.r) exitToMaze();
-      }
-
-      if (state.distMovedSinceSpawn >= ARROW_MOVE_THRESHOLD) {
-        const exit = getNPPExit(now);
-        if (exit) transitionTo(exit);
-      }
-
-      checkBonusTrees();
     }
-    drawFrame(now);
-    requestAnimationFrame(tick);
+
+    if (spawnUnlocked && state.roomId === MAZE_EXIT.roomId) {
+      const dMaze = Math.hypot(state.x - MAZE_EXIT.x, state.y - MAZE_EXIT.y);
+      if (dMaze <= MAZE_EXIT.r) {
+        state.clickTarget = null;
+        state.moving = false;
+        exitToMaze();
+      }
+    }
+
+    if (spawnUnlocked) {
+      const exit = getNPPExit(now);
+      if (exit) {
+        state.clickTarget = null;
+        state.moving = false;
+        transitionTo(exit);
+      }
+    }
   }
+
+  drawFrame(now);
+  requestAnimationFrame(tick);
+}
 
   /* ═══════════════════════════════════════════
      MUSIC
