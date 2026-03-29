@@ -584,19 +584,6 @@
      UTSUROBA PORTAL — canvas marker + popup
   ═══════════════════════════════════════════ */
 
-  function _utsurobaCurriculumUnlocked() {
-    if (window.__devAllGames) return true;
-    try {
-      if (window.BoohaAdventure && BoohaAdventure.scores) {
-        const curricula = ['bc', 'br', 'pb'];
-        for (const c of curricula) {
-          if (BoohaAdventure.scores.weeklyCompletedFor(c) >= 9) return true;
-        }
-      }
-    } catch (_) {}
-    return false;
-  }
-
   /* Drip particles — downward, heavy, viscous */
   const DRIP_MAX       = 10;
   const DRIP_SPAWN_MS  = 340;
@@ -899,7 +886,7 @@
 
     document.body.appendChild(utsurubaPopOverlay);
 
-    document.getElementById('utsuroba-pop-close').addEventListener('click', closeUtsurobaPop);
+    document.getElementById('utsuroba-pop-close').addEventListener('click', closeUtsurobaPopClose);
     document.getElementById('utsuroba-locked-ok').addEventListener('click', closeUtsurobaPopClose);
     document.getElementById('utsuroba-no').addEventListener('click', closeUtsurobaPopClose);
     document.getElementById('utsuroba-yes').addEventListener('click', startUtsuobaTransition);
@@ -947,37 +934,6 @@
 
   function closeUtsurobaPopClose() {
     utsurobaCooldownUntil = performance.now() + POPUP_COOLDOWN_MS;
-    closeUtsurobaPopAnim();
-  }
-
-  function closeUtsurobaPopAnim() {
-    utsurubaPopOverlay.style.background = 'rgba(0,0,0,0)';
-    setTimeout(() => { utsurubaPopOverlay.style.display = 'none'; }, 400);
-  }
-
-  function closeUtsurobaPopClose_noCD() { closeUtsurobaPopAnim(); }
-  function closeUtsurobaPopAnim_noCD()  { closeUtsurobaPopAnim(); }
-
-  // alias used by ✕ button — no cooldown impact needed, still set cooldown
-  function closeUtsurobaPopAnim2() {
-    utsurobaCooldownUntil = performance.now() + POPUP_COOLDOWN_MS;
-    closeUtsurobaPopAnim();
-  }
-
-  // Simplify — ✕ button reuses close with cooldown
-  function closeUtsurobaPopAnim_x() { closeUtsurobaPopClose(); }
-
-  // Fix ✕ button binding
-  function injectUtsuobaPopOverlay_fixClose() {
-    const closeBtn = document.getElementById('utsuroba-pop-close');
-    if (closeBtn) {
-      closeBtn.removeEventListener('click', closeUtsurobaPopClose);
-      closeBtn.addEventListener('click', closeUtsurobaPopClose);
-    }
-  }
-
-  function closeUtsurobaPopClose() {
-    utsurobaCooldownUntil = performance.now() + POPUP_COOLDOWN_MS;
     utsurubaPopOverlay.style.background = 'rgba(0,0,0,0)';
     setTimeout(() => { utsurubaPopOverlay.style.display = 'none'; }, 400);
   }
@@ -987,7 +943,8 @@
   }
 
   function startUtsuobaTransition() {
-    closeUtsurobaPopAnim();
+    utsurubaPopOverlay.style.background = 'rgba(0,0,0,0)';
+    utsurubaPopOverlay.style.display    = 'none';
     state.clickTarget = null;
     state.moving      = false;
 
@@ -1205,9 +1162,7 @@
   }
 
   /* Patch _utsurobaCurriculumUnlocked to also respect dev flag */
-  const _utsurobaCurriculumUnlocked_orig = _utsurobaCurriculumUnlocked;
-  // Note: we handle __devUtsuroba inside the function already via __devAllGames,
-  // so we add a separate check inline in the draw/check functions.
+  /* _utsurobaCurriculumUnlocked redeclared here so __devUtsuroba is in scope */
 
   function _utsurobaCurriculumUnlocked() {
     if (window.__devAllGames || window.__devUtsuroba) return true;
