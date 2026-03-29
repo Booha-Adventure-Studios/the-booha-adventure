@@ -1,7 +1,7 @@
 
 (() => {
-  const DATA = window.BUKISARA_DATA;
-  if (!DATA || !DATA.rooms) { console.error("BUKISARA_DATA not found."); return; }
+  const DATA = window.UTSUROBA_DATA;
+  if (!DATA || !DATA.rooms) { console.error("UTSUROBA_DATA not found."); return; }
 
   /* ═══════════════════════════════════════════
      CONSTANTS
@@ -31,8 +31,8 @@
 
   /* ═══════════════════════════════════════════
      MONTH COLOURS
-     Muted / de-saturated palette for Bukisara,
-     matching the inline script in bukisara.html.
+     Muted / de-saturated palette for utsuroba,
+     matching the inline script in utsuroba.html.
   ═══════════════════════════════════════════ */
   const MONTH_COLORS = [
     ['#9b2c7a','#c45fa3'],
@@ -65,7 +65,7 @@
      NPP — navigation passage points (arrows)
      Same 15-room topology as Karasuki.
      Coordinates are identical; update them once
-     Bukisara backgrounds are finalised.
+     utsuroba backgrounds are finalised.
   ═══════════════════════════════════════════ */
   const NPP_RADIUS = 40;
 
@@ -183,7 +183,7 @@
   const ghostImg = new Image();
   ghostImg.src   = '/the-booha-adventure/assets/img/booha_ghost.png';
 
-  const music  = new Audio('/the-booha-adventure/assets/audio/bukisara-music.mp3');
+  const music  = new Audio('/the-booha-adventure/assets/audio/utsuroba-music.mp3');
   music.loop   = true;
   music.volume = 0.65;
 
@@ -198,10 +198,10 @@
     s.textContent = `
       html,body{margin:0;padding:0;width:100%;height:100%;background:#000;overflow:hidden;}
       body{display:grid;place-items:center;}
-      #bukisara-app{position:relative;width:100vw;height:100vh;overflow:hidden;background:#000;}
-      #bukisara-stage{position:absolute;left:50%;top:50%;width:${WORLD_W}px;height:${WORLD_H}px;transform-origin:50% 50%;overflow:hidden;cursor:crosshair;}
-      #bukisara-room-layer{position:absolute;inset:0;}
-      .bukisara-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center center;display:block;pointer-events:none;user-select:none;}
+      #utsuroba-app{position:relative;width:100vw;height:100vh;overflow:hidden;background:#000;}
+      #utsuroba-stage{position:absolute;left:50%;top:50%;width:${WORLD_W}px;height:${WORLD_H}px;transform-origin:50% 50%;overflow:hidden;cursor:crosshair;}
+      #utsuroba-room-layer{position:absolute;inset:0;}
+      .utsuroba-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center center;display:block;pointer-events:none;user-select:none;}
       #buki-canvas{position:absolute;inset:0;z-index:10;pointer-events:none;}
       #buki-fade{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none;z-index:20;}
       #rotate-overlay{display:none;position:fixed;inset:0;z-index:9999;background:#000;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center;padding:32px;}
@@ -254,7 +254,7 @@
       color:#a8d8a8;letter-spacing:.06em;min-width:160px;
       box-shadow:0 0 20px rgba(168,216,168,.15);`;
     panel.innerHTML = `
-      <div style="font-size:9px;color:rgba(168,216,168,.5);letter-spacing:.14em;margin-bottom:6px;">DEV — BUKISARA</div>
+      <div style="font-size:9px;color:rgba(168,216,168,.5);letter-spacing:.14em;margin-bottom:6px;">DEV — utsuroba</div>
       <div id="buki-dev-room-info" style="font-size:9px;color:rgba(168,216,168,.45);margin-top:4px;"></div>`;
     document.body.appendChild(panel);
     setInterval(() => {
@@ -267,9 +267,9 @@
      DOM BUILD
   ═══════════════════════════════════════════ */
   function buildApp() {
-    app       = document.createElement('div'); app.id = 'bukisara-app';
-    stage     = document.createElement('div'); stage.id = 'bukisara-stage';
-    roomLayer = document.createElement('div'); roomLayer.id = 'bukisara-room-layer';
+    app       = document.createElement('div'); app.id = 'utsuroba-app';
+    stage     = document.createElement('div'); stage.id = 'utsuroba-stage';
+    roomLayer = document.createElement('div'); roomLayer.id = 'utsuroba-room-layer';
     canvas    = document.createElement('canvas'); canvas.id = 'buki-canvas';
     const fade = document.createElement('div'); fade.id = 'buki-fade';
 
@@ -404,7 +404,7 @@
 
   function makeBg(src) {
     const img = document.createElement('img');
-    img.className = 'bukisara-bg';
+    img.className = 'utsuroba-bg';
     img.src = src;
     return img;
   }
