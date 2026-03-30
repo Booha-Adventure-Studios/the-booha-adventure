@@ -1,5 +1,4 @@
 
-
 (() => {
   const DATA = window.UTSUROBA_DATA;
   if (!DATA || !DATA.rooms) { console.error("UTSUROBA_DATA not found."); return; }
@@ -23,7 +22,6 @@
   const CENTER_Y    = WORLD_H * 0.5;
   const ARRIVE_DIST = 10;
 
-  /* Ghost enters rising from below the canvas */
   const ENTER_START_X = CENTER_X;
   const ENTER_START_Y = WORLD_H + GHOST_R * 4;
 
@@ -46,7 +44,7 @@
   const ARROW_MOVE_THRESHOLD          = 30;
   const POPUP_COOLDOWN_MS             = 900;
   const DRIFTER_HIT_R                 = isTouchDevice ? 64 : 48;
-  
+  const PANEL_SLIDE_MS                = 340; /* must match CSS transition */
 
   const KARASUKI_EXIT = {
     roomId : 'room_03',
@@ -117,7 +115,6 @@
     try { if (window.BoohaAdventure?.save) BoohaAdventure.save.save(data); } catch(_){}
   }
 
-  /* ── Quest cache — reads save max once per 500ms, not per frame ── */
   let _cachedQuest=null, _cachedQuestTime=0;
   function getCachedQuest() {
     const now=performance.now();
@@ -158,14 +155,9 @@
   }
   function drifterWorldPos(d) { return { x:d.roomCoords.x, y:d.roomCoords.y }; }
 
-  /* Preserve natural aspect ratio — store display dims on load */
   const drifterImgs = {};
   DATA.drifters.forEach(d => {
-    const load = src => {
-      const img=new Image(); img.src=src;
-     
-      return img;
-    };
+    const load = src => { const img=new Image(); img.src=src; return img; };
     drifterImgs[d.id]={ img1:load(d.sprite1), img2:load(d.sprite2) };
   });
 
@@ -210,10 +202,19 @@
     return `./assets/audio/memories/${d.audioPrefix}_q${String(memIdx).padStart(2,'0')}.mp3`;
   }
 
-  let questAudio=null;
+  /* ── FIX 1: activeAudio control ── */
+  let activeAudio = null;
+  function stopActiveAudio() {
+    if (!activeAudio) return;
+    try { activeAudio.pause(); activeAudio.currentTime=0; } catch(_){}
+    activeAudio = null;
+  }
   function playQuestAudio(src) {
-    if(questAudio){try{questAudio.pause();}catch(_){}}
-    questAudio=new Audio(src); questAudio.play().catch(()=>{});
+    stopActiveAudio();
+    const a = new Audio(src);
+    activeAudio = a;
+    a.play().catch(()=>{});
+    a.onended = () => { if(activeAudio===a) activeAudio=null; };
   }
 
   /* Sparkles */
@@ -249,6 +250,9 @@
   let coordToggle,coordReadout,pinLog;
   let exitPopOverlay=null, exitPopCooldownUntil=0;
   let drifterPanel=null, drifterPanelOpen=false, drifterPanelCooldown=0;
+
+  /* ── FIX 2: isMemoryPlaying lock (scoped to replay btn only) ── */
+  let isMemoryPlaying = false;
 
   /* ═══════════════════════════════════════════
      STYLES
@@ -296,8 +300,8 @@
       #buki-copy-toast{position:fixed;top:52px;left:50%;transform:translateX(-50%);z-index:300;background:rgba(20,0,30,.92);color:#fff;font:700 12px/1 monospace;padding:6px 18px;border-radius:20px;pointer-events:none;opacity:0;transition:opacity .18s;letter-spacing:.05em;}
       #buki-copy-toast.show{opacity:1;}
 
-      /* ══ DRIFTER PANEL — bottom slide-up, warm parchment ══ */
-      #utsuroba-drifter-panel{position:fixed;bottom:0;left:0;right:0;z-index:9100;background:linear-gradient(180deg,#f7f2e8 0%,#ede5d0 100%);border-top:2px solid #c8b48a;border-radius:20px 20px 0 0;box-shadow:0 -6px 32px rgba(0,0,0,0.5);transform:translateY(100%);transition:transform 0.32s cubic-bezier(0.22,1,0.36,1);font-family:'Georgia',serif;pointer-events:none;}
+      /* ══ DRIFTER PANEL ══ */
+      #utsuroba-drifter-panel{position:fixed;bottom:0;left:0;right:0;z-index:9100;background:linear-gradient(180deg,#f7f2e8 0%,#ede5d0 100%);border-top:2px solid #c8b48a;border-radius:20px 20px 0 0;box-shadow:0 -6px 32px rgba(0,0,0,0.5);transform:translateY(100%);transition:transform ${PANEL_SLIDE_MS}ms cubic-bezier(0.22,1,0.36,1);font-family:'Georgia',serif;pointer-events:none;}
       #utsuroba-drifter-panel.open{transform:translateY(0);pointer-events:auto;}
       .dp-handle{width:38px;height:4px;border-radius:2px;background:#c0aa80;margin:10px auto 0;}
       .dp-inner{display:flex;align-items:flex-start;gap:clamp(10px,2.5vw,22px);padding:12px clamp(14px,3.5vw,28px) 22px;}
@@ -321,6 +325,7 @@
       .dp-btn.no:hover{border-color:#806030;color:#4a2c08;}
       .dp-audio-btn{display:flex;align-items:center;gap:7px;background:#f0e8d0;border:1px solid #c0a060;color:#4a2c08;font-family:'Georgia',serif;font-size:clamp(.70rem,1.8vw,.82rem);letter-spacing:.08em;padding:7px 16px;border-radius:4px;cursor:pointer;transition:all .16s;margin-bottom:9px;}
       .dp-audio-btn:hover{background:#e8dab8;}
+      .dp-audio-btn:disabled{opacity:.45;cursor:default;}
     `;
     document.head.appendChild(s);
   }
@@ -388,6 +393,7 @@
   function doExitToKarasuki(){
     if(state.exitingToKarasuki) return;
     state.exitingToKarasuki=true; state.clickTarget=null; state.moving=false;
+    stopActiveAudio();
     try{music.pause();music.currentTime=0;}catch(_){}
     exitPopOverlay.style.display='none';
     const fadeEl=document.getElementById('buki-fade');
@@ -411,7 +417,11 @@
 
   function openDrifterPanel(drifter){
     if(performance.now()<drifterPanelCooldown||!drifter||!drifterPanel) return;
-    drifterPanelOpen=true; state.inputLocked=true; state.clickTarget=null;
+
+    /* ── FIX 4: set inputLocked immediately, panel open flag ── */
+    drifterPanelOpen=true;
+    state.inputLocked=true;
+    state.clickTarget=null;
     try{music.pause();}catch(_){}
 
     const quest=getCachedQuest();
@@ -480,23 +490,54 @@
         </div>
       </div>`;
 
+    /* ── FIX 3: all dismiss buttons wire to same close path ── */
     drifterPanel.querySelectorAll('.dp-dismiss').forEach(btn=>btn.addEventListener('click',closeDrifterPanel));
 
+    /* ── FIX: YES btn — close then reopen to show accepted state ── */
     const yesBtn=drifterPanel.querySelector('#dp-yes-btn');
     if(yesBtn) yesBtn.addEventListener('click',()=>{
       const q=activateQuest(drifter.id);
-      if(q){const src=questAudioSrc(drifter.id,q.memIdx);if(src)playQuestAudio(src);}
-      closeDrifterPanel();
+      let audioSrc=null;
+      if(q){ audioSrc=questAudioSrc(drifter.id,q.memIdx); }
+
+      /* slide down, then slide back up with accepted state + auto-play */
+      closeDrifterPanelSilent();
+      setTimeout(()=>{
+        if(audioSrc) playQuestAudio(audioSrc);
+        openDrifterPanel(drifter);
+      }, PANEL_SLIDE_MS + 60);
     });
 
+    /* ── FIX 2: replay btn with isMemoryPlaying lock ── */
     const replayBtn=drifterPanel.querySelector('#dp-replay-btn');
-    if(replayBtn) replayBtn.addEventListener('click',()=>{
-      const q=getCachedQuest(); if(!q) return;
-      const src=questAudioSrc(q.active,q.memIdx); if(src) playQuestAudio(src);
-    });
+    if(replayBtn){
+      if(isMemoryPlaying) replayBtn.disabled=true;
+      replayBtn.addEventListener('click',()=>{
+        if(isMemoryPlaying) return;
+        const q=getCachedQuest(); if(!q) return;
+        const src=questAudioSrc(q.active,q.memIdx); if(!src) return;
+        isMemoryPlaying=true;
+        replayBtn.disabled=true;
+        replayBtn.textContent='▶ Playing…';
+        stopActiveAudio();
+        const a=new Audio(src);
+        activeAudio=a;
+        a.play().catch(()=>{});
+        a.onended=()=>{
+          if(activeAudio===a) activeAudio=null;
+          isMemoryPlaying=false;
+          /* btn may have been removed if panel closed mid-play — guard */
+          if(replayBtn.isConnected){
+            replayBtn.disabled=false;
+            replayBtn.textContent='▶ Play / 聴く';
+          }
+        };
+      });
+    }
 
     const cancelQuestBtn=drifterPanel.querySelector('#dp-cancel-quest-btn');
     if(cancelQuestBtn) cancelQuestBtn.addEventListener('click',()=>{
+      stopActiveAudio();
       clearQuest();
       closeDrifterPanel();
     });
@@ -513,11 +554,24 @@
     requestAnimationFrame(()=>requestAnimationFrame(()=>drifterPanel.classList.add('open')));
   }
 
+  /* ── FIX 4: inputLocked cleared after slide animation, not immediately ── */
   function closeDrifterPanel(){
     drifterPanelCooldown=performance.now()+POPUP_COOLDOWN_MS;
-    drifterPanelOpen=false; state.inputLocked=false;
+    drifterPanelOpen=false;
     drifterPanel.classList.remove('open');
+    stopActiveAudio();
+    isMemoryPlaying=false;
+    /* defer input unlock until panel has fully slid down */
+    setTimeout(()=>{ state.inputLocked=false; },PANEL_SLIDE_MS);
     try{music.play().catch(()=>{});}catch(_){}
+  }
+
+  /* Silent close used by Yes-btn reopen — does NOT restart music or clear audio */
+  function closeDrifterPanelSilent(){
+    drifterPanelOpen=false;
+    drifterPanel.classList.remove('open');
+    isMemoryPlaying=false;
+    /* inputLocked stays true — openDrifterPanel will re-set it */
   }
 
   function showWrongMemoryMsg(){
@@ -619,11 +673,10 @@
   function makeBg(src){const img=document.createElement('img');img.className='utsuroba-bg';img.src=src;return img;}
   let currentBg;
 
-  /* Initial page load — ghost rises from below */
   function renderInitialRoom(){
     const room=getRoom(); currentBg=makeBg(room.bg); roomLayer.appendChild(currentBg);
     const spawn=getSpawn(room,state.spawnId);
-    placeGhost(ENTER_START_X,ENTER_START_Y);  /* below canvas */
+    placeGhost(ENTER_START_X,ENTER_START_Y);
     state.spawnX=spawn.x; state.spawnY=spawn.y;
     state.travelingToCenter=true; state.inputLocked=true;
     state.clickTarget={x:spawn.x,y:spawn.y};
@@ -634,7 +687,6 @@
     state.distMovedSinceSpawn=0; state.moving=false; state.spawnLockUntil=now+500;
   }
 
-  /* Room transition — ghost arrives at edge, travels to center */
   function arriveInRoom(nextRoom,spawnId,arrivalDir){
     const spawn=getSpawn(nextRoom,spawnId);
     placeGhost(spawn.x,spawn.y);
@@ -687,7 +739,6 @@
     const OPP={left:'right',right:'left',up:'down',down:'up'};
     const arrivalExit=state.arrivalDir?OPP[state.arrivalDir]:null;
     for(const npp of npps){
-    
       if(Math.hypot(state.x-npp.x,state.y-npp.y)<=NPP_RADIUS){
         if(npp.dir===arrivalExit&&now<arrivalArrowBackHiddenUntil)return null;
         return npp;
@@ -710,7 +761,7 @@
   }
 
   /* ═══════════════════════════════════════════
-     DRAW EXIT ARROWS — always at least 35% opacity
+     DRAW EXIT ARROWS
   ═══════════════════════════════════════════ */
   function drawExitArrows(now){
     const npps=NPP[state.roomId];if(!npps)return;
@@ -784,7 +835,7 @@
   }
 
   /* ═══════════════════════════════════════════
-     DRAW DRIFTERS — natural aspect ratio, independent bob
+     DRAW DRIFTERS
   ═══════════════════════════════════════════ */
   function drawDrifters(){
     const drifter=drifterForRoom(state.roomId);if(!drifter)return;
@@ -795,22 +846,19 @@
     const img=useImg2?imgs.img2:imgs.img1;
     const pos=drifterWorldPos(drifter);
 
-    /* Natural dimensions — fall back to square while loading: Still playing with sizes*/
-    const dw = img.naturalWidth  * drifter.scale;
-    const dh = img.naturalHeight * drifter.scale;
-
+    const dw=img.naturalWidth*drifter.scale;
+    const dh=img.naturalHeight*drifter.scale;
     const alpha=hasMemories?1:0.35;
 
     ctx.save();
     ctx.globalAlpha=alpha;
     if(img.complete&&img.naturalWidth>0){
       if(shadowsEnabled&&hasMemories){ctx.shadowBlur=18;ctx.shadowColor='#d8c0f8';}
-      /* Anchor bottom of sprite at pos.y, centered on pos.x — no movement */
       ctx.drawImage(img,pos.x-dw/2,pos.y-dh,dw,dh);
       ctx.shadowBlur=0;
     } else {
       ctx.fillStyle='#c090e8';
-      ctx.beginPath();ctx.arc(pos.x,pos.y-DRIFTER_MAX_H/2,24,0,Math.PI*2);ctx.fill();
+      ctx.beginPath();ctx.arc(pos.x,pos.y-40,24,0,Math.PI*2);ctx.fill();
     }
     ctx.restore();
   }
@@ -897,7 +945,7 @@
   }
 
   /* ═══════════════════════════════════════════
-     CENTER TRAVEL — input locked until arrival
+     CENTER TRAVEL
   ═══════════════════════════════════════════ */
   function handleCenterTravel(now){
     if(!state.travelingToCenter)return;
@@ -943,6 +991,17 @@
     if(wx>=pos.x-dw/2&&wx<=pos.x+dw/2&&wy>=pos.y-dh&&wy<=pos.y){openDrifterPanel(drifter);return true;}
     return false;
   }
+
+  /* ═══════════════════════════════════════════
+     FIX 3: unified tap handler — click + touch both route here
+  ═══════════════════════════════════════════ */
+  function handleWorldTap(wx,wy){
+    if(DEV_MODE&&state.coordMode){dropPin(wx,wy);ripples.push({x:wx,y:wy,life:1});return;}
+    if(clickCheckDrifter(wx,wy)){ripples.push({x:wx,y:wy,life:1});return;}
+    if(clickCheckKarasukiExit(wx,wy)){ripples.push({x:wx,y:wy,life:1});return;}
+    state.clickTarget={x:wx,y:wy};ripples.push({x:wx,y:wy,life:1});
+  }
+
   /* ═══════════════════════════════════════════
      MAIN LOOP
   ═══════════════════════════════════════════ */
@@ -982,25 +1041,25 @@
         const el=document.getElementById('buki-coord-xy');if(el)el.textContent=`${Math.round(p.x)}, ${Math.round(p.y)}`;
       });
     }
+
+    /* ── FIX 3: both events call handleWorldTap ── */
     stage.addEventListener('click',e=>{
       startMusic();
       if(state.transitioning||state.travelingToCenter||state.inputLocked)return;
       const p=stagePointToWorld(e.clientX,e.clientY);
-      if(DEV_MODE&&state.coordMode){dropPin(p.x,p.y);ripples.push({x:p.x,y:p.y,life:1});return;}
-      if(clickCheckDrifter(p.x,p.y)){ripples.push({x:p.x,y:p.y,life:1});return;}
-      if(clickCheckKarasukiExit(p.x,p.y)){ripples.push({x:p.x,y:p.y,life:1});return;}
-      state.clickTarget={x:p.x,y:p.y};ripples.push({x:p.x,y:p.y,life:1});
+      handleWorldTap(p.x,p.y);
     });
+
     stage.addEventListener('touchend',e=>{
       startMusic();
       if(state.transitioning||state.travelingToCenter||state.inputLocked){e.preventDefault();return;}
       if(!e.changedTouches.length)return;
-      const t0=e.changedTouches[0],p=stagePointToWorld(t0.clientX,t0.clientY);
-      if(DEV_MODE&&state.coordMode){dropPin(p.x,p.y);ripples.push({x:p.x,y:p.y,life:1});e.preventDefault();return;}
-      if(clickCheckDrifter(p.x,p.y)){ripples.push({x:p.x,y:p.y,life:1});e.preventDefault();return;}
-      if(clickCheckKarasukiExit(p.x,p.y)){ripples.push({x:p.x,y:p.y,life:1});e.preventDefault();return;}
-      state.clickTarget={x:p.x,y:p.y};ripples.push({x:p.x,y:p.y,life:1});e.preventDefault();
+      const t0=e.changedTouches[0];
+      const p=stagePointToWorld(t0.clientX,t0.clientY);
+      handleWorldTap(p.x,p.y);
+      e.preventDefault();
     },{passive:false});
+
     document.addEventListener('click',startMusic,{once:true});
     document.addEventListener('touchend',startMusic,{once:true,passive:true});
   }
