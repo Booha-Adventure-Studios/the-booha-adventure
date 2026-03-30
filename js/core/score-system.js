@@ -81,22 +81,24 @@ const BoohaScoreSystem = (() => {
       wCompleted[gameId] = true;
     }
 
-    // ── 3. Unlock next wanderer ────────────────────────────────────────────
-    // One wanderer per game played this week (up to 27).
-    // Uses the total count of distinct games played this week as the index.
-    const distinctPlayed = Object.keys(wScores).length; // count after adding this game
-    const wandererIndex  = distinctPlayed - 1;           // 0-based
-    if (wandererIndex >= 0 && wandererIndex < 27 && !wWanderers.includes(wandererIndex)) {
-      wWanderers.push(wandererIndex);
-    }
+   // ── 3. Unlock next wanderer ─────────────────────────────────────────────
+// One random wanderer unlocked per distinct game played this week (up to 22).
+const distinctPlayed = Object.keys(wScores).length; // count after adding this game
 
-    data.weekly = {
-      ...weekly,
-      gameScores:     wScores,
-      gameStars:      wStars,
-      completedGames: wCompleted,
-      wanderers:      wWanderers,
-    };
+const allIndices = Array.from({length: 22}, (_, i) => i);
+const remaining  = allIndices.filter(i => !wWanderers.includes(i));
+if (remaining.length > 0) {
+  const pick = remaining[Math.floor(Math.random() * remaining.length)];
+  wWanderers.push(pick);
+}
+
+data.weekly = {
+  ...weekly,
+  gameScores:     wScores,
+  gameStars:      wStars,
+  completedGames: wCompleted,
+  wanderers:      wWanderers,
+};
 
     // ── 4. Update meta.allTimeStars ────────────────────────────────────────
     // Only add the improvement in stars (delta) to avoid double-counting.
