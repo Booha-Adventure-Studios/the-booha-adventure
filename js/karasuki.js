@@ -1,4 +1,5 @@
 
+
 (() => {
   const DATA = window.KARASUKI_DATA;
   if (!DATA || !DATA.rooms) { console.error("KARASUKI_DATA not found."); return; }
@@ -281,19 +282,19 @@
     const memIdx    = (quest && quest.memIdx != null) ? quest.memIdx : 1;
     const drifterId = (quest && quest.active) ? quest.active : 'ks';
 
-    /* ── FIX: memKey uses _a format (orb audio), distinct from _q (quest audio) ── */
-    const correctMemKey = `${drifterId}_a${String(memIdx).padStart(2, '0')}`;
+    /* ── FIX: memoryId uses _a format (orb audio), distinct from _q (quest audio) ── */
+    const correctMemoryId = `${drifterId}_a${String(memIdx).padStart(2, '0')}`;
 
     const orbs = [];
     roomOrder.forEach((roomId, i) => {
       const pos       = generateOrbPosition(roomId, rng);
       const isCorrect = (i === 0);
-      /* ── FIX: orb carries memKey (memory identity) not a generic id ── */
-      const memKey    = isCorrect ? correctMemKey : pickedDecoys[i - 1];
+      /* ── FIX: orb carries memoryId (memory identity) not a generic id ── */
+      const memoryId    = isCorrect ? correctMemoryId : pickedDecoys[i - 1];
       const audioFile = isCorrect
-        ? ORB_AUDIO_BASE + correctMemKey + '.mp3'
+        ? ORB_AUDIO_BASE + correctMemoryId + '.mp3'
         : ORB_AUDIO_BASE + pickedDecoys[i - 1] + '.mp3';
-      orbs.push({ memKey, roomId, x: pos.x, y: pos.y, audioFile, collected: false, isCorrect });
+      orbs.push({ memoryId, roomId, x: pos.x, y: pos.y, audioFile, collected: false, isCorrect });
     });
     return orbs;
   }
@@ -322,16 +323,16 @@
   function initOrbs() {
     weeklyOrbs = buildWeeklyOrbs();
     const quest = loadDrifterQuest();
-    /* ── FIX: restore collected state using collectedMemKey ── */
-    if (quest && quest.collectedMemKey) {
+    /* ── FIX: restore collected state using collectedMemoryId ── */
+    if (quest && quest.collectedMemoryId) {
       for (const orb of weeklyOrbs) {
-        if (orb.memKey === quest.collectedMemKey) { orb.collected = true; break; }
+        if (orb.memoryId === quest.collectedMemoryId) { orb.collected = true; break; }
       }
     }
   }
 
-  function returnOrbToKarasuki(memKey) {
-    const orb = weeklyOrbs.find(o => o.memKey === memKey);
+  function returnOrbToKarasuki(memoryId) {
+    const orb = weeklyOrbs.find(o => o.memoryId === memoryId);
     if (!orb) return;
     orb.collected = false;
     const rng      = seededRng(boohaWeek * 3571 + Date.now() % 997);
@@ -344,6 +345,8 @@
   }
 
   function getOrbsForRoom(roomId) {
+    const quest = loadDrifterQuest();
+    if (!quest || (quest.state !== 'accepted' && quest.state !== 'collected')) return [];
     return weeklyOrbs.filter(o => o.roomId === roomId && !o.collected);
   }
 
@@ -496,9 +499,9 @@
   function collectOrb() {
     if (!orbPanelOrb) return;
     const quest = loadDrifterQuest();
-    /* ── FIX: check collectedMemKey, not collectedOrbId ── */
-    const alreadyCarrying = quest && quest.collectedMemKey;
-    if (alreadyCarrying && quest.collectedMemKey !== orbPanelOrb.memKey) {
+    /* ── FIX: check collectedMemoryId, not collectedOrbId ── */
+    const alreadyCarrying = quest && quest.collectedMemoryId;
+    if (alreadyCarrying && quest.collectedMemoryId !== orbPanelOrb.memoryId) {
       swapOverlayEl.style.display = 'flex';
       return;
     }
@@ -513,9 +516,9 @@
   function doCollect(orb) {
     orb.collected = true;
     stopOrbAudio();
-    /* ── FIX: write collectedMemKey + orbIsCorrect, single write point ── */
+    /* ── FIX: write collectedMemoryId + orbIsCorrect, single write point ── */
     saveDrifterQuest({
-      collectedMemKey : orb.memKey,
+      collectedMemoryId : orb.memoryId,
       orbIsCorrect    : orb.isCorrect,
       state           : 'collected',
     });
@@ -1072,14 +1075,6 @@
   }
 
   function _playUtsuobaIntroVideo() {
-    try {
-      const watchedWeek = localStorage.getItem('utsuroba_video_week');
-      /* Only skip if boohaWeek is a real week (>0) AND matches stored value */
-      if (boohaWeek > 0 && watchedWeek === String(boohaWeek)) {
-        window.location.href = UTSUROBA_PORTAL.href; return;
-      }
-      if (boohaWeek > 0) localStorage.setItem('utsuroba_video_week', String(boohaWeek));
-    } catch (_) { window.location.href = UTSUROBA_PORTAL.href; return; }
     let vOverlay = document.getElementById('utsuroba-video-overlay');
     if (!vOverlay) {
       vOverlay = document.createElement('div');
@@ -1098,7 +1093,6 @@
       vid.addEventListener('ended', goToUtsuroba);
       vid.addEventListener('error', e => { console.warn('[utsuroba video] error:', e); goToUtsuroba(); });
       vid.play().catch(e => { console.warn('[utsuroba video] play() rejected:', e); goToUtsuroba(); });
-      /* Safety timeout — 60s covers even slow connections */
       setTimeout(goToUtsuroba, 60000);
     }
   }
@@ -1141,7 +1135,7 @@
 
   (function checkReturnOrbState() {
     try {
-      /* ── FIX: sessionStorage key is karasuki_return_wrong_orb, value is now memKey ── */
+      /* ── FIX: sessionStorage key is karasuki_return_wrong_orb, value is now memoryId ── */
       const wrongMemKey = sessionStorage.getItem('karasuki_return_wrong_orb');
       if (wrongMemKey) { sessionStorage.removeItem('karasuki_return_wrong_orb'); returnOrbToKarasuki(wrongMemKey); }
     } catch (_) {}
@@ -1251,9 +1245,9 @@
       if (el) {
         const quest    = loadDrifterQuest();
         const orbsHere = weeklyOrbs.filter(o => o.roomId === state.roomId && !o.collected);
-        /* ── FIX: show collectedMemKey in dev panel ── */
+        /* ── FIX: show collectedMemoryId in dev panel ── */
         const qInfo = quest
-          ? `q:${quest.active} m:${quest.memIdx} ${quest.collectedMemKey ? 'carrying:'+quest.collectedMemKey : 'carrying:none'}`
+          ? `q:${quest.active} m:${quest.memIdx} ${quest.collectedMemoryId ? 'carrying:'+quest.collectedMemoryId : 'carrying:none'}`
           : 'quest:none';
         el.innerHTML = `room:${state.roomId} | orbs:${orbsHere.length}<br>${qInfo}`;
       }
