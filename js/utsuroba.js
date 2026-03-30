@@ -1,5 +1,5 @@
 
-(() => {
+ (() => {
   const DATA = window.UTSUROBA_DATA;
   if (!DATA || !DATA.rooms) { console.error("UTSUROBA_DATA not found."); return; }
 
@@ -45,7 +45,7 @@
   const ARROW_MOVE_THRESHOLD          = 30;
   const POPUP_COOLDOWN_MS             = 900;
   const DRIFTER_HIT_R                 = isTouchDevice ? 64 : 48;
-  const DRIFTER_MAX_H                 = 110; /* max display height on canvas */
+  const DRIFTER_MAX_H                 = 150; /* max display height on canvas */
 
   const KARASUKI_EXIT = {
     roomId : 'room_03',
@@ -766,7 +766,7 @@
   /* ═══════════════════════════════════════════
      DRAW DRIFTERS — natural aspect ratio, independent bob
   ═══════════════════════════════════════════ */
-  function drawDrifters(now){
+  function drawDrifters(){
     const drifter=drifterForRoom(state.roomId);if(!drifter)return;
     const hasMemories=drifterHasMemories(drifter.id);
     const quest=getCachedQuest();
@@ -779,21 +779,18 @@
     const dw=img._dw||DRIFTER_MAX_H;
     const dh=img._dh||DRIFTER_MAX_H;
 
-    const sec=now/1000;
-    /* Offset phase from ghost so they don't bob in sync */
-    const bob=Math.sin(sec*1.35+1.8)*5;
     const alpha=hasMemories?1:0.35;
 
     ctx.save();
     ctx.globalAlpha=alpha;
     if(img.complete&&img.naturalWidth>0){
       if(shadowsEnabled&&hasMemories){ctx.shadowBlur=18;ctx.shadowColor='#d8c0f8';}
-      /* Anchor bottom of sprite at pos.y, centered on pos.x */
-      ctx.drawImage(img,pos.x-dw/2,pos.y-dh+bob,dw,dh);
+      /* Anchor bottom of sprite at pos.y, centered on pos.x — no movement */
+      ctx.drawImage(img,pos.x-dw/2,pos.y-dh,dw,dh);
       ctx.shadowBlur=0;
     } else {
       ctx.fillStyle='#c090e8';
-      ctx.beginPath();ctx.arc(pos.x,pos.y-DRIFTER_MAX_H/2+bob,24,0,Math.PI*2);ctx.fill();
+      ctx.beginPath();ctx.arc(pos.x,pos.y-DRIFTER_MAX_H/2,24,0,Math.PI*2);ctx.fill();
     }
     ctx.restore();
   }
@@ -851,7 +848,7 @@
     }
     trail=trail.filter(p=>p.life>0);
 
-    drawDrifters(now);
+    drawDrifters();
     drawExitArrows(now);
     drawKarasukiExitArrow(now);
     drawSparkles();
