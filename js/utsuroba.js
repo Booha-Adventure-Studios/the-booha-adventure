@@ -87,13 +87,13 @@
       { dir: 'up',    x: 760,  y: 346, to: 'room_08', spawn: 'fromDown'  }
     ],
     room_04: [
-      { dir: 'left',  x: 210,  y: 635, to: 'room_03', spawn: 'fromRight' },
-      { dir: 'right', x: 1330, y: 734, to: 'room_05', spawn: 'fromLeft'  },
-      { dir: 'up',    x: 548,  y: 270, to: 'room_09', spawn: 'fromDown'  }
+      { dir: 'left',  x: 382,  y: 611, to: 'room_03', spawn: 'fromRight' },
+      { dir: 'right', x: 1101, y: 504, to: 'room_05', spawn: 'fromLeft'  },
+      { dir: 'up',    x: 711,  y: 329, to: 'room_09', spawn: 'fromDown'  }
     ],
     room_05: [
-      { dir: 'left',  x: 212,  y: 642, to: 'room_04', spawn: 'fromRight' },
-      { dir: 'up',    x: 435,  y: 310, to: 'room_10', spawn: 'fromDown'  }
+      { dir: 'left',  x: 413,  y: 605, to: 'room_04', spawn: 'fromRight' },
+      { dir: 'up',    x: 710,  y: 309, to: 'room_10', spawn: 'fromDown'  }
     ],
     room_06: [
       { dir: 'right', x: 1069, y: 488, to: 'room_07', spawn: 'fromLeft'  },
@@ -101,10 +101,10 @@
       { dir: 'down',  x: 999,  y: 756, to: 'room_01', spawn: 'fromUp'    }
     ],
     room_07: [
-      { dir: 'left',  x: 160,  y: 687, to: 'room_06', spawn: 'fromRight' },
-      { dir: 'right', x: 1220, y: 614, to: 'room_08', spawn: 'fromLeft'  },
-      { dir: 'up',    x: 555,  y: 250, to: 'room_12', spawn: 'fromDown'  },
-      { dir: 'down',  x: 901,  y: 800, to: 'room_02', spawn: 'fromUp'    }
+      { dir: 'left',  x: 361,  y: 610, to: 'room_06', spawn: 'fromRight' },
+      { dir: 'right', x: 1111, y: 497, to: 'room_08', spawn: 'fromLeft'  },
+      { dir: 'up',    x: 705,  y: 326, to: 'room_12', spawn: 'fromDown'  },
+      { dir: 'down',  x: 995,  y: 759, to: 'room_02', spawn: 'fromUp'    }
     ],
     room_08: [
       { dir: 'left',  x: 352,  y: 603, to: 'room_07', spawn: 'fromRight' },
@@ -113,15 +113,15 @@
       { dir: 'down',  x: 1011,  y: 770, to: 'room_03', spawn: 'fromUp'    }
     ],
     room_09: [
-      { dir: 'left',  x: 160,  y: 702, to: 'room_08', spawn: 'fromRight' },
-      { dir: 'right', x: 1365, y: 224, to: 'room_10', spawn: 'fromLeft'  },
-      { dir: 'up',    x: 449,  y: 270, to: 'room_14', spawn: 'fromDown'  },
-      { dir: 'down',  x: 918,  y: 800, to: 'room_04', spawn: 'fromUp'    }
+      { dir: 'left',  x: 394,  y: 590, to: 'room_08', spawn: 'fromRight' },
+      { dir: 'right', x: 1123, y: 502, to: 'room_10', spawn: 'fromLeft'  },
+      { dir: 'up',    x: 707,  y: 318, to: 'room_14', spawn: 'fromDown'  },
+      { dir: 'down',  x: 1000,  y: 747, to: 'room_04', spawn: 'fromUp'    }
     ],
     room_10: [
-      { dir: 'left',  x: 160,  y: 702, to: 'room_09', spawn: 'fromRight' },
-      { dir: 'up',    x: 838,  y: 270, to: 'room_15', spawn: 'fromDown'  },
-      { dir: 'down',  x: 776,  y: 800, to: 'room_05', spawn: 'fromUp'    }
+      { dir: 'left',  x: 401,  y: 603, to: 'room_09', spawn: 'fromRight' },
+      { dir: 'up',    x: 705,  y: 316, to: 'room_15', spawn: 'fromDown'  },
+      { dir: 'down',  x: 994,  y: 753, to: 'room_05', spawn: 'fromUp'    }
     ],
     room_11: [
       { dir: 'right', x: 1208, y: 322, to: 'room_12', spawn: 'fromLeft'  },
@@ -139,12 +139,12 @@
     ],
     room_14: [
       { dir: 'left',  x: 303,  y: 631, to: 'room_13', spawn: 'fromRight' },
-      { dir: 'right', x: 1370, y: 716, to: 'room_15', spawn: 'fromLeft'  },
-      { dir: 'down',  x: 751,  y: 820, to: 'room_09', spawn: 'fromUp'    }
+      { dir: 'right', x: 1210, y: 405, to: 'room_15', spawn: 'fromLeft'  },
+      { dir: 'down',  x: 930,  y: 812, to: 'room_09', spawn: 'fromUp'    }
     ],
     room_15: [
-      { dir: 'left',  x: 200,  y: 568, to: 'room_14', spawn: 'fromRight' },
-      { dir: 'down',  x: 663,  y: 800, to: 'room_10', spawn: 'fromUp'    }
+      { dir: 'left',  x: 402,  y: 614, to: 'room_14', spawn: 'fromRight' },
+      { dir: 'down',  x: 1003,  y: 790, to: 'room_10', spawn: 'fromUp'    }
     ]
   };
 
