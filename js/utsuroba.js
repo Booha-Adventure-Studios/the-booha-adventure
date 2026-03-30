@@ -374,7 +374,7 @@
       const r=document.getElementById('buki-dev-room'),p=document.getElementById('buki-dev-perf'),q=document.getElementById('buki-dev-quest');
       if(r) r.textContent=`room:${state.roomId} moved:${Math.round(state.distMovedSinceSpawn)}`;
       if(p) p.textContent=`tier:${perfTier} dpr:${MAX_DPR} touch:${isTouchDevice}`;
-      if(q){const quest=getCachedQuest();q.textContent=quest?`quest:${quest.active} s:${quest.state} m:${quest.memIdx} key:${quest.collectedMemKey||'none'}`:'quest:none';}
+      if(q){const quest=getCachedQuest();q.textContent=quest?`quest:${quest.active} s:${quest.state} m:${quest.memIdx} key:${quest.collectedMemoryId||'none'}`:'quest:none';}
     },500);
   }
 
@@ -578,11 +578,10 @@ function renderWaitingState(drifter) {
 
     /* YES btn — close silently then reopen (no auto-play) */
    const yesBtn = drifterPanel.querySelector('#dp-yes-btn');
-    if (yesBtn) yesBtn.addEventListener('click', () => {
-      activateQuest(drifter.id);
-      invalidateQuestCache();
-      renderWaitingState(drifter);
-    });
+  if (yesBtn) yesBtn.addEventListener('click', () => {
+  activateQuest(drifter.id);
+  closeDrifterPanel();
+});
 
     /* Replay btn — manual play only, isMemoryPlaying lock */
     const replayBtn=drifterPanel.querySelector('#dp-replay-btn');
@@ -621,7 +620,7 @@ function renderWaitingState(drifter) {
     if(giveBtn) giveBtn.addEventListener('click',()=>{
       const q=getCachedQuest(); if(!q||q.state!=='collected'){closeDrifterPanel();return;}
       const expectedMemKey=`${drifter.id}_a${String(q.memIdx).padStart(2,'0')}`;
-      const correct=q.orbIsCorrect===true && q.collectedMemKey===expectedMemKey;
+      const correct = q.orbIsCorrect === true && q.collectedMemoryId === expectedMemKey;
       closeDrifterPanel();
       if(correct){
         completeMemory(drifter.id,q.memIdx);
