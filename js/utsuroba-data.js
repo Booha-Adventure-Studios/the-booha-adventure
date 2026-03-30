@@ -52,7 +52,7 @@ window.UTSUROBA_DATA = {
       sprite2     : './assets/img/drifters/chagrin_gobito-2.png',
       audioPrefix : 'cg',
       memoryCount : 2,
-      scale       : 0.15, 
+      scale       : 0.10, 
       roomCoords  : { x: 820, y: 580 }
     }
   ],
