@@ -484,7 +484,13 @@
   }
 
   function stopOrbAudio() {
-    if (orbAudio) { try { orbAudio.pause(); orbAudio.currentTime = 0; } catch (_) {} orbAudio = null; }
+    if (orbAudio) {
+      try { orbAudio.onended = null; orbAudio.pause(); orbAudio.currentTime = 0; } catch (_) {}
+      orbAudio = null;
+    }
+    /* reset play button state regardless */
+    const btn = document.getElementById('orb-play-btn');
+    if (btn) btn.textContent = '▶';
   }
 
   function collectOrb() {
@@ -721,7 +727,7 @@
     for (const w of activeWanderers) {
       if (!w.name || !w.frames) continue;
       const sz = w.size || WANDERER_SIZE;
-      if (Math.abs(worldX - w.rx) <= sz * 1.5 && Math.abs(worldY - w.ry) <= sz * 1.5) { openWandererPop(w); return true; }
+      if (Math.abs(worldX - w.rx) <= sz * 0.85 && Math.abs(worldY - w.ry) <= sz * 0.85) { openWandererPop(w); return true; }
     }
     return false;
   }
@@ -1068,8 +1074,11 @@
   function _playUtsuobaIntroVideo() {
     try {
       const watchedWeek = localStorage.getItem('utsuroba_video_week');
-      if (watchedWeek === String(boohaWeek)) { window.location.href = UTSUROBA_PORTAL.href; return; }
-      localStorage.setItem('utsuroba_video_week', String(boohaWeek));
+      /* Only skip if boohaWeek is a real week (>0) AND matches stored value */
+      if (boohaWeek > 0 && watchedWeek === String(boohaWeek)) {
+        window.location.href = UTSUROBA_PORTAL.href; return;
+      }
+      if (boohaWeek > 0) localStorage.setItem('utsuroba_video_week', String(boohaWeek));
     } catch (_) { window.location.href = UTSUROBA_PORTAL.href; return; }
     let vOverlay = document.getElementById('utsuroba-video-overlay');
     if (!vOverlay) {
@@ -1081,9 +1090,16 @@
       vid.autoplay = true; vid.playsInline = true; vid.muted = false;
       vid.style.cssText = 'max-width:100%;max-height:100%;object-fit:contain;';
       vOverlay.appendChild(vid); document.body.appendChild(vOverlay);
-      function goToUtsuroba() { window.location.href = UTSUROBA_PORTAL.href; }
-      vid.addEventListener('ended', goToUtsuroba); vid.addEventListener('error', goToUtsuroba);
-      vid.play().catch(goToUtsuroba); setTimeout(goToUtsuroba, 30000);
+      let redirected = false;
+      function goToUtsuroba() {
+        if (redirected) return; redirected = true;
+        window.location.href = UTSUROBA_PORTAL.href;
+      }
+      vid.addEventListener('ended', goToUtsuroba);
+      vid.addEventListener('error', e => { console.warn('[utsuroba video] error:', e); goToUtsuroba(); });
+      vid.play().catch(e => { console.warn('[utsuroba video] play() rejected:', e); goToUtsuroba(); });
+      /* Safety timeout — 60s covers even slow connections */
+      setTimeout(goToUtsuroba, 60000);
     }
   }
 
