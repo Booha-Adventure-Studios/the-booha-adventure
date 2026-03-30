@@ -41,9 +41,9 @@
   const POPUP_COOLDOWN_MS             = 900;
 
   const KARASUKI_EXIT = {
-    roomId : 'room_01',
-    x      : 742,
-    y      : 876,
+    roomId : 'room_03',
+    x      : 762,
+    y      : 816,
     r      : isTouchDevice ? 58 : 44,
     href   : 'karasuki.html',
   };
@@ -602,7 +602,7 @@
     });
   }
 
-  /* ── LEAVE arrow in room_01 ── */
+  /* ── LEAVE arrow in room_03 ── */
   function drawKarasukiExitArrow(now) {
     if (state.roomId !== KARASUKI_EXIT.roomId) return;
     const show = window.__devUtsuExit || state.distMovedSinceSpawn >= ARROW_MOVE_THRESHOLD;
