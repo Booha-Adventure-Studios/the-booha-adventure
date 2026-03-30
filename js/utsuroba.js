@@ -668,6 +668,7 @@
     const OPP={left:'right',right:'left',up:'down',down:'up'};
     const arrivalExit=state.arrivalDir?OPP[state.arrivalDir]:null;
     for(const npp of npps){
+    
       if(Math.hypot(state.x-npp.x,state.y-npp.y)<=NPP_RADIUS){
         if(npp.dir===arrivalExit&&now<arrivalArrowBackHiddenUntil)return null;
         return npp;
@@ -916,10 +917,13 @@
     if(state.inputLocked||drifterPanelOpen)return false;
     const drifter=drifterForRoom(state.roomId);if(!drifter)return false;
     const pos=drifterWorldPos(drifter);
-    if(Math.hypot(wx-pos.x,wy-pos.y)<=DRIFTER_HIT_R){openDrifterPanel(drifter);return true;}
+    const imgs=drifterImgs[drifter.id];
+    const img=imgs.img1;
+    const dw=img.naturalWidth*drifter.scale;
+    const dh=img.naturalHeight*drifter.scale;
+    if(wx>=pos.x-dw/2&&wx<=pos.x+dw/2&&wy>=pos.y-dh&&wy<=pos.y){openDrifterPanel(drifter);return true;}
     return false;
   }
-
   /* ═══════════════════════════════════════════
      MAIN LOOP
   ═══════════════════════════════════════════ */
