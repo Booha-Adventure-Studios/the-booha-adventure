@@ -511,10 +511,11 @@
     drifterPanel.querySelectorAll('.dp-dismiss').forEach(btn=>btn.addEventListener('click',closeDrifterPanel));
 
     /* YES btn — close silently then reopen (no auto-play) */
-    const yesBtn=drifterPanel.querySelector('#dp-yes-btn');
+   const yesBtn=drifterPanel.querySelector('#dp-yes-btn');
     if(yesBtn) yesBtn.addEventListener('click',()=>{
       activateQuest(drifter.id);
       closeDrifterPanel();
+      setTimeout(()=>openDrifterPanel(drifter), PANEL_SLIDE_MS + POPUP_COOLDOWN_MS + 50);
     });
 
     /* Replay btn — manual play only, isMemoryPlaying lock */
