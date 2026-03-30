@@ -181,11 +181,14 @@
     const memIdx=pickRandomMemory(id); if(memIdx===null) return null;
     const decoys=pickDecoys(DATA.decoysPerQuest);
     const data=loadSave(); if(!data.weekly) data.weekly={};
+    
     /* ── collectedMemKey/orbIsCorrect initialised null/false — written at orb pickup ── */
-    data.weekly.drifterQuest={
-      active:id, state:'accepted', memIdx, decoys,
-      collectedMemoryId:null, orbIsCorrect:false,
-    };
+   data.weekly.drifterQuest = {
+  active: id, state: 'accepted', memIdx, decoys,
+  collectedMemoryId: null,   // ← was collectedMemKey
+  orbIsCorrect: false,
+};
+    
     writeSave(data); invalidateQuestCache();
     return data.weekly.drifterQuest;
   }
@@ -577,9 +580,10 @@ function renderWaitingState(drifter) {
     drifterPanel.querySelectorAll('.dp-dismiss').forEach(btn=>btn.addEventListener('click',closeDrifterPanel));
 
     /* YES btn — close silently then reopen (no auto-play) */
-   const yesBtn = drifterPanel.querySelector('#dp-yes-btn');
-  if (yesBtn) yesBtn.addEventListener('click', () => {
+  const yesBtn = drifterPanel.querySelector('#dp-yes-btn');
+ if (yesBtn) yesBtn.addEventListener('click', () => {
   activateQuest(drifter.id);
+  invalidateQuestCache();   // ← add this
   closeDrifterPanel();
 });
 
