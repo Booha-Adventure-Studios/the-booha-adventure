@@ -359,28 +359,47 @@
   ═══════════════════════════════════════════ */
   function injectDevPanel() {
     if (document.getElementById('buki-dev-panel')) return;
-    const panel=document.createElement('div');
-    panel.id='buki-dev-panel';
-    panel.style.cssText='position:fixed;bottom:60px;right:18px;z-index:9999;background:rgba(0,0,0,.90);border:1px solid rgba(255,200,0,.4);border-radius:10px;padding:10px 14px;font:700 11px/1.8 monospace;color:#ffd700;letter-spacing:.06em;min-width:190px;box-shadow:0 0 20px rgba(255,200,0,.2);';
-    panel.innerHTML=`
+    const panel = document.createElement('div');
+    panel.id = 'buki-dev-panel';
+    panel.style.cssText = 'position:fixed;bottom:60px;right:18px;z-index:9999;background:rgba(0,0,0,.90);border:1px solid rgba(255,200,0,.4);border-radius:10px;padding:10px 14px;font:700 11px/1.8 monospace;color:#ffd700;letter-spacing:.06em;min-width:190px;box-shadow:0 0 20px rgba(255,200,0,.2);';
+    panel.innerHTML = `
       <div style="font-size:9px;color:rgba(255,200,0,.5);letter-spacing:.14em;margin-bottom:6px;">DEV — utsuroba</div>
       <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:4px;"><input type="checkbox" id="buki-dev-exit"> Exit always visible</label>
       <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:4px;"><input type="checkbox" id="buki-dev-shadows" checked> Shadows on</label>
-      <div id="buki-dev-perf" style="font-size:9px;color:rgba(255,200,0,.45);margin-top:4px;"></div>
+      <button id="buki-dev-clear-quest" style="margin-top:2px;margin-bottom:4px;font:700 11px monospace;color:#ffd700;background:transparent;border:1px solid rgba(255,200,0,.4);border-radius:4px;padding:3px 8px;cursor:pointer;width:100%;">Clear quest</button>
+      <button id="buki-dev-clear-all" style="margin-bottom:6px;font:700 11px monospace;color:#ff8888;background:transparent;border:1px solid rgba(255,80,80,.4);border-radius:4px;padding:3px 8px;cursor:pointer;width:100%;">Clear all storage</button>
+      <div id="buki-dev-perf" style="font-size:9px;color:rgba(255,200,0,.45);margin-top:2px;"></div>
       <div id="buki-dev-room" style="font-size:9px;color:rgba(255,200,0,.45);margin-top:2px;"></div>
       <div id="buki-dev-quest" style="font-size:9px;color:rgba(255,200,0,.45);margin-top:2px;"></div>`;
     document.body.appendChild(panel);
-    window.__devUtsuExit=false;
-    document.getElementById('buki-dev-exit').addEventListener('change',function(){window.__devUtsuExit=this.checked;});
-    document.getElementById('buki-dev-shadows').addEventListener('change',function(){shadowsEnabled=this.checked;});
-    setInterval(()=>{
-      const r=document.getElementById('buki-dev-room'),p=document.getElementById('buki-dev-perf'),q=document.getElementById('buki-dev-quest');
-      if(r) r.textContent=`room:${state.roomId} moved:${Math.round(state.distMovedSinceSpawn)}`;
-      if(p) p.textContent=`tier:${perfTier} dpr:${MAX_DPR} touch:${isTouchDevice}`;
-      if(q){const quest=getCachedQuest();q.textContent=quest?`quest:${quest.active} s:${quest.state} m:${quest.memIdx} key:${quest.collectedMemoryId||'none'}`:'quest:none';}
-    },500);
-  }
 
+    window.__devUtsuExit = false;
+    document.getElementById('buki-dev-exit').addEventListener('change', function() { window.__devUtsuExit = this.checked; });
+    document.getElementById('buki-dev-shadows').addEventListener('change', function() { shadowsEnabled = this.checked; });
+    document.getElementById('buki-dev-clear-quest').addEventListener('click', () => {
+      try {
+        const raw = localStorage.getItem('booha_save');
+        const data = raw ? JSON.parse(raw) : {};
+        if (data.weekly) data.weekly.drifterQuest = null;
+        localStorage.setItem('booha_save', JSON.stringify(data));
+        invalidateQuestCache();
+      } catch(_) {}
+    });
+    document.getElementById('buki-dev-clear-all').addEventListener('click', () => {
+      if (confirm('Clear all booha_save data?')) {
+        localStorage.removeItem('booha_save');
+        invalidateQuestCache();
+      }
+    });
+    setInterval(() => {
+      const r = document.getElementById('buki-dev-room');
+      const p = document.getElementById('buki-dev-perf');
+      const q = document.getElementById('buki-dev-quest');
+      if (r) r.textContent = `room:${state.roomId} moved:${Math.round(state.distMovedSinceSpawn)}`;
+      if (p) p.textContent = `tier:${perfTier} dpr:${MAX_DPR} touch:${isTouchDevice}`;
+      if (q) { const quest = getCachedQuest(); q.textContent = quest ? `q:${quest.active} s:${quest.state} m:${quest.memIdx} key:${quest.collectedMemoryId||'none'}` : 'quest:none'; }
+    }, 500);
+  }
   /* ═══════════════════════════════════════════
      EXIT POPUP
   ═══════════════════════════════════════════ */
@@ -528,7 +547,8 @@
     activateQuest(drifter.id);
     invalidateQuestCache();
     closeDrifterPanel();
-    setTimeout(() => openDrifterPanel(drifter), PANEL_SLIDE_MS + 20);
+    
+    setTimeout(() => openDrifterPanel(drifter), POPUP_COOLDOWN_MS + PANEL_SLIDE_MS + 20);
   });
 
     /* Replay btn — manual play only, isMemoryPlaying lock */
