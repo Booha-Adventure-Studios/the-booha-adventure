@@ -59,7 +59,7 @@ window.KARASUKI_DATA = {
       bg: "assets/img/karasuki/room_05.webp",
       spawns: {
         default:   { x: 732,  y: 700  },
-        fromLeft:  { x: 280,  y: 328  },
+        fromLeft:  { x: 328,  y: 622  },
         fromRight: { x: 1390, y: 658  },
         fromUp:    { x: 785,  y: 360  },
         fromDown:  { x: 732,  y: 876  }
