@@ -184,7 +184,7 @@
     /* ── collectedMemKey/orbIsCorrect initialised null/false — written at orb pickup ── */
     data.weekly.drifterQuest={
       active:id, state:'accepted', memIdx, decoys,
-      collectedMemKey:null, orbIsCorrect:false,
+      collectedMemoryId:null, orbIsCorrect:false,
     };
     writeSave(data); invalidateQuestCache();
     return data.weekly.drifterQuest;
