@@ -23,7 +23,7 @@ window.UTSUROBA_DATA = {
       sprite2     : './assets/img/drifters/kurobane_shizuma-2.png',
       audioPrefix : 'ks',
       memoryCount : 2,
-      scale       : 3.0, 
+      scale       : 1.0, 
       /* x, y in world coords — used for whichever room is assigned */
       roomCoords  : { x: 900, y: 480 }
     },
@@ -38,7 +38,7 @@ window.UTSUROBA_DATA = {
       sprite2     : './assets/img/drifters/ned-the-oogle-2.png',
       audioPrefix : 'nto',
       memoryCount : 2,
-      scale       : 4.0, 
+      scale       : 1.0, 
       roomCoords  : { x: 650, y: 550 }
     },
     {
@@ -52,7 +52,7 @@ window.UTSUROBA_DATA = {
       sprite2     : './assets/img/drifters/chagrin_gobito-2.png',
       audioPrefix : 'cg',
       memoryCount : 2,
-      scale       : 1.0, 
+      scale       : 0.50, 
       roomCoords  : { x: 820, y: 580 }
     }
   ],
