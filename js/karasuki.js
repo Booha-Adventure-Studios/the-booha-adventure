@@ -1232,13 +1232,25 @@
       <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:4px;"><input type="checkbox" id="dev-all-games"> All games unlocked</label>
       <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:4px;"><input type="checkbox" id="dev-utsuroba"> Utsuroba unlocked</label>
       <label style="display:flex;align-items:center;gap:8px;cursor:pointer;"><input type="checkbox" id="dev-all-orbs"> Show all orbs</label>
-      <div id="dev-room-info" style="font-size:9px;color:rgba(255,200,0,.45);margin-top:8px;"></div>`;
+      <button id="dev-clear-quest" style="margin-top:4px;font:700 11px monospace;color:#ffd700;background:transparent;border:1px solid rgba(255,200,0,.4);border-radius:4px;padding:3px 8px;cursor:pointer;width:100%;">Clear quest</button>
+      <div id="dev-room-info"
+      style="font-size:9px;color:rgba(255,200,0,.45);margin-top:8px;"></div>`;
     document.body.appendChild(panel);
     window.__devAllGames = false; window.__devAllWanderers = false; window.__devUtsuroba = false; window.__devAllOrbs = false;
     document.getElementById('dev-all-games').addEventListener('change',     function() { window.__devAllGames = this.checked; });
     document.getElementById('dev-all-wanderers').addEventListener('change', function() { window.__devAllWanderers = this.checked; refreshWanderersForRoom(); });
     document.getElementById('dev-utsuroba').addEventListener('change',      function() { window.__devUtsuroba = this.checked; });
     document.getElementById('dev-all-orbs').addEventListener('change',      function() { window.__devAllOrbs = this.checked; });
+    document.getElementById('dev-clear-quest').addEventListener('click', () => {
+      try {
+        const raw = localStorage.getItem('booha_save');
+        const data = raw ? JSON.parse(raw) : {};
+        if (data.weekly) data.weekly.drifterQuest = null;
+        localStorage.setItem('booha_save', JSON.stringify(data));
+        weeklyOrbs.forEach(o => o.collected = false);
+      } catch(_) {}
+    });
+ 
     setInterval(() => {
       const el = document.getElementById('dev-room-info');
       if (el) {
