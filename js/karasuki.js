@@ -1,5 +1,4 @@
 
-
 (() => {
   const DATA = window.KARASUKI_DATA;
   if (!DATA || !DATA.rooms) { console.error("KARASUKI_DATA not found."); return; }
@@ -1631,13 +1630,30 @@
   }
 
   /* ═══════════════════════════════════════════
+     MODAL GUARD — single source of truth
+     Use only flags that exist in this file.
+     Never call from draw/update — input only.
+  ═══════════════════════════════════════════ */
+  function anyModalOpen() {
+    return (
+      state.transitioning   ||
+      state.mazeExiting     ||
+      isPortalOpen()        ||
+      isBonusPopOpen()      ||
+      isWandererPopOpen()   ||
+      isUtsuobaPopOpen()    ||
+      isOrbPanelOpen()      ||
+      isEntryDriftActive()
+    );
+  }
+
+  /* ═══════════════════════════════════════════
      MAIN LOOP
   ═══════════════════════════════════════════ */
   function tick(now) {
     const dt=Math.min(50,Math.max(8,now-(lastTickTime||now)));
     lastTickTime=now; SPEED=BASE_SPEED*(dt/TARGET_DT);
-    const anyModalOpen = state.transitioning||isPortalOpen()||state.mazeExiting||isBonusPopOpen()||isWandererPopOpen()||isUtsuobaPopOpen()||isOrbPanelOpen();
-    if (!anyModalOpen) {
+    if (!anyModalOpen()) {
       tickEntryDrift(now); handleClickMovement(now); updateWanderers(now);
       const driftDone    = !isEntryDriftActive();
       const spawnUnlocked = driftDone && now>=(state.spawnLockUntil||0) && state.distMovedSinceSpawn>=ARROW_MOVE_THRESHOLD;
@@ -1666,7 +1682,8 @@
   function isNearPortal(p) { return state.roomId==="room_08"&&Math.hypot(p.x-PORTAL.x,p.y-PORTAL.y)<=PORTAL.r; }
 
   function handleInput(clientX, clientY) {
-    startMusic(); if(isEntryDriftActive())return; if(state.transitioning)return;
+    startMusic();
+    if (anyModalOpen()) return;
     const p=stagePointToWorld(clientX,clientY);
     if(state.coordMode){dropPin(p.x,p.y);ripples.push({x:p.x,y:p.y,life:1});return;}
     if(clickCheckOrbs(p.x,p.y)){ripples.push({x:p.x,y:p.y,life:1});return;}
