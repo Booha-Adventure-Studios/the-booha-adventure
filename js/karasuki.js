@@ -1634,18 +1634,17 @@
      Use only flags that exist in this file.
      Never call from draw/update — input only.
   ═══════════════════════════════════════════ */
-  function anyModalOpen() {
-    return (
-      state.transitioning   ||
-      state.mazeExiting     ||
-      isPortalOpen()        ||
-      isBonusPopOpen()      ||
-      isWandererPopOpen()   ||
-      isUtsuobaPopOpen()    ||
-      isOrbPanelOpen()      ||
-      isEntryDriftActive()
-    );
-  }
+ function anyModalOpen() {
+  return (
+    state.transitioning   ||
+    state.mazeExiting     ||
+    isPortalOpen()        ||
+    isBonusPopOpen()      ||
+    isWandererPopOpen()   ||
+    isUtsuobaPopOpen()    ||
+    isOrbPanelOpen()
+  );
+}
 
   /* ═══════════════════════════════════════════
      MAIN LOOP
@@ -1684,6 +1683,7 @@
   function handleInput(clientX, clientY) {
     startMusic();
     if (anyModalOpen()) return;
+    if (isEntryDriftActive()) return; 
     const p=stagePointToWorld(clientX,clientY);
     if(state.coordMode){dropPin(p.x,p.y);ripples.push({x:p.x,y:p.y,life:1});return;}
     if(clickCheckOrbs(p.x,p.y)){ripples.push({x:p.x,y:p.y,life:1});return;}
