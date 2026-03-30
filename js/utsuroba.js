@@ -1,5 +1,5 @@
 
- (() => {
+(() => {
   const DATA = window.UTSUROBA_DATA;
   if (!DATA || !DATA.rooms) { console.error("UTSUROBA_DATA not found."); return; }
 
@@ -411,6 +411,7 @@
   function openDrifterPanel(drifter){
     if(performance.now()<drifterPanelCooldown||!drifter||!drifterPanel) return;
     drifterPanelOpen=true; state.inputLocked=true; state.clickTarget=null;
+    try{music.pause();}catch(_){}
 
     const quest=getCachedQuest();
     const hasMemories=drifterHasMemories(drifter.id);
@@ -423,11 +424,21 @@
         <div class="dp-btns"><button class="dp-btn no dp-dismiss">Close / 閉じる</button></div>`;
 
     } else if(quest&&quest.active===drifter.id){
+      const ACCEPT_RESPONSES={
+        ks:{en:"You better, you little blob!",jp:"当然だろう、このちっぽけな塊め。"},
+        nto:{en:"Wow! Thank you, cutie!",jp:"わあ！ありがとう、かわいいね！"},
+        cg:{en:"Really? Thank you so much!",jp:"本当に？ありがとうございます…！"}
+      };
+      const resp=ACCEPT_RESPONSES[drifter.id]||null;
+      const respHTML=resp?`<p class="dp-line-en">${resp.en}</p><p class="dp-line-jp" style="margin-bottom:10px;">${resp.jp}</p>`:'';
       const msg=quest.state==='collected'
         ?'You have a memory… give it to me?<br><span style="font-size:.9em;color:#806040;">記憶を持っている…くれる？</span>'
         :'I\'m waiting for you…<br><span style="font-size:.9em;color:#806040;">待ってるよ…</span>';
-      dialogueHTML=`<p class="dp-status">${msg}</p>
-        <button class="dp-audio-btn" id="dp-replay-btn">▶ Play memory again / もう一度聴く</button>`;
+      dialogueHTML=`${respHTML}<p class="dp-status">${msg}</p>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:9px;">
+          <button class="dp-audio-btn" id="dp-replay-btn" style="margin-bottom:0;">▶ Play / 聴く</button>
+          <button class="dp-btn no" id="dp-cancel-quest-btn">Cancel / キャンセル</button>
+        </div>`;
       if(quest.state==='collected'){
         dialogueHTML+=`<div class="dp-btns">
           <button class="dp-btn yes" id="dp-give-btn">Give memory / 渡す</button>
@@ -483,6 +494,12 @@
       const src=questAudioSrc(q.active,q.memIdx); if(src) playQuestAudio(src);
     });
 
+    const cancelQuestBtn=drifterPanel.querySelector('#dp-cancel-quest-btn');
+    if(cancelQuestBtn) cancelQuestBtn.addEventListener('click',()=>{
+      clearQuest();
+      closeDrifterPanel();
+    });
+
     const giveBtn=drifterPanel.querySelector('#dp-give-btn');
     if(giveBtn) giveBtn.addEventListener('click',()=>{
       const q=getCachedQuest(); if(!q||q.state!=='collected'){closeDrifterPanel();return;}
@@ -499,6 +516,7 @@
     drifterPanelCooldown=performance.now()+POPUP_COOLDOWN_MS;
     drifterPanelOpen=false; state.inputLocked=false;
     drifterPanel.classList.remove('open');
+    try{music.play().catch(()=>{});}catch(_){}
   }
 
   function showWrongMemoryMsg(){
@@ -982,8 +1000,8 @@
       if(clickCheckKarasukiExit(p.x,p.y)){ripples.push({x:p.x,y:p.y,life:1});e.preventDefault();return;}
       state.clickTarget={x:p.x,y:p.y};ripples.push({x:p.x,y:p.y,life:1});e.preventDefault();
     },{passive:false});
-    document.addEventListener('click',startMusic,{once:false});
-    document.addEventListener('touchend',startMusic,{once:false,passive:true});
+    document.addEventListener('click',startMusic,{once:true});
+    document.addEventListener('touchend',startMusic,{once:true,passive:true});
   }
 
   /* ═══════════════════════════════════════════
