@@ -244,6 +244,7 @@
     coordMode:false, musicStarted:false, lastTrailT:0,
     spawnLockUntil:0, exitingToKarasuki:false,
     travelingToCenter:false, inputLocked:false,
+    celebrating:false, celebrateUntil:0, celebrateSpinStart:0,
   };
 
   let pins=[], trail=[], ripples=[];
@@ -255,8 +256,18 @@
   let exitPopOverlay=null, exitPopCooldownUntil=0;
   let drifterPanel=null, drifterPanelOpen=false, drifterPanelCooldown=0;
 
-  /* ── FIX 2: isMemoryPlaying lock (scoped to replay btn only) ── */
+  /* ── isMemoryPlaying lock (scoped to replay btn only) ── */
   let isMemoryPlaying = false;
+
+  /* ── Celebration state — ghost spin on memory delivery ── */
+  const CELEBRATE_MS = 4000;
+
+  /* ── Per-drifter thank-you lines ── */
+  const THANK_YOU = {
+    ks:  { en:"Thank you… don't slow me down again.", jp:"ありがとう…。もう足を引っ張るなよ。" },
+    nto: { en:"Thank you! You're the best!",          jp:"ありがとう！あなたが一番だよ！" },
+    cg:  { en:"Thank you… I really mean it.",         jp:"ありがとう…。本当に、心から。" },
+  };
 
   /* ═══════════════════════════════════════════
      STYLES
@@ -422,12 +433,13 @@
   function openDrifterPanel(drifter){
     if(performance.now()<drifterPanelCooldown||!drifter||!drifterPanel) return;
 
-    /* ── FIX 4: set inputLocked immediately, panel open flag ── */
     drifterPanelOpen=true;
     state.inputLocked=true;
     state.clickTarget=null;
     try{music.pause();}catch(_){}
 
+    /* always flush cache before reading so reopened panel sees latest state */
+    invalidateQuestCache();
     const quest=getCachedQuest();
     const hasMemories=drifterHasMemories(drifter.id);
 
@@ -438,29 +450,31 @@
         <p class="dp-status">✦ All memories found. ✦<br>すべての記憶が見つかりました。</p>
         <div class="dp-btns"><button class="dp-btn no dp-dismiss">Close / 閉じる</button></div>`;
 
-    } else if(quest&&quest.active===drifter.id){
-      const ACCEPT_RESPONSES={
-        ks:{en:"You better, you little blob!",jp:"当然だろう、このちっぽけな塊め。"},
-        nto:{en:"Wow! Thank you, cutie!",jp:"わあ！ありがとう、かわいいね！"},
-        cg:{en:"Really? Thank you so much!",jp:"本当に？ありがとうございます…！"}
-      };
-      const resp=ACCEPT_RESPONSES[drifter.id]||null;
-      const respHTML=resp?`<p class="dp-line-en">${resp.en}</p><p class="dp-line-jp" style="margin-bottom:10px;">${resp.jp}</p>`:'';
-      const msg=quest.state==='collected'
-        ?'You have a memory… give it to me?<br><span style="font-size:.9em;color:#806040;">記憶を持っている…くれる？</span>'
-        :'I\'m waiting for you…<br><span style="font-size:.9em;color:#806040;">待ってるよ…</span>';
-      dialogueHTML=`${respHTML}<p class="dp-status">${msg}</p>
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:9px;">
+    } else if(quest&&quest.active===drifter.id&&quest.state==='accepted'){
+      /* ── Waiting state: title + play + cancel only ── */
+      dialogueHTML=`
+        <p class="dp-line-en" style="margin-bottom:2px;">Waiting for the memory…</p>
+        <p class="dp-line-jp" style="margin-bottom:10px;">記憶を待っています…</p>
+        <div class="dp-divider"></div>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:10px;">
           <button class="dp-audio-btn" id="dp-replay-btn" style="margin-bottom:0;">▶ Play / 聴く</button>
           <button class="dp-btn no" id="dp-cancel-quest-btn">Cancel / キャンセル</button>
         </div>`;
-      if(quest.state==='collected'){
-        dialogueHTML+=`<div class="dp-btns">
+
+    } else if(quest&&quest.active===drifter.id&&quest.state==='collected'){
+      /* ── Collected state: give button ── */
+      dialogueHTML=`
+        <p class="dp-line-en" style="margin-bottom:2px;">You have a memory… give it to me?</p>
+        <p class="dp-line-jp" style="margin-bottom:10px;">記憶を持っている…くれる？</p>
+        <div class="dp-divider"></div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:9px;margin-top:10px;">
+          <button class="dp-audio-btn" id="dp-replay-btn" style="margin-bottom:0;">▶ Play / 聴く</button>
+          <button class="dp-btn no" id="dp-cancel-quest-btn">Cancel / キャンセル</button>
+        </div>
+        <div class="dp-btns">
           <button class="dp-btn yes" id="dp-give-btn">Give memory / 渡す</button>
-          <button class="dp-btn no dp-dismiss">Not yet / まだ</button></div>`;
-      } else {
-        dialogueHTML+=`<div class="dp-btns"><button class="dp-btn no dp-dismiss">Close / 閉じる</button></div>`;
-      }
+          <button class="dp-btn no dp-dismiss">Not yet / まだ</button>
+        </div>`;
 
     } else if(quest&&quest.active!==drifter.id){
       dialogueHTML=`
@@ -494,25 +508,17 @@
         </div>
       </div>`;
 
-    /* ── FIX 3: all dismiss buttons wire to same close path ── */
     drifterPanel.querySelectorAll('.dp-dismiss').forEach(btn=>btn.addEventListener('click',closeDrifterPanel));
 
-    /* ── FIX: YES btn — close then reopen to show accepted state ── */
+    /* YES btn — close silently then reopen (no auto-play) */
     const yesBtn=drifterPanel.querySelector('#dp-yes-btn');
     if(yesBtn) yesBtn.addEventListener('click',()=>{
-      const q=activateQuest(drifter.id);
-      let audioSrc=null;
-      if(q){ audioSrc=questAudioSrc(drifter.id,q.memIdx); }
-
-      /* slide down, then slide back up with accepted state + auto-play */
+      activateQuest(drifter.id);
       closeDrifterPanelSilent();
-      setTimeout(()=>{
-        if(audioSrc) playQuestAudio(audioSrc);
-        openDrifterPanel(drifter);
-      }, PANEL_SLIDE_MS + 60);
+      setTimeout(()=>{ openDrifterPanel(drifter); }, PANEL_SLIDE_MS+60);
     });
 
-    /* ── FIX 2: replay btn with isMemoryPlaying lock ── */
+    /* Replay btn — manual play only, isMemoryPlaying lock */
     const replayBtn=drifterPanel.querySelector('#dp-replay-btn');
     if(replayBtn){
       if(isMemoryPlaying) replayBtn.disabled=true;
@@ -530,7 +536,6 @@
         a.onended=()=>{
           if(activeAudio===a) activeAudio=null;
           isMemoryPlaying=false;
-          /* btn may have been removed if panel closed mid-play — guard */
           if(replayBtn.isConnected){
             replayBtn.disabled=false;
             replayBtn.textContent='▶ Play / 聴く';
@@ -549,12 +554,16 @@
     const giveBtn=drifterPanel.querySelector('#dp-give-btn');
     if(giveBtn) giveBtn.addEventListener('click',()=>{
       const q=getCachedQuest(); if(!q||q.state!=='collected'){closeDrifterPanel();return;}
-      /* ── belt-and-suspenders: check both flag and key identity ── */
       const expectedMemKey=`${drifter.id}_a${String(q.memIdx).padStart(2,'0')}`;
       const correct=q.orbIsCorrect===true && q.collectedMemKey===expectedMemKey;
       closeDrifterPanel();
-      if(correct){completeMemory(drifter.id,q.memIdx);triggerSparkle();}
-      else{showWrongMemoryMsg();clearQuest();}
+      if(correct){
+        completeMemory(drifter.id,q.memIdx);
+        startCelebration(drifter);
+      } else {
+        showWrongMemoryMsg();
+        clearQuest();
+      }
     });
 
     requestAnimationFrame(()=>requestAnimationFrame(()=>drifterPanel.classList.add('open')));
@@ -588,6 +597,62 @@
       <p style="margin:0;font-size:.84rem;color:#806040;">ごめん…これは私のじゃない。</p></div>`;
     document.body.appendChild(msg);
     setTimeout(()=>{msg.style.opacity='0';msg.style.transition='opacity .4s';setTimeout(()=>msg.remove(),420);},2200);
+  }
+
+  function startCelebration(drifter){
+    const now=performance.now();
+    state.celebrating=true;
+    state.celebrateUntil=now+CELEBRATE_MS;
+    state.celebrateSpinStart=now;
+    state.inputLocked=true;
+    triggerSparkle();
+    /* show thank-you panel after a short sparkle moment */
+    setTimeout(()=>showThankYouPanel(drifter), 800);
+    /* end celebration after CELEBRATE_MS */
+    setTimeout(()=>{
+      state.celebrating=false;
+      state.inputLocked=false;
+    }, CELEBRATE_MS);
+  }
+
+  function showThankYouPanel(drifter){
+    const ty=THANK_YOU[drifter.id]||{en:'Thank you!',jp:'ありがとう！'};
+    const panel=document.createElement('div');
+    panel.style.cssText=`
+      position:fixed;bottom:0;left:0;right:0;z-index:9200;
+      background:linear-gradient(180deg,#f7f2e8 0%,#ede5d0 100%);
+      border-top:2px solid #c8b48a;border-radius:20px 20px 0 0;
+      box-shadow:0 -6px 32px rgba(0,0,0,0.5);
+      font-family:'Georgia',serif;
+      transform:translateY(100%);
+      transition:transform 0.32s cubic-bezier(0.22,1,0.36,1);
+      pointer-events:auto;`;
+    panel.innerHTML=`
+      <div style="max-width:480px;margin:0 auto;padding:14px clamp(14px,3.5vw,28px) 26px;">
+        <div style="width:38px;height:4px;border-radius:2px;background:#c0aa80;margin:0 auto 14px;"></div>
+        <div style="display:flex;align-items:flex-start;gap:clamp(10px,2.5vw,20px);">
+          <div style="flex-shrink:0;width:clamp(60px,12vw,96px);height:clamp(60px,12vw,96px);border-radius:10px;border:1.5px solid #c8b48a;background:#e8dfc8;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+            <img src="${drifter.sprite2}" alt="${drifter.name}" style="width:100%;height:100%;object-fit:contain;">
+          </div>
+          <div style="flex:1;min-width:0;">
+            <p style="font-size:clamp(.62rem,1.7vw,.75rem);color:#9a7850;letter-spacing:.14em;text-transform:uppercase;margin:0 0 2px;">${drifter.name}</p>
+            <div style="width:44px;height:1px;background:#c8b48a;margin:0 0 10px;"></div>
+            <p style="font-size:clamp(.88rem,2.4vw,1.04rem);color:#1e140a;line-height:1.6;margin:0 0 4px;">${ty.en}</p>
+            <p style="font-size:clamp(.76rem,2vw,.9rem);color:#6a5030;line-height:1.65;margin:0 0 14px;">${ty.jp}</p>
+            <button id="ty-close-btn" style="background:transparent;border:1px solid #b8a478;color:#9a7850;font-family:'Georgia',serif;font-size:clamp(.73rem,1.9vw,.86rem);letter-spacing:.1em;cursor:pointer;padding:7px 20px;border-radius:4px;transition:all .16s;">Close / 閉じる</button>
+          </div>
+        </div>
+      </div>`;
+    document.body.appendChild(panel);
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{ panel.style.transform='translateY(0)'; }));
+    const closeBtn=panel.querySelector('#ty-close-btn');
+    function dismissPanel(){
+      panel.style.transform='translateY(100%)';
+      setTimeout(()=>panel.remove(), 360);
+    }
+    closeBtn.addEventListener('click', dismissPanel);
+    /* auto-dismiss when celebration ends */
+    setTimeout(dismissPanel, CELEBRATE_MS - 800 + 600);
   }
 
   /* ═══════════════════════════════════════════
@@ -843,10 +908,11 @@
   /* ═══════════════════════════════════════════
      DRAW DRIFTERS
   ═══════════════════════════════════════════ */
-  function drawDrifters(){
+  function drawDrifters(now){
     const drifter=drifterForRoom(state.roomId);if(!drifter)return;
     const hasMemories=drifterHasMemories(drifter.id);
     const quest=getCachedQuest();
+    const isWaiting=!!(quest&&quest.active===drifter.id&&quest.state==='accepted');
     const useImg2=!!(quest&&quest.active===drifter.id);
     const imgs=drifterImgs[drifter.id];
     const img=useImg2?imgs.img2:imgs.img1;
@@ -856,10 +922,28 @@
     const dh=img.naturalHeight*drifter.scale;
     const alpha=hasMemories?1:0.35;
 
+    /* ── Waiting glow — amber pulse behind sprite when quest accepted ── */
+    if(isWaiting){
+      const sec=now/1000;
+      const pulse=0.5+0.5*Math.sin(sec*2.4);
+      const glowR=Math.max(dw,dh)*0.75;
+      const cx=pos.x, cy=pos.y-dh*0.5;
+      ctx.save();
+      const g=ctx.createRadialGradient(cx,cy,0,cx,cy,glowR);
+      g.addColorStop(0,'rgba(255,210,80,'+(0.45+pulse*0.30)+')');
+      g.addColorStop(0.5,'rgba(255,160,30,'+(0.18+pulse*0.14)+')');
+      g.addColorStop(1,'transparent');
+      ctx.globalAlpha=1;
+      ctx.fillStyle=g;
+      ctx.beginPath();ctx.arc(cx,cy,glowR,0,Math.PI*2);ctx.fill();
+      if(shadowsEnabled){ctx.shadowBlur=28+pulse*18;ctx.shadowColor='#ffcc40';}
+      ctx.restore();
+    }
+
     ctx.save();
     ctx.globalAlpha=alpha;
     if(img.complete&&img.naturalWidth>0){
-      if(shadowsEnabled&&hasMemories){ctx.shadowBlur=18;ctx.shadowColor='#d8c0f8';}
+      if(shadowsEnabled&&hasMemories){ctx.shadowBlur=18;ctx.shadowColor=isWaiting?'#ffcc40':'#d8c0f8';}
       ctx.drawImage(img,pos.x-dw/2,pos.y-dh,dw,dh);
       ctx.shadowBlur=0;
     } else {
@@ -922,20 +1006,27 @@
     }
     trail=trail.filter(p=>p.life>0);
 
-    drawDrifters();
+    drawDrifters(now);
     drawExitArrows(now);
     drawKarasukiExitArrow(now);
     drawSparkles();
 
     /* Ghost */
     const bobFreq=(Math.PI*2)/(HOVER_PERIOD/1000),bobPhase=sec*bobFreq;
-    const bob=Math.sin(bobPhase)*HOVER_AMP,wobble=Math.sin(bobPhase*2)*2.2;
+    const bob=Math.sin(bobPhase)*HOVER_AMP;
+    /* ── During celebration: spin on axis; otherwise normal wobble ── */
+    const wobble = state.celebrating
+      ? ((now - state.celebrateSpinStart) / 1000) * 720   /* 2 full rotations/sec in degrees */
+      : Math.sin(bobPhase*2)*2.2;
     const gx=state.x,gy=state.y+bob;
     const pulse=0.5+0.5*Math.sin(sec*2.1);
     const sx=1-Math.sin(bobPhase)*0.07,sy=(1+Math.sin(bobPhase)*0.10)*(state.moving?1.08:1.0);
     ctx.save();ctx.globalAlpha=0.22+pulse*0.12;
     const halo=ctx.createRadialGradient(gx,gy+3,0,gx,gy+3,GHOST_R*2.2);
-    halo.addColorStop(0,col1);halo.addColorStop(0.5,col2);halo.addColorStop(1,'transparent');
+    /* ── Gold halo during celebration ── */
+    const haloCol1 = state.celebrating ? '#ffd700' : col1;
+    const haloCol2 = state.celebrating ? '#ffaa00' : col2;
+    halo.addColorStop(0,haloCol1);halo.addColorStop(0.5,haloCol2);halo.addColorStop(1,'transparent');
     ctx.fillStyle=halo;ctx.beginPath();ctx.arc(gx,gy+3,GHOST_R*2.2,0,Math.PI*2);ctx.fill();
     ctx.globalAlpha=0.18+pulse*0.07;
     const shd=ctx.createRadialGradient(gx,gy+GHOST_R*.85,0,gx,gy+GHOST_R*.85,GHOST_R*.9);
@@ -943,7 +1034,10 @@
     ctx.fillStyle=shd;ctx.beginPath();ctx.arc(gx,gy+GHOST_R*.85,GHOST_R*.9,0,Math.PI*2);ctx.fill();ctx.restore();
     ctx.save();ctx.translate(gx,gy);ctx.rotate(wobble*Math.PI/180);ctx.scale(sx,sy);
     if(ghostImg.complete&&ghostImg.naturalWidth>0){
-      if(shadowsEnabled){ctx.shadowBlur=14+pulse*8;ctx.shadowColor=col1;}
+      if(shadowsEnabled){
+        ctx.shadowBlur=state.celebrating?28+pulse*14:14+pulse*8;
+        ctx.shadowColor=state.celebrating?'#ffd700':col1;
+      }
       ctx.drawImage(ghostImg,-GHOST_R,-GHOST_R,GHOST_R*2,GHOST_R*2);ctx.shadowBlur=0;
     } else {ctx.globalAlpha=1;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(0,0,GHOST_R*.7,0,Math.PI*2);ctx.fill();}
     ctx.restore();
@@ -1015,7 +1109,12 @@
     updatePerfTier(now);
     const dt=Math.min(50,Math.max(8,now-(lastTickTime||now)));
     lastTickTime=now;SPEED=BASE_SPEED*(dt/TARGET_DT);
-    const anyModal=state.transitioning||isExitPopOpen()||state.exitingToKarasuki||drifterPanelOpen;
+    /* expire celebration */
+    if(state.celebrating&&now>=state.celebrateUntil){
+      state.celebrating=false;
+      state.inputLocked=false;
+    }
+    const anyModal=state.transitioning||isExitPopOpen()||state.exitingToKarasuki||drifterPanelOpen||state.celebrating;
     if(!anyModal){
       if(state.travelingToCenter){handleCenterTravel(now);}
       else{
