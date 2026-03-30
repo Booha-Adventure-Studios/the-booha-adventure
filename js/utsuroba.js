@@ -439,64 +439,6 @@
     document.addEventListener('keydown',e=>{if(e.key==='Escape'&&drifterPanelOpen)closeDrifterPanel();});
   }
 
-function renderWaitingState(drifter) {
-    const wl = WAITING_LINES[drifter.id] || { en:"I'll be waiting…", jp:"待ってるよ…" };
-    const body = drifterPanel.querySelector('.dp-body');
-    if (!body) return;
-
-    /* replace only the content below the name block */
-    const divider = body.querySelector('.dp-divider');
-    if (!divider) return;
-
-    /* remove everything after the first divider */
-    let el = divider.nextSibling;
-    while (el) { const next = el.nextSibling; body.removeChild(el); el = next; }
-
-    /* inject waiting content */
-    const frag = document.createElement('div');
-    frag.innerHTML = `
-      <p class="dp-line-en" style="margin-bottom:2px;">${wl.en}</p>
-      <p class="dp-line-jp" style="margin-bottom:10px;">${wl.jp}</p>
-      <div class="dp-divider"></div>
-      <div style="display:flex;align-items:center;gap:10px;margin-top:10px;">
-        <button class="dp-audio-btn" id="dp-replay-btn" style="margin-bottom:0;">▶ Play / 聴く</button>
-        <button class="dp-btn no" id="dp-cancel-quest-btn">Cancel / キャンセル</button>
-      </div>`;
-    while (frag.firstChild) body.appendChild(frag.firstChild);
-
-    /* rebind replay btn */
-    const replayBtn = drifterPanel.querySelector('#dp-replay-btn');
-    if (replayBtn) {
-      replayBtn.addEventListener('click', () => {
-        if (isMemoryPlaying) return;
-        const q = getCachedQuest(); if (!q) return;
-        const src = questAudioSrc(q.active, q.memIdx); if (!src) return;
-        isMemoryPlaying = true;
-        replayBtn.disabled = true;
-        replayBtn.textContent = '▶ Playing…';
-        stopActiveAudio();
-        const a = new Audio(src);
-        activeAudio = a;
-        a.play().catch(() => {});
-        a.onended = () => {
-          if (activeAudio === a) activeAudio = null;
-          isMemoryPlaying = false;
-          if (replayBtn.isConnected) {
-            replayBtn.disabled = false;
-            replayBtn.textContent = '▶ Play / 聴く';
-          }
-        };
-      });
-    }
-
-    /* rebind cancel btn */
-    const cancelBtn = drifterPanel.querySelector('#dp-cancel-quest-btn');
-    if (cancelBtn) cancelBtn.addEventListener('click', () => {
-      stopActiveAudio();
-      clearQuest();
-      closeDrifterPanel();
-    });
-  }
 
     
   function openDrifterPanel(drifter){
@@ -520,10 +462,11 @@ function renderWaitingState(drifter) {
         <div class="dp-btns"><button class="dp-btn no dp-dismiss">Close / 閉じる</button></div>`;
 
     } else if(quest&&quest.active===drifter.id&&quest.state==='accepted'){
-      /* ── Waiting state: title + play + cancel only ── */
+      const wl=WAITING_LINES[drifter.id]||{en:"I'll be waiting…",jp:"待ってるよ…"};
       dialogueHTML=`
-        <p class="dp-line-en" style="margin-bottom:2px;">Waiting for the memory…</p>
-        <p class="dp-line-jp" style="margin-bottom:10px;">記憶を待っています…</p>
+        <p class="dp-line-en" style="margin-bottom:2px;">${wl.en}</p>
+        <p class="dp-line-jp" style="margin-bottom:10px;">${wl.jp}</p>
+        
         <div class="dp-divider"></div>
         <div style="display:flex;align-items:center;gap:10px;margin-top:10px;">
           <button class="dp-audio-btn" id="dp-replay-btn" style="margin-bottom:0;">▶ Play / 聴く</button>
@@ -581,11 +524,12 @@ function renderWaitingState(drifter) {
 
     /* YES btn — close silently then reopen (no auto-play) */
   const yesBtn = drifterPanel.querySelector('#dp-yes-btn');
- if (yesBtn) yesBtn.addEventListener('click', () => {
-  activateQuest(drifter.id);
-  invalidateQuestCache();   // ← add this
-  closeDrifterPanel();
-});
+  if (yesBtn) yesBtn.addEventListener('click', () => {
+    activateQuest(drifter.id);
+    invalidateQuestCache();
+    closeDrifterPanel();
+    setTimeout(() => openDrifterPanel(drifter), PANEL_SLIDE_MS + 20);
+  });
 
     /* Replay btn — manual play only, isMemoryPlaying lock */
     const replayBtn=drifterPanel.querySelector('#dp-replay-btn');
