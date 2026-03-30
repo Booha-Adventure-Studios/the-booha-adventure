@@ -38,7 +38,7 @@ window.UTSUROBA_DATA = {
       sprite2     : './assets/img/drifters/ned-the-oogle-2.png',
       audioPrefix : 'nto',
       memoryCount : 2,
-      scale       : 0.15, 
+      scale       : 0.17, 
       roomCoords  : { x: 650, y: 550 }
     },
     {
