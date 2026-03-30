@@ -1,4 +1,5 @@
 
+
 (() => {
   const DATA = window.UTSUROBA_DATA;
   if (!DATA || !DATA.rooms) { console.error("UTSUROBA_DATA not found."); return; }
@@ -206,7 +207,7 @@
   }
   function questAudioSrc(id,memIdx) {
     const d=DATA.drifters.find(x=>x.id===id); if(!d) return null;
-    return `./assets/audio/drifters/${d.audioPrefix}_q${String(memIdx).padStart(2,'0')}.mp3`;
+    return `./assets/audio/memories/${d.audioPrefix}_q${String(memIdx).padStart(2,'0')}.mp3`;
   }
 
   let questAudio=null;
