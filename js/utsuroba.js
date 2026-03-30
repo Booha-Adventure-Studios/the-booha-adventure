@@ -45,7 +45,7 @@
   const ARROW_MOVE_THRESHOLD          = 30;
   const POPUP_COOLDOWN_MS             = 900;
   const DRIFTER_HIT_R                 = isTouchDevice ? 64 : 48;
-  const DRIFTER_MAX_H                 = 150; /* max display height on canvas */
+  
 
   const KARASUKI_EXIT = {
     roomId : 'room_03',
@@ -162,7 +162,7 @@
   DATA.drifters.forEach(d => {
     const load = src => {
       const img=new Image(); img.src=src;
-      img.onload=()=>{ const sc=DRIFTER_MAX_H/img.naturalHeight; img._dw=img.naturalWidth*sc; img._dh=img.naturalHeight*sc; };
+     
       return img;
     };
     drifterImgs[d.id]={ img1:load(d.sprite1), img2:load(d.sprite2) };
@@ -775,9 +775,9 @@
     const img=useImg2?imgs.img2:imgs.img1;
     const pos=drifterWorldPos(drifter);
 
-    /* Natural dimensions — fall back to square while loading */
-    const dw=img._dw||DRIFTER_MAX_H;
-    const dh=img._dh||DRIFTER_MAX_H;
+    /* Natural dimensions — fall back to square while loading: Still playing with sizes*/
+    const dw = img.naturalWidth  * drifter.scale;
+    const dh = img.naturalHeight * drifter.scale;
 
     const alpha=hasMemories?1:0.35;
 
