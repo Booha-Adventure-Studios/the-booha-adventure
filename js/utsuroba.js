@@ -1,5 +1,5 @@
 
-(() => {
+  (() => {
   const DATA = window.UTSUROBA_DATA;
   if (!DATA || !DATA.rooms) { console.error("UTSUROBA_DATA not found."); return; }
 
@@ -514,8 +514,7 @@
     const yesBtn=drifterPanel.querySelector('#dp-yes-btn');
     if(yesBtn) yesBtn.addEventListener('click',()=>{
       activateQuest(drifter.id);
-      closeDrifterPanelSilent();
-      setTimeout(()=>{ openDrifterPanel(drifter); }, PANEL_SLIDE_MS+60);
+      closeDrifterPanel();
     });
 
     /* Replay btn — manual play only, isMemoryPlaying lock */
@@ -579,14 +578,6 @@
     /* defer input unlock until panel has fully slid down */
     setTimeout(()=>{ state.inputLocked=false; },PANEL_SLIDE_MS);
     try{music.play().catch(()=>{});}catch(_){}
-  }
-
-  /* Silent close used by Yes-btn reopen — does NOT restart music or clear audio */
-  function closeDrifterPanelSilent(){
-    drifterPanelOpen=false;
-    drifterPanel.classList.remove('open');
-    isMemoryPlaying=false;
-    /* inputLocked stays true — openDrifterPanel will re-set it */
   }
 
   function showWrongMemoryMsg(){
