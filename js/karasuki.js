@@ -171,7 +171,6 @@
   const DRIFT_ARRIVE_DIST   = 30;
   const DRIFT_LOCK_MAX_MS   = 2200;         // safety unlock after this long
 
-  // State for entry drift
   const entryDrift = {
     active    : false,
     lockUntil : 0,
@@ -186,16 +185,12 @@
 
   function tickEntryDrift(now) {
     if (!entryDrift.active) return;
-
-    // Safety timeout
     if (now >= entryDrift.lockUntil) {
       entryDrift.active = false;
       state.clickTarget = null;
       state.moving      = false;
       return;
     }
-
-    // Arrived at center
     const dist = Math.hypot(state.x - DRIFT_CENTER_X, state.y - DRIFT_CENTER_Y);
     if (dist <= DRIFT_ARRIVE_DIST) {
       entryDrift.active = false;
@@ -210,32 +205,27 @@
      ORB SYSTEM
   ═══════════════════════════════════════════ */
   const ORB_AUDIO_BASE  = './assets/audio/memories/';
-  const ORB_COUNT       = 4;   // 1 correct + 3 decoys
+  const ORB_COUNT       = 4;
   const ORB_ROOMS       = ['room_01','room_02','room_03','room_04','room_05',
                             'room_06','room_07','room_08','room_09','room_10',
                             'room_11','room_12','room_13','room_14','room_15'];
-  const ORB_DECOY_COUNT = 9;   // decoy_01.mp3 … decoy_09.mp3
+  const ORB_DECOY_COUNT = 9;
 
-  // Orb visual constants
-  const ORB_R           = 10;  // base radius
+  const ORB_R           = 10;
   const ORB_GLOW        = 28;
 
-  // Minimum distances from hazard zones
-  const ORB_MIN_FROM_CENTER    = 220;  // avoid auto-drift landing zone
+  const ORB_MIN_FROM_CENTER    = 220;
   const ORB_MIN_FROM_WANDERER  = 90;
   const ORB_MIN_FROM_TREE      = 80;
   const ORB_MIN_FROM_NPP       = 70;
 
-  // Popup cooldown
   let orbPopCooldownUntil = 0;
 
-  // Runtime orb state (rebuilt each session from save + week seed)
-  let weeklyOrbs = [];         // [{ id, roomId, x, y, audioFile, collected }]
+  let weeklyOrbs = [];
   let orbPanelOpen = false;
-  let orbPanelOrb  = null;     // the orb currently shown in panel
-  let orbAudio     = null;     // single persistent Audio element
+  let orbPanelOrb  = null;
+  let orbAudio     = null;
 
-  /* ── Seeded RNG ── */
   function seededRng(seed) {
     let s = seed >>> 0;
     return function() {
@@ -253,7 +243,6 @@
     return a;
   }
 
-  /* ── Obstacle lists per room (for placement validation) ── */
   function getWandererCoordsForRoom(roomId) {
     return WANDERER_DEFS.filter(w => w.roomId === roomId).map(w => ({ x: w.x, y: w.y }));
   }
@@ -266,45 +255,31 @@
     return (NPP[roomId] || []).map(n => ({ x: n.x, y: n.y }));
   }
 
-  /* ── Check if a position is clear ── */
   function isOrbPositionClear(x, y, roomId) {
-    // Away from auto-drift center landing zone
     if (Math.hypot(x - DRIFT_CENTER_X, y - DRIFT_CENTER_Y) < ORB_MIN_FROM_CENTER) return false;
-
-    // Away from wanderers
     for (const w of getWandererCoordsForRoom(roomId)) {
       if (Math.hypot(x - w.x, y - w.y) < ORB_MIN_FROM_WANDERER) return false;
     }
-    // Away from bonus trees
     for (const t of getBonusTreeCoordsForRoom(roomId)) {
       if (Math.hypot(x - t.x, y - t.y) < ORB_MIN_FROM_TREE) return false;
     }
-    // Away from NPPs
     for (const n of getNppCoordsForRoom(roomId)) {
       if (Math.hypot(x - n.x, y - n.y) < ORB_MIN_FROM_NPP) return false;
     }
-    // Away from canvas edges
     if (x < 120 || x > WORLD_W - 120 || y < 150 || y > WORLD_H - 150) return false;
-
     return true;
   }
 
-  /* ── Generate orb position for a room ── */
   function generateOrbPosition(roomId, rng) {
-    // Try up to 30 candidate positions; fall back to nearest clear spot
     const cx = WORLD_W / 2;
     const cy = WORLD_H / 2;
-
     for (let attempt = 0; attempt < 30; attempt++) {
-      // Random offset from center, biased toward center area but with spread
       const angle  = rng() * Math.PI * 2;
-      const radius = 260 + rng() * 280;  // 260–540px from center
+      const radius = 260 + rng() * 280;
       const x      = Math.round(cx + Math.cos(angle) * radius);
-      const y      = Math.round(cy + Math.sin(angle) * radius * 0.65); // flatter vertically
+      const y      = Math.round(cy + Math.sin(angle) * radius * 0.65);
       if (isOrbPositionClear(x, y, roomId)) return { x, y };
     }
-
-    // Fallback: scan a grid of safe quadrant positions
     const quadrants = [
       { x: cx - 360, y: cy - 200 }, { x: cx + 360, y: cy - 200 },
       { x: cx - 360, y: cy + 200 }, { x: cx + 360, y: cy + 200 },
@@ -315,26 +290,19 @@
       const y = Math.max(150, Math.min(WORLD_H - 150, Math.round(q.y)));
       if (isOrbPositionClear(x, y, roomId)) return { x, y };
     }
-    // Last resort
     return { x: Math.round(cx + 300), y: Math.round(cy + 250) };
   }
 
-  /* ── Build weekly orbs from seed ── */
   function buildWeeklyOrbs() {
     const rng         = seededRng(boohaWeek * 7919 + 3);
     const roomOrder   = seededShuffle(ORB_ROOMS, rng).slice(0, ORB_COUNT);
-
-    // Pick which decoy IDs to use (3 of 9)
     const allDecoys   = Array.from({ length: ORB_DECOY_COUNT }, (_, i) =>
       'decoy_' + String(i + 1).padStart(2, '0'));
     const pickedDecoys = seededShuffle(allDecoys, rng).slice(0, 3);
-
-    // Figure out memory index from active quest
     const quest    = loadDrifterQuest();
     const memIdx   = (quest && quest.memIdx != null) ? quest.memIdx : 0;
     const drifterId = (quest && quest.drifterId) ? quest.drifterId : 'ks';
     const memId    = drifterId + '_a' + String(memIdx + 1).padStart(2, '0');
-
     const orbs = [];
     roomOrder.forEach((roomId, i) => {
       const pos = generateOrbPosition(roomId, rng);
@@ -345,11 +313,9 @@
         : ORB_AUDIO_BASE + pickedDecoys[i - 1] + '.mp3';
       orbs.push({ id, roomId, x: pos.x, y: pos.y, audioFile, collected: false, isCorrect });
     });
-
     return orbs;
   }
 
-  /* ── Load / save drifter quest from localStorage ── */
   function loadDrifterQuest() {
     try {
       const raw  = localStorage.getItem('booha_save');
@@ -371,11 +337,8 @@
     } catch (_) {}
   }
 
-  /* ── Initialise orb session (call once on load) ── */
   function initOrbs() {
     weeklyOrbs = buildWeeklyOrbs();
-
-    // Mark already-collected orb from save
     const quest = loadDrifterQuest();
     if (quest && quest.collectedOrbId) {
       for (const orb of weeklyOrbs) {
@@ -384,13 +347,10 @@
     }
   }
 
-  /* ── Return a "wrong" orb to a new random room ── */
   function returnOrbToKarasuki(orbId) {
     const orb = weeklyOrbs.find(o => o.id === orbId);
     if (!orb) return;
     orb.collected = false;
-
-    // Pick a different room from its current one
     const rng       = seededRng(boohaWeek * 3571 + Date.now() % 997);
     const otherRooms = ORB_ROOMS.filter(r => r !== orb.roomId);
     const newRoom   = otherRooms[Math.floor(rng() * otherRooms.length)];
@@ -399,12 +359,10 @@
     orb.y           = generateOrbPosition(newRoom, rng).y;
   }
 
-  /* ── Orbs in current room ── */
   function getOrbsForRoom(roomId) {
     return weeklyOrbs.filter(o => o.roomId === roomId && !o.collected);
   }
 
-  /* ── Click check ── */
   function clickCheckOrbs(worldX, worldY) {
     if (performance.now() < orbPopCooldownUntil) return false;
     if (isEntryDriftActive()) return false;
@@ -418,22 +376,17 @@
     return false;
   }
 
-  /* ── Draw orbs ── */
   function drawOrbs(now) {
     const orbs = getOrbsForRoom(state.roomId);
     if (!orbs.length) return;
     const sec = now / 1000;
-
     orbs.forEach((orb, i) => {
       const pulse  = 0.5 + 0.5 * Math.sin(sec * 1.8 + i * 1.1);
       const pulse2 = 0.5 + 0.5 * Math.sin(sec * 2.6 + i * 0.7);
       const bob    = Math.sin(sec * 1.4 + i * 0.9) * 5;
       const ox     = orb.x;
       const oy     = orb.y + bob;
-
       ctx.save();
-
-      // Outer glow
       const glow = ctx.createRadialGradient(ox, oy, 0, ox, oy, ORB_GLOW);
       glow.addColorStop(0,   'rgba(255,240,180,0.55)');
       glow.addColorStop(0.4, 'rgba(255,220,100,0.25)');
@@ -441,8 +394,6 @@
       ctx.globalAlpha = 0.5 + pulse * 0.35;
       ctx.fillStyle   = glow;
       ctx.beginPath(); ctx.arc(ox, oy, ORB_GLOW, 0, Math.PI * 2); ctx.fill();
-
-      // Inner core gradient white → gold
       const coreR = ORB_R * (0.85 + pulse * 0.18);
       const core  = ctx.createRadialGradient(ox - coreR * 0.3, oy - coreR * 0.3, 0, ox, oy, coreR);
       core.addColorStop(0,   '#ffffff');
@@ -455,20 +406,19 @@
       ctx.fillStyle   = core;
       ctx.beginPath(); ctx.arc(ox, oy, coreR, 0, Math.PI * 2); ctx.fill();
       ctx.shadowBlur  = 0;
-
-      // Specular highlight
       ctx.globalAlpha = 0.55 + pulse * 0.2;
       ctx.fillStyle   = '#ffffff';
       ctx.beginPath();
       ctx.arc(ox - coreR * 0.28, oy - coreR * 0.28, coreR * 0.28, 0, Math.PI * 2);
       ctx.fill();
-
       ctx.restore();
     });
   }
 
   /* ═══════════════════════════════════════════
-     ORB PANEL (warm parchment slide-up)
+     ORB PANEL — warm parchment slide-up
+     CHANGE 1: BGM pause on open / resume on close
+     CHANGE 2: EN/JP text, no hira
   ═══════════════════════════════════════════ */
   let orbPanelEl = null;
 
@@ -494,31 +444,27 @@
     orbPanelEl.innerHTML = `
       <div style="max-width:520px;margin:0 auto;padding:22px 28px 28px;">
 
-        <!-- drag handle -->
         <div style="width:44px;height:4px;border-radius:2px;background:#c8a96e;margin:0 auto 18px;opacity:0.55;"></div>
 
-        <!-- close -->
         <button id="orb-panel-close" style="
           position:absolute;top:16px;right:20px;
           background:transparent;border:none;cursor:pointer;
           font-size:1.1rem;color:#8b6914;opacity:0.55;padding:4px 8px;
           font-family:'Georgia',serif;">✕</button>
 
-        <!-- title -->
         <h2 id="orb-panel-title" style="
-          text-align:center;margin:0 0 6px;
+          text-align:center;margin:0 0 4px;
           font-size:clamp(1.1rem,3.5vw,1.35rem);
           color:#3a2400;letter-spacing:.08em;
-          text-shadow:0 1px 0 rgba(255,255,255,0.7);">Memory Found!</h2>
+          text-shadow:0 1px 0 rgba(255,255,255,0.7);">You found a memory!</h2>
 
-        <p id="orb-panel-sub" style="
-          text-align:center;margin:0 0 20px;
-          font-size:clamp(.78rem,2.4vw,.9rem);
-          color:#7a5c1e;letter-spacing:.05em;opacity:0.8;">
-          Listen before you decide.
+        <p style="
+          text-align:center;margin:0 0 18px;
+          font-size:clamp(.8rem,2.5vw,.95rem);
+          color:#5a3c00;letter-spacing:.06em;opacity:0.75;">
+          記憶を見つけた！
         </p>
 
-        <!-- play button -->
         <div style="text-align:center;margin-bottom:18px;">
           <button id="orb-play-btn" style="
             background:linear-gradient(135deg,#fdf3d0,#f5dfa0);
@@ -530,7 +476,6 @@
             align-items:center;justify-content:center;color:#5a3800;">▶</button>
         </div>
 
-        <!-- collect / leave -->
         <div style="display:flex;gap:14px;justify-content:center;margin-bottom:14px;">
           <button id="orb-collect-btn" style="
             background:linear-gradient(135deg,#fdf3d0,#f0dfa0);
@@ -549,11 +494,15 @@
             transition:all .18s;">LEAVE</button>
         </div>
 
-        <!-- footer note -->
         <p style="
           text-align:center;font-size:clamp(.68rem,2vw,.78rem);
-          color:#9a7830;opacity:0.65;margin:0;font-style:italic;">
-          Only 1 memory can be carried at a time.
+          color:#7a5010;opacity:0.7;margin:0 0 2px;font-style:italic;">
+          Only one memory can be carried at a time.
+        </p>
+        <p style="
+          text-align:center;font-size:clamp(.66rem,1.9vw,.76rem);
+          color:#7a5010;opacity:0.5;margin:0;font-style:italic;">
+          ※記憶は一つしか持てません。
         </p>
       </div>
     `;
@@ -586,8 +535,12 @@
         text-align:center;font-family:'Georgia',serif;
         box-shadow:0 8px 40px rgba(0,0,0,0.5);">
         <p style="color:#3a2400;font-size:clamp(.9rem,3vw,1.05rem);
-          margin:0 0 22px;line-height:1.6;letter-spacing:.03em;">
+          margin:0 0 8px;line-height:1.6;letter-spacing:.03em;">
           You're already carrying a memory — swap?
+        </p>
+        <p style="color:#7a5010;font-size:clamp(.76rem,2.3vw,.88rem);
+          margin:0 0 22px;opacity:0.7;letter-spacing:.04em;">
+          すでに記憶を持っています。交換しますか？
         </p>
         <div style="display:flex;gap:14px;justify-content:center;">
           <button id="swap-yes" style="
@@ -618,7 +571,9 @@
     orbPanelOpen = true;
     stopOrbAudio();
 
-    // Reset play button
+    // CHANGE 1: pause BGM when orb panel opens
+    try { if (state.musicStarted) { music.pause(); } } catch (_) {}
+
     const playBtn = document.getElementById('orb-play-btn');
     if (playBtn) playBtn.textContent = '▶';
 
@@ -633,6 +588,10 @@
     orbPanelOpen = false;
     orbPanelOrb  = null;
     stopOrbAudio();
+
+    // CHANGE 1: resume BGM when orb panel closes
+    try { if (state.musicStarted) { music.play().catch(() => {}); } } catch (_) {}
+
     orbPanelEl.style.transform = 'translateY(100%)';
     setTimeout(() => {
       if (!orbPanelOpen) orbPanelEl.style.display = 'none';
@@ -664,16 +623,12 @@
 
   function collectOrb() {
     if (!orbPanelOrb) return;
-
     const quest = loadDrifterQuest();
     const alreadyCarrying = quest && quest.collectedOrbId;
-
     if (alreadyCarrying && quest.collectedOrbId !== orbPanelOrb.id) {
-      // Show swap confirmation
       swapOverlayEl.style.display = 'flex';
       return;
     }
-
     doCollect(orbPanelOrb);
   }
 
@@ -683,18 +638,13 @@
   }
 
   function doCollect(orb) {
-    // Un-collect any previously carried orb (drop it — just clear the flag,
-    // it stays gone from karasuki for this session; player lost it)
     orb.collected = true;
     stopOrbAudio();
-
-    // Write to save
     saveDrifterQuest({
       collectedOrbId : orb.id,
       orbIsCorrect   : orb.isCorrect,
       state          : 'carrying',
     });
-
     closeOrbPanel();
   }
 
@@ -847,10 +797,9 @@
         </div>
         <div style="padding:0 28px;">
           <h2 id="wanderer-pop-name" style="font-size:clamp(1.2rem,4vw,1.5rem);margin:0 0 4px;letter-spacing:.06em;"></h2>
-          <p id="wanderer-pop-jp" style="font-size:clamp(.82rem,2.6vw,.96rem);margin:0 0 2px;opacity:.72;letter-spacing:.08em;font-family:'Georgia',serif;color:#ffffff;"></p>
-          <p id="wanderer-pop-kanji" style="font-size:clamp(.7rem,2.2vw,.82rem);margin:0 0 20px;opacity:.38;letter-spacing:.14em;color:#ffffff;"></p>
-          <p id="wanderer-pop-desc" style="font-size:clamp(.84rem,2.8vw,.98rem);line-height:1.7;opacity:.85;margin:0 0 12px;font-family:'Georgia',serif;text-align:left;color:#ffffff;"></p>
-          <p id="wanderer-pop-desc-jp" style="font-size:clamp(.76rem,2.4vw,.88rem);line-height:1.7;opacity:.55;margin:0;font-family:'Georgia',serif;text-align:left;color:#ffffff;display:none;"></p>
+          <p id="wanderer-pop-jp" style="font-size:clamp(.82rem,2.6vw,.96rem);margin:0 0 20px;opacity:.85;letter-spacing:.08em;font-family:'Georgia',serif;color:#ffffff;"></p>
+          <p id="wanderer-pop-desc" style="font-size:clamp(.84rem,2.8vw,.98rem);line-height:1.7;color:#ffffff;margin:0 0 14px;font-family:'Georgia',serif;text-align:left;"></p>
+          <p id="wanderer-pop-desc-jp" style="font-size:clamp(.76rem,2.4vw,.88rem);line-height:1.7;color:#ffffff;opacity:.75;margin:0;font-family:'Georgia',serif;text-align:left;display:none;"></p>
         </div>
       </div>`;
     document.body.appendChild(wandererPopOverlay);
@@ -870,7 +819,6 @@
     const portraitFade = document.getElementById('wanderer-pop-portrait-fade');
     const nameEl = document.getElementById('wanderer-pop-name');
     const jpEl = document.getElementById('wanderer-pop-jp');
-    const kanjiEl = document.getElementById('wanderer-pop-kanji');
     const descEl = document.getElementById('wanderer-pop-desc');
     const descJpEl = document.getElementById('wanderer-pop-desc-jp');
     const closeEl = document.getElementById('wanderer-pop-close');
@@ -886,8 +834,8 @@
     nameEl.style.color = c;
     nameEl.style.textShadow = `0 0 18px ${c}88`;
     nameEl.textContent = w.name || '';
+    // CHANGE 3: EN + JP only, no kanji line, full white opacity
     jpEl.textContent = w.nameJP ? `「${w.nameJP}」` : '';
-    kanjiEl.textContent = w.nameKanji || '';
     descEl.textContent = w.desc || '';
     if (w.descJP) { descJpEl.textContent = w.descJP; descJpEl.style.display = 'block'; } else { descJpEl.style.display = 'none'; }
     wandererPopOverlay.style.display = 'flex';
@@ -982,11 +930,9 @@
         <div id="bonus-pop-orb" style="width:60px;height:60px;border-radius:50%;margin:0 auto 18px;position:relative;"></div>
         <div id="bonus-pop-lock" style="font-size:1.6rem;margin-bottom:8px;display:none;">🔒</div>
         <h2 id="bonus-pop-name" style="font-size:clamp(1.1rem,3.5vw,1.4rem);margin:0 0 3px;letter-spacing:.08em;"></h2>
-        <p id="bonus-pop-jp" style="font-size:clamp(.78rem,2.4vw,.9rem);margin:0 0 2px;opacity:.7;letter-spacing:.08em;"></p>
-        <p id="bonus-pop-kanji" style="font-size:clamp(.68rem,2vw,.8rem);margin:0 0 20px;opacity:.4;letter-spacing:.14em;"></p>
-        <p id="bonus-pop-desc" style="font-size:clamp(.82rem,2.6vw,.95rem);line-height:1.65;margin:0 0 8px;opacity:.88;"></p>
-        <p id="bonus-pop-desc-jp" style="font-size:clamp(.74rem,2.2vw,.85rem);line-height:1.6;margin:0 0 4px;opacity:.6;"></p>
-        <p id="bonus-pop-desc-kanji" style="font-size:clamp(.66rem,1.9vw,.78rem);line-height:1.55;margin:0 0 26px;opacity:.35;"></p>
+        <p id="bonus-pop-jp" style="font-size:clamp(.78rem,2.4vw,.9rem);margin:0 0 20px;opacity:.8;letter-spacing:.08em;color:#ffffff;"></p>
+        <p id="bonus-pop-desc" style="font-size:clamp(.82rem,2.6vw,.95rem);line-height:1.65;margin:0 0 8px;color:#ffffff;"></p>
+        <p id="bonus-pop-desc-jp" style="font-size:clamp(.74rem,2.2vw,.85rem);line-height:1.6;margin:0 0 26px;color:#ffffff;opacity:.8;"></p>
         <div id="bonus-pop-btns" style="display:none;gap:16px;justify-content:center;flex-wrap:wrap;">
           <button id="bonus-pop-yes" class="bonus-pop-btn" style="background:transparent;font-family:'Georgia',serif;font-size:clamp(.8rem,2.6vw,.92rem);letter-spacing:.12em;cursor:pointer;padding:8px 28px;border-radius:3px;transition:all .18s;">はい / Yes</button>
           <button id="bonus-pop-no" class="bonus-pop-btn" style="background:transparent;font-family:'Georgia',serif;font-size:clamp(.8rem,2.6vw,.92rem);letter-spacing:.12em;cursor:pointer;padding:8px 28px;border-radius:3px;transition:all .18s;">いいえ / No</button>
@@ -1018,11 +964,18 @@
     document.getElementById('bonus-pop-lock').style.display = unlocked ? 'none' : 'block';
     const nameEl = document.getElementById('bonus-pop-name');
     nameEl.textContent = tree.nameEN; nameEl.style.color = t.accent1; nameEl.style.textShadow = `0 0 16px ${t.accent1}99`;
-    document.getElementById('bonus-pop-jp').textContent = tree.nameJP; document.getElementById('bonus-pop-jp').style.color = t.accent3;
-    document.getElementById('bonus-pop-kanji').textContent = tree.nameKanji;
-    const descEl = document.getElementById('bonus-pop-desc'); const descJpEl = document.getElementById('bonus-pop-desc-jp'); const descKEl = document.getElementById('bonus-pop-desc-kanji');
-    if (unlocked) { descEl.textContent = tree.descUnlocked; descJpEl.textContent = tree.descUnlockedJP; descKEl.textContent = tree.descUnlockedKanji; } else { descEl.textContent = tree.descLocked; descJpEl.textContent = tree.descLockedJP; descKEl.textContent = tree.descLockedKanji; }
-    descEl.style.color = '#ffffff'; descJpEl.style.color = '#ffffff'; descKEl.style.color = '#ffffff';
+    // CHANGE 3: EN + JP only, no kanji, full white text
+    document.getElementById('bonus-pop-jp').textContent = tree.nameJP;
+    document.getElementById('bonus-pop-jp').style.color = t.accent3;
+    const descEl = document.getElementById('bonus-pop-desc');
+    const descJpEl = document.getElementById('bonus-pop-desc-jp');
+    if (unlocked) {
+      descEl.textContent   = tree.descUnlocked;
+      descJpEl.textContent = tree.descUnlockedJP;
+    } else {
+      descEl.textContent   = tree.descLocked;
+      descJpEl.textContent = tree.descLockedJP;
+    }
     const btnsEl = document.getElementById('bonus-pop-btns'); const okEl = document.getElementById('bonus-pop-ok');
     const yesEl = document.getElementById('bonus-pop-yes'); const noEl = document.getElementById('bonus-pop-no');
     if (unlocked) { btnsEl.style.display = 'flex'; okEl.style.display = 'none'; yesEl.style.border = `1.5px solid ${t.btnBorder}`; yesEl.style.color = t.btnColor; noEl.style.border = `1.5px solid ${t.accent1}44`; noEl.style.color = `${t.accent3}99`; } else { btnsEl.style.display = 'none'; okEl.style.display = 'inline-block'; okEl.style.border = `1.5px solid ${t.btnBorder}`; okEl.style.color = t.btnColor; }
@@ -1116,100 +1069,97 @@
   }
 
   /* ═══════════════════════════════════════════
-     UTSUROBA PORTAL — canvas marker + popup
+     UTSUROBA PORTAL — canvas marker
+     CHANGE 5: Replace dripping eye with white/gold glowing light
+     Deleted: DRIP_MAX, DRIP_SPAWN_MS, DRIP_LIFE_MS, utsurobaDrips,
+              dripNextAt, spawnDrip(), updateDrips(), drawDrips(), drawEye()
   ═══════════════════════════════════════════ */
-
-  const DRIP_MAX       = 10;
-  const DRIP_SPAWN_MS  = 340;
-  const DRIP_LIFE_MS   = 1800;
-  let   utsurobaDrips  = [];
-  let   dripNextAt     = 0;
-
-  function spawnDrip(now, cx, cy) {
-    if (now < dripNextAt) return;
-    if (utsurobaDrips.length >= DRIP_MAX) return;
-    const angle = Math.PI / 2 + (Math.random() - 0.5) * Math.PI * 0.6;
-    const speed = 0.08 + Math.random() * 0.14;
-    utsurobaDrips.push({ x: cx + (Math.random() - 0.5) * 28, y: cy + 6 + Math.random() * 10, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, size: 1.4 + Math.random() * 2.2, born: now, phase: Math.random() * Math.PI * 2 });
-    dripNextAt = now + DRIP_SPAWN_MS + Math.random() * 200;
-  }
-
-  function updateDrips(now) {
-    utsurobaDrips = utsurobaDrips.filter(p => (now - p.born) < DRIP_LIFE_MS);
-    utsurobaDrips.forEach(p => { p.vy += 0.006; p.x += p.vx; p.y += p.vy; p.vx *= 0.98; });
-  }
-
-  function drawDrips(now, unlocked) {
-    if (!utsurobaDrips.length) return;
-    utsurobaDrips.forEach(p => {
-      const age = (now - p.born) / DRIP_LIFE_MS;
-      const fadeIn = Math.min(1, age * 4); const fadeOut = 1 - Math.pow(age, 1.4); const alpha = fadeIn * fadeOut;
-      const col = unlocked ? '#3a0000' : '#1a0020';
-      ctx.save(); ctx.globalAlpha = alpha * 0.72; ctx.fillStyle = col; ctx.shadowBlur = 6; ctx.shadowColor = unlocked ? '#880022' : '#330055';
-      ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill(); ctx.shadowBlur = 0; ctx.restore();
-    });
-  }
-
-  function drawEye(cx, cy, alpha, pulse, unlocked, sec) {
-    const ew = 22 + pulse * 4; const eh = 8 + pulse * 3; const pupR = 4 + pulse * 1.5;
-    const eyeCol = unlocked ? '#cc0022' : '#5500aa'; const pupilCol = unlocked ? '#ff0033' : '#aa00ff';
-    ctx.save(); ctx.globalAlpha = alpha; ctx.shadowBlur = 18 + pulse * 12; ctx.shadowColor = eyeCol;
-    ctx.beginPath(); ctx.moveTo(cx - ew, cy); ctx.quadraticCurveTo(cx, cy - eh * 1.6, cx + ew, cy); ctx.quadraticCurveTo(cx, cy + eh * 1.6, cx - ew, cy); ctx.closePath();
-    ctx.fillStyle = '#080808'; ctx.fill(); ctx.strokeStyle = eyeCol; ctx.lineWidth = 1.2; ctx.stroke(); ctx.shadowBlur = 0;
-    const crackAngles = [0.2, 0.85, Math.PI - 0.3, Math.PI + 0.6];
-    crackAngles.forEach((a, i) => {
-      const len = 12 + i * 4; const ex = cx + Math.cos(a) * ew * 0.9; const ey = cy + Math.sin(a) * eh * 0.9;
-      ctx.beginPath(); ctx.moveTo(ex, ey); ctx.lineTo(ex + Math.cos(a) * len, ey + Math.sin(a) * len);
-      ctx.strokeStyle = eyeCol + '66'; ctx.lineWidth = 0.8; ctx.globalAlpha = alpha * 0.5; ctx.stroke();
-    });
-    ctx.globalAlpha = alpha; ctx.shadowBlur = 10 + pulse * 8; ctx.shadowColor = pupilCol;
-    ctx.beginPath(); ctx.ellipse(cx, cy, pupR * 0.55, pupR, 0, 0, Math.PI * 2); ctx.fillStyle = pupilCol; ctx.fill(); ctx.shadowBlur = 0;
-    const twitch = Math.sin(sec * 0.7 + 1.4) * eh * 0.35;
-    ctx.beginPath(); ctx.ellipse(cx, cy + twitch * 0.3, pupR * 0.28, pupR * 0.55, 0, 0, Math.PI * 2);
-    ctx.fillStyle = '#fff'; ctx.globalAlpha = alpha * 0.25; ctx.fill(); ctx.restore();
-  }
 
   function drawUtsurobPortalMarker(now) {
     if (state.roomId !== UTSUROBA_PORTAL.roomId) return;
     const sec = now / 1000;
     const moveReveal = Math.min(1, state.distMovedSinceSpawn / ARROW_MOVE_THRESHOLD);
     if (moveReveal <= 0) return;
-    const cx = UTSUROBA_PORTAL.x; const cy = UTSUROBA_PORTAL.y;
+
+    const cx = UTSUROBA_PORTAL.x;
+    const cy = UTSUROBA_PORTAL.y;
     const unlocked = _utsurobaCurriculumUnlocked();
-    const pulse = 0.5 + 0.5 * Math.sin(sec * 0.9); const pulse2 = 0.5 + 0.5 * Math.sin(sec * 1.3 + 1.1);
-    const rot = sec * 0.18;
-    ctx.save(); ctx.globalAlpha = moveReveal;
-    const voidR = 68 + pulse * 8;
-    const voidG = ctx.createRadialGradient(cx, cy, 0, cx, cy, voidR);
-    const voidC1 = unlocked ? 'rgba(50,0,0,0.55)' : 'rgba(20,0,40,0.55)';
-    const voidC2 = unlocked ? 'rgba(20,0,0,0.18)' : 'rgba(8,0,20,0.18)';
-    voidG.addColorStop(0, voidC1); voidG.addColorStop(0.6, voidC2); voidG.addColorStop(1, 'transparent');
-    ctx.globalAlpha = moveReveal * (0.6 + pulse * 0.25); ctx.fillStyle = voidG;
-    ctx.beginPath(); ctx.arc(cx, cy, voidR, 0, Math.PI * 2); ctx.fill();
-    for (let i = 0; i < 5; i++) {
-      const baseAngle = rot + (i / 5) * Math.PI * 2; const armLen = 38 + pulse2 * 10; const segments = 8;
-      const armCol = unlocked ? '#550011' : '#220033'; const armGlow = unlocked ? '#880022' : '#440066';
-      ctx.save(); ctx.translate(cx, cy); ctx.rotate(baseAngle);
-      ctx.globalAlpha = moveReveal * (0.28 + pulse * 0.18); ctx.strokeStyle = armCol; ctx.lineWidth = 1.4 - i * 0.1;
-      ctx.shadowBlur = 8; ctx.shadowColor = armGlow;
-      ctx.beginPath(); ctx.moveTo(0, 0);
-      for (let s = 1; s <= segments; s++) { const t = s / segments; const r = t * armLen; const curve = Math.sin(t * Math.PI) * 14 * (i % 2 === 0 ? 1 : -1); ctx.lineTo(r, curve); }
-      ctx.stroke(); ctx.shadowBlur = 0; ctx.restore();
+
+    // Locked is dimmer overall
+    const masterAlpha = unlocked ? moveReveal : moveReveal * 0.38;
+
+    const pulse  = 0.5 + 0.5 * Math.sin(sec * 1.1);
+    const pulse2 = 0.5 + 0.5 * Math.sin(sec * 1.7 + 0.8);
+    const bob    = Math.sin(sec * 1.3) * 4;
+
+    ctx.save();
+
+    // ── Outer ambient haze ──
+    const hazeR = 72 + pulse * 10;
+    const haze  = ctx.createRadialGradient(cx, cy + bob, 0, cx, cy + bob, hazeR);
+    haze.addColorStop(0,   'rgba(255,248,220,0.22)');
+    haze.addColorStop(0.45,'rgba(255,220,100,0.12)');
+    haze.addColorStop(1,   'transparent');
+    ctx.globalAlpha = masterAlpha * (0.6 + pulse * 0.3);
+    ctx.fillStyle   = haze;
+    ctx.beginPath(); ctx.arc(cx, cy + bob, hazeR, 0, Math.PI * 2); ctx.fill();
+
+    // ── Gold ring orbits (unlocked only) ──
+    if (unlocked) {
+      const rings = [
+        { r: 32, speed: 0.55,  dotR: 2.2, count: 5 },
+        { r: 46, speed: -0.38, dotR: 1.6, count: 7 },
+      ];
+      rings.forEach(ring => {
+        for (let i = 0; i < ring.count; i++) {
+          const angle  = sec * ring.speed + (i / ring.count) * Math.PI * 2;
+          const dx     = cx + Math.cos(angle) * ring.r;
+          const dy     = cy + bob + Math.sin(angle) * ring.r * 0.55; // elliptical
+          const twinkle = 0.4 + 0.6 * Math.abs(Math.sin(sec * 4.5 + i * 1.4));
+          ctx.globalAlpha = masterAlpha * twinkle * 0.85;
+          ctx.fillStyle   = i % 2 === 0 ? '#ffd966' : '#fff8d0';
+          ctx.shadowBlur  = 6; ctx.shadowColor = '#ffd966';
+          ctx.beginPath(); ctx.arc(dx, dy, ring.dotR, 0, Math.PI * 2); ctx.fill();
+          ctx.shadowBlur  = 0;
+        }
+      });
     }
-    const coreR = 16 + pulse * 5;
-    const coreG = ctx.createRadialGradient(cx, cy, 0, cx, cy, coreR);
-    const coreC = unlocked ? '#1a0000' : '#0d0018';
-    coreG.addColorStop(0, '#000000'); coreG.addColorStop(0.55, coreC); coreG.addColorStop(1, 'transparent');
-    ctx.globalAlpha = moveReveal * (0.82 + pulse * 0.12); ctx.fillStyle = coreG;
-    ctx.beginPath(); ctx.arc(cx, cy, coreR, 0, Math.PI * 2); ctx.fill();
-    const ringCol = unlocked ? '#660011' : '#330055';
-    ctx.globalAlpha = moveReveal * (0.30 + pulse * 0.28); ctx.strokeStyle = ringCol; ctx.lineWidth = 0.8;
-    ctx.shadowBlur = 12; ctx.shadowColor = ringCol;
-    ctx.beginPath(); ctx.arc(cx, cy, coreR + 4, 0, Math.PI * 2); ctx.stroke(); ctx.shadowBlur = 0;
+
+    // ── Mid glow ring ──
+    const midR  = 18 + pulse2 * 6;
+    const midG  = ctx.createRadialGradient(cx, cy + bob, midR * 0.2, cx, cy + bob, midR);
+    midG.addColorStop(0,   'rgba(255,240,160,0.55)');
+    midG.addColorStop(0.6, 'rgba(255,200,60,0.28)');
+    midG.addColorStop(1,   'transparent');
+    ctx.globalAlpha = masterAlpha * (0.7 + pulse * 0.25);
+    ctx.fillStyle   = midG;
+    ctx.beginPath(); ctx.arc(cx, cy + bob, midR, 0, Math.PI * 2); ctx.fill();
+
+    // ── Core white-gold orb ──
+    const coreR = 9 + pulse * 3.5;
+    const core  = ctx.createRadialGradient(
+      cx - coreR * 0.3, cy + bob - coreR * 0.3, 0,
+      cx,               cy + bob,                coreR
+    );
+    core.addColorStop(0,    '#ffffff');
+    core.addColorStop(0.3,  '#fffde8');
+    core.addColorStop(0.65, '#ffd966');
+    core.addColorStop(1,    '#c8860a');
+    ctx.globalAlpha = masterAlpha * (0.95 + pulse * 0.05);
+    ctx.shadowBlur  = 22 + pulse * 18;
+    ctx.shadowColor = '#ffeea0';
+    ctx.fillStyle   = core;
+    ctx.beginPath(); ctx.arc(cx, cy + bob, coreR, 0, Math.PI * 2); ctx.fill();
+    ctx.shadowBlur  = 0;
+
+    // ── Specular highlight ──
+    ctx.globalAlpha = masterAlpha * (0.6 + pulse2 * 0.25);
+    ctx.fillStyle   = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(cx - coreR * 0.3, cy + bob - coreR * 0.3, coreR * 0.3, 0, Math.PI * 2);
+    ctx.fill();
+
     ctx.restore();
-    const eyeAlpha = moveReveal * (0.55 + pulse2 * 0.38);
-    drawEye(cx, cy, eyeAlpha, pulse, unlocked, sec);
-    if (state.roomId === UTSUROBA_PORTAL.roomId) { spawnDrip(now, cx, cy); updateDrips(now); drawDrips(now, unlocked); }
   }
 
   /* ── Utsuroba popup ── */
@@ -1234,19 +1184,17 @@
         </div>
         <div id="utsuroba-locked" style="display:none;padding:0 clamp(20px,6vw,40px);">
           <p style="font-size:clamp(.7rem,2vw,.78rem);color:rgba(140,80,200,.6);letter-spacing:.22em;margin:0 0 14px;text-transform:uppercase;">— 封印 —</p>
-          <p id="utsuroba-locked-en" style="font-size:clamp(.86rem,2.8vw,1rem);color:#7a5a8a;margin:0 0 10px;line-height:1.65;letter-spacing:.04em;white-space:pre-line;"></p>
-          <p id="utsuroba-locked-jp" style="font-size:clamp(.76rem,2.4vw,.9rem);color:#5a3a6a;margin:0 0 6px;letter-spacing:.06em;white-space:pre-line;"></p>
-          <p id="utsuroba-locked-kanji" style="font-size:clamp(.68rem,2vw,.8rem);color:#3a2044;margin:0 0 22px;letter-spacing:.1em;opacity:.55;white-space:pre-line;"></p>
-          <button id="utsuroba-locked-ok" style="background:transparent;font-family:'Georgia',serif;font-size:clamp(.8rem,2.5vw,.9rem);letter-spacing:.14em;cursor:pointer;padding:8px 28px;border-radius:2px;border:1px solid rgba(80,0,120,.5);color:#6a3a8a;transition:all .2s;">— 閉じる —</button>
+          <p id="utsuroba-locked-en" style="font-size:clamp(.86rem,2.8vw,1rem);color:#c8b8d8;margin:0 0 10px;line-height:1.65;letter-spacing:.04em;white-space:pre-line;"></p>
+          <p id="utsuroba-locked-jp" style="font-size:clamp(.76rem,2.4vw,.9rem);color:#a890c0;margin:0 0 22px;letter-spacing:.06em;white-space:pre-line;"></p>
+          <button id="utsuroba-locked-ok" style="background:transparent;font-family:'Georgia',serif;font-size:clamp(.8rem,2.5vw,.9rem);letter-spacing:.14em;cursor:pointer;padding:8px 28px;border-radius:2px;border:1px solid rgba(80,0,120,.5);color:#c0a0e0;transition:all .2s;">— 閉じる —</button>
         </div>
         <div id="utsuroba-unlocked" style="display:none;padding:0 clamp(20px,6vw,40px);">
           <p style="font-size:clamp(.68rem,1.9vw,.76rem);color:rgba(180,120,255,.7);letter-spacing:.22em;margin:0 0 12px;text-transform:uppercase;text-shadow:0 0 12px rgba(180,80,255,.4);">— 新しい世界 —</p>
           <p id="utsuroba-unlocked-en" style="font-size:clamp(.9rem,3vw,1.08rem);color:#d8b8f8;margin:0 0 8px;line-height:1.6;letter-spacing:.04em;text-shadow:0 0 24px rgba(180,80,255,.45);white-space:pre-line;"></p>
-          <p id="utsuroba-unlocked-jp" style="font-size:clamp(.78rem,2.5vw,.92rem);color:#a880d0;margin:0 0 4px;letter-spacing:.07em;white-space:pre-line;"></p>
-          <p id="utsuroba-unlocked-kanji" style="font-size:clamp(.7rem,2.1vw,.82rem);color:#7050a8;margin:0 0 24px;letter-spacing:.12em;opacity:.7;white-space:pre-line;"></p>
+          <p id="utsuroba-unlocked-jp" style="font-size:clamp(.78rem,2.5vw,.92rem);color:#c0a0e8;margin:0 0 24px;letter-spacing:.07em;white-space:pre-line;"></p>
           <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
             <button id="utsuroba-yes" style="background:rgba(60,0,100,.35);font-family:'Georgia',serif;font-size:clamp(.82rem,2.6vw,.94rem);letter-spacing:.12em;cursor:pointer;padding:10px 32px;border-radius:3px;border:1px solid rgba(160,60,255,.75);color:#e0c0ff;box-shadow:0 0 18px rgba(140,40,220,.3);transition:all .22s;">はい / Yes</button>
-            <button id="utsuroba-no" style="background:transparent;font-family:'Georgia',serif;font-size:clamp(.82rem,2.6vw,.94rem);letter-spacing:.12em;cursor:pointer;padding:10px 32px;border-radius:3px;border:1px solid rgba(60,20,80,.65);color:#7a5a8a;transition:all .22s;">いいえ / No</button>
+            <button id="utsuroba-no" style="background:transparent;font-family:'Georgia',serif;font-size:clamp(.82rem,2.6vw,.94rem);letter-spacing:.12em;cursor:pointer;padding:10px 32px;border-radius:3px;border:1px solid rgba(60,20,80,.65);color:#c0a0e0;transition:all .22s;">いいえ / No</button>
           </div>
         </div>
       </div>`;
@@ -1259,16 +1207,15 @@
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && isUtsuobaPopOpen()) closeUtsurobaPopClose(); });
   }
 
+  // CHANGE 2: EN/JP only, no kanji lines in Utsuroba popup copy
   const UTSUROBA_LOCKED_COPY = {
-    en    : 'Something waits behind this mark.\nComplete nine lessons in one path\nbefore it will open to you.',
-    jp    : 'この印の奥に、何かが待っている。\nひとつの道で九つの学びを終えよ。\nそれまで、ここは開かない。',
-    kanji : '此の印の奥に、何かが待つ。\n一道にて九学を終えよ。\nされど今は、開かぬ。',
+    en : 'Something waits behind this light.\nComplete nine lessons in one path\nbefore it will open to you.',
+    jp : 'この光の奥に、何かが待っている。\nひとつの道で九つの学びを終えよ。\nそれまで、ここは開かない。',
   };
 
   const UTSUROBA_UNLOCKED_COPY = {
-    en    : 'A new world has opened.\nDo you want to enter Utsuroba?',
-    jp    : '新しい世界が開いた。\nうつろばに入りますか？',
-    kanji : '新世界が開かれた。\n空洞場へ参りますか？',
+    en : 'A new world has opened.\nDo you want to enter Utsuroba?',
+    jp : '新しい世界が開いた。\nうつろばに入りますか？',
   };
 
   function openUtsuobaPopup() {
@@ -1277,14 +1224,12 @@
     const unlockedEl = document.getElementById('utsuroba-unlocked');
     if (unlocked) {
       lockedEl.style.display = 'none'; unlockedEl.style.display = 'block';
-      document.getElementById('utsuroba-unlocked-en').textContent    = UTSUROBA_UNLOCKED_COPY.en;
-      document.getElementById('utsuroba-unlocked-jp').textContent    = UTSUROBA_UNLOCKED_COPY.jp;
-      document.getElementById('utsuroba-unlocked-kanji').textContent = UTSUROBA_UNLOCKED_COPY.kanji;
+      document.getElementById('utsuroba-unlocked-en').textContent = UTSUROBA_UNLOCKED_COPY.en;
+      document.getElementById('utsuroba-unlocked-jp').textContent = UTSUROBA_UNLOCKED_COPY.jp;
     } else {
       lockedEl.style.display = 'block'; unlockedEl.style.display = 'none';
-      document.getElementById('utsuroba-locked-en').textContent    = UTSUROBA_LOCKED_COPY.en;
-      document.getElementById('utsuroba-locked-jp').textContent    = UTSUROBA_LOCKED_COPY.jp;
-      document.getElementById('utsuroba-locked-kanji').textContent = UTSUROBA_LOCKED_COPY.kanji;
+      document.getElementById('utsuroba-locked-en').textContent = UTSUROBA_LOCKED_COPY.en;
+      document.getElementById('utsuroba-locked-jp').textContent = UTSUROBA_LOCKED_COPY.jp;
     }
     utsurubaPopOverlay.style.display = 'flex';
     utsurubaPopOverlay.style.background = 'rgba(0,0,0,0.88)';
@@ -1311,7 +1256,21 @@
     }, FADE_MS + 60);
   }
 
+  // CHANGE 4: play intro video once per boohaWeek, skip on repeat visits
   function _playUtsuobaIntroVideo() {
+    // Check if already watched this week
+    try {
+      const watchedWeek = localStorage.getItem('utsuroba_video_week');
+      if (watchedWeek === String(boohaWeek)) {
+        window.location.href = UTSUROBA_PORTAL.href;
+        return;
+      }
+      localStorage.setItem('utsuroba_video_week', String(boohaWeek));
+    } catch (_) {
+      window.location.href = UTSUROBA_PORTAL.href;
+      return;
+    }
+
     let vOverlay = document.getElementById('utsuroba-video-overlay');
     if (!vOverlay) {
       vOverlay = document.createElement('div');
@@ -1384,7 +1343,6 @@
     } catch (_) {}
   })();
 
-  /* Check if returning from Utsuroba with a wrong-memory result */
   (function checkReturnOrbState() {
     try {
       const wrongOrb = sessionStorage.getItem('karasuki_return_wrong_orb');
@@ -1463,8 +1421,7 @@
       #portal-box::before{top:10px;left:10px;border-width:1.5px 0 0 1.5px;}
       #portal-box::after{bottom:10px;right:10px;border-width:0 1.5px 1.5px 0;}
       #portal-en{font-size:clamp(.9rem,3.5vw,1.1rem);margin:0 0 10px;letter-spacing:.04em;color:#f0e8ff;line-height:1.55;text-shadow:0 0 20px rgba(200,180,255,.5);}
-      #portal-ja{font-size:clamp(.78rem,3vw,.92rem);margin:0 0 6px;color:#cdb8e8;letter-spacing:.05em;}
-      #portal-kanji{font-size:clamp(.72rem,2.5vw,.84rem);margin:0 0 clamp(18px,4vw,32px);color:#a888cc;letter-spacing:.08em;}
+      #portal-ja{font-size:clamp(.78rem,3vw,.92rem);margin:0 0 clamp(18px,4vw,32px);color:#cdb8e8;letter-spacing:.05em;}
       .portal-btn{background:transparent;font-family:'Georgia',serif;font-size:clamp(.82rem,3vw,.95rem);letter-spacing:.12em;cursor:pointer;transition:color .18s,border-color .18s,box-shadow .18s,background .18s;padding:clamp(6px,2vw,10px) clamp(20px,5vw,34px);border-radius:3px;}
       #portal-yes{border:1.5px solid rgba(160,70,210,.9);color:#e8d8ff;margin-right:16px;background:rgba(100,30,150,.15);}
       #portal-yes:hover{color:#fff;border-color:rgba(210,120,255,1);background:rgba(140,50,200,.3);box-shadow:0 0 20px rgba(180,80,240,.6),0 0 40px rgba(140,40,200,.3);}
@@ -1473,10 +1430,8 @@
       #wanderer-pop-box::-webkit-scrollbar{width:4px;}
       #wanderer-pop-box::-webkit-scrollbar-track{background:transparent;}
       #wanderer-pop-box::-webkit-scrollbar-thumb{background:rgba(255,255,255,.18);border-radius:4px;}
-      #utsuroba-locked-en,#utsuroba-locked-jp,#utsuroba-locked-kanji,
-      #utsuroba-unlocked-en,#utsuroba-unlocked-jp,#utsuroba-unlocked-kanji{white-space:pre-line;}
-      /* Orb panel pointer events — stage is pointer-events:none on canvas,
-         but panel is fixed so fine */
+      #utsuroba-locked-en,#utsuroba-locked-jp,
+      #utsuroba-unlocked-en,#utsuroba-unlocked-jp{white-space:pre-line;}
       #orb-panel { touch-action: none; }
       #orb-swap-overlay { touch-action: none; }
     `;
@@ -1564,7 +1519,6 @@
       <div id="portal-box">
         <p id="portal-en">Do you want to go to your profile page?</p>
         <p id="portal-ja">プロフィールページに行きますか？</p>
-        <p id="portal-kanji">貴方の横顔の頁へ参りますか？</p>
         <button class="portal-btn" id="portal-yes">Yes</button>
         <button class="portal-btn" id="portal-no">No</button>
       </div>`;
@@ -1749,14 +1703,14 @@
       fadeEl.style.transition = `opacity ${FADE_MS / 2}ms ease-out`; fadeEl.style.opacity = "0";
       setTimeout(() => {
         state.transitioning = false;
-        startEntryDrift();   // ← begin drift to center on every room arrival
+        startEntryDrift();
       }, FADE_MS / 2 + 30);
     }, FADE_MS / 2 + 20);
   }
 
   function getNPPExit(now) {
     if (now < state.transitionReadyAt) return null;
-    if (isEntryDriftActive()) return null;   // prevent NPP trigger during drift
+    if (isEntryDriftActive()) return null;
     const npps = NPP[state.roomId]; if (!npps) return null;
     const OPPOSITE = { left:'right', right:'left', up:'down', down:'up' };
     const arrivalExit = state.arrivalDir ? OPPOSITE[state.arrivalDir] : null;
@@ -1945,7 +1899,7 @@
     drawBonusTrees(now);
     drawUtsurobPortalMarker(now);
     drawWanderers(now);
-    drawOrbs(now);   // ← memory orbs drawn above wanderers
+    drawOrbs(now);
 
     const bobFreq = (Math.PI * 2) / (HOVER_PERIOD / 1000); const bobPhase = sec * bobFreq;
     const bob = Math.sin(bobPhase) * HOVER_AMP; const wobble = Math.sin(bobPhase * 2) * 2.2;
@@ -1990,13 +1944,11 @@
   }
 
   /* ═══════════════════════════════════════════
-     MAIN LOOP — Android-smooth dt-scaled movement
+     MAIN LOOP
   ═══════════════════════════════════════════ */
   function tick(now) {
-    // Clamp dt: min 8ms (cap at 120fps), max 50ms (don't skip frames on tab-resume)
     const dt = Math.min(50, Math.max(8, now - (lastTickTime || now)));
     lastTickTime = now;
-    // Scale speed by real dt so movement is framerate-independent on all devices
     SPEED = BASE_SPEED * (dt / TARGET_DT);
 
     const anyModalOpen =
@@ -2009,7 +1961,7 @@
       isOrbPanelOpen();
 
     if (!anyModalOpen) {
-      tickEntryDrift(now);        // resolve drift lock state first
+      tickEntryDrift(now);
       handleClickMovement(now);
       updateWanderers(now);
 
@@ -2066,23 +2018,15 @@
 
   function handleInput(clientX, clientY) {
     startMusic();
-
-    // Block ALL player input during entry drift
     if (isEntryDriftActive()) return;
     if (state.transitioning) return;
-
     const p = stagePointToWorld(clientX, clientY);
-
     if (state.coordMode) { dropPin(p.x, p.y); ripples.push({ x: p.x, y: p.y, life: 1 }); return; }
-
-    // Orb click — highest priority after portals
     if (clickCheckOrbs(p.x, p.y)) { ripples.push({ x: p.x, y: p.y, life: 1 }); return; }
-
     if (isNearPortal(p)) { openPortal(); ripples.push({ x: p.x, y: p.y, life: 1 }); return; }
     if (clickCheckUtsuobaPortal(p.x, p.y)) { ripples.push({ x: p.x, y: p.y, life: 1 }); return; }
     if (clickCheckWanderers(p.x, p.y)) { ripples.push({ x: p.x, y: p.y, life: 1 }); return; }
     if (clickBonusTree(p.x, p.y)) { ripples.push({ x: p.x, y: p.y, life: 1 }); return; }
-
     state.clickTarget = { x: p.x, y: p.y };
     ripples.push({ x: p.x, y: p.y, life: 1 });
   }
@@ -2106,8 +2050,8 @@
     }, { passive: false });
 
     document.addEventListener("keydown", (e) => { if (e.key === "Escape") closePortal(); });
-    document.addEventListener("click",    startMusic, { once: false });
-    document.addEventListener("touchend", startMusic, { once: false, passive: true });
+    document.addEventListener("click",    startMusic, { once: true });
+    document.addEventListener("touchend", startMusic, { once: true, passive: true });
   }
 
   /* ═══════════════════════════════════════════
@@ -2119,7 +2063,7 @@
     fitStage();
     resizeCanvas();
     initOrbs();
-    renderInitialRoom();   // calls startEntryDrift() internally
+    renderInitialRoom();
     initWanderers();
     bindInput();
     window.addEventListener("resize", () => { fitStage(); resizeCanvas(); });
@@ -2129,7 +2073,7 @@
   init();
 
   /* ═══════════════════════════════════════════
-     PUBLIC API (for Utsuroba to call)
+     PUBLIC API
   ═══════════════════════════════════════════ */
   window.KarasakiOrbs = {
     returnOrbToKarasuki,
