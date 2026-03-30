@@ -33,8 +33,8 @@ window.UTSUROBA_DATA = {
       nameHira    : 'ねど・ざ・おーぐる',
       greeting    : ['Wow!', 'You\'re so cute!', 'Please, please, please help me find some memories!'],
       greetingJP  : ['わあ！', 'とってもかわいいね！', 'お願い、お願い、お願い！記憶を探すのを手伝って！'],
-      sprite1     : './assets/img/drifters/ned-the-oogle1.png',
-      sprite2     : './assets/img/drifters/ned-the-oogle2.png',
+      sprite1     : './assets/img/drifters/ned-the-oogle-1.png',
+      sprite2     : './assets/img/drifters/ned-the-oogle-2.png',
       audioPrefix : 'nto',
       memoryCount : 2,
       roomCoords  : { x: 650, y: 550 }
