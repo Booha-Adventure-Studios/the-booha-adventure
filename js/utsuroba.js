@@ -181,7 +181,11 @@
     const memIdx=pickRandomMemory(id); if(memIdx===null) return null;
     const decoys=pickDecoys(DATA.decoysPerQuest);
     const data=loadSave(); if(!data.weekly) data.weekly={};
-    data.weekly.drifterQuest={active:id,state:'accepted',memIdx,decoys};
+    /* ── collectedMemKey/orbIsCorrect initialised null/false — written at orb pickup ── */
+    data.weekly.drifterQuest={
+      active:id, state:'accepted', memIdx, decoys,
+      collectedMemKey:null, orbIsCorrect:false,
+    };
     writeSave(data); invalidateQuestCache();
     return data.weekly.drifterQuest;
   }
@@ -353,7 +357,7 @@
       const r=document.getElementById('buki-dev-room'),p=document.getElementById('buki-dev-perf'),q=document.getElementById('buki-dev-quest');
       if(r) r.textContent=`room:${state.roomId} moved:${Math.round(state.distMovedSinceSpawn)}`;
       if(p) p.textContent=`tier:${perfTier} dpr:${MAX_DPR} touch:${isTouchDevice}`;
-      if(q){const quest=getCachedQuest();q.textContent=quest?`quest:${quest.active} s:${quest.state} m:${quest.memIdx}`:'quest:none';}
+      if(q){const quest=getCachedQuest();q.textContent=quest?`quest:${quest.active} s:${quest.state} m:${quest.memIdx} key:${quest.collectedMemKey||'none'}`:'quest:none';}
     },500);
   }
 
@@ -545,7 +549,9 @@
     const giveBtn=drifterPanel.querySelector('#dp-give-btn');
     if(giveBtn) giveBtn.addEventListener('click',()=>{
       const q=getCachedQuest(); if(!q||q.state!=='collected'){closeDrifterPanel();return;}
-      const correct=q.collectedOrbId===drifter.id;
+      /* ── belt-and-suspenders: check both flag and key identity ── */
+      const expectedMemKey=`${drifter.id}_a${String(q.memIdx).padStart(2,'0')}`;
+      const correct=q.orbIsCorrect===true && q.collectedMemKey===expectedMemKey;
       closeDrifterPanel();
       if(correct){completeMemory(drifter.id,q.memIdx);triggerSparkle();}
       else{showWrongMemoryMsg();clearQuest();}
