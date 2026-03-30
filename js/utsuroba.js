@@ -459,19 +459,18 @@
   }
 
 
-    
-  function openDrifterPanel(drifter){
-    if(performance.now()<drifterPanelCooldown||!drifter||!drifterPanel) return;
+ function openDrifterPanel(drifter, forcedQuest = null){
+  if (performance.now() < drifterPanelCooldown || !drifter || !drifterPanel) return;
 
-    drifterPanelOpen=true;
-    state.inputLocked=true;
-    state.clickTarget=null;
-    try{music.pause();}catch(_){}
+  drifterPanelOpen = true;
+  state.inputLocked = true;
+  state.clickTarget = null;
+  try { music.pause(); } catch (_) {}
 
-    /* always flush cache before reading so reopened panel sees latest state */
-    invalidateQuestCache();
-    const quest=getCachedQuest();
-    const hasMemories=drifterHasMemories(drifter.id);
+  invalidateQuestCache();
+  const quest = forcedQuest || getCachedQuest();
+  const hasMemories = drifterHasMemories(drifter.id);
+
 
     let dialogueHTML='';
 
@@ -542,14 +541,18 @@
     drifterPanel.querySelectorAll('.dp-dismiss').forEach(btn=>btn.addEventListener('click',closeDrifterPanel));
 
     /* YES btn — close silently then reopen (no auto-play) */
-  const yesBtn = drifterPanel.querySelector('#dp-yes-btn');
-  if (yesBtn) yesBtn.addEventListener('click', () => {
-    activateQuest(drifter.id);
-    invalidateQuestCache();
-    closeDrifterPanel();
-    
-    setTimeout(() => openDrifterPanel(drifter), POPUP_COOLDOWN_MS + PANEL_SLIDE_MS + 20);
-  });
+ const yesBtn = drifterPanel.querySelector('#dp-yes-btn');
+if (yesBtn) yesBtn.addEventListener('click', () => {
+  const quest = activateQuest(drifter.id);
+  if (!quest) { closeDrifterPanel(); return; }
+
+  closeDrifterPanel();
+
+  setTimeout(() => {
+    drifterPanelCooldown = 0;
+    openDrifterPanel(drifter, quest);
+  }, PANEL_SLIDE_MS + 20);
+});
 
     /* Replay btn — manual play only, isMemoryPlaying lock */
     const replayBtn=drifterPanel.querySelector('#dp-replay-btn');
