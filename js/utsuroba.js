@@ -1093,6 +1093,22 @@
     state.clickTarget={x:wx,y:wy};ripples.push({x:wx,y:wy,life:1});
   }
 
+
+/* ═══════════════════════════════════════════
+     MODAL GUARD — single source of truth
+  ═══════════════════════════════════════════ */
+  function anyModalOpen() {
+    return (
+      state.transitioning      ||
+      state.exitingToKarasuki  ||
+      state.celebrating        ||
+      drifterPanelOpen         ||
+      isExitPopOpen()
+    );
+  }
+
+
+    
   /* ═══════════════════════════════════════════
      MAIN LOOP
   ═══════════════════════════════════════════ */
@@ -1105,8 +1121,9 @@
       state.celebrating=false;
       state.inputLocked=false;
     }
-    const anyModal=state.transitioning||isExitPopOpen()||state.exitingToKarasuki||drifterPanelOpen||state.celebrating;
-    if(!anyModal){
+    
+    if(!anyModalOpen()){
+      
       if(state.travelingToCenter){handleCenterTravel(now);}
       else{
         handleClickMovement(now);
