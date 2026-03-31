@@ -57,7 +57,7 @@
   /* ═══════════════════════════════════════════
      DEV MODE
   ═══════════════════════════════════════════ */
-  const DEV_MODE = true;
+  const DEV_MODE = false;
 
   /* ═══════════════════════════════════════════
      COLOURS
@@ -1257,10 +1257,23 @@
   /* ═══════════════════════════════════════════
      DRIFTER HIT CHECK
   ═══════════════════════════════════════════ */
+  /* ── returns true if tap is within NPP_RADIUS of any exit in current room ── */
+  function tapInNPPZone(wx,wy) {
+    const npps = NPP[state.roomId]; if (!npps) return false;
+    for (const npp of npps) {
+      if (Math.hypot(wx-npp.x, wy-npp.y) <= NPP_RADIUS) return true;
+    }
+    /* also check karasuki exit zone if in that room */
+    if (state.roomId === KARASUKI_EXIT.roomId &&
+        Math.hypot(wx-exitPxX(), wy-exitPxY()) <= KARASUKI_EXIT.r) return true;
+    return false;
+  }
+
   function clickCheckDrifter(wx,wy) {
     if (state.inputLocked || drifterPanelOpen) return false;
     const drifter = drifterForRoom(state.roomId); if (!drifter) return false;
     if (!drifterHasMemories(drifter.id)) return false;   /* all done — sprite is inert */
+    if (tapInNPPZone(wx,wy)) return false;               /* exit zone always wins */
     const pos  = drifterWorldPos(drifter);
     const imgs = drifterImgs[drifter.id];
     const img  = imgs.img1;
