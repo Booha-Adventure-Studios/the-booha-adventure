@@ -142,7 +142,7 @@ async function cacheFirst(request, cacheName) {
 async function networkFirst(request, cacheName) {
   const cache = await caches.open(cacheName);
   try {
-    const response = await fetch(request);
+    const response = await fetch(request, { cache: 'no-store' });
     if (response.ok) cache.put(request, response.clone());
     return response;
   } catch {
