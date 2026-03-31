@@ -52,7 +52,9 @@
   const PORTAL_TRIGGER_R              = 36;
 
   const POPUP_COOLDOWN_MS  = 900;
-  const TAP_COOLDOWN_MS    = 200;
+  const TAP_COOLDOWN_MS    = 180;
+  const TAP_MIN_DIST       = 30;   
+  
   let   bonusPopCooldownUntil       = 0;
   let   wandererPopCooldownUntil    = 0;
   let   utsurobaCooldownUntil       = 0;
@@ -1712,10 +1714,14 @@
     if(clickCheckUtsuobaPortal(p.x,p.y)){ripples.push({x:p.x,y:p.y,life:1});return;}
     if(clickCheckWanderers(p.x,p.y)){ripples.push({x:p.x,y:p.y,life:1});return;}
     if(clickBonusTree(p.x,p.y)){ripples.push({x:p.x,y:p.y,life:1});return;}
-    // Movement taps: ignore while ghost is still moving toward a recent tap
+    
+     // Movement taps: ignore while ghost is still moving toward a recent tap
     if(state.moving && now < state.tapCooldownUntil) return;
+    // Ignore taps that land too close to the ghost's current position
+    if(Math.hypot(p.x - state.x, p.y - state.y) < TAP_MIN_DIST) return;
     state.clickTarget={x:p.x,y:p.y};
     state.tapCooldownUntil = now + TAP_COOLDOWN_MS;
+    
     ripples.push({x:p.x,y:p.y,life:1});
   }
 
