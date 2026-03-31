@@ -56,7 +56,7 @@
   /* ═══════════════════════════════════════════
      DEV MODE
   ═══════════════════════════════════════════ */
-  const DEV_MODE = false;
+  const DEV_MODE = true;
 
   const MONTH_COLORS = [
     ['#ff3bbd','#ff79d7'],['#ff6b3b','#ffaa5e'],['#3bc8ff','#a8edff'],
@@ -1306,7 +1306,7 @@
     rotateOverlay.innerHTML = `<span class="rotate-phone">📱</span><div class="rotate-bar"></div><p class="rotate-title">横にして遊ぼう！</p><p class="rotate-sub">カラスキは<strong style="color:#ff79d7">横画面</strong>で遊べるよ。<br>スマホを横にしてね。</p>`;
     document.body.appendChild(rotateOverlay);
     ctx = canvas.getContext("2d");
-    document.getElementById("clear-pins").addEventListener("click", () => { pins = []; renderPinLog(); });
+    if (DEV_MODE) document.getElementById("clear-pins").addEventListener("click", () => { pins = []; renderPinLog(); });
     document.getElementById("portal-yes").addEventListener("click", () => { try { sessionStorage.setItem('karasuki_return_room', 'room_08'); } catch (_) {} window.location.href = PORTAL.href; });
     document.getElementById("portal-no").addEventListener("click", closePortal);
     portalOverlay.addEventListener("click", (e) => { if (e.target === portalOverlay) closePortal(); });
