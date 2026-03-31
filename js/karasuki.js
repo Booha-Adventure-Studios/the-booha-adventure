@@ -56,7 +56,7 @@
   /* ═══════════════════════════════════════════
      DEV MODE
   ═══════════════════════════════════════════ */
-  const DEV_MODE = true;
+  const DEV_MODE = false;
 
   const MONTH_COLORS = [
     ['#ff3bbd','#ff79d7'],['#ff6b3b','#ffaa5e'],['#3bc8ff','#a8edff'],
@@ -174,15 +174,21 @@
   function startEntryDrift() {
     entryDrift.active    = true;
     entryDrift.lockUntil = performance.now() + DRIFT_LOCK_MAX_MS;
-    state.clickTarget    = { x: DRIFT_CENTER_X, y: DRIFT_CENTER_Y };
+    state.clickTarget    = null;  // drift drives itself via tickEntryDrift
     state.moving         = true;
   }
 
   function tickEntryDrift(now) {
     if (!entryDrift.active) return;
     if (now >= entryDrift.lockUntil) { entryDrift.active = false; state.clickTarget = null; state.moving = false; return; }
-    const dist = Math.hypot(state.x - DRIFT_CENTER_X, state.y - DRIFT_CENTER_Y);
-    if (dist <= DRIFT_ARRIVE_DIST) { entryDrift.active = false; state.clickTarget = null; state.moving = false; }
+    const dx = DRIFT_CENTER_X - state.x, dy = DRIFT_CENTER_Y - state.y;
+    const dist = Math.hypot(dx, dy);
+    if (dist <= DRIFT_ARRIVE_DIST) { entryDrift.active = false; state.clickTarget = null; state.moving = false; return; }
+    // Bypass collision — direct lerp so frame-rate variance can't stall drift on Android
+    const step = Math.min(dist, SPEED * 1.1);
+    state.x += (dx / dist) * step;
+    state.y += (dy / dist) * step;
+    state.moving = true;
   }
 
   function isEntryDriftActive() { return entryDrift.active; }
@@ -277,18 +283,15 @@
     const pickedDecoys = seededShuffle(allDecoys, rng).slice(0, 3);
 
     const quest     = loadDrifterQuest();
-    /* ── FIX: memIdx is already 1-based from pickRandomMemory — use directly ── */
     const memIdx    = (quest && quest.memIdx != null) ? quest.memIdx : 1;
     const drifterId = (quest && quest.active) ? quest.active : 'ks';
 
-    /* ── FIX: memoryId uses _a format (orb audio), distinct from _q (quest audio) ── */
     const correctMemoryId = `${drifterId}_a${String(memIdx).padStart(2, '0')}`;
 
     const orbs = [];
     roomOrder.forEach((roomId, i) => {
       const pos       = generateOrbPosition(roomId, rng);
       const isCorrect = (i === 0);
-      /* ── FIX: orb carries memoryId (memory identity) not a generic id ── */
       const memoryId    = isCorrect ? correctMemoryId : pickedDecoys[i - 1];
       const audioFile = isCorrect
         ? ORB_AUDIO_BASE + correctMemoryId + '.mp3'
@@ -322,7 +325,6 @@
   function initOrbs() {
     weeklyOrbs = buildWeeklyOrbs();
     const quest = loadDrifterQuest();
-    /* ── FIX: restore collected state using collectedMemoryId ── */
     if (quest && quest.collectedMemoryId) {
       for (const orb of weeklyOrbs) {
         if (orb.memoryId === quest.collectedMemoryId) { orb.collected = true; break; }
@@ -490,7 +492,6 @@
       try { orbAudio.onended = null; orbAudio.pause(); orbAudio.currentTime = 0; } catch (_) {}
       orbAudio = null;
     }
-    /* reset play button state regardless */
     const btn = document.getElementById('orb-play-btn');
     if (btn) btn.textContent = '▶';
   }
@@ -498,7 +499,6 @@
   function collectOrb() {
     if (!orbPanelOrb) return;
     const quest = loadDrifterQuest();
-    /* ── FIX: check collectedMemoryId, not collectedOrbId ── */
     const alreadyCarrying = quest && quest.collectedMemoryId;
     if (alreadyCarrying && quest.collectedMemoryId !== orbPanelOrb.memoryId) {
       swapOverlayEl.style.display = 'flex';
@@ -515,7 +515,6 @@
   function doCollect(orb) {
     orb.collected = true;
     stopOrbAudio();
-    /* ── FIX: write collectedMemoryId + orbIsCorrect, single write point ── */
     saveDrifterQuest({
       collectedMemoryId : orb.memoryId,
       orbIsCorrect    : orb.isCorrect,
@@ -1134,7 +1133,6 @@
 
   (function checkReturnOrbState() {
     try {
-      /* ── FIX: sessionStorage key is karasuki_return_wrong_orb, value is now memoryId ── */
       const wrongMemKey = sessionStorage.getItem('karasuki_return_wrong_orb');
       if (wrongMemKey) { sessionStorage.removeItem('karasuki_return_wrong_orb'); returnOrbToKarasuki(wrongMemKey); }
     } catch (_) {}
@@ -1144,7 +1142,7 @@
   const ghostImg = new Image(); ghostImg.src = "assets/img/booha_ghost.png";
   const music    = new Audio("assets/audio/karasuki-music.mp3"); music.loop = true; music.volume = 0.65;
 
-  let app, stage, canvas, ctx, roomLayer, coordToggle, coordReadout, pinLog;
+  let app, stage, canvas, ctx, roomLayer, coordReadout, pinLog;
   let portalOverlay = null;
 
   /* ═══════════════════════════════════════════
@@ -1169,11 +1167,7 @@
       @keyframes barshimmer{0%{background-position:0%}100%{background-position:200%}}
       .rotate-title{font-family:system-ui,-apple-system,sans-serif;font-size:clamp(18px,5vw,28px);font-weight:900;letter-spacing:1px;color:#fff;margin:0;text-shadow:0 0 28px rgba(255,140,255,.7);}
       .rotate-sub{font-size:14px;color:rgba(255,255,255,.55);margin:0;line-height:1.7;}
-      #coord-toggle{position:fixed;bottom:18px;right:18px;z-index:200;display:flex;align-items:center;gap:8px;background:rgba(0,0,0,.80);color:#ff8ae2;font:700 11px/1 monospace;padding:7px 13px;border-radius:20px;cursor:pointer;border:1px solid rgba(255,138,226,.40);user-select:none;letter-spacing:.06em;}
-      .toggle-pill{width:30px;height:16px;border-radius:8px;background:rgba(255,138,226,.18);position:relative;transition:background .2s;}
-      .toggle-pill::after{content:"";position:absolute;top:3px;left:3px;width:10px;height:10px;border-radius:50%;background:#ff8ae2;transition:transform .2s;}
-      #coord-toggle.active .toggle-pill{background:rgba(255,138,226,.55);}
-      #coord-toggle.active .toggle-pill::after{transform:translateX(14px);}
+      /* coord-toggle moved into dev panel */
       #coord-readout{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:200;background:rgba(0,0,0,.80);color:#ff8ae2;font:700 13px/1.4 monospace;padding:6px 16px;border-radius:20px;pointer-events:none;border:1px solid rgba(255,138,226,.30);letter-spacing:.05em;opacity:0;transition:opacity .2s;white-space:nowrap;text-align:center;}
       #coord-readout.show{opacity:1;}
       #coord-readout .hint{font-size:10px;color:rgba(255,138,226,.55);display:block;margin-top:2px;}
@@ -1225,22 +1219,23 @@
     if (document.getElementById('dev-panel')) return;
     const panel = document.createElement('div');
     panel.id = 'dev-panel';
-    panel.style.cssText = `position:fixed;bottom:60px;right:18px;z-index:9999;pointer-events:auto;background:rgba(0,0,0,.88);border:1px solid rgba(255,200,0,.4);border-radius:10px;padding:10px 14px;font:700 11px/1.8 monospace;color:#ffd700;letter-spacing:.06em;min-width:160px;box-shadow:0 0 20px rgba(255,200,0,.2);`;
+    panel.style.cssText = `position:fixed;bottom:18px;right:18px;z-index:9999;pointer-events:auto;background:rgba(0,0,0,.88);border:1px solid rgba(255,200,0,.4);border-radius:10px;padding:10px 14px;font:700 11px/1.8 monospace;color:#ffd700;letter-spacing:.06em;min-width:160px;box-shadow:0 0 20px rgba(255,200,0,.2);`;
     panel.innerHTML = `
       <div style="font-size:9px;color:rgba(255,200,0,.5);letter-spacing:.14em;margin-bottom:6px;">DEV MODE</div>
       <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:4px;"><input type="checkbox" id="dev-all-wanderers"> All wanderers</label>
       <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:4px;"><input type="checkbox" id="dev-all-games"> All games unlocked</label>
       <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:4px;"><input type="checkbox" id="dev-utsuroba"> Utsuroba unlocked</label>
-      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;"><input type="checkbox" id="dev-all-orbs"> Show all orbs</label>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:4px;"><input type="checkbox" id="dev-all-orbs"> Show all orbs</label>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:4px;"><input type="checkbox" id="dev-coords-toggle"> Coord mode</label>
       <button id="dev-clear-quest" style="margin-top:4px;font:700 11px monospace;color:#ffd700;background:transparent;border:1px solid rgba(255,200,0,.4);border-radius:4px;padding:3px 8px;cursor:pointer;width:100%;">Clear quest</button>
-      <div id="dev-room-info"
-      style="font-size:9px;color:rgba(255,200,0,.45);margin-top:8px;"></div>`;
+      <div id="dev-room-info" style="font-size:9px;color:rgba(255,200,0,.45);margin-top:8px;"></div>`;
     document.body.appendChild(panel);
     window.__devAllGames = false; window.__devAllWanderers = false; window.__devUtsuroba = false; window.__devAllOrbs = false;
     document.getElementById('dev-all-games').addEventListener('change',     function() { window.__devAllGames = this.checked; });
     document.getElementById('dev-all-wanderers').addEventListener('change', function() { window.__devAllWanderers = this.checked; refreshWanderersForRoom(); });
     document.getElementById('dev-utsuroba').addEventListener('change',      function() { window.__devUtsuroba = this.checked; });
     document.getElementById('dev-all-orbs').addEventListener('change',      function() { window.__devAllOrbs = this.checked; });
+    document.getElementById('dev-coords-toggle').addEventListener('change', function() { if (this.checked !== state.coordMode) toggleCoordMode(); });
     document.getElementById('dev-clear-quest').addEventListener('click', () => {
       try {
         const raw = localStorage.getItem('booha_save');
@@ -1250,13 +1245,12 @@
         weeklyOrbs.forEach(o => o.collected = false);
       } catch(_) {}
     });
- 
+
     setInterval(() => {
       const el = document.getElementById('dev-room-info');
       if (el) {
         const quest    = loadDrifterQuest();
         const orbsHere = weeklyOrbs.filter(o => o.roomId === state.roomId && !o.collected);
-        /* ── FIX: show collectedMemoryId in dev panel ── */
         const qInfo = quest
           ? `q:${quest.active} m:${quest.memIdx} ${quest.collectedMemoryId ? 'carrying:'+quest.collectedMemoryId : 'carrying:none'}`
           : 'quest:none';
@@ -1287,9 +1281,6 @@
     const fade = document.createElement("div"); fade.id = "kara-fade";
     stage.appendChild(roomLayer); stage.appendChild(canvas); stage.appendChild(fade);
     app.appendChild(stage);
-    coordToggle = document.createElement("div"); coordToggle.id = "coord-toggle";
-    coordToggle.innerHTML = `<span>COORDS</span><div class="toggle-pill"></div>`;
-    if (DEV_MODE) coordToggle.addEventListener("click", toggleCoordMode);
     coordReadout = document.createElement("div"); coordReadout.id = "coord-readout";
     coordReadout.innerHTML = `<span id="coord-xy">—</span><span class="hint">click to pin · hover to read</span>`;
     pinLog = document.createElement("div"); pinLog.id = "pin-log";
@@ -1299,7 +1290,7 @@
     portalOverlay.innerHTML = `<div id="portal-box"><p id="portal-en">Do you want to go to your profile page?</p><p id="portal-ja">プロフィールページに行きますか？</p><button class="portal-btn" id="portal-yes">Yes</button><button class="portal-btn" id="portal-no">No</button></div>`;
     document.body.innerHTML = "";
     document.body.appendChild(app);
-    if (DEV_MODE) { document.body.appendChild(coordToggle); document.body.appendChild(coordReadout); document.body.appendChild(pinLog); }
+    if (DEV_MODE) { document.body.appendChild(coordReadout); document.body.appendChild(pinLog); }
     document.body.appendChild(toast);
     document.body.appendChild(portalOverlay);
     injectBonusPopOverlay(); injectWandererPopOverlay(); injectUtsuobaPopOverlay(); injectOrbPanel(); injectSwapOverlay();
@@ -1355,10 +1346,12 @@
   ═══════════════════════════════════════════ */
   function toggleCoordMode() {
     state.coordMode = !state.coordMode;
-    coordToggle.classList.toggle("active", state.coordMode);
     coordReadout.classList.toggle("show",  state.coordMode);
     pinLog.classList.toggle("show",        state.coordMode);
     pinLog.querySelector(".log-header span").textContent = `PINS — ${state.roomId}`;
+    // Sync dev panel checkbox
+    const cb = document.getElementById("dev-coords-toggle");
+    if (cb && cb.checked !== state.coordMode) cb.checked = state.coordMode;
   }
   function dropPin(wx, wy) { const label = `${Math.round(wx)}, ${Math.round(wy)}`; pins.push({ x: wx, y: wy, label }); renderPinLog(); copyText(label); showToast(`pinned ${label}`); }
   function renderPinLog() {
@@ -1642,28 +1635,28 @@
   }
 
   /* ═══════════════════════════════════════════
-     MODAL GUARD — single source of truth
-     Use only flags that exist in this file.
-     Never call from draw/update — input only.
+     MODAL GUARD
   ═══════════════════════════════════════════ */
- function anyModalOpen() {
-  return (
-    state.transitioning   ||
-    state.mazeExiting     ||
-    isPortalOpen()        ||
-    isBonusPopOpen()      ||
-    isWandererPopOpen()   ||
-    isUtsuobaPopOpen()    ||
-    isOrbPanelOpen()
-  );
-}
+  function anyModalOpen() {
+    return (
+      state.transitioning   ||
+      state.mazeExiting     ||
+      isPortalOpen()        ||
+      isBonusPopOpen()      ||
+      isWandererPopOpen()   ||
+      isUtsuobaPopOpen()    ||
+      isOrbPanelOpen()
+    );
+  }
 
   /* ═══════════════════════════════════════════
      MAIN LOOP
   ═══════════════════════════════════════════ */
   function tick(now) {
-    const dt=Math.min(50,Math.max(8,now-(lastTickTime||now)));
-    lastTickTime=now; SPEED=BASE_SPEED*(dt/TARGET_DT);
+    // FIX: tighter dt clamp (32ms max = ~30fps floor) and cap SPEED multiplier
+    // to prevent rubber-banding on Android high-refresh or stuttery frames
+    const dt=Math.min(32,Math.max(8,now-(lastTickTime||now)));
+    lastTickTime=now; SPEED=BASE_SPEED*Math.min(dt/TARGET_DT,1.6);
     if (!anyModalOpen()) {
       tickEntryDrift(now); handleClickMovement(now); updateWanderers(now);
       const driftDone    = !isEntryDriftActive();
@@ -1686,8 +1679,11 @@
   function startMusic() { if(state.musicStarted)return; state.musicStarted=true; music.play().catch(()=>{}); }
 
   function stagePointToWorld(clientX, clientY) {
-    const rect=stage.getBoundingClientRect();
-    return clampToWorld(((clientX-rect.left)/rect.width)*WORLD_W, ((clientY-rect.top)/rect.height)*WORLD_H);
+    // rect already reflects the CSS scale on all DPRs — fraction gives correct world coord.
+    const rect = stage.getBoundingClientRect();
+    const fx = (clientX - rect.left) / rect.width;
+    const fy = (clientY - rect.top)  / rect.height;
+    return clampToWorld(fx * WORLD_W, fy * WORLD_H);
   }
 
   function isNearPortal(p) { return state.roomId==="room_08"&&Math.hypot(p.x-PORTAL.x,p.y-PORTAL.y)<=PORTAL.r; }
@@ -1695,7 +1691,7 @@
   function handleInput(clientX, clientY) {
     startMusic();
     if (anyModalOpen()) return;
-    if (isEntryDriftActive()) return; 
+    if (isEntryDriftActive()) return;
     const p=stagePointToWorld(clientX,clientY);
     if(state.coordMode){dropPin(p.x,p.y);ripples.push({x:p.x,y:p.y,life:1});return;}
     if(clickCheckOrbs(p.x,p.y)){ripples.push({x:p.x,y:p.y,life:1});return;}
