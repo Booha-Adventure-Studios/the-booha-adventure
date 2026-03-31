@@ -56,7 +56,7 @@
   /* ═══════════════════════════════════════════
      DEV MODE
   ═══════════════════════════════════════════ */
-  const DEV_MODE = false;
+  const DEV_MODE = true;
 
   const MONTH_COLORS = [
     ['#ff3bbd','#ff79d7'],['#ff6b3b','#ffaa5e'],['#3bc8ff','#a8edff'],
@@ -1663,8 +1663,7 @@
     // FIX: tighter dt clamp (32ms max = ~30fps floor) and cap SPEED multiplier
     // to prevent rubber-banding on Android high-refresh or stuttery frames
     const dt=Math.min(50,Math.max(8,now-(lastTickTime||now)));
-    lastTickTime=now; SPEED=BASE_SPEED*Math.min(dt/TARGET_DT, 1.0);
-    
+    lastTickTime=now; SPEED=BASE_SPEED*(dt/TARGET_DT);
     if (!anyModalOpen()) {
       tickEntryDrift(now); handleClickMovement(now); updateWanderers(now);
       const driftDone    = !isEntryDriftActive();
