@@ -644,6 +644,7 @@
       }
     }
 
+    
     /* Karasuki popup — compact at small viewport HEIGHT */
 @media (max-height: 700px), (max-width: 767px) {
   #krPrompt {
@@ -678,6 +679,38 @@
   }
 }
 
+
+/* Homework popup — compact at small viewport HEIGHT */
+@media (max-height: 700px), (max-width: 767px) {
+  #hwPrompt {
+    padding: 14px 16px 14px;
+    border-radius: 18px;
+  }
+  #hwTreeEmoji {
+    width: 44px;
+    height: 44px;
+    margin-bottom: 8px;
+  }
+  #hwPromptBar {
+    margin-bottom: 10px;
+  }
+  #hwPromptTitle {
+    font-size: clamp(15px, 3.5vw, 22px);
+    margin-bottom: 5px;
+  }
+  #hwPromptSub {
+    font-size: 11px;
+    margin-bottom: 10px;
+  }
+  .hw-dots {
+    margin-bottom: 10px;
+  }
+  #hwNoBtn, #hwYesBtn {
+    padding: 9px 20px;
+    font-size: 13px;
+  }
+}
+    
     @media (prefers-reduced-motion:reduce){
       #startGhost{ animation:none; }
       .rotateIcon{ animation:none; transform:rotate(-90deg); }
