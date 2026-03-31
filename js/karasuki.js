@@ -12,7 +12,7 @@
   const GHOST_RADIUS    = 18;
   
   const IS_PHONE        = ('ontouchstart' in window || navigator.maxTouchPoints > 0) && window.innerWidth < 768;
-  const BASE_SPEED      = IS_PHONE ? 7.5 : 5.5;
+  const BASE_SPEED      = IS_PHONE ? 8.0 : 5.5;
   
   const FADE_MS         = 600;
   const CLICK_STOP_DIST = 6;
@@ -52,7 +52,7 @@
   const PORTAL_TRIGGER_R              = 36;
 
   const POPUP_COOLDOWN_MS  = 900;
-  const TAP_COOLDOWN_MS    = 120;
+  const TAP_COOLDOWN_MS    = 200;
   let   bonusPopCooldownUntil       = 0;
   let   wandererPopCooldownUntil    = 0;
   let   utsurobaCooldownUntil       = 0;
@@ -60,7 +60,8 @@
   /* ═══════════════════════════════════════════
      DEV MODE
   ═══════════════════════════════════════════ */
-  const DEV_MODE = true;
+  const DEV_MODE = false
+  ;
 
   const MONTH_COLORS = [
     ['#ff3bbd','#ff79d7'],['#ff6b3b','#ffaa5e'],['#3bc8ff','#a8edff'],
