@@ -1161,9 +1161,9 @@ function drawWanderers(nowMs){
     if(w.opacity<=0)continue;const img=ghostImgs[w.ghostIdx];if(!img||!img.complete||!img.naturalWidth)continue;
     const gR=GHOST_SIZE/2,gx=w.cx,gy=w.cy;
     
-    const isSmallPhone = window.innerWidth < 430;
-    const isMobile = window.innerWidth < 768;
-    const drawR = isSmallPhone ? gR * .45 : isMobile ? gR * .65 : gR;
+    // Mirror the active ghost's continuous scale — all ghosts stay proportional on every device.
+    const _wScale = Math.min(1, Math.max(0.30, cssW / IMG_W));
+    const drawR   = gR * _wScale;
     
     const col1=MONTH_COLORS[w.ghostIdx%MONTH_COLORS.length][0],col2=MONTH_COLORS[w.ghostIdx%MONTH_COLORS.length][1];
     const sec=nowMs/1000,pulseG=.5+.5*Math.sin(sec*2.1+w.ghostIdx*.8);
@@ -1308,10 +1308,11 @@ function drawFrame(now){
   // ── Layer 3: checkpoint orbs ─────────────────────────────────────────────
   const{scale:coverScale}=getCover();
   
- const isMobile = cssW < 768;
- const isSmallPhone = cssW < 430;
- const baseGhostR = GHOST_SIZE / 2;
- const activeGhostR = isSmallPhone ? baseGhostR * .45 : isMobile ? baseGhostR * .65 : baseGhostR;
+ // Ghost size scales continuously with viewport width vs reference image width (1600px).
+  // Clamped: min 30% of base on tiny phones, max 100% on desktop.
+  const _ghostScale  = Math.min(1, Math.max(0.30, cssW / IMG_W));
+  const baseGhostR   = GHOST_SIZE / 2;
+  const activeGhostR = baseGhostR * _ghostScale;
 
   CHECKPOINTS.forEach((cp,cpIdx)=>{
     const state=cpState[cp.w];if(!state||state.alpha<=.01)return;
