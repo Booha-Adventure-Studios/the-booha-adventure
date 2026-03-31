@@ -10,7 +10,7 @@
   const WORLD_H         = 1024;
   const GHOST_R         = 26;
   const GHOST_RADIUS    = 18;
-  const BASE_SPEED      = 3.2;
+  const BASE_SPEED      = 4.2;
   const FADE_MS         = 600;
   const CLICK_STOP_DIST = 6;
   const HOVER_AMP       = 9;
@@ -1663,7 +1663,8 @@
     // FIX: tighter dt clamp (32ms max = ~30fps floor) and cap SPEED multiplier
     // to prevent rubber-banding on Android high-refresh or stuttery frames
     const dt=Math.min(32,Math.max(8,now-(lastTickTime||now)));
-    lastTickTime=now; SPEED=BASE_SPEED*Math.min(dt/TARGET_DT,1.6);
+    lastTickTime=now; SPEED=BASE_SPEED*Math.min(dt/TARGET_DT, 1.4);
+    
     if (!anyModalOpen()) {
       tickEntryDrift(now); handleClickMovement(now); updateWanderers(now);
       const driftDone    = !isEntryDriftActive();
