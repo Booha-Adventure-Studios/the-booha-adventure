@@ -28,8 +28,8 @@
 
   const MAZE_EXIT = {
     roomId  : "room_03",
-    x       : 738,
-    y       : 808,
+    x       : 754,
+    y       : 663,
     r       : 44,
     mazeUrl : "maze.html",
     treeIX  : 535,
