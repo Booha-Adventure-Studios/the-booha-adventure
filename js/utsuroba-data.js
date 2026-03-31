@@ -108,7 +108,7 @@ window.UTSUROBA_DATA = {
         fromLeft : { x: 0.182, y: 0.320 },
         fromRight: { x: 0.749, y: 0.232 },
         fromUp   : { x: 0.511, y: 0.352 },
-        fromDown : { x: 0.477, y: 0.801 }
+        fromDown : { x: 0.749, y: 0.681 }
       },
       collisions: [{ x:0, y:0, w:1536, h:1024 }]
     },
