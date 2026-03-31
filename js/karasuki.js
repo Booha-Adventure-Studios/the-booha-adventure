@@ -65,7 +65,7 @@
   /* ═══════════════════════════════════════════
      DEV MODE
   ═══════════════════════════════════════════ */
-  const DEV_MODE = true;
+  const DEV_MODE = false;
 
   const MONTH_COLORS = [
     ['#ff3bbd','#ff79d7'],['#ff6b3b','#ffaa5e'],['#3bc8ff','#a8edff'],
@@ -780,10 +780,7 @@
   const BONUS_TREES = [
     { id:'booha_invaders',      roomId:'room_07', x:1019, y:381, r:44, url:'booha_invaders.html', label:'INVADERS', color:'#44ff88', theme:'invaders', nameEN:'Booha Invaders',  nameJP:'ブーハ・インベーダーズ', nameKanji:'侵略者', descUnlocked:'You\'ve unlocked this game! Do you want to play?', descUnlockedJP:'このゲームがつかえます！あそびますか？', descUnlockedKanji:'このゲームが使えます。遊びますか？', descLocked:'This game is locked. You need to play more games in the maze.', descLockedJP:'このゲームはまだロックされています。めいろでもっとゲームをしてください。', descLockedKanji:'このゲームはまだロックされています。迷路でもっとゲームをして下さい。' },
     { id:'booha_blocks',        roomId:'room_02', x:1084, y:365, r:44, url:'booha_blocks.html',   label:'BLOCKS',   color:'#44aaff', theme:'blocks',   nameEN:'Booha Blocks',    nameJP:'ブーハ・ブロック',       nameKanji:'積木',   descUnlocked:'You\'ve unlocked this game! Do you want to play?', descUnlockedJP:'このゲームがつかえます！あそびますか？', descUnlockedKanji:'このゲームが使えます。遊びますか？', descLocked:'This game is locked. You need to play more games in the maze.', descLockedJP:'このゲームはまだロックされています。めいろでもっとゲームをしてください。', descLockedKanji:'このゲームはまだロックされています。迷路でもっとゲームをして下さい。' },
-    { id:'bonus_placeholder_1', roomId:'room_12', x:993,  y:362, r:44, url:'bonus_game_1.html',   label:'???',      color:'#cc88ff', theme:'mystery',  nameEN:'???',             nameJP:'？？？',                nameKanji:'謎',     descUnlocked:'You\'ve unlocked this game! Do you want to play?', descUnlockedJP:'このゲームがつかえます！あそびますか？', descUnlockedKanji:'このゲームが使えます。遊びますか？', descLocked:'This game is locked. You need to play more games in the maze.', descLockedJP:'このゲームはまだロックされています。めいろでもっとゲームをしてください。', descLockedKanji:'このゲームはまだロックされています。迷路でもっとゲームをして下さい。' },
-    { id:'bonus_placeholder_2', roomId:'room_14', x:491,  y:328, r:44, url:'bonus_game_2.html',   label:'???',      color:'#ffcc44', theme:'mystery',  nameEN:'???',             nameJP:'？？？',                nameKanji:'謎',     descUnlocked:'You\'ve unlocked this game! Do you want to play?', descUnlockedJP:'このゲームがつかえます！あそびますか？', descUnlockedKanji:'このゲームが使えます。遊びますか？', descLocked:'This game is locked. You need to play more games in the maze.', descLockedJP:'このゲームはまだロックされています。めいろでもっとゲームをしてください。', descLockedKanji:'このゲームはまだロックされています。迷路でもっとゲームをして下さい。' },
-    { id:'bonus_placeholder_3', roomId:'room_10', x:344,  y:392, r:44, url:'bonus_game_3.html',   label:'???',      color:'#ff9966', theme:'mystery',  nameEN:'???',             nameJP:'？？？',                nameKanji:'謎',     descUnlocked:'You\'ve unlocked this game! Do you want to play?', descUnlockedJP:'このゲームがつかえます！あそびますか？', descUnlockedKanji:'このゲームが使えます。遊びますか？', descLocked:'This game is locked. You need to play more games in the maze.', descLockedJP:'このゲームはまだロックされています。めいろでもっとゲームをしてください。', descLockedKanji:'このゲームはまだロックされています。迷路でもっとゲームをして下さい。' },
-  ];
+   ];
 
   let bonusPopOverlay     = null;
   let bonusPopCurrentTree = null;
