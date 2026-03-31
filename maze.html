@@ -59,7 +59,8 @@
     .btnBlue{ background:linear-gradient(180deg,var(--blue2),var(--blue)); box-shadow:0 8px 20px rgba(59,200,255,.28),0 0 0 2px rgba(59,200,255,.18),0 0 26px rgba(59,200,255,.38); }
     .btnBlue:active{ transform:scale(.96); }
     .sparkleWrap{ position:relative; display:inline-flex; align-items:center; justify-content:center; }
-    .sparkleField{ position:absolute; inset:-50px; pointer-events:none; }
+    
+    .sparkleField{ position:absolute; inset:-40%; pointer-events:none; }
     .sp{ position:absolute; border-radius:50%; background:#fff; opacity:0; animation:sparkleLife var(--dur) ease-in-out var(--delay) infinite; width:var(--size); height:var(--size); top:var(--y); left:var(--x); box-shadow:0 0 4px 1px rgba(255,255,255,.9),0 0 10px 3px rgba(255,100,220,.6); }
     @keyframes sparkleLife{ 0%{ opacity:0; transform:scale(.4) translateY(0); } 20%{ opacity:1; transform:scale(1) translateY(-6px); } 60%{ opacity:.85; transform:scale(.9) translateY(-14px); } 100%{ opacity:0; transform:scale(.3) translateY(-22px); } }
     #overlay1{ z-index:50; }
@@ -70,7 +71,8 @@
     #overlay2.show{ display:flex; }
     .ghostBtnWrap{ position:relative; display:inline-flex; align-items:center; justify-content:center; background:none; border:none; padding:0; cursor:pointer; -webkit-tap-highlight-color:transparent; }
     .ghostBtnWrap:active #startGhost{ transform:scale(.88) translateY(-5px); filter:drop-shadow(0 0 44px rgba(255,100,220,1)) drop-shadow(0 14px 30px rgba(0,0,0,.7)); }
-    .ghostSparkleField{ position:absolute; inset:-70px; pointer-events:none; z-index:0; }
+    .ghostSparkleField{ position:absolute; inset:-35%; pointer-events:none; z-index:0; }
+    
     .ghostSparkleField .sp{ box-shadow:0 0 6px 2px rgba(255,255,255,.95),0 0 16px 5px rgba(255,100,220,.75); }
     #startGhost{ width:clamp(80px,20vmin,200px); height:clamp(80px,20vmin,200px); object-fit:contain; user-select:none; -webkit-user-drag:none; filter:drop-shadow(0 0 26px rgba(255,100,220,.6)) drop-shadow(0 14px 30px rgba(0,0,0,.7)); animation:floaty 3.6s ease-in-out infinite; transform-origin:50% 60%; transition:transform 120ms ease,filter 120ms ease; position:relative; z-index:1; }
     @keyframes floaty{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-8px); } }
@@ -867,6 +869,7 @@
 const { getCurrentCurriculumWeek, getAcademicWeekNumber } = window.CALENDAR;
 
 const BRYAN_PASS = 'him141amra803';
+const SHOW_BRYAN_BTN = false; // set true to re-enable dev mode button
 const IMG_W = 1600;
 const IMG_H = 900;
 
@@ -1636,15 +1639,17 @@ checkOrientation();
 
 function buildSparkles(container,count=24,wide=false){
   container.innerHTML='';
+  // Radii are now percentages of the container (which uses inset:% so it scales with the button)
   for(let i=0;i<count;i++){
     const sp=document.createElement('div');sp.className='sp';
-    const angle=(i/count)*Math.PI*2,r=wide?35+Math.random()*28:28+Math.random()*18;
+    const angle=(i/count)*Math.PI*2,r=wide?28+Math.random()*18:22+Math.random()*12;
     const cx=50+Math.cos(angle)*r,cy=50+Math.sin(angle)*r;
     const size=wide?3+Math.random()*4:2+Math.random()*3,dur=1.3+Math.random()*1.8,delay=-(Math.random()*dur);
     sp.style.cssText=`--size:${size}px;--x:${cx}%;--y:${cy}%;--dur:${dur}s;--delay:${delay}s;`;
     container.appendChild(sp);
   }
 }
+  
 buildSparkles(confirmSp,24);buildSparkles(startSp,36,true);
 
 returnBtn.addEventListener('click',()=>{fadeOut();setTimeout(()=>goToHub(),FADE_MS);});
@@ -1680,6 +1685,8 @@ mazeStartBtn.addEventListener('click',async()=>{
   try{bgMusic.volume=.65;await bgMusic.play();}catch(e){console.warn('Music blocked',e);}
 });
 
+
+if (!SHOW_BRYAN_BTN) bryanBtn.style.display = 'none';  
 backBtn.addEventListener('click',()=>{
   if(ghostLocked)return;
   try{bgMusic.pause();bgMusic.currentTime=0;}catch(e){}
