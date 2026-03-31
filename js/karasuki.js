@@ -1142,7 +1142,7 @@
   const ghostImg = new Image(); ghostImg.src = "assets/img/booha_ghost.png";
   const music    = new Audio("assets/audio/karasuki-music.mp3"); music.loop = true; music.volume = 0.65;
 
-  let app, stage, canvas, ctx, roomLayer, coordReadout, pinLog;
+  let app, stage, canvas, ctx, roomLayer, coordToggle, coordReadout, pinLog;
   let portalOverlay = null;
 
   /* ═══════════════════════════════════════════
@@ -1167,7 +1167,11 @@
       @keyframes barshimmer{0%{background-position:0%}100%{background-position:200%}}
       .rotate-title{font-family:system-ui,-apple-system,sans-serif;font-size:clamp(18px,5vw,28px);font-weight:900;letter-spacing:1px;color:#fff;margin:0;text-shadow:0 0 28px rgba(255,140,255,.7);}
       .rotate-sub{font-size:14px;color:rgba(255,255,255,.55);margin:0;line-height:1.7;}
-      /* coord-toggle moved into dev panel */
+      #coord-toggle{position:fixed;bottom:18px;right:18px;z-index:200;display:flex;align-items:center;gap:8px;background:rgba(0,0,0,.80);color:#ff8ae2;font:700 11px/1 monospace;padding:7px 13px;border-radius:20px;cursor:pointer;border:1px solid rgba(255,138,226,.40);user-select:none;letter-spacing:.06em;}
+      .toggle-pill{width:30px;height:16px;border-radius:8px;background:rgba(255,138,226,.18);position:relative;transition:background .2s;}
+      .toggle-pill::after{content:"";position:absolute;top:3px;left:3px;width:10px;height:10px;border-radius:50%;background:#ff8ae2;transition:transform .2s;}
+      #coord-toggle.active .toggle-pill{background:rgba(255,138,226,.55);}
+      #coord-toggle.active .toggle-pill::after{transform:translateX(14px);}
       #coord-readout{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:200;background:rgba(0,0,0,.80);color:#ff8ae2;font:700 13px/1.4 monospace;padding:6px 16px;border-radius:20px;pointer-events:none;border:1px solid rgba(255,138,226,.30);letter-spacing:.05em;opacity:0;transition:opacity .2s;white-space:nowrap;text-align:center;}
       #coord-readout.show{opacity:1;}
       #coord-readout .hint{font-size:10px;color:rgba(255,138,226,.55);display:block;margin-top:2px;}
@@ -1281,6 +1285,9 @@
     const fade = document.createElement("div"); fade.id = "kara-fade";
     stage.appendChild(roomLayer); stage.appendChild(canvas); stage.appendChild(fade);
     app.appendChild(stage);
+    coordToggle = document.createElement("div"); coordToggle.id = "coord-toggle";
+    coordToggle.innerHTML = `<span>COORDS</span><div class="toggle-pill"></div>`;
+    if (DEV_MODE) coordToggle.addEventListener("click", toggleCoordMode);
     coordReadout = document.createElement("div"); coordReadout.id = "coord-readout";
     coordReadout.innerHTML = `<span id="coord-xy">—</span><span class="hint">click to pin · hover to read</span>`;
     pinLog = document.createElement("div"); pinLog.id = "pin-log";
@@ -1290,7 +1297,7 @@
     portalOverlay.innerHTML = `<div id="portal-box"><p id="portal-en">Do you want to go to your profile page?</p><p id="portal-ja">プロフィールページに行きますか？</p><button class="portal-btn" id="portal-yes">Yes</button><button class="portal-btn" id="portal-no">No</button></div>`;
     document.body.innerHTML = "";
     document.body.appendChild(app);
-    if (DEV_MODE) { document.body.appendChild(coordReadout); document.body.appendChild(pinLog); }
+    if (DEV_MODE) { document.body.appendChild(coordToggle); document.body.appendChild(coordReadout); document.body.appendChild(pinLog); }
     document.body.appendChild(toast);
     document.body.appendChild(portalOverlay);
     injectBonusPopOverlay(); injectWandererPopOverlay(); injectUtsuobaPopOverlay(); injectOrbPanel(); injectSwapOverlay();
@@ -1346,10 +1353,10 @@
   ═══════════════════════════════════════════ */
   function toggleCoordMode() {
     state.coordMode = !state.coordMode;
+    coordToggle.classList.toggle("active", state.coordMode);
     coordReadout.classList.toggle("show",  state.coordMode);
     pinLog.classList.toggle("show",        state.coordMode);
     pinLog.querySelector(".log-header span").textContent = `PINS — ${state.roomId}`;
-    // Sync dev panel checkbox
     const cb = document.getElementById("dev-coords-toggle");
     if (cb && cb.checked !== state.coordMode) cb.checked = state.coordMode;
   }
