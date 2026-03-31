@@ -57,7 +57,7 @@
   /* ═══════════════════════════════════════════
      DEV MODE
   ═══════════════════════════════════════════ */
-  const DEV_MODE = false;
+  const DEV_MODE = true;
 
   /* ═══════════════════════════════════════════
      COLOURS
@@ -349,6 +349,7 @@
     spawnLockUntil:0, exitingToKarasuki:false,
     travelingToCenter:false, inputLocked:false,
     celebrating:false, celebrateUntil:0, celebrateSpinStart:0,
+    celebrateOrbitX:CENTER_X, celebrateOrbitY:CENTER_Y,
   };
 
   let pins = [], trail = [], ripples = [];
@@ -362,7 +363,7 @@
 
   let isMemoryPlaying = false;
 
-  const CELEBRATE_MS = 4000;
+  const CELEBRATE_MS = 8000;
 
   const THANK_YOU = {
     ks:  { en:"Thank you… don't slow me down again.", jp:"ありがとう…。もう足を引っ張るなよ。" },
@@ -732,13 +733,31 @@
 
   function startCelebration(drifter) {
     const now = performance.now();
-    state.celebrating       = true;
-    state.celebrateUntil    = now + CELEBRATE_MS;
-    state.celebrateSpinStart= now;
-    state.inputLocked       = true;
+    state.celebrating        = true;
+    state.celebrateUntil     = now + CELEBRATE_MS;
+    state.celebrateSpinStart = now;
+    state.inputLocked        = true;
+
+    /* orbit center = drifter world position */
+    const pos = drifterWorldPos(drifter);
+    state.celebrateOrbitX = pos.x;
+    state.celebrateOrbitY = pos.y - (drifterImgs[drifter.id].img2.naturalHeight * drifter.scale) * 0.5;
+
+    /* initial burst */
     triggerSparkle();
-    setTimeout(() => showThankYouPanel(drifter), 800);
-    setTimeout(() => { state.celebrating = false; state.inputLocked = false; }, CELEBRATE_MS);
+
+    /* periodic sparkle bursts during orbit */
+    const burstInterval = setInterval(() => {
+      if (!state.celebrating) { clearInterval(burstInterval); return; }
+      triggerSparkle();
+    }, 1200);
+
+    setTimeout(() => showThankYouPanel(drifter), 1000);
+    setTimeout(() => {
+      clearInterval(burstInterval);
+      state.celebrating = false;
+      state.inputLocked = false;
+    }, CELEBRATE_MS);
   }
 
   function showThankYouPanel(drifter) {
@@ -1155,12 +1174,36 @@
     const bobFreq  = (Math.PI*2)/(HOVER_PERIOD/1000);
     const bobPhase = sec * bobFreq;
     const bob      = Math.sin(bobPhase) * HOVER_AMP;
-    const wobble   = state.celebrating
-      ? ((now - state.celebrateSpinStart) / 1000) * 720
-      : Math.sin(bobPhase*2) * 2.2;
-    const gx = state.x, gy = state.y + bob;
-    const pulse = 0.5+0.5*Math.sin(sec*2.1);
-    const sx = 1-Math.sin(bobPhase)*0.07, sy = (1+Math.sin(bobPhase)*0.10)*(state.moving?1.08:1.0);
+    const pulse    = 0.5+0.5*Math.sin(sec*2.1);
+
+    /* ── Celebration orbit: ghost flies around the drifter ── */
+    let gx, gy, wobble, sx, sy;
+    if (state.celebrating) {
+      const elapsed   = (now - state.celebrateSpinStart) / 1000;
+      const totalSec  = CELEBRATE_MS / 1000;
+      /* orbit speed ramps up then eases out in final 20% */
+      const tNorm     = elapsed / totalSec;
+      const easeOut   = tNorm > 0.8 ? 1 - ((tNorm-0.8)/0.2) : 1;
+      const orbitSpeed= (1.8 + elapsed * 0.18) * easeOut;   /* accelerates, then slows */
+      const orbitAngle= elapsed * orbitSpeed * Math.PI * 2 * 0.5; /* ~1 rev/sec at peak */
+      const orbitR    = 90 + Math.sin(elapsed * 1.4) * 22;  /* radius breathes */
+      const orbitBob  = Math.sin(elapsed * 3.1) * 14;       /* vertical waver */
+      gx     = state.celebrateOrbitX + Math.cos(orbitAngle) * orbitR;
+      gy     = state.celebrateOrbitY + Math.sin(orbitAngle) * orbitR * 0.55 + orbitBob;
+      wobble = orbitAngle * (180/Math.PI) + 90; /* face direction of travel */
+      sx     = 1.0 + Math.sin(elapsed*4)*0.08;
+      sy     = 1.0 + Math.cos(elapsed*4)*0.08;
+      /* keep state.x/y updated so trail follows orbit */
+      state.x = gx; state.y = gy;
+      addTrailParticle(gx, gy, now);
+    } else {
+      gx     = state.x;
+      gy     = state.y + bob;
+      wobble = Math.sin(bobPhase*2) * 2.2;
+      sx     = 1-Math.sin(bobPhase)*0.07;
+      sy     = (1+Math.sin(bobPhase)*0.10) * (state.moving?1.08:1.0);
+    }
+
     ctx.save(); ctx.globalAlpha = 0.22+pulse*0.12;
     const halo     = ctx.createRadialGradient(gx,gy+3,0,gx,gy+3,GHOST_R*2.2);
     const haloCol1 = state.celebrating ? '#ffd700' : col1;
@@ -1220,6 +1263,7 @@
   function clickCheckDrifter(wx,wy) {
     if (state.inputLocked || drifterPanelOpen) return false;
     const drifter = drifterForRoom(state.roomId); if (!drifter) return false;
+    if (!drifterHasMemories(drifter.id)) return false;   /* all done — sprite is inert */
     const pos  = drifterWorldPos(drifter);
     const imgs = drifterImgs[drifter.id];
     const img  = imgs.img1;
@@ -1232,12 +1276,12 @@
   /* ═══════════════════════════════════════════
      UNIFIED TAP HANDLER
   ═══════════════════════════════════════════ */
-  function handleWorldTap(wx, wy) {
-  if (DEV_MODE && state.coordMode) { dropPin(wx,wy); ripples.push({x:wx,y:wy,life:1}); return; }
-  if (clickCheckKarasukiExit(wx, wy)) { ripples.push({x:wx,y:wy,life:1}); return; }  // ← moved up
-  if (clickCheckDrifter(wx, wy))      { ripples.push({x:wx,y:wy,life:1}); return; }
-  state.clickTarget = { x:wx, y:wy }; ripples.push({x:wx,y:wy,life:1});
-}
+  function handleWorldTap(wx,wy) {
+    if (DEV_MODE && state.coordMode) { dropPin(wx,wy); ripples.push({x:wx,y:wy,life:1}); return; }
+    if (clickCheckKarasukiExit(wx,wy)) { ripples.push({x:wx,y:wy,life:1}); return; }
+    if (clickCheckDrifter(wx,wy))      { ripples.push({x:wx,y:wy,life:1}); return; }
+    state.clickTarget = { x:wx, y:wy }; ripples.push({x:wx,y:wy,life:1});
+  }
 
   /* ═══════════════════════════════════════════
      MODAL GUARD
