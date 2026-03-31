@@ -57,7 +57,7 @@
   /* ═══════════════════════════════════════════
      DEV MODE
   ═══════════════════════════════════════════ */
-  const DEV_MODE = false;
+  const DEV_MODE = true;
 
   /* ═══════════════════════════════════════════
      COLOURS
@@ -248,6 +248,7 @@
   });
 
   function drifterHasMemories(id) {
+    if (drifterIsWrong(id)) return false;   /* wrong memory delivered this week — inert */
     const utsu = readUtsuroba();
     const rec  = utsu.drifters?.[id];
     const d    = DATA.drifters.find(x => x.id === id);
@@ -296,6 +297,18 @@
     const data = loadSave();
     if (data.weekly) data.weekly.drifterQuest = null;
     writeSave(data); invalidateQuestCache();
+  }
+
+  /* ── wrong-memory penalty: drifter gone for the rest of the week ── */
+  function markDrifterWrong(id) {
+    const data = loadSave();
+    if (!data.utsuroba.drifters[id]) data.utsuroba.drifters[id] = { completed: [] };
+    data.utsuroba.drifters[id].wrongWeek = getWeekSeed();
+    writeSave(data);
+  }
+  function drifterIsWrong(id) {
+    const utsu = readUtsuroba();
+    return (utsu.drifters?.[id]?.wrongWeek ?? -1) === getWeekSeed();
   }
 
   function questAudioSrc(id, memIdx) {
@@ -358,7 +371,9 @@
   let exitPopOverlay = null, exitPopCooldownUntil = 0;
   let drifterPanel = null, drifterPanelOpen = false, drifterPanelCooldown = 0;
 
-  let isMemoryPlaying = false;
+  let isMemoryPlaying  = false;
+  let drifterFadeStart = 0;   /* performance.now() when wrong-memory fade begins; 0 = not fading */
+  let _lastWrongId     = '';  /* id of drifter currently fading out */
 
   const CELEBRATE_MS = 8000;
 
@@ -701,7 +716,11 @@
         startCelebration(drifter);
       } else {
         showWrongMemoryMsg();
+        markDrifterWrong(drifter.id);
         clearQuest();
+        /* begin fade after the wrong-memory message has shown for a moment */
+        _lastWrongId = drifter.id;
+        setTimeout(() => { drifterFadeStart = performance.now(); }, 1800);
       }
     });
 
@@ -725,7 +744,7 @@
       <p style="margin:0 0 6px;font-size:1.04rem;color:#1e140a;">Sorry… this isn't for me.</p>
       <p style="margin:0;font-size:.84rem;color:#806040;">ごめん…これは私のじゃない。</p></div>`;
     document.body.appendChild(msg);
-    setTimeout(() => { msg.style.opacity='0'; msg.style.transition='opacity .4s'; setTimeout(() => msg.remove(), 420); }, 2200);
+    setTimeout(() => { msg.style.opacity='0'; msg.style.transition='opacity .5s'; setTimeout(() => msg.remove(), 520); }, 3200);
   }
 
   function startCelebration(drifter) {
@@ -1066,10 +1085,21 @@
     const img         = useImg2 ? imgs.img2 : imgs.img1;
     const pos         = drifterWorldPos(drifter);
 
-    const dw    = img.naturalWidth  * drifter.scale;
-    const dh    = img.naturalHeight * drifter.scale;
-    const alpha = hasMemories ? 1 : 0.35;
-    const sec   = now / 1000;
+    const dw  = img.naturalWidth  * drifter.scale;
+    const dh  = img.naturalHeight * drifter.scale;
+    const sec = now / 1000;
+
+    /* ── wrong-memory fade: animate out over 2.5s, then gone for the week ── */
+    const FADE_OUT_MS = 2500;
+    if (drifterIsWrong(drifter.id) && drifterFadeStart === 0) return; /* already faded — skip */
+    let alpha;
+    if (drifterFadeStart > 0) {
+      const elapsed = now - drifterFadeStart;
+      alpha = Math.max(0, 1 - elapsed / FADE_OUT_MS);
+      if (alpha === 0) { drifterFadeStart = 0; return; } /* done fading */
+    } else {
+      alpha = hasMemories ? 1 : 0.35;
+    }
 
     if (questActive) {
       /* ── OUTER BLOOM: large slow pulse ── */
