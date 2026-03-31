@@ -57,7 +57,7 @@
   /* ═══════════════════════════════════════════
      DEV MODE
   ═══════════════════════════════════════════ */
-  const DEV_MODE = false;
+  const DEV_MODE = true;
 
   /* ═══════════════════════════════════════════
      COLOURS
@@ -715,6 +715,8 @@
         completeMemory(drifter.id, q.memIdx);
         startCelebration(drifter);
       } else {
+        /* tell karasuki to respawn this orb when the player returns */
+        try { sessionStorage.setItem('karasuki_return_wrong_orb', q.collectedMemoryId || ''); } catch(_) {}
         showWrongMemoryMsg();
         markDrifterWrong(drifter.id);
         clearQuest();
