@@ -5,27 +5,42 @@
 // ============================================================
 (function () {
   'use strict';
-  // ── 1. Register Service Worker ──────────────────────────
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker
-        .register('./sw.js')
-        .then(reg => {
-          console.log('[PWA] Service worker registered, scope:', reg.scope);
-          // Notify any waiting SW to activate immediately
-          if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
-          reg.addEventListener('updatefound', () => {
-            const newWorker = reg.installing;
-            newWorker?.addEventListener('statechange', () => {
-              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                console.log('[PWA] New version available — reload to update.');
-              }
-            });
+  
+// ── 1. Register Service Worker ──────────────────────────
+if ('serviceWorker' in navigator) {
+
+  // Guard against double-reload loops
+  let refreshing = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (refreshing) return;
+    refreshing = true;
+    window.location.reload();
+  });
+
+  window.addEventListener('load', () => {
+    navigator.serviceWorker
+      .register('./sw.js')
+      .then(reg => {
+        console.log('[PWA] Service worker registered, scope:', reg.scope);
+
+        // Already-waiting SW (e.g. tab was open during a previous deploy)
+        if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+
+        reg.addEventListener('updatefound', () => {
+          const newWorker = reg.installing;
+          newWorker?.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              // New SW installed — tell it to activate; controllerchange fires → reload
+              newWorker.postMessage({ type: 'SKIP_WAITING' });
+            }
           });
-        })
-        .catch(err => console.error('[PWA] Service worker registration failed:', err));
-    });
-  }
+        });
+      })
+      .catch(err => console.error('[PWA] Service worker registration failed:', err));
+  });
+}
+
+  
   // ── 2. Install Prompt ───────────────────────────────────
   let deferredPrompt = null;
   window.addEventListener('beforeinstallprompt', event => {
