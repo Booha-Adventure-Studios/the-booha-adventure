@@ -1,5 +1,5 @@
 
-  (() => {
+(() => {
   const DATA = window.UTSUROBA_DATA;
   if (!DATA || !DATA.rooms) { console.error("UTSUROBA_DATA not found."); return; }
 
@@ -44,7 +44,7 @@
   const ARROW_MOVE_THRESHOLD          = 30;
   const POPUP_COOLDOWN_MS             = 900;
   const DRIFTER_HIT_R                 = isTouchDevice ? 64 : 48;
-  const PANEL_SLIDE_MS                = 340; /* must match CSS transition */
+  const PANEL_SLIDE_MS                = 340;
 
   const KARASUKI_EXIT = {
     roomId : 'room_03',
@@ -106,133 +106,221 @@
   let arrivalArrowBackHiddenUntil = 0;
 
   /* ═══════════════════════════════════════════
-     SAVE HELPERS
+     SAVE LAYER
+     ─────────────────────────────────────────
+     Structure:
+       booha_save = {
+         version, weekly, meta, scores, unlocks, collectibles, pageState,
+         karasuki: { visitedRooms, wanderersSeen, activeOrbs, deliveredMemories, flags },
+         utsuroba: { visitedRooms, drifters, flags }
+       }
+
+     Cross-area bridge:
+       save.weekly.drifterQuest  (owned here, read by karasuki)
+
+     Utsuroba-specific:
+       save.utsuroba.drifters[id].completed = [memIdx, ...]
+
+     Karasuki-specific:
+       save.karasuki.activeOrbs
+       save.karasuki.roomFlags
+       etc. (written by karasuki engine)
   ═══════════════════════════════════════════ */
+  const SAVE_KEY = 'booha_save';
+
   function loadSave() {
-    try { if (window.BoohaAdventure?.save) return BoohaAdventure.save.load()||{}; } catch(_){} return {};
-  }
-  function writeSave(data) {
-    try { if (window.BoohaAdventure?.save) BoohaAdventure.save.save(data); } catch(_){}
+    /* 1. prefer the registered BoohaAdventure system */
+    try {
+      if (window.BoohaAdventure?.save) {
+        const d = BoohaAdventure.save.load();
+        if (d && typeof d === 'object') return migrateUtsurobaSave(d);
+      }
+    } catch(_) {}
+    /* 2. direct localStorage fallback (works when adventure-core isn't loaded) */
+    try {
+      const raw = localStorage.getItem(SAVE_KEY);
+      const d   = raw ? JSON.parse(raw) : {};
+      return migrateUtsurobaSave(d);
+    } catch(_) {}
+    return { utsuroba:{}, karasuki:{}, weekly:{} };
   }
 
-  let _cachedQuest=null, _cachedQuestTime=0;
+  function writeSave(data) {
+    try {
+      if (window.BoohaAdventure?.save) { BoohaAdventure.save.save(data); return; }
+    } catch(_) {}
+    try { localStorage.setItem(SAVE_KEY, JSON.stringify(data)); } catch(_) {}
+  }
+
+  /* ── one-time migration: move data.drifters → data.utsuroba.drifters ── */
+  function migrateUtsurobaSave(data) {
+    if (!data.utsuroba) data.utsuroba = {};
+    if (!data.karasuki) data.karasuki = {};
+    if (!data.weekly)   data.weekly   = {};
+
+    /* old flat drifters namespace → utsuroba.drifters */
+    if (data.drifters && !data.utsuroba.drifters) {
+      data.utsuroba.drifters = data.drifters;
+      delete data.drifters;
+      writeSave(data);
+    }
+    if (!data.utsuroba.drifters)   data.utsuroba.drifters   = {};
+    if (!data.utsuroba.visitedRooms) data.utsuroba.visitedRooms = {};
+    if (!data.utsuroba.flags)       data.utsuroba.flags       = {};
+
+    /* old weekly.drifterQuest collectedMemKey → collectedMemoryId */
+    const q = data.weekly.drifterQuest;
+    if (q && q.collectedMemKey !== undefined && q.collectedMemoryId === undefined) {
+      q.collectedMemoryId = q.collectedMemKey;
+      delete q.collectedMemKey;
+      writeSave(data);
+    }
+
+    return data;
+  }
+
+  /* ── namespace helpers ── */
+  function readUtsuroba() {
+    const d = loadSave();
+    return d.utsuroba || {};
+  }
+  function writeUtsuroba(utsuData) {
+    const d = loadSave();
+    d.utsuroba = { ...d.utsuroba, ...utsuData };
+    writeSave(d);
+  }
+
+  /* ── quest cache (short-lived, 500 ms) ── */
+  let _cachedQuest = null, _cachedQuestTime = 0;
   function getCachedQuest() {
-    const now=performance.now();
-    if (now-_cachedQuestTime>500) {
-      _cachedQuest=loadSave().weekly?.drifterQuest||null;
-      _cachedQuestTime=now;
+    const now = performance.now();
+    if (now - _cachedQuestTime > 500) {
+      _cachedQuest      = loadSave().weekly?.drifterQuest || null;
+      _cachedQuestTime  = now;
     }
     return _cachedQuest;
   }
-  function invalidateQuestCache() { _cachedQuestTime=0; }
+  function invalidateQuestCache() { _cachedQuestTime = 0; }
 
   /* ═══════════════════════════════════════════
      DRIFTER SYSTEM
   ═══════════════════════════════════════════ */
-  function seededShuffle(arr,seed) {
-    const a=arr.slice(); let s=seed;
-    for (let i=a.length-1;i>0;i--) {
-      s=(s*1664525+1013904223)&0xffffffff;
-      const j=Math.abs(s)%(i+1); [a[i],a[j]]=[a[j],a[i]];
+  function seededShuffle(arr, seed) {
+    const a = arr.slice(); let s = seed;
+    for (let i = a.length-1; i > 0; i--) {
+      s = (s*1664525+1013904223) & 0xffffffff;
+      const j = Math.abs(s) % (i+1); [a[i],a[j]] = [a[j],a[i]];
     }
     return a;
   }
   function getWeekSeed() {
-    try { if (window.CALENDAR?.getCurrentCurriculumWeek) return CALENDAR.getCurrentCurriculumWeek(); } catch(_){}
-    const now=new Date(),jan1=new Date(now.getFullYear(),0,1);
+    try { if (window.CALENDAR?.getCurrentCurriculumWeek) return CALENDAR.getCurrentCurriculumWeek(); } catch(_) {}
+    const now = new Date(), jan1 = new Date(now.getFullYear(),0,1);
     return Math.ceil(((now-jan1)/86400000+jan1.getDay()+1)/7);
   }
 
   const weeklyRooms = (() => {
-    const seed=getWeekSeed();
-    const rooms=seededShuffle(DATA.drifterRoomPool,seed);
-    return DATA.drifters.map((_,i)=>rooms[i%rooms.length]);
+    const seed  = getWeekSeed();
+    const rooms = seededShuffle(DATA.drifterRoomPool, seed);
+    return DATA.drifters.map((_,i) => rooms[i % rooms.length]);
   })();
 
   function drifterForRoom(roomId) {
-    const idx=weeklyRooms.indexOf(roomId);
-    return idx>=0?(DATA.drifters[idx]||null):null;
+    const idx = weeklyRooms.indexOf(roomId);
+    return idx >= 0 ? (DATA.drifters[idx] || null) : null;
   }
-  function drifterWorldPos(d) { return { x:d.roomCoords.x, y:d.roomCoords.y }; }
+  function drifterWorldPos(d) { return { x: d.roomCoords.x, y: d.roomCoords.y }; }
 
   const drifterImgs = {};
   DATA.drifters.forEach(d => {
-    const load = src => { const img=new Image(); img.src=src; return img; };
-    drifterImgs[d.id]={ img1:load(d.sprite1), img2:load(d.sprite2) };
+    const load = src => { const img = new Image(); img.src = src; return img; };
+    drifterImgs[d.id] = { img1: load(d.sprite1), img2: load(d.sprite2) };
   });
 
   function drifterHasMemories(id) {
-    const data=loadSave(); const rec=data.drifters?.[id];
-    const d=DATA.drifters.find(x=>x.id===id);
-    return d?(rec?.completed?.length||0)<d.memoryCount:false;
+    const utsu = readUtsuroba();
+    const rec  = utsu.drifters?.[id];
+    const d    = DATA.drifters.find(x => x.id === id);
+    return d ? (rec?.completed?.length || 0) < d.memoryCount : false;
   }
   function pickRandomMemory(id) {
-    const data=loadSave(); const rec=data.drifters?.[id]||{completed:[]};
-    const d=DATA.drifters.find(x=>x.id===id); if(!d) return null;
-    const pool=[];
-    for(let i=1;i<=d.memoryCount;i++) if(!rec.completed.includes(i)) pool.push(i);
-    return pool.length?pool[Math.floor(Math.random()*pool.length)]:null;
+    const utsu = readUtsuroba();
+    const rec  = utsu.drifters?.[id] || { completed: [] };
+    const d    = DATA.drifters.find(x => x.id === id); if (!d) return null;
+    const pool = [];
+    for (let i = 1; i <= d.memoryCount; i++) if (!rec.completed.includes(i)) pool.push(i);
+    return pool.length ? pool[Math.floor(Math.random() * pool.length)] : null;
   }
   function pickDecoys(n) {
-    const pool=Array.from({length:DATA.decoyCount},(_,i)=>i+1);
-    return seededShuffle(pool,Math.floor(Math.random()*999999)).slice(0,n);
+    const pool = Array.from({ length: DATA.decoyCount }, (_,i) => i+1);
+    return seededShuffle(pool, Math.floor(Math.random()*999999)).slice(0, n);
   }
+
   function activateQuest(id) {
-    const memIdx=pickRandomMemory(id); if(memIdx===null) return null;
-    const decoys=pickDecoys(DATA.decoysPerQuest);
-    const data=loadSave(); if(!data.weekly) data.weekly={};
-    
-    /* ── collectedMemKey/orbIsCorrect initialised null/false — written at orb pickup ── */
-   data.weekly.drifterQuest = {
-  active: id, state: 'accepted', memIdx, decoys,
-  collectedMemoryId: null,   // ← was collectedMemKey
-  orbIsCorrect: false,
-};
-    
+    const memIdx = pickRandomMemory(id); if (memIdx === null) return null;
+    const decoys = pickDecoys(DATA.decoysPerQuest);
+    const data   = loadSave();
+    if (!data.weekly) data.weekly = {};
+    data.weekly.drifterQuest = {
+      active           : id,
+      state            : 'accepted',
+      memIdx,
+      decoys,
+      collectedMemoryId: null,
+      orbIsCorrect     : false,
+    };
     writeSave(data); invalidateQuestCache();
     return data.weekly.drifterQuest;
   }
-  function completeMemory(id,memIdx) {
-    const data=loadSave();
-    if(!data.drifters) data.drifters={};
-    if(!data.drifters[id]) data.drifters[id]={completed:[]};
-    if(!data.drifters[id].completed.includes(memIdx)) data.drifters[id].completed.push(memIdx);
-    if(data.weekly) data.weekly.drifterQuest=null;
+
+  function completeMemory(id, memIdx) {
+    const data = loadSave();
+    if (!data.utsuroba.drifters[id]) data.utsuroba.drifters[id] = { completed: [] };
+    if (!data.utsuroba.drifters[id].completed.includes(memIdx))
+      data.utsuroba.drifters[id].completed.push(memIdx);
+    if (data.weekly) data.weekly.drifterQuest = null;
     writeSave(data); invalidateQuestCache();
   }
+
   function clearQuest() {
-    const data=loadSave(); if(data.weekly) data.weekly.drifterQuest=null;
+    const data = loadSave();
+    if (data.weekly) data.weekly.drifterQuest = null;
     writeSave(data); invalidateQuestCache();
   }
-  function questAudioSrc(id,memIdx) {
-    const d=DATA.drifters.find(x=>x.id===id); if(!d) return null;
+
+  function questAudioSrc(id, memIdx) {
+    const d = DATA.drifters.find(x => x.id === id); if (!d) return null;
     return `./assets/audio/memories/${d.audioPrefix}_q${String(memIdx).padStart(2,'0')}.mp3`;
   }
 
-  /* ── FIX 1: activeAudio control ── */
+  /* ── active audio control ── */
   let activeAudio = null;
   function stopActiveAudio() {
     if (!activeAudio) return;
-    try { activeAudio.pause(); activeAudio.currentTime=0; } catch(_){}
+    try { activeAudio.pause(); activeAudio.currentTime = 0; } catch(_) {}
     activeAudio = null;
   }
   function playQuestAudio(src) {
     stopActiveAudio();
     const a = new Audio(src);
     activeAudio = a;
-    a.play().catch(()=>{});
-    a.onended = () => { if(activeAudio===a) activeAudio=null; };
+    a.play().catch(() => {});
+    a.onended = () => { if (activeAudio === a) activeAudio = null; };
   }
 
-  /* Sparkles */
-  let sparkles=[];
+  /* ── sparkles ── */
+  let sparkles = [];
   function triggerSparkle() {
-    const colors=['#ff79d7','#a8edff','#ffd700','#b2ffda','#ff85a1','#90aaff','#d49aff','#fff'];
-    for(let i=0;i<60;i++){
-      const ang=Math.random()*Math.PI*2, sp=1.5+Math.random()*3.5;
-      sparkles.push({x:state.x,y:state.y,vx:Math.cos(ang)*sp,vy:Math.sin(ang)*sp-1.5,
-        life:1,size:2+Math.random()*5,color:colors[Math.floor(Math.random()*colors.length)],
-        spin:Math.random()*Math.PI*2,dspin:(Math.random()-.5)*.2});
+    const colors = ['#ff79d7','#a8edff','#ffd700','#b2ffda','#ff85a1','#90aaff','#d49aff','#fff'];
+    for (let i = 0; i < 60; i++) {
+      const ang = Math.random()*Math.PI*2, sp = 1.5+Math.random()*3.5;
+      sparkles.push({
+        x: state.x, y: state.y,
+        vx: Math.cos(ang)*sp, vy: Math.sin(ang)*sp-1.5,
+        life: 1, size: 2+Math.random()*5,
+        color: colors[Math.floor(Math.random()*colors.length)],
+        spin: Math.random()*Math.PI*2, dspin: (Math.random()-.5)*.2,
+      });
     }
   }
 
@@ -240,7 +328,7 @@
      STATE
   ═══════════════════════════════════════════ */
   const state = {
-    roomId: (()=>{ const p=new URLSearchParams(window.location.search); return p.get('room')||DATA.startRoom; })(),
+    roomId: (()=>{ const p = new URLSearchParams(window.location.search); return p.get('room') || DATA.startRoom; })(),
     spawnId:'default', x:CENTER_X, y:CENTER_Y, spawnX:CENTER_X, spawnY:CENTER_Y,
     arrivalDir:null, transitioning:false, transitionReadyAt:0,
     clickTarget:null, moving:false, distMovedSinceSpawn:0,
@@ -250,40 +338,36 @@
     celebrating:false, celebrateUntil:0, celebrateSpinStart:0,
   };
 
-  let pins=[], trail=[], ripples=[];
-  const ghostImg=new Image(); ghostImg.src='./assets/img/booha_ghost.png';
-  const music=new Audio('./assets/audio/utsuroba-music.mp3'); music.loop=true; music.volume=0.65;
+  let pins = [], trail = [], ripples = [];
+  const ghostImg = new Image(); ghostImg.src = './assets/img/booha_ghost.png';
+  const music = new Audio('./assets/audio/utsuroba-music.mp3'); music.loop = true; music.volume = 0.65;
 
-  let app,stage,canvas,ctx,roomLayer;
-  let coordToggle,coordReadout,pinLog;
-  let exitPopOverlay=null, exitPopCooldownUntil=0;
-  let drifterPanel=null, drifterPanelOpen=false, drifterPanelCooldown=0;
+  let app, stage, canvas, ctx, roomLayer;
+  let coordToggle, coordReadout, pinLog;
+  let exitPopOverlay = null, exitPopCooldownUntil = 0;
+  let drifterPanel = null, drifterPanelOpen = false, drifterPanelCooldown = 0;
 
-  /* ── isMemoryPlaying lock (scoped to replay btn only) ── */
   let isMemoryPlaying = false;
 
-  /* ── Celebration state — ghost spin on memory delivery ── */
   const CELEBRATE_MS = 4000;
 
-  /* ── Per-drifter thank-you lines ── */
   const THANK_YOU = {
     ks:  { en:"Thank you… don't slow me down again.", jp:"ありがとう…。もう足を引っ張るなよ。" },
     nto: { en:"Thank you! You're the best!",          jp:"ありがとう！あなたが一番だよ！" },
     cg:  { en:"Thank you… I really mean it.",         jp:"ありがとう…。本当に、心から。" },
   };
-
-    const WAITING_LINES = {
-    ks:  { en:"Hurry up, you little blob.",       jp:"さっさと行けよ、このチビ。" },
-    nto: { en:"See you soon, cutie.",              jp:"じゃあね、かわいい子ちゃん。またね。" },
-    cg:  { en:"I'll be waiting here… don't take too long.", jp:"ここで待ってるよ…あまり遅くなるなよ。" },
+  const WAITING_LINES = {
+    ks:  { en:"Hurry up, you little blob.",                   jp:"さっさと行けよ、このチビ。" },
+    nto: { en:"See you soon, cutie.",                         jp:"じゃあね、かわいい子ちゃん。またね。" },
+    cg:  { en:"I'll be waiting here… don't take too long.",   jp:"ここで待ってるよ…あまり遅くなるなよ。" },
   };
 
   /* ═══════════════════════════════════════════
      STYLES
   ═══════════════════════════════════════════ */
   function injectStyles() {
-    const s=document.createElement('style');
-    s.textContent=`
+    const s = document.createElement('style');
+    s.textContent = `
       html,body{margin:0;padding:0;width:100%;height:100%;background:#000;overflow:hidden;}
       body{display:grid;place-items:center;}
       #utsuroba-app{position:relative;width:100vw;height:100vh;overflow:hidden;background:#000;}
@@ -377,17 +461,13 @@
     document.getElementById('buki-dev-exit').addEventListener('change', function() { window.__devUtsuExit = this.checked; });
     document.getElementById('buki-dev-shadows').addEventListener('change', function() { shadowsEnabled = this.checked; });
     document.getElementById('buki-dev-clear-quest').addEventListener('click', () => {
-      try {
-        const raw = localStorage.getItem('booha_save');
-        const data = raw ? JSON.parse(raw) : {};
-        if (data.weekly) data.weekly.drifterQuest = null;
-        localStorage.setItem('booha_save', JSON.stringify(data));
-        invalidateQuestCache();
-      } catch(_) {}
+      const data = loadSave();
+      if (data.weekly) data.weekly.drifterQuest = null;
+      writeSave(data); invalidateQuestCache();
     });
     document.getElementById('buki-dev-clear-all').addEventListener('click', () => {
       if (confirm('Clear all booha_save data?')) {
-        localStorage.removeItem('booha_save');
+        try { localStorage.removeItem(SAVE_KEY); } catch(_) {}
         invalidateQuestCache();
       }
     });
@@ -397,18 +477,24 @@
       const q = document.getElementById('buki-dev-quest');
       if (r) r.textContent = `room:${state.roomId} moved:${Math.round(state.distMovedSinceSpawn)}`;
       if (p) p.textContent = `tier:${perfTier} dpr:${MAX_DPR} touch:${isTouchDevice}`;
-      if (q) { const quest = getCachedQuest(); q.textContent = quest ? `q:${quest.active} s:${quest.state} m:${quest.memIdx} key:${quest.collectedMemoryId||'none'}` : 'quest:none'; }
+      if (q) {
+        const quest = getCachedQuest();
+        q.textContent = quest
+          ? `q:${quest.active} s:${quest.state} m:${quest.memIdx} key:${quest.collectedMemoryId||'none'}`
+          : 'quest:none';
+      }
     }, 500);
   }
+
   /* ═══════════════════════════════════════════
      EXIT POPUP
   ═══════════════════════════════════════════ */
   function injectExitPopOverlay() {
-    if(exitPopOverlay) return;
-    exitPopOverlay=document.createElement('div');
-    exitPopOverlay.id='utsuroba-exit-overlay';
-    exitPopOverlay.style.cssText='display:none;position:fixed;inset:0;z-index:9200;align-items:center;justify-content:center;background:rgba(0,0,0,0);transition:background 0.35s ease;';
-    exitPopOverlay.innerHTML=`
+    if (exitPopOverlay) return;
+    exitPopOverlay = document.createElement('div');
+    exitPopOverlay.id = 'utsuroba-exit-overlay';
+    exitPopOverlay.style.cssText = 'display:none;position:fixed;inset:0;z-index:9200;align-items:center;justify-content:center;background:rgba(0,0,0,0);transition:background 0.35s ease;';
+    exitPopOverlay.innerHTML = `
       <div style="background:linear-gradient(160deg,#06000f,#0c0018 60%,#04000a);border:1px solid rgba(100,0,180,.45);border-radius:6px;padding:clamp(24px,5vw,40px) clamp(22px,6vw,48px) clamp(20px,4vw,32px);max-width:min(400px,94vw);width:94vw;text-align:center;box-shadow:0 0 40px rgba(40,0,80,.8);font-family:'Georgia',serif;position:relative;animation:utsuPopIn 0.3s ease-out;">
         <button id="utsuroba-exit-close" style="position:absolute;top:11px;right:13px;background:transparent;border:none;cursor:pointer;font-size:.95rem;color:rgba(120,0,180,.45);padding:4px 7px;">✕</button>
         <p style="font-size:clamp(.88rem,3vw,1.04rem);color:#b090d0;margin:0 0 10px;line-height:1.6;letter-spacing:.04em;">Do you want to leave Utsuroba?</p>
@@ -420,80 +506,83 @@
         </div>
       </div>`;
     document.body.appendChild(exitPopOverlay);
-    document.getElementById('utsuroba-exit-close').addEventListener('click',closeExitPop);
-    document.getElementById('utsuroba-exit-no').addEventListener('click',closeExitPop);
-    document.getElementById('utsuroba-exit-yes').addEventListener('click',doExitToKarasuki);
-    exitPopOverlay.addEventListener('click',e=>{if(e.target===exitPopOverlay)closeExitPop();});
-    document.addEventListener('keydown',e=>{if(e.key==='Escape'&&isExitPopOpen())closeExitPop();});
+    document.getElementById('utsuroba-exit-close').addEventListener('click', closeExitPop);
+    document.getElementById('utsuroba-exit-no').addEventListener('click', closeExitPop);
+    document.getElementById('utsuroba-exit-yes').addEventListener('click', doExitToKarasuki);
+    exitPopOverlay.addEventListener('click', e => { if (e.target === exitPopOverlay) closeExitPop(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && isExitPopOpen()) closeExitPop(); });
   }
-  function isExitPopOpen(){return exitPopOverlay?.style.display==='flex';}
-  function openExitPop(){exitPopOverlay.style.display='flex';exitPopOverlay.style.background='rgba(0,0,0,0.88)';state.clickTarget=null;}
-  function closeExitPop(){
-    exitPopCooldownUntil=performance.now()+POPUP_COOLDOWN_MS;
-    exitPopOverlay.style.background='rgba(0,0,0,0)';
-    setTimeout(()=>{exitPopOverlay.style.display='none';},350);
+  function isExitPopOpen() { return exitPopOverlay?.style.display === 'flex'; }
+  function openExitPop() { exitPopOverlay.style.display = 'flex'; exitPopOverlay.style.background = 'rgba(0,0,0,0.88)'; state.clickTarget = null; }
+  function closeExitPop() {
+    exitPopCooldownUntil = performance.now() + POPUP_COOLDOWN_MS;
+    exitPopOverlay.style.background = 'rgba(0,0,0,0)';
+    setTimeout(() => { exitPopOverlay.style.display = 'none'; }, 350);
   }
-  function doExitToKarasuki(){
-    if(state.exitingToKarasuki) return;
-    state.exitingToKarasuki=true; state.clickTarget=null; state.moving=false;
+  function doExitToKarasuki() {
+    if (state.exitingToKarasuki) return;
+    state.exitingToKarasuki = true; state.clickTarget = null; state.moving = false;
     stopActiveAudio();
-    try{music.pause();music.currentTime=0;}catch(_){}
-    exitPopOverlay.style.display='none';
-    const fadeEl=document.getElementById('buki-fade');
-    fadeEl.style.transition=`opacity ${FADE_MS}ms ease-in`; fadeEl.style.opacity='1';
-    setTimeout(()=>{
-      try{sessionStorage.setItem('utsuroba_return_room','room_15');}catch(_){}
-      window.location.href=KARASUKI_EXIT.href;
-    },FADE_MS+60);
+    try { music.pause(); music.currentTime = 0; } catch(_) {}
+    exitPopOverlay.style.display = 'none';
+    const fadeEl = document.getElementById('buki-fade');
+    fadeEl.style.transition = `opacity ${FADE_MS}ms ease-in`; fadeEl.style.opacity = '1';
+    setTimeout(() => {
+      try { sessionStorage.setItem('utsuroba_return_room','room_15'); } catch(_) {}
+      window.location.href = KARASUKI_EXIT.href;
+    }, FADE_MS+60);
   }
 
   /* ═══════════════════════════════════════════
      DRIFTER PANEL
   ═══════════════════════════════════════════ */
-  function buildDrifterPanel(){
-    if(drifterPanel) return;
-    drifterPanel=document.createElement('div');
-    drifterPanel.id='utsuroba-drifter-panel';
+  function buildDrifterPanel() {
+    if (drifterPanel) return;
+    drifterPanel = document.createElement('div');
+    drifterPanel.id = 'utsuroba-drifter-panel';
     document.body.appendChild(drifterPanel);
-    document.addEventListener('keydown',e=>{if(e.key==='Escape'&&drifterPanelOpen)closeDrifterPanel();});
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && drifterPanelOpen) closeDrifterPanel(); });
   }
 
+  function openDrifterPanel(drifter, forcedQuest = null) {
+    if (performance.now() < drifterPanelCooldown || !drifter || !drifterPanel) return;
 
- function openDrifterPanel(drifter, forcedQuest = null){
-  if (performance.now() < drifterPanelCooldown || !drifter || !drifterPanel) return;
+    drifterPanelOpen    = true;
+    state.inputLocked   = true;
+    state.clickTarget   = null;
+    try { music.pause(); } catch(_) {}
 
-  drifterPanelOpen = true;
-  state.inputLocked = true;
-  state.clickTarget = null;
-  try { music.pause(); } catch (_) {}
+    invalidateQuestCache();
+    const quest       = forcedQuest || getCachedQuest();
+    const hasMemories = drifterHasMemories(drifter.id);
 
-  invalidateQuestCache();
-  const quest = forcedQuest || getCachedQuest();
-  const hasMemories = drifterHasMemories(drifter.id);
+    /* ── resolve audio src NOW, while quest is fresh ── */
+    /* This is the fix for the play button: capture src at panel-build time,
+       not at click time. The click handler closes over this value directly. */
+    const currentAudioSrc = (quest && quest.active === drifter.id)
+      ? questAudioSrc(quest.active, quest.memIdx)
+      : null;
 
+    let dialogueHTML = '';
 
-    let dialogueHTML='';
-
-    if(!hasMemories){
-      dialogueHTML=`
+    if (!hasMemories) {
+      dialogueHTML = `
         <p class="dp-status">✦ All memories found. ✦<br>すべての記憶が見つかりました。</p>
         <div class="dp-btns"><button class="dp-btn no dp-dismiss">Close / 閉じる</button></div>`;
 
-    } else if(quest&&quest.active===drifter.id&&quest.state==='accepted'){
-      const wl=WAITING_LINES[drifter.id]||{en:"I'll be waiting…",jp:"待ってるよ…"};
-      dialogueHTML=`
+    } else if (quest && quest.active === drifter.id && quest.state === 'accepted') {
+      const wl = WAITING_LINES[drifter.id] || { en:"I'll be waiting…", jp:"待ってるよ…" };
+      dialogueHTML = `
         <p class="dp-line-en" style="margin-bottom:2px;">${wl.en}</p>
         <p class="dp-line-jp" style="margin-bottom:10px;">${wl.jp}</p>
-        
         <div class="dp-divider"></div>
         <div style="display:flex;align-items:center;gap:10px;margin-top:10px;">
           <button class="dp-audio-btn" id="dp-replay-btn" style="margin-bottom:0;">▶ Play / 聴く</button>
           <button class="dp-btn no" id="dp-cancel-quest-btn">Cancel / キャンセル</button>
         </div>`;
 
-    } else if(quest&&quest.active===drifter.id&&quest.state==='collected'){
-      /* ── Collected state: give button ── */
-      dialogueHTML=`
+    } else if (quest && quest.active === drifter.id && quest.state === 'collected') {
+      dialogueHTML = `
         <p class="dp-line-en" style="margin-bottom:2px;">You have a memory… give it to me?</p>
         <p class="dp-line-jp" style="margin-bottom:10px;">記憶を持っている…くれる？</p>
         <div class="dp-divider"></div>
@@ -506,15 +595,15 @@
           <button class="dp-btn no dp-dismiss">Not yet / まだ</button>
         </div>`;
 
-    } else if(quest&&quest.active!==drifter.id){
-      dialogueHTML=`
+    } else if (quest && quest.active !== drifter.id) {
+      dialogueHTML = `
         <p class="dp-status">Please help my friend first…<br>先に友達を助けてあげて…</p>
         <div class="dp-btns"><button class="dp-btn no dp-dismiss">Close / 閉じる</button></div>`;
 
     } else {
-      const lines=drifter.greeting.map((en,i)=>
+      const lines = drifter.greeting.map((en,i) =>
         `<p class="dp-line-en">${en}</p><p class="dp-line-jp">${drifter.greetingJP[i]}</p>`).join('');
-      dialogueHTML=`${lines}
+      dialogueHTML = `${lines}
         <div class="dp-divider"></div>
         <p class="dp-line-en" style="margin-bottom:2px;">Will you help me find a memory?</p>
         <p class="dp-line-jp" style="margin-bottom:10px;">記憶を探すのを手伝ってくれる？</p>
@@ -524,7 +613,7 @@
         </div>`;
     }
 
-    drifterPanel.innerHTML=`
+    drifterPanel.innerHTML = `
       <div class="dp-handle"></div>
       <div class="dp-inner">
         <div class="dp-portrait"><img src="${drifter.sprite2}" alt="${drifter.name}"></div>
@@ -538,63 +627,66 @@
         </div>
       </div>`;
 
-    drifterPanel.querySelectorAll('.dp-dismiss').forEach(btn=>btn.addEventListener('click',closeDrifterPanel));
+    drifterPanel.querySelectorAll('.dp-dismiss').forEach(btn => btn.addEventListener('click', closeDrifterPanel));
 
-    /* YES btn — close silently then reopen (no auto-play) */
- const yesBtn = drifterPanel.querySelector('#dp-yes-btn');
-if (yesBtn) yesBtn.addEventListener('click', () => {
-  const quest = activateQuest(drifter.id);
-  if (!quest) { closeDrifterPanel(); return; }
+    /* YES btn */
+    const yesBtn = drifterPanel.querySelector('#dp-yes-btn');
+    if (yesBtn) yesBtn.addEventListener('click', () => {
+      const newQuest = activateQuest(drifter.id);
+      if (!newQuest) { closeDrifterPanel(); return; }
+      closeDrifterPanel();
+      setTimeout(() => {
+        drifterPanelCooldown = 0;
+        openDrifterPanel(drifter, newQuest);
+      }, PANEL_SLIDE_MS + 20);
+    });
 
-  closeDrifterPanel();
-
-  setTimeout(() => {
-    drifterPanelCooldown = 0;
-    openDrifterPanel(drifter, quest);
-  }, PANEL_SLIDE_MS + 20);
-});
-
-    /* Replay btn — manual play only, isMemoryPlaying lock */
-    const replayBtn=drifterPanel.querySelector('#dp-replay-btn');
-    if(replayBtn){
-      if(isMemoryPlaying) replayBtn.disabled=true;
-      replayBtn.addEventListener('click',()=>{
-        if(isMemoryPlaying) return;
-        const q=getCachedQuest(); if(!q) return;
-        const src=questAudioSrc(q.active,q.memIdx); if(!src) return;
-        isMemoryPlaying=true;
-        replayBtn.disabled=true;
-        replayBtn.textContent='▶ Playing…';
-        stopActiveAudio();
-        const a=new Audio(src);
-        activeAudio=a;
-        a.play().catch(()=>{});
-        a.onended=()=>{
-          if(activeAudio===a) activeAudio=null;
-          isMemoryPlaying=false;
-          if(replayBtn.isConnected){
-            replayBtn.disabled=false;
-            replayBtn.textContent='▶ Play / 聴く';
-          }
-        };
-      });
+    /* ── REPLAY BTN — fixed: uses closure-bound src, not getCachedQuest() at click time ── */
+    const replayBtn = drifterPanel.querySelector('#dp-replay-btn');
+    if (replayBtn) {
+      if (!currentAudioSrc) {
+        replayBtn.disabled = true;
+      } else {
+        if (isMemoryPlaying) replayBtn.disabled = true;
+        replayBtn.addEventListener('click', () => {
+          if (isMemoryPlaying) return;
+          isMemoryPlaying       = true;
+          replayBtn.disabled    = true;
+          replayBtn.textContent = '▶ Playing…';
+          stopActiveAudio();
+          const a  = new Audio(currentAudioSrc);
+          activeAudio = a;
+          a.play().catch(() => {});
+          a.onended = () => {
+            if (activeAudio === a) activeAudio = null;
+            isMemoryPlaying = false;
+            if (replayBtn.isConnected) {
+              replayBtn.disabled    = false;
+              replayBtn.textContent = '▶ Play / 聴く';
+            }
+          };
+        });
+      }
     }
 
-    const cancelQuestBtn=drifterPanel.querySelector('#dp-cancel-quest-btn');
-    if(cancelQuestBtn) cancelQuestBtn.addEventListener('click',()=>{
+    /* CANCEL QUEST */
+    const cancelQuestBtn = drifterPanel.querySelector('#dp-cancel-quest-btn');
+    if (cancelQuestBtn) cancelQuestBtn.addEventListener('click', () => {
       stopActiveAudio();
       clearQuest();
       closeDrifterPanel();
     });
 
-    const giveBtn=drifterPanel.querySelector('#dp-give-btn');
-    if(giveBtn) giveBtn.addEventListener('click',()=>{
-      const q=getCachedQuest(); if(!q||q.state!=='collected'){closeDrifterPanel();return;}
-      const expectedMemKey=`${drifter.id}_a${String(q.memIdx).padStart(2,'0')}`;
+    /* GIVE MEMORY */
+    const giveBtn = drifterPanel.querySelector('#dp-give-btn');
+    if (giveBtn) giveBtn.addEventListener('click', () => {
+      const q = getCachedQuest();
+      if (!q || q.state !== 'collected') { closeDrifterPanel(); return; }
+      const expectedMemKey = `${drifter.id}_a${String(q.memIdx).padStart(2,'0')}`;
       const correct = q.orbIsCorrect === true && q.collectedMemoryId === expectedMemKey;
       closeDrifterPanel();
-      if(correct){
-        completeMemory(drifter.id,q.memIdx);
+      if (correct) {
+        completeMemory(drifter.id, q.memIdx);
         startCelebration(drifter);
       } else {
         showWrongMemoryMsg();
@@ -602,51 +694,44 @@ if (yesBtn) yesBtn.addEventListener('click', () => {
       }
     });
 
-    requestAnimationFrame(()=>requestAnimationFrame(()=>drifterPanel.classList.add('open')));
+    requestAnimationFrame(() => requestAnimationFrame(() => drifterPanel.classList.add('open')));
   }
 
-  /* ── FIX 4: inputLocked cleared after slide animation, not immediately ── */
-  function closeDrifterPanel(){
-    drifterPanelCooldown=performance.now()+POPUP_COOLDOWN_MS;
-    drifterPanelOpen=false;
+  function closeDrifterPanel() {
+    drifterPanelCooldown = performance.now() + POPUP_COOLDOWN_MS;
+    drifterPanelOpen     = false;
     drifterPanel.classList.remove('open');
     stopActiveAudio();
-    isMemoryPlaying=false;
-    /* defer input unlock until panel has fully slid down */
-    setTimeout(()=>{ state.inputLocked=false; },PANEL_SLIDE_MS);
-    try{music.play().catch(()=>{});}catch(_){}
+    isMemoryPlaying = false;
+    setTimeout(() => { state.inputLocked = false; }, PANEL_SLIDE_MS);
+    try { music.play().catch(() => {}); } catch(_) {}
   }
 
-  function showWrongMemoryMsg(){
-    const msg=document.createElement('div');
-    msg.style.cssText='position:fixed;inset:0;z-index:9500;display:flex;align-items:center;justify-content:center;pointer-events:none;';
-    msg.innerHTML=`<div style="background:rgba(247,242,232,0.97);border:1.5px solid #c8b48a;border-radius:10px;padding:24px 36px;text-align:center;font-family:Georgia,serif;box-shadow:0 8px 32px rgba(0,0,0,0.35);animation:utsuPopIn .22s ease-out;">
+  function showWrongMemoryMsg() {
+    const msg = document.createElement('div');
+    msg.style.cssText = 'position:fixed;inset:0;z-index:9500;display:flex;align-items:center;justify-content:center;pointer-events:none;';
+    msg.innerHTML = `<div style="background:rgba(247,242,232,0.97);border:1.5px solid #c8b48a;border-radius:10px;padding:24px 36px;text-align:center;font-family:Georgia,serif;box-shadow:0 8px 32px rgba(0,0,0,0.35);animation:utsuPopIn .22s ease-out;">
       <p style="margin:0 0 6px;font-size:1.04rem;color:#1e140a;">Sorry… this isn't for me.</p>
       <p style="margin:0;font-size:.84rem;color:#806040;">ごめん…これは私のじゃない。</p></div>`;
     document.body.appendChild(msg);
-    setTimeout(()=>{msg.style.opacity='0';msg.style.transition='opacity .4s';setTimeout(()=>msg.remove(),420);},2200);
+    setTimeout(() => { msg.style.opacity='0'; msg.style.transition='opacity .4s'; setTimeout(() => msg.remove(), 420); }, 2200);
   }
 
-  function startCelebration(drifter){
-    const now=performance.now();
-    state.celebrating=true;
-    state.celebrateUntil=now+CELEBRATE_MS;
-    state.celebrateSpinStart=now;
-    state.inputLocked=true;
+  function startCelebration(drifter) {
+    const now = performance.now();
+    state.celebrating       = true;
+    state.celebrateUntil    = now + CELEBRATE_MS;
+    state.celebrateSpinStart= now;
+    state.inputLocked       = true;
     triggerSparkle();
-    /* show thank-you panel after a short sparkle moment */
-    setTimeout(()=>showThankYouPanel(drifter), 800);
-    /* end celebration after CELEBRATE_MS */
-    setTimeout(()=>{
-      state.celebrating=false;
-      state.inputLocked=false;
-    }, CELEBRATE_MS);
+    setTimeout(() => showThankYouPanel(drifter), 800);
+    setTimeout(() => { state.celebrating = false; state.inputLocked = false; }, CELEBRATE_MS);
   }
 
-  function showThankYouPanel(drifter){
-    const ty=THANK_YOU[drifter.id]||{en:'Thank you!',jp:'ありがとう！'};
-    const panel=document.createElement('div');
-    panel.style.cssText=`
+  function showThankYouPanel(drifter) {
+    const ty = THANK_YOU[drifter.id] || { en:'Thank you!', jp:'ありがとう！' };
+    const panel = document.createElement('div');
+    panel.style.cssText = `
       position:fixed;bottom:0;left:0;right:0;z-index:9200;
       background:linear-gradient(180deg,#f7f2e8 0%,#ede5d0 100%);
       border-top:2px solid #c8b48a;border-radius:20px 20px 0 0;
@@ -655,7 +740,7 @@ if (yesBtn) yesBtn.addEventListener('click', () => {
       transform:translateY(100%);
       transition:transform 0.32s cubic-bezier(0.22,1,0.36,1);
       pointer-events:auto;`;
-    panel.innerHTML=`
+    panel.innerHTML = `
       <div style="max-width:480px;margin:0 auto;padding:14px clamp(14px,3.5vw,28px) 26px;">
         <div style="width:38px;height:4px;border-radius:2px;background:#c0aa80;margin:0 auto 14px;"></div>
         <div style="display:flex;align-items:flex-start;gap:clamp(10px,2.5vw,20px);">
@@ -672,174 +757,174 @@ if (yesBtn) yesBtn.addEventListener('click', () => {
         </div>
       </div>`;
     document.body.appendChild(panel);
-    requestAnimationFrame(()=>requestAnimationFrame(()=>{ panel.style.transform='translateY(0)'; }));
-    const closeBtn=panel.querySelector('#ty-close-btn');
-    function dismissPanel(){
-      panel.style.transform='translateY(100%)';
-      setTimeout(()=>panel.remove(), 360);
-    }
-    closeBtn.addEventListener('click', dismissPanel);
-    /* auto-dismiss when celebration ends */
+    requestAnimationFrame(() => requestAnimationFrame(() => { panel.style.transform = 'translateY(0)'; }));
+    function dismissPanel() { panel.style.transform = 'translateY(100%)'; setTimeout(() => panel.remove(), 360); }
+    panel.querySelector('#ty-close-btn').addEventListener('click', dismissPanel);
     setTimeout(dismissPanel, CELEBRATE_MS - 800 + 600);
   }
 
   /* ═══════════════════════════════════════════
      DOM BUILD
   ═══════════════════════════════════════════ */
-  function buildApp(){
-    app=document.createElement('div'); app.id='utsuroba-app';
-    stage=document.createElement('div'); stage.id='utsuroba-stage';
-    roomLayer=document.createElement('div'); roomLayer.id='utsuroba-room-layer';
-    canvas=document.createElement('canvas'); canvas.id='buki-canvas';
-    const fade=document.createElement('div'); fade.id='buki-fade';
+  function buildApp() {
+    app      = document.createElement('div'); app.id = 'utsuroba-app';
+    stage    = document.createElement('div'); stage.id = 'utsuroba-stage';
+    roomLayer= document.createElement('div'); roomLayer.id = 'utsuroba-room-layer';
+    canvas   = document.createElement('canvas'); canvas.id = 'buki-canvas';
+    const fade = document.createElement('div'); fade.id = 'buki-fade';
     stage.appendChild(roomLayer); stage.appendChild(canvas); stage.appendChild(fade);
     app.appendChild(stage);
-    const toast=document.createElement('div'); toast.id='buki-copy-toast'; toast.textContent='copied!';
-    document.body.innerHTML='';
+    const toast = document.createElement('div'); toast.id = 'buki-copy-toast'; toast.textContent = 'copied!';
+    document.body.innerHTML = '';
     document.body.appendChild(app);
     document.body.appendChild(toast);
     injectExitPopOverlay();
     buildDrifterPanel();
-    if(DEV_MODE){
-      coordToggle=document.createElement('div'); coordToggle.id='buki-coord-toggle';
-      coordToggle.innerHTML='<span>COORDS</span><div class="toggle-pill"></div>';
-      coordToggle.addEventListener('click',toggleCoordMode);
-      coordReadout=document.createElement('div'); coordReadout.id='buki-coord-readout';
-      coordReadout.innerHTML='<span id="buki-coord-xy">—</span><span class="hint">click to pin · hover to read</span>';
-      pinLog=document.createElement('div'); pinLog.id='buki-pin-log';
-      pinLog.innerHTML=`<div class="log-header"><span>PINS — ${state.roomId}</span><span class="clear-btn" id="buki-clear-pins">CLEAR</span></div><div id="buki-pin-rows"></div>`;
+    if (DEV_MODE) {
+      coordToggle = document.createElement('div'); coordToggle.id = 'buki-coord-toggle';
+      coordToggle.innerHTML = '<span>COORDS</span><div class="toggle-pill"></div>';
+      coordToggle.addEventListener('click', toggleCoordMode);
+      coordReadout = document.createElement('div'); coordReadout.id = 'buki-coord-readout';
+      coordReadout.innerHTML = '<span id="buki-coord-xy">—</span><span class="hint">click to pin · hover to read</span>';
+      pinLog = document.createElement('div'); pinLog.id = 'buki-pin-log';
+      pinLog.innerHTML = `<div class="log-header"><span>PINS — ${state.roomId}</span><span class="clear-btn" id="buki-clear-pins">CLEAR</span></div><div id="buki-pin-rows"></div>`;
       document.body.appendChild(coordToggle);
       document.body.appendChild(coordReadout);
       document.body.appendChild(pinLog);
-      document.getElementById('buki-clear-pins').addEventListener('click',()=>{pins=[];renderPinLog();});
+      document.getElementById('buki-clear-pins').addEventListener('click', () => { pins = []; renderPinLog(); });
       injectDevPanel();
     }
-    const ro=document.createElement('div'); ro.id='rotate-overlay';
-    ro.innerHTML=`<span class="rotate-phone">📱</span><div class="rotate-bar"></div><p class="rotate-title">横にして遊ぼう！</p><p class="rotate-sub">うつろばは<strong style="color:#c45fa3">横画面</strong>で遊べるよ。<br>スマホを横にしてね。</p>`;
+    const ro = document.createElement('div'); ro.id = 'rotate-overlay';
+    ro.innerHTML = `<span class="rotate-phone">📱</span><div class="rotate-bar"></div><p class="rotate-title">横にして遊ぼう！</p><p class="rotate-sub">うつろばは<strong style="color:#c45fa3">横画面</strong>で遊べるよ。<br>スマホを横にしてね。</p>`;
     document.body.appendChild(ro);
-    ctx=canvas.getContext('2d');
+    ctx = canvas.getContext('2d');
   }
 
   /* ═══════════════════════════════════════════
      CANVAS / FIT
   ═══════════════════════════════════════════ */
-  function resizeCanvas(){
-    canvas.style.width=WORLD_W+'px'; canvas.style.height=WORLD_H+'px';
-    canvas.width=Math.round(WORLD_W*MAX_DPR); canvas.height=Math.round(WORLD_H*MAX_DPR);
+  function resizeCanvas() {
+    canvas.style.width = WORLD_W+'px'; canvas.style.height = WORLD_H+'px';
+    canvas.width  = Math.round(WORLD_W*MAX_DPR);
+    canvas.height = Math.round(WORLD_H*MAX_DPR);
     ctx.setTransform(MAX_DPR,0,0,MAX_DPR,0,0);
   }
-  function fitStage(){
-    const scale=Math.max(window.innerWidth/WORLD_W,window.innerHeight/WORLD_H);
-    stage.style.transform=`translate(-50%,-50%) scale(${scale})`;
+  function fitStage() {
+    const scale = Math.max(window.innerWidth/WORLD_W, window.innerHeight/WORLD_H);
+    stage.style.transform = `translate(-50%,-50%) scale(${scale})`;
   }
 
   /* ═══════════════════════════════════════════
      PERF
   ═══════════════════════════════════════════ */
-  function updatePerfTier(now){
-    if(perfTier==='low') return;
+  function updatePerfTier(now) {
+    if (perfTier === 'low') return;
     perfFrameCount++;
-    if(perfFrameCount===1){perfFirstTime=now;return;}
-    if(perfFrameCount===90){const avg=89/((now-perfFirstTime)/1000);if(avg<40){perfTier='low';shadowsEnabled=false;}}
+    if (perfFrameCount === 1) { perfFirstTime = now; return; }
+    if (perfFrameCount === 90) { const avg = 89/((now-perfFirstTime)/1000); if (avg < 40) { perfTier = 'low'; shadowsEnabled = false; } }
   }
 
   /* ═══════════════════════════════════════════
      COORD MODE
   ═══════════════════════════════════════════ */
-  function toggleCoordMode(){
-    state.coordMode=!state.coordMode;
-    coordToggle.classList.toggle('active',state.coordMode);
-    coordReadout.classList.toggle('show',state.coordMode);
-    pinLog.classList.toggle('show',state.coordMode);
-    pinLog.querySelector('.log-header span').textContent=`PINS — ${state.roomId}`;
+  function toggleCoordMode() {
+    state.coordMode = !state.coordMode;
+    coordToggle.classList.toggle('active', state.coordMode);
+    coordReadout.classList.toggle('show', state.coordMode);
+    pinLog.classList.toggle('show', state.coordMode);
+    pinLog.querySelector('.log-header span').textContent = `PINS — ${state.roomId}`;
   }
-  function dropPin(wx,wy){const label=`${Math.round(wx)}, ${Math.round(wy)}`;pins.push({x:wx,y:wy,label});renderPinLog();copyText(label);showToast(`pinned ${label}`);}
-  function renderPinLog(){
-    const rows=document.getElementById('buki-pin-rows');if(!rows)return;
-    rows.innerHTML=pins.map((p,i)=>`<div class="pin-row" data-i="${i}"><span class="pin-idx">${i+1}</span><span class="pin-coords">${p.label}</span><span class="pin-copy">copy</span></div>`).join('');
-    rows.querySelectorAll('.pin-row').forEach(row=>row.addEventListener('click',()=>{const pin=pins[+row.dataset.i];if(pin){copyText(pin.label);showToast(`copied ${pin.label}`);}}));
+  function dropPin(wx,wy) { const label = `${Math.round(wx)}, ${Math.round(wy)}`; pins.push({x:wx,y:wy,label}); renderPinLog(); copyText(label); showToast(`pinned ${label}`); }
+  function renderPinLog() {
+    const rows = document.getElementById('buki-pin-rows'); if (!rows) return;
+    rows.innerHTML = pins.map((p,i) => `<div class="pin-row" data-i="${i}"><span class="pin-idx">${i+1}</span><span class="pin-coords">${p.label}</span><span class="pin-copy">copy</span></div>`).join('');
+    rows.querySelectorAll('.pin-row').forEach(row => row.addEventListener('click', () => { const pin = pins[+row.dataset.i]; if (pin) { copyText(pin.label); showToast(`copied ${pin.label}`); } }));
   }
-  let toastTimer=null;
-  function showToast(msg){const t=document.getElementById('buki-copy-toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),1400);}
-  async function copyText(txt){try{await navigator.clipboard.writeText(txt);return;}catch(_){}try{const ta=document.createElement('textarea');ta.value=txt;ta.style.cssText='position:fixed;left:-9999px';document.body.appendChild(ta);ta.focus();ta.select();document.execCommand('copy');document.body.removeChild(ta);}catch(_){}}
+  let toastTimer = null;
+  function showToast(msg) { const t = document.getElementById('buki-copy-toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 1400); }
+  async function copyText(txt) { try { await navigator.clipboard.writeText(txt); return; } catch(_) {} try { const ta = document.createElement('textarea'); ta.value = txt; ta.style.cssText = 'position:fixed;left:-9999px'; document.body.appendChild(ta); ta.focus(); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); } catch(_) {} }
 
   /* ═══════════════════════════════════════════
      ROOM HELPERS
   ═══════════════════════════════════════════ */
-  function getRoom(){return DATA.rooms[state.roomId];}
-  function getSpawn(room,spawnId){const sp=room.spawns?.[spawnId]||room.spawns?.default;if(!sp)return{x:CENTER_X,y:CENTER_Y};return spawnToWorld(sp);}
-  function placeGhost(x,y){state.x=x;state.y=y;}
-  function makeBg(src){const img=document.createElement('img');img.className='utsuroba-bg';img.src=src;return img;}
+  function getRoom()  { return DATA.rooms[state.roomId]; }
+  function getSpawn(room, spawnId) {
+    const sp = room.spawns?.[spawnId] || room.spawns?.default;
+    if (!sp) return { x:CENTER_X, y:CENTER_Y };
+    return spawnToWorld(sp);
+  }
+  function placeGhost(x,y) { state.x = x; state.y = y; }
+  function makeBg(src) { const img = document.createElement('img'); img.className = 'utsuroba-bg'; img.src = src; return img; }
   let currentBg;
 
-  function renderInitialRoom(){
-    const room=getRoom(); currentBg=makeBg(room.bg); roomLayer.appendChild(currentBg);
-    const spawn=getSpawn(room,state.spawnId);
-    placeGhost(ENTER_START_X,ENTER_START_Y);
-    state.spawnX=spawn.x; state.spawnY=spawn.y;
-    state.travelingToCenter=true; state.inputLocked=true;
-    state.clickTarget={x:spawn.x,y:spawn.y};
-    const now=performance.now();
-    state.transitionReadyAt=now+TRANSITION_COOLDOWN_MS;
-    arrivalArrowHiddenUntil=now+ARRIVAL_ARROW_DELAY_MS;
-    arrivalArrowBackHiddenUntil=now+ARRIVAL_ARROW_DELAY_MS*ARRIVAL_ARROW_BACK_MULTIPLIER;
-    state.distMovedSinceSpawn=0; state.moving=false; state.spawnLockUntil=now+500;
+  function renderInitialRoom() {
+    const room = getRoom(); currentBg = makeBg(room.bg); roomLayer.appendChild(currentBg);
+    const spawn = getSpawn(room, state.spawnId);
+    placeGhost(ENTER_START_X, ENTER_START_Y);
+    state.spawnX = spawn.x; state.spawnY = spawn.y;
+    state.travelingToCenter = true; state.inputLocked = true;
+    state.clickTarget = { x:spawn.x, y:spawn.y };
+    const now = performance.now();
+    state.transitionReadyAt = now + TRANSITION_COOLDOWN_MS;
+    arrivalArrowHiddenUntil     = now + ARRIVAL_ARROW_DELAY_MS;
+    arrivalArrowBackHiddenUntil = now + ARRIVAL_ARROW_DELAY_MS * ARRIVAL_ARROW_BACK_MULTIPLIER;
+    state.distMovedSinceSpawn = 0; state.moving = false; state.spawnLockUntil = now+500;
   }
 
-  function arriveInRoom(nextRoom,spawnId,arrivalDir){
-    const spawn=getSpawn(nextRoom,spawnId);
-    placeGhost(spawn.x,spawn.y);
-    state.travelingToCenter=true; state.inputLocked=true;
-    state.clickTarget={x:CENTER_X,y:CENTER_Y};
-    state.arrivalDir=arrivalDir||null;
-    trail=[]; pins=[];
-    const now=performance.now();
-    state.transitionReadyAt=now+TRANSITION_COOLDOWN_MS;
-    arrivalArrowHiddenUntil=now+ARRIVAL_ARROW_DELAY_MS;
-    arrivalArrowBackHiddenUntil=now+ARRIVAL_ARROW_DELAY_MS*ARRIVAL_ARROW_BACK_MULTIPLIER;
-    state.distMovedSinceSpawn=0; state.spawnLockUntil=now+800;
-    if(DEV_MODE&&pinLog){const lh=pinLog.querySelector('.log-header span');if(lh)lh.textContent=`PINS — ${state.roomId}`;renderPinLog();}
+  function arriveInRoom(nextRoom, spawnId, arrivalDir) {
+    const spawn = getSpawn(nextRoom, spawnId);
+    placeGhost(spawn.x, spawn.y);
+    state.travelingToCenter = true; state.inputLocked = true;
+    state.clickTarget = { x:CENTER_X, y:CENTER_Y };
+    state.arrivalDir = arrivalDir || null;
+    trail = []; pins = [];
+    const now = performance.now();
+    state.transitionReadyAt = now + TRANSITION_COOLDOWN_MS;
+    arrivalArrowHiddenUntil     = now + ARRIVAL_ARROW_DELAY_MS;
+    arrivalArrowBackHiddenUntil = now + ARRIVAL_ARROW_DELAY_MS * ARRIVAL_ARROW_BACK_MULTIPLIER;
+    state.distMovedSinceSpawn = 0; state.spawnLockUntil = now+800;
+    if (DEV_MODE && pinLog) { const lh = pinLog.querySelector('.log-header span'); if (lh) lh.textContent = `PINS — ${state.roomId}`; renderPinLog(); }
   }
 
   /* ═══════════════════════════════════════════
      COLLISION
   ═══════════════════════════════════════════ */
-  function clampToWorld(nx,ny){return{x:Math.max(GHOST_RADIUS,Math.min(WORLD_W-GHOST_RADIUS,nx)),y:Math.max(GHOST_RADIUS,Math.min(WORLD_H-GHOST_RADIUS,ny))};}
-  function pointInRect(px,py,r){return px>=r.x&&px<=r.x+r.w&&py>=r.y&&py<=r.y+r.h;}
-  function canMoveTo(nx,ny){const rects=getRoom()?.collisions||[];if(!rects.length)return true;for(const r of rects){if(pointInRect(nx,ny,r))return true;}return false;}
-  function tryMove(nx,ny){
-    const c=clampToWorld(nx,ny);if(canMoveTo(c.x,c.y)){placeGhost(c.x,c.y);return true;}
-    const tx=clampToWorld(nx,state.y);if(canMoveTo(tx.x,tx.y)){placeGhost(tx.x,tx.y);return true;}
-    const ty=clampToWorld(state.x,ny);if(canMoveTo(ty.x,ty.y)){placeGhost(ty.x,ty.y);return true;}
+  function clampToWorld(nx,ny) { return { x:Math.max(GHOST_RADIUS,Math.min(WORLD_W-GHOST_RADIUS,nx)), y:Math.max(GHOST_RADIUS,Math.min(WORLD_H-GHOST_RADIUS,ny)) }; }
+  function pointInRect(px,py,r) { return px>=r.x && px<=r.x+r.w && py>=r.y && py<=r.y+r.h; }
+  function canMoveTo(nx,ny) { const rects = getRoom()?.collisions||[]; if (!rects.length) return true; for (const r of rects) { if (pointInRect(nx,ny,r)) return true; } return false; }
+  function tryMove(nx,ny) {
+    const c = clampToWorld(nx,ny); if (canMoveTo(c.x,c.y)) { placeGhost(c.x,c.y); return true; }
+    const tx = clampToWorld(nx,state.y); if (canMoveTo(tx.x,tx.y)) { placeGhost(tx.x,tx.y); return true; }
+    const ty = clampToWorld(state.x,ny); if (canMoveTo(ty.x,ty.y)) { placeGhost(ty.x,ty.y); return true; }
     return false;
   }
 
   /* ═══════════════════════════════════════════
      TRANSITIONS
   ═══════════════════════════════════════════ */
-  function transitionTo(exit){
-    if(!exit?.to||state.transitioning)return;
-    const nextRoom=DATA.rooms[exit.to];if(!nextRoom)return;
-    state.transitioning=true; state.clickTarget=null; state.inputLocked=true;
-    const fadeEl=document.getElementById('buki-fade');
-    fadeEl.style.transition=`opacity ${FADE_MS/2}ms ease-in`; fadeEl.style.opacity='1';
-    setTimeout(()=>{
-      const nextBg=makeBg(nextRoom.bg); roomLayer.innerHTML=''; roomLayer.appendChild(nextBg); currentBg=nextBg;
-      state.roomId=exit.to; state.spawnId=exit.spawn||'default';
-      arriveInRoom(nextRoom,state.spawnId,exit.dir);
-      fadeEl.style.transition=`opacity ${FADE_MS/2}ms ease-out`; fadeEl.style.opacity='0';
-      setTimeout(()=>{state.transitioning=false;},FADE_MS/2+30);
-    },FADE_MS/2+20);
+  function transitionTo(exit) {
+    if (!exit?.to || state.transitioning) return;
+    const nextRoom = DATA.rooms[exit.to]; if (!nextRoom) return;
+    state.transitioning = true; state.clickTarget = null; state.inputLocked = true;
+    const fadeEl = document.getElementById('buki-fade');
+    fadeEl.style.transition = `opacity ${FADE_MS/2}ms ease-in`; fadeEl.style.opacity = '1';
+    setTimeout(() => {
+      const nextBg = makeBg(nextRoom.bg); roomLayer.innerHTML = ''; roomLayer.appendChild(nextBg); currentBg = nextBg;
+      state.roomId  = exit.to; state.spawnId = exit.spawn || 'default';
+      arriveInRoom(nextRoom, state.spawnId, exit.dir);
+      fadeEl.style.transition = `opacity ${FADE_MS/2}ms ease-out`; fadeEl.style.opacity = '0';
+      setTimeout(() => { state.transitioning = false; }, FADE_MS/2+30);
+    }, FADE_MS/2+20);
   }
 
-  function getNPPExit(now){
-    if(now<state.transitionReadyAt||state.inputLocked)return null;
-    const npps=NPP[state.roomId];if(!npps)return null;
-    const OPP={left:'right',right:'left',up:'down',down:'up'};
-    const arrivalExit=state.arrivalDir?OPP[state.arrivalDir]:null;
-    for(const npp of npps){
-      if(Math.hypot(state.x-npp.x,state.y-npp.y)<=NPP_RADIUS){
-        if(npp.dir===arrivalExit&&now<arrivalArrowBackHiddenUntil)return null;
+  function getNPPExit(now) {
+    if (now < state.transitionReadyAt || state.inputLocked) return null;
+    const npps = NPP[state.roomId]; if (!npps) return null;
+    const OPP = { left:'right', right:'left', up:'down', down:'up' };
+    const arrivalExit = state.arrivalDir ? OPP[state.arrivalDir] : null;
+    for (const npp of npps) {
+      if (Math.hypot(state.x-npp.x, state.y-npp.y) <= NPP_RADIUS) {
+        if (npp.dir === arrivalExit && now < arrivalArrowBackHiddenUntil) return null;
         return npp;
       }
     }
@@ -849,134 +934,182 @@ if (yesBtn) yesBtn.addEventListener('click', () => {
   /* ═══════════════════════════════════════════
      TRAIL
   ═══════════════════════════════════════════ */
-  function addTrailParticle(x,y,now){
-    const interval=perfTier==='low'?90:45;
-    if(now-state.lastTrailT<interval)return;
-    state.lastTrailT=now;
-    const[col1,col2]=roomColorPair(state.roomId);
-    const maxT=perfTier==='low'?30:TRAIL_MAX;
-    trail.push({x:x+(Math.random()-.5)*10,y:y+GHOST_R*.55+(Math.random()-.5)*8,vx:(Math.random()-.5)*.4,vy:-Math.random()*.5,life:1,size:2+Math.random()*4.5,color:Math.random()>.5?col1:col2});
-    if(trail.length>maxT)trail.shift();
+  function addTrailParticle(x,y,now) {
+    const interval = perfTier === 'low' ? 90 : 45;
+    if (now - state.lastTrailT < interval) return;
+    state.lastTrailT = now;
+    const [col1,col2] = roomColorPair(state.roomId);
+    const maxT = perfTier === 'low' ? 30 : TRAIL_MAX;
+    trail.push({x:x+(Math.random()-.5)*10, y:y+GHOST_R*.55+(Math.random()-.5)*8, vx:(Math.random()-.5)*.4, vy:-Math.random()*.5, life:1, size:2+Math.random()*4.5, color:Math.random()>.5?col1:col2});
+    if (trail.length > maxT) trail.shift();
   }
 
   /* ═══════════════════════════════════════════
      DRAW EXIT ARROWS
   ═══════════════════════════════════════════ */
-  function drawExitArrows(now){
-    const npps=NPP[state.roomId];if(!npps)return;
-    const moveReveal=Math.min(1,state.distMovedSinceSpawn/ARROW_MOVE_THRESHOLD);
-    const totalReveal=Math.max(0.35,moveReveal);
-    const sec=now/1000;const[col1,col2]=roomColorPair(state.roomId);
-    const OPP={left:'right',right:'left',up:'down',down:'up'};
-    const arrivalExit=state.arrivalDir?OPP[state.arrivalDir]:null;
-    npps.forEach((npp,i)=>{
-      if(!npp.dir)return;
-      const isBack=npp.dir===arrivalExit;
-      const hiddenUntil=isBack?arrivalArrowBackHiddenUntil:arrivalArrowHiddenUntil;
-      const delayRem=hiddenUntil-now;if(delayRem>400)return;
-      const rf=Math.min(1,Math.max(0,1-delayRem/(isBack?ARRIVAL_ARROW_DELAY_MS*ARRIVAL_ARROW_BACK_MULTIPLIER:ARRIVAL_ARROW_DELAY_MS)));
-      const angle=DIR_ANGLE[npp.dir]??0;
-      const pulse=0.5+0.5*Math.sin(sec*2.2+i*1.3);
-      const bounce=Math.sin(sec*2.2+i*1.3)*6;
-      const ax=npp.x+Math.cos(angle)*bounce,ay=npp.y+Math.sin(angle)*bounce;
-      const fa=rf*totalReveal;
-      ctx.save();ctx.translate(ax,ay);ctx.rotate(angle);
-      const ga=ctx.createRadialGradient(0,0,0,0,0,40);ga.addColorStop(0,col1);ga.addColorStop(1,'transparent');
-      ctx.globalAlpha=fa*(0.10+pulse*0.08);ctx.fillStyle=ga;ctx.beginPath();ctx.arc(0,0,40,0,Math.PI*2);ctx.fill();
-      [{ox:-11,a:0.65},{ox:4,a:1.0}].forEach(({ox,a})=>{
-        ctx.globalAlpha=fa*a*(0.38+pulse*0.32);ctx.strokeStyle=col1;ctx.lineWidth=2.5;ctx.lineCap='round';ctx.lineJoin='round';
-        if(shadowsEnabled){ctx.shadowBlur=12;ctx.shadowColor=col2;}
-        ctx.beginPath();ctx.moveTo(ox-7,-10);ctx.lineTo(ox+7,0);ctx.lineTo(ox-7,10);ctx.stroke();ctx.shadowBlur=0;
+  function drawExitArrows(now) {
+    const npps = NPP[state.roomId]; if (!npps) return;
+    const moveReveal   = Math.min(1, state.distMovedSinceSpawn / ARROW_MOVE_THRESHOLD);
+    const totalReveal  = Math.max(0.35, moveReveal);
+    const sec = now/1000; const [col1,col2] = roomColorPair(state.roomId);
+    const OPP = { left:'right', right:'left', up:'down', down:'up' };
+    const arrivalExit = state.arrivalDir ? OPP[state.arrivalDir] : null;
+    npps.forEach((npp,i) => {
+      if (!npp.dir) return;
+      const isBack     = npp.dir === arrivalExit;
+      const hiddenUntil= isBack ? arrivalArrowBackHiddenUntil : arrivalArrowHiddenUntil;
+      const delayRem   = hiddenUntil - now; if (delayRem > 400) return;
+      const rf         = Math.min(1, Math.max(0, 1 - delayRem/(isBack ? ARRIVAL_ARROW_DELAY_MS*ARRIVAL_ARROW_BACK_MULTIPLIER : ARRIVAL_ARROW_DELAY_MS)));
+      const angle      = DIR_ANGLE[npp.dir] ?? 0;
+      const pulse      = 0.5+0.5*Math.sin(sec*2.2+i*1.3);
+      const bounce     = Math.sin(sec*2.2+i*1.3)*6;
+      const ax         = npp.x+Math.cos(angle)*bounce, ay = npp.y+Math.sin(angle)*bounce;
+      const fa         = rf * totalReveal;
+      ctx.save(); ctx.translate(ax,ay); ctx.rotate(angle);
+      const ga = ctx.createRadialGradient(0,0,0,0,0,40); ga.addColorStop(0,col1); ga.addColorStop(1,'transparent');
+      ctx.globalAlpha = fa*(0.10+pulse*0.08); ctx.fillStyle = ga; ctx.beginPath(); ctx.arc(0,0,40,0,Math.PI*2); ctx.fill();
+      [{ox:-11,a:0.65},{ox:4,a:1.0}].forEach(({ox,a}) => {
+        ctx.globalAlpha = fa*a*(0.38+pulse*0.32); ctx.strokeStyle = col1; ctx.lineWidth = 2.5; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+        if (shadowsEnabled) { ctx.shadowBlur = 12; ctx.shadowColor = col2; }
+        ctx.beginPath(); ctx.moveTo(ox-7,-10); ctx.lineTo(ox+7,0); ctx.lineTo(ox-7,10); ctx.stroke(); ctx.shadowBlur = 0;
       });
-      ctx.globalAlpha=fa*(0.60+pulse*0.38);ctx.fillStyle='#fff';
-      if(shadowsEnabled){ctx.shadowBlur=14;ctx.shadowColor=col1;}
-      ctx.beginPath();ctx.arc(0,0,5,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;ctx.restore();
+      ctx.globalAlpha = fa*(0.60+pulse*0.38); ctx.fillStyle = '#fff';
+      if (shadowsEnabled) { ctx.shadowBlur = 14; ctx.shadowColor = col1; }
+      ctx.beginPath(); ctx.arc(0,0,5,0,Math.PI*2); ctx.fill(); ctx.shadowBlur = 0; ctx.restore();
     });
   }
 
-  function drawKarasukiExitArrow(now){
-    if(state.roomId!==KARASUKI_EXIT.roomId)return;
-    const moveReveal=Math.min(1,state.distMovedSinceSpawn/ARROW_MOVE_THRESHOLD);
-    const totalReveal=window.__devUtsuExit?1:Math.max(0.35,moveReveal);
-    const sec=now/1000,pulse=0.5+0.5*Math.sin(sec*1.6),bounce=Math.sin(sec*1.6)*7;
-    const ax=exitPxX(),ay=exitPxY()+bounce;
-    const col1='#6b1a2a',col2='#a03050',col3='#c06080';
+  function drawKarasukiExitArrow(now) {
+    if (state.roomId !== KARASUKI_EXIT.roomId) return;
+    const moveReveal  = Math.min(1, state.distMovedSinceSpawn / ARROW_MOVE_THRESHOLD);
+    const totalReveal = window.__devUtsuExit ? 1 : Math.max(0.35, moveReveal);
+    const sec=now/1000, pulse=0.5+0.5*Math.sin(sec*1.6), bounce=Math.sin(sec*1.6)*7;
+    const ax=exitPxX(), ay=exitPxY()+bounce;
+    const col1='#6b1a2a', col2='#a03050', col3='#c06080';
     ctx.save();
-    const amb=ctx.createRadialGradient(ax,ay,0,ax,ay,52);amb.addColorStop(0,col1+'44');amb.addColorStop(.5,col2+'22');amb.addColorStop(1,'transparent');
-    ctx.globalAlpha=totalReveal*(0.18+pulse*0.12);ctx.fillStyle=amb;ctx.beginPath();ctx.arc(ax,ay,52,0,Math.PI*2);ctx.fill();
-    ctx.save();ctx.translate(ax,ay);ctx.rotate(Math.PI/2);
-    [{ox:-12,a:0.5},{ox:5,a:0.9}].forEach(({ox,a})=>{
-      ctx.globalAlpha=totalReveal*a*(0.35+pulse*0.32);ctx.strokeStyle=col2;ctx.lineWidth=2.8;ctx.lineCap='round';ctx.lineJoin='round';
-      if(shadowsEnabled){ctx.shadowBlur=12;ctx.shadowColor=col1;}
-      ctx.beginPath();ctx.moveTo(ox-8,-11);ctx.lineTo(ox+8,0);ctx.lineTo(ox-8,11);ctx.stroke();ctx.shadowBlur=0;
-    });ctx.restore();
-    ctx.globalAlpha=totalReveal*(0.65+pulse*0.28);
-    if(shadowsEnabled){ctx.shadowBlur=16;ctx.shadowColor=col2;}
-    const dg=ctx.createRadialGradient(ax,ay,0,ax,ay,6);dg.addColorStop(0,col3);dg.addColorStop(.5,col2);dg.addColorStop(1,'transparent');
-    ctx.fillStyle=dg;ctx.beginPath();ctx.arc(ax,ay,6,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
-    ctx.globalAlpha=totalReveal*(0.50+pulse*0.22);
-    ctx.font='bold 12px monospace';ctx.fillStyle=col3;ctx.textAlign='center';
-    if(shadowsEnabled){ctx.shadowBlur=8;ctx.shadowColor=col1;}
-    ctx.fillText('LEAVE',ax,ay-26);ctx.shadowBlur=0;ctx.textAlign='left';ctx.restore();
+    const amb = ctx.createRadialGradient(ax,ay,0,ax,ay,52); amb.addColorStop(0,col1+'44'); amb.addColorStop(.5,col2+'22'); amb.addColorStop(1,'transparent');
+    ctx.globalAlpha = totalReveal*(0.18+pulse*0.12); ctx.fillStyle = amb; ctx.beginPath(); ctx.arc(ax,ay,52,0,Math.PI*2); ctx.fill();
+    ctx.save(); ctx.translate(ax,ay); ctx.rotate(Math.PI/2);
+    [{ox:-12,a:0.5},{ox:5,a:0.9}].forEach(({ox,a}) => {
+      ctx.globalAlpha = totalReveal*a*(0.35+pulse*0.32); ctx.strokeStyle = col2; ctx.lineWidth = 2.8; ctx.lineCap='round'; ctx.lineJoin='round';
+      if (shadowsEnabled) { ctx.shadowBlur=12; ctx.shadowColor=col1; }
+      ctx.beginPath(); ctx.moveTo(ox-8,-11); ctx.lineTo(ox+8,0); ctx.lineTo(ox-8,11); ctx.stroke(); ctx.shadowBlur=0;
+    }); ctx.restore();
+    ctx.globalAlpha = totalReveal*(0.65+pulse*0.28);
+    if (shadowsEnabled) { ctx.shadowBlur=16; ctx.shadowColor=col2; }
+    const dg = ctx.createRadialGradient(ax,ay,0,ax,ay,6); dg.addColorStop(0,col3); dg.addColorStop(.5,col2); dg.addColorStop(1,'transparent');
+    ctx.fillStyle=dg; ctx.beginPath(); ctx.arc(ax,ay,6,0,Math.PI*2); ctx.fill(); ctx.shadowBlur=0;
+    ctx.globalAlpha = totalReveal*(0.50+pulse*0.22);
+    ctx.font='bold 12px monospace'; ctx.fillStyle=col3; ctx.textAlign='center';
+    if (shadowsEnabled) { ctx.shadowBlur=8; ctx.shadowColor=col1; }
+    ctx.fillText('LEAVE',ax,ay-26); ctx.shadowBlur=0; ctx.textAlign='left'; ctx.restore();
   }
 
-  function checkKarasukiExit(){
-    if(state.roomId!==KARASUKI_EXIT.roomId||state.inputLocked)return;
-    if(performance.now()<exitPopCooldownUntil)return;
-    if(!window.__devUtsuExit&&state.distMovedSinceSpawn<ARROW_MOVE_THRESHOLD)return;
-    if(Math.hypot(state.x-exitPxX(),state.y-exitPxY())<=KARASUKI_EXIT.r){state.clickTarget=null;state.moving=false;openExitPop();}
+  function checkKarasukiExit() {
+    if (state.roomId !== KARASUKI_EXIT.roomId || state.inputLocked) return;
+    if (performance.now() < exitPopCooldownUntil) return;
+    if (!window.__devUtsuExit && state.distMovedSinceSpawn < ARROW_MOVE_THRESHOLD) return;
+    if (Math.hypot(state.x-exitPxX(), state.y-exitPxY()) <= KARASUKI_EXIT.r) { state.clickTarget=null; state.moving=false; openExitPop(); }
   }
-  function clickCheckKarasukiExit(wx,wy){
-    if(state.roomId!==KARASUKI_EXIT.roomId)return false;
-    if(performance.now()<exitPopCooldownUntil)return false;
-    if(Math.hypot(wx-exitPxX(),wy-exitPxY())<=KARASUKI_EXIT.r){openExitPop();return true;}
+  function clickCheckKarasukiExit(wx,wy) {
+    if (state.roomId !== KARASUKI_EXIT.roomId) return false;
+    if (performance.now() < exitPopCooldownUntil) return false;
+    if (Math.hypot(wx-exitPxX(), wy-exitPxY()) <= KARASUKI_EXIT.r) { openExitPop(); return true; }
     return false;
   }
 
   /* ═══════════════════════════════════════════
      DRAW DRIFTERS
+     ─────────────────────────────────────────
+     Quest-active glow is now a prominent multi-ring
+     effect: outer pulse bloom + animated ring + 
+     inner halo. Clearly visible from across the room.
   ═══════════════════════════════════════════ */
-  function drawDrifters(now){
-    const drifter=drifterForRoom(state.roomId);if(!drifter)return;
-    const hasMemories=drifterHasMemories(drifter.id);
-    const quest=getCachedQuest();
-    const isWaiting=!!(quest&&quest.active===drifter.id&&quest.state==='accepted');
-    const useImg2=!!(quest&&quest.active===drifter.id);
-    const imgs=drifterImgs[drifter.id];
-    const img=useImg2?imgs.img2:imgs.img1;
-    const pos=drifterWorldPos(drifter);
+  function drawDrifters(now) {
+    const drifter = drifterForRoom(state.roomId); if (!drifter) return;
+    const hasMemories = drifterHasMemories(drifter.id);
+    const quest       = getCachedQuest();
+    const isWaiting   = !!(quest && quest.active === drifter.id && quest.state === 'accepted');
+    const isCollected = !!(quest && quest.active === drifter.id && quest.state === 'collected');
+    const questActive = isWaiting || isCollected;
+    const useImg2     = !!(quest && quest.active === drifter.id);
+    const imgs        = drifterImgs[drifter.id];
+    const img         = useImg2 ? imgs.img2 : imgs.img1;
+    const pos         = drifterWorldPos(drifter);
 
-    const dw=img.naturalWidth*drifter.scale;
-    const dh=img.naturalHeight*drifter.scale;
-    const alpha=hasMemories?1:0.35;
+    const dw    = img.naturalWidth  * drifter.scale;
+    const dh    = img.naturalHeight * drifter.scale;
+    const alpha = hasMemories ? 1 : 0.35;
+    const sec   = now / 1000;
 
-    /* ── Waiting glow — amber pulse behind sprite when quest accepted ── */
-    if(isWaiting){
-      const sec=now/1000;
-      const pulse=0.5+0.5*Math.sin(sec*2.4);
-      const glowR=Math.max(dw,dh)*0.75;
-      const cx=pos.x, cy=pos.y-dh*0.5;
+    if (questActive) {
+      /* ── OUTER BLOOM: large slow pulse ── */
+      const slowPulse = 0.5 + 0.5 * Math.sin(sec * 1.4);
+      const bloomR    = Math.max(dw, dh) * 1.1 + slowPulse * 18;
+      const cx = pos.x, cy = pos.y - dh * 0.5;
       ctx.save();
-      const g=ctx.createRadialGradient(cx,cy,0,cx,cy,glowR);
-      g.addColorStop(0,'rgba(255,210,80,'+(0.45+pulse*0.30)+')');
-      g.addColorStop(0.5,'rgba(255,160,30,'+(0.18+pulse*0.14)+')');
-      g.addColorStop(1,'transparent');
-      ctx.globalAlpha=1;
-      ctx.fillStyle=g;
-      ctx.beginPath();ctx.arc(cx,cy,glowR,0,Math.PI*2);ctx.fill();
-      if(shadowsEnabled){ctx.shadowBlur=28+pulse*18;ctx.shadowColor='#ffcc40';}
+      const bloom = ctx.createRadialGradient(cx, cy, 0, cx, cy, bloomR);
+      bloom.addColorStop(0,   `rgba(255,210,60,${0.55 + slowPulse*0.30})`);
+      bloom.addColorStop(0.45,`rgba(255,160,20,${0.22 + slowPulse*0.18})`);
+      bloom.addColorStop(0.75,`rgba(255,100,10,${0.08 + slowPulse*0.06})`);
+      bloom.addColorStop(1,   'transparent');
+      ctx.globalAlpha = 1;
+      ctx.fillStyle   = bloom;
+      ctx.beginPath(); ctx.arc(cx, cy, bloomR, 0, Math.PI*2); ctx.fill();
+      ctx.restore();
+
+      /* ── ROTATING RING ── */
+      const ringPulse = 0.5 + 0.5 * Math.sin(sec * 2.8);
+      const ringR     = Math.max(dw, dh) * 0.62 + ringPulse * 8;
+      const rot       = sec * 1.2;
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(rot);
+      /* dashed arc — simulate with 16 arcs */
+      const dashCount = 16;
+      for (let i = 0; i < dashCount; i++) {
+        const a0 = (i / dashCount) * Math.PI*2;
+        const a1 = a0 + (Math.PI*2 / dashCount) * 0.55;
+        ctx.beginPath();
+        ctx.arc(0, 0, ringR, a0, a1);
+        ctx.strokeStyle = isCollected ? '#88ffcc' : '#ffdd44';
+        ctx.lineWidth   = 2.8 + ringPulse * 1.4;
+        ctx.lineCap     = 'round';
+        ctx.globalAlpha = 0.72 + ringPulse * 0.22;
+        if (shadowsEnabled) { ctx.shadowBlur = 12; ctx.shadowColor = isCollected ? '#44ffaa' : '#ffbb00'; }
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+      }
+      ctx.restore();
+
+      /* ── INNER HALO tight around sprite ── */
+      const fastPulse = 0.5 + 0.5 * Math.sin(sec * 3.6);
+      ctx.save();
+      const inner = ctx.createRadialGradient(cx, cy, ringR*0.3, cx, cy, ringR*0.78);
+      inner.addColorStop(0,   `rgba(255,240,120,${0.18 + fastPulse*0.14})`);
+      inner.addColorStop(0.6, `rgba(255,190,40,${0.10 + fastPulse*0.08})`);
+      inner.addColorStop(1,   'transparent');
+      ctx.globalAlpha = 1;
+      ctx.fillStyle   = inner;
+      ctx.beginPath(); ctx.arc(cx, cy, ringR*0.78, 0, Math.PI*2); ctx.fill();
       ctx.restore();
     }
 
+    /* ── Draw sprite ── */
     ctx.save();
-    ctx.globalAlpha=alpha;
-    if(img.complete&&img.naturalWidth>0){
-      if(shadowsEnabled&&hasMemories){ctx.shadowBlur=18;ctx.shadowColor=isWaiting?'#ffcc40':'#d8c0f8';}
-      ctx.drawImage(img,pos.x-dw/2,pos.y-dh,dw,dh);
-      ctx.shadowBlur=0;
+    ctx.globalAlpha = alpha;
+    if (img.complete && img.naturalWidth > 0) {
+      if (shadowsEnabled && hasMemories) {
+        ctx.shadowBlur  = questActive ? 28 : 18;
+        ctx.shadowColor = questActive
+          ? (isCollected ? '#44ffaa' : '#ffcc40')
+          : '#d8c0f8';
+      }
+      ctx.drawImage(img, pos.x-dw/2, pos.y-dh, dw, dh);
+      ctx.shadowBlur = 0;
     } else {
-      ctx.fillStyle='#c090e8';
-      ctx.beginPath();ctx.arc(pos.x,pos.y-40,24,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle = '#c090e8';
+      ctx.beginPath(); ctx.arc(pos.x, pos.y-40, 24, 0, Math.PI*2); ctx.fill();
     }
     ctx.restore();
   }
@@ -984,55 +1117,56 @@ if (yesBtn) yesBtn.addEventListener('click', () => {
   /* ═══════════════════════════════════════════
      DRAW SPARKLES
   ═══════════════════════════════════════════ */
-  function drawSparkles(){
-    for(let i=sparkles.length-1;i>=0;i--){
-      const sp=sparkles[i];sp.life-=0.018;if(sp.life<=0){sparkles.splice(i,1);continue;}
-      sp.x+=sp.vx;sp.y+=sp.vy;sp.vy+=0.06;sp.spin+=sp.dspin;
-      ctx.save();ctx.globalAlpha=sp.life;ctx.translate(sp.x,sp.y);ctx.rotate(sp.spin);
-      if(shadowsEnabled){ctx.shadowBlur=8;ctx.shadowColor=sp.color;}
-      ctx.fillStyle=sp.color;ctx.fillRect(-sp.size/2,-sp.size/2,sp.size,sp.size);
-      ctx.shadowBlur=0;ctx.restore();
+  function drawSparkles() {
+    for (let i = sparkles.length-1; i >= 0; i--) {
+      const sp = sparkles[i]; sp.life -= 0.018; if (sp.life <= 0) { sparkles.splice(i,1); continue; }
+      sp.x += sp.vx; sp.y += sp.vy; sp.vy += 0.06; sp.spin += sp.dspin;
+      ctx.save(); ctx.globalAlpha = sp.life; ctx.translate(sp.x,sp.y); ctx.rotate(sp.spin);
+      if (shadowsEnabled) { ctx.shadowBlur = 8; ctx.shadowColor = sp.color; }
+      ctx.fillStyle = sp.color; ctx.fillRect(-sp.size/2,-sp.size/2,sp.size,sp.size);
+      ctx.shadowBlur = 0; ctx.restore();
     }
   }
 
   /* ═══════════════════════════════════════════
      DRAW PINS
   ═══════════════════════════════════════════ */
-  function drawPins(now){
-    if(!state.coordMode||!pins.length)return;
-    const sec=now/1000;
-    pins.forEach((p,i)=>{
-      const pulse=0.5+0.5*Math.sin(sec*3+i);
-      ctx.save();ctx.globalAlpha=0.80+pulse*0.18;ctx.strokeStyle='#ff8ae2';ctx.lineWidth=1;ctx.setLineDash([3,3]);
-      ctx.beginPath();ctx.moveTo(p.x-14,p.y);ctx.lineTo(p.x+14,p.y);ctx.moveTo(p.x,p.y-14);ctx.lineTo(p.x,p.y+14);ctx.stroke();ctx.setLineDash([]);
-      ctx.globalAlpha=1;ctx.fillStyle='#ff4fc8';if(shadowsEnabled){ctx.shadowBlur=8;ctx.shadowColor='#ff8ae2';}
-      ctx.beginPath();ctx.arc(p.x,p.y,4,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
-      ctx.font='bold 10px monospace';const tw=ctx.measureText(p.label).width,bx=p.x+10,by=p.y-18;
-      ctx.globalAlpha=0.88;ctx.fillStyle='rgba(0,0,0,.75)';ctx.beginPath();ctx.roundRect(bx-4,by-11,tw+10,15,5);ctx.fill();
-      ctx.fillStyle='#ff8ae2';ctx.globalAlpha=1;ctx.fillText(`${i+1}. ${p.label}`,bx+1,by);ctx.restore();
+  function drawPins(now) {
+    if (!state.coordMode || !pins.length) return;
+    const sec = now/1000;
+    pins.forEach((p,i) => {
+      const pulse = 0.5+0.5*Math.sin(sec*3+i);
+      ctx.save(); ctx.globalAlpha = 0.80+pulse*0.18; ctx.strokeStyle = '#ff8ae2'; ctx.lineWidth = 1; ctx.setLineDash([3,3]);
+      ctx.beginPath(); ctx.moveTo(p.x-14,p.y); ctx.lineTo(p.x+14,p.y); ctx.moveTo(p.x,p.y-14); ctx.lineTo(p.x,p.y+14); ctx.stroke(); ctx.setLineDash([]);
+      ctx.globalAlpha = 1; ctx.fillStyle = '#ff4fc8'; if (shadowsEnabled) { ctx.shadowBlur=8; ctx.shadowColor='#ff8ae2'; }
+      ctx.beginPath(); ctx.arc(p.x,p.y,4,0,Math.PI*2); ctx.fill(); ctx.shadowBlur=0;
+      ctx.font = 'bold 10px monospace'; const tw = ctx.measureText(p.label).width, bx=p.x+10, by=p.y-18;
+      ctx.globalAlpha = 0.88; ctx.fillStyle = 'rgba(0,0,0,.75)'; ctx.beginPath(); ctx.roundRect(bx-4,by-11,tw+10,15,5); ctx.fill();
+      ctx.fillStyle = '#ff8ae2'; ctx.globalAlpha = 1; ctx.fillText(`${i+1}. ${p.label}`,bx+1,by); ctx.restore();
     });
   }
 
   /* ═══════════════════════════════════════════
      MAIN DRAW FRAME
   ═══════════════════════════════════════════ */
-  function drawFrame(now){
+  function drawFrame(now) {
     ctx.clearRect(0,0,WORLD_W,WORLD_H);
-    const sec=now/1000;const[col1,col2]=roomColorPair(state.roomId);
+    const sec = now/1000; const [col1,col2] = roomColorPair(state.roomId);
 
-    for(let i=ripples.length-1;i>=0;i--){
-      const rp=ripples[i];rp.life-=0.038;if(rp.life<=0){ripples.splice(i,1);continue;}
-      ctx.save();ctx.globalAlpha=rp.life*0.72;ctx.strokeStyle=col1+'cc';ctx.lineWidth=1.5;
-      ctx.beginPath();ctx.arc(rp.x,rp.y,(1-rp.life)*38+5,0,Math.PI*2);ctx.stroke();ctx.restore();
+    for (let i = ripples.length-1; i >= 0; i--) {
+      const rp = ripples[i]; rp.life -= 0.038; if (rp.life <= 0) { ripples.splice(i,1); continue; }
+      ctx.save(); ctx.globalAlpha = rp.life*0.72; ctx.strokeStyle = col1+'cc'; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.arc(rp.x,rp.y,(1-rp.life)*38+5,0,Math.PI*2); ctx.stroke(); ctx.restore();
     }
-    for(let i=trail.length-1;i>=0;i--){
-      const p=trail[i];const gr=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.size*2.4);
-      gr.addColorStop(0,p.color);gr.addColorStop(1,'transparent');
-      ctx.globalAlpha=p.life*0.48;ctx.fillStyle=gr;ctx.beginPath();ctx.arc(p.x,p.y,p.size*2.4,0,Math.PI*2);ctx.fill();
-      ctx.globalAlpha=p.life*0.90;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(p.x,p.y,p.size*0.3,0,Math.PI*2);ctx.fill();
-      ctx.globalAlpha=1;p.life-=0.022;p.x+=p.vx;p.y+=p.vy;
+    for (let i = trail.length-1; i >= 0; i--) {
+      const p = trail[i];
+      const gr = ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.size*2.4);
+      gr.addColorStop(0,p.color); gr.addColorStop(1,'transparent');
+      ctx.globalAlpha = p.life*0.48; ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(p.x,p.y,p.size*2.4,0,Math.PI*2); ctx.fill();
+      ctx.globalAlpha = p.life*0.90; ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(p.x,p.y,p.size*0.3,0,Math.PI*2); ctx.fill();
+      ctx.globalAlpha = 1; p.life -= 0.022; p.x += p.vx; p.y += p.vy;
     }
-    trail=trail.filter(p=>p.life>0);
+    trail = trail.filter(p => p.life > 0);
 
     drawDrifters(now);
     drawExitArrows(now);
@@ -1040,133 +1174,121 @@ if (yesBtn) yesBtn.addEventListener('click', () => {
     drawSparkles();
 
     /* Ghost */
-    const bobFreq=(Math.PI*2)/(HOVER_PERIOD/1000),bobPhase=sec*bobFreq;
-    const bob=Math.sin(bobPhase)*HOVER_AMP;
-    /* ── During celebration: spin on axis; otherwise normal wobble ── */
-    const wobble = state.celebrating
-      ? ((now - state.celebrateSpinStart) / 1000) * 720   /* 2 full rotations/sec in degrees */
-      : Math.sin(bobPhase*2)*2.2;
-    const gx=state.x,gy=state.y+bob;
-    const pulse=0.5+0.5*Math.sin(sec*2.1);
-    const sx=1-Math.sin(bobPhase)*0.07,sy=(1+Math.sin(bobPhase)*0.10)*(state.moving?1.08:1.0);
-    ctx.save();ctx.globalAlpha=0.22+pulse*0.12;
-    const halo=ctx.createRadialGradient(gx,gy+3,0,gx,gy+3,GHOST_R*2.2);
-    /* ── Gold halo during celebration ── */
+    const bobFreq  = (Math.PI*2)/(HOVER_PERIOD/1000);
+    const bobPhase = sec * bobFreq;
+    const bob      = Math.sin(bobPhase) * HOVER_AMP;
+    const wobble   = state.celebrating
+      ? ((now - state.celebrateSpinStart) / 1000) * 720
+      : Math.sin(bobPhase*2) * 2.2;
+    const gx = state.x, gy = state.y + bob;
+    const pulse = 0.5+0.5*Math.sin(sec*2.1);
+    const sx = 1-Math.sin(bobPhase)*0.07, sy = (1+Math.sin(bobPhase)*0.10)*(state.moving?1.08:1.0);
+    ctx.save(); ctx.globalAlpha = 0.22+pulse*0.12;
+    const halo     = ctx.createRadialGradient(gx,gy+3,0,gx,gy+3,GHOST_R*2.2);
     const haloCol1 = state.celebrating ? '#ffd700' : col1;
     const haloCol2 = state.celebrating ? '#ffaa00' : col2;
-    halo.addColorStop(0,haloCol1);halo.addColorStop(0.5,haloCol2);halo.addColorStop(1,'transparent');
-    ctx.fillStyle=halo;ctx.beginPath();ctx.arc(gx,gy+3,GHOST_R*2.2,0,Math.PI*2);ctx.fill();
-    ctx.globalAlpha=0.18+pulse*0.07;
-    const shd=ctx.createRadialGradient(gx,gy+GHOST_R*.85,0,gx,gy+GHOST_R*.85,GHOST_R*.9);
-    shd.addColorStop(0,'rgba(0,0,0,.65)');shd.addColorStop(1,'transparent');
-    ctx.fillStyle=shd;ctx.beginPath();ctx.arc(gx,gy+GHOST_R*.85,GHOST_R*.9,0,Math.PI*2);ctx.fill();ctx.restore();
-    ctx.save();ctx.translate(gx,gy);ctx.rotate(wobble*Math.PI/180);ctx.scale(sx,sy);
-    if(ghostImg.complete&&ghostImg.naturalWidth>0){
-      if(shadowsEnabled){
-        ctx.shadowBlur=state.celebrating?28+pulse*14:14+pulse*8;
-        ctx.shadowColor=state.celebrating?'#ffd700':col1;
+    halo.addColorStop(0,haloCol1); halo.addColorStop(0.5,haloCol2); halo.addColorStop(1,'transparent');
+    ctx.fillStyle = halo; ctx.beginPath(); ctx.arc(gx,gy+3,GHOST_R*2.2,0,Math.PI*2); ctx.fill();
+    ctx.globalAlpha = 0.18+pulse*0.07;
+    const shd = ctx.createRadialGradient(gx,gy+GHOST_R*.85,0,gx,gy+GHOST_R*.85,GHOST_R*.9);
+    shd.addColorStop(0,'rgba(0,0,0,.65)'); shd.addColorStop(1,'transparent');
+    ctx.fillStyle = shd; ctx.beginPath(); ctx.arc(gx,gy+GHOST_R*.85,GHOST_R*.9,0,Math.PI*2); ctx.fill(); ctx.restore();
+    ctx.save(); ctx.translate(gx,gy); ctx.rotate(wobble*Math.PI/180); ctx.scale(sx,sy);
+    if (ghostImg.complete && ghostImg.naturalWidth > 0) {
+      if (shadowsEnabled) {
+        ctx.shadowBlur  = state.celebrating ? 28+pulse*14 : 14+pulse*8;
+        ctx.shadowColor = state.celebrating ? '#ffd700' : col1;
       }
-      ctx.drawImage(ghostImg,-GHOST_R,-GHOST_R,GHOST_R*2,GHOST_R*2);ctx.shadowBlur=0;
-    } else {ctx.globalAlpha=1;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(0,0,GHOST_R*.7,0,Math.PI*2);ctx.fill();}
+      ctx.drawImage(ghostImg,-GHOST_R,-GHOST_R,GHOST_R*2,GHOST_R*2); ctx.shadowBlur=0;
+    } else { ctx.globalAlpha=1; ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(0,0,GHOST_R*.7,0,Math.PI*2); ctx.fill(); }
     ctx.restore();
-    if(DEV_MODE)drawPins(now);
+    if (DEV_MODE) drawPins(now);
   }
 
   /* ═══════════════════════════════════════════
      CENTER TRAVEL
   ═══════════════════════════════════════════ */
-  function handleCenterTravel(now){
-    if(!state.travelingToCenter)return;
-    const tx=state.clickTarget?.x??CENTER_X,ty=state.clickTarget?.y??CENTER_Y;
-    const dx=tx-state.x,dy=ty-state.y,dist=Math.hypot(dx,dy);
-    if(dist<=ARRIVE_DIST){
-      state.travelingToCenter=false;state.inputLocked=false;state.clickTarget=null;state.moving=false;return;
-    }
-    const prevX=state.x,prevY=state.y;
-    const moved=tryMove(state.x+(dx/dist)*SPEED,state.y+(dy/dist)*SPEED);
-    state.moving=moved;
-    if(moved){state.distMovedSinceSpawn+=Math.hypot(state.x-prevX,state.y-prevY);addTrailParticle(state.x,state.y,now);}
-    else{state.travelingToCenter=false;state.inputLocked=false;state.clickTarget=null;state.moving=false;}
+  function handleCenterTravel(now) {
+    if (!state.travelingToCenter) return;
+    const tx = state.clickTarget?.x ?? CENTER_X, ty = state.clickTarget?.y ?? CENTER_Y;
+    const dx = tx-state.x, dy = ty-state.y, dist = Math.hypot(dx,dy);
+    if (dist <= ARRIVE_DIST) { state.travelingToCenter=false; state.inputLocked=false; state.clickTarget=null; state.moving=false; return; }
+    const prevX=state.x, prevY=state.y;
+    const moved = tryMove(state.x+(dx/dist)*SPEED, state.y+(dy/dist)*SPEED);
+    state.moving = moved;
+    if (moved) { state.distMovedSinceSpawn += Math.hypot(state.x-prevX,state.y-prevY); addTrailParticle(state.x,state.y,now); }
+    else { state.travelingToCenter=false; state.inputLocked=false; state.clickTarget=null; state.moving=false; }
   }
 
   /* ═══════════════════════════════════════════
      PLAYER MOVEMENT
   ═══════════════════════════════════════════ */
-  function handleClickMovement(now){
-    if(state.travelingToCenter||state.inputLocked)return;
-    if(!state.clickTarget){state.moving=false;return;}
-    const tx=state.clickTarget.x,ty=state.clickTarget.y;
-    const dx=tx-state.x,dy=ty-state.y,dist=Math.hypot(dx,dy);
-    if(dist<=CLICK_STOP_DIST){state.clickTarget=null;state.moving=false;return;}
-    const prevX=state.x,prevY=state.y;
-    const moved=tryMove(state.x+(dx/dist)*SPEED,state.y+(dy/dist)*SPEED);
-    state.moving=moved;
-    if(!moved){state.clickTarget=null;state.moving=false;}
-    else{state.distMovedSinceSpawn+=Math.hypot(state.x-prevX,state.y-prevY);addTrailParticle(state.x,state.y,now);}
+  function handleClickMovement(now) {
+    if (state.travelingToCenter || state.inputLocked) return;
+    if (!state.clickTarget) { state.moving = false; return; }
+    const tx=state.clickTarget.x, ty=state.clickTarget.y;
+    const dx=tx-state.x, dy=ty-state.y, dist=Math.hypot(dx,dy);
+    if (dist <= CLICK_STOP_DIST) { state.clickTarget=null; state.moving=false; return; }
+    const prevX=state.x, prevY=state.y;
+    const moved = tryMove(state.x+(dx/dist)*SPEED, state.y+(dy/dist)*SPEED);
+    state.moving = moved;
+    if (!moved) { state.clickTarget=null; state.moving=false; }
+    else { state.distMovedSinceSpawn += Math.hypot(state.x-prevX,state.y-prevY); addTrailParticle(state.x,state.y,now); }
   }
 
   /* ═══════════════════════════════════════════
      DRIFTER HIT CHECK
   ═══════════════════════════════════════════ */
-  function clickCheckDrifter(wx,wy){
-    if(state.inputLocked||drifterPanelOpen)return false;
-    const drifter=drifterForRoom(state.roomId);if(!drifter)return false;
-    const pos=drifterWorldPos(drifter);
-    const imgs=drifterImgs[drifter.id];
-    const img=imgs.img1;
-    const dw=img.naturalWidth*drifter.scale;
-    const dh=img.naturalHeight*drifter.scale;
-    if(wx>=pos.x-dw/2&&wx<=pos.x+dw/2&&wy>=pos.y-dh&&wy<=pos.y){openDrifterPanel(drifter);return true;}
+  function clickCheckDrifter(wx,wy) {
+    if (state.inputLocked || drifterPanelOpen) return false;
+    const drifter = drifterForRoom(state.roomId); if (!drifter) return false;
+    const pos  = drifterWorldPos(drifter);
+    const imgs = drifterImgs[drifter.id];
+    const img  = imgs.img1;
+    const dw   = img.naturalWidth  * drifter.scale;
+    const dh   = img.naturalHeight * drifter.scale;
+    if (wx >= pos.x-dw/2 && wx <= pos.x+dw/2 && wy >= pos.y-dh && wy <= pos.y) { openDrifterPanel(drifter); return true; }
     return false;
   }
 
   /* ═══════════════════════════════════════════
-     FIX 3: unified tap handler — click + touch both route here
+     UNIFIED TAP HANDLER
   ═══════════════════════════════════════════ */
-  function handleWorldTap(wx,wy){
-    if(DEV_MODE&&state.coordMode){dropPin(wx,wy);ripples.push({x:wx,y:wy,life:1});return;}
-    if(clickCheckDrifter(wx,wy)){ripples.push({x:wx,y:wy,life:1});return;}
-    if(clickCheckKarasukiExit(wx,wy)){ripples.push({x:wx,y:wy,life:1});return;}
-    state.clickTarget={x:wx,y:wy};ripples.push({x:wx,y:wy,life:1});
+  function handleWorldTap(wx,wy) {
+    if (DEV_MODE && state.coordMode) { dropPin(wx,wy); ripples.push({x:wx,y:wy,life:1}); return; }
+    if (clickCheckDrifter(wx,wy))       { ripples.push({x:wx,y:wy,life:1}); return; }
+    if (clickCheckKarasukiExit(wx,wy))  { ripples.push({x:wx,y:wy,life:1}); return; }
+    state.clickTarget = { x:wx, y:wy }; ripples.push({x:wx,y:wy,life:1});
   }
 
-
-/* ═══════════════════════════════════════════
-     MODAL GUARD — single source of truth
+  /* ═══════════════════════════════════════════
+     MODAL GUARD
   ═══════════════════════════════════════════ */
   function anyModalOpen() {
     return (
-      state.transitioning      ||
-      state.exitingToKarasuki  ||
-      state.celebrating        ||
-      drifterPanelOpen         ||
+      state.transitioning     ||
+      state.exitingToKarasuki ||
+      state.celebrating       ||
+      drifterPanelOpen        ||
       isExitPopOpen()
     );
   }
 
-
-    
   /* ═══════════════════════════════════════════
      MAIN LOOP
   ═══════════════════════════════════════════ */
-  function tick(now){
+  function tick(now) {
     updatePerfTier(now);
-    const dt=Math.min(50,Math.max(8,now-(lastTickTime||now)));
-    lastTickTime=now;SPEED=BASE_SPEED*(dt/TARGET_DT);
-    /* expire celebration */
-    if(state.celebrating&&now>=state.celebrateUntil){
-      state.celebrating=false;
-      state.inputLocked=false;
-    }
-    
-    if(!anyModalOpen()){
-      
-      if(state.travelingToCenter){handleCenterTravel(now);}
-      else{
+    const dt = Math.min(50, Math.max(8, now-(lastTickTime||now)));
+    lastTickTime = now; SPEED = BASE_SPEED * (dt/TARGET_DT);
+    if (state.celebrating && now >= state.celebrateUntil) { state.celebrating=false; state.inputLocked=false; }
+    if (!anyModalOpen()) {
+      if (state.travelingToCenter) { handleCenterTravel(now); }
+      else {
         handleClickMovement(now);
-        const unlocked=now>=state.spawnLockUntil&&state.distMovedSinceSpawn>=ARROW_MOVE_THRESHOLD;
-        if(unlocked)checkKarasukiExit();
-        if(unlocked){const exit=getNPPExit(now);if(exit){state.clickTarget=null;state.moving=false;transitionTo(exit);}}
+        const unlocked = now >= state.spawnLockUntil && state.distMovedSinceSpawn >= ARROW_MOVE_THRESHOLD;
+        if (unlocked) checkKarasukiExit();
+        if (unlocked) { const exit = getNPPExit(now); if (exit) { state.clickTarget=null; state.moving=false; transitionTo(exit); } }
       }
     }
     drawFrame(now);
@@ -1176,51 +1298,59 @@ if (yesBtn) yesBtn.addEventListener('click', () => {
   /* ═══════════════════════════════════════════
      MUSIC + INPUT
   ═══════════════════════════════════════════ */
-  function startMusic(){if(state.musicStarted)return;state.musicStarted=true;music.play().catch(()=>{});}
+  function startMusic() { if (state.musicStarted) return; state.musicStarted=true; music.play().catch(()=>{}); }
 
-  function stagePointToWorld(cx,cy){
-    const rect=stage.getBoundingClientRect();
-    return clampToWorld(((cx-rect.left)/rect.width)*WORLD_W,((cy-rect.top)/rect.height)*WORLD_H);
+  function stagePointToWorld(cx,cy) {
+    const rect = stage.getBoundingClientRect();
+    return clampToWorld(((cx-rect.left)/rect.width)*WORLD_W, ((cy-rect.top)/rect.height)*WORLD_H);
   }
 
-  function bindInput(){
-    if(DEV_MODE){
-      stage.addEventListener('mousemove',e=>{
-        if(!state.coordMode)return;
-        const p=stagePointToWorld(e.clientX,e.clientY);
-        const el=document.getElementById('buki-coord-xy');if(el)el.textContent=`${Math.round(p.x)}, ${Math.round(p.y)}`;
+  function bindInput() {
+    if (DEV_MODE) {
+      stage.addEventListener('mousemove', e => {
+        if (!state.coordMode) return;
+        const p  = stagePointToWorld(e.clientX, e.clientY);
+        const el = document.getElementById('buki-coord-xy'); if (el) el.textContent = `${Math.round(p.x)}, ${Math.round(p.y)}`;
       });
     }
-
-    /* ── FIX 3: both events call handleWorldTap ── */
-    stage.addEventListener('click',e=>{
+    stage.addEventListener('click', e => {
       startMusic();
-      if(state.transitioning||state.travelingToCenter||state.inputLocked)return;
-      const p=stagePointToWorld(e.clientX,e.clientY);
-      handleWorldTap(p.x,p.y);
+      if (state.transitioning || state.travelingToCenter || state.inputLocked) return;
+      const p = stagePointToWorld(e.clientX, e.clientY);
+      handleWorldTap(p.x, p.y);
     });
-
-    stage.addEventListener('touchend',e=>{
+    stage.addEventListener('touchend', e => {
       startMusic();
-      if(state.transitioning||state.travelingToCenter||state.inputLocked){e.preventDefault();return;}
-      if(!e.changedTouches.length)return;
-      const t0=e.changedTouches[0];
-      const p=stagePointToWorld(t0.clientX,t0.clientY);
-      handleWorldTap(p.x,p.y);
+      if (state.transitioning || state.travelingToCenter || state.inputLocked) { e.preventDefault(); return; }
+      if (!e.changedTouches.length) return;
+      const t0 = e.changedTouches[0];
+      const p  = stagePointToWorld(t0.clientX, t0.clientY);
+      handleWorldTap(p.x, p.y);
       e.preventDefault();
-    },{passive:false});
-
-    document.addEventListener('click',startMusic,{once:true});
-    document.addEventListener('touchend',startMusic,{once:true,passive:true});
+    }, { passive:false });
+    document.addEventListener('click',    startMusic, { once:true });
+    document.addEventListener('touchend', startMusic, { once:true, passive:true });
   }
 
   /* ═══════════════════════════════════════════
      INIT
   ═══════════════════════════════════════════ */
-  function init(){
-    injectStyles();buildApp();fitStage();resizeCanvas();renderInitialRoom();bindInput();
-    window.addEventListener('resize',()=>{fitStage();resizeCanvas();});
-    try{const d=loadSave();if(!d.weekly)d.weekly={};d.weekly.utsuobaVisited=true;writeSave(d);}catch(_){}
+  function init() {
+    injectStyles();
+    buildApp();
+    fitStage();
+    resizeCanvas();
+    renderInitialRoom();
+    bindInput();
+    window.addEventListener('resize', () => { fitStage(); resizeCanvas(); });
+    /* mark utsuroba visited in save */
+    try {
+      const d = loadSave();
+      if (!d.utsuroba.visitedRooms) d.utsuroba.visitedRooms = {};
+      d.utsuroba.flags = d.utsuroba.flags || {};
+      d.utsuroba.flags.visited = true;
+      writeSave(d);
+    } catch(_) {}
     requestAnimationFrame(tick);
   }
 
