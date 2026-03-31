@@ -10,7 +10,10 @@
   const WORLD_H         = 1024;
   const GHOST_R         = 26;
   const GHOST_RADIUS    = 18;
-  const BASE_SPEED      = 5.5;
+  
+  const IS_PHONE        = ('ontouchstart' in window || navigator.maxTouchPoints > 0) && window.innerWidth < 768;
+  const BASE_SPEED      = IS_PHONE ? 7.5 : 5.5;
+  
   const FADE_MS         = 600;
   const CLICK_STOP_DIST = 6;
   const HOVER_AMP       = 9;
@@ -48,7 +51,8 @@
   const ARROW_MOVE_THRESHOLD          = 30;
   const PORTAL_TRIGGER_R              = 36;
 
-  const POPUP_COOLDOWN_MS = 900;
+  const POPUP_COOLDOWN_MS  = 900;
+  const TAP_COOLDOWN_MS    = 120;
   let   bonusPopCooldownUntil       = 0;
   let   wandererPopCooldownUntil    = 0;
   let   utsurobaCooldownUntil       = 0;
@@ -1120,7 +1124,7 @@
     arrivalDir: null, transitioning: false, transitionReadyAt: 0,
     clickTarget: null, moving: false, distMovedSinceSpawn: 0,
     mazeExiting: false, coordMode: false, musicStarted: false,
-    lastTrailT: 0, spawnLockUntil: 0,
+    lastTrailT: 0, spawnLockUntil: 0, tapCooldownUntil: 0,
   };
 
   (function checkReturnFromProfile() {
@@ -1699,14 +1703,20 @@
     startMusic();
     if (anyModalOpen()) return;
     if (isEntryDriftActive()) return;
+    const now = performance.now();
     const p=stagePointToWorld(clientX,clientY);
     if(state.coordMode){dropPin(p.x,p.y);ripples.push({x:p.x,y:p.y,life:1});return;}
+    // Interactive elements always respond immediately regardless of tap cooldown
     if(clickCheckOrbs(p.x,p.y)){ripples.push({x:p.x,y:p.y,life:1});return;}
     if(isNearPortal(p)){openPortal();ripples.push({x:p.x,y:p.y,life:1});return;}
     if(clickCheckUtsuobaPortal(p.x,p.y)){ripples.push({x:p.x,y:p.y,life:1});return;}
     if(clickCheckWanderers(p.x,p.y)){ripples.push({x:p.x,y:p.y,life:1});return;}
     if(clickBonusTree(p.x,p.y)){ripples.push({x:p.x,y:p.y,life:1});return;}
-    state.clickTarget={x:p.x,y:p.y}; ripples.push({x:p.x,y:p.y,life:1});
+    // Movement taps: ignore while ghost is still moving toward a recent tap
+    if(state.moving && now < state.tapCooldownUntil) return;
+    state.clickTarget={x:p.x,y:p.y};
+    state.tapCooldownUntil = now + TAP_COOLDOWN_MS;
+    ripples.push({x:p.x,y:p.y,life:1});
   }
 
   function bindInput() {
