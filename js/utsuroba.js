@@ -152,30 +152,43 @@
     try { localStorage.setItem(SAVE_KEY, JSON.stringify(data)); } catch(_) {}
   }
 
-  /* ── one-time migration: move data.drifters → data.utsuroba.drifters ── */
+  /* ── one-time migration: move data.drifters → data.utsuroba.drifters ──
+     Returns the (possibly mutated) data object.
+     Never calls writeSave — callers decide whether to flush.        ── */
   function migrateUtsurobaSave(data) {
-    if (!data.utsuroba) data.utsuroba = {};
-    if (!data.karasuki) data.karasuki = {};
-    if (!data.weekly)   data.weekly   = {};
+    let dirty = false;
+
+    if (!data.utsuroba) { data.utsuroba = {}; dirty = true; }
+    if (!data.karasuki) { data.karasuki = {}; dirty = true; }
+    if (!data.weekly)   { data.weekly   = {}; dirty = true; }
 
     /* old flat drifters namespace → utsuroba.drifters */
     if (data.drifters && !data.utsuroba.drifters) {
       data.utsuroba.drifters = data.drifters;
       delete data.drifters;
-      writeSave(data);
+      dirty = true;
     }
-    if (!data.utsuroba.drifters)   data.utsuroba.drifters   = {};
-    if (!data.utsuroba.visitedRooms) data.utsuroba.visitedRooms = {};
-    if (!data.utsuroba.flags)       data.utsuroba.flags       = {};
+    if (!data.utsuroba.drifters)     { data.utsuroba.drifters     = {}; dirty = true; }
+    if (!data.utsuroba.visitedRooms) { data.utsuroba.visitedRooms = {}; dirty = true; }
+    if (!data.utsuroba.flags)        { data.utsuroba.flags        = {}; dirty = true; }
+
+    /* old weekly.utsuobaVisited (typo) → utsuroba.flags.visited */
+    if (data.weekly.utsuobaVisited || data.weekly.utsurobaVisited) {
+      data.utsuroba.flags.visited = true;
+      delete data.weekly.utsuobaVisited;
+      delete data.weekly.utsurobaVisited;
+      dirty = true;
+    }
 
     /* old weekly.drifterQuest collectedMemKey → collectedMemoryId */
     const q = data.weekly.drifterQuest;
     if (q && q.collectedMemKey !== undefined && q.collectedMemoryId === undefined) {
       q.collectedMemoryId = q.collectedMemKey;
       delete q.collectedMemKey;
-      writeSave(data);
+      dirty = true;
     }
 
+    if (dirty) writeSave(data);
     return data;
   }
 
@@ -1332,6 +1345,16 @@
     document.addEventListener('touchend', startMusic, { once:true, passive:true });
   }
 
+  /* ── canonical visited flag: data.utsuroba.flags.visited ── */
+  function markVisited() {
+    try {
+      const d = loadSave();
+      if (d.utsuroba.flags.visited) return;   /* already set — no write needed */
+      d.utsuroba.flags.visited = true;
+      writeSave(d);
+    } catch(_) {}
+  }
+
   /* ═══════════════════════════════════════════
      INIT
   ═══════════════════════════════════════════ */
@@ -1343,14 +1366,7 @@
     renderInitialRoom();
     bindInput();
     window.addEventListener('resize', () => { fitStage(); resizeCanvas(); });
-    /* mark utsuroba visited in save */
-    try {
-      const d = loadSave();
-      if (!d.utsuroba.visitedRooms) d.utsuroba.visitedRooms = {};
-      d.utsuroba.flags = d.utsuroba.flags || {};
-      d.utsuroba.flags.visited = true;
-      writeSave(d);
-    } catch(_) {}
+    markVisited();
     requestAnimationFrame(tick);
   }
 
