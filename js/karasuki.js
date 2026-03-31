@@ -81,78 +81,78 @@
 
   const NPP = {
     room_01: [
-      { dir: "right", x: 1340, y: 658,  to: "room_02", spawn: "fromLeft"  },
-      { dir: "up",    x: 1084, y: 250,  to: "room_06", spawn: "fromDown"  }
+      { dir: "right", x: 1199, y: 638,  to: "room_02", spawn: "fromLeft"  },
+      { dir: "up",    x: 1035, y: 339,  to: "room_06", spawn: "fromDown"  }
     ],
     room_02: [
-      { dir: "left",  x: 260,  y: 255,  to: "room_01", spawn: "fromRight" },
-      { dir: "right", x: 1340, y: 727,  to: "room_03", spawn: "fromLeft"  },
+      { dir: "left",  x: 439,  y: 473,  to: "room_01", spawn: "fromRight" },
+      { dir: "right", x: 1133, y: 642,  to: "room_03", spawn: "fromLeft"  },
       { dir: "up",    x: 765,  y: 230,  to: "room_07", spawn: "fromDown"  }
     ],
     room_03: [
-      { dir: "left",  x: 320,  y: 328,  to: "room_02", spawn: "fromRight" },
-      { dir: "right", x: 1170, y: 237,  to: "room_04", spawn: "fromLeft"  },
+      { dir: "left",  x: 410,  y: 377,  to: "room_02", spawn: "fromRight" },
+      { dir: "right", x: 1093, y: 371,  to: "room_04", spawn: "fromLeft"  },
       { dir: "up",    x: 785,  y: 270,  to: "room_08", spawn: "fromDown"  }
     ],
     room_04: [
-      { dir: "left",  x: 210,  y: 635,  to: "room_03", spawn: "fromRight" },
-      { dir: "right", x: 1330, y: 734,  to: "room_05", spawn: "fromLeft"  },
+      { dir: "left",  x: 382,  y: 606,  to: "room_03", spawn: "fromRight" },
+      { dir: "right", x: 1146, y: 660,  to: "room_05", spawn: "fromLeft"  },
       { dir: "up",    x: 548,  y: 270,  to: "room_09", spawn: "fromDown"  }
     ],
     room_05: [
-      { dir: "left",  x: 212,  y: 642,  to: "room_04", spawn: "fromRight" },
-      { dir: "up",    x: 435,  y: 310,  to: "room_10", spawn: "fromDown"  }
+      { dir: "left",  x: 314,  y: 630,  to: "room_04", spawn: "fromRight" },
+      { dir: "up",    x: 480,  y: 341,  to: "room_10", spawn: "fromDown"  }
     ],
     room_06: [
       { dir: "right", x: 1229, y: 652,  to: "room_07", spawn: "fromLeft"  },
-      { dir: "up",    x: 1065, y: 239,  to: "room_11", spawn: "fromDown"  },
-      { dir: "down",  x: 623,  y: 840,  to: "room_01", spawn: "fromUp"    }
+      { dir: "up",    x: 1033, y: 314,  to: "room_11", spawn: "fromDown"  },
+      { dir: "down",  x: 718,  y: 761,  to: "room_01", spawn: "fromUp"    }
     ],
     room_07: [
-      { dir: "left",  x: 160,  y: 687,  to: "room_06", spawn: "fromRight" },
-      { dir: "right", x: 1220, y: 614,  to: "room_08", spawn: "fromLeft"  },
-      { dir: "up",    x: 555,  y: 250,  to: "room_12", spawn: "fromDown"  },
-      { dir: "down",  x: 901,  y: 800,  to: "room_02", spawn: "fromUp"    }
+      { dir: "left",  x: 366,  y: 642,  to: "room_06", spawn: "fromRight" },
+      { dir: "right", x: 1108, y: 611,  to: "room_08", spawn: "fromLeft"  },
+      { dir: "up",    x: 561,  y: 300,  to: "room_12", spawn: "fromDown"  },
+      { dir: "down",  x: 820,  y: 757,  to: "room_02", spawn: "fromUp"    }
     ],
     room_08: [
-      { dir: "left",  x: 190,  y: 776,  to: "room_07", spawn: "fromRight" },
-      { dir: "right", x: 1390, y: 592,  to: "room_09", spawn: "fromLeft"  },
-      { dir: "up",    x: 984,  y: 240,  to: "room_13", spawn: "fromDown"  },
-      { dir: "down",  x: 848,  y: 847,  to: "room_03", spawn: "fromUp"    }
+      { dir: "left",  x: 436,  y: 692,  to: "room_07", spawn: "fromRight" },
+      { dir: "right", x: 1186, y: 585,  to: "room_09", spawn: "fromLeft"  },
+      { dir: "up",    x: 963,  y: 298,  to: "room_13", spawn: "fromDown"  },
+      { dir: "down",  x: 825,  y: 758,  to: "room_03", spawn: "fromUp"    }
     ],
     room_09: [
-      { dir: "left",  x: 160,  y: 702,  to: "room_08", spawn: "fromRight" },
-      { dir: "right", x: 1365, y: 224,  to: "room_10", spawn: "fromLeft"  },
-      { dir: "up",    x: 449,  y: 270,  to: "room_14", spawn: "fromDown"  },
-      { dir: "down",  x: 918,  y: 800,  to: "room_04", spawn: "fromUp"    }
+      { dir: "left",  x: 304,  y: 666,  to: "room_08", spawn: "fromRight" },
+      { dir: "right", x: 1148, y: 493,  to: "room_10", spawn: "fromLeft"  },
+      { dir: "up",    x: 465,  y: 318,  to: "room_14", spawn: "fromDown"  },
+      { dir: "down",  x: 781,  y: 763,  to: "room_04", spawn: "fromUp"    }
     ],
     room_10: [
-      { dir: "left",  x: 160,  y: 702,  to: "room_09", spawn: "fromRight" },
+      { dir: "left",  x: 394,  y: 655,  to: "room_09", spawn: "fromRight" },
       { dir: "up",    x: 838,  y: 270,  to: "room_15", spawn: "fromDown"  },
       { dir: "down",  x: 776,  y: 800,  to: "room_05", spawn: "fromUp"    }
     ],
     room_11: [
-      { dir: "right", x: 1250, y: 312,  to: "room_12", spawn: "fromLeft"  },
+      { dir: "right", x: 1167, y: 468,  to: "room_12", spawn: "fromLeft"  },
       { dir: "down",  x: 804,  y: 800,  to: "room_06", spawn: "fromUp"    }
     ],
     room_12: [
-      { dir: "left",  x: 290,  y: 344,  to: "room_11", spawn: "fromRight" },
-      { dir: "right", x: 1251, y: 671,  to: "room_13", spawn: "fromLeft"  },
-      { dir: "down",  x: 751,  y: 820,  to: "room_07", spawn: "fromUp"    }
+      { dir: "left",  x: 431,  y: 494,  to: "room_11", spawn: "fromRight" },
+      { dir: "right", x: 1092, y: 642,  to: "room_13", spawn: "fromLeft"  },
+      { dir: "down",  x: 733,  y: 741,  to: "room_07", spawn: "fromUp"    }
     ],
     room_13: [
-      { dir: "left",  x: 200,  y: 568,  to: "room_12", spawn: "fromRight" },
-      { dir: "right", x: 1310, y: 242,  to: "room_14", spawn: "fromLeft"  },
-      { dir: "down",  x: 910,  y: 820,  to: "room_08", spawn: "fromUp"    }
+      { dir: "left",  x: 361,  y: 564,  to: "room_12", spawn: "fromRight" },
+      { dir: "right", x: 1192, y: 518,  to: "room_14", spawn: "fromLeft"  },
+      { dir: "down",  x: 813,  y: 731,  to: "room_08", spawn: "fromUp"    }
     ],
     room_14: [
-      { dir: "left",  x: 303,  y: 631,  to: "room_13", spawn: "fromRight" },
-      { dir: "right", x: 1370, y: 716,  to: "room_15", spawn: "fromLeft"  },
-      { dir: "down",  x: 751,  y: 820,  to: "room_09", spawn: "fromUp"    }
+      { dir: "left",  x: 390,  y: 602,  to: "room_13", spawn: "fromRight" },
+      { dir: "right", x: 1170, y: 684,  to: "room_15", spawn: "fromLeft"  },
+      { dir: "down",  x: 758,  y: 745,  to: "room_09", spawn: "fromUp"    }
     ],
     room_15: [
-      { dir: "left",  x: 200,  y: 568,  to: "room_14", spawn: "fromRight" },
-      { dir: "down",  x: 663,  y: 800,  to: "room_10", spawn: "fromUp"    }
+      { dir: "left",  x: 407,  y: 645,  to: "room_14", spawn: "fromRight" },
+      { dir: "down",  x: 717,  y: 744,  to: "room_10", spawn: "fromUp"    }
     ]
   };
 
