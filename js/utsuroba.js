@@ -57,7 +57,7 @@
   /* ═══════════════════════════════════════════
      DEV MODE
   ═══════════════════════════════════════════ */
-  const DEV_MODE = true;
+  const DEV_MODE = false;
 
   /* ═══════════════════════════════════════════
      COLOURS
@@ -1071,41 +1071,6 @@
       ctx.beginPath(); ctx.arc(cx, cy, bloomR, 0, Math.PI*2); ctx.fill();
       ctx.restore();
 
-      /* ── ROTATING RING ── */
-      const ringPulse = 0.5 + 0.5 * Math.sin(sec * 2.8);
-      const ringR     = Math.max(dw, dh) * 0.62 + ringPulse * 8;
-      const rot       = sec * 1.2;
-      ctx.save();
-      ctx.translate(cx, cy);
-      ctx.rotate(rot);
-      /* dashed arc — simulate with 16 arcs */
-      const dashCount = 16;
-      for (let i = 0; i < dashCount; i++) {
-        const a0 = (i / dashCount) * Math.PI*2;
-        const a1 = a0 + (Math.PI*2 / dashCount) * 0.55;
-        ctx.beginPath();
-        ctx.arc(0, 0, ringR, a0, a1);
-        ctx.strokeStyle = isCollected ? '#88ffcc' : '#ffdd44';
-        ctx.lineWidth   = 2.8 + ringPulse * 1.4;
-        ctx.lineCap     = 'round';
-        ctx.globalAlpha = 0.72 + ringPulse * 0.22;
-        if (shadowsEnabled) { ctx.shadowBlur = 12; ctx.shadowColor = isCollected ? '#44ffaa' : '#ffbb00'; }
-        ctx.stroke();
-        ctx.shadowBlur = 0;
-      }
-      ctx.restore();
-
-      /* ── INNER HALO tight around sprite ── */
-      const fastPulse = 0.5 + 0.5 * Math.sin(sec * 3.6);
-      ctx.save();
-      const inner = ctx.createRadialGradient(cx, cy, ringR*0.3, cx, cy, ringR*0.78);
-      inner.addColorStop(0,   `rgba(255,240,120,${0.18 + fastPulse*0.14})`);
-      inner.addColorStop(0.6, `rgba(255,190,40,${0.10 + fastPulse*0.08})`);
-      inner.addColorStop(1,   'transparent');
-      ctx.globalAlpha = 1;
-      ctx.fillStyle   = inner;
-      ctx.beginPath(); ctx.arc(cx, cy, ringR*0.78, 0, Math.PI*2); ctx.fill();
-      ctx.restore();
     }
 
     /* ── Draw sprite ── */
@@ -1267,12 +1232,12 @@
   /* ═══════════════════════════════════════════
      UNIFIED TAP HANDLER
   ═══════════════════════════════════════════ */
-  function handleWorldTap(wx,wy) {
-    if (DEV_MODE && state.coordMode) { dropPin(wx,wy); ripples.push({x:wx,y:wy,life:1}); return; }
-    if (clickCheckDrifter(wx,wy))       { ripples.push({x:wx,y:wy,life:1}); return; }
-    if (clickCheckKarasukiExit(wx,wy))  { ripples.push({x:wx,y:wy,life:1}); return; }
-    state.clickTarget = { x:wx, y:wy }; ripples.push({x:wx,y:wy,life:1});
-  }
+  function handleWorldTap(wx, wy) {
+  if (DEV_MODE && state.coordMode) { dropPin(wx,wy); ripples.push({x:wx,y:wy,life:1}); return; }
+  if (clickCheckKarasukiExit(wx, wy)) { ripples.push({x:wx,y:wy,life:1}); return; }  // ← moved up
+  if (clickCheckDrifter(wx, wy))      { ripples.push({x:wx,y:wy,life:1}); return; }
+  state.clickTarget = { x:wx, y:wy }; ripples.push({x:wx,y:wy,life:1});
+}
 
   /* ═══════════════════════════════════════════
      MODAL GUARD
