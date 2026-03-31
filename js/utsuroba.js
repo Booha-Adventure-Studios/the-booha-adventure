@@ -57,7 +57,7 @@
   /* ═══════════════════════════════════════════
      DEV MODE
   ═══════════════════════════════════════════ */
-  const DEV_MODE = false;
+  const DEV_MODE = true;
 
   /* ═══════════════════════════════════════════
      COLOURS
@@ -129,14 +129,8 @@
   const SAVE_KEY = 'booha_save';
 
   function loadSave() {
-    /* 1. prefer the registered BoohaAdventure system */
-    try {
-      if (window.BoohaAdventure?.save) {
-        const d = BoohaAdventure.save.load();
-        if (d && typeof d === 'object') return migrateUtsurobaSave(d);
-      }
-    } catch(_) {}
-    /* 2. direct localStorage fallback (works when adventure-core isn't loaded) */
+    /* always read directly from localStorage — BoohaAdventure.save may have
+       a stale in-memory cache that predates writes made by this engine */
     try {
       const raw = localStorage.getItem(SAVE_KEY);
       const d   = raw ? JSON.parse(raw) : {};
@@ -147,9 +141,12 @@
 
   function writeSave(data) {
     try {
-      if (window.BoohaAdventure?.save) { BoohaAdventure.save.save(data); return; }
+      data.updatedAt = Date.now();
+      localStorage.setItem(SAVE_KEY, JSON.stringify(data));
     } catch(_) {}
-    try { localStorage.setItem(SAVE_KEY, JSON.stringify(data)); } catch(_) {}
+    /* notify BoohaAdventure if it exposes an invalidate hook, so its
+       cache doesn't serve stale data to other pages */
+    try { if (window.BoohaAdventure?.save?.invalidate) BoohaAdventure.save.invalidate(); } catch(_) {}
   }
 
   /* ── one-time migration: move data.drifters → data.utsuroba.drifters ──
@@ -1190,7 +1187,7 @@
       const orbitBob  = Math.sin(elapsed * 3.1) * 14;       /* vertical waver */
       gx     = state.celebrateOrbitX + Math.cos(orbitAngle) * orbitR;
       gy     = state.celebrateOrbitY + Math.sin(orbitAngle) * orbitR * 0.55 + orbitBob;
-      wobble = orbitAngle * (180/Math.PI) + 90; /* face direction of travel */
+      wobble = Math.sin(elapsed * 1.8) * 12;    /* gentle sway, no axis spin */
       sx     = 1.0 + Math.sin(elapsed*4)*0.08;
       sy     = 1.0 + Math.cos(elapsed*4)*0.08;
       /* keep state.x/y updated so trail follows orbit */
