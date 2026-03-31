@@ -52,8 +52,11 @@
   const PORTAL_TRIGGER_R              = 36;
 
   const POPUP_COOLDOWN_MS  = 900;
-  const TAP_COOLDOWN_MS    = 180;
-  const TAP_MIN_DIST       = 30;   
+  
+  const TAP_COOLDOWN_MS        = 180;   // base cooldown after any movement tap
+  const TAP_NEAR_COOLDOWN_MS   = 600;   // longer cooldown if tap is near last tap
+  const TAP_NEAR_DIST          = 60;    // distance threshold for "near last tap"
+  const TAP_MIN_DIST           = 30;    // ignore taps too close to ghost   
   
   let   bonusPopCooldownUntil       = 0;
   let   wandererPopCooldownUntil    = 0;
@@ -1126,7 +1129,8 @@
     arrivalDir: null, transitioning: false, transitionReadyAt: 0,
     clickTarget: null, moving: false, distMovedSinceSpawn: 0,
     mazeExiting: false, coordMode: false, musicStarted: false,
-    lastTrailT: 0, spawnLockUntil: 0, tapCooldownUntil: 0,
+    
+    lastTrailT: 0, spawnLockUntil: 0, tapCooldownUntil: 0, lastTapPos: null,
   };
 
   (function checkReturnFromProfile() {
@@ -1714,21 +1718,31 @@
     if(clickCheckUtsuobaPortal(p.x,p.y)){ripples.push({x:p.x,y:p.y,life:1});return;}
     if(clickCheckWanderers(p.x,p.y)){ripples.push({x:p.x,y:p.y,life:1});return;}
     if(clickBonusTree(p.x,p.y)){ripples.push({x:p.x,y:p.y,life:1});return;}
+
+   // AFTER all the early returns, BEFORE the movement logic:
+    ripples.push({x:p.x, y:p.y, life:1});   // always show tap feedback
     
-     // Movement taps: ignore while ghost is still moving toward a recent tap
-    if(state.moving && now < state.tapCooldownUntil) return;
-    // Ignore taps that land too close to the ghost's current position
+   // Block all movement taps until ghost has fully arrived
+    if(state.moving) return;
+    // Block if still in cooldown
+    if(now < state.tapCooldownUntil) return;
+    // Ignore taps too close to the ghost's current position
     if(Math.hypot(p.x - state.x, p.y - state.y) < TAP_MIN_DIST) return;
-    state.clickTarget={x:p.x,y:p.y};
-    state.tapCooldownUntil = now + TAP_COOLDOWN_MS;
+    // Longer cooldown if tapping near the same spot as last tap
+    const nearLastTap = state.lastTapPos &&
+      Math.hypot(p.x - state.lastTapPos.x, p.y - state.lastTapPos.y) < TAP_NEAR_DIST;
+    state.clickTarget  = {x: p.x, y: p.y};
+    state.lastTapPos   = {x: p.x, y: p.y};
+    state.tapCooldownUntil = now + (nearLastTap ? TAP_NEAR_COOLDOWN_MS : TAP_COOLDOWN_MS);
     
-    ripples.push({x:p.x,y:p.y,life:1});
   }
 
   function bindInput() {
+    let lastTouchEnd = 0;
     stage.addEventListener("mousemove",(e)=>{ if(!DEV_MODE||!state.coordMode)return; const p=stagePointToWorld(e.clientX,e.clientY); const el=document.getElementById("coord-xy"); if(el)el.textContent=`${Math.round(p.x)}, ${Math.round(p.y)}`; });
-    stage.addEventListener("click",(e)=>{ handleInput(e.clientX,e.clientY); });
-    stage.addEventListener("touchend",(e)=>{ if(!e.changedTouches.length)return; const t0=e.changedTouches[0]; handleInput(t0.clientX,t0.clientY); e.preventDefault(); },{passive:false});
+    stage.addEventListener("click",(e)=>{ if(performance.now() - lastTouchEnd < 500) return; handleInput(e.clientX,e.clientY); });
+    stage.addEventListener("touchend",(e)=>{ if(!e.changedTouches.length)return; lastTouchEnd=performance.now(); const t0=e.changedTouches[0]; handleInput(t0.clientX,t0.clientY); e.preventDefault(); },{passive:false});
+  
     document.addEventListener("keydown",(e)=>{ if(e.key==="Escape")closePortal(); });
     document.addEventListener("click",startMusic,{once:true});
     document.addEventListener("touchend",startMusic,{once:true,passive:true});
