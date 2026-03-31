@@ -35,7 +35,7 @@ window.KARASUKI_DATA = {
         // FIX: was { x: 785, y: 240 } — too close to the "up" NPP at y:200.
         // Moved the ghost further down so the cooldown has room to breathe.
         fromUp:    { x: 785,  y: 360  },
-        fromDown:  { x: 732,  y: 820  }
+        fromDown:  { x: 750,  y: 715  }
       }
     },
 
