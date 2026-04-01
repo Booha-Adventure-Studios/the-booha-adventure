@@ -52,6 +52,12 @@ await Promise.all([
   loadSfx('fart', CFG.sfxBase + 'fart.mp3'),
 ]);
 
+
+/* ── Persistent word-audio element (iOS-safe, unlocked on first gesture) ── */
+const wordAudio = new Audio();
+wordAudio.setAttribute('playsinline', '');
+wordAudio.setAttribute('webkit-playsinline', '');
+   
 /* ══════════════════════════════════════════════════════════════
    LABEL HELPERS
    ══════════════════════════════════════════════════════════════ */
@@ -847,26 +853,55 @@ function showCard() {
    ══════════════════════════════════════════════════════════════ */
 function advanceAfterCorrect() {
   const card = order[idx];
+  let advanced = false;          // guard: only one path may advance
+
+  function doAdvance() {
+    if (advanced) return;
+    advanced = true;
+    idx++;
+    showCard();
+  }
+
   const dingClone = SFX['ding'] ? SFX['ding'].cloneNode() : null;
+
   if (dingClone) {
-    dingClone.setAttribute('playsinline',''); dingClone.setAttribute('webkit-playsinline','');
-    dingClone.play().catch(()=>{});
+    dingClone.setAttribute('playsinline', '');
+    dingClone.setAttribute('webkit-playsinline', '');
+    dingClone.play().catch(() => {});
+
     dingClone.onended = () => {
-      if (!card.mp3) { setTimeout(() => { idx++; showCard(); }, 800); return; }
-      const a = new Audio(CFG.audioBase + card.mp3);
-      a.setAttribute('playsinline',''); a.setAttribute('webkit-playsinline','');
-      a.play().catch(()=>{});
-      a.onended = () => { setTimeout(() => { idx++; showCard(); }, 800); };
-      setTimeout(() => { idx++; showCard(); }, 7000); // safety fallback
+      if (!card.mp3) {
+        setTimeout(doAdvance, 800);
+        return;
+      }
+      wordAudio.src = CFG.audioBase + card.mp3;
+      wordAudio.onended = () => setTimeout(doAdvance, 800);
+      wordAudio.play().catch(() => setTimeout(doAdvance, 800));
+      setTimeout(doAdvance, 7000);   // safety — now guarded
     };
+
+    setTimeout(() => {
+      // ding itself hung — bail out
+      if (!advanced) {
+        if (card.mp3) {
+          wordAudio.src = CFG.audioBase + card.mp3;
+          wordAudio.onended = () => setTimeout(doAdvance, 800);
+          wordAudio.play().catch(() => setTimeout(doAdvance, 800));
+          setTimeout(doAdvance, 7000);
+        } else {
+          setTimeout(doAdvance, 800);
+        }
+      }
+    }, 3000);
+
   } else if (card.mp3) {
-    const a = new Audio(CFG.audioBase + card.mp3);
-    a.setAttribute('playsinline',''); a.setAttribute('webkit-playsinline','');
-    a.play().catch(()=>{});
-    a.onended = () => { setTimeout(() => { idx++; showCard(); }, 800); };
-    setTimeout(() => { idx++; showCard(); }, 7000);
+    wordAudio.src = CFG.audioBase + card.mp3;
+    wordAudio.onended = () => setTimeout(doAdvance, 800);
+    wordAudio.play().catch(() => setTimeout(doAdvance, 800));
+    setTimeout(doAdvance, 7000);   // guarded
+
   } else {
-    setTimeout(() => { idx++; showCard(); }, 1500);
+    setTimeout(doAdvance, 1500);
   }
 }
 
