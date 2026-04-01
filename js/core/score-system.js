@@ -81,15 +81,17 @@ const BoohaScoreSystem = (() => {
       wCompleted[gameId] = true;
     }
 
-   // ── 3. Unlock next wanderer ─────────────────────────────────────────────
-// One random wanderer unlocked per distinct game played this week (up to 22).
-const distinctPlayed = Object.keys(wScores).length; // count after adding this game
+  // ── 3. Unlock next wanderer ─────────────────────────────────────────────
+// One random wanderer unlocked per *new* distinct game played this week.
+const wasNewGame = !(weekly.gameScores && weekly.gameScores[gameId]);
 
-const allIndices = Array.from({length: 22}, (_, i) => i);
-const remaining  = allIndices.filter(i => !wWanderers.includes(i));
-if (remaining.length > 0) {
-  const pick = remaining[Math.floor(Math.random() * remaining.length)];
-  wWanderers.push(pick);
+if (wasNewGame) {
+  const allIndices = Array.from({length: 22}, (_, i) => i);
+  const remaining  = allIndices.filter(i => !wWanderers.includes(i));
+  if (remaining.length > 0) {
+    const pick = remaining[Math.floor(Math.random() * remaining.length)];
+    wWanderers.push(pick);
+  }
 }
 
 data.weekly = {
