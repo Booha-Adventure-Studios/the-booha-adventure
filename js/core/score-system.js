@@ -81,26 +81,44 @@ const BoohaScoreSystem = (() => {
       wCompleted[gameId] = true;
     }
 
-  // ── 3. Unlock next wanderer ─────────────────────────────────────────────
-// One random wanderer unlocked per *new* distinct game played this week.
-const wasNewGame = !(weekly.gameScores && weekly.gameScores[gameId]);
+// ── 3. Unlock wanderer for this game ───────────────────────────────────────
+// Build a stable week-seeded game→wanderer map so the same game always
+// unlocks the same wanderer this week, regardless of play order or reruns.
+const wasNewGame = !(wScores[gameId]);   // wScores is fresh from the new load()
 
 if (wasNewGame) {
-  const allIndices = Array.from({length: 22}, (_, i) => i);
-  const remaining  = allIndices.filter(i => !wWanderers.includes(i));
-  if (remaining.length > 0) {
-    const pick = remaining[Math.floor(Math.random() * remaining.length)];
-    wWanderers.push(pick);
+  const weekSeed  = parseInt(sessionStorage.getItem('booha_active_week') || '1', 10);
+  const allGames  = BoohaAdventure.registry
+    ? BoohaAdventure.registry.CURRICULUMS.flatMap(c =>
+        BoohaAdventure.registry.getForCurriculum(c).map(g => g.saveId)
+      )
+    : [];
+
+  // Seeded shuffle of game saveIds
+  function seededRng(seed) {
+    let s = seed >>> 0;
+    return function() { s ^= s << 13; s ^= s >> 17; s ^= s << 5; return (s >>> 0) / 0xffffffff; };
+  }
+  function seededShuffle(arr, rng) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(rng() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  const rng          = seededRng(weekSeed * 6271 + 17);
+  const shuffledGames = seededShuffle(allGames, rng);
+  // Map game index → wanderer index (27 games, 22 wanderers — wrap with modulo)
+  const wandererForGame = {};
+  shuffledGames.forEach((sid, i) => { wandererForGame[sid] = i % 22; });
+
+  const assignedWanderer = wandererForGame[gameId];
+  if (assignedWanderer != null && !wWanderers.includes(assignedWanderer)) {
+    wWanderers.push(assignedWanderer);
   }
 }
-
-data.weekly = {
-  ...weekly,
-  gameScores:     wScores,
-  gameStars:      wStars,
-  completedGames: wCompleted,
-  wanderers:      wWanderers,
-};
 
     // ── 4. Update meta.allTimeStars ────────────────────────────────────────
     // Only add the improvement in stars (delta) to avoid double-counting.
