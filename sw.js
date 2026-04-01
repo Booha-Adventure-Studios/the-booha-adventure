@@ -16,6 +16,7 @@ const CORE_FILES = [
   `${BASE}/index.html`,
   `${BASE}/maze.html`,
   `${BASE}/karasuki.html`,
+  `${BASE}/utsuroba.html`,
   `${BASE}/homework.html`,
   `${BASE}/icons/icon-192.png`,
   `${BASE}/icons/icon-512.png`,
@@ -48,9 +49,8 @@ self.addEventListener('install', event => {
       return cache.addAll(CORE_FILES).catch(err => {
         console.warn('[SW] Some core files could not be cached:', err);
       });
-    })
+    }).then(() => self.skipWaiting())
   );
-  self.skipWaiting();
 });
 
 // ============================================================
@@ -68,9 +68,8 @@ self.addEventListener('activate', event => {
             return caches.delete(name);
           })
       )
-    )
+    ).then(() => self.clients.claim())
   );
-  self.clients.claim();
 });
 
 // ============================================================
