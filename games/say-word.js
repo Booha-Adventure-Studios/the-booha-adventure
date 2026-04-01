@@ -727,10 +727,12 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') modalOver.cl
 // In doStart(), after U.unlockAudio():
 function doStart() {
   U.unlockAudio();
-  /* Pre-warm sfx so first play is always ready */
   try {
     const warm = SFX['fart'] ? SFX['fart'].cloneNode() : null;
     if (warm) { warm.volume = 0; warm.play().catch(()=>{}); }
+    wordAudio.volume = 0;
+    wordAudio.play().catch(()=>{});
+    wordAudio.volume = 1;
   } catch(e) {}
   startOver.classList.add('hiding');
   setTimeout(() => { startOver.style.display = 'none'; }, 380);
