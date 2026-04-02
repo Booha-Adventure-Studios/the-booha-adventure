@@ -761,16 +761,17 @@ function startProgress() {
     else progFill.classList.remove('warning');
     if (pct > 0) {
       progRAF = requestAnimationFrame(tick);
+       
     } else {
-      // Time's up — stop listening, treat as a miss
-      if (srListening) {
-        clearMicUi();
-        try { recognition.stop(); } catch(e) {}
-        if (heardBox) {
-          heardBox.className = 'stw-heard-box';
-          heardText.textContent = 'Try again';
-        }
+      // Meter ran out — discard any in-flight SR result then clean up
+      micSessionId++;
+      if (recognition) { try { recognition.stop(); } catch(e) {} }
+      clearMicUi();
+      if (heardBox) {
+        heardBox.className = 'stw-heard-box';
+        heardText.textContent = 'No speech heard — try again';
       }
+     }
     }
   };
   progRAF = requestAnimationFrame(tick);
@@ -1067,13 +1068,12 @@ function handleIosPick(btn, en) {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   MIC MODE: SPEECH RECOGNITION  (say-sentence pattern)
+   MIC MODE: SPEECH RECOGNITION
    ══════════════════════════════════════════════════════════════ */
 let recognition  = null;
 let srListening  = false;
 let lastMicAt    = 0;
 let micSessionId = 0;
-let lastTranscript = '';
 
 function clearMicUi() {
   srListening = false;
@@ -1084,65 +1084,6 @@ function clearMicUi() {
 }
 
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition || null;
-
-if (SR && !isIOS) {
-  recognition = new SR();
-  recognition.lang = 'en-US';
-  recognition.continuous = true;
-  recognition.interimResults = true;
-  recognition.maxAlternatives = 3;
-
-  recognition.onstart = () => {
-    srListening = true;
-    micBtn.classList.add('listening');
-    jpCard.classList.add('listening');
-    badgeText.textContent = 'LISTENING… / きいてる…';
-    if (heardBox) {
-      heardBox.className = 'stw-heard-box';
-      heardText.textContent = '…';
-    }
-    startProgress();
-  };
-
-  recognition.onresult = e => {
-    if (!srListening || answered) return;
-
-    for (let i = e.resultIndex; i < e.results.length; i++) {
-      if (!e.results[i].isFinal) continue;
-
-      clearMicUi();
-      try { recognition.stop(); } catch(e) {}
-
-      const alts  = Array.from(e.results[i]).map(r => r.transcript);
-      const heard = (alts[0] || '').toLowerCase().replace(/[.?!,'"]/g, '').trim();
-      const matched = matchesWord(alts, order[idx].en);
-
-      if (!matched && heardText) heardText.textContent = `"${heard}"`;
-
-      if (matched) {
-        onMicCorrect();
-      } else {
-        onMicWrong();
-      }
-      return;
-    }
-  };
-
-  recognition.onerror = e => {
-    if (e.error === 'aborted' || e.error === 'no-speech') return;
-    clearMicUi();
-    if (heardBox) {
-      heardBox.className = 'stw-heard-box';
-      heardText.textContent = 'Try again';
-    }
-  };
-
-  recognition.onend = () => {
-    if (srListening) {
-      try { recognition.start(); } catch(e) {}
-    }
-  };
-}
 
 function onMicCorrect() {
   answered = true;
@@ -1195,67 +1136,91 @@ if (micBtn) {
     wordAudio.pause();
     wordAudio.currentTime = 0;
     wordAudio.onended = null;
+
     if (!SR) {
       alert('Speech recognition needs Chrome on Android or a desktop browser.');
       return;
     }
 
-    // Tear down old instance, build fresh one each tap
-    if (recognition) { try { recognition.stop(); } catch(e) {} }
+    // Stamp session before anything else — all callbacks check this
+    const sessionAtTap = ++micSessionId;
+
+    // Start UI immediately so meter is in sync with the player
+    srListening = true;
+    micBtn.classList.add('listening');
+    jpCard.classList.add('listening');
+    badgeText.textContent = 'LISTENING… / きいてる…';
+    if (heardBox) {
+      heardBox.className = 'stw-heard-box';
+      heardText.textContent = '…';
+    }
+    startProgress();
+
+    // Tear down previous instance cleanly before building a fresh one
+    if (recognition) {
+      try {
+        recognition.onstart  = null;
+        recognition.onresult = null;
+        recognition.onerror  = null;
+        recognition.onend    = null;
+        recognition.stop();
+      } catch(e) {}
+    }
+
     recognition = new SR();
-    recognition.lang = 'en-US';
-    recognition.continuous = true;
-    recognition.interimResults = true;
+    recognition.lang            = 'en-US';
+    recognition.continuous      = false;  // single-shot per tap — no restart loop
+    recognition.interimResults  = false;
     recognition.maxAlternatives = 3;
 
     recognition.onstart = () => {
-      srListening = true;
-      micBtn.classList.add('listening');
-      jpCard.classList.add('listening');
-      badgeText.textContent = 'LISTENING… / きいてる…';
-      if (heardBox) {
-        heardBox.className = 'stw-heard-box';
-        heardText.textContent = '…';
-      }
-      startProgress();
+      // SR caught up to the UI — nothing extra needed
     };
 
     recognition.onresult = e => {
-      if (!srListening || answered) return;
-      for (let i = e.resultIndex; i < e.results.length; i++) {
-        if (!e.results[i].isFinal) continue;
-        clearMicUi();
-        try { recognition.stop(); } catch(e) {}
-        const alts  = Array.from(e.results[i]).map(r => r.transcript);
-        const heard = (alts[0] || '').toLowerCase().replace(/[.?!,'"]/g, '').trim();
-        const matched = matchesWord(alts, order[idx].en);
-        if (!matched && heardText) heardText.textContent = `"${heard}"`;
-        if (matched) { onMicCorrect(); } else { onMicWrong(); }
-        return;
-      }
+      if (micSessionId !== sessionAtTap || !srListening || answered) return;
+      const result = e.results[e.results.length - 1];
+      if (!result.isFinal) return;
+      clearMicUi();
+      const alts    = Array.from(result).map(r => r.transcript);
+      const heard   = (alts[0] || '').toLowerCase().replace(/[.?!,'"]/g, '').trim();
+      const matched = matchesWord(alts, order[idx].en);
+      if (!matched && heardText) heardText.textContent = `"${heard}"`;
+      if (matched) { onMicCorrect(); } else { onMicWrong(); }
     };
 
     recognition.onerror = e => {
-      if (e.error === 'aborted' || e.error === 'no-speech') return;
+      if (micSessionId !== sessionAtTap) return;
+      if (e.error === 'aborted') return;
       clearMicUi();
       if (heardBox) {
         heardBox.className = 'stw-heard-box';
-        heardText.textContent = 'Try again';
+        heardText.textContent = e.error === 'no-speech' ? 'No speech heard — try again' : 'Try again';
       }
     };
 
     recognition.onend = () => {
-      if (srListening) { try { recognition.start(); } catch(e) {} }
+      // continuous=false: onend fires after the result is delivered.
+      // If srListening is still true here, SR ended without a result at all.
+      if (micSessionId === sessionAtTap && srListening) {
+        clearMicUi();
+        if (heardBox) {
+          heardBox.className = 'stw-heard-box';
+          heardText.textContent = 'No speech heard — try again';
+        }
+      }
     };
 
-    micSessionId++;
-    try { recognition.start(); } catch(e) { console.error('SR start:', e); }
+    try { recognition.start(); } catch(e) { console.error('SR start:', e); clearMicUi(); }
   };
 
   micBtn.addEventListener('click', triggerMic);
   micBtn.addEventListener('touchstart', e => { e.preventDefault(); triggerMic(); }, { passive: false });
 }
 
+
+
+   
 /* ══════════════════════════════════════════════════════════════
    CONFETTI
    ══════════════════════════════════════════════════════════════ */
