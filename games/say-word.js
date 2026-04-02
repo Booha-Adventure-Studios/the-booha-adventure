@@ -810,6 +810,8 @@ let firstTry  = true;
 let answered  = false;
 let iosLocked = false;
 
+
+   
 /* ══════════════════════════════════════════════════════════════
    DOTS
    ══════════════════════════════════════════════════════════════ */
@@ -829,7 +831,8 @@ function showCard() {
   answered  = false;
   firstTry  = true;
   iosLocked = false;
-
+  lastTranscript = '';
+   
   const card = order[idx];
   numEl.textContent  = idx + 1;
   jpEl.textContent   = card.jp;
@@ -857,13 +860,40 @@ function showCard() {
    ══════════════════════════════════════════════════════════════ */
 function advanceAfterCorrect() {
   const card = order[idx];
-  let advanced = false;          // guard: only one path may advance
+
+  let advanced = false;
+  let chainStarted = false;
+  let wordStarted = false;
+  let dingFailTimer = null;
+  let advanceSafetyTimer = null;
 
   function doAdvance() {
     if (advanced) return;
     advanced = true;
+    clearTimeout(dingFailTimer);
+    clearTimeout(advanceSafetyTimer);
+    wordAudio.onended = null;
     idx++;
     showCard();
+  }
+
+  function startWordAudio() {
+    if (wordStarted) return;
+    wordStarted = true;
+
+    if (!card.mp3) {
+      setTimeout(doAdvance, 800);
+      return;
+    }
+
+    wordAudio.onended = null;
+    wordAudio.pause();
+    wordAudio.currentTime = 0;
+    wordAudio.src = CFG.audioBase + card.mp3;
+    wordAudio.onended = () => setTimeout(doAdvance, 800);
+    wordAudio.play().catch(() => setTimeout(doAdvance, 800));
+
+    advanceSafetyTimer = setTimeout(doAdvance, 7000);
   }
 
   const dingClone = SFX['ding'] ? SFX['ding'].cloneNode() : null;
@@ -871,43 +901,29 @@ function advanceAfterCorrect() {
   if (dingClone) {
     dingClone.setAttribute('playsinline', '');
     dingClone.setAttribute('webkit-playsinline', '');
-    dingClone.play().catch(() => {});
 
     dingClone.onended = () => {
-      if (!card.mp3) {
-        setTimeout(doAdvance, 800);
-        return;
-      }
-      wordAudio.onended = null;
-      wordAudio.src = CFG.audioBase + card.mp3;
-      wordAudio.onended = () => setTimeout(doAdvance, 800);
-      wordAudio.play().catch(() => setTimeout(doAdvance, 800));
-      setTimeout(doAdvance, 7000);   // safety — now guarded
+      if (chainStarted) return;
+      chainStarted = true;
+      clearTimeout(dingFailTimer);
+      startWordAudio();
     };
 
-   setTimeout(() => {
-  // ding itself hung — bail out
-  if (!advanced) {
-    if (card.mp3) {
-      wordAudio.onended = null;
-      wordAudio.src = CFG.audioBase + card.mp3;
-      wordAudio.onended = () => setTimeout(doAdvance, 800);
-      wordAudio.play().catch(() => setTimeout(doAdvance, 800));
-      setTimeout(doAdvance, 7000);
-    } else {
-      setTimeout(doAdvance, 800);
-    }
-  }
-}, 3000);
-} else if (card.mp3) {
-  wordAudio.onended = null;
-  wordAudio.src = CFG.audioBase + card.mp3;
-  wordAudio.onended = () => setTimeout(doAdvance, 800);
-  wordAudio.play().catch(() => setTimeout(doAdvance, 800));
-  setTimeout(doAdvance, 7000);   // guarded
+    dingClone.play().catch(() => {
+      if (chainStarted) return;
+      chainStarted = true;
+      clearTimeout(dingFailTimer);
+      startWordAudio();
+    });
+
+    dingFailTimer = setTimeout(() => {
+      if (chainStarted) return;
+      chainStarted = true;
+      startWordAudio();
+    }, 3000);
 
   } else {
-    setTimeout(doAdvance, 1500);
+    startWordAudio();
   }
 }
 
@@ -991,70 +1007,115 @@ function handleIosPick(btn, en) {
 let recognition = null;
 let srListening = false;
 let lastMicAt   = 0;
+let micTimeout = null;
+let lastTranscript = '';   
 
+function clearMicUi() {
+  srListening = false;
+  if (micBtn) micBtn.classList.remove('listening');
+  jpCard.classList.remove('listening');
+  if (!answered) badgeText.textContent = 'TAP MIC / マイクをタップ';
+  clearTimeout(micTimeout);
+}   
+
+   
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition || null;
+   
 if (SR && !isIOS) {
   recognition = new SR();
   recognition.lang = 'en-US';
   recognition.interimResults = false;
   recognition.maxAlternatives = 3;
+  recognition.continuous = false;
 
   recognition.onstart = () => {
     srListening = true;
     micBtn.classList.add('listening');
     jpCard.classList.add('listening');
     badgeText.textContent = 'LISTENING… / きいてる…';
-    if (heardBox) { heardBox.className = 'stw-heard-box'; heardText.textContent = '…'; }
+    if (heardBox) {
+      heardBox.className = 'stw-heard-box';
+      heardText.textContent = '…';
+    }
+
+    clearTimeout(micTimeout);
+    micTimeout = setTimeout(() => {
+      try { recognition.abort(); } catch (e) {}
+    }, 2200);
   };
 
-  recognition.onresult = e => {
-    srListening = false;
-    micBtn.classList.remove('listening');
-    jpCard.classList.remove('listening');
-    badgeText.textContent = 'TAP MIC / マイクをタップ';
+ recognition.onresult = e => {
+  if (answered || !srListening) return;
 
-    const alts    = Array.from(e.results[0]).map(r => r.transcript);
-    const heard   = alts[0].toLowerCase().replace(/[.?!,'"]/g, '').trim();
-    const target  = order[idx].en;
+  answered = true;       // 🔥 HARD LOCK (this is the real fix)
+  srListening = false;
+    
+
+    try { recognition.abort(); } catch (e) {}
+    clearMicUi();
+
+    const result = e.results?.[0];
+    if (!result) return;
+
+    const alts = Array.from(result).map(r => r.transcript);
+    const heard = (alts[0] || '').toLowerCase().replace(/[.?!,'"]/g, '').trim();
+
+    if (heard === lastTranscript) return;
+    lastTranscript = heard;
+    
+    const target = order[idx].en;
     const matched = matchesWord(alts, target);
 
     if (heardText && !matched) heardText.textContent = `"${heard}"`;
 
-    if (matched) onMicCorrect();
-    else         onMicWrong();
+    if (matched) {
+   onMicCorrect();
+   } else {
+   answered = false;   // allow retry
+   onMicWrong();
+ }
+    
   };
 
   recognition.onerror = () => {
-    srListening = false;
-    micBtn.classList.remove('listening');
-    jpCard.classList.remove('listening');
-    badgeText.textContent = 'TAP MIC / マイクをタップ';
-    if (heardBox) { heardBox.className = 'stw-heard-box'; heardText.textContent = 'Try again'; }
+    clearMicUi();
+    if (heardBox) {
+      heardBox.className = 'stw-heard-box';
+      heardText.textContent = 'Try again';
+    }
   };
 
   recognition.onend = () => {
-    srListening = false;
-    micBtn.classList.remove('listening');
-    jpCard.classList.remove('listening');
-    if (!answered) badgeText.textContent = 'TAP MIC / マイクをタップ';
-  };
+  if (!srListening) return; // ignore forced abort end
+  clearMicUi();
+};
 }
 
 function onMicCorrect() {
   answered = true;
-  if (heardBox) { heardText.textContent = '✓'; heardBox.classList.add('heard-correct'); }
+
+  clearMicUi();
+  if (recognition) {
+    try { recognition.abort(); } catch (e) {}
+  }
+
+  if (heardBox) {
+    heardText.textContent = '✓';
+    heardBox.classList.add('heard-correct');
+  }
   if (micBtn) micBtn.disabled = true;
 
   if (firstTry) {
-    score++; streak++;
+    score++;
+    streak++;
     scoreEl.textContent = score;
     const streakEl = document.getElementById('stw-streak');
     if (streakEl) streakEl.textContent = streak;
   }
 
-  jpCard.classList.add('dancing','correct-state');
+  jpCard.classList.add('dancing', 'correct-state');
   updateDots();
-  advanceAfterCorrect();
+  setTimeout(() => advanceAfterCorrect(), 250);
 }
 
 function onMicWrong() {
@@ -1076,12 +1137,22 @@ function onMicWrong() {
 
 if (micBtn) {
   const triggerMic = () => {
-    if (answered || srListening) return;
-    const now = Date.now();
-    if (now - lastMicAt < 400) return;
-    lastMicAt = now;
-    U.unlockAudio();
-    if (!recognition) { alert('Speech recognition needs Chrome on Android or a desktop browser.'); return; }
+  if (answered || srListening) return;
+
+  const now = Date.now();
+  if (now - lastMicAt < 400) return;
+  lastMicAt = now;
+
+  U.unlockAudio();
+
+  wordAudio.pause();
+  wordAudio.currentTime = 0;
+  wordAudio.onended = null;
+
+  if (!recognition) {
+    alert('Speech recognition needs Chrome on Android or a desktop browser.');
+    return;
+  }
     try { recognition.start(); } catch(e) {}
   };
   micBtn.addEventListener('click', triggerMic);
