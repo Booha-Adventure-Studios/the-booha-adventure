@@ -21,7 +21,6 @@ const isIOS = U.isIOS();
 
 /* ══════════════════════════════════════════════════════════════
    PRE-LOAD SFX — plain Audio objects, cloned on each play
-   This bypasses U.playSFX entirely and works reliably on desktop
    ══════════════════════════════════════════════════════════════ */
 const SFX = {};
 function loadSfx(name, url) {
@@ -32,7 +31,6 @@ function loadSfx(name, url) {
     a.addEventListener('canplaythrough', () => { SFX[name] = a; resolve(); }, { once: true });
     a.addEventListener('error', resolve, { once: true });
     a.load();
-    /* Fallback if canplaythrough never fires */
     setTimeout(() => { if (!SFX[name]) { SFX[name] = a; resolve(); } }, 2000);
   });
 }
@@ -52,12 +50,11 @@ await Promise.all([
   loadSfx('fart', CFG.sfxBase + 'fart.mp3'),
 ]);
 
-
 /* ── Persistent word-audio element (iOS-safe, unlocked on first gesture) ── */
 const wordAudio = new Audio();
 wordAudio.setAttribute('playsinline', '');
 wordAudio.setAttribute('webkit-playsinline', '');
-   
+
 /* ══════════════════════════════════════════════════════════════
    LABEL HELPERS
    ══════════════════════════════════════════════════════════════ */
@@ -244,7 +241,6 @@ S.textContent = `
 /* ── JP word — auto-sizes via JS-set --stw-jp-len ── */
 .stw-jp-word{
   font-family:var(--game-font-jp); font-weight:900;
-  /* Base size scales down as character count grows */
   font-size:clamp(28px, calc(17cqi - var(--stw-jp-len, 0) * 1.2cqi), 88px);
   line-height:1.2; color:var(--game-ink);
   word-break:break-all; overflow-wrap:anywhere;
@@ -258,6 +254,29 @@ S.textContent = `
   word-break:break-all;
 }
 [data-curriculum="pb"] .stw-hira{ color:rgba(58,26,46,.55); }
+
+/* ══ PROGRESS METER (inside card) ══ */
+.stw-progress-wrap{ width:100%; margin:.9rem 0 0; }
+.stw-progress-track{
+  height:8px; border-radius:99px; overflow:hidden;
+  background:rgba(255,255,255,.08); border:1.5px solid rgba(255,255,255,.1);
+}
+[data-curriculum="pb"] .stw-progress-track{ background:rgba(180,100,255,.08); border-color:rgba(180,100,255,.18); }
+.stw-progress-fill{
+  height:100%; border-radius:99px;
+  background:linear-gradient(90deg,#a78bfa,#ff2288,#22ddff);
+  transition:width .1s linear; position:relative; overflow:hidden;
+}
+[data-curriculum="bc"] .stw-progress-fill{ background:linear-gradient(90deg,#00f0ff,#4455ff,#aa00ff); }
+[data-curriculum="pb"] .stw-progress-fill{ background:linear-gradient(90deg,#ff6eb4,#cc88ff,#44ccff); }
+.stw-progress-fill::after{
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(90deg,transparent 20%,rgba(255,255,255,.35) 50%,transparent 80%);
+  background-size:200% 100%; animation:stwShimmer 1.2s linear infinite;
+}
+@keyframes stwShimmer{ from{background-position:200% 0} to{background-position:-200% 0} }
+.stw-progress-fill.warning{ animation:stwPulseWarn .5s ease-in-out infinite; }
+@keyframes stwPulseWarn{ 0%,100%{filter:brightness(1)} 50%{filter:brightness(1.7) saturate(2)} }
 
 /* card states */
 .stw-jp-card.dancing .stw-jp-word{ animation:stwDance .6s ease-in-out infinite alternate; }
@@ -585,6 +604,11 @@ U.mount(`
     </div>
     <div class="stw-jp-word" id="stw-jp"></div>
     <div class="stw-hira"    id="stw-hira"></div>
+    <div class="stw-progress-wrap" id="stw-prog-wrap" style="display:none">
+      <div class="stw-progress-track">
+        <div class="stw-progress-fill" id="stw-prog-fill" style="width:100%"></div>
+      </div>
+    </div>
   </div>
 
   ${!isIOS ? `
@@ -703,6 +727,8 @@ const dotsRow   = document.getElementById('stw-dots');
 const startOver = document.getElementById('stw-start-overlay');
 const helpBtn   = document.getElementById('stw-help');
 const modalOver = document.getElementById('stw-modal-overlay');
+const progWrap  = document.getElementById('stw-prog-wrap');
+const progFill  = document.getElementById('stw-prog-fill');
 
 const micBtn    = isIOS ? null : document.getElementById('stw-mic');
 const heardBox  = isIOS ? null : document.getElementById('stw-heard');
@@ -717,6 +743,47 @@ for (let i = 0; i < 15; i++) {
 }
 
 /* ══════════════════════════════════════════════════════════════
+   PROGRESS METER
+   ══════════════════════════════════════════════════════════════ */
+const METER_MS = 4000;
+let progRAF = 0, progStart = 0;
+
+function startProgress() {
+  stopProgress();
+  progWrap.style.display = '';
+  progFill.style.width = '100%';
+  progFill.classList.remove('warning');
+  progStart = performance.now();
+  const tick = t => {
+    const pct = Math.max(0, 1 - (t - progStart) / METER_MS);
+    progFill.style.width = `${pct * 100}%`;
+    if (pct < 0.25) progFill.classList.add('warning');
+    else progFill.classList.remove('warning');
+    if (pct > 0) {
+      progRAF = requestAnimationFrame(tick);
+    } else {
+      // Time's up — stop listening, treat as a miss
+      if (srListening) {
+        clearMicUi();
+        try { recognition.stop(); } catch(e) {}
+        if (heardBox) {
+          heardBox.className = 'stw-heard-box';
+          heardText.textContent = 'Try again';
+        }
+      }
+    }
+  };
+  progRAF = requestAnimationFrame(tick);
+}
+
+function stopProgress() {
+  cancelAnimationFrame(progRAF);
+  progRAF = 0;
+  if (progFill) { progFill.style.width = '0%'; progFill.classList.remove('warning'); }
+  if (progWrap) progWrap.style.display = 'none';
+}
+
+/* ══════════════════════════════════════════════════════════════
    MODAL / START
    ══════════════════════════════════════════════════════════════ */
 helpBtn.addEventListener('click', () => modalOver.classList.add('open'));
@@ -724,7 +791,6 @@ document.getElementById('stw-modal-ok').addEventListener('click', () => modalOve
 modalOver.addEventListener('click', e => { if (e.target === modalOver) modalOver.classList.remove('open'); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') modalOver.classList.remove('open'); });
 
-// In doStart(), after U.unlockAudio():
 function doStart() {
   U.unlockAudio();
   try {
@@ -740,7 +806,7 @@ function doStart() {
   setTimeout(() => { startOver.style.display = 'none'; }, 380);
   showCard();
 }
-   
+
 document.getElementById('stw-start-btn').addEventListener('click', doStart);
 document.getElementById('stw-start-btn').addEventListener('touchstart', e => { e.preventDefault(); doStart(); }, { passive: false });
 
@@ -810,8 +876,6 @@ let firstTry  = true;
 let answered  = false;
 let iosLocked = false;
 
-
-   
 /* ══════════════════════════════════════════════════════════════
    DOTS
    ══════════════════════════════════════════════════════════════ */
@@ -832,18 +896,18 @@ function showCard() {
   firstTry  = true;
   iosLocked = false;
   lastTranscript = '';
-  micSessionId++; 
-   
+  micSessionId++;
+
   const card = order[idx];
   numEl.textContent  = idx + 1;
   jpEl.textContent   = card.jp;
   hiraEl.textContent = card.hira ? `（${card.hira}）` : '';
 
-  /* Auto-size JP word by character count */
   const len = (card.jp || '').length;
   jpCard.style.setProperty('--stw-jp-len', len);
 
   jpCard.classList.remove('dancing','correct-state','wrong-state','listening');
+  stopProgress();
   updateDots();
 
   if (isIOS) {
@@ -1003,23 +1067,20 @@ function handleIosPick(btn, en) {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   MIC MODE: SPEECH RECOGNITION
-   ══════════════════════════════════════════════════════════════ */
-/* ══════════════════════════════════════════════════════════════
    MIC MODE: SPEECH RECOGNITION  (say-sentence pattern)
    ══════════════════════════════════════════════════════════════ */
-let recognition = null;
+let recognition  = null;
 let srListening  = false;
 let lastMicAt    = 0;
-let micTimeout   = null;
 let micSessionId = 0;
+let lastTranscript = '';
 
 function clearMicUi() {
   srListening = false;
+  stopProgress();
   if (micBtn) micBtn.classList.remove('listening');
   jpCard.classList.remove('listening');
   if (!answered) badgeText.textContent = 'TAP MIC / マイクをタップ';
-  clearTimeout(micTimeout);
 }
 
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition || null;
@@ -1027,8 +1088,8 @@ const SR = window.SpeechRecognition || window.webkitSpeechRecognition || null;
 if (SR && !isIOS) {
   recognition = new SR();
   recognition.lang = 'en-US';
-  recognition.continuous = true;        // ← match say-sentence
-  recognition.interimResults = true;    // ← match say-sentence
+  recognition.continuous = true;
+  recognition.interimResults = true;
   recognition.maxAlternatives = 3;
 
   recognition.onstart = () => {
@@ -1040,22 +1101,15 @@ if (SR && !isIOS) {
       heardBox.className = 'stw-heard-box';
       heardText.textContent = '…';
     }
-    clearTimeout(micTimeout);
-    micTimeout = setTimeout(() => {
-      // Time's up — treat as wrong/no answer
-      clearMicUi();
-      try { recognition.stop(); } catch(e) {}
-    }, 5000);
+    startProgress();
   };
 
   recognition.onresult = e => {
     if (!srListening || answered) return;
 
-    // Collect the latest final result only
     for (let i = e.resultIndex; i < e.results.length; i++) {
       if (!e.results[i].isFinal) continue;
 
-      clearTimeout(micTimeout);
       clearMicUi();
       try { recognition.stop(); } catch(e) {}
 
@@ -1070,7 +1124,7 @@ if (SR && !isIOS) {
       } else {
         onMicWrong();
       }
-      return; // only process first final result
+      return;
     }
   };
 
@@ -1084,21 +1138,16 @@ if (SR && !isIOS) {
   };
 
   recognition.onend = () => {
-    // say-sentence pattern: restart if still supposed to be listening
     if (srListening) {
       try { recognition.start(); } catch(e) {}
     }
   };
 }
 
-   
 function onMicCorrect() {
   answered = true;
-
   clearMicUi();
-  if (recognition) {
-    try { recognition.abort(); } catch (e) {}
-  }
+  try { recognition.stop(); } catch(e) {}
 
   if (heardBox) {
     heardText.textContent = '✓';
@@ -1138,23 +1187,21 @@ function onMicWrong() {
 
 if (micBtn) {
   const triggerMic = () => {
-  if (answered || srListening) return;
-  const now = Date.now();
-  if (now - lastMicAt < 400) return;
-  lastMicAt = now;
-  U.unlockAudio();
-  wordAudio.pause();
-  wordAudio.currentTime = 0;
-  wordAudio.onended = null;
-  if (!recognition) {
-    alert('Speech recognition needs Chrome on Android or a desktop browser.');
-    return;
-  }
-  micSessionId++;
-  try { recognition.start(); } catch(e) {}
-};
-
-   
+    if (answered || srListening) return;
+    const now = Date.now();
+    if (now - lastMicAt < 400) return;
+    lastMicAt = now;
+    U.unlockAudio();
+    wordAudio.pause();
+    wordAudio.currentTime = 0;
+    wordAudio.onended = null;
+    if (!recognition) {
+      alert('Speech recognition needs Chrome on Android or a desktop browser.');
+      return;
+    }
+    micSessionId++;
+    try { recognition.start(); } catch(e) {}
+  };
   micBtn.addEventListener('click', triggerMic);
   micBtn.addEventListener('touchstart', e => { e.preventDefault(); triggerMic(); }, { passive: false });
 }
@@ -1182,6 +1229,7 @@ function fireConfetti(big = false) {
    ══════════════════════════════════════════════════════════════ */
 function showResults() {
   if (srListening && recognition) { try { recognition.stop(); } catch(e) {} }
+  stopProgress();
   jpCard.classList.remove('dancing','correct-state','listening');
 
   for (let i = 0; i < 15; i++) {
@@ -1234,6 +1282,7 @@ document.getElementById('stw-replay').addEventListener('click', () => {
 
 document.getElementById('stw-back').addEventListener('click', () => {
   if (srListening && recognition) { try { recognition.stop(); } catch(e) {} }
+  stopProgress();
   window.location.assign(CFG.navTarget + '?week=' + encodeURIComponent(CFG.weekParam));
 });
 
