@@ -1,6 +1,6 @@
 
 /* ══════════════════════════════════════════════════════════════
-   say-word.js  —  Say the Word  v3
+   say-word.js  —  Say the Word  v4
    Show big JP card → mic to say it (Android/Desktop)
                    → 4-choice tap (iOS — can still get it wrong)
    Heat: correct = ding + word-dance + audio + auto-advance
@@ -762,8 +762,10 @@ function startProgress() {
     if (pct > 0) {
       progRAF = requestAnimationFrame(tick);
     } else {
-      // Meter ran out — discard any in-flight SR result then clean up
+      // Meter ran out — bump session so any late SR result is ignored, then clean up
       micSessionId++;
+      collecting = false;
+      srListening = false;
       if (recognition) { try { recognition.stop(); } catch(e) {} }
       clearMicUi();
       if (heardBox) {
@@ -790,17 +792,32 @@ document.getElementById('stw-modal-ok').addEventListener('click', () => modalOve
 modalOver.addEventListener('click', e => { if (e.target === modalOver) modalOver.classList.remove('open'); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') modalOver.classList.remove('open'); });
 
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition || null;
+
 function doStart() {
   U.unlockAudio();
+
+  /* Pre-warm SFX at zero volume */
   try {
     const warm = SFX['fart'] ? SFX['fart'].cloneNode() : null;
-    if (warm) { warm.volume = 0; warm.play().catch(()=>{}); }
-    if (isIOS) {
-      wordAudio.volume = 0;
-      wordAudio.play().catch(()=>{});
-      wordAudio.volume = 1;
-    }
+    if (warm) { warm.volume = 0; warm.play().catch(() => {}); }
   } catch(e) {}
+
+  /* Probe mic permission NOW, before any game timer starts.
+     This triggers the browser "Allow mic?" dialog during the
+     start-card dismiss animation — by the time the student
+     taps the mic the permission is already granted. */
+  if (SR && !isIOS) {
+    try {
+      const probe = new SR();
+      probe.lang = 'en-US';
+      probe.maxAlternatives = 1;
+      probe.onstart = () => { try { probe.stop(); } catch(e) {} };
+      probe.onerror = () => {};
+      probe.start();
+    } catch(e) {}
+  }
+
   startOver.classList.add('hiding');
   setTimeout(() => { startOver.style.display = 'none'; }, 380);
   showCard();
@@ -845,7 +862,7 @@ const HOMOPHONES = {
   'mail':['mail','male'],'male':['mail','male'],
 };
 
-function matchesWord(alternatives, target) {
+function matchesWord(transcript, target) {
   const clean = s => s.toLowerCase().replace(/[.?!,'"]/g, '').trim();
   const tClean = clean(target);
   const tWords = tClean.split(/\s+/);
@@ -861,7 +878,13 @@ function matchesWord(alternatives, target) {
     });
     variants.forEach(v => acceptSet.add(v.join(' ')));
   }
-  return alternatives.some(alt => acceptSet.has(clean(alt)));
+  // transcript is a single string here (accumulated interim+final)
+  const heard = clean(transcript);
+  // Check if any accepted form appears as a word sequence in the heard string
+  for (const accept of acceptSet) {
+    if (heard === accept || heard.includes(accept)) return true;
+  }
+  return false;
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -894,7 +917,6 @@ function showCard() {
   answered  = false;
   firstTry  = true;
   iosLocked = false;
-  lastTranscript = '';
   micSessionId++;
 
   const card = order[idx];
@@ -1066,27 +1088,28 @@ function handleIosPick(btn, en) {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   MIC MODE: SPEECH RECOGNITION
+   MIC MODE — continuous SR with timed window (say-sentence pattern)
    ══════════════════════════════════════════════════════════════ */
 let recognition  = null;
 let srListening  = false;
+let collecting   = false;
+let heard        = '';
 let lastMicAt    = 0;
 let micSessionId = 0;
 
 function clearMicUi() {
   srListening = false;
+  collecting  = false;
   stopProgress();
   if (micBtn) micBtn.classList.remove('listening');
   jpCard.classList.remove('listening');
   if (!answered) badgeText.textContent = 'TAP MIC / マイクをタップ';
 }
 
-const SR = window.SpeechRecognition || window.webkitSpeechRecognition || null;
-
 function onMicCorrect() {
   answered = true;
   clearMicUi();
-  try { recognition.stop(); } catch(e) {}
+  if (recognition) { try { recognition.stop(); } catch(e) {} }
 
   if (heardBox) {
     heardText.textContent = '✓';
@@ -1130,21 +1153,24 @@ if (micBtn) {
     const now = Date.now();
     if (now - lastMicAt < 400) return;
     lastMicAt = now;
-    U.unlockAudio();
-    wordAudio.pause();
-    wordAudio.currentTime = 0;
-    wordAudio.onended = null;
 
     if (!SR) {
       alert('Speech recognition needs Chrome on Android or a desktop browser.');
       return;
     }
 
-    // Stamp session before anything else — all callbacks check this
+    U.unlockAudio();
+    wordAudio.pause();
+    wordAudio.currentTime = 0;
+    wordAudio.onended = null;
+
+    // Stamp session — callbacks check this to discard stale results
     const sessionAtTap = ++micSessionId;
 
-    // Start UI immediately so meter is in sync with the player
+    // Show listening UI immediately — meter starts now, not after SR permission
     srListening = true;
+    collecting  = false;
+    heard       = '';
     micBtn.classList.add('listening');
     jpCard.classList.add('listening');
     badgeText.textContent = 'LISTENING… / きいてる…';
@@ -1154,7 +1180,7 @@ if (micBtn) {
     }
     startProgress();
 
-    // Tear down previous instance cleanly before building a fresh one
+    // Tear down any previous SR instance cleanly
     if (recognition) {
       try {
         recognition.onstart  = null;
@@ -1165,26 +1191,39 @@ if (micBtn) {
       } catch(e) {}
     }
 
+    // Build fresh instance — continuous=true matches say-sentence (reliable on Android)
     recognition = new SR();
     recognition.lang            = 'en-US';
-    recognition.continuous      = false;  // single-shot per tap — no restart loop
-    recognition.interimResults  = false;
+    recognition.continuous      = true;
+    recognition.interimResults  = true;
     recognition.maxAlternatives = 3;
 
     recognition.onstart = () => {
-      // SR caught up to the UI — nothing extra needed
+      if (micSessionId !== sessionAtTap) return;
+      // SR is now truly live — open the collection window
+      collecting = true;
     };
 
     recognition.onresult = e => {
-      if (micSessionId !== sessionAtTap || !srListening || answered) return;
-      const result = e.results[e.results.length - 1];
-      if (!result.isFinal) return;
-      clearMicUi();
-      const alts    = Array.from(result).map(r => r.transcript);
-      const heard   = (alts[0] || '').toLowerCase().replace(/[.?!,'"]/g, '').trim();
-      const matched = matchesWord(alts, order[idx].en);
-      if (!matched && heardText) heardText.textContent = `"${heard}"`;
-      if (matched) { onMicCorrect(); } else { onMicWrong(); }
+      if (micSessionId !== sessionAtTap || !collecting || answered) return;
+
+      // Accumulate all transcripts (interim + final) into `heard`
+      let chunk = '';
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        chunk += e.results[i][0].transcript + ' ';
+      }
+      heard = (heard + ' ' + chunk).trim();
+
+      // Show what was heard in the box
+      if (heardText) heardText.textContent = `"${heard}"`;
+
+      // Check for a match on every incoming result — react immediately
+      if (matchesWord(heard, order[idx].en)) {
+        collecting  = false;
+        srListening = false;
+        if (recognition) { try { recognition.stop(); } catch(e) {} }
+        onMicCorrect();
+      }
     };
 
     recognition.onerror = e => {
@@ -1198,27 +1237,23 @@ if (micBtn) {
     };
 
     recognition.onend = () => {
-      // continuous=false: onend fires after the result is delivered.
-      // If srListening is still true here, SR ended without a result at all.
+      // continuous=true: if srListening is still true, restart to keep listening
       if (micSessionId === sessionAtTap && srListening) {
-        clearMicUi();
-        if (heardBox) {
-          heardBox.className = 'stw-heard-box';
-          heardText.textContent = 'No speech heard — try again';
-        }
+        try { recognition.start(); } catch(e) {}
       }
     };
 
     try { recognition.start(); } catch(e) { console.error('SR start:', e); clearMicUi(); }
+
+    // Hard cut-off: after METER_MS the window closes
+    // (meter timeout in startProgress also fires at the same time —
+    //  whichever fires first bumps micSessionId and stops SR)
   };
 
   micBtn.addEventListener('click', triggerMic);
   micBtn.addEventListener('touchstart', e => { e.preventDefault(); triggerMic(); }, { passive: false });
 }
 
-
-
-   
 /* ══════════════════════════════════════════════════════════════
    CONFETTI
    ══════════════════════════════════════════════════════════════ */
@@ -1241,7 +1276,9 @@ function fireConfetti(big = false) {
    RESULTS
    ══════════════════════════════════════════════════════════════ */
 function showResults() {
-  if (srListening && recognition) { try { recognition.stop(); } catch(e) {} }
+  collecting  = false;
+  srListening = false;
+  if (recognition) { try { recognition.stop(); } catch(e) {} }
   stopProgress();
   jpCard.classList.remove('dancing','correct-state','listening');
 
@@ -1275,7 +1312,7 @@ function showResults() {
   if (CFG.sfxBase && tier.sound) {
     const snd = new Audio(CFG.sfxBase + tier.sound);
     snd.setAttribute('playsinline',''); snd.setAttribute('webkit-playsinline','');
-    snd.play().catch(()=>{});
+    snd.play().catch(() => {});
   }
 }
 
@@ -1294,7 +1331,9 @@ document.getElementById('stw-replay').addEventListener('click', () => {
 });
 
 document.getElementById('stw-back').addEventListener('click', () => {
-  if (srListening && recognition) { try { recognition.stop(); } catch(e) {} }
+  collecting  = false;
+  srListening = false;
+  if (recognition) { try { recognition.stop(); } catch(e) {} }
   stopProgress();
   window.location.assign(CFG.navTarget + '?week=' + encodeURIComponent(CFG.weekParam));
 });
