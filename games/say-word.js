@@ -1005,13 +1005,14 @@ function handleIosPick(btn, en) {
 /* ══════════════════════════════════════════════════════════════
    MIC MODE: SPEECH RECOGNITION
    ══════════════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════════════════════════
+   MIC MODE: SPEECH RECOGNITION  (say-sentence pattern)
+   ══════════════════════════════════════════════════════════════ */
 let recognition = null;
-let srListening = false;
-let lastMicAt   = 0;
-let micTimeout  = null;
-let lastTranscript = '';
+let srListening  = false;
+let lastMicAt    = 0;
+let micTimeout   = null;
 let micSessionId = 0;
-let thisSession  = 0;
 
 function clearMicUi() {
   srListening = false;
@@ -1019,17 +1020,16 @@ function clearMicUi() {
   jpCard.classList.remove('listening');
   if (!answered) badgeText.textContent = 'TAP MIC / マイクをタップ';
   clearTimeout(micTimeout);
-}   
+}
 
-   
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition || null;
-   
+
 if (SR && !isIOS) {
   recognition = new SR();
   recognition.lang = 'en-US';
-  recognition.interimResults = false;
+  recognition.continuous = true;        // ← match say-sentence
+  recognition.interimResults = true;    // ← match say-sentence
   recognition.maxAlternatives = 3;
-  recognition.continuous = false;
 
   recognition.onstart = () => {
     srListening = true;
@@ -1040,55 +1040,58 @@ if (SR && !isIOS) {
       heardBox.className = 'stw-heard-box';
       heardText.textContent = '…';
     }
-
     clearTimeout(micTimeout);
     micTimeout = setTimeout(() => {
-      try { recognition.abort(); } catch (e) {}
-    }, 2200);
+      // Time's up — treat as wrong/no answer
+      clearMicUi();
+      try { recognition.stop(); } catch(e) {}
+    }, 5000);
   };
 
-recognition.onresult = e => {
-  if (thisSession !== micSessionId) return;
-  if (answered || !srListening) return;
+  recognition.onresult = e => {
+    if (!srListening || answered) return;
 
-  clearMicUi();
-  // ← remove the try { recognition.abort() } block that was here
+    // Collect the latest final result only
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      if (!e.results[i].isFinal) continue;
 
-  const result = e.results?.[0];
-  if (!result) return;
+      clearTimeout(micTimeout);
+      clearMicUi();
+      try { recognition.stop(); } catch(e) {}
 
-  const alts = Array.from(result).map(r => r.transcript);
-  const heard = (alts[0] || '').toLowerCase().replace(/[.?!,'"]/g, '').trim();
+      const alts  = Array.from(e.results[i]).map(r => r.transcript);
+      const heard = (alts[0] || '').toLowerCase().replace(/[.?!,'"]/g, '').trim();
+      const matched = matchesWord(alts, order[idx].en);
 
-  lastTranscript = heard;
+      if (!matched && heardText) heardText.textContent = `"${heard}"`;
 
-  const target = order[idx].en;
-  const matched = matchesWord(alts, target);
+      if (matched) {
+        onMicCorrect();
+      } else {
+        onMicWrong();
+      }
+      return; // only process first final result
+    }
+  };
 
-  if (!matched && heardText) heardText.textContent = `"${heard}"`;
-
-  if (matched) {
-    onMicCorrect();
-  } else {
-    onMicWrong();
-  }
-};
-
- recognition.onerror = e => {
-  if (e.error === 'aborted' || e.error === 'no-speech') return;  // not a real error
-  clearMicUi();
-  if (heardBox) {
-    heardBox.className = 'stw-heard-box';
-    heardText.textContent = 'Try again';
-  }
-};
+  recognition.onerror = e => {
+    if (e.error === 'aborted' || e.error === 'no-speech') return;
+    clearMicUi();
+    if (heardBox) {
+      heardBox.className = 'stw-heard-box';
+      heardText.textContent = 'Try again';
+    }
+  };
 
   recognition.onend = () => {
-  if (!srListening) return; // ignore forced abort end
-  clearMicUi();
-};
+    // say-sentence pattern: restart if still supposed to be listening
+    if (srListening) {
+      try { recognition.start(); } catch(e) {}
+    }
+  };
 }
 
+   
 function onMicCorrect() {
   answered = true;
 
@@ -1147,9 +1150,11 @@ if (micBtn) {
     alert('Speech recognition needs Chrome on Android or a desktop browser.');
     return;
   }
-  thisSession = ++micSessionId;
+  micSessionId++;
   try { recognition.start(); } catch(e) {}
-  };
+};
+
+   
   micBtn.addEventListener('click', triggerMic);
   micBtn.addEventListener('touchstart', e => { e.preventDefault(); triggerMic(); }, { passive: false });
 }
