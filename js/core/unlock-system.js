@@ -118,10 +118,6 @@ const BoohaUnlockSystem = (() => {
   }
 
   // ── Weekly bonus game unlock ──────────────────────────────────────────────
-  /**
-   * The 5 bonus game IDs stored in weekly.unlockedBonusGames.
-   * Add more placeholders here when coordinates are ready.
-   */
   const BONUS_GAMES = [
     'booha_invaders',
     'booha_blocks',
@@ -130,11 +126,6 @@ const BoohaUnlockSystem = (() => {
     'bonus_placeholder_3',
   ];
 
-  /**
-   * Check if a student has earned ≥2 stars (score ≥ 70) on ALL 9 games
-   * in at least one curriculum THIS WEEK.
-   * If yes, unlock all 5 bonus games in weekly.unlockedBonusGames.
-   */
   function checkWeeklyBonusGames() {
     const registry  = BoohaAdventure.registry;
     const scores    = BoohaAdventure.scores;
@@ -156,10 +147,9 @@ const BoohaUnlockSystem = (() => {
 
     if (!qualified) return;
 
-    // Unlock all bonus games
-   // AFTER**FIXED**
-   BONUS_GAMES.forEach(id => { bonus[id] = true; });
-   BoohaAdventure.save.patchDeep('weekly', 'unlockedBonusGames', bonus);
+    // Unlock all bonus games — use patchDeep to avoid clobbering other weekly data
+    BONUS_GAMES.forEach(id => { bonus[id] = true; });
+    BoohaAdventure.save.patchDeep('weekly', 'unlockedBonusGames', bonus);
 
     document.dispatchEvent(new CustomEvent('booha:bonusGamesUnlocked', {
       detail: { games: BONUS_GAMES }
@@ -167,9 +157,6 @@ const BoohaUnlockSystem = (() => {
     console.log('[BoohaUnlockSystem] Bonus games unlocked for this week!');
   }
 
-  /**
-   * Read whether a specific bonus game is unlocked this week.
-   */
   function isBonusGameUnlocked(bonusId) {
     const data = BoohaAdventure.save.load();
     return !!(data.weekly && data.weekly.unlockedBonusGames && data.weekly.unlockedBonusGames[bonusId]);
