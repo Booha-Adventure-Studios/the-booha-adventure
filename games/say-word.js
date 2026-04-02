@@ -1010,7 +1010,8 @@ let srListening = false;
 let lastMicAt   = 0;
 let micTimeout  = null;
 let lastTranscript = '';
-let micSessionId = 0;  
+let micSessionId = 0;
+let thisSession  = 0;
 
 function clearMicUi() {
   srListening = false;
@@ -1152,7 +1153,7 @@ if (micBtn) {
     alert('Speech recognition needs Chrome on Android or a desktop browser.');
     return;
   }
-  const thisSession = ++micSessionId;
+  thisSession = ++micSessionId;
   try { recognition.start(); } catch(e) {}
   };
   micBtn.addEventListener('click', triggerMic);
