@@ -1052,7 +1052,7 @@ recognition.onresult = e => {
   if (answered || !srListening) return;
 
   clearMicUi();
-  try { recognition.abort(); } catch (e) {}
+  // ← remove the try { recognition.abort() } block that was here
 
   const result = e.results?.[0];
   if (!result) return;
@@ -1060,7 +1060,7 @@ recognition.onresult = e => {
   const alts = Array.from(result).map(r => r.transcript);
   const heard = (alts[0] || '').toLowerCase().replace(/[.?!,'"]/g, '').trim();
 
-  lastTranscript = heard;   // always update — no early-return guard
+  lastTranscript = heard;
 
   const target = order[idx].en;
   const matched = matchesWord(alts, target);
@@ -1074,13 +1074,14 @@ recognition.onresult = e => {
   }
 };
 
-  recognition.onerror = () => {
-    clearMicUi();
-    if (heardBox) {
-      heardBox.className = 'stw-heard-box';
-      heardText.textContent = 'Try again';
-    }
-  };
+ recognition.onerror = e => {
+  if (e.error === 'aborted' || e.error === 'no-speech') return;  // not a real error
+  clearMicUi();
+  if (heardBox) {
+    heardBox.className = 'stw-heard-box';
+    heardText.textContent = 'Try again';
+  }
+};
 
   recognition.onend = () => {
   if (!srListening) return; // ignore forced abort end
