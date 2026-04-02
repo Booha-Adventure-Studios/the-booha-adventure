@@ -1047,39 +1047,32 @@ if (SR && !isIOS) {
     }, 2200);
   };
 
- recognition.onresult = e => {
+recognition.onresult = e => {
   if (thisSession !== micSessionId) return;
   if (answered || !srListening) return;
 
-  answered = true;       // HARD LOCK (this is the real fix)
-  srListening = false;
-    
+  clearMicUi();
+  try { recognition.abort(); } catch (e) {}
 
-    try { recognition.abort(); } catch (e) {}
-    clearMicUi();
+  const result = e.results?.[0];
+  if (!result) return;
 
-    const result = e.results?.[0];
-    if (!result) return;
+  const alts = Array.from(result).map(r => r.transcript);
+  const heard = (alts[0] || '').toLowerCase().replace(/[.?!,'"]/g, '').trim();
 
-    const alts = Array.from(result).map(r => r.transcript);
-    const heard = (alts[0] || '').toLowerCase().replace(/[.?!,'"]/g, '').trim();
+  lastTranscript = heard;   // always update — no early-return guard
 
-    if (heard === lastTranscript) return;
-    lastTranscript = heard;
-    
-    const target = order[idx].en;
-    const matched = matchesWord(alts, target);
+  const target = order[idx].en;
+  const matched = matchesWord(alts, target);
 
-    if (heardText && !matched) heardText.textContent = `"${heard}"`;
+  if (!matched && heardText) heardText.textContent = `"${heard}"`;
 
-    if (matched) {
-   onMicCorrect();
-   } else {
-   answered = false;   // allow retry
-   onMicWrong();
- }
-    
-  };
+  if (matched) {
+    onMicCorrect();
+  } else {
+    onMicWrong();
+  }
+};
 
   recognition.onerror = () => {
     clearMicUi();
