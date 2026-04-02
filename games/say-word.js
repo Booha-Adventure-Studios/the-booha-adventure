@@ -730,9 +730,11 @@ function doStart() {
   try {
     const warm = SFX['fart'] ? SFX['fart'].cloneNode() : null;
     if (warm) { warm.volume = 0; warm.play().catch(()=>{}); }
-    wordAudio.volume = 0;
-    wordAudio.play().catch(()=>{});
-    wordAudio.volume = 1;
+    if (isIOS) {
+      wordAudio.volume = 0;
+      wordAudio.play().catch(()=>{});
+      wordAudio.volume = 1;
+    }
   } catch(e) {}
   startOver.classList.add('hiding');
   setTimeout(() => { startOver.style.display = 'none'; }, 380);
@@ -876,31 +878,33 @@ function advanceAfterCorrect() {
         setTimeout(doAdvance, 800);
         return;
       }
+      wordAudio.onended = null;
       wordAudio.src = CFG.audioBase + card.mp3;
       wordAudio.onended = () => setTimeout(doAdvance, 800);
       wordAudio.play().catch(() => setTimeout(doAdvance, 800));
       setTimeout(doAdvance, 7000);   // safety — now guarded
     };
 
-    setTimeout(() => {
-      // ding itself hung — bail out
-      if (!advanced) {
-        if (card.mp3) {
-          wordAudio.src = CFG.audioBase + card.mp3;
-          wordAudio.onended = () => setTimeout(doAdvance, 800);
-          wordAudio.play().catch(() => setTimeout(doAdvance, 800));
-          setTimeout(doAdvance, 7000);
-        } else {
-          setTimeout(doAdvance, 800);
-        }
-      }
-    }, 3000);
-
-  } else if (card.mp3) {
-    wordAudio.src = CFG.audioBase + card.mp3;
-    wordAudio.onended = () => setTimeout(doAdvance, 800);
-    wordAudio.play().catch(() => setTimeout(doAdvance, 800));
-    setTimeout(doAdvance, 7000);   // guarded
+   setTimeout(() => {
+  // ding itself hung — bail out
+  if (!advanced) {
+    if (card.mp3) {
+      wordAudio.onended = null;
+      wordAudio.src = CFG.audioBase + card.mp3;
+      wordAudio.onended = () => setTimeout(doAdvance, 800);
+      wordAudio.play().catch(() => setTimeout(doAdvance, 800));
+      setTimeout(doAdvance, 7000);
+    } else {
+      setTimeout(doAdvance, 800);
+    }
+  }
+}, 3000);
+} else if (card.mp3) {
+  wordAudio.onended = null;
+  wordAudio.src = CFG.audioBase + card.mp3;
+  wordAudio.onended = () => setTimeout(doAdvance, 800);
+  wordAudio.play().catch(() => setTimeout(doAdvance, 800));
+  setTimeout(doAdvance, 7000);   // guarded
 
   } else {
     setTimeout(doAdvance, 1500);
