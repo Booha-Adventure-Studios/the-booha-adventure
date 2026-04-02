@@ -4,9 +4,9 @@
 //  sw.js
 // ============================================================
 
-const CACHE_NAME   = 'booha-adventure-2026-02';
-const ASSET_CACHE  = 'booha-assets-2026-02';
-const DECK_CACHE   = 'booha-decks-2026-02';
+const CACHE_NAME   = 'booha-adventure-2026-03';
+const ASSET_CACHE  = 'booha-assets-2026-03';
+const DECK_CACHE   = 'booha-decks-2026-03';
 
 const BASE = '/the-booha-adventure';
 
