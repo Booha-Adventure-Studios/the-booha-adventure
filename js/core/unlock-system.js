@@ -157,9 +157,9 @@ const BoohaUnlockSystem = (() => {
     if (!qualified) return;
 
     // Unlock all bonus games
-    BONUS_GAMES.forEach(id => { bonus[id] = true; });
-    data.weekly = { ...weekly, unlockedBonusGames: bonus };
-    BoohaAdventure.save.save(data);
+   // AFTER**FIXED**
+   BONUS_GAMES.forEach(id => { bonus[id] = true; });
+   BoohaAdventure.save.patchDeep('weekly', 'unlockedBonusGames', bonus);
 
     document.dispatchEvent(new CustomEvent('booha:bonusGamesUnlocked', {
       detail: { games: BONUS_GAMES }
