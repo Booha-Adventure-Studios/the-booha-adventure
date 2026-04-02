@@ -832,6 +832,7 @@ function showCard() {
   firstTry  = true;
   iosLocked = false;
   lastTranscript = '';
+  micSessionId++; 
    
   const card = order[idx];
   numEl.textContent  = idx + 1;
@@ -1007,8 +1008,9 @@ function handleIosPick(btn, en) {
 let recognition = null;
 let srListening = false;
 let lastMicAt   = 0;
-let micTimeout = null;
-let lastTranscript = '';   
+let micTimeout  = null;
+let lastTranscript = '';
+let micSessionId = 0;  
 
 function clearMicUi() {
   srListening = false;
@@ -1045,9 +1047,10 @@ if (SR && !isIOS) {
   };
 
  recognition.onresult = e => {
+  if (thisSession !== micSessionId) return;
   if (answered || !srListening) return;
 
-  answered = true;       // 🔥 HARD LOCK (this is the real fix)
+  answered = true;       // HARD LOCK (this is the real fix)
   srListening = false;
     
 
@@ -1138,22 +1141,19 @@ function onMicWrong() {
 if (micBtn) {
   const triggerMic = () => {
   if (answered || srListening) return;
-
   const now = Date.now();
   if (now - lastMicAt < 400) return;
   lastMicAt = now;
-
   U.unlockAudio();
-
   wordAudio.pause();
   wordAudio.currentTime = 0;
   wordAudio.onended = null;
-
   if (!recognition) {
     alert('Speech recognition needs Chrome on Android or a desktop browser.');
     return;
   }
-    try { recognition.start(); } catch(e) {}
+  const thisSession = ++micSessionId;
+  try { recognition.start(); } catch(e) {}
   };
   micBtn.addEventListener('click', triggerMic);
   micBtn.addEventListener('touchstart', e => { e.preventDefault(); triggerMic(); }, { passive: false });
