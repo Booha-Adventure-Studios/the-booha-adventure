@@ -607,7 +607,8 @@ window.uhibonInit = function () {
     return (pageKey && PAGE_CONTEXTS[pageKey]?.quickReplies) || [];
   }
 
-  // ── Knowledge matching ────────────────────────────────────
+// ── Knowledge matching ────────────────────────────────────
+
   function normalizeText(str) {
     return String(str || '')
       .toLowerCase()
@@ -616,39 +617,42 @@ window.uhibonInit = function () {
       .trim();
   }
 
+  function wordMatch(norm, k) {
+    if (!k) return false;
+    const escaped = k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    if (/[\u3040-\u9FFF]/.test(k)) return norm.includes(k);
+    return new RegExp(`(?<![\\w-])${escaped}(?![\\w-])`).test(norm);
+  }
+
+  function pickRandom(val) {
+    if (Array.isArray(val)) return val[Math.floor(Math.random() * val.length)];
+    return val;
+  }
+
   function matchKnowledge(inputText) {
     const norm = normalizeText(inputText);
     const data = window.UHIBON_KNOWLEDGE || {};
 
-    // Check page-specific entries first
     for (const entry of getUhibonPageEntries()) {
       for (const key of entry.keywords || []) {
         const k = normalizeText(key);
-        if (k && norm.includes(k)) {
-          // Page context entries store en/jp as flat strings (not nested objects)
-          return { en: entry.en, jp: entry.jp };
+        if (wordMatch(norm, k)) {
+          const payload = entry.answer || { en: entry.en, jp: entry.jp };
+          return pickRandom(payload);
         }
       }
     }
 
-    // Then global knowledge
     for (const entry of data.entries || []) {
       for (const key of entry.keywords || []) {
         const k = normalizeText(key);
-        if (k && norm.includes(k)) return entry.answer;
+        if (wordMatch(norm, k)) return pickRandom(entry.answer);
       }
     }
 
-    // Fallback
-    const fallback =
-      Array.isArray(data.unknown) && data.unknown.length
-        ? data.unknown
-        : [
-            {
-              en: "Try asking me in a different way.",
-              jp: "ちがう ききかたで きいてみて。"
-            }
-          ];
+    const fallback = Array.isArray(data.unknown) && data.unknown.length
+      ? data.unknown
+      : [{ en: "Try asking me in a different way.", jp: "ちがう ききかたで きいてみて。" }];
 
     return fallback[Math.floor(Math.random() * fallback.length)];
   }
@@ -657,5 +661,6 @@ window.uhibonInit = function () {
     return matchKnowledge(inputText);
   }
 
+    
 })(); // end IIFE
 };   // end window.uhibonInit
