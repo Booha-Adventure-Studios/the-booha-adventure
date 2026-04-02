@@ -761,7 +761,6 @@ function startProgress() {
     else progFill.classList.remove('warning');
     if (pct > 0) {
       progRAF = requestAnimationFrame(tick);
-       
     } else {
       // Meter ran out — discard any in-flight SR result then clean up
       micSessionId++;
@@ -771,7 +770,6 @@ function startProgress() {
         heardBox.className = 'stw-heard-box';
         heardText.textContent = 'No speech heard — try again';
       }
-     }
     }
   };
   progRAF = requestAnimationFrame(tick);
