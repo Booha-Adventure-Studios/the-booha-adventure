@@ -344,235 +344,356 @@ window.uhibonInit = function () {
     More like a friendly forest creature than a helpful assistant.
   */
 
-  const PAGE_CONTEXTS = {
+  /* uhibon-page-contexts.js
+   Drop this into uhibon-init.js in place of the existing PAGE_CONTEXTS block.
+   Requires the engine patch: pickRandom(val) handles both flat { en, jp } and arrays.
+*/
 
-    maze: {
-      intro: {
-        en: "Uuu-hi-hi-hi-hi. You found the Maze. Good. Very twisty in here.",
-        jp: "うーひひひひ。めいろを みつけたね。よかった。ここは くねくねしてるよ。"
-      },
-      quickReplies: [
-        { en: "What is the Maze, anyway?", jp: "めいろって なに？" },
-        { en: "I think I am lost in here.", jp: "まよったかも。" },
-        { en: "Where should I go first?",  jp: "さいしょに どこへ いけばいい？" }
-      ],
-      entries: [
-        {
-          keywords: ["maze", "what is the maze", "what is this", "めいろ", "なに"],
-          en: "The Maze is the main walking-around place. Lots of paths. Some of them go somewhere interesting.",
-          jp: "めいろは メインの ちずのない たんけんばしょだよ。みちが いっぱいあって、おもしろい ところに つながってるのも あるよ。"
-        },
-        {
-          keywords: ["lost", "i'm lost", "i am lost", "where am i", "迷子", "まよった"],
-          en: "Getting a little lost is fine. The Maze is used to it.",
-          jp: "ちょっと まよっても だいじょうぶ。めいろは なれてるから。"
-        },
-        {
-          keywords: ["where do i go", "which way", "direction", "どこ", "みち", "どっち", "where now"],
-          en: "Pick the path that looks interesting. Boring paths are less fun.",
-          jp: "きになる みちを えらんで。つまらない みちは つまらないよ。"
-        },
-        {
-          keywords: ["help", "maze help", "can you help", "たすけて", "てつだって"],
-          en: "The best move in the Maze is to just start walking and look carefully.",
-          jp: "めいろでは まず あるいて、よく みるのが だいいちだよ。"
-        },
-        {
-          keywords: ["exit", "goal", "finish", "clear", "出口", "ゴール", "クリア"],
-          en: "Getting out is one thing. But sometimes the Maze wants you to find something first.",
-          jp: "でることも いいけど、なにかを みつけてから のほうが いいかもね。"
-        },
-        {
-          keywords: ["map", "layout", "地図", "マップ"],
-          en: "No map. Sorry. That would ruin it a little.",
-          jp: "ちずは ないよ。ごめんね。あったら ちょっと つまらなくなるもん。"
-        },
-        {
-          keywords: ["scary", "creepy", "こわい"],
-          en: "A bit spooky maybe. But the spooky kind that is still fun.",
-          jp: "ちょっと こわいかも。でも たのしい こわさだよ。"
-        },
-        {
-          keywords: ["secret", "hidden", "ひみつ", "かくし"],
-          en: "Mazes are quite good at hiding small things.",
-          jp: "めいろは ちいさい ものを かくすのが とくいなんだ。"
-        },
-        {
-          keywords: ["wall", "walls", "tree", "trees", "かべ", "き"],
-          en: "Walls are walls. Sometimes they are also a hint. Hard to tell.",
-          jp: "かべは かべだよ。でも ヒントのときも あるかも。わかんないけど。"
-        },
-        {
-          keywords: ["start", "begin", "first", "さいしょ", "はじめ"],
-          en: "Starting is easy. Just pick a direction.",
-          jp: "はじめるのは かんたん。みちを きめて いくだけ。"
-        },
-        {
-          keywords: ["why maze", "why is there a maze", "なんで めいろ"],
-          en: "Because straight lines are boring.",
-          jp: "まっすぐだけだと つまらないからだよ。"
-        }
-      ]
-    },
+const PAGE_CONTEXTS = {
 
-    karasuki: {
-      intro: {
-        en: "Uuu-hi-hi-hi-hi. Karasuki is a strange place. Darker. Quieter. A bit more mysterious than usual.",
-        jp: "うーひひひひ。カラスキは ふしぎな ばしょだよ。くらくて しずかで、いつもより ちょっと なぞめいてるんだ。"
-      },
-      quickReplies: [
-        { en: "What even is Karasuki?",       jp: "カラスキって なに？" },
-        { en: "Why does it feel so strange?", jp: "なんで こんなに へんな かんじがするの？" },
-        { en: "Is it okay to explore here?",  jp: "ここを たんけんしても いい？" }
-      ],
-      entries: [
-        {
-          keywords: ["karasuki", "what is karasuki", "カラスキ", "なに"],
-          en: "Karasuki is a strange place. Darker than usual. Quieter too. Not scary exactly. Just different.",
-          jp: "カラスキは ふしぎな ばしょだよ。いつもより くらくて しずか。こわいわけじゃないけど、なんか ちがうんだ。"
-        },
-        {
-          keywords: ["where am i", "where is this", "ここは", "どこ"],
-          en: "You are in Karasuki. It feels a little lost and a little alive at the same time.",
-          jp: "カラスキに いるよ。ちょっと まよったみたいで、でも ちょっと いきてる みたいな ばしょなんだ。"
-        },
-        {
-          keywords: ["why dark", "dark", "dim", "くらい"],
-          en: "Karasuki likes mystery more than brightness. They do not agree on that point.",
-          jp: "カラスキは あかるさより ふしぎが すきなんだ。そこは なかよくできないみたい。"
-        },
-        {
-          keywords: ["scary", "creepy", "こわい"],
-          en: "A little spooky. But not the loud kind. More like a quiet strange feeling.",
-          jp: "ちょっと こわい。でも うるさい こわさじゃなくて、しずかに へんな かんじ。"
-        },
-        {
-          keywords: ["what do i do here", "what should i do", "なにをする", "どうする"],
-          en: "Look around carefully. Karasuki is better if you take your time.",
-          jp: "まわりを よく みてみて。カラスキは ゆっくり みると もっと いいんだよ。"
-        },
-        {
-          keywords: ["weird", "strange", "why strange", "へん", "ふしぎ"],
-          en: "Because normal places do not become Karasuki.",
-          jp: "ふつうの ばしょは カラスキに ならないからだよ。"
-        },
-        {
-          keywords: ["lost", "i'm lost", "i am lost", "まよった"],
-          en: "Being a little lost in Karasuki is maybe part of seeing it properly.",
-          jp: "カラスキで ちょっと まようのも、ちゃんと みるための ひとつかもね。"
-        },
-        {
-          keywords: ["secret", "hidden", "ひみつ"],
-          en: "Karasuki feels full of secrets even when nothing is speaking.",
-          jp: "カラスキは なにも しゃべってなくても、ひみつが いっぱい ありそうな かんじがするよ。"
-        },
-        {
-          keywords: ["crow", "crows", "bird", "からす", "とり"],
-          en: "Karasuki and crows seem to understand each other.",
-          jp: "カラスキと からすは なんとなく わかりあってるみたい。"
-        },
-        {
-          keywords: ["can i leave", "go back", "exit", "でられる", "もどれる"],
-          en: "Probably yes. But Karasuki prefers not to be rushed.",
-          jp: "たぶん だいじょうぶ。でも カラスキは いそがれるのが すきじゃないんだ。"
-        },
-        {
-          keywords: ["who lives here", "who is here", "だれが いる"],
-          en: "Karasuki feels like the kind of place where something is always nearby.",
-          jp: "カラスキは なんか いつも なにかが ちかくに いそうな ばしょだよ。"
-        }
-      ]
-    },
+  /* ════════════════════════════════════════
+     MAZE
+  ════════════════════════════════════════ */
 
-    homework: {
-      intro: {
-        en: "Uuu-hi-hi-hi-hi. Homework Tree time. I can help you think and practice.",
-        jp: "うーひひひひ。しゅくだいの木だよ。かんがえたり れんしゅうしたり、てつだえるよ。"
+  maze: {
+    intro: [
+      { en: "Uuu-hi-hi-hi-hi. You found the Maze. Good. Very twisty in here.", jp: "うーひひひひ。めいろを みつけたね。よかった。くねくねしてるよ。" },
+      { en: "Heehee. The Maze. Lots of paths. Some go somewhere good.", jp: "えへへ。めいろだね。みちが いっぱい。いい ところに いくのも あるよ。" },
+      { en: "Uuu-hi-hi-hi-hi. Welcome to the twisty place.", jp: "うーひひひひ。ぐるぐるの ばしょへ ようこそ。" }
+    ],
+
+    quickReplies: [
+      { en: "What is the Maze, anyway?",  jp: "めいろって なに？" },
+      { en: "I think I am lost in here.", jp: "まよったかも。" },
+      { en: "Is there a secret in here?", jp: "なにか かくれてる？" },
+      { en: "Where should I go first?",   jp: "さいしょに どこへ いけばいい？" }
+    ],
+
+    entries: [
+      {
+        keywords: ["hello","hi","hey","howdy","yo","sup","what's up","hiya","konnichiwa","こんにちは","やあ"],
+        answer: [
+          { en: "Uuu-hi-hi-hi-hi! Hello, Maze explorer.", jp: "うーひひひひ！こんにちは、めいろたんけんしゃ。" },
+          { en: "Heehee. You made it to the Maze. Hello.", jp: "えへへ。めいろに きたんだね。こんにちは。" },
+          { en: "Hi hi! Lost already? That's okay.", jp: "やあやあ！もう まよった？だいじょうぶだよ。" },
+          { en: "Oh! A visitor. Hello. Watch the walls.", jp: "あ！だれか きた。こんにちは。かべに きをつけてね。" }
+        ]
       },
-      quickReplies: [
-        { en: "What is Homework Tree?",     jp: "しゅくだいの木って なに？" },
-        { en: "I am stuck on something.",   jp: "わからないところが あるよ。" },
-        { en: "Why do I even do homework?", jp: "なんで しゅくだいするの？" }
-      ],
-      entries: [
-        {
-          keywords: ["homework", "what is homework tree", "homework tree", "しゅくだい", "しゅくだいの木"],
-          en: "Homework Tree is the place for practice and review. You come here to get better at things.",
-          jp: "しゅくだいの木は れんしゅうと ふくしゅうの ばしょだよ。ここで じょうずになれるんだ。"
-        },
-        {
-          keywords: ["what do i do here", "now what", "どうする", "なにをする"],
-          en: "Practice a little. Review a little. Try again. That is the whole thing.",
-          jp: "すこし れんしゅうして、すこし ふくしゅうして、もういちど やってみよう。それだけだよ。"
-        },
-        {
-          keywords: ["help", "help me", "can you help", "たすけて", "おしえて"],
-          en: "Yes. Tell me which part feels tricky.",
-          jp: "うん。どこが むずかしいか おしえて。"
-        },
-        {
-          keywords: ["i don't understand", "confused", "stuck", "わからない", "こまった"],
-          en: "That is okay. We can make it smaller and easier to look at.",
-          jp: "だいじょうぶ。もっと ちいさく わけて かんがえてみよう。"
-        },
-        {
-          keywords: ["answer", "just tell me", "tell me the answer", "答え", "せいかい"],
-          en: "I would rather help you get there yourself. More fun that way.",
-          jp: "じぶんで たどりつくのを てつだいたいな。そっちのほうが おもしろいから。"
-        },
-        {
-          keywords: ["why homework", "why do homework", "なんで しゅくだい"],
-          en: "Practice helps English get stronger. Small bits every day add up.",
-          jp: "れんしゅうすると えいごが つよくなるよ。まいにち すこしずつで ちゃんと のびるんだ。"
-        },
-        {
-          keywords: ["boring", "homework is boring", "つまらない"],
-          en: "A little boring is okay. Finishing still feels pretty good.",
-          jp: "ちょっと つまらなくても いいよ。おわると きもちいいからね。"
-        },
-        {
-          keywords: ["hard", "too hard", "difficult", "むずかしい"],
-          en: "Then do one small part first. Just one.",
-          jp: "じゃあ まず ちいさい ひとつだけ やってみよう。ひとつだけ。"
-        },
-        {
-          keywords: ["easy", "too easy", "かんたん"],
-          en: "Then do it neatly. Neat is its own kind of hard.",
-          jp: "じゃあ ていねいに やってみよう。ていねいって それなりに むずかしいんだよ。"
-        },
-        {
-          keywords: ["reading", "read", "よみ", "読む"],
-          en: "Read slowly first. Fast reading can come later.",
-          jp: "さいしょは ゆっくり よんで。はやく よむのは あとでも できるよ。"
-        },
-        {
-          keywords: ["writing", "write", "かく", "書く"],
-          en: "Writing by hand helps your brain remember things.",
-          jp: "てで かくと あたまに のこりやすいよ。"
-        },
-        {
-          keywords: ["english", "eigo", "えいご"],
-          en: "Little by little is good. English grows with practice.",
-          jp: "すこしずつ でいいよ。えいごは れんしゅうで のびるんだ。"
-        },
-        {
-          keywords: ["math", "number", "numbers", "計算", "すうがく", "かず"],
-          en: "One step at a time. Rushing makes sneaky mistakes.",
-          jp: "ひとつずつ やっていこう。いそぐと こっそり まちがえるから。"
-        },
-        {
-          keywords: ["finished", "done", "i'm done", "おわった"],
-          en: "Good. Finished is better than floating around forever.",
-          jp: "いいね。いつまでも ふわふわしてるより、おわるのが いちばん いいよ。"
-        },
-        {
-          keywords: ["don't want to", "i don't want homework", "やりたくない"],
-          en: "Do one tiny part anyway. Just the tiniest part.",
-          jp: "それでも ちいさい ひとつだけ やってみよう。ほんの ちいさいやつだけ。"
-        }
-      ]
-    }
-  };
+      {
+        keywords: ["maze","what is the maze","what is this","めいろ","なに"],
+        answer: [
+          { en: "The Maze is the main walking-around place. Lots of paths. Some go somewhere interesting.", jp: "めいろは メインの たんけんばしょだよ。みちが いっぱいあって、おもしろい ところに いくのも あるよ。" },
+          { en: "A big connected place. You explore it. Things happen.", jp: "おおきな つながった ばしょだよ。たんけんするんだ。いろいろ おこるよ。" }
+        ]
+      },
+      {
+        keywords: ["lost","i'm lost","i am lost","where am i","迷子","まよった"],
+        answer: [
+          { en: "Getting a little lost is fine. The Maze is used to it.", jp: "ちょっと まよっても だいじょうぶ。めいろは なれてるから。" },
+          { en: "Heehee. Lost is just another word for exploring.", jp: "えへへ。まよってるって いうのは、たんけんしてるって ことだよ。" },
+          { en: "Look for something interesting and go toward it.", jp: "おもしろそうな ものを みつけて、そっちへ いって。" }
+        ]
+      },
+      {
+        keywords: ["where do i go","which way","direction","どこ","みち","どっち","where now"],
+        answer: [
+          { en: "Pick the path that looks interesting. Boring paths are less fun.", jp: "きになる みちを えらんで。つまらない みちは つまらないよ。" },
+          { en: "Try the one you almost didn't notice.", jp: "あやうく みのがした みちを ためしてみて。" }
+        ]
+      },
+      {
+        keywords: ["exit","goal","finish","clear","出口","ゴール","クリア"],
+        answer: [
+          { en: "Getting out is one thing. But sometimes the Maze wants you to find something first.", jp: "でることも いいけど、なにかを みつけてから のほうが いいかもね。" },
+          { en: "You'll find the exit. But maybe not right away.", jp: "でぐちは みつかるよ。でも すぐじゃ ないかも。" }
+        ]
+      },
+      {
+        keywords: ["map","layout","地図","マップ"],
+        answer: [
+          { en: "No map. Sorry. That would ruin it a little.", jp: "ちずは ないよ。ごめんね。あったら ちょっと つまらなくなるもん。" },
+          { en: "The Maze is the map. Kind of.", jp: "めいろ じたいが ちずみたいなものだよ。たぶんね。" }
+        ]
+      },
+      {
+        keywords: ["scary","creepy","こわい"],
+        answer: [
+          { en: "A bit spooky. But the kind that is still fun.", jp: "ちょっと こわいかも。でも たのしい こわさだよ。" },
+          { en: "Heehee. I think it's more mysterious than scary.", jp: "えへへ。こわいより ふしぎな かんじだと おもうよ。" }
+        ]
+      },
+      {
+        keywords: ["secret","hidden","ひみつ","かくし"],
+        answer: [
+          { en: "Mazes are quite good at hiding small things.", jp: "めいろは ちいさい ものを かくすのが とくいなんだ。" },
+          { en: "Maybe. Look at things that seem unimportant.", jp: "あるかも。なんでも ないように みえる ものを よく みてみて。" }
+        ]
+      },
+      {
+        keywords: ["wall","walls","tree","trees","かべ","き"],
+        answer: [
+          { en: "Walls are walls. Sometimes they are also a hint. Hard to tell.", jp: "かべは かべだよ。でも ヒントのときも あるかも。わかんないけど。" },
+          { en: "The walls know things. They're not saying though.", jp: "かべは なにかを しってるよ。でも しゃべってくれないんだ。" }
+        ]
+      },
+      {
+        keywords: ["start","begin","first","さいしょ","はじめ"],
+        answer: [
+          { en: "Starting is easy. Just pick a direction.", jp: "はじめるのは かんたん。みちを きめて いくだけ。" },
+          { en: "Go somewhere. The Maze rewards trying.", jp: "どこかに いって。めいろは ためした ひとに いいことが あるよ。" }
+        ]
+      },
+      {
+        keywords: ["why maze","why is there a maze","なんで めいろ"],
+        answer: [
+          { en: "Because straight lines are boring.", jp: "まっすぐだけだと つまらないからだよ。" },
+          { en: "Adventures need a maze. That's just how it works.", jp: "ぼうけんには めいろが ひつようなんだよ。そういう ものなんだ。" }
+        ]
+      }
+    ]
+  },
+
+  /* ════════════════════════════════════════
+     KARASUKI
+  ════════════════════════════════════════ */
+
+  karasuki: {
+    intro: [
+      { en: "Uuu-hi-hi-hi-hi. Karasuki. Darker here. Quieter. Something is always nearby.", jp: "うーひひひひ。カラスキだよ。ここは くらい。しずか。なにかが いつも ちかくに いるんだ。" },
+      { en: "Heehee. You found Karasuki. Strange place. Good strange.", jp: "えへへ。カラスキを みつけたね。へんな ばしょだよ。いい へんさだけど。" },
+      { en: "Uuu-hi-hi-hi-hi. Welcome to the strange dark quiet place.", jp: "うーひひひひ。へんで くらくて しずかな ばしょへ ようこそ。" }
+    ],
+
+    quickReplies: [
+      { en: "What even is Karasuki?",       jp: "カラスキって なに？" },
+      { en: "Why does it feel so strange?", jp: "なんで こんなに へんな かんじがするの？" },
+      { en: "Is something hiding in here?", jp: "なにかが かくれてる？" },
+      { en: "Is it okay to explore here?",  jp: "ここを たんけんしても いい？" }
+    ],
+
+    entries: [
+      {
+        keywords: ["hello","hi","hey","howdy","yo","sup","what's up","hiya","konnichiwa","こんにちは","やあ"],
+        answer: [
+          { en: "Uuu-hi-hi-hi-hi. Hello. Quietly.", jp: "うーひひひひ。こんにちは。しずかにね。" },
+          { en: "Heehee. Someone arrived. Hello, quiet adventurer.", jp: "えへへ。だれか きた。こんにちは、しずかな ぼうけんしゃ。" },
+          { en: "Hi. Karasuki noticed you came in.", jp: "こんにちは。カラスキは きみが はいってきたの しってるよ。" },
+          { en: "Oh. Hello. This place gets quieter when someone arrives. Strange.", jp: "あ。こんにちは。だれかが くると もっと しずかになるんだ。ふしぎだね。" }
+        ]
+      },
+      {
+        keywords: ["karasuki","what is karasuki","カラスキ","なに"],
+        answer: [
+          { en: "Karasuki is a strange place. Darker than usual. Quieter too. Not scary exactly. Just different.", jp: "カラスキは ふしぎな ばしょだよ。いつもより くらくて しずか。こわいわけじゃないけど、なんか ちがうんだ。" },
+          { en: "Old. Strange. Quiet. Full of things that don't quite say what they are.", jp: "ふるくて へんで しずか。なにかを かくしてる ものが いっぱいあるよ。" }
+        ]
+      },
+      {
+        keywords: ["where am i","where is this","ここは","どこ"],
+        answer: [
+          { en: "You are in Karasuki. It feels a little lost and a little alive at the same time.", jp: "カラスキに いるよ。ちょっと まよったみたいで、でも ちょっと いきてる みたいな ばしょなんだ。" },
+          { en: "Karasuki. Somewhere between here and somewhere else.", jp: "カラスキ。ここと どこかの あいだに ある ばしょだよ。" }
+        ]
+      },
+      {
+        keywords: ["why dark","dark","dim","くらい"],
+        answer: [
+          { en: "Karasuki likes mystery more than brightness. They don't agree on that point.", jp: "カラスキは あかるさより ふしぎが すきなんだ。そこは なかよくできないみたい。" },
+          { en: "Some places just like the dark. Karasuki is one of them.", jp: "くらいのが すきな ばしょって あるんだよ。カラスキは そういう ばしょ。" }
+        ]
+      },
+      {
+        keywords: ["scary","creepy","こわい"],
+        answer: [
+          { en: "A little spooky. Not the loud kind. More like a quiet strange feeling.", jp: "ちょっと こわい。でも うるさい こわさじゃなくて、しずかに へんな かんじ。" },
+          { en: "Heehee. Karasuki is the kind of spooky that makes you look twice.", jp: "えへへ。カラスキは もう いちど みたくなる こわさだよ。" }
+        ]
+      },
+      {
+        keywords: ["what do i do here","what should i do","なにをする","どうする"],
+        answer: [
+          { en: "Look around carefully. Karasuki is better if you take your time.", jp: "まわりを よく みてみて。カラスキは ゆっくり みると もっと いいんだよ。" },
+          { en: "Slow down. Let Karasuki show you things.", jp: "ゆっくりして。カラスキが みせてくれるのを まってみて。" }
+        ]
+      },
+      {
+        keywords: ["weird","strange","why strange","へん","ふしぎ"],
+        answer: [
+          { en: "Because normal places don't become Karasuki.", jp: "ふつうの ばしょは カラスキに ならないからだよ。" },
+          { en: "Strange is just how Karasuki is. It's comfortable with it.", jp: "へんなのが カラスキの ふつうなんだ。なれてるよ。" }
+        ]
+      },
+      {
+        keywords: ["lost","i'm lost","i am lost","まよった"],
+        answer: [
+          { en: "Being a little lost in Karasuki is maybe part of seeing it properly.", jp: "カラスキで ちょっと まようのも、ちゃんと みるための ひとつかもね。" },
+          { en: "Heehee. Karasuki likes it when you stay a while.", jp: "えへへ。カラスキは すこし いてくれると うれしいんだよ。" }
+        ]
+      },
+      {
+        keywords: ["secret","hidden","ひみつ"],
+        answer: [
+          { en: "Karasuki feels full of secrets even when nothing is speaking.", jp: "カラスキは なにも しゃべってなくても、ひみつが いっぱい ありそうな かんじがするよ。" },
+          { en: "Yes. Many. Don't rush.", jp: "あるよ。たくさん。いそがないでね。" }
+        ]
+      },
+      {
+        keywords: ["crow","crows","bird","からす","とり"],
+        answer: [
+          { en: "Karasuki and crows seem to understand each other.", jp: "カラスキと からすは なんとなく わかりあってるみたい。" },
+          { en: "Crows know things. So does Karasuki. They get along.", jp: "からすは いろいろ しってるんだ。カラスキも そう。だから なかよし。" }
+        ]
+      },
+      {
+        keywords: ["can i leave","go back","exit","でられる","もどれる"],
+        answer: [
+          { en: "Probably yes. But Karasuki prefers not to be rushed.", jp: "たぶん だいじょうぶ。でも カラスキは いそがれるのが すきじゃないんだ。" },
+          { en: "You can leave. But look around a little more first.", jp: "でられるよ。でも もう すこし みていって。" }
+        ]
+      },
+      {
+        keywords: ["who lives here","who is here","だれが いる"],
+        answer: [
+          { en: "Karasuki feels like the kind of place where something is always nearby.", jp: "カラスキは なんか いつも なにかが ちかくに いそうな ばしょだよ。" },
+          { en: "Hard to say. But you probably aren't alone.", jp: "むずかしい しつもんだね。でも たぶん ひとりじゃ ないよ。" }
+        ]
+      }
+    ]
+  },
+
+  /* ════════════════════════════════════════
+     HOMEWORK
+  ════════════════════════════════════════ */
+
+  homework: {
+    intro: [
+      { en: "Uuu-hi-hi-hi-hi. Homework Tree. Good place. I can help.", jp: "うーひひひひ。しゅくだいの木だよ。いい ばしょ。てつだえるよ。" },
+      { en: "Heehee. Homework time. You can do this.", jp: "えへへ。しゅくだいの じかんだよ。できるよ。" },
+      { en: "Uuu-hi-hi-hi-hi. Practice place. Ask me things if you get stuck.", jp: "うーひひひひ。れんしゅうの ばしょだよ。まよったら きいてね。" }
+    ],
+
+    quickReplies: [
+      { en: "What is Homework Tree?",     jp: "しゅくだいの木って なに？" },
+      { en: "I am stuck on something.",   jp: "わからないところが あるよ。" },
+      { en: "Why do I even do homework?", jp: "なんで しゅくだいするの？" },
+      { en: "I don't want to do this.",   jp: "やりたくないな。" }
+    ],
+
+    entries: [
+      {
+        keywords: ["hello","hi","hey","howdy","yo","sup","what's up","hiya","konnichiwa","こんにちは","やあ"],
+        answer: [
+          { en: "Uuu-hi-hi-hi-hi! Hello. Ready to practice?", jp: "うーひひひひ！こんにちは。れんしゅう できる？" },
+          { en: "Hi hi! Homework Tree adventurer. Good.", jp: "やあやあ！しゅくだいの木の ぼうけんしゃだね。いいね。" },
+          { en: "Heehee. Hello. Let's make brains sparkle.", jp: "えへへ。こんにちは。あたまを ぴかぴかに しよう。" },
+          { en: "Oh! You came to practice. That's the right idea.", jp: "あ！れんしゅうしに きたんだね。それが いいんだよ。" }
+        ]
+      },
+      {
+        keywords: ["homework","what is homework tree","homework tree","しゅくだい","しゅくだいの木"],
+        answer: [
+          { en: "Homework Tree is the place for practice and review. You come here to get better at things.", jp: "しゅくだいの木は れんしゅうと ふくしゅうの ばしょだよ。ここで じょうずになれるんだ。" },
+          { en: "Practice and review. A little each time. It adds up.", jp: "れんしゅうと ふくしゅう。すこしずつ やると ちゃんと のびるんだよ。" }
+        ]
+      },
+      {
+        keywords: ["what do i do here","now what","どうする","なにをする"],
+        answer: [
+          { en: "Practice a little. Review a little. Try again. That is the whole thing.", jp: "すこし れんしゅうして、すこし ふくしゅうして、もういちど やってみよう。それだけだよ。" },
+          { en: "Pick something and start. Starting is the hardest part.", jp: "なにか えらんで はじめて。はじめるのが いちばん むずかしいんだから。" }
+        ]
+      },
+      {
+        keywords: ["help","help me","can you help","たすけて","おしえて"],
+        answer: [
+          { en: "Yes. Tell me which part feels tricky.", jp: "うん。どこが むずかしいか おしえて。" },
+          { en: "Sure. What part has you stuck?", jp: "いいよ。どこで まよってる？" }
+        ]
+      },
+      {
+        keywords: ["i don't understand","confused","stuck","わからない","こまった"],
+        answer: [
+          { en: "That is okay. We can make it smaller and easier to look at.", jp: "だいじょうぶ。もっと ちいさく わけて かんがえてみよう。" },
+          { en: "Not understanding yet is fine. That's why you practice.", jp: "まだ わからなくて いいんだよ。だから れんしゅうするんだから。" }
+        ]
+      },
+      {
+        keywords: ["answer","just tell me","tell me the answer","答え","せいかい"],
+        answer: [
+          { en: "I would rather help you get there yourself. More fun that way.", jp: "じぶんで たどりつくのを てつだいたいな。そっちのほうが おもしろいから。" },
+          { en: "Heehee. Try first. Then we can talk.", jp: "えへへ。まず やってみて。そのあと はなそう。" }
+        ]
+      },
+      {
+        keywords: ["why homework","why do homework","なんで しゅくだい"],
+        answer: [
+          { en: "Practice helps English get stronger. Small bits every day add up.", jp: "れんしゅうすると えいごが つよくなるよ。まいにち すこしずつで ちゃんと のびるんだ。" },
+          { en: "Because you practiced today, future-you will thank you.", jp: "きょう れんしゅうしたら、みらいの きみが ありがとうって いってくれるよ。" }
+        ]
+      },
+      {
+        keywords: ["boring","homework is boring","つまらない"],
+        answer: [
+          { en: "A little boring is okay. Finishing still feels pretty good.", jp: "ちょっと つまらなくても いいよ。おわると きもちいいからね。" },
+          { en: "Heehee. Do one part. See if it stays boring.", jp: "えへへ。ひとつ やってみて。それでも つまらいか みてみよう。" }
+        ]
+      },
+      {
+        keywords: ["hard","too hard","difficult","むずかしい"],
+        answer: [
+          { en: "Then do one small part first. Just one.", jp: "じゃあ まず ちいさい ひとつだけ やってみよう。ひとつだけ。" },
+          { en: "Hard is okay. Hard means your brain is working.", jp: "むずかしくて いいんだよ。むずかしいのは あたまが はたらいてる しょうこだから。" }
+        ]
+      },
+      {
+        keywords: ["easy","too easy","かんたん"],
+        answer: [
+          { en: "Then do it neatly. Neat is its own kind of hard.", jp: "じゃあ ていねいに やってみよう。ていねいって それなりに むずかしいんだよ。" },
+          { en: "Good. Go faster. See how clean you can make it.", jp: "いいね。もっと はやくやってみて。どれだけ きれいに できるか みてみよう。" }
+        ]
+      },
+      {
+        keywords: ["finished","done","i'm done","おわった"],
+        answer: [
+          { en: "Good. Finished is better than floating around forever.", jp: "いいね。いつまでも ふわふわしてるより、おわるのが いちばんだよ。" },
+          { en: "Heehee! Done already. That's the right kind of fast.", jp: "えへへ！もう おわった。それが いい はやさだよ。" }
+        ]
+      },
+      {
+        keywords: ["don't want to","i don't want homework","やりたくない"],
+        answer: [
+          { en: "Do one tiny part anyway. Just the tiniest part.", jp: "それでも ちいさい ひとつだけ やってみよう。ほんの ちいさいやつだけ。" },
+          { en: "Heehee. Five minutes. That is all. Then see how you feel.", jp: "えへへ。五分だけ。それだけ。そのあと どんな きもちか みてみて。" }
+        ]
+      },
+      {
+        keywords: ["reading","read","よみ","読む"],
+        answer: [
+          { en: "Read slowly first. Fast reading can come later.", jp: "さいしょは ゆっくり よんで。はやく よむのは あとでも できるよ。" }
+        ]
+      },
+      {
+        keywords: ["writing","write","かく","書く"],
+        answer: [
+          { en: "Writing by hand helps your brain remember things.", jp: "てで かくと あたまに のこりやすいよ。" }
+        ]
+      },
+      {
+        keywords: ["english","eigo","えいご"],
+        answer: [
+          { en: "Little by little is good. English grows with practice.", jp: "すこしずつ でいいよ。えいごは れんしゅうで のびるんだ。" }
+        ]
+      },
+      {
+        keywords: ["math","number","numbers","計算","すうがく","かず"],
+        answer: [
+          { en: "One step at a time. Rushing makes sneaky mistakes.", jp: "ひとつずつ やっていこう。いそぐと こっそり まちがえるから。" }
+        ]
+      }
+    ]
+  }
+
+};
 
   // ── Context detection ─────────────────────────────────────
   function detectUhibonPageContext() {
