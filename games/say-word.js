@@ -1195,13 +1195,63 @@ if (micBtn) {
     wordAudio.pause();
     wordAudio.currentTime = 0;
     wordAudio.onended = null;
-    if (!recognition) {
+    if (!SR) {
       alert('Speech recognition needs Chrome on Android or a desktop browser.');
       return;
     }
+
+    // Tear down old instance, build fresh one each tap
+    if (recognition) { try { recognition.stop(); } catch(e) {} }
+    recognition = new SR();
+    recognition.lang = 'en-US';
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.maxAlternatives = 3;
+
+    recognition.onstart = () => {
+      srListening = true;
+      micBtn.classList.add('listening');
+      jpCard.classList.add('listening');
+      badgeText.textContent = 'LISTENING… / きいてる…';
+      if (heardBox) {
+        heardBox.className = 'stw-heard-box';
+        heardText.textContent = '…';
+      }
+      startProgress();
+    };
+
+    recognition.onresult = e => {
+      if (!srListening || answered) return;
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        if (!e.results[i].isFinal) continue;
+        clearMicUi();
+        try { recognition.stop(); } catch(e) {}
+        const alts  = Array.from(e.results[i]).map(r => r.transcript);
+        const heard = (alts[0] || '').toLowerCase().replace(/[.?!,'"]/g, '').trim();
+        const matched = matchesWord(alts, order[idx].en);
+        if (!matched && heardText) heardText.textContent = `"${heard}"`;
+        if (matched) { onMicCorrect(); } else { onMicWrong(); }
+        return;
+      }
+    };
+
+    recognition.onerror = e => {
+      if (e.error === 'aborted' || e.error === 'no-speech') return;
+      clearMicUi();
+      if (heardBox) {
+        heardBox.className = 'stw-heard-box';
+        heardText.textContent = 'Try again';
+      }
+    };
+
+    recognition.onend = () => {
+      if (srListening) { try { recognition.start(); } catch(e) {} }
+    };
+
     micSessionId++;
-    try { recognition.start(); } catch(e) {}
+    try { recognition.start(); } catch(e) { console.error('SR start:', e); }
   };
+
   micBtn.addEventListener('click', triggerMic);
   micBtn.addEventListener('touchstart', e => { e.preventDefault(); triggerMic(); }, { passive: false });
 }
