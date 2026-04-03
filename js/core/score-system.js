@@ -65,6 +65,8 @@ const BoohaScoreSystem = (() => {
     const wCompleted   = weekly.completedGames  || {};
     const wWanderers   = weekly.wanderers       || [];
 
+    const wasNewGame = !(wScores[gameId]);   // wScores is fresh from the new load()
+    
     // Weekly high score
     if (!wScores[gameId] || score > wScores[gameId]) {
       wScores[gameId] = score;
@@ -84,7 +86,7 @@ const BoohaScoreSystem = (() => {
 // ── 3. Unlock wanderer for this game ───────────────────────────────────────
 // Build a stable week-seeded game→wanderer map so the same game always
 // unlocks the same wanderer this week, regardless of play order or reruns.
-const wasNewGame = !(wScores[gameId]);   // wScores is fresh from the new load()
+
 
 if (wasNewGame) {
   const weekSeed  = parseInt(sessionStorage.getItem('booha_active_week') || '1', 10);
