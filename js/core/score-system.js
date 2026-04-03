@@ -84,43 +84,22 @@ const BoohaScoreSystem = (() => {
     }
 
 // ── 3. Unlock wanderer for this game ───────────────────────────────────────
-// Build a stable week-seeded game→wanderer map so the same game always
-// unlocks the same wanderer this week, regardless of play order or reruns.
-
-
 if (wasNewGame) {
-  const weekSeed  = parseInt(sessionStorage.getItem('booha_active_week') || '1', 10);
-  const allGames  = BoohaAdventure.registry
-    ? BoohaAdventure.registry.CURRICULUMS.flatMap(c =>
-        BoohaAdventure.registry.getForCurriculum(c).map(g => g.saveId)
-      )
-    : [];
+  const TOTAL_WANDERERS = 22;
+  const remaining = [];
 
-  // Seeded shuffle of game saveIds
-  function seededRng(seed) {
-    let s = seed >>> 0;
-    return function() { s ^= s << 13; s ^= s >> 17; s ^= s << 5; return (s >>> 0) / 0xffffffff; };
-  }
-  function seededShuffle(arr, rng) {
-    const a = arr.slice();
-    for (let i = a.length - 1; i > 0; i--) {
-      const j = Math.floor(rng() * (i + 1));
-      [a[i], a[j]] = [a[j], a[i]];
-    }
-    return a;
+  for (let i = 0; i < TOTAL_WANDERERS; i++) {
+    if (!wWanderers.includes(i)) remaining.push(i);
   }
 
-  const rng          = seededRng(weekSeed * 6271 + 17);
-  const shuffledGames = seededShuffle(allGames, rng);
-  // Map game index → wanderer index (27 games, 22 wanderers — wrap with modulo)
-  const wandererForGame = {};
-  shuffledGames.forEach((sid, i) => { wandererForGame[sid] = i % 22; });
-
-  const assignedWanderer = wandererForGame[gameId];
-  if (assignedWanderer != null && !wWanderers.includes(assignedWanderer)) {
-    wWanderers.push(assignedWanderer);
+  if (remaining.length > 0) {
+    const randIndex = Math.floor(Math.random() * remaining.length);
+    const chosen = remaining[randIndex];
+    wWanderers.push(chosen);
   }
 }
+
+
 
     // ── 4. Update meta.allTimeStars ────────────────────────────────────────
     // Only add the improvement in stars (delta) to avoid double-counting.
