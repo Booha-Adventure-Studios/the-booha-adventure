@@ -629,20 +629,23 @@
     });
   }
 
-  function refreshWanderersForRoom() {
-    let unlockedIndices = [];
-    if (window.__devAllWanderers) {
-      unlockedIndices = WANDERER_DEFS.map(d => d.index);
-    } else {
-      try {
-        const data = window.BoohaAdventure && BoohaAdventure.save ? BoohaAdventure.save.load() : null;
-        if (data && data.weekly && data.weekly.wanderers) unlockedIndices = data.weekly.wanderers;
-      } catch (_) {}
-    }
-    activeWanderers = WANDERER_DEFS
-      .filter(def => def.roomId === state.roomId && unlockedIndices.includes(def.index))
-      .map(def => ({ ...def, rx: def.x, ry: def.y, wobblePhase: Math.random() * Math.PI * 2, pose: 0, frozen: false, glitter: [], glitterNextAt: 0, images: (def.frames || []).map(f => wandererImages[f]).filter(Boolean) }));
+ function refreshWanderersForRoom() {
+  let unlockedIndices = [];
+  if (window.__devAllWanderers) {
+    unlockedIndices = WANDERER_DEFS.map(d => d.index);
+  } else {
+    try {
+      const raw = localStorage.getItem('booha_save');
+      const data = raw ? JSON.parse(raw) : null;
+      if (data && data.weekly && data.weekly.wanderers) {
+        unlockedIndices = data.weekly.wanderers;
+      }
+    } catch (_) {}
   }
+  activeWanderers = WANDERER_DEFS
+    .filter(def => def.roomId === state.roomId && unlockedIndices.includes(def.index))
+    .map(def => ({ ...def, rx: def.x, ry: def.y, wobblePhase: Math.random() * Math.PI * 2, pose: 0, frozen: false, glitter: [], glitterNextAt: 0, images: (def.frames || []).map(f => wandererImages[f]).filter(Boolean) }));
+}
 
   function initWanderers() { preloadWandererImages(); refreshWanderersForRoom(); }
   function onRoomChanged() { refreshWanderersForRoom(); }
