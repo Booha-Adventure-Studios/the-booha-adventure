@@ -15,7 +15,9 @@ const ASSET_PATHS = {
   background:  ASSET_BASE + "background.png",
   booIdle:     ASSET_BASE + "booha-invad-1.png",
   booShoot:    ASSET_BASE + "booha-invad-2.png",
-  bug:         ASSET_BASE + "bug-1.png",
+  bugNormal:   ASSET_BASE + "bug-1.png",   // default Dotty
+  bugHurt:     ASSET_BASE + "bug-2.png",   // hit-flash sprite (shown briefly on damage)
+  bugBoss:     ASSET_BASE + "bug-3.png",   // angry boss sprite (phase 2 + 3)
   candy:       ASSET_BASE + "candy.png",
   rocks:       [
     ASSET_BASE + "rock1.png",
@@ -190,6 +192,37 @@ const DROPPER_CONFIG = {
   fallSpeedMax:    320,        // px/s max fall speed
   aimSpread:       0.20,       // ±fraction of screen width aim randomness
   playerDamage:    22,         // energy damage on direct player hit
+};
+
+// ── HIT STOP ─────────────────────────────────────────────────
+// Brief game-freeze on kill — makes every shot feel weighted.
+const HIT_STOP = {
+  normalKill:  0.04,   // seconds to freeze on a normal bug kill
+  bossHit:     0.05,   // seconds to freeze each time boss is damaged
+  bossDeath:   0.10,   // seconds to freeze at the start of boss death sequence
+};
+
+// ── BOSS DEATH SEQUENCE ───────────────────────────────────────
+// Staged explosion — small pops, then the big bang.
+const BOSS_DEATH = {
+  popCount:    6,      // number of small pre-explosions
+  popInterval: 0.09,   // seconds between each small pop
+  popSpread:   0.40,   // fraction of boss size for pop position spread
+  bigDelay:    0.55,   // seconds after first pop before the main explosion
+};
+
+// ── DOTTY SPRITE STATES ───────────────────────────────────────
+const DOTTY_SPRITES = {
+  hurtFlashDur: 0.10,  // seconds the hurt sprite shows after taking a hit
+};
+
+// ── ENEMY SHADOW ─────────────────────────────────────────────
+const SHADOW_CONFIG = {
+  yOffset:     8,      // px below enemy centre
+  xScale:      0.70,   // shadow ellipse width as fraction of enemy width
+  yScale:      0.18,   // shadow ellipse height as fraction of enemy width
+  alphaBase:   0.28,   // opacity at normal height
+  alphaBoost:  0.14,   // extra opacity added as enemy gets closer to player
 };
 
 // ── SCREEN SHAKE MAGNITUDES ──────────────────────────────────
