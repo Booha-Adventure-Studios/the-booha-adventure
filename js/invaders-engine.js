@@ -82,6 +82,9 @@ let screenFlash = { alpha: 0, color: "#fff" };
 // Shield
 let playerShield = 0;
 
+// Hit stop — brief game freeze on kills
+let hitStopTimer = 0;
+
 // ════════════════════════════════════════
 // VIEWPORT
 // ════════════════════════════════════════
@@ -617,6 +620,7 @@ function spawnBug() {
     fireCD: rand(waveFireCooldown(WS.wave)*0.75, waveFireCooldown(WS.wave)*1.1),
     glow:0, shakeT:0, shakeMag:0,
     panicking:false, panicT:0,
+    hurtFlash:0,
     isBoss:false,
   });
 }
@@ -695,17 +699,20 @@ function spawnBossDotty() {
     w: bw, h: bh, alive: true, isBoss: true,
     hp, maxHp: hp, phase: 1, hitsTaken: 0,
     shotDmg: 3 + (k-1),
-    enterT: 0, enterDur: 1.4,
-    shieldT: 1.4 + DOTTY_SHIELD_POST,
+    enterT: 0, enterDur: 2.2,                   // slower descent than normal bugs
+    shieldT: 2.2 + DOTTY_SHIELD_POST,
     hasShotOnce: false,
     sx: W()/2 - bw/2, sy: -bh - 40, tx, ty,
     bob: rand(0, 10),
     driftSpeed: waveDriftSpeed(WS.wave),
     fireCD: 0.5,
-    glow: 0, shakeT: 0, shakeMag: 0,
+    glow: 0.6,                                   // already glowing on entry
+    shakeT: 0, shakeMag: 0,
     moveDir: 1, moveSpeed: 0,
     atkPattern: 0, atkTimer: 0,
     tintHue: bgHue,
+    hurtFlash: 0,
+    _landingShakeDone: false,                    // landing shake fires once on arrival
   });
 }
 
@@ -944,6 +951,7 @@ function update(dt) {
     b.shieldT  = Math.max(0, b.shieldT - dt);
     b.glow     = Math.max(0, b.glow - dt*2);
     b.shakeT   = Math.max(0, (b.shakeT||0) - dt);
+    if ((b.hurtFlash||0) > 0) b.hurtFlash = Math.max(0, b.hurtFlash - dt);
     b.bob     += dt;
 
     if (b.isBoss) {
@@ -962,6 +970,12 @@ function update(dt) {
       const curve = Math.sin(t * Math.PI) * (W()*0.012) * (Math.random() < 0.5 ? -1 : 1);
       b.x = b.sx + (b.tx - b.sx) * easeOutCubic(t) + curve*(1-t);
       b.y = b.sy + (b.ty - b.sy) * easeInOutSine(t);
+      // Boss landing shake — fires once as it reaches its target position
+      if (b.isBoss && !b._landingShakeDone && t >= 0.95) {
+        b._landingShakeDone = true;
+        doShake(18, 0.35);
+        screenFlash.alpha = 0.22; screenFlash.color = "rgba(255,80,80,1)";
+      }
       continue;
     }
 
@@ -1101,19 +1115,39 @@ function updateProjectiles(dt) {
       const dmg = s.isPink || s.isFriend ? 2 : 1;
       b.hp -= dmg; b.hitsTaken = (b.hitsTaken||0) + 1;
       b.shakeT = b.isBoss ? 0.18 : 0.10; b.shakeMag = b.isBoss ? 8 : 4;
+      b.hurtFlash = DOTTY_SPRITES.hurtFlashDur; // trigger hurt sprite
       s.dead = true;
       addSpark(b.x+b.w/2, b.y+b.h/2, b.isBoss?16:10, s.isFriend?"friend":s.isPink?"pink":"gold");
-      if (b.isBoss && b.hitsTaken % 3 === 0) fireBossSpread(b);
+      if (b.isBoss) {
+        hitStopTimer = Math.max(hitStopTimer, HIT_STOP.bossHit);
+        if (b.hitsTaken % 3 === 0) fireBossSpread(b);
+      } else {
+        hitStopTimer = Math.max(hitStopTimer, HIT_STOP.normalKill * 0.5); // half-stop on normal hit
+      }
       if (b.hp <= 0) {
         b.alive = false; WS.killed++;
         const pts = b.isBoss ? 500 : 10 + WS.wave * 2;
         registerKill(pts);
         if (b.isBoss) {
-          addBigExplosion(b.x+b.w/2, b.y+b.h/2, "boss");
-          screenFlash.alpha = 0.9; screenFlash.color = "#fff";
-          doShake(SHAKE_CONFIG.bossDeath.mag, SHAKE_CONFIG.bossDeath.dur);
+          // Staged boss death — small pops then the big bang
+          hitStopTimer = Math.max(hitStopTimer, HIT_STOP.bossDeath);
+          const bcx = b.x+b.w/2, bcy = b.y+b.h/2;
+          for (let pi = 0; pi < BOSS_DEATH.popCount; pi++) {
+            setTimeout(() => {
+              const ox = rand(-b.w*BOSS_DEATH.popSpread, b.w*BOSS_DEATH.popSpread);
+              const oy = rand(-b.h*BOSS_DEATH.popSpread, b.h*BOSS_DEATH.popSpread);
+              addBigExplosion(bcx+ox, bcy+oy, "boss");
+              doShake(6, 0.08);
+            }, pi * BOSS_DEATH.popInterval * 1000);
+          }
+          setTimeout(() => {
+            addBigExplosion(bcx, bcy, "boss");
+            screenFlash.alpha = 0.9; screenFlash.color = "#fff";
+            doShake(SHAKE_CONFIG.bossDeath.mag, SHAKE_CONFIG.bossDeath.dur);
+          }, BOSS_DEATH.bigDelay * 1000);
           score += WS.wave * 100;
         } else {
+          hitStopTimer = Math.max(hitStopTimer, HIT_STOP.normalKill);
           addSpark(b.x+b.w/2, b.y+b.h/2, 18, s.isFriend?"friend":s.isPink?"pink":"gold");
           for (const nb of bugs) {
             if (!nb.alive || nb.isBoss) continue;
@@ -1777,31 +1811,73 @@ function draw() {
     let bsx=0, bsy=0;
     if (b.shakeT > 0) { const m=b.shakeMag||5; bsx=rand(-m,m); bsy=rand(-m,m); }
     const bx=b.x+bsx, by=b.y+bsy;
-    if (b.diving) { drawGlow(bx+b.w/2,by+b.h/2,b.w*0.7,0.35,"rgba(255,50,50,0.8)"); }
-    else if (b.glow > 0) { const gc=b.isBoss?"rgba(255,80,80,0.7)":"rgba(120,255,200,0.6)"; drawGlow(bx+b.w/2,by+b.h/2,b.w*0.6,(b.glow/0.4)*0.28,gc); }
-    if (b.isBoss && b.phase>=3) { const ts=performance.now()/1000,p=0.5+0.5*Math.sin(ts*8); drawGlow(bx+b.w/2,by+b.h/2,b.w*0.85,p*0.25,"rgba(255,40,40,0.7)"); }
-    if (IMG.bug) {
+    const bcx=bx+b.w/2, bcy=by+b.h/2;
+
+    // ── SHADOW ──
+    // Soft ellipse beneath each Dotty. Opacity grows as they drift lower (closer to player).
+    {
+      const proximity = clamp((by - U()*0.15) / (H()*0.5), 0, 1);
+      const sa = SHADOW_CONFIG.alphaBase + proximity * SHADOW_CONFIG.alphaBoost;
+      const sw = b.w * SHADOW_CONFIG.xScale;
+      const sh = b.w * SHADOW_CONFIG.yScale;
+      const sy = by + b.h + SHADOW_CONFIG.yOffset;
       ctx.save();
-      const hpPct=b.hp/b.maxHp;
+      ctx.globalAlpha = sa * (b.diving ? 0.4 : 1); // fade shadow while diving
+      ctx.fillStyle = "rgba(0,0,0,0.55)";
+      ctx.beginPath();
+      ctx.ellipse(bcx, sy, sw/2, sh/2, 0, 0, Math.PI*2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    // ── GLOW ──
+    if (b.diving) { drawGlow(bcx,bcy,b.w*0.7,0.35,"rgba(255,50,50,0.8)"); }
+    else if (b.glow > 0) {
+      const gc = b.isBoss ? "rgba(255,80,80,0.7)" : "rgba(120,255,200,0.6)";
+      drawGlow(bcx,bcy,b.w*0.6,(b.glow/0.4)*0.28,gc);
+    }
+    if (b.isBoss && b.phase>=3) {
+      const ts=performance.now()/1000, p=0.5+0.5*Math.sin(ts*8);
+      drawGlow(bcx,bcy,b.w*0.85,p*0.25,"rgba(255,40,40,0.7)");
+    }
+
+    // ── SPRITE SELECTION ──
+    // Normal bug:  hurtFlash active → bugHurt, else bugNormal
+    // Boss:        phase >= 2      → bugBoss,  else bugNormal
+    // Fallback:    bugNormal if specific sprite missing
+    const isHurt = (b.hurtFlash||0) > 0;
+    let sprite;
+    if (b.isBoss) {
+      sprite = (b.phase >= 2 && IMG.bugBoss) ? IMG.bugBoss : (IMG.bugNormal || IMG.bugBoss);
+    } else {
+      sprite = (isHurt && IMG.bugHurt) ? IMG.bugHurt : (IMG.bugNormal || IMG.bugHurt);
+    }
+
+    if (sprite) {
+      ctx.save();
       if (b.diving) {
-        const cx2=bx+b.w/2, cy2=by+b.h/2;
-        const angle=Math.atan2(b.diveVy,b.diveVx||0.001)-Math.PI/2;
-        ctx.translate(cx2,cy2); ctx.rotate(angle); ctx.translate(-b.w/2,-b.h/2);
-        ctx.drawImage(IMG.bug,0,0,b.w,b.h);
-        ctx.globalCompositeOperation="multiply"; ctx.globalAlpha=0.5; ctx.fillStyle="#ff4444"; ctx.fillRect(0,0,b.w,b.h);
+        const angle = Math.atan2(b.diveVy, b.diveVx||0.001) - Math.PI/2;
+        ctx.translate(bcx,bcy); ctx.rotate(angle); ctx.translate(-b.w/2,-b.h/2);
+        ctx.drawImage(sprite, 0, 0, b.w, b.h);
       } else {
-        ctx.drawImage(IMG.bug,bx,by,b.w,b.h);
-        if (hpPct < 0.99) { ctx.globalCompositeOperation="multiply"; ctx.globalAlpha=(1-hpPct)*0.55; ctx.fillStyle=`hsl(${Math.round(hpPct*100)},100%,60%)`; ctx.fillRect(bx,by,b.w,b.h); }
+        ctx.drawImage(sprite, bx, by, b.w, b.h);
       }
       ctx.restore();
-    } else { ctx.fillStyle=b.isBoss?"#ff4466":b.diving?"#ff2222":"#44ff88"; ctx.fillRect(bx,by,b.w,b.h); }
+    } else {
+      ctx.fillStyle = b.isBoss ? "#ff4466" : b.diving ? "#ff2222" : "#44ff88";
+      ctx.fillRect(bx, by, b.w, b.h);
+    }
+
+    // ── SHIELD PULSE ──
     if (b.shieldT > 0) {
       const ts=performance.now()/1000, pulse=0.5+0.5*Math.sin(ts*6+(b.bob||0)), sr=b.w*(0.44+0.03*pulse);
       ctx.save(); ctx.globalCompositeOperation="lighter"; ctx.globalAlpha=0.28+0.10*pulse;
-      ctx.fillStyle="rgba(255,210,80,1)"; ctx.beginPath(); ctx.arc(bx+b.w/2,by+b.h/2,sr,0,Math.PI*2); ctx.fill(); ctx.restore();
+      ctx.fillStyle="rgba(255,210,80,1)"; ctx.beginPath(); ctx.arc(bcx,bcy,sr,0,Math.PI*2); ctx.fill(); ctx.restore();
     }
+
+    // ── HP BAR (non-boss only) ──
     if (!b.isBoss && b.maxHp > 1) {
-      const pw=b.w*0.85, ph=4, px=bx+b.w/2-pw/2, pby=by-8;
+      const pw=b.w*0.85, ph=4, px=bcx-pw/2, pby=by-8;
       ctx.fillStyle="rgba(0,0,0,0.45)"; roundRect(px,pby,pw,ph,2); ctx.fill();
       ctx.fillStyle=`hsl(${Math.round((b.hp/b.maxHp)*100)},100%,55%)`; roundRect(px,pby,pw*(b.hp/b.maxHp),ph,2); ctx.fill();
     }
@@ -2041,7 +2117,7 @@ function resetGame() {
   playerShield=0; timedWeapon.level=0; timedWeapon.remaining=0;
   stageTime=0; candyTimer=8; bossAlive=false; bossMusicIdx=0;
   WS.skillMult=1.0; WS.skillDisplay=1.0; WS.skillHeat=0; WS.groupStartT=0;
-  booFireTimer=0; booAutoCD=0; shakeDecay=0; shakeX=0; shakeY=0;
+  booFireTimer=0; booAutoCD=0; shakeDecay=0; shakeX=0; shakeY=0; hitStopTimer=0;
   screenFlash.alpha=0;
   bgOverlay={h:240,s:60,l:30,a:0,th:240,ts:60,tl:30,ta:0};
   bossCinematic.active=false; bossCinematic.t=0;
@@ -2075,8 +2151,17 @@ function tick(ts) {
   if (endPlaying) { draw(); return; }
   try {
     const t=ts/1000;
-    const dt=Math.min(0.033, (t-last)||0);
+    const rawDt=Math.min(0.033, (t-last)||0);
     last=t;
+
+    // Hit stop — count down in real time but skip gameplay updates
+    if (hitStopTimer > 0) {
+      hitStopTimer = Math.max(0, hitStopTimer - rawDt);
+      draw();
+      return;
+    }
+    const dt = rawDt;
+
     if (started && player.energy>0 && !paused) {
       update(dt); updateFiring(dt); updateProjectiles(dt); updateDiveCollisions();
       updateDroppers(dt); updateCandy(dt); updateParticles(dt); updateWaveSystem(dt);
@@ -2107,16 +2192,19 @@ function tick(ts) {
   try { candySfx=new Audio(ASSET_PATHS.candySfx); candySfx.volume=1; } catch(_){}
 
   try {
-    const [bg,b1,b2,bug,candy,r1,r2,r3,r4] = await Promise.all([
+    const [bg,b1,b2,bugN,bugH,bugB,candy,r1,r2,r3,r4] = await Promise.all([
       loadImg(ASSET_PATHS.background),
       loadImg(ASSET_PATHS.booIdle),
       loadImg(ASSET_PATHS.booShoot),
-      loadImg(ASSET_PATHS.bug),
+      loadImg(ASSET_PATHS.bugNormal),
+      loadImg(ASSET_PATHS.bugHurt),
+      loadImg(ASSET_PATHS.bugBoss),
       loadImg(ASSET_PATHS.candy),
       ...ASSET_PATHS.rocks.map(loadImg),
     ]);
-    IMG.bg=bg; IMG.booIdle=b1; IMG.booShoot=b2; IMG.bug=bug; IMG.candy=candy;
-    IMG.rocks=[r1,r2,r3,r4];
+    IMG.bg=bg; IMG.booIdle=b1; IMG.booShoot=b2;
+    IMG.bugNormal=bugN; IMG.bugHurt=bugH; IMG.bugBoss=bugB;
+    IMG.candy=candy; IMG.rocks=[r1,r2,r3,r4];
   } catch(err) { console.warn("Asset load:", err); }
 
   resetGame();
