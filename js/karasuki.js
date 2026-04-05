@@ -65,7 +65,6 @@
   /* ═══════════════════════════════════════════
      DEV MODE
   ═══════════════════════════════════════════ */
-  const DEV_MODE = false;
 
   const MONTH_COLORS = [
     ['#ff3bbd','#ff79d7'],['#ff6b3b','#ffaa5e'],['#3bc8ff','#a8edff'],
@@ -1297,7 +1296,8 @@
     app.appendChild(stage);
     coordToggle = document.createElement("div"); coordToggle.id = "coord-toggle";
     coordToggle.innerHTML = `<span>COORDS</span><div class="toggle-pill"></div>`;
-    if (DEV_MODE) coordToggle.addEventListener("click", toggleCoordMode);
+    
+    
     coordReadout = document.createElement("div"); coordReadout.id = "coord-readout";
     coordReadout.innerHTML = `<span id="coord-xy">—</span><span class="hint">click to pin · hover to read</span>`;
     pinLog = document.createElement("div"); pinLog.id = "pin-log";
@@ -1307,11 +1307,13 @@
     portalOverlay.innerHTML = `<div id="portal-box"><p id="portal-en">Do you want to go to your profile page?</p><p id="portal-ja">プロフィールページに行きますか？</p><button class="portal-btn" id="portal-yes">Yes</button><button class="portal-btn" id="portal-no">No</button></div>`;
     document.body.innerHTML = "";
     document.body.appendChild(app);
-    if (DEV_MODE) { document.body.appendChild(coordToggle); document.body.appendChild(coordReadout); document.body.appendChild(pinLog); }
+    
+    // dev UI removed
+    
     document.body.appendChild(toast);
     document.body.appendChild(portalOverlay);
     injectBonusPopOverlay(); injectWandererPopOverlay(); injectUtsuobaPopOverlay(); injectOrbPanel(); injectSwapOverlay();
-    if (DEV_MODE) injectDevPanel();
+    
     const rotateOverlay = document.createElement("div"); rotateOverlay.id = "rotate-overlay";
     rotateOverlay.innerHTML = `<span class="rotate-phone">📱</span><div class="rotate-bar"></div><p class="rotate-title">横にして遊ぼう！</p><p class="rotate-sub">カラスキは<strong style="color:#ff79d7">横画面</strong>で遊べるよ。<br>スマホを横にしてね。</p>`;
     document.body.appendChild(rotateOverlay);
@@ -1739,7 +1741,8 @@
 
   function bindInput() {
     let lastTouchEnd = 0;
-    stage.addEventListener("mousemove",(e)=>{ if(!DEV_MODE||!state.coordMode)return; const p=stagePointToWorld(e.clientX,e.clientY); const el=document.getElementById("coord-xy"); if(el)el.textContent=`${Math.round(p.x)}, ${Math.round(p.y)}`; });
+    
+    stage.addEventListener("mousemove",(e)=>{ if(!state.coordMode)return; const p=stagePointToWorld(e.clientX,e.clientY); const el=document.getElementById("coord-xy"); if(el)el.textContent=`${Math.round(p.x)}, ${Math.round(p.y)}`; });
     stage.addEventListener("click",(e)=>{ if(performance.now() - lastTouchEnd < 500) return; handleInput(e.clientX,e.clientY); });
     stage.addEventListener("touchend",(e)=>{ if(!e.changedTouches.length)return; lastTouchEnd=performance.now(); const t0=e.changedTouches[0]; handleInput(t0.clientX,t0.clientY); e.preventDefault(); },{passive:false});
   
@@ -1760,6 +1763,15 @@
 
   init();
 
-  window.KarasakiOrbs = { returnOrbToKarasuki };
+window.KarasakiOrbs = { returnOrbToKarasuki };
+
+  Object.defineProperty(window, 'b_3910', {
+    value: () => {
+      if (typeof injectDevPanel === 'function') injectDevPanel();
+    },
+    writable: false,
+    configurable: false,
+    enumerable: false
+  });
 
 })();
