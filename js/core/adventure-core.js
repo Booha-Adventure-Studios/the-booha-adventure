@@ -62,6 +62,15 @@ const BoohaAdventure = (() => {
     if (!saveFile) return;
 
     const weekKey = _getWeekKey();
+
+    // Diagnostic log — remove once weekly reset is confirmed working
+    const _diagData = saveFile.load();
+    console.log('[BoohaAdventure] Weekly check:', {
+      hasCalendar: !!window.CALENDAR,
+      weekKey,
+      storedKey: (_diagData.meta && _diagData.meta.lastWeeklyKey) || ''
+    });
+
     if (!weekKey) return; // CALENDAR not available, skip
 
     const data          = saveFile.load();
@@ -108,6 +117,25 @@ const BoohaAdventure = (() => {
 
     // ── Weekly reset check — runs after all systems are booted ───────────────
     _checkWeeklyReset();
+
+    // If CALENDAR was not ready yet at boot, retry briefly until it appears.
+    if (!window.CALENDAR) {
+      let tries = 0;
+      const retry = setInterval(() => {
+        tries++;
+
+        if (window.CALENDAR) {
+          clearInterval(retry);
+          _checkWeeklyReset();
+          return;
+        }
+
+        if (tries >= 30) {
+          clearInterval(retry);
+          console.warn('[BoohaAdventure] CALENDAR never became ready; weekly reset check skipped.');
+        }
+      }, 100);
+    }
 
     // ── Auto-submit scores from booha:gameEnd ────────────────────────────────
     document.addEventListener('booha:gameEnd', (e) => {
