@@ -66,7 +66,7 @@ const BoohaScoreSystem = (() => {
     const wWanderers   = weekly.wanderers       || [];
 
     const wasNewGame = !(wScores[gameId]);   // wScores is fresh from the new load()
-    
+
     // Weekly high score
     if (!wScores[gameId] || score > wScores[gameId]) {
       wScores[gameId] = score;
@@ -83,25 +83,29 @@ const BoohaScoreSystem = (() => {
       wCompleted[gameId] = true;
     }
 
-// ── 3. Unlock wanderer for this game ───────────────────────────────────────
-if (wasNewGame) {
-  const TOTAL_WANDERERS = 22;
-  const remaining = [];
+    // ── 3. Unlock wanderer for this game ───────────────────────────────────
+    if (wasNewGame) {
+      const TOTAL_WANDERERS = 22;
+      const remaining = [];
 
-  for (let i = 0; i < TOTAL_WANDERERS; i++) {
-    if (!wWanderers.includes(i)) remaining.push(i);
-  }
+      for (let i = 0; i < TOTAL_WANDERERS; i++) {
+        if (!wWanderers.includes(i)) remaining.push(i);
+      }
 
-  if (remaining.length > 0) {
-    const randIndex = Math.floor(Math.random() * remaining.length);
-    const chosen = remaining[randIndex];
-    wWanderers.push(chosen);
-  }
-}
+      if (remaining.length > 0) {
+        const randIndex = Math.floor(Math.random() * remaining.length);
+        const chosen = remaining[randIndex];
+        wWanderers.push(chosen);
+      }
+    }
 
+    // ── 4. Write weekly mutations back into data before saving ─────────────
+    data.weekly.gameScores     = wScores;
+    data.weekly.gameStars      = wStars;
+    data.weekly.completedGames = wCompleted;
+    data.weekly.wanderers      = wWanderers;
 
-
-    // ── 4. Update meta.allTimeStars ────────────────────────────────────────
+    // ── 5. Update meta.allTimeStars ────────────────────────────────────────
     // Only add the improvement in stars (delta) to avoid double-counting.
     const starDelta = entry.stars - prevStars;
     if (starDelta > 0) {
@@ -112,7 +116,7 @@ if (wasNewGame) {
 
     BoohaAdventure.save.save(data);
 
-    // ── 5. Fire events ─────────────────────────────────────────────────────
+    // ── 6. Fire events ─────────────────────────────────────────────────────
     const detail = { gameId, score, isHighScore, isBestTime, stars: entry.stars, wasCompleted };
     document.dispatchEvent(new CustomEvent('booha:scoreSubmitted', { detail }));
 
