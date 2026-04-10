@@ -750,84 +750,63 @@
   /* ── soft dance sparkles (separate from triggerSparkle burst) ── */
   let danceSparkles = [];
 
-  function spawnDanceSparkle() {
-    const [col1, col2] = roomColorPair(state.roomId);
-    const colors = [col1, col2, '#ffffff', '#fffde0'];
+ function spawnDanceSparkle(originX, originY) {
+    const colors = ['#ffd700','#ffe066','#fff0a0','#c8960a','#ffffff','#fffde0'];
     const angle  = Math.random() * Math.PI * 2;
-    const radius = 18 + Math.random() * 38;
+    const radius = 10 + Math.random() * 28;
     danceSparkles.push({
-      x     : CENTER_X + Math.cos(angle) * radius,
-      y     : CENTER_Y + Math.sin(angle) * radius,
-      vx    : (Math.random() - 0.5) * 0.4,
-      vy    : -(0.3 + Math.random() * 0.5),
+      x     : originX + Math.cos(angle) * radius,
+      y     : originY + Math.sin(angle) * radius,
+      vx    : (Math.random() - 0.5) * 0.35,
+      vy    : -(0.2 + Math.random() * 0.4),
       life  : 1,
-      size  : 1.5 + Math.random() * 3,
+      size  : 0.8 + Math.random() * 1.8,
       color : colors[Math.floor(Math.random() * colors.length)],
       phase : Math.random() * Math.PI * 2,
     });
   }
 
-  function startCelebration(drifter) {
+function startCelebration(drifter) {
     state.celebrating        = true;
     state.inputLocked        = true;
     state.celebrateSpinStart = performance.now();
+    state.celebrateDrifter   = drifter;
     danceSparkles            = [];
     stopActiveAudio();
+    try { music.pause(); } catch(_) {}
 
-    /* ── 1. fade to black ── */
-    const fadeEl = document.getElementById('buki-fade');
-    fadeEl.style.transition = `opacity ${FADE_MS}ms ease-in`;
-    fadeEl.style.opacity    = '1';
+    /* ghost dances near the drifter */
+    const pos = drifterWorldPos(drifter);
+    state.celebrateOrbitX = pos.x;
+    state.celebrateOrbitY = pos.y;
 
+    /* start dance music after a short breath */
+    const danceAudio = new Audio('./assets/audio/boo-dance.mp3');
+    danceAudio.volume = 0.85;
+    setTimeout(() => { danceAudio.play().catch(() => {}); }, 300);
+
+    danceAudio.onended = () => {
+      state.celebrateSettling    = true;
+      state.celebrateSettleStart = performance.now();
+      setTimeout(() => {
+        state.celebrateDancing  = false;
+        state.celebrateSettling = false;
+        state.celebrating       = false;
+        danceSparkles           = [];
+        state.x = state.celebrateOrbitX;
+        state.y = state.celebrateOrbitY;
+        try { music.play().catch(() => {}); } catch(_) {}
+        state.inputLocked = false;
+        showThankYouPanel(drifter);
+      }, 1000);
+    };
+
+    /* safety fallback */
     setTimeout(() => {
-      /* ── 2. ghost snaps to center, hide room, show dance scene ── */
-      state.x = CENTER_X;
-      state.y = CENTER_Y;
-      state.celebrateDancing = true;
-      if (roomLayer) roomLayer.style.visibility = 'hidden';
+      if (state.celebrating) danceAudio.dispatchEvent(new Event('ended'));
+    }, 18000);
 
-      /* ── 3. fade back in to reveal dance scene ── */
-      fadeEl.style.transition = `opacity 400ms ease-out`;
-      fadeEl.style.opacity    = '0';
-      /* ── 4. start music after ghost is visible ── */
-      const danceAudio = new Audio('./assets/audio/boo-dance.mp3');
-      danceAudio.volume = 0.85;
-      setTimeout(() => {
-        danceAudio.play().catch(() => {});
-      }, 500);
-
-      /* ── 5. on song end: settle then return to room ── */
-     danceAudio.onended = () => {
-        state.celebrateSettling    = true;
-        state.celebrateSettleStart = performance.now();
-        setTimeout(() => {
-          /* fade out dance scene */
-          fadeEl.style.transition = `opacity ${FADE_MS}ms ease-in`;
-          fadeEl.style.opacity    = '1';
-          setTimeout(() => {
-            /* restore room, fade back in */
-            state.celebrateDancing  = false;
-            state.celebrateSettling = false;
-            state.celebrating       = false;
-            danceSparkles           = [];
-            if (roomLayer) roomLayer.style.visibility = 'visible';
-            try { music.play().catch(() => {}); } catch(_) {}
-            fadeEl.style.transition = `opacity ${FADE_MS}ms ease-out`;
-            fadeEl.style.opacity    = '0';
-            setTimeout(() => {
-              state.inputLocked = false;
-              showThankYouPanel(drifter);
-            }, FADE_MS + 60);
-          }, FADE_MS + 60);
-        }, 1000);   /* 1s settle before fade out */
-      };
-
-      /* ── safety fallback if audio never fires onended ── */
-      setTimeout(() => {
-        if (state.celebrating) danceAudio.dispatchEvent(new Event('ended'));
-      }, 18000);
-
-    }, FADE_MS + 60);
+    state.celebrateDancing = true;
   }
 
   function showThankYouPanel(drifter) {
@@ -1250,63 +1229,41 @@
     if (state.celebrateDancing) {
       const elapsed = (now - state.celebrateSpinStart) / 1000;
 
-      /* aurora gradient behind ghost */
-      const [col1, col2] = roomColorPair(state.roomId);
-      const aurora = ctx.createRadialGradient(CENTER_X, CENTER_Y, 0, CENTER_X, CENTER_Y, 340);
-      aurora.addColorStop(0,   col1 + '22');
-      aurora.addColorStop(0.4, col2 + '18');
-      aurora.addColorStop(0.7, col1 + '0e');
-      aurora.addColorStop(1,   'transparent');
-      ctx.save();
-      ctx.globalAlpha = 1;
-      ctx.fillStyle   = aurora;
-      ctx.fillRect(0, 0, WORLD_W, WORLD_H);
-      ctx.restore();
-
-      /* spawn soft sparkles */
-      if (Math.random() < 0.35) spawnDanceSparkle();
-
-      /* draw dance sparkles */
-      for (let i = danceSparkles.length - 1; i >= 0; i--) {
-        const sp = danceSparkles[i];
-        sp.life -= 0.012;
-        if (sp.life <= 0) { danceSparkles.splice(i, 1); continue; }
-        sp.x += sp.vx; sp.y += sp.vy;
-        const twinkle = 0.5 + 0.5 * Math.sin(now / 120 + sp.phase);
-        ctx.save();
-        ctx.globalAlpha = sp.life * twinkle * 0.85;
-        if (shadowsEnabled) { ctx.shadowBlur = 8; ctx.shadowColor = sp.color; }
-        ctx.fillStyle = sp.color;
-        ctx.beginPath(); ctx.arc(sp.x, sp.y, sp.size, 0, Math.PI * 2); ctx.fill();
-        ctx.shadowBlur = 0; ctx.restore();
-      }
-
-      /* happy dance motion */
       const settleEase = state.celebrateSettling
         ? Math.max(0, 1 - ((now - state.celebrateSettleStart) / 900))
         : 1;
 
-      /* wandering drift around center */
-      const driftX = Math.sin(elapsed * 1.1) * 70 + Math.sin(elapsed * 2.3) * 30;
-      const driftY = Math.cos(elapsed * 1.4) * 50 + Math.cos(elapsed * 2.9) * 20;
+      /* dance around the drifter position */
+      const driftX = (Math.sin(elapsed * 1.1) * 60 + Math.sin(elapsed * 2.3) * 25) * settleEase;
+      const driftY = (Math.cos(elapsed * 1.4) * 40 + Math.cos(elapsed * 2.9) * 16) * settleEase;
+      const bigBob = (Math.sin(elapsed * 6.2) * 20 + Math.sin(elapsed * 3.7) * 9) * settleEase;
 
-      /* irregular bob — two frequencies layered */
-      const bigBob = (Math.sin(elapsed * 6.2) * 22 + Math.sin(elapsed * 3.7) * 10) * settleEase;
-
-      /* spin — full rotations, eases on settle */
       const spinAngle = elapsed * 3.8 * settleEase;
-
-      /* squash/stretch on beat */
-      const beat = Math.sin(elapsed * 6.2);
+      const beat      = Math.sin(elapsed * 6.2);
       sx = (1.0 + beat * 0.18) * settleEase + (1 - settleEase);
       sy = (1.0 - beat * 0.22) * settleEase + (1 - settleEase);
 
-      gx     = CENTER_X + driftX * settleEase;
-      gy     = CENTER_Y + driftY * settleEase + bigBob;
-      wobble = spinAngle * (180 / Math.PI);   /* pass degrees — drawFrame rotates by wobble*Math.PI/180 */
+      gx     = state.celebrateOrbitX + driftX;
+      gy     = state.celebrateOrbitY + driftY + bigBob;
+      wobble = spinAngle * (180 / Math.PI);
 
-      /* denser sparkles during active dance */
-      if (settleEase > 0 && Math.random() < 0.55) spawnDanceSparkle();
+      /* sparkles follow the ghost */
+      if (settleEase > 0 && Math.random() < 0.45) spawnDanceSparkle(gx, gy);
+
+      /* draw dance sparkles */
+      for (let i = danceSparkles.length - 1; i >= 0; i--) {
+        const sp = danceSparkles[i];
+        sp.life -= 0.014;
+        if (sp.life <= 0) { danceSparkles.splice(i, 1); continue; }
+        sp.x += sp.vx; sp.y += sp.vy;
+        const twinkle = 0.5 + 0.5 * Math.sin(now / 100 + sp.phase);
+        ctx.save();
+        ctx.globalAlpha = sp.life * twinkle * 0.9;
+        if (shadowsEnabled) { ctx.shadowBlur = 6; ctx.shadowColor = '#ffd700'; }
+        ctx.fillStyle = sp.color;
+        ctx.beginPath(); ctx.arc(sp.x, sp.y, sp.size, 0, Math.PI * 2); ctx.fill();
+        ctx.shadowBlur = 0; ctx.restore();
+      }
 
     } else {
       gx     = state.x;
