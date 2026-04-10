@@ -608,15 +608,8 @@
         <div class="dp-btns"><button class="dp-btn no dp-dismiss">Close / 閉じる</button></div>`;
 
     } else {
-      /* no active quest — offer one using questGreeting */
-      const qLines   = drifter.questGreeting   || [];
-      const qLinesJP = drifter.questGreetingJP || [];
-      const qHTML = qLines.map((en, i) =>
-        `<p class="dp-line-en" style="margin-bottom:2px;">${en}</p>
-         <p class="dp-line-jp" style="margin-bottom:6px;">${qLinesJP[i] || ''}</p>`
-      ).join('');
+      /* no active quest — offer one using questLines */
       actionHTML = `
-        ${qHTML}
         <div class="dp-divider"></div>
         <p class="dp-line-en" style="margin-bottom:2px;">Will you help me find a memory?</p>
         <p class="dp-line-jp" style="margin-bottom:10px;">記憶を探すのを手伝ってくれる？</p>
@@ -652,8 +645,12 @@
     /* ── typewriter engine ── */
     const twContainer = drifterPanel.querySelector('#dp-typewriter-lines');
     const actionArea  = drifterPanel.querySelector('#dp-action-area');
-    const enLines     = drifter.greeting;
-    const jpLines     = drifter.greetingJP;
+    
+    /* use questLines for quest-offer state, greeting for everything else */
+    const hasQuestOffer = !quest && drifter.memoryCount > 0 && drifterHasMemories(drifter.id);
+    const enLines = (hasQuestOffer && drifter.questLines)   ? drifter.questLines   : drifter.greeting;
+    const jpLines = (hasQuestOffer && drifter.questLinesJP) ? drifter.questLinesJP : drifter.greetingJP;
+    
     let   finished    = false;
 
     function showActionArea() {
