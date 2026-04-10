@@ -3,67 +3,94 @@ window.UTSUROBA_DATA = {
 
   startRoom: "room_03",
 
-  /* ─────────────────────────────────────────────────────────
-     DRIFTERS
-     memoryCount: how many q/a pairs exist for this drifter.
-     Increment this number when you add new audio files.
-     Coordinates are in 1536×1024 world space (same as NPP).
-     roomCoords: one position per room — used whichever room
-     the weekly rotation assigns this drifter to.
-  ───────────────────────────────────────────────────────── */
+ drifterRoomPool: ['room_01','room_05','room_06','room_11','room_14','room_15'],
+
   drifters: [
     {
-      id          : 'ks',
-      name        : 'Kurobane Shizuma',
-      nameKanji   : '黒羽 静魔',
-      nameHira    : 'くろはね しずま',
-      greeting    : ['Hey…', 'You weird little ghost.', 'Go find my memories.'],
-      greetingJP  : ['おい…', '変な小さな幽霊。', '俺の記憶を探してこい。'],
-      sprite1     : './assets/img/drifters/kurobane_shizuma-1.png',
-      sprite2     : './assets/img/drifters/kurobane_shizuma-2.png',
-      audioPrefix : 'ks',
-      memoryCount : 1,
-      scale       : 0.15, 
-      /* x, y in world coords — used for whichever room is assigned */
-      roomCoords  : { x: 803, y: 543 }
+      id              : 'ks',
+      name            : 'Kurobane Shizuma',
+      nameKanji       : '黒羽 静魔',
+      nameHira        : 'くろはね しずま',
+      greeting        : ['…What.', 'You\'re not from here.', 'Don\'t just stand there staring.'],
+      greetingJP      : ['…何だ。', 'ここにいるやつじゃないな。', 'じっと見てるな。'],
+      questGreeting   : ['Hey…', 'You weird little ghost.', 'Go find my memories.'],
+      questGreetingJP : ['おい…', '変な小さな幽霊。', '俺の記憶を探してこい。'],
+      sprite1         : './assets/img/drifters/kurobane_shizuma-1.png',
+      sprite2         : './assets/img/drifters/kurobane_shizuma-2.png',
+      audioPrefix     : 'ks',
+      memoryCount     : 1,
+      scale           : 0.15,
     },
     {
-      id          : 'nto',
-      name        : 'Ned the Oogle',
-      nameKanji   : 'ネド・ザ・オーグル',
-      nameHira    : 'ねど・ざ・おーぐる',
-      greeting    : ['Wow!', 'You\'re so cute!', 'Please, please, please help me find some memories!'],
-      greetingJP  : ['わあ！', 'とってもかわいいね！', 'お願い、お願い、お願い！記憶を探すのを手伝って！'],
-      sprite1     : './assets/img/drifters/ned-the-oogle-1.png',
-      sprite2     : './assets/img/drifters/ned-the-oogle-2.png',
-      audioPrefix : 'nto',
-      memoryCount : 1,
-      scale       : 0.17, 
-      roomCoords  : { x: 650, y: 550 }
+      id              : 'nto',
+      name            : 'Ned the Oogle',
+      nameKanji       : 'ネド・ザ・オーグル',
+      nameHira        : 'ねど・ざ・おーぐる',
+      greeting        : ['Oh! Hey!', 'You\'re new, right?', 'Hehe… I like you already!'],
+      greetingJP      : ['あっ！ねえ！', 'はじめて見るよね？', 'えへへ…なんか好きかも！'],
+      questGreeting   : ['Wow!', 'You\'re so cute!', 'Please, please, please help me find some memories!'],
+      questGreetingJP : ['わあ！', 'とってもかわいいね！', 'お願い、お願い、お願い！記憶を探すのを手伝って！'],
+      sprite1         : './assets/img/drifters/ned-the-oogle-1.png',
+      sprite2         : './assets/img/drifters/ned-the-oogle-2.png',
+      audioPrefix     : 'nto',
+      memoryCount     : 1,
+      scale           : 0.17,
     },
     {
-      id          : 'cg',
-      name        : 'Chagrin Gobito',
-      nameKanji   : 'チャグリン・ゴビト',
-      nameHira    : 'ちゃぐりん・ごびと',
-      greeting    : ['Ah!', 'You scared me!', 'Um… if it\'s okay… can you help me find some memories?'],
-      greetingJP  : ['あっ！', 'びっくりした…！', 'あの…よかったら…記憶を探すの、手伝ってくれる？'],
-      sprite1     : './assets/img/drifters/chagrin_gobito-1.png',
-      sprite2     : './assets/img/drifters/chagrin_gobito-2.png',
-      audioPrefix : 'cg',
-      memoryCount : 1,
-      scale       : 0.10, 
-      roomCoords  : { x: 820, y: 580 }
-    }
+      id              : 'cg',
+      name            : 'Chagrin Gobito',
+      nameKanji       : 'チャグリン・ゴビト',
+      nameHira        : 'ちゃぐりん・ごびと',
+      greeting        : ['Ah—!', 'S-sorry…', 'I didn\'t see you there…'],
+      greetingJP      : ['あっ…！', 'ご、ごめん…', 'そこにいるの気づかなかった…'],
+      questGreeting   : ['Ah!', 'You scared me!', 'Um… if it\'s okay… can you help me find some memories?'],
+      questGreetingJP : ['あっ！', 'びっくりした…！', 'あの…よかったら…記憶を探すの、手伝ってくれる？'],
+      sprite1         : './assets/img/drifters/chagrin_gobito-1.png',
+      sprite2         : './assets/img/drifters/chagrin_gobito-2.png',
+      audioPrefix     : 'cg',
+      memoryCount     : 1,
+      scale           : 0.10,
+    },
+    {
+      id          : 'bh',
+      name        : 'Bryan Harper',
+      nameKanji   : 'ブライアン・ハーパー',
+      nameHira    : 'ぶらいあん はーぱー',
+      greeting    : ['Hey…', 'You made it this far, huh.', 'I just got here myself.', 'Come back later.'],
+      greetingJP  : ['おい…', 'ここまで来たのか。', '俺も今来たところだ。', 'またあとで来い。'],
+      sprite1     : './assets/img/drifters/bryan_harper-1.png',
+      sprite2     : './assets/img/drifters/bryan_harper-2.png',
+      audioPrefix : 'bh',
+      memoryCount : 0,
+      scale       : 0.15,
+    },
+    {
+      id          : 'bk',
+      name        : 'Blakesly Kassidy',
+      nameKanji   : 'ブレイクスリー・カシディ',
+      nameHira    : 'ぶれいくすりー かしでぃ',
+      greeting    : ['…What are you.', 'Don\'t answer that.', 'You look like something someone stepped on.', 'Come back later.'],
+      greetingJP  : ['…何それ。', 'いや、答えなくていい。', '踏まれた何かみたい。', 'あとで来て。'],
+      sprite1     : './assets/img/drifters/blakesly_kassidy-1.png',
+      sprite2     : './assets/img/drifters/blakesly_kassidy-2.png',
+      audioPrefix : 'bk',
+      memoryCount : 0,
+      scale       : 0.15,
+    },
+    {
+      id          : 'ph',
+      name        : 'Patricia Hollingshead',
+      nameKanji   : 'パトリシア・ホリングスヘッド',
+      nameHira    : 'ぱとりしあ ほりんぐすへっど',
+      greeting    : ['Oh my…', 'You\'re just the cutest thing, aren\'t you.', 'Don\'t wander too far, okay?', 'Come back and see me later.'],
+      greetingJP  : ['あら…', 'ほんとにかわいい子ね。', 'あんまり遠くに行っちゃだめよ？', 'あとでまたいらっしゃい。'],
+      sprite1     : './assets/img/drifters/patricia_hollingshead-1.png',
+      sprite2     : './assets/img/drifters/patricia_hollingshead-2.png',
+      audioPrefix : 'ph',
+      memoryCount : 0,
+      scale       : 0.15,
+    },
   ],
-
-  /* ─────────────────────────────────────────────────────────
-     DRIFTER ROOM POOL
-     These 3 rooms rotate weekly. Each drifter is assigned
-     one room per week via seeded shuffle. Add more rooms
-     here if you want a larger rotation pool later.
-  ───────────────────────────────────────────────────────── */
-  drifterRoomPool: ['room_05', 'room_06', 'room_14'],
 
   /* ─────────────────────────────────────────────────────────
      DECOY COUNT
