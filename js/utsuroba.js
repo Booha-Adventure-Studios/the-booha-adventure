@@ -1422,4 +1422,13 @@
   }
 
   init();
+Object.defineProperty(window, 'b_4911', {
+    value: () => {
+      if (typeof injectDevPanel === 'function') injectDevPanel();
+    },
+    writable: false,
+    configurable: false,
+    enumerable: false
+  });
+
 })();
