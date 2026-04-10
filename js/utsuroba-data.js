@@ -71,7 +71,7 @@ window.UTSUROBA_DATA = {
       sprite2     : './assets/img/drifters/bryan_harper-2.png',
       audioPrefix : 'bh',
       memoryCount : 0,
-      scale       : 0.20,
+      scale       : 0.21,
     },
     {
       id          : 'bk',
@@ -97,7 +97,7 @@ window.UTSUROBA_DATA = {
       sprite2     : './assets/img/drifters/patricia_hollingshead-2.png',
       audioPrefix : 'ph',
       memoryCount : 0,
-      scale       : 0.19,
+      scale       : 0.21,
     },
   ],
 
