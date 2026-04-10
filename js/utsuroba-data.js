@@ -3,6 +3,15 @@ window.UTSUROBA_DATA = {
 
   startRoom: "room_03",
 
+  roomStandingCoords: {
+    room_01: { x: 491, y: 557 },
+    room_05: { x: 820, y: 580 },
+    room_06: { x: 650, y: 550 },
+    room_11: { x: 673, y: 491 },
+    room_14: { x: 803, y: 543 },
+    room_15: { x: 787, y: 490 },
+  },
+
  drifterRoomPool: ['room_01','room_05','room_06','room_11','room_14','room_15'],
 
   drifters: [
