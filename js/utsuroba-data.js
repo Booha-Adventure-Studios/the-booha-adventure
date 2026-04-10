@@ -28,7 +28,7 @@ window.UTSUROBA_DATA = {
       sprite2         : './assets/img/drifters/kurobane_shizuma-2.png',
       audioPrefix     : 'ks',
       memoryCount     : 1,
-      scale           : 0.15,
+      scale           : 0.17,
     },
     {
       id              : 'nto',
@@ -43,7 +43,7 @@ window.UTSUROBA_DATA = {
       sprite2         : './assets/img/drifters/ned-the-oogle-2.png',
       audioPrefix     : 'nto',
       memoryCount     : 1,
-      scale           : 0.17,
+      scale           : 0.18,
     },
     {
       id              : 'cg',
@@ -58,7 +58,7 @@ window.UTSUROBA_DATA = {
       sprite2         : './assets/img/drifters/chagrin_gobito-2.png',
       audioPrefix     : 'cg',
       memoryCount     : 1,
-      scale           : 0.10,
+      scale           : 0.11,
     },
     {
       id          : 'bh',
@@ -71,7 +71,7 @@ window.UTSUROBA_DATA = {
       sprite2     : './assets/img/drifters/bryan_harper-2.png',
       audioPrefix : 'bh',
       memoryCount : 0,
-      scale       : 0.15,
+      scale       : 0.17,
     },
     {
       id          : 'bk',
@@ -84,7 +84,7 @@ window.UTSUROBA_DATA = {
       sprite2     : './assets/img/drifters/blakesly_kassidy-2.png',
       audioPrefix : 'bk',
       memoryCount : 0,
-      scale       : 0.15,
+      scale       : 0.18,
     },
     {
       id          : 'ph',
@@ -97,7 +97,7 @@ window.UTSUROBA_DATA = {
       sprite2     : './assets/img/drifters/patricia_hollingshead-2.png',
       audioPrefix : 'ph',
       memoryCount : 0,
-      scale       : 0.15,
+      scale       : 0.16,
     },
   ],
 
