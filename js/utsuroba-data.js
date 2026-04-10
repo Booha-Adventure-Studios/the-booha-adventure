@@ -25,7 +25,7 @@ window.UTSUROBA_DATA = {
       memoryCount : 1,
       scale       : 0.15, 
       /* x, y in world coords — used for whichever room is assigned */
-      roomCoords  : { x: 900, y: 480 }
+      roomCoords  : { x: 803, y: 543 }
     },
     {
       id          : 'nto',
