@@ -19,7 +19,7 @@ window.UTSUROBA_DATA = {
       id              : 'ks',
       name            : 'Kurobane Shizuma',
       nameKanji       : '黒羽 静魔',
-      nameHira        : 'くろはね しずま',
+     
       greeting        : ['…What.', 'You\'re not from here.', 'Don\'t just stand there staring.'],
       greetingJP      : ['…何だ。', 'ここにいるやつじゃないな。', 'じっと見てるな。'],
       questLines      : ['…What.', 'You again.', 'Don\'t just stand there.', 'I lost something.', 'A memory.', 'Go find it.'],
@@ -34,7 +34,7 @@ window.UTSUROBA_DATA = {
       id              : 'nto',
       name            : 'Ned the Oogle',
       nameKanji       : 'ネド・ザ・オーグル',
-      nameHira        : 'ねど・ざ・おーぐる',
+      
       greeting        : ['Oh! Hey!', 'You\'re new, right?', 'Hehe… I like you already!'],
       greetingJP      : ['あっ！ねえ！', 'はじめて見るよね？', 'えへへ…なんか好きかも！'],
       questLines      : ['Oh! Hey hey hey!', 'You came back!', 'I\'ve been waiting!', 'I lost a memory somewhere out there…', 'Will you find it for me? Please please please?'],
@@ -49,7 +49,7 @@ window.UTSUROBA_DATA = {
       id              : 'cg',
       name            : 'Chagrin Gobito',
       nameKanji       : 'チャグリン・ゴビト',
-      nameHira        : 'ちゃぐりん・ごびと',
+      
       greeting        : ['Ah—!', 'S-sorry…', 'I didn\'t see you there…'],
       greetingJP      : ['あっ…！', 'ご、ごめん…', 'そこにいるの気づかなかった…'],
       questLines      : ['Ah—!', 'Oh… it\'s you.', 'Sorry, you startled me again…', 'Um…', 'I think I lost something.', 'A memory…', 'Would you… maybe… help me find it?'],
@@ -64,7 +64,7 @@ window.UTSUROBA_DATA = {
       id          : 'bh',
       name        : 'Bryan Harper',
       nameKanji   : 'ブライアン・ハーパー',
-      nameHira    : 'ぶらいあん はーぱー',
+     
       greeting    : ['Hey…', 'You made it this far, huh.', 'I just got here myself.', 'Come back later.'],
       greetingJP  : ['おい…', 'ここまで来たのか。', '俺も今来たところだ。', 'またあとで来い。'],
       sprite1     : './assets/img/drifters/bryan_harper-1.png',
@@ -77,7 +77,7 @@ window.UTSUROBA_DATA = {
       id          : 'bk',
       name        : 'Blakesly Kassidy',
       nameKanji   : 'ブレイクスリー・カシディ',
-      nameHira    : 'ぶれいくすりー かしでぃ',
+      
       greeting    : ['…What are you.', 'Don\'t answer that.', 'You look like something someone stepped on.', 'Come back later.'],
       greetingJP  : ['…何それ。', 'いや、答えなくていい。', '踏まれた何かみたい。', 'あとで来て。'],
       sprite1     : './assets/img/drifters/blakesly_kassidy-1.png',
@@ -90,7 +90,7 @@ window.UTSUROBA_DATA = {
       id          : 'ph',
       name        : 'Patricia Hollingshead',
       nameKanji   : 'パトリシア・ホリングスヘッド',
-      nameHira    : 'ぱとりしあ ほりんぐすへっど',
+      
       greeting    : ['Oh my…', 'You\'re just the cutest thing, aren\'t you.', 'Don\'t wander too far, okay?', 'Come back and see me later.'],
       greetingJP  : ['あら…', 'ほんとにかわいい子ね。', 'あんまり遠くに行っちゃだめよ？', 'あとでまたいらっしゃい。'],
       sprite1     : './assets/img/drifters/patricia_hollingshead-1.png',
