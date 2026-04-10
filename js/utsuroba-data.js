@@ -79,7 +79,7 @@ window.UTSUROBA_DATA = {
       nameKanji   : 'ブレイクスリー・カシディ',
       
       greeting    : ['…What are you.', 'Don\'t answer that.', 'You look like something someone stepped on.', 'Come back later.'],
-      greetingJP  : ['…何それ。', 'いや、答えなくていい。', '踏まれた何かみたい。', 'あとで来て。'],
+      greetingJP  : ['…何だコレ。', 'いや、答えなくていい。', 'おまえ、踏まれた何かみたい。', 'あとで来て。'],
       sprite1     : './assets/img/drifters/blakesly_kassidy-1.png',
       sprite2     : './assets/img/drifters/blakesly_kassidy-2.png',
       audioPrefix : 'bk',
