@@ -10,7 +10,7 @@
   const WORLD_H         = 1024;
   const GHOST_R         = 26;
   const GHOST_RADIUS    = 18;
-  const BASE_SPEED      = 3.2;
+  const BASE_SPEED      = 3.5;
   const FADE_MS         = 600;
   const CLICK_STOP_DIST = 6;
   const HOVER_AMP       = 9;
@@ -107,30 +107,10 @@
 
   /* ═══════════════════════════════════════════
      SAVE LAYER
-     ─────────────────────────────────────────
-     Structure:
-       booha_save = {
-         version, weekly, meta, scores, unlocks, collectibles, pageState,
-         karasuki: { visitedRooms, wanderersSeen, activeOrbs, deliveredMemories, flags },
-         utsuroba: { visitedRooms, drifters, flags }
-       }
-
-     Cross-area bridge:
-       save.weekly.drifterQuest  (owned here, read by karasuki)
-
-     Utsuroba-specific:
-       save.utsuroba.drifters[id].completed = [memIdx, ...]
-
-     Karasuki-specific:
-       save.karasuki.activeOrbs
-       save.karasuki.roomFlags
-       etc. (written by karasuki engine)
   ═══════════════════════════════════════════ */
   const SAVE_KEY = 'booha_save';
 
   function loadSave() {
-    /* always read directly from localStorage — BoohaAdventure.save may have
-       a stale in-memory cache that predates writes made by this engine */
     try {
       const raw = localStorage.getItem(SAVE_KEY);
       const d   = raw ? JSON.parse(raw) : {};
@@ -144,22 +124,14 @@
       data.updatedAt = Date.now();
       localStorage.setItem(SAVE_KEY, JSON.stringify(data));
     } catch(_) {}
-    /* notify BoohaAdventure if it exposes an invalidate hook, so its
-       cache doesn't serve stale data to other pages */
     try { if (window.BoohaAdventure?.save?.invalidate) BoohaAdventure.save.invalidate(); } catch(_) {}
   }
 
-  /* ── one-time migration: move data.drifters → data.utsuroba.drifters ──
-     Returns the (possibly mutated) data object.
-     Never calls writeSave — callers decide whether to flush.        ── */
   function migrateUtsurobaSave(data) {
     let dirty = false;
-
     if (!data.utsuroba) { data.utsuroba = {}; dirty = true; }
     if (!data.karasuki) { data.karasuki = {}; dirty = true; }
     if (!data.weekly)   { data.weekly   = {}; dirty = true; }
-
-    /* old flat drifters namespace → utsuroba.drifters */
     if (data.drifters && !data.utsuroba.drifters) {
       data.utsuroba.drifters = data.drifters;
       delete data.drifters;
@@ -168,28 +140,22 @@
     if (!data.utsuroba.drifters)     { data.utsuroba.drifters     = {}; dirty = true; }
     if (!data.utsuroba.visitedRooms) { data.utsuroba.visitedRooms = {}; dirty = true; }
     if (!data.utsuroba.flags)        { data.utsuroba.flags        = {}; dirty = true; }
-
-    /* old weekly.utsuobaVisited (typo) → utsuroba.flags.visited */
     if (data.weekly.utsuobaVisited || data.weekly.utsurobaVisited) {
       data.utsuroba.flags.visited = true;
       delete data.weekly.utsuobaVisited;
       delete data.weekly.utsurobaVisited;
       dirty = true;
     }
-
-    /* old weekly.drifterQuest collectedMemKey → collectedMemoryId */
     const q = data.weekly.drifterQuest;
     if (q && q.collectedMemKey !== undefined && q.collectedMemoryId === undefined) {
       q.collectedMemoryId = q.collectedMemKey;
       delete q.collectedMemKey;
       dirty = true;
     }
-
     if (dirty) writeSave(data);
     return data;
   }
 
-  /* ── namespace helpers ── */
   function readUtsuroba() {
     const d = loadSave();
     return d.utsuroba || {};
@@ -200,7 +166,6 @@
     writeSave(d);
   }
 
-  /* ── quest cache (short-lived, 500 ms) ── */
   let _cachedQuest = null, _cachedQuestTime = 0;
   function getCachedQuest() {
     const now = performance.now();
@@ -235,11 +200,14 @@
     return DATA.drifters.map((_,i) => rooms[i % rooms.length]);
   })();
 
-  function drifterForRoom(roomId) {
-    const idx = weeklyRooms.indexOf(roomId);
-    return idx >= 0 ? (DATA.drifters[idx] || null) : null;
+  function driftersForRoom(roomId) {
+    return DATA.drifters.filter((_,i) => weeklyRooms[i] === roomId);
   }
-  function drifterWorldPos(d) { return { x: d.roomCoords.x, y: d.roomCoords.y }; }
+
+  function drifterWorldPos(d, roomId) {
+    const coords = DATA.roomStandingCoords[roomId];
+    return { x: coords.x, y: coords.y };
+  }
 
   const drifterImgs = {};
   DATA.drifters.forEach(d => {
@@ -248,7 +216,7 @@
   });
 
   function drifterHasMemories(id) {
-    if (drifterIsWrong(id)) return false;   /* wrong memory delivered this week — inert */
+    if (drifterIsWrong(id)) return false;
     const utsu = readUtsuroba();
     const rec  = utsu.drifters?.[id];
     const d    = DATA.drifters.find(x => x.id === id);
@@ -299,7 +267,6 @@
     writeSave(data); invalidateQuestCache();
   }
 
-  /* ── wrong-memory penalty: drifter gone for the rest of the week ── */
   function markDrifterWrong(id) {
     const data = loadSave();
     if (!data.utsuroba.drifters[id]) data.utsuroba.drifters[id] = { completed: [] };
@@ -316,22 +283,12 @@
     return `./assets/audio/memories/${d.audioPrefix}_q${String(memIdx).padStart(2,'0')}.mp3`;
   }
 
-  /* ── active audio control ── */
   let activeAudio = null;
   function stopActiveAudio() {
     if (!activeAudio) return;
     try { activeAudio.pause(); activeAudio.currentTime = 0; } catch(_) {}
     activeAudio = null;
   }
-  function playQuestAudio(src) {
-    stopActiveAudio();
-    const a = new Audio(src);
-    activeAudio = a;
-    a.play().catch(() => {});
-    a.onended = () => { if (activeAudio === a) activeAudio = null; };
-  }
-
-  
 
   /* ═══════════════════════════════════════════
      STATE
@@ -344,8 +301,9 @@
     coordMode:false, musicStarted:false, lastTrailT:0,
     spawnLockUntil:0, exitingToKarasuki:false,
     travelingToCenter:false, inputLocked:false,
-    celebrating:false, celebrateUntil:0, celebrateSpinStart:0,
+    celebrating:false, celebrateSpinStart:0,
     celebrateOrbitX:CENTER_X, celebrateOrbitY:CENTER_Y,
+    celebrateDancing:false, celebrateSettling:false, celebrateSettleStart:0,
   };
 
   let pins = [], trail = [], ripples = [];
@@ -358,8 +316,8 @@
   let drifterPanel = null, drifterPanelOpen = false, drifterPanelCooldown = 0;
 
   let isMemoryPlaying  = false;
-  let drifterFadeStart = 0;   /* performance.now() when wrong-memory fade begins; 0 = not fading */
-  let _lastWrongId     = '';  /* id of drifter currently fading out */
+  let drifterFadeStart = 0;
+  let _lastWrongId     = '';
 
   const CELEBRATE_MS = 8000;
 
@@ -369,9 +327,9 @@
     cg:  { en:"Thank you… I really mean it.",         jp:"ありがとう…。本当に、心から。" },
   };
   const WAITING_LINES = {
-    ks:  { en:"Hurry up, you little blob.",                   jp:"さっさと行けよ、このチビ。" },
-    nto: { en:"See you soon, cutie.",                         jp:"じゃあね、かわいい子ちゃん。またね。" },
-    cg:  { en:"I'll be waiting here… don't take too long.",   jp:"ここで待ってるよ…あまり遅くなるなよ。" },
+    ks:  { en:"Hurry up, you little blob.",                 jp:"さっさと行けよ、このチビ。" },
+    nto: { en:"See you soon, cutie.",                       jp:"じゃあね、かわいい子ちゃん。またね。" },
+    cg:  { en:"I'll be waiting here… don't take too long.", jp:"ここで待ってるよ…あまり遅くなるなよ。" },
   };
 
   /* ═══════════════════════════════════════════
@@ -419,7 +377,6 @@
       #buki-pin-log .clear-btn:hover{color:#fff;border-color:rgba(255,138,226,.6);}
       #buki-copy-toast{position:fixed;top:52px;left:50%;transform:translateX(-50%);z-index:300;background:rgba(20,0,30,.92);color:#fff;font:700 12px/1 monospace;padding:6px 18px;border-radius:20px;pointer-events:none;opacity:0;transition:opacity .18s;letter-spacing:.05em;}
       #buki-copy-toast.show{opacity:1;}
-
       /* ══ DRIFTER PANEL ══ */
       #utsuroba-drifter-panel{position:fixed;bottom:0;left:0;right:0;z-index:9100;background:linear-gradient(180deg,#f7f2e8 0%,#ede5d0 100%);border-top:2px solid #c8b48a;border-radius:20px 20px 0 0;box-shadow:0 -6px 32px rgba(0,0,0,0.5);transform:translateY(100%);transition:transform ${PANEL_SLIDE_MS}ms cubic-bezier(0.22,1,0.36,1);font-family:'Georgia',serif;pointer-events:none;}
       #utsuroba-drifter-panel.open{transform:translateY(0);pointer-events:auto;}
@@ -455,7 +412,7 @@
   ═══════════════════════════════════════════ */
   function injectDevPanel() {
     if (document.getElementById('buki-dev-panel')) return;
-    
+
     const panel = document.createElement('div');
     panel.id = 'buki-dev-panel';
 
@@ -484,8 +441,6 @@
       pinLog = document.getElementById('buki-pin-log');
     }
 
-
-    
     panel.style.cssText = 'position:fixed;bottom:60px;right:18px;z-index:9999;background:rgba(0,0,0,.90);border:1px solid rgba(255,200,0,.4);border-radius:10px;padding:10px 14px;font:700 11px/1.8 monospace;color:#ffd700;letter-spacing:.06em;min-width:190px;box-shadow:0 0 20px rgba(255,200,0,.2);';
     panel.innerHTML = `
       <div style="font-size:9px;color:rgba(255,200,0,.5);letter-spacing:.14em;margin-bottom:6px;">DEV — utsuroba</div>
@@ -513,12 +468,10 @@
         invalidateQuestCache();
       }
     });
-
     document.getElementById('buki-dev-celebrate').addEventListener('click', () => {
       const drifter = DATA.drifters[0];
       if (drifter) startCelebration(drifter);
     });
-    
     setInterval(() => {
       const r = document.getElementById('buki-dev-room');
       const p = document.getElementById('buki-dev-perf');
@@ -573,13 +526,9 @@
     stopActiveAudio();
     try { music.pause(); music.currentTime = 0; } catch(_) {}
     exitPopOverlay.style.display = 'none';
-    
-    /* ── 1. pause BGM, fade to black ── */
-    try { music.pause(); } catch(_) {}
     const fadeEl = document.getElementById('buki-fade');
     fadeEl.style.transition = `opacity ${FADE_MS}ms ease-in`;
     fadeEl.style.opacity    = '1';
-    
     setTimeout(() => {
       try { sessionStorage.setItem('utsuroba_return_room','room_15'); } catch(_) {}
       window.location.href = KARASUKI_EXIT.href;
@@ -600,32 +549,34 @@
   function openDrifterPanel(drifter, forcedQuest = null) {
     if (performance.now() < drifterPanelCooldown || !drifter || !drifterPanel) return;
 
-    drifterPanelOpen    = true;
-    state.inputLocked   = true;
-    state.clickTarget   = null;
+    drifterPanelOpen  = true;
+    state.inputLocked = true;
+    state.clickTarget = null;
     try { music.pause(); } catch(_) {}
 
     invalidateQuestCache();
     const quest       = forcedQuest || getCachedQuest();
     const hasMemories = drifterHasMemories(drifter.id);
 
-    /* ── resolve audio src NOW, while quest is fresh ── */
-    /* This is the fix for the play button: capture src at panel-build time,
-       not at click time. The click handler closes over this value directly. */
     const currentAudioSrc = (quest && quest.active === drifter.id)
       ? questAudioSrc(quest.active, quest.memIdx)
       : null;
 
-    let dialogueHTML = '';
+    /* ── build post-greeting action HTML ── */
+    let actionHTML = '';
 
-    if (!hasMemories) {
-      dialogueHTML = `
+    if (drifter.memoryCount === 0) {
+      actionHTML = `
+        <div class="dp-btns"><button class="dp-btn no dp-dismiss">Close / 閉じる</button></div>`;
+
+    } else if (!hasMemories) {
+      actionHTML = `
         <p class="dp-status">✦ All memories found. ✦<br>すべての記憶が見つかりました。</p>
         <div class="dp-btns"><button class="dp-btn no dp-dismiss">Close / 閉じる</button></div>`;
 
     } else if (quest && quest.active === drifter.id && quest.state === 'accepted') {
       const wl = WAITING_LINES[drifter.id] || { en:"I'll be waiting…", jp:"待ってるよ…" };
-      dialogueHTML = `
+      actionHTML = `
         <p class="dp-line-en" style="margin-bottom:2px;">${wl.en}</p>
         <p class="dp-line-jp" style="margin-bottom:10px;">${wl.jp}</p>
         <div class="dp-divider"></div>
@@ -635,7 +586,7 @@
         </div>`;
 
     } else if (quest && quest.active === drifter.id && quest.state === 'collected') {
-      dialogueHTML = `
+      actionHTML = `
         <p class="dp-line-en" style="margin-bottom:2px;">You have a memory… give it to me?</p>
         <p class="dp-line-jp" style="margin-bottom:10px;">記憶を持っている…くれる？</p>
         <div class="dp-divider"></div>
@@ -649,14 +600,20 @@
         </div>`;
 
     } else if (quest && quest.active !== drifter.id) {
-      dialogueHTML = `
+      actionHTML = `
         <p class="dp-status">Please help my friend first…<br>先に友達を助けてあげて…</p>
         <div class="dp-btns"><button class="dp-btn no dp-dismiss">Close / 閉じる</button></div>`;
 
     } else {
-      const lines = drifter.greeting.map((en,i) =>
-        `<p class="dp-line-en">${en}</p><p class="dp-line-jp">${drifter.greetingJP[i]}</p>`).join('');
-      dialogueHTML = `${lines}
+      /* no active quest — offer one using questGreeting */
+      const qLines   = drifter.questGreeting   || [];
+      const qLinesJP = drifter.questGreetingJP || [];
+      const qHTML = qLines.map((en, i) =>
+        `<p class="dp-line-en" style="margin-bottom:2px;">${en}</p>
+         <p class="dp-line-jp" style="margin-bottom:6px;">${qLinesJP[i] || ''}</p>`
+      ).join('');
+      actionHTML = `
+        ${qHTML}
         <div class="dp-divider"></div>
         <p class="dp-line-en" style="margin-bottom:2px;">Will you help me find a memory?</p>
         <p class="dp-line-jp" style="margin-bottom:10px;">記憶を探すのを手伝ってくれる？</p>
@@ -665,6 +622,9 @@
           <button class="dp-btn no dp-dismiss">いいえ / No</button>
         </div>`;
     }
+
+    /* ── skip typewriter for mid-quest states ── */
+    const skipTypewriter = !!(quest && quest.active === drifter.id);
 
     drifterPanel.innerHTML = `
       <div class="dp-handle"></div>
@@ -676,84 +636,145 @@
           <p class="dp-name-kanji">${drifter.nameKanji}</p>
           <p class="dp-name-hira">${drifter.nameHira}</p>
           <div class="dp-divider"></div>
-          ${dialogueHTML}
+          <div id="dp-typewriter-lines"></div>
+          <div id="dp-action-area" style="opacity:0;transition:opacity 0.3s;">${actionHTML}</div>
         </div>
       </div>`;
 
-    drifterPanel.querySelectorAll('.dp-dismiss').forEach(btn => btn.addEventListener('click', closeDrifterPanel));
-
-    /* YES btn */
-    const yesBtn = drifterPanel.querySelector('#dp-yes-btn');
-    if (yesBtn) yesBtn.addEventListener('click', () => {
-      const newQuest = activateQuest(drifter.id);
-      if (!newQuest) { closeDrifterPanel(); return; }
-      closeDrifterPanel();
-      setTimeout(() => {
-        drifterPanelCooldown = 0;
-        openDrifterPanel(drifter, newQuest);
-      }, PANEL_SLIDE_MS + 20);
-    });
-
-    /* ── REPLAY BTN — fixed: uses closure-bound src, not getCachedQuest() at click time ── */
-    const replayBtn = drifterPanel.querySelector('#dp-replay-btn');
-    if (replayBtn) {
-      if (!currentAudioSrc) {
-        replayBtn.disabled = true;
-      } else {
-        if (isMemoryPlaying) replayBtn.disabled = true;
-        replayBtn.addEventListener('click', () => {
-          if (isMemoryPlaying) return;
-          isMemoryPlaying       = true;
-          replayBtn.disabled    = true;
-          replayBtn.textContent = '▶ Playing…';
-          stopActiveAudio();
-          const a  = new Audio(currentAudioSrc);
-          activeAudio = a;
-          a.play().catch(() => {});
-          a.onended = () => {
-            if (activeAudio === a) activeAudio = null;
-            isMemoryPlaying = false;
-            if (replayBtn.isConnected) {
-              replayBtn.disabled    = false;
-              replayBtn.textContent = '▶ Play / 聴く';
-            }
-          };
-        });
-      }
-    }
-
-    /* CANCEL QUEST */
-    const cancelQuestBtn = drifterPanel.querySelector('#dp-cancel-quest-btn');
-    if (cancelQuestBtn) cancelQuestBtn.addEventListener('click', () => {
-      stopActiveAudio();
-      clearQuest();
-      closeDrifterPanel();
-    });
-
-    /* GIVE MEMORY */
-    const giveBtn = drifterPanel.querySelector('#dp-give-btn');
-    if (giveBtn) giveBtn.addEventListener('click', () => {
-      const q = getCachedQuest();
-      if (!q || q.state !== 'collected') { closeDrifterPanel(); return; }
-      const expectedMemKey = `${drifter.id}_a${String(q.memIdx).padStart(2,'0')}`;
-      const correct = q.orbIsCorrect === true && q.collectedMemoryId === expectedMemKey;
-      closeDrifterPanel();
-      if (correct) {
-        completeMemory(drifter.id, q.memIdx);
-        startCelebration(drifter);
-      } else {
-        /* tell karasuki to respawn this orb when the player returns */
-        try { sessionStorage.setItem('karasuki_return_wrong_orb', q.collectedMemoryId || ''); } catch(_) {}
-        showWrongMemoryMsg();
-        markDrifterWrong(drifter.id);
-        clearQuest();
-        /* begin fade after the wrong-memory message has shown for a moment */
-        _lastWrongId = drifter.id;
-        setTimeout(() => { drifterFadeStart = performance.now(); }, 1800);
-      }
-    });
+    drifterPanel.querySelectorAll('.dp-dismiss').forEach(btn =>
+      btn.addEventListener('click', closeDrifterPanel));
 
     requestAnimationFrame(() => requestAnimationFrame(() => drifterPanel.classList.add('open')));
+
+    /* ── typewriter engine ── */
+    const twContainer = drifterPanel.querySelector('#dp-typewriter-lines');
+    const actionArea  = drifterPanel.querySelector('#dp-action-area');
+    const enLines     = drifter.greeting;
+    const jpLines     = drifter.greetingJP;
+    let   finished    = false;
+
+    function showActionArea() {
+      if (finished) return;
+      finished = true;
+      twContainer.innerHTML = enLines.map((en, i) =>
+        `<p class="dp-line-en" style="margin-bottom:2px;">${en}</p>
+         <p class="dp-line-jp" style="margin-bottom:6px;">${jpLines[i] || ''}</p>`
+      ).join('');
+      actionArea.style.opacity = '1';
+      drifterPanel.querySelectorAll('.dp-dismiss').forEach(btn =>
+        btn.addEventListener('click', closeDrifterPanel));
+      bindActionButtons();
+    }
+
+    if (skipTypewriter) {
+      showActionArea();
+    } else {
+      drifterPanel.addEventListener('click', showActionArea, { once: true });
+
+      let lineIdx = 0, charIdx = 0;
+      let currentEnEl = null, currentJpEl = null;
+      const CHAR_MS = 38, LINE_PAUSE_MS = 320;
+
+      function typeLine() {
+        if (finished) return;
+        if (lineIdx >= enLines.length) { setTimeout(showActionArea, 400); return; }
+        currentEnEl = document.createElement('p');
+        currentEnEl.className = 'dp-line-en';
+        currentEnEl.style.marginBottom = '2px';
+        currentJpEl = document.createElement('p');
+        currentJpEl.className = 'dp-line-jp';
+        currentJpEl.style.marginBottom = '6px';
+        twContainer.appendChild(currentEnEl);
+        twContainer.appendChild(currentJpEl);
+        charIdx = 0;
+        typeChar();
+      }
+
+      function typeChar() {
+        if (finished) return;
+        const enLine = enLines[lineIdx];
+        const jpLine = jpLines[lineIdx] || '';
+        if (charIdx <= enLine.length) {
+          currentEnEl.textContent = enLine.slice(0, charIdx);
+          const jpProgress = Math.round((charIdx / enLine.length) * jpLine.length);
+          currentJpEl.textContent = jpLine.slice(0, jpProgress);
+          charIdx++;
+          setTimeout(typeChar, CHAR_MS);
+        } else {
+          lineIdx++;
+          setTimeout(typeLine, LINE_PAUSE_MS);
+        }
+      }
+
+      typeLine();
+    }
+
+    function bindActionButtons() {
+      const yesBtn = drifterPanel.querySelector('#dp-yes-btn');
+      if (yesBtn) yesBtn.addEventListener('click', () => {
+        const newQuest = activateQuest(drifter.id);
+        if (!newQuest) { closeDrifterPanel(); return; }
+        closeDrifterPanel();
+        setTimeout(() => {
+          drifterPanelCooldown = 0;
+          openDrifterPanel(drifter, newQuest);
+        }, PANEL_SLIDE_MS + 20);
+      });
+
+      const replayBtn = drifterPanel.querySelector('#dp-replay-btn');
+      if (replayBtn) {
+        if (!currentAudioSrc) {
+          replayBtn.disabled = true;
+        } else {
+          if (isMemoryPlaying) replayBtn.disabled = true;
+          replayBtn.addEventListener('click', () => {
+            if (isMemoryPlaying) return;
+            isMemoryPlaying       = true;
+            replayBtn.disabled    = true;
+            replayBtn.textContent = '▶ Playing…';
+            stopActiveAudio();
+            const a = new Audio(currentAudioSrc);
+            activeAudio = a;
+            a.play().catch(() => {});
+            a.onended = () => {
+              if (activeAudio === a) activeAudio = null;
+              isMemoryPlaying = false;
+              if (replayBtn.isConnected) {
+                replayBtn.disabled    = false;
+                replayBtn.textContent = '▶ Play / 聴く';
+              }
+            };
+          });
+        }
+      }
+
+      const cancelQuestBtn = drifterPanel.querySelector('#dp-cancel-quest-btn');
+      if (cancelQuestBtn) cancelQuestBtn.addEventListener('click', () => {
+        stopActiveAudio();
+        clearQuest();
+        closeDrifterPanel();
+      });
+
+      const giveBtn = drifterPanel.querySelector('#dp-give-btn');
+      if (giveBtn) giveBtn.addEventListener('click', () => {
+        const q = getCachedQuest();
+        if (!q || q.state !== 'collected') { closeDrifterPanel(); return; }
+        const expectedMemKey = `${drifter.id}_a${String(q.memIdx).padStart(2,'0')}`;
+        const correct = q.orbIsCorrect === true && q.collectedMemoryId === expectedMemKey;
+        closeDrifterPanel();
+        if (correct) {
+          completeMemory(drifter.id, q.memIdx);
+          startCelebration(drifter);
+        } else {
+          try { sessionStorage.setItem('karasuki_return_wrong_orb', q.collectedMemoryId || ''); } catch(_) {}
+          showWrongMemoryMsg();
+          markDrifterWrong(drifter.id);
+          clearQuest();
+          _lastWrongId = drifter.id;
+          setTimeout(() => { drifterFadeStart = performance.now(); }, 1800);
+        }
+      });
+    }
   }
 
   function closeDrifterPanel() {
@@ -776,10 +797,10 @@
     setTimeout(() => { msg.style.opacity='0'; msg.style.transition='opacity .5s'; setTimeout(() => msg.remove(), 520); }, 3200);
   }
 
-  /* ── soft dance sparkles (separate from triggerSparkle burst) ── */
+  /* ── soft dance sparkles ── */
   let danceSparkles = [];
 
- function spawnDanceSparkle(originX, originY) {
+  function spawnDanceSparkle(originX, originY) {
     const colors = ['#ffd700','#ffe066','#fff0a0','#c8960a','#ffffff','#fffde0'];
     const angle  = Math.random() * Math.PI * 2;
     const radius = 10 + Math.random() * 28;
@@ -795,7 +816,7 @@
     });
   }
 
-function startCelebration(drifter) {
+  function startCelebration(drifter) {
     state.celebrating        = true;
     state.inputLocked        = true;
     state.celebrateSpinStart = performance.now();
@@ -804,12 +825,10 @@ function startCelebration(drifter) {
     stopActiveAudio();
     try { music.pause(); } catch(_) {}
 
-    /* ghost dances near the drifter */
-    const pos = drifterWorldPos(drifter);
+    const pos = drifterWorldPos(drifter, weeklyRooms[DATA.drifters.indexOf(drifter)]);
     state.celebrateOrbitX = pos.x;
     state.celebrateOrbitY = pos.y;
 
-    /* start dance music after a short breath */
     const danceAudio = new Audio('./assets/audio/boo-dance.mp3');
     danceAudio.volume = 0.85;
     setTimeout(() => { danceAudio.play().catch(() => {}); }, 300);
@@ -830,7 +849,6 @@ function startCelebration(drifter) {
       }, 1000);
     };
 
-    /* safety fallback */
     setTimeout(() => {
       if (state.celebrating) danceAudio.dispatchEvent(new Event('ended'));
     }, 18000);
@@ -890,10 +908,7 @@ function startCelebration(drifter) {
     document.body.appendChild(toast);
     injectExitPopOverlay();
     buildDrifterPanel();
-    
-   if (DEV_MODE) {
-      injectDevPanel();
-    }
+    if (DEV_MODE) { injectDevPanel(); }
     const ro = document.createElement('div'); ro.id = 'rotate-overlay';
     ro.innerHTML = `<span class="rotate-phone">📱</span><div class="rotate-bar"></div><p class="rotate-title">横にして遊ぼう！</p><p class="rotate-sub">うつろばは<strong style="color:#c45fa3">横画面</strong>で遊べるよ。<br>スマホを横にしてね。</p>`;
     document.body.appendChild(ro);
@@ -929,10 +944,12 @@ function startCelebration(drifter) {
   ═══════════════════════════════════════════ */
   function toggleCoordMode() {
     state.coordMode = !state.coordMode;
-    coordToggle.classList.toggle('active', state.coordMode);
-    coordReadout.classList.toggle('show', state.coordMode);
-    pinLog.classList.toggle('show', state.coordMode);
-    pinLog.querySelector('.log-header span').textContent = `PINS — ${state.roomId}`;
+    if (coordToggle) coordToggle.classList.toggle('active', state.coordMode);
+    if (coordReadout) coordReadout.classList.toggle('show', state.coordMode);
+    if (pinLog) {
+      pinLog.classList.toggle('show', state.coordMode);
+      pinLog.querySelector('.log-header span').textContent = `PINS — ${state.roomId}`;
+    }
   }
   function dropPin(wx,wy) { const label = `${Math.round(wx)}, ${Math.round(wy)}`; pins.push({x:wx,y:wy,label}); renderPinLog(); copyText(label); showToast(`pinned ${label}`); }
   function renderPinLog() {
@@ -983,7 +1000,7 @@ function startCelebration(drifter) {
     arrivalArrowHiddenUntil     = now + ARRIVAL_ARROW_DELAY_MS;
     arrivalArrowBackHiddenUntil = now + ARRIVAL_ARROW_DELAY_MS * ARRIVAL_ARROW_BACK_MULTIPLIER;
     state.distMovedSinceSpawn = 0; state.spawnLockUntil = now+800;
-    if (DEV_MODE && pinLog) { const lh = pinLog.querySelector('.log-header span'); if (lh) lh.textContent = `PINS — ${state.roomId}`; renderPinLog(); }
+    if (pinLog) { const lh = pinLog.querySelector('.log-header span'); if (lh) lh.textContent = `PINS — ${state.roomId}`; renderPinLog(); }
   }
 
   /* ═══════════════════════════════════════════
@@ -1120,77 +1137,72 @@ function startCelebration(drifter) {
 
   /* ═══════════════════════════════════════════
      DRAW DRIFTERS
-     ─────────────────────────────────────────
-     Quest-active glow is now a prominent multi-ring
-     effect: outer pulse bloom + animated ring + 
-     inner halo. Clearly visible from across the room.
   ═══════════════════════════════════════════ */
   function drawDrifters(now) {
-    const drifter = drifterForRoom(state.roomId); if (!drifter) return;
-    const hasMemories = drifterHasMemories(drifter.id);
-    const quest       = getCachedQuest();
-    const isWaiting   = !!(quest && quest.active === drifter.id && quest.state === 'accepted');
-    const isCollected = !!(quest && quest.active === drifter.id && quest.state === 'collected');
-    const questActive = isWaiting || isCollected;
-    const useImg2     = !!(quest && quest.active === drifter.id);
-    const imgs        = drifterImgs[drifter.id];
-    const img         = useImg2 ? imgs.img2 : imgs.img1;
-    const pos         = drifterWorldPos(drifter);
+    const drifters = driftersForRoom(state.roomId);
+    if (!drifters.length) return;
+    const quest = getCachedQuest();
+    const sec   = now / 1000;
 
-    const dw  = img.naturalWidth  * drifter.scale;
-    const dh  = img.naturalHeight * drifter.scale;
-    const sec = now / 1000;
+    drifters.forEach(drifter => {
+      const hasMemories = drifterHasMemories(drifter.id);
+      const isWaiting   = !!(quest && quest.active === drifter.id && quest.state === 'accepted');
+      const isCollected = !!(quest && quest.active === drifter.id && quest.state === 'collected');
+      const questActive = isWaiting || isCollected;
+      const useImg2     = !!(quest && quest.active === drifter.id);
+      const imgs        = drifterImgs[drifter.id];
+      const img         = useImg2 ? imgs.img2 : imgs.img1;
+      const pos         = drifterWorldPos(drifter, state.roomId);
 
-    /* ── wrong-memory fade: animate out over 2.5s, then gone for the week ── */
-    const FADE_OUT_MS = 2500;
-    if (drifterIsWrong(drifter.id) && drifterFadeStart === 0) return; /* already faded — skip */
-    let alpha;
-    if (drifterFadeStart > 0) {
-      const elapsed = now - drifterFadeStart;
-      alpha = Math.max(0, 1 - elapsed / FADE_OUT_MS);
-      if (alpha === 0) { drifterFadeStart = 0; return; } /* done fading */
-    } else {
-      alpha = hasMemories ? 1 : 0.35;
-    }
+      const dw = img.naturalWidth  * drifter.scale;
+      const dh = img.naturalHeight * drifter.scale;
 
-    if (questActive) {
-      /* ── OUTER BLOOM: large slow pulse ── */
-      const slowPulse = 0.5 + 0.5 * Math.sin(sec * 1.4);
-      const bloomR    = Math.max(dw, dh) * 1.1 + slowPulse * 18;
-      const cx = pos.x, cy = pos.y - dh * 0.5;
-      ctx.save();
-      const bloom = ctx.createRadialGradient(cx, cy, 0, cx, cy, bloomR);
-      bloom.addColorStop(0,   `rgba(255,210,60,${0.55 + slowPulse*0.30})`);
-      bloom.addColorStop(0.45,`rgba(255,160,20,${0.22 + slowPulse*0.18})`);
-      bloom.addColorStop(0.75,`rgba(255,100,10,${0.08 + slowPulse*0.06})`);
-      bloom.addColorStop(1,   'transparent');
-      ctx.globalAlpha = 1;
-      ctx.fillStyle   = bloom;
-      ctx.beginPath(); ctx.arc(cx, cy, bloomR, 0, Math.PI*2); ctx.fill();
-      ctx.restore();
-
-    }
-
-    /* ── Draw sprite ── */
-    ctx.save();
-    ctx.globalAlpha = alpha;
-    if (img.complete && img.naturalWidth > 0) {
-      if (shadowsEnabled && hasMemories) {
-        ctx.shadowBlur  = questActive ? 28 : 18;
-        ctx.shadowColor = questActive
-          ? (isCollected ? '#44ffaa' : '#ffcc40')
-          : '#d8c0f8';
+      /* ── wrong-memory fade ── */
+      const FADE_OUT_MS = 2500;
+      if (drifterIsWrong(drifter.id) && drifterFadeStart === 0) return;
+      let alpha;
+      if (drifterFadeStart > 0 && _lastWrongId === drifter.id) {
+        const elapsed = now - drifterFadeStart;
+        alpha = Math.max(0, 1 - elapsed / FADE_OUT_MS);
+        if (alpha === 0) { drifterFadeStart = 0; return; }
+      } else {
+        alpha = (hasMemories || drifter.memoryCount === 0) ? 1 : 0.35;
       }
-      ctx.drawImage(img, pos.x-dw/2, pos.y-dh, dw, dh);
-      ctx.shadowBlur = 0;
-    } else {
-      ctx.fillStyle = '#c090e8';
-      ctx.beginPath(); ctx.arc(pos.x, pos.y-40, 24, 0, Math.PI*2); ctx.fill();
-    }
-    ctx.restore();
-  }
 
-  
+      if (questActive) {
+        const slowPulse = 0.5 + 0.5 * Math.sin(sec * 1.4);
+        const bloomR    = Math.max(dw, dh) * 1.1 + slowPulse * 18;
+        const cx = pos.x, cy = pos.y - dh * 0.5;
+        ctx.save();
+        const bloom = ctx.createRadialGradient(cx, cy, 0, cx, cy, bloomR);
+        bloom.addColorStop(0,   `rgba(255,210,60,${0.55 + slowPulse*0.30})`);
+        bloom.addColorStop(0.45,`rgba(255,160,20,${0.22 + slowPulse*0.18})`);
+        bloom.addColorStop(0.75,`rgba(255,100,10,${0.08 + slowPulse*0.06})`);
+        bloom.addColorStop(1,   'transparent');
+        ctx.globalAlpha = 1;
+        ctx.fillStyle   = bloom;
+        ctx.beginPath(); ctx.arc(cx, cy, bloomR, 0, Math.PI*2); ctx.fill();
+        ctx.restore();
+      }
+
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      if (img.complete && img.naturalWidth > 0) {
+        if (shadowsEnabled && (hasMemories || drifter.memoryCount === 0)) {
+          ctx.shadowBlur  = questActive ? 28 : 18;
+          ctx.shadowColor = questActive
+            ? (isCollected ? '#44ffaa' : '#ffcc40')
+            : '#d8c0f8';
+        }
+        ctx.drawImage(img, pos.x-dw/2, pos.y-dh, dw, dh);
+        ctx.shadowBlur = 0;
+      } else {
+        ctx.fillStyle = '#c090e8';
+        ctx.beginPath(); ctx.arc(pos.x, pos.y-40, 24, 0, Math.PI*2); ctx.fill();
+      }
+      ctx.restore();
+    });
+  }
 
   /* ═══════════════════════════════════════════
      DRAW PINS
@@ -1235,15 +1247,14 @@ function startCelebration(drifter) {
     drawDrifters(now);
     drawExitArrows(now);
     drawKarasukiExitArrow(now);
- 
+
     /* Ghost */
     const bobFreq  = (Math.PI*2)/(HOVER_PERIOD/1000);
     const bobPhase = sec * bobFreq;
     const bob      = Math.sin(bobPhase) * HOVER_AMP;
     const pulse    = 0.5+0.5*Math.sin(sec*2.1);
-    
 
-   /* ── Dance celebration ── */
+    /* ── Dance celebration ── */
     let gx, gy, wobble, sx, sy;
     if (state.celebrateDancing) {
       const elapsed = (now - state.celebrateSpinStart) / 1000;
@@ -1252,7 +1263,6 @@ function startCelebration(drifter) {
         ? Math.max(0, 1 - ((now - state.celebrateSettleStart) / 900))
         : 1;
 
-      /* dance around the drifter position */
       const driftX = (Math.sin(elapsed * 1.1) * 60 + Math.sin(elapsed * 2.3) * 25) * settleEase;
       const driftY = (Math.cos(elapsed * 1.4) * 40 + Math.cos(elapsed * 2.9) * 16) * settleEase;
       const bigBob = (Math.sin(elapsed * 6.2) * 20 + Math.sin(elapsed * 3.7) * 9) * settleEase;
@@ -1266,10 +1276,8 @@ function startCelebration(drifter) {
       gy     = state.celebrateOrbitY + driftY + bigBob;
       wobble = spinAngle * (180 / Math.PI);
 
-      /* sparkles follow the ghost */
       if (settleEase > 0 && Math.random() < 0.45) spawnDanceSparkle(gx, gy);
 
-      /* draw dance sparkles */
       for (let i = danceSparkles.length - 1; i >= 0; i--) {
         const sp = danceSparkles[i];
         sp.life -= 0.014;
@@ -1292,7 +1300,6 @@ function startCelebration(drifter) {
       sy     = (1+Math.sin(bobPhase)*0.10) * (state.moving?1.08:1.0);
     }
 
-    
     ctx.save(); ctx.globalAlpha = 0.22+pulse*0.12;
     const halo     = ctx.createRadialGradient(gx,gy+3,0,gx,gy+3,GHOST_R*2.2);
     const haloCol1 = state.celebrating ? '#ffd700' : col1;
@@ -1312,7 +1319,7 @@ function startCelebration(drifter) {
       ctx.drawImage(ghostImg,-GHOST_R,-GHOST_R,GHOST_R*2,GHOST_R*2); ctx.shadowBlur=0;
     } else { ctx.globalAlpha=1; ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(0,0,GHOST_R*.7,0,Math.PI*2); ctx.fill(); }
     ctx.restore();
-    if (DEV_MODE) drawPins(now);
+    if (state.coordMode) drawPins(now);
   }
 
   /* ═══════════════════════════════════════════
@@ -1349,13 +1356,11 @@ function startCelebration(drifter) {
   /* ═══════════════════════════════════════════
      DRIFTER HIT CHECK
   ═══════════════════════════════════════════ */
-  /* ── returns true if tap is within NPP_RADIUS of any exit in current room ── */
   function tapInNPPZone(wx,wy) {
     const npps = NPP[state.roomId]; if (!npps) return false;
     for (const npp of npps) {
       if (Math.hypot(wx-npp.x, wy-npp.y) <= NPP_RADIUS) return true;
     }
-    /* also check karasuki exit zone if in that room */
     if (state.roomId === KARASUKI_EXIT.roomId &&
         Math.hypot(wx-exitPxX(), wy-exitPxY()) <= KARASUKI_EXIT.r) return true;
     return false;
@@ -1363,15 +1368,18 @@ function startCelebration(drifter) {
 
   function clickCheckDrifter(wx,wy) {
     if (state.inputLocked || drifterPanelOpen) return false;
-    const drifter = drifterForRoom(state.roomId); if (!drifter) return false;
-    if (!drifterHasMemories(drifter.id)) return false;   /* all done — sprite is inert */
-    if (tapInNPPZone(wx,wy)) return false;               /* exit zone always wins */
-    const pos  = drifterWorldPos(drifter);
-    const imgs = drifterImgs[drifter.id];
-    const img  = imgs.img1;
-    const dw   = img.naturalWidth  * drifter.scale;
-    const dh   = img.naturalHeight * drifter.scale;
-    if (wx >= pos.x-dw/2 && wx <= pos.x+dw/2 && wy >= pos.y-dh && wy <= pos.y) { openDrifterPanel(drifter); return true; }
+    if (tapInNPPZone(wx,wy)) return false;
+    const drifters = driftersForRoom(state.roomId);
+    for (const drifter of drifters) {
+      const pos  = drifterWorldPos(drifter, state.roomId);
+      const imgs = drifterImgs[drifter.id];
+      const img  = imgs.img1;
+      const dw   = img.naturalWidth  * drifter.scale;
+      const dh   = img.naturalHeight * drifter.scale;
+      if (wx >= pos.x-dw/2 && wx <= pos.x+dw/2 && wy >= pos.y-dh && wy <= pos.y) {
+        openDrifterPanel(drifter); return true;
+      }
+    }
     return false;
   }
 
@@ -1379,7 +1387,7 @@ function startCelebration(drifter) {
      UNIFIED TAP HANDLER
   ═══════════════════════════════════════════ */
   function handleWorldTap(wx,wy) {
-    if (DEV_MODE && state.coordMode) { dropPin(wx,wy); ripples.push({x:wx,y:wy,life:1}); return; }
+    if (state.coordMode) { dropPin(wx,wy); ripples.push({x:wx,y:wy,life:1}); return; }
     if (clickCheckKarasukiExit(wx,wy)) { ripples.push({x:wx,y:wy,life:1}); return; }
     if (clickCheckDrifter(wx,wy))      { ripples.push({x:wx,y:wy,life:1}); return; }
     state.clickTarget = { x:wx, y:wy }; ripples.push({x:wx,y:wy,life:1});
@@ -1405,7 +1413,6 @@ function startCelebration(drifter) {
     updatePerfTier(now);
     const dt = Math.min(50, Math.max(8, now-(lastTickTime||now)));
     lastTickTime = now; SPEED = BASE_SPEED * (dt/TARGET_DT);
-    if (state.celebrating && now >= state.celebrateUntil) { state.celebrating=false; state.inputLocked=false; }
     if (!anyModalOpen()) {
       if (state.travelingToCenter) { handleCenterTravel(now); }
       else {
@@ -1454,11 +1461,10 @@ function startCelebration(drifter) {
     document.addEventListener('touchend', startMusic, { once:true, passive:true });
   }
 
-  /* ── canonical visited flag: data.utsuroba.flags.visited ── */
   function markVisited() {
     try {
       const d = loadSave();
-      if (d.utsuroba.flags.visited) return;   /* already set — no write needed */
+      if (d.utsuroba.flags.visited) return;
       d.utsuroba.flags.visited = true;
       writeSave(d);
     } catch(_) {}
@@ -1480,7 +1486,8 @@ function startCelebration(drifter) {
   }
 
   init();
-Object.defineProperty(window, 'b_4911', {
+
+  Object.defineProperty(window, 'b_4911', {
     value: () => {
       if (typeof injectDevPanel === 'function') injectDevPanel();
     },
