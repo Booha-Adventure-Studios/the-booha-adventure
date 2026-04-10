@@ -10,7 +10,10 @@
   const WORLD_H         = 1024;
   const GHOST_R         = 26;
   const GHOST_RADIUS    = 18;
-  const BASE_SPEED      = 3.5;
+
+  const IS_PHONE        = ('ontouchstart' in window || navigator.maxTouchPoints > 0) && window.innerWidth < 768;
+  const BASE_SPEED      = IS_PHONE ? 8.0 : 5.5;
+
   const FADE_MS         = 600;
   const CLICK_STOP_DIST = 6;
   const HOVER_AMP       = 9;
