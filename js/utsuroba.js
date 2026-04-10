@@ -455,8 +455,37 @@
   ═══════════════════════════════════════════ */
   function injectDevPanel() {
     if (document.getElementById('buki-dev-panel')) return;
+    
     const panel = document.createElement('div');
     panel.id = 'buki-dev-panel';
+
+    /* ── coord UI ── */
+    if (!document.getElementById('buki-coord-toggle')) {
+      coordToggle = document.createElement('div'); coordToggle.id = 'buki-coord-toggle';
+      coordToggle.innerHTML = '<span>COORDS</span><div class="toggle-pill"></div>';
+      coordToggle.addEventListener('click', toggleCoordMode);
+      document.body.appendChild(coordToggle);
+    } else {
+      coordToggle = document.getElementById('buki-coord-toggle');
+    }
+    if (!document.getElementById('buki-coord-readout')) {
+      coordReadout = document.createElement('div'); coordReadout.id = 'buki-coord-readout';
+      coordReadout.innerHTML = '<span id="buki-coord-xy">—</span><span class="hint">click to pin · hover to read</span>';
+      document.body.appendChild(coordReadout);
+    } else {
+      coordReadout = document.getElementById('buki-coord-readout');
+    }
+    if (!document.getElementById('buki-pin-log')) {
+      pinLog = document.createElement('div'); pinLog.id = 'buki-pin-log';
+      pinLog.innerHTML = `<div class="log-header"><span>PINS — ${state.roomId}</span><span class="clear-btn" id="buki-clear-pins">CLEAR</span></div><div id="buki-pin-rows"></div>`;
+      document.body.appendChild(pinLog);
+      document.getElementById('buki-clear-pins').addEventListener('click', () => { pins = []; renderPinLog(); });
+    } else {
+      pinLog = document.getElementById('buki-pin-log');
+    }
+
+
+    
     panel.style.cssText = 'position:fixed;bottom:60px;right:18px;z-index:9999;background:rgba(0,0,0,.90);border:1px solid rgba(255,200,0,.4);border-radius:10px;padding:10px 14px;font:700 11px/1.8 monospace;color:#ffd700;letter-spacing:.06em;min-width:190px;box-shadow:0 0 20px rgba(255,200,0,.2);';
     panel.innerHTML = `
       <div style="font-size:9px;color:rgba(255,200,0,.5);letter-spacing:.14em;margin-bottom:6px;">DEV — utsuroba</div>
@@ -861,18 +890,8 @@ function startCelebration(drifter) {
     document.body.appendChild(toast);
     injectExitPopOverlay();
     buildDrifterPanel();
-    if (DEV_MODE) {
-      coordToggle = document.createElement('div'); coordToggle.id = 'buki-coord-toggle';
-      coordToggle.innerHTML = '<span>COORDS</span><div class="toggle-pill"></div>';
-      coordToggle.addEventListener('click', toggleCoordMode);
-      coordReadout = document.createElement('div'); coordReadout.id = 'buki-coord-readout';
-      coordReadout.innerHTML = '<span id="buki-coord-xy">—</span><span class="hint">click to pin · hover to read</span>';
-      pinLog = document.createElement('div'); pinLog.id = 'buki-pin-log';
-      pinLog.innerHTML = `<div class="log-header"><span>PINS — ${state.roomId}</span><span class="clear-btn" id="buki-clear-pins">CLEAR</span></div><div id="buki-pin-rows"></div>`;
-      document.body.appendChild(coordToggle);
-      document.body.appendChild(coordReadout);
-      document.body.appendChild(pinLog);
-      document.getElementById('buki-clear-pins').addEventListener('click', () => { pins = []; renderPinLog(); });
+    
+   if (DEV_MODE) {
       injectDevPanel();
     }
     const ro = document.createElement('div'); ro.id = 'rotate-overlay';
@@ -1411,13 +1430,11 @@ function startCelebration(drifter) {
   }
 
   function bindInput() {
-    if (DEV_MODE) {
-      stage.addEventListener('mousemove', e => {
-        if (!state.coordMode) return;
-        const p  = stagePointToWorld(e.clientX, e.clientY);
-        const el = document.getElementById('buki-coord-xy'); if (el) el.textContent = `${Math.round(p.x)}, ${Math.round(p.y)}`;
-      });
-    }
+    stage.addEventListener('mousemove', e => {
+      if (!state.coordMode) return;
+      const p  = stagePointToWorld(e.clientX, e.clientY);
+      const el = document.getElementById('buki-coord-xy'); if (el) el.textContent = `${Math.round(p.x)}, ${Math.round(p.y)}`;
+    });
     stage.addEventListener('click', e => {
       startMusic();
       if (state.transitioning || state.travelingToCenter || state.inputLocked) return;
