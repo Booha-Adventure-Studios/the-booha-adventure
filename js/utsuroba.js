@@ -392,7 +392,7 @@
       .dp-close-x:hover{color:#5a3010;}
       .dp-name-en{font-size:clamp(.62rem,1.7vw,.75rem);color:#9a7850;letter-spacing:.14em;text-transform:uppercase;margin:0 0 2px;}
       .dp-name-kanji{font-size:clamp(.95rem,2.6vw,1.14rem);color:#1e140a;font-weight:700;margin:0 0 1px;}
-      .dp-name-hira{font-size:clamp(.64rem,1.7vw,.76rem);color:#806040;margin:0 0 9px;letter-spacing:.06em;}
+      
       .dp-divider{width:44px;height:1px;background:#c8b48a;margin:0 0 9px;}
       .dp-line-en{font-size:clamp(.80rem,2.1vw,.94rem);color:#120c04;line-height:1.6;margin:0 0 2px;}
       .dp-line-jp{font-size:clamp(.72rem,1.9vw,.84rem);color:#6a5030;line-height:1.65;margin:0 0 4px;}
@@ -630,7 +630,7 @@
           <button class="dp-close-x dp-dismiss">✕</button>
           <p class="dp-name-en">${drifter.name}</p>
           <p class="dp-name-kanji">${drifter.nameKanji}</p>
-          <p class="dp-name-hira">${drifter.nameHira}</p>
+          
           <div class="dp-divider"></div>
           <div id="dp-typewriter-lines"></div>
           <div id="dp-action-area" style="opacity:0;transition:opacity 0.3s;">${actionHTML}</div>
