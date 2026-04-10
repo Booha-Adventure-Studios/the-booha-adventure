@@ -544,8 +544,13 @@
     stopActiveAudio();
     try { music.pause(); music.currentTime = 0; } catch(_) {}
     exitPopOverlay.style.display = 'none';
+    
+    /* ── 1. pause BGM, fade to black ── */
+    try { music.pause(); } catch(_) {}
     const fadeEl = document.getElementById('buki-fade');
-    fadeEl.style.transition = `opacity ${FADE_MS}ms ease-in`; fadeEl.style.opacity = '1';
+    fadeEl.style.transition = `opacity ${FADE_MS}ms ease-in`;
+    fadeEl.style.opacity    = '1';
+    
     setTimeout(() => {
       try { sessionStorage.setItem('utsuroba_return_room','room_15'); } catch(_) {}
       window.location.href = KARASUKI_EXIT.href;
@@ -775,15 +780,15 @@
     fadeEl.style.opacity    = '1';
 
     setTimeout(() => {
-      /* ── 2. ghost snaps to center, aurora canvas shown ── */
+      /* ── 2. ghost snaps to center, hide room, show dance scene ── */
       state.x = CENTER_X;
       state.y = CENTER_Y;
       state.celebrateDancing = true;
+      if (roomLayer) roomLayer.style.visibility = 'hidden';
 
       /* ── 3. fade back in to reveal dance scene ── */
       fadeEl.style.transition = `opacity 400ms ease-out`;
       fadeEl.style.opacity    = '0';
-
       /* ── 4. start music after ghost is visible ── */
       const danceAudio = new Audio('./assets/audio/boo-dance.mp3');
       danceAudio.volume = 0.85;
@@ -792,8 +797,9 @@
       }, 500);
 
       /* ── 5. on song end: settle then return to room ── */
-      danceAudio.onended = () => {
-        state.celebrateSettling = true;   /* ghost does a little settle wobble */
+     danceAudio.onended = () => {
+        state.celebrateSettling    = true;
+        state.celebrateSettleStart = performance.now();
         setTimeout(() => {
           /* fade out dance scene */
           fadeEl.style.transition = `opacity ${FADE_MS}ms ease-in`;
@@ -804,6 +810,8 @@
             state.celebrateSettling = false;
             state.celebrating       = false;
             danceSparkles           = [];
+            if (roomLayer) roomLayer.style.visibility = 'visible';
+            try { music.play().catch(() => {}); } catch(_) {}
             fadeEl.style.transition = `opacity ${FADE_MS}ms ease-out`;
             fadeEl.style.opacity    = '0';
             setTimeout(() => {
@@ -1274,14 +1282,31 @@
       }
 
       /* happy dance motion */
-      const settleEase = state.celebrateSettling ? Math.max(0, 1 - ((now - state.celebrateSpinStart) / 800)) : 1;
-      const bigBob  = Math.sin(elapsed * 5.5) * 18 * settleEase;
-      const sway    = Math.sin(elapsed * 2.8) * 14 * settleEase;
-      gx     = CENTER_X + sway;
-      gy     = CENTER_Y + bigBob;
-      wobble = Math.sin(elapsed * 3.2) * 10 * settleEase;
-      sx     = 1.0 + Math.sin(elapsed * 5.5) * 0.12 * settleEase;
-      sy     = 1.0 + Math.cos(elapsed * 5.5) * 0.14 * settleEase;
+      const settleEase = state.celebrateSettling
+        ? Math.max(0, 1 - ((now - state.celebrateSettleStart) / 900))
+        : 1;
+
+      /* wandering drift around center */
+      const driftX = Math.sin(elapsed * 1.1) * 70 + Math.sin(elapsed * 2.3) * 30;
+      const driftY = Math.cos(elapsed * 1.4) * 50 + Math.cos(elapsed * 2.9) * 20;
+
+      /* irregular bob — two frequencies layered */
+      const bigBob = (Math.sin(elapsed * 6.2) * 22 + Math.sin(elapsed * 3.7) * 10) * settleEase;
+
+      /* spin — full rotations, eases on settle */
+      const spinAngle = elapsed * 3.8 * settleEase;
+
+      /* squash/stretch on beat */
+      const beat = Math.sin(elapsed * 6.2);
+      sx = (1.0 + beat * 0.18) * settleEase + (1 - settleEase);
+      sy = (1.0 - beat * 0.22) * settleEase + (1 - settleEase);
+
+      gx     = CENTER_X + driftX * settleEase;
+      gy     = CENTER_Y + driftY * settleEase + bigBob;
+      wobble = spinAngle * (180 / Math.PI);   /* pass degrees — drawFrame rotates by wobble*Math.PI/180 */
+
+      /* denser sparkles during active dance */
+      if (settleEase > 0 && Math.random() < 0.55) spawnDanceSparkle();
 
     } else {
       gx     = state.x;
