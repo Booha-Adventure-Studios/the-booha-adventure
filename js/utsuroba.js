@@ -1371,7 +1371,7 @@
     if (tapInNPPZone(wx,wy)) return false;
     const drifters = driftersForRoom(state.roomId);
     for (const drifter of drifters) {
-      const pos  = drifterWorldPos(drifter, state.roomId);
+      const pos         = drifterWorldPos(drifter, state.roomId);
       const imgs = drifterImgs[drifter.id];
       const img  = imgs.img1;
       const dw   = img.naturalWidth  * drifter.scale;
