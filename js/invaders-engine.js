@@ -2227,12 +2227,11 @@ function tick(ts) {
         endVideoEl.pause(); endVideoEl.currentTime=0; endVideoEl.muted=true;
         endVideoEl.play().catch(()=>{});
         setTimeout(()=>{ try{ endVideoEl.pause(); endVideoEl.currentTime=0; endVideoEl.muted=false; }catch(_){} },60);
+        
         endVideoEl.addEventListener("ended", ()=>{
           endVideoEl.pause(); endVideoEl.currentTime=0;
           endVideoEl.style.opacity="0"; endVideoEl.style.pointerEvents="none";
-          endPlaying=false; started=false;
-          document.getElementById("startOverlay").style.display="flex";
-          resetGame();
+          window.location.href = "karasuki.html?room=room_07";
         });
       }
 
