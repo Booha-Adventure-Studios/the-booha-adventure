@@ -1111,6 +1111,12 @@
     nextBtn.addEventListener('click', nextLevel);
     helpBtn.addEventListener('click', () => toggleHelp(true));
     closeHelpBtn.addEventListener('click', () => toggleHelp(false));
+    document.getElementById('startExitBtn')?.addEventListener('click', () => {
+      window.location.href = 'karasuki.html?room=room_10';
+    });
+    document.getElementById('exitBtn')?.addEventListener('click', () => {
+      window.location.href = 'karasuki.html?room=room_10';
+    });    
     canvas.addEventListener('click', evt => handleTap(getCanvasPoint(evt)));
     canvas.addEventListener('touchstart', evt => {
       if (!state.started) return;
