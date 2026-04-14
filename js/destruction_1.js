@@ -1650,11 +1650,11 @@ function traitGlowColor(block) {
   function onDown(evt){
     getAC();
     const p=worldPt(evt);
+     
     if(htHelp(p.x,p.y)&&(gs.phase===P.TITLE||gs.phase===P.PLAY)){openHelp();evt.preventDefault();return;}
-     
-    if(gs.cardTimer>0){ctx.font='11px system-ui,sans-serif';ctx.fillStyle='rgba(255,255,255,0.28)';ctx.fillText(`Auto in ${Math.ceil(gs.cardTimer/1000)}s`,W/2,by+bh+20);}
-     
+    if(gs.phase===P.TITLE){if(htStart(p.x,p.y)){loadRound(0);startRound();}else if(htExit(p.x,p.y)){window.location.href='karasuki.html?room=room_12';}evt.preventDefault();return;}
     if(gs.phase===P.WIN||gs.phase===P.FAIL){
+       
       if(htAction(p.x,p.y)){if(gs.phase===P.WIN)advanceRound();else{loadRound(gs.round);startRound();}}
       else if(htExit(p.x,p.y)){window.location.href='karasuki.html?room=room_12';}
       evt.preventDefault();return;
