@@ -426,7 +426,10 @@ body {
     <div class="start-title">Booha Blocks</div>
     <div class="start-sub">BOOHA ADVENTURE</div>
     <div class="start-tap">タップしてスタート</div>
+    
+   <div class="start-tap">タップしてスタート</div>
     <div class="start-desc">ブロックを動かしてラインを消そう<br>Move blocks &middot; clear lines &middot; go!</div>
+    <button id="startExitBtn" style="margin-top:14px;background:none;border:none;color:rgba(255,255,255,.28);font-size:.72rem;cursor:pointer;letter-spacing:.06em;" type="button">✕ カラスキに戻る · Exit</button>
   </div>
 </div>
 
@@ -1341,7 +1344,8 @@ function showStartOverlay(){
     <div class="start-title">Booha Blocks</div>
     <div class="start-sub">BOOHA ADVENTURE</div>
     <div class="start-tap">タップしてスタート</div>
-    <div class="start-desc">ブロックを動かしてラインを消そう<br>Move blocks &middot; clear lines &middot; go!</div>`;
+    <div class="start-desc">ブロックを動かしてラインを消そう<br>Move blocks &middot; clear lines &middot; go!</div>
+    <button id="startExitBtn" style="margin-top:14px;background:none;border:none;color:rgba(255,255,255,.28);font-size:.72rem;cursor:pointer;letter-spacing:.06em;" type="button">✕ カラスキに戻る · Exit</button>`;
 }
 function startFromOverlay(){
   if(gameStarted)return;
@@ -1363,6 +1367,13 @@ function startFromOverlay(){
   },660);
 }
 startOverlay?.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();startFromOverlay();},{passive:false});
+
+document.addEventListener('pointerdown', e => {
+  if (e.target && e.target.id === 'startExitBtn') {
+    e.preventDefault(); e.stopPropagation();
+    window.location.href = 'karasuki.html?room=room_02';
+  }
+}, { passive: false });  
 
 applyTheme(1);
 draw();
