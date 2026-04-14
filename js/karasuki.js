@@ -938,16 +938,31 @@
         core.addColorStop(0, '#ffffff'); core.addColorStop(0.25, t.accent1); core.addColorStop(0.6, t.accent2+'aa'); core.addColorStop(1, 'transparent');
         ctx.globalAlpha = moveReveal * (0.92 + pulse * 0.07); ctx.shadowBlur = 24 + pulse * 18; ctx.shadowColor = t.accent1;
         ctx.fillStyle = core; ctx.beginPath(); ctx.arc(tree.x, tree.y + bounce, coreR * 1.8, 0, Math.PI * 2); ctx.fill(); ctx.shadowBlur = 0;
+        
       } else {
-        const lockGlow = ctx.createRadialGradient(tree.x, tree.y, 0, tree.x, tree.y, 40);
-        lockGlow.addColorStop(0, 'rgba(110,110,110,0.22)'); lockGlow.addColorStop(0.6, 'rgba(80,80,80,0.08)'); lockGlow.addColorStop(1, 'transparent');
-        ctx.globalAlpha = moveReveal * 0.55; ctx.fillStyle = lockGlow;
-        ctx.beginPath(); ctx.arc(tree.x, tree.y, 40, 0, Math.PI * 2); ctx.fill();
-        const dotG = ctx.createRadialGradient(tree.x, tree.y, 0, tree.x, tree.y, 7);
-        dotG.addColorStop(0, 'rgba(160,160,160,0.45)'); dotG.addColorStop(1, 'transparent');
-        ctx.globalAlpha = moveReveal * 0.45; ctx.fillStyle = dotG;
-        ctx.beginPath(); ctx.arc(tree.x, tree.y, 7, 0, Math.PI * 2); ctx.fill();
-      }
+  const t      = BONUS_THEMES[tree.theme] || BONUS_THEMES.mystery;
+  const pulse  = 0.5 + 0.5 * Math.sin(sec * 1.4);
+  const bounce = Math.sin(sec * 1.4) * 4;
+  const lockGlow = ctx.createRadialGradient(tree.x, tree.y + bounce, 0, tree.x, tree.y + bounce, 55);
+  lockGlow.addColorStop(0, t.accent1 + '28');
+  lockGlow.addColorStop(0.5, t.accent1 + '0e');
+  lockGlow.addColorStop(1, 'transparent');
+  ctx.globalAlpha = moveReveal * (0.5 + pulse * 0.2); ctx.fillStyle = lockGlow;
+  ctx.beginPath(); ctx.arc(tree.x, tree.y + bounce, 55, 0, Math.PI * 2); ctx.fill();
+  const coreR = 6 + pulse * 2;
+  const core  = ctx.createRadialGradient(tree.x, tree.y + bounce, 0, tree.x, tree.y + bounce, coreR);
+  core.addColorStop(0, '#ffffff');
+  core.addColorStop(0.4, t.accent1 + '88');
+  core.addColorStop(1, 'transparent');
+  ctx.globalAlpha = moveReveal * (0.28 + pulse * 0.12);
+  ctx.shadowBlur = 10 + pulse * 6; ctx.shadowColor = t.accent1;
+  ctx.fillStyle = core; ctx.beginPath(); ctx.arc(tree.x, tree.y + bounce, coreR, 0, Math.PI * 2); ctx.fill();
+  ctx.shadowBlur = 0;
+  ctx.globalAlpha = moveReveal * (0.18 + pulse * 0.08);
+  ctx.strokeStyle = t.accent1 + '55'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.arc(tree.x, tree.y + bounce, 18, 0, Math.PI * 2); ctx.stroke();
+}
+      
       ctx.restore();
     });
   }
