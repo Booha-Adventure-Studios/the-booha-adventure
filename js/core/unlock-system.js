@@ -118,12 +118,12 @@ const BoohaUnlockSystem = (() => {
   }
 
   // ── Weekly bonus game unlock ──────────────────────────────────────────────
-  const BONUS_GAMES = [
+ const BONUS_GAMES = [
     'booha_invaders',
     'booha_blocks',
+    'feed_booha',
+    'booha_destruction',
     'bonus_placeholder_1',
-    'bonus_placeholder_2',
-    'bonus_placeholder_3',
   ];
 
   function checkWeeklyBonusGames() {
