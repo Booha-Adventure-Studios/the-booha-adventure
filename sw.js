@@ -24,6 +24,7 @@ const CORE_FILES = [
   `${BASE}/booha_blocks.html`,
   `${BASE}/booha_invaders.html`,
   `${BASE}/feed_booha.html`,
+  `${BASE}/booha_destruction.html`,
   `${BASE}/game.html`,
   `${BASE}/homework.html`,
   `${BASE}/karasuki.html`,
