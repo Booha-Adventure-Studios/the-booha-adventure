@@ -973,8 +973,8 @@
   function drawUtsurobPortalMarker(now) {
     if (state.roomId !== UTSUROBA_PORTAL.roomId) return;
     const sec        = now / 1000;
-    const moveReveal = Math.min(1, state.distMovedSinceSpawn / ARROW_MOVE_THRESHOLD);
-    if (moveReveal <= 0) return;
+    const moveReveal = Math.max(0.18, Math.min(1, state.distMovedSinceSpawn / ARROW_MOVE_THRESHOLD));
+    
     const cx       = UTSUROBA_PORTAL.x, cy = UTSUROBA_PORTAL.y;
     const unlocked = _utsurobaCurriculumUnlocked();
     const masterAlpha = unlocked ? moveReveal : moveReveal * 0.38;
