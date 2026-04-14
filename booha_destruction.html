@@ -1,0 +1,107 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Booha Destruction</title>
+  <meta name="theme-color" content="#000000" />
+
+
+<!-- ═══ TOKEN GATE ════════════════════════════════════════ -->
+<style>
+  html.token-checking,
+  html.token-checking body {
+    background: #000;
+    visibility: hidden;
+  }
+</style>
+<script>document.documentElement.classList.add('token-checking');</script>
+<script src="./js/token.js"></script>
+<!-- ═══════════════════════════════════════════════════════ -->
+
+
+  
+  <link rel="preload" href="./assets/images/destruction-1.png" as="image" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%; height: 100%;
+      background: #000;
+      overflow: hidden;
+      /* Prevent pull-to-refresh on mobile */
+      overscroll-behavior: none;
+    }
+    #gameCanvas {
+      display: block;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      touch-action: none;
+      cursor: crosshair;
+    }
+    /* Portrait lock overlay */
+    #rotateOverlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: #000;
+      color: #fff;
+      font-family: system-ui, sans-serif;
+      align-items: center; justify-content: center;
+      text-align: center; z-index: 9999;
+    }
+    #rotateOverlay.show { display: flex; }
+    #rotateOverlay p { font-size: 18px; opacity: 0.8; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <canvas id="gameCanvas" aria-label="Booha Destruction"></canvas>
+
+  <div id="rotateOverlay">
+    <div>
+      <div style="font-size:48px">↺</div>
+      <p>Please rotate to landscape</p>
+      <p style="font-size:13px;margin-top:4px;opacity:0.5">横向きでつかってください</p>
+    </div>
+  </div>
+
+  <script>
+    window.BOOHA_CFG = {
+      canvasId: 'gameCanvas',
+      assets: {
+        bg: './assets/images/destruction-1.png'
+      },
+      audio: {
+        pull:   './assets/destruction/pull.mp3',
+        launch: './assets/destruction/launch.mp3',
+        wood:   './assets/destruction/wood.mp3',
+        stone:  './assets/destruction/stone.mp3',
+        glass:  './assets/destruction/glass.mp3',
+        soft:   './assets/destruction/soft.mp3',
+        break:  './assets/destruction/break.mp3',
+        rubble: './assets/destruction/fall_rubble.mp3',
+        ground: './assets/destruction/ground.mp3',
+        win:    './assets/destruction/100.mp3',
+        fail:   './assets/destruction/fail.mp3'
+      },
+      gameplay: {
+        ghostsPerRound: 3,
+        targetPercent:  100
+      }
+    };
+
+    // Portrait detection
+    function checkRotate() {
+      const ro = document.getElementById('rotateOverlay');
+      const portrait = window.innerWidth < 600 && window.innerHeight > window.innerWidth;
+      ro.classList.toggle('show', portrait);
+    }
+    window.addEventListener('resize', checkRotate);
+    checkRotate();
+  </script>
+
+  <script src="./js/destruction_levels_1.js"></script>
+  <script src="./js/destruction_1.js"></script>
+</body>
+</html>
