@@ -65,14 +65,14 @@
   const images       = {};
 
   const imageSources = {
-    bg:           './assets/img/feed_booha-1.png',
-    booEat:       './assets/img/boo-eat.png',
-    booMouthOpen: './assets/img/boo-mouth-open.png',
-    booSad:       './assets/img/boo-sad.png',
-    booSurprised: './assets/img/boo-surprised.png',
-    booWait:      './assets/img/boo-wait.png',
-    booWin:       './assets/img/boo-win.png',
-    candy:        './assets/img/candy.png'
+    bg:           './assets/feed/feed_booha-1.png',
+    booEat:       './assets/feed/boo-eat.png',
+    booMouthOpen: './assets/feed/boo-mouth-open.png',
+    booSad:       './assets/feed/boo-sad.png',
+    booSurprised: './assets/feed/boo-surprised.png',
+    booWait:      './assets/feed/boo-wait.png',
+    booWin:       './assets/feed/boo-win.png',
+    candy:        './assets/feed/candy.png'
   };
 
 
@@ -107,7 +107,7 @@
   // Index cycles: 0 (get-1) → 1 (get-2) → 2 (get-3) → 3 (get-4) → 0 …
   function playEatSound() {
     const files = ['get-1.mp3', 'get-2.mp3', 'get-3.mp3', 'get-4.mp3'];
-    const src   = './assets/audio/' + files[eatSoundIndex % files.length];
+    const src   = './assets/feed/' + files[eatSoundIndex % files.length];
     eatSoundIndex = (eatSoundIndex + 1) % files.length;
     const a = new Audio(src);
     a.play().catch(() => {});
