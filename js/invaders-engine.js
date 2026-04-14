@@ -2220,19 +2220,17 @@ function tick(ts) {
       document.getElementById("startOverlay").style.display="none";
       try {
         if (candySfx) { candySfx.muted=true; candySfx.play().catch(()=>{}); setTimeout(()=>{ candySfx.pause(); candySfx.currentTime=0; candySfx.muted=false; },50); }
-      } catch(_){}
-
+     } catch(_){}
       endVideoEl = document.getElementById("endVideo");
       if (endVideoEl) {
         endVideoEl.pause(); endVideoEl.currentTime=0; endVideoEl.muted=true;
         endVideoEl.play().catch(()=>{});
         setTimeout(()=>{ try{ endVideoEl.pause(); endVideoEl.currentTime=0; endVideoEl.muted=false; }catch(_){} },60);
+        
         endVideoEl.addEventListener("ended", ()=>{
           endVideoEl.pause(); endVideoEl.currentTime=0;
           endVideoEl.style.opacity="0"; endVideoEl.style.pointerEvents="none";
-          endPlaying=false; started=false;
-          document.getElementById("startOverlay").style.display="flex";
-          resetGame();
+          window.location.href = "karasuki.html?room=room_07";
         });
       }
 
@@ -2242,5 +2240,9 @@ function tick(ts) {
     });
   }
 
+ document.getElementById("startExitBtn")?.addEventListener("pointerdown", e => {
+    e.preventDefault(); e.stopPropagation();
+    window.location.href = "karasuki.html?room=room_07";
+  }, { passive: false });
   requestAnimationFrame(tick);
 })();
