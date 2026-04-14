@@ -832,7 +832,7 @@
     document.getElementById('bonus-pop-close').addEventListener('click', closeBonusPop);
     document.getElementById('bonus-pop-ok').addEventListener('click',    closeBonusPop);
     document.getElementById('bonus-pop-no').addEventListener('click',    closeBonusPop);
-    document.getElementById('bonus-pop-yes').addEventListener('click',   () => { if (bonusPopCurrentTree) window.location.href = bonusPopCurrentTree.url; });
+    document.getElementById('bonus-pop-yes').addEventListener('click',   () => { if (bonusPopCurrentTree) { try { sessionStorage.setItem('booha_bonus_return_room', bonusPopCurrentTree.roomId); } catch(_) {} window.location.href = bonusPopCurrentTree.url; } });
     bonusPopOverlay.addEventListener('click', e => { if (e.target === bonusPopOverlay) closeBonusPop(); });
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeBonusPop(); });
   }
@@ -1151,6 +1151,10 @@
 
   (function checkReturnFromUtsuroba() {
     try { const ret = sessionStorage.getItem('utsuroba_return_room'); if (ret) { state.roomId = ret; state.spawnId = 'default'; sessionStorage.removeItem('utsuroba_return_room'); } } catch (_) {}
+  })();
+
+  (function checkReturnFromBonusGame() {
+    try { const ret = sessionStorage.getItem('booha_bonus_return_room'); if (ret && DATA.rooms[ret]) { state.roomId = ret; state.spawnId = 'default'; sessionStorage.removeItem('booha_bonus_return_room'); } } catch (_) {}
   })();
 
   (function checkReturnOrbState() {
