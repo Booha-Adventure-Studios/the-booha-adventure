@@ -4,7 +4,7 @@
  * The Booha Adventure — Game Registry
  * Single source of truth for all 9 games × 3 curriculums (27 total entries).
  *
- * Save IDs are scoped per curriculum: e.g. "bc:ask_sentence"
+ * Save IDs are scoped per curriculum: e.g. "bc:ask_question"
  * This keeps scores separate per curriculum as intended.
  *
  * Curriculums: 'bc' | 'br' | 'pb'
@@ -26,9 +26,9 @@ const BoohaGameRegistry = (() => {
    */
   const BASE_GAMES = [
     {
-      id:             'ask_sentence',
+      id:             'ask_question',
       name:           'Ask a Sentence',
-      file:           'games/ask-sentence.js',
+      file:           'games/ask-question.js',
       category:       'speaking',
       scoreMax:       100,
       starThresholds: [40, 70, 90],
@@ -106,15 +106,15 @@ const BoohaGameRegistry = (() => {
       GAMES.push({
         ...base,
         curriculum,
-        saveId: `${curriculum}:${base.id}`,   // e.g. "bc:ask_sentence"
+        saveId: `${curriculum}:${base.id}`,   // e.g. "bc:ask_question"
         indexFile: `curriculum/${curriculum}/games-index.html`,
       });
     });
   });
 
   // ── Internal indexes ──────────────────────────────────────────────────────
-  const _bySaveId     = {};   // "bc:ask_sentence" → entry
-  const _byBaseId     = {};   // "ask_sentence"    → [bc entry, br entry, pb entry]
+  const _bySaveId     = {};   // "bc:ask_question" → entry
+  const _byBaseId     = {};   // "ask_question"    → [bc entry, br entry, pb entry]
   const _byCurriculum = {};   // "bc"              → [9 entries]
 
   GAMES.forEach(g => {
@@ -132,7 +132,7 @@ const BoohaGameRegistry = (() => {
   /** All 27 expanded entries */
   function getAll() { return [...GAMES]; }
 
-  /** Lookup by full save ID e.g. "bc:ask_sentence" */
+  /** Lookup by full save ID e.g. "bc:ask_question" */
   function getById(saveId) { return _bySaveId[saveId] || null; }
 
   /** All entries for one curriculum e.g. getForCurriculum('bc') */
