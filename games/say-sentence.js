@@ -16,7 +16,7 @@ U.unlockAudio();
 
 const isIOS  = U.isIOS();
 const PASS   = 80;
-const DUR_MS = 7500;
+const DUR_MS = 3600; // PATCH #3: was 7500
 
 /* ═══ PRE-LOAD SFX — clone pattern ═══ */
 const SFX = {};
@@ -320,9 +320,7 @@ U.mount(`
   </div>
   <div class="sas-status" id="sas-status">TAP MIC TO SPEAK</div>
   ` : `
-  
   <div class="sas-ios-grid" id="sas-ios-grid"></div>
-  
   `}
   <div class="sas-bottom-bar">
     <button class="sas-retry-btn" id="sas-retry" style="display:none">TRY AGAIN / もう一回</button>
@@ -467,30 +465,23 @@ if (isIOS) {
 
 if (!isIOS && startOver) {
   const startBtn = document.getElementById('sas-start-btn');
-   
- const doStart = () => {
-  U.unlockAudio();
-  /* Pre-warm SFX */
-  try { const w = SFX['fart'] ? SFX['fart'].cloneNode() : null; if (w) { w.volume=0; w.play().catch(()=>{}); } } catch(e) {}
-  try { const w = SFX['ding'] ? SFX['ding'].cloneNode() : null; if (w) { w.volume=0; w.play().catch(()=>{}); } } catch(e) {}
-
-  /* Request mic permission now, before any timer starts */
-  if (SR && !isIOS) {
-    try {
-      const probe = new SR();
-      probe.lang = 'en-US';
-      probe.maxAlternatives = 1;
-      probe.onstart = () => { try { probe.stop(); } catch(e) {} };
-      probe.onerror = () => {};
-      probe.start();
-    } catch(e) {}
-  }
-
-  startOver.classList.add('hiding');
-  setTimeout(() => { startOver.style.display = 'none'; }, 380);
-};
-
-   
+  const doStart = () => {
+    U.unlockAudio();
+    try { const w = SFX['fart'] ? SFX['fart'].cloneNode() : null; if (w) { w.volume=0; w.play().catch(()=>{}); } } catch(e) {}
+    try { const w = SFX['ding'] ? SFX['ding'].cloneNode() : null; if (w) { w.volume=0; w.play().catch(()=>{}); } } catch(e) {}
+    if (SR && !isIOS) {
+      try {
+        const probe = new SR();
+        probe.lang = 'en-US';
+        probe.maxAlternatives = 1;
+        probe.onstart = () => { try { probe.stop(); } catch(e) {} };
+        probe.onerror = () => {};
+        probe.start();
+      } catch(e) {}
+    }
+    startOver.classList.add('hiding');
+    setTimeout(() => { startOver.style.display = 'none'; }, 380);
+  };
   startBtn.addEventListener('click', doStart);
   startBtn.addEventListener('touchstart', e => { e.preventDefault(); doStart(); }, { passive:false });
 }
@@ -508,14 +499,55 @@ const order = U.shuffle(CFG.cards.slice(0, 15));
 let idx=0, score=0, streak=0;
 let firstScores = new Array(15).fill(null);
 let isBusy=false, listening=false, collecting=false, heard='', SR_inst=null;
-let iosAnswered=false, iosFirstTry=true;
-let iosPickCooldown = false;
-   
+let iosAnswered=false, iosFirstTry=true, iosPickCooldown=false;
+// PATCH #1: unified advance state
+let desktopFirstTry = true;
+let advancedThisCard = false;
 
 function updateStreak(n) {
   streak = n;
   const el = document.getElementById('sas-streak');
   if (el) el.textContent = streak;
+}
+
+// PATCH #1: single advance function
+function advanceToNextCard() {
+  if (advancedThisCard) return;
+  advancedThisCard = true;
+  isBusy = false;
+  idx++;
+  if (idx >= order.length) showResults();
+  else showCard();
+}
+
+// PATCH #1: single success audio + advance — replaces all duplicated onended chains
+function playSuccessThenAdvance(mp3) {
+  const goNext = () => setTimeout(advanceToNextCard, 220);
+
+  const playAnswer = () => {
+    if (!mp3) { goNext(); return; }
+    const a = new Audio(CFG.audioBase + mp3);
+    a.setAttribute('playsinline','');
+    a.setAttribute('webkit-playsinline','');
+    a.setAttribute('preload','auto');
+    let done = false;
+    const finish = () => { if (done) return; done = true; goNext(); };
+    a.onended = finish;
+    a.onerror = finish;
+    setTimeout(finish, 4000);
+    a.play().catch(finish);
+  };
+
+  const ding = SFX['ding'] ? SFX['ding'].cloneNode() : null;
+  if (!ding) { playAnswer(); return; }
+  ding.setAttribute('playsinline','');
+  ding.setAttribute('webkit-playsinline','');
+  let dingDone = false;
+  const afterDing = () => { if (dingDone) return; dingDone = true; playAnswer(); };
+  ding.onended = afterDing;
+  ding.onerror = afterDing;
+  setTimeout(afterDing, 450);
+  ding.play().catch(afterDing);
 }
 
 /* ═══ PROGRESS BAR ═══ */
@@ -566,25 +598,29 @@ function finalizeColors() {
 
 /* ═══ SHOW CARD ═══ */
 function showCard() {
+  // PATCH #2: reset all per-card locks at the top
   isBusy = false;
+  iosPickCooldown = false;
+  advancedThisCard = false;
+  desktopFirstTry = true;
+  iosAnswered = false;
+  iosFirstTry = true;
   const card = order[idx];
   numEl.textContent = idx + 1;
   jpEl.textContent  = card.jp;
   hiraEl.textContent = card.hira || '';
   sasCard.style.setProperty('--sas-jp-len', (card.jp || '').length);
   stopProgress(); progWrap.style.display = 'none';
-   
   retryBtn.style.display = 'none'; skipBtn.style.display = 'none';
   if (playBtn) playBtn.disabled = false;
   sasCard.classList.remove('listening','wrong-state');
-   
   updateDots();
   if (!isIOS) {
     mountWords(card.en);
     if (micBtn) { micBtn.disabled = false; micBtn.classList.remove('listening'); }
     if (statusEl) { statusEl.textContent = 'TAP MIC TO SPEAK'; statusEl.classList.remove('listening'); }
   } else {
-    iosAnswered = false; iosFirstTry = true;
+    // PATCH #2: resets already done above — no redundant inline resets needed
     buildIosChoices(card);
   }
 }
@@ -607,7 +643,7 @@ function makeSR() {
   return r;
 }
 
-/* ═══ MIC ROUND — no countdown ═══ */
+/* ═══ MIC ROUND ═══ */
 async function beginRound() {
   if (isIOS || isBusy) return;
   isBusy = true; playBtn.disabled = true;
@@ -617,13 +653,12 @@ async function beginRound() {
   if (statusEl) { statusEl.textContent = 'STARTING…'; statusEl.classList.remove('listening'); }
   SR_inst = makeSR();
   if (SR_inst) { listening = true; try { SR_inst.start(); } catch(e) {} await U.wait(600); }
-   
   if (statusEl) { statusEl.textContent = 'LISTENING…'; statusEl.classList.add('listening'); }
   if (micBtn) micBtn.classList.add('listening');
   sasCard.classList.add('listening');
   heard = ''; collecting = true;
   startProgress();
-  await U.wait(DUR_MS + 140);
+  await U.wait(DUR_MS); // PATCH #3: was DUR_MS + 140
   collecting = false; listening = false;
   if (SR_inst) { try { SR_inst.stop(); } catch(e) {} }
   stopProgress(); finalizeColors();
@@ -636,37 +671,19 @@ async function beginRound() {
   const nHeard = enEl.querySelectorAll('.sas-word.heard').length;
   const s = total > 0 ? Math.round((nHeard / total) * 100) : 0;
   if (firstScores[idx] === null) firstScores[idx] = s;
-   
- if (s >= PASS) {
-    if (firstScores[idx] === s) { score++; scoreEl.textContent = score; updateStreak(streak + 1); }
-    updateDots();
-    const card = order[idx];
-    const dingClone = SFX['ding'] ? SFX['ding'].cloneNode() : null;
-    if (dingClone) {
-      dingClone.setAttribute('playsinline',''); dingClone.setAttribute('webkit-playsinline','');
-      dingClone.play().catch(()=>{});
-      dingClone.onended = () => {
-        if (!card.mp3) { setTimeout(() => { idx++; isBusy=false; if (idx >= order.length) { showResults(); } else { showCard(); } }, 800); return; }
-        const a = new Audio(CFG.audioBase + card.mp3);
-        a.setAttribute('playsinline',''); a.setAttribute('webkit-playsinline','');
-        a.setAttribute('preload','auto');
-        a.play().catch(()=>{});
-        a.onended = () => { setTimeout(() => { idx++; isBusy=false; if (idx >= order.length) { showResults(); } else { showCard(); } }, 800); };
-        setTimeout(() => { if (isBusy) { idx++; isBusy=false; if (idx >= order.length) { showResults(); } else { showCard(); } } }, 7000);
-      };
-    } else if (card.mp3) {
-      const a = new Audio(CFG.audioBase + card.mp3);
-      a.setAttribute('playsinline',''); a.setAttribute('webkit-playsinline','');
-      a.setAttribute('preload','auto');
-      a.play().catch(()=>{});
-      a.onended = () => { setTimeout(() => { idx++; isBusy=false; if (idx >= order.length) { showResults(); } else { showCard(); } }, 800); };
-      setTimeout(() => { if (isBusy) { idx++; isBusy=false; if (idx >= order.length) { showResults(); } else { showCard(); } } }, 7000);
-    } else {
-      setTimeout(() => { idx++; isBusy=false; if (idx >= order.length) { showResults(); } else { showCard(); } }, 2000);
+  if (s >= PASS) {
+    // PATCH #4: use desktopFirstTry, not firstScores comparison
+    if (desktopFirstTry) {
+      score++;
+      scoreEl.textContent = score;
     }
-
-     
+    updateStreak(streak + 1);
+    updateDots();
+    // PATCH #1: unified advance
+    playSuccessThenAdvance(order[idx].mp3);
   } else {
+    // PATCH #4: mark desktop first try used on failure
+    desktopFirstTry = false;
     playSfx('fart'); updateStreak(0);
     sasCard.classList.add('wrong-state');
     setTimeout(() => sasCard.classList.remove('wrong-state'), 500);
@@ -675,11 +692,12 @@ async function beginRound() {
   }
 }
 
-/* ═══ iOS ═══ */
+/* ═══ iOS CHOICES ═══ */
 function buildIosChoices(card) {
   if (!iosGrid) return;
   iosGrid.innerHTML = '';
-  const pool = order.filter((_,i) => i !== idx);
+  // PATCH #7: exclude same-en distractors
+  const pool = order.filter((c,i) => i !== idx && c.en !== card.en);
   const distractors = U.shuffle(pool).slice(0,3);
   const choices = U.shuffle([card, ...distractors]);
   choices.forEach((c,ci) => {
@@ -692,46 +710,26 @@ function buildIosChoices(card) {
     iosGrid.appendChild(btn);
   });
 }
+
 function handleIosPick(btn, card) {
   if (iosAnswered || iosPickCooldown) return;
   iosPickCooldown = true;
   setTimeout(() => { iosPickCooldown = false; }, 600);
-   
   const correct = card.en === order[idx].en;
   if (correct) {
+    // PATCH #5: set isBusy immediately; lock all buttons including correct one
+    isBusy = true;
     iosAnswered = true;
     btn.classList.add('ios-correct');
-    Array.from(iosGrid.children).forEach(b => { if (b !== btn) b.classList.add('ios-locked'); });
-     
-   if (iosFirstTry) { score++; scoreEl.textContent = score; updateStreak(streak+1); }
-    updateDots();
-    const mp3 = order[idx].mp3;
-    const dingClone = SFX['ding'] ? SFX['ding'].cloneNode() : null;
-    if (dingClone) {
-      dingClone.setAttribute('playsinline',''); dingClone.setAttribute('webkit-playsinline','');
-      dingClone.play().catch(()=>{});
-      dingClone.onended = () => {
-        if (!mp3) { setTimeout(() => { idx++; if (idx >= order.length) { showResults(); } else { showCard(); } }, 800); return; }
-        const a = new Audio(CFG.audioBase+mp3);
-        a.setAttribute('playsinline',''); a.setAttribute('webkit-playsinline','');
-        a.setAttribute('preload','auto');
-        a.play().catch(()=>{});
-        a.onended = () => { setTimeout(() => { idx++; if (idx >= order.length) { showResults(); } else { showCard(); } }, 800); };
-        setTimeout(() => { if (iosAnswered) { idx++; if (idx >= order.length) { showResults(); } else { showCard(); } } }, 7000);
-      };
-    } else if (mp3) {
-      const a = new Audio(CFG.audioBase+mp3);
-      a.setAttribute('playsinline',''); a.setAttribute('webkit-playsinline','');
-      a.setAttribute('preload','auto');
-      a.play().catch(()=>{});
-      a.onended = () => { setTimeout(() => { idx++; if (idx >= order.length) { showResults(); } else { showCard(); } }, 800); };
-      setTimeout(() => { if (iosAnswered) { idx++; if (idx >= order.length) { showResults(); } else { showCard(); } } }, 7000);
-    } else {
-      setTimeout(() => { idx++; if (idx >= order.length) { showResults(); } else { showCard(); } }, 1500);
+    Array.from(iosGrid.children).forEach(b => b.classList.add('ios-locked'));
+    if (iosFirstTry) {
+      score++;
+      scoreEl.textContent = score;
     }
-
-
-     
+    updateStreak(streak + 1);
+    updateDots();
+    // PATCH #1 + #5: unified advance
+    playSuccessThenAdvance(order[idx].mp3);
   } else {
     iosFirstTry = false; updateStreak(0);
     btn.classList.add('ios-wrong'); U.unlockAudio(); playSfx('fart');
@@ -767,19 +765,23 @@ if (micBtn) {
   micBtn.addEventListener('touchstart', e => { e.preventDefault(); triggerMic(); }, { passive:false });
 }
 
+/* ═══ RETRY / SKIP ═══ */
+// PATCH #6
 retryBtn.addEventListener('click', () => {
   if (isBusy) return;
-  retryBtn.style.display = 'none'; skipBtn.style.display = 'none';
-   
+  retryBtn.style.display = 'none';
+  skipBtn.style.display = 'none';
   if (enEl) mountWords(order[idx].en);
+  isBusy = false;
   beginRound();
 });
+// PATCH #6: showCard() handles all resets
 skipBtn.addEventListener('click', () => {
   if (isBusy) return;
-  idx++; scoreEl.textContent = score;
+  idx++;
+  scoreEl.textContent = score;
   if (idx >= order.length) { showResults(); return; }
-  iosAnswered = false; iosFirstTry = true; showCard();
-  iosPickCooldown = false;   
+  showCard();
 });
 
 /* ═══ CONFETTI ═══ */
@@ -811,13 +813,14 @@ function showResults() {
   if (CFG.sfxBase && tier.sound) { const snd=new Audio(CFG.sfxBase+tier.sound); snd.setAttribute('playsinline',''); snd.setAttribute('webkit-playsinline',''); snd.play().catch(()=>{}); }
 }
 
+/* ═══ REPLAY / BACK ═══ */
 document.getElementById('sas-replay').addEventListener('click', () => {
   results.classList.remove('show'); mainWrap.style.display = '';
   idx=0; score=0; streak=0; firstScores=new Array(15).fill(null);
   scoreEl.textContent='0';
   const se=document.getElementById('sas-streak'); if(se) se.textContent='0';
-  iosAnswered=false; iosFirstTry=true;
-  iosPickCooldown = false;   
+  iosAnswered=false; iosFirstTry=true; iosPickCooldown=false;
+  desktopFirstTry=true; advancedThisCard=false;
   U.shuffle(order); showCard();
 });
 document.getElementById('sas-back').addEventListener('click', () => {
