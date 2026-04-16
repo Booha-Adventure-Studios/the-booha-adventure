@@ -18,7 +18,7 @@ U.unlockAudio();
 
 const isIOS  = U.isIOS();
 const PASS   = 80;
-const DUR_MS = 7500;
+const DUR_MS = 3600; // PATCH #3: was 7500
 
 /* ═══ PRE-LOAD SFX — clone pattern ═══ */
 const SFX = {};
@@ -530,11 +530,72 @@ let idx=0, score=0, streak=0;
 let firstScores = new Array(15).fill(null);
 let isBusy=false, listening=false, collecting=false, heard='', SR_inst=null;
 let iosAnswered=false, iosFirstTry=true, iosPickCooldown=false;
+// PATCH #1: unified advance state
+let desktopFirstTry = true;
+let advancedThisCard = false;
 
 function updateStreak(n) {
   streak = n;
   const el = document.getElementById('aq-streak');
   if (el) el.textContent = streak;
+}
+
+// PATCH #1: single advance function — all paths funnel through here
+function advanceToNextCard() {
+  if (advancedThisCard) return;
+  advancedThisCard = true;
+  isBusy = false;
+  idx++;
+  if (idx >= order.length) showResults();
+  else showCard();
+}
+
+// PATCH #1: single success audio + advance — replaces all duplicated onended chains
+function playSuccessThenAdvance(mp3) {
+  const goNext = () => setTimeout(advanceToNextCard, 220);
+
+  const playAnswer = () => {
+    if (!mp3) { goNext(); return; }
+
+    const a = new Audio(CFG.audioBase + mp3);
+    a.setAttribute('playsinline','');
+    a.setAttribute('webkit-playsinline','');
+    a.setAttribute('preload','auto');
+
+    let done = false;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      goNext();
+    };
+
+    a.onended = finish;
+    a.onerror = finish;
+
+    /* hard cap so the game never stalls — bump if your longest MP3 exceeds ~3.8s */
+    setTimeout(finish, 4000);
+
+    a.play().catch(finish);
+  };
+
+  const ding = SFX['ding'] ? SFX['ding'].cloneNode() : null;
+  if (!ding) { playAnswer(); return; }
+
+  ding.setAttribute('playsinline','');
+  ding.setAttribute('webkit-playsinline','');
+
+  let dingDone = false;
+  const afterDing = () => {
+    if (dingDone) return;
+    dingDone = true;
+    playAnswer();
+  };
+
+  ding.onended = afterDing;
+  ding.onerror = afterDing;
+  setTimeout(afterDing, 450);
+
+  ding.play().catch(afterDing);
 }
 
 /* ═══ PROGRESS BAR ═══ */
@@ -585,26 +646,31 @@ function finalizeColors() {
 
 /* ═══ SHOW CARD ═══ */
 function showCard() {
+  // PATCH #2: reset all per-card locks in one place
   isBusy = false;
   iosPickCooldown = false;
+  advancedThisCard = false;
+  desktopFirstTry = true;
+  iosAnswered = false;
+  iosFirstTry = true;
   const card = order[idx];
   numEl.textContent = idx + 1;
   jpEl.textContent  = card.jp;
   hiraEl.textContent = card.hira || '';
   aqCard.style.setProperty('--aq-jp-len', (card.jp || '').length);
   stopProgress(); progWrap.style.display = 'none';
-   
+
   retryBtn.style.display = 'none'; skipBtn.style.display = 'none';
   if (playBtn) playBtn.disabled = false;
   aqCard.classList.remove('listening','wrong-state');
-   
+
   updateDots();
   if (!isIOS) {
     mountWords(card.en);
     if (micBtn) { micBtn.disabled = false; micBtn.classList.remove('listening'); }
     if (statusEl) { statusEl.textContent = 'TAP MIC TO ANSWER'; statusEl.classList.remove('listening'); }
   } else {
-    iosAnswered = false; iosFirstTry = true;
+    // PATCH #2: iosAnswered/iosFirstTry resets now live above — removed redundant inline resets
     buildIosChoices(card);
   }
 }
@@ -636,14 +702,14 @@ async function beginRound() {
   heard = ''; listening = false; collecting = false;
   if (statusEl) { statusEl.textContent = 'STARTING…'; statusEl.classList.remove('listening'); }
   SR_inst = makeSR();
-   
+
   if (SR_inst) { listening = true; try { SR_inst.start(); } catch(e) {} await U.wait(600); }
   if (statusEl) { statusEl.textContent = 'LISTENING…'; statusEl.classList.add('listening'); }
   if (micBtn) micBtn.classList.add('listening');
   aqCard.classList.add('listening');
   heard = ''; collecting = true;
   startProgress();
-  await U.wait(DUR_MS + 140);
+  await U.wait(DUR_MS); // PATCH #3: was DUR_MS + 140
   collecting = false; listening = false;
   if (SR_inst) { try { SR_inst.stop(); } catch(e) {} }
   stopProgress(); finalizeColors();
@@ -657,36 +723,18 @@ async function beginRound() {
   const s = total > 0 ? Math.round((nHeard / total) * 100) : 0;
   if (firstScores[idx] === null) firstScores[idx] = s;
   if (s >= PASS) {
-     
-    if (iosFirstTry) { score++; scoreEl.textContent = score; updateStreak(streak+1); }
-    updateDots();
-    const mp3 = order[idx].mp3;
-    const dingClone = SFX['ding'] ? SFX['ding'].cloneNode() : null;
-    if (dingClone) {
-      dingClone.setAttribute('playsinline',''); dingClone.setAttribute('webkit-playsinline','');
-      dingClone.play().catch(()=>{});
-      dingClone.onended = () => {
-        if (!mp3) { setTimeout(() => { idx++; if (idx >= order.length) { showResults(); } else { showCard(); } }, 800); return; }
-        const a = new Audio(CFG.audioBase+mp3);
-        a.setAttribute('playsinline',''); a.setAttribute('webkit-playsinline','');
-        a.setAttribute('preload','auto');
-        a.play().catch(()=>{});
-        a.onended = () => { setTimeout(() => { idx++; if (idx >= order.length) { showResults(); } else { showCard(); } }, 800); };
-        setTimeout(() => { if (iosAnswered) { idx++; if (idx >= order.length) { showResults(); } else { showCard(); } } }, 7000);
-      };
-    } else if (mp3) {
-      const a = new Audio(CFG.audioBase+mp3);
-      a.setAttribute('playsinline',''); a.setAttribute('webkit-playsinline','');
-      a.setAttribute('preload','auto');
-      a.play().catch(()=>{});
-      a.onended = () => { setTimeout(() => { idx++; if (idx >= order.length) { showResults(); } else { showCard(); } }, 800); };
-      setTimeout(() => { if (iosAnswered) { idx++; if (idx >= order.length) { showResults(); } else { showCard(); } } }, 7000);
-    } else {
-      setTimeout(() => { idx++; if (idx >= order.length) { showResults(); } else { showCard(); } }, 1500);
+    // PATCH #4: use desktopFirstTry, not iosFirstTry, for mic-branch scoring
+    if (desktopFirstTry) {
+      score++;
+      scoreEl.textContent = score;
     }
-
-     
+    updateStreak(streak + 1);
+    updateDots();
+    // PATCH #1: unified advance replaces all the duplicated onended+setTimeout chains
+    playSuccessThenAdvance(order[idx].mp3);
   } else {
+    // PATCH #4: mark desktop first try as used on failure
+    desktopFirstTry = false;
     playSfx('fart'); updateStreak(0);
     aqCard.classList.add('wrong-state');
     setTimeout(() => aqCard.classList.remove('wrong-state'), 500);
@@ -699,7 +747,8 @@ async function beginRound() {
 function buildIosChoices(card) {
   if (!iosGrid) return;
   iosGrid.innerHTML = '';
-  const pool = order.filter((_,i) => i !== idx);
+  // PATCH #7: exclude cards with the same en text to prevent duplicate-looking choices
+  const pool = order.filter((c,i) => i !== idx && c.en !== card.en);
   const distractors = U.shuffle(pool).slice(0,3);
   const choices = U.shuffle([card, ...distractors]);
   choices.forEach((c,ci) => {
@@ -721,40 +770,20 @@ function handleIosPick(btn, card) {
 
   const correct = card.en === order[idx].en;
   if (correct) {
+    // PATCH #5: set isBusy immediately so nothing else can fire; lock all buttons
+    isBusy = true;
     iosAnswered = true;
     btn.classList.add('ios-correct');
-    Array.from(iosGrid.children).forEach(b => { if (b !== btn) b.classList.add('ios-locked'); });
-     
-   if (iosFirstTry) { score++; scoreEl.textContent = score; updateStreak(streak+1); }
-    updateDots();
-    const mp3 = order[idx].mp3;
-    const dingClone = SFX['ding'] ? SFX['ding'].cloneNode() : null;
-    if (dingClone) {
-      dingClone.setAttribute('playsinline',''); dingClone.setAttribute('webkit-playsinline','');
-      dingClone.play().catch(()=>{});
-      dingClone.onended = () => {
-        if (!mp3) { setTimeout(() => { idx++; if (idx >= order.length) { showResults(); } else { showCard(); } }, 800); return; }
-        const a = new Audio(CFG.audioBase+mp3);
-        a.setAttribute('playsinline',''); a.setAttribute('webkit-playsinline','');
-        a.setAttribute('preload','auto');
-        a.play().catch(()=>{});
-        a.onended = () => { setTimeout(() => { idx++; if (idx >= order.length) { showResults(); } else { showCard(); } }, 800); };
-        setTimeout(() => { if (iosAnswered) { idx++; if (idx >= order.length) { showResults(); } else { showCard(); } } }, 7000);
-      };
-    } else if (mp3) {
-      const a = new Audio(CFG.audioBase+mp3);
-      a.setAttribute('playsinline',''); a.setAttribute('webkit-playsinline','');
-      a.setAttribute('preload','auto');
-      a.play().catch(()=>{});
-      a.onended = () => { setTimeout(() => { idx++; if (idx >= order.length) { showResults(); } else { showCard(); } }, 800); };
-       
-      setTimeout(() => { if (isBusy) { idx++; isBusy=false; if (idx >= order.length) { showResults(); } else { showCard(); } } }, 7000);
-       
-    } else {
-      setTimeout(() => { idx++; if (idx >= order.length) { showResults(); } else { showCard(); } }, 1500);
-    }
+    Array.from(iosGrid.children).forEach(b => b.classList.add('ios-locked'));
 
-     
+    if (iosFirstTry) {
+      score++;
+      scoreEl.textContent = score;
+    }
+    updateStreak(streak + 1);
+    updateDots();
+    // PATCH #1 + #5: unified advance replaces all the duplicated onended+setTimeout chains
+    playSuccessThenAdvance(order[idx].mp3);
   } else {
     iosFirstTry = false; updateStreak(0);
     btn.classList.add('ios-wrong'); U.unlockAudio(); playSfx('fart');
@@ -790,18 +819,22 @@ if (micBtn) {
   micBtn.addEventListener('touchstart', e => { e.preventDefault(); triggerMic(); }, { passive:false });
 }
 
-/* ═══ RETRY / SKIP — smash protection ═══ */
+/* ═══ RETRY / SKIP ═══ */
+// PATCH #6: retry — explicit isBusy reset before beginRound (harmless but clear)
 retryBtn.addEventListener('click', () => {
   if (isBusy) return;
-  retryBtn.style.display = 'none'; skipBtn.style.display = 'none';
+  retryBtn.style.display = 'none';
+  skipBtn.style.display = 'none';
   if (enEl) mountWords(order[idx].en);
+  isBusy = false;
   beginRound();
 });
+// PATCH #6: skip — showCard() now handles all state resets
 skipBtn.addEventListener('click', () => {
   if (isBusy) return;
-  idx++; scoreEl.textContent = score;
+  idx++;
+  scoreEl.textContent = score;
   if (idx >= order.length) { showResults(); return; }
-  iosAnswered = false; iosFirstTry = true; iosPickCooldown = false;
   showCard();
 });
 
@@ -841,6 +874,7 @@ document.getElementById('aq-replay').addEventListener('click', () => {
   scoreEl.textContent='0';
   const se=document.getElementById('aq-streak'); if(se) se.textContent='0';
   iosAnswered=false; iosFirstTry=true; iosPickCooldown=false;
+  desktopFirstTry=true; advancedThisCard=false;
   U.shuffle(order); showCard();
 });
 document.getElementById('aq-back').addEventListener('click', () => {
