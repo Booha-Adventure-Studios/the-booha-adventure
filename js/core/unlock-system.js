@@ -28,7 +28,7 @@ const BoohaUnlockSystem = (() => {
       condition() { return _totalCompleted() >= 1; },
     },
     // BC
-    { id:'bc:ask_sentence',   name:'BC: Ask a Sentence',   description:'Complete Ask a Sentence (BC).',   condition() { return _done('bc','ask_sentence'); } },
+    { id:'bc:ask_question',   name:'BC: Ask the Question',   description:'Complete Ask the Question (BC).',   condition() { return _done('bc','ask_question'); } },
     { id:'bc:say_sentence',   name:'BC: Say a Sentence',   description:'Complete Say a Sentence (BC).',   condition() { return _done('bc','say_sentence'); } },
     { id:'bc:say_word',       name:'BC: Say a Word',       description:'Complete Say a Word (BC).',       condition() { return _done('bc','say_word'); } },
     { id:'bc:sentence_order', name:'BC: Sentence Order',   description:'Complete Sentence Order (BC).',   condition() { return _done('bc','sentence_order'); } },
@@ -38,7 +38,7 @@ const BoohaUnlockSystem = (() => {
     { id:'bc:vocab_speed',    name:'BC: Vocab Speed',      description:'Complete Vocab Speed (BC).',      condition() { return _done('bc','vocab_speed'); } },
     { id:'bc:vocab_tap',      name:'BC: Vocab Tap',        description:'Complete Vocab Tap (BC).',        condition() { return _done('bc','vocab_tap'); } },
     // BR
-    { id:'br:ask_sentence',   name:'BR: Ask a Sentence',   description:'Complete Ask a Sentence (BR).',   condition() { return _done('br','ask_sentence'); } },
+    { id:'br:ask_question',   name:'BR: Ask the Question',   description:'Complete Ask the Question (BR).',   condition() { return _done('br','ask_question'); } },
     { id:'br:say_sentence',   name:'BR: Say a Sentence',   description:'Complete Say a Sentence (BR).',   condition() { return _done('br','say_sentence'); } },
     { id:'br:say_word',       name:'BR: Say a Word',       description:'Complete Say a Word (BR).',       condition() { return _done('br','say_word'); } },
     { id:'br:sentence_order', name:'BR: Sentence Order',   description:'Complete Sentence Order (BR).',   condition() { return _done('br','sentence_order'); } },
@@ -48,7 +48,7 @@ const BoohaUnlockSystem = (() => {
     { id:'br:vocab_speed',    name:'BR: Vocab Speed',      description:'Complete Vocab Speed (BR).',      condition() { return _done('br','vocab_speed'); } },
     { id:'br:vocab_tap',      name:'BR: Vocab Tap',        description:'Complete Vocab Tap (BR).',        condition() { return _done('br','vocab_tap'); } },
     // PB
-    { id:'pb:ask_sentence',   name:'PB: Ask a Sentence',   description:'Complete Ask a Sentence (PB).',   condition() { return _done('pb','ask_sentence'); } },
+    { id:'pb:ask_question',   name:'PB: Ask the Question',   description:'Complete Ask the Question (PB).',   condition() { return _done('pb','ask_question'); } },
     { id:'pb:say_sentence',   name:'PB: Say a Sentence',   description:'Complete Say a Sentence (PB).',   condition() { return _done('pb','say_sentence'); } },
     { id:'pb:say_word',       name:'PB: Say a Word',       description:'Complete Say a Word (PB).',       condition() { return _done('pb','say_word'); } },
     { id:'pb:sentence_order', name:'PB: Sentence Order',   description:'Complete Sentence Order (PB).',   condition() { return _done('pb','sentence_order'); } },
