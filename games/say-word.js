@@ -762,7 +762,6 @@ function startProgress() {
     if (pct > 0) {
       progRAF = requestAnimationFrame(tick);
     } else {
-      // Meter ran out — bump session so any late SR result is ignored, then clean up
       micSessionId++;
       collecting = false;
       srListening = false;
@@ -796,17 +795,10 @@ const SR = window.SpeechRecognition || window.webkitSpeechRecognition || null;
 
 function doStart() {
   U.unlockAudio();
-
-  /* Pre-warm SFX at zero volume */
   try {
     const warm = SFX['fart'] ? SFX['fart'].cloneNode() : null;
     if (warm) { warm.volume = 0; warm.play().catch(() => {}); }
   } catch(e) {}
-
-  /* Probe mic permission NOW, before any game timer starts.
-     This triggers the browser "Allow mic?" dialog during the
-     start-card dismiss animation — by the time the student
-     taps the mic the permission is already granted. */
   if (SR && !isIOS) {
     try {
       const probe = new SR();
@@ -817,7 +809,6 @@ function doStart() {
       probe.start();
     } catch(e) {}
   }
-
   startOver.classList.add('hiding');
   setTimeout(() => { startOver.style.display = 'none'; }, 380);
   showCard();
@@ -878,9 +869,7 @@ function matchesWord(transcript, target) {
     });
     variants.forEach(v => acceptSet.add(v.join(' ')));
   }
-  // transcript is a single string here (accumulated interim+final)
   const heard = clean(transcript);
-  // Check if any accepted form appears as a word sequence in the heard string
   for (const accept of acceptSet) {
     if (heard === accept || heard.includes(accept)) return true;
   }
@@ -1018,7 +1007,8 @@ function advanceAfterCorrect() {
    ══════════════════════════════════════════════════════════════ */
 function buildIosChoices(card) {
   iosGrid.innerHTML = '';
-  const pool        = order.filter((_, i) => i !== idx);
+  // PATCH #7: exclude cards with the same en to prevent duplicate-looking choices
+  const pool        = order.filter((c, i) => i !== idx && c.en !== card.en);
   const distractors = U.shuffle(pool).slice(0, 3);
   const choices     = U.shuffle([card, ...distractors]);
 
@@ -1088,7 +1078,7 @@ function handleIosPick(btn, en) {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   MIC MODE — continuous SR with timed window (say-sentence pattern)
+   MIC MODE — continuous SR with timed window
    ══════════════════════════════════════════════════════════════ */
 let recognition  = null;
 let srListening  = false;
@@ -1164,10 +1154,8 @@ if (micBtn) {
     wordAudio.currentTime = 0;
     wordAudio.onended = null;
 
-    // Stamp session — callbacks check this to discard stale results
     const sessionAtTap = ++micSessionId;
 
-    // Show listening UI immediately — meter starts now, not after SR permission
     srListening = true;
     collecting  = false;
     heard       = '';
@@ -1180,7 +1168,6 @@ if (micBtn) {
     }
     startProgress();
 
-    // Tear down any previous SR instance cleanly
     if (recognition) {
       try {
         recognition.onstart  = null;
@@ -1191,7 +1178,6 @@ if (micBtn) {
       } catch(e) {}
     }
 
-    // Build fresh instance — continuous=true matches say-sentence (reliable on Android)
     recognition = new SR();
     recognition.lang            = 'en-US';
     recognition.continuous      = true;
@@ -1200,24 +1186,20 @@ if (micBtn) {
 
     recognition.onstart = () => {
       if (micSessionId !== sessionAtTap) return;
-      // SR is now truly live — open the collection window
       collecting = true;
     };
 
     recognition.onresult = e => {
       if (micSessionId !== sessionAtTap || !collecting || answered) return;
 
-      // Accumulate all transcripts (interim + final) into `heard`
       let chunk = '';
       for (let i = e.resultIndex; i < e.results.length; i++) {
         chunk += e.results[i][0].transcript + ' ';
       }
       heard = (heard + ' ' + chunk).trim();
 
-      // Show what was heard in the box
       if (heardText) heardText.textContent = `"${heard}"`;
 
-      // Check for a match on every incoming result — react immediately
       if (matchesWord(heard, order[idx].en)) {
         collecting  = false;
         srListening = false;
@@ -1237,17 +1219,12 @@ if (micBtn) {
     };
 
     recognition.onend = () => {
-      // continuous=true: if srListening is still true, restart to keep listening
       if (micSessionId === sessionAtTap && srListening) {
         try { recognition.start(); } catch(e) {}
       }
     };
 
     try { recognition.start(); } catch(e) { console.error('SR start:', e); clearMicUi(); }
-
-    // Hard cut-off: after METER_MS the window closes
-    // (meter timeout in startProgress also fires at the same time —
-    //  whichever fires first bumps micSessionId and stops SR)
   };
 
   micBtn.addEventListener('click', triggerMic);
