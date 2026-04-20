@@ -1764,12 +1764,14 @@ function injectObserverPop() {
     align-items:center;justify-content:center;
     background:rgba(0,0,0,0);transition:background 0.3s ease;`;
   observerPopEl.innerHTML = `
-    <div style="
+  
+   <div style="
       background:#05050d;border:1px solid rgba(200,200,220,0.18);
       border-radius:8px;padding:0 0 28px;
-      width:min(340px,90vw);text-align:center;
+      width:min(340px,90vw);max-height:90vh;overflow-y:auto;text-align:center;
       font-family:'Georgia',serif;position:relative;
       box-shadow:0 0 40px rgba(20,20,40,0.9);">
+      
       <div style="padding:28px 0 18px;display:flex;align-items:center;justify-content:center;">
         <img src="assets/img/karasuki/observer-1.png"
           style="max-width:88%;max-height:min(160px,35vw);object-fit:contain;
