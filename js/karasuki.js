@@ -1845,7 +1845,7 @@ function drawObserver(now) {
   if (!coord) return;
   const sec   = now / 1000;
   const pulse = 0.85 + 0.15 * Math.sin(sec * 0.0015 * 1000);
-  const W     = 90;
+  const W     = 140;
   ctx.save();
   ctx.globalAlpha = pulse;
   ctx.drawImage(observerImg, coord.x - W / 2, coord.y - W, W, W * 1.2);
