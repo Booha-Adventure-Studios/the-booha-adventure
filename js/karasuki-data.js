@@ -213,4 +213,36 @@ window.KARASUKI_DATA = {
   },
 
   overlays: {}
+
+OBSERVER_COORDS: {
+    room_01: { x: 800, y: 600 },
+    room_02: { x: 750, y: 500 },
+    room_03: { x: 700, y: 650 },
+    room_04: { x: 900, y: 500 },
+    room_05: { x: 600, y: 700 },
+    room_06: { x: 820, y: 580 },
+    room_07: { x: 700, y: 600 },
+    room_08: { x: 950, y: 550 },
+    room_09: { x: 780, y: 620 },
+    room_10: { x: 730, y: 680 },
+    room_11: { x: 800, y: 540 },
+    room_12: { x: 760, y: 600 },
+    room_13: { x: 820, y: 580 },
+    room_14: { x: 700, y: 640 },
+    room_15: { x: 780, y: 560 },
+  },
+
+  OBSERVER_LINES: [
+    { en: "You have not played yet this week.",         jp: "今週はまだ遊んでいない。" },
+    { en: "One game. You have begun.",                  jp: "一回。始まった。" },
+    { en: "Two games. You are still here.",             jp: "二回。まだここにいる。" },
+    { en: "Three games. Something is changing in you.", jp: "三回。何かが変わっている。" },
+    { en: "Four. You return without being asked.",      jp: "四回。呼ばれていないのに戻ってくる。" },
+    { en: "Five games. Curious.",                       jp: "五回。不思議だ。" },
+    { en: "Six. I've started to remember your face.",   jp: "六回。顔を覚え始めた。" },
+    { en: "Seven games. You almost never stop.",        jp: "七回。ほとんど止まらない。" },
+    { en: "Eight. What are you looking for?",           jp: "八回。何を探している？" },
+    { en: "Nine games. I think I understand now.",      jp: "九回。もう分かった気がする。" },
+  ],
+  
 };
