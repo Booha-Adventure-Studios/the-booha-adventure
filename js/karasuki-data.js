@@ -212,7 +212,7 @@ window.KARASUKI_DATA = {
     }
   },
 
-  overlays: {}
+  overlays: {},
 
 OBSERVER_COORDS: {
     room_01: { x: 800, y: 600 },
