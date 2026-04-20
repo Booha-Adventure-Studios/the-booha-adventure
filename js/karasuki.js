@@ -1742,7 +1742,8 @@
   try {
     const raw  = localStorage.getItem('booha_save');
     const data = raw ? JSON.parse(raw) : null;
-    return Array.isArray(data?.weekly?.wCompleted) ? data.weekly.wCompleted.length : 0;
+    const cg = data?.weekly?.completedGames;
+    return cg && typeof cg === 'object' ? Object.keys(cg).length : 0;
   } catch (_) { return 0; }
 }
 
