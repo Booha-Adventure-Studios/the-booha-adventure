@@ -1773,7 +1773,7 @@ function injectObserverPop() {
       box-shadow:0 0 40px rgba(20,20,40,0.9);">
       
       <div style="padding:28px 0 18px;display:flex;align-items:center;justify-content:center;">
-        <img src="assets/img/karasuki/observer-1.png"
+        <img src="assets/img/karasuki/observer-2.png"
           style="max-width:88%;max-height:min(160px,35vw);object-fit:contain;
                  filter:drop-shadow(0 0 18px rgba(220,220,255,0.25));"/>
       </div>
