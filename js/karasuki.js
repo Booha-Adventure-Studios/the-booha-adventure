@@ -61,6 +61,7 @@
   let   bonusPopCooldownUntil       = 0;
   let   wandererPopCooldownUntil    = 0;
   let   utsurobaCooldownUntil       = 0;
+  let   observerPopCooldownUntil    = 0;
 
   /* ═══════════════════════════════════════════
      DEV MODE
@@ -816,10 +817,12 @@
     bonusPopOverlay.id = 'bonus-pop-overlay';
     bonusPopOverlay.style.cssText = `display:none;position:fixed;inset:0;z-index:9150;align-items:center;justify-content:center;background:rgba(0,0,0,0);transition:background 0.3s ease;`;
     bonusPopOverlay.innerHTML = `
-      <div id="bonus-pop-box" style="border-radius:8px;padding:36px 40px 30px;max-width:min(420px,92vw);width:92vw;text-align:center;font-family:'Georgia',serif;position:relative;animation:portalAppear 0.25s ease-out;">
+        <div id="bonus-pop-box" style="border-radius:8px;padding:36px 40px 30px;max-width:min(420px,92vw);width:92vw;max-height:90vh;overflow-y:auto;text-align:center;font-family:'Georgia',serif;position:relative;animation:portalAppear 0.25s ease-out;">
         <div id="bp-corner-tl" style="position:absolute;top:10px;left:10px;width:18px;height:18px;border-style:solid;border-width:1.5px 0 0 1.5px;"></div>
         <div id="bp-corner-br" style="position:absolute;bottom:10px;right:10px;width:18px;height:18px;border-style:solid;border-width:0 1.5px 1.5px 0;"></div>
-        <button id="bonus-pop-close" style="position:absolute;top:10px;right:14px;background:transparent;border:none;cursor:pointer;font-size:1.1rem;line-height:1;padding:4px 8px;opacity:.5;transition:opacity .18s;">✕</button>
+        
+       <button id="bonus-pop-close" style="position:sticky;top:10px;float:right;margin-right:4px;background:transparent;border:none;cursor:pointer;font-size:1.1rem;line-height:1;padding:4px 8px;opacity:.5;transition:opacity .18s;z-index:2;">✕</button>
+        
         <div id="bonus-pop-orb" style="width:60px;height:60px;border-radius:50%;margin:0 auto 18px;position:relative;"></div>
         <div id="bonus-pop-lock" style="font-size:1.6rem;margin-bottom:8px;display:none;">🔒</div>
         <h2 id="bonus-pop-name" style="font-size:clamp(1.1rem,3.5vw,1.4rem);margin:0 0 3px;letter-spacing:.08em;"></h2>
@@ -1185,6 +1188,8 @@
 
   let pins = [], trail = [], ripples = [];
   const ghostImg = new Image(); ghostImg.src = "assets/img/booha_ghost.png";
+  const observerImg = new Image();
+  observerImg.src = 'assets/img/karasuki/observer-1.png';
   const music    = new Audio("assets/audio/karasuki-music.mp3"); music.loop = true; music.volume = 0.65;
 
   let app, stage, canvas, ctx, roomLayer, coordToggle, coordReadout, pinLog;
@@ -1346,7 +1351,7 @@
     
     document.body.appendChild(toast);
     document.body.appendChild(portalOverlay);
-    injectBonusPopOverlay(); injectWandererPopOverlay(); injectUtsuobaPopOverlay(); injectOrbPanel(); injectSwapOverlay();
+    injectBonusPopOverlay(); injectWandererPopOverlay(); injectUtsuobaPopOverlay(); injectOrbPanel(); injectSwapOverlay(); injectObserverPop();
     
     const rotateOverlay = document.createElement("div"); rotateOverlay.id = "rotate-overlay";
     rotateOverlay.innerHTML = `<span class="rotate-phone">📱</span><div class="rotate-bar"></div><p class="rotate-title">横にして遊ぼう！</p><p class="rotate-sub">カラスキは<strong style="color:#ff79d7">横画面</strong>で遊べるよ。<br>スマホを横にしてね。</p>`;
@@ -1653,7 +1658,7 @@
     }
     trail=trail.filter(p=>p.life>0);
     drawPortalOrb(now); drawExitArrows(now); drawMazeExitArrow(now);
-    drawBonusTrees(now); drawUtsurobPortalMarker(now); drawWanderers(now); drawOrbs(now);
+    drawBonusTrees(now); drawUtsurobPortalMarker(now); drawWanderers(now); drawObserver(now); drawOrbs(now);
     const bobFreq=(Math.PI*2)/(HOVER_PERIOD/1000); const bobPhase=sec*bobFreq;
     const bob=Math.sin(bobPhase)*HOVER_AMP; const wobble=Math.sin(bobPhase*2)*2.2;
     const gx=state.x, gy=state.y+bob;
@@ -1699,6 +1704,7 @@
       isBonusPopOpen()      ||
       isWandererPopOpen()   ||
       isUtsuobaPopOpen()    ||
+      isObserverPopOpen()   ||
       isOrbPanelOpen()
     );
   }
@@ -1732,6 +1738,118 @@
   ═══════════════════════════════════════════ */
   function startMusic() { if(state.musicStarted)return; state.musicStarted=true; music.play().catch(()=>{}); }
 
+  function getGamesThisWeek() {
+  try {
+    const raw  = localStorage.getItem('booha_save');
+    const data = raw ? JSON.parse(raw) : null;
+    return Array.isArray(data?.weekly?.wCompleted) ? data.weekly.wCompleted.length : 0;
+  } catch (_) { return 0; }
+}
+
+function getObserverRoomId() {
+  const rooms = Object.keys(window.KARASUKI_DATA.OBSERVER_COORDS);
+  const seed  = parseInt(sessionStorage.getItem('booha_active_week') || '1', 10);
+  return rooms[seed % rooms.length];
+}
+
+let observerPopEl   = null;
+let observerPopOpen = false;
+
+function injectObserverPop() {
+  if (observerPopEl) return;
+  observerPopEl = document.createElement('div');
+  observerPopEl.id = 'observer-pop';
+  observerPopEl.style.cssText = `
+    display:none;position:fixed;inset:0;z-index:9250;
+    align-items:center;justify-content:center;
+    background:rgba(0,0,0,0);transition:background 0.3s ease;`;
+  observerPopEl.innerHTML = `
+    <div style="
+      background:#05050d;border:1px solid rgba(200,200,220,0.18);
+      border-radius:8px;padding:0 0 28px;
+      width:min(340px,90vw);text-align:center;
+      font-family:'Georgia',serif;position:relative;
+      box-shadow:0 0 40px rgba(20,20,40,0.9);">
+      <div style="padding:28px 0 18px;display:flex;align-items:center;justify-content:center;">
+        <img src="assets/img/karasuki/observer-1.png"
+          style="max-width:88%;max-height:min(160px,35vw);object-fit:contain;
+                 filter:drop-shadow(0 0 18px rgba(220,220,255,0.25));"/>
+      </div>
+      <button id="obs-pop-close" style="
+        position:absolute;top:12px;right:14px;background:transparent;
+        border:none;cursor:pointer;font-size:1rem;
+        color:rgba(200,200,220,0.30);padding:4px 8px;">✕</button>
+      <p id="obs-pop-line-en" style="
+        font-size:clamp(.85rem,3.5vw,1.05rem);line-height:1.65;
+        color:rgba(220,218,240,0.88);margin:0 24px 6px;
+        letter-spacing:.04em;"></p>
+      <p id="obs-pop-line-jp" style="
+        font-size:clamp(.8rem,3.2vw,.95rem);line-height:1.6;
+        color:rgba(190,188,220,0.65);margin:0 24px 14px;
+        font-family:'Noto Sans JP',serif;letter-spacing:.06em;"></p>
+      <p id="obs-pop-count" style="
+        font-size:clamp(.7rem,2.5vw,.82rem);color:rgba(180,178,210,0.45);
+        margin:0 24px;letter-spacing:.08em;"></p>
+    </div>`;
+  document.body.appendChild(observerPopEl);
+  document.getElementById('obs-pop-close')
+    .addEventListener('click', closeObserverPop);
+  observerPopEl.addEventListener('click', e => {
+    if (e.target === observerPopEl) closeObserverPop();
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && observerPopOpen) closeObserverPop();
+  });
+}
+
+function openObserverPop() {
+  const games   = getGamesThisWeek();
+  const lines   = window.KARASUKI_DATA.OBSERVER_LINES;
+  const line    = lines[Math.min(games, lines.length - 1)];
+  document.getElementById('obs-pop-line-en').textContent = line.en;
+  document.getElementById('obs-pop-line-jp').textContent = line.jp;
+  document.getElementById('obs-pop-count').textContent   = `${games} / 9`;
+  observerPopOpen = true;
+  observerPopEl.style.display    = 'flex';
+  observerPopEl.style.background = 'rgba(0,0,0,0.88)';
+  state.clickTarget = null;
+}
+
+function closeObserverPop() {
+  observerPopOpen = false;
+  observerPopEl.style.background = 'rgba(0,0,0,0)';
+  setTimeout(() => { if (!observerPopOpen) observerPopEl.style.display = 'none'; }, 300);
+  observerPopCooldownUntil = performance.now() + POPUP_COOLDOWN_MS;
+}
+
+function isObserverPopOpen() { return observerPopOpen; }
+
+function clickCheckObserver(worldX, worldY) {
+  if (performance.now() < observerPopCooldownUntil) return false;
+  const roomId = getObserverRoomId();
+  if (state.roomId !== roomId) return false;
+  const coord  = window.KARASUKI_DATA.OBSERVER_COORDS[roomId];
+  if (!coord) return false;
+  if (Math.hypot(worldX - coord.x, worldY - coord.y) <= 80) {
+    openObserverPop(); return true;
+  }
+  return false;
+}
+
+function drawObserver(now) {
+  const roomId = getObserverRoomId();
+  if (state.roomId !== roomId) return;
+  const coord = window.KARASUKI_DATA.OBSERVER_COORDS[roomId];
+  if (!coord) return;
+  const sec   = now / 1000;
+  const pulse = 0.85 + 0.15 * Math.sin(sec * 0.0015 * 1000);
+  const W     = 90;
+  ctx.save();
+  ctx.globalAlpha = pulse;
+  ctx.drawImage(observerImg, coord.x - W / 2, coord.y - W, W, W * 1.2);
+  ctx.restore();
+}
+
   function stagePointToWorld(clientX, clientY) {
     // rect already reflects the CSS scale on all DPRs — fraction gives correct world coord.
     const rect = stage.getBoundingClientRect();
@@ -1755,6 +1873,7 @@
     if(clickCheckUtsuobaPortal(p.x,p.y)){ripples.push({x:p.x,y:p.y,life:1});return;}
     if(clickCheckWanderers(p.x,p.y)){ripples.push({x:p.x,y:p.y,life:1});return;}
     if(clickBonusTree(p.x,p.y)){ripples.push({x:p.x,y:p.y,life:1});return;}
+    if(clickCheckObserver(p.x,p.y)){ripples.push({x:p.x,y:p.y,life:1});return;}
 
    // AFTER all the early returns, BEFORE the movement logic:
     ripples.push({x:p.x, y:p.y, life:1});   // always show tap feedback
