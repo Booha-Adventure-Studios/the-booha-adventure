@@ -1935,15 +1935,19 @@ function clickCheckObserver(worldX, worldY) {
     }
   }
  
-  function updateNuppi(now) {
+ function updateNuppi(now) {
     if (nuppi.frozen) return;
-    nuppi.wobbleT += 16;
- 
+    // Use actual elapsed time so movement is frame-rate independent
+    const dt = Math.min(50, Math.max(8, now - (nuppi._lastNow || now)));
+    nuppi._lastNow = now;
+    const dtScale  = dt / (1000 / 60); // normalize to 60fps baseline
+    nuppi.wobbleT += dt;
+
     if (nuppi.roomId !== state.roomId) {
-      _nuppiIdleDrift();
+      _nuppiIdleDrift(dtScale);
       return;
     }
- 
+
     if (nuppi.aware && nuppi.exitTarget) {
       const dx   = nuppi.exitTarget.x - nuppi.x;
       const dy   = nuppi.exitTarget.y - nuppi.y;
@@ -1952,63 +1956,52 @@ function clickCheckObserver(worldX, worldY) {
         nuppiPlaceInRoom(nuppiRandomRoom(state.roomId));
         return;
       }
-      nuppi.x += (dx / dist) * NUPPI_SPEED;
-      nuppi.y += (dy / dist) * NUPPI_SPEED;
+      nuppi.x += (dx / dist) * NUPPI_SPEED * dtScale;
+      nuppi.y += (dy / dist) * NUPPI_SPEED * dtScale;
     } else if (!nuppi.aware) {
       if (Math.hypot(state.x - nuppi.x, state.y - nuppi.y) < NUPPI_AWARE_DIST) {
         nuppi.aware      = true;
         nuppi.exitTarget = nuppiPickExit();
       } else {
-        _nuppiIdleDrift();
+        _nuppiIdleDrift(dtScale);
       }
     }
- 
+
     nuppi.x = Math.max(120, Math.min(WORLD_W - 120, nuppi.x));
     nuppi.y = Math.max(120, Math.min(WORLD_H - 120, nuppi.y));
   }
- 
-  function _nuppiIdleDrift() {
-    nuppi.idleTimer -= 16;
+
+  function _nuppiIdleDrift(dtScale) {
+    nuppi.idleTimer -= 16 * dtScale;
     if (nuppi.idleTimer <= 0) {
       nuppi.idleAngle = Math.random() * Math.PI * 2;
       nuppi.idleTimer = 2000 + Math.random() * 3000;
     }
-    nuppi.x += Math.cos(nuppi.idleAngle) * NUPPI_IDLE_DRIFT;
-    nuppi.y += Math.sin(nuppi.idleAngle) * NUPPI_IDLE_DRIFT;
+    nuppi.x += Math.cos(nuppi.idleAngle) * NUPPI_IDLE_DRIFT * dtScale;
+    nuppi.y += Math.sin(nuppi.idleAngle) * NUPPI_IDLE_DRIFT * dtScale;
     nuppi.x  = Math.max(200, Math.min(WORLD_W - 200, nuppi.x));
     nuppi.y  = Math.max(200, Math.min(WORLD_H - 200, nuppi.y));
   }
- 
-  function drawNuppi(now) {
+
+
+  
+ function drawNuppi(now) {
     if (nuppi.roomId !== state.roomId) return;
     const sec   = now / 1000;
-    const bob   = Math.sin(nuppi.wobbleT * NUPPI_WOBBLE_FREQ * 1000) * NUPPI_WOBBLE_AMP;
+    const bob   = Math.sin(nuppi.wobbleT * NUPPI_WOBBLE_FREQ) * NUPPI_WOBBLE_AMP;
     const pulse = 0.5 + 0.5 * Math.sin(sec * 1.3);
     const nx    = nuppi.x;
     const ny    = nuppi.y + bob;
- 
+
     ctx.save();
- 
-    const glow = ctx.createRadialGradient(nx, ny, 0, nx, ny, NUPPI_GLOW_R);
-    glow.addColorStop(0,   'rgba(255,220,240,0.22)');
-    glow.addColorStop(0.4, 'rgba(255,180,210,0.10)');
-    glow.addColorStop(0.7, 'rgba(240,200,255,0.05)');
-    glow.addColorStop(1,   'transparent');
-    ctx.globalAlpha = 0.55 + pulse * 0.25;
-    ctx.fillStyle   = glow;
-    ctx.beginPath();
-    ctx.arc(nx, ny, NUPPI_GLOW_R, 0, Math.PI * 2);
-    ctx.fill();
- 
+
+    // Draw sprite first — black background included
     if (nuppiImg1.complete && nuppiImg1.naturalWidth > 0) {
       const ratio = nuppiImg1.naturalWidth / (nuppiImg1.naturalHeight || 1);
       const dw    = NUPPI_SIZE * 2;
       const dh    = dw / ratio;
-      ctx.globalAlpha = 0.94;
-      ctx.shadowBlur  = 18 + pulse * 10;
-      ctx.shadowColor = 'rgba(255,200,230,0.45)';
+      ctx.globalAlpha = 0.96;
       ctx.drawImage(nuppiImg1, nx - dw / 2, ny - dh / 2, dw, dh);
-      ctx.shadowBlur  = 0;
     } else {
       ctx.globalAlpha = 0.88;
       ctx.fillStyle   = 'rgba(220,180,200,0.7)';
@@ -2016,9 +2009,37 @@ function clickCheckObserver(worldX, worldY) {
       ctx.arc(nx, ny, NUPPI_SIZE * 0.7, 0, Math.PI * 2);
       ctx.fill();
     }
- 
-    ctx.restore();
+
+    // Glow drawn AFTER sprite using 'screen' blend — adds light on top of black pixels
+    ctx.globalCompositeOperation = 'screen';
+
+    // Outer soft halo
+    const halo = ctx.createRadialGradient(nx, ny, 0, nx, ny, NUPPI_GLOW_R * 1.4);
+    halo.addColorStop(0,   'rgba(255,180,220,0.38)');
+    halo.addColorStop(0.4, 'rgba(220,140,200,0.18)');
+    halo.addColorStop(0.8, 'rgba(180,100,200,0.06)');
+    halo.addColorStop(1,   'transparent');
+    ctx.globalAlpha = 0.7 + pulse * 0.25;
+    ctx.fillStyle   = halo;
+    ctx.beginPath();
+    ctx.arc(nx, ny, NUPPI_GLOW_R * 1.4, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Inner pink core glow
+    const core = ctx.createRadialGradient(nx, ny, 0, nx, ny, NUPPI_GLOW_R * 0.55);
+    core.addColorStop(0,   'rgba(255,200,240,0.55)');
+    core.addColorStop(0.5, 'rgba(255,140,200,0.28)');
+    core.addColorStop(1,   'transparent');
+    ctx.globalAlpha = 0.55 + pulse * 0.35;
+    ctx.fillStyle   = core;
+    ctx.beginPath();
+    ctx.arc(nx, ny, NUPPI_GLOW_R * 0.55, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore(); // resets globalCompositeOperation back to 'source-over'
   }
+
+  
  
   function clickCheckNuppi(worldX, worldY) {
     if (performance.now() < nuppiPopCooldownUntil) return false;
