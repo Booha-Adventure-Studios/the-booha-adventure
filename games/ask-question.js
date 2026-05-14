@@ -166,7 +166,7 @@ S.textContent = `
 [data-curriculum="pb"] .aq-choice[data-ci="2"]{background:#fff;border:2.5px solid #44ccff;color:#2a1020;box-shadow:0 5px 0 #99e8ff,0 7px 14px rgba(50,180,255,.1)}
 [data-curriculum="pb"] .aq-choice[data-ci="3"]{background:#fff;border:2.5px solid #ff6eb4;color:#2a1020;box-shadow:0 5px 0 #ffb0d8,0 7px 14px rgba(255,110,180,.12)}
 .aq-choice-kanji{font-family:var(--game-font-jp);font-size:clamp(16px,3.2vw,22px);font-weight:900;line-height:1.4;word-break:break-all}
-.aq-choice-hira{font-family:var(--game-font-jp);font-size:clamp(12px,2.1vw,16px);color:var(--game-muted);margin-top:2px;line-height:1.3;word-break:break-all}
+.aq-choice-hira{font-family:var(--game-font-jp);font-size:clamp(12px,2.1vw,16px);font-weight:900;color:var(--game-muted);margin-top:2px;line-height:1.3;word-break:break-all}
 [data-curriculum="pb"] .aq-choice-hira{color:rgba(58,26,46,.5)}
 .aq-choice.correct{background:linear-gradient(135deg,#0a3d1a,#0d5e28)!important;border-color:#22c55e!important;color:#22c55e!important;box-shadow:0 0 0 4px rgba(34,197,94,.3),0 0 36px rgba(34,197,94,.5),0 5px 20px rgba(0,0,0,.3)!important;animation:aqChoicePop .4s cubic-bezier(.34,1.56,.64,1)}
 [data-curriculum="pb"] .aq-choice.correct{background:#f0fff4!important;border-color:#22c55e!important;color:#22c55e!important;box-shadow:0 0 0 3px rgba(34,197,94,.22),0 4px 0 #86efac!important}
@@ -179,16 +179,10 @@ S.textContent = `
 
 /* ── Bottom bar ── */
 .aq-bottom-bar{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;align-items:center;width:100%}
-.aq-skip-btn,.aq-help-btn{font-family:var(--game-font-title);font-size:clamp(13px,2.4vw,17px);font-weight:900;letter-spacing:.06em;padding:11px 24px;border-radius:999px;border:none;cursor:pointer;transition:transform .15s cubic-bezier(.34,1.56,.64,1);-webkit-tap-highlight-color:transparent}
-.aq-skip-btn{background:transparent;border:2px solid rgba(255,255,255,.22);color:var(--game-muted);box-shadow:none}
-.aq-skip-btn:hover{border-color:rgba(255,255,255,.5);color:var(--game-ink)}
-[data-curriculum="pb"] .aq-skip-btn{border-color:rgba(58,26,46,.22);color:rgba(58,26,46,.5)}
 .aq-help-btn{width:44px;height:44px;border-radius:50%;padding:0;background:var(--game-surface);border:2px solid var(--game-border);color:var(--game-muted);font-size:1.15rem;display:flex;align-items:center;justify-content:center;box-shadow:none}
 .aq-help-btn:hover{border-color:#ffcc00;color:#ffcc00;transform:scale(1.08)}
 [data-curriculum="bc"] .aq-help-btn:hover{border-color:#00ddaa;color:#00ddaa}
 [data-curriculum="pb"] .aq-help-btn{background:#fff;border-color:#ff9966;color:#cc5522;box-shadow:0 3px 0 #ffccaa}
-.aq-skip-btn:active{transform:scale(.94)}
-
 /* ── Results ── */
 .aq-results-outer{max-width:660px;margin:0 auto;padding:0 1rem;box-sizing:border-box;width:100%}
 .aq-results{display:none;text-align:center;width:100%;padding:2.4rem 1.4rem 2rem;border-radius:32px;position:relative;overflow:hidden;border:2.5px solid var(--aq-tier-color,#ffcc00);background:color-mix(in srgb,var(--aq-tier-color,#ffcc00) 6%,var(--game-bg));box-shadow:0 0 56px color-mix(in srgb,var(--aq-tier-color,#ffcc00) 22%,transparent),0 22px 44px rgba(0,0,0,.4);box-sizing:border-box}
@@ -265,7 +259,6 @@ U.mount(`
   </div>
   <div class="aq-choices" id="aq-choices"></div>
   <div class="aq-bottom-bar">
-    <button class="aq-skip-btn" id="aq-skip" style="display:none">SKIP / スキップ</button>
     <button class="aq-help-btn" id="aq-help">？</button>
   </div>
 </div>
@@ -322,7 +315,6 @@ const scoreEl    = document.getElementById('aq-score');
 const aqCard     = document.getElementById('aq-card');
 const playBtn    = document.getElementById('aq-play');
 const choicesEl  = document.getElementById('aq-choices');
-const skipBtn    = document.getElementById('aq-skip');
 const helpBtn    = document.getElementById('aq-help');
 const results    = document.getElementById('aq-results');
 const dotsRow    = document.getElementById('aq-dots');
@@ -482,7 +474,7 @@ function handleChoice(btn, card) {
     if (firstTry) { score++; scoreEl.textContent = score; }
     updateStreak(streak + 1);
     updateDots();
-    playSuccessThenAdvance(order[idx].mp3);
+    playSuccessThenAdvance(null);
   } else {
     firstTry = false;
     updateStreak(0);
@@ -493,7 +485,6 @@ function handleChoice(btn, card) {
       btn.classList.remove('wrong');
       aqCard.classList.remove('wrong-state');
     }, 500);
-    skipBtn.style.display = '';
   }
 }
 
@@ -504,7 +495,6 @@ function showCard() {
   firstTry = true;
   pickCooldown = false;
   advancedThisCard = false;
-  skipBtn.style.display = 'none';
   playBtn.disabled = false;
   playBtn.classList.remove('playing');
   playBtn.textContent = '▶';
@@ -513,15 +503,6 @@ function showCard() {
   updateDots();
   buildChoices(order[idx]);
 }
-
-/* ═══ SKIP ═══ */
-skipBtn.addEventListener('click', () => {
-  if (isBusy) return;
-  idx++;
-  scoreEl.textContent = score;
-  if (idx >= order.length) { showResults(); return; }
-  showCard();
-});
 
 /* ═══ CONFETTI ═══ */
 function fireConfetti(big = false) {
