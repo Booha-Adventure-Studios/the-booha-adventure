@@ -1995,25 +1995,8 @@ function clickCheckObserver(worldX, worldY) {
 
     ctx.save();
 
-    // Draw sprite first — black background included
-    if (nuppiImg1.complete && nuppiImg1.naturalWidth > 0) {
-      const ratio = nuppiImg1.naturalWidth / (nuppiImg1.naturalHeight || 1);
-      const dw    = NUPPI_SIZE * 2;
-      const dh    = dw / ratio;
-      ctx.globalAlpha = 0.96;
-      ctx.drawImage(nuppiImg1, nx - dw / 2, ny - dh / 2, dw, dh);
-    } else {
-      ctx.globalAlpha = 0.88;
-      ctx.fillStyle   = 'rgba(220,180,200,0.7)';
-      ctx.beginPath();
-      ctx.arc(nx, ny, NUPPI_SIZE * 0.7, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    // Glow drawn AFTER sprite using 'screen' blend — adds light on top of black pixels
-    ctx.globalCompositeOperation = 'screen';
-
-    // Outer soft halo
+   
+   // Outer soft halo — drawn before sprite so it sits underneath
     const halo = ctx.createRadialGradient(nx, ny, 0, nx, ny, NUPPI_GLOW_R * 1.4);
     halo.addColorStop(0,   'rgba(255,180,220,0.38)');
     halo.addColorStop(0.4, 'rgba(220,140,200,0.18)');
@@ -2036,8 +2019,23 @@ function clickCheckObserver(worldX, worldY) {
     ctx.arc(nx, ny, NUPPI_GLOW_R * 0.55, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.restore(); // resets globalCompositeOperation back to 'source-over'
-  }
+    // Sprite drawn last — sits on top of glow
+    if (nuppiImg1.complete && nuppiImg1.naturalWidth > 0) {
+      const ratio = nuppiImg1.naturalWidth / (nuppiImg1.naturalHeight || 1);
+      const dw    = NUPPI_SIZE * 2;
+      const dh    = dw / ratio;
+      ctx.globalAlpha = 0.96;
+      ctx.drawImage(nuppiImg1, nx - dw / 2, ny - dh / 2, dw, dh);
+    } else {
+      ctx.globalAlpha = 0.88;
+      ctx.fillStyle   = 'rgba(220,180,200,0.7)';
+      ctx.beginPath();
+      ctx.arc(nx, ny, NUPPI_SIZE * 0.7, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    ctx.restore();
+
 
   
  
