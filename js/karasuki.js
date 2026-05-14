@@ -659,7 +659,7 @@
 }
 
   function initWanderers() { preloadWandererImages(); refreshWanderersForRoom(); }
-  function onRoomChanged() { refreshWanderersForRoom(); }
+  function onRoomChanged() { refreshWanderersForRoom(); onRoomChangedNuppi(); }
 
   function updateWanderers(now) {
     if (!activeWanderers.length) return;
@@ -1658,7 +1658,8 @@
     }
     trail=trail.filter(p=>p.life>0);
     drawPortalOrb(now); drawExitArrows(now); drawMazeExitArrow(now);
-    drawBonusTrees(now); drawUtsurobPortalMarker(now); drawWanderers(now); drawObserver(now); drawOrbs(now);
+    drawBonusTrees(now); drawUtsurobPortalMarker(now); drawWanderers(now); drawObserver(now); drawOrbs(now); drawNuppi(now);
+    
     const bobFreq=(Math.PI*2)/(HOVER_PERIOD/1000); const bobPhase=sec*bobFreq;
     const bob=Math.sin(bobPhase)*HOVER_AMP; const wobble=Math.sin(bobPhase*2)*2.2;
     const gx=state.x, gy=state.y+bob;
@@ -1705,6 +1706,7 @@
       isWandererPopOpen()   ||
       isUtsuobaPopOpen()    ||
       isObserverPopOpen()   ||
+      isNuppiPopOpen()      ||
       isOrbPanelOpen()
     );
   }
@@ -1718,7 +1720,8 @@
     const dt=Math.min(50,Math.max(8,now-(lastTickTime||now)));
     lastTickTime=now; SPEED=BASE_SPEED*(dt/TARGET_DT);
     if (!anyModalOpen()) {
-      tickEntryDrift(now); handleClickMovement(now); updateWanderers(now);
+      
+       tickEntryDrift(now); handleClickMovement(now); updateWanderers(now); updateNuppi(now);
       const driftDone    = !isEntryDriftActive();
       const spawnUnlocked = driftDone && now>=(state.spawnLockUntil||0) && state.distMovedSinceSpawn>=ARROW_MOVE_THRESHOLD;
       if (state.roomId==="room_08"&&state.moving&&driftDone) {
@@ -1841,6 +1844,255 @@ function clickCheckObserver(worldX, worldY) {
   return false;
 }
 
+ /* ── Nuppi images ── */
+  const nuppiImg1 = new Image();
+  nuppiImg1.src = 'assets/img/wanderers/nuppi-1.png';
+  const nuppiImg2 = new Image();
+  nuppiImg2.src = 'assets/img/wanderers/nuppi-2.png';
+ 
+  /* ── Nuppi constants ── */
+  const NUPPI_SIZE        = 52;
+  const NUPPI_HIT_R       = 80;
+  const NUPPI_SPEED       = 0.55;
+  const NUPPI_WOBBLE_AMP  = 6;
+  const NUPPI_WOBBLE_FREQ = 0.0009;
+  const NUPPI_AWARE_DIST  = 480;
+  const NUPPI_EXIT_DIST   = 60;
+  const NUPPI_IDLE_DRIFT  = 0.18;
+  const NUPPI_GLOW_R      = 90;
+ 
+  /* ── Nuppi dialogue ── */
+  const NUPPI_LINES = [
+    { en: "You came back.",
+      jp: "また来たね。" },
+    { en: "Something followed you here. Not me.",
+      jp: "何かがついてきた。私じゃない。" },
+    { en: "I heard your name once. I kept it.",
+      jp: "あなたの名前、一回聞こえた。取っておいた。" },
+    { en: "You looked sad before. I watched.",
+      jp: "さっき悲しそうだった。見てた。" },
+    { en: "I gave something to someone like you. They threw it away.",
+      jp: "あなたに似た人に何かあげた。捨てられた。" },
+  ];
+ 
+  /* ── Nuppi state ── */
+  const nuppi = {
+    roomId:    null,
+    x:         0,
+    y:         0,
+    wobbleT:   0,
+    aware:     false,
+    exitTarget: null,
+    frozen:    false,
+    idleAngle: Math.random() * Math.PI * 2,
+    idleTimer: 0,
+  };
+ 
+  let nuppiPopEl            = null;
+  let nuppiPopOpen          = false;
+  let nuppiPopCooldownUntil = 0;
+ 
+  function nuppiRandomRoom(exclude) {
+    const pool = Object.keys(DATA.rooms).filter(r => r !== exclude);
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+ 
+  function nuppiPlaceInRoom(roomId) {
+    nuppi.roomId     = roomId;
+    nuppi.x          = WORLD_W / 2 + (Math.random() - 0.5) * 300;
+    nuppi.y          = WORLD_H / 2 + (Math.random() - 0.5) * 180;
+    nuppi.aware      = false;
+    nuppi.exitTarget = null;
+    nuppi.frozen     = false;
+    nuppi.idleAngle  = Math.random() * Math.PI * 2;
+    nuppi.idleTimer  = 0;
+  }
+ 
+  function nuppiPickExit() {
+    const exits = NPP[nuppi.roomId];
+    if (!exits || !exits.length) {
+      const edgeTargets = [
+        { x: 200,           y: WORLD_H / 2 },
+        { x: WORLD_W - 200, y: WORLD_H / 2 },
+        { x: WORLD_W / 2,   y: 200         },
+        { x: WORLD_W / 2,   y: WORLD_H - 200 },
+      ];
+      return edgeTargets[Math.floor(Math.random() * edgeTargets.length)];
+    }
+    const exit = exits[Math.floor(Math.random() * exits.length)];
+    return { x: exit.x, y: exit.y };
+  }
+ 
+  function initNuppi() {
+    nuppiPlaceInRoom(nuppiRandomRoom(state.roomId));
+    injectNuppiPop();
+  }
+ 
+  function onRoomChangedNuppi() {
+    if (nuppi.roomId === state.roomId) {
+      nuppi.aware      = true;
+      nuppi.exitTarget = nuppiPickExit();
+    }
+  }
+ 
+  function updateNuppi(now) {
+    if (nuppi.frozen) return;
+    nuppi.wobbleT += 16;
+ 
+    if (nuppi.roomId !== state.roomId) {
+      _nuppiIdleDrift();
+      return;
+    }
+ 
+    if (nuppi.aware && nuppi.exitTarget) {
+      const dx   = nuppi.exitTarget.x - nuppi.x;
+      const dy   = nuppi.exitTarget.y - nuppi.y;
+      const dist = Math.hypot(dx, dy);
+      if (dist <= NUPPI_EXIT_DIST) {
+        nuppiPlaceInRoom(nuppiRandomRoom(state.roomId));
+        return;
+      }
+      nuppi.x += (dx / dist) * NUPPI_SPEED;
+      nuppi.y += (dy / dist) * NUPPI_SPEED;
+    } else if (!nuppi.aware) {
+      if (Math.hypot(state.x - nuppi.x, state.y - nuppi.y) < NUPPI_AWARE_DIST) {
+        nuppi.aware      = true;
+        nuppi.exitTarget = nuppiPickExit();
+      } else {
+        _nuppiIdleDrift();
+      }
+    }
+ 
+    nuppi.x = Math.max(120, Math.min(WORLD_W - 120, nuppi.x));
+    nuppi.y = Math.max(120, Math.min(WORLD_H - 120, nuppi.y));
+  }
+ 
+  function _nuppiIdleDrift() {
+    nuppi.idleTimer -= 16;
+    if (nuppi.idleTimer <= 0) {
+      nuppi.idleAngle = Math.random() * Math.PI * 2;
+      nuppi.idleTimer = 2000 + Math.random() * 3000;
+    }
+    nuppi.x += Math.cos(nuppi.idleAngle) * NUPPI_IDLE_DRIFT;
+    nuppi.y += Math.sin(nuppi.idleAngle) * NUPPI_IDLE_DRIFT;
+    nuppi.x  = Math.max(200, Math.min(WORLD_W - 200, nuppi.x));
+    nuppi.y  = Math.max(200, Math.min(WORLD_H - 200, nuppi.y));
+  }
+ 
+  function drawNuppi(now) {
+    if (nuppi.roomId !== state.roomId) return;
+    const sec   = now / 1000;
+    const bob   = Math.sin(nuppi.wobbleT * NUPPI_WOBBLE_FREQ * 1000) * NUPPI_WOBBLE_AMP;
+    const pulse = 0.5 + 0.5 * Math.sin(sec * 1.3);
+    const nx    = nuppi.x;
+    const ny    = nuppi.y + bob;
+ 
+    ctx.save();
+ 
+    const glow = ctx.createRadialGradient(nx, ny, 0, nx, ny, NUPPI_GLOW_R);
+    glow.addColorStop(0,   'rgba(255,220,240,0.22)');
+    glow.addColorStop(0.4, 'rgba(255,180,210,0.10)');
+    glow.addColorStop(0.7, 'rgba(240,200,255,0.05)');
+    glow.addColorStop(1,   'transparent');
+    ctx.globalAlpha = 0.55 + pulse * 0.25;
+    ctx.fillStyle   = glow;
+    ctx.beginPath();
+    ctx.arc(nx, ny, NUPPI_GLOW_R, 0, Math.PI * 2);
+    ctx.fill();
+ 
+    if (nuppiImg1.complete && nuppiImg1.naturalWidth > 0) {
+      const ratio = nuppiImg1.naturalWidth / (nuppiImg1.naturalHeight || 1);
+      const dw    = NUPPI_SIZE * 2;
+      const dh    = dw / ratio;
+      ctx.globalAlpha = 0.94;
+      ctx.shadowBlur  = 18 + pulse * 10;
+      ctx.shadowColor = 'rgba(255,200,230,0.45)';
+      ctx.drawImage(nuppiImg1, nx - dw / 2, ny - dh / 2, dw, dh);
+      ctx.shadowBlur  = 0;
+    } else {
+      ctx.globalAlpha = 0.88;
+      ctx.fillStyle   = 'rgba(220,180,200,0.7)';
+      ctx.beginPath();
+      ctx.arc(nx, ny, NUPPI_SIZE * 0.7, 0, Math.PI * 2);
+      ctx.fill();
+    }
+ 
+    ctx.restore();
+  }
+ 
+  function clickCheckNuppi(worldX, worldY) {
+    if (performance.now() < nuppiPopCooldownUntil) return false;
+    if (nuppi.roomId !== state.roomId) return false;
+    const bob = Math.sin(nuppi.wobbleT * NUPPI_WOBBLE_FREQ * 1000) * NUPPI_WOBBLE_AMP;
+    if (Math.hypot(worldX - nuppi.x, worldY - (nuppi.y + bob)) <= NUPPI_HIT_R) {
+      openNuppiPop();
+      return true;
+    }
+    return false;
+  }
+ 
+  function injectNuppiPop() {
+    if (nuppiPopEl) return;
+    nuppiPopEl = document.createElement('div');
+    nuppiPopEl.id = 'nuppi-pop';
+    nuppiPopEl.style.cssText = `
+      display:none;position:fixed;inset:0;z-index:9260;
+      align-items:center;justify-content:center;
+      background:rgba(0,0,0,0);transition:background 0.3s ease;`;
+    nuppiPopEl.innerHTML = `
+      <div style="
+        background:#06040a;border:1px solid rgba(220,180,220,0.18);
+        border-radius:8px;padding:0 0 28px;
+        width:min(340px,90vw);max-height:90vh;overflow-y:auto;
+        text-align:center;font-family:'Georgia',serif;position:relative;
+        box-shadow:0 0 50px rgba(30,10,40,0.95),0 0 20px rgba(180,100,200,0.12);">
+        <div style="padding:28px 0 18px;display:flex;align-items:center;justify-content:center;">
+          <img src="assets/img/wanderers/nuppi-2.png"
+            style="max-width:88%;max-height:min(170px,36vw);object-fit:contain;
+                   filter:drop-shadow(0 0 16px rgba(200,150,220,0.30));"/>
+        </div>
+        <button id="nuppi-pop-close" style="
+          position:absolute;top:12px;right:14px;background:transparent;
+          border:none;cursor:pointer;font-size:1rem;
+          color:rgba(200,180,220,0.28);padding:4px 8px;">✕</button>
+        <p id="nuppi-pop-en" style="
+          font-size:clamp(.88rem,3.6vw,1.06rem);line-height:1.65;
+          color:rgba(225,215,235,0.88);margin:0 24px 8px;
+          letter-spacing:.04em;font-style:italic;"></p>
+        <p id="nuppi-pop-jp" style="
+          font-size:clamp(.8rem,3.2vw,.95rem);line-height:1.6;
+          color:rgba(190,175,210,0.60);margin:0 24px 0;
+          font-family:'Noto Sans JP',serif;letter-spacing:.06em;"></p>
+      </div>`;
+    document.body.appendChild(nuppiPopEl);
+    document.getElementById('nuppi-pop-close').addEventListener('click', closeNuppiPop);
+    nuppiPopEl.addEventListener('click', e => { if (e.target === nuppiPopEl) closeNuppiPop(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && nuppiPopOpen) closeNuppiPop(); });
+  }
+ 
+  function openNuppiPop() {
+    const line = NUPPI_LINES[Math.floor(Math.random() * NUPPI_LINES.length)];
+    document.getElementById('nuppi-pop-en').textContent = line.en;
+    document.getElementById('nuppi-pop-jp').textContent = line.jp;
+    nuppiPopOpen              = true;
+    nuppi.frozen              = true;
+    nuppiPopEl.style.display    = 'flex';
+    nuppiPopEl.style.background = 'rgba(0,0,0,0.88)';
+    state.clickTarget = null;
+  }
+ 
+  function closeNuppiPop() {
+    nuppiPopOpen  = false;
+    nuppi.frozen  = false;
+    nuppiPopEl.style.background = 'rgba(0,0,0,0)';
+    setTimeout(() => { if (!nuppiPopOpen) nuppiPopEl.style.display = 'none'; }, 300);
+    nuppiPopCooldownUntil = performance.now() + POPUP_COOLDOWN_MS;
+  }
+ 
+  function isNuppiPopOpen() { return nuppiPopOpen; }
+
+
+  
 function drawObserver(now) {
   const roomId = getObserverRoomId();
   if (state.roomId !== roomId) return;
@@ -1878,9 +2130,13 @@ function drawObserver(now) {
     if(clickCheckUtsuobaPortal(p.x,p.y)){ripples.push({x:p.x,y:p.y,life:1});return;}
     if(clickCheckWanderers(p.x,p.y)){ripples.push({x:p.x,y:p.y,life:1});return;}
     if(clickBonusTree(p.x,p.y)){ripples.push({x:p.x,y:p.y,life:1});return;}
+    
     if(clickCheckObserver(p.x,p.y)){ripples.push({x:p.x,y:p.y,life:1});return;}
+    if(clickCheckNuppi(p.x,p.y)){ripples.push({x:p.x,y:p.y,life:1});return;}
+ 
+      // AFTER all the early returns, BEFORE the movement logic:
 
-   // AFTER all the early returns, BEFORE the movement logic:
+    
     ripples.push({x:p.x, y:p.y, life:1});   // always show tap feedback
     
    // Block all movement taps until ghost has fully arrived
@@ -1915,7 +2171,8 @@ function drawObserver(now) {
   ═══════════════════════════════════════════ */
   function init() {
     injectStyles(); buildApp(); fitStage(); resizeCanvas();
-    initOrbs(); renderInitialRoom(); initWanderers(); bindInput();
+     initOrbs(); renderInitialRoom(); initWanderers(); initNuppi(); bindInput();
+    
     window.addEventListener("resize",()=>{ fitStage(); resizeCanvas(); });
     requestAnimationFrame(tick);
   }
