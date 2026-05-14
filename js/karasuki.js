@@ -1751,13 +1751,13 @@
 }
 
 function getObserverRoomId() {
-  const rooms = Object.keys(window.KARASUKI_DATA.OBSERVER_COORDS);
-  
-  const seed  = window.CALENDAR.getCurrentCurriculumWeek();
-  
+  const rooms  = Object.keys(window.KARASUKI_DATA.OBSERVER_COORDS);
+  const cal    = window.CALENDAR.getCurrentCurriculumWeek();
+  const seed   = typeof cal === 'object' ? (cal.weekNumber || 1) : cal;
   return rooms[seed % rooms.length];
 }
 
+  
 let observerPopEl   = null;
 let observerPopOpen = false;
 
