@@ -1749,7 +1749,9 @@
 
 function getObserverRoomId() {
   const rooms = Object.keys(window.KARASUKI_DATA.OBSERVER_COORDS);
-  const seed  = parseInt(sessionStorage.getItem('booha_active_week') || '1', 10);
+  
+  const seed  = window.CALENDAR.getCurrentCurriculumWeek();
+  
   return rooms[seed % rooms.length];
 }
 
