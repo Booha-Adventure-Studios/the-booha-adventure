@@ -2035,9 +2035,8 @@ function clickCheckObserver(worldX, worldY) {
     }
 
     ctx.restore();
+ }
 
-
-  
  
   function clickCheckNuppi(worldX, worldY) {
     if (performance.now() < nuppiPopCooldownUntil) return false;
