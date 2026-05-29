@@ -579,37 +579,119 @@ window.VocabBlitz = (() => {
       });
   }
 
- function shockwave(overlay, color) {
-  const ring = document.createElement('div');
-  ring.style.cssText = `
-    position: absolute;
-    left: 50%; top: 50%;
-    width: 40px; height: 40px;
-    margin-left: -20px; margin-top: -20px;
-    border-radius: 50%;
-    border: 3px solid ${color};
-    box-shadow: 0 0 24px 8px ${color}, inset 0 0 24px 8px ${color};
-    pointer-events: none;
-    z-index: 10;
-    animation: vbShockwave 380ms cubic-bezier(.2,.8,.4,1) forwards;
-  `;
-  overlay.appendChild(ring);
-  ring.addEventListener('animationend', () => ring.remove());
+ function correctDetonate(overlay, correctBtn, optionsEl, jpWordEl, hiraEl, palette) {
+  // ── 1. Button green flash ────────────────────────────────
+  correctBtn.style.transition = 'none';
+  correctBtn.style.background = 'rgba(0,255,100,0.7)';
+  correctBtn.style.boxShadow  = '0 0 32px 8px rgba(0,255,100,0.8)';
 
-  // Inject keyframe once
-  if (!document.getElementById('vb-shockwave-kf')) {
-    const s = document.createElement('style');
-    s.id = 'vb-shockwave-kf';
-    s.textContent = `
-      @keyframes vbShockwave {
-        0%   { transform: scale(0.3); opacity: 1; }
-        70%  { opacity: 0.6; }
-        100% { transform: scale(18); opacity: 0; }
+  // ── 2. Impact zoom shake ─────────────────────────────────
+  overlay.style.animation = 'none';
+  overlay.style.transform = 'scale(1.03)';
+  setTimeout(() => {
+    overlay.style.transform = '';
+    overlay.style.transition = 'transform 80ms ease';
+    setTimeout(() => { overlay.style.transition = ''; }, 80);
+  }, 60);
+
+  // ── 3. Wrong buttons shoot away ──────────────────────────
+  const allBtns = Array.from(optionsEl.querySelectorAll('.vb-opt'));
+  setTimeout(() => {
+    allBtns.forEach(btn => {
+      if (btn === correctBtn) return;
+      const angle  = Math.random() * Math.PI * 2;
+      const dist   = 220 + Math.random() * 180;
+      const tx     = Math.cos(angle) * dist;
+      const ty     = Math.sin(angle) * dist;
+      const rot    = (Math.random() - 0.5) * 540;
+      btn.style.transition = 'transform 280ms cubic-bezier(.4,0,1,1), opacity 220ms ease';
+      btn.style.transform  = `translate(${tx}px, ${ty}px) rotate(${rot}deg) scale(0.2)`;
+      btn.style.opacity    = '0';
+    });
+  }, 80);
+
+  // ── 4. Correct button particle explosion ─────────────────
+  setTimeout(() => {
+    const r   = correctBtn.getBoundingClientRect();
+    const ovr = overlay.getBoundingClientRect();
+    const cx  = r.left - ovr.left + r.width  / 2;
+    const cy  = r.top  - ovr.top  + r.height / 2;
+
+    correctBtn.style.transition = 'transform 120ms ease, opacity 100ms ease';
+    correctBtn.style.transform  = 'scale(1.3)';
+    correctBtn.style.opacity    = '0';
+
+    const colors = [palette.accent, palette.accent2, '#ffffff', '#00ff64'];
+    for (let i = 0; i < 22; i++) {
+      const p     = document.createElement('div');
+      const angle = (i / 22) * Math.PI * 2;
+      const dist  = 60 + Math.random() * 120;
+      const size  = 5 + Math.random() * 8;
+      p.style.cssText = `
+        position:absolute;
+        left:${cx}px; top:${cy}px;
+        width:${size}px; height:${size}px;
+        border-radius:${Math.random() > 0.5 ? '50%' : '3px'};
+        background:${colors[Math.floor(Math.random() * colors.length)]};
+        pointer-events:none; z-index:10;
+        box-shadow:0 0 8px 2px ${palette.accent};
+        --px:${Math.cos(angle) * dist}px;
+        --py:${Math.sin(angle) * dist}px;
+        --pdur:${260 + Math.random() * 160}ms;
+        --pdelay:${Math.random() * 40}ms;
+        animation: vbParticle var(--pdur) ease-out var(--pdelay) both;
+      `;
+      overlay.appendChild(p);
+      p.addEventListener('animationend', () => p.remove());
+    }
+  }, 100);
+
+  // ── 5. Full screen white/neon flash ──────────────────────
+  setTimeout(() => {
+    flashEl.style.background = palette.accent;
+    flashEl.style.opacity    = '0.55';
+    setTimeout(() => {
+      flashEl.style.background = '#ffffff';
+      flashEl.style.opacity    = '0.85';
+      setTimeout(() => {
+        flashEl.style.opacity    = '0';
+        flashEl.style.background = 'rgba(255,255,255,0.18)';
+      }, 60);
+    }, 40);
+  }, 120);
+
+  // ── 6. Hard cut to next question ─────────────────────────
+  setTimeout(() => {
+    jpWordEl.style.opacity  = '0';
+    hiraEl.style.opacity    = '0';
+    optionsEl.style.opacity = '0';
+
+    setTimeout(() => {
+      if (current >= queue.length) {
+        stopTimer();
+        stopBGM();
+        showWin(elapsed, curr, palette, overlay, winScreen,
+          monthSlug, weekNumber, queue);
+      } else {
+        renderQuestion();
+        // Hard cut — snap visible immediately, no fade
+        requestAnimationFrame(() => {
+          jpWordEl.style.transition  = 'none';
+          hiraEl.style.transition    = 'none';
+          optionsEl.style.transition = 'none';
+          jpWordEl.style.opacity     = '1';
+          hiraEl.style.opacity       = '1';
+          optionsEl.style.opacity    = '1';
+          requestAnimationFrame(() => {
+            jpWordEl.style.transition  = '';
+            hiraEl.style.transition    = '';
+            optionsEl.style.transition = '';
+          });
+        });
       }
-    `;
-    document.head.appendChild(s);
-  }
-}  
+    }, 80);
+  }, 220);
+}
 
   function startGame(allCards, curr, weekNumber, palette, monthSlug) {
     // Slice this week's 15
@@ -733,23 +815,12 @@ function stopBGM() {
 
   if (chosen.n === correct.n) {
     // ── CORRECT ──
-    btn.classList.add('correct');
-    flashEl.classList.add('on');
-    setTimeout(() => flashEl.classList.remove('on'), 100);
-
-    // Shockwave
-    shockwave(overlay, palette.accent);
-
+     
+   btn.classList.add('correct');
     current++;
-    if (current >= queue.length) {
-      stopTimer();
-      stopBGM();
-      setTimeout(() => showWin(elapsed, curr, palette, overlay, winScreen,
-        monthSlug, weekNumber, queue), 420);
-    } else {
-      setTimeout(renderQuestion, 380);
-    }
-  } else {
+    correctDetonate(overlay, btn, optionsEl, jpWordEl, hiraEl, palette);
+
+     
     // ── WRONG ──
     btn.classList.add('wrong');
     const allBtns = optionsEl.querySelectorAll('.vb-opt');
