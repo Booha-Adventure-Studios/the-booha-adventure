@@ -390,8 +390,14 @@ window.SentenceBlitz = (() => {
         75% { transform: translate(-5px,5px); }
         90% { transform: translate(6px,-2px); }
       }
-      #sb-overlay.shake { animation: sbScreenShake 380ms ease; }
+     #sb-overlay.shake { animation: sbScreenShake 380ms ease; }
+
+      @keyframes sbParticle {
+        0%   { transform: translate(0,0) scale(1); opacity: 1; }
+        100% { transform: translate(var(--px),var(--py)) scale(0); opacity: 0; }
+      }
     `;
+     
     document.head.appendChild(s);
   }
 
@@ -553,7 +559,8 @@ window.SentenceBlitz = (() => {
             box-shadow:0 0 6px 2px ${palette.accent};
             --px:${Math.cos(angle)*dist}px; --py:${Math.sin(angle)*dist}px;
             --pdur:${240+Math.random()*140}ms; --pdelay:${Math.random()*30}ms;
-            animation: vbParticle var(--pdur) ease-out var(--pdelay) both;
+            
+            animation: sbParticle var(--pdur) ease-out var(--pdelay) both;
           `;
           overlay.appendChild(p);
           p.addEventListener('animationend', () => p.remove());
