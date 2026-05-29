@@ -65,18 +65,19 @@
     transform: translate(-50%, -50%);
     z-index: 10;
     pointer-events: auto;
+    background: transparent;
   }
 
-  /* Forward glow — warm amber */
+  /* Forward glow — warm amber pool of light on the floor, no solid core */
   .hh-hotspot.forward {
-    width: 8%;
+    width: 12%;
     aspect-ratio: 1;
-    background: radial-gradient(circle at 40% 38%, #fff8e0, #ffd966 40%, #c8860a 80%, transparent);
+    background: radial-gradient(circle, rgba(255,230,120,0.18) 0%, rgba(255,190,40,0.08) 45%, transparent 70%);
     box-shadow:
-      0 0 18px 4px rgba(255, 210, 80, 0.55),
-      0 0 40px 10px rgba(255, 170, 30, 0.30),
-      0 0 80px 20px rgba(200, 130, 10, 0.15);
-    animation: hh-pulse-forward 2.2s ease-in-out infinite;
+      0 0 22px 8px rgba(255, 210, 80, 0.22),
+      0 0 55px 18px rgba(255, 160, 20, 0.12),
+      0 0 100px 30px rgba(200, 120, 0, 0.07);
+    animation: hh-pulse-forward 2.8s ease-in-out infinite;
   }
 
   /* Back arrow — small, top-left, subtle */
@@ -114,23 +115,23 @@
 
   /* Branch choice hotspots — left and right at end-of-hall */
   .hh-hotspot.branch-left {
-    width: 9%;
+    width: 11%;
     aspect-ratio: 1;
-    background: radial-gradient(circle at 40% 38%, #ffe0f8, #cc88ff 40%, #6600cc 80%, transparent);
+    background: radial-gradient(circle, rgba(200,140,255,0.16) 0%, rgba(160,80,220,0.07) 45%, transparent 70%);
     box-shadow:
-      0 0 18px 4px rgba(180, 80, 255, 0.50),
-      0 0 40px 10px rgba(140, 40, 220, 0.28),
-      0 0 80px 20px rgba(100, 0, 180, 0.14);
+      0 0 22px 8px rgba(180, 80, 255, 0.20),
+      0 0 55px 18px rgba(140, 40, 220, 0.10),
+      0 0 100px 30px rgba(100, 0, 180, 0.06);
     animation: hh-pulse-branch 2.6s ease-in-out infinite;
   }
   .hh-hotspot.branch-right {
-    width: 9%;
+    width: 11%;
     aspect-ratio: 1;
-    background: radial-gradient(circle at 40% 38%, #e0f8ff, #44ccff 40%, #0066aa 80%, transparent);
+    background: radial-gradient(circle, rgba(100,200,255,0.16) 0%, rgba(40,150,220,0.07) 45%, transparent 70%);
     box-shadow:
-      0 0 18px 4px rgba(50, 180, 255, 0.50),
-      0 0 40px 10px rgba(30, 130, 220, 0.28),
-      0 0 80px 20px rgba(0, 80, 160, 0.14);
+      0 0 22px 8px rgba(50, 180, 255, 0.20),
+      0 0 55px 18px rgba(30, 130, 220, 0.10),
+      0 0 100px 30px rgba(0, 80, 160, 0.06);
     animation: hh-pulse-branch 2.6s ease-in-out infinite 0.4s;
   }
 
@@ -171,12 +172,12 @@
   .hh-rotate-sub { font-size: 14px; color: rgba(255,255,255,.55); margin: 0; line-height: 1.7; }
 
   @keyframes hh-pulse-forward {
-    0%, 100% { transform: translate(-50%, -50%) scale(1.00); box-shadow: 0 0 18px 4px rgba(255,210,80,0.55), 0 0 40px 10px rgba(255,170,30,0.30); }
-    50%       { transform: translate(-50%, -50%) scale(1.12); box-shadow: 0 0 28px 8px rgba(255,210,80,0.75), 0 0 60px 18px rgba(255,170,30,0.45); }
+    0%, 100% { opacity: 0.7; }
+    50%       { opacity: 1.0; }
   }
   @keyframes hh-pulse-branch {
-    0%, 100% { transform: translate(-50%, -50%) scale(1.00); }
-    50%       { transform: translate(-50%, -50%) scale(1.10); }
+    0%, 100% { opacity: 0.6; }
+    50%       { opacity: 1.0; }
   }
   @keyframes hh-rotatehint  { 0%,100%{transform:rotate(0deg);}40%,60%{transform:rotate(-90deg);} }
   @keyframes hh-barshimmer  { 0%{background-position:0%}100%{background-position:200%} }
@@ -216,6 +217,21 @@
 
 <script>
 (() => {
+  /* ── BGM ── */
+  const bgm = new Audio('assets/happy_house/happy-house.mp3');
+  bgm.loop   = true;
+  bgm.volume = 0.65;
+  let bgmStarted = false;
+
+  function startBGM() {
+    if (bgmStarted) return;
+    bgmStarted = true;
+    bgm.play().catch(() => {});
+  }
+
+  document.addEventListener('click',    startBGM, { once: true });
+  document.addEventListener('touchend', startBGM, { once: true, passive: true });
+
   /* ═══════════════════════════════════════════
      CONSTANTS
   ═══════════════════════════════════════════ */
@@ -388,6 +404,7 @@
   function exitToKarasuki() {
     if (transitioning) return;
     transitioning = true;
+    try { bgm.pause(); bgm.currentTime = 0; } catch (_) {}
     fadeEl.style.transition = `opacity 0.6s ease-in`;
     fadeEl.style.opacity    = '1';
     setTimeout(() => {
