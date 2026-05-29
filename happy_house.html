@@ -1,0 +1,426 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mister Happy's House</title>
+<style>
+  html, body {
+    margin: 0; padding: 0;
+    width: 100%; height: 100%;
+    background: #000; overflow: hidden;
+    font-family: 'Georgia', serif;
+  }
+
+  #hh-app {
+    position: relative;
+    width: 100vw; height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    background: #000;
+  }
+
+  /* ── Stage: letterboxed 16:9 ── */
+  #hh-stage {
+    position: relative;
+    width: min(100vw, calc(100vh * 16 / 9));
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: #000;
+  }
+
+  /* ── Scene images ── */
+  .hh-scene {
+    position: absolute;
+    inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    object-position: center center;
+    display: block;
+    pointer-events: none;
+    user-select: none;
+    opacity: 0;
+    transition: opacity 1.2s ease-in-out;
+  }
+  .hh-scene.visible {
+    opacity: 1;
+  }
+
+  /* ── Fade overlay for transitions ── */
+  #hh-fade {
+    position: absolute;
+    inset: 0;
+    background: #000;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 20;
+    transition: opacity 0.6s ease-in-out;
+  }
+
+  /* ── Hotspot glows ── */
+  .hh-hotspot {
+    position: absolute;
+    border-radius: 50%;
+    cursor: pointer;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    pointer-events: auto;
+  }
+
+  /* Forward glow — warm amber */
+  .hh-hotspot.forward {
+    width: 8%;
+    aspect-ratio: 1;
+    background: radial-gradient(circle at 40% 38%, #fff8e0, #ffd966 40%, #c8860a 80%, transparent);
+    box-shadow:
+      0 0 18px 4px rgba(255, 210, 80, 0.55),
+      0 0 40px 10px rgba(255, 170, 30, 0.30),
+      0 0 80px 20px rgba(200, 130, 10, 0.15);
+    animation: hh-pulse-forward 2.2s ease-in-out infinite;
+  }
+
+  /* Back arrow — small, top-left, subtle */
+  #hh-back-btn {
+    position: absolute;
+    top: 4%;
+    left: 3%;
+    z-index: 15;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border: 1px solid rgba(255, 220, 140, 0.30);
+    border-radius: 20px;
+    background: rgba(0, 0, 0, 0.45);
+    color: rgba(255, 220, 140, 0.65);
+    font-family: 'Georgia', serif;
+    font-size: clamp(0.65rem, 1.8vw, 0.82rem);
+    letter-spacing: 0.1em;
+    user-select: none;
+  }
+  #hh-back-btn.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  #hh-back-btn:hover {
+    background: rgba(0, 0, 0, 0.65);
+    color: rgba(255, 220, 140, 0.90);
+    border-color: rgba(255, 220, 140, 0.55);
+  }
+
+  /* Branch choice hotspots — left and right at end-of-hall */
+  .hh-hotspot.branch-left {
+    width: 9%;
+    aspect-ratio: 1;
+    background: radial-gradient(circle at 40% 38%, #ffe0f8, #cc88ff 40%, #6600cc 80%, transparent);
+    box-shadow:
+      0 0 18px 4px rgba(180, 80, 255, 0.50),
+      0 0 40px 10px rgba(140, 40, 220, 0.28),
+      0 0 80px 20px rgba(100, 0, 180, 0.14);
+    animation: hh-pulse-branch 2.6s ease-in-out infinite;
+  }
+  .hh-hotspot.branch-right {
+    width: 9%;
+    aspect-ratio: 1;
+    background: radial-gradient(circle at 40% 38%, #e0f8ff, #44ccff 40%, #0066aa 80%, transparent);
+    box-shadow:
+      0 0 18px 4px rgba(50, 180, 255, 0.50),
+      0 0 40px 10px rgba(30, 130, 220, 0.28),
+      0 0 80px 20px rgba(0, 80, 160, 0.14);
+    animation: hh-pulse-branch 2.6s ease-in-out infinite 0.4s;
+  }
+
+  /* Rotate prompt */
+  #hh-rotate {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: #000;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    text-align: center;
+    padding: 32px;
+  }
+  @media screen and (orientation: portrait) and (max-width: 1023px) {
+    #hh-rotate { display: flex !important; }
+  }
+  .hh-rotate-phone {
+    font-size: 64px;
+    animation: hh-rotatehint 2.4s ease-in-out infinite;
+    transform-origin: center;
+  }
+  .hh-rotate-bar {
+    width: 120px; height: 3px; border-radius: 999px;
+    background: linear-gradient(90deg, #ffd966, #ffaa00, #ffd966);
+    background-size: 200%;
+    animation: hh-barshimmer 2s linear infinite;
+    box-shadow: 0 0 14px rgba(255, 180, 0, 0.5);
+  }
+  .hh-rotate-title {
+    font-size: clamp(18px, 5vw, 28px);
+    font-weight: 900; letter-spacing: 1px; color: #fff; margin: 0;
+    text-shadow: 0 0 28px rgba(255, 200, 80, 0.7);
+  }
+  .hh-rotate-sub { font-size: 14px; color: rgba(255,255,255,.55); margin: 0; line-height: 1.7; }
+
+  @keyframes hh-pulse-forward {
+    0%, 100% { transform: translate(-50%, -50%) scale(1.00); box-shadow: 0 0 18px 4px rgba(255,210,80,0.55), 0 0 40px 10px rgba(255,170,30,0.30); }
+    50%       { transform: translate(-50%, -50%) scale(1.12); box-shadow: 0 0 28px 8px rgba(255,210,80,0.75), 0 0 60px 18px rgba(255,170,30,0.45); }
+  }
+  @keyframes hh-pulse-branch {
+    0%, 100% { transform: translate(-50%, -50%) scale(1.00); }
+    50%       { transform: translate(-50%, -50%) scale(1.10); }
+  }
+  @keyframes hh-rotatehint  { 0%,100%{transform:rotate(0deg);}40%,60%{transform:rotate(-90deg);} }
+  @keyframes hh-barshimmer  { 0%{background-position:0%}100%{background-position:200%} }
+</style>
+</head>
+<body>
+
+<div id="hh-app">
+  <div id="hh-stage">
+
+    <!-- Scene images — all preloaded, only one visible at a time -->
+    <img class="hh-scene" id="scene-entry"       src="assets/happy_house/entry.jpg"       alt="">
+    <img class="hh-scene" id="scene-mid-hall"    src="assets/happy_house/mid-hall.jpg"    alt="">
+    <img class="hh-scene" id="scene-end-of-hall" src="assets/happy_house/end-of-hall.jpg" alt="">
+    <img class="hh-scene" id="scene-left-branch" src="assets/happy_house/left-branch.jpg" alt="">
+    <img class="hh-scene" id="scene-right-branch" src="assets/happy_house/right-branch.jpg" alt="">
+    <img class="hh-scene" id="scene-game-room"   src="assets/happy_house/game-room.jpg"   alt="">
+
+    <!-- Hotspot layer — repositioned per scene by JS -->
+    <div id="hh-hotspot-layer"></div>
+
+    <!-- Back button -->
+    <div id="hh-back-btn">← 戻る</div>
+
+    <!-- Fade overlay -->
+    <div id="hh-fade"></div>
+  </div>
+</div>
+
+<!-- Rotate overlay -->
+<div id="hh-rotate">
+  <span class="hh-rotate-phone">📱</span>
+  <div class="hh-rotate-bar"></div>
+  <p class="hh-rotate-title">横にして遊ぼう！</p>
+  <p class="hh-rotate-sub">横画面で遊んでね。</p>
+</div>
+
+<script>
+(() => {
+  /* ═══════════════════════════════════════════
+     CONSTANTS
+  ═══════════════════════════════════════════ */
+  const TRANSITION_MS      = 1200; // crossfade duration
+  const COOLDOWN_AFTER_MS  = 400;  // extra dead time after transition completes
+  const TOTAL_LOCK_MS      = TRANSITION_MS + COOLDOWN_AFTER_MS;
+
+  /* ═══════════════════════════════════════════
+     SCENE GRAPH
+     Each scene defines:
+       id       — matches <img> element id
+       forward  — { sceneId, hotspot: {x,y} as % of stage }
+       back     — sceneId to go back to (null = exit to karasuki)
+       branches — optional left/right at split point
+  ═══════════════════════════════════════════ */
+  const SCENES = {
+    'entry': {
+      forward:  { to: 'mid-hall',    hotspot: { x: 50, y: 52 } },
+      back:     null, // exits to karasuki
+    },
+    'mid-hall': {
+      forward:  { to: 'end-of-hall', hotspot: { x: 50, y: 50 } },
+      back:     'entry',
+    },
+    'end-of-hall': {
+      // No single forward — branches here
+      branches: {
+        left:  { to: 'left-branch',  hotspot: { x: 24, y: 54 } },
+        right: { to: 'right-branch', hotspot: { x: 74, y: 52 } },
+      },
+      back: 'mid-hall',
+    },
+    'left-branch': {
+      // Dead end — no forward, back only
+      back: 'end-of-hall',
+    },
+    'right-branch': {
+      forward: { to: 'game-room', hotspot: { x: 50, y: 50 } },
+      back: 'end-of-hall',
+    },
+    'game-room': {
+      // Terminal — back only
+      back: 'right-branch',
+    },
+  };
+
+  /* ═══════════════════════════════════════════
+     STATE
+  ═══════════════════════════════════════════ */
+  let currentScene  = 'entry';
+  let transitioning = false;
+  let lockUntil     = 0;
+
+  /* ═══════════════════════════════════════════
+     DOM REFS
+  ═══════════════════════════════════════════ */
+  const fadeEl      = document.getElementById('hh-fade');
+  const backBtn     = document.getElementById('hh-back-btn');
+  const hotspotLayer = document.getElementById('hh-hotspot-layer');
+  const stage       = document.getElementById('hh-stage');
+
+  function getSceneEl(sceneId) {
+    return document.getElementById('scene-' + sceneId);
+  }
+
+  /* ═══════════════════════════════════════════
+     HOTSPOT BUILDER
+  ═══════════════════════════════════════════ */
+  function clearHotspots() {
+    hotspotLayer.innerHTML = '';
+  }
+
+  function makeHotspot(cssClass, xPct, yPct, onClick) {
+    const el = document.createElement('div');
+    el.className  = 'hh-hotspot ' + cssClass;
+    el.style.left = xPct + '%';
+    el.style.top  = yPct + '%';
+    // Prevent ghost taps from stacking — only fire once per transition
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      onClick();
+    });
+    hotspotLayer.appendChild(el);
+    return el;
+  }
+
+  /* ═══════════════════════════════════════════
+     BACK BUTTON
+  ═══════════════════════════════════════════ */
+  function updateBackBtn(scene) {
+    if (scene.back !== undefined) {
+      backBtn.classList.add('visible');
+    } else {
+      backBtn.classList.remove('visible');
+    }
+  }
+
+  backBtn.addEventListener('click', () => {
+    if (performance.now() < lockUntil) return;
+    const scene = SCENES[currentScene];
+    if (!scene) return;
+    if (scene.back === null) {
+      // Exit to Karasuki
+      exitToKarasuki();
+    } else if (scene.back) {
+      navigateTo(scene.back);
+    }
+  });
+
+  /* ═══════════════════════════════════════════
+     NAVIGATION
+  ═══════════════════════════════════════════ */
+  function navigateTo(targetSceneId) {
+    if (performance.now() < lockUntil) return;
+    if (transitioning) return;
+    if (!SCENES[targetSceneId]) return;
+
+    transitioning = true;
+    lockUntil     = performance.now() + TOTAL_LOCK_MS;
+
+    // Fade out
+    fadeEl.style.transition = `opacity ${TRANSITION_MS / 2}ms ease-in`;
+    fadeEl.style.opacity    = '1';
+
+    setTimeout(() => {
+      // Swap visible scene
+      getSceneEl(currentScene).classList.remove('visible');
+      getSceneEl(targetSceneId).classList.add('visible');
+      currentScene = targetSceneId;
+
+      // Rebuild hotspots for new scene
+      clearHotspots();
+      buildHotspotsForScene(currentScene);
+      updateBackBtn(SCENES[currentScene]);
+
+      // Fade in
+      fadeEl.style.transition = `opacity ${TRANSITION_MS / 2}ms ease-out`;
+      fadeEl.style.opacity    = '0';
+
+      setTimeout(() => {
+        transitioning = false;
+      }, TRANSITION_MS / 2 + COOLDOWN_AFTER_MS);
+
+    }, TRANSITION_MS / 2 + 20);
+  }
+
+  function buildHotspotsForScene(sceneId) {
+    const scene = SCENES[sceneId];
+    if (!scene) return;
+
+    // Forward hotspot
+    if (scene.forward) {
+      makeHotspot('forward', scene.forward.hotspot.x, scene.forward.hotspot.y, () => {
+        navigateTo(scene.forward.to);
+      });
+    }
+
+    // Branch hotspots (end-of-hall only for now)
+    if (scene.branches) {
+      const bl = scene.branches.left;
+      const br = scene.branches.right;
+      if (bl) makeHotspot('branch-left',  bl.hotspot.x, bl.hotspot.y, () => navigateTo(bl.to));
+      if (br) makeHotspot('branch-right', br.hotspot.x, br.hotspot.y, () => navigateTo(br.to));
+    }
+  }
+
+  /* ═══════════════════════════════════════════
+     EXIT TO KARASUKI
+  ═══════════════════════════════════════════ */
+  function exitToKarasuki() {
+    if (transitioning) return;
+    transitioning = true;
+    fadeEl.style.transition = `opacity 0.6s ease-in`;
+    fadeEl.style.opacity    = '1';
+    setTimeout(() => {
+      // Return room is set by karasuki before we arrived; just go back
+      window.location.href = 'karasuki.html';
+    }, 700);
+  }
+
+  /* ═══════════════════════════════════════════
+     INIT
+  ═══════════════════════════════════════════ */
+  function init() {
+    // Show entry scene immediately
+    getSceneEl('entry').classList.add('visible');
+
+    // Build initial hotspots
+    buildHotspotsForScene('entry');
+
+    // Entry scene has a back (exit), so show back button
+    updateBackBtn(SCENES['entry']);
+
+    // Block all stage clicks during transition
+    stage.addEventListener('click', (e) => {
+      if (performance.now() < lockUntil) {
+        e.stopPropagation();
+        e.preventDefault();
+      }
+    }, true); // capture phase — fires before hotspot handlers
+  }
+
+  init();
+
+})();
+</script>
+</body>
+</html>
