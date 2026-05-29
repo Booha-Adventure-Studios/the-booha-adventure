@@ -1297,10 +1297,10 @@ function renderHub() {
   let activeTab = 'vocab';
 
   const TABS = [
-    { id: 'vocab',     label: 'VOCAB',     ready: true  },
-    { id: 'sentences', label: 'SENTENCES', ready: false },
-    { id: 'questions', label: 'QUESTIONS', ready: false },
-  ];
+  { id: 'vocab',     label: 'VOCAB',     ready: true },
+  { id: 'sentences', label: 'SENTENCES', ready: true },
+  { id: 'questions', label: 'QUESTIONS', ready: true },
+];
 
   const PILLS = [
     { curr: 'pb', label: 'Pre-Boo Blitz',       cls: 'blitz-pb' },
@@ -1323,30 +1323,28 @@ function renderHub() {
   const tabsEl  = arcade.querySelector('#blitzTabs');
   const gamesEl = arcade.querySelector('#blitzGames');
 
-  function renderPills() {
-    gamesEl.innerHTML = '';
-    if (activeTab !== 'vocab') {
-      const msg = document.createElement('div');
-      msg.className = 'blitzComingSoon';
-      msg.textContent = 'Coming soon';
-      gamesEl.appendChild(msg);
-      return;
-    }
-    PILLS.forEach(({ curr, label, cls }) => {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = `blitzPill ${cls}`;
-      btn.textContent = label;
-      btn.addEventListener('click', () => {
-        VocabBlitz.launch({
-          curr,
-          monthSlug: thisWeek.monthSlug,
-          weekNumber: thisWeek.weekNumber,
-        });
+ function renderPills() {
+  gamesEl.innerHTML = '';
+  const engineMap = {
+    vocab:     (cfg) => VocabBlitz.launch(cfg),
+    sentences: (cfg) => SentenceBlitz.launch(cfg),
+    questions: (cfg) => QuestionBlitz.launch(cfg),
+  };
+  PILLS.forEach(({ curr, label, cls }) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = `blitzPill ${cls}`;
+    btn.textContent = label;
+    btn.addEventListener('click', () => {
+      engineMap[activeTab]({
+        curr,
+        monthSlug: thisWeek.monthSlug,
+        weekNumber: thisWeek.weekNumber,
       });
-      gamesEl.appendChild(btn);
     });
-  }
+    gamesEl.appendChild(btn);
+  });
+}
 
   TABS.forEach(tab => {
     const btn = document.createElement('button');
@@ -1562,6 +1560,8 @@ window.addEventListener('pageshow', ev => {
 <script src="js/uhibon-chatbot.js"></script>
 <script src="pwa-init.js"></script>
 <script src="js/vocab-blitz.js"></script>
+<script src="js/sentence-blitz.js"></script>
+<script src="js/question-blitz.js"></script>  
   
 </body>
 </html>
