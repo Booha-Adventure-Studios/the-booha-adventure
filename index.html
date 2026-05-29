@@ -729,6 +729,7 @@
         <div class="hubRow" id="weekCards"></div>
         <div class="hubBottom">
           <button id="mazeBtn" class="btn btnSmall" type="button">めいろへ（Maze）</button>
+          <button id="vbFastestBtn" class="btn btnSmall" type="button">WHO IS FASTEST?</button>
           <button id="pwa-install-btn" class="btn btnSmall" type="button" onclick="boohaInstallPWA()">
             📲 インストール
           </button>
@@ -962,9 +963,75 @@ checkOrientation();
    HUB CARDS
 ════════════════════════════════════════════════════════════ */
 function renderHub() {
+  
   const container = document.getElementById('weekCards');
   container.innerHTML = '';
+
+  // ── Vocab Blitz strip (this week only) ──────────────────────
+  const thisWeek = getCurrentCurriculumWeek();
+  const blitzStrip = document.createElement('div');
+  blitzStrip.id = 'vb-strip';
+  blitzStrip.style.cssText = `
+    grid-column: 1 / -1;
+    display: flex; gap: 10px; flex-wrap: wrap;
+    padding: 14px 18px;
+    border-radius: 18px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    box-shadow: 0 0 0 2px rgba(255,59,189,0.25), 0 0 24px rgba(255,59,189,0.12);
+    align-items: center;
+  `;
+
+  const blitzLabel = document.createElement('div');
+  blitzLabel.style.cssText = `
+    font-size: clamp(10px,2vw,13px); font-weight:900; letter-spacing:2px;
+    color:rgba(255,255,255,0.5); text-transform:uppercase; margin-right:4px; flex-shrink:0;
+  `;
+  blitzLabel.textContent = '⚡ THIS WEEK — VOCAB BLITZ';
+  blitzStrip.appendChild(blitzLabel);
+
+  [
+    { curr:'pb', label:'Pre-Boo', color:'#ff3bff', glow:'rgba(255,59,255,0.5)' },
+    { curr:'br', label:'Boo-riculum', color:'#00ffee', glow:'rgba(0,255,238,0.5)' },
+    { curr:'bc', label:'Boo-continuum', color:'#ff6a00', glow:'rgba(255,106,0,0.5)' },
+  ].forEach(({ curr, label, color, glow }) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = label;
+    btn.style.cssText = `
+      appearance:none; border:0; border-radius:999px;
+      padding: 9px 18px; font-size:clamp(12px,2.5vw,14px);
+      font-weight:900; letter-spacing:0.5px; cursor:pointer;
+      color:#000; background:${color};
+      box-shadow: 0 6px 16px ${glow}, 0 0 18px ${glow};
+      -webkit-tap-highlight-color:transparent;
+      transition: transform 120ms ease, box-shadow 120ms ease;
+    `;
+    btn.addEventListener('mouseenter', () => {
+      btn.style.transform = 'scale(1.06)';
+      btn.style.boxShadow = `0 8px 22px ${glow}, 0 0 28px ${glow}`;
+    });
+    btn.addEventListener('mouseleave', () => {
+      btn.style.transform = '';
+      btn.style.boxShadow = `0 6px 16px ${glow}, 0 0 18px ${glow}`;
+    });
+    btn.addEventListener('click', () => {
+      VocabBlitz.launch({
+        curr,
+        monthSlug: thisWeek.monthSlug,
+        weekNumber: thisWeek.weekNumber,
+      });
+    });
+    blitzStrip.appendChild(btn);
+  });
+
+  container.appendChild(blitzStrip);
+  // ────────────────────────────────────────────────────────────
+
   buildWeekData().forEach(wk => {
+
+
+    
     const card = document.createElement('div');
     card.className      = 'weekCard';
     card.dataset.weekId = wk.weekId;
@@ -1029,6 +1096,10 @@ mazeBtn.addEventListener('click', () => {
   setTimeout(() => { window.location.href = 'maze.html'; }, 520);
 });
 
+document.getElementById('vbFastestBtn').addEventListener('click', () => {
+  VocabBlitz.openFastestPanel();
+});
+  
 /* ════════════════════════════════════════════════════════════
    START FLOW
 ════════════════════════════════════════════════════════════ */
@@ -1149,6 +1220,7 @@ window.addEventListener('pageshow', ev => {
 <script src="js/uhibon-knowledge.js"></script>
 <script src="js/uhibon-chatbot.js"></script>
 <script src="pwa-init.js"></script>
+<script src="js/vocab-blitz.js"></script>
   
 </body>
 </html>
