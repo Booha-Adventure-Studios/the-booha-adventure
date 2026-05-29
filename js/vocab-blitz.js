@@ -1129,44 +1129,13 @@ function buildScorePane(saveKey) {
 }
 
    
-  function openFastestPanel(gameType = 'vocab') {
-     
-    let panel = document.getElementById('vb-fastest-panel');
-    if (!panel) panel = buildFastestPanel();
+ function openFastestPanel(gameType = 'vocab') {
+  let panel = document.getElementById('vb-fastest-panel');
+  if (!panel) panel = buildFastestPanel();
 
-    // Refresh scores
-    ['pb','br','bc'].forEach(curr => {
-  const el = panel.querySelector(`[data-vb-score="${curr}"]`);
-  if (el) {
-    const t = getBestTime(curr);
-    if (t !== null && t !== undefined) {
-      el.textContent = fmtTime(t);
-      el.classList.remove('no-score');
-    } else {
-      el.textContent = '-- --';
-      el.classList.add('no-score');
-    }
-  }
-  ['sentenceBlitz','questionBlitz'].forEach(saveKey => {
-    const sel = panel.querySelector(`[data-vb-score="${saveKey}-${curr}"]`);
-    if (!sel) return;
-    try {
-      const raw  = localStorage.getItem('booha_save');
-      const data = raw ? JSON.parse(raw) : {};
-      const t    = data?.meta?.[saveKey]?.[curr] ?? null;
-      if (t !== null && t !== undefined) {
-        sel.textContent = fmtTime(t);
-        sel.classList.remove('no-score');
-      } else {
-        sel.textContent = '-- --';
-        sel.classList.add('no-score');
-      }
-    } catch {}
-  });
-});
-
-       
-      if (!el) return;
+  ['pb','br','bc'].forEach(curr => {
+    const el = panel.querySelector(`[data-vb-score="${curr}"]`);
+    if (el) {
       const t = getBestTime(curr);
       if (t !== null && t !== undefined) {
         el.textContent = fmtTime(t);
@@ -1175,10 +1144,26 @@ function buildScorePane(saveKey) {
         el.textContent = '-- --';
         el.classList.add('no-score');
       }
+    }
+    ['sentenceBlitz','questionBlitz'].forEach(saveKey => {
+      const sel = panel.querySelector(`[data-vb-score="${saveKey}-${curr}"]`);
+      if (!sel) return;
+      try {
+        const raw  = localStorage.getItem('booha_save');
+        const data = raw ? JSON.parse(raw) : {};
+        const t    = data?.meta?.[saveKey]?.[curr] ?? null;
+        if (t !== null && t !== undefined) {
+          sel.textContent = fmtTime(t);
+          sel.classList.remove('no-score');
+        } else {
+          sel.textContent = '-- --';
+          sel.classList.add('no-score');
+        }
+      } catch {}
     });
+  });
 
-    panel.classList.add('show');
-     // Update title and active tab to match gameType
+  panel.classList.add('show');
   const tabs = panel.querySelectorAll('.vb-fp-tab');
   tabs.forEach(t => {
     t.classList.toggle('active', t.dataset.tab === gameType);
@@ -1186,8 +1171,7 @@ function buildScorePane(saveKey) {
   panel.querySelectorAll('.vb-fp-pane').forEach(p => {
     p.classList.toggle('active', p.dataset.pane === gameType);
   });
-  }
-
+}
   /* ── Public API ──────────────────────────────────────────────── */
   return {
     launch,
