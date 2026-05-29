@@ -579,6 +579,38 @@ window.VocabBlitz = (() => {
       });
   }
 
+ function shockwave(overlay, color) {
+  const ring = document.createElement('div');
+  ring.style.cssText = `
+    position: absolute;
+    left: 50%; top: 50%;
+    width: 40px; height: 40px;
+    margin-left: -20px; margin-top: -20px;
+    border-radius: 50%;
+    border: 3px solid ${color};
+    box-shadow: 0 0 24px 8px ${color}, inset 0 0 24px 8px ${color};
+    pointer-events: none;
+    z-index: 10;
+    animation: vbShockwave 380ms cubic-bezier(.2,.8,.4,1) forwards;
+  `;
+  overlay.appendChild(ring);
+  ring.addEventListener('animationend', () => ring.remove());
+
+  // Inject keyframe once
+  if (!document.getElementById('vb-shockwave-kf')) {
+    const s = document.createElement('style');
+    s.id = 'vb-shockwave-kf';
+    s.textContent = `
+      @keyframes vbShockwave {
+        0%   { transform: scale(0.3); opacity: 1; }
+        70%  { opacity: 0.6; }
+        100% { transform: scale(18); opacity: 0; }
+      }
+    `;
+    document.head.appendChild(s);
+  }
+}  
+
   function startGame(allCards, curr, weekNumber, palette, monthSlug) {
     // Slice this week's 15
     const offset = (weekNumber - 1) * 15;
@@ -593,6 +625,22 @@ window.VocabBlitz = (() => {
     if (existing) existing.remove();
 
     const overlay = buildOverlay();
+     
+    // ── BGM ──────────────────────────────────────────────────
+const bgm = new Audio('assets/audio/blitz.mp3');
+bgm.loop = true;
+bgm.volume = 0.55;
+let bgmStarted = false;
+function startBGM() {
+  if (bgmStarted) return;
+  bgmStarted = true;
+  bgm.play().catch(() => {});
+}
+function stopBGM() {
+  bgm.pause();
+  bgm.currentTime = 0;
+}
+// ───────────────────────────────────────────────────────── 
 
     // Apply CSS vars for palette
     overlay.style.setProperty('--vb-glow', palette.glow);
@@ -679,50 +727,44 @@ window.VocabBlitz = (() => {
     }
 
     function handleAnswer(btn, chosen, correct, allOpts) {
-      if (locked) return;
-      locked = true;
+  if (locked) return;
+  locked = true;
+  startBGM();
 
-      if (chosen.n === correct.n) {
-        // ── CORRECT ──
-        btn.classList.add('correct');
+  if (chosen.n === correct.n) {
+    // ── CORRECT ──
+    btn.classList.add('correct');
+    flashEl.classList.add('on');
+    setTimeout(() => flashEl.classList.remove('on'), 100);
 
-        // Particle burst from button center
-        const r = btn.getBoundingClientRect();
-        const ox = overlay.getBoundingClientRect();
-        burst(overlay, r.left - ox.left + r.width/2, r.top - ox.top + r.height/2, palette.accent);
+    // Shockwave
+    shockwave(overlay, palette.accent);
 
-        // Flash
-        flashEl.classList.add('on');
-        setTimeout(() => flashEl.classList.remove('on'), 120);
-
-        current++;
-        if (current >= queue.length) {
-          // WIN
-          stopTimer();
-          setTimeout(() => showWin(elapsed, curr, palette, overlay, winScreen,
-            monthSlug, weekNumber, queue), 350);
-        } else {
-          setTimeout(renderQuestion, 420);
-        }
-      } else {
-        // ── WRONG ──
-        btn.classList.add('wrong');
-
-        // Highlight correct answer
-        const allBtns = optionsEl.querySelectorAll('.vb-opt');
-        allBtns.forEach(b => {
-          if (b.textContent === correct.en) b.classList.add('correct');
-        });
-
-        // Screen shake
-        overlay.classList.add('shake');
-        overlay.addEventListener('animationend', () => overlay.classList.remove('shake'), { once: true });
-
-        stopTimer();
-        setTimeout(() => showWrongPopup(correct, overlay, wrongPopup, elapsed), 500);
-      }
+    current++;
+    if (current >= queue.length) {
+      stopTimer();
+      stopBGM();
+      setTimeout(() => showWin(elapsed, curr, palette, overlay, winScreen,
+        monthSlug, weekNumber, queue), 420);
+    } else {
+      setTimeout(renderQuestion, 380);
     }
+  } else {
+    // ── WRONG ──
+    btn.classList.add('wrong');
+    const allBtns = optionsEl.querySelectorAll('.vb-opt');
+    allBtns.forEach(b => {
+      if (b.textContent === correct.en) b.classList.add('correct');
+    });
+    overlay.classList.add('shake');
+    overlay.addEventListener('animationend', () => overlay.classList.remove('shake'), { once: true });
+    stopTimer();
+    stopBGM();
+    setTimeout(() => showWrongPopup(correct, overlay, wrongPopup, elapsed), 500);
+  }
+}
 
+     
     // Wrong popup
     function showWrongPopup(correct, overlay, popup, ms) {
       const scold = SCOLDS[Math.floor(Math.random() * SCOLDS.length)];
@@ -736,9 +778,11 @@ window.VocabBlitz = (() => {
       popup.classList.add('show');
     }
 
-    overlay.querySelector('#vb-wrong-close').addEventListener('click', () => {
-      stopTimer();
-      overlay.remove();
+   overlay.querySelector('#vb-wrong-close').addEventListener('click', () => {
+  stopTimer();
+  stopBGM();
+  overlay.remove();
+       
       if (typeof window.VocabBlitz._onClose === 'function') window.VocabBlitz._onClose();
     });
 
@@ -778,9 +822,11 @@ window.VocabBlitz = (() => {
     });
 
     // Quit
-    overlay.querySelector('#vb-quit').addEventListener('click', () => {
-      stopTimer();
-      overlay.remove();
+  overlay.querySelector('#vb-quit').addEventListener('click', () => {
+  stopTimer();
+  stopBGM();
+  overlay.remove();
+       
       if (typeof window.VocabBlitz._onClose === 'function') window.VocabBlitz._onClose();
     });
 
