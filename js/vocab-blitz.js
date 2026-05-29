@@ -796,7 +796,7 @@ window.VocabBlitz = (() => {
     panel.innerHTML = `
       <div id="vb-fp-inner">
         <div id="vb-fp-top">
-          <div id="vb-fp-title">🏆 WHO IS FASTEST?</div>
+          <div id="vb-fp-title">FASTEST PLAYERS</div>
           <button id="vb-fp-close" type="button">とじる</button>
         </div>
         <div id="vb-fp-tabs">
@@ -980,7 +980,8 @@ window.VocabBlitz = (() => {
     }).join('');
   }
 
-  function openFastestPanel() {
+  function openFastestPanel(gameType = 'vocab') {
+     
     let panel = document.getElementById('vb-fastest-panel');
     if (!panel) panel = buildFastestPanel();
 
@@ -999,6 +1000,14 @@ window.VocabBlitz = (() => {
     });
 
     panel.classList.add('show');
+     // Update title and active tab to match gameType
+  const tabs = panel.querySelectorAll('.vb-fp-tab');
+  tabs.forEach(t => {
+    t.classList.toggle('active', t.dataset.tab === gameType);
+  });
+  panel.querySelectorAll('.vb-fp-pane').forEach(p => {
+    p.classList.toggle('active', p.dataset.pane === gameType);
+  });
   }
 
   /* ── Public API ──────────────────────────────────────────────── */
