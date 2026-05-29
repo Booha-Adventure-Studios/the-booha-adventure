@@ -695,6 +695,7 @@
 
  /* ══ VOCAB BLITZ STRIP ══════════════════════════════════════ */
 .blitzSection {
+  grid-column: 1 / -1;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -1207,7 +1208,7 @@ function renderHub() {
   });
 
   blitzSection.appendChild(blitzRow);
-  container.appendChild(blitzSection);
+  container.parentElement.insertBefore(blitzSection, container);
   // ────────────────────────────────────────────────────────────
 
   buildWeekData().forEach(wk => {
