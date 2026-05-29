@@ -927,12 +927,14 @@ function stopBGM() {
           <div class="vb-fp-pane active" data-pane="vocab">
             ${buildVocabPane()}
           </div>
-          <div class="vb-fp-pane" data-pane="sentences">
-            <div class="vb-fp-coming">Coming soon…<br>文章ゲームは準備中</div>
-          </div>
-          <div class="vb-fp-pane" data-pane="questions">
-            <div class="vb-fp-coming">Coming soon…<br>問題ゲームは準備中</div>
-          </div>
+          
+        <div class="vb-fp-pane" data-pane="sentences">
+        ${buildScorePane('sentenceBlitz')}
+        </div>
+        <div class="vb-fp-pane" data-pane="questions">
+        ${buildScorePane('questionBlitz')}
+        </div>
+          
         </div>
       </div>
     `;
@@ -1099,6 +1101,34 @@ function stopBGM() {
     }).join('');
   }
 
+function buildScorePane(saveKey) {
+  const rows = [
+    { curr: 'pb', name: 'Pre-Boo',       jp: 'プレブー',             color: '#ff3bff' },
+    { curr: 'br', name: 'Boo-riculum',   jp: 'ブーリキュラム',       color: '#00ffee' },
+    { curr: 'bc', name: 'Boo-continuum', jp: 'ブーコンティニューム', color: '#ff6a00' },
+  ];
+  return rows.map(r => {
+    try {
+      const raw  = localStorage.getItem('booha_save');
+      const data = raw ? JSON.parse(raw) : {};
+      const t    = data?.meta?.[saveKey]?.[r.curr] ?? null;
+      const hasScore = t !== null && t !== undefined;
+      return `
+        <div class="vb-fp-row">
+          <div class="vb-fp-dot" style="background:${r.color};box-shadow:0 0 8px ${r.color};"></div>
+          <div class="vb-fp-curr">
+            <div class="vb-fp-curr-name">${r.name}</div>
+            <div class="vb-fp-curr-jp">${r.jp}</div>
+          </div>
+          <div class="vb-fp-time ${hasScore?'':'no-score'}" data-vb-score="${saveKey}-${r.curr}">
+            ${hasScore ? fmtTime(t) : '-- --'}
+          </div>
+        </div>`;
+    } catch { return ''; }
+  }).join('');
+}
+
+   
   function openFastestPanel(gameType = 'vocab') {
      
     let panel = document.getElementById('vb-fastest-panel');
@@ -1106,7 +1136,36 @@ function stopBGM() {
 
     // Refresh scores
     ['pb','br','bc'].forEach(curr => {
-      const el = panel.querySelector(`[data-vb-score="${curr}"]`);
+  const el = panel.querySelector(`[data-vb-score="${curr}"]`);
+  if (el) {
+    const t = getBestTime(curr);
+    if (t !== null && t !== undefined) {
+      el.textContent = fmtTime(t);
+      el.classList.remove('no-score');
+    } else {
+      el.textContent = '-- --';
+      el.classList.add('no-score');
+    }
+  }
+  ['sentenceBlitz','questionBlitz'].forEach(saveKey => {
+    const sel = panel.querySelector(`[data-vb-score="${saveKey}-${curr}"]`);
+    if (!sel) return;
+    try {
+      const raw  = localStorage.getItem('booha_save');
+      const data = raw ? JSON.parse(raw) : {};
+      const t    = data?.meta?.[saveKey]?.[curr] ?? null;
+      if (t !== null && t !== undefined) {
+        sel.textContent = fmtTime(t);
+        sel.classList.remove('no-score');
+      } else {
+        sel.textContent = '-- --';
+        sel.classList.add('no-score');
+      }
+    } catch {}
+  });
+});
+
+       
       if (!el) return;
       const t = getBestTime(curr);
       if (t !== null && t !== undefined) {
