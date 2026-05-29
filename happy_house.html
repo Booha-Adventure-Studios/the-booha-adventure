@@ -40,10 +40,28 @@
     pointer-events: none;
     user-select: none;
     opacity: 0;
-    transition: opacity 1.2s ease-in-out;
+    z-index: 1;
+    transform: scale(1.0);
+    transition: opacity 1.1s ease-in-out, transform 1.4s ease-in-out;
   }
   .hh-scene.visible {
     opacity: 1;
+    z-index: 2;
+    transform: scale(1.0);
+  }
+  /* Outgoing: zooms toward you and fades */
+  .hh-scene.zooming-out {
+    opacity: 0;
+    transform: scale(1.07);
+    z-index: 2;
+    transition: opacity 1.1s ease-in-out, transform 1.4s ease-in-out;
+  }
+  /* Incoming: starts zoomed, settles back, sits on top */
+  .hh-scene.zooming-in {
+    opacity: 1;
+    transform: scale(1.0);
+    z-index: 3;
+    transition: opacity 1.1s ease-in-out, transform 1.4s ease-in-out;
   }
 
   /* ── Fade overlay for transitions ── */
@@ -288,7 +306,7 @@
   /* ═══════════════════════════════════════════
      DOM REFS
   ═══════════════════════════════════════════ */
-  const fadeEl      = document.getElementById('hh-fade');
+  const fadeEl       = document.getElementById('hh-fade'); // kept for exit-to-karasuki only
   const backBtn     = document.getElementById('hh-back-btn');
   const hotspotLayer = document.getElementById('hh-hotspot-layer');
   const stage       = document.getElementById('hh-stage');
@@ -342,7 +360,7 @@
   });
 
   /* ═══════════════════════════════════════════
-     NAVIGATION
+     NAVIGATION — cross-dissolve, no black flash
   ═══════════════════════════════════════════ */
   function navigateTo(targetSceneId) {
     if (performance.now() < lockUntil) return;
@@ -352,30 +370,58 @@
     transitioning = true;
     lockUntil     = performance.now() + TOTAL_LOCK_MS;
 
-    // Fade out
-    fadeEl.style.transition = `opacity ${TRANSITION_MS / 2}ms ease-in`;
-    fadeEl.style.opacity    = '1';
+    const outEl = getSceneEl(currentScene);
+    const inEl  = getSceneEl(targetSceneId);
+
+    // Prepare incoming: invisible, slightly zoomed in, ready to cross-dissolve
+    inEl.style.transition = 'none';
+    inEl.classList.remove('visible', 'zooming-in', 'zooming-out');
+    inEl.style.opacity   = '0';
+    inEl.style.transform = 'scale(1.06)';
+    inEl.style.zIndex    = '3';
+
+    // Force reflow so the browser registers the starting state
+    void inEl.offsetWidth;
+
+    // Re-enable transitions then trigger both animations simultaneously
+    inEl.style.transition = 'opacity 1.1s ease-in-out, transform 1.4s ease-in-out';
+
+    requestAnimationFrame(() => {
+      // Outgoing: fade + zoom toward viewer
+      outEl.style.transition = 'opacity 1.1s ease-in-out, transform 1.4s ease-in-out';
+      outEl.style.opacity    = '0';
+      outEl.style.transform  = 'scale(1.07)';
+      outEl.style.zIndex     = '2';
+
+      // Incoming: fade in + settle to normal scale
+      inEl.style.opacity   = '1';
+      inEl.style.transform = 'scale(1.0)';
+    });
 
     setTimeout(() => {
-      // Swap visible scene
-      getSceneEl(currentScene).classList.remove('visible');
-      getSceneEl(targetSceneId).classList.add('visible');
+      // Clean up outgoing
+      outEl.style.transition = 'none';
+      outEl.style.opacity    = '0';
+      outEl.style.transform  = 'scale(1.0)';
+      outEl.style.zIndex     = '1';
+      outEl.classList.remove('visible');
+
+      // Settle incoming as the new current
+      inEl.style.zIndex = '2';
+      inEl.classList.add('visible');
+
       currentScene = targetSceneId;
 
-      // Rebuild hotspots for new scene
+      // Rebuild hotspots and back button
       clearHotspots();
       buildHotspotsForScene(currentScene);
       updateBackBtn(SCENES[currentScene]);
 
-      // Fade in
-      fadeEl.style.transition = `opacity ${TRANSITION_MS / 2}ms ease-out`;
-      fadeEl.style.opacity    = '0';
-
       setTimeout(() => {
         transitioning = false;
-      }, TRANSITION_MS / 2 + COOLDOWN_AFTER_MS);
+      }, COOLDOWN_AFTER_MS);
 
-    }, TRANSITION_MS / 2 + 20);
+    }, TRANSITION_MS);
   }
 
   function buildHotspotsForScene(sceneId) {
@@ -417,13 +463,14 @@
      INIT
   ═══════════════════════════════════════════ */
   function init() {
-    // Show entry scene immediately
-    getSceneEl('entry').classList.add('visible');
+    // Show entry scene immediately — set inline styles to match .visible state
+    const entryEl = getSceneEl('entry');
+    entryEl.style.opacity   = '1';
+    entryEl.style.transform = 'scale(1.0)';
+    entryEl.style.zIndex    = '2';
+    entryEl.classList.add('visible');
 
-    // Build initial hotspots
     buildHotspotsForScene('entry');
-
-    // Entry scene has a back (exit), so show back button
     updateBackBtn(SCENES['entry']);
 
     // Block all stage clicks during transition
