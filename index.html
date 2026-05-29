@@ -45,10 +45,6 @@
     visibility: hidden;
   }
 
-
-
-
-  
 </style>
 <script>document.documentElement.classList.add('token-checking');</script>
 <script src="./js/token.js"></script>
@@ -693,24 +689,25 @@
          only to #uhibon-icon-btn and #uhibon-popout.open     */
     }
 
+
 /* ══ BLITZ ARCADE ═══════════════════════════════════════════ */
 .blitzArcade {
   width: min(820px, 96%);
-  padding: 10px 14px 12px;
+  padding: 12px 16px 14px;
   border-radius: 22px;
   text-align: center;
-  background: rgba(0,0,0,.36);
-  border: 1px solid rgba(255,255,255,.18);
+  background: rgba(0,0,0,.40);
+  border: 1px solid rgba(255,255,255,.15);
   box-shadow:
-    inset 0 0 0 1px rgba(255,255,255,.08),
-    0 12px 34px rgba(0,0,0,.42),
-    0 0 30px rgba(255,220,90,.16);
-  backdrop-filter: blur(12px) saturate(140%);
-  -webkit-backdrop-filter: blur(12px) saturate(140%);
+    inset 0 0 0 1px rgba(255,255,255,.07),
+    0 12px 34px rgba(0,0,0,.5),
+    0 0 30px rgba(255,220,90,.12);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
 }
 
-.blitzTitle {
-  font-size: clamp(12px, 1.8vw, 16px);
+.speedTitle {
+  font-size: clamp(12px, 1.8vw, 15px);
   font-weight: 900;
   letter-spacing: 4px;
   color: #ffe66d;
@@ -718,57 +715,134 @@
   text-transform: uppercase;
 }
 
-.blitzSubtitle {
+.speedSub {
   margin-top: 2px;
-  font-size: clamp(9px, 1.2vw, 11px);
+  font-size: clamp(8px, 1.1vw, 10px);
   font-weight: 800;
-  letter-spacing: 1.5px;
-  color: rgba(255,255,255,.52);
+  letter-spacing: 2px;
+  color: rgba(255,255,255,.40);
   text-transform: uppercase;
 }
 
-.blitzPills {
-  margin-top: 9px;
+/* ── Tabs ── */
+.blitzTabs {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.blitzTabs button {
+  appearance: none; border: 0;
+  background: transparent;
+  color: rgba(255,255,255,.35);
+  font-size: clamp(9px, 1.2vw, 11px);
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 5px 12px 6px;
+  border-radius: 999px;
+  cursor: pointer;
+  position: relative;
+  transition: color 180ms ease, background 180ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.blitzTabs button.active {
+  color: #ffe66d;
+  background: rgba(255,220,80,.10);
+  box-shadow: inset 0 0 0 1px rgba(255,220,80,.25);
+}
+
+.blitzTabs button.soon {
+  color: rgba(255,255,255,.22);
+  cursor: default;
+}
+
+.blitzTabs button.soon::after {
+  content: 'SOON';
+  font-size: 7px;
+  letter-spacing: 1px;
+  color: rgba(255,255,255,.28);
+  background: rgba(255,255,255,.08);
+  border-radius: 999px;
+  padding: 1px 5px;
+  margin-left: 5px;
+  vertical-align: middle;
+  position: relative;
+  top: -1px;
+}
+
+.blitzTabs button:not(.soon):not(.active):hover {
+  color: rgba(255,255,255,.6);
+  background: rgba(255,255,255,.06);
+}
+
+/* ── Tab divider ── */
+.blitzDivider {
+  height: 1px;
+  background: rgba(255,255,255,.08);
+  margin: 10px 0 10px;
+}
+
+/* ── Game pills ── */
+.blitzGames {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 8px;
+  min-height: 38px;
+}
+
+@media (max-width: 480px) {
+  .blitzGames {
+    grid-template-columns: 1fr;
+  }
+  .blitzArcade {
+    width: 100%;
+    border-radius: 16px;
+  }
 }
 
 .blitzPill {
-  appearance: none;
-  border: 0;
+  appearance: none; border: 0;
   border-radius: 999px;
-  padding: 9px 12px;
+  padding: 9px 10px;
   font-weight: 900;
-  font-size: clamp(10px, 1.45vw, 13px);
+  font-size: clamp(10px, 1.4vw, 12px);
   letter-spacing: .4px;
   color: #fff;
   cursor: pointer;
-  background: rgba(255,255,255,.10);
-  box-shadow:
-    inset 0 0 0 1px rgba(255,255,255,.18),
-    0 6px 14px rgba(0,0,0,.28);
+  background: rgba(255,255,255,.08);
   transition: transform 140ms ease, background 140ms ease;
   -webkit-tap-highlight-color: transparent;
   white-space: nowrap;
 }
-
-.blitzPill:hover  { transform: translateY(-2px); background: rgba(255,255,255,.16); }
+.blitzPill:hover  { transform: translateY(-2px); background: rgba(255,255,255,.15); }
 .blitzPill:active { transform: scale(.98); }
 
-.blitz-pb { box-shadow: inset 0 0 0 1px rgba(255,70,230,.5), 0 0 18px rgba(255,70,230,.22); }
-.blitz-br { box-shadow: inset 0 0 0 1px rgba(0,240,230,.5), 0 0 18px rgba(0,240,230,.20); }
-.blitz-bc { box-shadow: inset 0 0 0 1px rgba(255,135,30,.5), 0 0 18px rgba(255,135,30,.22); }
+.blitz-pb { box-shadow: inset 0 0 0 1px rgba(255,70,230,.5), 0 0 14px rgba(255,70,230,.18); }
+.blitz-br { box-shadow: inset 0 0 0 1px rgba(0,240,230,.5), 0 0 14px rgba(0,240,230,.16); }
+.blitz-bc { box-shadow: inset 0 0 0 1px rgba(255,135,30,.5), 0 0 14px rgba(255,135,30,.18); }
 
+.blitzComingSoon {
+  grid-column: 1 / -1;
+  color: rgba(255,255,255,.25);
+  font-size: clamp(10px, 1.4vw, 12px);
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 8px 0;
+}
+
+/* ── Rank button ── */
 .blitzRankBtn {
-  appearance: none;
-  margin-top: 9px;
-  border: 0;
+  appearance: none; border: 0;
+  margin-top: 10px;
   border-radius: 999px;
   padding: 7px 20px;
-  font-size: clamp(10px, 1.3vw, 12px);
+  font-size: clamp(9px, 1.2vw, 11px);
   font-weight: 900;
-  letter-spacing: 1.5px;
+  letter-spacing: 2px;
   text-transform: uppercase;
   color: #1b1200;
   cursor: pointer;
@@ -777,13 +851,10 @@
   background: linear-gradient(135deg, #ffe88a 0%, #ffc928 50%, #f4a900 100%);
   background-size: 200% 100%;
   animation: goldShift 4s ease-in-out infinite;
-  box-shadow:
-    0 5px 16px rgba(255,190,40,.35),
-    inset 0 1px 0 rgba(255,255,255,.45);
+  box-shadow: 0 4px 14px rgba(255,190,40,.35), inset 0 1px 0 rgba(255,255,255,.45);
   transition: transform 140ms ease, box-shadow 140ms ease;
   -webkit-tap-highlight-color: transparent;
 }
-
 .blitzRankBtn::after {
   content: '';
   position: absolute;
@@ -793,21 +864,18 @@
   transform: skewX(-15deg);
   animation: goldGlimmer 3.5s ease-in-out infinite;
 }
-
 .blitzRankBtn:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 22px rgba(255,190,40,.5), inset 0 1px 0 rgba(255,255,255,.5);
 }
 .blitzRankBtn:active { transform: scale(.98); }
 
-/* ══ MAZE + FASTEST BUTTONS ══════════════════════════════════ */
+/* ══ MAZE BUTTON ════════════════════════════════════════════ */
 .btnMaze {
   background: rgba(255,255,255,0.08);
   border: 1px solid rgba(255,255,255,0.22);
   color: rgba(255,255,255,0.9);
-  box-shadow:
-    0 6px 18px rgba(0,0,0,0.35),
-    inset 0 1px 0 rgba(255,255,255,0.12);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.12);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
 }
@@ -818,14 +886,12 @@
   50%  { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
-
 @keyframes goldGlimmer {
   0%   { left: -80%; opacity: 0; }
   20%  { opacity: 1; }
   55%  { left: 130%; opacity: 0; }
   100% { left: 130%; opacity: 0; }
 }
-
 
     
 .blitzBtnName {
@@ -1199,50 +1265,91 @@ function renderHub() {
   const container = document.getElementById('weekCards');
   container.innerHTML = '';
 
-  // Remove any existing blitzArcade (re-render guard)
   const existing = document.getElementById('blitzArcade');
   if (existing) existing.remove();
 
   const thisWeek = getCurrentCurriculumWeek();
+  let activeTab = 'vocab';
 
-  // ── Blitz Arcade panel ───────────────────────────────────────
+  const TABS = [
+    { id: 'vocab',     label: 'VOCAB',     ready: true  },
+    { id: 'sentences', label: 'SENTENCES', ready: false },
+    { id: 'questions', label: 'QUESTIONS', ready: false },
+  ];
+
+  const PILLS = [
+    { curr: 'pb', label: 'Pre-Boo Blitz',       cls: 'blitz-pb' },
+    { curr: 'br', label: 'Boo-riculum Blitz',   cls: 'blitz-br' },
+    { curr: 'bc', label: 'Boo-continuum Blitz', cls: 'blitz-bc' },
+  ];
+
   const arcade = document.createElement('div');
   arcade.id = 'blitzArcade';
   arcade.className = 'blitzArcade';
   arcade.innerHTML = `
-    <div class="blitzTitle">BLITZ GAMES</div>
-    <div class="blitzSubtitle">Fast vocabulary challenges — this week only</div>
-    <div class="blitzPills">
-      <button class="blitzPill blitz-pb" type="button">Pre-Boo Blitz</button>
-      <button class="blitzPill blitz-br" type="button">Boo-riculum Blitz</button>
-      <button class="blitzPill blitz-bc" type="button">Boo-continuum Blitz</button>
-    </div>
-    <button class="blitzRankBtn" type="button">Who is Fastest?</button>
+    <div class="speedTitle">BLITZ GAMES</div>
+    <div class="speedSub">Fast challenges — this week only</div>
+    <div class="blitzTabs" id="blitzTabs"></div>
+    <div class="blitzDivider"></div>
+    <div class="blitzGames" id="blitzGames"></div>
+    <button class="blitzRankBtn" type="button">FASTEST PLAYERS</button>
   `;
 
-  [
-    { cls: '.blitz-pb', curr: 'pb' },
-    { cls: '.blitz-br', curr: 'br' },
-    { cls: '.blitz-bc', curr: 'bc' },
-  ].forEach(({ cls, curr }) => {
-    arcade.querySelector(cls).addEventListener('click', () => {
-      VocabBlitz.launch({
-        curr,
-        monthSlug: thisWeek.monthSlug,
-        weekNumber: thisWeek.weekNumber,
+  const tabsEl  = arcade.querySelector('#blitzTabs');
+  const gamesEl = arcade.querySelector('#blitzGames');
+
+  function renderPills() {
+    gamesEl.innerHTML = '';
+    if (activeTab !== 'vocab') {
+      const msg = document.createElement('div');
+      msg.className = 'blitzComingSoon';
+      msg.textContent = 'Coming soon';
+      gamesEl.appendChild(msg);
+      return;
+    }
+    PILLS.forEach(({ curr, label, cls }) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = `blitzPill ${cls}`;
+      btn.textContent = label;
+      btn.addEventListener('click', () => {
+        VocabBlitz.launch({
+          curr,
+          monthSlug: thisWeek.monthSlug,
+          weekNumber: thisWeek.weekNumber,
+        });
       });
+      gamesEl.appendChild(btn);
     });
+  }
+
+  TABS.forEach(tab => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = tab.label;
+    btn.className = tab.ready ? (tab.id === activeTab ? 'active' : '') : 'soon';
+    btn.addEventListener('click', () => {
+      if (!tab.ready) return;
+      activeTab = tab.id;
+      tabsEl.querySelectorAll('button').forEach(b => {
+        b.className = TABS.find(t => t.label === b.textContent)?.ready
+          ? (b.textContent === tab.label ? 'active' : '')
+          : 'soon';
+      });
+      renderPills();
+    });
+    tabsEl.appendChild(btn);
   });
 
   arcade.querySelector('.blitzRankBtn').addEventListener('click', () => {
-    VocabBlitz.openFastestPanel();
+    VocabBlitz.openFastestPanel(activeTab);
   });
 
-  // Insert above the hubHeading
-  const hub = document.querySelector('.hub');
+  renderPills();
+
+  const hub     = document.querySelector('.hub');
   const heading = hub.querySelector('.hubHeading');
   hub.insertBefore(arcade, heading);
-  // ────────────────────────────────────────────────────────────
 
   buildWeekData().forEach(wk => {
     const card = document.createElement('div');
@@ -1259,9 +1366,7 @@ function renderHub() {
       openPicker(wk.tagEn, wk.tagJp, wk.range, wk.weekId));
     container.appendChild(card);
   });
-}  
-
-
+}
   
 /* ════════════════════════════════════════════════════════════
    PICKER
