@@ -36,6 +36,18 @@
     treeIY  : 300,
   };
 
+const HAPPY_HOUSE_PORTAL = {
+    roomId  : "room_01",
+    x       : 546,
+    y       : 293,
+    r       : 44,
+    videoSrc: "assets/happy_house/happy-video.mp4",
+    href    : "happy_house.html",
+  };
+ 
+  let happyHouseCooldownUntil = 0;
+
+  
   const UTSUROBA_PORTAL = {
     roomId  : "room_15",
     x       : 381,
@@ -974,6 +986,209 @@
     });
   }
 
+ /* ═══════════════════════════════════════════
+     HAPPY HOUSE PORTAL
+  ═══════════════════════════════════════════ */
+ 
+  const HAPPY_HOUSE_PORTAL_COLORS = ['#8b00ff','#00bfff','#ff007f','#00ff99','#ffaa00','#aa00ff'];
+ 
+  function drawHappyHouseOrb(now) {
+    if (state.roomId !== HAPPY_HOUSE_PORTAL.roomId) return;
+    const sec    = now / 1000;
+    const cx     = HAPPY_HOUSE_PORTAL.x;
+    const cy     = HAPPY_HOUSE_PORTAL.y;
+    const moveReveal = Math.min(1, state.distMovedSinceSpawn / ARROW_MOVE_THRESHOLD);
+ 
+    const cycleT = (sec * 0.28) % HAPPY_HOUSE_PORTAL_COLORS.length;
+    const idx0   = Math.floor(cycleT) % HAPPY_HOUSE_PORTAL_COLORS.length;
+    const idx1   = (idx0 + 1) % HAPPY_HOUSE_PORTAL_COLORS.length;
+    const t      = cycleT - Math.floor(cycleT);
+    const col    = lerpHex(HAPPY_HOUSE_PORTAL_COLORS[idx0], HAPPY_HOUSE_PORTAL_COLORS[idx1], t);
+    const col2   = lerpHex(
+      HAPPY_HOUSE_PORTAL_COLORS[(idx1 + 1) % HAPPY_HOUSE_PORTAL_COLORS.length],
+      HAPPY_HOUSE_PORTAL_COLORS[(idx1 + 2) % HAPPY_HOUSE_PORTAL_COLORS.length], t
+    );
+ 
+    const pulse  = 0.5 + 0.5 * Math.sin(sec * 2.6);
+    const pulse2 = 0.5 + 0.5 * Math.sin(sec * 1.8 + 1.2);
+    const bob    = Math.sin(sec * 1.4) * 5;
+ 
+    ctx.save();
+ 
+    // Outer ambient glow
+    const ambient = ctx.createRadialGradient(cx, cy + bob, 0, cx, cy + bob, 72);
+    ambient.addColorStop(0,   col + '00');
+    ambient.addColorStop(0.3, col + '28');
+    ambient.addColorStop(0.6, col + '44');
+    ambient.addColorStop(1,   'transparent');
+    ctx.globalAlpha = moveReveal * (0.55 + pulse * 0.35);
+    ctx.fillStyle   = ambient;
+    ctx.beginPath(); ctx.arc(cx, cy + bob, 72, 0, Math.PI * 2); ctx.fill();
+ 
+    // Secondary colour cloud
+    const cloud2 = ctx.createRadialGradient(cx, cy + bob, 0, cx, cy + bob, 52);
+    cloud2.addColorStop(0,    col2 + '00');
+    cloud2.addColorStop(0.25, col2 + '22');
+    cloud2.addColorStop(0.55, col2 + '38');
+    cloud2.addColorStop(1,    'transparent');
+    ctx.globalAlpha = moveReveal * (0.4 + pulse2 * 0.3);
+    ctx.fillStyle   = cloud2;
+    ctx.beginPath(); ctx.arc(cx, cy + bob, 52, 0, Math.PI * 2); ctx.fill();
+ 
+    // Energy ring
+    const innerR = 10 + pulse * 6;
+    const energy = ctx.createRadialGradient(cx, cy + bob, 0, cx, cy + bob, innerR * 2.8);
+    energy.addColorStop(0,    'transparent');
+    energy.addColorStop(0.25, col + '55');
+    energy.addColorStop(0.55, col + 'cc');
+    energy.addColorStop(0.75, col + '66');
+    energy.addColorStop(1,    'transparent');
+    ctx.globalAlpha = moveReveal * (0.85 + pulse * 0.13);
+    ctx.shadowBlur  = 18 + pulse * 16; ctx.shadowColor = col;
+    ctx.fillStyle   = energy;
+    ctx.beginPath(); ctx.arc(cx, cy + bob, innerR * 2.8, 0, Math.PI * 2); ctx.fill();
+    ctx.shadowBlur  = 0;
+ 
+    // Orbiting dots
+    const dotCount = 8;
+    for (let d = 0; d < dotCount; d++) {
+      const ringR  = 18 + pulse * 4 + (d % 2) * 8;
+      const speed  = d % 2 === 0 ? 0.7 : -0.5;
+      const angle  = (sec * speed) + (d / dotCount) * Math.PI * 2;
+      const dx     = cx + Math.cos(angle) * ringR;
+      const dy     = cy + bob + Math.sin(angle) * ringR;
+      const sparkA = 0.3 + 0.7 * Math.abs(Math.sin(sec * 2.5 + d * 0.8));
+      const sparkR = 1.2 + pulse * 1.0;
+      ctx.globalAlpha = moveReveal * sparkA;
+      const sparkCol = d % 2 === 0 ? col : col2;
+      ctx.fillStyle  = sparkCol; ctx.shadowBlur = 8; ctx.shadowColor = sparkCol;
+      ctx.beginPath(); ctx.arc(dx, dy, sparkR, 0, Math.PI * 2); ctx.fill();
+      ctx.shadowBlur = 0;
+    }
+ 
+    // Sweep arcs
+    for (let w = 0; w < 3; w++) {
+      const wAngle = (sec * 0.4) + (w / 3) * Math.PI * 2;
+      const wR     = 14 + pulse2 * 5;
+      ctx.globalAlpha = moveReveal * (0.18 + pulse * 0.14);
+      ctx.strokeStyle = w % 2 === 0 ? col : col2;
+      ctx.lineWidth   = 1.5; ctx.shadowBlur = 10; ctx.shadowColor = col;
+      ctx.beginPath(); ctx.arc(cx, cy + bob, wR, wAngle, wAngle + Math.PI * 0.7); ctx.stroke();
+      ctx.shadowBlur  = 0;
+    }
+ 
+    ctx.restore();
+  }
+ 
+  /* ── Happy House popup DOM ── */
+  let happyHousePopOverlay = null;
+ 
+  function injectHappyHousePop() {
+    if (happyHousePopOverlay) return;
+    happyHousePopOverlay = document.createElement('div');
+    happyHousePopOverlay.id = 'happy-house-pop-overlay';
+    happyHousePopOverlay.style.cssText = `display:none;position:fixed;inset:0;z-index:9300;align-items:center;justify-content:center;background:rgba(0,0,0,0);transition:background 0.3s ease;`;
+    happyHousePopOverlay.innerHTML = `
+      <div id="happy-house-pop-box" style="
+        background:#080810;border:1px solid rgba(160,70,210,.55);
+        border-radius:8px;padding:clamp(28px,5vw,44px) clamp(24px,6vw,52px) clamp(22px,4vw,36px);
+        max-width:min(420px,92vw);width:92vw;text-align:center;
+        box-shadow:0 0 0 1px rgba(160,40,220,.5),0 0 40px rgba(160,40,220,.65),0 0 90px rgba(120,0,180,.4),inset 0 0 50px rgba(0,0,0,.5);
+        font-family:'Georgia',serif;position:relative;animation:portalAppear 0.25s ease-out;">
+        <div style="position:absolute;top:10px;left:10px;width:18px;height:18px;border:1.5px solid rgba(160,60,255,.55);border-right:none;border-bottom:none;"></div>
+        <div style="position:absolute;top:10px;right:10px;width:18px;height:18px;border:1.5px solid rgba(160,60,255,.55);border-left:none;border-bottom:none;"></div>
+        <div style="position:absolute;bottom:10px;left:10px;width:18px;height:18px;border:1.5px solid rgba(160,60,255,.55);border-right:none;border-top:none;"></div>
+        <div style="position:absolute;bottom:10px;right:10px;width:18px;height:18px;border:1.5px solid rgba(160,60,255,.55);border-left:none;border-top:none;"></div>
+        <button id="happy-house-pop-close" style="position:absolute;top:12px;right:14px;background:transparent;border:none;cursor:pointer;font-size:1rem;color:rgba(160,80,255,.4);transition:color .18s;padding:4px 8px;">✕</button>
+        <p id="happy-house-pop-en" style="font-size:clamp(.9rem,3.5vw,1.1rem);margin:0 0 10px;letter-spacing:.04em;color:#f0e8ff;line-height:1.55;text-shadow:0 0 20px rgba(200,180,255,.5);">Do you want to go into Mister Happy's house?</p>
+        <p id="happy-house-pop-ja" style="font-size:clamp(.78rem,3vw,.92rem);margin:0 0 clamp(18px,4vw,32px);color:#cdb8e8;letter-spacing:.05em;">ミスター・ハッピーの家に入りますか？</p>
+        <button id="happy-house-yes" style="background:transparent;font-family:'Georgia',serif;font-size:clamp(.82rem,3vw,.95rem);letter-spacing:.12em;cursor:pointer;padding:clamp(6px,2vw,10px) clamp(20px,5vw,34px);border-radius:3px;border:1.5px solid rgba(160,70,210,.9);color:#e8d8ff;margin-right:16px;background:rgba(100,30,150,.15);transition:all .18s;">はい</button>
+        <button id="happy-house-no"  style="background:transparent;font-family:'Georgia',serif;font-size:clamp(.82rem,3vw,.95rem);letter-spacing:.12em;cursor:pointer;padding:clamp(6px,2vw,10px) clamp(20px,5vw,34px);border-radius:3px;border:1.5px solid rgba(70,45,90,.8);color:#b8a8c8;transition:all .18s;">いいえ</button>
+      </div>`;
+    document.body.appendChild(happyHousePopOverlay);
+    document.getElementById('happy-house-pop-close').addEventListener('click', closeHappyHousePop);
+    document.getElementById('happy-house-no').addEventListener('click',        closeHappyHousePop);
+    document.getElementById('happy-house-yes').addEventListener('click',       _startHappyHouseTransition);
+    happyHousePopOverlay.addEventListener('click', e => { if (e.target === happyHousePopOverlay) closeHappyHousePop(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && isHappyHousePopOpen()) closeHappyHousePop(); });
+  }
+ 
+  function openHappyHousePop() {
+    happyHousePopOverlay.style.display    = 'flex';
+    happyHousePopOverlay.style.background = 'rgba(0,0,0,0.88)';
+    state.clickTarget = null;
+  }
+ 
+  function closeHappyHousePop() {
+    happyHouseCooldownUntil = performance.now() + POPUP_COOLDOWN_MS;
+    happyHousePopOverlay.style.background = 'rgba(0,0,0,0)';
+    setTimeout(() => { happyHousePopOverlay.style.display = 'none'; }, 300);
+  }
+ 
+  function isHappyHousePopOpen() {
+    return happyHousePopOverlay && happyHousePopOverlay.style.display === 'flex';
+  }
+ 
+  function _startHappyHouseTransition() {
+    happyHousePopOverlay.style.background = 'rgba(0,0,0,0)';
+    happyHousePopOverlay.style.display    = 'none';
+    state.clickTarget = null; state.moving = false;
+    try { music.pause(); music.currentTime = 0; } catch (_) {}
+    const fadeEl = document.getElementById('kara-fade');
+    fadeEl.style.transition = `opacity ${FADE_MS}ms ease-in`;
+    fadeEl.style.opacity    = '1';
+    setTimeout(() => {
+      try { sessionStorage.setItem('happy_house_return_room', HAPPY_HOUSE_PORTAL.roomId); } catch (_) {}
+      _playHappyHouseVideo();
+    }, FADE_MS + 60);
+  }
+ 
+  function _playHappyHouseVideo() {
+    let vOverlay = document.getElementById('happy-house-video-overlay');
+    if (!vOverlay) {
+      vOverlay = document.createElement('div');
+      vOverlay.id = 'happy-house-video-overlay';
+      vOverlay.style.cssText = `position:fixed;inset:0;z-index:99999;background:#000;display:flex;align-items:center;justify-content:center;`;
+      const vid = document.createElement('video');
+      vid.id         = 'happy-house-intro-vid';
+      vid.src        = HAPPY_HOUSE_PORTAL.videoSrc;
+      vid.autoplay   = true;
+      vid.playsInline = true;
+      vid.muted      = false;
+      vid.style.cssText = 'max-width:100%;max-height:100%;object-fit:contain;';
+      vOverlay.appendChild(vid);
+      document.body.appendChild(vOverlay);
+      let redirected = false;
+      function goToHappyHouse() {
+        if (redirected) return; redirected = true;
+        window.location.href = HAPPY_HOUSE_PORTAL.href;
+      }
+      vid.addEventListener('ended', goToHappyHouse);
+      vid.addEventListener('error', e => { console.warn('[happy house video] error:', e); goToHappyHouse(); });
+      vid.play().catch(e => { console.warn('[happy house video] play() rejected:', e); goToHappyHouse(); });
+      setTimeout(goToHappyHouse, 60000); // safety fallback
+    }
+  }
+ 
+  function checkHappyHousePortal() {
+    if (state.roomId !== HAPPY_HOUSE_PORTAL.roomId) return;
+    if (performance.now() < happyHouseCooldownUntil) return;
+    if (state.distMovedSinceSpawn < ARROW_MOVE_THRESHOLD) return;
+    if (Math.hypot(state.x - HAPPY_HOUSE_PORTAL.x, state.y - HAPPY_HOUSE_PORTAL.y) <= HAPPY_HOUSE_PORTAL.r) {
+      state.clickTarget = null; state.moving = false; openHappyHousePop();
+    }
+  }
+ 
+  function clickCheckHappyHousePortal(worldX, worldY) {
+    if (state.roomId !== HAPPY_HOUSE_PORTAL.roomId) return false;
+    if (performance.now() < happyHouseCooldownUntil) return false;
+    if (Math.hypot(worldX - HAPPY_HOUSE_PORTAL.x, worldY - HAPPY_HOUSE_PORTAL.y) <= HAPPY_HOUSE_PORTAL.r) {
+      openHappyHousePop(); return true;
+    }
+    return false;
+  }
+
+  
   /* ═══════════════════════════════════════════
      UTSUROBA PORTAL
   ═══════════════════════════════════════════ */
@@ -1179,6 +1394,17 @@
     try { const ret = sessionStorage.getItem('booha_bonus_return_room'); if (ret && DATA.rooms[ret]) { state.roomId = ret; state.spawnId = 'default'; sessionStorage.removeItem('booha_bonus_return_room'); } } catch (_) {}
   })();
 
+ (function checkReturnFromHappyHouse() {
+    try {
+      const ret = sessionStorage.getItem('happy_house_return_room');
+      if (ret && DATA.rooms[ret]) {
+        state.roomId  = ret;
+        state.spawnId = 'default';
+        sessionStorage.removeItem('happy_house_return_room');
+      }
+    } catch (_) {}
+  })();
+  
   (function checkReturnOrbState() {
     try {
       const wrongMemKey = sessionStorage.getItem('karasuki_return_wrong_orb');
@@ -1351,7 +1577,7 @@
     
     document.body.appendChild(toast);
     document.body.appendChild(portalOverlay);
-    injectBonusPopOverlay(); injectWandererPopOverlay(); injectUtsuobaPopOverlay(); injectOrbPanel(); injectSwapOverlay(); injectObserverPop();
+        injectBonusPopOverlay(); injectWandererPopOverlay(); injectUtsuobaPopOverlay(); injectOrbPanel(); injectSwapOverlay(); injectObserverPop(); injectHappyHousePop();
     
     const rotateOverlay = document.createElement("div"); rotateOverlay.id = "rotate-overlay";
     rotateOverlay.innerHTML = `<span class="rotate-phone">📱</span><div class="rotate-bar"></div><p class="rotate-title">横にして遊ぼう！</p><p class="rotate-sub">カラスキは<strong style="color:#ff79d7">横画面</strong>で遊べるよ。<br>スマホを横にしてね。</p>`;
@@ -1657,7 +1883,7 @@
       ctx.globalAlpha=1; p.life-=0.022; p.x+=p.vx; p.y+=p.vy;
     }
     trail=trail.filter(p=>p.life>0);
-    drawPortalOrb(now); drawExitArrows(now); drawMazeExitArrow(now);
+    drawPortalOrb(now); drawExitArrows(now); drawMazeExitArrow(now); drawHappyHouseOrb(now);
     drawBonusTrees(now); drawUtsurobPortalMarker(now); drawWanderers(now); drawObserver(now); drawOrbs(now); drawNuppi(now);
     
     const bobFreq=(Math.PI*2)/(HOVER_PERIOD/1000); const bobPhase=sec*bobFreq;
@@ -1697,17 +1923,18 @@
   /* ═══════════════════════════════════════════
      MODAL GUARD
   ═══════════════════════════════════════════ */
-  function anyModalOpen() {
+   function anyModalOpen() {
     return (
-      state.transitioning   ||
-      state.mazeExiting     ||
-      isPortalOpen()        ||
-      isBonusPopOpen()      ||
-      isWandererPopOpen()   ||
-      isUtsuobaPopOpen()    ||
-      isObserverPopOpen()   ||
-      isNuppiPopOpen()      ||
-      isOrbPanelOpen()
+      state.transitioning        ||
+      state.mazeExiting          ||
+      isPortalOpen()             ||
+      isBonusPopOpen()           ||
+      isWandererPopOpen()        ||
+      isUtsuobaPopOpen()         ||
+      isObserverPopOpen()        ||
+      isNuppiPopOpen()           ||
+      isOrbPanelOpen()           ||
+      isHappyHousePopOpen()
     );
   }
 
@@ -1730,7 +1957,9 @@
       if (spawnUnlocked&&state.roomId===MAZE_EXIT.roomId) {
         if (Math.hypot(state.x-MAZE_EXIT.x,state.y-MAZE_EXIT.y)<=MAZE_EXIT.r) { state.clickTarget=null; state.moving=false; exitToMaze(); }
       }
-      if (spawnUnlocked) checkUtsuobaPortal();
+       if (spawnUnlocked) checkUtsuobaPortal();
+       if (spawnUnlocked) checkHappyHousePortal();
+      
       if (spawnUnlocked) { const exit=getNPPExit(now); if(exit){state.clickTarget=null;state.moving=false;transitionTo(exit);} }
     }
     drawFrame(now); requestAnimationFrame(tick);
@@ -2150,6 +2379,8 @@ function drawObserver(now) {
     if(clickBonusTree(p.x,p.y)){ripples.push({x:p.x,y:p.y,life:1});return;}
     
     if(clickCheckObserver(p.x,p.y)){ripples.push({x:p.x,y:p.y,life:1});return;}
+    if(clickCheckHappyHousePortal(p.x,p.y)){ripples.push({x:p.x,y:p.y,life:1});return;}
+    
     if(clickCheckNuppi(p.x,p.y)){ripples.push({x:p.x,y:p.y,life:1});return;}
  
       // AFTER all the early returns, BEFORE the movement logic:
