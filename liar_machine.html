@@ -5,30 +5,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>THE LIAR MACHINE</title>
-
-<!-- ═══ PWA ═══════════════════════════════════════════════ -->
-<link rel="manifest" href="/the-booha-adventure/manifest.json">
-<meta name="theme-color" content="#000000">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
-<meta name="apple-mobile-web-app-title" content="Booha Adventure">
-<link rel="apple-touch-icon" href="/the-booha-adventure/icons/icon-512.png">
-<!-- ═══════════════════════════════════════════════════════ -->
-
-<!-- ═══ TOKEN GATE ════════════════════════════════════════ -->
-<style>
-  html.token-checking,
-  html.token-checking body {
-    background: #000;
-    visibility: hidden;
-  }
-</style>
-<script>document.documentElement.classList.add('token-checking');</script>
-<script src="./js/token.js"></script>
-<!-- ═══════════════════════════════════════════════════════ -->
-
-  
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Share+Tech+Mono&family=Noto+Sans+JP:wght@400;700;900&display=swap');
 
@@ -703,6 +679,24 @@
     letter-spacing: 0;
   }
 
+  /* ── EXIT BUTTON ── */
+  #liar-exit-btn {
+    position: fixed;
+    top: 14px; right: 16px;
+    z-index: 800;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 18px;
+    color: var(--dim);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 4px 8px;
+    line-height: 1;
+    transition: color 0.15s;
+    display: none;
+  }
+  #liar-exit-btn:hover { color: var(--accent2); }
+
   /* ── TIME PENALTY FLASH ── */
   .penalty-pop {
     position: fixed;
@@ -723,6 +717,9 @@
 </style>
 </head>
 <body>
+
+<!-- EXIT TO GAME ROOM -->
+<button id="liar-exit-btn" onclick="exitToGameRoom()">&#10005;</button>
 
 <!-- ═══════════════════════════════════ SCREENS ═══════════════════════════════════ -->
 
@@ -887,7 +884,7 @@
 
   <div class="btn-row">
     <button class="big-btn" onclick="playAgain()">PLAY AGAIN</button>
-    <button class="big-btn ghost" onclick="showScreen('title')">TITLE</button>
+    <button class="big-btn ghost" onclick="showScreen('title')">MAIN MENU</button>
     <button class="big-btn ghost" onclick="openRecords()">RECORDS</button>
   </div>
 </div>
@@ -1060,7 +1057,23 @@ const STATE = {
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + id).classList.add('active');
+  // X button only on title screen
+  document.getElementById('liar-exit-btn').style.display =
+    id === 'title' ? 'block' : 'none';
 }
+
+function exitToGameRoom() {
+  const overlay = document.getElementById('flash-overlay');
+  overlay.style.background = '#000';
+  overlay.style.opacity = '1';
+  overlay.style.transition = 'opacity 0.4s ease-in';
+  setTimeout(() => { window.location.href = 'happy_house.html'; }, 450);
+}
+
+// X visible on initial load (title is active by default)
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('liar-exit-btn').style.display = 'block';
+});
 
 function selectOpt(group, val, el) {
   STATE[group] = val;
