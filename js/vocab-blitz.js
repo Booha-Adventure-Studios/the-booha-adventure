@@ -864,7 +864,7 @@ function stopBGM() {
       });
     }
   }, 220);
-   
+}  
 
     function handleAnswer(btn, chosen, correct, allOpts) {
   if (locked) return;
