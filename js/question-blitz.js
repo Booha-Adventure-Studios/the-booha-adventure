@@ -8,9 +8,9 @@
 window.QuestionBlitz = (() => {
 
   /* ── Palettes ────────────────────────────────────────────────── */
-  const PALETTES = {
+ const PALETTES = {
     pb: {
-      bg: ['#00001a','#000828','#00102e','#000520','#000a24'],
+      baseHue: 195, bgSat: 85, bgLit: 10,
       accent: '#00cfff',
       accent2: '#ffffff',
       glow: 'rgba(0,207,255,0.7)',
@@ -21,7 +21,7 @@ window.QuestionBlitz = (() => {
       hiraColor: '#88eeff',
     },
     br: {
-      bg: ['#000a1a','#001228','#001830','#000d22','#001026'],
+      baseHue: 220, bgSat: 85, bgLit: 10,
       accent: '#3d8eff',
       accent2: '#aaccff',
       glow: 'rgba(61,142,255,0.7)',
@@ -32,7 +32,7 @@ window.QuestionBlitz = (() => {
       hiraColor: '#88aaff',
     },
     bc: {
-      bg: ['#05001a','#0a0028','#100030','#070020','#0c0026'],
+      baseHue: 275, bgSat: 85, bgLit: 10,
       accent: '#a855f7',
       accent2: '#d8b4fe',
       glow: 'rgba(168,85,247,0.7)',
@@ -43,17 +43,89 @@ window.QuestionBlitz = (() => {
       hiraColor: '#c084fc',
     },
   };
-
+   
   /* ── Scolding bank ───────────────────────────────────────────── */
   const SCOLDS = [
-    { jp: '練習ゼロ分？', hira: 'れんしゅうぜろぷん？', en: 'Did you practice for zero minutes?' },
-    { jp: 'お母さんには言わないよ。今回は。', hira: 'おかあさんにはいわないよ。こんかいは。', en: "I won't tell your mom. This time." },
-    { jp: '目を開けてプレイしてね。', hira: 'めをあけてぷれいしてね。', en: 'Play with your eyes open.' },
-    { jp: '大丈夫。天才じゃない人もいるから。', hira: 'だいじょうぶ。てんさいじゃないひともいるから。', en: "It's okay. Not everyone can be a genius." },
-    { jp: '次は質問を読んでみて。', hira: 'つぎはしつもんをよんでみて。', en: 'Maybe read the questions next time.' },
-    { jp: 'あ、惜しい！…全然。', hira: 'あ、おしい！…ぜんぜん。', en: 'Oh, so close! ...Not really.' },
-    { jp: '質問、ちゃんと読んだ？', hira: 'しつもん、ちゃんとよんだ？', en: 'Did you actually read the question?' },
-    { jp: 'ブーハもびっくり。', hira: 'ぶーはもびっくり。', en: 'Even Booha is shocked.' },
+    {
+      jp: '練習した形跡がないね。',
+      hira: 'れんしゅうしたけいせきがないね。',
+      en: 'There is no evidence that you practiced.'
+    },
+    {
+      jp: 'ブーハ、今ちょっと黙ったよ。',
+      hira: 'ぶーは、いまちょっとだまったよ。',
+      en: 'Booha just went quiet for a second.'
+    },
+    {
+      jp: 'お母さんには言わないよ。今回は。',
+      hira: 'おかあさんにはいわないよ。こんかいは。',
+      en: "I won't tell your mom. This time."
+    },
+    {
+      jp: '目を開けてプレイしてね。',
+      hira: 'めをあけてぷれいしてね。',
+      en: 'Play with your eyes open.'
+    },
+    {
+      jp: '今のは、英語じゃなくて勇気だったね。',
+      hira: 'いまのは、えいごじゃなくてゆうきだったね。',
+      en: 'That was not English. That was courage.'
+    },
+    {
+      jp: '大丈夫。単語もたまには休みたいよね。',
+      hira: 'だいじょうぶ。たんごもたまにはやすみたいよね。',
+      en: "It's okay. Words need a vacation too."
+    },
+    {
+      jp: '次は質問をよく読んでから来よう。',
+      hira: 'つぎはしつもんをよくよんでからこよう。',
+      en: 'Next time, try actually reading the question first.'
+    },
+    {
+      jp: 'あ、惜しい！…と言いたかった。',
+      hira: 'あ、おしい！…といいたかった。',
+      en: 'Oh, so close! ...I wanted to say.'
+    },
+    {
+      jp: '単語帳、都市伝説じゃないよ。',
+      hira: 'たんごちょう、としでんせつじゃないよ。',
+      en: 'Flashcards are not an urban legend.'
+    },
+    {
+      jp: 'ブーハも二度見したよ。',
+      hira: 'ぶーはもにどみしたよ。',
+      en: 'Even Booha did a double take.'
+    },
+    {
+      jp: 'これはミスじゃない。事件だ。',
+      hira: 'これはみすじゃない。じけんだ。',
+      en: 'This is not a mistake. This is an incident.'
+    },
+    {
+      jp: '今の答え、どこから来たの？',
+      hira: 'いまのこたえ、どこからきたの？',
+      en: 'Where did that answer come from?'
+    },
+    {
+      jp: 'ブーハの魂が少し抜けたよ。',
+      hira: 'ぶーはのたましいがすこしぬけたよ。',
+      en: "A little bit of Booha's soul just left."
+    },
+    {
+      jp: '先生の心に小さなヒビが入りました。',
+      hira: 'せんせいのこころにちいさなひびがはいりました。',
+      en: "A tiny crack just appeared in the teacher's heart."
+    },
+    {
+      jp: '復習って知ってる？友だちになれるよ。',
+      hira: 'ふくしゅうってしってる？ともだちになれるよ。',
+      en: 'Do you know review? You two could be friends.'
+    },
+    {
+      jp: '今のはブーハの予想を下回りました。',
+      hira: 'いまのはぶーはのよそうをしたまわりました。',
+      en: "That was below Booha's expectations."
+    }
   ];
 
   /* ── Save helpers ────────────────────────────────────────────── */
@@ -267,7 +339,7 @@ window.QuestionBlitz = (() => {
       #qb-wrong-popup.show { display: flex; }
 
       .qb-wrong-jp {
-        font-size: clamp(18px,4.5vw,32px);
+        font-size: clamp(48px,12vw,88px);
         font-weight: 900; color: #ff3b3b;
         text-shadow: 0 0 24px rgba(255,59,59,0.8);
         line-height: 1.35;
@@ -275,12 +347,12 @@ window.QuestionBlitz = (() => {
         max-width: 560px;
       }
       .qb-wrong-hira {
-        font-size: clamp(10px,2vw,14px);
+        font-size: clamp(14px,3.5vw,22px);
         color: rgba(255,150,150,0.85);
         letter-spacing: 1.5px; line-height: 1.6; max-width: 560px;
       }
       .qb-wrong-en {
-        font-size: clamp(15px,3.5vw,24px);
+        font-size: clamp(22px,6vw,42px);
         font-weight: 900; color: #fff; margin-top: 6px;
         line-height: 1.4; max-width: 560px;
       }
@@ -471,7 +543,7 @@ window.QuestionBlitz = (() => {
     overlay.style.setProperty('--qb-opt-bg', palette.optionBg);
     overlay.style.setProperty('--qb-opt-border', palette.optionBorder);
     overlay.style.setProperty('--qb-opt-hover', palette.optionHover);
-    overlay.style.background = palette.bg[0];
+    overlay.style.background = `hsl(${palette.baseHue}, ${palette.bgSat}%, ${palette.bgLit}%)`;
 
     // DOM refs
     const timerEl    = overlay.querySelector('#qb-timer');
@@ -567,41 +639,30 @@ window.QuestionBlitz = (() => {
         }, 35);
       }, 110);
 
-      setTimeout(() => {
-        jpWordEl.style.opacity  = '0';
-        hiraEl.style.opacity    = '0';
-        optionsEl.style.opacity = '0';
-        setTimeout(() => {
-          if (current >= queue.length) {
-            stopTimer(); stopBGM();
-            showWin(elapsed, curr, palette, overlay, winScreen, monthSlug, weekNumber);
-          } else {
-            renderQuestion();
-            scrollEl.scrollTop = 0;
-            requestAnimationFrame(() => {
-              jpWordEl.style.transition  = 'none';
-              hiraEl.style.transition    = 'none';
-              optionsEl.style.transition = 'none';
-              jpWordEl.style.opacity     = '1';
-              hiraEl.style.opacity       = '1';
-              optionsEl.style.opacity    = '1';
-              requestAnimationFrame(() => {
-                jpWordEl.style.transition  = '';
-                hiraEl.style.transition    = '';
-                optionsEl.style.transition = '';
-              });
-            });
-          }
-        }, 75);
+     setTimeout(() => {
+        if (current >= queue.length) {
+          stopTimer(); stopBGM();
+          showWin(elapsed, curr, palette, overlay, winScreen, monthSlug, weekNumber);
+        } else {
+          optionsEl.style.visibility = 'hidden';
+          renderQuestion();
+          scrollEl.scrollTop = 0;
+          requestAnimationFrame(() => {
+            optionsEl.style.visibility = '';
+          });
+        }
       }, 200);
-    }
+ 
 
+       
     /* ── renderQuestion ── */
     function renderQuestion() {
       locked = false;
       const card = queue[current];
-      bgIndex = (bgIndex + 1) % palette.bg.length;
-      overlay.style.background = palette.bg[bgIndex];
+       
+      bgIndex++;
+      const hue = (palette.baseHue + bgIndex * 51) % 360;
+      overlay.style.background = `hsl(${hue}, ${palette.bgSat}%, ${palette.bgLit}%)`;
 
       jpWordEl.style.animation = 'none';
       hiraEl.style.animation   = 'none';
