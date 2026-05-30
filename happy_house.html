@@ -203,7 +203,7 @@
     pointer-events: none;
     cursor: default;
     opacity: 1;
-    transition: opacity 2.8s ease-out;
+    transition: opacity 3.0s ease-out;
   }
   .hh-obj.mister-happy.faded {
     opacity: 0;
@@ -522,9 +522,6 @@
     bgm.play().catch(() => {});
   }
 
-  document.addEventListener('click',    startBGM, { once: true });
-  document.addEventListener('touchend', startBGM, { once: true, passive: true });
-
   /* ═══════════════════════════════════════════
      CONSTANTS
   ═══════════════════════════════════════════ */
@@ -627,6 +624,7 @@
 
   backBtn.addEventListener('click', () => {
     if (performance.now() < lockUntil) return;
+    startBGM();
     const scene = SCENES[currentScene];
     if (!scene) return;
     if (scene.back === null) {
@@ -643,6 +641,8 @@
     if (performance.now() < lockUntil) return;
     if (transitioning) return;
     if (!SCENES[targetSceneId]) return;
+
+    startBGM();
 
     transitioning = true;
     lockUntil     = performance.now() + TOTAL_LOCK_MS;
@@ -722,7 +722,7 @@
       img.className = 'hh-obj trophy';
       img.style.left = scene.trophy.hotspot.x + '%';
       img.style.top  = scene.trophy.hotspot.y + '%';
-      img.addEventListener('click', (e) => { e.stopPropagation(); openLiarRecords(); });
+      img.addEventListener('click', (e) => { e.stopPropagation(); startBGM(); openLiarRecords(); });
       hotspotLayer.appendChild(img);
     }
 
@@ -735,6 +735,7 @@
       img.style.top  = scene.liarMachine.hotspot.y + '%';
       img.addEventListener('click', (e) => {
         e.stopPropagation();
+        startBGM();
         try { bgm.pause(); } catch(_) {}
         window.location.href = 'liar_machine.html';
       });
@@ -758,6 +759,7 @@
   ═══════════════════════════════════════════ */
   function exitToKarasuki() {
     if (transitioning) return;
+    startBGM();
     transitioning = true;
     try { bgm.pause(); bgm.currentTime = 0; } catch (_) {}
     fadeEl.style.transition = 'opacity 0.6s ease-in';
