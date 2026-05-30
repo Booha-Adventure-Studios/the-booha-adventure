@@ -661,7 +661,7 @@ window.SentenceBlitz = (() => {
           });
         }
       }, 200);
-
+    }
      
     /* ── renderQuestion ── */
     function renderQuestion() {
