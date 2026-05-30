@@ -653,6 +653,32 @@
     text-transform: uppercase;
   }
 
+  /* ── BILINGUAL TEXT ── */
+  .jp-small {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 12px;
+    letter-spacing: 1px;
+    color: var(--jp-col);
+  }
+  .jp-line {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 13px;
+    color: var(--jp-col);
+    letter-spacing: 0;
+  }
+  .simple-rules {
+    text-align: center;
+    font-size: 11px;
+    color: var(--dim);
+    letter-spacing: 1px;
+    line-height: 1.8;
+  }
+  .simple-rules span {
+    font-family: 'Noto Sans JP', sans-serif;
+    color: var(--jp-col);
+    letter-spacing: 0;
+  }
+
   /* ── TIME PENALTY FLASH ── */
   .penalty-pop {
     position: fixed;
@@ -680,7 +706,10 @@
 <div id="screen-title" class="screen active">
   <div class="title-badge">▸ BOOHA ARCADE ◂</div>
   <div class="title-main">THE LIAR<br>MACHINE</div>
-  <div class="title-sub">TRUST NOTHING. TAP FAST.</div>
+  <div class="title-sub">
+    THIS IS A 2 PERSON BATTLE GAME<br>
+    <span class="jp-small">これは2人対戦ゲームです</span>
+  </div>
   <div class="sep-line"></div>
   <div class="title-warning">⚠ ACCURACY BELOW 70% = INSTANT FAIL ⚠</div>
   <div class="btn-row">
@@ -713,9 +742,11 @@
   </div>
 
   <div class="sep-line"></div>
-  <div style="text-align:center; font-size:11px; color:var(--dim); letter-spacing:1px; line-height:1.8;">
-    15 ITEMS &nbsp;·&nbsp; 70% TO SURVIVE<br>
-    WRONG ANSWER = TIME PENALTY + ACCURACY HIT
+  <div class="simple-rules">
+    15 QUESTIONS &nbsp;·&nbsp; 70% TO SURVIVE<br>
+    <span>15問・70%以上で生き残り</span><br>
+    WRONG ANSWER = TIME PENALTY<br>
+    <span>まちがえると時間ペナルティ</span>
   </div>
 
   <div class="btn-row">
@@ -788,6 +819,25 @@
   <div class="btn-row">
     <button class="big-btn danger" id="fail-continue-btn">CONTINUE</button>
   </div>
+</div>
+
+<!-- READY TO CALCULATE -->
+<div id="screen-readycalc" class="screen">
+  <div class="calc-title">PLAYER 1 ONLY</div>
+  <div class="jp-line">P1だけ</div>
+  <div class="sep-line"></div>
+  <div class="handoff-instruction">
+    Both players are finished.<br>
+    Press the button to calculate the results.<br>
+    <span class="jp-line">
+      2人とも終わりました。<br>
+      ボタンを押して結果を見ましょう。
+    </span>
+  </div>
+  <button class="big-btn" onclick="showCalc()">
+    CALCULATE RESULTS<br>
+    <span class="jp-line">結果を見る</span>
+  </button>
 </div>
 
 <!-- CALCULATING -->
@@ -1096,20 +1146,36 @@ async function startDuel() {
 function setupHandoff(player) {
   STATE.currentPlayer = player;
   const isP2 = (player === 2);
+
   document.getElementById('handoff-player-label').textContent =
-    isP2 ? "THE DINGLEBERRY" : "MY TURN";
+    isP2 ? "THE DINGLEBERRY" : "PLAYER 1";
+
   document.getElementById('handoff-player-label').className =
     'handoff-player ' + (isP2 ? 'p2' : 'p1');
-  document.getElementById('handoff-turn-label').textContent =
-    isP2 ? 'GOES FIRST' : 'YOUR TURN';
+
+  document.getElementById('handoff-turn-label').innerHTML = isP2
+    ? 'P2 GOES FIRST<br><span class="jp-small">P2からスタート</span>'
+    : 'PLAYER 1 TURN<br><span class="jp-small">P1の番</span>';
+
   document.getElementById('handoff-instruction').innerHTML = isP2
-    ? `Hand the device to your opponent.<br>They play first. Your score stays hidden.`
-    : `Take back the device.<br>Now it's your turn. Beat their time.`;
-  document.getElementById('handoff-rule').textContent = isP2
-    ? '⚠ DO NOT SHOW THIS SCREEN TO YOUR OPPONENT'
-    : '⚠ DO NOT SHOW THIS SCREEN TO YOUR OPPONENT';
-  document.getElementById('handoff-start-btn').textContent =
-    isP2 ? 'READY → START' : 'MY TURN → START';
+    ? `Give the device to Player 2.<br>
+       <span class="jp-line">P2にわたしてね。</span><br><br>
+       Player 2 plays first.<br>
+       <span class="jp-line">P2が先にプレイします。</span>`
+    : `Give it back to Player 1.<br>
+       <span class="jp-line">P1に返してね。</span><br><br>
+       Player 1 will calculate the results after playing.<br>
+       <span class="jp-line">P1がプレイしたあと、結果を見ます。</span>`;
+
+  document.getElementById('handoff-rule').innerHTML = isP2
+    ? `&#9888; SCORES ARE HIDDEN<br>
+       <span class="jp-line">スコアはまだ見えません</span>`
+    : `&#9888; GIVE BACK TO THE SUPER COOL GENIUS PLAYER 1<br>
+       <span class="jp-line">天才プレイヤーP1に返しましょう</span>`;
+
+  document.getElementById('handoff-start-btn').innerHTML = isP2
+    ? `READY &#8594; START<br><span class="jp-line">スタート</span>`
+    : `PLAYER 1 &#8594; START<br><span class="jp-line">P1スタート</span>`;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1261,8 +1327,8 @@ function finishRun() {
     setupHandoff(1);
     showScreen('handoff');
   } else {
-    // Both done, calculate
-    showCalc();
+    // Both done — P1 manually triggers results
+    showScreen('readycalc');
   }
 }
 
@@ -1287,11 +1353,11 @@ function triggerFail() {
 
   const btn = document.getElementById('fail-continue-btn');
   if (isP2) {
-    btn.textContent = 'HAND TO PLAYER 1 →';
+    btn.innerHTML = 'HAND TO PLAYER 1<br><span class="jp-line">P1に返してね</span>';
     btn.onclick = () => { setupHandoff(1); showScreen('handoff'); };
   } else {
-    btn.textContent = 'SEE RESULTS';
-    btn.onclick = () => showCalc();
+    btn.innerHTML = 'CALCULATE RESULTS<br><span class="jp-line">結果を見る</span>';
+    btn.onclick = () => showScreen('readycalc');
   }
   showScreen('fail');
 }
