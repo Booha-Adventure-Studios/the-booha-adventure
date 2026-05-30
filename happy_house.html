@@ -171,20 +171,66 @@
     animation: hh-pulse-branch 2.6s ease-in-out infinite 0.4s;
   }
 
-  /* ── Trophy hotspot ── */
-  .hh-hotspot.trophy {
-    width: 8%;
-    aspect-ratio: 1;
-    background: transparent;
-    border-radius: 50%;
+  /* ── Game room PNG overlays ── */
+  .hh-obj {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    pointer-events: auto;
+    cursor: pointer;
+    user-select: none;
+    display: block;
   }
-
-  /* ── Liar Machine hotspot ── */
-  .hh-hotspot.liar-machine {
-    width: 10%;
-    aspect-ratio: 1;
-    background: transparent;
-    border-radius: 50%;
+  .hh-obj.trophy {
+    /* 🔧 tune width here */
+    width: 8%;
+    filter:
+      drop-shadow(0 0 6px rgba(255, 200, 60, 0.55))
+      drop-shadow(0 0 18px rgba(255, 170, 20, 0.30));
+    animation: hh-glow-gold 2.8s ease-in-out infinite;
+  }
+  .hh-obj.liar-machine {
+    /* 🔧 tune width here */
+    width: 12%;
+    filter:
+      drop-shadow(0 0 6px rgba(80, 200, 255, 0.55))
+      drop-shadow(0 0 18px rgba(40, 150, 255, 0.28));
+    animation: hh-glow-blue 2.8s ease-in-out infinite;
+  }
+  .hh-obj.mister-happy {
+    /* 🔧 tune width here */
+    width: 14%;
+    pointer-events: none;
+    cursor: default;
+    opacity: 1;
+    transition: opacity 0.8s ease-out;
+  }
+  .hh-obj.mister-happy.faded {
+    opacity: 0;
+  }
+  @keyframes hh-glow-gold {
+    0%, 100% {
+      filter:
+        drop-shadow(0 0 5px rgba(255, 200, 60, 0.45))
+        drop-shadow(0 0 14px rgba(255, 170, 20, 0.22));
+    }
+    50% {
+      filter:
+        drop-shadow(0 0 9px rgba(255, 210, 80, 0.70))
+        drop-shadow(0 0 24px rgba(255, 180, 30, 0.38));
+    }
+  }
+  @keyframes hh-glow-blue {
+    0%, 100% {
+      filter:
+        drop-shadow(0 0 5px rgba(80, 200, 255, 0.45))
+        drop-shadow(0 0 14px rgba(40, 150, 255, 0.22));
+    }
+    50% {
+      filter:
+        drop-shadow(0 0 9px rgba(100, 220, 255, 0.70))
+        drop-shadow(0 0 24px rgba(60, 170, 255, 0.38));
+    }
   }
 
   /* ── Rotate prompt ── */
@@ -497,6 +543,10 @@
     'mid-hall': {
       forward: { to: 'end-of-hall', hotspot: { x: 50, y: 50 } },
       back: 'entry',
+      misterHappy: {
+        src: 'assets/happy_house/mister_happy-2.png',
+        hotspot: { x: 42.4, y: 45.1 }
+      },
     },
     'end-of-hall': {
       branches: {
@@ -513,9 +563,12 @@
       back: 'end-of-hall',
     },
     'game-room': {
-      // x/y placeholders — tune with b_4800() coord overlay once art is in
-      trophy:       { hotspot: { x: 30, y: 50 } },
-      liarMachine:  { hotspot: { x: 65, y: 50 } },
+      trophy:      { hotspot: { x: 26.0, y: 64.6 } },
+      liarMachine: { hotspot: { x: 62.2, y: 49.1 } },
+      misterHappy: {
+        src: 'assets/happy_house/mister_happy-2.png',
+        hotspot: { x: 52.4, y: 42.6 }
+      },
       back: 'right-branch',
     },
   };
@@ -657,18 +710,41 @@
       if (br) makeHotspot('branch-right', br.hotspot.x, br.hotspot.y, () => navigateTo(br.to));
     }
 
-    // Game room interactive objects
+    // Game room: trophy PNG
     if (scene.trophy) {
-      makeHotspot('trophy', scene.trophy.hotspot.x, scene.trophy.hotspot.y, () => {
-        openLiarRecords();
-      });
+      const img = document.createElement('img');
+      img.src       = 'assets/happy_house/happy_trophy.png';
+      img.className = 'hh-obj trophy';
+      img.style.left = scene.trophy.hotspot.x + '%';
+      img.style.top  = scene.trophy.hotspot.y + '%';
+      img.addEventListener('click', (e) => { e.stopPropagation(); openLiarRecords(); });
+      hotspotLayer.appendChild(img);
     }
 
+    // Game room: liar machine PNG
     if (scene.liarMachine) {
-      makeHotspot('liar-machine', scene.liarMachine.hotspot.x, scene.liarMachine.hotspot.y, () => {
+      const img = document.createElement('img');
+      img.src       = 'assets/happy_house/liar_machine.png';
+      img.className = 'hh-obj liar-machine';
+      img.style.left = scene.liarMachine.hotspot.x + '%';
+      img.style.top  = scene.liarMachine.hotspot.y + '%';
+      img.addEventListener('click', (e) => {
+        e.stopPropagation();
         try { bgm.pause(); } catch(_) {}
         window.location.href = 'liar_machine.html';
       });
+      hotspotLayer.appendChild(img);
+    }
+
+    // Game room + mid-hall: Mister Happy (non-interactive, fades out after 600ms)
+    if (scene.misterHappy) {
+      const img = document.createElement('img');
+      img.src       = scene.misterHappy.src;
+      img.className = 'hh-obj mister-happy';
+      img.style.left = scene.misterHappy.hotspot.x + '%';
+      img.style.top  = scene.misterHappy.hotspot.y + '%';
+      hotspotLayer.appendChild(img);
+      setTimeout(() => img.classList.add('faded'), 600);
     }
   }
 
