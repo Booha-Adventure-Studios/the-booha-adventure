@@ -1,0 +1,1580 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>THE LIAR MACHINE</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Share+Tech+Mono&family=Noto+Sans+JP:wght@400;700;900&display=swap');
+
+  :root {
+    --bg:       #0a0a0f;
+    --panel:    #11111a;
+    --border:   #2a2a3a;
+    --accent:   #e8c84a;
+    --accent2:  #ff4e4e;
+    --accent3:  #4ecaff;
+    --yes:      #2ecc71;
+    --no:       #e74c3c;
+    --text:     #f0f0f0;
+    --dim:      #666680;
+    --en-col:   #4ecaff;
+    --jp-col:   #ffd96a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; touch-action: manipulation; }
+
+  html, body {
+    width: 100%; height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    overflow: hidden;
+    user-select: none;
+  }
+
+  /* ── SCREENS ── */
+  .screen {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 20px;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .screen.active { opacity: 1; pointer-events: all; }
+
+  /* ── SCANLINE OVERLAY ── */
+  body::after {
+    content: '';
+    position: fixed; inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.08) 2px,
+      rgba(0,0,0,0.08) 4px
+    );
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* ── TITLE SCREEN ── */
+  #screen-title {
+    gap: 28px;
+    background: radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a0f 70%);
+  }
+  .title-badge {
+    border: 3px solid var(--accent);
+    padding: 6px 20px;
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--accent);
+    text-transform: uppercase;
+  }
+  .title-main {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: clamp(36px, 8vw, 72px);
+    letter-spacing: 2px;
+    color: var(--accent);
+    text-shadow: 0 0 40px rgba(232,200,74,0.4), 0 0 80px rgba(232,200,74,0.1);
+    text-align: center;
+    line-height: 1;
+  }
+  .title-sub {
+    font-size: 13px;
+    letter-spacing: 3px;
+    color: var(--dim);
+    text-align: center;
+  }
+  .title-warning {
+    border: 1px solid var(--accent2);
+    color: var(--accent2);
+    padding: 8px 16px;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-align: center;
+    animation: blink 1.4s step-end infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+  /* ── SETUP SCREEN ── */
+  #screen-setup { gap: 20px; }
+  .setup-title {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: 22px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    text-align: center;
+  }
+  .setup-section-label {
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--dim);
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 8px;
+  }
+  .btn-group {
+    display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;
+  }
+  .sel-btn {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 2px;
+    padding: 10px 20px;
+    border: 2px solid var(--border);
+    background: var(--panel);
+    color: var(--dim);
+    cursor: pointer;
+    transition: all 0.15s;
+    text-transform: uppercase;
+  }
+  .sel-btn.active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(232,200,74,0.08);
+    box-shadow: 0 0 12px rgba(232,200,74,0.2);
+  }
+  .sel-btn:active { transform: scale(0.96); }
+
+  /* ── HANDOFF SCREEN ── */
+  #screen-handoff { gap: 24px; text-align: center; }
+  .handoff-player {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: clamp(28px, 6vw, 52px);
+    letter-spacing: 2px;
+  }
+  .handoff-player.p1 { color: var(--accent3); }
+  .handoff-player.p2 { color: var(--accent); }
+  .handoff-instruction {
+    font-size: 13px;
+    color: var(--dim);
+    letter-spacing: 2px;
+    line-height: 1.7;
+  }
+  .handoff-rule {
+    border: 1px solid var(--border);
+    padding: 12px 20px;
+    font-size: 12px;
+    color: var(--accent2);
+    letter-spacing: 1px;
+    max-width: 340px;
+  }
+
+  /* ── GAME SCREEN ── */
+  #screen-game {
+    flex-direction: column;
+    padding: 0;
+    background: var(--bg);
+  }
+
+  .game-hud {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--panel);
+    flex-shrink: 0;
+  }
+  .hud-player {
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--dim);
+    text-transform: uppercase;
+  }
+  .hud-player span {
+    color: var(--accent);
+    font-size: 13px;
+  }
+  .hud-counter {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: 18px;
+    color: var(--text);
+  }
+  .hud-counter .sep { color: var(--dim); font-size: 14px; }
+  .hud-accuracy {
+    font-size: 12px;
+    letter-spacing: 1px;
+  }
+  .hud-accuracy.ok { color: var(--yes); }
+  .hud-accuracy.danger { color: var(--accent2); animation: blink 0.6s step-end infinite; }
+  .hud-timer {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: 18px;
+    color: var(--accent3);
+  }
+
+  /* ── GAME CONTENT AREA ── */
+  .game-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 16px;
+    gap: 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Scrolling text containers */
+  .item-track {
+    width: 100%;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .item-track.en-track {
+    border-bottom: 1px solid var(--border);
+  }
+  .item-track.jp-track {
+    border-top: 1px solid var(--border);
+  }
+
+  .track-label {
+    font-size: 9px;
+    letter-spacing: 4px;
+    color: var(--dim);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .item-text {
+    text-align: center;
+    line-height: 1.3;
+    transition: none;
+  }
+  .item-text.en-text {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: clamp(22px, 5vw, 42px);
+    color: var(--en-col);
+    text-shadow: 0 0 20px rgba(78,202,255,0.3);
+  }
+  .item-text.jp-text {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-weight: 900;
+    font-size: clamp(24px, 5.5vw, 46px);
+    color: var(--jp-col);
+    text-shadow: 0 0 20px rgba(255,217,106,0.3);
+  }
+  .item-text.hira-text {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-weight: 400;
+    font-size: clamp(13px, 2.5vw, 20px);
+    color: rgba(255,217,106,0.6);
+    margin-top: 4px;
+  }
+
+  /* slide animations */
+  .slide-down-enter { animation: slideDownIn 0.25s ease-out forwards; }
+  .slide-up-enter   { animation: slideUpIn 0.25s ease-out forwards; }
+  .slide-down-exit  { animation: slideDownOut 0.2s ease-in forwards; }
+  .slide-up-exit    { animation: slideUpOut 0.2s ease-in forwards; }
+
+  @keyframes slideDownIn  { from { transform: translateY(-40px); opacity:0; } to { transform: translateY(0); opacity:1; } }
+  @keyframes slideUpIn    { from { transform: translateY(40px);  opacity:0; } to { transform: translateY(0); opacity:1; } }
+  @keyframes slideDownOut { from { transform: translateY(0); opacity:1; } to { transform: translateY(40px); opacity:0; } }
+  @keyframes slideUpOut   { from { transform: translateY(0); opacity:1; } to { transform: translateY(-40px); opacity:0; } }
+
+  /* ── DIVIDER / BUTTONS ── */
+  .game-buttons {
+    display: flex;
+    gap: 0;
+    width: 100%;
+    max-width: 500px;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .answer-btn {
+    flex: 1;
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: clamp(20px, 4vw, 32px);
+    letter-spacing: 3px;
+    padding: 20px 10px;
+    border: none;
+    cursor: pointer;
+    transition: filter 0.1s;
+    position: relative;
+    overflow: hidden;
+  }
+  .answer-btn::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: rgba(255,255,255,0);
+    transition: background 0.1s;
+  }
+  .answer-btn:active::after { background: rgba(255,255,255,0.15); }
+  .answer-btn:active { transform: scale(0.98); }
+
+  .btn-yes {
+    background: rgba(46,204,113,0.12);
+    color: var(--yes);
+    border-right: 1px solid var(--border);
+  }
+  .btn-no {
+    background: rgba(231,76,60,0.12);
+    color: var(--no);
+  }
+  .btn-yes:hover { background: rgba(46,204,113,0.2); }
+  .btn-no:hover  { background: rgba(231,76,60,0.2); }
+
+  /* ── FLASH OVERLAY ── */
+  #flash-overlay {
+    position: fixed; inset: 0;
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0;
+  }
+  #flash-overlay.flash-wrong {
+    background: var(--accent2);
+    animation: flashWrong 0.5s ease-out forwards;
+  }
+  #flash-overlay.flash-correct {
+    background: var(--yes);
+    animation: flashCorrect 0.3s ease-out forwards;
+  }
+  @keyframes flashWrong   { 0%{opacity:0.5} 100%{opacity:0} }
+  @keyframes flashCorrect { 0%{opacity:0.25} 100%{opacity:0} }
+
+  /* ── SHAKE ── */
+  @keyframes shake {
+    0%,100%{transform:translateX(0)}
+    15%{transform:translateX(-12px)}
+    30%{transform:translateX(10px)}
+    45%{transform:translateX(-8px)}
+    60%{transform:translateX(6px)}
+    75%{transform:translateX(-4px)}
+    90%{transform:translateX(2px)}
+  }
+  .shaking { animation: shake 0.5s ease-out; }
+
+  /* ── FAIL SCREEN ── */
+  #screen-fail {
+    gap: 20px; text-align: center;
+    background: radial-gradient(ellipse at center, #2a0a0a, #0a0a0f);
+  }
+  .fail-title {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: clamp(42px, 10vw, 80px);
+    color: var(--accent2);
+    text-shadow: 0 0 40px rgba(255,78,78,0.5);
+    letter-spacing: 3px;
+    animation: pulseRed 1.2s ease-in-out infinite;
+  }
+  @keyframes pulseRed { 0%,100%{text-shadow:0 0 40px rgba(255,78,78,0.5)} 50%{text-shadow:0 0 80px rgba(255,78,78,0.9)} }
+  .fail-sub { font-size: 13px; color: var(--dim); letter-spacing: 2px; }
+  .fail-stats { font-size: 12px; color: var(--text); letter-spacing: 1px; line-height: 2; }
+
+  /* ── CALCULATING SCREEN ── */
+  #screen-calc {
+    gap: 20px; text-align: center;
+    background: var(--bg);
+  }
+  .calc-title {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: clamp(18px, 4vw, 32px);
+    color: var(--accent);
+    letter-spacing: 3px;
+  }
+  .calc-log {
+    font-size: 12px;
+    color: var(--accent3);
+    letter-spacing: 1px;
+    line-height: 2;
+    min-height: 120px;
+    text-align: left;
+    padding: 12px 16px;
+    border: 1px solid var(--border);
+    background: var(--panel);
+    width: 100%;
+    max-width: 380px;
+  }
+  .calc-log .log-line { display: block; }
+  .calc-bar-wrap {
+    width: 100%; max-width: 380px;
+    height: 6px;
+    background: var(--border);
+    overflow: hidden;
+  }
+  .calc-bar {
+    height: 100%;
+    width: 0%;
+    background: var(--accent);
+    transition: width 0.1s linear;
+  }
+
+  /* ── RESULT SCREEN ── */
+  #screen-result {
+    gap: 0;
+    background: radial-gradient(ellipse at center, #0d1a0d, #0a0a0f);
+    padding: 16px;
+  }
+  .result-header {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: 11px;
+    letter-spacing: 5px;
+    color: var(--dim);
+    text-align: center;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+  }
+  .result-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    width: 100%;
+    max-width: 480px;
+    margin-bottom: 16px;
+  }
+  .result-cell {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 14px 12px;
+    text-align: center;
+  }
+  .result-cell-label {
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--dim);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .result-cell-val {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: 22px;
+  }
+  .result-cell-val.p1c { color: var(--accent3); }
+  .result-cell-val.p2c { color: var(--accent); }
+
+  .result-winner-banner {
+    width: 100%;
+    max-width: 480px;
+    padding: 16px;
+    text-align: center;
+    margin-bottom: 16px;
+    border: 2px solid var(--yes);
+    background: rgba(46,204,113,0.07);
+  }
+  .result-winner-banner.draw {
+    border-color: var(--accent);
+    background: rgba(232,200,74,0.07);
+  }
+  .result-winner-banner.loser {
+    border-color: var(--accent2);
+    background: rgba(255,78,78,0.07);
+  }
+  .result-winner-label {
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: var(--dim);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+  }
+  .result-winner-name {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: clamp(26px, 6vw, 48px);
+    color: var(--yes);
+    letter-spacing: 2px;
+  }
+  .result-winner-name.draw { color: var(--accent); }
+  .result-winner-name.loser { color: var(--accent2); }
+
+  .result-score-detail {
+    font-size: 11px;
+    color: var(--dim);
+    letter-spacing: 1px;
+    margin-top: 4px;
+  }
+
+  /* ── RECORDS MODAL ── */
+  #records-modal {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 500;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+  #records-modal.open { display: flex; }
+  .records-box {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    width: 100%;
+    max-width: 420px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 20px;
+  }
+  .records-title {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: 20px;
+    color: var(--accent);
+    letter-spacing: 3px;
+    text-align: center;
+    margin-bottom: 4px;
+  }
+  .records-sub {
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--dim);
+    text-align: center;
+    margin-bottom: 16px;
+  }
+  .records-section {
+    border-top: 1px solid var(--border);
+    padding-top: 12px;
+    margin-top: 12px;
+  }
+  .records-section-title {
+    font-size: 9px;
+    letter-spacing: 4px;
+    color: var(--dim);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .records-best-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    font-size: 13px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .records-best-label { color: var(--dim); letter-spacing: 1px; }
+  .records-best-val { color: var(--accent); font-size: 15px; }
+  .records-best-val.none { color: var(--border); font-size: 12px; }
+  .records-stat-row {
+    display: flex; gap: 2px; margin-bottom: 8px;
+  }
+  .records-stat-cell {
+    flex: 1; text-align: center;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    padding: 8px 4px;
+  }
+  .records-stat-num {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: 22px;
+    color: var(--text);
+  }
+  .records-stat-label { font-size: 9px; letter-spacing: 2px; color: var(--dim); margin-top: 2px; text-transform: uppercase; }
+  .recent-run {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .recent-run .rr-mode { color: var(--accent3); letter-spacing: 1px; min-width: 60px; }
+  .recent-run .rr-time { color: var(--text); }
+  .recent-run .rr-acc  { color: var(--dim); }
+  .recent-run .rr-outcome { font-weight: bold; }
+  .recent-run .rr-outcome.win  { color: var(--yes); }
+  .recent-run .rr-outcome.loss { color: var(--accent2); }
+  .recent-run .rr-date { color: var(--dim); font-size: 10px; }
+
+  /* ── SHARED BUTTONS ── */
+  .big-btn {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 3px;
+    padding: 14px 32px;
+    border: 2px solid var(--accent);
+    background: transparent;
+    color: var(--accent);
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.15s;
+  }
+  .big-btn:hover { background: rgba(232,200,74,0.1); }
+  .big-btn:active { transform: scale(0.97); }
+  .big-btn.danger {
+    border-color: var(--accent2);
+    color: var(--accent2);
+  }
+  .big-btn.danger:hover { background: rgba(255,78,78,0.1); }
+  .big-btn.ghost {
+    border-color: var(--border);
+    color: var(--dim);
+    font-size: 11px;
+    padding: 10px 20px;
+  }
+
+  .btn-row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 8px; }
+
+  /* ── MISC ── */
+  .tag { font-size: 9px; letter-spacing: 3px; color: var(--dim); text-transform: uppercase; }
+  .pulse { animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+  .sep-line {
+    width: 100%; max-width: 400px;
+    height: 1px;
+    background: var(--border);
+  }
+  #records-close-btn {
+    display: block;
+    width: 100%;
+    margin-top: 16px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 2px;
+    padding: 10px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--dim);
+    cursor: pointer;
+    text-transform: uppercase;
+  }
+
+  /* Mode/curriculum tags in HUD */
+  .hud-tags {
+    display: flex; gap: 6px;
+  }
+  .hud-tag {
+    font-size: 9px;
+    letter-spacing: 2px;
+    padding: 2px 6px;
+    border: 1px solid var(--border);
+    color: var(--dim);
+    text-transform: uppercase;
+  }
+
+  /* ── TIME PENALTY FLASH ── */
+  .penalty-pop {
+    position: fixed;
+    top: 60px; left: 50%; transform: translateX(-50%);
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: 18px;
+    color: var(--accent2);
+    letter-spacing: 2px;
+    animation: penaltyAnim 1.2s ease-out forwards;
+    pointer-events: none;
+    z-index: 900;
+  }
+  @keyframes penaltyAnim {
+    0%  { opacity: 1; transform: translateX(-50%) translateY(0); }
+    80% { opacity: 0.8; transform: translateX(-50%) translateY(-30px); }
+    100%{ opacity: 0; transform: translateX(-50%) translateY(-40px); }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════ SCREENS ═══════════════════════════════════ -->
+
+<!-- TITLE -->
+<div id="screen-title" class="screen active">
+  <div class="title-badge">▸ BOOHA ARCADE ◂</div>
+  <div class="title-main">THE LIAR<br>MACHINE</div>
+  <div class="title-sub">TRUST NOTHING. TAP FAST.</div>
+  <div class="sep-line"></div>
+  <div class="title-warning">⚠ ACCURACY BELOW 70% = INSTANT FAIL ⚠</div>
+  <div class="btn-row">
+    <button class="big-btn" onclick="showScreen('setup')">INSERT COIN</button>
+    <button class="big-btn ghost" onclick="openRecords()">RECORDS</button>
+  </div>
+</div>
+
+<!-- SETUP -->
+<div id="screen-setup" class="screen">
+  <div class="setup-title">CONFIGURE MACHINE</div>
+  <div class="sep-line"></div>
+
+  <div>
+    <div class="setup-section-label">Curriculum</div>
+    <div class="btn-group" id="curr-group">
+      <button class="sel-btn" data-val="pb" onclick="selectOpt('curr','pb',this)">PB</button>
+      <button class="sel-btn active" data-val="br" onclick="selectOpt('curr','br',this)">BR</button>
+      <button class="sel-btn" data-val="bc" onclick="selectOpt('curr','bc',this)">BC</button>
+    </div>
+  </div>
+
+  <div>
+    <div class="setup-section-label">Mode</div>
+    <div class="btn-group" id="mode-group">
+      <button class="sel-btn active" data-val="vocab" onclick="selectOpt('mode','vocab',this)">VOCAB</button>
+      <button class="sel-btn" data-val="sentences" onclick="selectOpt('mode','sentences',this)">SENTENCES</button>
+      <button class="sel-btn" data-val="questions" onclick="selectOpt('mode','questions',this)">QUESTIONS</button>
+    </div>
+  </div>
+
+  <div class="sep-line"></div>
+  <div style="text-align:center; font-size:11px; color:var(--dim); letter-spacing:1px; line-height:1.8;">
+    15 ITEMS &nbsp;·&nbsp; 70% TO SURVIVE<br>
+    WRONG ANSWER = TIME PENALTY + ACCURACY HIT
+  </div>
+
+  <div class="btn-row">
+    <button class="big-btn" onclick="startDuel()">LOAD MACHINE</button>
+    <button class="big-btn ghost" onclick="showScreen('title')">BACK</button>
+  </div>
+</div>
+
+<!-- HANDOFF: P2 first -->
+<div id="screen-handoff" class="screen">
+  <div class="tag">PASS AND PLAY</div>
+  <div class="handoff-player p2" id="handoff-player-label">THE DINGLEBERRY</div>
+  <div class="tag" id="handoff-turn-label">GOES FIRST</div>
+  <div class="sep-line"></div>
+  <div class="handoff-instruction" id="handoff-instruction">
+    Hand the device to your opponent.<br>
+    They play first. You play second.<br>
+    Neither player sees the other's score.
+  </div>
+  <div class="handoff-rule" id="handoff-rule">
+    ⚠ DO NOT SHOW THIS SCREEN TO YOUR OPPONENT
+  </div>
+  <div class="btn-row">
+    <button class="big-btn" id="handoff-start-btn" onclick="startPlayerRun()">READY → START</button>
+  </div>
+</div>
+
+<!-- GAME -->
+<div id="screen-game" class="screen">
+  <div class="game-hud">
+    <div class="hud-tags">
+      <div class="hud-tag" id="hud-curr">BR</div>
+      <div class="hud-tag" id="hud-mode">VOCAB</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+      <div class="hud-player">PLAYER: <span id="hud-player-name">–</span></div>
+      <div class="hud-counter"><span id="hud-item-num">1</span><span class="sep">/</span><span>15</span></div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;">
+      <div class="hud-timer" id="hud-timer">0.0s</div>
+      <div class="hud-accuracy ok" id="hud-accuracy">100%</div>
+    </div>
+  </div>
+
+  <div class="game-content" id="game-content">
+    <div class="item-track en-track">
+      <div class="track-label">ENGLISH</div>
+      <div class="item-text en-text" id="disp-en">—</div>
+    </div>
+
+    <div class="game-buttons">
+      <button class="answer-btn btn-yes" id="btn-yes" onclick="answer(true)">YES ✓</button>
+      <button class="answer-btn btn-no"  id="btn-no"  onclick="answer(false)">✗ NO</button>
+    </div>
+
+    <div class="item-track jp-track">
+      <div class="track-label">JAPANESE</div>
+      <div class="item-text jp-text"   id="disp-jp">—</div>
+      <div class="item-text hira-text" id="disp-hira">—</div>
+    </div>
+  </div>
+</div>
+
+<!-- FAIL -->
+<div id="screen-fail" class="screen">
+  <div class="fail-title">YOU LOSE</div>
+  <div class="fail-sub" id="fail-player-label">ACCURACY COLLAPSED</div>
+  <div class="sep-line"></div>
+  <div class="fail-stats" id="fail-stats"></div>
+  <div class="btn-row">
+    <button class="big-btn danger" id="fail-continue-btn">CONTINUE</button>
+  </div>
+</div>
+
+<!-- CALCULATING -->
+<div id="screen-calc" class="screen">
+  <div class="calc-title">CALCULATING RESULTS</div>
+  <div class="calc-bar-wrap"><div class="calc-bar" id="calc-bar"></div></div>
+  <div class="calc-log" id="calc-log"></div>
+</div>
+
+<!-- RESULT -->
+<div id="screen-result" class="screen">
+  <div class="result-header">LIAR MACHINE — DUEL RESULTS</div>
+
+  <div class="result-grid" id="result-grid">
+    <!-- populated by JS -->
+  </div>
+
+  <div class="result-winner-banner" id="result-banner">
+    <div class="result-winner-label">WINNER</div>
+    <div class="result-winner-name" id="result-winner-name">—</div>
+    <div class="result-score-detail" id="result-score-detail"></div>
+  </div>
+
+  <div class="btn-row">
+    <button class="big-btn" onclick="playAgain()">PLAY AGAIN</button>
+    <button class="big-btn ghost" onclick="showScreen('title')">TITLE</button>
+    <button class="big-btn ghost" onclick="openRecords()">RECORDS</button>
+  </div>
+</div>
+
+<!-- RECORDS MODAL -->
+<div id="records-modal">
+  <div class="records-box">
+    <div class="records-title">THE LIAR MACHINE</div>
+    <div class="records-sub">MISTER HAPPY'S RECORDS</div>
+    <div id="records-content"></div>
+    <button id="records-close-btn" onclick="closeRecords()">CLOSE</button>
+  </div>
+</div>
+
+<!-- FLASH OVERLAY -->
+<div id="flash-overlay"></div>
+
+<!-- ═══════════════════════════════════ SCRIPTS ═══════════════════════════════════ -->
+<script>
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  RECORDS  (booha_liar_machine localStorage)
+// ─────────────────────────────────────────────────────────────────────────────
+const STORE_KEY = 'booha_liar_machine';
+
+function loadRecords() {
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  return {
+    totalDuels: 0,
+    p1Wins: 0,
+    p2Wins: 0,
+    draws: 0,
+    best: { vocab: null, sentences: null, questions: null },
+    recentRuns: []   // last 20 duel sessions
+  };
+}
+
+function saveRecords(data) {
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(data)); } catch(e) {}
+}
+
+function recordDuel(duelSession) {
+  // duelSession: { mode, p1, p2 }
+  // p1/p2: { name, correct, wrong, accuracy, timeMs, survived, penaltyMs, dupeScore, date, weekKey }
+  const rec = loadRecords();
+  rec.totalDuels++;
+
+  const { winner, reason } = determineWinner(duelSession.p1, duelSession.p2);
+  if (winner === 'p1') rec.p1Wins++;
+  else if (winner === 'p2') rec.p2Wins++;
+  else rec.draws++;
+
+  // Update best score per mode (best = survived + lowest dupeScore)
+  const mode = duelSession.mode;
+  [duelSession.p1, duelSession.p2].forEach(run => {
+    if (!run.survived) return;
+    const cur = rec.best[mode];
+    if (!cur || run.dupeScore < cur.dupeScore) {
+      rec.best[mode] = {
+        name: run.name,
+        timeMs: run.timeMs,
+        accuracy: run.accuracy,
+        dupeScore: run.dupeScore,
+        date: run.date,
+        weekKey: run.weekKey
+      };
+    }
+  });
+
+  // Push to recentRuns, cap at 20
+  rec.recentRuns.unshift({
+    mode,
+    winner,
+    reason,
+    p1: { name: duelSession.p1.name, timeMs: duelSession.p1.timeMs, accuracy: duelSession.p1.accuracy, survived: duelSession.p1.survived },
+    p2: { name: duelSession.p2.name, timeMs: duelSession.p2.timeMs, accuracy: duelSession.p2.accuracy, survived: duelSession.p2.survived },
+    date: duelSession.p1.date
+  });
+  if (rec.recentRuns.length > 20) rec.recentRuns.length = 20;
+
+  saveRecords(rec);
+  return { winner, reason };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  DUPE SCORE (lower = better)
+//  Formula: a run's duel score = penalisedTime (timeMs + penaltyMs already applied)
+//  We then reward accuracy by subtracting (accuracy - 70) * 500ms per point above threshold
+//  So a 93% accurate player gets a 11,500ms bonus off their time vs a 70% player
+//  Fastest accurate run wins. Fail = Infinity.
+// ─────────────────────────────────────────────────────────────────────────────
+function calcDupeScore(run) {
+  if (!run.survived) return Infinity;
+  const accBonus = Math.max(0, run.accuracy - 70) * 500; // ms reward
+  return run.timeMs - accBonus;
+}
+
+function determineWinner(p1, p2) {
+  // Both failed
+  if (!p1.survived && !p2.survived) return { winner: 'draw', reason: 'Both eliminated' };
+  // One failed
+  if (!p1.survived) return { winner: 'p2', reason: `${p1.name} eliminated` };
+  if (!p2.survived) return { winner: 'p1', reason: `${p2.name} eliminated` };
+  // Both survived — compare scores
+  if (p1.dupeScore < p2.dupeScore) return { winner: 'p1', reason: 'Fastest accurate run' };
+  if (p2.dupeScore < p1.dupeScore) return { winner: 'p2', reason: 'Fastest accurate run' };
+  return { winner: 'draw', reason: 'Dead heat' };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  SEEDED SHUFFLE  (mulberry32 — reproducible from weekKey + mode + curr)
+// ─────────────────────────────────────────────────────────────────────────────
+function hashStr(s) {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) { h = Math.imul(31, h) + s.charCodeAt(i) | 0; }
+  return h >>> 0;
+}
+
+function mulberry32(seed) {
+  return function() {
+    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+    let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+
+function seededShuffle(arr, rng) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  GAME STATE
+// ─────────────────────────────────────────────────────────────────────────────
+const STATE = {
+  curr:     'br',
+  mode:     'vocab',
+  weekKey:  '',
+  seed:     0,
+  allCards: [],   // full pool from JSON
+  items:    [],   // 15 selected cards
+  pairs:    [],   // [{en, jp, hira, isLiar}] — same for both players
+  p1Name:   'MY TURN',
+  p2Name:   "THE DINGLEBERRY'S TURN",
+
+  // per-player run
+  currentPlayer: 2,  // 2 goes first
+  itemIndex: 0,
+  correct: 0,
+  wrong: 0,
+  startTime: 0,
+  penaltyMs: 0,
+  timerHandle: null,
+
+  // results
+  runs: { p1: null, p2: null }
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  NAVIGATION
+// ─────────────────────────────────────────────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+}
+
+function selectOpt(group, val, el) {
+  STATE[group] = val;
+  const groupEl = document.getElementById(group + '-group');
+  if (groupEl) groupEl.querySelectorAll('.sel-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  CONTENT LOADING
+// ─────────────────────────────────────────────────────────────────────────────
+function getWeekKey() {
+  // Try CALENDAR if available, otherwise derive from date
+  if (window.CALENDAR && window.CALENDAR.getCurrentCurriculumWeek) {
+    const cw = window.CALENDAR.getCurrentCurriculumWeek();
+    return cw.weekKey || deriveDateWeekKey();
+  }
+  return deriveDateWeekKey();
+}
+
+function deriveDateWeekKey() {
+  const now = new Date();
+  const year = now.getFullYear();
+  // ISO week number
+  const d = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
+  const dayNum = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+  return `${year}_w${String(weekNo).padStart(2,'0')}`;
+}
+
+function getMonthFolder() {
+  const months = ['january','february','march','april','may','june',
+                  'july','august','september','october','november','december'];
+  return months[new Date().getMonth()];
+}
+
+async function loadContent() {
+  const month  = getMonthFolder();
+  const path   = `content/${STATE.curr}/${month}/${STATE.mode}.json`;
+  try {
+    const res = await fetch(path);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    // Support both {cards:[...]} and flat array
+    return Array.isArray(data) ? data : (data.cards || data.items || []);
+  } catch(e) {
+    console.warn('Failed to load content:', path, e);
+    return null;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  PAIR GENERATION
+//  Build 15 rounds from selected items. Each round is either truth or liar.
+//  Liar swap: use jp+hira from a DIFFERENT card that has a different jp value.
+//  Seed is fixed for the week+mode+curr so P1 and P2 get identical pairs.
+// ─────────────────────────────────────────────────────────────────────────────
+function buildPairs(items, rng) {
+  // Decide truth/liar for each slot: roughly 50/50 but random
+  return items.map((card, i) => {
+    const isLiar = rng() < 0.5;
+    if (!isLiar) {
+      return { en: card.en, jp: card.jp, hira: card.hira, isLiar: false };
+    }
+    // Pick a liar swap: different card with different jp value
+    const candidates = items.filter((c, ci) => ci !== i && c.jp !== card.jp);
+    if (candidates.length === 0) {
+      // Fallback to truth if no valid liar candidate
+      return { en: card.en, jp: card.jp, hira: card.hira, isLiar: false };
+    }
+    const liar = candidates[Math.floor(rng() * candidates.length)];
+    return { en: card.en, jp: liar.jp, hira: liar.hira, isLiar: true };
+  });
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  START DUEL
+// ─────────────────────────────────────────────────────────────────────────────
+async function startDuel() {
+  // Load content
+  const cards = await loadContent();
+  if (!cards || cards.length < 15) {
+    alert('Content not found for ' + STATE.curr + ' / ' + STATE.mode + '. Check your JSON files.');
+    return;
+  }
+
+  STATE.weekKey = getWeekKey();
+  STATE.seed    = hashStr(STATE.weekKey + STATE.curr + STATE.mode);
+  const rng     = mulberry32(STATE.seed);
+
+  // Shuffle pool, pick 15
+  const shuffled = seededShuffle(cards, mulberry32(STATE.seed));
+  STATE.allCards = cards;
+  STATE.items    = shuffled.slice(0, 15);
+
+  // Build pairs with a second rng (post-shuffle)
+  STATE.pairs    = buildPairs(STATE.items, rng);
+  STATE.runs     = { p1: null, p2: null };
+
+  // Show handoff for P2 first
+  setupHandoff(2);
+  showScreen('handoff');
+}
+
+function setupHandoff(player) {
+  STATE.currentPlayer = player;
+  const isP2 = (player === 2);
+  document.getElementById('handoff-player-label').textContent =
+    isP2 ? "THE DINGLEBERRY" : "MY TURN";
+  document.getElementById('handoff-player-label').className =
+    'handoff-player ' + (isP2 ? 'p2' : 'p1');
+  document.getElementById('handoff-turn-label').textContent =
+    isP2 ? 'GOES FIRST' : 'YOUR TURN';
+  document.getElementById('handoff-instruction').innerHTML = isP2
+    ? `Hand the device to your opponent.<br>They play first. Your score stays hidden.`
+    : `Take back the device.<br>Now it's your turn. Beat their time.`;
+  document.getElementById('handoff-rule').textContent = isP2
+    ? '⚠ DO NOT SHOW THIS SCREEN TO YOUR OPPONENT'
+    : '⚠ DO NOT SHOW THIS SCREEN TO YOUR OPPONENT';
+  document.getElementById('handoff-start-btn').textContent =
+    isP2 ? 'READY → START' : 'MY TURN → START';
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  PLAYER RUN
+// ─────────────────────────────────────────────────────────────────────────────
+function startPlayerRun() {
+  STATE.itemIndex = 0;
+  STATE.correct   = 0;
+  STATE.wrong     = 0;
+  STATE.penaltyMs = 0;
+  STATE.startTime = performance.now();
+
+  // HUD
+  const isP2 = STATE.currentPlayer === 2;
+  document.getElementById('hud-player-name').textContent = isP2 ? 'DINGLEBERRY' : 'MY TURN';
+  document.getElementById('hud-player-name').style.color = isP2 ? 'var(--accent)' : 'var(--accent3)';
+  document.getElementById('hud-curr').textContent = STATE.curr.toUpperCase();
+  document.getElementById('hud-mode').textContent = STATE.mode.toUpperCase();
+
+  showScreen('game');
+  startTimer();
+  renderItem(true);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  TIMER
+// ─────────────────────────────────────────────────────────────────────────────
+function startTimer() {
+  if (STATE.timerHandle) clearInterval(STATE.timerHandle);
+  STATE.timerHandle = setInterval(() => {
+    const elapsed = (performance.now() - STATE.startTime) / 1000;
+    document.getElementById('hud-timer').textContent = elapsed.toFixed(1) + 's';
+  }, 100);
+}
+
+function stopTimer() {
+  if (STATE.timerHandle) { clearInterval(STATE.timerHandle); STATE.timerHandle = null; }
+  return performance.now() - STATE.startTime;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  RENDER ITEM
+// ─────────────────────────────────────────────────────────────────────────────
+function renderItem(first) {
+  const pair = STATE.pairs[STATE.itemIndex];
+
+  const enEl   = document.getElementById('disp-en');
+  const jpEl   = document.getElementById('disp-jp');
+  const hiraEl = document.getElementById('disp-hira');
+
+  if (!first) {
+    // Exit animation
+    enEl.classList.add('slide-down-exit');
+    jpEl.classList.add('slide-up-exit');
+    hiraEl.classList.add('slide-up-exit');
+    setTimeout(() => {
+      enEl.classList.remove('slide-down-exit');
+      jpEl.classList.remove('slide-up-exit');
+      hiraEl.classList.remove('slide-up-exit');
+      setItemText(pair, enEl, jpEl, hiraEl);
+    }, 200);
+  } else {
+    setItemText(pair, enEl, jpEl, hiraEl);
+  }
+
+  // HUD
+  document.getElementById('hud-item-num').textContent = STATE.itemIndex + 1;
+  updateAccuracyHud();
+}
+
+function setItemText(pair, enEl, jpEl, hiraEl) {
+  enEl.textContent   = pair.en;
+  jpEl.textContent   = pair.jp;
+  hiraEl.textContent = pair.hira;
+  enEl.classList.add('slide-down-enter');
+  jpEl.classList.add('slide-up-enter');
+  hiraEl.classList.add('slide-up-enter');
+  setTimeout(() => {
+    enEl.classList.remove('slide-down-enter');
+    jpEl.classList.remove('slide-up-enter');
+    hiraEl.classList.remove('slide-up-enter');
+  }, 300);
+}
+
+function updateAccuracyHud() {
+  const answered = STATE.correct + STATE.wrong;
+  const pct = answered === 0 ? 100 : Math.round(STATE.correct / answered * 100);
+  const el = document.getElementById('hud-accuracy');
+  el.textContent = pct + '%';
+  el.className = 'hud-accuracy ' + (pct < 70 && answered >= 5 ? 'danger' : 'ok');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  ANSWER
+// ─────────────────────────────────────────────────────────────────────────────
+function answer(playerSaidYes) {
+  const pair    = STATE.pairs[STATE.itemIndex];
+  const correct = (playerSaidYes === !pair.isLiar);  // isLiar=true → correct answer is NO
+
+  if (correct) {
+    STATE.correct++;
+    flashOverlay('correct');
+    advance();
+  } else {
+    STATE.wrong++;
+    STATE.penaltyMs += 3000;  // 3-second hidden penalty
+    flashOverlay('wrong');
+    shakeScreen();
+    playWrongSound();
+    showPenaltyPop();
+
+    // Check fail condition: < 70% after 5+ answers
+    const answered = STATE.correct + STATE.wrong;
+    if (answered >= 5) {
+      const pct = Math.round(STATE.correct / answered * 100);
+      if (pct < 70) {
+        setTimeout(() => triggerFail(), 400);
+        return;
+      }
+    }
+    // Small delay before advancing on wrong
+    setTimeout(() => advance(), 600);
+  }
+}
+
+function advance() {
+  STATE.itemIndex++;
+  if (STATE.itemIndex >= STATE.pairs.length) {
+    finishRun();
+  } else {
+    renderItem(false);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  FINISH RUN (survived all 15)
+// ─────────────────────────────────────────────────────────────────────────────
+function finishRun() {
+  const rawMs   = stopTimer();
+  const totalMs = rawMs + STATE.penaltyMs;
+  const answered = STATE.correct + STATE.wrong;
+  const accuracy = Math.round(STATE.correct / answered * 100);
+
+  const run = buildRunObject(totalMs, accuracy, true);
+  storeRun(run);
+
+  if (STATE.currentPlayer === 2) {
+    // P2 done, hand to P1
+    setupHandoff(1);
+    showScreen('handoff');
+  } else {
+    // Both done, calculate
+    showCalc();
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  FAIL
+// ─────────────────────────────────────────────────────────────────────────────
+function triggerFail() {
+  const rawMs   = stopTimer();
+  const totalMs = rawMs + STATE.penaltyMs;
+  const answered = STATE.correct + STATE.wrong;
+  const accuracy = Math.round(STATE.correct / answered * 100);
+
+  const run = buildRunObject(totalMs, accuracy, false);
+  storeRun(run);
+
+  // Show fail screen
+  const isP2 = STATE.currentPlayer === 2;
+  document.getElementById('fail-player-label').textContent =
+    (isP2 ? 'DINGLEBERRY' : 'MY TURN') + ' — ACCURACY COLLAPSED';
+  document.getElementById('fail-stats').innerHTML =
+    `Correct: ${STATE.correct} / ${answered}<br>Accuracy: ${accuracy}%<br>Time: ${(totalMs/1000).toFixed(1)}s`;
+
+  const btn = document.getElementById('fail-continue-btn');
+  if (isP2) {
+    btn.textContent = 'HAND TO PLAYER 1 →';
+    btn.onclick = () => { setupHandoff(1); showScreen('handoff'); };
+  } else {
+    btn.textContent = 'SEE RESULTS';
+    btn.onclick = () => showCalc();
+  }
+  showScreen('fail');
+}
+
+function buildRunObject(totalMs, accuracy, survived) {
+  const today = new Date().toISOString().slice(0, 10);
+  const run = {
+    name:       STATE.currentPlayer === 2 ? "THE DINGLEBERRY" : "MY TURN",
+    correct:    STATE.correct,
+    wrong:      STATE.wrong,
+    accuracy,
+    timeMs:     totalMs,
+    survived,
+    penaltyMs:  STATE.penaltyMs,
+    date:       today,
+    weekKey:    STATE.weekKey
+  };
+  run.dupeScore = calcDupeScore(run);
+  return run;
+}
+
+function storeRun(run) {
+  if (STATE.currentPlayer === 2) STATE.runs.p2 = run;
+  else STATE.runs.p1 = run;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  CALCULATING SCREEN
+// ─────────────────────────────────────────────────────────────────────────────
+function showCalc() {
+  showScreen('calc');
+  const log   = document.getElementById('calc-log');
+  const bar   = document.getElementById('calc-bar');
+  log.innerHTML = '';
+  bar.style.width = '0%';
+
+  const p1 = STATE.runs.p1;
+  const p2 = STATE.runs.p2;
+
+  const lines = [
+    '> LOADING RESULTS...',
+    `> P2 TIME:     ${(p2.timeMs/1000).toFixed(2)}s`,
+    `> P2 ACCURACY: ${p2.accuracy}%`,
+    `> P2 STATUS:   ${p2.survived ? 'SURVIVED' : 'ELIMINATED'}`,
+    '> ...',
+    `> P1 TIME:     ${(p1.timeMs/1000).toFixed(2)}s`,
+    `> P1 ACCURACY: ${p1.accuracy}%`,
+    `> P1 STATUS:   ${p1.survived ? 'SURVIVED' : 'ELIMINATED'}`,
+    '> ...',
+    '> COMPUTING DUEL SCORE...',
+    '> APPLYING ACCURACY BONUS...',
+    '> VERDICT LOCKED IN.',
+  ];
+
+  let i = 0;
+  function addLine() {
+    if (i >= lines.length) {
+      bar.style.width = '100%';
+      setTimeout(() => showResult(), 700);
+      return;
+    }
+    const span = document.createElement('span');
+    span.className = 'log-line';
+    span.textContent = lines[i];
+    log.appendChild(span);
+    log.scrollTop = log.scrollHeight;
+    bar.style.width = ((i+1) / lines.length * 100) + '%';
+    i++;
+    setTimeout(addLine, 280);
+  }
+  setTimeout(addLine, 400);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  RESULT SCREEN
+// ─────────────────────────────────────────────────────────────────────────────
+function showResult() {
+  const p1 = STATE.runs.p1;
+  const p2 = STATE.runs.p2;
+  const { winner, reason } = determineWinner(p1, p2);
+
+  // Save to records
+  recordDuel({ mode: STATE.mode, p1, p2 });
+
+  // Grid
+  const grid = document.getElementById('result-grid');
+  grid.innerHTML = `
+    <div class="result-cell">
+      <div class="result-cell-label">MY TIME</div>
+      <div class="result-cell-val p1c">${(p1.timeMs/1000).toFixed(1)}s</div>
+    </div>
+    <div class="result-cell">
+      <div class="result-cell-label">DINGLEBERRY TIME</div>
+      <div class="result-cell-val p2c">${(p2.timeMs/1000).toFixed(1)}s</div>
+    </div>
+    <div class="result-cell">
+      <div class="result-cell-label">MY ACCURACY</div>
+      <div class="result-cell-val p1c">${p1.accuracy}%</div>
+    </div>
+    <div class="result-cell">
+      <div class="result-cell-label">DINGLEBERRY ACC</div>
+      <div class="result-cell-val p2c">${p2.accuracy}%</div>
+    </div>
+    <div class="result-cell">
+      <div class="result-cell-label">MY STATUS</div>
+      <div class="result-cell-val p1c" style="font-size:14px">${p1.survived ? '✓ SURVIVED' : '✗ ELIMINATED'}</div>
+    </div>
+    <div class="result-cell">
+      <div class="result-cell-label">DINGLEBERRY</div>
+      <div class="result-cell-val p2c" style="font-size:14px">${p2.survived ? '✓ SURVIVED' : '✗ ELIMINATED'}</div>
+    </div>
+  `;
+
+  // Banner
+  const banner   = document.getElementById('result-banner');
+  const nameEl   = document.getElementById('result-winner-name');
+  const detailEl = document.getElementById('result-score-detail');
+  banner.className = 'result-winner-banner';
+
+  if (winner === 'p1') {
+    nameEl.textContent = 'MY TURN WINS';
+    nameEl.className   = 'result-winner-name';
+    detailEl.textContent = reason;
+  } else if (winner === 'p2') {
+    nameEl.textContent = 'DINGLEBERRY WINS';
+    nameEl.className   = 'result-winner-name';
+    detailEl.textContent = reason;
+    banner.classList.add('loser');
+    nameEl.classList.add('loser');
+  } else {
+    nameEl.textContent = 'DEAD HEAT';
+    nameEl.className   = 'result-winner-name draw';
+    detailEl.textContent = reason;
+    banner.classList.add('draw');
+  }
+
+  showScreen('result');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  RECORDS MODAL
+// ─────────────────────────────────────────────────────────────────────────────
+function openRecords() {
+  renderRecords();
+  document.getElementById('records-modal').classList.add('open');
+}
+function closeRecords() {
+  document.getElementById('records-modal').classList.remove('open');
+}
+
+function renderRecords() {
+  const rec = loadRecords();
+  const total = rec.totalDuels;
+  const p1w   = rec.p1Wins;
+  const p2w   = rec.p2Wins;
+  const draws = rec.draws;
+  const winRate = total === 0 ? '—' : Math.round(p1w / total * 100) + '%';
+
+  const fmtBest = (b) => {
+    if (!b) return '<span class="records-best-val none">NO RUNS YET</span>';
+    return `<span class="records-best-val">${(b.timeMs/1000).toFixed(1)}s &nbsp;/&nbsp; ${b.accuracy}%</span>`;
+  };
+
+  let recentHTML = '';
+  if (rec.recentRuns.length === 0) {
+    recentHTML = '<div style="color:var(--dim);font-size:11px;padding:8px 0;">No runs yet.</div>';
+  } else {
+    rec.recentRuns.forEach(r => {
+      const winnerLabel = r.winner === 'p1' ? 'MY WIN' : r.winner === 'p2' ? 'DINGLE' : 'DRAW';
+      const winnerClass = r.winner === 'p1' ? 'win' : r.winner === 'p2' ? 'loss' : '';
+      recentHTML += `
+        <div class="recent-run">
+          <span class="rr-mode">${r.mode.toUpperCase()}</span>
+          <span class="rr-time">ME: ${(r.p1.timeMs/1000).toFixed(1)}s</span>
+          <span class="rr-acc">${r.p1.accuracy}%</span>
+          <span class="rr-outcome ${winnerClass}">${winnerLabel}</span>
+          <span class="rr-date">${r.date}</span>
+        </div>`;
+    });
+  }
+
+  document.getElementById('records-content').innerHTML = `
+    <div class="records-section">
+      <div class="records-section-title">Best Times</div>
+      <div class="records-best-row">
+        <span class="records-best-label">VOCAB</span>
+        ${fmtBest(rec.best.vocab)}
+      </div>
+      <div class="records-best-row">
+        <span class="records-best-label">SENTENCES</span>
+        ${fmtBest(rec.best.sentences)}
+      </div>
+      <div class="records-best-row">
+        <span class="records-best-label">QUESTIONS</span>
+        ${fmtBest(rec.best.questions)}
+      </div>
+    </div>
+
+    <div class="records-section">
+      <div class="records-section-title">Win / Loss Record</div>
+      <div class="records-stat-row">
+        <div class="records-stat-cell">
+          <div class="records-stat-num" style="color:var(--yes)">${p1w}</div>
+          <div class="records-stat-label">MY WINS</div>
+        </div>
+        <div class="records-stat-cell">
+          <div class="records-stat-num" style="color:var(--accent2)">${p2w}</div>
+          <div class="records-stat-label">LOSSES</div>
+        </div>
+        <div class="records-stat-cell">
+          <div class="records-stat-num" style="color:var(--dim)">${draws}</div>
+          <div class="records-stat-label">DRAWS</div>
+        </div>
+        <div class="records-stat-cell">
+          <div class="records-stat-num">${winRate}</div>
+          <div class="records-stat-label">WIN RATE</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="records-section">
+      <div class="records-section-title">Recent Duels</div>
+      ${recentHTML}
+    </div>
+  `;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  FX
+// ─────────────────────────────────────────────────────────────────────────────
+function flashOverlay(type) {
+  const el = document.getElementById('flash-overlay');
+  el.className = '';
+  void el.offsetWidth; // reflow
+  el.className = 'flash-' + type;
+}
+
+function shakeScreen() {
+  const el = document.getElementById('game-content');
+  el.classList.remove('shaking');
+  void el.offsetWidth;
+  el.classList.add('shaking');
+  setTimeout(() => el.classList.remove('shaking'), 600);
+}
+
+function showPenaltyPop() {
+  const el = document.createElement('div');
+  el.className = 'penalty-pop';
+  el.textContent = '+3s PENALTY';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1200);
+}
+
+// Wrong sound: Web Audio API buzzer
+let _audioCtx = null;
+function getAudioCtx() {
+  if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return _audioCtx;
+}
+function playWrongSound() {
+  try {
+    const ctx = getAudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(120, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(60, ctx.currentTime + 0.4);
+    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.5);
+  } catch(e) {}
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  PLAY AGAIN
+// ─────────────────────────────────────────────────────────────────────────────
+function playAgain() {
+  showScreen('setup');
+}
+
+</script>
+</body>
+</html>
