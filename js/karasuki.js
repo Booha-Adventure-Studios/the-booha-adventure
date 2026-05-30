@@ -1614,12 +1614,21 @@ const HAPPY_HOUSE_PORTAL = {
   /* ═══════════════════════════════════════════
      CANVAS / FIT
   ═══════════════════════════════════════════ */
-  function resizeCanvas() {
-    const dpr = window.devicePixelRatio || 1;
-    canvas.style.width = WORLD_W + "px"; canvas.style.height = WORLD_H + "px";
-    canvas.width = Math.round(WORLD_W * dpr); canvas.height = Math.round(WORLD_H * dpr);
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  }
+ function resizeCanvas() {
+  // Android phones can report very high DPR values.
+  // A huge internal canvas + gradients/shadows = laggy Booha.
+  const rawDpr = window.devicePixelRatio || 1;
+  const dpr = IS_PHONE ? Math.min(rawDpr, 1.5) : Math.min(rawDpr, 2);
+
+  canvas.style.width = WORLD_W + "px";
+  canvas.style.height = WORLD_H + "px";
+
+  canvas.width = Math.round(WORLD_W * dpr);
+  canvas.height = Math.round(WORLD_H * dpr);
+
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+  
   function fitStage() {
     const scale = Math.max(window.innerWidth / WORLD_W, window.innerHeight / WORLD_H);
     stage.style.transform = `translate(-50%, -50%) scale(${scale})`;
@@ -1941,29 +1950,60 @@ const HAPPY_HOUSE_PORTAL = {
   /* ═══════════════════════════════════════════
      MAIN LOOP
   ═══════════════════════════════════════════ */
-  function tick(now) {
-    // FIX: tighter dt clamp (32ms max = ~30fps floor) and cap SPEED multiplier
-    // to prevent rubber-banding on Android high-refresh or stuttery frames
-    const dt=Math.min(50,Math.max(8,now-(lastTickTime||now)));
-    lastTickTime=now; SPEED=BASE_SPEED*(dt/TARGET_DT);
-    if (!anyModalOpen()) {
-      
-       tickEntryDrift(now); handleClickMovement(now); updateWanderers(now); updateNuppi(now);
-      const driftDone    = !isEntryDriftActive();
-      const spawnUnlocked = driftDone && now>=(state.spawnLockUntil||0) && state.distMovedSinceSpawn>=ARROW_MOVE_THRESHOLD;
-      if (state.roomId==="room_08"&&state.moving&&driftDone) {
-        if (Math.hypot(state.x-PORTAL.x,state.y-PORTAL.y)<=PORTAL_TRIGGER_R) { state.clickTarget=null; state.moving=false; openPortal(); }
+function tick(now) {
+  // Keep motion stable on Android when frames stutter.
+  // 32ms max = about a 30fps floor.
+  const dt = Math.min(32, Math.max(8, now - (lastTickTime || now)));
+  lastTickTime = now;
+
+  // Cap speed multiplier so one bad frame does not make Booha lurch forward.
+  const speedMult = Math.min(1.6, dt / TARGET_DT);
+  SPEED = BASE_SPEED * speedMult;
+
+  if (!anyModalOpen()) {
+    tickEntryDrift(now);
+    handleClickMovement(now);
+    updateWanderers(now);
+    updateNuppi(now);
+
+    const driftDone = !isEntryDriftActive();
+    const spawnUnlocked =
+      driftDone &&
+      now >= (state.spawnLockUntil || 0) &&
+      state.distMovedSinceSpawn >= ARROW_MOVE_THRESHOLD;
+
+    if (state.roomId === "room_08" && state.moving && driftDone) {
+      if (Math.hypot(state.x - PORTAL.x, state.y - PORTAL.y) <= PORTAL_TRIGGER_R) {
+        state.clickTarget = null;
+        state.moving = false;
+        openPortal();
       }
-      if (spawnUnlocked&&state.roomId===MAZE_EXIT.roomId) {
-        if (Math.hypot(state.x-MAZE_EXIT.x,state.y-MAZE_EXIT.y)<=MAZE_EXIT.r) { state.clickTarget=null; state.moving=false; exitToMaze(); }
-      }
-       if (spawnUnlocked) checkUtsuobaPortal();
-       if (spawnUnlocked) checkHappyHousePortal();
-      
-      if (spawnUnlocked) { const exit=getNPPExit(now); if(exit){state.clickTarget=null;state.moving=false;transitionTo(exit);} }
     }
-    drawFrame(now); requestAnimationFrame(tick);
+
+    if (spawnUnlocked && state.roomId === MAZE_EXIT.roomId) {
+      if (Math.hypot(state.x - MAZE_EXIT.x, state.y - MAZE_EXIT.y) <= MAZE_EXIT.r) {
+        state.clickTarget = null;
+        state.moving = false;
+        exitToMaze();
+      }
+    }
+
+    if (spawnUnlocked) checkUtsuobaPortal();
+    if (spawnUnlocked) checkHappyHousePortal();
+
+    if (spawnUnlocked) {
+      const exit = getNPPExit(now);
+      if (exit) {
+        state.clickTarget = null;
+        state.moving = false;
+        transitionTo(exit);
+      }
+    }
   }
+
+  drawFrame(now);
+  requestAnimationFrame(tick);
+}
 
   /* ═══════════════════════════════════════════
      MUSIC + INPUT
