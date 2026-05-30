@@ -652,7 +652,7 @@ window.QuestionBlitz = (() => {
           });
         }
       }, 200);
- 
+    }
 
        
     /* ── renderQuestion ── */
