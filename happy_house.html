@@ -594,7 +594,10 @@
   /* ═══════════════════════════════════════════
      HOTSPOT BUILDER
   ═══════════════════════════════════════════ */
+  let _mhFadeTimer = null;
+
   function clearHotspots() {
+    if (_mhFadeTimer) { clearTimeout(_mhFadeTimer); _mhFadeTimer = null; }
     hotspotLayer.innerHTML = '';
   }
 
@@ -644,6 +647,9 @@
     transitioning = true;
     lockUntil     = performance.now() + TOTAL_LOCK_MS;
 
+    // Clear hotspots immediately so PNG overlays don't bleed into the crossfade
+    clearHotspots();
+
     const outEl = getSceneEl(currentScene);
     const inEl  = getSceneEl(targetSceneId);
 
@@ -679,7 +685,6 @@
 
       currentScene = targetSceneId;
 
-      clearHotspots();
       buildHotspotsForScene(currentScene);
       updateBackBtn(SCENES[currentScene]);
 
@@ -744,7 +749,7 @@
       img.style.left = scene.misterHappy.hotspot.x + '%';
       img.style.top  = scene.misterHappy.hotspot.y + '%';
       hotspotLayer.appendChild(img);
-      setTimeout(() => img.classList.add('faded'), 600);
+      _mhFadeTimer = setTimeout(() => { img.classList.add('faded'); _mhFadeTimer = null; }, 600);
     }
   }
 
