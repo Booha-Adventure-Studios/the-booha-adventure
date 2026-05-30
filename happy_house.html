@@ -28,7 +28,6 @@
 <script src="./js/token.js"></script>
 <!-- ═══════════════════════════════════════════════════════ -->
 
-  
 <style>
   html, body {
     margin: 0; padding: 0;
@@ -73,14 +72,12 @@
     z-index: 2;
     transform: scale(1.0);
   }
-  /* Outgoing: zooms toward you and fades */
   .hh-scene.zooming-out {
     opacity: 0;
     transform: scale(1.07);
     z-index: 2;
     transition: opacity 1.1s ease-in-out, transform 1.4s ease-in-out;
   }
-  /* Incoming: starts zoomed, settles back, sits on top */
   .hh-scene.zooming-in {
     opacity: 1;
     transform: scale(1.0);
@@ -88,7 +85,7 @@
     transition: opacity 1.1s ease-in-out, transform 1.4s ease-in-out;
   }
 
-  /* ── Fade overlay for transitions ── */
+  /* ── Fade overlay ── */
   #hh-fade {
     position: absolute;
     inset: 0;
@@ -99,7 +96,7 @@
     transition: opacity 0.6s ease-in-out;
   }
 
-  /* ── Hotspot glows ── */
+  /* ── Hotspots ── */
   .hh-hotspot {
     position: absolute;
     border-radius: 50%;
@@ -110,7 +107,6 @@
     background: transparent;
   }
 
-  /* Forward glow — warm amber pool of light on the floor, no solid core */
   .hh-hotspot.forward {
     width: 12%;
     aspect-ratio: 1;
@@ -122,7 +118,6 @@
     animation: hh-pulse-forward 2.8s ease-in-out infinite;
   }
 
-  /* Back arrow — small, top-left, subtle */
   #hh-back-btn {
     position: absolute;
     top: 4%;
@@ -155,7 +150,6 @@
     border-color: rgba(255, 220, 140, 0.55);
   }
 
-  /* Branch choice hotspots — left and right at end-of-hall */
   .hh-hotspot.branch-left {
     width: 11%;
     aspect-ratio: 1;
@@ -177,7 +171,23 @@
     animation: hh-pulse-branch 2.6s ease-in-out infinite 0.4s;
   }
 
-  /* Rotate prompt */
+  /* ── Trophy hotspot ── */
+  .hh-hotspot.trophy {
+    width: 8%;
+    aspect-ratio: 1;
+    background: transparent;
+    border-radius: 50%;
+  }
+
+  /* ── Liar Machine hotspot ── */
+  .hh-hotspot.liar-machine {
+    width: 10%;
+    aspect-ratio: 1;
+    background: transparent;
+    border-radius: 50%;
+  }
+
+  /* ── Rotate prompt ── */
   #hh-rotate {
     display: none;
     position: fixed;
@@ -223,6 +233,61 @@
   }
   @keyframes hh-rotatehint  { 0%,100%{transform:rotate(0deg);}40%,60%{transform:rotate(-90deg);} }
   @keyframes hh-barshimmer  { 0%{background-position:0%}100%{background-position:200%} }
+
+  /* ══ DEV TOOLS ══════════════════════════════════════════ */
+  #hh-dev-coords {
+    display: none;
+    position: absolute;
+    top: 6px; right: 8px;
+    z-index: 900;
+    background: rgba(0,0,0,0.75);
+    color: #0f0;
+    font-family: monospace;
+    font-size: 12px;
+    padding: 4px 8px;
+    border: 1px solid #0f0;
+    pointer-events: none;
+    letter-spacing: 1px;
+  }
+  #hh-dev-panel {
+    display: none;
+    position: absolute;
+    bottom: 8px; left: 8px;
+    z-index: 900;
+    background: rgba(0,0,0,0.85);
+    color: #ff0;
+    font-family: monospace;
+    font-size: 11px;
+    padding: 10px 12px;
+    border: 1px solid #ff0;
+    min-width: 220px;
+    line-height: 1.8;
+  }
+  #hh-dev-panel button {
+    display: block;
+    margin-top: 6px;
+    font-family: monospace;
+    font-size: 11px;
+    background: #222;
+    color: #ff0;
+    border: 1px solid #ff0;
+    padding: 3px 8px;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+  }
+  #hh-dev-panel button:hover { background: #333; }
+  #hh-dev-click-marker {
+    display: none;
+    position: absolute;
+    width: 12px; height: 12px;
+    border: 2px solid #f0f;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 901;
+  }
+  /* ══ END DEV TOOLS ══════════════════════════════════════ */
 </style>
 </head>
 <body>
@@ -230,35 +295,175 @@
 <div id="hh-app">
   <div id="hh-stage">
 
-    <!-- Scene images — all preloaded, only one visible at a time -->
-    <img class="hh-scene" id="scene-entry"       src="assets/happy_house/entry.jpg"       alt="">
-    <img class="hh-scene" id="scene-mid-hall"    src="assets/happy_house/mid-hall.jpg"    alt="">
-    <img class="hh-scene" id="scene-end-of-hall" src="assets/happy_house/end-of-hall.jpg" alt="">
-    <img class="hh-scene" id="scene-left-branch" src="assets/happy_house/left-branch.jpg" alt="">
+    <!-- Scene images -->
+    <img class="hh-scene" id="scene-entry"        src="assets/happy_house/entry.jpg"        alt="">
+    <img class="hh-scene" id="scene-mid-hall"     src="assets/happy_house/mid-hall.jpg"     alt="">
+    <img class="hh-scene" id="scene-end-of-hall"  src="assets/happy_house/end-of-hall.jpg"  alt="">
+    <img class="hh-scene" id="scene-left-branch"  src="assets/happy_house/left-branch.jpg"  alt="">
     <img class="hh-scene" id="scene-right-branch" src="assets/happy_house/right-branch.jpg" alt="">
-    <img class="hh-scene" id="scene-game-room"   src="assets/happy_house/game-room.jpg"   alt="">
+    <img class="hh-scene" id="scene-game-room"    src="assets/happy_house/game-room.jpg"    alt="">
 
-    <!-- Hotspot layer — repositioned per scene by JS -->
+    <!-- Hotspot layer -->
     <div id="hh-hotspot-layer"></div>
 
     <!-- Back button -->
-    <div id="hh-back-btn">← 戻る</div>
+    <div id="hh-back-btn">&#8592; 戻る</div>
 
     <!-- Fade overlay -->
     <div id="hh-fade"></div>
+
+    <!-- DEV: coord display (top-right) -->
+    <div id="hh-dev-coords">x: 0.0% y: 0.0%</div>
+
+    <!-- DEV: panel (bottom-left) -->
+    <div id="hh-dev-panel">
+      <div id="hh-dev-scene-label">scene: entry</div>
+      <div id="hh-dev-last-click">last click: —</div>
+      <button onclick="hhDevCopyLast()">copy last click coords</button>
+      <button onclick="hhDevCopyScene()">copy scene name</button>
+      <button onclick="hhDevClearRecords()">clear liar records</button>
+    </div>
+
+    <!-- DEV: click marker -->
+    <div id="hh-dev-click-marker"></div>
+
   </div>
 </div>
 
 <!-- Rotate overlay -->
 <div id="hh-rotate">
-  <span class="hh-rotate-phone">📱</span>
+  <span class="hh-rotate-phone">&#128241;</span>
   <div class="hh-rotate-bar"></div>
   <p class="hh-rotate-title">横にして遊ぼう！</p>
   <p class="hh-rotate-sub">横画面で遊んでね。</p>
 </div>
 
+<!-- ═══ LIAR MACHINE RECORDS MODAL ════════════════════════ -->
+<div id="liar-records-modal" style="
+  display:none;
+  position:fixed; inset:0;
+  background:rgba(0,0,0,0.88);
+  z-index:9000;
+  align-items:center;
+  justify-content:center;
+  padding:16px;
+  font-family:'Share Tech Mono',monospace;
+">
+  <div style="
+    background:#11111a;
+    border:1px solid #2a2a3a;
+    width:100%; max-width:420px;
+    max-height:90vh;
+    overflow-y:auto;
+    padding:20px;
+    color:#f0f0f0;
+  ">
+    <div style="font-family:sans-serif;font-size:20px;color:#e8c84a;letter-spacing:3px;text-align:center;margin-bottom:4px;font-weight:900;">
+      THE LIAR MACHINE
+    </div>
+    <div style="font-size:10px;letter-spacing:3px;color:#666680;text-align:center;margin-bottom:16px;">
+      MISTER HAPPY'S RECORDS
+    </div>
+    <div id="liar-records-body"></div>
+    <button onclick="closeLiarRecords()" style="
+      display:block; width:100%; margin-top:16px;
+      font-family:monospace;
+      font-size:12px; letter-spacing:2px;
+      padding:10px; border:1px solid #2a2a3a;
+      background:transparent; color:#666680; cursor:pointer;
+      text-transform:uppercase;
+    ">CLOSE</button>
+  </div>
+</div>
+<!-- ════════════════════════════════════════════════════════ -->
+
 <script>
 (() => {
+
+  /* ══ DEV MODE ══════════════════════════════════════════ */
+  const DEV_MODE = false; // 🔧 toggle
+
+  const devCoordsEl  = document.getElementById('hh-dev-coords');
+  const devPanelEl   = document.getElementById('hh-dev-panel');
+  const devMarkerEl  = document.getElementById('hh-dev-click-marker');
+  const devSceneLbl  = document.getElementById('hh-dev-scene-label');
+  const devClickLbl  = document.getElementById('hh-dev-last-click');
+  let   devLastClick = null;
+
+  function devShow() {
+    devCoordsEl.style.display = 'block';
+    devPanelEl.style.display  = 'block';
+    devMarkerEl.style.display = 'block';
+  }
+  function devHide() {
+    devCoordsEl.style.display = 'none';
+    devPanelEl.style.display  = 'none';
+    devMarkerEl.style.display = 'none';
+  }
+
+  if (DEV_MODE) devShow();
+
+  // Expose console trigger: b_4800()
+  Object.defineProperty(window, 'b_4800', {
+    enumerable: false,
+    get() {
+      return () => {
+        const on = devPanelEl.style.display === 'block';
+        on ? devHide() : devShow();
+        console.log('[HH DEV] panel ' + (on ? 'OFF' : 'ON'));
+      };
+    }
+  });
+
+  // Mouse move: show x/y as % of stage
+  const stage = document.getElementById('hh-stage');
+  stage.addEventListener('mousemove', (e) => {
+    if (devPanelEl.style.display !== 'block') return;
+    const r = stage.getBoundingClientRect();
+    const x = ((e.clientX - r.left) / r.width  * 100).toFixed(1);
+    const y = ((e.clientY - r.top)  / r.height * 100).toFixed(1);
+    devCoordsEl.textContent = 'x: ' + x + '%  y: ' + y + '%';
+  });
+
+  // Click: drop marker and record coords
+  stage.addEventListener('click', (e) => {
+    if (devPanelEl.style.display !== 'block') return;
+    const r = stage.getBoundingClientRect();
+    const x = ((e.clientX - r.left) / r.width  * 100).toFixed(1);
+    const y = ((e.clientY - r.top)  / r.height * 100).toFixed(1);
+    devLastClick = { x, y };
+    devClickLbl.textContent = 'last click: x:' + x + ' y:' + y;
+    devMarkerEl.style.left = x + '%';
+    devMarkerEl.style.top  = y + '%';
+  }, true); // capture so it fires even when hotspot swallows the click
+
+  function hhDevCopyLast() {
+    if (!devLastClick) { console.log('[HH DEV] no click recorded yet'); return; }
+    const txt = 'hotspot: { x: ' + devLastClick.x + ', y: ' + devLastClick.y + ' }';
+    navigator.clipboard.writeText(txt).then(
+      ()  => console.log('[HH DEV] copied: ' + txt),
+      ()  => console.log('[HH DEV] clipboard blocked — coords: ' + txt)
+    );
+  }
+  function hhDevCopyScene() {
+    navigator.clipboard.writeText(currentScene).then(
+      ()  => console.log('[HH DEV] copied scene: ' + currentScene),
+      ()  => console.log('[HH DEV] scene: ' + currentScene)
+    );
+  }
+  function hhDevClearRecords() {
+    localStorage.removeItem('booha_liar_machine');
+    console.log('[HH DEV] booha_liar_machine cleared');
+  }
+
+  // Keep these accessible from panel buttons (outside IIFE scope)
+  window.hhDevCopyLast  = hhDevCopyLast;
+  window.hhDevCopyScene = hhDevCopyScene;
+  window.hhDevClearRecords = hhDevClearRecords;
+
+  /* ══ END DEV TOOLS ═════════════════════════════════════ */
+
+
   /* ── BGM ── */
   const bgm = new Audio('assets/happy_house/happy-house.mp3');
   bgm.loop   = true;
@@ -277,29 +482,23 @@
   /* ═══════════════════════════════════════════
      CONSTANTS
   ═══════════════════════════════════════════ */
-  const TRANSITION_MS      = 1200; // crossfade duration
-  const COOLDOWN_AFTER_MS  = 400;  // extra dead time after transition completes
-  const TOTAL_LOCK_MS      = TRANSITION_MS + COOLDOWN_AFTER_MS;
+  const TRANSITION_MS     = 1200;
+  const COOLDOWN_AFTER_MS = 400;
+  const TOTAL_LOCK_MS     = TRANSITION_MS + COOLDOWN_AFTER_MS;
 
   /* ═══════════════════════════════════════════
      SCENE GRAPH
-     Each scene defines:
-       id       — matches <img> element id
-       forward  — { sceneId, hotspot: {x,y} as % of stage }
-       back     — sceneId to go back to (null = exit to karasuki)
-       branches — optional left/right at split point
   ═══════════════════════════════════════════ */
   const SCENES = {
     'entry': {
-      forward:  { to: 'mid-hall',    hotspot: { x: 50, y: 52 } },
-      back:     null, // exits to karasuki
+      forward: { to: 'mid-hall', hotspot: { x: 50, y: 52 } },
+      back: null,
     },
     'mid-hall': {
-      forward:  { to: 'end-of-hall', hotspot: { x: 50, y: 50 } },
-      back:     'entry',
+      forward: { to: 'end-of-hall', hotspot: { x: 50, y: 50 } },
+      back: 'entry',
     },
     'end-of-hall': {
-      // No single forward — branches here
       branches: {
         left:  { to: 'left-branch',  hotspot: { x: 24, y: 54 } },
         right: { to: 'right-branch', hotspot: { x: 74, y: 52 } },
@@ -307,7 +506,6 @@
       back: 'mid-hall',
     },
     'left-branch': {
-      // Dead end — no forward, back only
       back: 'end-of-hall',
     },
     'right-branch': {
@@ -315,7 +513,9 @@
       back: 'end-of-hall',
     },
     'game-room': {
-      // Terminal — back only
+      // x/y placeholders — tune with b_4800() coord overlay once art is in
+      trophy:       { hotspot: { x: 30, y: 50 } },
+      liarMachine:  { hotspot: { x: 65, y: 50 } },
       back: 'right-branch',
     },
   };
@@ -330,10 +530,9 @@
   /* ═══════════════════════════════════════════
      DOM REFS
   ═══════════════════════════════════════════ */
-  const fadeEl       = document.getElementById('hh-fade'); // kept for exit-to-karasuki only
-  const backBtn     = document.getElementById('hh-back-btn');
+  const fadeEl       = document.getElementById('hh-fade');
+  const backBtn      = document.getElementById('hh-back-btn');
   const hotspotLayer = document.getElementById('hh-hotspot-layer');
-  const stage       = document.getElementById('hh-stage');
 
   function getSceneEl(sceneId) {
     return document.getElementById('scene-' + sceneId);
@@ -351,7 +550,6 @@
     el.className  = 'hh-hotspot ' + cssClass;
     el.style.left = xPct + '%';
     el.style.top  = yPct + '%';
-    // Prevent ghost taps from stacking — only fire once per transition
     el.addEventListener('click', (e) => {
       e.stopPropagation();
       onClick();
@@ -376,7 +574,6 @@
     const scene = SCENES[currentScene];
     if (!scene) return;
     if (scene.back === null) {
-      // Exit to Karasuki
       exitToKarasuki();
     } else if (scene.back) {
       navigateTo(scene.back);
@@ -384,7 +581,7 @@
   });
 
   /* ═══════════════════════════════════════════
-     NAVIGATION — cross-dissolve, no black flash
+     NAVIGATION
   ═══════════════════════════════════════════ */
   function navigateTo(targetSceneId) {
     if (performance.now() < lockUntil) return;
@@ -397,53 +594,48 @@
     const outEl = getSceneEl(currentScene);
     const inEl  = getSceneEl(targetSceneId);
 
-    // Prepare incoming: invisible, slightly zoomed in, ready to cross-dissolve
     inEl.style.transition = 'none';
     inEl.classList.remove('visible', 'zooming-in', 'zooming-out');
     inEl.style.opacity   = '0';
     inEl.style.transform = 'scale(1.06)';
     inEl.style.zIndex    = '3';
 
-    // Force reflow so the browser registers the starting state
     void inEl.offsetWidth;
 
-    // Re-enable transitions then trigger both animations simultaneously
     inEl.style.transition = 'opacity 1.1s ease-in-out, transform 1.4s ease-in-out';
 
     requestAnimationFrame(() => {
-      // Outgoing: fade + zoom toward viewer
       outEl.style.transition = 'opacity 1.1s ease-in-out, transform 1.4s ease-in-out';
       outEl.style.opacity    = '0';
       outEl.style.transform  = 'scale(1.07)';
       outEl.style.zIndex     = '2';
 
-      // Incoming: fade in + settle to normal scale
       inEl.style.opacity   = '1';
       inEl.style.transform = 'scale(1.0)';
     });
 
     setTimeout(() => {
-      // Clean up outgoing
       outEl.style.transition = 'none';
       outEl.style.opacity    = '0';
       outEl.style.transform  = 'scale(1.0)';
       outEl.style.zIndex     = '1';
       outEl.classList.remove('visible');
 
-      // Settle incoming as the new current
       inEl.style.zIndex = '2';
       inEl.classList.add('visible');
 
       currentScene = targetSceneId;
 
-      // Rebuild hotspots and back button
       clearHotspots();
       buildHotspotsForScene(currentScene);
       updateBackBtn(SCENES[currentScene]);
 
-      setTimeout(() => {
-        transitioning = false;
-      }, COOLDOWN_AFTER_MS);
+      // DEV: update scene label
+      if (devPanelEl.style.display === 'block') {
+        devSceneLbl.textContent = 'scene: ' + currentScene;
+      }
+
+      setTimeout(() => { transitioning = false; }, COOLDOWN_AFTER_MS);
 
     }, TRANSITION_MS);
   }
@@ -452,19 +644,31 @@
     const scene = SCENES[sceneId];
     if (!scene) return;
 
-    // Forward hotspot
     if (scene.forward) {
       makeHotspot('forward', scene.forward.hotspot.x, scene.forward.hotspot.y, () => {
         navigateTo(scene.forward.to);
       });
     }
 
-    // Branch hotspots (end-of-hall only for now)
     if (scene.branches) {
       const bl = scene.branches.left;
       const br = scene.branches.right;
       if (bl) makeHotspot('branch-left',  bl.hotspot.x, bl.hotspot.y, () => navigateTo(bl.to));
       if (br) makeHotspot('branch-right', br.hotspot.x, br.hotspot.y, () => navigateTo(br.to));
+    }
+
+    // Game room interactive objects
+    if (scene.trophy) {
+      makeHotspot('trophy', scene.trophy.hotspot.x, scene.trophy.hotspot.y, () => {
+        openLiarRecords();
+      });
+    }
+
+    if (scene.liarMachine) {
+      makeHotspot('liar-machine', scene.liarMachine.hotspot.x, scene.liarMachine.hotspot.y, () => {
+        try { bgm.pause(); } catch(_) {}
+        window.location.href = 'liar_machine.html';
+      });
     }
   }
 
@@ -475,10 +679,9 @@
     if (transitioning) return;
     transitioning = true;
     try { bgm.pause(); bgm.currentTime = 0; } catch (_) {}
-    fadeEl.style.transition = `opacity 0.6s ease-in`;
+    fadeEl.style.transition = 'opacity 0.6s ease-in';
     fadeEl.style.opacity    = '1';
     setTimeout(() => {
-      // Return room is set by karasuki before we arrived; just go back
       window.location.href = 'karasuki.html';
     }, 700);
   }
@@ -487,7 +690,6 @@
      INIT
   ═══════════════════════════════════════════ */
   function init() {
-    // Show entry scene immediately — set inline styles to match .visible state
     const entryEl = getSceneEl('entry');
     entryEl.style.opacity   = '1';
     entryEl.style.transform = 'scale(1.0)';
@@ -497,18 +699,115 @@
     buildHotspotsForScene('entry');
     updateBackBtn(SCENES['entry']);
 
-    // Block all stage clicks during transition
     stage.addEventListener('click', (e) => {
       if (performance.now() < lockUntil) {
         e.stopPropagation();
         e.preventDefault();
       }
-    }, true); // capture phase — fires before hotspot handlers
+    }, true);
   }
 
   init();
 
 })();
 </script>
+
+
+<!-- ═══ LIAR MACHINE RECORDS ════════════════════════════ -->
+<script>
+const LIAR_STORE = 'booha_liar_machine';
+
+function loadLiarRecords() {
+  try {
+    const raw = localStorage.getItem(LIAR_STORE);
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  return {
+    totalDuels: 0, p1Wins: 0, p2Wins: 0, draws: 0,
+    best: { vocab: null, sentences: null, questions: null },
+    recentRuns: []
+  };
+}
+
+function openLiarRecords() {
+  const rec     = loadLiarRecords();
+  const total   = rec.totalDuels;
+  const p1w     = rec.p1Wins;
+  const p2w     = rec.p2Wins;
+  const draws   = rec.draws;
+  const winRate = total === 0 ? '—' : Math.round(p1w / total * 100) + '%';
+
+  const fmtBest = (b) => b
+    ? `<span style="color:#e8c84a">${(b.timeMs/1000).toFixed(1)}s &nbsp;/&nbsp; ${b.accuracy}%</span>`
+    : `<span style="color:#2a2a3a;font-size:12px">NO RUNS YET</span>`;
+
+  let recentHTML = '<div style="color:#666680;font-size:11px;padding:8px 0;">No runs yet.</div>';
+  if (rec.recentRuns.length > 0) {
+    recentHTML = rec.recentRuns.map(r => {
+      const wl = r.winner === 'p1'
+        ? '<span style="color:#2ecc71">MY WIN</span>'
+        : r.winner === 'p2'
+          ? '<span style="color:#e74c3c">DINGLE</span>'
+          : '<span style="color:#666680">DRAW</span>';
+      return `<div style="display:flex;justify-content:space-between;font-size:11px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.04);gap:8px;flex-wrap:wrap;">
+        <span style="color:#4ecaff;letter-spacing:1px;min-width:60px">${r.mode.toUpperCase()}</span>
+        <span>ME: ${(r.p1.timeMs/1000).toFixed(1)}s</span>
+        <span style="color:#666680">${r.p1.accuracy}%</span>
+        ${wl}
+        <span style="color:#666680;font-size:10px">${r.date}</span>
+      </div>`;
+    }).join('');
+  }
+
+  document.getElementById('liar-records-body').innerHTML = `
+    <div style="border-top:1px solid #2a2a3a;padding-top:12px;margin-top:4px;">
+      <div style="font-size:9px;letter-spacing:4px;color:#666680;text-transform:uppercase;margin-bottom:8px;">Best Times</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:13px;border-bottom:1px solid rgba(255,255,255,0.04);">
+        <span style="color:#666680">VOCAB</span>${fmtBest(rec.best.vocab)}
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:13px;border-bottom:1px solid rgba(255,255,255,0.04);">
+        <span style="color:#666680">SENTENCES</span>${fmtBest(rec.best.sentences)}
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:13px;">
+        <span style="color:#666680">QUESTIONS</span>${fmtBest(rec.best.questions)}
+      </div>
+    </div>
+    <div style="border-top:1px solid #2a2a3a;padding-top:12px;margin-top:12px;">
+      <div style="font-size:9px;letter-spacing:4px;color:#666680;text-transform:uppercase;margin-bottom:8px;">Win / Loss Record</div>
+      <div style="display:flex;gap:2px;margin-bottom:8px;">
+        <div style="flex:1;text-align:center;background:rgba(255,255,255,0.03);border:1px solid #2a2a3a;padding:8px 4px;">
+          <div style="font-size:22px;font-weight:900;color:#2ecc71">${p1w}</div>
+          <div style="font-size:9px;letter-spacing:2px;color:#666680;margin-top:2px;text-transform:uppercase">MY WINS</div>
+        </div>
+        <div style="flex:1;text-align:center;background:rgba(255,255,255,0.03);border:1px solid #2a2a3a;padding:8px 4px;">
+          <div style="font-size:22px;font-weight:900;color:#e74c3c">${p2w}</div>
+          <div style="font-size:9px;letter-spacing:2px;color:#666680;margin-top:2px;text-transform:uppercase">LOSSES</div>
+        </div>
+        <div style="flex:1;text-align:center;background:rgba(255,255,255,0.03);border:1px solid #2a2a3a;padding:8px 4px;">
+          <div style="font-size:22px;font-weight:900;color:#666680">${draws}</div>
+          <div style="font-size:9px;letter-spacing:2px;color:#666680;margin-top:2px;text-transform:uppercase">DRAWS</div>
+        </div>
+        <div style="flex:1;text-align:center;background:rgba(255,255,255,0.03);border:1px solid #2a2a3a;padding:8px 4px;">
+          <div style="font-size:22px;font-weight:900;color:#f0f0f0">${winRate}</div>
+          <div style="font-size:9px;letter-spacing:2px;color:#666680;margin-top:2px;text-transform:uppercase">WIN RATE</div>
+        </div>
+      </div>
+    </div>
+    <div style="border-top:1px solid #2a2a3a;padding-top:12px;margin-top:4px;">
+      <div style="font-size:9px;letter-spacing:4px;color:#666680;text-transform:uppercase;margin-bottom:8px;">Recent Duels</div>
+      ${recentHTML}
+    </div>
+  `;
+
+  const modal = document.getElementById('liar-records-modal');
+  modal.style.display = 'flex';
+}
+
+function closeLiarRecords() {
+  document.getElementById('liar-records-modal').style.display = 'none';
+}
+</script>
+<!-- ════════════════════════════════════════════════════════ -->
+
 </body>
 </html>
