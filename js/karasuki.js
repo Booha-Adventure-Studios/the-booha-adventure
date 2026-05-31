@@ -2019,6 +2019,16 @@ function tick(now) {
   } catch (_) { return 0; }
 }
 
+function getBoohaFirstName() {
+  try {
+    const direct = localStorage.getItem('booha_first_name');
+    if (direct) return direct.charAt(0).toUpperCase() + direct.slice(1).toLowerCase().slice(0, 12);
+    const full = localStorage.getItem('booha_user_name') || '';
+    const first = full.split(' ')[0].slice(0, 12);
+    return first.charAt(0).toUpperCase() + first.slice(1).toLowerCase();
+  } catch (_) { return ''; }
+}
+
 function getObserverRoomId() {
   const rooms  = Object.keys(window.KARASUKI_DATA.OBSERVER_COORDS);
   const cal    = window.CALENDAR.getCurrentCurriculumWeek();
@@ -2085,7 +2095,9 @@ function openObserverPop() {
   const line    = lines[Math.min(games, lines.length - 1)];
   document.getElementById('obs-pop-line-en').textContent = line.en;
   document.getElementById('obs-pop-line-jp').textContent = line.jp;
-  document.getElementById('obs-pop-count').textContent   = `${games} / 9`;
+  
+  const name = getBoohaFirstName();
+  document.getElementById('obs-pop-count').textContent   = name ? `${name} — ${games} / 9` : `${games} / 9`;
   observerPopOpen = true;
   observerPopEl.style.display    = 'flex';
   observerPopEl.style.background = 'rgba(0,0,0,0.88)';
@@ -2130,19 +2142,150 @@ function clickCheckObserver(worldX, worldY) {
   const NUPPI_IDLE_DRIFT  = 0.18;
   const NUPPI_GLOW_R      = 90;
  
-  /* ── Nuppi dialogue ── */
-  const NUPPI_LINES = [
-    { en: "You came back.",
-      jp: "また来たね。" },
-    { en: "Something followed you here. Not me.",
-      jp: "何かがついてきた。私じゃない。" },
-    { en: "I heard your name once. I kept it.",
-      jp: "あなたの名前、一回聞こえた。取っておいた。" },
-    { en: "You looked sad before. I watched.",
-      jp: "さっき悲しそうだった。見てた。" },
-    { en: "I gave something to someone like you. They threw it away.",
-      jp: "あなたに似た人に何かあげた。捨てられた。" },
-  ];
+ /* ── Nuppi dialogue ── */
+const NUPPI_LINES = [
+  {
+    en: "{name}, you came back.",
+    jp: "{name}、また来たね。"
+  },
+  {
+    en: "{name}, something followed you here. Not me.",
+    jp: "{name}、何かがついてきたよ。私じゃない。"
+  },
+  {
+    en: "{name}, I heard your name once. I kept it.",
+    jp: "{name}、名前を一回聞いたよ。取っておいた。"
+  },
+  {
+    en: "{name}, you looked sad before. I watched.",
+    jp: "{name}、さっき悲しそうだったね。見てたよ。"
+  },
+  {
+    en: "{name}, I gave something to someone like you. They threw it away.",
+    jp: "{name}、きみに似た子に何かあげたよ。捨てられたけど。"
+  },
+
+  {
+    en: "{name}, don’t worry. I only remember small things.",
+    jp: "{name}、だいじょうぶ。小さいことしか覚えてないよ。"
+  },
+  {
+    en: "{name}, your shadow came first.",
+    jp: "{name}、影のほうが先に来たよ。"
+  },
+  {
+    en: "{name}, I found a lost thought. Is it yours?",
+    jp: "{name}、なくした考えを見つけたよ。きみの？"
+  },
+  {
+    en: "{name}, I was quiet. That doesn’t mean I wasn’t listening.",
+    jp: "{name}、静かにしてたよ。聞いてなかったわけじゃないよ。"
+  },
+  {
+    en: "{name}, Booha trusts you. I’m still thinking.",
+    jp: "{name}、ブーハーはきみを信じてるよ。私はまだ考え中。"
+  },
+  {
+    en: "{name}, the maze changed when you blinked.",
+    jp: "{name}、まばたきした時に、めいろが変わったよ。"
+  },
+  {
+    en: "{name}, I saved a sound for you. It was very small.",
+    jp: "{name}、きみに音を取っておいたよ。すごく小さい音。"
+  },
+  {
+    en: "{name}, someone forgot this place. Maybe on purpose.",
+    jp: "{name}、だれかがここを忘れたよ。わざとかも。"
+  },
+  {
+    en: "{name}, if you hear your name twice, don’t answer the second one.",
+    jp: "{name}、名前を二回聞いたら、二回目には返事しないで。"
+  },
+  {
+    en: "{name}, I like your name. It fits in my pocket.",
+    jp: "{name}、その名前、いいね。ポケットに入る。"
+  },
+  {
+    en: "{name}, I saw a door pretending to be a wall.",
+    jp: "{name}、壁のふりをしてるドアを見たよ。"
+  },
+  {
+    en: "{name}, I’m not lost. I just don’t agree with the map.",
+    jp: "{name}、私はまいごじゃないよ。地図と意見が合わないだけ。"
+  },
+  {
+    en: "{name}, one of the lights blinked when you looked away.",
+    jp: "{name}、きみが見てない時、光が一つまばたきしたよ。"
+  },
+  {
+    en: "{name}, I found a button. Not the kind you press.",
+    jp: "{name}、ボタンを見つけたよ。押すほうじゃないやつ。"
+  },
+  {
+    en: "{name}, don’t step on the quiet parts.",
+    jp: "{name}、静かなところはふまないでね。"
+  },
+  {
+    en: "{name}, I think the maze likes you. That might be bad.",
+    jp: "{name}、めいろはきみが好きみたい。ちょっとこわいね。"
+  },
+  {
+    en: "{name}, I heard Booha laughing behind the trees.",
+    jp: "{name}、木の後ろでブーハーが笑ってたよ。"
+  },
+  {
+    en: "{name}, I had a dream, but it ran away.",
+    jp: "{name}、夢を見たよ。でも逃げちゃった。"
+  },
+  {
+    en: "{name}, if you find a key, ask what it forgot.",
+    jp: "{name}、カギを見つけたら、何を忘れたか聞いてね。"
+  },
+  {
+    en: "{name}, your footsteps sound different today.",
+    jp: "{name}、今日の足音、いつもとちがうね。"
+  },
+  {
+    en: "{name}, I put your worry under a rock. Don’t lift it.",
+    jp: "{name}、心配を石の下に入れたよ。持ち上げないでね。"
+  },
+  {
+    en: "{name}, the forest said hello. Very quietly.",
+    jp: "{name}、森がこんにちはって言ったよ。すごく小さく。"
+  },
+  {
+    en: "{name}, I’m smiling. You can tell because I said so.",
+    jp: "{name}、私は笑ってるよ。そう言ったからわかるでしょ。"
+  },
+  {
+    en: "{name}, something shiny is pretending not to be important.",
+    jp: "{name}、キラキラしたものが、大事じゃないふりをしてるよ。"
+  },
+  {
+    en: "{name}, I don’t bite. I collect.",
+    jp: "{name}、かまないよ。集めるだけ。"
+  },
+  {
+    en: "{name}, if Booha runs, follow. If I run, maybe don’t.",
+    jp: "{name}、ブーハーが走ったらついていって。私が走ったら……どうかな。"
+  },
+  {
+    en: "{name}, I found a memory with no owner.",
+    jp: "{name}、持ち主のいない思い出を見つけたよ。"
+  },
+  {
+    en: "{name}, the dark isn’t empty. It’s just shy.",
+    jp: "{name}、暗いところは空っぽじゃないよ。はずかしがりなだけ。"
+  },
+  {
+    en: "{name}, I was here before I arrived.",
+    jp: "{name}、来る前からここにいたよ。"
+  },
+  {
+    en: "{name}, don’t worry. I only know some of your secrets.",
+    jp: "{name}、だいじょうぶ。秘密は少ししか知らないよ。"
+  }
+];
  
   /* ── Nuppi state ── */
   const nuppi = {
@@ -2359,8 +2502,13 @@ function clickCheckObserver(worldX, worldY) {
  
   function openNuppiPop() {
     const line = NUPPI_LINES[Math.floor(Math.random() * NUPPI_LINES.length)];
-    document.getElementById('nuppi-pop-en').textContent = line.en;
-    document.getElementById('nuppi-pop-jp').textContent = line.jp;
+    
+    const name = getBoohaFirstName();
+    const en = name ? line.en.replace('{name}', name) : line.en.replace('{name}, ', '').replace('{name}、', '');
+    const jp = name ? line.jp.replace('{name}', name) : line.jp.replace('{name}、', '').replace('{name}, ', '');
+    document.getElementById('nuppi-pop-en').textContent = en;
+   document.getElementById('nuppi-pop-jp').textContent = jp;
+    
     nuppiPopOpen              = true;
     nuppi.frozen              = true;
     nuppiPopEl.style.display    = 'flex';
