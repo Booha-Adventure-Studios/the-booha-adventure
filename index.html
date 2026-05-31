@@ -286,6 +286,20 @@
       line-height: 1.1;
     }
 
+    .playerGreeting {
+  margin-top: -4px;
+  font-size: clamp(11px, 1.6vw, 16px);
+  font-weight: 900;
+  letter-spacing: 2px;
+  color: rgba(255,255,255,.82);
+  text-shadow:
+    0 0 18px rgba(255,120,220,.45),
+    0 2px 8px rgba(0,0,0,.8);
+  text-transform: uppercase;
+}
+
+
+    
     .hubRow {
       display: grid;
       grid-template-columns: repeat(3, minmax(0,1fr));
@@ -1048,6 +1062,7 @@
     <div class="hubScroll">
       <div class="hub">
         <div class="hubHeading">BOOHA ADVENTURE</div>
+        <div id="playerGreeting" class="playerGreeting"></div>
         <div class="hubRow" id="weekCards"></div>
         <div class="hubBottom">
           
@@ -1070,7 +1085,7 @@
         <button id="pickerClose" class="ghostBtn" type="button">戻る</button>
       </div>
       <div class="pickerSub" id="pickerDates"></div>
-      <div class="pickerSub2">カリキュラムをえらんでね</div>
+      <div class="pickerSub2" id="pickerSub2">カリキュラムをえらんでね</div>
 
       <div class="pickerGrid">
         <button class="pickTile" type="button" data-curr="preboo">
@@ -1114,7 +1129,24 @@
 
 <script src="./js/calendar.js"></script>
 <script>
+  
 const { getCurrentCurriculumWeek } = window.CALENDAR;
+
+function getBoohaFirstName() {
+  const directFirst =
+    localStorage.getItem('booha_first_name') ||
+    localStorage.getItem('boohaFirstName') ||
+    '';
+  const fullName =
+    localStorage.getItem('booha_user_name') ||
+    localStorage.getItem('boohaUserName') ||
+    localStorage.getItem('booha_display_name') ||
+    '';
+  const raw = (directFirst || fullName.split(' ')[0] || '').trim();
+  if (!raw) return 'PLAYER';
+  const capped = raw.length > 12 ? raw.slice(0, 12) : raw;
+  return capped.toUpperCase();
+}
 
 console.log('CURRENT CURRICULUM WEEK:', getCurrentCurriculumWeek());
 
@@ -1290,9 +1322,18 @@ function renderHub() {
   const container = document.getElementById('weekCards');
   container.innerHTML = '';
 
+  const playerName = getBoohaFirstName();
+
+  const greeting = document.getElementById('playerGreeting');
+  if (greeting) greeting.textContent = `WELCOME BACK, ${playerName}`;
+
+  const mazeButton = document.getElementById('mazeBtn');
+  if (mazeButton) mazeButton.textContent = `${playerName}, go to the Maze`;
+
   const existing = document.getElementById('blitzArcade');
   if (existing) existing.remove();
 
+  
   const thisWeek = getCurrentCurriculumWeek();
   let activeTab = 'vocab';
 
@@ -1313,7 +1354,8 @@ function renderHub() {
   arcade.className = 'blitzArcade';
   arcade.innerHTML = `
     <div class="speedTitle">BLITZ GAMES</div>
-    <div class="speedSub">Fast challenges — this week only</div>
+    <div class="speedSub">${playerName}'S FAST CHALLENGES — THIS WEEK ONLY</div>
+    
     <div class="blitzTabs" id="blitzTabs"></div>
     <div class="blitzDivider"></div>
     <div class="blitzGames" id="blitzGames"></div>
@@ -1405,6 +1447,8 @@ function openPicker(tagEn, tagJp, dates, weekId) {
   currentWeekId = weekId;
   pickerTitle.textContent = `${tagEn}（${tagJp}）`;
   pickerDates.textContent = dates;
+  const pickerSub2 = document.getElementById('pickerSub2');
+  if (pickerSub2) pickerSub2.textContent = `${getBoohaFirstName()}, choose your curriculum`;
   picker.scrollTop = 0;
   picker.classList.add('show');
   picker.setAttribute('aria-hidden', 'false');
