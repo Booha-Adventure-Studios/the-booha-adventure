@@ -926,6 +926,26 @@ function loadRecords() {
   };
 }
 
+function getBoohaFirstName() {
+  const directFirst =
+    localStorage.getItem('booha_first_name') ||
+    localStorage.getItem('boohaFirstName') ||
+    '';
+  const fullName =
+    localStorage.getItem('booha_user_name') ||
+    localStorage.getItem('boohaUserName') ||
+    localStorage.getItem('booha_display_name') ||
+    '';
+  const raw = (directFirst || fullName.split(' ')[0] || '').trim();
+  if (!raw) return 'PLAYER 1';
+  const capped = raw.length > 12 ? raw.slice(0, 12) : raw;
+  return capped.toUpperCase();
+}
+
+function getP1Name() { return getBoohaFirstName(); }
+function getP2Name() { return 'THE DINGLEBERRY'; }
+
+  
 function saveRecords(data) {
   try { localStorage.setItem(STORE_KEY, JSON.stringify(data)); } catch(e) {}
 }
@@ -1036,8 +1056,8 @@ const STATE = {
   allCards: [],   // full pool from JSON
   items:    [],   // 15 selected cards
   pairs:    [],   // [{en, jp, hira, isLiar}] — same for both players
-  p1Name:   'MY TURN',
-  p2Name:   "THE DINGLEBERRY'S TURN",
+  p1Name:   getP1Name(),
+  p2Name:   getP2Name(),
 
   // per-player run
   currentPlayer: 2,  // 2 goes first
@@ -1178,6 +1198,8 @@ async function startDuel() {
   // Build pairs with a second rng (post-shuffle)
   STATE.pairs    = buildPairs(STATE.items, rng);
   STATE.runs     = { p1: null, p2: null };
+  STATE.p1Name = getP1Name();
+  STATE.p2Name = getP2Name();
 
   // Show handoff for P2 first
   setupHandoff(2);
@@ -1187,36 +1209,38 @@ async function startDuel() {
 function setupHandoff(player) {
   STATE.currentPlayer = player;
   const isP2 = (player === 2);
+  const p1Name = STATE.p1Name || getP1Name();
+  const p2Name = STATE.p2Name || getP2Name();
 
   document.getElementById('handoff-player-label').textContent =
-    isP2 ? "THE DINGLEBERRY" : "PLAYER 1";
+    isP2 ? p2Name : p1Name;
 
   document.getElementById('handoff-player-label').className =
     'handoff-player ' + (isP2 ? 'p2' : 'p1');
 
   document.getElementById('handoff-turn-label').innerHTML = isP2
     ? 'P2 GOES FIRST<br><span class="jp-small">P2からスタート</span>'
-    : 'PLAYER 1 TURN<br><span class="jp-small">P1の番</span>';
+    : `${p1Name} TURN<br><span class="jp-small">P1の番</span>`;
 
   document.getElementById('handoff-instruction').innerHTML = isP2
     ? `Give the device to Player 2.<br>
        <span class="jp-line">P2にわたしてね。</span><br><br>
        Player 2 plays first.<br>
        <span class="jp-line">P2が先にプレイします。</span>`
-    : `Give it back to Player 1.<br>
-       <span class="jp-line">P1に返してね。</span><br><br>
-       Player 1 will calculate the results after playing.<br>
+    : `Give it back to ${p1Name}.<br>
+       <span class="jp-line">${p1Name}に返してね。</span><br><br>
+       ${p1Name} will calculate the results after playing.<br>
        <span class="jp-line">P1がプレイしたあと、結果を見ます。</span>`;
 
   document.getElementById('handoff-rule').innerHTML = isP2
     ? `&#9888; SCORES ARE HIDDEN<br>
        <span class="jp-line">スコアはまだ見えません</span>`
-    : `&#9888; GIVE BACK TO THE SUPER COOL GENIUS PLAYER 1<br>
-       <span class="jp-line">天才プレイヤーP1に返しましょう</span>`;
+    : `&#9888; GIVE BACK TO THE SUPER COOL GENIUS ${p1Name}<br>
+       <span class="jp-line">天才プレイヤー${p1Name}に返しましょう</span>`;
 
   document.getElementById('handoff-start-btn').innerHTML = isP2
     ? `READY &#8594; START<br><span class="jp-line">スタート</span>`
-    : `PLAYER 1 &#8594; START<br><span class="jp-line">P1スタート</span>`;
+    : `${p1Name} &#8594; START<br><span class="jp-line">P1スタート</span>`;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1231,7 +1255,9 @@ function startPlayerRun() {
 
   // HUD
   const isP2 = STATE.currentPlayer === 2;
-  document.getElementById('hud-player-name').textContent = isP2 ? 'DINGLEBERRY' : 'MY TURN';
+  document.getElementById('hud-player-name').textContent =
+    isP2 ? STATE.p2Name : STATE.p1Name;
+  
   document.getElementById('hud-player-name').style.color = isP2 ? 'var(--accent)' : 'var(--accent3)';
   document.getElementById('hud-curr').textContent = STATE.curr.toUpperCase();
   document.getElementById('hud-mode').textContent = STATE.mode.toUpperCase();
@@ -1387,8 +1413,10 @@ function triggerFail() {
 
   // Show fail screen
   const isP2 = STATE.currentPlayer === 2;
+  
   document.getElementById('fail-player-label').textContent =
-    (isP2 ? 'DINGLEBERRY' : 'MY TURN') + ' — ACCURACY COLLAPSED';
+    (isP2 ? STATE.p2Name : STATE.p1Name) + ' — ACCURACY COLLAPSED';
+  
   document.getElementById('fail-stats').innerHTML =
     `Correct: ${STATE.correct} / ${answered}<br>Accuracy: ${accuracy}%<br>Time: ${(totalMs/1000).toFixed(1)}s`;
 
@@ -1406,7 +1434,7 @@ function triggerFail() {
 function buildRunObject(totalMs, accuracy, survived) {
   const today = new Date().toISOString().slice(0, 10);
   const run = {
-    name:       STATE.currentPlayer === 2 ? "THE DINGLEBERRY" : "MY TURN",
+    name:       STATE.currentPlayer === 2 ? STATE.p2Name : STATE.p1Name,
     correct:    STATE.correct,
     wrong:      STATE.wrong,
     accuracy,
@@ -1487,27 +1515,27 @@ function showResult() {
   const grid = document.getElementById('result-grid');
   grid.innerHTML = `
     <div class="result-cell">
-      <div class="result-cell-label">MY TIME</div>
+      <div class="result-cell-label">${p1.name} TIME</div>
       <div class="result-cell-val p1c">${(p1.timeMs/1000).toFixed(1)}s</div>
     </div>
     <div class="result-cell">
-      <div class="result-cell-label">DINGLEBERRY TIME</div>
+      <div class="result-cell-label">${p2.name} TIME</div>
       <div class="result-cell-val p2c">${(p2.timeMs/1000).toFixed(1)}s</div>
     </div>
     <div class="result-cell">
-      <div class="result-cell-label">MY ACCURACY</div>
+      <div class="result-cell-label">${p1.name} ACCURACY</div>
       <div class="result-cell-val p1c">${p1.accuracy}%</div>
     </div>
     <div class="result-cell">
-      <div class="result-cell-label">DINGLEBERRY ACC</div>
+      <div class="result-cell-label">${p2.name} ACC</div>
       <div class="result-cell-val p2c">${p2.accuracy}%</div>
     </div>
     <div class="result-cell">
-      <div class="result-cell-label">MY STATUS</div>
+      <div class="result-cell-label">${p1.name} STATUS</div>
       <div class="result-cell-val p1c" style="font-size:14px">${p1.survived ? '✓ SURVIVED' : '✗ ELIMINATED'}</div>
     </div>
     <div class="result-cell">
-      <div class="result-cell-label">DINGLEBERRY</div>
+      <div class="result-cell-label">${p2.name}</div>
       <div class="result-cell-val p2c" style="font-size:14px">${p2.survived ? '✓ SURVIVED' : '✗ ELIMINATED'}</div>
     </div>
   `;
@@ -1519,11 +1547,11 @@ function showResult() {
   banner.className = 'result-winner-banner';
 
   if (winner === 'p1') {
-    nameEl.textContent = 'MY TURN WINS';
+    nameEl.textContent = `${p1.name} WINS`;
     nameEl.className   = 'result-winner-name';
     detailEl.textContent = reason;
   } else if (winner === 'p2') {
-    nameEl.textContent = 'DINGLEBERRY WINS';
+    nameEl.textContent = `${p2.name} WINS`;
     nameEl.className   = 'result-winner-name';
     detailEl.textContent = reason;
     banner.classList.add('loser');
