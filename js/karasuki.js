@@ -2092,12 +2092,17 @@ function injectObserverPop() {
 function openObserverPop() {
   const games   = getGamesThisWeek();
   const lines   = window.KARASUKI_DATA.OBSERVER_LINES;
-  const line    = lines[Math.min(games, lines.length - 1)];
+  
+  const line    = lines[Math.min(games, 10)];
   document.getElementById('obs-pop-line-en').textContent = line.en;
   document.getElementById('obs-pop-line-jp').textContent = line.jp;
   
   const name = getBoohaFirstName();
-  document.getElementById('obs-pop-count').textContent   = name ? `${name} — ${games} / 9` : `${games} / 9`;
+const en = name ? line.en.replace('{name}', name) : line.en.replace('{name}, ', '').replace('{name}、', '');
+const jp = name ? line.jp.replace('{name}', name) : line.jp.replace('{name}、', '').replace('{name}, ', '');
+document.getElementById('obs-pop-line-en').textContent = en;
+document.getElementById('obs-pop-line-jp').textContent = jp;
+document.getElementById('obs-pop-count').textContent   = name ? `${name} — ${games} / 9` : `${games} / 9`;
   observerPopOpen = true;
   observerPopEl.style.display    = 'flex';
   observerPopEl.style.background = 'rgba(0,0,0,0.88)';
