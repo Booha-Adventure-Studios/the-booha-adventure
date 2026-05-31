@@ -1150,6 +1150,22 @@ function getBoohaFirstName() {
   return capped.toUpperCase();
 }
 
+function typeGreeting() {
+  const greeting = document.getElementById('playerGreeting');
+  if (!greeting) return;
+  greeting.textContent = '';
+  const fullText = `WELCOME BACK, ${getBoohaFirstName()}`;
+  let i = 0;
+  function typeNext() {
+    if (i < fullText.length) {
+      greeting.textContent += fullText[i];
+      i++;
+      setTimeout(typeNext, i < 14 ? 55 : 38);
+    }
+  }
+  setTimeout(typeNext, 400);
+}
+
 console.log('CURRENT CURRICULUM WEEK:', getCurrentCurriculumWeek());
 
 function navigateToCurriculum(weekId, curr) {
@@ -1367,22 +1383,6 @@ function renderHub() {
   const tabsEl  = arcade.querySelector('#blitzTabs');
   const gamesEl = arcade.querySelector('#blitzGames');
 
-
-function typeGreeting() {
-  const greeting = document.getElementById('playerGreeting');
-  if (!greeting) return;
-  greeting.textContent = '';
-  const fullText = `WELCOME BACK, ${getBoohaFirstName()}`;
-  let i = 0;
-  function typeNext() {
-    if (i < fullText.length) {
-      greeting.textContent += fullText[i];
-      i++;
-      setTimeout(typeNext, i < 14 ? 55 : 38);
-    }
-  }
-  setTimeout(typeNext, 400);
-}
 
   
  function renderPills() {
