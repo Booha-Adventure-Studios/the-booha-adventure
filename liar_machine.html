@@ -893,7 +893,7 @@
 <div id="records-modal">
   <div class="records-box">
     <div class="records-title">THE LIAR MACHINE</div>
-    <div class="records-sub">MISTER HAPPY'S RECORDS</div>
+    <div class="records-sub" id="records-sub">RECORDS</div>
     <div id="records-content"></div>
     <button id="records-close-btn" onclick="closeRecords()">CLOSE</button>
   </div>
@@ -1572,6 +1572,7 @@ function showResult() {
 function openRecords() {
   renderRecords();
   document.getElementById('records-modal').classList.add('open');
+  document.getElementById('records-sub').textContent = `${getP1Name()}'S RECORDS`;
 }
 function closeRecords() {
   document.getElementById('records-modal').classList.remove('open');
