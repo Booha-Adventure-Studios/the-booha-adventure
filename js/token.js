@@ -209,7 +209,10 @@
     // Valid — update storage
     localStorage.setItem(KEY_VALIDATED, String(Date.now()));
     if (data.expiresAt) localStorage.setItem(KEY_EXPIRES, data.expiresAt);
-    if (data.displayName) localStorage.setItem(KEY_NAME, data.displayName);
+    if (data.displayName) {
+    localStorage.setItem(KEY_NAME, data.displayName);
+    localStorage.setItem('booha_first_name', data.displayName.split(' ')[0]);
+   }
 
     // Install overlay — once only, not in standalone
     if (!isStandalone() && !localStorage.getItem(INSTALL_KEY)) {
