@@ -273,10 +273,10 @@ OBSERVER_COORDS: {
     en: "{name}, nine games. Now we understand why you came.",
     jp: "{name}、九回。なぜ来たのか、もう分かった。"
   },
-   { 
-    en: "More than nine. You are still here.",        
-    jp: "九回を超えた。まだここにいる。" 
-   },
+  { 
+    en: "{name}, more than nine. You are still here.", 
+    jp: "{name}、九回を超えた。まだここにいる。" 
+  },
 ],
   
 };
