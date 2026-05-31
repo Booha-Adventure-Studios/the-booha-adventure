@@ -1327,20 +1327,8 @@ function renderHub() {
   const playerName = getBoohaFirstName();
 
   const greeting = document.getElementById('playerGreeting');
-  if (greeting) {
-    greeting.textContent = '';
-    const fullText = `WELCOME BACK, ${playerName}`;
-    let i = 0;
-    function typeNext() {
-      if (i < fullText.length) {
-        greeting.textContent += fullText[i];
-        i++;
-        setTimeout(typeNext, i < 14 ? 55 : 38);
-      }
-    }
-    setTimeout(typeNext, 320);
-  }
-
+  if (greeting) greeting.textContent = '';
+  
   const mazeButton = document.getElementById('mazeBtn');
   if (mazeButton) mazeButton.textContent = `Enter the Maze`;
 
@@ -1379,6 +1367,24 @@ function renderHub() {
   const tabsEl  = arcade.querySelector('#blitzTabs');
   const gamesEl = arcade.querySelector('#blitzGames');
 
+
+function typeGreeting() {
+  const greeting = document.getElementById('playerGreeting');
+  if (!greeting) return;
+  greeting.textContent = '';
+  const fullText = `WELCOME BACK, ${getBoohaFirstName()}`;
+  let i = 0;
+  function typeNext() {
+    if (i < fullText.length) {
+      greeting.textContent += fullText[i];
+      i++;
+      setTimeout(typeNext, i < 14 ? 55 : 38);
+    }
+  }
+  setTimeout(typeNext, 400);
+}
+
+  
  function renderPills() {
   gamesEl.innerHTML = '';
   const engineMap = {
@@ -1514,6 +1520,7 @@ async function startIntro() {
   await new Promise(r => setTimeout(r, 900));
   showScene(videoScene);
   try { introVideo.currentTime = 0; } catch(e) {}
+  typeGreeting();
   requestAnimationFrame(() => requestAnimationFrame(() => fadeToBlack(false)));
   try {
     await introVideo.play();
@@ -1595,6 +1602,7 @@ function jumpToHub() {
   fadingOut = false;
   started   = false;
   try { renderHub(); hubRendered = true; } catch(e2) {}
+  typeGreeting();
   sessionStorage.removeItem('booha_return_to_hub');
   if (window.location.hash === '#hub') {
     history.replaceState(null, '', window.location.pathname + window.location.search);
