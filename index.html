@@ -1536,7 +1536,7 @@ function jumpToHub() {
   fade.classList.remove('on');
   fadingOut = false;
   started   = false;
-  if (!hubRendered) { try { renderHub(); hubRendered = true; } catch(e2) {} }
+  try { renderHub(); hubRendered = true; } catch(e2) {}
   sessionStorage.removeItem('booha_return_to_hub');
   if (window.location.hash === '#hub') {
     history.replaceState(null, '', window.location.pathname + window.location.search);
