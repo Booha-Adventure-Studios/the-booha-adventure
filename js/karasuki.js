@@ -2093,7 +2093,7 @@ function openObserverPop() {
   const games   = getGamesThisWeek();
   const lines   = window.KARASUKI_DATA.OBSERVER_LINES;
   
-  const line    = lines[Math.min(games, 10)];
+  const line = lines[Math.min(games, lines.length - 1)];
   document.getElementById('obs-pop-line-en').textContent = line.en;
   document.getElementById('obs-pop-line-jp').textContent = line.jp;
   
