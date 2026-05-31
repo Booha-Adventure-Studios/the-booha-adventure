@@ -65,6 +65,25 @@
     .overlay.hidden{ opacity:0; pointer-events:none; }
     .overlay.gone{ display:none; }
     .overlayHeading{ font-family:'Bowlby One',sans-serif; font-size:clamp(20px,4.5vw,46px); letter-spacing:2px; margin:0; color:#fff; line-height:1.2; text-shadow:0 0 32px rgba(255,140,255,.7),0 0 80px rgba(255,80,200,.35),0 2px 8px rgba(0,0,0,.9); }
+    .mazeNameSub {
+  margin: -8px 0 0;
+  font-size: clamp(14px, 3vmin, 24px);
+  font-weight: 900;
+  letter-spacing: 1px;
+  color: rgba(255,255,255,.82);
+  text-shadow:
+    0 0 18px rgba(255,120,220,.55),
+    0 0 36px rgba(120,220,255,.25),
+    0 2px 8px rgba(0,0,0,.9);
+}
+
+.mazePlayerName {
+  color: #fff;
+  text-shadow:
+    0 0 10px rgba(255,255,255,.95),
+    0 0 24px rgba(255,120,220,.85),
+    0 0 52px rgba(255,80,200,.45);
+}
     .btnRow{ display:flex; gap:clamp(10px,3vmin,20px); flex-wrap:wrap; justify-content:center; align-items:center; }
     .btnPink,.btnBlue{ appearance:none; border:0; border-radius:999px; padding:clamp(11px,2.5vmin,15px) clamp(20px,5vmin,30px); font-size:clamp(15px,3.8vmin,20px); font-weight:1000; letter-spacing:.5px; cursor:pointer; color:#000; -webkit-tap-highlight-color:transparent; transform:translateZ(0); min-width:80px; }
     .btnPink{ background:linear-gradient(180deg,var(--pink2),var(--pink)); box-shadow:0 8px 20px rgba(255,59,189,.28),0 0 0 2px rgba(255,59,189,.18),0 0 26px rgba(255,59,189,.38); }
@@ -740,7 +759,10 @@
     <p class="rotateSub">めいろをあそぶには<br>スマホを<strong style="color:#ff79d7">よこむき</strong>にしてください</p>
   </div>
   <div id="overlay1" class="overlay" aria-label="めいろへいく？">
-    <h1 class="overlayHeading">ブーハーめいろにいく？</h1>
+    <h1 class="overlayHeading" id="mazeQuestion">
+  ブーハーめいろにいく？
+</h1>
+<p class="mazeNameSub" id="mazeNameSub"></p>
     <div class="btnRow">
       <button id="returnBtn" class="btnBlue" type="button">いかない</button>
       <div class="sparkleWrap">
@@ -914,6 +936,26 @@
 <script>
 const { getCurrentCurriculumWeek, getAcademicWeekNumber } = window.CALENDAR;
 
+  function getBoohaFirstName() {
+  const directFirst =
+    localStorage.getItem('booha_first_name') ||
+    localStorage.getItem('boohaFirstName') ||
+    '';
+
+  const fullName =
+    localStorage.getItem('booha_user_name') ||
+    localStorage.getItem('boohaUserName') ||
+    localStorage.getItem('booha_display_name') ||
+    '';
+
+  const raw = (directFirst || fullName.split(' ')[0] || '').trim();
+
+  if (!raw) return 'PLAYER';
+
+  const capped = raw.length > 12 ? raw.slice(0, 12) : raw;
+  return capped.charAt(0).toUpperCase() + capped.slice(1).toLowerCase();
+}
+
 const BRYAN_PASS = 'him141amra803';
 const SHOW_BRYAN_BTN = false; // set true to re-enable dev mode button
 const IMG_W = 1600;
@@ -1039,6 +1081,15 @@ const app=document.getElementById('app'),rotateOverlay=document.getElementById('
   krYesBtn=document.getElementById('krYesBtn'),
   krVideoWrap=document.getElementById('krVideoWrap'),
   krVideo=document.getElementById('krVideo');
+
+  function personalizeMazeIntro() {
+  const sub = document.getElementById('mazeNameSub');
+  if (!sub) return;
+
+  const name = getBoohaFirstName();
+
+  sub.innerHTML = `<span class="mazePlayerName">${name}</span>、ブーハーがまってるよ。`;
+}
 
 const FADE_MS=520;
 
@@ -1755,6 +1806,7 @@ document.addEventListener('visibilitychange',()=>{
   }
 });
 
+personalizeMazeIntro();  
 if(sessionStorage.getItem('booha_return_to_checkpoint')==='1')restoreMazeFromCheckpoint();
 else resizeCanvas();
 
