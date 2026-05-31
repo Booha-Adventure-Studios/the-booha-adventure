@@ -290,12 +290,14 @@
   margin-top: -4px;
   font-size: clamp(11px, 1.6vw, 16px);
   font-weight: 900;
-  letter-spacing: 2px;
-  color: rgba(255,255,255,.82);
+  letter-spacing: 3px;
+  color: rgba(255,255,255,.9);
   text-shadow:
-    0 0 18px rgba(255,120,220,.45),
+    0 0 22px rgba(255,120,220,.6),
+    0 0 48px rgba(255,80,200,.25),
     0 2px 8px rgba(0,0,0,.8);
   text-transform: uppercase;
+  min-height: 1.4em;
 }
 
 
@@ -1325,7 +1327,19 @@ function renderHub() {
   const playerName = getBoohaFirstName();
 
   const greeting = document.getElementById('playerGreeting');
-  if (greeting) greeting.textContent = `WELCOME BACK, ${playerName}`;
+  if (greeting) {
+    greeting.textContent = '';
+    const fullText = `WELCOME BACK, ${playerName}`;
+    let i = 0;
+    function typeNext() {
+      if (i < fullText.length) {
+        greeting.textContent += fullText[i];
+        i++;
+        setTimeout(typeNext, i < 14 ? 55 : 38);
+      }
+    }
+    setTimeout(typeNext, 320);
+  }
 
   const mazeButton = document.getElementById('mazeBtn');
   if (mazeButton) mazeButton.textContent = `Enter the Maze`;
