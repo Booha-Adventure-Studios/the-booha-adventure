@@ -1583,6 +1583,8 @@ function renderRecords() {
   const p1w   = rec.p1Wins;
   const p2w   = rec.p2Wins;
   const draws = rec.draws;
+  const p1Name = getP1Name();
+  const p2Name = getP2Name();
   const winRate = total === 0 ? '—' : Math.round(p1w / total * 100) + '%';
 
   const fmtBest = (b) => {
@@ -1594,18 +1596,29 @@ function renderRecords() {
   if (rec.recentRuns.length === 0) {
     recentHTML = '<div style="color:var(--dim);font-size:11px;padding:8px 0;">No runs yet.</div>';
   } else {
-    rec.recentRuns.forEach(r => {
-      const winnerLabel = r.winner === 'p1' ? 'MY WIN' : r.winner === 'p2' ? 'DINGLE' : 'DRAW';
-      const winnerClass = r.winner === 'p1' ? 'win' : r.winner === 'p2' ? 'loss' : '';
-      recentHTML += `
-        <div class="recent-run">
-          <span class="rr-mode">${r.mode.toUpperCase()}</span>
-          <span class="rr-time">ME: ${(r.p1.timeMs/1000).toFixed(1)}s</span>
-          <span class="rr-acc">${r.p1.accuracy}%</span>
-          <span class="rr-outcome ${winnerClass}">${winnerLabel}</span>
-          <span class="rr-date">${r.date}</span>
-        </div>`;
-    });
+   rec.recentRuns.forEach(r => {
+  const p1RunName = r.p1.name || p1Name;
+  const p2RunName = r.p2.name || p2Name;
+
+  const winnerLabel =
+    r.winner === 'p1' ? `${p1RunName} WIN` :
+    r.winner === 'p2' ? `${p2RunName} WIN` :
+    'DRAW';
+
+  const winnerClass =
+    r.winner === 'p1' ? 'win' :
+    r.winner === 'p2' ? 'loss' :
+    '';
+
+  recentHTML += `
+    <div class="recent-run">
+      <span class="rr-mode">${r.mode.toUpperCase()}</span>
+      <span class="rr-time">${p1RunName}: ${(r.p1.timeMs/1000).toFixed(1)}s</span>
+      <span class="rr-acc">${r.p1.accuracy}%</span>
+      <span class="rr-outcome ${winnerClass}">${winnerLabel}</span>
+      <span class="rr-date">${r.date}</span>
+    </div>`;
+   });
   }
 
   document.getElementById('records-content').innerHTML = `
@@ -1630,11 +1643,11 @@ function renderRecords() {
       <div class="records-stat-row">
         <div class="records-stat-cell">
           <div class="records-stat-num" style="color:var(--yes)">${p1w}</div>
-          <div class="records-stat-label">MY WINS</div>
+          <div class="records-stat-label">${p1Name} WINS</div>
         </div>
         <div class="records-stat-cell">
           <div class="records-stat-num" style="color:var(--accent2)">${p2w}</div>
-          <div class="records-stat-label">LOSSES</div>
+          <div class="records-stat-label">${p2Name} WINS</div>
         </div>
         <div class="records-stat-cell">
           <div class="records-stat-num" style="color:var(--dim)">${draws}</div>
