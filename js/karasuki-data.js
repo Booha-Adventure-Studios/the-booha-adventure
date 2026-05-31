@@ -232,17 +232,51 @@ OBSERVER_COORDS: {
     room_15: { x: 665, y: 327 },
   },
 
-  OBSERVER_LINES: [
-    { en: "You have not played yet this week.",         jp: "今週はまだ遊んでいない。" },
-    { en: "One game. You have begun.",                  jp: "一回。始まった。" },
-    { en: "Two games. You are still here.",             jp: "二回。まだここにいる。" },
-    { en: "Three games. Something is changing in you.", jp: "三回。何かが変わっている。" },
-    { en: "Four. You return without being asked.",      jp: "四回。呼ばれていないのに戻ってくる。" },
-    { en: "Five games. Curious.",                       jp: "五回。不思議だ。" },
-    { en: "Six. I've started to remember your face.",   jp: "六回。顔を覚え始めた。" },
-    { en: "Seven games. You almost never stop.",        jp: "七回。ほとんど止まらない。" },
-    { en: "Eight. What are you looking for?",           jp: "八回。何を探している？" },
-    { en: "Nine games. I think I understand now.",      jp: "九回。もう分かった気がする。" },
-  ],
+ OBSERVER_LINES: [
+  {
+    en: "{name}, you have not played yet this week.",
+    jp: "{name}、今週はまだ何もしていない。"
+  },
+  {
+    en: "{name}, one game. You have begun.",
+    jp: "{name}、一回。始まった。"
+  },
+  {
+    en: "{name}, two games. You came back.",
+    jp: "{name}、二回。戻ってきた。"
+  },
+  {
+    en: "{name}, three games. Something noticed you.",
+    jp: "{name}、三回。何かが気づいた。"
+  },
+  {
+    en: "{name}, four games. You return without being called.",
+    jp: "{name}、四回。呼ばれていないのに戻ってくる。"
+  },
+  {
+    en: "{name}, five games. Your footsteps are easier to hear now.",
+    jp: "{name}、五回。足音が聞こえやすくなった。"
+  },
+  {
+    en: "{name}, six games. We are starting to remember your face.",
+    jp: "{name}、六回。顔を覚え始めている。"
+  },
+  {
+    en: "{name}, seven games. You almost never stop.",
+    jp: "{name}、七回。ほとんど止まらない。"
+  },
+  {
+    en: "{name}, eight games. What are you looking for?",
+    jp: "{name}、八回。何を探している？"
+  },
+  {
+    en: "{name}, nine games. Now we understand why you came.",
+    jp: "{name}、九回。なぜ来たのか、もう分かった。"
+  },
+   { 
+    en: "More than nine. You are still here.",        
+    jp: "九回を超えた。まだここにいる。" 
+   },
+],
   
 };
