@@ -287,17 +287,67 @@
     }
 
     .playerGreeting {
-  margin-top: -4px;
-  font-size: clamp(11px, 1.6vw, 16px);
-  font-weight: 900;
+  margin-top: -2px;
+  min-height: 34px;
+  padding: 7px 18px 8px;
+  border-radius: 999px;
+
+  font-family: 'Bowlby One', system-ui, sans-serif;
+  font-size: clamp(13px, 2vw, 22px);
+  font-weight: 400;
   letter-spacing: 3px;
-  color: rgba(255,255,255,.9);
-  text-shadow:
-    0 0 22px rgba(255,120,220,.6),
-    0 0 48px rgba(255,80,200,.25),
-    0 2px 8px rgba(0,0,0,.8);
   text-transform: uppercase;
-  min-height: 1.4em;
+  color: rgba(255,255,255,.96);
+
+  background:
+    linear-gradient(90deg,
+      rgba(255,60,190,.10),
+      rgba(255,255,255,.08),
+      rgba(255,60,190,.10));
+  border: 1px solid rgba(255,150,230,.35);
+
+  box-shadow:
+    0 0 18px rgba(255,60,190,.25),
+    0 0 42px rgba(255,60,190,.18),
+    inset 0 0 18px rgba(255,255,255,.08);
+
+  text-shadow:
+    0 0 10px rgba(255,255,255,.85),
+    0 0 24px rgba(255,90,220,.70),
+    0 0 54px rgba(255,40,190,.45),
+    0 3px 10px rgba(0,0,0,.95);
+
+  opacity: 0;
+  transform: translateY(8px) scale(.96);
+  transition:
+    opacity 420ms ease,
+    transform 520ms cubic-bezier(.18,.9,.2,1.2);
+}
+
+.playerGreeting.show {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.playerGreeting .greetName {
+  color: #ffd6f6;
+  text-shadow:
+    0 0 8px rgba(255,255,255,.95),
+    0 0 22px rgba(255,70,220,.95),
+    0 0 54px rgba(255,30,190,.75);
+}
+
+.playerGreeting .cursor {
+  display: inline-block;
+  width: .55em;
+  margin-left: 3px;
+  color: #ff8ee8;
+  animation: greetBlink .75s steps(2,end) infinite;
+}
+
+@keyframes greetBlink {
+  0%, 45% { opacity: 1; }
+  46%, 100% { opacity: 0; }
 }
 
 
@@ -1153,18 +1203,46 @@ function getBoohaFirstName() {
 function typeGreeting() {
   const greeting = document.getElementById('playerGreeting');
   if (!greeting) return;
-  greeting.textContent = '';
-  const fullText = `WELCOME BACK, ${getBoohaFirstName()}`;
+
+  const name = getBoohaFirstName();
+  const prefix = 'WELCOME BACK, ';
+  const fullText = prefix + name;
+
+  greeting.classList.remove('show');
+  greeting.innerHTML = '';
+
   let i = 0;
-  function typeNext() {
-    if (i < fullText.length) {
-      greeting.textContent += fullText[i];
-      i++;
-      setTimeout(typeNext, i < 14 ? 55 : 38);
+
+  setTimeout(() => {
+    greeting.classList.add('show');
+
+    function typeNext() {
+      if (i <= fullText.length) {
+        const typed = fullText.slice(0, i);
+
+        if (typed.length <= prefix.length) {
+          greeting.innerHTML =
+            `${typed}<span class="cursor">|</span>`;
+        } else {
+          const typedName = typed.slice(prefix.length);
+          greeting.innerHTML =
+            `${prefix}<span class="greetName">${typedName}</span><span class="cursor">|</span>`;
+        }
+
+        i++;
+        setTimeout(typeNext, i < prefix.length ? 55 : 75);
+      } else {
+        setTimeout(() => {
+          greeting.innerHTML =
+            `${prefix}<span class="greetName">${name}</span>`;
+        }, 650);
+      }
     }
-  }
-  setTimeout(typeNext, 400);
+
+    typeNext();
+  }, 450);
 }
+  
 
 console.log('CURRENT CURRICULUM WEEK:', getCurrentCurriculumWeek());
 
@@ -1520,7 +1598,7 @@ async function startIntro() {
   await new Promise(r => setTimeout(r, 900));
   showScene(videoScene);
   try { introVideo.currentTime = 0; } catch(e) {}
-  typeGreeting();
+  
   requestAnimationFrame(() => requestAnimationFrame(() => fadeToBlack(false)));
   try {
     await introVideo.play();
@@ -1571,10 +1649,18 @@ async function goToHub() {
   fadeToBlack(true);
   await new Promise(r => setTimeout(r, FADE_MS));
   try { introVideo.pause(); } catch(e) {}
+  
   showScene(hubScene);
-  activateUhibon();
+ activateUhibon();
   if (!hubRendered) { try { renderHub(); hubRendered = true; } catch(e) {} }
-  requestAnimationFrame(() => requestAnimationFrame(() => fadeToBlack(false)));
+
+   requestAnimationFrame(() => {
+  requestAnimationFrame(() => {
+    fadeToBlack(false);
+    typeGreeting();
+  });
+});
+  
 }
 
 introVideo.addEventListener('timeupdate', () => {
@@ -1602,7 +1688,7 @@ function jumpToHub() {
   fadingOut = false;
   started   = false;
   try { renderHub(); hubRendered = true; } catch(e2) {}
-  typeGreeting();
+  setTimeout(typeGreeting, 250);
   sessionStorage.removeItem('booha_return_to_hub');
   if (window.location.hash === '#hub') {
     history.replaceState(null, '', window.location.pathname + window.location.search);
