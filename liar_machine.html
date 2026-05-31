@@ -1107,6 +1107,9 @@ function deriveDateWeekKey() {
 }
 
 function getMonthFolder() {
+  if (window.CALENDAR && window.CALENDAR.getCurrentCurriculumWeek) {
+    return window.CALENDAR.getCurrentCurriculumWeek().monthSlug;
+  }
   const months = ['january','february','march','april','may','june',
                   'july','august','september','october','november','december'];
   return months[new Date().getMonth()];
@@ -1678,6 +1681,6 @@ function playAgain() {
   showScreen('setup');
 }
 
-</script>
+<script src="../../js/calendar.js"></script>
 </body>
 </html>
