@@ -714,6 +714,177 @@
     80% { opacity: 0.8; transform: translateX(-50%) translateY(-30px); }
     100%{ opacity: 0; transform: translateX(-50%) translateY(-40px); }
   }
+
+/* ── KID-READABLE PATCH ── */
+
+.primary-start {
+  font-size: clamp(16px, 4vw, 26px);
+  padding: 18px 34px;
+  line-height: 1.45;
+  box-shadow: 0 0 24px rgba(232,200,74,0.22);
+}
+
+.big-btn .jp-line {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: clamp(13px, 3.4vw, 19px);
+  color: var(--jp-col);
+  letter-spacing: 0;
+}
+
+.big-rules {
+  max-width: 420px;
+  font-size: clamp(14px, 3.5vw, 20px);
+  line-height: 1.35;
+  color: var(--text);
+}
+
+.big-rules strong {
+  color: var(--accent3);
+  letter-spacing: 1px;
+}
+
+.big-rules span {
+  display: inline-block;
+  margin-top: 3px;
+  font-size: clamp(13px, 3.3vw, 18px);
+  color: var(--jp-col);
+}
+
+/* Bigger setup/select buttons */
+.sel-btn {
+  min-width: 96px;
+  min-height: 52px;
+  font-size: clamp(14px, 3.4vw, 20px);
+  padding: 13px 20px;
+}
+
+/* Bigger handoff/pass screen */
+.handoff-instruction {
+  font-size: clamp(16px, 4vw, 24px);
+  color: var(--text);
+  line-height: 1.55;
+  max-width: 440px;
+}
+
+.handoff-rule {
+  font-size: clamp(14px, 3.6vw, 21px);
+  line-height: 1.45;
+  max-width: 440px;
+  padding: 16px 20px;
+}
+
+#handoff-start-btn {
+  font-size: clamp(17px, 4vw, 26px);
+  padding: 18px 34px;
+}
+
+/* Bigger YES/NO buttons */
+.answer-btn {
+  min-height: 96px;
+  font-size: clamp(30px, 8vw, 54px);
+  line-height: 1.05;
+  padding: 22px 8px;
+}
+
+.answer-btn span {
+  display: block;
+  margin-top: 6px;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: clamp(18px, 5vw, 30px);
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+/* Make the actual game question area breathe */
+.item-track {
+  padding: 20px 16px;
+}
+
+.track-label {
+  font-size: 11px;
+  margin-bottom: 10px;
+}
+
+/* Turn splash before each player starts */
+#turn-splash {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(ellipse at center, #1a1a2e 0%, #050508 75%);
+  text-align: center;
+  padding: 24px;
+}
+
+#turn-splash.show {
+  display: flex;
+  animation: turnSplashFade 1.15s ease-in-out forwards;
+}
+
+.turn-box {
+  border: 3px solid var(--accent);
+  background: rgba(17,17,26,0.92);
+  padding: 28px 22px;
+  width: min(92vw, 460px);
+  box-shadow: 0 0 40px rgba(232,200,74,0.25);
+}
+
+.turn-mini {
+  font-size: clamp(12px, 3vw, 17px);
+  letter-spacing: 4px;
+  color: var(--dim);
+  margin-bottom: 14px;
+}
+
+.turn-main {
+  font-family: 'Black Han Sans', sans-serif;
+  font-size: clamp(28px, 8vw, 56px);
+  line-height: 1.05;
+  color: var(--accent);
+  text-shadow: 0 0 28px rgba(232,200,74,0.35);
+}
+
+.turn-jp {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 900;
+  font-size: clamp(18px, 5vw, 30px);
+  color: var(--jp-col);
+  margin-top: 14px;
+}
+
+@keyframes turnSplashFade {
+  0%   { opacity: 0; transform: scale(0.98); }
+  14%  { opacity: 1; transform: scale(1); }
+  78%  { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.03); }
+}
+
+@media (max-height: 620px) {
+  #screen-title {
+    gap: 16px;
+  }
+
+  .title-main {
+    font-size: clamp(32px, 7vw, 54px);
+  }
+
+  .answer-btn {
+    min-height: 82px;
+  }
+
+  .item-text.en-text {
+    font-size: clamp(22px, 6vw, 36px);
+  }
+
+  .item-text.jp-text {
+    font-size: clamp(23px, 6vw, 38px);
+  }
+}
+
+  
 </style>
 </head>
 <body>
@@ -734,8 +905,17 @@
   <div class="sep-line"></div>
   <div class="title-warning">⚠ ACCURACY BELOW 70% = INSTANT FAIL ⚠</div>
   <div class="btn-row">
-    <button class="big-btn" onclick="showScreen('setup')">INSERT COIN</button>
-    <button class="big-btn ghost" onclick="openRecords()">RECORDS</button>
+    
+    <button class="big-btn primary-start" onclick="showScreen('setup')">
+  START 2 PLAYER GAME<br>
+  <span class="jp-line">2人対戦をはじめる</span>
+</button>
+
+<button class="big-btn ghost" onclick="openRecords()">
+  RECORDS<br>
+  <span class="jp-line">記録</span>
+</button>
+    
   </div>
 </div>
 
@@ -763,12 +943,20 @@
   </div>
 
   <div class="sep-line"></div>
-  <div class="simple-rules">
-    15 QUESTIONS &nbsp;·&nbsp; 70% TO SURVIVE<br>
-    <span>15問・70%以上で生き残り</span><br>
-    WRONG ANSWER = TIME PENALTY<br>
-    <span>まちがえると時間ペナルティ</span>
-  </div>
+  
+  <div class="simple-rules big-rules">
+  <strong>PLAYER 2 GOES FIRST</strong><br>
+  <span>P2が先にプレイします</span><br><br>
+
+  <strong>LOOK: DO THE WORDS MATCH?</strong><br>
+  <span>英語と日本語は同じ意味？</span><br><br>
+
+  <strong>YES = SAME / NO = DIFFERENT</strong><br>
+  <span>YES＝同じ　NO＝ちがう</span><br><br>
+
+  <strong>BELOW 70% = YOU LOSE</strong><br>
+  <span>70%未満で負け</span>
+</div>
 
   <div class="btn-row">
     <button class="big-btn" onclick="startDuel()">LOAD MACHINE</button>
@@ -819,8 +1007,17 @@
     </div>
 
     <div class="game-buttons">
-      <button class="answer-btn btn-yes" id="btn-yes" onclick="answer(true)">YES ✓</button>
-      <button class="answer-btn btn-no"  id="btn-no"  onclick="answer(false)">✗ NO</button>
+      
+      <button class="answer-btn btn-yes" id="btn-yes" onclick="answer(true)">
+  YES ✓<br>
+  <span>同じ</span>
+</button>
+
+<button class="answer-btn btn-no" id="btn-no" onclick="answer(false)">
+  NO ✗<br>
+  <span>ちがう</span>
+</button>
+      
     </div>
 
     <div class="item-track jp-track">
@@ -899,6 +1096,16 @@
   </div>
 </div>
 
+<!-- TURN SPLASH -->
+<div id="turn-splash">
+  <div class="turn-box">
+    <div class="turn-mini" id="turn-mini">PASS THE PHONE</div>
+    <div class="turn-main" id="turn-main">YOUR OPPONENT'S TURN</div>
+    <div class="turn-jp" id="turn-jp">相手の番です</div>
+  </div>
+</div>
+
+  
 <!-- FLASH OVERLAY -->
 <div id="flash-overlay"></div>
 
@@ -943,7 +1150,7 @@ function getBoohaFirstName() {
 }
 
 function getP1Name() { return getBoohaFirstName(); }
-function getP2Name() { return 'THE DINGLEBERRY'; }
+function getP2Name() { return 'PLAYER 2'; }
 
   
 function saveRecords(data) {
@@ -1059,6 +1266,33 @@ const STATE = {
   p1Name:   getP1Name(),
   p2Name:   getP2Name(),
 
+
+function showTurnSplashThenStart() {
+  const isP2 = STATE.currentPlayer === 2;
+  const splash = document.getElementById('turn-splash');
+
+  document.getElementById('turn-mini').textContent = isP2
+    ? 'PLAYER 2 GOES FIRST'
+    : 'PLAYER 1 TURN';
+
+  document.getElementById('turn-main').textContent = isP2
+    ? "YOUR OPPONENT'S TURN"
+    : `${STATE.p1Name}'S TURN`;
+
+  document.getElementById('turn-jp').textContent = isP2
+    ? '相手の番です'
+    : 'P1の番です';
+
+  splash.classList.remove('show');
+  void splash.offsetWidth;
+  splash.classList.add('show');
+
+  setTimeout(() => {
+    splash.classList.remove('show');
+    actuallyStartPlayerRun();
+  }, 1150);
+}
+  
   // per-player run
   currentPlayer: 2,  // 2 goes first
   itemIndex: 0,
@@ -1247,6 +1481,11 @@ function setupHandoff(player) {
 //  PLAYER RUN
 // ─────────────────────────────────────────────────────────────────────────────
 function startPlayerRun() {
+  showTurnSplashThenStart();
+}
+  
+  function actuallyStartPlayerRun() {
+  
   STATE.itemIndex = 0;
   STATE.correct   = 0;
   STATE.wrong     = 0;
