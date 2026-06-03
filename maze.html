@@ -1003,6 +1003,28 @@ const GHOSTS = [
   'assets/img/purple-boo.png'
 ];
 
+  // Extra Booha visitors.
+// These are NOT playable colors.
+// They only appear in the maze after students play games.
+const EXTRA_BOOHA_GHOSTS = [
+  'assets/img/extra-boo-gold.png',
+  'assets/img/extra-boo-orange.png',
+  'assets/img/extra-boo-aqua.png',
+  'assets/img/extra-boo-rose.png',
+  'assets/img/extra-boo-lime.png',
+  'assets/img/extra-boo-candy.png',
+  'assets/img/extra-boo-mint.png',
+  'assets/img/extra-boo-sky.png',
+  'assets/img/extra-boo-peach.png',
+  'assets/img/extra-boo-violet.png'
+];
+
+// DEV switches.
+// Type b_4822() in the browser console.
+window.__boohaMazeDev = false;
+window.__boohaShowAllCheckpoints = false;
+window.__boohaExtraGhosts = false;
+
 const HW_TREE_IW = 100;
 const KR_TREE_IW = 78;
 
@@ -1111,10 +1133,36 @@ function imgToCSS(ix,iy){ const{scale,ox,oy}=getCover(); return{x:ix*scale-ox,y:
 function cssToImg(cx,cy){ const{scale,ox,oy}=getCover(); return{ix:Math.round(Math.max(0,Math.min((cx+ox)/scale,IMG_W))),iy:Math.round(Math.max(0,Math.min((cy+oy)/scale,IMG_H)))}; }
 
 // Ghost images
-const ghostImgs=GHOSTS.map(src=>{const i=new Image();i.src=src;return i;});
-let activeGhostIdx=0;
-function assignRandomGhost(){ activeGhostIdx=Math.floor(Math.random()*GHOSTS.length); startGhost.src=GHOSTS[activeGhostIdx]; }
+// Playable ghost images — the sacred main five.
+const ghostImgs = GHOSTS.map(src => {
+  const i = new Image();
+  i.src = src;
+  return i;
+});
+
+// Extra visitor ghost images — not playable.
+const extraGhostImgs = EXTRA_BOOHA_GHOSTS.map(src => {
+  const i = new Image();
+  i.src = src;
+  return i;
+});
+
+let activeGhostIdx = 0;
+
+function assignRandomGhost() {
+  // Player can only be one of the five main Booha logo colors.
+  activeGhostIdx = Math.floor(Math.random() * GHOSTS.length);
+  startGhost.src = GHOSTS[activeGhostIdx];
+}
+
 assignRandomGhost();
+
+function getWandererImage(w) {
+  if (w.kind === 'extra') {
+    return extraGhostImgs[w.extraIdx];
+  }
+  return ghostImgs[w.ghostIdx];
+}
 
 // Tree images
 const homeworkImg=new Image(); homeworkImg.src='assets/img/homework-tree.png';
@@ -1219,13 +1267,65 @@ function restoreMazeFromCheckpoint(){
 const GHOST_SIZE=48,WANDER_TRAIL_MAX=60;
 let wanderers=[];
 
-function buildWanderers(){
-  wanderers=[];
-  for(let gi=0;gi<GHOSTS.length;gi++){
-    if(gi===activeGhostIdx)continue;
-    wanderers.push(createWanderer(gi,wanderers.length*1400));
+function getGamesThisWeekForMaze() {
+  try {
+    const raw = localStorage.getItem('booha_save');
+    const data = raw ? JSON.parse(raw) : null;
+
+    const completed = data?.weekly?.completedGames;
+
+    if (completed && typeof completed === 'object') {
+      return Object.keys(completed).length;
+    }
+
+    return 0;
+  } catch (_) {
+    return 0;
   }
 }
+
+function shuffledExtraIndices() {
+  const arr = EXTRA_BOOHA_GHOSTS.map((_, i) => i);
+
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+
+  return arr;
+}
+
+function buildWanderers() {
+  wanderers = [];
+
+  // Always keep the cute original maze feeling:
+  // player ghost + 4 main Booha friends.
+  for (let gi = 0; gi < GHOSTS.length; gi++) {
+    if (gi === activeGhostIdx) continue;
+
+    const w = createWanderer(gi, wanderers.length * 1400);
+    w.kind = 'main';
+    wanderers.push(w);
+  }
+
+  const games = window.__boohaExtraGhosts ? 9 : getGamesThisWeekForMaze();
+
+  // Quiet atmospheric increase.
+  // Not "one game = one obvious unlock."
+  const extraCount = window.__boohaExtraGhosts
+    ? EXTRA_BOOHA_GHOSTS.length
+    : Math.min(EXTRA_BOOHA_GHOSTS.length, Math.floor(games * 0.75));
+
+  const extras = shuffledExtraIndices();
+
+  for (let i = 0; i < extraCount; i++) {
+    const w = createWanderer(0, wanderers.length * 850 + Math.random() * 900);
+    w.kind = 'extra';
+    w.extraIdx = extras[i];
+    wanderers.push(w);
+  }
+}
+  
 function createWanderer(ghostIdx,delayMs){
   const side=Math.floor(Math.random()*4);
   let sx,sy;
@@ -1234,7 +1334,30 @@ function createWanderer(ghostIdx,delayMs){
   let tx,ty;
   switch(exitSide){case 0:tx=Math.random()*window.innerWidth;ty=-GHOST_SIZE;break;case 1:tx=window.innerWidth+GHOST_SIZE;ty=Math.random()*window.innerHeight;break;case 2:tx=Math.random()*window.innerWidth;ty=window.innerHeight+GHOST_SIZE;break;default:tx=-GHOST_SIZE;ty=Math.random()*window.innerHeight;}
   const dur=14000+Math.random()*12000;
-  return{ghostIdx,sx,sy,tx,ty,startTime:null,delayMs,dur,wobbleAmp:18+Math.random()*24,wobbleFreq:.25+Math.random()*.35,wobblePhase:Math.random()*Math.PI*2,bobAmp:5+Math.random()*6,bobFreq:1.2+Math.random()*.8,trail:[],done:false,cx:sx,cy:sy,opacity:0};
+  
+  return {
+  kind: 'main',
+  ghostIdx,
+  extraIdx: -1,
+  sx,
+  sy,
+  tx,
+  ty,
+  startTime: null,
+  delayMs,
+  dur,
+  wobbleAmp: 18 + Math.random() * 24,
+  wobbleFreq: .25 + Math.random() * .35,
+  wobblePhase: Math.random() * Math.PI * 2,
+  bobAmp: 5 + Math.random() * 6,
+  bobFreq: 1.2 + Math.random() * .8,
+  trail: [],
+  done: false,
+  cx: sx,
+  cy: sy,
+  opacity: 0
+};
+  
 }
 function tickWanderers(nowMs){
   for(let i=0;i<wanderers.length;i++){
@@ -1248,7 +1371,21 @@ function tickWanderers(nowMs){
     if(Math.random()<.35){const col=MONTH_COLORS[Math.floor(Math.random()*MONTH_COLORS.length)];w.trail.push({x:bx,y:by,life:1,size:2+Math.random()*3.5,color:col[Math.random()<.5?0:1],dx:(Math.random()-.5)*.3,dy:-Math.random()*.4});if(w.trail.length>WANDER_TRAIL_MAX)w.trail.shift();}
     w.cx=bx;w.cy=by;if(t>=1)w.done=true;
   }
-  for(let i=0;i<wanderers.length;i++){if(wanderers[i].done){const gi=wanderers[i].ghostIdx;const delay=performance.now()+3000+Math.random()*8000;wanderers[i]=createWanderer(gi,delay);wanderers[i].startTime=null;}}
+  
+  for (let i = 0; i < wanderers.length; i++) {
+  if (wanderers[i].done) {
+    const old = wanderers[i];
+    const delay = performance.now() + 3000 + Math.random() * 8000;
+
+    const nw = createWanderer(old.ghostIdx, delay);
+    nw.kind = old.kind || 'main';
+    nw.extraIdx = Number.isInteger(old.extraIdx) ? old.extraIdx : -1;
+    nw.startTime = null;
+
+    wanderers[i] = nw;
+  }
+}
+  
 }
 function easeInOut(t){return t<.5?2*t*t:-1+(4-2*t)*t;}
 
@@ -1258,7 +1395,13 @@ function easeInOut(t){return t<.5?2*t*t:-1+(4-2*t)*t;}
 // ─────────────────────────────────────────────────────────────────────────────
 function drawWanderers(nowMs){
   for(const w of wanderers){
-    if(w.opacity<=0)continue;const img=ghostImgs[w.ghostIdx];if(!img||!img.complete||!img.naturalWidth)continue;
+    
+   if (w.opacity <= 0) continue;
+
+  const img = getWandererImage(w);
+
+  if (!img || !img.complete || !img.naturalWidth) continue;
+    
     const gR=GHOST_SIZE/2,gx=w.cx,gy=w.cy;
     
     // Mirror the active ghost's continuous scale — all ghosts stay proportional on every device.
@@ -1836,6 +1979,84 @@ window.addEventListener('pageshow',(e)=>{
   krPromptScrim.classList.remove('show','active');
   krVideoWrap.classList.remove('show');
 });
+
+  /* ═══════════════════════════════════════
+   BRYAN DEV CONSOLE TOOL
+   Type b_4822() in browser console.
+═══════════════════════════════════════ */
+
+window.b_4822 = function b_4822() {
+  window.__boohaMazeDev = true;
+  window.__boohaShowAllCheckpoints = true;
+  window.__boohaExtraGhosts = true;
+
+  bryanOn = true;
+  applyBryan();
+
+  // Show all checkpoint orbs.
+  CHECKPOINTS.forEach(cp => {
+    if (!OPEN_WEEKS.includes(cp.w)) OPEN_WEEKS.push(cp.w);
+  });
+
+  mazeStarted = true;
+  ghostVisible = true;
+  introPhase = 'done';
+  setTravelLock(false);
+
+  const cp = CHECKPOINTS.find(c => c.w === CURRENT_WEEK) || CHECKPOINTS[0];
+
+  if (!ghostIX || !ghostIY) {
+    ghostIX = cp.ix;
+    ghostIY = cp.iy;
+  }
+
+  buildWanderers();
+  resizeCanvas();
+  startLoop();
+
+  console.log('👻 b_4822 DEV ON');
+  console.log('Coords ON. All checkpoints visible. Extra Booha visitors visible.');
+  console.log('Playable ghosts are still ONLY the main five.');
+
+  return {
+    dev: true,
+    playableGhosts: GHOSTS.length,
+    extraGhostsAvailable: EXTRA_BOOHA_GHOSTS.length,
+    activeGhostIdx,
+    activeGhostSrc: GHOSTS[activeGhostIdx],
+    wanderers: wanderers.length,
+    checkpoints: CHECKPOINTS.length
+  };
+};
+
+window.b_4822_off = function b_4822_off() {
+  window.__boohaMazeDev = false;
+  window.__boohaShowAllCheckpoints = false;
+  window.__boohaExtraGhosts = false;
+
+  bryanOn = false;
+  applyBryan();
+
+  // Restore normal open weeks.
+  OPEN_WEEKS.length = 0;
+  OPEN_WEEKS.push(Math.max(1, _lastW), CURRENT_WEEK);
+
+  if (_nextData.weekId !== CURRENT_WEEK_DATA.weekId) {
+    OPEN_WEEKS.push(Math.min(48, _nextW));
+  }
+
+  buildWanderers();
+  resizeCanvas();
+
+  console.log('👻 b_4822 DEV OFF');
+
+  return {
+    dev: false,
+    openWeeks: OPEN_WEEKS.slice(),
+    wanderers: wanderers.length
+  };
+};
+  
 </script>
 </body>
 </html>
