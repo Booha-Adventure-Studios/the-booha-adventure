@@ -1319,7 +1319,7 @@ function getWeekKey() {
   // Try CALENDAR if available, otherwise derive from date
   if (window.CALENDAR && window.CALENDAR.getCurrentCurriculumWeek) {
     const cw = window.CALENDAR.getCurrentCurriculumWeek();
-    return cw.weekKey || deriveDateWeekKey();
+    return cw.weekId || deriveDateWeekKey();
   }
   return deriveDateWeekKey();
 }
