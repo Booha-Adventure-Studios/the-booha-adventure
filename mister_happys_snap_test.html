@@ -544,7 +544,7 @@
 <div id="screen-game" class="screen">
   <div class="hud">
     <div class="hud-left">
-      <div class="hud-tag">PLAYER 1</div>
+      <div class="hud-tag" id="p1-tag">PLAYER 1</div>
       <div class="hud-score p1c" id="p1-score">0</div>
     </div>
     <div class="hud-center">
@@ -552,7 +552,7 @@
       <div class="round-label" id="hud-mode-label">BR · VOCAB</div>
     </div>
     <div class="hud-right">
-      <div class="hud-tag">PLAYER 2</div>
+      <div class="hud-tag" id="p2-tag">PLAYER 2</div>
       <div class="hud-score p2c" id="p2-score">0</div>
     </div>
   </div>
@@ -615,10 +615,26 @@
 
 const STORE_KEY = 'booha_snap_test_records';
 
+function getP1Name() {
+  const directFirst = localStorage.getItem('booha_first_name') ||
+                      localStorage.getItem('boohaFirstName') || '';
+  const fullName = localStorage.getItem('booha_user_name') ||
+                   localStorage.getItem('boohaUserName') ||
+                   localStorage.getItem('booha_display_name') || '';
+  const raw = (directFirst || fullName.split(' ')[0] || '').trim();
+  if (!raw) return 'PLAYER 1';
+  return (raw.length > 12 ? raw.slice(0, 12) : raw).toUpperCase();
+}
+function getP2Name() { return 'PLAYER 2'; }
+function pName(n) { return n === 1 ? STATE.p1Name : STATE.p2Name; }
+
 const STATE = {
   curr: 'br',
   mode: 'vocab',
+  p1Name: getP1Name(),
+  p2Name: getP2Name(),
   weekKey: '',
+  
   seed: 0,
   cards: [],
   items: [],
@@ -765,16 +781,22 @@ async function startMatch() {
   STATE.cards = cards;
   STATE.items = seededShuffle(cards, mulberry32(STATE.seed)).slice(0, 15);
   STATE.pairs = buildPairs(STATE.items, mulberry32(STATE.seed + 999));
+  
   STATE.round = 0;
   STATE.p1 = 0;
   STATE.p2 = 0;
   STATE.phase = 'idle';
   STATE.activePlayer = null;
   STATE.roundLog = [];
+  STATE.p1Name = getP1Name();
+  STATE.p2Name = getP2Name();
+
+  document.getElementById('p1-tag').textContent = STATE.p1Name;
+  document.getElementById('p2-tag').textContent = STATE.p2Name;
 
   updateHud();
   showScreen('game');
-  showToast('GET READY', '準備して', 'Player 1 top. Player 2 bottom.');
+  showToast('GET READY', '準備して', `${STATE.p1Name} top. ${STATE.p2Name} bottom.`);
   later(nextRound, 900);
 }
 
@@ -851,7 +873,7 @@ function tooFast(player) {
   flashColor('wrong');
   shakeArena();
   beep('wrong');
-  showToast('TOO FAST', '早すぎる', `Player ${player}: -1. Your brain was late.`);
+  showToast('TOO FAST', '早すぎる', `Point to ${pName(player === 1 ? 2 : 1)}.`);
   STATE.round++;
   updateHud();
   later(nextRound, 900);
@@ -874,14 +896,14 @@ function answer(playerSaidYes) {
     STATE.roundLog.push({ round: STATE.round + 1, player, result: 'correct' });
     flashColor('correct');
     beep('correct');
-    showToast('CORRECT', '正解', `Player ${player}: +1`);
+    showToast('CORRECT', '正解', `${pName(player)}: +1`);
   } else {
     addScore(opponent, 1);
     STATE.roundLog.push({ round: STATE.round + 1, player, result: 'wrong' });
     flashColor('wrong');
     shakeArena();
     beep('wrong');
-    showToast('WRONG', 'ちがう', `Point stolen by Player ${opponent}.`);
+    showToast('WRONG', 'ちがう', `Point stolen by ${pName(opponent)}.`);
   }
 
   STATE.round++;
@@ -906,13 +928,14 @@ function finishMatch() {
   if (STATE.p1 > STATE.p2) winner = 'p1';
   if (STATE.p2 > STATE.p1) winner = 'p2';
 
-  if (winner === 'p1') {
-    winnerTitle.textContent = 'PLAYER 1 WINS';
-    winnerJp.textContent = 'プレイヤー1の勝ち';
+if (winner === 'p1') {
+    winnerTitle.textContent = `${STATE.p1Name} WINS`;
+    winnerJp.textContent = `${STATE.p1Name}の勝ち`;
   } else if (winner === 'p2') {
-    winnerTitle.textContent = 'PLAYER 2 WINS';
-    winnerJp.textContent = 'プレイヤー2の勝ち';
+    winnerTitle.textContent = `${STATE.p2Name} WINS`;
+    winnerJp.textContent = `${STATE.p2Name}の勝ち`;
   } else {
+    
     winnerTitle.textContent = 'DEAD HEAT';
     winnerJp.textContent = '引き分け';
   }
@@ -922,8 +945,8 @@ function finishMatch() {
   const fasts = STATE.roundLog.filter(r => r.result === 'too-fast').length;
 
   document.getElementById('final-grid').innerHTML = `
-    <div class="score-cell"><div class="score-label">PLAYER 1</div><div class="score-val p1c">${STATE.p1}</div></div>
-    <div class="score-cell"><div class="score-label">PLAYER 2</div><div class="score-val p2c">${STATE.p2}</div></div>
+    <div class="score-cell"><div class="score-label">${STATE.p1Name}</div><div class="score-val p1c">${STATE.p1}</div></div>
+    <div class="score-cell"><div class="score-label">${STATE.p2Name}</div><div class="score-val p2c">${STATE.p2}</div></div>
     <div class="score-cell"><div class="score-label">CORRECT SNAPS</div><div class="score-val" style="color:var(--green)">${corrects}</div></div>
     <div class="score-cell"><div class="score-label">STOLEN / TOO FAST</div><div class="score-val" style="color:var(--red)">${wrongs + fasts}</div></div>
   `;
@@ -932,10 +955,13 @@ function finishMatch() {
     date: new Date().toISOString().slice(0,10),
     weekKey: STATE.weekKey,
     curr: STATE.curr,
+    
     mode: STATE.mode,
+    p1Name: STATE.p1Name,
     p1: STATE.p1,
     p2: STATE.p2,
     winner,
+    
     corrects,
     wrongs,
     tooFast: fasts
@@ -968,12 +994,14 @@ function renderRecords() {
   }
 
   box.innerHTML = rec.runs.map(r => {
-    const winner = r.winner === 'p1' ? 'P1 WIN' : r.winner === 'p2' ? 'P2 WIN' : 'DRAW';
+    const p1n = r.p1Name || 'P1';
+    const winner = r.winner === 'p1' ? `${p1n} WIN` : r.winner === 'p2' ? 'P2 WIN' : 'DRAW';
     return `
       <div class="rec-row">
         <div>${r.curr.toUpperCase()}<br>${r.mode.toUpperCase()}</div>
         <div>
-          ${winner} · P1 ${r.p1} - P2 ${r.p2}<br>
+          ${winner} · ${p1n} ${r.p1} - P2 ${r.p2}<br>
+          
           <span class="jp">正解 ${r.corrects} / 早すぎ ${r.tooFast}</span>
         </div>
         <div>${r.date}</div>
