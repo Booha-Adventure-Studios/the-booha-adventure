@@ -5,9 +5,9 @@
 // ============================================================
 
 const CURRENT_CACHES = {
-  pages:  'booha-pages-2026-17',
-  assets: 'booha-assets-2026-17',
-  decks:  'booha-decks-2026-17',
+  pages:  'booha-pages-2026-18',
+  assets: 'booha-assets-2026-18',
+  decks:  'booha-decks-2026-18',
 };
 
 const PAGE_CACHE  = CURRENT_CACHES.pages;
@@ -30,6 +30,7 @@ const CORE_FILES = [
   `${BASE}/karasuki.html`,
   `${BASE}/happy_house.html`,
   `${BASE}/liar_machine.html`,
+  `${BASE}/mister_happys_snap_test.html`,
   `${BASE}/maze.html`,
   `${BASE}/study-deck.html`,
   `${BASE}/utsuroba.html`,
