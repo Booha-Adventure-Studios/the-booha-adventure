@@ -671,7 +671,8 @@ const HAPPY_HOUSE_PORTAL = {
 }
 
   function initWanderers() { preloadWandererImages(); refreshWanderersForRoom(); }
-  function onRoomChanged() { refreshWanderersForRoom(); onRoomChangedNuppi(); }
+  
+  function onRoomChanged() { refreshWanderersForRoom(); onRoomChangedNuppi(); buildAmbientForRoom(); }
 
   function updateWanderers(now) {
     if (!activeWanderers.length) return;
@@ -1674,8 +1675,10 @@ const HAPPY_HOUSE_PORTAL = {
     state.transitionReadyAt = now + TRANSITION_COOLDOWN_MS;
     arrivalArrowHiddenUntil = now + ARRIVAL_ARROW_DELAY_MS;
     arrivalArrowBackHiddenUntil = now + ARRIVAL_ARROW_DELAY_MS * ARRIVAL_ARROW_BACK_MULTIPLIER;
-    state.distMovedSinceSpawn = 0; state.clickTarget = null; state.moving = false;
+    
+   state.distMovedSinceSpawn = 0; state.clickTarget = null; state.moving = false;
     state.spawnLockUntil = now + 500;
+    buildAmbientForRoom();
     startEntryDrift();
   }
 
@@ -1850,7 +1853,63 @@ const HAPPY_HOUSE_PORTAL = {
     const ar=(ah>>16)&0xff, ag=(ah>>8)&0xff, ab=ah&0xff;
     const br=(bh>>16)&0xff, bg=(bh>>8)&0xff, bb=bh&0xff;
     const rr=Math.round(ar+(br-ar)*t), rg=Math.round(ag+(bg-ag)*t), rb=Math.round(ab+(bb-ab)*t);
+    
     return '#'+[rr,rg,rb].map(v=>v.toString(16).padStart(2,'0')).join('');
+  }
+
+  /* ═══════════════════════════════════════════
+     AMBIENT MOTES — forest wakes with weekly games
+  ═══════════════════════════════════════════ */
+  let ambientMotes     = [];
+  let ambientIntensity = 0;            // 0..1, set on each room build
+  const ambientGlowCache = {};         // color -> offscreen sprite (built once, ever)
+
+  function makeMoteSprite(color) {
+    if (ambientGlowCache[color]) return ambientGlowCache[color];
+    const S = 32, c = document.createElement('canvas');
+    c.width = c.height = S;
+    const g = c.getContext('2d');
+    const grad = g.createRadialGradient(S/2, S/2, 0, S/2, S/2, S/2);
+    grad.addColorStop(0, color); grad.addColorStop(0.4, color + '88'); grad.addColorStop(1, 'transparent');
+    g.fillStyle = grad; g.beginPath(); g.arc(S/2, S/2, S/2, 0, Math.PI*2); g.fill();
+    return (ambientGlowCache[color] = c);
+  }
+
+  function buildAmbientForRoom() {
+    ambientMotes = [];
+    const cfg = getRoom()?.ambient;
+    if (!cfg) { ambientIntensity = 0; return; }              // no block = dead-still room
+    ambientIntensity = Math.min(getGamesThisWeek(), 9) / 9;  // 0 = asleep, 1 = awake
+    const n = Math.round((cfg.density || 12) * ambientIntensity);
+    const colors = cfg.colors || roomColorPair(state.roomId);
+    const rMin = (cfg.size && cfg.size[0]) || 1;
+    const rMax = (cfg.size && cfg.size[1]) || 2.6;
+    for (let i = 0; i < n; i++) {
+      ambientMotes.push({
+        x: 120 + Math.random() * (WORLD_W - 240),
+        y: Math.random() * WORLD_H,
+        r: rMin + Math.random() * (rMax - rMin),
+        vy: (cfg.drift || 0.18) * (0.6 + Math.random() * 0.8),
+        wob: 0.2 + Math.random() * 0.5,
+        phase: Math.random() * Math.PI * 2,
+        sprite: makeMoteSprite(colors[i % colors.length]),
+      });
+    }
+  }
+
+  function drawAmbient(now) {
+    if (!ambientMotes.length) return;
+    const sec = now / 1000;
+    for (const m of ambientMotes) {
+      m.y -= m.vy;
+      if (m.y < -20) { m.y = WORLD_H + 20; m.x = 120 + Math.random() * (WORLD_W - 240); }
+      const x  = m.x + Math.sin(sec * m.wob + m.phase) * 14;
+      const tw = 0.35 + 0.65 * (0.5 + 0.5 * Math.sin(sec * 1.6 + m.phase));
+      const sz = m.r * 6;
+      ctx.globalAlpha = tw * (0.5 + ambientIntensity * 0.5);
+      ctx.drawImage(m.sprite, x - sz/2, m.y - sz/2, sz, sz);
+    }
+    ctx.globalAlpha = 1;
   }
 
   /* ═══════════════════════════════════════════
@@ -1877,6 +1936,8 @@ const HAPPY_HOUSE_PORTAL = {
   ═══════════════════════════════════════════ */
   function drawFrame(now) {
     ctx.clearRect(0,0,WORLD_W,WORLD_H);
+    drawAmbient(now);
+    
     const sec = now/1000; const [col1,col2] = roomColorPair(state.roomId);
     for (let i=ripples.length-1;i>=0;i--) {
       const rp=ripples[i]; rp.life-=0.038; if(rp.life<=0){ripples.splice(i,1);continue;}
