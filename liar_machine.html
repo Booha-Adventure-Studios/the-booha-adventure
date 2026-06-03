@@ -1263,38 +1263,13 @@ const STATE = {
   allCards: [],   // full pool from JSON
   items:    [],   // 15 selected cards
   pairs:    [],   // [{en, jp, hira, isLiar}] — same for both players
+  
   p1Name:   getP1Name(),
   p2Name:   getP2Name(),
 
-
-function showTurnSplashThenStart() {
-  const isP2 = STATE.currentPlayer === 2;
-  const splash = document.getElementById('turn-splash');
-
-  document.getElementById('turn-mini').textContent = isP2
-    ? 'PLAYER 2 GOES FIRST'
-    : 'PLAYER 1 TURN';
-
-  document.getElementById('turn-main').textContent = isP2
-    ? "YOUR OPPONENT'S TURN"
-    : `${STATE.p1Name}'S TURN`;
-
-  document.getElementById('turn-jp').textContent = isP2
-    ? '相手の番です'
-    : 'P1の番です';
-
-  splash.classList.remove('show');
-  void splash.offsetWidth;
-  splash.classList.add('show');
-
-  setTimeout(() => {
-    splash.classList.remove('show');
-    actuallyStartPlayerRun();
-  }, 1150);
-}
-  
   // per-player run
   currentPlayer: 2,  // 2 goes first
+  
   itemIndex: 0,
   correct: 0,
   wrong: 0,
@@ -1480,6 +1455,32 @@ function setupHandoff(player) {
 // ─────────────────────────────────────────────────────────────────────────────
 //  PLAYER RUN
 // ─────────────────────────────────────────────────────────────────────────────
+function showTurnSplashThenStart() {
+  const isP2 = STATE.currentPlayer === 2;
+  const splash = document.getElementById('turn-splash');
+
+  document.getElementById('turn-mini').textContent = isP2
+    ? 'PLAYER 2 GOES FIRST'
+    : 'PLAYER 1 TURN';
+
+  document.getElementById('turn-main').textContent = isP2
+    ? "YOUR OPPONENT'S TURN"
+    : `${STATE.p1Name}'S TURN`;
+
+  document.getElementById('turn-jp').textContent = isP2
+    ? '相手の番です'
+    : 'P1の番です';
+
+  splash.classList.remove('show');
+  void splash.offsetWidth;
+  splash.classList.add('show');
+
+  setTimeout(() => {
+    splash.classList.remove('show');
+    actuallyStartPlayerRun();
+  }, 1150);
+}
+
 function startPlayerRun() {
   showTurnSplashThenStart();
 }
