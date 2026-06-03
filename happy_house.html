@@ -189,14 +189,24 @@
       drop-shadow(0 0 18px rgba(255, 170, 20, 0.30));
     animation: hh-glow-gold 2.8s ease-in-out infinite;
   }
+  
   .hh-obj.liar-machine {
-    /* 🔧 tune width here */
+    /* tune width here */
     width: 12%;
     filter:
       drop-shadow(0 0 6px rgba(80, 200, 255, 0.55))
       drop-shadow(0 0 18px rgba(40, 150, 255, 0.28));
     animation: hh-glow-blue 2.8s ease-in-out infinite;
   }
+  .hh-obj.snap-machine {
+    /* tune width here */
+    width: 14%;
+    filter:
+      drop-shadow(0 0 6px rgba(90, 230, 130, 0.55))
+      drop-shadow(0 0 18px rgba(46, 204, 113, 0.28));
+    animation: hh-glow-green 2.8s ease-in-out infinite;
+  }
+  
   .hh-obj.mister-happy {
     /* 🔧 tune width here */
     width: 11%;
@@ -220,7 +230,8 @@
         drop-shadow(0 0 24px rgba(255, 180, 30, 0.38));
     }
   }
-  @keyframes hh-glow-blue {
+  
+ @keyframes hh-glow-blue {
     0%, 100% {
       filter:
         drop-shadow(0 0 5px rgba(80, 200, 255, 0.45))
@@ -232,6 +243,19 @@
         drop-shadow(0 0 24px rgba(60, 170, 255, 0.38));
     }
   }
+  @keyframes hh-glow-green {
+    0%, 100% {
+      filter:
+        drop-shadow(0 0 5px rgba(90, 230, 130, 0.45))
+        drop-shadow(0 0 14px rgba(46, 204, 113, 0.22));
+    }
+    50% {
+      filter:
+        drop-shadow(0 0 9px rgba(120, 255, 160, 0.70))
+        drop-shadow(0 0 24px rgba(70, 220, 130, 0.38));
+    }
+  }
+  
 
   /* ── Rotate prompt ── */
   #hh-rotate {
@@ -752,7 +776,7 @@
     if (scene.snapTest) {
       const img = document.createElement('img');
       img.src       = 'assets/happy_house/mister_happys_snap_test.png';
-      img.className = 'hh-obj liar-machine';
+      img.className = 'hh-obj snap-machine';
       img.style.left = scene.snapTest.hotspot.x + '%';
       img.style.top  = scene.snapTest.hotspot.y + '%';
       img.addEventListener('click', (e) => {
