@@ -1408,8 +1408,17 @@ function drawWanderers(nowMs){
     const _wScale = Math.min(1, Math.max(0.30, cssW / IMG_W));
     const drawR   = gR * _wScale;
     
-    const col1=MONTH_COLORS[w.ghostIdx%MONTH_COLORS.length][0],col2=MONTH_COLORS[w.ghostIdx%MONTH_COLORS.length][1];
-    const sec=nowMs/1000,pulseG=.5+.5*Math.sin(sec*2.1+w.ghostIdx*.8);
+    const colorKey = w.kind === 'extra'
+  ? (GHOSTS.length + w.extraIdx)
+  : w.ghostIdx;
+
+const colSet = MONTH_COLORS[colorKey % MONTH_COLORS.length];
+const col1 = colSet[0];
+const col2 = colSet[1];
+
+const sec = nowMs / 1000;
+const pulseG = .5 + .5 * Math.sin(sec * 2.1 + colorKey * .8);
+    
     ctx.save();
     for(let pi=w.trail.length-1;pi>=0;pi--){const p=w.trail[pi];const gr=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.size*2.3);gr.addColorStop(0,p.color);gr.addColorStop(1,'transparent');ctx.globalAlpha=p.life*.35*w.opacity;ctx.fillStyle=gr;ctx.beginPath();ctx.arc(p.x,p.y,p.size*2.3,0,Math.PI*2);ctx.fill();ctx.globalAlpha=p.life*.70*w.opacity;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(p.x,p.y,p.size*.34,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;p.life-=.018;p.x+=p.dx;p.y+=p.dy;}
     w.trail=w.trail.filter(p=>p.life>0);
@@ -2005,10 +2014,16 @@ window.b_4822 = function b_4822() {
 
   const cp = CHECKPOINTS.find(c => c.w === CURRENT_WEEK) || CHECKPOINTS[0];
 
-  if (!ghostIX || !ghostIY) {
-    ghostIX = cp.ix;
-    ghostIY = cp.iy;
-  }
+  // Put the player ghost at the current week checkpoint when DEV starts.
+ghostIX = cp.ix;
+ghostIY = cp.iy;
+ghostSrcIX = cp.ix;
+ghostSrcIY = cp.iy;
+ghostDstIX = cp.ix;
+ghostDstIY = cp.iy;
+ghostT = 1;
+activeWeek = cp.w;
+  
 
   buildWanderers();
   resizeCanvas();
