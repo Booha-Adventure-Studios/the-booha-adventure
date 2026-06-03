@@ -1467,13 +1467,16 @@ function renderHub() {
     btn.type = 'button';
     btn.className = `blitzPill ${cls}`;
     btn.textContent = label;
-    btn.addEventListener('click', () => {
+    
+  btn.addEventListener('click', () => {
+      const cw = getCurrentCurriculumWeek();
       engineMap[activeTab]({
         curr,
-        monthSlug: thisWeek.monthSlug,
-        weekNumber: thisWeek.weekNumber,
+        monthSlug: cw.monthSlug,
+        weekNumber: cw.weekNumber,
       });
     });
+    
     gamesEl.appendChild(btn);
   });
 }
