@@ -892,7 +892,7 @@ async function startMatch() {
   }
 
   STATE.weekKey = getWeekKey();
-  STATE.seed = hashStr(`${STATE.weekKey}:${STATE.curr}:${STATE.mode}:snap-test`);
+  STATE.seed = (Math.random() * 0xFFFFFFFF) >>> 0;  // fresh random seed every match
   STATE.cards = cards;
   STATE.items = seededShuffle(cards, mulberry32(STATE.seed)).slice(0, 15);
   STATE.pairs = buildPairs(STATE.items, mulberry32(STATE.seed + 999));
