@@ -818,15 +818,27 @@
   /* ═══════════════════════════════════════════
      INIT
   ═══════════════════════════════════════════ */
-  function init() {
-    const entryEl = getSceneEl('entry');
-    entryEl.style.opacity   = '1';
-    entryEl.style.transform = 'scale(1.0)';
-    entryEl.style.zIndex    = '2';
-    entryEl.classList.add('visible');
+function init() {
+    // Default to entry, unless a game sent us back to a specific scene (read-once).
+    let startScene = 'entry';
+    try {
+      const ret = localStorage.getItem('hh_return_scene');
+      if (ret && SCENES[ret]) startScene = ret;
+      localStorage.removeItem('hh_return_scene');
+    } catch (_) {}
 
-    buildHotspotsForScene('entry');
-    updateBackBtn(SCENES['entry']);
+    const startEl = getSceneEl(startScene);
+    startEl.style.opacity   = '1';
+    startEl.style.transform = 'scale(1.0)';
+    startEl.style.zIndex    = '2';
+    startEl.classList.add('visible');
+
+    currentScene = startScene;
+
+    buildHotspotsForScene(startScene);
+    updateBackBtn(SCENES[startScene]);
+
+    
 
     stage.addEventListener('click', (e) => {
       if (performance.now() < lockUntil) {
