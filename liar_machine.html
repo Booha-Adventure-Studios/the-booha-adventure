@@ -1130,14 +1130,14 @@
 
 <!-- RESULT -->
 <div id="screen-result" class="screen">
-  <div class="result-header">LIAR MACHINE — DUEL RESULTS</div>
+  <div class="result-header">LIAR MACHINE — RESULTS · けっか</div>
 
   <div class="result-grid" id="result-grid">
     <!-- populated by JS -->
   </div>
 
   <div class="result-winner-banner" id="result-banner">
-    <div class="result-winner-label">WINNER</div>
+    <div class="result-winner-label">RESULT · けっか</div>
     <div class="result-winner-name" id="result-winner-name">—</div>
     <div class="result-score-detail" id="result-score-detail"></div>
   </div>
@@ -1356,6 +1356,7 @@ function showScreen(id) {
 }
 
 function exitToGameRoom() {
+  try { localStorage.setItem('hh_return_scene', 'game-room'); } catch (_) {}
   const overlay = document.getElementById('flash-overlay');
   overlay.style.background = '#000';
   overlay.style.opacity = '1';
@@ -1824,66 +1825,84 @@ function showResult() {
   recordDuel({ mode: STATE.mode, p1, p2 });
 
   // Grid
- // Grid
+// Grid
   const penLine = (run) => {
     const rawS = ((run.timeMs - run.penaltyMs) / 1000).toFixed(1);
     if (run.penaltyMs > 0) {
       const penS = (run.penaltyMs / 1000).toFixed(1);
-      return `<div class="penalty-detail"><span class="pen-raw">RAW ${rawS}s</span>&nbsp; <span class="pen-cost">+${penS}s LIES</span></div>`;
+      return `<div class="penalty-detail"><span class="pen-raw">RAW ${rawS}s</span>&nbsp; <span class="pen-cost">+${penS}s ウソ</span></div>`;
     }
     return `<div class="penalty-detail"><span class="pen-clean">CLEAN RUN · ノーミス</span></div>`;
+  };
+  const statusCell = (run, colorClass) => {
+    const txt = run.survived
+      ? `✓ CLEAR<br><span style="font-size:11px;color:var(--jp-col)">クリア</span>`
+      : `✗ OUT<br><span style="font-size:11px;color:var(--accent2)">アウト</span>`;
+    return `<div class="result-cell-val ${colorClass}" style="font-size:15px">${txt}</div>`;
   };
   const grid = document.getElementById('result-grid');
   grid.innerHTML = `
     <div class="result-cell">
-      <div class="result-cell-label">${p1.name} FINAL TIME</div>
+      <div class="result-cell-label">${p1.name} TIME / タイム</div>
       <div class="result-cell-val p1c">${(p1.timeMs/1000).toFixed(1)}s</div>
       ${penLine(p1)}
     </div>
     <div class="result-cell">
-      <div class="result-cell-label">${p2.name} FINAL TIME</div>
+      <div class="result-cell-label">${p2.name} TIME / タイム</div>
       <div class="result-cell-val p2c">${(p2.timeMs/1000).toFixed(1)}s</div>
       ${penLine(p2)}
     </div>
-    
     <div class="result-cell">
-      <div class="result-cell-label">${p1.name} ACCURACY</div>
+      <div class="result-cell-label">${p1.name} せいかい率</div>
       <div class="result-cell-val p1c">${p1.accuracy}%</div>
     </div>
     <div class="result-cell">
-      <div class="result-cell-label">${p2.name} ACC</div>
+      <div class="result-cell-label">${p2.name} せいかい率</div>
       <div class="result-cell-val p2c">${p2.accuracy}%</div>
     </div>
     <div class="result-cell">
-      <div class="result-cell-label">${p1.name} STATUS</div>
-      <div class="result-cell-val p1c" style="font-size:14px">${p1.survived ? '✓ SURVIVED' : '✗ ELIMINATED'}</div>
+      <div class="result-cell-label">${p1.name} けっか</div>
+      ${statusCell(p1, 'p1c')}
     </div>
     <div class="result-cell">
-      <div class="result-cell-label">${p2.name}</div>
-      <div class="result-cell-val p2c" style="font-size:14px">${p2.survived ? '✓ SURVIVED' : '✗ ELIMINATED'}</div>
+      <div class="result-cell-label">${p2.name} けっか</div>
+      ${statusCell(p2, 'p2c')}
     </div>
   `;
 
-  // Banner
+  // Banner (bilingual)
   const banner   = document.getElementById('result-banner');
   const nameEl   = document.getElementById('result-winner-name');
   const detailEl = document.getElementById('result-score-detail');
   banner.className = 'result-winner-banner';
 
+  let detail;
+  if (winner === 'draw') {
+    detail = (!p1.survived && !p2.survived)
+      ? 'BOTH OUT · 2人ともアウト！'
+      : 'DEAD HEAT · ひきわけ！';
+  } else {
+    const loser = (winner === 'p1') ? p2 : p1;
+    detail = (!loser.survived)
+      ? `${loser.name} OUT · ${loser.name}は70%みまんでアウト`
+      : 'FAST & CORRECT · はやくて せいかい！';
+  }
+  detailEl.textContent = detail;
+
   if (winner === 'p1') {
-    nameEl.textContent = `${p1.name} WINS`;
-    nameEl.className   = 'result-winner-name';
-    detailEl.textContent = reason;
+    nameEl.innerHTML = `${p1.name} WINS<br><span style="font-size:0.5em;color:var(--jp-col)">${p1.name}の勝ち！</span>`;
+    nameEl.className  = 'result-winner-name';
   } else if (winner === 'p2') {
-    nameEl.textContent = `${p2.name} WINS`;
-    nameEl.className   = 'result-winner-name';
-    detailEl.textContent = reason;
+    nameEl.innerHTML = `${p2.name} WINS<br><span style="font-size:0.5em;color:var(--jp-col)">${p2.name}の勝ち！</span>`;
+    nameEl.className  = 'result-winner-name';
     banner.classList.add('loser');
     nameEl.classList.add('loser');
   } else {
-    nameEl.textContent = 'DEAD HEAT';
-    nameEl.className   = 'result-winner-name draw';
-    detailEl.textContent = reason;
+    const bothOut = (!p1.survived && !p2.survived);
+    nameEl.innerHTML = bothOut
+      ? 'BOTH OUT<br><span style="font-size:0.5em;color:var(--jp-col)">2人ともアウト！</span>'
+      : 'DEAD HEAT<br><span style="font-size:0.5em;color:var(--jp-col)">ひきわけ！</span>';
+    nameEl.className  = 'result-winner-name draw';
     banner.classList.add('draw');
   }
 
