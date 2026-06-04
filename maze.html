@@ -1422,16 +1422,14 @@ const pulseG = .5 + .5 * Math.sin(sec * 2.1 + colorKey * .8);
     // Extras: cheap render — no trail, no radial gradients.
     // Just the sprite with a gentle opacity breathe + one soft shadow glow.
     if (w.kind === 'extra') {
-      ctx.save();
-      ctx.globalAlpha = w.opacity * (.55 + pulseG * .25);
-      ctx.shadowBlur  = 12 * _wScale;
-      ctx.shadowColor = col1;
-      ctx.drawImage(img, gx - drawR, gy - drawR, drawR * 2, drawR * 2);
-      ctx.shadowBlur  = 0;
-      ctx.globalAlpha = 1;
-      ctx.restore();
-      continue;
-    }
+  ctx.save();
+  ctx.globalAlpha = w.opacity;                      // sprite always full colour
+  ctx.shadowBlur  = (8 + pulseG * 12) * _wScale;    // the halo breathes
+  ctx.shadowColor = col1;
+  ctx.drawImage(img, gx - drawR, gy - drawR, drawR * 2, drawR * 2);
+  ctx.restore();
+  continue;
+}
     
     ctx.save();
     
