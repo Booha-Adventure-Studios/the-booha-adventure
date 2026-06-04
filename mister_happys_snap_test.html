@@ -390,6 +390,13 @@
     background: linear-gradient(90deg, var(--green), var(--gold) 60%, var(--red));
   }
 
+  /* PASS announce — receiver's own half pulses YOUR TURN (oriented) before the question shows */
+  .half.announce .snap-hint   { display: block; animation: announcePulse .4s ease-in-out 2; }
+  .half.announce .prompt      { display: none; }
+  .half.announce .answers     { display: none; }
+  .half.announce .timer-track { visibility: hidden; }
+  @keyframes announcePulse { 0%,100%{ transform: scale(1);} 50%{ transform: scale(1.18);} }
+
   /* thin centre divider — round counter + go signal */
   .center-strip {
     display: flex;
@@ -404,12 +411,18 @@
   }
   .round-num { font-family:'Black Han Sans', sans-serif; font-size: clamp(16px, 4vw, 24px); color: var(--text); }
   .round-num small { color: var(--dim); }
-  .center-status {
-    font-family:'Black Han Sans', sans-serif;
-    font-size: clamp(14px, 4vw, 24px);
-    letter-spacing: 3px;
-    color: var(--gold);
+  .state-dot {
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: var(--dim);
+    transition: background .15s, box-shadow .15s;
   }
+  .state-dot.go {
+    background: var(--gold);
+    box-shadow: 0 0 16px var(--gold);
+    animation: dotPulse .55s ease-in-out infinite;
+  }
+  @keyframes dotPulse { 0%,100%{opacity:1} 50%{opacity:.35} }
   .mode-tag { font-size: 10px; letter-spacing: 2px; color: var(--dim); }
 
   /* ═══ FEEDBACK ══════════════════════════════════════════ */
@@ -645,7 +658,7 @@
     <!-- CENTRE -->
     <div class="center-strip">
       <div class="round-num"><span id="round-now">1</span><small>/15</small></div>
-      <div class="center-status" id="center-status">READY</div>
+      <div class="state-dot" id="state-dot"></div>
       <div class="mode-tag" id="mode-tag">BR · VOCAB</div>
     </div>
 
@@ -768,6 +781,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function exitToGameRoom() {
+  try { localStorage.setItem('hh_return_scene', 'game-room'); } catch (_) {}
   flashColor('gold');
   setTimeout(() => { window.location.href = 'happy_house.html'; }, 260);
 }
@@ -924,6 +938,7 @@ function setPromptFor(p, pair) {
   document.getElementById('p' + p + '-jp').textContent = pair.jp;
   document.getElementById('p' + p + '-hira').textContent = pair.hira || '';
 }
+function setDot(go) { document.getElementById('state-dot').classList.toggle('go', !!go); }
 
 // ── round flow ────────────────────────────────────────────────────────────────
 function nextRound() {
@@ -939,7 +954,7 @@ function nextRound() {
     setHalfClass(p, 'locked');
     setHint(p, '…', 'まて');
   });
-  document.getElementById('center-status').textContent = 'GET READY';
+  setDot(false);
   updateHud();
 
   const rng = mulberry32(STATE.seed + STATE.round * 77 + 1234);
@@ -951,9 +966,9 @@ function goLive() {
   STATE.phase = 'live';
   [1,2].forEach(p => {
     setHalfClass(p, 'live');
-    setHint(p, 'TAP!', '押して！');
+    setHint(p, 'TAP!', '押せ！');
   });
-  document.getElementById('center-status').textContent = 'SNAP!';
+  setDot(true);
   beep('go');
   later(noSnap, LIVE_MS);
 }
@@ -981,20 +996,28 @@ function beginAnswer(player, isPass) {
 
   const opp = other(player);
   setPromptFor(player, STATE.pair);
-  setHalfClass(player, 'answering');
   setHalfClass(opp, 'waiting');
-  setHint(opp, 'WAIT', 'まって');
+  setHint(opp, 'WAIT', 'まて');
+  setDot(false);
 
   STATE.stats.attempts[player]++;
   if (!isPass) STATE.stats.snaps[player]++;
 
-  document.getElementById('center-status').textContent = isPass ? 'PASSED' : `${pName(player)}`;
   flashColor(player === 1 ? 'snap1' : 'snap2');
   beep('hit');
 
-  if (isPass) showToast('TOO SLOW → PASS', `${pName(player)}の番！`, `${pName(player)}, your turn!`, player);
-
-  startAnswerTimer(player);
+  if (isPass) {
+    // brief oriented "YOUR TURN" pulse in the receiver's own half, then reveal the question
+    setHalfClass(player, 'answering', 'announce');
+    setHint(player, 'YOUR TURN', '君の番');
+    later(() => {
+      half(player).classList.remove('announce');
+      startAnswerTimer(player);
+    }, 800);
+  } else {
+    setHalfClass(player, 'answering');
+    startAnswerTimer(player);
+  }
 }
 
 function startAnswerTimer(player) {
