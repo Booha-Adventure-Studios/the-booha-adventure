@@ -1353,6 +1353,13 @@ function showScreen(id) {
   // X button only on title screen
   document.getElementById('liar-exit-btn').style.display =
     id === 'title' ? 'block' : 'none';
+
+  if (id === 'readycalc') {
+    const n = STATE.p1Name || getP1Name();
+    const box = document.getElementById('screen-readycalc');
+    box.querySelector('.calc-title').textContent = `${n} ONLY`;
+    box.querySelector('.jp-line').textContent     = `${n}だけ`;
+  }
 }
 
 function exitToGameRoom() {
