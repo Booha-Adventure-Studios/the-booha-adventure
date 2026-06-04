@@ -1460,11 +1460,12 @@ async function startDuel() {
   }
 
   STATE.weekKey = getWeekKey();
-  STATE.seed    = hashStr(STATE.weekKey + STATE.curr + STATE.mode);
+  STATE.seed    = (Math.random() * 0xFFFFFFFF) >>> 0;  // fresh random seed every duel
   const rng     = mulberry32(STATE.seed);
 
   // Shuffle pool, pick 15
   const shuffled = seededShuffle(cards, mulberry32(STATE.seed));
+  
   STATE.allCards = cards;
   STATE.items    = shuffled.slice(0, 15);
 
