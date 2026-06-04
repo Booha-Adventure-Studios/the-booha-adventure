@@ -907,6 +907,44 @@
   }
 }
 
+/* ── TIER 1: DANGER ZONE + PENALTY REVEAL ── */
+#danger-warning {
+  position: absolute;
+  top: 6px; left: 50%; transform: translateX(-50%);
+  z-index: 50;
+  display: none;
+  text-align: center;
+  font-family: 'Black Han Sans', sans-serif;
+  font-size: clamp(15px, 4.2vw, 23px);
+  letter-spacing: 2px;
+  color: var(--accent2);
+  background: rgba(36,6,6,0.94);
+  border: 2px solid var(--accent2);
+  padding: 8px 18px;
+  line-height: 1.15;
+  text-shadow: 0 0 14px rgba(255,78,78,0.6);
+  animation: dangerPulse 0.7s ease-in-out infinite;
+  pointer-events: none;
+}
+#danger-warning.show { display: block; }
+#danger-warning span {
+  display: block;
+  margin-top: 2px;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 900;
+  font-size: clamp(12px, 3.2vw, 16px);
+  color: var(--jp-col);
+}
+@keyframes dangerPulse {
+  0%,100% { opacity: 1;    box-shadow: 0 0 16px rgba(255,78,78,0.35); }
+  50%     { opacity: 0.82; box-shadow: 0 0 34px rgba(255,78,78,0.85); }
+}
+
+.penalty-detail { font-size: 10px; letter-spacing: 1px; margin-top: 6px; line-height: 1.4; }
+.penalty-detail .pen-raw   { color: var(--dim); }
+.penalty-detail .pen-cost  { color: var(--accent2); font-weight: bold; }
+.penalty-detail .pen-clean { color: var(--yes); }
+  
   
 </style>
 </head>
@@ -1023,8 +1061,10 @@
     </div>
   </div>
 
-  <div class="game-content" id="game-content">
+ <div class="game-content" id="game-content">
+    <div id="danger-warning">ONE MORE MISTAKE?<span>もう一回まちがえたら…</span></div>
     <div class="item-track en-track">
+      
       <div class="track-label">ENGLISH</div>
       <div class="item-text en-text" id="disp-en">—</div>
     </div>
@@ -1572,8 +1612,9 @@ function renderItem(first) {
   }
 
   // HUD
-  document.getElementById('hud-item-num').textContent = STATE.itemIndex + 1;
+document.getElementById('hud-item-num').textContent = STATE.itemIndex + 1;
   updateAccuracyHud();
+  updateDangerWarning();
 }
 
 function setItemText(pair, enEl, jpEl, hiraEl) {
@@ -1596,6 +1637,14 @@ function updateAccuracyHud() {
   const el = document.getElementById('hud-accuracy');
   el.textContent = pct + '%';
   el.className = 'hud-accuracy ' + (pct < 70 && answered >= 5 ? 'danger' : 'ok');
+}
+
+function updateDangerWarning() {
+  const answered     = STATE.correct + STATE.wrong;
+  const nextAnswered = answered + 1;
+  // Fire only when ONE more wrong answer would drop them under the 70% kill line.
+  const fatal = nextAnswered >= 5 && (STATE.correct / nextAnswered) < 0.70;
+  document.getElementById('danger-warning').classList.toggle('show', fatal);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1775,16 +1824,28 @@ function showResult() {
   recordDuel({ mode: STATE.mode, p1, p2 });
 
   // Grid
+ // Grid
+  const penLine = (run) => {
+    const rawS = ((run.timeMs - run.penaltyMs) / 1000).toFixed(1);
+    if (run.penaltyMs > 0) {
+      const penS = (run.penaltyMs / 1000).toFixed(1);
+      return `<div class="penalty-detail"><span class="pen-raw">RAW ${rawS}s</span>&nbsp; <span class="pen-cost">+${penS}s LIES</span></div>`;
+    }
+    return `<div class="penalty-detail"><span class="pen-clean">CLEAN RUN · ノーミス</span></div>`;
+  };
   const grid = document.getElementById('result-grid');
   grid.innerHTML = `
     <div class="result-cell">
-      <div class="result-cell-label">${p1.name} TIME</div>
+      <div class="result-cell-label">${p1.name} FINAL TIME</div>
       <div class="result-cell-val p1c">${(p1.timeMs/1000).toFixed(1)}s</div>
+      ${penLine(p1)}
     </div>
     <div class="result-cell">
-      <div class="result-cell-label">${p2.name} TIME</div>
+      <div class="result-cell-label">${p2.name} FINAL TIME</div>
       <div class="result-cell-val p2c">${(p2.timeMs/1000).toFixed(1)}s</div>
+      ${penLine(p2)}
     </div>
+    
     <div class="result-cell">
       <div class="result-cell-label">${p1.name} ACCURACY</div>
       <div class="result-cell-val p1c">${p1.accuracy}%</div>
