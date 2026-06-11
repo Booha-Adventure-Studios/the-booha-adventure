@@ -1,1 +1,485 @@
 
+{
+"cards": [
+{
+"n": 1,
+"en": "It is sunny.",
+"jp": "晴れです。",
+"hira": "はれ です",
+"mp3": "pb_s01_it_is_sunny.mp3",
+"jp_mp3": "pb_s01_it_is_sunny_jp.mp3"
+},
+{
+"n": 2,
+"en": "It is cloudy.",
+"jp": "くもりです。",
+"hira": "くもり です",
+"mp3": "pb_s02_it_is_cloudy.mp3",
+"jp_mp3": "pb_s02_it_is_cloudy_jp.mp3"
+},
+{
+"n": 3,
+"en": "It is rainy.",
+"jp": "雨です。",
+"hira": "あめ です",
+"mp3": "pb_s03_it_is_rainy.mp3",
+"jp_mp3": "pb_s03_it_is_rainy_jp.mp3"
+},
+{
+"n": 4,
+"en": "It is snowy.",
+"jp": "雪です。",
+"hira": "ゆき です",
+"mp3": "pb_s04_it_is_snowy.mp3",
+"jp_mp3": "pb_s04_it_is_snowy_jp.mp3"
+},
+{
+"n": 5,
+"en": "It is windy.",
+"jp": "風が強いです。",
+"hira": "かぜ が つよい です",
+"mp3": "pb_s05_it_is_windy.mp3",
+"jp_mp3": "pb_s05_it_is_windy_jp.mp3"
+},
+{
+"n": 6,
+"en": "It is hot.",
+"jp": "暑いです。",
+"hira": "あつい です",
+"mp3": "pb_s06_it_is_hot.mp3",
+"jp_mp3": "pb_s06_it_is_hot_jp.mp3"
+},
+{
+"n": 7,
+"en": "It is cold.",
+"jp": "寒いです。",
+"hira": "さむい です",
+"mp3": "pb_s07_it_is_cold.mp3",
+"jp_mp3": "pb_s07_it_is_cold_jp.mp3"
+},
+{
+"n": 8,
+"en": "It is cool.",
+"jp": "涼しいです。",
+"hira": "すずしい です",
+"mp3": "pb_s08_it_is_cool.mp3",
+"jp_mp3": "pb_s08_it_is_cool_jp.mp3"
+},
+{
+"n": 9,
+"en": "It is warm.",
+"jp": "暖かいです。",
+"hira": "あたたかい です",
+"mp3": "pb_s09_it_is_warm.mp3",
+"jp_mp3": "pb_s09_it_is_warm_jp.mp3"
+},
+{
+"n": 10,
+"en": "I like sunny days.",
+"jp": "晴れの日が好きです。",
+"hira": "はれ の ひ が すき です",
+"mp3": "pb_s10_i_like_sunny_days.mp3",
+"jp_mp3": "pb_s10_i_like_sunny_days_jp.mp3"
+},
+{
+"n": 11,
+"en": "I like spring.",
+"jp": "春が好きです。",
+"hira": "はる が すき です",
+"mp3": "pb_s11_i_like_spring.mp3",
+"jp_mp3": "pb_s11_i_like_spring_jp.mp3"
+},
+{
+"n": 12,
+"en": "I like summer.",
+"jp": "夏が好きです。",
+"hira": "なつ が すき です",
+"mp3": "pb_s12_i_like_summer.mp3",
+"jp_mp3": "pb_s12_i_like_summer_jp.mp3"
+},
+{
+"n": 13,
+"en": "I like autumn.",
+"jp": "秋が好きです。",
+"hira": "あき が すき です",
+"mp3": "pb_s13_i_like_autumn.mp3",
+"jp_mp3": "pb_s13_i_like_autumn_jp.mp3"
+},
+{
+"n": 14,
+"en": "I like winter.",
+"jp": "冬が好きです。",
+"hira": "ふゆ が すき です",
+"mp3": "pb_s14_i_like_winter.mp3",
+"jp_mp3": "pb_s14_i_like_winter_jp.mp3"
+},
+{
+"n": 15,
+"en": "Flowers bloom.",
+"jp": "花が咲きます。",
+"hira": "はな が さき ます",
+"mp3": "pb_s15_flowers_bloom.mp3",
+"jp_mp3": "pb_s15_flowers_bloom_jp.mp3"
+},
+{
+"n": 16,
+"en": "Leaves change color.",
+"jp": "葉の色が変わります。",
+"hira": "は の いろ が かわり ます",
+"mp3": "pb_s16_leaves_change_color.mp3",
+"jp_mp3": "pb_s16_leaves_change_color_jp.mp3"
+},
+{
+"n": 17,
+"en": "I use an umbrella.",
+"jp": "かさを使います。",
+"hira": "かさ を つかい ます",
+"mp3": "pb_s17_i_use_an_umbrella.mp3",
+"jp_mp3": "pb_s17_i_use_an_umbrella_jp.mp3"
+},
+{
+"n": 18,
+"en": "I wear a T-shirt.",
+"jp": "Tシャツを着ます。",
+"hira": "てぃーしゃつ を き ます",
+"mp3": "pb_s18_i_wear_a_t_shirt.mp3",
+"jp_mp3": "pb_s18_i_wear_a_t_shirt_jp.mp3"
+},
+{
+"n": 19,
+"en": "I wear a coat.",
+"jp": "コートを着ます。",
+"hira": "こーと を き ます",
+"mp3": "pb_s19_i_wear_a_coat.mp3",
+"jp_mp3": "pb_s19_i_wear_a_coat_jp.mp3"
+},
+{
+"n": 20,
+"en": "Let’s check the weather.",
+"jp": "天気を見ましょう。",
+"hira": "てんき を み ましょう",
+"mp3": "pb_s20_lets_check_the_weather.mp3",
+"jp_mp3": "pb_s20_lets_check_the_weather_jp.mp3"
+},
+{
+"n": 21,
+"en": "There is an earthquake.",
+"jp": "地震です。",
+"hira": "じしん です",
+"mp3": "pb_s21_there_is_an_earthquake.mp3",
+"jp_mp3": "pb_s21_there_is_an_earthquake_jp.mp3"
+},
+{
+"n": 22,
+"en": "Stay calm.",
+"jp": "落ち着いてください。",
+"hira": "おちついて ください",
+"mp3": "pb_s22_stay_calm.mp3",
+"jp_mp3": "pb_s22_stay_calm_jp.mp3"
+},
+{
+"n": 23,
+"en": "Go under the table.",
+"jp": "テーブルの下に入ってください。",
+"hira": "てーぶる の した に はいって ください",
+"mp3": "pb_s23_go_under_the_table.mp3",
+"jp_mp3": "pb_s23_go_under_the_table_jp.mp3"
+},
+{
+"n": 24,
+"en": "Do not run.",
+"jp": "走らないでください。",
+"hira": "はしら ないで ください",
+"mp3": "pb_s24_do_not_run.mp3",
+"jp_mp3": "pb_s24_do_not_run_jp.mp3"
+},
+{
+"n": 25,
+"en": "Listen carefully.",
+"jp": "よく聞いてください。",
+"hira": "よく きいて ください",
+"mp3": "pb_s25_listen_carefully.mp3",
+"jp_mp3": "pb_s25_listen_carefully_jp.mp3"
+},
+{
+"n": 26,
+"en": "Go to the shelter.",
+"jp": "避難所へ行ってください。",
+"hira": "ひなんじょ へ いって ください",
+"mp3": "pb_s26_go_to_the_shelter.mp3",
+"jp_mp3": "pb_s26_go_to_the_shelter_jp.mp3"
+},
+{
+"n": 27,
+"en": "Bring water.",
+"jp": "水を持って行ってください。",
+"hira": "みず を もって いって ください",
+"mp3": "pb_s27_bring_water.mp3",
+"jp_mp3": "pb_s27_bring_water_jp.mp3"
+},
+{
+"n": 28,
+"en": "Bring food.",
+"jp": "食べ物を持って行ってください。",
+"hira": "たべもの を もって いって ください",
+"mp3": "pb_s28_bring_food.mp3",
+"jp_mp3": "pb_s28_bring_food_jp.mp3"
+},
+{
+"n": 29,
+"en": "Bring a flashlight.",
+"jp": "懐中電灯を持って行ってください。",
+"hira": "かいちゅうでんとう を もって いって ください",
+"mp3": "pb_s29_bring_a_flashlight.mp3",
+"jp_mp3": "pb_s29_bring_a_flashlight_jp.mp3"
+},
+{
+"n": 30,
+"en": "Are you safe?",
+"jp": "安全ですか。",
+"hira": "あんぜん です か",
+"mp3": "pb_s30_are_you_safe.mp3",
+"jp_mp3": "pb_s30_are_you_safe_jp.mp3"
+},
+{
+"n": 31,
+"en": "This is a bear.",
+"jp": "これはクマです。",
+"hira": "これ は くま です",
+"mp3": "pb_s31_this_is_a_bear.mp3",
+"jp_mp3": "pb_s31_this_is_a_bear_jp.mp3"
+},
+{
+"n": 32,
+"en": "This is a fox.",
+"jp": "これはキツネです。",
+"hira": "これ は きつね です",
+"mp3": "pb_s32_this_is_a_fox.mp3",
+"jp_mp3": "pb_s32_this_is_a_fox_jp.mp3"
+},
+{
+"n": 33,
+"en": "This is a deer.",
+"jp": "これはシカです。",
+"hira": "これ は しか です",
+"mp3": "pb_s33_this_is_a_deer.mp3",
+"jp_mp3": "pb_s33_this_is_a_deer_jp.mp3"
+},
+{
+"n": 34,
+"en": "This is an eagle.",
+"jp": "これはワシです。",
+"hira": "これ は わし です",
+"mp3": "pb_s34_this_is_an_eagle.mp3",
+"jp_mp3": "pb_s34_this_is_an_eagle_jp.mp3"
+},
+{
+"n": 35,
+"en": "This is a dolphin.",
+"jp": "これはイルカです。",
+"hira": "これ は いるか です",
+"mp3": "pb_s35_this_is_a_dolphin.mp3",
+"jp_mp3": "pb_s35_this_is_a_dolphin_jp.mp3"
+},
+{
+"n": 36,
+"en": "This is a turtle.",
+"jp": "これはカメです。",
+"hira": "これ は かめ です",
+"mp3": "pb_s36_this_is_a_turtle.mp3",
+"jp_mp3": "pb_s36_this_is_a_turtle_jp.mp3"
+},
+{
+"n": 37,
+"en": "This is a frog.",
+"jp": "これはカエルです。",
+"hira": "これ は かえる です",
+"mp3": "pb_s37_this_is_a_frog.mp3",
+"jp_mp3": "pb_s37_this_is_a_frog_jp.mp3"
+},
+{
+"n": 38,
+"en": "This is a butterfly.",
+"jp": "これはチョウです。",
+"hira": "これ は ちょう です",
+"mp3": "pb_s38_this_is_a_butterfly.mp3",
+"jp_mp3": "pb_s38_this_is_a_butterfly_jp.mp3"
+},
+{
+"n": 39,
+"en": "This is an insect.",
+"jp": "これは昆虫です。",
+"hira": "これ は こんちゅう です",
+"mp3": "pb_s39_this_is_an_insect.mp3",
+"jp_mp3": "pb_s39_this_is_an_insect_jp.mp3"
+},
+{
+"n": 40,
+"en": "This is an animal.",
+"jp": "これは動物です。",
+"hira": "これ は どうぶつ です",
+"mp3": "pb_s40_this_is_an_animal.mp3",
+"jp_mp3": "pb_s40_this_is_an_animal_jp.mp3"
+},
+{
+"n": 41,
+"en": "A bear can climb.",
+"jp": "クマは登れます。",
+"hira": "くま は のぼれ ます",
+"mp3": "pb_s41_a_bear_can_climb.mp3",
+"jp_mp3": "pb_s41_a_bear_can_climb_jp.mp3"
+},
+{
+"n": 42,
+"en": "A deer can run.",
+"jp": "シカは走れます。",
+"hira": "しか は はしれ ます",
+"mp3": "pb_s42_a_deer_can_run.mp3",
+"jp_mp3": "pb_s42_a_deer_can_run_jp.mp3"
+},
+{
+"n": 43,
+"en": "An eagle can fly.",
+"jp": "ワシは飛べます。",
+"hira": "わし は とべ ます",
+"mp3": "pb_s43_an_eagle_can_fly.mp3",
+"jp_mp3": "pb_s43_an_eagle_can_fly_jp.mp3"
+},
+{
+"n": 44,
+"en": "A dolphin can swim.",
+"jp": "イルカは泳げます。",
+"hira": "いるか は およげ ます",
+"mp3": "pb_s44_a_dolphin_can_swim.mp3",
+"jp_mp3": "pb_s44_a_dolphin_can_swim_jp.mp3"
+},
+{
+"n": 45,
+"en": "Animals need homes.",
+"jp": "動物にはすみかが必要です。",
+"hira": "どうぶつ に は すみか が ひつよう です",
+"mp3": "pb_s45_animals_need_homes.mp3",
+"jp_mp3": "pb_s45_animals_need_homes_jp.mp3"
+},
+{
+"n": 46,
+"en": "Let’s go hiking.",
+"jp": "ハイキングに行きましょう。",
+"hira": "はいきんぐ に いき ましょう",
+"mp3": "pb_s46_lets_go_hiking.mp3",
+"jp_mp3": "pb_s46_lets_go_hiking_jp.mp3"
+},
+{
+"n": 47,
+"en": "Let’s go camping.",
+"jp": "キャンプに行きましょう。",
+"hira": "きゃんぷ に いき ましょう",
+"mp3": "pb_s47_lets_go_camping.mp3",
+"jp_mp3": "pb_s47_lets_go_camping_jp.mp3"
+},
+{
+"n": 48,
+"en": "This is a tent.",
+"jp": "これはテントです。",
+"hira": "これ は てんと です",
+"mp3": "pb_s48_this_is_a_tent.mp3",
+"jp_mp3": "pb_s48_this_is_a_tent_jp.mp3"
+},
+{
+"n": 49,
+"en": "This is a map.",
+"jp": "これは地図です。",
+"hira": "これ は ちず です",
+"mp3": "pb_s49_this_is_a_map.mp3",
+"jp_mp3": "pb_s49_this_is_a_map_jp.mp3"
+},
+{
+"n": 50,
+"en": "This is a compass.",
+"jp": "これはコンパスです。",
+"hira": "これ は こんぱす です",
+"mp3": "pb_s50_this_is_a_compass.mp3",
+"jp_mp3": "pb_s50_this_is_a_compass_jp.mp3"
+},
+{
+"n": 51,
+"en": "I have a backpack.",
+"jp": "リュックを持っています。",
+"hira": "りゅっく を もって い ます",
+"mp3": "pb_s51_i_have_a_backpack.mp3",
+"jp_mp3": "pb_s51_i_have_a_backpack_jp.mp3"
+},
+{
+"n": 52,
+"en": "I have a snack.",
+"jp": "おやつを持っています。",
+"hira": "おやつ を もって い ます",
+"mp3": "pb_s52_i_have_a_snack.mp3",
+"jp_mp3": "pb_s52_i_have_a_snack_jp.mp3"
+},
+{
+"n": 53,
+"en": "Let’s have a picnic.",
+"jp": "ピクニックをしましょう。",
+"hira": "ぴくにっく を し ましょう",
+"mp3": "pb_s53_lets_have_a_picnic.mp3",
+"jp_mp3": "pb_s53_lets_have_a_picnic_jp.mp3"
+},
+{
+"n": 54,
+"en": "Let’s go to the park.",
+"jp": "公園に行きましょう。",
+"hira": "こうえん に いき ましょう",
+"mp3": "pb_s54_lets_go_to_the_park.mp3",
+"jp_mp3": "pb_s54_lets_go_to_the_park_jp.mp3"
+},
+{
+"n": 55,
+"en": "Stay on the trail.",
+"jp": "ハイキングコースを歩いてください。",
+"hira": "はいきんぐこーす を あるいて ください",
+"mp3": "pb_s55_stay_on_the_trail.mp3",
+"jp_mp3": "pb_s55_stay_on_the_trail_jp.mp3"
+},
+{
+"n": 56,
+"en": "Do not leave trash.",
+"jp": "ごみを置いていかないでください。",
+"hira": "ごみ を おいて いか ないで ください",
+"mp3": "pb_s56_do_not_leave_trash.mp3",
+"jp_mp3": "pb_s56_do_not_leave_trash_jp.mp3"
+},
+{
+"n": 57,
+"en": "I see a bird.",
+"jp": "鳥が見えます。",
+"hira": "とり が みえ ます",
+"mp3": "pb_s57_i_see_a_bird.mp3",
+"jp_mp3": "pb_s57_i_see_a_bird_jp.mp3"
+},
+{
+"n": 58,
+"en": "I like nature.",
+"jp": "自然が好きです。",
+"hira": "しぜん が すき です",
+"mp3": "pb_s58_i_like_nature.mp3",
+"jp_mp3": "pb_s58_i_like_nature_jp.mp3"
+},
+{
+"n": 59,
+"en": "Write in your journal.",
+"jp": "ノートに書いてください。",
+"hira": "のーと に かいて ください",
+"mp3": "pb_s59_write_in_your_journal.mp3",
+"jp_mp3": "pb_s59_write_in_your_journal_jp.mp3"
+},
+{
+"n": 60,
+"en": "Let’s go outside.",
+"jp": "外に行きましょう。",
+"hira": "そと に いき ましょう",
+"mp3": "pb_s60_lets_go_outside.mp3",
+"jp_mp3": "pb_s60_lets_go_outside_jp.mp3"
+}
+]
+}
