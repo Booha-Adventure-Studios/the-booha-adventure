@@ -1,1 +1,485 @@
 
+{
+"cards": [
+{
+"n": 1,
+"en": "sunny",
+"jp": "晴れ",
+"hira": "はれ",
+"mp3": "pb_v01_sunny.mp3",
+"jp_mp3": "pb_v01_sunny_jp.mp3"
+},
+{
+"n": 2,
+"en": "cloudy",
+"jp": "くもり",
+"hira": "くもり",
+"mp3": "pb_v02_cloudy.mp3",
+"jp_mp3": "pb_v02_cloudy_jp.mp3"
+},
+{
+"n": 3,
+"en": "rainy",
+"jp": "雨",
+"hira": "あめ",
+"mp3": "pb_v03_rainy.mp3",
+"jp_mp3": "pb_v03_rainy_jp.mp3"
+},
+{
+"n": 4,
+"en": "snowy",
+"jp": "雪",
+"hira": "ゆき",
+"mp3": "pb_v04_snowy.mp3",
+"jp_mp3": "pb_v04_snowy_jp.mp3"
+},
+{
+"n": 5,
+"en": "windy",
+"jp": "風",
+"hira": "かぜ",
+"mp3": "pb_v05_windy.mp3",
+"jp_mp3": "pb_v05_windy_jp.mp3"
+},
+{
+"n": 6,
+"en": "hot",
+"jp": "暑い",
+"hira": "あつい",
+"mp3": "pb_v06_hot.mp3",
+"jp_mp3": "pb_v06_hot_jp.mp3"
+},
+{
+"n": 7,
+"en": "cold",
+"jp": "寒い",
+"hira": "さむい",
+"mp3": "pb_v07_cold.mp3",
+"jp_mp3": "pb_v07_cold_jp.mp3"
+},
+{
+"n": 8,
+"en": "cool",
+"jp": "涼しい",
+"hira": "すずしい",
+"mp3": "pb_v08_cool.mp3",
+"jp_mp3": "pb_v08_cool_jp.mp3"
+},
+{
+"n": 9,
+"en": "warm",
+"jp": "暖かい",
+"hira": "あたたかい",
+"mp3": "pb_v09_warm.mp3",
+"jp_mp3": "pb_v09_warm_jp.mp3"
+},
+{
+"n": 10,
+"en": "weather",
+"jp": "天気",
+"hira": "てんき",
+"mp3": "pb_v10_weather.mp3",
+"jp_mp3": "pb_v10_weather_jp.mp3"
+},
+{
+"n": 11,
+"en": "spring",
+"jp": "春",
+"hira": "はる",
+"mp3": "pb_v11_spring.mp3",
+"jp_mp3": "pb_v11_spring_jp.mp3"
+},
+{
+"n": 12,
+"en": "summer",
+"jp": "夏",
+"hira": "なつ",
+"mp3": "pb_v12_summer.mp3",
+"jp_mp3": "pb_v12_summer_jp.mp3"
+},
+{
+"n": 13,
+"en": "autumn",
+"jp": "秋",
+"hira": "あき",
+"mp3": "pb_v13_autumn.mp3",
+"jp_mp3": "pb_v13_autumn_jp.mp3"
+},
+{
+"n": 14,
+"en": "winter",
+"jp": "冬",
+"hira": "ふゆ",
+"mp3": "pb_v14_winter.mp3",
+"jp_mp3": "pb_v14_winter_jp.mp3"
+},
+{
+"n": 15,
+"en": "season",
+"jp": "季節",
+"hira": "きせつ",
+"mp3": "pb_v15_season.mp3",
+"jp_mp3": "pb_v15_season_jp.mp3"
+},
+{
+"n": 16,
+"en": "umbrella",
+"jp": "かさ",
+"hira": "かさ",
+"mp3": "pb_v16_umbrella.mp3",
+"jp_mp3": "pb_v16_umbrella_jp.mp3"
+},
+{
+"n": 17,
+"en": "T-shirt",
+"jp": "Tシャツ",
+"hira": "てぃーしゃつ",
+"mp3": "pb_v17_t_shirt.mp3",
+"jp_mp3": "pb_v17_t_shirt_jp.mp3"
+},
+{
+"n": 18,
+"en": "coat",
+"jp": "コート",
+"hira": "こーと",
+"mp3": "pb_v18_coat.mp3",
+"jp_mp3": "pb_v18_coat_jp.mp3"
+},
+{
+"n": 19,
+"en": "flower",
+"jp": "花",
+"hira": "はな",
+"mp3": "pb_v19_flower.mp3",
+"jp_mp3": "pb_v19_flower_jp.mp3"
+},
+{
+"n": 20,
+"en": "leaf",
+"jp": "葉",
+"hira": "は",
+"mp3": "pb_v20_leaf.mp3",
+"jp_mp3": "pb_v20_leaf_jp.mp3"
+},
+{
+"n": 21,
+"en": "earthquake",
+"jp": "地震",
+"hira": "じしん",
+"mp3": "pb_v21_earthquake.mp3",
+"jp_mp3": "pb_v21_earthquake_jp.mp3"
+},
+{
+"n": 22,
+"en": "shelter",
+"jp": "避難所",
+"hira": "ひなんじょ",
+"mp3": "pb_v22_shelter.mp3",
+"jp_mp3": "pb_v22_shelter_jp.mp3"
+},
+{
+"n": 23,
+"en": "route",
+"jp": "経路",
+"hira": "けいろ",
+"mp3": "pb_v23_route.mp3",
+"jp_mp3": "pb_v23_route_jp.mp3"
+},
+{
+"n": 24,
+"en": "warning",
+"jp": "警報",
+"hira": "けいほう",
+"mp3": "pb_v24_warning.mp3",
+"jp_mp3": "pb_v24_warning_jp.mp3"
+},
+{
+"n": 25,
+"en": "danger",
+"jp": "危険",
+"hira": "きけん",
+"mp3": "pb_v25_danger.mp3",
+"jp_mp3": "pb_v25_danger_jp.mp3"
+},
+{
+"n": 26,
+"en": "safe",
+"jp": "安全",
+"hira": "あんぜん",
+"mp3": "pb_v26_safe.mp3",
+"jp_mp3": "pb_v26_safe_jp.mp3"
+},
+{
+"n": 27,
+"en": "help",
+"jp": "助け",
+"hira": "たすけ",
+"mp3": "pb_v27_help.mp3",
+"jp_mp3": "pb_v27_help_jp.mp3"
+},
+{
+"n": 28,
+"en": "flashlight",
+"jp": "懐中電灯",
+"hira": "かいちゅうでんとう",
+"mp3": "pb_v28_flashlight.mp3",
+"jp_mp3": "pb_v28_flashlight_jp.mp3"
+},
+{
+"n": 29,
+"en": "water",
+"jp": "水",
+"hira": "みず",
+"mp3": "pb_v29_water.mp3",
+"jp_mp3": "pb_v29_water_jp.mp3"
+},
+{
+"n": 30,
+"en": "food",
+"jp": "食べ物",
+"hira": "たべもの",
+"mp3": "pb_v30_food.mp3",
+"jp_mp3": "pb_v30_food_jp.mp3"
+},
+{
+"n": 31,
+"en": "bear",
+"jp": "クマ",
+"hira": "くま",
+"mp3": "pb_v31_bear.mp3",
+"jp_mp3": "pb_v31_bear_jp.mp3"
+},
+{
+"n": 32,
+"en": "fox",
+"jp": "キツネ",
+"hira": "きつね",
+"mp3": "pb_v32_fox.mp3",
+"jp_mp3": "pb_v32_fox_jp.mp3"
+},
+{
+"n": 33,
+"en": "deer",
+"jp": "シカ",
+"hira": "しか",
+"mp3": "pb_v33_deer.mp3",
+"jp_mp3": "pb_v33_deer_jp.mp3"
+},
+{
+"n": 34,
+"en": "eagle",
+"jp": "ワシ",
+"hira": "わし",
+"mp3": "pb_v34_eagle.mp3",
+"jp_mp3": "pb_v34_eagle_jp.mp3"
+},
+{
+"n": 35,
+"en": "dolphin",
+"jp": "イルカ",
+"hira": "いるか",
+"mp3": "pb_v35_dolphin.mp3",
+"jp_mp3": "pb_v35_dolphin_jp.mp3"
+},
+{
+"n": 36,
+"en": "turtle",
+"jp": "カメ",
+"hira": "かめ",
+"mp3": "pb_v36_turtle.mp3",
+"jp_mp3": "pb_v36_turtle_jp.mp3"
+},
+{
+"n": 37,
+"en": "frog",
+"jp": "カエル",
+"hira": "かえる",
+"mp3": "pb_v37_frog.mp3",
+"jp_mp3": "pb_v37_frog_jp.mp3"
+},
+{
+"n": 38,
+"en": "butterfly",
+"jp": "チョウ",
+"hira": "ちょう",
+"mp3": "pb_v38_butterfly.mp3",
+"jp_mp3": "pb_v38_butterfly_jp.mp3"
+},
+{
+"n": 39,
+"en": "insect",
+"jp": "昆虫",
+"hira": "こんちゅう",
+"mp3": "pb_v39_insect.mp3",
+"jp_mp3": "pb_v39_insect_jp.mp3"
+},
+{
+"n": 40,
+"en": "animal",
+"jp": "動物",
+"hira": "どうぶつ",
+"mp3": "pb_v40_animal.mp3",
+"jp_mp3": "pb_v40_animal_jp.mp3"
+},
+{
+"n": 41,
+"en": "habitat",
+"jp": "生息地",
+"hira": "せいそくち",
+"mp3": "pb_v41_habitat.mp3",
+"jp_mp3": "pb_v41_habitat_jp.mp3"
+},
+{
+"n": 42,
+"en": "sea",
+"jp": "海",
+"hira": "うみ",
+"mp3": "pb_v42_sea.mp3",
+"jp_mp3": "pb_v42_sea_jp.mp3"
+},
+{
+"n": 43,
+"en": "river",
+"jp": "川",
+"hira": "かわ",
+"mp3": "pb_v43_river.mp3",
+"jp_mp3": "pb_v43_river_jp.mp3"
+},
+{
+"n": 44,
+"en": "tree",
+"jp": "木",
+"hira": "き",
+"mp3": "pb_v44_tree.mp3",
+"jp_mp3": "pb_v44_tree_jp.mp3"
+},
+{
+"n": 45,
+"en": "wing",
+"jp": "羽",
+"hira": "はね",
+"mp3": "pb_v45_wing.mp3",
+"jp_mp3": "pb_v45_wing_jp.mp3"
+},
+{
+"n": 46,
+"en": "hiking",
+"jp": "ハイキング",
+"hira": "はいきんぐ",
+"mp3": "pb_v46_hiking.mp3",
+"jp_mp3": "pb_v46_hiking_jp.mp3"
+},
+{
+"n": 47,
+"en": "camping",
+"jp": "キャンプ",
+"hira": "きゃんぷ",
+"mp3": "pb_v47_camping.mp3",
+"jp_mp3": "pb_v47_camping_jp.mp3"
+},
+{
+"n": 48,
+"en": "tent",
+"jp": "テント",
+"hira": "てんと",
+"mp3": "pb_v48_tent.mp3",
+"jp_mp3": "pb_v48_tent_jp.mp3"
+},
+{
+"n": 49,
+"en": "map",
+"jp": "地図",
+"hira": "ちず",
+"mp3": "pb_v49_map.mp3",
+"jp_mp3": "pb_v49_map_jp.mp3"
+},
+{
+"n": 50,
+"en": "compass",
+"jp": "コンパス",
+"hira": "こんぱす",
+"mp3": "pb_v50_compass.mp3",
+"jp_mp3": "pb_v50_compass_jp.mp3"
+},
+{
+"n": 51,
+"en": "backpack",
+"jp": "リュック",
+"hira": "りゅっく",
+"mp3": "pb_v51_backpack.mp3",
+"jp_mp3": "pb_v51_backpack_jp.mp3"
+},
+{
+"n": 52,
+"en": "snack",
+"jp": "おやつ",
+"hira": "おやつ",
+"mp3": "pb_v52_snack.mp3",
+"jp_mp3": "pb_v52_snack_jp.mp3"
+},
+{
+"n": 53,
+"en": "picnic",
+"jp": "ピクニック",
+"hira": "ぴくにっく",
+"mp3": "pb_v53_picnic.mp3",
+"jp_mp3": "pb_v53_picnic_jp.mp3"
+},
+{
+"n": 54,
+"en": "park",
+"jp": "公園",
+"hira": "こうえん",
+"mp3": "pb_v54_park.mp3",
+"jp_mp3": "pb_v54_park_jp.mp3"
+},
+{
+"n": 55,
+"en": "trail",
+"jp": "ハイキングコース",
+"hira": "はいきんぐこーす",
+"mp3": "pb_v55_trail.mp3",
+"jp_mp3": "pb_v55_trail_jp.mp3"
+},
+{
+"n": 56,
+"en": "trash",
+"jp": "ごみ",
+"hira": "ごみ",
+"mp3": "pb_v56_trash.mp3",
+"jp_mp3": "pb_v56_trash_jp.mp3"
+},
+{
+"n": 57,
+"en": "binoculars",
+"jp": "双眼鏡",
+"hira": "そうがんきょう",
+"mp3": "pb_v57_binoculars.mp3",
+"jp_mp3": "pb_v57_binoculars_jp.mp3"
+},
+{
+"n": 58,
+"en": "nature",
+"jp": "自然",
+"hira": "しぜん",
+"mp3": "pb_v58_nature.mp3",
+"jp_mp3": "pb_v58_nature_jp.mp3"
+},
+{
+"n": 59,
+"en": "journal",
+"jp": "ノート",
+"hira": "のーと",
+"mp3": "pb_v59_journal.mp3",
+"jp_mp3": "pb_v59_journal_jp.mp3"
+},
+{
+"n": 60,
+"en": "outside",
+"jp": "外",
+"hira": "そと",
+"mp3": "pb_v60_outside.mp3",
+"jp_mp3": "pb_v60_outside_jp.mp3"
+}
+]
+}
