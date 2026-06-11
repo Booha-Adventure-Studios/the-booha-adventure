@@ -1,1 +1,485 @@
 
+{
+"cards": [
+{
+"n": 1,
+"en": "Is it sunny?",
+"jp": "晴れですか。",
+"hira": "はれ です か",
+"mp3": "pb_q01_is_it_sunny.mp3",
+"jp_mp3": "pb_q01_is_it_sunny_jp.mp3"
+},
+{
+"n": 2,
+"en": "Is it cloudy?",
+"jp": "くもりですか。",
+"hira": "くもり です か",
+"mp3": "pb_q02_is_it_cloudy.mp3",
+"jp_mp3": "pb_q02_is_it_cloudy_jp.mp3"
+},
+{
+"n": 3,
+"en": "Is it rainy?",
+"jp": "雨ですか。",
+"hira": "あめ です か",
+"mp3": "pb_q03_is_it_rainy.mp3",
+"jp_mp3": "pb_q03_is_it_rainy_jp.mp3"
+},
+{
+"n": 4,
+"en": "Is it snowy?",
+"jp": "雪ですか。",
+"hira": "ゆき です か",
+"mp3": "pb_q04_is_it_snowy.mp3",
+"jp_mp3": "pb_q04_is_it_snowy_jp.mp3"
+},
+{
+"n": 5,
+"en": "Is it windy?",
+"jp": "風が強いですか。",
+"hira": "かぜ が つよい です か",
+"mp3": "pb_q05_is_it_windy.mp3",
+"jp_mp3": "pb_q05_is_it_windy_jp.mp3"
+},
+{
+"n": 6,
+"en": "Is it hot?",
+"jp": "暑いですか。",
+"hira": "あつい です か",
+"mp3": "pb_q06_is_it_hot.mp3",
+"jp_mp3": "pb_q06_is_it_hot_jp.mp3"
+},
+{
+"n": 7,
+"en": "Is it cold?",
+"jp": "寒いですか。",
+"hira": "さむい です か",
+"mp3": "pb_q07_is_it_cold.mp3",
+"jp_mp3": "pb_q07_is_it_cold_jp.mp3"
+},
+{
+"n": 8,
+"en": "Is it cool?",
+"jp": "涼しいですか。",
+"hira": "すずしい です か",
+"mp3": "pb_q08_is_it_cool.mp3",
+"jp_mp3": "pb_q08_is_it_cool_jp.mp3"
+},
+{
+"n": 9,
+"en": "Is it warm?",
+"jp": "暖かいですか。",
+"hira": "あたたかい です か",
+"mp3": "pb_q09_is_it_warm.mp3",
+"jp_mp3": "pb_q09_is_it_warm_jp.mp3"
+},
+{
+"n": 10,
+"en": "What is the weather?",
+"jp": "天気は何ですか。",
+"hira": "てんき は なん です か",
+"mp3": "pb_q10_what_is_the_weather.mp3",
+"jp_mp3": "pb_q10_what_is_the_weather_jp.mp3"
+},
+{
+"n": 11,
+"en": "Do you like spring?",
+"jp": "春が好きですか。",
+"hira": "はる が すき です か",
+"mp3": "pb_q11_do_you_like_spring.mp3",
+"jp_mp3": "pb_q11_do_you_like_spring_jp.mp3"
+},
+{
+"n": 12,
+"en": "Do you like summer?",
+"jp": "夏が好きですか。",
+"hira": "なつ が すき です か",
+"mp3": "pb_q12_do_you_like_summer.mp3",
+"jp_mp3": "pb_q12_do_you_like_summer_jp.mp3"
+},
+{
+"n": 13,
+"en": "Do you like autumn?",
+"jp": "秋が好きですか。",
+"hira": "あき が すき です か",
+"mp3": "pb_q13_do_you_like_autumn.mp3",
+"jp_mp3": "pb_q13_do_you_like_autumn_jp.mp3"
+},
+{
+"n": 14,
+"en": "Do you like winter?",
+"jp": "冬が好きですか。",
+"hira": "ふゆ が すき です か",
+"mp3": "pb_q14_do_you_like_winter.mp3",
+"jp_mp3": "pb_q14_do_you_like_winter_jp.mp3"
+},
+{
+"n": 15,
+"en": "What season do you like?",
+"jp": "どの季節が好きですか。",
+"hira": "どの きせつ が すき です か",
+"mp3": "pb_q15_what_season_do_you_like.mp3",
+"jp_mp3": "pb_q15_what_season_do_you_like_jp.mp3"
+},
+{
+"n": 16,
+"en": "Do you have an umbrella?",
+"jp": "かさを持っていますか。",
+"hira": "かさ を もって い ます か",
+"mp3": "pb_q16_do_you_have_an_umbrella.mp3",
+"jp_mp3": "pb_q16_do_you_have_an_umbrella_jp.mp3"
+},
+{
+"n": 17,
+"en": "Do you wear a T-shirt?",
+"jp": "Tシャツを着ますか。",
+"hira": "てぃーしゃつ を き ます か",
+"mp3": "pb_q17_do_you_wear_a_t_shirt.mp3",
+"jp_mp3": "pb_q17_do_you_wear_a_t_shirt_jp.mp3"
+},
+{
+"n": 18,
+"en": "Do you wear a coat?",
+"jp": "コートを着ますか。",
+"hira": "こーと を き ます か",
+"mp3": "pb_q18_do_you_wear_a_coat.mp3",
+"jp_mp3": "pb_q18_do_you_wear_a_coat_jp.mp3"
+},
+{
+"n": 19,
+"en": "Do flowers bloom?",
+"jp": "花が咲きますか。",
+"hira": "はな が さき ます か",
+"mp3": "pb_q19_do_flowers_bloom.mp3",
+"jp_mp3": "pb_q19_do_flowers_bloom_jp.mp3"
+},
+{
+"n": 20,
+"en": "Do leaves change color?",
+"jp": "葉の色が変わりますか。",
+"hira": "は の いろ が かわり ます か",
+"mp3": "pb_q20_do_leaves_change_color.mp3",
+"jp_mp3": "pb_q20_do_leaves_change_color_jp.mp3"
+},
+{
+"n": 21,
+"en": "Is there an earthquake?",
+"jp": "地震ですか。",
+"hira": "じしん です か",
+"mp3": "pb_q21_is_there_an_earthquake.mp3",
+"jp_mp3": "pb_q21_is_there_an_earthquake_jp.mp3"
+},
+{
+"n": 22,
+"en": "Are you calm?",
+"jp": "落ち着いていますか。",
+"hira": "おちついて い ます か",
+"mp3": "pb_q22_are_you_calm.mp3",
+"jp_mp3": "pb_q22_are_you_calm_jp.mp3"
+},
+{
+"n": 23,
+"en": "Are you safe?",
+"jp": "安全ですか。",
+"hira": "あんぜん です か",
+"mp3": "pb_q23_are_you_safe.mp3",
+"jp_mp3": "pb_q23_are_you_safe_jp.mp3"
+},
+{
+"n": 24,
+"en": "Where is the shelter?",
+"jp": "避難所はどこですか。",
+"hira": "ひなんじょ は どこ です か",
+"mp3": "pb_q24_where_is_the_shelter.mp3",
+"jp_mp3": "pb_q24_where_is_the_shelter_jp.mp3"
+},
+{
+"n": 25,
+"en": "Where is the route?",
+"jp": "経路はどこですか。",
+"hira": "けいろ は どこ です か",
+"mp3": "pb_q25_where_is_the_route.mp3",
+"jp_mp3": "pb_q25_where_is_the_route_jp.mp3"
+},
+{
+"n": 26,
+"en": "Is it dangerous?",
+"jp": "危険ですか。",
+"hira": "きけん です か",
+"mp3": "pb_q26_is_it_dangerous.mp3",
+"jp_mp3": "pb_q26_is_it_dangerous_jp.mp3"
+},
+{
+"n": 27,
+"en": "Do you need help?",
+"jp": "助けが必要ですか。",
+"hira": "たすけ が ひつよう です か",
+"mp3": "pb_q27_do_you_need_help.mp3",
+"jp_mp3": "pb_q27_do_you_need_help_jp.mp3"
+},
+{
+"n": 28,
+"en": "Do you have a flashlight?",
+"jp": "懐中電灯を持っていますか。",
+"hira": "かいちゅうでんとう を もって い ます か",
+"mp3": "pb_q28_do_you_have_a_flashlight.mp3",
+"jp_mp3": "pb_q28_do_you_have_a_flashlight_jp.mp3"
+},
+{
+"n": 29,
+"en": "Do you have water?",
+"jp": "水を持っていますか。",
+"hira": "みず を もって い ます か",
+"mp3": "pb_q29_do_you_have_water.mp3",
+"jp_mp3": "pb_q29_do_you_have_water_jp.mp3"
+},
+{
+"n": 30,
+"en": "Do you have food?",
+"jp": "食べ物を持っていますか。",
+"hira": "たべもの を もって い ます か",
+"mp3": "pb_q30_do_you_have_food.mp3",
+"jp_mp3": "pb_q30_do_you_have_food_jp.mp3"
+},
+{
+"n": 31,
+"en": "Is this a bear?",
+"jp": "これはクマですか。",
+"hira": "これ は くま です か",
+"mp3": "pb_q31_is_this_a_bear.mp3",
+"jp_mp3": "pb_q31_is_this_a_bear_jp.mp3"
+},
+{
+"n": 32,
+"en": "Is this a fox?",
+"jp": "これはキツネですか。",
+"hira": "これ は きつね です か",
+"mp3": "pb_q32_is_this_a_fox.mp3",
+"jp_mp3": "pb_q32_is_this_a_fox_jp.mp3"
+},
+{
+"n": 33,
+"en": "Is this a deer?",
+"jp": "これはシカですか。",
+"hira": "これ は しか です か",
+"mp3": "pb_q33_is_this_a_deer.mp3",
+"jp_mp3": "pb_q33_is_this_a_deer_jp.mp3"
+},
+{
+"n": 34,
+"en": "Is this an eagle?",
+"jp": "これはワシですか。",
+"hira": "これ は わし です か",
+"mp3": "pb_q34_is_this_an_eagle.mp3",
+"jp_mp3": "pb_q34_is_this_an_eagle_jp.mp3"
+},
+{
+"n": 35,
+"en": "Is this a dolphin?",
+"jp": "これはイルカですか。",
+"hira": "これ は いるか です か",
+"mp3": "pb_q35_is_this_a_dolphin.mp3",
+"jp_mp3": "pb_q35_is_this_a_dolphin_jp.mp3"
+},
+{
+"n": 36,
+"en": "Is this a turtle?",
+"jp": "これはカメですか。",
+"hira": "これ は かめ です か",
+"mp3": "pb_q36_is_this_a_turtle.mp3",
+"jp_mp3": "pb_q36_is_this_a_turtle_jp.mp3"
+},
+{
+"n": 37,
+"en": "Is this a frog?",
+"jp": "これはカエルですか。",
+"hira": "これ は かえる です か",
+"mp3": "pb_q37_is_this_a_frog.mp3",
+"jp_mp3": "pb_q37_is_this_a_frog_jp.mp3"
+},
+{
+"n": 38,
+"en": "Is this a butterfly?",
+"jp": "これはチョウですか。",
+"hira": "これ は ちょう です か",
+"mp3": "pb_q38_is_this_a_butterfly.mp3",
+"jp_mp3": "pb_q38_is_this_a_butterfly_jp.mp3"
+},
+{
+"n": 39,
+"en": "Is this an insect?",
+"jp": "これは昆虫ですか。",
+"hira": "これ は こんちゅう です か",
+"mp3": "pb_q39_is_this_an_insect.mp3",
+"jp_mp3": "pb_q39_is_this_an_insect_jp.mp3"
+},
+{
+"n": 40,
+"en": "Is this an animal?",
+"jp": "これは動物ですか。",
+"hira": "これ は どうぶつ です か",
+"mp3": "pb_q40_is_this_an_animal.mp3",
+"jp_mp3": "pb_q40_is_this_an_animal_jp.mp3"
+},
+{
+"n": 41,
+"en": "Can a bear climb?",
+"jp": "クマは登れますか。",
+"hira": "くま は のぼれ ます か",
+"mp3": "pb_q41_can_a_bear_climb.mp3",
+"jp_mp3": "pb_q41_can_a_bear_climb_jp.mp3"
+},
+{
+"n": 42,
+"en": "Can a deer run?",
+"jp": "シカは走れますか。",
+"hira": "しか は はしれ ます か",
+"mp3": "pb_q42_can_a_deer_run.mp3",
+"jp_mp3": "pb_q42_can_a_deer_run_jp.mp3"
+},
+{
+"n": 43,
+"en": "Can an eagle fly?",
+"jp": "ワシは飛べますか。",
+"hira": "わし は とべ ます か",
+"mp3": "pb_q43_can_an_eagle_fly.mp3",
+"jp_mp3": "pb_q43_can_an_eagle_fly_jp.mp3"
+},
+{
+"n": 44,
+"en": "Can a dolphin swim?",
+"jp": "イルカは泳げますか。",
+"hira": "いるか は およげ ます か",
+"mp3": "pb_q44_can_a_dolphin_swim.mp3",
+"jp_mp3": "pb_q44_can_a_dolphin_swim_jp.mp3"
+},
+{
+"n": 45,
+"en": "Do animals need homes?",
+"jp": "動物にはすみかが必要ですか。",
+"hira": "どうぶつ に は すみか が ひつよう です か",
+"mp3": "pb_q45_do_animals_need_homes.mp3",
+"jp_mp3": "pb_q45_do_animals_need_homes_jp.mp3"
+},
+{
+"n": 46,
+"en": "Do you like hiking?",
+"jp": "ハイキングが好きですか。",
+"hira": "はいきんぐ が すき です か",
+"mp3": "pb_q46_do_you_like_hiking.mp3",
+"jp_mp3": "pb_q46_do_you_like_hiking_jp.mp3"
+},
+{
+"n": 47,
+"en": "Do you like camping?",
+"jp": "キャンプが好きですか。",
+"hira": "きゃんぷ が すき です か",
+"mp3": "pb_q47_do_you_like_camping.mp3",
+"jp_mp3": "pb_q47_do_you_like_camping_jp.mp3"
+},
+{
+"n": 48,
+"en": "Is this a tent?",
+"jp": "これはテントですか。",
+"hira": "これ は てんと です か",
+"mp3": "pb_q48_is_this_a_tent.mp3",
+"jp_mp3": "pb_q48_is_this_a_tent_jp.mp3"
+},
+{
+"n": 49,
+"en": "Is this a map?",
+"jp": "これは地図ですか。",
+"hira": "これ は ちず です か",
+"mp3": "pb_q49_is_this_a_map.mp3",
+"jp_mp3": "pb_q49_is_this_a_map_jp.mp3"
+},
+{
+"n": 50,
+"en": "Is this a compass?",
+"jp": "これはコンパスですか。",
+"hira": "これ は こんぱす です か",
+"mp3": "pb_q50_is_this_a_compass.mp3",
+"jp_mp3": "pb_q50_is_this_a_compass_jp.mp3"
+},
+{
+"n": 51,
+"en": "Do you have a backpack?",
+"jp": "リュックを持っていますか。",
+"hira": "りゅっく を もって い ます か",
+"mp3": "pb_q51_do_you_have_a_backpack.mp3",
+"jp_mp3": "pb_q51_do_you_have_a_backpack_jp.mp3"
+},
+{
+"n": 52,
+"en": "Do you have a snack?",
+"jp": "おやつを持っていますか。",
+"hira": "おやつ を もって い ます か",
+"mp3": "pb_q52_do_you_have_a_snack.mp3",
+"jp_mp3": "pb_q52_do_you_have_a_snack_jp.mp3"
+},
+{
+"n": 53,
+"en": "Do you like picnics?",
+"jp": "ピクニックが好きですか。",
+"hira": "ぴくにっく が すき です か",
+"mp3": "pb_q53_do_you_like_picnics.mp3",
+"jp_mp3": "pb_q53_do_you_like_picnics_jp.mp3"
+},
+{
+"n": 54,
+"en": "Do you like the park?",
+"jp": "公園が好きですか。",
+"hira": "こうえん が すき です か",
+"mp3": "pb_q54_do_you_like_the_park.mp3",
+"jp_mp3": "pb_q54_do_you_like_the_park_jp.mp3"
+},
+{
+"n": 55,
+"en": "Do you see a bird?",
+"jp": "鳥が見えますか。",
+"hira": "とり が みえ ます か",
+"mp3": "pb_q55_do_you_see_a_bird.mp3",
+"jp_mp3": "pb_q55_do_you_see_a_bird_jp.mp3"
+},
+{
+"n": 56,
+"en": "Do you see trash?",
+"jp": "ごみが見えますか。",
+"hira": "ごみ が みえ ます か",
+"mp3": "pb_q56_do_you_see_trash.mp3",
+"jp_mp3": "pb_q56_do_you_see_trash_jp.mp3"
+},
+{
+"n": 57,
+"en": "Can you read a map?",
+"jp": "地図を読めますか。",
+"hira": "ちず を よめ ます か",
+"mp3": "pb_q57_can_you_read_a_map.mp3",
+"jp_mp3": "pb_q57_can_you_read_a_map_jp.mp3"
+},
+{
+"n": 58,
+"en": "Do you like nature?",
+"jp": "自然が好きですか。",
+"hira": "しぜん が すき です か",
+"mp3": "pb_q58_do_you_like_nature.mp3",
+"jp_mp3": "pb_q58_do_you_like_nature_jp.mp3"
+},
+{
+"n": 59,
+"en": "Can you write in your journal?",
+"jp": "ノートに書けますか。",
+"hira": "のーと に かけ ます か",
+"mp3": "pb_q59_can_you_write_in_your_journal.mp3",
+"jp_mp3": "pb_q59_can_you_write_in_your_journal_jp.mp3"
+},
+{
+"n": 60,
+"en": "Do you want to go outside?",
+"jp": "外に行きたいですか。",
+"hira": "そと に いきたい です か",
+"mp3": "pb_q60_do_you_want_to_go_outside.mp3",
+"jp_mp3": "pb_q60_do_you_want_to_go_outside_jp.mp3"
+}
+]
+}
