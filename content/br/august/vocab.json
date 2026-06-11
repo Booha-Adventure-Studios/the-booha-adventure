@@ -1,1 +1,425 @@
 
+{
+  "cards": [
+    {
+      "n": 1,
+      "en": "spring",
+      "jp": "春",
+      "hira": "はる",
+      "mp3": "br_v01_spring.mp3"
+    },
+    {
+      "n": 2,
+      "en": "summer",
+      "jp": "夏",
+      "hira": "なつ",
+      "mp3": "br_v02_summer.mp3"
+    },
+    {
+      "n": 3,
+      "en": "autumn / fall",
+      "jp": "秋",
+      "hira": "あき",
+      "mp3": "br_v03_autumn_fall.mp3"
+    },
+    {
+      "n": 4,
+      "en": "winter",
+      "jp": "冬",
+      "hira": "ふゆ",
+      "mp3": "br_v04_winter.mp3"
+    },
+    {
+      "n": 5,
+      "en": "weather",
+      "jp": "天気",
+      "hira": "てんき",
+      "mp3": "br_v05_weather.mp3"
+    },
+    {
+      "n": 6,
+      "en": "sunny",
+      "jp": "晴れ",
+      "hira": "はれ",
+      "mp3": "br_v06_sunny.mp3"
+    },
+    {
+      "n": 7,
+      "en": "cloudy",
+      "jp": "曇り",
+      "hira": "くもり",
+      "mp3": "br_v07_cloudy.mp3"
+    },
+    {
+      "n": 8,
+      "en": "rainy",
+      "jp": "雨",
+      "hira": "あめ",
+      "mp3": "br_v08_rainy.mp3"
+    },
+    {
+      "n": 9,
+      "en": "snowy",
+      "jp": "雪",
+      "hira": "ゆき",
+      "mp3": "br_v09_snowy.mp3"
+    },
+    {
+      "n": 10,
+      "en": "windy",
+      "jp": "風が強い",
+      "hira": "かぜ が つよい",
+      "mp3": "br_v10_windy.mp3"
+    },
+    {
+      "n": 11,
+      "en": "hot",
+      "jp": "暑い／熱い",
+      "hira": "あつい",
+      "mp3": "br_v11_hot.mp3"
+    },
+    {
+      "n": 12,
+      "en": "warm",
+      "jp": "暖かい／温かい",
+      "hira": "あたたかい",
+      "mp3": "br_v12_warm.mp3"
+    },
+    {
+      "n": 13,
+      "en": "cool",
+      "jp": "涼しい",
+      "hira": "すずしい",
+      "mp3": "br_v13_cool.mp3"
+    },
+    {
+      "n": 14,
+      "en": "cold",
+      "jp": "寒い",
+      "hira": "さむい",
+      "mp3": "br_v14_cold.mp3"
+    },
+    {
+      "n": 15,
+      "en": "temperature",
+      "jp": "気温",
+      "hira": "きおん",
+      "mp3": "br_v15_temperature.mp3"
+    },
+    {
+      "n": 16,
+      "en": "earthquake",
+      "jp": "地震",
+      "hira": "じしん",
+      "mp3": "br_v16_earthquake.mp3"
+    },
+    {
+      "n": 17,
+      "en": "aftershock",
+      "jp": "余震",
+      "hira": "よしん",
+      "mp3": "br_v17_aftershock.mp3"
+    },
+    {
+      "n": 18,
+      "en": "tsunami",
+      "jp": "津波",
+      "hira": "つなみ",
+      "mp3": "br_v18_tsunami.mp3"
+    },
+    {
+      "n": 19,
+      "en": "typhoon / cyclone",
+      "jp": "台風",
+      "hira": "たいふう",
+      "mp3": "br_v19_typhoon_cyclone.mp3"
+    },
+    {
+      "n": 20,
+      "en": "heavy rain",
+      "jp": "大雨",
+      "hira": "おおあめ",
+      "mp3": "br_v20_heavy_rain.mp3"
+    },
+    {
+      "n": 21,
+      "en": "flood",
+      "jp": "洪水",
+      "hira": "こうずい",
+      "mp3": "br_v21_flood.mp3"
+    },
+    {
+      "n": 22,
+      "en": "landslide",
+      "jp": "土砂崩れ",
+      "hira": "どしゃくずれ",
+      "mp3": "br_v22_landslide.mp3"
+    },
+    {
+      "n": 23,
+      "en": "evacuation shelter",
+      "jp": "避難所",
+      "hira": "ひなんじょ",
+      "mp3": "br_v23_evacuation_shelter.mp3"
+    },
+    {
+      "n": 24,
+      "en": "emergency kit",
+      "jp": "防災セット／非常用持ち出し袋",
+      "hira": "ぼうさい せっと／ひじょうよう もちだしぶくろ",
+      "mp3": "br_v24_emergency_kit.mp3"
+    },
+    {
+      "n": 25,
+      "en": "first aid",
+      "jp": "応急手当",
+      "hira": "おうきゅう てあて",
+      "mp3": "br_v25_first_aid.mp3"
+    },
+    {
+      "n": 26,
+      "en": "flashlight",
+      "jp": "懐中電灯",
+      "hira": "かいちゅうでんとう",
+      "mp3": "br_v26_flashlight.mp3"
+    },
+    {
+      "n": 27,
+      "en": "battery",
+      "jp": "電池",
+      "hira": "でんち",
+      "mp3": "br_v27_battery.mp3"
+    },
+    {
+      "n": 28,
+      "en": "warning / alert",
+      "jp": "警報／注意報",
+      "hira": "けいほう／ちゅういほう",
+      "mp3": "br_v28_warning_alert.mp3"
+    },
+    {
+      "n": 29,
+      "en": "safe / safety",
+      "jp": "安全／安全性",
+      "hira": "あんぜん／あんぜんせい",
+      "mp3": "br_v29_safe_safety.mp3"
+    },
+    {
+      "n": 30,
+      "en": "evacuate",
+      "jp": "避難する",
+      "hira": "ひなん する",
+      "mp3": "br_v30_evacuate.mp3"
+    },
+    {
+      "n": 31,
+      "en": "mammal",
+      "jp": "哺乳類",
+      "hira": "ほにゅうるい",
+      "mp3": "br_v31_mammal.mp3"
+    },
+    {
+      "n": 32,
+      "en": "bird",
+      "jp": "鳥",
+      "hira": "とり",
+      "mp3": "br_v32_bird.mp3"
+    },
+    {
+      "n": 33,
+      "en": "fish",
+      "jp": "魚",
+      "hira": "さかな",
+      "mp3": "br_v33_fish.mp3"
+    },
+    {
+      "n": 34,
+      "en": "reptile",
+      "jp": "爬虫類",
+      "hira": "はちゅうるい",
+      "mp3": "br_v34_reptile.mp3"
+    },
+    {
+      "n": 35,
+      "en": "amphibian",
+      "jp": "両生類",
+      "hira": "りょうせいるい",
+      "mp3": "br_v35_amphibian.mp3"
+    },
+    {
+      "n": 36,
+      "en": "insect",
+      "jp": "昆虫",
+      "hira": "こんちゅう",
+      "mp3": "br_v36_insect.mp3"
+    },
+    {
+      "n": 37,
+      "en": "bear",
+      "jp": "クマ",
+      "hira": "くま",
+      "mp3": "br_v37_bear.mp3"
+    },
+    {
+      "n": 38,
+      "en": "fox",
+      "jp": "キツネ",
+      "hira": "きつね",
+      "mp3": "br_v38_fox.mp3"
+    },
+    {
+      "n": 39,
+      "en": "deer",
+      "jp": "シカ",
+      "hira": "しか",
+      "mp3": "br_v39_deer.mp3"
+    },
+    {
+      "n": 40,
+      "en": "eagle",
+      "jp": "ワシ",
+      "hira": "わし",
+      "mp3": "br_v40_eagle.mp3"
+    },
+    {
+      "n": 41,
+      "en": "dolphin",
+      "jp": "イルカ",
+      "hira": "いるか",
+      "mp3": "br_v41_dolphin.mp3"
+    },
+    {
+      "n": 42,
+      "en": "turtle",
+      "jp": "カメ",
+      "hira": "かめ",
+      "mp3": "br_v42_turtle.mp3"
+    },
+    {
+      "n": 43,
+      "en": "frog",
+      "jp": "カエル",
+      "hira": "かえる",
+      "mp3": "br_v43_frog.mp3"
+    },
+    {
+      "n": 44,
+      "en": "butterfly",
+      "jp": "チョウ",
+      "hira": "ちょう",
+      "mp3": "br_v44_butterfly.mp3"
+    },
+    {
+      "n": 45,
+      "en": "habitat",
+      "jp": "生息地",
+      "hira": "せいそくち",
+      "mp3": "br_v45_habitat.mp3"
+    },
+    {
+      "n": 46,
+      "en": "hike / hiking",
+      "jp": "ハイキング（する）",
+      "hira": "はいきんぐ（する）",
+      "mp3": "br_v46_hike_hiking.mp3"
+    },
+    {
+      "n": 47,
+      "en": "trail",
+      "jp": "小道／トレイル",
+      "hira": "こみち／とれいる",
+      "mp3": "br_v47_trail.mp3"
+    },
+    {
+      "n": 48,
+      "en": "camp / campsite",
+      "jp": "キャンプ／キャンプ場",
+      "hira": "きゃんぷ／きゃんぷじょう",
+      "mp3": "br_v48_camp_campsite.mp3"
+    },
+    {
+      "n": 49,
+      "en": "tent",
+      "jp": "テント",
+      "hira": "てんと",
+      "mp3": "br_v49_tent.mp3"
+    },
+    {
+      "n": 50,
+      "en": "sleeping bag",
+      "jp": "寝袋",
+      "hira": "ねぶくろ",
+      "mp3": "br_v50_sleeping_bag.mp3"
+    },
+    {
+      "n": 51,
+      "en": "backpack",
+      "jp": "リュック",
+      "hira": "りゅっく",
+      "mp3": "br_v51_backpack.mp3"
+    },
+    {
+      "n": 52,
+      "en": "map",
+      "jp": "地図",
+      "hira": "ちず",
+      "mp3": "br_v52_map.mp3"
+    },
+    {
+      "n": 53,
+      "en": "compass",
+      "jp": "コンパス",
+      "hira": "こんぱす",
+      "mp3": "br_v53_compass.mp3"
+    },
+    {
+      "n": 54,
+      "en": "flashlight",
+      "jp": "懐中電灯",
+      "hira": "かいちゅうでんとう",
+      "mp3": "br_v54_flashlight.mp3"
+    },
+    {
+      "n": 55,
+      "en": "insect repellent",
+      "jp": "虫除け",
+      "hira": "むしよけ",
+      "mp3": "br_v55_insect_repellent.mp3"
+    },
+    {
+      "n": 56,
+      "en": "picnic",
+      "jp": "ピクニック",
+      "hira": "ぴくにっく",
+      "mp3": "br_v56_picnic.mp3"
+    },
+    {
+      "n": 57,
+      "en": "binoculars",
+      "jp": "双眼鏡",
+      "hira": "そうがんきょう",
+      "mp3": "br_v57_binoculars.mp3"
+    },
+    {
+      "n": 58,
+      "en": "birdwatching",
+      "jp": "バードウォッチング",
+      "hira": "ばーどうぉっちんぐ",
+      "mp3": "br_v58_birdwatching.mp3"
+    },
+    {
+      "n": 59,
+      "en": "fishing",
+      "jp": "釣り",
+      "hira": "つり",
+      "mp3": "br_v59_fishing.mp3"
+    },
+    {
+      "n": 60,
+      "en": "nature journal",
+      "jp": "自然ノート",
+      "hira": "しぜん のーと",
+      "mp3": "br_v60_nature_journal.mp3"
+    }
+  ]
+}
