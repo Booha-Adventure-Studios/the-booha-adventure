@@ -18,8 +18,9 @@
     { "n": 15, "en": "fan", "jp": "うちわ／扇風機", "hira": "うちわ／せんぷうき", "mp3": "br_v15_fan.mp3" },
 
     { "n": 16, "en": "vacation", "jp": "休み／休暇", "hira": "やすみ／きゅうか", "mp3": "br_v16_vacation.mp3" },
-    { "n": 17, "en": "travel", "jp": "旅行", "hira": "りょこう", "mp3": "br_v17_travel.mp3" },
-    { "n": 18, "en": "trip", "jp": "旅行", "hira": "りょこう", "mp3": "br_v18_trip.mp3" },
+    { "n": 17, "en": "travel", "jp": "旅行する（動詞）", "hira": "りょこうする", "mp3": "br_v17_travel.mp3" },
+    { "n": 18, "en": "trip", "jp": "旅行（名詞）", "hira": "りょこう", "mp3": "br_v18_trip.mp3" }
+
     { "n": 19, "en": "hotel", "jp": "ホテル", "hira": "ほてる", "mp3": "br_v19_hotel.mp3" },
     { "n": 20, "en": "reservation", "jp": "予約", "hira": "よやく", "mp3": "br_v20_reservation.mp3" },
     { "n": 21, "en": "souvenir", "jp": "おみやげ", "hira": "おみやげ", "mp3": "br_v21_souvenir.mp3" },
