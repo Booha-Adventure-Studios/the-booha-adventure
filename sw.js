@@ -1,13 +1,13 @@
 
 // ============================================================
-//  Booha Adventure — Service Worker
+//  Booha Adventure — Service Worker - I blast the pages/assets/decks in current_cache
 //  sw.js
 // ============================================================
 
 const CURRENT_CACHES = {
-  pages:  'booha-pages-2026-20',
-  assets: 'booha-assets-2026-20',
-  decks:  'booha-decks-2026-20',
+  pages:  'booha-pages-2026-21',
+  assets: 'booha-assets-2026-21',
+  decks:  'booha-decks-2026-21',
 };
 
 const PAGE_CACHE  = CURRENT_CACHES.pages;
@@ -16,7 +16,7 @@ const DECK_CACHE  = CURRENT_CACHES.decks;
 
 const BASE = '/the-booha-adventure';
 
-// ── Core pages ───────────────────────────────────────────────
+// ── Core html pages in the repo───────────────────────────────────────────────
 const CORE_FILES = [
   `${BASE}/`,
   `${BASE}/index.html`,
@@ -61,7 +61,7 @@ const DECK_PATTERNS = [
 ];
 
 // ============================================================
-//  INSTALL — pre-cache core files
+//  INSTALL — pre-cache core files - Keep chacking this
 // ============================================================
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -78,7 +78,7 @@ self.addEventListener('install', (event) => {
 });
 
 // ============================================================
-//  ACTIVATE — clean up old caches
+//  ACTIVATE — clean up old caches - Checked 06/26
 // ============================================================
 self.addEventListener('activate', (event) => {
   const expectedCacheNamesSet = new Set(Object.values(CURRENT_CACHES));
@@ -100,7 +100,7 @@ self.addEventListener('activate', (event) => {
 });
 
 // ============================================================
-//  FETCH — routing strategy
+//  FETCH that SHIT — routing strategy
 // ============================================================
 self.addEventListener('fetch', (event) => {
   const { request } = event;
