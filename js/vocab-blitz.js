@@ -136,32 +136,163 @@ const SCOLDS = [
     en: "That was below Booha's expectations."
   }
 ];
-  /* ── Save helpers ────────────────────────────────────────────── */
-  function getBestTime(curr) {
-    try {
-      const raw = localStorage.getItem('booha_save');
-      if (!raw) return null;
-      const data = JSON.parse(raw);
-      return data?.meta?.vocabBlitz?.[curr] ?? null;
-    } catch { return null; }
-  }
+   
+  /* ── Blitz score helpers ──────────────────────────────────────── */
+  const BLITZ_GAME_TYPE = 'vocab';
+  const LEGACY_SCORE_KEY = 'vocabBlitz';
+  const WIN_COPY = {
+    clear: 'ATE THE WORDS',
+    record: 'BROKE THE MACHINE',
+    jp: 'ブーハが覚えた。'
+  };
 
-  function saveBestTime(curr, ms) {
+  function getPlayerName() {
     try {
-      const raw = localStorage.getItem('booha_save');
-      const data = raw ? JSON.parse(raw) : {};
-      if (!data.meta) data.meta = {};
-      if (!data.meta.vocabBlitz) data.meta.vocabBlitz = {};
-      const existing = data.meta.vocabBlitz[curr];
-      if (existing === null || existing === undefined || ms < existing) {
-        data.meta.vocabBlitz[curr] = ms;
-        localStorage.setItem('booha_save', JSON.stringify(data));
-        return true; // new record
+      if (typeof getBoohaFirstName === 'function') {
+        const n = getBoohaFirstName();
+        if (n) return String(n).trim().split(/\s+/)[0].toUpperCase();
       }
-      return false;
-    } catch { return false; }
+      const raw =
+        localStorage.getItem('booha_first_name') ||
+        localStorage.getItem('booha_user_name') ||
+        localStorage.getItem('booha_display_name') ||
+        localStorage.getItem('booha_name') ||
+        'PLAYER 1';
+      const first = String(raw).trim().split(/\s+/)[0] || 'PLAYER';
+      return first.toUpperCase();
+    } catch {
+      return 'PLAYER';
+    }
   }
 
+  // Weekly bucket is keyed off the curriculum week (monthSlug + weekNumber),
+  // which calendar.js already resolved upstream. Keeps the blitz reset in
+  // lockstep with the main booha_save week — no raw date arithmetic.
+  function makeWeekId(monthSlug, weekNumber) {
+    return `${monthSlug}:w${weekNumber}`;
+  }
+
+  function normalizeScore(score) {
+    if (score === null || score === undefined) return null;
+    if (typeof score === 'number') {
+      return { ms: score, name: 'UNKNOWN', date: null };
+    }
+    if (typeof score === 'object' && typeof score.ms === 'number') {
+      return score;
+    }
+    return null;
+  }
+
+  function ensureBlitzStore(data, weekId) {
+    if (!data.meta) data.meta = {};
+    if (!data.meta.blitz) data.meta.blitz = {};
+
+    const blitz = data.meta.blitz;
+    if (!blitz.weekly) blitz.weekly = {};
+    if (!blitz.records) blitz.records = {};
+
+    // This only rolls the weekly bucket when we have an authoritative week id.
+    if (weekId && blitz.weeklyKey !== weekId) {
+      blitz.weeklyKey = weekId;
+      blitz.weekly = {};
+    }
+
+    if (!blitz.weekly[BLITZ_GAME_TYPE]) blitz.weekly[BLITZ_GAME_TYPE] = {};
+    if (!blitz.records[BLITZ_GAME_TYPE]) blitz.records[BLITZ_GAME_TYPE] = {};
+
+    return blitz;
+  }
+
+  function readSave() {
+    try {
+      const raw = localStorage.getItem('booha_save');
+      return raw ? JSON.parse(raw) : {};
+    } catch {
+      return {};
+    }
+  }
+
+  function writeSave(data) {
+    localStorage.setItem('booha_save', JSON.stringify(data));
+  }
+
+  function getLegacyBestTime(curr) {
+    try {
+      const data = readSave();
+      return data?.meta?.[LEGACY_SCORE_KEY]?.[curr] ?? null;
+    } catch {
+      return null;
+    }
+  }
+
+  function getBestScore(curr) {
+    try {
+      const data = readSave();
+      const blitz = ensureBlitzStore(data);
+      const modern = normalizeScore(blitz.records?.[BLITZ_GAME_TYPE]?.[curr]);
+      if (modern) return modern;
+      return normalizeScore(getLegacyBestTime(curr));
+    } catch {
+      return null;
+    }
+  }
+
+  function getWeeklyScore(curr, weekId) {
+    try {
+      const data = readSave();
+      const blitz = ensureBlitzStore(data, weekId);
+      return normalizeScore(blitz.weekly?.[BLITZ_GAME_TYPE]?.[curr]);
+    } catch {
+      return null;
+    }
+  }
+
+  function getBestTime(curr) {
+    const best = getBestScore(curr);
+    return best ? best.ms : null;
+  }
+
+  function saveBestTime(curr, ms, weekId) {
+    try {
+      const data = readSave();
+      const blitz = ensureBlitzStore(data, weekId);
+      const playerName = getPlayerName();
+
+      const oldWeekly = normalizeScore(blitz.weekly[BLITZ_GAME_TYPE][curr]);
+      const oldRecord = normalizeScore(blitz.records[BLITZ_GAME_TYPE][curr]);
+      const legacy = normalizeScore(getLegacyBestTime(curr));
+
+      const bestBefore = [oldRecord, legacy]
+        .filter(Boolean)
+        .sort((a, b) => a.ms - b.ms)[0] || null;
+
+      const newScore = { ms, name: playerName, date: new Date().toISOString() };
+
+      const isWeeklyRecord  = !oldWeekly || ms < oldWeekly.ms;
+      const isAllTimeRecord = !bestBefore || ms < bestBefore.ms;
+
+      if (isWeeklyRecord) {
+        blitz.weekly[BLITZ_GAME_TYPE][curr] = newScore;
+      }
+      if (isAllTimeRecord) {
+        blitz.records[BLITZ_GAME_TYPE][curr] = newScore;
+        if (!data.meta[LEGACY_SCORE_KEY]) data.meta[LEGACY_SCORE_KEY] = {};
+        data.meta[LEGACY_SCORE_KEY][curr] = ms;
+      }
+
+      writeSave(data);
+      return { isWeeklyRecord, isAllTimeRecord, oldRecord: bestBefore, newScore };
+    } catch {
+      return {
+        isWeeklyRecord: false,
+        isAllTimeRecord: false,
+        oldRecord: null,
+        newScore: { ms, name: getPlayerName(), date: new Date().toISOString() }
+      };
+    }
+  }
+
+   
   /* ── Shuffle ─────────────────────────────────────────────────── */
   function shuffle(arr) {
     const a = [...arr];
@@ -501,9 +632,71 @@ const SCOLDS = [
         color: rgba(255,255,255,0.8);
         box-shadow: none;
       }
+      
       .vb-win-btn:active { transform: scale(0.98); }
 
+      /* ── Mega win screen ── */
+      .vb-win-name {
+        font-size: clamp(42px, 13vw, 108px);
+        font-weight: 1000;
+        line-height: 0.9;
+        color: #fff;
+        letter-spacing: 2px;
+        overflow-wrap: anywhere;
+        text-shadow: 0 0 18px #fff, 0 0 34px var(--vb-glow), 0 0 70px var(--vb-glow);
+        animation: vbWinSlam 520ms cubic-bezier(.12,1.7,.34,1) both;
+      }
+      .vb-win-scream {
+        font-size: clamp(18px, 5vw, 42px);
+        font-weight: 1000;
+        color: #ffee00;
+        letter-spacing: 1px;
+        text-shadow: 0 0 16px rgba(255,238,0,0.9), 0 0 34px rgba(255,0,120,0.55);
+        animation: vbWinSlam 620ms 120ms cubic-bezier(.12,1.7,.34,1) both;
+      }
+      .vb-win-jp {
+        font-size: clamp(14px, 3.5vw, 24px);
+        font-weight: 900;
+        color: rgba(255,255,255,0.86);
+        text-shadow: 0 0 18px var(--vb-glow);
+        animation: vbWinFade 700ms 280ms ease both;
+      }
+      .vb-win-record.big {
+        color: #ffd700;
+        font-size: clamp(18px, 5vw, 34px);
+        text-shadow: 0 0 18px rgba(255,215,0,0.95), 0 0 36px rgba(255,90,0,0.75);
+        animation: vbRecordPulse 900ms ease-in-out infinite alternate;
+      }
+      .vb-win-delta {
+        font-size: clamp(12px, 3vw, 18px);
+        font-weight: 900;
+        color: rgba(255,255,255,0.72);
+        letter-spacing: 1px;
+      }
+      #vb-win.record-mode {
+        background:
+          radial-gradient(circle at 50% 35%, rgba(255,215,0,0.22), transparent 34%),
+          radial-gradient(circle at 20% 20%, rgba(255,0,120,0.22), transparent 26%),
+          radial-gradient(circle at 80% 25%, rgba(0,229,255,0.18), transparent 28%),
+          rgba(0,0,0,0.94);
+      }
+      @keyframes vbWinSlam {
+        0%   { transform: scale(3.1) rotate(-4deg); opacity: 0; filter: blur(8px); }
+        55%  { transform: scale(0.88) rotate(1deg); opacity: 1; filter: blur(0); }
+        75%  { transform: scale(1.08) rotate(0deg); }
+        100% { transform: scale(1); opacity: 1; }
+      }
+      @keyframes vbWinFade {
+        from { transform: translateY(12px); opacity: 0; }
+        to   { transform: translateY(0); opacity: 1; }
+      }
+      @keyframes vbRecordPulse {
+        from { transform: scale(1); }
+        to   { transform: scale(1.06); }
+      }
+
       /* ── Particle burst ── */
+      
       .vb-particle {
         position: absolute; border-radius: 50%;
         pointer-events: none; z-index: 3;
@@ -573,16 +766,21 @@ const SCOLDS = [
         <button id="vb-wrong-close" type="button">もどる</button>
       </div>
 
-      <div id="vb-win">
+     <div id="vb-win">
+        <div class="vb-win-name"   id="vb-win-name"></div>
+        <div class="vb-win-scream" id="vb-win-scream"></div>
+        <div class="vb-win-jp"     id="vb-win-jp"></div>
         <div class="vb-win-label">FINAL TIME</div>
         <div class="vb-win-time"   id="vb-win-time-val"></div>
         <div class="vb-win-record" id="vb-win-record-msg"></div>
         <div class="vb-win-best"   id="vb-win-best-val"></div>
+        <div class="vb-win-delta"  id="vb-win-delta"></div>
         <div class="vb-win-buttons">
           <button class="vb-win-btn" id="vb-play-again" type="button">もう一度</button>
           <button class="vb-win-btn ghost" id="vb-win-close" type="button">もどる</button>
         </div>
       </div>
+      
     `;
     document.body.appendChild(el);
     return el;
@@ -627,12 +825,77 @@ const SCOLDS = [
         --cdelay:${Math.random()*400}ms;
         border-radius:${Math.random()>0.5?'50%':'2px'};
       `;
+       
+     overlay.appendChild(c);
+      c.addEventListener('animationend', () => c.remove());
+    }
+  }
+
+  function megaCelebrate(overlay, palette, isRecord) {
+    const colors = [
+      palette.accent, palette.accent2,
+      '#ff005d', '#ffea00', '#00ff66',
+      '#00e5ff', '#7c4dff', '#ff7a00', '#ffffff'
+    ];
+
+    overlay.classList.add('shake');
+    setTimeout(() => overlay.classList.remove('shake'), 420);
+
+    const cx = window.innerWidth / 2;
+    const cy = window.innerHeight / 2;
+
+    for (let i = 0; i < (isRecord ? 96 : 64); i++) {
+      const p = document.createElement('div');
+      const angle = Math.random() * Math.PI * 2;
+      const dist  = 90 + Math.random() * (isRecord ? 420 : 300);
+      const size  = 5 + Math.random() * 12;
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      p.className = 'vb-particle';
+      p.style.cssText = `
+        position:absolute;
+        left:${cx}px; top:${cy}px;
+        width:${size}px; height:${size}px;
+        border-radius:${Math.random() > 0.55 ? '50%' : '3px'};
+        background:${color};
+        pointer-events:none; z-index:30;
+        box-shadow:0 0 12px 3px ${color};
+        --px:${Math.cos(angle) * dist}px;
+        --py:${Math.sin(angle) * dist}px;
+        --pdur:${650 + Math.random() * 650}ms;
+        --pdelay:${Math.random() * 120}ms;
+        animation: vbParticle var(--pdur) ease-out var(--pdelay) both;
+      `;
+      overlay.appendChild(p);
+      p.addEventListener('animationend', () => p.remove());
+    }
+
+    for (let i = 0; i < (isRecord ? 150 : 90); i++) {
+      const c = document.createElement('div');
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      c.className = 'vb-confetti';
+      c.style.cssText = `
+        position:absolute;
+        left:${Math.random() * window.innerWidth}px;
+        top:${-30 - Math.random() * 180}px;
+        width:${6 + Math.random() * 10}px;
+        height:${6 + Math.random() * 14}px;
+        background:${color};
+        pointer-events:none; z-index:29;
+        box-shadow:0 0 8px ${color};
+        --cx:${(Math.random() - 0.5) * 520}px;
+        --cy:${window.innerHeight * 0.75 + Math.random() * 420}px;
+        --cdur:${900 + Math.random() * 1000}ms;
+        --cdelay:${Math.random() * 420}ms;
+        border-radius:${Math.random() > 0.5 ? '50%' : '2px'};
+        animation: vbConfettiFall var(--cdur) ease-out var(--cdelay) both;
+      `;
       overlay.appendChild(c);
       c.addEventListener('animationend', () => c.remove());
     }
   }
 
   /* ── Main launch function ────────────────────────────────────── */
+   
   function launch({ curr, monthSlug, weekNumber }) {
     const palette = PALETTES[curr];
     if (!palette) { console.error('VocabBlitz: unknown curr', curr); return; }
@@ -915,30 +1178,55 @@ function stopBGM() {
       if (typeof window.VocabBlitz._onClose === 'function') window.VocabBlitz._onClose();
     });
 
-    // Win screen
+     
+   // Fucking epic Win screen
     function showWin(ms, curr, palette, overlay, winScreen, monthSlug, weekNumber) {
-      const isRecord = saveBestTime(curr, ms);
-      const best     = getBestTime(curr);
+      const weekId     = makeWeekId(monthSlug, weekNumber);
+      const result     = saveBestTime(curr, ms, weekId);
+      const best       = getBestScore(curr);
+      const weekly     = getWeeklyScore(curr, weekId);
+      const playerName = getPlayerName();
 
-      overlay.style.setProperty('--vb-glow', palette.glow);
+      const isRecord  = result.isAllTimeRecord;
+      const oldRecord = result.oldRecord;
+
+      winScreen.classList.toggle('record-mode', isRecord);
+
+      winScreen.querySelector('#vb-win-name').textContent = playerName;
+      winScreen.querySelector('#vb-win-scream').textContent =
+        isRecord ? WIN_COPY.record : WIN_COPY.clear;
+      winScreen.querySelector('#vb-win-jp').textContent =
+        isRecord ? WIN_COPY.jp : 'クリア。';
+
       winScreen.querySelector('#vb-win-time-val').textContent = fmtTime(ms);
-      winScreen.querySelector('#vb-win-time-val').style.color = palette.timerColor;
+      winScreen.querySelector('#vb-win-time-val').style.color =
+        isRecord ? '#ffd700' : palette.timerColor;
       winScreen.querySelector('#vb-win-time-val').style.textShadow =
-        `0 0 32px ${palette.glow}, 0 0 64px ${palette.glow}`;
+        isRecord
+          ? '0 0 28px rgba(255,215,0,1), 0 0 70px rgba(255,90,0,0.75)'
+          : `0 0 32px ${palette.glow}, 0 0 64px ${palette.glow}`;
+
+      const recordEl = winScreen.querySelector('#vb-win-record-msg');
+      const bestEl   = winScreen.querySelector('#vb-win-best-val');
+      const deltaEl  = winScreen.querySelector('#vb-win-delta');
+
+      recordEl.classList.toggle('big', isRecord);
 
       if (isRecord) {
-        winScreen.querySelector('#vb-win-record-msg').textContent = '🏆 新記録！ NEW RECORD!';
-        winScreen.querySelector('#vb-win-best-val').textContent = '';
+        recordEl.textContent = '🏆 NEW BOOHA RECORD';
+        bestEl.textContent   = oldRecord ? `OLD: ${fmtTime(oldRecord.ms)}` : 'FIRST RECORD';
+        deltaEl.textContent  = oldRecord ? `-${fmtTime(oldRecord.ms - ms)} faster` : '';
       } else {
-        winScreen.querySelector('#vb-win-record-msg').textContent = '';
-        winScreen.querySelector('#vb-win-best-val').textContent =
-          `ベスト: ${fmtTime(best)}`;
+        recordEl.textContent = result.isWeeklyRecord ? 'THIS WEEK’S FASTEST' : '';
+        bestEl.textContent   = best ? `ALL-TIME BEST: ${fmtTime(best.ms)}${best.name ? ` — ${best.name}` : ''}` : '';
+        deltaEl.textContent  = weekly ? `THIS WEEK: ${fmtTime(weekly.ms)}${weekly.name ? ` — ${weekly.name}` : ''}` : '';
       }
 
       winScreen.classList.add('show');
-      confetti(overlay, palette);
+      megaCelebrate(overlay, palette, isRecord);
     }
 
+     
     overlay.querySelector('#vb-play-again').addEventListener('click', () => {
       overlay.remove();
       // Relaunch with same params
