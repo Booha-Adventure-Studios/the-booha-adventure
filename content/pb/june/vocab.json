@@ -36,7 +36,7 @@
     { "n": 30, "en": "time", "jp": "じかん", "hira": "じかん", "mp3": "pb_v30_time.mp3" },
 
     { "n": 31, "en": "pack", "jp": "いれる", "hira": "いれる", "mp3": "pb_v31_pack.mp3" },
-    { "n": 32, "en": "plan", "jp": "かんがえる", "hira": "かんがえる", "mp3": "pb_v32_plan.mp3" },
+    { "n": 32, "en": "plan/think", "jp": "かんがえる", "hira": "かんがえる", "mp3": "pb_v32_plan.mp3" },
     { "n": 33, "en": "list", "jp": "リスト", "hira": "りすと", "mp3": "pb_v33_list.mp3" },
     { "n": 34, "en": "bag", "jp": "バッグ", "hira": "ばっぐ", "mp3": "pb_v34_bag.mp3" },
     { "n": 35, "en": "case", "jp": "ケース", "hira": "けーす", "mp3": "pb_v35_case.mp3" },
