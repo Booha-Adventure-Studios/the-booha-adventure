@@ -1499,8 +1499,12 @@ function renderHub() {
     tabsEl.appendChild(btn);
   });
 
-  arcade.querySelector('.blitzRankBtn').addEventListener('click', () => {
-    VocabBlitz.openFastestPanel(activeTab);
+ arcade.querySelector('.blitzRankBtn').addEventListener('click', () => {
+    const cw = getCurrentCurriculumWeek();
+    VocabBlitz.openFastestPanel(activeTab, {
+      monthSlug: cw.monthSlug,
+      weekNumber: cw.weekNumber,
+    });
   });
 
   renderPills();
