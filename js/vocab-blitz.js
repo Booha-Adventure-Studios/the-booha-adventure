@@ -1269,14 +1269,14 @@ function stopBGM() {
         </div>
         <div id="vb-fp-body">
           <div class="vb-fp-pane active" data-pane="vocab">
-            ${buildVocabPane()}
+            
           </div>
           
         <div class="vb-fp-pane" data-pane="sentences">
-        ${buildScorePane('sentenceBlitz')}
+        
         </div>
         <div class="vb-fp-pane" data-pane="questions">
-        ${buildScorePane('questionBlitz')}
+      
         </div>
           
         </div>
@@ -1372,7 +1372,7 @@ function stopBGM() {
         padding: 24px 0;
       }
 
-      .vb-fp-row {
+     .vb-fp-row {
         display: flex; align-items: center;
         gap: 12px; padding: 12px 14px;
         border-radius: 14px;
@@ -1380,26 +1380,64 @@ function stopBGM() {
         border: 1px solid rgba(255,255,255,0.1);
         margin-bottom: 8px;
       }
+      .vb-fp-row.not-played {
+        background: rgba(255,60,60,0.06);
+        border: 1px dashed rgba(255,90,90,0.4);
+      }
       .vb-fp-dot {
         width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
       }
-      .vb-fp-curr { flex: 1; }
+      .vb-fp-row.not-played .vb-fp-dot {
+        filter: grayscale(1) brightness(0.7);
+        box-shadow: none !important;
+      }
+      .vb-fp-curr { flex: 1; min-width: 0; }
       .vb-fp-curr-name {
         font-size: clamp(12px,3vw,15px);
         font-weight: 900; color: #fff;
       }
+      .vb-fp-row.not-played .vb-fp-curr-name { color: rgba(255,255,255,0.6); }
       .vb-fp-curr-jp {
         font-size: clamp(10px,2.2vw,12px);
         color: rgba(255,255,255,0.45);
         margin-top: 2px;
       }
+      .vb-fp-scores { text-align: right; flex-shrink: 0; }
+      .vb-fp-weekly { display: flex; flex-direction: column; align-items: flex-end; }
       .vb-fp-time {
         font-size: clamp(18px,4.5vw,28px);
         font-weight: 900;
         font-variant-numeric: tabular-nums;
-        color: #fff;
+        color: #fff; line-height: 1;
       }
-      .vb-fp-time.no-score { color: rgba(255,255,255,0.25); font-size: clamp(14px,3vw,18px); }
+      .vb-fp-who {
+        font-size: clamp(10px,2.2vw,12px);
+        font-weight: 900; color: #ffee00;
+        letter-spacing: 0.5px; margin-top: 3px;
+        text-shadow: 0 0 10px rgba(255,238,0,0.4);
+        max-width: 140px; overflow: hidden; text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .vb-fp-alltime {
+        font-size: clamp(9px,2vw,11px);
+        color: rgba(255,255,255,0.4);
+        margin-top: 5px; letter-spacing: 0.3px;
+        font-variant-numeric: tabular-nums;
+        max-width: 160px; overflow: hidden; text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .vb-fp-unplayed { display: flex; flex-direction: column; align-items: flex-end; }
+      .vb-fp-unplayed-jp {
+        font-size: clamp(13px,3vw,16px);
+        font-weight: 900; color: #ff6b6b; line-height: 1;
+      }
+      .vb-fp-unplayed-en {
+        font-size: clamp(8px,1.8vw,10px);
+        font-weight: 900; letter-spacing: 1px;
+        color: rgba(255,107,107,0.7); margin-top: 2px;
+      }
+
+      
     `;
     document.head.appendChild(s);
     document.body.appendChild(panel);
@@ -1421,101 +1459,113 @@ function stopBGM() {
 
     return panel;
   }
+   
+// Escape user-supplied names before injecting into innerHTML.
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, c =>
+      ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
 
-  function buildVocabPane() {
+  // '' for missing or placeholder names so we don't print "· UNKNOWN".
+  function blitzScoreName(n) {
+    if (!n || n === 'UNKNOWN') return '';
+    return escapeHtml(n);
+  }
+
+  const LEGACY_KEY_FOR = {
+    vocab: 'vocabBlitz',
+    sentences: 'sentenceBlitz',
+    questions: 'questionBlitz',
+  };
+
+  function getRecordScoreFor(gameType, curr) {
+    try {
+      const data = readSave();
+      const modern = normalizeScore(data?.meta?.blitz?.records?.[gameType]?.[curr]);
+      if (modern) return modern;
+      const legacyKey = LEGACY_KEY_FOR[gameType];
+      return legacyKey ? normalizeScore(data?.meta?.[legacyKey]?.[curr]) : null;
+    } catch { return null; }
+  }
+
+  function getWeeklyScoreFor(gameType, curr, currentWeekId) {
+    try {
+      const blitz = readSave()?.meta?.blitz;
+      if (!blitz) return null;
+      // If we know the live week and the stored bucket is from another week,
+      // the weekly data is stale — treat as not played this week.
+      if (currentWeekId && blitz.weeklyKey !== currentWeekId) return null;
+      return normalizeScore(blitz.weekly?.[gameType]?.[curr]);
+    } catch { return null; }
+  }
+
+  function buildBlitzPane(gameType, currentWeekId) {
     const rows = [
-      { curr: 'pb', name: 'Pre-Boo',        jp: 'プレブー',              color: '#ff3bff' },
-      { curr: 'br', name: 'Boo-riculum',     jp: 'ブーリキュラム',        color: '#00ffee' },
-      { curr: 'bc', name: 'Boo-continuum',   jp: 'ブーコンティニューム',  color: '#ff6a00' },
+      { curr: 'pb', name: 'Pre-Boo',       jp: 'プレブー',             color: '#ff3bff' },
+      { curr: 'br', name: 'Boo-riculum',   jp: 'ブーリキュラム',       color: '#00ffee' },
+      { curr: 'bc', name: 'Boo-continuum', jp: 'ブーコンティニューム', color: '#ff6a00' },
     ];
     return rows.map(r => {
-      const t = getBestTime(r.curr);
-      const hasScore = t !== null && t !== undefined;
+      const weekly = getWeeklyScoreFor(gameType, r.curr, currentWeekId);
+      const record = getRecordScoreFor(gameType, r.curr);
+      const played = !!weekly;
+
+      const weeklyName = played ? blitzScoreName(weekly.name) : '';
+      const weeklyBlock = played
+        ? `<div class="vb-fp-weekly">
+             <div class="vb-fp-time">${fmtTime(weekly.ms)}</div>
+             ${weeklyName ? `<div class="vb-fp-who">${weeklyName}</div>` : ''}
+           </div>`
+        : `<div class="vb-fp-unplayed">
+             <div class="vb-fp-unplayed-jp">未プレイ</div>
+             <div class="vb-fp-unplayed-en">NOT PLAYED</div>
+           </div>`;
+
+      const recordName = record ? blitzScoreName(record.name) : '';
+      const recordBlock = record
+        ? `<div class="vb-fp-alltime">ベスト ${fmtTime(record.ms)}${recordName ? ` · ${recordName}` : ''}</div>`
+        : `<div class="vb-fp-alltime">ベスト --</div>`;
+
       return `
-        <div class="vb-fp-row">
+        <div class="vb-fp-row ${played ? '' : 'not-played'}">
           <div class="vb-fp-dot" style="background:${r.color};box-shadow:0 0 8px ${r.color};"></div>
           <div class="vb-fp-curr">
             <div class="vb-fp-curr-name">${r.name}</div>
             <div class="vb-fp-curr-jp">${r.jp}</div>
           </div>
-          <div class="vb-fp-time ${hasScore ? '' : 'no-score'}" data-vb-score="${r.curr}">
-            ${hasScore ? fmtTime(t) : '-- --'}
+          <div class="vb-fp-scores">
+            ${weeklyBlock}
+            ${recordBlock}
           </div>
         </div>`;
     }).join('');
   }
 
-function buildScorePane(saveKey) {
-  const rows = [
-    { curr: 'pb', name: 'Pre-Boo',       jp: 'プレブー',             color: '#ff3bff' },
-    { curr: 'br', name: 'Boo-riculum',   jp: 'ブーリキュラム',       color: '#00ffee' },
-    { curr: 'bc', name: 'Boo-continuum', jp: 'ブーコンティニューム', color: '#ff6a00' },
-  ];
-  return rows.map(r => {
-    try {
-      const raw  = localStorage.getItem('booha_save');
-      const data = raw ? JSON.parse(raw) : {};
-      const t    = data?.meta?.[saveKey]?.[r.curr] ?? null;
-      const hasScore = t !== null && t !== undefined;
-      return `
-        <div class="vb-fp-row">
-          <div class="vb-fp-dot" style="background:${r.color};box-shadow:0 0 8px ${r.color};"></div>
-          <div class="vb-fp-curr">
-            <div class="vb-fp-curr-name">${r.name}</div>
-            <div class="vb-fp-curr-jp">${r.jp}</div>
-          </div>
-          <div class="vb-fp-time ${hasScore?'':'no-score'}" data-vb-score="${saveKey}-${r.curr}">
-            ${hasScore ? fmtTime(t) : '-- --'}
-          </div>
-        </div>`;
-    } catch { return ''; }
-  }).join('');
-}
+
+function openFastestPanel(gameType = 'vocab', ctx = {}) {
+    let panel = document.getElementById('vb-fastest-panel');
+    if (!panel) panel = buildFastestPanel();
+
+    // Resolve the live curriculum week so stale weekly buckets read as
+    // "not played." Without it, a new week shows last week's scores.
+    const currentWeekId =
+      (ctx && ctx.monthSlug && ctx.weekNumber)
+        ? makeWeekId(ctx.monthSlug, ctx.weekNumber)
+        : null;
+
+    ['vocab', 'sentences', 'questions'].forEach(type => {
+      const pane = panel.querySelector(`.vb-fp-pane[data-pane="${type}"]`);
+      if (pane) pane.innerHTML = buildBlitzPane(type, currentWeekId);
+    });
+
+    panel.classList.add('show');
+    panel.querySelectorAll('.vb-fp-tab').forEach(t =>
+      t.classList.toggle('active', t.dataset.tab === gameType));
+    panel.querySelectorAll('.vb-fp-pane').forEach(p =>
+      p.classList.toggle('active', p.dataset.pane === gameType));
+  }
 
    
- function openFastestPanel(gameType = 'vocab') {
-  let panel = document.getElementById('vb-fastest-panel');
-  if (!panel) panel = buildFastestPanel();
-
-  ['pb','br','bc'].forEach(curr => {
-    const el = panel.querySelector(`[data-vb-score="${curr}"]`);
-    if (el) {
-      const t = getBestTime(curr);
-      if (t !== null && t !== undefined) {
-        el.textContent = fmtTime(t);
-        el.classList.remove('no-score');
-      } else {
-        el.textContent = '-- --';
-        el.classList.add('no-score');
-      }
-    }
-    ['sentenceBlitz','questionBlitz'].forEach(saveKey => {
-      const sel = panel.querySelector(`[data-vb-score="${saveKey}-${curr}"]`);
-      if (!sel) return;
-      try {
-        const raw  = localStorage.getItem('booha_save');
-        const data = raw ? JSON.parse(raw) : {};
-        const t    = data?.meta?.[saveKey]?.[curr] ?? null;
-        if (t !== null && t !== undefined) {
-          sel.textContent = fmtTime(t);
-          sel.classList.remove('no-score');
-        } else {
-          sel.textContent = '-- --';
-          sel.classList.add('no-score');
-        }
-      } catch {}
-    });
-  });
-
-  panel.classList.add('show');
-  const tabs = panel.querySelectorAll('.vb-fp-tab');
-  tabs.forEach(t => {
-    t.classList.toggle('active', t.dataset.tab === gameType);
-  });
-  panel.querySelectorAll('.vb-fp-pane').forEach(p => {
-    p.classList.toggle('active', p.dataset.pane === gameType);
-  });
-}
   /* ── Public API ──────────────────────────────────────────────── */
   return {
     launch,
