@@ -17,7 +17,7 @@
   <!-- ═══════════════════════════════════════════════════════ -->
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Yomogi&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
 
   <!-- ═══ TOKEN GATE ════════════════════════════════════════ -->
   <style>
@@ -48,7 +48,8 @@
         radial-gradient(ellipse at 50% -10%, #2c2014 0%, transparent 55%),
         repeating-linear-gradient(115deg, rgba(0,0,0,.16) 0 2px, transparent 2px 7px),
         #14100a;
-      font-family: 'Yomogi', 'Hiragino Maru Gothic ProN', sans-serif;
+      font-family: 'Zen Maru Gothic', 'Hiragino Maru Gothic ProN', sans-serif;
+      font-weight: 700;
       color: #3a2c1a;
       padding: 14px 10px 40px;
       -webkit-font-smoothing: antialiased;
@@ -135,16 +136,16 @@
     .alog-stamp:nth-child(3n)   { transform: rotate(2.4deg); }
     .alog-stamp:nth-child(3n+1) { transform: rotate(-2deg); }
     .alog-stamp:nth-child(4n)   { transform: rotate(1.2deg); }
-    .alog-stamp.done {
-      border: 3px double #8a5a1e;
-      color: #6b4a16;
-      background: radial-gradient(circle at 50% 42%, rgba(184,137,47,.28), rgba(184,137,47,.06) 70%);
-      box-shadow: inset 0 0 12px rgba(122,80,20,.35);
-    }
+    .alog-stamp.done,
     .alog-stamp.blitz.done {
-      border-color: #0e6f7a; color: #0b5661;
-      background: radial-gradient(circle at 50% 42%, rgba(14,111,122,.22), rgba(14,111,122,.05) 70%);
-      box-shadow: inset 0 0 12px rgba(14,111,122,.3);
+      border: 3px double #2e7d4f;
+      color: #1f5c39;
+      background: radial-gradient(circle at 50% 42%, rgba(64,150,98,.30), rgba(64,150,98,.07) 70%);
+      box-shadow: inset 0 0 12px rgba(46,125,79,.35);
+    }
+    .alog-stamp.done .alog-stamp-glyph {
+      color: #d4a017;
+      text-shadow: 0 1px 0 rgba(120,80,10,.5), 0 0 8px rgba(212,160,23,.55);
     }
     .alog-stamp-glyph { font-size: 18px; min-height: 22px; }
     .alog-stamp-label { font-size: 8.5px; letter-spacing: .4px; line-height: 1.15; }
@@ -155,42 +156,35 @@
       font-size: 16px; color: #5c4626;
     }
 
-    /* ── The wax seal ── */
-    .alog-seal {
-      margin: 14px auto 4px; width: 158px; height: 158px; border-radius: 50%;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center; gap: 1px; text-align: center;
-      background:
-        radial-gradient(circle at 38% 30%, rgba(255,255,255,.25), transparent 45%),
-        radial-gradient(circle at 50% 55%, #8a6a34, #5c4420 78%);
-      box-shadow:
-        0 3px 10px rgba(0,0,0,.35),
-        inset 0 -6px 14px rgba(0,0,0,.35),
-        inset 0 4px 10px rgba(255,235,180,.25);
-      color: #efe1c2;
-      filter: saturate(.65);
+    /* ── Weekly progress & score ── */
+    .alog-progress { margin: 16px auto 4px; max-width: 440px; text-align: center; }
+    .alog-progress-label { font-size: 19px; font-weight: 900; color: #3a2c1a; }
+    .alog-bar {
+      margin: 8px 0 6px; height: 18px; border-radius: 999px;
+      border: 2px solid #8a7048; background: rgba(58,44,26,.08);
+      overflow: hidden;
     }
-    .alog-seal.open {
-      filter: none;
-      background:
-        radial-gradient(circle at 38% 30%, rgba(255,255,255,.5), transparent 45%),
-        radial-gradient(circle at 50% 55%, #e8b93c, #8a5a1e 80%);
-      box-shadow:
-        0 4px 16px rgba(184,137,47,.55),
-        inset 0 -6px 14px rgba(90,55,10,.5),
-        inset 0 4px 12px rgba(255,245,200,.6);
-      color: #3a2510;
-      animation: waxCrack 700ms cubic-bezier(.2,1.6,.4,1) both;
+    .alog-bar-fill {
+      height: 100%; border-radius: 999px; min-width: 4px;
+      background: linear-gradient(90deg, #7fb98f, #2e7d4f);
+      transition: width 600ms ease;
     }
-    @keyframes waxCrack { from { transform: scale(.65) rotate(-6deg); opacity: 0; }
-                          to   { transform: scale(1) rotate(0); opacity: 1; } }
-    @media (prefers-reduced-motion: reduce) { .alog-seal.open { animation: none; } }
-    .alog-seal-ghost { font-size: 34px; opacity: .85; }
-    .alog-seal-pct   { font-size: 42px; font-weight: 700;
-                       text-shadow: 0 1px 0 rgba(255,245,200,.7); }
-    .alog-seal-jp    { font-size: 13px; }
-    .alog-seal-en    { font-family: 'Cinzel Decorative', serif;
-                       font-size: 7.5px; letter-spacing: 1.5px; }
+    .alog-bar-fill.full { background: linear-gradient(90deg, #e8b93c, #b8892f); }
+    .alog-progress-en {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 10px; letter-spacing: 2px; color: #7a603a;
+    }
+    .alog-score {
+      margin: 14px auto 4px; max-width: 440px; text-align: center;
+      border: 3px double #b8892f; border-radius: 16px;
+      padding: 12px 14px;
+      background: radial-gradient(circle at 50% 20%, rgba(232,185,60,.28), rgba(232,185,60,.06) 75%);
+    }
+    .alog-score-pct { font-size: 46px; font-weight: 900; color: #8a5a1e;
+                      text-shadow: 0 1px 0 rgba(255,245,200,.8); }
+    .alog-score-jp  { font-size: 14px; font-weight: 900; color: #5c4626; }
+    .alog-score-en  { font-family: 'Cinzel Decorative', serif;
+                      font-size: 9px; letter-spacing: 2px; color: #7a603a; margin-top: 2px; }
 
     .alog-duels { margin-top: 14px; text-align: center; font-size: 14px; color: #5c4626; }
     .alog-duel-label { color: #a34d12; font-weight: 700; margin-right: 8px; }
@@ -222,16 +216,25 @@
       border-color: #b8892f;
       background: rgba(184,137,47,.14); color: #6b4a16;
     }
-    .alog-cal-cell.played {
-      border: 2px solid #8a5a1e;
-      background: radial-gradient(circle at 50% 40%, rgba(184,137,47,.32), rgba(184,137,47,.08) 75%);
-      color: #6b4a16;
-    }
     .alog-cal-cell.today  { outline: 2px solid #0e6f7a; outline-offset: 1px; }
     .alog-cal-cell.future { opacity: .35; }
     .alog-cal-cell.empty  { border: none; }
     .alog-cal-num   { line-height: 1.1; }
-    .alog-cal-ghost { font-size: 13px; line-height: 1; }
+    .alog-cal-star {
+      font-size: 15px; line-height: 1; color: #d4a017;
+      text-shadow: 0 1px 0 rgba(120,80,10,.4);
+    }
+    .alog-cal-cell.played {
+      border: 2px solid #2e7d4f;
+      background: radial-gradient(circle at 50% 40%, rgba(64,150,98,.28), rgba(64,150,98,.06) 75%);
+      color: #1f5c39;
+    }
+    .alog-cal-legend {
+      text-align: center; margin-top: 10px;
+      font-size: 12px; color: #7a603a;
+    }
+    .alog-legend-star  { color: #d4a017; font-size: 14px; }
+    .alog-legend-visit { color: #b8892f; }
     .alog-streak {
       text-align: center; margin-top: 10px; min-height: 22px;
       font-size: 16px; color: #0b5661; font-weight: 700;
