@@ -719,17 +719,19 @@ const SCOLDS = [
       }
       #vb-overlay.shake { animation: vbScreenShake 400ms ease; }
 
-      /* ── Confetti ── */
-      .vb-confetti {
+      /* ── Name rain ── */
+      .vb-name-drop {
         position: absolute;
-        width: 10px; height: 10px;
-        border-radius: 2px;
-        pointer-events: none; z-index: 3;
-        animation: vbConfettiFall var(--cdur) ease-out var(--cdelay) both;
+        font-weight: 1000;
+        letter-spacing: 1px;
+        white-space: nowrap;
+        pointer-events: none; z-index: 29;
+        animation: vbNameFall var(--cdur) cubic-bezier(.25,.1,.55,1) var(--cdelay) both;
       }
-      @keyframes vbConfettiFall {
-        0%   { transform: translate(0,0) rotate(0deg) scale(1); opacity: 1; }
-        100% { transform: translate(var(--cx), var(--cy)) rotate(720deg) scale(0.3); opacity: 0; }
+      @keyframes vbNameFall {
+        0%   { transform: translate(0,0) rotate(var(--r0)) scale(1); opacity: 1; }
+        85%  { opacity: 1; }
+        100% { transform: translate(var(--cx), var(--cy)) rotate(var(--r1)) scale(0.85); opacity: 0; }
       }
     `;
     document.head.appendChild(s);
@@ -787,56 +789,12 @@ const SCOLDS = [
   }
 
   /* ── Particles ───────────────────────────────────────────────── */
-  function burst(overlay, x, y, color) {
-    for (let i = 0; i < 14; i++) {
-      const p = document.createElement('div');
-      p.className = 'vb-particle';
-      const angle = (i / 14) * Math.PI * 2;
-      const dist  = 50 + Math.random() * 80;
-      p.style.cssText = `
-        left:${x}px; top:${y}px;
-        width:${6 + Math.random()*6}px;
-        height:${6 + Math.random()*6}px;
-        background:${color};
-        --px:${Math.cos(angle)*dist}px;
-        --py:${Math.sin(angle)*dist}px;
-        --pdur:${500 + Math.random()*300}ms;
-        --pdelay:${Math.random()*60}ms;
-        box-shadow:0 0 8px 2px ${color};
-      `;
-      overlay.appendChild(p);
-      p.addEventListener('animationend', () => p.remove());
-    }
-  }
-
-  function confetti(overlay, palette) {
-    const colors = [palette.accent, palette.accent2, '#ffffff', '#ff3bbd', '#ffee00'];
-    for (let i = 0; i < 60; i++) {
-      const c = document.createElement('div');
-      c.className = 'vb-confetti';
-      const startX = Math.random() * window.innerWidth;
-      const startY = -20;
-      c.style.cssText = `
-        left:${startX}px; top:${startY}px;
-        background:${colors[Math.floor(Math.random()*colors.length)]};
-        --cx:${(Math.random()-0.5)*400}px;
-        --cy:${200 + Math.random()*400}px;
-        --cdur:${800+Math.random()*600}ms;
-        --cdelay:${Math.random()*400}ms;
-        border-radius:${Math.random()>0.5?'50%':'2px'};
-      `;
-       
-     overlay.appendChild(c);
-      c.addEventListener('animationend', () => c.remove());
-    }
-  }
-
   function megaCelebrate(overlay, palette, isRecord) {
-    const colors = [
-      palette.accent, palette.accent2,
-      '#ff005d', '#ffea00', '#00ff66',
-      '#00e5ff', '#7c4dff', '#ff7a00', '#ffffff'
-    ];
+    const name   = getPlayerName();
+    const colors = isRecord
+      ? ['#ffd700', '#ffea00', '#fff3b0', '#ffffff']
+      : [palette.accent, palette.accent2, '#ffffff', '#ffea00'];
+    const crumbs = ['#ffdca8', '#ffc46b', '#fff1d6', palette.accent, '#ffffff'];
 
     overlay.classList.add('shake');
     setTimeout(() => overlay.classList.remove('shake'), 420);
@@ -844,53 +802,54 @@ const SCOLDS = [
     const cx = window.innerWidth / 2;
     const cy = window.innerHeight / 2;
 
-    for (let i = 0; i < (isRecord ? 96 : 64); i++) {
-      const p = document.createElement('div');
+    /* 1 ── The bite: word-crumbs spray from center ─────────────── */
+    for (let i = 0; i < (isRecord ? 70 : 46); i++) {
+      const p     = document.createElement('div');
       const angle = Math.random() * Math.PI * 2;
-      const dist  = 90 + Math.random() * (isRecord ? 420 : 300);
-      const size  = 5 + Math.random() * 12;
-      const color = colors[Math.floor(Math.random() * colors.length)];
+      const dist  = 70 + Math.random() * (isRecord ? 360 : 240);
+      const size  = 3 + Math.random() * 6;
+      const color = crumbs[Math.floor(Math.random() * crumbs.length)];
       p.className = 'vb-particle';
       p.style.cssText = `
         position:absolute;
         left:${cx}px; top:${cy}px;
         width:${size}px; height:${size}px;
-        border-radius:${Math.random() > 0.55 ? '50%' : '3px'};
+        border-radius:${Math.random() > 0.4 ? '50%' : '2px'};
         background:${color};
         pointer-events:none; z-index:30;
-        box-shadow:0 0 12px 3px ${color};
+        box-shadow:0 0 8px 2px ${color};
         --px:${Math.cos(angle) * dist}px;
-        --py:${Math.sin(angle) * dist}px;
-        --pdur:${650 + Math.random() * 650}ms;
-        --pdelay:${Math.random() * 120}ms;
+        --py:${Math.sin(angle) * dist + 40}px;
+        --pdur:${520 + Math.random() * 520}ms;
+        --pdelay:${Math.random() * 100}ms;
         animation: vbParticle var(--pdur) ease-out var(--pdelay) both;
       `;
       overlay.appendChild(p);
       p.addEventListener('animationend', () => p.remove());
     }
 
-    for (let i = 0; i < (isRecord ? 150 : 90); i++) {
-      const c = document.createElement('div');
+    /* 2 ── Name rain: the sky fills with the student ───────────── */
+    for (let i = 0; i < (isRecord ? 44 : 28); i++) {
+      const d     = document.createElement('div');
       const color = colors[Math.floor(Math.random() * colors.length)];
-      c.className = 'vb-confetti';
-      c.style.cssText = `
-        position:absolute;
+      const size  = 12 + Math.random() * (isRecord ? 26 : 20);
+      d.className   = 'vb-name-drop';
+      d.textContent = name;
+      d.style.cssText = `
         left:${Math.random() * window.innerWidth}px;
-        top:${-30 - Math.random() * 180}px;
-        width:${6 + Math.random() * 10}px;
-        height:${6 + Math.random() * 14}px;
-        background:${color};
-        pointer-events:none; z-index:29;
-        box-shadow:0 0 8px ${color};
-        --cx:${(Math.random() - 0.5) * 520}px;
-        --cy:${window.innerHeight * 0.75 + Math.random() * 420}px;
-        --cdur:${900 + Math.random() * 1000}ms;
-        --cdelay:${Math.random() * 420}ms;
-        border-radius:${Math.random() > 0.5 ? '50%' : '2px'};
-        animation: vbConfettiFall var(--cdur) ease-out var(--cdelay) both;
+        top:${-40 - Math.random() * 220}px;
+        font-size:${size}px;
+        color:${color};
+        text-shadow:0 0 10px ${color}, 0 0 22px ${color};
+        --cx:${(Math.random() - 0.5) * 340}px;
+        --cy:${window.innerHeight * 0.8 + Math.random() * 380}px;
+        --r0:${(Math.random() - 0.5) * 40}deg;
+        --r1:${(Math.random() - 0.5) * 220}deg;
+        --cdur:${1100 + Math.random() * 1100}ms;
+        --cdelay:${Math.random() * 480}ms;
       `;
-      overlay.appendChild(c);
-      c.addEventListener('animationend', () => c.remove());
+      overlay.appendChild(d);
+      d.addEventListener('animationend', () => d.remove());
     }
   }
 
@@ -1182,14 +1141,12 @@ function stopBGM() {
    // Fucking epic Win screen
     function showWin(ms, curr, palette, overlay, winScreen, monthSlug, weekNumber) {
       const weekId     = makeWeekId(monthSlug, weekNumber);
-       
       const result     = saveBestTime(curr, ms, weekId);
 
       // Report clear to Booha day-recorder (fires only on 100% clear)
       document.dispatchEvent(new CustomEvent('booha:gameEnd', {
         detail: { saveId: `blitz:${curr}:vocab`, score: 100, completed: true, time: ms }
       }));
-       
       const best       = getBestScore(curr);
       const weekly     = getWeeklyScore(curr, weekId);
       const playerName = getPlayerName();
