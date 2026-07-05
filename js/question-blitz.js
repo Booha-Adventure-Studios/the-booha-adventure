@@ -1006,7 +1006,14 @@ window.QuestionBlitz = (() => {
    /* ── Win screen ── */
     function showWin(ms, curr, palette, overlay, winScreen, monthSlug, weekNumber) {
       const weekId     = makeWeekId(monthSlug, weekNumber);
+       
       const result     = saveBestTime(curr, ms, weekId);
+
+      // Report clear to Booha day-recorder (fires only on 100% clear)
+      document.dispatchEvent(new CustomEvent('booha:gameEnd', {
+        detail: { saveId: `blitz:${curr}:question`, score: 100, completed: true, time: ms }
+      }));
+       
       const best       = getBestScore(curr);
       const weekly     = getWeeklyScore(curr, weekId);
       const playerName = getPlayerName();
