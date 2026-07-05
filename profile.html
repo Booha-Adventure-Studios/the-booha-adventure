@@ -128,10 +128,20 @@
 
     /* ═══ Adventure-log module reskin (ink & wax) ═══════════ */
 
-    .alog-curr-badge {
-      display: inline-block; font-weight: 700; letter-spacing: 2px;
-      font-size: 12px; color: #efe1c2; background: #3a2c1a;
-      border-radius: 6px; padding: 3px 12px; margin-bottom: 12px;
+    .alog-curr-tabs {
+      display: flex; gap: 8px; margin-bottom: 14px; justify-content: center;
+    }
+    .alog-curr-tab {
+      appearance: none; cursor: pointer;
+      font-family: inherit; font-weight: 900; letter-spacing: 2px;
+      font-size: 13px; padding: 6px 18px; border-radius: 999px;
+      border: 2px dashed rgba(58,44,26,.45);
+      background: transparent; color: #8a7048;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .alog-curr-tab.active {
+      border: 2px solid #3a2c1a;
+      background: #3a2c1a; color: #efe1c2;
       transform: rotate(-1.2deg);
     }
 
