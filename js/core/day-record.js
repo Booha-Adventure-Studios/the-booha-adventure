@@ -121,7 +121,7 @@ const BoohaDayRecord = (() => {
     catch (err) { console.error('[DayRecord] failed:', err); } // never break a game
   });
 
-  return { record, getDayLog, getWeekLog, weeklyPct };
+  return { record, getDayLog, getWeekLog, weeklyPct, getCurrentKeys: _keys };
 })();
 
 window.BoohaDayRecord = BoohaDayRecord;
