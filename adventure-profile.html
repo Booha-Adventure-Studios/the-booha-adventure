@@ -751,6 +751,160 @@
     </div>
   </div>
 
+  <!-- ═══ ADVENTURE LOG (weekly accountability) ═══════════════ -->
+  <style>
+    .alog-section { margin: 26px auto; max-width: 720px; }
+    .alog-title {
+      text-align: center; font-family: 'Yomogi', sans-serif;
+      font-size: clamp(22px, 6vw, 34px); color: #ffe9b0;
+      text-shadow: 0 0 18px rgba(255,215,0,.35); margin-bottom: 14px;
+    }
+    .alog-card {
+      background: rgba(10,12,22,.55); border: 1px solid rgba(255,255,255,.12);
+      border-radius: 18px; padding: 18px 16px; backdrop-filter: blur(6px);
+      margin-bottom: 20px;
+    }
+    .alog-curr-badge {
+      display: inline-block; font-weight: 900; letter-spacing: 2px;
+      font-size: 12px; color: #0b0e18; background: #ffd700;
+      border-radius: 8px; padding: 3px 10px; margin-bottom: 12px;
+    }
+    .alog-stamps {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+      gap: 10px;
+    }
+    .alog-stamp {
+      border: 2px dashed rgba(255,255,255,.25); border-radius: 14px;
+      min-height: 74px; padding: 8px 6px; text-align: center;
+      display: flex; flex-direction: column; justify-content: center; gap: 2px;
+    }
+    .alog-stamp.done {
+      border: 2px solid rgba(255,215,0,.85);
+      background: radial-gradient(circle at 50% 30%, rgba(255,215,0,.18), transparent 70%);
+      box-shadow: 0 0 14px rgba(255,215,0,.25) inset;
+    }
+    .alog-stamp.blitz.done { border-color: rgba(0,229,255,.85);
+      background: radial-gradient(circle at 50% 30%, rgba(0,229,255,.16), transparent 70%); }
+    .alog-stamp-glyph { font-size: 20px; min-height: 24px; }
+    .alog-stamp-label { font-size: 10px; letter-spacing: .5px; color: #cfd6e4; }
+    .alog-stamp-pct   { font-size: 13px; font-weight: 900; color: #ffe9b0; }
+    .alog-stamp.blitz .alog-stamp-pct { color: #9ff2ff; }
+    .alog-count { text-align: center; margin: 14px 0 6px;
+      font-family: 'Yomogi', sans-serif; color: #cfd6e4; font-size: 15px; }
+    .alog-seal {
+      margin: 12px auto 0; width: 168px; height: 168px; border-radius: 50%;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 2px; text-align: center;
+      border: 3px solid rgba(200,160,90,.5);
+      background: radial-gradient(circle at 50% 35%, rgba(90,70,40,.5), rgba(20,16,10,.7));
+      filter: saturate(.6);
+    }
+    .alog-seal.open {
+      border-color: #ffd700; filter: none;
+      background: radial-gradient(circle at 50% 35%, rgba(255,215,0,.28), rgba(40,30,8,.75));
+      box-shadow: 0 0 34px rgba(255,215,0,.45);
+      animation: alogSealOpen 700ms cubic-bezier(.2,1.6,.4,1) both;
+    }
+    @keyframes alogSealOpen { from { transform: scale(.6); opacity: 0; }
+                              to   { transform: scale(1);  opacity: 1; } }
+    @media (prefers-reduced-motion: reduce) { .alog-seal.open { animation: none; } }
+    .alog-seal-ghost { font-size: 34px; opacity: .7; }
+    .alog-seal-pct   { font-size: 40px; font-weight: 1000; color: #ffd700;
+                       text-shadow: 0 0 22px rgba(255,215,0,.8); }
+    .alog-seal-jp { font-family: 'Yomogi', sans-serif; font-size: 14px; color: #ffe9b0; }
+    .alog-seal-en { font-size: 9px; letter-spacing: 1.5px; color: #cfd6e4; }
+    .alog-duels { margin-top: 14px; text-align: center; font-size: 13px; color: #cfd6e4; }
+    .alog-duel-label { color: #ff9a62; font-weight: 900; margin-right: 10px; }
+    .alog-duel-item  { margin: 0 8px; }
+    .alog-untouched {
+      border: 2px dashed rgba(255,80,80,.75); border-radius: 14px;
+      padding: 26px 12px; text-align: center; color: #ff8a8a;
+    }
+    .alog-untouched-jp { font-family: 'Yomogi', sans-serif; font-size: 26px; }
+    .alog-untouched-en { font-size: 11px; letter-spacing: 2px; margin-top: 4px; }
+    .alog-cal-month { text-align: center; font-family: 'Yomogi', sans-serif;
+      color: #ffe9b0; font-size: 18px; margin-bottom: 10px; }
+    .alog-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+    .alog-cal-dow  { text-align: center; font-size: 11px; color: #8f97a8; padding: 2px 0; }
+    .alog-cal-cell {
+      aspect-ratio: 1; border-radius: 10px; border: 1px solid rgba(255,255,255,.08);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      font-size: 11px; color: #8f97a8; position: relative;
+    }
+    .alog-cal-cell.visited { border-color: rgba(255,233,176,.5);
+      background: rgba(255,233,176,.07); color: #ffe9b0; }
+    .alog-cal-cell.played  { border-color: rgba(255,215,0,.8);
+      background: radial-gradient(circle at 50% 40%, rgba(255,215,0,.2), transparent 75%);
+      color: #ffe9b0; }
+    .alog-cal-cell.today   { outline: 2px solid rgba(0,229,255,.7); }
+    .alog-cal-cell.future  { opacity: .35; }
+    .alog-cal-cell.empty   { border: none; }
+    .alog-cal-ghost { font-size: 14px; line-height: 1; }
+    .alog-streak { text-align: center; margin-top: 12px;
+      font-family: 'Yomogi', sans-serif; color: #9ff2ff; font-size: 15px; min-height: 20px; }
+    .alog-past-strip { display: flex; gap: 10px; overflow-x: auto; padding: 4px 2px 10px; }
+    .alog-past-seal {
+      flex: 0 0 auto; width: 74px; height: 74px; border-radius: 50%;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      border: 2px solid rgba(255,255,255,.2); color: #cfd6e4;
+    }
+    .alog-past-seal.gold    { border-color: #ffd700; color: #ffd700;
+      background: radial-gradient(circle at 50% 35%, rgba(255,215,0,.2), transparent 75%); }
+    .alog-past-seal.partial { border-color: rgba(255,233,176,.5); }
+    .alog-past-seal.missed  { border-style: dashed; border-color: rgba(255,80,80,.7); color: #ff8a8a; }
+    .alog-past-pct  { font-weight: 1000; font-size: 15px; }
+    .alog-past-week { font-size: 9px; letter-spacing: 1px; opacity: .8; }
+    .alog-past-empty { text-align: center; font-family: 'Yomogi', sans-serif;
+      color: #8f97a8; padding: 10px; }
+    .alog-progress { margin: 16px auto 4px; max-width: 440px; text-align: center; }
+    .alog-progress-label { font-family: 'Yomogi', sans-serif; font-size: 17px; color: #ffe9b0; }
+    .alog-bar { margin: 8px 0 6px; height: 16px; border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.25); background: rgba(255,255,255,.06); overflow: hidden; }
+    .alog-bar-fill { height: 100%; border-radius: 999px; min-width: 4px;
+      background: linear-gradient(90deg, #67d99b, #1f9d5c); transition: width 600ms ease; }
+    .alog-bar-fill.full { background: linear-gradient(90deg, #ffe066, #ffd700); }
+    .alog-progress-en { font-size: 9px; letter-spacing: 2px; color: #cfd6e4; }
+    .alog-score { margin: 14px auto 4px; max-width: 440px; text-align: center;
+      border: 2px solid #ffd700; border-radius: 16px; padding: 12px 14px;
+      background: radial-gradient(circle at 50% 20%, rgba(255,215,0,.22), transparent 75%); }
+    .alog-score-pct { font-size: 44px; font-weight: 1000; color: #ffd700;
+      text-shadow: 0 0 22px rgba(255,215,0,.7); }
+    .alog-score-jp { font-family: 'Yomogi', sans-serif; font-size: 14px; color: #ffe9b0; }
+    .alog-score-en { font-size: 9px; letter-spacing: 2px; color: #cfd6e4; }
+    .alog-cal-star { font-size: 14px; line-height: 1; color: #ffd700; }
+    .alog-cal-legend { text-align: center; margin-top: 10px; font-size: 12px; color: #8f97a8; }
+    .alog-legend-star { color: #ffd700; font-size: 13px; }
+    .alog-legend-visit { color: #ffe9b0; }
+  </style>
+
+  <section class="alog-section">
+    <div class="alog-title" id="alog-title">ぼうけんログ</div>
+
+    <div class="eyebrow">
+      <span class="ey-jp">こんしゅう</span>
+      <span class="ey-en">This Week</span>
+      <span class="ey-kanji">今週</span>
+      <div class="ey-line"></div>
+    </div>
+    <div class="alog-card" id="alog-week"></div>
+
+    <div class="eyebrow">
+      <span class="ey-jp">ぼうけんカレンダー</span>
+      <span class="ey-en">Adventure Calendar</span>
+      <span class="ey-kanji">冒険暦</span>
+      <div class="ey-line"></div>
+    </div>
+    <div class="alog-card" id="alog-calendar"></div>
+
+    <div class="eyebrow">
+      <span class="ey-jp">これまでのきろく</span>
+      <span class="ey-en">Past Weeks</span>
+      <span class="ey-kanji">記録</span>
+      <div class="ey-line"></div>
+    </div>
+    <div class="alog-card" id="alog-past"></div>
+  </section>
+
   <!-- Curriculum progress -->
   <section class="curr-section">
     <div class="eyebrow">
@@ -844,6 +998,7 @@
 <script src="js/core/adventure-core.js"></script>
 <script src="js/core/save-file.js"></script>
 <script src="js/core/save-utils.js"></script>
+<script src="js/core/day-record.js"></script>
 <script src="js/core/save-code.js"></script>
 <script src="js/core/game-registry.js"></script>
 <script src="js/core/score-system.js"></script>
@@ -854,6 +1009,7 @@
 <script src="js/core/week-system.js"></script>
 <script src="js/ui/memory-code-ui.js"></script>
 <script src="js/ui/save-menu.js"></script>
+<script src="js/ui/adventure-log.js"></script>
 
 
 
