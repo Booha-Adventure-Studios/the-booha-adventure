@@ -191,12 +191,22 @@
     }
     return a;
   }
+  
   function getWeekSeed() {
-    try { if (window.CALENDAR?.getCurrentCurriculumWeek) return CALENDAR.getCurrentCurriculumWeek(); } catch(_) {}
-    const now = new Date(), jan1 = new Date(now.getFullYear(),0,1);
-    return Math.ceil(((now-jan1)/86400000+jan1.getDay()+1)/7);
+    if (window.CALENDAR?.getCurrentCurriculumWeek) {
+      return CALENDAR.getCurrentCurriculumWeek();
+    }
+    // calendar.js missing or API changed — fail LOUDLY, never guess the week
+    const msg = '[Utsuroba] calendar.js is not loaded — cannot compute week seed.';
+    console.error(msg);
+    document.body.insertAdjacentHTML('beforeend',
+      '<div style="position:fixed;inset:0;display:grid;place-items:center;' +
+      'background:#111;color:#fff;font:16px sans-serif;z-index:9999;text-align:center">' +
+      'Something went wrong loading this world.<br>Please tell your teacher! 🙏</div>');
+    throw new Error(msg);
   }
 
+  
   const weeklyRooms = (() => {
     const seed  = getWeekSeed();
     const rooms = seededShuffle(DATA.drifterRoomPool, seed);
