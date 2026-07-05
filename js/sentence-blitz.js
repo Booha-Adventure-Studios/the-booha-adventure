@@ -754,8 +754,8 @@ window.SentenceBlitz = (() => {
         --cx:${(Math.random() - 0.5) * 90}px;
         --cy:${H * (0.5 + Math.random() * 0.42)}px;
         --r0:${(Math.random() - 0.5) * 24}deg;
-        --cdur:${560 + Math.random() * 520}ms;
-        --cdelay:${Math.random() * 620}ms;
+        --cdur:${1400 + Math.random() * 1000}ms;
+        --cdelay:${Math.random() * 1100}ms;
       `;
       overlay.appendChild(d);
       d.addEventListener('animationend', () => d.remove());
