@@ -845,8 +845,8 @@ const SCOLDS = [
         --cy:${window.innerHeight * 0.8 + Math.random() * 380}px;
         --r0:${(Math.random() - 0.5) * 40}deg;
         --r1:${(Math.random() - 0.5) * 220}deg;
-        --cdur:${1100 + Math.random() * 1100}ms;
-        --cdelay:${Math.random() * 480}ms;
+        --cdur:${2800 + Math.random() * 1800}ms;
+        --cdelay:${Math.random() * 1000}ms;
       `;
       overlay.appendChild(d);
       d.addEventListener('animationend', () => d.remove());
