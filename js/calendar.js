@@ -126,10 +126,19 @@ function getAcademicWeekKey(curriculumWeek) {
 }
 
 /* ── Expose on window.CALENDAR (plain-script safe, no ES module needed) ── */
+  
+function getTodayKey(now) {
+  const p = getTokyoDateParts(now || new Date());
+  return `${p.year}-${String(p.month).padStart(2,'0')}-${String(p.day).padStart(2,'0')}`;
+}
+
 window.CALENDAR = {
   getCurrentCurriculumWeek: getCurrentCurriculumWeek,
   getAcademicWeekNumber:    getAcademicWeekNumber,
-  getAcademicWeekKey:       getAcademicWeekKey
+  getAcademicWeekKey:       getAcademicWeekKey,
+  getTodayKey:              getTodayKey
 };
+
+  
 
 })();
