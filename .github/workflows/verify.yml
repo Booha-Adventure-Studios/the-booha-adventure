@@ -1,0 +1,33 @@
+
+name: Pre-deploy verification
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2   # so we can compare against the previous commit
+
+      - name: Run verify.sh
+        run: |
+          chmod +x verify.sh
+          ./verify.sh
+
+      - name: Cache bump reminder
+        if: github.event_name == 'push'
+        run: |
+          CHANGED=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || true)
+          CACHED=$(echo "$CHANGED" | grep -cE '\.(html|js|css|json)$' || true)
+          SW=$(echo "$CHANGED" | grep -c '^sw\.js$' || true)
+          if [ "$CACHED" -gt 0 ] && [ "$SW" -eq 0 ]; then
+            echo "::warning::This push changed $CACHED cached file(s) but sw.js was not touched. Did you bump the cache version? Students may see stale files until you do."
+          else
+            echo "Cache bump check: OK"
+          fi
