@@ -751,8 +751,8 @@ window.QuestionBlitz = (() => {
         text-shadow:0 0 10px ${color}, 0 0 24px ${color};
         --sk:${toLeft ? 14 : -14}deg;
         --dx:${toLeft ? -(W + 620) : (W + 620)}px;
-        --cdur:${380 + Math.random() * 420}ms;
-        --cdelay:${Math.random() * 520}ms;
+        --cdur:${900 + Math.random() * 600}ms;
+        --cdelay:${Math.random() * 900}ms;
       `;
       overlay.appendChild(d);
       d.addEventListener('animationend', () => d.remove());
@@ -773,7 +773,7 @@ window.QuestionBlitz = (() => {
         box-shadow:0 0 6px ${color};
         --sk:0deg;
         --dx:${toLeft ? -(W + 480) : (W + 480)}px;
-        --cdur:${240 + Math.random() * 260}ms;
+        --cdur:${600 + Math.random() * 300}ms;
         --cdelay:${Math.random() * 460}ms;
       `;
       overlay.appendChild(l);
