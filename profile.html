@@ -1,0 +1,297 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ぼうけんログ — Adventure Log</title>
+
+  <!-- ═══ PWA ═══════════════════════════════════════════════ -->
+  <link rel="manifest" href="/the-booha-adventure/manifest.json">
+  <meta name="theme-color" content="#14100a">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Booha Adventure">
+  <link rel="apple-touch-icon" href="/the-booha-adventure/icons/icon-512.png">
+  <!-- ═══════════════════════════════════════════════════════ -->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Yomogi&display=swap" rel="stylesheet">
+
+  <!-- ═══ TOKEN GATE ════════════════════════════════════════ -->
+  <style>
+    html.token-checking,
+    html.token-checking body {
+      background: #000;
+      visibility: hidden;
+    }
+  </style>
+  <script>document.documentElement.classList.add('token-checking');</script>
+  <script src="./js/token.js"></script>
+  <!-- ═══════════════════════════════════════════════════════ -->
+
+  <style>
+    /* ═══ THE OPEN JOURNAL ═══════════════════════════════════
+       Leather:  #14100a  #241a10
+       Paper:    #efe1c2  #e6d5ae
+       Ink:      #3a2c1a
+       Wax/gold: #b8892f  #ffd700
+       Blitz:    #0e6f7a (teal ink)
+       Honesty:  #b03434 (red ink)                              */
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(ellipse at 50% -10%, #2c2014 0%, transparent 55%),
+        repeating-linear-gradient(115deg, rgba(0,0,0,.16) 0 2px, transparent 2px 7px),
+        #14100a;
+      font-family: 'Yomogi', 'Hiragino Maru Gothic ProN', sans-serif;
+      color: #3a2c1a;
+      padding: 14px 10px 40px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Leather header plate ── */
+    .journal-plate {
+      max-width: 680px; margin: 0 auto 14px; text-align: center;
+      color: #e6cf9a; padding: 10px 8px 12px;
+    }
+    .journal-plate h1 {
+      font-size: clamp(24px, 7vw, 38px);
+      font-weight: 400;
+      letter-spacing: 2px;
+      text-shadow: 0 0 22px rgba(255,215,0,.28), 0 2px 0 rgba(0,0,0,.7);
+    }
+    .journal-plate .plate-en {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 11px; letter-spacing: 4px; color: #9c8352; margin-top: 2px;
+    }
+
+    /* ── The paper spread ── */
+    .paper {
+      max-width: 680px; margin: 0 auto;
+      background:
+        radial-gradient(ellipse at 20% 0%, rgba(255,255,255,.35), transparent 40%),
+        repeating-linear-gradient(0deg, transparent 0 30px, rgba(122,96,58,.10) 30px 31px),
+        linear-gradient(160deg, #efe1c2, #e6d5ae 60%, #dcc99e);
+      border-radius: 10px;
+      border: 1px solid #4a3820;
+      box-shadow:
+        0 0 0 6px #241a10,
+        0 0 0 8px #4a3820,
+        0 18px 44px rgba(0,0,0,.65),
+        inset 0 0 60px rgba(122,96,58,.25);
+      padding: 22px 16px 26px;
+      position: relative;
+    }
+    /* brass corners */
+    .paper::before, .paper::after {
+      content: ''; position: absolute; width: 26px; height: 26px;
+      border: 3px solid #b8892f; opacity: .8;
+    }
+    .paper::before { top: -2px; left: -2px; border-right: none; border-bottom: none; border-radius: 8px 0 0 0; }
+    .paper::after  { bottom: -2px; right: -2px; border-left: none; border-top: none; border-radius: 0 0 8px 0; }
+
+    /* ── Section headers: handwritten ink rules ── */
+    .ink-head {
+      display: flex; align-items: baseline; gap: 10px;
+      margin: 22px 2px 12px;
+      border-bottom: 2px solid rgba(58,44,26,.55);
+      padding-bottom: 4px;
+    }
+    .ink-head:first-of-type { margin-top: 4px; }
+    .ink-head .jp { font-size: 20px; font-weight: 700; }
+    .ink-head .en {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 10px; letter-spacing: 3px; color: #7a603a;
+    }
+
+    /* ═══ Adventure-log module reskin (ink & wax) ═══════════ */
+
+    .alog-curr-badge {
+      display: inline-block; font-weight: 700; letter-spacing: 2px;
+      font-size: 12px; color: #efe1c2; background: #3a2c1a;
+      border-radius: 6px; padding: 3px 12px; margin-bottom: 12px;
+      transform: rotate(-1.2deg);
+    }
+
+    .alog-stamps {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(94px, 1fr));
+      gap: 10px;
+    }
+    .alog-stamp {
+      aspect-ratio: 1; border-radius: 50%;
+      border: 2px dashed rgba(58,44,26,.4);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 1px;
+      text-align: center; padding: 6px;
+      color: #8a7048;
+    }
+    /* each stamp pressed slightly crooked */
+    .alog-stamp:nth-child(3n)   { transform: rotate(2.4deg); }
+    .alog-stamp:nth-child(3n+1) { transform: rotate(-2deg); }
+    .alog-stamp:nth-child(4n)   { transform: rotate(1.2deg); }
+    .alog-stamp.done {
+      border: 3px double #8a5a1e;
+      color: #6b4a16;
+      background: radial-gradient(circle at 50% 42%, rgba(184,137,47,.28), rgba(184,137,47,.06) 70%);
+      box-shadow: inset 0 0 12px rgba(122,80,20,.35);
+    }
+    .alog-stamp.blitz.done {
+      border-color: #0e6f7a; color: #0b5661;
+      background: radial-gradient(circle at 50% 42%, rgba(14,111,122,.22), rgba(14,111,122,.05) 70%);
+      box-shadow: inset 0 0 12px rgba(14,111,122,.3);
+    }
+    .alog-stamp-glyph { font-size: 18px; min-height: 22px; }
+    .alog-stamp-label { font-size: 8.5px; letter-spacing: .4px; line-height: 1.15; }
+    .alog-stamp-pct   { font-size: 13px; font-weight: 700; }
+
+    .alog-count {
+      text-align: center; margin: 14px 0 4px;
+      font-size: 16px; color: #5c4626;
+    }
+
+    /* ── The wax seal ── */
+    .alog-seal {
+      margin: 14px auto 4px; width: 158px; height: 158px; border-radius: 50%;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 1px; text-align: center;
+      background:
+        radial-gradient(circle at 38% 30%, rgba(255,255,255,.25), transparent 45%),
+        radial-gradient(circle at 50% 55%, #8a6a34, #5c4420 78%);
+      box-shadow:
+        0 3px 10px rgba(0,0,0,.35),
+        inset 0 -6px 14px rgba(0,0,0,.35),
+        inset 0 4px 10px rgba(255,235,180,.25);
+      color: #efe1c2;
+      filter: saturate(.65);
+    }
+    .alog-seal.open {
+      filter: none;
+      background:
+        radial-gradient(circle at 38% 30%, rgba(255,255,255,.5), transparent 45%),
+        radial-gradient(circle at 50% 55%, #e8b93c, #8a5a1e 80%);
+      box-shadow:
+        0 4px 16px rgba(184,137,47,.55),
+        inset 0 -6px 14px rgba(90,55,10,.5),
+        inset 0 4px 12px rgba(255,245,200,.6);
+      color: #3a2510;
+      animation: waxCrack 700ms cubic-bezier(.2,1.6,.4,1) both;
+    }
+    @keyframes waxCrack { from { transform: scale(.65) rotate(-6deg); opacity: 0; }
+                          to   { transform: scale(1) rotate(0); opacity: 1; } }
+    @media (prefers-reduced-motion: reduce) { .alog-seal.open { animation: none; } }
+    .alog-seal-ghost { font-size: 34px; opacity: .85; }
+    .alog-seal-pct   { font-size: 42px; font-weight: 700;
+                       text-shadow: 0 1px 0 rgba(255,245,200,.7); }
+    .alog-seal-jp    { font-size: 13px; }
+    .alog-seal-en    { font-family: 'Cinzel Decorative', serif;
+                       font-size: 7.5px; letter-spacing: 1.5px; }
+
+    .alog-duels { margin-top: 14px; text-align: center; font-size: 14px; color: #5c4626; }
+    .alog-duel-label { color: #a34d12; font-weight: 700; margin-right: 8px; }
+    .alog-duel-item  { margin: 0 7px; }
+
+    .alog-untouched {
+      border: 3px dashed #b03434; border-radius: 12px;
+      padding: 26px 12px; text-align: center; color: #b03434;
+      transform: rotate(-.6deg);
+      background: rgba(176,52,52,.05);
+    }
+    .alog-untouched-jp { font-size: 28px; font-weight: 700; }
+    .alog-untouched-en { font-family: 'Cinzel Decorative', serif;
+                         font-size: 10px; letter-spacing: 2px; margin-top: 4px; }
+
+    /* ── Calendar: hand-ruled grid ── */
+    .alog-cal-month { text-align: center; font-size: 18px; color: #5c4626; margin-bottom: 8px; }
+    .alog-cal-grid  { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+    .alog-cal-dow   { text-align: center; font-size: 12px; color: #8a7048; padding-bottom: 2px; }
+    .alog-cal-dow:first-child { color: #b03434; }
+    .alog-cal-cell {
+      aspect-ratio: 1; border-radius: 8px;
+      border: 1px solid rgba(58,44,26,.3);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      font-size: 11px; color: #8a7048;
+    }
+    .alog-cal-cell.visited {
+      border-color: #b8892f;
+      background: rgba(184,137,47,.14); color: #6b4a16;
+    }
+    .alog-cal-cell.played {
+      border: 2px solid #8a5a1e;
+      background: radial-gradient(circle at 50% 40%, rgba(184,137,47,.32), rgba(184,137,47,.08) 75%);
+      color: #6b4a16;
+    }
+    .alog-cal-cell.today  { outline: 2px solid #0e6f7a; outline-offset: 1px; }
+    .alog-cal-cell.future { opacity: .35; }
+    .alog-cal-cell.empty  { border: none; }
+    .alog-cal-num   { line-height: 1.1; }
+    .alog-cal-ghost { font-size: 13px; line-height: 1; }
+    .alog-streak {
+      text-align: center; margin-top: 10px; min-height: 22px;
+      font-size: 16px; color: #0b5661; font-weight: 700;
+    }
+
+    /* ── Past weeks: a row of wax blobs ── */
+    .alog-past-strip { display: flex; gap: 10px; overflow-x: auto; padding: 4px 2px 8px; }
+    .alog-past-seal {
+      flex: 0 0 auto; width: 72px; height: 72px; border-radius: 50%;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      color: #efe1c2;
+      background: radial-gradient(circle at 45% 35%, #7a6030, #55401e 80%);
+      box-shadow: 0 2px 6px rgba(0,0,0,.3), inset 0 -4px 8px rgba(0,0,0,.3);
+    }
+    .alog-past-seal.gold {
+      background: radial-gradient(circle at 45% 35%, #e8b93c, #8a5a1e 82%);
+      color: #3a2510;
+      box-shadow: 0 2px 10px rgba(184,137,47,.5), inset 0 -4px 8px rgba(90,55,10,.4);
+    }
+    .alog-past-seal.partial { filter: saturate(.55); }
+    .alog-past-seal.missed {
+      background: none; box-shadow: none;
+      border: 2px dashed #b03434; color: #b03434;
+    }
+    .alog-past-pct  { font-weight: 700; font-size: 15px; }
+    .alog-past-week { font-size: 8px; letter-spacing: 1px; opacity: .85;
+                      font-family: 'Cinzel Decorative', serif; }
+    .alog-past-empty { text-align: center; color: #8a7048; padding: 8px; font-size: 15px; }
+  </style>
+</head>
+<body>
+
+  <div class="journal-plate">
+    <h1 id="alog-title">ぼうけんログ</h1>
+    <div class="plate-en">THE BOOHA ADVENTURE — RECORD OF DEEDS</div>
+  </div>
+
+  <div class="paper">
+    <div class="ink-head">
+      <span class="jp">こんしゅう</span><span class="en">THIS WEEK</span>
+    </div>
+    <div id="alog-week"></div>
+
+    <div class="ink-head">
+      <span class="jp">ぼうけんカレンダー</span><span class="en">CALENDAR</span>
+    </div>
+    <div id="alog-calendar"></div>
+
+    <div class="ink-head">
+      <span class="jp">これまでのきろく</span><span class="en">PAST WEEKS</span>
+    </div>
+    <div id="alog-past"></div>
+  </div>
+
+<script src="./js/calendar.js"></script>
+<script src="./js/core/adventure-core.js"></script>
+<script src="./js/core/save-file.js"></script>
+<script src="./js/core/game-registry.js"></script>
+<script src="./js/core/day-record.js"></script>
+<script src="./js/ui/adventure-log.js"></script>
+</body>
+</html>
