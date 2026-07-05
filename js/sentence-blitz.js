@@ -641,14 +641,19 @@ window.SentenceBlitz = (() => {
       }
 
       /* ── Confetti ── */
-      .sb-confetti {
+      .sb-name-drop {
         position: absolute;
-        pointer-events: none;
-        animation: sbConfettiFall var(--cdur) ease-out var(--cdelay) both;
+        font-weight: 1000;
+        letter-spacing: 1px;
+        white-space: nowrap;
+        pointer-events: none; z-index: 29;
+        animation: sbNameSlam var(--cdur) cubic-bezier(.55,0,.85,.5) var(--cdelay) both;
       }
-      @keyframes sbConfettiFall {
-        0%   { transform: translate(0,0) rotate(0deg) scale(1); opacity: 1; }
-        100% { transform: translate(var(--cx), var(--cy)) rotate(900deg) scale(0.35); opacity: 0; }
+      @keyframes sbNameSlam {
+        0%   { transform: translate(0,0) rotate(var(--r0)) scaleY(1); opacity: 1; }
+        76%  { transform: translate(var(--cx), var(--cy)) rotate(0deg) scaleY(1); opacity: 1; }
+        84%  { transform: translate(var(--cx), calc(var(--cy) + 7px)) scaleY(.6) scaleX(1.2); opacity: 1; }
+        100% { transform: translate(var(--cx), var(--cy)) scaleY(.82) scaleX(1.06); opacity: 0; }
       }
 
       /* ── Screen shake ── */
@@ -722,66 +727,67 @@ window.SentenceBlitz = (() => {
   }
 
   function megaCelebrate(overlay, palette, isRecord) {
-    const colors = [
-      palette.accent, palette.accent2,
-      '#ff005d', '#ffea00', '#00ff66',
-      '#00e5ff', '#7c4dff', '#ff7a00', '#ffffff'
-    ];
+    const name   = getPlayerName();
+    const colors = isRecord
+      ? ['#ffd700', '#ffea00', '#fff3b0', '#ffffff']
+      : [palette.accent, palette.accent2, '#ffffff', '#ffea00'];
+    const rubble = ['#9aa0a8', '#c7ccd4', '#6d737c', palette.accent, '#ffffff'];
 
     overlay.classList.add('shake');
     setTimeout(() => overlay.classList.remove('shake'), 420);
 
-    const cx = window.innerWidth / 2;
-    const cy = window.innerHeight / 2;
+    const W = window.innerWidth, H = window.innerHeight;
 
-    for (let i = 0; i < (isRecord ? 96 : 64); i++) {
-      const p = document.createElement('div');
-      const angle = Math.random() * Math.PI * 2;
-      const dist  = 90 + Math.random() * (isRecord ? 420 : 300);
-      const size  = 5 + Math.random() * 12;
+    /* 1 ── Names SLAM down and squash on impact ────────────────── */
+    for (let i = 0; i < (isRecord ? 40 : 26); i++) {
+      const d     = document.createElement('div');
       const color = colors[Math.floor(Math.random() * colors.length)];
-      p.className = 'sb-particle';
-      p.style.cssText = `
-        position:absolute;
-        left:${cx}px; top:${cy}px;
-        width:${size}px; height:${size}px;
-        border-radius:${Math.random() > 0.55 ? '50%' : '3px'};
-        background:${color};
-        pointer-events:none; z-index:30;
-        box-shadow:0 0 12px 3px ${color};
-        --px:${Math.cos(angle) * dist}px;
-        --py:${Math.sin(angle) * dist}px;
-        --pdur:${650 + Math.random() * 650}ms;
-        --pdelay:${Math.random() * 120}ms;
-        animation: sbParticle var(--pdur) ease-out var(--pdelay) both;
+      const size  = 14 + Math.random() * (isRecord ? 28 : 22);
+      d.className   = 'sb-name-drop';
+      d.textContent = name;
+      d.style.cssText = `
+        left:${Math.random() * W}px;
+        top:${-50 - Math.random() * 160}px;
+        font-size:${size}px;
+        color:${color};
+        text-shadow:0 0 10px ${color}, 0 2px 0 rgba(0,0,0,.45);
+        --cx:${(Math.random() - 0.5) * 90}px;
+        --cy:${H * (0.5 + Math.random() * 0.42)}px;
+        --r0:${(Math.random() - 0.5) * 24}deg;
+        --cdur:${560 + Math.random() * 520}ms;
+        --cdelay:${Math.random() * 620}ms;
       `;
-      overlay.appendChild(p);
-      p.addEventListener('animationend', () => p.remove());
+      overlay.appendChild(d);
+      d.addEventListener('animationend', () => d.remove());
     }
 
-    for (let i = 0; i < (isRecord ? 150 : 90); i++) {
-      const c = document.createElement('div');
-      const color = colors[Math.floor(Math.random() * colors.length)];
-      c.className = 'sb-confetti';
-      c.style.cssText = `
-        position:absolute;
-        left:${Math.random() * window.innerWidth}px;
-        top:${-30 - Math.random() * 180}px;
-        width:${6 + Math.random() * 10}px;
-        height:${6 + Math.random() * 14}px;
-        background:${color};
-        pointer-events:none; z-index:29;
-        box-shadow:0 0 8px ${color};
-        --cx:${(Math.random() - 0.5) * 520}px;
-        --cy:${window.innerHeight * 0.75 + Math.random() * 420}px;
-        --cdur:${900 + Math.random() * 1000}ms;
-        --cdelay:${Math.random() * 420}ms;
-        border-radius:${Math.random() > 0.5 ? '50%' : '2px'};
-        animation: sbConfettiFall var(--cdur) ease-out var(--cdelay) both;
-      `;
-      overlay.appendChild(c);
-      c.addEventListener('animationend', () => c.remove());
-    }
+    /* 2 ── Rubble kicks UP from the ground under the impacts ───── */
+    setTimeout(() => {
+      for (let i = 0; i < (isRecord ? 60 : 40); i++) {
+        const p     = document.createElement('div');
+        const angle = -Math.PI * (0.15 + Math.random() * 0.7);
+        const dist  = 80 + Math.random() * (isRecord ? 340 : 240);
+        const size  = 4 + Math.random() * 8;
+        const color = rubble[Math.floor(Math.random() * rubble.length)];
+        p.className = 'sb-particle';
+        p.style.cssText = `
+          position:absolute;
+          left:${Math.random() * W}px; top:${H - 8}px;
+          width:${size}px; height:${size}px;
+          border-radius:${Math.random() > 0.6 ? '50%' : '2px'};
+          background:${color};
+          pointer-events:none; z-index:30;
+          box-shadow:0 0 8px 2px ${color};
+          --px:${Math.cos(angle) * dist}px;
+          --py:${Math.sin(angle) * dist}px;
+          --pdur:${520 + Math.random() * 560}ms;
+          --pdelay:${Math.random() * 260}ms;
+          animation: sbParticle var(--pdur) ease-out var(--pdelay) both;
+        `;
+        overlay.appendChild(p);
+        p.addEventListener('animationend', () => p.remove());
+      }
+    }, 300);
   }
 
   /* ── Launch ──────────────────────────────────────────────────── */
@@ -1015,14 +1021,12 @@ window.SentenceBlitz = (() => {
    /* ── Win screen ── */
     function showWin(ms, curr, palette, overlay, winScreen, monthSlug, weekNumber) {
       const weekId     = makeWeekId(monthSlug, weekNumber);
-       
       const result     = saveBestTime(curr, ms, weekId);
 
       // Report clear to Booha day-recorder (fires only on 100% clear)
       document.dispatchEvent(new CustomEvent('booha:gameEnd', {
         detail: { saveId: `blitz:${curr}:sentence`, score: 100, completed: true, time: ms }
       }));
-       
       const best       = getBestScore(curr);
       const weekly     = getWeeklyScore(curr, weekId);
       const playerName = getPlayerName();
