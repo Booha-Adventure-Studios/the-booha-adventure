@@ -632,14 +632,26 @@ window.QuestionBlitz = (() => {
       }
 
       /* ── Confetti ── */
-      .qb-confetti {
+      .qb-name-streak {
         position: absolute;
-        pointer-events: none;
-        animation: qbConfettiFall var(--cdur) ease-out var(--cdelay) both;
+        font-weight: 1000;
+        font-style: italic;
+        letter-spacing: 2px;
+        white-space: nowrap;
+        pointer-events: none; z-index: 29;
+        animation: qbNameStreak var(--cdur) cubic-bezier(.2,.75,.3,1) var(--cdelay) both;
       }
-      @keyframes qbConfettiFall {
-        0%   { transform: translate(0,0) rotate(0deg) scale(1); opacity: 1; }
-        100% { transform: translate(var(--cx), var(--cy)) rotate(900deg) scale(0.35); opacity: 0; }
+      .qb-speed-line {
+        position: absolute;
+        height: 2px;
+        pointer-events: none; z-index: 28;
+        animation: qbNameStreak var(--cdur) linear var(--cdelay) both;
+      }
+      @keyframes qbNameStreak {
+        0%   { transform: translateX(0) skewX(var(--sk)); opacity: 0; }
+        8%   { opacity: 1; }
+        78%  { opacity: 1; }
+        100% { transform: translateX(var(--dx)) skewX(var(--sk)); opacity: 0; }
       }
 
       /* ── Screen shake ── */
@@ -713,65 +725,59 @@ window.QuestionBlitz = (() => {
   }
 
   function megaCelebrate(overlay, palette, isRecord) {
-    const colors = [
-      palette.accent, palette.accent2,
-      '#ff005d', '#ffea00', '#00ff66',
-      '#00e5ff', '#7c4dff', '#ff7a00', '#ffffff'
-    ];
+    const name   = getPlayerName();
+    const colors = isRecord
+      ? ['#ffd700', '#ffea00', '#fff3b0', '#ffffff']
+      : [palette.accent, palette.accent2, '#ffffff', '#ffea00'];
 
     overlay.classList.add('shake');
     setTimeout(() => overlay.classList.remove('shake'), 420);
 
-    const cx = window.innerWidth / 2;
-    const cy = window.innerHeight / 2;
+    const W = window.innerWidth, H = window.innerHeight;
 
-    for (let i = 0; i < (isRecord ? 96 : 64); i++) {
-      const p = document.createElement('div');
-      const angle = Math.random() * Math.PI * 2;
-      const dist  = 90 + Math.random() * (isRecord ? 420 : 300);
-      const size  = 5 + Math.random() * 12;
-      const color = colors[Math.floor(Math.random() * colors.length)];
-      p.className = 'qb-particle';
-      p.style.cssText = `
-        position:absolute;
-        left:${cx}px; top:${cy}px;
-        width:${size}px; height:${size}px;
-        border-radius:${Math.random() > 0.55 ? '50%' : '3px'};
-        background:${color};
-        pointer-events:none; z-index:30;
-        box-shadow:0 0 12px 3px ${color};
-        --px:${Math.cos(angle) * dist}px;
-        --py:${Math.sin(angle) * dist}px;
-        --pdur:${650 + Math.random() * 650}ms;
-        --pdelay:${Math.random() * 120}ms;
-        animation: qbParticle var(--pdur) ease-out var(--pdelay) both;
+    /* 1 ── Names STREAK across at speed, alternating direction ─── */
+    for (let i = 0; i < (isRecord ? 42 : 26); i++) {
+      const d      = document.createElement('div');
+      const color  = colors[Math.floor(Math.random() * colors.length)];
+      const size   = 12 + Math.random() * (isRecord ? 26 : 20);
+      const toLeft = i % 2 === 1;
+      d.className   = 'qb-name-streak';
+      d.textContent = name;
+      d.style.cssText = `
+        left:${toLeft ? W + 60 : -300}px;
+        top:${Math.random() * H}px;
+        font-size:${size}px;
+        color:${color};
+        text-shadow:0 0 10px ${color}, 0 0 24px ${color};
+        --sk:${toLeft ? 14 : -14}deg;
+        --dx:${toLeft ? -(W + 620) : (W + 620)}px;
+        --cdur:${380 + Math.random() * 420}ms;
+        --cdelay:${Math.random() * 520}ms;
       `;
-      overlay.appendChild(p);
-      p.addEventListener('animationend', () => p.remove());
+      overlay.appendChild(d);
+      d.addEventListener('animationend', () => d.remove());
     }
 
-    for (let i = 0; i < (isRecord ? 150 : 90); i++) {
-      const c = document.createElement('div');
-      const color = colors[Math.floor(Math.random() * colors.length)];
-      c.className = 'qb-confetti';
-      c.style.cssText = `
-        position:absolute;
-        left:${Math.random() * window.innerWidth}px;
-        top:${-30 - Math.random() * 180}px;
-        width:${6 + Math.random() * 10}px;
-        height:${6 + Math.random() * 14}px;
-        background:${color};
-        pointer-events:none; z-index:29;
-        box-shadow:0 0 8px ${color};
-        --cx:${(Math.random() - 0.5) * 520}px;
-        --cy:${window.innerHeight * 0.75 + Math.random() * 420}px;
-        --cdur:${900 + Math.random() * 1000}ms;
-        --cdelay:${Math.random() * 420}ms;
-        border-radius:${Math.random() > 0.5 ? '50%' : '2px'};
-        animation: qbConfettiFall var(--cdur) ease-out var(--cdelay) both;
+    /* 2 ── Speed lines tear through with them ──────────────────── */
+    for (let i = 0; i < (isRecord ? 34 : 22); i++) {
+      const l      = document.createElement('div');
+      const color  = colors[Math.floor(Math.random() * colors.length)];
+      const toLeft = i % 2 === 0;
+      const len    = 60 + Math.random() * 180;
+      l.className = 'qb-speed-line';
+      l.style.cssText = `
+        left:${toLeft ? W + 40 : -240}px;
+        top:${Math.random() * H}px;
+        width:${len}px;
+        background:linear-gradient(${toLeft ? '270deg' : '90deg'}, transparent, ${color});
+        box-shadow:0 0 6px ${color};
+        --sk:0deg;
+        --dx:${toLeft ? -(W + 480) : (W + 480)}px;
+        --cdur:${240 + Math.random() * 260}ms;
+        --cdelay:${Math.random() * 460}ms;
       `;
-      overlay.appendChild(c);
-      c.addEventListener('animationend', () => c.remove());
+      overlay.appendChild(l);
+      l.addEventListener('animationend', () => l.remove());
     }
   }
 
@@ -1006,14 +1012,12 @@ window.QuestionBlitz = (() => {
    /* ── Win screen ── */
     function showWin(ms, curr, palette, overlay, winScreen, monthSlug, weekNumber) {
       const weekId     = makeWeekId(monthSlug, weekNumber);
-       
       const result     = saveBestTime(curr, ms, weekId);
 
       // Report clear to Booha day-recorder (fires only on 100% clear)
       document.dispatchEvent(new CustomEvent('booha:gameEnd', {
         detail: { saveId: `blitz:${curr}:question`, score: 100, completed: true, time: ms }
       }));
-       
       const best       = getBestScore(curr);
       const weekly     = getWeeklyScore(curr, weekId);
       const playerName = getPlayerName();
