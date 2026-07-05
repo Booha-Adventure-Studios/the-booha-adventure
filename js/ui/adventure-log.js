@@ -102,8 +102,23 @@ const BoohaAdventureLog = (() => {
     return e;
   }
 
-  function renderWeek(mount, status, curr, playerName) {
+  const CURR_LABELS = { pb: 'Pre-Boo', br: 'Boo-riculum', bc: 'Boo-continuum' };
+
+  function renderWeek(mount, status, curr, playerName, onPick) {
     mount.textContent = '';
+
+    // Curriculum selector — always visible so students can switch tracks
+    const tabs = el('div', 'alog-curr-tabs');
+    ['pb', 'br', 'bc'].forEach(c => {
+      const b = el('button', 'alog-curr-tab' + (c === curr ? ' active' : ''),
+                   c.toUpperCase());
+      b.type = 'button';
+      b.title = CURR_LABELS[c];
+      b.setAttribute('aria-pressed', c === curr ? 'true' : 'false');
+      b.addEventListener('click', () => { if (c !== curr && onPick) onPick(c); });
+      tabs.appendChild(b);
+    });
+    mount.appendChild(tabs);
 
     const untouched = status.advDone === 0 && status.blitzDone === 0;
     if (untouched) {
@@ -113,9 +128,6 @@ const BoohaAdventureLog = (() => {
       mount.appendChild(box);
       return;
     }
-
-    const currBadge = el('div', 'alog-curr-badge', curr.toUpperCase());
-    mount.appendChild(currBadge);
 
     // 9 game stamps
     const grid = el('div', 'alog-stamps');
@@ -258,10 +270,16 @@ const BoohaAdventureLog = (() => {
     if (!keys) return; // CALENDAR failed — sections stay empty rather than wrong
     const dayLog  = BoohaDayRecord.getDayLog();
     const weekLog = BoohaDayRecord.getWeekLog();
-    const curr    = inferCurriculum(weekLog, keys.week);
-    const games   = BoohaGameRegistry.getForCurriculum(curr).map(g => ({
+    let curr = null;
+    try {
+      const s = localStorage.getItem('booha_profile_curr');
+      if (['pb', 'br', 'bc'].includes(s)) curr = s;
+    } catch (_) {}
+    if (!curr) curr = inferCurriculum(weekLog, keys.week);
+    const gamesFor = c => BoohaGameRegistry.getForCurriculum(c).map(g => ({
       id: g.baseId || g.id.split(':').pop(), name: g.name
     }));
+    const games = gamesFor(curr);
 
     let playerName = 'PLAYER';
     try {
@@ -273,9 +291,14 @@ const BoohaAdventureLog = (() => {
     const title = document.getElementById('alog-title');
     if (title) title.textContent = `${playerName}のぼうけんログ`;
 
-    renderWeek(wMount, weekStatus(weekLog[keys.week], curr, games), curr, playerName);
+    const paint = (c) => {
+      try { localStorage.setItem('booha_profile_curr', c); } catch (_) {}
+      const g = gamesFor(c);
+      renderWeek(wMount, weekStatus(weekLog[keys.week], c, g), c, playerName, paint);
+      if (pMount) renderPast(pMount, weekLog, keys.week, c, g);
+    };
+    paint(curr);
     if (cMount) renderCalendar(cMount, dayLog, keys.day);
-    if (pMount) renderPast(pMount, weekLog, keys.week, curr, games);
   }
 
   if (document.readyState === 'loading') {
