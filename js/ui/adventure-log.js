@@ -129,7 +129,7 @@ const BoohaAdventureLog = (() => {
     // 3 blitz stamps
     status.blitzStamps.forEach(s => {
       const stamp = el('div', 'alog-stamp blitz' + (s.ms != null ? ' done' : ''));
-      stamp.appendChild(el('div', 'alog-stamp-glyph', s.ms != null ? '⚡' : ''));
+      stamp.appendChild(el('div', 'alog-stamp-glyph', s.ms != null ? '★' : ''));
       stamp.appendChild(el('div', 'alog-stamp-label', s.id.toUpperCase() + ' BLITZ'));
       if (s.ms != null) stamp.appendChild(el('div', 'alog-stamp-pct', fmtMs(s.ms)));
       grid.appendChild(stamp);
@@ -140,18 +140,30 @@ const BoohaAdventureLog = (() => {
     mount.appendChild(el('div', 'alog-count',
       `ゲーム ${status.advDone}/9 ・ ブリッツ ${status.blitzDone}/3`));
 
-    // The seal
-    const seal = el('div', 'alog-seal' + (status.complete ? ' open' : ''));
+    // Weekly progress (completion) + score on completion
+    const total    = status.gameStamps.length + status.blitzStamps.length;
+    const done     = status.advDone + status.blitzDone;
+    const progress = Math.round((done / total) * 100);
+
+    const prog = el('div', 'alog-progress');
+    prog.appendChild(el('div', 'alog-progress-label',
+      `こんしゅうのたっせい ${progress}%`));
+    const barWrap = el('div', 'alog-bar');
+    const barFill = el('div', 'alog-bar-fill' + (status.complete ? ' full' : ''));
+    barFill.style.width = progress + '%';
+    barWrap.appendChild(barFill);
+    prog.appendChild(barWrap);
+    prog.appendChild(el('div', 'alog-progress-en',
+      `${done} / ${total} COMPLETE`));
+    mount.appendChild(prog);
+
     if (status.complete) {
-      seal.appendChild(el('div', 'alog-seal-pct', status.pct + '%'));
-      seal.appendChild(el('div', 'alog-seal-jp', 'こんしゅうのスコア'));
-      seal.appendChild(el('div', 'alog-seal-en', `${playerName}'S WEEKLY SCORE`));
-    } else {
-      seal.appendChild(el('div', 'alog-seal-ghost', '👻'));
-      seal.appendChild(el('div', 'alog-seal-jp', 'ふういん中'));
-      seal.appendChild(el('div', 'alog-seal-en', 'SEALED — FINISH ALL 12'));
+      const score = el('div', 'alog-score');
+      score.appendChild(el('div', 'alog-score-pct', status.pct + '%'));
+      score.appendChild(el('div', 'alog-score-jp', 'こんしゅうのスコア（9ゲームのへいきん）'));
+      score.appendChild(el('div', 'alog-score-en', `${playerName}'S WEEKLY SCORE`));
+      mount.appendChild(score);
     }
-    mount.appendChild(seal);
 
     // Duels bonus row
     const duelIds = Object.keys(status.duel || {});
@@ -190,10 +202,17 @@ const BoohaAdventureLog = (() => {
       if (key === todayKey)    cls += ' today';
       const cell = el('div', cls);
       cell.appendChild(el('div', 'alog-cal-num', String(d)));
-      if (!future && rec && rec.g) cell.appendChild(el('div', 'alog-cal-ghost', '👻'));
+      if (!future && rec && rec.g) cell.appendChild(el('div', 'alog-cal-star', '★'));
       head.appendChild(cell);
     }
     mount.appendChild(head);
+
+    const legend = el('div', 'alog-cal-legend');
+    legend.appendChild(el('span', 'alog-legend-star', '★'));
+    legend.appendChild(el('span', null, ' ゲームをクリアした日 / PLAYED ・ '));
+    legend.appendChild(el('span', 'alog-legend-visit', '□'));
+    legend.appendChild(el('span', null, ' ひらいた日 / VISITED'));
+    mount.appendChild(legend);
 
     const st = streak(dayLog, todayKey);
     mount.appendChild(el('div', 'alog-streak',
