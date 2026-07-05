@@ -787,7 +787,7 @@ window.SentenceBlitz = (() => {
         overlay.appendChild(p);
         p.addEventListener('animationend', () => p.remove());
       }
-    }, 300);
+    }, 900);
   }
 
   /* ── Launch ──────────────────────────────────────────────────── */
