@@ -61,7 +61,12 @@ const BoohaSaveFile = (() => {
         save.meta = { lastWeeklyKey: '', allTimeStars: 0 };
       }
       if (!save.meta.lastWeeklyKey) save.meta.lastWeeklyKey = '';
+      
       if (typeof save.meta.allTimeStars !== 'number') save.meta.allTimeStars = 0;
+      if (!save.meta.dayLog)  save.meta.dayLog  = {};
+      if (!save.meta.weekLog) save.meta.weekLog = {};
+      if (typeof save.meta.lastActivityTs !== 'number') save.meta.lastActivityTs = 0;
+      
 
       if (!save.weekly) {
         save.weekly = {
