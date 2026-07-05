@@ -55,6 +55,22 @@
       -webkit-font-smoothing: antialiased;
     }
 
+    /* ── Close button (back to hub) ── */
+    #alog-close {
+      position: fixed; top: calc(10px + env(safe-area-inset-top, 0px));
+      right: 12px; z-index: 80;
+      width: 46px; height: 46px; border-radius: 50%;
+      border: 2px solid #8a6a34; cursor: pointer;
+      font-size: 26px; font-weight: 900; line-height: 1;
+      color: #efe1c2;
+      background: radial-gradient(circle at 38% 30%, #7a6030, #4a3820 80%);
+      box-shadow: 0 3px 10px rgba(0,0,0,.5), inset 0 -4px 8px rgba(0,0,0,.35),
+                  inset 0 3px 6px rgba(255,235,180,.25);
+      -webkit-tap-highlight-color: transparent;
+      transition: transform .12s ease;
+    }
+    #alog-close:active { transform: scale(.9); }
+
     /* ── Leather header plate ── */
     .journal-plate {
       max-width: 680px; margin: 0 auto 14px; text-align: center;
@@ -268,6 +284,8 @@
 </head>
 <body>
 
+  <button id="alog-close" type="button" aria-label="もどる / Back to games">×</button>
+
   <div class="journal-plate">
     <h1 id="alog-title">ぼうけんログ</h1>
     <div class="plate-en">THE BOOHA ADVENTURE — RECORD OF DEEDS</div>
@@ -290,6 +308,12 @@
     <div id="alog-past"></div>
   </div>
 
+<script>
+  document.getElementById('alog-close').addEventListener('click', () => {
+    sessionStorage.setItem('booha_return_to_hub', '1');
+    window.location.href = 'index.html';
+  });
+</script>
 <script src="./js/calendar.js"></script>
 <script src="./js/core/adventure-core.js"></script>
 <script src="./js/core/save-file.js"></script>
