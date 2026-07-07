@@ -283,6 +283,7 @@ const SCOLDS = [
       writeSave(data);
       return { isWeeklyRecord, isAllTimeRecord, oldRecord: bestBefore, newScore };
     } catch {
+       
       return {
         isWeeklyRecord: false,
         isAllTimeRecord: false,
@@ -1531,11 +1532,12 @@ function openFastestPanel(gameType = 'vocab', ctx = {}) {
 
    
   /* ── Public API ──────────────────────────────────────────────── */
-  return {
+return {
     launch,
     openFastestPanel,
     fmtTime,
     getBestTime,
+    getWeeklyScore,   // weekly read w/ stale-week guard — used by index pills
     _onClose: null,   // set by index.html if needed
   };
 
