@@ -27,8 +27,16 @@
     visibility: hidden;
   }
 </style>
+ 
 <script>document.documentElement.classList.add('token-checking');</script>
 <script src="/the-booha-adventure/js/token.js"></script>
+
+<!-- Core stack: weekly reset must run before stars are read -->
+<script src="/the-booha-adventure/js/calendar.js"></script>
+<script src="/the-booha-adventure/js/core/adventure-core.js"></script>
+<script src="/the-booha-adventure/js/core/save-file.js"></script>
+<script src="/the-booha-adventure/js/core/game-registry.js"></script>
+<script src="/the-booha-adventure/js/core/score-system.js"></script>
 <!-- ═══════════════════════════════════════════════════════ -->
  
 <style>
@@ -259,7 +267,23 @@ body::before {
   transform: translateY(-6px) scale(1.04) rotate(-1deg);
   filter: brightness(1.08);
 }
+
 .tile:active { transform: translateY(2px) scale(0.96); box-shadow: 0 2px 0 transparent !important; }
+
+/* ── Weekly star overlay (PB variant: preserves 3D button shadow) ── */
+.tile-stars{
+  position:absolute; top:7px; right:9px;
+  font-size:15px; letter-spacing:2px; line-height:1;
+  color:#ffd54f;
+  text-shadow:-1px -1px 0 rgba(0,0,0,.55), 1px -1px 0 rgba(0,0,0,.55),
+              -1px 1px 0 rgba(0,0,0,.55), 1px 1px 0 rgba(0,0,0,.55);
+  pointer-events:none; z-index:2;
+}
+.tile.gold3{ animation:goldPulse 2.6s ease-in-out infinite; }
+@keyframes goldPulse{
+  0%,100%{ filter:drop-shadow(0 0 6px rgba(255,200,60,.45)); }
+  50%    { filter:drop-shadow(0 0 16px rgba(255,200,60,.85)); }
+} 
 
 /* shine */
 .tile::before {
@@ -557,6 +581,32 @@ document.getElementById('closeBtn').addEventListener('click', function(e) {
 });
 
   
+</script>
+ 
+<script>
+/* ── Weekly star overlay ─────────────────────────────────
+   Reads weekly.gameStars ONLY (resets Monday via core boot).
+   ⚠️ Never read scores[...].stars here — that is the
+   all-time best and would survive the weekly reset. ── */
+(function () {
+  'use strict';
+  var CURR = 'pb';
+  document.addEventListener('booha:ready', function () {
+    var scores = window.BoohaAdventure && BoohaAdventure.scores;
+    if (!scores) return;
+    document.querySelectorAll('.tile[data-game]').forEach(function (tile) {
+      var saveId = CURR + ':' + tile.dataset.game.replace(/-/g, '_');
+      var stars  = 0;
+      try { stars = scores.weeklyStarsForGame(saveId) || 0; } catch (e) {}
+      if (!stars) return; /* untouched tiles stay bare */
+      var badge = document.createElement('span');
+      badge.className   = 'tile-stars';
+      badge.textContent = '★★★'.slice(0, stars);
+      tile.appendChild(badge);
+      if (stars === 3) tile.classList.add('gold3');
+    });
+  });
+})();
 </script>
 </body>
 </html>
