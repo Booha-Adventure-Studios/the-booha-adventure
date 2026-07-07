@@ -856,7 +856,14 @@
   white-space: nowrap;
 }
 .blitzPill:hover  { transform: translateY(-2px); background: rgba(255,255,255,.15); }
+    
 .blitzPill:active { transform: scale(.98); }
+
+.blitzPill.done{
+  box-shadow: inset 0 0 0 1px rgba(255,213,79,.85), 0 0 16px rgba(255,200,60,.45);
+  color:#ffd54f;
+}
+.blitzPill.done::after{ content:' ★'; }
 
 .blitz-pb { box-shadow: inset 0 0 0 1px rgba(255,70,230,.5), 0 0 14px rgba(255,70,230,.18); }
 .blitz-br { box-shadow: inset 0 0 0 1px rgba(0,240,230,.5), 0 0 14px rgba(0,240,230,.16); }
@@ -1414,21 +1421,23 @@ function renderHub() {
   if (existing) existing.remove();
 
   
-  const thisWeek = getCurrentCurriculumWeek();
-  let activeTab = 'vocab';
+const thisWeek = getCurrentCurriculumWeek();
+  let activeTab = 'pb';   // activeTab now holds the curriculum id
 
   const TABS = [
-  { id: 'vocab',     label: 'VOCAB',     ready: true },
-  { id: 'sentences', label: 'SENTENCES', ready: true },
-  { id: 'questions', label: 'QUESTIONS', ready: true },
+  { id: 'pb', label: 'PRE-BOO',       ready: true },
+  { id: 'br', label: 'BOO-RICULUM',   ready: true },
+  { id: 'bc', label: 'BOO-CONTINUUM', ready: true },
 ];
 
-  const PILLS = [
-    { curr: 'pb', label: 'Pre-Boo Blitz',       cls: 'blitz-pb' },
-    { curr: 'br', label: 'Boo-riculum Blitz',   cls: 'blitz-br' },
-    { curr: 'bc', label: 'Boo-continuum Blitz', cls: 'blitz-bc' },
+  
+const PILLS = [
+    { type: 'vocab',     label: 'Vocab Blitz'    },
+    { type: 'sentences', label: 'Sentence Blitz' },
+    { type: 'questions', label: 'Question Blitz' },
   ];
 
+  
   const arcade = document.createElement('div');
   arcade.id = 'blitzArcade';
   arcade.className = 'blitzArcade';
@@ -1449,30 +1458,40 @@ function renderHub() {
   
  function renderPills() {
   gamesEl.innerHTML = '';
-  const engineMap = {
-    vocab:     (cfg) => VocabBlitz.launch(cfg),
-    sentences: (cfg) => SentenceBlitz.launch(cfg),
-    questions: (cfg) => QuestionBlitz.launch(cfg),
+  const ENGINES = {
+    vocab:     window.VocabBlitz,
+    sentences: window.SentenceBlitz,
+    questions: window.QuestionBlitz,
   };
-  PILLS.forEach(({ curr, label, cls }) => {
+  const cw     = getCurrentCurriculumWeek();
+  const weekId = `${cw.monthSlug}:w${cw.weekNumber}`;
+
+  PILLS.forEach(({ type, label }) => {
     const btn = document.createElement('button');
     btn.type = 'button';
-    btn.className = `blitzPill ${cls}`;
+    btn.className = `blitzPill blitz-${activeTab}`;
     btn.textContent = label;
-    
-  btn.addEventListener('click', () => {
-      const cw = getCurrentCurriculumWeek();
-      engineMap[activeTab]({
-        curr,
-        monthSlug: cw.monthSlug,
-        weekNumber: cw.weekNumber,
+
+    /* Weekly completion — a time can only exist for a perfect run.
+       getWeeklyScore self-guards against stale week buckets. */
+    let done = null;
+    try { done = ENGINES[type].getWeeklyScore(activeTab, weekId); } catch (e) {}
+    if (done) btn.classList.add('done');
+
+    btn.addEventListener('click', () => {
+      const live = getCurrentCurriculumWeek();
+      ENGINES[type].launch({
+        curr: activeTab,
+        monthSlug: live.monthSlug,
+        weekNumber: live.weekNumber,
       });
     });
-    
+
     gamesEl.appendChild(btn);
   });
 }
 
+  
   TABS.forEach(tab => {
     const btn = document.createElement('button');
     btn.type = 'button';
@@ -1493,15 +1512,24 @@ function renderHub() {
 
  arcade.querySelector('.blitzRankBtn').addEventListener('click', () => {
     const cw = getCurrentCurriculumWeek();
-    VocabBlitz.openFastestPanel(activeTab, {
+   
+   VocabBlitz.openFastestPanel('vocab', {
+      
       monthSlug: cw.monthSlug,
       weekNumber: cw.weekNumber,
     });
   });
 
-  renderPills();
+renderPills();
+
+  /* Relight pills the moment a blitz overlay closes */
+  const _relight = () => renderPills();
+  if (window.VocabBlitz)    VocabBlitz._onClose    = _relight;
+  if (window.SentenceBlitz) SentenceBlitz._onClose = _relight;
+  if (window.QuestionBlitz) QuestionBlitz._onClose = _relight;
 
   const weekCards = document.getElementById('weekCards');
+  
   weekCards.insertAdjacentElement('afterend', arcade);
 
   buildWeekData().forEach(wk => {
