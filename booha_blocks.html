@@ -16,9 +16,58 @@
       visibility: hidden;
     }
   </style>
-  <script>document.documentElement.classList.add('token-checking');</script>
+ <script>document.documentElement.classList.add('token-checking');</script>
   <script src="./js/token.js"></script>
-  <!-- ═══════════════════════════════════════════════════════ -->  
+
+  <!-- ═══ BONUS UNLOCK GATE ═════════════════════════════════
+       Core stack must load here so the Monday weekly reset
+       runs BEFORE we read the unlock. A raw localStorage
+       check would honor last week's stale unlock.
+       ⚠️ day-record.js is deliberately NOT loaded on bonus
+       pages — reward play is never tracked. Do not add it. -->
+  <style>
+    html.bonus-checking,
+    html.bonus-checking body {
+      background: #000;
+      visibility: hidden;
+    }
+  </style>
+  <script>document.documentElement.classList.add('bonus-checking');</script>
+  <script src="./js/calendar.js"></script>
+  <script src="./js/core/adventure-core.js"></script>
+  <script src="./js/core/save-file.js"></script>
+  <script src="./js/core/game-registry.js"></script>
+  <script src="./js/core/score-system.js"></script>
+  <script src="./js/core/unlock-system.js"></script>
+  <script>
+    (function () {
+      'use strict';
+      var GAME_ID = 'booha_blocks';
+      var passed  = false;
+
+      function fail() {
+        window.location.replace('./index.html');
+      }
+
+      document.addEventListener('booha:ready', function () {
+        try {
+          if (window.BoohaUnlockSystem &&
+              BoohaUnlockSystem.isBonusGameUnlocked(GAME_ID)) {
+            passed = true;
+            document.documentElement.classList.remove('bonus-checking');
+            return;
+          }
+        } catch (e) {
+          console.error('[BonusGate] Check failed:', e);
+        }
+        fail();
+      });
+
+      /* Fail closed: if the core stack never boots, leave. */
+      setTimeout(function () { if (!passed) fail(); }, 5000);
+    })();
+  </script>
+  <!-- ═══════════════════════════════════════════════════════ -->
   
   
 <style>
