@@ -28,10 +28,18 @@
       visibility: hidden;
     }
   </style>
-  <script>document.documentElement.classList.add('token-checking');</script>
+ 
+<script>document.documentElement.classList.add('token-checking');</script>
   <script src="/the-booha-adventure/js/token.js"></script>
-  <!-- ═══════════════════════════════════════════════════════ -->
 
+  <!-- Core stack: weekly reset must run before stars are read -->
+  <script src="/the-booha-adventure/js/calendar.js"></script>
+  <script src="/the-booha-adventure/js/core/adventure-core.js"></script>
+  <script src="/the-booha-adventure/js/core/save-file.js"></script>
+  <script src="/the-booha-adventure/js/core/game-registry.js"></script>
+  <script src="/the-booha-adventure/js/core/score-system.js"></script> 
+
+ <!-- ═══ TOKEN GATE ════════════════════════════════════════ -->
  
 <style>
 :root {
@@ -239,7 +247,22 @@ body::before {
 .tile:nth-child(9){background:linear-gradient(145deg,#180000,#300000);--tn:var(--red);box-shadow:0 0 16px rgba(255,51,68,0.2),inset 0 0 20px rgba(255,51,68,0.04);}
 
 .tile:hover{transform:translateY(-5px) scale(1.04);filter:brightness(1.25);}
+ 
 .tile:active{transform:scale(0.94);}
+
+/* ── Weekly star overlay ── */
+.tile-stars{
+  position:absolute; top:7px; right:9px;
+  font-size:15px; letter-spacing:2px; line-height:1;
+  color:#ffd54f;
+  text-shadow:0 0 6px rgba(255,190,40,.9), 0 1px 2px rgba(0,0,0,.8);
+  pointer-events:none; z-index:2;
+}
+.tile.gold3{ border-color:#ffd54f; animation:goldPulse 2.6s ease-in-out infinite; }
+@keyframes goldPulse{
+  0%,100%{ box-shadow:0 0 14px rgba(255,200,60,.40), inset 0 0 18px rgba(255,200,60,.08); }
+  50%    { box-shadow:0 0 26px rgba(255,200,60,.70), inset 0 0 26px rgba(255,200,60,.14); }
+}
 
 .tile::before{
   content:'';position:absolute;top:-55%;left:-75%;
@@ -478,4 +501,30 @@ document.getElementById('closeBtn').addEventListener('click', function(e) {
   
 </script>
 </body>
+
+<script>
+/* ── Weekly star overlay ─────────────────────────────────
+   Reads weekly.gameStars ONLY (resets Monday via core boot).
+   ⚠️ Never read scores[...].stars here — that is the
+   all-time best and would survive the weekly reset. ── */
+(function () {
+  'use strict';
+  var CURR = 'br';
+  document.addEventListener('booha:ready', function () {
+    var scores = window.BoohaAdventure && BoohaAdventure.scores;
+    if (!scores) return;
+    document.querySelectorAll('.tile[data-game]').forEach(function (tile) {
+      var saveId = CURR + ':' + tile.dataset.game.replace(/-/g, '_');
+      var stars  = 0;
+      try { stars = scores.weeklyStarsForGame(saveId) || 0; } catch (e) {}
+      if (!stars) return; /* untouched tiles stay bare */
+      var badge = document.createElement('span');
+      badge.className   = 'tile-stars';
+      badge.textContent = '★★★'.slice(0, stars);
+      tile.appendChild(badge);
+      if (stars === 3) tile.classList.add('gold3');
+    });
+  });
+})();
+</script> 
 </html>
