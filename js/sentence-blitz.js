@@ -1088,11 +1088,11 @@ window.SentenceBlitz = (() => {
   }
 
   /* ── Public API ──────────────────────────────────────────────── */
-  return {
+return {
     launch,
     getBestTime,
     fmtTime,
+    getWeeklyScore,   // weekly read w/ stale-week guard — used by index pills
     _onClose: null,
   };
-
 })();
