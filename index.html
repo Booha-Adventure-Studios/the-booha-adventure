@@ -787,9 +787,10 @@
 }
 
 .blitzTabs button.active {
-  color: #ffe66d;
-  background: rgba(255,220,80,.10);
-  box-shadow: inset 0 0 0 1px rgba(255,220,80,.25);
+  color: #1a1408;
+  background: #ffe66d;
+  box-shadow: 0 0 12px rgba(255,220,80,.45);
+  transform: scale(1.06);
 }
 
 .blitzTabs button.soon {
@@ -1464,6 +1465,8 @@ const PILLS = [
     questions: window.QuestionBlitz,
   };
   const cw     = getCurrentCurriculumWeek();
+
+   
   const weekId = `${cw.monthSlug}:w${cw.weekNumber}`;
 
   PILLS.forEach(({ type, label }) => {
@@ -1520,15 +1523,23 @@ const PILLS = [
     });
   });
 
-renderPills();
-
-  /* Relight pills the moment a blitz overlay closes */
-  const _relight = () => renderPills();
-  if (window.VocabBlitz)    VocabBlitz._onClose    = _relight;
-  if (window.SentenceBlitz) SentenceBlitz._onClose = _relight;
-  if (window.QuestionBlitz) QuestionBlitz._onClose = _relight;
+/* Blitz engines load at the END of <body>, after this script runs.
+     First paint + close-hook wiring must wait until they exist. */
+  function initPillsWhenEnginesReady() {
+    renderPills();
+    const _relight = () => renderPills();
+    if (window.VocabBlitz)    VocabBlitz._onClose    = _relight;
+    if (window.SentenceBlitz) SentenceBlitz._onClose = _relight;
+    if (window.QuestionBlitz) QuestionBlitz._onClose = _relight;
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initPillsWhenEnginesReady);
+  } else {
+    initPillsWhenEnginesReady();
+  }
 
   const weekCards = document.getElementById('weekCards');
+
   
   weekCards.insertAdjacentElement('afterend', arcade);
 
