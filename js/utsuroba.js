@@ -140,9 +140,29 @@
       delete data.drifters;
       dirty = true;
     }
+    
     if (!data.utsuroba.drifters)     { data.utsuroba.drifters     = {}; dirty = true; }
     if (!data.utsuroba.visitedRooms) { data.utsuroba.visitedRooms = {}; dirty = true; }
     if (!data.utsuroba.flags)        { data.utsuroba.flags        = {}; dirty = true; }
+
+    /* ── Weekly drifter reset ───────────────────────────────
+       Drifter memories reset with the weekly content.
+       Self-guarding stamp, same pattern as meta.blitz.
+       Only rolls when CALENDAR gives an authoritative week —
+       never wipe on an unknown week. */
+    try {
+      if (window.CALENDAR?.getCurrentCurriculumWeek) {
+        const cw = CALENDAR.getCurrentCurriculumWeek();
+        const wk = `${cw.monthSlug}:w${cw.weekNumber}`;
+        if (data.utsuroba.driftersWeekKey !== wk) {
+          data.utsuroba.drifters        = {};
+          data.utsuroba.driftersWeekKey = wk;
+          if (data.weekly) data.weekly.drifterQuest = null;
+          dirty = true;
+        }
+      }
+    } catch (_) {}
+    
     if (data.weekly.utsuobaVisited || data.weekly.utsurobaVisited) {
       data.utsuroba.flags.visited = true;
       delete data.weekly.utsuobaVisited;
