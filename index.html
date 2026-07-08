@@ -1697,8 +1697,19 @@ function jumpToHub() {
   fadingOut = false;
   started   = false;
   try { renderHub(); hubRendered = true; } catch(e2) {}
+  
   setTimeout(typeGreeting, 250);
   sessionStorage.removeItem('booha_return_to_hub');
+
+  /* Deep-link from maze: ブリッツへ scrolls to the arcade */
+  if (sessionStorage.getItem('booha_scroll_to_blitz')) {
+    sessionStorage.removeItem('booha_scroll_to_blitz');
+    setTimeout(() => {
+      const a = document.getElementById('blitzArcade');
+      if (a) a.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 400);
+  }
+  
   if (window.location.hash === '#hub') {
     history.replaceState(null, '', window.location.pathname + window.location.search);
   }
