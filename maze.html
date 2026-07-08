@@ -1133,12 +1133,13 @@ const app=document.getElementById('app'),rotateOverlay=document.getElementById('
 
   if (heading) {
     heading.textContent = blitzDone
-      ? 'ブリッツぜんぶクリア！すごい！'
-      : 'ブリッツがまだのこってるよ';
+      ? 'ブリッツぜんぶクリア！'
+      : 'まだブリッツがのこってるよ';
   }
 
   /* XSS-safe name insertion — names always via textContent */
   sub.textContent = '';
+  if (blitzDone) sub.appendChild(document.createTextNode('すごい！'));
   const span = document.createElement('span');
   span.className   = 'mazePlayerName';
   span.textContent = name;
@@ -1147,6 +1148,17 @@ const app=document.getElementById('app'),rotateOverlay=document.getElementById('
     blitzDone ? '、ブーハーがまってるよ。めいろにいく？'
               : '、それでもめいろにいく？'
   ));
+
+  /* Buttons per state */
+  const rBtn = document.getElementById('returnBtn');
+  const cBtn = document.getElementById('continueBtn');
+  if (rBtn) rBtn.textContent = blitzDone ? 'あとで' : 'ブリッツへ';
+  if (cBtn) cBtn.textContent = blitzDone ? 'いく！' : 'めいろへ';
+  if (rBtn && !blitzDone) {
+    rBtn.addEventListener('click', () => {
+      sessionStorage.setItem('booha_scroll_to_blitz', '1');
+    });
+  }
 }
 
   
