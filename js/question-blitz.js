@@ -751,7 +751,7 @@ window.QuestionBlitz = (() => {
         text-shadow:0 0 10px ${color}, 0 0 24px ${color};
         --sk:${toLeft ? 14 : -14}deg;
         --dx:${toLeft ? -(W + 620) : (W + 620)}px;
-        --cdur:${900 + Math.random() * 600}ms;
+        --cdur:${1800 + Math.random() * 1200}ms;
         --cdelay:${Math.random() * 900}ms;
       `;
       overlay.appendChild(d);
