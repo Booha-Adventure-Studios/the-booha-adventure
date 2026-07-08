@@ -1105,14 +1105,51 @@ const app=document.getElementById('app'),rotateOverlay=document.getElementById('
   krVideo=document.getElementById('krVideo');
 
  function personalizeMazeIntro() {
-  const sub = document.getElementById('mazeNameSub');
+  const sub     = document.getElementById('mazeNameSub');
+  const heading = document.getElementById('mazeQuestion');
   if (!sub) return;
 
   const name = getBoohaFirstName();
 
-  sub.innerHTML = `<span class="mazePlayerName">${name}</span>、ブーハーがよんでるよ。`;
+  /* ── Weekly Blitz completion ────────────────────────────
+     meta.blitz self-guards with weeklyKey, so a raw read is
+     safe here WITHOUT the core stack — but only because we
+     compare weeklyKey against the current week id. */
+  let blitzDone = false;
+  try {
+    const cw     = getCurrentCurriculumWeek();
+    const weekId = `${cw.monthSlug}:w${cw.weekNumber}`;
+    const save   = JSON.parse(localStorage.getItem('booha_save') || '{}');
+    const blitz  = (save.meta || {}).blitz || {};
+    if (blitz.weeklyKey === weekId && blitz.weekly) {
+      const w = blitz.weekly;
+      blitzDone = ['pb', 'br', 'bc'].some(c =>
+        (w.vocab     || {})[c] &&
+        (w.sentences || {})[c] &&
+        (w.questions || {})[c]
+      );
+    }
+  } catch (e) {}
+
+  if (heading) {
+    heading.textContent = blitzDone
+      ? 'ブリッツぜんぶクリア！すごい！'
+      : 'ブリッツがまだのこってるよ';
+  }
+
+  /* XSS-safe name insertion — names always via textContent */
+  sub.textContent = '';
+  const span = document.createElement('span');
+  span.className   = 'mazePlayerName';
+  span.textContent = name;
+  sub.appendChild(span);
+  sub.appendChild(document.createTextNode(
+    blitzDone ? '、ブーハーがまってるよ。めいろにいく？'
+              : '、それでもめいろにいく？'
+  ));
 }
 
+  
 const FADE_MS=520;
 
 // Canvas
