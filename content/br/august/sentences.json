@@ -1,486 +1,68 @@
 
 {
-"cards": [
-{
-"n": 1,
-"en": "It’s sunny today.",
-"jp": "今日は晴れです。",
-"hira": "きょう は はれ です",
-"mp3": "br_s01_its_sunny_today.mp3",
-"jp_mp3": "br_s01_its_sunny_today_jp.mp3"
-},
-{
-"n": 2,
-"en": "It’s cloudy and cool.",
-"jp": "くもっていて涼しいです。",
-"hira": "くもって いて すずしい です",
-"mp3": "br_s02_its_cloudy_and_cool.mp3",
-"jp_mp3": "br_s02_its_cloudy_and_cool_jp.mp3"
-},
-{
-"n": 3,
-"en": "It’s raining now.",
-"jp": "今、雨が降っています。",
-"hira": "いま、 あめ が ふって い ます",
-"mp3": "br_s03_its_raining_now.mp3",
-"jp_mp3": "br_s03_its_raining_now_jp.mp3"
-},
-{
-"n": 4,
-"en": "It’s snowing in winter.",
-"jp": "冬には雪が降ります。",
-"hira": "ふゆ に は ゆき が ふり ます",
-"mp3": "br_s04_its_snowing_in_winter.mp3",
-"jp_mp3": "br_s04_its_snowing_in_winter_jp.mp3"
-},
-{
-"n": 5,
-"en": "It’s very hot in summer.",
-"jp": "夏はとても暑いです。",
-"hira": "なつ は とても あつい です",
-"mp3": "br_s05_its_very_hot_in_summer.mp3",
-"jp_mp3": "br_s05_its_very_hot_in_summer_jp.mp3"
-},
-{
-"n": 6,
-"en": "In spring, flowers bloom.",
-"jp": "春には花が咲きます。",
-"hira": "はる に は はな が さき ます",
-"mp3": "br_s06_in_spring_flowers_bloom.mp3",
-"jp_mp3": "br_s06_in_spring_flowers_bloom_jp.mp3"
-},
-{
-"n": 7,
-"en": "In autumn, leaves change color.",
-"jp": "秋には葉が色づきます。",
-"hira": "あき に は は が いろづき ます",
-"mp3": "br_s07_in_autumn_leaves_change_color.mp3",
-"jp_mp3": "br_s07_in_autumn_leaves_change_color_jp.mp3"
-},
-{
-"n": 8,
-"en": "The wind is strong today.",
-"jp": "今日は風が強いです。",
-"hira": "きょう は かぜ が つよい です",
-"mp3": "br_s08_the_wind_is_strong_today.mp3",
-"jp_mp3": "br_s08_the_wind_is_strong_today_jp.mp3"
-},
-{
-"n": 9,
-"en": "The temperature is twenty-eight degrees.",
-"jp": "気温は28度です。",
-"hira": "きおん は にじゅうはち ど です",
-"mp3": "br_s09_the_temperature_is_twenty_eight_degrees.mp3",
-"jp_mp3": "br_s09_the_temperature_is_twenty_eight_degrees_jp.mp3"
-},
-{
-"n": 10,
-"en": "I wear a T-shirt when it’s hot.",
-"jp": "暑いときはTシャツを着ます。",
-"hira": "あつい とき は てぃーしゃつ を き ます",
-"mp3": "br_s10_i_wear_a_t_shirt_when_its_hot.mp3",
-"jp_mp3": "br_s10_i_wear_a_t_shirt_when_its_hot_jp.mp3"
-},
-{
-"n": 11,
-"en": "I wear a coat when it’s cold.",
-"jp": "寒いときはコートを着ます。",
-"hira": "さむい とき は こーと を き ます",
-"mp3": "br_s11_i_wear_a_coat_when_its_cold.mp3",
-"jp_mp3": "br_s11_i_wear_a_coat_when_its_cold_jp.mp3"
-},
-{
-"n": 12,
-"en": "I use an umbrella on rainy days.",
-"jp": "雨の日はかさを使います。",
-"hira": "あめ の ひ は かさ を つかい ます",
-"mp3": "br_s12_i_use_an_umbrella_on_rainy_days.mp3",
-"jp_mp3": "br_s12_i_use_an_umbrella_on_rainy_days_jp.mp3"
-},
-{
-"n": 13,
-"en": "Do you like warm weather?",
-"jp": "あたたかい天気が好きですか。",
-"hira": "あたたかい てんき が すき です か",
-"mp3": "br_s13_do_you_like_warm_weather.mp3",
-"jp_mp3": "br_s13_do_you_like_warm_weather_jp.mp3"
-},
-{
-"n": 14,
-"en": "What season do you like?",
-"jp": "どの季節が好きですか。",
-"hira": "どの きせつ が すき です か",
-"mp3": "br_s14_what_season_do_you_like.mp3",
-"jp_mp3": "br_s14_what_season_do_you_like_jp.mp3"
-},
-{
-"n": 15,
-"en": "Let’s check the weather forecast.",
-"jp": "天気予報を見ましょう。",
-"hira": "てんきよほう を み ましょう",
-"mp3": "br_s15_lets_check_the_weather_forecast.mp3",
-"jp_mp3": "br_s15_lets_check_the_weather_forecast_jp.mp3"
-},
-{
-"n": 16,
-"en": "There is an earthquake. Stay calm.",
-"jp": "地震です。落ち着いてください。",
-"hira": "じしん です。 おちついて ください",
-"mp3": "br_s16_there_is_an_earthquake_stay_calm.mp3",
-"jp_mp3": "br_s16_there_is_an_earthquake_stay_calm_jp.mp3"
-},
-{
-"n": 17,
-"en": "Drop and cover under a table.",
-"jp": "テーブルの下に入って、身を守ってください。",
-"hira": "てーぶる の した に はいって、 み を まもって ください",
-"mp3": "br_s17_drop_and_cover_under_a_table.mp3",
-"jp_mp3": "br_s17_drop_and_cover_under_a_table_jp.mp3"
-},
-{
-"n": 18,
-"en": "Don’t run outside suddenly.",
-"jp": "急に外へ走り出さないでください。",
-"hira": "きゅう に そと へ はしりださ ないで ください",
-"mp3": "br_s18_dont_run_outside_suddenly.mp3",
-"jp_mp3": "br_s18_dont_run_outside_suddenly_jp.mp3"
-},
-{
-"n": 19,
-"en": "Listen to warnings and alerts.",
-"jp": "警報や注意報を確認してください。",
-"hira": "けいほう や ちゅういほう を かくにん して ください",
-"mp3": "br_s19_listen_to_warnings_and_alerts.mp3",
-"jp_mp3": "br_s19_listen_to_warnings_and_alerts_jp.mp3"
-},
-{
-"n": 20,
-"en": "We must evacuate to the shelter.",
-"jp": "避難所へ行かなければなりません。",
-"hira": "ひなんじょ へ いか なければ なり ません",
-"mp3": "br_s20_we_must_evacuate_to_the_shelter.mp3",
-"jp_mp3": "br_s20_we_must_evacuate_to_the_shelter_jp.mp3"
-},
-{
-"n": 21,
-"en": "Where is the evacuation route?",
-"jp": "避難経路はどこですか。",
-"hira": "ひなん けいろ は どこ です か",
-"mp3": "br_s21_where_is_the_evacuation_route.mp3",
-"jp_mp3": "br_s21_where_is_the_evacuation_route_jp.mp3"
-},
-{
-"n": 22,
-"en": "Bring your emergency kit and flashlight.",
-"jp": "非常用持ち出し袋と懐中電灯を持って行ってください。",
-"hira": "ひじょうよう もちだしぶくろ と かいちゅうでんとう を もって いって ください",
-"mp3": "br_s22_bring_your_emergency_kit_and_flashlight.mp3",
-"jp_mp3": "br_s22_bring_your_emergency_kit_and_flashlight_jp.mp3"
-},
-{
-"n": 23,
-"en": "Do not use the elevator.",
-"jp": "エレベーターを使わないでください。",
-"hira": "えれべーたー を つかわ ないで ください",
-"mp3": "br_s23_do_not_use_the_elevator.mp3",
-"jp_mp3": "br_s23_do_not_use_the_elevator_jp.mp3"
-},
-{
-"n": 24,
-"en": "Stay away from the river.",
-"jp": "川から離れてください。",
-"hira": "かわ から はなれて ください",
-"mp3": "br_s24_stay_away_from_the_river.mp3",
-"jp_mp3": "br_s24_stay_away_from_the_river_jp.mp3"
-},
-{
-"n": 25,
-"en": "Turn off the gas and electricity.",
-"jp": "ガスと電気を止めてください。",
-"hira": "がす と でんき を とめて ください",
-"mp3": "br_s25_turn_off_the_gas_and_electricity.mp3",
-"jp_mp3": "br_s25_turn_off_the_gas_and_electricity_jp.mp3"
-},
-{
-"n": 26,
-"en": "After the quake, check for danger.",
-"jp": "地震のあとに危険がないか確認してください。",
-"hira": "じしん の あと に きけん が ない か かくにん して ください",
-"mp3": "br_s26_after_the_quake_check_for_danger.mp3",
-"jp_mp3": "br_s26_after_the_quake_check_for_danger_jp.mp3"
-},
-{
-"n": 27,
-"en": "Call for help if you need it.",
-"jp": "必要なら助けを呼んでください。",
-"hira": "ひつよう なら たすけ を よんで ください",
-"mp3": "br_s27_call_for_help_if_you_need_it.mp3",
-"jp_mp3": "br_s27_call_for_help_if_you_need_it_jp.mp3"
-},
-{
-"n": 28,
-"en": "Is everyone safe?",
-"jp": "みんな安全ですか。",
-"hira": "みんな あんぜん です か",
-"mp3": "br_s28_is_everyone_safe.mp3",
-"jp_mp3": "br_s28_is_everyone_safe_jp.mp3"
-},
-{
-"n": 29,
-"en": "Follow the staff’s directions.",
-"jp": "職員の指示にしたがってください。",
-"hira": "しょくいん の しじ に したがって ください",
-"mp3": "br_s29_follow_the_staffs_directions.mp3",
-"jp_mp3": "br_s29_follow_the_staffs_directions_jp.mp3"
-},
-{
-"n": 30,
-"en": "Let’s prepare at home today.",
-"jp": "今日は家で備えましょう。",
-"hira": "きょう は いえ で そなえ ましょう",
-"mp3": "br_s30_lets_prepare_at_home_today.mp3",
-"jp_mp3": "br_s30_lets_prepare_at_home_today_jp.mp3"
-},
-{
-"n": 31,
-"en": "Animals live in different habitats.",
-"jp": "動物はそれぞれちがう生息地に住んでいます。",
-"hira": "どうぶつ は それぞれ ちがう せいそくち に すんで い ます",
-"mp3": "br_s31_animals_live_in_different_habitats.mp3",
-"jp_mp3": "br_s31_animals_live_in_different_habitats_jp.mp3"
-},
-{
-"n": 32,
-"en": "A bear can climb trees.",
-"jp": "クマは木に登ることができます。",
-"hira": "くま は き に のぼる こと が でき ます",
-"mp3": "br_s32_a_bear_can_climb_trees.mp3",
-"jp_mp3": "br_s32_a_bear_can_climb_trees_jp.mp3"
-},
-{
-"n": 33,
-"en": "Foxes have long tails.",
-"jp": "キツネは長いしっぽを持っています。",
-"hira": "きつね は ながい しっぽ を もって い ます",
-"mp3": "br_s33_foxes_have_long_tails.mp3",
-"jp_mp3": "br_s33_foxes_have_long_tails_jp.mp3"
-},
-{
-"n": 34,
-"en": "Deer can run fast.",
-"jp": "シカは速く走れます。",
-"hira": "しか は はやく はしれ ます",
-"mp3": "br_s34_deer_can_run_fast.mp3",
-"jp_mp3": "br_s34_deer_can_run_fast_jp.mp3"
-},
-{
-"n": 35,
-"en": "Eagles can fly high.",
-"jp": "ワシは高く飛べます。",
-"hira": "わし は たかく とべ ます",
-"mp3": "br_s35_eagles_can_fly_high.mp3",
-"jp_mp3": "br_s35_eagles_can_fly_high_jp.mp3"
-},
-{
-"n": 36,
-"en": "Dolphins live in the sea.",
-"jp": "イルカは海に住んでいます。",
-"hira": "いるか は うみ に すんで い ます",
-"mp3": "br_s36_dolphins_live_in_the_sea.mp3",
-"jp_mp3": "br_s36_dolphins_live_in_the_sea_jp.mp3"
-},
-{
-"n": 37,
-"en": "Turtles have hard shells.",
-"jp": "カメにはかたい甲羅があります。",
-"hira": "かめ に は かたい こうら が あり ます",
-"mp3": "br_s37_turtles_have_hard_shells.mp3",
-"jp_mp3": "br_s37_turtles_have_hard_shells_jp.mp3"
-},
-{
-"n": 38,
-"en": "Frogs live near water.",
-"jp": "カエルは水の近くに住みます。",
-"hira": "かえる は みず の ちかく に すみ ます",
-"mp3": "br_s38_frogs_live_near_water.mp3",
-"jp_mp3": "br_s38_frogs_live_near_water_jp.mp3"
-},
-{
-"n": 39,
-"en": "Butterflies have colorful wings.",
-"jp": "チョウには色とりどりの羽があります。",
-"hira": "ちょう に は いろとりどり の はね が あり ます",
-"mp3": "br_s39_butterflies_have_colorful_wings.mp3",
-"jp_mp3": "br_s39_butterflies_have_colorful_wings_jp.mp3"
-},
-{
-"n": 40,
-"en": "Some insects can jump or fly.",
-"jp": "昆虫には跳ねたり飛んだりできるものもいます。",
-"hira": "こんちゅう に は はねたり とんだり できる もの も い ます",
-"mp3": "br_s40_some_insects_can_jump_or_fly.mp3",
-"jp_mp3": "br_s40_some_insects_can_jump_or_fly_jp.mp3"
-},
-{
-"n": 41,
-"en": "This animal is a mammal.",
-"jp": "この動物はほ乳類です。",
-"hira": "この どうぶつ は ほにゅうるい です",
-"mp3": "br_s41_this_animal_is_a_mammal.mp3",
-"jp_mp3": "br_s41_this_animal_is_a_mammal_jp.mp3"
-},
-{
-"n": 42,
-"en": "That animal is a reptile.",
-"jp": "その動物はは虫類です。",
-"hira": "その どうぶつ は はちゅうるい です",
-"mp3": "br_s42_that_animal_is_a_reptile.mp3",
-"jp_mp3": "br_s42_that_animal_is_a_reptile_jp.mp3"
-},
-{
-"n": 43,
-"en": "Where do bears live?",
-"jp": "クマはどこに住んでいますか。",
-"hira": "くま は どこ に すんで い ます か",
-"mp3": "br_s43_where_do_bears_live.mp3",
-"jp_mp3": "br_s43_where_do_bears_live_jp.mp3"
-},
-{
-"n": 44,
-"en": "What do dolphins eat?",
-"jp": "イルカは何を食べますか。",
-"hira": "いるか は なに を たべ ます か",
-"mp3": "br_s44_what_do_dolphins_eat.mp3",
-"jp_mp3": "br_s44_what_do_dolphins_eat_jp.mp3"
-},
-{
-"n": 45,
-"en": "Let’s protect animal habitats.",
-"jp": "動物の生息地を守りましょう。",
-"hira": "どうぶつ の せいそくち を まもり ましょう",
-"mp3": "br_s45_lets_protect_animal_habitats.mp3",
-"jp_mp3": "br_s45_lets_protect_animal_habitats_jp.mp3"
-},
-{
-"n": 46,
-"en": "Let’s go hiking this weekend.",
-"jp": "今週末にハイキングに行きましょう。",
-"hira": "こんしゅうまつ に はいきんぐ に いき ましょう",
-"mp3": "br_s46_lets_go_hiking_this_weekend.mp3",
-"jp_mp3": "br_s46_lets_go_hiking_this_weekend_jp.mp3"
-},
-{
-"n": 47,
-"en": "We need a map and a compass.",
-"jp": "地図とコンパスが必要です。",
-"hira": "ちず と こんぱす が ひつよう です",
-"mp3": "br_s47_we_need_a_map_and_a_compass.mp3",
-"jp_mp3": "br_s47_we_need_a_map_and_a_compass_jp.mp3"
-},
-{
-"n": 48,
-"en": "We can camp by the river.",
-"jp": "川のそばでキャンプできます。",
-"hira": "かわ の そば で きゃんぷ でき ます",
-"mp3": "br_s48_we_can_camp_by_the_river.mp3",
-"jp_mp3": "br_s48_we_can_camp_by_the_river_jp.mp3"
-},
-{
-"n": 49,
-"en": "Set up the tent before sunset.",
-"jp": "日没前にテントを立ててください。",
-"hira": "にちぼつ まえ に てんと を たてて ください",
-"mp3": "br_s49_set_up_the_tent_before_sunset.mp3",
-"jp_mp3": "br_s49_set_up_the_tent_before_sunset_jp.mp3"
-},
-{
-"n": 50,
-"en": "Don’t leave trash outside.",
-"jp": "外にごみを置いていかないでください。",
-"hira": "そと に ごみ を おいて いか ないで ください",
-"mp3": "br_s50_dont_leave_trash_outside.mp3",
-"jp_mp3": "br_s50_dont_leave_trash_outside_jp.mp3"
-},
-{
-"n": 51,
-"en": "Bring a flashlight at night.",
-"jp": "夜は懐中電灯を持って行ってください。",
-"hira": "よる は かいちゅうでんとう を もって いって ください",
-"mp3": "br_s51_bring_a_flashlight_at_night.mp3",
-"jp_mp3": "br_s51_bring_a_flashlight_at_night_jp.mp3"
-},
-{
-"n": 52,
-"en": "Use insect repellent in summer.",
-"jp": "夏は虫よけを使ってください。",
-"hira": "なつ は むしよけ を つかって ください",
-"mp3": "br_s52_use_insect_repellent_in_summer.mp3",
-"jp_mp3": "br_s52_use_insect_repellent_in_summer_jp.mp3"
-},
-{
-"n": 53,
-"en": "Let’s have a picnic in the park.",
-"jp": "公園でピクニックをしましょう。",
-"hira": "こうえん で ぴくにっく を し ましょう",
-"mp3": "br_s53_lets_have_a_picnic_in_the_park.mp3",
-"jp_mp3": "br_s53_lets_have_a_picnic_in_the_park_jp.mp3"
-},
-{
-"n": 54,
-"en": "We can watch birds with binoculars.",
-"jp": "双眼鏡で鳥を観察できます。",
-"hira": "そうがんきょう で とり を かんさつ でき ます",
-"mp3": "br_s54_we_can_watch_birds_with_binoculars.mp3",
-"jp_mp3": "br_s54_we_can_watch_birds_with_binoculars_jp.mp3"
-},
-{
-"n": 55,
-"en": "Be careful on the trail.",
-"jp": "ハイキングコースでは気をつけてください。",
-"hira": "はいきんぐこーす で は き を つけて ください",
-"mp3": "br_s55_be_careful_on_the_trail.mp3",
-"jp_mp3": "br_s55_be_careful_on_the_trail_jp.mp3"
-},
-{
-"n": 56,
-"en": "Let’s write in a nature journal.",
-"jp": "自然観察ノートに書きましょう。",
-"hira": "しぜんかんさつ のーと に かき ましょう",
-"mp3": "br_s56_lets_write_in_a_nature_journal.mp3",
-"jp_mp3": "br_s56_lets_write_in_a_nature_journal_jp.mp3"
-},
-{
-"n": 57,
-"en": "We need water and snacks.",
-"jp": "水とおやつが必要です。",
-"hira": "みず と おやつ が ひつよう です",
-"mp3": "br_s57_we_need_water_and_snacks.mp3",
-"jp_mp3": "br_s57_we_need_water_and_snacks_jp.mp3"
-},
-{
-"n": 58,
-"en": "Can you carry the backpack?",
-"jp": "リュックを背負えますか。",
-"hira": "りゅっく を せおえ ます か",
-"mp3": "br_s58_can_you_carry_the_backpack.mp3",
-"jp_mp3": "br_s58_can_you_carry_the_backpack_jp.mp3"
-},
-{
-"n": 59,
-"en": "Keep the campsite clean.",
-"jp": "キャンプ場をきれいに保ってください。",
-"hira": "きゃんぷじょう を きれい に たもって ください",
-"mp3": "br_s59_keep_the_campsite_clean.mp3",
-"jp_mp3": "br_s59_keep_the_campsite_clean_jp.mp3"
-},
-{
-"n": 60,
-"en": "Let’s enjoy nature safely.",
-"jp": "安全に自然を楽しみましょう。",
-"hira": "あんぜん に しぜん を たのしみ ましょう",
-"mp3": "br_s60_lets_enjoy_nature_safely.mp3",
-"jp_mp3": "br_s60_lets_enjoy_nature_safely_jp.mp3"
-}
-]
-}
+  "cards": [
+    { "n": 1, "en": "It’s sunny today.", "jp": "今日は晴れです。", "hira": "きょう は はれ です", "mp3": "br_s01_its_sunny_today.mp3" },
+    { "n": 2, "en": "It’s cloudy and cool.", "jp": "くもっていて涼しいです。", "hira": "くもって いて すずしい です", "mp3": "br_s02_its_cloudy_and_cool.mp3" },
+    { "n": 3, "en": "It’s raining now.", "jp": "今、雨が降っています。", "hira": "いま、 あめ が ふって い ます", "mp3": "br_s03_its_raining_now.mp3" },
+    { "n": 4, "en": "It’s snowing in winter.", "jp": "冬には雪が降ります。", "hira": "ふゆ に は ゆき が ふり ます", "mp3": "br_s04_its_snowing_in_winter.mp3" },
+    { "n": 5, "en": "It’s very hot in summer.", "jp": "夏はとても暑いです。", "hira": "なつ は とても あつい です", "mp3": "br_s05_its_very_hot_in_summer.mp3" },
+    { "n": 6, "en": "In spring, flowers bloom.", "jp": "春には花が咲きます。", "hira": "はる に は はな が さき ます", "mp3": "br_s06_in_spring_flowers_bloom.mp3" },
+    { "n": 7, "en": "In autumn, leaves change color.", "jp": "秋には葉が色づきます。", "hira": "あき に は は が いろづき ます", "mp3": "br_s07_in_autumn_leaves_change_color.mp3" },
+    { "n": 8, "en": "The wind is strong today.", "jp": "今日は風が強いです。", "hira": "きょう は かぜ が つよい です", "mp3": "br_s08_the_wind_is_strong_today.mp3" },
+    { "n": 9, "en": "The temperature is twenty-eight degrees.", "jp": "気温は28度です。", "hira": "きおん は にじゅうはち ど です", "mp3": "br_s09_the_temperature_is_twenty_eight_degrees.mp3" },
+    { "n": 10, "en": "I wear a T-shirt when it’s hot.", "jp": "暑いときはTシャツを着ます。", "hira": "あつい とき は てぃーしゃつ を き ます", "mp3": "br_s10_i_wear_a_t_shirt_when_its_hot.mp3" },
+    { "n": 11, "en": "I wear a coat when it’s cold.", "jp": "寒いときはコートを着ます。", "hira": "さむい とき は こーと を き ます", "mp3": "br_s11_i_wear_a_coat_when_its_cold.mp3" },
+    { "n": 12, "en": "I use an umbrella on rainy days.", "jp": "雨の日はかさを使います。", "hira": "あめ の ひ は かさ を つかい ます", "mp3": "br_s12_i_use_an_umbrella_on_rainy_days.mp3" },
+    { "n": 13, "en": "Do you like warm weather?", "jp": "あたたかい天気が好きですか。", "hira": "あたたかい てんき が すき です か", "mp3": "br_s13_do_you_like_warm_weather.mp3" },
+    { "n": 14, "en": "What season do you like?", "jp": "どの季節が好きですか。", "hira": "どの きせつ が すき です か", "mp3": "br_s14_what_season_do_you_like.mp3" },
+    { "n": 15, "en": "Let’s check the weather forecast.", "jp": "天気予報を見ましょう。", "hira": "てんきよほう を み ましょう", "mp3": "br_s15_lets_check_the_weather_forecast.mp3" },
 
+    { "n": 16, "en": "There is an earthquake. Stay calm.", "jp": "地震です。落ち着いてください。", "hira": "じしん です。 おちついて ください", "mp3": "br_s16_there_is_an_earthquake_stay_calm.mp3" },
+    { "n": 17, "en": "Drop and cover under a table.", "jp": "テーブルの下に入って、身を守ってください。", "hira": "てーぶる の した に はいって、 み を まもって ください", "mp3": "br_s17_drop_and_cover_under_a_table.mp3" },
+    { "n": 18, "en": "Don’t run outside suddenly.", "jp": "急に外へ走り出さないでください。", "hira": "きゅう に そと へ はしりださ ないで ください", "mp3": "br_s18_dont_run_outside_suddenly.mp3" },
+    { "n": 19, "en": "Listen to warnings and alerts.", "jp": "警報や注意報を確認してください。", "hira": "けいほう や ちゅういほう を かくにん して ください", "mp3": "br_s19_listen_to_warnings_and_alerts.mp3" },
+    { "n": 20, "en": "We must evacuate to the shelter.", "jp": "避難所へ行かなければなりません。", "hira": "ひなんじょ へ いか なければ なり ません", "mp3": "br_s20_we_must_evacuate_to_the_shelter.mp3" },
+    { "n": 21, "en": "Where is the evacuation route?", "jp": "避難経路はどこですか。", "hira": "ひなん けいろ は どこ です か", "mp3": "br_s21_where_is_the_evacuation_route.mp3" },
+    { "n": 22, "en": "Bring your emergency kit and flashlight.", "jp": "非常用持ち出し袋と懐中電灯を持って行ってください。", "hira": "ひじょうよう もちだしぶくろ と かいちゅうでんとう を もって いって ください", "mp3": "br_s22_bring_your_emergency_kit_and_flashlight.mp3" },
+    { "n": 23, "en": "Do not use the elevator.", "jp": "エレベーターを使わないでください。", "hira": "えれべーたー を つかわ ないで ください", "mp3": "br_s23_do_not_use_the_elevator.mp3" },
+    { "n": 24, "en": "Stay away from the river.", "jp": "川から離れてください。", "hira": "かわ から はなれて ください", "mp3": "br_s24_stay_away_from_the_river.mp3" },
+    { "n": 25, "en": "Turn off the gas and electricity.", "jp": "ガスと電気を止めてください。", "hira": "がす と でんき を とめて ください", "mp3": "br_s25_turn_off_the_gas_and_electricity.mp3" },
+    { "n": 26, "en": "After the quake, check for danger.", "jp": "地震のあとに危険がないか確認してください。", "hira": "じしん の あと に きけん が ない か かくにん して ください", "mp3": "br_s26_after_the_quake_check_for_danger.mp3" },
+    { "n": 27, "en": "Call for help if you need it.", "jp": "必要なら助けを呼んでください。", "hira": "ひつよう なら たすけ を よんで ください", "mp3": "br_s27_call_for_help_if_you_need_it.mp3" },
+    { "n": 28, "en": "Is everyone safe?", "jp": "みんな安全ですか。", "hira": "みんな あんぜん です か", "mp3": "br_s28_is_everyone_safe.mp3" },
+    { "n": 29, "en": "Follow the staff’s directions.", "jp": "職員の指示にしたがってください。", "hira": "しょくいん の しじ に したがって ください", "mp3": "br_s29_follow_the_staffs_directions.mp3" },
+    { "n": 30, "en": "Let’s prepare at home today.", "jp": "今日は家で備えましょう。", "hira": "きょう は いえ で そなえ ましょう", "mp3": "br_s30_lets_prepare_at_home_today.mp3" },
+
+    { "n": 31, "en": "Animals live in different habitats.", "jp": "動物はそれぞれちがう生息地に住んでいます。", "hira": "どうぶつ は それぞれ ちがう せいそくち に すんで い ます", "mp3": "br_s31_animals_live_in_different_habitats.mp3" },
+    { "n": 32, "en": "A bear can climb trees.", "jp": "クマは木に登ることができます。", "hira": "くま は き に のぼる こと が でき ます", "mp3": "br_s32_a_bear_can_climb_trees.mp3" },
+    { "n": 33, "en": "Foxes have long tails.", "jp": "キツネは長いしっぽを持っています。", "hira": "きつね は ながい しっぽ を もって い ます", "mp3": "br_s33_foxes_have_long_tails.mp3" },
+    { "n": 34, "en": "Deer can run fast.", "jp": "シカは速く走れます。", "hira": "しか は はやく はしれ ます", "mp3": "br_s34_deer_can_run_fast.mp3" },
+    { "n": 35, "en": "Eagles can fly high.", "jp": "ワシは高く飛べます。", "hira": "わし は たかく とべ ます", "mp3": "br_s35_eagles_can_fly_high.mp3" },
+    { "n": 36, "en": "Dolphins live in the sea.", "jp": "イルカは海に住んでいます。", "hira": "いるか は うみ に すんで い ます", "mp3": "br_s36_dolphins_live_in_the_sea.mp3" },
+    { "n": 37, "en": "Turtles have hard shells.", "jp": "カメにはかたい甲羅があります。", "hira": "かめ に は かたい こうら が あり ます", "mp3": "br_s37_turtles_have_hard_shells.mp3" },
+    { "n": 38, "en": "Frogs live near water.", "jp": "カエルは水の近くに住みます。", "hira": "かえる は みず の ちかく に すみ ます", "mp3": "br_s38_frogs_live_near_water.mp3" },
+    { "n": 39, "en": "Butterflies have colorful wings.", "jp": "チョウには色とりどりの羽があります。", "hira": "ちょう に は いろとりどり の はね が あり ます", "mp3": "br_s39_butterflies_have_colorful_wings.mp3" },
+    { "n": 40, "en": "Some insects can jump or fly.", "jp": "昆虫には跳ねたり飛んだりできるものもいます。", "hira": "こんちゅう に は はねたり とんだり できる もの も い ます", "mp3": "br_s40_some_insects_can_jump_or_fly.mp3" },
+    { "n": 41, "en": "This animal is a mammal.", "jp": "この動物はほ乳類です。", "hira": "この どうぶつ は ほにゅうるい です", "mp3": "br_s41_this_animal_is_a_mammal.mp3" },
+    { "n": 42, "en": "That animal is a reptile.", "jp": "その動物はは虫類です。", "hira": "その どうぶつ は はちゅうるい です", "mp3": "br_s42_that_animal_is_a_reptile.mp3" },
+    { "n": 43, "en": "Where do bears live?", "jp": "クマはどこに住んでいますか。", "hira": "くま は どこ に すんで い ます か", "mp3": "br_s43_where_do_bears_live.mp3" },
+    { "n": 44, "en": "What do dolphins eat?", "jp": "イルカは何を食べますか。", "hira": "いるか は なに を たべ ます か", "mp3": "br_s44_what_do_dolphins_eat.mp3" },
+    { "n": 45, "en": "Let’s protect animal habitats.", "jp": "動物の生息地を守りましょう。", "hira": "どうぶつ の せいそくち を まもり ましょう", "mp3": "br_s45_lets_protect_animal_habitats.mp3" },
+
+    { "n": 46, "en": "Let’s go hiking this weekend.", "jp": "今週末にハイキングに行きましょう。", "hira": "こんしゅうまつ に はいきんぐ に いき ましょう", "mp3": "br_s46_lets_go_hiking_this_weekend.mp3" },
+    { "n": 47, "en": "We need a map and a compass.", "jp": "地図とコンパスが必要です。", "hira": "ちず と こんぱす が ひつよう です", "mp3": "br_s47_we_need_a_map_and_a_compass.mp3" },
+    { "n": 48, "en": "We can camp by the river.", "jp": "川のそばでキャンプできます。", "hira": "かわ の そば で きゃんぷ でき ます", "mp3": "br_s48_we_can_camp_by_the_river.mp3" },
+    { "n": 49, "en": "Set up the tent before sunset.", "jp": "日没前にテントを立ててください。", "hira": "にちぼつ まえ に てんと を たてて ください", "mp3": "br_s49_set_up_the_tent_before_sunset.mp3" },
+    { "n": 50, "en": "Don’t leave trash outside.", "jp": "外にごみを置いていかないでください。", "hira": "そと に ごみ を おいて いか ないで ください", "mp3": "br_s50_dont_leave_trash_outside.mp3" },
+    { "n": 51, "en": "Bring a flashlight at night.", "jp": "夜は懐中電灯を持って行ってください。", "hira": "よる は かいちゅうでんとう を もって いって ください", "mp3": "br_s51_bring_a_flashlight_at_night.mp3" },
+    { "n": 52, "en": "Use insect repellent in summer.", "jp": "夏は虫よけを使ってください。", "hira": "なつ は むしよけ を つかって ください", "mp3": "br_s52_use_insect_repellent_in_summer.mp3" },
+    { "n": 53, "en": "Let’s have a picnic in the park.", "jp": "公園でピクニックをしましょう。", "hira": "こうえん で ぴくにっく を し ましょう", "mp3": "br_s53_lets_have_a_picnic_in_the_park.mp3" },
+    { "n": 54, "en": "We can watch birds with binoculars.", "jp": "双眼鏡で鳥を観察できます。", "hira": "そうがんきょう で とり を かんさつ でき ます", "mp3": "br_s54_we_can_watch_birds_with_binoculars.mp3" },
+    { "n": 55, "en": "Be careful on the trail.", "jp": "ハイキングコースでは気をつけてください。", "hira": "はいきんぐこーす で は き を つけて ください", "mp3": "br_s55_be_careful_on_the_trail.mp3" },
+    { "n": 56, "en": "Let’s write in a nature journal.", "jp": "自然観察ノートに書きましょう。", "hira": "しぜんかんさつ のーと に かき ましょう", "mp3": "br_s56_lets_write_in_a_nature_journal.mp3" },
+    { "n": 57, "en": "We need water and snacks.", "jp": "水とおやつが必要です。", "hira": "みず と おやつ が ひつよう です", "mp3": "br_s57_we_need_water_and_snacks.mp3" },
+    { "n": 58, "en": "Can you carry the backpack?", "jp": "リュックを背負えますか。", "hira": "りゅっく を せおえ ます か", "mp3": "br_s58_can_you_carry_the_backpack.mp3" },
+    { "n": 59, "en": "Keep the campsite clean.", "jp": "キャンプ場をきれいに保ってください。", "hira": "きゃんぷじょう を きれい に たもって ください", "mp3": "br_s59_keep_the_campsite_clean.mp3" },
+    { "n": 60, "en": "Let’s enjoy nature safely.", "jp": "安全に自然を楽しみましょう。", "hira": "あんぜん に しぜん を たのしみ ましょう", "mp3": "br_s60_lets_enjoy_nature_safely.mp3" }
+  ]
+}
