@@ -1,488 +1,68 @@
 
 {
-"cards": [
-{
-"n": 1,
-"en": "What’s the weather today?",
-"jp": "今日の天気はどうですか。",
-"hira": "きょう の てんき は どう です か",
-"mp3": "br_q01_whats_the_weather_today.mp3",
-"jp_mp3": "br_q01_whats_the_weather_today_jp.mp3"
-},
-{
-"n": 2,
-"en": "How is the temperature?",
-"jp": "気温はどうですか。",
-"hira": "きおん は どう です か",
-"mp3": "br_q02_how_is_the_temperature.mp3",
-"jp_mp3": "br_q02_how_is_the_temperature_jp.mp3"
-},
-{
-"n": 3,
-"en": "Do you like sunny or cloudy days?",
-"jp": "晴れの日とくもりの日ではどちらが好きですか。",
-"hira": "はれ の ひ と くもり の ひ では どちら が すき です か",
-"mp3": "br_q03_do_you_like_sunny_or_cloudy_days.mp3",
-"jp_mp3": "br_q03_do_you_like_sunny_or_cloudy_days_jp.mp3"
-},
-{
-"n": 4,
-"en": "What do you wear in winter?",
-"jp": "冬には何を着ますか。",
-"hira": "ふゆ に は なに を き ます か",
-"mp3": "br_q04_what_do_you_wear_in_winter.mp3",
-"jp_mp3": "br_q04_what_do_you_wear_in_winter_jp.mp3"
-},
-{
-"n": 5,
-"en": "What do you do on rainy days?",
-"jp": "雨の日は何をしますか。",
-"hira": "あめ の ひ は なに を し ます か",
-"mp3": "br_q05_what_do_you_do_on_rainy_days.mp3",
-"jp_mp3": "br_q05_what_do_you_do_on_rainy_days_jp.mp3"
-},
-{
-"n": 6,
-"en": "What season do you like best? Why?",
-"jp": "一番好きな季節は何ですか。なぜですか。",
-"hira": "いちばん すき な きせつ は なん です か。 なぜ です か",
-"mp3": "br_q06_what_season_do_you_like_best_why.mp3",
-"jp_mp3": "br_q06_what_season_do_you_like_best_why_jp.mp3"
-},
-{
-"n": 7,
-"en": "What happens in spring?",
-"jp": "春にはどんなことがありますか。",
-"hira": "はる に は どんな こと が あり ます か",
-"mp3": "br_q07_what_happens_in_spring.mp3",
-"jp_mp3": "br_q07_what_happens_in_spring_jp.mp3"
-},
-{
-"n": 8,
-"en": "What color are the leaves in autumn?",
-"jp": "秋の葉は何色になりますか。",
-"hira": "あき の は は なにいろ に なり ます か",
-"mp3": "br_q08_what_color_are_the_leaves_in_autumn.mp3",
-"jp_mp3": "br_q08_what_color_are_the_leaves_in_autumn_jp.mp3"
-},
-{
-"n": 9,
-"en": "Is it windy today?",
-"jp": "今日は風が強いですか。",
-"hira": "きょう は かぜ が つよい です か",
-"mp3": "br_q09_is_it_windy_today.mp3",
-"jp_mp3": "br_q09_is_it_windy_today_jp.mp3"
-},
-{
-"n": 10,
-"en": "Do you like snow?",
-"jp": "雪が好きですか。",
-"hira": "ゆき が すき です か",
-"mp3": "br_q10_do_you_like_snow.mp3",
-"jp_mp3": "br_q10_do_you_like_snow_jp.mp3"
-},
-{
-"n": 11,
-"en": "What’s your favorite weather word?",
-"jp": "好きな天気を表す言葉は何ですか。",
-"hira": "すき な てんき を あらわす ことば は なん です か",
-"mp3": "br_q11_whats_your_favorite_weather_word.mp3",
-"jp_mp3": "br_q11_whats_your_favorite_weather_word_jp.mp3"
-},
-{
-"n": 12,
-"en": "How do you say “It’s hot” in English?",
-"jp": "英語で「暑いです」はどう言いますか。",
-"hira": "えいご で あつい です は どう いいます か",
-"mp3": "br_q12_how_do_you_say_its_hot_in_english.mp3",
-"jp_mp3": "br_q12_how_do_you_say_its_hot_in_english_jp.mp3"
-},
-{
-"n": 13,
-"en": "What do you bring on a rainy day?",
-"jp": "雨の日は何を持っていきますか。",
-"hira": "あめ の ひ は なに を もって いき ます か",
-"mp3": "br_q13_what_do_you_bring_on_a_rainy_day.mp3",
-"jp_mp3": "br_q13_what_do_you_bring_on_a_rainy_day_jp.mp3"
-},
-{
-"n": 14,
-"en": "When is your birthday? What season is it?",
-"jp": "あなたの誕生日はいつですか。どの季節ですか。",
-"hira": "あなた の たんじょうび は いつ です か。 どの きせつ です か",
-"mp3": "br_q14_when_is_your_birthday_what_season_is_it.mp3",
-"jp_mp3": "br_q14_when_is_your_birthday_what_season_is_it_jp.mp3"
-},
-{
-"n": 15,
-"en": "Let’s draw today’s weather.",
-"jp": "今日の天気をえがきましょう。",
-"hira": "きょう の てんき を えがき ましょう",
-"mp3": "br_q15_lets_draw_todays_weather.mp3",
-"jp_mp3": "br_q15_lets_draw_todays_weather_jp.mp3"
-},
-{
-"n": 16,
-"en": "Where is your nearest shelter?",
-"jp": "一番近い避難所はどこですか。",
-"hira": "いちばん ちかい ひなんじょ は どこ です か",
-"mp3": "br_q16_where_is_your_nearest_shelter.mp3",
-"jp_mp3": "br_q16_where_is_your_nearest_shelter_jp.mp3"
-},
-{
-"n": 17,
-"en": "What is in your emergency kit?",
-"jp": "防災セットには何が入っていますか。",
-"hira": "ぼうさい せっと に は なに が はいって い ます か",
-"mp3": "br_q17_what_is_in_your_emergency_kit.mp3",
-"jp_mp3": "br_q17_what_is_in_your_emergency_kit_jp.mp3"
-},
-{
-"n": 18,
-"en": "Do you have a flashlight and batteries?",
-"jp": "懐中電灯と電池はありますか。",
-"hira": "かいちゅうでんとう と でんち は あり ます か",
-"mp3": "br_q18_do_you_have_a_flashlight_and_batteries.mp3",
-"jp_mp3": "br_q18_do_you_have_a_flashlight_and_batteries_jp.mp3"
-},
-{
-"n": 19,
-"en": "How do you evacuate from school?",
-"jp": "学校からどうやって避難しますか。",
-"hira": "がっこう から どうやって ひなん し ます か",
-"mp3": "br_q19_how_do_you_evacuate_from_school.mp3",
-"jp_mp3": "br_q19_how_do_you_evacuate_from_school_jp.mp3"
-},
-{
-"n": 20,
-"en": "What number do you call for help?",
-"jp": "助けを呼ぶときの番号は何ですか。",
-"hira": "たすけ を よぶ とき の ばんごう は なん です か",
-"mp3": "br_q20_what_number_do_you_call_for_help.mp3",
-"jp_mp3": "br_q20_what_number_do_you_call_for_help_jp.mp3"
-},
-{
-"n": 21,
-"en": "What should you not do in a quake?",
-"jp": "地震のとき、してはいけないことは何ですか。",
-"hira": "じしん の とき、 して は いけない こと は なん です か",
-"mp3": "br_q21_what_should_you_not_do_in_a_quake.mp3",
-"jp_mp3": "br_q21_what_should_you_not_do_in_a_quake_jp.mp3"
-},
-{
-"n": 22,
-"en": "Where is the evacuation route?",
-"jp": "避難経路はどこですか。",
-"hira": "ひなん けいろ は どこ です か",
-"mp3": "br_q22_where_is_the_evacuation_route.mp3",
-"jp_mp3": "br_q22_where_is_the_evacuation_route_jp.mp3"
-},
-{
-"n": 23,
-"en": "Do you know emergency words in English?",
-"jp": "英語の緊急時の言葉を知っていますか。",
-"hira": "えいご の きんきゅうじ の ことば を しって い ます か",
-"mp3": "br_q23_do_you_know_emergency_words_in_english.mp3",
-"jp_mp3": "br_q23_do_you_know_emergency_words_in_english_jp.mp3"
-},
-{
-"n": 24,
-"en": "What disasters happen in your area?",
-"jp": "あなたの地域ではどんな災害が起こりますか。",
-"hira": "あなた の ちいき で は どんな さいがい が おこり ます か",
-"mp3": "br_q24_what_disasters_happen_in_your_area.mp3",
-"jp_mp3": "br_q24_what_disasters_happen_in_your_area_jp.mp3"
-},
-{
-"n": 25,
-"en": "How can we help each other?",
-"jp": "どうやって助け合えますか。",
-"hira": "どうやって たすけあえ ます か",
-"mp3": "br_q25_how_can_we_help_each_other.mp3",
-"jp_mp3": "br_q25_how_can_we_help_each_other_jp.mp3"
-},
-{
-"n": 26,
-"en": "Where do you keep water and food?",
-"jp": "水と食料はどこに保管していますか。",
-"hira": "みず と しょくりょう は どこ に ほかん して い ます か",
-"mp3": "br_q26_where_do_you_keep_water_and_food.mp3",
-"jp_mp3": "br_q26_where_do_you_keep_water_and_food_jp.mp3"
-},
-{
-"n": 27,
-"en": "Do you practice evacuation drills?",
-"jp": "避難訓練をしますか。",
-"hira": "ひなん くんれん を し ます か",
-"mp3": "br_q27_do_you_practice_evacuation_drills.mp3",
-"jp_mp3": "br_q27_do_you_practice_evacuation_drills_jp.mp3"
-},
-{
-"n": 28,
-"en": "Can you say “I need help” in English?",
-"jp": "英語で「助けが必要です」と言えますか。",
-"hira": "えいご で たすけ が ひつよう です と いえ ます か",
-"mp3": "br_q28_can_you_say_i_need_help_in_english.mp3",
-"jp_mp3": "br_q28_can_you_say_i_need_help_in_english_jp.mp3"
-},
-{
-"n": 29,
-"en": "What should we prepare today?",
-"jp": "今日は何を準備しましょうか。",
-"hira": "きょう は なに を じゅんび しましょう か",
-"mp3": "br_q29_what_should_we_prepare_today.mp3",
-"jp_mp3": "br_q29_what_should_we_prepare_today_jp.mp3"
-},
-{
-"n": 30,
-"en": "Are you ready at home and at school?",
-"jp": "家でも学校でも準備はできていますか。",
-"hira": "いえ でも がっこう でも じゅんび は できて い ます か",
-"mp3": "br_q30_are_you_ready_at_home_and_at_school.mp3",
-"jp_mp3": "br_q30_are_you_ready_at_home_and_at_school_jp.mp3"
-},
-{
-"n": 31,
-"en": "What is your favorite animal?",
-"jp": "好きな動物は何ですか。",
-"hira": "すき な どうぶつ は なん です か",
-"mp3": "br_q31_what_is_your_favorite_animal.mp3",
-"jp_mp3": "br_q31_what_is_your_favorite_animal_jp.mp3"
-},
-{
-"n": 32,
-"en": "Where does it live?",
-"jp": "それはどこに住んでいますか。",
-"hira": "それ は どこ に すんで い ます か",
-"mp3": "br_q32_where_does_it_live.mp3",
-"jp_mp3": "br_q32_where_does_it_live_jp.mp3"
-},
-{
-"n": 33,
-"en": "What can it do?",
-"jp": "それは何ができますか。",
-"hira": "それ は なに が でき ます か",
-"mp3": "br_q33_what_can_it_do.mp3",
-"jp_mp3": "br_q33_what_can_it_do_jp.mp3"
-},
-{
-"n": 34,
-"en": "What does it eat?",
-"jp": "それは何を食べますか。",
-"hira": "それ は なに を たべ ます か",
-"mp3": "br_q34_what_does_it_eat.mp3",
-"jp_mp3": "br_q34_what_does_it_eat_jp.mp3"
-},
-{
-"n": 35,
-"en": "Is it a mammal or a reptile?",
-"jp": "それはほ乳類ですか、は虫類ですか。",
-"hira": "それ は ほにゅうるい です か、 はちゅうるい です か",
-"mp3": "br_q35_is_it_a_mammal_or_a_reptile.mp3",
-"jp_mp3": "br_q35_is_it_a_mammal_or_a_reptile_jp.mp3"
-},
-{
-"n": 36,
-"en": "Can it fly?",
-"jp": "それは飛べますか。",
-"hira": "それ は とべ ます か",
-"mp3": "br_q36_can_it_fly.mp3",
-"jp_mp3": "br_q36_can_it_fly_jp.mp3"
-},
-{
-"n": 37,
-"en": "Can it swim?",
-"jp": "それは泳げますか。",
-"hira": "それ は およげ ます か",
-"mp3": "br_q37_can_it_swim.mp3",
-"jp_mp3": "br_q37_can_it_swim_jp.mp3"
-},
-{
-"n": 38,
-"en": "What color is it?",
-"jp": "それは何色ですか。",
-"hira": "それ は なにいろ です か",
-"mp3": "br_q38_what_color_is_it.mp3",
-"jp_mp3": "br_q38_what_color_is_it_jp.mp3"
-},
-{
-"n": 39,
-"en": "Is it big or small?",
-"jp": "それは大きいですか、小さいですか。",
-"hira": "それ は おおきい です か、 ちいさい です か",
-"mp3": "br_q39_is_it_big_or_small.mp3",
-"jp_mp3": "br_q39_is_it_big_or_small_jp.mp3"
-},
-{
-"n": 40,
-"en": "Is it wild or a pet?",
-"jp": "野生動物ですか、ペットですか。",
-"hira": "やせいどうぶつ です か、 ぺっと です か",
-"mp3": "br_q40_is_it_wild_or_a_pet.mp3",
-"jp_mp3": "br_q40_is_it_wild_or_a_pet_jp.mp3"
-},
-{
-"n": 41,
-"en": "How can we protect it?",
-"jp": "どうやってその動物を守れますか。",
-"hira": "どうやって その どうぶつ を まもれ ます か",
-"mp3": "br_q41_how_can_we_protect_it.mp3",
-"jp_mp3": "br_q41_how_can_we_protect_it_jp.mp3"
-},
-{
-"n": 42,
-"en": "Have you seen it before?",
-"jp": "それを見たことがありますか。",
-"hira": "それ を みた こと が あり ます か",
-"mp3": "br_q42_have_you_seen_it_before.mp3",
-"jp_mp3": "br_q42_have_you_seen_it_before_jp.mp3"
-},
-{
-"n": 43,
-"en": "Do you like insects?",
-"jp": "昆虫は好きですか。",
-"hira": "こんちゅう は すき です か",
-"mp3": "br_q43_do_you_like_insects.mp3",
-"jp_mp3": "br_q43_do_you_like_insects_jp.mp3"
-},
-{
-"n": 44,
-"en": "What animal do you want to learn about?",
-"jp": "どの動物について学びたいですか。",
-"hira": "どの どうぶつ について まなびたい です か",
-"mp3": "br_q44_what_animal_do_you_want_to_learn_about.mp3",
-"jp_mp3": "br_q44_what_animal_do_you_want_to_learn_about_jp.mp3"
-},
-{
-"n": 45,
-"en": "Let’s draw your animal.",
-"jp": "選んだ動物をえがきましょう。",
-"hira": "えらんだ どうぶつ を えがき ましょう",
-"mp3": "br_q45_lets_draw_your_animal.mp3",
-"jp_mp3": "br_q45_lets_draw_your_animal_jp.mp3"
-},
-{
-"n": 46,
-"en": "Where do you want to go hiking?",
-"jp": "どこへハイキングに行きたいですか。",
-"hira": "どこ へ はいきんぐ に いきたい です か",
-"mp3": "br_q46_where_do_you_want_to_go_hiking.mp3",
-"jp_mp3": "br_q46_where_do_you_want_to_go_hiking_jp.mp3"
-},
-{
-"n": 47,
-"en": "What will you pack?",
-"jp": "荷物に何を入れますか。",
-"hira": "にもつ に なに を いれ ます か",
-"mp3": "br_q47_what_will_you_pack.mp3",
-"jp_mp3": "br_q47_what_will_you_pack_jp.mp3"
-},
-{
-"n": 48,
-"en": "Can you set up a tent?",
-"jp": "テントを立てられますか。",
-"hira": "てんと を たてられ ます か",
-"mp3": "br_q48_can_you_set_up_a_tent.mp3",
-"jp_mp3": "br_q48_can_you_set_up_a_tent_jp.mp3"
-},
-{
-"n": 49,
-"en": "What outdoor rules do you know?",
-"jp": "どんな外でのルールを知っていますか。",
-"hira": "どんな そと で の るーる を しって い ます か",
-"mp3": "br_q49_what_outdoor_rules_do_you_know.mp3",
-"jp_mp3": "br_q49_what_outdoor_rules_do_you_know_jp.mp3"
-},
-{
-"n": 50,
-"en": "Do you like picnics?",
-"jp": "ピクニックは好きですか。",
-"hira": "ぴくにっく は すき です か",
-"mp3": "br_q50_do_you_like_picnics.mp3",
-"jp_mp3": "br_q50_do_you_like_picnics_jp.mp3"
-},
-{
-"n": 51,
-"en": "What birds can you see?",
-"jp": "どんな鳥が見られますか。",
-"hira": "どんな とり が みられ ます か",
-"mp3": "br_q51_what_birds_can_you_see.mp3",
-"jp_mp3": "br_q51_what_birds_can_you_see_jp.mp3"
-},
-{
-"n": 52,
-"en": "Do you go fishing?",
-"jp": "つりに行きますか。",
-"hira": "つり に いき ます か",
-"mp3": "br_q52_do_you_go_fishing.mp3",
-"jp_mp3": "br_q52_do_you_go_fishing_jp.mp3"
-},
-{
-"n": 53,
-"en": "What do you write in your nature journal?",
-"jp": "自然観察ノートに何を書きますか。",
-"hira": "しぜんかんさつ のーと に なに を かき ます か",
-"mp3": "br_q53_what_do_you_write_in_your_nature_journal.mp3",
-"jp_mp3": "br_q53_what_do_you_write_in_your_nature_journal_jp.mp3"
-},
-{
-"n": 54,
-"en": "How do you stay safe outdoors?",
-"jp": "外ではどうやって安全に過ごしますか。",
-"hira": "そと で は どうやって あんぜん に すごし ます か",
-"mp3": "br_q54_how_do_you_stay_safe_outdoors.mp3",
-"jp_mp3": "br_q54_how_do_you_stay_safe_outdoors_jp.mp3"
-},
-{
-"n": 55,
-"en": "What snacks do you bring?",
-"jp": "どんなおやつを持っていきますか。",
-"hira": "どんな おやつ を もって いき ます か",
-"mp3": "br_q55_what_snacks_do_you_bring.mp3",
-"jp_mp3": "br_q55_what_snacks_do_you_bring_jp.mp3"
-},
-{
-"n": 56,
-"en": "Who do you go with?",
-"jp": "だれと行きますか。",
-"hira": "だれ と いき ます か",
-"mp3": "br_q56_who_do_you_go_with.mp3",
-"jp_mp3": "br_q56_who_do_you_go_with_jp.mp3"
-},
-{
-"n": 57,
-"en": "What time will you start?",
-"jp": "何時に出発しますか。",
-"hira": "なんじ に しゅっぱつ し ます か",
-"mp3": "br_q57_what_time_will_you_start.mp3",
-"jp_mp3": "br_q57_what_time_will_you_start_jp.mp3"
-},
-{
-"n": 58,
-"en": "Can you read a map?",
-"jp": "地図を読めますか。",
-"hira": "ちず を よめ ます か",
-"mp3": "br_q58_can_you_read_a_map.mp3",
-"jp_mp3": "br_q58_can_you_read_a_map_jp.mp3"
-},
-{
-"n": 59,
-"en": "What animals might you see?",
-"jp": "どんな動物が見られるかもしれませんか。",
-"hira": "どんな どうぶつ が みられる かも しれ ません か",
-"mp3": "br_q59_what_animals_might_you_see.mp3",
-"jp_mp3": "br_q59_what_animals_might_you_see_jp.mp3"
-},
-{
-"n": 60,
-"en": "Let’s plan an outdoor day.",
-"jp": "外で過ごす一日を計画しましょう。",
-"hira": "そと で すごす いちにち を けいかく し ましょう",
-"mp3": "br_q60_lets_plan_an_outdoor_day.mp3",
-"jp_mp3": "br_q60_lets_plan_an_outdoor_day_jp.mp3"
+  "cards": [
+    {"n": 1, "en": "What’s the weather today?", "jp": "今日の天気はどうですか。", "hira": "きょう の てんき は どう です か", "mp3": "br_q01_whats_the_weather_today.mp3"},
+    {"n": 2, "en": "How is the temperature?", "jp": "気温はどうですか。", "hira": "きおん は どう です か", "mp3": "br_q02_how_is_the_temperature.mp3"},
+    {"n": 3, "en": "Do you like sunny or cloudy days?", "jp": "晴れの日とくもりの日ではどちらが好きですか。", "hira": "はれ の ひ と くもり の ひ では どちら が すき です か", "mp3": "br_q03_do_you_like_sunny_or_cloudy_days.mp3"},
+    {"n": 4, "en": "What do you wear in winter?", "jp": "冬には何を着ますか。", "hira": "ふゆ に は なに を き ます か", "mp3": "br_q04_what_do_you_wear_in_winter.mp3"},
+    {"n": 5, "en": "What do you do on rainy days?", "jp": "雨の日は何をしますか。", "hira": "あめ の ひ は なに を し ます か", "mp3": "br_q05_what_do_you_do_on_rainy_days.mp3"},
+    {"n": 6, "en": "What season do you like best? Why?", "jp": "一番好きな季節は何ですか。なぜですか。", "hira": "いちばん すき な きせつ は なん です か。 なぜ です か", "mp3": "br_q06_what_season_do_you_like_best_why.mp3"},
+    {"n": 7, "en": "What happens in spring?", "jp": "春にはどんなことがありますか。", "hira": "はる に は どんな こと が あり ます か", "mp3": "br_q07_what_happens_in_spring.mp3"},
+    {"n": 8, "en": "What color are the leaves in autumn?", "jp": "秋の葉は何色になりますか。", "hira": "あき の は は なにいろ に なり ます か", "mp3": "br_q08_what_color_are_the_leaves_in_autumn.mp3"},
+    {"n": 9, "en": "Is it windy today?", "jp": "今日は風が強いですか。", "hira": "きょう は かぜ が つよい です か", "mp3": "br_q09_is_it_windy_today.mp3"},
+    {"n": 10, "en": "Do you like snow?", "jp": "雪が好きですか。", "hira": "ゆき が すき です か", "mp3": "br_q10_do_you_like_snow.mp3"},
+    {"n": 11, "en": "What’s your favorite weather word?", "jp": "好きな天気を表す言葉は何ですか。", "hira": "すき な てんき を あらわす ことば は なん です か", "mp3": "br_q11_whats_your_favorite_weather_word.mp3"},
+    {"n": 12, "en": "How do you say “It’s hot” in English?", "jp": "英語で「暑いです」はどう言いますか。", "hira": "えいご で あつい です は どう いいます か", "mp3": "br_q12_how_do_you_say_its_hot_in_english.mp3"},
+    {"n": 13, "en": "What do you bring on a rainy day?", "jp": "雨の日は何を持っていきますか。", "hira": "あめ の ひ は なに を もって いき ます か", "mp3": "br_q13_what_do_you_bring_on_a_rainy_day.mp3"},
+    {"n": 14, "en": "When is your birthday? What season is it?", "jp": "あなたの誕生日はいつですか。どの季節ですか。", "hira": "あなた の たんじょうび は いつ です か。 どの きせつ です か", "mp3": "br_q14_when_is_your_birthday_what_season_is_it.mp3"},
+    {"n": 15, "en": "Let’s draw today’s weather.", "jp": "今日の天気をえがきましょう。", "hira": "きょう の てんき を えがき ましょう", "mp3": "br_q15_lets_draw_todays_weather.mp3"},
+
+    {"n": 16, "en": "Where is your nearest shelter?", "jp": "一番近い避難所はどこですか。", "hira": "いちばん ちかい ひなんじょ は どこ です か", "mp3": "br_q16_where_is_your_nearest_shelter.mp3"},
+    {"n": 17, "en": "What is in your emergency kit?", "jp": "防災セットには何が入っていますか。", "hira": "ぼうさい せっと に は なに が はいって い ます か", "mp3": "br_q17_what_is_in_your_emergency_kit.mp3"},
+    {"n": 18, "en": "Do you have a flashlight and batteries?", "jp": "懐中電灯と電池はありますか。", "hira": "かいちゅうでんとう と でんち は あり ます か", "mp3": "br_q18_do_you_have_a_flashlight_and_batteries.mp3"},
+    {"n": 19, "en": "How do you evacuate from school?", "jp": "学校からどうやって避難しますか。", "hira": "がっこう から どうやって ひなん し ます か", "mp3": "br_q19_how_do_you_evacuate_from_school.mp3"},
+    {"n": 20, "en": "What number do you call for help?", "jp": "助けを呼ぶときの番号は何ですか。", "hira": "たすけ を よぶ とき の ばんごう は なん です か", "mp3": "br_q20_what_number_do_you_call_for_help.mp3"},
+    {"n": 21, "en": "What should you not do in a quake?", "jp": "地震のとき、してはいけないことは何ですか。", "hira": "じしん の とき、 して は いけない こと は なん です か", "mp3": "br_q21_what_should_you_not_do_in_a_quake.mp3"},
+    {"n": 22, "en": "Where is the evacuation route?", "jp": "避難経路はどこですか。", "hira": "ひなん けいろ は どこ です か", "mp3": "br_q22_where_is_the_evacuation_route.mp3"},
+    {"n": 23, "en": "Do you know emergency words in English?", "jp": "英語の緊急時の言葉を知っていますか。", "hira": "えいご の きんきゅうじ の ことば を しって い ます か", "mp3": "br_q23_do_you_know_emergency_words_in_english.mp3"},
+    {"n": 24, "en": "What disasters happen in your area?", "jp": "あなたの地域ではどんな災害が起こりますか。", "hira": "あなた の ちいき で は どんな さいがい が おこり ます か", "mp3": "br_q24_what_disasters_happen_in_your_area.mp3"},
+    {"n": 25, "en": "How can we help each other?", "jp": "どうやって助け合えますか。", "hira": "どうやって たすけあえ ます か", "mp3": "br_q25_how_can_we_help_each_other.mp3"},
+    {"n": 26, "en": "Where do you keep water and food?", "jp": "水と食料はどこに保管していますか。", "hira": "みず と しょくりょう は どこ に ほかん して い ます か", "mp3": "br_q26_where_do_you_keep_water_and_food.mp3"},
+    {"n": 27, "en": "Do you practice evacuation drills?", "jp": "避難訓練をしますか。", "hira": "ひなん くんれん を し ます か", "mp3": "br_q27_do_you_practice_evacuation_drills.mp3"},
+    {"n": 28, "en": "Can you say “I need help” in English?", "jp": "英語で「助けが必要です」と言えますか。", "hira": "えいご で たすけ が ひつよう です と いえ ます か", "mp3": "br_q28_can_you_say_i_need_help_in_english.mp3"},
+    {"n": 29, "en": "What should we prepare today?", "jp": "今日は何を準備しましょうか。", "hira": "きょう は なに を じゅんび しましょう か", "mp3": "br_q29_what_should_we_prepare_today.mp3"},
+    {"n": 30, "en": "Are you ready at home and at school?", "jp": "家でも学校でも準備はできていますか。", "hira": "いえ でも がっこう でも じゅんび は できて い ます か", "mp3": "br_q30_are_you_ready_at_home_and_at_school.mp3"},
+
+    {"n": 31, "en": "What is your favorite animal?", "jp": "好きな動物は何ですか。", "hira": "すき な どうぶつ は なん です か", "mp3": "br_q31_what_is_your_favorite_animal.mp3"},
+    {"n": 32, "en": "Where does it live?", "jp": "それはどこに住んでいますか。", "hira": "それ は どこ に すんで い ます か", "mp3": "br_q32_where_does_it_live.mp3"},
+    {"n": 33, "en": "What can it do?", "jp": "それは何ができますか。", "hira": "それ は なに が でき ます か", "mp3": "br_q33_what_can_it_do.mp3"},
+    {"n": 34, "en": "What does it eat?", "jp": "それは何を食べますか。", "hira": "それ は なに を たべ ます か", "mp3": "br_q34_what_does_it_eat.mp3"},
+    {"n": 35, "en": "Is it a mammal or a reptile?", "jp": "それはほ乳類ですか、は虫類ですか。", "hira": "それ は ほにゅうるい です か、 はちゅうるい です か", "mp3": "br_q35_is_it_a_mammal_or_a_reptile.mp3"},
+    {"n": 36, "en": "Can it fly?", "jp": "それは飛べますか。", "hira": "それ は とべ ます か", "mp3": "br_q36_can_it_fly.mp3"},
+    {"n": 37, "en": "Can it swim?", "jp": "それは泳げますか。", "hira": "それ は およげ ます か", "mp3": "br_q37_can_it_swim.mp3"},
+    {"n": 38, "en": "What color is it?", "jp": "それは何色ですか。", "hira": "それ は なにいろ です か", "mp3": "br_q38_what_color_is_it.mp3"},
+    {"n": 39, "en": "Is it big or small?", "jp": "それは大きいですか、小さいですか。", "hira": "それ は おおきい です か、 ちいさい です か", "mp3": "br_q39_is_it_big_or_small.mp3"},
+    {"n": 40, "en": "Is it wild or a pet?", "jp": "野生動物ですか、ペットですか。", "hira": "やせいどうぶつ です か、 ぺっと です か", "mp3": "br_q40_is_it_wild_or_a_pet.mp3"},
+    {"n": 41, "en": "How can we protect it?", "jp": "どうやってその動物を守れますか。", "hira": "どうやって その どうぶつ を まもれ ます か", "mp3": "br_q41_how_can_we_protect_it.mp3"},
+    {"n": 42, "en": "Have you seen it before?", "jp": "それを見たことがありますか。", "hira": "それ を みた こと が あり ます か", "mp3": "br_q42_have_you_seen_it_before.mp3"},
+    {"n": 43, "en": "Do you like insects?", "jp": "昆虫は好きですか。", "hira": "こんちゅう は すき です か", "mp3": "br_q43_do_you_like_insects.mp3"},
+    {"n": 44, "en": "What animal do you want to learn about?", "jp": "どの動物について学びたいですか。", "hira": "どの どうぶつ について まなびたい です か", "mp3": "br_q44_what_animal_do_you_want_to_learn_about.mp3"},
+    {"n": 45, "en": "Let’s draw your animal.", "jp": "選んだ動物をえがきましょう。", "hira": "えらんだ どうぶつ を えがき ましょう", "mp3": "br_q45_lets_draw_your_animal.mp3"},
+
+    {"n": 46, "en": "Where do you want to go hiking?", "jp": "どこへハイキングに行きたいですか。", "hira": "どこ へ はいきんぐ に いきたい です か", "mp3": "br_q46_where_do_you_want_to_go_hiking.mp3"},
+    {"n": 47, "en": "What will you pack?", "jp": "荷物に何を入れますか。", "hira": "にもつ に なに を いれ ます か", "mp3": "br_q47_what_will_you_pack.mp3"},
+    {"n": 48, "en": "Can you set up a tent?", "jp": "テントを立てられますか。", "hira": "てんと を たてられ ます か", "mp3": "br_q48_can_you_set_up_a_tent.mp3"},
+    {"n": 49, "en": "What outdoor rules do you know?", "jp": "どんな外でのルールを知っていますか。", "hira": "どんな そと で の るーる を しって い ます か", "mp3": "br_q49_what_outdoor_rules_do_you_know.mp3"},
+    {"n": 50, "en": "Do you like picnics?", "jp": "ピクニックは好きですか。", "hira": "ぴくにっく は すき です か", "mp3": "br_q50_do_you_like_picnics.mp3"},
+    {"n": 51, "en": "What birds can you see?", "jp": "どんな鳥が見られますか。", "hira": "どんな とり が みられ ます か", "mp3": "br_q51_what_birds_can_you_see.mp3"},
+    {"n": 52, "en": "Do you go fishing?", "jp": "つりに行きますか。", "hira": "つり に いき ます か", "mp3": "br_q52_do_you_go_fishing.mp3"},
+    {"n": 53, "en": "What do you write in your nature journal?", "jp": "自然観察ノートに何を書きますか。", "hira": "しぜんかんさつ のーと に なに を かき ます か", "mp3": "br_q53_what_do_you_write_in_your_nature_journal.mp3"},
+    {"n": 54, "en": "How do you stay safe outdoors?", "jp": "外ではどうやって安全に過ごしますか。", "hira": "そと で は どうやって あんぜん に すごし ます か", "mp3": "br_q54_how_do_you_stay_safe_outdoors.mp3"},
+    {"n": 55, "en": "What snacks do you bring?", "jp": "どんなおやつを持っていきますか。", "hira": "どんな おやつ を もって いき ます か", "mp3": "br_q55_what_snacks_do_you_bring.mp3"},
+    {"n": 56, "en": "Who do you go with?", "jp": "だれと行きますか。", "hira": "だれ と いき ます か", "mp3": "br_q56_who_do_you_go_with.mp3"},
+    {"n": 57, "en": "What time will you start?", "jp": "何時に出発しますか。", "hira": "なんじ に しゅっぱつ し ます か", "mp3": "br_q57_what_time_will_you_start.mp3"},
+    {"n": 58, "en": "Can you read a map?", "jp": "地図を読めますか。", "hira": "ちず を よめ ます か", "mp3": "br_q58_can_you_read_a_map.mp3"},
+    {"n": 59, "en": "What animals might you see?", "jp": "どんな動物が見られるかもしれませんか。", "hira": "どんな どうぶつ が みられる かも しれ ません か", "mp3": "br_q59_what_animals_might_you_see.mp3"},
+    {"n": 60, "en": "Let’s plan an outdoor day.", "jp": "外で過ごす一日を計画しましょう。", "hira": "そと で すごす いちにち を けいかく し ましょう", "mp3": "br_q60_lets_plan_an_outdoor_day.mp3"}
+  ]
 }
-]
-}
-
-
-
