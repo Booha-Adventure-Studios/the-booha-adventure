@@ -13,12 +13,17 @@
   const KEY_EXPIRES   = 'booha_token_expires';
   const KEY_NAME      = 'booha_user_name';
   const KEY_VALIDATED = 'booha_last_validated_at';
+  const KEY_FIRST     = 'booha_first_name';
+  const KEY_JUKU      = 'booha_is_juku';
 
   function clearSession() {
     localStorage.removeItem(KEY_TOKEN);
     localStorage.removeItem(KEY_EXPIRES);
     localStorage.removeItem(KEY_NAME);
     localStorage.removeItem(KEY_VALIDATED);
+    localStorage.removeItem(KEY_FIRST);
+    localStorage.removeItem(KEY_JUKU);
+  }
   }
 
   function redirect(reason) {
@@ -209,10 +214,12 @@
     // Valid — update storage
     localStorage.setItem(KEY_VALIDATED, String(Date.now()));
     if (data.expiresAt) localStorage.setItem(KEY_EXPIRES, data.expiresAt);
-    if (data.displayName) {
-    localStorage.setItem(KEY_NAME, data.displayName);
-    localStorage.setItem('booha_first_name', data.displayName.split(' ')[0]);
-   }
+    
+   if (data.displayName) {
+      localStorage.setItem(KEY_NAME, data.displayName);
+      localStorage.setItem(KEY_FIRST, data.displayName.split(' ')[0]);
+    }
+    localStorage.setItem(KEY_JUKU, data.isJuku === true ? '1' : '0');
 
     // Install overlay — once only, not in standalone
     if (!isStandalone() && !localStorage.getItem(INSTALL_KEY)) {
