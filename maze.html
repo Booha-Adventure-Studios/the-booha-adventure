@@ -640,6 +640,164 @@
     }
 
     /* ═══════════════════════════════════════
+       JUKU PROMPT — warm lantern
+    ═══════════════════════════════════════ */
+    #jkPromptScrim{
+      position:fixed; inset:0; z-index:210;
+      background:rgba(0,0,0,0);
+      backdrop-filter:blur(0px); -webkit-backdrop-filter:blur(0px);
+      display:none;
+      transition:background 600ms ease, backdrop-filter 600ms ease, -webkit-backdrop-filter 600ms ease;
+    }
+    #jkPromptScrim.show{ display:block; }
+    #jkPromptScrim.active{
+      background:rgba(8,6,0,.80);
+      backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+    }
+
+    #jkPrompt{
+      position:fixed; left:50%; top:50%;
+      transform:translate(-50%,-50%) scale(0.78) translateY(18px);
+      z-index:215;
+      min-width:280px; max-width:420px; width:min(90vw,420px);
+      max-height:90vh; overflow-y:auto;
+      background:
+        radial-gradient(ellipse at 50% -8%, rgba(214,226,154,.14) 0%, transparent 55%),
+        radial-gradient(ellipse at 50% 115%, rgba(232,196,106,.10) 0%, transparent 50%),
+        linear-gradient(155deg, rgba(26,22,16,.99) 0%, rgba(16,20,10,.99) 100%);
+      border-radius:28px;
+      padding:clamp(24px,4vw,36px) clamp(20px,4vw,32px) clamp(20px,4vw,32px);
+      backdrop-filter:blur(36px); -webkit-backdrop-filter:blur(36px);
+      text-align:center;
+      border:1px solid rgba(216,196,120,.28);
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,.05),
+        0 48px 120px rgba(0,0,0,.92),
+        0 0 110px rgba(214,226,154,.10),
+        inset 0 1px 0 rgba(255,255,255,.10);
+      display:none;
+      pointer-events:auto;
+      overflow:hidden;
+      opacity:0;
+      transition:opacity 480ms cubic-bezier(.22,1,.36,1), transform 520ms cubic-bezier(.34,1.42,.64,1);
+    }
+    #jkPrompt.show{ display:block; }
+    #jkPrompt.visible{
+      opacity:1;
+      transform:translate(-50%,-50%) scale(1) translateY(0);
+    }
+
+    #jkPromptBar{
+      height:2px; border-radius:999px; margin:0 auto 18px; width:55%;
+      background:linear-gradient(90deg,#5a4a1a,#e8c46a,#fff3c0,#b9d977,#e8c46a,#5a4a1a);
+      background-size:300% 100%;
+      animation:jkBarShimmer 3.2s linear infinite;
+      box-shadow:0 0 14px rgba(232,196,106,.35);
+    }
+    @keyframes jkBarShimmer{
+      0%{ background-position:0% 0% }
+      100%{ background-position:300% 0% }
+    }
+
+    #jkTreeLogo{
+      width:clamp(64px,14vmin,100px);
+      height:clamp(64px,14vmin,100px);
+      object-fit:contain;
+      display:block;
+      margin:0 auto 14px;
+      animation:jkLogoFloat 4.6s ease-in-out infinite;
+      filter:
+        drop-shadow(0 0 16px rgba(232,196,106,.45))
+        drop-shadow(0 0 36px rgba(185,217,119,.25))
+        drop-shadow(0 10px 24px rgba(0,0,0,.85));
+    }
+    @keyframes jkLogoFloat{
+      0%,100%{ transform:translateY(0); }
+      50%{ transform:translateY(-7px); }
+    }
+
+    .jk-eyebrow{
+      font-family:'Bowlby One',sans-serif;
+      font-size:clamp(8px,1.4vw,10px);
+      letter-spacing:4px;
+      text-transform:uppercase;
+      color:rgba(232,196,106,.55);
+      margin:0 0 8px;
+    }
+
+    #jkPromptTitle{
+      font-family:'Bowlby One',sans-serif;
+      font-size:clamp(18px,3.8vw,30px);
+      letter-spacing:.2px;
+      margin:0 0 8px;
+      color:#f2ecd8;
+      line-height:1.3;
+      text-shadow:
+        0 0 40px rgba(232,196,106,.40),
+        0 2px 10px rgba(0,0,0,.95);
+    }
+
+    #jkPromptSub{
+      font-size:clamp(11px,1.9vw,15px);
+      font-weight:700;
+      color:rgba(220,210,180,.48);
+      margin:0 0 18px;
+      letter-spacing:.3px;
+      line-height:1.8;
+    }
+
+    .jk-actions{
+      display:flex;
+      justify-content:center;
+      gap:clamp(10px,3vw,16px);
+      flex-wrap:wrap;
+    }
+
+    #jkNoBtn{
+      appearance:none; border:0;
+      border-radius:999px;
+      padding:clamp(11px,2.5vw,14px) clamp(22px,5vw,32px);
+      font-size:clamp(14px,2.4vw,17px);
+      font-weight:900;
+      cursor:pointer;
+      color:rgba(230,220,190,.60);
+      background:rgba(255,255,255,.06);
+      box-shadow:
+        0 4px 18px rgba(0,0,0,.55),
+        inset 0 0 0 1px rgba(216,196,120,.22);
+      transition:transform 120ms ease;
+      letter-spacing:.3px;
+    }
+    #jkNoBtn:active{ transform:scale(.93); }
+
+    #jkYesBtn{
+      appearance:none; border:0;
+      border-radius:999px;
+      padding:clamp(11px,2.5vw,14px) clamp(28px,6vw,40px);
+      font-size:clamp(14px,2.6vw,18px);
+      font-weight:900;
+      cursor:pointer;
+      color:#2a2005;
+      background:linear-gradient(160deg,#fff3c0 0%,#e8c46a 45%,#b9d977 100%);
+      box-shadow:
+        0 6px 24px rgba(232,196,106,.40),
+        0 0 0 1px rgba(255,243,192,.35),
+        inset 0 1px 0 rgba(255,255,255,.55);
+      transition:transform 120ms ease;
+      letter-spacing:.5px;
+    }
+    #jkYesBtn:active{ transform:scale(.93); }
+
+    @media (max-height:700px),(max-width:767px){
+      #jkPrompt{ padding:14px 16px 14px; border-radius:18px; }
+      #jkTreeLogo{ width:44px; height:44px; margin-bottom:8px; }
+      #jkPromptBar{ margin-bottom:10px; }
+      #jkPromptTitle{ font-size:clamp(15px,3.5vw,22px); margin-bottom:5px; }
+      #jkPromptSub{ font-size:11px; margin-bottom:10px; }
+      #jkNoBtn,#jkYesBtn{ padding:9px 20px; font-size:13px; }
+    }
+
+    /* ═══════════════════════════════════════
        MOBILE FIXES
     ═══════════════════════════════════════ */
     @media (max-width:767px),(pointer:coarse) and (max-width:900px){
@@ -746,6 +904,9 @@
       .kr-drip-bar{ animation:none; opacity:.5; }
       .kr-corner{ animation:none; }
       #krTreeLogo{ animation:none; }
+      #jkPromptBar{ animation:none; }
+      #jkTreeLogo{ animation:none; }
+      #jkPrompt{ transition:none; }
       .sp{ animation:none; opacity:.6; }
     }
   </style>
@@ -922,14 +1083,29 @@
     </div>
   </div>
 
-  <!-- KARASUKI VIDEO — simple fade -->
+<!-- KARASUKI VIDEO — simple fade -->
   <div id="krVideoWrap" aria-hidden="true">
     <video id="krVideo" preload="auto" playsinline webkit-playsinline>
       <source src="assets/video/karasuki.mp4" type="video/mp4" />
     </video>
   </div>
 
+  <!-- JUKU PROMPT -->
+  <div id="jkPromptScrim"></div>
+  <div id="jkPrompt" role="dialog" aria-modal="true" aria-labelledby="jkPromptTitle">
+    <div id="jkPromptBar"></div>
+    <img id="jkTreeLogo" src="assets/img/juku-tree.png" alt="英語塾" />
+    <p class="jk-eyebrow">えいごじゅく</p>
+    <h2 id="jkPromptTitle"></h2>
+    <p id="jkPromptSub"></p>
+    <div class="jk-actions">
+      <button id="jkNoBtn" type="button">いいえ</button>
+      <button id="jkYesBtn" type="button">はい</button>
+    </div>
+  </div>
+
 </div>
+  
 <audio id="bgMusic" src="assets/audio/sneaky.mp3" loop preload="auto"></audio>
 
 <script src="./js/calendar.js"></script>
@@ -995,6 +1171,11 @@ const KR_TREE_IX = 535;
 const KR_TREE_IY = 300;
 const KR_TREE_HIT_R = 52;
 
+// Juku tree image-space position & hit radius
+const JUKU_TREE_IX = 1182;
+const JUKU_TREE_IY = 307;
+const JUKU_TREE_HIT_R = 52;
+
 const GHOSTS = [
   'assets/img/booha_ghost.png',
   'assets/img/blue-boo.png',
@@ -1027,6 +1208,7 @@ window.__boohaExtraGhosts = false;
 
 const HW_TREE_IW = 100;
 const KR_TREE_IW = 78;
+const JUKU_TREE_IW = 100;
 
 const MONTH_COLORS = [
   ['#ff3bbd','#ff79d7'],['#ff6b3b','#ffaa5e'],['#3bc8ff','#a8edff'],
@@ -1217,6 +1399,7 @@ function getWandererImage(w) {
 const homeworkImg=new Image(); homeworkImg.src='assets/img/homework-tree.png';
 const karasuki1Img=new Image(); karasuki1Img.src='assets/img/karasuki1-tree.png';
 const karasuki2Img=new Image(); karasuki2Img.src='assets/img/karasuki2-tree.png';
+const jukuImg=new Image(); jukuImg.src='assets/img/juku-tree.png';
 
 // Karasuki state machine
 let karasukiPhase=0,karasukiBlend=0,karasukiOpacity=1,karasukiLastSwap=0;
@@ -1257,6 +1440,8 @@ let ghostT=1,ghostAnimStart=0,pendingPopupCP=null,ghostVisible=false;
 let pendingHomework=false;
 // pendingKarasuki: ghost travelling to Karasuki tree
 let pendingKarasuki=false;
+// pendingJuku: ghost travelling to Juku tree
+let pendingJuku=false;
 
 let trail=[];
 
@@ -1289,13 +1474,16 @@ function restoreMazeFromCheckpoint(){
   const spawnIY=(Number.isInteger(returnIY)&&returnIY>0)?returnIY:cp.iy;
   mazeStarted=true;mazeLaunched=true;videoPlayed=true;o2shown=true;
   introPhase='done';ghostVisible=true;
-  ghostIX=spawnIX;ghostIY=spawnIY;ghostSrcIX=spawnIX;ghostSrcIY=spawnIY;ghostDstIX=spawnIX;ghostDstIY=spawnIY;ghostT=1;pendingPopupCP=null;pendingHomework=false;pendingKarasuki=false;
+  ghostIX=spawnIX;ghostIY=spawnIY;ghostSrcIX=spawnIX;ghostSrcIY=spawnIY;ghostDstIX=spawnIX;ghostDstIY=spawnIY;ghostT=1;pendingPopupCP=null;pendingHomework=false;pendingKarasuki=false;pendingJuku=false;
   overlay1.classList.add('hidden','gone');overlay2.classList.remove('show');overlay2.classList.add('hidden','gone');
   videoWrap.classList.remove('show');cpPopup.classList.remove('show');cpScrim.classList.remove('show');
   hwPrompt.classList.remove('show','visible');hwPromptScrim.classList.remove('show','active');
   hwVideoWrap.classList.remove('show');
+  
   krPrompt.classList.remove('show','visible');krPromptScrim.classList.remove('show','active');
   krVideoWrap.classList.remove('show');
+  jkPrompt.classList.remove('show','visible');jkPromptScrim.classList.remove('show','active');
+  
   app.classList.remove('inTransition');
   karasukiLastSwap=performance.now();
   resizeCanvas();buildWanderers();startLoop();
@@ -1493,7 +1681,8 @@ const pulseG = .5 + .5 * Math.sin(sec * 2.1 + colorKey * .8);
 function popupOpen(){
   return cpPopup.classList.contains('show')
     || hwPrompt.classList.contains('show')
-    || krPrompt.classList.contains('show');
+    || krPrompt.classList.contains('show')
+    || jkPrompt.classList.contains('show');
 }
 
 function setTravelLock(on){
@@ -1531,6 +1720,18 @@ function drawTrees(now){
     ctx.globalAlpha=.25+pulse*.16;const a3=ctx.createRadialGradient(cx,cy-r.h*.25,0,cx,cy-r.h*.25,r.w*.72);a3.addColorStop(0,'#ffffff');a3.addColorStop(.35,'#ffe888');a3.addColorStop(1,'transparent');ctx.fillStyle=a3;ctx.beginPath();ctx.arc(cx,cy-r.h*.25,r.w*.72,0,Math.PI*2);ctx.fill();
     for(let i=0;i<6;i++){const angle=(i/6)*Math.PI*2+sec*.4;const twinkle=.4+.6*Math.abs(Math.sin(sec*2.2+i*1.1));const orb=r.w*(.65+.12*Math.sin(sec*.8+i));const fx=cx+Math.cos(angle)*orb,fy=(cy-r.h*.2)+Math.sin(angle)*orb*.6;ctx.globalAlpha=twinkle*.58;ctx.strokeStyle='#fff8c0';ctx.lineWidth=1.0;ctx.shadowBlur=6;ctx.shadowColor='#ffe566';const sl=3+twinkle*2.5;ctx.beginPath();ctx.moveTo(fx,fy-sl);ctx.lineTo(fx,fy+sl);ctx.moveTo(fx-sl,fy);ctx.lineTo(fx+sl,fy);ctx.stroke();ctx.shadowBlur=0;}
     ctx.globalAlpha=1;ctx.drawImage(homeworkImg,cx-r.w/2,cy-r.h/2,r.w,r.h);ctx.restore();
+  }
+
+// Juku tree — calm lantern glow, slow and steady (a place of study)
+  if(jukuImg.complete&&jukuImg.naturalWidth>0){
+    const r=treeRect(jukuImg,JUKU_TREE_IX,JUKU_TREE_IY,JUKU_TREE_IW);
+    const cx=r.x,cy=r.y;const pulse=.5+.5*Math.sin(sec*.7);
+    ctx.save();
+    ctx.globalAlpha=.15+pulse*.03;const sg=ctx.createRadialGradient(cx,cy+r.h*.42,0,cx,cy+r.h*.42,r.w*.9);sg.addColorStop(0,'rgba(0,0,0,.5)');sg.addColorStop(1,'transparent');ctx.fillStyle=sg;ctx.beginPath();ctx.ellipse(cx,cy+r.h*.44,r.w*.7,r.h*.18,0,0,Math.PI*2);ctx.fill();
+    ctx.globalAlpha=.06+pulse*.04;const a1=ctx.createRadialGradient(cx,cy,0,cx,cy,r.w*2.0);a1.addColorStop(0,'#d6e29a');a1.addColorStop(.45,'#9db86a');a1.addColorStop(1,'transparent');ctx.fillStyle=a1;ctx.beginPath();ctx.arc(cx,cy,r.w*2.0,0,Math.PI*2);ctx.fill();
+    ctx.globalAlpha=.16+pulse*.10;const a2=ctx.createRadialGradient(cx,cy+r.h*.16,0,cx,cy+r.h*.16,r.w*.6);a2.addColorStop(0,'#ffe6a8');a2.addColorStop(.5,'#e8c46a');a2.addColorStop(1,'transparent');ctx.fillStyle=a2;ctx.beginPath();ctx.arc(cx,cy+r.h*.16,r.w*.6,0,Math.PI*2);ctx.fill();
+    for(let i=0;i<4;i++){const ft=((sec*.14+i*.25)%1);const fx=cx+Math.sin(sec*.9+i*1.7)*r.w*.45;const fy=(cy+r.h*.34)-ft*r.h*.75;const fa=(ft<.2?ft/.2:ft>.75?(1-ft)/.25:1);ctx.globalAlpha=fa*.55;ctx.fillStyle='#fff3b0';ctx.shadowBlur=7;ctx.shadowColor='#ffe27a';ctx.beginPath();ctx.arc(fx,fy,1.4+Math.sin(sec*3+i)*.5,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;}
+    ctx.globalAlpha=1;ctx.drawImage(jukuImg,cx-r.w/2,cy-r.h/2,r.w,r.h);ctx.restore();
   }
 
   // Karasuki tree
@@ -1593,13 +1794,18 @@ function drawFrame(now){
       if(ghostT>=1){
         ghostIX=ghostDstIX;ghostIY=ghostDstIY;
         setTravelLock(false);
-        if(pendingHomework){
+        
+       if(pendingHomework){
           pendingHomework=false;
           openHomeworkPrompt();
         } else if(pendingKarasuki){
           pendingKarasuki=false;
           openKarasukiPrompt();
+        } else if(pendingJuku){
+          pendingJuku=false;
+          openJukuPrompt();
         } else if(pendingPopupCP){
+          
           showPopupAtCP(pendingPopupCP);pendingPopupCP=null;
         }
       }
@@ -1692,9 +1898,14 @@ function hitHomeworkTree(clientX,clientY){
   const rect=canvas.getBoundingClientRect();const{ix,iy}=cssToImg(clientX-rect.left,clientY-rect.top);
   return Math.hypot(ix-HW_TREE_IX,iy-HW_TREE_IY)<HW_TREE_HIT_R;
 }
+  
 function hitKarasukiTree(clientX,clientY){
   const rect=canvas.getBoundingClientRect();const{ix,iy}=cssToImg(clientX-rect.left,clientY-rect.top);
   return Math.hypot(ix-KR_TREE_IX,iy-KR_TREE_IY)<KR_TREE_HIT_R;
+}
+function hitJukuTree(clientX,clientY){
+  const rect=canvas.getBoundingClientRect();const{ix,iy}=cssToImg(clientX-rect.left,clientY-rect.top);
+  return Math.hypot(ix-JUKU_TREE_IX,iy-JUKU_TREE_IY)<JUKU_TREE_HIT_R;
 }
 
 function startGhostTravelToHWTree(){
@@ -1706,6 +1917,7 @@ function startGhostTravelToHWTree(){
   pendingPopupCP=null;
   pendingHomework=true;
   pendingKarasuki=false;
+  pendingJuku=false;
   setTravelLock(true);
 }
 
@@ -1718,6 +1930,20 @@ function startGhostTravelToKRTree(){
   pendingPopupCP=null;
   pendingHomework=false;
   pendingKarasuki=true;
+  pendingJuku=false;
+  setTravelLock(true);
+}
+
+function startGhostTravelToJukuTree(){
+  if(ghostLocked)return;
+  closePopup();
+  ghostSrcIX=ghostIX;ghostSrcIY=ghostIY;
+  ghostDstIX=JUKU_TREE_IX;ghostDstIY=JUKU_TREE_IY;
+  ghostT=0;ghostAnimStart=performance.now();
+  pendingPopupCP=null;
+  pendingHomework=false;
+  pendingKarasuki=false;
+  pendingJuku=true;
   setTravelLock(true);
 }
 
@@ -1725,8 +1951,11 @@ canvas.addEventListener('click',e=>{
   if(!mazeStarted)return;
   if(ghostLocked||popupOpen())return;
   if(['allGlow','dropping','hovering','settling'].includes(introPhase))return;
+  
   if(hitHomeworkTree(e.clientX,e.clientY)){ startGhostTravelToHWTree(); return; }
   if(hitKarasukiTree(e.clientX,e.clientY)){ startGhostTravelToKRTree(); return; }
+  if(hitJukuTree(e.clientX,e.clientY)){ startGhostTravelToJukuTree(); return; }
+  
   if(bryanOn){
     const rect=canvas.getBoundingClientRect();const{ix,iy}=cssToImg(e.clientX-rect.left,e.clientY-rect.top);
     coordText.textContent=`x: ${ix}  y: ${iy}`;
@@ -1740,8 +1969,11 @@ canvas.addEventListener('touchend',e=>{
   if(['allGlow','dropping','hovering','settling'].includes(introPhase))return;
   if(!e.changedTouches.length)return;
   const t0=e.changedTouches[0];
+  
   if(hitHomeworkTree(t0.clientX,t0.clientY)){startGhostTravelToHWTree();e.preventDefault();return;}
   if(hitKarasukiTree(t0.clientX,t0.clientY)){startGhostTravelToKRTree();e.preventDefault();return;}
+  if(hitJukuTree(t0.clientX,t0.clientY)){startGhostTravelToJukuTree();e.preventDefault();return;}
+  
   const cp=hitTest(t0.clientX,t0.clientY);if(cp){startGhostTravel(cp);e.preventDefault();}
 },{passive:false});
 canvas.addEventListener('mousemove',e=>{
@@ -1752,7 +1984,8 @@ canvas.addEventListener('mouseleave',()=>{bMouseX=-1;bMouseY=-1;});
 
 function startGhostTravel(cp){
   if(ghostLocked)return;closePopup();
-  pendingHomework=false;pendingKarasuki=false;
+  pendingHomework=false;pendingKarasuki=false;pendingJuku=false;
+  
   ghostSrcIX=ghostIX;ghostSrcIY=ghostIY;ghostDstIX=cp.ix;ghostDstIY=cp.iy;
   ghostT=0;ghostAnimStart=performance.now();activeWeek=cp.w;pendingPopupCP=cp;setTravelLock(true);
 }
@@ -1894,6 +2127,62 @@ krPromptScrim.addEventListener('click',closeKarasukiPrompt);
 krNoBtn.addEventListener('click',closeKarasukiPrompt);
 krYesBtn.addEventListener('click',playKarasukiVideoAndGo);
 
+// ── Juku prompt ──────────────────────────────────────────────────────────────
+const jkPromptScrim=document.getElementById('jkPromptScrim'),
+  jkPrompt=document.getElementById('jkPrompt'),
+  jkPromptTitle=document.getElementById('jkPromptTitle'),
+  jkPromptSub=document.getElementById('jkPromptSub'),
+  jkNoBtn=document.getElementById('jkNoBtn'),
+  jkYesBtn=document.getElementById('jkYesBtn');
+
+function openJukuPrompt(){
+  // Branch on membership. Authored constant strings only — no user data.
+  // juku.html fail-closes on its own gate; this branch is UX, not security.
+  const isJuku=localStorage.getItem('booha_is_juku')==='1';
+  if(isJuku){
+    jkPromptTitle.innerHTML='英語塾に<br>はいりますか？';
+    jkPromptSub.innerHTML='English Juku へ いきますか？';
+    jkYesBtn.style.display='';
+    jkNoBtn.textContent='いいえ';
+  } else {
+    jkPromptTitle.innerHTML='しーっ……<br>この扉のむこうは英語塾。';
+    jkPromptSub.innerHTML='この扉は、English Jukuの生徒だけが開けられるよ。<br>なかに何があるか気になる？<br>Bryanに「English Jukuってなに？」って聞いてみて！<br><span style="opacity:.6">Shhh… Only English Juku students can open this door.<br>Ask Bryan, &ldquo;What&rsquo;s English Juku?&rdquo;</span>';
+    jkYesBtn.style.display='none';
+    jkNoBtn.textContent='とじる';
+  }
+  jkPromptScrim.classList.add('show');
+  jkPrompt.classList.add('show');
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    jkPromptScrim.classList.add('active');
+    jkPrompt.classList.add('visible');
+  }));
+}
+
+function closeJukuPrompt(){
+  jkPrompt.classList.remove('visible');
+  jkPromptScrim.classList.remove('active');
+  setTimeout(()=>{
+    jkPrompt.classList.remove('show');
+    jkPromptScrim.classList.remove('show');
+  },520);
+}
+
+function goToJuku(){
+  closeJukuPrompt();
+  try{bgMusic.pause();bgMusic.currentTime=0;}catch(e){}
+  sessionStorage.setItem('booha_return_to_checkpoint','1');
+  sessionStorage.setItem('booha_return_week',String(activeWeek));
+  sessionStorage.setItem('booha_return_ghost',String(activeGhostIdx));
+  sessionStorage.setItem('booha_return_ix',String(JUKU_TREE_IX));
+  sessionStorage.setItem('booha_return_iy',String(JUKU_TREE_IY));
+  fade.classList.add('on');
+  setTimeout(()=>{ window.location.href='juku.html'; },FADE_MS+100);
+}
+
+jkPromptScrim.addEventListener('click',closeJukuPrompt);
+jkNoBtn.addEventListener('click',closeJukuPrompt);
+jkYesBtn.addEventListener('click',goToJuku);
+
 // ────────────────────────────────────────────────────────────────────────────
 iconPreBoo.addEventListener('click',()=>{
   if(ghostLocked)return;closePopup();fadeOut();
@@ -2007,6 +2296,7 @@ backBtn.addEventListener('click',()=>{
 function fadeOut(){
   closeHomeworkPrompt();
   closeKarasukiPrompt();
+  closeJukuPrompt();
   fade.classList.add('on');
 }
 
@@ -2046,9 +2336,12 @@ window.addEventListener('pageshow',(e)=>{
   hwPrompt.classList.remove('show','visible');
   hwPromptScrim.classList.remove('show','active');
   hwVideoWrap.classList.remove('show');
+  
   krPrompt.classList.remove('show','visible');
   krPromptScrim.classList.remove('show','active');
   krVideoWrap.classList.remove('show');
+  jkPrompt.classList.remove('show','visible');
+  jkPromptScrim.classList.remove('show','active');
 });
 
   /* ═══════════════════════════════════════
