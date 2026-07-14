@@ -1153,21 +1153,110 @@
     </div>
   </div>
 
-  <!-- Adventure Log Icon -->
+<!-- Adventure Log Icon -->
  <a href="profile.html" id="alog-icon-btn" aria-label="ぼうけんログ / Adventure Log">
   <img src="assets/img/profile.png" alt="">
+</a>
+<!-- English Juku Icon -->
+<a href="juku.html" id="juku-icon-btn" aria-label="英語塾 / English Juku">
+  <img src="assets/img/juku-logo.png" alt="">
 </a>
 <style>
   #alog-icon-btn {
     position: fixed; right: 16px; bottom: 16px; z-index: 60;
     width: 76px; height: 76px; display: block;
-    filter: drop-shadow(0 4px 14px rgba(0,0,0,.6));
     transition: transform .15s ease;
+    animation: alogGlow 3s ease-in-out infinite;
   }
   #alog-icon-btn:active { transform: scale(.92); }
   #alog-icon-btn img { width: 100%; height: 100%; object-fit: contain; }
+
+  #juku-icon-btn {
+    position: fixed; left: 16px; bottom: 16px; z-index: 60;
+    width: 76px; height: 76px; display: block;
+    transition: transform .15s ease;
+    animation: jukuGlow 4s ease-in-out infinite;
+    animation-delay: 1.2s;
+  }
+  #juku-icon-btn:active { transform: scale(.92); }
+  #juku-icon-btn img { width: 100%; height: 100%; object-fit: contain; }
+
+  @keyframes alogGlow {
+    0%, 100% { filter: drop-shadow(0 4px 14px rgba(0,0,0,.6)); }
+    50%      { filter: drop-shadow(0 0 18px rgba(255,180,80,.75)); }
+  }
+  @keyframes jukuGlow {
+    0%, 100% { filter: drop-shadow(0 4px 14px rgba(0,0,0,.6)); }
+    50%      { filter: drop-shadow(0 0 18px rgba(170,220,120,.75)); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #alog-icon-btn, #juku-icon-btn { animation: none;
+      filter: drop-shadow(0 4px 14px rgba(0,0,0,.6)); }
+  }
+
+  /* ── Juku whisper popup ── */
+  #juku-popup {
+    position: fixed; inset: 0; z-index: 200;
+    display: none;
+    align-items: center; justify-content: center;
+    background: rgba(0,0,0,.65);
+    padding: 24px;
+  }
+  #juku-popup.open { display: flex; }
+  #juku-popup .card {
+    background: #1a1610; color: #e8dfc8;
+    border: 1px solid #4a4030;
+    border-radius: 14px;
+    max-width: 340px; width: 100%;
+    padding: 26px 22px;
+    text-align: center;
+    font: 400 15px/1.9 "DM Sans", "Hiragino Kaku Gothic ProN", sans-serif;
+    box-shadow: 0 12px 40px rgba(0,0,0,.7);
+  }
+  #juku-popup .card .en {
+    font-size: 12.5px; color: #8a8069; margin-top: 12px; line-height: 1.7;
+  }
+  #juku-popup .card button {
+    margin-top: 18px; padding: 10px 30px;
+    background: transparent; color: #b8ac8f;
+    border: 1px solid #4a4030; border-radius: 8px;
+    font: 600 14px "DM Sans", sans-serif; cursor: pointer;
+  }
 </style>
 
+<div id="juku-popup" role="dialog" aria-modal="true">
+  <div class="card">
+    <p>しーっ……この扉のむこうは英語塾。<br>
+    この扉は、English Jukuの生徒だけが開けられるよ。<br>
+    なかに何があるか気になる？<br>
+    Bryanに「English Jukuってなに？」って聞いてみて！</p>
+    <p class="en">Shhh… English Juku is behind this door.<br>
+    Only English Juku students can open it.<br>
+    Curious about what's inside?<br>
+    Ask Bryan, "What's English Juku?"</p>
+    <button id="juku-popup-close" type="button">とじる / Close</button>
+  </div>
+</div>
+<script>
+(function () {
+  var btn   = document.getElementById('juku-icon-btn');
+  var pop   = document.getElementById('juku-popup');
+  var close = document.getElementById('juku-popup-close');
+
+  btn.addEventListener('click', function (e) {
+    if (localStorage.getItem('booha_is_juku') === '1') return; // navigate normally
+    e.preventDefault();
+    pop.classList.add('open');
+  });
+
+  close.addEventListener('click', function () { pop.classList.remove('open'); });
+  pop.addEventListener('click', function (e) {
+    if (e.target === pop) pop.classList.remove('open');
+  });
+})();
+</script>
+  
   <div id="fade" aria-hidden="true"></div>
 </div>
 
