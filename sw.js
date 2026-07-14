@@ -43,6 +43,9 @@ const CORE_FILES = [
   `${BASE}/icons/icon-192.png`,
   `${BASE}/icons/icon-512.png`,
   `${BASE}/icons/icon-maskable-512.png`,
+  `${BASE}/juku.html`,
+  `${BASE}/assets/img/juku-tree.png`,
+  `${BASE}/assets/img/juku-logo.png`,
 ];
 
 // ── Asset folder prefixes (matched at runtime) ───────────────
