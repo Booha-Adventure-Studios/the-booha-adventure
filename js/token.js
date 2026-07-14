@@ -23,8 +23,7 @@
     localStorage.removeItem(KEY_VALIDATED);
     localStorage.removeItem(KEY_FIRST);
     localStorage.removeItem(KEY_JUKU);
-  }
-  }
+ }
 
   function redirect(reason) {
     clearSession();
