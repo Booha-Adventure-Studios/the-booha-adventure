@@ -27,9 +27,21 @@ window.JUKU_CONFIG = {
     // PLACEHOLDER — null activates demo mode (badged, never silent).
     // Example once the real scheme is known:
     //   sentencesUrl: (curr, cw) => `curriculum/${curr}/content/${cw.monthSlug}/sentences.json`,
-    // Week 5 clamps to week 4's content — same rule as nav.js contentWeek.
+  // Week 5 clamps to week 4's content — same rule as nav.js contentWeek.
     contentWeek: function (cw) {
       return cw.weekNumber === 5 ? 4 : cw.weekNumber;
+    },
+
+    // Monthly → weekly: 15 cards per week, selected by card n
+    // (same ranges as deck-core.js WEEK_RANGES; equivalent to
+    // game-core.js's positional slice on well-formed files, but
+    // robust against reordering).
+    cardsPerWeek: 15,
+    filterWeek: function (cards, cw) {
+      const w = this.contentWeek(cw);
+      const lo = (w - 1) * this.cardsPerWeek + 1;
+      const hi = w * this.cardsPerWeek;
+      return cards.filter(c => c && c.n >= lo && c.n <= hi);
     },
 
     sentencesUrl: function (curr, cw) {
