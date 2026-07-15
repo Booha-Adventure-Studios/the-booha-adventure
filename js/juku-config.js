@@ -19,6 +19,23 @@ window.JUKU_CONFIG = {
   // How many minutes before start the lobby (survey) opens.
   lobbyOpenMin: 5,
 
+  // ── Content wiring ───────────────────────────────────────
+  content: {
+    counts: { order: 8 },   // items per test
+
+    // Return the URL of the week's sentences JSON for a curriculum.
+    // PLACEHOLDER — null activates demo mode (badged, never silent).
+    // Example once the real scheme is known:
+    //   sentencesUrl: (curr, cw) => `curriculum/${curr}/content/${cw.monthSlug}/sentences.json`,
+    sentencesUrl: function (curr, cw) { return null; },
+
+    // Normalize one raw sentence entry to { n, en, jp }.
+    // Adjust if the JSON's field names differ.
+    mapSentence: function (raw) {
+      return { n: raw.n, en: raw.en, jp: raw.jp || raw.hira || '' };
+    }
+  },
+
   // ── Phase schedule (0–90) ────────────────────────────────
   // kind: 'broadcast' = app dictates item timing (synced, weekId seed)
   //       'window'    = self-paced inside the time box (per-student seed)
