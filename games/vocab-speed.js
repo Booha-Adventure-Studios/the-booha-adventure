@@ -1098,7 +1098,7 @@ document.getElementById('vs-start-btn').addEventListener('touchstart', (e) => {
 /* ══════════════════════════════════════════════════════════════
    STATE
    ══════════════════════════════════════════════════════════════ */
-const order   = U.shuffle(CFG.cards.slice(0, 15));
+let order   = U.shuffle(CFG.cards.slice(0, 15));
 let idx       = 0;
 let score     = 0;
 let streak    = 0;
@@ -1425,7 +1425,7 @@ document.getElementById('vs-replay').addEventListener('click', () => {
   scoreEl.textContent  = '0';
   streakEl.textContent = '0';
   updateStreakUI();
-  U.shuffle(order);
+  order = U.shuffle(order);
   renderQ();
 });
 
