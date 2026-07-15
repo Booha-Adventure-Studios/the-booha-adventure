@@ -246,10 +246,14 @@
         <h1>${res.phase.jp}</h1>
         <p class="en">${res.phase.en}</p>
         <div class="juku-count" id="juku-count">${fmt(res.phaseRemainSec)}</div>
-        <div class="juku-task" id="juku-task">
-          ${placeholderFor(res.phase)}
+        
+   <div class="juku-task" id="juku-task">
         </div>
       </div>`;
+    const taskEl = document.getElementById('juku-task');
+    if (!(window.JUKU_TESTS && window.JUKU_TESTS.render(taskEl, res, slot))) {
+      taskEl.innerHTML = placeholderFor(res.phase);
+    }
   }
 
   function placeholderFor(p) {
