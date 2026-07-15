@@ -131,7 +131,7 @@ function playListen(mp3) {
 /* ══════════════════════════════════════════════════════════════
    DATA / TIERS
    ══════════════════════════════════════════════════════════════ */
-const allCards = U.shuffle(CFG.cards.slice(0, 15));
+let allCards = U.shuffle(CFG.cards.slice(0, 15));
 
 const TIERS = [
   { min:0,  max:5,  sound:'result_0-5.mp3',
@@ -1135,7 +1135,7 @@ function showResults() {
     idx   = 0;
     score = 0;
     scoreEl.textContent = '0';
-    U.shuffle(allCards);
+    allCards = U.shuffle(allCards);
     showCard();
   });
 
