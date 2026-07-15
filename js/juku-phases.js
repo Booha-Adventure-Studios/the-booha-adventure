@@ -1,10 +1,12 @@
 
-// js/juku-phases.js  (Stage 2)
+// js/juku-phases.js  (Stage 2.1)
 // English Juku — phase renderers. Load AFTER juku-engine.js.
 //
-// Stage 2 adds: check-in survey (lobby), self-prediction phase, slot
-// recording. All answers write to booha_juku_save the moment they are
-// tapped — device death loses nothing. Japanese first, English under.
+// Text register: grade-2 kana-friendly (pre-boo students read everything).
+// Survey: taps auto-save (device-death insurance); submit is a state on
+// top — a できた！ button, a ✓ done card, and えらびなおす to reopen.
+// X / navigation exist ONLY outside the lesson: once the clock crosses
+// start, it's an exam room. No exit invitation until けっか ends.
 
 (function () {
   'use strict';
@@ -23,27 +25,27 @@
   // Authored constant strings only — never user data.
 
   const SURVEY_QS = [
-    { key: 'mood', jp: 'きょうのちょうしは？', en: 'How are you today?',
+    { key: 'mood', jp: 'きょうの ちょうしは？', en: 'How are you today?',
       opts: [
         { v: 'genki',  jp: '😄 げんき' },
         { v: 'futsuu', jp: '😐 ふつう' },
         { v: 'nemui',  jp: '😴 ねむい' },
         { v: 'chotto', jp: '😟 ちょっと…' }
       ]},
-    { key: 'review', jp: 'こんしゅう、れんしゅうした？', en: 'Did you review this week?',
+    { key: 'review', jp: 'こんしゅう、れんしゅう した？', en: 'Did you review this week?',
       opts: [
-        { v: 'lots', jp: 'たくさんした' },
-        { v: 'some', jp: 'すこしした' },
+        { v: 'lots', jp: 'たくさん した' },
+        { v: 'some', jp: 'すこし した' },
         { v: 'none', jp: 'してない…' }
       ]},
-    { key: 'hardest', jp: 'いちばんむずかしそうなのは？', en: 'Which feels hardest?',
+    { key: 'hardest', jp: 'いちばん むずかしそうなのは？', en: 'Which feels hardest?',
       opts: [
-        { v: 'dictation', jp: 'ディクテーション' },
-        { v: 'order',     jp: '語順テスト' },
-        { v: 'vocab',     jp: '語い・意味' },
+        { v: 'dictation', jp: 'きいてかく' },
+        { v: 'order',     jp: 'じゅんばん' },
+        { v: 'vocab',     jp: 'たんご' },
         { v: 'mixed',     jp: 'ミックス' }
       ]},
-    { key: 'expect', jp: 'きょうの予想スコアは？', en: 'What score do you expect?',
+    { key: 'expect', jp: 'きょうは なんてん とれそう？', en: 'What score do you expect?',
       opts: [
         { v: '90+',   jp: '90〜100' },
         { v: '80-89', jp: '80〜89' },
@@ -54,7 +56,7 @@
   ];
 
   const PREDICT_QS = [
-    { key: 'expect', jp: 'きょうは何点だったと思う？', en: 'How do you think you did?',
+    { key: 'expect', jp: 'きょうは なんてんだったと おもう？', en: 'How do you think you did?',
       opts: [
         { v: '90+',   jp: '90〜100' },
         { v: '80-89', jp: '80〜89' },
@@ -62,18 +64,16 @@
         { v: '60-69', jp: '60〜69' },
         { v: '<60',   jp: '〜59' }
       ]},
-    { key: 'worst', jp: 'いちばんむずかしかったのは？', en: 'Which was hardest?',
+    { key: 'worst', jp: 'いちばん むずかしかったのは？', en: 'Which was hardest?',
       opts: [
-        { v: 'dictation', jp: 'ディクテーション' },
-        { v: 'order',     jp: '語順テスト' },
-        { v: 'vocab',     jp: '語い・意味' },
+        { v: 'dictation', jp: 'きいてかく' },
+        { v: 'order',     jp: 'じゅんばん' },
+        { v: 'vocab',     jp: 'たんご' },
         { v: 'mixed',     jp: 'ミックス' }
       ]}
   ];
 
   // ── Question block renderer ──────────────────────────────
-  // Answers can be changed until the phase/window closes; every tap
-  // writes immediately. `section` is 'survey' or 'prediction'.
 
   function questionsHTML(qs, saved) {
     return qs.map(q => {
@@ -91,22 +91,39 @@
     }).join('');
   }
 
-  function wireQuestions(container, section) {
+  function allAnswered(qs, saved) {
+    return !!saved && qs.every(q => saved[q.key]);
+  }
+
+  function wireQuestions(container, section, qs, onChange) {
     container.querySelectorAll('.juku-opt').forEach(btn => {
       btn.addEventListener('click', () => {
         const q = btn.dataset.q, v = btn.dataset.v;
-        // visual: single-select within this question
         container.querySelectorAll(`.juku-opt[data-q="${q}"]`)
           .forEach(b => b.classList.remove('sel'));
         btn.classList.add('sel');
-        // write immediately
         J.patchWeek(w => {
           if (!w[section]) w[section] = {};
           w[section][q] = v;
           w[section].at = Date.now();
         });
+        if (onChange) onChange();
       });
     });
+  }
+
+  // ── Exit controls (outside the lesson only) ──────────────
+
+  function exitX() {
+    return `<a class="juku-x" href="index.html" aria-label="とじる">✕</a>`;
+  }
+
+  function navFooter() {
+    return `
+      <div class="juku-nav">
+        <a class="juku-nav-btn" href="index.html">スタディデッキへ<br><span class="en">Study Decks</span></a>
+        <a class="juku-nav-btn" href="maze.html">めいろへ<br><span class="en">Maze</span></a>
+      </div>`;
   }
 
   // ── Screens ──────────────────────────────────────────────
@@ -121,12 +138,14 @@
       </button>`;
     }).join('');
     root.innerHTML = `
+      ${exitX()}
       <div class="juku-panel">
         <img class="juku-crest" src="assets/img/juku-logo.png" alt="">
         <h1>英語塾</h1>
         <p class="en">English Juku</p>
-        <p class="juku-sub">クラスをえらんでね<br><span class="en">Choose your class</span></p>
+        <p class="juku-sub">クラスを えらんでね<br><span class="en">Choose your class</span></p>
         <div class="juku-slot-list">${buttons}</div>
+        ${navFooter()}
       </div>`;
     root.querySelectorAll('.juku-slot-btn').forEach(b => {
       b.addEventListener('click', () => {
@@ -138,36 +157,70 @@
 
   function renderBefore(res, slot) {
     root.innerHTML = `
+      ${exitX()}
       <div class="juku-panel">
         <img class="juku-crest" src="assets/img/juku-logo.png" alt="">
         <h1>英語塾</h1>
         <p class="juku-sub">${slot.label}</p>
         <div class="juku-count" id="juku-count">${fmt(res.secToStart)}</div>
-        <p class="juku-sub2">まだ開いていません。じゅんびしてまってね。<br>
+        <p class="juku-sub2">まだ あいてないよ。じゅんびして まっててね。<br>
         <span class="en">Not open yet — get ready.</span></p>
-        <button class="juku-back-btn" id="juku-slot-back">クラスをえらびなおす</button>
+        <button class="juku-back-btn" id="juku-slot-back">クラスを えらびなおす</button>
       </div>`;
     wireBack();
   }
 
   function renderLobby(res, slot) {
-    // Record which slot this week's lesson happened in (first entry wins)
     J.patchWeek(w => { if (!w.slot) w.slot = slot.id; });
-
     const { week } = J.weekRecord();
+    const submitted = week.survey && week.survey.submitted;
+
     root.innerHTML = `
       <div class="juku-panel">
-        <h1>まもなく開始</h1>
+        <h1>まもなく はじまるよ</h1>
         <p class="en">Starting soon</p>
         <p class="juku-sub">${slot.label}</p>
         <div class="juku-count big" id="juku-count">${fmt(res.secToStart)}</div>
-        <p class="juku-sub2">ノート・えんぴつ・きもちのじゅんび。<br>
+        <p class="juku-sub2">ノート・えんぴつ・きもちの じゅんび。<br>
         <span class="en">Notebook, pencil, mind — ready.</span></p>
-        <div class="juku-survey" id="juku-survey">
-          ${questionsHTML(SURVEY_QS, week.survey)}
-        </div>
+        <div class="juku-survey" id="juku-survey"></div>
       </div>`;
-    wireQuestions(document.getElementById('juku-survey'), 'survey');
+
+    const box = document.getElementById('juku-survey');
+    if (submitted) renderSurveyDone(box);
+    else renderSurveyOpen(box, week);
+  }
+
+  function renderSurveyOpen(box, week) {
+    box.innerHTML = `
+      ${questionsHTML(SURVEY_QS, week.survey)}
+      <button class="juku-submit ${allAnswered(SURVEY_QS, week.survey) ? '' : 'off'}"
+              id="juku-survey-submit">できた！</button>`;
+    const submitBtn = document.getElementById('juku-survey-submit');
+    wireQuestions(box, 'survey', SURVEY_QS, () => {
+      const { week: w2 } = J.weekRecord();
+      submitBtn.classList.toggle('off', !allAnswered(SURVEY_QS, w2.survey));
+    });
+    submitBtn.addEventListener('click', () => {
+      const { week: w2 } = J.weekRecord();
+      if (!allAnswered(SURVEY_QS, w2.survey)) return;
+      J.patchWeek(w => { w.survey.submitted = true; });
+      renderSurveyDone(box);
+    });
+  }
+
+  function renderSurveyDone(box) {
+    box.innerHTML = `
+      <div class="juku-done">
+        <p class="juku-done-jp">✓ うけつけ OK！</p>
+        <p class="en">Check-in complete</p>
+        <button class="juku-edit" id="juku-survey-edit">えらびなおす</button>
+      </div>`;
+    document.getElementById('juku-survey-edit').addEventListener('click', () => {
+      J.patchWeek(w => { if (w.survey) w.survey.submitted = false; });
+      const { week } = J.weekRecord();
+      renderSurveyOpen(box, week);
+    });
   }
 
   function renderPredict(res, slot) {
@@ -182,7 +235,7 @@
           ${questionsHTML(PREDICT_QS, week.prediction)}
         </div>
       </div>`;
-    wireQuestions(document.getElementById('juku-predict'), 'prediction');
+    wireQuestions(document.getElementById('juku-predict'), 'prediction', PREDICT_QS);
   }
 
   function renderPhase(res, slot) {
@@ -202,9 +255,9 @@
   function placeholderFor(p) {
     switch (p.kind) {
       case 'paper':
-        return `<p class="juku-paper">📖 目を上げて。<br><span class="en">Eyes up — reading round with Bryan.</span></p>`;
+        return `<p class="juku-paper">📖 めを あげて。<br><span class="en">Eyes up — reading round with Bryan.</span></p>`;
       case 'interval':
-        return `<p class="juku-paper">☕ 休けい。せのび、水、えんぴつ。<br><span class="en">Break time.</span></p>`;
+        return `<p class="juku-paper">☕ きゅうけい。せのび、みず、えんぴつ。<br><span class="en">Break time.</span></p>`;
       case 'results':
         return `<p class="juku-paper">🧾 （Stage 5：レポート）</p>`;
       case 'broadcast':
@@ -216,12 +269,14 @@
 
   function renderClosed(slot) {
     root.innerHTML = `
+      ${exitX()}
       <div class="juku-panel">
         <img class="juku-crest" src="assets/img/juku-logo.png" alt="">
-        <h1>本日は終了</h1>
+        <h1>きょうは おしまい</h1>
         <p class="en">Finished for today</p>
-        <p class="juku-sub">おつかれさま。また来週。</p>
+        <p class="juku-sub">おつかれさま。また らいしゅう！</p>
         <button class="juku-back-btn" id="juku-slot-back">もどる</button>
+        ${navFooter()}
       </div>`;
     wireBack();
   }
