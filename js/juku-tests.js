@@ -45,10 +45,15 @@
     try {
       const res = await fetch(url);
       const raw = await res.json();
+      
       const map = (CFG.content && CFG.content.mapSentence) || (x => x);
-      const items = (Array.isArray(raw) ? raw : raw.sentences || raw.cards || [])
+      const all = Array.isArray(raw) ? raw : (raw.cards || raw.sentences || []);
+      const weekCards = (CFG.content && CFG.content.filterWeek)
+        ? CFG.content.filterWeek(all, cw) : all;
+      const items = weekCards
         .map(map)
         .filter(it => it && it.en && String(it.en).trim().split(/\s+/).length >= 3);
+      
       if (!items.length) throw new Error('no usable sentences');
       _cache[curr] = { demo: false, items };
       return _cache[curr];
