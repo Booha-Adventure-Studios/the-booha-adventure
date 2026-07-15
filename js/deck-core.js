@@ -33,7 +33,7 @@ const AUDIO_BASE = `${AUDIO_ROOT}/${MONTH_CODE}/${CFG.audioFolder}/${CFG.audioSu
 console.log('[deck-core] JSON URL:', CFG.jsonUrl);
 console.log('[deck-core] Audio base:', AUDIO_BASE);
 
-const WEEK_RANGES = { w1:[1,15], w2:[16,30], w3:[31,45], w4:[46,60] };
+const WEEK_RANGES = { w1:[1,15], w2:[16,30], w3:[31,45], w4:[46,60], w5:[46,60] };  // w5 = w4 content
 
 const PALETTES = (CFG.palettes && CFG.palettes.length)
   ? CFG.palettes
