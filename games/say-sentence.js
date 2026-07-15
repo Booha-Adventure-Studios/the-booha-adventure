@@ -341,7 +341,8 @@ modalOver.addEventListener('click', e => { if (e.target === modalOver) modalOver
 document.addEventListener('keydown', e => { if (e.key === 'Escape') modalOver.classList.remove('open'); });
 
 /* ═══ STATE ═══ */
-const order = U.shuffle(CFG.cards.slice(0, 15));
+
+let order = U.shuffle(CFG.cards.slice(0, 15));
 let idx = 0, score = 0, streak = 0;
 let answered = false, firstTry = true, pickCooldown = false, isBusy = false;
 let showKanji = true;
@@ -514,8 +515,10 @@ document.getElementById('sas-replay').addEventListener('click', () => {
   const se = document.getElementById('sas-streak'); if (se) se.textContent = '0';
   answered = false; firstTry = true; pickCooldown = false;
   advancedThisCard = false; isBusy = false;
+   
   showKanji = true; applyToggle();
-  U.shuffle(order); showCard();
+  order = U.shuffle(order); showCard();
+   
 });
 document.getElementById('sas-back').addEventListener('click', () => {
   window.location.assign(CFG.navTarget + '?week=' + encodeURIComponent(CFG.weekParam));
