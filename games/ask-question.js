@@ -343,7 +343,7 @@ modalOver.addEventListener('click', e => { if (e.target === modalOver) modalOver
 document.addEventListener('keydown', e => { if (e.key === 'Escape') modalOver.classList.remove('open'); });
 
 /* ═══ STATE ═══ */
-const order = U.shuffle(CFG.cards.slice(0, 15));
+let order = U.shuffle(CFG.cards.slice(0, 15));
 let idx = 0, score = 0, streak = 0;
 let answered = false, firstTry = true, pickCooldown = false, isBusy = false;
 let showKanji = true; // toggle state — persists for entire game
@@ -555,8 +555,10 @@ document.getElementById('aq-replay').addEventListener('click', () => {
   advancedThisCard = false; isBusy = false;
   // reset toggle to kanji on replay
   showKanji = true; applyToggle();
-  U.shuffle(order);
+   
+  order = U.shuffle(order);
   showCard();
+   
 });
 document.getElementById('aq-back').addEventListener('click', () => {
   window.location.assign(CFG.navTarget + '?week=' + encodeURIComponent(CFG.weekParam));
