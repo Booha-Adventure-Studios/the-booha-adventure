@@ -27,16 +27,27 @@ window.JUKU_CONFIG = {
     // PLACEHOLDER — null activates demo mode (badged, never silent).
     // Example once the real scheme is known:
     //   sentencesUrl: (curr, cw) => `curriculum/${curr}/content/${cw.monthSlug}/sentences.json`,
+    // Week 5 clamps to week 4's content — same rule as nav.js contentWeek.
+    contentWeek: function (cw) {
+      return cw.weekNumber === 5 ? 4 : cw.weekNumber;
+    },
+
     sentencesUrl: function (curr, cw) {
       return `content/${curr}/${cw.monthSlug}/sentences.json`;
     },
 
     // Normalize one raw sentence entry to { n, en, jp }.
     // Adjust if the JSON's field names differ.
-    mapSentence: function (raw) {
-      // hira preferred: the youngest reader sets the register
-      return { n: raw.n, en: raw.en, jp: raw.hira || raw.jp || '', mp3: raw.mp3 || null };
-    }
+    sentencesUrl: function (curr, cw) {
+      // week IDs use abbreviated months (jul); content folders use full
+      // names (july). Accept either form from calendar.js.
+      const FULL = { jan:'january', feb:'february', mar:'march', apr:'april',
+                     may:'may', jun:'june', jul:'july', aug:'august',
+                     sep:'september', oct:'october', nov:'november', dec:'december' };
+      const m = String(cw.monthSlug).toLowerCase();
+      const folder = FULL[m] || m;
+      return `content/${curr}/${folder}/sentences.json`;
+    },
     
   },
 
