@@ -27,13 +27,17 @@ window.JUKU_CONFIG = {
     // PLACEHOLDER — null activates demo mode (badged, never silent).
     // Example once the real scheme is known:
     //   sentencesUrl: (curr, cw) => `curriculum/${curr}/content/${cw.monthSlug}/sentences.json`,
-    sentencesUrl: function (curr, cw) { return null; },
+    sentencesUrl: function (curr, cw) {
+      return `content/${curr}/${cw.monthSlug}/sentences.json`;
+    },
 
     // Normalize one raw sentence entry to { n, en, jp }.
     // Adjust if the JSON's field names differ.
     mapSentence: function (raw) {
-      return { n: raw.n, en: raw.en, jp: raw.jp || raw.hira || '' };
+      // hira preferred: the youngest reader sets the register
+      return { n: raw.n, en: raw.en, jp: raw.hira || raw.jp || '', mp3: raw.mp3 || null };
     }
+    
   },
 
   // ── Phase schedule (0–90) ────────────────────────────────
