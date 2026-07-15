@@ -342,7 +342,7 @@ modalOver.addEventListener('click', e => { if (e.target === modalOver) modalOver
 document.addEventListener('keydown', e => { if (e.key === 'Escape') modalOver.classList.remove('open'); });
 
 /* ═══ STATE ═══ */
-const order = U.shuffle(CFG.cards.slice(0, 15));
+let order = U.shuffle(CFG.cards.slice(0, 15));
 let idx = 0, score = 0, streak = 0;
 let answered = false, firstTry = true, pickCooldown = false, isBusy = false;
 let showKanji = true;
@@ -516,7 +516,7 @@ document.getElementById('stw-replay').addEventListener('click', () => {
   answered = false; firstTry = true; pickCooldown = false;
   advancedThisCard = false; isBusy = false;
   showKanji = true; applyToggle();
-  U.shuffle(order); showCard();
+  order = U.shuffle(order); showCard();
 });
 document.getElementById('stw-back').addEventListener('click', () => {
   window.location.assign(CFG.navTarget + '?week=' + encodeURIComponent(CFG.weekParam));
