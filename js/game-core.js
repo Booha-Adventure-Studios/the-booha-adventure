@@ -20,7 +20,7 @@ if (!slugMatch) { showError('Bad week param: ' + weekParam); return; }
 
 const curriculum = slugMatch[1].toLowerCase();
 const monthShort = slugMatch[2].toLowerCase();
-const weekNum    = Number(slugMatch[3]);
+const weekNum    = Math.min(4, Number(slugMatch[3]));  // w5 clamps to w4 content (same rule as nav.js)
 
 const MONTH_MAP = {
   jan:'january', feb:'february', mar:'march',    apr:'april',
