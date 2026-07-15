@@ -1,10 +1,10 @@
-// js/juku-phases.js
+
+// js/juku-phases.js  (Stage 2)
 // English Juku — phase renderers. Load AFTER juku-engine.js.
-// The engine owns the clock and calls these; renderers never read the clock
-// themselves except through the resolution object they are handed.
 //
-// Stage 1: slot menu, lobby, progress spine, placeholder phase panels,
-// closed screen. Real task UIs replace the placeholders stage by stage.
+// Stage 2 adds: check-in survey (lobby), self-prediction phase, slot
+// recording. All answers write to booha_juku_save the moment they are
+// tapped — device death loses nothing. Japanese first, English under.
 
 (function () {
   'use strict';
@@ -19,23 +19,94 @@
     return `${m}:${String(s).padStart(2, '0')}`;
   }
 
-  // Authored constant strings only in innerHTML — never user data.
-  function el(html) {
-    const d = document.createElement('div');
-    d.innerHTML = html;
-    return d.firstElementChild;
+  // ── Survey / prediction question sets ────────────────────
+  // Authored constant strings only — never user data.
+
+  const SURVEY_QS = [
+    { key: 'mood', jp: 'きょうのちょうしは？', en: 'How are you today?',
+      opts: [
+        { v: 'genki',  jp: '😄 げんき' },
+        { v: 'futsuu', jp: '😐 ふつう' },
+        { v: 'nemui',  jp: '😴 ねむい' },
+        { v: 'chotto', jp: '😟 ちょっと…' }
+      ]},
+    { key: 'review', jp: 'こんしゅう、れんしゅうした？', en: 'Did you review this week?',
+      opts: [
+        { v: 'lots', jp: 'たくさんした' },
+        { v: 'some', jp: 'すこしした' },
+        { v: 'none', jp: 'してない…' }
+      ]},
+    { key: 'hardest', jp: 'いちばんむずかしそうなのは？', en: 'Which feels hardest?',
+      opts: [
+        { v: 'dictation', jp: 'ディクテーション' },
+        { v: 'order',     jp: '語順テスト' },
+        { v: 'vocab',     jp: '語い・意味' },
+        { v: 'mixed',     jp: 'ミックス' }
+      ]},
+    { key: 'expect', jp: 'きょうの予想スコアは？', en: 'What score do you expect?',
+      opts: [
+        { v: '90+',   jp: '90〜100' },
+        { v: '80-89', jp: '80〜89' },
+        { v: '70-79', jp: '70〜79' },
+        { v: '60-69', jp: '60〜69' },
+        { v: '<60',   jp: '〜59' }
+      ]}
+  ];
+
+  const PREDICT_QS = [
+    { key: 'expect', jp: 'きょうは何点だったと思う？', en: 'How do you think you did?',
+      opts: [
+        { v: '90+',   jp: '90〜100' },
+        { v: '80-89', jp: '80〜89' },
+        { v: '70-79', jp: '70〜79' },
+        { v: '60-69', jp: '60〜69' },
+        { v: '<60',   jp: '〜59' }
+      ]},
+    { key: 'worst', jp: 'いちばんむずかしかったのは？', en: 'Which was hardest?',
+      opts: [
+        { v: 'dictation', jp: 'ディクテーション' },
+        { v: 'order',     jp: '語順テスト' },
+        { v: 'vocab',     jp: '語い・意味' },
+        { v: 'mixed',     jp: 'ミックス' }
+      ]}
+  ];
+
+  // ── Question block renderer ──────────────────────────────
+  // Answers can be changed until the phase/window closes; every tap
+  // writes immediately. `section` is 'survey' or 'prediction'.
+
+  function questionsHTML(qs, saved) {
+    return qs.map(q => {
+      const chosen = saved && saved[q.key];
+      const opts = q.opts.map(o =>
+        `<button class="juku-opt ${chosen === o.v ? 'sel' : ''}"
+                 data-q="${q.key}" data-v="${o.v}">${o.jp}</button>`
+      ).join('');
+      return `
+        <div class="juku-q">
+          <p class="juku-q-jp">${q.jp}</p>
+          <p class="juku-q-en">${q.en}</p>
+          <div class="juku-opts">${opts}</div>
+        </div>`;
+    }).join('');
   }
 
-  // ── Progress spine ───────────────────────────────────────
-  // The thin bar: every phase visible, current one lit. The 90 minutes
-  // always feels finite and legible.
-
-  function spineHTML(activeIdx) {
-    const cells = CFG.phases.map((p, i) => {
-      const cls = i < activeIdx ? 'done' : i === activeIdx ? 'now' : '';
-      return `<div class="jsp-cell ${cls}" style="flex:${p.min}" title="${p.jp}"></div>`;
-    }).join('');
-    return `<div class="juku-spine">${cells}</div>`;
+  function wireQuestions(container, section) {
+    container.querySelectorAll('.juku-opt').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const q = btn.dataset.q, v = btn.dataset.v;
+        // visual: single-select within this question
+        container.querySelectorAll(`.juku-opt[data-q="${q}"]`)
+          .forEach(b => b.classList.remove('sel'));
+        btn.classList.add('sel');
+        // write immediately
+        J.patchWeek(w => {
+          if (!w[section]) w[section] = {};
+          w[section][q] = v;
+          w[section].at = Date.now();
+        });
+      });
+    });
   }
 
   // ── Screens ──────────────────────────────────────────────
@@ -53,13 +124,13 @@
       <div class="juku-panel">
         <img class="juku-crest" src="assets/img/juku-logo.png" alt="">
         <h1>英語塾</h1>
-        <p class="juku-sub">クラスをえらんでね</p>
+        <p class="en">English Juku</p>
+        <p class="juku-sub">クラスをえらんでね<br><span class="en">Choose your class</span></p>
         <div class="juku-slot-list">${buttons}</div>
       </div>`;
     root.querySelectorAll('.juku-slot-btn').forEach(b => {
       b.addEventListener('click', () => {
         J.selectSlot(b.dataset.slot);
-        // engine tick picks up the new slot within a second; force it now:
         window.dispatchEvent(new Event('juku:slotChosen'));
       });
     });
@@ -72,52 +143,70 @@
         <h1>英語塾</h1>
         <p class="juku-sub">${slot.label}</p>
         <div class="juku-count" id="juku-count">${fmt(res.secToStart)}</div>
-        <p class="juku-sub2">まだ開いていません。じゅんびしてまってね。</p>
+        <p class="juku-sub2">まだ開いていません。じゅんびしてまってね。<br>
+        <span class="en">Not open yet — get ready.</span></p>
         <button class="juku-back-btn" id="juku-slot-back">クラスをえらびなおす</button>
       </div>`;
     wireBack();
   }
 
   function renderLobby(res, slot) {
-    // Stage 2 replaces the notice with the 4-question check-in survey.
+    // Record which slot this week's lesson happened in (first entry wins)
+    J.patchWeek(w => { if (!w.slot) w.slot = slot.id; });
+
+    const { week } = J.weekRecord();
     root.innerHTML = `
       <div class="juku-panel">
-        <img class="juku-crest" src="assets/img/juku-logo.png" alt="">
         <h1>まもなく開始</h1>
+        <p class="en">Starting soon</p>
         <p class="juku-sub">${slot.label}</p>
         <div class="juku-count big" id="juku-count">${fmt(res.secToStart)}</div>
         <p class="juku-sub2">ノート・えんぴつ・きもちのじゅんび。<br>
         <span class="en">Notebook, pencil, mind — ready.</span></p>
-        <div class="juku-survey-slot" id="juku-survey"><!-- Stage 2: check-in survey --></div>
+        <div class="juku-survey" id="juku-survey">
+          ${questionsHTML(SURVEY_QS, week.survey)}
+        </div>
       </div>`;
+    wireQuestions(document.getElementById('juku-survey'), 'survey');
   }
 
-  function renderPhase(res, slot) {
-    const p = res.phase;
+  function renderPredict(res, slot) {
+    const { week } = J.weekRecord();
     root.innerHTML = `
       ${spineHTML(res.phaseIdx)}
       <div class="juku-panel">
-        <p class="juku-eyebrow">${p.en}</p>
-        <h1>${p.jp}</h1>
+        <h1>${res.phase.jp}</h1>
+        <p class="en">${res.phase.en}</p>
+        <div class="juku-count" id="juku-count">${fmt(res.phaseRemainSec)}</div>
+        <div class="juku-survey" id="juku-predict">
+          ${questionsHTML(PREDICT_QS, week.prediction)}
+        </div>
+      </div>`;
+    wireQuestions(document.getElementById('juku-predict'), 'prediction');
+  }
+
+  function renderPhase(res, slot) {
+    if (res.phase.kind === 'predict') { renderPredict(res, slot); return; }
+    root.innerHTML = `
+      ${spineHTML(res.phaseIdx)}
+      <div class="juku-panel">
+        <h1>${res.phase.jp}</h1>
+        <p class="en">${res.phase.en}</p>
         <div class="juku-count" id="juku-count">${fmt(res.phaseRemainSec)}</div>
         <div class="juku-task" id="juku-task">
-          ${placeholderFor(p)}
+          ${placeholderFor(res.phase)}
         </div>
       </div>`;
   }
 
   function placeholderFor(p) {
-    // Stage 1 placeholders. Each is replaced by a real task renderer:
-    //  Stage 3: window tests   Stage 4: broadcast dictation   Stage 5: results
     switch (p.kind) {
       case 'paper':
         return `<p class="juku-paper">📖 目を上げて。<br><span class="en">Eyes up — reading round with Bryan.</span></p>`;
       case 'interval':
-        return `<p class="juku-paper">☕ 休けい。せのび、水、えんぴつ。</p>`;
+        return `<p class="juku-paper">☕ 休けい。せのび、水、えんぴつ。<br><span class="en">Break time.</span></p>`;
       case 'results':
         return `<p class="juku-paper">🧾 （Stage 5：レポート）</p>`;
-      case 'predict':
-        return `<p class="juku-paper">🤔 （Stage 2：自己予想）</p>`;
       case 'broadcast':
         return `<p class="juku-paper">🎧 （Stage 4：ディクテーション）</p>`;
       default: // window
@@ -130,6 +219,7 @@
       <div class="juku-panel">
         <img class="juku-crest" src="assets/img/juku-logo.png" alt="">
         <h1>本日は終了</h1>
+        <p class="en">Finished for today</p>
         <p class="juku-sub">おつかれさま。また来週。</p>
         <button class="juku-back-btn" id="juku-slot-back">もどる</button>
       </div>`;
@@ -139,6 +229,16 @@
   function wireBack() {
     const b = document.getElementById('juku-slot-back');
     if (b) b.addEventListener('click', () => { J.clearSlot(); });
+  }
+
+  // ── Progress spine ───────────────────────────────────────
+
+  function spineHTML(activeIdx) {
+    const cells = CFG.phases.map((p, i) => {
+      const cls = i < activeIdx ? 'done' : i === activeIdx ? 'now' : '';
+      return `<div class="jsp-cell ${cls}" style="flex:${p.min}" title="${p.jp}"></div>`;
+    }).join('');
+    return `<div class="juku-spine">${cells}</div>`;
   }
 
   // ── Engine hookup ────────────────────────────────────────
@@ -159,7 +259,6 @@
   }
 
   window.addEventListener('juku:slotChosen', () => {
-    // slot changed outside the tick — repaint immediately
     onPhaseChange(J.slot ? J.resolve(J.slot, J.tokyoNow()) : { state: 'menu' }, J.slot);
   });
 
