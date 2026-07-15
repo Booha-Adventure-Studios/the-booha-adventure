@@ -140,7 +140,7 @@ function displayChip(token, isFirst, isLast) {
 /* ══════════════════════════════════════════════════════════════
    DATA / TIERS
    ══════════════════════════════════════════════════════════════ */
-const allCards = U.shuffle(CFG.cards.slice(0, 15));
+let allCards = U.shuffle(CFG.cards.slice(0, 15));
 
 const TIERS = [
   { min:0,  max:5,  sound:'result_0-5.mp3',
@@ -1179,8 +1179,10 @@ function showResults() {
     document.body.classList.remove('hira-mode');
     hiraMode = false;
     hiraLabel.textContent = 'ひらがな';
-    U.shuffle(allCards);
+     
+    allCards = U.shuffle(allCards);
     showCard();
+     
   });
 
   if (backBtn) backBtn.addEventListener('click', () => {
