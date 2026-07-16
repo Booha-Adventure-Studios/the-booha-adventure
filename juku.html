@@ -215,10 +215,26 @@
     padding: 3px 8px;
   }
 
-  /* ── task area ── */
+ /* ── task area ── */
   .juku-task { margin-top: 22px; }
   .juku-paper { font-size: 17px; line-height: 2; color: #b8ac8f; }
 
+  /* ── Stage 3b ── */
+  .juku-choices { display: flex; flex-direction: column; gap: 10px; margin: 14px 0; }
+  .juku-choice { padding: 12px 16px; border-radius: 12px; border: 2px solid rgba(255,255,255,.25);
+    background: rgba(255,255,255,.06); color: inherit; font: inherit; text-align: left; }
+  .juku-choice.picked { border-color: currentColor; background: rgba(255,255,255,.16); }
+  .juku-play { margin: 6px 0 10px; padding: 8px 18px; border-radius: 999px;
+    border: 2px solid rgba(255,255,255,.3); background: rgba(255,255,255,.08);
+    color: inherit; font: inherit; }
+  .juku-passage { text-align: left; line-height: 1.75; padding: 12px 14px;
+    border-radius: 12px; background: rgba(255,255,255,.05); margin-bottom: 10px;
+    max-height: 34vh; overflow-y: auto; }
+  .juku-read-text { text-align: left; line-height: 1.7; margin-bottom: 8px; }
+  .juku-item-word { font-size: 1.6em; font-weight: 700; margin: 8px 0; }
+  .juku-item-def { line-height: 1.6; margin: 8px 0; }
+  .juku-item-q { opacity: .9; margin: 4px 0 8px; }
+  .juku-chip.letter { min-width: 2.1em; text-align: center; }
   @media (prefers-reduced-motion: reduce) {
     .live-dot, .jsp-cell.now { animation: none; }
   }
