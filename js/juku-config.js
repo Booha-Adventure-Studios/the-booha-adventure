@@ -21,7 +21,15 @@ window.JUKU_CONFIG = {
 
   // ── Content wiring ───────────────────────────────────────
   content: {
-    counts: { order: 8 },   // items per test
+    
+  counts: {
+      order: 8,          // sentence-order items
+      vocabMean: 8,      // vocab test: word→meaning items (rest are definition→word)
+      mixedRead: 2,      // mixed: read items sampled from juku.json
+      mixedTranslate: 2, // mixed: translate items sampled from juku.json
+      mixedWrite: 2,     // mixed: write (spelling) items sampled from juku.json
+      proveIt: 2         // mixed: re-asked items missed/wobbled earlier this session
+    },
 
     // Return the URL of the week's sentences JSON for a curriculum.
     // PLACEHOLDER — null activates demo mode (badged, never silent).
@@ -52,7 +60,29 @@ window.JUKU_CONFIG = {
                      sep:'september', oct:'october', nov:'november', dec:'december' };
       const m = String(cw.monthSlug).toLowerCase();
       const folder = FULL[m] || m;
+     
       return `content/${curr}/${folder}/sentences.json`;
+    },
+
+    // Generic sibling of sentencesUrl — same folder, any file.
+    contentUrl: function (curr, cw, file) {
+      const FULL = { jan:'january', feb:'february', mar:'march', apr:'april',
+                     may:'may', jun:'june', jul:'july', aug:'august',
+                     sep:'september', oct:'october', nov:'november', dec:'december' };
+      const m = String(cw.monthSlug).toLowerCase();
+      return `content/${curr}/${FULL[m] || m}/${file}`;
+    },
+
+    // Audio base — same URLs game-core.js builds; Juku records nothing new.
+    // type: 'vocab' | 'sentences'. Accepts monthSlug in either form.
+    audioBase: function (curr, cw, type) {
+      const AUDIO_ROOT = 'https://pub-8d5941f302df44b899ce9d9a4606dcb7.r2.dev/audio-2027';
+      const FOLDER = { pb: 'pre_boo', br: 'boo_riculum', bc: 'boo_continuum' };
+      const SHORT = { january:'jan', february:'feb', march:'mar', april:'apr',
+                      may:'may', june:'jun', july:'jul', august:'aug',
+                      september:'sep', october:'oct', november:'nov', december:'dec' };
+      const m = String(cw.monthSlug).toLowerCase();
+      return `${AUDIO_ROOT}/${SHORT[m] || m}/${FOLDER[curr]}/${type}/`;
     },
     
   },
