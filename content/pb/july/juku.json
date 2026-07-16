@@ -1,3 +1,4 @@
+
 {
   "curriculum": "pb",
   "month": "july",
@@ -103,9 +104,9 @@
           "en": "This is a story about a witch",
           "extra": ["wolf", "these"]
         },
-        { "n": 7, "type": "write", "jp": "城", "en": "castle" },
-        { "n": 8, "type": "write", "jp": "女王", "en": "queen" },
-        { "n": 9, "type": "write", "jp": "妖精", "en": "fairy" }
+        { "n": 7, "type": "write", "jp": "しろ", "en": "castle" },
+        { "n": 8, "type": "write", "jp": "じょおう", "en": "queen" },
+        { "n": 9, "type": "write", "jp": "ようせい", "en": "fairy" }
       ]
     },
     {
@@ -151,7 +152,7 @@
         { "n": 17, "def": "special words used to make magic happen", "pos": "noun" },
         { "n": 18, "def": "a long sharp weapon", "pos": "noun" },
         { "n": 19, "def": "something carried to protect your body", "pos": "noun" },
-        { "n": 20, "def": "valuable things such as gold or jewels", "pos": "noun" },
+        { "n": 20, "def": "special things like gold that people want to find", "pos": "noun" },
         { "n": 21, "def": "a picture that shows where places are", "pos": "noun" },
         { "n": 22, "def": "the part of a room or building that opens and closes", "pos": "noun" },
         { "n": 23, "def": "a small metal object used to open a lock", "pos": "noun" },
@@ -209,9 +210,9 @@
           "en": "Booha rides a horse",
           "extra": ["ride", "map"]
         },
-        { "n": 7, "type": "write", "jp": "剣", "en": "sword" },
-        { "n": 8, "type": "write", "jp": "地図", "en": "map" },
-        { "n": 9, "type": "write", "jp": "友達", "en": "friend" }
+        { "n": 7, "type": "write", "jp": "けん", "en": "sword" },
+        { "n": 8, "type": "write", "jp": "ちず", "en": "map" },
+        { "n": 9, "type": "write", "jp": "ともだち", "en": "friend" }
       ]
     },
     {
@@ -297,15 +298,15 @@
         {
           "n": 4,
           "type": "translate",
-          "jp": "その もんすたーは おおきくて つよいです。",
-          "en": "The monster is big and strong",
+          "jp": "その もんすたーは とても つよいです。",
+          "en": "The monster is very strong",
           "extra": ["small", "are"]
         },
         {
           "n": 5,
           "type": "translate",
-          "jp": "わたしの ともだちは ゆうかんで やさしいです。",
-          "en": "My friend is brave and kind",
+          "jp": "わたしの ともだちは とても やさしいです。",
+          "en": "My friend is very kind",
           "extra": ["angry", "are"]
         },
         {
@@ -315,9 +316,9 @@
           "en": "This room is dark",
           "extra": ["light", "these"]
         },
-        { "n": 7, "type": "write", "jp": "嬉しい", "en": "happy" },
-        { "n": 8, "type": "write", "jp": "勇敢な", "en": "brave" },
-        { "n": 9, "type": "write", "jp": "秘密", "en": "secret" }
+        { "n": 7, "type": "write", "jp": "うれしい", "en": "happy" },
+        { "n": 8, "type": "write", "jp": "ゆうかんな", "en": "brave" },
+        { "n": 9, "type": "write", "jp": "ひみつ", "en": "secret" }
       ]
     },
     {
@@ -362,7 +363,7 @@
         { "n": 46, "def": "one time", "pos": "adverb" },
         { "n": 47, "def": "on this day", "pos": "adverb" },
         { "n": 48, "def": "before all others", "pos": "adverb" },
-        { "n": 49, "def": "coming immediately after", "pos": "adverb" },
+        { "n": 49, "def": "coming right after", "pos": "adverb" },
         { "n": 50, "def": "after that", "pos": "adverb" },
         { "n": 51, "def": "later than something else", "pos": "preposition" },
         { "n": 52, "def": "coming after everything else", "pos": "adjective" },
@@ -372,7 +373,7 @@
         { "n": 56, "def": "to make something easier or better for someone", "pos": "verb" },
         { "n": 57, "def": "to try to hurt or defeat someone", "pos": "verb" },
         { "n": 58, "def": "to move quickly on your feet", "pos": "verb" },
-        { "n": 59, "def": "to discover or see something you were looking for", "pos": "verb" },
+        { "n": 59, "def": "to see something you were looking for", "pos": "verb" },
         { "n": 60, "def": "to finish a game or fight as the best side", "pos": "verb" }
       ],
       "questions": [
@@ -421,9 +422,9 @@
           "en": "Booha runs but Nuppi waits",
           "extra": ["and", "run"]
         },
-        { "n": 7, "type": "write", "jp": "今日", "en": "today" },
-        { "n": 8, "type": "write", "jp": "助ける", "en": "help" },
-        { "n": 9, "type": "write", "jp": "勝つ", "en": "win" }
+        { "n": 7, "type": "write", "jp": "きょう", "en": "today" },
+        { "n": 8, "type": "write", "jp": "たすける", "en": "help" },
+        { "n": 9, "type": "write", "jp": "かつ", "en": "win" }
       ]
     }
   ]
