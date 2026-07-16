@@ -44,13 +44,7 @@ window.JUKU_CONFIG = {
       return cards.filter(c => c && c.n >= lo && c.n <= hi);
     },
 
-    sentencesUrl: function (curr, cw) {
-      return `content/${curr}/${cw.monthSlug}/sentences.json`;
-    },
-
-    // Normalize one raw sentence entry to { n, en, jp }.
-    // Adjust if the JSON's field names differ.
-    sentencesUrl: function (curr, cw) {
+   sentencesUrl: function (curr, cw) {
       // week IDs use abbreviated months (jul); content folders use full
       // names (july). Accept either form from calendar.js.
       const FULL = { jan:'january', feb:'february', mar:'march', apr:'april',
