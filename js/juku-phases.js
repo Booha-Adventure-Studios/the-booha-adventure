@@ -126,9 +126,25 @@
       </div>`;
   }
 
+// ── Attendance ───────────────────────────────────────────
+  // Stamped on first lobby or live-phase entry — reaching the scheduled
+  // class environment is attendance, survey finished or not. Closed-state
+  // report finalization (JUKU_RESULTS.finalize) requires this evidence,
+  // so a student opening the app after class never mints a zero report.
+
+  function stampAttendance(slot) {
+    J.patchWeek(w => {
+      if (!w.attendance) {
+        w.attendance = { firstSeenAt: Date.now(), slot: slot.id,
+                         curriculum: slot.curriculum };
+      }
+    });
+  }
+
   // ── Screens ──────────────────────────────────────────────
 
   function renderMenu() {
+    
     const tk = J.tokyoNow();
     const buttons = CFG.slots.map(s => {
       const r = J.resolve(s, tk);
@@ -170,7 +186,8 @@
     wireBack();
   }
 
-  function renderLobby(res, slot) {
+function renderLobby(res, slot) {
+    stampAttendance(slot);
     const { week } = J.weekRecord();
     
     const submitted = week.survey && week.survey.submitted;
@@ -239,7 +256,9 @@
   }
 
   function renderPhase(res, slot) {
+    stampAttendance(slot);
     if (res.phase.kind === 'predict') { renderPredict(res, slot); return; }
+    
     root.innerHTML = `
       ${spineHTML(res.phaseIdx)}
       <div class="juku-panel">
@@ -250,7 +269,15 @@
    <div class="juku-task" id="juku-task">
         </div>
       </div>`;
+    
     const taskEl = document.getElementById('juku-task');
+    // Results is a phase renderer, not a test task — routed here, never
+    // through JUKU_TESTS. Dependency direction: engine → phases → tests
+    //                                                          → results.
+    if (res.phase.kind === 'results' && window.JUKU_RESULTS) {
+      window.JUKU_RESULTS.render(taskEl, res, slot);
+      return;
+    }
     if (!(window.JUKU_TESTS && window.JUKU_TESTS.render(taskEl, res, slot))) {
       taskEl.innerHTML = placeholderFor(res.phase);
     }
@@ -263,16 +290,19 @@
       case 'interval':
         return `<p class="juku-paper">☕ きゅうけい。せのび、みず、えんぴつ。<br><span class="en">Break time.</span></p>`;
         
-     case 'results':
-        return `<p class="juku-paper">🧾 （Stage 5：レポート）</p>`;
-      default: // window
+    default: // window
         
         return `<p class="juku-paper">✏️ （Stage 3：テスト）</p>`;
     }
   }
 
   function renderClosed(slot) {
+    // Report compute-if-null, gated on attendance evidence inside
+    // finalize() — the closed screen itself creates a week record just
+    // by existing, so the gate lives in the results file, not here.
+    if (window.JUKU_RESULTS) window.JUKU_RESULTS.finalize();
     root.innerHTML = `
+    
       ${exitX()}
       <div class="juku-panel">
         <img class="juku-crest" src="assets/img/juku-logo.png" alt="">
