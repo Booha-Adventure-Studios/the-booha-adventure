@@ -171,8 +171,8 @@
   }
 
   function renderLobby(res, slot) {
-    J.patchWeek(w => { if (!w.slot) w.slot = slot.id; });
     const { week } = J.weekRecord();
+    
     const submitted = week.survey && week.survey.submitted;
 
     root.innerHTML = `
@@ -262,11 +262,11 @@
         return `<p class="juku-paper">📖 めを あげて。<br><span class="en">Eyes up — reading round with Bryan.</span></p>`;
       case 'interval':
         return `<p class="juku-paper">☕ きゅうけい。せのび、みず、えんぴつ。<br><span class="en">Break time.</span></p>`;
-      case 'results':
+        
+     case 'results':
         return `<p class="juku-paper">🧾 （Stage 5：レポート）</p>`;
-      case 'broadcast':
-        return `<p class="juku-paper">🎧 （Stage 4：ディクテーション）</p>`;
       default: // window
+        
         return `<p class="juku-paper">✏️ （Stage 3：テスト）</p>`;
     }
   }
@@ -311,12 +311,16 @@
   }
 
   function onTick(res, slot) {
+    // Broadcast phases are clock-driven: the tests file derives the
+    // current item from this forward. Fires regardless of #juku-count.
+    if (window.JUKU_TESTS && window.JUKU_TESTS.tick) window.JUKU_TESTS.tick(res, slot);
     const c = document.getElementById('juku-count');
     if (!c) return;
     if (res.state === 'before' || res.state === 'lobby') c.textContent = fmt(res.secToStart);
     else if (res.state === 'phase') c.textContent = fmt(res.phaseRemainSec);
   }
 
+  
   window.addEventListener('juku:slotChosen', () => {
     onPhaseChange(J.slot ? J.resolve(J.slot, J.tokyoNow()) : { state: 'menu' }, J.slot);
   });
