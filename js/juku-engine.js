@@ -169,28 +169,39 @@
   // computed once in the results phase and then locked.
 
   function loadSave() {
-    try { return JSON.parse(localStorage.getItem(SAVE_KEY) || '{"weeks":{}}'); }
-    catch (e) { return { weeks: {} }; }
+    try {
+      const s = JSON.parse(localStorage.getItem(SAVE_KEY) || '{"v":1,"weeks":{}}');
+      if (!s.v) s.v = 1;
+      if (!s.weeks) s.weeks = {};
+      return s;
+    }
+    catch (e) { return { v: 1, weeks: {} }; }
   }
-
+  
   function writeSave(s) {
     try { localStorage.setItem(SAVE_KEY, JSON.stringify(s)); } catch (e) {}
   }
 
-  function weekRecord() {
+ function weekRecord() {
     // calendar.js is the week authority — never derive weeks here.
+    // Records key by week + slot: a shared tablet serving the 17:00 and
+    // 19:00 classes on the same day can never collide.
     const cw = window.CALENDAR.getCurrentCurriculumWeek();
+    const slotId = _slot ? _slot.id : 'noslot';
+    const key = `${cw.weekId}|${slotId}`;
     const s = loadSave();
-    if (!s.weeks[cw.weekId]) {
-      s.weeks[cw.weekId] = {
+    if (!s.weeks[key]) {
+      s.weeks[key] = {
         weekId: cw.weekId, monthSlug: cw.monthSlug, weekNumber: cw.weekNumber,
-        slot: null, survey: null, prediction: null,
+        slot: _slot ? _slot.id : null,
+        survey: null, prediction: null,
         sections: {}, behavioral: {}, report: null
       };
       writeSave(s);
     }
-    return { save: s, week: s.weeks[cw.weekId], weekId: cw.weekId };
+    return { save: s, week: s.weeks[key], weekId: cw.weekId };
   }
+  
 
   function patchWeek(fn) {
     const { save, week } = weekRecord();
