@@ -189,8 +189,7 @@
 function renderLobby(res, slot) {
     stampAttendance(slot);
     const { week } = J.weekRecord();
-    
-    const submitted = week.survey && week.survey.submitted;
+    if (week.survey && week.survey.submitted) { renderLobbyReady(res, slot); return; }
 
     root.innerHTML = `
       <div class="juku-panel">
@@ -203,11 +202,33 @@ function renderLobby(res, slot) {
         <div class="juku-survey" id="juku-survey"></div>
       </div>`;
 
-    const box = document.getElementById('juku-survey');
-    if (submitted) renderSurveyDone(box);
-    else renderSurveyOpen(box, week);
+    renderSurveyOpen(document.getElementById('juku-survey'), week);
   }
 
+  // Ghost waiting room: check-in done, the big confirmation box has said
+  // its piece. Timer stays (the class is clock-governed) but demoted —
+  // it now answers "when do we begin?", not "how long do I have?".
+  function renderLobbyReady(res, slot) {
+    root.innerHTML = `
+      <div class="juku-panel">
+        <p class="juku-sub">${slot.label}</p>
+        <div class="juku-count" id="juku-count">${fmt(res.secToStart)}</div>
+        <div class="juku-ghost-room" id="juku-ghost-room"></div>
+        <button class="juku-edit" id="juku-survey-edit">えらびなおす</button>
+      </div>`;
+    if (window.JUKU_GHOSTS) {
+      window.JUKU_GHOSTS.mount(document.getElementById('juku-ghost-room'),
+                               { name: true });
+    }
+    document.getElementById('juku-survey-edit').addEventListener('click', () => {
+      if (window.JUKU_GHOSTS) window.JUKU_GHOSTS.unmount();
+      J.patchWeek(w => { if (w.survey) w.survey.submitted = false; });
+      renderLobby(J.resolve(J.slot, J.tokyoNow()), slot);
+    });
+  }
+
+
+  
   function renderSurveyOpen(box, week) {
     box.innerHTML = `
       ${questionsHTML(SURVEY_QS, week.survey)}
@@ -218,29 +239,19 @@ function renderLobby(res, slot) {
       const { week: w2 } = J.weekRecord();
       submitBtn.classList.toggle('off', !allAnswered(SURVEY_QS, w2.survey));
     });
-    submitBtn.addEventListener('click', () => {
+    
+   submitBtn.addEventListener('click', () => {
       const { week: w2 } = J.weekRecord();
       if (!allAnswered(SURVEY_QS, w2.survey)) return;
       J.patchWeek(w => { w.survey.submitted = true; });
-      renderSurveyDone(box);
+      renderLobbyReady(J.resolve(J.slot, J.tokyoNow()), J.slot);
     });
-  }
-
-  function renderSurveyDone(box) {
-    box.innerHTML = `
-      <div class="juku-done">
-        <p class="juku-done-jp">✓ うけつけ OK！</p>
-        <p class="en">Check-in complete</p>
-        <button class="juku-edit" id="juku-survey-edit">えらびなおす</button>
-      </div>`;
-    document.getElementById('juku-survey-edit').addEventListener('click', () => {
-      J.patchWeek(w => { if (w.survey) w.survey.submitted = false; });
-      const { week } = J.weekRecord();
-      renderSurveyOpen(box, week);
-    });
+    
   }
 
   function renderPredict(res, slot) {
+
+    
     const { week } = J.weekRecord();
     root.innerHTML = `
       ${spineHTML(res.phaseIdx)}
@@ -278,11 +289,17 @@ function renderLobby(res, slot) {
       window.JUKU_RESULTS.render(taskEl, res, slot);
       return;
     }
+    
     if (!(window.JUKU_TESTS && window.JUKU_TESTS.render(taskEl, res, slot))) {
       taskEl.innerHTML = placeholderFor(res.phase);
+      // Interval is a sanctioned waiting state — ghosts allowed.
+      if (res.phase.kind === 'interval' && window.JUKU_GHOSTS) {
+        window.JUKU_GHOSTS.mount(taskEl, { name: false });
+      }
     }
   }
 
+  
   function placeholderFor(p) {
     switch (p.kind) {
       case 'paper':
@@ -333,7 +350,9 @@ function renderLobby(res, slot) {
   // ── Engine hookup ────────────────────────────────────────
 
   function onPhaseChange(res, slot) {
+    if (window.JUKU_GHOSTS) window.JUKU_GHOSTS.unmount();
     if (!slot)                    { renderMenu(); return; }
+    
     if (res.state === 'before')   { renderBefore(res, slot); return; }
     if (res.state === 'lobby')    { renderLobby(res, slot); return; }
     if (res.state === 'closed')   { renderClosed(slot); return; }
