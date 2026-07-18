@@ -31,6 +31,20 @@ window.JUKU_CONFIG = {
       proveIt: 2         // mixed: re-asked items missed/wobbled earlier this session
     },
 
+    // Dictation (Stage 4) — broadcast schedule. All devices derive the
+    // current item from phaseElapsedSec against this table; nothing is
+    // counted, only read. Budget: 15×20 + 10 + 12×45 = 850s of 900.
+    dictation: {
+      words: 15,         // word-tier items (all weekly vocab cards)
+      wordSec: 20,       // answer window per word
+      sentences: 12,     // sentence-tier items (weekId-seeded pick of 15)
+      sentenceSec: 45,   // answer window per sentence
+      transitionSec: 10, // tier-change splash between word and sentence
+      // sentence-tier word-bank decoys, drawn from the week's OTHER
+      // sentence cards (seeded). pb gets a clean bank.
+      distractors: { pb: 0, br: 3, bc: 3 }
+    },
+
     // Return the URL of the week's sentences JSON for a curriculum.
     // PLACEHOLDER — null activates demo mode (badged, never silent).
     // Example once the real scheme is known:
