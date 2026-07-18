@@ -363,9 +363,10 @@
   // ── Generic construction item (words or letters) ─────────
   // Lock enables at TARGET length (bank may hold distractors).
 
-  function showBuildItem(taskEl, opts, onLock) {
+ function showBuildItem(taskEl, opts, onLock) {
     const shownAt = performance.now();
     let firstMs = null, changes = 0, answer = [];
+    let plays = 0, playing = false, committed = false, audio = null;
     const bank = opts.bank;
     const chipCls = opts.letter ? 'juku-chip letter' : 'juku-chip';
 
@@ -376,7 +377,9 @@
       ${opts.demo ? '<div class="juku-demo-badge">DEMO</div>' : ''}
       <p class="juku-item-count">もんだい ${opts.idx + 1} / ${opts.count}</p>
       ${opts.promptHtml}
+      ${opts.audioUrl ? '<button class="juku-play" id="jt-play">🔊 きく</button>' : ''}
       <div class="juku-answer" id="jt-answer"></div>
+      
       <div class="juku-bank" id="jt-bank">${bankChips}</div>
       <div class="juku-test-actions">
         <button class="juku-clear" id="jt-clear">やりなおす</button>
@@ -418,7 +421,7 @@
       });
     });
 
-    taskEl.querySelector('#jt-clear').addEventListener('click', () => {
+  taskEl.querySelector('#jt-clear').addEventListener('click', () => {
       if (!answer.length) return;
       changes += answer.length;
       answer = [];
@@ -426,22 +429,54 @@
       repaintAnswer(); syncLock();
     });
 
-    lockBtn.addEventListener('click', () => {
-      if (answer.length !== opts.target.length) return;
+    // Serialized playback: a tap while the clip is playing is ignored —
+    // replays never overlap or cut each other off. plays counts real starts.
+    function playAudio() {
+      if (!audio || playing) return;
+      playing = true;
+      audio.currentTime = 0;
+      audio.play().then(() => { plays++; }).catch(() => { playing = false; });
+    }
+
+    if (opts.audioUrl) {
+      audio = new Audio(opts.audioUrl);
+      audio.preload = 'auto';
+      audio.addEventListener('ended', () => { playing = false; });
+      taskEl.querySelector('#jt-play').addEventListener('click', playAudio);
+      // Autoplay may be blocked before any gesture; the button is the
+      // guaranteed path.
+      if (opts.autoplay) playAudio();
+    }
+
+    // commit(force): force=false is これで OK！ (complete answers only);
+    // force=true is the broadcast clock (commits whatever is placed).
+    // committed guard: a clock force-commit and a lock tap in the same
+    // segment can never write twice.
+    function commit(force) {
+      if (committed) return;
+      if (!force && answer.length !== opts.target.length) return;
+      committed = true;
       const seq = answer.map(k => bank[k]);
-      const ok = seq.every((u, i) => u === opts.target[i]);
+      const ok = seq.length === opts.target.length &&
+                 seq.every((u, i) => u === opts.target[i]);
       onLock({
         ans: seq.join(opts.letter ? '' : ' '),
         ok,
         firstMs,
         ms: Math.round(performance.now() - shownAt),
-        chg: changes
+        chg: changes,
+        plays,
+        forced: !!force
       });
-    });
+    }
+
+    lockBtn.addEventListener('click', () => { commit(false); });
 
     repaintAnswer(); syncLock();
+    return { commit };
   }
 
+  
   function renderTestDone(taskEl, demo) {
     taskEl.innerHTML = `
       ${demo ? '<div class="juku-demo-badge">DEMO</div>' : ''}
@@ -680,8 +715,193 @@
       }
       showChoiceItem(taskEl,
         Object.assign({ promptHtml: prompt, audioUrl, choices }, common),
-        r => save(item.kind === 'proveDef' ? 'def' : 'mean',
+
+                     
+       r => save(item.kind === 'proveDef' ? 'def' : 'mean',
                   card.n, { proveIt: true }, r));
+    }
+  }
+
+  // ═══ Stage 4 — Listening Dictation (broadcast) ═══════════
+  // The wall clock is the invigilator. Every device derives the current
+  // segment from phaseElapsedSec against a schedule built from config +
+  // the week's actual cards — same data, same weekId seed, same table on
+  // every device. JUKU_TESTS.tick drives all rendering after load; the
+  // render call only prepares state. A refresh lands on whatever segment
+  // the clock says is current. Section completeness is decided by the
+  // phase ending — NEVER by items.length (missed segments stay unwritten
+  // and score as zeros in Stage 5).
+
+  let _dict = null;   // { schedule, sentAll, demo, seed, slotRef, taskEl, seg, ctrl }
+
+  function dictUsable(pack) {
+    // A dictation item without audio is broken — filter, except in demo
+    // mode where the text itself stands in for the missing clip.
+    return pack.demo ? pack.items.slice() : pack.items.filter(c => c && c.mp3);
+  }
+
+  async function buildDictSchedule(slot) {
+    const D = CFG.content.dictation;
+    const cw = window.CALENDAR.getCurrentCurriculumWeek();
+    const seed = `${cw.weekId}|dict`;
+
+    const [vocab, sent] = await Promise.all([
+      getCards(slot.curriculum, 'vocab.json', DEMO_VOCAB),
+      getSentences(slot.curriculum)
+    ]);
+    const wordsAll = dictUsable(vocab);
+    const sentAll = dictUsable(sent);
+
+    const wordPick = J.seededShuffle(wordsAll, seed + '|w')
+      .slice(0, Math.min(D.words, wordsAll.length));
+    const sentPick = J.seededShuffle(sentAll, seed + '|s')
+      .slice(0, Math.min(D.sentences, sentAll.length));
+
+    const schedule = [];
+    let t = 0;
+    wordPick.forEach(card => {
+      schedule.push({ tier: 'word', card, start: t, dur: D.wordSec });
+      t += D.wordSec;
+    });
+    schedule.push({ tier: 'trans', start: t, dur: D.transitionSec });
+    t += D.transitionSec;
+    sentPick.forEach(card => {
+      schedule.push({ tier: 'sent', card, start: t, dur: D.sentenceSec });
+      t += D.sentenceSec;
+    });
+
+    return { schedule, sentAll, seed,
+             demo: vocab.demo || sent.demo,
+             itemTotal: wordPick.length + sentPick.length };
+  }
+
+  function dictSegAt(schedule, elapsedSec) {
+    for (let i = 0; i < schedule.length; i++) {
+      if (elapsedSec < schedule[i].start + schedule[i].dur) return i;
+    }
+    return schedule.length;   // past the last window → done screen
+  }
+
+  async function renderDictation(taskEl, res, slot) {
+    taskEl.innerHTML = `<p class="juku-paper">よみこみちゅう…</p>`;
+    _dict = null;
+    const built = await buildDictSchedule(slot);
+
+    J.patchWeek(w => {
+      if (!w.sections.dictation) {
+        w.sections.dictation = { total: built.itemTotal, items: [],
+                                 startedAt: Date.now(), demo: built.demo };
+      }
+    });
+
+    _dict = { schedule: built.schedule, sentAll: built.sentAll,
+              demo: built.demo, seed: built.seed,
+              slotRef: slot, taskEl, seg: -1, ctrl: null };
+    // First paint happens on the next engine tick (≤1s). The clock, not
+    // this call, decides which segment is current — load and refresh are
+    // the same path.
+  }
+
+  function dictRenderLocked(taskEl, demo) {
+    taskEl.innerHTML = `
+      ${demo ? '<div class="juku-demo-badge">DEMO</div>' : ''}
+      <div class="juku-done">
+        <p class="juku-done-jp">✓ ロック OK！</p>
+        <p class="en">Locked in.</p>
+        <p class="juku-sub2">とけいが すすむまで まっててね。</p>
+      </div>`;
+  }
+
+  function dictRenderSeg(segIdx) {
+    const d = _dict;
+    d.seg = segIdx;
+    d.ctrl = null;
+    const taskEl = d.taskEl;
+
+    if (segIdx >= d.schedule.length) { renderTestDone(taskEl, d.demo); return; }
+    const seg = d.schedule[segIdx];
+
+    if (seg.tier === 'trans') {
+      taskEl.innerHTML = `
+        ${d.demo ? '<div class="juku-demo-badge">DEMO</div>' : ''}
+        <div class="juku-done">
+          <p class="juku-done-jp">つぎは ぶんしょう！</p>
+          <p class="en">Sentences next.</p>
+        </div>`;
+      return;
+    }
+
+    const { week } = J.weekRecord();
+    if (week.sections.dictation.items.some(it => it.seg === segIdx)) {
+      dictRenderLocked(taskEl, d.demo);   // early lock → wait for the clock
+      return;
+    }
+
+    const card = seg.card;
+    const curr = d.slotRef.curriculum;
+    const tierSegs = d.schedule.filter(s => s.tier === seg.tier);
+    const ord = tierSegs.indexOf(seg);
+    const audioUrl = cardAudio(curr, seg.tier === 'word' ? 'vocab' : 'sentences', card);
+    let target, bankArr;
+
+    if (seg.tier === 'word') {
+      target = String(card.en).toLowerCase().split('');
+      const decoys = J.seededShuffle(
+        'abcdefghijklmnopqrstuvwxyz'.split('').filter(l => !target.includes(l)),
+        `${d.seed}|wd|${card.n}`).slice(0, 3);
+      bankArr = J.seededShuffle(target.concat(decoys), `${d.seed}|wd|${card.n}|b`);
+    } else {
+      target = words(card.en);
+      const nDis = (CFG.content.dictation.distractors || {})[curr] || 0;
+      const poolWords = [];
+      d.sentAll.forEach(c => {
+        if (c.n === card.n) return;
+        words(c.en).forEach(w => {
+          if (!target.includes(w) && !poolWords.includes(w)) poolWords.push(w);
+        });
+      });
+      const dis = J.seededShuffle(poolWords, `${d.seed}|sd|${card.n}`).slice(0, nDis);
+      bankArr = J.seededShuffle(target.concat(dis), `${d.seed}|sd|${card.n}|b`);
+    }
+
+    // Audio-only prompt — no Japanese, no English. Demo mode (no clip)
+    // shows the text so the flow stays testable.
+    const prompt = `
+      <p class="juku-dict-ear">🎧</p>
+      ${audioUrl ? '' : `<p class="juku-item-word">${card.en}</p>`}
+      <p class="juku-answer-hint">${seg.tier === 'word'
+        ? 'きいて、もじで つくろう' : 'きいて、ことばで ならべよう'}</p>
+      <p class="juku-dict-remain" id="jd-remain"></p>`;
+
+    d.ctrl = showBuildItem(taskEl, {
+      count: tierSegs.length, idx: ord, demo: d.demo,
+      promptHtml: prompt, audioUrl, autoplay: true,
+      target, bank: bankArr, letter: seg.tier === 'word'
+    }, r => {
+      J.patchWeek(w => {
+        if (w.sections.dictation.items.some(it => it.seg === segIdx)) return;
+        w.sections.dictation.items.push(Object.assign(
+          { seg: segIdx, tier: seg.tier, n: card.n, at: Date.now() }, r));
+      });
+      d.ctrl = null;
+      dictRenderLocked(taskEl, d.demo);
+    });
+  }
+
+  function dictTick(res) {
+    if (!_dict) return;
+    const segIdx = dictSegAt(_dict.schedule, res.phaseElapsedSec);
+    if (segIdx !== _dict.seg) {
+      // Window closed: force-commit whatever is placed (empty counts),
+      // then render what the clock says is current.
+      if (_dict.ctrl) { _dict.ctrl.commit(true); _dict.ctrl = null; }
+      dictRenderSeg(segIdx);
+    }
+    const r = document.getElementById('jd-remain');
+    if (r && segIdx < _dict.schedule.length) {
+      const s = _dict.schedule[segIdx];
+      const left = Math.max(0, Math.ceil(s.start + s.dur - res.phaseElapsedSec));
+      r.textContent = `のこり ${left} びょう`;
     }
   }
 
@@ -692,14 +912,18 @@
   window.JUKU_TESTS = {
     render(taskEl, res, slot) {
       switch (res.phase.id) {
-          
+        case 'dictation': renderDictation(taskEl, res, slot); return true;
         case 'order': renderOrder(taskEl, res, slot); return true;
         case 'vocab': renderVocab(taskEl, res, slot); return true;
         case 'mixed': renderMixed(taskEl, res, slot); return true;
-        // Stage 4: 'dictation'
         default: return false;
-          
       }
+    },
+    // Driven every second by juku-phases.js. Broadcast phases live here;
+    // leaving the phase clears state.
+    tick(res, slot) {
+      if (res.state === 'phase' && res.phase.id === 'dictation') dictTick(res);
+      else if (_dict) _dict = null;
     }
   };
 
