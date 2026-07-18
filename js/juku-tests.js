@@ -626,19 +626,28 @@
     taskEl.innerHTML = `<p class="juku-paper">よみこみちゅう…</p>`;
     const cw = window.CALENDAR.getCurrentCurriculumWeek();
     const base = `${J.studentSeedBase()}|${cw.weekId}|mixed`;
-    const items = await buildMixedItems(slot);
-    const demo = items.some(it => it.demo);
+    
+  const items = await buildMixedItems(slot);
+    // Prove-it is remediation, not assessment: it lives outside the
+    // section score. total = scored items only; proveTotal frozen here
+    // (report time can't know how many unanswered tail items were
+    // prove-it). demo describes only the scored questions — a demo
+    // prove-it item must not contaminate a real section.
+    const scored = items.filter(it => !String(it.kind).startsWith('prove'));
+    const demo = scored.some(it => it.demo);
 
     J.patchWeek(w => {
       if (!w.sections.mixed) {
-        w.sections.mixed = { total: items.length, items: [], startedAt: Date.now(), demo };
+        w.sections.mixed = { total: scored.length, proveTotal: items.length - scored.length,
+                             items: [], startedAt: Date.now(), demo };
       }
     });
 
     const { week } = J.weekRecord();
-    const done = week.sections.mixed.items.length;
+    const done = week.sections.mixed.items.length;   // all committed, incl. prove-it
     if (done >= items.length) { renderTestDone(taskEl, demo); return; }
     showMixedItem(taskEl, items, done, slot, base);
+    
   }
 
   function showMixedItem(taskEl, items, idx, slot, base) {
