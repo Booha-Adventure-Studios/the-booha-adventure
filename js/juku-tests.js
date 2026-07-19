@@ -202,7 +202,7 @@
         <p class="en">All locked in.</p>
         <p class="juku-sub2">つぎの じかんまで まっててね。</p>
       </div>`;
-    if (window.JUKU_GHOSTS) window.JUKU_GHOSTS.mount(taskEl, { name: false });
+    if (window.JUKU_GHOSTS) window.JUKU_GHOSTS.mount(taskEl, { name: false, venue: 'order' });
   }
 
  // ═══ Stage 3b — Vocab & Meaning, Mixed Weekly Check ══════
@@ -486,7 +486,7 @@
         <p class="en">All locked in.</p>
         <p class="juku-sub2">つぎの じかんまで まっててね。</p>
       </div>`;
-    if (window.JUKU_GHOSTS) window.JUKU_GHOSTS.mount(taskEl, { name: false });
+    if (window.JUKU_GHOSTS) window.JUKU_GHOSTS.mount(taskEl, { name: false, venue: 'done' });
   }
 
   // ── Vocab & Meaning Test ─────────────────────────────────
