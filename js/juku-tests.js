@@ -202,6 +202,7 @@
         <p class="en">All locked in.</p>
         <p class="juku-sub2">つぎの じかんまで まっててね。</p>
       </div>`;
+    if (window.JUKU_GHOSTS) window.JUKU_GHOSTS.mount(taskEl, { name: false });
   }
 
  // ═══ Stage 3b — Vocab & Meaning, Mixed Weekly Check ══════
@@ -477,7 +478,7 @@
   }
 
   
-  function renderTestDone(taskEl, demo) {
+ function renderTestDone(taskEl, demo) {
     taskEl.innerHTML = `
       ${demo ? '<div class="juku-demo-badge">DEMO</div>' : ''}
       <div class="juku-done">
@@ -485,6 +486,7 @@
         <p class="en">All locked in.</p>
         <p class="juku-sub2">つぎの じかんまで まっててね。</p>
       </div>`;
+    if (window.JUKU_GHOSTS) window.JUKU_GHOSTS.mount(taskEl, { name: false });
   }
 
   // ── Vocab & Meaning Test ─────────────────────────────────
@@ -823,6 +825,7 @@
 
   function dictRenderSeg(segIdx) {
     const d = _dict;
+    if (window.JUKU_GHOSTS) window.JUKU_GHOSTS.unmount();
     d.seg = segIdx;
     d.ctrl = null;
     const taskEl = d.taskEl;
