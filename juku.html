@@ -32,11 +32,13 @@
     box-sizing: border-box;
   }
 
-  .juku-panel {
+.juku-panel {
     max-width: 560px;
     width: 100%;
     text-align: center;
     padding: 24px 18px;
+    position: relative;
+    z-index: 10;
   }
 
   .juku-crest { width: min(34vw, 150px); height: auto; margin-bottom: 14px; }
@@ -134,12 +136,15 @@
   }
   .juku-submit:active { transform: scale(.96); }
   .juku-submit.off { opacity: .3; pointer-events: none; }
+  
   .juku-done {
-    text-align: center; margin-top: 8px; padding: 18px;
+    text-align: center; margin-top: 8px; padding: 10px 14px;
     border: 1px solid rgba(185,217,119,.4); border-radius: 14px;
     background: rgba(185,217,119,.06);
+    display: inline-block;
   }
-  .juku-done-jp { font-size: 19px; font-weight: 800; color: #b9d977; margin: 0 0 2px; }
+  .juku-done-jp { font-size: 16px; font-weight: 800; color: #b9d977; margin: 0 0 2px; }
+  
   .juku-edit {
     appearance: none; cursor: pointer; margin-top: 12px;
     background: transparent; border: 1px solid #4a4030; color: #8a8069;
