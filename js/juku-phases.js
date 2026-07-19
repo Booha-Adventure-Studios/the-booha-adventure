@@ -218,7 +218,7 @@ function renderLobby(res, slot) {
       </div>`;
     if (window.JUKU_GHOSTS) {
       window.JUKU_GHOSTS.mount(document.getElementById('juku-ghost-room'),
-                               { name: true });
+                               { name: true, venue: 'lobby' });
     }
     document.getElementById('juku-survey-edit').addEventListener('click', () => {
       if (window.JUKU_GHOSTS) window.JUKU_GHOSTS.unmount();
@@ -294,7 +294,7 @@ function renderLobby(res, slot) {
       taskEl.innerHTML = placeholderFor(res.phase);
       // Interval is a sanctioned waiting state — ghosts allowed.
       if (res.phase.kind === 'interval' && window.JUKU_GHOSTS) {
-        window.JUKU_GHOSTS.mount(taskEl, { name: false });
+        window.JUKU_GHOSTS.mount(taskEl, { name: false, venue: 'interval' });
       }
     }
   }
