@@ -1080,10 +1080,16 @@
       </div>
     </div>
     
-    <div id="dcStamp" class="dcStamp" aria-hidden="true"></div>
+   <div id="dcStamp" class="dcStamp" aria-hidden="true"></div>
     <div class="startBtns">
-      <button id="dailyCheckBtn" class="btn" type="button">デイリーチェック</button>
-      <button id="startBtn" class="btn btnGhost" type="button">あとで</button>
+      <div class="btnGroup">
+        <div class="btnLabel">デイリーチェック<span>Daily Check</span></div>
+        <button id="dailyCheckBtn" class="btn btnGold" type="button">スタート</button>
+      </div>
+      <div class="btnGroup">
+        <div class="btnLabel muted">あとで<span>Continue anyway</span></div>
+        <button id="startBtn" class="btn btnGhost" type="button">つづける</button>
+      </div>
     </div>
     
   </section>
@@ -1169,8 +1175,13 @@
 </a>
 <style>
 
-.startBtns{display:flex;flex-direction:column;gap:12px;align-items:center;}
-.btnGhost{background:transparent;border:1.5px solid rgba(255,255,255,.4);box-shadow:none;color:var(--muted);font-weight:700;}
+.startBtns{display:flex;flex-direction:column;gap:26px;align-items:center;}
+.btnGroup{display:flex;flex-direction:column;align-items:center;gap:8px;}
+.btnLabel{font-weight:800;font-size:1.05rem;letter-spacing:.02em;line-height:1.25;text-align:center;color:var(--text);}
+.btnLabel span{display:block;font-size:.72rem;font-weight:600;letter-spacing:.06em;color:var(--muted);text-transform:uppercase;margin-top:2px;}
+.btnLabel.muted{color:var(--muted);}
+.btnGold{background:linear-gradient(135deg,#f5c451,#e0a32e);color:#2a1c00;box-shadow:0 8px 24px rgba(224,163,46,.45);}
+.btnGhost{background:transparent;border:1.5px solid rgba(255,59,189,.55);box-shadow:none;color:var(--pink2);font-weight:700;}
 .dcStamp{min-height:1.4em;margin-bottom:10px;font-weight:800;color:var(--pink2);opacity:0;transition:opacity .3s;}
 .dcStamp.show{opacity:1;}
 
