@@ -572,6 +572,37 @@ window.BoohaDailyCheck = (function () {
     stepCurriculum();
   }
 
+  /* Parent-facing weekly summary. Week identity (Sun–Sat) comes from CALENDAR;
+     we only enumerate the 7 days inside that boundary — no week arithmetic.
+     Returns: { days:[{key,st,isToday,isFuture}], doneCount, total:7,
+                accuracy:<0-100|null>, streak } */
+  function weekSummary() {
+    const cw = CALENDAR.getCurrentCurriculumWeek();
+    const today = todayKey();
+    const meta = _meta();
+    const log = meta.checkIn || {};
+    // Step 7 days from CALENDAR's weekStart, UTC-safe (mirrors calendar.js).
+    const start = new Date(cw.weekStart + 'T00:00:00Z');
+    const days = [];
+    let doneCount = 0, pctSum = 0, pctN = 0;
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(start); d.setUTCDate(d.getUTCDate() + i);
+      const key = d.toISOString().slice(0, 10);
+      const rec = log[key] || null;
+      const st = rec ? rec.st : null;
+      if (st === 'done') {
+        doneCount++;
+        if (typeof rec.pct === 'number') { pctSum += rec.pct; pctN++; }
+      }
+      days.push({ key, st, isToday: key === today, isFuture: today ? key > today : false });
+    }
+    return {
+      days, doneCount, total: 7,
+      accuracy: pctN ? Math.round(pctSum / pctN) : null,
+      streak: streak()
+    };
+  }
+
   /* ── Public surface ──────────────────────────────────────────────────── */
   return {
     // state
@@ -580,7 +611,7 @@ window.BoohaDailyCheck = (function () {
     markDone: (pct, curr) => write('done', pct, curr),
     markSkip: (curr) => write('skip', null, curr),
     // content
-    loadContent, buildDay, weekInfo, audioUrl,
+    loadContent, buildDay, weekInfo, audioUrl, weekSummary,
     // runner
     run,
     // constants
