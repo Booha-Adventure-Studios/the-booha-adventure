@@ -55,6 +55,25 @@
       -webkit-font-smoothing: antialiased;
     }
 
+
+  .dc-wk{margin:6px 0 4px;}
+    .dc-row{display:flex;justify-content:space-between;gap:4px;margin-bottom:14px;}
+    .dc-day{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;}
+    .dc-dow{font-size:11px;color:#7a603a;font-weight:700;}
+    .dc-dot{width:26px;height:26px;border-radius:50%;border:2px dashed rgba(58,44,26,.4);
+      display:flex;align-items:center;justify-content:center;font-size:13px;color:#8a7048;}
+    .dc-dot.done{border:3px double #2e7d4f;color:#1f5c39;background:radial-gradient(circle at 50% 42%,rgba(64,150,98,.30),rgba(64,150,98,.07) 70%);}
+    .dc-dot.skip{border-style:solid;border-color:rgba(58,44,26,.35);color:#b09068;}
+    .dc-dot.future{opacity:.35;}
+    .dc-dot.today{box-shadow:0 0 0 2px #b8892f;}
+    .dc-stats{display:flex;gap:10px;justify-content:center;}
+    .dc-stat{flex:1;max-width:120px;text-align:center;padding:8px 6px;border:1px solid #4a3820;border-radius:8px;}
+    .dc-stat b{display:block;font-size:22px;color:#3a2c1a;line-height:1;}
+    .dc-stat .lab{font-size:10px;color:#7a603a;letter-spacing:1px;margin-top:4px;font-weight:700;}
+    .dc-empty{color:#7a603a;font-size:14px;padding:6px 0 14px;}
+
+
+    
     /* ── Close button (back to hub) ── */
     #alog-close {
       position: fixed; top: calc(10px + env(safe-area-inset-top, 0px));
@@ -301,7 +320,12 @@
     <div class="plate-en">THE BOOHA ADVENTURE — RECORD OF DEEDS</div>
   </div>
 
-  <div class="paper">
+ <div class="paper">
+    <div class="ink-head">
+      <span class="jp">まいにちチェック</span><span class="en">DAILY CHECK</span>
+    </div>
+    <div id="dc-week"></div>
+
     <div class="ink-head">
       <span class="jp">こんしゅう</span><span class="en">THIS WEEK</span>
     </div>
@@ -329,6 +353,44 @@
 <script src="./js/core/save-file.js"></script>
 <script src="./js/core/game-registry.js"></script>
 <script src="./js/core/day-record.js"></script>
+  
 <script src="./js/ui/adventure-log.js"></script>
+<script src="./js/daily-check.js"></script>
+<script>
+  (function () {
+    var host = document.getElementById('dc-week');
+    if (!host || !window.BoohaDailyCheck) return;
+    var DOW = ['日','月','火','水','木','金','土'];
+    var s;
+    try { s = BoohaDailyCheck.weekSummary(); } catch (e) { return; }
+
+    var row = document.createElement('div'); row.className = 'dc-row';
+    s.days.forEach(function (d, i) {
+      var cell = document.createElement('div'); cell.className = 'dc-day';
+      var dow = document.createElement('div'); dow.className = 'dc-dow'; dow.textContent = DOW[i];
+      var dot = document.createElement('div'); dot.className = 'dc-dot';
+      if (d.st === 'done') { dot.classList.add('done'); dot.textContent = '✓'; }
+      else if (d.st === 'skip') { dot.classList.add('skip'); dot.textContent = '·'; }
+      else if (d.isFuture) { dot.classList.add('future'); }
+      if (d.isToday) dot.classList.add('today');
+      cell.appendChild(dow); cell.appendChild(dot); row.appendChild(cell);
+    });
+
+    var stats = document.createElement('div'); stats.className = 'dc-stats';
+    function stat(value, label) {
+      var box = document.createElement('div'); box.className = 'dc-stat';
+      var b = document.createElement('b'); b.textContent = value;
+      var l = document.createElement('div'); l.className = 'lab'; l.textContent = label;
+      box.appendChild(b); box.appendChild(l); return box;
+    }
+    stats.appendChild(stat(s.doneCount + '/' + s.total, 'こんしゅう'));
+    stats.appendChild(stat('🔥 ' + s.streak, 'れんぞく'));
+    stats.appendChild(stat(s.accuracy == null ? '—' : s.accuracy + '%', 'せいかいりつ'));
+
+    host.appendChild(row);
+    host.appendChild(stats);
+  })();
+</script>
 </body>
+  
 </html>
