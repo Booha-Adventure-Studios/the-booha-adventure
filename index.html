@@ -1738,22 +1738,27 @@ const introVideo = document.getElementById('introVideo');
 const ghostWrap  = document.querySelector('.ghostWrap');
 const dailyCheckBtn = document.getElementById('dailyCheckBtn');
 
-/* Daily check-in (optional homework). onDone → straight to hub (skip video). */
-if (window.BoohaDailyCheck) {
+/* Daily check-in (optional homework). The handler attaches now, but the module
+   and save layer finish loading later in the body — so we check at click time,
+   by which point they're ready. */
+if (dailyCheckBtn) dailyCheckBtn.addEventListener('click', () => {
+  if (started) return;
+  if (!window.BoohaDailyCheck) return;
+  BoohaDailyCheck.run({
+    onDone: () => { try { jumpToHub(); } catch (e) { showScene(hubScene); } },
+    onSkip: () => {}   // stay on the start scene; they can tap あとで
+  });
+});
+
+/* Done-state stamp — deferred to window load so the module + save are ready. */
+window.addEventListener('load', () => {
   try {
-    if (BoohaDailyCheck.isDoneToday()) {
+    if (window.BoohaDailyCheck && BoohaDailyCheck.isDoneToday()) {
       const stamp = document.getElementById('dcStamp');
       if (stamp) { stamp.textContent = '✓ ' + BoohaDailyCheck.streak() + '日'; stamp.classList.add('show'); }
     }
   } catch (e) {}
-
-  if (dailyCheckBtn) dailyCheckBtn.addEventListener('click', () => {
-    if (started) return;
-    BoohaDailyCheck.run({
-      onDone: () => { try { jumpToHub(); } catch (e) { showScene(hubScene); } },
-      onSkip: () => {}   // stay on the start scene; they can tap あとで
-    });
-  });
+});
 }
 
 let started = false, fadingOut = false;
