@@ -1,6 +1,6 @@
 
 <!doctype html>
-<html lang="en">
+<html lang="en" class="scene-start">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -65,6 +65,9 @@
 
     *, *::before, *::after { box-sizing: border-box; }
 
+    html.scene-start #alog-icon-btn,
+    html.scene-start #juku-icon-btn { display: none !important; }
+    
     html, body {
       height: 100%;
       margin: 0;
@@ -1485,6 +1488,9 @@ if (window.visualViewport) {
 function showScene(el) {
   [startScene, videoScene, hubScene].forEach(s => s.classList.remove('active'));
   el.classList.add('active');
+  document.documentElement.classList.toggle('scene-start', el === startScene);
+
+  
   if (el === hubScene) hubScene.scrollTop = 0;
   checkOrientation();
 }
@@ -1837,7 +1843,9 @@ function jumpToHub() {
   closePicker();
   ghostWrap.classList.remove('flyAway');
   [startScene, videoScene, hubScene].forEach(s => s.classList.remove('active'));
+  
   hubScene.classList.add('active');
+  document.documentElement.classList.remove('scene-start');
  
   fade.classList.remove('on');
   fadingOut = false;
