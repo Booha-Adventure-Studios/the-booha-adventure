@@ -1488,7 +1488,7 @@ if (window.visualViewport) {
 function showScene(el) {
   [startScene, videoScene, hubScene].forEach(s => s.classList.remove('active'));
   el.classList.add('active');
-  document.documentElement.classList.toggle('scene-start', el === startScene);
+  document.documentElement.classList.toggle('scene-start', el !== hubScene);
 
   
   if (el === hubScene) hubScene.scrollTop = 0;
