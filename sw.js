@@ -5,9 +5,9 @@
 // ============================================================
 
 const CURRENT_CACHES = {
-  pages:  'booha-pages-2026-32',
-  assets: 'booha-assets-2026-32',
-  decks:  'booha-decks-2026-32',
+  pages:  'booha-pages-2026-33',
+  assets: 'booha-assets-2026-33',
+  decks:  'booha-decks-2026-33',
 };
 
 const PAGE_CACHE  = CURRENT_CACHES.pages;
@@ -21,6 +21,7 @@ const CORE_FILES = [
   `${BASE}/`,
   `${BASE}/index.html`,
   `${BASE}/adventure-profile.html`,
+  `${BASE}/profile.html`,
   `${BASE}/booha_blocks.html`,
   `${BASE}/booha_invaders.html`,
   `${BASE}/feed_booha.html`,
