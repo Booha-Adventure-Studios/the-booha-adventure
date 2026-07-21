@@ -1079,7 +1079,13 @@
         <img id="boohaGhost" src="assets/img/booha_ghost.png" alt="Booha" />
       </div>
     </div>
-    <button id="startBtn" class="btn" type="button">スタート</button>
+    
+    <div id="dcStamp" class="dcStamp" aria-hidden="true"></div>
+    <div class="startBtns">
+      <button id="dailyCheckBtn" class="btn" type="button">デイリーチェック</button>
+      <button id="startBtn" class="btn btnGhost" type="button">あとで</button>
+    </div>
+    
   </section>
 
   <!-- ── VIDEO ── -->
@@ -1162,6 +1168,13 @@
   <img src="assets/img/juku-logo.png" alt="">
 </a>
 <style>
+
+.startBtns{display:flex;flex-direction:column;gap:12px;align-items:center;}
+.btnGhost{background:transparent;border:1.5px solid rgba(255,255,255,.4);box-shadow:none;color:var(--muted);font-weight:700;}
+.dcStamp{min-height:1.4em;margin-bottom:10px;font-weight:800;color:var(--pink2);opacity:0;transition:opacity .3s;}
+.dcStamp.show{opacity:1;}
+
+  
   #alog-icon-btn {
     position: fixed; right: 16px; bottom: 16px; z-index: 60;
     width: 76px; height: 76px; display: block;
@@ -1683,8 +1696,14 @@ document.querySelectorAll('.pickTile').forEach(btn => {
   btn.addEventListener('click', e => {
     e.stopPropagation();
     const weekId = currentWeekId;
-    const curr   = btn.dataset.curr;
+    
+   const curr   = btn.dataset.curr;
+    try {
+      const map = { preboo:'pb', booriculum:'br', boocontinuum:'bc' };
+      if (map[curr]) localStorage.setItem('booha_last_curr', map[curr]);
+    } catch (e) {}
     closePicker();
+    
     navigateToCurriculum(weekId, curr);
   });
 });
@@ -1706,6 +1725,25 @@ mazeBtn.addEventListener('click', () => {
 const startBtn   = document.getElementById('startBtn');
 const introVideo = document.getElementById('introVideo');
 const ghostWrap  = document.querySelector('.ghostWrap');
+const dailyCheckBtn = document.getElementById('dailyCheckBtn');
+
+/* Daily check-in (optional homework). onDone → straight to hub (skip video). */
+if (window.BoohaDailyCheck) {
+  try {
+    if (BoohaDailyCheck.isDoneToday()) {
+      const stamp = document.getElementById('dcStamp');
+      if (stamp) { stamp.textContent = '✓ ' + BoohaDailyCheck.streak() + '日'; stamp.classList.add('show'); }
+    }
+  } catch (e) {}
+
+  if (dailyCheckBtn) dailyCheckBtn.addEventListener('click', () => {
+    if (started) return;
+    BoohaDailyCheck.run({
+      onDone: () => { try { jumpToHub(); } catch (e) { showScene(hubScene); } },
+      onSkip: () => {}   // stay on the start scene; they can tap あとで
+    });
+  });
+}
 
 let started = false, fadingOut = false;
 
@@ -1730,7 +1768,10 @@ async function startIntro() {
   }
 }
 
-startBtn.addEventListener('click', startIntro);
+startBtn.addEventListener('click', () => {
+  try { if (window.BoohaDailyCheck) BoohaDailyCheck.markSkip(BoohaDailyCheck.knownCurr()); } catch (e) {}
+  startIntro();
+});
 
 /* ════════════════════════════════════════════════════════════
    VIDEO → HUB
@@ -1821,6 +1862,7 @@ window.addEventListener('pageshow', ev => {
 <script src="js/core/adventure-core.js"></script>
 <script src="js/core/save-file.js"></script>
 <script src="js/core/day-record.js"></script>
+<script src="js/daily-check.js"></script>  
 <script src="js/vocab-blitz.js"></script>
 <script src="js/sentence-blitz.js"></script>
 <script src="js/question-blitz.js"></script>  
