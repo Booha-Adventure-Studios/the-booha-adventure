@@ -452,7 +452,7 @@ window.BoohaDailyCheck = (function () {
 
         const audioBtn = document.createElement('button');
         audioBtn.className = 'dc-audio'; audioBtn.type = 'button';
-        audioBtn.setAttribute('aria-label', 'きく'); audioBtn.textContent = '🔊';
+        audioBtn.setAttribute('aria-label', 'きく'); audioBtn.textContent = '▶';
         const url = audioUrl(content.curr, type, card.mp3, content.monCode);
         audioBtn.addEventListener('click', () => {
           const a = getAudio();
