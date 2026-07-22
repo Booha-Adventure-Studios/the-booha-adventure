@@ -538,7 +538,11 @@ window.KarasukiAtmos = (() => {
       `${fps.toFixed(0)} fps   ${roomId || '—'}\n` +
       `vitality ${(S.vit * 100).toFixed(0)}%  (base ${(S.baseline * 100).toFixed(0)} + week ${(S.weekly * 100).toFixed(0)})\n` +
       `motes ${parts.length}   flies ${flies.length}   sprites ${sprites.size}\n` +
-      `event ${active ? 'running' : 'in ' + Math.max(0, sched.timer).toFixed(0) + 's'}`;
+       
+      `event ${active ? 'running'
+        : S.vit < CFG.thresholds.life ? 'asleep (needs ' + (CFG.thresholds.life * 100).toFixed(0) + '%)'
+        : 'in ' + Math.max(0, sched.timer).toFixed(0) + 's'}`;
+     
     statsEl.style.whiteSpace = 'pre';
   }
 
