@@ -343,7 +343,7 @@ const HAPPY_HOUSE_PORTAL = {
     } catch (_) {}
   }
 
-  function initOrbs() {
+ function initOrbs() {
     weeklyOrbs = buildWeeklyOrbs();
     const quest = loadDrifterQuest();
     if (quest && quest.collectedMemoryId) {
@@ -351,6 +351,17 @@ const HAPPY_HOUSE_PORTAL = {
         if (orb.memoryId === quest.collectedMemoryId) { orb.collected = true; break; }
       }
     }
+  }
+
+  // Must run AFTER initOrbs() — weeklyOrbs is empty before that, so the
+  // lookup silently fails and the session key is consumed for nothing.
+  function processWrongOrbReturn() {
+    try {
+      const key = sessionStorage.getItem('karasuki_return_wrong_orb');
+      if (!key) return;
+      sessionStorage.removeItem('karasuki_return_wrong_orb');
+      returnOrbToKarasuki(key);
+    } catch (_) {}
   }
 
   function returnOrbToKarasuki(memoryId) {
@@ -1379,7 +1390,13 @@ const HAPPY_HOUSE_PORTAL = {
      STATE
   ═══════════════════════════════════════════ */
   const state = {
-    roomId: (() => { const p = new URLSearchParams(window.location.search); return p.get('room') || DATA.startRoom; })(),
+    
+    roomId: (() => {
+      const p = new URLSearchParams(window.location.search);
+      const r = p.get('room');
+      return (r && DATA.rooms[r]) ? r : DATA.startRoom;
+    })(),
+    
     spawnId: "default", x: 742, y: 717, spawnX: 742, spawnY: 717,
     arrivalDir: null, transitioning: false, transitionReadyAt: 0,
     clickTarget: null, moving: false, distMovedSinceSpawn: 0,
@@ -1393,30 +1410,38 @@ const HAPPY_HOUSE_PORTAL = {
   })();
 
   (function checkReturnFromUtsuroba() {
-    try { const ret = sessionStorage.getItem('utsuroba_return_room'); if (ret) { state.roomId = ret; state.spawnId = 'default'; sessionStorage.removeItem('utsuroba_return_room'); } } catch (_) {}
+    try {
+      const ret = sessionStorage.getItem('utsuroba_return_room');
+      if (!ret) return;
+      sessionStorage.removeItem('utsuroba_return_room');
+      if (DATA.rooms[ret]) { state.roomId = ret; state.spawnId = 'default'; }
+    } catch (_) {}
   })();
 
   (function checkReturnFromBonusGame() {
-    try { const ret = sessionStorage.getItem('booha_bonus_return_room'); if (ret && DATA.rooms[ret]) { state.roomId = ret; state.spawnId = 'default'; sessionStorage.removeItem('booha_bonus_return_room'); } } catch (_) {}
+    try {
+      const ret = sessionStorage.getItem('booha_bonus_return_room');
+      if (!ret) return;
+      sessionStorage.removeItem('booha_bonus_return_room');
+      if (DATA.rooms[ret]) { state.roomId = ret; state.spawnId = 'default'; }
+    } catch (_) {}
   })();
 
  (function checkReturnFromHappyHouse() {
     try {
-      const ret = sessionStorage.getItem('happy_house_return_room');
-      if (ret && DATA.rooms[ret]) {
+      
+     const ret = sessionStorage.getItem('happy_house_return_room');
+      if (!ret) return;
+      sessionStorage.removeItem('happy_house_return_room');
+      if (DATA.rooms[ret]) {
         state.roomId  = ret;
         state.spawnId = 'default';
-        sessionStorage.removeItem('happy_house_return_room');
       }
+      
     } catch (_) {}
   })();
   
-  (function checkReturnOrbState() {
-    try {
-      const wrongMemKey = sessionStorage.getItem('karasuki_return_wrong_orb');
-      if (wrongMemKey) { sessionStorage.removeItem('karasuki_return_wrong_orb'); returnOrbToKarasuki(wrongMemKey); }
-    } catch (_) {}
-  })();
+  
 
   let pins = [], trail = [], ripples = [];
   const ghostImg = new Image(); ghostImg.src = "assets/img/booha_ghost.png";
@@ -2630,7 +2655,7 @@ function drawObserver(now) {
   function init() {
     injectStyles(); buildApp(); KarasukiAtmos.init(stage);
     fitStage(); resizeCanvas();
-    initOrbs(); renderInitialRoom(); initWanderers(); initNuppi(); bindInput();
+    initOrbs(); processWrongOrbReturn(); renderInitialRoom(); initWanderers(); initNuppi(); bindInput();
     
     window.addEventListener("resize",()=>{ fitStage(); resizeCanvas(); });
     requestAnimationFrame(tick);
