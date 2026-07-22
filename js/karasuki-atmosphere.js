@@ -1,35 +1,39 @@
 
 /* ═══════════════════════════════════════════════════════════
-   KARASUKI — ATMOSPHERE ENGINE
+   KARASUKI — ATMOSPHERE ENGINE  (rev 2)
    Data: js/karasuki-atmos-data.js  (window.KARASUKI_ATMOS)
    Load order: karasuki-atmos-data.js → karasuki-atmosphere.js → karasuki.js
 
-   Draws on its OWN canvas, inserted into #karasuki-stage BEFORE
-   #kara-canvas. Everything karasuki.js draws — ghost, trail,
-   wanderers, arrows, orbs, Nuppi, Observer — stays on kara-canvas
-   and is untouched. Only this canvas drifts, so hit-testing in
-   stagePointToWorld() is unaffected.
+   rev 2 fixes a sprite-cache bug in rev 1: the cache key included
+   the draw size, which varies continuously per particle per frame,
+   so every mote minted a fresh offscreen canvas every frame
+   (~3,700/sec on desktop) and the Map never evicted. Sprites are
+   now baked once per colour at a reference radius and scaled at
+   draw time. Fog and cloud no longer rebuild gradients per frame.
 
    Public API:
      KarasukiAtmos.init(stageEl)
      KarasukiAtmos.setRoom(roomId, observerRoomId)
      KarasukiAtmos.refreshVitality()
+   Dev:
+     b_4120()   toggle the performance readout
    ═══════════════════════════════════════════════════════════ */
 
 window.KarasukiAtmos = (() => {
   'use strict';
 
   const CFG = window.KARASUKI_ATMOS;
-  if (!CFG) { console.warn('[atmos] KARASUKI_ATMOS missing — atmosphere disabled.'); 
+  if (!CFG) { console.warn('[atmos] KARASUKI_ATMOS missing — atmosphere disabled.');
     return { init(){}, setRoom(){}, refreshVitality(){} }; }
 
   const WORLD_W = 1536;
   const WORLD_H = 1024;
 
-  /* Atmosphere is all soft gradients — it does not need the
-     content canvas's DPR. Running it at 1.0 roughly halves the
-     fill cost of the fog / cloud passes on budget Android. */
-  const ATMOS_DPR = 1.0;
+  /* Backing-store scale for the atmosphere canvas.
+     1.0 = 1536x1024. Everything here is soft gradients, so if an
+     older machine still struggles, drop this to 0.75 or 0.5 —
+     fill cost falls with the square and you will not see it. */
+  const ATMOS_SCALE = 1.0;
 
   const IS_PHONE = ('ontouchstart' in window || navigator.maxTouchPoints > 0) && window.innerWidth < 768;
   const REDUCED  = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -57,7 +61,7 @@ window.KarasukiAtmos = (() => {
     S.weekly   = 0.55 * Math.min(1, games / 9);
     const next = Math.max(0, Math.min(1, S.baseline + S.weekly));
     const tier = tierOf(next);
-    if (S.tier >= 0 && tier > S.tier) bloomMoment();   // crossed upward → the forest responds
+    if (S.tier >= 0 && tier > S.tier) bloomMoment();
     S.tier = tier;
     S.vit  = next;
   }
@@ -71,29 +75,46 @@ window.KarasukiAtmos = (() => {
     return 0;
   }
 
-  /* ═══════════════ glow sprite cache ═══════════════ */
+  /* ═══════════════ sprite cache ═══════════════
+     Keyed by COLOUR + PROFILE only — never by size.
+     Baked once at REF_R and scaled by drawImage at draw time,
+     so the cache tops out at roughly two entries per colour.  */
+  const REF_R   = 96;
   const sprites = new Map();
-  function glowSprite(col, size) {
-    const key = col[0] + ',' + col[1] + ',' + col[2] + '|' + size;
+
+  function sprite(col, kind) {
+    const key = col[0] + ',' + col[1] + ',' + col[2] + '|' + kind;
     let c = sprites.get(key);
     if (c) return c;
-    const s = Math.max(4, Math.ceil(size * 2));
+    const s = REF_R * 2;
     c = document.createElement('canvas');
     c.width = c.height = s;
-    const g = c.getContext('2d'), r = s / 2;
-    const grd = g.createRadialGradient(r, r, 0, r, r, r);
-    grd.addColorStop(0,    `rgba(${col[0]},${col[1]},${col[2]},1)`);
-    grd.addColorStop(0.35, `rgba(${col[0]},${col[1]},${col[2]},0.42)`);
-    grd.addColorStop(1,    `rgba(${col[0]},${col[1]},${col[2]},0)`);
+    const g = c.getContext('2d');
+    const grd = g.createRadialGradient(REF_R, REF_R, 0, REF_R, REF_R, REF_R);
+    if (kind === 'soft') {                       // fog / cloud: gentler falloff
+      grd.addColorStop(0,    `rgba(${col[0]},${col[1]},${col[2]},1)`);
+      grd.addColorStop(0.55, `rgba(${col[0]},${col[1]},${col[2]},0.45)`);
+      grd.addColorStop(1,    `rgba(${col[0]},${col[1]},${col[2]},0)`);
+    } else {                                     // glow: tight hot core
+      grd.addColorStop(0,    `rgba(${col[0]},${col[1]},${col[2]},1)`);
+      grd.addColorStop(0.35, `rgba(${col[0]},${col[1]},${col[2]},0.42)`);
+      grd.addColorStop(1,    `rgba(${col[0]},${col[1]},${col[2]},0)`);
+    }
     g.fillStyle = grd; g.fillRect(0, 0, s, s);
     sprites.set(key, c);
     return c;
   }
+
   function blit(x, y, col, size, alpha) {
-    if (alpha <= 0.004) return;
-    const sp = glowSprite(col, size);
+    if (alpha <= 0.004 || size <= 0) return;
     ctx.globalAlpha = alpha > 1 ? 1 : alpha;
-    ctx.drawImage(sp, x - size, y - size, size * 2, size * 2);
+    ctx.drawImage(sprite(col, 'glow'), x - size, y - size, size * 2, size * 2);
+    ctx.globalAlpha = 1;
+  }
+  function blitEllipse(cx, cy, rx, ry, col, alpha) {
+    if (alpha <= 0.004 || rx <= 0 || ry <= 0) return;
+    ctx.globalAlpha = alpha > 1 ? 1 : alpha;
+    ctx.drawImage(sprite(col, 'soft'), cx - rx, cy - ry, rx * 2, ry * 2);
     ctx.globalAlpha = 1;
   }
 
@@ -192,12 +213,13 @@ window.KarasukiAtmos = (() => {
       f.x += Math.cos(f.drift) * 7 * dt + (S.wind + S.gust) * 10 * dt;
       f.y += Math.sin(f.drift * 0.7) * 5 * dt;
       let pulse = Math.sin(f.blink) * 0.5 + 0.5;
-      if (S.flash > 0) pulse = Math.max(pulse, S.flash);   // bloom: all pulse together
+      if (S.flash > 0) pulse = Math.max(pulse, S.flash);
       blit(f.x, f.y, f.col, (2 + pulse * 2.4) * 4, pulse * pulse * 0.95 * ramp);
     }
   }
 
   /* ═══════════════ fog / cloud / breath ═══════════════ */
+  const FOG_COL = [190, 208, 214], CLOUD_COL = [0, 0, 0];
   const fogBands = [
     { x: 0.10, y: 0.30, sp: 0.008, rx: 0.60, ry: 0.10 },
     { x: 0.60, y: 0.24, sp: 0.005, rx: 0.50, ry: 0.08 },
@@ -208,30 +230,19 @@ window.KarasukiAtmos = (() => {
     for (const f of fogBands) {
       f.x += dt * f.sp * (1 + (S.wind + S.gust));
       if (f.x > 1.5) f.x = -0.6;
-      const cx = f.x * WORLD_W, cy = f.y * WORLD_H, rx = WORLD_W * f.rx, ry = WORLD_H * f.ry;
-      const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, rx);
-      g.addColorStop(0, `rgba(190,208,214,${0.085 * amt})`);
-      g.addColorStop(1, 'rgba(190,208,214,0)');
-      ctx.save(); ctx.translate(cx, cy); ctx.scale(1, ry / rx); ctx.translate(-cx, -cy);
-      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, rx, 0, 6.283); ctx.fill(); ctx.restore();
+      blitEllipse(f.x * WORLD_W, f.y * WORLD_H, WORLD_W * f.rx, WORLD_H * f.ry, FOG_COL, 0.085 * amt);
     }
   }
   const cloud = { x: -0.5 };
   function drawCloud(dt) {
     const amt = room.cloud || 0; if (amt <= 0) return;
     cloud.x += dt * 0.016; if (cloud.x > 1.5) cloud.x = -0.6 - Math.random();
-    const cx = cloud.x * WORLD_W, cy = WORLD_H * 0.42, rx = WORLD_W * 0.6, ry = WORLD_H * 0.55;
-    const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, rx);
-    g.addColorStop(0,   `rgba(0,0,0,${0.26 * amt})`);
-    g.addColorStop(0.6, `rgba(0,0,0,${0.12 * amt})`);
-    g.addColorStop(1,   'rgba(0,0,0,0)');
-    ctx.save(); ctx.translate(cx, cy); ctx.scale(1, ry / rx); ctx.translate(-cx, -cy);
-    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, rx, 0, 6.283); ctx.fill(); ctx.restore();
+    blitEllipse(cloud.x * WORLD_W, WORLD_H * 0.42, WORLD_W * 0.6, WORLD_H * 0.55, CLOUD_COL, 0.26 * amt);
   }
   function drawBreath(now) {
-    const x = room.pathLight[0], y = room.pathLight[1];
     const pulse = Math.sin(now * 0.0006) * 0.5 + 0.5;
-    blit(x, y, [214, 228, 238], 560, (0.030 + pulse * 0.040) * (0.35 + S.vit * 0.9));
+    blit(room.pathLight[0], room.pathLight[1], [214, 228, 238], 560,
+         (0.030 + pulse * 0.040) * (0.35 + S.vit * 0.9));
   }
   function drawHush() {
     if (S.hush <= 0.01) return;
@@ -266,7 +277,7 @@ window.KarasukiAtmos = (() => {
     for (const k in ev) {
       if (k === 'observer') {
         if (S.vit < T.deep) continue;
-        if (roomId === observerRoom) continue;   // the real Observer is here — don't double him
+        if (roomId === observerRoom) continue;
         out[k] = ev[k]; continue;
       }
       if ((k === 'hush' || k === 'crow') && S.vit < T.deep) continue;
@@ -377,8 +388,6 @@ window.KarasukiAtmos = (() => {
     ctx.globalAlpha = 1; ctx.restore();
   };
 
-  /* Two eye-glints in the treeline. Only ever fires in rooms the
-     real Observer is NOT occupying this week. */
   function Glint() {
     const left = Math.random() < 0.5;
     this.x = left ? 90 + Math.random() * 240 : WORLD_W - 330 + Math.random() * 240;
@@ -390,7 +399,7 @@ window.KarasukiAtmos = (() => {
     this.life += dt;
     const t = this.life;
     this.a = t < 0.9 ? t / 0.9 : (t > this.dur - 1.0 ? Math.max(0, (this.dur - t) / 1.0) : 1);
-    if (t > 1.9 && t < 2.06) this.a *= 0.06;   // one slow blink
+    if (t > 1.9 && t < 2.06) this.a *= 0.06;
     if (this.life > this.dur) active = null;
   };
   Glint.prototype.draw = function () {
@@ -511,6 +520,28 @@ window.KarasukiAtmos = (() => {
     }
   };
 
+  /* ═══════════════ dev readout — b_4120() ═══════════════ */
+  let statsEl = null, fps = 0, fAcc = 0, fCount = 0;
+  function toggleStats() {
+    if (statsEl) { statsEl.remove(); statsEl = null; return; }
+    statsEl = document.createElement('div');
+    statsEl.style.cssText = 'position:fixed;left:14px;top:14px;z-index:9999;background:rgba(0,0,0,.82);' +
+      'color:#8fe3c0;font:700 11px/1.7 monospace;padding:8px 12px;border-radius:8px;' +
+      'border:1px solid rgba(143,227,192,.3);pointer-events:none;letter-spacing:.05em;';
+    document.body.appendChild(statsEl);
+  }
+  function updateStats(dt) {
+    if (!statsEl) return;
+    fAcc += dt; fCount++;
+    if (fAcc >= 0.5) { fps = fCount / fAcc; fAcc = 0; fCount = 0; }
+    statsEl.textContent =
+      `${fps.toFixed(0)} fps   ${roomId || '—'}\n` +
+      `vitality ${(S.vit * 100).toFixed(0)}%  (base ${(S.baseline * 100).toFixed(0)} + week ${(S.weekly * 100).toFixed(0)})\n` +
+      `motes ${parts.length}   flies ${flies.length}   sprites ${sprites.size}\n` +
+      `event ${active ? 'running' : 'in ' + Math.max(0, sched.timer).toFixed(0) + 's'}`;
+    statsEl.style.whiteSpace = 'pre';
+  }
+
   /* ═══════════════ loop ═══════════════ */
   let last = 0;
   function frame(now) {
@@ -543,6 +574,7 @@ window.KarasukiAtmos = (() => {
     drawHush();
     ctx.restore();
 
+    updateStats(dt);
     rafId = requestAnimationFrame(frame);
   }
 
@@ -550,9 +582,9 @@ window.KarasukiAtmos = (() => {
   function sizeCanvas() {
     canvas.style.width  = WORLD_W + 'px';
     canvas.style.height = WORLD_H + 'px';
-    canvas.width  = Math.round(WORLD_W * ATMOS_DPR);
-    canvas.height = Math.round(WORLD_H * ATMOS_DPR);
-    ctx.setTransform(ATMOS_DPR, 0, 0, ATMOS_DPR, 0, 0);
+    canvas.width  = Math.round(WORLD_W * ATMOS_SCALE);
+    canvas.height = Math.round(WORLD_H * ATMOS_SCALE);
+    ctx.setTransform(ATMOS_SCALE, 0, 0, ATMOS_SCALE, 0, 0);
   }
 
   function init(stageEl) {
@@ -568,7 +600,10 @@ window.KarasukiAtmos = (() => {
     window.addEventListener('resize', sizeCanvas);
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) { running = false; cancelAnimationFrame(rafId); }
-      else if (roomId && !running) { running = true; last = 0; rafId = requestAnimationFrame(frame); }
+      else if (room && !running) { running = true; last = 0; rafId = requestAnimationFrame(frame); }
+    });
+    Object.defineProperty(window, 'b_4120', {
+      value: toggleStats, writable: false, configurable: false, enumerable: false
     });
   }
 
@@ -576,7 +611,7 @@ window.KarasukiAtmos = (() => {
     if (!canvas) return;
     const r = CFG.rooms[id];
     observerRoom = observerRoomId || null;
-    if (!r) {                       // room with no atmosphere authored — go quiet
+    if (!r) {
       running = false; cancelAnimationFrame(rafId);
       if (ctx) ctx.clearRect(0, 0, WORLD_W, WORLD_H);
       roomId = id; room = null; return;
