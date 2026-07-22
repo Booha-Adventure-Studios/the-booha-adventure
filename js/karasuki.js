@@ -2044,10 +2044,12 @@ function getBoohaFirstName() {
 }
 
 function getObserverRoomId() {
-  const rooms  = Object.keys(window.KARASUKI_DATA.OBSERVER_COORDS);
-  const cal    = window.CALENDAR.getCurrentCurriculumWeek();
-  const seed   = typeof cal === 'object' ? (cal.weekNumber || 1) : cal;
-  return rooms[seed % rooms.length];
+  const rooms = Object.keys(window.KARASUKI_DATA.OBSERVER_COORDS);
+  const cal   = window.CALENDAR.getCurrentCurriculumWeek();
+  const m = (cal && cal.month)      || 1;
+  const w = (cal && cal.weekNumber) || 1;
+  const running = (m - 1) * 4 + w;              // month 7, week 3 → 27
+  return rooms[(running * 7) % rooms.length];   // stride 7 is coprime with 15 → full cycle
 }
 
   
