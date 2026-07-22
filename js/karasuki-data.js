@@ -6,7 +6,7 @@ window.KARASUKI_DATA = {
     // ── ROW 1 ──────────────────────────────────────────────
     room_01: {
       bg: "assets/img/karasuki/room_01.webp",
-      ambient: { density: 12, drift: 0.16 },
+     
       spawns: {
         default:   { x: 732,  y: 876  },
         fromLeft:  { x: 200,  y: 658  },
@@ -18,7 +18,7 @@ window.KARASUKI_DATA = {
 
     room_02: {
       bg: "assets/img/karasuki/room_02.webp",
-      ambient: { density: 12, drift: 0.18 },
+     
       spawns: {
         default:   { x: 732,  y: 700  },
         fromLeft:  { x: 210,  y: 255  },
@@ -30,7 +30,7 @@ window.KARASUKI_DATA = {
 
     room_03: {
       bg: "assets/img/karasuki/room_03.webp",
-      ambient: { density: 16, drift: 0.18 },
+     
       spawns: {
         default:   { x: 747,  y: 663  },
         fromLeft:  { x: 280,  y: 328  },
@@ -44,7 +44,7 @@ window.KARASUKI_DATA = {
 
     room_04: {
       bg: "assets/img/karasuki/room_04.webp",
-      ambient: { density: 12, drift: 0.16 },
+     
       exits: {
         up:    { x: 548,  y: 169 },
         right: { x: 1443, y: 734 },
@@ -61,7 +61,7 @@ window.KARASUKI_DATA = {
 
     room_05: {
       bg: "assets/img/karasuki/room_05.webp",
-      ambient: { density: 13, drift: 0.20 },
+     
       spawns: {
         default:   { x: 732,  y: 700  },
         fromLeft:  { x: 328,  y: 622  },
@@ -88,7 +88,7 @@ window.KARASUKI_DATA = {
 
     room_07: {
       bg: "assets/img/karasuki/room_07.webp",
-      ambient: { density: 12, drift: 0.18 },
+
       spawns: {
         default:   { x: 732,  y: 700  },
         fromLeft:  { x: 200,  y: 687  },
@@ -100,7 +100,7 @@ window.KARASUKI_DATA = {
 
     room_08: {
       bg: "assets/img/karasuki/room_08.webp",
-      ambient: { density: 13, drift: 0.17 },
+    
       spawns: {
         // FIX: default was { x:357, y:342 } — exactly on the portal orb.
         // Moved to centre of room so returning from profile doesn't
@@ -144,7 +144,7 @@ window.KARASUKI_DATA = {
 
     room_10: {
       bg: "assets/img/karasuki/room_10.webp",
-      ambient: { density: 12, drift: 0.18 },
+     
       spawns: {
         default:   { x: 732,  y: 700  },
         fromLeft:  { x: 200,  y: 702  },
@@ -157,7 +157,7 @@ window.KARASUKI_DATA = {
     // ── ROW 3 ──────────────────────────────────────────────
     room_11: {
       bg: "assets/img/karasuki/room_11.webp",
-      ambient: { density: 12, drift: 0.16 },
+   
       spawns: {
         default:   { x: 732,  y: 700  },
         fromLeft:  { x: 300,  y: 312  },
@@ -169,7 +169,7 @@ window.KARASUKI_DATA = {
 
     room_12: {
       bg: "assets/img/karasuki/room_12.webp",
-      ambient: { density: 13, drift: 0.19 },
+     
       spawns: {
         default:   { x: 732,  y: 700  },
         fromLeft:  { x: 310,  y: 344  },
@@ -181,7 +181,7 @@ window.KARASUKI_DATA = {
 
     room_13: {
       bg: "assets/img/karasuki/room_13.webp",
-      ambient: { density: 12, drift: 0.17 },
+     
       exits: {
         right: { x: 1421, y: 242 },
         left:  { x: 88,   y: 568 },
@@ -209,7 +209,7 @@ window.KARASUKI_DATA = {
 
     room_15: {
       bg: "assets/img/karasuki/room_15.webp",
-      ambient: { density: 14, drift: 0.18 },
+     
       exits: {
         left: { x: 88,  y: 568 },
         down: { x: 663, y: 894 }
