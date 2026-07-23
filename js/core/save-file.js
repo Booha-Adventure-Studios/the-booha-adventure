@@ -68,9 +68,12 @@ const BoohaSaveFile = (() => {
       weekData:    {},   // legacy — kept for migration safety
 
       // ── Meta — permanent counters ────────────────────────────────────────
-      meta: {
+     meta: {
         lastWeeklyKey:  '',      // e.g. "2026-march-w3" — used to detect Monday reset
         allTimeStars:   0,       // running total, only goes up
+        dayLog:         {},      // { "2026-07-22": { s, g } }  — accountability
+        weekLog:        {},      // { "2026-w27": { adv, blitz, duel } }
+        lastActivityTs: 0,
       },
 
       // ── Weekly — resets every Monday midnight Tokyo ──────────────────────
@@ -95,34 +98,34 @@ const BoohaSaveFile = (() => {
       save = Object.assign(_defaultSave(), save);
       save.version = 1;
     }
-    if (save.version < 2) {
-      // Add new sections without touching existing data
-      if (!save.meta) {
-        save.meta = { lastWeeklyKey: '', allTimeStars: 0 };
-      }
-      if (!save.meta.lastWeeklyKey) save.meta.lastWeeklyKey = '';
-      
-      if (typeof save.meta.allTimeStars !== 'number') save.meta.allTimeStars = 0;
-      if (!save.meta.dayLog)  save.meta.dayLog  = {};
-      if (!save.meta.weekLog) save.meta.weekLog = {};
-      if (typeof save.meta.lastActivityTs !== 'number') save.meta.lastActivityTs = 0;
-      
+    
+    // Field backfill runs UNCONDITIONALLY, not gated on version.
+    // Gating it meant a save born at the current version never received these
+    // fields at all — _defaultSave() didn't create dayLog/weekLog, and the
+    // migration branch never ran, so the accountability log was silently empty
+    // for every new save. Version gates guard *transformations*; presence
+    // checks are idempotent and belong outside them.
+    if (!save.meta) save.meta = {};
+    if (typeof save.meta.lastWeeklyKey  !== 'string') save.meta.lastWeeklyKey  = '';
+    if (typeof save.meta.allTimeStars   !== 'number') save.meta.allTimeStars   = 0;
+    if (typeof save.meta.lastActivityTs !== 'number') save.meta.lastActivityTs = 0;
+    if (!save.meta.dayLog)  save.meta.dayLog  = {};
+    if (!save.meta.weekLog) save.meta.weekLog = {};
 
-      if (!save.weekly) {
-        save.weekly = {
-          completedGames:     {},
-          gameScores:         {},
-          gameStars:          {},
-          unlockedBonusGames: {},
-          wanderers:          [],
-        };
-      }
-      if (!save.collection) {
-        save.collection = { wanderers: [] };
-      }
-      save.version = 2;
+    if (!save.weekly) {
+      save.weekly = {
+        completedGames:     {},
+        gameScores:         {},
+        gameStars:          {},
+        unlockedBonusGames: {},
+        wanderers:          [],
+      };
     }
+    if (!save.collection) save.collection = { wanderers: [] };
+
+    if (save.version < 2) save.version = 2;
     return save;
+    
   }
 
   // ── Core read / write ─────────────────────────────────────────────────────
