@@ -162,10 +162,14 @@ const BoohaSaveFile = (() => {
       
       document.dispatchEvent(new CustomEvent('booha:saved', { detail: data }));
       return true;
-    } catch (e) {
+   } catch (e) {
+      // Quota or private-mode failure. Callers get false, but the student needs
+      // to know too — silent write failure looks identical to normal play.
       console.error('[BoohaSaveFile] Write error:', e);
+      document.dispatchEvent(new CustomEvent('booha:saveFailed', { detail: { error: String(e) } }));
       return false;
     }
+    
   }
 
   function clear() {
