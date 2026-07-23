@@ -157,24 +157,29 @@ const BoohaAdventure = (() => {
   // the student was known. Wait for the identity signal; fall back on a timer
   // so a page without token.js, or a stalled verify, still boots.
 
-  const IDENTITY_TIMEOUT_MS = 8000;
+ // There is no legitimate unidentified mode. All 13 pages loading this file
+  // are token-gated, and every save consumer now routes through BoohaSaveFile,
+  // which refuses to write without an identity. Booting anyway would only
+  // produce a world rendered from an empty save.
+  //
+  // The listener is NOT consumed on timeout — a slow verify still boots
+  // normally when it lands. token.js already shows the connecting banner from
+  // 4s, so the student sees "saves are paused" rather than a silent stall.
+  const IDENTITY_WARN_MS = 8000;
 
   function _bootWhenReady() {
     if (window.BOOHA_IDENTITY_READY) { init(); return; }
 
-    let fired = false;
-    const go = (why) => {
-      if (fired) return;
-      fired = true;
-      if (why === 'timeout') {
-        console.warn('[BoohaAdventure] Identity never signalled — booting on the legacy save key.');
-      }
-      init();
-    };
+    document.addEventListener('booha:identityReady', init, { once: true });
 
-    document.addEventListener('booha:identityReady', () => go('identity'), { once: true });
-    setTimeout(() => go('timeout'), IDENTITY_TIMEOUT_MS);
+    setTimeout(() => {
+      if (window.BOOHA_IDENTITY_READY) return;
+      console.error('[BoohaAdventure] No identity after ' + (IDENTITY_WARN_MS / 1000) +
+                    's — Adventure NOT initialized. Waiting for booha:identityReady.');
+      document.dispatchEvent(new Event('booha:saveLocked'));
+    }, IDENTITY_WARN_MS);
   }
+  
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', _bootWhenReady);
