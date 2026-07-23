@@ -10,6 +10,7 @@
 
   const CFG = window.JUKU_CONFIG;
   const SAVE_BASE   = 'booha_juku_save';
+  const JUKU_EPOCH  = 2;     // key generation, independent of ADVENTURE_EPOCH
   const SLOT_KEY    = 'booha_juku_slot';   // sessionStorage: today's chosen slot
   const KEY_USER_ID = 'booha_userid';
 
@@ -20,9 +21,13 @@
   function jukuUid() {
     try { return localStorage.getItem(KEY_USER_ID) || ''; } catch (e) { return ''; }
   }
+  
+  // Null when unidentified — juku.html is token-gated, so no identity means a
+  // broken session. An assessment record written to an unscoped key on a shared
+  // classroom tablet attributes one student's exam to another.
   function saveKey() {
     const uid = jukuUid();
-    return uid ? `${SAVE_BASE}:${uid}` : SAVE_BASE;
+    return uid ? `${SAVE_BASE}:v${JUKU_EPOCH}:${uid}` : null;
   }
 
   // ── Tokyo clock ──────────────────────────────────────────
@@ -182,7 +187,8 @@
 
   function loadSave() {
     try {
-      const s = JSON.parse(localStorage.getItem(saveKey()) || '{"v":1,"weeks":{}}');
+      const k = saveKey();
+      const s = JSON.parse((k && localStorage.getItem(k)) || '{"v":1,"weeks":{}}');
       if (!s.v) s.v = 1;
       if (!s.weeks) s.weeks = {};
       return s;
@@ -191,9 +197,17 @@
   }
   
   function writeSave(s) {
+    
+    const k = saveKey();
+    if (!k) {
+      console.error('[JUKU] Save write BLOCKED — no identity.');
+      document.dispatchEvent(new CustomEvent('juku:saveFailed', { detail: { error: 'NO_IDENTITY' } }));
+      return false;
+    }
     try {
-      localStorage.setItem(saveKey(), JSON.stringify(s));
+      localStorage.setItem(k, JSON.stringify(s));
       return true;
+      
     } catch (e) {
       // Quota or private-mode failure. Silently swallowing this meant a student
       // could sit a full 90-minute exam with nothing being recorded.
