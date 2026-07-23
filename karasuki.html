@@ -47,9 +47,18 @@ function monthPrimary(w) {
 function monthSecondary(w) {
   return MONTH_COLORS[Math.max(0, Math.min(11, Math.floor((w - 1) / 4)))][1];
 }
-const boohaWeek = parseInt(sessionStorage.getItem('booha_active_week') || '1', 10);
+
+const boohaWeek = (() => {
+  try {
+    const cw = window.CALENDAR.getCurrentCurriculumWeek();
+    const w  = window.CALENDAR.getAcademicWeekNumber(cw);
+    if (Number.isInteger(w) && w >= 1) return w;
+  } catch (e) {}
+  return 1;
+})();
 const primary   = monthPrimary(boohaWeek);
-const secondary = monthSecondary(boohaWeek);
+const secondary = monthSecondary(boohaWeek); 
+ 
 </script>
 <script src="js/calendar.js"></script>
 <script src="js/core/adventure-core.js"></script>
