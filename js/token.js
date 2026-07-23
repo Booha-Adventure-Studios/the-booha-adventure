@@ -27,6 +27,21 @@
     localStorage.removeItem(KEY_USER_ID);
  }
 
+ // ── Identity gate ─────────────────────────────────────────────────────────
+  // Storage keys are scoped to booha_userid, which is written below only after
+  // the async verify returns. Systems that read or write the save must wait for
+  // this signal, or they operate on the legacy key and can mutate the previous
+  // student's data before anyone is identified.
+
+  let _identitySignalled = false;
+
+  function signalIdentityReady() {
+    if (_identitySignalled) return;
+    _identitySignalled = true;
+    window.BOOHA_IDENTITY_READY = true;
+    document.dispatchEvent(new Event('booha:identityReady'));
+  }
+
   function redirect(reason) {
     clearSession();
     window.location.replace(GATE_URL + '?reason=' + reason);
@@ -41,14 +56,35 @@
     const age  = Date.now() - last;
 
     if (last && age < GRACE_MS) {
-      // Within grace period — show page with offline banner
+      
+      // Within grace period — show page with offline banner.
+      // booha_userid is already cached from the last successful verify, so
+      // identity is known and boot can proceed.
+      if (!localStorage.getItem(KEY_USER_ID)) {
+        console.warn('[token] Offline with no cached userId — legacy save key in use.');
+      }
+      signalIdentityReady();
       unlock();
       showOfflineBanner();
+      
     } else {
       // Grace expired — block and redirect when connection returns
       showOfflineBlock();
       waitForConnection(() => redirect('offline'));
     }
+  }
+
+  function showIdentityBanner() {
+    const el = document.createElement('div');
+    el.id = 'booha-identity-banner';
+    el.style.cssText = [
+      'position:fixed', 'top:0', 'left:0', 'right:0',
+      'background:#8a5a00', 'color:#fff',
+      'text-align:center', 'padding:8px 16px',
+      'font:600 14px/1.4 sans-serif', 'z-index:99999'
+    ].join(';');
+    el.textContent = 'Save identity unavailable — tell your teacher.';
+    document.body.appendChild(el);
   }
 
   function showOfflineBanner() {
@@ -225,8 +261,14 @@
     if (data.userId) {
       localStorage.setItem(KEY_USER_ID, data.userId);
     } else {
-      console.warn('[token] No userId in verify response — saves stay on the legacy key.');
+      // Not fatal — a lockout over a save-keying field would be worse than
+      // degrading to the old behaviour. But it must never be silent.
+      console.error('[token] No userId in verify response — saves stay on the legacy key.');
+      localStorage.removeItem(KEY_USER_ID);
+      showIdentityBanner();
     }
+
+    signalIdentityReady();
 
     // Install overlay — once only, not in standalone
     if (!isStandalone() && !localStorage.getItem(INSTALL_KEY)) {
