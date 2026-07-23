@@ -241,11 +241,16 @@
   }
   
 
+// Returns null when the write did not land. Callers in the answer-commit
+  // path MUST check: a mutated in-memory object with no successful write is
+  // exactly the state where a student sees an accepted answer that was never
+  // recorded. writeSave() dispatches juku:saveFailed for the banner; the null
+  // return is what lets the commit flow refuse to advance.
   function patchWeek(fn) {
-    const { save, week } = weekRecord();
-    fn(week);
-    writeSave(save);
-    return week;
+    const rec = weekRecord();
+    if (!rec) return null;
+    fn(rec.week);
+    return writeSave(rec.save) ? rec.week : null;
   }
 
   // ── Tick loop ────────────────────────────────────────────
