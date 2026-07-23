@@ -79,6 +79,32 @@
     return s;
   }
 
+  // ── Fail-closed commit ───────────────────────────────────
+  // patchWeek returns null when the write did not land (quota, private
+  // mode, no identity). Advancing anyway is the one failure this platform
+  // cannot have: the student sees the next question and believes the last
+  // answer was recorded. Halt the ITEM, never the lesson — the wall clock
+  // keeps running, and retry re-reads the save fresh so it is idempotent.
+
+  function commitOrHalt(taskEl, mutate, onSuccess) {
+    if (J.patchWeek(mutate) !== null) { onSuccess(); return true; }
+    renderCommitFailed(taskEl, () => commitOrHalt(taskEl, mutate, onSuccess));
+    return false;
+  }
+
+  function renderCommitFailed(taskEl, retry) {
+    taskEl.innerHTML = `
+      <div class="juku-done juku-commit-fail">
+        <p class="juku-done-jp">⚠ ほぞん できなかった</p>
+        <p class="en">This answer was NOT saved.</p>
+        <p class="juku-sub2">先生を よんでね。<br>
+        <span class="en">Please call your teacher.</span></p>
+        <button class="juku-lock" id="jt-retry">もう いちど</button>
+      </div>`;
+    const b = taskEl.querySelector('#jt-retry');
+    if (b) b.addEventListener('click', retry);
+  }
+
   // ── Sentence Order test ──────────────────────────────────
 
   async function renderOrder(taskEl, res, slot) {
@@ -90,12 +116,17 @@
     const count = (CFG.content && CFG.content.counts && CFG.content.counts.order) || 8;
     const picked = J.seededShuffle(pack.items, seed).slice(0, Math.min(count, pack.items.length));
 
-    // section record (created once)
-    J.patchWeek(w => {
+    // section record (created once). If this write fails the section never
+    // persists, and the read below would throw on undefined.
+    const okSec = J.patchWeek(w => {
       if (!w.sections.order) {
         w.sections.order = { total: picked.length, items: [], startedAt: Date.now(), demo: pack.demo };
       }
     });
+    if (okSec === null) {
+      renderCommitFailed(taskEl, () => renderOrder(taskEl, res, slot));
+      return;
+    }
 
     const { week } = J.weekRecord();
     const committed = week.sections.order.items.length;
@@ -176,8 +207,10 @@
       if (answer.length !== bank.length) return;
       const seq = answer.map(k => bank[k].w);
       const ok = seq.length === target.length && seq.every((w, i) => w === target[i]);
-      // LOCK: write immediately, no feedback, move on
-      J.patchWeek(w => {
+      
+     // LOCK: write immediately, no feedback, move on — but only if the
+      // write landed.
+      commitOrHalt(taskEl, w => {
         w.sections.order.items.push({
           n: item.n, ans: seq.join(' '), ok,
           firstMs: firstMs === null ? null : firstMs,
@@ -185,10 +218,12 @@
           chg: changes,
           at: Date.now()
         });
+      }, () => {
+        const next = idx + 1;
+        if (next >= picked.length) renderOrderDone(taskEl, demo);
+        else showItem(taskEl, picked, next, demo);
       });
-      const next = idx + 1;
-      if (next >= picked.length) renderOrderDone(taskEl, demo);
-      else showItem(taskEl, picked, next, demo);
+      
     });
 
     repaintAnswer(); syncLock();
@@ -512,11 +547,15 @@
       kind: (i >= meanCount && defs.some(d => d.n === card.n)) ? 'def' : 'mean'
     }));
 
-    J.patchWeek(w => {
+   const okSec = J.patchWeek(w => {
       if (!w.sections.vocab) {
         w.sections.vocab = { total: items.length, items: [], startedAt: Date.now(), demo };
       }
     });
+    if (okSec === null) {
+      renderCommitFailed(taskEl, () => renderVocab(taskEl, res, slot));
+      return;
+    }
 
     const { week } = J.weekRecord();
     const done = week.sections.vocab.items.length;
@@ -542,15 +581,18 @@
 
     showChoiceItem(taskEl,
       { count: items.length, idx, demo, promptHtml: prompt, audioUrl, choices },
-      r => {
-        J.patchWeek(w => {
+                   
+     r => {
+        commitOrHalt(taskEl, w => {
           w.sections.vocab.items.push(
             Object.assign({ n: card.n, kind, at: Date.now() }, r));
+        }, () => {
+          const next = idx + 1;
+          if (next >= items.length) renderTestDone(taskEl, demo);
+          else showVocabItem(taskEl, items, next, demo, slot, pool, defs, seed);
         });
-        const next = idx + 1;
-        if (next >= items.length) renderTestDone(taskEl, demo);
-        else showVocabItem(taskEl, items, next, demo, slot, pool, defs, seed);
       });
+    
   }
 
   // ── Mixed Weekly Check ───────────────────────────────────
@@ -638,12 +680,16 @@
     const scored = items.filter(it => !String(it.kind).startsWith('prove'));
     const demo = scored.some(it => it.demo);
 
-    J.patchWeek(w => {
+ const okSec = J.patchWeek(w => {
       if (!w.sections.mixed) {
         w.sections.mixed = { total: scored.length, proveTotal: items.length - scored.length,
                              items: [], startedAt: Date.now(), demo };
       }
     });
+    if (okSec === null) {
+      renderCommitFailed(taskEl, () => renderMixed(taskEl, res, slot));
+      return;
+    }
 
     const { week } = J.weekRecord();
     const done = week.sections.mixed.items.length;   // all committed, incl. prove-it
@@ -655,14 +701,16 @@
   function showMixedItem(taskEl, items, idx, slot, base) {
     const item = items[idx];
     const common = { count: items.length, idx, demo: !!item.demo };
-    const save = (kind, n, extra, r) => {
-      J.patchWeek(w => {
+    
+   const save = (kind, n, extra, r) => {
+      commitOrHalt(taskEl, w => {
         w.sections.mixed.items.push(
           Object.assign({ kind, n, at: Date.now() }, extra, r));
+      }, () => {
+        const next = idx + 1;
+        if (next >= items.length) renderTestDone(taskEl, !!item.demo);
+        else showMixedItem(taskEl, items, next, slot, base);
       });
-      const next = idx + 1;
-      if (next >= items.length) renderTestDone(taskEl, !!item.demo);
-      else showMixedItem(taskEl, items, next, slot, base);
     };
 
     if (item.kind === 'comp' || item.kind === 'read') {
@@ -798,12 +846,16 @@
     _dict = null;
     const built = await buildDictSchedule(slot);
 
-    J.patchWeek(w => {
+   const okSec = J.patchWeek(w => {
       if (!w.sections.dictation) {
         w.sections.dictation = { total: built.itemTotal, items: [],
                                  startedAt: Date.now(), demo: built.demo };
       }
     });
+    if (okSec === null) {
+      renderCommitFailed(taskEl, () => renderDictation(taskEl, res, slot));
+      return;
+    }
 
     _dict = { schedule: built.schedule, sentAll: built.sentAll,
               demo: built.demo, seed: built.seed,
@@ -889,15 +941,22 @@
       count: tierSegs.length, idx: ord, demo: d.demo,
       promptHtml: prompt, audioUrl, autoplay: true,
       target, bank: bankArr, letter: seg.tier === 'word'
+      
     }, r => {
-      J.patchWeek(w => {
+      // Broadcast phase: the clock owns the screen, so a failure here can be
+      // overwritten by the next segment render. The persistent banner from
+      // juku:saveFailed is what survives — this halt only holds when the
+      // student locked early and the window is still open.
+      commitOrHalt(taskEl, w => {
         if (w.sections.dictation.items.some(it => it.seg === segIdx)) return;
         w.sections.dictation.items.push(Object.assign(
           { seg: segIdx, tier: seg.tier, n: card.n, at: Date.now() }, r));
+      }, () => {
+        d.ctrl = null;
+        dictRenderLocked(taskEl, d.demo);
       });
-      d.ctrl = null;
-      dictRenderLocked(taskEl, d.demo);
     });
+    
   }
 
   function dictTick(res) {
