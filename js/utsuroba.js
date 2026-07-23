@@ -111,23 +111,30 @@
   /* ═══════════════════════════════════════════
      SAVE LAYER
   ═══════════════════════════════════════════ */
-  const SAVE_KEY = 'booha_save';
-
+// Routed through BoohaSaveFile, never localStorage directly. The bare
+  // 'booha_save' key is unscoped: the drifter world lived on the orphaned
+  // pre-epoch blob, shared by every student using the device.
   function loadSave() {
     try {
-      const raw = localStorage.getItem(SAVE_KEY);
-      const d   = raw ? JSON.parse(raw) : {};
+      const d = (window.BoohaAdventure && BoohaAdventure.save)
+        ? BoohaAdventure.save.load()
+        : {};
       return migrateUtsurobaSave(d);
-    } catch(_) {}
+    } catch(e) { console.error('[Utsuroba] Save read failed:', e); }
     return { utsuroba:{}, karasuki:{}, weekly:{} };
   }
 
+  // Returns true only if the write landed. BoohaSaveFile refuses to write
+  // when no student is identified, and dispatches the failure banner itself.
   function writeSave(data) {
     try {
-      data.updatedAt = Date.now();
-      localStorage.setItem(SAVE_KEY, JSON.stringify(data));
-    } catch(_) {}
-    try { if (window.BoohaAdventure?.save?.invalidate) BoohaAdventure.save.invalidate(); } catch(_) {}
+      if (window.BoohaAdventure && BoohaAdventure.save) return BoohaAdventure.save.save(data);
+      console.error('[Utsuroba] Save system unavailable — progress NOT written.');
+      return false;
+    } catch(e) {
+      console.error('[Utsuroba] Save write failed:', e);
+      return false;
+    }
   }
 
   function migrateUtsurobaSave(data) {
@@ -496,10 +503,14 @@
       writeSave(data); invalidateQuestCache();
     });
     document.getElementById('buki-dev-clear-all').addEventListener('click', () => {
+      
       if (confirm('Clear all booha_save data?')) {
-        try { localStorage.removeItem(SAVE_KEY); } catch(_) {}
+        try {
+          if (window.BoohaAdventure && BoohaAdventure.save) BoohaAdventure.save.clear();
+        } catch(_) {}
         invalidateQuestCache();
       }
+      
     });
     document.getElementById('buki-dev-celebrate').addEventListener('click', () => {
       const drifter = DATA.drifters[0];
@@ -1515,9 +1526,15 @@
     requestAnimationFrame(tick);
   }
 
-  init();
+  // The save is keyed on booha_userid, which token.js writes only after its
+  // async verify returns. init() reads and writes immediately (markVisited,
+  // the drifter quest), so it must not run before identity lands. The page is
+  // already hidden by token-checking until then, so this adds no visible wait.
+  if (window.BOOHA_READY) init();
+  else document.addEventListener('booha:ready', init, { once: true });
 
   Object.defineProperty(window, 'b_4911', {
+    
     value: () => {
       if (typeof injectDevPanel === 'function') injectDevPanel();
     },
