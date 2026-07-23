@@ -5,9 +5,9 @@
 // ============================================================
 
 const CURRENT_CACHES = {
-  pages:  'booha-pages-2026-39',
-  assets: 'booha-assets-2026-39',
-  decks:  'booha-decks-2026-39',
+  pages:  'booha-pages-2026-40',
+  assets: 'booha-assets-2026-40',
+  decks:  'booha-decks-2026-40',
 };
 
 const PAGE_CACHE  = CURRENT_CACHES.pages;
