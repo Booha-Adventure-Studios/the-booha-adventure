@@ -63,13 +63,7 @@ const BoohaAdventure = (() => {
 
     const weekKey = _getWeekKey();
 
-    // Diagnostic log — remove once weekly reset is confirmed working
-    const _diagData = saveFile.load();
-    console.log('[BoohaAdventure] Weekly check:', {
-      hasCalendar: !!window.CALENDAR,
-      weekKey,
-      storedKey: (_diagData.meta && _diagData.meta.lastWeeklyKey) || ''
-    });
+    
 
     if (!weekKey) return; // CALENDAR not available, skip
 
@@ -151,15 +145,41 @@ const BoohaAdventure = (() => {
       }
     });
 
+    window.BOOHA_READY = true;
     console.log(`[BoohaAdventure] v${VERSION} ready. Systems: ${Object.keys(_systems).join(', ')}`);
     document.dispatchEvent(new CustomEvent('booha:ready', { detail: { version: VERSION } }));
   }
 
-  // ── Auto-init on DOM ready ────────────────────────────────────────────────
+// ── Boot gate: identity before storage ────────────────────────────────────
+  // saveFile keys on booha_userid, which token.js writes only after its async
+  // verify returns — always after DOMContentLoaded. Booting on DOM ready meant
+  // _checkWeeklyReset() could read, reset and rewrite the *legacy* save before
+  // the student was known. Wait for the identity signal; fall back on a timer
+  // so a page without token.js, or a stalled verify, still boots.
+
+  const IDENTITY_TIMEOUT_MS = 8000;
+
+  function _bootWhenReady() {
+    if (window.BOOHA_IDENTITY_READY) { init(); return; }
+
+    let fired = false;
+    const go = (why) => {
+      if (fired) return;
+      fired = true;
+      if (why === 'timeout') {
+        console.warn('[BoohaAdventure] Identity never signalled — booting on the legacy save key.');
+      }
+      init();
+    };
+
+    document.addEventListener('booha:identityReady', () => go('identity'), { once: true });
+    setTimeout(() => go('timeout'), IDENTITY_TIMEOUT_MS);
+  }
+
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
+    document.addEventListener('DOMContentLoaded', _bootWhenReady);
   } else {
-    setTimeout(init, 0);
+    setTimeout(_bootWhenReady, 0);
   }
 
   // ── Public API ────────────────────────────────────────────────────────────
