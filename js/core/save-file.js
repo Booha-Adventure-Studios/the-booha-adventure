@@ -52,6 +52,7 @@ const BoohaSaveFile = (() => {
       localStorage.setItem(nsKey, stamped);
       localStorage.setItem(STORAGE_BASE, stamped);
       console.log('[BoohaSaveFile] Legacy save adopted by', uid);
+      
     } catch (e) {
       console.error('[BoohaSaveFile] Legacy adoption failed:', e);
     }
@@ -139,8 +140,14 @@ const BoohaSaveFile = (() => {
       if (!raw) return _defaultSave();
       const parsed = JSON.parse(raw);
       return _migrate(parsed);
-    } catch (e) {
+   } catch (e) {
+      // A parse failure must not silently become a blank save: the next write
+      // would persist the default over recoverable data. Stash the raw string.
       console.error('[BoohaSaveFile] Load error:', e);
+      try {
+        const raw = localStorage.getItem(_key());
+        if (raw) localStorage.setItem(_key() + ':corrupt:' + Date.now(), raw);
+      } catch (_) {}
       return _defaultSave();
     }
   }
