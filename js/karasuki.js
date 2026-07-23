@@ -322,25 +322,52 @@ const HAPPY_HOUSE_PORTAL = {
     return orbs;
   }
 
+  // Routed through BoohaSaveFile. Utsuroba writes the quest to the scoped
+  // save, so reading the bare key here meant Karasuki never saw an accepted
+  // quest and no orbs ever spawned.
+  //
+  // Cached: loadDrifterQuest() is called from getOrbsForRoom(), which runs
+  // inside drawOrbs() every frame. An uncached read is a full localStorage
+  // read + JSON.parse + schema migration at 60fps.
+  let _questCache = null, _questCacheAt = 0;
+  const QUEST_CACHE_MS = 500;
+
+  function invalidateQuestCache() { _questCacheAt = 0; }
+
   function loadDrifterQuest() {
+    const now = performance.now();
+    if (_questCacheAt && (now - _questCacheAt) < QUEST_CACHE_MS) return _questCache;
     try {
-      const raw = localStorage.getItem('booha_save');
-      if (!raw) return null;
-      const data = JSON.parse(raw);
-      return data?.weekly?.drifterQuest || null;
-    } catch (_) { return null; }
+      const data = (window.BoohaAdventure && BoohaAdventure.save)
+        ? BoohaAdventure.save.load()
+        : null;
+      _questCache   = (data && data.weekly && data.weekly.drifterQuest) || null;
+      _questCacheAt = now;
+      return _questCache;
+    } catch (e) {
+      console.error('[Karasuki] Quest read failed:', e);
+      return null;
+    }
   }
 
   function saveDrifterQuest(patch) {
     try {
-      const raw  = localStorage.getItem('booha_save');
-      const data = raw ? JSON.parse(raw) : {};
-      if (!data.weekly)               data.weekly             = {};
-      if (!data.weekly.drifterQuest)  data.weekly.drifterQuest = {};
+      if (!window.BoohaAdventure || !BoohaAdventure.save) {
+        console.error('[Karasuki] Save system unavailable — quest NOT written.');
+        return false;
+      }
+      const data = BoohaAdventure.save.load();
+      if (!data.weekly)              data.weekly              = {};
+      if (!data.weekly.drifterQuest) data.weekly.drifterQuest = {};
       Object.assign(data.weekly.drifterQuest, patch);
-      data.updatedAt = Date.now();
-      localStorage.setItem('booha_save', JSON.stringify(data));
-    } catch (_) {}
+      const ok = BoohaAdventure.save.save(data);
+      invalidateQuestCache();
+      if (!ok) console.error('[Karasuki] Quest write BLOCKED — no identity.');
+      return ok;
+    } catch (e) {
+      console.error('[Karasuki] Quest write failed:', e);
+      return false;
+    }
   }
 
  function initOrbs() {
@@ -670,13 +697,16 @@ const HAPPY_HOUSE_PORTAL = {
   if (window.__devAllWanderers) {
     unlockedIndices = WANDERER_DEFS.map(d => d.index);
   } else {
+    
     try {
-      const raw = localStorage.getItem('booha_save');
-      const data = raw ? JSON.parse(raw) : null;
+      const data = (window.BoohaAdventure && BoohaAdventure.save)
+        ? BoohaAdventure.save.load()
+        : null;
       if (data && data.weekly && data.weekly.wanderers) {
         unlockedIndices = data.weekly.wanderers;
       }
-    } catch (_) {}
+    } catch (e) { console.error('[Karasuki] Wanderer read failed:', e); }
+    
   }
   activeWanderers = WANDERER_DEFS
     .filter(def => def.roomId === state.roomId && unlockedIndices.includes(def.index))
@@ -1548,13 +1578,17 @@ const HAPPY_HOUSE_PORTAL = {
     document.getElementById('dev-all-orbs').addEventListener('change',      function() { window.__devAllOrbs = this.checked; });
     document.getElementById('dev-coords-toggle').addEventListener('change', function() { if (this.checked !== state.coordMode) toggleCoordMode(); });
     document.getElementById('dev-clear-quest').addEventListener('click', () => {
+
       try {
-        const raw = localStorage.getItem('booha_save');
-        const data = raw ? JSON.parse(raw) : {};
-        if (data.weekly) data.weekly.drifterQuest = null;
-        localStorage.setItem('booha_save', JSON.stringify(data));
+        if (window.BoohaAdventure && BoohaAdventure.save) {
+          const data = BoohaAdventure.save.load();
+          if (data.weekly) data.weekly.drifterQuest = null;
+          BoohaAdventure.save.save(data);
+          invalidateQuestCache();
+        }
         weeklyOrbs.forEach(o => o.collected = false);
       } catch(_) {}
+      
     });
 
     setInterval(() => {
@@ -2051,8 +2085,9 @@ function tick(now) {
 
   function getGamesThisWeek() {
   try {
-    const raw  = localStorage.getItem('booha_save');
-    const data = raw ? JSON.parse(raw) : null;
+    const data = (window.BoohaAdventure && BoohaAdventure.save)
+      ? BoohaAdventure.save.load()
+      : null;
     const cg = data?.weekly?.completedGames;
     return cg && typeof cg === 'object' ? Object.keys(cg).length : 0;
   } catch (_) { return 0; }
@@ -2661,7 +2696,12 @@ function drawObserver(now) {
     requestAnimationFrame(tick);
   }
 
-  init();
+  // The save is keyed on booha_userid, which token.js writes only after its
+  // async verify returns. init() reads the quest, wanderers and vitality
+  // immediately, so it must not run before identity lands. The page is
+  // already hidden by token-checking until then.
+  if (window.BOOHA_READY) init();
+  else document.addEventListener('booha:ready', init, { once: true });
 
 window.KarasakiOrbs = { returnOrbToKarasuki };
 
