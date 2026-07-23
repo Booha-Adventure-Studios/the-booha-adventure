@@ -9,8 +9,21 @@
   'use strict';
 
   const CFG = window.JUKU_CONFIG;
-  const SAVE_KEY = 'booha_juku_save';
-  const SLOT_KEY = 'booha_juku_slot';   // sessionStorage: today's chosen slot
+  const SAVE_BASE   = 'booha_juku_save';
+  const SLOT_KEY    = 'booha_juku_slot';   // sessionStorage: today's chosen slot
+  const KEY_USER_ID = 'booha_userid';
+
+  // Juku records are scoped to the logged-in student. There is deliberately
+  // NO legacy adoption here: Juku runs on shared classroom tablets, where
+  // inheriting an anonymous record would attribute one student's exam to
+  // another. An unidentified student gets a clean record instead.
+  function jukuUid() {
+    try { return localStorage.getItem(KEY_USER_ID) || ''; } catch (e) { return ''; }
+  }
+  function saveKey() {
+    const uid = jukuUid();
+    return uid ? `${SAVE_BASE}:${uid}` : SAVE_BASE;
+  }
 
   // ── Tokyo clock ──────────────────────────────────────────
   // Week arithmetic stays in calendar.js (the authority). Time-of-day in
@@ -122,12 +135,9 @@
   }
 
   // ── Seeded RNG (mulberry32 over a string hash) ───────────
-  // Broadcast phases: seed = weekId          (every device identical)
-  // Test phases:      seed = PIN? no — PIN is never stored client-side.
-  //                   seed = firstName + displayName + weekId is weak;
-  //                   use the token string: stable per login, per student.
-  //                   NOTE: a re-login reshuffles order — acceptable, since
-  //                   committed answers are already written to the save.
+ // Broadcast phases: seed = weekId   (every device identical)
+  // Test phases:      seed = booha_userid — stable for the life of the
+  //                   account, so a re-login no longer reshuffles order.
 
   function hashStr(str) {
     let h = 1779033703 ^ str.length;
@@ -159,8 +169,10 @@
   }
 
   function studentSeedBase() {
-    // Per-student, stable within a login session.
-    return (localStorage.getItem('booha_token') || 'anon');
+    // Per-student and stable for the life of the account: the Wix record _id.
+    // Replaces the token, which rotated on every login and reshuffled question
+    // order mid-term, and whose 'anon' fallback collided across all devices.
+    return jukuUid() || (localStorage.getItem('booha_token') || 'anon');
   }
 
   // ── Save file (booha_juku_save) ──────────────────────────
@@ -170,7 +182,7 @@
 
   function loadSave() {
     try {
-      const s = JSON.parse(localStorage.getItem(SAVE_KEY) || '{"v":1,"weeks":{}}');
+      const s = JSON.parse(localStorage.getItem(saveKey()) || '{"v":1,"weeks":{}}');
       if (!s.v) s.v = 1;
       if (!s.weeks) s.weeks = {};
       return s;
@@ -179,7 +191,7 @@
   }
   
   function writeSave(s) {
-    try { localStorage.setItem(SAVE_KEY, JSON.stringify(s)); } catch (e) {}
+    try { localStorage.setItem(saveKey(), JSON.stringify(s)); } catch (e) {}
   }
 
  function weekRecord() {
@@ -187,8 +199,11 @@
     // Records key by week + slot: a shared tablet serving the 17:00 and
     // 19:00 classes on the same day can never collide.
     const cw = window.CALENDAR.getCurrentCurriculumWeek();
+   
     const slotId = _slot ? _slot.id : 'noslot';
-    const key = `${cw.weekId}|${slotId}`;
+    const uid    = jukuUid() || 'anon';
+    const key    = `${cw.weekId}|${slotId}|${uid}`;
+   
     const s = loadSave();
     if (!s.weeks[key]) {
       s.weeks[key] = {
