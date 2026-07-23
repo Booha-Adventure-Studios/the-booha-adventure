@@ -48,10 +48,17 @@ window.KarasukiAtmos = (() => {
   };
 
   /* ═══════════════ vitality ═══════════════ */
+  // Routed through BoohaSaveFile. Reading the bare key meant vitality was
+  // computed from the orphaned pre-epoch blob — the world's atmosphere
+  // reflected whoever last used the device, and never updated again.
   function readSave() {
-    try { const raw = localStorage.getItem('booha_save'); return raw ? JSON.parse(raw) : null; }
-    catch (_) { return null; }
+    try {
+      return (window.BoohaAdventure && BoohaAdventure.save)
+        ? BoohaAdventure.save.load()
+        : null;
+    } catch (_) { return null; }
   }
+   
   function computeVitality() {
     const d = readSave();
     const stars = (d && d.meta && typeof d.meta.allTimeStars === 'number') ? d.meta.allTimeStars : 0;
