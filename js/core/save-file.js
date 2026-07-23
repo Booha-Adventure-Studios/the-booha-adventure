@@ -8,9 +8,15 @@
 const BoohaSaveFile = (() => {
   'use strict';
 
-  const STORAGE_BASE = 'booha_save';
-  const SAVE_VERSION = 2;
-  const KEY_USER_ID  = 'booha_userid';
+  const STORAGE_BASE    = 'booha_save';
+  const KEY_USER_ID     = 'booha_userid';
+
+  // Two different numbers. Do not read them together.
+  //   ADVENTURE_EPOCH — key generation. Bump to ABANDON every existing save.
+  //                     Old keys are orphaned, not migrated, not deleted.
+  //   SAVE_VERSION    — schema shape. Bump to MIGRATE saves via _migrate().
+  const ADVENTURE_EPOCH = 3;
+  const SAVE_VERSION    = 2;
 
   // ── Identity-scoped storage key ───────────────────────────────────────────
   // Saves live under the logged-in student's Wix _id, so two students sharing
@@ -22,41 +28,28 @@ const BoohaSaveFile = (() => {
     try { return localStorage.getItem(KEY_USER_ID) || ''; } catch (e) { return ''; }
   }
 
+ // Returns null when no student is identified. All 13 pages that load this
+  // file are token-gated, so there is no legitimate anonymous Adventure save:
+  // no userId means the session is broken, not anonymous. Callers MUST treat
+  // null as "refuse to touch storage" — an unscoped fallback is what let one
+  // student's page load read and mutate another student's save.
+  //
+  // Returns null rather than throwing: load() and save() catch internally, so
+  // a throw would be swallowed and silently become a blank _defaultSave().
   function _key() {
     const uid = _uid();
-    return uid ? `${STORAGE_BASE}:${uid}` : STORAGE_BASE;
+    return uid ? `${STORAGE_BASE}:v${ADVENTURE_EPOCH}:${uid}` : null;
   }
 
-  // ── One-time adoption of the pre-identity save ────────────────────────────
-  // The first student to log in on a device claims the existing anonymous
-  // save. The legacy blob is stamped `meta.adoptedBy` and LEFT IN PLACE: it
-  // is the rollback path, and the stamp stops a second student claiming it.
-
-  let _adoptDone = false;
-
-  function _adoptLegacy() {
-    if (_adoptDone) return;
-    const uid = _uid();
-    if (!uid) return;                 // not identified yet — retry on next call
-    _adoptDone = true;
-    try {
-      const nsKey = `${STORAGE_BASE}:${uid}`;
-      if (localStorage.getItem(nsKey) !== null) return;  // already has own save
-      const legacy = localStorage.getItem(STORAGE_BASE);
-      if (legacy === null) return;                       // nothing to adopt
-      const parsed = JSON.parse(legacy);
-      if (parsed && parsed.meta && parsed.meta.adoptedBy) return;  // claimed
-      if (!parsed.meta) parsed.meta = {};
-      parsed.meta.adoptedBy = uid;
-      const stamped = JSON.stringify(parsed);
-      localStorage.setItem(nsKey, stamped);
-      localStorage.setItem(STORAGE_BASE, stamped);
-      console.log('[BoohaSaveFile] Legacy save adopted by', uid);
-      
-    } catch (e) {
-      console.error('[BoohaSaveFile] Legacy adoption failed:', e);
-    }
+  let _lockWarned = false;
+  function _warnLocked(op) {
+    if (_lockWarned) return;
+    _lockWarned = true;
+    console.error(`[BoohaSaveFile] ${op} blocked — no identity. Saves are disabled.`);
+    document.dispatchEvent(new Event('booha:saveLocked'));
   }
+
+  
 
   // ── Default save structure ────────────────────────────────────────────────
   function _defaultSave() {
@@ -135,9 +128,12 @@ const BoohaSaveFile = (() => {
   // ── Core read / write ─────────────────────────────────────────────────────
   function load() {
     try {
-      _adoptLegacy();
-      const raw = localStorage.getItem(_key());
+      
+      const k = _key();
+      if (!k) { _warnLocked('read'); return _defaultSave(); }
+      const raw = localStorage.getItem(k);
       if (!raw) return _defaultSave();
+      
       const parsed = JSON.parse(raw);
       return _migrate(parsed);
    } catch (e) {
@@ -154,10 +150,13 @@ const BoohaSaveFile = (() => {
 
   function save(data) {
     try {
+      
+      const k = _key();
+      if (!k) { _warnLocked('write'); return false; }
       data.updatedAt = Date.now();
       data.version   = SAVE_VERSION;
-      _adoptLegacy();
-      localStorage.setItem(_key(), JSON.stringify(data));
+      localStorage.setItem(k, JSON.stringify(data));
+      
       document.dispatchEvent(new CustomEvent('booha:saved', { detail: data }));
       return true;
     } catch (e) {
@@ -167,13 +166,16 @@ const BoohaSaveFile = (() => {
   }
 
   function clear() {
-    localStorage.removeItem(_key());
+    const k = _key();
+    if (!k) { _warnLocked('clear'); return; }
+    localStorage.removeItem(k);
     document.dispatchEvent(new Event('booha:saveCleared'));
   }
 
   function exists() {
-    _adoptLegacy();
-    return localStorage.getItem(_key()) !== null;
+    const k = _key();
+    if (!k) return false;
+    return localStorage.getItem(k) !== null;
   }
 
   // ── Partial update helper ─────────────────────────────────────────────────
@@ -217,6 +219,9 @@ const BoohaSaveFile = (() => {
 
   // ── Export / Import ───────────────────────────────────────────────────────
   function exportJSON() {
+    // Guard explicitly: load() returns a default when locked, so without this
+    // a student could export a legitimate-looking file containing nothing.
+    if (!_key()) { _warnLocked('export'); return null; }
     return JSON.stringify(load(), null, 2);
   }
 
@@ -241,6 +246,7 @@ const BoohaSaveFile = (() => {
     resetWeekly,
     exportJSON, importJSON,
     init() {
+      if (!_key()) { _warnLocked('init'); return; }
       if (!exists()) save(_defaultSave());
     }
   };
