@@ -192,17 +192,32 @@ window.QuestionBlitz = (() => {
     return blitz;
   }
 
+ // Routed through BoohaSaveFile, never localStorage directly. The bare
+  // 'booha_save' key is unscoped: writing to it put blitz records outside the
+  // student's save file, outside the weekly reset, and shared across everyone
+  // using the device. Reads here also get schema migration for free.
   function readSave() {
     try {
-      const raw = localStorage.getItem('booha_save');
-      return raw ? JSON.parse(raw) : {};
-    } catch {
+      if (window.BoohaAdventure && BoohaAdventure.save) return BoohaAdventure.save.load();
+      console.error('[Blitz] Save system unavailable — reading empty.');
+      return {};
+    } catch (e) {
+      console.error('[Blitz] Save read failed:', e);
       return {};
     }
   }
 
+  // Returns true only if the write actually landed. BoohaSaveFile refuses to
+  // write when no student is identified, and that must not be silent.
   function writeSave(data) {
-    localStorage.setItem('booha_save', JSON.stringify(data));
+    try {
+      if (window.BoohaAdventure && BoohaAdventure.save) return BoohaAdventure.save.save(data);
+      console.error('[Blitz] Save system unavailable — record NOT written.');
+      return false;
+    } catch (e) {
+      console.error('[Blitz] Save write failed:', e);
+      return false;
+    }
   }
 
   function getLegacyBestTime(curr) {
@@ -269,7 +284,14 @@ window.QuestionBlitz = (() => {
         data.meta[LEGACY_SCORE_KEY][curr] = ms;
       }
 
-      writeSave(data);
+      if (!writeSave(data)) {
+        // Don't claim a record that wasn't stored — the student would see
+        // "NEW BOOHA RECORD" and find it gone on the next load.
+        return {
+          isWeeklyRecord: false, isAllTimeRecord: false,
+          oldRecord: bestBefore, newScore, saveFailed: true
+        };
+      }
       return { isWeeklyRecord, isAllTimeRecord, oldRecord: bestBefore, newScore };
     } catch {
       return {
@@ -1013,6 +1035,9 @@ window.QuestionBlitz = (() => {
     function showWin(ms, curr, palette, overlay, winScreen, monthSlug, weekNumber) {
       const weekId     = makeWeekId(monthSlug, weekNumber);
       const result     = saveBestTime(curr, ms, weekId);
+      if (result.saveFailed) {
+        console.error('[Blitz] Time not saved:', ms, 'ms');
+      }
 
       // Report clear to Booha day-recorder (fires only on 100% clear)
       document.dispatchEvent(new CustomEvent('booha:gameEnd', {
