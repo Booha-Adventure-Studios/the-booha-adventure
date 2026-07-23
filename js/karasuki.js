@@ -94,7 +94,19 @@ const HAPPY_HOUSE_PORTAL = {
     return MONTH_COLORS[(n - 1) % MONTH_COLORS.length];
   }
 
-  const boohaWeek = parseInt(sessionStorage.getItem('booha_active_week') || '1', 10);
+  // booha_active_week is never written by anything in the repo, so this read
+  // resolved to 1 on every visit for every student — the weekly orb layout
+  // has been frozen at week 1 since it shipped. CALENDAR is the authority.
+  const boohaWeek = (() => {
+    try {
+      const cw = window.CALENDAR.getCurrentCurriculumWeek();
+      const w  = window.CALENDAR.getAcademicWeekNumber(cw);
+      if (Number.isInteger(w) && w >= 1) return w;
+    } catch (e) {
+      console.error('[Karasuki] Week resolution failed:', e);
+    }
+    return 1;
+  })();
   const primary   = monthPrimary(boohaWeek);
   const secondary = monthSecondary(boohaWeek);
 
