@@ -15,6 +15,7 @@
   const KEY_VALIDATED = 'booha_last_validated_at';
   const KEY_FIRST     = 'booha_first_name';
   const KEY_JUKU      = 'booha_is_juku';
+  const KEY_USER_ID   = 'booha_userid';
 
   function clearSession() {
     localStorage.removeItem(KEY_TOKEN);
@@ -23,6 +24,7 @@
     localStorage.removeItem(KEY_VALIDATED);
     localStorage.removeItem(KEY_FIRST);
     localStorage.removeItem(KEY_JUKU);
+    localStorage.removeItem(KEY_USER_ID);
  }
 
   function redirect(reason) {
@@ -219,6 +221,12 @@
       localStorage.setItem(KEY_FIRST, data.displayName.split(' ')[0]);
     }
     localStorage.setItem(KEY_JUKU, data.isJuku === true ? '1' : '0');
+
+    if (data.userId) {
+      localStorage.setItem(KEY_USER_ID, data.userId);
+    } else {
+      console.warn('[token] No userId in verify response — saves stay on the legacy key.');
+    }
 
     // Install overlay — once only, not in standalone
     if (!isStandalone() && !localStorage.getItem(INSTALL_KEY)) {
