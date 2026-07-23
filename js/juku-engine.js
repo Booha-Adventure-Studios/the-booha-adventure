@@ -191,7 +191,16 @@
   }
   
   function writeSave(s) {
-    try { localStorage.setItem(saveKey(), JSON.stringify(s)); } catch (e) {}
+    try {
+      localStorage.setItem(saveKey(), JSON.stringify(s));
+      return true;
+    } catch (e) {
+      // Quota or private-mode failure. Silently swallowing this meant a student
+      // could sit a full 90-minute exam with nothing being recorded.
+      console.error('[JUKU] Save write FAILED:', e);
+      document.dispatchEvent(new CustomEvent('juku:saveFailed', { detail: { error: String(e) } }));
+      return false;
+    }
   }
 
  function weekRecord() {
