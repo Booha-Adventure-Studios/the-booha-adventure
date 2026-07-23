@@ -8,8 +8,54 @@
 const BoohaSaveFile = (() => {
   'use strict';
 
-  const STORAGE_KEY  = 'booha_save';
+  const STORAGE_BASE = 'booha_save';
   const SAVE_VERSION = 2;
+  const KEY_USER_ID  = 'booha_userid';
+
+  // ── Identity-scoped storage key ───────────────────────────────────────────
+  // Saves live under the logged-in student's Wix _id, so two students sharing
+  // one device never inherit each other's progress. Falls back to the legacy
+  // unscoped key when nobody is identified — behaviour then matches the old
+  // build exactly, so a missing userId degrades instead of breaking.
+
+  function _uid() {
+    try { return localStorage.getItem(KEY_USER_ID) || ''; } catch (e) { return ''; }
+  }
+
+  function _key() {
+    const uid = _uid();
+    return uid ? `${STORAGE_BASE}:${uid}` : STORAGE_BASE;
+  }
+
+  // ── One-time adoption of the pre-identity save ────────────────────────────
+  // The first student to log in on a device claims the existing anonymous
+  // save. The legacy blob is stamped `meta.adoptedBy` and LEFT IN PLACE: it
+  // is the rollback path, and the stamp stops a second student claiming it.
+
+  let _adoptDone = false;
+
+  function _adoptLegacy() {
+    if (_adoptDone) return;
+    const uid = _uid();
+    if (!uid) return;                 // not identified yet — retry on next call
+    _adoptDone = true;
+    try {
+      const nsKey = `${STORAGE_BASE}:${uid}`;
+      if (localStorage.getItem(nsKey) !== null) return;  // already has own save
+      const legacy = localStorage.getItem(STORAGE_BASE);
+      if (legacy === null) return;                       // nothing to adopt
+      const parsed = JSON.parse(legacy);
+      if (parsed && parsed.meta && parsed.meta.adoptedBy) return;  // claimed
+      if (!parsed.meta) parsed.meta = {};
+      parsed.meta.adoptedBy = uid;
+      const stamped = JSON.stringify(parsed);
+      localStorage.setItem(nsKey, stamped);
+      localStorage.setItem(STORAGE_BASE, stamped);
+      console.log('[BoohaSaveFile] Legacy save adopted by', uid);
+    } catch (e) {
+      console.error('[BoohaSaveFile] Legacy adoption failed:', e);
+    }
+  }
 
   // ── Default save structure ────────────────────────────────────────────────
   function _defaultSave() {
@@ -88,7 +134,8 @@ const BoohaSaveFile = (() => {
   // ── Core read / write ─────────────────────────────────────────────────────
   function load() {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
+      _adoptLegacy();
+      const raw = localStorage.getItem(_key());
       if (!raw) return _defaultSave();
       const parsed = JSON.parse(raw);
       return _migrate(parsed);
@@ -102,7 +149,8 @@ const BoohaSaveFile = (() => {
     try {
       data.updatedAt = Date.now();
       data.version   = SAVE_VERSION;
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      _adoptLegacy();
+      localStorage.setItem(_key(), JSON.stringify(data));
       document.dispatchEvent(new CustomEvent('booha:saved', { detail: data }));
       return true;
     } catch (e) {
@@ -112,12 +160,13 @@ const BoohaSaveFile = (() => {
   }
 
   function clear() {
-    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(_key());
     document.dispatchEvent(new Event('booha:saveCleared'));
   }
 
   function exists() {
-    return localStorage.getItem(STORAGE_KEY) !== null;
+    _adoptLegacy();
+    return localStorage.getItem(_key()) !== null;
   }
 
   // ── Partial update helper ─────────────────────────────────────────────────
