@@ -48,32 +48,7 @@ body::after {
 </head>
 <body>
 
-<script>
-const MONTH_COLORS = [
-  ['#9b2c7a','#c45fa3'], // faded magenta
-  ['#a14a2f','#c97a5a'], // burnt orange
-  ['#2f6f8f','#6aa6c9'], // cold blue
-  ['#2f8f5a','#79c7a3'], // damp green
-  ['#a89b2f','#d6c76a'], // sick yellow
-  ['#2f4fa8','#7f9de0'], // deep blue
-  ['#6f2fa8','#b07fe0'], // muted purple
-  ['#a86a2f','#d6a06a'], // dusty amber
-  ['#2f8f8a','#7fd6cf'], // fog teal
-  ['#7a8f2f','#b8d66a'], // moss green
-  ['#a82f4f','#e07f97'], // dried rose
-];
 
-function monthPrimary(w) {
-  return MONTH_COLORS[Math.max(0, Math.min(11, Math.floor((w - 1) / 4)))][0];
-}
-function monthSecondary(w) {
-  return MONTH_COLORS[Math.max(0, Math.min(11, Math.floor((w - 1) / 4)))][1];
-}
-
-const boohaWeek = parseInt(sessionStorage.getItem('booha_active_week') || '1', 10);
-const primary   = monthPrimary(boohaWeek);
-const secondary = monthSecondary(boohaWeek);
-</script>
 
 <script src="js/calendar.js"></script>
 <script src="js/core/adventure-core.js"></script>
