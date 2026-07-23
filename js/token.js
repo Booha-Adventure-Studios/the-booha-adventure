@@ -80,6 +80,26 @@
     }
   }
 
+  // Persistent — no auto-dismiss. A save failure is not transient information,
+  // and a toast that fades leaves the student believing their work was stored.
+  function showSaveFailedBanner() {
+    if (document.getElementById('booha-savefail-banner')) return;
+    const el = document.createElement('div');
+    el.id = 'booha-savefail-banner';
+    el.style.cssText = [
+      'position:fixed', 'bottom:0', 'left:0', 'right:0',
+      'background:#b00020', 'color:#fff',
+      'text-align:center', 'padding:10px 16px',
+      'font:600 14px/1.4 sans-serif', 'z-index:99999'
+    ].join(';');
+    el.textContent = 'きろくできません / Not saving — tell your teacher.';
+    document.body.appendChild(el);
+  }
+
+  document.addEventListener('booha:saveLocked', showSaveFailedBanner);
+  document.addEventListener('booha:saveFailed', showSaveFailedBanner);
+  document.addEventListener('juku:saveFailed',  showSaveFailedBanner);
+
   function showConnectingBanner() {
     if (document.getElementById('booha-connecting-banner')) return;
     const el = document.createElement('div');
