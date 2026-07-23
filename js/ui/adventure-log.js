@@ -301,10 +301,12 @@ const BoohaAdventureLog = (() => {
     if (cMount) renderCalendar(cMount, dayLog, keys.day);
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
+// Boot after BoohaAdventure, whose identity gate guarantees booha_userid is
+  // present — otherwise BoohaDayRecord reads the legacy save, not the student's.
+  if (window.BOOHA_READY) {
     init();
+  } else {
+    document.addEventListener('booha:ready', init, { once: true });
   }
 
   return { init, _test: { inferCurriculum, weekStatus, streak, fmtMs } };
