@@ -96,18 +96,28 @@
   }
 
   function wireQuestions(container, section, qs, onChange) {
+    
     container.querySelectorAll('.juku-opt').forEach(btn => {
       btn.addEventListener('click', () => {
         const q = btn.dataset.q, v = btn.dataset.v;
+        
+        const prev = container.querySelector(`.juku-opt[data-q="${q}"].sel`);
         container.querySelectorAll(`.juku-opt[data-q="${q}"]`)
           .forEach(b => b.classList.remove('sel'));
         btn.classList.add('sel');
-        J.patchWeek(w => {
+        const ok = J.patchWeek(w => {
           if (!w[section]) w[section] = {};
           w[section][q] = v;
           w[section].at = Date.now();
         });
+        if (ok === null) {
+          // Roll the highlight back — a selected-looking button that was
+          // never written is the same lie as an accepted answer.
+          btn.classList.remove('sel');
+          if (prev) prev.classList.add('sel');
+        }
         if (onChange) onChange();
+        
       });
     });
   }
@@ -132,13 +142,17 @@
   // report finalization (JUKU_RESULTS.finalize) requires this evidence,
   // so a student opening the app after class never mints a zero report.
 
-  function stampAttendance(slot) {
-    J.patchWeek(w => {
+function stampAttendance(slot) {
+    // finalize() gates the report on this evidence, so a silent failure here
+    // means the student sits the whole lesson and gets no report at all.
+    // Retried on every lobby/phase render, so a transient failure self-heals.
+    const ok = J.patchWeek(w => {
       if (!w.attendance) {
         w.attendance = { firstSeenAt: Date.now(), slot: slot.id,
                          curriculum: slot.curriculum };
       }
     });
+    if (ok === null) console.error('[juku] Attendance NOT stamped — report will not finalize.');
   }
 
   // ── Screens ──────────────────────────────────────────────
@@ -243,7 +257,10 @@ function renderLobby(res, slot) {
    submitBtn.addEventListener('click', () => {
       const { week: w2 } = J.weekRecord();
       if (!allAnswered(SURVEY_QS, w2.survey)) return;
-      J.patchWeek(w => { w.survey.submitted = true; });
+      if (J.patchWeek(w => { w.survey.submitted = true; }) === null) {
+        submitBtn.textContent = '⚠ ほぞん できなかった — もう いちど';
+        return;
+      }
       renderLobbyReady(J.resolve(J.slot, J.tokyoNow()), J.slot);
     });
     
