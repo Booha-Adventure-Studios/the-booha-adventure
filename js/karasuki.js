@@ -2715,7 +2715,7 @@ function drawObserver(now) {
   if (window.BOOHA_READY) init();
   else document.addEventListener('booha:ready', init, { once: true });
 
-window.KarasakiOrbs = { returnOrbToKarasuki };
+
 
   Object.defineProperty(window, 'b_3910', {
     value: () => {
