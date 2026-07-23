@@ -1109,6 +1109,8 @@
 <audio id="bgMusic" src="assets/audio/sneaky.mp3" loop preload="auto"></audio>
 
 <script src="./js/calendar.js"></script>
+<script src="./js/core/adventure-core.js"></script>
+<script src="./js/core/save-file.js"></script>
 <script>
 const { getCurrentCurriculumWeek, getAcademicWeekNumber } = window.CALENDAR;
 
@@ -1293,16 +1295,19 @@ const app=document.getElementById('app'),rotateOverlay=document.getElementById('
 
   const name = getBoohaFirstName();
 
-  /* ── Weekly Blitz completion ────────────────────────────
-     meta.blitz self-guards with weeklyKey, so a raw read is
-     safe here WITHOUT the core stack — but only because we
-     compare weeklyKey against the current week id. */
+ /* ── Weekly Blitz completion ────────────────────────────
+     Routed through BoohaSaveFile. A raw read of 'booha_save'
+     hit the orphaned pre-epoch blob, so the maze reflected
+     whichever student last used the device before the bump. */
   let blitzDone = false;
   try {
     const cw     = getCurrentCurriculumWeek();
     const weekId = `${cw.monthSlug}:w${cw.weekNumber}`;
-    const save   = JSON.parse(localStorage.getItem('booha_save') || '{}');
+    const save   = (window.BoohaAdventure && BoohaAdventure.save)
+      ? BoohaAdventure.save.load()
+      : {};
     const blitz  = (save.meta || {}).blitz || {};
+    
     if (blitz.weeklyKey === weekId && blitz.weekly) {
       const w = blitz.weekly;
       blitzDone = ['pb', 'br', 'bc'].some(c =>
@@ -1506,8 +1511,10 @@ let wanderers=[];
 
 function getGamesThisWeekForMaze() {
   try {
-    const raw = localStorage.getItem('booha_save');
-    const data = raw ? JSON.parse(raw) : null;
+    // Ghost count follows the logged-in student, not the device.
+    const data = (window.BoohaAdventure && BoohaAdventure.save)
+      ? BoohaAdventure.save.load()
+      : null;
 
     const completed = data?.weekly?.completedGames;
 
@@ -2310,7 +2317,16 @@ document.addEventListener('visibilitychange',()=>{
   }
 });
 
-personalizeMazeIntro();  
+// The save is keyed on booha_userid, which token.js writes only after its
+// async verify returns — always after this script parses. Reading now would
+// hit the locked/empty state, so wait for the boot signal.
+function onSaveReady(){
+  personalizeMazeIntro();
+  if (mazeStarted) buildWanderers();   // extra ghost count depends on the save
+}
+if (window.BOOHA_READY) onSaveReady();
+else document.addEventListener('booha:ready', onSaveReady, { once: true });
+
 if(sessionStorage.getItem('booha_return_to_checkpoint')==='1')restoreMazeFromCheckpoint();
 else resizeCanvas();
 
