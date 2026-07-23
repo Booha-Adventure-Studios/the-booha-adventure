@@ -60,8 +60,14 @@
       // Within grace period — show page with offline banner.
       // booha_userid is already cached from the last successful verify, so
       // identity is known and boot can proceed.
+      // Offline grace is valid ONLY with a cached userId. Without one there is
+      // no key to write to and nothing can be saved, so treat it as a blocked
+      // session rather than letting a student play a lesson into the void.
       if (!localStorage.getItem(KEY_USER_ID)) {
-        console.warn('[token] Offline with no cached userId — legacy save key in use.');
+        console.error('[token] Offline with no cached userId — session unavailable.');
+        showOfflineBlock();
+        waitForConnection(() => redirect('offline'));
+        return;
       }
       signalIdentityReady();
       unlock();
@@ -72,6 +78,25 @@
       showOfflineBlock();
       waitForConnection(() => redirect('offline'));
     }
+  }
+
+  function showConnectingBanner() {
+    if (document.getElementById('booha-connecting-banner')) return;
+    const el = document.createElement('div');
+    el.id = 'booha-connecting-banner';
+    el.style.cssText = [
+      'position:fixed', 'top:0', 'left:0', 'right:0',
+      'background:#334', 'color:#fff',
+      'text-align:center', 'padding:8px 16px',
+      'font:600 14px/1.4 sans-serif', 'z-index:99999'
+    ].join(';');
+    el.textContent = 'せつぞくちゅう… / Connecting — saves are paused.';
+    document.body.appendChild(el);
+  }
+
+  function clearConnectingBanner() {
+    const el = document.getElementById('booha-connecting-banner');
+    if (el) el.remove();
   }
 
   function showIdentityBanner() {
@@ -231,16 +256,26 @@
       return;
     }
 
+    // Slow verify gets a visible, self-clearing state. School wifi trips the
+    // 8s boot fallback regularly; a terminal error screen would just train
+    // students to reload past it.
+    const slowTimer = setTimeout(showConnectingBanner, 4000);
+
     // Validate with Wix
     let data;
     try {
       const res = await fetch(`${VERIFY_URL}?token=${encodeURIComponent(token)}`);
       data = await res.json();
-    } catch (err) {
+      
+   } catch (err) {
       // Network error — treat as offline
+      clearTimeout(slowTimer);
+      clearConnectingBanner();
       handleOffline(token);
       return;
     }
+    clearTimeout(slowTimer);
+    clearConnectingBanner();
 
     if (!data.ok) {
       const reason = (data.reason || 'invalid').toLowerCase();
