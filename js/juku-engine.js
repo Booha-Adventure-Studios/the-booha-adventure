@@ -265,13 +265,32 @@
   }
   
 
+  function reportRuntimeFailure(context, error) {
+    const message = error && error.message ? error.message : String(error);
+    console.error(`[JUKU] ${context}:`, message);
+    document.dispatchEvent(new CustomEvent('juku:saveFailed',
+      { detail: { error: message } }));
+  }
+
+  // Event handlers sometimes need to read before they can commit. Give those
+  // paths the same fail-closed contract as patchWeek instead of letting a
+  // broken invariant escape as an uncaught click-handler exception.
+  function tryWeekRecord(context) {
+    try {
+      return weekRecord();
+    } catch (e) {
+      reportRuntimeFailure(context || 'Cannot open week record', e);
+      return null;
+    }
+  }
+
 // Returns null when the write did not land. Callers in the answer-commit
   // path MUST check: a mutated in-memory object with no successful write is
   // exactly the state where a student sees an accepted answer that was never
   // recorded. writeSave() dispatches juku:saveFailed for the banner; the null
   // return is what lets the commit flow refuse to advance.
   function patchWeek(fn) {
-    const rec = weekRecord();
+    const rec = tryWeekRecord('Cannot open week record for commit');
     if (!rec) return null;
     fn(rec.week);
     return writeSave(rec.save) ? rec.week : null;
@@ -295,9 +314,27 @@
 
     if (key !== _lastKey) {
       _lastKey = key;
-      if (_onPhaseChange) _onPhaseChange(res, _slot);
+      if (_onPhaseChange) {
+        try {
+          _onPhaseChange(res, _slot);
+        } catch (e) {
+          // The key was already advanced. Clear it so a transient render
+          // failure retries on the next wall-clock tick instead of leaving
+          // the phase blank permanently.
+          reportRuntimeFailure('Phase render failed; retrying next tick', e);
+          _lastKey = '';
+        }
+      }
     }
-    if (_onTick) _onTick(res, _slot, tk);
+    if (_onTick) {
+      try {
+        _onTick(res, _slot, tk);
+      } catch (e) {
+        // Tick work is naturally retried one second later. Catching here also
+        // protects dictation reads, which occur outside the phase renderer.
+        reportRuntimeFailure('Tick update failed; retrying next tick', e);
+      }
+    }
   }
 
   function start(onPhaseChange, onTick) {
@@ -344,7 +381,7 @@
     tokyoNow, resolve, selectSlot, autoSlot,
     
     seededShuffle, rng, studentSeedBase,
-    loadSave, weekRecord, patchWeek,
+    loadSave, weekRecord, tryWeekRecord, patchWeek,
     start,
     TOTAL_MIN, PHASE_OFFSETS,
     get slot() { return _slot; },
