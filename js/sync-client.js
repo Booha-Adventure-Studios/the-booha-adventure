@@ -14,7 +14,9 @@
  * Sync metadata lives in its own key, NOT inside either game blob — otherwise
  * every metadata change would change the data being synchronised.
  *
- * Load AFTER save-file.js. Load on every page that loads adventure-core.js.
+ * Load AFTER save-file.js on Adventure pages. On juku.html, load after
+ * juku-engine.js. Each page reconciles only the blob whose storage engine is
+ * present; the other blob is restored when its own world is opened.
  */
 
 window.BoohaSync = (() => {
@@ -34,6 +36,8 @@ window.BoohaSync = (() => {
   let _meta   = null;
   let _state  = 'idle';        // idle | restoring | ready | blocked
   let _timers = { adventure: null, juku: null };
+  let _generation = { adventure: 0, juku: 0 };
+  let _inflight   = { adventure: null, juku: null };
 
   /* ── identity + keys ─────────────────────────────────── */
 
@@ -52,6 +56,13 @@ window.BoohaSync = (() => {
       }
       return (window.JUKU && JUKU.saveKey()) || null;
     } catch (e) { return null; }
+  }
+
+  function availableBlobs() {
+    const blobs = [];
+    if (window.BoohaSaveFile && BoohaSaveFile.key()) blobs.push('adventure');
+    if (window.JUKU && JUKU.saveKey()) blobs.push('juku');
+    return blobs;
   }
 
   function readLocal(blob) {
@@ -103,17 +114,18 @@ window.BoohaSync = (() => {
   function loadMeta() {
     const fresh = { adventureRevision: 0, jukuRevision: 0,
                     adventureDirty: false, jukuDirty: false,
-                    lastSyncAt: 0, firstRun: true };
+                    adventureSeen: false, jukuSeen: false,
+                    lastSyncAt: 0 };
     try {
       const raw = localStorage.getItem(metaKey());
       if (!raw) return fresh;
       const m = JSON.parse(raw);
-      m.firstRun = false;
-      return Object.assign(fresh, m, { firstRun: false });
+      return Object.assign(fresh, m);
     } catch (e) { return fresh; }
   }
 
   function saveMeta() {
+    if (!_meta || !uid()) return;
     try { localStorage.setItem(metaKey(), JSON.stringify(_meta)); }
     catch (e) { console.error('[sync] meta write failed:', e); }
   }
@@ -211,9 +223,9 @@ window.BoohaSync = (() => {
 
     if (!hasLocal) return { act: 'install' };                // fresh device
 
-    // First run after deploy with content on both sides: we cannot know which
+    // First reconciliation for this blob with content on both sides: we cannot know which
     // is newer, and guessing could erase a term. Surface it.
-    if (_meta.firstRun) return { act: 'conflict' };
+    if (!_meta[blob + 'Seen']) return { act: 'conflict' };
 
     if (!dirty) {
       if (remote.revision === localRev) return { act: 'none' };
@@ -232,10 +244,17 @@ window.BoohaSync = (() => {
 
     _state = 'restoring';
     _meta  = loadMeta();
+    _meta.blocked = false;
     showRestoring();
 
+    const blobs = availableBlobs();
+    if (!blobs.length) { block('no local storage engine'); return; }
+
     if (!navigator.onLine) {
-      const hasAny = readLocal('adventure') || readLocal('juku');
+      const hasAny = blobs.some(blob => {
+        const local = readLocal(blob);
+        return local && !isEmpty(blob, local);
+      });
       if (!hasAny) { showOfflineBlocked(); _state = 'blocked'; return; }
       console.warn('[sync] offline — playing from local, will push later.');
       clearScreen();
@@ -260,7 +279,7 @@ window.BoohaSync = (() => {
       return;
     }
 
-    for (const blob of ['adventure', 'juku']) {
+    for (const blob of blobs) {
       const remote = res[blob] || { data: null, revision: 0 };
       const d = decide(blob, remote);
 
@@ -271,6 +290,7 @@ window.BoohaSync = (() => {
         console.log(`[sync] ${blob}: installed remote revision ${remote.revision}`);
 
       } else if (d.act === 'push') {
+        setDirty(blob);
         const okPush = await pushBlob(blob, d.base);
         if (!okPush) console.warn(`[sync] ${blob}: initial push deferred`);
 
@@ -289,13 +309,16 @@ window.BoohaSync = (() => {
       } else {
         console.log(`[sync] ${blob}: already in sync (revision ${remote.revision})`);
       }
+      _meta[blob + 'Seen'] = true;
     }
 
-    _meta.firstRun  = false;
     _meta.lastSyncAt = Date.now();
     saveMeta();
     clearScreen();
     ready();
+    blobs.forEach(blob => {
+      if (_meta[blob + 'Dirty']) schedulePush(blob);
+    });
   }
 
   function ready() {
@@ -312,92 +335,112 @@ window.BoohaSync = (() => {
 
   /* ── push ────────────────────────────────────────────── */
 
-  async function pushBlob(blob, baseOverride) {
-    if (_state === 'blocked' || _meta.blocked) return false;
+  function pushBlob(blob, baseOverride) {
+    if (_state === 'blocked' || _meta.blocked) return Promise.resolve(false);
+    if (_inflight[blob]) {
+      return _inflight[blob];
+    }
+
     const data = readLocal(blob);
-    if (!data || isEmpty(blob, data)) return false;
+    if (!data || isEmpty(blob, data)) return Promise.resolve(false);
 
     const base = (baseOverride !== undefined)
       ? baseOverride
       : Number(_meta[blob + 'Revision'] || 0);
+    const sentGeneration = _generation[blob];
 
-    let res;
-    try {
-      res = await post(PUSH_URL, { token: token(), blob, baseRevision: base, data });
-    } catch (e) {
-      console.warn('[sync] push failed (will retry):', blob, e.message);
-      return false;                       // stays dirty
-    }
-
-    if (res && res.ok) {
-      _meta[blob + 'Revision'] = res.revision;
-      _meta[blob + 'Dirty']    = false;
-      _meta.lastSyncAt         = Date.now();
-      saveMeta();
-      console.log(`[sync] ${blob}: pushed revision ${res.revision}`);
-      return true;
-    }
-
-    if (res && res.reason === 'REVISION_CONFLICT') {
-      console.error(`[sync] ${blob}: push conflict — sync blocked, local intact.`);
+    _inflight[blob] = (async () => {
+      let res;
       try {
-        localStorage.setItem(`${META_BASE}:conflict:${blob}:${uid()}`,
-                             JSON.stringify(res.remote || null));
-      } catch (e) {}
-      _meta.blocked = true;
-      saveMeta();
-      showConflict();
-      _state = 'blocked';
-      return false;
-    }
+        res = await post(PUSH_URL, { token: token(), blob, baseRevision: base, data });
+      } catch (e) {
+        console.warn('[sync] push failed (will retry):', blob, e.message);
+        _meta[blob + 'Dirty'] = true;
+        saveMeta();
+        return false;
+      }
 
-    console.warn('[sync] push rejected:', blob, res && res.reason);
-    return false;
+      if (res && res.ok) {
+        _meta[blob + 'Revision'] = res.revision;
+        _meta[blob + 'Dirty'] = _generation[blob] !== sentGeneration;
+        _meta.lastSyncAt = Date.now();
+        saveMeta();
+        console.log(`[sync] ${blob}: pushed revision ${res.revision}`);
+        return true;
+      }
+
+      if (res && res.reason === 'REVISION_CONFLICT') {
+        console.error(`[sync] ${blob}: push conflict — sync blocked, local intact.`);
+        try {
+          localStorage.setItem(`${META_BASE}:conflict:${blob}:${uid()}`,
+                               JSON.stringify(res.remote || null));
+        } catch (e) {}
+        _meta.blocked = true;
+        saveMeta();
+        showConflict();
+        _state = 'blocked';
+        return false;
+      }
+
+      console.warn('[sync] push rejected:', blob, res && res.reason);
+      _meta[blob + 'Dirty'] = true;
+      saveMeta();
+      return false;
+    })().finally(() => {
+      _inflight[blob] = null;
+      if (_state === 'ready' && !_meta.blocked && _meta[blob + 'Dirty']) {
+        schedulePush(blob);
+      }
+    });
+
+    return _inflight[blob];
   }
 
   /* ── dirty tracking ──────────────────────────────────── */
 
-  function markDirty(blob) {
-    if (_state !== 'ready') return;
+  function setDirty(blob) {
+    _generation[blob]++;
     _meta[blob + 'Dirty'] = true;
     saveMeta();
+  }
+
+  function schedulePush(blob) {
     clearTimeout(_timers[blob]);
     _timers[blob] = setTimeout(() => pushBlob(blob), DEBOUNCE_MS);
   }
 
+  function markDirty(blob) {
+    if (_state !== 'ready' || !availableBlobs().includes(blob)) return;
+    setDirty(blob);
+  }
+
   /** Immediate push — call at meaningful boundaries. */
   function checkpoint(blob) {
-    if (_state !== 'ready') return;
+    if (_state !== 'ready' || !availableBlobs().includes(blob)) return;
     clearTimeout(_timers[blob]);
-    _meta[blob + 'Dirty'] = true;
-    saveMeta();
+    if (!_meta[blob + 'Dirty']) return Promise.resolve(true);
     return pushBlob(blob);
   }
 
   document.addEventListener('booha:saved', () => markDirty('adventure'));
   document.addEventListener('juku:saved',  () => markDirty('juku'));
 
-  // Best-effort only. iOS frequently kills the page before this completes;
-  // the dirty flag surviving in localStorage is the real guarantee.
-  window.addEventListener('pagehide', () => {
-    if (_state !== 'ready') return;
-    ['adventure', 'juku'].forEach(blob => {
-      if (!_meta[blob + 'Dirty']) return;
-      const data = readLocal(blob);
-      if (!data || isEmpty(blob, data)) return;
-      try {
-        navigator.sendBeacon(PUSH_URL, new Blob([JSON.stringify({
-          token: token(), blob,
-          baseRevision: Number(_meta[blob + 'Revision'] || 0), data
-        })], { type: 'application/json' }));
-      } catch (e) {}
-    });
-  });
+  // Do not push revisioned data with sendBeacon: it cannot return the new
+  // revision to this page. The durable dirty flag is retried on the next boot.
+  window.addEventListener('pagehide', saveMeta);
 
   /* ── boot ────────────────────────────────────────────── */
 
-  if (window.BOOHA_IDENTITY_READY) restore();
-  else document.addEventListener('booha:identityReady', restore, { once: true });
+  function begin() {
+    if (window.BOOHA_IDENTITY_READY) restore();
+    else document.addEventListener('booha:identityReady', restore, { once: true });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', begin, { once: true });
+  } else {
+    begin();
+  }
 
   return {
     checkpoint,

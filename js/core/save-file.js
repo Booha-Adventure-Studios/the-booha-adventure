@@ -233,17 +233,13 @@ const BoohaSaveFile = (() => {
   }
 
   function importJSON(jsonString) {
-    try {
-      const incoming = JSON.parse(jsonString);
-      if (typeof incoming !== 'object' || Array.isArray(incoming)) {
-        return { ok: false, error: 'Invalid save data.' };
-      }
-      const migrated = _migrate(incoming);
-      save(migrated);
-      return { ok: true };
-    } catch (e) {
-      return { ok: false, error: e.message };
-    }
+    // The authenticated Wix record is authoritative in Increment B. Accepting
+    // arbitrary JSON here would upload another student's progress under the
+    // current identity at the next sync checkpoint.
+    return {
+      ok: false,
+      error: 'Save import has been retired. Progress now follows your login.'
+    };
   }
 
   // ── System interface ──────────────────────────────────────────────────────

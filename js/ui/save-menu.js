@@ -49,16 +49,16 @@ const BoohaSaveMenu = (() => {
   <section class="booha-save-section">
     <h3>Save &amp; Load</h3>
     <button id="booha-btn-export-file" class="booha-btn">📥 Export Save File</button>
-    <button id="booha-btn-import-file" class="booha-btn">📤 Import Save File</button>
+    <button id="booha-btn-import-file" class="booha-btn" hidden>📤 Import Save File</button>
   </section>
 
   <section class="booha-save-section">
     <h3>Memory Code</h3>
     <button id="booha-btn-show-code"  class="booha-btn">🔑 Show Memory Code</button>
-    <button id="booha-btn-enter-code" class="booha-btn">📋 Enter Memory Code</button>
+    <button id="booha-btn-enter-code" class="booha-btn" hidden>📋 Enter Memory Code</button>
   </section>
 
-  <section class="booha-save-section booha-danger-zone">
+  <section class="booha-save-section booha-danger-zone" hidden>
     <h3>Reset</h3>
     <button id="booha-btn-reset" class="booha-btn booha-btn-danger">🗑 Reset Adventure</button>
   </section>

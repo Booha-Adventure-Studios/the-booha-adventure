@@ -46,19 +46,10 @@ const BoohaSaveCode = (() => {
    * @returns {{ ok: boolean, error?: string }}
    */
   function decode(codeInput) {
-    try {
-      const stripped = codeInput.replace(/\s+/g, '').toUpperCase();
-      if (!stripped.startsWith(PREFIX)) {
-        return { ok: false, error: 'Not a valid Booha Memory Code.' };
-      }
-      const b64  = stripped.slice(PREFIX.length);
-      // Case-preserve: codes are originally mixed-case base64 after the prefix
-      const b64orig = codeInput.replace(/\s+/g, '').slice(PREFIX.length);
-      const json = decodeURIComponent(escape(atob(b64orig)));
-      return BoohaAdventure.save.importJSON(json);
-    } catch (e) {
-      return { ok: false, error: 'Code could not be read. Check for typos.' };
-    }
+    return {
+      ok: false,
+      error: 'Memory Code restore has been retired. Progress now follows your login.'
+    };
   }
 
   // ── Clipboard helpers ─────────────────────────────────────────────────────

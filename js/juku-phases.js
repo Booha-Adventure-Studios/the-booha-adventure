@@ -261,6 +261,7 @@ function renderLobby(res, slot) {
         submitBtn.textContent = '⚠ ほぞん できなかった — もう いちど';
         return;
       }
+      if (window.BoohaSync) BoohaSync.checkpoint('juku');
       renderLobbyReady(J.resolve(J.slot, J.tokyoNow()), J.slot);
     });
     
@@ -367,6 +368,9 @@ function renderLobby(res, slot) {
   // ── Engine hookup ────────────────────────────────────────
 
   function onPhaseChange(res, slot) {
+    // A clock-driven section transition is a durable checkpoint for every
+    // answer committed during the section that just ended.
+    if (window.BoohaSync) BoohaSync.checkpoint('juku');
     if (window.JUKU_GHOSTS) window.JUKU_GHOSTS.unmount();
     if (!slot)                    { renderMenu(); return; }
     
@@ -391,6 +395,13 @@ function renderLobby(res, slot) {
     onPhaseChange(J.slot ? J.resolve(J.slot, J.tokyoNow()) : { state: 'menu' }, J.slot);
   });
 
-  J.start(onPhaseChange, onTick);
+  function startJuku() {
+    J.start(onPhaseChange, onTick);
+  }
+
+  // A borrowed device must restore the remote Juku blob before the engine can
+  // create or commit a week record. sync-client.js is loaded after juku-engine.
+  if (window.BOOHA_SYNC_READY) startJuku();
+  else document.addEventListener('booha:syncReady', startJuku, { once: true });
 
 })();

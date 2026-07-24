@@ -375,6 +375,7 @@ const HAPPY_HOUSE_PORTAL = {
       const ok = BoohaAdventure.save.save(data);
       invalidateQuestCache();
       if (!ok) console.error('[Karasuki] Quest write BLOCKED — no identity.');
+      if (ok && window.BoohaSync) BoohaSync.checkpoint('adventure');
       return ok;
     } catch (e) {
       console.error('[Karasuki] Quest write failed:', e);

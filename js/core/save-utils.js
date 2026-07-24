@@ -28,35 +28,16 @@ const BoohaSaveUtils = (() => {
    * Opens a file picker. Returns a Promise<{ ok, error }>.
    */
   function uploadSaveFile() {
-    return new Promise((resolve) => {
-      const input    = document.createElement('input');
-      input.type     = 'file';
-      input.accept   = '.json,application/json';
-      input.onchange = (e) => {
-        const file = e.target.files[0];
-        if (!file) return resolve({ ok: false, error: 'No file selected.' });
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-          const result = BoohaAdventure.save.importJSON(ev.target.result);
-          resolve(result);
-        };
-        reader.onerror = () => resolve({ ok: false, error: 'File read error.' });
-        reader.readAsText(file);
-      };
-      document.body.appendChild(input);
-      input.click();
-      document.body.removeChild(input);
+    return Promise.resolve({
+      ok: false,
+      error: 'Save import has been retired. Progress now follows your login.'
     });
   }
 
   // ── Reset / wipe everything ───────────────────────────────────────────────
   function resetAll(confirm = true) {
-    if (confirm && !window.confirm('Reset your entire Booha Adventure? This cannot be undone.')) {
-      return false;
-    }
-    BoohaAdventure.save.clear();
-    document.dispatchEvent(new Event('booha:reset'));
-    return true;
+    window.alert('Progress reset is teacher-managed now that saves follow your login.');
+    return false;
   }
 
   // ── Deep merge helper (used by other systems) ─────────────────────────────
