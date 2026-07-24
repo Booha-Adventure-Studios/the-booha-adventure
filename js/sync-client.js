@@ -28,16 +28,35 @@ window.BoohaSync = (() => {
 
   const KEY_TOKEN  = 'booha_token';
   const KEY_USERID = 'booha_userid';
-  const META_BASE  = 'booha_sync:v1';
+  // v2 is a deliberate sync-metadata epoch. The game saves themselves are
+  // untouched; only stale v1 revision bookkeeping is retired. On first v2
+  // boot Wix remains authoritative and any displaced local blob is preserved
+  // by preserveReplacedLocal() below.
+  const META_BASE  = 'booha_sync:v2';
+  const DEVICE_KEY = 'booha_device:v1';
+  const CHANNEL_NAME = 'booha-sync-tabs-v2';
 
   const DEBOUNCE_MS = 12000;   // dirty → background push
   const TIMEOUT_MS  = 15000;   // per request
+  const LEASE_MS    = 25000;   // fallback cross-tab push lock
 
   let _meta   = null;
   let _state  = 'idle';        // idle | restoring | ready | blocked
   let _timers = { adventure: null, juku: null };
-  let _generation = { adventure: 0, juku: 0 };
   let _inflight   = { adventure: null, juku: null };
+  let _changeCounter = 0;
+  let _channel = null;
+
+  function randomId(prefix) {
+    try {
+      if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+        return `${prefix}-${window.crypto.randomUUID()}`;
+      }
+    } catch (e) {}
+    return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+  }
+
+  const TAB_ID = randomId('tab');
 
   /* ── identity + keys ─────────────────────────────────── */
 
@@ -46,6 +65,19 @@ window.BoohaSync = (() => {
   }
   function token() {
     try { return localStorage.getItem(KEY_TOKEN) || ''; } catch (e) { return ''; }
+  }
+  function deviceId() {
+    try {
+      let id = localStorage.getItem(DEVICE_KEY);
+      if (!id) {
+        id = randomId('device');
+        localStorage.setItem(DEVICE_KEY, id);
+      }
+      return id;
+    } catch (e) { return 'device-unavailable'; }
+  }
+  function pageVisible() {
+    return !document.visibilityState || document.visibilityState !== 'hidden';
   }
 
   // Delegated — never re-derived here. See save-file.js / juku-engine.js.
@@ -142,11 +174,19 @@ window.BoohaSync = (() => {
 
   function metaKey() { return `${META_BASE}:${uid()}`; }
 
+  function freshMeta() {
+    return {
+      adventureRevision: 0, jukuRevision: 0,
+      adventureDirty: false, jukuDirty: false,
+      adventureSeen: false, jukuSeen: false,
+      adventureChangeId: '', jukuChangeId: '',
+      adventureSyncedSignature: '', jukuSyncedSignature: '',
+      blocked: false, conflict: null, lastSyncAt: 0
+    };
+  }
+
   function loadMeta() {
-    const fresh = { adventureRevision: 0, jukuRevision: 0,
-                    adventureDirty: false, jukuDirty: false,
-                    adventureSeen: false, jukuSeen: false,
-                    lastSyncAt: 0 };
+    const fresh = freshMeta();
     try {
       const raw = localStorage.getItem(metaKey());
       if (!raw) return fresh;
@@ -155,10 +195,133 @@ window.BoohaSync = (() => {
     } catch (e) { return fresh; }
   }
 
-  function saveMeta() {
+  function announce(type, blob) {
+    if (!_channel) return;
+    try {
+      _channel.postMessage({
+        type, blob: blob || null, userId: uid(), deviceId: deviceId(),
+        sender: TAB_ID, at: Date.now()
+      });
+    } catch (e) {}
+  }
+
+  function saveMeta(type, blob) {
     if (!_meta || !uid()) return;
-    try { localStorage.setItem(metaKey(), JSON.stringify(_meta)); }
+    try {
+      localStorage.setItem(metaKey(), JSON.stringify(_meta));
+      announce(type || 'meta', blob);
+    }
     catch (e) { console.error('[sync] meta write failed:', e); }
+  }
+
+  // Every mutation starts from the shared localStorage copy. A tab must never
+  // write its hours-old in-memory revision over a newer revision published by
+  // a sibling tab.
+  function mutateMeta(fn, type, blob) {
+    _meta = loadMeta();
+    fn(_meta);
+    saveMeta(type, blob);
+    return _meta;
+  }
+
+  function refreshMeta() {
+    _meta = loadMeta();
+    return _meta;
+  }
+
+  function nextChangeId() {
+    _changeCounter++;
+    return `${Date.now().toString(36)}:${TAB_ID}:${_changeCounter}`;
+  }
+
+  function sameData(a, b) {
+    if (a === b) return true;
+    if (!a || !b) return false;
+    try { return JSON.stringify(a) === JSON.stringify(b); }
+    catch (e) { return false; }
+  }
+
+  // A signature makes the dirty flag self-healing. Even if two JavaScript
+  // contexts interleave localStorage writes at the worst possible instant,
+  // a later checkpoint/boot can still prove that the local blob differs from
+  // the last successfully installed or pushed snapshot.
+  function dataSignature(data) {
+    if (!data) return '';
+    let text;
+    try { text = JSON.stringify(data); } catch (e) { return 'unserializable'; }
+    let h = 2166136261;
+    for (let i = 0; i < text.length; i++) {
+      h ^= text.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return `${text.length}:${(h >>> 0).toString(36)}`;
+  }
+
+  function isEffectivelyDirty(blob, local) {
+    if (_meta[blob + 'Dirty']) return true;
+    const synced = _meta[blob + 'SyncedSignature'] || '';
+    return !!(_meta[blob + 'Seen'] && synced &&
+      dataSignature(local) !== synced);
+  }
+
+  function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  function lockName(blob) {
+    return `${META_BASE}:push:${uid()}:${blob}`;
+  }
+
+  async function withLeaseLock(blob, work) {
+    const key = `${META_BASE}:lease:${uid()}:${blob}`;
+    const deadline = Date.now() + LEASE_MS;
+    while (Date.now() < deadline) {
+      let lease = null;
+      try { lease = JSON.parse(localStorage.getItem(key) || 'null'); } catch (e) {}
+      if (!lease || Number(lease.expiresAt || 0) <= Date.now() || lease.owner === TAB_ID) {
+        try {
+          localStorage.setItem(key, JSON.stringify({
+            owner: TAB_ID, expiresAt: Date.now() + LEASE_MS
+          }));
+          // A short settlement window closes the usual two-tabs-write-at-once
+          // race: only the last candidate still owns the lease afterwards.
+          await delay(60 + Math.floor(Math.random() * 80));
+          const check = JSON.parse(localStorage.getItem(key) || 'null');
+          if (check && check.owner === TAB_ID) {
+            const heartbeat = setInterval(() => {
+              try {
+                const current = JSON.parse(localStorage.getItem(key) || 'null');
+                if (current && current.owner === TAB_ID) {
+                  current.expiresAt = Date.now() + LEASE_MS;
+                  localStorage.setItem(key, JSON.stringify(current));
+                }
+              } catch (e) {}
+            }, 5000);
+            try { return await work(); }
+            finally {
+              clearInterval(heartbeat);
+              try {
+                const current = JSON.parse(localStorage.getItem(key) || 'null');
+                if (current && current.owner === TAB_ID) localStorage.removeItem(key);
+              } catch (e) {}
+            }
+          }
+        } catch (e) {
+          console.warn('[sync] fallback tab lock unavailable:', e);
+          return work();
+        }
+      }
+      await delay(80 + Math.floor(Math.random() * 120));
+    }
+    console.warn('[sync] another tab still owns the push lock:', blob);
+    return false;
+  }
+
+  function withPushLock(blob, work) {
+    if (navigator.locks && typeof navigator.locks.request === 'function') {
+      return navigator.locks.request(lockName(blob), { mode: 'exclusive' }, work);
+    }
+    return withLeaseLock(blob, work);
   }
 
   /* ── transport ───────────────────────────────────────── */
@@ -220,12 +383,30 @@ window.BoohaSync = (() => {
     el.querySelector('#booha-sync-retry').addEventListener('click', retry);
   }
 
-  function showConflict() {
+  function revisionOf(remote) {
+    return Number(remote && remote.revision || 0);
+  }
+
+  function conflictInfo(blob, localRevision, remoteRevision) {
+    const shortDevice = deviceId().replace(/[^a-z0-9]/gi, '').slice(-5).toUpperCase();
+    const letter = blob === 'juku' ? 'J' : 'A';
+    return {
+      blob,
+      localRevision: Number(localRevision || 0),
+      remoteRevision: Number(remoteRevision || 0),
+      code: `${letter}-L${Number(localRevision || 0)}-R${Number(remoteRevision || 0)}-${shortDevice}`
+    };
+  }
+
+  function showConflict(info) {
+    info = info || (_meta && _meta.conflict) || conflictInfo('adventure', 0, 0);
     screen(`<div style="font-size:34px">🔀</div>
-      <div style="font-weight:600">べつのデバイスで すすめたみたい</div>
+      <div style="font-weight:600">ほかのセッションで すすめたみたい</div>
       <div style="color:#aaa;font-size:14px;max-width:340px">
-        Your progress changed on another device.<br>
-        Please tell your teacher before continuing.</div>`);
+        Another Booha session has different unsaved progress.<br>
+        Please tell your teacher before continuing.</div>
+      <div style="color:#7f86a8;font:600 12px/1.4 ui-monospace,monospace">
+        ${info.code}</div>`);
   }
 
   function showOfflineBlocked() {
@@ -244,7 +425,7 @@ window.BoohaSync = (() => {
   function decide(blob, remote) {
     const local    = readLocal(blob);
     const localRev = Number(_meta[blob + 'Revision'] || 0);
-    const dirty    = !!_meta[blob + 'Dirty'];
+    const dirty    = isEffectivelyDirty(blob, local);
     const hasLocal = local !== null && !isEmpty(blob, local);
 
     if (!remote.data) {
@@ -272,17 +453,24 @@ window.BoohaSync = (() => {
     }
 
     if (remote.revision === localRev) return { act: 'push', base: localRev };
+    // Two sessions can race while uploading the exact same snapshot. There is
+    // no divergent work to choose between in that case; adopt the server's
+    // newer revision and continue.
+    if (sameData(remote.data, local)) return { act: 'adopt' };
     return { act: 'conflict' };
   }
 
   /* ── restore ─────────────────────────────────────────── */
 
   async function restore() {
+    if (_state === 'restoring') return;
     if (!uid() || !token()) { block('no identity'); return; }
 
     _state = 'restoring';
-    _meta  = loadMeta();
-    _meta.blocked = false;
+    mutateMeta(m => {
+      m.blocked = false;
+      m.conflict = null;
+    }, 'restore');
     showRestoring();
 
     const blobs = availableBlobs();
@@ -319,13 +507,28 @@ window.BoohaSync = (() => {
 
     for (const blob of blobs) {
       const remote = res[blob] || { data: null, revision: 0 };
-      const d = decide(blob, remote);
+      refreshMeta();
+      let d = decide(blob, remote);
+
+      // A sibling tab may have saved while the network load was in flight.
+      // Re-check immediately before a remote install so that new local work
+      // becomes dirty/pushable instead of being overwritten by the response.
+      if (d.act === 'install') {
+        refreshMeta();
+        d = decide(blob, remote);
+      }
 
       if (d.act === 'install') {
         if (d.preserveLocal) preserveReplacedLocal(blob);
         if (!writeLocal(blob, remote.data)) { showFailed(() => restore()); _state='blocked'; return; }
-        _meta[blob + 'Revision'] = remote.revision;
-        _meta[blob + 'Dirty']    = false;
+        mutateMeta(m => {
+          m[blob + 'Revision'] = remote.revision;
+          m[blob + 'Dirty'] = false;
+          m[blob + 'Seen'] = true;
+          m[blob + 'SyncedSignature'] = dataSignature(remote.data);
+          m.blocked = false;
+          m.conflict = null;
+        }, 'revision', blob);
         clearStoredConflict(blob);
         console.log(`[sync] ${blob}: installed remote revision ${remote.revision}`);
 
@@ -334,30 +537,53 @@ window.BoohaSync = (() => {
         const okPush = await pushBlob(blob, d.base);
         if (!okPush) console.warn(`[sync] ${blob}: initial push deferred`);
 
+      } else if (d.act === 'adopt') {
+        mutateMeta(m => {
+          m[blob + 'Revision'] = remote.revision;
+          m[blob + 'Dirty'] = false;
+          m[blob + 'Seen'] = true;
+          m[blob + 'SyncedSignature'] = dataSignature(remote.data);
+          m.blocked = false;
+          m.conflict = null;
+        }, 'revision', blob);
+        clearStoredConflict(blob);
+        console.log(`[sync] ${blob}: adopted matching remote revision ${remote.revision}`);
+
       } else if (d.act === 'conflict') {
         console.error(`[sync] ${blob}: CONFLICT — local kept, sync blocked.`);
         try {
           localStorage.setItem(`${META_BASE}:conflict:${blob}:${uid()}`,
                                JSON.stringify(remote));
         } catch (e) {}
-        _meta.blocked = true;
-        saveMeta();
-        showConflict();
+        const info = conflictInfo(
+          blob, Number(_meta[blob + 'Revision'] || 0), revisionOf(remote)
+        );
+        mutateMeta(m => {
+          m.blocked = true;
+          m.conflict = info;
+        }, 'conflict', blob);
+        showConflict(info);
         _state = 'blocked';
         return;
 
       } else {
+        mutateMeta(m => {
+          m[blob + 'Seen'] = true;
+          m[blob + 'SyncedSignature'] = dataSignature(readLocal(blob));
+          m.blocked = false;
+          m.conflict = null;
+        }, 'revision', blob);
+        clearStoredConflict(blob);
         console.log(`[sync] ${blob}: already in sync (revision ${remote.revision})`);
       }
-      _meta[blob + 'Seen'] = true;
     }
 
-    _meta.lastSyncAt = Date.now();
-    saveMeta();
+    mutateMeta(m => { m.lastSyncAt = Date.now(); }, 'ready');
     clearScreen();
     ready();
+    refreshMeta();
     blobs.forEach(blob => {
-      if (_meta[blob + 'Dirty']) schedulePush(blob);
+      if (isEffectivelyDirty(blob, readLocal(blob))) schedulePush(blob);
     });
   }
 
@@ -375,60 +601,133 @@ window.BoohaSync = (() => {
 
   /* ── push ────────────────────────────────────────────── */
 
-  function pushBlob(blob, baseOverride) {
-    if (_state === 'blocked' || _meta.blocked) return Promise.resolve(false);
-    if (_inflight[blob]) {
-      return _inflight[blob];
+  async function recoverMatchingConflict(blob, sentData, sentChangeId, base, responseRemote) {
+    // If another tab already recorded a newer shared revision while this
+    // request was travelling, that tab won the race. Keep any newer dirty flag
+    // and let the normal scheduler send the latest shared local blob.
+    refreshMeta();
+    if (Number(_meta[blob + 'Revision'] || 0) > base && !_meta.blocked) {
+      console.log(`[sync] ${blob}: sibling tab already advanced the revision; retrying latest data.`);
+      return true;
     }
 
-    const data = readLocal(blob);
-    if (!data || isEmpty(blob, data)) return Promise.resolve(false);
-
-    const base = (baseOverride !== undefined)
-      ? baseOverride
-      : Number(_meta[blob + 'Revision'] || 0);
-    const sentGeneration = _generation[blob];
-
-    _inflight[blob] = (async () => {
-      let res;
+    let remote = responseRemote || null;
+    if (!remote || !remote.data) {
       try {
-        res = await post(PUSH_URL, { token: token(), blob, baseRevision: base, data });
+        const loaded = await post(LOAD_URL, { token: token() });
+        if (loaded && loaded.ok) remote = loaded[blob] || null;
       } catch (e) {
-        console.warn('[sync] push failed (will retry):', blob, e.message);
-        _meta[blob + 'Dirty'] = true;
-        saveMeta();
-        return false;
+        console.warn('[sync] conflict comparison load failed:', e.message);
       }
+    }
 
-      if (res && res.ok) {
-        _meta[blob + 'Revision'] = res.revision;
-        _meta[blob + 'Dirty'] = _generation[blob] !== sentGeneration;
-        _meta.lastSyncAt = Date.now();
-        saveMeta();
-        console.log(`[sync] ${blob}: pushed revision ${res.revision}`);
-        return true;
-      }
+    // Concurrent identical uploads are harmless. Adopt the winning revision;
+    // if another local save landed after sentData, its different change id
+    // remains dirty and will be pushed next.
+    if (remote && sameData(remote.data, sentData)) {
+      const remoteRev = revisionOf(remote);
+      const remoteSignature = dataSignature(remote.data);
+      const latestLocalSignature = dataSignature(readLocal(blob));
+      mutateMeta(m => {
+        m[blob + 'Revision'] = remoteRev;
+        m[blob + 'Dirty'] =
+          m[blob + 'ChangeId'] !== sentChangeId ||
+          latestLocalSignature !== remoteSignature;
+        m[blob + 'Seen'] = true;
+        m[blob + 'SyncedSignature'] = remoteSignature;
+        m.blocked = false;
+        m.conflict = null;
+        m.lastSyncAt = Date.now();
+      }, 'revision', blob);
+      clearStoredConflict(blob);
+      console.log(`[sync] ${blob}: identical concurrent upload adopted at revision ${remoteRev}.`);
+      return true;
+    }
+    return false;
+  }
 
-      if (res && res.reason === 'REVISION_CONFLICT') {
-        console.error(`[sync] ${blob}: push conflict — sync blocked, local intact.`);
-        try {
-          localStorage.setItem(`${META_BASE}:conflict:${blob}:${uid()}`,
-                               JSON.stringify(res.remote || null));
-        } catch (e) {}
-        _meta.blocked = true;
-        saveMeta();
-        showConflict();
-        _state = 'blocked';
-        return false;
-      }
+  async function pushBlobLocked(blob, baseOverride) {
+    refreshMeta();
+    if (_state === 'blocked' || _meta.blocked) return false;
+    if (!pageVisible()) return false;        // visible tab becomes the writer
 
-      console.warn('[sync] push rejected:', blob, res && res.reason);
-      _meta[blob + 'Dirty'] = true;
-      saveMeta();
+    const data = readLocal(blob);
+    if (!data || isEmpty(blob, data)) return false;
+    if (!isEffectivelyDirty(blob, data)) return true; // sibling already pushed it
+
+    const sharedBase = Number(_meta[blob + 'Revision'] || 0);
+    const base = sharedBase > 0
+      ? sharedBase
+      : Number(baseOverride !== undefined ? baseOverride : sharedBase);
+    const sentChangeId = _meta[blob + 'ChangeId'] || '';
+    const sentSignature = dataSignature(data);
+
+    let res;
+    try {
+      res = await post(PUSH_URL, { token: token(), blob, baseRevision: base, data });
+    } catch (e) {
+      console.warn('[sync] push failed (will retry):', blob, e.message);
+      mutateMeta(m => { m[blob + 'Dirty'] = true; }, 'dirty', blob);
       return false;
-    })().finally(() => {
+    }
+
+    if (res && res.ok) {
+      const latestLocalSignature = dataSignature(readLocal(blob));
+      mutateMeta(m => {
+        m[blob + 'Revision'] = res.revision;
+        m[blob + 'Dirty'] =
+          m[blob + 'ChangeId'] !== sentChangeId ||
+          latestLocalSignature !== sentSignature;
+        m[blob + 'Seen'] = true;
+        m[blob + 'SyncedSignature'] = sentSignature;
+        m.blocked = false;
+        m.conflict = null;
+        m.lastSyncAt = Date.now();
+      }, 'revision', blob);
+      clearStoredConflict(blob);
+      console.log(`[sync] ${blob}: pushed revision ${res.revision}`);
+      return true;
+    }
+
+    if (res && res.reason === 'REVISION_CONFLICT') {
+      if (await recoverMatchingConflict(
+        blob, data, sentChangeId, base, res.remote || null
+      )) return true;
+
+      console.error(`[sync] ${blob}: genuine divergent conflict — local kept, sync blocked.`);
+      try {
+        localStorage.setItem(`${META_BASE}:conflict:${blob}:${uid()}`,
+                             JSON.stringify(res.remote || null));
+      } catch (e) {}
+      const info = conflictInfo(blob, base, revisionOf(res.remote));
+      mutateMeta(m => {
+        m.blocked = true;
+        m.conflict = info;
+        m[blob + 'Dirty'] = true;
+      }, 'conflict', blob);
+      showConflict(info);
+      _state = 'blocked';
+      return false;
+    }
+
+    console.warn('[sync] push rejected:', blob, res && res.reason);
+    mutateMeta(m => { m[blob + 'Dirty'] = true; }, 'dirty', blob);
+    return false;
+  }
+
+  function pushBlob(blob, baseOverride) {
+    refreshMeta();
+    if (_state === 'blocked' || _meta.blocked) return Promise.resolve(false);
+    if (_inflight[blob]) return _inflight[blob];
+    if (!pageVisible()) return Promise.resolve(false);
+
+    _inflight[blob] = withPushLock(
+      blob, () => pushBlobLocked(blob, baseOverride)
+    ).finally(() => {
       _inflight[blob] = null;
-      if (_state === 'ready' && !_meta.blocked && _meta[blob + 'Dirty']) {
+      refreshMeta();
+      if (_state === 'ready' && !_meta.blocked &&
+          isEffectivelyDirty(blob, readLocal(blob)) && pageVisible()) {
         schedulePush(blob);
       }
     });
@@ -439,13 +738,16 @@ window.BoohaSync = (() => {
   /* ── dirty tracking ──────────────────────────────────── */
 
   function setDirty(blob) {
-    _generation[blob]++;
-    _meta[blob + 'Dirty'] = true;
-    saveMeta();
+    const changeId = nextChangeId();
+    mutateMeta(m => {
+      m[blob + 'Dirty'] = true;
+      m[blob + 'ChangeId'] = changeId;
+    }, 'dirty', blob);
   }
 
   function schedulePush(blob) {
     clearTimeout(_timers[blob]);
+    if (!pageVisible()) return;
     _timers[blob] = setTimeout(() => pushBlob(blob), DEBOUNCE_MS);
   }
 
@@ -463,21 +765,77 @@ window.BoohaSync = (() => {
     if (_state !== 'ready' || !availableBlobs().includes(blob)) {
       return Promise.resolve(false);
     }
+    refreshMeta();
     clearTimeout(_timers[blob]);
-    if (!_meta[blob + 'Dirty']) return Promise.resolve(true);
+    if (!isEffectivelyDirty(blob, readLocal(blob))) return Promise.resolve(true);
     return pushBlob(blob);
   }
 
   document.addEventListener('booha:saved', () => markDirty('adventure'));
   document.addEventListener('juku:saved',  () => markDirty('juku'));
 
-  // Do not push revisioned data with sendBeacon: it cannot return the new
-  // revision to this page. The durable dirty flag is retried on the next boot.
-  window.addEventListener('pagehide', saveMeta);
+  /* ── same-device tab coordination ────────────────────── */
+
+  function applySharedMeta() {
+    if (!uid()) return;
+    refreshMeta();
+
+    if (_meta.blocked) {
+      if (_state !== 'restoring') {
+        _state = 'blocked';
+        showConflict(_meta.conflict);
+      }
+      return;
+    }
+
+    if (_state === 'ready' && pageVisible()) {
+      availableBlobs().forEach(blob => {
+        if (isEffectivelyDirty(blob, readLocal(blob))) schedulePush(blob);
+      });
+    }
+  }
+
+  function setupCoordination() {
+    if (!_channel && typeof window.BroadcastChannel === 'function') {
+      try {
+        _channel = new window.BroadcastChannel(CHANNEL_NAME);
+        _channel.addEventListener('message', event => {
+          const msg = event.data || {};
+          if (msg.sender === TAB_ID || msg.userId !== uid()) return;
+          applySharedMeta();
+        });
+      } catch (e) {
+        console.warn('[sync] BroadcastChannel unavailable; storage events remain active.');
+      }
+    }
+  }
+
+  window.addEventListener('storage', event => {
+    if (event.key === metaKey()) applySharedMeta();
+  });
+
+  function resumeVisibleTab() {
+    if (!pageVisible() || !uid()) return;
+    const wasBlocked = _state === 'blocked';
+    applySharedMeta();
+    if (wasBlocked && _state === 'blocked' && !_meta.blocked &&
+        navigator.onLine) {
+      restore();
+    }
+  }
+
+  document.addEventListener('visibilitychange', resumeVisibleTab);
+  window.addEventListener('pageshow', resumeVisibleTab);
+
+  // Do not write metadata from pagehide. An older hidden page doing that was
+  // able to overwrite a sibling tab's newer revision—the core classroom bug.
+  // Metadata is persisted immediately at every mutation instead.
 
   /* ── boot ────────────────────────────────────────────── */
 
   function begin() {
+    setupCoordination();
+    deviceId(); // establish one stable installation id shared by its tabs
     if (window.BOOHA_IDENTITY_READY) restore();
     else document.addEventListener('booha:identityReady', restore, { once: true });
   }
@@ -493,6 +851,7 @@ window.BoohaSync = (() => {
     markDirty,
     get state()    { return _state; },
     get meta()     { return _meta; },
+    get deviceId() { return deviceId(); },
     restore
   };
 })();
