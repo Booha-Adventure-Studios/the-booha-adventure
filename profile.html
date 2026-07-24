@@ -69,6 +69,7 @@
     .dc-stats{display:flex;gap:10px;justify-content:center;}
     .dc-stat{flex:1;max-width:120px;text-align:center;padding:8px 6px;border:1px solid #4a3820;border-radius:8px;}
     .dc-stat b{display:block;font-size:22px;color:#3a2c1a;line-height:1;}
+    .dc-stat.accuracy b{font-size:clamp(14px,3.5vw,19px);white-space:nowrap;}
     .dc-stat .lab{font-size:10px;color:#7a603a;letter-spacing:1px;margin-top:4px;font-weight:700;}
     .dc-empty{color:#7a603a;font-size:14px;padding:6px 0 14px;}
 
@@ -286,6 +287,16 @@
     }
 
     /* ── Past weeks: a row of wax blobs ── */
+    .alog-term {
+      margin: 2px auto 16px; max-width: 520px; text-align: center;
+      border: 3px double #b8892f; border-radius: 14px; padding: 14px 16px;
+      background: radial-gradient(circle at 50% 15%, rgba(232,185,60,.24), rgba(232,185,60,.05) 78%);
+    }
+    .alog-term-jp { color: #3a2c1a; font-size: 21px; font-weight: 900; line-height: 1.35; }
+    .alog-term-en {
+      margin-top: 4px; color: #7a603a; font-family: 'Cinzel Decorative', serif;
+      font-size: 9px; letter-spacing: 1.3px; line-height: 1.5;
+    }
     .alog-past-strip { display: flex; gap: 10px; overflow-x: auto; padding: 4px 2px 8px; }
     .alog-past-seal {
       flex: 0 0 auto; width: 72px; height: 72px; border-radius: 50%;
@@ -359,37 +370,52 @@
 <script src="./js/daily-check.js"></script>
 <script>
   (function () {
-    var host = document.getElementById('dc-week');
-    if (!host || !window.BoohaDailyCheck) return;
-    var DOW = ['日','月','火','水','木','金','土'];
-    var s;
-    try { s = BoohaDailyCheck.weekSummary(); } catch (e) { return; }
+    function renderDailySummary() {
+      var host = document.getElementById('dc-week');
+      if (!host || !window.BoohaDailyCheck) return;
+      var DOW = ['日','月','火','水','木','金','土'];
+      var s;
+      try { s = BoohaDailyCheck.weekSummary(); } catch (e) { return; }
+      host.textContent = '';
 
-    var row = document.createElement('div'); row.className = 'dc-row';
-    s.days.forEach(function (d, i) {
-      var cell = document.createElement('div'); cell.className = 'dc-day';
-      var dow = document.createElement('div'); dow.className = 'dc-dow'; dow.textContent = DOW[i];
-      var dot = document.createElement('div'); dot.className = 'dc-dot';
-      if (d.st === 'done') { dot.classList.add('done'); dot.textContent = '✓'; }
-      else if (d.st === 'skip') { dot.classList.add('skip'); dot.textContent = '·'; }
-      else if (d.isFuture) { dot.classList.add('future'); }
-      if (d.isToday) dot.classList.add('today');
-      cell.appendChild(dow); cell.appendChild(dot); row.appendChild(cell);
-    });
+      var row = document.createElement('div'); row.className = 'dc-row';
+      s.days.forEach(function (d, i) {
+        var cell = document.createElement('div'); cell.className = 'dc-day';
+        var dow = document.createElement('div'); dow.className = 'dc-dow'; dow.textContent = DOW[i];
+        var dot = document.createElement('div'); dot.className = 'dc-dot';
+        if (d.st === 'done') { dot.classList.add('done'); dot.textContent = '✓'; }
+        else if (d.st === 'skip') { dot.classList.add('skip'); dot.textContent = '·'; }
+        else if (d.isFuture) { dot.classList.add('future'); }
+        if (d.isToday) dot.classList.add('today');
+        cell.appendChild(dow); cell.appendChild(dot); row.appendChild(cell);
+      });
 
-    var stats = document.createElement('div'); stats.className = 'dc-stats';
-    function stat(value, label) {
-      var box = document.createElement('div'); box.className = 'dc-stat';
-      var b = document.createElement('b'); b.textContent = value;
-      var l = document.createElement('div'); l.className = 'lab'; l.textContent = label;
-      box.appendChild(b); box.appendChild(l); return box;
+      var stats = document.createElement('div'); stats.className = 'dc-stats';
+      function stat(value, label, extraClass) {
+        var box = document.createElement('div');
+        box.className = 'dc-stat' + (extraClass ? ' ' + extraClass : '');
+        var b = document.createElement('b'); b.textContent = value;
+        var l = document.createElement('div'); l.className = 'lab'; l.textContent = label;
+        box.appendChild(b); box.appendChild(l); return box;
+      }
+      var accuracy = s.accuracyFirst == null ? '—' : s.accuracyFirst + '%';
+      var accuracyLabel = 'せいかいりつ';
+      if (s.hasRetakes && s.accuracyBest != null) {
+        accuracy = s.accuracyFirst + '% → ' + s.accuracyBest + '%';
+        accuracyLabel = 'さいしょ → ベスト';
+      }
+      stats.appendChild(stat(s.doneCount + '/' + s.total, 'こんしゅう'));
+      stats.appendChild(stat('🔥 ' + s.streak, 'チェックれんぞく'));
+      stats.appendChild(stat(accuracy, accuracyLabel, 'accuracy'));
+
+      host.appendChild(row);
+      host.appendChild(stats);
     }
-    stats.appendChild(stat(s.doneCount + '/' + s.total, 'こんしゅう'));
-    stats.appendChild(stat('🔥 ' + s.streak, 'れんぞく'));
-    stats.appendChild(stat(s.accuracy == null ? '—' : s.accuracy + '%', 'せいかいりつ'));
 
-    host.appendChild(row);
-    host.appendChild(stats);
+    // A borrowed device must finish cloud restoration before this summary
+    // reads meta.checkIn; otherwise it can paint an empty local week forever.
+    if (window.BOOHA_READY) renderDailySummary();
+    else document.addEventListener('booha:ready', renderDailySummary, { once: true });
   })();
 </script>
 </body>

@@ -72,14 +72,24 @@ const BoohaAdventureLog = (() => {
     return { gameStamps, blitzStamps, advDone, blitzDone, complete, pct, duel };
   }
 
-  /** Consecutive days (ending today) with at least one session. */
+  /** Consecutive game-completion days, ending today or yesterday.
+   *
+   * Grace day: when today has no completed game yet, count back from
+   * yesterday. A streak breaks after a full missed day, not each morning.
+   * `g` is completed games; `s` is only evidence that the app was opened.
+   */
   function streak(dayLog, todayKey) {
+    const dayBefore = (key) => {
+      const d = new Date(key + 'T00:00:00Z');
+      d.setUTCDate(d.getUTCDate() - 1);
+      return d.toISOString().slice(0, 10);
+    };
+    const today = dayLog[todayKey];
+    let cursor = (today && today.g > 0) ? todayKey : dayBefore(todayKey);
     let n = 0;
-    let d = new Date(todayKey + 'T00:00:00Z');
     for (;;) {
-      const key = d.toISOString().slice(0, 10);
-      const rec = dayLog[key];
-      if (rec && rec.s > 0) { n++; d.setUTCDate(d.getUTCDate() - 1); }
+      const rec = dayLog[cursor];
+      if (rec && rec.g > 0) { n++; cursor = dayBefore(cursor); }
       else break;
     }
     return n;
@@ -228,19 +238,45 @@ const BoohaAdventureLog = (() => {
 
     const st = streak(dayLog, todayKey);
     mount.appendChild(el('div', 'alog-streak',
-      st > 0 ? `れんぞく ${st}日 / ${st}-DAY STREAK` : ''));
+      st > 0 ? `ゲームれんぞく ${st}日 / ${st}-DAY GAME STREAK` : ''));
   }
 
   function renderPast(mount, weekLog, currentWeekKey, curr, games) {
     mount.textContent = '';
-    const keys = Object.keys(weekLog).filter(k => k !== currentWeekKey).sort().reverse();
+    const prefix = curr + ':';
+    const hasCurriculumActivity = (wk) =>
+      Object.keys((wk && wk.adv) || {}).some(k => k.startsWith(prefix)) ||
+      Object.keys((wk && wk.blitz) || {}).some(k => k.startsWith(prefix));
+    const keys = Object.keys(weekLog)
+      .filter(k => k !== currentWeekKey && hasCurriculumActivity(weekLog[k]))
+      .sort().reverse();
     if (!keys.length) {
       mount.appendChild(el('div', 'alog-past-empty', 'これから きろくが たまるよ！'));
       return;
     }
+
+    // Honest running summary: only weeks with activity in the selected
+    // curriculum enter the denominator, and only fully completed weeks enter
+    // the score average. Completely missed weeks need an explicit tracking
+    // start before they can be counted fairly.
+    const stats = keys.map(k => weekStatus(weekLog[k], curr, games));
+    const full = stats.filter(s => s.complete);
+    const fullPcts = full.map(s => s.pct).filter(v => v != null);
+    const avg = fullPcts.length
+      ? Math.round(fullPcts.reduce((a, b) => a + b, 0) / fullPcts.length)
+      : null;
+
+    const sum = el('div', 'alog-term');
+    sum.appendChild(el('div', 'alog-term-jp',
+      `きろくのある ${keys.length}しゅうのうち ${full.length}しゅう かんりょう`));
+    sum.appendChild(el('div', 'alog-term-en',
+      `${full.length} OF ${keys.length} RECORDED WEEKS COMPLETE` +
+      (avg != null ? ` · COMPLETE-WEEK AVG ${avg}%` : '')));
+    mount.appendChild(sum);
+
     const strip = el('div', 'alog-past-strip');
-    keys.forEach(k => {
-      const s = weekStatus(weekLog[k], curr, games);
+    keys.forEach((k, i) => {
+      const s = stats[i];
       let badge;
       if (s.complete) {
         badge = el('div', 'alog-past-seal gold');

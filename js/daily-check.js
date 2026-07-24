@@ -9,7 +9,8 @@
      → stamp + small celebration → fade straight to hub.
 
    Records to  booha_save.meta.checkIn[<todayKey>]  =
-       { st:'done'|'skip', pct:<0-100|null>, curr:'pb'|'br'|'bc', ts:<ms> }
+       { st:'done'|'skip', pct:<first 0-100|null>, curr, ts:<first ms>,
+         retries:[{ pct, curr, ts }, ...] }
    Flat, dayKey-keyed — the exact shape a future Wix sync will lift as-is.
    Streak is COMPUTED at read time (see BoohaDailyCheck.streak); never stored.
 
@@ -90,27 +91,56 @@ window.BoohaDailyCheck = (function () {
     const k = todayKey();
     if (!k) { console.error('[DailyCheck] CALENDAR missing — not recorded.'); return; }
     const meta = _meta();
+    const existing = meta.checkIn[k] || null;
+    const now = Date.now();
+    const score = typeof pct === 'number' ? pct : null;
+
     // A skip must never downgrade a day already completed (protects the streak).
-    if (st === 'skip' && meta.checkIn[k] && meta.checkIn[k].st === 'done') return;
-    meta.checkIn[k] = { st, pct: (typeof pct === 'number' ? pct : null), curr: curr || null, ts: Date.now() };
+    if (st === 'skip' && existing && existing.st === 'done') return;
+
+    if (st === 'done' && existing && existing.st === 'done') {
+      // First-attempt pct/ts/curr are immutable. Every later completion is a
+      // retake, so completion count and streak still advance only once.
+      const retries = Array.isArray(existing.retries) ? existing.retries.slice() : [];
+      retries.push({ pct: score, curr: curr || null, ts: now });
+      meta.checkIn[k] = Object.assign({}, existing, { retries });
+    } else {
+      // A prior "skip" means "later," not an attempt; the first completion
+      // replaces it and establishes the permanent first-attempt evidence.
+      meta.checkIn[k] = {
+        st,
+        pct: score,
+        curr: curr || null,
+        ts: now,
+        retries: []
+      };
+    }
+
     const ok = window.BoohaSaveFile.patch('meta', meta);
     if (!ok) return;
     document.dispatchEvent(new CustomEvent('booha:checkIn', { detail: { day: k, st, pct } }));
     if (window.BoohaSync) BoohaSync.checkpoint('adventure');
   }
 
-  /* Consecutive-day streak up to & including today (computed, never stored). */
+  /* Consecutive completed check-ins, ending today or yesterday. */
   function streak() {
     const meta = _meta();
     const log = meta.checkIn || {};
+    const today = todayKey();
+    if (!today) return 0;
+    const dayBefore = (key) => {
+      const d = new Date(key + 'T00:00:00Z');
+      d.setUTCDate(d.getUTCDate() - 1);
+      return d.toISOString().slice(0, 10);
+    };
+    let cursor = log[today] && log[today].st === 'done'
+      ? today : dayBefore(today);
     let n = 0;
-    // Walk backwards from today over calendar days.
-    const start = todayKey();
-    if (!start) return 0;
-    let d = new Date(start + 'T00:00:00Z');
     for (;;) {
-      const key = d.toISOString().slice(0, 10);
-      if (log[key] && log[key].st === 'done') { n++; d.setUTCDate(d.getUTCDate() - 1); }
+      if (log[cursor] && log[cursor].st === 'done') {
+        n++;
+        cursor = dayBefore(cursor);
+      }
       else break;
     }
     return n;
@@ -576,8 +606,9 @@ window.BoohaDailyCheck = (function () {
 
   /* Parent-facing weekly summary. Week identity (Sun–Sat) comes from CALENDAR;
      we only enumerate the 7 days inside that boundary — no week arithmetic.
-     Returns: { days:[{key,st,isToday,isFuture}], doneCount, total:7,
-                accuracy:<0-100|null>, streak } */
+     Returns: { days:[{key,st,attempts,isToday,isFuture}],
+                doneCount, total:7, accuracyFirst, accuracyBest,
+                hasRetakes, streak } */
   function weekSummary() {
     const cw = CALENDAR.getCurrentCurriculumWeek();
     const today = todayKey();
@@ -586,7 +617,8 @@ window.BoohaDailyCheck = (function () {
     // Step 7 days from CALENDAR's weekStart, UTC-safe (mirrors calendar.js).
     const start = new Date(cw.weekStart + 'T00:00:00Z');
     const days = [];
-    let doneCount = 0, pctSum = 0, pctN = 0;
+    let doneCount = 0, firstSum = 0, firstN = 0,
+        bestSum = 0, bestN = 0, hasRetakes = false;
     for (let i = 0; i < 7; i++) {
       const d = new Date(start); d.setUTCDate(d.getUTCDate() + i);
       const key = d.toISOString().slice(0, 10);
@@ -594,13 +626,37 @@ window.BoohaDailyCheck = (function () {
       const st = rec ? rec.st : null;
       if (st === 'done') {
         doneCount++;
-        if (typeof rec.pct === 'number') { pctSum += rec.pct; pctN++; }
+        if (typeof rec.pct === 'number') {
+          firstSum += rec.pct;
+          firstN++;
+          const retries = Array.isArray(rec.retries) ? rec.retries : [];
+          if (retries.length) hasRetakes = true;
+          const comparable = retries
+            .filter(r => r && typeof r.pct === 'number' &&
+              (!rec.curr || !r.curr || r.curr === rec.curr));
+          // Scores from a different curriculum remain in the audit trail but
+          // are not compared as though they were the same assessment.
+          bestSum += Math.max(rec.pct, ...comparable.map(r => r.pct));
+          bestN++;
+        }
       }
-      days.push({ key, st, isToday: key === today, isFuture: today ? key > today : false });
+      days.push({
+        key, st,
+        attempts: st === 'done'
+          ? 1 + (Array.isArray(rec.retries) ? rec.retries.length : 0)
+          : 0,
+        isToday: key === today,
+        isFuture: today ? key > today : false
+      });
     }
+    const accuracyFirst = firstN ? Math.round(firstSum / firstN) : null;
+    const accuracyBest  = bestN  ? Math.round(bestSum / bestN)   : null;
     return {
       days, doneCount, total: 7,
-      accuracy: pctN ? Math.round(pctSum / pctN) : null,
+      accuracy: accuracyFirst, // compatibility for existing consumers
+      accuracyFirst,
+      accuracyBest,
+      hasRetakes,
       streak: streak()
     };
   }
