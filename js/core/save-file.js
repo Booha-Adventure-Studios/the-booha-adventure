@@ -248,7 +248,11 @@ const BoohaSaveFile = (() => {
 
   // ── System interface ──────────────────────────────────────────────────────
   const api = {
+    // Exposed for sync-client.js, which installs a restored blob before this
+    // system boots. Never duplicate the key derivation — one source of truth.
+    key: _key,
     load, save, clear, exists,
+    
     patch, patchDeep,
     resetWeekly,
     exportJSON, importJSON,
