@@ -81,7 +81,11 @@ const BoohaAdventure = (() => {
     const updated = saveFile.load();
     if (!updated.meta) updated.meta = {};
     updated.meta.lastWeeklyKey = weekKey;
-    saveFile.save(updated);
+    const saved = saveFile.save(updated);
+
+    // Weekly rollover is a durable boundary: do not leave the reset waiting
+    // for the background debounce if the student closes the page immediately.
+    if (saved && window.BoohaSync) BoohaSync.checkpoint('adventure');
 
     document.dispatchEvent(new CustomEvent('booha:newWeek', { detail: { weekKey } }));
   }
@@ -140,6 +144,7 @@ const BoohaAdventure = (() => {
       }
       if (BoohaAdventure.scores) {
         BoohaAdventure.scores.submit(saveId, score, { completed, time });
+        if (window.BoohaSync) BoohaSync.checkpoint('adventure');
       } else {
         console.warn('[BoohaAdventure] booha:gameEnd fired before scoreSystem ready.');
       }
@@ -157,7 +162,7 @@ const BoohaAdventure = (() => {
   // the student was known. Wait for the identity signal; fall back on a timer
   // so a page without token.js, or a stalled verify, still boots.
 
- // There is no legitimate unidentified mode. All 13 pages loading this file
+ // There is no legitimate unidentified mode. All pages loading this file
   // are token-gated, and every save consumer now routes through BoohaSaveFile,
   // which refuses to write without an identity. Booting anyway would only
   // produce a world rendered from an empty save.

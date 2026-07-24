@@ -288,8 +288,10 @@
       collectedMemoryId: null,
       orbIsCorrect     : false,
     };
-    writeSave(data); invalidateQuestCache();
-    return data.weekly.drifterQuest;
+    const ok = writeSave(data);
+    invalidateQuestCache();
+    if (ok && window.BoohaSync) BoohaSync.checkpoint('adventure');
+    return ok ? data.weekly.drifterQuest : null;
   }
 
   function completeMemory(id, memIdx) {
@@ -298,7 +300,10 @@
     if (!data.utsuroba.drifters[id].completed.includes(memIdx))
       data.utsuroba.drifters[id].completed.push(memIdx);
     if (data.weekly) data.weekly.drifterQuest = null;
-    writeSave(data); invalidateQuestCache();
+    const ok = writeSave(data);
+    invalidateQuestCache();
+    if (ok && window.BoohaSync) BoohaSync.checkpoint('adventure');
+    return ok;
   }
 
   function clearQuest() {
@@ -804,8 +809,7 @@
         const correct = q.orbIsCorrect === true && q.collectedMemoryId === expectedMemKey;
         closeDrifterPanel();
         if (correct) {
-          completeMemory(drifter.id, q.memIdx);
-          startCelebration(drifter);
+          if (completeMemory(drifter.id, q.memIdx)) startCelebration(drifter);
         } else {
           try { sessionStorage.setItem('karasuki_return_wrong_orb', q.collectedMemoryId || ''); } catch(_) {}
           showWrongMemoryMsg();

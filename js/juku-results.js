@@ -179,7 +179,9 @@
     if (week.report) return week.report;
     if (requireAttendance && !attended(week)) return null;
     const report = computeReport(week);
-    J.patchWeek(w => { if (!w.report) w.report = report; });
+    const saved = J.patchWeek(w => { if (!w.report) w.report = report; });
+    if (saved === null) return null;
+    if (window.BoohaSync) BoohaSync.checkpoint('juku');
     return J.weekRecord().week.report;
   }
 
@@ -245,6 +247,10 @@
 
   function render(taskEl, res, slot) {
     const report = ensureReport(false);   // results phase: always compute
+    if (!report) {
+      taskEl.textContent = '⚠ ほぞん できなかった — ページを とじずに せんせいを よんでください';
+      return;
+    }
 
     const totalHTML = report.total === null
       ? `<p class="juku-res-total none">DEMO のため、てんすうは ありません</p>`
