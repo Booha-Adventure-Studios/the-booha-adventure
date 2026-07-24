@@ -2,7 +2,7 @@
 /* ═══════════════════════════════════════════════════════════════════════
    daily-check.js  —  The Booha Adventure  ·  Daily 5-Minute Check-in
    ─────────────────────────────────────────────────────────────────────
-   An OPTIONAL homework gate shown on the start scene of index.html.
+   An OPTIONAL homework check launched from the start scene or adventure log.
 
    Flow (≈3–4 min, all tap, no typing):
      5 vocab (tap-through, audio) → 5 sentences → 5 questions → 5-item quiz
@@ -87,16 +87,41 @@ window.BoohaDailyCheck = (function () {
     const r = k && recordFor(k);
     return !!(r && r.st === 'done');
   }
+  function summarizeRecord(rec) {
+    const retries = rec && Array.isArray(rec.retries) ? rec.retries : [];
+    const done = !!(rec && rec.st === 'done');
+    const first = done && typeof rec.pct === 'number' ? rec.pct : null;
+    const comparable = done ? retries.filter(r =>
+      r && typeof r.pct === 'number' &&
+      (!rec.curr || !r.curr || r.curr === rec.curr)
+    ) : [];
+    return {
+      done,
+      first,
+      best: first == null ? null : Math.max(first, ...comparable.map(r => r.pct)),
+      attempts: done ? 1 + retries.length : 0,
+      hasRetakes: done && retries.length > 0,
+      curr: rec && rec.curr ? rec.curr : null
+    };
+  }
+  function todaySummary() {
+    const key = todayKey();
+    const rec = key ? recordFor(key) : null;
+    return Object.assign({ key, st: rec ? rec.st : null }, summarizeRecord(rec));
+  }
   function write(st, pct, curr) {
     const k = todayKey();
-    if (!k) { console.error('[DailyCheck] CALENDAR missing — not recorded.'); return; }
+    if (!k) {
+      console.error('[DailyCheck] CALENDAR missing — not recorded.');
+      return false;
+    }
     const meta = _meta();
     const existing = meta.checkIn[k] || null;
     const now = Date.now();
     const score = typeof pct === 'number' ? pct : null;
 
     // A skip must never downgrade a day already completed (protects the streak).
-    if (st === 'skip' && existing && existing.st === 'done') return;
+    if (st === 'skip' && existing && existing.st === 'done') return true;
 
     if (st === 'done' && existing && existing.st === 'done') {
       // First-attempt pct/ts/curr are immutable. Every later completion is a
@@ -117,9 +142,14 @@ window.BoohaDailyCheck = (function () {
     }
 
     const ok = window.BoohaSaveFile.patch('meta', meta);
-    if (!ok) return;
+    if (!ok) return false;
     document.dispatchEvent(new CustomEvent('booha:checkIn', { detail: { day: k, st, pct } }));
-    if (window.BoohaSync) BoohaSync.checkpoint('adventure');
+    if (window.BoohaSync) {
+      try { BoohaSync.checkpoint('adventure'); } catch (e) {
+        console.warn('[DailyCheck] Cloud checkpoint will retry later:', e);
+      }
+    }
+    return true;
   }
 
   /* Consecutive completed check-ins, ending today or yesterday. */
@@ -228,7 +258,7 @@ window.BoohaDailyCheck = (function () {
   /* ═══════════════════════════════════════════════════════════════════════
      RUNNER (UI)  —  self-contained full-screen overlay.
      Reaches into NOTHING in index.html; talks back only through callbacks:
-        run({ onDone(pct), onSkip() })
+        run({ curr, mode, onDone(pct), onCancel() })
      index.html decides what those do (fade to hub / play the intro video).
      ═══════════════════════════════════════════════════════════════════════ */
 
@@ -347,6 +377,12 @@ window.BoohaDailyCheck = (function () {
     opts = opts || {};
     const onDone = typeof opts.onDone === 'function' ? opts.onDone : function () {};
     const onSkip = typeof opts.onSkip === 'function' ? opts.onSkip : function () {};
+    const onCancel = typeof opts.onCancel === 'function' ? opts.onCancel : onSkip;
+    const fixedCurr = ['pb', 'br', 'bc'].includes(opts.curr) ? opts.curr : null;
+    const mode = opts.mode === 'retake' ? 'retake' : 'check';
+    const recordSkipOnCancel = opts.recordSkipOnCancel !== false && mode !== 'retake';
+    const doneLabel = opts.doneLabel ||
+      (mode === 'retake' ? 'ログにもどる' : 'ぼうけんへ');
     injectStyles();
 
     const root = document.createElement('div');
@@ -361,10 +397,14 @@ window.BoohaDailyCheck = (function () {
       try { getAudio().pause(); } catch (e) {}
       root.remove();
     }
-    function bailToSkip() {              // gentle exit = an explicit skip
-      const curr = knownCurr();
-      write('skip', null, curr || 'pb');
-      teardown(); onSkip();
+    function bailToCancel() {
+      // Leaving the first check from the start scene records "later." Leaving
+      // a journal-launched check or retake must not alter today's evidence.
+      if (recordSkipOnCancel) {
+        const curr = fixedCurr || knownCurr();
+        write('skip', null, curr || 'pb');
+      }
+      teardown(); onCancel();
     }
 
     function clear() { root.textContent = ''; }
@@ -384,7 +424,7 @@ window.BoohaDailyCheck = (function () {
     /* ── Step 0: curriculum pick ─────────────────────────────────────── */
     function stepCurriculum() {
       clear();
-      addClose(bailToSkip);
+      addClose(bailToCancel);
       root.appendChild(ghost());
       const t = document.createElement('div'); t.className = 'dc-title';
       t.textContent = 'デイリーチェック'; root.appendChild(t);
@@ -444,7 +484,7 @@ window.BoohaDailyCheck = (function () {
         s.textContent = 'コンテンツをよみこめませんでした。'; root.appendChild(s);
         const b = document.createElement('button');
         b.className = 'dc-btn ghost'; b.type = 'button'; b.textContent = 'とじる';
-        b.addEventListener('click', bailToSkip);
+        b.addEventListener('click', bailToCancel);
         root.appendChild(b);
       });
     }
@@ -456,7 +496,7 @@ window.BoohaDailyCheck = (function () {
 
       function showCard() {
         clear();
-        addClose(bailToSkip);
+        addClose(bailToCancel);
         const type = order[si];
         const cards = day.picks[type];
         const card = cards[ci];
@@ -521,7 +561,7 @@ window.BoohaDailyCheck = (function () {
 
       function showQ() {
         clear();
-        addClose(bailToSkip);
+        addClose(bailToCancel);
         const q = day.quiz[qi];
 
         const count = document.createElement('div'); count.className = 'dc-count';
@@ -569,39 +609,72 @@ window.BoohaDailyCheck = (function () {
 
       function finish() {
         const pct = Math.round((correct / day.quiz.length) * 100);
-        write('done', pct, content.curr);     // stamps the check-in
-        const st = streak();
+        let saving = false;
 
-        clear();
-        const g = ghost(); root.appendChild(g);
-        const t = document.createElement('div'); t.className = 'dc-title';
-        t.textContent = 'よくできました！'; root.appendChild(t);
-        const sc = document.createElement('div'); sc.className = 'dc-result-score';
-        sc.textContent = `${correct}/${day.quiz.length}`; root.appendChild(sc);
-        const sub = document.createElement('div'); sub.className = 'dc-sub';
-        sub.textContent = `${pct}%  ·  ${content.curr.toUpperCase()}`; root.appendChild(sub);
+        function renderSaveFailure() {
+          clear();
+          root.appendChild(ghost());
+          const t = document.createElement('div'); t.className = 'dc-title';
+          t.textContent = 'まだ保存できていません'; root.appendChild(t);
+          const sub = document.createElement('div'); sub.className = 'dc-sub';
+          sub.textContent = 'Not saved — please tell your teacher.';
+          root.appendChild(sub);
+          const b = document.createElement('button');
+          b.className = 'dc-btn'; b.type = 'button';
+          b.textContent = 'もういちど保存 / RETRY SAVE';
+          b.addEventListener('click', persistResult);
+          root.appendChild(b);
+        }
 
-        const streakEl = document.createElement('div'); streakEl.className = 'dc-streak';
-        streakEl.textContent = `🔥 ${st}日`; root.appendChild(streakEl);
+        function renderSuccess() {
+          const st = streak();
+          clear();
+          const g = ghost(); root.appendChild(g);
+          const t = document.createElement('div'); t.className = 'dc-title';
+          t.textContent = 'よくできました！'; root.appendChild(t);
+          const sc = document.createElement('div'); sc.className = 'dc-result-score';
+          sc.textContent = `${correct}/${day.quiz.length}`; root.appendChild(sc);
+          const sub = document.createElement('div'); sub.className = 'dc-sub';
+          sub.textContent = `${pct}%  ·  ${content.curr.toUpperCase()}`; root.appendChild(sub);
 
-        const b = document.createElement('button');
-        b.className = 'dc-btn'; b.type = 'button'; b.textContent = 'ぼうけんへ';
-        b.style.marginTop = '22px';
-        b.addEventListener('click', () => { teardown(); onDone(pct); });
-        root.appendChild(b);
+          const streakEl = document.createElement('div'); streakEl.className = 'dc-streak';
+          streakEl.textContent = `🔥 ${st}日`; root.appendChild(streakEl);
 
-        // celebration burst from the ghost
-        requestAnimationFrame(() => {
-          const r = root.getBoundingClientRect();
-          const gr = g.getBoundingClientRect();
-          burst(root, gr.left + gr.width / 2 - r.left, gr.top + gr.height / 2 - r.top);
-        });
+          const b = document.createElement('button');
+          b.className = 'dc-btn'; b.type = 'button'; b.textContent = doneLabel;
+          b.style.marginTop = '22px';
+          b.addEventListener('click', () => { teardown(); onDone(pct); });
+          root.appendChild(b);
+
+          // celebration burst from the ghost
+          requestAnimationFrame(() => {
+            const r = root.getBoundingClientRect();
+            const gr = g.getBoundingClientRect();
+            burst(root, gr.left + gr.width / 2 - r.left, gr.top + gr.height / 2 - r.top);
+          });
+        }
+
+        function persistResult() {
+          if (saving) return;
+          saving = true;
+          if (write('done', pct, content.curr)) {
+            renderSuccess();
+          } else {
+            saving = false;
+            renderSaveFailure();
+          }
+        }
+
+        persistResult();
       }
 
       showQ();
     }
 
-    stepCurriculum();
+    // Journal retakes are locked to the curriculum of the first attempt.
+    // A fresh check still shows the picker when no curriculum was supplied.
+    if (fixedCurr) stepLoading(fixedCurr);
+    else stepCurriculum();
   }
 
   /* Parent-facing weekly summary. Week identity (Sun–Sat) comes from CALENDAR;
@@ -624,27 +697,20 @@ window.BoohaDailyCheck = (function () {
       const key = d.toISOString().slice(0, 10);
       const rec = log[key] || null;
       const st = rec ? rec.st : null;
+      const summary = summarizeRecord(rec);
       if (st === 'done') {
         doneCount++;
-        if (typeof rec.pct === 'number') {
-          firstSum += rec.pct;
+        if (summary.first != null) {
+          firstSum += summary.first;
           firstN++;
-          const retries = Array.isArray(rec.retries) ? rec.retries : [];
-          if (retries.length) hasRetakes = true;
-          const comparable = retries
-            .filter(r => r && typeof r.pct === 'number' &&
-              (!rec.curr || !r.curr || r.curr === rec.curr));
-          // Scores from a different curriculum remain in the audit trail but
-          // are not compared as though they were the same assessment.
-          bestSum += Math.max(rec.pct, ...comparable.map(r => r.pct));
+          bestSum += summary.best;
           bestN++;
         }
+        if (summary.hasRetakes) hasRetakes = true;
       }
       days.push({
         key, st,
-        attempts: st === 'done'
-          ? 1 + (Array.isArray(rec.retries) ? rec.retries.length : 0)
-          : 0,
+        attempts: summary.attempts,
         isToday: key === today,
         isFuture: today ? key > today : false
       });
@@ -664,7 +730,7 @@ window.BoohaDailyCheck = (function () {
   /* ── Public surface ──────────────────────────────────────────────────── */
   return {
     // state
-    isDoneToday, recordFor, streak, knownCurr, todayKey,
+    isDoneToday, recordFor, todaySummary, streak, knownCurr, todayKey,
     // records
     markDone: (pct, curr) => write('done', pct, curr),
     markSkip: (curr) => write('skip', null, curr),
