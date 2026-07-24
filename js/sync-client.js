@@ -25,6 +25,7 @@ window.BoohaSync = (() => {
   const BASE       = 'https://www.bryanharper.tokyo/_functions';
   const LOAD_URL   = `${BASE}/studentSavesLoad`;
   const PUSH_URL   = `${BASE}/studentSavesPush`;
+  const RESOLVE_URL = `${BASE}/studentSavesResolve`;
 
   const KEY_TOKEN  = 'booha_token';
   const KEY_USERID = 'booha_userid';
@@ -42,6 +43,8 @@ window.BoohaSync = (() => {
 
   let _meta   = null;
   let _state  = 'idle';        // idle | restoring | ready | blocked
+  let _blockedByConflict = false;
+  let _conflictResolutionBaseline = 0;
   let _timers = { adventure: null, juku: null };
   let _inflight   = { adventure: null, juku: null };
   let _changeCounter = 0;
@@ -142,6 +145,28 @@ window.BoohaSync = (() => {
     }
   }
 
+  // Conflict resolution is intentionally loss-aware. Whichever copy the
+  // teacher does not choose is kept locally under a timestamped recovery key.
+  function preserveResolutionCopy(blob, reason, snapshot) {
+    if (!snapshot || !snapshot.data) return true;
+    try {
+      const key = `${META_BASE}:resolution:${blob}:${uid()}:${Date.now()}`;
+      localStorage.setItem(key, JSON.stringify({
+        reason,
+        savedAt: Date.now(),
+        deviceId: deviceId(),
+        revision: Number(snapshot.revision || 0),
+        updatedAt: snapshot.updatedAt || null,
+        data: snapshot.data
+      }));
+      console.warn(`[sync] ${blob}: displaced ${reason} copy preserved as ${key}`);
+      return true;
+    } catch (e) {
+      console.error(`[sync] ${blob}: could not preserve displaced ${reason} copy:`, e);
+      return false;
+    }
+  }
+
   function clearStoredConflict(blob) {
     try {
       localStorage.removeItem(`${META_BASE}:conflict:${blob}:${uid()}`);
@@ -181,7 +206,7 @@ window.BoohaSync = (() => {
       adventureSeen: false, jukuSeen: false,
       adventureChangeId: '', jukuChangeId: '',
       adventureSyncedSignature: '', jukuSyncedSignature: '',
-      blocked: false, conflict: null, lastSyncAt: 0
+      blocked: false, conflict: null, lastSyncAt: 0, lastResolutionAt: 0
     };
   }
 
@@ -373,6 +398,7 @@ window.BoohaSync = (() => {
   }
 
   function showFailed(retry) {
+    _blockedByConflict = false;
     const el = screen(`<div style="font-size:34px">⚠️</div>
       <div style="font-weight:600">よみこめませんでした</div>
       <div style="color:#aaa;font-size:14px;max-width:320px">
@@ -388,28 +414,226 @@ window.BoohaSync = (() => {
   }
 
   function conflictInfo(blob, localRevision, remoteRevision) {
-    const shortDevice = deviceId().replace(/[^a-z0-9]/gi, '').slice(-5).toUpperCase();
+    const shortDevice = deviceId().replace(/[^a-z0-9]/gi, '').slice(-8).toUpperCase();
     const letter = blob === 'juku' ? 'J' : 'A';
     return {
       blob,
       localRevision: Number(localRevision || 0),
       remoteRevision: Number(remoteRevision || 0),
+      deviceCode: shortDevice,
       code: `${letter}-L${Number(localRevision || 0)}-R${Number(remoteRevision || 0)}-${shortDevice}`
     };
   }
 
-  function showConflict(info) {
+  function showConflict(info, notice) {
+    if (!_blockedByConflict) {
+      _conflictResolutionBaseline = Number(_meta && _meta.lastResolutionAt || 0);
+    }
+    _blockedByConflict = true;
     info = info || (_meta && _meta.conflict) || conflictInfo('adventure', 0, 0);
-    screen(`<div style="font-size:34px">🔀</div>
+    if (!info.deviceCode) {
+      info = conflictInfo(info.blob, info.localRevision, info.remoteRevision);
+    }
+    const el = screen(`<div style="font-size:34px">🔀</div>
       <div style="font-weight:600">ほかのセッションで すすめたみたい</div>
       <div style="color:#aaa;font-size:14px;max-width:340px">
         Another Booha session has different unsaved progress.<br>
-        Please tell your teacher before continuing.</div>
+        A teacher can safely choose which copy to keep.</div>
+      <div style="display:flex;gap:10px;width:min(100%,360px);justify-content:center">
+        <div style="flex:1;border:1px solid #363a58;border-radius:10px;padding:9px">
+          <div style="color:#8e95be;font-size:11px">THIS DEVICE</div>
+          <div style="font-weight:700">REV ${info.localRevision}</div>
+        </div>
+        <div style="flex:1;border:1px solid #363a58;border-radius:10px;padding:9px">
+          <div style="color:#8e95be;font-size:11px">CLOUD COPY</div>
+          <div style="font-weight:700">REV ${info.remoteRevision}</div>
+        </div>
+      </div>
       <div style="color:#7f86a8;font:600 12px/1.4 ui-monospace,monospace">
-        ${info.code}</div>`);
+        DEVICE ${info.deviceCode}<br>${info.code}</div>
+      <label for="booha-teacher-pin" style="font-size:12px;color:#b8bdd8">
+        先生のリカバリーPIN / Teacher recovery PIN
+      </label>
+      <input id="booha-teacher-pin" type="password" inputmode="numeric"
+        autocomplete="off" maxlength="12" aria-label="Teacher recovery PIN"
+        style="width:150px;padding:11px 14px;text-align:center;font-size:20px;
+        letter-spacing:5px;border:1px solid #4b5178;border-radius:9px;
+        background:#17192a;color:#fff;outline:none">
+      <div id="booha-resolve-status" style="min-height:20px;color:#ffb3bd;
+        font-size:12px;max-width:350px">${notice || ''}</div>
+      <div style="display:flex;flex-direction:column;gap:9px;width:min(100%,360px)">
+        <button id="booha-resolve-local" style="padding:12px 18px;
+          background:#9a5b18;border:0;color:#fff;border-radius:10px;
+          font:600 14px sans-serif;cursor:pointer">
+          このデバイスをのこす / Keep this device
+        </button>
+        <button id="booha-resolve-cloud" style="padding:12px 18px;
+          background:#4e58a8;border:0;color:#fff;border-radius:10px;
+          font:600 14px sans-serif;cursor:pointer">
+          クラウドにもどす / Restore cloud copy
+        </button>
+      </div>
+      <div style="color:#777e9f;font-size:11px;max-width:350px">
+        The copy not chosen will be preserved for recovery.</div>`);
+
+    const pin = el.querySelector('#booha-teacher-pin');
+    const status = el.querySelector('#booha-resolve-status');
+    const localBtn = el.querySelector('#booha-resolve-local');
+    const cloudBtn = el.querySelector('#booha-resolve-cloud');
+    const buttons = [localBtn, cloudBtn];
+
+    function setBusy(busy) {
+      buttons.forEach(button => { button.disabled = busy; button.style.opacity = busy ? '.55' : '1'; });
+      pin.disabled = busy;
+    }
+
+    async function choose(choice) {
+      const teacherPin = String(pin.value || '').trim();
+      if (!teacherPin) {
+        status.textContent = '先生のPINを入力してください / Enter the teacher PIN.';
+        pin.focus();
+        return;
+      }
+      setBusy(true);
+      status.textContent = 'かくにん中… / Checking…';
+      const result = await resolveConflict(info, choice, teacherPin);
+      pin.value = '';
+      if (result.ok) return;
+      if (result.reason === 'RESOLUTION_STALE') {
+        showConflict(result.info,
+          'Cloud progress changed again. Please review and enter the PIN once more.');
+        return;
+      }
+      setBusy(false);
+      if (result.reason === 'RATE_LIMITED') {
+        status.textContent = 'Too many attempts. Please wait and try again.';
+      } else if (result.reason === 'ARCHIVE_FAILED') {
+        status.textContent = 'Could not preserve the displaced copy. Nothing was replaced.';
+      } else if (result.reason === 'LOCAL_WRITE_FAILED' ||
+                 result.reason === 'INVALID_REMOTE') {
+        status.textContent = 'This device could not install the chosen copy. Nothing local was erased.';
+      } else if (result.reason === 'NETWORK_ERROR') {
+        status.textContent = 'Connection failed. Check Wi-Fi and try again.';
+      } else {
+        status.textContent = 'PIN was not accepted. Please ask your teacher.';
+      }
+    }
+
+    localBtn.addEventListener('click', () => choose('local'));
+    cloudBtn.addEventListener('click', () => choose('cloud'));
+  }
+
+  async function resolveConflict(info, choice, teacherPin) {
+    const blob = info && info.blob;
+    if (!['adventure', 'juku'].includes(blob) ||
+        !['local', 'cloud'].includes(choice)) {
+      return { ok: false, reason: 'INVALID_RESOLUTION' };
+    }
+
+    const localData = readLocal(blob);
+    if (!localData) return { ok: false, reason: 'LOCAL_WRITE_FAILED' };
+
+    const body = {
+      token: token(),
+      blob,
+      choice,
+      teacherPin,
+      expectedRemoteRevision: Number(info.remoteRevision || 0),
+      deviceId: deviceId()
+    };
+    if (choice === 'local') body.data = localData;
+
+    let res;
+    try {
+      res = await post(RESOLVE_URL, body);
+    } catch (e) {
+      console.error('[sync] conflict resolution request failed:', e);
+      return { ok: false, reason: 'NETWORK_ERROR' };
+    }
+
+    if (!res || res.ok !== true) {
+      if (res && res.reason === 'RESOLUTION_STALE' && res.remote) {
+        refreshMeta();
+        const updated = conflictInfo(
+          blob,
+          Number(_meta[blob + 'Revision'] || info.localRevision || 0),
+          revisionOf(res.remote)
+        );
+        try {
+          localStorage.setItem(`${META_BASE}:conflict:${blob}:${uid()}`,
+                               JSON.stringify(res.remote));
+        } catch (e) {}
+        mutateMeta(m => {
+          m.blocked = true;
+          m.conflict = updated;
+        }, 'conflict', blob);
+        return { ok: false, reason: 'RESOLUTION_STALE', info: updated };
+      }
+      return { ok: false, reason: res && res.reason || 'RESOLUTION_REJECTED' };
+    }
+
+    let authoritativeData;
+    let resolvedRevision = Number(res.revision || 0);
+    let archived = true;
+
+    if (choice === 'cloud') {
+      const remote = res.remote || {
+        data: res.data,
+        revision: res.revision,
+        updatedAt: res.updatedAt
+      };
+      if (!remote || !remote.data || typeof remote.data !== 'object') {
+        return { ok: false, reason: 'INVALID_REMOTE' };
+      }
+
+      // The local copy is still untouched here. If it cannot be quarantined,
+      // fail closed rather than erasing the student's offline work.
+      archived = preserveResolutionCopy(blob, 'local-displaced-by-cloud', {
+        data: localData,
+        revision: Number(_meta[blob + 'Revision'] || info.localRevision || 0),
+        updatedAt: localData.updatedAt || null
+      });
+      if (!archived) return { ok: false, reason: 'ARCHIVE_FAILED' };
+      if (!writeLocal(blob, remote.data)) {
+        return { ok: false, reason: 'LOCAL_WRITE_FAILED' };
+      }
+      authoritativeData = remote.data;
+      resolvedRevision = revisionOf(remote);
+    } else {
+      // Wix has accepted this exact snapshot. The displaced remote copy is
+      // returned by the resolver and preserved locally when storage permits.
+      authoritativeData = localData;
+      archived = preserveResolutionCopy(
+        blob, 'cloud-displaced-by-local', res.displaced
+      );
+    }
+
+    const authoritativeSignature = dataSignature(authoritativeData);
+    const currentLocalSignature = dataSignature(readLocal(blob));
+    mutateMeta(m => {
+      m[blob + 'Revision'] = resolvedRevision;
+      m[blob + 'Dirty'] =
+        choice === 'local' && currentLocalSignature !== authoritativeSignature;
+      m[blob + 'Seen'] = true;
+      m[blob + 'SyncedSignature'] = authoritativeSignature;
+      m.blocked = false;
+      m.conflict = null;
+      m.lastSyncAt = Date.now();
+      m.lastResolutionAt = Date.now();
+    }, 'resolved', blob);
+    if (archived) clearStoredConflict(blob);
+
+    console.warn(`[sync] ${blob}: teacher resolved conflict using ${choice} copy at revision ${resolvedRevision}.`);
+    _blockedByConflict = false;
+    clearScreen();
+    ready();
+    refreshMeta();
+    if (isEffectivelyDirty(blob, readLocal(blob))) schedulePush(blob);
+    return { ok: true, choice, revision: resolvedRevision };
   }
 
   function showOfflineBlocked() {
+    _blockedByConflict = false;
     screen(`<div style="font-size:34px">📡</div>
       <div style="font-weight:600">せつぞくが ひつようです</div>
       <div style="color:#aaa;font-size:14px;max-width:320px">
@@ -467,6 +691,13 @@ window.BoohaSync = (() => {
     if (!uid() || !token()) { block('no identity'); return; }
 
     _state = 'restoring';
+    _blockedByConflict = false;
+    refreshMeta();
+    if (_meta.blocked && _meta.conflict) {
+      _state = 'blocked';
+      showConflict(_meta.conflict);
+      return;
+    }
     mutateMeta(m => {
       m.blocked = false;
       m.conflict = null;
@@ -589,6 +820,7 @@ window.BoohaSync = (() => {
 
   function ready() {
     _state = 'ready';
+    if (window.BOOHA_SYNC_READY) return;
     window.BOOHA_SYNC_READY = true;
     document.dispatchEvent(new Event('booha:syncReady'));
   }
@@ -786,6 +1018,13 @@ window.BoohaSync = (() => {
         showConflict(_meta.conflict);
       }
       return;
+    }
+
+    if (_blockedByConflict &&
+        Number(_meta.lastResolutionAt || 0) > _conflictResolutionBaseline) {
+      _blockedByConflict = false;
+      clearScreen();
+      ready();
     }
 
     if (_state === 'ready' && pageVisible()) {
