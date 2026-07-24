@@ -167,17 +167,20 @@ const BoohaAdventure = (() => {
   // 4s, so the student sees "saves are paused" rather than a silent stall.
   const IDENTITY_WARN_MS = 8000;
 
-  function _bootWhenReady() {
-    if (window.BOOHA_IDENTITY_READY) { init(); return; }
+ function _bootWhenReady() {
+    if (window.BOOHA_SYNC_READY) { init(); return; }
 
-    document.addEventListener('booha:identityReady', init, { once: true });
+    // Waits for SYNC, not identity: booting before the restore completes
+    // would let a game write land on a save that is about to be replaced,
+    // and would allow a push from a session that never loaded.
+    document.addEventListener('booha:syncReady', init, { once: true });
 
     setTimeout(() => {
-      if (window.BOOHA_IDENTITY_READY) return;
-      console.error('[BoohaAdventure] No identity after ' + (IDENTITY_WARN_MS / 1000) +
-                    's — Adventure NOT initialized. Waiting for booha:identityReady.');
-      document.dispatchEvent(new Event('booha:saveLocked'));
+      if (window.BOOHA_SYNC_READY) return;
+      console.error('[BoohaAdventure] No sync after ' + (IDENTITY_WARN_MS / 1000) +
+                    's — Adventure NOT initialized. Waiting for booha:syncReady.');
     }, IDENTITY_WARN_MS);
+   
   }
   
 
