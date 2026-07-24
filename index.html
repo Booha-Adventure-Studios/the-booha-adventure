@@ -1750,9 +1750,14 @@ const dailyCheckBtn = document.getElementById('dailyCheckBtn');
 if (dailyCheckBtn) dailyCheckBtn.addEventListener('click', () => {
   if (started) return;
   if (!window.BoohaDailyCheck) return;
+  const today = BoohaDailyCheck.todaySummary();
   BoohaDailyCheck.run({
+    // Once today's first attempt exists, every later launch is a retake of
+    // that same curriculum. A fresh day still gets the normal class picker.
+    curr: today.done ? (today.curr || BoohaDailyCheck.knownCurr()) : null,
+    mode: today.done ? 'retake' : 'check',
     onDone: () => { try { jumpToHub(); } catch (e) { showScene(hubScene); } },
-    onSkip: () => {}   // stay on the start scene; they can tap あとで
+    onCancel: () => {}   // stay on the start scene; they can tap あとで
   });
 });
 
