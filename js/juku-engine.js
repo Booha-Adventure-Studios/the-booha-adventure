@@ -61,7 +61,10 @@
   // ── Schedule math ────────────────────────────────────────
 
   function parseHM(hm) {
-    const m = /^(\d{1,2}):(\d{2})$/.exec(hm);
+    const m = /^(\d{1,2}):(\d{2})$/.exec(String(hm || ''));
+    if (!m || +m[1] > 23 || +m[2] > 59) {
+      throw new Error(`[JUKU] Invalid schedule time: ${String(hm)}`);
+    }
     return (+m[1]) * 60 + (+m[2]);   // minutes from midnight
   }
 
@@ -187,14 +190,23 @@
   // computed once in the results phase and then locked.
 
   function loadSave() {
+    const k = saveKey();
     try {
-      const k = saveKey();
       const s = JSON.parse((k && localStorage.getItem(k)) || '{"v":1,"weeks":{}}');
       if (!s.v) s.v = 1;
       if (!s.weeks) s.weeks = {};
       return s;
     }
-    catch (e) { return { v: 1, weeks: {} }; }
+    catch (e) {
+      // Preserve malformed records before a later successful write replaces
+      // the active key. The quarantined raw blob can be recovered manually.
+      console.error('[JUKU] Save parse failed; quarantining raw data:', e);
+      try {
+        const raw = k && localStorage.getItem(k);
+        if (raw) localStorage.setItem(`${k}:corrupt:${Date.now()}`, raw);
+      } catch (_) {}
+      return { v: 1, weeks: {} };
+    }
   }
   
   function writeSave(s) {
@@ -224,10 +236,19 @@
     // calendar.js is the week authority — never derive weeks here.
     // Records key by week + slot: a shared tablet serving the 17:00 and
     // 19:00 classes on the same day can never collide.
+    if (!window.CALENDAR || typeof CALENDAR.getCurrentCurriculumWeek !== 'function') {
+      throw new Error('[JUKU] Cannot open a week record before CALENDAR is ready.');
+    }
+    if (!_slot) {
+      throw new Error('[JUKU] Cannot open a week record before a class slot is selected.');
+    }
+    const uid = jukuUid();
+    if (!uid) {
+      throw new Error('[JUKU] Cannot open a week record without a student identity.');
+    }
+
     const cw = window.CALENDAR.getCurrentCurriculumWeek();
-   
-    const slotId = _slot ? _slot.id : 'noslot';
-    const uid    = jukuUid() || 'anon';
+    const slotId = _slot.id;
     const key    = `${cw.weekId}|${slotId}|${uid}`;
    
     const s = loadSave();

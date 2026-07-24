@@ -93,8 +93,10 @@ window.BoohaDailyCheck = (function () {
     // A skip must never downgrade a day already completed (protects the streak).
     if (st === 'skip' && meta.checkIn[k] && meta.checkIn[k].st === 'done') return;
     meta.checkIn[k] = { st, pct: (typeof pct === 'number' ? pct : null), curr: curr || null, ts: Date.now() };
-    window.BoohaSaveFile.patch('meta', meta);
+    const ok = window.BoohaSaveFile.patch('meta', meta);
+    if (!ok) return;
     document.dispatchEvent(new CustomEvent('booha:checkIn', { detail: { day: k, st, pct } }));
+    if (window.BoohaSync) BoohaSync.checkpoint('adventure');
   }
 
   /* Consecutive-day streak up to & including today (computed, never stored). */
