@@ -200,14 +200,18 @@ window.BoohaDailyCheck = (function () {
   async function loadContent(curr) {
     const wi = weekInfo();
     const monCode = MON_CODE[wi.monthSlug] || 'jan';
-    const out = {};
-    for (const type of TYPES) {
+    // These files are independent. Loading them in parallel changes the wait
+    // from three network round trips to the slowest one, which matters on
+    // classroom Wi-Fi and older tablets.
+    const entries = await Promise.all(TYPES.map(async type => {
       const url = `content/${curr}/${wi.monthSlug}/${type}.json`;
       const res = await fetch(url);
       if (!res.ok) throw new Error(`${type} ${res.status}`);
       const data = await res.json();
-      out[type] = sliceForWeek(data.cards, wi.weekNumber);
-    }
+      return [type, sliceForWeek(data.cards, wi.weekNumber)];
+    }));
+    const out = {};
+    entries.forEach(entry => { out[entry[0]] = entry[1]; });
     return { curr, monCode, week: wi, sets: out };
   }
 
@@ -278,12 +282,17 @@ window.BoohaDailyCheck = (function () {
     if (styleInjected) return;
     styleInjected = true;
     const css = `
-    .dc-root{position:fixed;inset:0;z-index:9000;display:flex;flex-direction:column;
-      align-items:center;justify-content:center;padding:calc(18px + var(--safe-top,0px)) 18px
+    .dc-root{position:fixed;inset:0;z-index:10000;display:flex;flex-direction:column;
+      align-items:center;justify-content:flex-start;padding:calc(18px + var(--safe-top,0px)) 18px
       calc(18px + var(--safe-bottom,0px));background:var(--bg,#000)
       url('assets/img/background-1.png') center/cover no-repeat;color:var(--text,#fff);
-      font-family:inherit;text-align:center;overflow:hidden;-webkit-tap-highlight-color:transparent;}
+      font-family:inherit;text-align:center;overflow-x:hidden;overflow-y:auto;
+      -webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;
+      -webkit-tap-highlight-color:transparent;}
     .dc-root *{box-sizing:border-box;}
+    .dc-root::before,.dc-root::after{content:'';flex:1 0 18px;}
+    .dc-root>*{flex-shrink:0;}
+    .dc-root button{touch-action:manipulation;-webkit-user-select:none;user-select:none;}
     .dc-ghost{width:132px;height:132px;object-fit:contain;
       filter:drop-shadow(0 8px 24px rgba(255,59,189,.45));animation:dcFloat 3.4s ease-in-out infinite;}
     @keyframes dcFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
@@ -339,6 +348,23 @@ window.BoohaDailyCheck = (function () {
       font-weight:800;font-size:1rem;}
     .dc-burst{position:absolute;width:9px;height:9px;border-radius:50%;pointer-events:none;
       will-change:transform,opacity;}
+    @media (orientation:landscape) and (max-height:600px){
+      .dc-root{padding-top:calc(8px + var(--safe-top,0px));
+        padding-bottom:calc(8px + var(--safe-bottom,0px));}
+      .dc-root::before,.dc-root::after{flex-basis:8px;}
+      .dc-ghost{width:70px;height:70px;animation:none;filter:none;}
+      .dc-title{font-size:1.2rem;margin:5px 0 2px;}
+      .dc-sub{font-size:.84rem;margin-bottom:8px;}
+      .dc-progress{margin-bottom:9px;}
+      .dc-card{padding:14px 18px;}
+      .dc-jp{font-size:1.3rem;margin-bottom:6px;}
+      .dc-audio{margin-top:9px;width:48px;height:48px;}
+      .dc-btn{margin-top:10px;padding:11px 22px;}
+      .dc-tiles{width:min(94vw,720px);flex-direction:row;gap:8px;margin-top:2px;}
+      .dc-tile{flex:1;min-width:0;padding:11px 12px;}
+      .dc-choices{margin-top:10px;gap:8px;}
+      .dc-choice{padding:11px 15px;}
+    }
     @media (prefers-reduced-motion: reduce){
       .dc-ghost{animation:none;} .dc-burst{display:none;}
     }`;
@@ -390,12 +416,16 @@ window.BoohaDailyCheck = (function () {
     root.setAttribute('role', 'dialog');
     root.setAttribute('aria-modal', 'true');
     document.body.appendChild(root);
+    document.dispatchEvent(new CustomEvent('booha:dailyCheckVisibility',
+      { detail: { open: true } }));
 
     let closed = false;
     function teardown() {
       if (closed) return; closed = true;
       try { getAudio().pause(); } catch (e) {}
       root.remove();
+      document.dispatchEvent(new CustomEvent('booha:dailyCheckVisibility',
+        { detail: { open: false } }));
     }
     function bailToCancel() {
       // Leaving the first check from the start scene records "later." Leaving
