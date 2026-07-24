@@ -102,6 +102,10 @@ window.BoohaSync = (() => {
     if (Number(m.allTimeStars) > 0) return false;
     if (m.weekLog && Object.keys(m.weekLog).length) return false;
     if (m.dayLog  && Object.keys(m.dayLog).length)  return false;
+    if (m.checkIn && Object.keys(m.checkIn).length) return false;
+    const w = d.weekly || {};
+    if (w.completedGames && Object.keys(w.completedGames).length) return false;
+    if (w.drifterQuest) return false;
     if (d.collection && (d.collection.wanderers || []).length) return false;
     if (d.unlocks && Object.keys(d.unlocks).length) return false;
     return true;
@@ -412,11 +416,17 @@ window.BoohaSync = (() => {
   function markDirty(blob) {
     if (_state !== 'ready' || !availableBlobs().includes(blob)) return;
     setDirty(blob);
+    // Adventure writes are sparse and can be followed by a device switch, so
+    // trailing debounce prevents ordinary roaming from becoming a conflict.
+    // Juku stays checkpoint-only to avoid a network request per exam item.
+    if (blob === 'adventure') schedulePush(blob);
   }
 
   /** Immediate push — call at meaningful boundaries. */
   function checkpoint(blob) {
-    if (_state !== 'ready' || !availableBlobs().includes(blob)) return;
+    if (_state !== 'ready' || !availableBlobs().includes(blob)) {
+      return Promise.resolve(false);
+    }
     clearTimeout(_timers[blob]);
     if (!_meta[blob + 'Dirty']) return Promise.resolve(true);
     return pushBlob(blob);

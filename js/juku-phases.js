@@ -115,6 +115,7 @@
           // never written is the same lie as an accepted answer.
           btn.classList.remove('sel');
           if (prev) prev.classList.add('sel');
+          return;
         }
         if (onChange) onChange();
         
@@ -255,7 +256,12 @@ function renderLobby(res, slot) {
     });
     
    submitBtn.addEventListener('click', () => {
-      const { week: w2 } = J.weekRecord();
+      const rec = J.tryWeekRecord('Cannot read survey before submission');
+      if (!rec) {
+        submitBtn.textContent = '⚠ ほぞん できなかった — せんせいを よんでね';
+        return;
+      }
+      const w2 = rec.week;
       if (!allAnswered(SURVEY_QS, w2.survey)) return;
       if (J.patchWeek(w => { w.survey.submitted = true; }) === null) {
         submitBtn.textContent = '⚠ ほぞん できなかった — もう いちど';
