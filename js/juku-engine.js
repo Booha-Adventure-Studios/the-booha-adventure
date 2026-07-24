@@ -1,3 +1,4 @@
+
 // js/juku-engine.js
 // English Juku — the clock. Load AFTER calendar.js and juku-config.js.
 //
@@ -204,8 +205,10 @@
       document.dispatchEvent(new CustomEvent('juku:saveFailed', { detail: { error: 'NO_IDENTITY' } }));
       return false;
     }
+    
     try {
       localStorage.setItem(k, JSON.stringify(s));
+      document.dispatchEvent(new Event('juku:saved'));
       return true;
       
     } catch (e) {
@@ -315,8 +318,10 @@
   });
 
   // ── Public API ───────────────────────────────────────────
-  window.JUKU = {
+ window.JUKU = {
+    saveKey,          // for sync-client.js — see save-file.js note
     tokyoNow, resolve, selectSlot, autoSlot,
+    
     seededShuffle, rng, studentSeedBase,
     loadSave, weekRecord, patchWeek,
     start,
