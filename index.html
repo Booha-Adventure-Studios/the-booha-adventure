@@ -1763,15 +1763,20 @@ if (dailyCheckBtn) dailyCheckBtn.addEventListener('click', () => {
   });
 });
 
-/* Done-state stamp — deferred to window load so the module + save are ready. */
-window.addEventListener('load', () => {
+/* Done-state stamp — wait for identity + cloud restore, not window.load.
+   On slower devices window.load can win the Wix verification race; reading
+   the identity-scoped save there emitted a permanent false "Not saving"
+   warning even though the student was identified a moment later. */
+function renderDailyCheckStamp() {
   try {
     if (window.BoohaDailyCheck && BoohaDailyCheck.isDoneToday()) {
       const stamp = document.getElementById('dcStamp');
       if (stamp) { stamp.textContent = '✓ ' + BoohaDailyCheck.streak() + '日'; stamp.classList.add('show'); }
     }
   } catch (e) {}
-});
+}
+if (window.BOOHA_READY) renderDailyCheckStamp();
+else document.addEventListener('booha:ready', renderDailyCheckStamp, { once: true });
 
 
 let started = false, fadingOut = false;
