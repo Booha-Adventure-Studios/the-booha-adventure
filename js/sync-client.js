@@ -89,6 +89,33 @@ window.BoohaSync = (() => {
     }
   }
 
+  // A first-time cloud restore may replace progress created before Increment B.
+  // Keep that local blob as a separate, timestamped snapshot so the rollout
+  // can prefer Wix without making the displaced device data unrecoverable.
+  function preserveReplacedLocal(blob) {
+    const data = readLocal(blob);
+    if (!data) return;
+    try {
+      const key = `${META_BASE}:replaced:${blob}:${uid()}:${Date.now()}`;
+      localStorage.setItem(key, JSON.stringify({
+        reason: 'first-cloud-restore',
+        savedAt: Date.now(),
+        data
+      }));
+      console.warn(`[sync] ${blob}: pre-sync local progress quarantined as ${key}`);
+    } catch (e) {
+      // The user explicitly chose Wix as the rollout authority. A full local
+      // quota must not turn that one-time migration into a permanent dead end.
+      console.error(`[sync] ${blob}: could not quarantine replaced local data:`, e);
+    }
+  }
+
+  function clearStoredConflict(blob) {
+    try {
+      localStorage.removeItem(`${META_BASE}:conflict:${blob}:${uid()}`);
+    } catch (e) {}
+  }
+
   /* ── emptiness ───────────────────────────────────────────
      A device with no progress must NEVER claim revision 1. Doing so would
      let an empty save become the authoritative record and overwrite a real
@@ -227,9 +254,16 @@ window.BoohaSync = (() => {
 
     if (!hasLocal) return { act: 'install' };                // fresh device
 
-    // First reconciliation for this blob with content on both sides: we cannot know which
-    // is newer, and guessing could erase a term. Surface it.
-    if (!_meta[blob + 'Seen']) return { act: 'conflict' };
+    // Rollout rule: revision 0 + clean + never seen means this blob predates
+    // cloud sync. Wix is authoritative by product decision. Preserve the old
+    // local blob, then install remote progress automatically. Any evidence of
+    // earlier sync or unsent work still receives the genuine conflict screen.
+    if (!_meta[blob + 'Seen']) {
+      if (localRev === 0 && !dirty) {
+        return { act: 'install', preserveLocal: true };
+      }
+      return { act: 'conflict' };
+    }
 
     if (!dirty) {
       if (remote.revision === localRev) return { act: 'none' };
@@ -288,9 +322,11 @@ window.BoohaSync = (() => {
       const d = decide(blob, remote);
 
       if (d.act === 'install') {
+        if (d.preserveLocal) preserveReplacedLocal(blob);
         if (!writeLocal(blob, remote.data)) { showFailed(() => restore()); _state='blocked'; return; }
         _meta[blob + 'Revision'] = remote.revision;
         _meta[blob + 'Dirty']    = false;
+        clearStoredConflict(blob);
         console.log(`[sync] ${blob}: installed remote revision ${remote.revision}`);
 
       } else if (d.act === 'push') {
