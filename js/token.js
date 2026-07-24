@@ -80,25 +80,63 @@
     }
   }
 
-  // Persistent — no auto-dismiss. A save failure is not transient information,
-  // and a toast that fades leaves the student believing their work was stored.
-  function showSaveFailedBanner() {
-    if (document.getElementById('booha-savefail-banner')) return;
-    const el = document.createElement('div');
-    el.id = 'booha-savefail-banner';
-    el.style.cssText = [
-      'position:fixed', 'bottom:0', 'left:0', 'right:0',
-      'background:#b00020', 'color:#fff',
-      'text-align:center', 'padding:10px 16px',
-      'font:600 14px/1.4 sans-serif', 'z-index:99999'
-    ].join(';');
+  // Sticky while a failure is real, but not permanent after recovery. The
+  // previous banner remembered only that *something* had failed once, so a
+  // harmless identity race could leave "Not saving" on screen all lesson even
+  // after subsequent writes succeeded.
+  const saveHealth = {
+    locked: false,
+    adventure: false,
+    juku: false
+  };
+
+  function renderSaveFailedBanner() {
+    const failing = saveHealth.locked || saveHealth.adventure || saveHealth.juku;
+    let el = document.getElementById('booha-savefail-banner');
+    if (!failing) {
+      if (el) el.remove();
+      return;
+    }
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'booha-savefail-banner';
+      el.style.cssText = [
+        'position:fixed', 'bottom:0', 'left:0', 'right:0',
+        'background:#b00020', 'color:#fff',
+        'text-align:center', 'padding:10px 16px',
+        'font:600 14px/1.4 sans-serif', 'z-index:99999'
+      ].join(';');
+      document.body.appendChild(el);
+    }
     el.textContent = 'きろくできません / Not saving — tell your teacher.';
-    document.body.appendChild(el);
   }
 
-  document.addEventListener('booha:saveLocked', showSaveFailedBanner);
-  document.addEventListener('booha:saveFailed', showSaveFailedBanner);
-  document.addEventListener('juku:saveFailed',  showSaveFailedBanner);
+  function noteSaveProblem(kind) {
+    saveHealth[kind] = true;
+    renderSaveFailedBanner();
+  }
+
+  function clearSaveProblem(kind) {
+    saveHealth[kind] = false;
+    renderSaveFailedBanner();
+  }
+
+  document.addEventListener('booha:saveLocked', () => noteSaveProblem('locked'));
+  document.addEventListener('booha:saveFailed', () => noteSaveProblem('adventure'));
+  document.addEventListener('juku:saveFailed',  () => noteSaveProblem('juku'));
+
+  // Sync-ready proves the temporary no-identity lock has been resolved. A real
+  // storage failure remains red until that same storage engine successfully
+  // writes again.
+  document.addEventListener('booha:syncReady', () => clearSaveProblem('locked'));
+  document.addEventListener('booha:saved', () => {
+    clearSaveProblem('locked');
+    clearSaveProblem('adventure');
+  });
+  document.addEventListener('juku:saved', () => {
+    clearSaveProblem('locked');
+    clearSaveProblem('juku');
+  });
 
   function showConnectingBanner() {
     if (document.getElementById('booha-connecting-banner')) return;
