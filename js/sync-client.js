@@ -49,6 +49,7 @@ window.BoohaSync = (() => {
   let _inflight   = { adventure: null, juku: null };
   let _changeCounter = 0;
   let _channel = null;
+  let _conflictRefreshSeq = 0;
 
   function randomId(prefix) {
     try {
@@ -376,7 +377,10 @@ window.BoohaSync = (() => {
         'position:fixed', 'inset:0', 'z-index:99997',
         'background:#0e0f1a', 'color:#fff',
         'display:flex', 'flex-direction:column',
-        'align-items:center', 'justify-content:center',
+        'align-items:center', 'justify-content:flex-start',
+        'justify-content:safe center', 'overflow-y:auto',
+        '-webkit-overflow-scrolling:touch', 'overscroll-behavior:contain',
+        'touch-action:pan-y',
         'text-align:center', 'padding:32px', 'gap:18px',
         'font:400 16px/1.7 system-ui,-apple-system,sans-serif'
       ].join(';');
@@ -425,6 +429,75 @@ window.BoohaSync = (() => {
     };
   }
 
+  function fmtWhen(ts) {
+    const n = Number(ts || 0);
+    if (!n) return '—';
+    try {
+      return new Date(n).toLocaleString('ja-JP', {
+        month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit'
+      });
+    } catch (e) { return '—'; }
+  }
+
+  // Give the teacher useful evidence, not just two revision numbers. These
+  // summaries are deliberately read-only and use only counts/timestamps from
+  // the save; choosing a copy still happens through the guarded resolver.
+  function summarizeConflictCopy(blob, data) {
+    if (!data || typeof data !== 'object') return ['— なし / none —'];
+
+    if (blob === 'juku') {
+      const weeks = data.weeks && typeof data.weeks === 'object'
+        ? Object.keys(data.weeks) : [];
+      let answers = 0;
+      let latest = 0;
+      weeks.forEach(key => {
+        const week = data.weeks[key] || {};
+        const sections = week.sections && typeof week.sections === 'object'
+          ? week.sections : {};
+        Object.keys(sections).forEach(sectionId => {
+          const items = Array.isArray(sections[sectionId] && sections[sectionId].items)
+            ? sections[sectionId].items : [];
+          answers += items.length;
+          items.forEach(item => {
+            const at = Number(item && item.at || 0);
+            if (at > latest) latest = at;
+          });
+        });
+      });
+      return [
+        `しゅう / weeks: ${weeks.length}`,
+        `こたえ / answers: ${answers}`,
+        `さいご / last: ${fmtWhen(latest)}`
+      ];
+    }
+
+    const scores = data.scores && typeof data.scores === 'object'
+      ? data.scores : {};
+    const completed = Object.values(scores)
+      .filter(entry => entry && entry.completed).length;
+    const completedGames =
+      data.weekly && data.weekly.completedGames &&
+      typeof data.weekly.completedGames === 'object'
+        ? Object.keys(data.weekly.completedGames).length : 0;
+    return [
+      `★ ${Number(data.meta && data.meta.allTimeStars || 0)}`,
+      `ゲーム / games: ${completed}`,
+      `こんしゅう / this week: ${completedGames}`,
+      `さいご / last: ${fmtWhen(data.updatedAt)}`
+    ];
+  }
+
+  function conflictColumnHTML(title, lines, revision) {
+    const rows = lines.map(line =>
+      `<div style="color:#c9cee6">${line}</div>`).join('');
+    return `<div style="flex:1;min-width:0;background:rgba(255,255,255,.05);
+      border-radius:10px;padding:12px;text-align:left;font-size:12.5px;line-height:1.65">
+      <div style="font-weight:700;color:#fff;margin-bottom:6px">${title}</div>
+      <div style="color:#7f86a8;font:600 11px ui-monospace,monospace;margin-bottom:6px">
+        rev ${revision}</div>
+      ${rows}</div>`;
+  }
+
   function showConflict(info, notice) {
     if (!_blockedByConflict) {
       _conflictResolutionBaseline = Number(_meta && _meta.lastResolutionAt || 0);
@@ -434,23 +507,74 @@ window.BoohaSync = (() => {
     if (!info.deviceCode) {
       info = conflictInfo(info.blob, info.localRevision, info.remoteRevision);
     }
+    renderConflictPanel(info, null, notice || '', 'loading');
+    refreshConflictPanel(info);
+  }
+
+  // A conflict may have sat open while another device advanced the server.
+  // Always reload it before enabling either decision. The sequence number
+  // prevents a slow, older request from repainting over a newer refresh.
+  async function refreshConflictPanel(info) {
+    const seq = ++_conflictRefreshSeq;
+    let res;
+    try {
+      res = await post(LOAD_URL, { token: token() });
+    } catch (e) {
+      if (seq !== _conflictRefreshSeq || !_blockedByConflict) return;
+      console.warn('[sync] conflict refresh failed:', e.message);
+      renderConflictPanel(
+        info, null,
+        'Could not check the cloud copy. Check Wi-Fi and retry.',
+        'error'
+      );
+      return;
+    }
+
+    if (seq !== _conflictRefreshSeq || !_blockedByConflict) return;
+    const remote = res && res.ok === true ? res[info.blob] : null;
+    if (!remote || !remote.data || typeof remote.data !== 'object') {
+      renderConflictPanel(
+        info, null,
+        'The cloud copy could not be loaded. Nothing has been changed.',
+        'error'
+      );
+      return;
+    }
+
+    refreshMeta();
+    const freshInfo = conflictInfo(
+      info.blob,
+      Number(_meta[info.blob + 'Revision'] || info.localRevision || 0),
+      revisionOf(remote)
+    );
+    renderConflictPanel(freshInfo, remote, '', 'ready');
+  }
+
+  function renderConflictPanel(info, remote, notice, loadState) {
+    const blob = info.blob;
+    const local = readLocal(blob);
+    const remoteRevision = remote ? revisionOf(remote) : '…';
+    const statusText = notice ||
+      (loadState === 'loading' ? 'よみこみちゅう… / checking cloud…' : '');
     const el = screen(`<div style="font-size:34px">🔀</div>
-      <div style="font-weight:600">ほかのセッションで すすめたみたい</div>
-      <div style="color:#aaa;font-size:14px;max-width:340px">
-        Another Booha session has different unsaved progress.<br>
-        A teacher can safely choose which copy to keep.</div>
-      <div style="display:flex;gap:10px;width:min(100%,360px);justify-content:center">
-        <div style="flex:1;border:1px solid #363a58;border-radius:10px;padding:9px">
-          <div style="color:#8e95be;font-size:11px">THIS DEVICE</div>
-          <div style="font-weight:700">REV ${info.localRevision}</div>
-        </div>
-        <div style="flex:1;border:1px solid #363a58;border-radius:10px;padding:9px">
-          <div style="color:#8e95be;font-size:11px">CLOUD COPY</div>
-          <div style="font-weight:700">REV ${info.remoteRevision}</div>
-        </div>
+      <div style="font-weight:600">きろくが ふたつ あります</div>
+      <div style="color:#aaa;font-size:13.5px;max-width:390px">
+        Two different histories exist for this student.<br>
+        <b>先生を よんでね / Please call your teacher.</b></div>
+      <div style="display:flex;gap:10px;width:min(100%,420px);justify-content:center">
+        ${conflictColumnHTML(
+          'このデバイス<br>THIS DEVICE',
+          summarizeConflictCopy(blob, local),
+          info.localRevision
+        )}
+        ${conflictColumnHTML(
+          'クラウド<br>CLOUD',
+          summarizeConflictCopy(blob, remote && remote.data),
+          remoteRevision
+        )}
       </div>
       <div style="color:#7f86a8;font:600 12px/1.4 ui-monospace,monospace">
-        DEVICE ${info.deviceCode}<br>${info.code}</div>
+        DEVICE ${info.deviceCode}<br>${info.code} · ${blob}</div>
       <label for="booha-teacher-pin" style="font-size:12px;color:#b8bdd8">
         先生のリカバリーPIN / Teacher recovery PIN
       </label>
@@ -459,8 +583,9 @@ window.BoohaSync = (() => {
         style="width:150px;padding:11px 14px;text-align:center;font-size:20px;
         letter-spacing:5px;border:1px solid #4b5178;border-radius:9px;
         background:#17192a;color:#fff;outline:none">
-      <div id="booha-resolve-status" style="min-height:20px;color:#ffb3bd;
-        font-size:12px;max-width:350px">${notice || ''}</div>
+      <div id="booha-resolve-status" role="status" aria-live="polite"
+        style="min-height:20px;color:#ffb3bd;font-size:12px;max-width:390px">
+        ${statusText}</div>
       <div style="display:flex;flex-direction:column;gap:9px;width:min(100%,360px)">
         <button id="booha-resolve-local" style="padding:12px 18px;
           background:#9a5b18;border:0;color:#fff;border-radius:10px;
@@ -472,6 +597,11 @@ window.BoohaSync = (() => {
           font:600 14px sans-serif;cursor:pointer">
           クラウドにもどす / Restore cloud copy
         </button>
+        <button id="booha-resolve-retry" style="display:none;padding:10px 18px;
+          background:transparent;border:1px solid #4b5178;color:#c9cee6;
+          border-radius:10px;font:600 13px sans-serif;cursor:pointer">
+          もういちど / Retry cloud check
+        </button>
       </div>
       <div style="color:#777e9f;font-size:11px;max-width:350px">
         The copy not chosen will be preserved for recovery.</div>`);
@@ -480,11 +610,18 @@ window.BoohaSync = (() => {
     const status = el.querySelector('#booha-resolve-status');
     const localBtn = el.querySelector('#booha-resolve-local');
     const cloudBtn = el.querySelector('#booha-resolve-cloud');
+    const retryBtn = el.querySelector('#booha-resolve-retry');
     const buttons = [localBtn, cloudBtn];
+    let localArmed = false;
 
     function setBusy(busy) {
       buttons.forEach(button => { button.disabled = busy; button.style.opacity = busy ? '.55' : '1'; });
       pin.disabled = busy;
+    }
+
+    if (loadState !== 'ready') {
+      setBusy(true);
+      if (loadState === 'error') retryBtn.style.display = 'block';
     }
 
     async function choose(choice) {
@@ -519,8 +656,23 @@ window.BoohaSync = (() => {
       }
     }
 
-    localBtn.addEventListener('click', () => choose('local'));
+    localBtn.addEventListener('click', () => {
+      if (localBtn.disabled) return;
+      if (!localArmed) {
+        localArmed = true;
+        localBtn.textContent = 'ほんとうに？ / Confirm overwrite cloud';
+        localBtn.style.background = '#b0392f';
+        status.textContent =
+          'クラウドのきろくをうわがきします / This will overwrite the cloud copy.';
+        return;
+      }
+      choose('local');
+    });
     cloudBtn.addEventListener('click', () => choose('cloud'));
+    retryBtn.addEventListener('click', () => {
+      renderConflictPanel(info, null, '', 'loading');
+      refreshConflictPanel(info);
+    });
   }
 
   async function resolveConflict(info, choice, teacherPin) {

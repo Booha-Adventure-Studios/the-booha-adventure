@@ -1468,10 +1468,11 @@ function isPortrait() {
 
 function checkOrientation() {
   const portrait = isPortrait();
-  const onBlockedScene =
-    startScene.classList.contains('active') ||
-    videoScene.classList.contains('active');
-  const show = portrait && onBlockedScene;
+  const dailyCheckOpen = !!document.querySelector('.dc-root');
+  // The start menu and Daily Check both fit portrait. Ask for landscape only
+  // when the student enters the full-screen Adventure intro.
+  const onBlockedScene = videoScene.classList.contains('active');
+  const show = portrait && onBlockedScene && !dailyCheckOpen;
   lsOverlay.classList.toggle('show', show);
   lsOverlay.setAttribute('aria-hidden', show ? 'false' : 'true');
 }
@@ -1484,6 +1485,7 @@ window.addEventListener('orientationchange', () => {
 if (window.visualViewport) {
   window.visualViewport.addEventListener('resize', checkOrientation);
 }
+document.addEventListener('booha:dailyCheckVisibility', checkOrientation);
 
 function showScene(el) {
   [startScene, videoScene, hubScene].forEach(s => s.classList.remove('active'));
