@@ -267,6 +267,46 @@ window.BoohaSync = (() => {
     catch (e) { return false; }
   }
 
+  // Raw JSON equality is too strict for progress. Two devices can hold the
+  // same student work while timestamps, harmless session counters, or object
+  // key order differ. Those differences were producing teacher-PIN walls at
+  // login even when both summaries showed zero games and zero stars.
+  const NON_PROGRESS_KEYS = new Set([
+    'createdAt', 'updatedAt', 'lastActivityTs', 'lastWeeklyKey',
+    'startedAt', 'submittedAt', 'generatedAt', 'savedAt',
+    'unlockedAt', 'foundAt', 'ts', 'at'
+  ]);
+
+  function progressProjection(blob, value, path) {
+    path = path || [];
+    if (value === null || typeof value !== 'object') return value;
+    if (Array.isArray(value)) {
+      return value.map((item, index) =>
+        progressProjection(blob, item, path.concat(String(index))));
+    }
+
+    const out = {};
+    Object.keys(value).sort().forEach(key => {
+      if (NON_PROGRESS_KEYS.has(key)) return;
+      if (blob === 'adventure' && key === 'playerName' && path.length === 0) return;
+      // Session opens are not completed work and must not create a conflict.
+      // Keep g (completed games) in the same day record.
+      if (blob === 'adventure' && key === 's' &&
+          path[0] === 'meta' && path[1] === 'dayLog') return;
+      out[key] = progressProjection(blob, value[key], path.concat(key));
+    });
+    return out;
+  }
+
+  function equivalentProgress(blob, a, b) {
+    if (sameData(a, b)) return true;
+    if (!a || !b) return false;
+    try {
+      return JSON.stringify(progressProjection(blob, a)) ===
+             JSON.stringify(progressProjection(blob, b));
+    } catch (e) { return false; }
+  }
+
   // A signature makes the dirty flag self-healing. Even if two JavaScript
   // contexts interleave localStorage writes at the worst possible instant,
   // a later checkpoint/boot can still prove that the local blob differs from
@@ -393,6 +433,85 @@ window.BoohaSync = (() => {
   function clearScreen() {
     const el = document.getElementById('booha-sync-screen');
     if (el) el.remove();
+  }
+
+  function showRecoveryNotice(blobs) {
+    const names = (blobs || []).map(blob =>
+      blob === 'juku' ? 'Juku' : 'Adventure').join(' + ');
+    if (!names) return;
+    const old = document.getElementById('booha-cloud-recovery-notice');
+    if (old) old.remove();
+    const el = document.createElement('div');
+    el.id = 'booha-cloud-recovery-notice';
+    el.style.cssText = [
+      'position:fixed', 'top:14px', 'left:50%', 'transform:translateX(-50%)',
+      'width:min(92vw,520px)', 'z-index:99996',
+      'background:#26345c', 'color:#fff', 'border:1px solid #6677b9',
+      'border-radius:12px', 'padding:11px 16px', 'text-align:center',
+      'box-shadow:0 8px 28px rgba(0,0,0,.45)',
+      'font:600 13px/1.45 system-ui,-apple-system,sans-serif'
+    ].join(';');
+    el.textContent = `${names}: さいしんのオンラインきろくを もどしました。` +
+      ' / Latest online progress restored. The other copy was saved for recovery.';
+    document.body.appendChild(el);
+    setTimeout(() => { if (el.isConnected) el.remove(); }, 8000);
+  }
+
+  function queueRecoveryNotice(blob) {
+    try {
+      const key = `${META_BASE}:recovery-notice:${uid()}`;
+      const list = JSON.parse(sessionStorage.getItem(key) || '[]');
+      if (!list.includes(blob)) list.push(blob);
+      sessionStorage.setItem(key, JSON.stringify(list));
+    } catch (e) {}
+  }
+
+  function takeRecoveryNotices() {
+    try {
+      const key = `${META_BASE}:recovery-notice:${uid()}`;
+      const list = JSON.parse(sessionStorage.getItem(key) || '[]');
+      sessionStorage.removeItem(key);
+      return Array.isArray(list) ? list : [];
+    } catch (e) { return []; }
+  }
+
+  // Cloud is the classroom authority. Before replacing genuinely different
+  // unsynced work, quarantine the complete local blob. If that archive cannot
+  // be written (for example storage is full), fail closed instead of erasing
+  // the only remaining copy.
+  function installCloudCopy(blob, remote, options) {
+    options = options || {};
+    if (!remote || !remote.data || typeof remote.data !== 'object') return false;
+
+    refreshMeta();
+    const local = readLocal(blob);
+    if (options.preserveLocal && local) {
+      const kept = preserveResolutionCopy(
+        blob,
+        options.reason || 'automatic-cloud-recovery',
+        {
+          data: local,
+          revision: Number(_meta[blob + 'Revision'] || 0),
+          updatedAt: local.updatedAt || null
+        }
+      );
+      if (!kept) return false;
+    }
+
+    if (!writeLocal(blob, remote.data)) return false;
+    const remoteRevision = revisionOf(remote);
+    mutateMeta(m => {
+      m[blob + 'Revision'] = remoteRevision;
+      m[blob + 'Dirty'] = false;
+      m[blob + 'Seen'] = true;
+      m[blob + 'SyncedSignature'] = dataSignature(remote.data);
+      m.blocked = false;
+      m.conflict = null;
+      m.lastSyncAt = Date.now();
+      if (options.recoveredConflict) m.lastResolutionAt = Date.now();
+    }, options.recoveredConflict ? 'resolved' : 'revision', blob);
+    clearStoredConflict(blob);
+    return true;
   }
 
   function showRestoring() {
@@ -811,29 +930,45 @@ window.BoohaSync = (() => {
 
     if (!hasLocal) return { act: 'install' };                // fresh device
 
-    // Rollout rule: revision 0 + clean + never seen means this blob predates
-    // cloud sync. Wix is authoritative by product decision. Preserve the old
-    // local blob, then install remote progress automatically. Any evidence of
-    // earlier sync or unsent work still receives the genuine conflict screen.
+    // Rollout rule: this blob predates cloud sync. Wix is authoritative; keep
+    // a recovery snapshot only when the local progress is meaningfully
+    // different from the cloud copy.
     if (!_meta[blob + 'Seen']) {
+      const equivalent = equivalentProgress(blob, remote.data, local);
       if (localRev === 0 && !dirty) {
-        return { act: 'install', preserveLocal: true };
+        return {
+          act: 'install',
+          preserveLocal: !equivalent,
+          recoveredConflict: !equivalent
+        };
       }
-      return { act: 'conflict' };
+      return {
+        act: 'install',
+        preserveLocal: !equivalent,
+        recoveredConflict: !equivalent
+      };
     }
 
     if (!dirty) {
       if (remote.revision === localRev) return { act: 'none' };
       if (remote.revision >  localRev) return { act: 'install' };
-      return { act: 'conflict' };                            // remote regressed
+      // A clean local revision ahead of Wix means revision bookkeeping
+      // regressed. Preserve it, but keep the server deterministic.
+      return {
+        act: 'install', preserveLocal: true, recoveredConflict: true
+      };
     }
 
     if (remote.revision === localRev) return { act: 'push', base: localRev };
-    // Two sessions can race while uploading the exact same snapshot. There is
-    // no divergent work to choose between in that case; adopt the server's
-    // newer revision and continue.
-    if (sameData(remote.data, local)) return { act: 'adopt' };
-    return { act: 'conflict' };
+    // A different server revision no longer blocks the student at login.
+    // Harmless timestamp/order differences simply collapse into the cloud
+    // copy. Genuine local work is quarantined first, then cloud continues.
+    const equivalent = equivalentProgress(blob, remote.data, local);
+    return {
+      act: 'install',
+      preserveLocal: !equivalent,
+      recoveredConflict: !equivalent
+    };
   }
 
   /* ── restore ─────────────────────────────────────────── */
@@ -845,10 +980,16 @@ window.BoohaSync = (() => {
     _state = 'restoring';
     _blockedByConflict = false;
     refreshMeta();
+    // v2 stored terminal conflict state in localStorage. Under the cloud-first
+    // policy, an old blocked flag is migration data—not a reason to reopen the
+    // retired teacher decision screen.
     if (_meta.blocked && _meta.conflict) {
-      _state = 'blocked';
-      showConflict(_meta.conflict);
-      return;
+      const oldConflictBlob = _meta.conflict.blob;
+      mutateMeta(m => {
+        m.blocked = false;
+        m.conflict = null;
+      }, 'conflict-cleared');
+      if (oldConflictBlob) clearStoredConflict(oldConflictBlob);
     }
     mutateMeta(m => {
       m.blocked = false;
@@ -888,6 +1029,7 @@ window.BoohaSync = (() => {
       return;
     }
 
+    const recoveredBlobs = [];
     for (const blob of blobs) {
       const remote = res[blob] || { data: null, revision: 0 };
       refreshMeta();
@@ -902,52 +1044,23 @@ window.BoohaSync = (() => {
       }
 
       if (d.act === 'install') {
-        if (d.preserveLocal) preserveReplacedLocal(blob);
-        if (!writeLocal(blob, remote.data)) { showFailed(() => restore()); _state='blocked'; return; }
-        mutateMeta(m => {
-          m[blob + 'Revision'] = remote.revision;
-          m[blob + 'Dirty'] = false;
-          m[blob + 'Seen'] = true;
-          m[blob + 'SyncedSignature'] = dataSignature(remote.data);
-          m.blocked = false;
-          m.conflict = null;
-        }, 'revision', blob);
-        clearStoredConflict(blob);
+        const installed = installCloudCopy(blob, remote, {
+          preserveLocal: !!d.preserveLocal,
+          recoveredConflict: !!d.recoveredConflict,
+          reason: 'automatic-cloud-recovery-at-login'
+        });
+        if (!installed) {
+          showFailed(() => restore());
+          _state = 'blocked';
+          return;
+        }
+        if (d.recoveredConflict) recoveredBlobs.push(blob);
         console.log(`[sync] ${blob}: installed remote revision ${remote.revision}`);
 
       } else if (d.act === 'push') {
         setDirty(blob);
         const okPush = await pushBlob(blob, d.base);
         if (!okPush) console.warn(`[sync] ${blob}: initial push deferred`);
-
-      } else if (d.act === 'adopt') {
-        mutateMeta(m => {
-          m[blob + 'Revision'] = remote.revision;
-          m[blob + 'Dirty'] = false;
-          m[blob + 'Seen'] = true;
-          m[blob + 'SyncedSignature'] = dataSignature(remote.data);
-          m.blocked = false;
-          m.conflict = null;
-        }, 'revision', blob);
-        clearStoredConflict(blob);
-        console.log(`[sync] ${blob}: adopted matching remote revision ${remote.revision}`);
-
-      } else if (d.act === 'conflict') {
-        console.error(`[sync] ${blob}: CONFLICT — local kept, sync blocked.`);
-        try {
-          localStorage.setItem(`${META_BASE}:conflict:${blob}:${uid()}`,
-                               JSON.stringify(remote));
-        } catch (e) {}
-        const info = conflictInfo(
-          blob, Number(_meta[blob + 'Revision'] || 0), revisionOf(remote)
-        );
-        mutateMeta(m => {
-          m.blocked = true;
-          m.conflict = info;
-        }, 'conflict', blob);
-        showConflict(info);
-        _state = 'blocked';
-        return;
 
       } else {
         mutateMeta(m => {
@@ -964,6 +1077,8 @@ window.BoohaSync = (() => {
     mutateMeta(m => { m.lastSyncAt = Date.now(); }, 'ready');
     clearScreen();
     ready();
+    const notices = Array.from(new Set(recoveredBlobs.concat(takeRecoveryNotices())));
+    if (notices.length) showRecoveryNotice(notices);
     refreshMeta();
     blobs.forEach(blob => {
       if (isEffectivelyDirty(blob, readLocal(blob))) schedulePush(blob);
@@ -1005,17 +1120,20 @@ window.BoohaSync = (() => {
       }
     }
 
-    // Concurrent identical uploads are harmless. Adopt the winning revision;
-    // if another local save landed after sentData, its different change id
-    // remains dirty and will be pushed next.
-    if (remote && sameData(remote.data, sentData)) {
+    // Concurrent uploads with the same meaningful progress are harmless even
+    // when timestamps or key order differ. If no newer local save landed,
+    // install the server bytes too so raw-signature tracking stays clean.
+    if (remote && equivalentProgress(blob, remote.data, sentData)) {
       const remoteRev = revisionOf(remote);
       const remoteSignature = dataSignature(remote.data);
+      refreshMeta();
+      const unchanged = _meta[blob + 'ChangeId'] === sentChangeId;
+      if (unchanged && !writeLocal(blob, remote.data)) return false;
       const latestLocalSignature = dataSignature(readLocal(blob));
       mutateMeta(m => {
         m[blob + 'Revision'] = remoteRev;
         m[blob + 'Dirty'] =
-          m[blob + 'ChangeId'] !== sentChangeId ||
+          !unchanged ||
           latestLocalSignature !== remoteSignature;
         m[blob + 'Seen'] = true;
         m[blob + 'SyncedSignature'] = remoteSignature;
@@ -1028,6 +1146,35 @@ window.BoohaSync = (() => {
       return true;
     }
     return false;
+  }
+
+  async function recoverDivergentConflict(blob, responseRemote) {
+    let remote = responseRemote || null;
+    if (!remote || !remote.data) {
+      try {
+        const loaded = await post(LOAD_URL, { token: token() });
+        if (loaded && loaded.ok) remote = loaded[blob] || null;
+      } catch (e) {
+        console.warn('[sync] cloud-first recovery load failed:', e.message);
+      }
+    }
+    if (!remote || !remote.data) return false;
+
+    const local = readLocal(blob);
+    const equivalent = equivalentProgress(blob, local, remote.data);
+    const installed = installCloudCopy(blob, remote, {
+      preserveLocal: !equivalent,
+      recoveredConflict: !equivalent,
+      reason: 'automatic-cloud-recovery-after-push-conflict'
+    });
+    if (!installed) return false;
+
+    console.warn(`[sync] ${blob}: cloud revision ${revisionOf(remote)} restored after a divergent push.`);
+    if (!equivalent) {
+      queueRecoveryNotice(blob);
+      setTimeout(() => window.location.reload(), 250);
+    }
+    return true;
   }
 
   async function pushBlobLocked(blob, baseOverride) {
@@ -1078,19 +1225,17 @@ window.BoohaSync = (() => {
         blob, data, sentChangeId, base, res.remote || null
       )) return true;
 
-      console.error(`[sync] ${blob}: genuine divergent conflict — local kept, sync blocked.`);
-      try {
-        localStorage.setItem(`${META_BASE}:conflict:${blob}:${uid()}`,
-                             JSON.stringify(res.remote || null));
-      } catch (e) {}
-      const info = conflictInfo(blob, base, revisionOf(res.remote));
+      if (await recoverDivergentConflict(blob, res.remote || null)) return true;
+
+      // The server copy could not be loaded or the local recovery archive
+      // could not be written. Do not overwrite anything and do not ask the
+      // student to choose histories; retain dirty state and retry later.
+      console.error(`[sync] ${blob}: cloud-first recovery deferred; local copy retained.`);
       mutateMeta(m => {
-        m.blocked = true;
-        m.conflict = info;
+        m.blocked = false;
+        m.conflict = null;
         m[blob + 'Dirty'] = true;
-      }, 'conflict', blob);
-      showConflict(info);
-      _state = 'blocked';
+      }, 'dirty', blob);
       return false;
     }
 
@@ -1165,10 +1310,13 @@ window.BoohaSync = (() => {
     refreshMeta();
 
     if (_meta.blocked) {
-      if (_state !== 'restoring') {
-        _state = 'blocked';
-        showConflict(_meta.conflict);
-      }
+      const oldBlob = _meta.conflict && _meta.conflict.blob;
+      mutateMeta(m => {
+        m.blocked = false;
+        m.conflict = null;
+      }, 'conflict-cleared', oldBlob);
+      if (oldBlob) clearStoredConflict(oldBlob);
+      if (_state !== 'restoring' && navigator.onLine) restore();
       return;
     }
 
