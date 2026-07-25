@@ -26,6 +26,7 @@ window.BoohaSync = (() => {
   const LOAD_URL   = `${BASE}/studentSavesLoad`;
   const PUSH_URL   = `${BASE}/studentSavesPush`;
   const RESOLVE_URL = `${BASE}/studentSavesResolve`;
+  const ARCHIVE_URL = `${BASE}/studentSaveRecoveryArchive`;
 
   const KEY_TOKEN  = 'booha_token';
   const KEY_USERID = 'booha_userid';
@@ -452,7 +453,7 @@ window.BoohaSync = (() => {
       'font:600 13px/1.45 system-ui,-apple-system,sans-serif'
     ].join(';');
     el.textContent = `${names}: さいしんのオンラインきろくを もどしました。` +
-      ' / Latest online progress restored. The other copy was saved for recovery.';
+      ' / Latest online progress restored. The other copy was saved safely for your teacher.';
     document.body.appendChild(el);
     setTimeout(() => { if (el.isConnected) el.remove(); }, 8000);
   }
@@ -475,27 +476,101 @@ window.BoohaSync = (() => {
     } catch (e) { return []; }
   }
 
+  function pendingRecoveryKey(blob) {
+    return `${META_BASE}:pending-recovery:${blob}:${uid()}`;
+  }
+
+  function recoveryRequestId(blob, data) {
+    const signature = dataSignature(data);
+    const key = pendingRecoveryKey(blob);
+    try {
+      const pending = JSON.parse(localStorage.getItem(key) || 'null');
+      if (pending && pending.signature === signature && pending.recoveryId) {
+        return pending.recoveryId;
+      }
+    } catch (e) {}
+
+    const recoveryId = randomId('recovery')
+      .replace(/[^a-z0-9-]/gi, '')
+      .slice(0, 64);
+    try {
+      localStorage.setItem(key, JSON.stringify({ recoveryId, signature }));
+    } catch (e) {}
+    return recoveryId;
+  }
+
+  function clearPendingRecovery(blob) {
+    try { localStorage.removeItem(pendingRecoveryKey(blob)); } catch (e) {}
+  }
+
+  /**
+   * Store the displaced local blob in Wix BEFORE replacing it. The endpoint
+   * derives the student from the token and returns the current authoritative
+   * cloud blob, so a cloud revision that changed during recovery is handled
+   * without installing stale data.
+   */
+  async function archiveLocalRecovery(blob, remote, reason, local) {
+    const recoveryId = recoveryRequestId(blob, local);
+    let res;
+    try {
+      res = await post(ARCHIVE_URL, {
+        token: token(),
+        recoveryId,
+        blob,
+        data: local,
+        deviceId: deviceId(),
+        localRevision: Number(_meta[blob + 'Revision'] || 0),
+        expectedRemoteRevision: revisionOf(remote),
+        reason: reason || 'automatic-cloud-recovery'
+      });
+    } catch (e) {
+      console.error(`[sync] ${blob}: Wix recovery archive failed:`, e);
+      return null;
+    }
+
+    if (!res || res.ok !== true || !res.remote || !res.remote.data) {
+      console.error(`[sync] ${blob}: Wix recovery archive rejected:`,
+                    res && res.reason);
+      return null;
+    }
+
+    // Wix is now the durable recovery copy. Keep the old on-device quarantine
+    // too when storage allows, but its failure is no longer data loss.
+    preserveResolutionCopy(blob, reason || 'automatic-cloud-recovery', {
+      data: local,
+      revision: Number(_meta[blob + 'Revision'] || 0),
+      updatedAt: local.updatedAt || null
+    });
+    clearPendingRecovery(blob);
+    console.warn(`[sync] ${blob}: displaced local copy archived in Wix as ${res.archiveId}.`);
+    return res.remote;
+  }
+
   // Cloud is the classroom authority. Before replacing genuinely different
-  // unsynced work, quarantine the complete local blob. If that archive cannot
-  // be written (for example storage is full), fail closed instead of erasing
-  // the only remaining copy.
-  function installCloudCopy(blob, remote, options) {
+  // unsynced work, archive the complete local blob in Wix. If that archive
+  // cannot be confirmed, fail closed instead of erasing the only copy.
+  async function installCloudCopy(blob, remote, options) {
     options = options || {};
     if (!remote || !remote.data || typeof remote.data !== 'object') return false;
 
     refreshMeta();
     const local = readLocal(blob);
     if (options.preserveLocal && local) {
-      const kept = preserveResolutionCopy(
+      const archivedSignature = dataSignature(local);
+      const currentRemote = await archiveLocalRecovery(
         blob,
+        remote,
         options.reason || 'automatic-cloud-recovery',
-        {
-          data: local,
-          revision: Number(_meta[blob + 'Revision'] || 0),
-          updatedAt: local.updatedAt || null
-        }
+        local
       );
-      if (!kept) return false;
+      if (!currentRemote) return false;
+      // Another tab may have saved while the archive request was travelling.
+      // That newer snapshot has not been archived, so never replace it.
+      if (dataSignature(readLocal(blob)) !== archivedSignature) {
+        console.warn(`[sync] ${blob}: local progress changed during recovery; retrying later.`);
+        return false;
+      }
+      remote = currentRemote;
     }
 
     if (!writeLocal(blob, remote.data)) return false;
@@ -1044,7 +1119,7 @@ window.BoohaSync = (() => {
       }
 
       if (d.act === 'install') {
-        const installed = installCloudCopy(blob, remote, {
+        const installed = await installCloudCopy(blob, remote, {
           preserveLocal: !!d.preserveLocal,
           recoveredConflict: !!d.recoveredConflict,
           reason: 'automatic-cloud-recovery-at-login'
@@ -1162,7 +1237,7 @@ window.BoohaSync = (() => {
 
     const local = readLocal(blob);
     const equivalent = equivalentProgress(blob, local, remote.data);
-    const installed = installCloudCopy(blob, remote, {
+    const installed = await installCloudCopy(blob, remote, {
       preserveLocal: !equivalent,
       recoveredConflict: !equivalent,
       reason: 'automatic-cloud-recovery-after-push-conflict'
@@ -1357,7 +1432,8 @@ window.BoohaSync = (() => {
     if (!pageVisible() || !uid()) return;
     const wasBlocked = _state === 'blocked';
     applySharedMeta();
-    if (wasBlocked && _state === 'blocked' && !_meta.blocked &&
+    if (wasBlocked && _state === 'blocked' && window.BOOHA_SYNC_READY &&
+        !_meta.blocked &&
         navigator.onLine) {
       restore();
     }
