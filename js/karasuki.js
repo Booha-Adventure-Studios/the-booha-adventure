@@ -632,6 +632,8 @@ const HAPPY_HOUSE_PORTAL = {
     { index:30, roomId:'room_05', x:397,  y:460, type:'stay',  frames:['oboteruyo-1.png','oboteruyo-2.png'],                     color:'#ffd9a0', size:62,  name:'Oboteruyo',          nameJP:'オボテルヨ',         desc:'Oboteruyo are friendly creatures with ears made for listening. Every spoken word eventually reaches them. A secret whispered into a pillow may take longer than a shout, but it arrives all the same.\n\nThey repeat what they hear without understanding why someone wanted it hidden. When an Oboteruyo raises its ears, choose your words carefully. It may know what you did yesterday, what someone said about you last week, and what you plan to do tomorrow.\n\nAn unsaid thought is safe. Once it becomes sound, an Oboteruyo can remember it for you.', descJP:'オボテルヨは、大きな耳で話を聞く、親しみやすい生き物だ。口に出された言葉は、いつか必ず彼らに届く。まくらにささやいた秘密は、大声より時間がかかるかもしれない。それでも、同じように届いてしまう。\n\nなぜ隠したかったのか分からないまま、聞いたことをくり返す。オボテルヨが耳を立てたら、言葉をよく選んだほうがいい。昨日したことも、先週誰かが話したことも、明日するつもりのことも知っているかもしれない。\n\n口に出さない考えは安全だ。音になれば、オボテルヨが代わりに覚えている。' },
     { index:31, roomId:'room_10', x:587,  y:704, type:'stay',  frames:['mimasayuki-1.png','mimasayuki-2.png'],                   color:'#b8b0e0', size:60,  name:'Mimasayuki',         nameJP:'ミマサユキ',         desc:'Mimasayuki always look as though their eyes are closed. This does not stop them from seeing.\n\nThey notice what happens behind doors, beneath tables, and in the moment everyone in a room looks somewhere else. Distance makes little difference. Darkness makes none. If an event took place, a Mimasayuki probably watched it from a position no one thought to check.\n\nThey rarely explain what they have seen. Asking only makes their closed eyes seem more peaceful.\n\nPeople behave differently when watched. Mimasayuki know how people behave when they believe they are alone.', descJP:'ミマサユキの目は、いつも閉じているように見える。それでも、見ることを止めることはない。\n\n扉の向こう、机の下、部屋にいる全員が別の方向を見た瞬間に起きたことまで知っている。遠くても関係なく、暗やみもじゃまにならない。何かが起きたなら、誰も確かめようとしなかった場所から、ミマサユキが見ていた可能性が高い。\n\n見たことを説明することはほとんどない。質問すると、閉じた目がさらに静かに見えるだけだ。\n\n人は見られていると行動を変える。ミマサユキは、誰もいないと思ったときの行動を知っている。' },
     { index:32, roomId:'room_14', x:470,  y:471, type:'stay',  frames:['mouhitome-1.png','mouhitome-2.png'],                     color:'#aab8cc', size:120,  name:'Mouhitome',         nameJP:'モウヒトメ',          desc:'Some moments are practiced with all the heart, yet never happen. A confession stays silent. An apology comes too late to be spoken. Courage waits until the chance has passed. Strong feelings left unused may leave a Mouhitome behind.\n\nBeneath its disguise, it is a mirror-black mannequin with no face, voice, reflection, or self. It wears the person the moment belonged to and performs the missing act at full strength, always in the wrong place, time, or company.\n\nThe original person cannot see it. Everyone else remembers the face. News of what you did arrives from people who saw you. You were somewhere else.\n\nA Nulvane is a person who never happened. A Mouhitome is a moment that never happened, wearing someone who did.', descJP:'心の中で何度も練習したのに、起きなかった瞬間がある。告白は口に出ず、あやまりたい言葉は遅すぎて言えず、勇気を出す前に機会が過ぎる。使われないまま強く残った気持ちは、モウヒトメを残すことがある。\n\n借りた姿の下にいるのは、鏡のように黒い人形だ。顔も声も、映る姿も、自分という心もない。その瞬間を持っていた人の姿を着て、行えなかった行動を、その強さのままで行う。ただし、場所も時間も相手も必ず間違っている。\n\n元の人には、モウヒトメが見えない。ほかの人には、その顔だけが残る。あなたが何をしたのか、見ていた人から知らされる。あなたは、そこにいなかったのに。\n\nヌルヴェインは、生まれなかった人。モウヒトメは、起きなかった瞬間が、本当にいた人の姿を着たものだ。' },
+    { index:33, roomId:'room_09', x:487,  y:333, type:'stay',  frames:['yukan-1.png','yukan-2.png'],                             color:'#c7bfd6', size:92,  name:'Yūkan',              nameJP:'幽慣',               desc:'A Yūkan is born when the reason for a custom dies, but the pressure to continue it remains. There are many of them, silently repeating rules and rituals that no living person chose.\n\nThey stand behind people who feel they must bow, apologize, endure, give, attend, or obey simply because others did the same before them. A Yūkan never gives an order. It only makes refusing feel wrong.\n\nA single Yūkan is only discomfort. Where many stand together, it is called tradition.\n\nThey are not your ancestors. They are the pressure your ancestors forgot to stop passing down.', descJP:'幽慣は、慣習の理由が消えても、それを続けなければならないという圧力だけが残ったときに生まれる。幽慣は無数に存在し、今を生きる誰も選んでいない決まりや儀式を、黙って繰り返している。\n\n昔から皆がそうしてきたというだけで、頭を下げ、謝り、我慢し、与え、参加し、従わなければならないと感じる人の後ろに立つ。幽慣は決して命令しない。ただ、従わないことを悪いことのように感じさせる。\n\n幽慣が一体なら、ただの居心地の悪さだ。何体も並んで立つとき、それは伝統と呼ばれる。\n\n彼らはあなたの先祖ではない。先祖たちが止めることを忘れ、次の世代へ渡し続けた圧力だ。' },
+    { index:34, roomId:'room_12', x:318,  y:494, type:'stay',  frames:['chillicothe-1.png','chillicothe-2.png'],                   color:'#f29a4a', size:105, name:'Chillicothe',         nameJP:'チリコシー',         desc:'Chillicothe is a large capybara with long orange fur who walks upright. When October was young, he went wherever she went. They played, they argued, and they spent so much time together that he no longer knows which of those days were imaginary.\n\nImaginary friends do not disappear when children stop believing in them. They disappear the same way real friends do: when no one speaks to them anymore. A friend from elementary school and a creature no one else could see can be lost in exactly the same way.\n\nThings that were only imagined do not remember you. Chillicothe does.\n\nOctober remembers that she once had an imaginary friend. Chillicothe remembers being him.', descJP:'チリコシーは、長いオレンジ色の毛に覆われた大きなカピバラで、二本足で歩く。オクトーバーが幼かったころは、どこへ行くにも一緒だった。二人は遊び、けんかをし、あまりにも長い時間を共に過ごしたため、そのうちのどの日が想像の中の出来事だったのか、チリコシーにはもう分からない。\n\n空想の友達は、子どもが信じなくなったから消えるのではない。本当の友達と同じように、誰からも話しかけられなくなったとき、いなくなる。小学校で毎日一緒だった子も、ほかの誰にも見えなかった生き物も、まったく同じように失われる。\n\nただ想像されただけのものは、あなたを覚えていない。チリコシーは覚えている。\n\nオクトーバーは、昔、空想の友達がいたことを覚えている。チリコシーは、その友達だったことを覚えている。' },
  ];
   
 
@@ -694,8 +696,8 @@ const HAPPY_HOUSE_PORTAL = {
   const wandererImages = {};
   const WANDERER_SIZE  = 22;
 
-  function preloadWandererImages() {
-    WANDERER_DEFS.forEach(def => {
+  function preloadWandererImages(defs) {
+    (defs || []).forEach(def => {
       if (!def.frames) return;
       def.frames.forEach(filename => {
         if (wandererImages[filename]) return;
@@ -721,12 +723,16 @@ const HAPPY_HOUSE_PORTAL = {
     } catch (e) { console.error('[Karasuki] Wanderer read failed:', e); }
     
   }
-  activeWanderers = WANDERER_DEFS
-    .filter(def => def.roomId === state.roomId && unlockedIndices.includes(def.index))
+  const roomDefs = WANDERER_DEFS
+    .filter(def => def.roomId === state.roomId && unlockedIndices.includes(def.index));
+  // Several portraits are intentionally large. Loading only the unlocked
+  // wanderers in this room keeps Karasuki responsive on classroom devices.
+  preloadWandererImages(roomDefs);
+  activeWanderers = roomDefs
     .map(def => ({ ...def, rx: def.x, ry: def.y, wobblePhase: Math.random() * Math.PI * 2, hauntAngle: Math.random() * Math.PI * 2, pose: 0, frozen: false, glitter: [], glitterNextAt: 0, images: (def.frames || []).map(f => wandererImages[f]).filter(Boolean) }));
 }
 
-  function initWanderers() { preloadWandererImages(); refreshWanderersForRoom(); }
+  function initWanderers() { refreshWanderersForRoom(); }
   
   function onRoomChanged() { refreshWanderersForRoom(); onRoomChangedNuppi(); 
   KarasukiAtmos.setRoom(state.roomId, getObserverRoomId()); }
