@@ -85,7 +85,7 @@ const BoohaScoreSystem = (() => {
 
     // ── 3. Unlock wanderer for this game ───────────────────────────────────
     if (wasNewGame) {
-      const TOTAL_WANDERERS = 33;
+      const TOTAL_WANDERERS = 35;
       const remaining = [];
 
       for (let i = 0; i < TOTAL_WANDERERS; i++) {
