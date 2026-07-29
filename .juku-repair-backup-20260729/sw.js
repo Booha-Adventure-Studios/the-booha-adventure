@@ -5,9 +5,9 @@
 // ============================================================
 
 const CURRENT_CACHES = {
-  pages:  'booha-pages-2026-56',
-  assets: 'booha-assets-2026-56',
-  decks:  'booha-decks-2026-56',
+  pages:  'booha-pages-2026-55',
+  assets: 'booha-assets-2026-55',
+  decks:  'booha-decks-2026-55',
 };
 
 const PAGE_CACHE  = CURRENT_CACHES.pages;
@@ -117,14 +117,6 @@ self.addEventListener('fetch', (event) => {
 
   // Only handle requests under our base path
   if (!path.startsWith(BASE)) return;
-
-  // Juku preflights must see the published assessment before class. Keep the
-  // last verified response as the offline fallback, but do not let a stale
-  // cache silently win while the network is available.
-  if (url.searchParams.get('juku') === '1') {
-    event.respondWith(networkFirst(request, DECK_CACHE));
-    return;
-  }
 
   // ── Study decks / JSON → Cache-first, then network ───────
   if (DECK_PATTERNS.some((pattern) => pattern.test(path))) {

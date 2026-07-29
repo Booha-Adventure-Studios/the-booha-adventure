@@ -10,11 +10,10 @@ window.JUKU_CONFIG = {
 
   // ── Class slots ──────────────────────────────────────────
   // start is Tokyo wall-clock time, 24h "HH:MM".
-  // day is the Tokyo weekday (0=Sunday … 6=Saturday).
   // curriculum decides which weekly content the tests load (Stage 3+).
   slots: [
-    { id: 'slot-a', label: '17:00 プレブー',        day: 6, start: '17:00', curriculum: 'pb' },
-    { id: 'slot-b', label: '19:00 ブーカリキュラム', day: 6, start: '19:00', curriculum: 'br' }
+    { id: 'slot-a', label: '17:00 プレブー',        start: '17:00', curriculum: 'pb' },
+    { id: 'slot-b', label: '19:00 ブーカリキュラム', start: '19:00', curriculum: 'br' }
   ],
 
   // How many minutes before start the lobby (survey) opens.
@@ -22,11 +21,8 @@ window.JUKU_CONFIG = {
 
   // ── Content wiring ───────────────────────────────────────
   content: {
-    // Production sessions fail closed if real content is unavailable.
-    // Set true only while deliberately testing the built-in demo questions.
-    allowDemo: false,
-
-    counts: {
+    
+  counts: {
       order: 8,          // sentence-order items
       vocabMean: 8,      // vocab test: word→meaning items (rest are definition→word)
       mixedRead: 2,      // mixed: read items sampled from juku.json
@@ -79,7 +75,7 @@ window.JUKU_CONFIG = {
       const m = String(cw.monthSlug).toLowerCase();
       const folder = FULL[m] || m;
      
-      return `content/${curr}/${folder}/sentences.json?juku=1`;
+      return `content/${curr}/${folder}/sentences.json`;
     },
 
     // Generic sibling of sentencesUrl — same folder, any file.
@@ -88,7 +84,7 @@ window.JUKU_CONFIG = {
                      may:'may', jun:'june', jul:'july', aug:'august',
                      sep:'september', oct:'october', nov:'november', dec:'december' };
       const m = String(cw.monthSlug).toLowerCase();
-      return `content/${curr}/${FULL[m] || m}/${file}?juku=1`;
+      return `content/${curr}/${FULL[m] || m}/${file}`;
     },
 
     // Audio base — same URLs game-core.js builds; Juku records nothing new.

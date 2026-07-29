@@ -244,43 +244,6 @@
   .juku-item-def { line-height: 1.6; margin: 8px 0; }
   .juku-item-q { opacity: .9; margin: 4px 0 8px; }
   .juku-chip.letter { min-width: 2.1em; text-align: center; }
-  .juku-preflight {
-    margin: 14px auto 0; padding: 9px 12px; max-width: 420px;
-    border-radius: 10px; font-size: 12px; line-height: 1.45;
-    color: #b8ac8f; background: rgba(255,255,255,.045);
-  }
-  .juku-preflight.ready { color: #b9d977; background: rgba(185,217,119,.08); }
-  .juku-preflight.failed { color: #ffd0d0; background: rgba(176,0,32,.25); }
-
-  /* ── results and detailed skill evidence ── */
-  .juku-results { width: min(100%, 560px); margin: 0 auto; text-align: left; }
-  .juku-res-total { text-align: center; font-size: 20px; color: #e8dfc8; margin: 0 0 18px; }
-  .juku-res-total .pct { font-size: 42px; font-weight: 900; color: #e8c46a; }
-  .juku-res-total.none { font-size: 16px; color: #f0b0b0; }
-  .juku-res-row { display: grid; grid-template-columns: 1fr auto; gap: 5px 12px;
-    align-items: center; padding: 9px 0; }
-  .juku-res-label { font-weight: 750; color: #e8dfc8; }
-  .juku-res-frac { color: #b8ac8f; font-variant-numeric: tabular-nums; }
-  .juku-res-bar { grid-column: 1 / -1; height: 7px; overflow: hidden;
-    border-radius: 999px; background: rgba(255,255,255,.08); }
-  .juku-res-fill { height: 100%; border-radius: inherit;
-    background: linear-gradient(90deg, #7fc4ce, #b9d977); }
-  .juku-res-row.missing, .juku-res-row.demo { opacity: .62; }
-  .juku-res-demo { font-size: 10px; color: #e8c46a; }
-  .juku-res-note, .juku-res-prove, .juku-res-reading {
-    margin: 12px 0; color: #b8ac8f; line-height: 1.55; }
-  .juku-res-skills { margin-top: 18px; padding-top: 14px;
-    border-top: 1px solid rgba(255,255,255,.1); }
-  .juku-res-skills h2 { margin: 0 0 8px; text-align: center;
-    font-size: 15px; color: #e8c46a; }
-  .juku-res-skill { display: flex; justify-content: space-between; gap: 14px;
-    padding: 6px 0; font-size: 13px; color: #b8ac8f; }
-  .juku-res-calbox { margin-top: 18px; padding: 12px 14px; border-radius: 12px;
-    background: rgba(255,255,255,.045); }
-  .juku-res-cal { margin: 4px 0; color: #b8ac8f; line-height: 1.5; }
-  .juku-res-flourish { margin: 9px 0 0; color: #b9d977; font-weight: 800; }
-  .juku-res-invalid { padding: 18px; border-radius: 14px; text-align: center;
-    color: #ffd0d0; background: rgba(176,0,32,.22); line-height: 1.7; }
   @media (prefers-reduced-motion: reduce) {
     .live-dot, .jsp-cell.now { animation: none; }
   }
@@ -323,7 +286,7 @@
   function loadEngine() {
    var files = ['js/calendar.js', 'js/juku-config.js', 'js/juku-engine.js',
                 'js/sync-client.js', 'js/juku-ghosts.js', 'js/juku-tests.js',
-                'js/juku-results.js', 'js/juku-phases.js'];
+                'js/juku-phases.js'];
     
     (function next(i) {
       if (i >= files.length) return;

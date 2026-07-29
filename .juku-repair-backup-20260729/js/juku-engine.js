@@ -37,8 +37,7 @@
   // Dev time machine (b_1730) applies an offset anchored at activation, so
   // the overridden clock still advances in real time.
 
-  let _tmOffsetMs = 0;         // 0 = real time
-  let _tmWeekday = null;       // null = real Tokyo weekday
+  let _tmOffsetMs = 0;   // 0 = real time
 
   function tokyoNow() {
     const real = new Date(Date.now() + _tmOffsetMs);
@@ -50,14 +49,8 @@
       hour12: false
     }).formatToParts(real);
     const get = t => parts.find(p => p.type === t).value;
-    const y = +get('year'), mo = +get('month'), d = +get('day');
     return {
-      y, mo, d,
-      // Date.UTC turns the already-resolved Tokyo calendar date into a
-      // timezone-neutral weekday lookup (0=Sunday … 6=Saturday).
-      weekday: _tmWeekday === null
-        ? new Date(Date.UTC(y, mo - 1, d)).getUTCDay()
-        : _tmWeekday,
+      y: +get('year'), mo: +get('month'), d: +get('day'),
       h: +get('hour') % 24, mi: +get('minute'), s: +get('second'),
       dateStr: `${get('year')}-${get('month')}-${get('day')}`,
       minOfDay: (+get('hour') % 24) * 60 + (+get('minute')),
@@ -86,12 +79,9 @@
   // Resolve engine state for a slot at a given Tokyo second-of-day.
   // Returns { state, phase?, phaseIdx?, phaseElapsedSec?, phaseRemainSec?,
   //           lessonElapsedSec?, secToStart? }
-  // state: 'before-day' | 'before' | 'lobby' | 'phase' | 'closed'
+  // state: 'before' | 'lobby' | 'phase' | 'closed'
   function resolve(slot, tk) {
     const startSec = parseHM(slot.start) * 60;
-    if (Number.isInteger(slot.day) && tk.weekday !== slot.day) {
-      return { state: 'before-day', requiredDay: slot.day };
-    }
     const lobbySec = startSec - CFG.lobbyOpenMin * 60;
     const endSec   = startSec + TOTAL_MIN * 60;
     const now      = tk.secOfDay;
@@ -129,10 +119,7 @@
       const raw = sessionStorage.getItem(SLOT_KEY);
       if (!raw) return null;
       const obj = JSON.parse(raw);
-      if (obj.date !== tk.dateStr || obj.uid !== jukuUid()) {
-        sessionStorage.removeItem(SLOT_KEY);
-        return null;
-      }
+      if (obj.date !== tk.dateStr) { sessionStorage.removeItem(SLOT_KEY); return null; }
       return CFG.slots.find(s => s.id === obj.id) || null;
     } catch (e) { return null; }
   }
@@ -143,9 +130,7 @@
     if (!slot) return null;
     _slot = slot;
     try {
-      sessionStorage.setItem(SLOT_KEY, JSON.stringify({
-        id: slot.id, date: tk.dateStr, uid: jukuUid()
-      }));
+      sessionStorage.setItem(SLOT_KEY, JSON.stringify({ id: slot.id, date: tk.dateStr }));
     } catch (e) {}
     return slot;
   }
@@ -197,14 +182,6 @@
     // Replaces the token, which rotated on every login and reshuffled question
     // order mid-term, and whose 'anon' fallback collided across all devices.
     return jukuUid() || (localStorage.getItem('booha_token') || 'anon');
-  }
-
-  // calendar.js intentionally exposes a human-friendly weekId such as
-  // "july-w1". Juku records and randomization need an occurrence key that
-  // cannot collide with the same curriculum week next year.
-  function curriculumWeekKey(cw) {
-    cw = cw || window.CALENDAR.getCurrentCurriculumWeek();
-    return `${cw.weekStart}|${cw.weekId}`;
   }
 
   // ── Save file (booha_juku_save) ──────────────────────────
@@ -272,21 +249,19 @@
 
     const cw = window.CALENDAR.getCurrentCurriculumWeek();
     const slotId = _slot.id;
-    const occurrenceKey = curriculumWeekKey(cw);
-    const key    = `${occurrenceKey}|${slotId}|${uid}`;
+    const key    = `${cw.weekId}|${slotId}|${uid}`;
    
     const s = loadSave();
     if (!s.weeks[key]) {
       s.weeks[key] = {
-        weekId: cw.weekId, weekStart: cw.weekStart, year: cw.year,
-        occurrenceKey, monthSlug: cw.monthSlug, weekNumber: cw.weekNumber,
+        weekId: cw.weekId, monthSlug: cw.monthSlug, weekNumber: cw.weekNumber,
         slot: _slot ? _slot.id : null,
         survey: null, prediction: null,
         sections: {}, behavioral: {}, report: null
       };
       writeSave(s);
     }
-    return { save: s, week: s.weeks[key], weekId: cw.weekId, occurrenceKey };
+    return { save: s, week: s.weeks[key], weekId: cw.weekId };
   }
   
 
@@ -370,30 +345,23 @@
   }
 
   // ── Dev time machine ─────────────────────────────────────
-  // b_1730('17:25')     → clock jumps to 17:25 Tokyo today and keeps running
-  // b_1730('17:25', 6)  → same, with a Saturday weekday override for testing
+  // b_1730('17:25')  → clock jumps to 17:25 Tokyo today and keeps running
   // b_1730_off()     → back to real time
   // Console-only; not enumerable; affects display only, never the save's
   // integrity rules (a report already written stays written).
 
   Object.defineProperty(window, 'b_1730', {
     enumerable: false,
-    value: function (hm, weekday) {
+    value: function (hm) {
       const m = /^(\d{1,2}):(\d{2})$/.exec(String(hm || ''));
       if (!m) { console.log('usage: b_1730("17:25")'); return false; }
-      if (weekday !== undefined && (!Number.isInteger(weekday) || weekday < 0 || weekday > 6)) {
-        console.log('weekday must be 0 (Sunday) through 6 (Saturday)');
-        return false;
-      }
       _tmOffsetMs = 0;                       // measure from real Tokyo now
-      _tmWeekday = weekday === undefined ? null : weekday;
       const tk = tokyoNow();
       const targetSec = ((+m[1]) * 60 + (+m[2])) * 60;
       _tmOffsetMs = (targetSec - tk.secOfDay) * 1000;
       _lastKey = '';                          // force re-render
       tick();
-      console.log('⏰ juku clock →', hm,
-        _tmWeekday === null ? '(Tokyo, still advancing)' : `(weekday ${_tmWeekday}, still advancing)`);
+      console.log('⏰ juku clock →', hm, '(Tokyo, still advancing)');
       return true;
     }
   });
@@ -401,7 +369,7 @@
   Object.defineProperty(window, 'b_1730_off', {
     enumerable: false,
     value: function () {
-      _tmOffsetMs = 0; _tmWeekday = null; _lastKey = ''; tick();
+      _tmOffsetMs = 0; _lastKey = ''; tick();
       console.log('⏰ juku clock → real time');
       return true;
     }
@@ -412,7 +380,7 @@
     saveKey,          // for sync-client.js — see save-file.js note
     tokyoNow, resolve, selectSlot, autoSlot,
     
-    seededShuffle, rng, studentSeedBase, curriculumWeekKey,
+    seededShuffle, rng, studentSeedBase,
     loadSave, weekRecord, tryWeekRecord, patchWeek,
     start,
     TOTAL_MIN, PHASE_OFFSETS,

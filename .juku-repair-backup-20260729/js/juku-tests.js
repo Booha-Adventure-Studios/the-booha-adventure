@@ -31,54 +31,21 @@
 
   const _cache = {};
 
-  function contentCacheKey(curr, file, cw) {
-    return `${curr}|${file}|${J.curriculumWeekKey(cw)}`;
-  }
-
-  // Small deterministic fingerprint of the exact JSON bytes this device
-  // loaded. Reports retain the combined manifest so later edits cannot make
-  // an old answer record ambiguous.
-  function fingerprint(text) {
-    let h = 2166136261;
-    for (let i = 0; i < text.length; i++) {
-      h ^= text.charCodeAt(i);
-      h = Math.imul(h, 16777619);
-    }
-    return (h >>> 0).toString(16).padStart(8, '0');
-  }
-
-  async function fetchJson(url) {
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
-    const text = await res.text();
-    return { raw: JSON.parse(text), revision: fingerprint(text) };
-  }
-
-  function unavailablePack(label, error, demoItems) {
-    if (CFG.content && CFG.content.allowDemo) {
-      console.warn(`[juku] ${label} load failed — DEMO MODE`, error);
-      return { demo: true, items: demoItems || [], revision: `demo:${label}` };
-    }
-    console.error(`[juku] ${label} load failed — assessment blocked`, error);
-    return {
-      demo: false, items: [], error: `${label}: ${error && error.message ? error.message : error}`,
-      revision: null
-    };
-  }
-
   async function getSentences(curr) {
+    if (_cache[curr]) return _cache[curr];
     const cw = window.CALENDAR.getCurrentCurriculumWeek();
-    const key = contentCacheKey(curr, 'sentences.json', cw);
-    if (_cache[key]) return _cache[key];
     const url = CFG.content && CFG.content.sentencesUrl
       ? CFG.content.sentencesUrl(curr, cw) : null;
 
     if (!url) {
-      return unavailablePack('sentences.json', new Error('URL not configured'), DEMO_SENTENCES);
+      console.warn('[juku] sentencesUrl not configured — DEMO MODE');
+      _cache[curr] = { demo: true, items: DEMO_SENTENCES };
+      return _cache[curr];
     }
     try {
-      const loaded = await fetchJson(url);
-      const raw = loaded.raw;
+      const res = await fetch(url);
+      const raw = await res.json();
+      
       const map = (CFG.content && CFG.content.mapSentence) || (x => x);
       const all = Array.isArray(raw) ? raw : (raw.cards || raw.sentences || []);
       const weekCards = (CFG.content && CFG.content.filterWeek)
@@ -88,10 +55,12 @@
         .filter(it => it && it.en && String(it.en).trim().split(/\s+/).length >= 3);
       
       if (!items.length) throw new Error('no usable sentences');
-      _cache[key] = { demo: false, items, revision: loaded.revision };
-      return _cache[key];
+      _cache[curr] = { demo: false, items };
+      return _cache[curr];
     } catch (e) {
-      return unavailablePack('sentences.json', e, DEMO_SENTENCES);
+      console.warn('[juku] sentence load failed — DEMO MODE', e);
+      _cache[curr] = { demo: true, items: DEMO_SENTENCES };
+      return _cache[curr];
     }
   }
 
@@ -141,14 +110,9 @@
   async function renderOrder(taskEl, res, slot) {
     taskEl.innerHTML = `<p class="juku-paper">よみこみちゅう…</p>`;
 
-    const ready = await preflight(slot);
-    if (!ready.ok) {
-      renderContentFailed(taskEl, ready, () => renderOrder(taskEl, res, slot));
-      return;
-    }
     const pack = await getSentences(slot.curriculum);
     const cw = window.CALENDAR.getCurrentCurriculumWeek();
-    const seed = `${J.studentSeedBase()}|${J.curriculumWeekKey(cw)}|order`;
+    const seed = `${J.studentSeedBase()}|${cw.weekId}|order`;
     const count = (CFG.content && CFG.content.counts && CFG.content.counts.order) || 8;
     const picked = J.seededShuffle(pack.items, seed).slice(0, Math.min(count, pack.items.length));
 
@@ -175,14 +139,12 @@
     const item = picked[idx];
     const target = words(item.en);
     const cw = window.CALENDAR.getCurrentCurriculumWeek();
-    const bank = scrambled(target,
-      `${J.studentSeedBase()}|${J.curriculumWeekKey(cw)}|order|${item.n}`);
+    const bank = scrambled(target, `${J.studentSeedBase()}|${cw.weekId}|order|${item.n}`);
 
     // behavioral state for this item
     const shownAt = performance.now();
     let firstMs = null;
     let changes = 0;
-    let committed = false;
     let answer = [];   // array of bank indices in placed order
 
     const bankChips = bank.map((o, k) =>
@@ -242,9 +204,7 @@
     });
 
     lockBtn.addEventListener('click', () => {
-      if (committed || answer.length !== bank.length) return;
-      committed = true;
-      lockBtn.disabled = true;
+      if (answer.length !== bank.length) return;
       const seq = answer.map(k => bank[k].w);
       const ok = seq.length === target.length && seq.every((w, i) => w === target[i]);
       
@@ -314,95 +274,41 @@
   // ── Loaders (parallel to getSentences; that one stays frozen) ──
 
   async function getCards(curr, file, demoItems) {
-    const cw = window.CALENDAR.getCurrentCurriculumWeek();
-    const key = contentCacheKey(curr, file, cw);
+    const key = `${curr}|${file}`;
     if (_cache[key]) return _cache[key];
+    const cw = window.CALENDAR.getCurrentCurriculumWeek();
     try {
       const url = CFG.content.contentUrl(curr, cw, file);
-      const loaded = await fetchJson(url);
-      const raw = loaded.raw;
+      const res = await fetch(url);
+      const raw = await res.json();
       const all = Array.isArray(raw) ? raw : (raw.cards || []);
       const items = (CFG.content.filterWeek
         ? CFG.content.filterWeek(all, cw) : all).filter(Boolean);
       if (!items.length) throw new Error('no cards in ' + file);
-      _cache[key] = { demo: false, items, revision: loaded.revision };
+      _cache[key] = { demo: false, items };
     } catch (e) {
-      return unavailablePack(file, e, demoItems);
+      console.warn('[juku] ' + file + ' load failed — DEMO MODE', e);
+      _cache[key] = { demo: true, items: demoItems };
     }
     return _cache[key];
   }
 
   async function getJukuWeek(curr) {
-    const cw = window.CALENDAR.getCurrentCurriculumWeek();
-    const key = contentCacheKey(curr, 'juku.json', cw);
+    const key = `${curr}|juku`;
     if (_cache[key]) return _cache[key];
+    const cw = window.CALENDAR.getCurrentCurriculumWeek();
     const wNum = CFG.content.contentWeek(cw);
     try {
-      const loaded = await fetchJson(CFG.content.contentUrl(curr, cw, 'juku.json'));
-      const raw = loaded.raw;
+      const res = await fetch(CFG.content.contentUrl(curr, cw, 'juku.json'));
+      const raw = await res.json();
       const wk = (raw.weeks || []).find(x => x && x.week === wNum);
       if (!wk) throw new Error('week ' + wNum + ' missing from juku.json');
-      _cache[key] = {
-        demo: false, week: wk, revision: loaded.revision,
-        curriculum: raw.curriculum || curr, month: raw.month || cw.monthSlug
-      };
+      _cache[key] = { demo: false, week: wk };
     } catch (e) {
-      const failed = unavailablePack('juku.json', e, []);
-      if (failed.demo) return {
-        demo: true, week: DEMO_JUKU, revision: failed.revision,
-        curriculum: curr, month: cw.monthSlug
-      };
-      return Object.assign(failed, { week: null });
+      console.warn('[juku] juku.json load failed — DEMO MODE', e);
+      _cache[key] = { demo: true, week: DEMO_JUKU };
     }
     return _cache[key];
-  }
-
-  function manifestOf(packs) {
-    return packs.map(p => p.revision).join('.');
-  }
-
-  async function preflight(slot) {
-    const curr = slot.curriculum;
-    const packs = await Promise.all([
-      getCards(curr, 'vocab.json', DEMO_VOCAB),
-      getSentences(curr),
-      getJukuWeek(curr)
-    ]);
-    const issues = packs.filter(p => p.error).map(p => p.error);
-    const demo = packs.some(p => p.demo);
-    if (demo && !(CFG.content && CFG.content.allowDemo)) {
-      issues.push('Demo content is disabled for production sessions.');
-    }
-    const ok = issues.length === 0;
-    const manifest = ok ? manifestOf(packs) : null;
-    const saved = J.patchWeek(w => {
-      const next = {
-        ready: ok, checkedAt: Date.now(), curriculum: curr,
-        manifest, issues: issues.slice()
-      };
-      // Preserve a concise history of a recovered preflight failure.
-      if (ok && w.contentStatus && w.contentStatus.ready === false) {
-        next.recoveredFromFailure = true;
-      }
-      w.contentStatus = next;
-    });
-    if (saved === null) {
-      return { ok: false, issues: ['Assessment storage is unavailable.'], manifest: null };
-    }
-    return { ok, issues, manifest, packs };
-  }
-
-  function renderContentFailed(taskEl, result, retry) {
-    const detail = (result.issues || []).join(' / ');
-    taskEl.innerHTML = `
-      <div class="juku-done juku-commit-fail">
-        <p class="juku-done-jp">⚠ 教材を よみこめません</p>
-        <p class="en">The real lesson content is unavailable. No demo test was started.</p>
-        <p class="juku-sub2">${detail || '先生を よんでください。'}</p>
-        <button class="juku-lock" id="jt-content-retry">もう いちど</button>
-      </div>`;
-    const b = taskEl.querySelector('#jt-content-retry');
-    if (b) b.addEventListener('click', retry);
   }
 
   function cardAudio(curr, type, card) {
@@ -442,7 +348,6 @@
   function showChoiceItem(taskEl, opts, onLock) {
     const shownAt = performance.now();
     let firstMs = null, changes = 0, sel = -1, audio = null;
-    let committed = false;
 
     taskEl.innerHTML = `
       ${opts.demo ? '<div class="juku-demo-badge">DEMO</div>' : ''}
@@ -480,9 +385,7 @@
     }
 
     lockBtn.addEventListener('click', () => {
-      if (committed || sel === -1) return;
-      committed = true;
-      lockBtn.disabled = true;
+      if (sel === -1) return;
       onLock({
         ans: opts.choices[sel].label,
         ok: !!opts.choices[sel].ok,
@@ -629,16 +532,11 @@
 
   async function renderVocab(taskEl, res, slot) {
     taskEl.innerHTML = `<p class="juku-paper">よみこみちゅう…</p>`;
-    const ready = await preflight(slot);
-    if (!ready.ok) {
-      renderContentFailed(taskEl, ready, () => renderVocab(taskEl, res, slot));
-      return;
-    }
     const curr = slot.curriculum;
     const vocab = await getCards(curr, 'vocab.json', DEMO_VOCAB);
     const juku = await getJukuWeek(curr);
     const cw = window.CALENDAR.getCurrentCurriculumWeek();
-    const seed = `${J.studentSeedBase()}|${J.curriculumWeekKey(cw)}|vocab`;
+    const seed = `${J.studentSeedBase()}|${cw.weekId}|vocab`;
     const defs = juku.demo ? [] : (juku.week.definitions || []);
     const meanCount = (CFG.content.counts && CFG.content.counts.vocabMean) || 8;
     const demo = vocab.demo;
@@ -649,16 +547,9 @@
       kind: (i >= meanCount && defs.some(d => d.n === card.n)) ? 'def' : 'mean'
     }));
 
-    const okSec = J.patchWeek(w => {
+   const okSec = J.patchWeek(w => {
       if (!w.sections.vocab) {
-        w.sections.vocab = {
-          total: items.length,
-          subTotals: {
-            mean: items.filter(x => x.kind === 'mean').length,
-            def: items.filter(x => x.kind === 'def').length
-          },
-          items: [], startedAt: Date.now(), demo
-        };
+        w.sections.vocab = { total: items.length, items: [], startedAt: Date.now(), demo };
       }
     });
     if (okSec === null) {
@@ -715,7 +606,7 @@
   async function buildMixedItems(slot) {
     const curr = slot.curriculum;
     const cw = window.CALENDAR.getCurrentCurriculumWeek();
-    const base = `${J.studentSeedBase()}|${J.curriculumWeekKey(cw)}|mixed`;
+    const base = `${J.studentSeedBase()}|${cw.weekId}|mixed`;
     const C = CFG.content.counts || {};
     const [sent, vocab, juku] = await Promise.all([
       getSentences(curr),
@@ -777,13 +668,8 @@
 
   async function renderMixed(taskEl, res, slot) {
     taskEl.innerHTML = `<p class="juku-paper">よみこみちゅう…</p>`;
-    const ready = await preflight(slot);
-    if (!ready.ok) {
-      renderContentFailed(taskEl, ready, () => renderMixed(taskEl, res, slot));
-      return;
-    }
     const cw = window.CALENDAR.getCurrentCurriculumWeek();
-    const base = `${J.studentSeedBase()}|${J.curriculumWeekKey(cw)}|mixed`;
+    const base = `${J.studentSeedBase()}|${cw.weekId}|mixed`;
     
   const items = await buildMixedItems(slot);
     // Prove-it is remediation, not assessment: it lives outside the
@@ -796,13 +682,8 @@
 
  const okSec = J.patchWeek(w => {
       if (!w.sections.mixed) {
-        const subTotals = {};
-        scored.forEach(x => { subTotals[x.kind] = (subTotals[x.kind] || 0) + 1; });
-        w.sections.mixed = {
-          total: scored.length, subTotals,
-          proveTotal: items.length - scored.length,
-          items: [], startedAt: Date.now(), demo
-        };
+        w.sections.mixed = { total: scored.length, proveTotal: items.length - scored.length,
+                             items: [], startedAt: Date.now(), demo };
       }
     });
     if (okSec === null) {
@@ -921,7 +802,7 @@
   async function buildDictSchedule(slot) {
     const D = CFG.content.dictation;
     const cw = window.CALENDAR.getCurrentCurriculumWeek();
-    const seed = `${J.curriculumWeekKey(cw)}|dict`;
+    const seed = `${cw.weekId}|dict`;
 
     const [vocab, sent] = await Promise.all([
       getCards(slot.curriculum, 'vocab.json', DEMO_VOCAB),
@@ -950,8 +831,7 @@
 
     return { schedule, sentAll, seed,
              demo: vocab.demo || sent.demo,
-             itemTotal: wordPick.length + sentPick.length,
-             subTotals: { word: wordPick.length, sent: sentPick.length } };
+             itemTotal: wordPick.length + sentPick.length };
   }
 
   function dictSegAt(schedule, elapsedSec) {
@@ -964,16 +844,11 @@
   async function renderDictation(taskEl, res, slot) {
     taskEl.innerHTML = `<p class="juku-paper">よみこみちゅう…</p>`;
     _dict = null;
-    const ready = await preflight(slot);
-    if (!ready.ok) {
-      renderContentFailed(taskEl, ready, () => renderDictation(taskEl, res, slot));
-      return;
-    }
     const built = await buildDictSchedule(slot);
 
    const okSec = J.patchWeek(w => {
       if (!w.sections.dictation) {
-        w.sections.dictation = { total: built.itemTotal, subTotals: built.subTotals, items: [],
+        w.sections.dictation = { total: built.itemTotal, items: [],
                                  startedAt: Date.now(), demo: built.demo };
       }
     });
@@ -1106,7 +981,6 @@
   // the placeholder the caller provides.
 
   window.JUKU_TESTS = {
-    preflight,
     render(taskEl, res, slot) {
       switch (res.phase.id) {
         case 'dictation': renderDictation(taskEl, res, slot); return true;

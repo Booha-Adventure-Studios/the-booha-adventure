@@ -111,9 +111,8 @@
 
   function modeFor(venue) {
     try {
-      const cw = window.CALENDAR.getCurrentCurriculumWeek();
-      const weekKey = window.JUKU.curriculumWeekKey(cw);
-      return window.JUKU.rng(`${weekKey}|ghost|${venue}`)() < 0.5
+      const weekId = window.CALENDAR.getCurrentCurriculumWeek().weekId;
+      return window.JUKU.rng(`${weekId}|ghost|${venue}`)() < 0.5
         ? 'pop' : 'feed';
     } catch (e) { return 'pop'; }
   }

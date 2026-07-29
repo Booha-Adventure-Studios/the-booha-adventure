@@ -41,7 +41,6 @@
     { key: 'hardest', jp: 'いちばん むずかしそうなのは？', en: 'Which feels hardest?',
       opts: [
         { v: 'dictation', jp: 'きいてかく' },
-        { v: 'reading',   jp: 'おんどく' },
         { v: 'order',     jp: 'じゅんばん' },
         { v: 'vocab',     jp: 'たんご' },
         { v: 'mixed',     jp: 'ミックス' }
@@ -68,7 +67,6 @@
     { key: 'worst', jp: 'いちばん むずかしかったのは？', en: 'Which was hardest?',
       opts: [
         { v: 'dictation', jp: 'きいてかく' },
-        { v: 'reading',   jp: 'おんどく' },
         { v: 'order',     jp: 'じゅんばん' },
         { v: 'vocab',     jp: 'たんご' },
         { v: 'mixed',     jp: 'ミックス' }
@@ -158,29 +156,6 @@ function stampAttendance(slot) {
     if (ok === null) console.error('[juku] Attendance NOT stamped — report will not finalize.');
   }
 
-  // Load and validate the week's real assessment data during the lobby.
-  // The live renderers repeat the same check, so arriving late also fails
-  // closed rather than receiving demo questions.
-  function runPreflight(el, slot) {
-    if (!el || !(window.JUKU_TESTS && JUKU_TESTS.preflight)) return;
-    el.className = 'juku-preflight checking';
-    el.textContent = '教材を かくにんしています… / Checking lesson content…';
-    JUKU_TESTS.preflight(slot).then(result => {
-      if (!el.isConnected) return;
-      if (result.ok) {
-        el.className = 'juku-preflight ready';
-        el.textContent = '✓ 教材 OK / Lesson content ready';
-      } else {
-        el.className = 'juku-preflight failed';
-        el.textContent = '⚠ 教材を よみこめません。先生を よんでください。 / Content unavailable.';
-      }
-    }).catch(() => {
-      if (!el.isConnected) return;
-      el.className = 'juku-preflight failed';
-      el.textContent = '⚠ 教材を よみこめません。先生を よんでください。 / Content unavailable.';
-    });
-  }
-
   // ── Screens ──────────────────────────────────────────────
 
   function renderMenu() {
@@ -226,19 +201,6 @@ function stampAttendance(slot) {
     wireBack();
   }
 
-  function renderUnavailable(slot) {
-    root.innerHTML = `
-      ${exitX()}
-      <div class="juku-panel">
-        <img class="juku-crest" src="assets/img/juku-logo.png" alt="">
-        <h1>土よう日の クラスです</h1>
-        <p class="en">English Juku opens on Saturday only.</p>
-        <p class="juku-sub">${slot.label}</p>
-        <button class="juku-back-btn" id="juku-slot-back">クラスを えらびなおす</button>
-      </div>`;
-    wireBack();
-  }
-
 function renderLobby(res, slot) {
     stampAttendance(slot);
     const { week } = J.weekRecord();
@@ -252,11 +214,9 @@ function renderLobby(res, slot) {
         <div class="juku-count big" id="juku-count">${fmt(res.secToStart)}</div>
         <p class="juku-sub2">ノート・えんぴつ・きもちの じゅんび。<br>
         <span class="en">Notebook, pencil, mind — ready.</span></p>
-        <div id="juku-preflight"></div>
         <div class="juku-survey" id="juku-survey"></div>
       </div>`;
 
-    runPreflight(document.getElementById('juku-preflight'), slot);
     renderSurveyOpen(document.getElementById('juku-survey'), week);
   }
 
@@ -268,11 +228,9 @@ function renderLobby(res, slot) {
       <div class="juku-panel">
         <p class="juku-sub">${slot.label}</p>
         <div class="juku-count" id="juku-count">${fmt(res.secToStart)}</div>
-        <div id="juku-preflight"></div>
         <div class="juku-ghost-room" id="juku-ghost-room"></div>
         <button class="juku-edit" id="juku-survey-edit">えらびなおす</button>
       </div>`;
-    runPreflight(document.getElementById('juku-preflight'), slot);
     if (window.JUKU_GHOSTS) {
       window.JUKU_GHOSTS.mount(document.getElementById('juku-ghost-room'),
                                { name: true, venue: 'lobby' });
@@ -369,9 +327,7 @@ function renderLobby(res, slot) {
   function placeholderFor(p) {
     switch (p.kind) {
       case 'paper':
-        return `<p class="juku-paper">📖 15ふん、こえに だして よみます。<br>
-          先生が じゅんばんに ききます。<br>
-          <span class="en">Fifteen minutes of reading only. Read aloud while the teacher listens in turn.</span></p>`;
+        return `<p class="juku-paper">📖 めを あげて。<br><span class="en">Eyes up — reading round with Bryan.</span></p>`;
       case 'interval':
         return `<p class="juku-paper">☕ きゅうけい。せのび、みず、えんぴつ。<br><span class="en">Break time.</span></p>`;
         
@@ -424,7 +380,6 @@ function renderLobby(res, slot) {
     if (window.JUKU_GHOSTS) window.JUKU_GHOSTS.unmount();
     if (!slot)                    { renderMenu(); return; }
     
-    if (res.state === 'before-day') { renderUnavailable(slot); return; }
     if (res.state === 'before')   { renderBefore(res, slot); return; }
     if (res.state === 'lobby')    { renderLobby(res, slot); return; }
     if (res.state === 'closed')   { renderClosed(slot); return; }
