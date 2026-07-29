@@ -1,0 +1,187 @@
+#!/usr/bin/env node
+// CommonJS on purpose: the Desktop parent project declares ESM globally.
+'use strict';
+
+const assert = require('assert');
+const fs = require('fs');
+const path = require('path');
+const vm = require('vm');
+
+const ROOT = path.resolve(__dirname, '..');
+
+function storage() {
+  const data = new Map();
+  return {
+    getItem: key => data.has(key) ? data.get(key) : null,
+    setItem: (key, value) => data.set(key, String(value)),
+    removeItem: key => data.delete(key)
+  };
+}
+
+const localStorage = storage();
+const sessionStorage = storage();
+localStorage.setItem('booha_userid', 'student-a');
+
+const document = {
+  dispatchEvent() {},
+  addEventListener() {}
+};
+
+const context = {
+  window: {},
+  document,
+  localStorage,
+  sessionStorage,
+  console,
+  Date,
+  Intl,
+  Math,
+  JSON,
+  Event: class Event { constructor(type) { this.type = type; } },
+  CustomEvent: class CustomEvent {
+    constructor(type, init) { this.type = type; this.detail = init && init.detail; }
+  },
+  setInterval() { return 1; }
+};
+context.window.window = context.window;
+context.window.CALENDAR = {
+  getCurrentCurriculumWeek() {
+    return {
+      year: 2026, monthSlug: 'july', weekNumber: 4,
+      weekId: 'july-w4', weekStart: '2026-07-26'
+    };
+  }
+};
+context.CALENDAR = context.window.CALENDAR;
+
+vm.createContext(context);
+for (const file of ['js/juku-config.js', 'js/juku-engine.js']) {
+  vm.runInContext(fs.readFileSync(path.join(ROOT, file), 'utf8'), context, { filename: file });
+}
+
+const CFG = context.window.JUKU_CONFIG;
+const J = context.window.JUKU;
+const slotA = CFG.slots[0];
+const slotB = CFG.slots[1];
+const tk = (weekday, h, mi, s = 0) => ({
+  weekday, secOfDay: h * 3600 + mi * 60 + s,
+  dateStr: '2026-08-01'
+});
+
+assert.strictEqual(J.TOTAL_MIN, 90, 'phase schedule must total 90 minutes');
+assert.strictEqual(J.resolve(slotB, tk(3, 18, 58)).state, 'before-day',
+  'weekday access must stay locked');
+assert.strictEqual(J.resolve(slotA, tk(6, 16, 54, 59)).state, 'before');
+assert.strictEqual(J.resolve(slotA, tk(6, 16, 55)).state, 'lobby');
+assert.strictEqual(J.resolve(slotA, tk(6, 17, 0)).phase.id, 'dictation');
+assert.strictEqual(J.resolve(slotA, tk(6, 18, 25)).phase.id, 'results');
+assert.strictEqual(J.resolve(slotA, tk(6, 18, 30)).state, 'closed');
+assert.strictEqual(J.resolve(slotB, tk(6, 18, 55)).state, 'lobby');
+assert.strictEqual(J.resolve(slotB, tk(6, 19, 0)).phase.id, 'dictation');
+assert.strictEqual(J.resolve(slotB, tk(6, 20, 30)).state, 'closed');
+
+J.selectSlot('slot-a');
+const record = J.weekRecord();
+assert.ok(record.occurrenceKey.includes('2026-07-26'),
+  'record occurrence key must include a year-safe week date');
+assert.ok(Object.keys(record.save.weeks)[0].includes('2026-07-26'),
+  'saved record key must not collide annually');
+
+const html = fs.readFileSync(path.join(ROOT, 'juku.html'), 'utf8');
+assert.ok(html.includes("'js/juku-results.js'"),
+  'juku-results.js must be loaded before phases');
+assert.strictEqual(CFG.content.allowDemo, false,
+  'production juku must not silently fall back to demo questions');
+
+for (const curriculum of ['br', 'pb']) {
+  const base = path.join(ROOT, 'content', curriculum, 'july');
+  const juku = JSON.parse(fs.readFileSync(path.join(base, 'juku.json'), 'utf8'));
+  const vocab = JSON.parse(fs.readFileSync(path.join(base, 'vocab.json'), 'utf8')).cards;
+  const sentences = JSON.parse(fs.readFileSync(path.join(base, 'sentences.json'), 'utf8')).cards;
+  assert.strictEqual(juku.weeks.length, 4, `${curriculum}: four juku weeks`);
+  assert.strictEqual(vocab.length, 60, `${curriculum}: 60 vocabulary cards`);
+  assert.strictEqual(sentences.length, 60, `${curriculum}: 60 sentence cards`);
+  for (const week of juku.weeks) {
+    assert.strictEqual(week.definitions.length, 15,
+      `${curriculum} week ${week.week}: 15 definitions`);
+    for (const question of [
+      ...(week.passage.comprehension || []),
+      ...(week.questions || []).filter(q => q.type === 'read')
+    ]) {
+      assert.ok(question.correct >= 0 && question.correct < question.choices.length,
+        `${curriculum} week ${week.week}: valid correct-answer index`);
+    }
+  }
+}
+
+context.fetch = async function (url) {
+  const clean = String(url).split('?')[0];
+  const filename = path.join(ROOT, clean);
+  try {
+    const text = fs.readFileSync(filename, 'utf8');
+    return { ok: true, status: 200, text: async () => text };
+  } catch (error) {
+    return { ok: false, status: 404, text: async () => '' };
+  }
+};
+vm.runInContext(
+  fs.readFileSync(path.join(ROOT, 'js/juku-tests.js'), 'utf8'),
+  context,
+  { filename: 'js/juku-tests.js' }
+);
+
+context.window.JUKU_TESTS.preflight(slotB).then(result => {
+  assert.strictEqual(result.ok, true, `BR July preflight failed: ${result.issues}`);
+  assert.ok(result.manifest && result.manifest.split('.').length === 3,
+    'preflight must record exact vocab/sentence/juku revisions');
+  const saved = J.weekRecord().week;
+  assert.strictEqual(saved.contentStatus.ready, true);
+  assert.strictEqual(saved.contentStatus.manifest, result.manifest);
+  J.patchWeek(week => {
+    week.survey = { expect: '70-79', hardest: 'reading', submitted: true };
+    week.prediction = { expect: '80-89', worst: 'dictation' };
+    week.sections = {
+      dictation: {
+        total: 2, subTotals: { word: 1, sent: 1 },
+        items: [{ tier: 'word', ok: true }, { tier: 'sent', ok: false }]
+      },
+      order: { total: 1, items: [{ ok: true }] },
+      vocab: {
+        total: 2, subTotals: { mean: 1, def: 1 },
+        items: [{ kind: 'mean', ok: true }, { kind: 'def', ok: true }]
+      },
+      mixed: {
+        total: 4, subTotals: { comp: 1, read: 1, translate: 1, write: 1 },
+        items: [
+          { kind: 'comp', ok: true }, { kind: 'read', ok: true },
+          { kind: 'translate', ok: false }, { kind: 'write', ok: true }
+        ]
+      }
+    };
+  });
+  vm.runInContext(
+    fs.readFileSync(path.join(ROOT, 'js/juku-results.js'), 'utf8'),
+    context,
+    { filename: 'js/juku-results.js' }
+  );
+  const task = { innerHTML: '', textContent: '' };
+  context.window.JUKU_RESULTS.render(task, {}, slotA);
+  const report = J.weekRecord().week.report;
+  assert.strictEqual(report.schema, 2);
+  assert.strictEqual(report.skills.listeningWords.percent, 100);
+  assert.strictEqual(report.skills.listeningSentences.percent, 0);
+  assert.strictEqual(report.skills.translationBuild.percent, 0);
+  assert.ok(task.innerHTML.includes('Skill evidence'));
+
+  localStorage.setItem('booha_userid', 'late-student');
+  J.selectSlot('slot-a');
+  const lateTask = { innerHTML: '', textContent: '' };
+  context.window.JUKU_RESULTS.render(lateTask, {}, slotA);
+  assert.strictEqual(J.weekRecord().week.report, null,
+    'opening during results without assessment evidence must not mint a zero report');
+  assert.ok(lateTask.textContent.includes('No assessment evidence'));
+  console.log('Juku smoke checks passed.');
+}).catch(error => {
+  console.error(error);
+  process.exitCode = 1;
+});
