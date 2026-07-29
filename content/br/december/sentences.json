@@ -1,1 +1,424 @@
-
+{
+  "cards": [
+    {
+      "n": 1,
+      "en": "It’s cold and snowy in winter.",
+      "jp": "冬は寒くて雪が降ります。",
+      "hira": "ふゆ は さむくて ゆき が ふり ます",
+      "mp3": "br_s01_its_cold_and_snowy_in_winter.mp3"
+    },
+    {
+      "n": 2,
+      "en": "It’s winter break next week.",
+      "jp": "来週は冬休みです。",
+      "hira": "らいしゅう は ふゆやすみ です",
+      "mp3": "br_s02_its_winter_break_next_week.mp3"
+    },
+    {
+      "n": 3,
+      "en": "We decorate a tree at home.",
+      "jp": "家でツリーをかざります。",
+      "hira": "いえ で つりー を かざり ます",
+      "mp3": "br_s03_we_decorate_a_tree_at_home.mp3"
+    },
+    {
+      "n": 4,
+      "en": "We put up holiday lights.",
+      "jp": "イルミネーションを飾ります。",
+      "hira": "いるみねーしょん を かざります",
+      "mp3": "br_s04_we_put_up_holiday_lights.mp3"
+    },
+    {
+      "n": 5,
+      "en": "We make a snowman in the yard.",
+      "jp": "庭で雪だるまを作ります。",
+      "hira": "にわ で ゆきだるま を つくり ます",
+      "mp3": "br_s05_we_make_a_snowman_in_the_yard.mp3"
+    },
+    {
+      "n": 6,
+      "en": "I drink hot cocoa.",
+      "jp": "私はホットココアを飲みます。",
+      "hira": "わたし は ほっと ここあ を のみ ます",
+      "mp3": "br_s06_i_drink_hot_cocoa.mp3"
+    },
+    {
+      "n": 7,
+      "en": "We have a family gathering.",
+      "jp": "家族の集まりがあります。",
+      "hira": "かぞく の あつまり が あり ます",
+      "mp3": "br_s07_we_have_a_family_gathering.mp3"
+    },
+    {
+      "n": 8,
+      "en": "We do a countdown on New Year’s Eve.",
+      "jp": "大みそかにカウントダウンをします。",
+      "hira": "おおみそか に かうんとだうん を し ます",
+      "mp3": "br_s08_we_do_a_countdown_on_new_years_eve.mp3"
+    },
+    {
+      "n": 9,
+      "en": "I will visit a shrine on New Year’s Day.",
+      "jp": "元日に初詣に行きます。",
+      "hira": "がんじつ に はつもうで に いき ます",
+      "mp3": "br_s09_i_will_visit_a_shrine_on_new_years_day.mp3"
+    },
+    {
+      "n": 10,
+      "en": "We skate at the rink.",
+      "jp": "リンクでスケートをします。",
+      "hira": "りんく で すけーと を し ます",
+      "mp3": "br_s10_we_skate_at_the_rink.mp3"
+    },
+    {
+      "n": 11,
+      "en": "It’s fun to go sledding on a hill.",
+      "jp": "丘でそりすべりをするのは楽しいです。",
+      "hira": "おか で そりすべり を する の は たのしい です",
+      "mp3": "br_s11_its_fun_to_go_sledding_on_a_hill.mp3"
+    },
+    {
+      "n": 12,
+      "en": "Do you like winter holidays?",
+      "jp": "冬の休日は好きですか。",
+      "hira": "ふゆ の きゅうじつ は すき です か",
+      "mp3": "br_s12_do_you_like_winter_holidays.mp3"
+    },
+    {
+      "n": 13,
+      "en": "We watch holiday movies.",
+      "jp": "休日の映画を見ます。",
+      "hira": "きゅうじつ の えいが を み ます",
+      "mp3": "br_s13_we_watch_holiday_movies.mp3"
+    },
+    {
+      "n": 14,
+      "en": "We send messages to friends.",
+      "jp": "友だちにメッセージを送ります。",
+      "hira": "ともだち に めっせーじ を おくり ます",
+      "mp3": "br_s14_we_send_messages_to_friends.mp3"
+    },
+    {
+      "n": 15,
+      "en": "I will relax and have fun.",
+      "jp": "私はゆっくりして楽しみます。",
+      "hira": "わたし は ゆっくり して たのしみ ます",
+      "mp3": "br_s15_i_will_relax_and_have_fun.mp3"
+    },
+    {
+      "n": 16,
+      "en": "We have a family dinner every New Year.",
+      "jp": "毎年お正月に家族で夕食を食べます。",
+      "hira": "まいとし おしょうがつ に かぞく で ゆうしょく を たべます",
+      "mp3": "br_s16_we_have_a_family_dinner_every_new_year.mp3"
+    },
+    {
+      "n": 17,
+      "en": "We always share a holiday meal.",
+      "jp": "私たちはいつも祝日の食事をいっしょに食べます。",
+      "hira": "わたしたち は いつも しゅくじつ の しょくじ を いっしょ に たべます",
+      "mp3": "br_s17_we_always_share_a_holiday_meal.mp3"
+    },
+    {
+      "n": 18,
+      "en": "My family decorates the house.",
+      "jp": "私の家族は家をかざります。",
+      "hira": "わたし の かぞく は いえ を かざり ます",
+      "mp3": "br_s18_my_family_decorates_the_house.mp3"
+    },
+    {
+      "n": 19,
+      "en": "We listen to holiday music.",
+      "jp": "休日の音楽を聞きます。",
+      "hira": "きゅうじつ の おんがく を きき ます",
+      "mp3": "br_s19_we_listen_to_holiday_music.mp3"
+    },
+    {
+      "n": 20,
+      "en": "We make a cake together.",
+      "jp": "いっしょにケーキを作ります。",
+      "hira": "いっしょ に けーき を つくり ます",
+      "mp3": "br_s20_we_make_a_cake_together.mp3"
+    },
+    {
+      "n": 21,
+      "en": "We send cards to friends.",
+      "jp": "友だちにカードを送ります。",
+      "hira": "ともだち に かーど を おくります",
+      "mp3": "br_s21_we_send_cards_to_friends.mp3"
+    },
+    {
+      "n": 22,
+      "en": "We visit our grandparents.",
+      "jp": "祖父母を訪ねます。",
+      "hira": "そふぼ を たずねます",
+      "mp3": "br_s22_we_visit_our_grandparents.mp3"
+    },
+    {
+      "n": 23,
+      "en": "We sing traditional songs.",
+      "jp": "伝統の歌を歌います。",
+      "hira": "でんとう の うた を うたい ます",
+      "mp3": "br_s23_we_sing_traditional_songs.mp3"
+    },
+    {
+      "n": 24,
+      "en": "We eat special food.",
+      "jp": "特別な食べ物を食べます。",
+      "hira": "とくべつ な たべもの を たべ ます",
+      "mp3": "br_s24_we_eat_special_food.mp3"
+    },
+    {
+      "n": 25,
+      "en": "We make memories together.",
+      "jp": "いっしょに思い出を作ります。",
+      "hira": "いっしょ に おもいで を つくり ます",
+      "mp3": "br_s25_we_make_memories_together.mp3"
+    },
+    {
+      "n": 26,
+      "en": "We always smile a lot.",
+      "jp": "いつもたくさん笑います。",
+      "hira": "いつも たくさん わらい ます",
+      "mp3": "br_s26_we_always_smile_a_lot.mp3"
+    },
+    {
+      "n": 27,
+      "en": "My family celebrates New Year at home.",
+      "jp": "家族は家で新年を祝います。",
+      "hira": "かぞく は いえ で しんねん を いわい ます",
+      "mp3": "br_s27_my_family_celebrates_new_year_at_home.mp3"
+    },
+    {
+      "n": 28,
+      "en": "We clean the house before New Year’s Day.",
+      "jp": "お正月の前に家を掃除します。",
+      "hira": "おしょうがつ の まえ に いえ を そうじ します",
+      "mp3": "br_s28_we_clean_the_house_before_new_years_day.mp3"
+    },
+    {
+      "n": 29,
+      "en": "We play games after dinner.",
+      "jp": "夕食のあとにゲームをします。",
+      "hira": "ゆうしょく の あと に げーむ を し ます",
+      "mp3": "br_s29_we_play_games_after_dinner.mp3"
+    },
+    {
+      "n": 30,
+      "en": "We take a family photo every year.",
+      "jp": "毎年家族写真を撮ります。",
+      "hira": "まいとし かぞく しゃしん を とり ます",
+      "mp3": "br_s30_we_take_a_family_photo_every_year.mp3"
+    },
+    {
+      "n": 31,
+      "en": "I gave a present to my friend.",
+      "jp": "友だちにプレゼントをあげました。",
+      "hira": "ともだち に ぷれぜんと を あげ ました",
+      "mp3": "br_s31_i_gave_a_present_to_my_friend.mp3"
+    },
+    {
+      "n": 32,
+      "en": "I got a gift from my teacher.",
+      "jp": "先生からプレゼントをもらいました。",
+      "hira": "せんせい から ぷれぜんと を もらい ました",
+      "mp3": "br_s32_i_got_a_gift_from_my_teacher.mp3"
+    },
+    {
+      "n": 33,
+      "en": "I gave my mother a card.",
+      "jp": "お母さんにカードをあげました。",
+      "hira": "おかあさん に かーど を あげ ました",
+      "mp3": "br_s33_i_gave_my_mother_a_card.mp3"
+    },
+    {
+      "n": 34,
+      "en": "I got money from my grandparents.",
+      "jp": "祖父母からお金をもらいました。",
+      "hira": "そふぼ から おかね を もらい ました",
+      "mp3": "br_s34_i_got_money_from_my_grandparents.mp3"
+    },
+    {
+      "n": 35,
+      "en": "I wrapped the gift with ribbon.",
+      "jp": "リボンでプレゼントを包みました。",
+      "hira": "りぼん で ぷれぜんと を つつみ ました",
+      "mp3": "br_s35_i_wrapped_the_gift_with_ribbon.mp3"
+    },
+    {
+      "n": 36,
+      "en": "I wrote a thank-you card.",
+      "jp": "サンキューカードを書きました。",
+      "hira": "さんきゅーかーど を かき ました",
+      "mp3": "br_s36_i_wrote_a_thankyou_card.mp3"
+    },
+    {
+      "n": 37,
+      "en": "Thank you for the present.",
+      "jp": "プレゼントをありがとう。",
+      "hira": "ぷれぜんと を ありがとう",
+      "mp3": "br_s37_thank_you_for_the_present.mp3"
+    },
+    {
+      "n": 38,
+      "en": "Thank you for your kindness.",
+      "jp": "ご親切にありがとうございます。",
+      "hira": "ごしんせつ に ありがとう ございます",
+      "mp3": "br_s38_thank_you_for_your_kindness.mp3"
+    },
+    {
+      "n": 39,
+      "en": "Thank you for helping me.",
+      "jp": "手伝ってくれてありがとう。",
+      "hira": "てつだって くれて ありがとう",
+      "mp3": "br_s39_thank_you_for_helping_me.mp3"
+    },
+    {
+      "n": 40,
+      "en": "It was a nice surprise.",
+      "jp": "すてきなサプライズでした。",
+      "hira": "すてき な さぷらいず でした",
+      "mp3": "br_s40_it_was_a_nice_surprise.mp3"
+    },
+    {
+      "n": 41,
+      "en": "I was happy to get a toy.",
+      "jp": "おもちゃをもらってうれしかったです。",
+      "hira": "おもちゃ を もらって うれしかった です",
+      "mp3": "br_s41_i_was_happy_to_get_a_toy.mp3"
+    },
+    {
+      "n": 42,
+      "en": "I gave a book to my younger brother.",
+      "jp": "弟に本をあげました。",
+      "hira": "おとうと に ほん を あげました",
+      "mp3": "br_s42_i_gave_a_book_to_my_younger_brother.mp3"
+    },
+    {
+      "n": 43,
+      "en": "I got a bag from my younger sister.",
+      "jp": "妹からバッグをもらいました。",
+      "hira": "いもうと から ばっぐ を もらいました",
+      "mp3": "br_s43_i_got_a_bag_from_my_younger_sister.mp3"
+    },
+    {
+      "n": 44,
+      "en": "I said thank you to everyone.",
+      "jp": "みんなにありがとうと言いました。",
+      "hira": "みんな に ありがとう と いい ました",
+      "mp3": "br_s44_i_said_thank_you_to_everyone.mp3"
+    },
+    {
+      "n": 45,
+      "en": "I gave my teacher a thank-you card.",
+      "jp": "先生にサンキューカードをあげました。",
+      "hira": "せんせい に さんきゅーかーど を あげ ました",
+      "mp3": "br_s45_i_gave_my_teacher_a_thankyou_card.mp3"
+    },
+    {
+      "n": 46,
+      "en": "I learned many new words.",
+      "jp": "たくさんの新しい単語を学びました。",
+      "hira": "たくさん の あたらしい たんご を まなび ました",
+      "mp3": "br_s46_i_learned_many_new_words.mp3"
+    },
+    {
+      "n": 47,
+      "en": "I enjoyed my English lessons.",
+      "jp": "英語のレッスンを楽しみました。",
+      "hira": "えいご の れっすん を たのしみ ました",
+      "mp3": "br_s47_i_enjoyed_my_english_lessons.mp3"
+    },
+    {
+      "n": 48,
+      "en": "I made new friends.",
+      "jp": "新しい友だちができました。",
+      "hira": "あたらしい ともだち が でき ました",
+      "mp3": "br_s48_i_made_new_friends.mp3"
+    },
+    {
+      "n": 49,
+      "en": "I tried many new things.",
+      "jp": "たくさんの新しいことに挑戦しました。",
+      "hira": "たくさん の あたらしい こと に ちょうせん しました",
+      "mp3": "br_s49_i_tried_many_new_things.mp3"
+    },
+    {
+      "n": 50,
+      "en": "I learned from my mistakes.",
+      "jp": "間違いから学びました。",
+      "hira": "まちがい から まなび ました",
+      "mp3": "br_s50_i_learned_from_my_mistakes.mp3"
+    },
+    {
+      "n": 51,
+      "en": "I helped my friends.",
+      "jp": "友だちを助けました。",
+      "hira": "ともだち を たすけ ました",
+      "mp3": "br_s51_i_helped_my_friends.mp3"
+    },
+    {
+      "n": 52,
+      "en": "I read many books this year.",
+      "jp": "今年は本をたくさん読みました。",
+      "hira": "ことし は ほん を たくさん よみました",
+      "mp3": "br_s52_i_read_many_books_this_year.mp3"
+    },
+    {
+      "n": 53,
+      "en": "I grew more confident.",
+      "jp": "もっと自信がつきました。",
+      "hira": "もっと じしん が つき ました",
+      "mp3": "br_s53_i_grew_more_confident.mp3"
+    },
+    {
+      "n": 54,
+      "en": "I met nice people.",
+      "jp": "良い人たちに出会いました。",
+      "hira": "よい ひとたち に であい ました",
+      "mp3": "br_s54_i_met_nice_people.mp3"
+    },
+    {
+      "n": 55,
+      "en": "Next year I will study more.",
+      "jp": "来年はもっと勉強します。",
+      "hira": "らいねん は もっと べんきょう します",
+      "mp3": "br_s55_next_year_i_will_study_more.mp3"
+    },
+    {
+      "n": 56,
+      "en": "Next year I will visit a new place.",
+      "jp": "来年は新しい場所に行きます。",
+      "hira": "らいねん は あたらしい ばしょ に いきます",
+      "mp3": "br_s56_next_year_i_will_visit_a_new_place.mp3"
+    },
+    {
+      "n": 57,
+      "en": "Next year I will try my best.",
+      "jp": "来年はがんばります。",
+      "hira": "らいねん は がんばり ます",
+      "mp3": "br_s57_next_year_i_will_try_my_best.mp3"
+    },
+    {
+      "n": 58,
+      "en": "It was a good year.",
+      "jp": "いい一年でした。",
+      "hira": "いい いちねん でした",
+      "mp3": "br_s58_it_was_a_good_year.mp3"
+    },
+    {
+      "n": 59,
+      "en": "I’m thankful for my teachers.",
+      "jp": "先生に感謝しています。",
+      "hira": "せんせい に かんしゃ して います",
+      "mp3": "br_s59_im_thankful_for_my_teachers.mp3"
+    },
+    {
+      "n": 60,
+      "en": "I’m proud of myself.",
+      "jp": "自分を誇りに思います。",
+      "hira": "じぶん を ほこり に おもい ます",
+      "mp3": "br_s60_im_proud_of_myself.mp3"
+    }
+  ]
+}

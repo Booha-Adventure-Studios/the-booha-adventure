@@ -1,1 +1,424 @@
-
+{
+  "cards": [
+    {
+      "n": 1,
+      "en": "The housing market is highly sensitive to interest rates and employment trends.",
+      "jp": "住宅市場は金利と雇用動向に非常に敏感です。",
+      "hira": "じゅうたく しじょう は きんり と こよう どうこう に ひじょう に びんかん です",
+      "mp3": "bc_s01_the_housing_market_is_highly_sensitive_to_interest_rates_and_employment_trends.mp3"
+    },
+    {
+      "n": 2,
+      "en": "For many households, residential property is their largest financial asset.",
+      "jp": "多くの世帯にとって、住宅用不動産は最大の金融資産です。",
+      "hira": "おおく の せたい に とって じゅうたくよう ふどうさん は さいだい の きんゆう しさん です",
+      "mp3": "bc_s02_for_many_households_residential_property_is_their_largest_financial_asset.mp3"
+    },
+    {
+      "n": 3,
+      "en": "A detached residence offers privacy but usually requires more maintenance.",
+      "jp": "戸建て住宅はプライバシーを確保できますが、通常はより多くの維持管理が必要です。",
+      "hira": "こだて じゅうたく は ぷらいばしー を かくほ できます が つうじょう は より おおく の いじ かんり が ひつよう です",
+      "mp3": "bc_s03_a_detached_residence_offers_privacy_but_usually_requires_more_maintenance.mp3"
+    },
+    {
+      "n": 4,
+      "en": "Condominium owners share responsibility for common areas and major repairs.",
+      "jp": "分譲マンションの所有者は共用部分と大規模修繕の責任を共有します。",
+      "hira": "ぶんじょう まんしょん の しょゆうしゃ は きょうよう ぶぶん と だいきぼ しゅうぜん の せきにん を きょうゆう します",
+      "mp3": "bc_s04_condominium_owners_share_responsibility_for_common_areas_and_major_repairs.mp3"
+    },
+    {
+      "n": 5,
+      "en": "Rental accommodation gives residents flexibility when their circumstances change.",
+      "jp": "賃貸住宅は状況が変化した際に住民へ柔軟性を与えます。",
+      "hira": "ちんたい じゅうたく は じょうきょう が へんか した さい に じゅうみん へ じゅうなんせい を あたえます",
+      "mp3": "bc_s05_rental_accommodation_gives_residents_flexibility_when_their_circumstances_change.mp3"
+    },
+    {
+      "n": 6,
+      "en": "Homeownership can provide stability, although it also involves financial risk.",
+      "jp": "持ち家所有は安定をもたらしますが、経済的リスクも伴います。",
+      "hira": "もちいえ しょゆう は あんてい を もたらします が けいざいてき りすく も ともないます",
+      "mp3": "bc_s06_homeownership_can_provide_stability_although_it_also_involves_financial_risk.mp3"
+    },
+    {
+      "n": 7,
+      "en": "Applicants must prove they can repay the mortgage over the agreed period.",
+      "jp": "申込者は合意した期間内に住宅ローンを返済できることを証明しなければなりません。",
+      "hira": "もうしこみしゃ は ごうい した きかんない に じゅうたく ろーん を へんさい できる こと を しょうめい しなければ なりません",
+      "mp3": "bc_s07_applicants_must_prove_they_can_repay_the_mortgage_over_the_agreed_period.mp3"
+    },
+    {
+      "n": 8,
+      "en": "A larger down payment can reduce both monthly payments and borrowing costs.",
+      "jp": "より多い頭金は毎月の返済額と借入費用の両方を減らせます。",
+      "hira": "より おおい あたまきん は まいつき の へんさいがく と かりいれ ひよう の りょうほう を へらせます",
+      "mp3": "bc_s08_a_larger_down_payment_can_reduce_both_monthly_payments_and_borrowing_costs.mp3"
+    },
+    {
+      "n": 9,
+      "en": "Property value is influenced by location, condition, and access to public services.",
+      "jp": "不動産価値は立地、状態、公共サービスへのアクセスに左右されます。",
+      "hira": "ふどうさん かち は りっち じょうたい こうきょう さーびす への あくせす に さゆう されます",
+      "mp3": "bc_s09_property_value_is_influenced_by_location_condition_and_access_to_public_services.mp3"
+    },
+    {
+      "n": 10,
+      "en": "The revised floor plan creates a clearer separation between work and relaxation.",
+      "jp": "改訂された間取りは仕事と休息をより明確に分けます。",
+      "hira": "かいてい された まどり は しごと と きゅうそく を より めいかく に わけます",
+      "mp3": "bc_s10_the_revised_floor_plan_creates_a_clearer_separation_between_work_and_relaxation.mp3"
+    },
+    {
+      "n": 11,
+      "en": "Multipurpose furniture can make limited living space more functional.",
+      "jp": "多目的家具は限られた居住空間をより機能的にできます。",
+      "hira": "たもくてき かぐ は かぎられた きょじゅう くうかん を より きのうてき に できます",
+      "mp3": "bc_s11_multipurpose_furniture_can_make_limited_living_space_more_functional.mp3"
+    },
+    {
+      "n": 12,
+      "en": "Occupancy limits are intended to protect health and safety.",
+      "jp": "入居人数の制限は健康と安全を守ることを目的としています。",
+      "hira": "にゅうきょ にんずう の せいげん は けんこう と あんぜん を まもる こと を もくてき と して います",
+      "mp3": "bc_s12_occupancy_limits_are_intended_to_protect_health_and_safety.mp3"
+    },
+    {
+      "n": 13,
+      "en": "An urban residence may offer convenience at the expense of space.",
+      "jp": "都市型住宅は空間を犠牲にして利便性を得る場合があります。",
+      "hira": "としがた じゅうたく は くうかん を ぎせい に して りべんせい を える ばあい が あります",
+      "mp3": "bc_s13_an_urban_residence_may_offer_convenience_at_the_expense_of_space.mp3"
+    },
+    {
+      "n": 14,
+      "en": "The suburban neighborhood attracts families seeking larger homes and quiet streets.",
+      "jp": "その郊外住宅地は広い家と静かな通りを求める家族を引きつけます。",
+      "hira": "その こうがい じゅうたくち は ひろい いえ と しずかな とおり を もとめる かぞく を ひきつけます",
+      "mp3": "bc_s14_the_suburban_neighborhood_attracts_families_seeking_larger_homes_and_quiet_stree.mp3"
+    },
+    {
+      "n": 15,
+      "en": "Housing demand has risen faster than the supply of new homes.",
+      "jp": "住宅需要は新築住宅の供給より速く増加しています。",
+      "hira": "じゅうたく じゅよう は しんちく じゅうたく の きょうきゅう より はやく ぞうか して います",
+      "mp3": "bc_s15_housing_demand_has_risen_faster_than_the_supply_of_new_homes.mp3"
+    },
+    {
+      "n": 16,
+      "en": "Furnishings should be selected for durability as well as appearance.",
+      "jp": "家具調度品は外観だけでなく耐久性も考えて選ぶべきです。",
+      "hira": "かぐ ちょうどひん は がいかん だけ で なく たいきゅうせい も かんがえて えらぶ べき です",
+      "mp3": "bc_s16_furnishings_should_be_selected_for_durability_as_well_as_appearance.mp3"
+    },
+    {
+      "n": 17,
+      "en": "Energy-efficient household appliances can lower long-term operating costs.",
+      "jp": "省エネ型家電製品は長期的な運転費用を下げられます。",
+      "hira": "しょうえねがた かでん せいひん は ちょうきてき な うんてん ひよう を さげられます",
+      "mp3": "bc_s17_energyefficient_household_appliances_can_lower_longterm_operating_costs.mp3"
+    },
+    {
+      "n": 18,
+      "en": "Effective interior design balances function, comfort, and personal taste.",
+      "jp": "効果的なインテリアデザインは機能、快適さ、個人の好みの均衡を取ります。",
+      "hira": "こうかてき な いんてりあ でざいん は きのう かいてきさ こじん の このみ の きんこう を とります",
+      "mp3": "bc_s18_effective_interior_design_balances_function_comfort_and_personal_taste.mp3"
+    },
+    {
+      "n": 19,
+      "en": "Natural lighting can improve mood while reducing electricity use.",
+      "jp": "自然採光は電力使用を減らしながら気分を改善できます。",
+      "hira": "しぜん さいこう は でんりょく しよう を へらしながら きぶん を かいぜん できます",
+      "mp3": "bc_s19_natural_lighting_can_improve_mood_while_reducing_electricity_use.mp3"
+    },
+    {
+      "n": 20,
+      "en": "Adequate ventilation prevents moisture and improves indoor air quality.",
+      "jp": "十分な換気は湿気を防ぎ室内の空気の質を改善します。",
+      "hira": "じゅうぶん な かんき は しっけ を ふせぎ しつない の くうき の しつ を かいぜん します",
+      "mp3": "bc_s20_adequate_ventilation_prevents_moisture_and_improves_indoor_air_quality.mp3"
+    },
+    {
+      "n": 21,
+      "en": "High-quality insulation keeps homes comfortable in both summer and winter.",
+      "jp": "高品質な断熱は夏も冬も住宅を快適に保ちます。",
+      "hira": "こうひんしつ な だんねつ は なつ も ふゆ も じゅうたく を かいてき に たもちます",
+      "mp3": "bc_s21_highquality_insulation_keeps_homes_comfortable_in_both_summer_and_winter.mp3"
+    },
+    {
+      "n": 22,
+      "en": "Energy efficiency should be considered throughout a building's entire life cycle.",
+      "jp": "エネルギー効率は建物の全ライフサイクルを通して考慮すべきです。",
+      "hira": "えねるぎー こうりつ は たてもの の ぜん らいふ さいくる を とおして こうりょ する べき です",
+      "mp3": "bc_s22_energy_efficiency_should_be_considered_throughout_a_buildings_entire_life_cycle.mp3"
+    },
+    {
+      "n": 23,
+      "en": "Some households generate renewable energy with rooftop solar panels.",
+      "jp": "一部の世帯は屋上のソーラーパネルで再生可能エネルギーを生み出します。",
+      "hira": "いちぶ の せたい は おくじょう の そーらー ぱねる で さいせい かのう えねるぎー を うみだします",
+      "mp3": "bc_s23_some_households_generate_renewable_energy_with_rooftop_solar_panels.mp3"
+    },
+    {
+      "n": 24,
+      "en": "Smart-home technology can improve convenience but may create privacy risks.",
+      "jp": "スマートホーム技術は利便性を高めますが、プライバシー上の危険を生む可能性があります。",
+      "hira": "すまーと ほーむ ぎじゅつ は りべんせい を たかめます が ぷらいばしーじょう の きけん を うむ かのうせい が あります",
+      "mp3": "bc_s24_smarthome_technology_can_improve_convenience_but_may_create_privacy_risks.mp3"
+    },
+    {
+      "n": 25,
+      "en": "Good accessibility allows residents to remain independent as their needs change.",
+      "jp": "優れた利用しやすさはニーズが変化しても住民が自立を保つことを可能にします。",
+      "hira": "すぐれた りよう しやすさ は にーず が へんか しても じゅうみん が じりつ を たもつ こと を かのう に します",
+      "mp3": "bc_s25_good_accessibility_allows_residents_to_remain_independent_as_their_needs_change.mp3"
+    },
+    {
+      "n": 26,
+      "en": "Built-in cabinets significantly increase storage capacity without using extra floor space.",
+      "jp": "造り付けの棚は追加の床面積を使わず収納容量を大幅に増やします。",
+      "hira": "つくりつけ の たな は ついか の ゆか めんせき を つかわず しゅうのう ようりょう を おおはば に ふやします",
+      "mp3": "bc_s26_builtin_cabinets_significantly_increase_storage_capacity_without_using_extra_flo.mp3"
+    },
+    {
+      "n": 27,
+      "en": "Engineers examined the building's structural integrity after the earthquake.",
+      "jp": "技術者は地震後に建物の構造的健全性を調査しました。",
+      "hira": "ぎじゅつしゃ は じしんご に たてもの の こうぞうてき けんぜんせい を ちょうさ しました",
+      "mp3": "bc_s27_engineers_examined_the_buildings_structural_integrity_after_the_earthquake.mp3"
+    },
+    {
+      "n": 28,
+      "en": "Local building materials can reduce transport costs and environmental impact.",
+      "jp": "地域の建築材料は輸送費と環境への影響を減らせます。",
+      "hira": "ちいき の けんちく ざいりょう は ゆそうひ と かんきょう への えいきょう を へらせます",
+      "mp3": "bc_s28_local_building_materials_can_reduce_transport_costs_and_environmental_impact.mp3"
+    },
+    {
+      "n": 29,
+      "en": "The renovation preserved the original character while improving safety.",
+      "jp": "その改修は安全性を高めながら元の特徴を保ちました。",
+      "hira": "その かいしゅう は あんぜんせい を たかめながら もと の とくちょう を たもちました",
+      "mp3": "bc_s29_the_renovation_preserved_the_original_character_while_improving_safety.mp3"
+    },
+    {
+      "n": 30,
+      "en": "Regular maintenance prevents minor defects from becoming expensive problems.",
+      "jp": "定期的な維持管理は小さな欠陥が高額な問題になるのを防ぎます。",
+      "hira": "ていきてき な いじ かんり は ちいさな けっかん が こうがく な もんだい に なる の を ふせぎます",
+      "mp3": "bc_s30_regular_maintenance_prevents_minor_defects_from_becoming_expensive_problems.mp3"
+    },
+    {
+      "n": 31,
+      "en": "Every family member has a household responsibility to keep shared spaces clean.",
+      "jp": "家族一人ひとりには共用空間を清潔に保つ家庭内の責任があります。",
+      "hira": "かぞく ひとりひとり には きょうよう くうかん を せいけつ に たもつ かていない の せきにん が あります",
+      "mp3": "bc_s31_every_family_member_has_a_household_responsibility_to_keep_shared_spaces_clean.mp3"
+    },
+    {
+      "n": 32,
+      "en": "The domestic workload often remains unevenly distributed within families.",
+      "jp": "家事負担は家庭内で不均等に配分されたままであることが多いです。",
+      "hira": "かじ ふたん は かていない で ふきんとう に はいぶん された まま で ある こと が おおい です",
+      "mp3": "bc_s32_the_domestic_workload_often_remains_unevenly_distributed_within_families.mp3"
+    },
+    {
+      "n": 33,
+      "en": "A fair division of labor should reflect each person's time and ability.",
+      "jp": "公平な役割分担は各人の時間と能力を反映すべきです。",
+      "hira": "こうへい な やくわり ぶんたん は かくじん の じかん と のうりょく を はんえい する べき です",
+      "mp3": "bc_s33_a_fair_division_of_labor_should_reflect_each_persons_time_and_ability.mp3"
+    },
+    {
+      "n": 34,
+      "en": "Routine upkeep includes cleaning surfaces, checking equipment, and replacing filters.",
+      "jp": "日常的な手入れには表面の清掃、機器の点検、フィルター交換が含まれます。",
+      "hira": "にちじょうてき な ていれ には ひょうめん の せいそう きき の てんけん ふぃるたー こうかん が ふくまれます",
+      "mp3": "bc_s34_routine_upkeep_includes_cleaning_surfaces_checking_equipment_and_replacing_filte.mp3"
+    },
+    {
+      "n": 35,
+      "en": "Proper waste disposal protects public health and the local environment.",
+      "jp": "適切な廃棄物処理は公衆衛生と地域環境を守ります。",
+      "hira": "てきせつ な はいきぶつ しょり は こうしゅう えいせい と ちいき かんきょう を まもります",
+      "mp3": "bc_s35_proper_waste_disposal_protects_public_health_and_the_local_environment.mp3"
+    },
+    {
+      "n": 36,
+      "en": "The recycling system works only when residents separate materials correctly.",
+      "jp": "リサイクル制度は住民が資源を正しく分別して初めて機能します。",
+      "hira": "りさいくる せいど は じゅうみん が しげん を ただしく ぶんべつ して はじめて きのう します",
+      "mp3": "bc_s36_the_recycling_system_works_only_when_residents_separate_materials_correctly.mp3"
+    },
+    {
+      "n": 37,
+      "en": "Household energy consumption can be monitored with a smart meter.",
+      "jp": "家庭のエネルギー消費はスマートメーターで監視できます。",
+      "hira": "かてい の えねるぎー しょうひ は すまーと めーたー で かんし できます",
+      "mp3": "bc_s37_household_energy_consumption_can_be_monitored_with_a_smart_meter.mp3"
+    },
+    {
+      "n": 38,
+      "en": "Water conservation becomes especially important during prolonged droughts.",
+      "jp": "長期の干ばつ中は節水が特に重要になります。",
+      "hira": "ちょうき の かんばつちゅう は せっすい が とくに じゅうよう に なります",
+      "mp3": "bc_s38_water_conservation_becomes_especially_important_during_prolonged_droughts.mp3"
+    },
+    {
+      "n": 39,
+      "en": "The annual safety inspection identified several electrical hazards.",
+      "jp": "年次安全点検で複数の電気的危険が見つかりました。",
+      "hira": "ねんじ あんぜん てんけん で ふくすう の でんきてき きけん が みつかりました",
+      "mp3": "bc_s39_the_annual_safety_inspection_identified_several_electrical_hazards.mp3"
+    },
+    {
+      "n": 40,
+      "en": "Fire prevention requires working alarms and unobstructed escape routes.",
+      "jp": "防火には作動する警報器と塞がれていない避難経路が必要です。",
+      "hira": "ぼうか には さどう する けいほうき と ふさがれて いない ひなん けいろ が ひつよう です",
+      "mp3": "bc_s40_fire_prevention_requires_working_alarms_and_unobstructed_escape_routes.mp3"
+    },
+    {
+      "n": 41,
+      "en": "A security system should discourage intruders without invading residents' privacy.",
+      "jp": "防犯システムは住民のプライバシーを侵害せず侵入者を抑止すべきです。",
+      "hira": "ぼうはん しすてむ は じゅうみん の ぷらいばしー を しんがい せず しんにゅうしゃ を よくし する べき です",
+      "mp3": "bc_s41_a_security_system_should_discourage_intruders_without_invading_residents_privacy.mp3"
+    },
+    {
+      "n": 42,
+      "en": "Effective property management depends on clear communication with residents and contractors.",
+      "jp": "効果的な不動産管理は住民と業者との明確な意思疎通にかかっています。",
+      "hira": "こうかてき な ふどうさん かんり は じゅうみん と ぎょうしゃ と の めいかく な いし そつう に かかって います",
+      "mp3": "bc_s42_effective_property_management_depends_on_clear_communication_with_residents_and.mp3"
+    },
+    {
+      "n": 43,
+      "en": "The tenant submitted a repair request after discovering a leak.",
+      "jp": "入居者は水漏れを発見した後に修理依頼を提出しました。",
+      "hira": "にゅうきょしゃ は みずもれ を はっけん した あと に しゅうり いらい を ていしゅつ しました",
+      "mp3": "bc_s43_the_tenant_submitted_a_repair_request_after_discovering_a_leak.mp3"
+    },
+    {
+      "n": 44,
+      "en": "A tenant must follow the lease while being treated fairly.",
+      "jp": "入居者は公正に扱われる一方で賃貸契約を守らなければなりません。",
+      "hira": "にゅうきょしゃ は こうせい に あつかわれる いっぽう で ちんたい けいやく を まもらなければ なりません",
+      "mp3": "bc_s44_a_tenant_must_follow_the_lease_while_being_treated_fairly.mp3"
+    },
+    {
+      "n": 45,
+      "en": "The landlord is responsible for repairs that affect habitability.",
+      "jp": "家主は居住可能性に影響する修理に責任を負います。",
+      "hira": "やぬし は きょじゅう かのうせい に えいきょう する しゅうり に せきにん を おいます",
+      "mp3": "bc_s45_the_landlord_is_responsible_for_repairs_that_affect_habitability.mp3"
+    },
+    {
+      "n": 46,
+      "en": "Housing affordability has become a major concern for younger generations.",
+      "jp": "住宅費の負担可能性は若い世代にとって大きな懸念となっています。",
+      "hira": "じゅうたくひ の ふたん かのうせい は わかい せだい に とって おおきな けねん と なって います",
+      "mp3": "bc_s46_housing_affordability_has_become_a_major_concern_for_younger_generations.mp3"
+    },
+    {
+      "n": 47,
+      "en": "The housing shortage has pushed rents beyond many workers' budgets.",
+      "jp": "住宅不足により家賃が多くの労働者の予算を超えています。",
+      "hira": "じゅうたく ぶそく に より やちん が おおく の ろうどうしゃ の よさん を こえて います",
+      "mp3": "bc_s47_the_housing_shortage_has_pushed_rents_beyond_many_workers_budgets.mp3"
+    },
+    {
+      "n": 48,
+      "en": "Public housing provides stable accommodation for eligible households.",
+      "jp": "公営住宅は対象となる世帯に安定した住居を提供します。",
+      "hira": "こうえい じゅうたく は たいしょう と なる せたい に あんてい した じゅうきょ を ていきょう します",
+      "mp3": "bc_s48_public_housing_provides_stable_accommodation_for_eligible_households.mp3"
+    },
+    {
+      "n": 49,
+      "en": "Zoning regulations determine where different types of buildings may be constructed.",
+      "jp": "用途地域規制は異なる種類の建物をどこに建設できるか決めます。",
+      "hira": "ようと ちいき きせい は ことなる しゅるい の たてもの を どこ に けんせつ できる か きめます",
+      "mp3": "bc_s49_zoning_regulations_determine_where_different_types_of_buildings_may_be_construct.mp3"
+    },
+    {
+      "n": 50,
+      "en": "The building code establishes minimum standards for safety and performance.",
+      "jp": "建築基準は安全性と性能の最低基準を定めます。",
+      "hira": "けんちく きじゅん は あんぜんせい と せいのう の さいてい きじゅん を さだめます",
+      "mp3": "bc_s50_the_building_code_establishes_minimum_standards_for_safety_and_performance.mp3"
+    },
+    {
+      "n": 51,
+      "en": "Higher population density can support efficient public transportation.",
+      "jp": "より高い人口密度は効率的な公共交通を支えられます。",
+      "hira": "より たかい じんこう みつど は こうりつてき な こうきょう こうつう を ささえられます",
+      "mp3": "bc_s51_higher_population_density_can_support_efficient_public_transportation.mp3"
+    },
+    {
+      "n": 52,
+      "en": "Urban development should include housing, services, and green space.",
+      "jp": "都市開発には住宅、サービス、緑地を含めるべきです。",
+      "hira": "とし かいはつ には じゅうたく さーびす りょくち を ふくめる べき です",
+      "mp3": "bc_s52_urban_development_should_include_housing_services_and_green_space.mp3"
+    },
+    {
+      "n": 53,
+      "en": "Neighborhood revitalization can create jobs but may also raise rents.",
+      "jp": "地域再生は雇用を生み出せますが、家賃を上昇させる可能性もあります。",
+      "hira": "ちいき さいせい は こよう を うみだせます が やちん を じょうしょう させる かのうせい も あります",
+      "mp3": "bc_s53_neighborhood_revitalization_can_create_jobs_but_may_also_raise_rents.mp3"
+    },
+    {
+      "n": 54,
+      "en": "Shared facilities and local events can strengthen community cohesion.",
+      "jp": "共用施設と地域行事は地域の結束を強められます。",
+      "hira": "きょうよう しせつ と ちいき ぎょうじ は ちいき の けっそく を つよめられます",
+      "mp3": "bc_s54_shared_facilities_and_local_events_can_strengthen_community_cohesion.mp3"
+    },
+    {
+      "n": 55,
+      "en": "Secure housing is a fundamental part of a good quality of life.",
+      "jp": "安定した住居は良い生活の質の基本的な一部です。",
+      "hira": "あんてい した じゅうきょ は よい せいかつ の しつ の きほんてき な いちぶ です",
+      "mp3": "bc_s55_secure_housing_is_a_fundamental_part_of_a_good_quality_of_life.mp3"
+    },
+    {
+      "n": 56,
+      "en": "Sustainable housing minimizes resource use without sacrificing comfort.",
+      "jp": "持続可能な住宅は快適さを犠牲にせず資源使用を最小限に抑えます。",
+      "hira": "じぞく かのう な じゅうたく は かいてきさ を ぎせい に せず しげん しよう を さいしょうげん に おさえます",
+      "mp3": "bc_s56_sustainable_housing_minimizes_resource_use_without_sacrificing_comfort.mp3"
+    },
+    {
+      "n": 57,
+      "en": "Mixed-use development places homes, shops, and workplaces within walking distance.",
+      "jp": "複合用途開発は住宅、店舗、職場を徒歩圏内に配置します。",
+      "hira": "ふくごう ようと かいはつ は じゅうたく てんぽ しょくば を とほけんない に はいち します",
+      "mp3": "bc_s57_mixeduse_development_places_homes_shops_and_workplaces_within_walking_distance.mp3"
+    },
+    {
+      "n": 58,
+      "en": "Redevelopment can cause displacement if existing residents cannot afford to remain.",
+      "jp": "再開発は既存住民が住み続ける余裕を失うと立ち退きを引き起こす可能性があります。",
+      "hira": "さいかいはつ は きそん じゅうみん が すみつづける よゆう を うしなう と たちのき を ひきおこす かのうせい が あります",
+      "mp3": "bc_s58_redevelopment_can_cause_displacement_if_existing_residents_cannot_afford_to_rema.mp3"
+    },
+    {
+      "n": 59,
+      "en": "Homelessness cannot be solved through emergency shelters alone.",
+      "jp": "ホームレス問題は緊急避難所だけでは解決できません。",
+      "hira": "ほーむれす もんだい は きんきゅう ひなんじょ だけ では かいけつ できません",
+      "mp3": "bc_s59_homelessness_cannot_be_solved_through_emergency_shelters_alone.mp3"
+    },
+    {
+      "n": 60,
+      "en": "Effective housing policy must balance supply, affordability, and environmental goals.",
+      "jp": "効果的な住宅政策は供給、負担可能性、環境目標の均衡を取らなければなりません。",
+      "hira": "こうかてき な じゅうたく せいさく は きょうきゅう ふたん かのうせい かんきょう もくひょう の きんこう を とらなければ なりません",
+      "mp3": "bc_s60_effective_housing_policy_must_balance_supply_affordability_and_environmental_goa.mp3"
+    }
+  ]
+}

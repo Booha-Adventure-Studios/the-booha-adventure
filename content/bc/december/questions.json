@@ -1,1 +1,424 @@
-
+{
+  "cards": [
+    {
+      "n": 1,
+      "en": "Why has the winter solstice been important across cultures?",
+      "jp": "冬至がさまざまな文化で重要なのはなぜですか。",
+      "hira": "とうじ が さまざま な ぶんか で じゅうよう な の は なぜ です か",
+      "mp3": "bc_q01_why_has_the_winter_solstice_been_important_across_cultures.mp3"
+    },
+    {
+      "n": 2,
+      "en": "How does the holiday season affect businesses and public services?",
+      "jp": "年末の休暇シーズンは企業と公共サービスにどう影響しますか。",
+      "hira": "ねんまつ の きゅうか しーずん は きぎょう と こうきょう さーびす に どう えいきょう します か",
+      "mp3": "bc_q02_how_does_the_holiday_season_affect_businesses_and_public_services.mp3"
+    },
+    {
+      "n": 3,
+      "en": "What gives an observance lasting meaning?",
+      "jp": "記念行事に持続的な意味を与えるものは何ですか。",
+      "hira": "きねん ぎょうじ に じぞくてき な いみ を あたえる もの は なん です か",
+      "mp3": "bc_q03_what_gives_an_observance_lasting_meaning.mp3"
+    },
+    {
+      "n": 4,
+      "en": "How should visitors behave during a religious ceremony?",
+      "jp": "宗教儀式の間、訪問者はどう振る舞うべきですか。",
+      "hira": "しゅうきょう ぎしき の あいだ ほうもんしゃ は どう ふるまう べき です か",
+      "mp3": "bc_q04_how_should_visitors_behave_during_a_religious_ceremony.mp3"
+    },
+    {
+      "n": 5,
+      "en": "What are the benefits of a secular celebration?",
+      "jp": "宗教色のない祝祭にはどのような利点がありますか。",
+      "hira": "しゅうきょうしょく の ない しゅくさい には どの よう な りてん が あります か",
+      "mp3": "bc_q05_what_are_the_benefits_of_a_secular_celebration.mp3"
+    },
+    {
+      "n": 6,
+      "en": "Should a cultural tradition ever be deliberately changed?",
+      "jp": "文化的伝統を意図的に変えるべき場合はありますか。",
+      "hira": "ぶんかてき でんとう を いとてき に かえる べき ばあい は あります か",
+      "mp3": "bc_q06_should_a_cultural_tradition_ever_be_deliberately_changed.mp3"
+    },
+    {
+      "n": 7,
+      "en": "Why do seasonal customs change over time?",
+      "jp": "季節の習慣が時代とともに変化するのはなぜですか。",
+      "hira": "きせつ の しゅうかん が じだい と とも に へんか する の は なぜ です か",
+      "mp3": "bc_q07_why_do_seasonal_customs_change_over_time.mp3"
+    },
+    {
+      "n": 8,
+      "en": "How does New Year’s Eve encourage reflection?",
+      "jp": "大みそかはどのように振り返りを促しますか。",
+      "hira": "おおみそか は どの よう に ふりかえり を うながします か",
+      "mp3": "bc_q08_how_does_new_years_eve_encourage_reflection.mp3"
+    },
+    {
+      "n": 9,
+      "en": "How has the first shrine visit changed in modern society?",
+      "jp": "初詣は現代社会でどのように変化しましたか。",
+      "hira": "はつもうで は げんだい しゃかい で どの よう に へんか しました か",
+      "mp3": "bc_q09_how_has_the_first_shrine_visit_changed_in_modern_society.mp3"
+    },
+    {
+      "n": 10,
+      "en": "What creates a festive atmosphere without excessive spending?",
+      "jp": "過剰な支出なしに祝祭的な雰囲気を作るものは何ですか。",
+      "hira": "かじょう な ししゅつ なし に しゅくさいてき な ふんいき を つくる もの は なん です か",
+      "mp3": "bc_q10_what_creates_a_festive_atmosphere_without_excessive_spending.mp3"
+    },
+    {
+      "n": 11,
+      "en": "Should every worker be guaranteed time off on a public holiday?",
+      "jp": "すべての労働者に祝日の休暇を保障すべきですか。",
+      "hira": "すべて の ろうどうしゃ に しゅくじつ の きゅうか を ほしょう する べき です か",
+      "mp3": "bc_q11_should_every_worker_be_guaranteed_time_off_on_a_public_holiday.mp3"
+    },
+    {
+      "n": 12,
+      "en": "How should transportation systems manage the year-end travel peak?",
+      "jp": "交通システムは年末の旅行のピークをどう管理すべきですか。",
+      "hira": "こうつう しすてむ は ねんまつ の りょこう の ぴーく を どう かんり する べき です か",
+      "mp3": "bc_q12_how_should_transportation_systems_manage_the_yearend_travel_peak.mp3"
+    },
+    {
+      "n": 13,
+      "en": "How can winter recreation become more sustainable?",
+      "jp": "冬のレクリエーションをどうすればより持続可能にできますか。",
+      "hira": "ふゆ の れくりえーしょん を どう すれば より じぞく かのう に できます か",
+      "mp3": "bc_q13_how_can_winter_recreation_become_more_sustainable.mp3"
+    },
+    {
+      "n": 14,
+      "en": "Why can a family reunion be emotionally difficult?",
+      "jp": "家族の再会が感情的に難しくなることがあるのはなぜですか。",
+      "hira": "かぞく の さいかい が かんじょうてき に むずかしく なる こと が ある の は なぜ です か",
+      "mp3": "bc_q14_why_can_a_family_reunion_be_emotionally_difficult.mp3"
+    },
+    {
+      "n": 15,
+      "en": "Which year-end preparations are truly necessary?",
+      "jp": "どの年末の準備が本当に必要ですか。",
+      "hira": "どの ねんまつ の じゅんび が ほんとう に ひつよう です か",
+      "mp3": "bc_q15_which_yearend_preparations_are_truly_necessary.mp3"
+    },
+    {
+      "n": 16,
+      "en": "Who should decide how cultural heritage is preserved?",
+      "jp": "文化遺産をどう保存するかは誰が決めるべきですか。",
+      "hira": "ぶんか いさん を どう ほぞん する か は だれ が きめる べき です か",
+      "mp3": "bc_q16_who_should_decide_how_cultural_heritage_is_preserved.mp3"
+    },
+    {
+      "n": 17,
+      "en": "What makes a family ritual meaningful?",
+      "jp": "家族の儀式を意味あるものにするのは何ですか。",
+      "hira": "かぞく の ぎしき を いみ ある もの に する の は なん です か",
+      "mp3": "bc_q17_what_makes_a_family_ritual_meaningful.mp3"
+    },
+    {
+      "n": 18,
+      "en": "How can families strengthen intergenerational bonds?",
+      "jp": "家族は世代間の絆をどう強められますか。",
+      "hira": "かぞく は せだいかん の きずな を どう つよめられます か",
+      "mp3": "bc_q18_how_can_families_strengthen_intergenerational_bonds.mp3"
+    },
+    {
+      "n": 19,
+      "en": "Can collective memory present a biased version of history?",
+      "jp": "集合的記憶は偏った歴史像を示すことがありますか。",
+      "hira": "しゅうごうてき きおく は かたよった れきしぞう を しめす こと が あります か",
+      "mp3": "bc_q19_can_collective_memory_present_a_biased_version_of_history.mp3"
+    },
+    {
+      "n": 20,
+      "en": "What creates a strong sense of belonging?",
+      "jp": "強い帰属意識を生み出すものは何ですか。",
+      "hira": "つよい きぞく いしき を うみだす もの は なん です か",
+      "mp3": "bc_q20_what_creates_a_strong_sense_of_belonging.mp3"
+    },
+    {
+      "n": 21,
+      "en": "How does hospitality differ between cultures?",
+      "jp": "もてなしは文化によってどう異なりますか。",
+      "hira": "もてなし は ぶんか に よって どう ことなります か",
+      "mp3": "bc_q21_how_does_hospitality_differ_between_cultures.mp3"
+    },
+    {
+      "n": 22,
+      "en": "What does a festive meal communicate about identity?",
+      "jp": "祝いの食事はアイデンティティについて何を伝えますか。",
+      "hira": "いわい の しょくじ は あいでんてぃてぃ について なに を つたえます か",
+      "mp3": "bc_q22_what_does_a_festive_meal_communicate_about_identity.mp3"
+    },
+    {
+      "n": 23,
+      "en": "Why do traditional objects acquire symbolic meaning?",
+      "jp": "伝統的な物が象徴的な意味を持つのはなぜですか。",
+      "hira": "でんとうてき な もの が しょうちょうてき な いみ を もつ の は なぜ です か",
+      "mp3": "bc_q23_why_do_traditional_objects_acquire_symbolic_meaning.mp3"
+    },
+    {
+      "n": 24,
+      "en": "Can oral tradition remain reliable over many generations?",
+      "jp": "口承伝統は多くの世代を経ても信頼できますか。",
+      "hira": "こうしょう でんとう は おおく の せだい を へても しんらい できます か",
+      "mp3": "bc_q24_can_oral_tradition_remain_reliable_over_many_generations.mp3"
+    },
+    {
+      "n": 25,
+      "en": "Which traditions deserve public funding for preservation?",
+      "jp": "どの伝統が保存のための公的資金に値しますか。",
+      "hira": "どの でんとう が ほぞん の ため の こうてき しきん に あたい します か",
+      "mp3": "bc_q25_which_traditions_deserve_public_funding_for_preservation.mp3"
+    },
+    {
+      "n": 26,
+      "en": "How much adaptation can a tradition accept before losing its identity?",
+      "jp": "伝統はアイデンティティを失う前にどの程度適応できますか。",
+      "hira": "でんとう は あいでんてぃてぃ を うしなう まえ に どの ていど てきおう できます か",
+      "mp3": "bc_q26_how_much_adaptation_can_a_tradition_accept_before_losing_its_identity.mp3"
+    },
+    {
+      "n": 27,
+      "en": "How is cultural identity formed in a diverse society?",
+      "jp": "多様な社会で文化的アイデンティティはどう形成されますか。",
+      "hira": "たよう な しゃかい で ぶんかてき あいでんてぃてぃ は どう けいせい されます か",
+      "mp3": "bc_q27_how_is_cultural_identity_formed_in_a_diverse_society.mp3"
+    },
+    {
+      "n": 28,
+      "en": "Why is community participation important for local festivals?",
+      "jp": "地域の祭りに地域参加が重要なのはなぜですか。",
+      "hira": "ちいき の まつり に ちいき さんか が じゅうよう な の は なぜ です か",
+      "mp3": "bc_q28_why_is_community_participation_important_for_local_festivals.mp3"
+    },
+    {
+      "n": 29,
+      "en": "How can holiday events become more inclusive?",
+      "jp": "祝日の行事をどうすればより包摂的にできますか。",
+      "hira": "しゅくじつ の ぎょうじ を どう すれば より ほうせつてき に できます か",
+      "mp3": "bc_q29_how_can_holiday_events_become_more_inclusive.mp3"
+    },
+    {
+      "n": 30,
+      "en": "Does commercialization preserve traditions or weaken them?",
+      "jp": "商業化は伝統を保存しますか、それとも弱めますか。",
+      "hira": "しょうぎょうか は でんとう を ほぞん します か それとも よわめます か",
+      "mp3": "bc_q30_does_commercialization_preserve_traditions_or_weaken_them.mp3"
+    },
+    {
+      "n": 31,
+      "en": "What social purposes does gift-giving serve?",
+      "jp": "贈り物をすることにはどのような社会的目的がありますか。",
+      "hira": "おくりもの を する こと には どの よう な しゃかいてき もくてき が あります か",
+      "mp3": "bc_q31_what_social_purposes_does_giftgiving_serve.mp3"
+    },
+    {
+      "n": 32,
+      "en": "Can generosity be measured without considering money?",
+      "jp": "お金を考慮せずに寛大さを測れますか。",
+      "hira": "おかね を こうりょ せず に かんだいさ を はかれます か",
+      "mp3": "bc_q32_can_generosity_be_measured_without_considering_money.mp3"
+    },
+    {
+      "n": 33,
+      "en": "Why is gratitude important in professional relationships?",
+      "jp": "職業的関係で感謝が重要なのはなぜですか。",
+      "hira": "しょくぎょうてき かんけい で かんしゃ が じゅうよう な の は なぜ です か",
+      "mp3": "bc_q33_why_is_gratitude_important_in_professional_relationships.mp3"
+    },
+    {
+      "n": 34,
+      "en": "When does reciprocity become social pressure?",
+      "jp": "相互関係が社会的圧力になるのはいつですか。",
+      "hira": "そうご かんけい が しゃかいてき あつりょく に なる の は いつ です か",
+      "mp3": "bc_q34_when_does_reciprocity_become_social_pressure.mp3"
+    },
+    {
+      "n": 35,
+      "en": "Should people reject an unreasonable social obligation?",
+      "jp": "人々は不合理な社会的義務を拒否すべきですか。",
+      "hira": "ひとびと は ふごうり な しゃかいてき ぎむ を きょひ する べき です か",
+      "mp3": "bc_q35_should_people_reject_an_unreasonable_social_obligation.mp3"
+    },
+    {
+      "n": 36,
+      "en": "What makes a gesture genuinely thoughtful?",
+      "jp": "行為を本当に思いやりあるものにするのは何ですか。",
+      "hira": "こうい を ほんとう に おもいやり ある もの に する の は なん です か",
+      "mp3": "bc_q36_what_makes_a_gesture_genuinely_thoughtful.mp3"
+    },
+    {
+      "n": 37,
+      "en": "How should people choose a charitable donation?",
+      "jp": "人々は慈善寄付をどのように選ぶべきですか。",
+      "hira": "ひとびと は じぜん きふ を どの よう に えらぶ べき です か",
+      "mp3": "bc_q37_how_should_people_choose_a_charitable_donation.mp3"
+    },
+    {
+      "n": 38,
+      "en": "Is volunteer work as valuable as financial support?",
+      "jp": "ボランティア活動は金銭的支援と同じくらい価値がありますか。",
+      "hira": "ぼらんてぃあ かつどう は きんせんてき しえん と おなじ くらい かち が あります か",
+      "mp3": "bc_q38_is_volunteer_work_as_valuable_as_financial_support.mp3"
+    },
+    {
+      "n": 39,
+      "en": "Should disposable gift wrapping be discouraged?",
+      "jp": "使い捨ての贈り物の包装を控えるべきですか。",
+      "hira": "つかいすて の おくりもの の ほうそう を ひかえる べき です か",
+      "mp3": "bc_q39_should_disposable_gift_wrapping_be_discouraged.mp3"
+    },
+    {
+      "n": 40,
+      "en": "Why can a personalized message be more memorable than a gift?",
+      "jp": "個人向けのメッセージが贈り物より印象深い場合があるのはなぜですか。",
+      "hira": "こじんむけ の めっせーじ が おくりもの より いんしょうぶかい ばあい が ある の は なぜ です か",
+      "mp3": "bc_q40_why_can_a_personalized_message_be_more_memorable_than_a_gift.mp3"
+    },
+    {
+      "n": 41,
+      "en": "How should a recipient respond to an unwanted gift?",
+      "jp": "受取人は望まない贈り物にどう対応すべきですか。",
+      "hira": "うけとりにん は のぞまない おくりもの に どう たいおう する べき です か",
+      "mp3": "bc_q41_how_should_a_recipient_respond_to_an_unwanted_gift.mp3"
+    },
+    {
+      "n": 42,
+      "en": "What responsibilities does a giver have?",
+      "jp": "贈り手にはどのような責任がありますか。",
+      "hira": "おくりて には どの よう な せきにん が あります か",
+      "mp3": "bc_q42_what_responsibilities_does_a_giver_have.mp3"
+    },
+    {
+      "n": 43,
+      "en": "How do expectations affect holiday satisfaction?",
+      "jp": "期待は祝日の満足度にどう影響しますか。",
+      "hira": "きたい は しゅくじつ の まんぞくど に どう えいきょう します か",
+      "mp3": "bc_q43_how_do_expectations_affect_holiday_satisfaction.mp3"
+    },
+    {
+      "n": 44,
+      "en": "Does materialism damage the meaning of celebrations?",
+      "jp": "物質主義は祝祭の意味を損ないますか。",
+      "hira": "ぶっしつ しゅぎ は しゅくさい の いみ を そこないます か",
+      "mp3": "bc_q44_does_materialism_damage_the_meaning_of_celebrations.mp3"
+    },
+    {
+      "n": 45,
+      "en": "How does consumer spending affect the wider economy?",
+      "jp": "消費支出はより広い経済にどう影響しますか。",
+      "hira": "しょうひ ししゅつ は より ひろい けいざい に どう えいきょう します か",
+      "mp3": "bc_q45_how_does_consumer_spending_affect_the_wider_economy.mp3"
+    },
+    {
+      "n": 46,
+      "en": "What makes year-end reflection useful rather than superficial?",
+      "jp": "一年の振り返りを表面的でなく有用にするものは何ですか。",
+      "hira": "いちねん の ふりかえり を ひょうめんてき で なく ゆうよう に する もの は なん です か",
+      "mp3": "bc_q46_what_makes_yearend_reflection_useful_rather_than_superficial.mp3"
+    },
+    {
+      "n": 47,
+      "en": "How should an achievement be evaluated fairly?",
+      "jp": "達成をどのように公正に評価すべきですか。",
+      "hira": "たっせい を どの よう に こうせい に ひょうか する べき です か",
+      "mp3": "bc_q47_how_should_an_achievement_be_evaluated_fairly.mp3"
+    },
+    {
+      "n": 48,
+      "en": "What can a setback teach that success cannot?",
+      "jp": "挫折は成功では学べない何を教えますか。",
+      "hira": "ざせつ は せいこう では まなべない なに を おしえます か",
+      "mp3": "bc_q48_what_can_a_setback_teach_that_success_cannot.mp3"
+    },
+    {
+      "n": 49,
+      "en": "How can personal growth be measured?",
+      "jp": "人間的成長はどう測定できますか。",
+      "hira": "にんげんてき せいちょう は どう そくてい できます か",
+      "mp3": "bc_q49_how_can_personal_growth_be_measured.mp3"
+    },
+    {
+      "n": 50,
+      "en": "Which evidence makes a self-assessment reliable?",
+      "jp": "どの根拠が自己評価を信頼できるものにしますか。",
+      "hira": "どの こんきょ が じこ ひょうか を しんらい できる もの に します か",
+      "mp3": "bc_q50_which_evidence_makes_a_selfassessment_reliable.mp3"
+    },
+    {
+      "n": 51,
+      "en": "What makes feedback constructive rather than discouraging?",
+      "jp": "意見を落胆させるものでなく建設的にするのは何ですか。",
+      "hira": "いけん を らくたん させる もの で なく けんせつてき に する の は なん です か",
+      "mp3": "bc_q51_what_makes_feedback_constructive_rather_than_discouraging.mp3"
+    },
+    {
+      "n": 52,
+      "en": "How can people develop resilience after failure?",
+      "jp": "人々は失敗後に回復力をどう育てられますか。",
+      "hira": "ひとびと は しっぱいご に かいふくりょく を どう そだてられます か",
+      "mp3": "bc_q52_how_can_people_develop_resilience_after_failure.mp3"
+    },
+    {
+      "n": 53,
+      "en": "Why does motivation often decline over time?",
+      "jp": "意欲が時間とともに低下することが多いのはなぜですか。",
+      "hira": "いよく が じかん と とも に ていか する こと が おおい の は なぜ です か",
+      "mp3": "bc_q53_why_does_motivation_often_decline_over_time.mp3"
+    },
+    {
+      "n": 54,
+      "en": "How should people choose their highest priority?",
+      "jp": "人々は最優先事項をどう選ぶべきですか。",
+      "hira": "ひとびと は さいゆうせん じこう を どう えらぶ べき です か",
+      "mp3": "bc_q54_how_should_people_choose_their_highest_priority.mp3"
+    },
+    {
+      "n": 55,
+      "en": "What makes a goal genuinely measurable?",
+      "jp": "目標を本当に測定可能にするものは何ですか。",
+      "hira": "もくひょう を ほんとう に そくてい かのう に する もの は なん です か",
+      "mp3": "bc_q55_what_makes_a_goal_genuinely_measurable.mp3"
+    },
+    {
+      "n": 56,
+      "en": "How should a long-term objective be divided into stages?",
+      "jp": "長期目標をどのように段階へ分けるべきですか。",
+      "hira": "ちょうき もくひょう を どの よう に だんかい へ わける べき です か",
+      "mp3": "bc_q56_how_should_a_longterm_objective_be_divided_into_stages.mp3"
+    },
+    {
+      "n": 57,
+      "en": "What information should an action plan include?",
+      "jp": "行動計画にはどの情報を含めるべきですか。",
+      "hira": "こうどう けいかく には どの じょうほう を ふくめる べき です か",
+      "mp3": "bc_q57_what_information_should_an_action_plan_include.mp3"
+    },
+    {
+      "n": 58,
+      "en": "Does accountability improve performance or create anxiety?",
+      "jp": "説明責任は成果を改善しますか、それとも不安を生みますか。",
+      "hira": "せつめい せきにん は せいか を かいぜん します か それとも ふあん を うみます か",
+      "mp3": "bc_q58_does_accountability_improve_performance_or_create_anxiety.mp3"
+    },
+    {
+      "n": 59,
+      "en": "How can continuous improvement be maintained without exhaustion?",
+      "jp": "疲弊せずに継続的改善をどう維持できますか。",
+      "hira": "ひへい せず に けいぞくてき かいぜん を どう いじ できます か",
+      "mp3": "bc_q59_how_can_continuous_improvement_be_maintained_without_exhaustion.mp3"
+    },
+    {
+      "n": 60,
+      "en": "What turns a new beginning into lasting change?",
+      "jp": "新たな始まりを持続する変化に変えるものは何ですか。",
+      "hira": "あらた な はじまり を じぞく する へんか に かえる もの は なん です か",
+      "mp3": "bc_q60_what_turns_a_new_beginning_into_lasting_change.mp3"
+    }
+  ]
+}

@@ -1,1 +1,424 @@
-
+{
+  "cards": [
+    {
+      "n": 1,
+      "en": "winter solstice",
+      "jp": "冬至",
+      "hira": "とうじ",
+      "mp3": "bc_v01_winter_solstice.mp3"
+    },
+    {
+      "n": 2,
+      "en": "holiday season",
+      "jp": "年末の休暇シーズン",
+      "hira": "ねんまつ の きゅうか しーずん",
+      "mp3": "bc_v02_holiday_season.mp3"
+    },
+    {
+      "n": 3,
+      "en": "observance",
+      "jp": "記念行事",
+      "hira": "きねん ぎょうじ",
+      "mp3": "bc_v03_observance.mp3"
+    },
+    {
+      "n": 4,
+      "en": "religious ceremony",
+      "jp": "宗教儀式",
+      "hira": "しゅうきょう ぎしき",
+      "mp3": "bc_v04_religious_ceremony.mp3"
+    },
+    {
+      "n": 5,
+      "en": "secular celebration",
+      "jp": "宗教色のない祝祭",
+      "hira": "しゅうきょうしょく の ない しゅくさい",
+      "mp3": "bc_v05_secular_celebration.mp3"
+    },
+    {
+      "n": 6,
+      "en": "cultural tradition",
+      "jp": "文化的伝統",
+      "hira": "ぶんかてき でんとう",
+      "mp3": "bc_v06_cultural_tradition.mp3"
+    },
+    {
+      "n": 7,
+      "en": "seasonal custom",
+      "jp": "季節の習慣",
+      "hira": "きせつ の しゅうかん",
+      "mp3": "bc_v07_seasonal_custom.mp3"
+    },
+    {
+      "n": 8,
+      "en": "New Year’s Eve",
+      "jp": "大みそか",
+      "hira": "おおみそか",
+      "mp3": "bc_v08_new_years_eve.mp3"
+    },
+    {
+      "n": 9,
+      "en": "first shrine visit",
+      "jp": "初詣",
+      "hira": "はつもうで",
+      "mp3": "bc_v09_first_shrine_visit.mp3"
+    },
+    {
+      "n": 10,
+      "en": "festive atmosphere",
+      "jp": "祝祭的な雰囲気",
+      "hira": "しゅくさいてき な ふんいき",
+      "mp3": "bc_v10_festive_atmosphere.mp3"
+    },
+    {
+      "n": 11,
+      "en": "public holiday",
+      "jp": "祝日",
+      "hira": "しゅくじつ",
+      "mp3": "bc_v11_public_holiday.mp3"
+    },
+    {
+      "n": 12,
+      "en": "travel peak",
+      "jp": "旅行のピーク",
+      "hira": "りょこう の ぴーく",
+      "mp3": "bc_v12_travel_peak.mp3"
+    },
+    {
+      "n": 13,
+      "en": "winter recreation",
+      "jp": "冬のレクリエーション",
+      "hira": "ふゆ の れくりえーしょん",
+      "mp3": "bc_v13_winter_recreation.mp3"
+    },
+    {
+      "n": 14,
+      "en": "family reunion",
+      "jp": "家族の再会",
+      "hira": "かぞく の さいかい",
+      "mp3": "bc_v14_family_reunion.mp3"
+    },
+    {
+      "n": 15,
+      "en": "year-end preparations",
+      "jp": "年末の準備",
+      "hira": "ねんまつ の じゅんび",
+      "mp3": "bc_v15_yearend_preparations.mp3"
+    },
+    {
+      "n": 16,
+      "en": "cultural heritage",
+      "jp": "文化遺産",
+      "hira": "ぶんか いさん",
+      "mp3": "bc_v16_cultural_heritage.mp3"
+    },
+    {
+      "n": 17,
+      "en": "family ritual",
+      "jp": "家族の儀式",
+      "hira": "かぞく の ぎしき",
+      "mp3": "bc_v17_family_ritual.mp3"
+    },
+    {
+      "n": 18,
+      "en": "intergenerational bond",
+      "jp": "世代間の絆",
+      "hira": "せだいかん の きずな",
+      "mp3": "bc_v18_intergenerational_bond.mp3"
+    },
+    {
+      "n": 19,
+      "en": "collective memory",
+      "jp": "集合的記憶",
+      "hira": "しゅうごうてき きおく",
+      "mp3": "bc_v19_collective_memory.mp3"
+    },
+    {
+      "n": 20,
+      "en": "sense of belonging",
+      "jp": "帰属意識",
+      "hira": "きぞく いしき",
+      "mp3": "bc_v20_sense_of_belonging.mp3"
+    },
+    {
+      "n": 21,
+      "en": "hospitality",
+      "jp": "もてなし",
+      "hira": "もてなし",
+      "mp3": "bc_v21_hospitality.mp3"
+    },
+    {
+      "n": 22,
+      "en": "festive meal",
+      "jp": "祝いの食事",
+      "hira": "いわい の しょくじ",
+      "mp3": "bc_v22_festive_meal.mp3"
+    },
+    {
+      "n": 23,
+      "en": "symbolic meaning",
+      "jp": "象徴的な意味",
+      "hira": "しょうちょうてき な いみ",
+      "mp3": "bc_v23_symbolic_meaning.mp3"
+    },
+    {
+      "n": 24,
+      "en": "oral tradition",
+      "jp": "口承伝統",
+      "hira": "こうしょう でんとう",
+      "mp3": "bc_v24_oral_tradition.mp3"
+    },
+    {
+      "n": 25,
+      "en": "preservation",
+      "jp": "保存",
+      "hira": "ほぞん",
+      "mp3": "bc_v25_preservation.mp3"
+    },
+    {
+      "n": 26,
+      "en": "adaptation",
+      "jp": "適応",
+      "hira": "てきおう",
+      "mp3": "bc_v26_adaptation.mp3"
+    },
+    {
+      "n": 27,
+      "en": "cultural identity",
+      "jp": "文化的アイデンティティ",
+      "hira": "ぶんかてき あいでんてぃてぃ",
+      "mp3": "bc_v27_cultural_identity.mp3"
+    },
+    {
+      "n": 28,
+      "en": "community participation",
+      "jp": "地域参加",
+      "hira": "ちいき さんか",
+      "mp3": "bc_v28_community_participation.mp3"
+    },
+    {
+      "n": 29,
+      "en": "inclusion",
+      "jp": "包摂",
+      "hira": "ほうせつ",
+      "mp3": "bc_v29_inclusion.mp3"
+    },
+    {
+      "n": 30,
+      "en": "commercialization",
+      "jp": "商業化",
+      "hira": "しょうぎょうか",
+      "mp3": "bc_v30_commercialization.mp3"
+    },
+    {
+      "n": 31,
+      "en": "gift-giving",
+      "jp": "贈り物をすること",
+      "hira": "おくりもの を する こと",
+      "mp3": "bc_v31_giftgiving.mp3"
+    },
+    {
+      "n": 32,
+      "en": "generosity",
+      "jp": "寛大さ",
+      "hira": "かんだいさ",
+      "mp3": "bc_v32_generosity.mp3"
+    },
+    {
+      "n": 33,
+      "en": "gratitude",
+      "jp": "感謝",
+      "hira": "かんしゃ",
+      "mp3": "bc_v33_gratitude.mp3"
+    },
+    {
+      "n": 34,
+      "en": "reciprocity",
+      "jp": "相互関係",
+      "hira": "そうご かんけい",
+      "mp3": "bc_v34_reciprocity.mp3"
+    },
+    {
+      "n": 35,
+      "en": "social obligation",
+      "jp": "社会的義務",
+      "hira": "しゃかいてき ぎむ",
+      "mp3": "bc_v35_social_obligation.mp3"
+    },
+    {
+      "n": 36,
+      "en": "thoughtful gesture",
+      "jp": "思いやりのある行為",
+      "hira": "おもいやり の ある こうい",
+      "mp3": "bc_v36_thoughtful_gesture.mp3"
+    },
+    {
+      "n": 37,
+      "en": "charitable donation",
+      "jp": "慈善寄付",
+      "hira": "じぜん きふ",
+      "mp3": "bc_v37_charitable_donation.mp3"
+    },
+    {
+      "n": 38,
+      "en": "volunteer work",
+      "jp": "ボランティア活動",
+      "hira": "ぼらんてぃあ かつどう",
+      "mp3": "bc_v38_volunteer_work.mp3"
+    },
+    {
+      "n": 39,
+      "en": "gift wrapping",
+      "jp": "贈り物の包装",
+      "hira": "おくりもの の ほうそう",
+      "mp3": "bc_v39_gift_wrapping.mp3"
+    },
+    {
+      "n": 40,
+      "en": "personalized message",
+      "jp": "個人向けのメッセージ",
+      "hira": "こじんむけ の めっせーじ",
+      "mp3": "bc_v40_personalized_message.mp3"
+    },
+    {
+      "n": 41,
+      "en": "recipient",
+      "jp": "受取人",
+      "hira": "うけとりにん",
+      "mp3": "bc_v41_recipient.mp3"
+    },
+    {
+      "n": 42,
+      "en": "giver",
+      "jp": "贈り手",
+      "hira": "おくりて",
+      "mp3": "bc_v42_giver.mp3"
+    },
+    {
+      "n": 43,
+      "en": "expectation",
+      "jp": "期待",
+      "hira": "きたい",
+      "mp3": "bc_v43_expectation.mp3"
+    },
+    {
+      "n": 44,
+      "en": "materialism",
+      "jp": "物質主義",
+      "hira": "ぶっしつ しゅぎ",
+      "mp3": "bc_v44_materialism.mp3"
+    },
+    {
+      "n": 45,
+      "en": "consumer spending",
+      "jp": "消費支出",
+      "hira": "しょうひ ししゅつ",
+      "mp3": "bc_v45_consumer_spending.mp3"
+    },
+    {
+      "n": 46,
+      "en": "year-end reflection",
+      "jp": "一年の振り返り",
+      "hira": "いちねん の ふりかえり",
+      "mp3": "bc_v46_yearend_reflection.mp3"
+    },
+    {
+      "n": 47,
+      "en": "achievement",
+      "jp": "達成",
+      "hira": "たっせい",
+      "mp3": "bc_v47_achievement.mp3"
+    },
+    {
+      "n": 48,
+      "en": "setback",
+      "jp": "挫折",
+      "hira": "ざせつ",
+      "mp3": "bc_v48_setback.mp3"
+    },
+    {
+      "n": 49,
+      "en": "personal growth",
+      "jp": "人間的成長",
+      "hira": "にんげんてき せいちょう",
+      "mp3": "bc_v49_personal_growth.mp3"
+    },
+    {
+      "n": 50,
+      "en": "self-assessment",
+      "jp": "自己評価",
+      "hira": "じこ ひょうか",
+      "mp3": "bc_v50_selfassessment.mp3"
+    },
+    {
+      "n": 51,
+      "en": "constructive feedback",
+      "jp": "建設的な意見",
+      "hira": "けんせつてき な いけん",
+      "mp3": "bc_v51_constructive_feedback.mp3"
+    },
+    {
+      "n": 52,
+      "en": "resilience",
+      "jp": "回復力",
+      "hira": "かいふくりょく",
+      "mp3": "bc_v52_resilience.mp3"
+    },
+    {
+      "n": 53,
+      "en": "motivation",
+      "jp": "意欲",
+      "hira": "いよく",
+      "mp3": "bc_v53_motivation.mp3"
+    },
+    {
+      "n": 54,
+      "en": "priority",
+      "jp": "優先事項",
+      "hira": "ゆうせん じこう",
+      "mp3": "bc_v54_priority.mp3"
+    },
+    {
+      "n": 55,
+      "en": "measurable goal",
+      "jp": "測定可能な目標",
+      "hira": "そくてい かのう な もくひょう",
+      "mp3": "bc_v55_measurable_goal.mp3"
+    },
+    {
+      "n": 56,
+      "en": "long-term objective",
+      "jp": "長期目標",
+      "hira": "ちょうき もくひょう",
+      "mp3": "bc_v56_longterm_objective.mp3"
+    },
+    {
+      "n": 57,
+      "en": "action plan",
+      "jp": "行動計画",
+      "hira": "こうどう けいかく",
+      "mp3": "bc_v57_action_plan.mp3"
+    },
+    {
+      "n": 58,
+      "en": "accountability",
+      "jp": "説明責任",
+      "hira": "せつめい せきにん",
+      "mp3": "bc_v58_accountability.mp3"
+    },
+    {
+      "n": 59,
+      "en": "continuous improvement",
+      "jp": "継続的改善",
+      "hira": "けいぞくてき かいぜん",
+      "mp3": "bc_v59_continuous_improvement.mp3"
+    },
+    {
+      "n": 60,
+      "en": "new beginning",
+      "jp": "新たな始まり",
+      "hira": "あらた な はじまり",
+      "mp3": "bc_v60_new_beginning.mp3"
+    }
+  ]
+}

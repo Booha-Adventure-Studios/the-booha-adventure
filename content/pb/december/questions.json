@@ -1,1 +1,424 @@
-
+{
+  "cards": [
+    {
+      "n": 1,
+      "en": "Do you like winter?",
+      "jp": "冬が好きですか。",
+      "hira": "ふゆ が すき です か",
+      "mp3": "pb_q01_do_you_like_winter.mp3"
+    },
+    {
+      "n": 2,
+      "en": "When does winter break start?",
+      "jp": "冬休みはいつ始まりますか。",
+      "hira": "ふゆやすみ は いつ はじまります か",
+      "mp3": "pb_q02_when_does_winter_break_start.mp3"
+    },
+    {
+      "n": 3,
+      "en": "What do you do on holidays?",
+      "jp": "休日に何をしますか。",
+      "hira": "きゅうじつ に なに を します か",
+      "mp3": "pb_q03_what_do_you_do_on_holidays.mp3"
+    },
+    {
+      "n": 4,
+      "en": "Do you celebrate Christmas?",
+      "jp": "クリスマスを祝いますか。",
+      "hira": "くりすます を いわいます か",
+      "mp3": "pb_q04_do_you_celebrate_christmas.mp3"
+    },
+    {
+      "n": 5,
+      "en": "What do you do at New Year?",
+      "jp": "お正月に何をしますか。",
+      "hira": "おしょうがつ に なに を します か",
+      "mp3": "pb_q05_what_do_you_do_at_new_year.mp3"
+    },
+    {
+      "n": 6,
+      "en": "What do you do on New Year’s Eve?",
+      "jp": "大みそかに何をしますか。",
+      "hira": "おおみそか に なに を します か",
+      "mp3": "pb_q06_what_do_you_do_on_new_years_eve.mp3"
+    },
+    {
+      "n": 7,
+      "en": "Where do you go on New Year’s Day?",
+      "jp": "元日にどこへ行きますか。",
+      "hira": "がんじつ に どこ へ いきます か",
+      "mp3": "pb_q07_where_do_you_go_on_new_years_day.mp3"
+    },
+    {
+      "n": 8,
+      "en": "Do you visit a shrine?",
+      "jp": "神社へ行きますか。",
+      "hira": "じんじゃ へ いきます か",
+      "mp3": "pb_q08_do_you_visit_a_shrine.mp3"
+    },
+    {
+      "n": 9,
+      "en": "Is there a temple near your home?",
+      "jp": "家の近くにお寺はありますか。",
+      "hira": "いえ の ちかく に おてら は あります か",
+      "mp3": "pb_q09_is_there_a_temple_near_your_home.mp3"
+    },
+    {
+      "n": 10,
+      "en": "Do you like snow?",
+      "jp": "雪が好きですか。",
+      "hira": "ゆき が すき です か",
+      "mp3": "pb_q10_do_you_like_snow.mp3"
+    },
+    {
+      "n": 11,
+      "en": "Can you make a snowman?",
+      "jp": "雪だるまを作れますか。",
+      "hira": "ゆきだるま を つくれます か",
+      "mp3": "pb_q11_can_you_make_a_snowman.mp3"
+    },
+    {
+      "n": 12,
+      "en": "Have you ridden a sled?",
+      "jp": "そりに乗ったことがありますか。",
+      "hira": "そり に のった こと が あります か",
+      "mp3": "pb_q12_have_you_ridden_a_sled.mp3"
+    },
+    {
+      "n": 13,
+      "en": "Can you go ice skating?",
+      "jp": "アイススケートができますか。",
+      "hira": "あいす すけーと が できます か",
+      "mp3": "pb_q13_can_you_go_ice_skating.mp3"
+    },
+    {
+      "n": 14,
+      "en": "Do you like holiday lights?",
+      "jp": "イルミネーションが好きですか。",
+      "hira": "いるみねーしょん が すき です か",
+      "mp3": "pb_q14_do_you_like_holiday_lights.mp3"
+    },
+    {
+      "n": 15,
+      "en": "Do you drink hot cocoa?",
+      "jp": "ホットココアを飲みますか。",
+      "hira": "ほっと ここあ を のみます か",
+      "mp3": "pb_q15_do_you_drink_hot_cocoa.mp3"
+    },
+    {
+      "n": 16,
+      "en": "What traditions does your family have?",
+      "jp": "あなたの家族にはどんな伝統がありますか。",
+      "hira": "あなた の かぞく には どんな でんとう が あります か",
+      "mp3": "pb_q16_what_traditions_does_your_family_have.mp3"
+    },
+    {
+      "n": 17,
+      "en": "Who joins your celebration?",
+      "jp": "だれがお祝いに参加しますか。",
+      "hira": "だれ が おいわい に さんか します か",
+      "mp3": "pb_q17_who_joins_your_celebration.mp3"
+    },
+    {
+      "n": 18,
+      "en": "Do you have a family dinner?",
+      "jp": "家族で夕食を食べますか。",
+      "hira": "かぞく で ゆうしょく を たべます か",
+      "mp3": "pb_q18_do_you_have_a_family_dinner.mp3"
+    },
+    {
+      "n": 19,
+      "en": "What special food do you eat?",
+      "jp": "どんな特別な食べ物を食べますか。",
+      "hira": "どんな とくべつ な たべもの を たべます か",
+      "mp3": "pb_q19_what_special_food_do_you_eat.mp3"
+    },
+    {
+      "n": 20,
+      "en": "Do you make a cake?",
+      "jp": "ケーキを作りますか。",
+      "hira": "けーき を つくります か",
+      "mp3": "pb_q20_do_you_make_a_cake.mp3"
+    },
+    {
+      "n": 21,
+      "en": "Do you send cards?",
+      "jp": "カードを送りますか。",
+      "hira": "かーど を おくります か",
+      "mp3": "pb_q21_do_you_send_cards.mp3"
+    },
+    {
+      "n": 22,
+      "en": "What music do you listen to?",
+      "jp": "どんな音楽を聞きますか。",
+      "hira": "どんな おんがく を ききます か",
+      "mp3": "pb_q22_what_music_do_you_listen_to.mp3"
+    },
+    {
+      "n": 23,
+      "en": "What songs do you sing?",
+      "jp": "どんな歌を歌いますか。",
+      "hira": "どんな うた を うたいます か",
+      "mp3": "pb_q23_what_songs_do_you_sing.mp3"
+    },
+    {
+      "n": 24,
+      "en": "Do you take a family photo?",
+      "jp": "家族写真を撮りますか。",
+      "hira": "かぞく しゃしん を とります か",
+      "mp3": "pb_q24_do_you_take_a_family_photo.mp3"
+    },
+    {
+      "n": 25,
+      "en": "What games do you play?",
+      "jp": "どんなゲームをしますか。",
+      "hira": "どんな げーむ を します か",
+      "mp3": "pb_q25_what_games_do_you_play.mp3"
+    },
+    {
+      "n": 26,
+      "en": "Who is in your family?",
+      "jp": "あなたの家族にはだれがいますか。",
+      "hira": "あなた の かぞく には だれ が います か",
+      "mp3": "pb_q26_who_is_in_your_family.mp3"
+    },
+    {
+      "n": 27,
+      "en": "Do you visit your grandparents?",
+      "jp": "祖父母を訪ねますか。",
+      "hira": "そふぼ を たずねます か",
+      "mp3": "pb_q27_do_you_visit_your_grandparents.mp3"
+    },
+    {
+      "n": 28,
+      "en": "What makes you smile?",
+      "jp": "何をすると笑顔になりますか。",
+      "hira": "なに を する と えがお に なります か",
+      "mp3": "pb_q28_what_makes_you_smile.mp3"
+    },
+    {
+      "n": 29,
+      "en": "What is your favorite memory?",
+      "jp": "お気に入りの思い出は何ですか。",
+      "hira": "おきにいり の おもいで は なん です か",
+      "mp3": "pb_q29_what_is_your_favorite_memory.mp3"
+    },
+    {
+      "n": 30,
+      "en": "What do you do every year?",
+      "jp": "毎年何をしますか。",
+      "hira": "まいとし なに を します か",
+      "mp3": "pb_q30_what_do_you_do_every_year.mp3"
+    },
+    {
+      "n": 31,
+      "en": "What present did you get?",
+      "jp": "どんなプレゼントをもらいましたか。",
+      "hira": "どんな ぷれぜんと を もらいました か",
+      "mp3": "pb_q31_what_present_did_you_get.mp3"
+    },
+    {
+      "n": 32,
+      "en": "What did you give your friend?",
+      "jp": "友だちに何をあげましたか。",
+      "hira": "ともだち に なに を あげました か",
+      "mp3": "pb_q32_what_did_you_give_your_friend.mp3"
+    },
+    {
+      "n": 33,
+      "en": "What did you get from your teacher?",
+      "jp": "先生から何をもらいましたか。",
+      "hira": "せんせい から なに を もらいました か",
+      "mp3": "pb_q33_what_did_you_get_from_your_teacher.mp3"
+    },
+    {
+      "n": 34,
+      "en": "Do you write thank-you cards?",
+      "jp": "サンキューカードを書きますか。",
+      "hira": "さんきゅー かーど を かきます か",
+      "mp3": "pb_q34_do_you_write_thankyou_cards.mp3"
+    },
+    {
+      "n": 35,
+      "en": "Do you like surprises?",
+      "jp": "サプライズが好きですか。",
+      "hira": "さぷらいず が すき です か",
+      "mp3": "pb_q35_do_you_like_surprises.mp3"
+    },
+    {
+      "n": 36,
+      "en": "Can you wrap a present?",
+      "jp": "プレゼントを包めますか。",
+      "hira": "ぷれぜんと を つつめます か",
+      "mp3": "pb_q36_can_you_wrap_a_present.mp3"
+    },
+    {
+      "n": 37,
+      "en": "What is in the box?",
+      "jp": "箱の中には何がありますか。",
+      "hira": "はこ の なか には なに が あります か",
+      "mp3": "pb_q37_what_is_in_the_box.mp3"
+    },
+    {
+      "n": 38,
+      "en": "Do you use a gift bag?",
+      "jp": "プレゼント袋を使いますか。",
+      "hira": "ぷれぜんと ぶくろ を つかいます か",
+      "mp3": "pb_q38_do_you_use_a_gift_bag.mp3"
+    },
+    {
+      "n": 39,
+      "en": "What color ribbon do you like?",
+      "jp": "何色のリボンが好きですか。",
+      "hira": "なにいろ の りぼん が すき です か",
+      "mp3": "pb_q39_what_color_ribbon_do_you_like.mp3"
+    },
+    {
+      "n": 40,
+      "en": "Do you write letters?",
+      "jp": "手紙を書きますか。",
+      "hira": "てがみ を かきます か",
+      "mp3": "pb_q40_do_you_write_letters.mp3"
+    },
+    {
+      "n": 41,
+      "en": "When do you say thank you?",
+      "jp": "いつありがとうと言いますか。",
+      "hira": "いつ ありがとう と いいます か",
+      "mp3": "pb_q41_when_do_you_say_thank_you.mp3"
+    },
+    {
+      "n": 42,
+      "en": "Who is kind to you?",
+      "jp": "だれがあなたに親切ですか。",
+      "hira": "だれ が あなた に しんせつ です か",
+      "mp3": "pb_q42_who_is_kind_to_you.mp3"
+    },
+    {
+      "n": 43,
+      "en": "Did you get New Year’s money?",
+      "jp": "お年玉をもらいましたか。",
+      "hira": "おとしだま を もらいました か",
+      "mp3": "pb_q43_did_you_get_new_years_money.mp3"
+    },
+    {
+      "n": 44,
+      "en": "What toy do you want?",
+      "jp": "どんなおもちゃがほしいですか。",
+      "hira": "どんな おもちゃ が ほしい です か",
+      "mp3": "pb_q44_what_toy_do_you_want.mp3"
+    },
+    {
+      "n": 45,
+      "en": "What book do you want to read?",
+      "jp": "どんな本を読みたいですか。",
+      "hira": "どんな ほん を よみたい です か",
+      "mp3": "pb_q45_what_book_do_you_want_to_read.mp3"
+    },
+    {
+      "n": 46,
+      "en": "What did you learn this year?",
+      "jp": "今年何を学びましたか。",
+      "hira": "ことし なに を まなびました か",
+      "mp3": "pb_q46_what_did_you_learn_this_year.mp3"
+    },
+    {
+      "n": 47,
+      "en": "What did you enjoy last year?",
+      "jp": "去年何を楽しみましたか。",
+      "hira": "きょねん なに を たのしみました か",
+      "mp3": "pb_q47_what_did_you_enjoy_last_year.mp3"
+    },
+    {
+      "n": 48,
+      "en": "What will you do next year?",
+      "jp": "来年何をしますか。",
+      "hira": "らいねん なに を します か",
+      "mp3": "pb_q48_what_will_you_do_next_year.mp3"
+    },
+    {
+      "n": 49,
+      "en": "What was your favorite lesson?",
+      "jp": "お気に入りのレッスンは何でしたか。",
+      "hira": "おきにいり の れっすん は なん でした か",
+      "mp3": "pb_q49_what_was_your_favorite_lesson.mp3"
+    },
+    {
+      "n": 50,
+      "en": "What is your goal?",
+      "jp": "あなたの目標は何ですか。",
+      "hira": "あなた の もくひょう は なん です か",
+      "mp3": "pb_q50_what_is_your_goal.mp3"
+    },
+    {
+      "n": 51,
+      "en": "What was your biggest success?",
+      "jp": "一番の成功は何でしたか。",
+      "hira": "いちばん の せいこう は なん でした か",
+      "mp3": "pb_q51_what_was_your_biggest_success.mp3"
+    },
+    {
+      "n": 52,
+      "en": "What challenge did you try?",
+      "jp": "どんなことに挑戦しましたか。",
+      "hira": "どんな こと に ちょうせん しました か",
+      "mp3": "pb_q52_what_challenge_did_you_try.mp3"
+    },
+    {
+      "n": 53,
+      "en": "What did you learn from a mistake?",
+      "jp": "間違いから何を学びましたか。",
+      "hira": "まちがい から なに を まなびました か",
+      "mp3": "pb_q53_what_did_you_learn_from_a_mistake.mp3"
+    },
+    {
+      "n": 54,
+      "en": "Did you make a new friend?",
+      "jp": "新しい友だちができましたか。",
+      "hira": "あたらしい ともだち が できました か",
+      "mp3": "pb_q54_did_you_make_a_new_friend.mp3"
+    },
+    {
+      "n": 55,
+      "en": "Who was your favorite teacher?",
+      "jp": "お気に入りの先生はだれでしたか。",
+      "hira": "おきにいり の せんせい は だれ でした か",
+      "mp3": "pb_q55_who_was_your_favorite_teacher.mp3"
+    },
+    {
+      "n": 56,
+      "en": "What was your favorite activity?",
+      "jp": "お気に入りの活動は何でしたか。",
+      "hira": "おきにいり の かつどう は なん でした か",
+      "mp3": "pb_q56_what_was_your_favorite_activity.mp3"
+    },
+    {
+      "n": 57,
+      "en": "What did you improve this year?",
+      "jp": "今年何が上達しましたか。",
+      "hira": "ことし なに が じょうたつ しました か",
+      "mp3": "pb_q57_what_did_you_improve_this_year.mp3"
+    },
+    {
+      "n": 58,
+      "en": "What new skill did you learn?",
+      "jp": "どんな新しい技能を学びましたか。",
+      "hira": "どんな あたらしい ぎのう を まなびました か",
+      "mp3": "pb_q58_what_new_skill_did_you_learn.mp3"
+    },
+    {
+      "n": 59,
+      "en": "How will you try your best next year?",
+      "jp": "来年どのようにがんばりますか。",
+      "hira": "らいねん どの よう に がんばります か",
+      "mp3": "pb_q59_how_will_you_try_your_best_next_year.mp3"
+    },
+    {
+      "n": 60,
+      "en": "What are you proud of?",
+      "jp": "何を誇りに思いますか。",
+      "hira": "なに を ほこり に おもいます か",
+      "mp3": "pb_q60_what_are_you_proud_of.mp3"
+    }
+  ]
+}

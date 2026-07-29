@@ -1,1 +1,424 @@
-
+{
+  "cards": [
+    {
+      "n": 1,
+      "en": "winter",
+      "jp": "冬",
+      "hira": "ふゆ",
+      "mp3": "pb_v01_winter.mp3"
+    },
+    {
+      "n": 2,
+      "en": "winter break",
+      "jp": "冬休み",
+      "hira": "ふゆやすみ",
+      "mp3": "pb_v02_winter_break.mp3"
+    },
+    {
+      "n": 3,
+      "en": "holiday",
+      "jp": "休日",
+      "hira": "きゅうじつ",
+      "mp3": "pb_v03_holiday.mp3"
+    },
+    {
+      "n": 4,
+      "en": "Christmas",
+      "jp": "クリスマス",
+      "hira": "くりすます",
+      "mp3": "pb_v04_christmas.mp3"
+    },
+    {
+      "n": 5,
+      "en": "New Year",
+      "jp": "お正月",
+      "hira": "おしょうがつ",
+      "mp3": "pb_v05_new_year.mp3"
+    },
+    {
+      "n": 6,
+      "en": "New Year’s Eve",
+      "jp": "大みそか",
+      "hira": "おおみそか",
+      "mp3": "pb_v06_new_years_eve.mp3"
+    },
+    {
+      "n": 7,
+      "en": "New Year’s Day",
+      "jp": "元日",
+      "hira": "がんじつ",
+      "mp3": "pb_v07_new_years_day.mp3"
+    },
+    {
+      "n": 8,
+      "en": "shrine",
+      "jp": "神社",
+      "hira": "じんじゃ",
+      "mp3": "pb_v08_shrine.mp3"
+    },
+    {
+      "n": 9,
+      "en": "temple",
+      "jp": "お寺",
+      "hira": "おてら",
+      "mp3": "pb_v09_temple.mp3"
+    },
+    {
+      "n": 10,
+      "en": "snow",
+      "jp": "雪",
+      "hira": "ゆき",
+      "mp3": "pb_v10_snow.mp3"
+    },
+    {
+      "n": 11,
+      "en": "snowman",
+      "jp": "雪だるま",
+      "hira": "ゆきだるま",
+      "mp3": "pb_v11_snowman.mp3"
+    },
+    {
+      "n": 12,
+      "en": "sled",
+      "jp": "そり",
+      "hira": "そり",
+      "mp3": "pb_v12_sled.mp3"
+    },
+    {
+      "n": 13,
+      "en": "ice skating",
+      "jp": "アイススケート",
+      "hira": "あいす すけーと",
+      "mp3": "pb_v13_ice_skating.mp3"
+    },
+    {
+      "n": 14,
+      "en": "holiday lights",
+      "jp": "イルミネーション",
+      "hira": "いるみねーしょん",
+      "mp3": "pb_v14_holiday_lights.mp3"
+    },
+    {
+      "n": 15,
+      "en": "hot cocoa",
+      "jp": "ホットココア",
+      "hira": "ほっと ここあ",
+      "mp3": "pb_v15_hot_cocoa.mp3"
+    },
+    {
+      "n": 16,
+      "en": "tradition",
+      "jp": "伝統",
+      "hira": "でんとう",
+      "mp3": "pb_v16_tradition.mp3"
+    },
+    {
+      "n": 17,
+      "en": "celebration",
+      "jp": "お祝い",
+      "hira": "おいわい",
+      "mp3": "pb_v17_celebration.mp3"
+    },
+    {
+      "n": 18,
+      "en": "family dinner",
+      "jp": "家族の夕食",
+      "hira": "かぞく の ゆうしょく",
+      "mp3": "pb_v18_family_dinner.mp3"
+    },
+    {
+      "n": 19,
+      "en": "special food",
+      "jp": "特別な食べ物",
+      "hira": "とくべつ な たべもの",
+      "mp3": "pb_v19_special_food.mp3"
+    },
+    {
+      "n": 20,
+      "en": "cake",
+      "jp": "ケーキ",
+      "hira": "けーき",
+      "mp3": "pb_v20_cake.mp3"
+    },
+    {
+      "n": 21,
+      "en": "card",
+      "jp": "カード",
+      "hira": "かーど",
+      "mp3": "pb_v21_card.mp3"
+    },
+    {
+      "n": 22,
+      "en": "music",
+      "jp": "音楽",
+      "hira": "おんがく",
+      "mp3": "pb_v22_music.mp3"
+    },
+    {
+      "n": 23,
+      "en": "song",
+      "jp": "歌",
+      "hira": "うた",
+      "mp3": "pb_v23_song.mp3"
+    },
+    {
+      "n": 24,
+      "en": "photo",
+      "jp": "写真",
+      "hira": "しゃしん",
+      "mp3": "pb_v24_photo.mp3"
+    },
+    {
+      "n": 25,
+      "en": "game",
+      "jp": "ゲーム",
+      "hira": "げーむ",
+      "mp3": "pb_v25_game.mp3"
+    },
+    {
+      "n": 26,
+      "en": "family",
+      "jp": "家族",
+      "hira": "かぞく",
+      "mp3": "pb_v26_family.mp3"
+    },
+    {
+      "n": 27,
+      "en": "grandparents",
+      "jp": "祖父母",
+      "hira": "そふぼ",
+      "mp3": "pb_v27_grandparents.mp3"
+    },
+    {
+      "n": 28,
+      "en": "smile",
+      "jp": "笑顔",
+      "hira": "えがお",
+      "mp3": "pb_v28_smile.mp3"
+    },
+    {
+      "n": 29,
+      "en": "memory",
+      "jp": "思い出",
+      "hira": "おもいで",
+      "mp3": "pb_v29_memory.mp3"
+    },
+    {
+      "n": 30,
+      "en": "every year",
+      "jp": "毎年",
+      "hira": "まいとし",
+      "mp3": "pb_v30_every_year.mp3"
+    },
+    {
+      "n": 31,
+      "en": "present",
+      "jp": "プレゼント",
+      "hira": "ぷれぜんと",
+      "mp3": "pb_v31_present.mp3"
+    },
+    {
+      "n": 32,
+      "en": "give",
+      "jp": "あげる",
+      "hira": "あげる",
+      "mp3": "pb_v32_give.mp3"
+    },
+    {
+      "n": 33,
+      "en": "get",
+      "jp": "もらう",
+      "hira": "もらう",
+      "mp3": "pb_v33_get.mp3"
+    },
+    {
+      "n": 34,
+      "en": "thank-you card",
+      "jp": "サンキューカード",
+      "hira": "さんきゅー かーど",
+      "mp3": "pb_v34_thankyou_card.mp3"
+    },
+    {
+      "n": 35,
+      "en": "surprise",
+      "jp": "サプライズ",
+      "hira": "さぷらいず",
+      "mp3": "pb_v35_surprise.mp3"
+    },
+    {
+      "n": 36,
+      "en": "wrap",
+      "jp": "包む",
+      "hira": "つつむ",
+      "mp3": "pb_v36_wrap.mp3"
+    },
+    {
+      "n": 37,
+      "en": "box",
+      "jp": "箱",
+      "hira": "はこ",
+      "mp3": "pb_v37_box.mp3"
+    },
+    {
+      "n": 38,
+      "en": "gift bag",
+      "jp": "プレゼント袋",
+      "hira": "ぷれぜんと ぶくろ",
+      "mp3": "pb_v38_gift_bag.mp3"
+    },
+    {
+      "n": 39,
+      "en": "ribbon",
+      "jp": "リボン",
+      "hira": "りぼん",
+      "mp3": "pb_v39_ribbon.mp3"
+    },
+    {
+      "n": 40,
+      "en": "letter",
+      "jp": "手紙",
+      "hira": "てがみ",
+      "mp3": "pb_v40_letter.mp3"
+    },
+    {
+      "n": 41,
+      "en": "thank you",
+      "jp": "ありがとう",
+      "hira": "ありがとう",
+      "mp3": "pb_v41_thank_you.mp3"
+    },
+    {
+      "n": 42,
+      "en": "kindness",
+      "jp": "親切",
+      "hira": "しんせつ",
+      "mp3": "pb_v42_kindness.mp3"
+    },
+    {
+      "n": 43,
+      "en": "New Year’s money",
+      "jp": "お年玉",
+      "hira": "おとしだま",
+      "mp3": "pb_v43_new_years_money.mp3"
+    },
+    {
+      "n": 44,
+      "en": "toy",
+      "jp": "おもちゃ",
+      "hira": "おもちゃ",
+      "mp3": "pb_v44_toy.mp3"
+    },
+    {
+      "n": 45,
+      "en": "book",
+      "jp": "本",
+      "hira": "ほん",
+      "mp3": "pb_v45_book.mp3"
+    },
+    {
+      "n": 46,
+      "en": "this year",
+      "jp": "今年",
+      "hira": "ことし",
+      "mp3": "pb_v46_this_year.mp3"
+    },
+    {
+      "n": 47,
+      "en": "last year",
+      "jp": "去年",
+      "hira": "きょねん",
+      "mp3": "pb_v47_last_year.mp3"
+    },
+    {
+      "n": 48,
+      "en": "next year",
+      "jp": "来年",
+      "hira": "らいねん",
+      "mp3": "pb_v48_next_year.mp3"
+    },
+    {
+      "n": 49,
+      "en": "lesson",
+      "jp": "レッスン",
+      "hira": "れっすん",
+      "mp3": "pb_v49_lesson.mp3"
+    },
+    {
+      "n": 50,
+      "en": "goal",
+      "jp": "目標",
+      "hira": "もくひょう",
+      "mp3": "pb_v50_goal.mp3"
+    },
+    {
+      "n": 51,
+      "en": "success",
+      "jp": "成功",
+      "hira": "せいこう",
+      "mp3": "pb_v51_success.mp3"
+    },
+    {
+      "n": 52,
+      "en": "challenge",
+      "jp": "挑戦",
+      "hira": "ちょうせん",
+      "mp3": "pb_v52_challenge.mp3"
+    },
+    {
+      "n": 53,
+      "en": "mistake",
+      "jp": "間違い",
+      "hira": "まちがい",
+      "mp3": "pb_v53_mistake.mp3"
+    },
+    {
+      "n": 54,
+      "en": "friend",
+      "jp": "友だち",
+      "hira": "ともだち",
+      "mp3": "pb_v54_friend.mp3"
+    },
+    {
+      "n": 55,
+      "en": "teacher",
+      "jp": "先生",
+      "hira": "せんせい",
+      "mp3": "pb_v55_teacher.mp3"
+    },
+    {
+      "n": 56,
+      "en": "favorite",
+      "jp": "お気に入り",
+      "hira": "おきにいり",
+      "mp3": "pb_v56_favorite.mp3"
+    },
+    {
+      "n": 57,
+      "en": "activity",
+      "jp": "活動",
+      "hira": "かつどう",
+      "mp3": "pb_v57_activity.mp3"
+    },
+    {
+      "n": 58,
+      "en": "improve",
+      "jp": "上達する",
+      "hira": "じょうたつ する",
+      "mp3": "pb_v58_improve.mp3"
+    },
+    {
+      "n": 59,
+      "en": "new skill",
+      "jp": "新しい技能",
+      "hira": "あたらしい ぎのう",
+      "mp3": "pb_v59_new_skill.mp3"
+    },
+    {
+      "n": 60,
+      "en": "proud",
+      "jp": "誇りに思う",
+      "hira": "ほこり に おもう",
+      "mp3": "pb_v60_proud.mp3"
+    }
+  ]
+}
