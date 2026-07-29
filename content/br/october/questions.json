@@ -1,1 +1,424 @@
-
+{
+  "cards": [
+    {
+      "n": 1,
+      "en": "How do you go to school?",
+      "jp": "学校へどうやって行きますか。",
+      "hira": "がっこう へ どうやって いき ます か",
+      "mp3": "br_q01_how_do_you_go_to_school.mp3"
+    },
+    {
+      "n": 2,
+      "en": "Do you ride a bicycle?",
+      "jp": "自転車に乗りますか。",
+      "hira": "じてんしゃ に のり ます か",
+      "mp3": "br_q02_do_you_ride_a_bicycle.mp3"
+    },
+    {
+      "n": 3,
+      "en": "Which is faster, a bus or a train?",
+      "jp": "バスと電車ではどちらが速いですか。",
+      "hira": "ばす と でんしゃ では どちら が はやい です か",
+      "mp3": "br_q03_which_is_faster_a_bus_or_a_train.mp3"
+    },
+    {
+      "n": 4,
+      "en": "Have you ever taken a ferry?",
+      "jp": "フェリーに乗ったことがありますか。",
+      "hira": "ふぇりー に のった こと が あります か",
+      "mp3": "br_q04_have_you_ever_taken_a_ferry.mp3"
+    },
+    {
+      "n": 5,
+      "en": "Do you like trams?",
+      "jp": "路面電車は好きですか。",
+      "hira": "ろめんでんしゃ は すき です か",
+      "mp3": "br_q05_do_you_like_trams.mp3"
+    },
+    {
+      "n": 6,
+      "en": "Can you drive a car?",
+      "jp": "車を運転できますか。",
+      "hira": "くるま を うんてん でき ます か",
+      "mp3": "br_q06_can_you_drive_a_car.mp3"
+    },
+    {
+      "n": 7,
+      "en": "What color is your bike?",
+      "jp": "あなたの自転車は何色ですか。",
+      "hira": "あなた の じてんしゃ は なにいろ です か",
+      "mp3": "br_q07_what_color_is_your_bike.mp3"
+    },
+    {
+      "n": 8,
+      "en": "Which vehicle would you like to try?",
+      "jp": "どんな乗り物に乗ってみたいですか。",
+      "hira": "どんな のりもの に のって みたい です か",
+      "mp3": "br_q08_which_vehicle_would_you_like_to_try.mp3"
+    },
+    {
+      "n": 9,
+      "en": "Is there a subway in your city?",
+      "jp": "あなたの町に地下鉄はありますか。",
+      "hira": "あなた の まち に ちかてつ は あり ます か",
+      "mp3": "br_q09_is_there_a_subway_in_your_city.mp3"
+    },
+    {
+      "n": 10,
+      "en": "How often do you take a taxi?",
+      "jp": "どのくらいの頻度でタクシーに乗りますか。",
+      "hira": "どの くらい の ひんど で たくしー に のります か",
+      "mp3": "br_q10_how_often_do_you_take_a_taxi.mp3"
+    },
+    {
+      "n": 11,
+      "en": "What does an ambulance do?",
+      "jp": "救急車は何をしますか。",
+      "hira": "きゅうきゅうしゃ は なに を し ます か",
+      "mp3": "br_q11_what_does_an_ambulance_do.mp3"
+    },
+    {
+      "n": 12,
+      "en": "Do you get car sick?",
+      "jp": "車酔いをしますか。",
+      "hira": "くるま よい を し ます か",
+      "mp3": "br_q12_do_you_get_car_sick.mp3"
+    },
+    {
+      "n": 13,
+      "en": "What vehicle is noisy?",
+      "jp": "どの乗り物がうるさいですか。",
+      "hira": "どの のりもの が うるさい です か",
+      "mp3": "br_q13_what_vehicle_is_noisy.mp3"
+    },
+    {
+      "n": 14,
+      "en": "What vehicle is quiet?",
+      "jp": "どの乗り物が静かですか。",
+      "hira": "どの のりもの が しずか です か",
+      "mp3": "br_q14_what_vehicle_is_quiet.mp3"
+    },
+    {
+      "n": 15,
+      "en": "Which vehicle do you use most?",
+      "jp": "一番よく使う乗り物は何ですか。",
+      "hira": "いちばん よく つかう のりもの は なん です か",
+      "mp3": "br_q15_which_vehicle_do_you_use_most.mp3"
+    },
+    {
+      "n": 16,
+      "en": "How do you commute to school?",
+      "jp": "学校へはどうやって通学しますか。",
+      "hira": "がっこう へ は どうやって つうがく し ます か",
+      "mp3": "br_q16_how_do_you_commute_to_school.mp3"
+    },
+    {
+      "n": 17,
+      "en": "How long does it take?",
+      "jp": "どのくらい時間がかかりますか。",
+      "hira": "どの くらい じかん が かかり ます か",
+      "mp3": "br_q17_how_long_does_it_take.mp3"
+    },
+    {
+      "n": 18,
+      "en": "Can you give me directions to the station?",
+      "jp": "駅までの道案内をしてくれますか。",
+      "hira": "えき まで の みちあんない を して くれ ます か",
+      "mp3": "br_q18_can_you_give_me_directions_to_the_station.mp3"
+    },
+    {
+      "n": 19,
+      "en": "Is the bus stop near here?",
+      "jp": "この近くにバス停はありますか。",
+      "hira": "この ちかく に ばすてい は あり ます か",
+      "mp3": "br_q19_is_the_bus_stop_near_here.mp3"
+    },
+    {
+      "n": 20,
+      "en": "Which way is the library?",
+      "jp": "図書館はどちらですか。",
+      "hira": "としょかん は どちら です か",
+      "mp3": "br_q20_which_way_is_the_library.mp3"
+    },
+    {
+      "n": 21,
+      "en": "Should I turn left or right?",
+      "jp": "左と右のどちらに曲がればいいですか。",
+      "hira": "ひだり と みぎ の どちら に まがれば いい です か",
+      "mp3": "br_q21_should_i_turn_left_or_right.mp3"
+    },
+    {
+      "n": 22,
+      "en": "Is it far?",
+      "jp": "遠いですか。",
+      "hira": "とおい です か",
+      "mp3": "br_q22_is_it_far.mp3"
+    },
+    {
+      "n": 23,
+      "en": "Which platform does our train leave from?",
+      "jp": "私たちの電車は何番ホームから出ますか。",
+      "hira": "わたしたち の でんしゃ は なんばん ほーむ から でます か",
+      "mp3": "br_q23_which_platform_does_our_train_leave_from.mp3"
+    },
+    {
+      "n": 24,
+      "en": "Where shall we meet?",
+      "jp": "どこで会いましょうか。",
+      "hira": "どこ で あい ましょう か",
+      "mp3": "br_q24_where_shall_we_meet.mp3"
+    },
+    {
+      "n": 25,
+      "en": "Can you read this map?",
+      "jp": "この地図を読めますか。",
+      "hira": "この ちず を よめ ます か",
+      "mp3": "br_q25_can_you_read_this_map.mp3"
+    },
+    {
+      "n": 26,
+      "en": "What’s across from the station?",
+      "jp": "駅の向かいには何がありますか。",
+      "hira": "えき の むかい に は なに が あり ます か",
+      "mp3": "br_q26_whats_across_from_the_station.mp3"
+    },
+    {
+      "n": 27,
+      "en": "What’s between the bank and the park?",
+      "jp": "銀行と公園の間には何がありますか。",
+      "hira": "ぎんこう と こうえん の あいだ に は なに が あり ます か",
+      "mp3": "br_q27_whats_between_the_bank_and_the_park.mp3"
+    },
+    {
+      "n": 28,
+      "en": "How many blocks away is it?",
+      "jp": "何ブロック先ですか。",
+      "hira": "なん ぶろっく さき です か",
+      "mp3": "br_q28_how_many_blocks_away_is_it.mp3"
+    },
+    {
+      "n": 29,
+      "en": "Is there a crosswalk?",
+      "jp": "横断歩道はありますか。",
+      "hira": "おうだん ほどう は あり ます か",
+      "mp3": "br_q29_is_there_a_crosswalk.mp3"
+    },
+    {
+      "n": 30,
+      "en": "Shall we go straight together?",
+      "jp": "いっしょにまっすぐ行きましょうか。",
+      "hira": "いっしょ に まっすぐ いきましょう か",
+      "mp3": "br_q30_shall_we_go_straight_together.mp3"
+    },
+    {
+      "n": 31,
+      "en": "What safety rules do you know?",
+      "jp": "どんな安全ルールを知っていますか。",
+      "hira": "どんな あんぜん るーる を しって い ます か",
+      "mp3": "br_q31_what_safety_rules_do_you_know.mp3"
+    },
+    {
+      "n": 32,
+      "en": "When must you wear a seat belt?",
+      "jp": "いつシートベルトをしなければなりませんか。",
+      "hira": "いつ しーとべると を しなければ なり ません か",
+      "mp3": "br_q32_when_must_you_wear_a_seat_belt.mp3"
+    },
+    {
+      "n": 33,
+      "en": "Where is the yellow line?",
+      "jp": "黄色い線はどこにありますか。",
+      "hira": "きいろい せん は どこ に あり ます か",
+      "mp3": "br_q33_where_is_the_yellow_line.mp3"
+    },
+    {
+      "n": 34,
+      "en": "Who should use priority seats?",
+      "jp": "優先席はどのような人のための席ですか。",
+      "hira": "ゆうせんせき は どの よう な ひと の ため の せき です か",
+      "mp3": "br_q34_who_should_use_priority_seats.mp3"
+    },
+    {
+      "n": 35,
+      "en": "What do you do if you are lost?",
+      "jp": "道に迷ったらどうしますか。",
+      "hira": "みち に まよったら どう し ます か",
+      "mp3": "br_q35_what_do_you_do_if_you_are_lost.mp3"
+    },
+    {
+      "n": 36,
+      "en": "What should you not do on the platform?",
+      "jp": "ホームでしてはいけないことは何ですか。",
+      "hira": "ほーむ で して は いけない こと は なん です か",
+      "mp3": "br_q36_what_should_you_not_do_on_the_platform.mp3"
+    },
+    {
+      "n": 37,
+      "en": "How do you ask staff for help?",
+      "jp": "職員にどうやって助けを求めますか。",
+      "hira": "しょくいん に どうやって たすけ を もとめます か",
+      "mp3": "br_q37_how_do_you_ask_staff_for_help.mp3"
+    },
+    {
+      "n": 38,
+      "en": "Where is the lost and found?",
+      "jp": "遺失物取扱所はどこですか。",
+      "hira": "いしつぶつ とりあつかいじょ は どこ です か",
+      "mp3": "br_q38_where_is_the_lost_and_found.mp3"
+    },
+    {
+      "n": 39,
+      "en": "Do you carry your ID?",
+      "jp": "身分証を持ち歩きますか。",
+      "hira": "みぶんしょう を もちあるき ます か",
+      "mp3": "br_q39_do_you_carry_your_id.mp3"
+    },
+    {
+      "n": 40,
+      "en": "What is the emergency number?",
+      "jp": "緊急電話番号は何ですか。",
+      "hira": "きんきゅう でんわ ばんごう は なん です か",
+      "mp3": "br_q40_what_is_the_emergency_number.mp3"
+    },
+    {
+      "n": 41,
+      "en": "How can you keep your bag safe?",
+      "jp": "かばんを安全に保つにはどうしますか。",
+      "hira": "かばん を あんぜん に たもつ には どう し ます か",
+      "mp3": "br_q41_how_can_you_keep_your_bag_safe.mp3"
+    },
+    {
+      "n": 42,
+      "en": "Do you wear a helmet when cycling?",
+      "jp": "自転車に乗るときヘルメットをかぶりますか。",
+      "hira": "じてんしゃ に のる とき へるめっと を かぶります か",
+      "mp3": "br_q42_do_you_wear_a_helmet_when_cycling.mp3"
+    },
+    {
+      "n": 43,
+      "en": "Who can you call in an emergency?",
+      "jp": "緊急時にはだれに電話できますか。",
+      "hira": "きんきゅう じ に は だれ に でんわ でき ます か",
+      "mp3": "br_q43_who_can_you_call_in_an_emergency.mp3"
+    },
+    {
+      "n": 44,
+      "en": "Which signs indicate danger?",
+      "jp": "危険を示す表示はどれですか。",
+      "hira": "きけん を しめす ひょうじ は どれ です か",
+      "mp3": "br_q44_which_signs_indicate_danger.mp3"
+    },
+    {
+      "n": 45,
+      "en": "What does “Be careful” mean in Japanese?",
+      "jp": "「Be careful」は日本語で何と言いますか。",
+      "hira": "びー けあふる は にほんご で なん と いいます か",
+      "mp3": "br_q45_what_does_be_careful_mean_in_japanese.mp3"
+    },
+    {
+      "n": 46,
+      "en": "Where can I buy a ticket?",
+      "jp": "どこで切符を買えますか。",
+      "hira": "どこ で きっぷ を かえ ます か",
+      "mp3": "br_q46_where_can_i_buy_a_ticket.mp3"
+    },
+    {
+      "n": 47,
+      "en": "How do I top up an IC card?",
+      "jp": "ICカードはどうやってチャージしますか。",
+      "hira": "あいしー かーど は どうやって ちゃーじ します か",
+      "mp3": "br_q47_how_do_i_top_up_an_ic_card.mp3"
+    },
+    {
+      "n": 48,
+      "en": "Which platform does the express train leave from?",
+      "jp": "急行は何番線から出ますか。",
+      "hira": "きゅうこう は なんばんせん から でます か",
+      "mp3": "br_q48_which_platform_does_the_express_train_leave_from.mp3"
+    },
+    {
+      "n": 49,
+      "en": "Where do I transfer to the subway?",
+      "jp": "地下鉄へはどこで乗り換えますか。",
+      "hira": "ちかてつ へ は どこ で のりかえ ます か",
+      "mp3": "br_q49_where_do_i_transfer_to_the_subway.mp3"
+    },
+    {
+      "n": 50,
+      "en": "How much is a round-trip ticket?",
+      "jp": "往復切符はいくらですか。",
+      "hira": "おうふく きっぷ は いくら です か",
+      "mp3": "br_q50_how_much_is_a_roundtrip_ticket.mp3"
+    },
+    {
+      "n": 51,
+      "en": "What time does it depart?",
+      "jp": "何時に出発しますか。",
+      "hira": "なんじ に しゅっぱつ し ます か",
+      "mp3": "br_q51_what_time_does_it_depart.mp3"
+    },
+    {
+      "n": 52,
+      "en": "What time does it arrive?",
+      "jp": "何時に到着しますか。",
+      "hira": "なんじ に とうちゃく し ます か",
+      "mp3": "br_q52_what_time_does_it_arrive.mp3"
+    },
+    {
+      "n": 53,
+      "en": "Is this seat available?",
+      "jp": "この席は空いていますか。",
+      "hira": "この せき は あいて い ます か",
+      "mp3": "br_q53_is_this_seat_available.mp3"
+    },
+    {
+      "n": 54,
+      "en": "Can I sit in the priority seat?",
+      "jp": "優先席に座ってもいいですか。",
+      "hira": "ゆうせんせき に すわって も いい です か",
+      "mp3": "br_q54_can_i_sit_in_the_priority_seat.mp3"
+    },
+    {
+      "n": 55,
+      "en": "What does the announcement say?",
+      "jp": "アナウンスは何と言っていますか。",
+      "hira": "あなうんす は なん と いって います か",
+      "mp3": "br_q55_what_does_the_announcement_say.mp3"
+    },
+    {
+      "n": 56,
+      "en": "Is there a delay today?",
+      "jp": "今日は遅延がありますか。",
+      "hira": "きょう は ちえん が あり ます か",
+      "mp3": "br_q56_is_there_a_delay_today.mp3"
+    },
+    {
+      "n": 57,
+      "en": "Where is car number one?",
+      "jp": "1号車はどこですか。",
+      "hira": "いち ごうしゃ は どこ です か",
+      "mp3": "br_q57_where_is_car_number_one.mp3"
+    },
+    {
+      "n": 58,
+      "en": "How do I get to the terminal?",
+      "jp": "終点へはどうやって行きますか。",
+      "hira": "しゅうてん へ は どうやって いき ます か",
+      "mp3": "br_q58_how_do_i_get_to_the_terminal.mp3"
+    },
+    {
+      "n": 59,
+      "en": "Can I use this ticket on the bus?",
+      "jp": "この切符はバスで使えますか。",
+      "hira": "この きっぷ は ばす で つかえ ます か",
+      "mp3": "br_q59_can_i_use_this_ticket_on_the_bus.mp3"
+    },
+    {
+      "n": 60,
+      "en": "Where should we line up?",
+      "jp": "どこに並べばいいですか。",
+      "hira": "どこ に ならべ ば いい です か",
+      "mp3": "br_q60_where_should_we_line_up.mp3"
+    }
+  ]
+}
