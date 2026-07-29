@@ -1,1 +1,424 @@
-
+{
+  "cards": [
+    {
+      "n": 1,
+      "en": "Do you live in a house or an apartment?",
+      "jp": "一戸建てとアパートのどちらに住んでいますか。",
+      "hira": "いっこだて と あぱーと の どちら に すんで います か",
+      "mp3": "br_q01_do_you_live_in_a_house_or_an_apartment.mp3"
+    },
+    {
+      "n": 2,
+      "en": "How many rooms does your home have?",
+      "jp": "あなたの家には部屋がいくつありますか。",
+      "hira": "あなた の いえ には へや が いくつ あります か",
+      "mp3": "br_q02_how_many_rooms_does_your_home_have.mp3"
+    },
+    {
+      "n": 3,
+      "en": "Where is your bedroom?",
+      "jp": "あなたの寝室はどこにありますか。",
+      "hira": "あなた の しんしつ は どこ に あり ます か",
+      "mp3": "br_q03_where_is_your_bedroom.mp3"
+    },
+    {
+      "n": 4,
+      "en": "Is the toilet separate from the bathroom?",
+      "jp": "トイレは浴室と別ですか。",
+      "hira": "といれ は よくしつ と べつ です か",
+      "mp3": "br_q04_is_the_toilet_separate_from_the_bathroom.mp3"
+    },
+    {
+      "n": 5,
+      "en": "Which room do you like best?",
+      "jp": "どの部屋が一番好きですか。",
+      "hira": "どの へや が いちばん すき です か",
+      "mp3": "br_q05_which_room_do_you_like_best.mp3"
+    },
+    {
+      "n": 6,
+      "en": "Is there a balcony?",
+      "jp": "バルコニーはありますか。",
+      "hira": "ばるこにー は あり ます か",
+      "mp3": "br_q06_is_there_a_balcony.mp3"
+    },
+    {
+      "n": 7,
+      "en": "What is on the first floor?",
+      "jp": "1階には何がありますか。",
+      "hira": "いっかい に は なに が あり ます か",
+      "mp3": "br_q07_what_is_on_the_first_floor.mp3"
+    },
+    {
+      "n": 8,
+      "en": "Do you have a yard or garden?",
+      "jp": "庭はありますか。",
+      "hira": "にわ は あり ます か",
+      "mp3": "br_q08_do_you_have_a_yard_or_garden.mp3"
+    },
+    {
+      "n": 9,
+      "en": "Where do you eat dinner?",
+      "jp": "どこで夕食を食べますか。",
+      "hira": "どこ で ゆうしょく を たべ ます か",
+      "mp3": "br_q09_where_do_you_eat_dinner.mp3"
+    },
+    {
+      "n": 10,
+      "en": "Is your kitchen big or small?",
+      "jp": "あなたのキッチンは大きいですか、小さいですか。",
+      "hira": "あなた の きっちん は おおきい です か、 ちいさい です か",
+      "mp3": "br_q10_is_your_kitchen_big_or_small.mp3"
+    },
+    {
+      "n": 11,
+      "en": "What is next to the entrance?",
+      "jp": "玄関のとなりには何がありますか。",
+      "hira": "げんかん の となり に は なに が あり ます か",
+      "mp3": "br_q11_what_is_next_to_the_entrance.mp3"
+    },
+    {
+      "n": 12,
+      "en": "Where do you keep your shoes?",
+      "jp": "靴はどこにしまいますか。",
+      "hira": "くつ は どこ に しまいます か",
+      "mp3": "br_q12_where_do_you_keep_your_shoes.mp3"
+    },
+    {
+      "n": 13,
+      "en": "Is your living room bright?",
+      "jp": "リビングは明るいですか。",
+      "hira": "りびんぐ は あかるい です か",
+      "mp3": "br_q13_is_your_living_room_bright.mp3"
+    },
+    {
+      "n": 14,
+      "en": "Do you share a room with someone?",
+      "jp": "だれかと同じ部屋を使っていますか。",
+      "hira": "だれか と おなじ へや を つかって います か",
+      "mp3": "br_q14_do_you_share_a_room_with_someone.mp3"
+    },
+    {
+      "n": 15,
+      "en": "What’s your address?",
+      "jp": "あなたの住所は何ですか。",
+      "hira": "あなた の じゅうしょ は なん です か",
+      "mp3": "br_q15_whats_your_address.mp3"
+    },
+    {
+      "n": 16,
+      "en": "What furniture is in your room?",
+      "jp": "あなたの部屋にはどんな家具がありますか。",
+      "hira": "あなた の へや に は どんな かぐ が あり ます か",
+      "mp3": "br_q16_what_furniture_is_in_your_room.mp3"
+    },
+    {
+      "n": 17,
+      "en": "Where do you keep your clothes?",
+      "jp": "服はどこにしまいますか。",
+      "hira": "ふく は どこ に しまい ます か",
+      "mp3": "br_q17_where_do_you_keep_your_clothes.mp3"
+    },
+    {
+      "n": 18,
+      "en": "Do you have a desk?",
+      "jp": "机はありますか。",
+      "hira": "つくえ は あり ます か",
+      "mp3": "br_q18_do_you_have_a_desk.mp3"
+    },
+    {
+      "n": 19,
+      "en": "What do you put on your bookshelf?",
+      "jp": "本棚に何を置きますか。",
+      "hira": "ほんだな に なに を おき ます か",
+      "mp3": "br_q19_what_do_you_put_on_your_bookshelf.mp3"
+    },
+    {
+      "n": 20,
+      "en": "Do you turn off the TV before bed?",
+      "jp": "寝る前にテレビを消しますか。",
+      "hira": "ねる まえ に てれび を けし ます か",
+      "mp3": "br_q20_do_you_turn_off_the_tv_before_bed.mp3"
+    },
+    {
+      "n": 21,
+      "en": "How often do you use the microwave?",
+      "jp": "電子レンジをどのくらいの頻度で使いますか。",
+      "hira": "でんし れんじ を どの くらい の ひんど で つかいます か",
+      "mp3": "br_q21_how_often_do_you_use_the_microwave.mp3"
+    },
+    {
+      "n": 22,
+      "en": "Is your refrigerator big?",
+      "jp": "冷蔵庫は大きいですか。",
+      "hira": "れいぞうこ は おおきい です か",
+      "mp3": "br_q22_is_your_refrigerator_big.mp3"
+    },
+    {
+      "n": 23,
+      "en": "Do you have an air conditioner or a fan?",
+      "jp": "エアコンか扇風機はありますか。",
+      "hira": "えあこん か せんぷうき は あります か",
+      "mp3": "br_q23_do_you_have_an_air_conditioner_or_a_fan.mp3"
+    },
+    {
+      "n": 24,
+      "en": "Where is your bed?",
+      "jp": "ベッドはどこにありますか。",
+      "hira": "べっど は どこ に あり ます か",
+      "mp3": "br_q24_where_is_your_bed.mp3"
+    },
+    {
+      "n": 25,
+      "en": "What color is your rug?",
+      "jp": "カーペットは何色ですか。",
+      "hira": "かーぺっと は なにいろ です か",
+      "mp3": "br_q25_what_color_is_your_rug.mp3"
+    },
+    {
+      "n": 26,
+      "en": "Do you have a lamp on your desk?",
+      "jp": "机にランプはありますか。",
+      "hira": "つくえ に らんぷ は あり ます か",
+      "mp3": "br_q26_do_you_have_a_lamp_on_your_desk.mp3"
+    },
+    {
+      "n": 27,
+      "en": "What appliance do you use every day?",
+      "jp": "毎日使う家電は何ですか。",
+      "hira": "まいにち つかう かでん は なん です か",
+      "mp3": "br_q27_what_appliance_do_you_use_every_day.mp3"
+    },
+    {
+      "n": 28,
+      "en": "Can you move the table?",
+      "jp": "テーブルを動かせますか。",
+      "hira": "てーぶる を うごかせ ます か",
+      "mp3": "br_q28_can_you_move_the_table.mp3"
+    },
+    {
+      "n": 29,
+      "en": "Where should I put this?",
+      "jp": "これはどこに置けばいいですか。",
+      "hira": "これ は どこ に おけば いい です か",
+      "mp3": "br_q29_where_should_i_put_this.mp3"
+    },
+    {
+      "n": 30,
+      "en": "What would you like to add to your room?",
+      "jp": "部屋に何を追加したいですか。",
+      "hira": "へや に なに を ついか したい です か",
+      "mp3": "br_q30_what_would_you_like_to_add_to_your_room.mp3"
+    },
+    {
+      "n": 31,
+      "en": "What chores do you do at home?",
+      "jp": "家でどんな家事をしますか。",
+      "hira": "いえ で どんな かじ を し ます か",
+      "mp3": "br_q31_what_chores_do_you_do_at_home.mp3"
+    },
+    {
+      "n": 32,
+      "en": "How often do you take out the trash?",
+      "jp": "どのくらいの頻度でゴミを出しますか。",
+      "hira": "どの くらい の ひんど で ごみ を だします か",
+      "mp3": "br_q32_how_often_do_you_take_out_the_trash.mp3"
+    },
+    {
+      "n": 33,
+      "en": "Who washes the dishes?",
+      "jp": "だれが皿を洗いますか。",
+      "hira": "だれ が さら を あらい ます か",
+      "mp3": "br_q33_who_washes_the_dishes.mp3"
+    },
+    {
+      "n": 34,
+      "en": "Do you recycle at home?",
+      "jp": "家でリサイクルしますか。",
+      "hira": "いえ で りさいくる し ます か",
+      "mp3": "br_q34_do_you_recycle_at_home.mp3"
+    },
+    {
+      "n": 35,
+      "en": "When do you do laundry?",
+      "jp": "いつ洗濯をしますか。",
+      "hira": "いつ せんたく を し ます か",
+      "mp3": "br_q35_when_do_you_do_laundry.mp3"
+    },
+    {
+      "n": 36,
+      "en": "Can you vacuum the living room?",
+      "jp": "リビングに掃除機をかけられますか。",
+      "hira": "りびんぐ に そうじき を かけられ ます か",
+      "mp3": "br_q36_can_you_vacuum_the_living_room.mp3"
+    },
+    {
+      "n": 37,
+      "en": "Do you water the plants?",
+      "jp": "植物に水をやりますか。",
+      "hira": "しょくぶつ に みず を やります か",
+      "mp3": "br_q37_do_you_water_the_plants.mp3"
+    },
+    {
+      "n": 38,
+      "en": "Do you have any pets to feed?",
+      "jp": "えさをあげるペットはいますか。",
+      "hira": "えさ を あげる ぺっと は い ます か",
+      "mp3": "br_q38_do_you_have_any_pets_to_feed.mp3"
+    },
+    {
+      "n": 39,
+      "en": "Who sets the table?",
+      "jp": "だれが食卓を用意しますか。",
+      "hira": "だれ が しょくたく を ようい し ます か",
+      "mp3": "br_q39_who_sets_the_table.mp3"
+    },
+    {
+      "n": 40,
+      "en": "What chore do you dislike?",
+      "jp": "きらいな家事は何ですか。",
+      "hira": "きらい な かじ は なん です か",
+      "mp3": "br_q40_what_chore_do_you_dislike.mp3"
+    },
+    {
+      "n": 41,
+      "en": "What chore are you good at?",
+      "jp": "得意な家事は何ですか。",
+      "hira": "とくい な かじ は なん です か",
+      "mp3": "br_q41_what_chore_are_you_good_at.mp3"
+    },
+    {
+      "n": 42,
+      "en": "Should children help with chores?",
+      "jp": "子どもも家事を手伝うべきですか。",
+      "hira": "こども も かじ を てつだう べき です か",
+      "mp3": "br_q42_should_children_help_with_chores.mp3"
+    },
+    {
+      "n": 43,
+      "en": "How do you share chores?",
+      "jp": "どうやって家事を分担しますか。",
+      "hira": "どうやって かじ を ぶんたん し ます か",
+      "mp3": "br_q43_how_do_you_share_chores.mp3"
+    },
+    {
+      "n": 44,
+      "en": "What will you do after cleaning?",
+      "jp": "掃除のあと、何をしますか。",
+      "hira": "そうじ の あと、 なに を し ます か",
+      "mp3": "br_q44_what_will_you_do_after_cleaning.mp3"
+    },
+    {
+      "n": 45,
+      "en": "How do you thank your family?",
+      "jp": "家族にどうやって感謝しますか。",
+      "hira": "かぞく に どうやって かんしゃ し ます か",
+      "mp3": "br_q45_how_do_you_thank_your_family.mp3"
+    },
+    {
+      "n": 46,
+      "en": "What is your ideal home like?",
+      "jp": "あなたの理想の家はどんな感じですか。",
+      "hira": "あなた の りそう の いえ は どんな かんじ です か",
+      "mp3": "br_q46_what_is_your_ideal_home_like.mp3"
+    },
+    {
+      "n": 47,
+      "en": "Do you prefer a house or an apartment?",
+      "jp": "家とアパートではどちらが好きですか。",
+      "hira": "いえ と あぱーと では どちら が すき です か",
+      "mp3": "br_q47_do_you_prefer_a_house_or_an_apartment.mp3"
+    },
+    {
+      "n": 48,
+      "en": "How many rooms would your ideal home have?",
+      "jp": "理想の家には部屋がいくつあるといいですか。",
+      "hira": "りそう の いえ には へや が いくつ ある と いい です か",
+      "mp3": "br_q48_how_many_rooms_would_your_ideal_home_have.mp3"
+    },
+    {
+      "n": 49,
+      "en": "What kind of kitchen do you want?",
+      "jp": "どんなキッチンがほしいですか。",
+      "hira": "どんな きっちん が ほしい です か",
+      "mp3": "br_q49_what_kind_of_kitchen_do_you_want.mp3"
+    },
+    {
+      "n": 50,
+      "en": "Do you want a garden or a balcony?",
+      "jp": "庭がいいですか、バルコニーがいいですか。",
+      "hira": "にわ が いい です か、 ばるこにー が いい です か",
+      "mp3": "br_q50_do_you_want_a_garden_or_a_balcony.mp3"
+    },
+    {
+      "n": 51,
+      "en": "Where would your ideal home be?",
+      "jp": "理想の家はどこにあるといいですか。",
+      "hira": "りそう の いえ は どこ に ある と いい です か",
+      "mp3": "br_q51_where_would_your_ideal_home_be.mp3"
+    },
+    {
+      "n": 52,
+      "en": "What makes a home cozy for you?",
+      "jp": "あなたにとって居心地のよい家の条件は何ですか。",
+      "hira": "あなた に とって いごこち の よい いえ の じょうけん は なん です か",
+      "mp3": "br_q52_what_makes_a_home_cozy_for_you.mp3"
+    },
+    {
+      "n": 53,
+      "en": "Do you need a study or office?",
+      "jp": "書斎／オフィスは必要ですか。",
+      "hira": "しょさい／おふぃす は ひつよう です か",
+      "mp3": "br_q53_do_you_need_a_study_or_office.mp3"
+    },
+    {
+      "n": 54,
+      "en": "Is energy efficiency important?",
+      "jp": "省エネは大切ですか。",
+      "hira": "しょうえね は たいせつ です か",
+      "mp3": "br_q54_is_energy_efficiency_important.mp3"
+    },
+    {
+      "n": 55,
+      "en": "Would you like to live near the station?",
+      "jp": "駅の近くに住みたいですか。",
+      "hira": "えき の ちかく に すみたい です か",
+      "mp3": "br_q55_would_you_like_to_live_near_the_station.mp3"
+    },
+    {
+      "n": 56,
+      "en": "Do you want a pet-friendly place?",
+      "jp": "ペット可の家がいいですか。",
+      "hira": "ぺっと か の いえ が いい です か",
+      "mp3": "br_q56_do_you_want_a_petfriendly_place.mp3"
+    },
+    {
+      "n": 57,
+      "en": "How big should your bedroom be?",
+      "jp": "寝室はどのくらいの広さがいいですか。",
+      "hira": "しんしつ は どの くらい の ひろさ が いい です か",
+      "mp3": "br_q57_how_big_should_your_bedroom_be.mp3"
+    },
+    {
+      "n": 58,
+      "en": "What view do you want from the window?",
+      "jp": "窓からどんな景色が見たいですか。",
+      "hira": "まど から どんな けしき が みたい です か",
+      "mp3": "br_q58_what_view_do_you_want_from_the_window.mp3"
+    },
+    {
+      "n": 59,
+      "en": "What color would your walls be?",
+      "jp": "壁の色は何色がいいですか。",
+      "hira": "かべ の いろ は なにいろ が いい です か",
+      "mp3": "br_q59_what_color_would_your_walls_be.mp3"
+    },
+    {
+      "n": 60,
+      "en": "What is the most important feature?",
+      "jp": "一番大切な特徴は何ですか。",
+      "hira": "いちばん たいせつ な とくちょう は なん です か",
+      "mp3": "br_q60_what_is_the_most_important_feature.mp3"
+    }
+  ]
+}

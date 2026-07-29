@@ -1,1 +1,424 @@
-
+{
+  "cards": [
+    {
+      "n": 1,
+      "en": "The winter solstice has carried symbolic importance in many cultures.",
+      "jp": "冬至は多くの文化で象徴的な重要性を持ってきました。",
+      "hira": "とうじ は おおく の ぶんか で しょうちょうてき な じゅうようせい を もって きました",
+      "mp3": "bc_s01_the_winter_solstice_has_carried_symbolic_importance_in_many_cultures.mp3"
+    },
+    {
+      "n": 2,
+      "en": "The holiday season creates both economic opportunities and logistical pressure.",
+      "jp": "年末の休暇シーズンは経済的機会と物流上の圧力の両方を生みます。",
+      "hira": "ねんまつ の きゅうか しーずん は けいざいてき きかい と ぶつりゅうじょう の あつりょく の りょうほう を うみます",
+      "mp3": "bc_s02_the_holiday_season_creates_both_economic_opportunities_and_logistical_pressure.mp3"
+    },
+    {
+      "n": 3,
+      "en": "Each observance reflects a community’s history, beliefs, and values.",
+      "jp": "各記念行事は地域社会の歴史、信念、価値観を反映します。",
+      "hira": "かく きねん ぎょうじ は ちいき しゃかい の れきし しんねん かちかん を はんえい します",
+      "mp3": "bc_s03_each_observance_reflects_a_communitys_history_beliefs_and_values.mp3"
+    },
+    {
+      "n": 4,
+      "en": "Visitors should approach a religious ceremony with respect and sensitivity.",
+      "jp": "訪問者は宗教儀式に敬意と配慮を持って接するべきです。",
+      "hira": "ほうもんしゃ は しゅうきょう ぎしき に けいい と はいりょ を もって せっする べき です",
+      "mp3": "bc_s04_visitors_should_approach_a_religious_ceremony_with_respect_and_sensitivity.mp3"
+    },
+    {
+      "n": 5,
+      "en": "A secular celebration allows people with different beliefs to participate together.",
+      "jp": "宗教色のない祝祭では異なる信念を持つ人々も共に参加できます。",
+      "hira": "しゅうきょうしょく の ない しゅくさい では ことなる しんねん を もつ ひとびと も とも に さんか できます",
+      "mp3": "bc_s05_a_secular_celebration_allows_people_with_different_beliefs_to_participate_togeth.mp3"
+    },
+    {
+      "n": 6,
+      "en": "A cultural tradition remains meaningful only when people understand its purpose.",
+      "jp": "文化的伝統は人々がその目的を理解して初めて意味を保ちます。",
+      "hira": "ぶんかてき でんとう は ひとびと が その もくてき を りかい して はじめて いみ を たもちます",
+      "mp3": "bc_s06_a_cultural_tradition_remains_meaningful_only_when_people_understand_its_purpose.mp3"
+    },
+    {
+      "n": 7,
+      "en": "Seasonal customs often evolve as lifestyles and communities change.",
+      "jp": "季節の習慣は生活様式や地域社会の変化に伴って進化することがよくあります。",
+      "hira": "きせつ の しゅうかん は せいかつ ようしき や ちいき しゃかい の へんか に ともなって しんか する こと が よく あります",
+      "mp3": "bc_s07_seasonal_customs_often_evolve_as_lifestyles_and_communities_change.mp3"
+    },
+    {
+      "n": 8,
+      "en": "New Year’s Eve encourages people to reflect on the past and anticipate the future.",
+      "jp": "大みそかは人々に過去を振り返り未来を思い描く機会を与えます。",
+      "hira": "おおみそか は ひとびと に かこ を ふりかえり みらい を おもいえがく きかい を あたえます",
+      "mp3": "bc_s08_new_years_eve_encourages_people_to_reflect_on_the_past_and_anticipate_the_future.mp3"
+    },
+    {
+      "n": 9,
+      "en": "The first shrine visit combines spiritual practice with social tradition.",
+      "jp": "初詣は精神的な慣行と社会的伝統を組み合わせています。",
+      "hira": "はつもうで は せいしんてき な かんこう と しゃかいてき でんとう を くみあわせて います",
+      "mp3": "bc_s09_the_first_shrine_visit_combines_spiritual_practice_with_social_tradition.mp3"
+    },
+    {
+      "n": 10,
+      "en": "Decorations and music contribute to a festive atmosphere in public spaces.",
+      "jp": "飾りと音楽は公共空間の祝祭的な雰囲気に貢献します。",
+      "hira": "かざり と おんがく は こうきょう くうかん の しゅくさいてき な ふんいき に こうけん します",
+      "mp3": "bc_s10_decorations_and_music_contribute_to_a_festive_atmosphere_in_public_spaces.mp3"
+    },
+    {
+      "n": 11,
+      "en": "A public holiday gives many workers time to rest or reconnect with family.",
+      "jp": "祝日は多くの労働者に休息や家族との再会の時間を与えます。",
+      "hira": "しゅくじつ は おおく の ろうどうしゃ に きゅうそく や かぞく と の さいかい の じかん を あたえます",
+      "mp3": "bc_s11_a_public_holiday_gives_many_workers_time_to_rest_or_reconnect_with_family.mp3"
+    },
+    {
+      "n": 12,
+      "en": "Transportation providers increase capacity during the year-end travel peak.",
+      "jp": "交通事業者は年末の旅行のピークに輸送力を増やします。",
+      "hira": "こうつう じぎょうしゃ は ねんまつ の りょこう の ぴーく に ゆそうりょく を ふやします",
+      "mp3": "bc_s12_transportation_providers_increase_capacity_during_the_yearend_travel_peak.mp3"
+    },
+    {
+      "n": 13,
+      "en": "Winter recreation can support local economies if environmental damage is controlled.",
+      "jp": "冬のレクリエーションは環境被害が抑えられれば地域経済を支えられます。",
+      "hira": "ふゆ の れくりえーしょん は かんきょう ひがい が おさえられれば ちいき けいざい を ささえられます",
+      "mp3": "bc_s13_winter_recreation_can_support_local_economies_if_environmental_damage_is_control.mp3"
+    },
+    {
+      "n": 14,
+      "en": "A family reunion may strengthen relationships that distance has weakened.",
+      "jp": "家族の再会は距離によって弱まった関係を強めることがあります。",
+      "hira": "かぞく の さいかい は きょり に よって よわまった かんけい を つよめる こと が あります",
+      "mp3": "bc_s14_a_family_reunion_may_strengthen_relationships_that_distance_has_weakened.mp3"
+    },
+    {
+      "n": 15,
+      "en": "Careful year-end preparations can reduce stress during a busy period.",
+      "jp": "丁寧な年末の準備は忙しい時期のストレスを減らせます。",
+      "hira": "ていねい な ねんまつ の じゅんび は いそがしい じき の すとれす を へらせます",
+      "mp3": "bc_s15_careful_yearend_preparations_can_reduce_stress_during_a_busy_period.mp3"
+    },
+    {
+      "n": 16,
+      "en": "Cultural heritage should be protected without preventing communities from changing.",
+      "jp": "文化遺産は地域社会の変化を妨げずに守られるべきです。",
+      "hira": "ぶんか いさん は ちいき しゃかい の へんか を さまたげず に まもられる べき です",
+      "mp3": "bc_s16_cultural_heritage_should_be_protected_without_preventing_communities_from_changi.mp3"
+    },
+    {
+      "n": 17,
+      "en": "A family ritual can provide stability during periods of uncertainty.",
+      "jp": "家族の儀式は不確実な時期に安定をもたらすことができます。",
+      "hira": "かぞく の ぎしき は ふかくじつ な じき に あんてい を もたらす こと が できます",
+      "mp3": "bc_s17_a_family_ritual_can_provide_stability_during_periods_of_uncertainty.mp3"
+    },
+    {
+      "n": 18,
+      "en": "Shared celebrations help maintain an intergenerational bond.",
+      "jp": "共に祝うことは世代間の絆を保つのに役立ちます。",
+      "hira": "とも に いわう こと は せだいかん の きずな を たもつ の に やくだちます",
+      "mp3": "bc_s18_shared_celebrations_help_maintain_an_intergenerational_bond.mp3"
+    },
+    {
+      "n": 19,
+      "en": "Collective memory influences how a community explains its past.",
+      "jp": "集合的記憶は地域社会が過去をどう説明するかに影響します。",
+      "hira": "しゅうごうてき きおく は ちいき しゃかい が かこ を どう せつめい する か に えいきょう します",
+      "mp3": "bc_s19_collective_memory_influences_how_a_community_explains_its_past.mp3"
+    },
+    {
+      "n": 20,
+      "en": "Participating in traditions can strengthen a sense of belonging.",
+      "jp": "伝統への参加は帰属意識を強めることができます。",
+      "hira": "でんとう への さんか は きぞく いしき を つよめる こと が できます",
+      "mp3": "bc_s20_participating_in_traditions_can_strengthen_a_sense_of_belonging.mp3"
+    },
+    {
+      "n": 21,
+      "en": "Hospitality requires attention to a guest’s needs and cultural background.",
+      "jp": "もてなしには客のニーズと文化的背景への配慮が必要です。",
+      "hira": "もてなし には きゃく の にーず と ぶんかてき はいけい への はいりょ が ひつよう です",
+      "mp3": "bc_s21_hospitality_requires_attention_to_a_guests_needs_and_cultural_background.mp3"
+    },
+    {
+      "n": 22,
+      "en": "A festive meal often expresses identity through ingredients and preparation methods.",
+      "jp": "祝いの食事は食材と調理法を通してアイデンティティを表すことがよくあります。",
+      "hira": "いわい の しょくじ は しょくざい と ちょうりほう を とおして あいでんてぃてぃ を あらわす こと が よく あります",
+      "mp3": "bc_s22_a_festive_meal_often_expresses_identity_through_ingredients_and_preparation_meth.mp3"
+    },
+    {
+      "n": 23,
+      "en": "Traditional objects may carry symbolic meaning beyond their practical use.",
+      "jp": "伝統的な物には実用性を超えた象徴的な意味がある場合があります。",
+      "hira": "でんとうてき な もの には じつようせい を こえた しょうちょうてき な いみ が ある ばあい が あります",
+      "mp3": "bc_s23_traditional_objects_may_carry_symbolic_meaning_beyond_their_practical_use.mp3"
+    },
+    {
+      "n": 24,
+      "en": "Oral tradition allows stories and knowledge to pass between generations.",
+      "jp": "口承伝統は物語と知識を世代間で伝えることを可能にします。",
+      "hira": "こうしょう でんとう は ものがたり と ちしき を せだいかん で つたえる こと を かのう に します",
+      "mp3": "bc_s24_oral_tradition_allows_stories_and_knowledge_to_pass_between_generations.mp3"
+    },
+    {
+      "n": 25,
+      "en": "Preservation efforts are most effective when local communities lead them.",
+      "jp": "保存活動は地域社会が主導するとき最も効果的です。",
+      "hira": "ほぞん かつどう は ちいき しゃかい が しゅどう する とき もっとも こうかてき です",
+      "mp3": "bc_s25_preservation_efforts_are_most_effective_when_local_communities_lead_them.mp3"
+    },
+    {
+      "n": 26,
+      "en": "Adaptation can keep a tradition relevant to younger generations.",
+      "jp": "適応によって伝統を若い世代にも関係あるものに保てます。",
+      "hira": "てきおう に よって でんとう を わかい せだい にも かんけい ある もの に たもてます",
+      "mp3": "bc_s26_adaptation_can_keep_a_tradition_relevant_to_younger_generations.mp3"
+    },
+    {
+      "n": 27,
+      "en": "Cultural identity is shaped by language, memory, and shared experience.",
+      "jp": "文化的アイデンティティは言語、記憶、共有経験によって形作られます。",
+      "hira": "ぶんかてき あいでんてぃてぃ は げんご きおく きょうゆう けいけん に よって かたちづくられます",
+      "mp3": "bc_s27_cultural_identity_is_shaped_by_language_memory_and_shared_experience.mp3"
+    },
+    {
+      "n": 28,
+      "en": "Community participation prevents festivals from becoming purely commercial events.",
+      "jp": "地域参加は祭りが純粋な商業行事になるのを防ぎます。",
+      "hira": "ちいき さんか は まつり が じゅんすい な しょうぎょう ぎょうじ に なる の を ふせぎます",
+      "mp3": "bc_s28_community_participation_prevents_festivals_from_becoming_purely_commercial_event.mp3"
+    },
+    {
+      "n": 29,
+      "en": "Inclusion requires organizers to remove physical and social barriers.",
+      "jp": "包摂には主催者が物理的・社会的障壁を取り除くことが必要です。",
+      "hira": "ほうせつ には しゅさいしゃ が ぶつりてき しゃかいてき しょうへき を とりのぞく こと が ひつよう です",
+      "mp3": "bc_s29_inclusion_requires_organizers_to_remove_physical_and_social_barriers.mp3"
+    },
+    {
+      "n": 30,
+      "en": "Commercialization can increase visibility while weakening a tradition’s original meaning.",
+      "jp": "商業化は認知度を高める一方で伝統本来の意味を弱めることがあります。",
+      "hira": "しょうぎょうか は にんちど を たかめる いっぽう で でんとう ほんらい の いみ を よわめる こと が あります",
+      "mp3": "bc_s30_commercialization_can_increase_visibility_while_weakening_a_traditions_original.mp3"
+    },
+    {
+      "n": 31,
+      "en": "Gift-giving can communicate affection, respect, or social status.",
+      "jp": "贈り物をすることは愛情、敬意、社会的地位を伝える場合があります。",
+      "hira": "おくりもの を する こと は あいじょう けいい しゃかいてき ちい を つたえる ばあい が あります",
+      "mp3": "bc_s31_giftgiving_can_communicate_affection_respect_or_social_status.mp3"
+    },
+    {
+      "n": 32,
+      "en": "Generosity should not be judged solely by the monetary value of a gift.",
+      "jp": "寛大さは贈り物の金銭的価値だけで判断すべきではありません。",
+      "hira": "かんだいさ は おくりもの の きんせんてき かち だけ で はんだん する べき では ありません",
+      "mp3": "bc_s32_generosity_should_not_be_judged_solely_by_the_monetary_value_of_a_gift.mp3"
+    },
+    {
+      "n": 33,
+      "en": "Expressing gratitude can improve both personal and professional relationships.",
+      "jp": "感謝を表すことは個人的・職業的関係の両方を改善できます。",
+      "hira": "かんしゃ を あらわす こと は こじんてき しょくぎょうてき かんけい の りょうほう を かいぜん できます",
+      "mp3": "bc_s33_expressing_gratitude_can_improve_both_personal_and_professional_relationships.mp3"
+    },
+    {
+      "n": 34,
+      "en": "Reciprocity can build trust, although it may also create pressure.",
+      "jp": "相互関係は信頼を築けますが、圧力を生む場合もあります。",
+      "hira": "そうご かんけい は しんらい を きずけます が あつりょく を うむ ばあい も あります",
+      "mp3": "bc_s34_reciprocity_can_build_trust_although_it_may_also_create_pressure.mp3"
+    },
+    {
+      "n": 35,
+      "en": "A social obligation may make a voluntary act feel less sincere.",
+      "jp": "社会的義務は自発的な行為を誠意のないものに感じさせる場合があります。",
+      "hira": "しゃかいてき ぎむ は じはつてき な こうい を せいい の ない もの に かんじさせる ばあい が あります",
+      "mp3": "bc_s35_a_social_obligation_may_make_a_voluntary_act_feel_less_sincere.mp3"
+    },
+    {
+      "n": 36,
+      "en": "A thoughtful gesture often matters more than an expensive present.",
+      "jp": "思いやりのある行為は高価な贈り物より重要なことがよくあります。",
+      "hira": "おもいやり の ある こうい は こうか な おくりもの より じゅうよう な こと が よく あります",
+      "mp3": "bc_s36_a_thoughtful_gesture_often_matters_more_than_an_expensive_present.mp3"
+    },
+    {
+      "n": 37,
+      "en": "A charitable donation can support people beyond one’s immediate social circle.",
+      "jp": "慈善寄付は身近な人間関係を超えて人々を支援できます。",
+      "hira": "じぜん きふ は みぢか な にんげん かんけい を こえて ひとびと を しえん できます",
+      "mp3": "bc_s37_a_charitable_donation_can_support_people_beyond_ones_immediate_social_circle.mp3"
+    },
+    {
+      "n": 38,
+      "en": "Volunteer work allows people to contribute time instead of money.",
+      "jp": "ボランティア活動ではお金の代わりに時間を提供できます。",
+      "hira": "ぼらんてぃあ かつどう では おかね の かわり に じかん を ていきょう できます",
+      "mp3": "bc_s38_volunteer_work_allows_people_to_contribute_time_instead_of_money.mp3"
+    },
+    {
+      "n": 39,
+      "en": "Reusable gift wrapping reduces waste during the holiday season.",
+      "jp": "再利用できる贈り物の包装は休暇シーズンのごみを減らします。",
+      "hira": "さいりよう できる おくりもの の ほうそう は きゅうか しーずん の ごみ を へらします",
+      "mp3": "bc_s39_reusable_gift_wrapping_reduces_waste_during_the_holiday_season.mp3"
+    },
+    {
+      "n": 40,
+      "en": "A personalized message can make a simple gift memorable.",
+      "jp": "個人向けのメッセージは簡素な贈り物を印象深くできます。",
+      "hira": "こじんむけ の めっせーじ は かんそ な おくりもの を いんしょうぶかく できます",
+      "mp3": "bc_s40_a_personalized_message_can_make_a_simple_gift_memorable.mp3"
+    },
+    {
+      "n": 41,
+      "en": "The recipient’s preferences should guide the choice of a gift.",
+      "jp": "受取人の好みを贈り物選びの基準にすべきです。",
+      "hira": "うけとりにん の このみ を おくりもの えらび の きじゅん に する べき です",
+      "mp3": "bc_s41_the_recipients_preferences_should_guide_the_choice_of_a_gift.mp3"
+    },
+    {
+      "n": 42,
+      "en": "A giver should not expect equal value in return.",
+      "jp": "贈り手は同じ価値の返礼を期待すべきではありません。",
+      "hira": "おくりて は おなじ かち の へんれい を きたい する べき では ありません",
+      "mp3": "bc_s42_a_giver_should_not_expect_equal_value_in_return.mp3"
+    },
+    {
+      "n": 43,
+      "en": "Unrealistic expectations often lead to disappointment during celebrations.",
+      "jp": "非現実的な期待は祝祭中の失望につながることがよくあります。",
+      "hira": "ひげんじつてき な きたい は しゅくさいちゅう の しつぼう に つながる こと が よく あります",
+      "mp3": "bc_s43_unrealistic_expectations_often_lead_to_disappointment_during_celebrations.mp3"
+    },
+    {
+      "n": 44,
+      "en": "Materialism can shift attention from relationships to possessions.",
+      "jp": "物質主義は関心を人間関係から所有物へ移すことがあります。",
+      "hira": "ぶっしつ しゅぎ は かんしん を にんげん かんけい から しょゆうぶつ へ うつす こと が あります",
+      "mp3": "bc_s44_materialism_can_shift_attention_from_relationships_to_possessions.mp3"
+    },
+    {
+      "n": 45,
+      "en": "Consumer spending rises sharply before major holidays.",
+      "jp": "消費支出は主要な祝日の前に急増します。",
+      "hira": "しょうひ ししゅつ は しゅよう な しゅくじつ の まえ に きゅうぞう します",
+      "mp3": "bc_s45_consumer_spending_rises_sharply_before_major_holidays.mp3"
+    },
+    {
+      "n": 46,
+      "en": "Year-end reflection helps people recognize patterns in their decisions.",
+      "jp": "一年の振り返りは自分の決定の傾向を認識するのに役立ちます。",
+      "hira": "いちねん の ふりかえり は じぶん の けってい の けいこう を にんしき する の に やくだちます",
+      "mp3": "bc_s46_yearend_reflection_helps_people_recognize_patterns_in_their_decisions.mp3"
+    },
+    {
+      "n": 47,
+      "en": "An achievement should be evaluated in relation to the original objective.",
+      "jp": "達成は当初の目標との関係で評価すべきです。",
+      "hira": "たっせい は とうしょ の もくひょう と の かんけい で ひょうか する べき です",
+      "mp3": "bc_s47_an_achievement_should_be_evaluated_in_relation_to_the_original_objective.mp3"
+    },
+    {
+      "n": 48,
+      "en": "A setback can reveal weaknesses that success might hide.",
+      "jp": "挫折は成功では見えない弱点を明らかにすることがあります。",
+      "hira": "ざせつ は せいこう では みえない じゃくてん を あきらか に する こと が あります",
+      "mp3": "bc_s48_a_setback_can_reveal_weaknesses_that_success_might_hide.mp3"
+    },
+    {
+      "n": 49,
+      "en": "Personal growth is often gradual and difficult to measure.",
+      "jp": "人間的成長は多くの場合ゆるやかで測定が困難です。",
+      "hira": "にんげんてき せいちょう は おおく の ばあい ゆるやか で そくてい が こんなん です",
+      "mp3": "bc_s49_personal_growth_is_often_gradual_and_difficult_to_measure.mp3"
+    },
+    {
+      "n": 50,
+      "en": "Honest self-assessment requires evidence rather than emotion alone.",
+      "jp": "正直な自己評価には感情だけでなく根拠が必要です。",
+      "hira": "しょうじき な じこ ひょうか には かんじょう だけ で なく こんきょ が ひつよう です",
+      "mp3": "bc_s50_honest_selfassessment_requires_evidence_rather_than_emotion_alone.mp3"
+    },
+    {
+      "n": 51,
+      "en": "Constructive feedback identifies both strengths and practical next steps.",
+      "jp": "建設的な意見は長所と実践的な次の段階の両方を示します。",
+      "hira": "けんせつてき な いけん は ちょうしょ と じっせんてき な つぎ の だんかい の りょうほう を しめします",
+      "mp3": "bc_s51_constructive_feedback_identifies_both_strengths_and_practical_next_steps.mp3"
+    },
+    {
+      "n": 52,
+      "en": "Resilience develops when people recover from difficulty and adjust their approach.",
+      "jp": "回復力は困難から立ち直り方法を調整するときに育ちます。",
+      "hira": "かいふくりょく は こんなん から たちなおり ほうほう を ちょうせい する とき に そだちます",
+      "mp3": "bc_s52_resilience_develops_when_people_recover_from_difficulty_and_adjust_their_approac.mp3"
+    },
+    {
+      "n": 53,
+      "en": "Motivation is easier to maintain when progress is visible.",
+      "jp": "進歩が見えると意欲を維持しやすくなります。",
+      "hira": "しんぽ が みえる と いよく を いじ しやすく なります",
+      "mp3": "bc_s53_motivation_is_easier_to_maintain_when_progress_is_visible.mp3"
+    },
+    {
+      "n": 54,
+      "en": "A clear priority helps people allocate limited time and energy.",
+      "jp": "明確な優先事項は限られた時間とエネルギーの配分に役立ちます。",
+      "hira": "めいかく な ゆうせん じこう は かぎられた じかん と えねるぎー の はいぶん に やくだちます",
+      "mp3": "bc_s54_a_clear_priority_helps_people_allocate_limited_time_and_energy.mp3"
+    },
+    {
+      "n": 55,
+      "en": "A measurable goal makes it possible to evaluate progress objectively.",
+      "jp": "測定可能な目標は進歩を客観的に評価することを可能にします。",
+      "hira": "そくてい かのう な もくひょう は しんぽ を きゃっかんてき に ひょうか する こと を かのう に します",
+      "mp3": "bc_s55_a_measurable_goal_makes_it_possible_to_evaluate_progress_objectively.mp3"
+    },
+    {
+      "n": 56,
+      "en": "A long-term objective should be divided into manageable stages.",
+      "jp": "長期目標は取り組みやすい段階に分けるべきです。",
+      "hira": "ちょうき もくひょう は とりくみやすい だんかい に わける べき です",
+      "mp3": "bc_s56_a_longterm_objective_should_be_divided_into_manageable_stages.mp3"
+    },
+    {
+      "n": 57,
+      "en": "An action plan turns a broad intention into specific tasks.",
+      "jp": "行動計画は幅広い意図を具体的な課題に変えます。",
+      "hira": "こうどう けいかく は はばひろい いと を ぐたいてき な かだい に かえます",
+      "mp3": "bc_s57_an_action_plan_turns_a_broad_intention_into_specific_tasks.mp3"
+    },
+    {
+      "n": 58,
+      "en": "Accountability increases the likelihood that commitments will be honored.",
+      "jp": "説明責任は約束が守られる可能性を高めます。",
+      "hira": "せつめい せきにん は やくそく が まもられる かのうせい を たかめます",
+      "mp3": "bc_s58_accountability_increases_the_likelihood_that_commitments_will_be_honored.mp3"
+    },
+    {
+      "n": 59,
+      "en": "Continuous improvement depends on regular review and small adjustments.",
+      "jp": "継続的改善は定期的な見直しと小さな調整にかかっています。",
+      "hira": "けいぞくてき かいぜん は ていきてき な みなおし と ちいさな ちょうせい に かかって います",
+      "mp3": "bc_s59_continuous_improvement_depends_on_regular_review_and_small_adjustments.mp3"
+    },
+    {
+      "n": 60,
+      "en": "A new beginning provides hope, but lasting change requires consistent action.",
+      "jp": "新たな始まりは希望を与えますが、持続する変化には一貫した行動が必要です。",
+      "hira": "あらた な はじまり は きぼう を あたえます が じぞく する へんか には いっかん した こうどう が ひつよう です",
+      "mp3": "bc_s60_a_new_beginning_provides_hope_but_lasting_change_requires_consistent_action.mp3"
+    }
+  ]
+}

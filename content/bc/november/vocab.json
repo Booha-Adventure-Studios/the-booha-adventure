@@ -1,1 +1,424 @@
-
+{
+  "cards": [
+    {
+      "n": 1,
+      "en": "housing market",
+      "jp": "住宅市場",
+      "hira": "じゅうたく しじょう",
+      "mp3": "bc_v01_housing_market.mp3"
+    },
+    {
+      "n": 2,
+      "en": "residential property",
+      "jp": "住宅用不動産",
+      "hira": "じゅうたくよう ふどうさん",
+      "mp3": "bc_v02_residential_property.mp3"
+    },
+    {
+      "n": 3,
+      "en": "detached residence",
+      "jp": "戸建て住宅",
+      "hira": "こだて じゅうたく",
+      "mp3": "bc_v03_detached_residence.mp3"
+    },
+    {
+      "n": 4,
+      "en": "condominium",
+      "jp": "分譲マンション",
+      "hira": "ぶんじょう まんしょん",
+      "mp3": "bc_v04_condominium.mp3"
+    },
+    {
+      "n": 5,
+      "en": "rental accommodation",
+      "jp": "賃貸住宅",
+      "hira": "ちんたい じゅうたく",
+      "mp3": "bc_v05_rental_accommodation.mp3"
+    },
+    {
+      "n": 6,
+      "en": "homeownership",
+      "jp": "持ち家所有",
+      "hira": "もちいえ しょゆう",
+      "mp3": "bc_v06_homeownership.mp3"
+    },
+    {
+      "n": 7,
+      "en": "mortgage",
+      "jp": "住宅ローン",
+      "hira": "じゅうたく ろーん",
+      "mp3": "bc_v07_mortgage.mp3"
+    },
+    {
+      "n": 8,
+      "en": "down payment",
+      "jp": "頭金",
+      "hira": "あたまきん",
+      "mp3": "bc_v08_down_payment.mp3"
+    },
+    {
+      "n": 9,
+      "en": "property value",
+      "jp": "不動産価値",
+      "hira": "ふどうさん かち",
+      "mp3": "bc_v09_property_value.mp3"
+    },
+    {
+      "n": 10,
+      "en": "floor plan",
+      "jp": "間取り",
+      "hira": "まどり",
+      "mp3": "bc_v10_floor_plan.mp3"
+    },
+    {
+      "n": 11,
+      "en": "living space",
+      "jp": "居住空間",
+      "hira": "きょじゅう くうかん",
+      "mp3": "bc_v11_living_space.mp3"
+    },
+    {
+      "n": 12,
+      "en": "occupancy",
+      "jp": "入居人数",
+      "hira": "にゅうきょ にんずう",
+      "mp3": "bc_v12_occupancy.mp3"
+    },
+    {
+      "n": 13,
+      "en": "urban residence",
+      "jp": "都市型住宅",
+      "hira": "としがた じゅうたく",
+      "mp3": "bc_v13_urban_residence.mp3"
+    },
+    {
+      "n": 14,
+      "en": "suburban neighborhood",
+      "jp": "郊外住宅地",
+      "hira": "こうがい じゅうたくち",
+      "mp3": "bc_v14_suburban_neighborhood.mp3"
+    },
+    {
+      "n": 15,
+      "en": "housing demand",
+      "jp": "住宅需要",
+      "hira": "じゅうたく じゅよう",
+      "mp3": "bc_v15_housing_demand.mp3"
+    },
+    {
+      "n": 16,
+      "en": "furnishings",
+      "jp": "家具調度品",
+      "hira": "かぐ ちょうどひん",
+      "mp3": "bc_v16_furnishings.mp3"
+    },
+    {
+      "n": 17,
+      "en": "household appliance",
+      "jp": "家電製品",
+      "hira": "かでん せいひん",
+      "mp3": "bc_v17_household_appliance.mp3"
+    },
+    {
+      "n": 18,
+      "en": "interior design",
+      "jp": "インテリアデザイン",
+      "hira": "いんてりあ でざいん",
+      "mp3": "bc_v18_interior_design.mp3"
+    },
+    {
+      "n": 19,
+      "en": "natural lighting",
+      "jp": "自然採光",
+      "hira": "しぜん さいこう",
+      "mp3": "bc_v19_natural_lighting.mp3"
+    },
+    {
+      "n": 20,
+      "en": "ventilation",
+      "jp": "換気",
+      "hira": "かんき",
+      "mp3": "bc_v20_ventilation.mp3"
+    },
+    {
+      "n": 21,
+      "en": "insulation",
+      "jp": "断熱",
+      "hira": "だんねつ",
+      "mp3": "bc_v21_insulation.mp3"
+    },
+    {
+      "n": 22,
+      "en": "energy efficiency",
+      "jp": "エネルギー効率",
+      "hira": "えねるぎー こうりつ",
+      "mp3": "bc_v22_energy_efficiency.mp3"
+    },
+    {
+      "n": 23,
+      "en": "renewable energy",
+      "jp": "再生可能エネルギー",
+      "hira": "さいせい かのう えねるぎー",
+      "mp3": "bc_v23_renewable_energy.mp3"
+    },
+    {
+      "n": 24,
+      "en": "smart-home technology",
+      "jp": "スマートホーム技術",
+      "hira": "すまーと ほーむ ぎじゅつ",
+      "mp3": "bc_v24_smarthome_technology.mp3"
+    },
+    {
+      "n": 25,
+      "en": "accessibility",
+      "jp": "利用しやすさ",
+      "hira": "りよう しやすさ",
+      "mp3": "bc_v25_accessibility.mp3"
+    },
+    {
+      "n": 26,
+      "en": "storage capacity",
+      "jp": "収納容量",
+      "hira": "しゅうのう ようりょう",
+      "mp3": "bc_v26_storage_capacity.mp3"
+    },
+    {
+      "n": 27,
+      "en": "structural integrity",
+      "jp": "構造的健全性",
+      "hira": "こうぞうてき けんぜんせい",
+      "mp3": "bc_v27_structural_integrity.mp3"
+    },
+    {
+      "n": 28,
+      "en": "building materials",
+      "jp": "建築材料",
+      "hira": "けんちく ざいりょう",
+      "mp3": "bc_v28_building_materials.mp3"
+    },
+    {
+      "n": 29,
+      "en": "renovation",
+      "jp": "改修",
+      "hira": "かいしゅう",
+      "mp3": "bc_v29_renovation.mp3"
+    },
+    {
+      "n": 30,
+      "en": "maintenance",
+      "jp": "維持管理",
+      "hira": "いじ かんり",
+      "mp3": "bc_v30_maintenance.mp3"
+    },
+    {
+      "n": 31,
+      "en": "household responsibility",
+      "jp": "家庭内の責任",
+      "hira": "かていない の せきにん",
+      "mp3": "bc_v31_household_responsibility.mp3"
+    },
+    {
+      "n": 32,
+      "en": "domestic workload",
+      "jp": "家事負担",
+      "hira": "かじ ふたん",
+      "mp3": "bc_v32_domestic_workload.mp3"
+    },
+    {
+      "n": 33,
+      "en": "division of labor",
+      "jp": "役割分担",
+      "hira": "やくわり ぶんたん",
+      "mp3": "bc_v33_division_of_labor.mp3"
+    },
+    {
+      "n": 34,
+      "en": "routine upkeep",
+      "jp": "日常的な手入れ",
+      "hira": "にちじょうてき な ていれ",
+      "mp3": "bc_v34_routine_upkeep.mp3"
+    },
+    {
+      "n": 35,
+      "en": "waste disposal",
+      "jp": "廃棄物処理",
+      "hira": "はいきぶつ しょり",
+      "mp3": "bc_v35_waste_disposal.mp3"
+    },
+    {
+      "n": 36,
+      "en": "recycling system",
+      "jp": "リサイクル制度",
+      "hira": "りさいくる せいど",
+      "mp3": "bc_v36_recycling_system.mp3"
+    },
+    {
+      "n": 37,
+      "en": "energy consumption",
+      "jp": "エネルギー消費",
+      "hira": "えねるぎー しょうひ",
+      "mp3": "bc_v37_energy_consumption.mp3"
+    },
+    {
+      "n": 38,
+      "en": "water conservation",
+      "jp": "節水",
+      "hira": "せっすい",
+      "mp3": "bc_v38_water_conservation.mp3"
+    },
+    {
+      "n": 39,
+      "en": "safety inspection",
+      "jp": "安全点検",
+      "hira": "あんぜん てんけん",
+      "mp3": "bc_v39_safety_inspection.mp3"
+    },
+    {
+      "n": 40,
+      "en": "fire prevention",
+      "jp": "防火",
+      "hira": "ぼうか",
+      "mp3": "bc_v40_fire_prevention.mp3"
+    },
+    {
+      "n": 41,
+      "en": "security system",
+      "jp": "防犯システム",
+      "hira": "ぼうはん しすてむ",
+      "mp3": "bc_v41_security_system.mp3"
+    },
+    {
+      "n": 42,
+      "en": "property management",
+      "jp": "不動産管理",
+      "hira": "ふどうさん かんり",
+      "mp3": "bc_v42_property_management.mp3"
+    },
+    {
+      "n": 43,
+      "en": "repair request",
+      "jp": "修理依頼",
+      "hira": "しゅうり いらい",
+      "mp3": "bc_v43_repair_request.mp3"
+    },
+    {
+      "n": 44,
+      "en": "tenant",
+      "jp": "入居者",
+      "hira": "にゅうきょしゃ",
+      "mp3": "bc_v44_tenant.mp3"
+    },
+    {
+      "n": 45,
+      "en": "landlord",
+      "jp": "家主",
+      "hira": "やぬし",
+      "mp3": "bc_v45_landlord.mp3"
+    },
+    {
+      "n": 46,
+      "en": "housing affordability",
+      "jp": "住宅費の負担可能性",
+      "hira": "じゅうたくひ の ふたん かのうせい",
+      "mp3": "bc_v46_housing_affordability.mp3"
+    },
+    {
+      "n": 47,
+      "en": "housing shortage",
+      "jp": "住宅不足",
+      "hira": "じゅうたく ぶそく",
+      "mp3": "bc_v47_housing_shortage.mp3"
+    },
+    {
+      "n": 48,
+      "en": "public housing",
+      "jp": "公営住宅",
+      "hira": "こうえい じゅうたく",
+      "mp3": "bc_v48_public_housing.mp3"
+    },
+    {
+      "n": 49,
+      "en": "zoning regulation",
+      "jp": "用途地域規制",
+      "hira": "ようと ちいき きせい",
+      "mp3": "bc_v49_zoning_regulation.mp3"
+    },
+    {
+      "n": 50,
+      "en": "building code",
+      "jp": "建築基準",
+      "hira": "けんちく きじゅん",
+      "mp3": "bc_v50_building_code.mp3"
+    },
+    {
+      "n": 51,
+      "en": "population density",
+      "jp": "人口密度",
+      "hira": "じんこう みつど",
+      "mp3": "bc_v51_population_density.mp3"
+    },
+    {
+      "n": 52,
+      "en": "urban development",
+      "jp": "都市開発",
+      "hira": "とし かいはつ",
+      "mp3": "bc_v52_urban_development.mp3"
+    },
+    {
+      "n": 53,
+      "en": "neighborhood revitalization",
+      "jp": "地域再生",
+      "hira": "ちいき さいせい",
+      "mp3": "bc_v53_neighborhood_revitalization.mp3"
+    },
+    {
+      "n": 54,
+      "en": "community cohesion",
+      "jp": "地域の結束",
+      "hira": "ちいき の けっそく",
+      "mp3": "bc_v54_community_cohesion.mp3"
+    },
+    {
+      "n": 55,
+      "en": "quality of life",
+      "jp": "生活の質",
+      "hira": "せいかつ の しつ",
+      "mp3": "bc_v55_quality_of_life.mp3"
+    },
+    {
+      "n": 56,
+      "en": "sustainable housing",
+      "jp": "持続可能な住宅",
+      "hira": "じぞく かのう な じゅうたく",
+      "mp3": "bc_v56_sustainable_housing.mp3"
+    },
+    {
+      "n": 57,
+      "en": "mixed-use development",
+      "jp": "複合用途開発",
+      "hira": "ふくごう ようと かいはつ",
+      "mp3": "bc_v57_mixeduse_development.mp3"
+    },
+    {
+      "n": 58,
+      "en": "displacement",
+      "jp": "立ち退き",
+      "hira": "たちのき",
+      "mp3": "bc_v58_displacement.mp3"
+    },
+    {
+      "n": 59,
+      "en": "homelessness",
+      "jp": "ホームレス問題",
+      "hira": "ほーむれす もんだい",
+      "mp3": "bc_v59_homelessness.mp3"
+    },
+    {
+      "n": 60,
+      "en": "housing policy",
+      "jp": "住宅政策",
+      "hira": "じゅうたく せいさく",
+      "mp3": "bc_v60_housing_policy.mp3"
+    }
+  ]
+}

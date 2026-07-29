@@ -1,1 +1,424 @@
-
+{
+  "cards": [
+    {
+      "n": 1,
+      "en": "house",
+      "jp": "家",
+      "hira": "いえ",
+      "mp3": "br_v01_house.mp3"
+    },
+    {
+      "n": 2,
+      "en": "apartment",
+      "jp": "アパート",
+      "hira": "あぱーと",
+      "mp3": "br_v02_apartment.mp3"
+    },
+    {
+      "n": 3,
+      "en": "condominium",
+      "jp": "分譲マンション",
+      "hira": "ぶんじょう まんしょん",
+      "mp3": "br_v03_condominium.mp3"
+    },
+    {
+      "n": 4,
+      "en": "detached house",
+      "jp": "一戸建て",
+      "hira": "いっこだて",
+      "mp3": "br_v04_detached_house.mp3"
+    },
+    {
+      "n": 5,
+      "en": "floor / story",
+      "jp": "階",
+      "hira": "かい",
+      "mp3": "br_v05_floor_story.mp3"
+    },
+    {
+      "n": 6,
+      "en": "room",
+      "jp": "部屋",
+      "hira": "へや",
+      "mp3": "br_v06_room.mp3"
+    },
+    {
+      "n": 7,
+      "en": "living room",
+      "jp": "居間／リビング",
+      "hira": "いま／りびんぐ",
+      "mp3": "br_v07_living_room.mp3"
+    },
+    {
+      "n": 8,
+      "en": "dining room",
+      "jp": "食堂／ダイニング",
+      "hira": "しょくどう／だいにんぐ",
+      "mp3": "br_v08_dining_room.mp3"
+    },
+    {
+      "n": 9,
+      "en": "kitchen",
+      "jp": "台所／キッチン",
+      "hira": "だいどころ／きっちん",
+      "mp3": "br_v09_kitchen.mp3"
+    },
+    {
+      "n": 10,
+      "en": "bedroom",
+      "jp": "寝室",
+      "hira": "しんしつ",
+      "mp3": "br_v10_bedroom.mp3"
+    },
+    {
+      "n": 11,
+      "en": "bathroom",
+      "jp": "浴室／バスルーム",
+      "hira": "よくしつ／ばするーむ",
+      "mp3": "br_v11_bathroom.mp3"
+    },
+    {
+      "n": 12,
+      "en": "toilet / restroom",
+      "jp": "トイレ",
+      "hira": "といれ",
+      "mp3": "br_v12_toilet_restroom.mp3"
+    },
+    {
+      "n": 13,
+      "en": "entrance",
+      "jp": "玄関",
+      "hira": "げんかん",
+      "mp3": "br_v13_entrance.mp3"
+    },
+    {
+      "n": 14,
+      "en": "balcony",
+      "jp": "バルコニー",
+      "hira": "ばるこにー",
+      "mp3": "br_v14_balcony.mp3"
+    },
+    {
+      "n": 15,
+      "en": "yard / garden",
+      "jp": "庭",
+      "hira": "にわ",
+      "mp3": "br_v15_yard_garden.mp3"
+    },
+    {
+      "n": 16,
+      "en": "sofa",
+      "jp": "ソファ",
+      "hira": "そふぁ",
+      "mp3": "br_v16_sofa.mp3"
+    },
+    {
+      "n": 17,
+      "en": "table",
+      "jp": "テーブル",
+      "hira": "てーぶる",
+      "mp3": "br_v17_table.mp3"
+    },
+    {
+      "n": 18,
+      "en": "chair",
+      "jp": "いす",
+      "hira": "いす",
+      "mp3": "br_v18_chair.mp3"
+    },
+    {
+      "n": 19,
+      "en": "bed",
+      "jp": "ベッド",
+      "hira": "べっど",
+      "mp3": "br_v19_bed.mp3"
+    },
+    {
+      "n": 20,
+      "en": "desk",
+      "jp": "机",
+      "hira": "つくえ",
+      "mp3": "br_v20_desk.mp3"
+    },
+    {
+      "n": 21,
+      "en": "bookshelf",
+      "jp": "本棚",
+      "hira": "ほんだな",
+      "mp3": "br_v21_bookshelf.mp3"
+    },
+    {
+      "n": 22,
+      "en": "closet / wardrobe",
+      "jp": "クローゼット／押し入れ",
+      "hira": "くろーぜっと／おしいれ",
+      "mp3": "br_v22_closet_wardrobe.mp3"
+    },
+    {
+      "n": 23,
+      "en": "lamp",
+      "jp": "ランプ",
+      "hira": "らんぷ",
+      "mp3": "br_v23_lamp.mp3"
+    },
+    {
+      "n": 24,
+      "en": "rug / carpet",
+      "jp": "カーペット",
+      "hira": "かーぺっと",
+      "mp3": "br_v24_rug_carpet.mp3"
+    },
+    {
+      "n": 25,
+      "en": "refrigerator",
+      "jp": "冷蔵庫",
+      "hira": "れいぞうこ",
+      "mp3": "br_v25_refrigerator.mp3"
+    },
+    {
+      "n": 26,
+      "en": "stove / cooktop",
+      "jp": "コンロ",
+      "hira": "こんろ",
+      "mp3": "br_v26_stove_cooktop.mp3"
+    },
+    {
+      "n": 27,
+      "en": "microwave",
+      "jp": "電子レンジ",
+      "hira": "でんし れんじ",
+      "mp3": "br_v27_microwave.mp3"
+    },
+    {
+      "n": 28,
+      "en": "washing machine",
+      "jp": "洗濯機",
+      "hira": "せんたくき",
+      "mp3": "br_v28_washing_machine.mp3"
+    },
+    {
+      "n": 29,
+      "en": "air conditioner / AC",
+      "jp": "エアコン",
+      "hira": "えあこん",
+      "mp3": "br_v29_air_conditioner_ac.mp3"
+    },
+    {
+      "n": 30,
+      "en": "TV",
+      "jp": "テレビ",
+      "hira": "てれび",
+      "mp3": "br_v30_tv.mp3"
+    },
+    {
+      "n": 31,
+      "en": "chore / housework",
+      "jp": "家事",
+      "hira": "かじ",
+      "mp3": "br_v31_chore_housework.mp3"
+    },
+    {
+      "n": 32,
+      "en": "clean",
+      "jp": "掃除（する）",
+      "hira": "そうじ（する）",
+      "mp3": "br_v32_clean.mp3"
+    },
+    {
+      "n": 33,
+      "en": "sweep",
+      "jp": "ほうきで掃く",
+      "hira": "ほうき で はく",
+      "mp3": "br_v33_sweep.mp3"
+    },
+    {
+      "n": 34,
+      "en": "vacuum",
+      "jp": "掃除機をかける",
+      "hira": "そうじき を かける",
+      "mp3": "br_v34_vacuum.mp3"
+    },
+    {
+      "n": 35,
+      "en": "mop",
+      "jp": "モップをかける",
+      "hira": "もっぷ を かける",
+      "mp3": "br_v35_mop.mp3"
+    },
+    {
+      "n": 36,
+      "en": "wash dishes",
+      "jp": "皿洗い（する）",
+      "hira": "さらあらい（する）",
+      "mp3": "br_v36_wash_dishes.mp3"
+    },
+    {
+      "n": 37,
+      "en": "do laundry",
+      "jp": "洗濯（する）",
+      "hira": "せんたく（する）",
+      "mp3": "br_v37_do_laundry.mp3"
+    },
+    {
+      "n": 38,
+      "en": "fold clothes",
+      "jp": "服をたたむ",
+      "hira": "ふく を たたむ",
+      "mp3": "br_v38_fold_clothes.mp3"
+    },
+    {
+      "n": 39,
+      "en": "take out the trash",
+      "jp": "ゴミ出し（する）",
+      "hira": "ごみだし（する）",
+      "mp3": "br_v39_take_out_the_trash.mp3"
+    },
+    {
+      "n": 40,
+      "en": "recycle",
+      "jp": "リサイクル（する）",
+      "hira": "りさいくる（する）",
+      "mp3": "br_v40_recycle.mp3"
+    },
+    {
+      "n": 41,
+      "en": "water the plants",
+      "jp": "水やり（する）",
+      "hira": "みずやり（する）",
+      "mp3": "br_v41_water_the_plants.mp3"
+    },
+    {
+      "n": 42,
+      "en": "feed the pet",
+      "jp": "えさをやる／ごはんをあげる",
+      "hira": "えさ を やる／ごはん を あげる",
+      "mp3": "br_v42_feed_the_pet.mp3"
+    },
+    {
+      "n": 43,
+      "en": "make the bed",
+      "jp": "ベッドを整える",
+      "hira": "べっど を ととのえる",
+      "mp3": "br_v43_make_the_bed.mp3"
+    },
+    {
+      "n": 44,
+      "en": "set the table",
+      "jp": "食卓を整える",
+      "hira": "しょくたく を ととのえる",
+      "mp3": "br_v44_set_the_table.mp3"
+    },
+    {
+      "n": 45,
+      "en": "responsibility",
+      "jp": "責任",
+      "hira": "せきにん",
+      "mp3": "br_v45_responsibility.mp3"
+    },
+    {
+      "n": 46,
+      "en": "dream house",
+      "jp": "夢の家",
+      "hira": "ゆめ の いえ",
+      "mp3": "br_v46_dream_house.mp3"
+    },
+    {
+      "n": 47,
+      "en": "spacious",
+      "jp": "広々とした",
+      "hira": "ひろびろ と した",
+      "mp3": "br_v47_spacious.mp3"
+    },
+    {
+      "n": 48,
+      "en": "cozy",
+      "jp": "居心地のよい",
+      "hira": "いごこち の よい",
+      "mp3": "br_v48_cozy.mp3"
+    },
+    {
+      "n": 49,
+      "en": "bright",
+      "jp": "明るい",
+      "hira": "あかるい",
+      "mp3": "br_v49_bright.mp3"
+    },
+    {
+      "n": 50,
+      "en": "quiet",
+      "jp": "静かな",
+      "hira": "しずかな",
+      "mp3": "br_v50_quiet.mp3"
+    },
+    {
+      "n": 51,
+      "en": "rooftop",
+      "jp": "屋上",
+      "hira": "おくじょう",
+      "mp3": "br_v51_rooftop.mp3"
+    },
+    {
+      "n": 52,
+      "en": "garden",
+      "jp": "庭",
+      "hira": "にわ",
+      "mp3": "br_v52_garden.mp3"
+    },
+    {
+      "n": 53,
+      "en": "study / home office",
+      "jp": "書斎",
+      "hira": "しょさい",
+      "mp3": "br_v53_study_home_office.mp3"
+    },
+    {
+      "n": 54,
+      "en": "playroom",
+      "jp": "あそび部屋／プレイルーム",
+      "hira": "あそび べや／ぷれいるーむ",
+      "mp3": "br_v54_playroom.mp3"
+    },
+    {
+      "n": 55,
+      "en": "home theater",
+      "jp": "ホームシアター",
+      "hira": "ほーむ しあたー",
+      "mp3": "br_v55_home_theater.mp3"
+    },
+    {
+      "n": 56,
+      "en": "storage",
+      "jp": "収納",
+      "hira": "しゅうのう",
+      "mp3": "br_v56_storage.mp3"
+    },
+    {
+      "n": 57,
+      "en": "energy-efficient",
+      "jp": "省エネの",
+      "hira": "しょうえね の",
+      "mp3": "br_v57_energyefficient.mp3"
+    },
+    {
+      "n": 58,
+      "en": "eco-friendly",
+      "jp": "環境にやさしい",
+      "hira": "かんきょう に やさしい",
+      "mp3": "br_v58_ecofriendly.mp3"
+    },
+    {
+      "n": 59,
+      "en": "neighborhood",
+      "jp": "近所／地域",
+      "hira": "きんじょ／ちいき",
+      "mp3": "br_v59_neighborhood.mp3"
+    },
+    {
+      "n": 60,
+      "en": "pet-friendly",
+      "jp": "ペット可の",
+      "hira": "ぺっと か の",
+      "mp3": "br_v60_petfriendly.mp3"
+    }
+  ]
+}
