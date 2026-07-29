@@ -1,1 +1,424 @@
-
+{
+  "cards": [
+    {
+      "n": 1,
+      "en": "How do interest rates influence the housing market?",
+      "jp": "金利は住宅市場にどのような影響を与えますか。",
+      "hira": "きんり は じゅうたく しじょう に どの よう な えいきょう を あたえます か",
+      "mp3": "bc_q01_how_do_interest_rates_influence_the_housing_market.mp3"
+    },
+    {
+      "n": 2,
+      "en": "What makes residential property a valuable long-term investment?",
+      "jp": "住宅用不動産が価値ある長期投資となるのはなぜですか。",
+      "hira": "じゅうたくよう ふどうさん が かち ある ちょうき とうし と なる の は なぜ です か",
+      "mp3": "bc_q02_what_makes_residential_property_a_valuable_longterm_investment.mp3"
+    },
+    {
+      "n": 3,
+      "en": "What are the advantages and disadvantages of a detached residence?",
+      "jp": "戸建て住宅の利点と欠点は何ですか。",
+      "hira": "こだて じゅうたく の りてん と けってん は なん です か",
+      "mp3": "bc_q03_what_are_the_advantages_and_disadvantages_of_a_detached_residence.mp3"
+    },
+    {
+      "n": 4,
+      "en": "How should condominium owners make collective decisions?",
+      "jp": "分譲マンションの所有者は共同の決定をどのように行うべきですか。",
+      "hira": "ぶんじょう まんしょん の しょゆうしゃ は きょうどう の けってい を どの よう に おこなう べき です か",
+      "mp3": "bc_q04_how_should_condominium_owners_make_collective_decisions.mp3"
+    },
+    {
+      "n": 5,
+      "en": "When is rental accommodation preferable to buying a home?",
+      "jp": "住宅を買うより賃貸住宅が望ましいのはどのような場合ですか。",
+      "hira": "じゅうたく を かう より ちんたい じゅうたく が のぞましい の は どの よう な ばあい です か",
+      "mp3": "bc_q05_when_is_rental_accommodation_preferable_to_buying_a_home.mp3"
+    },
+    {
+      "n": 6,
+      "en": "Is homeownership still a reliable path to financial stability?",
+      "jp": "持ち家所有は今も経済的安定への確かな道ですか。",
+      "hira": "もちいえ しょゆう は いま も けいざいてき あんてい への たしか な みち です か",
+      "mp3": "bc_q06_is_homeownership_still_a_reliable_path_to_financial_stability.mp3"
+    },
+    {
+      "n": 7,
+      "en": "Which factors determine whether a mortgage application is approved?",
+      "jp": "住宅ローンの申請が承認されるかを決める要因は何ですか。",
+      "hira": "じゅうたく ろーん の しんせい が しょうにん される か を きめる よういん は なん です か",
+      "mp3": "bc_q07_which_factors_determine_whether_a_mortgage_application_is_approved.mp3"
+    },
+    {
+      "n": 8,
+      "en": "How large a down payment should buyers aim for?",
+      "jp": "購入者はどの程度の頭金を目指すべきですか。",
+      "hira": "こうにゅうしゃ は どの ていど の あたまきん を めざす べき です か",
+      "mp3": "bc_q08_how_large_a_down_payment_should_buyers_aim_for.mp3"
+    },
+    {
+      "n": 9,
+      "en": "Which improvements are most likely to increase property value?",
+      "jp": "どの改良が不動産価値を最も高める可能性がありますか。",
+      "hira": "どの かいりょう が ふどうさん かち を もっとも たかめる かのうせい が あります か",
+      "mp3": "bc_q09_which_improvements_are_most_likely_to_increase_property_value.mp3"
+    },
+    {
+      "n": 10,
+      "en": "How should a floor plan adapt to remote work?",
+      "jp": "間取りは在宅勤務にどう対応すべきですか。",
+      "hira": "まどり は ざいたく きんむ に どう たいおう する べき です か",
+      "mp3": "bc_q10_how_should_a_floor_plan_adapt_to_remote_work.mp3"
+    },
+    {
+      "n": 11,
+      "en": "How can residents make the best use of limited living space?",
+      "jp": "住民は限られた居住空間をどう最大限に活用できますか。",
+      "hira": "じゅうみん は かぎられた きょじゅう くうかん を どう さいだいげん に かつよう できます か",
+      "mp3": "bc_q11_how_can_residents_make_the_best_use_of_limited_living_space.mp3"
+    },
+    {
+      "n": 12,
+      "en": "Why are occupancy limits necessary in some buildings?",
+      "jp": "一部の建物で入居人数の制限が必要なのはなぜですか。",
+      "hira": "いちぶ の たてもの で にゅうきょ にんずう の せいげん が ひつよう な の は なぜ です か",
+      "mp3": "bc_q12_why_are_occupancy_limits_necessary_in_some_buildings.mp3"
+    },
+    {
+      "n": 13,
+      "en": "What trade-offs are involved in choosing an urban residence?",
+      "jp": "都市型住宅を選ぶ際にはどのようなトレードオフがありますか。",
+      "hira": "としがた じゅうたく を えらぶ さい には どの よう な とれーど おふ が あります か",
+      "mp3": "bc_q13_what_tradeoffs_are_involved_in_choosing_an_urban_residence.mp3"
+    },
+    {
+      "n": 14,
+      "en": "What attracts families to suburban neighborhoods?",
+      "jp": "家族が郊外住宅地に引きつけられるのはなぜですか。",
+      "hira": "かぞく が こうがい じゅうたくち に ひきつけられる の は なぜ です か",
+      "mp3": "bc_q14_what_attracts_families_to_suburban_neighborhoods.mp3"
+    },
+    {
+      "n": 15,
+      "en": "How can cities respond to rising housing demand?",
+      "jp": "都市は増加する住宅需要にどう対応できますか。",
+      "hira": "とし は ぞうか する じゅうたく じゅよう に どう たいおう できます か",
+      "mp3": "bc_q15_how_can_cities_respond_to_rising_housing_demand.mp3"
+    },
+    {
+      "n": 16,
+      "en": "Which furnishings are worth investing in for long-term use?",
+      "jp": "長期使用のために投資する価値がある家具調度品はどれですか。",
+      "hira": "ちょうき しよう の ため に とうし する かち が ある かぐ ちょうどひん は どれ です か",
+      "mp3": "bc_q16_which_furnishings_are_worth_investing_in_for_longterm_use.mp3"
+    },
+    {
+      "n": 17,
+      "en": "Should inefficient household appliances be replaced before they fail?",
+      "jp": "効率の悪い家電製品は故障前に交換すべきですか。",
+      "hira": "こうりつ の わるい かでん せいひん は こしょうまえ に こうかん する べき です か",
+      "mp3": "bc_q17_should_inefficient_household_appliances_be_replaced_before_they_fail.mp3"
+    },
+    {
+      "n": 18,
+      "en": "How does interior design affect well-being?",
+      "jp": "インテリアデザインは心身の健康にどう影響しますか。",
+      "hira": "いんてりあ でざいん は しんしん の けんこう に どう えいきょう します か",
+      "mp3": "bc_q18_how_does_interior_design_affect_wellbeing.mp3"
+    },
+    {
+      "n": 19,
+      "en": "How can homes make better use of natural lighting?",
+      "jp": "住宅は自然採光をどうすればより有効に活用できますか。",
+      "hira": "じゅうたく は しぜん さいこう を どう すれば より ゆうこう に かつよう できます か",
+      "mp3": "bc_q19_how_can_homes_make_better_use_of_natural_lighting.mp3"
+    },
+    {
+      "n": 20,
+      "en": "What health problems can result from poor ventilation?",
+      "jp": "換気不足はどのような健康問題を引き起こしますか。",
+      "hira": "かんき ぶそく は どの よう な けんこう もんだい を ひきおこします か",
+      "mp3": "bc_q20_what_health_problems_can_result_from_poor_ventilation.mp3"
+    },
+    {
+      "n": 21,
+      "en": "How does insulation reduce household energy use?",
+      "jp": "断熱は家庭のエネルギー使用をどう減らしますか。",
+      "hira": "だんねつ は かてい の えねるぎー しよう を どう へらします か",
+      "mp3": "bc_q21_how_does_insulation_reduce_household_energy_use.mp3"
+    },
+    {
+      "n": 22,
+      "en": "How should a home's energy efficiency be measured?",
+      "jp": "住宅のエネルギー効率はどのように測定すべきですか。",
+      "hira": "じゅうたく の えねるぎー こうりつ は どの よう に そくてい する べき です か",
+      "mp3": "bc_q22_how_should_a_homes_energy_efficiency_be_measured.mp3"
+    },
+    {
+      "n": 23,
+      "en": "When is an investment in renewable energy worthwhile?",
+      "jp": "再生可能エネルギーへの投資はどのような場合に価値がありますか。",
+      "hira": "さいせい かのう えねるぎー への とうし は どの よう な ばあい に かち が あります か",
+      "mp3": "bc_q23_when_is_an_investment_in_renewable_energy_worthwhile.mp3"
+    },
+    {
+      "n": 24,
+      "en": "Should smart-home technology be allowed to collect personal data?",
+      "jp": "スマートホーム技術に個人データの収集を認めるべきですか。",
+      "hira": "すまーと ほーむ ぎじゅつ に こじん でーた の しゅうしゅう を みとめる べき です か",
+      "mp3": "bc_q24_should_smarthome_technology_be_allowed_to_collect_personal_data.mp3"
+    },
+    {
+      "n": 25,
+      "en": "How can homes be designed for greater accessibility?",
+      "jp": "住宅をより利用しやすくするにはどう設計できますか。",
+      "hira": "じゅうたく を より りよう しやすく する には どう せっけい できます か",
+      "mp3": "bc_q25_how_can_homes_be_designed_for_greater_accessibility.mp3"
+    },
+    {
+      "n": 26,
+      "en": "How much storage capacity does a household actually need?",
+      "jp": "一世帯には実際どの程度の収納容量が必要ですか。",
+      "hira": "いちせたい には じっさい どの ていど の しゅうのう ようりょう が ひつよう です か",
+      "mp3": "bc_q26_how_much_storage_capacity_does_a_household_actually_need.mp3"
+    },
+    {
+      "n": 27,
+      "en": "Which warning signs may indicate a problem with structural integrity?",
+      "jp": "構造的健全性の問題を示す可能性がある兆候は何ですか。",
+      "hira": "こうぞうてき けんぜんせい の もんだい を しめす かのうせい が ある ちょうこう は なん です か",
+      "mp3": "bc_q27_which_warning_signs_may_indicate_a_problem_with_structural_integrity.mp3"
+    },
+    {
+      "n": 28,
+      "en": "Which building materials are most sustainable in this region?",
+      "jp": "この地域で最も持続可能な建築材料はどれですか。",
+      "hira": "この ちいき で もっとも じぞく かのう な けんちく ざいりょう は どれ です か",
+      "mp3": "bc_q28_which_building_materials_are_most_sustainable_in_this_region.mp3"
+    },
+    {
+      "n": 29,
+      "en": "When is renovation preferable to rebuilding?",
+      "jp": "建て替えより改修が望ましいのはどのような場合ですか。",
+      "hira": "たてかえ より かいしゅう が のぞましい の は どの よう な ばあい です か",
+      "mp3": "bc_q29_when_is_renovation_preferable_to_rebuilding.mp3"
+    },
+    {
+      "n": 30,
+      "en": "Who should be responsible for regular maintenance?",
+      "jp": "定期的な維持管理には誰が責任を負うべきですか。",
+      "hira": "ていきてき な いじ かんり には だれ が せきにん を おう べき です か",
+      "mp3": "bc_q30_who_should_be_responsible_for_regular_maintenance.mp3"
+    },
+    {
+      "n": 31,
+      "en": "Which household responsibilities should children have?",
+      "jp": "子どもはどのような家庭内の責任を持つべきですか。",
+      "hira": "こども は どの よう な かていない の せきにん を もつ べき です か",
+      "mp3": "bc_q31_which_household_responsibilities_should_children_have.mp3"
+    },
+    {
+      "n": 32,
+      "en": "How can families reduce an unequal domestic workload?",
+      "jp": "家庭は不平等な家事負担をどう減らせますか。",
+      "hira": "かてい は ふびょうどう な かじ ふたん を どう へらせます か",
+      "mp3": "bc_q32_how_can_families_reduce_an_unequal_domestic_workload.mp3"
+    },
+    {
+      "n": 33,
+      "en": "What should a fair division of labor be based on?",
+      "jp": "公平な役割分担は何に基づくべきですか。",
+      "hira": "こうへい な やくわり ぶんたん は なに に もとづく べき です か",
+      "mp3": "bc_q33_what_should_a_fair_division_of_labor_be_based_on.mp3"
+    },
+    {
+      "n": 34,
+      "en": "How can routine upkeep prevent household emergencies?",
+      "jp": "日常的な手入れは家庭内の緊急事態をどう防げますか。",
+      "hira": "にちじょうてき な ていれ は かていない の きんきゅう じたい を どう ふせげます か",
+      "mp3": "bc_q34_how_can_routine_upkeep_prevent_household_emergencies.mp3"
+    },
+    {
+      "n": 35,
+      "en": "How can communities improve waste disposal?",
+      "jp": "地域社会は廃棄物処理をどう改善できますか。",
+      "hira": "ちいき しゃかい は はいきぶつ しょり を どう かいぜん できます か",
+      "mp3": "bc_q35_how_can_communities_improve_waste_disposal.mp3"
+    },
+    {
+      "n": 36,
+      "en": "Why do some recycling systems fail?",
+      "jp": "一部のリサイクル制度が失敗するのはなぜですか。",
+      "hira": "いちぶ の りさいくる せいど が しっぱい する の は なぜ です か",
+      "mp3": "bc_q36_why_do_some_recycling_systems_fail.mp3"
+    },
+    {
+      "n": 37,
+      "en": "Which actions reduce household energy consumption most effectively?",
+      "jp": "どの行動が家庭のエネルギー消費を最も効果的に減らしますか。",
+      "hira": "どの こうどう が かてい の えねるぎー しょうひ を もっとも こうかてき に へらします か",
+      "mp3": "bc_q37_which_actions_reduce_household_energy_consumption_most_effectively.mp3"
+    },
+    {
+      "n": 38,
+      "en": "How can governments encourage water conservation?",
+      "jp": "政府は節水をどう促進できますか。",
+      "hira": "せいふ は せっすい を どう そくしん できます か",
+      "mp3": "bc_q38_how_can_governments_encourage_water_conservation.mp3"
+    },
+    {
+      "n": 39,
+      "en": "How often should a home receive a safety inspection?",
+      "jp": "住宅はどのくらいの頻度で安全点検を受けるべきですか。",
+      "hira": "じゅうたく は どの くらい の ひんど で あんぜん てんけん を うける べき です か",
+      "mp3": "bc_q39_how_often_should_a_home_receive_a_safety_inspection.mp3"
+    },
+    {
+      "n": 40,
+      "en": "Which fire prevention measures are essential in every home?",
+      "jp": "すべての住宅に不可欠な防火対策は何ですか。",
+      "hira": "すべて の じゅうたく に ふかけつ な ぼうか たいさく は なん です か",
+      "mp3": "bc_q40_which_fire_prevention_measures_are_essential_in_every_home.mp3"
+    },
+    {
+      "n": 41,
+      "en": "How should a security system balance safety and privacy?",
+      "jp": "防犯システムは安全とプライバシーをどう両立すべきですか。",
+      "hira": "ぼうはん しすてむ は あんぜん と ぷらいばしー を どう りょうりつ する べき です か",
+      "mp3": "bc_q41_how_should_a_security_system_balance_safety_and_privacy.mp3"
+    },
+    {
+      "n": 42,
+      "en": "What makes property management effective?",
+      "jp": "不動産管理を効果的にするものは何ですか。",
+      "hira": "ふどうさん かんり を こうかてき に する もの は なん です か",
+      "mp3": "bc_q42_what_makes_property_management_effective.mp3"
+    },
+    {
+      "n": 43,
+      "en": "How quickly should a landlord respond to a repair request?",
+      "jp": "家主は修理依頼にどのくらい早く対応すべきですか。",
+      "hira": "やぬし は しゅうり いらい に どの くらい はやく たいおう する べき です か",
+      "mp3": "bc_q43_how_quickly_should_a_landlord_respond_to_a_repair_request.mp3"
+    },
+    {
+      "n": 44,
+      "en": "Which legal protections should every tenant have?",
+      "jp": "すべての入居者にどのような法的保護が必要ですか。",
+      "hira": "すべて の にゅうきょしゃ に どの よう な ほうてき ほご が ひつよう です か",
+      "mp3": "bc_q44_which_legal_protections_should_every_tenant_have.mp3"
+    },
+    {
+      "n": 45,
+      "en": "Which landlord responsibilities should be legally required?",
+      "jp": "家主のどの責任を法律で義務づけるべきですか。",
+      "hira": "やぬし の どの せきにん を ほうりつ で ぎむづける べき です か",
+      "mp3": "bc_q45_which_landlord_responsibilities_should_be_legally_required.mp3"
+    },
+    {
+      "n": 46,
+      "en": "How can governments improve housing affordability?",
+      "jp": "政府は住宅費の負担可能性をどう改善できますか。",
+      "hira": "せいふ は じゅうたくひ の ふたん かのうせい を どう かいぜん できます か",
+      "mp3": "bc_q46_how_can_governments_improve_housing_affordability.mp3"
+    },
+    {
+      "n": 47,
+      "en": "What are the main causes of a housing shortage?",
+      "jp": "住宅不足の主な原因は何ですか。",
+      "hira": "じゅうたく ぶそく の おもな げんいん は なん です か",
+      "mp3": "bc_q47_what_are_the_main_causes_of_a_housing_shortage.mp3"
+    },
+    {
+      "n": 48,
+      "en": "Who should qualify for public housing?",
+      "jp": "誰が公営住宅の入居資格を得るべきですか。",
+      "hira": "だれ が こうえい じゅうたく の にゅうきょ しかく を える べき です か",
+      "mp3": "bc_q48_who_should_qualify_for_public_housing.mp3"
+    },
+    {
+      "n": 49,
+      "en": "How can zoning regulations restrict housing supply?",
+      "jp": "用途地域規制は住宅供給をどう制限する可能性がありますか。",
+      "hira": "ようと ちいき きせい は じゅうたく きょうきゅう を どう せいげん する かのうせい が あります か",
+      "mp3": "bc_q49_how_can_zoning_regulations_restrict_housing_supply.mp3"
+    },
+    {
+      "n": 50,
+      "en": "How often should the building code be updated?",
+      "jp": "建築基準はどのくらいの頻度で更新すべきですか。",
+      "hira": "けんちく きじゅん は どの くらい の ひんど で こうしん する べき です か",
+      "mp3": "bc_q50_how_often_should_the_building_code_be_updated.mp3"
+    },
+    {
+      "n": 51,
+      "en": "Can higher population density improve quality of life?",
+      "jp": "より高い人口密度は生活の質を向上させられますか。",
+      "hira": "より たかい じんこう みつど は せいかつ の しつ を こうじょう させられます か",
+      "mp3": "bc_q51_can_higher_population_density_improve_quality_of_life.mp3"
+    },
+    {
+      "n": 52,
+      "en": "Which principles should guide urban development?",
+      "jp": "どの原則が都市開発を導くべきですか。",
+      "hira": "どの げんそく が とし かいはつ を みちびく べき です か",
+      "mp3": "bc_q52_which_principles_should_guide_urban_development.mp3"
+    },
+    {
+      "n": 53,
+      "en": "How can neighborhood revitalization benefit existing residents?",
+      "jp": "地域再生は既存住民にどう利益をもたらせますか。",
+      "hira": "ちいき さいせい は きそん じゅうみん に どう りえき を もたらせます か",
+      "mp3": "bc_q53_how_can_neighborhood_revitalization_benefit_existing_residents.mp3"
+    },
+    {
+      "n": 54,
+      "en": "What strengthens community cohesion in a neighborhood?",
+      "jp": "近隣地域で地域の結束を強めるものは何ですか。",
+      "hira": "きんりん ちいき で ちいき の けっそく を つよめる もの は なん です か",
+      "mp3": "bc_q54_what_strengthens_community_cohesion_in_a_neighborhood.mp3"
+    },
+    {
+      "n": 55,
+      "en": "How do housing conditions affect quality of life?",
+      "jp": "住宅の状態は生活の質にどう影響しますか。",
+      "hira": "じゅうたく の じょうたい は せいかつ の しつ に どう えいきょう します か",
+      "mp3": "bc_q55_how_do_housing_conditions_affect_quality_of_life.mp3"
+    },
+    {
+      "n": 56,
+      "en": "Which features define sustainable housing?",
+      "jp": "どの特徴が持続可能な住宅を定義しますか。",
+      "hira": "どの とくちょう が じぞく かのう な じゅうたく を ていぎ します か",
+      "mp3": "bc_q56_which_features_define_sustainable_housing.mp3"
+    },
+    {
+      "n": 57,
+      "en": "Can mixed-use development reduce dependence on cars?",
+      "jp": "複合用途開発は車への依存を減らせますか。",
+      "hira": "ふくごう ようと かいはつ は くるま への いぞん を へらせます か",
+      "mp3": "bc_q57_can_mixeduse_development_reduce_dependence_on_cars.mp3"
+    },
+    {
+      "n": 58,
+      "en": "How can cities prevent displacement during redevelopment?",
+      "jp": "都市は再開発中の立ち退きをどう防げますか。",
+      "hira": "とし は さいかいはつちゅう の たちのき を どう ふせげます か",
+      "mp3": "bc_q58_how_can_cities_prevent_displacement_during_redevelopment.mp3"
+    },
+    {
+      "n": 59,
+      "en": "Which long-term policies can reduce homelessness?",
+      "jp": "どの長期政策がホームレス問題を減らせますか。",
+      "hira": "どの ちょうき せいさく が ほーむれす もんだい を へらせます か",
+      "mp3": "bc_q59_which_longterm_policies_can_reduce_homelessness.mp3"
+    },
+    {
+      "n": 60,
+      "en": "What should be the main objective of housing policy?",
+      "jp": "住宅政策の主な目的は何であるべきですか。",
+      "hira": "じゅうたく せいさく の おもな もくてき は なん で ある べき です か",
+      "mp3": "bc_q60_what_should_be_the_main_objective_of_housing_policy.mp3"
+    }
+  ]
+}

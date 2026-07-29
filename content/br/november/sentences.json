@@ -1,1 +1,424 @@
-
+{
+  "cards": [
+    {
+      "n": 1,
+      "en": "There is a kitchen in my house.",
+      "jp": "私の家にはキッチンがあります。",
+      "hira": "わたし の いえ に は きっちん が あり ます",
+      "mp3": "br_s01_there_is_a_kitchen_in_my_house.mp3"
+    },
+    {
+      "n": 2,
+      "en": "There are three rooms.",
+      "jp": "部屋が三つあります。",
+      "hira": "へや が みっつ あり ます",
+      "mp3": "br_s02_there_are_three_rooms.mp3"
+    },
+    {
+      "n": 3,
+      "en": "The living room is on the first floor.",
+      "jp": "リビングは1階にあります。",
+      "hira": "りびんぐ は いっかい に あり ます",
+      "mp3": "br_s03_the_living_room_is_on_the_first_floor.mp3"
+    },
+    {
+      "n": 4,
+      "en": "My bedroom is next to the bathroom.",
+      "jp": "私の寝室は浴室のとなりです。",
+      "hira": "わたし の しんしつ は よくしつ の となり です",
+      "mp3": "br_s04_my_bedroom_is_next_to_the_bathroom.mp3"
+    },
+    {
+      "n": 5,
+      "en": "There is a balcony next to the dining room.",
+      "jp": "ダイニングのとなりにバルコニーがあります。",
+      "hira": "だいにんぐ の となり に ばるこにー が あります",
+      "mp3": "br_s05_there_is_a_balcony_next_to_the_dining_room.mp3"
+    },
+    {
+      "n": 6,
+      "en": "The toilet is separate from the bathroom.",
+      "jp": "トイレは浴室と別です。",
+      "hira": "といれ は よくしつ と べつ です",
+      "mp3": "br_s06_the_toilet_is_separate_from_the_bathroom.mp3"
+    },
+    {
+      "n": 7,
+      "en": "We live in an apartment near the station.",
+      "jp": "私たちは駅の近くのアパートに住んでいます。",
+      "hira": "わたしたち は えき の ちかく の あぱーと に すんで い ます",
+      "mp3": "br_s07_we_live_in_an_apartment_near_the_station.mp3"
+    },
+    {
+      "n": 8,
+      "en": "My address is 3-2-1 Sakura Street.",
+      "jp": "私の住所は桜通り3-2-1です。",
+      "hira": "わたし の じゅうしょ は さくら どおり さん の に の いち です",
+      "mp3": "br_s08_my_address_is_321_sakura_street.mp3"
+    },
+    {
+      "n": 9,
+      "en": "Our house has a small yard.",
+      "jp": "私たちの家には小さな庭があります。",
+      "hira": "わたしたち の いえ に は ちいさな にわ が あり ます",
+      "mp3": "br_s09_our_house_has_a_small_yard.mp3"
+    },
+    {
+      "n": 10,
+      "en": "There is a shoe cabinet at the entrance.",
+      "jp": "玄関に下駄箱があります。",
+      "hira": "げんかん に げたばこ が あり ます",
+      "mp3": "br_s10_there_is_a_shoe_cabinet_at_the_entrance.mp3"
+    },
+    {
+      "n": 11,
+      "en": "The kitchen is bright and clean.",
+      "jp": "キッチンは明るくてきれいです。",
+      "hira": "きっちん は あかるくて きれい です",
+      "mp3": "br_s11_the_kitchen_is_bright_and_clean.mp3"
+    },
+    {
+      "n": 12,
+      "en": "Is there a bathtub?",
+      "jp": "浴槽はありますか。",
+      "hira": "よくそう は あり ます か",
+      "mp3": "br_s12_is_there_a_bathtub.mp3"
+    },
+    {
+      "n": 13,
+      "en": "How many rooms are there?",
+      "jp": "部屋はいくつありますか。",
+      "hira": "へや は いくつ あり ます か",
+      "mp3": "br_s13_how_many_rooms_are_there.mp3"
+    },
+    {
+      "n": 14,
+      "en": "My room is on the second floor.",
+      "jp": "私の部屋は2階にあります。",
+      "hira": "わたし の へや は にかい に あります",
+      "mp3": "br_s14_my_room_is_on_the_second_floor.mp3"
+    },
+    {
+      "n": 15,
+      "en": "There are flowers in the yard.",
+      "jp": "庭に花があります。",
+      "hira": "にわ に はな が あり ます",
+      "mp3": "br_s15_there_are_flowers_in_the_yard.mp3"
+    },
+    {
+      "n": 16,
+      "en": "I have a desk in my room.",
+      "jp": "私の部屋には机があります。",
+      "hira": "わたし の へや に は つくえ が あり ます",
+      "mp3": "br_s16_i_have_a_desk_in_my_room.mp3"
+    },
+    {
+      "n": 17,
+      "en": "There is a sofa in the living room.",
+      "jp": "リビングにソファがあります。",
+      "hira": "りびんぐ に そふぁ が あり ます",
+      "mp3": "br_s17_there_is_a_sofa_in_the_living_room.mp3"
+    },
+    {
+      "n": 18,
+      "en": "Turn on the lamp, please.",
+      "jp": "ランプをつけてください。",
+      "hira": "らんぷ を つけて ください",
+      "mp3": "br_s18_turn_on_the_lamp_please.mp3"
+    },
+    {
+      "n": 19,
+      "en": "Turn off the TV before bed.",
+      "jp": "寝る前にテレビを消してください。",
+      "hira": "ねる まえ に てれび を けして ください",
+      "mp3": "br_s19_turn_off_the_tv_before_bed.mp3"
+    },
+    {
+      "n": 20,
+      "en": "Put the books on the bookshelf.",
+      "jp": "本を本棚に置いてください。",
+      "hira": "ほん を ほんだな に おいて ください",
+      "mp3": "br_s20_put_the_books_on_the_bookshelf.mp3"
+    },
+    {
+      "n": 21,
+      "en": "We keep clothes in the closet.",
+      "jp": "服はクローゼットにしまいます。",
+      "hira": "ふく は くろーぜっと に しまい ます",
+      "mp3": "br_s21_we_keep_clothes_in_the_closet.mp3"
+    },
+    {
+      "n": 22,
+      "en": "I cook on the stove.",
+      "jp": "私はコンロで料理します。",
+      "hira": "わたし は こんろ で りょうり し ます",
+      "mp3": "br_s22_i_cook_on_the_stove.mp3"
+    },
+    {
+      "n": 23,
+      "en": "Please heat it in the microwave.",
+      "jp": "電子レンジで温めてください。",
+      "hira": "でんし れんじ で あたためて ください",
+      "mp3": "br_s23_please_heat_it_in_the_microwave.mp3"
+    },
+    {
+      "n": 24,
+      "en": "The refrigerator is empty.",
+      "jp": "冷蔵庫は空っぽです。",
+      "hira": "れいぞうこ は からっぽ です",
+      "mp3": "br_s24_the_refrigerator_is_empty.mp3"
+    },
+    {
+      "n": 25,
+      "en": "The washing machine is new.",
+      "jp": "洗濯機は新しいです。",
+      "hira": "せんたくき は あたらしい です",
+      "mp3": "br_s25_the_washing_machine_is_new.mp3"
+    },
+    {
+      "n": 26,
+      "en": "We use the air conditioner in summer.",
+      "jp": "夏はエアコンを使います。",
+      "hira": "なつ は えあこん を つかいます",
+      "mp3": "br_s26_we_use_the_air_conditioner_in_summer.mp3"
+    },
+    {
+      "n": 27,
+      "en": "Put the rug under the table.",
+      "jp": "カーペットをテーブルの下に敷いてください。",
+      "hira": "かーぺっと を てーぶる の した に しいて ください",
+      "mp3": "br_s27_put_the_rug_under_the_table.mp3"
+    },
+    {
+      "n": 28,
+      "en": "My bed is next to the window.",
+      "jp": "私のベッドは窓のとなりです。",
+      "hira": "わたし の べっど は まど の となり です",
+      "mp3": "br_s28_my_bed_is_next_to_the_window.mp3"
+    },
+    {
+      "n": 29,
+      "en": "The lamp won’t turn on.",
+      "jp": "ランプがつきません。",
+      "hira": "らんぷ が つきません",
+      "mp3": "br_s29_the_lamp_wont_turn_on.mp3"
+    },
+    {
+      "n": 30,
+      "en": "Let’s keep the room tidy.",
+      "jp": "部屋をきれいに保ちましょう。",
+      "hira": "へや を きれい に たもち ましょう",
+      "mp3": "br_s30_lets_keep_the_room_tidy.mp3"
+    },
+    {
+      "n": 31,
+      "en": "I have to clean my room.",
+      "jp": "私は部屋を掃除しなければなりません。",
+      "hira": "わたし は へや を そうじ しなければ なり ません",
+      "mp3": "br_s31_i_have_to_clean_my_room.mp3"
+    },
+    {
+      "n": 32,
+      "en": "You have to take out the trash tonight.",
+      "jp": "あなたは今夜ゴミを出さなければなりません。",
+      "hira": "あなた は こんや ごみ を ださなければ なり ません",
+      "mp3": "br_s32_you_have_to_take_out_the_trash_tonight.mp3"
+    },
+    {
+      "n": 33,
+      "en": "We should recycle plastic and paper.",
+      "jp": "プラスチックと紙はリサイクルすべきです。",
+      "hira": "ぷらすちっく と かみ は りさいくる すべき です",
+      "mp3": "br_s33_we_should_recycle_plastic_and_paper.mp3"
+    },
+    {
+      "n": 34,
+      "en": "Please wash the dishes after dinner.",
+      "jp": "夕食のあとに皿を洗ってください。",
+      "hira": "ゆうしょく の あと に さら を あらって ください",
+      "mp3": "br_s34_please_wash_the_dishes_after_dinner.mp3"
+    },
+    {
+      "n": 35,
+      "en": "I do the laundry on Sundays.",
+      "jp": "私は日曜日に洗濯をします。",
+      "hira": "わたし は にちようび に せんたく を し ます",
+      "mp3": "br_s35_i_do_the_laundry_on_sundays.mp3"
+    },
+    {
+      "n": 36,
+      "en": "Then I fold the clothes.",
+      "jp": "それから、服をたたみます。",
+      "hira": "それから、 ふく を たたみ ます",
+      "mp3": "br_s36_then_i_fold_the_clothes.mp3"
+    },
+    {
+      "n": 37,
+      "en": "He vacuums the living room.",
+      "jp": "彼はリビングに掃除機をかけます。",
+      "hira": "かれ は りびんぐ に そうじき を かけ ます",
+      "mp3": "br_s37_he_vacuums_the_living_room.mp3"
+    },
+    {
+      "n": 38,
+      "en": "She mops the kitchen floor.",
+      "jp": "彼女はキッチンの床にモップをかけます。",
+      "hira": "かのじょ は きっちん の ゆか に もっぷ を かけ ます",
+      "mp3": "br_s38_she_mops_the_kitchen_floor.mp3"
+    },
+    {
+      "n": 39,
+      "en": "Don’t forget to water the plants.",
+      "jp": "植物に水をやるのを忘れないでください。",
+      "hira": "しょくぶつ に みず を やる の を わすれ ないで ください",
+      "mp3": "br_s39_dont_forget_to_water_the_plants.mp3"
+    },
+    {
+      "n": 40,
+      "en": "Please feed the cat in the morning.",
+      "jp": "朝、ねこにえさをあげてください。",
+      "hira": "あさ、 ねこ に えさ を あげて ください",
+      "mp3": "br_s40_please_feed_the_cat_in_the_morning.mp3"
+    },
+    {
+      "n": 41,
+      "en": "It’s my responsibility to set the table.",
+      "jp": "食卓を用意するのは私の責任です。",
+      "hira": "しょくたく を ようい する の は わたし の せきにん です",
+      "mp3": "br_s41_its_my_responsibility_to_set_the_table.mp3"
+    },
+    {
+      "n": 42,
+      "en": "Can you make the bed?",
+      "jp": "ベッドを整えてくれますか。",
+      "hira": "べっど を ととのえて くれ ます か",
+      "mp3": "br_s42_can_you_make_the_bed.mp3"
+    },
+    {
+      "n": 43,
+      "en": "Let’s share the chores fairly.",
+      "jp": "家事を公平に分担しましょう。",
+      "hira": "かじ を こうへい に ぶんたん し ましょう",
+      "mp3": "br_s43_lets_share_the_chores_fairly.mp3"
+    },
+    {
+      "n": 44,
+      "en": "After we clean, let’s relax.",
+      "jp": "掃除の後で休みましょう。",
+      "hira": "そうじ の あと で やすみましょう",
+      "mp3": "br_s44_after_we_clean_lets_relax.mp3"
+    },
+    {
+      "n": 45,
+      "en": "Thank you for helping at home.",
+      "jp": "家で手伝ってくれてありがとう。",
+      "hira": "いえ で てつだって くれて ありがとう",
+      "mp3": "br_s45_thank_you_for_helping_at_home.mp3"
+    },
+    {
+      "n": 46,
+      "en": "I want a bright kitchen.",
+      "jp": "明るいキッチンがほしいです。",
+      "hira": "あかるい きっちん が ほしい です",
+      "mp3": "br_s46_i_want_a_bright_kitchen.mp3"
+    },
+    {
+      "n": 47,
+      "en": "I’d like a cozy living room.",
+      "jp": "居心地のよいリビングがいいです。",
+      "hira": "いごこち の よい りびんぐ が いい です",
+      "mp3": "br_s47_id_like_a_cozy_living_room.mp3"
+    },
+    {
+      "n": 48,
+      "en": "My dream house would have a big garden.",
+      "jp": "夢の家には大きな庭があるでしょう。",
+      "hira": "ゆめ の いえ には おおきな にわ が ある でしょう",
+      "mp3": "br_s48_my_dream_house_would_have_a_big_garden.mp3"
+    },
+    {
+      "n": 49,
+      "en": "I want a study to read in.",
+      "jp": "読むための書斎がほしいです。",
+      "hira": "よむ ため の しょさい が ほしい です",
+      "mp3": "br_s49_i_want_a_study_to_read_in.mp3"
+    },
+    {
+      "n": 50,
+      "en": "I’d like a playroom for kids.",
+      "jp": "子どもたちのためのあそび部屋がほしいです。",
+      "hira": "こども たち の ため の あそび べや が ほしい です",
+      "mp3": "br_s50_id_like_a_playroom_for_kids.mp3"
+    },
+    {
+      "n": 51,
+      "en": "I want it to be quiet and safe.",
+      "jp": "静かで安全な場所がいいです。",
+      "hira": "しずか で あんぜん な ばしょ が いい です",
+      "mp3": "br_s51_i_want_it_to_be_quiet_and_safe.mp3"
+    },
+    {
+      "n": 52,
+      "en": "I prefer a house to an apartment.",
+      "jp": "アパートより家のほうがいいです。",
+      "hira": "あぱーと より いえ の ほう が いい です",
+      "mp3": "br_s52_i_prefer_a_house_to_an_apartment.mp3"
+    },
+    {
+      "n": 53,
+      "en": "I want to live near the station.",
+      "jp": "駅の近くに住みたいです。",
+      "hira": "えき の ちかく に すみ たい です",
+      "mp3": "br_s53_i_want_to_live_near_the_station.mp3"
+    },
+    {
+      "n": 54,
+      "en": "There would be lots of storage.",
+      "jp": "収納がたくさんあるでしょう。",
+      "hira": "しゅうのう が たくさん ある でしょう",
+      "mp3": "br_s54_there_would_be_lots_of_storage.mp3"
+    },
+    {
+      "n": 55,
+      "en": "I’d like an eco-friendly home.",
+      "jp": "環境にやさしい家がいいです。",
+      "hira": "かんきょう に やさしい いえ が いい です",
+      "mp3": "br_s55_id_like_an_ecofriendly_home.mp3"
+    },
+    {
+      "n": 56,
+      "en": "I want a rooftop for stargazing.",
+      "jp": "星を見るための屋上がほしいです。",
+      "hira": "ほし を みる ため の おくじょう が ほしい です",
+      "mp3": "br_s56_i_want_a_rooftop_for_stargazing.mp3"
+    },
+    {
+      "n": 57,
+      "en": "My ideal home is pet-friendly.",
+      "jp": "理想の家はペット可です。",
+      "hira": "りそう の いえ は ぺっと か です",
+      "mp3": "br_s57_my_ideal_home_is_petfriendly.mp3"
+    },
+    {
+      "n": 58,
+      "en": "If possible, I want two bathrooms.",
+      "jp": "できれば浴室を二つほしいです。",
+      "hira": "できれば よくしつ を ふたつ ほしい です",
+      "mp3": "br_s58_if_possible_i_want_two_bathrooms.mp3"
+    },
+    {
+      "n": 59,
+      "en": "I’d like a bright, spacious bedroom.",
+      "jp": "明るくて広々とした寝室がいいです。",
+      "hira": "あかるくて ひろびろ と した しんしつ が いい です",
+      "mp3": "br_s59_id_like_a_bright_spacious_bedroom.mp3"
+    },
+    {
+      "n": 60,
+      "en": "There would be friendly neighbors.",
+      "jp": "親切な近所の人たちがいるでしょう。",
+      "hira": "しんせつ な きんじょ の ひと たち が いる でしょう",
+      "mp3": "br_s60_there_would_be_friendly_neighbors.mp3"
+    }
+  ]
+}

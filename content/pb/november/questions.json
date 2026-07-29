@@ -1,1 +1,424 @@
-
+{
+  "cards": [
+    {
+      "n": 1,
+      "en": "Do you live in a house or an apartment?",
+      "jp": "一戸建てとアパートのどちらに住んでいますか。",
+      "hira": "いっこだて と あぱーと の どちら に すんで います か",
+      "mp3": "pb_q01_do_you_live_in_a_house_or_an_apartment.mp3"
+    },
+    {
+      "n": 2,
+      "en": "Where do you live?",
+      "jp": "どこに住んでいますか。",
+      "hira": "どこ に すんで います か",
+      "mp3": "pb_q02_where_do_you_live.mp3"
+    },
+    {
+      "n": 3,
+      "en": "Do you like your home?",
+      "jp": "自分の住まいが好きですか。",
+      "hira": "じぶん の すまい が すき です か",
+      "mp3": "pb_q03_do_you_like_your_home.mp3"
+    },
+    {
+      "n": 4,
+      "en": "How many rooms are there?",
+      "jp": "部屋はいくつありますか。",
+      "hira": "へや は いくつ あります か",
+      "mp3": "pb_q04_how_many_rooms_are_there.mp3"
+    },
+    {
+      "n": 5,
+      "en": "What do you do in the living room?",
+      "jp": "リビングで何をしますか。",
+      "hira": "りびんぐ で なに を します か",
+      "mp3": "pb_q05_what_do_you_do_in_the_living_room.mp3"
+    },
+    {
+      "n": 6,
+      "en": "Where do you eat dinner?",
+      "jp": "どこで夕食を食べますか。",
+      "hira": "どこ で ゆうしょく を たべます か",
+      "mp3": "pb_q06_where_do_you_eat_dinner.mp3"
+    },
+    {
+      "n": 7,
+      "en": "Who cooks in the kitchen?",
+      "jp": "だれがキッチンで料理しますか。",
+      "hira": "だれ が きっちん で りょうり します か",
+      "mp3": "pb_q07_who_cooks_in_the_kitchen.mp3"
+    },
+    {
+      "n": 8,
+      "en": "Where is your bedroom?",
+      "jp": "あなたの寝室はどこですか。",
+      "hira": "あなた の しんしつ は どこ です か",
+      "mp3": "pb_q08_where_is_your_bedroom.mp3"
+    },
+    {
+      "n": 9,
+      "en": "Is the bathroom clean?",
+      "jp": "浴室はきれいですか。",
+      "hira": "よくしつ は きれい です か",
+      "mp3": "pb_q09_is_the_bathroom_clean.mp3"
+    },
+    {
+      "n": 10,
+      "en": "Where do you take off your shoes?",
+      "jp": "どこで靴を脱ぎますか。",
+      "hira": "どこ で くつ を ぬぎます か",
+      "mp3": "pb_q10_where_do_you_take_off_your_shoes.mp3"
+    },
+    {
+      "n": 11,
+      "en": "Do you have a balcony?",
+      "jp": "バルコニーはありますか。",
+      "hira": "ばるこにー は あります か",
+      "mp3": "pb_q11_do_you_have_a_balcony.mp3"
+    },
+    {
+      "n": 12,
+      "en": "What is in your yard?",
+      "jp": "庭には何がありますか。",
+      "hira": "にわ には なに が あります か",
+      "mp3": "pb_q12_what_is_in_your_yard.mp3"
+    },
+    {
+      "n": 13,
+      "en": "Do you have a garden?",
+      "jp": "庭はありますか。",
+      "hira": "にわ は あります か",
+      "mp3": "pb_q13_do_you_have_a_garden.mp3"
+    },
+    {
+      "n": 14,
+      "en": "What is on the first floor?",
+      "jp": "1階には何がありますか。",
+      "hira": "いっかい には なに が あります か",
+      "mp3": "pb_q14_what_is_on_the_first_floor.mp3"
+    },
+    {
+      "n": 15,
+      "en": "What is on the second floor?",
+      "jp": "2階には何がありますか。",
+      "hira": "にかい には なに が あります か",
+      "mp3": "pb_q15_what_is_on_the_second_floor.mp3"
+    },
+    {
+      "n": 16,
+      "en": "What color is your sofa?",
+      "jp": "あなたのソファは何色ですか。",
+      "hira": "あなた の そふぁ は なにいろ です か",
+      "mp3": "pb_q16_what_color_is_your_sofa.mp3"
+    },
+    {
+      "n": 17,
+      "en": "What is on the table?",
+      "jp": "テーブルの上には何がありますか。",
+      "hira": "てーぶる の うえ には なに が あります か",
+      "mp3": "pb_q17_what_is_on_the_table.mp3"
+    },
+    {
+      "n": 18,
+      "en": "How many chairs are there?",
+      "jp": "いすはいくつありますか。",
+      "hira": "いす は いくつ あります か",
+      "mp3": "pb_q18_how_many_chairs_are_there.mp3"
+    },
+    {
+      "n": 19,
+      "en": "What time do you go to bed?",
+      "jp": "何時に寝ますか。",
+      "hira": "なんじ に ねます か",
+      "mp3": "pb_q19_what_time_do_you_go_to_bed.mp3"
+    },
+    {
+      "n": 20,
+      "en": "Where do you do your homework?",
+      "jp": "どこで宿題をしますか。",
+      "hira": "どこ で しゅくだい を します か",
+      "mp3": "pb_q20_where_do_you_do_your_homework.mp3"
+    },
+    {
+      "n": 21,
+      "en": "Do you have a bookshelf?",
+      "jp": "本棚はありますか。",
+      "hira": "ほんだな は あります か",
+      "mp3": "pb_q21_do_you_have_a_bookshelf.mp3"
+    },
+    {
+      "n": 22,
+      "en": "Where do you keep your clothes?",
+      "jp": "服はどこにしまいますか。",
+      "hira": "ふく は どこ に しまいます か",
+      "mp3": "pb_q22_where_do_you_keep_your_clothes.mp3"
+    },
+    {
+      "n": 23,
+      "en": "Do you have a lamp?",
+      "jp": "ランプはありますか。",
+      "hira": "らんぷ は あります か",
+      "mp3": "pb_q23_do_you_have_a_lamp.mp3"
+    },
+    {
+      "n": 24,
+      "en": "Where is the rug?",
+      "jp": "カーペットはどこにありますか。",
+      "hira": "かーぺっと は どこ に あります か",
+      "mp3": "pb_q24_where_is_the_rug.mp3"
+    },
+    {
+      "n": 25,
+      "en": "What is in the refrigerator?",
+      "jp": "冷蔵庫には何がありますか。",
+      "hira": "れいぞうこ には なに が あります か",
+      "mp3": "pb_q25_what_is_in_the_refrigerator.mp3"
+    },
+    {
+      "n": 26,
+      "en": "Do you use the microwave?",
+      "jp": "電子レンジを使いますか。",
+      "hira": "でんし れんじ を つかいます か",
+      "mp3": "pb_q26_do_you_use_the_microwave.mp3"
+    },
+    {
+      "n": 27,
+      "en": "Is your washing machine new?",
+      "jp": "洗濯機は新しいですか。",
+      "hira": "せんたくき は あたらしい です か",
+      "mp3": "pb_q27_is_your_washing_machine_new.mp3"
+    },
+    {
+      "n": 28,
+      "en": "Do you use the air conditioner in summer?",
+      "jp": "夏にエアコンを使いますか。",
+      "hira": "なつ に えあこん を つかいます か",
+      "mp3": "pb_q28_do_you_use_the_air_conditioner_in_summer.mp3"
+    },
+    {
+      "n": 29,
+      "en": "Do you watch TV every day?",
+      "jp": "毎日テレビを見ますか。",
+      "hira": "まいにち てれび を みます か",
+      "mp3": "pb_q29_do_you_watch_tv_every_day.mp3"
+    },
+    {
+      "n": 30,
+      "en": "How many windows are in your room?",
+      "jp": "あなたの部屋には窓がいくつありますか。",
+      "hira": "あなた の へや には まど が いくつ あります か",
+      "mp3": "pb_q30_how_many_windows_are_in_your_room.mp3"
+    },
+    {
+      "n": 31,
+      "en": "Do you help with the housework?",
+      "jp": "家事を手伝いますか。",
+      "hira": "かじ を てつだいます か",
+      "mp3": "pb_q31_do_you_help_with_the_housework.mp3"
+    },
+    {
+      "n": 32,
+      "en": "How often do you clean your room?",
+      "jp": "どのくらいの頻度で部屋を掃除しますか。",
+      "hira": "どの くらい の ひんど で へや を そうじ します か",
+      "mp3": "pb_q32_how_often_do_you_clean_your_room.mp3"
+    },
+    {
+      "n": 33,
+      "en": "Can you sweep the floor?",
+      "jp": "床をほうきで掃けますか。",
+      "hira": "ゆか を ほうき で はけます か",
+      "mp3": "pb_q33_can_you_sweep_the_floor.mp3"
+    },
+    {
+      "n": 34,
+      "en": "Who vacuums the living room?",
+      "jp": "だれがリビングに掃除機をかけますか。",
+      "hira": "だれ が りびんぐ に そうじき を かけます か",
+      "mp3": "pb_q34_who_vacuums_the_living_room.mp3"
+    },
+    {
+      "n": 35,
+      "en": "Can you mop the floor?",
+      "jp": "床にモップをかけられますか。",
+      "hira": "ゆか に もっぷ を かけられます か",
+      "mp3": "pb_q35_can_you_mop_the_floor.mp3"
+    },
+    {
+      "n": 36,
+      "en": "Who washes the dishes?",
+      "jp": "だれが皿を洗いますか。",
+      "hira": "だれ が さら を あらいます か",
+      "mp3": "pb_q36_who_washes_the_dishes.mp3"
+    },
+    {
+      "n": 37,
+      "en": "When do you do the laundry?",
+      "jp": "いつ洗濯しますか。",
+      "hira": "いつ せんたく します か",
+      "mp3": "pb_q37_when_do_you_do_the_laundry.mp3"
+    },
+    {
+      "n": 38,
+      "en": "Do you fold your clothes?",
+      "jp": "服をたたみますか。",
+      "hira": "ふく を たたみます か",
+      "mp3": "pb_q38_do_you_fold_your_clothes.mp3"
+    },
+    {
+      "n": 39,
+      "en": "When do you take out the trash?",
+      "jp": "いつゴミを出しますか。",
+      "hira": "いつ ごみ を だします か",
+      "mp3": "pb_q39_when_do_you_take_out_the_trash.mp3"
+    },
+    {
+      "n": 40,
+      "en": "Do you recycle cans and bottles?",
+      "jp": "缶とびんをリサイクルしますか。",
+      "hira": "かん と びん を りさいくる します か",
+      "mp3": "pb_q40_do_you_recycle_cans_and_bottles.mp3"
+    },
+    {
+      "n": 41,
+      "en": "Do you water the plants every day?",
+      "jp": "毎日植物に水をやりますか。",
+      "hira": "まいにち しょくぶつ に みず を やります か",
+      "mp3": "pb_q41_do_you_water_the_plants_every_day.mp3"
+    },
+    {
+      "n": 42,
+      "en": "Do you have a pet to feed?",
+      "jp": "えさをあげるペットはいますか。",
+      "hira": "えさ を あげる ぺっと は います か",
+      "mp3": "pb_q42_do_you_have_a_pet_to_feed.mp3"
+    },
+    {
+      "n": 43,
+      "en": "Do you make your bed every day?",
+      "jp": "毎日ベッドを整えますか。",
+      "hira": "まいにち べっど を ととのえます か",
+      "mp3": "pb_q43_do_you_make_your_bed_every_day.mp3"
+    },
+    {
+      "n": 44,
+      "en": "Who sets the table?",
+      "jp": "だれが食卓を整えますか。",
+      "hira": "だれ が しょくたく を ととのえます か",
+      "mp3": "pb_q44_who_sets_the_table.mp3"
+    },
+    {
+      "n": 45,
+      "en": "How do you help your family?",
+      "jp": "家族をどのように手伝いますか。",
+      "hira": "かぞく を どの よう に てつだいます か",
+      "mp3": "pb_q45_how_do_you_help_your_family.mp3"
+    },
+    {
+      "n": 46,
+      "en": "What is your dream house like?",
+      "jp": "あなたの夢の家はどんな家ですか。",
+      "hira": "あなた の ゆめ の いえ は どんな いえ です か",
+      "mp3": "pb_q46_what_is_your_dream_house_like.mp3"
+    },
+    {
+      "n": 47,
+      "en": "Do you want a big house?",
+      "jp": "大きな家がほしいですか。",
+      "hira": "おおきな いえ が ほしい です か",
+      "mp3": "pb_q47_do_you_want_a_big_house.mp3"
+    },
+    {
+      "n": 48,
+      "en": "Do you want a small room?",
+      "jp": "小さな部屋がほしいですか。",
+      "hira": "ちいさな へや が ほしい です か",
+      "mp3": "pb_q48_do_you_want_a_small_room.mp3"
+    },
+    {
+      "n": 49,
+      "en": "Do you want a bright room?",
+      "jp": "明るい部屋がほしいですか。",
+      "hira": "あかるい へや が ほしい です か",
+      "mp3": "pb_q49_do_you_want_a_bright_room.mp3"
+    },
+    {
+      "n": 50,
+      "en": "Do you want a quiet home?",
+      "jp": "静かな家がほしいですか。",
+      "hira": "しずかな いえ が ほしい です か",
+      "mp3": "pb_q50_do_you_want_a_quiet_home.mp3"
+    },
+    {
+      "n": 51,
+      "en": "Is your living room cozy?",
+      "jp": "リビングは居心地がよいですか。",
+      "hira": "りびんぐ は いごこち が よい です か",
+      "mp3": "pb_q51_is_your_living_room_cozy.mp3"
+    },
+    {
+      "n": 52,
+      "en": "Do you want a rooftop garden?",
+      "jp": "屋上の庭がほしいですか。",
+      "hira": "おくじょう の にわ が ほしい です か",
+      "mp3": "pb_q52_do_you_want_a_rooftop_garden.mp3"
+    },
+    {
+      "n": 53,
+      "en": "Do you want a playroom?",
+      "jp": "遊び部屋がほしいですか。",
+      "hira": "あそび べや が ほしい です か",
+      "mp3": "pb_q53_do_you_want_a_playroom.mp3"
+    },
+    {
+      "n": 54,
+      "en": "Do you need a home office?",
+      "jp": "自宅の仕事部屋が必要ですか。",
+      "hira": "じたく の しごと べや が ひつよう です か",
+      "mp3": "pb_q54_do_you_need_a_home_office.mp3"
+    },
+    {
+      "n": 55,
+      "en": "Do you need more storage space?",
+      "jp": "もっと収納スペースが必要ですか。",
+      "hira": "もっと しゅうのう すぺーす が ひつよう です か",
+      "mp3": "pb_q55_do_you_need_more_storage_space.mp3"
+    },
+    {
+      "n": 56,
+      "en": "Do you want an eco-friendly home?",
+      "jp": "環境にやさしい家がほしいですか。",
+      "hira": "かんきょう に やさしい いえ が ほしい です か",
+      "mp3": "pb_q56_do_you_want_an_ecofriendly_home.mp3"
+    },
+    {
+      "n": 57,
+      "en": "Do you know your neighbors?",
+      "jp": "近所の人を知っていますか。",
+      "hira": "きんじょ の ひと を しって います か",
+      "mp3": "pb_q57_do_you_know_your_neighbors.mp3"
+    },
+    {
+      "n": 58,
+      "en": "Do you want to live near the station?",
+      "jp": "駅の近くに住みたいですか。",
+      "hira": "えき の ちかく に すみたい です か",
+      "mp3": "pb_q58_do_you_want_to_live_near_the_station.mp3"
+    },
+    {
+      "n": 59,
+      "en": "Do you want a pet-friendly apartment?",
+      "jp": "ペット可のアパートがほしいですか。",
+      "hira": "ぺっと か の あぱーと が ほしい です か",
+      "mp3": "pb_q59_do_you_want_a_petfriendly_apartment.mp3"
+    },
+    {
+      "n": 60,
+      "en": "Is your neighborhood safe?",
+      "jp": "あなたの近所は安全ですか。",
+      "hira": "あなた の きんじょ は あんぜん です か",
+      "mp3": "pb_q60_is_your_neighborhood_safe.mp3"
+    }
+  ]
+}

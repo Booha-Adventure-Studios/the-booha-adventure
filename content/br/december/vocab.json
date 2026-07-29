@@ -1,1 +1,424 @@
-
+{
+  "cards": [
+    {
+      "n": 1,
+      "en": "winter break",
+      "jp": "冬休み",
+      "hira": "ふゆやすみ",
+      "mp3": "br_v01_winter_break.mp3"
+    },
+    {
+      "n": 2,
+      "en": "winter",
+      "jp": "冬",
+      "hira": "ふゆ",
+      "mp3": "br_v02_winter.mp3"
+    },
+    {
+      "n": 3,
+      "en": "holiday / vacation",
+      "jp": "休日／休暇",
+      "hira": "きゅうじつ／きゅうか",
+      "mp3": "br_v03_holiday_vacation.mp3"
+    },
+    {
+      "n": 4,
+      "en": "Christmas",
+      "jp": "クリスマス",
+      "hira": "くりすます",
+      "mp3": "br_v04_christmas.mp3"
+    },
+    {
+      "n": 5,
+      "en": "New Year",
+      "jp": "新年／お正月",
+      "hira": "しんねん／おしょうがつ",
+      "mp3": "br_v05_new_year.mp3"
+    },
+    {
+      "n": 6,
+      "en": "countdown",
+      "jp": "カウントダウン",
+      "hira": "かうんとだうん",
+      "mp3": "br_v06_countdown.mp3"
+    },
+    {
+      "n": 7,
+      "en": "first shrine visit",
+      "jp": "初詣",
+      "hira": "はつもうで",
+      "mp3": "br_v07_first_shrine_visit.mp3"
+    },
+    {
+      "n": 8,
+      "en": "snowman",
+      "jp": "雪だるま",
+      "hira": "ゆきだるま",
+      "mp3": "br_v08_snowman.mp3"
+    },
+    {
+      "n": 9,
+      "en": "sled",
+      "jp": "そり",
+      "hira": "そり",
+      "mp3": "br_v09_sled.mp3"
+    },
+    {
+      "n": 10,
+      "en": "ice skating",
+      "jp": "アイススケート",
+      "hira": "あいす すけーと",
+      "mp3": "br_v10_ice_skating.mp3"
+    },
+    {
+      "n": 11,
+      "en": "decoration",
+      "jp": "飾り",
+      "hira": "かざり",
+      "mp3": "br_v11_decoration.mp3"
+    },
+    {
+      "n": 12,
+      "en": "holiday tree",
+      "jp": "ホリデーツリー",
+      "hira": "ほりでー つりー",
+      "mp3": "br_v12_holiday_tree.mp3"
+    },
+    {
+      "n": 13,
+      "en": "holiday lights",
+      "jp": "イルミネーション",
+      "hira": "いるみねーしょん",
+      "mp3": "br_v13_holiday_lights.mp3"
+    },
+    {
+      "n": 14,
+      "en": "hot drink",
+      "jp": "温かい飲み物",
+      "hira": "あたたかい のみもの",
+      "mp3": "br_v14_hot_drink.mp3"
+    },
+    {
+      "n": 15,
+      "en": "family gathering",
+      "jp": "家族の集まり",
+      "hira": "かぞく の あつまり",
+      "mp3": "br_v15_family_gathering.mp3"
+    },
+    {
+      "n": 16,
+      "en": "tradition",
+      "jp": "伝統",
+      "hira": "でんとう",
+      "mp3": "br_v16_tradition.mp3"
+    },
+    {
+      "n": 17,
+      "en": "custom",
+      "jp": "習慣",
+      "hira": "しゅうかん",
+      "mp3": "br_v17_custom.mp3"
+    },
+    {
+      "n": 18,
+      "en": "celebration",
+      "jp": "お祝い",
+      "hira": "おいわい",
+      "mp3": "br_v18_celebration.mp3"
+    },
+    {
+      "n": 19,
+      "en": "family dinner",
+      "jp": "家族の食事",
+      "hira": "かぞく の しょくじ",
+      "mp3": "br_v19_family_dinner.mp3"
+    },
+    {
+      "n": 20,
+      "en": "holiday meal",
+      "jp": "祝日の食事",
+      "hira": "しゅくじつ の しょくじ",
+      "mp3": "br_v20_holiday_meal.mp3"
+    },
+    {
+      "n": 21,
+      "en": "gift",
+      "jp": "プレゼント",
+      "hira": "ぷれぜんと",
+      "mp3": "br_v21_gift.mp3"
+    },
+    {
+      "n": 22,
+      "en": "card",
+      "jp": "カード",
+      "hira": "かーど",
+      "mp3": "br_v22_card.mp3"
+    },
+    {
+      "n": 23,
+      "en": "cake",
+      "jp": "ケーキ",
+      "hira": "けーき",
+      "mp3": "br_v23_cake.mp3"
+    },
+    {
+      "n": 24,
+      "en": "music",
+      "jp": "音楽",
+      "hira": "おんがく",
+      "mp3": "br_v24_music.mp3"
+    },
+    {
+      "n": 25,
+      "en": "ornament",
+      "jp": "飾り物",
+      "hira": "かざりもの",
+      "mp3": "br_v25_ornament.mp3"
+    },
+    {
+      "n": 26,
+      "en": "photo",
+      "jp": "写真",
+      "hira": "しゃしん",
+      "mp3": "br_v26_photo.mp3"
+    },
+    {
+      "n": 27,
+      "en": "family time",
+      "jp": "家族の時間",
+      "hira": "かぞく の じかん",
+      "mp3": "br_v27_family_time.mp3"
+    },
+    {
+      "n": 28,
+      "en": "smile",
+      "jp": "笑顔",
+      "hira": "えがお",
+      "mp3": "br_v28_smile.mp3"
+    },
+    {
+      "n": 29,
+      "en": "memory",
+      "jp": "思い出",
+      "hira": "おもいで",
+      "mp3": "br_v29_memory.mp3"
+    },
+    {
+      "n": 30,
+      "en": "traditional song",
+      "jp": "伝統の歌",
+      "hira": "でんとう の うた",
+      "mp3": "br_v30_traditional_song.mp3"
+    },
+    {
+      "n": 31,
+      "en": "present",
+      "jp": "プレゼント",
+      "hira": "ぷれぜんと",
+      "mp3": "br_v31_present.mp3"
+    },
+    {
+      "n": 32,
+      "en": "give",
+      "jp": "あげる／渡す",
+      "hira": "あげる／わたす",
+      "mp3": "br_v32_give.mp3"
+    },
+    {
+      "n": 33,
+      "en": "receive",
+      "jp": "もらう",
+      "hira": "もらう",
+      "mp3": "br_v33_receive.mp3"
+    },
+    {
+      "n": 34,
+      "en": "thank-you card",
+      "jp": "サンキューカード",
+      "hira": "さんきゅーかーど",
+      "mp3": "br_v34_thankyou_card.mp3"
+    },
+    {
+      "n": 35,
+      "en": "surprise",
+      "jp": "サプライズ",
+      "hira": "さぷらいず",
+      "mp3": "br_v35_surprise.mp3"
+    },
+    {
+      "n": 36,
+      "en": "gift wrapping",
+      "jp": "プレゼントの包装",
+      "hira": "ぷれぜんと の ほうそう",
+      "mp3": "br_v36_gift_wrapping.mp3"
+    },
+    {
+      "n": 37,
+      "en": "box",
+      "jp": "箱",
+      "hira": "はこ",
+      "mp3": "br_v37_box.mp3"
+    },
+    {
+      "n": 38,
+      "en": "gift bag",
+      "jp": "プレゼント袋",
+      "hira": "ぷれぜんと ぶくろ",
+      "mp3": "br_v38_gift_bag.mp3"
+    },
+    {
+      "n": 39,
+      "en": "ribbon",
+      "jp": "リボン",
+      "hira": "りぼん",
+      "mp3": "br_v39_ribbon.mp3"
+    },
+    {
+      "n": 40,
+      "en": "letter",
+      "jp": "手紙",
+      "hira": "てがみ",
+      "mp3": "br_v40_letter.mp3"
+    },
+    {
+      "n": 41,
+      "en": "thanks",
+      "jp": "感謝",
+      "hira": "かんしゃ",
+      "mp3": "br_v41_thanks.mp3"
+    },
+    {
+      "n": 42,
+      "en": "kindness",
+      "jp": "親切",
+      "hira": "しんせつ",
+      "mp3": "br_v42_kindness.mp3"
+    },
+    {
+      "n": 43,
+      "en": "New Year’s money envelope",
+      "jp": "お年玉袋",
+      "hira": "おとしだま ぶくろ",
+      "mp3": "br_v43_new_years_money_envelope.mp3"
+    },
+    {
+      "n": 44,
+      "en": "toy",
+      "jp": "おもちゃ",
+      "hira": "おもちゃ",
+      "mp3": "br_v44_toy.mp3"
+    },
+    {
+      "n": 45,
+      "en": "book",
+      "jp": "本",
+      "hira": "ほん",
+      "mp3": "br_v45_book.mp3"
+    },
+    {
+      "n": 46,
+      "en": "year",
+      "jp": "年",
+      "hira": "とし",
+      "mp3": "br_v46_year.mp3"
+    },
+    {
+      "n": 47,
+      "en": "month",
+      "jp": "月",
+      "hira": "つき",
+      "mp3": "br_v47_month.mp3"
+    },
+    {
+      "n": 48,
+      "en": "year in review",
+      "jp": "一年の振り返り",
+      "hira": "いちねん の ふりかえり",
+      "mp3": "br_v48_year_in_review.mp3"
+    },
+    {
+      "n": 49,
+      "en": "lesson",
+      "jp": "レッスン",
+      "hira": "れっすん",
+      "mp3": "br_v49_lesson.mp3"
+    },
+    {
+      "n": 50,
+      "en": "goal",
+      "jp": "目標",
+      "hira": "もくひょう",
+      "mp3": "br_v50_goal.mp3"
+    },
+    {
+      "n": 51,
+      "en": "success",
+      "jp": "成功",
+      "hira": "せいこう",
+      "mp3": "br_v51_success.mp3"
+    },
+    {
+      "n": 52,
+      "en": "challenge",
+      "jp": "挑戦",
+      "hira": "ちょうせん",
+      "mp3": "br_v52_challenge.mp3"
+    },
+    {
+      "n": 53,
+      "en": "mistake",
+      "jp": "間違い",
+      "hira": "まちがい",
+      "mp3": "br_v53_mistake.mp3"
+    },
+    {
+      "n": 54,
+      "en": "friend",
+      "jp": "友だち",
+      "hira": "ともだち",
+      "mp3": "br_v54_friend.mp3"
+    },
+    {
+      "n": 55,
+      "en": "teacher",
+      "jp": "先生",
+      "hira": "せんせい",
+      "mp3": "br_v55_teacher.mp3"
+    },
+    {
+      "n": 56,
+      "en": "favorite",
+      "jp": "お気に入り",
+      "hira": "おきにいり",
+      "mp3": "br_v56_favorite.mp3"
+    },
+    {
+      "n": 57,
+      "en": "activity",
+      "jp": "活動",
+      "hira": "かつどう",
+      "mp3": "br_v57_activity.mp3"
+    },
+    {
+      "n": 58,
+      "en": "goal for next year",
+      "jp": "来年の目標",
+      "hira": "らいねん の もくひょう",
+      "mp3": "br_v58_goal_for_next_year.mp3"
+    },
+    {
+      "n": 59,
+      "en": "improvement",
+      "jp": "上達",
+      "hira": "じょうたつ",
+      "mp3": "br_v59_improvement.mp3"
+    },
+    {
+      "n": 60,
+      "en": "new skill",
+      "jp": "新しいスキル",
+      "hira": "あたらしい すきる",
+      "mp3": "br_v60_new_skill.mp3"
+    }
+  ]
+}

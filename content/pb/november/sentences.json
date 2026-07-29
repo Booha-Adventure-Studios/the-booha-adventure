@@ -1,1 +1,424 @@
-
+{
+  "cards": [
+    {
+      "n": 1,
+      "en": "This is my house.",
+      "jp": "これは私の家です。",
+      "hira": "これ は わたし の いえ です",
+      "mp3": "pb_s01_this_is_my_house.mp3"
+    },
+    {
+      "n": 2,
+      "en": "I live in an apartment.",
+      "jp": "私はアパートに住んでいます。",
+      "hira": "わたし は あぱーと に すんで います",
+      "mp3": "pb_s02_i_live_in_an_apartment.mp3"
+    },
+    {
+      "n": 3,
+      "en": "I like my home.",
+      "jp": "私は自分の住まいが好きです。",
+      "hira": "わたし は じぶん の すまい が すき です",
+      "mp3": "pb_s03_i_like_my_home.mp3"
+    },
+    {
+      "n": 4,
+      "en": "There are four rooms.",
+      "jp": "部屋が四つあります。",
+      "hira": "へや が よっつ あります",
+      "mp3": "pb_s04_there_are_four_rooms.mp3"
+    },
+    {
+      "n": 5,
+      "en": "We watch TV in the living room.",
+      "jp": "私たちはリビングでテレビを見ます。",
+      "hira": "わたしたち は りびんぐ で てれび を みます",
+      "mp3": "pb_s05_we_watch_tv_in_the_living_room.mp3"
+    },
+    {
+      "n": 6,
+      "en": "We eat in the dining room.",
+      "jp": "私たちはダイニングで食事をします。",
+      "hira": "わたしたち は だいにんぐ で しょくじ を します",
+      "mp3": "pb_s06_we_eat_in_the_dining_room.mp3"
+    },
+    {
+      "n": 7,
+      "en": "We cook in the kitchen.",
+      "jp": "私たちはキッチンで料理します。",
+      "hira": "わたしたち は きっちん で りょうり します",
+      "mp3": "pb_s07_we_cook_in_the_kitchen.mp3"
+    },
+    {
+      "n": 8,
+      "en": "This is my bedroom.",
+      "jp": "ここは私の寝室です。",
+      "hira": "ここ は わたし の しんしつ です",
+      "mp3": "pb_s08_this_is_my_bedroom.mp3"
+    },
+    {
+      "n": 9,
+      "en": "The bathroom is clean.",
+      "jp": "浴室はきれいです。",
+      "hira": "よくしつ は きれい です",
+      "mp3": "pb_s09_the_bathroom_is_clean.mp3"
+    },
+    {
+      "n": 10,
+      "en": "Take off your shoes at the entrance.",
+      "jp": "玄関で靴を脱いでください。",
+      "hira": "げんかん で くつ を ぬいで ください",
+      "mp3": "pb_s10_take_off_your_shoes_at_the_entrance.mp3"
+    },
+    {
+      "n": 11,
+      "en": "We have a small balcony.",
+      "jp": "小さなバルコニーがあります。",
+      "hira": "ちいさな ばるこにー が あります",
+      "mp3": "pb_s11_we_have_a_small_balcony.mp3"
+    },
+    {
+      "n": 12,
+      "en": "The dog plays in the yard.",
+      "jp": "犬は庭で遊びます。",
+      "hira": "いぬ は にわ で あそびます",
+      "mp3": "pb_s12_the_dog_plays_in_the_yard.mp3"
+    },
+    {
+      "n": 13,
+      "en": "There are flowers in the garden.",
+      "jp": "庭に花があります。",
+      "hira": "にわ に はな が あります",
+      "mp3": "pb_s13_there_are_flowers_in_the_garden.mp3"
+    },
+    {
+      "n": 14,
+      "en": "The living room is on the first floor.",
+      "jp": "リビングは1階にあります。",
+      "hira": "りびんぐ は いっかい に あります",
+      "mp3": "pb_s14_the_living_room_is_on_the_first_floor.mp3"
+    },
+    {
+      "n": 15,
+      "en": "My bedroom is on the second floor.",
+      "jp": "私の寝室は2階にあります。",
+      "hira": "わたし の しんしつ は にかい に あります",
+      "mp3": "pb_s15_my_bedroom_is_on_the_second_floor.mp3"
+    },
+    {
+      "n": 16,
+      "en": "The sofa is soft.",
+      "jp": "ソファはやわらかいです。",
+      "hira": "そふぁ は やわらかい です",
+      "mp3": "pb_s16_the_sofa_is_soft.mp3"
+    },
+    {
+      "n": 17,
+      "en": "Dinner is on the table.",
+      "jp": "夕食はテーブルの上にあります。",
+      "hira": "ゆうしょく は てーぶる の うえ に あります",
+      "mp3": "pb_s17_dinner_is_on_the_table.mp3"
+    },
+    {
+      "n": 18,
+      "en": "There are three chairs.",
+      "jp": "いすが三脚あります。",
+      "hira": "いす が さんきゃく あります",
+      "mp3": "pb_s18_there_are_three_chairs.mp3"
+    },
+    {
+      "n": 19,
+      "en": "I go to bed at nine.",
+      "jp": "私は9時に寝ます。",
+      "hira": "わたし は くじ に ねます",
+      "mp3": "pb_s19_i_go_to_bed_at_nine.mp3"
+    },
+    {
+      "n": 20,
+      "en": "I do my homework at my desk.",
+      "jp": "私は机で宿題をします。",
+      "hira": "わたし は つくえ で しゅくだい を します",
+      "mp3": "pb_s20_i_do_my_homework_at_my_desk.mp3"
+    },
+    {
+      "n": 21,
+      "en": "The books are on the bookshelf.",
+      "jp": "本は本棚にあります。",
+      "hira": "ほん は ほんだな に あります",
+      "mp3": "pb_s21_the_books_are_on_the_bookshelf.mp3"
+    },
+    {
+      "n": 22,
+      "en": "My clothes are in the closet.",
+      "jp": "私の服はクローゼットにあります。",
+      "hira": "わたし の ふく は くろーぜっと に あります",
+      "mp3": "pb_s22_my_clothes_are_in_the_closet.mp3"
+    },
+    {
+      "n": 23,
+      "en": "Please turn on the lamp.",
+      "jp": "ランプをつけてください。",
+      "hira": "らんぷ を つけて ください",
+      "mp3": "pb_s23_please_turn_on_the_lamp.mp3"
+    },
+    {
+      "n": 24,
+      "en": "The rug is under the table.",
+      "jp": "カーペットはテーブルの下にあります。",
+      "hira": "かーぺっと は てーぶる の した に あります",
+      "mp3": "pb_s24_the_rug_is_under_the_table.mp3"
+    },
+    {
+      "n": 25,
+      "en": "The milk is in the refrigerator.",
+      "jp": "牛乳は冷蔵庫にあります。",
+      "hira": "ぎゅうにゅう は れいぞうこ に あります",
+      "mp3": "pb_s25_the_milk_is_in_the_refrigerator.mp3"
+    },
+    {
+      "n": 26,
+      "en": "I heat my lunch in the microwave.",
+      "jp": "私は昼食を電子レンジで温めます。",
+      "hira": "わたし は ちゅうしょく を でんし れんじ で あたためます",
+      "mp3": "pb_s26_i_heat_my_lunch_in_the_microwave.mp3"
+    },
+    {
+      "n": 27,
+      "en": "The washing machine is new.",
+      "jp": "洗濯機は新しいです。",
+      "hira": "せんたくき は あたらしい です",
+      "mp3": "pb_s27_the_washing_machine_is_new.mp3"
+    },
+    {
+      "n": 28,
+      "en": "We use the air conditioner on hot days.",
+      "jp": "暑い日にはエアコンを使います。",
+      "hira": "あつい ひ には えあこん を つかいます",
+      "mp3": "pb_s28_we_use_the_air_conditioner_on_hot_days.mp3"
+    },
+    {
+      "n": 29,
+      "en": "Please turn off the TV.",
+      "jp": "テレビを消してください。",
+      "hira": "てれび を けして ください",
+      "mp3": "pb_s29_please_turn_off_the_tv.mp3"
+    },
+    {
+      "n": 30,
+      "en": "Please open the window.",
+      "jp": "窓を開けてください。",
+      "hira": "まど を あけて ください",
+      "mp3": "pb_s30_please_open_the_window.mp3"
+    },
+    {
+      "n": 31,
+      "en": "I help with the housework.",
+      "jp": "私は家事を手伝います。",
+      "hira": "わたし は かじ を てつだいます",
+      "mp3": "pb_s31_i_help_with_the_housework.mp3"
+    },
+    {
+      "n": 32,
+      "en": "I clean my room every Saturday.",
+      "jp": "私は毎週土曜日に部屋を掃除します。",
+      "hira": "わたし は まいしゅう どようび に へや を そうじ します",
+      "mp3": "pb_s32_i_clean_my_room_every_saturday.mp3"
+    },
+    {
+      "n": 33,
+      "en": "I sweep the kitchen floor.",
+      "jp": "私はキッチンの床をほうきで掃きます。",
+      "hira": "わたし は きっちん の ゆか を ほうき で はきます",
+      "mp3": "pb_s33_i_sweep_the_kitchen_floor.mp3"
+    },
+    {
+      "n": 34,
+      "en": "We vacuum the living room on Sunday.",
+      "jp": "私たちは日曜日にリビングに掃除機をかけます。",
+      "hira": "わたしたち は にちようび に りびんぐ に そうじき を かけます",
+      "mp3": "pb_s34_we_vacuum_the_living_room_on_sunday.mp3"
+    },
+    {
+      "n": 35,
+      "en": "Please mop the floor.",
+      "jp": "床にモップをかけてください。",
+      "hira": "ゆか に もっぷ を かけて ください",
+      "mp3": "pb_s35_please_mop_the_floor.mp3"
+    },
+    {
+      "n": 36,
+      "en": "I wash the dishes after dinner.",
+      "jp": "私は夕食後に皿を洗います。",
+      "hira": "わたし は ゆうしょくご に さら を あらいます",
+      "mp3": "pb_s36_i_wash_the_dishes_after_dinner.mp3"
+    },
+    {
+      "n": 37,
+      "en": "We do the laundry on Saturday.",
+      "jp": "私たちは土曜日に洗濯します。",
+      "hira": "わたしたち は どようび に せんたく します",
+      "mp3": "pb_s37_we_do_the_laundry_on_saturday.mp3"
+    },
+    {
+      "n": 38,
+      "en": "I fold the clean clothes.",
+      "jp": "私はきれいな服をたたみます。",
+      "hira": "わたし は きれい な ふく を たたみます",
+      "mp3": "pb_s38_i_fold_the_clean_clothes.mp3"
+    },
+    {
+      "n": 39,
+      "en": "Please take out the trash tonight.",
+      "jp": "今夜ゴミを出してください。",
+      "hira": "こんや ごみ を だして ください",
+      "mp3": "pb_s39_please_take_out_the_trash_tonight.mp3"
+    },
+    {
+      "n": 40,
+      "en": "We recycle cans and bottles.",
+      "jp": "私たちは缶とびんをリサイクルします。",
+      "hira": "わたしたち は かん と びん を りさいくる します",
+      "mp3": "pb_s40_we_recycle_cans_and_bottles.mp3"
+    },
+    {
+      "n": 41,
+      "en": "I water the plants every morning.",
+      "jp": "私は毎朝植物に水をやります。",
+      "hira": "わたし は まいあさ しょくぶつ に みず を やります",
+      "mp3": "pb_s41_i_water_the_plants_every_morning.mp3"
+    },
+    {
+      "n": 42,
+      "en": "I feed the dog at seven.",
+      "jp": "私は7時に犬にえさをあげます。",
+      "hira": "わたし は しちじ に いぬ に えさ を あげます",
+      "mp3": "pb_s42_i_feed_the_dog_at_seven.mp3"
+    },
+    {
+      "n": 43,
+      "en": "I make my bed every day.",
+      "jp": "私は毎日ベッドを整えます。",
+      "hira": "わたし は まいにち べっど を ととのえます",
+      "mp3": "pb_s43_i_make_my_bed_every_day.mp3"
+    },
+    {
+      "n": 44,
+      "en": "We set the table before dinner.",
+      "jp": "私たちは夕食前に食卓を整えます。",
+      "hira": "わたしたち は ゆうしょくまえ に しょくたく を ととのえます",
+      "mp3": "pb_s44_we_set_the_table_before_dinner.mp3"
+    },
+    {
+      "n": 45,
+      "en": "Thank you for your help.",
+      "jp": "手伝ってくれてありがとう。",
+      "hira": "てつだって くれて ありがとう",
+      "mp3": "pb_s45_thank_you_for_your_help.mp3"
+    },
+    {
+      "n": 46,
+      "en": "This is my dream house.",
+      "jp": "これは私の夢の家です。",
+      "hira": "これ は わたし の ゆめ の いえ です",
+      "mp3": "pb_s46_this_is_my_dream_house.mp3"
+    },
+    {
+      "n": 47,
+      "en": "I want a big kitchen.",
+      "jp": "私は大きなキッチンがほしいです。",
+      "hira": "わたし は おおきな きっちん が ほしい です",
+      "mp3": "pb_s47_i_want_a_big_kitchen.mp3"
+    },
+    {
+      "n": 48,
+      "en": "My room is small but nice.",
+      "jp": "私の部屋は小さいですが、すてきです。",
+      "hira": "わたし の へや は ちいさい です が すてき です",
+      "mp3": "pb_s48_my_room_is_small_but_nice.mp3"
+    },
+    {
+      "n": 49,
+      "en": "I want a bright room.",
+      "jp": "私は明るい部屋がほしいです。",
+      "hira": "わたし は あかるい へや が ほしい です",
+      "mp3": "pb_s49_i_want_a_bright_room.mp3"
+    },
+    {
+      "n": 50,
+      "en": "My neighborhood is quiet.",
+      "jp": "私の近所は静かです。",
+      "hira": "わたし の きんじょ は しずか です",
+      "mp3": "pb_s50_my_neighborhood_is_quiet.mp3"
+    },
+    {
+      "n": 51,
+      "en": "The living room is warm and cozy.",
+      "jp": "リビングは暖かくて居心地がよいです。",
+      "hira": "りびんぐ は あたたかくて いごこち が よい です",
+      "mp3": "pb_s51_the_living_room_is_warm_and_cozy.mp3"
+    },
+    {
+      "n": 52,
+      "en": "I want a garden on the rooftop.",
+      "jp": "私は屋上に庭がほしいです。",
+      "hira": "わたし は おくじょう に にわ が ほしい です",
+      "mp3": "pb_s52_i_want_a_garden_on_the_rooftop.mp3"
+    },
+    {
+      "n": 53,
+      "en": "The children play in the playroom.",
+      "jp": "子どもたちは遊び部屋で遊びます。",
+      "hira": "こどもたち は あそび べや で あそびます",
+      "mp3": "pb_s53_the_children_play_in_the_playroom.mp3"
+    },
+    {
+      "n": 54,
+      "en": "I study in the home office.",
+      "jp": "私は自宅の仕事部屋で勉強します。",
+      "hira": "わたし は じたく の しごと べや で べんきょう します",
+      "mp3": "pb_s54_i_study_in_the_home_office.mp3"
+    },
+    {
+      "n": 55,
+      "en": "We need more storage space.",
+      "jp": "もっと収納スペースが必要です。",
+      "hira": "もっと しゅうのう すぺーす が ひつよう です",
+      "mp3": "pb_s55_we_need_more_storage_space.mp3"
+    },
+    {
+      "n": 56,
+      "en": "This home is eco-friendly.",
+      "jp": "この家は環境にやさしいです。",
+      "hira": "この いえ は かんきょう に やさしい です",
+      "mp3": "pb_s56_this_home_is_ecofriendly.mp3"
+    },
+    {
+      "n": 57,
+      "en": "I know everyone in my neighborhood.",
+      "jp": "私は近所のみんなを知っています。",
+      "hira": "わたし は きんじょ の みんな を しって います",
+      "mp3": "pb_s57_i_know_everyone_in_my_neighborhood.mp3"
+    },
+    {
+      "n": 58,
+      "en": "My dream home is near the station.",
+      "jp": "私の夢の家は駅の近くにあります。",
+      "hira": "わたし の ゆめ の いえ は えき の ちかく に あります",
+      "mp3": "pb_s58_my_dream_home_is_near_the_station.mp3"
+    },
+    {
+      "n": 59,
+      "en": "We want a pet-friendly apartment.",
+      "jp": "私たちはペット可のアパートがほしいです。",
+      "hira": "わたしたち は ぺっと か の あぱーと が ほしい です",
+      "mp3": "pb_s59_we_want_a_petfriendly_apartment.mp3"
+    },
+    {
+      "n": 60,
+      "en": "This area is safe for children.",
+      "jp": "この地域は子どもにとって安全です。",
+      "hira": "この ちいき は こども に とって あんぜん です",
+      "mp3": "pb_s60_this_area_is_safe_for_children.mp3"
+    }
+  ]
+}
