@@ -1,1 +1,424 @@
-
+{
+  "cards": [
+    {
+      "n": 1,
+      "en": "This is my desk.",
+      "jp": "これは私の机です。",
+      "hira": "これ は わたし の つくえ です",
+      "mp3": "br_s01_this_is_my_desk.mp3"
+    },
+    {
+      "n": 2,
+      "en": "That is the teacher’s chair.",
+      "jp": "あれは先生のいすです。",
+      "hira": "あれ は せんせい の いす です",
+      "mp3": "br_s02_that_is_the_teachers_chair.mp3"
+    },
+    {
+      "n": 3,
+      "en": "Use your notebook, please.",
+      "jp": "ノートを使ってください。",
+      "hira": "のーと を つかって ください",
+      "mp3": "br_s03_use_your_notebook_please.mp3"
+    },
+    {
+      "n": 4,
+      "en": "Don’t write on the desk.",
+      "jp": "机に書かないでください。",
+      "hira": "つくえ に かか ないで ください",
+      "mp3": "br_s04_dont_write_on_the_desk.mp3"
+    },
+    {
+      "n": 5,
+      "en": "You must bring your textbook.",
+      "jp": "教科書を持ってこなければなりません。",
+      "hira": "きょうかしょ を もって こなければ なり ません",
+      "mp3": "br_s05_you_must_bring_your_textbook.mp3"
+    },
+    {
+      "n": 6,
+      "en": "You mustn’t run in the classroom.",
+      "jp": "教室で走ってはいけません。",
+      "hira": "きょうしつ で はしって は いけ ません",
+      "mp3": "br_s06_you_mustnt_run_in_the_classroom.mp3"
+    },
+    {
+      "n": 7,
+      "en": "Raise your hand before speaking.",
+      "jp": "話す前に手を上げてください。",
+      "hira": "はなす まえ に て を あげて ください",
+      "mp3": "br_s07_raise_your_hand_before_speaking.mp3"
+    },
+    {
+      "n": 8,
+      "en": "Be kind and share.",
+      "jp": "やさしくして、分け合ってください。",
+      "hira": "やさしく して、 わけ あって ください",
+      "mp3": "br_s08_be_kind_and_share.mp3"
+    },
+    {
+      "n": 9,
+      "en": "Keep your locker clean.",
+      "jp": "ロッカーをきれいに保ってください。",
+      "hira": "ろっかー を きれい に たもって ください",
+      "mp3": "br_s09_keep_your_locker_clean.mp3"
+    },
+    {
+      "n": 10,
+      "en": "You can borrow a ruler.",
+      "jp": "定規を借りてもいいです。",
+      "hira": "じょうぎ を かりて も いい です",
+      "mp3": "br_s10_you_can_borrow_a_ruler.mp3"
+    },
+    {
+      "n": 11,
+      "en": "Can I use the projector?",
+      "jp": "プロジェクターを使ってもいいですか。",
+      "hira": "ぷろじぇくたー を つかって も いい です か",
+      "mp3": "br_s11_can_i_use_the_projector.mp3"
+    },
+    {
+      "n": 12,
+      "en": "Put trash in the trash can.",
+      "jp": "ゴミはゴミ箱に入れてください。",
+      "hira": "ごみ は ごみばこ に いれて ください",
+      "mp3": "br_s12_put_trash_in_the_trash_can.mp3"
+    },
+    {
+      "n": 13,
+      "en": "Line up quietly.",
+      "jp": "静かに並びましょう。",
+      "hira": "しずか に ならび ましょう",
+      "mp3": "br_s13_line_up_quietly.mp3"
+    },
+    {
+      "n": 14,
+      "en": "We must listen to the teacher.",
+      "jp": "先生の話を聞かなければなりません。",
+      "hira": "せんせい の はなし を きかなければ なり ません",
+      "mp3": "br_s14_we_must_listen_to_the_teacher.mp3"
+    },
+    {
+      "n": 15,
+      "en": "Let’s follow the rules.",
+      "jp": "ルールにしたがいましょう。",
+      "hira": "るーる に したがい ましょう",
+      "mp3": "br_s15_lets_follow_the_rules.mp3"
+    },
+    {
+      "n": 16,
+      "en": "I like English.",
+      "jp": "私は英語が好きです。",
+      "hira": "わたし は えいご が すき です",
+      "mp3": "br_s16_i_like_english.mp3"
+    },
+    {
+      "n": 17,
+      "en": "I’m good at math.",
+      "jp": "私は数学が得意です。",
+      "hira": "わたし は すうがく が とくい です",
+      "mp3": "br_s17_im_good_at_math.mp3"
+    },
+    {
+      "n": 18,
+      "en": "I’m not good at history.",
+      "jp": "私は歴史が得意ではありません。",
+      "hira": "わたし は れきし が とくい では ありません",
+      "mp3": "br_s18_im_not_good_at_history.mp3"
+    },
+    {
+      "n": 19,
+      "en": "My favorite subject is science.",
+      "jp": "私の一番好きな教科は理科です。",
+      "hira": "わたし の いちばん すき な きょうか は りか です",
+      "mp3": "br_s19_my_favorite_subject_is_science.mp3"
+    },
+    {
+      "n": 20,
+      "en": "On Monday, we have PE and music.",
+      "jp": "月曜日は体育と音楽があります。",
+      "hira": "げつようび は たいいく と おんがく が あり ます",
+      "mp3": "br_s20_on_monday_we_have_pe_and_music.mp3"
+    },
+    {
+      "n": 21,
+      "en": "Do you like art?",
+      "jp": "美術は好きですか。",
+      "hira": "びじゅつ は すき です か",
+      "mp3": "br_s21_do_you_like_art.mp3"
+    },
+    {
+      "n": 22,
+      "en": "We study geography this term.",
+      "jp": "今学期は地理を勉強します。",
+      "hira": "こん がっき は ちり を べんきょう し ます",
+      "mp3": "br_s22_we_study_geography_this_term.mp3"
+    },
+    {
+      "n": 23,
+      "en": "We learn about health in class.",
+      "jp": "授業で保健について学びます。",
+      "hira": "じゅぎょう で ほけん について まなび ます",
+      "mp3": "br_s23_we_learn_about_health_in_class.mp3"
+    },
+    {
+      "n": 24,
+      "en": "In ICT, we use computers.",
+      "jp": "情報の授業ではコンピューターを使います。",
+      "hira": "じょうほう の じゅぎょう で は こんぴゅーたー を つかい ます",
+      "mp3": "br_s24_in_ict_we_use_computers.mp3"
+    },
+    {
+      "n": 25,
+      "en": "Home economics is useful.",
+      "jp": "家庭科は役に立ちます。",
+      "hira": "かていか は やく に たち ます",
+      "mp3": "br_s25_home_economics_is_useful.mp3"
+    },
+    {
+      "n": 26,
+      "en": "Let’s practice for music class.",
+      "jp": "音楽の授業のために練習しましょう。",
+      "hira": "おんがく の じゅぎょう の ため に れんしゅう し ましょう",
+      "mp3": "br_s26_lets_practice_for_music_class.mp3"
+    },
+    {
+      "n": 27,
+      "en": "We have a science test on Friday.",
+      "jp": "金曜日に理科のテストがあります。",
+      "hira": "きんようび に りか の てすと が あり ます",
+      "mp3": "br_s27_we_have_a_science_test_on_friday.mp3"
+    },
+    {
+      "n": 28,
+      "en": "Club activities start at four.",
+      "jp": "部活動は4時に始まります。",
+      "hira": "ぶかつどう は よじ に はじまり ます",
+      "mp3": "br_s28_club_activities_start_at_four.mp3"
+    },
+    {
+      "n": 29,
+      "en": "Do you like homeroom time?",
+      "jp": "ホームルームの時間は好きですか。",
+      "hira": "ほーむるーむ の じかん は すき です か",
+      "mp3": "br_s29_do_you_like_homeroom_time.mp3"
+    },
+    {
+      "n": 30,
+      "en": "We study hard and have fun.",
+      "jp": "一生けんめい勉強して、楽しく過ごします。",
+      "hira": "いっしょうけんめい べんきょう して、 たのしく すごし ます",
+      "mp3": "br_s30_we_study_hard_and_have_fun.mp3"
+    },
+    {
+      "n": 31,
+      "en": "Who is your homeroom teacher?",
+      "jp": "あなたの担任の先生はだれですか。",
+      "hira": "あなた の たんにん の せんせい は だれ です か",
+      "mp3": "br_s31_who_is_your_homeroom_teacher.mp3"
+    },
+    {
+      "n": 32,
+      "en": "He is our principal.",
+      "jp": "彼は私たちの校長先生です。",
+      "hira": "かれ は わたしたち の こうちょう せんせい です",
+      "mp3": "br_s32_he_is_our_principal.mp3"
+    },
+    {
+      "n": 33,
+      "en": "She is the librarian.",
+      "jp": "彼女は司書です。",
+      "hira": "かのじょ は ししょ です",
+      "mp3": "br_s33_she_is_the_librarian.mp3"
+    },
+    {
+      "n": 34,
+      "en": "They are office staff.",
+      "jp": "彼らは事務の人たちです。",
+      "hira": "かれら は じむ の ひと たち です",
+      "mp3": "br_s34_they_are_office_staff.mp3"
+    },
+    {
+      "n": 35,
+      "en": "The nurse helps students.",
+      "jp": "保健の先生は生徒を助けます。",
+      "hira": "ほけん の せんせい は せいと を たすけ ます",
+      "mp3": "br_s35_the_nurse_helps_students.mp3"
+    },
+    {
+      "n": 36,
+      "en": "Ask the counselor for help.",
+      "jp": "カウンセラーに助けを求めてください。",
+      "hira": "かうんせらー に たすけ を もとめて ください",
+      "mp3": "br_s36_ask_the_counselor_for_help.mp3"
+    },
+    {
+      "n": 37,
+      "en": "The janitor keeps the school clean.",
+      "jp": "用務員さんは学校をきれいに保ちます。",
+      "hira": "ようむいん さん は がっこう を きれい に たもち ます",
+      "mp3": "br_s37_the_janitor_keeps_the_school_clean.mp3"
+    },
+    {
+      "n": 38,
+      "en": "Our coach is kind and strict.",
+      "jp": "私たちのコーチはやさしくて厳しいです。",
+      "hira": "わたしたち の こーち は やさしくて きびしい です",
+      "mp3": "br_s38_our_coach_is_kind_and_strict.mp3"
+    },
+    {
+      "n": 39,
+      "en": "My classmate helps me with math.",
+      "jp": "私のクラスメートが数学の勉強を手伝ってくれます。",
+      "hira": "わたし の くらすめーと が すうがく の べんきょう を てつだって くれます",
+      "mp3": "br_s39_my_classmate_helps_me_with_math.mp3"
+    },
+    {
+      "n": 40,
+      "en": "Where is the principal’s office?",
+      "jp": "校長室はどこですか。",
+      "hira": "こうちょうしつ は どこ です か",
+      "mp3": "br_s40_where_is_the_principals_office.mp3"
+    },
+    {
+      "n": 41,
+      "en": "Can I talk to the counselor?",
+      "jp": "カウンセラーと話してもいいですか。",
+      "hira": "かうんせらー と はなして も いい です か",
+      "mp3": "br_s41_can_i_talk_to_the_counselor.mp3"
+    },
+    {
+      "n": 42,
+      "en": "Please ask the librarian about this book.",
+      "jp": "この本について司書にたずねてください。",
+      "hira": "この ほん について ししょ に たずねて ください",
+      "mp3": "br_s42_please_ask_the_librarian_about_this_book.mp3"
+    },
+    {
+      "n": 43,
+      "en": "Our advisor checks the club plan.",
+      "jp": "顧問の先生が部活動の計画を確認します。",
+      "hira": "こもん の せんせい が ぶかつどう の けいかく を かくにん します",
+      "mp3": "br_s43_our_advisor_checks_the_club_plan.mp3"
+    },
+    {
+      "n": 44,
+      "en": "Say “thank you” to staff.",
+      "jp": "職員に「ありがとう」と言いましょう。",
+      "hira": "しょくいん に「ありがとう」 と いい ましょう",
+      "mp3": "br_s44_say_thank_you_to_staff.mp3"
+    },
+    {
+      "n": 45,
+      "en": "Let’s help underclassmen.",
+      "jp": "後輩を助けましょう。",
+      "hira": "こうはい を たすけ ましょう",
+      "mp3": "br_s45_lets_help_underclassmen.mp3"
+    },
+    {
+      "n": 46,
+      "en": "School starts at eight thirty.",
+      "jp": "学校は8時30分に始まります。",
+      "hira": "がっこう は はちじ さんじゅっぷん に はじまり ます",
+      "mp3": "br_s46_school_starts_at_eight_thirty.mp3"
+    },
+    {
+      "n": 47,
+      "en": "Classes finish at three thirty.",
+      "jp": "授業は3時30分に終わります。",
+      "hira": "じゅぎょう は さんじ さんじゅっぷん に おわり ます",
+      "mp3": "br_s47_classes_finish_at_three_thirty.mp3"
+    },
+    {
+      "n": 48,
+      "en": "We have five periods today.",
+      "jp": "今日は5時間あります。",
+      "hira": "きょう は ご じかん あり ます",
+      "mp3": "br_s48_we_have_five_periods_today.mp3"
+    },
+    {
+      "n": 49,
+      "en": "English is from nine to nine forty-five.",
+      "jp": "英語は9時から9時45分までです。",
+      "hira": "えいご は くじ から くじ よんじゅうごふん まで です",
+      "mp3": "br_s49_english_is_from_nine_to_nine_fortyfive.mp3"
+    },
+    {
+      "n": 50,
+      "en": "Lunch break is from twelve to twelve forty.",
+      "jp": "昼休みは12時から12時40分までです。",
+      "hira": "ひるやすみ は じゅうにじ から じゅうにじ よんじゅっぷん まで です",
+      "mp3": "br_s50_lunch_break_is_from_twelve_to_twelve_forty.mp3"
+    },
+    {
+      "n": 51,
+      "en": "Before school, I read a book.",
+      "jp": "登校前に本を読みます。",
+      "hira": "とうこう まえ に ほん を よみ ます",
+      "mp3": "br_s51_before_school_i_read_a_book.mp3"
+    },
+    {
+      "n": 52,
+      "en": "After school, we have club activities.",
+      "jp": "放課後に部活動があります。",
+      "hira": "ほうかご に ぶかつどう が あり ます",
+      "mp3": "br_s52_after_school_we_have_club_activities.mp3"
+    },
+    {
+      "n": 53,
+      "en": "The bell rings at the start of each period.",
+      "jp": "各授業の始まりにチャイムが鳴ります。",
+      "hira": "かく じゅぎょう の はじまり に ちゃいむ が なります",
+      "mp3": "br_s53_the_bell_rings_at_the_start_of_each_period.mp3"
+    },
+    {
+      "n": 54,
+      "en": "There is an assembly on Monday morning.",
+      "jp": "月曜日の朝に全校集会があります。",
+      "hira": "げつようび の あさ に ぜんこう しゅうかい が あり ます",
+      "mp3": "br_s54_there_is_an_assembly_on_monday_morning.mp3"
+    },
+    {
+      "n": 55,
+      "en": "We have an exam next week.",
+      "jp": "来週、試験があります。",
+      "hira": "らいしゅう、 しけん が あり ます",
+      "mp3": "br_s55_we_have_an_exam_next_week.mp3"
+    },
+    {
+      "n": 56,
+      "en": "Is there a holiday this month?",
+      "jp": "今月、休みはありますか。",
+      "hira": "こんげつ、 やすみ は あり ます か",
+      "mp3": "br_s56_is_there_a_holiday_this_month.mp3"
+    },
+    {
+      "n": 57,
+      "en": "There is a parent meeting after school.",
+      "jp": "放課後に保護者会があります。",
+      "hira": "ほうかご に ほごしゃ かい が あり ます",
+      "mp3": "br_s57_there_is_a_parent_meeting_after_school.mp3"
+    },
+    {
+      "n": 58,
+      "en": "We will have a make-up class on Friday.",
+      "jp": "金曜日に補講があります。",
+      "hira": "きんようび に ほこう が あり ます",
+      "mp3": "br_s58_we_will_have_a_makeup_class_on_friday.mp3"
+    },
+    {
+      "n": 59,
+      "en": "Please check the timetable.",
+      "jp": "時間割を確認してください。",
+      "hira": "じかんわり を かくにん して ください",
+      "mp3": "br_s59_please_check_the_timetable.mp3"
+    },
+    {
+      "n": 60,
+      "en": "Let’s be on time for every class.",
+      "jp": "どの授業にも遅れないようにしましょう。",
+      "hira": "どの じゅぎょう にも おくれない よう に しましょう",
+      "mp3": "br_s60_lets_be_on_time_for_every_class.mp3"
+    }
+  ]
+}

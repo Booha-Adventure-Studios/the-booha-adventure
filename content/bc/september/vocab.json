@@ -1,1 +1,424 @@
-
+{
+  "cards": [
+    {
+      "n": 1,
+      "en": "instructional materials",
+      "jp": "教材",
+      "hira": "きょうざい",
+      "mp3": "bc_v01_instructional_materials.mp3"
+    },
+    {
+      "n": 2,
+      "en": "interactive whiteboard",
+      "jp": "電子黒板",
+      "hira": "でんし こくばん",
+      "mp3": "bc_v02_interactive_whiteboard.mp3"
+    },
+    {
+      "n": 3,
+      "en": "audiovisual equipment",
+      "jp": "視聴覚機器",
+      "hira": "しちょうかく きき",
+      "mp3": "bc_v03_audiovisual_equipment.mp3"
+    },
+    {
+      "n": 4,
+      "en": "stationery",
+      "jp": "文房具",
+      "hira": "ぶんぼうぐ",
+      "mp3": "bc_v04_stationery.mp3"
+    },
+    {
+      "n": 5,
+      "en": "storage compartment",
+      "jp": "収納スペース",
+      "hira": "しゅうのう すぺーす",
+      "mp3": "bc_v05_storage_compartment.mp3"
+    },
+    {
+      "n": 6,
+      "en": "classroom management",
+      "jp": "学級運営",
+      "hira": "がっきゅう うんえい",
+      "mp3": "bc_v06_classroom_management.mp3"
+    },
+    {
+      "n": 7,
+      "en": "code of conduct",
+      "jp": "行動規範",
+      "hira": "こうどう きはん",
+      "mp3": "bc_v07_code_of_conduct.mp3"
+    },
+    {
+      "n": 8,
+      "en": "academic integrity",
+      "jp": "学術的誠実性",
+      "hira": "がくじゅつてき せいじつせい",
+      "mp3": "bc_v08_academic_integrity.mp3"
+    },
+    {
+      "n": 9,
+      "en": "mutual respect",
+      "jp": "相互尊重",
+      "hira": "そうご そんちょう",
+      "mp3": "bc_v09_mutual_respect.mp3"
+    },
+    {
+      "n": 10,
+      "en": "disruptive behavior",
+      "jp": "授業妨害行為",
+      "hira": "じゅぎょう ぼうがい こうい",
+      "mp3": "bc_v10_disruptive_behavior.mp3"
+    },
+    {
+      "n": 11,
+      "en": "participation",
+      "jp": "参加",
+      "hira": "さんか",
+      "mp3": "bc_v11_participation.mp3"
+    },
+    {
+      "n": 12,
+      "en": "collaboration",
+      "jp": "協働",
+      "hira": "きょうどう",
+      "mp3": "bc_v12_collaboration.mp3"
+    },
+    {
+      "n": 13,
+      "en": "permission",
+      "jp": "許可",
+      "hira": "きょか",
+      "mp3": "bc_v13_permission.mp3"
+    },
+    {
+      "n": 14,
+      "en": "obligation",
+      "jp": "義務",
+      "hira": "ぎむ",
+      "mp3": "bc_v14_obligation.mp3"
+    },
+    {
+      "n": 15,
+      "en": "prohibited",
+      "jp": "禁止された",
+      "hira": "きんし された",
+      "mp3": "bc_v15_prohibited.mp3"
+    },
+    {
+      "n": 16,
+      "en": "curriculum",
+      "jp": "教育課程",
+      "hira": "きょういく かてい",
+      "mp3": "bc_v16_curriculum.mp3"
+    },
+    {
+      "n": 17,
+      "en": "compulsory subject",
+      "jp": "必修科目",
+      "hira": "ひっしゅう かもく",
+      "mp3": "bc_v17_compulsory_subject.mp3"
+    },
+    {
+      "n": 18,
+      "en": "elective subject",
+      "jp": "選択科目",
+      "hira": "せんたく かもく",
+      "mp3": "bc_v18_elective_subject.mp3"
+    },
+    {
+      "n": 19,
+      "en": "interdisciplinary studies",
+      "jp": "学際的学習",
+      "hira": "がくさいてき がくしゅう",
+      "mp3": "bc_v19_interdisciplinary_studies.mp3"
+    },
+    {
+      "n": 20,
+      "en": "academic performance",
+      "jp": "学業成績",
+      "hira": "がくぎょう せいせき",
+      "mp3": "bc_v20_academic_performance.mp3"
+    },
+    {
+      "n": 21,
+      "en": "proficiency",
+      "jp": "習熟度",
+      "hira": "しゅうじゅくど",
+      "mp3": "bc_v21_proficiency.mp3"
+    },
+    {
+      "n": 22,
+      "en": "aptitude",
+      "jp": "適性",
+      "hira": "てきせい",
+      "mp3": "bc_v22_aptitude.mp3"
+    },
+    {
+      "n": 23,
+      "en": "critical thinking",
+      "jp": "批判的思考",
+      "hira": "ひはんてき しこう",
+      "mp3": "bc_v23_critical_thinking.mp3"
+    },
+    {
+      "n": 24,
+      "en": "problem-solving",
+      "jp": "問題解決",
+      "hira": "もんだい かいけつ",
+      "mp3": "bc_v24_problemsolving.mp3"
+    },
+    {
+      "n": 25,
+      "en": "research assignment",
+      "jp": "調査課題",
+      "hira": "ちょうさ かだい",
+      "mp3": "bc_v25_research_assignment.mp3"
+    },
+    {
+      "n": 26,
+      "en": "assessment",
+      "jp": "評価",
+      "hira": "ひょうか",
+      "mp3": "bc_v26_assessment.mp3"
+    },
+    {
+      "n": 27,
+      "en": "coursework",
+      "jp": "授業での課題",
+      "hira": "じゅぎょう で の かだい",
+      "mp3": "bc_v27_coursework.mp3"
+    },
+    {
+      "n": 28,
+      "en": "practical skills",
+      "jp": "実践的技能",
+      "hira": "じっせんてき ぎのう",
+      "mp3": "bc_v28_practical_skills.mp3"
+    },
+    {
+      "n": 29,
+      "en": "digital literacy",
+      "jp": "デジタル・リテラシー",
+      "hira": "でじたる りてらしー",
+      "mp3": "bc_v29_digital_literacy.mp3"
+    },
+    {
+      "n": 30,
+      "en": "lifelong learning",
+      "jp": "生涯学習",
+      "hira": "しょうがい がくしゅう",
+      "mp3": "bc_v30_lifelong_learning.mp3"
+    },
+    {
+      "n": 31,
+      "en": "faculty",
+      "jp": "教職員",
+      "hira": "きょうしょくいん",
+      "mp3": "bc_v31_faculty.mp3"
+    },
+    {
+      "n": 32,
+      "en": "administrator",
+      "jp": "管理職",
+      "hira": "かんりしょく",
+      "mp3": "bc_v32_administrator.mp3"
+    },
+    {
+      "n": 33,
+      "en": "vice principal",
+      "jp": "教頭",
+      "hira": "きょうとう",
+      "mp3": "bc_v33_vice_principal.mp3"
+    },
+    {
+      "n": 34,
+      "en": "homeroom instructor",
+      "jp": "担任教師",
+      "hira": "たんにん きょうし",
+      "mp3": "bc_v34_homeroom_instructor.mp3"
+    },
+    {
+      "n": 35,
+      "en": "subject specialist",
+      "jp": "教科専門教師",
+      "hira": "きょうか せんもん きょうし",
+      "mp3": "bc_v35_subject_specialist.mp3"
+    },
+    {
+      "n": 36,
+      "en": "guidance counselor",
+      "jp": "スクールカウンセラー",
+      "hira": "すくーる かうんせらー",
+      "mp3": "bc_v36_guidance_counselor.mp3"
+    },
+    {
+      "n": 37,
+      "en": "school nurse",
+      "jp": "養護教諭",
+      "hira": "ようご きょうゆ",
+      "mp3": "bc_v37_school_nurse.mp3"
+    },
+    {
+      "n": 38,
+      "en": "librarian",
+      "jp": "司書",
+      "hira": "ししょ",
+      "mp3": "bc_v38_librarian.mp3"
+    },
+    {
+      "n": 39,
+      "en": "custodian",
+      "jp": "用務員",
+      "hira": "ようむいん",
+      "mp3": "bc_v39_custodian.mp3"
+    },
+    {
+      "n": 40,
+      "en": "club supervisor",
+      "jp": "部活動顧問",
+      "hira": "ぶかつどう こもん",
+      "mp3": "bc_v40_club_supervisor.mp3"
+    },
+    {
+      "n": 41,
+      "en": "student representative",
+      "jp": "生徒代表",
+      "hira": "せいと だいひょう",
+      "mp3": "bc_v41_student_representative.mp3"
+    },
+    {
+      "n": 42,
+      "en": "peer mentor",
+      "jp": "ピアメンター",
+      "hira": "ぴあ めんたー",
+      "mp3": "bc_v42_peer_mentor.mp3"
+    },
+    {
+      "n": 43,
+      "en": "support staff",
+      "jp": "支援職員",
+      "hira": "しえん しょくいん",
+      "mp3": "bc_v43_support_staff.mp3"
+    },
+    {
+      "n": 44,
+      "en": "disciplinary committee",
+      "jp": "懲戒委員会",
+      "hira": "ちょうかい いいんかい",
+      "mp3": "bc_v44_disciplinary_committee.mp3"
+    },
+    {
+      "n": 45,
+      "en": "safeguarding officer",
+      "jp": "生徒保護担当者",
+      "hira": "せいと ほご たんとうしゃ",
+      "mp3": "bc_v45_safeguarding_officer.mp3"
+    },
+    {
+      "n": 46,
+      "en": "academic calendar",
+      "jp": "学年暦",
+      "hira": "がくねんれき",
+      "mp3": "bc_v46_academic_calendar.mp3"
+    },
+    {
+      "n": 47,
+      "en": "timetable",
+      "jp": "時間割",
+      "hira": "じかんわり",
+      "mp3": "bc_v47_timetable.mp3"
+    },
+    {
+      "n": 48,
+      "en": "period",
+      "jp": "時限",
+      "hira": "じげん",
+      "mp3": "bc_v48_period.mp3"
+    },
+    {
+      "n": 49,
+      "en": "interval",
+      "jp": "合間",
+      "hira": "あいま",
+      "mp3": "bc_v49_interval.mp3"
+    },
+    {
+      "n": 50,
+      "en": "assembly",
+      "jp": "全校集会",
+      "hira": "ぜんこう しゅうかい",
+      "mp3": "bc_v50_assembly.mp3"
+    },
+    {
+      "n": 51,
+      "en": "extracurricular activity",
+      "jp": "課外活動",
+      "hira": "かがい かつどう",
+      "mp3": "bc_v51_extracurricular_activity.mp3"
+    },
+    {
+      "n": 52,
+      "en": "deadline",
+      "jp": "締め切り",
+      "hira": "しめきり",
+      "mp3": "bc_v52_deadline.mp3"
+    },
+    {
+      "n": 53,
+      "en": "reschedule",
+      "jp": "日程を変更する",
+      "hira": "にってい を へんこう する",
+      "mp3": "bc_v53_reschedule.mp3"
+    },
+    {
+      "n": 54,
+      "en": "cancellation",
+      "jp": "中止",
+      "hira": "ちゅうし",
+      "mp3": "bc_v54_cancellation.mp3"
+    },
+    {
+      "n": 55,
+      "en": "postponement",
+      "jp": "延期",
+      "hira": "えんき",
+      "mp3": "bc_v55_postponement.mp3"
+    },
+    {
+      "n": 56,
+      "en": "punctuality",
+      "jp": "時間厳守",
+      "hira": "じかん げんしゅ",
+      "mp3": "bc_v56_punctuality.mp3"
+    },
+    {
+      "n": 57,
+      "en": "attendance",
+      "jp": "出席",
+      "hira": "しゅっせき",
+      "mp3": "bc_v57_attendance.mp3"
+    },
+    {
+      "n": 58,
+      "en": "make-up session",
+      "jp": "補講",
+      "hira": "ほこう",
+      "mp3": "bc_v58_makeup_session.mp3"
+    },
+    {
+      "n": 59,
+      "en": "time management",
+      "jp": "時間管理",
+      "hira": "じかん かんり",
+      "mp3": "bc_v59_time_management.mp3"
+    },
+    {
+      "n": 60,
+      "en": "conflicting commitments",
+      "jp": "予定の重複",
+      "hira": "よてい の ちょうふく",
+      "mp3": "bc_v60_conflicting_commitments.mp3"
+    }
+  ]
+}

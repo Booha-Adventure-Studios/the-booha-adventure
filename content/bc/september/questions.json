@@ -1,1 +1,424 @@
-
+{
+  "cards": [
+    {
+      "n": 1,
+      "en": "Where are the instructional materials stored?",
+      "jp": "教材はどこに保管されていますか。",
+      "hira": "きょうざい は どこ に ほかん されて います か",
+      "mp3": "bc_q01_where_are_the_instructional_materials_stored.mp3"
+    },
+    {
+      "n": 2,
+      "en": "How does the interactive whiteboard enhance a lesson?",
+      "jp": "電子黒板は授業の質をどのように高めますか。",
+      "hira": "でんし こくばん は じゅぎょう の しつ を どの よう に たかめます か",
+      "mp3": "bc_q02_how_does_the_interactive_whiteboard_enhance_a_lesson.mp3"
+    },
+    {
+      "n": 3,
+      "en": "What precautions should you take when using audiovisual equipment?",
+      "jp": "視聴覚機器を使う際にはどのような注意が必要ですか。",
+      "hira": "しちょうかく きき を つかう さい には どの よう な ちゅうい が ひつよう です か",
+      "mp3": "bc_q03_what_precautions_should_you_take_when_using_audiovisual_equipment.mp3"
+    },
+    {
+      "n": 4,
+      "en": "Who is responsible for returning stationery to its proper place?",
+      "jp": "文房具を所定の場所に戻す責任は誰にありますか。",
+      "hira": "ぶんぼうぐ を しょてい の ばしょ に もどす せきにん は だれ に あります か",
+      "mp3": "bc_q04_who_is_responsible_for_returning_stationery_to_its_proper_place.mp3"
+    },
+    {
+      "n": 5,
+      "en": "What do you keep in your storage compartment?",
+      "jp": "収納スペースには何を入れていますか。",
+      "hira": "しゅうのう すぺーす には なに を いれて います か",
+      "mp3": "bc_q05_what_do_you_keep_in_your_storage_compartment.mp3"
+    },
+    {
+      "n": 6,
+      "en": "How can effective classroom management improve learning?",
+      "jp": "効果的な学級運営は学習をどのように改善できますか。",
+      "hira": "こうかてき な がっきゅう うんえい は がくしゅう を どの よう に かいぜん できます か",
+      "mp3": "bc_q06_how_can_effective_classroom_management_improve_learning.mp3"
+    },
+    {
+      "n": 7,
+      "en": "Why is it important to comply with the code of conduct?",
+      "jp": "行動規範を守ることが重要なのはなぜですか。",
+      "hira": "こうどう きはん を まもる こと が じゅうよう な の は なぜ です か",
+      "mp3": "bc_q07_why_is_it_important_to_comply_with_the_code_of_conduct.mp3"
+    },
+    {
+      "n": 8,
+      "en": "What constitutes a violation of academic integrity?",
+      "jp": "学術的誠実性の違反に当たるのはどのような行為ですか。",
+      "hira": "がくじゅつてき せいじつせい の いはん に あたる の は どの よう な こうい です か",
+      "mp3": "bc_q08_what_constitutes_a_violation_of_academic_integrity.mp3"
+    },
+    {
+      "n": 9,
+      "en": "How does mutual respect contribute to discussion?",
+      "jp": "相互尊重は議論にどのように役立ちますか。",
+      "hira": "そうご そんちょう は ぎろん に どの よう に やくだちます か",
+      "mp3": "bc_q09_how_does_mutual_respect_contribute_to_discussion.mp3"
+    },
+    {
+      "n": 10,
+      "en": "How should teachers respond to disruptive behavior?",
+      "jp": "教師は授業妨害行為にどのように対応すべきですか。",
+      "hira": "きょうし は じゅぎょう ぼうがい こうい に どの よう に たいおう する べき です か",
+      "mp3": "bc_q10_how_should_teachers_respond_to_disruptive_behavior.mp3"
+    },
+    {
+      "n": 11,
+      "en": "To what extent should participation affect a student's grade?",
+      "jp": "授業への参加は成績にどの程度反映されるべきですか。",
+      "hira": "じゅぎょう への さんか は せいせき に どの ていど はんえい される べき です か",
+      "mp3": "bc_q11_to_what_extent_should_participation_affect_a_students_grade.mp3"
+    },
+    {
+      "n": 12,
+      "en": "What skills can students develop through collaboration?",
+      "jp": "生徒は協働を通してどのような技能を身につけられますか。",
+      "hira": "せいと は きょうどう を とおして どの よう な ぎのう を み に つけられます か",
+      "mp3": "bc_q12_what_skills_can_students_develop_through_collaboration.mp3"
+    },
+    {
+      "n": 13,
+      "en": "When should students obtain permission?",
+      "jp": "生徒はいつ許可を得るべきですか。",
+      "hira": "せいと は いつ きょか を える べき です か",
+      "mp3": "bc_q13_when_should_students_obtain_permission.mp3"
+    },
+    {
+      "n": 14,
+      "en": "What obligations do students have before class begins?",
+      "jp": "授業が始まる前に生徒にはどのような義務がありますか。",
+      "hira": "じゅぎょう が はじまる まえ に せいと には どの よう な ぎむ が あります か",
+      "mp3": "bc_q14_what_obligations_do_students_have_before_class_begins.mp3"
+    },
+    {
+      "n": 15,
+      "en": "Why is phone use prohibited during examinations?",
+      "jp": "試験中に携帯電話の使用が禁止されているのはなぜですか。",
+      "hira": "しけんちゅう に けいたい でんわ の しよう が きんし されて いる の は なぜ です か",
+      "mp3": "bc_q15_why_is_phone_use_prohibited_during_examinations.mp3"
+    },
+    {
+      "n": 16,
+      "en": "Does the current curriculum meet students' future needs?",
+      "jp": "現在の教育課程は生徒の将来のニーズを満たしていますか。",
+      "hira": "げんざい の きょういく かてい は せいと の しょうらい の にーず を みたして います か",
+      "mp3": "bc_q16_does_the_current_curriculum_meet_students_future_needs.mp3"
+    },
+    {
+      "n": 17,
+      "en": "Which compulsory subjects should every student take?",
+      "jp": "すべての生徒が履修すべき必修科目はどれですか。",
+      "hira": "すべて の せいと が りしゅう する べき ひっしゅう かもく は どれ です か",
+      "mp3": "bc_q17_which_compulsory_subjects_should_every_student_take.mp3"
+    },
+    {
+      "n": 18,
+      "en": "What factors should students consider when choosing elective subjects?",
+      "jp": "選択科目を選ぶ際にどのような要素を考慮すべきですか。",
+      "hira": "せんたく かもく を えらぶ さい に どの よう な ようそ を こうりょ する べき です か",
+      "mp3": "bc_q18_what_factors_should_students_consider_when_choosing_elective_subjects.mp3"
+    },
+    {
+      "n": 19,
+      "en": "How do interdisciplinary studies reveal connections between subjects?",
+      "jp": "学際的学習は教科間のつながりをどのように明らかにしますか。",
+      "hira": "がくさいてき がくしゅう は きょうかかん の つながり を どの よう に あきらか に します か",
+      "mp3": "bc_q19_how_do_interdisciplinary_studies_reveal_connections_between_subjects.mp3"
+    },
+    {
+      "n": 20,
+      "en": "What is the fairest way to measure academic performance?",
+      "jp": "学業成績を測る最も公平な方法は何ですか。",
+      "hira": "がくぎょう せいせき を はかる もっとも こうへい な ほうほう は なん です か",
+      "mp3": "bc_q20_what_is_the_fairest_way_to_measure_academic_performance.mp3"
+    },
+    {
+      "n": 21,
+      "en": "How can students improve language proficiency outside school?",
+      "jp": "生徒は学校外でどのように言語の習熟度を高められますか。",
+      "hira": "せいと は がっこうがい で どの よう に げんご の しゅうじゅくど を たかめられます か",
+      "mp3": "bc_q21_how_can_students_improve_language_proficiency_outside_school.mp3"
+    },
+    {
+      "n": 22,
+      "en": "Which has a greater influence on success, aptitude or effort?",
+      "jp": "適性と努力のどちらが成功に強く影響しますか。",
+      "hira": "てきせい と どりょく の どちら が せいこう に つよく えいきょう します か",
+      "mp3": "bc_q22_which_has_a_greater_influence_on_success_aptitude_or_effort.mp3"
+    },
+    {
+      "n": 23,
+      "en": "Why is critical thinking essential when using the internet?",
+      "jp": "インターネットを使う際に批判的思考が不可欠なのはなぜですか。",
+      "hira": "いんたーねっと を つかう さい に ひはんてき しこう が ふかけつ な の は なぜ です か",
+      "mp3": "bc_q23_why_is_critical_thinking_essential_when_using_the_internet.mp3"
+    },
+    {
+      "n": 24,
+      "en": "What abilities are required for effective problem-solving?",
+      "jp": "効果的な問題解決にはどのような能力が必要ですか。",
+      "hira": "こうかてき な もんだい かいけつ には どの よう な のうりょく が ひつよう です か",
+      "mp3": "bc_q24_what_abilities_are_required_for_effective_problemsolving.mp3"
+    },
+    {
+      "n": 25,
+      "en": "Why must sources be cited in a research assignment?",
+      "jp": "調査課題ではなぜ出典を引用しなければならないのですか。",
+      "hira": "ちょうさ かだい では なぜ しゅってん を いんよう しなければ ならない の です か",
+      "mp3": "bc_q25_why_must_sources_be_cited_in_a_research_assignment.mp3"
+    },
+    {
+      "n": 26,
+      "en": "When should assessment criteria be explained to students?",
+      "jp": "評価基準はいつ生徒に説明されるべきですか。",
+      "hira": "ひょうか きじゅん は いつ せいと に せつめい される べき です か",
+      "mp3": "bc_q26_when_should_assessment_criteria_be_explained_to_students.mp3"
+    },
+    {
+      "n": 27,
+      "en": "How much should coursework contribute to the final grade?",
+      "jp": "授業での課題は最終成績のどの程度を占めるべきですか。",
+      "hira": "じゅぎょう で の かだい は さいしゅう せいせき の どの ていど を しめる べき です か",
+      "mp3": "bc_q27_how_much_should_coursework_contribute_to_the_final_grade.mp3"
+    },
+    {
+      "n": 28,
+      "en": "Which practical skills should schools teach?",
+      "jp": "学校ではどの実践的技能を教えるべきですか。",
+      "hira": "がっこう では どの じっせんてき ぎのう を おしえる べき です か",
+      "mp3": "bc_q28_which_practical_skills_should_schools_teach.mp3"
+    },
+    {
+      "n": 29,
+      "en": "How can digital literacy protect students from misinformation?",
+      "jp": "デジタル・リテラシーは生徒を誤情報からどのように守れますか。",
+      "hira": "でじたる りてらしー は せいと を ごじょうほう から どの よう に まもれます か",
+      "mp3": "bc_q29_how_can_digital_literacy_protect_students_from_misinformation.mp3"
+    },
+    {
+      "n": 30,
+      "en": "Why is lifelong learning essential in modern society?",
+      "jp": "生涯学習が現代社会で不可欠なのはなぜですか。",
+      "hira": "しょうがい がくしゅう が げんだい しゃかい で ふかけつ な の は なぜ です か",
+      "mp3": "bc_q30_why_is_lifelong_learning_essential_in_modern_society.mp3"
+    },
+    {
+      "n": 31,
+      "en": "What professional responsibilities do faculty members have?",
+      "jp": "教職員にはどのような職業的責任がありますか。",
+      "hira": "きょうしょくいん には どの よう な しょくぎょうてき せきにん が あります か",
+      "mp3": "bc_q31_what_professional_responsibilities_do_faculty_members_have.mp3"
+    },
+    {
+      "n": 32,
+      "en": "How should administrators allocate limited school resources?",
+      "jp": "管理職は限られた学校資源をどのように配分すべきですか。",
+      "hira": "かんりしょく は かぎられた がっこう しげん を どの よう に はいぶん する べき です か",
+      "mp3": "bc_q32_how_should_administrators_allocate_limited_school_resources.mp3"
+    },
+    {
+      "n": 33,
+      "en": "Who assumes responsibility when the principal is absent?",
+      "jp": "校長が不在のとき、誰が責任を負いますか。",
+      "hira": "こうちょう が ふざい の とき だれ が せきにん を おいます か",
+      "mp3": "bc_q33_who_assumes_responsibility_when_the_principal_is_absent.mp3"
+    },
+    {
+      "n": 34,
+      "en": "How does a homeroom instructor monitor student development?",
+      "jp": "担任教師は生徒の成長をどのように把握しますか。",
+      "hira": "たんにん きょうし は せいと の せいちょう を どの よう に はあく します か",
+      "mp3": "bc_q34_how_does_a_homeroom_instructor_monitor_student_development.mp3"
+    },
+    {
+      "n": 35,
+      "en": "What support can subject specialists provide?",
+      "jp": "教科専門教師はどのような支援を提供できますか。",
+      "hira": "きょうか せんもん きょうし は どの よう な しえん を ていきょう できます か",
+      "mp3": "bc_q35_what_support_can_subject_specialists_provide.mp3"
+    },
+    {
+      "n": 36,
+      "en": "When should students consult a guidance counselor?",
+      "jp": "生徒はいつスクールカウンセラーに相談すべきですか。",
+      "hira": "せいと は いつ すくーる かうんせらー に そうだん する べき です か",
+      "mp3": "bc_q36_when_should_students_consult_a_guidance_counselor.mp3"
+    },
+    {
+      "n": 37,
+      "en": "How does the school nurse determine whether a student needs medical attention?",
+      "jp": "養護教諭は生徒に医療処置が必要かどうかをどのように判断しますか。",
+      "hira": "ようご きょうゆ は せいと に いりょう しょち が ひつよう か どうか を どの よう に はんだん します か",
+      "mp3": "bc_q37_how_does_the_school_nurse_determine_whether_a_student_needs_medical_attention.mp3"
+    },
+    {
+      "n": 38,
+      "en": "How can the librarian help students find credible sources?",
+      "jp": "司書は生徒が信頼できる情報源を見つけるのをどのように助けられますか。",
+      "hira": "ししょ は せいと が しんらい できる じょうほうげん を みつける の を どの よう に たすけられます か",
+      "mp3": "bc_q38_how_can_the_librarian_help_students_find_credible_sources.mp3"
+    },
+    {
+      "n": 39,
+      "en": "Why is the custodian's work essential to school safety?",
+      "jp": "用務員の仕事が学校の安全に不可欠なのはなぜですか。",
+      "hira": "ようむいん の しごと が がっこう の あんぜん に ふかけつ な の は なぜ です か",
+      "mp3": "bc_q39_why_is_the_custodians_work_essential_to_school_safety.mp3"
+    },
+    {
+      "n": 40,
+      "en": "What responsibilities does a club supervisor have?",
+      "jp": "部活動顧問にはどのような責任がありますか。",
+      "hira": "ぶかつどう こもん には どの よう な せきにん が あります か",
+      "mp3": "bc_q40_what_responsibilities_does_a_club_supervisor_have.mp3"
+    },
+    {
+      "n": 41,
+      "en": "How should a student representative communicate classmates' concerns?",
+      "jp": "生徒代表はクラスメートの意見をどのように伝えるべきですか。",
+      "hira": "せいと だいひょう は くらすめーと の いけん を どの よう に つたえる べき です か",
+      "mp3": "bc_q41_how_should_a_student_representative_communicate_classmates_concerns.mp3"
+    },
+    {
+      "n": 42,
+      "en": "How can a peer mentor help new students adjust to school?",
+      "jp": "ピアメンターは新入生が学校に慣れるのをどのように助けられますか。",
+      "hira": "ぴあ めんたー は しんにゅうせい が がっこう に なれる の を どの よう に たすけられます か",
+      "mp3": "bc_q42_how_can_a_peer_mentor_help_new_students_adjust_to_school.mp3"
+    },
+    {
+      "n": 43,
+      "en": "How do support staff address individual learning needs?",
+      "jp": "支援職員はどのように個々の学習ニーズに対応しますか。",
+      "hira": "しえん しょくいん は どの よう に ここ の がくしゅう にーず に たいおう します か",
+      "mp3": "bc_q43_how_do_support_staff_address_individual_learning_needs.mp3"
+    },
+    {
+      "n": 44,
+      "en": "Who should review serious violations of school policy?",
+      "jp": "学校方針の重大な違反は誰が審議すべきですか。",
+      "hira": "がっこう ほうしん の じゅうだい な いはん は だれ が しんぎ する べき です か",
+      "mp3": "bc_q44_who_should_review_serious_violations_of_school_policy.mp3"
+    },
+    {
+      "n": 45,
+      "en": "Why must a safeguarding officer maintain confidentiality?",
+      "jp": "生徒保護担当者はなぜ秘密を守らなければならないのですか。",
+      "hira": "せいと ほご たんとうしゃ は なぜ ひみつ を まもらなければ ならない の です か",
+      "mp3": "bc_q45_why_must_a_safeguarding_officer_maintain_confidentiality.mp3"
+    },
+    {
+      "n": 46,
+      "en": "What information should be included in an academic calendar?",
+      "jp": "学年暦にはどの情報を記載すべきですか。",
+      "hira": "がくねんれき には どの じょうほう を きさい する べき です か",
+      "mp3": "bc_q46_what_information_should_be_included_in_an_academic_calendar.mp3"
+    },
+    {
+      "n": 47,
+      "en": "Under what circumstances should a timetable be revised?",
+      "jp": "どのような場合に時間割を改訂する必要がありますか。",
+      "hira": "どの よう な ばあい に じかんわり を かいてい する ひつよう が あります か",
+      "mp3": "bc_q47_under_what_circumstances_should_a_timetable_be_revised.mp3"
+    },
+    {
+      "n": 48,
+      "en": "What are the advantages and disadvantages of extending a class period?",
+      "jp": "授業時間を延長する利点と欠点は何ですか。",
+      "hira": "じゅぎょう じかん を えんちょう する りてん と けってん は なん です か",
+      "mp3": "bc_q48_what_are_the_advantages_and_disadvantages_of_extending_a_class_period.mp3"
+    },
+    {
+      "n": 49,
+      "en": "How can students use the interval between classes effectively?",
+      "jp": "生徒は授業の合間をどのように効果的に活用できますか。",
+      "hira": "せいと は じゅぎょう の あいま を どの よう に こうかてき に かつよう できます か",
+      "mp3": "bc_q49_how_can_students_use_the_interval_between_classes_effectively.mp3"
+    },
+    {
+      "n": 50,
+      "en": "Under what circumstances should an assembly be postponed?",
+      "jp": "どのような状況で全校集会を延期すべきですか。",
+      "hira": "どの よう な じょうきょう で ぜんこう しゅうかい を えんき する べき です か",
+      "mp3": "bc_q50_under_what_circumstances_should_an_assembly_be_postponed.mp3"
+    },
+    {
+      "n": 51,
+      "en": "How do extracurricular activities contribute to growth beyond academics?",
+      "jp": "課外活動は学業以外の成長にどのように貢献しますか。",
+      "hira": "かがい かつどう は がくぎょう いがい の せいちょう に どの よう に こうけん します か",
+      "mp3": "bc_q51_how_do_extracurricular_activities_contribute_to_growth_beyond_academics.mp3"
+    },
+    {
+      "n": 52,
+      "en": "What should students do if they cannot meet a deadline?",
+      "jp": "生徒が締め切りを守れない場合はどうすべきですか。",
+      "hira": "せいと が しめきり を まもれない ばあい は どう する べき です か",
+      "mp3": "bc_q52_what_should_students_do_if_they_cannot_meet_a_deadline.mp3"
+    },
+    {
+      "n": 53,
+      "en": "Who needs to be notified when an event is rescheduled?",
+      "jp": "行事の日程を変更する際、誰に通知する必要がありますか。",
+      "hira": "ぎょうじ の にってい を へんこう する さい だれ に つうち する ひつよう が あります か",
+      "mp3": "bc_q53_who_needs_to_be_notified_when_an_event_is_rescheduled.mp3"
+    },
+    {
+      "n": 54,
+      "en": "How early should a cancellation be communicated to families?",
+      "jp": "中止はどのくらい早く家庭に伝えるべきですか。",
+      "hira": "ちゅうし は どの くらい はやく かてい に つたえる べき です か",
+      "mp3": "bc_q54_how_early_should_a_cancellation_be_communicated_to_families.mp3"
+    },
+    {
+      "n": 55,
+      "en": "What might lead to the postponement of a field trip?",
+      "jp": "何が校外学習の延期につながる可能性がありますか。",
+      "hira": "なに が こうがい がくしゅう の えんき に つながる かのうせい が あります か",
+      "mp3": "bc_q55_what_might_lead_to_the_postponement_of_a_field_trip.mp3"
+    },
+    {
+      "n": 56,
+      "en": "Why is punctuality regarded as a sign of respect?",
+      "jp": "時間厳守が敬意の表れとみなされるのはなぜですか。",
+      "hira": "じかん げんしゅ が けいい の あらわれ と みなされる の は なぜ です か",
+      "mp3": "bc_q56_why_is_punctuality_regarded_as_a_sign_of_respect.mp3"
+    },
+    {
+      "n": 57,
+      "en": "How does attendance affect academic performance?",
+      "jp": "出席状況は学業成績にどのような影響を与えますか。",
+      "hira": "しゅっせき じょうきょう は がくぎょう せいせき に どの よう な えいきょう を あたえます か",
+      "mp3": "bc_q57_how_does_attendance_affect_academic_performance.mp3"
+    },
+    {
+      "n": 58,
+      "en": "Which students should be eligible for a make-up session?",
+      "jp": "どの生徒が補講を受けられるべきですか。",
+      "hira": "どの せいと が ほこう を うけられる べき です か",
+      "mp3": "bc_q58_which_students_should_be_eligible_for_a_makeup_session.mp3"
+    },
+    {
+      "n": 59,
+      "en": "What is the most effective way to improve time management?",
+      "jp": "時間管理を改善する最も効果的な方法は何ですか。",
+      "hira": "じかん かんり を かいぜん する もっとも こうかてき な ほうほう は なん です か",
+      "mp3": "bc_q59_what_is_the_most_effective_way_to_improve_time_management.mp3"
+    },
+    {
+      "n": 60,
+      "en": "How should conflicting commitments be handled?",
+      "jp": "予定が重なった場合、どう対処すべきですか。",
+      "hira": "よてい が かさなった ばあい どう たいしょ する べき です か",
+      "mp3": "bc_q60_how_should_conflicting_commitments_be_handled.mp3"
+    }
+  ]
+}

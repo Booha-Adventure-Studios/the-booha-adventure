@@ -1,1 +1,424 @@
-
+{
+  "cards": [
+    {
+      "n": 1,
+      "en": "The instructional materials are stored in the cabinet at the back of the classroom.",
+      "jp": "教材は教室後方の戸棚に保管されています。",
+      "hira": "きょうざい は きょうしつ こうほう の とだな に ほかん されて います",
+      "mp3": "bc_s01_the_instructional_materials_are_stored_in_the_cabinet_at_the_back_of_the_classro.mp3"
+    },
+    {
+      "n": 2,
+      "en": "The interactive whiteboard enables teachers to present information effectively.",
+      "jp": "電子黒板により、教師は情報を効果的に提示できます。",
+      "hira": "でんし こくばん により きょうし は じょうほう を こうかてき に ていじ できます",
+      "mp3": "bc_s02_the_interactive_whiteboard_enables_teachers_to_present_information_effectively.mp3"
+    },
+    {
+      "n": 3,
+      "en": "Students must handle audiovisual equipment with care.",
+      "jp": "生徒は視聴覚機器を慎重に扱わなければなりません。",
+      "hira": "せいと は しちょうかく きき を しんちょう に あつかわなければ なりません",
+      "mp3": "bc_s03_students_must_handle_audiovisual_equipment_with_care.mp3"
+    },
+    {
+      "n": 4,
+      "en": "Please make sure all stationery is returned to its proper place.",
+      "jp": "すべての文房具が所定の場所に戻されていることを確認してください。",
+      "hira": "すべて の ぶんぼうぐ が しょてい の ばしょ に もどされて いる こと を かくにん して ください",
+      "mp3": "bc_s04_please_make_sure_all_stationery_is_returned_to_its_proper_place.mp3"
+    },
+    {
+      "n": 5,
+      "en": "Each student is assigned a storage compartment.",
+      "jp": "各生徒には収納スペースが割り当てられています。",
+      "hira": "かく せいと には しゅうのう すぺーす が わりあてられて います",
+      "mp3": "bc_s05_each_student_is_assigned_a_storage_compartment.mp3"
+    },
+    {
+      "n": 6,
+      "en": "Effective classroom management creates a productive learning environment.",
+      "jp": "効果的な学級運営は、生産的な学習環境を生み出します。",
+      "hira": "こうかてき な がっきゅう うんえい は せいさんてき な がくしゅう かんきょう を うみだします",
+      "mp3": "bc_s06_effective_classroom_management_creates_a_productive_learning_environment.mp3"
+    },
+    {
+      "n": 7,
+      "en": "Everyone is expected to comply with the school's code of conduct.",
+      "jp": "全員が学校の行動規範を守ることを求められています。",
+      "hira": "ぜんいん が がっこう の こうどう きはん を まもる こと を もとめられて います",
+      "mp3": "bc_s07_everyone_is_expected_to_comply_with_the_schools_code_of_conduct.mp3"
+    },
+    {
+      "n": 8,
+      "en": "Academic integrity requires students to submit their own work.",
+      "jp": "学術的誠実性を守るには、生徒が自分自身の成果物を提出する必要があります。",
+      "hira": "がくじゅつてき せいじつせい を まもる には せいと が じぶん じしん の せいかぶつ を ていしゅつ する ひつよう が あります",
+      "mp3": "bc_s08_academic_integrity_requires_students_to_submit_their_own_work.mp3"
+    },
+    {
+      "n": 9,
+      "en": "Mutual respect is essential for constructive discussion.",
+      "jp": "建設的な議論には相互尊重が不可欠です。",
+      "hira": "けんせつてき な ぎろん には そうご そんちょう が ふかけつ です",
+      "mp3": "bc_s09_mutual_respect_is_essential_for_constructive_discussion.mp3"
+    },
+    {
+      "n": 10,
+      "en": "Repeated disruptive behavior may result in disciplinary action.",
+      "jp": "授業妨害行為を繰り返すと、懲戒処分を受ける場合があります。",
+      "hira": "じゅぎょう ぼうがい こうい を くりかえす と ちょうかい しょぶん を うける ばあい が あります",
+      "mp3": "bc_s10_repeated_disruptive_behavior_may_result_in_disciplinary_action.mp3"
+    },
+    {
+      "n": 11,
+      "en": "Active participation is encouraged, but students should not interrupt others.",
+      "jp": "積極的な参加は推奨されますが、生徒は他の人の発言を遮るべきではありません。",
+      "hira": "せっきょくてき な さんか は すいしょう されます が せいと は ほか の ひと の はつげん を さえぎる べき では ありません",
+      "mp3": "bc_s11_active_participation_is_encouraged_but_students_should_not_interrupt_others.mp3"
+    },
+    {
+      "n": 12,
+      "en": "Collaboration enables students to learn from different perspectives.",
+      "jp": "協働により、生徒は異なる視点から学ぶことができます。",
+      "hira": "きょうどう により せいと は ことなる してん から まなぶ こと が できます",
+      "mp3": "bc_s12_collaboration_enables_students_to_learn_from_different_perspectives.mp3"
+    },
+    {
+      "n": 13,
+      "en": "You must obtain permission before leaving the classroom.",
+      "jp": "教室を出る前に許可を得なければなりません。",
+      "hira": "きょうしつ を でる まえ に きょか を えなければ なりません",
+      "mp3": "bc_s13_you_must_obtain_permission_before_leaving_the_classroom.mp3"
+    },
+    {
+      "n": 14,
+      "en": "Students have an obligation to arrive prepared for every lesson.",
+      "jp": "生徒には、毎回の授業に準備を整えて出席する義務があります。",
+      "hira": "せいと には まいかい の じゅぎょう に じゅんび を ととのえて しゅっせき する ぎむ が あります",
+      "mp3": "bc_s14_students_have_an_obligation_to_arrive_prepared_for_every_lesson.mp3"
+    },
+    {
+      "n": 15,
+      "en": "Using a phone during an examination is strictly prohibited.",
+      "jp": "試験中の携帯電話の使用は厳しく禁止されています。",
+      "hira": "しけんちゅう の けいたい でんわ の しよう は きびしく きんし されて います",
+      "mp3": "bc_s15_using_a_phone_during_an_examination_is_strictly_prohibited.mp3"
+    },
+    {
+      "n": 16,
+      "en": "The curriculum is designed to balance academic knowledge with practical skills.",
+      "jp": "教育課程は学術的知識と実践的技能の均衡を図るよう設計されています。",
+      "hira": "きょういく かてい は がくじゅつてき ちしき と じっせんてき ぎのう の きんこう を はかる よう せっけい されて います",
+      "mp3": "bc_s16_the_curriculum_is_designed_to_balance_academic_knowledge_with_practical_skills.mp3"
+    },
+    {
+      "n": 17,
+      "en": "Compulsory subjects provide students with a common foundation of knowledge.",
+      "jp": "必修科目は生徒に共通の知識基盤を与えます。",
+      "hira": "ひっしゅう かもく は せいと に きょうつう の ちしき きばん を あたえます",
+      "mp3": "bc_s17_compulsory_subjects_provide_students_with_a_common_foundation_of_knowledge.mp3"
+    },
+    {
+      "n": 18,
+      "en": "Students can select elective subjects according to their interests and goals.",
+      "jp": "生徒は興味や目標に応じて選択科目を選べます。",
+      "hira": "せいと は きょうみ や もくひょう に おうじて せんたく かもく を えらべます",
+      "mp3": "bc_s18_students_can_select_elective_subjects_according_to_their_interests_and_goals.mp3"
+    },
+    {
+      "n": 19,
+      "en": "Interdisciplinary studies encourage learners to make connections between subjects.",
+      "jp": "学際的学習は、学習者が教科間のつながりを見いだすことを促します。",
+      "hira": "がくさいてき がくしゅう は がくしゅうしゃ が きょうかかん の つながり を みいだす こと を うながします",
+      "mp3": "bc_s19_interdisciplinary_studies_encourage_learners_to_make_connections_between_subject.mp3"
+    },
+    {
+      "n": 20,
+      "en": "Academic performance should be evaluated using more than test scores.",
+      "jp": "学業成績はテストの点数以外の要素も用いて評価されるべきです。",
+      "hira": "がくぎょう せいせき は てすと の てんすう いがい の ようそ も もちいて ひょうか される べき です",
+      "mp3": "bc_s20_academic_performance_should_be_evaluated_using_more_than_test_scores.mp3"
+    },
+    {
+      "n": 21,
+      "en": "Language proficiency develops through consistent practice and meaningful communication.",
+      "jp": "言語の習熟度は継続的な練習と意味のあるコミュニケーションを通して向上します。",
+      "hira": "げんご の しゅうじゅくど は けいぞくてき な れんしゅう と いみ の ある こみゅにけーしょん を とおして こうじょう します",
+      "mp3": "bc_s21_language_proficiency_develops_through_consistent_practice_and_meaningful_communi.mp3"
+    },
+    {
+      "n": 22,
+      "en": "Aptitude may influence progress, but persistence is equally important.",
+      "jp": "適性は上達に影響することがありますが、粘り強さも同じくらい重要です。",
+      "hira": "てきせい は じょうたつ に えいきょう する こと が あります が ねばりづよさ も おなじ くらい じゅうよう です",
+      "mp3": "bc_s22_aptitude_may_influence_progress_but_persistence_is_equally_important.mp3"
+    },
+    {
+      "n": 23,
+      "en": "Critical thinking helps students assess the reliability of information.",
+      "jp": "批判的思考は、生徒が情報の信頼性を評価するのに役立ちます。",
+      "hira": "ひはんてき しこう は せいと が じょうほう の しんらいせい を ひょうか する の に やくだちます",
+      "mp3": "bc_s23_critical_thinking_helps_students_assess_the_reliability_of_information.mp3"
+    },
+    {
+      "n": 24,
+      "en": "Effective problem-solving requires both logical reasoning and creativity.",
+      "jp": "効果的な問題解決には論理的思考と創造性の両方が必要です。",
+      "hira": "こうかてき な もんだい かいけつ には ろんりてき しこう と そうぞうせい の りょうほう が ひつよう です",
+      "mp3": "bc_s24_effective_problemsolving_requires_both_logical_reasoning_and_creativity.mp3"
+    },
+    {
+      "n": 25,
+      "en": "Every research assignment must cite its sources accurately.",
+      "jp": "すべての調査課題では、出典を正確に示さなければなりません。",
+      "hira": "すべて の ちょうさ かだい では しゅってん を せいかく に しめさなければ なりません",
+      "mp3": "bc_s25_every_research_assignment_must_cite_its_sources_accurately.mp3"
+    },
+    {
+      "n": 26,
+      "en": "The assessment criteria should be explained before the project begins.",
+      "jp": "評価基準はプロジェクトが始まる前に説明されるべきです。",
+      "hira": "ひょうか きじゅん は ぷろじぇくと が はじまる まえ に せつめい される べき です",
+      "mp3": "bc_s26_the_assessment_criteria_should_be_explained_before_the_project_begins.mp3"
+    },
+    {
+      "n": 27,
+      "en": "Coursework accounts for forty percent of the final grade.",
+      "jp": "授業での課題は最終成績の40パーセントを占めます。",
+      "hira": "じゅぎょう で の かだい は さいしゅう せいせき の よんじゅっ ぱーせんと を しめます",
+      "mp3": "bc_s27_coursework_accounts_for_forty_percent_of_the_final_grade.mp3"
+    },
+    {
+      "n": 28,
+      "en": "Practical skills can be applied beyond the classroom.",
+      "jp": "実践的技能は教室の外でも応用できます。",
+      "hira": "じっせんてき ぎのう は きょうしつ の そと でも おうよう できます",
+      "mp3": "bc_s28_practical_skills_can_be_applied_beyond_the_classroom.mp3"
+    },
+    {
+      "n": 29,
+      "en": "Digital literacy includes the ability to recognize unreliable online content.",
+      "jp": "デジタル・リテラシーには、信頼できないオンライン情報を見分ける能力が含まれます。",
+      "hira": "でじたる りてらしー には しんらい できない おんらいん じょうほう を みわける のうりょく が ふくまれます",
+      "mp3": "bc_s29_digital_literacy_includes_the_ability_to_recognize_unreliable_online_content.mp3"
+    },
+    {
+      "n": 30,
+      "en": "Lifelong learning enables people to adapt to social and technological change.",
+      "jp": "生涯学習により、人々は社会や技術の変化に適応できます。",
+      "hira": "しょうがい がくしゅう により ひとびと は しゃかい や ぎじゅつ の へんか に てきおう できます",
+      "mp3": "bc_s30_lifelong_learning_enables_people_to_adapt_to_social_and_technological_change.mp3"
+    },
+    {
+      "n": 31,
+      "en": "Faculty members are expected to maintain high professional standards.",
+      "jp": "教職員には高い職業的基準を維持することが求められます。",
+      "hira": "きょうしょくいん には たかい しょくぎょうてき きじゅん を いじ する こと が もとめられます",
+      "mp3": "bc_s31_faculty_members_are_expected_to_maintain_high_professional_standards.mp3"
+    },
+    {
+      "n": 32,
+      "en": "Administrators coordinate policies and allocate school resources.",
+      "jp": "管理職は方針を調整し、学校の資源を配分します。",
+      "hira": "かんりしょく は ほうしん を ちょうせい し がっこう の しげん を はいぶん します",
+      "mp3": "bc_s32_administrators_coordinate_policies_and_allocate_school_resources.mp3"
+    },
+    {
+      "n": 33,
+      "en": "The vice principal assumes responsibility when the principal is absent.",
+      "jp": "校長が不在の際は、教頭が責任を担います。",
+      "hira": "こうちょう が ふざい の さい は きょうとう が せきにん を にないます",
+      "mp3": "bc_s33_the_vice_principal_assumes_responsibility_when_the_principal_is_absent.mp3"
+    },
+    {
+      "n": 34,
+      "en": "A homeroom instructor monitors each student's academic and social development.",
+      "jp": "担任教師は各生徒の学業面と社会面の成長を見守ります。",
+      "hira": "たんにん きょうし は かく せいと の がくぎょうめん と しゃかいめん の せいちょう を みまもります",
+      "mp3": "bc_s34_a_homeroom_instructor_monitors_each_students_academic_and_social_development.mp3"
+    },
+    {
+      "n": 35,
+      "en": "Subject specialists provide guidance in their areas of expertise.",
+      "jp": "教科専門教師は、それぞれの専門分野で指導を行います。",
+      "hira": "きょうか せんもん きょうし は それぞれ の せんもん ぶんや で しどう を おこないます",
+      "mp3": "bc_s35_subject_specialists_provide_guidance_in_their_areas_of_expertise.mp3"
+    },
+    {
+      "n": 36,
+      "en": "The guidance counselor supports students facing academic or personal difficulties.",
+      "jp": "スクールカウンセラーは、学業上または個人的な問題に直面している生徒を支援します。",
+      "hira": "すくーる かうんせらー は がくぎょうじょう または こじんてき な もんだい に ちょくめん して いる せいと を しえん します",
+      "mp3": "bc_s36_the_guidance_counselor_supports_students_facing_academic_or_personal_difficultie.mp3"
+    },
+    {
+      "n": 37,
+      "en": "The school nurse assesses whether an injured student requires further medical attention.",
+      "jp": "養護教諭は、けがをした生徒にさらなる医療処置が必要かどうかを判断します。",
+      "hira": "ようご きょうゆ は けが を した せいと に さらなる いりょう しょち が ひつよう か どうか を はんだん します",
+      "mp3": "bc_s37_the_school_nurse_assesses_whether_an_injured_student_requires_further_medical_at.mp3"
+    },
+    {
+      "n": 38,
+      "en": "The librarian teaches students how to evaluate credible sources.",
+      "jp": "司書は信頼できる情報源を評価する方法を生徒に教えます。",
+      "hira": "ししょ は しんらい できる じょうほうげん を ひょうか する ほうほう を せいと に おしえます",
+      "mp3": "bc_s38_the_librarian_teaches_students_how_to_evaluate_credible_sources.mp3"
+    },
+    {
+      "n": 39,
+      "en": "The custodian plays an essential role in maintaining a safe environment.",
+      "jp": "用務員は安全な環境を維持するうえで不可欠な役割を果たします。",
+      "hira": "ようむいん は あんぜん な かんきょう を いじ する うえ で ふかけつ な やくわり を はたします",
+      "mp3": "bc_s39_the_custodian_plays_an_essential_role_in_maintaining_a_safe_environment.mp3"
+    },
+    {
+      "n": 40,
+      "en": "The club supervisor is responsible for safety during extracurricular activities.",
+      "jp": "部活動顧問は課外活動中の安全に責任を負います。",
+      "hira": "ぶかつどう こもん は かがい かつどうちゅう の あんぜん に せきにん を おいます",
+      "mp3": "bc_s40_the_club_supervisor_is_responsible_for_safety_during_extracurricular_activities.mp3"
+    },
+    {
+      "n": 41,
+      "en": "The student representative conveys the concerns of the class to the faculty.",
+      "jp": "生徒代表はクラスの懸念事項を教職員に伝えます。",
+      "hira": "せいと だいひょう は くらす の けねん じこう を きょうしょくいん に つたえます",
+      "mp3": "bc_s41_the_student_representative_conveys_the_concerns_of_the_class_to_the_faculty.mp3"
+    },
+    {
+      "n": 42,
+      "en": "A peer mentor helps new students adjust to unfamiliar routines.",
+      "jp": "ピアメンターは新入生が不慣れな日課に慣れるのを助けます。",
+      "hira": "ぴあ めんたー は しんにゅうせい が ふなれ な にっか に なれる の を たすけます",
+      "mp3": "bc_s42_a_peer_mentor_helps_new_students_adjust_to_unfamiliar_routines.mp3"
+    },
+    {
+      "n": 43,
+      "en": "Support staff provide assistance tailored to individual learning needs.",
+      "jp": "支援職員は個々の学習ニーズに応じた支援を提供します。",
+      "hira": "しえん しょくいん は ここ の がくしゅう にーず に おうじた しえん を ていきょう します",
+      "mp3": "bc_s43_support_staff_provide_assistance_tailored_to_individual_learning_needs.mp3"
+    },
+    {
+      "n": 44,
+      "en": "The disciplinary committee reviews serious violations of school policy.",
+      "jp": "懲戒委員会は学校方針の重大な違反を審議します。",
+      "hira": "ちょうかい いいんかい は がっこう ほうしん の じゅうだい な いはん を しんぎ します",
+      "mp3": "bc_s44_the_disciplinary_committee_reviews_serious_violations_of_school_policy.mp3"
+    },
+    {
+      "n": 45,
+      "en": "The safeguarding officer ensures that welfare concerns are handled confidentially.",
+      "jp": "生徒保護担当者は、安全や福祉に関する懸念が守秘義務に従って扱われるようにします。",
+      "hira": "せいと ほご たんとうしゃ は あんぜん や ふくし に かんする けねん が しゅひ ぎむ に したがって あつかわれる よう に します",
+      "mp3": "bc_s45_the_safeguarding_officer_ensures_that_welfare_concerns_are_handled_confidentiall.mp3"
+    },
+    {
+      "n": 46,
+      "en": "The academic calendar outlines examinations, holidays, and major school events.",
+      "jp": "学年暦には試験、休暇、主要な学校行事が記載されています。",
+      "hira": "がくねんれき には しけん きゅうか しゅよう な がっこう ぎょうじ が きさい されて います",
+      "mp3": "bc_s46_the_academic_calendar_outlines_examinations_holidays_and_major_school_events.mp3"
+    },
+    {
+      "n": 47,
+      "en": "The timetable was revised to accommodate the new science program.",
+      "jp": "時間割は新しい理科プログラムに対応するため改訂されました。",
+      "hira": "じかんわり は あたらしい りか ぷろぐらむ に たいおう する ため かいてい されました",
+      "mp3": "bc_s47_the_timetable_was_revised_to_accommodate_the_new_science_program.mp3"
+    },
+    {
+      "n": 48,
+      "en": "The final period has been extended by fifteen minutes.",
+      "jp": "最終時限は15分延長されました。",
+      "hira": "さいしゅう じげん は じゅうごふん えんちょう されました",
+      "mp3": "bc_s48_the_final_period_has_been_extended_by_fifteen_minutes.mp3"
+    },
+    {
+      "n": 49,
+      "en": "The interval between classes gives students time to prepare for the next lesson.",
+      "jp": "授業の合間に、生徒は次の授業の準備をする時間を持てます。",
+      "hira": "じゅぎょう の あいま に せいと は つぎ の じゅぎょう の じゅんび を する じかん を もてます",
+      "mp3": "bc_s49_the_interval_between_classes_gives_students_time_to_prepare_for_the_next_lesson.mp3"
+    },
+    {
+      "n": 50,
+      "en": "The assembly was postponed because the auditorium was unavailable.",
+      "jp": "講堂が使用できなかったため、全校集会は延期されました。",
+      "hira": "こうどう が しよう できなかった ため ぜんこう しゅうかい は えんき されました",
+      "mp3": "bc_s50_the_assembly_was_postponed_because_the_auditorium_was_unavailable.mp3"
+    },
+    {
+      "n": 51,
+      "en": "Extracurricular activities contribute to students' personal development.",
+      "jp": "課外活動は生徒の人間的成長に貢献します。",
+      "hira": "かがい かつどう は せいと の にんげんてき せいちょう に こうけん します",
+      "mp3": "bc_s51_extracurricular_activities_contribute_to_students_personal_development.mp3"
+    },
+    {
+      "n": 52,
+      "en": "All assignments must be submitted before the deadline.",
+      "jp": "すべての課題は締め切り前に提出しなければなりません。",
+      "hira": "すべて の かだい は しめきり まえ に ていしゅつ しなければ なりません",
+      "mp3": "bc_s52_all_assignments_must_be_submitted_before_the_deadline.mp3"
+    },
+    {
+      "n": 53,
+      "en": "The parent meeting has been rescheduled for next Thursday.",
+      "jp": "保護者会は来週木曜日に日程変更されました。",
+      "hira": "ほごしゃかい は らいしゅう もくようび に にってい へんこう されました",
+      "mp3": "bc_s53_the_parent_meeting_has_been_rescheduled_for_next_thursday.mp3"
+    },
+    {
+      "n": 54,
+      "en": "Notice of the cancellation was sent to every family.",
+      "jp": "中止の通知は全家庭に送られました。",
+      "hira": "ちゅうし の つうち は ぜん かてい に おくられました",
+      "mp3": "bc_s54_notice_of_the_cancellation_was_sent_to_every_family.mp3"
+    },
+    {
+      "n": 55,
+      "en": "The postponement of the field trip was announced this morning.",
+      "jp": "校外学習の延期は今朝発表されました。",
+      "hira": "こうがい がくしゅう の えんき は けさ はっぴょう されました",
+      "mp3": "bc_s55_the_postponement_of_the_field_trip_was_announced_this_morning.mp3"
+    },
+    {
+      "n": 56,
+      "en": "Punctuality demonstrates respect for other people's time.",
+      "jp": "時間厳守は、他の人の時間を尊重する姿勢を示します。",
+      "hira": "じかん げんしゅ は ほか の ひと の じかん を そんちょう する しせい を しめします",
+      "mp3": "bc_s56_punctuality_demonstrates_respect_for_other_peoples_time.mp3"
+    },
+    {
+      "n": 57,
+      "en": "Regular attendance is strongly associated with academic achievement.",
+      "jp": "良好な出席状況は学業成績と強く関連しています。",
+      "hira": "りょうこう な しゅっせき じょうきょう は がくぎょう せいせき と つよく かんれん して います",
+      "mp3": "bc_s57_regular_attendance_is_strongly_associated_with_academic_achievement.mp3"
+    },
+    {
+      "n": 58,
+      "en": "A make-up session will be arranged for students who missed the examination.",
+      "jp": "試験を欠席した生徒のために補講が設定されます。",
+      "hira": "しけん を けっせき した せいと の ため に ほこう が せってい されます",
+      "mp3": "bc_s58_a_makeup_session_will_be_arranged_for_students_who_missed_the_examination.mp3"
+    },
+    {
+      "n": 59,
+      "en": "Effective time management prevents unnecessary stress before deadlines.",
+      "jp": "効果的な時間管理は締め切り前の不必要なストレスを防ぎます。",
+      "hira": "こうかてき な じかん かんり は しめきり まえ の ふひつよう な すとれす を ふせぎます",
+      "mp3": "bc_s59_effective_time_management_prevents_unnecessary_stress_before_deadlines.mp3"
+    },
+    {
+      "n": 60,
+      "en": "Conflicting commitments should be discussed with the teacher as early as possible.",
+      "jp": "予定が重なっている場合は、できるだけ早く教師に相談すべきです。",
+      "hira": "よてい が かさなって いる ばあい は できるだけ はやく きょうし に そうだん する べき です",
+      "mp3": "bc_s60_conflicting_commitments_should_be_discussed_with_the_teacher_as_early_as_possibl.mp3"
+    }
+  ]
+}

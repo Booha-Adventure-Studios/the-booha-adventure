@@ -1,1 +1,424 @@
-
+{
+  "cards": [
+    {
+      "n": 1,
+      "en": "desk",
+      "jp": "机",
+      "hira": "つくえ",
+      "mp3": "pb_v01_desk.mp3"
+    },
+    {
+      "n": 2,
+      "en": "chair",
+      "jp": "いす",
+      "hira": "いす",
+      "mp3": "pb_v02_chair.mp3"
+    },
+    {
+      "n": 3,
+      "en": "board",
+      "jp": "黒板",
+      "hira": "こくばん",
+      "mp3": "pb_v03_board.mp3"
+    },
+    {
+      "n": 4,
+      "en": "pencil",
+      "jp": "えんぴつ",
+      "hira": "えんぴつ",
+      "mp3": "pb_v04_pencil.mp3"
+    },
+    {
+      "n": 5,
+      "en": "eraser",
+      "jp": "消しゴム",
+      "hira": "けしごむ",
+      "mp3": "pb_v05_eraser.mp3"
+    },
+    {
+      "n": 6,
+      "en": "notebook",
+      "jp": "ノート",
+      "hira": "のーと",
+      "mp3": "pb_v06_notebook.mp3"
+    },
+    {
+      "n": 7,
+      "en": "textbook",
+      "jp": "教科書",
+      "hira": "きょうかしょ",
+      "mp3": "pb_v07_textbook.mp3"
+    },
+    {
+      "n": 8,
+      "en": "pencil case",
+      "jp": "筆箱",
+      "hira": "ふでばこ",
+      "mp3": "pb_v08_pencil_case.mp3"
+    },
+    {
+      "n": 9,
+      "en": "ruler",
+      "jp": "定規",
+      "hira": "じょうぎ",
+      "mp3": "pb_v09_ruler.mp3"
+    },
+    {
+      "n": 10,
+      "en": "scissors",
+      "jp": "はさみ",
+      "hira": "はさみ",
+      "mp3": "pb_v10_scissors.mp3"
+    },
+    {
+      "n": 11,
+      "en": "glue",
+      "jp": "のり",
+      "hira": "のり",
+      "mp3": "pb_v11_glue.mp3"
+    },
+    {
+      "n": 12,
+      "en": "computer",
+      "jp": "コンピューター",
+      "hira": "こんぴゅーたー",
+      "mp3": "pb_v12_computer.mp3"
+    },
+    {
+      "n": 13,
+      "en": "locker",
+      "jp": "ロッカー",
+      "hira": "ろっかー",
+      "mp3": "pb_v13_locker.mp3"
+    },
+    {
+      "n": 14,
+      "en": "classroom",
+      "jp": "教室",
+      "hira": "きょうしつ",
+      "mp3": "pb_v14_classroom.mp3"
+    },
+    {
+      "n": 15,
+      "en": "trash can",
+      "jp": "ゴミ箱",
+      "hira": "ごみばこ",
+      "mp3": "pb_v15_trash_can.mp3"
+    },
+    {
+      "n": 16,
+      "en": "English",
+      "jp": "英語",
+      "hira": "えいご",
+      "mp3": "pb_v16_english.mp3"
+    },
+    {
+      "n": 17,
+      "en": "Japanese",
+      "jp": "日本語",
+      "hira": "にほんご",
+      "mp3": "pb_v17_japanese.mp3"
+    },
+    {
+      "n": 18,
+      "en": "math",
+      "jp": "算数",
+      "hira": "さんすう",
+      "mp3": "pb_v18_math.mp3"
+    },
+    {
+      "n": 19,
+      "en": "science",
+      "jp": "理科",
+      "hira": "りか",
+      "mp3": "pb_v19_science.mp3"
+    },
+    {
+      "n": 20,
+      "en": "social studies",
+      "jp": "社会",
+      "hira": "しゃかい",
+      "mp3": "pb_v20_social_studies.mp3"
+    },
+    {
+      "n": 21,
+      "en": "history",
+      "jp": "歴史",
+      "hira": "れきし",
+      "mp3": "pb_v21_history.mp3"
+    },
+    {
+      "n": 22,
+      "en": "geography",
+      "jp": "地理",
+      "hira": "ちり",
+      "mp3": "pb_v22_geography.mp3"
+    },
+    {
+      "n": 23,
+      "en": "PE",
+      "jp": "体育",
+      "hira": "たいいく",
+      "mp3": "pb_v23_pe.mp3"
+    },
+    {
+      "n": 24,
+      "en": "music",
+      "jp": "音楽",
+      "hira": "おんがく",
+      "mp3": "pb_v24_music.mp3"
+    },
+    {
+      "n": 25,
+      "en": "art",
+      "jp": "図工",
+      "hira": "ずこう",
+      "mp3": "pb_v25_art.mp3"
+    },
+    {
+      "n": 26,
+      "en": "home economics",
+      "jp": "家庭科",
+      "hira": "かていか",
+      "mp3": "pb_v26_home_economics.mp3"
+    },
+    {
+      "n": 27,
+      "en": "computer class",
+      "jp": "コンピューターの授業",
+      "hira": "こんぴゅーたー の じゅぎょう",
+      "mp3": "pb_v27_computer_class.mp3"
+    },
+    {
+      "n": 28,
+      "en": "health",
+      "jp": "保健",
+      "hira": "ほけん",
+      "mp3": "pb_v28_health.mp3"
+    },
+    {
+      "n": 29,
+      "en": "homework",
+      "jp": "宿題",
+      "hira": "しゅくだい",
+      "mp3": "pb_v29_homework.mp3"
+    },
+    {
+      "n": 30,
+      "en": "test",
+      "jp": "テスト",
+      "hira": "てすと",
+      "mp3": "pb_v30_test.mp3"
+    },
+    {
+      "n": 31,
+      "en": "teacher",
+      "jp": "先生",
+      "hira": "せんせい",
+      "mp3": "pb_v31_teacher.mp3"
+    },
+    {
+      "n": 32,
+      "en": "principal",
+      "jp": "校長先生",
+      "hira": "こうちょう せんせい",
+      "mp3": "pb_v32_principal.mp3"
+    },
+    {
+      "n": 33,
+      "en": "school nurse",
+      "jp": "保健室の先生",
+      "hira": "ほけんしつ の せんせい",
+      "mp3": "pb_v33_school_nurse.mp3"
+    },
+    {
+      "n": 34,
+      "en": "librarian",
+      "jp": "司書",
+      "hira": "ししょ",
+      "mp3": "pb_v34_librarian.mp3"
+    },
+    {
+      "n": 35,
+      "en": "coach",
+      "jp": "コーチ",
+      "hira": "こーち",
+      "mp3": "pb_v35_coach.mp3"
+    },
+    {
+      "n": 36,
+      "en": "student",
+      "jp": "生徒",
+      "hira": "せいと",
+      "mp3": "pb_v36_student.mp3"
+    },
+    {
+      "n": 37,
+      "en": "classmate",
+      "jp": "クラスメート",
+      "hira": "くらすめーと",
+      "mp3": "pb_v37_classmate.mp3"
+    },
+    {
+      "n": 38,
+      "en": "friend",
+      "jp": "友達",
+      "hira": "ともだち",
+      "mp3": "pb_v38_friend.mp3"
+    },
+    {
+      "n": 39,
+      "en": "older student",
+      "jp": "先輩",
+      "hira": "せんぱい",
+      "mp3": "pb_v39_older_student.mp3"
+    },
+    {
+      "n": 40,
+      "en": "younger student",
+      "jp": "後輩",
+      "hira": "こうはい",
+      "mp3": "pb_v40_younger_student.mp3"
+    },
+    {
+      "n": 41,
+      "en": "school staff",
+      "jp": "学校の職員",
+      "hira": "がっこう の しょくいん",
+      "mp3": "pb_v41_school_staff.mp3"
+    },
+    {
+      "n": 42,
+      "en": "office",
+      "jp": "事務室",
+      "hira": "じむしつ",
+      "mp3": "pb_v42_office.mp3"
+    },
+    {
+      "n": 43,
+      "en": "help",
+      "jp": "助ける",
+      "hira": "たすける",
+      "mp3": "pb_v43_help.mp3"
+    },
+    {
+      "n": 44,
+      "en": "ask",
+      "jp": "たずねる",
+      "hira": "たずねる",
+      "mp3": "pb_v44_ask.mp3"
+    },
+    {
+      "n": 45,
+      "en": "thank",
+      "jp": "お礼を言う",
+      "hira": "おれい を いう",
+      "mp3": "pb_v45_thank.mp3"
+    },
+    {
+      "n": 46,
+      "en": "schedule",
+      "jp": "予定表",
+      "hira": "よていひょう",
+      "mp3": "pb_v46_schedule.mp3"
+    },
+    {
+      "n": 47,
+      "en": "time",
+      "jp": "時間",
+      "hira": "じかん",
+      "mp3": "pb_v47_time.mp3"
+    },
+    {
+      "n": 48,
+      "en": "clock",
+      "jp": "時計",
+      "hira": "とけい",
+      "mp3": "pb_v48_clock.mp3"
+    },
+    {
+      "n": 49,
+      "en": "morning",
+      "jp": "朝",
+      "hira": "あさ",
+      "mp3": "pb_v49_morning.mp3"
+    },
+    {
+      "n": 50,
+      "en": "afternoon",
+      "jp": "午後",
+      "hira": "ごご",
+      "mp3": "pb_v50_afternoon.mp3"
+    },
+    {
+      "n": 51,
+      "en": "Monday",
+      "jp": "月曜日",
+      "hira": "げつようび",
+      "mp3": "pb_v51_monday.mp3"
+    },
+    {
+      "n": 52,
+      "en": "class",
+      "jp": "授業",
+      "hira": "じゅぎょう",
+      "mp3": "pb_v52_class.mp3"
+    },
+    {
+      "n": 53,
+      "en": "lunch",
+      "jp": "昼ごはん",
+      "hira": "ひるごはん",
+      "mp3": "pb_v53_lunch.mp3"
+    },
+    {
+      "n": 54,
+      "en": "break",
+      "jp": "休み時間",
+      "hira": "やすみ じかん",
+      "mp3": "pb_v54_break.mp3"
+    },
+    {
+      "n": 55,
+      "en": "bell",
+      "jp": "チャイム",
+      "hira": "ちゃいむ",
+      "mp3": "pb_v55_bell.mp3"
+    },
+    {
+      "n": 56,
+      "en": "start",
+      "jp": "始まる",
+      "hira": "はじまる",
+      "mp3": "pb_v56_start.mp3"
+    },
+    {
+      "n": 57,
+      "en": "finish",
+      "jp": "終わる",
+      "hira": "おわる",
+      "mp3": "pb_v57_finish.mp3"
+    },
+    {
+      "n": 58,
+      "en": "before school",
+      "jp": "学校が始まる前",
+      "hira": "がっこう が はじまる まえ",
+      "mp3": "pb_v58_before_school.mp3"
+    },
+    {
+      "n": 59,
+      "en": "after school",
+      "jp": "放課後",
+      "hira": "ほうかご",
+      "mp3": "pb_v59_after_school.mp3"
+    },
+    {
+      "n": 60,
+      "en": "on time",
+      "jp": "時間どおり",
+      "hira": "じかんどおり",
+      "mp3": "pb_v60_on_time.mp3"
+    }
+  ]
+}
