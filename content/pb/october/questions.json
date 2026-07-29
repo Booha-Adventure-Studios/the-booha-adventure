@@ -1,1 +1,424 @@
-
+{
+  "cards": [
+    {
+      "n": 1,
+      "en": "Do you have a car?",
+      "jp": "車を持っていますか。",
+      "hira": "くるま を もって います か",
+      "mp3": "pb_q01_do_you_have_a_car.mp3"
+    },
+    {
+      "n": 2,
+      "en": "Do you take the bus?",
+      "jp": "バスに乗りますか。",
+      "hira": "ばす に のります か",
+      "mp3": "pb_q02_do_you_take_the_bus.mp3"
+    },
+    {
+      "n": 3,
+      "en": "Do you take the train?",
+      "jp": "電車に乗りますか。",
+      "hira": "でんしゃ に のります か",
+      "mp3": "pb_q03_do_you_take_the_train.mp3"
+    },
+    {
+      "n": 4,
+      "en": "Is there a subway?",
+      "jp": "地下鉄はありますか。",
+      "hira": "ちかてつ は あります か",
+      "mp3": "pb_q04_is_there_a_subway.mp3"
+    },
+    {
+      "n": 5,
+      "en": "Do you ride a bicycle?",
+      "jp": "自転車に乗りますか。",
+      "hira": "じてんしゃ に のります か",
+      "mp3": "pb_q05_do_you_ride_a_bicycle.mp3"
+    },
+    {
+      "n": 6,
+      "en": "Can you ride a motorcycle?",
+      "jp": "バイクに乗れますか。",
+      "hira": "ばいく に のれます か",
+      "mp3": "pb_q06_can_you_ride_a_motorcycle.mp3"
+    },
+    {
+      "n": 7,
+      "en": "Do you take taxis?",
+      "jp": "タクシーに乗りますか。",
+      "hira": "たくしー に のります か",
+      "mp3": "pb_q07_do_you_take_taxis.mp3"
+    },
+    {
+      "n": 8,
+      "en": "Do you like boats?",
+      "jp": "船が好きですか。",
+      "hira": "ふね が すき です か",
+      "mp3": "pb_q08_do_you_like_boats.mp3"
+    },
+    {
+      "n": 9,
+      "en": "Have you traveled by plane?",
+      "jp": "飛行機で旅行したことがありますか。",
+      "hira": "ひこうき で りょこう した こと が あります か",
+      "mp3": "pb_q09_have_you_traveled_by_plane.mp3"
+    },
+    {
+      "n": 10,
+      "en": "Is the truck big?",
+      "jp": "トラックは大きいですか。",
+      "hira": "とらっく は おおきい です か",
+      "mp3": "pb_q10_is_the_truck_big.mp3"
+    },
+    {
+      "n": 11,
+      "en": "Is that an ambulance?",
+      "jp": "あれは救急車ですか。",
+      "hira": "あれ は きゅうきゅうしゃ です か",
+      "mp3": "pb_q11_is_that_an_ambulance.mp3"
+    },
+    {
+      "n": 12,
+      "en": "Is this a police car?",
+      "jp": "これはパトカーですか。",
+      "hira": "これ は ぱとかー です か",
+      "mp3": "pb_q12_is_this_a_police_car.mp3"
+    },
+    {
+      "n": 13,
+      "en": "What color is the fire engine?",
+      "jp": "消防車は何色ですか。",
+      "hira": "しょうぼうしゃ は なにいろ です か",
+      "mp3": "pb_q13_what_color_is_the_fire_engine.mp3"
+    },
+    {
+      "n": 14,
+      "en": "Where is the station?",
+      "jp": "駅はどこですか。",
+      "hira": "えき は どこ です か",
+      "mp3": "pb_q14_where_is_the_station.mp3"
+    },
+    {
+      "n": 15,
+      "en": "Where is the bus stop?",
+      "jp": "バス停はどこですか。",
+      "hira": "ばすてい は どこ です か",
+      "mp3": "pb_q15_where_is_the_bus_stop.mp3"
+    },
+    {
+      "n": 16,
+      "en": "What is this street called?",
+      "jp": "この通りの名前は何ですか。",
+      "hira": "この とおり の なまえ は なん です か",
+      "mp3": "pb_q16_what_is_this_street_called.mp3"
+    },
+    {
+      "n": 17,
+      "en": "Do you have a map?",
+      "jp": "地図を持っていますか。",
+      "hira": "ちず を もって います か",
+      "mp3": "pb_q17_do_you_have_a_map.mp3"
+    },
+    {
+      "n": 18,
+      "en": "Should I turn left?",
+      "jp": "左に曲がればいいですか。",
+      "hira": "ひだり に まがれば いい です か",
+      "mp3": "pb_q18_should_i_turn_left.mp3"
+    },
+    {
+      "n": 19,
+      "en": "Should I turn right?",
+      "jp": "右に曲がればいいですか。",
+      "hira": "みぎ に まがれば いい です か",
+      "mp3": "pb_q19_should_i_turn_right.mp3"
+    },
+    {
+      "n": 20,
+      "en": "Should I go straight?",
+      "jp": "まっすぐ進めばいいですか。",
+      "hira": "まっすぐ すすめば いい です か",
+      "mp3": "pb_q20_should_i_go_straight.mp3"
+    },
+    {
+      "n": 21,
+      "en": "Is it on the corner?",
+      "jp": "角にありますか。",
+      "hira": "かど に あります か",
+      "mp3": "pb_q21_is_it_on_the_corner.mp3"
+    },
+    {
+      "n": 22,
+      "en": "Where is the traffic light?",
+      "jp": "信号はどこですか。",
+      "hira": "しんごう は どこ です か",
+      "mp3": "pb_q22_where_is_the_traffic_light.mp3"
+    },
+    {
+      "n": 23,
+      "en": "Is there a crosswalk?",
+      "jp": "横断歩道はありますか。",
+      "hira": "おうだん ほどう は あります か",
+      "mp3": "pb_q23_is_there_a_crosswalk.mp3"
+    },
+    {
+      "n": 24,
+      "en": "Where is the intersection?",
+      "jp": "交差点はどこですか。",
+      "hira": "こうさてん は どこ です か",
+      "mp3": "pb_q24_where_is_the_intersection.mp3"
+    },
+    {
+      "n": 25,
+      "en": "Is the station near?",
+      "jp": "駅は近いですか。",
+      "hira": "えき は ちかい です か",
+      "mp3": "pb_q25_is_the_station_near.mp3"
+    },
+    {
+      "n": 26,
+      "en": "Is the airport far?",
+      "jp": "空港は遠いですか。",
+      "hira": "くうこう は とおい です か",
+      "mp3": "pb_q26_is_the_airport_far.mp3"
+    },
+    {
+      "n": 27,
+      "en": "What is next to the store?",
+      "jp": "店のとなりには何がありますか。",
+      "hira": "みせ の となり には なに が あります か",
+      "mp3": "pb_q27_what_is_next_to_the_store.mp3"
+    },
+    {
+      "n": 28,
+      "en": "What is between the park and the bank?",
+      "jp": "公園と銀行の間には何がありますか。",
+      "hira": "こうえん と ぎんこう の あいだ には なに が あります か",
+      "mp3": "pb_q28_what_is_between_the_park_and_the_bank.mp3"
+    },
+    {
+      "n": 29,
+      "en": "What is across from the station?",
+      "jp": "駅の向かいには何がありますか。",
+      "hira": "えき の むかい には なに が あります か",
+      "mp3": "pb_q29_what_is_across_from_the_station.mp3"
+    },
+    {
+      "n": 30,
+      "en": "How many minutes does it take?",
+      "jp": "何分かかりますか。",
+      "hira": "なんぷん かかります か",
+      "mp3": "pb_q30_how_many_minutes_does_it_take.mp3"
+    },
+    {
+      "n": 31,
+      "en": "Do you wear a seat belt?",
+      "jp": "シートベルトをしますか。",
+      "hira": "しーとべると を します か",
+      "mp3": "pb_q31_do_you_wear_a_seat_belt.mp3"
+    },
+    {
+      "n": 32,
+      "en": "Do you wear a helmet?",
+      "jp": "ヘルメットをかぶりますか。",
+      "hira": "へるめっと を かぶります か",
+      "mp3": "pb_q32_do_you_wear_a_helmet.mp3"
+    },
+    {
+      "n": 33,
+      "en": "Do you walk on the sidewalk?",
+      "jp": "歩道を歩きますか。",
+      "hira": "ほどう を あるきます か",
+      "mp3": "pb_q33_do_you_walk_on_the_sidewalk.mp3"
+    },
+    {
+      "n": 34,
+      "en": "Are there pedestrians here?",
+      "jp": "ここに歩行者はいますか。",
+      "hira": "ここ に ほこうしゃ は います か",
+      "mp3": "pb_q34_are_there_pedestrians_here.mp3"
+    },
+    {
+      "n": 35,
+      "en": "Where is the yellow line?",
+      "jp": "黄色い線はどこですか。",
+      "hira": "きいろい せん は どこ です か",
+      "mp3": "pb_q35_where_is_the_yellow_line.mp3"
+    },
+    {
+      "n": 36,
+      "en": "Who uses priority seats?",
+      "jp": "優先席はだれが使いますか。",
+      "hira": "ゆうせんせき は だれ が つかいます か",
+      "mp3": "pb_q36_who_uses_priority_seats.mp3"
+    },
+    {
+      "n": 37,
+      "en": "Do you hold the handrail?",
+      "jp": "手すりにつかまりますか。",
+      "hira": "てすり に つかまります か",
+      "mp3": "pb_q37_do_you_hold_the_handrail.mp3"
+    },
+    {
+      "n": 38,
+      "en": "Which button should I press?",
+      "jp": "どのボタンを押せばいいですか。",
+      "hira": "どの ぼたん を おせば いい です か",
+      "mp3": "pb_q38_which_button_should_i_press.mp3"
+    },
+    {
+      "n": 39,
+      "en": "Is this place dangerous?",
+      "jp": "ここは危険ですか。",
+      "hira": "ここ は きけん です か",
+      "mp3": "pb_q39_is_this_place_dangerous.mp3"
+    },
+    {
+      "n": 40,
+      "en": "Is this road safe?",
+      "jp": "この道は安全ですか。",
+      "hira": "この みち は あんぜん です か",
+      "mp3": "pb_q40_is_this_road_safe.mp3"
+    },
+    {
+      "n": 41,
+      "en": "What does the sign say?",
+      "jp": "標識には何と書いてありますか。",
+      "hira": "ひょうしき には なん と かいて あります か",
+      "mp3": "pb_q41_what_does_the_sign_say.mp3"
+    },
+    {
+      "n": 42,
+      "en": "Where is the first aid kit?",
+      "jp": "救急箱はどこですか。",
+      "hira": "きゅうきゅうばこ は どこ です か",
+      "mp3": "pb_q42_where_is_the_first_aid_kit.mp3"
+    },
+    {
+      "n": 43,
+      "en": "Do you have your ID?",
+      "jp": "身分証明書を持っていますか。",
+      "hira": "みぶん しょうめいしょ を もって います か",
+      "mp3": "pb_q43_do_you_have_your_id.mp3"
+    },
+    {
+      "n": 44,
+      "en": "Who do you call in an emergency?",
+      "jp": "緊急時にはだれに電話しますか。",
+      "hira": "きんきゅうじ には だれ に でんわ します か",
+      "mp3": "pb_q44_who_do_you_call_in_an_emergency.mp3"
+    },
+    {
+      "n": 45,
+      "en": "Do you need help?",
+      "jp": "助けが必要ですか。",
+      "hira": "たすけ が ひつよう です か",
+      "mp3": "pb_q45_do_you_need_help.mp3"
+    },
+    {
+      "n": 46,
+      "en": "Where can I buy a ticket?",
+      "jp": "どこで切符を買えますか。",
+      "hira": "どこ で きっぷ を かえます か",
+      "mp3": "pb_q46_where_can_i_buy_a_ticket.mp3"
+    },
+    {
+      "n": 47,
+      "en": "How much is the fare?",
+      "jp": "運賃はいくらですか。",
+      "hira": "うんちん は いくら です か",
+      "mp3": "pb_q47_how_much_is_the_fare.mp3"
+    },
+    {
+      "n": 48,
+      "en": "Do you need a one-way ticket?",
+      "jp": "片道切符が必要ですか。",
+      "hira": "かたみち きっぷ が ひつよう です か",
+      "mp3": "pb_q48_do_you_need_a_oneway_ticket.mp3"
+    },
+    {
+      "n": 49,
+      "en": "Do you want a round-trip ticket?",
+      "jp": "往復切符がほしいですか。",
+      "hira": "おうふく きっぷ が ほしい です か",
+      "mp3": "pb_q49_do_you_want_a_roundtrip_ticket.mp3"
+    },
+    {
+      "n": 50,
+      "en": "Where is the ticket machine?",
+      "jp": "券売機はどこですか。",
+      "hira": "けんばいき は どこ です か",
+      "mp3": "pb_q50_where_is_the_ticket_machine.mp3"
+    },
+    {
+      "n": 51,
+      "en": "Do you have an IC card?",
+      "jp": "ICカードを持っていますか。",
+      "hira": "あいしー かーど を もって います か",
+      "mp3": "pb_q51_do_you_have_an_ic_card.mp3"
+    },
+    {
+      "n": 52,
+      "en": "Can you read the timetable?",
+      "jp": "時刻表を読めますか。",
+      "hira": "じこくひょう を よめます か",
+      "mp3": "pb_q52_can_you_read_the_timetable.mp3"
+    },
+    {
+      "n": 53,
+      "en": "Is this a local train?",
+      "jp": "これは各駅停車ですか。",
+      "hira": "これ は かくえき ていしゃ です か",
+      "mp3": "pb_q53_is_this_a_local_train.mp3"
+    },
+    {
+      "n": 54,
+      "en": "Is that an express train?",
+      "jp": "あれは急行ですか。",
+      "hira": "あれ は きゅうこう です か",
+      "mp3": "pb_q54_is_that_an_express_train.mp3"
+    },
+    {
+      "n": 55,
+      "en": "Where do I transfer?",
+      "jp": "どこで乗り換えますか。",
+      "hira": "どこ で のりかえます か",
+      "mp3": "pb_q55_where_do_i_transfer.mp3"
+    },
+    {
+      "n": 56,
+      "en": "Which platform is it?",
+      "jp": "何番ホームですか。",
+      "hira": "なんばん ほーむ です か",
+      "mp3": "pb_q56_which_platform_is_it.mp3"
+    },
+    {
+      "n": 57,
+      "en": "What time is the departure?",
+      "jp": "出発は何時ですか。",
+      "hira": "しゅっぱつ は なんじ です か",
+      "mp3": "pb_q57_what_time_is_the_departure.mp3"
+    },
+    {
+      "n": 58,
+      "en": "What time is the arrival?",
+      "jp": "到着は何時ですか。",
+      "hira": "とうちゃく は なんじ です か",
+      "mp3": "pb_q58_what_time_is_the_arrival.mp3"
+    },
+    {
+      "n": 59,
+      "en": "Is the train delayed?",
+      "jp": "電車は遅れていますか。",
+      "hira": "でんしゃ は おくれて います か",
+      "mp3": "pb_q59_is_the_train_delayed.mp3"
+    },
+    {
+      "n": 60,
+      "en": "Is this the terminal?",
+      "jp": "ここは終点ですか。",
+      "hira": "ここ は しゅうてん です か",
+      "mp3": "pb_q60_is_this_the_terminal.mp3"
+    }
+  ]
+}

@@ -1,1 +1,424 @@
-
+{
+  "cards": [
+    {
+      "n": 1,
+      "en": "How can cities improve mobility without increasing traffic?",
+      "jp": "都市は交通量を増やさずに移動性をどう改善できますか。",
+      "hira": "とし は こうつうりょう を ふやさず に いどうせい を どう かいぜん できます か",
+      "mp3": "bc_q01_how_can_cities_improve_mobility_without_increasing_traffic.mp3"
+    },
+    {
+      "n": 2,
+      "en": "Why is sustained investment in transportation infrastructure necessary?",
+      "jp": "交通インフラへの継続的な投資が必要なのはなぜですか。",
+      "hira": "こうつう いんふら への けいぞくてき な とうし が ひつよう な の は なぜ です か",
+      "mp3": "bc_q02_why_is_sustained_investment_in_transportation_infrastructure_necessary.mp3"
+    },
+    {
+      "n": 3,
+      "en": "What ethical issues are raised by autonomous vehicles?",
+      "jp": "自動運転車はどのような倫理的問題を引き起こしますか。",
+      "hira": "じどう うんてんしゃ は どの よう な りんりてき もんだい を ひきおこします か",
+      "mp3": "bc_q03_what_ethical_issues_are_raised_by_autonomous_vehicles.mp3"
+    },
+    {
+      "n": 4,
+      "en": "Are electric vehicles environmentally beneficial when battery production is considered?",
+      "jp": "バッテリー製造を考慮しても電気自動車は環境に有益ですか。",
+      "hira": "ばってりー せいぞう を こうりょ しても でんき じどうしゃ は かんきょう に ゆうえき です か",
+      "mp3": "bc_q04_are_electric_vehicles_environmentally_beneficial_when_battery_production_is_cons.mp3"
+    },
+    {
+      "n": 5,
+      "en": "Under what conditions are hybrid vehicles more efficient than conventional cars?",
+      "jp": "どのような条件でハイブリッド車は従来の車より効率的ですか。",
+      "hira": "どの よう な じょうけん で はいぶりっどしゃ は じゅうらい の くるま より こうりつてき です か",
+      "mp3": "bc_q05_under_what_conditions_are_hybrid_vehicles_more_efficient_than_conventional_cars.mp3"
+    },
+    {
+      "n": 6,
+      "en": "Should public transit be treated as an essential public service?",
+      "jp": "公共交通は不可欠な公共サービスとして扱われるべきですか。",
+      "hira": "こうきょう こうつう は ふかけつ な こうきょう さーびす として あつかわれる べき です か",
+      "mp3": "bc_q06_should_public_transit_be_treated_as_an_essential_public_service.mp3"
+    },
+    {
+      "n": 7,
+      "en": "How can freight transport become more efficient and less polluting?",
+      "jp": "貨物輸送はどうすればより効率的で汚染の少ないものになりますか。",
+      "hira": "かもつ ゆそう は どう すれば より こうりつてき で おせん の すくない もの に なります か",
+      "mp3": "bc_q07_how_can_freight_transport_become_more_efficient_and_less_polluting.mp3"
+    },
+    {
+      "n": 8,
+      "en": "What makes mass transit viable in some cities but not others?",
+      "jp": "大量輸送機関が一部の都市では成立し、他では成立しないのはなぜですか。",
+      "hira": "たいりょう ゆそう きかん が いちぶ の とし では せいりつ し ほか では せいりつ しない の は なぜ です か",
+      "mp3": "bc_q08_what_makes_mass_transit_viable_in_some_cities_but_not_others.mp3"
+    },
+    {
+      "n": 9,
+      "en": "How should the aviation industry reduce its environmental impact?",
+      "jp": "航空業界は環境への影響をどのように減らすべきですか。",
+      "hira": "こうくう ぎょうかい は かんきょう への えいきょう を どの よう に へらす べき です か",
+      "mp3": "bc_q09_how_should_the_aviation_industry_reduce_its_environmental_impact.mp3"
+    },
+    {
+      "n": 10,
+      "en": "Why does maritime transport remain central to global trade?",
+      "jp": "海上輸送が世界貿易の中心であり続けるのはなぜですか。",
+      "hira": "かいじょう ゆそう が せかい ぼうえき の ちゅうしん で ありつづける の は なぜ です か",
+      "mp3": "bc_q10_why_does_maritime_transport_remain_central_to_global_trade.mp3"
+    },
+    {
+      "n": 11,
+      "en": "Who should bear the cost of stricter emissions standards?",
+      "jp": "より厳しい排出ガス基準の費用を誰が負担すべきですか。",
+      "hira": "より きびしい はいしゅつ がす きじゅん の ひよう を だれ が ふたん する べき です か",
+      "mp3": "bc_q11_who_should_bear_the_cost_of_stricter_emissions_standards.mp3"
+    },
+    {
+      "n": 12,
+      "en": "Which factors have the greatest effect on fuel efficiency?",
+      "jp": "どの要因が燃費効率に最も大きく影響しますか。",
+      "hira": "どの よういん が ねんぴ こうりつ に もっとも おおきく えいきょう します か",
+      "mp3": "bc_q12_which_factors_have_the_greatest_effect_on_fuel_efficiency.mp3"
+    },
+    {
+      "n": 13,
+      "en": "What policies are most effective in reducing congestion?",
+      "jp": "交通渋滞の削減に最も効果的な政策は何ですか。",
+      "hira": "こうつう じゅうたい の さくげん に もっとも こうかてき な せいさく は なん です か",
+      "mp3": "bc_q13_what_policies_are_most_effective_in_reducing_congestion.mp3"
+    },
+    {
+      "n": 14,
+      "en": "How can transportation systems improve accessibility for all passengers?",
+      "jp": "交通システムはすべての乗客の利用しやすさをどう改善できますか。",
+      "hira": "こうつう しすてむ は すべて の じょうきゃく の りよう しやすさ を どう かいぜん できます か",
+      "mp3": "bc_q14_how_can_transportation_systems_improve_accessibility_for_all_passengers.mp3"
+    },
+    {
+      "n": 15,
+      "en": "What changes are required to achieve sustainable mobility?",
+      "jp": "持続可能な移動を実現するにはどのような変化が必要ですか。",
+      "hira": "じぞく かのう な いどう を じつげん する には どの よう な へんか が ひつよう です か",
+      "mp3": "bc_q15_what_changes_are_required_to_achieve_sustainable_mobility.mp3"
+    },
+    {
+      "n": 16,
+      "en": "How does a long commute affect health and productivity?",
+      "jp": "長時間通勤は健康と生産性にどう影響しますか。",
+      "hira": "ちょうじかん つうきん は けんこう と せいさんせい に どう えいきょう します か",
+      "mp3": "bc_q16_how_does_a_long_commute_affect_health_and_productivity.mp3"
+    },
+    {
+      "n": 17,
+      "en": "What information should route optimization software prioritize?",
+      "jp": "経路最適化ソフトはどの情報を優先すべきですか。",
+      "hira": "けいろ さいてきか そふと は どの じょうほう を ゆうせん する べき です か",
+      "mp3": "bc_q17_what_information_should_route_optimization_software_prioritize.mp3"
+    },
+    {
+      "n": 18,
+      "en": "Could you navigate safely if satellite services became unavailable?",
+      "jp": "衛星サービスが利用できなくなっても安全に道を進めますか。",
+      "hira": "えいせい さーびす が りよう できなく なっても あんぜん に みち を すすめます か",
+      "mp3": "bc_q18_could_you_navigate_safely_if_satellite_services_became_unavailable.mp3"
+    },
+    {
+      "n": 19,
+      "en": "How can intersections be redesigned to protect vulnerable road users?",
+      "jp": "交通弱者を守るために交差点をどう再設計できますか。",
+      "hira": "こうつう じゃくしゃ を まもる ため に こうさてん を どう さいせっけい できます か",
+      "mp3": "bc_q19_how_can_intersections_be_redesigned_to_protect_vulnerable_road_users.mp3"
+    },
+    {
+      "n": 20,
+      "en": "When must drivers yield at a pedestrian crossing?",
+      "jp": "運転者は横断歩道でいつ道を譲らなければなりませんか。",
+      "hira": "うんてんしゃ は おうだん ほどう で いつ みち を ゆずらなければ なりません か",
+      "mp3": "bc_q20_when_must_drivers_yield_at_a_pedestrian_crossing.mp3"
+    },
+    {
+      "n": 21,
+      "en": "Why do disputes arise over the right of way?",
+      "jp": "優先通行権をめぐる争いが起きるのはなぜですか。",
+      "hira": "ゆうせん つうこうけん を めぐる あらそい が おきる の は なぜ です か",
+      "mp3": "bc_q21_why_do_disputes_arise_over_the_right_of_way.mp3"
+    },
+    {
+      "n": 22,
+      "en": "How can cities improve traffic flow without building more roads?",
+      "jp": "都市は道路を増やさずに交通の流れをどう改善できますか。",
+      "hira": "とし は どうろ を ふやさず に こうつう の ながれ を どう かいぜん できます か",
+      "mp3": "bc_q22_how_can_cities_improve_traffic_flow_without_building_more_roads.mp3"
+    },
+    {
+      "n": 23,
+      "en": "How should detours be communicated to unfamiliar drivers?",
+      "jp": "迂回路は不慣れな運転者にどう伝えるべきですか。",
+      "hira": "うかいろ は ふなれ な うんてんしゃ に どう つたえる べき です か",
+      "mp3": "bc_q23_how_should_detours_be_communicated_to_unfamiliar_drivers.mp3"
+    },
+    {
+      "n": 24,
+      "en": "What makes a landmark useful when giving directions?",
+      "jp": "道案内で目印が役立つのはどのような点ですか。",
+      "hira": "みちあんない で めじるし が やくだつ の は どの よう な てん です か",
+      "mp3": "bc_q24_what_makes_a_landmark_useful_when_giving_directions.mp3"
+    },
+    {
+      "n": 25,
+      "en": "Why are orientation skills still valuable in the digital age?",
+      "jp": "デジタル時代でも方向感覚が重要なのはなぜですか。",
+      "hira": "でじたる じだい でも ほうこう かんかく が じゅうよう な の は なぜ です か",
+      "mp3": "bc_q25_why_are_orientation_skills_still_valuable_in_the_digital_age.mp3"
+    },
+    {
+      "n": 26,
+      "en": "Why is the shortest distance not always the quickest route?",
+      "jp": "最短距離が必ずしも最速の経路ではないのはなぜですか。",
+      "hira": "さいたん きょり が かならずしも さいそく の けいろ では ない の は なぜ です か",
+      "mp3": "bc_q26_why_is_the_shortest_distance_not_always_the_quickest_route.mp3"
+    },
+    {
+      "n": 27,
+      "en": "How reliable are estimated travel times during rush hour?",
+      "jp": "ラッシュアワー中の予想所要時間はどの程度信頼できますか。",
+      "hira": "らっしゅ あわーちゅう の よそう しょよう じかん は どの ていど しんらい できます か",
+      "mp3": "bc_q27_how_reliable_are_estimated_travel_times_during_rush_hour.mp3"
+    },
+    {
+      "n": 28,
+      "en": "What measures can reduce overcrowding during rush hour?",
+      "jp": "ラッシュアワーの混雑を減らすにはどのような対策が有効ですか。",
+      "hira": "らっしゅ あわー の こんざつ を へらす には どの よう な たいさく が ゆうこう です か",
+      "mp3": "bc_q28_what_measures_can_reduce_overcrowding_during_rush_hour.mp3"
+    },
+    {
+      "n": 29,
+      "en": "How does urban planning influence transportation choices?",
+      "jp": "都市計画は交通手段の選択にどう影響しますか。",
+      "hira": "とし けいかく は こうつう しゅだん の せんたく に どう えいきょう します か",
+      "mp3": "bc_q29_how_does_urban_planning_influence_transportation_choices.mp3"
+    },
+    {
+      "n": 30,
+      "en": "Does transit-oriented development improve quality of life?",
+      "jp": "公共交通指向型開発は生活の質を向上させますか。",
+      "hira": "こうきょう こうつう しこうがた かいはつ は せいかつ の しつ を こうじょう させます か",
+      "mp3": "bc_q30_does_transitoriented_development_improve_quality_of_life.mp3"
+    },
+    {
+      "n": 31,
+      "en": "Which road safety measures are most effective?",
+      "jp": "どの交通安全対策が最も効果的ですか。",
+      "hira": "どの こうつう あんぜん たいさく が もっとも こうかてき です か",
+      "mp3": "bc_q31_which_road_safety_measures_are_most_effective.mp3"
+    },
+    {
+      "n": 32,
+      "en": "What should drivers do immediately after a collision?",
+      "jp": "衝突事故の直後に運転者は何をすべきですか。",
+      "hira": "しょうとつ じこ の ちょくご に うんてんしゃ は なに を する べき です か",
+      "mp3": "bc_q32_what_should_drivers_do_immediately_after_a_collision.mp3"
+    },
+    {
+      "n": 33,
+      "en": "How can travelers identify hazards before they become emergencies?",
+      "jp": "旅行者は危険要因が緊急事態になる前にどう見つけられますか。",
+      "hira": "りょこうしゃ は きけん よういん が きんきゅう じたい に なる まえ に どう みつけられます か",
+      "mp3": "bc_q33_how_can_travelers_identify_hazards_before_they_become_emergencies.mp3"
+    },
+    {
+      "n": 34,
+      "en": "Which precautions are essential when traveling at night?",
+      "jp": "夜間の移動ではどの予防措置が不可欠ですか。",
+      "hira": "やかん の いどう では どの よぼう そち が ふかけつ です か",
+      "mp3": "bc_q34_which_precautions_are_essential_when_traveling_at_night.mp3"
+    },
+    {
+      "n": 35,
+      "en": "How does limited visibility affect reaction time?",
+      "jp": "視界の悪さは反応時間にどう影響しますか。",
+      "hira": "しかい の わるさ は はんのう じかん に どう えいきょう します か",
+      "mp3": "bc_q35_how_does_limited_visibility_affect_reaction_time.mp3"
+    },
+    {
+      "n": 36,
+      "en": "Should protective equipment be legally required for all cyclists?",
+      "jp": "すべての自転車利用者に保護具を法的に義務づけるべきですか。",
+      "hira": "すべて の じてんしゃ りようしゃ に ほごぐ を ほうてき に ぎむづける べき です か",
+      "mp3": "bc_q36_should_protective_equipment_be_legally_required_for_all_cyclists.mp3"
+    },
+    {
+      "n": 37,
+      "en": "How often should emergency procedures be practiced?",
+      "jp": "緊急時手順はどのくらいの頻度で練習すべきですか。",
+      "hira": "きんきゅうじ てじゅん は どの くらい の ひんど で れんしゅう する べき です か",
+      "mp3": "bc_q37_how_often_should_emergency_procedures_be_practiced.mp3"
+    },
+    {
+      "n": 38,
+      "en": "Why must evacuation routes remain unobstructed?",
+      "jp": "避難経路を塞いではならないのはなぜですか。",
+      "hira": "ひなん けいろ を ふさいで は ならない の は なぜ です か",
+      "mp3": "bc_q38_why_must_evacuation_routes_remain_unobstructed.mp3"
+    },
+    {
+      "n": 39,
+      "en": "Which first aid skills should every traveler know?",
+      "jp": "すべての旅行者が知るべき応急処置技能は何ですか。",
+      "hira": "すべて の りょこうしゃ が しる べき おうきゅう しょち ぎのう は なん です か",
+      "mp3": "bc_q39_which_first_aid_skills_should_every_traveler_know.mp3"
+    },
+    {
+      "n": 40,
+      "en": "How should transportation providers balance surveillance and privacy?",
+      "jp": "交通事業者は監視とプライバシーをどう両立すべきですか。",
+      "hira": "こうつう じぎょうしゃ は かんし と ぷらいばしー を どう りょうりつ する べき です か",
+      "mp3": "bc_q40_how_should_transportation_providers_balance_surveillance_and_privacy.mp3"
+    },
+    {
+      "n": 41,
+      "en": "What is the most effective form of theft prevention on public transit?",
+      "jp": "公共交通で最も効果的な盗難防止策は何ですか。",
+      "hira": "こうきょう こうつう で もっとも こうかてき な とうなん ぼうしさく は なん です か",
+      "mp3": "bc_q41_what_is_the_most_effective_form_of_theft_prevention_on_public_transit.mp3"
+    },
+    {
+      "n": 42,
+      "en": "What exclusions should travelers check in their insurance coverage?",
+      "jp": "旅行者は保険の補償範囲でどの免責事項を確認すべきですか。",
+      "hira": "りょこうしゃ は ほけん の ほしょう はんい で どの めんせき じこう を かくにん する べき です か",
+      "mp3": "bc_q42_what_exclusions_should_travelers_check_in_their_insurance_coverage.mp3"
+    },
+    {
+      "n": 43,
+      "en": "When should passengers be required to show identification?",
+      "jp": "乗客はいつ身分証明書の提示を求められるべきですか。",
+      "hira": "じょうきゃく は いつ みぶん しょうめいしょ の ていじ を もとめられる べき です か",
+      "mp3": "bc_q43_when_should_passengers_be_required_to_show_identification.mp3"
+    },
+    {
+      "n": 44,
+      "en": "How is liability determined in a transportation accident?",
+      "jp": "交通事故の法的責任はどのように決まりますか。",
+      "hira": "こうつう じこ の ほうてき せきにん は どの よう に きまります か",
+      "mp3": "bc_q44_how_is_liability_determined_in_a_transportation_accident.mp3"
+    },
+    {
+      "n": 45,
+      "en": "Who should conduct a risk assessment for a school trip?",
+      "jp": "校外学習のリスク評価は誰が行うべきですか。",
+      "hira": "こうがい がくしゅう の りすく ひょうか は だれ が おこなう べき です か",
+      "mp3": "bc_q45_who_should_conduct_a_risk_assessment_for_a_school_trip.mp3"
+    },
+    {
+      "n": 46,
+      "en": "Should fare structures be based on distance, time, or ability to pay?",
+      "jp": "運賃体系は距離、時間、支払い能力のどれに基づくべきですか。",
+      "hira": "うんちん たいけい は きょり じかん しはらい のうりょく の どれ に もとづく べき です か",
+      "mp3": "bc_q46_should_fare_structures_be_based_on_distance_time_or_ability_to_pay.mp3"
+    },
+    {
+      "n": 47,
+      "en": "What are the risks of relying entirely on contactless payment?",
+      "jp": "非接触決済だけに頼ることにはどのような危険がありますか。",
+      "hira": "ひせっしょく けっさい だけ に たよる こと には どの よう な きけん が あります か",
+      "mp3": "bc_q47_what_are_the_risks_of_relying_entirely_on_contactless_payment.mp3"
+    },
+    {
+      "n": 48,
+      "en": "Why do some transportation systems require ticket validation?",
+      "jp": "一部の交通システムで乗車券の有効化が必要なのはなぜですか。",
+      "hira": "いちぶ の こうつう しすてむ で じょうしゃけん の ゆうこうか が ひつよう な の は なぜ です か",
+      "mp3": "bc_q48_why_do_some_transportation_systems_require_ticket_validation.mp3"
+    },
+    {
+      "n": 49,
+      "en": "How much transfer time should passengers allow at an unfamiliar station?",
+      "jp": "不慣れな駅で乗客は乗り換えにどのくらいの時間を見込むべきですか。",
+      "hira": "ふなれ な えき で じょうきゃく は のりかえ に どの くらい の じかん を みこむ べき です か",
+      "mp3": "bc_q49_how_much_transfer_time_should_passengers_allow_at_an_unfamiliar_station.mp3"
+    },
+    {
+      "n": 50,
+      "en": "What assistance should be offered after a missed connection?",
+      "jp": "接続に乗り遅れた乗客にはどのような支援を提供すべきですか。",
+      "hira": "せつぞく に のりおくれた じょうきゃく には どの よう な しえん を ていきょう する べき です か",
+      "mp3": "bc_q50_what_assistance_should_be_offered_after_a_missed_connection.mp3"
+    },
+    {
+      "n": 51,
+      "en": "Which information on a departure board is most important?",
+      "jp": "発車案内板のどの情報が最も重要ですか。",
+      "hira": "はっしゃ あんないばん の どの じょうほう が もっとも じゅうよう です か",
+      "mp3": "bc_q51_which_information_on_a_departure_board_is_most_important.mp3"
+    },
+    {
+      "n": 52,
+      "en": "How should operators respond to a major service disruption?",
+      "jp": "大規模な運行障害に事業者はどう対応すべきですか。",
+      "hira": "だいきぼ な うんこう しょうがい に じぎょうしゃ は どう たいおう する べき です か",
+      "mp3": "bc_q52_how_should_operators_respond_to_a_major_service_disruption.mp3"
+    },
+    {
+      "n": 53,
+      "en": "When should passengers receive compensation for a delay?",
+      "jp": "遅延に対して乗客はいつ補償を受けるべきですか。",
+      "hira": "ちえん に たいして じょうきゃく は いつ ほしょう を うける べき です か",
+      "mp3": "bc_q53_when_should_passengers_receive_compensation_for_a_delay.mp3"
+    },
+    {
+      "n": 54,
+      "en": "How early should a cancellation be announced?",
+      "jp": "運休はどのくらい前に発表すべきですか。",
+      "hira": "うんきゅう は どの くらい まえ に はっぴょう する べき です か",
+      "mp3": "bc_q54_how_early_should_a_cancellation_be_announced.mp3"
+    },
+    {
+      "n": 55,
+      "en": "When is a replacement bus an adequate alternative?",
+      "jp": "代行バスが十分な代替手段となるのはどのような場合ですか。",
+      "hira": "だいこう ばす が じゅうぶん な だいたい しゅだん と なる の は どの よう な ばあい です か",
+      "mp3": "bc_q55_when_is_a_replacement_bus_an_adequate_alternative.mp3"
+    },
+    {
+      "n": 56,
+      "en": "How is passenger capacity determined safely?",
+      "jp": "乗客定員は安全にどのように決められますか。",
+      "hira": "じょうきゃく ていいん は あんぜん に どの よう に きめられます か",
+      "mp3": "bc_q56_how_is_passenger_capacity_determined_safely.mp3"
+    },
+    {
+      "n": 57,
+      "en": "Who should have priority when priority seating is limited?",
+      "jp": "優先席が限られているとき、誰を優先すべきですか。",
+      "hira": "ゆうせんせき が かぎられて いる とき だれ を ゆうせん する べき です か",
+      "mp3": "bc_q57_who_should_have_priority_when_priority_seating_is_limited.mp3"
+    },
+    {
+      "n": 58,
+      "en": "How can passengers arrange accessibility assistance?",
+      "jp": "乗客は移動支援をどのように手配できますか。",
+      "hira": "じょうきゃく は いどう しえん を どの よう に てはい できます か",
+      "mp3": "bc_q58_how_can_passengers_arrange_accessibility_assistance.mp3"
+    },
+    {
+      "n": 59,
+      "en": "How can travelers confirm a vehicle's final destination?",
+      "jp": "旅行者は乗り物の最終目的地をどう確認できますか。",
+      "hira": "りょこうしゃ は のりもの の さいしゅう もくてきち を どう かくにん できます か",
+      "mp3": "bc_q59_how_can_travelers_confirm_a_vehicles_final_destination.mp3"
+    },
+    {
+      "n": 60,
+      "en": "What should be the main objective of transportation policy?",
+      "jp": "交通政策の主な目的は何であるべきですか。",
+      "hira": "こうつう せいさく の おもな もくてき は なん で ある べき です か",
+      "mp3": "bc_q60_what_should_be_the_main_objective_of_transportation_policy.mp3"
+    }
+  ]
+}

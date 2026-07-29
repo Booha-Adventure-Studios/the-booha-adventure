@@ -1,1 +1,424 @@
-
+{
+  "cards": [
+    {
+      "n": 1,
+      "en": "mobility",
+      "jp": "移動性・モビリティ",
+      "hira": "いどうせい・もびりてぃ",
+      "mp3": "bc_v01_mobility.mp3"
+    },
+    {
+      "n": 2,
+      "en": "transportation infrastructure",
+      "jp": "交通インフラ",
+      "hira": "こうつう いんふら",
+      "mp3": "bc_v02_transportation_infrastructure.mp3"
+    },
+    {
+      "n": 3,
+      "en": "autonomous vehicle",
+      "jp": "自動運転車",
+      "hira": "じどう うんてんしゃ",
+      "mp3": "bc_v03_autonomous_vehicle.mp3"
+    },
+    {
+      "n": 4,
+      "en": "electric vehicle",
+      "jp": "電気自動車",
+      "hira": "でんき じどうしゃ",
+      "mp3": "bc_v04_electric_vehicle.mp3"
+    },
+    {
+      "n": 5,
+      "en": "hybrid vehicle",
+      "jp": "ハイブリッド車",
+      "hira": "はいぶりっどしゃ",
+      "mp3": "bc_v05_hybrid_vehicle.mp3"
+    },
+    {
+      "n": 6,
+      "en": "public transit",
+      "jp": "公共交通",
+      "hira": "こうきょう こうつう",
+      "mp3": "bc_v06_public_transit.mp3"
+    },
+    {
+      "n": 7,
+      "en": "freight transport",
+      "jp": "貨物輸送",
+      "hira": "かもつ ゆそう",
+      "mp3": "bc_v07_freight_transport.mp3"
+    },
+    {
+      "n": 8,
+      "en": "mass transit",
+      "jp": "大量輸送機関",
+      "hira": "たいりょう ゆそう きかん",
+      "mp3": "bc_v08_mass_transit.mp3"
+    },
+    {
+      "n": 9,
+      "en": "aviation",
+      "jp": "航空",
+      "hira": "こうくう",
+      "mp3": "bc_v09_aviation.mp3"
+    },
+    {
+      "n": 10,
+      "en": "maritime transport",
+      "jp": "海上輸送",
+      "hira": "かいじょう ゆそう",
+      "mp3": "bc_v10_maritime_transport.mp3"
+    },
+    {
+      "n": 11,
+      "en": "emissions",
+      "jp": "排出ガス",
+      "hira": "はいしゅつ がす",
+      "mp3": "bc_v11_emissions.mp3"
+    },
+    {
+      "n": 12,
+      "en": "fuel efficiency",
+      "jp": "燃費効率",
+      "hira": "ねんぴ こうりつ",
+      "mp3": "bc_v12_fuel_efficiency.mp3"
+    },
+    {
+      "n": 13,
+      "en": "congestion",
+      "jp": "交通渋滞",
+      "hira": "こうつう じゅうたい",
+      "mp3": "bc_v13_congestion.mp3"
+    },
+    {
+      "n": 14,
+      "en": "accessibility",
+      "jp": "利用しやすさ",
+      "hira": "りよう しやすさ",
+      "mp3": "bc_v14_accessibility.mp3"
+    },
+    {
+      "n": 15,
+      "en": "sustainable mobility",
+      "jp": "持続可能な移動",
+      "hira": "じぞく かのう な いどう",
+      "mp3": "bc_v15_sustainable_mobility.mp3"
+    },
+    {
+      "n": 16,
+      "en": "commute",
+      "jp": "通勤・通学",
+      "hira": "つうきん・つうがく",
+      "mp3": "bc_v16_commute.mp3"
+    },
+    {
+      "n": 17,
+      "en": "route optimization",
+      "jp": "経路最適化",
+      "hira": "けいろ さいてきか",
+      "mp3": "bc_v17_route_optimization.mp3"
+    },
+    {
+      "n": 18,
+      "en": "navigation",
+      "jp": "経路案内",
+      "hira": "けいろ あんない",
+      "mp3": "bc_v18_navigation.mp3"
+    },
+    {
+      "n": 19,
+      "en": "intersection",
+      "jp": "交差点",
+      "hira": "こうさてん",
+      "mp3": "bc_v19_intersection.mp3"
+    },
+    {
+      "n": 20,
+      "en": "pedestrian crossing",
+      "jp": "横断歩道",
+      "hira": "おうだん ほどう",
+      "mp3": "bc_v20_pedestrian_crossing.mp3"
+    },
+    {
+      "n": 21,
+      "en": "right of way",
+      "jp": "優先通行権",
+      "hira": "ゆうせん つうこうけん",
+      "mp3": "bc_v21_right_of_way.mp3"
+    },
+    {
+      "n": 22,
+      "en": "traffic flow",
+      "jp": "交通の流れ",
+      "hira": "こうつう の ながれ",
+      "mp3": "bc_v22_traffic_flow.mp3"
+    },
+    {
+      "n": 23,
+      "en": "detour",
+      "jp": "迂回路",
+      "hira": "うかいろ",
+      "mp3": "bc_v23_detour.mp3"
+    },
+    {
+      "n": 24,
+      "en": "landmark",
+      "jp": "目印",
+      "hira": "めじるし",
+      "mp3": "bc_v24_landmark.mp3"
+    },
+    {
+      "n": 25,
+      "en": "orientation",
+      "jp": "方向感覚",
+      "hira": "ほうこう かんかく",
+      "mp3": "bc_v25_orientation.mp3"
+    },
+    {
+      "n": 26,
+      "en": "distance",
+      "jp": "距離",
+      "hira": "きょり",
+      "mp3": "bc_v26_distance.mp3"
+    },
+    {
+      "n": 27,
+      "en": "estimated travel time",
+      "jp": "予想所要時間",
+      "hira": "よそう しょよう じかん",
+      "mp3": "bc_v27_estimated_travel_time.mp3"
+    },
+    {
+      "n": 28,
+      "en": "rush hour",
+      "jp": "ラッシュアワー",
+      "hira": "らっしゅ あわー",
+      "mp3": "bc_v28_rush_hour.mp3"
+    },
+    {
+      "n": 29,
+      "en": "urban planning",
+      "jp": "都市計画",
+      "hira": "とし けいかく",
+      "mp3": "bc_v29_urban_planning.mp3"
+    },
+    {
+      "n": 30,
+      "en": "transit-oriented development",
+      "jp": "公共交通指向型開発",
+      "hira": "こうきょう こうつう しこうがた かいはつ",
+      "mp3": "bc_v30_transitoriented_development.mp3"
+    },
+    {
+      "n": 31,
+      "en": "road safety",
+      "jp": "交通安全",
+      "hira": "こうつう あんぜん",
+      "mp3": "bc_v31_road_safety.mp3"
+    },
+    {
+      "n": 32,
+      "en": "collision",
+      "jp": "衝突",
+      "hira": "しょうとつ",
+      "mp3": "bc_v32_collision.mp3"
+    },
+    {
+      "n": 33,
+      "en": "hazard",
+      "jp": "危険要因",
+      "hira": "きけん よういん",
+      "mp3": "bc_v33_hazard.mp3"
+    },
+    {
+      "n": 34,
+      "en": "precaution",
+      "jp": "予防措置",
+      "hira": "よぼう そち",
+      "mp3": "bc_v34_precaution.mp3"
+    },
+    {
+      "n": 35,
+      "en": "visibility",
+      "jp": "視界",
+      "hira": "しかい",
+      "mp3": "bc_v35_visibility.mp3"
+    },
+    {
+      "n": 36,
+      "en": "protective equipment",
+      "jp": "保護具",
+      "hira": "ほごぐ",
+      "mp3": "bc_v36_protective_equipment.mp3"
+    },
+    {
+      "n": 37,
+      "en": "emergency procedure",
+      "jp": "緊急時手順",
+      "hira": "きんきゅうじ てじゅん",
+      "mp3": "bc_v37_emergency_procedure.mp3"
+    },
+    {
+      "n": 38,
+      "en": "evacuation route",
+      "jp": "避難経路",
+      "hira": "ひなん けいろ",
+      "mp3": "bc_v38_evacuation_route.mp3"
+    },
+    {
+      "n": 39,
+      "en": "first aid",
+      "jp": "応急処置",
+      "hira": "おうきゅう しょち",
+      "mp3": "bc_v39_first_aid.mp3"
+    },
+    {
+      "n": 40,
+      "en": "surveillance",
+      "jp": "監視",
+      "hira": "かんし",
+      "mp3": "bc_v40_surveillance.mp3"
+    },
+    {
+      "n": 41,
+      "en": "theft prevention",
+      "jp": "盗難防止",
+      "hira": "とうなん ぼうし",
+      "mp3": "bc_v41_theft_prevention.mp3"
+    },
+    {
+      "n": 42,
+      "en": "insurance coverage",
+      "jp": "保険の補償範囲",
+      "hira": "ほけん の ほしょう はんい",
+      "mp3": "bc_v42_insurance_coverage.mp3"
+    },
+    {
+      "n": 43,
+      "en": "identification",
+      "jp": "身分証明",
+      "hira": "みぶん しょうめい",
+      "mp3": "bc_v43_identification.mp3"
+    },
+    {
+      "n": 44,
+      "en": "liability",
+      "jp": "法的責任",
+      "hira": "ほうてき せきにん",
+      "mp3": "bc_v44_liability.mp3"
+    },
+    {
+      "n": 45,
+      "en": "risk assessment",
+      "jp": "リスク評価",
+      "hira": "りすく ひょうか",
+      "mp3": "bc_v45_risk_assessment.mp3"
+    },
+    {
+      "n": 46,
+      "en": "fare structure",
+      "jp": "運賃体系",
+      "hira": "うんちん たいけい",
+      "mp3": "bc_v46_fare_structure.mp3"
+    },
+    {
+      "n": 47,
+      "en": "contactless payment",
+      "jp": "非接触決済",
+      "hira": "ひせっしょく けっさい",
+      "mp3": "bc_v47_contactless_payment.mp3"
+    },
+    {
+      "n": 48,
+      "en": "ticket validation",
+      "jp": "乗車券の有効化・検札",
+      "hira": "じょうしゃけん の ゆうこうか・けんさつ",
+      "mp3": "bc_v48_ticket_validation.mp3"
+    },
+    {
+      "n": 49,
+      "en": "transfer",
+      "jp": "乗り換え",
+      "hira": "のりかえ",
+      "mp3": "bc_v49_transfer.mp3"
+    },
+    {
+      "n": 50,
+      "en": "connection",
+      "jp": "接続",
+      "hira": "せつぞく",
+      "mp3": "bc_v50_connection.mp3"
+    },
+    {
+      "n": 51,
+      "en": "departure board",
+      "jp": "発車案内板",
+      "hira": "はっしゃ あんないばん",
+      "mp3": "bc_v51_departure_board.mp3"
+    },
+    {
+      "n": 52,
+      "en": "service disruption",
+      "jp": "運行障害",
+      "hira": "うんこう しょうがい",
+      "mp3": "bc_v52_service_disruption.mp3"
+    },
+    {
+      "n": 53,
+      "en": "delay",
+      "jp": "遅延",
+      "hira": "ちえん",
+      "mp3": "bc_v53_delay.mp3"
+    },
+    {
+      "n": 54,
+      "en": "cancellation",
+      "jp": "運休",
+      "hira": "うんきゅう",
+      "mp3": "bc_v54_cancellation.mp3"
+    },
+    {
+      "n": 55,
+      "en": "replacement bus",
+      "jp": "代行バス",
+      "hira": "だいこう ばす",
+      "mp3": "bc_v55_replacement_bus.mp3"
+    },
+    {
+      "n": 56,
+      "en": "passenger capacity",
+      "jp": "乗客定員",
+      "hira": "じょうきゃく ていいん",
+      "mp3": "bc_v56_passenger_capacity.mp3"
+    },
+    {
+      "n": 57,
+      "en": "priority seating",
+      "jp": "優先席",
+      "hira": "ゆうせんせき",
+      "mp3": "bc_v57_priority_seating.mp3"
+    },
+    {
+      "n": 58,
+      "en": "accessibility assistance",
+      "jp": "移動支援",
+      "hira": "いどう しえん",
+      "mp3": "bc_v58_accessibility_assistance.mp3"
+    },
+    {
+      "n": 59,
+      "en": "final destination",
+      "jp": "最終目的地",
+      "hira": "さいしゅう もくてきち",
+      "mp3": "bc_v59_final_destination.mp3"
+    },
+    {
+      "n": 60,
+      "en": "transportation policy",
+      "jp": "交通政策",
+      "hira": "こうつう せいさく",
+      "mp3": "bc_v60_transportation_policy.mp3"
+    }
+  ]
+}
