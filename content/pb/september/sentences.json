@@ -1,1 +1,424 @@
-
+{
+  "cards": [
+    {
+      "n": 1,
+      "en": "This is my desk.",
+      "jp": "これは私の机です。",
+      "hira": "これ は わたし の つくえ です",
+      "mp3": "pb_s01_this_is_my_desk.mp3"
+    },
+    {
+      "n": 2,
+      "en": "This is my chair.",
+      "jp": "これは私のいすです。",
+      "hira": "これ は わたし の いす です",
+      "mp3": "pb_s02_this_is_my_chair.mp3"
+    },
+    {
+      "n": 3,
+      "en": "That is the board.",
+      "jp": "あれは黒板です。",
+      "hira": "あれ は こくばん です",
+      "mp3": "pb_s03_that_is_the_board.mp3"
+    },
+    {
+      "n": 4,
+      "en": "I have a pencil.",
+      "jp": "私はえんぴつを持っています。",
+      "hira": "わたし は えんぴつ を もって います",
+      "mp3": "pb_s04_i_have_a_pencil.mp3"
+    },
+    {
+      "n": 5,
+      "en": "I have an eraser.",
+      "jp": "私は消しゴムを持っています。",
+      "hira": "わたし は けしごむ を もって います",
+      "mp3": "pb_s05_i_have_an_eraser.mp3"
+    },
+    {
+      "n": 6,
+      "en": "Open your notebook.",
+      "jp": "ノートを開いてください。",
+      "hira": "のーと を ひらいて ください",
+      "mp3": "pb_s06_open_your_notebook.mp3"
+    },
+    {
+      "n": 7,
+      "en": "Read your textbook.",
+      "jp": "教科書を読んでください。",
+      "hira": "きょうかしょ を よんで ください",
+      "mp3": "pb_s07_read_your_textbook.mp3"
+    },
+    {
+      "n": 8,
+      "en": "This is my pencil case.",
+      "jp": "これは私の筆箱です。",
+      "hira": "これ は わたし の ふでばこ です",
+      "mp3": "pb_s08_this_is_my_pencil_case.mp3"
+    },
+    {
+      "n": 9,
+      "en": "Use a ruler.",
+      "jp": "定規を使ってください。",
+      "hira": "じょうぎ を つかって ください",
+      "mp3": "pb_s09_use_a_ruler.mp3"
+    },
+    {
+      "n": 10,
+      "en": "Be careful with scissors.",
+      "jp": "はさみに気をつけてください。",
+      "hira": "はさみ に き を つけて ください",
+      "mp3": "pb_s10_be_careful_with_scissors.mp3"
+    },
+    {
+      "n": 11,
+      "en": "I need some glue.",
+      "jp": "のりが必要です。",
+      "hira": "のり が ひつよう です",
+      "mp3": "pb_s11_i_need_some_glue.mp3"
+    },
+    {
+      "n": 12,
+      "en": "We use computers.",
+      "jp": "私たちはコンピューターを使います。",
+      "hira": "わたしたち は こんぴゅーたー を つかいます",
+      "mp3": "pb_s12_we_use_computers.mp3"
+    },
+    {
+      "n": 13,
+      "en": "My locker is clean.",
+      "jp": "私のロッカーはきれいです。",
+      "hira": "わたし の ろっかー は きれい です",
+      "mp3": "pb_s13_my_locker_is_clean.mp3"
+    },
+    {
+      "n": 14,
+      "en": "Do not run in the classroom.",
+      "jp": "教室で走らないでください。",
+      "hira": "きょうしつ で はしらないで ください",
+      "mp3": "pb_s14_do_not_run_in_the_classroom.mp3"
+    },
+    {
+      "n": 15,
+      "en": "Put it in the trash can.",
+      "jp": "それをゴミ箱に入れてください。",
+      "hira": "それ を ごみばこ に いれて ください",
+      "mp3": "pb_s15_put_it_in_the_trash_can.mp3"
+    },
+    {
+      "n": 16,
+      "en": "I like English.",
+      "jp": "私は英語が好きです。",
+      "hira": "わたし は えいご が すき です",
+      "mp3": "pb_s16_i_like_english.mp3"
+    },
+    {
+      "n": 17,
+      "en": "We study Japanese.",
+      "jp": "私たちは日本語を勉強します。",
+      "hira": "わたしたち は にほんご を べんきょう します",
+      "mp3": "pb_s17_we_study_japanese.mp3"
+    },
+    {
+      "n": 18,
+      "en": "Math is easy.",
+      "jp": "算数は簡単です。",
+      "hira": "さんすう は かんたん です",
+      "mp3": "pb_s18_math_is_easy.mp3"
+    },
+    {
+      "n": 19,
+      "en": "Science is fun.",
+      "jp": "理科は楽しいです。",
+      "hira": "りか は たのしい です",
+      "mp3": "pb_s19_science_is_fun.mp3"
+    },
+    {
+      "n": 20,
+      "en": "We have social studies today.",
+      "jp": "今日は社会の授業があります。",
+      "hira": "きょう は しゃかい の じゅぎょう が あります",
+      "mp3": "pb_s20_we_have_social_studies_today.mp3"
+    },
+    {
+      "n": 21,
+      "en": "I study history.",
+      "jp": "私は歴史を勉強します。",
+      "hira": "わたし は れきし を べんきょう します",
+      "mp3": "pb_s21_i_study_history.mp3"
+    },
+    {
+      "n": 22,
+      "en": "I like geography.",
+      "jp": "私は地理が好きです。",
+      "hira": "わたし は ちり が すき です",
+      "mp3": "pb_s22_i_like_geography.mp3"
+    },
+    {
+      "n": 23,
+      "en": "We have PE on Monday.",
+      "jp": "月曜日に体育があります。",
+      "hira": "げつようび に たいいく が あります",
+      "mp3": "pb_s23_we_have_pe_on_monday.mp3"
+    },
+    {
+      "n": 24,
+      "en": "We have music class today.",
+      "jp": "今日は音楽の授業があります。",
+      "hira": "きょう は おんがく の じゅぎょう が あります",
+      "mp3": "pb_s24_we_have_music_class_today.mp3"
+    },
+    {
+      "n": 25,
+      "en": "We draw pictures in art class.",
+      "jp": "図工の授業で絵をかきます。",
+      "hira": "ずこう の じゅぎょう で え を かきます",
+      "mp3": "pb_s25_we_draw_pictures_in_art_class.mp3"
+    },
+    {
+      "n": 26,
+      "en": "We cook in home economics.",
+      "jp": "家庭科で料理をします。",
+      "hira": "かていか で りょうり を します",
+      "mp3": "pb_s26_we_cook_in_home_economics.mp3"
+    },
+    {
+      "n": 27,
+      "en": "We use computers in class.",
+      "jp": "授業でコンピューターを使います。",
+      "hira": "じゅぎょう で こんぴゅーたー を つかいます",
+      "mp3": "pb_s27_we_use_computers_in_class.mp3"
+    },
+    {
+      "n": 28,
+      "en": "We learn about health.",
+      "jp": "保健について学びます。",
+      "hira": "ほけん について まなびます",
+      "mp3": "pb_s28_we_learn_about_health.mp3"
+    },
+    {
+      "n": 29,
+      "en": "I do my homework after school.",
+      "jp": "放課後に宿題をします。",
+      "hira": "ほうかご に しゅくだい を します",
+      "mp3": "pb_s29_i_do_my_homework_after_school.mp3"
+    },
+    {
+      "n": 30,
+      "en": "We have a test on Friday.",
+      "jp": "金曜日にテストがあります。",
+      "hira": "きんようび に てすと が あります",
+      "mp3": "pb_s30_we_have_a_test_on_friday.mp3"
+    },
+    {
+      "n": 31,
+      "en": "This is my teacher.",
+      "jp": "こちらは私の先生です。",
+      "hira": "こちら は わたし の せんせい です",
+      "mp3": "pb_s31_this_is_my_teacher.mp3"
+    },
+    {
+      "n": 32,
+      "en": "The principal is kind.",
+      "jp": "校長先生はやさしいです。",
+      "hira": "こうちょう せんせい は やさしい です",
+      "mp3": "pb_s32_the_principal_is_kind.mp3"
+    },
+    {
+      "n": 33,
+      "en": "The school nurse helps us.",
+      "jp": "保健室の先生は私たちを助けてくれます。",
+      "hira": "ほけんしつ の せんせい は わたしたち を たすけて くれます",
+      "mp3": "pb_s33_the_school_nurse_helps_us.mp3"
+    },
+    {
+      "n": 34,
+      "en": "The librarian has many books.",
+      "jp": "司書はたくさんの本を持っています。",
+      "hira": "ししょ は たくさん の ほん を もって います",
+      "mp3": "pb_s34_the_librarian_has_many_books.mp3"
+    },
+    {
+      "n": 35,
+      "en": "Our coach is nice.",
+      "jp": "私たちのコーチはやさしいです。",
+      "hira": "わたしたち の こーち は やさしい です",
+      "mp3": "pb_s35_our_coach_is_nice.mp3"
+    },
+    {
+      "n": 36,
+      "en": "I am a student.",
+      "jp": "私は生徒です。",
+      "hira": "わたし は せいと です",
+      "mp3": "pb_s36_i_am_a_student.mp3"
+    },
+    {
+      "n": 37,
+      "en": "Ken is my classmate.",
+      "jp": "ケンは私のクラスメートです。",
+      "hira": "けん は わたし の くらすめーと です",
+      "mp3": "pb_s37_ken_is_my_classmate.mp3"
+    },
+    {
+      "n": 38,
+      "en": "She is my friend.",
+      "jp": "彼女は私の友達です。",
+      "hira": "かのじょ は わたし の ともだち です",
+      "mp3": "pb_s38_she_is_my_friend.mp3"
+    },
+    {
+      "n": 39,
+      "en": "He is an older student.",
+      "jp": "彼は先輩です。",
+      "hira": "かれ は せんぱい です",
+      "mp3": "pb_s39_he_is_an_older_student.mp3"
+    },
+    {
+      "n": 40,
+      "en": "She is a younger student.",
+      "jp": "彼女は後輩です。",
+      "hira": "かのじょ は こうはい です",
+      "mp3": "pb_s40_she_is_a_younger_student.mp3"
+    },
+    {
+      "n": 41,
+      "en": "The school staff are busy.",
+      "jp": "学校の職員は忙しいです。",
+      "hira": "がっこう の しょくいん は いそがしい です",
+      "mp3": "pb_s41_the_school_staff_are_busy.mp3"
+    },
+    {
+      "n": 42,
+      "en": "The office is near the library.",
+      "jp": "事務室は図書館の近くです。",
+      "hira": "じむしつ は としょかん の ちかく です",
+      "mp3": "pb_s42_the_office_is_near_the_library.mp3"
+    },
+    {
+      "n": 43,
+      "en": "Please help me.",
+      "jp": "手伝ってください。",
+      "hira": "てつだって ください",
+      "mp3": "pb_s43_please_help_me.mp3"
+    },
+    {
+      "n": 44,
+      "en": "I ask my teacher a question.",
+      "jp": "先生に質問します。",
+      "hira": "せんせい に しつもん します",
+      "mp3": "pb_s44_i_ask_my_teacher_a_question.mp3"
+    },
+    {
+      "n": 45,
+      "en": "I say thank you.",
+      "jp": "私は「ありがとう」と言います。",
+      "hira": "わたし は ありがとう と いいます",
+      "mp3": "pb_s45_i_say_thank_you.mp3"
+    },
+    {
+      "n": 46,
+      "en": "This is my schedule.",
+      "jp": "これは私の予定表です。",
+      "hira": "これ は わたし の よていひょう です",
+      "mp3": "pb_s46_this_is_my_schedule.mp3"
+    },
+    {
+      "n": 47,
+      "en": "What time is it?",
+      "jp": "何時ですか。",
+      "hira": "なんじ です か",
+      "mp3": "pb_s47_what_time_is_it.mp3"
+    },
+    {
+      "n": 48,
+      "en": "The clock is on the wall.",
+      "jp": "時計は壁にあります。",
+      "hira": "とけい は かべ に あります",
+      "mp3": "pb_s48_the_clock_is_on_the_wall.mp3"
+    },
+    {
+      "n": 49,
+      "en": "School starts in the morning.",
+      "jp": "学校は朝始まります。",
+      "hira": "がっこう は あさ はじまります",
+      "mp3": "pb_s49_school_starts_in_the_morning.mp3"
+    },
+    {
+      "n": 50,
+      "en": "I play soccer in the afternoon.",
+      "jp": "午後にサッカーをします。",
+      "hira": "ごご に さっかー を します",
+      "mp3": "pb_s50_i_play_soccer_in_the_afternoon.mp3"
+    },
+    {
+      "n": 51,
+      "en": "We have English on Monday.",
+      "jp": "月曜日に英語があります。",
+      "hira": "げつようび に えいご が あります",
+      "mp3": "pb_s51_we_have_english_on_monday.mp3"
+    },
+    {
+      "n": 52,
+      "en": "Class starts at nine.",
+      "jp": "授業は9時に始まります。",
+      "hira": "じゅぎょう は くじ に はじまります",
+      "mp3": "pb_s52_class_starts_at_nine.mp3"
+    },
+    {
+      "n": 53,
+      "en": "I eat lunch at school.",
+      "jp": "学校で昼ごはんを食べます。",
+      "hira": "がっこう で ひるごはん を たべます",
+      "mp3": "pb_s53_i_eat_lunch_at_school.mp3"
+    },
+    {
+      "n": 54,
+      "en": "We have a short break.",
+      "jp": "短い休み時間があります。",
+      "hira": "みじかい やすみ じかん が あります",
+      "mp3": "pb_s54_we_have_a_short_break.mp3"
+    },
+    {
+      "n": 55,
+      "en": "The bell rings.",
+      "jp": "チャイムが鳴ります。",
+      "hira": "ちゃいむ が なります",
+      "mp3": "pb_s55_the_bell_rings.mp3"
+    },
+    {
+      "n": 56,
+      "en": "School starts at eight thirty.",
+      "jp": "学校は8時30分に始まります。",
+      "hira": "がっこう は はちじ さんじゅっぷん に はじまります",
+      "mp3": "pb_s56_school_starts_at_eight_thirty.mp3"
+    },
+    {
+      "n": 57,
+      "en": "Class finishes at three.",
+      "jp": "授業は3時に終わります。",
+      "hira": "じゅぎょう は さんじ に おわります",
+      "mp3": "pb_s57_class_finishes_at_three.mp3"
+    },
+    {
+      "n": 58,
+      "en": "I read before school.",
+      "jp": "学校が始まる前に本を読みます。",
+      "hira": "がっこう が はじまる まえ に ほん を よみます",
+      "mp3": "pb_s58_i_read_before_school.mp3"
+    },
+    {
+      "n": 59,
+      "en": "I play tennis after school.",
+      "jp": "放課後にテニスをします。",
+      "hira": "ほうかご に てにす を します",
+      "mp3": "pb_s59_i_play_tennis_after_school.mp3"
+    },
+    {
+      "n": 60,
+      "en": "I am on time.",
+      "jp": "私は時間どおりです。",
+      "hira": "わたし は じかんどおり です",
+      "mp3": "pb_s60_i_am_on_time.mp3"
+    }
+  ]
+}
