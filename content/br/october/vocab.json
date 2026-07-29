@@ -1,1 +1,424 @@
-
+{
+  "cards": [
+    {
+      "n": 1,
+      "en": "vehicle",
+      "jp": "乗り物／車両",
+      "hira": "のりもの／しゃりょう",
+      "mp3": "br_v01_vehicle.mp3"
+    },
+    {
+      "n": 2,
+      "en": "car",
+      "jp": "車",
+      "hira": "くるま",
+      "mp3": "br_v02_car.mp3"
+    },
+    {
+      "n": 3,
+      "en": "bus",
+      "jp": "バス",
+      "hira": "ばす",
+      "mp3": "br_v03_bus.mp3"
+    },
+    {
+      "n": 4,
+      "en": "train",
+      "jp": "電車",
+      "hira": "でんしゃ",
+      "mp3": "br_v04_train.mp3"
+    },
+    {
+      "n": 5,
+      "en": "subway / metro",
+      "jp": "地下鉄",
+      "hira": "ちかてつ",
+      "mp3": "br_v05_subway_metro.mp3"
+    },
+    {
+      "n": 6,
+      "en": "tram",
+      "jp": "路面電車",
+      "hira": "ろめんでんしゃ",
+      "mp3": "br_v06_tram.mp3"
+    },
+    {
+      "n": 7,
+      "en": "bicycle / bike",
+      "jp": "自転車",
+      "hira": "じてんしゃ",
+      "mp3": "br_v07_bicycle_bike.mp3"
+    },
+    {
+      "n": 8,
+      "en": "motorbike / scooter",
+      "jp": "バイク／スクーター",
+      "hira": "ばいく／すくーたー",
+      "mp3": "br_v08_motorbike_scooter.mp3"
+    },
+    {
+      "n": 9,
+      "en": "taxi",
+      "jp": "タクシー",
+      "hira": "たくしー",
+      "mp3": "br_v09_taxi.mp3"
+    },
+    {
+      "n": 10,
+      "en": "ferry / boat",
+      "jp": "フェリー／船",
+      "hira": "ふぇりー／ふね",
+      "mp3": "br_v10_ferry_boat.mp3"
+    },
+    {
+      "n": 11,
+      "en": "airplane",
+      "jp": "飛行機",
+      "hira": "ひこうき",
+      "mp3": "br_v11_airplane.mp3"
+    },
+    {
+      "n": 12,
+      "en": "truck",
+      "jp": "トラック",
+      "hira": "とらっく",
+      "mp3": "br_v12_truck.mp3"
+    },
+    {
+      "n": 13,
+      "en": "ambulance",
+      "jp": "救急車",
+      "hira": "きゅうきゅうしゃ",
+      "mp3": "br_v13_ambulance.mp3"
+    },
+    {
+      "n": 14,
+      "en": "police car",
+      "jp": "パトカー",
+      "hira": "ぱとかー",
+      "mp3": "br_v14_police_car.mp3"
+    },
+    {
+      "n": 15,
+      "en": "fire engine",
+      "jp": "消防車",
+      "hira": "しょうぼうしゃ",
+      "mp3": "br_v15_fire_engine.mp3"
+    },
+    {
+      "n": 16,
+      "en": "commute",
+      "jp": "通学／通勤",
+      "hira": "つうがく／つうきん",
+      "mp3": "br_v16_commute.mp3"
+    },
+    {
+      "n": 17,
+      "en": "station",
+      "jp": "駅",
+      "hira": "えき",
+      "mp3": "br_v17_station.mp3"
+    },
+    {
+      "n": 18,
+      "en": "platform",
+      "jp": "ホーム",
+      "hira": "ほーむ",
+      "mp3": "br_v18_platform.mp3"
+    },
+    {
+      "n": 19,
+      "en": "ticket gate",
+      "jp": "改札口",
+      "hira": "かいさつぐち",
+      "mp3": "br_v19_ticket_gate.mp3"
+    },
+    {
+      "n": 20,
+      "en": "bus stop",
+      "jp": "バス停",
+      "hira": "ばすてい",
+      "mp3": "br_v20_bus_stop.mp3"
+    },
+    {
+      "n": 21,
+      "en": "intersection",
+      "jp": "交差点",
+      "hira": "こうさてん",
+      "mp3": "br_v21_intersection.mp3"
+    },
+    {
+      "n": 22,
+      "en": "crosswalk",
+      "jp": "横断歩道",
+      "hira": "おうだん ほどう",
+      "mp3": "br_v22_crosswalk.mp3"
+    },
+    {
+      "n": 23,
+      "en": "traffic light",
+      "jp": "信号",
+      "hira": "しんごう",
+      "mp3": "br_v23_traffic_light.mp3"
+    },
+    {
+      "n": 24,
+      "en": "corner",
+      "jp": "角",
+      "hira": "かど",
+      "mp3": "br_v24_corner.mp3"
+    },
+    {
+      "n": 25,
+      "en": "block",
+      "jp": "一区画／ブロック",
+      "hira": "いち くかく／ぶろっく",
+      "mp3": "br_v25_block.mp3"
+    },
+    {
+      "n": 26,
+      "en": "next to",
+      "jp": "〜のとなり",
+      "hira": "〜 の となり",
+      "mp3": "br_v26_next_to.mp3"
+    },
+    {
+      "n": 27,
+      "en": "between",
+      "jp": "〜の間",
+      "hira": "〜 の あいだ",
+      "mp3": "br_v27_between.mp3"
+    },
+    {
+      "n": 28,
+      "en": "across from",
+      "jp": "〜の向かい",
+      "hira": "〜 の むかい",
+      "mp3": "br_v28_across_from.mp3"
+    },
+    {
+      "n": 29,
+      "en": "on the left / right",
+      "jp": "左側／右側に",
+      "hira": "ひだり がわ／みぎ がわ に",
+      "mp3": "br_v29_on_the_left_right.mp3"
+    },
+    {
+      "n": 30,
+      "en": "far / near",
+      "jp": "遠い／近い",
+      "hira": "とおい／ちかい",
+      "mp3": "br_v30_far_near.mp3"
+    },
+    {
+      "n": 31,
+      "en": "seat belt",
+      "jp": "シートベルト",
+      "hira": "しーとべると",
+      "mp3": "br_v31_seat_belt.mp3"
+    },
+    {
+      "n": 32,
+      "en": "helmet",
+      "jp": "ヘルメット",
+      "hira": "へるめっと",
+      "mp3": "br_v32_helmet.mp3"
+    },
+    {
+      "n": 33,
+      "en": "bike lane",
+      "jp": "自転車専用レーン",
+      "hira": "じてんしゃ せんよう れーん",
+      "mp3": "br_v33_bike_lane.mp3"
+    },
+    {
+      "n": 34,
+      "en": "pedestrian",
+      "jp": "歩行者",
+      "hira": "ほこうしゃ",
+      "mp3": "br_v34_pedestrian.mp3"
+    },
+    {
+      "n": 35,
+      "en": "platform edge / yellow line",
+      "jp": "ホームの黄色い線",
+      "hira": "ほーむ の きいろい せん",
+      "mp3": "br_v35_platform_edge_yellow_line.mp3"
+    },
+    {
+      "n": 36,
+      "en": "priority seat",
+      "jp": "優先席",
+      "hira": "ゆうせんせき",
+      "mp3": "br_v36_priority_seat.mp3"
+    },
+    {
+      "n": 37,
+      "en": "emergency brake / stop button",
+      "jp": "非常ブレーキ／停止ボタン",
+      "hira": "ひじょう ぶれーき／ていし ぼたん",
+      "mp3": "br_v37_emergency_brake_stop_button.mp3"
+    },
+    {
+      "n": 38,
+      "en": "lost and found",
+      "jp": "遺失物取扱所",
+      "hira": "いしつぶつ とりあつかいじょ",
+      "mp3": "br_v38_lost_and_found.mp3"
+    },
+    {
+      "n": 39,
+      "en": "danger / hazard",
+      "jp": "危険",
+      "hira": "きけん",
+      "mp3": "br_v39_danger_hazard.mp3"
+    },
+    {
+      "n": 40,
+      "en": "warning sign",
+      "jp": "注意表示",
+      "hira": "ちゅうい ひょうじ",
+      "mp3": "br_v40_warning_sign.mp3"
+    },
+    {
+      "n": 41,
+      "en": "first aid kit",
+      "jp": "救急箱",
+      "hira": "きゅうきゅうばこ",
+      "mp3": "br_v41_first_aid_kit.mp3"
+    },
+    {
+      "n": 42,
+      "en": "lifeguard",
+      "jp": "ライフガード／監視員",
+      "hira": "らいふがーど／かんしいん",
+      "mp3": "br_v42_lifeguard.mp3"
+    },
+    {
+      "n": 43,
+      "en": "insurance",
+      "jp": "保険",
+      "hira": "ほけん",
+      "mp3": "br_v43_insurance.mp3"
+    },
+    {
+      "n": 44,
+      "en": "ID",
+      "jp": "身分証明書",
+      "hira": "みぶん しょうめいしょ",
+      "mp3": "br_v44_id.mp3"
+    },
+    {
+      "n": 45,
+      "en": "emergency number",
+      "jp": "緊急電話番号",
+      "hira": "きんきゅう でんわ ばんごう",
+      "mp3": "br_v45_emergency_number.mp3"
+    },
+    {
+      "n": 46,
+      "en": "fare / ticket price",
+      "jp": "運賃／料金",
+      "hira": "うんちん／りょうきん",
+      "mp3": "br_v46_fare_ticket_price.mp3"
+    },
+    {
+      "n": 47,
+      "en": "one-way / round-trip",
+      "jp": "片道／往復",
+      "hira": "かたみち／おうふく",
+      "mp3": "br_v47_oneway_roundtrip.mp3"
+    },
+    {
+      "n": 48,
+      "en": "ticket machine",
+      "jp": "券売機",
+      "hira": "けんばいき",
+      "mp3": "br_v48_ticket_machine.mp3"
+    },
+    {
+      "n": 49,
+      "en": "IC card",
+      "jp": "ICカード",
+      "hira": "あいしー かーど",
+      "mp3": "br_v49_ic_card.mp3"
+    },
+    {
+      "n": 50,
+      "en": "top up / add value",
+      "jp": "チャージする／入金する",
+      "hira": "ちゃーじ する／にゅうきん する",
+      "mp3": "br_v50_top_up_add_value.mp3"
+    },
+    {
+      "n": 51,
+      "en": "timetable",
+      "jp": "時刻表",
+      "hira": "じこくひょう",
+      "mp3": "br_v51_timetable.mp3"
+    },
+    {
+      "n": 52,
+      "en": "local / rapid / express",
+      "jp": "各停／快速／急行",
+      "hira": "かくてい／かいそく／きゅうこう",
+      "mp3": "br_v52_local_rapid_express.mp3"
+    },
+    {
+      "n": 53,
+      "en": "transfer / connection",
+      "jp": "乗り換え",
+      "hira": "のりかえ",
+      "mp3": "br_v53_transfer_connection.mp3"
+    },
+    {
+      "n": 54,
+      "en": "platform number",
+      "jp": "番線／ホーム番号",
+      "hira": "ばんせん／ほーむ ばんごう",
+      "mp3": "br_v54_platform_number.mp3"
+    },
+    {
+      "n": 55,
+      "en": "car / carriage number",
+      "jp": "号車",
+      "hira": "ごうしゃ",
+      "mp3": "br_v55_car_carriage_number.mp3"
+    },
+    {
+      "n": 56,
+      "en": "priority seat area",
+      "jp": "優先席エリア",
+      "hira": "ゆうせんせき えりあ",
+      "mp3": "br_v56_priority_seat_area.mp3"
+    },
+    {
+      "n": 57,
+      "en": "departure / arrival",
+      "jp": "出発／到着",
+      "hira": "しゅっぱつ／とうちゃく",
+      "mp3": "br_v57_departure_arrival.mp3"
+    },
+    {
+      "n": 58,
+      "en": "delay",
+      "jp": "遅延",
+      "hira": "ちえん",
+      "mp3": "br_v58_delay.mp3"
+    },
+    {
+      "n": 59,
+      "en": "announcement",
+      "jp": "アナウンス／放送",
+      "hira": "あなうんす／ほうそう",
+      "mp3": "br_v59_announcement.mp3"
+    },
+    {
+      "n": 60,
+      "en": "end of the line / terminal",
+      "jp": "終点",
+      "hira": "しゅうてん",
+      "mp3": "br_v60_end_of_the_line_terminal.mp3"
+    }
+  ]
+}

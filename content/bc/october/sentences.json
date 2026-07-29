@@ -1,1 +1,424 @@
-
+{
+  "cards": [
+    {
+      "n": 1,
+      "en": "Urban mobility depends on reliable transportation networks and equitable access.",
+      "jp": "都市の移動性は、信頼できる交通網と公平な利用機会に左右されます。",
+      "hira": "とし の いどうせい は しんらい できる こうつうもう と こうへい な りよう きかい に さゆう されます",
+      "mp3": "bc_s01_urban_mobility_depends_on_reliable_transportation_networks_and_equitable_access.mp3"
+    },
+    {
+      "n": 2,
+      "en": "Aging transportation infrastructure requires continuous investment to maintain safety and efficiency.",
+      "jp": "老朽化した交通インフラには、安全と効率を維持するための継続的な投資が必要です。",
+      "hira": "ろうきゅうか した こうつう いんふら には あんぜん と こうりつ を いじ する ため の けいぞくてき な とうし が ひつよう です",
+      "mp3": "bc_s02_aging_transportation_infrastructure_requires_continuous_investment_to_maintain_s.mp3"
+    },
+    {
+      "n": 3,
+      "en": "Autonomous vehicles may reduce human error, but they also raise new ethical concerns.",
+      "jp": "自動運転車は人為的ミスを減らす可能性がありますが、新たな倫理的問題も生じさせます。",
+      "hira": "じどう うんてんしゃ は じんいてき みす を へらす かのうせい が あります が あらた な りんりてき もんだい も しょうじさせます",
+      "mp3": "bc_s03_autonomous_vehicles_may_reduce_human_error_but_they_also_raise_new_ethical_conce.mp3"
+    },
+    {
+      "n": 4,
+      "en": "Electric vehicles produce no exhaust emissions while being driven.",
+      "jp": "電気自動車は走行中に排出ガスを出しません。",
+      "hira": "でんき じどうしゃ は そうこうちゅう に はいしゅつ がす を だしません",
+      "mp3": "bc_s04_electric_vehicles_produce_no_exhaust_emissions_while_being_driven.mp3"
+    },
+    {
+      "n": 5,
+      "en": "Hybrid vehicles improve fuel economy by combining an engine with an electric motor.",
+      "jp": "ハイブリッド車はエンジンと電動モーターを組み合わせて燃費を向上させます。",
+      "hira": "はいぶりっどしゃ は えんじん と でんどう もーたー を くみあわせて ねんぴ を こうじょう させます",
+      "mp3": "bc_s05_hybrid_vehicles_improve_fuel_economy_by_combining_an_engine_with_an_electric_mot.mp3"
+    },
+    {
+      "n": 6,
+      "en": "A reliable public transit system enables residents to travel without owning a car.",
+      "jp": "信頼できる公共交通機関があれば、住民は車を所有せずに移動できます。",
+      "hira": "しんらい できる こうきょう こうつう きかん が あれば じゅうみん は くるま を しょゆう せず に いどう できます",
+      "mp3": "bc_s06_a_reliable_public_transit_system_enables_residents_to_travel_without_owning_a_ca.mp3"
+    },
+    {
+      "n": 7,
+      "en": "Freight transport is essential to supply chains but contributes to congestion.",
+      "jp": "貨物輸送はサプライチェーンに不可欠ですが、交通渋滞の一因にもなります。",
+      "hira": "かもつ ゆそう は さぷらいちぇーん に ふかけつ です が こうつう じゅうたい の いちいん にも なります",
+      "mp3": "bc_s07_freight_transport_is_essential_to_supply_chains_but_contributes_to_congestion.mp3"
+    },
+    {
+      "n": 8,
+      "en": "Mass transit can move large numbers of passengers efficiently in dense urban areas.",
+      "jp": "大量輸送機関は人口密度の高い都市部で多数の乗客を効率よく運べます。",
+      "hira": "たいりょう ゆそう きかん は じんこう みつど の たかい としぶ で たすう の じょうきゃく を こうりつ よく はこべます",
+      "mp3": "bc_s08_mass_transit_can_move_large_numbers_of_passengers_efficiently_in_dense_urban_are.mp3"
+    },
+    {
+      "n": 9,
+      "en": "Aviation connects distant regions, although its environmental impact remains significant.",
+      "jp": "航空は遠隔地を結びますが、環境への影響は依然として大きいです。",
+      "hira": "こうくう は えんかくち を むすびます が かんきょう への えいきょう は いぜん として おおきい です",
+      "mp3": "bc_s09_aviation_connects_distant_regions_although_its_environmental_impact_remains_sign.mp3"
+    },
+    {
+      "n": 10,
+      "en": "Maritime transport carries most international trade by volume.",
+      "jp": "海上輸送は、量で見ると国際貿易の大部分を担っています。",
+      "hira": "かいじょう ゆそう は りょう で みる と こくさい ぼうえき の だいぶぶん を になって います",
+      "mp3": "bc_s10_maritime_transport_carries_most_international_trade_by_volume.mp3"
+    },
+    {
+      "n": 11,
+      "en": "Governments are introducing stricter emissions standards for commercial vehicles.",
+      "jp": "政府は商用車に対してより厳しい排出ガス基準を導入しています。",
+      "hira": "せいふ は しょうようしゃ に たいして より きびしい はいしゅつ がす きじゅん を どうにゅう して います",
+      "mp3": "bc_s11_governments_are_introducing_stricter_emissions_standards_for_commercial_vehicles.mp3"
+    },
+    {
+      "n": 12,
+      "en": "Fuel efficiency varies according to vehicle weight, speed, and driving conditions.",
+      "jp": "燃費効率は車両重量、速度、走行条件によって異なります。",
+      "hira": "ねんぴ こうりつ は しゃりょう じゅうりょう そくど そうこう じょうけん に よって ことなります",
+      "mp3": "bc_s12_fuel_efficiency_varies_according_to_vehicle_weight_speed_and_driving_conditions.mp3"
+    },
+    {
+      "n": 13,
+      "en": "Road congestion imposes economic costs through wasted time and fuel.",
+      "jp": "交通渋滞は時間と燃料の浪費を通して経済的損失をもたらします。",
+      "hira": "こうつう じゅうたい は じかん と ねんりょう の ろうひ を とおして けいざいてき そんしつ を もたらします",
+      "mp3": "bc_s13_road_congestion_imposes_economic_costs_through_wasted_time_and_fuel.mp3"
+    },
+    {
+      "n": 14,
+      "en": "Transportation must be accessible to passengers with diverse physical needs.",
+      "jp": "交通機関は多様な身体的ニーズを持つ乗客にも利用しやすくなければなりません。",
+      "hira": "こうつう きかん は たよう な しんたいてき にーず を もつ じょうきゃく にも りよう しやすく なければ なりません",
+      "mp3": "bc_s14_transportation_must_be_accessible_to_passengers_with_diverse_physical_needs.mp3"
+    },
+    {
+      "n": 15,
+      "en": "Sustainable mobility requires coordination between public policy and individual behavior.",
+      "jp": "持続可能な移動には公共政策と個人の行動の連携が必要です。",
+      "hira": "じぞく かのう な いどう には こうきょう せいさく と こじん の こうどう の れんけい が ひつよう です",
+      "mp3": "bc_s15_sustainable_mobility_requires_coordination_between_public_policy_and_individual.mp3"
+    },
+    {
+      "n": 16,
+      "en": "Flexible working arrangements can reduce the burden of a lengthy commute.",
+      "jp": "柔軟な勤務形態は長時間通勤の負担を軽減できます。",
+      "hira": "じゅうなん な きんむ けいたい は ちょうじかん つうきん の ふたん を けいげん できます",
+      "mp3": "bc_s16_flexible_working_arrangements_can_reduce_the_burden_of_a_lengthy_commute.mp3"
+    },
+    {
+      "n": 17,
+      "en": "Route optimization software considers traffic, distance, and delivery priorities.",
+      "jp": "経路最適化ソフトは交通状況、距離、配送の優先順位を考慮します。",
+      "hira": "けいろ さいてきか そふと は こうつう じょうきょう きょり はいそう の ゆうせん じゅんい を こうりょ します",
+      "mp3": "bc_s17_route_optimization_software_considers_traffic_distance_and_delivery_priorities.mp3"
+    },
+    {
+      "n": 18,
+      "en": "Satellite navigation is useful, but drivers should still remain aware of road signs.",
+      "jp": "衛星経路案内は便利ですが、運転者は道路標識にも注意を払うべきです。",
+      "hira": "えいせい けいろ あんない は べんり です が うんてんしゃ は どうろ ひょうしき にも ちゅうい を はらう べき です",
+      "mp3": "bc_s18_satellite_navigation_is_useful_but_drivers_should_still_remain_aware_of_road_sig.mp3"
+    },
+    {
+      "n": 19,
+      "en": "The intersection was redesigned to reduce the risk of collisions.",
+      "jp": "その交差点は衝突の危険を減らすために再設計されました。",
+      "hira": "その こうさてん は しょうとつ の きけん を へらす ため に さいせっけい されました",
+      "mp3": "bc_s19_the_intersection_was_redesigned_to_reduce_the_risk_of_collisions.mp3"
+    },
+    {
+      "n": 20,
+      "en": "Drivers must yield to pedestrians waiting at a pedestrian crossing.",
+      "jp": "運転者は横断歩道で待っている歩行者に道を譲らなければなりません。",
+      "hira": "うんてんしゃ は おうだん ほどう で まって いる ほこうしゃ に みち を ゆずらなければ なりません",
+      "mp3": "bc_s20_drivers_must_yield_to_pedestrians_waiting_at_a_pedestrian_crossing.mp3"
+    },
+    {
+      "n": 21,
+      "en": "The right of way depends on road markings, signals, and local regulations.",
+      "jp": "優先通行権は道路標示、信号、地域の規則によって決まります。",
+      "hira": "ゆうせん つうこうけん は どうろ ひょうじ しんごう ちいき の きそく に よって きまります",
+      "mp3": "bc_s21_the_right_of_way_depends_on_road_markings_signals_and_local_regulations.mp3"
+    },
+    {
+      "n": 22,
+      "en": "Poorly timed traffic lights can interrupt traffic flow.",
+      "jp": "不適切なタイミングの信号は交通の流れを妨げることがあります。",
+      "hira": "ふてきせつ な たいみんぐ の しんごう は こうつう の ながれ を さまたげる こと が あります",
+      "mp3": "bc_s22_poorly_timed_traffic_lights_can_interrupt_traffic_flow.mp3"
+    },
+    {
+      "n": 23,
+      "en": "A temporary detour was established while the bridge was being repaired.",
+      "jp": "橋の修理中、一時的な迂回路が設けられました。",
+      "hira": "はし の しゅうりちゅう いちじてき な うかいろ が もうけられました",
+      "mp3": "bc_s23_a_temporary_detour_was_established_while_the_bridge_was_being_repaired.mp3"
+    },
+    {
+      "n": 24,
+      "en": "The station serves as a useful landmark when giving directions.",
+      "jp": "道案内をするとき、その駅は便利な目印になります。",
+      "hira": "みちあんない を する とき その えき は べんり な めじるし に なります",
+      "mp3": "bc_s24_the_station_serves_as_a_useful_landmark_when_giving_directions.mp3"
+    },
+    {
+      "n": 25,
+      "en": "Good orientation skills are essential when digital navigation fails.",
+      "jp": "デジタル経路案内が使えないときには、優れた方向感覚が不可欠です。",
+      "hira": "でじたる けいろ あんない が つかえない とき には すぐれた ほうこう かんかく が ふかけつ です",
+      "mp3": "bc_s25_good_orientation_skills_are_essential_when_digital_navigation_fails.mp3"
+    },
+    {
+      "n": 26,
+      "en": "The shortest distance is not always the fastest route.",
+      "jp": "最短距離が必ずしも最速の経路とは限りません。",
+      "hira": "さいたん きょり が かならずしも さいそく の けいろ とは かぎりません",
+      "mp3": "bc_s26_the_shortest_distance_is_not_always_the_fastest_route.mp3"
+    },
+    {
+      "n": 27,
+      "en": "The estimated travel time increased after an accident blocked two lanes.",
+      "jp": "事故で二車線が塞がれた後、予想所要時間が長くなりました。",
+      "hira": "じこ で にしゃせん が ふさがれた あと よそう しょよう じかん が ながく なりました",
+      "mp3": "bc_s27_the_estimated_travel_time_increased_after_an_accident_blocked_two_lanes.mp3"
+    },
+    {
+      "n": 28,
+      "en": "Commuters often adjust their schedules to avoid rush hour.",
+      "jp": "通勤・通学者はラッシュアワーを避けるために予定を調整することがよくあります。",
+      "hira": "つうきん・つうがくしゃ は らっしゅ あわー を さける ため に よてい を ちょうせい する こと が よく あります",
+      "mp3": "bc_s28_commuters_often_adjust_their_schedules_to_avoid_rush_hour.mp3"
+    },
+    {
+      "n": 29,
+      "en": "Effective urban planning integrates housing, employment, and transportation.",
+      "jp": "効果的な都市計画は住宅、雇用、交通を統合します。",
+      "hira": "こうかてき な とし けいかく は じゅうたく こよう こうつう を とうごう します",
+      "mp3": "bc_s29_effective_urban_planning_integrates_housing_employment_and_transportation.mp3"
+    },
+    {
+      "n": 30,
+      "en": "Transit-oriented development encourages construction near major stations.",
+      "jp": "公共交通指向型開発は主要駅の近くでの建設を促進します。",
+      "hira": "こうきょう こうつう しこうがた かいはつ は しゅようえき の ちかく で の けんせつ を そくしん します",
+      "mp3": "bc_s30_transitoriented_development_encourages_construction_near_major_stations.mp3"
+    },
+    {
+      "n": 31,
+      "en": "Road safety campaigns can change behavior only if regulations are enforced.",
+      "jp": "交通安全運動は規則が実施されて初めて行動を変えられます。",
+      "hira": "こうつう あんぜん うんどう は きそく が じっし されて はじめて こうどう を かえられます",
+      "mp3": "bc_s31_road_safety_campaigns_can_change_behavior_only_if_regulations_are_enforced.mp3"
+    },
+    {
+      "n": 32,
+      "en": "Even a minor collision should be reported when property is damaged.",
+      "jp": "物が損傷した場合は、軽微な衝突でも報告すべきです。",
+      "hira": "もの が そんしょう した ばあい は けいび な しょうとつ でも ほうこく する べき です",
+      "mp3": "bc_s32_even_a_minor_collision_should_be_reported_when_property_is_damaged.mp3"
+    },
+    {
+      "n": 33,
+      "en": "Drivers should reduce speed when a hazard is difficult to see.",
+      "jp": "危険要因が見えにくいとき、運転者は速度を落とすべきです。",
+      "hira": "きけん よういん が みえにくい とき うんてんしゃ は そくど を おとす べき です",
+      "mp3": "bc_s33_drivers_should_reduce_speed_when_a_hazard_is_difficult_to_see.mp3"
+    },
+    {
+      "n": 34,
+      "en": "Wearing reflective clothing is a sensible precaution at night.",
+      "jp": "夜間に反射材の付いた服を着ることは賢明な予防措置です。",
+      "hira": "やかん に はんしゃざい の ついた ふく を きる こと は けんめい な よぼう そち です",
+      "mp3": "bc_s34_wearing_reflective_clothing_is_a_sensible_precaution_at_night.mp3"
+    },
+    {
+      "n": 35,
+      "en": "Heavy rain significantly reduces visibility and braking performance.",
+      "jp": "大雨は視界と制動性能を大幅に低下させます。",
+      "hira": "おおあめ は しかい と せいどう せいのう を おおはば に ていか させます",
+      "mp3": "bc_s35_heavy_rain_significantly_reduces_visibility_and_braking_performance.mp3"
+    },
+    {
+      "n": 36,
+      "en": "Cyclists should use protective equipment that meets recognized safety standards.",
+      "jp": "自転車利用者は公認の安全基準を満たす保護具を使うべきです。",
+      "hira": "じてんしゃ りようしゃ は こうにん の あんぜん きじゅん を みたす ほごぐ を つかう べき です",
+      "mp3": "bc_s36_cyclists_should_use_protective_equipment_that_meets_recognized_safety_standards.mp3"
+    },
+    {
+      "n": 37,
+      "en": "Every passenger should understand the emergency procedure before departure.",
+      "jp": "すべての乗客は出発前に緊急時手順を理解しておくべきです。",
+      "hira": "すべて の じょうきゃく は しゅっぱつまえ に きんきゅうじ てじゅん を りかい して おく べき です",
+      "mp3": "bc_s37_every_passenger_should_understand_the_emergency_procedure_before_departure.mp3"
+    },
+    {
+      "n": 38,
+      "en": "The evacuation route must remain clear at all times.",
+      "jp": "避難経路は常に通行できる状態にしておかなければなりません。",
+      "hira": "ひなん けいろ は つね に つうこう できる じょうたい に して おかなければ なりません",
+      "mp3": "bc_s38_the_evacuation_route_must_remain_clear_at_all_times.mp3"
+    },
+    {
+      "n": 39,
+      "en": "Basic first aid can prevent an injury from becoming more serious.",
+      "jp": "基本的な応急処置はけがの悪化を防ぐことができます。",
+      "hira": "きほんてき な おうきゅう しょち は けが の あっか を ふせぐ こと が できます",
+      "mp3": "bc_s39_basic_first_aid_can_prevent_an_injury_from_becoming_more_serious.mp3"
+    },
+    {
+      "n": 40,
+      "en": "Video surveillance may discourage theft but raises privacy concerns.",
+      "jp": "ビデオ監視は盗難を抑止する可能性がありますが、プライバシー上の懸念も生じさせます。",
+      "hira": "びでお かんし は とうなん を よくし する かのうせい が あります が ぷらいばしーじょう の けねん も しょうじさせます",
+      "mp3": "bc_s40_video_surveillance_may_discourage_theft_but_raises_privacy_concerns.mp3"
+    },
+    {
+      "n": 41,
+      "en": "Theft prevention requires awareness in crowded stations and vehicles.",
+      "jp": "盗難防止には混雑した駅や車内での注意が必要です。",
+      "hira": "とうなん ぼうし には こんざつ した えき や しゃない で の ちゅうい が ひつよう です",
+      "mp3": "bc_s41_theft_prevention_requires_awareness_in_crowded_stations_and_vehicles.mp3"
+    },
+    {
+      "n": 42,
+      "en": "Insurance coverage should be checked before renting a vehicle overseas.",
+      "jp": "海外で車を借りる前に保険の補償範囲を確認すべきです。",
+      "hira": "かいがい で くるま を かりる まえ に ほけん の ほしょう はんい を かくにん する べき です",
+      "mp3": "bc_s42_insurance_coverage_should_be_checked_before_renting_a_vehicle_overseas.mp3"
+    },
+    {
+      "n": 43,
+      "en": "Passengers may be required to present identification when collecting a lost item.",
+      "jp": "乗客は遺失物を受け取る際に身分証明書の提示を求められることがあります。",
+      "hira": "じょうきゃく は いしつぶつ を うけとる さい に みぶん しょうめいしょ の ていじ を もとめられる こと が あります",
+      "mp3": "bc_s43_passengers_may_be_required_to_present_identification_when_collecting_a_lost_item.mp3"
+    },
+    {
+      "n": 44,
+      "en": "Liability may be shared when several parties contribute to an accident.",
+      "jp": "複数の当事者が事故の原因となった場合、法的責任が分担されることがあります。",
+      "hira": "ふくすう の とうじしゃ が じこ の げんいん と なった ばあい ほうてき せきにん が ぶんたん される こと が あります",
+      "mp3": "bc_s44_liability_may_be_shared_when_several_parties_contribute_to_an_accident.mp3"
+    },
+    {
+      "n": 45,
+      "en": "A thorough risk assessment should be completed before any school trip.",
+      "jp": "どの校外学習の前にも徹底したリスク評価を行うべきです。",
+      "hira": "どの こうがい がくしゅう の まえ にも てってい した りすく ひょうか を おこなう べき です",
+      "mp3": "bc_s45_a_thorough_risk_assessment_should_be_completed_before_any_school_trip.mp3"
+    },
+    {
+      "n": 46,
+      "en": "The fare structure includes discounts for students and frequent passengers.",
+      "jp": "運賃体系には学生や頻繁に利用する乗客向けの割引が含まれています。",
+      "hira": "うんちん たいけい には がくせい や ひんぱん に りよう する じょうきゃく むけ の わりびき が ふくまれて います",
+      "mp3": "bc_s46_the_fare_structure_includes_discounts_for_students_and_frequent_passengers.mp3"
+    },
+    {
+      "n": 47,
+      "en": "Contactless payment has made boarding faster and more convenient.",
+      "jp": "非接触決済により乗車がより速く便利になりました。",
+      "hira": "ひせっしょく けっさい に より じょうしゃ が より はやく べんり に なりました",
+      "mp3": "bc_s47_contactless_payment_has_made_boarding_faster_and_more_convenient.mp3"
+    },
+    {
+      "n": 48,
+      "en": "Some systems require ticket validation before passengers enter the platform.",
+      "jp": "一部の交通システムでは、乗客がホームに入る前に乗車券の有効化が必要です。",
+      "hira": "いちぶ の こうつう しすてむ では じょうきゃく が ほーむ に はいる まえ に じょうしゃけん の ゆうこうか が ひつよう です",
+      "mp3": "bc_s48_some_systems_require_ticket_validation_before_passengers_enter_the_platform.mp3"
+    },
+    {
+      "n": 49,
+      "en": "Passengers must allow enough time to transfer between distant platforms.",
+      "jp": "乗客は離れたホーム間を乗り換えるために十分な時間を確保しなければなりません。",
+      "hira": "じょうきゃく は はなれた ほーむかん を のりかえる ため に じゅうぶん な じかん を かくほ しなければ なりません",
+      "mp3": "bc_s49_passengers_must_allow_enough_time_to_transfer_between_distant_platforms.mp3"
+    },
+    {
+      "n": 50,
+      "en": "A missed connection can affect every stage of a long journey.",
+      "jp": "接続に乗り遅れると長い旅の全行程に影響することがあります。",
+      "hira": "せつぞく に のりおくれる と ながい たび の ぜんこうてい に えいきょう する こと が あります",
+      "mp3": "bc_s50_a_missed_connection_can_affect_every_stage_of_a_long_journey.mp3"
+    },
+    {
+      "n": 51,
+      "en": "The departure board displays platform changes and real-time service information.",
+      "jp": "発車案内板にはホーム変更とリアルタイムの運行情報が表示されます。",
+      "hira": "はっしゃ あんないばん には ほーむ へんこう と りあるたいむ の うんこう じょうほう が ひょうじ されます",
+      "mp3": "bc_s51_the_departure_board_displays_platform_changes_and_realtime_service_information.mp3"
+    },
+    {
+      "n": 52,
+      "en": "A signaling failure caused widespread service disruption during the morning commute.",
+      "jp": "信号設備の故障により朝の通勤時間帯に広範な運行障害が発生しました。",
+      "hira": "しんごう せつび の こしょう に より あさ の つうきん じかんたい に こうはん な うんこう しょうがい が はっせい しました",
+      "mp3": "bc_s52_a_signaling_failure_caused_widespread_service_disruption_during_the_morning_comm.mp3"
+    },
+    {
+      "n": 53,
+      "en": "Passengers are entitled to accurate information during an extended delay.",
+      "jp": "長時間の遅延中、乗客には正確な情報を得る権利があります。",
+      "hira": "ちょうじかん の ちえんちゅう じょうきゃく には せいかく な じょうほう を える けんり が あります",
+      "mp3": "bc_s53_passengers_are_entitled_to_accurate_information_during_an_extended_delay.mp3"
+    },
+    {
+      "n": 54,
+      "en": "The cancellation was announced only minutes before departure.",
+      "jp": "運休は出発のわずか数分前に発表されました。",
+      "hira": "うんきゅう は しゅっぱつ の わずか すうふんまえ に はっぴょう されました",
+      "mp3": "bc_s54_the_cancellation_was_announced_only_minutes_before_departure.mp3"
+    },
+    {
+      "n": 55,
+      "en": "A replacement bus was provided while the railway line was closed.",
+      "jp": "鉄道路線の閉鎖中、代行バスが用意されました。",
+      "hira": "てつどう ろせん の へいさちゅう だいこう ばす が ようい されました",
+      "mp3": "bc_s55_a_replacement_bus_was_provided_while_the_railway_line_was_closed.mp3"
+    },
+    {
+      "n": 56,
+      "en": "Passenger capacity is restricted for safety reasons.",
+      "jp": "乗客定員は安全上の理由で制限されています。",
+      "hira": "じょうきゃく ていいん は あんぜんじょう の りゆう で せいげん されて います",
+      "mp3": "bc_s56_passenger_capacity_is_restricted_for_safety_reasons.mp3"
+    },
+    {
+      "n": 57,
+      "en": "Priority seating should remain available for those who need it most.",
+      "jp": "優先席は最も必要とする人のために空けておくべきです。",
+      "hira": "ゆうせんせき は もっとも ひつよう と する ひと の ため に あけて おく べき です",
+      "mp3": "bc_s57_priority_seating_should_remain_available_for_those_who_need_it_most.mp3"
+    },
+    {
+      "n": 58,
+      "en": "Accessibility assistance can be requested in advance at many stations.",
+      "jp": "多くの駅では移動支援を事前に依頼できます。",
+      "hira": "おおく の えき では いどう しえん を じぜん に いらい できます",
+      "mp3": "bc_s58_accessibility_assistance_can_be_requested_in_advance_at_many_stations.mp3"
+    },
+    {
+      "n": 59,
+      "en": "Please confirm the final destination before boarding an unfamiliar train.",
+      "jp": "慣れない電車に乗る前に最終目的地を確認してください。",
+      "hira": "なれない でんしゃ に のる まえ に さいしゅう もくてきち を かくにん して ください",
+      "mp3": "bc_s59_please_confirm_the_final_destination_before_boarding_an_unfamiliar_train.mp3"
+    },
+    {
+      "n": 60,
+      "en": "Effective transportation policy must balance convenience, cost, and environmental impact.",
+      "jp": "効果的な交通政策は利便性、費用、環境への影響の均衡を取らなければなりません。",
+      "hira": "こうかてき な こうつう せいさく は りべんせい ひよう かんきょう への えいきょう の きんこう を とらなければ なりません",
+      "mp3": "bc_s60_effective_transportation_policy_must_balance_convenience_cost_and_environmental.mp3"
+    }
+  ]
+}

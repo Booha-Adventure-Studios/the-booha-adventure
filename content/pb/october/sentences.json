@@ -1,1 +1,424 @@
-
+{
+  "cards": [
+    {
+      "n": 1,
+      "en": "This is a car.",
+      "jp": "これは車です。",
+      "hira": "これ は くるま です",
+      "mp3": "pb_s01_this_is_a_car.mp3"
+    },
+    {
+      "n": 2,
+      "en": "I go by bus.",
+      "jp": "私はバスで行きます。",
+      "hira": "わたし は ばす で いきます",
+      "mp3": "pb_s02_i_go_by_bus.mp3"
+    },
+    {
+      "n": 3,
+      "en": "I take the train.",
+      "jp": "私は電車に乗ります。",
+      "hira": "わたし は でんしゃ に のります",
+      "mp3": "pb_s03_i_take_the_train.mp3"
+    },
+    {
+      "n": 4,
+      "en": "I take the subway.",
+      "jp": "私は地下鉄に乗ります。",
+      "hira": "わたし は ちかてつ に のります",
+      "mp3": "pb_s04_i_take_the_subway.mp3"
+    },
+    {
+      "n": 5,
+      "en": "I ride my bicycle.",
+      "jp": "私は自転車に乗ります。",
+      "hira": "わたし は じてんしゃ に のります",
+      "mp3": "pb_s05_i_ride_my_bicycle.mp3"
+    },
+    {
+      "n": 6,
+      "en": "My brother rides a motorcycle.",
+      "jp": "兄はバイクに乗ります。",
+      "hira": "あに は ばいく に のります",
+      "mp3": "pb_s06_my_brother_rides_a_motorcycle.mp3"
+    },
+    {
+      "n": 7,
+      "en": "Let’s take a taxi.",
+      "jp": "タクシーに乗りましょう。",
+      "hira": "たくしー に のりましょう",
+      "mp3": "pb_s07_lets_take_a_taxi.mp3"
+    },
+    {
+      "n": 8,
+      "en": "We go by boat.",
+      "jp": "私たちは船で行きます。",
+      "hira": "わたしたち は ふね で いきます",
+      "mp3": "pb_s08_we_go_by_boat.mp3"
+    },
+    {
+      "n": 9,
+      "en": "I travel by plane.",
+      "jp": "私は飛行機で旅行します。",
+      "hira": "わたし は ひこうき で りょこう します",
+      "mp3": "pb_s09_i_travel_by_plane.mp3"
+    },
+    {
+      "n": 10,
+      "en": "The truck is big.",
+      "jp": "トラックは大きいです。",
+      "hira": "とらっく は おおきい です",
+      "mp3": "pb_s10_the_truck_is_big.mp3"
+    },
+    {
+      "n": 11,
+      "en": "The ambulance is fast.",
+      "jp": "救急車は速いです。",
+      "hira": "きゅうきゅうしゃ は はやい です",
+      "mp3": "pb_s11_the_ambulance_is_fast.mp3"
+    },
+    {
+      "n": 12,
+      "en": "The police car is blue and white.",
+      "jp": "パトカーは青と白です。",
+      "hira": "ぱとかー は あお と しろ です",
+      "mp3": "pb_s12_the_police_car_is_blue_and_white.mp3"
+    },
+    {
+      "n": 13,
+      "en": "The fire engine is red.",
+      "jp": "消防車は赤いです。",
+      "hira": "しょうぼうしゃ は あかい です",
+      "mp3": "pb_s13_the_fire_engine_is_red.mp3"
+    },
+    {
+      "n": 14,
+      "en": "The station is near my house.",
+      "jp": "駅は私の家の近くです。",
+      "hira": "えき は わたし の いえ の ちかく です",
+      "mp3": "pb_s14_the_station_is_near_my_house.mp3"
+    },
+    {
+      "n": 15,
+      "en": "This is the bus stop.",
+      "jp": "ここはバス停です。",
+      "hira": "ここ は ばすてい です",
+      "mp3": "pb_s15_this_is_the_bus_stop.mp3"
+    },
+    {
+      "n": 16,
+      "en": "This street is busy.",
+      "jp": "この通りは混んでいます。",
+      "hira": "この とおり は こんで います",
+      "mp3": "pb_s16_this_street_is_busy.mp3"
+    },
+    {
+      "n": 17,
+      "en": "I have a map.",
+      "jp": "私は地図を持っています。",
+      "hira": "わたし は ちず を もって います",
+      "mp3": "pb_s17_i_have_a_map.mp3"
+    },
+    {
+      "n": 18,
+      "en": "Turn left here.",
+      "jp": "ここで左に曲がってください。",
+      "hira": "ここ で ひだり に まがって ください",
+      "mp3": "pb_s18_turn_left_here.mp3"
+    },
+    {
+      "n": 19,
+      "en": "Turn right at the corner.",
+      "jp": "角で右に曲がってください。",
+      "hira": "かど で みぎ に まがって ください",
+      "mp3": "pb_s19_turn_right_at_the_corner.mp3"
+    },
+    {
+      "n": 20,
+      "en": "Go straight.",
+      "jp": "まっすぐ進んでください。",
+      "hira": "まっすぐ すすんで ください",
+      "mp3": "pb_s20_go_straight.mp3"
+    },
+    {
+      "n": 21,
+      "en": "The bank is on the corner.",
+      "jp": "銀行は角にあります。",
+      "hira": "ぎんこう は かど に あります",
+      "mp3": "pb_s21_the_bank_is_on_the_corner.mp3"
+    },
+    {
+      "n": 22,
+      "en": "Stop at the traffic light.",
+      "jp": "信号で止まってください。",
+      "hira": "しんごう で とまって ください",
+      "mp3": "pb_s22_stop_at_the_traffic_light.mp3"
+    },
+    {
+      "n": 23,
+      "en": "Use the crosswalk.",
+      "jp": "横断歩道を使ってください。",
+      "hira": "おうだん ほどう を つかって ください",
+      "mp3": "pb_s23_use_the_crosswalk.mp3"
+    },
+    {
+      "n": 24,
+      "en": "Meet me at the intersection.",
+      "jp": "交差点で会いましょう。",
+      "hira": "こうさてん で あいましょう",
+      "mp3": "pb_s24_meet_me_at_the_intersection.mp3"
+    },
+    {
+      "n": 25,
+      "en": "The station is near.",
+      "jp": "駅は近いです。",
+      "hira": "えき は ちかい です",
+      "mp3": "pb_s25_the_station_is_near.mp3"
+    },
+    {
+      "n": 26,
+      "en": "The airport is far.",
+      "jp": "空港は遠いです。",
+      "hira": "くうこう は とおい です",
+      "mp3": "pb_s26_the_airport_is_far.mp3"
+    },
+    {
+      "n": 27,
+      "en": "The bus stop is next to the store.",
+      "jp": "バス停は店のとなりです。",
+      "hira": "ばすてい は みせ の となり です",
+      "mp3": "pb_s27_the_bus_stop_is_next_to_the_store.mp3"
+    },
+    {
+      "n": 28,
+      "en": "The school is between the park and the bank.",
+      "jp": "学校は公園と銀行の間にあります。",
+      "hira": "がっこう は こうえん と ぎんこう の あいだ に あります",
+      "mp3": "pb_s28_the_school_is_between_the_park_and_the_bank.mp3"
+    },
+    {
+      "n": 29,
+      "en": "The library is across from the station.",
+      "jp": "図書館は駅の向かいです。",
+      "hira": "としょかん は えき の むかい です",
+      "mp3": "pb_s29_the_library_is_across_from_the_station.mp3"
+    },
+    {
+      "n": 30,
+      "en": "It takes ten minutes.",
+      "jp": "10分かかります。",
+      "hira": "じゅっぷん かかります",
+      "mp3": "pb_s30_it_takes_ten_minutes.mp3"
+    },
+    {
+      "n": 31,
+      "en": "Wear your seat belt.",
+      "jp": "シートベルトをしてください。",
+      "hira": "しーとべると を して ください",
+      "mp3": "pb_s31_wear_your_seat_belt.mp3"
+    },
+    {
+      "n": 32,
+      "en": "Wear a helmet.",
+      "jp": "ヘルメットをかぶってください。",
+      "hira": "へるめっと を かぶって ください",
+      "mp3": "pb_s32_wear_a_helmet.mp3"
+    },
+    {
+      "n": 33,
+      "en": "Walk on the sidewalk.",
+      "jp": "歩道を歩いてください。",
+      "hira": "ほどう を あるいて ください",
+      "mp3": "pb_s33_walk_on_the_sidewalk.mp3"
+    },
+    {
+      "n": 34,
+      "en": "Watch for pedestrians.",
+      "jp": "歩行者に気をつけてください。",
+      "hira": "ほこうしゃ に き を つけて ください",
+      "mp3": "pb_s34_watch_for_pedestrians.mp3"
+    },
+    {
+      "n": 35,
+      "en": "Stand behind the yellow line.",
+      "jp": "黄色い線の後ろに立ってください。",
+      "hira": "きいろい せん の うしろ に たって ください",
+      "mp3": "pb_s35_stand_behind_the_yellow_line.mp3"
+    },
+    {
+      "n": 36,
+      "en": "This is a priority seat.",
+      "jp": "これは優先席です。",
+      "hira": "これ は ゆうせんせき です",
+      "mp3": "pb_s36_this_is_a_priority_seat.mp3"
+    },
+    {
+      "n": 37,
+      "en": "Hold the handrail.",
+      "jp": "手すりにつかまってください。",
+      "hira": "てすり に つかまって ください",
+      "mp3": "pb_s37_hold_the_handrail.mp3"
+    },
+    {
+      "n": 38,
+      "en": "Press the button.",
+      "jp": "ボタンを押してください。",
+      "hira": "ぼたん を おして ください",
+      "mp3": "pb_s38_press_the_button.mp3"
+    },
+    {
+      "n": 39,
+      "en": "This place is dangerous.",
+      "jp": "ここは危険です。",
+      "hira": "ここ は きけん です",
+      "mp3": "pb_s39_this_place_is_dangerous.mp3"
+    },
+    {
+      "n": 40,
+      "en": "This road is safe.",
+      "jp": "この道は安全です。",
+      "hira": "この みち は あんぜん です",
+      "mp3": "pb_s40_this_road_is_safe.mp3"
+    },
+    {
+      "n": 41,
+      "en": "Read the sign.",
+      "jp": "標識を読んでください。",
+      "hira": "ひょうしき を よんで ください",
+      "mp3": "pb_s41_read_the_sign.mp3"
+    },
+    {
+      "n": 42,
+      "en": "We have a first aid kit.",
+      "jp": "救急箱があります。",
+      "hira": "きゅうきゅうばこ が あります",
+      "mp3": "pb_s42_we_have_a_first_aid_kit.mp3"
+    },
+    {
+      "n": 43,
+      "en": "Keep your ID with you.",
+      "jp": "身分証明書を持ち歩いてください。",
+      "hira": "みぶん しょうめいしょ を もちあるいて ください",
+      "mp3": "pb_s43_keep_your_id_with_you.mp3"
+    },
+    {
+      "n": 44,
+      "en": "Call for help in an emergency.",
+      "jp": "緊急時には助けを呼んでください。",
+      "hira": "きんきゅうじ には たすけ を よんで ください",
+      "mp3": "pb_s44_call_for_help_in_an_emergency.mp3"
+    },
+    {
+      "n": 45,
+      "en": "Please help me.",
+      "jp": "手伝ってください。",
+      "hira": "てつだって ください",
+      "mp3": "pb_s45_please_help_me.mp3"
+    },
+    {
+      "n": 46,
+      "en": "I need a ticket.",
+      "jp": "切符が必要です。",
+      "hira": "きっぷ が ひつよう です",
+      "mp3": "pb_s46_i_need_a_ticket.mp3"
+    },
+    {
+      "n": 47,
+      "en": "The fare is five hundred yen.",
+      "jp": "運賃は500円です。",
+      "hira": "うんちん は ごひゃくえん です",
+      "mp3": "pb_s47_the_fare_is_five_hundred_yen.mp3"
+    },
+    {
+      "n": 48,
+      "en": "I want a one-way ticket.",
+      "jp": "片道切符がほしいです。",
+      "hira": "かたみち きっぷ が ほしい です",
+      "mp3": "pb_s48_i_want_a_oneway_ticket.mp3"
+    },
+    {
+      "n": 49,
+      "en": "She bought a round-trip ticket.",
+      "jp": "彼女は往復切符を買いました。",
+      "hira": "かのじょ は おうふく きっぷ を かいました",
+      "mp3": "pb_s49_she_bought_a_roundtrip_ticket.mp3"
+    },
+    {
+      "n": 50,
+      "en": "Use the ticket machine.",
+      "jp": "券売機を使ってください。",
+      "hira": "けんばいき を つかって ください",
+      "mp3": "pb_s50_use_the_ticket_machine.mp3"
+    },
+    {
+      "n": 51,
+      "en": "I have an IC card.",
+      "jp": "私はICカードを持っています。",
+      "hira": "わたし は あいしー かーど を もって います",
+      "mp3": "pb_s51_i_have_an_ic_card.mp3"
+    },
+    {
+      "n": 52,
+      "en": "Please check the timetable.",
+      "jp": "時刻表を確認してください。",
+      "hira": "じこくひょう を かくにん して ください",
+      "mp3": "pb_s52_please_check_the_timetable.mp3"
+    },
+    {
+      "n": 53,
+      "en": "This is a local train.",
+      "jp": "これは各駅停車です。",
+      "hira": "これ は かくえき ていしゃ です",
+      "mp3": "pb_s53_this_is_a_local_train.mp3"
+    },
+    {
+      "n": 54,
+      "en": "That is an express train.",
+      "jp": "あれは急行です。",
+      "hira": "あれ は きゅうこう です",
+      "mp3": "pb_s54_that_is_an_express_train.mp3"
+    },
+    {
+      "n": 55,
+      "en": "I transfer at Tokyo Station.",
+      "jp": "東京駅で乗り換えます。",
+      "hira": "とうきょう えき で のりかえます",
+      "mp3": "pb_s55_i_transfer_at_tokyo_station.mp3"
+    },
+    {
+      "n": 56,
+      "en": "The train leaves from platform two.",
+      "jp": "電車は2番ホームから出ます。",
+      "hira": "でんしゃ は にばん ほーむ から でます",
+      "mp3": "pb_s56_the_train_leaves_from_platform_two.mp3"
+    },
+    {
+      "n": 57,
+      "en": "Departure is at nine.",
+      "jp": "出発は9時です。",
+      "hira": "しゅっぱつ は くじ です",
+      "mp3": "pb_s57_departure_is_at_nine.mp3"
+    },
+    {
+      "n": 58,
+      "en": "Arrival is at ten.",
+      "jp": "到着は10時です。",
+      "hira": "とうちゃく は じゅうじ です",
+      "mp3": "pb_s58_arrival_is_at_ten.mp3"
+    },
+    {
+      "n": 59,
+      "en": "The train is delayed.",
+      "jp": "電車が遅れています。",
+      "hira": "でんしゃ が おくれて います",
+      "mp3": "pb_s59_the_train_is_delayed.mp3"
+    },
+    {
+      "n": 60,
+      "en": "This is the terminal.",
+      "jp": "ここは終点です。",
+      "hira": "ここ は しゅうてん です",
+      "mp3": "pb_s60_this_is_the_terminal.mp3"
+    }
+  ]
+}
