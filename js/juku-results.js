@@ -27,8 +27,19 @@
     '60-69': '60〜69', '<60': '〜59'
   };
   const HARD_JP = {
-    dictation: 'きいてかく', order: 'じゅんばん',
+    dictation: 'きいてかく', reading: 'おんどく', order: 'じゅんばん',
     vocab: 'たんご', mixed: 'ミックス'
+  };
+
+  const SKILL_JP = {
+    listeningWords: 'きいて たんごを つくる',
+    listeningSentences: 'きいて ぶんを ならべる',
+    sentenceOrder: 'ぶんの じゅんばん',
+    vocabMeaning: 'たんごの いみ',
+    vocabDefinition: 'せつめいから たんご',
+    readingComprehension: 'よんで りかいする',
+    translationBuild: 'やくぶんを くみたてる',
+    spellingBuild: 'つづりを くみたてる'
   };
 
   function sectionLabel(id) {
@@ -90,6 +101,39 @@
     };
   }
 
+  function summarizeSkill(rec, predicate, expected) {
+    if (!rec) return { missing: true, correct: 0, total: null, percent: null };
+    const items = (rec.items || []).filter(it => it && !it.proveIt && predicate(it));
+    const total = typeof expected === 'number' ? expected : items.length;
+    const correct = items.filter(it => it.ok).length;
+    return {
+      missing: false, correct, total,
+      percent: total ? Math.round(correct / total * 100) : null
+    };
+  }
+
+  function computeSkills(week) {
+    const sec = week.sections || {};
+    const dt = sec.dictation && sec.dictation.subTotals || {};
+    const vt = sec.vocab && sec.vocab.subTotals || {};
+    const mt = sec.mixed && sec.mixed.subTotals || {};
+    const readingExpected = ('comp' in mt || 'read' in mt)
+      ? (mt.comp || 0) + (mt.read || 0) : undefined;
+    return {
+      listeningWords: summarizeSkill(sec.dictation, it => it.tier === 'word', dt.word),
+      listeningSentences: summarizeSkill(sec.dictation, it => it.tier === 'sent', dt.sent),
+      sentenceOrder: summarizeSkill(sec.order, () => true,
+        sec.order && sec.order.total),
+      vocabMeaning: summarizeSkill(sec.vocab, it => it.kind === 'mean', vt.mean),
+      vocabDefinition: summarizeSkill(sec.vocab, it => it.kind === 'def', vt.def),
+      readingComprehension: summarizeSkill(sec.mixed,
+        it => it.kind === 'comp' || it.kind === 'read',
+        readingExpected),
+      translationBuild: summarizeSkill(sec.mixed, it => it.kind === 'translate', mt.translate),
+      spellingBuild: summarizeSkill(sec.mixed, it => it.kind === 'write', mt.write)
+    };
+  }
+
   // ── Report computation ───────────────────────────────────
 
   function computeReport(week) {
@@ -132,13 +176,17 @@
 
     const survey = week.survey || {};
     const predict = week.prediction || {};
+    const invalidSession = !!(week.contentStatus && week.contentStatus.ready === false);
+    const effectiveTotal = invalidSession ? null : total;
 
     return {
-      schema: 1,
+      schema: 2,
       computedAt: Date.now(),
       locked: true,
       scoringMethod: 'equal-section-mean',
-      total,
+      total: effectiveTotal,
+      invalidSession,
+      contentManifest: week.contentStatus && week.contentStatus.manifest || null,
       partial: excluded.length > 0,
       includedSections: included,
       includedSectionCount: included.length,
@@ -146,12 +194,18 @@
       excludedSections: excluded,
       
       sections,
+      skills: computeSkills(week),
+      readingRound: {
+        mode: 'teacher-led-reading-only',
+        autoScored: false,
+        note: 'Oral reading is intentionally kept separate from the automatic score.'
+      },
       proveIt,
       calibration: {
         before: survey.expect || null,
         after: predict.expect || null,
-        actual: total,
-        actualBand: total === null ? null : bandOf(total),
+        actual: effectiveTotal,
+        actualBand: effectiveTotal === null ? null : bandOf(effectiveTotal),
         expectedHardest: survey.hardest || null,
         perceivedHardest: predict.worst || null,
         actualLowest
@@ -166,9 +220,12 @@
   // during live phases), or a submitted survey (lobby).
 
   function attended(week) {
-    if (week.attendance) return true;
     if (week.sections && Object.keys(week.sections).length) return true;
     if (week.survey && week.survey.submitted) return true;
+    // A content preflight proves the student opened the real class flow.
+    // Attendance alone is deliberately insufficient: renderPhase stamps it,
+    // so a student opening the page during results must not mint a zero report.
+    if (week.contentStatus) return true;
     return false;
   }
 
@@ -211,7 +268,7 @@
   function calibrationHTML(cal, partial) {
     const lines = [];
     if (cal.before) lines.push(
-      `<p class="juku-res-cal">あさの よそう: ${BAND_JP[cal.before] || cal.before}</p>`);
+      `<p class="juku-res-cal">テストまえの よそう: ${BAND_JP[cal.before] || cal.before}</p>`);
     if (cal.after) lines.push(
       `<p class="juku-res-cal">テストのあと: ${BAND_JP[cal.after] || cal.after}</p>`);
     if (cal.actual !== null) lines.push(
@@ -246,9 +303,20 @@
   }
 
   function render(taskEl, res, slot) {
-    const report = ensureReport(false);   // results phase: always compute
+    const report = ensureReport(true);
     if (!report) {
-      taskEl.textContent = '⚠ ほぞん できなかった — ページを とじずに せんせいを よんでください';
+      taskEl.textContent =
+        'けっかを つくる きろくが ありません。先生に かくにんしてください。 / No assessment evidence.';
+      return;
+    }
+
+    if (report.invalidSession) {
+      taskEl.innerHTML = `
+        <div class="juku-res-invalid">
+          <strong>今回は てんすうが ありません。</strong><br>
+          教材の よみこみに もんだいが ありました。先生が かくにんします。<br>
+          <span class="en">No score was issued because the lesson content was unavailable.</span>
+        </div>`;
       return;
     }
 
@@ -270,11 +338,24 @@
            report.proveIt.correct === report.proveIt.total ? ' ✓' : ''}</p>`
       : '';
 
+    const skillsHTML = report.skills
+      ? `<div class="juku-res-skills">
+          <h2>くわしい けっか / Skill evidence</h2>
+          ${Object.keys(SKILL_JP).map(id => {
+            const s = report.skills[id];
+            if (!s || s.missing || s.total === null) return '';
+            return `<div class="juku-res-skill"><span>${SKILL_JP[id]}</span>
+              <span>${s.correct}/${s.total}${s.percent === null ? '' : ` — ${s.percent}%`}</span></div>`;
+          }).join('')}
+        </div>` : '';
+
     taskEl.innerHTML = `
       <div class="juku-results">
         ${totalHTML}
         ${partialNote}
         <div class="juku-res-rows">${rows}</div>
+        ${skillsHTML}
+        <p class="juku-res-reading">📖 おんどくは 15ふんの先生チェックです。じどうの点数には入りません。</p>
         ${pvHTML}
         ${calibrationHTML(report.calibration, report.partial)}
       </div>`;
