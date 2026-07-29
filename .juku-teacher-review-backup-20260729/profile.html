@@ -90,51 +90,6 @@
     .dc-today-action:active{transform:translateY(2px);box-shadow:0 1px 0 #1f160d;}
     .dc-today-action:disabled{opacity:.55;cursor:wait;}
 
-    /* ── Juku weekly reports ── */
-    .juku-log-empty {
-      padding: 12px 4px 16px; color: #7a603a; text-align: center;
-      font-size: 14px; line-height: 1.6;
-    }
-    .juku-log-list { display: grid; gap: 12px; }
-    .juku-log-card {
-      border: 2px solid rgba(58,44,26,.48); border-radius: 13px;
-      background: rgba(255,255,255,.14); overflow: hidden;
-    }
-    .juku-log-head {
-      appearance: none; width: 100%; border: 0; cursor: pointer;
-      display: grid; grid-template-columns: 1fr auto; gap: 5px 12px;
-      padding: 13px 14px; background: transparent; color: #3a2c1a;
-      text-align: left; font: 900 14px/1.4 inherit;
-    }
-    .juku-log-date { color: #7a603a; font-size: 11px; font-weight: 700; }
-    .juku-log-score { grid-row: 1 / 3; grid-column: 2; align-self: center;
-      color: #8a5a1e; font-size: 26px; }
-    .juku-log-status { grid-row: 1 / 3; grid-column: 2; align-self: center;
-      color: #b03434; font-size: 12px; text-align: right; }
-    .juku-log-body {
-      display: none; padding: 0 14px 15px;
-      border-top: 1px dashed rgba(58,44,26,.35);
-    }
-    .juku-log-body.open { display: block; }
-    .juku-log-grid {
-      display: grid; grid-template-columns: repeat(2,minmax(0,1fr));
-      gap: 7px; margin-top: 12px;
-    }
-    .juku-log-metric {
-      padding: 8px; border-radius: 9px; background: rgba(58,44,26,.07);
-    }
-    .juku-log-metric b { display: block; font-size: 17px; }
-    .juku-log-metric span { color: #7a603a; font-size: 10px; }
-    .juku-log-subhead {
-      margin: 13px 0 5px; color: #5c4626; font-size: 13px; font-weight: 900;
-    }
-    .juku-log-line { margin: 4px 0; color: #5c4626; font-size: 12px; line-height: 1.5; }
-    .juku-log-strength { color: #1f5c39; }
-    .juku-log-focus { color: #8a5a1e; }
-    @media (max-width: 390px) {
-      .juku-log-grid { grid-template-columns: 1fr; }
-    }
-
 
     
     /* ── Close button (back to hub) ── */
@@ -404,13 +359,6 @@
     </div>
     <div id="alog-week"></div>
 
-    <div id="juku-report-section">
-      <div class="ink-head">
-        <span class="jp">じゅくレポート</span><span class="en">JUKU REPORTS</span>
-      </div>
-      <div id="juku-report-log"></div>
-    </div>
-
     <div class="ink-head">
       <span class="jp">ぼうけんカレンダー</span><span class="en">CALENDAR</span>
     </div>
@@ -431,14 +379,11 @@
 <script src="./js/calendar.js"></script>
 <script src="./js/core/adventure-core.js"></script>
 <script src="./js/core/save-file.js"></script>
-<script src="./js/juku-config.js"></script>
-<script src="./js/juku-engine.js"></script>
 <script src="./js/sync-client.js"></script>
 <script src="./js/core/game-registry.js"></script>
 <script src="./js/core/day-record.js"></script>
   
 <script src="./js/ui/adventure-log.js"></script>
-<script src="./js/ui/juku-report-log.js"></script>
 <script src="./js/daily-check.js"></script>
 <script>
   (function () {

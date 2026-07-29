@@ -84,8 +84,6 @@ J.selectSlot('slot-a');
 const record = J.weekRecord();
 assert.ok(record.occurrenceKey.includes('2026-07-26'),
   'record occurrence key must include a year-safe week date');
-assert.strictEqual(record.week.curriculum, 'pb',
-  'week records must freeze the selected curriculum');
 assert.ok(Object.keys(record.save.weeks)[0].includes('2026-07-26'),
   'saved record key must not collide annually');
 
@@ -94,8 +92,6 @@ assert.ok(html.includes("'js/juku-results.js'"),
   'juku-results.js must be loaded before phases');
 assert.strictEqual(CFG.content.allowDemo, false,
   'production juku must not silently fall back to demo questions');
-assert.strictEqual(CFG.teacherReview.purpose, 'juku-report-review',
-  'teacher review must use a purpose-scoped server authorization');
 assert.strictEqual(CFG.content.responseModes.pb.dictationWord, 'tiles',
   'Pre-Boo should retain letter-tile dictation scaffolding');
 assert.strictEqual(CFG.content.responseModes.br.dictationWord, 'text',
@@ -198,7 +194,7 @@ context.window.JUKU_TESTS.preflight(slotB).then(result => {
     context,
     { filename: 'js/juku-results.js' }
   );
-  const task = { innerHTML: '', textContent: '', querySelector() { return null; } };
+  const task = { innerHTML: '', textContent: '' };
   context.window.JUKU_RESULTS.render(task, {}, slotA);
   const report = J.weekRecord().week.report;
   assert.strictEqual(report.schema, 3);
@@ -213,22 +209,10 @@ context.window.JUKU_TESTS.preflight(slotB).then(result => {
   assert.ok(task.innerHTML.includes('じどうチェック'));
   assert.ok(task.innerHTML.includes('せいかくさ 3/3'));
   assert.ok(task.innerHTML.includes('Skill evidence'));
-  assert.ok(task.innerHTML.includes('PINで かくにん'),
-    'a provisional result must require teacher PIN finalization');
-
-  const resultsSource = fs.readFileSync(path.join(ROOT, 'js/juku-results.js'), 'utf8');
-  assert.ok(resultsSource.includes('ほんとうに？ / Are you sure?'),
-    'score denial must require an explicit second confirmation');
-  const syncSource = fs.readFileSync(path.join(ROOT, 'js/sync-client.js'), 'utf8');
-  assert.ok(syncSource.includes('/teacherPinVerify'),
-    'teacher PIN must be verified by a non-mutating server endpoint');
-  const profileSource = fs.readFileSync(path.join(ROOT, 'profile.html'), 'utf8');
-  assert.ok(profileSource.includes('juku-report-log.js'),
-    'the student profile must load the finalized Juku report viewer');
 
   localStorage.setItem('booha_userid', 'late-student');
   J.selectSlot('slot-a');
-  const lateTask = { innerHTML: '', textContent: '', querySelector() { return null; } };
+  const lateTask = { innerHTML: '', textContent: '' };
   context.window.JUKU_RESULTS.render(lateTask, {}, slotA);
   assert.strictEqual(J.weekRecord().week.report, null,
     'opening during results without assessment evidence must not mint a zero report');

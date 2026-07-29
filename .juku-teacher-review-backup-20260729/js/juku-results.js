@@ -43,22 +43,6 @@
     openWriting: 'じぶんの ぶんを かく'
   };
 
-  const READING_RUBRIC = [
-    { id: 'accuracy', jp: 'ことばの せいかくさ', en: 'Word accuracy' },
-    { id: 'selfCorrection', jp: 'じぶんで なおす', en: 'Self-correction' },
-    { id: 'phrasing', jp: 'いみの まとまり', en: 'Phrasing' },
-    { id: 'pace', jp: 'ききやすい はやさ', en: 'Pace' }
-  ];
-
-  // Authorization deliberately lives only in memory. One accepted PIN opens
-  // the review tools until this page is closed; the PIN itself is discarded.
-  let teacherAuthorizedFor = null;
-
-  function currentStudentId() {
-    try { return localStorage.getItem('booha_userid') || null; }
-    catch (e) { return null; }
-  }
-
   function sectionLabel(id) {
     const p = CFG.phases.find(x => x.id === id);
     return p ? p.jp : id;
@@ -409,221 +393,6 @@
     </p>`;
   }
 
-  function curriculumOf(week, slot) {
-    return week.curriculum ||
-      (week.contentStatus && week.contentStatus.curriculum) ||
-      (slot && slot.curriculum) || null;
-  }
-
-  function teacherEntryHTML(week, slot) {
-    const finalReport = week.finalReport;
-    if (finalReport && finalReport.status === 'approved') {
-      return `<div class="juku-final-status approved">
-        ✓ 先生かくにん かんりょう<br>
-        <span class="en">Final report saved to the student profile.</span>
-      </div>`;
-    }
-    if (finalReport && finalReport.status === 'denied') {
-      return `<div class="juku-final-status denied">
-        このクラスの てんすうは でません。<br>
-        <span class="en">The teacher denied this score. No scored report was issued.</span>
-      </div>`;
-    }
-    const label = slot && slot.label || curriculumOf(week, slot) || 'Juku';
-    return `<div class="juku-teacher-final" id="jtr-host">
-      <p class="juku-teacher-final-title">先生の さいしゅうかくにん</p>
-      <p class="en">Teacher review · ${label}</p>
-      <button class="juku-teacher-entry" id="jtr-open">
-        PINで かくにん / Finalize report
-      </button>
-    </div>`;
-  }
-
-  function renderPinPanel(host, openRubric) {
-    host.innerHTML = `
-      <p class="juku-teacher-final-title">先生PIN</p>
-      <p class="en">One PIN unlocks this review until the page is closed.</p>
-      <input class="juku-teacher-pin" id="jtr-pin" type="password"
-        inputmode="numeric" autocomplete="off" maxlength="12"
-        aria-label="Teacher PIN">
-      <button class="juku-teacher-entry" id="jtr-unlock">ひらく / Unlock</button>
-      <p class="juku-teacher-status" id="jtr-status"></p>`;
-    const pin = host.querySelector('#jtr-pin');
-    const button = host.querySelector('#jtr-unlock');
-    const status = host.querySelector('#jtr-status');
-    const submit = async () => {
-      if (button.disabled) return;
-      const value = pin.value.trim();
-      if (!value) {
-        status.textContent = 'PINを いれてください。 / Enter the PIN.';
-        return;
-      }
-      button.disabled = true;
-      status.textContent = 'かくにんちゅう… / Checking…';
-      const verifier = window.BoohaSync && BoohaSync.verifyTeacherPin;
-      const result = verifier
-        ? await verifier(value,
-            CFG.teacherReview && CFG.teacherReview.purpose || 'juku-report-review')
-        : { ok: false, reason: 'AUTH_UNAVAILABLE' };
-      pin.value = '';
-      if (!result || result.ok !== true) {
-        button.disabled = false;
-        status.textContent = result && result.reason === 'NETWORK_ERROR'
-          ? 'せつぞくを かくにんしてください。 / Check the connection.'
-          : 'PINが ちがいます。 / PIN was not accepted.';
-        pin.focus();
-        return;
-      }
-      teacherAuthorizedFor = currentStudentId();
-      openRubric();
-    };
-    button.addEventListener('click', submit);
-    pin.addEventListener('keydown', event => {
-      if (event.key === 'Enter') submit();
-    });
-    pin.focus();
-  }
-
-  function renderTeacherRubric(host, week, slot, rerender) {
-    const saved = week.teacherReview && week.teacherReview.reading;
-    const selected = Object.assign({}, saved && saved.scores || {});
-    const scale = CFG.teacherReview && CFG.teacherReview.readingScale ||
-      [0, 1, 2, 3];
-    const curriculum = curriculumOf(week, slot);
-    const classLabel = slot && slot.label || curriculum || 'Juku';
-    host.innerHTML = `
-      <p class="juku-teacher-final-title">おんどく / Reading</p>
-      <p class="juku-teacher-student">Student: <span id="jtr-student"></span></p>
-      <p class="juku-teacher-class">${classLabel}</p>
-      <p class="juku-rubric-scale">0 まだ　1 たすけあり　2 だいたい　3 ひとりでできた</p>
-      ${READING_RUBRIC.map(row => `
-        <div class="juku-rubric-row">
-          <div class="juku-rubric-label">${row.jp}<span>${row.en}</span></div>
-          <div class="juku-rubric-opts">
-            ${scale.map(score => `<button class="juku-rubric-opt ${
-              selected[row.id] === score ? 'sel' : ''}"
-              data-dimension="${row.id}" data-score="${score}"
-              aria-label="${row.en} ${score}">${score}</button>`).join('')}
-          </div>
-        </div>`).join('')}
-      <p class="juku-teacher-status" id="jtr-status">
-        4つ えらんでください。 / Choose all four.
-      </p>
-      <div class="juku-teacher-actions">
-        <button class="juku-teacher-approve" id="jtr-approve">レポートを つくる</button>
-        <button class="juku-teacher-deny" id="jtr-deny">この てんすうを みとめない</button>
-      </div>`;
-
-    const student = host.querySelector('#jtr-student');
-    student.textContent =
-      localStorage.getItem('booha_user_name') ||
-      localStorage.getItem('booha_first_name') || 'Student';
-    const status = host.querySelector('#jtr-status');
-    const approve = host.querySelector('#jtr-approve');
-    let denyArmed = false;
-
-    function complete() {
-      return READING_RUBRIC.every(row =>
-        typeof selected[row.id] === 'number');
-    }
-    function syncApprove() {
-      approve.disabled = !complete();
-      approve.classList.toggle('off', !complete());
-    }
-
-    host.querySelectorAll('.juku-rubric-opt').forEach(button => {
-      button.addEventListener('click', () => {
-        const dimension = button.dataset.dimension;
-        selected[dimension] = Number(button.dataset.score);
-        host.querySelectorAll(`[data-dimension="${dimension}"]`)
-          .forEach(x => x.classList.toggle('sel', x === button));
-        denyArmed = false;
-        host.querySelector('#jtr-deny').textContent = 'この てんすうを みとめない';
-        status.textContent = complete()
-          ? 'レポートを つくれます。 / Ready to finalize.'
-          : '4つ えらんでください。 / Choose all four.';
-        syncApprove();
-      });
-    });
-
-    approve.addEventListener('click', () => {
-      if (!complete() || approve.disabled) return;
-      approve.disabled = true;
-      const now = Date.now();
-      const savedOk = J.patchWeek(w => {
-        if (!w.teacherReview) w.teacherReview = {};
-        w.teacherReview.reading = {
-          mode: 'teacher-observed',
-          curriculum,
-          passageWeek: w.weekNumber,
-          scores: Object.assign({}, selected),
-          complete: true,
-          completedAt: now
-        };
-        w.finalReport = {
-          schema: 1,
-          status: 'approved',
-          curriculum,
-          slot: w.slot || (slot && slot.id) || null,
-          approvedAt: now
-        };
-      });
-      if (savedOk === null) {
-        approve.disabled = false;
-        status.textContent = 'ほぞん できませんでした。 / Could not save.';
-        return;
-      }
-      if (window.BoohaSync) BoohaSync.checkpoint('juku');
-      rerender();
-    });
-
-    host.querySelector('#jtr-deny').addEventListener('click', event => {
-      const button = event.currentTarget;
-      if (!denyArmed) {
-        denyArmed = true;
-        button.textContent = 'ほんとうに？ / Are you sure?';
-        status.textContent =
-          'このクラスの点数はプロフィールに出ません。もう一度押してください。';
-        return;
-      }
-      button.disabled = true;
-      const now = Date.now();
-      const savedOk = J.patchWeek(w => {
-        w.finalReport = {
-          schema: 1,
-          status: 'denied',
-          curriculum,
-          slot: w.slot || (slot && slot.id) || null,
-          deniedAt: now
-        };
-      });
-      if (savedOk === null) {
-        button.disabled = false;
-        denyArmed = false;
-        button.textContent = 'この てんすうを みとめない';
-        status.textContent = 'ほぞん できませんでした。 / Could not save.';
-        return;
-      }
-      if (window.BoohaSync) BoohaSync.checkpoint('juku');
-      rerender();
-    });
-    syncApprove();
-  }
-
-  function wireTeacherReview(taskEl, res, slot) {
-    const host = taskEl.querySelector('#jtr-host');
-    if (!host) return;
-    const openRubric = () => {
-      const week = J.weekRecord().week;
-      renderTeacherRubric(host, week, slot, () => render(taskEl, res, slot));
-    };
-    host.querySelector('#jtr-open').addEventListener('click', () => {
-      if (teacherAuthorizedFor &&
-          teacherAuthorizedFor === currentStudentId()) openRubric();
-      else renderPinPanel(host, openRubric);
-    });
-  }
-
   function render(taskEl, res, slot) {
     const report = ensureReport(true);
     if (!report) {
@@ -631,7 +400,6 @@
         'けっかを つくる きろくが ありません。先生に かくにんしてください。 / No assessment evidence.';
       return;
     }
-    const { week } = J.weekRecord();
 
     if (report.invalidSession) {
       taskEl.innerHTML = `
@@ -643,27 +411,15 @@
       return;
     }
 
-    if (week.finalReport && week.finalReport.status === 'denied') {
-      taskEl.innerHTML = `<div class="juku-results">
-        ${teacherEntryHTML(week, slot)}
-        <p class="juku-res-note">レッスンの きろくは のこっていますが、
-          スコアつきレポートは つくられません。<br>
-          <span class="en">Lesson evidence was retained without issuing a scored report.</span></p>
-      </div>`;
-      return;
-    }
-
     const totalHTML = report.total === null
       ? `<p class="juku-res-total none">DEMO のため、てんすうは ありません</p>`
       
       : `<p class="juku-res-total">じどうチェック　<span class="pct">${report.total}%</span></p>`;
 
-    const finalized = week.finalReport && week.finalReport.status === 'approved';
-    const provisionalHTML = !finalized
+    const provisionalHTML = report.provisional
       ? `<p class="juku-res-provisional">これは じどうチェックの けっかです。<br>
           おんどく・やく・じぶんの文は、先生チェック後の週レポートに入ります。</p>`
-      : `<p class="juku-res-provisional final">先生が かくにんしました。
-          プロフィールに ほぞんされています。</p>`;
+      : '';
 
     const partialNote = report.partial
       ? `<p class="juku-res-note">※ ${report.excludedSections
@@ -696,16 +452,10 @@
         ${partialNote}
         <div class="juku-res-rows">${rows}</div>
         ${skillsHTML}
-        ${readingResultHTML({
-          complete: !!(week.teacherReview && week.teacherReview.reading &&
-            week.teacherReview.reading.complete),
-          observation: week.teacherReview && week.teacherReview.reading || null
-        })}
+        ${readingResultHTML(report.readingRound)}
         ${pvHTML}
         ${calibrationHTML(report.calibration, report.partial)}
-        ${teacherEntryHTML(week, slot)}
       </div>`;
-    wireTeacherReview(taskEl, res, slot);
   }
 
   // Closed screen: compute only with attendance evidence, display nothing.
@@ -713,15 +463,6 @@
     ensureReport(true);
   }
 
-  function renderClosedReview(taskEl, slot) {
-    const report = ensureReport(true);
-    if (!report) return false;
-    const { week } = J.weekRecord();
-    taskEl.innerHTML = teacherEntryHTML(week, slot);
-    wireTeacherReview(taskEl, { state: 'closed' }, slot);
-    return true;
-  }
-
-  window.JUKU_RESULTS = { render, finalize, renderClosedReview };
+  window.JUKU_RESULTS = { render, finalize };
 
 })();

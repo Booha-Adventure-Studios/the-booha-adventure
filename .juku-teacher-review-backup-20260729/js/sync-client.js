@@ -27,7 +27,6 @@ window.BoohaSync = (() => {
   const PUSH_URL   = `${BASE}/studentSavesPush`;
   const RESOLVE_URL = `${BASE}/studentSavesResolve`;
   const ARCHIVE_URL = `${BASE}/studentSaveRecoveryArchive`;
-  const TEACHER_AUTH_URL = `${BASE}/teacherPinVerify`;
 
   const KEY_TOKEN  = 'booha_token';
   const KEY_USERID = 'booha_userid';
@@ -406,28 +405,6 @@ window.BoohaSync = (() => {
       });
       return await res.json();
     } finally { clearTimeout(t); }
-  }
-
-  // Non-mutating teacher authorization for Juku report finalization. The PIN
-  // is sent once to Wix over HTTPS, never cached, logged, or written into
-  // either student blob. A successful response authorizes only the in-memory
-  // Juku review screen that made this call.
-  async function verifyTeacherPin(teacherPin, purpose) {
-    const pin = String(teacherPin || '').trim();
-    if (!pin || !token()) return { ok: false, reason: 'MISSING_CREDENTIALS' };
-    try {
-      const result = await post(TEACHER_AUTH_URL, {
-        token: token(),
-        teacherPin: pin,
-        purpose: purpose || 'juku-report-review'
-      });
-      return result && result.ok === true
-        ? { ok: true }
-        : { ok: false, reason: result && result.reason || 'PIN_REJECTED' };
-    } catch (e) {
-      console.error('[sync] teacher PIN verification unavailable:', e);
-      return { ok: false, reason: 'NETWORK_ERROR' };
-    }
   }
 
   /* ── screens ─────────────────────────────────────────── */
@@ -1487,7 +1464,6 @@ window.BoohaSync = (() => {
   return {
     checkpoint,
     markDirty,
-    verifyTeacherPin,
     get state()    { return _state; },
     get meta()     { return _meta; },
     get deviceId() { return deviceId(); },

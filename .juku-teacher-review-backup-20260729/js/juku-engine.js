@@ -281,7 +281,6 @@
         weekId: cw.weekId, weekStart: cw.weekStart, year: cw.year,
         occurrenceKey, monthSlug: cw.monthSlug, weekNumber: cw.weekNumber,
         slot: _slot ? _slot.id : null,
-        curriculum: _slot ? _slot.curriculum : null,
         survey: null, prediction: null,
         sections: {}, behavioral: {}, report: null
       };

@@ -775,9 +775,31 @@
   }
 
   // ── Reading round ────────────────────────────────────────
-  // The full 15 minutes remain reading time: no questions, typing, teacher
-  // PIN, or scoring UI. The teacher records the observation once during the
-  // final review, after the lesson evidence is complete.
+  // The full 15 minutes remain reading time: no questions, typing, or
+  // student button work. A compact teacher panel records one observed
+  // read on four stable dimensions; a blank dimension means not observed.
+
+  const READING_RUBRIC = [
+    { id: 'accuracy', jp: 'ことばの せいかくさ', en: 'Word accuracy' },
+    { id: 'selfCorrection', jp: 'じぶんで なおす', en: 'Self-correction' },
+    { id: 'phrasing', jp: 'いみの まとまり', en: 'Phrasing' },
+    { id: 'pace', jp: 'ききやすい はやさ', en: 'Pace' }
+  ];
+
+  function readingRubricHTML(saved) {
+    const scores = saved && saved.scores || {};
+    return READING_RUBRIC.map(row => `
+      <div class="juku-rubric-row">
+        <div class="juku-rubric-label">${row.jp}<span>${row.en}</span></div>
+        <div class="juku-rubric-opts">
+          ${[0, 1, 2, 3].map(score =>
+            `<button class="juku-rubric-opt ${scores[row.id] === score ? 'sel' : ''}"
+              data-dimension="${row.id}" data-score="${score}"
+              aria-label="${row.en} ${score}">${score}</button>`
+          ).join('')}
+        </div>
+      </div>`).join('');
+  }
 
   async function renderReading(taskEl, res, slot) {
     taskEl.innerHTML = `<p class="juku-paper">よみこみちゅう…</p>`;
@@ -794,14 +816,67 @@
         () => renderReading(taskEl, res, slot));
       return;
     }
+    const { week } = J.weekRecord();
+    const saved = week.teacherReview && week.teacherReview.reading;
+    const complete = !!(saved && saved.complete);
     taskEl.innerHTML = `
       <div class="juku-reading-round">
         <p class="juku-reading-instruction">📖 こえに だして、なんども よもう。</p>
         <p class="en">Read aloud. Read again for clear words, smooth phrases, and expression.</p>
         <div class="juku-reading-passage">${passage}</div>
-        <p class="juku-reading-wait">先生は クラスのあとで きろくします。<br>
-          <span class="en">Your teacher records the reading check after class.</span></p>
+        <button class="juku-teacher-check ${complete ? 'complete' : ''}" id="jr-open">
+          ${complete ? '✓ 先生チェック きろくずみ' : '先生チェックを ひらく'}
+        </button>
+        <div class="juku-rubric" id="jr-rubric" hidden>
+          <p class="juku-rubric-title">先生だけ / Teacher observation</p>
+          <p class="juku-rubric-scale">0 まだ　1 たすけあり　2 だいたい　3 ひとりでできた</p>
+          ${readingRubricHTML(saved)}
+          <p class="juku-rubric-done" id="jr-done">${
+            complete ? '✓ 4つ きろくしました' : '4つ えらぶと きろく かんりょう'
+          }</p>
+        </div>
       </div>`;
+
+    const open = taskEl.querySelector('#jr-open');
+    const rubric = taskEl.querySelector('#jr-rubric');
+    open.addEventListener('click', () => { rubric.hidden = !rubric.hidden; });
+    rubric.querySelectorAll('.juku-rubric-opt').forEach(button => {
+      button.addEventListener('click', () => {
+        const dimension = button.dataset.dimension;
+        const score = Number(button.dataset.score);
+        const savedOk = J.patchWeek(w => {
+          if (!w.teacherReview) w.teacherReview = {};
+          const prior = w.teacherReview.reading || {};
+          const scores = Object.assign({}, prior.scores || {});
+          scores[dimension] = score;
+          const isComplete = READING_RUBRIC.every(row =>
+            typeof scores[row.id] === 'number');
+          w.teacherReview.reading = {
+            mode: 'teacher-observed',
+            curriculum: slot.curriculum,
+            passageWeek: CFG.content.contentWeek(
+              window.CALENDAR.getCurrentCurriculumWeek()),
+            scores,
+            complete: isComplete,
+            updatedAt: Date.now(),
+            completedAt: isComplete ? (prior.completedAt || Date.now()) : null
+          };
+        });
+        if (savedOk === null) {
+          renderCommitFailed(taskEl, () => renderReading(taskEl, res, slot));
+          return;
+        }
+        rubric.querySelectorAll(`[data-dimension="${dimension}"]`)
+          .forEach(x => x.classList.toggle('sel', x === button));
+        const current = J.weekRecord().week.teacherReview.reading;
+        const done = taskEl.querySelector('#jr-done');
+        if (current.complete) {
+          done.textContent = '✓ 4つ きろくしました';
+          open.textContent = '✓ 先生チェック きろくずみ';
+          open.classList.add('complete');
+        }
+      });
+    });
   }
 
   // ── Vocab & Meaning Test ─────────────────────────────────

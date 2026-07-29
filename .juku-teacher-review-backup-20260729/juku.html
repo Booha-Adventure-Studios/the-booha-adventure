@@ -276,10 +276,6 @@
     color: #f2ecd8; font-size: clamp(17px, 4.4vw, 20px); line-height: 1.85;
     letter-spacing: .01em;
   }
-  .juku-reading-wait {
-    margin: 8px 0 0; text-align: center; color: #8a8069;
-    font-size: 12px; line-height: 1.55;
-  }
   .juku-teacher-check {
     display: block; margin: 12px auto 0; padding: 9px 16px; cursor: pointer;
     border: 1px solid #5a4e38; border-radius: 999px;
@@ -325,7 +321,6 @@
     margin: -12px 0 15px; text-align: center; color: #e8c46a;
     font-size: 12px; line-height: 1.5;
   }
-  .juku-res-provisional.final { color: #b9d977; }
   .juku-res-row { display: grid; grid-template-columns: 1fr auto; gap: 5px 12px;
     align-items: center; padding: 9px 0; }
   .juku-res-label { font-weight: 750; color: #e8dfc8; }
@@ -350,35 +345,6 @@
   .juku-res-flourish { margin: 9px 0 0; color: #b9d977; font-weight: 800; }
   .juku-res-invalid { padding: 18px; border-radius: 14px; text-align: center;
     color: #ffd0d0; background: rgba(176,0,32,.22); line-height: 1.7; }
-  .juku-teacher-final, .juku-final-status {
-    margin: 22px 0 4px; padding: 15px; border-radius: 14px; text-align: center;
-    border: 1px solid rgba(232,196,106,.35); background: rgba(232,196,106,.06);
-  }
-  .juku-teacher-final-title { margin: 0 0 3px; color: #e8c46a; font-weight: 850; }
-  .juku-teacher-entry, .juku-teacher-approve, .juku-teacher-deny {
-    appearance: none; cursor: pointer; border-radius: 10px;
-    padding: 11px 16px; font: 800 13px "DM Sans", "Hiragino Kaku Gothic ProN", sans-serif;
-  }
-  .juku-teacher-entry, .juku-teacher-approve {
-    margin-top: 11px; border: 0; color: #2a2005;
-    background: linear-gradient(160deg,#fff3c0,#e8c46a);
-  }
-  .juku-teacher-entry:disabled, .juku-teacher-approve:disabled { opacity: .45; }
-  .juku-teacher-pin {
-    display: block; width: min(100%, 240px); box-sizing: border-box;
-    margin: 12px auto 0; padding: 12px; border-radius: 10px;
-    border: 2px solid #5a4e38; background: rgba(0,0,0,.28);
-    color: #f2ecd8; text-align: center; font: 800 18px "DM Sans", sans-serif;
-  }
-  .juku-teacher-status { min-height: 1.5em; margin: 9px 0 0; color: #b8ac8f; font-size: 12px; }
-  .juku-teacher-student { margin: 5px 0 2px; color: #e8dfc8; font-weight: 800; }
-  .juku-teacher-class { margin: 0 0 10px; color: #b9d977; font-size: 13px; }
-  .juku-teacher-actions { display: flex; flex-direction: column; align-items: stretch; gap: 8px; }
-  .juku-teacher-deny {
-    border: 1px solid rgba(255,140,140,.5); color: #f0b0b0; background: transparent;
-  }
-  .juku-final-status.approved { color: #b9d977; border-color: rgba(185,217,119,.5); }
-  .juku-final-status.denied { color: #f0b0b0; border-color: rgba(255,140,140,.5); }
   @media (max-width: 390px) {
     .juku-rubric-row { grid-template-columns: 1fr; }
     .juku-rubric-opts { justify-content: center; }

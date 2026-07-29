@@ -34,17 +34,9 @@ document.dispatchEvent(new Event('booha:identityReady'));
 `;
 
 const SYNC_STUB = `
-window.BoohaSync = {
-  checkpoint: function () { return Promise.resolve(true); },
-  verifyTeacherPin: function (pin) {
-    return Promise.resolve({ ok: String(pin) === '2468',
-      reason: String(pin) === '2468' ? null : 'PIN_REJECTED' });
-  }
-};
+window.BoohaSync = { checkpoint: function () {} };
 window.BOOHA_SYNC_READY = true;
 document.dispatchEvent(new Event('booha:syncReady'));
-window.BOOHA_READY = true;
-document.dispatchEvent(new Event('booha:ready'));
 `;
 
 const RESULTS_PREVIEW = `
@@ -60,8 +52,12 @@ const RESULTS_PREVIEW = `
     week.contentStatus = { ready: true, manifest: 'preview.vocab.sentences.juku' };
     week.survey = { expect: '70-79', hardest: 'reading', submitted: true };
     week.prediction = { expect: '80-89', worst: 'dictation' };
-    week.teacherReview = {};
-    week.finalReport = null;
+    week.teacherReview = {
+      reading: {
+        mode: 'teacher-observed', complete: true,
+        scores: { accuracy: 3, selfCorrection: 2, phrasing: 2, pace: 3 }
+      }
+    };
     week.sections = {
       dictation: { total: 14, subTotals: { word: 8, sent: 6 }, items: [] },
       order: { total: 8, items: [] },
@@ -123,65 +119,6 @@ const DICTATION_PREVIEW = `
 })();
 </script>`;
 
-const PROFILE_PREVIEW = `
-<script>
-(function previewJukuProfile() {
-  if (!(window.JUKU && window.BOOHA_READY)) {
-    setTimeout(previewJukuProfile, 50);
-    return;
-  }
-  localStorage.setItem('booha_userid', 'preview-profile');
-  localStorage.setItem('booha_is_juku', '1');
-  localStorage.setItem('booha_user_name', 'Preview Student');
-  var key = JUKU.saveKey();
-  var scores = {
-    listeningWords: { missing:false, correct:7, total:8, percent:88 },
-    listeningSentences: { missing:false, correct:4, total:6, percent:67 },
-    sentenceOrder: { missing:false, correct:7, total:8, percent:88 },
-    vocabMeaning: { missing:false, correct:7, total:8, percent:88 },
-    vocabDefinition: { missing:false, correct:5, total:7, percent:71 },
-    readingComprehension: { missing:false, correct:4, total:4, percent:100 },
-    spellingBuild: { missing:false, correct:1, total:1, percent:100 }
-  };
-  var week = {
-    weekId:'july-w4', weekStart:'2026-07-26', weekNumber:4,
-    slot:'slot-b', curriculum:'br',
-    sections:{
-      mixed:{items:[
-        {kind:'translate',reviewOnly:true,ans:'Meanwhile Booha looked for the door'},
-        {kind:'openWriting',reviewOnly:true,
-          ans:'Suddenly Booha heard a sound. Finally, he found Mimo.',
-          targetsRequired:['suddenly','finally'],targetsUsed:['suddenly','finally']}
-      ]}
-    },
-    teacherReview:{reading:{complete:true,
-      scores:{accuracy:3,selfCorrection:2,phrasing:2,pace:3}}},
-    report:{
-      total:86,
-      sections:{
-        dictation:{correct:11,total:14,percent:79},
-        order:{correct:7,total:8,percent:88},
-        vocab:{correct:12,total:15,percent:80},
-        mixed:{correct:5,total:5,percent:100}
-      },
-      skills:scores,
-      proveIt:{correct:1,total:1},
-      calibration:{after:'80-89',actual:86}
-    },
-    finalReport:{schema:1,status:'approved',curriculum:'br',
-      slot:'slot-b',approvedAt:Date.now()}
-  };
-  var denied = {
-    weekId:'july-w3', weekStart:'2026-07-19', weekNumber:3,
-    slot:'slot-a', curriculum:'pb', report:{total:72},
-    finalReport:{schema:1,status:'denied',curriculum:'pb',
-      slot:'slot-a',deniedAt:Date.now()-1000}
-  };
-  localStorage.setItem(key, JSON.stringify({v:1,weeks:{preview:week,denied:denied}}));
-  document.dispatchEvent(new Event('juku:saved'));
-})();
-</script>`;
-
 http.createServer((req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
   let pathname = decodeURIComponent(url.pathname);
@@ -204,16 +141,6 @@ http.createServer((req, res) => {
       : mode === 'dictation' ? DICTATION_PREVIEW : READING_PREVIEW;
     const html = fs.readFileSync(path.join(WORK, 'juku.html'), 'utf8')
       .replace('</body>', preview + '\n</body>');
-    res.writeHead(200, {
-      'Content-Type': MIME['.html'],
-      'Cache-Control': 'no-store'
-    });
-    res.end(html);
-    return;
-  }
-  if (pathname === '/profile.html' && url.searchParams.get('preview') === 'juku') {
-    const html = fs.readFileSync(path.join(WORK, 'profile.html'), 'utf8')
-      .replace('</body>', PROFILE_PREVIEW + '\n</body>');
     res.writeHead(200, {
       'Content-Type': MIME['.html'],
       'Cache-Control': 'no-store'

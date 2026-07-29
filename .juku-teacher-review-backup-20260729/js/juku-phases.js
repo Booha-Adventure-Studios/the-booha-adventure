@@ -394,14 +394,9 @@ function renderLobby(res, slot) {
         <h1>きょうは おしまい</h1>
         <p class="en">Finished for today</p>
         <p class="juku-sub">おつかれさま。また らいしゅう！</p>
-        <div class="juku-task" id="juku-closed-review"></div>
         <button class="juku-back-btn" id="juku-slot-back">もどる</button>
         ${navFooter()}
       </div>`;
-    if (window.JUKU_RESULTS && window.JUKU_RESULTS.renderClosedReview) {
-      window.JUKU_RESULTS.renderClosedReview(
-        document.getElementById('juku-closed-review'), slot);
-    }
     wireBack();
   }
 

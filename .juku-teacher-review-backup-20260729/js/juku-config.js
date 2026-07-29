@@ -20,13 +20,6 @@ window.JUKU_CONFIG = {
   // How many minutes before start the lobby (survey) opens.
   lobbyOpenMin: 5,
 
-  // Teacher authorization is verified server-side by sync-client.js. The PIN
-  // is never stored in config, localStorage, the report, or sync metadata.
-  teacherReview: {
-    purpose: 'juku-report-review',
-    readingScale: [0, 1, 2, 3]
-  },
-
   // ── Content wiring ───────────────────────────────────────
   content: {
     // Production sessions fail closed if real content is unavailable.

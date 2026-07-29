@@ -18,15 +18,11 @@ Game activity is never learning evidence and never changes a score.
 - Productive spelling is open typing for Boo-riculum.
 - Each July Boo-riculum week has one 1–3 sentence writing prompt using two
   named weekly targets.
-- The reading round shows the real weekly passage and no questions or teacher
-  controls.
-- The final screen is labeled as an automatic summary. A one-time teacher PIN
-  unlocks reading review and final report approval after class.
-- Approval writes the reading rubric and final-report status only into the
-  student's cloud-synced Juku save. Denial requires a second confirmation and
-  produces no scored report.
-- Finalized and denied reports are visible in the student's profile. No
-  separate teacher copy is created.
+- The reading round shows the real weekly passage and no questions. A hidden
+  teacher panel records four 0–3 observations.
+- The final screen is labeled as an automatic summary and clearly identifies
+  teacher-reviewed evidence. Raw responses remain in the weekly record for
+  the later weekly report.
 
 ## Recommended 90-minute structure
 
@@ -117,14 +113,12 @@ Suggested classroom flow:
 
 1. Everyone rehearses the weekly passage quietly or in a whisper.
 2. Each student reads aloud to the teacher for 60–90 seconds.
-3. The teacher observes four dimensions:
+3. The teacher records four taps per student:
    - word accuracy
    - decoding/self-correction
    - phrasing
    - smoothness/pace
 4. Students continue reading while waiting for their turn.
-5. At the end of class, the teacher enters one PIN and records the four
-   observations while finalizing that student's report.
 
 Use a 0–3 rubric for each dimension. Avoid automatic speech recognition for
 the initial launch: children's voices, Japanese accents, room noise, and
@@ -152,40 +146,6 @@ The teacher rubric should live separately from the immutable automatic result:
   }
 }
 ```
-
-## Teacher authorization and report lifecycle
-
-The browser must never contain the teacher PIN or a reusable PIN hash.
-`sync-client.js` sends the entered PIN over HTTPS to:
-
-`POST /_functions/teacherPinVerify`
-
-Request:
-
-```json
-{
-  "token": "student-session-token",
-  "teacherPin": "entered-once",
-  "purpose": "juku-report-review"
-}
-```
-
-Response is `{ "ok": true }` or `{ "ok": false, "reason": "PIN_REJECTED" }`.
-The endpoint is non-mutating. It should validate the student token, apply rate
-limits, compare the PIN server-side, and return no teacher identity or secret.
-
-After success, authorization exists only in page memory and disappears when
-the page closes. The PIN is cleared from the input immediately.
-
-Final report states:
-
-- no `finalReport`: provisional automatic result; profile report not generated
-- `approved`: reading rubric saved and scored report visible in the profile
-- `denied`: raw lesson evidence retained, but profile shows “No score”
-
-The review screen freezes and displays the selected slot and curriculum before
-approval. This is the teacher's check against a Juku student entering the wrong
-curriculum.
 
 ## Completion games
 
