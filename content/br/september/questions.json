@@ -1,1 +1,424 @@
-
+{
+  "cards": [
+    {
+      "n": 1,
+      "en": "What’s this?",
+      "jp": "これは何ですか。",
+      "hira": "これ は なん です か",
+      "mp3": "br_q01_whats_this.mp3"
+    },
+    {
+      "n": 2,
+      "en": "May I use your ruler?",
+      "jp": "あなたの定規を使ってもいいですか。",
+      "hira": "あなた の じょうぎ を つかって も いい です か",
+      "mp3": "br_q02_may_i_use_your_ruler.mp3"
+    },
+    {
+      "n": 3,
+      "en": "Where is the trash can?",
+      "jp": "ゴミ箱はどこですか。",
+      "hira": "ごみばこ は どこ です か",
+      "mp3": "br_q03_where_is_the_trash_can.mp3"
+    },
+    {
+      "n": 4,
+      "en": "What do we do before speaking?",
+      "jp": "話す前に何をしますか。",
+      "hira": "はなす まえ に なに を し ます か",
+      "mp3": "br_q04_what_do_we_do_before_speaking.mp3"
+    },
+    {
+      "n": 5,
+      "en": "What must we bring to class?",
+      "jp": "授業に何を持って来なければなりませんか。",
+      "hira": "じゅぎょう に なに を もって こなければ なり ません か",
+      "mp3": "br_q05_what_must_we_bring_to_class.mp3"
+    },
+    {
+      "n": 6,
+      "en": "What mustn’t we do?",
+      "jp": "してはいけないことは何ですか。",
+      "hira": "して は いけない こと は なん です か",
+      "mp3": "br_q06_what_mustnt_we_do.mp3"
+    },
+    {
+      "n": 7,
+      "en": "Can you show me your pencil case?",
+      "jp": "あなたの筆箱を見せてくれますか。",
+      "hira": "あなた の ふでばこ を みせて くれ ます か",
+      "mp3": "br_q07_can_you_show_me_your_pencil_case.mp3"
+    },
+    {
+      "n": 8,
+      "en": "Where do we keep textbooks?",
+      "jp": "教科書はどこに置きますか。",
+      "hira": "きょうかしょ は どこ に おき ます か",
+      "mp3": "br_q08_where_do_we_keep_textbooks.mp3"
+    },
+    {
+      "n": 9,
+      "en": "How do we line up?",
+      "jp": "どうやって並びますか。",
+      "hira": "どうやって ならび ます か",
+      "mp3": "br_q09_how_do_we_line_up.mp3"
+    },
+    {
+      "n": 10,
+      "en": "Can I borrow scissors?",
+      "jp": "はさみを借りてもいいですか。",
+      "hira": "はさみ を かりても いい です か",
+      "mp3": "br_q10_can_i_borrow_scissors.mp3"
+    },
+    {
+      "n": 11,
+      "en": "What is on the board today?",
+      "jp": "今日の板書は何ですか。",
+      "hira": "きょう の ばんしょ は なん です か",
+      "mp3": "br_q11_what_is_on_the_board_today.mp3"
+    },
+    {
+      "n": 12,
+      "en": "Do we use computers in class?",
+      "jp": "授業でコンピューターを使いますか。",
+      "hira": "じゅぎょう で こんぴゅーたー を つかい ます か",
+      "mp3": "br_q12_do_we_use_computers_in_class.mp3"
+    },
+    {
+      "n": 13,
+      "en": "Where is your locker?",
+      "jp": "あなたのロッカーはどこですか。",
+      "hira": "あなた の ろっかー は どこ です か",
+      "mp3": "br_q13_where_is_your_locker.mp3"
+    },
+    {
+      "n": 14,
+      "en": "Can we share the glue?",
+      "jp": "のりをいっしょに使ってもいいですか。",
+      "hira": "のり を いっしょ に つかって も いい です か",
+      "mp3": "br_q14_can_we_share_the_glue.mp3"
+    },
+    {
+      "n": 15,
+      "en": "Which classroom rule do you think is important?",
+      "jp": "どの教室のルールが大切だと思いますか。",
+      "hira": "どの きょうしつ の るーる が たいせつ だ と おもいます か",
+      "mp3": "br_q15_which_classroom_rule_do_you_think_is_important.mp3"
+    },
+    {
+      "n": 16,
+      "en": "What subjects do you have on Monday?",
+      "jp": "月曜日にはどんな教科がありますか。",
+      "hira": "げつようび に は どんな きょうか が あり ます か",
+      "mp3": "br_q16_what_subjects_do_you_have_on_monday.mp3"
+    },
+    {
+      "n": 17,
+      "en": "What’s your favorite subject?",
+      "jp": "一番好きな教科は何ですか。",
+      "hira": "いちばん すき な きょうか は なん です か",
+      "mp3": "br_q17_whats_your_favorite_subject.mp3"
+    },
+    {
+      "n": 18,
+      "en": "What subject are you good at?",
+      "jp": "どの教科が得意ですか。",
+      "hira": "どの きょうか が とくい です か",
+      "mp3": "br_q18_what_subject_are_you_good_at.mp3"
+    },
+    {
+      "n": 19,
+      "en": "Which subject is difficult?",
+      "jp": "どの教科がむずかしいですか。",
+      "hira": "どの きょうか が むずかしい です か",
+      "mp3": "br_q19_which_subject_is_difficult.mp3"
+    },
+    {
+      "n": 20,
+      "en": "Do you like PE?",
+      "jp": "体育は好きですか。",
+      "hira": "たいいく は すき です か",
+      "mp3": "br_q20_do_you_like_pe.mp3"
+    },
+    {
+      "n": 21,
+      "en": "What do you do in science class?",
+      "jp": "理科の授業で何をしますか。",
+      "hira": "りか の じゅぎょう で なに を し ます か",
+      "mp3": "br_q21_what_do_you_do_in_science_class.mp3"
+    },
+    {
+      "n": 22,
+      "en": "Do you use computers in ICT?",
+      "jp": "情報の授業でコンピューターを使いますか。",
+      "hira": "じょうほう の じゅぎょう で こんぴゅーたー を つかいます か",
+      "mp3": "br_q22_do_you_use_computers_in_ict.mp3"
+    },
+    {
+      "n": 23,
+      "en": "What do you learn in social studies?",
+      "jp": "社会の授業では何を学びますか。",
+      "hira": "しゃかい の じゅぎょう で は なに を まなび ます か",
+      "mp3": "br_q23_what_do_you_learn_in_social_studies.mp3"
+    },
+    {
+      "n": 24,
+      "en": "When is your music class?",
+      "jp": "音楽の授業はいつですか。",
+      "hira": "おんがく の じゅぎょう は いつ です か",
+      "mp3": "br_q24_when_is_your_music_class.mp3"
+    },
+    {
+      "n": 25,
+      "en": "Do you have club activities?",
+      "jp": "部活動はありますか。",
+      "hira": "ぶかつどう は あり ます か",
+      "mp3": "br_q25_do_you_have_club_activities.mp3"
+    },
+    {
+      "n": 26,
+      "en": "What do you make in home economics?",
+      "jp": "家庭科で何を作りますか。",
+      "hira": "かていか で なに を つくり ます か",
+      "mp3": "br_q26_what_do_you_make_in_home_economics.mp3"
+    },
+    {
+      "n": 27,
+      "en": "How do you study English?",
+      "jp": "英語はどうやって勉強しますか。",
+      "hira": "えいご は どうやって べんきょう し ます か",
+      "mp3": "br_q27_how_do_you_study_english.mp3"
+    },
+    {
+      "n": 28,
+      "en": "Which is more fun, art or music?",
+      "jp": "美術と音楽ではどちらが楽しいですか。",
+      "hira": "びじゅつ と おんがく では どちら が たのしい です か",
+      "mp3": "br_q28_which_is_more_fun_art_or_music.mp3"
+    },
+    {
+      "n": 29,
+      "en": "What subject do you want to improve?",
+      "jp": "どの教科をのばしたいですか。",
+      "hira": "どの きょうか を のばしたい です か",
+      "mp3": "br_q29_what_subject_do_you_want_to_improve.mp3"
+    },
+    {
+      "n": 30,
+      "en": "Why do you like that subject?",
+      "jp": "なぜその教科が好きですか。",
+      "hira": "なぜ その きょうか が すき です か",
+      "mp3": "br_q30_why_do_you_like_that_subject.mp3"
+    },
+    {
+      "n": 31,
+      "en": "Who helps you at school?",
+      "jp": "学校ではだれがあなたを助けてくれますか。",
+      "hira": "がっこう では だれ が あなた を たすけて くれます か",
+      "mp3": "br_q31_who_helps_you_at_school.mp3"
+    },
+    {
+      "n": 32,
+      "en": "Where is the nurse’s office?",
+      "jp": "保健室はどこですか。",
+      "hira": "ほけんしつ は どこ です か",
+      "mp3": "br_q32_where_is_the_nurses_office.mp3"
+    },
+    {
+      "n": 33,
+      "en": "What does the librarian do?",
+      "jp": "司書は何をしますか。",
+      "hira": "ししょ は なに を し ます か",
+      "mp3": "br_q33_what_does_the_librarian_do.mp3"
+    },
+    {
+      "n": 34,
+      "en": "Who is your club advisor?",
+      "jp": "あなたの部活の顧問はだれですか。",
+      "hira": "あなた の ぶかつ の こもん は だれ です か",
+      "mp3": "br_q34_who_is_your_club_advisor.mp3"
+    },
+    {
+      "n": 35,
+      "en": "How do you ask for help in English?",
+      "jp": "英語でどうやって助けを求めますか。",
+      "hira": "えいご で どうやって たすけ を もとめます か",
+      "mp3": "br_q35_how_do_you_ask_for_help_in_english.mp3"
+    },
+    {
+      "n": 36,
+      "en": "Who keeps the school clean?",
+      "jp": "学校をきれいに保つのはだれですか。",
+      "hira": "がっこう を きれい に たもつ の は だれ です か",
+      "mp3": "br_q36_who_keeps_the_school_clean.mp3"
+    },
+    {
+      "n": 37,
+      "en": "What does your coach teach?",
+      "jp": "あなたのコーチは何を教えますか。",
+      "hira": "あなた の こーち は なに を おしえ ます か",
+      "mp3": "br_q37_what_does_your_coach_teach.mp3"
+    },
+    {
+      "n": 38,
+      "en": "Who is your best friend in class?",
+      "jp": "クラスで一番仲の良い友達はだれですか。",
+      "hira": "くらす で いちばん なか の よい ともだち は だれ です か",
+      "mp3": "br_q38_who_is_your_best_friend_in_class.mp3"
+    },
+    {
+      "n": 39,
+      "en": "Do you help underclassmen?",
+      "jp": "後輩を助けますか。",
+      "hira": "こうはい を たすけ ます か",
+      "mp3": "br_q39_do_you_help_underclassmen.mp3"
+    },
+    {
+      "n": 40,
+      "en": "Who will you thank today?",
+      "jp": "今日はだれに感謝しますか。",
+      "hira": "きょう は だれ に かんしゃ します か",
+      "mp3": "br_q40_who_will_you_thank_today.mp3"
+    },
+    {
+      "n": 41,
+      "en": "Where is the principal’s office?",
+      "jp": "校長室はどこですか。",
+      "hira": "こうちょうしつ は どこ です か",
+      "mp3": "br_q41_where_is_the_principals_office.mp3"
+    },
+    {
+      "n": 42,
+      "en": "Can I talk to the counselor now?",
+      "jp": "今、カウンセラーと話せますか。",
+      "hira": "いま、 かうんせらー と はなせ ます か",
+      "mp3": "br_q42_can_i_talk_to_the_counselor_now.mp3"
+    },
+    {
+      "n": 43,
+      "en": "Who checks attendance?",
+      "jp": "出欠を確認するのはだれですか。",
+      "hira": "しゅっけつ を かくにん する の は だれ です か",
+      "mp3": "br_q43_who_checks_attendance.mp3"
+    },
+    {
+      "n": 44,
+      "en": "How do you greet teachers?",
+      "jp": "先生にはどうあいさつしますか。",
+      "hira": "せんせい に は どう あいさつ し ます か",
+      "mp3": "br_q44_how_do_you_greet_teachers.mp3"
+    },
+    {
+      "n": 45,
+      "en": "Who will you ask if you are lost?",
+      "jp": "道に迷ったらだれに聞きますか。",
+      "hira": "みち に まよったら だれ に きき ます か",
+      "mp3": "br_q45_who_will_you_ask_if_you_are_lost.mp3"
+    },
+    {
+      "n": 46,
+      "en": "What time does school start?",
+      "jp": "学校は何時に始まりますか。",
+      "hira": "がっこう は なんじ に はじまり ます か",
+      "mp3": "br_q46_what_time_does_school_start.mp3"
+    },
+    {
+      "n": 47,
+      "en": "How many periods do you have today?",
+      "jp": "今日は何時間ありますか。",
+      "hira": "きょう は なん じかん あり ます か",
+      "mp3": "br_q47_how_many_periods_do_you_have_today.mp3"
+    },
+    {
+      "n": 48,
+      "en": "When is lunch break?",
+      "jp": "昼休みはいつですか。",
+      "hira": "ひるやすみ は いつ です か",
+      "mp3": "br_q48_when_is_lunch_break.mp3"
+    },
+    {
+      "n": 49,
+      "en": "What do you do before school?",
+      "jp": "登校前に何をしますか。",
+      "hira": "とうこう まえ に なに を し ます か",
+      "mp3": "br_q49_what_do_you_do_before_school.mp3"
+    },
+    {
+      "n": 50,
+      "en": "What do you do after school?",
+      "jp": "放課後に何をしますか。",
+      "hira": "ほうかご に なに を し ます か",
+      "mp3": "br_q50_what_do_you_do_after_school.mp3"
+    },
+    {
+      "n": 51,
+      "en": "When is your English class?",
+      "jp": "英語の授業はいつですか。",
+      "hira": "えいご の じゅぎょう は いつ です か",
+      "mp3": "br_q51_when_is_your_english_class.mp3"
+    },
+    {
+      "n": 52,
+      "en": "What day is the assembly?",
+      "jp": "全校集会は何曜日ですか。",
+      "hira": "ぜんこう しゅうかい は なんようび です か",
+      "mp3": "br_q52_what_day_is_the_assembly.mp3"
+    },
+    {
+      "n": 53,
+      "en": "Do you have club activities today?",
+      "jp": "今日は部活動がありますか。",
+      "hira": "きょう は ぶかつどう が あり ます か",
+      "mp3": "br_q53_do_you_have_club_activities_today.mp3"
+    },
+    {
+      "n": 54,
+      "en": "When do classes finish?",
+      "jp": "授業はいつ終わりますか。",
+      "hira": "じゅぎょう は いつ おわり ます か",
+      "mp3": "br_q54_when_do_classes_finish.mp3"
+    },
+    {
+      "n": 55,
+      "en": "Are you on time for class?",
+      "jp": "授業には時間どおりに来ますか。",
+      "hira": "じゅぎょう には じかんどおり に きます か",
+      "mp3": "br_q55_are_you_on_time_for_class.mp3"
+    },
+    {
+      "n": 56,
+      "en": "What time is the test?",
+      "jp": "テストは何時ですか。",
+      "hira": "てすと は なんじ です か",
+      "mp3": "br_q56_what_time_is_the_test.mp3"
+    },
+    {
+      "n": 57,
+      "en": "How long is each period?",
+      "jp": "一時限はどのくらいの長さですか。",
+      "hira": "いち じげん は どの くらい の ながさ です か",
+      "mp3": "br_q57_how_long_is_each_period.mp3"
+    },
+    {
+      "n": 58,
+      "en": "Do you like your timetable?",
+      "jp": "あなたの時間割は好きですか。",
+      "hira": "あなた の じかんわり は すき です か",
+      "mp3": "br_q58_do_you_like_your_timetable.mp3"
+    },
+    {
+      "n": 59,
+      "en": "When is the parent meeting?",
+      "jp": "保護者会はいつですか。",
+      "hira": "ほごしゃ かい は いつ です か",
+      "mp3": "br_q59_when_is_the_parent_meeting.mp3"
+    },
+    {
+      "n": 60,
+      "en": "Can you read the schedule in English?",
+      "jp": "英語で書かれた予定表を読めますか。",
+      "hira": "えいご で かかれた よていひょう を よめます か",
+      "mp3": "br_q60_can_you_read_the_schedule_in_english.mp3"
+    }
+  ]
+}
