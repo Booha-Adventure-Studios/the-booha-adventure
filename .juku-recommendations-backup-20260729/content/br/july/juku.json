@@ -16,12 +16,6 @@
             "choices": ["the prince", "the wolf", "the dragon", "the giant"], "correct": 2 }
         ]
       },
-      "writingPrompt": {
-        "id": "jul-br-w1-writing",
-        "jp": "hero と villain を つかって、1〜3ぶんの ものがたりを かいてね。",
-        "en": "Write 1–3 sentences using hero and villain.",
-        "targets": ["hero", "villain"]
-      },
       "definitions": [
         { "n": 1, "def": "a story, especially one that may not be true", "pos": "noun" },
         { "n": 2, "def": "a brave main character who helps others", "pos": "noun" },
@@ -55,17 +49,14 @@
         { "n": 4, "type": "translate",
           "jp": "おうじは たからものを さがす ぼうけんを はじめます。",
           "en": "The prince begins a quest to find the treasure",
-          "accepted": ["The prince starts a quest to find the treasure"],
           "extra": ["castle", "began"] },
         { "n": 5, "type": "translate",
           "jp": "その どらごんは あくやくでは ありません。",
           "en": "The dragon is not a villain",
-          "accepted": ["That dragon is not a villain", "The dragon isn't a villain"],
           "extra": ["hero", "are"] },
         { "n": 6, "type": "translate",
           "jp": "まじょは もりで まほうを つかいます。",
           "en": "The witch uses magic in the forest",
-          "accepted": ["The witch uses her magic in the forest"],
           "extra": ["castle", "use"] },
         { "n": 7, "type": "write", "jp": "悪役", "en": "villain" },
         { "n": 8, "type": "write", "jp": "呪文", "en": "spell" },
@@ -84,12 +75,6 @@
           { "n": 3, "q": "What is the moral of the final story?",
             "choices": ["Never enter an empty school", "Always write a long plot", "Helping strangers is important", "Every conflict needs magic"], "correct": 2 }
         ]
-      },
-      "writingPrompt": {
-        "id": "jul-br-w2-writing",
-        "jp": "setting と conflict を つかって、1〜3ぶんの ものがたりを かいてね。",
-        "en": "Write 1–3 sentences using setting and conflict.",
-        "targets": ["setting", "conflict"]
       },
       "definitions": [
         { "n": 16, "def": "the connected events that make up a story", "pos": "noun" },
@@ -124,17 +109,14 @@
         { "n": 4, "type": "translate",
           "jp": "この ものがたりの せっていは からすきです。",
           "en": "The setting of this tale is Karasuki",
-          "accepted": ["The setting of this story is Karasuki", "This tale is set in Karasuki"],
           "extra": ["scene", "are"] },
         { "n": 5, "type": "translate",
           "jp": "かたりては とうじょうじんぶつを しょうかいします。",
           "en": "The narrator introduces the character",
-          "accepted": ["The narrator introduces a character"],
           "extra": ["dialogue", "introduce"] },
         { "n": 6, "type": "translate",
           "jp": "わたしは したがきの けつまつを へんしゅうしました。",
           "en": "I edited the ending of my draft",
-          "accepted": ["I edited my draft's ending", "I edited the ending in my draft"],
           "extra": ["edit", "chapter"] },
         { "n": 7, "type": "write", "jp": "設定", "en": "setting" },
         { "n": 8, "type": "write", "jp": "対立", "en": "conflict" },
@@ -153,12 +135,6 @@
           { "n": 3, "q": "How do Nuppi and Mimo pass the creature?",
             "choices": ["Nuppi fights it", "Mimo uses a clever plan", "The creature becomes friendly", "They run back home"], "correct": 1 }
         ]
-      },
-      "writingPrompt": {
-        "id": "jul-br-w3-writing",
-        "jp": "goal と promise を つかって、1〜3ぶんの ものがたりを かいてね。",
-        "en": "Write 1–3 sentences using goal and promise.",
-        "targets": ["goal", "promise"]
       },
       "definitions": [
         { "n": 31, "def": "the qualities that make a person behave in a certain way", "pos": "noun" },
@@ -193,17 +169,14 @@
         { "n": 4, "type": "translate",
           "jp": "かれは はずかしがりやですが、とても ふれんどりーです。",
           "en": "He is shy but very friendly",
-          "accepted": ["He is very friendly but shy"],
           "extra": ["brave", "are"] },
         { "n": 5, "type": "translate",
           "jp": "ぬっぴの もくひょうは ひみつを みつけることです。",
           "en": "Nuppi's goal is to discover the secret",
-          "accepted": ["Nuppi's goal is discovering the secret"],
           "extra": ["fear", "finds"] },
         { "n": 6, "type": "translate",
           "jp": "わたしたちは やくそくを まもりました。",
           "en": "We kept our promise",
-          "accepted": ["We kept the promise"],
           "extra": ["keep", "power"] },
         { "n": 7, "type": "write", "jp": "性格", "en": "personality" },
         { "n": 8, "type": "write", "jp": "賢い", "en": "clever" },
@@ -222,12 +195,6 @@
           { "n": 3, "q": "Why is the ending a cliffhanger?",
             "choices": ["The mystery is not solved", "Booha returns home", "The shadow explains everything", "The chapter has no climax"], "correct": 0 }
         ]
-      },
-      "writingPrompt": {
-        "id": "jul-br-w4-writing",
-        "jp": "suddenly と finally を つかって、1〜3ぶんの ものがたりを かいてね。",
-        "en": "Write 1–3 sentences using suddenly and finally.",
-        "targets": ["suddenly", "finally"]
       },
       "definitions": [
         { "n": 46, "def": "a traditional phrase used to begin a story", "pos": "phrase" },
@@ -262,17 +229,14 @@
         { "n": 4, "type": "translate",
           "jp": "とつぜん、おおきな おとが きこえました。",
           "en": "Suddenly I heard a loud sound",
-          "accepted": ["I suddenly heard a loud sound", "Suddenly I heard a big sound"],
           "extra": ["quiet", "hear"] },
         { "n": 5, "type": "translate",
           "jp": "そのあいだに、ぶーはーは どあを さがしました。",
           "en": "Meanwhile Booha searched for the door",
-          "accepted": ["Meanwhile Booha looked for the door"],
           "extra": ["searches", "because"] },
         { "n": 6, "type": "translate",
           "jp": "さいごに、ものがたりは くりふはんがーで おわります。",
           "en": "Finally the tale ends with a cliffhanger",
-          "accepted": ["Finally the story ends with a cliffhanger"],
           "extra": ["ending", "end"] },
         { "n": 7, "type": "write", "jp": "突然", "en": "suddenly" },
         { "n": 8, "type": "write", "jp": "最後に", "en": "finally" },

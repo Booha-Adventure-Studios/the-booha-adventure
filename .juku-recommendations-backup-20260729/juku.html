@@ -243,17 +243,6 @@
   .juku-item-word { font-size: 1.6em; font-weight: 700; margin: 8px 0; }
   .juku-item-def { line-height: 1.6; margin: 8px 0; }
   .juku-item-q { opacity: .9; margin: 4px 0 8px; }
-  .juku-open-response {
-    display: block; box-sizing: border-box; width: 100%; margin: 12px 0 8px;
-    padding: 13px 14px; border: 2px solid #5a4e38; border-radius: 12px;
-    background: rgba(0,0,0,.28); color: #f2ecd8;
-    font: 600 17px/1.55 "DM Sans", "Hiragino Kaku Gothic ProN", sans-serif;
-    resize: vertical; outline: none;
-  }
-  .juku-open-response:focus {
-    border-color: #e8c46a; box-shadow: 0 0 0 3px rgba(232,196,106,.12);
-  }
-  .juku-open-response::placeholder { color: #6f684f; }
   .juku-chip.letter { min-width: 2.1em; text-align: center; }
   .juku-preflight {
     margin: 14px auto 0; padding: 9px 12px; max-width: 420px;
@@ -263,64 +252,11 @@
   .juku-preflight.ready { color: #b9d977; background: rgba(185,217,119,.08); }
   .juku-preflight.failed { color: #ffd0d0; background: rgba(176,0,32,.25); }
 
-  /* ── reading round + teacher observation ── */
-  .juku-reading-round { text-align: left; }
-  .juku-reading-instruction {
-    margin: 0 0 2px; text-align: center; font-size: 16px; font-weight: 800;
-    color: #e8c46a;
-  }
-  .juku-reading-round > .en { display: block; text-align: center; line-height: 1.5; }
-  .juku-reading-passage {
-    margin: 14px 0; padding: 17px 18px; border-radius: 14px;
-    background: rgba(255,255,255,.055); border: 1px solid #4a4030;
-    color: #f2ecd8; font-size: clamp(17px, 4.4vw, 20px); line-height: 1.85;
-    letter-spacing: .01em;
-  }
-  .juku-teacher-check {
-    display: block; margin: 12px auto 0; padding: 9px 16px; cursor: pointer;
-    border: 1px solid #5a4e38; border-radius: 999px;
-    background: transparent; color: #8a8069;
-    font: 700 12px "DM Sans", "Hiragino Kaku Gothic ProN", sans-serif;
-  }
-  .juku-teacher-check.complete { color: #b9d977; border-color: rgba(185,217,119,.5); }
-  .juku-rubric {
-    margin-top: 12px; padding: 14px; border-radius: 14px;
-    background: #232013; border: 1px solid rgba(232,196,106,.3);
-  }
-  .juku-rubric[hidden] { display: none; }
-  .juku-rubric-title { margin: 0; text-align: center; font-weight: 800; color: #e8c46a; }
-  .juku-rubric-scale {
-    margin: 4px 0 12px; text-align: center; color: #8a8069;
-    font-size: 11px; line-height: 1.55;
-  }
-  .juku-rubric-row {
-    display: grid; grid-template-columns: minmax(120px, 1fr) auto;
-    gap: 10px; align-items: center; padding: 7px 0;
-    border-top: 1px solid rgba(255,255,255,.06);
-  }
-  .juku-rubric-label { font-size: 13px; font-weight: 700; color: #e8dfc8; }
-  .juku-rubric-label span { display: block; font-size: 10px; font-weight: 500; color: #6f684f; }
-  .juku-rubric-opts { display: flex; gap: 5px; }
-  .juku-rubric-opt {
-    width: 34px; height: 34px; padding: 0; cursor: pointer; border-radius: 50%;
-    border: 1px solid #5a4e38; background: rgba(255,255,255,.05);
-    color: #b8ac8f; font: 800 13px "DM Sans", sans-serif;
-  }
-  .juku-rubric-opt.sel {
-    color: #2a2005; border-color: #e8c46a;
-    background: linear-gradient(160deg,#fff3c0,#e8c46a);
-  }
-  .juku-rubric-done { margin: 9px 0 0; text-align: center; color: #b9d977; font-size: 12px; }
-
   /* ── results and detailed skill evidence ── */
   .juku-results { width: min(100%, 560px); margin: 0 auto; text-align: left; }
   .juku-res-total { text-align: center; font-size: 20px; color: #e8dfc8; margin: 0 0 18px; }
   .juku-res-total .pct { font-size: 42px; font-weight: 900; color: #e8c46a; }
   .juku-res-total.none { font-size: 16px; color: #f0b0b0; }
-  .juku-res-provisional {
-    margin: -12px 0 15px; text-align: center; color: #e8c46a;
-    font-size: 12px; line-height: 1.5;
-  }
   .juku-res-row { display: grid; grid-template-columns: 1fr auto; gap: 5px 12px;
     align-items: center; padding: 9px 0; }
   .juku-res-label { font-weight: 750; color: #e8dfc8; }
@@ -345,10 +281,6 @@
   .juku-res-flourish { margin: 9px 0 0; color: #b9d977; font-weight: 800; }
   .juku-res-invalid { padding: 18px; border-radius: 14px; text-align: center;
     color: #ffd0d0; background: rgba(176,0,32,.22); line-height: 1.7; }
-  @media (max-width: 390px) {
-    .juku-rubric-row { grid-template-columns: 1fr; }
-    .juku-rubric-opts { justify-content: center; }
-  }
   @media (prefers-reduced-motion: reduce) {
     .live-dot, .jsp-cell.now { animation: none; }
   }

@@ -29,50 +29,21 @@ window.JUKU_CONFIG = {
     counts: {
       order: 8,          // sentence-order items
       vocabMean: 8,      // vocab test: word→meaning items (rest are definition→word)
-      mixedRead: 1,      // mixed: read item sampled from juku.json
-      mixedTranslate: 1, // mixed: translation item sampled from juku.json
-      mixedWrite: 1,     // mixed: productive-spelling item sampled from juku.json
-      openWriting: 1,    // BR/BC: one teacher-reviewed short writing prompt
-      proveIt: 1         // mixed: one re-asked item missed/wobbled earlier
+      mixedRead: 2,      // mixed: read items sampled from juku.json
+      mixedTranslate: 2, // mixed: translate items sampled from juku.json
+      mixedWrite: 2,     // mixed: write (spelling) items sampled from juku.json
+      proveIt: 2         // mixed: re-asked items missed/wobbled earlier this session
     },
 
-    // Assessment interaction by curriculum. Pre-Boo keeps carefully named
-    // scaffolds; older students produce English without answer-piece clues.
-    responseModes: {
-      pb: {
-        dictationWord: 'tiles',
-        dictationSentence: 'tiles',
-        translation: 'builder',
-        spelling: 'tiles',
-        openWriting: false
-      },
-      br: {
-        dictationWord: 'text',
-        dictationSentence: 'text',
-        translation: 'text-review',
-        spelling: 'text',
-        openWriting: true
-      },
-      bc: {
-        dictationWord: 'text',
-        dictationSentence: 'text',
-        translation: 'text-review',
-        spelling: 'text',
-        openWriting: true
-      }
-    },
-
-    // Dictation (Stage 4) — broadcast schedule. Fewer, deeper responses
-    // leave enough time for real typing while keeping every device synced.
+    // Dictation (Stage 4) — broadcast schedule. All devices derive the
+    // current item from phaseElapsedSec against this table; nothing is
+    // counted, only read. Budget: 15×20 + 10 + 12×45 = 850s of 900.
     dictation: {
+      words: 15,         // word-tier items (all weekly vocab cards)
+      wordSec: 20,       // answer window per word
+      sentences: 12,     // sentence-tier items (weekId-seeded pick of 15)
+      sentenceSec: 45,   // answer window per sentence
       transitionSec: 10, // tier-change splash between word and sentence
-      profiles: {
-        // 850 seconds + a calm 50-second finish buffer.
-        pb: { words: 8, wordSec: 30, sentences: 4, sentenceSec: 150 },
-        // 830 seconds + a 70-second finish buffer.
-        br: { words: 8, wordSec: 35, sentences: 6, sentenceSec: 90 },
-        bc: { words: 8, wordSec: 35, sentences: 6, sentenceSec: 90 }
-      },
       // sentence-tier word-bank decoys, drawn from the week's OTHER
       // sentence cards (seeded). pb gets a clean bank.
       distractors: { pb: 0, br: 3, bc: 3 }

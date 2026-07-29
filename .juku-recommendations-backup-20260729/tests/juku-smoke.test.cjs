@@ -92,16 +92,6 @@ assert.ok(html.includes("'js/juku-results.js'"),
   'juku-results.js must be loaded before phases');
 assert.strictEqual(CFG.content.allowDemo, false,
   'production juku must not silently fall back to demo questions');
-assert.strictEqual(CFG.content.responseModes.pb.dictationWord, 'tiles',
-  'Pre-Boo should retain letter-tile dictation scaffolding');
-assert.strictEqual(CFG.content.responseModes.br.dictationWord, 'text',
-  'Boo-riculum should use open dictation');
-assert.strictEqual(CFG.content.responseModes.br.translation, 'text-review',
-  'Boo-riculum translation must be preserved for human review');
-assert.deepStrictEqual(
-  JSON.parse(JSON.stringify(CFG.content.dictation.profiles.br)),
-  { words: 8, wordSec: 35, sentences: 6, sentenceSec: 90 },
-  'Boo-riculum dictation should favor fewer, deeper open responses');
 
 for (const curriculum of ['br', 'pb']) {
   const base = path.join(ROOT, 'content', curriculum, 'july');
@@ -120,14 +110,6 @@ for (const curriculum of ['br', 'pb']) {
     ]) {
       assert.ok(question.correct >= 0 && question.correct < question.choices.length,
         `${curriculum} week ${week.week}: valid correct-answer index`);
-    }
-    if (curriculum === 'br') {
-      assert.ok(week.writingPrompt && week.writingPrompt.targets.length >= 2,
-        `BR week ${week.week}: open writing prompt with curriculum targets`);
-      for (const item of week.questions.filter(q => q.type === 'translate')) {
-        assert.ok(Array.isArray(item.accepted) && item.accepted.length,
-          `BR week ${week.week} translation ${item.n}: accepted alternatives`);
-      }
     }
   }
 }
@@ -158,12 +140,6 @@ context.window.JUKU_TESTS.preflight(slotB).then(result => {
   J.patchWeek(week => {
     week.survey = { expect: '70-79', hardest: 'reading', submitted: true };
     week.prediction = { expect: '80-89', worst: 'dictation' };
-    week.teacherReview = {
-      reading: {
-        mode: 'teacher-observed', complete: true,
-        scores: { accuracy: 3, selfCorrection: 2, phrasing: 2, pace: 3 }
-      }
-    };
     week.sections = {
       dictation: {
         total: 2, subTotals: { word: 1, sent: 1 },
@@ -175,16 +151,10 @@ context.window.JUKU_TESTS.preflight(slotB).then(result => {
         items: [{ kind: 'mean', ok: true }, { kind: 'def', ok: true }]
       },
       mixed: {
-        total: 3,
-        reviewTotal: 2,
-        subTotals: { comp: 1, read: 1, translate: 1, write: 1, openWriting: 1 },
+        total: 4, subTotals: { comp: 1, read: 1, translate: 1, write: 1 },
         items: [
           { kind: 'comp', ok: true }, { kind: 'read', ok: true },
-          { kind: 'translate', ok: false, reviewOnly: true, reviewStatus: 'pending',
-            ans: 'A valid alternative translation' },
-          { kind: 'write', ok: true, accuracy: 0.9 },
-          { kind: 'openWriting', ok: false, reviewOnly: true, reviewStatus: 'pending',
-            ans: 'My original story.' }
+          { kind: 'translate', ok: false }, { kind: 'write', ok: true }
         ]
       }
     };
@@ -197,17 +167,10 @@ context.window.JUKU_TESTS.preflight(slotB).then(result => {
   const task = { innerHTML: '', textContent: '' };
   context.window.JUKU_RESULTS.render(task, {}, slotA);
   const report = J.weekRecord().week.report;
-  assert.strictEqual(report.schema, 3);
+  assert.strictEqual(report.schema, 2);
   assert.strictEqual(report.skills.listeningWords.percent, 100);
   assert.strictEqual(report.skills.listeningSentences.percent, 0);
-  assert.strictEqual(report.skills.translationBuild.pending, 1);
-  assert.strictEqual(report.skills.openWriting.pending, 1);
-  assert.strictEqual(report.skills.spellingBuild.meanAccuracy, 90);
-  assert.strictEqual(report.readingRound.complete, true);
-  assert.strictEqual(report.reviewSummary.pending, 2);
-  assert.strictEqual(report.provisional, true);
-  assert.ok(task.innerHTML.includes('じどうチェック'));
-  assert.ok(task.innerHTML.includes('せいかくさ 3/3'));
+  assert.strictEqual(report.skills.translationBuild.percent, 0);
   assert.ok(task.innerHTML.includes('Skill evidence'));
 
   localStorage.setItem('booha_userid', 'late-student');

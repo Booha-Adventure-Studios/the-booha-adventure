@@ -9,21 +9,6 @@ an instant machine score.
 
 Game activity is never learning evidence and never changes a score.
 
-## Implemented in the July engine
-
-- Boo-riculum dictation uses open typing: 8 words and 6 sentences.
-- Pre-Boo keeps the existing letter/word scaffolds for the first launch.
-- Boo-riculum translation is open response. Exact normalized matches are
-  identified; every other nonblank answer is held for teacher review.
-- Productive spelling is open typing for Boo-riculum.
-- Each July Boo-riculum week has one 1–3 sentence writing prompt using two
-  named weekly targets.
-- The reading round shows the real weekly passage and no questions. A hidden
-  teacher panel records four 0–3 observations.
-- The final screen is labeled as an automatic summary and clearly identifies
-  teacher-reviewed evidence. Raw responses remain in the weekly record for
-  the later weekly report.
-
 ## Recommended 90-minute structure
 
 | Time | Round | Evidence |
@@ -44,9 +29,9 @@ dictation because they expose the answer pieces.
 
 Recommended modes:
 
-- **Pre-Boo:** begin with eight words and four short sentences. The launch
-  version retains the existing answer-piece scaffold; replacing it with a
-  complete alphabet keyboard is a useful later difficulty step.
+- **Pre-Boo:** audio followed by an empty response field and a complete
+  alphabet keyboard. The target letters are not preselected. Begin with eight
+  words and four short sentences.
 - **Boo-riculum:** audio followed by free typing. Use eight words and six
   sentences. Students may also write in their notebook, but the entered answer
   is the report evidence.
@@ -134,32 +119,15 @@ The teacher rubric should live separately from the immutable automatic result:
 {
   "teacherReview": {
     "reading": {
-      "mode": "teacher-observed",
-      "scores": {
-        "accuracy": 3,
-        "selfCorrection": 2,
-        "phrasing": 2,
-        "pace": 3
-      },
-      "complete": true
+      "accuracy": 3,
+      "selfCorrection": 2,
+      "phrasing": 2,
+      "pace": 3,
+      "note": "Slowed down at unfamiliar story words."
     }
   }
 }
 ```
-
-## Completion games
-
-The current pop/feed ghost games have the right guardrails:
-
-- They appear only after a block is fully committed or during the interval.
-- The mode changes by week and waiting venue, so it feels random without
-  producing different classroom instructions on different devices.
-- A round stops counting after six successful taps.
-- Nothing is written to the student record.
-
-Keep the counter local and decorative. Do not add coins, streaks, leaderboards,
-or faster game access for higher scores; those would reward rushing and would
-contaminate the assessment evidence.
 
 ## Weekly report structure
 

@@ -38,9 +38,8 @@
     vocabMeaning: 'たんごの いみ',
     vocabDefinition: 'せつめいから たんご',
     readingComprehension: 'よんで りかいする',
-    translationBuild: 'じぶんの ことばで やくす',
-    spellingBuild: 'つづりを かく',
-    openWriting: 'じぶんの ぶんを かく'
+    translationBuild: 'やくぶんを くみたてる',
+    spellingBuild: 'つづりを くみたてる'
   };
 
   function sectionLabel(id) {
@@ -88,10 +87,8 @@
     }
     // Prove-it is remediation, outside the section score — filter it out
     // of both the ratio and the behavioral aggregates.
-    const allItems = (rec.items || []).filter(it =>
+    const items = (rec.items || []).filter(it =>
       it && !(excludeProve && it.proveIt));
-    const items = allItems.filter(it => !it.reviewOnly);
-    const reviewItems = allItems.filter(it => it.reviewOnly);
     const correct = items.filter(it => it.ok).length;
     const total = rec.total || items.length || 1;
     const raw = correct / total * 100;
@@ -100,43 +97,18 @@
       missing: false, demo: !!rec.demo, included: !rec.demo,
       correct, total,
       percent: Math.round(raw), percentRaw: raw,
-      signals: aggregateSignals(items),
-      reviewTotal: reviewItems.length,
-      pendingReview: reviewItems.filter(it => it.reviewStatus === 'pending').length
+      signals: aggregateSignals(items)
     };
   }
 
   function summarizeSkill(rec, predicate, expected) {
     if (!rec) return { missing: true, correct: 0, total: null, percent: null };
-    const items = (rec.items || []).filter(it =>
-      it && !it.proveIt && !it.reviewOnly && predicate(it));
+    const items = (rec.items || []).filter(it => it && !it.proveIt && predicate(it));
     const total = typeof expected === 'number' ? expected : items.length;
     const correct = items.filter(it => it.ok).length;
-    const accuracyItems = items.filter(it => typeof it.accuracy === 'number');
     return {
       missing: false, correct, total,
-      percent: total ? Math.round(correct / total * 100) : null,
-      meanAccuracy: accuracyItems.length
-        ? Math.round(accuracyItems.reduce((sum, it) => sum + it.accuracy, 0)
-                     / accuracyItems.length * 100)
-        : null
-    };
-  }
-
-  function summarizeReviewSkill(rec, predicate, expected) {
-    if (!rec) {
-      return { missing: true, reviewOnly: true, submitted: 0,
-               total: null, pending: 0, autoApproved: 0 };
-    }
-    const items = (rec.items || []).filter(it =>
-      it && !it.proveIt && it.reviewOnly && predicate(it));
-    const total = typeof expected === 'number' ? expected : items.length;
-    return {
-      missing: false, reviewOnly: true,
-      submitted: items.filter(it => it.reviewStatus !== 'blank').length,
-      total,
-      pending: items.filter(it => it.reviewStatus === 'pending').length,
-      autoApproved: items.filter(it => it.reviewStatus === 'auto-approved').length
+      percent: total ? Math.round(correct / total * 100) : null
     };
   }
 
@@ -157,13 +129,8 @@
       readingComprehension: summarizeSkill(sec.mixed,
         it => it.kind === 'comp' || it.kind === 'read',
         readingExpected),
-      translationBuild: mt.translate && ((sec.mixed && sec.mixed.items) || [])
-        .some(it => it.kind === 'translate' && it.reviewOnly)
-        ? summarizeReviewSkill(sec.mixed, it => it.kind === 'translate', mt.translate)
-        : summarizeSkill(sec.mixed, it => it.kind === 'translate', mt.translate),
-      spellingBuild: summarizeSkill(sec.mixed, it => it.kind === 'write', mt.write),
-      openWriting: summarizeReviewSkill(sec.mixed,
-        it => it.kind === 'openWriting', mt.openWriting)
+      translationBuild: summarizeSkill(sec.mixed, it => it.kind === 'translate', mt.translate),
+      spellingBuild: summarizeSkill(sec.mixed, it => it.kind === 'write', mt.write)
     };
   }
 
@@ -211,22 +178,11 @@
     const predict = week.prediction || {};
     const invalidSession = !!(week.contentStatus && week.contentStatus.ready === false);
     const effectiveTotal = invalidSession ? null : total;
-    const reviewItems = Object.values(week.sections || {}).flatMap(rec =>
-      ((rec && rec.items) || []).filter(it => it && it.reviewOnly));
-    const reviewExpected = Object.values(week.sections || {}).reduce(
-      (sum, rec) => sum + (rec && typeof rec.reviewTotal === 'number'
-        ? rec.reviewTotal : 0), 0);
-    const missingReview = Math.max(0, reviewExpected - reviewItems.length);
-    const pendingReview = reviewItems.filter(it =>
-      it.reviewStatus === 'pending').length;
-    const readingReview = week.teacherReview && week.teacherReview.reading || null;
-    const readingComplete = !!(readingReview && readingReview.complete);
 
     return {
-      schema: 3,
+      schema: 2,
       computedAt: Date.now(),
       locked: true,
-      reportType: 'automatic-class-summary',
       scoringMethod: 'equal-section-mean',
       total: effectiveTotal,
       invalidSession,
@@ -240,21 +196,10 @@
       sections,
       skills: computeSkills(week),
       readingRound: {
-        mode: 'teacher-observed-reading-only',
+        mode: 'teacher-led-reading-only',
         autoScored: false,
-        complete: readingComplete,
-        observation: readingReview,
         note: 'Oral reading is intentionally kept separate from the automatic score.'
       },
-      reviewSummary: {
-        submitted: reviewItems.filter(it => it.reviewStatus !== 'blank').length,
-        pending: pendingReview,
-        missing: missingReview,
-        autoApproved: reviewItems.filter(it =>
-          it.reviewStatus === 'auto-approved').length,
-        total: Math.max(reviewExpected, reviewItems.length)
-      },
-      provisional: pendingReview > 0 || missingReview > 0 || !readingComplete,
       proveIt,
       calibration: {
         before: survey.expect || null,
@@ -357,42 +302,6 @@
       ? `<div class="juku-res-calbox">${lines.join('')}</div>` : '';
   }
 
-  function skillValueHTML(skill) {
-    if (skill.reviewOnly) {
-      const bits = [];
-      if (skill.autoApproved) bits.push(`${skill.autoApproved} みほんと一致`);
-      if (skill.pending) bits.push(`${skill.pending} 先生チェック`);
-      if (!bits.length) bits.push(`${skill.submitted}/${skill.total} ていしゅつ`);
-      return bits.join(' ／ ');
-    }
-    const exact = `${skill.correct}/${skill.total}` +
-      (skill.percent === null ? '' : ` — ${skill.percent}%`);
-    return skill.meanAccuracy === null || typeof skill.meanAccuracy !== 'number'
-      ? exact : `${exact}（もじ・語 ${skill.meanAccuracy}%）`;
-  }
-
-  function readingResultHTML(reading) {
-    const observation = reading && reading.observation;
-    if (!(reading && reading.complete && observation && observation.scores)) {
-      return `<p class="juku-res-reading">📖 おんどく: 先生チェック まち</p>`;
-    }
-    const scores = observation.scores;
-    const labels = [
-      ['accuracy', 'せいかくさ'], ['selfCorrection', 'なおす'],
-      ['phrasing', 'まとまり'], ['pace', 'はやさ']
-    ];
-    const values = labels.map(([id]) => scores[id])
-      .filter(value => typeof value === 'number');
-    const average = values.length
-      ? Math.round(values.reduce((sum, value) => sum + value, 0)
-                   / values.length * 10) / 10
-      : null;
-    return `<p class="juku-res-reading">📖 おんどく（先生チェック）:
-      ${labels.map(([id, label]) => `${label} ${scores[id]}/3`).join(' ／ ')}
-      ${average === null ? '' : `<br>へいきん ${average}/3`}
-    </p>`;
-  }
-
   function render(taskEl, res, slot) {
     const report = ensureReport(true);
     if (!report) {
@@ -414,12 +323,7 @@
     const totalHTML = report.total === null
       ? `<p class="juku-res-total none">DEMO のため、てんすうは ありません</p>`
       
-      : `<p class="juku-res-total">じどうチェック　<span class="pct">${report.total}%</span></p>`;
-
-    const provisionalHTML = report.provisional
-      ? `<p class="juku-res-provisional">これは じどうチェックの けっかです。<br>
-          おんどく・やく・じぶんの文は、先生チェック後の週レポートに入ります。</p>`
-      : '';
+      : `<p class="juku-res-total">ぜんたい　<span class="pct">${report.total}%</span></p>`;
 
     const partialNote = report.partial
       ? `<p class="juku-res-note">※ ${report.excludedSections
@@ -439,20 +343,19 @@
           <h2>くわしい けっか / Skill evidence</h2>
           ${Object.keys(SKILL_JP).map(id => {
             const s = report.skills[id];
-            if (!s || s.missing || s.total === null || s.total === 0) return '';
+            if (!s || s.missing || s.total === null) return '';
             return `<div class="juku-res-skill"><span>${SKILL_JP[id]}</span>
-              <span>${skillValueHTML(s)}</span></div>`;
+              <span>${s.correct}/${s.total}${s.percent === null ? '' : ` — ${s.percent}%`}</span></div>`;
           }).join('')}
         </div>` : '';
 
     taskEl.innerHTML = `
       <div class="juku-results">
         ${totalHTML}
-        ${provisionalHTML}
         ${partialNote}
         <div class="juku-res-rows">${rows}</div>
         ${skillsHTML}
-        ${readingResultHTML(report.readingRound)}
+        <p class="juku-res-reading">📖 おんどくは 15ふんの先生チェックです。じどうの点数には入りません。</p>
         ${pvHTML}
         ${calibrationHTML(report.calibration, report.partial)}
       </div>`;

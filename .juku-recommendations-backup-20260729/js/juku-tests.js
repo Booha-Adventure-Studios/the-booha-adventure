@@ -413,62 +413,6 @@
 
   function hiraOf(c) { return c.hira || c.jp || c.en; }
 
-  function responseMode(curr, key, fallback) {
-    const modes = CFG.content && CFG.content.responseModes;
-    return (modes && modes[curr] && modes[curr][key]) || fallback;
-  }
-
-  function normalizeEnglish(value) {
-    return String(value || '')
-      .normalize('NFKC')
-      .replace(/[‘’]/g, "'")
-      .replace(/[“”]/g, '"')
-      .toLowerCase()
-      .replace(/[.!?]+$/g, '')
-      .replace(/\s+/g, ' ')
-      .trim();
-  }
-
-  function editSimilarity(a, b) {
-    a = Array.from(normalizeEnglish(a));
-    b = Array.from(normalizeEnglish(b));
-    if (!a.length && !b.length) return 1;
-    if (!a.length || !b.length) return 0;
-    const prev = Array.from({ length: b.length + 1 }, (_, i) => i);
-    for (let i = 1; i <= a.length; i++) {
-      const next = [i];
-      for (let j = 1; j <= b.length; j++) {
-        next[j] = Math.min(
-          next[j - 1] + 1,
-          prev[j] + 1,
-          prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)
-        );
-      }
-      for (let j = 0; j < next.length; j++) prev[j] = next[j];
-    }
-    return Math.max(0, 1 - prev[b.length] / Math.max(a.length, b.length));
-  }
-
-  function tokenSimilarity(a, b) {
-    const aa = normalizeEnglish(a).split(' ').filter(Boolean);
-    const bb = normalizeEnglish(b).split(' ').filter(Boolean);
-    if (!aa.length && !bb.length) return 1;
-    if (!aa.length || !bb.length) return 0;
-    const prev = Array.from({ length: bb.length + 1 }, (_, i) => i);
-    for (let i = 1; i <= aa.length; i++) {
-      const next = [i];
-      for (let j = 1; j <= bb.length; j++) {
-        next[j] = Math.min(
-          next[j - 1] + 1,
-          prev[j] + 1,
-          prev[j - 1] + (aa[i - 1] === bb[j - 1] ? 0 : 1)
-        );
-      }
-      for (let j = 0; j < next.length; j++) prev[j] = next[j];
-    }
-    return Math.max(0, 1 - prev[bb.length] / Math.max(aa.length, bb.length));
-  }
-
   // ── Choice builders (all seeded — refresh rebuilds identically) ──
 
   function meanChoices(card, pool, salt) {
@@ -552,7 +496,7 @@
   // ── Generic construction item (words or letters) ─────────
   // Lock enables at TARGET length (bank may hold distractors).
 
-  function showBuildItem(taskEl, opts, onLock) {
+ function showBuildItem(taskEl, opts, onLock) {
     const shownAt = performance.now();
     let firstMs = null, changes = 0, answer = [];
     let plays = 0, playing = false, committed = false, audio = null;
@@ -665,103 +609,6 @@
     return { commit };
   }
 
-  // Open production: no target letters or words are exposed. Deterministic
-  // items (dictation/spelling) can be auto-scored; flexible translation and
-  // writing preserve the raw response for teacher review.
-  function showTextItem(taskEl, opts, onLock) {
-    const shownAt = performance.now();
-    let firstMs = null, edits = 0, plays = 0;
-    let playing = false, committed = false, audio = null;
-    const commonAttrs = `class="juku-open-response" id="jt-open"
-      maxlength="${opts.maxLength || 300}"
-      autocomplete="off" autocapitalize="sentences" spellcheck="false"
-      placeholder="${opts.placeholder || 'English で かこう'}"`;
-    const inputHtml = opts.multiline
-      ? `<textarea ${commonAttrs} rows="${opts.rows || 3}"></textarea>`
-      : `<input ${commonAttrs} type="text">`;
-
-    taskEl.innerHTML = `
-      ${opts.demo ? '<div class="juku-demo-badge">DEMO</div>' : ''}
-      <p class="juku-item-count">もんだい ${opts.idx + 1} / ${opts.count}</p>
-      ${opts.promptHtml}
-      ${opts.audioUrl ? '<button class="juku-play" id="jt-play">🔊 きく</button>' : ''}
-      ${inputHtml}
-      <p class="juku-answer-hint">${opts.hint || 'こたえは あとで まとめて かくにんします。'}</p>
-      <div class="juku-test-actions">
-        <button class="juku-lock off" id="jt-lock">これで OK！</button>
-      </div>`;
-
-    const input = taskEl.querySelector('#jt-open');
-    const lockBtn = taskEl.querySelector('#jt-lock');
-    input.addEventListener('input', () => {
-      if (firstMs === null && input.value.trim()) {
-        firstMs = Math.round(performance.now() - shownAt);
-      }
-      edits++;
-      lockBtn.classList.toggle('off', !input.value.trim());
-    });
-
-    function playAudio() {
-      if (!audio || playing) return;
-      playing = true;
-      audio.currentTime = 0;
-      audio.play().then(() => { plays++; }).catch(() => { playing = false; });
-    }
-
-    if (opts.audioUrl) {
-      audio = new Audio(opts.audioUrl);
-      audio.preload = 'auto';
-      audio.addEventListener('ended', () => { playing = false; });
-      taskEl.querySelector('#jt-play').addEventListener('click', playAudio);
-      if (opts.autoplay) playAudio();
-    }
-
-    function commit(force) {
-      if (committed) return;
-      const raw = input.value.trim();
-      if (!force && !raw) return;
-      committed = true;
-      input.disabled = true;
-      lockBtn.disabled = true;
-
-      const targets = (opts.accepted || (opts.target ? [opts.target] : []))
-        .map(normalizeEnglish).filter(Boolean);
-      const normalized = normalizeEnglish(raw);
-      const exact = targets.length
-        ? targets.some(target => normalized === target)
-        : null;
-      const similarity = targets.length
-        ? Math.max(...targets.map(target =>
-            opts.similarity === 'tokens'
-              ? tokenSimilarity(normalized, target)
-              : editSimilarity(normalized, target)))
-        : null;
-
-      const result = {
-        ans: raw,
-        normalized,
-        ok: opts.reviewOnly ? exact : !!exact,
-        exact,
-        accuracy: similarity === null ? null : Math.round(similarity * 1000) / 1000,
-        reviewOnly: !!opts.reviewOnly,
-        reviewStatus: opts.reviewOnly
-          ? (exact ? 'auto-approved' : (raw ? 'pending' : 'blank'))
-          : null,
-        firstMs,
-        ms: Math.round(performance.now() - shownAt),
-        edits,
-        chg: Math.max(0, edits - 1),
-        plays,
-        forced: !!force
-      };
-      if (opts.evidence) Object.assign(result, opts.evidence(raw, normalized));
-      onLock(result);
-    }
-
-    lockBtn.addEventListener('click', () => commit(false));
-    return { commit };
-  }
-
   
  function renderTestDone(taskEl, demo) {
     taskEl.innerHTML = `
@@ -772,111 +619,6 @@
         <p class="juku-sub2">つぎの じかんまで まっててね。</p>
       </div>`;
     if (window.JUKU_GHOSTS) window.JUKU_GHOSTS.mount(taskEl, { name: false, venue: 'done' });
-  }
-
-  // ── Reading round ────────────────────────────────────────
-  // The full 15 minutes remain reading time: no questions, typing, or
-  // student button work. A compact teacher panel records one observed
-  // read on four stable dimensions; a blank dimension means not observed.
-
-  const READING_RUBRIC = [
-    { id: 'accuracy', jp: 'ことばの せいかくさ', en: 'Word accuracy' },
-    { id: 'selfCorrection', jp: 'じぶんで なおす', en: 'Self-correction' },
-    { id: 'phrasing', jp: 'いみの まとまり', en: 'Phrasing' },
-    { id: 'pace', jp: 'ききやすい はやさ', en: 'Pace' }
-  ];
-
-  function readingRubricHTML(saved) {
-    const scores = saved && saved.scores || {};
-    return READING_RUBRIC.map(row => `
-      <div class="juku-rubric-row">
-        <div class="juku-rubric-label">${row.jp}<span>${row.en}</span></div>
-        <div class="juku-rubric-opts">
-          ${[0, 1, 2, 3].map(score =>
-            `<button class="juku-rubric-opt ${scores[row.id] === score ? 'sel' : ''}"
-              data-dimension="${row.id}" data-score="${score}"
-              aria-label="${row.en} ${score}">${score}</button>`
-          ).join('')}
-        </div>
-      </div>`).join('');
-  }
-
-  async function renderReading(taskEl, res, slot) {
-    taskEl.innerHTML = `<p class="juku-paper">よみこみちゅう…</p>`;
-    const ready = await preflight(slot);
-    if (!ready.ok) {
-      renderContentFailed(taskEl, ready, () => renderReading(taskEl, res, slot));
-      return;
-    }
-    const juku = await getJukuWeek(slot.curriculum);
-    const passage = juku.week && juku.week.passage && juku.week.passage.text;
-    if (!passage) {
-      renderContentFailed(taskEl,
-        { issues: ['The weekly reading passage is missing.'] },
-        () => renderReading(taskEl, res, slot));
-      return;
-    }
-    const { week } = J.weekRecord();
-    const saved = week.teacherReview && week.teacherReview.reading;
-    const complete = !!(saved && saved.complete);
-    taskEl.innerHTML = `
-      <div class="juku-reading-round">
-        <p class="juku-reading-instruction">📖 こえに だして、なんども よもう。</p>
-        <p class="en">Read aloud. Read again for clear words, smooth phrases, and expression.</p>
-        <div class="juku-reading-passage">${passage}</div>
-        <button class="juku-teacher-check ${complete ? 'complete' : ''}" id="jr-open">
-          ${complete ? '✓ 先生チェック きろくずみ' : '先生チェックを ひらく'}
-        </button>
-        <div class="juku-rubric" id="jr-rubric" hidden>
-          <p class="juku-rubric-title">先生だけ / Teacher observation</p>
-          <p class="juku-rubric-scale">0 まだ　1 たすけあり　2 だいたい　3 ひとりでできた</p>
-          ${readingRubricHTML(saved)}
-          <p class="juku-rubric-done" id="jr-done">${
-            complete ? '✓ 4つ きろくしました' : '4つ えらぶと きろく かんりょう'
-          }</p>
-        </div>
-      </div>`;
-
-    const open = taskEl.querySelector('#jr-open');
-    const rubric = taskEl.querySelector('#jr-rubric');
-    open.addEventListener('click', () => { rubric.hidden = !rubric.hidden; });
-    rubric.querySelectorAll('.juku-rubric-opt').forEach(button => {
-      button.addEventListener('click', () => {
-        const dimension = button.dataset.dimension;
-        const score = Number(button.dataset.score);
-        const savedOk = J.patchWeek(w => {
-          if (!w.teacherReview) w.teacherReview = {};
-          const prior = w.teacherReview.reading || {};
-          const scores = Object.assign({}, prior.scores || {});
-          scores[dimension] = score;
-          const isComplete = READING_RUBRIC.every(row =>
-            typeof scores[row.id] === 'number');
-          w.teacherReview.reading = {
-            mode: 'teacher-observed',
-            curriculum: slot.curriculum,
-            passageWeek: CFG.content.contentWeek(
-              window.CALENDAR.getCurrentCurriculumWeek()),
-            scores,
-            complete: isComplete,
-            updatedAt: Date.now(),
-            completedAt: isComplete ? (prior.completedAt || Date.now()) : null
-          };
-        });
-        if (savedOk === null) {
-          renderCommitFailed(taskEl, () => renderReading(taskEl, res, slot));
-          return;
-        }
-        rubric.querySelectorAll(`[data-dimension="${dimension}"]`)
-          .forEach(x => x.classList.toggle('sel', x === button));
-        const current = J.weekRecord().week.teacherReview.reading;
-        const done = taskEl.querySelector('#jr-done');
-        if (current.complete) {
-          done.textContent = '✓ 4つ きろくしました';
-          open.textContent = '✓ 先生チェック きろくずみ';
-          open.classList.add('complete');
-        }
-      });
-    });
   }
 
   // ── Vocab & Meaning Test ─────────────────────────────────
@@ -993,23 +735,11 @@
     const take = (type, count) => {
       J.seededShuffle(bank.filter(q => q.type === type), `${base}|${type}`)
         .slice(0, count)
-        .forEach(q => items.push({
-          kind: type, demo: juku.demo, q,
-          reviewOnly: type === 'translate' &&
-            responseMode(curr, 'translation', 'builder') === 'text-review'
-        }));
+        .forEach(q => items.push({ kind: type, demo: juku.demo, q }));
     };
     take('read', C.mixedRead || 2);
     take('translate', C.mixedTranslate || 2);
     take('write', C.mixedWrite || 2);
-
-    if (responseMode(curr, 'openWriting', false) &&
-        C.openWriting && wk.writingPrompt) {
-      items.push({
-        kind: 'openWriting', demo: juku.demo,
-        q: wk.writingPrompt, reviewOnly: true
-      });
-    }
 
     // C — prove-it: wrong answers first, then changed-but-right
     const { week } = J.weekRecord();
@@ -1061,19 +791,16 @@
     // (report time can't know how many unanswered tail items were
     // prove-it). demo describes only the scored questions — a demo
     // prove-it item must not contaminate a real section.
-    const presented = items.filter(it => !String(it.kind).startsWith('prove'));
-    const scored = presented.filter(it => !it.reviewOnly);
-    const reviewItems = presented.filter(it => it.reviewOnly);
+    const scored = items.filter(it => !String(it.kind).startsWith('prove'));
     const demo = scored.some(it => it.demo);
 
  const okSec = J.patchWeek(w => {
       if (!w.sections.mixed) {
         const subTotals = {};
-        presented.forEach(x => { subTotals[x.kind] = (subTotals[x.kind] || 0) + 1; });
+        scored.forEach(x => { subTotals[x.kind] = (subTotals[x.kind] || 0) + 1; });
         w.sections.mixed = {
           total: scored.length, subTotals,
-          reviewTotal: reviewItems.length,
-          proveTotal: items.filter(x => String(x.kind).startsWith('prove')).length,
+          proveTotal: items.length - scored.length,
           items: [], startedAt: Date.now(), demo
         };
       }
@@ -1120,73 +847,24 @@
 
     } else if (item.kind === 'translate') {
       const q = item.q;
-      if (responseMode(slot.curriculum, 'translation', 'builder') === 'text-review') {
-        showTextItem(taskEl, Object.assign({
-          promptHtml: `<p class="juku-item-jp">${q.jp}</p>
-            <p class="juku-item-q">じぶんの English で やくしてね。</p>`,
-          accepted: [q.en].concat(q.accepted || []),
-          similarity: 'tokens', reviewOnly: true,
-          multiline: false, maxLength: 180,
-          placeholder: 'English translation'
-        }, common), r => save('translate', q.n, { reviewOnly: true }, r));
-      } else {
-        const target = words(q.en);
-        const bank = J.seededShuffle(target.concat(q.extra || []), `${base}|tr|${q.n}`);
-        showBuildItem(taskEl, Object.assign({
-          promptHtml: `<p class="juku-item-jp">${q.jp}</p>`,
-          target, bank, letter: false
-        }, common), r => save('translate', q.n, {}, r));
-      }
+      const target = words(q.en);
+      const bank = J.seededShuffle(target.concat(q.extra || []), `${base}|tr|${q.n}`);
+      showBuildItem(taskEl, Object.assign({
+        promptHtml: `<p class="juku-item-jp">${q.jp}</p>`,
+        target, bank, letter: false
+      }, common), r => save('translate', q.n, {}, r));
 
     } else if (item.kind === 'write') {
       const q = item.q;
-      if (responseMode(slot.curriculum, 'spelling', 'tiles') === 'text') {
-        showTextItem(taskEl, Object.assign({
-          promptHtml: `<p class="juku-item-word">${q.jp}</p>
-            <p class="juku-item-q">English の つづりを かいてね。</p>`,
-          target: q.en, similarity: 'characters',
-          multiline: false, maxLength: 60,
-          placeholder: 'English spelling'
-        }, common), r => save('write', q.n, {}, r));
-      } else {
-        const target = String(q.en).toLowerCase().split('');
-        const decoys = J.seededShuffle(
-          'abcdefghijklmnopqrstuvwxyz'.split('').filter(l => !target.includes(l)),
-          `${base}|wr|${q.n}`).slice(0, 3);
-        const bank = J.seededShuffle(target.concat(decoys), `${base}|wr|${q.n}|b`);
-        showBuildItem(taskEl, Object.assign({
-          promptHtml: `<p class="juku-item-word">${q.jp}</p>`,
-          target, bank, letter: true
-        }, common), r => save('write', q.n, {}, r));
-      }
-
-    } else if (item.kind === 'openWriting') {
-      const q = item.q;
-      showTextItem(taskEl, Object.assign({
-        promptHtml: `<p class="juku-item-jp">${q.jp}</p>
-          <p class="juku-item-q">${q.en || 'Write one to three sentences.'}</p>`,
-        multiline: true, rows: 5, maxLength: 500,
-        placeholder: 'Write your own English…',
-        reviewOnly: true,
-        evidence: raw => {
-          const targetWords = (q.targets || []).map(normalizeEnglish);
-          const normalized = normalizeEnglish(raw);
-          const responseWords = normalized.match(/[a-z0-9']+/g) || [];
-          const targetsUsed = targetWords.filter(word => word.includes(' ')
-            ? normalized.includes(word) : responseWords.includes(word));
-          return {
-            promptId: q.id || `writing-${q.n || 1}`,
-            wordCount: normalized ? normalized.split(/\s+/).length : 0,
-            sentenceCount: raw.trim()
-              ? Math.max(1, (raw.match(/[.!?]+/g) || []).length) : 0,
-            targetsRequired: targetWords,
-            targetsUsed,
-            capitalized: /^[A-Z]/.test(raw.trim()),
-            terminalPunctuation: /[.!?]\s*$/.test(raw)
-          };
-        }
-      }, common), r => save('openWriting', q.n || q.id || 1,
-        { reviewOnly: true }, r));
+      const target = String(q.en).toLowerCase().split('');
+      const decoys = J.seededShuffle(
+        'abcdefghijklmnopqrstuvwxyz'.split('').filter(l => !target.includes(l)),
+        `${base}|wr|${q.n}`).slice(0, 3);
+      const bank = J.seededShuffle(target.concat(decoys), `${base}|wr|${q.n}|b`);
+      showBuildItem(taskEl, Object.assign({
+        promptHtml: `<p class="juku-item-word">${q.jp}</p>`,
+        target, bank, letter: true
+      }, common), r => save('write', q.n, {}, r));
 
     } else if (item.kind === 'proveOrder') {
       const card = item.card;
@@ -1242,7 +920,6 @@
 
   async function buildDictSchedule(slot) {
     const D = CFG.content.dictation;
-    const P = (D.profiles && D.profiles[slot.curriculum]) || D;
     const cw = window.CALENDAR.getCurrentCurriculumWeek();
     const seed = `${J.curriculumWeekKey(cw)}|dict`;
 
@@ -1254,21 +931,21 @@
     const sentAll = dictUsable(sent);
 
     const wordPick = J.seededShuffle(wordsAll, seed + '|w')
-      .slice(0, Math.min(P.words, wordsAll.length));
+      .slice(0, Math.min(D.words, wordsAll.length));
     const sentPick = J.seededShuffle(sentAll, seed + '|s')
-      .slice(0, Math.min(P.sentences, sentAll.length));
+      .slice(0, Math.min(D.sentences, sentAll.length));
 
     const schedule = [];
     let t = 0;
     wordPick.forEach(card => {
-      schedule.push({ tier: 'word', card, start: t, dur: P.wordSec });
-      t += P.wordSec;
+      schedule.push({ tier: 'word', card, start: t, dur: D.wordSec });
+      t += D.wordSec;
     });
     schedule.push({ tier: 'trans', start: t, dur: D.transitionSec });
     t += D.transitionSec;
     sentPick.forEach(card => {
-      schedule.push({ tier: 'sent', card, start: t, dur: P.sentenceSec });
-      t += P.sentenceSec;
+      schedule.push({ tier: 'sent', card, start: t, dur: D.sentenceSec });
+      t += D.sentenceSec;
     });
 
     return { schedule, sentAll, seed,
@@ -1354,8 +1031,6 @@
     const tierSegs = d.schedule.filter(s => s.tier === seg.tier);
     const ord = tierSegs.indexOf(seg);
     const audioUrl = cardAudio(curr, seg.tier === 'word' ? 'vocab' : 'sentences', card);
-    const mode = responseMode(curr,
-      seg.tier === 'word' ? 'dictationWord' : 'dictationSentence', 'tiles');
     let target, bankArr;
 
     if (seg.tier === 'word') {
@@ -1383,13 +1058,16 @@
     const prompt = `
       <p class="juku-dict-ear">🎧</p>
       ${audioUrl ? '' : `<p class="juku-item-word">${card.en}</p>`}
-      <p class="juku-answer-hint">${mode === 'text'
-        ? 'きいて、English を かこう'
-        : (seg.tier === 'word'
-          ? 'きいて、もじで つくろう' : 'きいて、ことばで ならべよう')}</p>
+      <p class="juku-answer-hint">${seg.tier === 'word'
+        ? 'きいて、もじで つくろう' : 'きいて、ことばで ならべよう'}</p>
       <p class="juku-dict-remain" id="jd-remain"></p>`;
 
-    const onLock = r => {
+    d.ctrl = showBuildItem(taskEl, {
+      count: tierSegs.length, idx: ord, demo: d.demo,
+      promptHtml: prompt, audioUrl, autoplay: true,
+      target, bank: bankArr, letter: seg.tier === 'word'
+      
+    }, r => {
       // Broadcast phase: the clock owns the screen, so a failure here can be
       // overwritten by the next segment render. The persistent banner from
       // juku:saveFailed is what survives — this halt only holds when the
@@ -1402,27 +1080,7 @@
         d.ctrl = null;
         dictRenderLocked(taskEl, d.demo);
       });
-    };
-
-    if (mode === 'text') {
-      d.ctrl = showTextItem(taskEl, {
-        count: tierSegs.length, idx: ord, demo: d.demo,
-        promptHtml: prompt, audioUrl, autoplay: true,
-        target: card.en,
-        similarity: seg.tier === 'word' ? 'characters' : 'tokens',
-        multiline: seg.tier === 'sent',
-        rows: seg.tier === 'sent' ? 2 : 1,
-        maxLength: seg.tier === 'word' ? 80 : 240,
-        placeholder: seg.tier === 'word' ? 'Type the word' : 'Type the sentence',
-        hint: 'きこえた English を そのまま かいてね。'
-      }, onLock);
-    } else {
-      d.ctrl = showBuildItem(taskEl, {
-        count: tierSegs.length, idx: ord, demo: d.demo,
-        promptHtml: prompt, audioUrl, autoplay: true,
-        target, bank: bankArr, letter: seg.tier === 'word'
-      }, onLock);
-    }
+    });
     
   }
 
@@ -1452,7 +1110,6 @@
     render(taskEl, res, slot) {
       switch (res.phase.id) {
         case 'dictation': renderDictation(taskEl, res, slot); return true;
-        case 'reading': renderReading(taskEl, res, slot); return true;
         case 'order': renderOrder(taskEl, res, slot); return true;
         case 'vocab': renderVocab(taskEl, res, slot); return true;
         case 'mixed': renderMixed(taskEl, res, slot); return true;
