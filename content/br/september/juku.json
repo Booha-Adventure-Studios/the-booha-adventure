@@ -1,0 +1,186 @@
+{
+  "curriculum": "br",
+  "month": "september",
+  "weeks": [
+    {
+      "week": 1,
+      "passage": {
+        "text": "Booha arrives early and helps prepare the classroom. He puts a notebook and textbook on each desk, then places every chair in a straight line. Nuppi writes the morning message on the whiteboard with a blue marker. Mister Happy checks the projector and computer while Mimo carries rulers, scissors, and glue from the locker. Before the bell rings, Booha finds an eraser under a pencil case and drops some paper in the trash can. The room is ready just as the students arrive.",
+        "comprehension": [
+          { "n": 1, "q": "What does Booha put on each desk?", "choices": ["a notebook and textbook", "scissors and glue", "a projector and computer", "a marker and eraser"], "correct": 0 },
+          { "n": 2, "q": "Who writes on the whiteboard?", "choices": ["Booha", "Nuppi", "Mimo", "Mister Happy"], "correct": 1 },
+          { "n": 3, "q": "Where do the rulers come from?", "choices": ["the trash can", "the pencil case", "the locker", "the teacher's desk"], "correct": 2 }
+        ]
+      },
+      "writingPrompt": {
+        "id": "sep-br-w1-writing",
+        "jp": "notebook と projector を つかって、がっこうの じゅんびを 1〜3ぶんで かいてね。",
+        "en": "Write 1–3 sentences about preparing a classroom using notebook and projector.",
+        "targets": ["notebook", "projector"]
+      },
+      "definitions": [
+        { "n": 1, "def": "a piece of classroom furniture with a flat top for working", "pos": "noun" },
+        { "n": 2, "def": "a seat for one person, usually with a back", "pos": "noun" },
+        { "n": 3, "def": "a large classroom surface that a teacher writes on", "pos": "noun" },
+        { "n": 4, "def": "a tool used to write or draw on a classroom board", "pos": "noun" },
+        { "n": 5, "def": "an object used to remove pencil or board marks", "pos": "noun" },
+        { "n": 6, "def": "a small book of blank or lined pages for writing notes", "pos": "noun" },
+        { "n": 7, "def": "a book containing information and lessons for a school subject", "pos": "noun" },
+        { "n": 8, "def": "a small container used to carry pencils and other writing tools", "pos": "noun" },
+        { "n": 9, "def": "a cutting tool with two blades and two handles", "pos": "noun" },
+        { "n": 10, "def": "a sticky substance used to join things together", "pos": "noun" },
+        { "n": 11, "def": "a straight tool used for measuring or drawing lines", "pos": "noun" },
+        { "n": 12, "def": "a machine that displays an image on a wall or screen", "pos": "noun" },
+        { "n": 13, "def": "an electronic machine used to store information and run programs", "pos": "noun" },
+        { "n": 14, "def": "a small lockable cupboard used for personal belongings", "pos": "noun" },
+        { "n": 15, "def": "a container where unwanted things are thrown away", "pos": "noun" }
+      ],
+      "questions": [
+        { "n": 1, "type": "read", "text": "Mimo borrows a ruler, measures the poster, and returns the ruler to the pencil case.", "q": "Why does Mimo use the ruler?", "choices": ["to cut the poster", "to measure the poster", "to erase the poster", "to glue the poster"], "correct": 1 },
+        { "n": 2, "type": "read", "text": "The projector is working, but the computer screen is dark because its cable is loose.", "q": "Why is the computer screen dark?", "choices": ["The projector is broken", "The cable is loose", "The locker is closed", "The marker is dry"], "correct": 1 },
+        { "n": 3, "type": "read", "text": "After art class, Nuppi puts the scissors and glue away and throws the scraps in the trash can.", "q": "What does Nuppi throw away?", "choices": ["the scissors", "the glue", "the scraps", "the notebook"], "correct": 2 },
+        { "n": 4, "type": "translate", "jp": "これは わたしの つくえです。", "en": "This is my desk", "accepted": ["This desk is mine"], "extra": ["chair", "are"] },
+        { "n": 5, "type": "translate", "jp": "きょうかしょを もってこなければ なりません。", "en": "You must bring your textbook", "accepted": ["You have to bring your textbook"], "extra": ["notebook", "brought"] },
+        { "n": 6, "type": "translate", "jp": "じょうぎを かりても いいです。", "en": "You can borrow a ruler", "accepted": ["You may borrow a ruler"], "extra": ["eraser", "borrows"] },
+        { "n": 7, "type": "write", "jp": "つくえ", "en": "desk" },
+        { "n": 8, "type": "write", "jp": "のーと", "en": "notebook" },
+        { "n": 9, "type": "write", "jp": "じょうぎ", "en": "ruler" }
+      ]
+    },
+    {
+      "week": 2,
+      "passage": {
+        "text": "Booha receives a new school timetable and studies it carefully. On Monday he has Japanese, English, math, and science. Social studies comes after lunch, and the class compares history with geography. On Tuesday, PE and health teach the students how to care for their bodies. Music and art give Booha a chance to create, while home economics teaches useful skills for daily life. In ICT, he makes a simple program. Homeroom is where the class shares news, and club activities begin after the last lesson.",
+        "comprehension": [
+          { "n": 1, "q": "Which subjects come before social studies on Monday?", "choices": ["music and art", "Japanese, English, math, and science", "health and PE", "ICT and homeroom"], "correct": 1 },
+          { "n": 2, "q": "What does Booha make in ICT?", "choices": ["a simple program", "a history map", "a healthy lunch", "a music club"], "correct": 0 },
+          { "n": 3, "q": "When do club activities begin?", "choices": ["before homeroom", "during lunch", "after the last lesson", "on Sunday"], "correct": 2 }
+        ]
+      },
+      "writingPrompt": {
+        "id": "sep-br-w2-writing",
+        "jp": "favorite subject と club activities を つかって、じぶんの がっこうを 1〜3ぶんで かいてね。",
+        "en": "Write 1–3 sentences about school using favorite subject and club activities.",
+        "targets": ["favorite subject", "club activities"]
+      },
+      "definitions": [
+        { "n": 16, "def": "the school subject about the language and literature of Japan", "pos": "noun" },
+        { "n": 17, "def": "the school subject about the language used in countries such as the UK and US", "pos": "noun" },
+        { "n": 18, "def": "the study of numbers, shapes, and calculations", "pos": "noun" },
+        { "n": 19, "def": "the study of the natural world through observation and experiments", "pos": "noun" },
+        { "n": 20, "def": "the study of society, communities, government, and human activity", "pos": "noun" },
+        { "n": 21, "def": "the study of important people and events from the past", "pos": "noun" },
+        { "n": 22, "def": "the study of places, people, and the physical features of Earth", "pos": "noun" },
+        { "n": 23, "def": "a school subject involving exercise, movement, and sports", "pos": "noun" },
+        { "n": 24, "def": "the art of arranging and performing sounds", "pos": "noun" },
+        { "n": 25, "def": "the school subject in which students draw, paint, and create things", "pos": "noun" },
+        { "n": 26, "def": "a subject about cooking, sewing, money, and managing a home", "pos": "noun" },
+        { "n": 27, "def": "the study and use of computers, digital information, and programming", "pos": "noun" },
+        { "n": 28, "def": "the condition of a person's body and mind and how to care for them", "pos": "noun" },
+        { "n": 29, "def": "organized groups that students join outside regular lessons", "pos": "noun" },
+        { "n": 30, "def": "a regular class meeting for notices, planning, and class matters", "pos": "noun" }
+      ],
+      "questions": [
+        { "n": 1, "type": "read", "text": "Nuppi uses a map in geography and a timeline in history.", "q": "What does Nuppi use in history?", "choices": ["a program", "a timeline", "a paintbrush", "a calculator"], "correct": 1 },
+        { "n": 2, "type": "read", "text": "Booha enjoys science because he can test an idea instead of only reading about it.", "q": "Why does Booha enjoy science?", "choices": ["He can test an idea", "There is no reading", "It is after school", "He sings every lesson"], "correct": 0 },
+        { "n": 3, "type": "read", "text": "The class discusses the festival in homeroom before the students go to their club activities.", "q": "What happens first?", "choices": ["club activities", "the festival discussion", "the health test", "music practice"], "correct": 1 },
+        { "n": 4, "type": "translate", "jp": "わたしは えいごが すきです。", "en": "I like English", "accepted": ["English is a subject I like"], "extra": ["Japanese", "likes"] },
+        { "n": 5, "type": "translate", "jp": "げつようびは たいいくと おんがくが あります。", "en": "On Monday we have PE and music", "accepted": ["We have PE and music on Monday"], "extra": ["Tuesday", "has"] },
+        { "n": 6, "type": "translate", "jp": "かていかは やくに たちます。", "en": "Home economics is useful", "accepted": ["Home economics is a useful subject"], "extra": ["history", "are"] },
+        { "n": 7, "type": "write", "jp": "すうがく", "en": "math" },
+        { "n": 8, "type": "write", "jp": "れきし", "en": "history" },
+        { "n": 9, "type": "write", "jp": "おんがく", "en": "music" }
+      ]
+    },
+    {
+      "week": 3,
+      "passage": {
+        "text": "A new student gets lost on the first morning of school, so Booha introduces the people who can help. The homeroom teacher shows her the classroom, and a subject teacher explains the science schedule. The librarian helps her find an English book. Later, the school nurse checks a small scratch while the counselor listens to her worries. In the hall, the janitor repairs a loose door and the security guard watches the entrance. The principal and vice principal welcome her at assembly. By lunchtime, a classmate, an upperclassman, and an underclassman have all said hello.",
+        "comprehension": [
+          { "n": 1, "q": "Who helps the student find an English book?", "choices": ["the counselor", "the librarian", "the coach", "the janitor"], "correct": 1 },
+          { "n": 2, "q": "Why does the student visit the school nurse?", "choices": ["She has a small scratch", "She lost a book", "She needs a schedule", "She broke a door"], "correct": 0 },
+          { "n": 3, "q": "Who watches the entrance?", "choices": ["the office staff", "the club advisor", "the security guard", "the vice principal"], "correct": 2 }
+        ]
+      },
+      "writingPrompt": {
+        "id": "sep-br-w3-writing",
+        "jp": "librarian と counselor を つかって、がっこうで たすけてもらう ばめんを 1〜3ぶんで かいてね。",
+        "en": "Write 1–3 sentences about getting help at school using librarian and counselor.",
+        "targets": ["librarian", "counselor"]
+      },
+      "definitions": [
+        { "n": 31, "def": "the person in charge of leading a school", "pos": "noun" },
+        { "n": 32, "def": "the school leader who works directly under the principal", "pos": "noun" },
+        { "n": 33, "def": "the teacher responsible for one class and its daily guidance", "pos": "noun" },
+        { "n": 34, "def": "a teacher who teaches one particular area of study", "pos": "noun" },
+        { "n": 35, "def": "a person who organizes books and helps people use a library", "pos": "noun" },
+        { "n": 36, "def": "a medical professional at school who cares for sick or injured students", "pos": "noun" },
+        { "n": 37, "def": "a person trained to listen and help with personal or school problems", "pos": "noun" },
+        { "n": 38, "def": "a person who cleans, maintains, and takes care of a building", "pos": "noun" },
+        { "n": 39, "def": "a person who trains and guides players in a sport", "pos": "noun" },
+        { "n": 40, "def": "a teacher who supervises and supports a student club", "pos": "noun" },
+        { "n": 41, "def": "a student who is in the same class as another student", "pos": "noun" },
+        { "n": 42, "def": "a student in a higher grade or year", "pos": "noun" },
+        { "n": 43, "def": "a student in a lower grade or year", "pos": "noun" },
+        { "n": 44, "def": "people who handle records, calls, visitors, and paperwork at school", "pos": "noun" },
+        { "n": 45, "def": "a person whose job is to protect a place and the people in it", "pos": "noun" }
+      ],
+      "questions": [
+        { "n": 1, "type": "read", "text": "The counselor listens to Mimo's problem and helps him make a calm plan.", "q": "How does the counselor help Mimo?", "choices": ["by giving him medicine", "by making a calm plan", "by fixing the door", "by lending a book"], "correct": 1 },
+        { "n": 2, "type": "read", "text": "The club advisor speaks with the coach before the team begins practice.", "q": "When do the adults speak?", "choices": ["after practice", "during lunch", "before practice", "at assembly"], "correct": 2 },
+        { "n": 3, "type": "read", "text": "An upperclassman shows the new underclassman how to reach the school office.", "q": "Who is new?", "choices": ["the underclassman", "the upperclassman", "the office worker", "the principal"], "correct": 0 },
+        { "n": 4, "type": "translate", "jp": "あなたの たんにんの せんせいは だれですか。", "en": "Who is your homeroom teacher", "accepted": ["Who is the teacher of your homeroom"], "extra": ["principal", "are"] },
+        { "n": 5, "type": "translate", "jp": "ほけんの せんせいは せいとを たすけます。", "en": "The school nurse helps students", "accepted": ["The nurse at school helps students"], "extra": ["librarian", "help"] },
+        { "n": 6, "type": "translate", "jp": "こうちょうしつは どこですか。", "en": "Where is the principal's office", "accepted": ["Where can I find the principal's office"], "extra": ["classroom", "were"] },
+        { "n": 7, "type": "write", "jp": "こうちょうせんせい", "en": "principal" },
+        { "n": 8, "type": "write", "jp": "としょかんの せんせい", "en": "librarian" },
+        { "n": 9, "type": "write", "jp": "こーち", "en": "coach" }
+      ]
+    },
+    {
+      "week": 4,
+      "passage": {
+        "text": "Booha reads the timetable so his busy school day will run smoothly. The first period starts after the morning assembly and the bell announces each change. During break, he prepares for the next class; during lunch break, he talks with Mimo. After school, they attend a club meeting before a parent meeting begins in another room. An exam is planned for Friday, but a holiday moves one lesson to a make-up class. Booha writes every start time and finish time in his schedule. Because he checks it carefully, he arrives on time all day.",
+        "comprehension": [
+          { "n": 1, "q": "What announces each change in the school day?", "choices": ["the exam", "the bell", "the parent meeting", "the holiday"], "correct": 1 },
+          { "n": 2, "q": "When is the exam planned?", "choices": ["Monday", "Wednesday", "Friday", "Saturday"], "correct": 2 },
+          { "n": 3, "q": "Why does Booha arrive on time?", "choices": ["He skips lunch", "He checks his schedule", "The class starts late", "There is no assembly"], "correct": 1 }
+        ]
+      },
+      "writingPrompt": {
+        "id": "sep-br-w4-writing",
+        "jp": "start time と after school を つかって、じぶんの よていを 1〜3ぶんで かいてね。",
+        "en": "Write 1–3 sentences about your schedule using start time and after school.",
+        "targets": ["start time", "after school"]
+      },
+      "definitions": [
+        { "n": 46, "def": "a chart showing the times when lessons or events happen", "pos": "noun" },
+        { "n": 47, "def": "one division of the school day used for a lesson", "pos": "noun" },
+        { "n": 48, "def": "a ringing sound used to mark the beginning or end of school time", "pos": "noun" },
+        { "n": 49, "def": "a large organized meeting of students and staff", "pos": "noun" },
+        { "n": 50, "def": "a short time between lessons when students can rest", "pos": "noun" },
+        { "n": 51, "def": "the part of the school day set aside for eating lunch and resting", "pos": "noun" },
+        { "n": 52, "def": "the clock time when an activity is planned to begin", "pos": "noun" },
+        { "n": 53, "def": "the clock time when an activity is planned to end", "pos": "noun" },
+        { "n": 54, "def": "the part of the day earlier than the beginning of classes", "pos": "phrase" },
+        { "n": 55, "def": "the part of the day following the end of classes", "pos": "phrase" },
+        { "n": 56, "def": "a planned gathering of the members of a student group", "pos": "noun" },
+        { "n": 57, "def": "a scheduled discussion between a student's family and teacher", "pos": "noun" },
+        { "n": 58, "def": "an assessment used to check knowledge or skill", "pos": "noun" },
+        { "n": 59, "def": "a day when school or regular work is officially closed", "pos": "noun" },
+        { "n": 60, "def": "an extra lesson held to replace one that was missed", "pos": "noun" }
+      ],
+      "questions": [
+        { "n": 1, "type": "read", "text": "The assembly finishes at eight forty, and first period starts five minutes later.", "q": "What time does first period start?", "choices": ["8:35", "8:40", "8:45", "8:50"], "correct": 2 },
+        { "n": 2, "type": "read", "text": "Because Monday is a holiday, the science teacher schedules a make-up class for Wednesday.", "q": "Why is there a make-up class?", "choices": ["The teacher is late", "Monday is a holiday", "The exam was easy", "The club meets Wednesday"], "correct": 1 },
+        { "n": 3, "type": "read", "text": "Mimo checks the platform clock and reaches the club meeting exactly at its start time.", "q": "Was Mimo on time?", "choices": ["Yes, exactly on time", "No, he was early", "No, he was late", "The text does not say"], "correct": 0 },
+        { "n": 4, "type": "translate", "jp": "がっこうは はちじ さんじゅっぷんに はじまります。", "en": "School starts at eight thirty", "accepted": ["School begins at eight thirty"], "extra": ["finishes", "nine"] },
+        { "n": 5, "type": "translate", "jp": "ひるやすみは じゅうにじから じゅうにじ よんじゅっぷんまでです。", "en": "Lunch break is from twelve to twelve forty", "accepted": ["The lunch break runs from twelve until twelve forty"], "extra": ["assembly", "eleven"] },
+        { "n": 6, "type": "translate", "jp": "らいしゅう、しけんが あります。", "en": "We have an exam next week", "accepted": ["There is an exam next week"], "extra": ["holiday", "last"] },
+        { "n": 7, "type": "write", "jp": "べる", "en": "bell" },
+        { "n": 8, "type": "write", "jp": "しゅうかい", "en": "assembly" },
+        { "n": 9, "type": "write", "jp": "きゅうじつ", "en": "holiday" }
+      ]
+    }
+  ]
+}
