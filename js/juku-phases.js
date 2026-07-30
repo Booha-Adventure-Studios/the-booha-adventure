@@ -169,7 +169,10 @@ function stampAttendance(slot) {
       if (!el.isConnected) return;
       if (result.ok) {
         el.className = 'juku-preflight ready';
-        el.textContent = '✓ 教材 OK / Lesson content ready';
+        const audio = result.audio;
+        el.textContent = audio && audio.required
+          ? `✓ 教材・音声 OK (${audio.ready}/${audio.required}) / Lesson and audio ready`
+          : '✓ 教材 OK / Lesson content ready';
       } else {
         el.className = 'juku-preflight failed';
         el.textContent = '⚠ 教材を よみこめません。先生を よんでください。 / Content unavailable.';

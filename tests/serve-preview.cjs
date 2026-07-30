@@ -110,6 +110,18 @@ const READING_PREVIEW = `
 })();
 </script>`;
 
+const LOBBY_PREVIEW = `
+<script>
+(function previewLobby() {
+  if (!(window.JUKU && window.JUKU_TESTS)) {
+    setTimeout(previewLobby, 50);
+    return;
+  }
+  localStorage.setItem('booha_userid', 'preview-lobby');
+  b_1730('18:56', 6);
+})();
+</script>`;
+
 const DICTATION_PREVIEW = `
 <script>
 (function previewDictation() {
@@ -201,6 +213,7 @@ http.createServer((req, res) => {
   if (pathname === '/juku.html' && url.searchParams.get('preview')) {
     const mode = url.searchParams.get('preview');
     const preview = mode === 'results' ? RESULTS_PREVIEW
+      : mode === 'lobby' ? LOBBY_PREVIEW
       : mode === 'dictation' ? DICTATION_PREVIEW : READING_PREVIEW;
     const html = fs.readFileSync(path.join(WORK, 'juku.html'), 'utf8')
       .replace('</body>', preview + '\n</body>');

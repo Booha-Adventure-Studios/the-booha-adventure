@@ -20,6 +20,9 @@ Game activity is never learning evidence and never changes a score.
   named weekly targets.
 - The reading round shows the real weekly passage and no questions or teacher
   controls.
+- The five-minute lobby validates all three lesson JSON files and preloads the
+  exact dictation clips selected for that class. Missing or silent audio blocks
+  the scored lesson instead of producing false zeroes.
 - The final screen is labeled as an automatic summary. A one-time teacher PIN
   unlocks reading review and final report approval after class.
 - Approval writes the reading rubric and final-report status only into the
