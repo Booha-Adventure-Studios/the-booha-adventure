@@ -721,11 +721,11 @@ a.deck.playing .clip  { animation: borderFlash .19s ease-in-out infinite; }
       vx:    (Math.random() - .5) * .2,
       vy:    -.04 - Math.random() * .17,
       color: COLORS[Math.floor(Math.random() * COLORS.length)],
-      alpha: .08 + Math.random() * .24,
+      alpha: .10 + Math.random() * .28,
       life:  scatter ? 1 - (y / height) : 0,
     };
   }
-  for (let i = 0; i < 64; i++) PARTS.push(makePart(true));
+  for (let i = 0; i < 82; i++) PARTS.push(makePart(true));
   function tick() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     for (let i = 0; i < PARTS.length; i++) {
