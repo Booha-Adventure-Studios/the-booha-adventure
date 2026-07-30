@@ -21,6 +21,10 @@
     return `${m}:${String(s).padStart(2, '0')}`;
   }
 
+  function atmosphere(name) {
+    document.body.dataset.jukuPhase = name || 'menu';
+  }
+
   // ── Survey / prediction question sets ────────────────────
   // Authored constant strings only — never user data.
 
@@ -187,7 +191,7 @@ function stampAttendance(slot) {
   // ── Screens ──────────────────────────────────────────────
 
   function renderMenu() {
-    
+    atmosphere('menu');
     const tk = J.tokyoNow();
     const buttons = CFG.slots.map(s => {
       const r = J.resolve(s, tk);
@@ -199,7 +203,10 @@ function stampAttendance(slot) {
     root.innerHTML = `
       ${exitX()}
       <div class="juku-panel">
-        <img class="juku-crest" src="assets/img/juku-logo.png" alt="">
+        <div class="juku-crest-wrap" aria-hidden="true">
+          <span class="juku-crest-rune"></span>
+          <img class="juku-crest" src="assets/img/juku-logo.png" alt="">
+        </div>
         <h1>英語塾</h1>
         <p class="en">English Juku</p>
         <p class="juku-sub">クラスを えらんでね<br><span class="en">Choose your class</span></p>
@@ -215,6 +222,7 @@ function stampAttendance(slot) {
   }
 
   function renderBefore(res, slot) {
+    atmosphere('before');
     root.innerHTML = `
       ${exitX()}
       <div class="juku-panel">
@@ -230,6 +238,7 @@ function stampAttendance(slot) {
   }
 
   function renderUnavailable(slot) {
+    atmosphere('before');
     root.innerHTML = `
       ${exitX()}
       <div class="juku-panel">
@@ -243,6 +252,7 @@ function stampAttendance(slot) {
   }
 
 function renderLobby(res, slot) {
+    atmosphere('lobby');
     stampAttendance(slot);
     const { week } = J.weekRecord();
     if (week.survey && week.survey.submitted) { renderLobbyReady(res, slot); return; }
@@ -267,6 +277,7 @@ function renderLobby(res, slot) {
   // its piece. Timer stays (the class is clock-governed) but demoted —
   // it now answers "when do we begin?", not "how long do I have?".
   function renderLobbyReady(res, slot) {
+    atmosphere('lobby');
     root.innerHTML = `
       <div class="juku-panel">
         <p class="juku-sub">${slot.label}</p>
@@ -319,8 +330,7 @@ function renderLobby(res, slot) {
   }
 
   function renderPredict(res, slot) {
-
-    
+    atmosphere('predict');
     const { week } = J.weekRecord();
     root.innerHTML = `
       ${spineHTML(res.phaseIdx)}
@@ -338,7 +348,7 @@ function renderLobby(res, slot) {
   function renderPhase(res, slot) {
     stampAttendance(slot);
     if (res.phase.kind === 'predict') { renderPredict(res, slot); return; }
-    
+    atmosphere(res.phase.id || res.phase.kind);
     root.innerHTML = `
       ${spineHTML(res.phaseIdx)}
       <div class="juku-panel">
@@ -372,19 +382,22 @@ function renderLobby(res, slot) {
   function placeholderFor(p) {
     switch (p.kind) {
       case 'paper':
-        return `<p class="juku-paper">📖 15ふん、こえに だして よみます。<br>
+        return `<div class="juku-book-rune" aria-hidden="true"><span></span><span></span></div>
+          <p class="juku-paper">15ふん、こえに だして よみます。<br>
           先生が じゅんばんに ききます。<br>
           <span class="en">Fifteen minutes of reading only. Read aloud while the teacher listens in turn.</span></p>`;
       case 'interval':
-        return `<p class="juku-paper">☕ きゅうけい。せのび、みず、えんぴつ。<br><span class="en">Break time.</span></p>`;
+        return `<div class="juku-rest-rune" aria-hidden="true"></div>
+          <p class="juku-paper">きゅうけい。せのび、みず、えんぴつ。<br><span class="en">Break time.</span></p>`;
         
     default: // window
         
-        return `<p class="juku-paper">✏️ （Stage 3：テスト）</p>`;
+        return `<p class="juku-paper">（Stage 3：テスト）</p>`;
     }
   }
 
   function renderClosed(slot) {
+    atmosphere('closed');
     // Report compute-if-null, gated on attendance evidence inside
     // finalize() — the closed screen itself creates a week record just
     // by existing, so the gate lives in the results file, not here.
@@ -418,7 +431,9 @@ function renderLobby(res, slot) {
   function spineHTML(activeIdx) {
     const cells = CFG.phases.map((p, i) => {
       const cls = i < activeIdx ? 'done' : i === activeIdx ? 'now' : '';
-      return `<div class="jsp-cell ${cls}" style="flex:${p.min}" title="${p.jp}"></div>`;
+      return `<div class="jsp-cell ${cls}" style="flex:${p.min}" title="${p.jp}">
+        <span class="jsp-node"></span>
+      </div>`;
     }).join('');
     return `<div class="juku-spine">${cells}</div>`;
   }

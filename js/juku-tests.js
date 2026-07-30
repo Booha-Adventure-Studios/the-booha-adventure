@@ -626,6 +626,14 @@
   // Select-then-lock: changing the selection before これで OK！ is what
   // keeps chg (and switched-from-correct) meaningful on MC items.
 
+  function audioButtonHTML() {
+    return `<button class="juku-play" id="jt-play" type="button"
+      aria-label="きく / Play audio">
+      <span class="juku-audio-rune" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span>きく</span>
+    </button>`;
+  }
+
   function showChoiceItem(taskEl, opts, onLock) {
     const shownAt = performance.now();
     let firstMs = null, changes = 0, sel = -1, audio = null;
@@ -635,7 +643,7 @@
       ${opts.demo ? '<div class="juku-demo-badge">DEMO</div>' : ''}
       <p class="juku-item-count">もんだい ${opts.idx + 1} / ${opts.count}</p>
       ${opts.promptHtml}
-      ${opts.audioUrl ? '<button class="juku-play" id="jt-play">🔊 きく</button>' : ''}
+      ${opts.audioUrl ? audioButtonHTML() : ''}
       <div class="juku-choices" id="jt-choices"></div>
       <div class="juku-test-actions">
         <button class="juku-lock off" id="jt-lock">これで OK！</button>
@@ -661,7 +669,13 @@
     if (opts.audioUrl) {
       audio = new Audio(opts.audioUrl);
       audio.preload = 'auto';
-      taskEl.querySelector('#jt-play').addEventListener('click', () => {
+      const playBtn = taskEl.querySelector('#jt-play');
+      const stopGlow = () => playBtn.classList.remove('is-playing');
+      audio.addEventListener('play', () => playBtn.classList.add('is-playing'));
+      audio.addEventListener('ended', stopGlow);
+      audio.addEventListener('pause', stopGlow);
+      audio.addEventListener('error', stopGlow);
+      playBtn.addEventListener('click', () => {
         audio.currentTime = 0; audio.play().catch(() => {});
       });
     }
@@ -697,7 +711,7 @@
       ${opts.demo ? '<div class="juku-demo-badge">DEMO</div>' : ''}
       <p class="juku-item-count">もんだい ${opts.idx + 1} / ${opts.count}</p>
       ${opts.promptHtml}
-      ${opts.audioUrl ? '<button class="juku-play" id="jt-play">🔊 きく</button>' : ''}
+      ${opts.audioUrl ? audioButtonHTML() : ''}
       <div class="juku-answer" id="jt-answer"></div>
       
       <div class="juku-bank" id="jt-bank">${bankChips}</div>
@@ -754,14 +768,26 @@
     function playAudio() {
       if (!audio || playing) return;
       playing = true;
+      const playBtn = taskEl.querySelector('#jt-play');
+      if (playBtn) playBtn.classList.add('is-playing');
       audio.currentTime = 0;
-      audio.play().then(() => { plays++; }).catch(() => { playing = false; });
+      audio.play().then(() => { plays++; }).catch(() => {
+        playing = false;
+        if (playBtn) playBtn.classList.remove('is-playing');
+      });
     }
 
     if (opts.audioUrl) {
       audio = new Audio(opts.audioUrl);
       audio.preload = 'auto';
-      audio.addEventListener('ended', () => { playing = false; });
+      audio.addEventListener('ended', () => {
+        playing = false;
+        taskEl.querySelector('#jt-play')?.classList.remove('is-playing');
+      });
+      audio.addEventListener('error', () => {
+        playing = false;
+        taskEl.querySelector('#jt-play')?.classList.remove('is-playing');
+      });
       taskEl.querySelector('#jt-play').addEventListener('click', playAudio);
       // Autoplay may be blocked before any gesture; the button is the
       // guaranteed path.
@@ -815,7 +841,7 @@
       ${opts.demo ? '<div class="juku-demo-badge">DEMO</div>' : ''}
       <p class="juku-item-count">もんだい ${opts.idx + 1} / ${opts.count}</p>
       ${opts.promptHtml}
-      ${opts.audioUrl ? '<button class="juku-play" id="jt-play">🔊 きく</button>' : ''}
+      ${opts.audioUrl ? audioButtonHTML() : ''}
       ${inputHtml}
       <p class="juku-answer-hint">${opts.hint || 'こたえは あとで まとめて かくにんします。'}</p>
       <div class="juku-test-actions">
@@ -835,14 +861,26 @@
     function playAudio() {
       if (!audio || playing) return;
       playing = true;
+      const playBtn = taskEl.querySelector('#jt-play');
+      if (playBtn) playBtn.classList.add('is-playing');
       audio.currentTime = 0;
-      audio.play().then(() => { plays++; }).catch(() => { playing = false; });
+      audio.play().then(() => { plays++; }).catch(() => {
+        playing = false;
+        if (playBtn) playBtn.classList.remove('is-playing');
+      });
     }
 
     if (opts.audioUrl) {
       audio = new Audio(opts.audioUrl);
       audio.preload = 'auto';
-      audio.addEventListener('ended', () => { playing = false; });
+      audio.addEventListener('ended', () => {
+        playing = false;
+        taskEl.querySelector('#jt-play')?.classList.remove('is-playing');
+      });
+      audio.addEventListener('error', () => {
+        playing = false;
+        taskEl.querySelector('#jt-play')?.classList.remove('is-playing');
+      });
       taskEl.querySelector('#jt-play').addEventListener('click', playAudio);
       if (opts.autoplay) playAudio();
     }
@@ -927,7 +965,8 @@
     }
     taskEl.innerHTML = `
       <div class="juku-reading-round">
-        <p class="juku-reading-instruction">📖 こえに だして、なんども よもう。</p>
+        <div class="juku-book-rune" aria-hidden="true"><span></span><span></span></div>
+        <p class="juku-reading-instruction">こえに だして、なんども よもう。</p>
         <p class="en">Read aloud. Read again for clear words, smooth phrases, and expression.</p>
         <div class="juku-reading-passage">${passage}</div>
         <p class="juku-reading-wait">先生は クラスのあとで きろくします。<br>
@@ -1363,14 +1402,50 @@
     // the same path.
   }
 
-  function dictRenderLocked(taskEl, demo) {
+  function dictClockText(sec) {
+    sec = Math.max(0, Math.ceil(sec));
+    return `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`;
+  }
+
+  function dictCountdownHTML(segIdx) {
+    const d = _dict;
+    const seg = d && d.schedule[segIdx];
+    const elapsed = d && Number.isFinite(d.lastElapsed) ? d.lastElapsed : 0;
+    const left = seg ? Math.max(0, seg.start + seg.dur - elapsed) : 0;
+    const pct = seg ? Math.max(0, Math.min(100, left / seg.dur * 100)) : 0;
+    let jp = 'つぎの もんだいまで';
+    let en = 'Next question';
+    if (seg && seg.tier === 'trans') {
+      jp = 'ぶんしょうの もんだいまで';
+      en = 'Sentences begin';
+    } else if (!d || !d.schedule.slice(segIdx + 1).some(s => s.tier !== 'trans')) {
+      jp = 'つぎの じかんまで';
+      en = 'Next round';
+    }
+    return `
+      <div class="juku-next-wrap" id="jd-countdown" role="timer"
+        aria-label="${jp}">
+        <div class="juku-next-label">
+          <span>${jp}</span><strong id="jd-remain">${dictClockText(left)}</strong>
+        </div>
+        <div class="juku-next-track" aria-hidden="true">
+          <span id="jd-meter" style="width:${pct}%"></span>
+          <i class="juku-next-spark" id="jd-spark" style="left:${pct}%"></i>
+        </div>
+        <span class="en">${en}</span>
+      </div>`;
+  }
+
+  function dictRenderLocked(taskEl, demo, segIdx) {
     taskEl.innerHTML = `
       ${demo ? '<div class="juku-demo-badge">DEMO</div>' : ''}
-      <div class="juku-done">
+      <div class="juku-done juku-locked-card">
+        <div class="juku-lock-seal" aria-hidden="true"></div>
         <p class="juku-done-jp">✓ ロック OK！</p>
         <p class="en">Locked in.</p>
-        <p class="juku-sub2">とけいが すすむまで まっててね。</p>
-      </div>`;
+        <p class="juku-sub2">メーターが なくなると、つぎへ すすむよ。</p>
+      </div>
+      ${dictCountdownHTML(segIdx)}`;
   }
 
   function dictRenderSeg(segIdx) {
@@ -1389,13 +1464,14 @@
         <div class="juku-done">
           <p class="juku-done-jp">つぎは ぶんしょう！</p>
           <p class="en">Sentences next.</p>
-        </div>`;
+        </div>
+        ${dictCountdownHTML(segIdx)}`;
       return;
     }
 
     const { week } = J.weekRecord();
     if (week.sections.dictation.items.some(it => it.seg === segIdx)) {
-      dictRenderLocked(taskEl, d.demo);   // early lock → wait for the clock
+      dictRenderLocked(taskEl, d.demo, segIdx);   // early lock → wait for the clock
       return;
     }
 
@@ -1431,13 +1507,15 @@
     // Audio-only prompt — no Japanese, no English. Demo mode (no clip)
     // shows the text so the flow stays testable.
     const prompt = `
-      <p class="juku-dict-ear">🎧</p>
+      <div class="juku-listening-stone" aria-hidden="true">
+        <span class="juku-sound-wave"><i></i><i></i><i></i><i></i><i></i></span>
+      </div>
       ${audioUrl ? '' : `<p class="juku-item-word">${card.en}</p>`}
       <p class="juku-answer-hint">${mode === 'text'
         ? 'きいて、English を かこう'
         : (seg.tier === 'word'
           ? 'きいて、もじで つくろう' : 'きいて、ことばで ならべよう')}</p>
-      <p class="juku-dict-remain" id="jd-remain"></p>`;
+      ${dictCountdownHTML(segIdx)}`;
 
     const onLock = r => {
       // Broadcast phase: the clock owns the screen, so a failure here can be
@@ -1450,7 +1528,7 @@
           { seg: segIdx, tier: seg.tier, n: card.n, at: Date.now() }, r));
       }, () => {
         d.ctrl = null;
-        dictRenderLocked(taskEl, d.demo);
+        dictRenderLocked(taskEl, d.demo, segIdx);
       });
     };
 
@@ -1478,6 +1556,7 @@
 
   function dictTick(res) {
     if (!_dict) return;
+    _dict.lastElapsed = res.phaseElapsedSec;
     const segIdx = dictSegAt(_dict.schedule, res.phaseElapsedSec);
     if (segIdx !== _dict.seg) {
       // Window closed: force-commit whatever is placed (empty counts),
@@ -1486,10 +1565,20 @@
       dictRenderSeg(segIdx);
     }
     const r = document.getElementById('jd-remain');
+    const meter = document.getElementById('jd-meter');
+    const spark = document.getElementById('jd-spark');
+    const wrap = document.getElementById('jd-countdown');
     if (r && segIdx < _dict.schedule.length) {
       const s = _dict.schedule[segIdx];
-      const left = Math.max(0, Math.ceil(s.start + s.dur - res.phaseElapsedSec));
-      r.textContent = `のこり ${left} びょう`;
+      const rawLeft = Math.max(0, s.start + s.dur - res.phaseElapsedSec);
+      const pct = Math.max(0, Math.min(100, rawLeft / s.dur * 100));
+      r.textContent = dictClockText(rawLeft);
+      if (meter) meter.style.width = `${pct}%`;
+      if (spark) spark.style.left = `${pct}%`;
+      if (wrap) {
+        wrap.classList.toggle('soon', rawLeft <= 10);
+        wrap.classList.toggle('arriving', rawLeft <= 3);
+      }
     }
   }
 
