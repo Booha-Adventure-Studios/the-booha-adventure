@@ -14,12 +14,74 @@
   body.juku-verified { visibility: visible; }
 
   body {
+    --phase-top: #171224;
+    --phase-bottom: #08141d;
+    --phase-glow: rgba(104, 185, 196, .18);
+    --phase-accent: #e8c46a;
     margin: 0;
     min-height: 100vh;
-    background: #1a1610;
+    background:
+      radial-gradient(circle at 50% -8%, var(--phase-glow), transparent 38rem),
+      radial-gradient(circle at 12% 88%, rgba(232,196,106,.08), transparent 25rem),
+      linear-gradient(155deg, var(--phase-top), var(--phase-bottom));
     color: #e8dfc8;
     font-family: "DM Sans", "Hiragino Kaku Gothic ProN", sans-serif;
     box-sizing: border-box;
+    overflow-x: hidden;
+    transition: background-color .8s ease;
+  }
+  body::before,
+  body::after {
+    content: "";
+    position: fixed;
+    z-index: 0;
+    pointer-events: none;
+    border-radius: 50%;
+    filter: blur(2px);
+    opacity: .7;
+  }
+  body::before {
+    width: 28rem; height: 28rem; left: -17rem; top: 18%;
+    border: 1px solid color-mix(in srgb, var(--phase-accent) 35%, transparent);
+    box-shadow:
+      0 0 0 42px color-mix(in srgb, var(--phase-accent) 5%, transparent),
+      0 0 0 94px color-mix(in srgb, var(--phase-accent) 3%, transparent);
+  }
+  body::after {
+    width: 20rem; height: 20rem; right: -13rem; bottom: 5%;
+    background: radial-gradient(circle, var(--phase-glow), transparent 66%);
+  }
+  body[data-juku-phase="menu"],
+  body[data-juku-phase="lobby"] {
+    --phase-top: #20172c; --phase-bottom: #071b20;
+    --phase-glow: rgba(232,196,106,.19); --phase-accent: #e8c46a;
+  }
+  body[data-juku-phase="dictation"] {
+    --phase-top: #10172e; --phase-bottom: #06141c;
+    --phase-glow: rgba(75,181,212,.2); --phase-accent: #7fc4ce;
+  }
+  body[data-juku-phase="reading"] {
+    --phase-top: #13251f; --phase-bottom: #0a1515;
+    --phase-glow: rgba(185,217,119,.16); --phase-accent: #b9d977;
+  }
+  body[data-juku-phase="order"],
+  body[data-juku-phase="vocab"] {
+    --phase-top: #23172e; --phase-bottom: #11101e;
+    --phase-glow: rgba(186,128,213,.16); --phase-accent: #c7a2e8;
+  }
+  body[data-juku-phase="mixed"],
+  body[data-juku-phase="predict"] {
+    --phase-top: #292015; --phase-bottom: #17101d;
+    --phase-glow: rgba(232,140,106,.15); --phase-accent: #e8c46a;
+  }
+  body[data-juku-phase="interval"] {
+    --phase-top: #10252b; --phase-bottom: #07171c;
+    --phase-glow: rgba(127,196,206,.14); --phase-accent: #7fc4ce;
+  }
+  body[data-juku-phase="results"],
+  body[data-juku-phase="closed"] {
+    --phase-top: #282117; --phase-bottom: #14141e;
+    --phase-glow: rgba(232,196,106,.22); --phase-accent: #e8c46a;
   }
 
   #juku-root {
@@ -30,20 +92,65 @@
     justify-content: center;
     padding: 20px;
     box-sizing: border-box;
+    position: relative;
+    z-index: 1;
   }
 
 .juku-panel {
     max-width: 560px;
     width: 100%;
+    box-sizing: border-box;
     text-align: center;
     padding: 24px 18px;
     position: relative;
     z-index: 10;
-    background: rgba(26,22,16,.72);
-    border-radius: 18px;
+    background:
+      linear-gradient(145deg, rgba(22,25,38,.9), rgba(12,17,25,.84));
+    border: 1px solid rgba(232,196,106,.16);
+    border-radius: 22px;
+    box-shadow:
+      0 24px 70px rgba(0,0,0,.44),
+      inset 0 1px 0 rgba(255,255,255,.045);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
   }
 
   .juku-crest { width: min(34vw, 150px); height: auto; margin-bottom: 14px; }
+  .juku-crest-wrap {
+    width: min(45vw, 190px); aspect-ratio: 1; margin: -10px auto 3px;
+    display: grid; place-items: center; position: relative; isolation: isolate;
+  }
+  .juku-crest-wrap::before,
+  .juku-crest-wrap::after,
+  .juku-crest-rune {
+    content: ""; position: absolute; border-radius: 50%; pointer-events: none;
+  }
+  .juku-crest-wrap::before {
+    inset: 10%; z-index: -1;
+    background: radial-gradient(circle, rgba(255,232,153,.35), rgba(232,196,106,.1) 45%, transparent 70%);
+    filter: blur(7px);
+    animation: jkCrestGlow 3.8s ease-in-out infinite;
+  }
+  .juku-crest-wrap::after {
+    inset: 7%; z-index: -1; border: 1px solid rgba(232,196,106,.3);
+    box-shadow: 0 0 24px rgba(232,196,106,.22), inset 0 0 20px rgba(232,196,106,.12);
+  }
+  .juku-crest-rune {
+    inset: 0; z-index: -2;
+    background:
+      repeating-conic-gradient(from 0deg, rgba(232,196,106,.42) 0 1deg, transparent 1deg 22.5deg);
+    -webkit-mask: radial-gradient(circle, transparent 0 62%, #000 63% 65%, transparent 66%);
+    mask: radial-gradient(circle, transparent 0 62%, #000 63% 65%, transparent 66%);
+    animation: jkRuneTurn 38s linear infinite;
+  }
+  .juku-crest-wrap .juku-crest {
+    width: 82%; margin: 0; filter: drop-shadow(0 8px 16px rgba(0,0,0,.48));
+  }
+  @keyframes jkCrestGlow {
+    0%,100% { opacity:.55; transform:scale(.94); }
+    50% { opacity:1; transform:scale(1.05); }
+  }
+  @keyframes jkRuneTurn { to { transform: rotate(360deg); } }
 
   h1 {
     font-size: 24px; font-weight: 700; margin: 0 0 6px;
@@ -93,19 +200,44 @@
 
   /* ── progress spine ── */
   .juku-spine {
-    position: fixed; top: 0; left: 0; right: 0; height: 6px;
-    display: flex; gap: 2px; z-index: 50;
-    background: rgba(0,0,0,.4);
+    position: fixed; top: 0; left: 0; right: 0; height: 26px;
+    display: flex; gap: 3px; z-index: 50; padding: 10px 10px 0;
+    box-sizing: border-box;
+    background: linear-gradient(180deg, rgba(4,7,13,.9), transparent);
   }
-  .jsp-cell { background: rgba(232,196,106,.12); }
-  .jsp-cell.done { background: rgba(232,196,106,.45); }
-  .jsp-cell.now  {
+  .jsp-cell {
+    height: 3px; position: relative; border-radius: 999px;
+    background: rgba(232,196,106,.13);
+  }
+  .jsp-cell.done { background: rgba(232,196,106,.48); }
+  .jsp-cell.now {
     background: linear-gradient(90deg,#e8c46a,#fff3c0,#e8c46a);
     background-size: 200% 100%;
     animation: jspNow 2.4s linear infinite;
     box-shadow: 0 0 10px rgba(232,196,106,.6);
   }
+  .jsp-node {
+    position: absolute; right: -4px; top: 50%; width: 7px; height: 7px;
+    border-radius: 50%; transform: translateY(-50%);
+    background: #332d24; border: 1px solid rgba(232,196,106,.35);
+    box-shadow: 0 0 0 2px rgba(4,7,13,.8);
+  }
+  .jsp-cell.done .jsp-node { background: #e8c46a; }
+  .jsp-cell.now .jsp-node {
+    width: 11px; height: 11px; right: -6px;
+    background: #fff3c0; border-color: #fff3c0;
+    box-shadow: 0 0 0 3px rgba(232,196,106,.16), 0 0 14px #e8c46a;
+  }
+  .jsp-cell.now .jsp-node::after {
+    content: ""; position: absolute; inset: -6px; border-radius: 50%;
+    border: 1px solid rgba(255,243,192,.5);
+    animation: jkNodePulse 1.8s ease-out infinite;
+  }
   @keyframes jspNow { 0%{background-position:0% 0} 100%{background-position:200% 0} }
+  @keyframes jkNodePulse {
+    0% { transform:scale(.55); opacity:1; }
+    100% { transform:scale(1.4); opacity:0; }
+  }
 
  /* ── exit X + nav (outside lesson only) ── */
   .juku-x {
@@ -139,13 +271,48 @@
   .juku-submit:active { transform: scale(.96); }
   .juku-submit.off { opacity: .3; pointer-events: none; }
   
- .juku-done {
+  .juku-done {
     text-align: center; margin-top: 8px; padding: 10px 14px;
     border: 1px solid rgba(185,217,119,.4); border-radius: 14px;
-    background: #232013;
+    background: linear-gradient(145deg, rgba(36,36,31,.94), rgba(19,25,29,.94));
     display: inline-block;
     box-shadow: 0 4px 24px rgba(0,0,0,.5);
   }
+  .juku-locked-card {
+    width: min(100%, 350px); box-sizing: border-box; padding: 18px 18px 15px;
+    position: relative; overflow: hidden;
+    border-color: rgba(127,196,206,.46);
+    box-shadow: 0 14px 38px rgba(0,0,0,.36), inset 0 0 32px rgba(127,196,206,.055);
+    animation: jkLockArrive .35s cubic-bezier(.2,.9,.25,1.2) both;
+  }
+  .juku-locked-card::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(110deg, transparent 20%, rgba(255,255,255,.07) 44%, transparent 63%);
+    transform: translateX(-120%);
+    animation: jkLockSheen .9s .15s ease-out both;
+  }
+  .juku-lock-seal {
+    width: 48px; height: 48px; margin: 0 auto 9px; border-radius: 50%;
+    display: grid; place-items: center; position: relative;
+    border: 1px solid rgba(127,196,206,.65);
+    background: radial-gradient(circle, rgba(127,196,206,.2), rgba(12,23,31,.9));
+    box-shadow: 0 0 18px rgba(127,196,206,.24);
+  }
+  .juku-lock-seal::before {
+    content: ""; width: 13px; height: 15px; border: 2px solid #bde5ea;
+    border-radius: 3px; box-sizing: border-box;
+    box-shadow: inset 0 -7px 0 rgba(189,229,234,.2);
+  }
+  .juku-lock-seal::after {
+    content: ""; position: absolute; width: 10px; height: 8px;
+    margin-top: -15px; border: 2px solid #bde5ea; border-bottom: 0;
+    border-radius: 8px 8px 0 0;
+  }
+  @keyframes jkLockArrive {
+    from { opacity:0; transform:scale(.94) translateY(7px); }
+    to { opacity:1; transform:none; }
+  }
+  @keyframes jkLockSheen { to { transform:translateX(120%); } }
   
   .juku-done-jp { font-size: 16px; font-weight: 800; color: #b9d977; margin: 0 0 2px; }
   
@@ -231,11 +398,39 @@
   /* ── Stage 3b ── */
   .juku-choices { display: flex; flex-direction: column; gap: 10px; margin: 14px 0; }
   .juku-choice { padding: 12px 16px; border-radius: 12px; border: 2px solid rgba(255,255,255,.25);
-    background: rgba(255,255,255,.06); color: inherit; font: inherit; text-align: left; }
-  .juku-choice.picked { border-color: currentColor; background: rgba(255,255,255,.16); }
-  .juku-play { margin: 6px 0 10px; padding: 8px 18px; border-radius: 999px;
-    border: 2px solid rgba(255,255,255,.3); background: rgba(255,255,255,.08);
-    color: inherit; font: inherit; }
+    background: linear-gradient(135deg, rgba(255,255,255,.075), rgba(255,255,255,.025));
+    color: inherit; font: inherit; text-align: left; }
+  .juku-choice.picked {
+    border-color: var(--phase-accent);
+    background: linear-gradient(135deg, rgba(232,196,106,.18), rgba(127,196,206,.09));
+    box-shadow: 0 0 18px rgba(232,196,106,.11);
+  }
+  .juku-play {
+    margin: 6px 0 10px; padding: 9px 18px; border-radius: 999px;
+    display: inline-flex; gap: 10px; align-items: center; justify-content: center;
+    border: 1px solid rgba(127,196,206,.52);
+    background: linear-gradient(145deg, rgba(127,196,206,.16), rgba(255,255,255,.045));
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.1), 0 5px 18px rgba(0,0,0,.22);
+    color: #d8f3f4; font: 750 14px "DM Sans", "Hiragino Kaku Gothic ProN", sans-serif;
+    cursor: pointer; transition: transform .12s ease, box-shadow .2s ease;
+  }
+  .juku-play:active { transform:scale(.96); }
+  .juku-play.is-playing { box-shadow: 0 0 22px rgba(127,196,206,.3); }
+  .juku-audio-rune {
+    width: 25px; height: 18px; display: flex; gap: 3px;
+    align-items: center; justify-content: center;
+  }
+  .juku-audio-rune i {
+    display: block; width: 3px; border-radius: 999px; background: #bde5ea;
+    box-shadow: 0 0 5px rgba(189,229,234,.45);
+  }
+  .juku-audio-rune i:nth-child(1) { height:7px; }
+  .juku-audio-rune i:nth-child(2) { height:15px; }
+  .juku-audio-rune i:nth-child(3) { height:10px; }
+  .juku-play.is-playing .juku-audio-rune i { animation: jkSoundBar .65s ease-in-out infinite alternate; }
+  .juku-play.is-playing .juku-audio-rune i:nth-child(2) { animation-delay:-.32s; }
+  .juku-play.is-playing .juku-audio-rune i:nth-child(3) { animation-delay:-.5s; }
+  @keyframes jkSoundBar { to { height:18px; filter:brightness(1.35); } }
   .juku-passage { text-align: left; line-height: 1.75; padding: 12px 14px;
     border-radius: 12px; background: rgba(255,255,255,.05); margin-bottom: 10px;
     max-height: 34vh; overflow-y: auto; }
@@ -251,7 +446,8 @@
     resize: vertical; outline: none;
   }
   .juku-open-response:focus {
-    border-color: #e8c46a; box-shadow: 0 0 0 3px rgba(232,196,106,.12);
+    border-color: var(--phase-accent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--phase-accent) 14%, transparent);
   }
   .juku-open-response::placeholder { color: #6f684f; }
   .juku-chip.letter { min-width: 2.1em; text-align: center; }
@@ -268,6 +464,26 @@
   .juku-reading-instruction {
     margin: 0 0 2px; text-align: center; font-size: 16px; font-weight: 800;
     color: #e8c46a;
+  }
+  .juku-book-rune {
+    width: 58px; height: 43px; margin: 0 auto 11px; position: relative;
+    display: flex; gap: 3px; perspective: 100px;
+    filter: drop-shadow(0 0 12px rgba(185,217,119,.18));
+  }
+  .juku-book-rune span {
+    flex: 1; border: 1px solid rgba(185,217,119,.7);
+    background: linear-gradient(135deg, rgba(185,217,119,.18), rgba(255,255,255,.035));
+  }
+  .juku-book-rune span:first-child {
+    border-radius: 10px 2px 3px 5px; transform:rotateY(10deg);
+  }
+  .juku-book-rune span:last-child {
+    border-radius: 2px 10px 5px 3px; transform:rotateY(-10deg);
+  }
+  .juku-book-rune::after {
+    content: ""; position:absolute; width:2px; height:38px; top:3px; left:28px;
+    background: linear-gradient(transparent, #b9d977, transparent);
+    box-shadow: 0 0 8px rgba(185,217,119,.45);
   }
   .juku-reading-round > .en { display: block; text-align: center; line-height: 1.5; }
   .juku-reading-passage {
@@ -315,6 +531,97 @@
     background: linear-gradient(160deg,#fff3c0,#e8c46a);
   }
   .juku-rubric-done { margin: 9px 0 0; text-align: center; color: #b9d977; font-size: 12px; }
+
+  /* ── listening stone + wall-clock item guide ── */
+  .juku-listening-stone {
+    width: 64px; height: 64px; margin: 4px auto 12px; position: relative;
+    display: grid; place-items: center; border-radius: 50%;
+    background:
+      radial-gradient(circle at 38% 32%, rgba(255,255,255,.14), transparent 24%),
+      radial-gradient(circle, rgba(127,196,206,.2), rgba(10,27,38,.94) 68%);
+    border: 1px solid rgba(127,196,206,.5);
+    box-shadow: inset 0 0 24px rgba(127,196,206,.1), 0 0 24px rgba(75,181,212,.12);
+  }
+  .juku-listening-stone::before,
+  .juku-listening-stone::after {
+    content: ""; position: absolute; border-radius: 50%;
+    border: 1px solid rgba(127,196,206,.28);
+  }
+  .juku-listening-stone::before { inset:-7px; }
+  .juku-listening-stone::after { inset:-15px; opacity:.45; }
+  .juku-sound-wave {
+    width: 31px; height: 25px; display:flex; align-items:center;
+    justify-content:center; gap:4px;
+  }
+  .juku-sound-wave i {
+    width:3px; border-radius:999px; background:#bde5ea;
+    box-shadow:0 0 6px rgba(189,229,234,.5);
+    animation:jkListen 1.15s ease-in-out infinite alternate;
+  }
+  .juku-sound-wave i:nth-child(1),
+  .juku-sound-wave i:nth-child(5) { height:8px; }
+  .juku-sound-wave i:nth-child(2),
+  .juku-sound-wave i:nth-child(4) { height:16px; animation-delay:-.35s; }
+  .juku-sound-wave i:nth-child(3) { height:25px; animation-delay:-.7s; }
+  @keyframes jkListen { to { transform:scaleY(.55); opacity:.62; } }
+
+  .juku-next-wrap {
+    width: min(100%, 390px); margin: 15px auto 2px; padding: 10px 12px 9px;
+    box-sizing: border-box; border-radius: 12px; text-align: left;
+    background: rgba(3,11,18,.38); border: 1px solid rgba(127,196,206,.16);
+  }
+  .juku-next-label {
+    display:flex; align-items:baseline; justify-content:space-between; gap:12px;
+    color:#9abcc0; font-size:11px; font-weight:750; letter-spacing:.04em;
+  }
+  .juku-next-label strong {
+    color:#d8f3f4; font-size:17px; font-variant-numeric:tabular-nums;
+    letter-spacing:.04em;
+  }
+  .juku-next-track {
+    height:6px; margin:7px 0 5px; position:relative; overflow:visible;
+    border-radius:999px; background:rgba(255,255,255,.08);
+  }
+  .juku-next-track > span {
+    display:block; height:100%; width:100%; border-radius:inherit;
+    background:linear-gradient(90deg,#4bb5d4,#bde5ea);
+    box-shadow:0 0 10px rgba(75,181,212,.3);
+    transition:width .85s linear, background .25s ease;
+  }
+  .juku-next-spark {
+    position:absolute; top:50%; left:100%; width:9px; height:9px;
+    border-radius:50%; transform:translate(-50%,-50%);
+    background:#d8f3f4; box-shadow:0 0 12px #7fc4ce;
+    transition:left .85s linear;
+  }
+  .juku-next-wrap > .en { display:block; color:#647d82; font-size:10px; }
+  .juku-next-wrap.soon .juku-next-track > span {
+    background:linear-gradient(90deg,#e8a56a,#fff3c0);
+    box-shadow:0 0 12px rgba(232,196,106,.28);
+  }
+  .juku-next-wrap.soon .juku-next-label strong { color:#fff3c0; }
+  .juku-next-wrap.soon .juku-next-spark {
+    background:#fff3c0; box-shadow:0 0 12px #e8c46a;
+  }
+  .juku-next-wrap.arriving { border-color:rgba(232,196,106,.32); }
+  .juku-next-wrap.arriving .juku-next-label strong { animation:jkArriving .7s ease-in-out infinite alternate; }
+  @keyframes jkArriving { to { opacity:.5; } }
+
+  .juku-rest-rune {
+    width:58px; height:58px; margin:0 auto 12px; position:relative;
+    border-radius:50%; border:1px solid rgba(127,196,206,.3);
+    box-shadow:inset 0 0 22px rgba(127,196,206,.1), 0 0 20px rgba(127,196,206,.08);
+  }
+  .juku-rest-rune::before {
+    content:""; position:absolute; width:27px; height:27px; top:11px; left:13px;
+    border-radius:50%; border:3px solid #bde5ea; border-top-color:transparent;
+    transform:rotate(-38deg); opacity:.8;
+  }
+  .juku-rest-rune::after {
+    content:""; position:absolute; width:4px; height:4px; right:10px; top:11px;
+    border-radius:50%; background:#fff3c0;
+    box-shadow:-7px 12px 0 rgba(255,243,192,.5), 2px 20px 0 rgba(255,243,192,.35);
+  }
 
   /* ── results and detailed skill evidence ── */
   .juku-results { width: min(100%, 560px); margin: 0 auto; text-align: left; }
@@ -384,7 +691,14 @@
     .juku-rubric-opts { justify-content: center; }
   }
   @media (prefers-reduced-motion: reduce) {
-    .live-dot, .jsp-cell.now { animation: none; }
+    .live-dot, .jsp-cell.now, .jsp-cell.now .jsp-node::after,
+    .juku-crest-wrap::before, .juku-crest-rune,
+    .juku-play.is-playing .juku-audio-rune i,
+    .juku-sound-wave i, .juku-locked-card,
+    .juku-locked-card::after, .juku-next-wrap.arriving .juku-next-label strong {
+      animation: none;
+    }
+    .juku-next-track > span, .juku-next-spark { transition:none; }
   }
 </style>
 

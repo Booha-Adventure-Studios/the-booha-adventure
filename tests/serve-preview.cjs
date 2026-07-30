@@ -129,7 +129,7 @@ const DICTATION_PREVIEW = `
     setTimeout(previewDictation, 50);
     return;
   }
-  localStorage.setItem('booha_userid', 'preview-dictation');
+  localStorage.setItem('booha_userid', 'preview-dictation-' + Date.now());
   JUKU.selectSlot('slot-b');
   b_1730('19:01', 6);
 })();
