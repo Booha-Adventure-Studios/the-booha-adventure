@@ -751,15 +751,17 @@ a.deck.playing .clip  { animation: borderFlash .21s ease-in-out infinite; }
   window.addEventListener('resize', resize);
   const PARTS = [];
   function makePart(scatter) {
+    const height = canvas.height || 700;
+    const y = scatter ? Math.random() * height : height + 12;
     return {
       x:     Math.random() * (canvas.width  || 400),
-      y:     scatter ? Math.random() * (canvas.height || 700) : (canvas.height || 700) + 12,
+      y,
       r:     .4 + Math.random() * 1.6,
       vx:    (Math.random() - .5) * .15,
       vy:    -.03 - Math.random() * .12,
       color: COLORS[Math.floor(Math.random() * COLORS.length)],
       alpha: .06 + Math.random() * .18,
-      life:  scatter ? Math.random() : 0,
+      life:  scatter ? 1 - (y / height) : 0,
     };
   }
   for (let i = 0; i < 55; i++) PARTS.push(makePart(true));
@@ -767,9 +769,13 @@ a.deck.playing .clip  { animation: borderFlash .21s ease-in-out infinite; }
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     for (let i = 0; i < PARTS.length; i++) {
       const p = PARTS[i];
-      p.x += p.vx; p.y += p.vy; p.life += .0025;
-      if (p.y < -12 || p.life > 1) { PARTS[i] = makePart(false); continue; }
-      const a = p.alpha * Math.sin(p.life * Math.PI);
+      p.x += p.vx;
+      p.y += p.vy;
+      p.life += Math.abs(p.vy) / ((canvas.height || 700) + 24);
+      if (p.x < -12) p.x = canvas.width + 12;
+      else if (p.x > canvas.width + 12) p.x = -12;
+      if (p.y < -12) { PARTS[i] = makePart(false); continue; }
+      const a = p.alpha * Math.sin(Math.min(1, p.life) * Math.PI);
       ctx.beginPath();
       ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
       ctx.fillStyle = p.color;
