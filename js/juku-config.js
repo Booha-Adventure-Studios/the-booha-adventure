@@ -73,6 +73,10 @@ window.JUKU_CONFIG = {
     // leave enough time for real typing while keeping every device synced.
     dictation: {
       transitionSec: 10, // tier-change splash between word and sentence
+      // The lobby preloads the exact clips selected for this week's
+      // broadcast. Four parallel loads are gentle on classroom Wi-Fi while
+      // comfortably fitting inside the five-minute lobby.
+      audioPreflight: { timeoutMs: 12000, concurrency: 4 },
       profiles: {
         // 850 seconds + a calm 50-second finish buffer.
         pb: { words: 8, wordSec: 30, sentences: 4, sentenceSec: 150 },

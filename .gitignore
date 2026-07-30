@@ -1,0 +1,13 @@
+# macOS metadata
+.DS_Store
+**/.DS_Store
+
+# Local repair/recommendation snapshots
+.juku-*-backup-*/
+
+# Local test and editor output
+node_modules/
+test-results/
+playwright-report/
+*.log
+

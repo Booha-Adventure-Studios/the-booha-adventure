@@ -398,26 +398,28 @@
 <script>
 (function () {
   // ── Juku gate ─────────────────────────────────────────────
-  // Fail-closed: membership must be proven, not assumed.
-  // Reads localStorage only — b_3910() sets an in-memory flag
-  // and is therefore rejected here by design.
+  // Fail-closed: membership must be proven for the CURRENT token, not read
+  // from a previous student's cached flag. token.js writes booha_is_juku and
+  // only then dispatches booha:identityReady.
 
   var KEY_JUKU = 'booha_is_juku';
-  var verified = false;
+  var decided = false;
 
   function fail() {
-    if (verified) return;
+    if (decided) return;
+    decided = true;
     window.location.replace('index.html');
   }
 
-  function check() {
+  function decideFromFreshIdentity() {
+    if (decided) return;
     if (localStorage.getItem(KEY_JUKU) === '1') {
-      verified = true;
+      decided = true;
       document.body.classList.add('juku-verified');
       loadEngine();
-      return true;
+      return;
     }
-    return false;
+    fail();
   }
 
   // The engine loads ONLY after the gate passes — sequentially,
@@ -436,20 +438,12 @@
     })(0);
   }
 
-  // token.js verifies async; the flag may be written moments
-  // after this script runs. Poll briefly, then fail closed.
-  if (!check()) {
-    var tries = 0;
-    var poll = setInterval(function () {
-      tries++;
-      if (check()) {
-        clearInterval(poll);
-      } else if (tries >= 10) {   // 10 × 500ms = 5-second timeout
-        clearInterval(poll);
-        fail();
-      }
-    }, 500);
-  }
+  // Offline grace also reaches this signal, but only when token.js has a
+  // previously verified userId. A slow network remains on token.js's
+  // connecting screen instead of being mistaken for a non-Juku student.
+  if (window.BOOHA_IDENTITY_READY) decideFromFreshIdentity();
+  else document.addEventListener(
+    'booha:identityReady', decideFromFreshIdentity, { once: true });
 })();
 </script>
 
