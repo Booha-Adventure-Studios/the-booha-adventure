@@ -533,11 +533,11 @@ a.deck.playing .clip {
       vx:    (Math.random() - .5) * .22,
       vy:    -.06 - Math.random() * .18,
       color: COLORS[Math.floor(Math.random() * COLORS.length)],
-      alpha: .1 + Math.random() * .26,
+      alpha: .12 + Math.random() * .30,
       life:  scatter ? 1 - (y / height) : 0,
     };
   }
-  for (let i = 0; i < 60; i++) PARTS.push(makePart(true));
+  for (let i = 0; i < 78; i++) PARTS.push(makePart(true));
   function tick() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     for (let i = 0; i < PARTS.length; i++) {

@@ -42,7 +42,6 @@ let isPlaying    = false;
 let slowMode     = false;
 let pauseTimer   = null;
 let ringRAF      = null;
-let lastMilestone = -1;
 // FIX: one persistent Audio element, created once, never replaced
 const audioEl    = new Audio();
 audioEl.preload  = 'auto';
@@ -226,12 +225,6 @@ function updateUI(track) {
   if (FX) {
     FX.setProgress(trackIdx + 1, TRACKS.length);
     FX.cardArrive();
-    if (trackIdx > 0 && (trackIdx + 1) % 5 === 0 && lastMilestone !== trackIdx) {
-      FX.milestone();
-      lastMilestone = trackIdx;
-    } else if ((trackIdx + 1) % 5 !== 0) {
-      lastMilestone = -1;
-    }
   }
   requestAnimationFrame(() => fitText(enTextEl));
   if (pauseRing) pauseRing.classList.remove('visible');
@@ -293,7 +286,6 @@ function startPause(track, gen) {
     /* ── FIX: check generation again when timer fires ── */
     if (gen !== playGen) return;
     if (pauseRing) pauseRing.classList.remove('visible');
-    if (trackIdx === TRACKS.length - 1 && FX) FX.celebrate();
     if (isPlaying) playTrack((trackIdx + 1) % TRACKS.length);
   }, ms);
 }
@@ -369,7 +361,6 @@ if (btnPrev) btnPrev.addEventListener('click', () => {
 
 if (btnNext) btnNext.addEventListener('click', () => {
   if (!TRACKS.length) return;
-  if (trackIdx === TRACKS.length - 1 && FX) FX.celebrate();
   const i = (trackIdx + 1) % TRACKS.length;
   if (isPlaying) { playTrack(i); }
   else {
