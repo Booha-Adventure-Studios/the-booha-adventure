@@ -123,6 +123,22 @@ assert.ok(Object.keys(record.save.weeks)[0].includes('2026-07-26'),
 const html = fs.readFileSync(path.join(ROOT, 'juku.html'), 'utf8');
 assert.ok(html.includes("'js/juku-results.js'"),
   'juku-results.js must be loaded before phases');
+assert.ok(html.includes('.juku-next-track') && html.includes('.juku-crest-wrap'),
+  'Juku must include the item countdown and glowing crest visual system');
+assert.ok(html.includes('prefers-reduced-motion'),
+  'Juku visual motion must respect the student motion preference');
+const phasesSource = fs.readFileSync(path.join(ROOT, 'js/juku-phases.js'), 'utf8');
+assert.ok(phasesSource.includes("atmosphere(res.phase.id || res.phase.kind)"),
+  'live Juku phases must set their visual atmosphere');
+assert.ok(phasesSource.includes('<span class="jsp-node"></span>'),
+  'the lesson spine must render quest-path nodes');
+const testsSource = fs.readFileSync(path.join(ROOT, 'js/juku-tests.js'), 'utf8');
+assert.ok(testsSource.includes('id="jd-meter"') &&
+  testsSource.includes("spark.style.left = `${pct}%`"),
+  'dictation must show a wall-clock meter through active and locked states');
+assert.ok(testsSource.includes('juku-audio-rune') &&
+  !testsSource.includes('🔊 きく') && !testsSource.includes('🎧'),
+  'lesson audio controls must use the Booha rune instead of emoji');
 assert.strictEqual(CFG.content.allowDemo, false,
   'production juku must not silently fall back to demo questions');
 assert.strictEqual(CFG.teacherReview.purpose, 'juku-report-review',
