@@ -299,15 +299,10 @@ function playAudio() {
    NAVIGATION
 ════════════════════════════ */
 function goNext() {
-  const completed = idx === CARDS.length - 1;
   stopAudio();
   idx = (idx + 1) % CARDS.length;
   flipped = false;
   showCard();
-  if (FX) {
-    if (completed) FX.celebrate();
-    else if ((idx + 1) % 5 === 0) FX.milestone();
-  }
 }
 function goPrev() { stopAudio(); idx=(idx-1+CARDS.length)%CARDS.length; flipped=false; showCard(); }
 function doFlip() {

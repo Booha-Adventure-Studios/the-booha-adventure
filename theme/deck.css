@@ -772,12 +772,11 @@ svg.ring-svg { width:44px; height:44px; transform:rotate(-90deg); }
 
 /* ══════════════════════════════════════════════════════════════
    LIVING DECK EFFECTS
-   Theme materials, depth, progress atmosphere, and celebrations.
+   Theme materials, depth, and responsive card interactions.
 ══════════════════════════════════════════════════════════════ */
 
 :root {
   --deck-progress: 0;
-  --world-opacity: .20;
   --world-saturation: 1;
   --world-brightness: 1;
   --tilt-x: 0deg;
@@ -792,54 +791,6 @@ body::before {
 }
 body.deck-audio-active::before {
   filter: saturate(1.28) brightness(1.12);
-}
-
-/* Slow environmental shapes behind the card and particle canvas. */
-#ambient-world {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  overflow: hidden;
-  pointer-events: none;
-  opacity: var(--world-opacity);
-  transition: opacity .9s ease;
-}
-#ambient-world i {
-  position: absolute;
-  left: var(--x);
-  bottom: -90px;
-  width: var(--size);
-  height: var(--size);
-  opacity: .32;
-  animation: worldFloat var(--dur) linear infinite;
-  animation-delay: var(--delay);
-  will-change: transform;
-}
-[data-theme="br"] #ambient-world i {
-  border-radius: 80% 8% 80% 8%;
-  background: linear-gradient(135deg, rgba(190,255,85,.45), rgba(20,100,8,.04));
-  border: 1px solid rgba(170,255,70,.22);
-  box-shadow: 0 0 20px rgba(120,255,40,.10);
-}
-[data-theme="pb"] #ambient-world i {
-  border-radius: 50%;
-  background:
-    radial-gradient(circle at 30% 25%, rgba(255,255,255,.75) 0 7%, transparent 9%),
-    radial-gradient(circle at 45% 45%, rgba(255,170,230,.28), rgba(170,90,255,.04) 70%);
-  border: 1px solid rgba(255,200,240,.26);
-  box-shadow: inset 0 0 12px rgba(255,255,255,.12), 0 0 18px rgba(255,100,220,.08);
-}
-[data-theme="bc"] #ambient-world i {
-  height: 2px;
-  border-radius: 1px;
-  background: linear-gradient(90deg, transparent, rgba(0,240,255,.65), transparent);
-  box-shadow: 0 0 12px rgba(0,240,255,.24);
-}
-@keyframes worldFloat {
-  0%   { transform:translate3d(0, 80px, 0) rotate(0deg); opacity:0; }
-  12%  { opacity:.34; }
-  82%  { opacity:.22; }
-  100% { transform:translate3d(var(--drift), -115vh, 0) rotate(300deg); opacity:0; }
 }
 
 /* The flip and pointer tilt share one transform without fighting. */
@@ -985,7 +936,7 @@ body.deck-audio-active .card-face {
   100% { opacity:1; transform:none; }
 }
 
-/* Flip wave and milestone/finish particles. */
+/* Translation flip wave. */
 #deck-effect-layer {
   position: fixed;
   inset: 0;
@@ -1010,122 +961,14 @@ body.deck-audio-active .card-face {
   0%   { opacity:.8; transform:translate(-50%,-50%) scale(.2); }
   100% { opacity:0; transform:translate(-50%,-50%) scale(34); }
 }
-.world-burst {
-  position: fixed;
-  left: var(--burst-x, 50vw);
-  top: var(--burst-y, 50vh);
-  width: var(--size);
-  height: var(--size);
-  border-radius: 50%;
-  background: var(--play-border);
-  box-shadow:0 0 12px var(--play-glow-h);
-  opacity:0;
-  animation:worldBurst 1.35s cubic-bezier(.16,.74,.22,1) var(--delay) forwards;
-}
-[data-theme="br"] .world-burst { border-radius:80% 8% 80% 8%; }
-[data-theme="pb"] .world-burst { background:#ff9cdb; }
-[data-theme="bc"] .world-burst { border-radius:1px; background:#00f0ff; }
-@keyframes worldBurst {
-  0%   { opacity:0; transform:translate(-50%,-50%) scale(.2) rotate(0); }
-  12%  { opacity:1; }
-  100% { opacity:0; transform:translate(calc(-50% + var(--tx)),calc(-50% + var(--ty))) scale(.45) rotate(var(--spin)); }
-}
-body.deck-milestone .card-counter,
-body.deck-milestone .stream-badge {
-  animation:milestoneLabel .85s ease;
-}
-@keyframes milestoneLabel {
-  0%,100% { transform:scale(1); color:rgba(255,255,255,.4); }
-  45%     { transform:scale(1.22); color:#fff; text-shadow:0 0 24px var(--play-glow-h); }
-}
-
-/* Completion is a short themed ceremony, dismissible by tapping. */
-#deck-celebration {
-  position: fixed;
-  inset: 0;
-  z-index: 10020;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  padding:24px;
-  text-align:center;
-  background:rgba(0,0,0,.92);
-  background:radial-gradient(circle at 50% 48%, color-mix(in srgb, var(--play-bg-a) 52%, transparent), rgba(0,0,0,.92) 68%);
-  opacity:0;
-  visibility:hidden;
-  transform:scale(1.05);
-  transition:opacity .35s ease, transform .5s cubic-bezier(.2,.8,.3,1), visibility 0s linear .5s;
-  cursor:pointer;
-}
-#deck-celebration.show {
-  opacity:1;
-  visibility:visible;
-  transform:scale(1);
-  transition-delay:0s;
-}
-.celebration-halo {
-  position:absolute;
-  width:min(74vw,520px);
-  aspect-ratio:1;
-  border:1px solid var(--play-border);
-  border-radius:50%;
-  box-shadow:0 0 80px var(--play-glow), inset 0 0 80px var(--play-glow);
-  animation:celebrationHalo 1.8s ease-in-out infinite alternate;
-}
-.celebration-symbol {
-  position:relative;
-  font-size:clamp(54px,13vw,118px);
-  color:var(--play-border);
-  line-height:1;
-  filter:drop-shadow(0 0 24px var(--play-glow-h));
-  animation:celebrationSymbol .8s cubic-bezier(.16,1.4,.35,1) both;
-}
-.celebration-title {
-  position:relative;
-  margin-top:18px;
-  font-family:var(--font-ui);
-  font-size:clamp(30px,7vw,72px);
-  letter-spacing:3px;
-  text-transform:uppercase;
-  text-shadow:0 0 35px var(--play-glow-h);
-}
-.celebration-jp {
-  position:relative;
-  margin-top:8px;
-  font-family:var(--font-jp);
-  font-size:clamp(18px,3vw,28px);
-  font-weight:900;
-}
-.celebration-sub {
-  position:relative;
-  margin-top:12px;
-  font-family:var(--font-ui);
-  font-size:clamp(12px,2vw,16px);
-  letter-spacing:3px;
-  color:var(--white-dim);
-  text-transform:uppercase;
-}
-@keyframes celebrationHalo {
-  from { transform:scale(.88) rotate(0); opacity:.32; }
-  to   { transform:scale(1.04) rotate(12deg); opacity:.76; }
-}
-@keyframes celebrationSymbol {
-  from { opacity:0; transform:scale(.25) rotate(-24deg); }
-  to   { opacity:1; transform:scale(1) rotate(0); }
-}
 
 @media (prefers-reduced-motion: reduce) {
-  #ambient-world { display:none; }
   .card-scene,
   .card-face.single.fx-tilt-target { transform:none; transition:none; }
   .card-scene.flipped { transform:rotateY(180deg); }
   .card-face::before,
-  body.deck-audio-active .card-face,
-  .celebration-halo,
-  .celebration-symbol { animation:none; }
-  #deck-flip-wave,
-  .world-burst { display:none; }
+  body.deck-audio-active .card-face { animation:none; }
+  #deck-flip-wave { display:none; }
   .card-back .jp-kanji,
   .card-back .jp-hira { transition:none; }
 }
