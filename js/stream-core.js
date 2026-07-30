@@ -5,6 +5,7 @@
 (function () {
 
 const CFG        = window.DECK_CONFIG;
+const FX         = window.DeckEffects;
 const AUDIO_ROOT = 'https://pub-8d5941f302df44b899ce9d9a4606dcb7.r2.dev/audio-2027';
 
 const searchParams  = new URLSearchParams(window.location.search);
@@ -41,6 +42,7 @@ let isPlaying    = false;
 let slowMode     = false;
 let pauseTimer   = null;
 let ringRAF      = null;
+let lastMilestone = -1;
 // FIX: one persistent Audio element, created once, never replaced
 const audioEl    = new Audio();
 audioEl.preload  = 'auto';
@@ -221,6 +223,16 @@ function updateUI(track) {
   applySection(sec.color);
   wrapWords(enTextEl, track.en);
   enTextEl.classList.remove('dancing');
+  if (FX) {
+    FX.setProgress(trackIdx + 1, TRACKS.length);
+    FX.cardArrive();
+    if (trackIdx > 0 && (trackIdx + 1) % 5 === 0 && lastMilestone !== trackIdx) {
+      FX.milestone();
+      lastMilestone = trackIdx;
+    } else if ((trackIdx + 1) % 5 !== 0) {
+      lastMilestone = -1;
+    }
+  }
   requestAnimationFrame(() => fitText(enTextEl));
   if (pauseRing) pauseRing.classList.remove('visible');
   if (ringFg)    ringFg.style.strokeDashoffset = '0';
@@ -255,6 +267,7 @@ function stopEverything() {
   cancelAnimationFrame(ringRAF);
   if (pauseRing) pauseRing.classList.remove('visible');
   enTextEl.classList.remove('dancing');
+  if (FX) FX.setAudio(false);
 }
 
    
@@ -280,6 +293,7 @@ function startPause(track, gen) {
     /* ── FIX: check generation again when timer fires ── */
     if (gen !== playGen) return;
     if (pauseRing) pauseRing.classList.remove('visible');
+    if (trackIdx === TRACKS.length - 1 && FX) FX.celebrate();
     if (isPlaying) playTrack((trackIdx + 1) % TRACKS.length);
   }, ms);
 }
@@ -299,12 +313,14 @@ function playTrack(i) {
 
   audioEl.onended = () => {
     enTextEl.classList.remove('dancing');
+    if (FX) FX.setAudio(false);
     if (gen !== playGen) return;
     if (isPlaying) startPause(track, gen);
   };
 
   audioEl.onerror = () => {
     enTextEl.classList.remove('dancing');
+    if (FX) FX.setAudio(false);
     if (gen !== playGen) return;
     if (isPlaying) startPause(track, gen);
   };
@@ -313,6 +329,7 @@ function playTrack(i) {
   audioEl.play().then(() => {
     if (gen !== playGen) return;
     enTextEl.classList.add('dancing');
+    if (FX) FX.setAudio(true);
     burstMotes();
   }).catch(() => {
     enTextEl.classList.remove('dancing');
@@ -352,9 +369,13 @@ if (btnPrev) btnPrev.addEventListener('click', () => {
 
 if (btnNext) btnNext.addEventListener('click', () => {
   if (!TRACKS.length) return;
+  if (trackIdx === TRACKS.length - 1 && FX) FX.celebrate();
   const i = (trackIdx + 1) % TRACKS.length;
   if (isPlaying) { playTrack(i); }
-  else           { trackIdx = i; updateUI(TRACKS[trackIdx]); }
+  else {
+    trackIdx = i;
+    updateUI(TRACKS[trackIdx]);
+  }
 });
 
 btnPlayPause.addEventListener('click', togglePlay);
@@ -378,13 +399,17 @@ window.addEventListener('resize', () => {
   const base    = `/the-booha-adventure/content/${CFG.curriculum}/${CFG.monthDir}/`;
 
   try {
-    const [vocabRes, sentRes, questRes] = await Promise.all([
-      fetch(base + 'vocab.json'),
-      fetch(base + 'sentences.json'),
-      fetch(base + 'questions.json')
-    ]);
+    async function fetchDeck(url) {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error('HTTP_' + response.status);
+      const raw = await response.text();
+      if (!raw.trim()) throw new Error('CONTENT_NOT_READY');
+      return JSON.parse(raw);
+    }
     const [vocabData, sentData, questData] = await Promise.all([
-      vocabRes.json(), sentRes.json(), questRes.json()
+      fetchDeck(base + 'vocab.json'),
+      fetchDeck(base + 'sentences.json'),
+      fetchDeck(base + 'questions.json')
     ]);
     const allCards = [
       ...(vocabData.cards  || []),
@@ -398,7 +423,11 @@ window.addEventListener('resize', () => {
     }
     TRACKS = buildWeekStream(allCards, weekNum);
   } catch(e) {
-    if (preloadBar) preloadBar.textContent = CFG.errorLabel || 'Could not load stream data.';
+    if (preloadBar) {
+      preloadBar.textContent = e && e.message === 'CONTENT_NOT_READY'
+        ? 'This month’s stream is coming soon.'
+        : (CFG.errorLabel || 'Could not load stream data.');
+    }
     console.error('[stream-core] fetch failed:', e);
     return;
   }

@@ -12,6 +12,7 @@
 (function () {
 
 const CFG        = window.DECK_CONFIG;
+const FX         = window.DeckEffects;
 const AUDIO_ROOT = 'https://pub-8d5941f302df44b899ce9d9a4606dcb7.r2.dev/audio-2027';
 
 const searchParams = new URLSearchParams(window.location.search);
@@ -222,6 +223,11 @@ function showCard() {
   hiraEl.textContent  = card.hira;
   counter.textContent = (idx+1) + ' / ' + CARDS.length;
   scene.classList.toggle('flipped', flipped);
+  scene.classList.toggle('reveal-jp', flipped);
+  if (FX) {
+    FX.setProgress(idx + 1, CARDS.length);
+    FX.cardArrive();
+  }
 
   requestAnimationFrame(() => {
     const fc = document.querySelector('.card-front .content');
@@ -263,6 +269,7 @@ function unlockPlay() {
   playLocked = false;
   btnPlay.classList.remove('locked');
   enEl.classList.remove('dancing');
+  if (FX) FX.setAudio(false);
 }
 
 function stopAudio() {
@@ -280,6 +287,7 @@ function playAudio() {
   playLocked = true;
   btnPlay.classList.add('locked');
   enEl.classList.add('dancing');
+  if (FX) FX.setAudio(true);
   burstMotes();
   a.currentTime = 0;
   a.onended = unlockPlay;
@@ -290,9 +298,23 @@ function playAudio() {
 /* ════════════════════════════
    NAVIGATION
 ════════════════════════════ */
-function goNext() { stopAudio(); idx=(idx+1)%CARDS.length; flipped=false; showCard(); }
+function goNext() {
+  const completed = idx === CARDS.length - 1;
+  stopAudio();
+  idx = (idx + 1) % CARDS.length;
+  flipped = false;
+  showCard();
+  if (FX) {
+    if (completed) FX.celebrate();
+    else if ((idx + 1) % 5 === 0) FX.milestone();
+  }
+}
 function goPrev() { stopAudio(); idx=(idx-1+CARDS.length)%CARDS.length; flipped=false; showCard(); }
-function doFlip() { flipped=!flipped; scene.classList.toggle('flipped',flipped); }
+function doFlip() {
+  flipped = !flipped;
+  scene.classList.toggle('flipped', flipped);
+  if (FX) FX.flip(flipped);
+}
 
 document.getElementById('btn-prev').addEventListener('click', goPrev);
 document.getElementById('btn-next').addEventListener('click', goNext);
@@ -311,10 +333,15 @@ window.addEventListener('resize', () => { if (CARDS.length) showCard(); });
 
   try {
     const res  = await fetch(CFG.jsonUrl);
-    const data = await res.json();
+    if (!res.ok) throw new Error('HTTP_' + res.status);
+    const raw = await res.text();
+    if (!raw.trim()) throw new Error('CONTENT_NOT_READY');
+    const data = JSON.parse(raw);
     CARDS = (data.cards || []).filter(c => c.n >= lo && c.n <= hi);
   } catch(e) {
-    preloadBar.textContent = CFG.errorLabel || 'Could not load data.';
+    preloadBar.textContent = e && e.message === 'CONTENT_NOT_READY'
+      ? 'This month’s cards are coming soon.'
+      : (CFG.errorLabel || 'Could not load data.');
     console.error('[deck-core] fetch failed:', e);
     return;
   }
