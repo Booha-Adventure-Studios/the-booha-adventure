@@ -30,6 +30,10 @@
   ];
 
   const _cache = {};
+  // Retain the loaded Audio elements for the page lifetime. This keeps the
+  // selected clips warm after lobby preflight instead of relying only on the
+  // browser's discretionary HTTP cache.
+  const _audioReady = new Map();
 
   function contentCacheKey(curr, file, cw) {
     return `${curr}|${file}|${J.curriculumWeekKey(cw)}`;
@@ -361,6 +365,100 @@
     return packs.map(p => p.revision).join('.');
   }
 
+  function dictProfile(curr) {
+    const D = CFG.content.dictation || {};
+    return (D.profiles && D.profiles[curr]) || D;
+  }
+
+  function selectDictationCards(slot, vocab, sent) {
+    const P = dictProfile(slot.curriculum);
+    const cw = window.CALENDAR.getCurrentCurriculumWeek();
+    const seed = `${J.curriculumWeekKey(cw)}|dict`;
+    const wordsAll = dictUsable(vocab);
+    const sentAll = dictUsable(sent);
+    return {
+      seed,
+      wordsAll,
+      sentAll,
+      wordPick: J.seededShuffle(wordsAll, seed + '|w')
+        .slice(0, Math.min(P.words, wordsAll.length)),
+      sentPick: J.seededShuffle(sentAll, seed + '|s')
+        .slice(0, Math.min(P.sentences, sentAll.length))
+    };
+  }
+
+  function preloadAudioUrl(url, timeoutMs) {
+    if (_audioReady.has(url)) return Promise.resolve(true);
+    if (!url || typeof Audio !== 'function') {
+      return Promise.reject(new Error(`audio loader unavailable: ${url || 'missing URL'}`));
+    }
+
+    return new Promise((resolve, reject) => {
+      const audio = new Audio();
+      let settled = false;
+      const finish = (error) => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        audio.removeEventListener('canplay', ready);
+        audio.removeEventListener('canplaythrough', ready);
+        audio.removeEventListener('error', failed);
+        if (error) reject(error);
+        else {
+          _audioReady.set(url, audio);
+          resolve(true);
+        }
+      };
+      const ready = () => finish(null);
+      const failed = () => finish(new Error(`audio unavailable: ${url}`));
+      const timer = setTimeout(
+        () => finish(new Error(`audio timed out: ${url}`)),
+        Math.max(1000, Number(timeoutMs) || 12000)
+      );
+
+      audio.preload = 'auto';
+      audio.addEventListener('canplay', ready);
+      audio.addEventListener('canplaythrough', ready);
+      audio.addEventListener('error', failed);
+      audio.src = url;
+      try {
+        audio.load();
+        if (audio.readyState >= 3) ready();
+      } catch (error) {
+        finish(error);
+      }
+    });
+  }
+
+  async function preloadAudioUrls(urls) {
+    const settings = (CFG.content.dictation &&
+      CFG.content.dictation.audioPreflight) || {};
+    const concurrency = Math.max(1, Math.min(8,
+      Number(settings.concurrency) || 4));
+    const failures = [];
+    let cursor = 0;
+
+    async function worker() {
+      while (cursor < urls.length) {
+        const url = urls[cursor++];
+        try {
+          await preloadAudioUrl(url, settings.timeoutMs);
+        } catch (error) {
+          failures.push(error && error.message ? error.message : String(error));
+        }
+      }
+    }
+
+    await Promise.all(
+      Array.from({ length: Math.min(concurrency, urls.length) }, worker)
+    );
+    return {
+      required: urls.length,
+      ready: urls.length - failures.length,
+      failures
+    };
+  }
+
   async function preflight(slot) {
     const curr = slot.curriculum;
     const packs = await Promise.all([
@@ -373,12 +471,45 @@
     if (demo && !(CFG.content && CFG.content.allowDemo)) {
       issues.push('Demo content is disabled for production sessions.');
     }
+    let audio = { required: 0, ready: 0, failures: [] };
+    if (!issues.length && !demo) {
+      const selected = selectDictationCards(slot, packs[0], packs[1]);
+      const P = dictProfile(curr);
+      if (selected.wordPick.length !== P.words) {
+        issues.push(
+          `dictation words: expected ${P.words}, found ${selected.wordPick.length} with audio`
+        );
+      }
+      if (selected.sentPick.length !== P.sentences) {
+        issues.push(
+          `dictation sentences: expected ${P.sentences}, found ${selected.sentPick.length} with audio`
+        );
+      }
+      if (!issues.length) {
+        const urls = selected.wordPick
+          .map(card => cardAudio(curr, 'vocab', card))
+          .concat(selected.sentPick.map(card =>
+            cardAudio(curr, 'sentences', card)));
+        audio = await preloadAudioUrls(urls);
+        if (audio.failures.length) {
+          const sample = audio.failures.slice(0, 2).join(' / ');
+          issues.push(
+            `audio preflight failed: ${audio.failures.length} clip(s) unavailable` +
+            (sample ? ` — ${sample}` : '')
+          );
+        }
+      }
+    }
     const ok = issues.length === 0;
     const manifest = ok ? manifestOf(packs) : null;
     const saved = J.patchWeek(w => {
       const next = {
         ready: ok, checkedAt: Date.now(), curriculum: curr,
-        manifest, issues: issues.slice()
+        manifest, issues: issues.slice(),
+        audio: {
+          required: audio.required,
+          ready: audio.ready
+        }
       };
       // Preserve a concise history of a recovered preflight failure.
       if (ok && w.contentStatus && w.contentStatus.ready === false) {
@@ -389,7 +520,7 @@
     if (saved === null) {
       return { ok: false, issues: ['Assessment storage is unavailable.'], manifest: null };
     }
-    return { ok, issues, manifest, packs };
+    return { ok, issues, manifest, packs, audio };
   }
 
   function renderContentFailed(taskEl, result, retry) {
@@ -1167,21 +1298,15 @@
 
   async function buildDictSchedule(slot) {
     const D = CFG.content.dictation;
-    const P = (D.profiles && D.profiles[slot.curriculum]) || D;
-    const cw = window.CALENDAR.getCurrentCurriculumWeek();
-    const seed = `${J.curriculumWeekKey(cw)}|dict`;
+    const P = dictProfile(slot.curriculum);
 
     const [vocab, sent] = await Promise.all([
       getCards(slot.curriculum, 'vocab.json', DEMO_VOCAB),
       getSentences(slot.curriculum)
     ]);
-    const wordsAll = dictUsable(vocab);
-    const sentAll = dictUsable(sent);
-
-    const wordPick = J.seededShuffle(wordsAll, seed + '|w')
-      .slice(0, Math.min(P.words, wordsAll.length));
-    const sentPick = J.seededShuffle(sentAll, seed + '|s')
-      .slice(0, Math.min(P.sentences, sentAll.length));
+    const selected = selectDictationCards(slot, vocab, sent);
+    const wordPick = selected.wordPick;
+    const sentPick = selected.sentPick;
 
     const schedule = [];
     let t = 0;
@@ -1196,7 +1321,7 @@
       t += P.sentenceSec;
     });
 
-    return { schedule, sentAll, seed,
+    return { schedule, sentAll: selected.sentAll, seed: selected.seed,
              demo: vocab.demo || sent.demo,
              itemTotal: wordPick.length + sentPick.length,
              subTotals: { word: wordPick.length, sent: sentPick.length } };

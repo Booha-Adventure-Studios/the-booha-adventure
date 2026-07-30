@@ -27,6 +27,34 @@ const document = {
   addEventListener() {}
 };
 
+class MockAudio {
+  constructor() {
+    this.readyState = 4;
+    this.preload = '';
+    this.src = '';
+  }
+  addEventListener() {}
+  removeEventListener() {}
+  load() {}
+}
+
+class FailingAudio extends MockAudio {
+  constructor() {
+    super();
+    this.readyState = 0;
+    this.listeners = {};
+  }
+  addEventListener(type, handler) {
+    this.listeners[type] = handler;
+  }
+  removeEventListener(type, handler) {
+    if (this.listeners[type] === handler) delete this.listeners[type];
+  }
+  load() {
+    if (this.listeners.error) this.listeners.error();
+  }
+}
+
 const context = {
   window: {},
   document,
@@ -41,7 +69,10 @@ const context = {
   CustomEvent: class CustomEvent {
     constructor(type, init) { this.type = type; this.detail = init && init.detail; }
   },
-  setInterval() { return 1; }
+  Audio: MockAudio,
+  setInterval() { return 1; },
+  setTimeout,
+  clearTimeout
 };
 context.window.window = context.window;
 context.window.CALENDAR = {
@@ -96,6 +127,10 @@ assert.strictEqual(CFG.content.allowDemo, false,
   'production juku must not silently fall back to demo questions');
 assert.strictEqual(CFG.teacherReview.purpose, 'juku-report-review',
   'teacher review must use a purpose-scoped server authorization');
+assert.deepStrictEqual(
+  JSON.parse(JSON.stringify(CFG.content.dictation.audioPreflight)),
+  { timeoutMs: 12000, concurrency: 4 },
+  'the lobby must preload selected dictation audio before class');
 assert.strictEqual(CFG.content.responseModes.pb.dictationWord, 'tiles',
   'Pre-Boo should retain letter-tile dictation scaffolding');
 assert.strictEqual(CFG.content.responseModes.br.dictationWord, 'text',
@@ -152,8 +187,13 @@ vm.runInContext(
   { filename: 'js/juku-tests.js' }
 );
 
-context.window.JUKU_TESTS.preflight(slotB).then(result => {
+J.selectSlot('slot-b');
+context.window.JUKU_TESTS.preflight(slotB).then(async result => {
   assert.strictEqual(result.ok, true, `BR July preflight failed: ${result.issues}`);
+  assert.deepStrictEqual(
+    JSON.parse(JSON.stringify(result.audio)),
+    { required: 14, ready: 14, failures: [] },
+    'BR preflight must confirm all 8 word and 6 sentence clips');
   assert.ok(result.manifest && result.manifest.split('.').length === 3,
     'preflight must record exact vocab/sentence/juku revisions');
   const saved = J.weekRecord().week;
@@ -199,7 +239,7 @@ context.window.JUKU_TESTS.preflight(slotB).then(result => {
     { filename: 'js/juku-results.js' }
   );
   const task = { innerHTML: '', textContent: '', querySelector() { return null; } };
-  context.window.JUKU_RESULTS.render(task, {}, slotA);
+  context.window.JUKU_RESULTS.render(task, {}, slotB);
   const report = J.weekRecord().week.report;
   assert.strictEqual(report.schema, 3);
   assert.strictEqual(report.skills.listeningWords.percent, 100);
@@ -225,6 +265,10 @@ context.window.JUKU_TESTS.preflight(slotB).then(result => {
   const profileSource = fs.readFileSync(path.join(ROOT, 'profile.html'), 'utf8');
   assert.ok(profileSource.includes('juku-report-log.js'),
     'the student profile must load the finalized Juku report viewer');
+  assert.ok(html.includes('booha:identityReady'),
+    'the Juku gate must wait for freshly verified token identity');
+  assert.ok(!html.includes('var poll = setInterval'),
+    'the Juku gate must not authorize from a stale cached membership flag');
 
   localStorage.setItem('booha_userid', 'late-student');
   J.selectSlot('slot-a');
@@ -233,6 +277,18 @@ context.window.JUKU_TESTS.preflight(slotB).then(result => {
   assert.strictEqual(J.weekRecord().week.report, null,
     'opening during results without assessment evidence must not mint a zero report');
   assert.ok(lateTask.textContent.includes('No assessment evidence'));
+
+  context.Audio = FailingAudio;
+  const audioFailure = await context.window.JUKU_TESTS.preflight(slotA);
+  assert.strictEqual(audioFailure.ok, false,
+    'a lesson with unavailable selected audio must fail closed');
+  assert.strictEqual(audioFailure.audio.required, 12,
+    'PB audio preflight must select 8 word and 4 sentence clips');
+  assert.strictEqual(audioFailure.audio.ready, 0);
+  assert.ok(audioFailure.issues.some(issue =>
+    String(issue).includes('audio preflight failed')),
+  'audio failure must be visible in preflight issues');
+
   console.log('Juku smoke checks passed.');
 }).catch(error => {
   console.error(error);
