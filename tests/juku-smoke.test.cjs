@@ -159,29 +159,57 @@ assert.deepStrictEqual(
   'Boo-riculum dictation should favor fewer, deeper open responses');
 
 for (const curriculum of ['br', 'pb']) {
-  const base = path.join(ROOT, 'content', curriculum, 'july');
-  const juku = JSON.parse(fs.readFileSync(path.join(base, 'juku.json'), 'utf8'));
-  const vocab = JSON.parse(fs.readFileSync(path.join(base, 'vocab.json'), 'utf8')).cards;
-  const sentences = JSON.parse(fs.readFileSync(path.join(base, 'sentences.json'), 'utf8')).cards;
-  assert.strictEqual(juku.weeks.length, 4, `${curriculum}: four juku weeks`);
-  assert.strictEqual(vocab.length, 60, `${curriculum}: 60 vocabulary cards`);
-  assert.strictEqual(sentences.length, 60, `${curriculum}: 60 sentence cards`);
-  for (const week of juku.weeks) {
-    assert.strictEqual(week.definitions.length, 15,
-      `${curriculum} week ${week.week}: 15 definitions`);
-    for (const question of [
-      ...(week.passage.comprehension || []),
-      ...(week.questions || []).filter(q => q.type === 'read')
-    ]) {
-      assert.ok(question.correct >= 0 && question.correct < question.choices.length,
-        `${curriculum} week ${week.week}: valid correct-answer index`);
-    }
-    if (curriculum === 'br') {
-      assert.ok(week.writingPrompt && week.writingPrompt.targets.length >= 2,
-        `BR week ${week.week}: open writing prompt with curriculum targets`);
-      for (const item of week.questions.filter(q => q.type === 'translate')) {
-        assert.ok(Array.isArray(item.accepted) && item.accepted.length,
-          `BR week ${week.week} translation ${item.n}: accepted alternatives`);
+  const curriculumRoot = path.join(ROOT, 'content', curriculum);
+  const months = fs.readdirSync(curriculumRoot)
+    .filter(month => fs.existsSync(path.join(curriculumRoot, month, 'juku.json')));
+  for (const month of months) {
+    const base = path.join(curriculumRoot, month);
+    const juku = JSON.parse(fs.readFileSync(path.join(base, 'juku.json'), 'utf8'));
+    const vocab = JSON.parse(fs.readFileSync(path.join(base, 'vocab.json'), 'utf8')).cards;
+    const sentences = JSON.parse(fs.readFileSync(path.join(base, 'sentences.json'), 'utf8')).cards;
+    const label = `${curriculum}/${month}`;
+    assert.strictEqual(juku.curriculum, curriculum, `${label}: curriculum metadata`);
+    assert.strictEqual(juku.month, month, `${label}: month metadata`);
+    assert.deepStrictEqual(juku.weeks.map(week => week.week), [1, 2, 3, 4],
+      `${label}: four ordered juku weeks`);
+    assert.strictEqual(vocab.length, 60, `${label}: 60 vocabulary cards`);
+    assert.strictEqual(sentences.length, 60, `${label}: 60 sentence cards`);
+    for (const week of juku.weeks) {
+      const weekLabel = `${label} week ${week.week}`;
+      const expectedNs = vocab
+        .slice((week.week - 1) * 15, week.week * 15).map(card => card.n);
+      assert.deepStrictEqual(week.definitions.map(def => def.n), expectedNs,
+        `${weekLabel}: definitions align with the vocabulary deck`);
+      assert.ok(week.definitions.every(def => def.def && def.pos),
+        `${weekLabel}: every definition has text and a part of speech`);
+      assert.ok(week.passage && week.passage.text &&
+        week.passage.comprehension.length >= 3,
+        `${weekLabel}: passage has at least three comprehension checks`);
+      for (const type of ['read', 'translate', 'write']) {
+        assert.ok(week.questions.filter(q => q.type === type).length >= 3,
+          `${weekLabel}: at least three ${type} questions`);
+      }
+      for (const question of [
+        ...week.passage.comprehension,
+        ...week.questions.filter(q => q.type === 'read')
+      ]) {
+        assert.ok(question.correct >= 0 && question.correct < question.choices.length,
+          `${weekLabel}: valid correct-answer index`);
+      }
+      const weeklyWords = new Set(vocab
+        .slice((week.week - 1) * 15, week.week * 15)
+        .map(card => card.en.toLowerCase()));
+      for (const item of week.questions.filter(q => q.type === 'write')) {
+        assert.ok(weeklyWords.has(item.en.toLowerCase()),
+          `${weekLabel}: spelling item "${item.en}" belongs to this week`);
+      }
+      if (curriculum === 'br') {
+        assert.ok(week.writingPrompt && week.writingPrompt.targets.length >= 2,
+          `${weekLabel}: open writing prompt with curriculum targets`);
+        for (const item of week.questions.filter(q => q.type === 'translate')) {
+          assert.ok(Array.isArray(item.accepted) && item.accepted.length,
+            `${weekLabel} translation ${item.n}: accepted alternatives`);
+        }
       }
     }
   }
