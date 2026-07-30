@@ -1,0 +1,162 @@
+{
+  "curriculum": "pb",
+  "month": "december",
+  "weeks": [
+    {
+      "week": 1,
+      "passage": {
+        "text": "Winter break begins, and snow covers Karasuki. Booha and Mimo make a snowman and ride a sled. Nuppi goes ice skating, then everyone drinks hot cocoa under the holiday lights. At Christmas, they decorate a tree. On New Year's Eve, they stay awake until midnight. On New Year's Day, they visit a shrine with their family. It is cold outside, but the holiday feels warm and happy.",
+        "comprehension": [
+          { "n": 1, "q": "What do Booha and Mimo make?", "choices": ["a snowman", "a temple", "a light", "a cup"], "correct": 0 },
+          { "n": 2, "q": "What does everyone drink?", "choices": ["cold water", "hot cocoa", "juice", "milk"], "correct": 1 },
+          { "n": 3, "q": "When do they visit a shrine?", "choices": ["on Christmas", "on New Year's Eve", "on New Year's Day", "after winter break"], "correct": 2 }
+        ]
+      },
+      "definitions": [
+        { "n": 1, "def": "the coldest season of the year", "pos": "noun" },
+        { "n": 2, "def": "a time without school during winter", "pos": "noun" },
+        { "n": 3, "def": "a special day or time when school and work may stop", "pos": "noun" },
+        { "n": 4, "def": "a holiday celebrated in December", "pos": "noun" },
+        { "n": 5, "def": "the beginning of a new calendar year", "pos": "noun" },
+        { "n": 6, "def": "the last evening of the year", "pos": "noun" },
+        { "n": 7, "def": "the first day of a new year", "pos": "noun" },
+        { "n": 8, "def": "a place in Japan where people may pray to Shinto gods", "pos": "noun" },
+        { "n": 9, "def": "a building where people may practice Buddhism and pray", "pos": "noun" },
+        { "n": 10, "def": "soft white frozen water that falls from the sky", "pos": "noun" },
+        { "n": 11, "def": "a person shape made from snow", "pos": "noun" },
+        { "n": 12, "def": "a low vehicle used to slide over snow", "pos": "noun" },
+        { "n": 13, "def": "moving over ice on special boots with blades", "pos": "noun" },
+        { "n": 14, "def": "small bright lamps used as winter decorations", "pos": "noun" },
+        { "n": 15, "def": "a warm sweet chocolate drink", "pos": "noun" }
+      ],
+      "questions": [
+        { "n": 1, "type": "read", "text": "The snow is deep, so Booha uses a sled instead of walking.", "q": "Why does Booha use a sled?", "choices": ["The snow is deep", "The sun is hot", "The shrine is closed", "The cocoa is cold"], "correct": 0 },
+        { "n": 2, "type": "read", "text": "Nuppi puts on warm clothes before she goes ice skating.", "q": "What does Nuppi do first?", "choices": ["goes skating", "puts on warm clothes", "drinks cocoa", "makes a snowman"], "correct": 1 },
+        { "n": 3, "type": "read", "text": "The family visits a shrine in the morning and a temple in the afternoon.", "q": "Where do they go first?", "choices": ["the temple", "the shrine", "the rink", "the holiday lights"], "correct": 1 },
+        { "n": 4, "type": "translate", "jp": "ふゆ は さむい です", "en": "Winter is cold", "extra": ["hot", "are"] },
+        { "n": 5, "type": "translate", "jp": "わたしたち は いえ で おしょうがつ を いわいます", "en": "We celebrate New Year at home", "extra": ["school", "celebrates"] },
+        { "n": 6, "type": "translate", "jp": "そと に ゆき が あります", "en": "There is snow outside", "extra": ["inside", "are"] },
+        { "n": 7, "type": "write", "jp": "ふゆ", "en": "winter" },
+        { "n": 8, "type": "write", "jp": "ゆき", "en": "snow" },
+        { "n": 9, "type": "write", "jp": "ゆきだるま", "en": "snowman" }
+      ]
+    },
+    {
+      "week": 2,
+      "passage": {
+        "text": "Every year, Mister Happy has a family celebration. His grandparents come for a family dinner. Everyone brings special food, and Nuppi makes a cake. Mimo plays music, and the family sings a song. After dinner, they play a game and take a photo. Booha gives his grandparents a card. Their smiles make it a happy memory and an important family tradition.",
+        "comprehension": [
+          { "n": 1, "q": "Who comes for dinner?", "choices": ["the teacher", "the grandparents", "the class", "the neighbors"], "correct": 1 },
+          { "n": 2, "q": "What does Nuppi make?", "choices": ["a song", "a photo", "a cake", "a game"], "correct": 2 },
+          { "n": 3, "q": "What makes the day a happy memory?", "choices": ["the family's smiles", "the cold weather", "the empty table", "the late train"], "correct": 0 }
+        ]
+      },
+      "definitions": [
+        { "n": 16, "def": "a way of doing something that a family or group has followed for many years", "pos": "noun" },
+        { "n": 17, "def": "a happy event for a special day", "pos": "noun" },
+        { "n": 18, "def": "an evening meal eaten together by a family", "pos": "noun" },
+        { "n": 19, "def": "food made for an important day", "pos": "noun" },
+        { "n": 20, "def": "a sweet baked food often eaten at celebrations", "pos": "noun" },
+        { "n": 21, "def": "folded paper with a greeting or message", "pos": "noun" },
+        { "n": 22, "def": "sounds arranged for singing or playing", "pos": "noun" },
+        { "n": 23, "def": "music with words that people sing", "pos": "noun" },
+        { "n": 24, "def": "a picture taken with a camera", "pos": "noun" },
+        { "n": 25, "def": "an activity played for fun with rules", "pos": "noun" },
+        { "n": 26, "def": "people who are related to one another", "pos": "noun" },
+        { "n": 27, "def": "the parents of a person's mother or father", "pos": "noun" },
+        { "n": 28, "def": "a happy look on a person's face", "pos": "noun" },
+        { "n": 29, "def": "something that you remember from the past", "pos": "noun" },
+        { "n": 30, "def": "happening in each and every year", "pos": "phrase" }
+      ],
+      "questions": [
+        { "n": 1, "type": "read", "text": "Grandfather brings a family photo, and Grandmother tells the story behind it.", "q": "What does Grandfather bring?", "choices": ["a cake", "a card", "a family photo", "a game"], "correct": 2 },
+        { "n": 2, "type": "read", "text": "The song is an old tradition, but the family learns a new game this year.", "q": "What is new?", "choices": ["the song", "the tradition", "the game", "the family"], "correct": 2 },
+        { "n": 3, "type": "read", "text": "Booha smiles because his grandparents remember his favorite music.", "q": "Why does Booha smile?", "choices": ["They bring special food", "They remember his favorite music", "The game is over", "The photo is missing"], "correct": 1 },
+        { "n": 4, "type": "translate", "jp": "これ は わたしたち の かぞく の でんとう です", "en": "This is our family tradition", "extra": ["celebration", "these"] },
+        { "n": 5, "type": "translate", "jp": "わたしたち は いっしょ に けーき を つくります", "en": "We make a cake together", "extra": ["card", "makes"] },
+        { "n": 6, "type": "translate", "jp": "わたしたち は ゆうしょくご に げーむ を します", "en": "We play a game after dinner", "extra": ["before", "plays"] },
+        { "n": 7, "type": "write", "jp": "でんとう", "en": "tradition" },
+        { "n": 8, "type": "write", "jp": "けーき", "en": "cake" },
+        { "n": 9, "type": "write", "jp": "おもいで", "en": "memory" }
+      ]
+    },
+    {
+      "week": 3,
+      "passage": {
+        "text": "Booha wants to thank Nuppi for her kindness. He gets a book and toy as presents. Mimo helps him put them in a box and wrap it. They add a bright ribbon and place the box in a gift bag. Booha writes a letter and thank-you card. Nuppi is surprised when she receives the presents. She says thank you and gives everyone a big smile.",
+        "comprehension": [
+          { "n": 1, "q": "Why does Booha prepare presents?", "choices": ["to thank Nuppi", "to get money", "to surprise Mimo", "to buy a bag"], "correct": 0 },
+          { "n": 2, "q": "What do they put around the box?", "choices": ["a book", "a ribbon", "a letter", "money"], "correct": 1 },
+          { "n": 3, "q": "How does Nuppi feel?", "choices": ["angry", "tired", "surprised", "afraid"], "correct": 2 }
+        ]
+      },
+      "definitions": [
+        { "n": 31, "def": "something given to another person as a gift", "pos": "noun" },
+        { "n": 32, "def": "to hand something to another person", "pos": "verb" },
+        { "n": 33, "def": "to receive something from another person", "pos": "verb" },
+        { "n": 34, "def": "a card that tells someone you are thankful", "pos": "noun" },
+        { "n": 35, "def": "something unexpected that causes a strong feeling", "pos": "noun" },
+        { "n": 36, "def": "to cover something with paper or other material", "pos": "verb" },
+        { "n": 37, "def": "a container with a bottom, sides, and often a lid", "pos": "noun" },
+        { "n": 38, "def": "a decorated bag used to hold a present", "pos": "noun" },
+        { "n": 39, "def": "a narrow strip used to tie or decorate a gift", "pos": "noun" },
+        { "n": 40, "def": "a written message sent to another person", "pos": "noun" },
+        { "n": 41, "def": "words used to show that you are grateful", "pos": "phrase" },
+        { "n": 42, "def": "friendly and caring behavior", "pos": "noun" },
+        { "n": 43, "def": "money traditionally given to children at New Year", "pos": "noun" },
+        { "n": 44, "def": "an object made for children to play with", "pos": "noun" },
+        { "n": 45, "def": "pages with words or pictures fastened together", "pos": "noun" }
+      ],
+      "questions": [
+        { "n": 1, "type": "read", "text": "Mimo writes a thank-you card after he gets a present.", "q": "What does Mimo do last?", "choices": ["gets a present", "writes a thank-you card", "opens the box", "buys a ribbon"], "correct": 1 },
+        { "n": 2, "type": "read", "text": "The toy is too large for the gift bag, so Booha puts it in a box.", "q": "Why does Booha use a box?", "choices": ["The toy is too large", "The book is missing", "The bag is new", "The ribbon is long"], "correct": 0 },
+        { "n": 3, "type": "read", "text": "Nuppi helps an older neighbor carry a heavy bag.", "q": "What does Nuppi show?", "choices": ["a surprise", "kindness", "a letter", "New Year's money"], "correct": 1 },
+        { "n": 4, "type": "translate", "jp": "わたし は ぷれぜんと を もらいました", "en": "I got a present", "extra": ["gave", "presents"] },
+        { "n": 5, "type": "translate", "jp": "それ は すてき な さぷらいず でした", "en": "It was a nice surprise", "extra": ["present", "were"] },
+        { "n": 6, "type": "translate", "jp": "わたし は そぼ に てがみ を かきました", "en": "I wrote a letter to my grandmother", "extra": ["card", "write"] },
+        { "n": 7, "type": "write", "jp": "ぷれぜんと", "en": "present" },
+        { "n": 8, "type": "write", "jp": "りぼん", "en": "ribbon" },
+        { "n": 9, "type": "write", "jp": "しんせつ", "en": "kindness" }
+      ]
+    },
+    {
+      "week": 4,
+      "passage": {
+        "text": "Booha thinks about this year. His favorite activity was reading with a friend. A difficult lesson was a challenge, but his teacher helped him. Booha made mistakes and learned from them. He feels proud of his success and improvement. Next year, his goal is to learn a new skill and read more books. He writes the goal down so he will remember it.",
+        "comprehension": [
+          { "n": 1, "q": "What was Booha's favorite activity?", "choices": ["reading with a friend", "making a cake", "riding a sled", "cleaning a room"], "correct": 0 },
+          { "n": 2, "q": "Who helped Booha with a difficult lesson?", "choices": ["his friend", "his teacher", "his neighbor", "his grandparent"], "correct": 1 },
+          { "n": 3, "q": "Why does Booha write down his goal?", "choices": ["to forget it", "to show his mistake", "to remember it", "to finish this year"], "correct": 2 }
+        ]
+      },
+      "definitions": [
+        { "n": 46, "def": "the year that is happening now", "pos": "phrase" },
+        { "n": 47, "def": "the year before this one", "pos": "phrase" },
+        { "n": 48, "def": "the year after this one", "pos": "phrase" },
+        { "n": 49, "def": "something learned from a teacher or experience", "pos": "noun" },
+        { "n": 50, "def": "something that a person plans and works to do", "pos": "noun" },
+        { "n": 51, "def": "doing or finishing something that you wanted to do", "pos": "noun" },
+        { "n": 52, "def": "something difficult that tests what you can do", "pos": "noun" },
+        { "n": 53, "def": "an answer or action that is not correct", "pos": "noun" },
+        { "n": 54, "def": "a person you like and enjoy spending time with", "pos": "noun" },
+        { "n": 55, "def": "a person who helps students learn", "pos": "noun" },
+        { "n": 56, "def": "liked more than the other choices", "pos": "adjective" },
+        { "n": 57, "def": "something done for learning, work, exercise, or fun", "pos": "noun" },
+        { "n": 58, "def": "to make something better", "pos": "verb" },
+        { "n": 59, "def": "an ability that a person has recently learned", "pos": "noun" },
+        { "n": 60, "def": "happy because you did something well", "pos": "adjective" }
+      ],
+      "questions": [
+        { "n": 1, "type": "read", "text": "Nuppi made a mistake, tried again, and improved her work.", "q": "What happened after the mistake?", "choices": ["Nuppi stopped", "Nuppi tried again", "The teacher left", "The activity ended"], "correct": 1 },
+        { "n": 2, "type": "read", "text": "Mimo's goal for next year is to learn a new song.", "q": "What does Mimo want to learn?", "choices": ["a new song", "a new game", "a new word", "a new lesson"], "correct": 0 },
+        { "n": 3, "type": "read", "text": "Booha is proud because he finished a difficult challenge.", "q": "Why is Booha proud?", "choices": ["He avoided the challenge", "He finished the challenge", "He forgot his goal", "He made no friends"], "correct": 1 },
+        { "n": 4, "type": "translate", "jp": "わたし は ことし たくさん の たんご を まなびました", "en": "I learned many words this year", "extra": ["last", "learn"] },
+        { "n": 5, "type": "translate", "jp": "わたし の もくひょう は もっと ほん を よむ こと です", "en": "My goal is to read more books", "extra": ["lesson", "are"] },
+        { "n": 6, "type": "translate", "jp": "せんせい が わたし を たすけて くれました", "en": "My teacher helped me", "extra": ["friend", "help"] },
+        { "n": 7, "type": "write", "jp": "れっすん", "en": "lesson" },
+        { "n": 8, "type": "write", "jp": "もくひょう", "en": "goal" },
+        { "n": 9, "type": "write", "jp": "ほこりに おもう", "en": "proud" }
+      ]
+    }
+  ]
+}
