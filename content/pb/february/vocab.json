@@ -1,1 +1,424 @@
-
+{
+  "cards": [
+    {
+      "n": 1,
+      "en": "happy",
+      "jp": "うれしい",
+      "hira": "うれしい",
+      "mp3": "pb_v01_happy.mp3"
+    },
+    {
+      "n": 2,
+      "en": "sad",
+      "jp": "悲しい",
+      "hira": "かなしい",
+      "mp3": "pb_v02_sad.mp3"
+    },
+    {
+      "n": 3,
+      "en": "angry",
+      "jp": "怒っている",
+      "hira": "おこって いる",
+      "mp3": "pb_v03_angry.mp3"
+    },
+    {
+      "n": 4,
+      "en": "tired",
+      "jp": "疲れた",
+      "hira": "つかれた",
+      "mp3": "pb_v04_tired.mp3"
+    },
+    {
+      "n": 5,
+      "en": "nervous",
+      "jp": "緊張した",
+      "hira": "きんちょう した",
+      "mp3": "pb_v05_nervous.mp3"
+    },
+    {
+      "n": 6,
+      "en": "excited",
+      "jp": "わくわくした",
+      "hira": "わくわく した",
+      "mp3": "pb_v06_excited.mp3"
+    },
+    {
+      "n": 7,
+      "en": "bored",
+      "jp": "退屈した",
+      "hira": "たいくつ した",
+      "mp3": "pb_v07_bored.mp3"
+    },
+    {
+      "n": 8,
+      "en": "surprised",
+      "jp": "驚いた",
+      "hira": "おどろいた",
+      "mp3": "pb_v08_surprised.mp3"
+    },
+    {
+      "n": 9,
+      "en": "scared",
+      "jp": "こわい",
+      "hira": "こわい",
+      "mp3": "pb_v09_scared.mp3"
+    },
+    {
+      "n": 10,
+      "en": "calm",
+      "jp": "落ち着いた",
+      "hira": "おちついた",
+      "mp3": "pb_v10_calm.mp3"
+    },
+    {
+      "n": 11,
+      "en": "proud",
+      "jp": "誇らしい",
+      "hira": "ほこらしい",
+      "mp3": "pb_v11_proud.mp3"
+    },
+    {
+      "n": 12,
+      "en": "worried",
+      "jp": "心配している",
+      "hira": "しんぱい して いる",
+      "mp3": "pb_v12_worried.mp3"
+    },
+    {
+      "n": 13,
+      "en": "shy",
+      "jp": "恥ずかしがりの",
+      "hira": "はずかしがり の",
+      "mp3": "pb_v13_shy.mp3"
+    },
+    {
+      "n": 14,
+      "en": "sick",
+      "jp": "具合が悪い",
+      "hira": "ぐあい が わるい",
+      "mp3": "pb_v14_sick.mp3"
+    },
+    {
+      "n": 15,
+      "en": "hungry",
+      "jp": "おなかがすいた",
+      "hira": "おなか が すいた",
+      "mp3": "pb_v15_hungry.mp3"
+    },
+    {
+      "n": 16,
+      "en": "friend",
+      "jp": "友達",
+      "hira": "ともだち",
+      "mp3": "pb_v16_friend.mp3"
+    },
+    {
+      "n": 17,
+      "en": "kind",
+      "jp": "親切な",
+      "hira": "しんせつ な",
+      "mp3": "pb_v17_kind.mp3"
+    },
+    {
+      "n": 18,
+      "en": "nice",
+      "jp": "やさしい",
+      "hira": "やさしい",
+      "mp3": "pb_v18_nice.mp3"
+    },
+    {
+      "n": 19,
+      "en": "polite",
+      "jp": "丁寧な",
+      "hira": "ていねい な",
+      "mp3": "pb_v19_polite.mp3"
+    },
+    {
+      "n": 20,
+      "en": "honest",
+      "jp": "正直な",
+      "hira": "しょうじき な",
+      "mp3": "pb_v20_honest.mp3"
+    },
+    {
+      "n": 21,
+      "en": "friendly",
+      "jp": "親しみやすい",
+      "hira": "したしみやすい",
+      "mp3": "pb_v21_friendly.mp3"
+    },
+    {
+      "n": 22,
+      "en": "patient",
+      "jp": "我慢強い",
+      "hira": "がまんづよい",
+      "mp3": "pb_v22_patient.mp3"
+    },
+    {
+      "n": 23,
+      "en": "brave",
+      "jp": "勇気のある",
+      "hira": "ゆうき の ある",
+      "mp3": "pb_v23_brave.mp3"
+    },
+    {
+      "n": 24,
+      "en": "share",
+      "jp": "分け合う",
+      "hira": "わけあう",
+      "mp3": "pb_v24_share.mp3"
+    },
+    {
+      "n": 25,
+      "en": "helpful",
+      "jp": "人の役に立つ",
+      "hira": "ひと の やく に たつ",
+      "mp3": "pb_v25_helpful.mp3"
+    },
+    {
+      "n": 26,
+      "en": "listen",
+      "jp": "聞く",
+      "hira": "きく",
+      "mp3": "pb_v26_listen.mp3"
+    },
+    {
+      "n": 27,
+      "en": "invite",
+      "jp": "招待する",
+      "hira": "しょうたい する",
+      "mp3": "pb_v27_invite.mp3"
+    },
+    {
+      "n": 28,
+      "en": "trust",
+      "jp": "信頼する",
+      "hira": "しんらい する",
+      "mp3": "pb_v28_trust.mp3"
+    },
+    {
+      "n": 29,
+      "en": "team",
+      "jp": "チーム",
+      "hira": "ちーむ",
+      "mp3": "pb_v29_team.mp3"
+    },
+    {
+      "n": 30,
+      "en": "together",
+      "jp": "いっしょに",
+      "hira": "いっしょ に",
+      "mp3": "pb_v30_together.mp3"
+    },
+    {
+      "n": 31,
+      "en": "mother",
+      "jp": "母",
+      "hira": "はは",
+      "mp3": "pb_v31_mother.mp3"
+    },
+    {
+      "n": 32,
+      "en": "father",
+      "jp": "父",
+      "hira": "ちち",
+      "mp3": "pb_v32_father.mp3"
+    },
+    {
+      "n": 33,
+      "en": "sister",
+      "jp": "姉または妹",
+      "hira": "あね または いもうと",
+      "mp3": "pb_v33_sister.mp3"
+    },
+    {
+      "n": 34,
+      "en": "brother",
+      "jp": "兄または弟",
+      "hira": "あに または おとうと",
+      "mp3": "pb_v34_brother.mp3"
+    },
+    {
+      "n": 35,
+      "en": "grandmother",
+      "jp": "祖母",
+      "hira": "そぼ",
+      "mp3": "pb_v35_grandmother.mp3"
+    },
+    {
+      "n": 36,
+      "en": "grandfather",
+      "jp": "祖父",
+      "hira": "そふ",
+      "mp3": "pb_v36_grandfather.mp3"
+    },
+    {
+      "n": 37,
+      "en": "cousin",
+      "jp": "いとこ",
+      "hira": "いとこ",
+      "mp3": "pb_v37_cousin.mp3"
+    },
+    {
+      "n": 38,
+      "en": "family",
+      "jp": "家族",
+      "hira": "かぞく",
+      "mp3": "pb_v38_family.mp3"
+    },
+    {
+      "n": 39,
+      "en": "love",
+      "jp": "愛",
+      "hira": "あい",
+      "mp3": "pb_v39_love.mp3"
+    },
+    {
+      "n": 40,
+      "en": "gift",
+      "jp": "プレゼント",
+      "hira": "ぷれぜんと",
+      "mp3": "pb_v40_gift.mp3"
+    },
+    {
+      "n": 41,
+      "en": "card",
+      "jp": "カード",
+      "hira": "かーど",
+      "mp3": "pb_v41_card.mp3"
+    },
+    {
+      "n": 42,
+      "en": "chocolate",
+      "jp": "チョコレート",
+      "hira": "ちょこれーと",
+      "mp3": "pb_v42_chocolate.mp3"
+    },
+    {
+      "n": 43,
+      "en": "heart",
+      "jp": "ハート",
+      "hira": "はーと",
+      "mp3": "pb_v43_heart.mp3"
+    },
+    {
+      "n": 44,
+      "en": "flower",
+      "jp": "花",
+      "hira": "はな",
+      "mp3": "pb_v44_flower.mp3"
+    },
+    {
+      "n": 45,
+      "en": "celebrate",
+      "jp": "祝う",
+      "hira": "いわう",
+      "mp3": "pb_v45_celebrate.mp3"
+    },
+    {
+      "n": 46,
+      "en": "help",
+      "jp": "助ける",
+      "hira": "たすける",
+      "mp3": "pb_v46_help.mp3"
+    },
+    {
+      "n": 47,
+      "en": "carry",
+      "jp": "運ぶ",
+      "hira": "はこぶ",
+      "mp3": "pb_v47_carry.mp3"
+    },
+    {
+      "n": 48,
+      "en": "open",
+      "jp": "開ける",
+      "hira": "あける",
+      "mp3": "pb_v48_open.mp3"
+    },
+    {
+      "n": 49,
+      "en": "close",
+      "jp": "閉める",
+      "hira": "しめる",
+      "mp3": "pb_v49_close.mp3"
+    },
+    {
+      "n": 50,
+      "en": "lend",
+      "jp": "貸す",
+      "hira": "かす",
+      "mp3": "pb_v50_lend.mp3"
+    },
+    {
+      "n": 51,
+      "en": "borrow",
+      "jp": "借りる",
+      "hira": "かりる",
+      "mp3": "pb_v51_borrow.mp3"
+    },
+    {
+      "n": 52,
+      "en": "heavy",
+      "jp": "重い",
+      "hira": "おもい",
+      "mp3": "pb_v52_heavy.mp3"
+    },
+    {
+      "n": 53,
+      "en": "light",
+      "jp": "軽い",
+      "hira": "かるい",
+      "mp3": "pb_v53_light.mp3"
+    },
+    {
+      "n": 54,
+      "en": "directions",
+      "jp": "道案内",
+      "hira": "みちあんない",
+      "mp3": "pb_v54_directions.mp3"
+    },
+    {
+      "n": 55,
+      "en": "broken",
+      "jp": "壊れた",
+      "hira": "こわれた",
+      "mp3": "pb_v55_broken.mp3"
+    },
+    {
+      "n": 56,
+      "en": "fix",
+      "jp": "直す",
+      "hira": "なおす",
+      "mp3": "pb_v56_fix.mp3"
+    },
+    {
+      "n": 57,
+      "en": "hurry",
+      "jp": "急ぐ",
+      "hira": "いそぐ",
+      "mp3": "pb_v57_hurry.mp3"
+    },
+    {
+      "n": 58,
+      "en": "safe",
+      "jp": "安全な",
+      "hira": "あんぜん な",
+      "mp3": "pb_v58_safe.mp3"
+    },
+    {
+      "n": 59,
+      "en": "accident",
+      "jp": "事故",
+      "hira": "じこ",
+      "mp3": "pb_v59_accident.mp3"
+    },
+    {
+      "n": 60,
+      "en": "emergency",
+      "jp": "緊急事態",
+      "hira": "きんきゅう じたい",
+      "mp3": "pb_v60_emergency.mp3"
+    }
+  ]
+}

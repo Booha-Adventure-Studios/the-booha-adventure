@@ -1,1 +1,424 @@
-
+{
+  "cards": [
+    {
+      "n": 1,
+      "en": "What makes you feel joyful?",
+      "jp": "あなたを楽しくさせるものは何ですか？",
+      "hira": "あなたをたのしくさせるものはなんですか？",
+      "mp3": "br_q01_what_makes_you_feel_joyful.mp3"
+    },
+    {
+      "n": 2,
+      "en": "How do you express your feelings?",
+      "jp": "あなたはどのように感情を表現しますか？",
+      "hira": "あなたはどのようにかんじょうをひょうげんしますか？",
+      "mp3": "br_q02_how_do_you_express_your_feelings.mp3"
+    },
+    {
+      "n": 3,
+      "en": "What do you do when you feel lonely?",
+      "jp": "孤独を感じたとき、あなたは何をしますか？",
+      "hira": "こどくをかんじたとき、あなたはなにをしますか？",
+      "mp3": "br_q03_what_do_you_do_when_you_feel_lonely.mp3"
+    },
+    {
+      "n": 4,
+      "en": "How do you cheer up a friend?",
+      "jp": "友達を元気づけるにはどうしますか？",
+      "hira": "ともだちをげんきづけるにはどうしますか？",
+      "mp3": "br_q04_how_do_you_cheer_up_a_friend.mp3"
+    },
+    {
+      "n": 5,
+      "en": "What does respect mean to you?",
+      "jp": "尊敬とはあなたにとって何ですか？",
+      "hira": "そんけいとはあなたにとってなんですか？",
+      "mp3": "br_q05_what_does_respect_mean_to_you.mp3"
+    },
+    {
+      "n": 6,
+      "en": "How can you show respect to your teachers?",
+      "jp": "先生にどのように敬意を表しますか？",
+      "hira": "せんせいにどのようにけいいをあらわしますか？",
+      "mp3": "br_q06_how_can_you_show_respect_to_your_teachers.mp3"
+    },
+    {
+      "n": 7,
+      "en": "What qualities do you look for in a friend?",
+      "jp": "友達に求める資質は何ですか？",
+      "hira": "ともだちにもとめるししつはなんですか？",
+      "mp3": "br_q07_what_qualities_do_you_look_for_in_a_friend.mp3"
+    },
+    {
+      "n": 8,
+      "en": "How do you handle disagreements with friends?",
+      "jp": "友達との意見の違いをどう扱いますか？",
+      "hira": "ともだちとのいけんのちがいをどうあつかいますか？",
+      "mp3": "br_q08_how_do_you_handle_disagreements_with_friends.mp3"
+    },
+    {
+      "n": 9,
+      "en": "What is your favorite family tradition?",
+      "jp": "あなたの好きな家族の伝統は何ですか？",
+      "hira": "あなたのすきなかぞくのでんとうはなんですか？",
+      "mp3": "br_q09_what_is_your_favorite_family_tradition.mp3"
+    },
+    {
+      "n": 10,
+      "en": "How do you celebrate special occasions with your family?",
+      "jp": "家族と特別な日をどのように祝いますか？",
+      "hira": "かぞくととくべつなひをどのようにいわいますか？",
+      "mp3": "br_q10_how_do_you_celebrate_special_occasions_with_your_family.mp3"
+    },
+    {
+      "n": 11,
+      "en": "Who do you admire in your family?",
+      "jp": "あなたの家族の中で誰を尊敬していますか？",
+      "hira": "あなたのかぞくのなかでだれをそんけいしていますか？",
+      "mp3": "br_q11_who_do_you_admire_in_your_family.mp3"
+    },
+    {
+      "n": 12,
+      "en": "How do you communicate with your family members?",
+      "jp": "家族のメンバーとどのようにコミュニケーションを取りますか？",
+      "hira": "かぞくのめんばーとどのようにこみゅにけーしょんをとりますか？",
+      "mp3": "br_q12_how_do_you_communicate_with_your_family_members.mp3"
+    },
+    {
+      "n": 13,
+      "en": "What is the best way to show gratitude?",
+      "jp": "感謝の気持ちを示す最良の方法は何ですか？",
+      "hira": "かんしゃのきもちをしめすさいりょうのほうほうはなんですか？",
+      "mp3": "br_q13_what_is_the_best_way_to_show_gratitude.mp3"
+    },
+    {
+      "n": 14,
+      "en": "How do you feel when someone helps you?",
+      "jp": "誰かに助けられたとき、あなたはどう感じますか？",
+      "hira": "だれかにたすけられたとき、あなたはどうかんじますか？",
+      "mp3": "br_q14_how_do_you_feel_when_someone_helps_you.mp3"
+    },
+    {
+      "n": 15,
+      "en": "What is your favorite way to celebrate a friend's birthday?",
+      "jp": "友達の誕生日を祝う好きな方法は何ですか？",
+      "hira": "ともだちのたんじょうびをいわうすきなほうほうはなんですか？",
+      "mp3": "br_q15_what_is_your_favorite_way_to_celebrate_a_friend_s_birthday.mp3"
+    },
+    {
+      "n": 16,
+      "en": "How do you feel when you receive a compliment?",
+      "jp": "褒められたとき、あなたはどう感じますか？",
+      "hira": "ほめられたとき、あなたはどうかんじますか？",
+      "mp3": "br_q16_how_do_you_feel_when_you_receive_a_compliment.mp3"
+    },
+    {
+      "n": 17,
+      "en": "What do you do to stay calm during stressful times?",
+      "jp": "ストレスの多い時に落ち着くために何をしますか？",
+      "hira": "すとれすのおおいときにおちつくためになにをしますか？",
+      "mp3": "br_q17_what_do_you_do_to_stay_calm_during_stressful_times.mp3"
+    },
+    {
+      "n": 18,
+      "en": "How do you help your friends when they are sad?",
+      "jp": "友達が悲しいとき、あなたはどう助けますか？",
+      "hira": "ともだちがかなしいとき、あなたはどうたすけますか？",
+      "mp3": "br_q18_how_do_you_help_your_friends_when_they_are_sad.mp3"
+    },
+    {
+      "n": 19,
+      "en": "What does it mean to be a good listener?",
+      "jp": "良い聞き手になるとはどういうことですか？",
+      "hira": "よいききてになるとはどういうことですか？",
+      "mp3": "br_q19_what_does_it_mean_to_be_a_good_listener.mp3"
+    },
+    {
+      "n": 20,
+      "en": "How do you feel about sharing your things?",
+      "jp": "自分の物を共有することについてどう感じますか？",
+      "hira": "じぶんのものをきょうゆうすることについてどうかんじますか？",
+      "mp3": "br_q20_how_do_you_feel_about_sharing_your_things.mp3"
+    },
+    {
+      "n": 21,
+      "en": "What is the importance of teamwork?",
+      "jp": "チームワークの重要性は何ですか？",
+      "hira": "ちーむわーくのじゅうようせいはなんですか？",
+      "mp3": "br_q21_what_is_the_importance_of_teamwork.mp3"
+    },
+    {
+      "n": 22,
+      "en": "How do you show appreciation to your family?",
+      "jp": "家族に感謝の気持ちをどのように示しますか？",
+      "hira": "かぞくにかんしゃのきもちをどのようにしめしますか？",
+      "mp3": "br_q22_how_do_you_show_appreciation_to_your_family.mp3"
+    },
+    {
+      "n": 23,
+      "en": "What do you do if you see someone in trouble?",
+      "jp": "誰かが困っているのを見たら、あなたはどうしますか？",
+      "hira": "だれかがこまっているのをみたら、あなたはどうしますか？",
+      "mp3": "br_q23_what_do_you_do_if_you_see_someone_in_trouble.mp3"
+    },
+    {
+      "n": 24,
+      "en": "How can you stay safe while playing outside?",
+      "jp": "外で遊ぶとき、どのように安全を保ちますか？",
+      "hira": "そとであそぶとき、どのようにあんぜんをたもちますか？",
+      "mp3": "br_q24_how_can_you_stay_safe_while_playing_outside.mp3"
+    },
+    {
+      "n": 25,
+      "en": "What should you do if you get lost?",
+      "jp": "迷子になったら、あなたは何をすべきですか？",
+      "hira": "まいごになったら、あなたはなにをすべきですか？",
+      "mp3": "br_q25_what_should_you_do_if_you_get_lost.mp3"
+    },
+    {
+      "n": 26,
+      "en": "How do you feel when you help someone?",
+      "jp": "誰かを助けたとき、あなたはどう感じますか？",
+      "hira": "だれかをたすけたとき、あなたはどうかんじますか？",
+      "mp3": "br_q26_how_do_you_feel_when_you_help_someone.mp3"
+    },
+    {
+      "n": 27,
+      "en": "What is your favorite way to communicate with friends?",
+      "jp": "友達とコミュニケーションを取る好きな方法は何ですか？",
+      "hira": "ともだちとこみゅにけーしょんをとるすきなほうほうはなんですか？",
+      "mp3": "br_q27_what_is_your_favorite_way_to_communicate_with_friends.mp3"
+    },
+    {
+      "n": 28,
+      "en": "How do you feel about trying new things?",
+      "jp": "新しいことに挑戦することについてどう感じますか？",
+      "hira": "あたらしいことにちょうせんすることについてどうかんじますか？",
+      "mp3": "br_q28_how_do_you_feel_about_trying_new_things.mp3"
+    },
+    {
+      "n": 29,
+      "en": "What do you do to celebrate achievements?",
+      "jp": "達成を祝うために何をしますか？",
+      "hira": "たっせいをいわうためになにをしますか？",
+      "mp3": "br_q29_what_do_you_do_to_celebrate_achievements.mp3"
+    },
+    {
+      "n": 30,
+      "en": "How do you express your emotions in writing?",
+      "jp": "文章で感情を表現するにはどうしますか？",
+      "hira": "ぶんしょうでかんじょうをひょうげんするにはどうしますか？",
+      "mp3": "br_q30_how_do_you_express_your_emotions_in_writing.mp3"
+    },
+    {
+      "n": 31,
+      "en": "What can you do to support a friend in need?",
+      "jp": "困っている友達を支えるために何ができますか？",
+      "hira": "こまっているともだちをささえるためになにができますか？",
+      "mp3": "br_q31_what_can_you_do_to_support_a_friend_in_need.mp3"
+    },
+    {
+      "n": 32,
+      "en": "How do you feel when you receive help from others?",
+      "jp": "他の人から助けられたとき、あなたはどう感じますか？",
+      "hira": "ほかのひとからたすけられたとき、あなたはどうかんじますか？",
+      "mp3": "br_q32_how_do_you_feel_when_you_receive_help_from_others.mp3"
+    },
+    {
+      "n": 33,
+      "en": "What is your favorite family celebration?",
+      "jp": "あなたの好きな家族の祝賀は何ですか？",
+      "hira": "あなたのすきなかぞくのしゅくがはなんですか？",
+      "mp3": "br_q33_what_is_your_favorite_family_celebration.mp3"
+    },
+    {
+      "n": 34,
+      "en": "How do you handle stress during exams?",
+      "jp": "試験中のストレスをどう対処しますか？",
+      "hira": "しけんちゅうのすとれすをどうたいしょしますか？",
+      "mp3": "br_q34_how_do_you_handle_stress_during_exams.mp3"
+    },
+    {
+      "n": 35,
+      "en": "What makes you feel proud of your family?",
+      "jp": "家族に誇りを感じるのは何ですか？",
+      "hira": "かぞくにほこりをかんじるのはなんですか？",
+      "mp3": "br_q35_what_makes_you_feel_proud_of_your_family.mp3"
+    },
+    {
+      "n": 36,
+      "en": "How do you celebrate holidays with your friends?",
+      "jp": "友達と休日をどのように祝いますか？",
+      "hira": "ともだちときゅうじつをどのようにいわいますか？",
+      "mp3": "br_q36_how_do_you_celebrate_holidays_with_your_friends.mp3"
+    },
+    {
+      "n": 37,
+      "en": "What do you do to make someone feel better?",
+      "jp": "誰かを元気にするために何をしますか？",
+      "hira": "だれかをげんきにするためになにをしますか？",
+      "mp3": "br_q37_what_do_you_do_to_make_someone_feel_better.mp3"
+    },
+    {
+      "n": 38,
+      "en": "How do you feel about giving compliments?",
+      "jp": "褒めることについてどう感じますか？",
+      "hira": "ほめることについてどうかんじますか？",
+      "mp3": "br_q38_how_do_you_feel_about_giving_compliments.mp3"
+    },
+    {
+      "n": 39,
+      "en": "What is your favorite way to show kindness?",
+      "jp": "親切を示す好きな方法は何ですか？",
+      "hira": "しんせつをしめすすきなほうほうはなんですか？",
+      "mp3": "br_q39_what_is_your_favorite_way_to_show_kindness.mp3"
+    },
+    {
+      "n": 40,
+      "en": "How do you feel when you achieve a goal?",
+      "jp": "目標を達成したとき、あなたはどう感じますか？",
+      "hira": "もくひょうをたっせいしたとき、あなたはどうかんじますか？",
+      "mp3": "br_q40_how_do_you_feel_when_you_achieve_a_goal.mp3"
+    },
+    {
+      "n": 41,
+      "en": "What do you do when you see someone being bullied?",
+      "jp": "誰かがいじめられているのを見たら、あなたはどうしますか？",
+      "hira": "だれかがいじめられているのをみたら、あなたはどうしますか？",
+      "mp3": "br_q41_what_do_you_do_when_you_see_someone_being_bullied.mp3"
+    },
+    {
+      "n": 42,
+      "en": "How do you feel about resolving conflicts?",
+      "jp": "対立を解決することについてどう感じますか？",
+      "hira": "たいりつをかいけつすることについてどうかんじますか？",
+      "mp3": "br_q42_how_do_you_feel_about_resolving_conflicts.mp3"
+    },
+    {
+      "n": 43,
+      "en": "What is the best way to give directions?",
+      "jp": "道案内をする最良の方法は何ですか？",
+      "hira": "みちあんないをするさいりょうのほうほうはなんですか？",
+      "mp3": "br_q43_what_is_the_best_way_to_give_directions.mp3"
+    },
+    {
+      "n": 44,
+      "en": "How do you feel when you are part of a team?",
+      "jp": "チームの一員でいるとき、あなたはどう感じますか？",
+      "hira": "ちーむのいちいんでいるとき、あなたはどうかんじますか？",
+      "mp3": "br_q44_how_do_you_feel_when_you_are_part_of_a_team.mp3"
+    },
+    {
+      "n": 45,
+      "en": "What do you do to stay safe at home?",
+      "jp": "家で安全を保つために何をしますか？",
+      "hira": "いえであんぜんをたもつためになにをしますか？",
+      "mp3": "br_q45_what_do_you_do_to_stay_safe_at_home.mp3"
+    },
+    {
+      "n": 46,
+      "en": "How do you feel about asking for help?",
+      "jp": "助けを求めることについてどう感じますか？",
+      "hira": "たすけをもとめることについてどうかんじますか？",
+      "mp3": "br_q46_how_do_you_feel_about_asking_for_help.mp3"
+    },
+    {
+      "n": 47,
+      "en": "What do you do if you see an emergency?",
+      "jp": "緊急事態を見たら、あなたはどうしますか？",
+      "hira": "きんきゅうじたいをみたら、あなたはどうしますか？",
+      "mp3": "br_q47_what_do_you_do_if_you_see_an_emergency.mp3"
+    },
+    {
+      "n": 48,
+      "en": "How do you celebrate achievements with your family?",
+      "jp": "家族と達成を祝うにはどうしますか？",
+      "hira": "かぞくとたっせいをいわうにはどうしますか？",
+      "mp3": "br_q48_how_do_you_celebrate_achievements_with_your_family.mp3"
+    },
+    {
+      "n": 49,
+      "en": "What is your favorite way to communicate your feelings?",
+      "jp": "感情を伝える好きな方法は何ですか？",
+      "hira": "かんじょうをつたえるすきなほうほうはなんですか？",
+      "mp3": "br_q49_what_is_your_favorite_way_to_communicate_your_feelings.mp3"
+    },
+    {
+      "n": 50,
+      "en": "How do you feel when you help someone in need?",
+      "jp": "困っている人を助けたとき、あなたはどう感じますか？",
+      "hira": "こまっているひとをたすけたとき、あなたはどうかんじますか？",
+      "mp3": "br_q50_how_do_you_feel_when_you_help_someone_in_need.mp3"
+    },
+    {
+      "n": 51,
+      "en": "What is the importance of family support?",
+      "jp": "家族の支えの重要性は何ですか？",
+      "hira": "かぞくのささえのじゅうようせいはなんですか？",
+      "mp3": "br_q51_what_is_the_importance_of_family_support.mp3"
+    },
+    {
+      "n": 52,
+      "en": "How do you feel about sharing your thoughts?",
+      "jp": "自分の考えを共有することについてどう感じますか？",
+      "hira": "じぶんのかんがえをきょうゆうすることについてどうかんじますか？",
+      "mp3": "br_q52_how_do_you_feel_about_sharing_your_thoughts.mp3"
+    },
+    {
+      "n": 53,
+      "en": "What do you do to keep your friends safe?",
+      "jp": "友達を安全に保つために何をしますか？",
+      "hira": "ともだちをあんぜんにたもつためになにをしますか？",
+      "mp3": "br_q53_what_do_you_do_to_keep_your_friends_safe.mp3"
+    },
+    {
+      "n": 54,
+      "en": "How do you celebrate your achievements?",
+      "jp": "自分の達成をどのように祝いますか？",
+      "hira": "じぶんのたっせいをどのようにいわいますか？",
+      "mp3": "br_q54_how_do_you_celebrate_your_achievements.mp3"
+    },
+    {
+      "n": 55,
+      "en": "What is your favorite way to show love to your family?",
+      "jp": "家族に愛を示す好きな方法は何ですか？",
+      "hira": "かぞくにあいをしめすすきなほうほうはなんですか？",
+      "mp3": "br_q55_what_is_your_favorite_way_to_show_love_to_your_family.mp3"
+    },
+    {
+      "n": 56,
+      "en": "How do you feel when you learn something new?",
+      "jp": "新しいことを学んだとき、あなたはどう感じますか？",
+      "hira": "あたらしいことをまなんだとき、あなたはどうかんじますか？",
+      "mp3": "br_q56_how_do_you_feel_when_you_learn_something_new.mp3"
+    },
+    {
+      "n": 57,
+      "en": "What do you do when you feel overwhelmed?",
+      "jp": "圧倒されたとき、あなたは何をしますか？",
+      "hira": "あっとうされたとき、あなたはなにをしますか？",
+      "mp3": "br_q57_what_do_you_do_when_you_feel_overwhelmed.mp3"
+    },
+    {
+      "n": 58,
+      "en": "How do you feel about giving back to the community?",
+      "jp": "地域に恩返しすることについてどう感じますか？",
+      "hira": "ちいきにおんがえしすることについてどうかんじますか？",
+      "mp3": "br_q58_how_do_you_feel_about_giving_back_to_the_community.mp3"
+    },
+    {
+      "n": 59,
+      "en": "What is your favorite way to express gratitude?",
+      "jp": "感謝を表現する好きな方法は何ですか？",
+      "hira": "かんしゃをひょうげんするすきなほうほうはなんですか？",
+      "mp3": "br_q59_what_is_your_favorite_way_to_express_gratitude.mp3"
+    },
+    {
+      "n": 60,
+      "en": "How do you feel when you achieve something difficult?",
+      "jp": "難しいことを達成したとき、あなたはどう感じますか？",
+      "hira": "むずかしいことをたっせいしたとき、あなたはどうかんじますか？",
+      "mp3": "br_q60_how_do_you_feel_when_you_achieve_something_difficult.mp3"
+    }
+  ]
+}
