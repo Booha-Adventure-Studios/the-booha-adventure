@@ -1,1 +1,424 @@
-
+{
+  "cards": [
+    {
+      "n": 1,
+      "en": "How can emotional awareness improve decision-making?",
+      "jp": "感情への気づきは意思決定をどのように改善できますか。",
+      "hira": "かんじょう への きづき は いし けってい を どの よう に かいぜん できます か",
+      "mp3": "bc_q01_how_can_emotional_awareness_improve_decisionmaking.mp3"
+    },
+    {
+      "n": 2,
+      "en": "Can emotional intelligence be developed through education?",
+      "jp": "感情知能は教育によって伸ばすことができますか。",
+      "hira": "かんじょう ちのう は きょういく に よって のばす こと が できます か",
+      "mp3": "bc_q02_can_emotional_intelligence_be_developed_through_education.mp3"
+    },
+    {
+      "n": 3,
+      "en": "How is empathy different from agreement?",
+      "jp": "共感は同意とどのように異なりますか。",
+      "hira": "きょうかん は どうい と どの よう に ことなります か",
+      "mp3": "bc_q03_how_is_empathy_different_from_agreement.mp3"
+    },
+    {
+      "n": 4,
+      "en": "When does compassion become emotionally exhausting?",
+      "jp": "思いやりが感情的な疲労になるのはどのような場合ですか。",
+      "hira": "おもいやり が かんじょうてき な ひろう に なる の は どの よう な ばあい です か",
+      "mp3": "bc_q04_when_does_compassion_become_emotionally_exhausting.mp3"
+    },
+    {
+      "n": 5,
+      "en": "What is the most constructive response to frustration?",
+      "jp": "欲求不満に対する最も建設的な対応は何ですか。",
+      "hira": "よっきゅう ふまん に たいする もっとも けんせつてき な たいおう は なん です か",
+      "mp3": "bc_q05_what_is_the_most_constructive_response_to_frustration.mp3"
+    },
+    {
+      "n": 6,
+      "en": "When should anxiety be treated as a medical concern?",
+      "jp": "不安はどのような場合に医療上の問題として扱うべきですか。",
+      "hira": "ふあん は どの よう な ばあい に いりょうじょう の もんだい として あつかう べき です か",
+      "mp3": "bc_q06_when_should_anxiety_be_treated_as_a_medical_concern.mp3"
+    },
+    {
+      "n": 7,
+      "en": "Can contentment coexist with strong ambition?",
+      "jp": "満足感と強い大志は両立できますか。",
+      "hira": "まんぞくかん と つよい たいし は りょうりつ できます か",
+      "mp3": "bc_q07_can_contentment_coexist_with_strong_ambition.mp3"
+    },
+    {
+      "n": 8,
+      "en": "How can disappointment lead to personal growth?",
+      "jp": "失望はどのように個人の成長につながりますか。",
+      "hira": "しつぼう は どの よう に こじん の せいちょう に つながります か",
+      "mp3": "bc_q08_how_can_disappointment_lead_to_personal_growth.mp3"
+    },
+    {
+      "n": 9,
+      "en": "Why do people remember embarrassing moments so clearly?",
+      "jp": "人はなぜ恥ずかしい出来事を鮮明に覚えているのですか。",
+      "hira": "ひと は なぜ はずかしい できごと を せんめい に おぼえて いる の です か",
+      "mp3": "bc_q09_why_do_people_remember_embarrassing_moments_so_clearly.mp3"
+    },
+    {
+      "n": 10,
+      "en": "How can resentment be resolved before it damages a relationship?",
+      "jp": "憤りが人間関係を損なう前に、どう解消できますか。",
+      "hira": "いきどおり が にんげん かんけい を そこなう まえ に どう かいしょう できます か",
+      "mp3": "bc_q10_how_can_resentment_be_resolved_before_it_damages_a_relationship.mp3"
+    },
+    {
+      "n": 11,
+      "en": "Why is vulnerability necessary for close relationships?",
+      "jp": "傷つきやすさはなぜ親しい関係に必要なのですか。",
+      "hira": "きずつきやすさ は なぜ したしい かんけい に ひつよう な の です か",
+      "mp3": "bc_q11_why_is_vulnerability_necessary_for_close_relationships.mp3"
+    },
+    {
+      "n": 12,
+      "en": "How can people identify their emotional triggers?",
+      "jp": "感情を引き起こす要因をどのように特定できますか。",
+      "hira": "かんじょう を ひきおこす よういん を どの よう に とくてい できます か",
+      "mp3": "bc_q12_how_can_people_identify_their_emotional_triggers.mp3"
+    },
+    {
+      "n": 13,
+      "en": "Is mood regulation always healthy?",
+      "jp": "気分の調整は常に健康的ですか。",
+      "hira": "きぶん の ちょうせい は つね に けんこうてき です か",
+      "mp3": "bc_q13_is_mood_regulation_always_healthy.mp3"
+    },
+    {
+      "n": 14,
+      "en": "Which social conditions most affect psychological well-being?",
+      "jp": "どの社会的条件が心理的幸福に最も影響しますか。",
+      "hira": "どの しゃかいてき じょうけん が しんりてき こうふく に もっとも えいきょう します か",
+      "mp3": "bc_q14_which_social_conditions_most_affect_psychological_wellbeing.mp3"
+    },
+    {
+      "n": 15,
+      "en": "How accurate is most people’s self-awareness?",
+      "jp": "多くの人の自己認識はどのくらい正確ですか。",
+      "hira": "おおく の ひと の じこ にんしき は どの くらい せいかく です か",
+      "mp3": "bc_q15_how_accurate_is_most_peoples_selfawareness.mp3"
+    },
+    {
+      "n": 16,
+      "en": "Can mutual respect exist without personal affection?",
+      "jp": "個人的な好意がなくても相互尊重は成り立ちますか。",
+      "hira": "こじんてき な こうい が なくて も そうご そんちょう は なりたちます か",
+      "mp3": "bc_q16_can_mutual_respect_exist_without_personal_affection.mp3"
+    },
+    {
+      "n": 17,
+      "en": "What behaviors make someone trustworthy?",
+      "jp": "どのような行動が人を信頼できる存在にしますか。",
+      "hira": "どの よう な こうどう が ひと を しんらい できる そんざい に します か",
+      "mp3": "bc_q17_what_behaviors_make_someone_trustworthy.mp3"
+    },
+    {
+      "n": 18,
+      "en": "Should reciprocity be expected in every friendship?",
+      "jp": "すべての友情で互恵性を期待すべきですか。",
+      "hira": "すべて の ゆうじょう で ごけいせい を きたい する べき です か",
+      "mp3": "bc_q18_should_reciprocity_be_expected_in_every_friendship.mp3"
+    },
+    {
+      "n": 19,
+      "en": "What prevents people from listening actively?",
+      "jp": "人が積極的に聞くことを妨げるものは何ですか。",
+      "hira": "ひと が せっきょくてき に きく こと を さまたげる もの は なん です か",
+      "mp3": "bc_q19_what_prevents_people_from_listening_actively.mp3"
+    },
+    {
+      "n": 20,
+      "en": "When should a conflict be confronted directly?",
+      "jp": "対立にはどのような場合に直接向き合うべきですか。",
+      "hira": "たいりつ には どの よう な ばあい に ちょくせつ むきあう べき です か",
+      "mp3": "bc_q20_when_should_a_conflict_be_confronted_directly.mp3"
+    },
+    {
+      "n": 21,
+      "en": "Can online relationships provide meaningful social support?",
+      "jp": "オンラインの関係は意味のある社会的支援を提供できますか。",
+      "hira": "おんらいん の かんけい は いみ の ある しゃかいてき しえん を ていきょう できます か",
+      "mp3": "bc_q21_can_online_relationships_provide_meaningful_social_support.mp3"
+    },
+    {
+      "n": 22,
+      "en": "How can cooperation be encouraged in competitive environments?",
+      "jp": "競争的な環境で協力をどのように促せますか。",
+      "hira": "きょうそうてき な かんきょう で きょうりょく を どの よう に うながせます か",
+      "mp3": "bc_q22_how_can_cooperation_be_encouraged_in_competitive_environments.mp3"
+    },
+    {
+      "n": 23,
+      "en": "What is the difference between inclusion and simple participation?",
+      "jp": "包摂と単なる参加の違いは何ですか。",
+      "hira": "ほうせつ と たんなる さんか の ちがい は なん です か",
+      "mp3": "bc_q23_what_is_the_difference_between_inclusion_and_simple_participation.mp3"
+    },
+    {
+      "n": 24,
+      "en": "When does loyalty become unethical?",
+      "jp": "忠誠心が非倫理的になるのはどのような場合ですか。",
+      "hira": "ちゅうせいしん が ひりんりてき に なる の は どの よう な ばあい です か",
+      "mp3": "bc_q24_when_does_loyalty_become_unethical.mp3"
+    },
+    {
+      "n": 25,
+      "en": "Is complete honesty always desirable?",
+      "jp": "完全な正直さは常に望ましいですか。",
+      "hira": "かんぜん な しょうじきさ は つね に のぞましい です か",
+      "mp3": "bc_q25_is_complete_honesty_always_desirable.mp3"
+    },
+    {
+      "n": 26,
+      "en": "How much patience should a difficult relationship receive?",
+      "jp": "難しい人間関係にどの程度の忍耐を向けるべきですか。",
+      "hira": "むずかしい にんげん かんけい に どの ていど の にんたい を むける べき です か",
+      "mp3": "bc_q26_how_much_patience_should_a_difficult_relationship_receive.mp3"
+    },
+    {
+      "n": 27,
+      "en": "Can generosity create unhealthy dependence?",
+      "jp": "寛大さが不健全な依存を生むことはありますか。",
+      "hira": "かんだいさ が ふけんぜん な いぞん を うむ こと は あります か",
+      "mp3": "bc_q27_can_generosity_create_unhealthy_dependence.mp3"
+    },
+    {
+      "n": 28,
+      "en": "How should personal boundaries be communicated?",
+      "jp": "個人の境界線をどのように伝えるべきですか。",
+      "hira": "こじん の きょうかいせん を どの よう に つたえる べき です か",
+      "mp3": "bc_q28_how_should_personal_boundaries_be_communicated.mp3"
+    },
+    {
+      "n": 29,
+      "en": "Why is peer pressure difficult to resist?",
+      "jp": "同調圧力に抵抗するのはなぜ難しいのですか。",
+      "hira": "どうちょう あつりょく に ていこう する の は なぜ むずかしい の です か",
+      "mp3": "bc_q29_why_is_peer_pressure_difficult_to_resist.mp3"
+    },
+    {
+      "n": 30,
+      "en": "How can schools strengthen students’ sense of belonging?",
+      "jp": "学校は生徒の帰属意識をどのように高められますか。",
+      "hira": "がっこう は せいと の きぞく いしき を どの よう に たかめられます か",
+      "mp3": "bc_q30_how_can_schools_strengthen_students_sense_of_belonging.mp3"
+    },
+    {
+      "n": 31,
+      "en": "How is family structure changing in modern society?",
+      "jp": "現代社会で家族構成はどのように変化していますか。",
+      "hira": "げんだい しゃかい で かぞく こうせい は どの よう に へんか して います か",
+      "mp3": "bc_q31_how_is_family_structure_changing_in_modern_society.mp3"
+    },
+    {
+      "n": 32,
+      "en": "What are the advantages of an extended family?",
+      "jp": "拡大家族の利点は何ですか。",
+      "hira": "かくだい かぞく の りてん は なん です か",
+      "mp3": "bc_q32_what_are_the_advantages_of_an_extended_family.mp3"
+    },
+    {
+      "n": 33,
+      "en": "Why has the nuclear family become less dominant?",
+      "jp": "核家族が以前ほど主流でなくなったのはなぜですか。",
+      "hira": "かく かぞく が いぜん ほど しゅりゅう で なく なった の は なぜ です か",
+      "mp3": "bc_q33_why_has_the_nuclear_family_become_less_dominant.mp3"
+    },
+    {
+      "n": 34,
+      "en": "What can younger and older generations learn from each other?",
+      "jp": "若い世代と高齢世代は互いに何を学べますか。",
+      "hira": "わかい せだい と こうれい せだい は たがい に なに を まなべます か",
+      "mp3": "bc_q34_what_can_younger_and_older_generations_learn_from_each_other.mp3"
+    },
+    {
+      "n": 35,
+      "en": "Should caregivers receive greater financial support?",
+      "jp": "介護者はより多くの経済的支援を受けるべきですか。",
+      "hira": "かいごしゃ は より おおく の けいざいてき しえん を うける べき です か",
+      "mp3": "bc_q35_should_caregivers_receive_greater_financial_support.mp3"
+    },
+    {
+      "n": 36,
+      "en": "How should household responsibilities be divided?",
+      "jp": "家庭内の責任をどのように分担すべきですか。",
+      "hira": "かていない の せきにん を どの よう に ぶんたん する べき です か",
+      "mp3": "bc_q36_how_should_household_responsibilities_be_divided.mp3"
+    },
+    {
+      "n": 37,
+      "en": "What makes emotional support effective?",
+      "jp": "精神的支援を効果的にするものは何ですか。",
+      "hira": "せいしんてき しえん を こうかてき に する もの は なん です か",
+      "mp3": "bc_q37_what_makes_emotional_support_effective.mp3"
+    },
+    {
+      "n": 38,
+      "en": "Can families remain close without shared values?",
+      "jp": "共有する価値観がなくても家族は親しくいられますか。",
+      "hira": "きょうゆう する かちかん が なくて も かぞく は したしく いられます か",
+      "mp3": "bc_q38_can_families_remain_close_without_shared_values.mp3"
+    },
+    {
+      "n": 39,
+      "en": "Should family traditions change over time?",
+      "jp": "家族の伝統は時間とともに変わるべきですか。",
+      "hira": "かぞく の でんとう は じかん と とも に かわる べき です か",
+      "mp3": "bc_q39_should_family_traditions_change_over_time.mp3"
+    },
+    {
+      "n": 40,
+      "en": "How can employers reduce work-family conflict?",
+      "jp": "雇用主は仕事と家庭の葛藤をどのように減らせますか。",
+      "hira": "こようぬし は しごと と かてい の かっとう を どの よう に へらせます か",
+      "mp3": "bc_q40_how_can_employers_reduce_workfamily_conflict.mp3"
+    },
+    {
+      "n": 41,
+      "en": "Should paid parental leave be guaranteed?",
+      "jp": "有給の育児休業を保障すべきですか。",
+      "hira": "ゆうきゅう の いくじ きゅうぎょう を ほしょう する べき です か",
+      "mp3": "bc_q41_should_paid_parental_leave_be_guaranteed.mp3"
+    },
+    {
+      "n": 42,
+      "en": "Is childcare primarily a family or public responsibility?",
+      "jp": "保育は主に家族と社会のどちらの責任ですか。",
+      "hira": "ほいく は おもに かぞく と しゃかい の どちら の せきにん です か",
+      "mp3": "bc_q42_is_childcare_primarily_a_family_or_public_responsibility.mp3"
+    },
+    {
+      "n": 43,
+      "en": "How should societies prepare for increasing eldercare needs?",
+      "jp": "社会は増加する高齢者介護の必要にどう備えるべきですか。",
+      "hira": "しゃかい は ぞうか する こうれいしゃ かいご の ひつよう に どう そなえる べき です か",
+      "mp3": "bc_q43_how_should_societies_prepare_for_increasing_eldercare_needs.mp3"
+    },
+    {
+      "n": 44,
+      "en": "Are domestic roles still shaped by gender?",
+      "jp": "家庭内の役割は今も性別に左右されていますか。",
+      "hira": "かていない の やくわり は いま も せいべつ に さゆう されて います か",
+      "mp3": "bc_q44_are_domestic_roles_still_shaped_by_gender.mp3"
+    },
+    {
+      "n": 45,
+      "en": "What maintains a family bond across distance?",
+      "jp": "距離があっても家族の絆を保つものは何ですか。",
+      "hira": "きょり が あって も かぞく の きずな を たもつ もの は なん です か",
+      "mp3": "bc_q45_what_maintains_a_family_bond_across_distance.mp3"
+    },
+    {
+      "n": 46,
+      "en": "Why should assistance begin with listening?",
+      "jp": "支援はなぜ話を聞くことから始めるべきですか。",
+      "hira": "しえん は なぜ はなし を きく こと から はじめる べき です か",
+      "mp3": "bc_q46_why_should_assistance_begin_with_listening.mp3"
+    },
+    {
+      "n": 47,
+      "en": "How can donors judge whether charitable giving is effective?",
+      "jp": "寄付者は慈善寄付の効果をどのように判断できますか。",
+      "hira": "きふしゃ は じぜん きふ の こうか を どの よう に はんだん できます か",
+      "mp3": "bc_q47_how_can_donors_judge_whether_charitable_giving_is_effective.mp3"
+    },
+    {
+      "n": 48,
+      "en": "Should volunteerism replace paid public services?",
+      "jp": "ボランティア活動は有給の公共サービスに取って代わるべきですか。",
+      "hira": "ぼらんてぃあ かつどう は ゆうきゅう の こうきょう さーびす に とって かわる べき です か",
+      "mp3": "bc_q48_should_volunteerism_replace_paid_public_services.mp3"
+    },
+    {
+      "n": 49,
+      "en": "Should community service be required in schools?",
+      "jp": "学校で地域奉仕を義務づけるべきですか。",
+      "hira": "がっこう で ちいき ほうし を ぎむづける べき です か",
+      "mp3": "bc_q49_should_community_service_be_required_in_schools.mp3"
+    },
+    {
+      "n": 50,
+      "en": "What social responsibilities do companies have?",
+      "jp": "企業にはどのような社会的責任がありますか。",
+      "hira": "きぎょう には どの よう な しゃかいてき せきにん が あります か",
+      "mp3": "bc_q50_what_social_responsibilities_do_companies_have.mp3"
+    },
+    {
+      "n": 51,
+      "en": "When is bystander intervention safe and appropriate?",
+      "jp": "傍観者の介入が安全で適切なのはどのような場合ですか。",
+      "hira": "ぼうかんしゃ の かいにゅう が あんぜん で てきせつ な の は どの よう な ばあい です か",
+      "mp3": "bc_q51_when_is_bystander_intervention_safe_and_appropriate.mp3"
+    },
+    {
+      "n": 52,
+      "en": "How can communities improve emergency response?",
+      "jp": "地域社会は緊急対応をどのように改善できますか。",
+      "hira": "ちいき しゃかい は きんきゅう たいおう を どの よう に かいぜん できます か",
+      "mp3": "bc_q52_how_can_communities_improve_emergency_response.mp3"
+    },
+    {
+      "n": 53,
+      "en": "Who is responsible for ensuring accessibility?",
+      "jp": "利用しやすさを確保する責任はだれにありますか。",
+      "hira": "りよう しやすさ を かくほ する せきにん は だれ に あります か",
+      "mp3": "bc_q53_who_is_responsible_for_ensuring_accessibility.mp3"
+    },
+    {
+      "n": 54,
+      "en": "Can mutual aid remain effective during a long crisis?",
+      "jp": "相互扶助は長期的な危機でも効果を保てますか。",
+      "hira": "そうご ふじょ は ちょうきてき な きき でも こうか を たもてます か",
+      "mp3": "bc_q54_can_mutual_aid_remain_effective_during_a_long_crisis.mp3"
+    },
+    {
+      "n": 55,
+      "en": "How can humanitarian relief avoid political bias?",
+      "jp": "人道支援は政治的偏りをどのように避けられますか。",
+      "hira": "じんどう しえん は せいじてき かたより を どの よう に さけられます か",
+      "mp3": "bc_q55_how_can_humanitarian_relief_avoid_political_bias.mp3"
+    },
+    {
+      "n": 56,
+      "en": "Which public services deserve the highest priority?",
+      "jp": "どの公共サービスを最優先すべきですか。",
+      "hira": "どの こうきょう さーびす を さいゆうせん する べき です か",
+      "mp3": "bc_q56_which_public_services_deserve_the_highest_priority.mp3"
+    },
+    {
+      "n": 57,
+      "en": "What makes crisis management trustworthy?",
+      "jp": "危機管理を信頼できるものにするのは何ですか。",
+      "hira": "きき かんり を しんらい できる もの に する の は なん です か",
+      "mp3": "bc_q57_what_makes_crisis_management_trustworthy.mp3"
+    },
+    {
+      "n": 58,
+      "en": "How should limited resources be allocated during an emergency?",
+      "jp": "緊急時に限られた資源をどのように配分すべきですか。",
+      "hira": "きんきゅうじ に かぎられた しげん を どの よう に はいぶん する べき です か",
+      "mp3": "bc_q58_how_should_limited_resources_be_allocated_during_an_emergency.mp3"
+    },
+    {
+      "n": 59,
+      "en": "How can vulnerable populations influence public policy?",
+      "jp": "弱い立場の人々は公共政策にどう影響を与えられますか。",
+      "hira": "よわい たちば の ひとびと は こうきょう せいさく に どう えいきょう を あたえられます か",
+      "mp3": "bc_q59_how_can_vulnerable_populations_influence_public_policy.mp3"
+    },
+    {
+      "n": 60,
+      "en": "Why does civic engagement decline in some communities?",
+      "jp": "一部の地域で市民参加が低下するのはなぜですか。",
+      "hira": "いちぶ の ちいき で しみん さんか が ていか する の は なぜ です か",
+      "mp3": "bc_q60_why_does_civic_engagement_decline_in_some_communities.mp3"
+    }
+  ]
+}

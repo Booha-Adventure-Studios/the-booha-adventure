@@ -1,1 +1,424 @@
-
+{
+  "cards": [
+    {
+      "n": 1,
+      "en": "emotional awareness",
+      "jp": "感情への気づき",
+      "hira": "かんじょう への きづき",
+      "mp3": "bc_v01_emotional_awareness.mp3"
+    },
+    {
+      "n": 2,
+      "en": "emotional intelligence",
+      "jp": "感情知能",
+      "hira": "かんじょう ちのう",
+      "mp3": "bc_v02_emotional_intelligence.mp3"
+    },
+    {
+      "n": 3,
+      "en": "empathy",
+      "jp": "共感",
+      "hira": "きょうかん",
+      "mp3": "bc_v03_empathy.mp3"
+    },
+    {
+      "n": 4,
+      "en": "compassion",
+      "jp": "思いやり",
+      "hira": "おもいやり",
+      "mp3": "bc_v04_compassion.mp3"
+    },
+    {
+      "n": 5,
+      "en": "frustration",
+      "jp": "欲求不満",
+      "hira": "よっきゅう ふまん",
+      "mp3": "bc_v05_frustration.mp3"
+    },
+    {
+      "n": 6,
+      "en": "anxiety",
+      "jp": "不安",
+      "hira": "ふあん",
+      "mp3": "bc_v06_anxiety.mp3"
+    },
+    {
+      "n": 7,
+      "en": "contentment",
+      "jp": "満足感",
+      "hira": "まんぞくかん",
+      "mp3": "bc_v07_contentment.mp3"
+    },
+    {
+      "n": 8,
+      "en": "disappointment",
+      "jp": "失望",
+      "hira": "しつぼう",
+      "mp3": "bc_v08_disappointment.mp3"
+    },
+    {
+      "n": 9,
+      "en": "embarrassment",
+      "jp": "恥ずかしさ",
+      "hira": "はずかしさ",
+      "mp3": "bc_v09_embarrassment.mp3"
+    },
+    {
+      "n": 10,
+      "en": "resentment",
+      "jp": "憤り",
+      "hira": "いきどおり",
+      "mp3": "bc_v10_resentment.mp3"
+    },
+    {
+      "n": 11,
+      "en": "vulnerability",
+      "jp": "傷つきやすさ",
+      "hira": "きずつきやすさ",
+      "mp3": "bc_v11_vulnerability.mp3"
+    },
+    {
+      "n": 12,
+      "en": "emotional trigger",
+      "jp": "感情を引き起こす要因",
+      "hira": "かんじょう を ひきおこす よういん",
+      "mp3": "bc_v12_emotional_trigger.mp3"
+    },
+    {
+      "n": 13,
+      "en": "mood regulation",
+      "jp": "気分の調整",
+      "hira": "きぶん の ちょうせい",
+      "mp3": "bc_v13_mood_regulation.mp3"
+    },
+    {
+      "n": 14,
+      "en": "psychological well-being",
+      "jp": "心理的幸福",
+      "hira": "しんりてき こうふく",
+      "mp3": "bc_v14_psychological_wellbeing.mp3"
+    },
+    {
+      "n": 15,
+      "en": "self-awareness",
+      "jp": "自己認識",
+      "hira": "じこ にんしき",
+      "mp3": "bc_v15_selfawareness.mp3"
+    },
+    {
+      "n": 16,
+      "en": "mutual respect",
+      "jp": "相互尊重",
+      "hira": "そうご そんちょう",
+      "mp3": "bc_v16_mutual_respect.mp3"
+    },
+    {
+      "n": 17,
+      "en": "trustworthiness",
+      "jp": "信頼性",
+      "hira": "しんらいせい",
+      "mp3": "bc_v17_trustworthiness.mp3"
+    },
+    {
+      "n": 18,
+      "en": "reciprocity",
+      "jp": "互恵性",
+      "hira": "ごけいせい",
+      "mp3": "bc_v18_reciprocity.mp3"
+    },
+    {
+      "n": 19,
+      "en": "active listening",
+      "jp": "積極的傾聴",
+      "hira": "せっきょくてき けいちょう",
+      "mp3": "bc_v19_active_listening.mp3"
+    },
+    {
+      "n": 20,
+      "en": "conflict resolution",
+      "jp": "対立解決",
+      "hira": "たいりつ かいけつ",
+      "mp3": "bc_v20_conflict_resolution.mp3"
+    },
+    {
+      "n": 21,
+      "en": "social support",
+      "jp": "社会的支援",
+      "hira": "しゃかいてき しえん",
+      "mp3": "bc_v21_social_support.mp3"
+    },
+    {
+      "n": 22,
+      "en": "cooperation",
+      "jp": "協力",
+      "hira": "きょうりょく",
+      "mp3": "bc_v22_cooperation.mp3"
+    },
+    {
+      "n": 23,
+      "en": "inclusion",
+      "jp": "包摂",
+      "hira": "ほうせつ",
+      "mp3": "bc_v23_inclusion.mp3"
+    },
+    {
+      "n": 24,
+      "en": "loyalty",
+      "jp": "忠誠心",
+      "hira": "ちゅうせいしん",
+      "mp3": "bc_v24_loyalty.mp3"
+    },
+    {
+      "n": 25,
+      "en": "honesty",
+      "jp": "正直さ",
+      "hira": "しょうじきさ",
+      "mp3": "bc_v25_honesty.mp3"
+    },
+    {
+      "n": 26,
+      "en": "patience",
+      "jp": "忍耐",
+      "hira": "にんたい",
+      "mp3": "bc_v26_patience.mp3"
+    },
+    {
+      "n": 27,
+      "en": "generosity",
+      "jp": "寛大さ",
+      "hira": "かんだいさ",
+      "mp3": "bc_v27_generosity.mp3"
+    },
+    {
+      "n": 28,
+      "en": "personal boundary",
+      "jp": "個人の境界線",
+      "hira": "こじん の きょうかいせん",
+      "mp3": "bc_v28_personal_boundary.mp3"
+    },
+    {
+      "n": 29,
+      "en": "peer pressure",
+      "jp": "同調圧力",
+      "hira": "どうちょう あつりょく",
+      "mp3": "bc_v29_peer_pressure.mp3"
+    },
+    {
+      "n": 30,
+      "en": "sense of belonging",
+      "jp": "帰属意識",
+      "hira": "きぞく いしき",
+      "mp3": "bc_v30_sense_of_belonging.mp3"
+    },
+    {
+      "n": 31,
+      "en": "family structure",
+      "jp": "家族構成",
+      "hira": "かぞく こうせい",
+      "mp3": "bc_v31_family_structure.mp3"
+    },
+    {
+      "n": 32,
+      "en": "extended family",
+      "jp": "拡大家族",
+      "hira": "かくだい かぞく",
+      "mp3": "bc_v32_extended_family.mp3"
+    },
+    {
+      "n": 33,
+      "en": "nuclear family",
+      "jp": "核家族",
+      "hira": "かく かぞく",
+      "mp3": "bc_v33_nuclear_family.mp3"
+    },
+    {
+      "n": 34,
+      "en": "intergenerational relationship",
+      "jp": "世代間関係",
+      "hira": "せだいかん かんけい",
+      "mp3": "bc_v34_intergenerational_relationship.mp3"
+    },
+    {
+      "n": 35,
+      "en": "caregiving",
+      "jp": "介護",
+      "hira": "かいご",
+      "mp3": "bc_v35_caregiving.mp3"
+    },
+    {
+      "n": 36,
+      "en": "household responsibility",
+      "jp": "家庭内の責任",
+      "hira": "かていない の せきにん",
+      "mp3": "bc_v36_household_responsibility.mp3"
+    },
+    {
+      "n": 37,
+      "en": "emotional support",
+      "jp": "精神的支援",
+      "hira": "せいしんてき しえん",
+      "mp3": "bc_v37_emotional_support.mp3"
+    },
+    {
+      "n": 38,
+      "en": "shared values",
+      "jp": "共有する価値観",
+      "hira": "きょうゆう する かちかん",
+      "mp3": "bc_v38_shared_values.mp3"
+    },
+    {
+      "n": 39,
+      "en": "family tradition",
+      "jp": "家族の伝統",
+      "hira": "かぞく の でんとう",
+      "mp3": "bc_v39_family_tradition.mp3"
+    },
+    {
+      "n": 40,
+      "en": "work-family conflict",
+      "jp": "仕事と家庭の葛藤",
+      "hira": "しごと と かてい の かっとう",
+      "mp3": "bc_v40_workfamily_conflict.mp3"
+    },
+    {
+      "n": 41,
+      "en": "parental leave",
+      "jp": "育児休業",
+      "hira": "いくじ きゅうぎょう",
+      "mp3": "bc_v41_parental_leave.mp3"
+    },
+    {
+      "n": 42,
+      "en": "childcare",
+      "jp": "保育",
+      "hira": "ほいく",
+      "mp3": "bc_v42_childcare.mp3"
+    },
+    {
+      "n": 43,
+      "en": "eldercare",
+      "jp": "高齢者介護",
+      "hira": "こうれいしゃ かいご",
+      "mp3": "bc_v43_eldercare.mp3"
+    },
+    {
+      "n": 44,
+      "en": "domestic role",
+      "jp": "家庭内の役割",
+      "hira": "かていない の やくわり",
+      "mp3": "bc_v44_domestic_role.mp3"
+    },
+    {
+      "n": 45,
+      "en": "family bond",
+      "jp": "家族の絆",
+      "hira": "かぞく の きずな",
+      "mp3": "bc_v45_family_bond.mp3"
+    },
+    {
+      "n": 46,
+      "en": "assistance",
+      "jp": "支援",
+      "hira": "しえん",
+      "mp3": "bc_v46_assistance.mp3"
+    },
+    {
+      "n": 47,
+      "en": "charitable giving",
+      "jp": "慈善寄付",
+      "hira": "じぜん きふ",
+      "mp3": "bc_v47_charitable_giving.mp3"
+    },
+    {
+      "n": 48,
+      "en": "volunteerism",
+      "jp": "ボランティア精神",
+      "hira": "ぼらんてぃあ せいしん",
+      "mp3": "bc_v48_volunteerism.mp3"
+    },
+    {
+      "n": 49,
+      "en": "community service",
+      "jp": "地域奉仕",
+      "hira": "ちいき ほうし",
+      "mp3": "bc_v49_community_service.mp3"
+    },
+    {
+      "n": 50,
+      "en": "social responsibility",
+      "jp": "社会的責任",
+      "hira": "しゃかいてき せきにん",
+      "mp3": "bc_v50_social_responsibility.mp3"
+    },
+    {
+      "n": 51,
+      "en": "bystander intervention",
+      "jp": "傍観者の介入",
+      "hira": "ぼうかんしゃ の かいにゅう",
+      "mp3": "bc_v51_bystander_intervention.mp3"
+    },
+    {
+      "n": 52,
+      "en": "emergency response",
+      "jp": "緊急対応",
+      "hira": "きんきゅう たいおう",
+      "mp3": "bc_v52_emergency_response.mp3"
+    },
+    {
+      "n": 53,
+      "en": "accessibility",
+      "jp": "利用しやすさ",
+      "hira": "りよう しやすさ",
+      "mp3": "bc_v53_accessibility.mp3"
+    },
+    {
+      "n": 54,
+      "en": "mutual aid",
+      "jp": "相互扶助",
+      "hira": "そうご ふじょ",
+      "mp3": "bc_v54_mutual_aid.mp3"
+    },
+    {
+      "n": 55,
+      "en": "humanitarian relief",
+      "jp": "人道支援",
+      "hira": "じんどう しえん",
+      "mp3": "bc_v55_humanitarian_relief.mp3"
+    },
+    {
+      "n": 56,
+      "en": "public service",
+      "jp": "公共サービス",
+      "hira": "こうきょう さーびす",
+      "mp3": "bc_v56_public_service.mp3"
+    },
+    {
+      "n": 57,
+      "en": "crisis management",
+      "jp": "危機管理",
+      "hira": "きき かんり",
+      "mp3": "bc_v57_crisis_management.mp3"
+    },
+    {
+      "n": 58,
+      "en": "resource allocation",
+      "jp": "資源配分",
+      "hira": "しげん はいぶん",
+      "mp3": "bc_v58_resource_allocation.mp3"
+    },
+    {
+      "n": 59,
+      "en": "vulnerable population",
+      "jp": "弱い立場の人々",
+      "hira": "よわい たちば の ひとびと",
+      "mp3": "bc_v59_vulnerable_population.mp3"
+    },
+    {
+      "n": 60,
+      "en": "civic engagement",
+      "jp": "市民参加",
+      "hira": "しみん さんか",
+      "mp3": "bc_v60_civic_engagement.mp3"
+    }
+  ]
+}

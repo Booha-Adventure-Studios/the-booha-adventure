@@ -1,1 +1,424 @@
-
+{
+  "cards": [
+    {
+      "n": 1,
+      "en": "frustrated",
+      "jp": "いらいらしている",
+      "hira": "いらいらしている",
+      "mp3": "br_v01_frustrated.mp3"
+    },
+    {
+      "n": 2,
+      "en": "relieved",
+      "jp": "ほっとしている",
+      "hira": "ほっとしている",
+      "mp3": "br_v02_relieved.mp3"
+    },
+    {
+      "n": 3,
+      "en": "curious",
+      "jp": "きょうみがある",
+      "hira": "きょうみがある",
+      "mp3": "br_v03_curious.mp3"
+    },
+    {
+      "n": 4,
+      "en": "disappointed",
+      "jp": "がっかりしている",
+      "hira": "がっかりしている",
+      "mp3": "br_v04_disappointed.mp3"
+    },
+    {
+      "n": 5,
+      "en": "enthusiastic",
+      "jp": "ねっちゅうしている",
+      "hira": "ねっちゅうしている",
+      "mp3": "br_v05_enthusiastic.mp3"
+    },
+    {
+      "n": 6,
+      "en": "confident",
+      "jp": "じしんがある",
+      "hira": "じしんがある",
+      "mp3": "br_v06_confident.mp3"
+    },
+    {
+      "n": 7,
+      "en": "grateful",
+      "jp": "かんしゃしている",
+      "hira": "かんしゃしている",
+      "mp3": "br_v07_grateful.mp3"
+    },
+    {
+      "n": 8,
+      "en": "embarrassed",
+      "jp": "はずかしい",
+      "hira": "はずかしい",
+      "mp3": "br_v08_embarrassed.mp3"
+    },
+    {
+      "n": 9,
+      "en": "optimistic",
+      "jp": "こうてきな",
+      "hira": "こうてきな",
+      "mp3": "br_v09_optimistic.mp3"
+    },
+    {
+      "n": 10,
+      "en": "generous",
+      "jp": "おおらか",
+      "hira": "おおらか",
+      "mp3": "br_v10_generous.mp3"
+    },
+    {
+      "n": 11,
+      "en": "supportive",
+      "jp": "しえんしている",
+      "hira": "しえんしている",
+      "mp3": "br_v11_supportive.mp3"
+    },
+    {
+      "n": 12,
+      "en": "respectful",
+      "jp": "そんけいしている",
+      "hira": "そんけいしている",
+      "mp3": "br_v12_respectful.mp3"
+    },
+    {
+      "n": 13,
+      "en": "sibling",
+      "jp": "きょうだい",
+      "hira": "きょうだい",
+      "mp3": "br_v13_sibling.mp3"
+    },
+    {
+      "n": 14,
+      "en": "relative",
+      "jp": "しんせき",
+      "hira": "しんせき",
+      "mp3": "br_v14_relative.mp3"
+    },
+    {
+      "n": 15,
+      "en": "celebration",
+      "jp": "いわいごと",
+      "hira": "いわいごと",
+      "mp3": "br_v15_celebration.mp3"
+    },
+    {
+      "n": 16,
+      "en": "communication",
+      "jp": "つうしん",
+      "hira": "つうしん",
+      "mp3": "br_v16_communication.mp3"
+    },
+    {
+      "n": 17,
+      "en": "tradition",
+      "jp": "でんとう",
+      "hira": "でんとう",
+      "mp3": "br_v17_tradition.mp3"
+    },
+    {
+      "n": 18,
+      "en": "gathering",
+      "jp": "あつまり",
+      "hira": "あつまり",
+      "mp3": "br_v18_gathering.mp3"
+    },
+    {
+      "n": 19,
+      "en": "encourage",
+      "jp": "はげます",
+      "hira": "はげます",
+      "mp3": "br_v19_encourage.mp3"
+    },
+    {
+      "n": 20,
+      "en": "navigate",
+      "jp": "みちびく",
+      "hira": "みちびく",
+      "mp3": "br_v20_navigate.mp3"
+    },
+    {
+      "n": 21,
+      "en": "emergency kit",
+      "jp": "きんきゅうようひん",
+      "hira": "きんきゅうようひん",
+      "mp3": "br_v21_emergency_kit.mp3"
+    },
+    {
+      "n": 22,
+      "en": "first aid",
+      "jp": "しょきゅうちりょう",
+      "hira": "しょきゅうちりょう",
+      "mp3": "br_v22_first_aid.mp3"
+    },
+    {
+      "n": 23,
+      "en": "safety",
+      "jp": "あんぜん",
+      "hira": "あんぜん",
+      "mp3": "br_v23_safety.mp3"
+    },
+    {
+      "n": 24,
+      "en": "alert",
+      "jp": "けいかいする",
+      "hira": "けいかいする",
+      "mp3": "br_v24_alert.mp3"
+    },
+    {
+      "n": 25,
+      "en": "calm down",
+      "jp": "おちつく",
+      "hira": "おちつく",
+      "mp3": "br_v25_calm_down.mp3"
+    },
+    {
+      "n": 26,
+      "en": "cooperate",
+      "jp": "きょうりょくする",
+      "hira": "きょうりょくする",
+      "mp3": "br_v26_cooperate.mp3"
+    },
+    {
+      "n": 27,
+      "en": "apologize",
+      "jp": "あやまる",
+      "hira": "あやまる",
+      "mp3": "br_v27_apologize.mp3"
+    },
+    {
+      "n": 28,
+      "en": "forgive",
+      "jp": "ゆるす",
+      "hira": "ゆるす",
+      "mp3": "br_v28_forgive.mp3"
+    },
+    {
+      "n": 29,
+      "en": "understand",
+      "jp": "りかいする",
+      "hira": "りかいする",
+      "mp3": "br_v29_understand.mp3"
+    },
+    {
+      "n": 30,
+      "en": "share feelings",
+      "jp": "きもちをわかちあう",
+      "hira": "きもちをわかちあう",
+      "mp3": "br_v30_share_feelings.mp3"
+    },
+    {
+      "n": 31,
+      "en": "help out",
+      "jp": "てつだう",
+      "hira": "てつだう",
+      "mp3": "br_v31_help_out.mp3"
+    },
+    {
+      "n": 32,
+      "en": "offer assistance",
+      "jp": "たすけをさしだす",
+      "hira": "たすけをさしだす",
+      "mp3": "br_v32_offer_assistance.mp3"
+    },
+    {
+      "n": 33,
+      "en": "show kindness",
+      "jp": "しんせつにする",
+      "hira": "しんせつにする",
+      "mp3": "br_v33_show_kindness.mp3"
+    },
+    {
+      "n": 34,
+      "en": "be considerate",
+      "jp": "きをつかう",
+      "hira": "きをつかう",
+      "mp3": "br_v34_be_considerate.mp3"
+    },
+    {
+      "n": 35,
+      "en": "listen carefully",
+      "jp": "よくきく",
+      "hira": "よくきく",
+      "mp3": "br_v35_listen_carefully.mp3"
+    },
+    {
+      "n": 36,
+      "en": "give directions",
+      "jp": "みちをおしえる",
+      "hira": "みちをおしえる",
+      "mp3": "br_v36_give_directions.mp3"
+    },
+    {
+      "n": 37,
+      "en": "stay calm",
+      "jp": "あんていする",
+      "hira": "あんていする",
+      "mp3": "br_v37_stay_calm.mp3"
+    },
+    {
+      "n": 38,
+      "en": "take responsibility",
+      "jp": "せきにんをもつ",
+      "hira": "せきにんをもつ",
+      "mp3": "br_v38_take_responsibility.mp3"
+    },
+    {
+      "n": 39,
+      "en": "be honest",
+      "jp": "しょうじきである",
+      "hira": "しょうじきである",
+      "mp3": "br_v39_be_honest.mp3"
+    },
+    {
+      "n": 40,
+      "en": "handle stress",
+      "jp": "ストレスをかいしょうする",
+      "hira": "ストレスをかいしょうする",
+      "mp3": "br_v40_handle_stress.mp3"
+    },
+    {
+      "n": 41,
+      "en": "stay positive",
+      "jp": "ポジティブでいる",
+      "hira": "ポジティブでいる",
+      "mp3": "br_v41_stay_positive.mp3"
+    },
+    {
+      "n": 42,
+      "en": "express gratitude",
+      "jp": "かんしゃのきもちをあらわす",
+      "hira": "かんしゃのきもちをあらわす",
+      "mp3": "br_v42_express_gratitude.mp3"
+    },
+    {
+      "n": 43,
+      "en": "show respect",
+      "jp": "そんけいをあらわす",
+      "hira": "そんけいをあらわす",
+      "mp3": "br_v43_show_respect.mp3"
+    },
+    {
+      "n": 44,
+      "en": "celebrate achievements",
+      "jp": "せいこうをいわう",
+      "hira": "せいこうをいわう",
+      "mp3": "br_v44_celebrate_achievements.mp3"
+    },
+    {
+      "n": 45,
+      "en": "make memories",
+      "jp": "おもいでをつくる",
+      "hira": "おもいでをつくる",
+      "mp3": "br_v45_make_memories.mp3"
+    },
+    {
+      "n": 46,
+      "en": "be supportive",
+      "jp": "しえんする",
+      "hira": "しえんする",
+      "mp3": "br_v46_be_supportive.mp3"
+    },
+    {
+      "n": 47,
+      "en": "stay connected",
+      "jp": "つながりをもつ",
+      "hira": "つながりをもつ",
+      "mp3": "br_v47_stay_connected.mp3"
+    },
+    {
+      "n": 48,
+      "en": "help in emergencies",
+      "jp": "きんきゅうじたいにたすける",
+      "hira": "きんきゅうじたいにたすける",
+      "mp3": "br_v48_help_in_emergencies.mp3"
+    },
+    {
+      "n": 49,
+      "en": "be a good listener",
+      "jp": "よいききてになる",
+      "hira": "よいききてになる",
+      "mp3": "br_v49_be_a_good_listener.mp3"
+    },
+    {
+      "n": 50,
+      "en": "solve problems",
+      "jp": "もんだいをかいけつする",
+      "hira": "もんだいをかいけつする",
+      "mp3": "br_v50_solve_problems.mp3"
+    },
+    {
+      "n": 51,
+      "en": "be patient",
+      "jp": "がまんする",
+      "hira": "がまんする",
+      "mp3": "br_v51_be_patient.mp3"
+    },
+    {
+      "n": 52,
+      "en": "show empathy",
+      "jp": "きもちをりかいする",
+      "hira": "きもちをりかいする",
+      "mp3": "br_v52_show_empathy.mp3"
+    },
+    {
+      "n": 53,
+      "en": "be inclusive",
+      "jp": "だれでもうけいれる",
+      "hira": "だれでもうけいれる",
+      "mp3": "br_v53_be_inclusive.mp3"
+    },
+    {
+      "n": 54,
+      "en": "encourage teamwork",
+      "jp": "ちーむわーくをはげます",
+      "hira": "ちーむわーくをはげます",
+      "mp3": "br_v54_encourage_teamwork.mp3"
+    },
+    {
+      "n": 55,
+      "en": "make compromises",
+      "jp": "だんかいする",
+      "hira": "だんかいする",
+      "mp3": "br_v55_make_compromises.mp3"
+    },
+    {
+      "n": 56,
+      "en": "be reliable",
+      "jp": "あてにされる",
+      "hira": "あてにされる",
+      "mp3": "br_v56_be_reliable.mp3"
+    },
+    {
+      "n": 57,
+      "en": "stay safe",
+      "jp": "あんぜんをたもつ",
+      "hira": "あんぜんをたもつ",
+      "mp3": "br_v57_stay_safe.mp3"
+    },
+    {
+      "n": 58,
+      "en": "be aware",
+      "jp": "いちにんをもつ",
+      "hira": "いちにんをもつ",
+      "mp3": "br_v58_be_aware.mp3"
+    },
+    {
+      "n": 59,
+      "en": "help others",
+      "jp": "ほかのひとをたすける",
+      "hira": "ほかのひとをたすける",
+      "mp3": "br_v59_help_others.mp3"
+    },
+    {
+      "n": 60,
+      "en": "respond quickly",
+      "jp": "すぐにへんじする",
+      "hira": "すぐにへんじする",
+      "mp3": "br_v60_respond_quickly.mp3"
+    }
+  ]
+}

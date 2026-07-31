@@ -1,1 +1,424 @@
-
+{
+  "cards": [
+    {
+      "n": 1,
+      "en": "How do you feel today?",
+      "jp": "今日はどんな気持ちですか。",
+      "hira": "きょう は どんな きもち です か",
+      "mp3": "pb_q01_how_do_you_feel_today.mp3"
+    },
+    {
+      "n": 2,
+      "en": "Are you happy?",
+      "jp": "うれしいですか。",
+      "hira": "うれしい です か",
+      "mp3": "pb_q02_are_you_happy.mp3"
+    },
+    {
+      "n": 3,
+      "en": "What makes you sad?",
+      "jp": "どんなときに悲しくなりますか。",
+      "hira": "どんな とき に かなしく なります か",
+      "mp3": "pb_q03_what_makes_you_sad.mp3"
+    },
+    {
+      "n": 4,
+      "en": "When do you feel angry?",
+      "jp": "いつ怒りますか。",
+      "hira": "いつ おこります か",
+      "mp3": "pb_q04_when_do_you_feel_angry.mp3"
+    },
+    {
+      "n": 5,
+      "en": "Are you tired after school?",
+      "jp": "放課後は疲れていますか。",
+      "hira": "ほうかご は つかれて います か",
+      "mp3": "pb_q05_are_you_tired_after_school.mp3"
+    },
+    {
+      "n": 6,
+      "en": "What makes you nervous?",
+      "jp": "どんなときに緊張しますか。",
+      "hira": "どんな とき に きんちょう します か",
+      "mp3": "pb_q06_what_makes_you_nervous.mp3"
+    },
+    {
+      "n": 7,
+      "en": "What makes you excited?",
+      "jp": "どんなときにわくわくしますか。",
+      "hira": "どんな とき に わくわく します か",
+      "mp3": "pb_q07_what_makes_you_excited.mp3"
+    },
+    {
+      "n": 8,
+      "en": "Do you get bored easily?",
+      "jp": "すぐに退屈しますか。",
+      "hira": "すぐ に たいくつ します か",
+      "mp3": "pb_q08_do_you_get_bored_easily.mp3"
+    },
+    {
+      "n": 9,
+      "en": "What are you scared of?",
+      "jp": "何がこわいですか。",
+      "hira": "なに が こわい です か",
+      "mp3": "pb_q09_what_are_you_scared_of.mp3"
+    },
+    {
+      "n": 10,
+      "en": "What helps you feel calm?",
+      "jp": "何をすると落ち着きますか。",
+      "hira": "なに を する と おちつきます か",
+      "mp3": "pb_q10_what_helps_you_feel_calm.mp3"
+    },
+    {
+      "n": 11,
+      "en": "What makes you proud?",
+      "jp": "どんなときに誇らしくなりますか。",
+      "hira": "どんな とき に ほこらしく なります か",
+      "mp3": "pb_q11_what_makes_you_proud.mp3"
+    },
+    {
+      "n": 12,
+      "en": "What are you worried about?",
+      "jp": "何を心配していますか。",
+      "hira": "なに を しんぱい して います か",
+      "mp3": "pb_q12_what_are_you_worried_about.mp3"
+    },
+    {
+      "n": 13,
+      "en": "Are you shy?",
+      "jp": "恥ずかしがりですか。",
+      "hira": "はずかしがり です か",
+      "mp3": "pb_q13_are_you_shy.mp3"
+    },
+    {
+      "n": 14,
+      "en": "What do you do when you feel sick?",
+      "jp": "具合が悪いときは何をしますか。",
+      "hira": "ぐあい が わるい とき は なに を します か",
+      "mp3": "pb_q14_what_do_you_do_when_you_feel_sick.mp3"
+    },
+    {
+      "n": 15,
+      "en": "What do you eat when you are hungry?",
+      "jp": "おなかがすいたときは何を食べますか。",
+      "hira": "おなか が すいた とき は なに を たべます か",
+      "mp3": "pb_q15_what_do_you_eat_when_you_are_hungry.mp3"
+    },
+    {
+      "n": 16,
+      "en": "Who is your best friend?",
+      "jp": "一番仲のよい友達はだれですか。",
+      "hira": "いちばん なか の よい ともだち は だれ です か",
+      "mp3": "pb_q16_who_is_your_best_friend.mp3"
+    },
+    {
+      "n": 17,
+      "en": "What makes a good friend?",
+      "jp": "よい友達に必要なことは何ですか。",
+      "hira": "よい ともだち に ひつよう な こと は なん です か",
+      "mp3": "pb_q17_what_makes_a_good_friend.mp3"
+    },
+    {
+      "n": 18,
+      "en": "Is your friend kind?",
+      "jp": "あなたの友達は親切ですか。",
+      "hira": "あなた の ともだち は しんせつ です か",
+      "mp3": "pb_q18_is_your_friend_kind.mp3"
+    },
+    {
+      "n": 19,
+      "en": "Do you share with friends?",
+      "jp": "友達と物を分け合いますか。",
+      "hira": "ともだち と もの を わけあいます か",
+      "mp3": "pb_q19_do_you_share_with_friends.mp3"
+    },
+    {
+      "n": 20,
+      "en": "Who helps you with homework?",
+      "jp": "だれが宿題を手伝ってくれますか。",
+      "hira": "だれ が しゅくだい を てつだって くれます か",
+      "mp3": "pb_q20_who_helps_you_with_homework.mp3"
+    },
+    {
+      "n": 21,
+      "en": "Do you listen to your friends?",
+      "jp": "友達の話を聞きますか。",
+      "hira": "ともだち の はなし を ききます か",
+      "mp3": "pb_q21_do_you_listen_to_your_friends.mp3"
+    },
+    {
+      "n": 22,
+      "en": "What do you do together?",
+      "jp": "いっしょに何をしますか。",
+      "hira": "いっしょ に なに を します か",
+      "mp3": "pb_q22_what_do_you_do_together.mp3"
+    },
+    {
+      "n": 23,
+      "en": "Do you invite everyone to play?",
+      "jp": "みんなを遊びにさそいますか。",
+      "hira": "みんな を あそび に さそいます か",
+      "mp3": "pb_q23_do_you_invite_everyone_to_play.mp3"
+    },
+    {
+      "n": 24,
+      "en": "Do you like teamwork?",
+      "jp": "チームワークは好きですか。",
+      "hira": "ちーむわーく は すき です か",
+      "mp3": "pb_q24_do_you_like_teamwork.mp3"
+    },
+    {
+      "n": 25,
+      "en": "Is honesty important?",
+      "jp": "正直でいることは大切ですか。",
+      "hira": "しょうじき で いる こと は たいせつ です か",
+      "mp3": "pb_q25_is_honesty_important.mp3"
+    },
+    {
+      "n": 26,
+      "en": "Who is patient in your class?",
+      "jp": "クラスでだれが我慢強いですか。",
+      "hira": "くらす で だれ が がまんづよい です か",
+      "mp3": "pb_q26_who_is_patient_in_your_class.mp3"
+    },
+    {
+      "n": 27,
+      "en": "Who is brave?",
+      "jp": "だれが勇気がありますか。",
+      "hira": "だれ が ゆうき が あります か",
+      "mp3": "pb_q27_who_is_brave.mp3"
+    },
+    {
+      "n": 28,
+      "en": "Who do you trust?",
+      "jp": "だれを信頼していますか。",
+      "hira": "だれ を しんらい して います か",
+      "mp3": "pb_q28_who_do_you_trust.mp3"
+    },
+    {
+      "n": 29,
+      "en": "When do you say thank you?",
+      "jp": "いつありがとうと言いますか。",
+      "hira": "いつ ありがとう と いいます か",
+      "mp3": "pb_q29_when_do_you_say_thank_you.mp3"
+    },
+    {
+      "n": 30,
+      "en": "How do you show kindness?",
+      "jp": "どうやって親切にしますか。",
+      "hira": "どうやって しんせつ に します か",
+      "mp3": "pb_q30_how_do_you_show_kindness.mp3"
+    },
+    {
+      "n": 31,
+      "en": "Who is in your family?",
+      "jp": "家族にはだれがいますか。",
+      "hira": "かぞく には だれ が います か",
+      "mp3": "pb_q31_who_is_in_your_family.mp3"
+    },
+    {
+      "n": 32,
+      "en": "Do you have a sister?",
+      "jp": "姉か妹がいますか。",
+      "hira": "あね か いもうと が います か",
+      "mp3": "pb_q32_do_you_have_a_sister.mp3"
+    },
+    {
+      "n": 33,
+      "en": "Do you have a brother?",
+      "jp": "兄か弟がいますか。",
+      "hira": "あに か おとうと が います か",
+      "mp3": "pb_q33_do_you_have_a_brother.mp3"
+    },
+    {
+      "n": 34,
+      "en": "What does your mother like?",
+      "jp": "お母さんは何が好きですか。",
+      "hira": "おかあさん は なに が すき です か",
+      "mp3": "pb_q34_what_does_your_mother_like.mp3"
+    },
+    {
+      "n": 35,
+      "en": "What does your father cook?",
+      "jp": "お父さんは何を料理しますか。",
+      "hira": "おとうさん は なに を りょうり します か",
+      "mp3": "pb_q35_what_does_your_father_cook.mp3"
+    },
+    {
+      "n": 36,
+      "en": "What do you do with your grandparents?",
+      "jp": "祖父母と何をしますか。",
+      "hira": "そふぼ と なに を します か",
+      "mp3": "pb_q36_what_do_you_do_with_your_grandparents.mp3"
+    },
+    {
+      "n": 37,
+      "en": "Do you have cousins?",
+      "jp": "いとこがいますか。",
+      "hira": "いとこ が います か",
+      "mp3": "pb_q37_do_you_have_cousins.mp3"
+    },
+    {
+      "n": 38,
+      "en": "What does your family do together?",
+      "jp": "家族でいっしょに何をしますか。",
+      "hira": "かぞく で いっしょ に なに を します か",
+      "mp3": "pb_q38_what_does_your_family_do_together.mp3"
+    },
+    {
+      "n": 39,
+      "en": "Who tells funny stories?",
+      "jp": "だれがおもしろい話をしますか。",
+      "hira": "だれ が おもしろい はなし を します か",
+      "mp3": "pb_q39_who_tells_funny_stories.mp3"
+    },
+    {
+      "n": 40,
+      "en": "Do you help your family?",
+      "jp": "家族を手伝いますか。",
+      "hira": "かぞく を てつだいます か",
+      "mp3": "pb_q40_do_you_help_your_family.mp3"
+    },
+    {
+      "n": 41,
+      "en": "Do you make cards?",
+      "jp": "カードを作りますか。",
+      "hira": "かーど を つくります か",
+      "mp3": "pb_q41_do_you_make_cards.mp3"
+    },
+    {
+      "n": 42,
+      "en": "Who do you give chocolate to?",
+      "jp": "だれにチョコレートをあげますか。",
+      "hira": "だれ に ちょこれーと を あげます か",
+      "mp3": "pb_q42_who_do_you_give_chocolate_to.mp3"
+    },
+    {
+      "n": 43,
+      "en": "What gifts do you like?",
+      "jp": "どんなプレゼントが好きですか。",
+      "hira": "どんな ぷれぜんと が すき です か",
+      "mp3": "pb_q43_what_gifts_do_you_like.mp3"
+    },
+    {
+      "n": 44,
+      "en": "Do you like hearts and flowers?",
+      "jp": "ハートや花が好きですか。",
+      "hira": "はーと や はな が すき です か",
+      "mp3": "pb_q44_do_you_like_hearts_and_flowers.mp3"
+    },
+    {
+      "n": 45,
+      "en": "How do you celebrate birthdays?",
+      "jp": "誕生日をどうやって祝いますか。",
+      "hira": "たんじょうび を どうやって いわいます か",
+      "mp3": "pb_q45_how_do_you_celebrate_birthdays.mp3"
+    },
+    {
+      "n": 46,
+      "en": "How do you ask for help in English?",
+      "jp": "英語でどうやって助けを求めますか。",
+      "hira": "えいご で どうやって たすけ を もとめます か",
+      "mp3": "pb_q46_how_do_you_ask_for_help_in_english.mp3"
+    },
+    {
+      "n": 47,
+      "en": "Can you carry a heavy box?",
+      "jp": "重い箱を運べますか。",
+      "hira": "おもい はこ を はこべます か",
+      "mp3": "pb_q47_can_you_carry_a_heavy_box.mp3"
+    },
+    {
+      "n": 48,
+      "en": "What can you lend to a friend?",
+      "jp": "友達に何を貸せますか。",
+      "hira": "ともだち に なに を かせます か",
+      "mp3": "pb_q48_what_can_you_lend_to_a_friend.mp3"
+    },
+    {
+      "n": 49,
+      "en": "What do you borrow at school?",
+      "jp": "学校で何を借りますか。",
+      "hira": "がっこう で なに を かります か",
+      "mp3": "pb_q49_what_do_you_borrow_at_school.mp3"
+    },
+    {
+      "n": 50,
+      "en": "Can you open the door?",
+      "jp": "ドアを開けられますか。",
+      "hira": "どあ を あけられます か",
+      "mp3": "pb_q50_can_you_open_the_door.mp3"
+    },
+    {
+      "n": 51,
+      "en": "When do you help others?",
+      "jp": "いつ人を助けますか。",
+      "hira": "いつ ひと を たすけます か",
+      "mp3": "pb_q51_when_do_you_help_others.mp3"
+    },
+    {
+      "n": 52,
+      "en": "How do you ask for directions?",
+      "jp": "どうやって道をたずねますか。",
+      "hira": "どうやって みち を たずねます か",
+      "mp3": "pb_q52_how_do_you_ask_for_directions.mp3"
+    },
+    {
+      "n": 53,
+      "en": "What do you do if a bag is heavy?",
+      "jp": "かばんが重いときはどうしますか。",
+      "hira": "かばん が おもい とき は どう します か",
+      "mp3": "pb_q53_what_do_you_do_if_a_bag_is_heavy.mp3"
+    },
+    {
+      "n": 54,
+      "en": "Can you fix a broken toy?",
+      "jp": "壊れたおもちゃを直せますか。",
+      "hira": "こわれた おもちゃ を なおせます か",
+      "mp3": "pb_q54_can_you_fix_a_broken_toy.mp3"
+    },
+    {
+      "n": 55,
+      "en": "When do you say please?",
+      "jp": "いつ「お願いします」と言いますか。",
+      "hira": "いつ おねがい します と いいます か",
+      "mp3": "pb_q55_when_do_you_say_please.mp3"
+    },
+    {
+      "n": 56,
+      "en": "How do you thank people?",
+      "jp": "人にどうやってお礼を言いますか。",
+      "hira": "ひと に どうやって おれい を いいます か",
+      "mp3": "pb_q56_how_do_you_thank_people.mp3"
+    },
+    {
+      "n": 57,
+      "en": "Who helps you the most?",
+      "jp": "一番助けてくれるのはだれですか。",
+      "hira": "いちばん たすけて くれる の は だれ です か",
+      "mp3": "pb_q57_who_helps_you_the_most.mp3"
+    },
+    {
+      "n": 58,
+      "en": "What should you do after an accident?",
+      "jp": "事故の後は何をすべきですか。",
+      "hira": "じこ の あと は なに を する べき です か",
+      "mp3": "pb_q58_what_should_you_do_after_an_accident.mp3"
+    },
+    {
+      "n": 59,
+      "en": "How can you stay safe?",
+      "jp": "どうすれば安全でいられますか。",
+      "hira": "どう すれば あんぜん で いられます か",
+      "mp3": "pb_q59_how_can_you_stay_safe.mp3"
+    },
+    {
+      "n": 60,
+      "en": "What should you do in an emergency?",
+      "jp": "緊急時は何をすべきですか。",
+      "hira": "きんきゅうじ は なに を する べき です か",
+      "mp3": "pb_q60_what_should_you_do_in_an_emergency.mp3"
+    }
+  ]
+}

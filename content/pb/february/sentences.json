@@ -1,1 +1,424 @@
-
+{
+  "cards": [
+    {
+      "n": 1,
+      "en": "I am happy today.",
+      "jp": "今日はうれしいです。",
+      "hira": "きょう は うれしい です",
+      "mp3": "pb_s01_i_am_happy_today.mp3"
+    },
+    {
+      "n": 2,
+      "en": "I feel sad.",
+      "jp": "悲しい気持ちです。",
+      "hira": "かなしい きもち です",
+      "mp3": "pb_s02_i_feel_sad.mp3"
+    },
+    {
+      "n": 3,
+      "en": "I am angry now.",
+      "jp": "今は怒っています。",
+      "hira": "いま は おこって います",
+      "mp3": "pb_s03_i_am_angry_now.mp3"
+    },
+    {
+      "n": 4,
+      "en": "I am tired after school.",
+      "jp": "放課後は疲れています。",
+      "hira": "ほうかご は つかれて います",
+      "mp3": "pb_s04_i_am_tired_after_school.mp3"
+    },
+    {
+      "n": 5,
+      "en": "I feel nervous before a test.",
+      "jp": "テストの前は緊張します。",
+      "hira": "てすと の まえ は きんちょう します",
+      "mp3": "pb_s05_i_feel_nervous_before_a_test.mp3"
+    },
+    {
+      "n": 6,
+      "en": "I am excited about the party.",
+      "jp": "パーティーが楽しみでわくわくしています。",
+      "hira": "ぱーてぃー が たのしみ で わくわく して います",
+      "mp3": "pb_s06_i_am_excited_about_the_party.mp3"
+    },
+    {
+      "n": 7,
+      "en": "I feel bored on rainy days.",
+      "jp": "雨の日は退屈します。",
+      "hira": "あめ の ひ は たいくつ します",
+      "mp3": "pb_s07_i_feel_bored_on_rainy_days.mp3"
+    },
+    {
+      "n": 8,
+      "en": "I am surprised by the news.",
+      "jp": "その知らせに驚きました。",
+      "hira": "その しらせ に おどろきました",
+      "mp3": "pb_s08_i_am_surprised_by_the_news.mp3"
+    },
+    {
+      "n": 9,
+      "en": "I am scared of spiders.",
+      "jp": "クモがこわいです。",
+      "hira": "くも が こわい です",
+      "mp3": "pb_s09_i_am_scared_of_spiders.mp3"
+    },
+    {
+      "n": 10,
+      "en": "I feel calm at home.",
+      "jp": "家では落ち着きます。",
+      "hira": "いえ では おちつきます",
+      "mp3": "pb_s10_i_feel_calm_at_home.mp3"
+    },
+    {
+      "n": 11,
+      "en": "I am proud of my work.",
+      "jp": "自分の作品を誇りに思います。",
+      "hira": "じぶん の さくひん を ほこり に おもいます",
+      "mp3": "pb_s11_i_am_proud_of_my_work.mp3"
+    },
+    {
+      "n": 12,
+      "en": "I am worried about the test.",
+      "jp": "テストのことが心配です。",
+      "hira": "てすと の こと が しんぱい です",
+      "mp3": "pb_s12_i_am_worried_about_the_test.mp3"
+    },
+    {
+      "n": 13,
+      "en": "I am shy with new people.",
+      "jp": "初めて会う人の前では恥ずかしくなります。",
+      "hira": "はじめて あう ひと の まえ では はずかしく なります",
+      "mp3": "pb_s13_i_am_shy_with_new_people.mp3"
+    },
+    {
+      "n": 14,
+      "en": "I feel sick today.",
+      "jp": "今日は具合が悪いです。",
+      "hira": "きょう は ぐあい が わるい です",
+      "mp3": "pb_s14_i_feel_sick_today.mp3"
+    },
+    {
+      "n": 15,
+      "en": "I am hungry now.",
+      "jp": "今おなかがすいています。",
+      "hira": "いま おなか が すいて います",
+      "mp3": "pb_s15_i_am_hungry_now.mp3"
+    },
+    {
+      "n": 16,
+      "en": "My friend is kind.",
+      "jp": "私の友達は親切です。",
+      "hira": "わたし の ともだち は しんせつ です",
+      "mp3": "pb_s16_my_friend_is_kind.mp3"
+    },
+    {
+      "n": 17,
+      "en": "We are in the same class.",
+      "jp": "私たちは同じクラスです。",
+      "hira": "わたしたち は おなじ くらす です",
+      "mp3": "pb_s17_we_are_in_the_same_class.mp3"
+    },
+    {
+      "n": 18,
+      "en": "I share my lunch with my friend.",
+      "jp": "友達と昼ごはんを分け合います。",
+      "hira": "ともだち と ひるごはん を わけあいます",
+      "mp3": "pb_s18_i_share_my_lunch_with_my_friend.mp3"
+    },
+    {
+      "n": 19,
+      "en": "My friend helps me with math.",
+      "jp": "友達が数学を手伝ってくれます。",
+      "hira": "ともだち が すうがく を てつだって くれます",
+      "mp3": "pb_s19_my_friend_helps_me_with_math.mp3"
+    },
+    {
+      "n": 20,
+      "en": "I listen to my friends.",
+      "jp": "友達の話を聞きます。",
+      "hira": "ともだち の はなし を ききます",
+      "mp3": "pb_s20_i_listen_to_my_friends.mp3"
+    },
+    {
+      "n": 21,
+      "en": "We play together.",
+      "jp": "私たちはいっしょに遊びます。",
+      "hira": "わたしたち は いっしょ に あそびます",
+      "mp3": "pb_s21_we_play_together.mp3"
+    },
+    {
+      "n": 22,
+      "en": "I invite everyone to the game.",
+      "jp": "みんなをゲームにさそいます。",
+      "hira": "みんな を げーむ に さそいます",
+      "mp3": "pb_s22_i_invite_everyone_to_the_game.mp3"
+    },
+    {
+      "n": 23,
+      "en": "We work as a team.",
+      "jp": "私たちはチームで取り組みます。",
+      "hira": "わたしたち は ちーむ で とりくみます",
+      "mp3": "pb_s23_we_work_as_a_team.mp3"
+    },
+    {
+      "n": 24,
+      "en": "My friend is honest.",
+      "jp": "私の友達は正直です。",
+      "hira": "わたし の ともだち は しょうじき です",
+      "mp3": "pb_s24_my_friend_is_honest.mp3"
+    },
+    {
+      "n": 25,
+      "en": "She is very patient.",
+      "jp": "彼女はとても我慢強いです。",
+      "hira": "かのじょ は とても がまんづよい です",
+      "mp3": "pb_s25_she_is_very_patient.mp3"
+    },
+    {
+      "n": 26,
+      "en": "He is brave.",
+      "jp": "彼は勇気があります。",
+      "hira": "かれ は ゆうき が あります",
+      "mp3": "pb_s26_he_is_brave.mp3"
+    },
+    {
+      "n": 27,
+      "en": "We trust each other.",
+      "jp": "私たちはお互いを信頼しています。",
+      "hira": "わたしたち は おたがい を しんらい して います",
+      "mp3": "pb_s27_we_trust_each_other.mp3"
+    },
+    {
+      "n": 28,
+      "en": "I say thank you.",
+      "jp": "私はありがとうと言います。",
+      "hira": "わたし は ありがとう と いいます",
+      "mp3": "pb_s28_i_say_thank_you.mp3"
+    },
+    {
+      "n": 29,
+      "en": "I say sorry.",
+      "jp": "私はごめんなさいと言います。",
+      "hira": "わたし は ごめんなさい と いいます",
+      "mp3": "pb_s29_i_say_sorry.mp3"
+    },
+    {
+      "n": 30,
+      "en": "Kind words make people happy.",
+      "jp": "やさしい言葉は人を幸せにします。",
+      "hira": "やさしい ことば は ひと を しあわせ に します",
+      "mp3": "pb_s30_kind_words_make_people_happy.mp3"
+    },
+    {
+      "n": 31,
+      "en": "I have a small family.",
+      "jp": "私の家族は少人数です。",
+      "hira": "わたし の かぞく は しょうにんずう です",
+      "mp3": "pb_s31_i_have_a_small_family.mp3"
+    },
+    {
+      "n": 32,
+      "en": "My mother likes flowers.",
+      "jp": "母は花が好きです。",
+      "hira": "はは は はな が すき です",
+      "mp3": "pb_s32_my_mother_likes_flowers.mp3"
+    },
+    {
+      "n": 33,
+      "en": "My father cooks dinner.",
+      "jp": "父は夕食を作ります。",
+      "hira": "ちち は ゆうしょく を つくります",
+      "mp3": "pb_s33_my_father_cooks_dinner.mp3"
+    },
+    {
+      "n": 34,
+      "en": "I have one sister.",
+      "jp": "私には姉妹が一人います。",
+      "hira": "わたし には しまい が ひとり います",
+      "mp3": "pb_s34_i_have_one_sister.mp3"
+    },
+    {
+      "n": 35,
+      "en": "My brother is funny.",
+      "jp": "私の兄弟はおもしろいです。",
+      "hira": "わたし の きょうだい は おもしろい です",
+      "mp3": "pb_s35_my_brother_is_funny.mp3"
+    },
+    {
+      "n": 36,
+      "en": "My grandmother has a garden.",
+      "jp": "祖母の家には庭があります。",
+      "hira": "そぼ の いえ には にわ が あります",
+      "mp3": "pb_s36_my_grandmother_has_a_garden.mp3"
+    },
+    {
+      "n": 37,
+      "en": "My grandfather tells stories.",
+      "jp": "祖父は物語を話します。",
+      "hira": "そふ は ものがたり を はなします",
+      "mp3": "pb_s37_my_grandfather_tells_stories.mp3"
+    },
+    {
+      "n": 38,
+      "en": "I play with my cousin.",
+      "jp": "いとこと遊びます。",
+      "hira": "いとこ と あそびます",
+      "mp3": "pb_s38_i_play_with_my_cousin.mp3"
+    },
+    {
+      "n": 39,
+      "en": "We eat dinner together.",
+      "jp": "私たちはいっしょに夕食を食べます。",
+      "hira": "わたしたち は いっしょ に ゆうしょく を たべます",
+      "mp3": "pb_s39_we_eat_dinner_together.mp3"
+    },
+    {
+      "n": 40,
+      "en": "I love my family.",
+      "jp": "私は家族が大好きです。",
+      "hira": "わたし は かぞく が だいすき です",
+      "mp3": "pb_s40_i_love_my_family.mp3"
+    },
+    {
+      "n": 41,
+      "en": "I made a card for my mother.",
+      "jp": "母のためにカードを作りました。",
+      "hira": "はは の ため に かーど を つくりました",
+      "mp3": "pb_s41_i_made_a_card_for_my_mother.mp3"
+    },
+    {
+      "n": 42,
+      "en": "I gave my friend chocolate.",
+      "jp": "友達にチョコレートをあげました。",
+      "hira": "ともだち に ちょこれーと を あげました",
+      "mp3": "pb_s42_i_gave_my_friend_chocolate.mp3"
+    },
+    {
+      "n": 43,
+      "en": "This gift is for you.",
+      "jp": "このプレゼントはあなたへのものです。",
+      "hira": "この ぷれぜんと は あなた への もの です",
+      "mp3": "pb_s43_this_gift_is_for_you.mp3"
+    },
+    {
+      "n": 44,
+      "en": "The card has a red heart.",
+      "jp": "カードには赤いハートがあります。",
+      "hira": "かーど には あかい はーと が あります",
+      "mp3": "pb_s44_the_card_has_a_red_heart.mp3"
+    },
+    {
+      "n": 45,
+      "en": "We celebrate birthdays together.",
+      "jp": "私たちはいっしょに誕生日を祝います。",
+      "hira": "わたしたち は いっしょ に たんじょうび を いわいます",
+      "mp3": "pb_s45_we_celebrate_birthdays_together.mp3"
+    },
+    {
+      "n": 46,
+      "en": "Can you help me?",
+      "jp": "助けてくれますか。",
+      "hira": "たすけて くれます か",
+      "mp3": "pb_s46_can_you_help_me.mp3"
+    },
+    {
+      "n": 47,
+      "en": "Could you carry this box?",
+      "jp": "この箱を運んでくれますか。",
+      "hira": "この はこ を はこんで くれます か",
+      "mp3": "pb_s47_could_you_carry_this_box.mp3"
+    },
+    {
+      "n": 48,
+      "en": "Can I borrow your pen?",
+      "jp": "あなたのペンを借りてもいいですか。",
+      "hira": "あなた の ぺん を かりて も いい です か",
+      "mp3": "pb_s48_can_i_borrow_your_pen.mp3"
+    },
+    {
+      "n": 49,
+      "en": "You can use my ruler.",
+      "jp": "私の定規を使ってもいいですよ。",
+      "hira": "わたし の じょうぎ を つかって も いい です よ",
+      "mp3": "pb_s49_you_can_use_my_ruler.mp3"
+    },
+    {
+      "n": 50,
+      "en": "May I open the window?",
+      "jp": "窓を開けてもいいですか。",
+      "hira": "まど を あけて も いい です か",
+      "mp3": "pb_s50_may_i_open_the_window.mp3"
+    },
+    {
+      "n": 51,
+      "en": "Shall I help you?",
+      "jp": "手伝いましょうか。",
+      "hira": "てつだい ましょう か",
+      "mp3": "pb_s51_shall_i_help_you.mp3"
+    },
+    {
+      "n": 52,
+      "en": "Please close the door.",
+      "jp": "ドアを閉めてください。",
+      "hira": "どあ を しめて ください",
+      "mp3": "pb_s52_please_close_the_door.mp3"
+    },
+    {
+      "n": 53,
+      "en": "This bag is heavy.",
+      "jp": "このかばんは重いです。",
+      "hira": "この かばん は おもい です",
+      "mp3": "pb_s53_this_bag_is_heavy.mp3"
+    },
+    {
+      "n": 54,
+      "en": "This box is light.",
+      "jp": "この箱は軽いです。",
+      "hira": "この はこ は かるい です",
+      "mp3": "pb_s54_this_box_is_light.mp3"
+    },
+    {
+      "n": 55,
+      "en": "Could you give me directions?",
+      "jp": "道を教えていただけますか。",
+      "hira": "みち を おしえて いただけます か",
+      "mp3": "pb_s55_could_you_give_me_directions.mp3"
+    },
+    {
+      "n": 56,
+      "en": "My bicycle is broken.",
+      "jp": "私の自転車は壊れています。",
+      "hira": "わたし の じてんしゃ は こわれて います",
+      "mp3": "pb_s56_my_bicycle_is_broken.mp3"
+    },
+    {
+      "n": 57,
+      "en": "Can you fix it?",
+      "jp": "それを直せますか。",
+      "hira": "それ を なおせます か",
+      "mp3": "pb_s57_can_you_fix_it.mp3"
+    },
+    {
+      "n": 58,
+      "en": "Please do not hurry.",
+      "jp": "急がないでください。",
+      "hira": "いそがない で ください",
+      "mp3": "pb_s58_please_do_not_hurry.mp3"
+    },
+    {
+      "n": 59,
+      "en": "Stay safe.",
+      "jp": "安全に気をつけてください。",
+      "hira": "あんぜん に きをつけて ください",
+      "mp3": "pb_s59_stay_safe.mp3"
+    },
+    {
+      "n": 60,
+      "en": "Call an adult in an emergency.",
+      "jp": "緊急時には大人を呼んでください。",
+      "hira": "きんきゅうじ には おとな を よんで ください",
+      "mp3": "pb_s60_call_an_adult_in_an_emergency.mp3"
+    }
+  ]
+}
