@@ -1,1 +1,424 @@
-
+{
+  "cards": [
+    {
+      "n": 1,
+      "en": "goal",
+      "jp": "目標",
+      "hira": "もくひょう",
+      "mp3": "pb_v01_goal.mp3"
+    },
+    {
+      "n": 2,
+      "en": "plan",
+      "jp": "計画",
+      "hira": "けいかく",
+      "mp3": "pb_v02_plan.mp3"
+    },
+    {
+      "n": 3,
+      "en": "dream",
+      "jp": "夢",
+      "hira": "ゆめ",
+      "mp3": "pb_v03_dream.mp3"
+    },
+    {
+      "n": 4,
+      "en": "future",
+      "jp": "将来",
+      "hira": "しょうらい",
+      "mp3": "pb_v04_future.mp3"
+    },
+    {
+      "n": 5,
+      "en": "try",
+      "jp": "やってみる",
+      "hira": "やって みる",
+      "mp3": "pb_v05_try.mp3"
+    },
+    {
+      "n": 6,
+      "en": "start",
+      "jp": "始める",
+      "hira": "はじめる",
+      "mp3": "pb_v06_start.mp3"
+    },
+    {
+      "n": 7,
+      "en": "change",
+      "jp": "変える",
+      "hira": "かえる",
+      "mp3": "pb_v07_change.mp3"
+    },
+    {
+      "n": 8,
+      "en": "habit",
+      "jp": "習慣",
+      "hira": "しゅうかん",
+      "mp3": "pb_v08_habit.mp3"
+    },
+    {
+      "n": 9,
+      "en": "study",
+      "jp": "勉強する",
+      "hira": "べんきょう する",
+      "mp3": "pb_v09_study.mp3"
+    },
+    {
+      "n": 10,
+      "en": "practice",
+      "jp": "練習する",
+      "hira": "れんしゅう する",
+      "mp3": "pb_v10_practice.mp3"
+    },
+    {
+      "n": 11,
+      "en": "read",
+      "jp": "読む",
+      "hira": "よむ",
+      "mp3": "pb_v11_read.mp3"
+    },
+    {
+      "n": 12,
+      "en": "write",
+      "jp": "書く",
+      "hira": "かく",
+      "mp3": "pb_v12_write.mp3"
+    },
+    {
+      "n": 13,
+      "en": "exercise",
+      "jp": "運動する",
+      "hira": "うんどう する",
+      "mp3": "pb_v13_exercise.mp3"
+    },
+    {
+      "n": 14,
+      "en": "success",
+      "jp": "成功",
+      "hira": "せいこう",
+      "mp3": "pb_v14_success.mp3"
+    },
+    {
+      "n": 15,
+      "en": "new",
+      "jp": "新しい",
+      "hira": "あたらしい",
+      "mp3": "pb_v15_new.mp3"
+    },
+    {
+      "n": 16,
+      "en": "morning",
+      "jp": "朝",
+      "hira": "あさ",
+      "mp3": "pb_v16_morning.mp3"
+    },
+    {
+      "n": 17,
+      "en": "afternoon",
+      "jp": "午後",
+      "hira": "ごご",
+      "mp3": "pb_v17_afternoon.mp3"
+    },
+    {
+      "n": 18,
+      "en": "evening",
+      "jp": "夕方",
+      "hira": "ゆうがた",
+      "mp3": "pb_v18_evening.mp3"
+    },
+    {
+      "n": 19,
+      "en": "night",
+      "jp": "夜",
+      "hira": "よる",
+      "mp3": "pb_v19_night.mp3"
+    },
+    {
+      "n": 20,
+      "en": "breakfast",
+      "jp": "朝ごはん",
+      "hira": "あさごはん",
+      "mp3": "pb_v20_breakfast.mp3"
+    },
+    {
+      "n": 21,
+      "en": "lunch",
+      "jp": "昼ごはん",
+      "hira": "ひるごはん",
+      "mp3": "pb_v21_lunch.mp3"
+    },
+    {
+      "n": 22,
+      "en": "dinner",
+      "jp": "晩ごはん",
+      "hira": "ばんごはん",
+      "mp3": "pb_v22_dinner.mp3"
+    },
+    {
+      "n": 23,
+      "en": "wake up",
+      "jp": "起きる",
+      "hira": "おきる",
+      "mp3": "pb_v23_wake_up.mp3"
+    },
+    {
+      "n": 24,
+      "en": "get dressed",
+      "jp": "服を着る",
+      "hira": "ふく を きる",
+      "mp3": "pb_v24_get_dressed.mp3"
+    },
+    {
+      "n": 25,
+      "en": "go to school",
+      "jp": "学校へ行く",
+      "hira": "がっこう へ いく",
+      "mp3": "pb_v25_go_to_school.mp3"
+    },
+    {
+      "n": 26,
+      "en": "come home",
+      "jp": "家に帰る",
+      "hira": "いえ に かえる",
+      "mp3": "pb_v26_come_home.mp3"
+    },
+    {
+      "n": 27,
+      "en": "homework",
+      "jp": "宿題",
+      "hira": "しゅくだい",
+      "mp3": "pb_v27_homework.mp3"
+    },
+    {
+      "n": 28,
+      "en": "take a bath",
+      "jp": "お風呂に入る",
+      "hira": "おふろ に はいる",
+      "mp3": "pb_v28_take_a_bath.mp3"
+    },
+    {
+      "n": 29,
+      "en": "go to bed",
+      "jp": "寝る",
+      "hira": "ねる",
+      "mp3": "pb_v29_go_to_bed.mp3"
+    },
+    {
+      "n": 30,
+      "en": "weekend",
+      "jp": "週末",
+      "hira": "しゅうまつ",
+      "mp3": "pb_v30_weekend.mp3"
+    },
+    {
+      "n": 31,
+      "en": "body",
+      "jp": "体",
+      "hira": "からだ",
+      "mp3": "pb_v31_body.mp3"
+    },
+    {
+      "n": 32,
+      "en": "head",
+      "jp": "頭",
+      "hira": "あたま",
+      "mp3": "pb_v32_head.mp3"
+    },
+    {
+      "n": 33,
+      "en": "stomach",
+      "jp": "おなか",
+      "hira": "おなか",
+      "mp3": "pb_v33_stomach.mp3"
+    },
+    {
+      "n": 34,
+      "en": "healthy",
+      "jp": "健康な",
+      "hira": "けんこう な",
+      "mp3": "pb_v34_healthy.mp3"
+    },
+    {
+      "n": 35,
+      "en": "sick",
+      "jp": "病気の",
+      "hira": "びょうき の",
+      "mp3": "pb_v35_sick.mp3"
+    },
+    {
+      "n": 36,
+      "en": "tired",
+      "jp": "疲れた",
+      "hira": "つかれた",
+      "mp3": "pb_v36_tired.mp3"
+    },
+    {
+      "n": 37,
+      "en": "hungry",
+      "jp": "おなかがすいた",
+      "hira": "おなか が すいた",
+      "mp3": "pb_v37_hungry.mp3"
+    },
+    {
+      "n": 38,
+      "en": "thirsty",
+      "jp": "のどがかわいた",
+      "hira": "のど が かわいた",
+      "mp3": "pb_v38_thirsty.mp3"
+    },
+    {
+      "n": 39,
+      "en": "water",
+      "jp": "水",
+      "hira": "みず",
+      "mp3": "pb_v39_water.mp3"
+    },
+    {
+      "n": 40,
+      "en": "fruit",
+      "jp": "果物",
+      "hira": "くだもの",
+      "mp3": "pb_v40_fruit.mp3"
+    },
+    {
+      "n": 41,
+      "en": "vegetables",
+      "jp": "野菜",
+      "hira": "やさい",
+      "mp3": "pb_v41_vegetables.mp3"
+    },
+    {
+      "n": 42,
+      "en": "sleep",
+      "jp": "睡眠",
+      "hira": "すいみん",
+      "mp3": "pb_v42_sleep.mp3"
+    },
+    {
+      "n": 43,
+      "en": "walk",
+      "jp": "歩く",
+      "hira": "あるく",
+      "mp3": "pb_v43_walk.mp3"
+    },
+    {
+      "n": 44,
+      "en": "run",
+      "jp": "走る",
+      "hira": "はしる",
+      "mp3": "pb_v44_run.mp3"
+    },
+    {
+      "n": 45,
+      "en": "rest",
+      "jp": "休む",
+      "hira": "やすむ",
+      "mp3": "pb_v45_rest.mp3"
+    },
+    {
+      "n": 46,
+      "en": "happy",
+      "jp": "うれしい",
+      "hira": "うれしい",
+      "mp3": "pb_v46_happy.mp3"
+    },
+    {
+      "n": 47,
+      "en": "sad",
+      "jp": "悲しい",
+      "hira": "かなしい",
+      "mp3": "pb_v47_sad.mp3"
+    },
+    {
+      "n": 48,
+      "en": "nervous",
+      "jp": "緊張した",
+      "hira": "きんちょう した",
+      "mp3": "pb_v48_nervous.mp3"
+    },
+    {
+      "n": 49,
+      "en": "excited",
+      "jp": "わくわくした",
+      "hira": "わくわく した",
+      "mp3": "pb_v49_excited.mp3"
+    },
+    {
+      "n": 50,
+      "en": "difficult",
+      "jp": "難しい",
+      "hira": "むずかしい",
+      "mp3": "pb_v50_difficult.mp3"
+    },
+    {
+      "n": 51,
+      "en": "easy",
+      "jp": "簡単な",
+      "hira": "かんたん な",
+      "mp3": "pb_v51_easy.mp3"
+    },
+    {
+      "n": 52,
+      "en": "mistake",
+      "jp": "間違い",
+      "hira": "まちがい",
+      "mp3": "pb_v52_mistake.mp3"
+    },
+    {
+      "n": 53,
+      "en": "learn",
+      "jp": "学ぶ",
+      "hira": "まなぶ",
+      "mp3": "pb_v53_learn.mp3"
+    },
+    {
+      "n": 54,
+      "en": "improve",
+      "jp": "上達する",
+      "hira": "じょうたつ する",
+      "mp3": "pb_v54_improve.mp3"
+    },
+    {
+      "n": 55,
+      "en": "focus",
+      "jp": "集中する",
+      "hira": "しゅうちゅう する",
+      "mp3": "pb_v55_focus.mp3"
+    },
+    {
+      "n": 56,
+      "en": "effort",
+      "jp": "努力",
+      "hira": "どりょく",
+      "mp3": "pb_v56_effort.mp3"
+    },
+    {
+      "n": 57,
+      "en": "courage",
+      "jp": "勇気",
+      "hira": "ゆうき",
+      "mp3": "pb_v57_courage.mp3"
+    },
+    {
+      "n": 58,
+      "en": "help",
+      "jp": "助ける",
+      "hira": "たすける",
+      "mp3": "pb_v58_help.mp3"
+    },
+    {
+      "n": 59,
+      "en": "smile",
+      "jp": "笑顔",
+      "hira": "えがお",
+      "mp3": "pb_v59_smile.mp3"
+    },
+    {
+      "n": 60,
+      "en": "believe",
+      "jp": "信じる",
+      "hira": "しんじる",
+      "mp3": "pb_v60_believe.mp3"
+    }
+  ]
+}

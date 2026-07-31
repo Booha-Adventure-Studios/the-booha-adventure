@@ -1,1 +1,424 @@
-
+{
+  "cards": [
+    {
+      "n": 1,
+      "en": "long-term objective",
+      "jp": "長期目標",
+      "hira": "ちょうき もくひょう",
+      "mp3": "bc_v01_longterm_objective.mp3"
+    },
+    {
+      "n": 2,
+      "en": "short-term target",
+      "jp": "短期目標",
+      "hira": "たんき もくひょう",
+      "mp3": "bc_v02_shortterm_target.mp3"
+    },
+    {
+      "n": 3,
+      "en": "milestone",
+      "jp": "節目",
+      "hira": "ふしめ",
+      "mp3": "bc_v03_milestone.mp3"
+    },
+    {
+      "n": 4,
+      "en": "priority",
+      "jp": "優先事項",
+      "hira": "ゆうせん じこう",
+      "mp3": "bc_v04_priority.mp3"
+    },
+    {
+      "n": 5,
+      "en": "commitment",
+      "jp": "決意",
+      "hira": "けつい",
+      "mp3": "bc_v05_commitment.mp3"
+    },
+    {
+      "n": 6,
+      "en": "resolution",
+      "jp": "新年の決意",
+      "hira": "しんねん の けつい",
+      "mp3": "bc_v06_resolution.mp3"
+    },
+    {
+      "n": 7,
+      "en": "ambition",
+      "jp": "大志",
+      "hira": "たいし",
+      "mp3": "bc_v07_ambition.mp3"
+    },
+    {
+      "n": 8,
+      "en": "feasibility",
+      "jp": "実現可能性",
+      "hira": "じつげん かのうせい",
+      "mp3": "bc_v08_feasibility.mp3"
+    },
+    {
+      "n": 9,
+      "en": "measurable outcome",
+      "jp": "測定可能な成果",
+      "hira": "そくてい かのう な せいか",
+      "mp3": "bc_v09_measurable_outcome.mp3"
+    },
+    {
+      "n": 10,
+      "en": "deadline",
+      "jp": "締め切り",
+      "hira": "しめきり",
+      "mp3": "bc_v10_deadline.mp3"
+    },
+    {
+      "n": 11,
+      "en": "strategy",
+      "jp": "戦略",
+      "hira": "せんりゃく",
+      "mp3": "bc_v11_strategy.mp3"
+    },
+    {
+      "n": 12,
+      "en": "obstacle",
+      "jp": "障害",
+      "hira": "しょうがい",
+      "mp3": "bc_v12_obstacle.mp3"
+    },
+    {
+      "n": 13,
+      "en": "progress",
+      "jp": "進捗",
+      "hira": "しんちょく",
+      "mp3": "bc_v13_progress.mp3"
+    },
+    {
+      "n": 14,
+      "en": "accountability",
+      "jp": "説明責任",
+      "hira": "せつめい せきにん",
+      "mp3": "bc_v14_accountability.mp3"
+    },
+    {
+      "n": 15,
+      "en": "achievement",
+      "jp": "達成",
+      "hira": "たっせい",
+      "mp3": "bc_v15_achievement.mp3"
+    },
+    {
+      "n": 16,
+      "en": "daily routine",
+      "jp": "日課",
+      "hira": "にっか",
+      "mp3": "bc_v16_daily_routine.mp3"
+    },
+    {
+      "n": 17,
+      "en": "time management",
+      "jp": "時間管理",
+      "hira": "じかん かんり",
+      "mp3": "bc_v17_time_management.mp3"
+    },
+    {
+      "n": 18,
+      "en": "productivity",
+      "jp": "生産性",
+      "hira": "せいさんせい",
+      "mp3": "bc_v18_productivity.mp3"
+    },
+    {
+      "n": 19,
+      "en": "work-life balance",
+      "jp": "仕事と生活の調和",
+      "hira": "しごと と せいかつ の ちょうわ",
+      "mp3": "bc_v19_worklife_balance.mp3"
+    },
+    {
+      "n": 20,
+      "en": "circadian rhythm",
+      "jp": "概日リズム",
+      "hira": "がいじつ りずむ",
+      "mp3": "bc_v20_circadian_rhythm.mp3"
+    },
+    {
+      "n": 21,
+      "en": "sleep deprivation",
+      "jp": "睡眠不足",
+      "hira": "すいみん ぶそく",
+      "mp3": "bc_v21_sleep_deprivation.mp3"
+    },
+    {
+      "n": 22,
+      "en": "commute",
+      "jp": "通勤",
+      "hira": "つうきん",
+      "mp3": "bc_v22_commute.mp3"
+    },
+    {
+      "n": 23,
+      "en": "schedule",
+      "jp": "予定",
+      "hira": "よてい",
+      "mp3": "bc_v23_schedule.mp3"
+    },
+    {
+      "n": 24,
+      "en": "procrastination",
+      "jp": "先延ばし",
+      "hira": "さきのばし",
+      "mp3": "bc_v24_procrastination.mp3"
+    },
+    {
+      "n": 25,
+      "en": "distraction",
+      "jp": "集中を妨げるもの",
+      "hira": "しゅうちゅう を さまたげる もの",
+      "mp3": "bc_v25_distraction.mp3"
+    },
+    {
+      "n": 26,
+      "en": "efficiency",
+      "jp": "効率",
+      "hira": "こうりつ",
+      "mp3": "bc_v26_efficiency.mp3"
+    },
+    {
+      "n": 27,
+      "en": "flexibility",
+      "jp": "柔軟性",
+      "hira": "じゅうなんせい",
+      "mp3": "bc_v27_flexibility.mp3"
+    },
+    {
+      "n": 28,
+      "en": "household responsibility",
+      "jp": "家庭での責任",
+      "hira": "かてい での せきにん",
+      "mp3": "bc_v28_household_responsibility.mp3"
+    },
+    {
+      "n": 29,
+      "en": "digital detox",
+      "jp": "デジタルデトックス",
+      "hira": "でじたる でとっくす",
+      "mp3": "bc_v29_digital_detox.mp3"
+    },
+    {
+      "n": 30,
+      "en": "consistency",
+      "jp": "継続性",
+      "hira": "けいぞくせい",
+      "mp3": "bc_v30_consistency.mp3"
+    },
+    {
+      "n": 31,
+      "en": "physical well-being",
+      "jp": "身体的健康",
+      "hira": "しんたいてき けんこう",
+      "mp3": "bc_v31_physical_wellbeing.mp3"
+    },
+    {
+      "n": 32,
+      "en": "mental health",
+      "jp": "心の健康",
+      "hira": "こころ の けんこう",
+      "mp3": "bc_v32_mental_health.mp3"
+    },
+    {
+      "n": 33,
+      "en": "balanced diet",
+      "jp": "バランスの取れた食事",
+      "hira": "ばらんす の とれた しょくじ",
+      "mp3": "bc_v33_balanced_diet.mp3"
+    },
+    {
+      "n": 34,
+      "en": "nutritional value",
+      "jp": "栄養価",
+      "hira": "えいようか",
+      "mp3": "bc_v34_nutritional_value.mp3"
+    },
+    {
+      "n": 35,
+      "en": "hydration",
+      "jp": "水分補給",
+      "hira": "すいぶん ほきゅう",
+      "mp3": "bc_v35_hydration.mp3"
+    },
+    {
+      "n": 36,
+      "en": "cardiovascular exercise",
+      "jp": "有酸素運動",
+      "hira": "ゆうさんそ うんどう",
+      "mp3": "bc_v36_cardiovascular_exercise.mp3"
+    },
+    {
+      "n": 37,
+      "en": "strength training",
+      "jp": "筋力トレーニング",
+      "hira": "きんりょく とれーにんぐ",
+      "mp3": "bc_v37_strength_training.mp3"
+    },
+    {
+      "n": 38,
+      "en": "immune system",
+      "jp": "免疫系",
+      "hira": "めんえきけい",
+      "mp3": "bc_v38_immune_system.mp3"
+    },
+    {
+      "n": 39,
+      "en": "preventive care",
+      "jp": "予防医療",
+      "hira": "よぼう いりょう",
+      "mp3": "bc_v39_preventive_care.mp3"
+    },
+    {
+      "n": 40,
+      "en": "medical checkup",
+      "jp": "健康診断",
+      "hira": "けんこう しんだん",
+      "mp3": "bc_v40_medical_checkup.mp3"
+    },
+    {
+      "n": 41,
+      "en": "stress management",
+      "jp": "ストレス管理",
+      "hira": "すとれす かんり",
+      "mp3": "bc_v41_stress_management.mp3"
+    },
+    {
+      "n": 42,
+      "en": "burnout",
+      "jp": "燃え尽き",
+      "hira": "もえつき",
+      "mp3": "bc_v42_burnout.mp3"
+    },
+    {
+      "n": 43,
+      "en": "sedentary lifestyle",
+      "jp": "座りがちな生活",
+      "hira": "すわりがち な せいかつ",
+      "mp3": "bc_v43_sedentary_lifestyle.mp3"
+    },
+    {
+      "n": 44,
+      "en": "self-care",
+      "jp": "セルフケア",
+      "hira": "せるふ けあ",
+      "mp3": "bc_v44_selfcare.mp3"
+    },
+    {
+      "n": 45,
+      "en": "life expectancy",
+      "jp": "平均寿命",
+      "hira": "へいきん じゅみょう",
+      "mp3": "bc_v45_life_expectancy.mp3"
+    },
+    {
+      "n": 46,
+      "en": "intrinsic motivation",
+      "jp": "内発的動機づけ",
+      "hira": "ないはつてき どうきづけ",
+      "mp3": "bc_v46_intrinsic_motivation.mp3"
+    },
+    {
+      "n": 47,
+      "en": "extrinsic reward",
+      "jp": "外的報酬",
+      "hira": "がいてき ほうしゅう",
+      "mp3": "bc_v47_extrinsic_reward.mp3"
+    },
+    {
+      "n": 48,
+      "en": "growth mindset",
+      "jp": "成長思考",
+      "hira": "せいちょう しこう",
+      "mp3": "bc_v48_growth_mindset.mp3"
+    },
+    {
+      "n": 49,
+      "en": "self-discipline",
+      "jp": "自己規律",
+      "hira": "じこ きりつ",
+      "mp3": "bc_v49_selfdiscipline.mp3"
+    },
+    {
+      "n": 50,
+      "en": "perseverance",
+      "jp": "忍耐力",
+      "hira": "にんたいりょく",
+      "mp3": "bc_v50_perseverance.mp3"
+    },
+    {
+      "n": 51,
+      "en": "resilience",
+      "jp": "回復力",
+      "hira": "かいふくりょく",
+      "mp3": "bc_v51_resilience.mp3"
+    },
+    {
+      "n": 52,
+      "en": "self-efficacy",
+      "jp": "自己効力感",
+      "hira": "じこ こうりょくかん",
+      "mp3": "bc_v52_selfefficacy.mp3"
+    },
+    {
+      "n": 53,
+      "en": "constructive feedback",
+      "jp": "建設的なフィードバック",
+      "hira": "けんせつてき な ふぃーどばっく",
+      "mp3": "bc_v53_constructive_feedback.mp3"
+    },
+    {
+      "n": 54,
+      "en": "cognitive bias",
+      "jp": "認知バイアス",
+      "hira": "にんち ばいあす",
+      "mp3": "bc_v54_cognitive_bias.mp3"
+    },
+    {
+      "n": 55,
+      "en": "fear of failure",
+      "jp": "失敗への恐れ",
+      "hira": "しっぱい への おそれ",
+      "mp3": "bc_v55_fear_of_failure.mp3"
+    },
+    {
+      "n": 56,
+      "en": "comfort zone",
+      "jp": "安心できる領域",
+      "hira": "あんしん できる りょういき",
+      "mp3": "bc_v56_comfort_zone.mp3"
+    },
+    {
+      "n": 57,
+      "en": "emotional regulation",
+      "jp": "感情の調整",
+      "hira": "かんじょう の ちょうせい",
+      "mp3": "bc_v57_emotional_regulation.mp3"
+    },
+    {
+      "n": 58,
+      "en": "adaptability",
+      "jp": "適応力",
+      "hira": "てきおうりょく",
+      "mp3": "bc_v58_adaptability.mp3"
+    },
+    {
+      "n": 59,
+      "en": "continuous improvement",
+      "jp": "継続的改善",
+      "hira": "けいぞくてき かいぜん",
+      "mp3": "bc_v59_continuous_improvement.mp3"
+    },
+    {
+      "n": 60,
+      "en": "sense of purpose",
+      "jp": "目的意識",
+      "hira": "もくてき いしき",
+      "mp3": "bc_v60_sense_of_purpose.mp3"
+    }
+  ]
+}
