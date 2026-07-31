@@ -1,1 +1,424 @@
-
+{
+  "cards": [
+    {
+      "n": 1,
+      "en": "What is your goal this year?",
+      "jp": "今年の目標は何ですか。",
+      "hira": "ことし の もくひょう は なん です か",
+      "mp3": "br_q01_what_is_your_goal_this_year.mp3"
+    },
+    {
+      "n": 2,
+      "en": "Why is it important to you?",
+      "jp": "あなたにとってなぜ大切ですか。",
+      "hira": "あなた に とって なぜ たいせつ です か",
+      "mp3": "br_q02_why_is_it_important_to_you.mp3"
+    },
+    {
+      "n": 3,
+      "en": "How will you reach your goal?",
+      "jp": "どうやって目標を達成しますか。",
+      "hira": "どうやって もくひょう を たっせい します か",
+      "mp3": "br_q03_how_will_you_reach_your_goal.mp3"
+    },
+    {
+      "n": 4,
+      "en": "Who helps you stay motivated?",
+      "jp": "だれがあなたのやる気を支えてくれますか。",
+      "hira": "だれ が あなた の やるき を ささえて くれます か",
+      "mp3": "br_q04_who_helps_you_stay_motivated.mp3"
+    },
+    {
+      "n": 5,
+      "en": "What habit do you want to change?",
+      "jp": "変えたい習慣は何ですか。",
+      "hira": "かえたい しゅうかん は なん です か",
+      "mp3": "br_q05_what_habit_do_you_want_to_change.mp3"
+    },
+    {
+      "n": 6,
+      "en": "Do you like making resolutions?",
+      "jp": "新年の目標を立てるのは好きですか。",
+      "hira": "しんねん の もくひょう を たてる の は すき です か",
+      "mp3": "br_q06_do_you_like_making_resolutions.mp3"
+    },
+    {
+      "n": 7,
+      "en": "What do you want to try this year?",
+      "jp": "今年挑戦したいことは何ですか。",
+      "hira": "ことし ちょうせん したい こと は なん です か",
+      "mp3": "br_q07_what_do_you_want_to_try_this_year.mp3"
+    },
+    {
+      "n": 8,
+      "en": "What’s something new you learned recently?",
+      "jp": "最近新しく学んだことは何ですか。",
+      "hira": "さいきん あたらしく まなんだ こと は なん です か",
+      "mp3": "br_q08_whats_something_new_you_learned_recently.mp3"
+    },
+    {
+      "n": 9,
+      "en": "Is it easy to stick to your goals?",
+      "jp": "目標を続けるのは簡単ですか。",
+      "hira": "もくひょう を つづける の は かんたん です か",
+      "mp3": "br_q09_is_it_easy_to_stick_to_your_goals.mp3"
+    },
+    {
+      "n": 10,
+      "en": "What happens when you don’t try?",
+      "jp": "挑戦しないとどうなりますか。",
+      "hira": "ちょうせん しない と どう なり ます か",
+      "mp3": "br_q10_what_happens_when_you_dont_try.mp3"
+    },
+    {
+      "n": 11,
+      "en": "What makes you feel proud?",
+      "jp": "どんなときに誇らしい気持ちになりますか。",
+      "hira": "どんな とき に ほこらしい きもち に なります か",
+      "mp3": "br_q11_what_makes_you_feel_proud.mp3"
+    },
+    {
+      "n": 12,
+      "en": "What’s your dream for the future?",
+      "jp": "将来の夢は何ですか。",
+      "hira": "しょうらい の ゆめ は なん です か",
+      "mp3": "br_q12_whats_your_dream_for_the_future.mp3"
+    },
+    {
+      "n": 13,
+      "en": "How do you stay positive?",
+      "jp": "どうやって前向きでいられますか。",
+      "hira": "どうやって まえむき で いられ ます か",
+      "mp3": "br_q13_how_do_you_stay_positive.mp3"
+    },
+    {
+      "n": 14,
+      "en": "Who inspires you?",
+      "jp": "だれから刺激を受けますか。",
+      "hira": "だれ から しげき を うけます か",
+      "mp3": "br_q14_who_inspires_you.mp3"
+    },
+    {
+      "n": 15,
+      "en": "How can English help your goals?",
+      "jp": "英語はあなたの目標にどう役立ちますか。",
+      "hira": "えいご は あなた の もくひょう に どう やくだち ます か",
+      "mp3": "br_q15_how_can_english_help_your_goals.mp3"
+    },
+    {
+      "n": 16,
+      "en": "What time do you wake up?",
+      "jp": "何時に起きますか。",
+      "hira": "なんじ に おき ます か",
+      "mp3": "br_q16_what_time_do_you_wake_up.mp3"
+    },
+    {
+      "n": 17,
+      "en": "What do you do after school?",
+      "jp": "放課後は何をしますか。",
+      "hira": "ほうかご は なに を します か",
+      "mp3": "br_q17_what_do_you_do_after_school.mp3"
+    },
+    {
+      "n": 18,
+      "en": "Do you help at home?",
+      "jp": "家で手伝いをしますか。",
+      "hira": "いえ で てつだい を します か",
+      "mp3": "br_q18_do_you_help_at_home.mp3"
+    },
+    {
+      "n": 19,
+      "en": "What do you do every morning?",
+      "jp": "毎朝何をしますか。",
+      "hira": "まいあさ なに を します か",
+      "mp3": "br_q19_what_do_you_do_every_morning.mp3"
+    },
+    {
+      "n": 20,
+      "en": "What time do you eat dinner?",
+      "jp": "何時に晩ごはんを食べますか。",
+      "hira": "なんじ に ばんごはん を たべ ます か",
+      "mp3": "br_q20_what_time_do_you_eat_dinner.mp3"
+    },
+    {
+      "n": 21,
+      "en": "Do you use your phone before bed?",
+      "jp": "寝る前にスマホを使いますか。",
+      "hira": "ねる まえ に スマホ を つかい ます か",
+      "mp3": "br_q21_do_you_use_your_phone_before_bed.mp3"
+    },
+    {
+      "n": 22,
+      "en": "How do you get ready for school?",
+      "jp": "どうやって学校の準備をしますか。",
+      "hira": "どうやって がっこう の じゅんび を します か",
+      "mp3": "br_q22_how_do_you_get_ready_for_school.mp3"
+    },
+    {
+      "n": 23,
+      "en": "What is your favorite part of the day?",
+      "jp": "一日の中で一番好きな時間は何ですか。",
+      "hira": "いちにち の なか で いちばん すき な じかん は なん です か",
+      "mp3": "br_q23_what_is_your_favorite_part_of_the_day.mp3"
+    },
+    {
+      "n": 24,
+      "en": "When do you do homework?",
+      "jp": "いつ宿題をしますか。",
+      "hira": "いつ しゅくだい を します か",
+      "mp3": "br_q24_when_do_you_do_homework.mp3"
+    },
+    {
+      "n": 25,
+      "en": "Do you study every day?",
+      "jp": "毎日勉強しますか。",
+      "hira": "まいにち べんきょう します か",
+      "mp3": "br_q25_do_you_study_every_day.mp3"
+    },
+    {
+      "n": 26,
+      "en": "What time do you go to bed?",
+      "jp": "何時に寝ますか。",
+      "hira": "なんじ に ね ます か",
+      "mp3": "br_q26_what_time_do_you_go_to_bed.mp3"
+    },
+    {
+      "n": 27,
+      "en": "What do you do on weekends?",
+      "jp": "週末は何をしますか。",
+      "hira": "しゅうまつ は なに を します か",
+      "mp3": "br_q27_what_do_you_do_on_weekends.mp3"
+    },
+    {
+      "n": 28,
+      "en": "What do you usually eat for breakfast?",
+      "jp": "朝ごはんはふつう何を食べますか。",
+      "hira": "あさごはん は ふつう なに を たべ ます か",
+      "mp3": "br_q28_what_do_you_usually_eat_for_breakfast.mp3"
+    },
+    {
+      "n": 29,
+      "en": "Who do you spend time with after school?",
+      "jp": "放課後は誰と過ごしますか。",
+      "hira": "ほうかご は だれ と すごし ます か",
+      "mp3": "br_q29_who_do_you_spend_time_with_after_school.mp3"
+    },
+    {
+      "n": 30,
+      "en": "What time do you finish dinner?",
+      "jp": "晩ごはんは何時に終わりますか。",
+      "hira": "ばんごはん は なんじ に おわり ます か",
+      "mp3": "br_q30_what_time_do_you_finish_dinner.mp3"
+    },
+    {
+      "n": 31,
+      "en": "What do you do to stay healthy?",
+      "jp": "健康のために何をしていますか。",
+      "hira": "けんこう の ため に なに を して います か",
+      "mp3": "br_q31_what_do_you_do_to_stay_healthy.mp3"
+    },
+    {
+      "n": 32,
+      "en": "How many hours do you sleep?",
+      "jp": "何時間寝ますか。",
+      "hira": "なんじかん ね ます か",
+      "mp3": "br_q32_how_many_hours_do_you_sleep.mp3"
+    },
+    {
+      "n": 33,
+      "en": "Do you eat vegetables every day?",
+      "jp": "毎日野菜を食べますか。",
+      "hira": "まいにち やさい を たべ ます か",
+      "mp3": "br_q33_do_you_eat_vegetables_every_day.mp3"
+    },
+    {
+      "n": 34,
+      "en": "What sports do you play?",
+      "jp": "どんなスポーツをしますか。",
+      "hira": "どんな スポーツ を します か",
+      "mp3": "br_q34_what_sports_do_you_play.mp3"
+    },
+    {
+      "n": 35,
+      "en": "How do you relax after school?",
+      "jp": "放課後はどうやってリラックスしますか。",
+      "hira": "ほうかご は どうやって リラックス します か",
+      "mp3": "br_q35_how_do_you_relax_after_school.mp3"
+    },
+    {
+      "n": 36,
+      "en": "Do you like exercise?",
+      "jp": "運動は好きですか。",
+      "hira": "うんどう は すき です か",
+      "mp3": "br_q36_do_you_like_exercise.mp3"
+    },
+    {
+      "n": 37,
+      "en": "What food gives you energy?",
+      "jp": "どんな食べ物が元気をくれますか。",
+      "hira": "どんな たべもの が げんき を くれ ます か",
+      "mp3": "br_q37_what_food_gives_you_energy.mp3"
+    },
+    {
+      "n": 38,
+      "en": "Do you drink enough water?",
+      "jp": "水を十分に飲んでいますか。",
+      "hira": "みず を じゅうぶん に のんで います か",
+      "mp3": "br_q38_do_you_drink_enough_water.mp3"
+    },
+    {
+      "n": 39,
+      "en": "What time do you go to sleep?",
+      "jp": "何時に寝ますか。",
+      "hira": "なんじ に ね ます か",
+      "mp3": "br_q39_what_time_do_you_go_to_sleep.mp3"
+    },
+    {
+      "n": 40,
+      "en": "What should people do when they’re sick?",
+      "jp": "病気のとき、人は何をすべきですか。",
+      "hira": "びょうき の とき ひと は なに を すべき です か",
+      "mp3": "br_q40_what_should_people_do_when_theyre_sick.mp3"
+    },
+    {
+      "n": 41,
+      "en": "Do you often feel tired?",
+      "jp": "よく疲れますか。",
+      "hira": "よく つかれ ます か",
+      "mp3": "br_q41_do_you_often_feel_tired.mp3"
+    },
+    {
+      "n": 42,
+      "en": "How do you stay happy?",
+      "jp": "どうやって幸せでいられますか。",
+      "hira": "どうやって しあわせ で いられ ます か",
+      "mp3": "br_q42_how_do_you_stay_happy.mp3"
+    },
+    {
+      "n": 43,
+      "en": "Is health important to you?",
+      "jp": "健康はあなたにとって大切ですか。",
+      "hira": "けんこう は あなた に とって たいせつ です か",
+      "mp3": "br_q43_is_health_important_to_you.mp3"
+    },
+    {
+      "n": 44,
+      "en": "What bad habit do you want to change?",
+      "jp": "直したい悪い習慣は何ですか。",
+      "hira": "なおしたい わるい しゅうかん は なん です か",
+      "mp3": "br_q44_what_bad_habit_do_you_want_to_change.mp3"
+    },
+    {
+      "n": 45,
+      "en": "What’s your favorite healthy food?",
+      "jp": "好きな健康的な食べ物は何ですか。",
+      "hira": "すき な けんこうてき な たべもの は なん です か",
+      "mp3": "br_q45_whats_your_favorite_healthy_food.mp3"
+    },
+    {
+      "n": 46,
+      "en": "What do you want to learn this year?",
+      "jp": "今年学びたいことは何ですか。",
+      "hira": "ことし まなびたい こと は なん です か",
+      "mp3": "br_q46_what_do_you_want_to_learn_this_year.mp3"
+    },
+    {
+      "n": 47,
+      "en": "What are you good at?",
+      "jp": "あなたは何が得意ですか。",
+      "hira": "あなた は なに が とくい です か",
+      "mp3": "br_q47_what_are_you_good_at.mp3"
+    },
+    {
+      "n": 48,
+      "en": "What do you find difficult?",
+      "jp": "何がむずかしいですか。",
+      "hira": "なに が むずかしい です か",
+      "mp3": "br_q48_what_do_you_find_difficult.mp3"
+    },
+    {
+      "n": 49,
+      "en": "How do you keep trying?",
+      "jp": "どうやって挑戦を続けますか。",
+      "hira": "どうやって ちょうせん を つづけ ます か",
+      "mp3": "br_q49_how_do_you_keep_trying.mp3"
+    },
+    {
+      "n": 50,
+      "en": "What helps you focus?",
+      "jp": "集中するのに何が役立ちますか。",
+      "hira": "しゅうちゅう する の に なに が やくだちます か",
+      "mp3": "br_q50_what_helps_you_focus.mp3"
+    },
+    {
+      "n": 51,
+      "en": "Do you believe in yourself?",
+      "jp": "自分を信じていますか。",
+      "hira": "じぶん を しんじて います か",
+      "mp3": "br_q51_do_you_believe_in_yourself.mp3"
+    },
+    {
+      "n": 52,
+      "en": "What do you do when you make mistakes?",
+      "jp": "まちがえたとき、どうしますか。",
+      "hira": "まちがえた とき どう します か",
+      "mp3": "br_q52_what_do_you_do_when_you_make_mistakes.mp3"
+    },
+    {
+      "n": 53,
+      "en": "Who inspires you?",
+      "jp": "あなたに刺激を与えるのは誰ですか。",
+      "hira": "あなた に しげき を あたえる の は だれ です か",
+      "mp3": "br_q53_who_inspires_you.mp3"
+    },
+    {
+      "n": 54,
+      "en": "What makes you happy at school?",
+      "jp": "学校でどんなときに幸せを感じますか。",
+      "hira": "がっこう で どんな とき に しあわせ を かんじます か",
+      "mp3": "br_q54_what_makes_you_happy_at_school.mp3"
+    },
+    {
+      "n": 55,
+      "en": "What is one thing you want to improve?",
+      "jp": "改善したいことは何ですか。",
+      "hira": "かいぜん したい こと は なん です か",
+      "mp3": "br_q55_what_is_one_thing_you_want_to_improve.mp3"
+    },
+    {
+      "n": 56,
+      "en": "Do you like challenges?",
+      "jp": "挑戦は好きですか。",
+      "hira": "ちょうせん は すき です か",
+      "mp3": "br_q56_do_you_like_challenges.mp3"
+    },
+    {
+      "n": 57,
+      "en": "How do you relax?",
+      "jp": "どうやってリラックスしますか。",
+      "hira": "どうやって リラックス します か",
+      "mp3": "br_q57_how_do_you_relax.mp3"
+    },
+    {
+      "n": 58,
+      "en": "What do you do when you feel nervous?",
+      "jp": "緊張したとき、どうしますか。",
+      "hira": "きんちょう した とき どう します か",
+      "mp3": "br_q58_what_do_you_do_when_you_feel_nervous.mp3"
+    },
+    {
+      "n": 59,
+      "en": "How do you motivate yourself?",
+      "jp": "どうやって自分のやる気を出しますか。",
+      "hira": "どうやって じぶん の やるき を だします か",
+      "mp3": "br_q59_how_do_you_motivate_yourself.mp3"
+    },
+    {
+      "n": 60,
+      "en": "What’s your biggest goal right now?",
+      "jp": "今一番大きな目標は何ですか。",
+      "hira": "いま いちばん おおきな もくひょう は なん です か",
+      "mp3": "br_q60_whats_your_biggest_goal_right_now.mp3"
+    }
+  ]
+}
