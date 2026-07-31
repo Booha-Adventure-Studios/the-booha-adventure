@@ -2,423 +2,423 @@
   "cards": [
     {
       "n": 1,
-      "en": "I will study every day.",
-      "jp": "毎日勉強します。",
-      "hira": "まいにち べんきょう します",
-      "mp3": "br_s01_i_will_study_every_day.mp3"
+      "en": "I want to reach my goal little by little.",
+      "jp": "少しずつ目標に近づきたいです。",
+      "hira": "すこしずつ もくひょう に ちかづきたい です",
+      "mp3": "br_s01_i_want_to_reach_my_goal_little_by_little.mp3"
     },
     {
       "n": 2,
-      "en": "I’m going to try something new.",
-      "jp": "新しいことに挑戦します。",
-      "hira": "あたらしい こと に ちょうせん します",
-      "mp3": "br_s02_im_going_to_try_something_new.mp3"
+      "en": "A clear plan helps me stay focused.",
+      "jp": "はっきりした計画は集中する助けになります。",
+      "hira": "はっきり した けいかく は しゅうちゅう する たすけ に なります",
+      "mp3": "br_s02_a_clear_plan_helps_me_stay_focused.mp3"
     },
     {
       "n": 3,
-      "en": "I will do my best this year.",
-      "jp": "今年は全力を尽くします。",
-      "hira": "ことし は ぜんりょく を つくし ます",
-      "mp3": "br_s03_i_will_do_my_best_this_year.mp3"
+      "en": "I write my goals where I can see them.",
+      "jp": "目標は見える場所に書きます。",
+      "hira": "もくひょう は みえる ばしょ に かきます",
+      "mp3": "br_s03_i_write_my_goals_where_i_can_see_them.mp3"
     },
     {
       "n": 4,
-      "en": "I will make a new friend.",
-      "jp": "新しい友だちを作ります。",
-      "hira": "あたらしい ともだち を つくり ます",
-      "mp3": "br_s04_i_will_make_a_new_friend.mp3"
+      "en": "Small efforts can lead to big results.",
+      "jp": "小さな努力が大きな結果につながることがあります。",
+      "hira": "ちいさな どりょく が おおきな けっか に つながる こと が あります",
+      "mp3": "br_s04_small_efforts_can_lead_to_big_results.mp3"
     },
     {
       "n": 5,
-      "en": "I will not be late anymore.",
-      "jp": "もう遅刻しません。",
-      "hira": "もう ちこく しません",
-      "mp3": "br_s05_i_will_not_be_late_anymore.mp3"
+      "en": "I try to improve one habit at a time.",
+      "jp": "私は一度に一つの習慣を改善しようとします。",
+      "hira": "わたし は いちど に ひとつ の しゅうかん を かいぜん しよう と します",
+      "mp3": "br_s05_i_try_to_improve_one_habit_at_a_time.mp3"
     },
     {
       "n": 6,
-      "en": "I will help my classmates.",
-      "jp": "クラスメイトを手伝います。",
-      "hira": "クラスメイト を てつだい ます",
-      "mp3": "br_s06_i_will_help_my_classmates.mp3"
+      "en": "My resolution is to use my time better.",
+      "jp": "私の決意は時間をもっと上手に使うことです。",
+      "hira": "わたし の けつい は じかん を もっと じょうず に つかう こと です",
+      "mp3": "br_s06_my_resolution_is_to_use_my_time_better.mp3"
     },
     {
       "n": 7,
-      "en": "I will clean my desk today.",
-      "jp": "今日は机を片づけます。",
-      "hira": "きょう は つくえ を かたづけ ます",
-      "mp3": "br_s07_i_will_clean_my_desk_today.mp3"
+      "en": "I feel motivated when I notice progress.",
+      "jp": "進歩に気づくとやる気が出ます。",
+      "hira": "しんぽ に きづく と やるき が でます",
+      "mp3": "br_s07_i_feel_motivated_when_i_notice_progress.mp3"
     },
     {
       "n": 8,
-      "en": "I will read more books.",
-      "jp": "もっと本を読みます。",
-      "hira": "もっと ほん を よみ ます",
-      "mp3": "br_s08_i_will_read_more_books.mp3"
+      "en": "A difficult challenge can teach me a lot.",
+      "jp": "難しい挑戦は多くのことを教えてくれます。",
+      "hira": "むずかしい ちょうせん は おおく の こと を おしえて くれます",
+      "mp3": "br_s08_a_difficult_challenge_can_teach_me_a_lot.mp3"
     },
     {
       "n": 9,
-      "en": "I will develop a good habit.",
-      "jp": "良い習慣を身につけます。",
-      "hira": "よい しゅうかん を み に つけます",
-      "mp3": "br_s09_i_will_develop_a_good_habit.mp3"
+      "en": "I ask for support when I need help.",
+      "jp": "助けが必要なときは支えを求めます。",
+      "hira": "たすけ が ひつよう な とき は ささえ を もとめます",
+      "mp3": "br_s09_i_ask_for_support_when_i_need_help.mp3"
     },
     {
       "n": 10,
-      "en": "I will speak more English.",
-      "jp": "もっと英語を話します。",
-      "hira": "もっと えいご を はなし ます",
-      "mp3": "br_s10_i_will_speak_more_english.mp3"
+      "en": "I feel proud when I finish what I started.",
+      "jp": "始めたことをやり終えると誇らしく感じます。",
+      "hira": "はじめた こと を やりおえる と ほこらしく かんじます",
+      "mp3": "br_s10_i_feel_proud_when_i_finish_what_i_started.mp3"
     },
     {
       "n": 11,
-      "en": "I will write in my diary every week.",
-      "jp": "毎週日記を書きます。",
-      "hira": "まいしゅう にっき を かき ます",
-      "mp3": "br_s11_i_will_write_in_my_diary_every_week.mp3"
+      "en": "I focus better in a quiet place.",
+      "jp": "静かな場所ではもっと集中できます。",
+      "hira": "しずかな ばしょ では もっと しゅうちゅう できます",
+      "mp3": "br_s11_i_focus_better_in_a_quiet_place.mp3"
     },
     {
       "n": 12,
-      "en": "I will wake up earlier.",
-      "jp": "もっと早く起きます。",
-      "hira": "もっと はやく おき ます",
-      "mp3": "br_s12_i_will_wake_up_earlier.mp3"
+      "en": "A deadline helps me stop procrastinating.",
+      "jp": "締め切りがあると先延ばしをやめやすくなります。",
+      "hira": "しめきり が ある と さきのばし を やめやすく なります",
+      "mp3": "br_s12_a_deadline_helps_me_stop_procrastinating.mp3"
     },
     {
       "n": 13,
-      "en": "I will listen carefully in class.",
-      "jp": "授業でしっかり聞きます。",
-      "hira": "じゅぎょう で しっかり きき ます",
-      "mp3": "br_s13_i_will_listen_carefully_in_class.mp3"
+      "en": "I change my plan when something does not work.",
+      "jp": "うまくいかないときは計画を変えます。",
+      "hira": "うまく いかない とき は けいかく を かえます",
+      "mp3": "br_s13_i_change_my_plan_when_something_does_not_work.mp3"
     },
     {
       "n": 14,
-      "en": "I will smile more often.",
-      "jp": "もっと笑顔を見せます。",
-      "hira": "もっと えがお を みせます",
-      "mp3": "br_s14_i_will_smile_more_often.mp3"
+      "en": "Practice makes my skills stronger.",
+      "jp": "練習すると自分の力が強くなります。",
+      "hira": "れんしゅう する と じぶん の ちから が つよく なります",
+      "mp3": "br_s14_practice_makes_my_skills_stronger.mp3"
     },
     {
       "n": 15,
-      "en": "I will enjoy learning.",
-      "jp": "学ぶことを楽しみます。",
-      "hira": "まなぶ こと を たのしみ ます",
-      "mp3": "br_s15_i_will_enjoy_learning.mp3"
+      "en": "Confidence grows through effort and experience.",
+      "jp": "自信は努力と経験を通して育ちます。",
+      "hira": "じしん は どりょく と けいけん を とおして そだちます",
+      "mp3": "br_s15_confidence_grows_through_effort_and_experience.mp3"
     },
     {
       "n": 16,
-      "en": "I wake up at seven.",
-      "jp": "7時に起きます。",
-      "hira": "しちじ に おき ます",
-      "mp3": "br_s16_i_wake_up_at_seven.mp3"
+      "en": "I prepare my bag the night before school.",
+      "jp": "学校の前の夜にかばんを準備します。",
+      "hira": "がっこう の まえ の よる に かばん を じゅんび します",
+      "mp3": "br_s16_i_prepare_my_bag_the_night_before_school.mp3"
     },
     {
       "n": 17,
-      "en": "I eat breakfast every day.",
-      "jp": "毎日朝ごはんを食べます。",
-      "hira": "まいにち あさごはん を たべ ます",
-      "mp3": "br_s17_i_eat_breakfast_every_day.mp3"
+      "en": "My morning routine helps me start the day calmly.",
+      "jp": "朝の習慣は落ち着いて一日を始める助けになります。",
+      "hira": "あさ の しゅうかん は おちついて いちにち を はじめる たすけ に なります",
+      "mp3": "br_s17_my_morning_routine_helps_me_start_the_day_calmly.mp3"
     },
     {
       "n": 18,
-      "en": "I go to school at eight.",
-      "jp": "8時に学校へ行きます。",
-      "hira": "はちじ に がっこう へ いき ます",
-      "mp3": "br_s18_i_go_to_school_at_eight.mp3"
+      "en": "I review my notes after dinner.",
+      "jp": "夕食のあとでノートを見直します。",
+      "hira": "ゆうしょく の あと で のーと を みなおします",
+      "mp3": "br_s18_i_review_my_notes_after_dinner.mp3"
     },
     {
       "n": 19,
-      "en": "I take a shower in the morning.",
-      "jp": "朝シャワーを浴びます。",
-      "hira": "あさ シャワー を あび ます",
-      "mp3": "br_s19_i_take_a_shower_in_the_morning.mp3"
+      "en": "I try to balance study and rest.",
+      "jp": "勉強と休けいのバランスを取ろうとします。",
+      "hira": "べんきょう と きゅうけい の ばらんす を とろう と します",
+      "mp3": "br_s19_i_try_to_balance_study_and_rest.mp3"
     },
     {
       "n": 20,
-      "en": "I brush my teeth after meals.",
-      "jp": "食後に歯をみがきます。",
-      "hira": "しょくご に は を みがき ます",
-      "mp3": "br_s20_i_brush_my_teeth_after_meals.mp3"
+      "en": "A simple schedule keeps me organized.",
+      "jp": "シンプルな予定が私を整理された状態にしてくれます。",
+      "hira": "しんぷる な よてい が わたし を せいり された じょうたい に して くれます",
+      "mp3": "br_s20_a_simple_schedule_keeps_me_organized.mp3"
     },
     {
       "n": 21,
-      "en": "I study English after dinner.",
-      "jp": "夕食の後に英語を勉強します。",
-      "hira": "ゆうしょく の あと に えいご を べんきょう します",
-      "mp3": "br_s21_i_study_english_after_dinner.mp3"
+      "en": "I finish important tasks before I relax.",
+      "jp": "くつろぐ前に大事な作業を終わらせます。",
+      "hira": "くつろぐ まえ に だいじ な さぎょう を おわらせます",
+      "mp3": "br_s21_i_finish_important_tasks_before_i_relax.mp3"
     },
     {
       "n": 22,
-      "en": "I do my homework before bed.",
-      "jp": "寝る前に宿題をします。",
-      "hira": "ねる まえ に しゅくだい を します",
-      "mp3": "br_s22_i_do_my_homework_before_bed.mp3"
+      "en": "I take short breaks to refresh my mind.",
+      "jp": "心を切りかえるために短い休けいを取ります。",
+      "hira": "こころ を きりかえる ため に みじかい きゅうけい を とります",
+      "mp3": "br_s22_i_take_short_breaks_to_refresh_my_mind.mp3"
     },
     {
       "n": 23,
-      "en": "I help my family in the evening.",
-      "jp": "夕方に家族を手伝います。",
-      "hira": "ゆうがた に かぞく を てつだい ます",
-      "mp3": "br_s23_i_help_my_family_in_the_evening.mp3"
+      "en": "Too many distractions make studying harder.",
+      "jp": "気が散るものが多すぎると勉強がむずかしくなります。",
+      "hira": "き が ちる もの が おおすぎる と べんきょう が むずかしく なります",
+      "mp3": "br_s23_too_many_distractions_make_studying_harder.mp3"
     },
     {
       "n": 24,
-      "en": "I clean my room every Sunday.",
-      "jp": "毎週日曜日に部屋をそうじします。",
-      "hira": "まいしゅう にちようび に へや を そうじ します",
-      "mp3": "br_s24_i_clean_my_room_every_sunday.mp3"
+      "en": "I concentrate better after I clean my desk.",
+      "jp": "机を片づけるともっと集中できます。",
+      "hira": "つくえ を かたづける と もっと しゅうちゅう できます",
+      "mp3": "br_s24_i_concentrate_better_after_i_clean_my_desk.mp3"
     },
     {
       "n": 25,
-      "en": "I go to bed at ten o’clock.",
-      "jp": "10時に寝ます。",
-      "hira": "じゅうじ に ねます",
-      "mp3": "br_s25_i_go_to_bed_at_ten_oclock.mp3"
+      "en": "Weekends give me time to reset my routine.",
+      "jp": "週末は生活習慣を立て直す時間をくれます。",
+      "hira": "しゅうまつ は せいかつ しゅうかん を たてなおす じかん を くれます",
+      "mp3": "br_s25_weekends_give_me_time_to_reset_my_routine.mp3"
     },
     {
       "n": 26,
-      "en": "I sometimes read books at night.",
-      "jp": "夜にときどき本を読みます。",
-      "hira": "よる に ときどき ほん を よみます",
-      "mp3": "br_s26_i_sometimes_read_books_at_night.mp3"
+      "en": "I use a checklist to manage my tasks.",
+      "jp": "作業を管理するためにチェックリストを使います。",
+      "hira": "さぎょう を かんり する ため に ちぇっくりすと を つかいます",
+      "mp3": "br_s26_i_use_a_checklist_to_manage_my_tasks.mp3"
     },
     {
       "n": 27,
-      "en": "I never watch TV before school.",
-      "jp": "登校前はテレビを見ません。",
-      "hira": "とうこう まえ は テレビ を み ません",
-      "mp3": "br_s27_i_never_watch_tv_before_school.mp3"
+      "en": "I am more productive when I plan ahead.",
+      "jp": "前もって計画すると、もっと生産的になります。",
+      "hira": "まえもって けいかく する と もっと せいさんてき に なります",
+      "mp3": "br_s27_i_am_more_productive_when_i_plan_ahead.mp3"
     },
     {
       "n": 28,
-      "en": "I usually eat lunch with friends.",
-      "jp": "たいてい友だちと昼ごはんを食べます。",
-      "hira": "たいてい ともだち と ひるごはん を たべ ます",
-      "mp3": "br_s28_i_usually_eat_lunch_with_friends.mp3"
+      "en": "Studying with a friend can keep me motivated.",
+      "jp": "友だちと勉強するとやる気を保ちやすいです。",
+      "hira": "ともだち と べんきょう する と やるき を たもちやすい です",
+      "mp3": "br_s28_studying_with_a_friend_can_keep_me_motivated.mp3"
     },
     {
       "n": 29,
-      "en": "I walk to school every day.",
-      "jp": "毎日歩いて学校へ行きます。",
-      "hira": "まいにち あるいて がっこう へ いき ます",
-      "mp3": "br_s29_i_walk_to_school_every_day.mp3"
+      "en": "I feel less stress when my room is organized.",
+      "jp": "部屋が整理されているとストレスが減ります。",
+      "hira": "へや が せいり されて いる と すとれす が へります",
+      "mp3": "br_s29_i_feel_less_stress_when_my_room_is_organized.mp3"
     },
     {
       "n": 30,
-      "en": "I relax after class.",
-      "jp": "授業の後にリラックスします。",
-      "hira": "じゅぎょう の あと に リラックス します",
-      "mp3": "br_s30_i_relax_after_class.mp3"
+      "en": "A good routine saves time and energy.",
+      "jp": "よい習慣は時間と力を節約します。",
+      "hira": "よい しゅうかん は じかん と ちから を せつやく します",
+      "mp3": "br_s30_a_good_routine_saves_time_and_energy.mp3"
     },
     {
       "n": 31,
-      "en": "You should eat breakfast.",
-      "jp": "朝ごはんを食べたほうがいいです。",
-      "hira": "あさごはん を たべた ほう が いい です",
-      "mp3": "br_s31_you_should_eat_breakfast.mp3"
+      "en": "A balanced meal helps me think clearly.",
+      "jp": "バランスのよい食事は頭をすっきりさせます。",
+      "hira": "ばらんす の よい しょくじ は あたま を すっきり させます",
+      "mp3": "br_s31_a_balanced_meal_helps_me_think_clearly.mp3"
     },
     {
       "n": 32,
-      "en": "You should drink more water.",
-      "jp": "もっと水を飲んだほうがいいです。",
-      "hira": "もっと みず を のんだ ほう が いい です",
-      "mp3": "br_s32_you_should_drink_more_water.mp3"
+      "en": "Drinking water regularly improves my focus.",
+      "jp": "こまめに水を飲むと集中力が上がります。",
+      "hira": "こまめ に みず を のむ と しゅうちゅうりょく が あがります",
+      "mp3": "br_s32_drinking_water_regularly_improves_my_focus.mp3"
     },
     {
       "n": 33,
-      "en": "You should sleep for eight hours.",
-      "jp": "8時間は寝たほうがいいです。",
-      "hira": "はちじかん は ねた ほう が いい です",
-      "mp3": "br_s33_you_should_sleep_for_eight_hours.mp3"
+      "en": "Sleep quality affects my mood and memory.",
+      "jp": "睡眠の質は気分と記憶に影響します。",
+      "hira": "すいみん の しつ は きぶん と きおく に えいきょう します",
+      "mp3": "br_s33_sleep_quality_affects_my_mood_and_memory.mp3"
     },
     {
       "n": 34,
-      "en": "You should not eat too much candy.",
-      "jp": "お菓子を食べ過ぎないほうがいいです。",
-      "hira": "おかし を たべすぎない ほう が いい です",
-      "mp3": "br_s34_you_should_not_eat_too_much_candy.mp3"
+      "en": "Stretching helps my body feel ready to move.",
+      "jp": "ストレッチをすると体が動く準備をしやすくなります。",
+      "hira": "すとれっち を する と からだ が うごく じゅんび を しやすく なります",
+      "mp3": "br_s34_stretching_helps_my_body_feel_ready_to_move.mp3"
     },
     {
       "n": 35,
-      "en": "You must wash your hands.",
-      "jp": "手を洗わなければなりません。",
-      "hira": "て を あらわなければ なりません",
-      "mp3": "br_s35_you_must_wash_your_hands.mp3"
+      "en": "Regular exercise gives me more energy.",
+      "jp": "定期的な運動はもっと元気をくれます。",
+      "hira": "ていきてき な うんどう は もっと げんき を くれます",
+      "mp3": "br_s35_regular_exercise_gives_me_more_energy.mp3"
     },
     {
       "n": 36,
-      "en": "You should wear a mask when you’re sick.",
-      "jp": "病気のときはマスクをしたほうがいいです。",
-      "hira": "びょうき の とき は ますく を した ほう が いい です",
-      "mp3": "br_s36_you_should_wear_a_mask_when_youre_sick.mp3"
+      "en": "Too much screen time can hurt my eyes.",
+      "jp": "画面を見る時間が長すぎると目によくありません。",
+      "hira": "がめん を みる じかん が ながすぎる と め に よく ありません",
+      "mp3": "br_s36_too_much_screen_time_can_hurt_my_eyes.mp3"
     },
     {
       "n": 37,
-      "en": "You must listen to your teacher.",
-      "jp": "先生の話を聞かなければなりません。",
-      "hira": "せんせい の はなし を きかなければ なりません",
-      "mp3": "br_s37_you_must_listen_to_your_teacher.mp3"
+      "en": "Healthy choices are usually small daily actions.",
+      "jp": "健康によい選択はたいてい毎日の小さな行動です。",
+      "hira": "けんこう に よい せんたく は たいてい まいにち の ちいさな こうどう です",
+      "mp3": "br_s37_healthy_choices_are_usually_small_daily_actions.mp3"
     },
     {
       "n": 38,
-      "en": "You have to do your homework.",
-      "jp": "宿題をしなければいけません。",
-      "hira": "しゅくだい を しなければ いけません",
-      "mp3": "br_s38_you_have_to_do_your_homework.mp3"
+      "en": "I try to reduce stress before it builds up.",
+      "jp": "ストレスがたまる前に減らそうとします。",
+      "hira": "すとれす が たまる まえ に へらそう と します",
+      "mp3": "br_s38_i_try_to_reduce_stress_before_it_builds_up.mp3"
     },
     {
       "n": 39,
-      "en": "You have to bring your notebook.",
-      "jp": "ノートを持ってこなければいけません。",
-      "hira": "ノート を もって こなければ いけません",
-      "mp3": "br_s39_you_have_to_bring_your_notebook.mp3"
+      "en": "Rest is important after a busy day.",
+      "jp": "忙しい一日のあとには休むことが大切です。",
+      "hira": "いそがしい いちにち の あと に は やすむ こと が たいせつ です",
+      "mp3": "br_s39_rest_is_important_after_a_busy_day.mp3"
     },
     {
       "n": 40,
-      "en": "You have to study for the test.",
-      "jp": "テストの勉強をしなければいけません。",
-      "hira": "テスト の べんきょう を しなければ いけません",
-      "mp3": "br_s40_you_have_to_study_for_the_test.mp3"
+      "en": "Skipping breakfast can make it hard to concentrate.",
+      "jp": "朝ごはんを抜くと集中しにくくなることがあります。",
+      "hira": "あさごはん を ぬく と しゅうちゅう しにくく なる こと が あります",
+      "mp3": "br_s40_skipping_breakfast_can_make_it_hard_to_concentrate.mp3"
     },
     {
       "n": 41,
-      "en": "You shouldn’t skip lunch.",
-      "jp": "昼ごはんを抜かないほうがいいです。",
-      "hira": "ひるごはん を ぬかない ほう が いい です",
-      "mp3": "br_s41_you_shouldnt_skip_lunch.mp3"
+      "en": "Good posture can prevent pain and fatigue.",
+      "jp": "よい姿勢は痛みや疲れを防ぐことがあります。",
+      "hira": "よい しせい は いたみ や つかれ を ふせぐ こと が あります",
+      "mp3": "br_s41_good_posture_can_prevent_pain_and_fatigue.mp3"
     },
     {
       "n": 42,
-      "en": "You should stretch before sports.",
-      "jp": "スポーツの前にストレッチをしたほうがいいです。",
-      "hira": "スポーツ の まえ に ストレッチ を した ほう が いい です",
-      "mp3": "br_s42_you_should_stretch_before_sports.mp3"
+      "en": "Mental health matters as much as physical health.",
+      "jp": "心の健康は体の健康と同じくらい大切です。",
+      "hira": "こころ の けんこう は からだ の けんこう と おなじ くらい たいせつ です",
+      "mp3": "br_s42_mental_health_matters_as_much_as_physical_health.mp3"
     },
     {
       "n": 43,
-      "en": "You should walk to school if it’s close.",
-      "jp": "近いなら歩いて学校へ行ったほうがいいです。",
-      "hira": "ちかい なら あるいて がっこう へ いった ほう が いい です",
-      "mp3": "br_s43_you_should_walk_to_school_if_its_close.mp3"
+      "en": "I recover faster when I sleep enough.",
+      "jp": "十分に眠ると早く回復できます。",
+      "hira": "じゅうぶん に ねむる と はやく かいふく できます",
+      "mp3": "br_s43_i_recover_faster_when_i_sleep_enough.mp3"
     },
     {
       "n": 44,
-      "en": "You should rest when you’re tired.",
-      "jp": "疲れたときは休んだほうがいいです。",
-      "hira": "つかれた とき は やすんだ ほう が いい です",
-      "mp3": "br_s44_you_should_rest_when_youre_tired.mp3"
+      "en": "Fresh air and movement improve my mood.",
+      "jp": "新鮮な空気と体の動きは気分をよくします。",
+      "hira": "しんせん な くうき と からだ の うごき は きぶん を よく します",
+      "mp3": "br_s44_fresh_air_and_movement_improve_my_mood.mp3"
     },
     {
       "n": 45,
-      "en": "You must be kind to others.",
-      "jp": "人に親切にしなければなりません。",
-      "hira": "ひと に しんせつ に しなければ なりません",
-      "mp3": "br_s45_you_must_be_kind_to_others.mp3"
+      "en": "A healthy body supports a healthy mind.",
+      "jp": "健康な体は健康な心を支えます。",
+      "hira": "けんこう な からだ は けんこう な こころ を ささえます",
+      "mp3": "br_s45_a_healthy_body_supports_a_healthy_mind.mp3"
     },
     {
       "n": 46,
-      "en": "I want to learn English.",
-      "jp": "英語を学びたいです。",
-      "hira": "えいご を まなびたい です",
-      "mp3": "br_s46_i_want_to_learn_english.mp3"
+      "en": "Encouraging words can change someone's day.",
+      "jp": "励ましの言葉はだれかの一日を変えることがあります。",
+      "hira": "はげまし の ことば は だれか の いちにち を かえる こと が あります",
+      "mp3": "br_s46_encouraging_words_can_change_someone_s_day.mp3"
     },
     {
       "n": 47,
-      "en": "I want to try harder.",
-      "jp": "もっと頑張ってみたいです。",
-      "hira": "もっと がんばって みたい です",
-      "mp3": "br_s47_i_want_to_try_harder.mp3"
+      "en": "Patience helps me solve problems calmly.",
+      "jp": "辛抱強さは落ち着いて問題を解決する助けになります。",
+      "hira": "しんぼうづよさ は おちついて もんだい を かいけつ する たすけ に なります",
+      "mp3": "br_s47_patience_helps_me_solve_problems_calmly.mp3"
     },
     {
       "n": 48,
-      "en": "I want to read more books.",
-      "jp": "もっと本を読みたいです。",
-      "hira": "もっと ほん を よみたい です",
-      "mp3": "br_s48_i_want_to_read_more_books.mp3"
+      "en": "Honest communication builds trust.",
+      "jp": "正直なやり取りは信頼を育てます。",
+      "hira": "しょうじき な やりとり は しんらい を そだてます",
+      "mp3": "br_s48_honest_communication_builds_trust.mp3"
     },
     {
       "n": 49,
-      "en": "I want to make new friends.",
-      "jp": "新しい友だちを作りたいです。",
-      "hira": "あたらしい ともだち を つくりたい です",
-      "mp3": "br_s49_i_want_to_make_new_friends.mp3"
+      "en": "Cooperation makes difficult tasks easier.",
+      "jp": "協力すると難しい作業もやりやすくなります。",
+      "hira": "きょうりょく する と むずかしい さぎょう も やりやすく なります",
+      "mp3": "br_s49_cooperation_makes_difficult_tasks_easier.mp3"
     },
     {
       "n": 50,
-      "en": "I can do my best.",
-      "jp": "ベストを尽くせます。",
-      "hira": "ベスト を つくせ ます",
-      "mp3": "br_s50_i_can_do_my_best.mp3"
+      "en": "Mistakes can become useful lessons.",
+      "jp": "間違いは役に立つ学びになることがあります。",
+      "hira": "まちがい は やく に たつ まなび に なる こと が あります",
+      "mp3": "br_s50_mistakes_can_become_useful_lessons.mp3"
     },
     {
       "n": 51,
-      "en": "I can speak a little English.",
-      "jp": "少し英語が話せます。",
-      "hira": "すこし えいご が はなせ ます",
-      "mp3": "br_s51_i_can_speak_a_little_english.mp3"
+      "en": "I keep going even when progress is slow.",
+      "jp": "進歩が遅くても続けます。",
+      "hira": "しんぽ が おそく て も つづけます",
+      "mp3": "br_s51_i_keep_going_even_when_progress_is_slow.mp3"
     },
     {
       "n": 52,
-      "en": "I can understand songs in English.",
-      "jp": "英語の歌が理解できます。",
-      "hira": "えいご の うた が りかい でき ます",
-      "mp3": "br_s52_i_can_understand_songs_in_english.mp3"
+      "en": "Support from others gives me confidence.",
+      "jp": "ほかの人の支えは私に自信をくれます。",
+      "hira": "ほか の ひと の ささえ は わたし に じしん を くれます",
+      "mp3": "br_s52_support_from_others_gives_me_confidence.mp3"
     },
     {
       "n": 53,
-      "en": "I can help my classmates.",
-      "jp": "クラスメイトを助けられます。",
-      "hira": "クラスメイト を たすけられ ます",
-      "mp3": "br_s53_i_can_help_my_classmates.mp3"
+      "en": "Self-control helps me make better choices.",
+      "jp": "自制心はよりよい選択をする助けになります。",
+      "hira": "じせいしん は より よい せんたく を する たすけ に なります",
+      "mp3": "br_s53_self_control_helps_me_make_better_choices.mp3"
     },
     {
       "n": 54,
-      "en": "I’m good at drawing.",
-      "jp": "絵を描くのが得意です。",
-      "hira": "え を かく の が とくい です",
-      "mp3": "br_s54_im_good_at_drawing.mp3"
+      "en": "Respect is important in every group.",
+      "jp": "どのグループでも敬意は大切です。",
+      "hira": "どの ぐるーぷ で も けいい は たいせつ です",
+      "mp3": "br_s54_respect_is_important_in_every_group.mp3"
     },
     {
       "n": 55,
-      "en": "I’m good at listening.",
-      "jp": "聞くのが得意です。",
-      "hira": "きく の が とくい です",
-      "mp3": "br_s55_im_good_at_listening.mp3"
+      "en": "Reflection helps me notice what I learned.",
+      "jp": "振り返ることで何を学んだかに気づけます。",
+      "hira": "ふりかえる こと で なに を まなんだ か に きづけます",
+      "mp3": "br_s55_reflection_helps_me_notice_what_i_learned.mp3"
     },
     {
       "n": 56,
-      "en": "I’m not good at math.",
-      "jp": "数学は得意ではありません。",
-      "hira": "すうがく は とくい では ありません",
-      "mp3": "br_s56_im_not_good_at_math.mp3"
+      "en": "I adapt more easily when I stay positive.",
+      "jp": "前向きでいると、より順応しやすくなります。",
+      "hira": "まえむき で いる と より じゅんのう しやすく なります",
+      "mp3": "br_s56_i_adapt_more_easily_when_i_stay_positive.mp3"
     },
     {
       "n": 57,
-      "en": "I’m good at remembering names.",
-      "jp": "名前を覚えるのが得意です。",
-      "hira": "なまえ を おぼえる の が とくい です",
-      "mp3": "br_s57_im_good_at_remembering_names.mp3"
+      "en": "A new challenge can help me grow.",
+      "jp": "新しい挑戦は私を成長させてくれます。",
+      "hira": "あたらしい ちょうせん は わたし を せいちょう させて くれます",
+      "mp3": "br_s57_a_new_challenge_can_help_me_grow.mp3"
     },
     {
       "n": 58,
-      "en": "I’m good at cheering people up.",
-      "jp": "人を元気づけるのが得意です。",
-      "hira": "ひと を げんきづける の が とくい です",
-      "mp3": "br_s58_im_good_at_cheering_people_up.mp3"
+      "en": "Achievement feels better after real effort.",
+      "jp": "本当の努力のあとの達成はよりうれしいです。",
+      "hira": "ほんとう の どりょく の あと の たっせい は より うれしい です",
+      "mp3": "br_s58_achievement_feels_better_after_real_effort.mp3"
     },
     {
       "n": 59,
-      "en": "I can learn from mistakes.",
-      "jp": "まちがいから学べます。",
-      "hira": "まちがい から まなべ ます",
-      "mp3": "br_s59_i_can_learn_from_mistakes.mp3"
+      "en": "I learn more when I listen carefully to feedback.",
+      "jp": "フィードバックをよく聞くと、もっと学べます。",
+      "hira": "ふぃーどばっく を よく きく と もっと まなべます",
+      "mp3": "br_s59_i_learn_more_when_i_listen_carefully_to_feedback.mp3"
     },
     {
       "n": 60,
-      "en": "I can stay positive.",
-      "jp": "前向きでいられます。",
-      "hira": "まえむき で いられ ます",
-      "mp3": "br_s60_i_can_stay_positive.mp3"
+      "en": "Success means becoming better than I was before.",
+      "jp": "成功とは前の自分よりよくなることです。",
+      "hira": "せいこう と は まえ の じぶん より よく なる こと です",
+      "mp3": "br_s60_success_means_becoming_better_than_i_was_before.mp3"
     }
   ]
 }
