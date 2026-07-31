@@ -1,1 +1,424 @@
-
+{
+  "cards": [
+    {
+      "n": 1,
+      "en": "I will study every day.",
+      "jp": "毎日勉強します。",
+      "hira": "まいにち べんきょう します",
+      "mp3": "br_s01_i_will_study_every_day.mp3"
+    },
+    {
+      "n": 2,
+      "en": "I’m going to try something new.",
+      "jp": "新しいことに挑戦します。",
+      "hira": "あたらしい こと に ちょうせん します",
+      "mp3": "br_s02_im_going_to_try_something_new.mp3"
+    },
+    {
+      "n": 3,
+      "en": "I will do my best this year.",
+      "jp": "今年は全力を尽くします。",
+      "hira": "ことし は ぜんりょく を つくし ます",
+      "mp3": "br_s03_i_will_do_my_best_this_year.mp3"
+    },
+    {
+      "n": 4,
+      "en": "I will make a new friend.",
+      "jp": "新しい友だちを作ります。",
+      "hira": "あたらしい ともだち を つくり ます",
+      "mp3": "br_s04_i_will_make_a_new_friend.mp3"
+    },
+    {
+      "n": 5,
+      "en": "I will not be late anymore.",
+      "jp": "もう遅刻しません。",
+      "hira": "もう ちこく しません",
+      "mp3": "br_s05_i_will_not_be_late_anymore.mp3"
+    },
+    {
+      "n": 6,
+      "en": "I will help my classmates.",
+      "jp": "クラスメイトを手伝います。",
+      "hira": "クラスメイト を てつだい ます",
+      "mp3": "br_s06_i_will_help_my_classmates.mp3"
+    },
+    {
+      "n": 7,
+      "en": "I will clean my desk today.",
+      "jp": "今日は机を片づけます。",
+      "hira": "きょう は つくえ を かたづけ ます",
+      "mp3": "br_s07_i_will_clean_my_desk_today.mp3"
+    },
+    {
+      "n": 8,
+      "en": "I will read more books.",
+      "jp": "もっと本を読みます。",
+      "hira": "もっと ほん を よみ ます",
+      "mp3": "br_s08_i_will_read_more_books.mp3"
+    },
+    {
+      "n": 9,
+      "en": "I will develop a good habit.",
+      "jp": "良い習慣を身につけます。",
+      "hira": "よい しゅうかん を み に つけます",
+      "mp3": "br_s09_i_will_develop_a_good_habit.mp3"
+    },
+    {
+      "n": 10,
+      "en": "I will speak more English.",
+      "jp": "もっと英語を話します。",
+      "hira": "もっと えいご を はなし ます",
+      "mp3": "br_s10_i_will_speak_more_english.mp3"
+    },
+    {
+      "n": 11,
+      "en": "I will write in my diary every week.",
+      "jp": "毎週日記を書きます。",
+      "hira": "まいしゅう にっき を かき ます",
+      "mp3": "br_s11_i_will_write_in_my_diary_every_week.mp3"
+    },
+    {
+      "n": 12,
+      "en": "I will wake up earlier.",
+      "jp": "もっと早く起きます。",
+      "hira": "もっと はやく おき ます",
+      "mp3": "br_s12_i_will_wake_up_earlier.mp3"
+    },
+    {
+      "n": 13,
+      "en": "I will listen carefully in class.",
+      "jp": "授業でしっかり聞きます。",
+      "hira": "じゅぎょう で しっかり きき ます",
+      "mp3": "br_s13_i_will_listen_carefully_in_class.mp3"
+    },
+    {
+      "n": 14,
+      "en": "I will smile more often.",
+      "jp": "もっと笑顔を見せます。",
+      "hira": "もっと えがお を みせます",
+      "mp3": "br_s14_i_will_smile_more_often.mp3"
+    },
+    {
+      "n": 15,
+      "en": "I will enjoy learning.",
+      "jp": "学ぶことを楽しみます。",
+      "hira": "まなぶ こと を たのしみ ます",
+      "mp3": "br_s15_i_will_enjoy_learning.mp3"
+    },
+    {
+      "n": 16,
+      "en": "I wake up at seven.",
+      "jp": "7時に起きます。",
+      "hira": "しちじ に おき ます",
+      "mp3": "br_s16_i_wake_up_at_seven.mp3"
+    },
+    {
+      "n": 17,
+      "en": "I eat breakfast every day.",
+      "jp": "毎日朝ごはんを食べます。",
+      "hira": "まいにち あさごはん を たべ ます",
+      "mp3": "br_s17_i_eat_breakfast_every_day.mp3"
+    },
+    {
+      "n": 18,
+      "en": "I go to school at eight.",
+      "jp": "8時に学校へ行きます。",
+      "hira": "はちじ に がっこう へ いき ます",
+      "mp3": "br_s18_i_go_to_school_at_eight.mp3"
+    },
+    {
+      "n": 19,
+      "en": "I take a shower in the morning.",
+      "jp": "朝シャワーを浴びます。",
+      "hira": "あさ シャワー を あび ます",
+      "mp3": "br_s19_i_take_a_shower_in_the_morning.mp3"
+    },
+    {
+      "n": 20,
+      "en": "I brush my teeth after meals.",
+      "jp": "食後に歯をみがきます。",
+      "hira": "しょくご に は を みがき ます",
+      "mp3": "br_s20_i_brush_my_teeth_after_meals.mp3"
+    },
+    {
+      "n": 21,
+      "en": "I study English after dinner.",
+      "jp": "夕食の後に英語を勉強します。",
+      "hira": "ゆうしょく の あと に えいご を べんきょう します",
+      "mp3": "br_s21_i_study_english_after_dinner.mp3"
+    },
+    {
+      "n": 22,
+      "en": "I do my homework before bed.",
+      "jp": "寝る前に宿題をします。",
+      "hira": "ねる まえ に しゅくだい を します",
+      "mp3": "br_s22_i_do_my_homework_before_bed.mp3"
+    },
+    {
+      "n": 23,
+      "en": "I help my family in the evening.",
+      "jp": "夕方に家族を手伝います。",
+      "hira": "ゆうがた に かぞく を てつだい ます",
+      "mp3": "br_s23_i_help_my_family_in_the_evening.mp3"
+    },
+    {
+      "n": 24,
+      "en": "I clean my room every Sunday.",
+      "jp": "毎週日曜日に部屋をそうじします。",
+      "hira": "まいしゅう にちようび に へや を そうじ します",
+      "mp3": "br_s24_i_clean_my_room_every_sunday.mp3"
+    },
+    {
+      "n": 25,
+      "en": "I go to bed at ten o’clock.",
+      "jp": "10時に寝ます。",
+      "hira": "じゅうじ に ねます",
+      "mp3": "br_s25_i_go_to_bed_at_ten_oclock.mp3"
+    },
+    {
+      "n": 26,
+      "en": "I sometimes read books at night.",
+      "jp": "夜にときどき本を読みます。",
+      "hira": "よる に ときどき ほん を よみます",
+      "mp3": "br_s26_i_sometimes_read_books_at_night.mp3"
+    },
+    {
+      "n": 27,
+      "en": "I never watch TV before school.",
+      "jp": "登校前はテレビを見ません。",
+      "hira": "とうこう まえ は テレビ を み ません",
+      "mp3": "br_s27_i_never_watch_tv_before_school.mp3"
+    },
+    {
+      "n": 28,
+      "en": "I usually eat lunch with friends.",
+      "jp": "たいてい友だちと昼ごはんを食べます。",
+      "hira": "たいてい ともだち と ひるごはん を たべ ます",
+      "mp3": "br_s28_i_usually_eat_lunch_with_friends.mp3"
+    },
+    {
+      "n": 29,
+      "en": "I walk to school every day.",
+      "jp": "毎日歩いて学校へ行きます。",
+      "hira": "まいにち あるいて がっこう へ いき ます",
+      "mp3": "br_s29_i_walk_to_school_every_day.mp3"
+    },
+    {
+      "n": 30,
+      "en": "I relax after class.",
+      "jp": "授業の後にリラックスします。",
+      "hira": "じゅぎょう の あと に リラックス します",
+      "mp3": "br_s30_i_relax_after_class.mp3"
+    },
+    {
+      "n": 31,
+      "en": "You should eat breakfast.",
+      "jp": "朝ごはんを食べたほうがいいです。",
+      "hira": "あさごはん を たべた ほう が いい です",
+      "mp3": "br_s31_you_should_eat_breakfast.mp3"
+    },
+    {
+      "n": 32,
+      "en": "You should drink more water.",
+      "jp": "もっと水を飲んだほうがいいです。",
+      "hira": "もっと みず を のんだ ほう が いい です",
+      "mp3": "br_s32_you_should_drink_more_water.mp3"
+    },
+    {
+      "n": 33,
+      "en": "You should sleep for eight hours.",
+      "jp": "8時間は寝たほうがいいです。",
+      "hira": "はちじかん は ねた ほう が いい です",
+      "mp3": "br_s33_you_should_sleep_for_eight_hours.mp3"
+    },
+    {
+      "n": 34,
+      "en": "You should not eat too much candy.",
+      "jp": "お菓子を食べ過ぎないほうがいいです。",
+      "hira": "おかし を たべすぎない ほう が いい です",
+      "mp3": "br_s34_you_should_not_eat_too_much_candy.mp3"
+    },
+    {
+      "n": 35,
+      "en": "You must wash your hands.",
+      "jp": "手を洗わなければなりません。",
+      "hira": "て を あらわなければ なりません",
+      "mp3": "br_s35_you_must_wash_your_hands.mp3"
+    },
+    {
+      "n": 36,
+      "en": "You should wear a mask when you’re sick.",
+      "jp": "病気のときはマスクをしたほうがいいです。",
+      "hira": "びょうき の とき は ますく を した ほう が いい です",
+      "mp3": "br_s36_you_should_wear_a_mask_when_youre_sick.mp3"
+    },
+    {
+      "n": 37,
+      "en": "You must listen to your teacher.",
+      "jp": "先生の話を聞かなければなりません。",
+      "hira": "せんせい の はなし を きかなければ なりません",
+      "mp3": "br_s37_you_must_listen_to_your_teacher.mp3"
+    },
+    {
+      "n": 38,
+      "en": "You have to do your homework.",
+      "jp": "宿題をしなければいけません。",
+      "hira": "しゅくだい を しなければ いけません",
+      "mp3": "br_s38_you_have_to_do_your_homework.mp3"
+    },
+    {
+      "n": 39,
+      "en": "You have to bring your notebook.",
+      "jp": "ノートを持ってこなければいけません。",
+      "hira": "ノート を もって こなければ いけません",
+      "mp3": "br_s39_you_have_to_bring_your_notebook.mp3"
+    },
+    {
+      "n": 40,
+      "en": "You have to study for the test.",
+      "jp": "テストの勉強をしなければいけません。",
+      "hira": "テスト の べんきょう を しなければ いけません",
+      "mp3": "br_s40_you_have_to_study_for_the_test.mp3"
+    },
+    {
+      "n": 41,
+      "en": "You shouldn’t skip lunch.",
+      "jp": "昼ごはんを抜かないほうがいいです。",
+      "hira": "ひるごはん を ぬかない ほう が いい です",
+      "mp3": "br_s41_you_shouldnt_skip_lunch.mp3"
+    },
+    {
+      "n": 42,
+      "en": "You should stretch before sports.",
+      "jp": "スポーツの前にストレッチをしたほうがいいです。",
+      "hira": "スポーツ の まえ に ストレッチ を した ほう が いい です",
+      "mp3": "br_s42_you_should_stretch_before_sports.mp3"
+    },
+    {
+      "n": 43,
+      "en": "You should walk to school if it’s close.",
+      "jp": "近いなら歩いて学校へ行ったほうがいいです。",
+      "hira": "ちかい なら あるいて がっこう へ いった ほう が いい です",
+      "mp3": "br_s43_you_should_walk_to_school_if_its_close.mp3"
+    },
+    {
+      "n": 44,
+      "en": "You should rest when you’re tired.",
+      "jp": "疲れたときは休んだほうがいいです。",
+      "hira": "つかれた とき は やすんだ ほう が いい です",
+      "mp3": "br_s44_you_should_rest_when_youre_tired.mp3"
+    },
+    {
+      "n": 45,
+      "en": "You must be kind to others.",
+      "jp": "人に親切にしなければなりません。",
+      "hira": "ひと に しんせつ に しなければ なりません",
+      "mp3": "br_s45_you_must_be_kind_to_others.mp3"
+    },
+    {
+      "n": 46,
+      "en": "I want to learn English.",
+      "jp": "英語を学びたいです。",
+      "hira": "えいご を まなびたい です",
+      "mp3": "br_s46_i_want_to_learn_english.mp3"
+    },
+    {
+      "n": 47,
+      "en": "I want to try harder.",
+      "jp": "もっと頑張ってみたいです。",
+      "hira": "もっと がんばって みたい です",
+      "mp3": "br_s47_i_want_to_try_harder.mp3"
+    },
+    {
+      "n": 48,
+      "en": "I want to read more books.",
+      "jp": "もっと本を読みたいです。",
+      "hira": "もっと ほん を よみたい です",
+      "mp3": "br_s48_i_want_to_read_more_books.mp3"
+    },
+    {
+      "n": 49,
+      "en": "I want to make new friends.",
+      "jp": "新しい友だちを作りたいです。",
+      "hira": "あたらしい ともだち を つくりたい です",
+      "mp3": "br_s49_i_want_to_make_new_friends.mp3"
+    },
+    {
+      "n": 50,
+      "en": "I can do my best.",
+      "jp": "ベストを尽くせます。",
+      "hira": "ベスト を つくせ ます",
+      "mp3": "br_s50_i_can_do_my_best.mp3"
+    },
+    {
+      "n": 51,
+      "en": "I can speak a little English.",
+      "jp": "少し英語が話せます。",
+      "hira": "すこし えいご が はなせ ます",
+      "mp3": "br_s51_i_can_speak_a_little_english.mp3"
+    },
+    {
+      "n": 52,
+      "en": "I can understand songs in English.",
+      "jp": "英語の歌が理解できます。",
+      "hira": "えいご の うた が りかい でき ます",
+      "mp3": "br_s52_i_can_understand_songs_in_english.mp3"
+    },
+    {
+      "n": 53,
+      "en": "I can help my classmates.",
+      "jp": "クラスメイトを助けられます。",
+      "hira": "クラスメイト を たすけられ ます",
+      "mp3": "br_s53_i_can_help_my_classmates.mp3"
+    },
+    {
+      "n": 54,
+      "en": "I’m good at drawing.",
+      "jp": "絵を描くのが得意です。",
+      "hira": "え を かく の が とくい です",
+      "mp3": "br_s54_im_good_at_drawing.mp3"
+    },
+    {
+      "n": 55,
+      "en": "I’m good at listening.",
+      "jp": "聞くのが得意です。",
+      "hira": "きく の が とくい です",
+      "mp3": "br_s55_im_good_at_listening.mp3"
+    },
+    {
+      "n": 56,
+      "en": "I’m not good at math.",
+      "jp": "数学は得意ではありません。",
+      "hira": "すうがく は とくい では ありません",
+      "mp3": "br_s56_im_not_good_at_math.mp3"
+    },
+    {
+      "n": 57,
+      "en": "I’m good at remembering names.",
+      "jp": "名前を覚えるのが得意です。",
+      "hira": "なまえ を おぼえる の が とくい です",
+      "mp3": "br_s57_im_good_at_remembering_names.mp3"
+    },
+    {
+      "n": 58,
+      "en": "I’m good at cheering people up.",
+      "jp": "人を元気づけるのが得意です。",
+      "hira": "ひと を げんきづける の が とくい です",
+      "mp3": "br_s58_im_good_at_cheering_people_up.mp3"
+    },
+    {
+      "n": 59,
+      "en": "I can learn from mistakes.",
+      "jp": "まちがいから学べます。",
+      "hira": "まちがい から まなべ ます",
+      "mp3": "br_s59_i_can_learn_from_mistakes.mp3"
+    },
+    {
+      "n": 60,
+      "en": "I can stay positive.",
+      "jp": "前向きでいられます。",
+      "hira": "まえむき で いられ ます",
+      "mp3": "br_s60_i_can_stay_positive.mp3"
+    }
+  ]
+}

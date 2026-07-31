@@ -1,1 +1,424 @@
-
+{
+  "cards": [
+    {
+      "n": 1,
+      "en": "A long-term objective becomes manageable when it is divided into stages.",
+      "jp": "長期目標は段階に分けると取り組みやすくなります。",
+      "hira": "ちょうき もくひょう は だんかい に わける と とりくみやすく なります",
+      "mp3": "bc_s01_a_longterm_objective_becomes_manageable_when_it_is_divided_into_stages.mp3"
+    },
+    {
+      "n": 2,
+      "en": "Short-term targets provide evidence of progress toward a larger goal.",
+      "jp": "短期目標は、より大きな目標への進捗を示します。",
+      "hira": "たんき もくひょう は より おおきな もくひょう への しんちょく を しめします",
+      "mp3": "bc_s02_shortterm_targets_provide_evidence_of_progress_toward_a_larger_goal.mp3"
+    },
+    {
+      "n": 3,
+      "en": "Each milestone should reflect a meaningful step rather than a symbolic deadline.",
+      "jp": "各節目は形式的な期限ではなく、意味のある一歩を示すべきです。",
+      "hira": "かく ふしめ は けいしきてき な きげん では なく いみ の ある いっぽ を しめす べき です",
+      "mp3": "bc_s03_each_milestone_should_reflect_a_meaningful_step_rather_than_a_symbolic_deadline.mp3"
+    },
+    {
+      "n": 4,
+      "en": "Clear priorities help people allocate limited time and attention.",
+      "jp": "明確な優先事項は、限られた時間と注意を配分するのに役立ちます。",
+      "hira": "めいかく な ゆうせん じこう は かぎられた じかん と ちゅうい を はいぶん する の に やくだちます",
+      "mp3": "bc_s04_clear_priorities_help_people_allocate_limited_time_and_attention.mp3"
+    },
+    {
+      "n": 5,
+      "en": "A genuine commitment requires action even when enthusiasm declines.",
+      "jp": "本当の決意には、熱意が薄れても行動することが必要です。",
+      "hira": "ほんとう の けつい には ねつい が うすれて も こうどう する こと が ひつよう です",
+      "mp3": "bc_s05_a_genuine_commitment_requires_action_even_when_enthusiasm_declines.mp3"
+    },
+    {
+      "n": 6,
+      "en": "New Year’s resolutions often fail because they depend on vague intentions.",
+      "jp": "新年の決意は、曖昧な意図に頼るため失敗しがちです。",
+      "hira": "しんねん の けつい は あいまい な いと に たよる ため しっぱい しがち です",
+      "mp3": "bc_s06_new_years_resolutions_often_fail_because_they_depend_on_vague_intentions.mp3"
+    },
+    {
+      "n": 7,
+      "en": "Ambition can drive innovation, but unrealistic expectations may cause burnout.",
+      "jp": "大志は革新を促しますが、非現実的な期待は燃え尽きを招くことがあります。",
+      "hira": "たいし は かくしん を うながします が ひげんじつてき な きたい は もえつき を まねく こと が あります",
+      "mp3": "bc_s07_ambition_can_drive_innovation_but_unrealistic_expectations_may_cause_burnout.mp3"
+    },
+    {
+      "n": 8,
+      "en": "Assessing feasibility prevents people from investing in impossible plans.",
+      "jp": "実現可能性を評価すれば、実行不可能な計画への投資を避けられます。",
+      "hira": "じつげん かのうせい を ひょうか すれば じっこう ふかのう な けいかく への とうし を さけられます",
+      "mp3": "bc_s08_assessing_feasibility_prevents_people_from_investing_in_impossible_plans.mp3"
+    },
+    {
+      "n": 9,
+      "en": "A measurable outcome allows progress to be evaluated objectively.",
+      "jp": "測定可能な成果があれば、進捗を客観的に評価できます。",
+      "hira": "そくてい かのう な せいか が あれば しんちょく を きゃっかんてき に ひょうか できます",
+      "mp3": "bc_s09_a_measurable_outcome_allows_progress_to_be_evaluated_objectively.mp3"
+    },
+    {
+      "n": 10,
+      "en": "A deadline can create urgency without guaranteeing high-quality work.",
+      "jp": "締め切りは緊急性を生みますが、仕事の質を保証するわけではありません。",
+      "hira": "しめきり は きんきゅうせい を うみます が しごと の しつ を ほしょう する わけ では ありません",
+      "mp3": "bc_s10_a_deadline_can_create_urgency_without_guaranteeing_highquality_work.mp3"
+    },
+    {
+      "n": 11,
+      "en": "An effective strategy anticipates both resources and risks.",
+      "jp": "効果的な戦略は、必要な資源とリスクの両方を予測します。",
+      "hira": "こうかてき な せんりゃく は ひつよう な しげん と りすく の りょうほう を よそく します",
+      "mp3": "bc_s11_an_effective_strategy_anticipates_both_resources_and_risks.mp3"
+    },
+    {
+      "n": 12,
+      "en": "An obstacle may reveal weaknesses in the original plan.",
+      "jp": "障害によって、当初の計画の弱点が明らかになることがあります。",
+      "hira": "しょうがい に よって とうしょ の けいかく の じゃくてん が あきらか に なる こと が あります",
+      "mp3": "bc_s12_an_obstacle_may_reveal_weaknesses_in_the_original_plan.mp3"
+    },
+    {
+      "n": 13,
+      "en": "Regular reviews make gradual progress easier to recognize.",
+      "jp": "定期的に見直すと、少しずつの進捗を認識しやすくなります。",
+      "hira": "ていきてき に みなおす と すこしずつ の しんちょく を にんしき しやすく なります",
+      "mp3": "bc_s13_regular_reviews_make_gradual_progress_easier_to_recognize.mp3"
+    },
+    {
+      "n": 14,
+      "en": "Accountability can strengthen commitment when it is supportive rather than punitive.",
+      "jp": "説明責任は、罰ではなく支援として機能すると決意を強めます。",
+      "hira": "せつめい せきにん は ばつ では なく しえん として きのう する と けつい を つよめます",
+      "mp3": "bc_s14_accountability_can_strengthen_commitment_when_it_is_supportive_rather_than_punit.mp3"
+    },
+    {
+      "n": 15,
+      "en": "Achievement is more meaningful when it reflects personal values.",
+      "jp": "達成は、個人の価値観を反映しているときに、より意味を持ちます。",
+      "hira": "たっせい は こじん の かちかん を はんえい して いる とき に より いみ を もちます",
+      "mp3": "bc_s15_achievement_is_more_meaningful_when_it_reflects_personal_values.mp3"
+    },
+    {
+      "n": 16,
+      "en": "A stable daily routine can reduce the mental effort required for ordinary decisions.",
+      "jp": "安定した日課は、日常的な判断に必要な精神的負担を減らします。",
+      "hira": "あんてい した にっか は にちじょうてき な はんだん に ひつよう な せいしんてき ふたん を へらします",
+      "mp3": "bc_s16_a_stable_daily_routine_can_reduce_the_mental_effort_required_for_ordinary_decisi.mp3"
+    },
+    {
+      "n": 17,
+      "en": "Effective time management includes deciding which tasks do not deserve attention.",
+      "jp": "効果的な時間管理には、注意を向ける必要のない作業を決めることも含まれます。",
+      "hira": "こうかてき な じかん かんり には ちゅうい を むける ひつよう の ない さぎょう を きめる こと も ふくまれます",
+      "mp3": "bc_s17_effective_time_management_includes_deciding_which_tasks_do_not_deserve_attention.mp3"
+    },
+    {
+      "n": 18,
+      "en": "Productivity should be measured by useful results, not constant activity.",
+      "jp": "生産性は、絶え間ない活動ではなく、有用な成果で測るべきです。",
+      "hira": "せいさんせい は たえまない かつどう では なく ゆうよう な せいか で はかる べき です",
+      "mp3": "bc_s18_productivity_should_be_measured_by_useful_results_not_constant_activity.mp3"
+    },
+    {
+      "n": 19,
+      "en": "Work-life balance depends on boundaries that employers and workers both respect.",
+      "jp": "仕事と生活の調和には、雇用主と労働者の双方が守る境界が必要です。",
+      "hira": "しごと と せいかつ の ちょうわ には こようぬし と ろうどうしゃ の そうほう が まもる きょうかい が ひつよう です",
+      "mp3": "bc_s19_worklife_balance_depends_on_boundaries_that_employers_and_workers_both_respect.mp3"
+    },
+    {
+      "n": 20,
+      "en": "Disrupting the circadian rhythm can impair concentration and emotional stability.",
+      "jp": "概日リズムの乱れは、集中力と感情の安定を損なうことがあります。",
+      "hira": "がいじつ りずむ の みだれ は しゅうちゅうりょく と かんじょう の あんてい を そこなう こと が あります",
+      "mp3": "bc_s20_disrupting_the_circadian_rhythm_can_impair_concentration_and_emotional_stability.mp3"
+    },
+    {
+      "n": 21,
+      "en": "Chronic sleep deprivation increases the risk of mistakes and poor judgment.",
+      "jp": "慢性的な睡眠不足は、ミスや判断力低下の危険を高めます。",
+      "hira": "まんせいてき な すいみん ぶそく は みす や はんだんりょく ていか の きけん を たかめます",
+      "mp3": "bc_s21_chronic_sleep_deprivation_increases_the_risk_of_mistakes_and_poor_judgment.mp3"
+    },
+    {
+      "n": 22,
+      "en": "A long commute reduces the time available for rest and family life.",
+      "jp": "長時間の通勤は、休息や家族生活に使える時間を減らします。",
+      "hira": "ちょうじかん の つうきん は きゅうそく や かぞく せいかつ に つかえる じかん を へらします",
+      "mp3": "bc_s22_a_long_commute_reduces_the_time_available_for_rest_and_family_life.mp3"
+    },
+    {
+      "n": 23,
+      "en": "A realistic schedule includes time for interruptions and recovery.",
+      "jp": "現実的な予定には、中断や回復のための時間も含まれます。",
+      "hira": "げんじつてき な よてい には ちゅうだん や かいふく の ため の じかん も ふくまれます",
+      "mp3": "bc_s23_a_realistic_schedule_includes_time_for_interruptions_and_recovery.mp3"
+    },
+    {
+      "n": 24,
+      "en": "Procrastination often reflects anxiety rather than simple laziness.",
+      "jp": "先延ばしは、単なる怠惰ではなく不安を表していることがよくあります。",
+      "hira": "さきのばし は たんなる たいだ では なく ふあん を あらわして いる こと が よく あります",
+      "mp3": "bc_s24_procrastination_often_reflects_anxiety_rather_than_simple_laziness.mp3"
+    },
+    {
+      "n": 25,
+      "en": "Digital notifications are a major source of distraction.",
+      "jp": "デジタル通知は、集中を妨げる大きな原因です。",
+      "hira": "でじたる つうち は しゅうちゅう を さまたげる おおきな げんいん です",
+      "mp3": "bc_s25_digital_notifications_are_a_major_source_of_distraction.mp3"
+    },
+    {
+      "n": 26,
+      "en": "Efficiency matters, but excessive optimization can make routines inflexible.",
+      "jp": "効率は重要ですが、過度な最適化は日課を柔軟性のないものにします。",
+      "hira": "こうりつ は じゅうよう です が かど な さいてきか は にっか を じゅうなんせい の ない もの に します",
+      "mp3": "bc_s26_efficiency_matters_but_excessive_optimization_can_make_routines_inflexible.mp3"
+    },
+    {
+      "n": 27,
+      "en": "Flexibility allows people to respond to unexpected demands.",
+      "jp": "柔軟性があれば、予期しない要求にも対応できます。",
+      "hira": "じゅうなんせい が あれば よき しない ようきゅう にも たいおう できます",
+      "mp3": "bc_s27_flexibility_allows_people_to_respond_to_unexpected_demands.mp3"
+    },
+    {
+      "n": 28,
+      "en": "Household responsibilities should be distributed fairly among family members.",
+      "jp": "家庭での責任は、家族の間で公平に分担されるべきです。",
+      "hira": "かてい での せきにん は かぞく の あいだ で こうへい に ぶんたん される べき です",
+      "mp3": "bc_s28_household_responsibilities_should_be_distributed_fairly_among_family_members.mp3"
+    },
+    {
+      "n": 29,
+      "en": "A digital detox can reveal how strongly devices shape daily behavior.",
+      "jp": "デジタルデトックスをすると、機器が日常行動に与える強い影響が分かります。",
+      "hira": "でじたる でとっくす を する と きき が にちじょう こうどう に あたえる つよい えいきょう が わかります",
+      "mp3": "bc_s29_a_digital_detox_can_reveal_how_strongly_devices_shape_daily_behavior.mp3"
+    },
+    {
+      "n": 30,
+      "en": "Consistency usually matters more than occasional bursts of effort.",
+      "jp": "継続性は、時折の集中的な努力よりも重要なことが多いです。",
+      "hira": "けいぞくせい は ときおり の しゅうちゅうてき な どりょく より も じゅうよう な こと が おおい です",
+      "mp3": "bc_s30_consistency_usually_matters_more_than_occasional_bursts_of_effort.mp3"
+    },
+    {
+      "n": 31,
+      "en": "Physical well-being depends on sleep, movement, nutrition, and recovery.",
+      "jp": "身体的健康は、睡眠、運動、栄養、回復に左右されます。",
+      "hira": "しんたいてき けんこう は すいみん うんどう えいよう かいふく に さゆう されます",
+      "mp3": "bc_s31_physical_wellbeing_depends_on_sleep_movement_nutrition_and_recovery.mp3"
+    },
+    {
+      "n": 32,
+      "en": "Mental health should be treated as seriously as physical illness.",
+      "jp": "心の健康は、身体の病気と同じくらい真剣に扱われるべきです。",
+      "hira": "こころ の けんこう は しんたい の びょうき と おなじ くらい しんけん に あつかわれる べき です",
+      "mp3": "bc_s32_mental_health_should_be_treated_as_seriously_as_physical_illness.mp3"
+    },
+    {
+      "n": 33,
+      "en": "A balanced diet is easier to maintain when healthy food is affordable and accessible.",
+      "jp": "健康的な食品が手頃で入手しやすければ、バランスの取れた食事を続けやすくなります。",
+      "hira": "けんこうてき な しょくひん が てごろ で にゅうしゅ しやすければ ばらんす の とれた しょくじ を つづけやすく なります",
+      "mp3": "bc_s33_a_balanced_diet_is_easier_to_maintain_when_healthy_food_is_affordable_and_access.mp3"
+    },
+    {
+      "n": 34,
+      "en": "Nutritional value matters more than persuasive packaging.",
+      "jp": "説得力のある包装よりも、栄養価のほうが重要です。",
+      "hira": "せっとくりょく の ある ほうそう より も えいようか の ほう が じゅうよう です",
+      "mp3": "bc_s34_nutritional_value_matters_more_than_persuasive_packaging.mp3"
+    },
+    {
+      "n": 35,
+      "en": "Proper hydration supports concentration as well as physical performance.",
+      "jp": "適切な水分補給は、身体能力だけでなく集中力も支えます。",
+      "hira": "てきせつ な すいぶん ほきゅう は しんたい のうりょく だけ で なく しゅうちゅうりょく も ささえます",
+      "mp3": "bc_s35_proper_hydration_supports_concentration_as_well_as_physical_performance.mp3"
+    },
+    {
+      "n": 36,
+      "en": "Cardiovascular exercise can reduce the risk of several chronic diseases.",
+      "jp": "有酸素運動は、いくつかの慢性疾患のリスクを減らします。",
+      "hira": "ゆうさんそ うんどう は いくつか の まんせい しっかん の りすく を へらします",
+      "mp3": "bc_s36_cardiovascular_exercise_can_reduce_the_risk_of_several_chronic_diseases.mp3"
+    },
+    {
+      "n": 37,
+      "en": "Strength training helps preserve mobility as people age.",
+      "jp": "筋力トレーニングは、年齢を重ねても運動能力を保つのに役立ちます。",
+      "hira": "きんりょく とれーにんぐ は ねんれい を かさねて も うんどう のうりょく を たもつ の に やくだちます",
+      "mp3": "bc_s37_strength_training_helps_preserve_mobility_as_people_age.mp3"
+    },
+    {
+      "n": 38,
+      "en": "The immune system is influenced by sleep, stress, and nutrition.",
+      "jp": "免疫系は、睡眠、ストレス、栄養の影響を受けます。",
+      "hira": "めんえきけい は すいみん すとれす えいよう の えいきょう を うけます",
+      "mp3": "bc_s38_the_immune_system_is_influenced_by_sleep_stress_and_nutrition.mp3"
+    },
+    {
+      "n": 39,
+      "en": "Preventive care can identify health risks before symptoms become severe.",
+      "jp": "予防医療は、症状が重くなる前に健康上のリスクを発見できます。",
+      "hira": "よぼう いりょう は しょうじょう が おもく なる まえ に けんこうじょう の りすく を はっけん できます",
+      "mp3": "bc_s39_preventive_care_can_identify_health_risks_before_symptoms_become_severe.mp3"
+    },
+    {
+      "n": 40,
+      "en": "A regular medical checkup is useful, but it cannot replace healthy habits.",
+      "jp": "定期的な健康診断は有用ですが、健康的な習慣の代わりにはなりません。",
+      "hira": "ていきてき な けんこう しんだん は ゆうよう です が けんこうてき な しゅうかん の かわり には なりません",
+      "mp3": "bc_s40_a_regular_medical_checkup_is_useful_but_it_cannot_replace_healthy_habits.mp3"
+    },
+    {
+      "n": 41,
+      "en": "Stress management requires both personal skills and supportive environments.",
+      "jp": "ストレス管理には、個人の技能と支援的な環境の両方が必要です。",
+      "hira": "すとれす かんり には こじん の ぎのう と しえんてき な かんきょう の りょうほう が ひつよう です",
+      "mp3": "bc_s41_stress_management_requires_both_personal_skills_and_supportive_environments.mp3"
+    },
+    {
+      "n": 42,
+      "en": "Burnout results from prolonged pressure without adequate recovery.",
+      "jp": "燃え尽きは、十分な回復のない長期的な重圧から生じます。",
+      "hira": "もえつき は じゅうぶん な かいふく の ない ちょうきてき な じゅうあつ から しょうじます",
+      "mp3": "bc_s42_burnout_results_from_prolonged_pressure_without_adequate_recovery.mp3"
+    },
+    {
+      "n": 43,
+      "en": "A sedentary lifestyle can damage health even when a person exercises occasionally.",
+      "jp": "座りがちな生活は、ときどき運動していても健康を害することがあります。",
+      "hira": "すわりがち な せいかつ は ときどき うんどう して いて も けんこう を がいする こと が あります",
+      "mp3": "bc_s43_a_sedentary_lifestyle_can_damage_health_even_when_a_person_exercises_occasionall.mp3"
+    },
+    {
+      "n": 44,
+      "en": "Self-care should restore well-being rather than become another obligation.",
+      "jp": "セルフケアは新たな義務になるのではなく、健康を回復させるべきです。",
+      "hira": "せるふ けあ は あらた な ぎむ に なる の では なく けんこう を かいふく させる べき です",
+      "mp3": "bc_s44_selfcare_should_restore_wellbeing_rather_than_become_another_obligation.mp3"
+    },
+    {
+      "n": 45,
+      "en": "Public policy can influence life expectancy through education, housing, and healthcare.",
+      "jp": "公共政策は、教育、住宅、医療を通じて平均寿命に影響を与えます。",
+      "hira": "こうきょう せいさく は きょういく じゅうたく いりょう を つうじて へいきん じゅみょう に えいきょう を あたえます",
+      "mp3": "bc_s45_public_policy_can_influence_life_expectancy_through_education_housing_and_health.mp3"
+    },
+    {
+      "n": 46,
+      "en": "Intrinsic motivation tends to last longer than motivation based only on external rewards.",
+      "jp": "内発的動機づけは、外的報酬だけに基づく動機より長続きする傾向があります。",
+      "hira": "ないはつてき どうきづけ は がいてき ほうしゅう だけ に もとづく どうき より ながつづき する けいこう が あります",
+      "mp3": "bc_s46_intrinsic_motivation_tends_to_last_longer_than_motivation_based_only_on_external.mp3"
+    },
+    {
+      "n": 47,
+      "en": "An extrinsic reward can encourage participation but may weaken genuine interest.",
+      "jp": "外的報酬は参加を促しますが、本当の関心を弱めることがあります。",
+      "hira": "がいてき ほうしゅう は さんか を うながします が ほんとう の かんしん を よわめる こと が あります",
+      "mp3": "bc_s47_an_extrinsic_reward_can_encourage_participation_but_may_weaken_genuine_interest.mp3"
+    },
+    {
+      "n": 48,
+      "en": "A growth mindset treats ability as something that can be developed.",
+      "jp": "成長思考では、能力は伸ばせるものだと考えます。",
+      "hira": "せいちょう しこう では のうりょく は のばせる もの だ と かんがえます",
+      "mp3": "bc_s48_a_growth_mindset_treats_ability_as_something_that_can_be_developed.mp3"
+    },
+    {
+      "n": 49,
+      "en": "Self-discipline makes progress possible when motivation is temporary.",
+      "jp": "自己規律があれば、やる気が一時的でも進歩を続けられます。",
+      "hira": "じこ きりつ が あれば やるき が いちじてき でも しんぽ を つづけられます",
+      "mp3": "bc_s49_selfdiscipline_makes_progress_possible_when_motivation_is_temporary.mp3"
+    },
+    {
+      "n": 50,
+      "en": "Perseverance is valuable, but abandoning a harmful goal can be rational.",
+      "jp": "忍耐力は大切ですが、有害な目標を断念することは合理的な場合があります。",
+      "hira": "にんたいりょく は たいせつ です が ゆうがい な もくひょう を だんねん する こと は ごうりてき な ばあい が あります",
+      "mp3": "bc_s50_perseverance_is_valuable_but_abandoning_a_harmful_goal_can_be_rational.mp3"
+    },
+    {
+      "n": 51,
+      "en": "Resilience involves adapting to difficulty, not simply enduring it.",
+      "jp": "回復力とは、困難にただ耐えるのではなく適応することです。",
+      "hira": "かいふくりょく とは こんなん に ただ たえる の では なく てきおう する こと です",
+      "mp3": "bc_s51_resilience_involves_adapting_to_difficulty_not_simply_enduring_it.mp3"
+    },
+    {
+      "n": 52,
+      "en": "Self-efficacy grows through experience, preparation, and realistic success.",
+      "jp": "自己効力感は、経験、準備、現実的な成功を通して高まります。",
+      "hira": "じこ こうりょくかん は けいけん じゅんび げんじつてき な せいこう を とおして たかまります",
+      "mp3": "bc_s52_selfefficacy_grows_through_experience_preparation_and_realistic_success.mp3"
+    },
+    {
+      "n": 53,
+      "en": "Constructive feedback identifies strengths while offering practical next steps.",
+      "jp": "建設的なフィードバックは、強みを示しながら実践的な次の段階を提案します。",
+      "hira": "けんせつてき な ふぃーどばっく は つよみ を しめし ながら じっせんてき な つぎ の だんかい を ていあん します",
+      "mp3": "bc_s53_constructive_feedback_identifies_strengths_while_offering_practical_next_steps.mp3"
+    },
+    {
+      "n": 54,
+      "en": "Cognitive bias can distort how people interpret success and failure.",
+      "jp": "認知バイアスは、成功と失敗の解釈をゆがめることがあります。",
+      "hira": "にんち ばいあす は せいこう と しっぱい の かいしゃく を ゆがめる こと が あります",
+      "mp3": "bc_s54_cognitive_bias_can_distort_how_people_interpret_success_and_failure.mp3"
+    },
+    {
+      "n": 55,
+      "en": "Fear of failure may prevent people from attempting meaningful challenges.",
+      "jp": "失敗への恐れは、意味のある挑戦を試すことを妨げる場合があります。",
+      "hira": "しっぱい への おそれ は いみ の ある ちょうせん を ためす こと を さまたげる ばあい が あります",
+      "mp3": "bc_s55_fear_of_failure_may_prevent_people_from_attempting_meaningful_challenges.mp3"
+    },
+    {
+      "n": 56,
+      "en": "Leaving the comfort zone can build confidence when risks remain manageable.",
+      "jp": "危険が管理できる範囲なら、安心できる領域を出ることで自信が育ちます。",
+      "hira": "きけん が かんり できる はんい なら あんしん できる りょういき を でる こと で じしん が そだちます",
+      "mp3": "bc_s56_leaving_the_comfort_zone_can_build_confidence_when_risks_remain_manageable.mp3"
+    },
+    {
+      "n": 57,
+      "en": "Emotional regulation helps people respond thoughtfully instead of reacting impulsively.",
+      "jp": "感情の調整は、衝動的に反応せず慎重に対応するのに役立ちます。",
+      "hira": "かんじょう の ちょうせい は しょうどうてき に はんのう せず しんちょう に たいおう する の に やくだちます",
+      "mp3": "bc_s57_emotional_regulation_helps_people_respond_thoughtfully_instead_of_reacting_impul.mp3"
+    },
+    {
+      "n": 58,
+      "en": "Adaptability has become essential in rapidly changing workplaces.",
+      "jp": "急速に変化する職場では、適応力が不可欠になっています。",
+      "hira": "きゅうそく に へんか する しょくば では てきおうりょく が ふかけつ に なって います",
+      "mp3": "bc_s58_adaptability_has_become_essential_in_rapidly_changing_workplaces.mp3"
+    },
+    {
+      "n": 59,
+      "en": "Continuous improvement depends on honest reflection and small adjustments.",
+      "jp": "継続的改善には、正直な振り返りと小さな調整が必要です。",
+      "hira": "けいぞくてき かいぜん には しょうじき な ふりかえり と ちいさな ちょうせい が ひつよう です",
+      "mp3": "bc_s59_continuous_improvement_depends_on_honest_reflection_and_small_adjustments.mp3"
+    },
+    {
+      "n": 60,
+      "en": "A strong sense of purpose can sustain effort during uncertainty.",
+      "jp": "強い目的意識は、不確実な状況でも努力を支えます。",
+      "hira": "つよい もくてき いしき は ふかくじつ な じょうきょう でも どりょく を ささえます",
+      "mp3": "bc_s60_a_strong_sense_of_purpose_can_sustain_effort_during_uncertainty.mp3"
+    }
+  ]
+}

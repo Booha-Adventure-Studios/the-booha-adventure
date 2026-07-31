@@ -1,1 +1,424 @@
-
+{
+  "cards": [
+    {
+      "n": 1,
+      "en": "My goal is to study English.",
+      "jp": "私の目標は英語を勉強することです。",
+      "hira": "わたし の もくひょう は えいご を べんきょう する こと です",
+      "mp3": "pb_s01_my_goal_is_to_study_english.mp3"
+    },
+    {
+      "n": 2,
+      "en": "I have a plan.",
+      "jp": "計画があります。",
+      "hira": "けいかく が あります",
+      "mp3": "pb_s02_i_have_a_plan.mp3"
+    },
+    {
+      "n": 3,
+      "en": "I want to learn new words.",
+      "jp": "新しい単語を学びたいです。",
+      "hira": "あたらしい たんご を まなびたい です",
+      "mp3": "pb_s03_i_want_to_learn_new_words.mp3"
+    },
+    {
+      "n": 4,
+      "en": "I will try something new.",
+      "jp": "新しいことをやってみます。",
+      "hira": "あたらしい こと を やって みます",
+      "mp3": "pb_s04_i_will_try_something_new.mp3"
+    },
+    {
+      "n": 5,
+      "en": "I will study every day.",
+      "jp": "毎日勉強します。",
+      "hira": "まいにち べんきょう します",
+      "mp3": "pb_s05_i_will_study_every_day.mp3"
+    },
+    {
+      "n": 6,
+      "en": "I will practice English after dinner.",
+      "jp": "夕食の後に英語を練習します。",
+      "hira": "ゆうしょく の あと に えいご を れんしゅう します",
+      "mp3": "pb_s06_i_will_practice_english_after_dinner.mp3"
+    },
+    {
+      "n": 7,
+      "en": "I will read one book this month.",
+      "jp": "今月は本を一冊読みます。",
+      "hira": "こんげつ は ほん を いっさつ よみます",
+      "mp3": "pb_s07_i_will_read_one_book_this_month.mp3"
+    },
+    {
+      "n": 8,
+      "en": "I will write in my diary every week.",
+      "jp": "毎週日記を書きます。",
+      "hira": "まいしゅう にっき を かきます",
+      "mp3": "pb_s08_i_will_write_in_my_diary_every_week.mp3"
+    },
+    {
+      "n": 9,
+      "en": "I will exercise after school.",
+      "jp": "放課後に運動します。",
+      "hira": "ほうかご に うんどう します",
+      "mp3": "pb_s09_i_will_exercise_after_school.mp3"
+    },
+    {
+      "n": 10,
+      "en": "I will wake up early.",
+      "jp": "早く起きます。",
+      "hira": "はやく おきます",
+      "mp3": "pb_s10_i_will_wake_up_early.mp3"
+    },
+    {
+      "n": 11,
+      "en": "I will help my family.",
+      "jp": "家族を手伝います。",
+      "hira": "かぞく を てつだいます",
+      "mp3": "pb_s11_i_will_help_my_family.mp3"
+    },
+    {
+      "n": 12,
+      "en": "I will clean my desk.",
+      "jp": "机を片づけます。",
+      "hira": "つくえ を かたづけます",
+      "mp3": "pb_s12_i_will_clean_my_desk.mp3"
+    },
+    {
+      "n": 13,
+      "en": "I will make a new friend.",
+      "jp": "新しい友だちを作ります。",
+      "hira": "あたらしい ともだち を つくります",
+      "mp3": "pb_s13_i_will_make_a_new_friend.mp3"
+    },
+    {
+      "n": 14,
+      "en": "I will not give up.",
+      "jp": "あきらめません。",
+      "hira": "あきらめません",
+      "mp3": "pb_s14_i_will_not_give_up.mp3"
+    },
+    {
+      "n": 15,
+      "en": "I can reach my goal.",
+      "jp": "目標を達成できます。",
+      "hira": "もくひょう を たっせい できます",
+      "mp3": "pb_s15_i_can_reach_my_goal.mp3"
+    },
+    {
+      "n": 16,
+      "en": "I wake up at seven.",
+      "jp": "7時に起きます。",
+      "hira": "しちじ に おきます",
+      "mp3": "pb_s16_i_wake_up_at_seven.mp3"
+    },
+    {
+      "n": 17,
+      "en": "I eat breakfast every day.",
+      "jp": "毎日朝ごはんを食べます。",
+      "hira": "まいにち あさごはん を たべます",
+      "mp3": "pb_s17_i_eat_breakfast_every_day.mp3"
+    },
+    {
+      "n": 18,
+      "en": "I brush my teeth after breakfast.",
+      "jp": "朝ごはんの後に歯をみがきます。",
+      "hira": "あさごはん の あと に は を みがきます",
+      "mp3": "pb_s18_i_brush_my_teeth_after_breakfast.mp3"
+    },
+    {
+      "n": 19,
+      "en": "I get dressed quickly.",
+      "jp": "すぐに服を着ます。",
+      "hira": "すぐ に ふく を きます",
+      "mp3": "pb_s19_i_get_dressed_quickly.mp3"
+    },
+    {
+      "n": 20,
+      "en": "I go to school at eight.",
+      "jp": "8時に学校へ行きます。",
+      "hira": "はちじ に がっこう へ いきます",
+      "mp3": "pb_s20_i_go_to_school_at_eight.mp3"
+    },
+    {
+      "n": 21,
+      "en": "I study at school.",
+      "jp": "学校で勉強します。",
+      "hira": "がっこう で べんきょう します",
+      "mp3": "pb_s21_i_study_at_school.mp3"
+    },
+    {
+      "n": 22,
+      "en": "I eat lunch with my friends.",
+      "jp": "友だちと昼ごはんを食べます。",
+      "hira": "ともだち と ひるごはん を たべます",
+      "mp3": "pb_s22_i_eat_lunch_with_my_friends.mp3"
+    },
+    {
+      "n": 23,
+      "en": "I come home at four.",
+      "jp": "4時に家に帰ります。",
+      "hira": "よじ に いえ に かえります",
+      "mp3": "pb_s23_i_come_home_at_four.mp3"
+    },
+    {
+      "n": 24,
+      "en": "I do my homework after dinner.",
+      "jp": "夕食の後に宿題をします。",
+      "hira": "ゆうしょく の あと に しゅくだい を します",
+      "mp3": "pb_s24_i_do_my_homework_after_dinner.mp3"
+    },
+    {
+      "n": 25,
+      "en": "I help with dinner.",
+      "jp": "夕食の手伝いをします。",
+      "hira": "ゆうしょく の てつだい を します",
+      "mp3": "pb_s25_i_help_with_dinner.mp3"
+    },
+    {
+      "n": 26,
+      "en": "I take a bath at night.",
+      "jp": "夜にお風呂に入ります。",
+      "hira": "よる に おふろ に はいります",
+      "mp3": "pb_s26_i_take_a_bath_at_night.mp3"
+    },
+    {
+      "n": 27,
+      "en": "I read a book before bed.",
+      "jp": "寝る前に本を読みます。",
+      "hira": "ねる まえ に ほん を よみます",
+      "mp3": "pb_s27_i_read_a_book_before_bed.mp3"
+    },
+    {
+      "n": 28,
+      "en": "I go to bed at ten.",
+      "jp": "10時に寝ます。",
+      "hira": "じゅうじ に ねます",
+      "mp3": "pb_s28_i_go_to_bed_at_ten.mp3"
+    },
+    {
+      "n": 29,
+      "en": "I sleep for eight hours.",
+      "jp": "8時間寝ます。",
+      "hira": "はちじかん ねます",
+      "mp3": "pb_s29_i_sleep_for_eight_hours.mp3"
+    },
+    {
+      "n": 30,
+      "en": "I relax on weekends.",
+      "jp": "週末はゆっくりします。",
+      "hira": "しゅうまつ は ゆっくり します",
+      "mp3": "pb_s30_i_relax_on_weekends.mp3"
+    },
+    {
+      "n": 31,
+      "en": "I eat fruit every morning.",
+      "jp": "毎朝果物を食べます。",
+      "hira": "まいあさ くだもの を たべます",
+      "mp3": "pb_s31_i_eat_fruit_every_morning.mp3"
+    },
+    {
+      "n": 32,
+      "en": "I eat vegetables with dinner.",
+      "jp": "夕食に野菜を食べます。",
+      "hira": "ゆうしょく に やさい を たべます",
+      "mp3": "pb_s32_i_eat_vegetables_with_dinner.mp3"
+    },
+    {
+      "n": 33,
+      "en": "I drink a lot of water.",
+      "jp": "水をたくさん飲みます。",
+      "hira": "みず を たくさん のみます",
+      "mp3": "pb_s33_i_drink_a_lot_of_water.mp3"
+    },
+    {
+      "n": 34,
+      "en": "I walk to school.",
+      "jp": "歩いて学校へ行きます。",
+      "hira": "あるいて がっこう へ いきます",
+      "mp3": "pb_s34_i_walk_to_school.mp3"
+    },
+    {
+      "n": 35,
+      "en": "I play soccer after school.",
+      "jp": "放課後にサッカーをします。",
+      "hira": "ほうかご に さっかー を します",
+      "mp3": "pb_s35_i_play_soccer_after_school.mp3"
+    },
+    {
+      "n": 36,
+      "en": "I stretch before sports.",
+      "jp": "スポーツの前にストレッチをします。",
+      "hira": "すぽーつ の まえ に すとれっち を します",
+      "mp3": "pb_s36_i_stretch_before_sports.mp3"
+    },
+    {
+      "n": 37,
+      "en": "I wash my hands before lunch.",
+      "jp": "昼ごはんの前に手を洗います。",
+      "hira": "ひるごはん の まえ に て を あらいます",
+      "mp3": "pb_s37_i_wash_my_hands_before_lunch.mp3"
+    },
+    {
+      "n": 38,
+      "en": "I sleep well at night.",
+      "jp": "夜はよく眠ります。",
+      "hira": "よる は よく ねむります",
+      "mp3": "pb_s38_i_sleep_well_at_night.mp3"
+    },
+    {
+      "n": 39,
+      "en": "I rest when I am tired.",
+      "jp": "疲れたときは休みます。",
+      "hira": "つかれた とき は やすみます",
+      "mp3": "pb_s39_i_rest_when_i_am_tired.mp3"
+    },
+    {
+      "n": 40,
+      "en": "I go to the doctor when I am sick.",
+      "jp": "病気のときは病院へ行きます。",
+      "hira": "びょうき の とき は びょういん へ いきます",
+      "mp3": "pb_s40_i_go_to_the_doctor_when_i_am_sick.mp3"
+    },
+    {
+      "n": 41,
+      "en": "You should eat breakfast.",
+      "jp": "朝ごはんを食べたほうがいいです。",
+      "hira": "あさごはん を たべた ほう が いい です",
+      "mp3": "pb_s41_you_should_eat_breakfast.mp3"
+    },
+    {
+      "n": 42,
+      "en": "You should drink more water.",
+      "jp": "もっと水を飲んだほうがいいです。",
+      "hira": "もっと みず を のんだ ほう が いい です",
+      "mp3": "pb_s42_you_should_drink_more_water.mp3"
+    },
+    {
+      "n": 43,
+      "en": "You should not eat too much candy.",
+      "jp": "お菓子を食べすぎないほうがいいです。",
+      "hira": "おかし を たべすぎない ほう が いい です",
+      "mp3": "pb_s43_you_should_not_eat_too_much_candy.mp3"
+    },
+    {
+      "n": 44,
+      "en": "You should go to bed early.",
+      "jp": "早く寝たほうがいいです。",
+      "hira": "はやく ねた ほう が いい です",
+      "mp3": "pb_s44_you_should_go_to_bed_early.mp3"
+    },
+    {
+      "n": 45,
+      "en": "Healthy food gives me energy.",
+      "jp": "健康的な食べ物は元気をくれます。",
+      "hira": "けんこうてき な たべもの は げんき を くれます",
+      "mp3": "pb_s45_healthy_food_gives_me_energy.mp3"
+    },
+    {
+      "n": 46,
+      "en": "I want to learn English.",
+      "jp": "英語を学びたいです。",
+      "hira": "えいご を まなびたい です",
+      "mp3": "pb_s46_i_want_to_learn_english.mp3"
+    },
+    {
+      "n": 47,
+      "en": "I can speak a little English.",
+      "jp": "少し英語が話せます。",
+      "hira": "すこし えいご が はなせます",
+      "mp3": "pb_s47_i_can_speak_a_little_english.mp3"
+    },
+    {
+      "n": 48,
+      "en": "I am good at drawing.",
+      "jp": "絵を描くのが得意です。",
+      "hira": "え を かく の が とくい です",
+      "mp3": "pb_s48_i_am_good_at_drawing.mp3"
+    },
+    {
+      "n": 49,
+      "en": "English is difficult sometimes.",
+      "jp": "英語はときどき難しいです。",
+      "hira": "えいご は ときどき むずかしい です",
+      "mp3": "pb_s49_english_is_difficult_sometimes.mp3"
+    },
+    {
+      "n": 50,
+      "en": "I can learn from mistakes.",
+      "jp": "間違いから学べます。",
+      "hira": "まちがい から まなべます",
+      "mp3": "pb_s50_i_can_learn_from_mistakes.mp3"
+    },
+    {
+      "n": 51,
+      "en": "I try again.",
+      "jp": "もう一度やってみます。",
+      "hira": "もう いちど やって みます",
+      "mp3": "pb_s51_i_try_again.mp3"
+    },
+    {
+      "n": 52,
+      "en": "I do not give up.",
+      "jp": "私はあきらめません。",
+      "hira": "わたし は あきらめません",
+      "mp3": "pb_s52_i_do_not_give_up.mp3"
+    },
+    {
+      "n": 53,
+      "en": "My friends help me.",
+      "jp": "友だちが助けてくれます。",
+      "hira": "ともだち が たすけて くれます",
+      "mp3": "pb_s53_my_friends_help_me.mp3"
+    },
+    {
+      "n": 54,
+      "en": "I help my classmates.",
+      "jp": "クラスメイトを助けます。",
+      "hira": "くらすめいと を たすけます",
+      "mp3": "pb_s54_i_help_my_classmates.mp3"
+    },
+    {
+      "n": 55,
+      "en": "I take a deep breath.",
+      "jp": "深呼吸をします。",
+      "hira": "しんこきゅう を します",
+      "mp3": "pb_s55_i_take_a_deep_breath.mp3"
+    },
+    {
+      "n": 56,
+      "en": "I can stay calm.",
+      "jp": "落ち着いていられます。",
+      "hira": "おちついて いられます",
+      "mp3": "pb_s56_i_can_stay_calm.mp3"
+    },
+    {
+      "n": 57,
+      "en": "Practice helps me improve.",
+      "jp": "練習すると上達します。",
+      "hira": "れんしゅう する と じょうたつ します",
+      "mp3": "pb_s57_practice_helps_me_improve.mp3"
+    },
+    {
+      "n": 58,
+      "en": "I am proud of my effort.",
+      "jp": "自分の努力を誇りに思います。",
+      "hira": "じぶん の どりょく を ほこり に おもいます",
+      "mp3": "pb_s58_i_am_proud_of_my_effort.mp3"
+    },
+    {
+      "n": 59,
+      "en": "I believe in myself.",
+      "jp": "自分を信じています。",
+      "hira": "じぶん を しんじて います",
+      "mp3": "pb_s59_i_believe_in_myself.mp3"
+    },
+    {
+      "n": 60,
+      "en": "I can do it.",
+      "jp": "私ならできます。",
+      "hira": "わたし なら できます",
+      "mp3": "pb_s60_i_can_do_it.mp3"
+    }
+  ]
+}

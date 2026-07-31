@@ -1,1 +1,424 @@
-
+{
+  "cards": [
+    {
+      "n": 1,
+      "en": "How should a long-term objective be divided into manageable stages?",
+      "jp": "長期目標はどのように管理しやすい段階に分けるべきですか。",
+      "hira": "ちょうき もくひょう は どの よう に かんり しやすい だんかい に わける べき です か",
+      "mp3": "bc_q01_how_should_a_longterm_objective_be_divided_into_manageable_stages.mp3"
+    },
+    {
+      "n": 2,
+      "en": "When does a short-term target become too narrow?",
+      "jp": "短期目標は、どのような場合に狭すぎるものになりますか。",
+      "hira": "たんき もくひょう は どの よう な ばあい に せますぎる もの に なります か",
+      "mp3": "bc_q02_when_does_a_shortterm_target_become_too_narrow.mp3"
+    },
+    {
+      "n": 3,
+      "en": "What makes a milestone genuinely meaningful?",
+      "jp": "節目を本当に意味のあるものにするのは何ですか。",
+      "hira": "ふしめ を ほんとう に いみ の ある もの に する の は なん です か",
+      "mp3": "bc_q03_what_makes_a_milestone_genuinely_meaningful.mp3"
+    },
+    {
+      "n": 4,
+      "en": "How should competing priorities be evaluated?",
+      "jp": "競合する優先事項をどのように評価すべきですか。",
+      "hira": "きょうごう する ゆうせん じこう を どの よう に ひょうか する べき です か",
+      "mp3": "bc_q04_how_should_competing_priorities_be_evaluated.mp3"
+    },
+    {
+      "n": 5,
+      "en": "Why does commitment often weaken over time?",
+      "jp": "決意はなぜ時間とともに弱まることが多いのですか。",
+      "hira": "けつい は なぜ じかん と とも に よわまる こと が おおい の です か",
+      "mp3": "bc_q05_why_does_commitment_often_weaken_over_time.mp3"
+    },
+    {
+      "n": 6,
+      "en": "Why do New Year’s resolutions frequently fail?",
+      "jp": "新年の決意はなぜ頻繁に失敗するのですか。",
+      "hira": "しんねん の けつい は なぜ ひんぱん に しっぱい する の です か",
+      "mp3": "bc_q06_why_do_new_years_resolutions_frequently_fail.mp3"
+    },
+    {
+      "n": 7,
+      "en": "Can ambition become harmful?",
+      "jp": "大志が有害になることはありますか。",
+      "hira": "たいし が ゆうがい に なる こと は あります か",
+      "mp3": "bc_q07_can_ambition_become_harmful.mp3"
+    },
+    {
+      "n": 8,
+      "en": "How should the feasibility of a goal be assessed?",
+      "jp": "目標の実現可能性をどのように評価すべきですか。",
+      "hira": "もくひょう の じつげん かのうせい を どの よう に ひょうか する べき です か",
+      "mp3": "bc_q08_how_should_the_feasibility_of_a_goal_be_assessed.mp3"
+    },
+    {
+      "n": 9,
+      "en": "Which outcomes are difficult to measure objectively?",
+      "jp": "どのような成果は客観的に測るのが難しいですか。",
+      "hira": "どの よう な せいか は きゃっかんてき に はかる の が むずかしい です か",
+      "mp3": "bc_q09_which_outcomes_are_difficult_to_measure_objectively.mp3"
+    },
+    {
+      "n": 10,
+      "en": "Do deadlines improve performance or reduce quality?",
+      "jp": "締め切りは成果を高めますか、それとも質を下げますか。",
+      "hira": "しめきり は せいか を たかめます か それとも しつ を さげます か",
+      "mp3": "bc_q10_do_deadlines_improve_performance_or_reduce_quality.mp3"
+    },
+    {
+      "n": 11,
+      "en": "What makes a strategy realistic?",
+      "jp": "戦略を現実的なものにするのは何ですか。",
+      "hira": "せんりゃく を げんじつてき な もの に する の は なん です か",
+      "mp3": "bc_q11_what_makes_a_strategy_realistic.mp3"
+    },
+    {
+      "n": 12,
+      "en": "How should people respond to an unexpected obstacle?",
+      "jp": "予期しない障害にどのように対応すべきですか。",
+      "hira": "よき しない しょうがい に どの よう に たいおう する べき です か",
+      "mp3": "bc_q12_how_should_people_respond_to_an_unexpected_obstacle.mp3"
+    },
+    {
+      "n": 13,
+      "en": "How can gradual progress be measured fairly?",
+      "jp": "少しずつの進捗をどのように公平に測れますか。",
+      "hira": "すこしずつ の しんちょく を どの よう に こうへい に はかれます か",
+      "mp3": "bc_q13_how_can_gradual_progress_be_measured_fairly.mp3"
+    },
+    {
+      "n": 14,
+      "en": "Does accountability motivate people or create pressure?",
+      "jp": "説明責任は人のやる気を高めますか、それとも重圧を生みますか。",
+      "hira": "せつめい せきにん は ひと の やるき を たかめます か それとも じゅうあつ を うみます か",
+      "mp3": "bc_q14_does_accountability_motivate_people_or_create_pressure.mp3"
+    },
+    {
+      "n": 15,
+      "en": "Should achievement be judged by results or personal growth?",
+      "jp": "達成は結果と個人の成長のどちらで判断すべきですか。",
+      "hira": "たっせい は けっか と こじん の せいちょう の どちら で はんだん する べき です か",
+      "mp3": "bc_q15_should_achievement_be_judged_by_results_or_personal_growth.mp3"
+    },
+    {
+      "n": 16,
+      "en": "How does a daily routine influence decision-making?",
+      "jp": "日課は意思決定にどのような影響を与えますか。",
+      "hira": "にっか は いし けってい に どの よう な えいきょう を あたえます か",
+      "mp3": "bc_q16_how_does_a_daily_routine_influence_decisionmaking.mp3"
+    },
+    {
+      "n": 17,
+      "en": "What is the greatest barrier to effective time management?",
+      "jp": "効果的な時間管理への最大の障害は何ですか。",
+      "hira": "こうかてき な じかん かんり への さいだい の しょうがい は なん です か",
+      "mp3": "bc_q17_what_is_the_greatest_barrier_to_effective_time_management.mp3"
+    },
+    {
+      "n": 18,
+      "en": "How should productivity be measured in knowledge-based work?",
+      "jp": "知識労働では生産性をどのように測るべきですか。",
+      "hira": "ちしき ろうどう では せいさんせい を どの よう に はかる べき です か",
+      "mp3": "bc_q18_how_should_productivity_be_measured_in_knowledgebased_work.mp3"
+    },
+    {
+      "n": 19,
+      "en": "Who is responsible for maintaining work-life balance?",
+      "jp": "仕事と生活の調和を保つ責任はだれにありますか。",
+      "hira": "しごと と せいかつ の ちょうわ を たもつ せきにん は だれ に あります か",
+      "mp3": "bc_q19_who_is_responsible_for_maintaining_worklife_balance.mp3"
+    },
+    {
+      "n": 20,
+      "en": "How does modern life disrupt the circadian rhythm?",
+      "jp": "現代生活は概日リズムをどのように乱しますか。",
+      "hira": "げんだい せいかつ は がいじつ りずむ を どの よう に みだします か",
+      "mp3": "bc_q20_how_does_modern_life_disrupt_the_circadian_rhythm.mp3"
+    },
+    {
+      "n": 21,
+      "en": "Should employers address sleep deprivation among workers?",
+      "jp": "雇用主は労働者の睡眠不足に対処すべきですか。",
+      "hira": "こようぬし は ろうどうしゃ の すいみん ぶそく に たいしょ する べき です か",
+      "mp3": "bc_q21_should_employers_address_sleep_deprivation_among_workers.mp3"
+    },
+    {
+      "n": 22,
+      "en": "How can cities reduce the burden of long commutes?",
+      "jp": "都市は長時間通勤の負担をどのように減らせますか。",
+      "hira": "とし は ちょうじかん つうきん の ふたん を どの よう に へらせます か",
+      "mp3": "bc_q22_how_can_cities_reduce_the_burden_of_long_commutes.mp3"
+    },
+    {
+      "n": 23,
+      "en": "Why do unrealistic schedules cause repeated failure?",
+      "jp": "非現実的な予定はなぜ繰り返し失敗を招くのですか。",
+      "hira": "ひげんじつてき な よてい は なぜ くりかえし しっぱい を まねく の です か",
+      "mp3": "bc_q23_why_do_unrealistic_schedules_cause_repeated_failure.mp3"
+    },
+    {
+      "n": 24,
+      "en": "Is procrastination mainly a problem of discipline or anxiety?",
+      "jp": "先延ばしは主に規律の問題ですか、それとも不安の問題ですか。",
+      "hira": "さきのばし は おもに きりつ の もんだい です か それとも ふあん の もんだい です か",
+      "mp3": "bc_q24_is_procrastination_mainly_a_problem_of_discipline_or_anxiety.mp3"
+    },
+    {
+      "n": 25,
+      "en": "Should people disable most digital notifications?",
+      "jp": "ほとんどのデジタル通知を無効にすべきですか。",
+      "hira": "ほとんど の でじたる つうち を むこう に する べき です か",
+      "mp3": "bc_q25_should_people_disable_most_digital_notifications.mp3"
+    },
+    {
+      "n": 26,
+      "en": "When can efficiency become counterproductive?",
+      "jp": "効率が逆効果になるのはどのような場合ですか。",
+      "hira": "こうりつ が ぎゃくこうか に なる の は どの よう な ばあい です か",
+      "mp3": "bc_q26_when_can_efficiency_become_counterproductive.mp3"
+    },
+    {
+      "n": 27,
+      "en": "How much flexibility should workplaces allow?",
+      "jp": "職場はどの程度の柔軟性を認めるべきですか。",
+      "hira": "しょくば は どの ていど の じゅうなんせい を みとめる べき です か",
+      "mp3": "bc_q27_how_much_flexibility_should_workplaces_allow.mp3"
+    },
+    {
+      "n": 28,
+      "en": "How should household responsibilities be divided?",
+      "jp": "家庭での責任をどのように分担すべきですか。",
+      "hira": "かてい での せきにん を どの よう に ぶんたん する べき です か",
+      "mp3": "bc_q28_how_should_household_responsibilities_be_divided.mp3"
+    },
+    {
+      "n": 29,
+      "en": "Does a digital detox create lasting behavioral change?",
+      "jp": "デジタルデトックスは持続的な行動変化を生みますか。",
+      "hira": "でじたる でとっくす は じぞくてき な こうどう へんか を うみます か",
+      "mp3": "bc_q29_does_a_digital_detox_create_lasting_behavioral_change.mp3"
+    },
+    {
+      "n": 30,
+      "en": "Why is consistency difficult to maintain?",
+      "jp": "継続性を保つことはなぜ難しいのですか。",
+      "hira": "けいぞくせい を たもつ こと は なぜ むずかしい の です か",
+      "mp3": "bc_q30_why_is_consistency_difficult_to_maintain.mp3"
+    },
+    {
+      "n": 31,
+      "en": "Which factor has the greatest influence on physical well-being?",
+      "jp": "身体的健康に最も大きな影響を与える要因は何ですか。",
+      "hira": "しんたいてき けんこう に もっとも おおきな えいきょう を あたえる よういん は なん です か",
+      "mp3": "bc_q31_which_factor_has_the_greatest_influence_on_physical_wellbeing.mp3"
+    },
+    {
+      "n": 32,
+      "en": "Why does mental health still carry social stigma?",
+      "jp": "心の健康にはなぜ今も社会的な偏見が伴うのですか。",
+      "hira": "こころ の けんこう には なぜ いま も しゃかいてき な へんけん が ともなう の です か",
+      "mp3": "bc_q32_why_does_mental_health_still_carry_social_stigma.mp3"
+    },
+    {
+      "n": 33,
+      "en": "Should governments make healthy food more affordable?",
+      "jp": "政府は健康的な食品をもっと手頃にすべきですか。",
+      "hira": "せいふ は けんこうてき な しょくひん を もっと てごろ に する べき です か",
+      "mp3": "bc_q33_should_governments_make_healthy_food_more_affordable.mp3"
+    },
+    {
+      "n": 34,
+      "en": "How can consumers judge nutritional value accurately?",
+      "jp": "消費者は栄養価をどのように正確に判断できますか。",
+      "hira": "しょうひしゃ は えいようか を どの よう に せいかく に はんだん できます か",
+      "mp3": "bc_q34_how_can_consumers_judge_nutritional_value_accurately.mp3"
+    },
+    {
+      "n": 35,
+      "en": "Do most people underestimate the importance of hydration?",
+      "jp": "多くの人は水分補給の重要性を過小評価していますか。",
+      "hira": "おおく の ひと は すいぶん ほきゅう の じゅうようせい を かしょう ひょうか して います か",
+      "mp3": "bc_q35_do_most_people_underestimate_the_importance_of_hydration.mp3"
+    },
+    {
+      "n": 36,
+      "en": "How much cardiovascular exercise should adults get?",
+      "jp": "成人はどのくらい有酸素運動をすべきですか。",
+      "hira": "せいじん は どの くらい ゆうさんそ うんどう を する べき です か",
+      "mp3": "bc_q36_how_much_cardiovascular_exercise_should_adults_get.mp3"
+    },
+    {
+      "n": 37,
+      "en": "Should strength training be recommended for older adults?",
+      "jp": "高齢者に筋力トレーニングを勧めるべきですか。",
+      "hira": "こうれいしゃ に きんりょく とれーにんぐ を すすめる べき です か",
+      "mp3": "bc_q37_should_strength_training_be_recommended_for_older_adults.mp3"
+    },
+    {
+      "n": 38,
+      "en": "Which habits have the strongest effect on the immune system?",
+      "jp": "免疫系に最も強い影響を与える習慣は何ですか。",
+      "hira": "めんえきけい に もっとも つよい えいきょう を あたえる しゅうかん は なん です か",
+      "mp3": "bc_q38_which_habits_have_the_strongest_effect_on_the_immune_system.mp3"
+    },
+    {
+      "n": 39,
+      "en": "Should preventive care receive more public funding?",
+      "jp": "予防医療にもっと公的資金を投入すべきですか。",
+      "hira": "よぼう いりょう に もっと こうてき しきん を とうにゅう する べき です か",
+      "mp3": "bc_q39_should_preventive_care_receive_more_public_funding.mp3"
+    },
+    {
+      "n": 40,
+      "en": "How often are medical checkups truly necessary?",
+      "jp": "健康診断は実際にどのくらいの頻度で必要ですか。",
+      "hira": "けんこう しんだん は じっさい に どの くらい の ひんど で ひつよう です か",
+      "mp3": "bc_q40_how_often_are_medical_checkups_truly_necessary.mp3"
+    },
+    {
+      "n": 41,
+      "en": "Should stress management focus on individuals or institutions?",
+      "jp": "ストレス管理は個人と組織のどちらに重点を置くべきですか。",
+      "hira": "すとれす かんり は こじん と そしき の どちら に じゅうてん を おく べき です か",
+      "mp3": "bc_q41_should_stress_management_focus_on_individuals_or_institutions.mp3"
+    },
+    {
+      "n": 42,
+      "en": "What workplace conditions are most likely to cause burnout?",
+      "jp": "どのような職場環境が最も燃え尽きを招きやすいですか。",
+      "hira": "どの よう な しょくば かんきょう が もっとも もえつき を まねきやすい です か",
+      "mp3": "bc_q42_what_workplace_conditions_are_most_likely_to_cause_burnout.mp3"
+    },
+    {
+      "n": 43,
+      "en": "How can a sedentary lifestyle be reduced?",
+      "jp": "座りがちな生活をどのように減らせますか。",
+      "hira": "すわりがち な せいかつ を どの よう に へらせます か",
+      "mp3": "bc_q43_how_can_a_sedentary_lifestyle_be_reduced.mp3"
+    },
+    {
+      "n": 44,
+      "en": "When does self-care become self-indulgence?",
+      "jp": "セルフケアはどのような場合に単なる甘やかしになりますか。",
+      "hira": "せるふ けあ は どの よう な ばあい に たんなる あまやかし に なります か",
+      "mp3": "bc_q44_when_does_selfcare_become_selfindulgence.mp3"
+    },
+    {
+      "n": 45,
+      "en": "Why does life expectancy differ between communities?",
+      "jp": "平均寿命は地域によってなぜ異なるのですか。",
+      "hira": "へいきん じゅみょう は ちいき に よって なぜ ことなる の です か",
+      "mp3": "bc_q45_why_does_life_expectancy_differ_between_communities.mp3"
+    },
+    {
+      "n": 46,
+      "en": "Is intrinsic motivation always more effective?",
+      "jp": "内発的動機づけは常により効果的ですか。",
+      "hira": "ないはつてき どうきづけ は つね に より こうかてき です か",
+      "mp3": "bc_q46_is_intrinsic_motivation_always_more_effective.mp3"
+    },
+    {
+      "n": 47,
+      "en": "When can an extrinsic reward reduce genuine interest?",
+      "jp": "外的報酬が本当の関心を弱めるのはどのような場合ですか。",
+      "hira": "がいてき ほうしゅう が ほんとう の かんしん を よわめる の は どの よう な ばあい です か",
+      "mp3": "bc_q47_when_can_an_extrinsic_reward_reduce_genuine_interest.mp3"
+    },
+    {
+      "n": 48,
+      "en": "Can a growth mindset be taught?",
+      "jp": "成長思考を教えることはできますか。",
+      "hira": "せいちょう しこう を おしえる こと は できます か",
+      "mp3": "bc_q48_can_a_growth_mindset_be_taught.mp3"
+    },
+    {
+      "n": 49,
+      "en": "Is self-discipline more important than talent?",
+      "jp": "自己規律は才能よりも重要ですか。",
+      "hira": "じこ きりつ は さいのう より も じゅうよう です か",
+      "mp3": "bc_q49_is_selfdiscipline_more_important_than_talent.mp3"
+    },
+    {
+      "n": 50,
+      "en": "When should perseverance give way to a new direction?",
+      "jp": "忍耐はどのような場合に新しい方向へ切り替えるべきですか。",
+      "hira": "にんたい は どの よう な ばあい に あたらしい ほうこう へ きりかえる べき です か",
+      "mp3": "bc_q50_when_should_perseverance_give_way_to_a_new_direction.mp3"
+    },
+    {
+      "n": 51,
+      "en": "How can resilience be developed without unnecessary hardship?",
+      "jp": "不必要な苦難なしに回復力をどのように育てられますか。",
+      "hira": "ふひつよう な くなん なし に かいふくりょく を どの よう に そだてられます か",
+      "mp3": "bc_q51_how_can_resilience_be_developed_without_unnecessary_hardship.mp3"
+    },
+    {
+      "n": 52,
+      "en": "What experiences strengthen self-efficacy?",
+      "jp": "どのような経験が自己効力感を強めますか。",
+      "hira": "どの よう な けいけん が じこ こうりょくかん を つよめます か",
+      "mp3": "bc_q52_what_experiences_strengthen_selfefficacy.mp3"
+    },
+    {
+      "n": 53,
+      "en": "What makes feedback constructive rather than discouraging?",
+      "jp": "フィードバックが落胆させるものではなく建設的なものになる条件は何ですか。",
+      "hira": "ふぃーどばっく が らくたん させる もの では なく けんせつてき な もの に なる じょうけん は なん です か",
+      "mp3": "bc_q53_what_makes_feedback_constructive_rather_than_discouraging.mp3"
+    },
+    {
+      "n": 54,
+      "en": "Which cognitive biases most affect personal decisions?",
+      "jp": "どの認知バイアスが個人の判断に最も影響しますか。",
+      "hira": "どの にんち ばいあす が こじん の はんだん に もっとも えいきょう します か",
+      "mp3": "bc_q54_which_cognitive_biases_most_affect_personal_decisions.mp3"
+    },
+    {
+      "n": 55,
+      "en": "How can fear of failure be used productively?",
+      "jp": "失敗への恐れをどのように生産的に活用できますか。",
+      "hira": "しっぱい への おそれ を どの よう に せいさんてき に かつよう できます か",
+      "mp3": "bc_q55_how_can_fear_of_failure_be_used_productively.mp3"
+    },
+    {
+      "n": 56,
+      "en": "Is leaving one’s comfort zone always beneficial?",
+      "jp": "安心できる領域を出ることは常に有益ですか。",
+      "hira": "あんしん できる りょういき を でる こと は つね に ゆうえき です か",
+      "mp3": "bc_q56_is_leaving_ones_comfort_zone_always_beneficial.mp3"
+    },
+    {
+      "n": 57,
+      "en": "How can emotional regulation improve leadership?",
+      "jp": "感情の調整はリーダーシップをどのように向上させますか。",
+      "hira": "かんじょう の ちょうせい は りーだーしっぷ を どの よう に こうじょう させます か",
+      "mp3": "bc_q57_how_can_emotional_regulation_improve_leadership.mp3"
+    },
+    {
+      "n": 58,
+      "en": "Why is adaptability increasingly important at work?",
+      "jp": "適応力が職場でますます重要なのはなぜですか。",
+      "hira": "てきおうりょく が しょくば で ますます じゅうよう な の は なぜ です か",
+      "mp3": "bc_q58_why_is_adaptability_increasingly_important_at_work.mp3"
+    },
+    {
+      "n": 59,
+      "en": "How can continuous improvement be sustained without exhaustion?",
+      "jp": "疲労せずに継続的改善をどのように維持できますか。",
+      "hira": "ひろう せず に けいぞくてき かいぜん を どの よう に いじ できます か",
+      "mp3": "bc_q59_how_can_continuous_improvement_be_sustained_without_exhaustion.mp3"
+    },
+    {
+      "n": 60,
+      "en": "What gives people a lasting sense of purpose?",
+      "jp": "人に持続的な目的意識を与えるものは何ですか。",
+      "hira": "ひと に じぞくてき な もくてき いしき を あたえる もの は なん です か",
+      "mp3": "bc_q60_what_gives_people_a_lasting_sense_of_purpose.mp3"
+    }
+  ]
+}
