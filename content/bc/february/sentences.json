@@ -1,1 +1,424 @@
-
+{
+  "cards": [
+    {
+      "n": 1,
+      "en": "Emotional awareness helps people identify feelings before reacting.",
+      "jp": "感情への気づきは、反応する前に自分の気持ちを認識するのに役立ちます。",
+      "hira": "かんじょう への きづき は はんのう する まえ に じぶん の きもち を にんしき する の に やくだちます",
+      "mp3": "bc_s01_emotional_awareness_helps_people_identify_feelings_before_reacting.mp3"
+    },
+    {
+      "n": 2,
+      "en": "Emotional intelligence involves recognizing emotions and responding appropriately.",
+      "jp": "感情知能には、感情を認識し適切に対応することが含まれます。",
+      "hira": "かんじょう ちのう には かんじょう を にんしき し てきせつ に たいおう する こと が ふくまれます",
+      "mp3": "bc_s02_emotional_intelligence_involves_recognizing_emotions_and_responding_appropriatel.mp3"
+    },
+    {
+      "n": 3,
+      "en": "Empathy requires understanding another person’s perspective without assuming their experience is identical to yours.",
+      "jp": "共感には、経験が同じだと決めつけずに相手の視点を理解することが必要です。",
+      "hira": "きょうかん には けいけん が おなじ だ と きめつけず に あいて の してん を りかい する こと が ひつよう です",
+      "mp3": "bc_s03_empathy_requires_understanding_another_persons_perspective_without_assuming_thei.mp3"
+    },
+    {
+      "n": 4,
+      "en": "Compassion turns concern into supportive action.",
+      "jp": "思いやりは、心配する気持ちを支援行動へと変えます。",
+      "hira": "おもいやり は しんぱい する きもち を しえん こうどう へ と かえます",
+      "mp3": "bc_s04_compassion_turns_concern_into_supportive_action.mp3"
+    },
+    {
+      "n": 5,
+      "en": "Frustration can signal a mismatch between expectations and reality.",
+      "jp": "欲求不満は、期待と現実のずれを示すことがあります。",
+      "hira": "よっきゅう ふまん は きたい と げんじつ の ずれ を しめす こと が あります",
+      "mp3": "bc_s05_frustration_can_signal_a_mismatch_between_expectations_and_reality.mp3"
+    },
+    {
+      "n": 6,
+      "en": "Anxiety becomes harmful when it consistently interferes with daily life.",
+      "jp": "不安は、日常生活を継続的に妨げると有害になります。",
+      "hira": "ふあん は にちじょう せいかつ を けいぞくてき に さまたげる と ゆうがい に なります",
+      "mp3": "bc_s06_anxiety_becomes_harmful_when_it_consistently_interferes_with_daily_life.mp3"
+    },
+    {
+      "n": 7,
+      "en": "Contentment does not require the absence of ambition.",
+      "jp": "満足感を得るために、大志を捨てる必要はありません。",
+      "hira": "まんぞくかん を える ため に たいし を すてる ひつよう は ありません",
+      "mp3": "bc_s07_contentment_does_not_require_the_absence_of_ambition.mp3"
+    },
+    {
+      "n": 8,
+      "en": "Disappointment can encourage reflection if it is handled constructively.",
+      "jp": "失望も建設的に受け止めれば、振り返りを促すことがあります。",
+      "hira": "しつぼう も けんせつてき に うけとめれば ふりかえり を うながす こと が あります",
+      "mp3": "bc_s08_disappointment_can_encourage_reflection_if_it_is_handled_constructively.mp3"
+    },
+    {
+      "n": 9,
+      "en": "Embarrassment often feels stronger than the attention others actually give the event.",
+      "jp": "恥ずかしさは、他人が実際に向ける注目よりも強く感じられがちです。",
+      "hira": "はずかしさ は たにん が じっさい に むける ちゅうもく より も つよく かんじられがち です",
+      "mp3": "bc_s09_embarrassment_often_feels_stronger_than_the_attention_others_actually_give_the_e.mp3"
+    },
+    {
+      "n": 10,
+      "en": "Resentment tends to grow when conflict remains unspoken.",
+      "jp": "対立について話さないままだと、憤りは大きくなりがちです。",
+      "hira": "たいりつ について はなさない まま だ と いきどおり は おおきく なりがち です",
+      "mp3": "bc_s10_resentment_tends_to_grow_when_conflict_remains_unspoken.mp3"
+    },
+    {
+      "n": 11,
+      "en": "Accepting vulnerability can deepen trust in close relationships.",
+      "jp": "傷つきやすさを受け入れることは、親しい関係の信頼を深めます。",
+      "hira": "きずつきやすさ を うけいれる こと は したしい かんけい の しんらい を ふかめます",
+      "mp3": "bc_s11_accepting_vulnerability_can_deepen_trust_in_close_relationships.mp3"
+    },
+    {
+      "n": 12,
+      "en": "An emotional trigger may be rooted in a previous experience.",
+      "jp": "感情を引き起こす要因は、過去の経験に根ざしている場合があります。",
+      "hira": "かんじょう を ひきおこす よういん は かこ の けいけん に ねざして いる ばあい が あります",
+      "mp3": "bc_s12_an_emotional_trigger_may_be_rooted_in_a_previous_experience.mp3"
+    },
+    {
+      "n": 13,
+      "en": "Mood regulation is not the same as suppressing difficult emotions.",
+      "jp": "気分の調整は、つらい感情を抑え込むこととは異なります。",
+      "hira": "きぶん の ちょうせい は つらい かんじょう を おさえこむ こと とは ことなります",
+      "mp3": "bc_s13_mood_regulation_is_not_the_same_as_suppressing_difficult_emotions.mp3"
+    },
+    {
+      "n": 14,
+      "en": "Psychological well-being depends on relationships, security, and purpose.",
+      "jp": "心理的幸福は、人間関係、安心感、目的に左右されます。",
+      "hira": "しんりてき こうふく は にんげん かんけい あんしんかん もくてき に さゆう されます",
+      "mp3": "bc_s14_psychological_wellbeing_depends_on_relationships_security_and_purpose.mp3"
+    },
+    {
+      "n": 15,
+      "en": "Self-awareness allows people to recognize patterns in their own behavior.",
+      "jp": "自己認識があれば、自分の行動パターンに気づくことができます。",
+      "hira": "じこ にんしき が あれば じぶん の こうどう ぱたーん に きづく こと が できます",
+      "mp3": "bc_s15_selfawareness_allows_people_to_recognize_patterns_in_their_own_behavior.mp3"
+    },
+    {
+      "n": 16,
+      "en": "Mutual respect allows disagreement without hostility.",
+      "jp": "相互尊重があれば、敵意を持たずに意見を異にできます。",
+      "hira": "そうご そんちょう が あれば てきい を もたず に いけん を こと に できます",
+      "mp3": "bc_s16_mutual_respect_allows_disagreement_without_hostility.mp3"
+    },
+    {
+      "n": 17,
+      "en": "Trustworthiness is built through consistent behavior rather than promises.",
+      "jp": "信頼性は、約束よりも一貫した行動によって築かれます。",
+      "hira": "しんらいせい は やくそく より も いっかん した こうどう に よって きずかれます",
+      "mp3": "bc_s17_trustworthiness_is_built_through_consistent_behavior_rather_than_promises.mp3"
+    },
+    {
+      "n": 18,
+      "en": "Reciprocity supports friendship, but exact equality is neither possible nor necessary.",
+      "jp": "互恵性は友情を支えますが、完全な平等は不可能であり必要でもありません。",
+      "hira": "ごけいせい は ゆうじょう を ささえます が かんぜん な びょうどう は ふかのう で あり ひつよう でも ありません",
+      "mp3": "bc_s18_reciprocity_supports_friendship_but_exact_equality_is_neither_possible_nor_neces.mp3"
+    },
+    {
+      "n": 19,
+      "en": "Active listening requires attention, curiosity, and patience.",
+      "jp": "積極的傾聴には、注意、好奇心、忍耐が必要です。",
+      "hira": "せっきょくてき けいちょう には ちゅうい こうきしん にんたい が ひつよう です",
+      "mp3": "bc_s19_active_listening_requires_attention_curiosity_and_patience.mp3"
+    },
+    {
+      "n": 20,
+      "en": "Conflict resolution works best when both sides feel heard.",
+      "jp": "対立解決は、双方が話を聞いてもらえたと感じるときに最も効果的です。",
+      "hira": "たいりつ かいけつ は そうほう が はなし を きいて もらえた と かんじる とき に もっとも こうかてき です",
+      "mp3": "bc_s20_conflict_resolution_works_best_when_both_sides_feel_heard.mp3"
+    },
+    {
+      "n": 21,
+      "en": "Social support can protect people during periods of stress.",
+      "jp": "社会的支援は、ストレスの多い時期に人を守ることができます。",
+      "hira": "しゃかいてき しえん は すとれす の おおい じき に ひと を まもる こと が できます",
+      "mp3": "bc_s21_social_support_can_protect_people_during_periods_of_stress.mp3"
+    },
+    {
+      "n": 22,
+      "en": "Cooperation becomes difficult when rewards are distributed unfairly.",
+      "jp": "報酬が不公平に配分されると、協力は難しくなります。",
+      "hira": "ほうしゅう が ふこうへい に はいぶん される と きょうりょく は むずかしく なります",
+      "mp3": "bc_s22_cooperation_becomes_difficult_when_rewards_are_distributed_unfairly.mp3"
+    },
+    {
+      "n": 23,
+      "en": "Inclusion requires removing barriers, not simply inviting participation.",
+      "jp": "包摂には、単に参加を呼びかけるだけでなく、障壁を取り除くことが必要です。",
+      "hira": "ほうせつ には たんに さんか を よびかける だけ で なく しょうへき を とりのぞく こと が ひつよう です",
+      "mp3": "bc_s23_inclusion_requires_removing_barriers_not_simply_inviting_participation.mp3"
+    },
+    {
+      "n": 24,
+      "en": "Loyalty should not require defending harmful behavior.",
+      "jp": "忠誠心のために、有害な行動を擁護する必要はありません。",
+      "hira": "ちゅうせいしん の ため に ゆうがい な こうどう を ようご する ひつよう は ありません",
+      "mp3": "bc_s24_loyalty_should_not_require_defending_harmful_behavior.mp3"
+    },
+    {
+      "n": 25,
+      "en": "Honesty is valuable, but timing and tone affect how truth is received.",
+      "jp": "正直さは大切ですが、時機と口調によって真実の受け取られ方が変わります。",
+      "hira": "しょうじきさ は たいせつ です が じき と くちょう に よって しんじつ の うけとられかた が かわります",
+      "mp3": "bc_s25_honesty_is_valuable_but_timing_and_tone_affect_how_truth_is_received.mp3"
+    },
+    {
+      "n": 26,
+      "en": "Patience gives relationships time to recover from misunderstandings.",
+      "jp": "忍耐は、人間関係が誤解から回復する時間を与えます。",
+      "hira": "にんたい は にんげん かんけい が ごかい から かいふく する じかん を あたえます",
+      "mp3": "bc_s26_patience_gives_relationships_time_to_recover_from_misunderstandings.mp3"
+    },
+    {
+      "n": 27,
+      "en": "Generosity can involve time, attention, or knowledge as well as money.",
+      "jp": "寛大さには、お金だけでなく時間、注意、知識を与えることも含まれます。",
+      "hira": "かんだいさ には おかね だけ で なく じかん ちゅうい ちしき を あたえる こと も ふくまれます",
+      "mp3": "bc_s27_generosity_can_involve_time_attention_or_knowledge_as_well_as_money.mp3"
+    },
+    {
+      "n": 28,
+      "en": "A personal boundary protects well-being without rejecting other people.",
+      "jp": "個人の境界線は、他人を拒絶せずに自分の幸福を守ります。",
+      "hira": "こじん の きょうかいせん は たにん を きょぜつ せず に じぶん の こうふく を まもります",
+      "mp3": "bc_s28_a_personal_boundary_protects_wellbeing_without_rejecting_other_people.mp3"
+    },
+    {
+      "n": 29,
+      "en": "Peer pressure can influence adults as strongly as young people.",
+      "jp": "同調圧力は、若者と同じくらい強く大人にも影響します。",
+      "hira": "どうちょう あつりょく は わかもの と おなじ くらい つよく おとな にも えいきょう します",
+      "mp3": "bc_s29_peer_pressure_can_influence_adults_as_strongly_as_young_people.mp3"
+    },
+    {
+      "n": 30,
+      "en": "A sense of belonging improves engagement in schools and workplaces.",
+      "jp": "帰属意識は、学校や職場での積極的な関与を高めます。",
+      "hira": "きぞく いしき は がっこう や しょくば での せっきょくてき な かんよ を たかめます",
+      "mp3": "bc_s30_a_sense_of_belonging_improves_engagement_in_schools_and_workplaces.mp3"
+    },
+    {
+      "n": 31,
+      "en": "Family structure varies across cultures and stages of life.",
+      "jp": "家族構成は、文化や人生の段階によって異なります。",
+      "hira": "かぞく こうせい は ぶんか や じんせい の だんかい に よって ことなります",
+      "mp3": "bc_s31_family_structure_varies_across_cultures_and_stages_of_life.mp3"
+    },
+    {
+      "n": 32,
+      "en": "Extended families can share resources and caregiving responsibilities.",
+      "jp": "拡大家族は、資源や介護の責任を分かち合うことができます。",
+      "hira": "かくだい かぞく は しげん や かいご の せきにん を わかちあう こと が できます",
+      "mp3": "bc_s32_extended_families_can_share_resources_and_caregiving_responsibilities.mp3"
+    },
+    {
+      "n": 33,
+      "en": "The nuclear family should not be treated as the only valid household model.",
+      "jp": "核家族だけを唯一の正当な世帯モデルとして扱うべきではありません。",
+      "hira": "かく かぞく だけ を ゆいいつ の せいとう な せたい もでる として あつかう べき では ありません",
+      "mp3": "bc_s33_the_nuclear_family_should_not_be_treated_as_the_only_valid_household_model.mp3"
+    },
+    {
+      "n": 34,
+      "en": "Intergenerational relationships allow knowledge and values to move in both directions.",
+      "jp": "世代間関係では、知識や価値観が双方向に伝わります。",
+      "hira": "せだいかん かんけい では ちしき や かちかん が そうほうこう に つたわります",
+      "mp3": "bc_s34_intergenerational_relationships_allow_knowledge_and_values_to_move_in_both_direc.mp3"
+    },
+    {
+      "n": 35,
+      "en": "Caregiving is essential work that is often economically undervalued.",
+      "jp": "介護は不可欠な仕事ですが、経済的に過小評価されがちです。",
+      "hira": "かいご は ふかけつ な しごと です が けいざいてき に かしょう ひょうか されがち です",
+      "mp3": "bc_s35_caregiving_is_essential_work_that_is_often_economically_undervalued.mp3"
+    },
+    {
+      "n": 36,
+      "en": "Household responsibilities should be negotiated rather than assigned by gender.",
+      "jp": "家庭内の責任は、性別で決めずに話し合って分担すべきです。",
+      "hira": "かていない の せきにん は せいべつ で きめず に はなしあって ぶんたん する べき です",
+      "mp3": "bc_s36_household_responsibilities_should_be_negotiated_rather_than_assigned_by_gender.mp3"
+    },
+    {
+      "n": 37,
+      "en": "Emotional support can be as important as practical help.",
+      "jp": "精神的支援は、実際的な助けと同じくらい重要です。",
+      "hira": "せいしんてき しえん は じっさいてき な たすけ と おなじ くらい じゅうよう です",
+      "mp3": "bc_s37_emotional_support_can_be_as_important_as_practical_help.mp3"
+    },
+    {
+      "n": 38,
+      "en": "Shared values can unite relatives who have different lifestyles.",
+      "jp": "共有する価値観は、生活様式の異なる親族を結びつけます。",
+      "hira": "きょうゆう する かちかん は せいかつ ようしき の ことなる しんぞく を むすびつけます",
+      "mp3": "bc_s38_shared_values_can_unite_relatives_who_have_different_lifestyles.mp3"
+    },
+    {
+      "n": 39,
+      "en": "A family tradition remains meaningful when participation is voluntary.",
+      "jp": "家族の伝統は、参加が自発的なときに意味を保ちます。",
+      "hira": "かぞく の でんとう は さんか が じはつてき な とき に いみ を たもちます",
+      "mp3": "bc_s39_a_family_tradition_remains_meaningful_when_participation_is_voluntary.mp3"
+    },
+    {
+      "n": 40,
+      "en": "Work-family conflict affects health, productivity, and relationships.",
+      "jp": "仕事と家庭の葛藤は、健康、生産性、人間関係に影響します。",
+      "hira": "しごと と かてい の かっとう は けんこう せいさんせい にんげん かんけい に えいきょう します",
+      "mp3": "bc_s40_workfamily_conflict_affects_health_productivity_and_relationships.mp3"
+    },
+    {
+      "n": 41,
+      "en": "Paid parental leave can improve outcomes for both parents and children.",
+      "jp": "有給の育児休業は、親と子の双方に良い結果をもたらします。",
+      "hira": "ゆうきゅう の いくじ きゅうぎょう は おや と こ の そうほう に よい けっか を もたらします",
+      "mp3": "bc_s41_paid_parental_leave_can_improve_outcomes_for_both_parents_and_children.mp3"
+    },
+    {
+      "n": 42,
+      "en": "Affordable childcare increases access to employment and education.",
+      "jp": "手頃な保育は、雇用と教育を利用する機会を広げます。",
+      "hira": "てごろ な ほいく は こよう と きょういく を りよう する きかい を ひろげます",
+      "mp3": "bc_s42_affordable_childcare_increases_access_to_employment_and_education.mp3"
+    },
+    {
+      "n": 43,
+      "en": "Eldercare policy must balance independence, safety, and family capacity.",
+      "jp": "高齢者介護政策は、自立、安全、家族の能力のバランスを取る必要があります。",
+      "hira": "こうれいしゃ かいご せいさく は じりつ あんぜん かぞく の のうりょく の ばらんす を とる ひつよう が あります",
+      "mp3": "bc_s43_eldercare_policy_must_balance_independence_safety_and_family_capacity.mp3"
+    },
+    {
+      "n": 44,
+      "en": "Domestic roles change as economic and social expectations evolve.",
+      "jp": "家庭内の役割は、経済的・社会的期待の変化に伴って変わります。",
+      "hira": "かていない の やくわり は けいざいてき しゃかいてき きたい の へんか に ともなって かわります",
+      "mp3": "bc_s44_domestic_roles_change_as_economic_and_social_expectations_evolve.mp3"
+    },
+    {
+      "n": 45,
+      "en": "A strong family bond can survive distance and disagreement.",
+      "jp": "強い家族の絆は、距離や意見の相違があっても続きます。",
+      "hira": "つよい かぞく の きずな は きょり や いけん の そうい が あって も つづきます",
+      "mp3": "bc_s45_a_strong_family_bond_can_survive_distance_and_disagreement.mp3"
+    },
+    {
+      "n": 46,
+      "en": "Effective assistance begins by asking what support is actually needed.",
+      "jp": "効果的な支援は、実際に必要な助けを尋ねることから始まります。",
+      "hira": "こうかてき な しえん は じっさい に ひつよう な たすけ を たずねる こと から はじまります",
+      "mp3": "bc_s46_effective_assistance_begins_by_asking_what_support_is_actually_needed.mp3"
+    },
+    {
+      "n": 47,
+      "en": "Charitable giving should be evaluated by impact, not emotion alone.",
+      "jp": "慈善寄付は、感情だけでなく効果によって評価すべきです。",
+      "hira": "じぜん きふ は かんじょう だけ で なく こうか に よって ひょうか する べき です",
+      "mp3": "bc_s47_charitable_giving_should_be_evaluated_by_impact_not_emotion_alone.mp3"
+    },
+    {
+      "n": 48,
+      "en": "Volunteerism strengthens communities when volunteers receive proper training.",
+      "jp": "ボランティア精神は、参加者が適切な訓練を受けると地域を強くします。",
+      "hira": "ぼらんてぃあ せいしん は さんかしゃ が てきせつ な くんれん を うける と ちいき を つよく します",
+      "mp3": "bc_s48_volunteerism_strengthens_communities_when_volunteers_receive_proper_training.mp3"
+    },
+    {
+      "n": 49,
+      "en": "Community service can build practical skills and social trust.",
+      "jp": "地域奉仕は、実践的な技能と社会的信頼を育てます。",
+      "hira": "ちいき ほうし は じっせんてき な ぎのう と しゃかいてき しんらい を そだてます",
+      "mp3": "bc_s49_community_service_can_build_practical_skills_and_social_trust.mp3"
+    },
+    {
+      "n": 50,
+      "en": "Social responsibility applies to organizations as well as individuals.",
+      "jp": "社会的責任は、個人だけでなく組織にも当てはまります。",
+      "hira": "しゃかいてき せきにん は こじん だけ で なく そしき にも あてはまります",
+      "mp3": "bc_s50_social_responsibility_applies_to_organizations_as_well_as_individuals.mp3"
+    },
+    {
+      "n": 51,
+      "en": "Bystander intervention should protect the victim without creating greater danger.",
+      "jp": "傍観者の介入は、より大きな危険を生まずに被害者を守るべきです。",
+      "hira": "ぼうかんしゃ の かいにゅう は より おおきな きけん を うまず に ひがいしゃ を まもる べき です",
+      "mp3": "bc_s51_bystander_intervention_should_protect_the_victim_without_creating_greater_danger.mp3"
+    },
+    {
+      "n": 52,
+      "en": "Emergency response depends on preparation, communication, and clear authority.",
+      "jp": "緊急対応は、準備、意思疎通、明確な権限に左右されます。",
+      "hira": "きんきゅう たいおう は じゅんび いし そつう めいかく な けんげん に さゆう されます",
+      "mp3": "bc_s52_emergency_response_depends_on_preparation_communication_and_clear_authority.mp3"
+    },
+    {
+      "n": 53,
+      "en": "Accessibility benefits many people beyond those with permanent disabilities.",
+      "jp": "利用しやすさは、永続的な障害のある人以外にも多くの人に役立ちます。",
+      "hira": "りよう しやすさ は えいぞくてき な しょうがい の ある ひと いがい にも おおく の ひと に やくだちます",
+      "mp3": "bc_s53_accessibility_benefits_many_people_beyond_those_with_permanent_disabilities.mp3"
+    },
+    {
+      "n": 54,
+      "en": "Mutual aid relies on cooperation among people with shared needs.",
+      "jp": "相互扶助は、共通の必要を持つ人々の協力に支えられます。",
+      "hira": "そうご ふじょ は きょうつう の ひつよう を もつ ひとびと の きょうりょく に ささえられます",
+      "mp3": "bc_s54_mutual_aid_relies_on_cooperation_among_people_with_shared_needs.mp3"
+    },
+    {
+      "n": 55,
+      "en": "Humanitarian relief must reach people without discrimination.",
+      "jp": "人道支援は、差別なく人々に届かなければなりません。",
+      "hira": "じんどう しえん は さべつ なく ひとびと に とどかなければ なりません",
+      "mp3": "bc_s55_humanitarian_relief_must_reach_people_without_discrimination.mp3"
+    },
+    {
+      "n": 56,
+      "en": "Reliable public services reduce inequality and improve social stability.",
+      "jp": "信頼できる公共サービスは、不平等を減らし社会の安定を高めます。",
+      "hira": "しんらい できる こうきょう さーびす は ふびょうどう を へらし しゃかい の あんてい を たかめます",
+      "mp3": "bc_s56_reliable_public_services_reduce_inequality_and_improve_social_stability.mp3"
+    },
+    {
+      "n": 57,
+      "en": "Crisis management requires accurate information and rapid coordination.",
+      "jp": "危機管理には、正確な情報と迅速な連携が必要です。",
+      "hira": "きき かんり には せいかく な じょうほう と じんそく な れんけい が ひつよう です",
+      "mp3": "bc_s57_crisis_management_requires_accurate_information_and_rapid_coordination.mp3"
+    },
+    {
+      "n": 58,
+      "en": "Resource allocation becomes difficult when needs exceed available support.",
+      "jp": "必要が利用可能な支援を上回ると、資源配分は難しくなります。",
+      "hira": "ひつよう が りよう かのう な しえん を うわまわる と しげん はいぶん は むずかしく なります",
+      "mp3": "bc_s58_resource_allocation_becomes_difficult_when_needs_exceed_available_support.mp3"
+    },
+    {
+      "n": 59,
+      "en": "Vulnerable populations should participate in decisions that affect them.",
+      "jp": "弱い立場の人々は、自分たちに影響する決定に参加すべきです。",
+      "hira": "よわい たちば の ひとびと は じぶんたち に えいきょう する けってい に さんか する べき です",
+      "mp3": "bc_s59_vulnerable_populations_should_participate_in_decisions_that_affect_them.mp3"
+    },
+    {
+      "n": 60,
+      "en": "Civic engagement turns concern about society into collective action.",
+      "jp": "市民参加は、社会への関心を集団的な行動に変えます。",
+      "hira": "しみん さんか は しゃかい への かんしん を しゅうだんてき な こうどう に かえます",
+      "mp3": "bc_s60_civic_engagement_turns_concern_about_society_into_collective_action.mp3"
+    }
+  ]
+}

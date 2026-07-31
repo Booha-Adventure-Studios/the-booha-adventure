@@ -1,1 +1,424 @@
-
+{
+  "cards": [
+    {
+      "n": 1,
+      "en": "I feel joyful when I see my friends.",
+      "jp": "友達を見ると私は嬉しいです。",
+      "hira": "ともだちをみるとわたしはうれしいです。",
+      "mp3": "br_s01_i_feel_joyful_when_i_see_my_friends.mp3"
+    },
+    {
+      "n": 2,
+      "en": "Sometimes I feel lonely when I'm at home.",
+      "jp": "家にいるとき、時々寂しく感じます。",
+      "hira": "いえにいるとき、ときどきさびしくかんじます。",
+      "mp3": "br_s02_sometimes_i_feel_lonely_when_i_m_at_home.mp3"
+    },
+    {
+      "n": 3,
+      "en": "I try to stay calm when things get tough.",
+      "jp": "大変なときは冷静にしようとします。",
+      "hira": "たいへんなときはれいせいにしようとします。",
+      "mp3": "br_s03_i_try_to_stay_calm_when_things_get_tough.mp3"
+    },
+    {
+      "n": 4,
+      "en": "My friend always cheers me up when I'm down.",
+      "jp": "友達は私が落ち込んでいるとき、いつも元気づけてくれます。",
+      "hira": "ともだちはわたしがおちこんでいるとき、いつもげんきづけてくれます。",
+      "mp3": "br_s04_my_friend_always_cheers_me_up_when_i_m_down.mp3"
+    },
+    {
+      "n": 5,
+      "en": "I feel grateful for my supportive family.",
+      "jp": "支えてくれる家族に感謝しています。",
+      "hira": "ささえてくれるかぞくにかんしゃしています。",
+      "mp3": "br_s05_i_feel_grateful_for_my_supportive_family.mp3"
+    },
+    {
+      "n": 6,
+      "en": "Respecting others is important for friendship.",
+      "jp": "他の人を尊重することは友情にとって大切です。",
+      "hira": "ほかのひとをそんちょうすることはゆうじょうにとってたいせつです。",
+      "mp3": "br_s06_respecting_others_is_important_for_friendship.mp3"
+    },
+    {
+      "n": 7,
+      "en": "I enjoy spending time with my siblings.",
+      "jp": "兄弟と過ごす時間が好きです。",
+      "hira": "きょうだいとすごすじかんがすきです。",
+      "mp3": "br_s07_i_enjoy_spending_time_with_my_siblings.mp3"
+    },
+    {
+      "n": 8,
+      "en": "Celebrating special occasions brings us closer.",
+      "jp": "特別な日を祝うことは私たちをより親密にします。",
+      "hira": "とくべつなひをいわうことはわたしたちをよりしんみつにします。",
+      "mp3": "br_s08_celebrating_special_occasions_brings_us_closer.mp3"
+    },
+    {
+      "n": 9,
+      "en": "I feel proud when I help others.",
+      "jp": "他の人を助けるとき、私は誇りに思います。",
+      "hira": "ほかのひとをたすけるとき、わたしはほこりにおもいます。",
+      "mp3": "br_s09_i_feel_proud_when_i_help_others.mp3"
+    },
+    {
+      "n": 10,
+      "en": "I always listen carefully to my parents.",
+      "jp": "私はいつも両親の話を注意深く聞きます。",
+      "hira": "わたしはいつもりょうしんのはなしをちゅういぶかくききます。",
+      "mp3": "br_s10_i_always_listen_carefully_to_my_parents.mp3"
+    },
+    {
+      "n": 11,
+      "en": "I feel safe when I am with my family.",
+      "jp": "家族と一緒にいるとき、私は安全だと感じます。",
+      "hira": "かぞくといっしょにいるとき、わたしはあんぜんだとかんじます。",
+      "mp3": "br_s11_i_feel_safe_when_i_am_with_my_family.mp3"
+    },
+    {
+      "n": 12,
+      "en": "My friends and I share our feelings openly.",
+      "jp": "友達と私は気持ちをオープンに共有します。",
+      "hira": "ともだちとわたしはきもちをおーぷんにきょうゆうします。",
+      "mp3": "br_s12_my_friends_and_i_share_our_feelings_openly.mp3"
+    },
+    {
+      "n": 13,
+      "en": "I feel excited about the upcoming festival.",
+      "jp": "近づいている祭りにワクワクしています。",
+      "hira": "ちかづいているまつりにわくわくしています。",
+      "mp3": "br_s13_i_feel_excited_about_the_upcoming_festival.mp3"
+    },
+    {
+      "n": 14,
+      "en": "I respect my friend's opinions even when we disagree.",
+      "jp": "意見が合わなくても友達の意見を尊重します。",
+      "hira": "いけんがあわなくてもともだちのいけんをそんちょうします。",
+      "mp3": "br_s14_i_respect_my_friend_s_opinions_even_when_we_disagree.mp3"
+    },
+    {
+      "n": 15,
+      "en": "I feel a sense of belonging with my classmates.",
+      "jp": "クラスメートといるとき、帰属感を感じます。",
+      "hira": "くらすめーとにいるとき、きぞくかんをかんじます。",
+      "mp3": "br_s15_i_feel_a_sense_of_belonging_with_my_classmates.mp3"
+    },
+    {
+      "n": 16,
+      "en": "I help my parents with chores around the house.",
+      "jp": "家の仕事を手伝って両親を助けます。",
+      "hira": "いえのしごとをてつだってりょうしんをたすけます。",
+      "mp3": "br_s16_i_help_my_parents_with_chores_around_the_house.mp3"
+    },
+    {
+      "n": 17,
+      "en": "I feel nervous before giving a presentation.",
+      "jp": "プレゼンテーションの前に緊張します。",
+      "hira": "ぷれぜんてーしょんのまえにきんちょうします。",
+      "mp3": "br_s17_i_feel_nervous_before_giving_a_presentation.mp3"
+    },
+    {
+      "n": 18,
+      "en": "It is important to communicate clearly with friends.",
+      "jp": "友達と明確にコミュニケーションを取ることが大切です。",
+      "hira": "ともだちとはっきりこみゅにけーしょんをとることがたいせつです。",
+      "mp3": "br_s18_it_is_important_to_communicate_clearly_with_friends.mp3"
+    },
+    {
+      "n": 19,
+      "en": "I feel happy when I see my family smile.",
+      "jp": "家族の笑顔を見ると嬉しいです。",
+      "hira": "かぞくのえがおをみるとうれしいです。",
+      "mp3": "br_s19_i_feel_happy_when_i_see_my_family_smile.mp3"
+    },
+    {
+      "n": 20,
+      "en": "I always say kind words to my friends.",
+      "jp": "友達にはいつも優しい言葉をかけます。",
+      "hira": "ともだちにはいつもやさしいことばをかけます。",
+      "mp3": "br_s20_i_always_say_kind_words_to_my_friends.mp3"
+    },
+    {
+      "n": 21,
+      "en": "I help my friends when they are in trouble.",
+      "jp": "友達が困っているとき、私は助けます。",
+      "hira": "ともだちがこまっているとき、わたしはたすけます。",
+      "mp3": "br_s21_i_help_my_friends_when_they_are_in_trouble.mp3"
+    },
+    {
+      "n": 22,
+      "en": "I feel excited when I receive good news.",
+      "jp": "良い知らせを受け取るとワクワクします。",
+      "hira": "よいしらせをうけとるとわくわくします。",
+      "mp3": "br_s22_i_feel_excited_when_i_receive_good_news.mp3"
+    },
+    {
+      "n": 23,
+      "en": "I enjoy planning surprises for my family.",
+      "jp": "家族のためにサプライズを計画するのが楽しいです。",
+      "hira": "かぞくのためにさぷらいずをけいかくするのがたのしいです。",
+      "mp3": "br_s23_i_enjoy_planning_surprises_for_my_family.mp3"
+    },
+    {
+      "n": 24,
+      "en": "I feel relieved after finishing my homework.",
+      "jp": "宿題を終えた後、ほっとします。",
+      "hira": "しゅくだいをおえたあと、ほっとします。",
+      "mp3": "br_s24_i_feel_relieved_after_finishing_my_homework.mp3"
+    },
+    {
+      "n": 25,
+      "en": "I always help my younger siblings with their studies.",
+      "jp": "私はいつも弟妹の勉強を手伝います。",
+      "hira": "わたしはいつもいもうとのべんきょうをてつだいます。",
+      "mp3": "br_s25_i_always_help_my_younger_siblings_with_their_studies.mp3"
+    },
+    {
+      "n": 26,
+      "en": "I feel thankful for my friends who support me.",
+      "jp": "私を支えてくれる友達に感謝しています。",
+      "hira": "わたしをささえてくれるともだちにかんしゃしています。",
+      "mp3": "br_s26_i_feel_thankful_for_my_friends_who_support_me.mp3"
+    },
+    {
+      "n": 27,
+      "en": "I enjoy celebrating holidays with my family.",
+      "jp": "家族と一緒に祝日を祝うのが楽しいです。",
+      "hira": "かぞくといっしょにしゅくじつをいわうのがたのしいです。",
+      "mp3": "br_s27_i_enjoy_celebrating_holidays_with_my_family.mp3"
+    },
+    {
+      "n": 28,
+      "en": "I feel safe when I follow safety rules.",
+      "jp": "安全ルールに従うとき、私は安全だと感じます。",
+      "hira": "あんぜんるーるにしたがうとき、わたしはあんぜんだとかんじます。",
+      "mp3": "br_s28_i_feel_safe_when_i_follow_safety_rules.mp3"
+    },
+    {
+      "n": 29,
+      "en": "I ask my friends for help when I need it.",
+      "jp": "必要なときに友達に助けを求めます。",
+      "hira": "ひつようなときにともだちにたすけをもとめます。",
+      "mp3": "br_s29_i_ask_my_friends_for_help_when_i_need_it.mp3"
+    },
+    {
+      "n": 30,
+      "en": "I feel proud of my achievements in school.",
+      "jp": "学校での成果を誇りに思います。",
+      "hira": "がっこうでのせいかをほこりにおもいます。",
+      "mp3": "br_s30_i_feel_proud_of_my_achievements_in_school.mp3"
+    },
+    {
+      "n": 31,
+      "en": "I try to understand my friends' feelings.",
+      "jp": "友達の気持ちを理解しようとします。",
+      "hira": "ともだちのきもちをりかいしようとします。",
+      "mp3": "br_s31_i_try_to_understand_my_friends_feelings.mp3"
+    },
+    {
+      "n": 32,
+      "en": "I feel happy when I help my community.",
+      "jp": "地域を助けるとき、私は幸せを感じます。",
+      "hira": "ちいきをたすけるとき、わたしはしあわせをかんじます。",
+      "mp3": "br_s32_i_feel_happy_when_i_help_my_community.mp3"
+    },
+    {
+      "n": 33,
+      "en": "I communicate my thoughts clearly during discussions.",
+      "jp": "話し合いのとき、自分の考えをはっきり伝えます。",
+      "hira": "はなしあいのとき、じぶんのかんがえをはっきりつたえます。",
+      "mp3": "br_s33_i_communicate_my_thoughts_clearly_during_discussions.mp3"
+    },
+    {
+      "n": 34,
+      "en": "I feel excited to learn new things every day.",
+      "jp": "毎日新しいことを学ぶのが楽しみです。",
+      "hira": "まいにちあたらしいことをまなぶのがたのしみです。",
+      "mp3": "br_s34_i_feel_excited_to_learn_new_things_every_day.mp3"
+    },
+    {
+      "n": 35,
+      "en": "I respect my teachers and their hard work.",
+      "jp": "先生とその努力を尊重します。",
+      "hira": "せんせいとそのどりょくをそんちょうします。",
+      "mp3": "br_s35_i_respect_my_teachers_and_their_hard_work.mp3"
+    },
+    {
+      "n": 36,
+      "en": "I feel comforted by my family's love.",
+      "jp": "家族の愛に慰められます。",
+      "hira": "かぞくのあいになぐさめられます。",
+      "mp3": "br_s36_i_feel_comforted_by_my_family_s_love.mp3"
+    },
+    {
+      "n": 37,
+      "en": "I celebrate my friends' successes with joy.",
+      "jp": "友達の成功を喜んで祝います。",
+      "hira": "ともだちのせいこうをよろこんでいわいます。",
+      "mp3": "br_s37_i_celebrate_my_friends_successes_with_joy.mp3"
+    },
+    {
+      "n": 38,
+      "en": "I feel determined to achieve my goals.",
+      "jp": "目標を達成するために決意しています。",
+      "hira": "もくひょうをたっせいするためにけついしています。",
+      "mp3": "br_s38_i_feel_determined_to_achieve_my_goals.mp3"
+    },
+    {
+      "n": 39,
+      "en": "I help my friends find their way when they are lost.",
+      "jp": "友達が迷ったとき、道を教えます。",
+      "hira": "ともだちがまよったとき、みちをおしえます。",
+      "mp3": "br_s39_i_help_my_friends_find_their_way_when_they_are_lost.mp3"
+    },
+    {
+      "n": 40,
+      "en": "I feel grateful for the support of my family.",
+      "jp": "家族の支えに感謝しています。",
+      "hira": "かぞくのささえにかんしゃしています。",
+      "mp3": "br_s40_i_feel_grateful_for_the_support_of_my_family.mp3"
+    },
+    {
+      "n": 41,
+      "en": "I always try to be a good listener.",
+      "jp": "私はいつも良い聞き手になろうとします。",
+      "hira": "わたしはいつもよいききてになろうとします。",
+      "mp3": "br_s41_i_always_try_to_be_a_good_listener.mp3"
+    },
+    {
+      "n": 42,
+      "en": "I feel excited about my birthday party.",
+      "jp": "誕生日パーティーを楽しみにしています。",
+      "hira": "たんじょうびぱーてぃーをたのしみにしています。",
+      "mp3": "br_s42_i_feel_excited_about_my_birthday_party.mp3"
+    },
+    {
+      "n": 43,
+      "en": "I help my neighbors when they need assistance.",
+      "jp": "隣人が助けを必要とするとき、私は手伝います。",
+      "hira": "りんじんがたすけをひつようとするとき、わたしはてつだいます。",
+      "mp3": "br_s43_i_help_my_neighbors_when_they_need_assistance.mp3"
+    },
+    {
+      "n": 44,
+      "en": "I feel happy when I receive compliments.",
+      "jp": "褒められると嬉しいです。",
+      "hira": "ほめられるとうれしいです。",
+      "mp3": "br_s44_i_feel_happy_when_i_receive_compliments.mp3"
+    },
+    {
+      "n": 45,
+      "en": "I respect my friends' choices and decisions.",
+      "jp": "友達の選択や決定を尊重します。",
+      "hira": "ともだちのせんたくやけっていをそんちょうします。",
+      "mp3": "br_s45_i_respect_my_friends_choices_and_decisions.mp3"
+    },
+    {
+      "n": 46,
+      "en": "I feel a sense of achievement after completing a project.",
+      "jp": "プロジェクトを終えた後、達成感を感じます。",
+      "hira": "ぷろじぇくとをおえたあと、たっせいかんをかんじます。",
+      "mp3": "br_s46_i_feel_a_sense_of_achievement_after_completing_a_project.mp3"
+    },
+    {
+      "n": 47,
+      "en": "I always say please and thank you to show respect.",
+      "jp": "敬意を示すために、いつも「お願いします」と「ありがとう」と言います。",
+      "hira": "けいいをしめすために、いつも「おねがいします」と「ありがとう」といいます。",
+      "mp3": "br_s47_i_always_say_please_and_thank_you_to_show_respect.mp3"
+    },
+    {
+      "n": 48,
+      "en": "I feel happy when I help my friends solve problems.",
+      "jp": "友達の問題を解決する手助けをすると嬉しいです。",
+      "hira": "ともだちのもんだいをかいけつするてだすけをするとうれしいです。",
+      "mp3": "br_s48_i_feel_happy_when_i_help_my_friends_solve_problems.mp3"
+    },
+    {
+      "n": 49,
+      "en": "I enjoy sharing my toys with my friends.",
+      "jp": "友達とおもちゃを共有するのが楽しいです。",
+      "hira": "ともだちとおもちゃをきょうゆうするのがたのしいです。",
+      "mp3": "br_s49_i_enjoy_sharing_my_toys_with_my_friends.mp3"
+    },
+    {
+      "n": 50,
+      "en": "I feel safe when I follow the rules at school.",
+      "jp": "学校のルールに従うとき、私は安全だと感じます。",
+      "hira": "がっこうのるーるにしたがうとき、わたしはあんぜんだとかんじます。",
+      "mp3": "br_s50_i_feel_safe_when_i_follow_the_rules_at_school.mp3"
+    },
+    {
+      "n": 51,
+      "en": "I help my friends feel better when they are sad.",
+      "jp": "友達が悲しいとき、気持ちを楽にする手助けをします。",
+      "hira": "ともだちがかなしいとき、きもちをらくにするてだすけをします。",
+      "mp3": "br_s51_i_help_my_friends_feel_better_when_they_are_sad.mp3"
+    },
+    {
+      "n": 52,
+      "en": "I feel excited to try new activities.",
+      "jp": "新しい活動に挑戦するのが楽しみです。",
+      "hira": "あたらしいかつどうにちょうせんするのがたのしみです。",
+      "mp3": "br_s52_i_feel_excited_to_try_new_activities.mp3"
+    },
+    {
+      "n": 53,
+      "en": "I respect my family's traditions and values.",
+      "jp": "家族の伝統や価値観を尊重します。",
+      "hira": "かぞくのでんとうやかちかんをそんちょうします。",
+      "mp3": "br_s53_i_respect_my_family_s_traditions_and_values.mp3"
+    },
+    {
+      "n": 54,
+      "en": "I feel happy when I see my friends succeed.",
+      "jp": "友達が成功するのを見ると嬉しいです。",
+      "hira": "ともだちがせいこうするのをみるとうれしいです。",
+      "mp3": "br_s54_i_feel_happy_when_i_see_my_friends_succeed.mp3"
+    },
+    {
+      "n": 55,
+      "en": "I help my family by doing my chores.",
+      "jp": "家事をすることで家族を助けます。",
+      "hira": "かじをすることでかぞくをたすけます。",
+      "mp3": "br_s55_i_help_my_family_by_doing_my_chores.mp3"
+    },
+    {
+      "n": 56,
+      "en": "I feel proud of my accomplishments in sports.",
+      "jp": "スポーツでの成果を誇りに思います。",
+      "hira": "すぽーつでのせいかをほこりにおもいます。",
+      "mp3": "br_s56_i_feel_proud_of_my_accomplishments_in_sports.mp3"
+    },
+    {
+      "n": 57,
+      "en": "I enjoy talking with my friends about our dreams.",
+      "jp": "友達と夢について話すのが楽しいです。",
+      "hira": "ともだちとゆめについてはなすのがたのしいです。",
+      "mp3": "br_s57_i_enjoy_talking_with_my_friends_about_our_dreams.mp3"
+    },
+    {
+      "n": 58,
+      "en": "I feel comforted when I talk to my family about my worries.",
+      "jp": "心配事について家族と話すと安心します。",
+      "hira": "しんぱいごとについてかぞくとはなすとあんしんします。",
+      "mp3": "br_s58_i_feel_comforted_when_i_talk_to_my_family_about_my_worries.mp3"
+    },
+    {
+      "n": 59,
+      "en": "I help my friends find solutions to their problems.",
+      "jp": "友達の問題に対する解決策を見つける手助けをします。",
+      "hira": "ともだちのもんだいにたいするかいけつさくをみつけるてだすけをします。",
+      "mp3": "br_s59_i_help_my_friends_find_solutions_to_their_problems.mp3"
+    },
+    {
+      "n": 60,
+      "en": "I feel excited to celebrate with my friends.",
+      "jp": "友達と一緒に祝うのが楽しみです。",
+      "hira": "ともだちといっしょにいわうのがたのしみです.",
+      "mp3": "br_s60_i_feel_excited_to_celebrate_with_my_friends.mp3"
+    }
+  ]
+}
