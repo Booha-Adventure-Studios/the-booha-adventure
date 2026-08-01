@@ -1,75 +1,424 @@
-
 {
   "cards": [
-    { "n": 1, "en": "I am from Japan.", "jp": "私は日本の出身です。", "hira": "わたし は にほん の しゅっしん です", "mp3": "br_s01_i_am_from_japan.mp3" },
-    { "n": 2, "en": "I am Japanese.", "jp": "私は日本人です。", "hira": "わたし は にほんじん です", "mp3": "br_s02_i_am_japanese.mp3" },
-    { "n": 3, "en": "My nationality is Japanese.", "jp": "私の国籍は日本です。", "hira": "わたし の こくせき は にほん です", "mp3": "br_s03_my_nationality_is_japanese.mp3" },
-    { "n": 4, "en": "I’m from a big city.", "jp": "私は大きな都市の出身です。", "hira": "わたし は おおきな とし の しゅっしん です", "mp3": "br_s04_im_from_a_big_city.mp3" },
-    { "n": 5, "en": "She is from Canada.", "jp": "彼女はカナダ出身です。", "hira": "かのじょ は かなだ しゅっしん です", "mp3": "br_s05_she_is_from_canada.mp3" },
-    { "n": 6, "en": "He is Korean.", "jp": "彼は韓国人です。", "hira": "かれ は かんこくじん です", "mp3": "br_s06_he_is_korean.mp3" },
-    { "n": 7, "en": "They are from the U.K.", "jp": "彼らはイギリス出身です。", "hira": "かれら は いぎりす しゅっしん です", "mp3": "br_s07_they_are_from_the_uk.mp3" },
-    { "n": 8, "en": "I speak Japanese and English.", "jp": "私は日本語と英語を話します。", "hira": "わたし は にほんご と えいご を はなします", "mp3": "br_s08_i_speak_japanese_and_english.mp3" },
-    { "n": 9, "en": "She speaks Spanish.", "jp": "彼女はスペイン語を話します。", "hira": "かのじょ は すぺいんご を はなします", "mp3": "br_s09_she_speaks_spanish.mp3" },
-    { "n": 10, "en": "Do you speak Chinese?", "jp": "中国語を話しますか。", "hira": "ちゅうごくご を はなします か", "mp3": "br_s10_do_you_speak_chinese.mp3" },
-
-    { "n": 11, "en": "What country are you from?", "jp": "どこの国の出身ですか。", "hira": "どこ の くに の しゅっしん です か", "mp3": "br_s11_what_country_are_you_from.mp3" },
-    { "n": 12, "en": "What is the capital of France?", "jp": "フランスの首都はどこですか。", "hira": "ふらんす の しゅと は どこ です か", "mp3": "br_s12_what_is_the_capital_of_france.mp3" },
-    { "n": 13, "en": "The flag is red and white.", "jp": "その旗は赤と白です。", "hira": "その はた は あか と しろ です", "mp3": "br_s13_the_flag_is_red_and_white.mp3" },
-    { "n": 14, "en": "My city is near the sea.", "jp": "私の町は海の近くにあります。", "hira": "わたし の まち は うみ の ちかく に あります", "mp3": "br_s14_my_city_is_near_the_sea.mp3" },
-    { "n": 15, "en": "There are many languages in the world.", "jp": "世界には多くの言語があります。", "hira": "せかい に は おおく の げんご が あります", "mp3": "br_s15_there_are_many_languages_in_the_world.mp3" },
-
-    { "n": 16, "en": "There is a castle in Himeji.", "jp": "姫路には城があります。", "hira": "ひめじ に は しろ が あります", "mp3": "br_s16_there_is_a_castle_in_himeji.mp3" },
-    { "n": 17, "en": "There are many temples in Kyoto.", "jp": "京都には寺がたくさんあります。", "hira": "きょうと に は てら が たくさん あります", "mp3": "br_s17_there_are_many_temples_in_kyoto.mp3" },
-    { "n": 18, "en": "There is a big tower near the river.", "jp": "川の近くに大きなタワーがあります。", "hira": "かわ の ちかく に おおきな たわー が あります", "mp3": "br_s18_there_is_a_big_tower_near_the_river.mp3" },
-    { "n": 19, "en": "There are gardens behind the palace.", "jp": "宮殿の後ろに庭園があります。", "hira": "きゅうでん の うしろ に ていえん が あります", "mp3": "br_s19_there_are_gardens_behind_the_palace.mp3" },
-    { "n": 20, "en": "There is a museum on this street.", "jp": "この通りに博物館があります。", "hira": "この とおり に はくぶつかん が あります", "mp3": "br_s20_there_is_a_museum_on_this_street.mp3" },
-
-    { "n": 21, "en": "There are shops around the square.", "jp": "広場のまわりに店があります。", "hira": "ひろば の まわり に みせ が あります", "mp3": "br_s21_there_are_shops_around_the_square.mp3" },
-    { "n": 22, "en": "There is a famous bridge in Osaka.", "jp": "大阪には有名な橋があります。", "hira": "おおさか に は ゆうめい な はし が あります", "mp3": "br_s22_there_is_a_famous_bridge_in_osaka.mp3" },
-    { "n": 23, "en": "There are tickets at the entrance.", "jp": "入口にチケットがあります。", "hira": "いりぐち に ちけっと が あります", "mp3": "br_s23_there_are_tickets_at_the_entrance.mp3" },
-    { "n": 24, "en": "There is a statue in the park.", "jp": "公園に像があります。", "hira": "こうえん に ぞう が あります", "mp3": "br_s24_there_is_a_statue_in_the_park.mp3" },
-    { "n": 25, "en": "There are cherry trees in the garden.", "jp": "庭園に桜の木があります。", "hira": "ていえん に さくら の き が あります", "mp3": "br_s25_there_are_cherry_trees_in_the_garden.mp3" },
-
-    { "n": 26, "en": "Is there a shrine near here?", "jp": "この近くに神社はありますか。", "hira": "この ちかく に じんじゃ は あります か", "mp3": "br_s26_is_there_a_shrine_near_here.mp3" },
-    { "n": 27, "en": "Are there any landmarks in your town?", "jp": "あなたの町に名所はありますか。", "hira": "あなた の まち に めいしょ は あります か", "mp3": "br_s27_are_there_any_landmarks_in_your_town.mp3" },
-    { "n": 28, "en": "There is a market on Sunday.", "jp": "日曜日に市場があります。", "hira": "にちようび に いちば が あります", "mp3": "br_s28_there_is_a_market_on_sunday.mp3" },
-    { "n": 29, "en": "There are many tourists in summer.", "jp": "夏には観光客がたくさんいます。", "hira": "なつ に は かんこうきゃく が たくさん います", "mp3": "br_s29_there_are_many_tourists_in_summer.mp3" },
-    { "n": 30, "en": "There is a good view from the tower.", "jp": "タワーからの景色は良いです。", "hira": "たわー から の けしき は よい です", "mp3": "br_s30_there_is_a_good_view_from_the_tower.mp3" },
-
-    { "n": 31, "en": "Japan is different from my friend’s country.", "jp": "日本は友だちの国と違います。", "hira": "にほん は ともだち の くに と ちがいます", "mp3": "br_s31_japan_is_different_from_my_friends_country.mp3" },
-    { "n": 32, "en": "People bow in Japan.", "jp": "日本ではおじぎをします。", "hira": "にほん では おじぎ を します", "mp3": "br_s32_people_bow_in_japan.mp3" },
-    { "n": 33, "en": "People shake hands in many countries.", "jp": "多くの国では握手をします。", "hira": "おおく の くに では あくしゅ を します", "mp3": "br_s33_people_shake_hands_in_many_countries.mp3" },
-    { "n": 34, "en": "We take off our shoes at the door.", "jp": "私たちは玄関で靴をぬぎます。", "hira": "わたしたち は げんかん で くつ を ぬぎます", "mp3": "br_s34_we_take_off_our_shoes_at_the_door.mp3" },
-    { "n": 35, "en": "Some people eat with chopsticks.", "jp": "箸で食べる人もいます。", "hira": "はし で たべる ひと も います", "mp3": "br_s35_some_people_eat_with_chopsticks.mp3" },
-
-    { "n": 36, "en": "I prefer rice to bread.", "jp": "私はパンよりご飯のほうが好きです。", "hira": "わたし は ぱん より ごはん の ほう が すき です", "mp3": "br_s36_i_prefer_rice_to_bread.mp3" },
-    { "n": 37, "en": "I prefer tea to coffee.", "jp": "私はコーヒーよりお茶のほうが好きです。", "hira": "わたし は こーひー より おちゃ の ほう が すき です", "mp3": "br_s37_i_prefer_tea_to_coffee.mp3" },
-    { "n": 38, "en": "Summer festivals are exciting.", "jp": "夏祭りは楽しいです。", "hira": "なつまつり は たのしい です", "mp3": "br_s38_summer_festivals_are_exciting.mp3" },
-    { "n": 39, "en": "New Year is an important holiday.", "jp": "お正月は大切な祝日です。", "hira": "おしょうがつ は たいせつ な しゅくじつ です", "mp3": "br_s39_new_year_is_an_important_holiday.mp3" },
-    { "n": 40, "en": "Gift-giving is part of the culture.", "jp": "贈り物は文化の一部です。", "hira": "おくりもの は ぶんか の いちぶ です", "mp3": "br_s40_giftgiving_is_part_of_the_culture.mp3" },
-
-    { "n": 41, "en": "It is polite to say “thank you.”", "jp": "「ありがとう」と言うのは丁寧です。", "hira": "ありがとう と いう の は ていねい です", "mp3": "br_s41_it_is_polite_to_say_thank_you.mp3" },
-    { "n": 42, "en": "Let’s compare two customs.", "jp": "二つの習慣を比べましょう。", "hira": "ふたつ の しゅうかん を くらべましょう", "mp3": "br_s42_lets_compare_two_customs.mp3" },
-    { "n": 43, "en": "This rule is the same at my school.", "jp": "このルールは私の学校でも同じです。", "hira": "この るーる は わたし の がっこう でも おなじ です", "mp3": "br_s43_this_rule_is_the_same_at_my_school.mp3" },
-    { "n": 44, "en": "Food is different in each country.", "jp": "国ごとに食べ物は違います。", "hira": "くに ごと に たべもの は ちがいます", "mp3": "br_s44_food_is_different_in_each_country.mp3" },
-    { "n": 45, "en": "I like learning about traditions.", "jp": "伝統について学ぶのが好きです。", "hira": "でんとう について まなぶ の が すき です", "mp3": "br_s45_i_like_learning_about_traditions.mp3" },
-
-    { "n": 46, "en": "I’d like to visit Okinawa.", "jp": "沖縄に行ってみたいです。", "hira": "おきなわ に いって みたい です", "mp3": "br_s46_id_like_to_visit_okinawa.mp3" },
-    { "n": 47, "en": "I’d like to try local food.", "jp": "その土地の食べ物を食べてみたいです。", "hira": "その とち の たべもの を たべて みたい です", "mp3": "br_s47_id_like_to_try_local_food.mp3" },
-    { "n": 48, "en": "I’d like to see a famous temple.", "jp": "有名なお寺を見てみたいです。", "hira": "ゆうめい な おてら を みて みたい です", "mp3": "br_s48_id_like_to_see_a_famous_temple.mp3" },
-    { "n": 49, "en": "I’d like to stay at a hotel near the station.", "jp": "駅の近くのホテルに泊まりたいです。", "hira": "えき の ちかく の ほてる に とまりたい です", "mp3": "br_s49_id_like_to_stay_at_a_hotel_near_the_station.mp3" },
-    { "n": 50, "en": "I want to travel by train.", "jp": "電車で旅行したいです。", "hira": "でんしゃ で りょこう したい です", "mp3": "br_s50_i_want_to_travel_by_train.mp3" },
-
-    { "n": 51, "en": "I want to make a reservation.", "jp": "予約をしたいです。", "hira": "よやく を したい です", "mp3": "br_s51_i_want_to_make_a_reservation.mp3" },
-    { "n": 52, "en": "I want to buy a ticket online.", "jp": "オンラインでチケットを買いたいです。", "hira": "おんらいん で ちけっと を かいたい です", "mp3": "br_s52_i_want_to_buy_a_ticket_online.mp3" },
-    { "n": 53, "en": "I want to pack a small suitcase.", "jp": "小さなスーツケースに荷物を入れたいです。", "hira": "ちいさな すーつけーす に にもつ を いれたい です", "mp3": "br_s53_i_want_to_pack_a_small_suitcase.mp3" },
-    { "n": 54, "en": "I’m going to check the schedule.", "jp": "予定を確認するつもりです。", "hira": "よてい を かくにん する つもり です", "mp3": "br_s54_im_going_to_check_the_schedule.mp3" },
-    { "n": 55, "en": "I’m going to bring my passport.", "jp": "パスポートを持っていくつもりです。", "hira": "ぱすぽーと を もって いく つもり です", "mp3": "br_s55_im_going_to_bring_my_passport.mp3" },
-
-    { "n": 56, "en": "I’m going to meet my friend at the airport.", "jp": "空港で友だちに会うつもりです。", "hira": "くうこう で ともだち に あう つもり です", "mp3": "br_s56_im_going_to_meet_my_friend_at_the_airport.mp3" },
-    { "n": 57, "en": "I’m going to take many photos.", "jp": "写真をたくさん撮るつもりです。", "hira": "しゃしん を たくさん とる つもり です", "mp3": "br_s57_im_going_to_take_many_photos.mp3" },
-    { "n": 58, "en": "I’m going to use a map app.", "jp": "地図アプリを使うつもりです。", "hira": "ちず あぷり を つかう つもり です", "mp3": "br_s58_im_going_to_use_a_map_app.mp3" },
-    { "n": 59, "en": "I’m going to practice English with tourists.", "jp": "観光客と英語を練習するつもりです。", "hira": "かんこうきゃく と えいご を れんしゅう する つもり です", "mp3": "br_s59_im_going_to_practice_english_with_tourists.mp3" },
-    { "n": 60, "en": "I’m going to have fun and stay safe.", "jp": "楽しんで、安全に過ごすつもりです。", "hira": "たのしんで あんぜん に すごす つもり です", "mp3": "br_s60_im_going_to_have_fun_and_stay_safe.mp3" }
+    {
+      "n": 1,
+      "en": "Traveling can help you learn about different cultures.",
+      "jp": "旅行は異なる文化について学ぶのに役立ちます。",
+      "hira": "りょこうはいことなるぶんかについてまなぶのにやくだちます。",
+      "mp3": "br_s01_traveling_can_help_you_learn_about_different_cultures.mp3"
+    },
+    {
+      "n": 2,
+      "en": "It is important to respect local customs when visiting new places.",
+      "jp": "新しい場所を訪れるときは、地元の習慣を尊重することが重要です。",
+      "hira": "あたらしいばしょをおとずれるときは、じもとのしゅうかんをそんちょうすることがじゅうようです。",
+      "mp3": "br_s02_it_is_important_to_respect_local_customs_when_visiting_new_places.mp3"
+    },
+    {
+      "n": 3,
+      "en": "Make sure to check the weather before your trip.",
+      "jp": "旅行の前に天気を確認することを忘れないでください。",
+      "hira": "りょこうのまえにてんきをかくにんすることをわすれないでください。",
+      "mp3": "br_s03_make_sure_to_check_the_weather_before_your_trip.mp3"
+    },
+    {
+      "n": 4,
+      "en": "You should learn a few phrases in the local language.",
+      "jp": "現地の言語でいくつかのフレーズを学ぶべきです。",
+      "hira": "げんちのげんごでいくつかのふれーずをまなぶべきです。",
+      "mp3": "br_s04_you_should_learn_a_few_phrases_in_the_local_language.mp3"
+    },
+    {
+      "n": 5,
+      "en": "Always keep your belongings safe while traveling.",
+      "jp": "旅行中は常に持ち物を安全に保ってください。",
+      "hira": "りょこうちゅうはつねにもちものをあんぜんにたもってください。",
+      "mp3": "br_s05_always_keep_your_belongings_safe_while_traveling.mp3"
+    },
+    {
+      "n": 6,
+      "en": "Try to use public transportation to explore the city.",
+      "jp": "街を探索するために公共交通機関を利用してみてください。",
+      "hira": "まちをたんさくするためにこうきょうこうつうきかんをりようしてみてください。",
+      "mp3": "br_s06_try_to_use_public_transportation_to_explore_the_city.mp3"
+    },
+    {
+      "n": 7,
+      "en": "Visiting famous landmarks can be an unforgettable experience.",
+      "jp": "有名なランドマークを訪れることは忘れられない経験になることがあります。",
+      "hira": "ゆうめいならんどまーくをおとずれることはわすれられないけいけんになることがあります。",
+      "mp3": "br_s07_visiting_famous_landmarks_can_be_an_unforgettable_experience.mp3"
+    },
+    {
+      "n": 8,
+      "en": "Make a travel itinerary to organize your plans.",
+      "jp": "計画を整理するために旅行の行程表を作成しましょう。",
+      "hira": "けいかくをせいりするためにりょこうのこうていひょうをさくせいしましょう。",
+      "mp3": "br_s08_make_a_travel_itinerary_to_organize_your_plans.mp3"
+    },
+    {
+      "n": 9,
+      "en": "Be aware of your surroundings when you are in a new place.",
+      "jp": "新しい場所にいるときは、周囲に注意を払いましょう。",
+      "hira": "あたらしいばしょにいるときは、しゅういにちゅういをはらいましょう。",
+      "mp3": "br_s09_be_aware_of_your_surroundings_when_you_are_in_a_new_place.mp3"
+    },
+    {
+      "n": 10,
+      "en": "Taking part in local festivals can enhance your travel experience.",
+      "jp": "地元の祭りに参加することで旅行の経験が豊かになります。",
+      "hira": "じもとのまつりにさんかすることでりょこうのけいけんがゆたかになります。",
+      "mp3": "br_s10_taking_part_in_local_festivals_can_enhance_your_travel_experience.mp3"
+    },
+    {
+      "n": 11,
+      "en": "Always ask for permission before taking photos of people.",
+      "jp": "人々の写真を撮る前には、必ず許可を求めてください。",
+      "hira": "ひとびとのしゃしんをとるまえには、かならずきょかをもとめてください。",
+      "mp3": "br_s11_always_ask_for_permission_before_taking_photos_of_people.mp3"
+    },
+    {
+      "n": 12,
+      "en": "Try local dishes to experience the culture through food.",
+      "jp": "食を通じて文化を体験するために、地元の料理を試してみてください。",
+      "hira": "しょくをつうじてぶんかをたいけんするために、じもとのりょうりをためしてみてください。",
+      "mp3": "br_s12_try_local_dishes_to_experience_the_culture_through_food.mp3"
+    },
+    {
+      "n": 13,
+      "en": "Plan your transportation in advance to avoid confusion.",
+      "jp": "混乱を避けるために、交通手段を事前に計画しましょう。",
+      "hira": "こんらんをさけるために、こうつうしゅだんをじぜんにけいかくしましょう。",
+      "mp3": "br_s13_plan_your_transportation_in_advance_to_avoid_confusion.mp3"
+    },
+    {
+      "n": 14,
+      "en": "Respect the environment by not littering during your travels.",
+      "jp": "旅行中にゴミを捨てないことで環境を尊重しましょう。",
+      "hira": "りょこうちゅうにごみをすてないことでかんきょうをそんちょうしましょう。",
+      "mp3": "br_s14_respect_the_environment_by_not_littering_during_your_travels.mp3"
+    },
+    {
+      "n": 15,
+      "en": "Learn about the history of the places you visit.",
+      "jp": "訪れる場所の歴史について学びましょう。",
+      "hira": "おとずれるばしょのれきしについてまなびましょう。",
+      "mp3": "br_s15_learn_about_the_history_of_the_places_you_visit.mp3"
+    },
+    {
+      "n": 16,
+      "en": "Always carry a small first aid kit while traveling.",
+      "jp": "旅行中は常に小さな応急処置キットを持ち歩きましょう。",
+      "hira": "りょこうちゅうはつねにちいさなおうきゅうしょちきっとをもちあるきましょう。",
+      "mp3": "br_s16_always_carry_a_small_first_aid_kit_while_traveling.mp3"
+    },
+    {
+      "n": 17,
+      "en": "Be polite and greet locals with a smile.",
+      "jp": "地元の人々に笑顔で挨拶することは礼儀正しいです。",
+      "hira": "じもとのひとびとにえがおであいさつすることはれいぎただしいです。",
+      "mp3": "br_s17_be_polite_and_greet_locals_with_a_smile.mp3"
+    },
+    {
+      "n": 18,
+      "en": "Use a travel guidebook to find interesting places.",
+      "jp": "面白い場所を見つけるために旅行ガイドブックを使いましょう。",
+      "hira": "おもしろいばしょをみつけるためにりょこうがいどぶっくをつかいましょう。",
+      "mp3": "br_s18_use_a_travel_guidebook_to_find_interesting_places.mp3"
+    },
+    {
+      "n": 19,
+      "en": "Be prepared for unexpected situations while traveling.",
+      "jp": "旅行中に予期しない状況に備えておきましょう。",
+      "hira": "りょこうちゅうによきしないじょうきょうにそなえておきましょう。",
+      "mp3": "br_s19_be_prepared_for_unexpected_situations_while_traveling.mp3"
+    },
+    {
+      "n": 20,
+      "en": "Research local transportation options before your trip.",
+      "jp": "旅行の前に地元の交通手段を調べておきましょう。",
+      "hira": "りょこうのまえにじもとのこうつうしゅだんをしらべておきましょう。",
+      "mp3": "br_s20_research_local_transportation_options_before_your_trip.mp3"
+    },
+    {
+      "n": 21,
+      "en": "Try to find a local guide for a better experience.",
+      "jp": "より良い体験のために地元のガイドを見つけてみましょう。",
+      "hira": "よりよいけいけんのためにじもとのがいどをみつけてみましょう。",
+      "mp3": "br_s21_try_to_find_a_local_guide_for_a_better_experience.mp3"
+    },
+    {
+      "n": 22,
+      "en": "Participating in workshops can be a fun way to learn.",
+      "jp": "ワークショップに参加することは学ぶ楽しい方法です。",
+      "hira": "わーくしょっぷにさんかすることはまなぶたのしいほうほうです。",
+      "mp3": "br_s22_participating_in_workshops_can_be_a_fun_way_to_learn.mp3"
+    },
+    {
+      "n": 23,
+      "en": "Be cautious when trying street food to avoid stomach issues.",
+      "jp": "お腹の問題を避けるために屋台の食べ物を試すときは注意しましょう。",
+      "hira": "おなかのもんだいをさけるためにやたいのたべものをためすときはちゅういしましょう。",
+      "mp3": "br_s23_be_cautious_when_trying_street_food_to_avoid_stomach_issues.mp3"
+    },
+    {
+      "n": 24,
+      "en": "Take time to relax and enjoy the scenery.",
+      "jp": "リラックスして景色を楽しむ時間を取りましょう。",
+      "hira": "りらっくすしてけしきをたのしむじかんをとりましょう。",
+      "mp3": "br_s24_take_time_to_relax_and_enjoy_the_scenery.mp3"
+    },
+    {
+      "n": 25,
+      "en": "Be open to making new friends during your travels.",
+      "jp": "旅行中に新しい友達を作ることにオープンでいましょう。",
+      "hira": "りょこうちゅうにあたらしいともだちをつくることにおーぷんでいましょう。",
+      "mp3": "br_s25_be_open_to_making_new_friends_during_your_travels.mp3"
+    },
+    {
+      "n": 26,
+      "en": "Take public transport to experience the local lifestyle.",
+      "jp": "地元の生活様式を体験するために公共交通機関を利用しましょう。",
+      "hira": "じもとのせいかつようしきをたいけんするためにこうきょうこうつうきかんをりようしましょう。",
+      "mp3": "br_s26_take_public_transport_to_experience_the_local_lifestyle.mp3"
+    },
+    {
+      "n": 27,
+      "en": "Always follow safety rules when exploring new areas.",
+      "jp": "新しい地域を探検するときは常に安全ルールに従いましょう。",
+      "hira": "あたらしいちいきをたんけんするときはつねにあんぜんるーるにしたがいましょう。",
+      "mp3": "br_s27_always_follow_safety_rules_when_exploring_new_areas.mp3"
+    },
+    {
+      "n": 28,
+      "en": "Understand the importance of cultural sensitivity while traveling.",
+      "jp": "旅行中の文化的配慮の重要性を理解しましょう。",
+      "hira": "りょこうちゅうのぶんかてきはいりょのじゅうようせいをりかいしましょう。",
+      "mp3": "br_s28_understand_the_importance_of_cultural_sensitivity_while_traveling.mp3"
+    },
+    {
+      "n": 29,
+      "en": "Make sure to have travel insurance for your safety.",
+      "jp": "安全のために旅行保険を持っていることを確認しましょう。",
+      "hira": "あんぜんのためにりょこうほけんをもっていることをかくにんしましょう。",
+      "mp3": "br_s29_make_sure_to_have_travel_insurance_for_your_safety.mp3"
+    },
+    {
+      "n": 30,
+      "en": "Visit local markets to find unique souvenirs.",
+      "jp": "ユニークなお土産を見つけるために地元の市場を訪れましょう。",
+      "hira": "ゆにーくなおみやげをみつけるためにじもとのいちばをおとずれましょう。",
+      "mp3": "br_s30_visit_local_markets_to_find_unique_souvenirs.mp3"
+    },
+    {
+      "n": 31,
+      "en": "Take time to learn about the traditions of the area.",
+      "jp": "その地域の伝統について学ぶ時間を取りましょう。",
+      "hira": "そのちいきのでんとうについてまなぶじかんをとりましょう。",
+      "mp3": "br_s31_take_time_to_learn_about_the_traditions_of_the_area.mp3"
+    },
+    {
+      "n": 32,
+      "en": "Be mindful of local dress codes when visiting temples.",
+      "jp": "寺院を訪れるときは、地元の服装規定に注意しましょう。",
+      "hira": "じいんをおとずれるときは、じもとのふくそうきていにちゅういしましょう。",
+      "mp3": "br_s32_be_mindful_of_local_dress_codes_when_visiting_temples.mp3"
+    },
+    {
+      "n": 33,
+      "en": "Use a map or a navigation app to find your way.",
+      "jp": "道を見つけるために地図やナビゲーションアプリを使用しましょう。",
+      "hira": "みちをみつけるためにちずやなびげーしょんあぷりをしようしましょう。",
+      "mp3": "br_s33_use_a_map_or_a_navigation_app_to_find_your_way.mp3"
+    },
+    {
+      "n": 34,
+      "en": "Engage with locals to learn more about their way of life.",
+      "jp": "地元の人々と交流して彼らの生活様式についてもっと学びましょう。",
+      "hira": "じもとのひとびととこうりゅうしてかれらのせいかつようしきについてもっとまなびましょう。",
+      "mp3": "br_s34_engage_with_locals_to_learn_more_about_their_way_of_life.mp3"
+    },
+    {
+      "n": 35,
+      "en": "Be patient and flexible when plans change unexpectedly.",
+      "jp": "計画が予期せず変更されたときは、忍耐強く柔軟でいましょう。",
+      "hira": "けいかくがよきせずへんこうされたときは、にんたいづよくじゅうなんでいましょう。",
+      "mp3": "br_s35_be_patient_and_flexible_when_plans_change_unexpectedly.mp3"
+    },
+    {
+      "n": 36,
+      "en": "Always keep emergency contact information handy.",
+      "jp": "緊急連絡先情報を常に手元に置いておきましょう。",
+      "hira": "きんきゅうれんらくさきじょうほうをつねにてもとにおいておきましょう。",
+      "mp3": "br_s36_always_keep_emergency_contact_information_handy.mp3"
+    },
+    {
+      "n": 37,
+      "en": "Explore different neighborhoods to see diverse lifestyles.",
+      "jp": "さまざまな生活様式を見るために異なる地域を探索しましょう。",
+      "hira": "さまざまなせいかつようしきをみるためにことなるちいきをたんさくしましょう。",
+      "mp3": "br_s37_explore_different_neighborhoods_to_see_diverse_lifestyles.mp3"
+    },
+    {
+      "n": 38,
+      "en": "Use public transport to save money while traveling.",
+      "jp": "旅行中にお金を節約するために公共交通機関を利用しましょう。",
+      "hira": "りょこうちゅうにおかねをせつやくするためにこうきょうこうつうきかんをりようしましょう。",
+      "mp3": "br_s38_use_public_transport_to_save_money_while_traveling.mp3"
+    },
+    {
+      "n": 39,
+      "en": "Try to understand local etiquette to avoid misunderstandings.",
+      "jp": "誤解を避けるために地元のエチケットを理解するようにしましょう。",
+      "hira": "ごかいをさけるためにじもとのえちけっとをりかいするようにしましょう。",
+      "mp3": "br_s39_try_to_understand_local_etiquette_to_avoid_misunderstandings.mp3"
+    },
+    {
+      "n": 40,
+      "en": "Be respectful when visiting sacred sites.",
+      "jp": "神聖な場所を訪れるときは敬意を表しましょう。",
+      "hira": "しんせいなばしょをおとずれるときはけいいをひょうしましょう。",
+      "mp3": "br_s40_be_respectful_when_visiting_sacred_sites.mp3"
+    },
+    {
+      "n": 41,
+      "en": "Pack light to make traveling easier.",
+      "jp": "旅行を楽にするために荷物は軽くしましょう。",
+      "hira": "りょこうをらくにするためににもつはかるくしましょう。",
+      "mp3": "br_s41_pack_light_to_make_traveling_easier.mp3"
+    },
+    {
+      "n": 42,
+      "en": "Take part in community events to connect with locals.",
+      "jp": "地元の人々とつながるために地域のイベントに参加しましょう。",
+      "hira": "じもとのひとびととつながるためにちいきのいべんとにさんかしましょう。",
+      "mp3": "br_s42_take_part_in_community_events_to_connect_with_locals.mp3"
+    },
+    {
+      "n": 43,
+      "en": "Try to learn about the local history before visiting.",
+      "jp": "訪れる前に地元の歴史について学ぶようにしましょう。",
+      "hira": "おとずれるまえにじもとのれきしについてまなぶようにしましょう。",
+      "mp3": "br_s43_try_to_learn_about_the_local_history_before_visiting.mp3"
+    },
+    {
+      "n": 44,
+      "en": "Be aware of cultural differences in communication styles.",
+      "jp": "コミュニケーションスタイルの文化的な違いに注意しましょう。",
+      "hira": "こみゅにけーしょんすたいるのぶんかてきなちがいにちゅういしましょう。",
+      "mp3": "br_s44_be_aware_of_cultural_differences_in_communication_styles.mp3"
+    },
+    {
+      "n": 45,
+      "en": "Make sure to try the local coffee or tea.",
+      "jp": "地元のコーヒーやお茶を必ず試してみてください。",
+      "hira": "じもとのこーひーやおちゃをかならずためしてみてください。",
+      "mp3": "br_s45_make_sure_to_try_the_local_coffee_or_tea.mp3"
+    },
+    {
+      "n": 46,
+      "en": "Visit museums to understand the culture better.",
+      "jp": "文化をよりよく理解するために博物館を訪れましょう。",
+      "hira": "ぶんかをよりよくりかいするためにはくぶつかんをおとずれましょう。",
+      "mp3": "br_s46_visit_museums_to_understand_the_culture_better.mp3"
+    },
+    {
+      "n": 47,
+      "en": "Be friendly and approachable to make new friends.",
+      "jp": "新しい友達を作るために、親しみやすく接しましょう。",
+      "hira": "あたらしいともだちをつくるために、したしみやすくせっしましょう。",
+      "mp3": "br_s47_be_friendly_and_approachable_to_make_new_friends.mp3"
+    },
+    {
+      "n": 48,
+      "en": "Understand the importance of being punctual in different cultures.",
+      "jp": "異なる文化において時間厳守の重要性を理解しましょう。",
+      "hira": "ことなるぶんかにおいてじかんげんしゅのじゅうようせいをりかいしましょう。",
+      "mp3": "br_s48_understand_the_importance_of_being_punctual_in_different_cultures.mp3"
+    },
+    {
+      "n": 49,
+      "en": "Use a travel journal to document your experiences.",
+      "jp": "経験を記録するために旅行日記を使いましょう。",
+      "hira": "けいけんをきろくするためにりょこうにっきをつかいましょう。",
+      "mp3": "br_s49_use_a_travel_journal_to_document_your_experiences.mp3"
+    },
+    {
+      "n": 50,
+      "en": "Be respectful of local wildlife and their habitats.",
+      "jp": "地元の野生動物とその生息地に敬意を表しましょう。",
+      "hira": "じもとのやせいどうぶつとそのせいそくちにけいいをひょうしましょう。",
+      "mp3": "br_s50_be_respectful_of_local_wildlife_and_their_habitats.mp3"
+    },
+    {
+      "n": 51,
+      "en": "Take time to appreciate the art and music of the area.",
+      "jp": "その地域のアートや音楽を楽しむ時間を取りましょう。",
+      "hira": "そのちいきのあーとやおんがくをたのしむじかんをとりましょう。",
+      "mp3": "br_s51_take_time_to_appreciate_the_art_and_music_of_the_area.mp3"
+    },
+    {
+      "n": 52,
+      "en": "Be cautious when crossing streets in busy areas.",
+      "jp": "混雑した地域で通りを渡るときは注意しましょう。",
+      "hira": "こんざつしたちいきでとおりをわたるときはちゅういしましょう。",
+      "mp3": "br_s52_be_cautious_when_crossing_streets_in_busy_areas.mp3"
+    },
+    {
+      "n": 53,
+      "en": "Learn about the local economy to understand its culture.",
+      "jp": "その文化を理解するために地元の経済について学びましょう。",
+      "hira": "そのぶんかをりかいするためにじもとのけいざいについてまなびましょう。",
+      "mp3": "br_s53_learn_about_the_local_economy_to_understand_its_culture.mp3"
+    },
+    {
+      "n": 54,
+      "en": "Be open to trying new things, even if they seem strange.",
+      "jp": "奇妙に思えても新しいことに挑戦することにオープンでいましょう。",
+      "hira": "きみょうにおもえてもあたらしいことにちょうせんすることにおーぷんでいましょう。",
+      "mp3": "br_s54_be_open_to_trying_new_things_even_if_they_seem_strange.mp3"
+    },
+    {
+      "n": 55,
+      "en": "Use technology to help navigate unfamiliar places.",
+      "jp": "不慣れな場所をナビゲートするためにテクノロジーを活用しましょう。",
+      "hira": "ふなれなばしょをなびげーとするためにてくのろじーをかつようしましょう。",
+      "mp3": "br_s55_use_technology_to_help_navigate_unfamiliar_places.mp3"
+    },
+    {
+      "n": 56,
+      "en": "Be mindful of local food allergies and dietary restrictions.",
+      "jp": "地元の食物アレルギーや食事制限に注意しましょう。",
+      "hira": "じもとのしょくもつあれるぎーやしょくじせいげんにちゅういしましょう。",
+      "mp3": "br_s56_be_mindful_of_local_food_allergies_and_dietary_restrictions.mp3"
+    },
+    {
+      "n": 57,
+      "en": "Take part in local traditions to feel more connected.",
+      "jp": "よりつながりを感じるために地元の伝統に参加しましょう。",
+      "hira": "よりつながりをかんじるためにじもとのでんとうにさんかしましょう。",
+      "mp3": "br_s57_take_part_in_local_traditions_to_feel_more_connected.mp3"
+    },
+    {
+      "n": 58,
+      "en": "Be aware of your personal belongings in crowded places.",
+      "jp": "混雑した場所では自分の持ち物に注意しましょう。",
+      "hira": "こんざつしたばしょではじぶんのもちものにちゅういしましょう。",
+      "mp3": "br_s58_be_aware_of_your_personal_belongings_in_crowded_places.mp3"
+    },
+    {
+      "n": 59,
+      "en": "Respect the rules of public spaces to ensure everyone's comfort.",
+      "jp": "みんなの快適さを確保するために公共の場のルールを尊重しましょう。",
+      "hira": "みんなのかいてきさをかくほするためにこうきょうのばのるーるをそんちょうしましょう。",
+      "mp3": "br_s59_respect_the_rules_of_public_spaces_to_ensure_everyone_s_comfort.mp3"
+    },
+    {
+      "n": 60,
+      "en": "Enjoy the journey as much as the destination.",
+      "jp": "目的地と同じくらい旅を楽しみましょう。",
+      "hira": "もくてきちとおなじくらいたびをたのしみましょう。",
+      "mp3": "br_s60_enjoy_the_journey_as_much_as_the_destination.mp3"
+    }
   ]
 }
