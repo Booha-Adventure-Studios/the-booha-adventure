@@ -1,425 +1,424 @@
-
 {
   "cards": [
     {
       "n": 1,
-      "en": "job",
-      "jp": "仕事",
-      "hira": "しごと",
-      "mp3": "br_v01_job.mp3"
+      "en": "customer service",
+      "jp": "カスタマーサービス",
+      "hira": "かすたまーさーびす",
+      "mp3": "br_v01_customer_service.mp3"
     },
     {
       "n": 2,
-      "en": "worker",
-      "jp": "働く人／労働者",
-      "hira": "はたらく ひと／ろうどうしゃ",
-      "mp3": "br_v02_worker.mp3"
+      "en": "technical skills",
+      "jp": "テクニカルスキル",
+      "hira": "てくにかるすきる",
+      "mp3": "br_v02_technical_skills.mp3"
     },
     {
       "n": 3,
-      "en": "teacher",
-      "jp": "先生",
-      "hira": "せんせい",
-      "mp3": "br_v03_teacher.mp3"
+      "en": "creative thinking",
+      "jp": "クリエイティブシンキング",
+      "hira": "くりえいてぃぶしんきんぐ",
+      "mp3": "br_v03_creative_thinking.mp3"
     },
     {
       "n": 4,
-      "en": "doctor",
-      "jp": "医者",
-      "hira": "いしゃ",
-      "mp3": "br_v04_doctor.mp3"
+      "en": "communication skills",
+      "jp": "コミュニケーションスキル",
+      "hira": "こみゅにけーしょんすきる",
+      "mp3": "br_v04_communication_skills.mp3"
     },
     {
       "n": 5,
-      "en": "nurse",
-      "jp": "看護師",
-      "hira": "かんごし",
-      "mp3": "br_v05_nurse.mp3"
+      "en": "problem-solving",
+      "jp": "問題解決",
+      "hira": "もんだいかいけつ",
+      "mp3": "br_v05_problem_solving.mp3"
     },
     {
       "n": 6,
-      "en": "chef",
-      "jp": "料理人／コック",
-      "hira": "りょうりにん／こっく",
-      "mp3": "br_v06_chef.mp3"
+      "en": "team collaboration",
+      "jp": "チームコラボレーション",
+      "hira": "ちーむこらぼれーしょん",
+      "mp3": "br_v06_team_collaboration.mp3"
     },
     {
       "n": 7,
-      "en": "artist",
-      "jp": "芸術家／アーティスト",
-      "hira": "げいじゅつか／あーてぃすと",
-      "mp3": "br_v07_artist.mp3"
+      "en": "time management",
+      "jp": "時間管理",
+      "hira": "じかんかんり",
+      "mp3": "br_v07_time_management.mp3"
     },
     {
       "n": 8,
-      "en": "scientist",
-      "jp": "科学者",
-      "hira": "かがくしゃ",
-      "mp3": "br_v08_scientist.mp3"
+      "en": "customer satisfaction",
+      "jp": "顧客満足",
+      "hira": "こきゃくまんぞく",
+      "mp3": "br_v08_customer_satisfaction.mp3"
     },
     {
       "n": 9,
-      "en": "police officer",
-      "jp": "警察官",
-      "hira": "けいさつかん",
-      "mp3": "br_v09_police_officer.mp3"
+      "en": "work ethic",
+      "jp": "労働倫理",
+      "hira": "ろうどうりんり",
+      "mp3": "br_v09_work_ethic.mp3"
     },
     {
       "n": 10,
-      "en": "pilot",
-      "jp": "パイロット",
-      "hira": "ぱいろっと",
-      "mp3": "br_v10_pilot.mp3"
+      "en": "interpersonal skills",
+      "jp": "対人スキル",
+      "hira": "たいじんすきる",
+      "mp3": "br_v10_interpersonal_skills.mp3"
     },
     {
       "n": 11,
-      "en": "engineer",
-      "jp": "エンジニア",
-      "hira": "えんじにあ",
-      "mp3": "br_v11_engineer.mp3"
+      "en": "adaptability",
+      "jp": "適応能力",
+      "hira": "てきおうのうりょく",
+      "mp3": "br_v11_adaptability.mp3"
     },
     {
       "n": 12,
-      "en": "farmer",
-      "jp": "農家",
-      "hira": "のうか",
-      "mp3": "br_v12_farmer.mp3"
+      "en": "initiative",
+      "jp": "主体性",
+      "hira": "しゅたいせい",
+      "mp3": "br_v12_initiative.mp3"
     },
     {
       "n": 13,
-      "en": "office",
-      "jp": "事務所／オフィス",
-      "hira": "じむしょ／おふぃす",
-      "mp3": "br_v13_office.mp3"
+      "en": "work-life balance",
+      "jp": "ワークライフバランス",
+      "hira": "わーくらいふばらんす",
+      "mp3": "br_v13_work_life_balance.mp3"
     },
     {
       "n": 14,
-      "en": "company",
-      "jp": "会社",
-      "hira": "かいしゃ",
-      "mp3": "br_v14_company.mp3"
+      "en": "networking",
+      "jp": "ネットワーキング",
+      "hira": "ねっとわーきんぐ",
+      "mp3": "br_v14_networking.mp3"
     },
     {
       "n": 15,
-      "en": "career",
-      "jp": "職業／キャリア",
-      "hira": "しょくぎょう／きゃりあ",
-      "mp3": "br_v15_career.mp3"
+      "en": "self-motivation",
+      "jp": "自己動機付け",
+      "hira": "じこどうきづけ",
+      "mp3": "br_v15_self_motivation.mp3"
     },
     {
       "n": 16,
-      "en": "skill",
-      "jp": "技術／スキル",
-      "hira": "ぎじゅつ／すきる",
-      "mp3": "br_v16_skill.mp3"
+      "en": "goal setting",
+      "jp": "目標設定",
+      "hira": "もくひょうせってい",
+      "mp3": "br_v16_goal_setting.mp3"
     },
     {
       "n": 17,
-      "en": "talent",
-      "jp": "才能",
-      "hira": "さいのう",
-      "mp3": "br_v17_talent.mp3"
+      "en": "work environment",
+      "jp": "職場環境",
+      "hira": "しょくばかんきょう",
+      "mp3": "br_v17_work_environment.mp3"
     },
     {
       "n": 18,
-      "en": "ability",
-      "jp": "能力",
-      "hira": "のうりょく",
-      "mp3": "br_v18_ability.mp3"
+      "en": "professional skills",
+      "jp": "専門スキル",
+      "hira": "せんもんすきる",
+      "mp3": "br_v18_professional_skills.mp3"
     },
     {
       "n": 19,
-      "en": "draw",
-      "jp": "絵を描く",
-      "hira": "え を かく",
-      "mp3": "br_v19_draw.mp3"
+      "en": "project management",
+      "jp": "プロジェクト管理",
+      "hira": "ぷろじぇくとかんり",
+      "mp3": "br_v19_project_management.mp3"
     },
     {
       "n": 20,
-      "en": "sing",
-      "jp": "歌う",
-      "hira": "うたう",
-      "mp3": "br_v20_sing.mp3"
+      "en": "digital literacy",
+      "jp": "デジタルリテラシー",
+      "hira": "でじたるりてらしー",
+      "mp3": "br_v20_digital_literacy.mp3"
     },
     {
       "n": 21,
-      "en": "dance",
-      "jp": "踊る",
-      "hira": "おどる",
-      "mp3": "br_v21_dance.mp3"
+      "en": "critical thinking",
+      "jp": "批判的思考",
+      "hira": "ひはんてきしこう",
+      "mp3": "br_v21_critical_thinking.mp3"
     },
     {
       "n": 22,
-      "en": "cook",
-      "jp": "料理する",
-      "hira": "りょうり する",
-      "mp3": "br_v22_cook.mp3"
+      "en": "customer feedback",
+      "jp": "顧客のフィードバック",
+      "hira": "こきゃくのふぃーどばっく",
+      "mp3": "br_v22_customer_feedback.mp3"
     },
     {
       "n": 23,
-      "en": "fix",
-      "jp": "直す／修理する",
-      "hira": "なおす／しゅうり する",
-      "mp3": "br_v23_fix.mp3"
+      "en": "workshop",
+      "jp": "ワークショップ",
+      "hira": "わーくしょっぷ",
+      "mp3": "br_v23_workshop.mp3"
     },
     {
       "n": 24,
-      "en": "build",
-      "jp": "作る／建てる",
-      "hira": "つくる／たてる",
-      "mp3": "br_v24_build.mp3"
+      "en": "business plan",
+      "jp": "ビジネスプラン",
+      "hira": "びじねすぷらん",
+      "mp3": "br_v24_business_plan.mp3"
     },
     {
       "n": 25,
-      "en": "teach",
-      "jp": "教える",
-      "hira": "おしえる",
-      "mp3": "br_v25_teach.mp3"
+      "en": "sales strategy",
+      "jp": "販売戦略",
+      "hira": "はんばいせんりゃく",
+      "mp3": "br_v25_sales_strategy.mp3"
     },
     {
       "n": 26,
-      "en": "learn",
-      "jp": "学ぶ",
-      "hira": "まなぶ",
-      "mp3": "br_v26_learn.mp3"
+      "en": "job shadowing",
+      "jp": "ジョブシャドウイング",
+      "hira": "じょぶしゃどういんぐ",
+      "mp3": "br_v26_job_shadowing.mp3"
     },
     {
       "n": 27,
-      "en": "remember",
-      "jp": "覚える",
-      "hira": "おぼえる",
-      "mp3": "br_v27_remember.mp3"
+      "en": "mentorship",
+      "jp": "メンターシップ",
+      "hira": "めんたーしっぷ",
+      "mp3": "br_v27_mentorship.mp3"
     },
     {
       "n": 28,
-      "en": "play",
-      "jp": "遊ぶ／（楽器を）弾く",
-      "hira": "あそぶ／ひく",
-      "mp3": "br_v28_play.mp3"
+      "en": "career fair",
+      "jp": "キャリアフェア",
+      "hira": "きゃりあふぇあ",
+      "mp3": "br_v28_career_fair.mp3"
     },
     {
       "n": 29,
-      "en": "drive",
-      "jp": "運転する",
-      "hira": "うんてん する",
-      "mp3": "br_v29_drive.mp3"
+      "en": "internship",
+      "jp": "インターンシップ",
+      "hira": "いんたーんしっぷ",
+      "mp3": "br_v29_internship.mp3"
     },
     {
       "n": 30,
-      "en": "type",
-      "jp": "タイピングする",
-      "hira": "たいぴんぐ する",
-      "mp3": "br_v30_type.mp3"
+      "en": "volunteer work",
+      "jp": "ボランティア活動",
+      "hira": "ぼらんてぃあかつどう",
+      "mp3": "br_v30_volunteer_work.mp3"
     },
     {
       "n": 31,
-      "en": "plan",
-      "jp": "計画",
-      "hira": "けいかく",
-      "mp3": "br_v31_plan.mp3"
+      "en": "networking event",
+      "jp": "ネットワーキングイベント",
+      "hira": "ねっとわーきんぐいべんと",
+      "mp3": "br_v31_networking_event.mp3"
     },
     {
       "n": 32,
-      "en": "schedule",
-      "jp": "予定／スケジュール",
-      "hira": "よてい／すけじゅーる",
-      "mp3": "br_v32_schedule.mp3"
+      "en": "resume writing",
+      "jp": "履歴書作成",
+      "hira": "りれきしょさくせい",
+      "mp3": "br_v32_resume_writing.mp3"
     },
     {
       "n": 33,
-      "en": "decide",
-      "jp": "決める",
-      "hira": "きめる",
-      "mp3": "br_v33_decide.mp3"
+      "en": "interview skills",
+      "jp": "面接スキル",
+      "hira": "めんせつすきる",
+      "mp3": "br_v33_interview_skills.mp3"
     },
     {
       "n": 34,
-      "en": "hope",
-      "jp": "希望する／望む",
-      "hira": "きぼう する／のぞむ",
-      "mp3": "br_v34_hope.mp3"
+      "en": "personal branding",
+      "jp": "パーソナルブランディング",
+      "hira": "ぱーそなるぶらんでぃんぐ",
+      "mp3": "br_v34_personal_branding.mp3"
     },
     {
       "n": 35,
-      "en": "dream",
-      "jp": "夢",
-      "hira": "ゆめ",
-      "mp3": "br_v35_dream.mp3"
+      "en": "skill assessment",
+      "jp": "スキル評価",
+      "hira": "すきるひょうか",
+      "mp3": "br_v35_skill_assessment.mp3"
     },
     {
       "n": 36,
-      "en": "travel",
-      "jp": "旅行する",
-      "hira": "りょこう する",
-      "mp3": "br_v36_travel.mp3"
+      "en": "performance review",
+      "jp": "パフォーマンスレビュー",
+      "hira": "ぱふぉーまんすれびゅー",
+      "mp3": "br_v36_performance_review.mp3"
     },
     {
       "n": 37,
-      "en": "study",
-      "jp": "勉強する",
-      "hira": "べんきょう する",
-      "mp3": "br_v37_study.mp3"
+      "en": "job application",
+      "jp": "求人応募",
+      "hira": "きゅうじんおうぼ",
+      "mp3": "br_v37_job_application.mp3"
     },
     {
       "n": 38,
-      "en": "move",
-      "jp": "引っ越す",
-      "hira": "ひっこす",
-      "mp3": "br_v38_move.mp3"
+      "en": "work experience",
+      "jp": "職務経験",
+      "hira": "しょくむけいけん",
+      "mp3": "br_v38_work_experience.mp3"
     },
     {
       "n": 39,
-      "en": "visit",
-      "jp": "訪ねる／訪問する",
-      "hira": "たずねる／ほうもん する",
-      "mp3": "br_v39_visit.mp3"
+      "en": "skill development",
+      "jp": "スキル開発",
+      "hira": "すきるかいはつ",
+      "mp3": "br_v39_skill_development.mp3"
     },
     {
       "n": 40,
-      "en": "save",
-      "jp": "貯める",
-      "hira": "ためる",
-      "mp3": "br_v40_save.mp3"
+      "en": "career counseling",
+      "jp": "キャリアカウンセリング",
+      "hira": "きゃりあかうんせりんぐ",
+      "mp3": "br_v40_career_counseling.mp3"
     },
     {
       "n": 41,
-      "en": "buy",
-      "jp": "買う",
-      "hira": "かう",
-      "mp3": "br_v41_buy.mp3"
+      "en": "job market",
+      "jp": "求人市場",
+      "hira": "きゅうじんしじょう",
+      "mp3": "br_v41_job_market.mp3"
     },
     {
       "n": 42,
-      "en": "graduate",
-      "jp": "卒業する",
-      "hira": "そつぎょう する",
-      "mp3": "br_v42_graduate.mp3"
+      "en": "work portfolio",
+      "jp": "ポートフォリオ",
+      "hira": "ぽーとふぉりお",
+      "mp3": "br_v42_work_portfolio.mp3"
     },
     {
       "n": 43,
-      "en": "change",
-      "jp": "変わる／変える",
-      "hira": "かわる／かえる",
-      "mp3": "br_v43_change.mp3"
+      "en": "salary negotiation",
+      "jp": "給与交渉",
+      "hira": "きゅうよこうしょう",
+      "mp3": "br_v43_salary_negotiation.mp3"
     },
     {
       "n": 44,
-      "en": "grow",
-      "jp": "成長する",
-      "hira": "せいちょう する",
-      "mp3": "br_v44_grow.mp3"
+      "en": "business ethics",
+      "jp": "ビジネス倫理",
+      "hira": "びじねすりんり",
+      "mp3": "br_v44_business_ethics.mp3"
     },
     {
       "n": 45,
-      "en": "future",
-      "jp": "未来",
-      "hira": "みらい",
-      "mp3": "br_v45_future.mp3"
+      "en": "work culture",
+      "jp": "職場文化",
+      "hira": "しょくばぶんか",
+      "mp3": "br_v45_work_culture.mp3"
     },
     {
       "n": 46,
-      "en": "factory",
-      "jp": "工場",
-      "hira": "こうじょう",
-      "mp3": "br_v46_factory.mp3"
+      "en": "employee benefits",
+      "jp": "従業員福利厚生",
+      "hira": "じゅうぎょういんふくりこうせい",
+      "mp3": "br_v46_employee_benefits.mp3"
     },
     {
       "n": 47,
-      "en": "hospital",
-      "jp": "病院",
-      "hira": "びょういん",
-      "mp3": "br_v47_hospital.mp3"
+      "en": "career advancement",
+      "jp": "キャリアの進展",
+      "hira": "きゃりあのしんてん",
+      "mp3": "br_v47_career_advancement.mp3"
     },
     {
       "n": 48,
-      "en": "school",
-      "jp": "学校",
-      "hira": "がっこう",
-      "mp3": "br_v48_school.mp3"
+      "en": "work-related skills",
+      "jp": "職務関連スキル",
+      "hira": "しょくむかんれんすきる",
+      "mp3": "br_v48_work_related_skills.mp3"
     },
     {
       "n": 49,
-      "en": "restaurant",
-      "jp": "レストラン",
-      "hira": "れすとらん",
-      "mp3": "br_v49_restaurant.mp3"
+      "en": "business communication",
+      "jp": "ビジネスコミュニケーション",
+      "hira": "びじねすこみゅにけーしょん",
+      "mp3": "br_v49_business_communication.mp3"
     },
     {
       "n": 50,
-      "en": "kitchen",
-      "jp": "台所／キッチン",
-      "hira": "だいどころ／きっちん",
-      "mp3": "br_v50_kitchen.mp3"
+      "en": "work ethics training",
+      "jp": "労働倫理トレーニング",
+      "hira": "ろうどうりんりとれーにんぐ",
+      "mp3": "br_v50_work_ethics_training.mp3"
     },
     {
       "n": 51,
-      "en": "shop",
-      "jp": "店",
-      "hira": "みせ",
-      "mp3": "br_v51_shop.mp3"
+      "en": "social skills",
+      "jp": "社会的スキル",
+      "hira": "しゃかいてきすきる",
+      "mp3": "br_v51_social_skills.mp3"
     },
     {
       "n": 52,
-      "en": "station",
-      "jp": "駅",
-      "hira": "えき",
-      "mp3": "br_v52_station.mp3"
+      "en": "career exploration",
+      "jp": "キャリア探求",
+      "hira": "きゃりあたんきゅう",
+      "mp3": "br_v52_career_exploration.mp3"
     },
     {
       "n": 53,
-      "en": "computer",
-      "jp": "コンピューター",
-      "hira": "こんぴゅーたー",
-      "mp3": "br_v53_computer.mp3"
+      "en": "job shadowing experience",
+      "jp": "ジョブシャドウイング体験",
+      "hira": "じょぶしゃどういんぐたいけん",
+      "mp3": "br_v53_job_shadowing_experience.mp3"
     },
     {
       "n": 54,
-      "en": "desk",
-      "jp": "机",
-      "hira": "つくえ",
-      "mp3": "br_v54_desk.mp3"
+      "en": "workplace diversity",
+      "jp": "職場の多様性",
+      "hira": "しょくばのたようせい",
+      "mp3": "br_v54_workplace_diversity.mp3"
     },
     {
       "n": 55,
-      "en": "machine",
-      "jp": "機械",
-      "hira": "きかい",
-      "mp3": "br_v55_machine.mp3"
+      "en": "professional network",
+      "jp": "専門的なネットワーク",
+      "hira": "せんもんてきなねっとわーく",
+      "mp3": "br_v55_professional_network.mp3"
     },
     {
       "n": 56,
-      "en": "tool",
-      "jp": "道具",
-      "hira": "どうぐ",
-      "mp3": "br_v56_tool.mp3"
+      "en": "career transition",
+      "jp": "キャリアの移行",
+      "hira": "きゃりあのいこう",
+      "mp3": "br_v56_career_transition.mp3"
     },
     {
       "n": 57,
-      "en": "uniform",
-      "jp": "制服",
-      "hira": "せいふく",
-      "mp3": "br_v57_uniform.mp3"
+      "en": "work-related training",
+      "jp": "職務関連トレーニング",
+      "hira": "しょくむかんれんとれーにんぐ",
+      "mp3": "br_v57_work_related_training.mp3"
     },
     {
       "n": 58,
-      "en": "door",
-      "jp": "ドア",
-      "hira": "どあ",
-      "mp3": "br_v58_door.mp3"
+      "en": "self-assessment",
+      "jp": "自己評価",
+      "hira": "じこひょうか",
+      "mp3": "br_v58_self_assessment.mp3"
     },
     {
       "n": 59,
-      "en": "window",
-      "jp": "窓",
-      "hira": "まど",
-      "mp3": "br_v59_window.mp3"
+      "en": "career objectives",
+      "jp": "キャリア目標",
+      "hira": "きゃりあもくひょう",
+      "mp3": "br_v59_career_objectives.mp3"
     },
     {
       "n": 60,
-      "en": "meeting",
-      "jp": "会議",
-      "hira": "かいぎ",
-      "mp3": "br_v60_meeting.mp3"
+      "en": "workforce skills",
+      "jp": "労働力スキル",
+      "hira": "ろうどうりょくすきる",
+      "mp3": "br_v60_workforce_skills.mp3"
     }
   ]
 }
