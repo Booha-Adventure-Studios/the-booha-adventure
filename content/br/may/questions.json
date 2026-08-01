@@ -1,76 +1,424 @@
-
 {
   "cards": [
-    { "n": 1, "en": "What time do you wake up?", "jp": "あなたは何時に起きますか。", "hira": "あなた は なんじ に おきます か", "mp3": "br_q01_what_time_do_you_wake_up.mp3" },
-    { "n": 2, "en": "What do you do after school?", "jp": "放課後に何をしますか。", "hira": "ほうかご に なに を します か", "mp3": "br_q02_what_do_you_do_after_school.mp3" },
-    { "n": 3, "en": "Do you always eat breakfast?", "jp": "いつも朝ごはんを食べますか。", "hira": "いつも あさごはん を たべます か", "mp3": "br_q03_do_you_always_eat_breakfast.mp3" },
-    { "n": 4, "en": "When do you do your homework?", "jp": "いつ宿題をしますか。", "hira": "いつ しゅくだい を します か", "mp3": "br_q04_when_do_you_do_your_homework.mp3" },
-    { "n": 5, "en": "Do you watch TV every day?", "jp": "毎日テレビを見ますか。", "hira": "まいにち てれび を みます か", "mp3": "br_q05_do_you_watch_tv_every_day.mp3" },
-
-    { "n": 6, "en": "How often do you take a bath?", "jp": "どのくらいおふろに入りますか。", "hira": "どのくらい おふろ に はいります か", "mp3": "br_q06_how_often_do_you_take_a_bath.mp3" },
-    { "n": 7, "en": "Who cooks dinner at your home?", "jp": "家ではだれが夕ごはんを作りますか。", "hira": "いえ では だれ が ゆうごはん を つくります か", "mp3": "br_q07_who_cooks_dinner_at_your_home.mp3" },
-    { "n": 8, "en": "Do you walk a pet?", "jp": "ペットの散歩をしますか。", "hira": "ぺっと の さんぽ を します か", "mp3": "br_q08_do_you_walk_a_pet.mp3" },
-    { "n": 9, "en": "What time do you go to bed?", "jp": "何時に寝ますか。", "hira": "なんじ に ねます か", "mp3": "br_q09_what_time_do_you_go_to_bed.mp3" },
-    { "n": 10, "en": "What do you usually do in the evening?", "jp": "夕方はたいてい何をしますか。", "hira": "ゆうがた は たいてい なに を します か", "mp3": "br_q10_what_do_you_usually_do_in_the_evening.mp3" },
-
-    { "n": 11, "en": "Do you study every day?", "jp": "毎日勉強しますか。", "hira": "まいにち べんきょうします か", "mp3": "br_q11_do_you_study_every_day.mp3" },
-    { "n": 12, "en": "What do you do before bed?", "jp": "寝る前に何をしますか。", "hira": "ねる まえ に なに を します か", "mp3": "br_q12_what_do_you_do_before_bed.mp3" },
-    { "n": 13, "en": "Do you help clean your room?", "jp": "部屋のそうじを手伝いますか。", "hira": "へや の そうじ を てつだいます か", "mp3": "br_q13_do_you_help_clean_your_room.mp3" },
-    { "n": 14, "en": "What time does your family have dinner?", "jp": "家族は何時に夕ごはんを食べますか。", "hira": "かぞく は なんじ に ゆうごはん を たべます か", "mp3": "br_q14_what_time_does_your_family_have_dinner.mp3" },
-    { "n": 15, "en": "What is your favorite part of the day?", "jp": "一日の中でいちばん好きな時間は何ですか。", "hira": "いちにち の なか で いちばん すき な じかん は なん です か", "mp3": "br_q15_what_is_your_favorite_part_of_the_day.mp3" },
-
-    { "n": 16, "en": "What time do you start school?", "jp": "学校は何時に始まりますか。", "hira": "がっこう は なんじ に はじまります か", "mp3": "br_q16_what_time_do_you_start_school.mp3" },
-    { "n": 17, "en": "When is lunch time?", "jp": "昼休みはいつですか。", "hira": "ひるやすみ は いつ です か", "mp3": "br_q17_when_is_lunch_time.mp3" },
-    { "n": 18, "en": "Are you early or late today?", "jp": "今日は早いですか、それとも遅いですか。", "hira": "きょう は はやい です か それとも おそい です か", "mp3": "br_q18_are_you_early_or_late_today.mp3" },
-    { "n": 19, "en": "What time is it now?", "jp": "今何時ですか。", "hira": "いま なんじ です か", "mp3": "br_q19_what_time_is_it_now.mp3" },
-    { "n": 20, "en": "What time do you get up?", "jp": "何時に起きますか。", "hira": "なんじ に おきます か", "mp3": "br_q20_what_time_do_you_get_up.mp3" },
-
-    { "n": 21, "en": "What time do you go to bed?", "jp": "何時に寝ますか。", "hira": "なんじ に ねます か", "mp3": "br_q21_what_time_do_you_go_to_bed.mp3" },
-    { "n": 22, "en": "When do you do homework?", "jp": "いつ宿題をしますか。", "hira": "いつ しゅくだい を します か", "mp3": "br_q22_when_do_you_do_homework.mp3" },
-    { "n": 23, "en": "What time does your club start?", "jp": "部活は何時に始まりますか。", "hira": "ぶかつ は なんじ に はじまります か", "mp3": "br_q23_what_time_does_your_club_start.mp3" },
-    { "n": 24, "en": "Do you use an alarm clock?", "jp": "目覚まし時計を使いますか。", "hira": "めざましどけい を つかいます か", "mp3": "br_q24_do_you_use_an_alarm_clock.mp3" },
-    { "n": 25, "en": "When do you arrive at school?", "jp": "学校にはいつ着きますか。", "hira": "がっこう には いつ つきます か", "mp3": "br_q25_when_do_you_arrive_at_school.mp3" },
-
-    { "n": 26, "en": "What time is dinner at your home?", "jp": "家では夕ごはんは何時ですか。", "hira": "いえ では ゆうごはん は なんじ です か", "mp3": "br_q26_what_time_is_dinner_at_your_home.mp3" },
-    { "n": 27, "en": "Do you ever oversleep?", "jp": "寝坊することはありますか。", "hira": "ねぼう する こと は あります か", "mp3": "br_q27_do_you_ever_oversleep.mp3" },
-    { "n": 28, "en": "How long is your lunch break?", "jp": "昼休みはどのくらいですか。", "hira": "ひるやすみ は どのくらい です か", "mp3": "br_q28_how_long_is_your_lunch_break.mp3" },
-    { "n": 29, "en": "Can we meet at three fifteen?", "jp": "3時15分に会えますか。", "hira": "さんじ じゅうごふん に あえます か", "mp3": "br_q29_can_we_meet_at_three_fifteen.mp3" },
-    { "n": 30, "en": "What time do you finish school?", "jp": "学校は何時に終わりますか。", "hira": "がっこう は なんじ に おわります か", "mp3": "br_q30_what_time_do_you_finish_school.mp3" },
-
-    { "n": 31, "en": "What do you do in your free time?", "jp": "ひまなときに何をしますか。", "hira": "ひま な とき に なに を します か", "mp3": "br_q31_what_do_you_do_in_your_free_time.mp3" },
-    { "n": 32, "en": "Do you like playing sports?", "jp": "スポーツをするのは好きですか。", "hira": "すぽーつ を する の は すき です か", "mp3": "br_q32_do_you_like_playing_sports.mp3" },
-    { "n": 33, "en": "Can you play a musical instrument?", "jp": "楽器を演奏できますか。", "hira": "がっき を えんそう できます か", "mp3": "br_q33_can_you_play_a_musical_instrument.mp3" },
-    { "n": 34, "en": "Who do you hang out with?", "jp": "だれと遊びますか。", "hira": "だれ と あそびます か", "mp3": "br_q34_who_do_you_hang_out_with.mp3" },
-    { "n": 35, "en": "Where do you go shopping?", "jp": "どこへ買い物に行きますか。", "hira": "どこ へ かいもの に いきます か", "mp3": "br_q35_where_do_you_go_shopping.mp3" },
-
-    { "n": 36, "en": "What comics do you like?", "jp": "どんなまんがが好きですか。", "hira": "どんな まんが が すき です か", "mp3": "br_q36_what_comics_do_you_like.mp3" },
-    { "n": 37, "en": "Do you prefer movies or games?", "jp": "映画とゲームではどちらが好きですか。", "hira": "えいが と げーむ では どちら が すき です か", "mp3": "br_q37_do_you_prefer_movies_or_games.mp3" },
-    { "n": 38, "en": "When do you ride a bike?", "jp": "いつ自転車に乗りますか。", "hira": "いつ じてんしゃ に のります か", "mp3": "br_q38_when_do_you_ride_a_bike.mp3" },
-    { "n": 39, "en": "What music do you listen to?", "jp": "どんな音楽を聞きますか。", "hira": "どんな おんがく を ききます か", "mp3": "br_q39_what_music_do_you_listen_to.mp3" },
-    { "n": 40, "en": "Do you like cooking?", "jp": "料理は好きですか。", "hira": "りょうり は すき です か", "mp3": "br_q40_do_you_like_cooking.mp3" },
-
-    { "n": 41, "en": "What do you bake?", "jp": "何を作りますか。", "hira": "なに を つくります か", "mp3": "br_q41_what_do_you_bake.mp3" },
-    { "n": 42, "en": "Where do you like to relax?", "jp": "どこでリラックスするのが好きですか。", "hira": "どこ で りらっくす する の が すき です か", "mp3": "br_q42_where_do_you_like_to_relax.mp3" },
-    { "n": 43, "en": "Do you like camping?", "jp": "キャンプは好きですか。", "hira": "きゃんぷ は すき です か", "mp3": "br_q43_do_you_like_camping.mp3" },
-    { "n": 44, "en": "Can you play basketball well?", "jp": "バスケットボールは上手にできますか。", "hira": "ばすけっとぼーる は じょうず に できます か", "mp3": "br_q44_can_you_play_basketball_well.mp3" },
-    { "n": 45, "en": "What hobby do you want to try?", "jp": "どんなしゅみをやってみたいですか。", "hira": "どんな しゅみ を やってみたい です か", "mp3": "br_q45_what_hobby_do_you_want_to_try.mp3" },
-
-    { "n": 46, "en": "What do you do to stay healthy?", "jp": "健康のために何をしますか。", "hira": "けんこう の ため に なに を します か", "mp3": "br_q46_what_do_you_do_to_stay_healthy.mp3" },
-    { "n": 47, "en": "How much water do you drink?", "jp": "どのくらい水を飲みますか。", "hira": "どのくらい みず を のみます か", "mp3": "br_q47_how_much_water_do_you_drink.mp3" },
-    { "n": 48, "en": "How many hours do you sleep?", "jp": "何時間寝ますか。", "hira": "なんじかん ねます か", "mp3": "br_q48_how_many_hours_do_you_sleep.mp3" },
-    { "n": 49, "en": "Do you exercise every day?", "jp": "毎日運動しますか。", "hira": "まいにち うんどうします か", "mp3": "br_q49_do_you_exercise_every_day.mp3" },
-    { "n": 50, "en": "What healthy food do you like?", "jp": "どんな健康的な食べ物が好きですか。", "hira": "どんな けんこうてき な たべもの が すき です か", "mp3": "br_q50_what_healthy_food_do_you_like.mp3" },
-
-    { "n": 51, "en": "Do you avoid junk food?", "jp": "ジャンクフードをさけますか。", "hira": "じゃんくふーど を さけます か", "mp3": "br_q51_do_you_avoid_junk_food.mp3" },
-    { "n": 52, "en": "When do you wash your hands?", "jp": "いつ手を洗いますか。", "hira": "いつ て を あらいます か", "mp3": "br_q52_when_do_you_wash_your_hands.mp3" },
-    { "n": 53, "en": "Where do you relax?", "jp": "どこでリラックスしますか。", "hira": "どこ で りらっくす します か", "mp3": "br_q53_where_do_you_relax.mp3" },
-    { "n": 54, "en": "Do you go outside every day?", "jp": "毎日外に出ますか。", "hira": "まいにち そと に でます か", "mp3": "br_q54_do_you_go_outside_every_day.mp3" },
-    { "n": 55, "en": "What time do you go to bed?", "jp": "何時に寝ますか。", "hira": "なんじ に ねます か", "mp3": "br_q55_what_time_do_you_go_to_bed.mp3" },
-
-    { "n": 56, "en": "Do you stretch in the morning?", "jp": "朝にストレッチをしますか。", "hira": "あさ に すとれっち を します か", "mp3": "br_q56_do_you_stretch_in_the_morning.mp3" },
-    { "n": 57, "en": "When do you feel good?", "jp": "どんなときに気分がよいですか。", "hira": "どんな とき に きぶん が よい です か", "mp3": "br_q57_when_do_you_feel_good.mp3" },
-    { "n": 58, "en": "What is good posture?", "jp": "良い姿勢とは何ですか。", "hira": "よい しせい とは なん です か", "mp3": "br_q58_what_is_good_posture.mp3" },
-    { "n": 59, "en": "What time do you eat breakfast?", "jp": "何時に朝ごはんを食べますか。", "hira": "なんじ に あさごはん を たべます か", "mp3": "br_q59_what_time_do_you_eat_breakfast.mp3" },
-    { "n": 60, "en": "What healthy habit will you try this week?", "jp": "今週はどんな健康習慣をやってみますか。", "hira": "こんしゅう は どんな けんこうしゅうかん を やってみます か", "mp3": "br_q60_what_healthy_habit_will_you_try_this_week.mp3" }
+    {
+      "n": 1,
+      "en": "How do you start your day?",
+      "jp": "あなたはどのように一日を始めますか？",
+      "hira": "あなたはどのようにいちにちをはじめますか？",
+      "mp3": "br_q01_how_do_you_start_your_day.mp3"
+    },
+    {
+      "n": 2,
+      "en": "What activities help you feel energized?",
+      "jp": "あなたを元気にする活動は何ですか？",
+      "hira": "あなたをげんきにするかつどうはなんですか？",
+      "mp3": "br_q02_what_activities_help_you_feel_energized.mp3"
+    },
+    {
+      "n": 3,
+      "en": "How do you balance school and home responsibilities?",
+      "jp": "学校と家庭の責任をどのようにバランスをとりますか？",
+      "hira": "がっこうとかていのせきにんをどのようにばらんすをとりますか？",
+      "mp3": "br_q03_how_do_you_balance_school_and_home_responsibilities.mp3"
+    },
+    {
+      "n": 4,
+      "en": "What is your favorite way to unwind after school?",
+      "jp": "学校の後、リラックスするための好きな方法は何ですか？",
+      "hira": "がっこうのあと、リラックスするためのすきなほうほうはなんですか？",
+      "mp3": "br_q04_what_is_your_favorite_way_to_unwind_after_school.mp3"
+    },
+    {
+      "n": 5,
+      "en": "How do you keep track of your homework?",
+      "jp": "宿題をどうやって管理していますか？",
+      "hira": "しゅくだいをどうやってかんりしていますか？",
+      "mp3": "br_q05_how_do_you_keep_track_of_your_homework.mp3"
+    },
+    {
+      "n": 6,
+      "en": "What healthy snacks do you enjoy?",
+      "jp": "どんな健康的なおやつが好きですか？",
+      "hira": "どんなけんこうてきなおやつがすきですか？",
+      "mp3": "br_q06_what_healthy_snacks_do_you_enjoy.mp3"
+    },
+    {
+      "n": 7,
+      "en": "How do you organize your study time?",
+      "jp": "勉強の時間をどのように整理しますか？",
+      "hira": "べんきょうのじかんをどのようにせいりしますか？",
+      "mp3": "br_q07_how_do_you_organize_your_study_time.mp3"
+    },
+    {
+      "n": 8,
+      "en": "What is your favorite subject in school and why?",
+      "jp": "学校で好きな科目は何ですか？なぜですか？",
+      "hira": "がっこうですきなかもくはなんですか？なぜですか？",
+      "mp3": "br_q08_what_is_your_favorite_subject_in_school_and_why.mp3"
+    },
+    {
+      "n": 9,
+      "en": "How do you stay healthy during busy days?",
+      "jp": "忙しい日々に健康を保つためにどうしますか？",
+      "hira": "いそがしいひびにけんこうをたもつためにどうしますか？",
+      "mp3": "br_q09_how_do_you_stay_healthy_during_busy_days.mp3"
+    },
+    {
+      "n": 10,
+      "en": "What do you do if you have too much homework?",
+      "jp": "宿題が多すぎるときはどうしますか？",
+      "hira": "しゅくだいがおおすぎるときはどうしますか？",
+      "mp3": "br_q10_what_do_you_do_if_you_have_too_much_homework.mp3"
+    },
+    {
+      "n": 11,
+      "en": "How do you make sure you get enough sleep?",
+      "jp": "十分な睡眠を確保するためにどうしますか？",
+      "hira": "じゅうぶんなすいみんをかくほするためにどうしますか？",
+      "mp3": "br_q11_how_do_you_make_sure_you_get_enough_sleep.mp3"
+    },
+    {
+      "n": 12,
+      "en": "What time do you usually have dinner?",
+      "jp": "普段何時に夕食を食べますか？",
+      "hira": "ふだんなんじにゆうしょくをたべますか？",
+      "mp3": "br_q12_what_time_do_you_usually_have_dinner.mp3"
+    },
+    {
+      "n": 13,
+      "en": "How do you feel when you are late for school?",
+      "jp": "学校に遅れるとどんな気持ちになりますか？",
+      "hira": "がっこうにおくれるとどんなきもちになりますか？",
+      "mp3": "br_q13_how_do_you_feel_when_you_are_late_for_school.mp3"
+    },
+    {
+      "n": 14,
+      "en": "What do you do to prepare for school in the morning?",
+      "jp": "朝、学校の準備をするために何をしますか？",
+      "hira": "あさ、がっこうのじゅんびをするためになにをしますか？",
+      "mp3": "br_q14_what_do_you_do_to_prepare_for_school_in_the_morning.mp3"
+    },
+    {
+      "n": 15,
+      "en": "What activities do you enjoy after school?",
+      "jp": "学校の後に楽しむ活動は何ですか？",
+      "hira": "がっこうのあとにたのしむかつどうはなんですか？",
+      "mp3": "br_q15_what_activities_do_you_enjoy_after_school.mp3"
+    },
+    {
+      "n": 16,
+      "en": "How do you manage your time effectively?",
+      "jp": "時間を効果的に管理するためにどうしますか？",
+      "hira": "じかんをこうかてきにかんりするためにどうしますか？",
+      "mp3": "br_q16_how_do_you_manage_your_time_effectively.mp3"
+    },
+    {
+      "n": 17,
+      "en": "What do you do to stay focused while studying?",
+      "jp": "勉強中に集中するために何をしますか？",
+      "hira": "べんきょうちゅうにしゅうちゅうするためになにをしますか？",
+      "mp3": "br_q17_what_do_you_do_to_stay_focused_while_studying.mp3"
+    },
+    {
+      "n": 18,
+      "en": "How do you keep your room organized?",
+      "jp": "部屋を整理整頓するためにどうしますか？",
+      "hira": "へやをせいりせいとんするためにどうしますか？",
+      "mp3": "br_q18_how_do_you_keep_your_room_organized.mp3"
+    },
+    {
+      "n": 19,
+      "en": "What is your strategy for completing difficult tasks?",
+      "jp": "難しい作業を終えるための戦略は何ですか？",
+      "hira": "むずかしいさぎょうをおえるためのせんりゃくはなんですか？",
+      "mp3": "br_q19_what_is_your_strategy_for_completing_difficult_tasks.mp3"
+    },
+    {
+      "n": 20,
+      "en": "How do you celebrate completing your homework?",
+      "jp": "宿題を終えたときはどう祝いますか？",
+      "hira": "しゅくだいをおえたときはどういわいますか？",
+      "mp3": "br_q20_how_do_you_celebrate_completing_your_homework.mp3"
+    },
+    {
+      "n": 21,
+      "en": "What do you do to maintain a healthy lifestyle?",
+      "jp": "健康的なライフスタイルを維持するために何をしますか？",
+      "hira": "けんこうてきならいふすたいるをいじするためになにをしますか？",
+      "mp3": "br_q21_what_do_you_do_to_maintain_a_healthy_lifestyle.mp3"
+    },
+    {
+      "n": 22,
+      "en": "How do you help your friends when they are stressed?",
+      "jp": "友達がストレスを感じているとき、どう助けますか？",
+      "hira": "ともだちがすとれすをかんじているとき、どうたすけますか？",
+      "mp3": "br_q22_how_do_you_help_your_friends_when_they_are_stressed.mp3"
+    },
+    {
+      "n": 23,
+      "en": "What time do you usually start your homework?",
+      "jp": "普段、宿題を始めるのは何時ですか？",
+      "hira": "ふだん、しゅくだいをはじめるのはなんじですか？",
+      "mp3": "br_q23_what_time_do_you_usually_start_your_homework.mp3"
+    },
+    {
+      "n": 24,
+      "en": "How do you keep your school supplies organized?",
+      "jp": "学校の道具をどうやって整理しますか？",
+      "hira": "がっこうのどうぐをどうやってせいりしますか？",
+      "mp3": "br_q24_how_do_you_keep_your_school_supplies_organized.mp3"
+    },
+    {
+      "n": 25,
+      "en": "What is your favorite time of day and why?",
+      "jp": "一日の中で好きな時間はいつですか？なぜですか？",
+      "hira": "いちにちのなかですきなじかんはいつですか？なぜですか？",
+      "mp3": "br_q25_what_is_your_favorite_time_of_day_and_why.mp3"
+    },
+    {
+      "n": 26,
+      "en": "How do you encourage yourself to study harder?",
+      "jp": "もっと勉強するためにはどう自分を励ましますか？",
+      "hira": "もっとべんきょうするためにはどうじぶんをはげましますか？",
+      "mp3": "br_q26_how_do_you_encourage_yourself_to_study_harder.mp3"
+    },
+    {
+      "n": 27,
+      "en": "What routines help you to be productive?",
+      "jp": "生産的になるために役立つルーティンは何ですか？",
+      "hira": "せいさんてきになるためにやくだつるーてぃんはなんですか？",
+      "mp3": "br_q27_what_routines_help_you_to_be_productive.mp3"
+    },
+    {
+      "n": 28,
+      "en": "How do you stay motivated to exercise regularly?",
+      "jp": "定期的に運動するためにどうやってやる気を保ちますか？",
+      "hira": "ていきてきにうんどうするためにどうやってやるきをたもちますか？",
+      "mp3": "br_q28_how_do_you_stay_motivated_to_exercise_regularly.mp3"
+    },
+    {
+      "n": 29,
+      "en": "What do you do to relax during your free time?",
+      "jp": "自由時間にリラックスするために何をしますか？",
+      "hira": "じゆうじかんにリラックスするためになにをしますか？",
+      "mp3": "br_q29_what_do_you_do_to_relax_during_your_free_time.mp3"
+    },
+    {
+      "n": 30,
+      "en": "How do you manage stress during exams?",
+      "jp": "試験中のストレスをどのように管理しますか？",
+      "hira": "しけんちゅうのすとれすをどのようにかんりしますか？",
+      "mp3": "br_q30_how_do_you_manage_stress_during_exams.mp3"
+    },
+    {
+      "n": 31,
+      "en": "What is your favorite way to spend the weekend?",
+      "jp": "週末を過ごす好きな方法は何ですか？",
+      "hira": "しゅうまつをすごすすきなほうほうはなんですか？",
+      "mp3": "br_q31_what_is_your_favorite_way_to_spend_the_weekend.mp3"
+    },
+    {
+      "n": 32,
+      "en": "How do you plan your week ahead?",
+      "jp": "一週間の計画をどのように立てますか？",
+      "hira": "いっしゅうかんのけいかくをどのようにたてますか？",
+      "mp3": "br_q32_how_do_you_plan_your_week_ahead.mp3"
+    },
+    {
+      "n": 33,
+      "en": "What do you do to keep a positive attitude?",
+      "jp": "ポジティブな態度を保つために何をしますか？",
+      "hira": "ぽじてぃぶなたいどをたもつためになにをしますか？",
+      "mp3": "br_q33_what_do_you_do_to_keep_a_positive_attitude.mp3"
+    },
+    {
+      "n": 34,
+      "en": "How do you help your family at home?",
+      "jp": "家庭で家族をどのように助けますか？",
+      "hira": "かていでかぞくをどのようにたすけますか？",
+      "mp3": "br_q34_how_do_you_help_your_family_at_home.mp3"
+    },
+    {
+      "n": 35,
+      "en": "What do you do when you feel overwhelmed?",
+      "jp": "圧倒されるときは何をしますか？",
+      "hira": "あっとうされるときはなにをしますか？",
+      "mp3": "br_q35_what_do_you_do_when_you_feel_overwhelmed.mp3"
+    },
+    {
+      "n": 36,
+      "en": "How do you reward yourself after achieving a goal?",
+      "jp": "目標を達成した後、どのように自分を報いますか？",
+      "hira": "もくひょうをたっせいしたあと、どのようにじぶんをほうむしますか？",
+      "mp3": "br_q36_how_do_you_reward_yourself_after_achieving_a_goal.mp3"
+    },
+    {
+      "n": 37,
+      "en": "What do you enjoy doing with your family?",
+      "jp": "家族と一緒に楽しむことは何ですか？",
+      "hira": "かぞくといっしょにたのしむことはなんですか？",
+      "mp3": "br_q37_what_do_you_enjoy_doing_with_your_family.mp3"
+    },
+    {
+      "n": 38,
+      "en": "How do you stay focused during online classes?",
+      "jp": "オンライン授業中に集中するためにどうしますか？",
+      "hira": "おんらいんじゅぎょうちゅうにしゅうちゅうするためにどうしますか？",
+      "mp3": "br_q38_how_do_you_stay_focused_during_online_classes.mp3"
+    },
+    {
+      "n": 39,
+      "en": "What do you do to improve your study habits?",
+      "jp": "勉強の習慣を改善するために何をしますか？",
+      "hira": "べんきょうのしゅうかんをかいぜんするためになにをしますか？",
+      "mp3": "br_q39_what_do_you_do_to_improve_your_study_habits.mp3"
+    },
+    {
+      "n": 40,
+      "en": "How do you prioritize your tasks each day?",
+      "jp": "毎日、タスクの優先順位をどのように決めますか？",
+      "hira": "まいにち、たすくのゆうせんじゅんをどのようにきめますか？",
+      "mp3": "br_q40_how_do_you_prioritize_your_tasks_each_day.mp3"
+    },
+    {
+      "n": 41,
+      "en": "What is one new healthy habit you want to try?",
+      "jp": "挑戦したい新しい健康的な習慣は何ですか？",
+      "hira": "ちょうせんしたいあたらしいけんこうてきなしゅうかんはなんですか？",
+      "mp3": "br_q41_what_is_one_new_healthy_habit_you_want_to_try.mp3"
+    },
+    {
+      "n": 42,
+      "en": "How do you ensure you have fun while studying?",
+      "jp": "勉強中に楽しむためにどうしますか？",
+      "hira": "べんきょうちゅうにたのしむためにどうしますか？",
+      "mp3": "br_q42_how_do_you_ensure_you_have_fun_while_studying.mp3"
+    },
+    {
+      "n": 43,
+      "en": "What helps you to wake up feeling refreshed?",
+      "jp": "すっきり目覚めるために何が助けになりますか？",
+      "hira": "すっきりめざめるためになにがたすけになりますか？",
+      "mp3": "br_q43_what_helps_you_to_wake_up_feeling_refreshed.mp3"
+    },
+    {
+      "n": 44,
+      "en": "How do you stay in touch with your friends?",
+      "jp": "友達と連絡を取り続けるためにどうしますか？",
+      "hira": "ともだちとれんらくをとりつづけるためにどうしますか？",
+      "mp3": "br_q44_how_do_you_stay_in_touch_with_your_friends.mp3"
+    },
+    {
+      "n": 45,
+      "en": "What is your favorite way to exercise?",
+      "jp": "運動する好きな方法は何ですか？",
+      "hira": "うんどうするすきなほうほうはなんですか？",
+      "mp3": "br_q45_what_is_your_favorite_way_to_exercise.mp3"
+    },
+    {
+      "n": 46,
+      "en": "How do you feel when you finish a big project?",
+      "jp": "大きなプロジェクトを終えたとき、どんな気持ちになりますか？",
+      "hira": "おおきなぷろじぇくとをおえたとき、どんなきもちになりますか？",
+      "mp3": "br_q46_how_do_you_feel_when_you_finish_a_big_project.mp3"
+    },
+    {
+      "n": 47,
+      "en": "What do you find most challenging about school?",
+      "jp": "学校で最も難しいと思うことは何ですか？",
+      "hira": "がっこうでいちばんむずかしいとおもうことはなんですか？",
+      "mp3": "br_q47_what_do_you_find_most_challenging_about_school.mp3"
+    },
+    {
+      "n": 48,
+      "en": "How do you maintain a good study environment?",
+      "jp": "良い勉強環境を維持するためにどうしますか？",
+      "hira": "よいべんきょうかんきょうをいじするためにどうしますか？",
+      "mp3": "br_q48_how_do_you_maintain_a_good_study_environment.mp3"
+    },
+    {
+      "n": 49,
+      "en": "What do you do to stay organized during the school year?",
+      "jp": "学年中に整理整頓を保つために何をしますか？",
+      "hira": "がくねんちゅうにせいりせいとんをたもつためになにをしますか？",
+      "mp3": "br_q49_what_do_you_do_to_stay_organized_during_the_school_year.mp3"
+    },
+    {
+      "n": 50,
+      "en": "How do you deal with distractions while studying?",
+      "jp": "勉強中の気を散らすものにどう対処しますか？",
+      "hira": "べんきょうちゅうのきをちらすものにどうたいしょしますか？",
+      "mp3": "br_q50_how_do_you_deal_with_distractions_while_studying.mp3"
+    },
+    {
+      "n": 51,
+      "en": "What is one goal you have for this school year?",
+      "jp": "今年の学年での目標は何ですか？",
+      "hira": "ことしのがくねんでのもくひょうはなんですか？",
+      "mp3": "br_q51_what_is_one_goal_you_have_for_this_school_year.mp3"
+    },
+    {
+      "n": 52,
+      "en": "How do you help your classmates when they struggle?",
+      "jp": "クラスメートが苦しんでいるとき、どう助けますか？",
+      "hira": "くらすめーとがくるしんでいるとき、どうたすけますか？",
+      "mp3": "br_q52_how_do_you_help_your_classmates_when_they_struggle.mp3"
+    },
+    {
+      "n": 53,
+      "en": "What do you enjoy most about your daily routine?",
+      "jp": "日常のルーティンで最も楽しむことは何ですか？",
+      "hira": "にちじょうのるーてぃんでもっともたのしむことはなんですか？",
+      "mp3": "br_q53_what_do_you_enjoy_most_about_your_daily_routine.mp3"
+    },
+    {
+      "n": 54,
+      "en": "How do you ensure you have enough time for yourself?",
+      "jp": "自分のための十分な時間を確保するためにどうしますか？",
+      "hira": "じぶんのためのじゅうぶんなじかんをかくほするためにどうしますか？",
+      "mp3": "br_q54_how_do_you_ensure_you_have_enough_time_for_yourself.mp3"
+    },
+    {
+      "n": 55,
+      "en": "What activities do you find help you relax?",
+      "jp": "リラックスするのに役立つ活動は何だと思いますか？",
+      "hira": "りらっくすするのにやくだつかつどうはなんだとおもいますか？",
+      "mp3": "br_q55_what_activities_do_you_find_help_you_relax.mp3"
+    },
+    {
+      "n": 56,
+      "en": "How do you motivate yourself to read more books?",
+      "jp": "もっと本を読むためにどうやって自分を励ましますか？",
+      "hira": "もっとほんをよむためにどうやってじぶんをはげましますか？",
+      "mp3": "br_q56_how_do_you_motivate_yourself_to_read_more_books.mp3"
+    },
+    {
+      "n": 57,
+      "en": "What do you think is the key to a successful day?",
+      "jp": "成功した一日の鍵は何だと思いますか？",
+      "hira": "せいこうしたいちにちのかぎはなんだとおもいますか？",
+      "mp3": "br_q57_what_do_you_think_is_the_key_to_a_successful_day.mp3"
+    },
+    {
+      "n": 58,
+      "en": "How do you stay connected with your family?",
+      "jp": "家族とつながりを保つためにどうしますか？",
+      "hira": "かぞくとつながりをたもつためにどうしますか？",
+      "mp3": "br_q58_how_do_you_stay_connected_with_your_family.mp3"
+    },
+    {
+      "n": 59,
+      "en": "What is something new you want to learn this year?",
+      "jp": "今年学びたい新しいことは何ですか？",
+      "hira": "ことしまなびたいあたらしいことはなんですか？",
+      "mp3": "br_q59_what_is_something_new_you_want_to_learn_this_year.mp3"
+    },
+    {
+      "n": 60,
+      "en": "How do you celebrate your achievements?",
+      "jp": "達成を祝うためにどうしますか？",
+      "hira": "たっせいをいわうためにどうしますか？",
+      "mp3": "br_q60_how_do_you_celebrate_your_achievements.mp3"
+    }
   ]
 }
