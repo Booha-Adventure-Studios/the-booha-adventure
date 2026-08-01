@@ -1,68 +1,424 @@
-
 {
   "cards": [
-    { "n": 1, "en": "I wake up at seven.", "jp": "私は7時に起きます。", "hira": "わたし は しちじ に おきます", "mp3": "br_s01_i_wake_up_at_seven.mp3" },
-    { "n": 2, "en": "I usually eat breakfast.", "jp": "私はたいてい朝ごはんを食べます。", "hira": "わたし は たいてい あさごはん を たべます", "mp3": "br_s02_i_usually_eat_breakfast.mp3" },
-    { "n": 3, "en": "I always brush my teeth after breakfast.", "jp": "私は朝ごはんのあとでいつも歯をみがきます。", "hira": "わたし は あさごはん の あと で いつも は を みがきます", "mp3": "br_s03_i_always_brush_my_teeth_after_breakfast.mp3" },
-    { "n": 4, "en": "He sometimes watches TV after dinner.", "jp": "彼は夕ごはんのあとでときどきテレビを見ます。", "hira": "かれ は ゆうごはん の あと で ときどき てれび を みます", "mp3": "br_s04_he_sometimes_watches_tv_after_dinner.mp3" },
-    { "n": 5, "en": "She never goes to bed late.", "jp": "彼女は遅く寝ません。", "hira": "かのじょ は おそく ねません", "mp3": "br_s05_she_never_goes_to_bed_late.mp3" },
-    { "n": 6, "en": "We often walk the dog in the evening.", "jp": "私たちは夕方によく犬を散歩させます。", "hira": "わたしたち は ゆうがた に よく いぬ を さんぽ させます", "mp3": "br_s06_we_often_walk_the_dog_in_the_evening.mp3" },
-    { "n": 7, "en": "I do my homework after school.", "jp": "私は放課後に宿題をします。", "hira": "わたし は ほうかご に しゅくだい を します", "mp3": "br_s07_i_do_my_homework_after_school.mp3" },
-    { "n": 8, "en": "Do you get dressed quickly?", "jp": "あなたは早く着替えますか。", "hira": "あなた は はやく きがえます か", "mp3": "br_s08_do_you_get_dressed_quickly.mp3" },
-    { "n": 9, "en": "Yes, I do. / No, I don’t.", "jp": "はい、します。／いいえ、しません。", "hira": "はい します／いいえ しません", "mp3": "br_s09_yes_i_do_no_i_dont.mp3" },
-    { "n": 10, "en": "My father takes a bath at nine.", "jp": "父は9時におふろに入ります。", "hira": "ちち は くじ に おふろ に はいります", "mp3": "br_s10_my_father_takes_a_bath_at_nine.mp3" },
-    { "n": 11, "en": "We clean our room on Saturday.", "jp": "私たちは土曜日に部屋をそうじします。", "hira": "わたしたち は どようび に へや を そうじします", "mp3": "br_s11_we_clean_our_room_on_saturday.mp3" },
-    { "n": 12, "en": "I sometimes read before bed.", "jp": "私は寝る前にときどき本を読みます。", "hira": "わたし は ねる まえ に ときどき ほん を よみます", "mp3": "br_s12_i_sometimes_read_before_bed.mp3" },
-    { "n": 13, "en": "She studies English every day.", "jp": "彼女は毎日英語を勉強します。", "hira": "かのじょ は まいにち えいご を べんきょうします", "mp3": "br_s13_she_studies_english_every_day.mp3" },
-    { "n": 14, "en": "Do you go to school by bus?", "jp": "あなたはバスで学校へ行きますか。", "hira": "あなた は ばす で がっこう へ いきます か", "mp3": "br_s14_do_you_go_to_school_by_bus.mp3" },
-    { "n": 15, "en": "I go to bed at ten o’clock.", "jp": "私は10時に寝ます。", "hira": "わたし は じゅうじ に ねます", "mp3": "br_s15_i_go_to_bed_at_ten_oclock.mp3" },
-
-    { "n": 16, "en": "What time is it?", "jp": "今何時ですか。", "hira": "いま なんじ です か", "mp3": "br_s16_what_time_is_it.mp3" },
-    { "n": 17, "en": "It’s three o’clock.", "jp": "3時です。", "hira": "さんじ です", "mp3": "br_s17_its_three_oclock.mp3" },
-    { "n": 18, "en": "It’s half past five.", "jp": "5時半です。", "hira": "ごじ はん です", "mp3": "br_s18_its_half_past_five.mp3" },
-    { "n": 19, "en": "It’s a quarter past eight.", "jp": "8時15分です。", "hira": "はちじ じゅうごふん です", "mp3": "br_s19_its_a_quarter_past_eight.mp3" },
-    { "n": 20, "en": "It’s a quarter to nine.", "jp": "9時15分前です。", "hira": "くじ じゅうごふん まえ です", "mp3": "br_s20_its_a_quarter_to_nine.mp3" },
-    { "n": 21, "en": "Class starts at eight thirty.", "jp": "授業は8時30分に始まります。", "hira": "じゅぎょう は はちじ さんじゅっぷん に はじまります", "mp3": "br_s21_class_starts_at_eight_thirty.mp3" },
-    { "n": 22, "en": "Lunch is from 12:10 to 12:40.", "jp": "昼休みは12時10分から12時40分までです。", "hira": "ひるやすみ は じゅうにじ じゅっぷん から じゅうにじ よんじゅっぷん まで です", "mp3": "br_s22_lunch_is_from_1210_to_1240.mp3" },
-    { "n": 23, "en": "The bus comes at 7:15.", "jp": "バスは7時15分に来ます。", "hira": "ばす は しちじ じゅうごふん に きます", "mp3": "br_s23_the_bus_comes_at_715.mp3" },
-    { "n": 24, "en": "I get up at six every day.", "jp": "私は毎日6時に起きます。", "hira": "わたし は まいにち ろくじ に おきます", "mp3": "br_s24_i_get_up_at_six_every_day.mp3" },
-    { "n": 25, "en": "I go to bed at ten.", "jp": "私は10時に寝ます。", "hira": "わたし は じゅうじ に ねます", "mp3": "br_s25_i_go_to_bed_at_ten.mp3" },
-    { "n": 26, "en": "I’m late for school!", "jp": "学校に遅れています！", "hira": "がっこう に おくれています", "mp3": "br_s26_im_late_for_school.mp3" },
-    { "n": 27, "en": "Don’t be late.", "jp": "遅れないでください。", "hira": "おくれないで ください", "mp3": "br_s27_dont_be_late.mp3" },
-    { "n": 28, "en": "Let’s meet at four p.m.", "jp": "午後4時に会いましょう。", "hira": "ごご よじ に あいましょう", "mp3": "br_s28_lets_meet_at_four_pm.mp3" },
-    { "n": 29, "en": "I set an alarm for six o’clock.", "jp": "6時に目覚ましをセットします。", "hira": "ろくじ に めざまし を せっとします", "mp3": "br_s29_i_set_an_alarm_for_six_oclock.mp3" },
-    { "n": 30, "en": "What time do you finish?", "jp": "何時に終わりますか。", "hira": "なんじ に おわります か", "mp3": "br_s30_what_time_do_you_finish.mp3" },
-
-    { "n": 31, "en": "I like playing soccer.", "jp": "私はサッカーをするのが好きです。", "hira": "わたし は さっかー を する の が すき です", "mp3": "br_s31_i_like_playing_soccer.mp3" },
-    { "n": 32, "en": "I don’t like shopping.", "jp": "私は買い物が好きではありません。", "hira": "わたし は かいもの が すき では ありません", "mp3": "br_s32_i_dont_like_shopping.mp3" },
-    { "n": 33, "en": "He can play the piano.", "jp": "彼はピアノがひけます。", "hira": "かれ は ぴあの が ひけます", "mp3": "br_s33_he_can_play_the_piano.mp3" },
-    { "n": 34, "en": "She can’t ride a bike.", "jp": "彼女は自転車に乗れません。", "hira": "かのじょ は じてんしゃ に のれません", "mp3": "br_s34_she_cant_ride_a_bike.mp3" },
-    { "n": 35, "en": "We often watch movies on weekends.", "jp": "私たちは週末によく映画を見ます。", "hira": "わたしたち は しゅうまつ に よく えいが を みます", "mp3": "br_s35_we_often_watch_movies_on_weekends.mp3" },
-    { "n": 36, "en": "Do you like reading comics?", "jp": "まんがを読むのは好きですか。", "hira": "まんが を よむ の は すき です か", "mp3": "br_s36_do_you_like_reading_comics.mp3" },
-    { "n": 37, "en": "Yes, I do. / No, I don’t.", "jp": "はい、好きです。／いいえ、好きではありません。", "hira": "はい すきです／いいえ すきでは ありません", "mp3": "br_s37_yes_i_do_no_i_dont.mp3" },
-    { "n": 38, "en": "I prefer music to TV.", "jp": "私はテレビより音楽のほうが好きです。", "hira": "わたし は てれび より おんがく の ほう が すき です", "mp3": "br_s38_i_prefer_music_to_tv.mp3" },
-    { "n": 39, "en": "Let’s hang out after school.", "jp": "放課後に遊びましょう。", "hira": "ほうかご に あそびましょう", "mp3": "br_s39_lets_hang_out_after_school.mp3" },
-    { "n": 40, "en": "I sometimes cook with my dad.", "jp": "私はときどき父と料理をします。", "hira": "わたし は ときどき ちち と りょうり を します", "mp3": "br_s40_i_sometimes_cook_with_my_dad.mp3" },
-    { "n": 41, "en": "I want to learn guitar.", "jp": "私はギターを習いたいです。", "hira": "わたし は ぎたー を ならいたい です", "mp3": "br_s41_i_want_to_learn_guitar.mp3" },
-    { "n": 42, "en": "It’s fun to camp in summer.", "jp": "夏にキャンプするのは楽しいです。", "hira": "なつ に きゃんぷ する の は たのしい です", "mp3": "br_s42_its_fun_to_camp_in_summer.mp3" },
-    { "n": 43, "en": "Can you play basketball?", "jp": "バスケットボールができますか。", "hira": "ばすけっとぼーる が できます か", "mp3": "br_s43_can_you_play_basketball.mp3" },
-    { "n": 44, "en": "I usually relax on Sundays.", "jp": "私はたいてい日曜日にリラックスします。", "hira": "わたし は たいてい にちようび に りらっくす します", "mp3": "br_s44_i_usually_relax_on_sundays.mp3" },
-    { "n": 45, "en": "My hobby is drawing.", "jp": "私のしゅみは絵を描くことです。", "hira": "わたし の しゅみ は え を かく こと です", "mp3": "br_s45_my_hobby_is_drawing.mp3" },
-
-    { "n": 46, "en": "I eat vegetables every day.", "jp": "私は毎日野菜を食べます。", "hira": "わたし は まいにち やさい を たべます", "mp3": "br_s46_i_eat_vegetables_every_day.mp3" },
-    { "n": 47, "en": "You should drink a lot of water.", "jp": "たくさん水を飲むべきです。", "hira": "たくさん みず を のむ べき です", "mp3": "br_s47_you_should_drink_a_lot_of_water.mp3" },
-    { "n": 48, "en": "I usually sleep for eight hours.", "jp": "私はたいてい8時間寝ます。", "hira": "わたし は たいてい はちじかん ねます", "mp3": "br_s48_i_usually_sleep_for_eight_hours.mp3" },
-    { "n": 49, "en": "Let’s exercise together.", "jp": "いっしょに運動しましょう。", "hira": "いっしょ に うんどう しましょう", "mp3": "br_s49_lets_exercise_together.mp3" },
-    { "n": 50, "en": "Wash your hands before eating.", "jp": "食べる前に手を洗ってください。", "hira": "たべる まえ に て を あらって ください", "mp3": "br_s50_wash_your_hands_before_eating.mp3" },
-    { "n": 51, "en": "Don’t eat too much junk food.", "jp": "ジャンクフードを食べすぎないでください。", "hira": "じゃんくふーど を たべすぎないで ください", "mp3": "br_s51_dont_eat_too_much_junk_food.mp3" },
-    { "n": 52, "en": "I always brush my teeth after meals.", "jp": "私は食事のあとでいつも歯をみがきます。", "hira": "わたし は しょくじ の あと で いつも は を みがきます", "mp3": "br_s52_i_always_brush_my_teeth_after_meals.mp3" },
-    { "n": 53, "en": "I sometimes go outside for a walk.", "jp": "私はときどき外へ散歩に出ます。", "hira": "わたし は ときどき そと へ さんぽ に でます", "mp3": "br_s53_i_sometimes_go_outside_for_a_walk.mp3" },
-    { "n": 54, "en": "Stretch in the morning.", "jp": "朝にストレッチをしてください。", "hira": "あさ に すとれっち を してください", "mp3": "br_s54_stretch_in_the_morning.mp3" },
-    { "n": 55, "en": "I feel good when I move my body.", "jp": "体を動かすと気分がよいです。", "hira": "からだ を うごかす と きぶん が よい です", "mp3": "br_s55_i_feel_good_when_i_move_my_body.mp3" },
-    { "n": 56, "en": "You should rest when you are tired.", "jp": "疲れたときは休むべきです。", "hira": "つかれた とき は やすむ べき です", "mp3": "br_s56_you_should_rest_when_you_are_tired.mp3" },
-    { "n": 57, "en": "Good posture is important.", "jp": "良い姿勢は大切です。", "hira": "よい しせい は たいせつ です", "mp3": "br_s57_good_posture_is_important.mp3" },
-    { "n": 58, "en": "Breathe deeply and slowly.", "jp": "ゆっくり深呼吸をしてください。", "hira": "ゆっくり しんこきゅう を してください", "mp3": "br_s58_breathe_deeply_and_slowly.mp3" },
-    { "n": 59, "en": "I try to go to bed early.", "jp": "私は早く寝るようにしています。", "hira": "わたし は はやく ねる よう に しています", "mp3": "br_s59_i_try_to_go_to_bed_early.mp3" },
-    { "n": 60, "en": "I never skip breakfast.", "jp": "私は朝ごはんを絶対に抜きません。", "hira": "わたし は あさごはん を ぜったい に ぬきません", "mp3": "br_s60_i_never_skip_breakfast.mp3" }
+    {
+      "n": 1,
+      "en": "I wake up and stretch my body every morning.",
+      "jp": "毎朝、体を伸ばして起きます。",
+      "hira": "まいあさ、からだをのばしておきます。",
+      "mp3": "br_s01_i_wake_up_and_stretch_my_body_every_morning.mp3"
+    },
+    {
+      "n": 2,
+      "en": "Before I leave for school, I prepare my bag.",
+      "jp": "学校に出かける前に、かばんを準備します。",
+      "hira": "がっこうにでかけるまえに、かばんをじゅんびします。",
+      "mp3": "br_s02_before_i_leave_for_school_i_prepare_my_bag.mp3"
+    },
+    {
+      "n": 3,
+      "en": "I like to have fruits as snacks during the day.",
+      "jp": "私は日中におやつとして果物を食べるのが好きです。",
+      "hira": "わたしはにちちゅうにおやつとしてくだものをたべるのがすきです。",
+      "mp3": "br_s03_i_like_to_have_fruits_as_snacks_during_the_day.mp3"
+    },
+    {
+      "n": 4,
+      "en": "After classes, I often play sports with my friends.",
+      "jp": "授業の後、友達とスポーツをすることが多いです。",
+      "hira": "じゅぎょうのあと、ともだちとすぽーつをすることがおおいです。",
+      "mp3": "br_s04_after_classes_i_often_play_sports_with_my_friends.mp3"
+    },
+    {
+      "n": 5,
+      "en": "I make sure to drink enough water every day.",
+      "jp": "毎日、十分な水を飲むようにしています。",
+      "hira": "まいにち、じゅうぶんなみずをのむようにしています。",
+      "mp3": "br_s05_i_make_sure_to_drink_enough_water_every_day.mp3"
+    },
+    {
+      "n": 6,
+      "en": "In the evening, I review what I learned at school.",
+      "jp": "夕方、学校で学んだことを復習します。",
+      "hira": "ゆうがた、がっこうでまなんだことをふくしゅうします。",
+      "mp3": "br_s06_in_the_evening_i_review_what_i_learned_at_school.mp3"
+    },
+    {
+      "n": 7,
+      "en": "I try to go to bed at a reasonable time.",
+      "jp": "私は適切な時間に寝るようにしています。",
+      "hira": "わたしはてきせつなじかんにねるようにしています。",
+      "mp3": "br_s07_i_try_to_go_to_bed_at_a_reasonable_time.mp3"
+    },
+    {
+      "n": 8,
+      "en": "My parents encourage me to stay active every day.",
+      "jp": "両親は毎日元気に過ごすように勧めてくれます。",
+      "hira": "りょうしんはまいにちげんきにすごすようにすすめてくれます。",
+      "mp3": "br_s08_my_parents_encourage_me_to_stay_active_every_day.mp3"
+    },
+    {
+      "n": 9,
+      "en": "I set a timer to help me manage my study time.",
+      "jp": "勉強時間を管理するためにタイマーを設定します。",
+      "hira": "べんきょうじかんをかんりするためにたいまーをせっていします。",
+      "mp3": "br_s09_i_set_a_timer_to_help_me_manage_my_study_time.mp3"
+    },
+    {
+      "n": 10,
+      "en": "I organize my schoolwork to avoid last-minute stress.",
+      "jp": "最後の瞬間のストレスを避けるために、学校の仕事を整理します。",
+      "hira": "さいごのしゅんかんのすとれすをさけるために、がっこうのしごとをせいりします。",
+      "mp3": "br_s10_i_organize_my_schoolwork_to_avoid_last_minute_stress.mp3"
+    },
+    {
+      "n": 11,
+      "en": "On weekends, I help with household chores.",
+      "jp": "週末に家事を手伝います。",
+      "hira": "しゅうまつにかじをてつだいます。",
+      "mp3": "br_s11_on_weekends_i_help_with_household_chores.mp3"
+    },
+    {
+      "n": 12,
+      "en": "I prepare my lunch the night before school.",
+      "jp": "学校の前の晩に昼食を準備します。",
+      "hira": "がっこうのまえのばんにちゅうしょくをじゅんびします。",
+      "mp3": "br_s12_i_prepare_my_lunch_the_night_before_school.mp3"
+    },
+    {
+      "n": 13,
+      "en": "I balance my time between studying and relaxing.",
+      "jp": "勉強とリラックスの時間をバランスよく取ります。",
+      "hira": "べんきょうとりらっくすのじかんをばらんすよくとります。",
+      "mp3": "br_s13_i_balance_my_time_between_studying_and_relaxing.mp3"
+    },
+    {
+      "n": 14,
+      "en": "I enjoy reading books before going to sleep.",
+      "jp": "寝る前に本を読むのが好きです。",
+      "hira": "ねるまえにほんをよむのがすきです。",
+      "mp3": "br_s14_i_enjoy_reading_books_before_going_to_sleep.mp3"
+    },
+    {
+      "n": 15,
+      "en": "I set goals for myself to improve my study habits.",
+      "jp": "勉強の習慣を改善するために自分で目標を設定します。",
+      "hira": "べんきょうのしゅうかんをかいぜんするためにじぶんでもくひょうをせっていします。",
+      "mp3": "br_s15_i_set_goals_for_myself_to_improve_my_study_habits.mp3"
+    },
+    {
+      "n": 16,
+      "en": "I learn new things by asking questions in class.",
+      "jp": "授業で質問することで新しいことを学びます。",
+      "hira": "じゅぎょうでしつもんすることであたらしいことをまなびます。",
+      "mp3": "br_s16_i_learn_new_things_by_asking_questions_in_class.mp3"
+    },
+    {
+      "n": 17,
+      "en": "I keep my room tidy to create a better space for studying.",
+      "jp": "勉強するために、部屋をきれいに保ちます。",
+      "hira": "べんきょうするために、へやをきれいにたもちます。",
+      "mp3": "br_s17_i_keep_my_room_tidy_to_create_a_better_space_for_studying.mp3"
+    },
+    {
+      "n": 18,
+      "en": "I take breaks during studying to stay focused.",
+      "jp": "集中力を保つために勉強中に休憩を取ります。",
+      "hira": "しゅうちゅうりょくをたもつためにべんきょうちゅうにきゅうけいをとります。",
+      "mp3": "br_s18_i_take_breaks_during_studying_to_stay_focused.mp3"
+    },
+    {
+      "n": 19,
+      "en": "I enjoy helping my classmates with their studies.",
+      "jp": "クラスメートの勉強を手伝うのが楽しいです。",
+      "hira": "くらすめーとのべんきょうをてつだうのがたのしいです。",
+      "mp3": "br_s19_i_enjoy_helping_my_classmates_with_their_studies.mp3"
+    },
+    {
+      "n": 20,
+      "en": "I write down important dates in my planner.",
+      "jp": "重要な日付をプランナーに書き留めます。",
+      "hira": "じゅうようなひづけをぷらんなーにかきとめます。",
+      "mp3": "br_s20_i_write_down_important_dates_in_my_planner.mp3"
+    },
+    {
+      "n": 21,
+      "en": "I enjoy making healthy meals on weekends.",
+      "jp": "週末に健康的な食事を作るのが楽しいです。",
+      "hira": "しゅうまつにけんこうてきなしょくじをつくるのがたのしいです。",
+      "mp3": "br_s21_i_enjoy_making_healthy_meals_on_weekends.mp3"
+    },
+    {
+      "n": 22,
+      "en": "I keep a schedule to track my assignments.",
+      "jp": "課題を追跡するためにスケジュールを保ちます。",
+      "hira": "かだいをついせきするためにすけじゅーるをたもちます。",
+      "mp3": "br_s22_i_keep_a_schedule_to_track_my_assignments.mp3"
+    },
+    {
+      "n": 23,
+      "en": "I participate in school clubs to meet new friends.",
+      "jp": "新しい友達を作るために学校のクラブに参加します。",
+      "hira": "あたらしいともだちをつくるためにがっこうのくらぶにさんかします。",
+      "mp3": "br_s23_i_participate_in_school_clubs_to_meet_new_friends.mp3"
+    },
+    {
+      "n": 24,
+      "en": "I practice good hygiene by washing my hands often.",
+      "jp": "手を頻繁に洗うことで良い衛生状態を保っています。",
+      "hira": "てをひんぱんにあらうことでよいいせいじょうたいをたもっています。",
+      "mp3": "br_s24_i_practice_good_hygiene_by_washing_my_hands_often.mp3"
+    },
+    {
+      "n": 25,
+      "en": "I try to limit my screen time during the week.",
+      "jp": "平日の画面時間を制限するようにしています。",
+      "hira": "へいじつのがめんじかんをせいげんするようにしています。",
+      "mp3": "br_s25_i_try_to_limit_my_screen_time_during_the_week.mp3"
+    },
+    {
+      "n": 26,
+      "en": "I enjoy spending time outdoors on sunny days.",
+      "jp": "晴れた日には外で過ごすのが楽しいです。",
+      "hira": "はれたひにはそとですごすのがたのしいです。",
+      "mp3": "br_s26_i_enjoy_spending_time_outdoors_on_sunny_days.mp3"
+    },
+    {
+      "n": 27,
+      "en": "I schedule time to relax after finishing my homework.",
+      "jp": "宿題を終えた後にリラックスする時間をスケジュールします。",
+      "hira": "しゅくだいをおえたあとにりらっくすするじかんをすけじゅーるします。",
+      "mp3": "br_s27_i_schedule_time_to_relax_after_finishing_my_homework.mp3"
+    },
+    {
+      "n": 28,
+      "en": "I keep track of my goals in a personal journal.",
+      "jp": "個人的な日記で目標を記録します。",
+      "hira": "こじんてきなにっきでもくひょうをきろくします。",
+      "mp3": "br_s28_i_keep_track_of_my_goals_in_a_personal_journal.mp3"
+    },
+    {
+      "n": 29,
+      "en": "I tidy up my study area before starting homework.",
+      "jp": "宿題を始める前に勉強エリアを整理します。",
+      "hira": "しゅくだいをはじめるまえにべんきょうえりあをせいりします。",
+      "mp3": "br_s29_i_tidy_up_my_study_area_before_starting_homework.mp3"
+    },
+    {
+      "n": 30,
+      "en": "I make sure to get enough sleep each night.",
+      "jp": "毎晩、十分な睡眠をとるようにしています。",
+      "hira": "まいばん、じゅうぶんなすいみんをとるようにしています。",
+      "mp3": "br_s30_i_make_sure_to_get_enough_sleep_each_night.mp3"
+    },
+    {
+      "n": 31,
+      "en": "I listen to music while preparing for my tests.",
+      "jp": "テストの準備をしながら音楽を聴きます。",
+      "hira": "てすとのじゅんびをしながらおんがくをききます。",
+      "mp3": "br_s31_i_listen_to_music_while_preparing_for_my_tests.mp3"
+    },
+    {
+      "n": 32,
+      "en": "I make a list of tasks to complete each day.",
+      "jp": "毎日終わらせるべきタスクのリストを作ります。",
+      "hira": "まいにちおわらせるべきたすくのりすとをつくります。",
+      "mp3": "br_s32_i_make_a_list_of_tasks_to_complete_each_day.mp3"
+    },
+    {
+      "n": 33,
+      "en": "I enjoy cooking healthy recipes with my family.",
+      "jp": "家族と健康的なレシピを作るのが楽しいです。",
+      "hira": "かぞくとけんこうてきなれしぴをつくるのがたのしいです。",
+      "mp3": "br_s33_i_enjoy_cooking_healthy_recipes_with_my_family.mp3"
+    },
+    {
+      "n": 34,
+      "en": "I participate in community service to help others.",
+      "jp": "他の人を助けるために地域サービスに参加します。",
+      "hira": "ほかのひとをたすけるためにちいきさーびすにさんかします。",
+      "mp3": "br_s34_i_participate_in_community_service_to_help_others.mp3"
+    },
+    {
+      "n": 35,
+      "en": "I plan my week every Sunday to stay organized.",
+      "jp": "毎週日曜日に整理するために週の計画を立てます。",
+      "hira": "まいしゅうにちようびにせいりするためにしゅうのけいかくをたてます。",
+      "mp3": "br_s35_i_plan_my_week_every_sunday_to_stay_organized.mp3"
+    },
+    {
+      "n": 36,
+      "en": "I try to be kind and helpful to my classmates.",
+      "jp": "クラスメートに優しくて助けになるようにしています。",
+      "hira": "くらすめーとにやさしくてたすけになるようにしています。",
+      "mp3": "br_s36_i_try_to_be_kind_and_helpful_to_my_classmates.mp3"
+    },
+    {
+      "n": 37,
+      "en": "I keep my backpack organized for easy access to my books.",
+      "jp": "本へのアクセスを簡単にするために、リュックサックを整理します。",
+      "hira": "ほんへのあくせすをかんたんにするために、りゅっくさっくをせいりします。",
+      "mp3": "br_s37_i_keep_my_backpack_organized_for_easy_access_to_my_books.mp3"
+    },
+    {
+      "n": 38,
+      "en": "I practice mindfulness to manage my stress.",
+      "jp": "ストレスを管理するためにマインドフルネスを実践します。",
+      "hira": "すとれすをかんりするためにまいんどふるねすをじっせんします。",
+      "mp3": "br_s38_i_practice_mindfulness_to_manage_my_stress.mp3"
+    },
+    {
+      "n": 39,
+      "en": "I enjoy learning about health and nutrition.",
+      "jp": "健康と栄養について学ぶのが楽しいです。",
+      "hira": "けんこうとえいようについてまなぶのがたのしいです。",
+      "mp3": "br_s39_i_enjoy_learning_about_health_and_nutrition.mp3"
+    },
+    {
+      "n": 40,
+      "en": "I like to write in my diary every night.",
+      "jp": "毎晩日記を書くのが好きです。",
+      "hira": "まいばんにっきをかくのがすきです。",
+      "mp3": "br_s40_i_like_to_write_in_my_diary_every_night.mp3"
+    },
+    {
+      "n": 41,
+      "en": "I try to be punctual and arrive on time to school.",
+      "jp": "時間厳守で学校に時間通りに着くようにします。",
+      "hira": "じかんげんしゅでがっこうにじかんどおりにつくようにします。",
+      "mp3": "br_s41_i_try_to_be_punctual_and_arrive_on_time_to_school.mp3"
+    },
+    {
+      "n": 42,
+      "en": "I make sure to include some exercise in my daily routine.",
+      "jp": "日常のルーチンに運動を取り入れるようにしています。",
+      "hira": "にちじょうのるーちんにうんどうをとりいれるようにしています。",
+      "mp3": "br_s42_i_make_sure_to_include_some_exercise_in_my_daily_routine.mp3"
+    },
+    {
+      "n": 43,
+      "en": "I help my parents with grocery shopping on weekends.",
+      "jp": "週末に両親と食料品の買い物を手伝います。",
+      "hira": "しゅうまつにりょうしんとしょくりょうひんのかいものをてつだいます。",
+      "mp3": "br_s43_i_help_my_parents_with_grocery_shopping_on_weekends.mp3"
+    },
+    {
+      "n": 44,
+      "en": "I try to read at least one book each month.",
+      "jp": "毎月少なくとも一冊の本を読むようにしています。",
+      "hira": "まいつきすくなくともいっさつのほんをよむようにしています。",
+      "mp3": "br_s44_i_try_to_read_at_least_one_book_each_month.mp3"
+    },
+    {
+      "n": 45,
+      "en": "I set aside time for hobbies and interests every week.",
+      "jp": "毎週趣味や興味に時間を確保します。",
+      "hira": "まいしゅうしゅみやきょうみにじかんをかくほします。",
+      "mp3": "br_s45_i_set_aside_time_for_hobbies_and_interests_every_week.mp3"
+    },
+    {
+      "n": 46,
+      "en": "I enjoy visiting new places during my vacations.",
+      "jp": "休暇中に新しい場所を訪れるのが楽しいです。",
+      "hira": "きゅうかちゅうにあたらしいばしょをおとずれるのがたのしいです。",
+      "mp3": "br_s46_i_enjoy_visiting_new_places_during_my_vacations.mp3"
+    },
+    {
+      "n": 47,
+      "en": "I keep track of my progress in school projects.",
+      "jp": "学校のプロジェクトの進捗を追跡します。",
+      "hira": "がっこうのぷろじぇくとのしんちょくをついせきします。",
+      "mp3": "br_s47_i_keep_track_of_my_progress_in_school_projects.mp3"
+    },
+    {
+      "n": 48,
+      "en": "I try to maintain a positive attitude towards challenges.",
+      "jp": "挑戦に対して前向きな態度を保つようにしています。",
+      "hira": "ちょうせんにたいしてまえむきなたいどをたもつようにしています。",
+      "mp3": "br_s48_i_try_to_maintain_a_positive_attitude_towards_challenges.mp3"
+    },
+    {
+      "n": 49,
+      "en": "I help organize study groups with my classmates.",
+      "jp": "クラスメートと勉強グループを組織するのを手伝います。",
+      "hira": "くらすめーととべんきょうぐるーぷをそしきするのをてつだいます。",
+      "mp3": "br_s49_i_help_organize_study_groups_with_my_classmates.mp3"
+    },
+    {
+      "n": 50,
+      "en": "I enjoy sharing my ideas and opinions in group discussions.",
+      "jp": "グループディスカッションで自分のアイデアや意見を共有するのが楽しいです。",
+      "hira": "ぐるーぷでぃすかっしょんでじぶんのあいであやいけんをきょうゆうするのがたのしいです。",
+      "mp3": "br_s50_i_enjoy_sharing_my_ideas_and_opinions_in_group_discussions.mp3"
+    },
+    {
+      "n": 51,
+      "en": "I keep my study space free from distractions.",
+      "jp": "勉強のスペースを気を散らさないように保ちます。",
+      "hira": "べんきょうのすぺーすをきをちらさないようにたもちます。",
+      "mp3": "br_s51_i_keep_my_study_space_free_from_distractions.mp3"
+    },
+    {
+      "n": 52,
+      "en": "I find it helpful to review my notes before exams.",
+      "jp": "試験の前にノートを見直すのが役に立つと感じます。",
+      "hira": "しけんのまえにのーとをみなおすのがやくにたつとかんじます。",
+      "mp3": "br_s52_i_find_it_helpful_to_review_my_notes_before_exams.mp3"
+    },
+    {
+      "n": 53,
+      "en": "I enjoy learning about different cultures during school events.",
+      "jp": "学校のイベントで異なる文化について学ぶのが楽しいです。",
+      "hira": "がっこうのいべんとでことなるぶんかについてまなぶのがたのしいです。",
+      "mp3": "br_s53_i_enjoy_learning_about_different_cultures_during_school_events.mp3"
+    },
+    {
+      "n": 54,
+      "en": "I participate in physical activities to stay healthy.",
+      "jp": "健康を保つために運動に参加します。",
+      "hira": "けんこうをたもつためにうんどうにさんかします。",
+      "mp3": "br_s54_i_participate_in_physical_activities_to_stay_healthy.mp3"
+    },
+    {
+      "n": 55,
+      "en": "I enjoy making new friends at school every year.",
+      "jp": "毎年学校で新しい友達を作るのが楽しいです。",
+      "hira": "まいとしがっこうであたらしいともだちをつくるのがたのしいです。",
+      "mp3": "br_s55_i_enjoy_making_new_friends_at_school_every_year.mp3"
+    },
+    {
+      "n": 56,
+      "en": "I try to support my friends when they need help.",
+      "jp": "友達が助けを必要とするときにサポートするようにしています。",
+      "hira": "ともだちがたすけをひつようとするときにさぽーとするようにしています。",
+      "mp3": "br_s56_i_try_to_support_my_friends_when_they_need_help.mp3"
+    },
+    {
+      "n": 57,
+      "en": "I write reminders to keep track of important tasks.",
+      "jp": "重要なタスクを追跡するためにリマインダーを書きます。",
+      "hira": "じゅうようなたすくをついせきするためにりまいんだーをかきます。",
+      "mp3": "br_s57_i_write_reminders_to_keep_track_of_important_tasks.mp3"
+    },
+    {
+      "n": 58,
+      "en": "I enjoy participating in school performances and activities.",
+      "jp": "学校のパフォーマンスや活動に参加するのが楽しいです。",
+      "hira": "がっこうのぱふぉーまんすやかつどうにさんかするのがたのしいです。",
+      "mp3": "br_s58_i_enjoy_participating_in_school_performances_and_activities.mp3"
+    },
+    {
+      "n": 59,
+      "en": "I strive to be a good listener during group discussions.",
+      "jp": "グループディスカッションで良い聞き手になるように努力しています。",
+      "hira": "ぐるーぷでぃすかっしょんでよいききてになるようにどりょくしています。",
+      "mp3": "br_s59_i_strive_to_be_a_good_listener_during_group_discussions.mp3"
+    },
+    {
+      "n": 60,
+      "en": "I keep an open mind to learn from others' experiences.",
+      "jp": "他の人の経験から学ぶためにオープンマインドを保ちます。",
+      "hira": "ほかのひとのけいけんからまなぶためにおーぷんまいんどをたもちます.",
+      "mp3": "br_s60_i_keep_an_open_mind_to_learn_from_others_experiences.mp3"
+    }
   ]
 }
