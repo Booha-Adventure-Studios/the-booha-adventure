@@ -1,72 +1,424 @@
-
 {
   "cards": [
-    { "n": 1, "en": "country", "jp": "国", "hira": "くに", "mp3": "br_v01_country.mp3" },
-    { "n": 2, "en": "world", "jp": "世界", "hira": "せかい", "mp3": "br_v02_world.mp3" },
-    { "n": 3, "en": "continent", "jp": "大陸", "hira": "たいりく", "mp3": "br_v03_continent.mp3" },
-    { "n": 4, "en": "map", "jp": "地図", "hira": "ちず", "mp3": "br_v04_map.mp3" },
-    { "n": 5, "en": "flag", "jp": "旗", "hira": "はた", "mp3": "br_v05_flag.mp3" },
-    { "n": 6, "en": "capital", "jp": "首都", "hira": "しゅと", "mp3": "br_v06_capital.mp3" },
-    { "n": 7, "en": "city", "jp": "都市", "hira": "とし", "mp3": "br_v07_city.mp3" },
-    { "n": 8, "en": "island", "jp": "島", "hira": "しま", "mp3": "br_v08_island.mp3" },
-    { "n": 9, "en": "mountain", "jp": "山", "hira": "やま", "mp3": "br_v09_mountain.mp3" },
-
-    { "n": 10, "en": "river", "jp": "川", "hira": "かわ", "mp3": "br_v10_river.mp3" },
-    { "n": 11, "en": "sea", "jp": "海", "hira": "うみ", "mp3": "br_v11_sea.mp3" },
-    { "n": 12, "en": "language", "jp": "言語", "hira": "げんご", "mp3": "br_v12_language.mp3" },
-    { "n": 13, "en": "nationality", "jp": "国籍", "hira": "こくせき", "mp3": "br_v13_nationality.mp3" },
-    { "n": 14, "en": "culture", "jp": "文化", "hira": "ぶんか", "mp3": "br_v14_culture.mp3" },
-    { "n": 15, "en": "tradition", "jp": "伝統", "hira": "でんとう", "mp3": "br_v15_tradition.mp3" },
-    { "n": 16, "en": "festival", "jp": "祭り", "hira": "まつり", "mp3": "br_v16_festival.mp3" },
-
-    { "n": 17, "en": "landmark", "jp": "名所", "hira": "めいしょ", "mp3": "br_v17_landmark.mp3" },
-    { "n": 18, "en": "castle", "jp": "城", "hira": "しろ", "mp3": "br_v18_castle.mp3" },
-    { "n": 19, "en": "temple", "jp": "寺", "hira": "てら", "mp3": "br_v19_temple.mp3" },
-    { "n": 20, "en": "shrine", "jp": "神社", "hira": "じんじゃ", "mp3": "br_v20_shrine.mp3" },
-    { "n": 21, "en": "tower", "jp": "タワー", "hira": "たわー", "mp3": "br_v21_tower.mp3" },
-    { "n": 22, "en": "bridge", "jp": "橋", "hira": "はし", "mp3": "br_v22_bridge.mp3" },
-    { "n": 23, "en": "museum", "jp": "博物館", "hira": "はくぶつかん", "mp3": "br_v23_museum.mp3" },
-    { "n": 24, "en": "statue", "jp": "像", "hira": "ぞう", "mp3": "br_v24_statue.mp3" },
-
-    { "n": 25, "en": "park", "jp": "公園", "hira": "こうえん", "mp3": "br_v25_park.mp3" },
-    { "n": 26, "en": "garden", "jp": "庭園", "hira": "ていえん", "mp3": "br_v26_garden.mp3" },
-    { "n": 27, "en": "palace", "jp": "宮殿", "hira": "きゅうでん", "mp3": "br_v27_palace.mp3" },
-    { "n": 28, "en": "square", "jp": "広場", "hira": "ひろば", "mp3": "br_v28_square.mp3" },
-    { "n": 29, "en": "market", "jp": "市場", "hira": "いちば", "mp3": "br_v29_market.mp3" },
-    { "n": 30, "en": "street", "jp": "通り", "hira": "とおり", "mp3": "br_v30_street.mp3" },
-    { "n": 31, "en": "ticket", "jp": "チケット", "hira": "ちけっと", "mp3": "br_v31_ticket.mp3" },
-
-    { "n": 32, "en": "custom", "jp": "習慣", "hira": "しゅうかん", "mp3": "br_v32_custom.mp3" },
-    { "n": 33, "en": "greeting", "jp": "あいさつ", "hira": "あいさつ", "mp3": "br_v33_greeting.mp3" },
-    { "n": 34, "en": "bow", "jp": "おじぎ", "hira": "おじぎ", "mp3": "br_v34_bow.mp3" },
-    { "n": 35, "en": "handshake", "jp": "握手", "hira": "あくしゅ", "mp3": "br_v35_handshake.mp3" },
-    { "n": 36, "en": "chopsticks", "jp": "箸", "hira": "はし", "mp3": "br_v36_chopsticks.mp3" },
-    { "n": 37, "en": "shoes", "jp": "靴", "hira": "くつ", "mp3": "br_v37_shoes.mp3" },
-    { "n": 38, "en": "gift", "jp": "贈り物", "hira": "おくりもの", "mp3": "br_v38_gift.mp3" },
-
-    { "n": 39, "en": "clothes", "jp": "服", "hira": "ふく", "mp3": "br_v39_clothes.mp3" },
-    { "n": 40, "en": "food", "jp": "食べ物", "hira": "たべもの", "mp3": "br_v40_food.mp3" },
-    { "n": 41, "en": "holiday", "jp": "祝日", "hira": "しゅくじつ", "mp3": "br_v41_holiday.mp3" },
-    { "n": 42, "en": "rule", "jp": "ルール", "hira": "るーる", "mp3": "br_v42_rule.mp3" },
-    { "n": 43, "en": "polite", "jp": "丁寧な", "hira": "ていねいな", "mp3": "br_v43_polite.mp3" },
-    { "n": 44, "en": "respect", "jp": "尊重する", "hira": "そんちょうする", "mp3": "br_v44_respect.mp3" },
-    { "n": 45, "en": "compare", "jp": "比べる", "hira": "くらべる", "mp3": "br_v45_compare.mp3" },
-
-    { "n": 46, "en": "airport", "jp": "空港", "hira": "くうこう", "mp3": "br_v46_airport.mp3" },
-    { "n": 47, "en": "station", "jp": "駅", "hira": "えき", "mp3": "br_v47_station.mp3" },
-    { "n": 48, "en": "passport", "jp": "パスポート", "hira": "ぱすぽーと", "mp3": "br_v48_passport.mp3" },
-    { "n": 49, "en": "baggage", "jp": "手荷物", "hira": "てにもつ", "mp3": "br_v49_baggage.mp3" },
-    { "n": 50, "en": "suitcase", "jp": "スーツケース", "hira": "すーつけーす", "mp3": "br_v50_suitcase.mp3" },
-    { "n": 51, "en": "hotel", "jp": "ホテル", "hira": "ほてる", "mp3": "br_v51_hotel.mp3" },
-    { "n": 52, "en": "hostel", "jp": "ホステル", "hira": "ほすてる", "mp3": "br_v52_hostel.mp3" },
-
-    { "n": 53, "en": "guidebook", "jp": "ガイドブック", "hira": "がいどぶっく", "mp3": "br_v53_guidebook.mp3" },
-    { "n": 54, "en": "plan", "jp": "計画", "hira": "けいかく", "mp3": "br_v54_plan.mp3" },
-    { "n": 55, "en": "schedule", "jp": "予定", "hira": "よてい", "mp3": "br_v55_schedule.mp3" },
-    { "n": 56, "en": "reservation", "jp": "予約", "hira": "よやく", "mp3": "br_v56_reservation.mp3" },
-    { "n": 57, "en": "train", "jp": "電車", "hira": "でんしゃ", "mp3": "br_v57_train.mp3" },
-    { "n": 58, "en": "flight", "jp": "便", "hira": "びん", "mp3": "br_v58_flight.mp3" },
-    { "n": 59, "en": "souvenir", "jp": "お土産", "hira": "おみやげ", "mp3": "br_v59_souvenir.mp3" },
-    { "n": 60, "en": "travel", "jp": "旅行", "hira": "りょこう", "mp3": "br_v60_travel.mp3" }
+    {
+      "n": 1,
+      "en": "travel itinerary",
+      "jp": "旅行の計画",
+      "hira": "りょこうのけいかく",
+      "mp3": "br_v01_travel_itinerary.mp3"
+    },
+    {
+      "n": 2,
+      "en": "local cuisine",
+      "jp": "地元の料理",
+      "hira": "じもとのりょうり",
+      "mp3": "br_v02_local_cuisine.mp3"
+    },
+    {
+      "n": 3,
+      "en": "safety tips",
+      "jp": "安全のアドバイス",
+      "hira": "あんぜんのあどばいす",
+      "mp3": "br_v03_safety_tips.mp3"
+    },
+    {
+      "n": 4,
+      "en": "travel essentials",
+      "jp": "旅行の必需品",
+      "hira": "りょこうのひつじゅひん",
+      "mp3": "br_v04_travel_essentials.mp3"
+    },
+    {
+      "n": 5,
+      "en": "cultural exchange",
+      "jp": "文化交流",
+      "hira": "ぶんかこうりゅう",
+      "mp3": "br_v05_cultural_exchange.mp3"
+    },
+    {
+      "n": 6,
+      "en": "travel insurance",
+      "jp": "旅行保険",
+      "hira": "りょこうほけん",
+      "mp3": "br_v06_travel_insurance.mp3"
+    },
+    {
+      "n": 7,
+      "en": "public transport",
+      "jp": "公共交通機関",
+      "hira": "こうきょうこうつうきかん",
+      "mp3": "br_v07_public_transport.mp3"
+    },
+    {
+      "n": 8,
+      "en": "souvenir shopping",
+      "jp": "お土産の買い物",
+      "hira": "おみやげのかいもの",
+      "mp3": "br_v08_souvenir_shopping.mp3"
+    },
+    {
+      "n": 9,
+      "en": "travel budget",
+      "jp": "旅行予算",
+      "hira": "りょこうよさん",
+      "mp3": "br_v09_travel_budget.mp3"
+    },
+    {
+      "n": 10,
+      "en": "travel advisory",
+      "jp": "旅行勧告",
+      "hira": "りょこうかんこく",
+      "mp3": "br_v10_travel_advisory.mp3"
+    },
+    {
+      "n": 11,
+      "en": "language barrier",
+      "jp": "言葉の壁",
+      "hira": "ことばのかべ",
+      "mp3": "br_v11_language_barrier.mp3"
+    },
+    {
+      "n": 12,
+      "en": "customs declaration",
+      "jp": "税関申告",
+      "hira": "ぜいかんしんこく",
+      "mp3": "br_v12_customs_declaration.mp3"
+    },
+    {
+      "n": 13,
+      "en": "boarding pass",
+      "jp": "搭乗券",
+      "hira": "とうじょうけん",
+      "mp3": "br_v13_boarding_pass.mp3"
+    },
+    {
+      "n": 14,
+      "en": "travel companion",
+      "jp": "旅行仲間",
+      "hira": "りょこうなかま",
+      "mp3": "br_v14_travel_companion.mp3"
+    },
+    {
+      "n": 15,
+      "en": "local traditions",
+      "jp": "地元の伝統",
+      "hira": "じもとのでんとう",
+      "mp3": "br_v15_local_traditions.mp3"
+    },
+    {
+      "n": 16,
+      "en": "emergency contact",
+      "jp": "緊急連絡先",
+      "hira": "きんきゅうれんらくさき",
+      "mp3": "br_v16_emergency_contact.mp3"
+    },
+    {
+      "n": 17,
+      "en": "cultural sensitivity",
+      "jp": "文化的配慮",
+      "hira": "ぶんかてきはいりょ",
+      "mp3": "br_v17_cultural_sensitivity.mp3"
+    },
+    {
+      "n": 18,
+      "en": "travel guidebook",
+      "jp": "旅行ガイドブック",
+      "hira": "りょこうがいどぶっく",
+      "mp3": "br_v18_travel_guidebook.mp3"
+    },
+    {
+      "n": 19,
+      "en": "local etiquette",
+      "jp": "地元の礼儀",
+      "hira": "じもとのれいぎ",
+      "mp3": "br_v19_local_etiquette.mp3"
+    },
+    {
+      "n": 20,
+      "en": "itinerary changes",
+      "jp": "予定変更",
+      "hira": "よていへんこう",
+      "mp3": "br_v20_itinerary_changes.mp3"
+    },
+    {
+      "n": 21,
+      "en": "sightseeing tour",
+      "jp": "観光ツアー",
+      "hira": "かんこうつあー",
+      "mp3": "br_v21_sightseeing_tour.mp3"
+    },
+    {
+      "n": 22,
+      "en": "sustainable travel",
+      "jp": "持続可能な旅行",
+      "hira": "じぞくかのうなりょこう",
+      "mp3": "br_v22_sustainable_travel.mp3"
+    },
+    {
+      "n": 23,
+      "en": "safety precautions",
+      "jp": "安全対策",
+      "hira": "あんぜんたいさく",
+      "mp3": "br_v23_safety_precautions.mp3"
+    },
+    {
+      "n": 24,
+      "en": "travel rewards",
+      "jp": "旅行特典",
+      "hira": "りょこうとくてん",
+      "mp3": "br_v24_travel_rewards.mp3"
+    },
+    {
+      "n": 25,
+      "en": "cultural landmarks",
+      "jp": "文化的名所",
+      "hira": "ぶんかてきめいしょ",
+      "mp3": "br_v25_cultural_landmarks.mp3"
+    },
+    {
+      "n": 26,
+      "en": "local transportation",
+      "jp": "地元の交通機関",
+      "hira": "じもとのこうつうきかん",
+      "mp3": "br_v26_local_transportation.mp3"
+    },
+    {
+      "n": 27,
+      "en": "travel checklist",
+      "jp": "旅行チェックリスト",
+      "hira": "りょこうちぇっくりすと",
+      "mp3": "br_v27_travel_checklist.mp3"
+    },
+    {
+      "n": 28,
+      "en": "foreign currency",
+      "jp": "外国通貨",
+      "hira": "がいこくつうか",
+      "mp3": "br_v28_foreign_currency.mp3"
+    },
+    {
+      "n": 29,
+      "en": "travel experience",
+      "jp": "旅行体験",
+      "hira": "りょこうたいけん",
+      "mp3": "br_v29_travel_experience.mp3"
+    },
+    {
+      "n": 30,
+      "en": "cultural immersion",
+      "jp": "文化的没入",
+      "hira": "ぶんかてきぼつにゅう",
+      "mp3": "br_v30_cultural_immersion.mp3"
+    },
+    {
+      "n": 31,
+      "en": "travel policies",
+      "jp": "旅行方針",
+      "hira": "りょこうほうしん",
+      "mp3": "br_v31_travel_policies.mp3"
+    },
+    {
+      "n": 32,
+      "en": "environmental impact",
+      "jp": "環境への影響",
+      "hira": "かんきょうへのえいきょう",
+      "mp3": "br_v32_environmental_impact.mp3"
+    },
+    {
+      "n": 33,
+      "en": "local festivals",
+      "jp": "地元の祭り",
+      "hira": "じもとのまつり",
+      "mp3": "br_v33_local_festivals.mp3"
+    },
+    {
+      "n": 34,
+      "en": "trip itinerary",
+      "jp": "旅行の旅程",
+      "hira": "りょこうのりょてい",
+      "mp3": "br_v34_trip_itinerary.mp3"
+    },
+    {
+      "n": 35,
+      "en": "cultural understanding",
+      "jp": "文化的理解",
+      "hira": "ぶんかてきりかい",
+      "mp3": "br_v35_cultural_understanding.mp3"
+    },
+    {
+      "n": 36,
+      "en": "travel arrangements",
+      "jp": "旅行手配",
+      "hira": "りょこうてはい",
+      "mp3": "br_v36_travel_arrangements.mp3"
+    },
+    {
+      "n": 37,
+      "en": "transportation options",
+      "jp": "交通手段",
+      "hira": "こうつうしゅだん",
+      "mp3": "br_v37_transportation_options.mp3"
+    },
+    {
+      "n": 38,
+      "en": "sightseeing spots",
+      "jp": "観光スポット",
+      "hira": "かんこうすぽっと",
+      "mp3": "br_v38_sightseeing_spots.mp3"
+    },
+    {
+      "n": 39,
+      "en": "cultural practices",
+      "jp": "文化的慣習",
+      "hira": "ぶんかてきかんしゅう",
+      "mp3": "br_v39_cultural_practices.mp3"
+    },
+    {
+      "n": 40,
+      "en": "planning tools",
+      "jp": "計画ツール",
+      "hira": "けいかくつーる",
+      "mp3": "br_v40_planning_tools.mp3"
+    },
+    {
+      "n": 41,
+      "en": "safety regulations",
+      "jp": "安全規則",
+      "hira": "あんぜんきそく",
+      "mp3": "br_v41_safety_regulations.mp3"
+    },
+    {
+      "n": 42,
+      "en": "travel experiences",
+      "jp": "旅行の経験",
+      "hira": "りょこうのけいけん",
+      "mp3": "br_v42_travel_experiences.mp3"
+    },
+    {
+      "n": 43,
+      "en": "travel restrictions",
+      "jp": "旅行制限",
+      "hira": "りょこうせいげん",
+      "mp3": "br_v43_travel_restrictions.mp3"
+    },
+    {
+      "n": 44,
+      "en": "local attractions",
+      "jp": "地元の観光地",
+      "hira": "じもとのかんこうち",
+      "mp3": "br_v44_local_attractions.mp3"
+    },
+    {
+      "n": 45,
+      "en": "adventure travel",
+      "jp": "冒険旅行",
+      "hira": "ぼうけんりょこう",
+      "mp3": "br_v45_adventure_travel.mp3"
+    },
+    {
+      "n": 46,
+      "en": "travel habits",
+      "jp": "旅行の習慣",
+      "hira": "りょこうのしゅうかん",
+      "mp3": "br_v46_travel_habits.mp3"
+    },
+    {
+      "n": 47,
+      "en": "personal safety",
+      "jp": "個人の安全",
+      "hira": "こじんのあんぜん",
+      "mp3": "br_v47_personal_safety.mp3"
+    },
+    {
+      "n": 48,
+      "en": "travel resources",
+      "jp": "旅行資源",
+      "hira": "りょこうしげん",
+      "mp3": "br_v48_travel_resources.mp3"
+    },
+    {
+      "n": 49,
+      "en": "cultural insights",
+      "jp": "文化的洞察",
+      "hira": "ぶんかてきどうさつ",
+      "mp3": "br_v49_cultural_insights.mp3"
+    },
+    {
+      "n": 50,
+      "en": "transportation hubs",
+      "jp": "交通の中心地",
+      "hira": "こうつうのちゅうしんち",
+      "mp3": "br_v50_transportation_hubs.mp3"
+    },
+    {
+      "n": 51,
+      "en": "responsible tourism",
+      "jp": "責任ある観光",
+      "hira": "せきにんあるかんこう",
+      "mp3": "br_v51_responsible_tourism.mp3"
+    },
+    {
+      "n": 52,
+      "en": "travel preferences",
+      "jp": "旅行の好み",
+      "hira": "りょこうのこのみ",
+      "mp3": "br_v52_travel_preferences.mp3"
+    },
+    {
+      "n": 53,
+      "en": "cultural awareness",
+      "jp": "文化的意識",
+      "hira": "ぶんかてきいしき",
+      "mp3": "br_v53_cultural_awareness.mp3"
+    },
+    {
+      "n": 54,
+      "en": "travel community",
+      "jp": "旅行コミュニティ",
+      "hira": "りょこうこみゅにてぃ",
+      "mp3": "br_v54_travel_community.mp3"
+    },
+    {
+      "n": 55,
+      "en": "adventure activities",
+      "jp": "冒険アクティビティ",
+      "hira": "ぼうけんあくてぃびてぃ",
+      "mp3": "br_v55_adventure_activities.mp3"
+    },
+    {
+      "n": 56,
+      "en": "local crafts",
+      "jp": "地元の手工芸品",
+      "hira": "じもとのしゅこうげいひん",
+      "mp3": "br_v56_local_crafts.mp3"
+    },
+    {
+      "n": 57,
+      "en": "cultural heritage sites",
+      "jp": "文化遺産",
+      "hira": "ぶんかいさん",
+      "mp3": "br_v57_cultural_heritage_sites.mp3"
+    },
+    {
+      "n": 58,
+      "en": "trip goals",
+      "jp": "旅行の目標",
+      "hira": "りょこうのもくひょう",
+      "mp3": "br_v58_trip_goals.mp3"
+    },
+    {
+      "n": 59,
+      "en": "travel reflections",
+      "jp": "旅行の振り返り",
+      "hira": "りょこうのふりかえり",
+      "mp3": "br_v59_travel_reflections.mp3"
+    },
+    {
+      "n": 60,
+      "en": "exploration mindset",
+      "jp": "探求心",
+      "hira": "たんきゅうしん",
+      "mp3": "br_v60_exploration_mindset.mp3"
+    }
   ]
 }

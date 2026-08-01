@@ -1,75 +1,424 @@
-
 {
   "cards": [
-    { "n": 1, "en": "Where are you from?", "jp": "あなたはどこの出身ですか。", "hira": "あなた は どこ の しゅっしん です か", "mp3": "br_q01_where_are_you_from.mp3" },
-    { "n": 2, "en": "What languages do you speak?", "jp": "何語を話しますか。", "hira": "なにご を はなします か", "mp3": "br_q02_what_languages_do_you_speak.mp3" },
-    { "n": 3, "en": "What is your nationality?", "jp": "あなたの国籍は何ですか。", "hira": "あなた の こくせき は なん です か", "mp3": "br_q03_what_is_your_nationality.mp3" },
-    { "n": 4, "en": "What countries do you want to visit?", "jp": "どの国に行きたいですか。", "hira": "どの くに に いきたい です か", "mp3": "br_q04_what_countries_do_you_want_to_visit.mp3" },
-    { "n": 5, "en": "What is a famous city in Japan?", "jp": "日本で有名な都市は何ですか。", "hira": "にほん で ゆうめい な とし は なん です か", "mp3": "br_q05_what_is_a_famous_city_in_japan.mp3" },
-    { "n": 6, "en": "Do you like maps?", "jp": "地図は好きですか。", "hira": "ちず は すき です か", "mp3": "br_q06_do_you_like_maps.mp3" },
-    { "n": 7, "en": "What colors are on Japan’s flag?", "jp": "日本の国旗は何色ですか。", "hira": "にほん の こっき は なにいろ です か", "mp3": "br_q07_what_colors_are_on_japans_flag.mp3" },
-    { "n": 8, "en": "What is your favorite country and why?", "jp": "好きな国はどこですか。理由は何ですか。", "hira": "すき な くに は どこ です か。りゆう は なん です か", "mp3": "br_q08_what_is_your_favorite_country_and_why.mp3" },
-    { "n": 9, "en": "What is a famous island in Japan?", "jp": "日本の有名な島は何ですか。", "hira": "にほん の ゆうめい な しま は なん です か", "mp3": "br_q09_what_is_a_famous_island_in_japan.mp3" },
-    { "n": 10, "en": "What languages do people speak in India?", "jp": "インドでは何語を話しますか。", "hira": "いんど では なにご を はなします か", "mp3": "br_q10_what_languages_do_people_speak_in_india.mp3" },
-
-    { "n": 11, "en": "What is the capital of Australia?", "jp": "オーストラリアの首都は何ですか。", "hira": "おーすとらりあ の しゅと は なん です か", "mp3": "br_q11_what_is_the_capital_of_australia.mp3" },
-    { "n": 12, "en": "Where is Mt. Fuji?", "jp": "富士山はどこにありますか。", "hira": "ふじさん は どこ に あります か", "mp3": "br_q12_where_is_mt_fuji.mp3" },
-    { "n": 13, "en": "Do you want to learn another language?", "jp": "ほかの言語を学びたいですか。", "hira": "ほか の げんご を まなびたい です か", "mp3": "br_q13_do_you_want_to_learn_another_language.mp3" },
-    { "n": 14, "en": "What culture interests you?", "jp": "どんな文化に興味がありますか。", "hira": "どんな ぶんか に きょうみ が あります か", "mp3": "br_q14_what_culture_interests_you.mp3" },
-    { "n": 15, "en": "What festival do you want to see?", "jp": "どの祭りを見たいですか。", "hira": "どの まつり を みたい です か", "mp3": "br_q15_what_festival_do_you_want_to_see.mp3" },
-
-    { "n": 16, "en": "What landmarks do you know in Japan?", "jp": "日本の名所にはどんなものがありますか。", "hira": "にほん の めいしょ に は どんな もの が あります か", "mp3": "br_q16_what_landmarks_do_you_know_in_japan.mp3" },
-    { "n": 17, "en": "What can you see in Kyoto?", "jp": "京都では何が見られますか。", "hira": "きょうと では なに が みられます か", "mp3": "br_q17_what_can_you_see_in_kyoto.mp3" },
-    { "n": 18, "en": "Is there a shrine near your house?", "jp": "家の近くに神社はありますか。", "hira": "いえ の ちかく に じんじゃ は あります か", "mp3": "br_q18_is_there_a_shrine_near_your_house.mp3" },
-    { "n": 19, "en": "What is your favorite park?", "jp": "好きな公園はどこですか。", "hira": "すき な こうえん は どこ です か", "mp3": "br_q19_what_is_your_favorite_park.mp3" },
-    { "n": 20, "en": "Have you been to a museum recently?", "jp": "最近、博物館に行きましたか。", "hira": "さいきん はくぶつかん に いきました か", "mp3": "br_q20_have_you_been_to_a_museum_recently.mp3" },
-
-    { "n": 21, "en": "Where is a good place to take photos?", "jp": "写真を撮るのに良い場所はどこですか。", "hira": "しゃしん を とる の に よい ばしょ は どこ です か", "mp3": "br_q21_where_is_a_good_place_to_take_photos.mp3" },
-    { "n": 22, "en": "What famous bridges do you know?", "jp": "有名な橋にはどんなものがありますか。", "hira": "ゆうめい な はし に は どんな もの が あります か", "mp3": "br_q22_what_famous_bridges_do_you_know.mp3" },
-    { "n": 23, "en": "What landmark do you want to visit?", "jp": "どの名所に行きたいですか。", "hira": "どの めいしょ に いきたい です か", "mp3": "br_q23_what_landmark_do_you_want_to_visit.mp3" },
-    { "n": 24, "en": "How do you buy a ticket?", "jp": "チケットはどうやって買いますか。", "hira": "ちけっと は どうやって かいます か", "mp3": "br_q24_how_do_you_buy_a_ticket.mp3" },
-    { "n": 25, "en": "What is a famous castle in Japan?", "jp": "日本で有名なお城は何ですか。", "hira": "にほん で ゆうめい な おしろ は なん です か", "mp3": "br_q25_what_is_a_famous_castle_in_japan.mp3" },
-
-    { "n": 26, "en": "What is your city famous for?", "jp": "あなたの町は何で有名ですか。", "hira": "あなた の まち は なに で ゆうめい です か", "mp3": "br_q26_what_is_your_city_famous_for.mp3" },
-    { "n": 27, "en": "Where can you see cherry blossoms?", "jp": "どこで桜を見られますか。", "hira": "どこ で さくら を みられます か", "mp3": "br_q27_where_can_you_see_cherry_blossoms.mp3" },
-    { "n": 28, "en": "What is a landmark in Tokyo?", "jp": "東京の名所は何ですか。", "hira": "とうきょう の めいしょ は なん です か", "mp3": "br_q28_what_is_a_landmark_in_tokyo.mp3" },
-    { "n": 29, "en": "Is there a market in your town?", "jp": "あなたの町に市場はありますか。", "hira": "あなた の まち に いちば は あります か", "mp3": "br_q29_is_there_a_market_in_your_town.mp3" },
-    { "n": 30, "en": "What landmark is near your school?", "jp": "学校の近くにある名所は何ですか。", "hira": "がっこう の ちかく に ある めいしょ は なん です か", "mp3": "br_q30_what_landmark_is_near_your_school.mp3" },
-
-    { "n": 31, "en": "What customs do you know in Japan?", "jp": "日本のしきたりで知っているものは何ですか。", "hira": "にほん の しきたり で しっている もの は なん です か", "mp3": "br_q31_what_customs_do_you_know_in_japan.mp3" },
-    { "n": 32, "en": "Do you bow or shake hands?", "jp": "おじぎをしますか、それとも握手をしますか。", "hira": "おじぎ を します か、それとも あくしゅ を します か", "mp3": "br_q32_do_you_bow_or_shake_hands.mp3" },
-    { "n": 33, "en": "What foods are popular in your town?", "jp": "あなたの町で人気の食べ物は何ですか。", "hira": "あなた の まち で にんき の たべもの は なん です か", "mp3": "br_q33_what_foods_are_popular_in_your_town.mp3" },
-    { "n": 34, "en": "What holiday is important to your family?", "jp": "あなたの家族にとって大切な祝日は何ですか。", "hira": "あなた の かぞく に とって たいせつ な しゅくじつ は なん です か", "mp3": "br_q34_what_holiday_is_important_to_your_family.mp3" },
-    { "n": 35, "en": "What do people wear at festivals?", "jp": "祭りでは人々は何を着ますか。", "hira": "まつり では ひとびと は なに を きます か", "mp3": "br_q35_what_do_people_wear_at_festivals.mp3" },
-
-    { "n": 36, "en": "What is polite in your culture?", "jp": "あなたの文化では何が丁寧ですか。", "hira": "あなた の ぶんか では なに が ていねい です か", "mp3": "br_q36_what_is_polite_in_your_culture.mp3" },
-    { "n": 37, "en": "What is different from other countries?", "jp": "他の国と違うことは何ですか。", "hira": "ほか の くに と ちがう こと は なん です か", "mp3": "br_q37_what_is_different_from_other_countries.mp3" },
-    { "n": 38, "en": "What is the same?", "jp": "同じところは何ですか。", "hira": "おなじ ところ は なん です か", "mp3": "br_q38_what_is_the_same.mp3" },
-    { "n": 39, "en": "Do you prefer tea or coffee? Why?", "jp": "お茶とコーヒーではどちらが好きですか。なぜですか。", "hira": "おちゃ と こーひー では どちら が すき です か。なぜ です か", "mp3": "br_q39_do_you_prefer_tea_or_coffee_why.mp3" },
-    { "n": 40, "en": "Do you prefer rice or bread? Why?", "jp": "ご飯とパンではどちらが好きですか。なぜですか。", "hira": "ごはん と ぱん では どちら が すき です か。なぜ です か", "mp3": "br_q40_do_you_prefer_rice_or_bread_why.mp3" },
-
-    { "n": 41, "en": "What gift is good to bring?", "jp": "持っていくのに良い贈り物は何ですか。", "hira": "もっていく の に よい おくりもの は なん です か", "mp3": "br_q41_what_gift_is_good_to_bring.mp3" },
-    { "n": 42, "en": "How do you greet teachers?", "jp": "先生にはどうやってあいさつしますか。", "hira": "せんせい には どうやって あいさつ します か", "mp3": "br_q42_how_do_you_greet_teachers.mp3" },
-    { "n": 43, "en": "What tradition would you like to try?", "jp": "どんな伝統をやってみたいですか。", "hira": "どんな でんとう を やってみたい です か", "mp3": "br_q43_what_tradition_would_you_like_to_try.mp3" },
-    { "n": 44, "en": "What tradition do you want to share?", "jp": "どんな伝統を紹介したいですか。", "hira": "どんな でんとう を しょうかい したい です か", "mp3": "br_q44_what_tradition_do_you_want_to_share.mp3" },
-    { "n": 45, "en": "How can we respect other cultures?", "jp": "他の文化をどうやって尊重できますか。", "hira": "ほか の ぶんか を どうやって そんちょう できます か", "mp3": "br_q45_how_can_we_respect_other_cultures.mp3" },
-
-    { "n": 46, "en": "Where would you like to go?", "jp": "どこに行ってみたいですか。", "hira": "どこ に いってみたい です か", "mp3": "br_q46_where_would_you_like_to_go.mp3" },
-    { "n": 47, "en": "What would you like to eat there?", "jp": "そこでは何を食べてみたいですか。", "hira": "そこ では なに を たべてみたい です か", "mp3": "br_q47_what_would_you_like_to_eat_there.mp3" },
-    { "n": 48, "en": "Who would you like to travel with?", "jp": "だれと旅行したいですか。", "hira": "だれ と りょこう したい です か", "mp3": "br_q48_who_would_you_like_to_travel_with.mp3" },
-    { "n": 49, "en": "When would you like to travel?", "jp": "いつ旅行したいですか。", "hira": "いつ りょこう したい です か", "mp3": "br_q49_when_would_you_like_to_travel.mp3" },
-    { "n": 50, "en": "How will you get there?", "jp": "どうやってそこへ行きますか。", "hira": "どうやって そこ へ いきます か", "mp3": "br_q50_how_will_you_get_there.mp3" },
-
-    { "n": 51, "en": "What will you pack?", "jp": "何を持っていきますか。", "hira": "なに を もっていきます か", "mp3": "br_q51_what_will_you_pack.mp3" },
-    { "n": 52, "en": "Do you prefer a hotel or hostel?", "jp": "ホテルとホステルではどちらがいいですか。", "hira": "ほてる と ほすてる では どちら が いい です か", "mp3": "br_q52_do_you_prefer_a_hotel_or_hostel.mp3" },
-    { "n": 53, "en": "Do you want to travel by train or plane?", "jp": "電車と飛行機ではどちらで旅行したいですか。", "hira": "でんしゃ と ひこうき では どちら で りょこう したい です か", "mp3": "br_q53_do_you_want_to_travel_by_train_or_plane.mp3" },
-    { "n": 54, "en": "What famous place do you want to see?", "jp": "どんな有名な場所を見たいですか。", "hira": "どんな ゆうめい な ばしょ を みたい です か", "mp3": "br_q54_what_famous_place_do_you_want_to_see.mp3" },
-    { "n": 55, "en": "Do you like to plan or be free?", "jp": "計画を立てるのが好きですか、それとも自由が好きですか。", "hira": "けいかく を たてる の が すき です か、それとも じゆう が すき です か", "mp3": "br_q55_do_you_like_to_plan_or_be_free.mp3" },
-
-    { "n": 56, "en": "How do you buy tickets?", "jp": "チケットはどうやって買いますか。", "hira": "ちけっと は どうやって かいます か", "mp3": "br_q56_how_do_you_buy_tickets.mp3" },
-    { "n": 57, "en": "What apps help you when you travel?", "jp": "旅行のとき役に立つアプリは何ですか。", "hira": "りょこう の とき やく に たつ あぷり は なん です か", "mp3": "br_q57_what_apps_help_you_when_you_travel.mp3" },
-    { "n": 58, "en": "What souvenirs will you buy?", "jp": "どんなおみやげを買いますか。", "hira": "どんな おみやげ を かいます か", "mp3": "br_q58_what_souvenirs_will_you_buy.mp3" },
-    { "n": 59, "en": "What language will you use?", "jp": "どんな言語を使いますか。", "hira": "どんな げんご を つかいます か", "mp3": "br_q59_what_language_will_you_use.mp3" },
-    { "n": 60, "en": "How will you stay safe?", "jp": "どうやって安全に過ごしますか。", "hira": "どうやって あんぜん に すごします か", "mp3": "br_q60_how_will_you_stay_safe.mp3" }
+    {
+      "n": 1,
+      "en": "What is your dream travel destination and why?",
+      "jp": "あなたの夢の旅行先はどこですか？そして、なぜですか？",
+      "hira": "あなたのゆめのりょこうさきはどこですか？そして、なぜですか？",
+      "mp3": "br_q01_what_is_your_dream_travel_destination_and_why.mp3"
+    },
+    {
+      "n": 2,
+      "en": "How do you usually plan your trips?",
+      "jp": "あなたは普段、旅行をどのように計画しますか？",
+      "hira": "あなたはふだん、りょこうをどのようにけいかくしますか？",
+      "mp3": "br_q02_how_do_you_usually_plan_your_trips.mp3"
+    },
+    {
+      "n": 3,
+      "en": "What transportation do you prefer when traveling?",
+      "jp": "旅行のとき、どの交通手段が好きですか？",
+      "hira": "りょこうのとき、どのこうつうしゅだんがすきですか？",
+      "mp3": "br_q03_what_transportation_do_you_prefer_when_traveling.mp3"
+    },
+    {
+      "n": 4,
+      "en": "Can you name a famous landmark you want to visit?",
+      "jp": "あなたが訪れたい有名なランドマークの名前を言えますか？",
+      "hira": "あなたがいきたいゆうめいなランドマークのなまえをいえますか？",
+      "mp3": "br_q04_can_you_name_a_famous_landmark_you_want_to_visit.mp3"
+    },
+    {
+      "n": 5,
+      "en": "What cultural experiences do you hope to have while traveling?",
+      "jp": "旅行中にどんな文化体験をしたいですか？",
+      "hira": "りょこうちゅうにどんなぶんかたいけんをしたいですか？",
+      "mp3": "br_q05_what_cultural_experiences_do_you_hope_to_have_while_traveling.mp3"
+    },
+    {
+      "n": 6,
+      "en": "How do you show respect to local customs when you travel?",
+      "jp": "旅行中に地元の習慣を尊重するためにどうしますか？",
+      "hira": "りょこうちゅうにじもとのしゅうかんをそんちょうするためにどうしますか？",
+      "mp3": "br_q06_how_do_you_show_respect_to_local_customs_when_you_travel.mp3"
+    },
+    {
+      "n": 7,
+      "en": "What is one thing you always pack for a trip?",
+      "jp": "旅行のためにいつも持っていくものは何ですか？",
+      "hira": "りょこうのためにいつももっていくものはなんですか？",
+      "mp3": "br_q07_what_is_one_thing_you_always_pack_for_a_trip.mp3"
+    },
+    {
+      "n": 8,
+      "en": "How do you stay safe while traveling?",
+      "jp": "旅行中に安全を保つためにどうしますか？",
+      "hira": "りょこうちゅうにあんぜんをたもつためにどうしますか？",
+      "mp3": "br_q08_how_do_you_stay_safe_while_traveling.mp3"
+    },
+    {
+      "n": 9,
+      "en": "What is your favorite local food from a place you visited?",
+      "jp": "訪れた場所で好きな地元の食べ物は何ですか？",
+      "hira": "おとずれたばしょですきなじもとのたべものはなんですか？",
+      "mp3": "br_q09_what_is_your_favorite_local_food_from_a_place_you_visited.mp3"
+    },
+    {
+      "n": 10,
+      "en": "How do you communicate with people who speak a different language?",
+      "jp": "異なる言語を話す人とどのようにコミュニケーションを取りますか？",
+      "hira": "ことなるげんごをはなすひととどのようにコミュニケーションをとりますか？",
+      "mp3": "br_q10_how_do_you_communicate_with_people_who_speak_a_different_language.mp3"
+    },
+    {
+      "n": 11,
+      "en": "What is the most memorable trip you have taken?",
+      "jp": "あなたが行った中で最も記憶に残る旅行は何ですか？",
+      "hira": "あなたがいったなかでもっともきおくにのこるりょこうはなんですか？",
+      "mp3": "br_q11_what_is_the_most_memorable_trip_you_have_taken.mp3"
+    },
+    {
+      "n": 12,
+      "en": "What do you think is the most important thing to remember when traveling?",
+      "jp": "旅行のときに最も重要なことは何だと思いますか？",
+      "hira": "りょこうのときにもっともじゅうようなことはなんだとおもいますか？",
+      "mp3": "br_q12_what_do_you_think_is_the_most_important_thing_to_remember_when_traveling.mp3"
+    },
+    {
+      "n": 13,
+      "en": "How can you be a responsible traveler?",
+      "jp": "責任ある旅行者になるためにはどうすればいいですか？",
+      "hira": "せきにんあるりょこうしゃになるためにはどうすればいいですか？",
+      "mp3": "br_q13_how_can_you_be_a_responsible_traveler.mp3"
+    },
+    {
+      "n": 14,
+      "en": "What is a unique tradition you learned from another culture?",
+      "jp": "他の文化から学んだユニークな伝統は何ですか？",
+      "hira": "ほかのぶんかからまなんだユニークなでんとうはなんですか？",
+      "mp3": "br_q14_what_is_a_unique_tradition_you_learned_from_another_culture.mp3"
+    },
+    {
+      "n": 15,
+      "en": "How do you feel about trying new foods while traveling?",
+      "jp": "旅行中に新しい食べ物を試すことについてどう思いますか？",
+      "hira": "りょこうちゅうにあたらしいたべものをためすことについてどうおもいますか？",
+      "mp3": "br_q15_how_do_you_feel_about_trying_new_foods_while_traveling.mp3"
+    },
+    {
+      "n": 16,
+      "en": "What is your favorite mode of transportation and why?",
+      "jp": "好きな交通手段は何ですか？そして、なぜですか？",
+      "hira": "すきなこうつうしゅだんはなんですか？そして、なぜですか？",
+      "mp3": "br_q16_what_is_your_favorite_mode_of_transportation_and_why.mp3"
+    },
+    {
+      "n": 17,
+      "en": "What do you do if you get lost in a new city?",
+      "jp": "新しい街で迷ったらどうしますか？",
+      "hira": "あたらしいまちでまよったらどうしますか？",
+      "mp3": "br_q17_what_do_you_do_if_you_get_lost_in_a_new_city.mp3"
+    },
+    {
+      "n": 18,
+      "en": "How can you help protect the environment while traveling?",
+      "jp": "旅行中に環境を守るためにどうできますか？",
+      "hira": "りょこうちゅうにかんきょうをまもるためにどうできますか？",
+      "mp3": "br_q18_how_can_you_help_protect_the_environment_while_traveling.mp3"
+    },
+    {
+      "n": 19,
+      "en": "What is a common greeting in a country you want to visit?",
+      "jp": "訪れたい国の一般的な挨拶は何ですか？",
+      "hira": "おとずれたいくにのいっぱんてきないあいさつはなんですか？",
+      "mp3": "br_q19_what_is_a_common_greeting_in_a_country_you_want_to_visit.mp3"
+    },
+    {
+      "n": 20,
+      "en": "What is the best way to learn about a new culture?",
+      "jp": "新しい文化を学ぶための最良の方法は何ですか？",
+      "hira": "あたらしいぶんかをまなぶためのさいりょうのほうほうはなんですか？",
+      "mp3": "br_q20_what_is_the_best_way_to_learn_about_a_new_culture.mp3"
+    },
+    {
+      "n": 21,
+      "en": "How do you feel about traveling alone?",
+      "jp": "一人で旅行することについてどう思いますか？",
+      "hira": "ひとりでりょこうすることについてどうおもいますか？",
+      "mp3": "br_q21_how_do_you_feel_about_traveling_alone.mp3"
+    },
+    {
+      "n": 22,
+      "en": "What is one cultural misunderstanding you have experienced?",
+      "jp": "あなたが経験した文化的誤解は何ですか？",
+      "hira": "あなたがけいけんしたぶんかてきごかいはなんですか？",
+      "mp3": "br_q22_what_is_one_cultural_misunderstanding_you_have_experienced.mp3"
+    },
+    {
+      "n": 23,
+      "en": "What is your favorite memory from a family trip?",
+      "jp": "家族旅行の中で好きな思い出は何ですか？",
+      "hira": "かぞくりょこうのなかですきなおもいではなんですか？",
+      "mp3": "br_q23_what_is_your_favorite_memory_from_a_family_trip.mp3"
+    },
+    {
+      "n": 24,
+      "en": "How do you choose a place to stay when you travel?",
+      "jp": "旅行の際に宿泊先をどのように選びますか？",
+      "hira": "りょこうのさいにしゅくはくさきをどのようにえらびますか？",
+      "mp3": "br_q24_how_do_you_choose_a_place_to_stay_when_you_travel.mp3"
+    },
+    {
+      "n": 25,
+      "en": "What is a travel tip you would give to a friend?",
+      "jp": "友達に教えたい旅行のヒントは何ですか？",
+      "hira": "ともだちにおしえたいりょこうのヒントはなんですか？",
+      "mp3": "br_q25_what_is_a_travel_tip_you_would_give_to_a_friend.mp3"
+    },
+    {
+      "n": 26,
+      "en": "What do you enjoy most about traveling?",
+      "jp": "旅行で最も楽しむことは何ですか？",
+      "hira": "りょこうでもっともたのしむことはなんですか？",
+      "mp3": "br_q26_what_do_you_enjoy_most_about_traveling.mp3"
+    },
+    {
+      "n": 27,
+      "en": "How do you feel when you visit historical sites?",
+      "jp": "歴史的な場所を訪れるとき、どう感じますか？",
+      "hira": "れきしてきなばしょをおとずれるとき、どうかんじますか？",
+      "mp3": "br_q27_how_do_you_feel_when_you_visit_historical_sites.mp3"
+    },
+    {
+      "n": 28,
+      "en": "What is one thing you want to learn from traveling?",
+      "jp": "旅行から学びたいことは何ですか？",
+      "hira": "りょこうからまなびたいことはなんですか？",
+      "mp3": "br_q28_what_is_one_thing_you_want_to_learn_from_traveling.mp3"
+    },
+    {
+      "n": 29,
+      "en": "How do you handle travel delays or cancellations?",
+      "jp": "旅行の遅延やキャンセルにどう対処しますか？",
+      "hira": "りょこうのおくれやキャンセルにどうたいしょしますか？",
+      "mp3": "br_q29_how_do_you_handle_travel_delays_or_cancellations.mp3"
+    },
+    {
+      "n": 30,
+      "en": "What is your favorite souvenir from a trip?",
+      "jp": "旅行の中で好きなお土産は何ですか？",
+      "hira": "りょこうのなかですきなおみやげはなんですか？",
+      "mp3": "br_q30_what_is_your_favorite_souvenir_from_a_trip.mp3"
+    },
+    {
+      "n": 31,
+      "en": "How do you make new friends while traveling?",
+      "jp": "旅行中に新しい友達を作るにはどうしますか？",
+      "hira": "りょこうちゅうにあたらしいともだちをつくるにはどうしますか？",
+      "mp3": "br_q31_how_do_you_make_new_friends_while_traveling.mp3"
+    },
+    {
+      "n": 32,
+      "en": "What is a local festival you would like to attend?",
+      "jp": "参加したい地元の祭りは何ですか？",
+      "hira": "さんかしたいじもとのまつりはなんですか？",
+      "mp3": "br_q32_what_is_a_local_festival_you_would_like_to_attend.mp3"
+    },
+    {
+      "n": 33,
+      "en": "How do you prepare for a long flight?",
+      "jp": "長いフライトの準備はどうしますか？",
+      "hira": "ながいフライトのじゅんびはどうしますか？",
+      "mp3": "br_q33_how_do_you_prepare_for_a_long_flight.mp3"
+    },
+    {
+      "n": 34,
+      "en": "What is one thing you wish you knew before traveling?",
+      "jp": "旅行前に知っておきたかったことは何ですか？",
+      "hira": "りょこうまえにしっておきたかったことはなんですか？",
+      "mp3": "br_q34_what_is_one_thing_you_wish_you_knew_before_traveling.mp3"
+    },
+    {
+      "n": 35,
+      "en": "How do you deal with language barriers while traveling?",
+      "jp": "旅行中の言語の壁にどう対処しますか？",
+      "hira": "りょこうちゅうのげんごのかべにどうたいしょしますか？",
+      "mp3": "br_q35_how_do_you_deal_with_language_barriers_while_traveling.mp3"
+    },
+    {
+      "n": 36,
+      "en": "What is your favorite way to explore a new city?",
+      "jp": "新しい街を探検する好きな方法は何ですか？",
+      "hira": "あたらしいまちをたんけんするすきなほうほうはなんですか？",
+      "mp3": "br_q36_what_is_your_favorite_way_to_explore_a_new_city.mp3"
+    },
+    {
+      "n": 37,
+      "en": "How do you stay connected with family while traveling?",
+      "jp": "旅行中に家族と連絡を取るにはどうしますか？",
+      "hira": "りょこうちゅうにかぞくとれんらくをとるにはどうしますか？",
+      "mp3": "br_q37_how_do_you_stay_connected_with_family_while_traveling.mp3"
+    },
+    {
+      "n": 38,
+      "en": "What is a travel experience that changed your perspective?",
+      "jp": "あなたの視点を変えた旅行の経験は何ですか？",
+      "hira": "あなたのしてんをかえたりょこうのけいけんはなんですか？",
+      "mp3": "br_q38_what_is_a_travel_experience_that_changed_your_perspective.mp3"
+    },
+    {
+      "n": 39,
+      "en": "How do you choose activities to do while traveling?",
+      "jp": "旅行中にするアクティビティをどのように選びますか？",
+      "hira": "りょこうちゅうにするアクティビティをどのようにえらびますか？",
+      "mp3": "br_q39_how_do_you_choose_activities_to_do_while_traveling.mp3"
+    },
+    {
+      "n": 40,
+      "en": "What is a common mistake travelers make?",
+      "jp": "旅行者がよくする一般的な間違いは何ですか？",
+      "hira": "りょこうしゃがよくするいっぱんてきなまちがいはなんですか？",
+      "mp3": "br_q40_what_is_a_common_mistake_travelers_make.mp3"
+    },
+    {
+      "n": 41,
+      "en": "How do you respect nature while traveling?",
+      "jp": "旅行中に自然を尊重するためにどうしますか？",
+      "hira": "りょこうちゅうにしぜんをそんちょうするためにどうしますか？",
+      "mp3": "br_q41_how_do_you_respect_nature_while_traveling.mp3"
+    },
+    {
+      "n": 42,
+      "en": "What is your favorite travel memory with friends?",
+      "jp": "友達との旅行の中で好きな思い出は何ですか？",
+      "hira": "ともだちとのりょこうのなかですきなおもいではなんですか？",
+      "mp3": "br_q42_what_is_your_favorite_travel_memory_with_friends.mp3"
+    },
+    {
+      "n": 43,
+      "en": "How do you find local attractions to visit?",
+      "jp": "訪れる地元の観光地をどうやって見つけますか？",
+      "hira": "おとずれるじもとのかんこうちをどうやってみつけますか？",
+      "mp3": "br_q43_how_do_you_find_local_attractions_to_visit.mp3"
+    },
+    {
+      "n": 44,
+      "en": "What is one thing you always try to learn before visiting a new country?",
+      "jp": "新しい国を訪れる前にいつも学ぼうとすることは何ですか？",
+      "hira": "あたらしいくにをおとずれるまえにいつもまなぼうとすることはなんですか？",
+      "mp3": "br_q44_what_is_one_thing_you_always_try_to_learn_before_visiting_a_new_country.mp3"
+    },
+    {
+      "n": 45,
+      "en": "How do you feel about group travel?",
+      "jp": "グループ旅行についてどう思いますか？",
+      "hira": "グループりょこうについてどうおもいますか？",
+      "mp3": "br_q45_how_do_you_feel_about_group_travel.mp3"
+    },
+    {
+      "n": 46,
+      "en": "What is a local dish you want to try in another country?",
+      "jp": "他の国で試してみたい地元の料理は何ですか？",
+      "hira": "ほかのくにでためしてみたいじもとのりょうりはなんですか？",
+      "mp3": "br_q46_what_is_a_local_dish_you_want_to_try_in_another_country.mp3"
+    },
+    {
+      "n": 47,
+      "en": "How do you keep your belongings safe while traveling?",
+      "jp": "旅行中に持ち物を安全に保つにはどうしますか？",
+      "hira": "りょこうちゅうにもつをあんぜんにたもつにはどうしますか？",
+      "mp3": "br_q47_how_do_you_keep_your_belongings_safe_while_traveling.mp3"
+    },
+    {
+      "n": 48,
+      "en": "What is your favorite travel story?",
+      "jp": "あなたの好きな旅行の話は何ですか？",
+      "hira": "あなたのすきなりょこうのはなしはなんですか？",
+      "mp3": "br_q48_what_is_your_favorite_travel_story.mp3"
+    },
+    {
+      "n": 49,
+      "en": "How do you adapt to different cultures while traveling?",
+      "jp": "旅行中に異なる文化にどのように適応しますか？",
+      "hira": "りょこうちゅうにことなるぶんかにどのようにてきおうしますか？",
+      "mp3": "br_q49_how_do_you_adapt_to_different_cultures_while_traveling.mp3"
+    },
+    {
+      "n": 50,
+      "en": "What is a travel goal you have for the future?",
+      "jp": "将来のための旅行の目標は何ですか？",
+      "hira": "しょうらいのためのりょこうのもくひょうはなんですか？",
+      "mp3": "br_q50_what_is_a_travel_goal_you_have_for_the_future.mp3"
+    },
+    {
+      "n": 51,
+      "en": "How do you handle unexpected situations while traveling?",
+      "jp": "旅行中の予期しない状況にどう対処しますか？",
+      "hira": "りょこうちゅうのよきしないじょうきょうにどうたいしょしますか？",
+      "mp3": "br_q51_how_do_you_handle_unexpected_situations_while_traveling.mp3"
+    },
+    {
+      "n": 52,
+      "en": "What is a unique experience you had while traveling?",
+      "jp": "旅行中に経験したユニークな体験は何ですか？",
+      "hira": "りょこうちゅうにけいけんしたユニークなたいけんはなんですか？",
+      "mp3": "br_q52_what_is_a_unique_experience_you_had_while_traveling.mp3"
+    },
+    {
+      "n": 53,
+      "en": "How do you plan your budget for a trip?",
+      "jp": "旅行の予算をどのように計画しますか？",
+      "hira": "りょこうのよさんをどのようにけいかくしますか？",
+      "mp3": "br_q53_how_do_you_plan_your_budget_for_a_trip.mp3"
+    },
+    {
+      "n": 54,
+      "en": "What is a travel app you find useful?",
+      "jp": "便利だと思う旅行アプリは何ですか？",
+      "hira": "べんりだとおもうりょこうアプリはなんですか？",
+      "mp3": "br_q54_what_is_a_travel_app_you_find_useful.mp3"
+    },
+    {
+      "n": 55,
+      "en": "How do you choose souvenirs to bring home?",
+      "jp": "持ち帰るお土産をどのように選びますか？",
+      "hira": "もちかえるおみやげをどのようにえらびますか？",
+      "mp3": "br_q55_how_do_you_choose_souvenirs_to_bring_home.mp3"
+    },
+    {
+      "n": 56,
+      "en": "What is a travel tradition in your family?",
+      "jp": "あなたの家族の旅行の伝統は何ですか？",
+      "hira": "あなたのかぞくのりょこうのでんとうはなんですか？",
+      "mp3": "br_q56_what_is_a_travel_tradition_in_your_family.mp3"
+    },
+    {
+      "n": 57,
+      "en": "How do you ensure you have a good time while traveling?",
+      "jp": "旅行中に楽しい時間を過ごすためにどうしますか？",
+      "hira": "りょこうちゅうにたのしいじかんをすごすためにどうしますか？",
+      "mp3": "br_q57_how_do_you_ensure_you_have_a_good_time_while_traveling.mp3"
+    },
+    {
+      "n": 58,
+      "en": "What is a travel challenge you have faced?",
+      "jp": "あなたが直面した旅行の課題は何ですか？",
+      "hira": "あなたがちょくめんしたりょこうのかだいはなんですか？",
+      "mp3": "br_q58_what_is_a_travel_challenge_you_have_faced.mp3"
+    },
+    {
+      "n": 59,
+      "en": "How do you stay healthy while traveling?",
+      "jp": "旅行中に健康を保つためにどうしますか？",
+      "hira": "りょこうちゅうにけんこうをたもつためにどうしますか？",
+      "mp3": "br_q59_how_do_you_stay_healthy_while_traveling.mp3"
+    },
+    {
+      "n": 60,
+      "en": "What is your favorite way to document your travels?",
+      "jp": "旅行を記録する好きな方法は何ですか？",
+      "hira": "りょこうをきろくするすきなほうほうはなんですか？",
+      "mp3": "br_q60_what_is_your_favorite_way_to_document_your_travels.mp3"
+    }
   ]
 }
