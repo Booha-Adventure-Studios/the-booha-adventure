@@ -2,423 +2,423 @@
   "cards": [
     {
       "n": 1,
-      "en": "What’s this?",
-      "jp": "これは何ですか。",
-      "hira": "これ は なん です か",
-      "mp3": "br_q01_whats_this.mp3"
+      "en": "What is your favorite subject and why do you enjoy it?",
+      "jp": "あなたの好きな教科は何ですか？なぜそれが好きですか？",
+      "hira": "あなたのすきなきょうかはなんですか？なぜそれがすきですか？",
+      "mp3": "br_q01_what_is_your_favorite_subject_and_why_do_you_enjoy_it.mp3"
     },
     {
       "n": 2,
-      "en": "May I use your ruler?",
-      "jp": "あなたの定規を使ってもいいですか。",
-      "hira": "あなた の じょうぎ を つかって も いい です か",
-      "mp3": "br_q02_may_i_use_your_ruler.mp3"
+      "en": "How do you feel about group projects in class?",
+      "jp": "クラスでのグループプロジェクトについてどう思いますか？",
+      "hira": "クラスでのぐるーぷぷろじぇくとについてどうおもいますか？",
+      "mp3": "br_q02_how_do_you_feel_about_group_projects_in_class.mp3"
     },
     {
       "n": 3,
-      "en": "Where is the trash can?",
-      "jp": "ゴミ箱はどこですか。",
-      "hira": "ごみばこ は どこ です か",
-      "mp3": "br_q03_where_is_the_trash_can.mp3"
+      "en": "What rules do you think are important in school?",
+      "jp": "学校で重要だと思うルールは何ですか？",
+      "hira": "がっこうでじゅうようだとおもうるーるはなんですか？",
+      "mp3": "br_q03_what_rules_do_you_think_are_important_in_school.mp3"
     },
     {
       "n": 4,
-      "en": "What do we do before speaking?",
-      "jp": "話す前に何をしますか。",
-      "hira": "はなす まえ に なに を し ます か",
-      "mp3": "br_q04_what_do_we_do_before_speaking.mp3"
+      "en": "How do you support your classmates when they need help?",
+      "jp": "クラスメートが助けを必要とするとき、あなたはどのようにサポートしますか？",
+      "hira": "くらすめーとがたすけをひつようとするとき、あなたはどのようにさぽーとしますか？",
+      "mp3": "br_q04_how_do_you_support_your_classmates_when_they_need_help.mp3"
     },
     {
       "n": 5,
-      "en": "What must we bring to class?",
-      "jp": "授業に何を持って来なければなりませんか。",
-      "hira": "じゅぎょう に なに を もって こなければ なり ません か",
-      "mp3": "br_q05_what_must_we_bring_to_class.mp3"
+      "en": "What responsibilities do you have as a student?",
+      "jp": "学生としてのあなたの責任は何ですか？",
+      "hira": "がくせいとしてのあなたのせきにんはなんですか？",
+      "mp3": "br_q05_what_responsibilities_do_you_have_as_a_student.mp3"
     },
     {
       "n": 6,
-      "en": "What mustn’t we do?",
-      "jp": "してはいけないことは何ですか。",
-      "hira": "して は いけない こと は なん です か",
-      "mp3": "br_q06_what_mustnt_we_do.mp3"
+      "en": "How can teachers make learning more enjoyable?",
+      "jp": "教師はどのように学びをもっと楽しくできますか？",
+      "hira": "きょうしはどのようにまなびをもっとたのしくできますか？",
+      "mp3": "br_q06_how_can_teachers_make_learning_more_enjoyable.mp3"
     },
     {
       "n": 7,
-      "en": "Can you show me your pencil case?",
-      "jp": "あなたの筆箱を見せてくれますか。",
-      "hira": "あなた の ふでばこ を みせて くれ ます か",
-      "mp3": "br_q07_can_you_show_me_your_pencil_case.mp3"
+      "en": "What is your favorite activity during break time?",
+      "jp": "休み時間中の好きな活動は何ですか？",
+      "hira": "やすみじかんちゅうのすきなかつどうはなんですか？",
+      "mp3": "br_q07_what_is_your_favorite_activity_during_break_time.mp3"
     },
     {
       "n": 8,
-      "en": "Where do we keep textbooks?",
-      "jp": "教科書はどこに置きますか。",
-      "hira": "きょうかしょ は どこ に おき ます か",
-      "mp3": "br_q08_where_do_we_keep_textbooks.mp3"
+      "en": "How do you organize your study materials?",
+      "jp": "勉強道具をどのように整理していますか？",
+      "hira": "べんきょうどうぐをどのようにせいりしていますか？",
+      "mp3": "br_q08_how_do_you_organize_your_study_materials.mp3"
     },
     {
       "n": 9,
-      "en": "How do we line up?",
-      "jp": "どうやって並びますか。",
-      "hira": "どうやって ならび ます か",
-      "mp3": "br_q09_how_do_we_line_up.mp3"
+      "en": "What do you think is the hardest part of being a student?",
+      "jp": "学生でいることの一番難しい部分は何だと思いますか？",
+      "hira": "がくせいでいることのいちばんむずかしいぶぶんはなんだとおもいますか？",
+      "mp3": "br_q09_what_do_you_think_is_the_hardest_part_of_being_a_student.mp3"
     },
     {
       "n": 10,
-      "en": "Can I borrow scissors?",
-      "jp": "はさみを借りてもいいですか。",
-      "hira": "はさみ を かりても いい です か",
-      "mp3": "br_q10_can_i_borrow_scissors.mp3"
+      "en": "How do you prepare for a test or exam?",
+      "jp": "テストや試験の準備はどうしていますか？",
+      "hira": "てすとやしけんのじゅんびはどうしていますか？",
+      "mp3": "br_q10_how_do_you_prepare_for_a_test_or_exam.mp3"
     },
     {
       "n": 11,
-      "en": "What is on the board today?",
-      "jp": "今日の板書は何ですか。",
-      "hira": "きょう の ばんしょ は なん です か",
-      "mp3": "br_q11_what_is_on_the_board_today.mp3"
+      "en": "What do you enjoy most about your school?",
+      "jp": "自分の学校で一番楽しんでいることは何ですか？",
+      "hira": "じぶんのがっこうでいちばんたのしんでいることはなんですか？",
+      "mp3": "br_q11_what_do_you_enjoy_most_about_your_school.mp3"
     },
     {
       "n": 12,
-      "en": "Do we use computers in class?",
-      "jp": "授業でコンピューターを使いますか。",
-      "hira": "じゅぎょう で こんぴゅーたー を つかい ます か",
-      "mp3": "br_q12_do_we_use_computers_in_class.mp3"
+      "en": "How do you feel when you help a classmate?",
+      "jp": "クラスメートを助けるとき、どのように感じますか？",
+      "hira": "くらすめーとをたすけるとき、どのようにかんじますか？",
+      "mp3": "br_q12_how_do_you_feel_when_you_help_a_classmate.mp3"
     },
     {
       "n": 13,
-      "en": "Where is your locker?",
-      "jp": "あなたのロッカーはどこですか。",
-      "hira": "あなた の ろっかー は どこ です か",
-      "mp3": "br_q13_where_is_your_locker.mp3"
+      "en": "What is the role of a class representative?",
+      "jp": "クラス代表の役割は何ですか？",
+      "hira": "くらすだいひょうのやくわりはなんですか？",
+      "mp3": "br_q13_what_is_the_role_of_a_class_representative.mp3"
     },
     {
       "n": 14,
-      "en": "Can we share the glue?",
-      "jp": "のりをいっしょに使ってもいいですか。",
-      "hira": "のり を いっしょ に つかって も いい です か",
-      "mp3": "br_q14_can_we_share_the_glue.mp3"
+      "en": "How do you manage your time between school and homework?",
+      "jp": "学校と宿題の間で時間をどう管理していますか？",
+      "hira": "がっこうとしゅくだいのあいだでじかんをどうかんりしていますか？",
+      "mp3": "br_q14_how_do_you_manage_your_time_between_school_and_homework.mp3"
     },
     {
       "n": 15,
-      "en": "Which classroom rule do you think is important?",
-      "jp": "どの教室のルールが大切だと思いますか。",
-      "hira": "どの きょうしつ の るーる が たいせつ だ と おもいます か",
-      "mp3": "br_q15_which_classroom_rule_do_you_think_is_important.mp3"
+      "en": "What is an important skill you learn in school?",
+      "jp": "学校で学ぶ重要なスキルは何ですか？",
+      "hira": "がっこうでまなぶじゅうようなすきるはなんですか？",
+      "mp3": "br_q15_what_is_an_important_skill_you_learn_in_school.mp3"
     },
     {
       "n": 16,
-      "en": "What subjects do you have on Monday?",
-      "jp": "月曜日にはどんな教科がありますか。",
-      "hira": "げつようび に は どんな きょうか が あり ます か",
-      "mp3": "br_q16_what_subjects_do_you_have_on_monday.mp3"
+      "en": "How do you feel about the rules at school?",
+      "jp": "学校のルールについてどう感じますか？",
+      "hira": "がっこうのるーるについてどうかんじますか？",
+      "mp3": "br_q16_how_do_you_feel_about_the_rules_at_school.mp3"
     },
     {
       "n": 17,
-      "en": "What’s your favorite subject?",
-      "jp": "一番好きな教科は何ですか。",
-      "hira": "いちばん すき な きょうか は なん です か",
-      "mp3": "br_q17_whats_your_favorite_subject.mp3"
+      "en": "What can students do to create a positive classroom environment?",
+      "jp": "学生はどのようにして良い教室環境を作ることができますか？",
+      "hira": "がくせいはどのようにしてよいきょうしつかんきょうをつくることができますか？",
+      "mp3": "br_q17_what_can_students_do_to_create_a_positive_classroom_environment.mp3"
     },
     {
       "n": 18,
-      "en": "What subject are you good at?",
-      "jp": "どの教科が得意ですか。",
-      "hira": "どの きょうか が とくい です か",
-      "mp3": "br_q18_what_subject_are_you_good_at.mp3"
+      "en": "What do you think is the best way to communicate with teachers?",
+      "jp": "教師とコミュニケーションをとる最良の方法は何だと思いますか？",
+      "hira": "きょうしとこみゅにけーしょんをとるさいりょうのほうほうはなんだとおもいますか？",
+      "mp3": "br_q18_what_do_you_think_is_the_best_way_to_communicate_with_teachers.mp3"
     },
     {
       "n": 19,
-      "en": "Which subject is difficult?",
-      "jp": "どの教科がむずかしいですか。",
-      "hira": "どの きょうか が むずかしい です か",
-      "mp3": "br_q19_which_subject_is_difficult.mp3"
+      "en": "How do you feel about participating in school clubs?",
+      "jp": "学校のクラブに参加することについてどう感じますか？",
+      "hira": "がっこうのくらぶにさんかすることについてどうかんじますか？",
+      "mp3": "br_q19_how_do_you_feel_about_participating_in_school_clubs.mp3"
     },
     {
       "n": 20,
-      "en": "Do you like PE?",
-      "jp": "体育は好きですか。",
-      "hira": "たいいく は すき です か",
-      "mp3": "br_q20_do_you_like_pe.mp3"
+      "en": "What subject do you think is most useful for your future?",
+      "jp": "将来に最も役立つと思う教科は何ですか？",
+      "hira": "しょうらいにもっともやくだつとおもうきょうかはなんですか？",
+      "mp3": "br_q20_what_subject_do_you_think_is_most_useful_for_your_future.mp3"
     },
     {
       "n": 21,
-      "en": "What do you do in science class?",
-      "jp": "理科の授業で何をしますか。",
-      "hira": "りか の じゅぎょう で なに を し ます か",
-      "mp3": "br_q21_what_do_you_do_in_science_class.mp3"
+      "en": "How do you handle conflicts with classmates?",
+      "jp": "クラスメートとの対立をどのように処理しますか？",
+      "hira": "くらすめーととのたいりつをどのようにしょりしますか？",
+      "mp3": "br_q21_how_do_you_handle_conflicts_with_classmates.mp3"
     },
     {
       "n": 22,
-      "en": "Do you use computers in ICT?",
-      "jp": "情報の授業でコンピューターを使いますか。",
-      "hira": "じょうほう の じゅぎょう で こんぴゅーたー を つかいます か",
-      "mp3": "br_q22_do_you_use_computers_in_ict.mp3"
+      "en": "What is your favorite memory from school so far?",
+      "jp": "これまでの学校の中での好きな思い出は何ですか？",
+      "hira": "これまでのがっこうのなかでのすきなおもいではなんですか？",
+      "mp3": "br_q22_what_is_your_favorite_memory_from_school_so_far.mp3"
     },
     {
       "n": 23,
-      "en": "What do you learn in social studies?",
-      "jp": "社会の授業では何を学びますか。",
-      "hira": "しゃかい の じゅぎょう で は なに を まなび ます か",
-      "mp3": "br_q23_what_do_you_learn_in_social_studies.mp3"
+      "en": "How do you stay organized with your assignments?",
+      "jp": "課題をどのように整理して管理していますか？",
+      "hira": "かだいをどのようにせいりしてかんりしていますか？",
+      "mp3": "br_q23_how_do_you_stay_organized_with_your_assignments.mp3"
     },
     {
       "n": 24,
-      "en": "When is your music class?",
-      "jp": "音楽の授業はいつですか。",
-      "hira": "おんがく の じゅぎょう は いつ です か",
-      "mp3": "br_q24_when_is_your_music_class.mp3"
+      "en": "What do you think makes a good teacher?",
+      "jp": "良い教師の条件は何だと思いますか？",
+      "hira": "よいきょうしのじょうけんはなんだとおもいますか？",
+      "mp3": "br_q24_what_do_you_think_makes_a_good_teacher.mp3"
     },
     {
       "n": 25,
-      "en": "Do you have club activities?",
-      "jp": "部活動はありますか。",
-      "hira": "ぶかつどう は あり ます か",
-      "mp3": "br_q25_do_you_have_club_activities.mp3"
+      "en": "How can students show respect to each other?",
+      "jp": "学生はどのようにお互いに敬意を示すことができますか？",
+      "hira": "がくせいはどのようにおたがいにけいいをしめすことができますか？",
+      "mp3": "br_q25_how_can_students_show_respect_to_each_other.mp3"
     },
     {
       "n": 26,
-      "en": "What do you make in home economics?",
-      "jp": "家庭科で何を作りますか。",
-      "hira": "かていか で なに を つくり ます か",
-      "mp3": "br_q26_what_do_you_make_in_home_economics.mp3"
+      "en": "What do you enjoy doing during after-school activities?",
+      "jp": "放課後の活動で何をするのが好きですか？",
+      "hira": "ほうかごのかつどうでなにをするのがすきですか？",
+      "mp3": "br_q26_what_do_you_enjoy_doing_during_after_school_activities.mp3"
     },
     {
       "n": 27,
-      "en": "How do you study English?",
-      "jp": "英語はどうやって勉強しますか。",
-      "hira": "えいご は どうやって べんきょう し ます か",
-      "mp3": "br_q27_how_do_you_study_english.mp3"
+      "en": "What do you think about homework? Is it necessary?",
+      "jp": "宿題についてどう思いますか？必要だと思いますか？",
+      "hira": "しゅくだいについてどうおもいますか？ひつようだとおもいますか？",
+      "mp3": "br_q27_what_do_you_think_about_homework_is_it_necessary.mp3"
     },
     {
       "n": 28,
-      "en": "Which is more fun, art or music?",
-      "jp": "美術と音楽ではどちらが楽しいですか。",
-      "hira": "びじゅつ と おんがく では どちら が たのしい です か",
-      "mp3": "br_q28_which_is_more_fun_art_or_music.mp3"
+      "en": "How do you feel about sharing supplies with classmates?",
+      "jp": "クラスメートと文房具を共有することについてどう感じますか？",
+      "hira": "くらすめーととぶんぼうぐをきょうゆうすることについてどうかんじますか？",
+      "mp3": "br_q28_how_do_you_feel_about_sharing_supplies_with_classmates.mp3"
     },
     {
       "n": 29,
-      "en": "What subject do you want to improve?",
-      "jp": "どの教科をのばしたいですか。",
-      "hira": "どの きょうか を のばしたい です か",
-      "mp3": "br_q29_what_subject_do_you_want_to_improve.mp3"
+      "en": "What can you do to make new students feel welcome?",
+      "jp": "新しい生徒を歓迎するために何ができますか？",
+      "hira": "あたらしいせいとをかんげいするためになにができますか？",
+      "mp3": "br_q29_what_can_you_do_to_make_new_students_feel_welcome.mp3"
     },
     {
       "n": 30,
-      "en": "Why do you like that subject?",
-      "jp": "なぜその教科が好きですか。",
-      "hira": "なぜ その きょうか が すき です か",
-      "mp3": "br_q30_why_do_you_like_that_subject.mp3"
+      "en": "How do you manage stress during exam periods?",
+      "jp": "試験期間中にストレスをどう管理しますか？",
+      "hira": "しけんきかんちゅうにすとれすをどうかんりしますか？",
+      "mp3": "br_q30_how_do_you_manage_stress_during_exam_periods.mp3"
     },
     {
       "n": 31,
-      "en": "Who helps you at school?",
-      "jp": "学校ではだれがあなたを助けてくれますか。",
-      "hira": "がっこう では だれ が あなた を たすけて くれます か",
-      "mp3": "br_q31_who_helps_you_at_school.mp3"
+      "en": "What do you think is the most important rule in your school?",
+      "jp": "あなたの学校で一番重要なルールは何だと思いますか？",
+      "hira": "あなたのがっこうでいちばんじゅうようなるーるはなんだとおもいますか？",
+      "mp3": "br_q31_what_do_you_think_is_the_most_important_rule_in_your_school.mp3"
     },
     {
       "n": 32,
-      "en": "Where is the nurse’s office?",
-      "jp": "保健室はどこですか。",
-      "hira": "ほけんしつ は どこ です か",
-      "mp3": "br_q32_where_is_the_nurses_office.mp3"
+      "en": "How can students help maintain a clean classroom?",
+      "jp": "学生は清潔な教室を保つためにどのように手助けできますか？",
+      "hira": "がくせいはせいけつなきょうしつをたもつためにどのようにてだすけできますか？",
+      "mp3": "br_q32_how_can_students_help_maintain_a_clean_classroom.mp3"
     },
     {
       "n": 33,
-      "en": "What does the librarian do?",
-      "jp": "司書は何をしますか。",
-      "hira": "ししょ は なに を し ます か",
-      "mp3": "br_q33_what_does_the_librarian_do.mp3"
+      "en": "What is your favorite part of the school day?",
+      "jp": "学校の日の中で一番好きな部分は何ですか？",
+      "hira": "がっこうのひのなかでいちばんすきなぶぶんはなんですか？",
+      "mp3": "br_q33_what_is_your_favorite_part_of_the_school_day.mp3"
     },
     {
       "n": 34,
-      "en": "Who is your club advisor?",
-      "jp": "あなたの部活の顧問はだれですか。",
-      "hira": "あなた の ぶかつ の こもん は だれ です か",
-      "mp3": "br_q34_who_is_your_club_advisor.mp3"
+      "en": "How do you feel about giving presentations in class?",
+      "jp": "クラスでプレゼンテーションをすることについてどう感じますか？",
+      "hira": "クラスでぷれぜんてーしょんをすることについてどうかんじますか？",
+      "mp3": "br_q34_how_do_you_feel_about_giving_presentations_in_class.mp3"
     },
     {
       "n": 35,
-      "en": "How do you ask for help in English?",
-      "jp": "英語でどうやって助けを求めますか。",
-      "hira": "えいご で どうやって たすけ を もとめます か",
-      "mp3": "br_q35_how_do_you_ask_for_help_in_english.mp3"
+      "en": "What do you think is the best way to study for a subject?",
+      "jp": "教科の勉強に最適な方法は何だと思いますか？",
+      "hira": "きょうかのべんきょうにさいてきなほうほうはなんだとおもいますか？",
+      "mp3": "br_q35_what_do_you_think_is_the_best_way_to_study_for_a_subject.mp3"
     },
     {
       "n": 36,
-      "en": "Who keeps the school clean?",
-      "jp": "学校をきれいに保つのはだれですか。",
-      "hira": "がっこう を きれい に たもつ の は だれ です か",
-      "mp3": "br_q36_who_keeps_the_school_clean.mp3"
+      "en": "How can students support each other academically?",
+      "jp": "学生は学業においてどのように支え合うことができますか？",
+      "hira": "がくせいはがくぎょうにおいてどのようにささえあうことができますか？",
+      "mp3": "br_q36_how_can_students_support_each_other_academically.mp3"
     },
     {
       "n": 37,
-      "en": "What does your coach teach?",
-      "jp": "あなたのコーチは何を教えますか。",
-      "hira": "あなた の こーち は なに を おしえ ます か",
-      "mp3": "br_q37_what_does_your_coach_teach.mp3"
+      "en": "What role does technology play in your learning?",
+      "jp": "あなたの学びにおけるテクノロジーの役割は何ですか？",
+      "hira": "あなたのまなびにおけるてくのろじーのやくわりはなんですか？",
+      "mp3": "br_q37_what_role_does_technology_play_in_your_learning.mp3"
     },
     {
       "n": 38,
-      "en": "Who is your best friend in class?",
-      "jp": "クラスで一番仲の良い友達はだれですか。",
-      "hira": "くらす で いちばん なか の よい ともだち は だれ です か",
-      "mp3": "br_q38_who_is_your_best_friend_in_class.mp3"
+      "en": "How do you feel about the lunch options at school?",
+      "jp": "学校のランチの選択肢についてどう感じますか？",
+      "hira": "がっこうのらんちのせんたくしについてどうかんじますか？",
+      "mp3": "br_q38_how_do_you_feel_about_the_lunch_options_at_school.mp3"
     },
     {
       "n": 39,
-      "en": "Do you help underclassmen?",
-      "jp": "後輩を助けますか。",
-      "hira": "こうはい を たすけ ます か",
-      "mp3": "br_q39_do_you_help_underclassmen.mp3"
+      "en": "What is an important lesson you learned this year?",
+      "jp": "今年学んだ重要な教訓は何ですか？",
+      "hira": "ことしまなんだじゅうようなきょうくんはなんですか？",
+      "mp3": "br_q39_what_is_an_important_lesson_you_learned_this_year.mp3"
     },
     {
       "n": 40,
-      "en": "Who will you thank today?",
-      "jp": "今日はだれに感謝しますか。",
-      "hira": "きょう は だれ に かんしゃ します か",
-      "mp3": "br_q40_who_will_you_thank_today.mp3"
+      "en": "How can students make good use of their free time?",
+      "jp": "学生は自由時間をどのように有効に使うことができますか？",
+      "hira": "がくせいはじゆうじかんをどのようにゆうこうに使うことができますか？",
+      "mp3": "br_q40_how_can_students_make_good_use_of_their_free_time.mp3"
     },
     {
       "n": 41,
-      "en": "Where is the principal’s office?",
-      "jp": "校長室はどこですか。",
-      "hira": "こうちょうしつ は どこ です か",
-      "mp3": "br_q41_where_is_the_principals_office.mp3"
+      "en": "What do you think about the dress code at school?",
+      "jp": "学校の服装規定についてどう思いますか？",
+      "hira": "がっこうのふくそうきていについてどうおもいますか？",
+      "mp3": "br_q41_what_do_you_think_about_the_dress_code_at_school.mp3"
     },
     {
       "n": 42,
-      "en": "Can I talk to the counselor now?",
-      "jp": "今、カウンセラーと話せますか。",
-      "hira": "いま、 かうんせらー と はなせ ます か",
-      "mp3": "br_q42_can_i_talk_to_the_counselor_now.mp3"
+      "en": "How do you celebrate achievements in your class?",
+      "jp": "クラスでの成果をどのように祝いますか？",
+      "hira": "くらすでのせいかをどのようにいわいますか？",
+      "mp3": "br_q42_how_do_you_celebrate_achievements_in_your_class.mp3"
     },
     {
       "n": 43,
-      "en": "Who checks attendance?",
-      "jp": "出欠を確認するのはだれですか。",
-      "hira": "しゅっけつ を かくにん する の は だれ です か",
-      "mp3": "br_q43_who_checks_attendance.mp3"
+      "en": "What is your favorite book that you've read for school?",
+      "jp": "学校のために読んだ好きな本は何ですか？",
+      "hira": "がっこうのためによんだすきなほんはなんですか？",
+      "mp3": "br_q43_what_is_your_favorite_book_that_you_ve_read_for_school.mp3"
     },
     {
       "n": 44,
-      "en": "How do you greet teachers?",
-      "jp": "先生にはどうあいさつしますか。",
-      "hira": "せんせい に は どう あいさつ し ます か",
-      "mp3": "br_q44_how_do_you_greet_teachers.mp3"
+      "en": "How do you think students can help improve school spirit?",
+      "jp": "学生はどのように学校の精神を改善する手助けができると思いますか？",
+      "hira": "がくせいはどのようにがっこうのせいしんをかいぜんするてだすけができるとおもいますか？",
+      "mp3": "br_q44_how_do_you_think_students_can_help_improve_school_spirit.mp3"
     },
     {
       "n": 45,
-      "en": "Who will you ask if you are lost?",
-      "jp": "道に迷ったらだれに聞きますか。",
-      "hira": "みち に まよったら だれ に きき ます か",
-      "mp3": "br_q45_who_will_you_ask_if_you_are_lost.mp3"
+      "en": "What strategies do you use to focus during class?",
+      "jp": "授業中に集中するためにどのような戦略を使用していますか？",
+      "hira": "じゅぎょうちゅうにしゅうちゅうするためにどのようなせんりゃくをしようしていますか？",
+      "mp3": "br_q45_what_strategies_do_you_use_to_focus_during_class.mp3"
     },
     {
       "n": 46,
-      "en": "What time does school start?",
-      "jp": "学校は何時に始まりますか。",
-      "hira": "がっこう は なんじ に はじまり ます か",
-      "mp3": "br_q46_what_time_does_school_start.mp3"
+      "en": "How do you feel about school events like sports day?",
+      "jp": "運動会のような学校のイベントについてどう感じますか？",
+      "hira": "うんどうかいのようながっこうのいべんとについてどうかんじますか？",
+      "mp3": "br_q46_how_do_you_feel_about_school_events_like_sports_day.mp3"
     },
     {
       "n": 47,
-      "en": "How many periods do you have today?",
-      "jp": "今日は何時間ありますか。",
-      "hira": "きょう は なん じかん あり ます か",
-      "mp3": "br_q47_how_many_periods_do_you_have_today.mp3"
+      "en": "What do you think is the value of having a school counselor?",
+      "jp": "学校カウンセラーがいることの価値は何だと思いますか？",
+      "hira": "がっこうかうんせらーがいることのかちはなんだとおもいますか？",
+      "mp3": "br_q47_what_do_you_think_is_the_value_of_having_a_school_counselor.mp3"
     },
     {
       "n": 48,
-      "en": "When is lunch break?",
-      "jp": "昼休みはいつですか。",
-      "hira": "ひるやすみ は いつ です か",
-      "mp3": "br_q48_when_is_lunch_break.mp3"
+      "en": "How can you help create a respectful classroom atmosphere?",
+      "jp": "敬意を持った教室の雰囲気を作るためにどのように助けることができますか？",
+      "hira": "けいいをもったきょうしつのふんいきをつくるためにどのようにたすけることができますか？",
+      "mp3": "br_q48_how_can_you_help_create_a_respectful_classroom_atmosphere.mp3"
     },
     {
       "n": 49,
-      "en": "What do you do before school?",
-      "jp": "登校前に何をしますか。",
-      "hira": "とうこう まえ に なに を し ます か",
-      "mp3": "br_q49_what_do_you_do_before_school.mp3"
+      "en": "What role do you think parents should play in your education?",
+      "jp": "あなたの教育において親はどのような役割を果たすべきだと思いますか？",
+      "hira": "あなたのきょういくにおいておやはどのようなやくわりをはたすべきだとおもいますか？",
+      "mp3": "br_q49_what_role_do_you_think_parents_should_play_in_your_education.mp3"
     },
     {
       "n": 50,
-      "en": "What do you do after school?",
-      "jp": "放課後に何をしますか。",
-      "hira": "ほうかご に なに を し ます か",
-      "mp3": "br_q50_what_do_you_do_after_school.mp3"
+      "en": "How can students express their opinions respectfully?",
+      "jp": "学生はどのようにして自分の意見を敬意を持って表現できますか？",
+      "hira": "がくせいはどのようにしてじぶんのいけんをけいいをもってひょうげんできますか？",
+      "mp3": "br_q50_how_can_students_express_their_opinions_respectfully.mp3"
     },
     {
       "n": 51,
-      "en": "When is your English class?",
-      "jp": "英語の授業はいつですか。",
-      "hira": "えいご の じゅぎょう は いつ です か",
-      "mp3": "br_q51_when_is_your_english_class.mp3"
+      "en": "What is an important quality for a good student?",
+      "jp": "良い学生にとって重要な資質は何ですか？",
+      "hira": "よいがくせいにとってじゅうようなししつはなんですか？",
+      "mp3": "br_q51_what_is_an_important_quality_for_a_good_student.mp3"
     },
     {
       "n": 52,
-      "en": "What day is the assembly?",
-      "jp": "全校集会は何曜日ですか。",
-      "hira": "ぜんこう しゅうかい は なんようび です か",
-      "mp3": "br_q52_what_day_is_the_assembly.mp3"
+      "en": "How do you feel about taking responsibility for your actions?",
+      "jp": "自分の行動に責任を持つことについてどう感じますか？",
+      "hira": "じぶんのこうどうにせきにんをもつことについてどうかんじますか？",
+      "mp3": "br_q52_how_do_you_feel_about_taking_responsibility_for_your_actions.mp3"
     },
     {
       "n": 53,
-      "en": "Do you have club activities today?",
-      "jp": "今日は部活動がありますか。",
-      "hira": "きょう は ぶかつどう が あり ます か",
-      "mp3": "br_q53_do_you_have_club_activities_today.mp3"
+      "en": "How can students encourage each other to do their best?",
+      "jp": "学生はお互いに最善を尽くすようにどのように励ますことができますか？",
+      "hira": "がくせいはおたがいにさいぜんをつくすようにどのようにはげますことができますか？",
+      "mp3": "br_q53_how_can_students_encourage_each_other_to_do_their_best.mp3"
     },
     {
       "n": 54,
-      "en": "When do classes finish?",
-      "jp": "授業はいつ終わりますか。",
-      "hira": "じゅぎょう は いつ おわり ます か",
-      "mp3": "br_q54_when_do_classes_finish.mp3"
+      "en": "What strategies help you remember what you learn in class?",
+      "jp": "授業で学んだことを思い出すための戦略は何ですか？",
+      "hira": "じゅぎょうでまなんだことをおもいだすためのせんりゃくはなんですか？",
+      "mp3": "br_q54_what_strategies_help_you_remember_what_you_learn_in_class.mp3"
     },
     {
       "n": 55,
-      "en": "Are you on time for class?",
-      "jp": "授業には時間どおりに来ますか。",
-      "hira": "じゅぎょう には じかんどおり に きます か",
-      "mp3": "br_q55_are_you_on_time_for_class.mp3"
+      "en": "How do you feel about collaborating with others on school projects?",
+      "jp": "学校のプロジェクトで他の人と協力することについてどう感じますか？",
+      "hira": "がっこうのぷろじぇくとでほかのひとときょうりょくすることについてどうかんじますか？",
+      "mp3": "br_q55_how_do_you_feel_about_collaborating_with_others_on_school_projects.mp3"
     },
     {
       "n": 56,
-      "en": "What time is the test?",
-      "jp": "テストは何時ですか。",
-      "hira": "てすと は なんじ です か",
-      "mp3": "br_q56_what_time_is_the_test.mp3"
+      "en": "What is your opinion on the importance of punctuality in school?",
+      "jp": "学校における時間厳守の重要性についてのあなたの意見は何ですか？",
+      "hira": "がっこうにおけるじかんげんしゅのじゅうようせいについてのあなたのいけんはなんですか？",
+      "mp3": "br_q56_what_is_your_opinion_on_the_importance_of_punctuality_in_school.mp3"
     },
     {
       "n": 57,
-      "en": "How long is each period?",
-      "jp": "一時限はどのくらいの長さですか。",
-      "hira": "いち じげん は どの くらい の ながさ です か",
-      "mp3": "br_q57_how_long_is_each_period.mp3"
+      "en": "How do you approach learning a new subject?",
+      "jp": "新しい教科を学ぶ際、どのようにアプローチしますか？",
+      "hira": "あたらしいきょうかをまなぶさい、どのようにあぷろーちしますか？",
+      "mp3": "br_q57_how_do_you_approach_learning_a_new_subject.mp3"
     },
     {
       "n": 58,
-      "en": "Do you like your timetable?",
-      "jp": "あなたの時間割は好きですか。",
-      "hira": "あなた の じかんわり は すき です か",
-      "mp3": "br_q58_do_you_like_your_timetable.mp3"
+      "en": "What can you do if you feel overwhelmed by schoolwork?",
+      "jp": "学校の仕事に圧倒されていると感じるとき、何ができますか？",
+      "hira": "がっこうのしごとにあとうされているとかんじるとき、なにができますか？",
+      "mp3": "br_q58_what_can_you_do_if_you_feel_overwhelmed_by_schoolwork.mp3"
     },
     {
       "n": 59,
-      "en": "When is the parent meeting?",
-      "jp": "保護者会はいつですか。",
-      "hira": "ほごしゃ かい は いつ です か",
-      "mp3": "br_q59_when_is_the_parent_meeting.mp3"
+      "en": "How do you feel about having discussions in class?",
+      "jp": "クラスでのディスカッションについてどう感じますか？",
+      "hira": "クラスでのでぃすかっしょんについてどうかんじますか？",
+      "mp3": "br_q59_how_do_you_feel_about_having_discussions_in_class.mp3"
     },
     {
       "n": 60,
-      "en": "Can you read the schedule in English?",
-      "jp": "英語で書かれた予定表を読めますか。",
-      "hira": "えいご で かかれた よていひょう を よめます か",
-      "mp3": "br_q60_can_you_read_the_schedule_in_english.mp3"
+      "en": "What advice would you give to a new student at your school?",
+      "jp": "あなたの学校の新しい生徒にどんなアドバイスをしますか？",
+      "hira": "あなたのがっこうのあたらしいせいとにどんなあどばいすをしますか？",
+      "mp3": "br_q60_what_advice_would_you_give_to_a_new_student_at_your_school.mp3"
     }
   ]
 }

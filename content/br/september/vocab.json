@@ -2,423 +2,423 @@
   "cards": [
     {
       "n": 1,
-      "en": "desk",
-      "jp": "机",
-      "hira": "つくえ",
-      "mp3": "br_v01_desk.mp3"
+      "en": "group work",
+      "jp": "グループ作業",
+      "hira": "ぐるーぷさぎょう",
+      "mp3": "br_v01_group_work.mp3"
     },
     {
       "n": 2,
-      "en": "chair",
-      "jp": "いす",
-      "hira": "いす",
-      "mp3": "br_v02_chair.mp3"
+      "en": "presentation",
+      "jp": "発表",
+      "hira": "はっぴょう",
+      "mp3": "br_v02_presentation.mp3"
     },
     {
       "n": 3,
-      "en": "blackboard / whiteboard",
-      "jp": "黒板／ホワイトボード",
-      "hira": "こくばん／ほわいとぼーど",
-      "mp3": "br_v03_blackboard_whiteboard.mp3"
+      "en": "study partner",
+      "jp": "勉強仲間",
+      "hira": "べんきょうなかま",
+      "mp3": "br_v03_study_partner.mp3"
     },
     {
       "n": 4,
-      "en": "chalk / marker",
-      "jp": "チョーク／マーカー",
-      "hira": "ちょーく／まーかー",
-      "mp3": "br_v04_chalk_marker.mp3"
+      "en": "field trip",
+      "jp": "校外学習",
+      "hira": "こうがいがくしゅう",
+      "mp3": "br_v04_field_trip.mp3"
     },
     {
       "n": 5,
-      "en": "eraser",
-      "jp": "消しゴム",
-      "hira": "けしごむ",
-      "mp3": "br_v05_eraser.mp3"
+      "en": "note-taking",
+      "jp": "ノートを取ること",
+      "hira": "のーとをとること",
+      "mp3": "br_v05_note_taking.mp3"
     },
     {
       "n": 6,
-      "en": "notebook",
-      "jp": "ノート",
-      "hira": "のーと",
-      "mp3": "br_v06_notebook.mp3"
+      "en": "class discussion",
+      "jp": "クラス討論",
+      "hira": "くらすとうろん",
+      "mp3": "br_v06_class_discussion.mp3"
     },
     {
       "n": 7,
-      "en": "textbook",
-      "jp": "教科書",
-      "hira": "きょうかしょ",
-      "mp3": "br_v07_textbook.mp3"
+      "en": "study skills",
+      "jp": "勉強スキル",
+      "hira": "べんきょうすきる",
+      "mp3": "br_v07_study_skills.mp3"
     },
     {
       "n": 8,
-      "en": "pencil case",
-      "jp": "筆箱",
-      "hira": "ふでばこ",
-      "mp3": "br_v08_pencil_case.mp3"
+      "en": "peer feedback",
+      "jp": "仲間からのフィードバック",
+      "hira": "なかまからのふぃーどばっく",
+      "mp3": "br_v08_peer_feedback.mp3"
     },
     {
       "n": 9,
-      "en": "scissors",
-      "jp": "はさみ",
-      "hira": "はさみ",
-      "mp3": "br_v09_scissors.mp3"
+      "en": "time for reflection",
+      "jp": "振り返りの時間",
+      "hira": "ふりかえりのじかん",
+      "mp3": "br_v09_time_for_reflection.mp3"
     },
     {
       "n": 10,
-      "en": "glue",
-      "jp": "のり／接着剤",
-      "hira": "のり／せっちゃくざい",
-      "mp3": "br_v10_glue.mp3"
+      "en": "academic goal",
+      "jp": "学業目標",
+      "hira": "がくぎょうもくひょう",
+      "mp3": "br_v10_academic_goal.mp3"
     },
     {
       "n": 11,
-      "en": "ruler",
-      "jp": "定規",
-      "hira": "じょうぎ",
-      "mp3": "br_v11_ruler.mp3"
+      "en": "study plan",
+      "jp": "勉強計画",
+      "hira": "べんきょうけいかく",
+      "mp3": "br_v11_study_plan.mp3"
     },
     {
       "n": 12,
-      "en": "projector",
-      "jp": "プロジェクター",
-      "hira": "ぷろじぇくたー",
-      "mp3": "br_v12_projector.mp3"
+      "en": "team project",
+      "jp": "チームプロジェクト",
+      "hira": "ちーむぷろじぇくと",
+      "mp3": "br_v12_team_project.mp3"
     },
     {
       "n": 13,
-      "en": "computer",
-      "jp": "コンピューター",
-      "hira": "こんぴゅーたー",
-      "mp3": "br_v13_computer.mp3"
+      "en": "responsibility",
+      "jp": "責任",
+      "hira": "せきにん",
+      "mp3": "br_v13_responsibility.mp3"
     },
     {
       "n": 14,
-      "en": "locker",
-      "jp": "ロッカー",
-      "hira": "ろっかー",
-      "mp3": "br_v14_locker.mp3"
+      "en": "school rules",
+      "jp": "学校のルール",
+      "hira": "がっこうのるーる",
+      "mp3": "br_v14_school_rules.mp3"
     },
     {
       "n": 15,
-      "en": "trash can",
-      "jp": "ゴミ箱",
-      "hira": "ごみばこ",
-      "mp3": "br_v15_trash_can.mp3"
+      "en": "home study",
+      "jp": "自宅学習",
+      "hira": "じたくがくしゅう",
+      "mp3": "br_v15_home_study.mp3"
     },
     {
       "n": 16,
-      "en": "Japanese",
-      "jp": "国語／日本語",
-      "hira": "こくご／にほんご",
-      "mp3": "br_v16_japanese.mp3"
+      "en": "subject choice",
+      "jp": "科目選択",
+      "hira": "かもくせんたく",
+      "mp3": "br_v16_subject_choice.mp3"
     },
     {
       "n": 17,
-      "en": "English",
-      "jp": "英語",
-      "hira": "えいご",
-      "mp3": "br_v17_english.mp3"
+      "en": "learning environment",
+      "jp": "学習環境",
+      "hira": "がくしゅうかんきょう",
+      "mp3": "br_v17_learning_environment.mp3"
     },
     {
       "n": 18,
-      "en": "math",
-      "jp": "数学／算数",
-      "hira": "すうがく／さんすう",
-      "mp3": "br_v18_math.mp3"
+      "en": "academic support",
+      "jp": "学業支援",
+      "hira": "がくぎょうしえん",
+      "mp3": "br_v18_academic_support.mp3"
     },
     {
       "n": 19,
-      "en": "science",
-      "jp": "理科／科学",
-      "hira": "りか／かがく",
-      "mp3": "br_v19_science.mp3"
+      "en": "goal setting",
+      "jp": "目標設定",
+      "hira": "もくひょうせってい",
+      "mp3": "br_v19_goal_setting.mp3"
     },
     {
       "n": 20,
-      "en": "social studies",
-      "jp": "社会",
-      "hira": "しゃかい",
-      "mp3": "br_v20_social_studies.mp3"
+      "en": "advice",
+      "jp": "アドバイス",
+      "hira": "あどばいす",
+      "mp3": "br_v20_advice.mp3"
     },
     {
       "n": 21,
-      "en": "history",
-      "jp": "歴史",
-      "hira": "れきし",
-      "mp3": "br_v21_history.mp3"
+      "en": "study habits",
+      "jp": "勉強習慣",
+      "hira": "べんきょうしゅうかん",
+      "mp3": "br_v21_study_habits.mp3"
     },
     {
       "n": 22,
-      "en": "geography",
-      "jp": "地理",
-      "hira": "ちり",
-      "mp3": "br_v22_geography.mp3"
+      "en": "class participation",
+      "jp": "授業参加",
+      "hira": "じゅぎょうさんか",
+      "mp3": "br_v22_class_participation.mp3"
     },
     {
       "n": 23,
-      "en": "PE (physical education)",
-      "jp": "体育",
-      "hira": "たいいく",
-      "mp3": "br_v23_pe_physical_education.mp3"
+      "en": "study break",
+      "jp": "勉強の休憩",
+      "hira": "べんきょうのきゅうけい",
+      "mp3": "br_v23_study_break.mp3"
     },
     {
       "n": 24,
-      "en": "music",
-      "jp": "音楽",
-      "hira": "おんがく",
-      "mp3": "br_v24_music.mp3"
+      "en": "feedback session",
+      "jp": "フィードバックセッション",
+      "hira": "ふぃーどばっくせっしょん",
+      "mp3": "br_v24_feedback_session.mp3"
     },
     {
       "n": 25,
-      "en": "art",
-      "jp": "美術／図工",
-      "hira": "びじゅつ／ずこう",
-      "mp3": "br_v25_art.mp3"
+      "en": "learning style",
+      "jp": "学習スタイル",
+      "hira": "がくしゅうすたいる",
+      "mp3": "br_v25_learning_style.mp3"
     },
     {
       "n": 26,
-      "en": "home economics",
-      "jp": "家庭科",
-      "hira": "かていか",
-      "mp3": "br_v26_home_economics.mp3"
+      "en": "community service",
+      "jp": "地域サービス",
+      "hira": "ちいきさーびす",
+      "mp3": "br_v26_community_service.mp3"
     },
     {
       "n": 27,
-      "en": "ICT / computer science",
-      "jp": "情報／コンピューター",
-      "hira": "じょうほう／こんぴゅーたー",
-      "mp3": "br_v27_ict_computer_science.mp3"
+      "en": "resource center",
+      "jp": "リソースセンター",
+      "hira": "りそーすせんたー",
+      "mp3": "br_v27_resource_center.mp3"
     },
     {
       "n": 28,
-      "en": "health",
-      "jp": "保健",
-      "hira": "ほけん",
-      "mp3": "br_v28_health.mp3"
+      "en": "study group",
+      "jp": "勉強グループ",
+      "hira": "べんきょうぐるーぷ",
+      "mp3": "br_v28_study_group.mp3"
     },
     {
       "n": 29,
-      "en": "club activities",
-      "jp": "部活動",
-      "hira": "ぶかつどう",
-      "mp3": "br_v29_club_activities.mp3"
+      "en": "motivation",
+      "jp": "モチベーション",
+      "hira": "もちべーしょん",
+      "mp3": "br_v29_motivation.mp3"
     },
     {
       "n": 30,
-      "en": "homeroom",
-      "jp": "ホームルーム",
-      "hira": "ほーむるーむ",
-      "mp3": "br_v30_homeroom.mp3"
+      "en": "self-assessment",
+      "jp": "自己評価",
+      "hira": "じこひょうか",
+      "mp3": "br_v30_self_assessment.mp3"
     },
     {
       "n": 31,
-      "en": "principal",
-      "jp": "校長先生",
-      "hira": "こうちょう せんせい",
-      "mp3": "br_v31_principal.mp3"
+      "en": "project deadline",
+      "jp": "プロジェクトの締切",
+      "hira": "ぷろじぇくとのしめきり",
+      "mp3": "br_v31_project_deadline.mp3"
     },
     {
       "n": 32,
-      "en": "vice principal",
-      "jp": "教頭先生",
-      "hira": "きょうとう せんせい",
-      "mp3": "br_v32_vice_principal.mp3"
+      "en": "collaborative learning",
+      "jp": "協力学習",
+      "hira": "きょうりょくがくしゅう",
+      "mp3": "br_v32_collaborative_learning.mp3"
     },
     {
       "n": 33,
-      "en": "homeroom teacher",
-      "jp": "担任の先生",
-      "hira": "たんにん の せんせい",
-      "mp3": "br_v33_homeroom_teacher.mp3"
+      "en": "participation grade",
+      "jp": "参加の評価",
+      "hira": "さんかのひょうか",
+      "mp3": "br_v33_participation_grade.mp3"
     },
     {
       "n": 34,
-      "en": "subject teacher",
-      "jp": "教科の先生",
-      "hira": "きょうか の せんせい",
-      "mp3": "br_v34_subject_teacher.mp3"
+      "en": "school event",
+      "jp": "学校のイベント",
+      "hira": "がっこうのいべんと",
+      "mp3": "br_v34_school_event.mp3"
     },
     {
       "n": 35,
-      "en": "librarian",
-      "jp": "司書",
-      "hira": "ししょ",
-      "mp3": "br_v35_librarian.mp3"
+      "en": "learning goal",
+      "jp": "学習目標",
+      "hira": "がくしゅうもくひょう",
+      "mp3": "br_v35_learning_goal.mp3"
     },
     {
       "n": 36,
-      "en": "school nurse",
-      "jp": "保健の先生",
-      "hira": "ほけん の せんせい",
-      "mp3": "br_v36_school_nurse.mp3"
+      "en": "parent-teacher meeting",
+      "jp": "保護者面談",
+      "hira": "ほごしゃめんだん",
+      "mp3": "br_v36_parent_teacher_meeting.mp3"
     },
     {
       "n": 37,
-      "en": "counselor",
-      "jp": "カウンセラー",
-      "hira": "かうんせらー",
-      "mp3": "br_v37_counselor.mp3"
+      "en": "class rules",
+      "jp": "クラスのルール",
+      "hira": "くらすのるーる",
+      "mp3": "br_v37_class_rules.mp3"
     },
     {
       "n": 38,
-      "en": "janitor / caretaker",
-      "jp": "用務員さん",
-      "hira": "ようむいん さん",
-      "mp3": "br_v38_janitor_caretaker.mp3"
+      "en": "study environment",
+      "jp": "勉強環境",
+      "hira": "べんきょうかんきょう",
+      "mp3": "br_v38_study_environment.mp3"
     },
     {
       "n": 39,
-      "en": "coach",
-      "jp": "コーチ",
-      "hira": "こーち",
-      "mp3": "br_v39_coach.mp3"
+      "en": "student council",
+      "jp": "生徒会",
+      "hira": "せいとかい",
+      "mp3": "br_v39_student_council.mp3"
     },
     {
       "n": 40,
-      "en": "club advisor",
-      "jp": "顧問の先生",
-      "hira": "こもん の せんせい",
-      "mp3": "br_v40_club_advisor.mp3"
+      "en": "academic project",
+      "jp": "学業プロジェクト",
+      "hira": "がくぎょうぷろじぇくと",
+      "mp3": "br_v40_academic_project.mp3"
     },
     {
       "n": 41,
-      "en": "classmate",
-      "jp": "クラスメート／同級生",
-      "hira": "くらすめーと／どうきゅうせい",
-      "mp3": "br_v41_classmate.mp3"
+      "en": "study resource",
+      "jp": "学習資源",
+      "hira": "がくしゅうしげん",
+      "mp3": "br_v41_study_resource.mp3"
     },
     {
       "n": 42,
-      "en": "upperclassman",
-      "jp": "先輩",
-      "hira": "せんぱい",
-      "mp3": "br_v42_upperclassman.mp3"
+      "en": "support system",
+      "jp": "支援システム",
+      "hira": "しえんしすてむ",
+      "mp3": "br_v42_support_system.mp3"
     },
     {
       "n": 43,
-      "en": "underclassman",
-      "jp": "後輩",
-      "hira": "こうはい",
-      "mp3": "br_v43_underclassman.mp3"
+      "en": "learning opportunity",
+      "jp": "学習の機会",
+      "hira": "がくしゅうのきかい",
+      "mp3": "br_v43_learning_opportunity.mp3"
     },
     {
       "n": 44,
-      "en": "office staff",
-      "jp": "事務職員",
-      "hira": "じむ しょくいん",
-      "mp3": "br_v44_office_staff.mp3"
+      "en": "student rights",
+      "jp": "生徒の権利",
+      "hira": "せいとのけんり",
+      "mp3": "br_v44_student_rights.mp3"
     },
     {
       "n": 45,
-      "en": "security guard",
-      "jp": "警備員",
-      "hira": "けいびいん",
-      "mp3": "br_v45_security_guard.mp3"
+      "en": "study challenge",
+      "jp": "勉強の挑戦",
+      "hira": "べんきょうのちょうせん",
+      "mp3": "br_v45_study_challenge.mp3"
     },
     {
       "n": 46,
-      "en": "timetable / schedule",
-      "jp": "時間割／予定表",
-      "hira": "じかんわり／よていひょう",
-      "mp3": "br_v46_timetable_schedule.mp3"
+      "en": "school project",
+      "jp": "学校のプロジェクト",
+      "hira": "がっこうのぷろじぇくと",
+      "mp3": "br_v46_school_project.mp3"
     },
     {
       "n": 47,
-      "en": "period",
-      "jp": "時限／時間",
-      "hira": "じげん／じかん",
-      "mp3": "br_v47_period.mp3"
+      "en": "teamwork",
+      "jp": "チームワーク",
+      "hira": "ちーむわーく",
+      "mp3": "br_v47_teamwork.mp3"
     },
     {
       "n": 48,
-      "en": "bell",
-      "jp": "チャイム／鐘",
-      "hira": "ちゃいむ／かね",
-      "mp3": "br_v48_bell.mp3"
+      "en": "school policy",
+      "jp": "学校の方針",
+      "hira": "がっこうのほうしん",
+      "mp3": "br_v48_school_policy.mp3"
     },
     {
       "n": 49,
-      "en": "assembly",
-      "jp": "全校集会",
-      "hira": "ぜんこう しゅうかい",
-      "mp3": "br_v49_assembly.mp3"
+      "en": "creative thinking",
+      "jp": "創造的思考",
+      "hira": "そうぞうてきしこう",
+      "mp3": "br_v49_creative_thinking.mp3"
     },
     {
       "n": 50,
-      "en": "break / recess",
-      "jp": "休み時間",
-      "hira": "やすみ じかん",
-      "mp3": "br_v50_break_recess.mp3"
+      "en": "study technique",
+      "jp": "勉強技術",
+      "hira": "べんきょうぎじゅつ",
+      "mp3": "br_v50_study_technique.mp3"
     },
     {
       "n": 51,
-      "en": "lunch break",
-      "jp": "昼休み",
-      "hira": "ひるやすみ",
-      "mp3": "br_v51_lunch_break.mp3"
+      "en": "goal achievement",
+      "jp": "目標達成",
+      "hira": "もくひょうたっせい",
+      "mp3": "br_v51_goal_achievement.mp3"
     },
     {
       "n": 52,
-      "en": "start time",
-      "jp": "開始時刻",
-      "hira": "かいし じこく",
-      "mp3": "br_v52_start_time.mp3"
+      "en": "school spirit",
+      "jp": "学校の精神",
+      "hira": "がっこうのせいしん",
+      "mp3": "br_v52_school_spirit.mp3"
     },
     {
       "n": 53,
-      "en": "finish time",
-      "jp": "終了時刻",
-      "hira": "しゅうりょう じこく",
-      "mp3": "br_v53_finish_time.mp3"
+      "en": "encouragement",
+      "jp": "励まし",
+      "hira": "はげまし",
+      "mp3": "br_v53_encouragement.mp3"
     },
     {
       "n": 54,
-      "en": "before school",
-      "jp": "登校前",
-      "hira": "とうこう まえ",
-      "mp3": "br_v54_before_school.mp3"
+      "en": "cultural exchange",
+      "jp": "文化交流",
+      "hira": "ぶんかこうりゅう",
+      "mp3": "br_v54_cultural_exchange.mp3"
     },
     {
       "n": 55,
-      "en": "after school",
-      "jp": "放課後",
-      "hira": "ほうかご",
-      "mp3": "br_v55_after_school.mp3"
+      "en": "critical thinking skills",
+      "jp": "批判的思考スキル",
+      "hira": "ひはんてきしこうすきる",
+      "mp3": "br_v55_critical_thinking_skills.mp3"
     },
     {
       "n": 56,
-      "en": "club meeting",
-      "jp": "部会／クラブの会合",
-      "hira": "ぶかい／くらぶ の かいごう",
-      "mp3": "br_v56_club_meeting.mp3"
+      "en": "student achievements",
+      "jp": "生徒の業績",
+      "hira": "せいとのぎょうせき",
+      "mp3": "br_v56_student_achievements.mp3"
     },
     {
       "n": 57,
-      "en": "parent meeting",
-      "jp": "保護者会",
-      "hira": "ほごしゃ かい",
-      "mp3": "br_v57_parent_meeting.mp3"
+      "en": "self-improvement",
+      "jp": "自己改善",
+      "hira": "じこかいぜん",
+      "mp3": "br_v57_self_improvement.mp3"
     },
     {
       "n": 58,
-      "en": "exam / test",
-      "jp": "試験／テスト",
-      "hira": "しけん／てすと",
-      "mp3": "br_v58_exam_test.mp3"
+      "en": "community involvement",
+      "jp": "地域参加",
+      "hira": "ちいきさんか",
+      "mp3": "br_v58_community_involvement.mp3"
     },
     {
       "n": 59,
-      "en": "holiday",
-      "jp": "休み／祝日",
-      "hira": "やすみ／しゅくじつ",
-      "mp3": "br_v59_holiday.mp3"
+      "en": "life skills",
+      "jp": "生活スキル",
+      "hira": "せいかつすきる",
+      "mp3": "br_v59_life_skills.mp3"
     },
     {
       "n": 60,
-      "en": "make-up class",
-      "jp": "補講／振替授業",
-      "hira": "ほこう／ふりかえ じゅぎょう",
-      "mp3": "br_v60_makeup_class.mp3"
+      "en": "study motivation",
+      "jp": "勉強のモチベーション",
+      "hira": "べんきょうのもちべーしょん",
+      "mp3": "br_v60_study_motivation.mp3"
     }
   ]
 }
