@@ -1,68 +1,424 @@
-
 {
   "cards": [
-    {"n": 1, "en": "What’s the weather today?", "jp": "今日の天気はどうですか。", "hira": "きょう の てんき は どう です か", "mp3": "br_q01_whats_the_weather_today.mp3"},
-    {"n": 2, "en": "How is the temperature?", "jp": "気温はどうですか。", "hira": "きおん は どう です か", "mp3": "br_q02_how_is_the_temperature.mp3"},
-    {"n": 3, "en": "Do you like sunny or cloudy days?", "jp": "晴れの日とくもりの日ではどちらが好きですか。", "hira": "はれ の ひ と くもり の ひ では どちら が すき です か", "mp3": "br_q03_do_you_like_sunny_or_cloudy_days.mp3"},
-    {"n": 4, "en": "What do you wear in winter?", "jp": "冬には何を着ますか。", "hira": "ふゆ に は なに を き ます か", "mp3": "br_q04_what_do_you_wear_in_winter.mp3"},
-    {"n": 5, "en": "What do you do on rainy days?", "jp": "雨の日は何をしますか。", "hira": "あめ の ひ は なに を し ます か", "mp3": "br_q05_what_do_you_do_on_rainy_days.mp3"},
-    {"n": 6, "en": "What season do you like best? Why?", "jp": "一番好きな季節は何ですか。なぜですか。", "hira": "いちばん すき な きせつ は なん です か。 なぜ です か", "mp3": "br_q06_what_season_do_you_like_best_why.mp3"},
-    {"n": 7, "en": "What happens in spring?", "jp": "春にはどんなことがありますか。", "hira": "はる に は どんな こと が あり ます か", "mp3": "br_q07_what_happens_in_spring.mp3"},
-    {"n": 8, "en": "What color are the leaves in autumn?", "jp": "秋の葉は何色になりますか。", "hira": "あき の は は なにいろ に なり ます か", "mp3": "br_q08_what_color_are_the_leaves_in_autumn.mp3"},
-    {"n": 9, "en": "Is it windy today?", "jp": "今日は風が強いですか。", "hira": "きょう は かぜ が つよい です か", "mp3": "br_q09_is_it_windy_today.mp3"},
-    {"n": 10, "en": "Do you like snow?", "jp": "雪が好きですか。", "hira": "ゆき が すき です か", "mp3": "br_q10_do_you_like_snow.mp3"},
-    {"n": 11, "en": "What’s your favorite weather word?", "jp": "好きな天気を表す言葉は何ですか。", "hira": "すき な てんき を あらわす ことば は なん です か", "mp3": "br_q11_whats_your_favorite_weather_word.mp3"},
-    {"n": 12, "en": "How do you say “It’s hot” in English?", "jp": "英語で「暑いです」はどう言いますか。", "hira": "えいご で あつい です は どう いいます か", "mp3": "br_q12_how_do_you_say_its_hot_in_english.mp3"},
-    {"n": 13, "en": "What do you bring on a rainy day?", "jp": "雨の日は何を持っていきますか。", "hira": "あめ の ひ は なに を もって いき ます か", "mp3": "br_q13_what_do_you_bring_on_a_rainy_day.mp3"},
-    {"n": 14, "en": "When is your birthday? What season is it?", "jp": "あなたの誕生日はいつですか。どの季節ですか。", "hira": "あなた の たんじょうび は いつ です か。 どの きせつ です か", "mp3": "br_q14_when_is_your_birthday_what_season_is_it.mp3"},
-    {"n": 15, "en": "Let’s draw today’s weather.", "jp": "今日の天気をえがきましょう。", "hira": "きょう の てんき を えがき ましょう", "mp3": "br_q15_lets_draw_todays_weather.mp3"},
-
-    {"n": 16, "en": "Where is your nearest shelter?", "jp": "一番近い避難所はどこですか。", "hira": "いちばん ちかい ひなんじょ は どこ です か", "mp3": "br_q16_where_is_your_nearest_shelter.mp3"},
-    {"n": 17, "en": "What is in your emergency kit?", "jp": "防災セットには何が入っていますか。", "hira": "ぼうさい せっと に は なに が はいって い ます か", "mp3": "br_q17_what_is_in_your_emergency_kit.mp3"},
-    {"n": 18, "en": "Do you have a flashlight and batteries?", "jp": "懐中電灯と電池はありますか。", "hira": "かいちゅうでんとう と でんち は あり ます か", "mp3": "br_q18_do_you_have_a_flashlight_and_batteries.mp3"},
-    {"n": 19, "en": "How do you evacuate from school?", "jp": "学校からどうやって避難しますか。", "hira": "がっこう から どうやって ひなん し ます か", "mp3": "br_q19_how_do_you_evacuate_from_school.mp3"},
-    {"n": 20, "en": "What number do you call for help?", "jp": "助けを呼ぶときの番号は何ですか。", "hira": "たすけ を よぶ とき の ばんごう は なん です か", "mp3": "br_q20_what_number_do_you_call_for_help.mp3"},
-    {"n": 21, "en": "What should you not do in a quake?", "jp": "地震のとき、してはいけないことは何ですか。", "hira": "じしん の とき、 して は いけない こと は なん です か", "mp3": "br_q21_what_should_you_not_do_in_a_quake.mp3"},
-    {"n": 22, "en": "Where is the evacuation route?", "jp": "避難経路はどこですか。", "hira": "ひなん けいろ は どこ です か", "mp3": "br_q22_where_is_the_evacuation_route.mp3"},
-    {"n": 23, "en": "Do you know emergency words in English?", "jp": "英語の緊急時の言葉を知っていますか。", "hira": "えいご の きんきゅうじ の ことば を しって い ます か", "mp3": "br_q23_do_you_know_emergency_words_in_english.mp3"},
-    {"n": 24, "en": "What disasters happen in your area?", "jp": "あなたの地域ではどんな災害が起こりますか。", "hira": "あなた の ちいき で は どんな さいがい が おこり ます か", "mp3": "br_q24_what_disasters_happen_in_your_area.mp3"},
-    {"n": 25, "en": "How can we help each other?", "jp": "どうやって助け合えますか。", "hira": "どうやって たすけあえ ます か", "mp3": "br_q25_how_can_we_help_each_other.mp3"},
-    {"n": 26, "en": "Where do you keep water and food?", "jp": "水と食料はどこに保管していますか。", "hira": "みず と しょくりょう は どこ に ほかん して い ます か", "mp3": "br_q26_where_do_you_keep_water_and_food.mp3"},
-    {"n": 27, "en": "Do you practice evacuation drills?", "jp": "避難訓練をしますか。", "hira": "ひなん くんれん を し ます か", "mp3": "br_q27_do_you_practice_evacuation_drills.mp3"},
-    {"n": 28, "en": "Can you say “I need help” in English?", "jp": "英語で「助けが必要です」と言えますか。", "hira": "えいご で たすけ が ひつよう です と いえ ます か", "mp3": "br_q28_can_you_say_i_need_help_in_english.mp3"},
-    {"n": 29, "en": "What should we prepare today?", "jp": "今日は何を準備しましょうか。", "hira": "きょう は なに を じゅんび しましょう か", "mp3": "br_q29_what_should_we_prepare_today.mp3"},
-    {"n": 30, "en": "Are you ready at home and at school?", "jp": "家でも学校でも準備はできていますか。", "hira": "いえ でも がっこう でも じゅんび は できて い ます か", "mp3": "br_q30_are_you_ready_at_home_and_at_school.mp3"},
-
-    {"n": 31, "en": "What is your favorite animal?", "jp": "好きな動物は何ですか。", "hira": "すき な どうぶつ は なん です か", "mp3": "br_q31_what_is_your_favorite_animal.mp3"},
-    {"n": 32, "en": "Where does it live?", "jp": "それはどこに住んでいますか。", "hira": "それ は どこ に すんで い ます か", "mp3": "br_q32_where_does_it_live.mp3"},
-    {"n": 33, "en": "What can it do?", "jp": "それは何ができますか。", "hira": "それ は なに が でき ます か", "mp3": "br_q33_what_can_it_do.mp3"},
-    {"n": 34, "en": "What does it eat?", "jp": "それは何を食べますか。", "hira": "それ は なに を たべ ます か", "mp3": "br_q34_what_does_it_eat.mp3"},
-    {"n": 35, "en": "Is it a mammal or a reptile?", "jp": "それはほ乳類ですか、は虫類ですか。", "hira": "それ は ほにゅうるい です か、 はちゅうるい です か", "mp3": "br_q35_is_it_a_mammal_or_a_reptile.mp3"},
-    {"n": 36, "en": "Can it fly?", "jp": "それは飛べますか。", "hira": "それ は とべ ます か", "mp3": "br_q36_can_it_fly.mp3"},
-    {"n": 37, "en": "Can it swim?", "jp": "それは泳げますか。", "hira": "それ は およげ ます か", "mp3": "br_q37_can_it_swim.mp3"},
-    {"n": 38, "en": "What color is it?", "jp": "それは何色ですか。", "hira": "それ は なにいろ です か", "mp3": "br_q38_what_color_is_it.mp3"},
-    {"n": 39, "en": "Is it big or small?", "jp": "それは大きいですか、小さいですか。", "hira": "それ は おおきい です か、 ちいさい です か", "mp3": "br_q39_is_it_big_or_small.mp3"},
-    {"n": 40, "en": "Is it wild or a pet?", "jp": "野生動物ですか、ペットですか。", "hira": "やせいどうぶつ です か、 ぺっと です か", "mp3": "br_q40_is_it_wild_or_a_pet.mp3"},
-    {"n": 41, "en": "How can we protect it?", "jp": "どうやってその動物を守れますか。", "hira": "どうやって その どうぶつ を まもれ ます か", "mp3": "br_q41_how_can_we_protect_it.mp3"},
-    {"n": 42, "en": "Have you seen it before?", "jp": "それを見たことがありますか。", "hira": "それ を みた こと が あり ます か", "mp3": "br_q42_have_you_seen_it_before.mp3"},
-    {"n": 43, "en": "Do you like insects?", "jp": "昆虫は好きですか。", "hira": "こんちゅう は すき です か", "mp3": "br_q43_do_you_like_insects.mp3"},
-    {"n": 44, "en": "What animal do you want to learn about?", "jp": "どの動物について学びたいですか。", "hira": "どの どうぶつ について まなびたい です か", "mp3": "br_q44_what_animal_do_you_want_to_learn_about.mp3"},
-    {"n": 45, "en": "Let’s draw your animal.", "jp": "選んだ動物をえがきましょう。", "hira": "えらんだ どうぶつ を えがき ましょう", "mp3": "br_q45_lets_draw_your_animal.mp3"},
-
-    {"n": 46, "en": "Where do you want to go hiking?", "jp": "どこへハイキングに行きたいですか。", "hira": "どこ へ はいきんぐ に いきたい です か", "mp3": "br_q46_where_do_you_want_to_go_hiking.mp3"},
-    {"n": 47, "en": "What will you pack?", "jp": "荷物に何を入れますか。", "hira": "にもつ に なに を いれ ます か", "mp3": "br_q47_what_will_you_pack.mp3"},
-    {"n": 48, "en": "Can you set up a tent?", "jp": "テントを立てられますか。", "hira": "てんと を たてられ ます か", "mp3": "br_q48_can_you_set_up_a_tent.mp3"},
-    {"n": 49, "en": "What outdoor rules do you know?", "jp": "どんな外でのルールを知っていますか。", "hira": "どんな そと で の るーる を しって い ます か", "mp3": "br_q49_what_outdoor_rules_do_you_know.mp3"},
-    {"n": 50, "en": "Do you like picnics?", "jp": "ピクニックは好きですか。", "hira": "ぴくにっく は すき です か", "mp3": "br_q50_do_you_like_picnics.mp3"},
-    {"n": 51, "en": "What birds can you see?", "jp": "どんな鳥が見られますか。", "hira": "どんな とり が みられ ます か", "mp3": "br_q51_what_birds_can_you_see.mp3"},
-    {"n": 52, "en": "Do you go fishing?", "jp": "つりに行きますか。", "hira": "つり に いき ます か", "mp3": "br_q52_do_you_go_fishing.mp3"},
-    {"n": 53, "en": "What do you write in your nature journal?", "jp": "自然観察ノートに何を書きますか。", "hira": "しぜんかんさつ のーと に なに を かき ます か", "mp3": "br_q53_what_do_you_write_in_your_nature_journal.mp3"},
-    {"n": 54, "en": "How do you stay safe outdoors?", "jp": "外ではどうやって安全に過ごしますか。", "hira": "そと で は どうやって あんぜん に すごし ます か", "mp3": "br_q54_how_do_you_stay_safe_outdoors.mp3"},
-    {"n": 55, "en": "What snacks do you bring?", "jp": "どんなおやつを持っていきますか。", "hira": "どんな おやつ を もって いき ます か", "mp3": "br_q55_what_snacks_do_you_bring.mp3"},
-    {"n": 56, "en": "Who do you go with?", "jp": "だれと行きますか。", "hira": "だれ と いき ます か", "mp3": "br_q56_who_do_you_go_with.mp3"},
-    {"n": 57, "en": "What time will you start?", "jp": "何時に出発しますか。", "hira": "なんじ に しゅっぱつ し ます か", "mp3": "br_q57_what_time_will_you_start.mp3"},
-    {"n": 58, "en": "Can you read a map?", "jp": "地図を読めますか。", "hira": "ちず を よめ ます か", "mp3": "br_q58_can_you_read_a_map.mp3"},
-    {"n": 59, "en": "What animals might you see?", "jp": "どんな動物が見られるかもしれませんか。", "hira": "どんな どうぶつ が みられる かも しれ ません か", "mp3": "br_q59_what_animals_might_you_see.mp3"},
-    {"n": 60, "en": "Let’s plan an outdoor day.", "jp": "外で過ごす一日を計画しましょう。", "hira": "そと で すごす いちにち を けいかく し ましょう", "mp3": "br_q60_lets_plan_an_outdoor_day.mp3"}
+    {
+      "n": 1,
+      "en": "What activities do you enjoy during the late summer?",
+      "jp": "あなたは晩夏にどんなアクティビティが好きですか？",
+      "hira": "あなたはばんかにどんなあくてぃびてぃがすきですか？",
+      "mp3": "br_q01_what_activities_do_you_enjoy_during_the_late_summer.mp3"
+    },
+    {
+      "n": 2,
+      "en": "How do you feel about the return of school after summer break?",
+      "jp": "夏休みの後、学校に戻ることについてどう思いますか？",
+      "hira": "なつやすみのあと、がっこうにかえることについてどうおもいますか？",
+      "mp3": "br_q02_how_do_you_feel_about_the_return_of_school_after_summer_break.mp3"
+    },
+    {
+      "n": 3,
+      "en": "What is your favorite summer memory with friends?",
+      "jp": "友達との一番好きな夏の思い出は何ですか？",
+      "hira": "ともだちとのいちばんすきななつのおもいではなんですか？",
+      "mp3": "br_q03_what_is_your_favorite_summer_memory_with_friends.mp3"
+    },
+    {
+      "n": 4,
+      "en": "How does the weather affect your mood in late summer?",
+      "jp": "晩夏の天気はあなたの気分にどのように影響しますか？",
+      "hira": "ばんかのてんきはあなたのきぶんにどのようにえいきょうしますか？",
+      "mp3": "br_q04_how_does_the_weather_affect_your_mood_in_late_summer.mp3"
+    },
+    {
+      "n": 5,
+      "en": "What preparations do you make for the new school term?",
+      "jp": "新学期のためにどんな準備をしますか？",
+      "hira": "しんがっきのためにどんなじゅんびをしますか？",
+      "mp3": "br_q05_what_preparations_do_you_make_for_the_new_school_term.mp3"
+    },
+    {
+      "n": 6,
+      "en": "Which summer activities do you want to try next year?",
+      "jp": "来年挑戦したい夏のアクティビティは何ですか？",
+      "hira": "らいねんちょうせんしたいなつのあくてぃびてぃはなんですか？",
+      "mp3": "br_q06_which_summer_activities_do_you_want_to_try_next_year.mp3"
+    },
+    {
+      "n": 7,
+      "en": "How do you keep in touch with friends during the summer?",
+      "jp": "夏の間、友達とどのように連絡を取りますか？",
+      "hira": "なつのあいだ、ともだちとどのようにれんらくをとりますか？",
+      "mp3": "br_q07_how_do_you_keep_in_touch_with_friends_during_the_summer.mp3"
+    },
+    {
+      "n": 8,
+      "en": "What kind of weather do you enjoy the most in late summer?",
+      "jp": "晩夏に一番好きな天気は何ですか？",
+      "hira": "ばんかにいちばんすきなてんきはなんですか？",
+      "mp3": "br_q08_what_kind_of_weather_do_you_enjoy_the_most_in_late_summer.mp3"
+    },
+    {
+      "n": 9,
+      "en": "How do you celebrate the end of summer with your friends?",
+      "jp": "友達と夏の終わりをどのように祝いますか？",
+      "hira": "ともだちとなつのおわりをどのようにいわいますか？",
+      "mp3": "br_q09_how_do_you_celebrate_the_end_of_summer_with_your_friends.mp3"
+    },
+    {
+      "n": 10,
+      "en": "What is your favorite late-summer fruit or vegetable?",
+      "jp": "晩夏の好きな果物や野菜は何ですか？",
+      "hira": "ばんかのすきなくだものややさいはなんですか？",
+      "mp3": "br_q10_what_is_your_favorite_late_summer_fruit_or_vegetable.mp3"
+    },
+    {
+      "n": 11,
+      "en": "How do you feel about the shorter days in late summer?",
+      "jp": "晩夏の日が短くなることについてどう思いますか？",
+      "hira": "ばんかのひがみじかくなることについてどうおもいますか？",
+      "mp3": "br_q11_how_do_you_feel_about_the_shorter_days_in_late_summer.mp3"
+    },
+    {
+      "n": 12,
+      "en": "What do you enjoy doing on a rainy day in late summer?",
+      "jp": "晩夏の雨の日に何をするのが好きですか？",
+      "hira": "ばんかのあめのひになにをするのがすきですか？",
+      "mp3": "br_q12_what_do_you_enjoy_doing_on_a_rainy_day_in_late_summer.mp3"
+    },
+    {
+      "n": 13,
+      "en": "How do you feel when you see the first signs of autumn?",
+      "jp": "秋の最初の兆しを見るとどう感じますか？",
+      "hira": "あきのさいしょのきざしをみるとどうかんじますか？",
+      "mp3": "br_q13_how_do_you_feel_when_you_see_the_first_signs_of_autumn.mp3"
+    },
+    {
+      "n": 14,
+      "en": "What activities do you think are best for making new friends?",
+      "jp": "新しい友達を作るために最適なアクティビティは何だと思いますか？",
+      "hira": "あたらしいともだちをつくるためにさいてきなあくてぃびてぃはなんだとおもいますか？",
+      "mp3": "br_q14_what_activities_do_you_think_are_best_for_making_new_friends.mp3"
+    },
+    {
+      "n": 15,
+      "en": "How do you usually spend your weekends in late summer?",
+      "jp": "晩夏の週末は通常どのように過ごしますか？",
+      "hira": "ばんかのしゅうまつはつうじょうどのようにすごしますか？",
+      "mp3": "br_q15_how_do_you_usually_spend_your_weekends_in_late_summer.mp3"
+    },
+    {
+      "n": 16,
+      "en": "What special events do you look forward to in the new school term?",
+      "jp": "新学期に楽しみにしている特別なイベントは何ですか？",
+      "hira": "しんがっきにたのしみにしているとくべつないべんとわなんですか？",
+      "mp3": "br_q16_what_special_events_do_you_look_forward_to_in_the_new_school_term.mp3"
+    },
+    {
+      "n": 17,
+      "en": "How do you feel about meeting your teachers again?",
+      "jp": "再び先生に会うことについてどう思いますか？",
+      "hira": "ふたたびせんせいにあうことについてどうおもいますか？",
+      "mp3": "br_q17_how_do_you_feel_about_meeting_your_teachers_again.mp3"
+    },
+    {
+      "n": 18,
+      "en": "What is your favorite late summer sport?",
+      "jp": "晩夏の好きなスポーツは何ですか？",
+      "hira": "ばんかのすきなすぽーつはなんですか？",
+      "mp3": "br_q18_what_is_your_favorite_late_summer_sport.mp3"
+    },
+    {
+      "n": 19,
+      "en": "How do you usually prepare your school supplies for the new term?",
+      "jp": "新学期のために学校の用品をどのように準備しますか？",
+      "hira": "しんがっきのためにがっこうのようひんをどのようにじゅんびしますか？",
+      "mp3": "br_q19_how_do_you_usually_prepare_your_school_supplies_for_the_new_term.mp3"
+    },
+    {
+      "n": 20,
+      "en": "What type of weather do you think is perfect for outdoor activities?",
+      "jp": "屋外アクティビティに最適な天候はどのようなものだと思いますか？",
+      "hira": "おくがいあくてぃびてぃにさいてきなてんこうはどのようなものだとおもいますか？",
+      "mp3": "br_q20_what_type_of_weather_do_you_think_is_perfect_for_outdoor_activities.mp3"
+    },
+    {
+      "n": 21,
+      "en": "What do you enjoy most about your summer vacation?",
+      "jp": "夏休みで一番楽しんだことは何ですか？",
+      "hira": "なつやすみでいちばんたのしんだことはなんですか？",
+      "mp3": "br_q21_what_do_you_enjoy_most_about_your_summer_vacation.mp3"
+    },
+    {
+      "n": 22,
+      "en": "What are you looking forward to learning in the new school year?",
+      "jp": "新学年で学ぶことを楽しみにしていることは何ですか？",
+      "hira": "しんがくねんでまなぶことをたのしみにしていることはなんですか？",
+      "mp3": "br_q22_what_are_you_looking_forward_to_learning_in_the_new_school_year.mp3"
+    },
+    {
+      "n": 23,
+      "en": "How do you stay connected with friends who live far away?",
+      "jp": "遠くに住んでいる友達とどのように連絡を保っていますか？",
+      "hira": "とおくにすんでいるともだちとどのようにれんらくをたもっていますか？",
+      "mp3": "br_q23_how_do_you_stay_connected_with_friends_who_live_far_away.mp3"
+    },
+    {
+      "n": 24,
+      "en": "What is your favorite way to relax during the late summer?",
+      "jp": "晩夏にリラックスするための好きな方法は何ですか？",
+      "hira": "ばんかにりらっくすするためのすきなほうほうはなんですか？",
+      "mp3": "br_q24_what_is_your_favorite_way_to_relax_during_the_late_summer.mp3"
+    },
+    {
+      "n": 25,
+      "en": "How do late summer activities differ from those in spring?",
+      "jp": "晩夏のアクティビティは春のものとどのように異なりますか？",
+      "hira": "ばんかのあくてぃびてぃははるのものとどのようにことなりますか？",
+      "mp3": "br_q25_how_do_late_summer_activities_differ_from_those_in_spring.mp3"
+    },
+    {
+      "n": 26,
+      "en": "What new skills do you hope to gain this school term?",
+      "jp": "この学期にどんな新しいスキルを身につけたいですか？",
+      "hira": "このがっきにどんなあたらしいすきるをみにつけたいですか？",
+      "mp3": "br_q26_what_new_skills_do_you_hope_to_gain_this_school_term.mp3"
+    },
+    {
+      "n": 27,
+      "en": "How do you plan to make new friends this year?",
+      "jp": "今年はどのように新しい友達を作るつもりですか？",
+      "hira": "ことしはどのようにあたらしいともだちをつくるつもりですか？",
+      "mp3": "br_q27_how_do_you_plan_to_make_new_friends_this_year.mp3"
+    },
+    {
+      "n": 28,
+      "en": "What kind of summer job would you like to try?",
+      "jp": "どんな夏の仕事を試してみたいですか？",
+      "hira": "どんななつのしごとをためしてみたいですか？",
+      "mp3": "br_q28_what_kind_of_summer_job_would_you_like_to_try.mp3"
+    },
+    {
+      "n": 29,
+      "en": "How do you feel about the end of summer vacation?",
+      "jp": "夏休みの終わりについてどう感じますか？",
+      "hira": "なつやすみのおわりについてどうかんじますか？",
+      "mp3": "br_q29_how_do_you_feel_about_the_end_of_summer_vacation.mp3"
+    },
+    {
+      "n": 30,
+      "en": "What do you think is the best way to enjoy the last days of summer?",
+      "jp": "夏の最後の日々を楽しむためのベストな方法は何だと思いますか？",
+      "hira": "なつのさいごのひびをたのしむためのべすとなほうほうはなんだとおもいますか？",
+      "mp3": "br_q30_what_do_you_think_is_the_best_way_to_enjoy_the_last_days_of_summer.mp3"
+    },
+    {
+      "n": 31,
+      "en": "What is your favorite way to spend time with friends in late summer?",
+      "jp": "晩夏に友達と過ごすのが好きな方法は何ですか？",
+      "hira": "ばんかにともだちとすごすのがすきなほうほうはなんですか？",
+      "mp3": "br_q31_what_is_your_favorite_way_to_spend_time_with_friends_in_late_summer.mp3"
+    },
+    {
+      "n": 32,
+      "en": "What hobbies do you pursue during the summer months?",
+      "jp": "夏の間にどんな趣味を楽しみますか？",
+      "hira": "なつのあいだにどんなしゅみをたのしみますか？",
+      "mp3": "br_q32_what_hobbies_do_you_pursue_during_the_summer_months.mp3"
+    },
+    {
+      "n": 33,
+      "en": "How do you feel when you see the summer flowers beginning to wilt?",
+      "jp": "夏の花がしおれ始めるのを見るとどう感じますか？",
+      "hira": "なつのはながしおれはじめるのをみるとどうかんじますか？",
+      "mp3": "br_q33_how_do_you_feel_when_you_see_the_summer_flowers_beginning_to_wilt.mp3"
+    },
+    {
+      "n": 34,
+      "en": "What is one thing you want to change about your routine this school term?",
+      "jp": "この学期にルーチンで変えたいことは一つ何ですか？",
+      "hira": "このがっきにるーちんでかえたいことはいちばんなんですか？",
+      "mp3": "br_q34_what_is_one_thing_you_want_to_change_about_your_routine_this_school_term.mp3"
+    },
+    {
+      "n": 35,
+      "en": "How do you think friendships change during the school year?",
+      "jp": "学校の年度中に友情はどのように変わると思いますか？",
+      "hira": "がっこうのねんどちゅうにゆうじょうはどのようにかわるとおもいますか？",
+      "mp3": "br_q35_how_do_you_think_friendships_change_during_the_school_year.mp3"
+    },
+    {
+      "n": 36,
+      "en": "What is your favorite late-summer festival or event?",
+      "jp": "晩夏の好きな祭りやイベントは何ですか？",
+      "hira": "ばんかのすきなまつりやいべんとはなんですか？",
+      "mp3": "br_q36_what_is_your_favorite_late_summer_festival_or_event.mp3"
+    },
+    {
+      "n": 37,
+      "en": "How do you like to celebrate the start of the new school term?",
+      "jp": "新学期の始まりをどのように祝うのが好きですか？",
+      "hira": "しんがっきのはじまりをどのようにいわうのがすきですか？",
+      "mp3": "br_q37_how_do_you_like_to_celebrate_the_start_of_the_new_school_term.mp3"
+    },
+    {
+      "n": 38,
+      "en": "What is one thing you are excited to do with your friends this term?",
+      "jp": "今学期に友達と一緒にするのが楽しみなことは何ですか？",
+      "hira": "いまがっきにともだちといっしょにするのがたのしみなことはなんですか？",
+      "mp3": "br_q38_what_is_one_thing_you_are_excited_to_do_with_your_friends_this_term.mp3"
+    },
+    {
+      "n": 39,
+      "en": "How do you feel about returning to school routines?",
+      "jp": "学校のルーチンに戻ることについてどう思いますか？",
+      "hira": "がっこうのるーちんにもどることについてどうおもいますか？",
+      "mp3": "br_q39_how_do_you_feel_about_returning_to_school_routines.mp3"
+    },
+    {
+      "n": 40,
+      "en": "What late-summer activities do you wish you could do more often?",
+      "jp": "もっと頻繁にできるといいなと思う晩夏のアクティビティはありますか？",
+      "hira": "もっとひんぱんにできるといいなとおもうばんかのあくてぃびてぃはありますか？",
+      "mp3": "br_q40_what_late_summer_activities_do_you_wish_you_could_do_more_often.mp3"
+    },
+    {
+      "n": 41,
+      "en": "How do you usually spend your time with family in late summer?",
+      "jp": "晩夏に家族とどのように過ごしますか？",
+      "hira": "ばんかにかぞくとどのようにすごしますか？",
+      "mp3": "br_q41_how_do_you_usually_spend_your_time_with_family_in_late_summer.mp3"
+    },
+    {
+      "n": 42,
+      "en": "What is your favorite way to enjoy a summer evening?",
+      "jp": "夏の夕暮れを楽しむための好きな方法は何ですか？",
+      "hira": "なつのゆうぐれをたのしむためのすきなほうほうはなんですか？",
+      "mp3": "br_q42_what_is_your_favorite_way_to_enjoy_a_summer_evening.mp3"
+    },
+    {
+      "n": 43,
+      "en": "How do you think summer influences your friendships?",
+      "jp": "夏が友情にどのように影響すると思いますか？",
+      "hira": "なつがゆうじょうにどのようにえいきょうするとおもいますか？",
+      "mp3": "br_q43_how_do_you_think_summer_influences_your_friendships.mp3"
+    },
+    {
+      "n": 44,
+      "en": "What memories do you cherish most from your summer holidays?",
+      "jp": "夏休みの思い出で最も大切にしているものは何ですか？",
+      "hira": "なつやすみのおもいででもっともたいせつにしているものはなんですか？",
+      "mp3": "br_q44_what_memories_do_you_cherish_most_from_your_summer_holidays.mp3"
+    },
+    {
+      "n": 45,
+      "en": "What new things do you want to try this school year?",
+      "jp": "今年の学期で挑戦したい新しいことは何ですか？",
+      "hira": "ことしのがっきでちょうせんしたいあたらしいことはなんですか？",
+      "mp3": "br_q45_what_new_things_do_you_want_to_try_this_school_year.mp3"
+    },
+    {
+      "n": 46,
+      "en": "How do you stay motivated during the busy school term?",
+      "jp": "忙しい学期中にどのようにモチベーションを保ちますか？",
+      "hira": "いそがしいがっきちゅうにどのようにもちべーしょんをたもちますか？",
+      "mp3": "br_q46_how_do_you_stay_motivated_during_the_busy_school_term.mp3"
+    },
+    {
+      "n": 47,
+      "en": "How would you describe your ideal summer day?",
+      "jp": "理想的な夏の日をどう表現しますか？",
+      "hira": "りそうてきななつのひをどうひょうげんしますか？",
+      "mp3": "br_q47_how_would_you_describe_your_ideal_summer_day.mp3"
+    },
+    {
+      "n": 48,
+      "en": "What do you think is the best way to make summer memories?",
+      "jp": "夏の思い出を作るための最善の方法は何だと思いますか？",
+      "hira": "なつのおもいでをつくるためのさいぜんのほうほうはなんだとおもいますか？",
+      "mp3": "br_q48_what_do_you_think_is_the_best_way_to_make_summer_memories.mp3"
+    },
+    {
+      "n": 49,
+      "en": "How do you prepare for the first day of school?",
+      "jp": "初日の学校のためにどのように準備しますか？",
+      "hira": "はつひのがっこうのためにどのようにじゅんびしますか？",
+      "mp3": "br_q49_how_do_you_prepare_for_the_first_day_of_school.mp3"
+    },
+    {
+      "n": 50,
+      "en": "What is one goal you have for this school term?",
+      "jp": "この学期の目標は何ですか？",
+      "hira": "このがっきのもくひょうはなんですか？",
+      "mp3": "br_q50_what_is_one_goal_you_have_for_this_school_term.mp3"
+    },
+    {
+      "n": 51,
+      "en": "How do you celebrate friendships at school?",
+      "jp": "学校で友情をどのように祝いますか？",
+      "hira": "がっこうでゆうじょうをどのようにいわいますか？",
+      "mp3": "br_q51_how_do_you_celebrate_friendships_at_school.mp3"
+    },
+    {
+      "n": 52,
+      "en": "What are you most excited about for the new school term?",
+      "jp": "新学期で一番楽しみにしていることは何ですか？",
+      "hira": "しんがっきでいちばんたのしみにしていることはなんですか？",
+      "mp3": "br_q52_what_are_you_most_excited_about_for_the_new_school_term.mp3"
+    },
+    {
+      "n": 53,
+      "en": "How do you balance fun and responsibilities during school?",
+      "jp": "学校で楽しみと責任をどうやって両立させますか？",
+      "hira": "がっこうでたのしみとせきにんをどうやってりょうりつさせますか？",
+      "mp3": "br_q53_how_do_you_balance_fun_and_responsibilities_during_school.mp3"
+    },
+    {
+      "n": 54,
+      "en": "What late-summer snack do you enjoy the most?",
+      "jp": "晩夏に一番楽しむスナックは何ですか？",
+      "hira": "ばんかにいちばんたのしむすなっくはなんですか？",
+      "mp3": "br_q54_what_late_summer_snack_do_you_enjoy_the_most.mp3"
+    },
+    {
+      "n": 55,
+      "en": "How do you feel about the challenges of a new school year?",
+      "jp": "新しい学年の挑戦についてどう感じますか？",
+      "hira": "あたらしいがくねんのちょうせんについてどうかんじますか？",
+      "mp3": "br_q55_how_do_you_feel_about_the_challenges_of_a_new_school_year.mp3"
+    },
+    {
+      "n": 56,
+      "en": "What is your favorite memory from this summer?",
+      "jp": "今年の夏の好きな思い出は何ですか？",
+      "hira": "ことしのなつのすきなおもいではなんですか？",
+      "mp3": "br_q56_what_is_your_favorite_memory_from_this_summer.mp3"
+    },
+    {
+      "n": 57,
+      "en": "What friendship traditions do you have with your friends?",
+      "jp": "友達との友情の伝統にはどんなものがありますか？",
+      "hira": "ともだちとのゆうじょうのでんとうにはどんなものがありますか？",
+      "mp3": "br_q57_what_friendship_traditions_do_you_have_with_your_friends.mp3"
+    },
+    {
+      "n": 58,
+      "en": "How do you keep your summer memories alive during the school year?",
+      "jp": "学校の年度中に夏の思い出をどうやって生かしますか？",
+      "hira": "がっこうのねんどちゅうになつのおもいでをどうやっていかしますか？",
+      "mp3": "br_q58_how_do_you_keep_your_summer_memories_alive_during_the_school_year.mp3"
+    },
+    {
+      "n": 59,
+      "en": "What kinds of things do you like to share with friends?",
+      "jp": "友達と共有したいものはどんなものですか？",
+      "hira": "ともだちときょうゆうしたいものはどんなものですか？",
+      "mp3": "br_q59_what_kinds_of_things_do_you_like_to_share_with_friends.mp3"
+    },
+    {
+      "n": 60,
+      "en": "How do you think the weather affects your daily activities in late summer?",
+      "jp": "晩夏の天気はあなたの日常活動にどのように影響すると思いますか？",
+      "hira": "ばんかのてんきはあなたのにちじょうかつどうにどのようにえいきょうするとおもいますか？",
+      "mp3": "br_q60_how_do_you_think_the_weather_affects_your_daily_activities_in_late_summer.mp3"
+    }
   ]
 }
