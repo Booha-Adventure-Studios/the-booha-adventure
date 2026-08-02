@@ -1,68 +1,424 @@
-
 {
   "cards": [
-    { "n": 1, "en": "It is hot today.", "jp": "今日は暑いです。", "hira": "きょう は あつい です", "mp3": "br_s01_it_is_hot_today.mp3" },
-    { "n": 2, "en": "I like summer.", "jp": "私は夏が好きです。", "hira": "わたし は なつ が すき です", "mp3": "br_s02_i_like_summer.mp3" },
-    { "n": 3, "en": "I want to swim.", "jp": "私は泳ぎたいです。", "hira": "わたし は およぎたい です", "mp3": "br_s03_i_want_to_swim.mp3" },
-    { "n": 4, "en": "Let’s go to the pool.", "jp": "プールに行こう。", "hira": "ぷーる に いこう", "mp3": "br_s04_lets_go_to_the_pool.mp3" },
-    { "n": 5, "en": "I have a swimsuit.", "jp": "私は水着を持っています。", "hira": "わたし は みずぎ を もって います", "mp3": "br_s05_i_have_a_swimsuit.mp3" },
-    { "n": 6, "en": "The beach is fun.", "jp": "ビーチは楽しいです。", "hira": "びーち は たのしい です", "mp3": "br_s06_the_beach_is_fun.mp3" },
-    { "n": 7, "en": "I want to eat ice cream.", "jp": "アイスクリームを食べたいです。", "hira": "あいすくりーむ を たべたい です", "mp3": "br_s07_i_want_to_eat_ice_cream.mp3" },
-    { "n": 8, "en": "Let’s go to a festival.", "jp": "祭りに行こう。", "hira": "まつり に いこう", "mp3": "br_s08_lets_go_to_a_festival.mp3" },
-    { "n": 9, "en": "We watched fireworks.", "jp": "私たちは花火を見ました。", "hira": "わたし たち は はなび を みました", "mp3": "br_s09_we_watched_fireworks.mp3" },
-    { "n": 10, "en": "I want to go camping.", "jp": "キャンプに行きたいです。", "hira": "きゃんぷ に いきたい です", "mp3": "br_s10_i_want_to_go_camping.mp3" },
-    { "n": 11, "en": "Let’s have a barbecue.", "jp": "バーベキューをしよう。", "hira": "ばーべきゅー を しよう", "mp3": "br_s11_lets_have_a_barbecue.mp3" },
-    { "n": 12, "en": "I put on sunscreen.", "jp": "日焼け止めをぬります。", "hira": "ひやけどめ を ぬります", "mp3": "br_s12_i_put_on_sunscreen.mp3" },
-    { "n": 13, "en": "The sun is strong.", "jp": "日差しが強いです。", "hira": "ひざし が つよい です", "mp3": "br_s13_the_sun_is_strong.mp3" },
-    { "n": 14, "en": "I use a fan.", "jp": "うちわや扇風機を使います。", "hira": "うちわ や せんぷうき を つかいます", "mp3": "br_s14_i_use_a_fan.mp3" },
-    { "n": 15, "en": "Summer is my favorite season.", "jp": "夏は私の一番好きな季節です。", "hira": "なつ は わたし の いちばん すき な きせつ です", "mp3": "br_s15_summer_is_my_favorite_season.mp3" },
-
-    { "n": 16, "en": "I am on vacation.", "jp": "私は休暇中です。", "hira": "わたし は きゅうかちゅう です", "mp3": "br_s16_i_am_on_vacation.mp3" },
-    { "n": 17, "en": "I’m going to travel this summer.", "jp": "この夏、旅行する予定です。", "hira": "この なつ りょこう する よてい です", "mp3": "br_s17_im_going_to_travel_this_summer.mp3" },
-    { "n": 18, "en": "I want to go on a trip.", "jp": "旅行に行きたいです。", "hira": "りょこう に いきたい です", "mp3": "br_s18_i_want_to_go_on_a_trip.mp3" },
-    { "n": 19, "en": "We will stay at a hotel.", "jp": "私たちはホテルに泊まります。", "hira": "わたし たち は ほてる に とまります", "mp3": "br_s19_we_will_stay_at_a_hotel.mp3" },
-    { "n": 20, "en": "I made a reservation.", "jp": "予約をしました。", "hira": "よやく を しました", "mp3": "br_s20_i_made_a_reservation.mp3" },
-    { "n": 21, "en": "I bought a ticket.", "jp": "チケットを買いました。", "hira": "ちけっと を かいました", "mp3": "br_s21_i_bought_a_ticket.mp3" },
-    { "n": 22, "en": "I’m going to the airport by train.", "jp": "電車で空港に行きます。", "hira": "でんしゃ で くうこう に いきます", "mp3": "br_s22_im_going_to_the_airport_by_train.mp3" },
-    { "n": 23, "en": "We went to the station.", "jp": "私たちは駅に行きました。", "hira": "わたし たち は えき に いきました", "mp3": "br_s23_we_went_to_the_station.mp3" },
-    { "n": 24, "en": "I want to ride the train.", "jp": "電車に乗りたいです。", "hira": "でんしゃ に のりたい です", "mp3": "br_s24_i_want_to_ride_the_train.mp3" },
-    { "n": 25, "en": "He will go by plane.", "jp": "彼は飛行機で行きます。", "hira": "かれ は ひこうき で いきます", "mp3": "br_s25_he_will_go_by_plane.mp3" },
-    { "n": 26, "en": "I need my passport.", "jp": "パスポートが必要です。", "hira": "ぱすぽーと が ひつよう です", "mp3": "br_s26_i_need_my_passport.mp3" },
-    { "n": 27, "en": "I take pictures with my camera.", "jp": "カメラで写真を撮ります。", "hira": "かめら で しゃしん を とります", "mp3": "br_s27_i_take_pictures_with_my_camera.mp3" },
-    { "n": 28, "en": "I will buy souvenirs.", "jp": "おみやげを買います。", "hira": "おみやげ を かいます", "mp3": "br_s28_i_will_buy_souvenirs.mp3" },
-    { "n": 29, "en": "I need money for the trip.", "jp": "旅行にお金が必要です。", "hira": "りょこう に おかね が ひつよう です", "mp3": "br_s29_i_need_money_for_the_trip.mp3" },
-    { "n": 30, "en": "I have free time today.", "jp": "今日は自由時間があります。", "hira": "きょう は じゆう じかん が あります", "mp3": "br_s30_i_have_free_time_today.mp3" },
-
-    { "n": 31, "en": "I need a list.", "jp": "リストが必要です。", "hira": "りすと が ひつよう です", "mp3": "br_s31_i_need_a_list.mp3" },
-    { "n": 32, "en": "I’m going to pack today.", "jp": "今日は荷造りする予定です。", "hira": "きょう は にづくり する よてい です", "mp3": "br_s32_im_going_to_pack_today.mp3" },
-    { "n": 33, "en": "I need my bag.", "jp": "かばんが必要です。", "hira": "かばん が ひつよう です", "mp3": "br_s33_i_need_my_bag.mp3" },
-    { "n": 34, "en": "I have a suitcase.", "jp": "スーツケースがあります。", "hira": "すーつけーす が あります", "mp3": "br_s34_i_have_a_suitcase.mp3" },
-    { "n": 35, "en": "I need clothes and shoes.", "jp": "服とくつが必要です。", "hira": "ふく と くつ が ひつよう です", "mp3": "br_s35_i_need_clothes_and_shoes.mp3" },
-    { "n": 36, "en": "I should bring a towel.", "jp": "タオルを持って行くべきです。", "hira": "たおる を もって いく べき です", "mp3": "br_s36_i_should_bring_a_towel.mp3" },
-    { "n": 37, "en": "I need a water bottle.", "jp": "水筒が必要です。", "hira": "すいとう が ひつよう です", "mp3": "br_s37_i_need_a_water_bottle.mp3" },
-    { "n": 38, "en": "I should bring medicine.", "jp": "薬を持って行くべきです。", "hira": "くすり を もって いく べき です", "mp3": "br_s38_i_should_bring_medicine.mp3" },
-    { "n": 39, "en": "I don’t need too many things.", "jp": "あまりたくさんの物はいりません。", "hira": "あまり たくさん の もの は いりません", "mp3": "br_s39_i_dont_need_too_many_things.mp3" },
-    { "n": 40, "en": "I might need an umbrella.", "jp": "かさが必要かもしれません。", "hira": "かさ が ひつよう かも しれません", "mp3": "br_s40_i_might_need_an_umbrella.mp3" },
-    { "n": 41, "en": "I use a map.", "jp": "地図を使います。", "hira": "ちず を つかいます", "mp3": "br_s41_i_use_a_map.mp3" },
-    { "n": 42, "en": "I checked my schedule.", "jp": "予定を確認しました。", "hira": "よてい を かくにん しました", "mp3": "br_s42_i_checked_my_schedule.mp3" },
-    { "n": 43, "en": "This is important.", "jp": "これは大事です。", "hira": "これ は だいじ です", "mp3": "br_s43_this_is_important.mp3" },
-    { "n": 44, "en": "Don’t forget your passport.", "jp": "パスポートを忘れないで。", "hira": "ぱすぽーと を わすれない で", "mp3": "br_s44_dont_forget_your_passport.mp3" },
-    { "n": 45, "en": "I planned the trip with my family.", "jp": "家族と旅行の計画をしました。", "hira": "かぞく と りょこう の けいかく を しました", "mp3": "br_s45_i_planned_the_trip_with_my_family.mp3" },
-
-    { "n": 46, "en": "I want to eat watermelon.", "jp": "すいかを食べたいです。", "hira": "すいか を たべたい です", "mp3": "br_s46_i_want_to_eat_watermelon.mp3" },
-    { "n": 47, "en": "Shaved ice is cold.", "jp": "かき氷は冷たいです。", "hira": "かきごおり は つめたい です", "mp3": "br_s47_shaved_ice_is_cold.mp3" },
-    { "n": 48, "en": "I like ramune.", "jp": "ラムネが好きです。", "hira": "らむね が すき です", "mp3": "br_s48_i_like_ramune.mp3" },
-    { "n": 49, "en": "Let’s eat yakisoba.", "jp": "焼きそばを食べよう。", "hira": "やきそば を たべよう", "mp3": "br_s49_lets_eat_yakisoba.mp3" },
-    { "n": 50, "en": "Takoyaki is delicious.", "jp": "たこ焼きはおいしいです。", "hira": "たこやき は おいしい です", "mp3": "br_s50_takoyaki_is_delicious.mp3" },
-    { "n": 51, "en": "I want to eat corn.", "jp": "とうもろこしを食べたいです。", "hira": "とうもろこし を たべたい です", "mp3": "br_s51_i_want_to_eat_corn.mp3" },
-    { "n": 52, "en": "Cucumber is refreshing.", "jp": "きゅうりはさっぱりしています。", "hira": "きゅうり は さっぱり しています", "mp3": "br_s52_cucumber_is_refreshing.mp3" },
-    { "n": 53, "en": "Tomatoes are sweet.", "jp": "トマトは甘いです。", "hira": "とまと は あまい です", "mp3": "br_s53_tomatoes_are_sweet.mp3" },
-    { "n": 54, "en": "I want to eat cold noodles.", "jp": "冷たいめんを食べたいです。", "hira": "つめたい めん を たべたい です", "mp3": "br_s54_i_want_to_eat_cold_noodles.mp3" },
-    { "n": 55, "en": "I’m thirsty. I want juice.", "jp": "のどがかわきました。ジュースがほしいです。", "hira": "のど が かわきました じゅーす が ほしい です", "mp3": "br_s55_im_thirsty_i_want_juice.mp3" },
-    { "n": 56, "en": "This is sweet.", "jp": "これは甘いです。", "hira": "これ は あまい です", "mp3": "br_s56_this_is_sweet.mp3" },
-    { "n": 57, "en": "This is salty.", "jp": "これはしょっぱいです。", "hira": "これ は しょっぱい です", "mp3": "br_s57_this_is_salty.mp3" },
-    { "n": 58, "en": "I’m hungry.", "jp": "おなかがすきました。", "hira": "おなか が すきました", "mp3": "br_s58_im_hungry.mp3" },
-    { "n": 59, "en": "Let’s eat together.", "jp": "いっしょに食べよう。", "hira": "いっしょ に たべよう", "mp3": "br_s59_lets_eat_together.mp3" },
-    { "n": 60, "en": "Summer food is the best.", "jp": "夏の食べ物が一番です。", "hira": "なつ の たべもの が いちばん です", "mp3": "br_s60_summer_food_is_the_best.mp3" }
+    {
+      "n": 1,
+      "en": "During summer, I enjoy outdoor picnics with my friends.",
+      "jp": "夏には友達と屋外ピクニックを楽しみます。",
+      "hira": "なつにはともだちとおくがいぴくにっくをたのしみます。",
+      "mp3": "br_s01_during_summer_i_enjoy_outdoor_picnics_with_my_friends.mp3"
+    },
+    {
+      "n": 2,
+      "en": "We plan to visit the mountains for hiking this weekend.",
+      "jp": "今週末はハイキングのために山を訪れる予定です。",
+      "hira": "こんしゅうまつははいきんぐのためにやまをおとずれるよていです。",
+      "mp3": "br_s02_we_plan_to_visit_the_mountains_for_hiking_this_weekend.mp3"
+    },
+    {
+      "n": 3,
+      "en": "I love making lemonade on hot days.",
+      "jp": "暑い日にはレモネードを作るのが大好きです。",
+      "hira": "あついひにはれもねーどをつくるのがだいすきです。",
+      "mp3": "br_s03_i_love_making_lemonade_on_hot_days.mp3"
+    },
+    {
+      "n": 4,
+      "en": "The weather is perfect for a beach day.",
+      "jp": "ビーチで遊ぶのに最適な天気です。",
+      "hira": "びーちであそぶのにさいてきなてんきです。",
+      "mp3": "br_s04_the_weather_is_perfect_for_a_beach_day.mp3"
+    },
+    {
+      "n": 5,
+      "en": "I want to try kayaking on the river this summer.",
+      "jp": "今夏、川でカヤックに挑戦したいです。",
+      "hira": "こんか、かわでかやっくにちょうせんしたいです。",
+      "mp3": "br_s05_i_want_to_try_kayaking_on_the_river_this_summer.mp3"
+    },
+    {
+      "n": 6,
+      "en": "My family and I will have a barbecue in our backyard.",
+      "jp": "家族と私は裏庭でバーベキューをします。",
+      "hira": "かぞくとわたしはうらにわでばーべきゅーをします。",
+      "mp3": "br_s06_my_family_and_i_will_have_a_barbecue_in_our_backyard.mp3"
+    },
+    {
+      "n": 7,
+      "en": "I enjoyed seeing the stars on a clear night.",
+      "jp": "晴れた夜に星を見るのを楽しみました。",
+      "hira": "はれたよるにほしをみるのをたのしみました。",
+      "mp3": "br_s07_i_enjoyed_seeing_the_stars_on_a_clear_night.mp3"
+    },
+    {
+      "n": 8,
+      "en": "We are excited to attend the summer festival next week.",
+      "jp": "来週の夏祭りに参加するのが楽しみです。",
+      "hira": "らいしゅうのなつまつりにさんかするのがたのしみです。",
+      "mp3": "br_s08_we_are_excited_to_attend_the_summer_festival_next_week.mp3"
+    },
+    {
+      "n": 9,
+      "en": "I think we should stay hydrated while playing outside.",
+      "jp": "外で遊んでいる間は水分補給をしなければならないと思います。",
+      "hira": "そとであそんでいるあいだはすいぶんほきゅうをしなければならないとおもいます。",
+      "mp3": "br_s09_i_think_we_should_stay_hydrated_while_playing_outside.mp3"
+    },
+    {
+      "n": 10,
+      "en": "I plan to visit my grandparents during summer vacation.",
+      "jp": "夏休み中に祖父母を訪れる予定です。",
+      "hira": "なつやすみちゅうにそふぼをおとずれるよていです。",
+      "mp3": "br_s10_i_plan_to_visit_my_grandparents_during_summer_vacation.mp3"
+    },
+    {
+      "n": 11,
+      "en": "Trying different fruits is a fun summer activity.",
+      "jp": "様々な果物を試すのは楽しい夏のアクティビティです。",
+      "hira": "さまざまなくだものをためすのはたのしいなつのあくてぃびてぃです。",
+      "mp3": "br_s11_trying_different_fruits_is_a_fun_summer_activity.mp3"
+    },
+    {
+      "n": 12,
+      "en": "I like to ride my bicycle along the beach path.",
+      "jp": "ビーチの道を自転車で走るのが好きです。",
+      "hira": "びーちのみちをじてんしゃではしるのがすきです。",
+      "mp3": "br_s12_i_like_to_ride_my_bicycle_along_the_beach_path.mp3"
+    },
+    {
+      "n": 13,
+      "en": "Going for walks in the evening is refreshing.",
+      "jp": "夕方に散歩に行くのはリフレッシュになります。",
+      "hira": "ゆうがたにさんぽにいくのはりふれっしゅになります。",
+      "mp3": "br_s13_going_for_walks_in_the_evening_is_refreshing.mp3"
+    },
+    {
+      "n": 14,
+      "en": "We should remember to wear sunscreen at the beach.",
+      "jp": "ビーチでは日焼け止めを塗ることを忘れないようにしましょう。",
+      "hira": "びーちではひやけどめをぬることをわすれないようにしましょう。",
+      "mp3": "br_s14_we_should_remember_to_wear_sunscreen_at_the_beach.mp3"
+    },
+    {
+      "n": 15,
+      "en": "I am looking forward to trying new foods at the festival.",
+      "jp": "祭りで新しい食べ物を試すのを楽しみにしています。",
+      "hira": "まつりであたらしいたべものをためすのをたのしみにしています。",
+      "mp3": "br_s15_i_am_looking_forward_to_trying_new_foods_at_the_festival.mp3"
+    },
+    {
+      "n": 16,
+      "en": "I plan to go fishing at the lake next Saturday.",
+      "jp": "来週の土曜日に湖で釣りをする予定です。",
+      "hira": "らいしゅうのどようびにみずうみでつりをするよていです。",
+      "mp3": "br_s16_i_plan_to_go_fishing_at_the_lake_next_saturday.mp3"
+    },
+    {
+      "n": 17,
+      "en": "The summer breeze feels nice after a hot day.",
+      "jp": "暑い日が終わった後、夏の風は心地よいです。",
+      "hira": "あついひがおわったあと、なつのかぜはここちよいです。",
+      "mp3": "br_s17_the_summer_breeze_feels_nice_after_a_hot_day.mp3"
+    },
+    {
+      "n": 18,
+      "en": "I enjoy camping under the stars with my friends.",
+      "jp": "友達と星の下でキャンプを楽しみます。",
+      "hira": "ともだちとほしのしたできゃんぷをたのしみます。",
+      "mp3": "br_s18_i_enjoy_camping_under_the_stars_with_my_friends.mp3"
+    },
+    {
+      "n": 19,
+      "en": "We should check the weather before going out.",
+      "jp": "出かける前に天気を確認しましょう。",
+      "hira": "でかけるまえにてんきをかくにんしましょう。",
+      "mp3": "br_s19_we_should_check_the_weather_before_going_out.mp3"
+    },
+    {
+      "n": 20,
+      "en": "I love visiting new places during my travels.",
+      "jp": "旅行中に新しい場所を訪れるのが大好きです。",
+      "hira": "りょこうちゅうにあたらしいばしょをおとずれるのがだいすきです。",
+      "mp3": "br_s20_i_love_visiting_new_places_during_my_travels.mp3"
+    },
+    {
+      "n": 21,
+      "en": "I am excited about our road trip next month.",
+      "jp": "来月のドライブ旅行が楽しみです。",
+      "hira": "らいげつのどらいぶりょこうがたのしみです。",
+      "mp3": "br_s21_i_am_excited_about_our_road_trip_next_month.mp3"
+    },
+    {
+      "n": 22,
+      "en": "We are making plans to go to the fireworks show.",
+      "jp": "花火大会に行く計画を立てています。",
+      "hira": "はなびたいかいにいくけいかくをたてています。",
+      "mp3": "br_s22_we_are_making_plans_to_go_to_the_fireworks_show.mp3"
+    },
+    {
+      "n": 23,
+      "en": "The ice-cold drinks are perfect for summer parties.",
+      "jp": "氷の入った冷たい飲み物は夏のパーティーにぴったりです。",
+      "hira": "こおりのはいったつめたいのみものはなつのぱーてぃーにぴったりです。",
+      "mp3": "br_s23_the_ice_cold_drinks_are_perfect_for_summer_parties.mp3"
+    },
+    {
+      "n": 24,
+      "en": "I want to learn how to surf at the beach.",
+      "jp": "ビーチでサーフィンのやり方を学びたいです。",
+      "hira": "びーちでさーふぃんのやりかたをまなびたいです。",
+      "mp3": "br_s24_i_want_to_learn_how_to_surf_at_the_beach.mp3"
+    },
+    {
+      "n": 25,
+      "en": "I feel happy when I see the bright sun in the sky.",
+      "jp": "空に明るい太陽を見ると幸せです。",
+      "hira": "そらにあかるいたいようをみるとしあわせです。",
+      "mp3": "br_s25_i_feel_happy_when_i_see_the_bright_sun_in_the_sky.mp3"
+    },
+    {
+      "n": 26,
+      "en": "We will visit the local farmers' market this weekend.",
+      "jp": "今週末に地元のファーマーズマーケットを訪れます。",
+      "hira": "こんしゅうまつにじもとのふぁーまーずまーけっとをおとずれます。",
+      "mp3": "br_s26_we_will_visit_the_local_farmers_market_this_weekend.mp3"
+    },
+    {
+      "n": 27,
+      "en": "I always carry a water bottle when I go outside.",
+      "jp": "外に出るときはいつも水筒を持ち歩きます。",
+      "hira": "そとにでるときはいつもすいとうをもちあるきます。",
+      "mp3": "br_s27_i_always_carry_a_water_bottle_when_i_go_outside.mp3"
+    },
+    {
+      "n": 28,
+      "en": "This summer, I want to try cooking new recipes.",
+      "jp": "この夏は新しいレシピを試したいです。",
+      "hira": "このなつはあたらしいれしぴをためしたいです。",
+      "mp3": "br_s28_this_summer_i_want_to_try_cooking_new_recipes.mp3"
+    },
+    {
+      "n": 29,
+      "en": "We are going to enjoy a picnic in the park tomorrow.",
+      "jp": "明日、公園でピクニックを楽しむ予定です。",
+      "hira": "あした、こうえんでぴくにっくをたのしむよていです。",
+      "mp3": "br_s29_we_are_going_to_enjoy_a_picnic_in_the_park_tomorrow.mp3"
+    },
+    {
+      "n": 30,
+      "en": "I take my dog for a walk every evening.",
+      "jp": "毎晩、犬を散歩に連れて行きます。",
+      "hira": "まいばん、いぬをさんぽにつれていきます。",
+      "mp3": "br_s30_i_take_my_dog_for_a_walk_every_evening.mp3"
+    },
+    {
+      "n": 31,
+      "en": "The summer nights are perfect for stargazing.",
+      "jp": "夏の夜は星空観察に最適です。",
+      "hira": "なつのよるはほしぞらかんさつにさいてきです。",
+      "mp3": "br_s31_the_summer_nights_are_perfect_for_stargazing.mp3"
+    },
+    {
+      "n": 32,
+      "en": "I am learning to skateboard at the park.",
+      "jp": "公園でスケートボードを学んでいます。",
+      "hira": "こうえんですけーとぼーどをまなんでいます。",
+      "mp3": "br_s32_i_am_learning_to_skateboard_at_the_park.mp3"
+    },
+    {
+      "n": 33,
+      "en": "We will go on a nature walk this weekend.",
+      "jp": "今週末に自然散策をします。",
+      "hira": "こんしゅうまつにしぜんさんさくをします。",
+      "mp3": "br_s33_we_will_go_on_a_nature_walk_this_weekend.mp3"
+    },
+    {
+      "n": 34,
+      "en": "I enjoy playing frisbee in the field.",
+      "jp": "野原でフリスビーをするのが楽しいです。",
+      "hira": "のはらでふりすびーをするのがたのしいです。",
+      "mp3": "br_s34_i_enjoy_playing_frisbee_in_the_field.mp3"
+    },
+    {
+      "n": 35,
+      "en": "Eating fresh fruit is one of my favorite summer activities.",
+      "jp": "新鮮な果物を食べるのは私の好きな夏のアクティビティの一つです。",
+      "hira": "しんせんなくだものをたべるのはわたしのすきななつのあくてぃびてぃのひとつです。",
+      "mp3": "br_s35_eating_fresh_fruit_is_one_of_my_favorite_summer_activities.mp3"
+    },
+    {
+      "n": 36,
+      "en": "I plan to take a trip to a nearby island.",
+      "jp": "近くの島に旅行に行く予定です。",
+      "hira": "ちかくのしまにりょこうにいくよていです。",
+      "mp3": "br_s36_i_plan_to_take_a_trip_to_a_nearby_island.mp3"
+    },
+    {
+      "n": 37,
+      "en": "I always check the sun's position before going outside.",
+      "jp": "外に出る前に太陽の位置を確認します。",
+      "hira": "そとにでるまえにたいようのいちをかくにんします。",
+      "mp3": "br_s37_i_always_check_the_sun_s_position_before_going_outside.mp3"
+    },
+    {
+      "n": 38,
+      "en": "I enjoy making summer crafts with my friends.",
+      "jp": "友達と夏のクラフトを作るのを楽しみます。",
+      "hira": "ともだちとなつのくらふとをつくるのをたのしみます。",
+      "mp3": "br_s38_i_enjoy_making_summer_crafts_with_my_friends.mp3"
+    },
+    {
+      "n": 39,
+      "en": "We should always wear sunglasses on sunny days.",
+      "jp": "晴れた日には必ずサングラスをかけるべきです。",
+      "hira": "はれたひにはかならずさんぐらすをかけるべきです。",
+      "mp3": "br_s39_we_should_always_wear_sunglasses_on_sunny_days.mp3"
+    },
+    {
+      "n": 40,
+      "en": "I love to discover new recipes for summer salads.",
+      "jp": "夏のサラダの新しいレシピを見つけるのが大好きです。",
+      "hira": "なつのさらだのあたらしいれしぴをみつけるのがだいすきです。",
+      "mp3": "br_s40_i_love_to_discover_new_recipes_for_summer_salads.mp3"
+    },
+    {
+      "n": 41,
+      "en": "We will go on a boat ride during our vacation.",
+      "jp": "休暇中にボートに乗る予定です。",
+      "hira": "きゅうかちゅうにぼーとにのるよていです。",
+      "mp3": "br_s41_we_will_go_on_a_boat_ride_during_our_vacation.mp3"
+    },
+    {
+      "n": 42,
+      "en": "My friends and I will explore the local trails.",
+      "jp": "友達と私は地元のトレイルを探検します。",
+      "hira": "ともだちとわたしはじもとのとれいるをたんけんします。",
+      "mp3": "br_s42_my_friends_and_i_will_explore_the_local_trails.mp3"
+    },
+    {
+      "n": 43,
+      "en": "I love to watch the clouds float in the sky.",
+      "jp": "空に浮かぶ雲を見るのが好きです。",
+      "hira": "そらにうかぶくもをみるのがすきです。",
+      "mp3": "br_s43_i_love_to_watch_the_clouds_float_in_the_sky.mp3"
+    },
+    {
+      "n": 44,
+      "en": "We should plan a day trip to the amusement park.",
+      "jp": "遊園地への日帰り旅行を計画しましょう。",
+      "hira": "ゆうえんちへのひがえりりょこうをけいかくしましょう。",
+      "mp3": "br_s44_we_should_plan_a_day_trip_to_the_amusement_park.mp3"
+    },
+    {
+      "n": 45,
+      "en": "I enjoy playing soccer with my friends in the park.",
+      "jp": "公園で友達とサッカーをするのが楽しみです。",
+      "hira": "こうえんでともだちとさっかーをするのがたのしみです。",
+      "mp3": "br_s45_i_enjoy_playing_soccer_with_my_friends_in_the_park.mp3"
+    },
+    {
+      "n": 46,
+      "en": "I want to learn how to make summer smoothies.",
+      "jp": "夏のスムージーの作り方を学びたいです。",
+      "hira": "なつのすむーじーのつくりかたをまなびたいです。",
+      "mp3": "br_s46_i_want_to_learn_how_to_make_summer_smoothies.mp3"
+    },
+    {
+      "n": 47,
+      "en": "We will have a family reunion at the beach this summer.",
+      "jp": "この夏、海で家族の再会をします。",
+      "hira": "このなつ、うみでかぞくのさいかいをします。",
+      "mp3": "br_s47_we_will_have_a_family_reunion_at_the_beach_this_summer.mp3"
+    },
+    {
+      "n": 48,
+      "en": "I enjoy collecting seashells when I go to the beach.",
+      "jp": "ビーチに行くときに貝殻を集めるのが好きです。",
+      "hira": "びーちにいくときにかいがらをあつめるのがすきです。",
+      "mp3": "br_s48_i_enjoy_collecting_seashells_when_i_go_to_the_beach.mp3"
+    },
+    {
+      "n": 49,
+      "en": "We will visit the zoo to see the summer animals.",
+      "jp": "夏の動物を見るために動物園を訪れます。",
+      "hira": "なつのどうぶつをみるためにどうぶつえんをおとずれます。",
+      "mp3": "br_s49_we_will_visit_the_zoo_to_see_the_summer_animals.mp3"
+    },
+    {
+      "n": 50,
+      "en": "I like to try different ice cream flavors in summer.",
+      "jp": "夏には様々なアイスクリームの味を試すのが好きです。",
+      "hira": "なつにはさまざまなあいすくりーむのあじをためすのがすきです。",
+      "mp3": "br_s50_i_like_to_try_different_ice_cream_flavors_in_summer.mp3"
+    },
+    {
+      "n": 51,
+      "en": "I am excited to see my friends during our summer break.",
+      "jp": "夏休みに友達に会えるのが楽しみです。",
+      "hira": "なつやすみにともだちにあえるのがたのしみです。",
+      "mp3": "br_s51_i_am_excited_to_see_my_friends_during_our_summer_break.mp3"
+    },
+    {
+      "n": 52,
+      "en": "We are going to have fun at the local water park.",
+      "jp": "地元のウォーターパークで楽しむ予定です。",
+      "hira": "じもとのうぉーたーぱーくでたのしむよていです。",
+      "mp3": "br_s52_we_are_going_to_have_fun_at_the_local_water_park.mp3"
+    },
+    {
+      "n": 53,
+      "en": "I enjoy taking long walks in the warm evenings.",
+      "jp": "暖かい夕方に長い散歩をするのが好きです。",
+      "hira": "あたたかいゆうがたにながいさんぽをするのがすきです。",
+      "mp3": "br_s53_i_enjoy_taking_long_walks_in_the_warm_evenings.mp3"
+    },
+    {
+      "n": 54,
+      "en": "We will visit a farm to pick fresh vegetables.",
+      "jp": "新鮮な野菜を摘むために農場を訪れます。",
+      "hira": "しんせんなやさいをつむためにのうじょうをおとずれます。",
+      "mp3": "br_s54_we_will_visit_a_farm_to_pick_fresh_vegetables.mp3"
+    },
+    {
+      "n": 55,
+      "en": "I love to create summer memories with my family.",
+      "jp": "家族と夏の思い出を作るのが大好きです。",
+      "hira": "かぞくとなつのおもいでをつくるのがだいすきです。",
+      "mp3": "br_s55_i_love_to_create_summer_memories_with_my_family.mp3"
+    },
+    {
+      "n": 56,
+      "en": "We should always be careful around water during summer.",
+      "jp": "夏には水の周りで常に注意するべきです。",
+      "hira": "なつにはみずのまわりでつねにちゅういするべきです。",
+      "mp3": "br_s56_we_should_always_be_careful_around_water_during_summer.mp3"
+    },
+    {
+      "n": 57,
+      "en": "I enjoy visiting new parks to explore nature.",
+      "jp": "自然を探検するために新しい公園を訪れるのが楽しいです。",
+      "hira": "しぜんをたんけんするためにあたらしいこうえんをおとずれるのがたのしいです。",
+      "mp3": "br_s57_i_enjoy_visiting_new_parks_to_explore_nature.mp3"
+    },
+    {
+      "n": 58,
+      "en": "I want to try fishing for the first time this summer.",
+      "jp": "この夏に初めて釣りをしてみたいです。",
+      "hira": "このなつにはじめてつりをしてみたいです。",
+      "mp3": "br_s58_i_want_to_try_fishing_for_the_first_time_this_summer.mp3"
+    },
+    {
+      "n": 59,
+      "en": "We are going to the aquarium to see the summer exhibits.",
+      "jp": "夏の展示を見に水族館に行く予定です。",
+      "hira": "なつのてんじをみにすいぞくかんにいくよていです。",
+      "mp3": "br_s59_we_are_going_to_the_aquarium_to_see_the_summer_exhibits.mp3"
+    },
+    {
+      "n": 60,
+      "en": "I enjoy taking care of my garden during the summer months.",
+      "jp": "夏の間に自分の庭を手入れするのが楽しいです。",
+      "hira": "なつのあいだにじぶんのにわをていれするのがたのしいです.",
+      "mp3": "br_s60_i_enjoy_taking_care_of_my_garden_during_the_summer_months.mp3"
+    }
   ]
 }

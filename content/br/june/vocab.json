@@ -1,69 +1,424 @@
-
 {
   "cards": [
-    { "n": 1, "en": "summer", "jp": "夏", "hira": "なつ", "mp3": "br_v01_summer.mp3" },
-    { "n": 2, "en": "hot", "jp": "暑い", "hira": "あつい", "mp3": "br_v02_hot.mp3" },
-    { "n": 3, "en": "sunny", "jp": "晴れ", "hira": "はれ", "mp3": "br_v03_sunny.mp3" },
-    { "n": 4, "en": "swimming pool", "jp": "プール", "hira": "ぷーる", "mp3": "br_v04_swimming_pool.mp3" },
-    { "n": 5, "en": "swimsuit", "jp": "水着", "hira": "みずぎ", "mp3": "br_v05_swimsuit.mp3" },
-    { "n": 6, "en": "swim", "jp": "泳ぐ", "hira": "およぐ", "mp3": "br_v06_swim.mp3" },
-    { "n": 7, "en": "beach", "jp": "海／ビーチ", "hira": "うみ／びーち", "mp3": "br_v07_beach.mp3" },
-    { "n": 8, "en": "sand", "jp": "砂", "hira": "すな", "mp3": "br_v08_sand.mp3" },
-    { "n": 9, "en": "ice cream", "jp": "アイスクリーム", "hira": "あいすくりーむ", "mp3": "br_v09_ice_cream.mp3" },
-    { "n": 10, "en": "festival", "jp": "祭り", "hira": "まつり", "mp3": "br_v10_festival.mp3" },
-    { "n": 11, "en": "fireworks", "jp": "花火", "hira": "はなび", "mp3": "br_v11_fireworks.mp3" },
-    { "n": 12, "en": "camping", "jp": "キャンプ", "hira": "きゃんぷ", "mp3": "br_v12_camping.mp3" },
-    { "n": 13, "en": "barbecue", "jp": "バーベキュー", "hira": "ばーべきゅー", "mp3": "br_v13_barbecue.mp3" },
-    { "n": 14, "en": "sunscreen", "jp": "日焼け止め", "hira": "ひやけどめ", "mp3": "br_v14_sunscreen.mp3" },
-    { "n": 15, "en": "fan", "jp": "うちわ／扇風機", "hira": "うちわ／せんぷうき", "mp3": "br_v15_fan.mp3" },
-
-    { "n": 16, "en": "vacation", "jp": "休み／休暇", "hira": "やすみ／きゅうか", "mp3": "br_v16_vacation.mp3" },
-    { "n": 17, "en": "travel", "jp": "旅行する／動詞", "hira": "りょこうする", "mp3": "br_v17_travel.mp3" },
-    { "n": 18, "en": "trip", "jp": "旅行／名詞", "hira": "りょこう", "mp3": "br_v18_trip.mp3" },
-
-    { "n": 19, "en": "hotel", "jp": "ホテル", "hira": "ほてる", "mp3": "br_v19_hotel.mp3" },
-    { "n": 20, "en": "reservation", "jp": "予約", "hira": "よやく", "mp3": "br_v20_reservation.mp3" },
-    { "n": 21, "en": "souvenir", "jp": "おみやげ", "hira": "おみやげ", "mp3": "br_v21_souvenir.mp3" },
-    { "n": 22, "en": "ticket", "jp": "チケット", "hira": "ちけっと", "mp3": "br_v22_ticket.mp3" },
-    { "n": 23, "en": "airport", "jp": "空港", "hira": "くうこう", "mp3": "br_v23_airport.mp3" },
-    { "n": 24, "en": "station", "jp": "駅", "hira": "えき", "mp3": "br_v24_station.mp3" },
-    { "n": 25, "en": "train", "jp": "電車", "hira": "でんしゃ", "mp3": "br_v25_train.mp3" },
-    { "n": 26, "en": "plane", "jp": "飛行機", "hira": "ひこうき", "mp3": "br_v26_plane.mp3" },
-    { "n": 27, "en": "passport", "jp": "パスポート", "hira": "ぱすぽーと", "mp3": "br_v27_passport.mp3" },
-    { "n": 28, "en": "camera", "jp": "カメラ", "hira": "かめら", "mp3": "br_v28_camera.mp3" },
-    { "n": 29, "en": "money", "jp": "お金", "hira": "おかね", "mp3": "br_v29_money.mp3" },
-    { "n": 30, "en": "free time", "jp": "自由時間", "hira": "じゆう じかん", "mp3": "br_v30_free_time.mp3" },
-
-    { "n": 31, "en": "pack", "jp": "荷造りする", "hira": "にづくり する", "mp3": "br_v31_pack.mp3" },
-    { "n": 32, "en": "plan", "jp": "計画する", "hira": "けいかく する", "mp3": "br_v32_plan.mp3" },
-    { "n": 33, "en": "list", "jp": "リスト", "hira": "りすと", "mp3": "br_v33_list.mp3" },
-    { "n": 34, "en": "bag", "jp": "かばん", "hira": "かばん", "mp3": "br_v34_bag.mp3" },
-    { "n": 35, "en": "suitcase", "jp": "スーツケース", "hira": "すーつけーす", "mp3": "br_v35_suitcase.mp3" },
-    { "n": 36, "en": "clothes", "jp": "服", "hira": "ふく", "mp3": "br_v36_clothes.mp3" },
-    { "n": 37, "en": "shoes", "jp": "くつ", "hira": "くつ", "mp3": "br_v37_shoes.mp3" },
-    { "n": 38, "en": "towel", "jp": "タオル", "hira": "たおる", "mp3": "br_v38_towel.mp3" },
-    { "n": 39, "en": "water bottle", "jp": "水筒", "hira": "すいとう", "mp3": "br_v39_water_bottle.mp3" },
-    { "n": 40, "en": "medicine", "jp": "薬", "hira": "くすり", "mp3": "br_v40_medicine.mp3" },
-    { "n": 41, "en": "umbrella", "jp": "かさ", "hira": "かさ", "mp3": "br_v41_umbrella.mp3" },
-    { "n": 42, "en": "map", "jp": "地図", "hira": "ちず", "mp3": "br_v42_map.mp3" },
-    { "n": 43, "en": "schedule", "jp": "予定", "hira": "よてい", "mp3": "br_v43_schedule.mp3" },
-    { "n": 44, "en": "important", "jp": "大事な", "hira": "だいじ な", "mp3": "br_v44_important.mp3" },
-    { "n": 45, "en": "forget", "jp": "忘れる", "hira": "わすれる", "mp3": "br_v45_forget.mp3" },
-
-    { "n": 46, "en": "watermelon", "jp": "すいか", "hira": "すいか", "mp3": "br_v46_watermelon.mp3" },
-    { "n": 47, "en": "shaved ice", "jp": "かき氷", "hira": "かきごおり", "mp3": "br_v47_shaved_ice.mp3" },
-    { "n": 48, "en": "ramune", "jp": "ラムネ", "hira": "らむね", "mp3": "br_v48_ramune.mp3" },
-    { "n": 49, "en": "yakisoba", "jp": "焼きそば", "hira": "やきそば", "mp3": "br_v49_yakisoba.mp3" },
-    { "n": 50, "en": "takoyaki", "jp": "たこ焼き", "hira": "たこやき", "mp3": "br_v50_takoyaki.mp3" },
-    { "n": 51, "en": "corn", "jp": "とうもろこし", "hira": "とうもろこし", "mp3": "br_v51_corn.mp3" },
-    { "n": 52, "en": "cucumber", "jp": "きゅうり", "hira": "きゅうり", "mp3": "br_v52_cucumber.mp3" },
-    { "n": 53, "en": "tomato", "jp": "トマト", "hira": "とまと", "mp3": "br_v53_tomato.mp3" },
-    { "n": 54, "en": "cold noodles", "jp": "冷やし中華／そうめん", "hira": "ひやしちゅうか／そうめん", "mp3": "br_v54_cold_noodles.mp3" },
-    { "n": 55, "en": "juice", "jp": "ジュース", "hira": "じゅーす", "mp3": "br_v55_juice.mp3" },
-    { "n": 56, "en": "sweet", "jp": "甘い", "hira": "あまい", "mp3": "br_v56_sweet.mp3" },
-    { "n": 57, "en": "salty", "jp": "しょっぱい", "hira": "しょっぱい", "mp3": "br_v57_salty.mp3" },
-    { "n": 58, "en": "hungry", "jp": "おなかがすいた", "hira": "おなか が すいた", "mp3": "br_v58_hungry.mp3" },
-    { "n": 59, "en": "thirsty", "jp": "のどがかわいた", "hira": "のど が かわいた", "mp3": "br_v59_thirsty.mp3" },
-    { "n": 60, "en": "delicious", "jp": "おいしい", "hira": "おいしい", "mp3": "br_v60_delicious.mp3" }
+    {
+      "n": 1,
+      "en": "outdoor picnic",
+      "jp": "アウトドアピクニック",
+      "hira": "あうとどあぴくにっく",
+      "mp3": "br_v01_outdoor_picnic.mp3"
+    },
+    {
+      "n": 2,
+      "en": "nature hike",
+      "jp": "自然ハイキング",
+      "hira": "しぜんはいきんぐ",
+      "mp3": "br_v02_nature_hike.mp3"
+    },
+    {
+      "n": 3,
+      "en": "campfire gathering",
+      "jp": "キャンプファイヤーの集まり",
+      "hira": "きゃんぷふぁいやーのあつまり",
+      "mp3": "br_v03_campfire_gathering.mp3"
+    },
+    {
+      "n": 4,
+      "en": "road trip adventure",
+      "jp": "ドライブ冒険",
+      "hira": "どらいぶぼうけん",
+      "mp3": "br_v04_road_trip_adventure.mp3"
+    },
+    {
+      "n": 5,
+      "en": "wildlife observation",
+      "jp": "野生動物観察",
+      "hira": "やせいどうぶつかんさつ",
+      "mp3": "br_v05_wildlife_observation.mp3"
+    },
+    {
+      "n": 6,
+      "en": "garden barbecue",
+      "jp": "庭のバーベキュー",
+      "hira": "にわのばーべきゅー",
+      "mp3": "br_v06_garden_barbecue.mp3"
+    },
+    {
+      "n": 7,
+      "en": "sunset view",
+      "jp": "夕日を見る",
+      "hira": "ゆうひをみる",
+      "mp3": "br_v07_sunset_view.mp3"
+    },
+    {
+      "n": 8,
+      "en": "outdoor games",
+      "jp": "屋外ゲーム",
+      "hira": "おくがいげーむ",
+      "mp3": "br_v08_outdoor_games.mp3"
+    },
+    {
+      "n": 9,
+      "en": "camping gear",
+      "jp": "キャンプ用品",
+      "hira": "きゃんぷようひん",
+      "mp3": "br_v09_camping_gear.mp3"
+    },
+    {
+      "n": 10,
+      "en": "star gazing",
+      "jp": "星空観察",
+      "hira": "ほしぞらかんさつ",
+      "mp3": "br_v10_star_gazing.mp3"
+    },
+    {
+      "n": 11,
+      "en": "safety precautions",
+      "jp": "安全対策",
+      "hira": "あんぜんたいさく",
+      "mp3": "br_v11_safety_precautions.mp3"
+    },
+    {
+      "n": 12,
+      "en": "outdoor sports",
+      "jp": "屋外スポーツ",
+      "hira": "おくがいすぽーつ",
+      "mp3": "br_v12_outdoor_sports.mp3"
+    },
+    {
+      "n": 13,
+      "en": "local market",
+      "jp": "地元の市場",
+      "hira": "じもとのいちば",
+      "mp3": "br_v13_local_market.mp3"
+    },
+    {
+      "n": 14,
+      "en": "hiking trail",
+      "jp": "ハイキングコース",
+      "hira": "はいきんぐこーす",
+      "mp3": "br_v14_hiking_trail.mp3"
+    },
+    {
+      "n": 15,
+      "en": "sunscreen application",
+      "jp": "日焼け止めの塗布",
+      "hira": "ひやけどめのとふ",
+      "mp3": "br_v15_sunscreen_application.mp3"
+    },
+    {
+      "n": 16,
+      "en": "family reunion",
+      "jp": "家族の再会",
+      "hira": "かぞくのさいかい",
+      "mp3": "br_v16_family_reunion.mp3"
+    },
+    {
+      "n": 17,
+      "en": "cooking class",
+      "jp": "料理教室",
+      "hira": "りょうりきょうしつ",
+      "mp3": "br_v17_cooking_class.mp3"
+    },
+    {
+      "n": 18,
+      "en": "cultural exchange",
+      "jp": "文化交流",
+      "hira": "ぶんかこうりゅう",
+      "mp3": "br_v18_cultural_exchange.mp3"
+    },
+    {
+      "n": 19,
+      "en": "outdoor concert",
+      "jp": "屋外コンサート",
+      "hira": "おくがいこんさーと",
+      "mp3": "br_v19_outdoor_concert.mp3"
+    },
+    {
+      "n": 20,
+      "en": "safety tips",
+      "jp": "安全のヒント",
+      "hira": "あんぜんのひんと",
+      "mp3": "br_v20_safety_tips.mp3"
+    },
+    {
+      "n": 21,
+      "en": "beach volleyball",
+      "jp": "ビーチバレーボール",
+      "hira": "びーちばれーぼーる",
+      "mp3": "br_v21_beach_volleyball.mp3"
+    },
+    {
+      "n": 22,
+      "en": "camping site",
+      "jp": "キャンプ場",
+      "hira": "きゃんぷじょう",
+      "mp3": "br_v22_camping_site.mp3"
+    },
+    {
+      "n": 23,
+      "en": "fishing trip",
+      "jp": "釣りの旅",
+      "hira": "つりのたび",
+      "mp3": "br_v23_fishing_trip.mp3"
+    },
+    {
+      "n": 24,
+      "en": "safety gear",
+      "jp": "安全装備",
+      "hira": "あんぜんそうび",
+      "mp3": "br_v24_safety_gear.mp3"
+    },
+    {
+      "n": 25,
+      "en": "nature reserve",
+      "jp": "自然保護区",
+      "hira": "しぜんほごく",
+      "mp3": "br_v25_nature_reserve.mp3"
+    },
+    {
+      "n": 26,
+      "en": "outdoor adventure",
+      "jp": "屋外冒険",
+      "hira": "おくがいぼうけん",
+      "mp3": "br_v26_outdoor_adventure.mp3"
+    },
+    {
+      "n": 27,
+      "en": "local cuisine",
+      "jp": "地元の料理",
+      "hira": "じもとのりょうり",
+      "mp3": "br_v27_local_cuisine.mp3"
+    },
+    {
+      "n": 28,
+      "en": "sun protection",
+      "jp": "日差し対策",
+      "hira": "ひざしたいさく",
+      "mp3": "br_v28_sun_protection.mp3"
+    },
+    {
+      "n": 29,
+      "en": "wild camping",
+      "jp": "野営",
+      "hira": "やえい",
+      "mp3": "br_v29_wild_camping.mp3"
+    },
+    {
+      "n": 30,
+      "en": "outdoor picnic basket",
+      "jp": "ピクニックバスケット",
+      "hira": "ぴくにっくばすけっと",
+      "mp3": "br_v30_outdoor_picnic_basket.mp3"
+    },
+    {
+      "n": 31,
+      "en": "fishing gear",
+      "jp": "釣り道具",
+      "hira": "つりどうぐ",
+      "mp3": "br_v31_fishing_gear.mp3"
+    },
+    {
+      "n": 32,
+      "en": "nature trail",
+      "jp": "自然の小道",
+      "hira": "しぜんのこみち",
+      "mp3": "br_v32_nature_trail.mp3"
+    },
+    {
+      "n": 33,
+      "en": "cooking outdoors",
+      "jp": "屋外料理",
+      "hira": "おくがいりょうり",
+      "mp3": "br_v33_cooking_outdoors.mp3"
+    },
+    {
+      "n": 34,
+      "en": "camping checklist",
+      "jp": "キャンプチェックリスト",
+      "hira": "きゃんぷちぇっくりすと",
+      "mp3": "br_v34_camping_checklist.mp3"
+    },
+    {
+      "n": 35,
+      "en": "outdoor festival",
+      "jp": "野外フェスティバル",
+      "hira": "やがいふぇすてぃばる",
+      "mp3": "br_v35_outdoor_festival.mp3"
+    },
+    {
+      "n": 36,
+      "en": "safety advice",
+      "jp": "安全なアドバイス",
+      "hira": "あんぜんなあどばいす",
+      "mp3": "br_v36_safety_advice.mp3"
+    },
+    {
+      "n": 37,
+      "en": "starry night",
+      "jp": "星空の夜",
+      "hira": "ほしぞらのよる",
+      "mp3": "br_v37_starry_night.mp3"
+    },
+    {
+      "n": 38,
+      "en": "sunset picnic",
+      "jp": "夕焼けピクニック",
+      "hira": "ゆうやけぴくにっく",
+      "mp3": "br_v38_sunset_picnic.mp3"
+    },
+    {
+      "n": 39,
+      "en": "outdoor party",
+      "jp": "屋外パーティー",
+      "hira": "おくがいぱーてぃー",
+      "mp3": "br_v39_outdoor_party.mp3"
+    },
+    {
+      "n": 40,
+      "en": "summer harvest",
+      "jp": "夏の収穫",
+      "hira": "なつのしゅうかく",
+      "mp3": "br_v40_summer_harvest.mp3"
+    },
+    {
+      "n": 41,
+      "en": "camping fun",
+      "jp": "キャンプの楽しみ",
+      "hira": "きゃんぷのたのしみ",
+      "mp3": "br_v41_camping_fun.mp3"
+    },
+    {
+      "n": 42,
+      "en": "travel guide",
+      "jp": "旅行ガイド",
+      "hira": "りょこうがいど",
+      "mp3": "br_v42_travel_guide.mp3"
+    },
+    {
+      "n": 43,
+      "en": "outdoor exploration",
+      "jp": "屋外探検",
+      "hira": "おくがいたんけん",
+      "mp3": "br_v43_outdoor_exploration.mp3"
+    },
+    {
+      "n": 44,
+      "en": "nature photography",
+      "jp": "自然の写真撮影",
+      "hira": "しぜんのしゃしんさつえい",
+      "mp3": "br_v44_nature_photography.mp3"
+    },
+    {
+      "n": 45,
+      "en": "summer fruits",
+      "jp": "夏の果物",
+      "hira": "なつのくだもの",
+      "mp3": "br_v45_summer_fruits.mp3"
+    },
+    {
+      "n": 46,
+      "en": "biking adventure",
+      "jp": "自転車の冒険",
+      "hira": "じてんしゃのぼうけん",
+      "mp3": "br_v46_biking_adventure.mp3"
+    },
+    {
+      "n": 47,
+      "en": "outdoor fitness",
+      "jp": "屋外フィットネス",
+      "hira": "おくがいふぃっとねす",
+      "mp3": "br_v47_outdoor_fitness.mp3"
+    },
+    {
+      "n": 48,
+      "en": "group activities",
+      "jp": "グループ活動",
+      "hira": "ぐるーぷかつどう",
+      "mp3": "br_v48_group_activities.mp3"
+    },
+    {
+      "n": 49,
+      "en": "weather changes",
+      "jp": "天候の変化",
+      "hira": "てんこうのへんか",
+      "mp3": "br_v49_weather_changes.mp3"
+    },
+    {
+      "n": 50,
+      "en": "tropical fruits",
+      "jp": "トロピカルフルーツ",
+      "hira": "とろぴかるふるーつ",
+      "mp3": "br_v50_tropical_fruits.mp3"
+    },
+    {
+      "n": 51,
+      "en": "cooking competition",
+      "jp": "料理コンペティション",
+      "hira": "りょうりこんぺてぃしょん",
+      "mp3": "br_v51_cooking_competition.mp3"
+    },
+    {
+      "n": 52,
+      "en": "summer activities",
+      "jp": "夏の活動",
+      "hira": "なつのかつどう",
+      "mp3": "br_v52_summer_activities.mp3"
+    },
+    {
+      "n": 53,
+      "en": "adventure planning",
+      "jp": "冒険計画",
+      "hira": "ぼうけんけいかく",
+      "mp3": "br_v53_adventure_planning.mp3"
+    },
+    {
+      "n": 54,
+      "en": "safety measures",
+      "jp": "安全対策",
+      "hira": "あんぜんたいさく",
+      "mp3": "br_v54_safety_measures.mp3"
+    },
+    {
+      "n": 55,
+      "en": "summer fairs",
+      "jp": "夏のフェア",
+      "hira": "なつのふぇあ",
+      "mp3": "br_v55_summer_fairs.mp3"
+    },
+    {
+      "n": 56,
+      "en": "outdoor relaxation",
+      "jp": "屋外リラクゼーション",
+      "hira": "おくがいりらくぜーしょん",
+      "mp3": "br_v56_outdoor_relaxation.mp3"
+    },
+    {
+      "n": 57,
+      "en": "nature crafts",
+      "jp": "自然のクラフト",
+      "hira": "しぜんのくらふと",
+      "mp3": "br_v57_nature_crafts.mp3"
+    },
+    {
+      "n": 58,
+      "en": "cultural festivals",
+      "jp": "文化祭",
+      "hira": "ぶんかさい",
+      "mp3": "br_v58_cultural_festivals.mp3"
+    },
+    {
+      "n": 59,
+      "en": "water safety",
+      "jp": "水の安全",
+      "hira": "みずのあんぜん",
+      "mp3": "br_v59_water_safety.mp3"
+    },
+    {
+      "n": 60,
+      "en": "sustainable tourism",
+      "jp": "持続可能な観光",
+      "hira": "じぞくかのうなかんこう",
+      "mp3": "br_v60_sustainable_tourism.mp3"
+    }
   ]
 }

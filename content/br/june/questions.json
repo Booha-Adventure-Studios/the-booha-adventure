@@ -1,68 +1,424 @@
-
 {
   "cards": [
-    { "n": 1, "en": "Do you like summer?", "jp": "夏が好きですか。", "hira": "なつ が すき です か", "mp3": "br_q01_do_you_like_summer.mp3" },
-    { "n": 2, "en": "What do you want to do this summer?", "jp": "この夏、何をしたいですか。", "hira": "この なつ なに を したい です か", "mp3": "br_q02_what_do_you_want_to_do_this_summer.mp3" },
-    { "n": 3, "en": "Do you like swimming?", "jp": "泳ぐのが好きですか。", "hira": "およぐ の が すき です か", "mp3": "br_q03_do_you_like_swimming.mp3" },
-    { "n": 4, "en": "Do you go to the pool?", "jp": "プールに行きますか。", "hira": "ぷーる に いきます か", "mp3": "br_q04_do_you_go_to_the_pool.mp3" },
-    { "n": 5, "en": "Do you go to the beach?", "jp": "海やビーチに行きますか。", "hira": "うみ や びーち に いきます か", "mp3": "br_q05_do_you_go_to_the_beach.mp3" },
-    { "n": 6, "en": "What is your favorite summer food?", "jp": "夏の好きな食べ物は何ですか。", "hira": "なつ の すき な たべもの は なん です か", "mp3": "br_q06_what_is_your_favorite_summer_food.mp3" },
-    { "n": 7, "en": "Do you like ice cream?", "jp": "アイスクリームが好きですか。", "hira": "あいすくりーむ が すき です か", "mp3": "br_q07_do_you_like_ice_cream.mp3" },
-    { "n": 8, "en": "Do you go to festivals?", "jp": "祭りに行きますか。", "hira": "まつり に いきます か", "mp3": "br_q08_do_you_go_to_festivals.mp3" },
-    { "n": 9, "en": "Do you like fireworks?", "jp": "花火が好きですか。", "hira": "はなび が すき です か", "mp3": "br_q09_do_you_like_fireworks.mp3" },
-    { "n": 10, "en": "Have you been camping?", "jp": "キャンプに行ったことがありますか。", "hira": "きゃんぷ に いった こと が あります か", "mp3": "br_q10_have_you_been_camping.mp3" },
-    { "n": 11, "en": "What do you do when it’s hot?", "jp": "暑いとき何をしますか。", "hira": "あつい とき なに を します か", "mp3": "br_q11_what_do_you_do_when_its_hot.mp3" },
-    { "n": 12, "en": "Do you use sunscreen?", "jp": "日焼け止めを使いますか。", "hira": "ひやけどめ を つかいます か", "mp3": "br_q12_do_you_use_sunscreen.mp3" },
-    { "n": 13, "en": "What do you wear to the pool?", "jp": "プールで何を着ますか。", "hira": "ぷーる で なに を きます か", "mp3": "br_q13_what_do_you_wear_to_the_pool.mp3" },
-    { "n": 14, "en": "Who do you go with?", "jp": "だれと行きますか。", "hira": "だれ と いきます か", "mp3": "br_q14_who_do_you_go_with.mp3" },
-    { "n": 15, "en": "What was fun last summer?", "jp": "去年の夏、何が楽しかったですか。", "hira": "きょねん の なつ なに が たのしかった です か", "mp3": "br_q15_what_was_fun_last_summer.mp3" },
-
-    { "n": 16, "en": "Do you have a vacation in summer?", "jp": "夏に休みがありますか。", "hira": "なつ に やすみ が あります か", "mp3": "br_q16_do_you_have_a_vacation_in_summer.mp3" },
-    { "n": 17, "en": "Where do you want to travel?", "jp": "どこに旅行したいですか。", "hira": "どこ に りょこう したい です か", "mp3": "br_q17_where_do_you_want_to_travel.mp3" },
-    { "n": 18, "en": "Are you going on a trip?", "jp": "旅行に行く予定ですか。", "hira": "りょこう に いく よてい です か", "mp3": "br_q18_are_you_going_on_a_trip.mp3" },
-    { "n": 19, "en": "Do you stay at a hotel?", "jp": "ホテルに泊まりますか。", "hira": "ほてる に とまります か", "mp3": "br_q19_do_you_stay_at_a_hotel.mp3" },
-    { "n": 20, "en": "Do you make reservations?", "jp": "予約をしますか。", "hira": "よやく を します か", "mp3": "br_q20_do_you_make_reservations.mp3" },
-    { "n": 21, "en": "How do you get there?", "jp": "どうやって行きますか。", "hira": "どうやって いきます か", "mp3": "br_q21_how_do_you_get_there.mp3" },
-    { "n": 22, "en": "Do you go by train?", "jp": "電車で行きますか。", "hira": "でんしゃ で いきます か", "mp3": "br_q22_do_you_go_by_train.mp3" },
-    { "n": 23, "en": "Do you go by plane?", "jp": "飛行機で行きますか。", "hira": "ひこうき で いきます か", "mp3": "br_q23_do_you_go_by_plane.mp3" },
-    { "n": 24, "en": "What do you pack for a trip?", "jp": "旅行に何を持って行きますか。", "hira": "りょこう に なに を もって いきます か", "mp3": "br_q24_what_do_you_pack_for_a_trip.mp3" },
-    { "n": 25, "en": "Do you need a passport?", "jp": "パスポートは必要ですか。", "hira": "ぱすぽーと は ひつよう です か", "mp3": "br_q25_do_you_need_a_passport.mp3" },
-    { "n": 26, "en": "Do you like taking pictures?", "jp": "写真を撮るのが好きですか。", "hira": "しゃしん を とる の が すき です か", "mp3": "br_q26_do_you_like_taking_pictures.mp3" },
-    { "n": 27, "en": "What souvenirs do you buy?", "jp": "どんなおみやげを買いますか。", "hira": "どんな おみやげ を かいます か", "mp3": "br_q27_what_souvenirs_do_you_buy.mp3" },
-    { "n": 28, "en": "How much money do you need?", "jp": "お金はいくら必要ですか。", "hira": "おかね は いくら ひつよう です か", "mp3": "br_q28_how_much_money_do_you_need.mp3" },
-    { "n": 29, "en": "Who do you travel with?", "jp": "だれと旅行しますか。", "hira": "だれ と りょこう します か", "mp3": "br_q29_who_do_you_travel_with.mp3" },
-    { "n": 30, "en": "What was your best trip?", "jp": "一番よかった旅行は何ですか。", "hira": "いちばん よかった りょこう は なん です か", "mp3": "br_q30_what_was_your_best_trip.mp3" },
-
-    { "n": 31, "en": "Do you make a packing list?", "jp": "持ち物リストを作りますか。", "hira": "もちもの りすと を つくります か", "mp3": "br_q31_do_you_make_a_packing_list.mp3" },
-    { "n": 32, "en": "What do you need for a trip?", "jp": "旅行に何が必要ですか。", "hira": "りょこう に なに が ひつよう です か", "mp3": "br_q32_what_do_you_need_for_a_trip.mp3" },
-    { "n": 33, "en": "What do you pack first?", "jp": "最初に何を入れますか。", "hira": "さいしょ に なに を いれます か", "mp3": "br_q33_what_do_you_pack_first.mp3" },
-    { "n": 34, "en": "Do you use a suitcase?", "jp": "スーツケースを使いますか。", "hira": "すーつけーす を つかいます か", "mp3": "br_q34_do_you_use_a_suitcase.mp3" },
-    { "n": 35, "en": "How many clothes do you bring?", "jp": "服は何枚持って行きますか。", "hira": "ふく は なんまい もって いきます か", "mp3": "br_q35_how_many_clothes_do_you_bring.mp3" },
-    { "n": 36, "en": "Do you bring a towel?", "jp": "タオルを持って行きますか。", "hira": "たおる を もって いきます か", "mp3": "br_q36_do_you_bring_a_towel.mp3" },
-    { "n": 37, "en": "Do you bring a water bottle?", "jp": "水筒を持って行きますか。", "hira": "すいとう を もって いきます か", "mp3": "br_q37_do_you_bring_a_water_bottle.mp3" },
-    { "n": 38, "en": "Do you bring medicine?", "jp": "薬を持って行きますか。", "hira": "くすり を もって いきます か", "mp3": "br_q38_do_you_bring_medicine.mp3" },
-    { "n": 39, "en": "Do you need an umbrella?", "jp": "かさは必要ですか。", "hira": "かさ は ひつよう です か", "mp3": "br_q39_do_you_need_an_umbrella.mp3" },
-    { "n": 40, "en": "Do you plan your schedule?", "jp": "予定を立てますか。", "hira": "よてい を たてます か", "mp3": "br_q40_do_you_plan_your_schedule.mp3" },
-    { "n": 41, "en": "What is important to bring?", "jp": "大事な持ち物は何ですか。", "hira": "だいじ な もちもの は なん です か", "mp3": "br_q41_what_is_important_to_bring.mp3" },
-    { "n": 42, "en": "What do you often forget?", "jp": "よく忘れるものは何ですか。", "hira": "よく わすれる もの は なん です か", "mp3": "br_q42_what_do_you_often_forget.mp3" },
-    { "n": 43, "en": "Do you pack the night before?", "jp": "前の夜に荷造りしますか。", "hira": "まえ の よる に にづくり します か", "mp3": "br_q43_do_you_pack_the_night_before.mp3" },
-    { "n": 44, "en": "Who helps you pack?", "jp": "だれが荷造りを手伝いますか。", "hira": "だれ が にづくり を てつだいます か", "mp3": "br_q44_who_helps_you_pack.mp3" },
-    { "n": 45, "en": "Do you like planning trips?", "jp": "旅行の計画が好きですか。", "hira": "りょこう の けいかく が すき です か", "mp3": "br_q45_do_you_like_planning_trips.mp3" },
-
-    { "n": 46, "en": "What summer food do you like?", "jp": "夏の食べ物は何が好きですか。", "hira": "なつ の たべもの は なに が すき です か", "mp3": "br_q46_what_summer_food_do_you_like.mp3" },
-    { "n": 47, "en": "Do you like watermelon?", "jp": "すいかが好きですか。", "hira": "すいか が すき です か", "mp3": "br_q47_do_you_like_watermelon.mp3" },
-    { "n": 48, "en": "Do you eat shaved ice?", "jp": "かき氷を食べますか。", "hira": "かきごおり を たべます か", "mp3": "br_q48_do_you_eat_shaved_ice.mp3" },
-    { "n": 49, "en": "What flavor do you like?", "jp": "何味が好きですか。", "hira": "なにあじ が すき です か", "mp3": "br_q49_what_flavor_do_you_like.mp3" },
-    { "n": 50, "en": "Do you like ramune?", "jp": "ラムネが好きですか。", "hira": "らむね が すき です か", "mp3": "br_q50_do_you_like_ramune.mp3" },
-    { "n": 51, "en": "Do you eat yakisoba at festivals?", "jp": "祭りで焼きそばを食べますか。", "hira": "まつり で やきそば を たべます か", "mp3": "br_q51_do_you_eat_yakisoba_at_festivals.mp3" },
-    { "n": 52, "en": "Do you like takoyaki?", "jp": "たこ焼きが好きですか。", "hira": "たこやき が すき です か", "mp3": "br_q52_do_you_like_takoyaki.mp3" },
-    { "n": 53, "en": "Do you like corn?", "jp": "とうもろこしが好きですか。", "hira": "とうもろこし が すき です か", "mp3": "br_q53_do_you_like_corn.mp3" },
-    { "n": 54, "en": "Do you eat cucumbers in summer?", "jp": "夏にきゅうりを食べますか。", "hira": "なつ に きゅうり を たべます か", "mp3": "br_q54_do_you_eat_cucumbers_in_summer.mp3" },
-    { "n": 55, "en": "Are tomatoes sweet or sour?", "jp": "トマトは甘いですか、それともすっぱいですか。", "hira": "とまと は あまい です か それとも すっぱい です か", "mp3": "br_q55_are_tomatoes_sweet_or_sour.mp3" },
-    { "n": 56, "en": "Do you like cold noodles?", "jp": "冷たいめんが好きですか。", "hira": "つめたい めん が すき です か", "mp3": "br_q56_do_you_like_cold_noodles.mp3" },
-    { "n": 57, "en": "What do you drink in summer?", "jp": "夏に何を飲みますか。", "hira": "なつ に なに を のみます か", "mp3": "br_q57_what_do_you_drink_in_summer.mp3" },
-    { "n": 58, "en": "Are you hungry now?", "jp": "今、おなかがすいていますか。", "hira": "いま おなか が すいています か", "mp3": "br_q58_are_you_hungry_now.mp3" },
-    { "n": 59, "en": "Are you thirsty now?", "jp": "今、のどがかわいていますか。", "hira": "いま のど が かわいています か", "mp3": "br_q59_are_you_thirsty_now.mp3" },
-    { "n": 60, "en": "What food is delicious for you?", "jp": "あなたにとっておいしい食べ物は何ですか。", "hira": "あなた に とって おいしい たべもの は なん です か", "mp3": "br_q60_what_food_is_delicious_for_you.mp3" }
+    {
+      "n": 1,
+      "en": "What summer activities do you enjoy with your friends?",
+      "jp": "友達と楽しむ夏のアクティビティは何ですか？",
+      "hira": "ともだちとたのしむなつのあくてぃびてぃはなんですか？",
+      "mp3": "br_q01_what_summer_activities_do_you_enjoy_with_your_friends.mp3"
+    },
+    {
+      "n": 2,
+      "en": "How do you usually celebrate summer holidays?",
+      "jp": "夏休みをどうやって祝いますか？",
+      "hira": "なつやすみをどうやっていわいますか？",
+      "mp3": "br_q02_how_do_you_usually_celebrate_summer_holidays.mp3"
+    },
+    {
+      "n": 3,
+      "en": "What kind of outdoor events do you like to attend in summer?",
+      "jp": "夏に参加したい屋外イベントはどんなものですか？",
+      "hira": "なつにさんかしたいおくがいイベントはどんなものですか？",
+      "mp3": "br_q03_what_kind_of_outdoor_events_do_you_like_to_attend_in_summer.mp3"
+    },
+    {
+      "n": 4,
+      "en": "Can you describe your favorite summer food?",
+      "jp": "あなたの好きな夏の食べ物を教えてください。",
+      "hira": "あなたのすきななつのたべものをおしえてください。",
+      "mp3": "br_q04_can_you_describe_your_favorite_summer_food.mp3"
+    },
+    {
+      "n": 5,
+      "en": "How does the weather affect your summer plans?",
+      "jp": "天気はあなたの夏の計画にどのように影響しますか？",
+      "hira": "てんきはあなたのなつのけいかくにどのようにえいきょうしますか？",
+      "mp3": "br_q05_how_does_the_weather_affect_your_summer_plans.mp3"
+    },
+    {
+      "n": 6,
+      "en": "What activities do you think are important for staying safe in hot weather?",
+      "jp": "暑い天候で安全を保つために重要なアクティビティは何だと思いますか？",
+      "hira": "あついてんこうであんぜんをたもつためにじゅうようなあくてぃびてぃはなんだとおもいますか？",
+      "mp3": "br_q06_what_activities_do_you_think_are_important_for_staying_safe_in_hot_weather.mp3"
+    },
+    {
+      "n": 7,
+      "en": "Have you ever tried a new food during summer? What was it?",
+      "jp": "夏に新しい食べ物を試したことがありますか？それは何でしたか？",
+      "hira": "なつにあたらしいたべものをためしたことがありますか？それはなんでしたか？",
+      "mp3": "br_q07_have_you_ever_tried_a_new_food_during_summer_what_was_it.mp3"
+    },
+    {
+      "n": 8,
+      "en": "What is your favorite place to visit during summer?",
+      "jp": "夏に訪れるのが好きな場所はどこですか？",
+      "hira": "なつにおとずれるのがすきなばしょはどこですか？",
+      "mp3": "br_q08_what_is_your_favorite_place_to_visit_during_summer.mp3"
+    },
+    {
+      "n": 9,
+      "en": "How do you stay cool when it's really hot outside?",
+      "jp": "外が本当に暑いとき、どうやって涼しくしていますか？",
+      "hira": "そとがほんとうにあついとき、どうやってすずしくしていますか？",
+      "mp3": "br_q09_how_do_you_stay_cool_when_it_s_really_hot_outside.mp3"
+    },
+    {
+      "n": 10,
+      "en": "Do you prefer going to summer events with family or friends? Why?",
+      "jp": "夏のイベントには家族と行くのが好きですか、それとも友達と行くのが好きですか？その理由は？",
+      "hira": "なつのイベントにはかぞくといくのがすきですか、それともともだちといくのがすきですか？そのりゆうは？",
+      "mp3": "br_q10_do_you_prefer_going_to_summer_events_with_family_or_friends_why.mp3"
+    },
+    {
+      "n": 11,
+      "en": "What kind of travel plans do you make for summer vacation?",
+      "jp": "夏休みのためにどんな旅行計画を立てますか？",
+      "hira": "なつやすみのためにどんなりょこうけいかくをたてますか？",
+      "mp3": "br_q11_what_kind_of_travel_plans_do_you_make_for_summer_vacation.mp3"
+    },
+    {
+      "n": 12,
+      "en": "What type of weather do you enjoy the most in summer?",
+      "jp": "夏に一番楽しむ天気はどんなものですか？",
+      "hira": "なつにいちばんたのしむてんきはどんなものですか？",
+      "mp3": "br_q12_what_type_of_weather_do_you_enjoy_the_most_in_summer.mp3"
+    },
+    {
+      "n": 13,
+      "en": "What outdoor activities do you want to try this summer?",
+      "jp": "今年の夏に挑戦したい屋外アクティビティは何ですか？",
+      "hira": "ことしのなつにちょうせんしたいおくがいあくてぃびてぃはなんですか？",
+      "mp3": "br_q13_what_outdoor_activities_do_you_want_to_try_this_summer.mp3"
+    },
+    {
+      "n": 14,
+      "en": "How do you usually prepare for a summer trip?",
+      "jp": "夏の旅行の準備を普段どのようにしますか？",
+      "hira": "なつのりょこうのじゅんびをふだんどのようにしますか？",
+      "mp3": "br_q14_how_do_you_usually_prepare_for_a_summer_trip.mp3"
+    },
+    {
+      "n": 15,
+      "en": "What do you think makes summer special?",
+      "jp": "夏を特別なものにしているのは何だと思いますか？",
+      "hira": "なつをとくべつなものにしているのはなんだとおもいますか？",
+      "mp3": "br_q15_what_do_you_think_makes_summer_special.mp3"
+    },
+    {
+      "n": 16,
+      "en": "Which outdoor event do you think is the most exciting?",
+      "jp": "どの屋外イベントが一番わくわくすると考えますか？",
+      "hira": "どのおくがいイベントがいちばんわくわくするとかんがえますか？",
+      "mp3": "br_q16_which_outdoor_event_do_you_think_is_the_most_exciting.mp3"
+    },
+    {
+      "n": 17,
+      "en": "How do you feel about trying new foods during summer festivals?",
+      "jp": "夏祭りで新しい食べ物を試すことについてどう思いますか？",
+      "hira": "なつまつりであたらしいたべものをためすことについてどうおもいますか？",
+      "mp3": "br_q17_how_do_you_feel_about_trying_new_foods_during_summer_festivals.mp3"
+    },
+    {
+      "n": 18,
+      "en": "What are your favorite summer drinks?",
+      "jp": "あなたの好きな夏の飲み物は何ですか？",
+      "hira": "あなたのすきななつののみものはなんですか？",
+      "mp3": "br_q18_what_are_your_favorite_summer_drinks.mp3"
+    },
+    {
+      "n": 19,
+      "en": "How often do you spend time outdoors in summer?",
+      "jp": "夏にどのくらいの頻度で屋外で過ごしますか？",
+      "hira": "なつにどのくらいのひんどでおくがいですごしますか？",
+      "mp3": "br_q19_how_often_do_you_spend_time_outdoors_in_summer.mp3"
+    },
+    {
+      "n": 20,
+      "en": "What is your ideal way to relax on a hot summer day?",
+      "jp": "暑い夏の日にリラックスする理想的な方法は何ですか？",
+      "hira": "あついなつの日にりらっくすするりそうてきなほうほうはなんですか？",
+      "mp3": "br_q20_what_is_your_ideal_way_to_relax_on_a_hot_summer_day.mp3"
+    },
+    {
+      "n": 21,
+      "en": "What do you like to do during a summer picnic?",
+      "jp": "夏のピクニックでは何をするのが好きですか？",
+      "hira": "なつのぴくにっくではなにをするのがすきですか？",
+      "mp3": "br_q21_what_do_you_like_to_do_during_a_summer_picnic.mp3"
+    },
+    {
+      "n": 22,
+      "en": "How important is it to stay hydrated in summer?",
+      "jp": "夏に水分補給をすることはどれほど重要ですか？",
+      "hira": "なつにすいぶんほきゅうをすることはどれほどじゅうようですか？",
+      "mp3": "br_q22_how_important_is_it_to_stay_hydrated_in_summer.mp3"
+    },
+    {
+      "n": 23,
+      "en": "Do you enjoy visiting different parks during summer?",
+      "jp": "夏にいろいろな公園を訪れるのは楽しいですか？",
+      "hira": "なつにいろいろなこうえんをおとずれるのはたのしいですか？",
+      "mp3": "br_q23_do_you_enjoy_visiting_different_parks_during_summer.mp3"
+    },
+    {
+      "n": 24,
+      "en": "What activities do you enjoy doing when it's sunny?",
+      "jp": "晴れているときに楽しむアクティビティは何ですか？",
+      "hira": "はれているときにたのしむあくてぃびてぃはなんですか？",
+      "mp3": "br_q24_what_activities_do_you_enjoy_doing_when_it_s_sunny.mp3"
+    },
+    {
+      "n": 25,
+      "en": "How do you deal with unexpected changes in your summer plans?",
+      "jp": "夏の計画に予期しない変更があった場合、どう対処しますか？",
+      "hira": "なつのけいかくによきしないへんこうがあったばあい、どうたいしょしますか？",
+      "mp3": "br_q25_how_do_you_deal_with_unexpected_changes_in_your_summer_plans.mp3"
+    },
+    {
+      "n": 26,
+      "en": "What makes a perfect summer day for you?",
+      "jp": "あなたにとって完璧な夏の日とは何ですか？",
+      "hira": "あなたにとってかんぺきななつのひとはなんですか？",
+      "mp3": "br_q26_what_makes_a_perfect_summer_day_for_you.mp3"
+    },
+    {
+      "n": 27,
+      "en": "What kind of souvenirs do you like to bring back from your travels?",
+      "jp": "旅行から持ち帰るのが好きな土産はどんなものですか？",
+      "hira": "りょこうからもちかえるのがすきなみやげはどんなものですか？",
+      "mp3": "br_q27_what_kind_of_souvenirs_do_you_like_to_bring_back_from_your_travels.mp3"
+    },
+    {
+      "n": 28,
+      "en": "Do you have a favorite summer destination? Where is it?",
+      "jp": "好きな夏の旅行先はありますか？そこはどこですか？",
+      "hira": "すきななつのりょこうさきはありますか？そこはどこですか？",
+      "mp3": "br_q28_do_you_have_a_favorite_summer_destination_where_is_it.mp3"
+    },
+    {
+      "n": 29,
+      "en": "What outdoor games do you enjoy playing in summer?",
+      "jp": "夏に楽しむ屋外ゲームは何ですか？",
+      "hira": "なつにたのしむおくがいゲームはなんですか？",
+      "mp3": "br_q29_what_outdoor_games_do_you_enjoy_playing_in_summer.mp3"
+    },
+    {
+      "n": 30,
+      "en": "How do you stay safe from the heat during outdoor events?",
+      "jp": "屋外イベント中に熱から安全を保つためにはどうしますか？",
+      "hira": "おくがいイベントちゅうにねつからあんぜんをたもつためにはどうしますか？",
+      "mp3": "br_q30_how_do_you_stay_safe_from_the_heat_during_outdoor_events.mp3"
+    },
+    {
+      "n": 31,
+      "en": "What summer hobbies would you like to explore?",
+      "jp": "夏に挑戦したい趣味は何ですか？",
+      "hira": "なつにちょうせんしたいしゅみはなんですか？",
+      "mp3": "br_q31_what_summer_hobbies_would_you_like_to_explore.mp3"
+    },
+    {
+      "n": 32,
+      "en": "How does summer vacation differ from the school year for you?",
+      "jp": "あなたにとって、夏休みは学年とどう違いますか？",
+      "hira": "あなたにとって、なつやすみはがくねんとどうちがいますか？",
+      "mp3": "br_q32_how_does_summer_vacation_differ_from_the_school_year_for_you.mp3"
+    },
+    {
+      "n": 33,
+      "en": "What is your favorite summer activity to do with family?",
+      "jp": "家族と一緒にするのが好きな夏のアクティビティは何ですか？",
+      "hira": "かぞくといっしょにするのがすきななつのあくてぃびてぃはなんですか？",
+      "mp3": "br_q33_what_is_your_favorite_summer_activity_to_do_with_family.mp3"
+    },
+    {
+      "n": 34,
+      "en": "What type of summer events do you think are the most fun?",
+      "jp": "どのような夏のイベントが一番楽しいと思いますか？",
+      "hira": "どのようななつのイベントがいちばんたのしいとおもいますか？",
+      "mp3": "br_q34_what_type_of_summer_events_do_you_think_are_the_most_fun.mp3"
+    },
+    {
+      "n": 35,
+      "en": "How do you manage your time when you have many summer activities?",
+      "jp": "たくさんの夏のアクティビティがあるとき、時間をどのように管理しますか？",
+      "hira": "たくさんのなつのあくてぃびてぃがあるとき、じかんをどのようにかんりしますか？",
+      "mp3": "br_q35_how_do_you_manage_your_time_when_you_have_many_summer_activities.mp3"
+    },
+    {
+      "n": 36,
+      "en": "What types of foods do you think are best for a summer barbecue?",
+      "jp": "夏のバーベキューに最適だと思う食べ物は何ですか？",
+      "hira": "なつのばーべきゅーにさいてきだとおもうたべものはなんですか？",
+      "mp3": "br_q36_what_types_of_foods_do_you_think_are_best_for_a_summer_barbecue.mp3"
+    },
+    {
+      "n": 37,
+      "en": "How do you feel about outdoor concerts in summer?",
+      "jp": "夏の屋外コンサートについてどう思いますか？",
+      "hira": "なつのおくがいこんさーとについてどうおもいますか？",
+      "mp3": "br_q37_how_do_you_feel_about_outdoor_concerts_in_summer.mp3"
+    },
+    {
+      "n": 38,
+      "en": "What are some fun ways to spend a hot summer afternoon?",
+      "jp": "暑い夏の午後を過ごす楽しみ方にはどんなものがありますか？",
+      "hira": "あついなつのごごをすごすたのしみかたにはどんなものがありますか？",
+      "mp3": "br_q38_what_are_some_fun_ways_to_spend_a_hot_summer_afternoon.mp3"
+    },
+    {
+      "n": 39,
+      "en": "Do you prefer summer nights or summer days? Why?",
+      "jp": "夏の夜と夏の日、どちらが好きですか？その理由は？",
+      "hira": "なつのよるとなつのひ、どちらがすきですか？そのりゆうは？",
+      "mp3": "br_q39_do_you_prefer_summer_nights_or_summer_days_why.mp3"
+    },
+    {
+      "n": 40,
+      "en": "What do you think is the best way to cool down during summer?",
+      "jp": "夏に涼しくなるためのベストな方法は何だと思いますか？",
+      "hira": "なつにすずしくなるためのべすとなほうほうはなんだとおもいますか？",
+      "mp3": "br_q40_what_do_you_think_is_the_best_way_to_cool_down_during_summer.mp3"
+    },
+    {
+      "n": 41,
+      "en": "How do you choose what to wear on hot summer days?",
+      "jp": "暑い夏の日に何を着るかはどのように選びますか？",
+      "hira": "あついなつの日になにをきるかはどのようにえらびますか？",
+      "mp3": "br_q41_how_do_you_choose_what_to_wear_on_hot_summer_days.mp3"
+    },
+    {
+      "n": 42,
+      "en": "What summer sports do you like to watch or play?",
+      "jp": "見るのが好きな夏のスポーツや、するのが好きな夏のスポーツは何ですか？",
+      "hira": "みるのがすきななつのすぽーつや、するのがすきななつのすぽーつはなんですか？",
+      "mp3": "br_q42_what_summer_sports_do_you_like_to_watch_or_play.mp3"
+    },
+    {
+      "n": 43,
+      "en": "What does a typical summer day look like for you?",
+      "jp": "あなたにとって典型的な夏の日はどのようなものですか？",
+      "hira": "あなたにとっててんけいてきななつのひはどのようなものですか？",
+      "mp3": "br_q43_what_does_a_typical_summer_day_look_like_for_you.mp3"
+    },
+    {
+      "n": 44,
+      "en": "What is your favorite memory from a summer vacation?",
+      "jp": "夏休みの思い出の中でお気に入りのものは何ですか？",
+      "hira": "なつやすみのおもいでのなかでおきにいりのものはなんですか？",
+      "mp3": "br_q44_what_is_your_favorite_memory_from_a_summer_vacation.mp3"
+    },
+    {
+      "n": 45,
+      "en": "How do you like to spend a rainy day in summer?",
+      "jp": "夏の雨の日をどうやって過ごすのが好きですか？",
+      "hira": "なつのあめのひをどうやってすごすのがすきですか？",
+      "mp3": "br_q45_how_do_you_like_to_spend_a_rainy_day_in_summer.mp3"
+    },
+    {
+      "n": 46,
+      "en": "What summer traditions do you have in your family?",
+      "jp": "家族にある夏の伝統は何ですか？",
+      "hira": "かぞくにあるなつのでんとうはなんですか？",
+      "mp3": "br_q46_what_summer_traditions_do_you_have_in_your_family.mp3"
+    },
+    {
+      "n": 47,
+      "en": "How do you decide which summer festival to attend?",
+      "jp": "どの夏祭りに参加するかはどのように決めますか？",
+      "hira": "どのなつまつりにさんかするかはどのようにきめますか？",
+      "mp3": "br_q47_how_do_you_decide_which_summer_festival_to_attend.mp3"
+    },
+    {
+      "n": 48,
+      "en": "What is one thing you want to learn this summer?",
+      "jp": "今年の夏に学びたいことは一つ何ですか？",
+      "hira": "ことしのなつにまなびたいことはひとつなんですか？",
+      "mp3": "br_q48_what_is_one_thing_you_want_to_learn_this_summer.mp3"
+    },
+    {
+      "n": 49,
+      "en": "What role does food play in your summer activities?",
+      "jp": "夏のアクティビティにおいて食べ物はどんな役割を果たしますか？",
+      "hira": "なつのあくてぃびてぃにおいてたべものはどんなやくわりをはたしますか？",
+      "mp3": "br_q49_what_role_does_food_play_in_your_summer_activities.mp3"
+    },
+    {
+      "n": 50,
+      "en": "How do you feel about taking road trips in summer?",
+      "jp": "夏のロードトリップについてどう思いますか？",
+      "hira": "なつのろーどとりっぷについてどうおもいますか？",
+      "mp3": "br_q50_how_do_you_feel_about_taking_road_trips_in_summer.mp3"
+    },
+    {
+      "n": 51,
+      "en": "What songs remind you of summer?",
+      "jp": "夏を思い出させる曲は何ですか？",
+      "hira": "なつをおもいださせるきょくはなんですか？",
+      "mp3": "br_q51_what_songs_remind_you_of_summer.mp3"
+    },
+    {
+      "n": 52,
+      "en": "How do you keep your belongings safe while traveling in summer?",
+      "jp": "夏に旅行中、持ち物を安全に保つためにはどうしますか？",
+      "hira": "なつにりょこうちゅう、もちものをあんぜんにたもつためにはどうしますか？",
+      "mp3": "br_q52_how_do_you_keep_your_belongings_safe_while_traveling_in_summer.mp3"
+    },
+    {
+      "n": 53,
+      "en": "What do you enjoy most about summer vacations?",
+      "jp": "夏休みで一番楽しむことは何ですか？",
+      "hira": "なつやすみでいちばんたのしむことはなんですか？",
+      "mp3": "br_q53_what_do_you_enjoy_most_about_summer_vacations.mp3"
+    },
+    {
+      "n": 54,
+      "en": "Do you think summer is the best season? Why or why not?",
+      "jp": "夏が一番の季節だと思いますか？その理由は？",
+      "hira": "なつがいちばんのきせつだとおもいますか？そのりゆうは？",
+      "mp3": "br_q54_do_you_think_summer_is_the_best_season_why_or_why_not.mp3"
+    },
+    {
+      "n": 55,
+      "en": "What do you do to prepare for the heat before going outside?",
+      "jp": "外に出る前に暑さに備えて何をしますか？",
+      "hira": "そとにでるまえにあつさにそなえてなにをしますか？",
+      "mp3": "br_q55_what_do_you_do_to_prepare_for_the_heat_before_going_outside.mp3"
+    },
+    {
+      "n": 56,
+      "en": "How do you like to capture summer memories?",
+      "jp": "夏の思い出をどのように残すのが好きですか？",
+      "hira": "なつのおもいでをどのようにのこすのがすきですか？",
+      "mp3": "br_q56_how_do_you_like_to_capture_summer_memories.mp3"
+    },
+    {
+      "n": 57,
+      "en": "What types of crafts do you like to do during summer?",
+      "jp": "夏に楽しむ手作りの活動は何ですか？",
+      "hira": "なつにたのしむてづくりのかつどうはなんですか？",
+      "mp3": "br_q57_what_types_of_crafts_do_you_like_to_do_during_summer.mp3"
+    },
+    {
+      "n": 58,
+      "en": "How do you celebrate the end of summer?",
+      "jp": "夏の終わりをどのように祝いますか？",
+      "hira": "なつのおわりをどのようにいわいますか？",
+      "mp3": "br_q58_how_do_you_celebrate_the_end_of_summer.mp3"
+    },
+    {
+      "n": 59,
+      "en": "What do you think is the most important thing to remember during hot weather?",
+      "jp": "暑い天候で覚えておくべき最も重要なことは何だと思いますか？",
+      "hira": "あついてんこうでおぼえておくべきもっともじゅうようなことはなんだとおもいますか？",
+      "mp3": "br_q59_what_do_you_think_is_the_most_important_thing_to_remember_during_hot_weather.mp3"
+    },
+    {
+      "n": 60,
+      "en": "How does summer inspire you to be more active?",
+      "jp": "夏はどのようにあなたをもっとアクティブにさせますか？",
+      "hira": "なつはどのようにあなたをもっとあくてぃぶにさせますか？",
+      "mp3": "br_q60_how_does_summer_inspire_you_to_be_more_active.mp3"
+    }
   ]
 }
