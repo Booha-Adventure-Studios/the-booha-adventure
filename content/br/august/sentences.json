@@ -1,68 +1,424 @@
-
 {
   "cards": [
-    { "n": 1, "en": "It’s sunny today.", "jp": "今日は晴れです。", "hira": "きょう は はれ です", "mp3": "br_s01_its_sunny_today.mp3" },
-    { "n": 2, "en": "It’s cloudy and cool.", "jp": "くもっていて涼しいです。", "hira": "くもって いて すずしい です", "mp3": "br_s02_its_cloudy_and_cool.mp3" },
-    { "n": 3, "en": "It’s raining now.", "jp": "今、雨が降っています。", "hira": "いま、 あめ が ふって い ます", "mp3": "br_s03_its_raining_now.mp3" },
-    { "n": 4, "en": "It’s snowing in winter.", "jp": "冬には雪が降ります。", "hira": "ふゆ に は ゆき が ふり ます", "mp3": "br_s04_its_snowing_in_winter.mp3" },
-    { "n": 5, "en": "It’s very hot in summer.", "jp": "夏はとても暑いです。", "hira": "なつ は とても あつい です", "mp3": "br_s05_its_very_hot_in_summer.mp3" },
-    { "n": 6, "en": "In spring, flowers bloom.", "jp": "春には花が咲きます。", "hira": "はる に は はな が さき ます", "mp3": "br_s06_in_spring_flowers_bloom.mp3" },
-    { "n": 7, "en": "In autumn, leaves change color.", "jp": "秋には葉が色づきます。", "hira": "あき に は は が いろづき ます", "mp3": "br_s07_in_autumn_leaves_change_color.mp3" },
-    { "n": 8, "en": "The wind is strong today.", "jp": "今日は風が強いです。", "hira": "きょう は かぜ が つよい です", "mp3": "br_s08_the_wind_is_strong_today.mp3" },
-    { "n": 9, "en": "The temperature is twenty-eight degrees.", "jp": "気温は28度です。", "hira": "きおん は にじゅうはち ど です", "mp3": "br_s09_the_temperature_is_twenty_eight_degrees.mp3" },
-    { "n": 10, "en": "I wear a T-shirt when it’s hot.", "jp": "暑いときはTシャツを着ます。", "hira": "あつい とき は てぃーしゃつ を き ます", "mp3": "br_s10_i_wear_a_t_shirt_when_its_hot.mp3" },
-    { "n": 11, "en": "I wear a coat when it’s cold.", "jp": "寒いときはコートを着ます。", "hira": "さむい とき は こーと を き ます", "mp3": "br_s11_i_wear_a_coat_when_its_cold.mp3" },
-    { "n": 12, "en": "I use an umbrella on rainy days.", "jp": "雨の日はかさを使います。", "hira": "あめ の ひ は かさ を つかい ます", "mp3": "br_s12_i_use_an_umbrella_on_rainy_days.mp3" },
-    { "n": 13, "en": "Do you like warm weather?", "jp": "あたたかい天気が好きですか。", "hira": "あたたかい てんき が すき です か", "mp3": "br_s13_do_you_like_warm_weather.mp3" },
-    { "n": 14, "en": "What season do you like?", "jp": "どの季節が好きですか。", "hira": "どの きせつ が すき です か", "mp3": "br_s14_what_season_do_you_like.mp3" },
-    { "n": 15, "en": "Let’s check the weather forecast.", "jp": "天気予報を見ましょう。", "hira": "てんきよほう を み ましょう", "mp3": "br_s15_lets_check_the_weather_forecast.mp3" },
-
-    { "n": 16, "en": "There is an earthquake. Stay calm.", "jp": "地震です。落ち着いてください。", "hira": "じしん です。 おちついて ください", "mp3": "br_s16_there_is_an_earthquake_stay_calm.mp3" },
-    { "n": 17, "en": "Drop and cover under a table.", "jp": "テーブルの下に入って、身を守ってください。", "hira": "てーぶる の した に はいって、 み を まもって ください", "mp3": "br_s17_drop_and_cover_under_a_table.mp3" },
-    { "n": 18, "en": "Don’t run outside suddenly.", "jp": "急に外へ走り出さないでください。", "hira": "きゅう に そと へ はしりださ ないで ください", "mp3": "br_s18_dont_run_outside_suddenly.mp3" },
-    { "n": 19, "en": "Listen to warnings and alerts.", "jp": "警報や注意報を確認してください。", "hira": "けいほう や ちゅういほう を かくにん して ください", "mp3": "br_s19_listen_to_warnings_and_alerts.mp3" },
-    { "n": 20, "en": "We must evacuate to the shelter.", "jp": "避難所へ行かなければなりません。", "hira": "ひなんじょ へ いか なければ なり ません", "mp3": "br_s20_we_must_evacuate_to_the_shelter.mp3" },
-    { "n": 21, "en": "Where is the evacuation route?", "jp": "避難経路はどこですか。", "hira": "ひなん けいろ は どこ です か", "mp3": "br_s21_where_is_the_evacuation_route.mp3" },
-    { "n": 22, "en": "Bring your emergency kit and flashlight.", "jp": "非常用持ち出し袋と懐中電灯を持って行ってください。", "hira": "ひじょうよう もちだしぶくろ と かいちゅうでんとう を もって いって ください", "mp3": "br_s22_bring_your_emergency_kit_and_flashlight.mp3" },
-    { "n": 23, "en": "Do not use the elevator.", "jp": "エレベーターを使わないでください。", "hira": "えれべーたー を つかわ ないで ください", "mp3": "br_s23_do_not_use_the_elevator.mp3" },
-    { "n": 24, "en": "Stay away from the river.", "jp": "川から離れてください。", "hira": "かわ から はなれて ください", "mp3": "br_s24_stay_away_from_the_river.mp3" },
-    { "n": 25, "en": "Turn off the gas and electricity.", "jp": "ガスと電気を止めてください。", "hira": "がす と でんき を とめて ください", "mp3": "br_s25_turn_off_the_gas_and_electricity.mp3" },
-    { "n": 26, "en": "After the quake, check for danger.", "jp": "地震のあとに危険がないか確認してください。", "hira": "じしん の あと に きけん が ない か かくにん して ください", "mp3": "br_s26_after_the_quake_check_for_danger.mp3" },
-    { "n": 27, "en": "Call for help if you need it.", "jp": "必要なら助けを呼んでください。", "hira": "ひつよう なら たすけ を よんで ください", "mp3": "br_s27_call_for_help_if_you_need_it.mp3" },
-    { "n": 28, "en": "Is everyone safe?", "jp": "みんな安全ですか。", "hira": "みんな あんぜん です か", "mp3": "br_s28_is_everyone_safe.mp3" },
-    { "n": 29, "en": "Follow the staff’s directions.", "jp": "職員の指示にしたがってください。", "hira": "しょくいん の しじ に したがって ください", "mp3": "br_s29_follow_the_staffs_directions.mp3" },
-    { "n": 30, "en": "Let’s prepare at home today.", "jp": "今日は家で備えましょう。", "hira": "きょう は いえ で そなえ ましょう", "mp3": "br_s30_lets_prepare_at_home_today.mp3" },
-
-    { "n": 31, "en": "Animals live in different habitats.", "jp": "動物はそれぞれちがう生息地に住んでいます。", "hira": "どうぶつ は それぞれ ちがう せいそくち に すんで い ます", "mp3": "br_s31_animals_live_in_different_habitats.mp3" },
-    { "n": 32, "en": "A bear can climb trees.", "jp": "クマは木に登ることができます。", "hira": "くま は き に のぼる こと が でき ます", "mp3": "br_s32_a_bear_can_climb_trees.mp3" },
-    { "n": 33, "en": "Foxes have long tails.", "jp": "キツネは長いしっぽを持っています。", "hira": "きつね は ながい しっぽ を もって い ます", "mp3": "br_s33_foxes_have_long_tails.mp3" },
-    { "n": 34, "en": "Deer can run fast.", "jp": "シカは速く走れます。", "hira": "しか は はやく はしれ ます", "mp3": "br_s34_deer_can_run_fast.mp3" },
-    { "n": 35, "en": "Eagles can fly high.", "jp": "ワシは高く飛べます。", "hira": "わし は たかく とべ ます", "mp3": "br_s35_eagles_can_fly_high.mp3" },
-    { "n": 36, "en": "Dolphins live in the sea.", "jp": "イルカは海に住んでいます。", "hira": "いるか は うみ に すんで い ます", "mp3": "br_s36_dolphins_live_in_the_sea.mp3" },
-    { "n": 37, "en": "Turtles have hard shells.", "jp": "カメにはかたい甲羅があります。", "hira": "かめ に は かたい こうら が あり ます", "mp3": "br_s37_turtles_have_hard_shells.mp3" },
-    { "n": 38, "en": "Frogs live near water.", "jp": "カエルは水の近くに住みます。", "hira": "かえる は みず の ちかく に すみ ます", "mp3": "br_s38_frogs_live_near_water.mp3" },
-    { "n": 39, "en": "Butterflies have colorful wings.", "jp": "チョウには色とりどりの羽があります。", "hira": "ちょう に は いろとりどり の はね が あり ます", "mp3": "br_s39_butterflies_have_colorful_wings.mp3" },
-    { "n": 40, "en": "Some insects can jump or fly.", "jp": "昆虫には跳ねたり飛んだりできるものもいます。", "hira": "こんちゅう に は はねたり とんだり できる もの も い ます", "mp3": "br_s40_some_insects_can_jump_or_fly.mp3" },
-    { "n": 41, "en": "This animal is a mammal.", "jp": "この動物はほ乳類です。", "hira": "この どうぶつ は ほにゅうるい です", "mp3": "br_s41_this_animal_is_a_mammal.mp3" },
-    { "n": 42, "en": "That animal is a reptile.", "jp": "その動物はは虫類です。", "hira": "その どうぶつ は はちゅうるい です", "mp3": "br_s42_that_animal_is_a_reptile.mp3" },
-    { "n": 43, "en": "Where do bears live?", "jp": "クマはどこに住んでいますか。", "hira": "くま は どこ に すんで い ます か", "mp3": "br_s43_where_do_bears_live.mp3" },
-    { "n": 44, "en": "What do dolphins eat?", "jp": "イルカは何を食べますか。", "hira": "いるか は なに を たべ ます か", "mp3": "br_s44_what_do_dolphins_eat.mp3" },
-    { "n": 45, "en": "Let’s protect animal habitats.", "jp": "動物の生息地を守りましょう。", "hira": "どうぶつ の せいそくち を まもり ましょう", "mp3": "br_s45_lets_protect_animal_habitats.mp3" },
-
-    { "n": 46, "en": "Let’s go hiking this weekend.", "jp": "今週末にハイキングに行きましょう。", "hira": "こんしゅうまつ に はいきんぐ に いき ましょう", "mp3": "br_s46_lets_go_hiking_this_weekend.mp3" },
-    { "n": 47, "en": "We need a map and a compass.", "jp": "地図とコンパスが必要です。", "hira": "ちず と こんぱす が ひつよう です", "mp3": "br_s47_we_need_a_map_and_a_compass.mp3" },
-    { "n": 48, "en": "We can camp by the river.", "jp": "川のそばでキャンプできます。", "hira": "かわ の そば で きゃんぷ でき ます", "mp3": "br_s48_we_can_camp_by_the_river.mp3" },
-    { "n": 49, "en": "Set up the tent before sunset.", "jp": "日没前にテントを立ててください。", "hira": "にちぼつ まえ に てんと を たてて ください", "mp3": "br_s49_set_up_the_tent_before_sunset.mp3" },
-    { "n": 50, "en": "Don’t leave trash outside.", "jp": "外にごみを置いていかないでください。", "hira": "そと に ごみ を おいて いか ないで ください", "mp3": "br_s50_dont_leave_trash_outside.mp3" },
-    { "n": 51, "en": "Bring a flashlight at night.", "jp": "夜は懐中電灯を持って行ってください。", "hira": "よる は かいちゅうでんとう を もって いって ください", "mp3": "br_s51_bring_a_flashlight_at_night.mp3" },
-    { "n": 52, "en": "Use insect repellent in summer.", "jp": "夏は虫よけを使ってください。", "hira": "なつ は むしよけ を つかって ください", "mp3": "br_s52_use_insect_repellent_in_summer.mp3" },
-    { "n": 53, "en": "Let’s have a picnic in the park.", "jp": "公園でピクニックをしましょう。", "hira": "こうえん で ぴくにっく を し ましょう", "mp3": "br_s53_lets_have_a_picnic_in_the_park.mp3" },
-    { "n": 54, "en": "We can watch birds with binoculars.", "jp": "双眼鏡で鳥を観察できます。", "hira": "そうがんきょう で とり を かんさつ でき ます", "mp3": "br_s54_we_can_watch_birds_with_binoculars.mp3" },
-    { "n": 55, "en": "Be careful on the trail.", "jp": "ハイキングコースでは気をつけてください。", "hira": "はいきんぐこーす で は き を つけて ください", "mp3": "br_s55_be_careful_on_the_trail.mp3" },
-    { "n": 56, "en": "Let’s write in a nature journal.", "jp": "自然観察ノートに書きましょう。", "hira": "しぜんかんさつ のーと に かき ましょう", "mp3": "br_s56_lets_write_in_a_nature_journal.mp3" },
-    { "n": 57, "en": "We need water and snacks.", "jp": "水とおやつが必要です。", "hira": "みず と おやつ が ひつよう です", "mp3": "br_s57_we_need_water_and_snacks.mp3" },
-    { "n": 58, "en": "Can you carry the backpack?", "jp": "リュックを背負えますか。", "hira": "りゅっく を せおえ ます か", "mp3": "br_s58_can_you_carry_the_backpack.mp3" },
-    { "n": 59, "en": "Keep the campsite clean.", "jp": "キャンプ場をきれいに保ってください。", "hira": "きゃんぷじょう を きれい に たもって ください", "mp3": "br_s59_keep_the_campsite_clean.mp3" },
-    { "n": 60, "en": "Let’s enjoy nature safely.", "jp": "安全に自然を楽しみましょう。", "hira": "あんぜん に しぜん を たのしみ ましょう", "mp3": "br_s60_lets_enjoy_nature_safely.mp3" }
+    {
+      "n": 1,
+      "en": "As summer ends, we can enjoy the last warm days at the beach.",
+      "jp": "夏が終わると、私たちはビーチでの最後の暖かい日々を楽しむことができます。",
+      "hira": "なつがおわると、わたしたちはびーちでのさいごのあたたかいひびをたのしむことができます。",
+      "mp3": "br_s01_as_summer_ends_we_can_enjoy_the_last_warm_days_at_the_beach.mp3"
+    },
+    {
+      "n": 2,
+      "en": "My friends and I love to have picnics under the big tree.",
+      "jp": "私の友達と私は、大きな木の下でピクニックをするのが大好きです。",
+      "hira": "わたしのともだちとわたしは、おおきなきのしたでぴくにっくをするのがだいすきです。",
+      "mp3": "br_s02_my_friends_and_i_love_to_have_picnics_under_the_big_tree.mp3"
+    },
+    {
+      "n": 3,
+      "en": "We are looking forward to going back to school and seeing our classmates.",
+      "jp": "私たちは学校に戻り、クラスメートに会うのが楽しみです。",
+      "hira": "わたしたちはがっこうにもどり、くらすめーとにあうのがたのしみです。",
+      "mp3": "br_s03_we_are_looking_forward_to_going_back_to_school_and_seeing_our_classmates.mp3"
+    },
+    {
+      "n": 4,
+      "en": "The evenings are getting cooler, so we need to wear light jackets.",
+      "jp": "夕方は涼しくなってきたので、軽いジャケットを着る必要があります。",
+      "hira": "ゆうがたはすずしくなってきたので、かるいじゃけっとをきるひつようがあります。",
+      "mp3": "br_s04_the_evenings_are_getting_cooler_so_we_need_to_wear_light_jackets.mp3"
+    },
+    {
+      "n": 5,
+      "en": "I enjoy reading books on the porch while the sun sets.",
+      "jp": "私は日が沈む間にポーチで本を読むのを楽しみます。",
+      "hira": "わたしはひがしずむあいだにぽーちでほんをよむのをたのしみます。",
+      "mp3": "br_s05_i_enjoy_reading_books_on_the_porch_while_the_sun_sets.mp3"
+    },
+    {
+      "n": 6,
+      "en": "Going for bike rides with friends is a great way to spend the last days of summer.",
+      "jp": "友達と自転車に乗るのは、夏の最後の日々を過ごす素晴らしい方法です。",
+      "hira": "ともだちとじてんしゃにのるのは、なつのさいごのひびをすごすすばらしいほうほうです。",
+      "mp3": "br_s06_going_for_bike_rides_with_friends_is_a_great_way_to_spend_the_last_days_of_summer.mp3"
+    },
+    {
+      "n": 7,
+      "en": "We can see the stars more clearly now that the nights are cooler.",
+      "jp": "夜が涼しくなったので、星がもっとはっきり見えます。",
+      "hira": "よるがすずしくなったので、ほしがもっとはっきりみえます。",
+      "mp3": "br_s07_we_can_see_the_stars_more_clearly_now_that_the_nights_are_cooler.mp3"
+    },
+    {
+      "n": 8,
+      "en": "I am excited to meet my teachers again after the summer break.",
+      "jp": "夏休みの後に再び先生に会うのが楽しみです。",
+      "hira": "なつやすみのあとにふたたびせんせいにあうのがたのしみです。",
+      "mp3": "br_s08_i_am_excited_to_meet_my_teachers_again_after_the_summer_break.mp3"
+    },
+    {
+      "n": 9,
+      "en": "We are gathering supplies for the new school term.",
+      "jp": "私たちは新学期のための準備をしています。",
+      "hira": "わたしたちはしんがっきのためのじゅんびをしています。",
+      "mp3": "br_s09_we_are_gathering_supplies_for_the_new_school_term.mp3"
+    },
+    {
+      "n": 10,
+      "en": "The summer festival was a joyful time to celebrate with friends.",
+      "jp": "夏祭りは友達と祝う楽しい時間でした。",
+      "hira": "なつまつりはともだちといわうたのしいじかんでした。",
+      "mp3": "br_s10_the_summer_festival_was_a_joyful_time_to_celebrate_with_friends.mp3"
+    },
+    {
+      "n": 11,
+      "en": "I plan to organize my school supplies before the new term starts.",
+      "jp": "新学期が始まる前に、学校の用品を整理するつもりです。",
+      "hira": "しんがっきがはじまるまえに、がっこうのようひんをせいりするつもりです。",
+      "mp3": "br_s11_i_plan_to_organize_my_school_supplies_before_the_new_term_starts.mp3"
+    },
+    {
+      "n": 12,
+      "en": "We can visit the local park to enjoy the fresh air.",
+      "jp": "新鮮な空気を楽しむために、地元の公園を訪れることができます。",
+      "hira": "しんせんなくうきをたのしむために、じもとのこうえんをおとずれることができます。",
+      "mp3": "br_s12_we_can_visit_the_local_park_to_enjoy_the_fresh_air.mp3"
+    },
+    {
+      "n": 13,
+      "en": "The sunset colors are beautiful at this time of year.",
+      "jp": "この時期の夕焼けの色は美しいです。",
+      "hira": "このじきのゆうやけのいろはうつくしいです。",
+      "mp3": "br_s13_the_sunset_colors_are_beautiful_at_this_time_of_year.mp3"
+    },
+    {
+      "n": 14,
+      "en": "I will make new friends in my class this year.",
+      "jp": "私は今年のクラスで新しい友達を作ります。",
+      "hira": "わたしはことしのくらすであたらしいともだちをつくります。",
+      "mp3": "br_s14_i_will_make_new_friends_in_my_class_this_year.mp3"
+    },
+    {
+      "n": 15,
+      "en": "We enjoy playing soccer in the park with our friends.",
+      "jp": "私たちは友達と公園でサッカーをするのを楽しんでいます。",
+      "hira": "わたしたちはともだちとこうえんでさっかーをするのをたのしんでいます。",
+      "mp3": "br_s15_we_enjoy_playing_soccer_in_the_park_with_our_friends.mp3"
+    },
+    {
+      "n": 16,
+      "en": "As summer fades, I remember the fun times we had.",
+      "jp": "夏が過ぎ去ると、私たちの楽しい思い出を思い出します。",
+      "hira": "なつがすぎさると、わたしたちのたのしいおもいでをおもいだします。",
+      "mp3": "br_s16_as_summer_fades_i_remember_the_fun_times_we_had.mp3"
+    },
+    {
+      "n": 17,
+      "en": "Now is the time to prepare for the upcoming school events.",
+      "jp": "今は、これからの学校行事の準備をする時です。",
+      "hira": "いまは、これからのがっこうぎょうじのじゅんびをするじきです。",
+      "mp3": "br_s17_now_is_the_time_to_prepare_for_the_upcoming_school_events.mp3"
+    },
+    {
+      "n": 18,
+      "en": "The warm days make it perfect for outdoor activities.",
+      "jp": "暖かい日々は屋外活動に最適です。",
+      "hira": "あたたかいひびはおくがいかつどうにさいてきです。",
+      "mp3": "br_s18_the_warm_days_make_it_perfect_for_outdoor_activities.mp3"
+    },
+    {
+      "n": 19,
+      "en": "I will join the art club to meet new friends this term.",
+      "jp": "私は今学期、新しい友達に会うためにアートクラブに参加します。",
+      "hira": "わたしはこんがっき、あたらしいともだちにあうためにあーとくらぶにさんかします。",
+      "mp3": "br_s19_i_will_join_the_art_club_to_meet_new_friends_this_term.mp3"
+    },
+    {
+      "n": 20,
+      "en": "The last days of summer are perfect for family outings.",
+      "jp": "夏の最後の日々は家族の外出に最適です。",
+      "hira": "なつのさいごのひびはかぞくのがいしゅつにさいてきです。",
+      "mp3": "br_s20_the_last_days_of_summer_are_perfect_for_family_outings.mp3"
+    },
+    {
+      "n": 21,
+      "en": "I love to ride my bike along the river in the late summer.",
+      "jp": "私は晩夏に川沿いを自転車で走るのが大好きです。",
+      "hira": "わたしはばんかにかわぞいをじてんしゃではしるのがだいすきです。",
+      "mp3": "br_s21_i_love_to_ride_my_bike_along_the_river_in_the_late_summer.mp3"
+    },
+    {
+      "n": 22,
+      "en": "We are excited to see our old teachers and catch up.",
+      "jp": "私たちは古い先生に会い、近況を話すのが楽しみです。",
+      "hira": "わたしたちはふるいせんせいにあい、きんきょうをはなすのがたのしみです。",
+      "mp3": "br_s22_we_are_excited_to_see_our_old_teachers_and_catch_up.mp3"
+    },
+    {
+      "n": 23,
+      "en": "The weather is perfect for hiking in the mountains.",
+      "jp": "山でハイキングをするのに最適な天気です。",
+      "hira": "やまではいきんぐをするのにさいてきなてんきです。",
+      "mp3": "br_s23_the_weather_is_perfect_for_hiking_in_the_mountains.mp3"
+    },
+    {
+      "n": 24,
+      "en": "I will decorate my new classroom with colorful drawings.",
+      "jp": "私は新しい教室をカラフルな絵で飾ります。",
+      "hira": "わたしはあたらしいきょうしつをからふるなえでかざります。",
+      "mp3": "br_s24_i_will_decorate_my_new_classroom_with_colorful_drawings.mp3"
+    },
+    {
+      "n": 25,
+      "en": "The fair at the end of summer was full of fun activities.",
+      "jp": "夏の終わりのフェアは楽しいアクティビティでいっぱいでした。",
+      "hira": "なつのおわりのふぇあはたのしいあくてぃびてぃでいっぱいでした。",
+      "mp3": "br_s25_the_fair_at_the_end_of_summer_was_full_of_fun_activities.mp3"
+    },
+    {
+      "n": 26,
+      "en": "We are reviewing what we learned last year to get ready.",
+      "jp": "私たちは昨年学んだことを復習して準備をしています。",
+      "hira": "わたしたはさくねんまなんだことをふくしゅうしてじゅんびをしています。",
+      "mp3": "br_s26_we_are_reviewing_what_we_learned_last_year_to_get_ready.mp3"
+    },
+    {
+      "n": 27,
+      "en": "I enjoy playing chess with my brother during the summer evenings.",
+      "jp": "夏の夕方に兄とチェスをするのが楽しみです。",
+      "hira": "なつのゆうがたにあにとちぇすをするのがたのしみです。",
+      "mp3": "br_s27_i_enjoy_playing_chess_with_my_brother_during_the_summer_evenings.mp3"
+    },
+    {
+      "n": 28,
+      "en": "My family loves to go camping before school starts again.",
+      "jp": "私の家族は学校が再び始まる前にキャンプに行くのが大好きです。",
+      "hira": "わたしのかぞくはがっこうがふたたびはじまるまえにきゃんぷにいくのがだいすきです。",
+      "mp3": "br_s28_my_family_loves_to_go_camping_before_school_starts_again.mp3"
+    },
+    {
+      "n": 29,
+      "en": "We are planning a road trip to visit our grandparents.",
+      "jp": "私たちは祖父母を訪れるためのロードトリップを計画しています。",
+      "hira": "わたしたちはそふぼをおとずれるためのろーどとりっぷをけいかくしています。",
+      "mp3": "br_s29_we_are_planning_a_road_trip_to_visit_our_grandparents.mp3"
+    },
+    {
+      "n": 30,
+      "en": "The late summer evenings are perfect for stargazing with friends.",
+      "jp": "晩夏の夕方は友達と星空を眺めるのに最適です。",
+      "hira": "ばんかのゆうがたはともだちとほしぞらをながめるのにさいてきです。",
+      "mp3": "br_s30_the_late_summer_evenings_are_perfect_for_stargazing_with_friends.mp3"
+    },
+    {
+      "n": 31,
+      "en": "We will celebrate the end of summer with a barbecue party.",
+      "jp": "私たちは夏の終わりをバーベキューパーティーで祝います。",
+      "hira": "わたしたちはなつのおわりをばーべきゅーぱーてぃーでいわいます。",
+      "mp3": "br_s31_we_will_celebrate_the_end_of_summer_with_a_barbecue_party.mp3"
+    },
+    {
+      "n": 32,
+      "en": "I look forward to joining the soccer team this semester.",
+      "jp": "私は今学期サッカーチームに参加するのを楽しみにしています。",
+      "hira": "わたしはこんがっきさっかーちーむにさんかするのをたのしみにしています。",
+      "mp3": "br_s32_i_look_forward_to_joining_the_soccer_team_this_semester.mp3"
+    },
+    {
+      "n": 33,
+      "en": "The trees are starting to change color, signaling the fall.",
+      "jp": "木々が色を変え始め、秋の訪れを知らせています。",
+      "hira": "きぎがいろをへんしはじめ、あきのおとずれをしらせています。",
+      "mp3": "br_s33_the_trees_are_starting_to_change_color_signaling_the_fall.mp3"
+    },
+    {
+      "n": 34,
+      "en": "I can’t wait to see my friends again after the break.",
+      "jp": "休みの後に友達に再び会うのが待ちきれません。",
+      "hira": "やすみのあとのともだちにふたたびあうのがまちきれません。",
+      "mp3": "br_s34_i_can_t_wait_to_see_my_friends_again_after_the_break.mp3"
+    },
+    {
+      "n": 35,
+      "en": "We will visit the beach one last time before school starts.",
+      "jp": "学校が始まる前に、ビーチを最後に訪れます。",
+      "hira": "がっこうがはじまるまえに、びーちをさいごにおとずれます。",
+      "mp3": "br_s35_we_will_visit_the_beach_one_last_time_before_school_starts.mp3"
+    },
+    {
+      "n": 36,
+      "en": "I enjoy cooking with my family during the long summer evenings.",
+      "jp": "長い夏の夕方に家族と料理をするのが好きです。",
+      "hira": "ながいなつのゆうがたにかぞくとりょうりをするのがすきです。",
+      "mp3": "br_s36_i_enjoy_cooking_with_my_family_during_the_long_summer_evenings.mp3"
+    },
+    {
+      "n": 37,
+      "en": "My friends and I are creating a scrapbook of our summer memories.",
+      "jp": "友達と私は夏の思い出のスクラップブックを作成しています。",
+      "hira": "ともだちとわたしはなつのおもいでのすくらっぷぶっくをさくせいしています。",
+      "mp3": "br_s37_my_friends_and_i_are_creating_a_scrapbook_of_our_summer_memories.mp3"
+    },
+    {
+      "n": 38,
+      "en": "I am excited to try new subjects in school this year.",
+      "jp": "私は今年学校で新しい科目を学ぶのが楽しみです。",
+      "hira": "わたしはことしがっこうであたらしいかもくをまなぶのがたのしみです。",
+      "mp3": "br_s38_i_am_excited_to_try_new_subjects_in_school_this_year.mp3"
+    },
+    {
+      "n": 39,
+      "en": "My family often goes to the mountains for a short vacation.",
+      "jp": "私の家族はしばしば短い休暇で山に行きます。",
+      "hira": "わたしのかぞくはしばしばみじかいやすみでやまにいきます。",
+      "mp3": "br_s39_my_family_often_goes_to_the_mountains_for_a_short_vacation.mp3"
+    },
+    {
+      "n": 40,
+      "en": "We should cherish the time we have together before school.",
+      "jp": "私たちは学校が始まる前に、一緒に過ごす時間を大切にするべきです。",
+      "hira": "わたしたちはがっこうがはじまるまえに、いっしょにすごすじかんをたいせつにするべきです。",
+      "mp3": "br_s40_we_should_cherish_the_time_we_have_together_before_school.mp3"
+    },
+    {
+      "n": 41,
+      "en": "Late summer is a great time for outdoor adventures.",
+      "jp": "晩夏は屋外冒険に最適な時期です。",
+      "hira": "ばんかはおくがいぼうけんにさいてきなじきです。",
+      "mp3": "br_s41_late_summer_is_a_great_time_for_outdoor_adventures.mp3"
+    },
+    {
+      "n": 42,
+      "en": "I am looking forward to the school sports day this year.",
+      "jp": "私は今年の学校のスポーツデーを楽しみにしています。",
+      "hira": "わたしはことしのがっこうのすぽーつでーをたのしみにしています。",
+      "mp3": "br_s42_i_am_looking_forward_to_the_school_sports_day_this_year.mp3"
+    },
+    {
+      "n": 43,
+      "en": "The late summer breeze feels refreshing in the park.",
+      "jp": "晩夏の風は公園でさわやかに感じます。",
+      "hira": "ばんかのかぜはこうえんでさわやかにかんじます。",
+      "mp3": "br_s43_the_late_summer_breeze_feels_refreshing_in_the_park.mp3"
+    },
+    {
+      "n": 44,
+      "en": "I will try to find a new hobby this school year.",
+      "jp": "私はこの学年に新しい趣味を見つけようと思います。",
+      "hira": "わたしはこのがくねんにあたらしいしゅみをみつけようとおもいます。",
+      "mp3": "br_s44_i_will_try_to_find_a_new_hobby_this_school_year.mp3"
+    },
+    {
+      "n": 45,
+      "en": "We are planning a farewell party for summer at the park.",
+      "jp": "私たちは公園で夏のお別れパーティーを計画しています。",
+      "hira": "わたしたちはこうえんでなつのおわかれぱーてぃーをけいかくしています。",
+      "mp3": "br_s45_we_are_planning_a_farewell_party_for_summer_at_the_park.mp3"
+    },
+    {
+      "n": 46,
+      "en": "I enjoy drawing pictures of our summer adventures.",
+      "jp": "私は私たちの夏の冒険の絵を描くのが好きです。",
+      "hira": "わたしはわたしたちのなつのぼうけんのえをかくのがすきです。",
+      "mp3": "br_s46_i_enjoy_drawing_pictures_of_our_summer_adventures.mp3"
+    },
+    {
+      "n": 47,
+      "en": "As we approach autumn, I can smell the seasonal changes in the air.",
+      "jp": "秋が近づくと、空気に季節の変化を感じます。",
+      "hira": "あきがちかづくと、くうきにきせつのへんかをかんじます。",
+      "mp3": "br_s47_as_we_approach_autumn_i_can_smell_the_seasonal_changes_in_the_air.mp3"
+    },
+    {
+      "n": 48,
+      "en": "We will decorate our classrooms to welcome the new school year.",
+      "jp": "私たちは新学年を迎えるために教室を飾ります。",
+      "hira": "わたしたちはしんがくねんをむかえるためにきょうしつをかざります。",
+      "mp3": "br_s48_we_will_decorate_our_classrooms_to_welcome_the_new_school_year.mp3"
+    },
+    {
+      "n": 49,
+      "en": "I am excited to learn about new countries in geography class.",
+      "jp": "私は地理の授業で新しい国について学ぶのが楽しみです。",
+      "hira": "わたしはちりのじゅぎょうであたらしいくにについてまなぶのがたのしみです。",
+      "mp3": "br_s49_i_am_excited_to_learn_about_new_countries_in_geography_class.mp3"
+    },
+    {
+      "n": 50,
+      "en": "The warm weather makes it easy to play outside with friends.",
+      "jp": "暖かい天候は友達と外で遊ぶのを簡単にします。",
+      "hira": "あたたかいてんこうはともだちとそとであそぶのをかんたんにします。",
+      "mp3": "br_s50_the_warm_weather_makes_it_easy_to_play_outside_with_friends.mp3"
+    },
+    {
+      "n": 51,
+      "en": "We will have a talent show at school to showcase our skills.",
+      "jp": "学校で私たちのスキルを披露するためのタレントショーがあります。",
+      "hira": "がっこうでわたしたちのすきるをひろうするためのたれんとしょーがあります。",
+      "mp3": "br_s51_we_will_have_a_talent_show_at_school_to_showcase_our_skills.mp3"
+    },
+    {
+      "n": 52,
+      "en": "I enjoy making friendship bracelets to give to my friends.",
+      "jp": "私は友達に贈るために友情のブレスレットを作るのが好きです。",
+      "hira": "わたしはともだちにおくるためにゆうじょうのぶれすれっとをつくるのがすきです。",
+      "mp3": "br_s52_i_enjoy_making_friendship_bracelets_to_give_to_my_friends.mp3"
+    },
+    {
+      "n": 53,
+      "en": "We are planning a summer cleanup at the local park.",
+      "jp": "私たちは地元の公園で夏の清掃を計画しています。",
+      "hira": "わたしたちはじもとのこうえんでなつのせいそうをけいかくしています。",
+      "mp3": "br_s53_we_are_planning_a_summer_cleanup_at_the_local_park.mp3"
+    },
+    {
+      "n": 54,
+      "en": "The warm evenings are ideal for bonfires with friends.",
+      "jp": "暖かい夕方は友達との焚き火に最適です。",
+      "hira": "あたたかいゆうがたはともだちとのたきびにさいてきです。",
+      "mp3": "br_s54_the_warm_evenings_are_ideal_for_bonfires_with_friends.mp3"
+    },
+    {
+      "n": 55,
+      "en": "I hope to learn how to cook new dishes this school year.",
+      "jp": "私はこの学年に新しい料理の作り方を学びたいです。",
+      "hira": "わたしはこのがくねんにあたらしいりょうりのつくりかたをまなびたいです。",
+      "mp3": "br_s55_i_hope_to_learn_how_to_cook_new_dishes_this_school_year.mp3"
+    },
+    {
+      "n": 56,
+      "en": "We are looking forward to our first school trip of the year.",
+      "jp": "私たちは今年の初めての学校旅行を楽しみにしています。",
+      "hira": "わたしたちはことしのはじめてのがっこうりょこうをたのしみにしています。",
+      "mp3": "br_s56_we_are_looking_forward_to_our_first_school_trip_of_the_year.mp3"
+    },
+    {
+      "n": 57,
+      "en": "Summer is a time to relax and recharge for the new term.",
+      "jp": "夏は新学期のためにリラックスしてエネルギーを充電する時です。",
+      "hira": "なつはしんがっきのためにりらっくすしてえねるぎーをじゅうでんするじきです。",
+      "mp3": "br_s57_summer_is_a_time_to_relax_and_recharge_for_the_new_term.mp3"
+    },
+    {
+      "n": 58,
+      "en": "I will try to participate in more school activities this year.",
+      "jp": "私は今年もっと学校の活動に参加しようと思います。",
+      "hira": "わたしはことしもっとがっこうのかつどうにさんかしようとおもいます。",
+      "mp3": "br_s58_i_will_try_to_participate_in_more_school_activities_this_year.mp3"
+    },
+    {
+      "n": 59,
+      "en": "The last summer barbecue was filled with laughter and joy.",
+      "jp": "最後の夏のバーベキューは笑いと喜びに満ちていました。",
+      "hira": "さいごのなつのばーべきゅーはわらいとよろこびにみちていました。",
+      "mp3": "br_s59_the_last_summer_barbecue_was_filled_with_laughter_and_joy.mp3"
+    },
+    {
+      "n": 60,
+      "en": "I am ready to start another exciting school year with my friends.",
+      "jp": "私は友達と一緒にもう一つのエキサイティングな学年を始める準備ができています。",
+      "hira": "わたしはともだちといっしょにもうひとつのえきさいてぃんぐながくねんをはじめるじゅんびができています.",
+      "mp3": "br_s60_i_am_ready_to_start_another_exciting_school_year_with_my_friends.mp3"
+    }
   ]
 }
