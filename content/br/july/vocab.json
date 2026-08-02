@@ -1,72 +1,424 @@
-
 {
   "cards": [
-    { "n": 1, "en": "tale", "jp": "物語", "hira": "ものがたり", "mp3": "br_v01_tale.mp3" },
-    { "n": 2, "en": "hero", "jp": "ヒーロー", "hira": "ひーろー", "mp3": "br_v02_hero.mp3" },
-    { "n": 3, "en": "villain", "jp": "悪役", "hira": "あくやく", "mp3": "br_v03_villain.mp3" },
-    { "n": 4, "en": "prince", "jp": "王子", "hira": "おうじ", "mp3": "br_v04_prince.mp3" },
-    { "n": 5, "en": "princess", "jp": "お姫様", "hira": "おひめさま", "mp3": "br_v05_princess.mp3" },
-    { "n": 6, "en": "dragon", "jp": "ドラゴン", "hira": "どらごん", "mp3": "br_v06_dragon.mp3" },
-    { "n": 7, "en": "wolf", "jp": "オオカミ", "hira": "おおかみ", "mp3": "br_v07_wolf.mp3" },
-    { "n": 8, "en": "witch", "jp": "魔女", "hira": "まじょ", "mp3": "br_v08_witch.mp3" },
-    { "n": 9, "en": "giant", "jp": "巨人", "hira": "きょじん", "mp3": "br_v09_giant.mp3" },
-    { "n": 10, "en": "castle", "jp": "城", "hira": "しろ", "mp3": "br_v10_castle.mp3" },
-
-    { "n": 11, "en": "forest", "jp": "森", "hira": "もり", "mp3": "br_v11_forest.mp3" },
-    { "n": 12, "en": "magic", "jp": "魔法", "hira": "まほう", "mp3": "br_v12_magic.mp3" },
-    { "n": 13, "en": "spell", "jp": "呪文", "hira": "じゅもん", "mp3": "br_v13_spell.mp3" },
-    { "n": 14, "en": "quest", "jp": "冒険", "hira": "ぼうけん", "mp3": "br_v14_quest.mp3" },
-    { "n": 15, "en": "treasure", "jp": "宝物", "hira": "たからもの", "mp3": "br_v15_treasure.mp3" },
-
-    { "n": 16, "en": "plot", "jp": "あらすじ", "hira": "あらすじ", "mp3": "br_v16_plot.mp3" },
-    { "n": 17, "en": "setting", "jp": "設定", "hira": "せってい", "mp3": "br_v17_setting.mp3" },
-    { "n": 18, "en": "character", "jp": "登場人物", "hira": "とうじょうじんぶつ", "mp3": "br_v18_character.mp3" },
-    { "n": 19, "en": "narrator", "jp": "語り手", "hira": "かたりて", "mp3": "br_v19_narrator.mp3" },
-    { "n": 20, "en": "dialogue", "jp": "会話", "hira": "かいわ", "mp3": "br_v20_dialogue.mp3" },
-    { "n": 21, "en": "scene", "jp": "場面", "hira": "ばめん", "mp3": "br_v21_scene.mp3" },
-    { "n": 22, "en": "chapter", "jp": "章", "hira": "しょう", "mp3": "br_v22_chapter.mp3" },
-    { "n": 23, "en": "paragraph", "jp": "段落", "hira": "だんらく", "mp3": "br_v23_paragraph.mp3" },
-    { "n": 24, "en": "sentence", "jp": "文", "hira": "ぶん", "mp3": "br_v24_sentence.mp3" },
-    { "n": 25, "en": "draft", "jp": "下書き", "hira": "したがき", "mp3": "br_v25_draft.mp3" },
-
-    { "n": 26, "en": "edit", "jp": "編集する", "hira": "へんしゅうする", "mp3": "br_v26_edit.mp3" },
-    { "n": 27, "en": "conflict", "jp": "対立", "hira": "たいりつ", "mp3": "br_v27_conflict.mp3" },
-    { "n": 28, "en": "solution", "jp": "解決", "hira": "かいけつ", "mp3": "br_v28_solution.mp3" },
-    { "n": 29, "en": "ending", "jp": "結末", "hira": "けつまつ", "mp3": "br_v29_ending.mp3" },
-    { "n": 30, "en": "moral", "jp": "教訓", "hira": "きょうくん", "mp3": "br_v30_moral.mp3" },
-
-    { "n": 31, "en": "personality", "jp": "性格", "hira": "せいかく", "mp3": "br_v31_personality.mp3" },
-    { "n": 32, "en": "kind", "jp": "優しい", "hira": "やさしい", "mp3": "br_v32_kind.mp3" },
-    { "n": 33, "en": "brave", "jp": "勇敢な", "hira": "ゆうかんな", "mp3": "br_v33_brave.mp3" },
-    { "n": 34, "en": "shy", "jp": "恥ずかしがり屋", "hira": "はずかしがりや", "mp3": "br_v34_shy.mp3" },
-    { "n": 35, "en": "clever", "jp": "賢い", "hira": "かしこい", "mp3": "br_v35_clever.mp3" },
-    { "n": 36, "en": "funny", "jp": "面白い", "hira": "おもしろい", "mp3": "br_v36_funny.mp3" },
-    { "n": 37, "en": "strong", "jp": "強い", "hira": "つよい", "mp3": "br_v37_strong.mp3" },
-    { "n": 38, "en": "friendly", "jp": "フレンドリー", "hira": "ふれんどりー", "mp3": "br_v38_friendly.mp3" },
-    { "n": 39, "en": "goal", "jp": "目標", "hira": "もくひょう", "mp3": "br_v39_goal.mp3" },
-    { "n": 40, "en": "fear", "jp": "恐れ", "hira": "おそれ", "mp3": "br_v40_fear.mp3" },
-
-    { "n": 41, "en": "power", "jp": "力", "hira": "ちから", "mp3": "br_v41_power.mp3" },
-    { "n": 42, "en": "secret", "jp": "秘密", "hira": "ひみつ", "mp3": "br_v42_secret.mp3" },
-    { "n": 43, "en": "promise", "jp": "約束", "hira": "やくそく", "mp3": "br_v43_promise.mp3" },
-    { "n": 44, "en": "adventure", "jp": "冒険", "hira": "ぼうけん", "mp3": "br_v44_adventure.mp3" },
-    { "n": 45, "en": "journey", "jp": "旅", "hira": "たび", "mp3": "br_v45_journey.mp3" },
-
-    { "n": 46, "en": "once upon a time", "jp": "昔々", "hira": "むかしむかし", "mp3": "br_v46_once_upon_a_time.mp3" },
-    { "n": 47, "en": "suddenly", "jp": "突然", "hira": "とつぜん", "mp3": "br_v47_suddenly.mp3" },
-    { "n": 48, "en": "meanwhile", "jp": "その間に", "hira": "そのあいだに", "mp3": "br_v48_meanwhile.mp3" },
-    { "n": 49, "en": "because", "jp": "なぜなら", "hira": "なぜなら", "mp3": "br_v49_because.mp3" },
-    { "n": 50, "en": "so", "jp": "だから", "hira": "だから", "mp3": "br_v50_so.mp3" },
-    { "n": 51, "en": "but", "jp": "しかし", "hira": "しかし", "mp3": "br_v51_but.mp3" },
-    { "n": 52, "en": "first", "jp": "最初に", "hira": "さいしょに", "mp3": "br_v52_first.mp3" },
-    { "n": 53, "en": "next", "jp": "次に", "hira": "つぎに", "mp3": "br_v53_next.mp3" },
-    { "n": 54, "en": "then", "jp": "それから", "hira": "それから", "mp3": "br_v54_then.mp3" },
-    { "n": 55, "en": "after that", "jp": "その後", "hira": "そのあと", "mp3": "br_v55_after_that.mp3" },
-
-    { "n": 56, "en": "finally", "jp": "最後に", "hira": "さいごに", "mp3": "br_v56_finally.mp3" },
-    { "n": 57, "en": "climax", "jp": "クライマックス", "hira": "くらいまっくす", "mp3": "br_v57_climax.mp3" },
-    { "n": 58, "en": "cliffhanger", "jp": "クリフハンガー", "hira": "くりふはんがー", "mp3": "br_v58_cliffhanger.mp3" },
-    { "n": 59, "en": "quote", "jp": "引用", "hira": "いんよう", "mp3": "br_v59_quote.mp3" },
-    { "n": 60, "en": "sound effect", "jp": "効果音", "hira": "こうかおん", "mp3": "br_v60_sound_effect.mp3" }
+    {
+      "n": 1,
+      "en": "reflect on my goals",
+      "jp": "目標を振り返る",
+      "hira": "もくひょうをふりかえる",
+      "mp3": "br_v01_reflect_on_my_goals.mp3"
+    },
+    {
+      "n": 2,
+      "en": "create a summer schedule",
+      "jp": "夏のスケジュールを作成する",
+      "hira": "なつのすけじゅーるをさくせいする",
+      "mp3": "br_v02_create_a_summer_schedule.mp3"
+    },
+    {
+      "n": 3,
+      "en": "develop new habits",
+      "jp": "新しい習慣を身につける",
+      "hira": "あたらしいしゅうかんをみにつける",
+      "mp3": "br_v03_develop_new_habits.mp3"
+    },
+    {
+      "n": 4,
+      "en": "explore new hobbies",
+      "jp": "新しい趣味を探求する",
+      "hira": "あたらしいしゅみをたんきゅうする",
+      "mp3": "br_v04_explore_new_hobbies.mp3"
+    },
+    {
+      "n": 5,
+      "en": "plan outdoor activities",
+      "jp": "屋外活動を計画する",
+      "hira": "おくがいかつどうをけいかくする",
+      "mp3": "br_v05_plan_outdoor_activities.mp3"
+    },
+    {
+      "n": 6,
+      "en": "connect with friends",
+      "jp": "友達とつながる",
+      "hira": "ともだちとつながる",
+      "mp3": "br_v06_connect_with_friends.mp3"
+    },
+    {
+      "n": 7,
+      "en": "share experiences",
+      "jp": "経験を共有する",
+      "hira": "けいけんをきょうゆうする",
+      "mp3": "br_v07_share_experiences.mp3"
+    },
+    {
+      "n": 8,
+      "en": "set personal challenges",
+      "jp": "個人的な挑戦を設定する",
+      "hira": "こじんてきなちょうせんをせっていする",
+      "mp3": "br_v08_set_personal_challenges.mp3"
+    },
+    {
+      "n": 9,
+      "en": "enjoy quiet moments",
+      "jp": "静かな瞬間を楽しむ",
+      "hira": "しずかなしゅんかんをたのしむ",
+      "mp3": "br_v09_enjoy_quiet_moments.mp3"
+    },
+    {
+      "n": 10,
+      "en": "practice mindfulness",
+      "jp": "マインドフルネスを実践する",
+      "hira": "まいんどふるねすをじっせんする",
+      "mp3": "br_v10_practice_mindfulness.mp3"
+    },
+    {
+      "n": 11,
+      "en": "try new recipes",
+      "jp": "新しいレシピに挑戦する",
+      "hira": "あたらしいれしぴにちょうせんする",
+      "mp3": "br_v11_try_new_recipes.mp3"
+    },
+    {
+      "n": 12,
+      "en": "read books for fun",
+      "jp": "楽しみのために本を読む",
+      "hira": "たのしみのためにほんをよむ",
+      "mp3": "br_v12_read_books_for_fun.mp3"
+    },
+    {
+      "n": 13,
+      "en": "join a club",
+      "jp": "クラブに加入する",
+      "hira": "くらぶにかにゅうする",
+      "mp3": "br_v13_join_a_club.mp3"
+    },
+    {
+      "n": 14,
+      "en": "make art projects",
+      "jp": "アートプロジェクトを作る",
+      "hira": "あーとぷろじぇくとをつくる",
+      "mp3": "br_v14_make_art_projects.mp3"
+    },
+    {
+      "n": 15,
+      "en": "attend workshops",
+      "jp": "ワークショップに参加する",
+      "hira": "わーくしょっぷにさんかする",
+      "mp3": "br_v15_attend_workshops.mp3"
+    },
+    {
+      "n": 16,
+      "en": "write in a journal",
+      "jp": "日記を書く",
+      "hira": "にっきをかく",
+      "mp3": "br_v16_write_in_a_journal.mp3"
+    },
+    {
+      "n": 17,
+      "en": "cultivate friendships",
+      "jp": "友情を育む",
+      "hira": "ゆうじょうをはぐくむ",
+      "mp3": "br_v17_cultivate_friendships.mp3"
+    },
+    {
+      "n": 18,
+      "en": "explore nature",
+      "jp": "自然を探検する",
+      "hira": "しぜんをたんけんする",
+      "mp3": "br_v18_explore_nature.mp3"
+    },
+    {
+      "n": 19,
+      "en": "visit local events",
+      "jp": "地元のイベントに参加する",
+      "hira": "じもとのいべんとにさんかする",
+      "mp3": "br_v19_visit_local_events.mp3"
+    },
+    {
+      "n": 20,
+      "en": "reflect on past experiences",
+      "jp": "過去の経験を振り返る",
+      "hira": "かこのけいけんをふりかえる",
+      "mp3": "br_v20_reflect_on_past_experiences.mp3"
+    },
+    {
+      "n": 21,
+      "en": "set future goals",
+      "jp": "将来の目標を設定する",
+      "hira": "しょうらいのもくひょうをせっていする",
+      "mp3": "br_v21_set_future_goals.mp3"
+    },
+    {
+      "n": 22,
+      "en": "practice teamwork",
+      "jp": "チームワークを実践する",
+      "hira": "ちーむわーくをじっせんする",
+      "mp3": "br_v22_practice_teamwork.mp3"
+    },
+    {
+      "n": 23,
+      "en": "enjoy family time",
+      "jp": "家族との時間を楽しむ",
+      "hira": "かぞくとのじかんをたのしむ",
+      "mp3": "br_v23_enjoy_family_time.mp3"
+    },
+    {
+      "n": 24,
+      "en": "learn a new skill",
+      "jp": "新しいスキルを学ぶ",
+      "hira": "あたらしいすきるをまなぶ",
+      "mp3": "br_v24_learn_a_new_skill.mp3"
+    },
+    {
+      "n": 25,
+      "en": "organize community service",
+      "jp": "地域奉仕を企画する",
+      "hira": "ちいきほうしをきかくする",
+      "mp3": "br_v25_organize_community_service.mp3"
+    },
+    {
+      "n": 26,
+      "en": "explore local culture",
+      "jp": "地元の文化を探求する",
+      "hira": "じもとのぶんかをたんきゅうする",
+      "mp3": "br_v26_explore_local_culture.mp3"
+    },
+    {
+      "n": 27,
+      "en": "develop leadership skills",
+      "jp": "リーダーシップスキルを育む",
+      "hira": "りーだーしっぷすきるをはぐくむ",
+      "mp3": "br_v27_develop_leadership_skills.mp3"
+    },
+    {
+      "n": 28,
+      "en": "do volunteer work",
+      "jp": "ボランティア活動をする",
+      "hira": "ぼらんてぃあかつどうをする",
+      "mp3": "br_v28_do_volunteer_work.mp3"
+    },
+    {
+      "n": 29,
+      "en": "try outdoor sports",
+      "jp": "アウトドアスポーツを試みる",
+      "hira": "あうとどあすぽーつをこころみる",
+      "mp3": "br_v29_try_outdoor_sports.mp3"
+    },
+    {
+      "n": 30,
+      "en": "appreciate simple things",
+      "jp": "シンプルなことを大切にする",
+      "hira": "しんぷるなことをたいせつにする",
+      "mp3": "br_v30_appreciate_simple_things.mp3"
+    },
+    {
+      "n": 31,
+      "en": "take time for self-care",
+      "jp": "自己ケアの時間を作る",
+      "hira": "じこけあのじかんをつくる",
+      "mp3": "br_v31_take_time_for_self_care.mp3"
+    },
+    {
+      "n": 32,
+      "en": "explore different genres",
+      "jp": "異なるジャンルを探求する",
+      "hira": "ことなるじゃんるをたんきゅうする",
+      "mp3": "br_v32_explore_different_genres.mp3"
+    },
+    {
+      "n": 33,
+      "en": "engage in discussions",
+      "jp": "議論に参加する",
+      "hira": "ぎろんにさんかする",
+      "mp3": "br_v33_engage_in_discussions.mp3"
+    },
+    {
+      "n": 34,
+      "en": "develop a reading habit",
+      "jp": "読書習慣を育てる",
+      "hira": "どくしょしゅうかんをはぐくむ",
+      "mp3": "br_v34_develop_a_reading_habit.mp3"
+    },
+    {
+      "n": 35,
+      "en": "reflect on personal growth",
+      "jp": "自己成長を振り返る",
+      "hira": "じこせいちょうをふりかえる",
+      "mp3": "br_v35_reflect_on_personal_growth.mp3"
+    },
+    {
+      "n": 36,
+      "en": "set priorities for the year",
+      "jp": "年間の優先事項を設定する",
+      "hira": "ねんかんのゆうせんじこうをせっていする",
+      "mp3": "br_v36_set_priorities_for_the_year.mp3"
+    },
+    {
+      "n": 37,
+      "en": "learn about different cultures",
+      "jp": "異なる文化について学ぶ",
+      "hira": "ことなるぶんかについてまなぶ",
+      "mp3": "br_v37_learn_about_different_cultures.mp3"
+    },
+    {
+      "n": 38,
+      "en": "explore photography",
+      "jp": "写真撮影を探求する",
+      "hira": "しゃしんさつえいをたんきゅうする",
+      "mp3": "br_v38_explore_photography.mp3"
+    },
+    {
+      "n": 39,
+      "en": "experience new things",
+      "jp": "新しいことを体験する",
+      "hira": "あたらしいことをたいけんする",
+      "mp3": "br_v39_experience_new_things.mp3"
+    },
+    {
+      "n": 40,
+      "en": "make a scrapbook",
+      "jp": "スクラップブックを作る",
+      "hira": "すくらっぷぶっくをつくる",
+      "mp3": "br_v40_make_a_scrapbook.mp3"
+    },
+    {
+      "n": 41,
+      "en": "take a course online",
+      "jp": "オンラインコースを受講する",
+      "hira": "おんらいんこーすをじゅこうする",
+      "mp3": "br_v41_take_a_course_online.mp3"
+    },
+    {
+      "n": 42,
+      "en": "plan a study schedule",
+      "jp": "勉強スケジュールを計画する",
+      "hira": "べんきょうすけじゅーるをけいかくする",
+      "mp3": "br_v42_plan_a_study_schedule.mp3"
+    },
+    {
+      "n": 43,
+      "en": "practice public speaking",
+      "jp": "パブリックスピーキングを練習する",
+      "hira": "ぱぶりっくすぴーきんぐをれんしゅうする",
+      "mp3": "br_v43_practice_public_speaking.mp3"
+    },
+    {
+      "n": 44,
+      "en": "explore local history",
+      "jp": "地元の歴史を探求する",
+      "hira": "じもとのれきしをたんきゅうする",
+      "mp3": "br_v44_explore_local_history.mp3"
+    },
+    {
+      "n": 45,
+      "en": "build a community",
+      "jp": "コミュニティを作る",
+      "hira": "こみゅにてぃをつくる",
+      "mp3": "br_v45_build_a_community.mp3"
+    },
+    {
+      "n": 46,
+      "en": "plan for future events",
+      "jp": "将来のイベントを計画する",
+      "hira": "しょうらいのいべんとをけいかくする",
+      "mp3": "br_v46_plan_for_future_events.mp3"
+    },
+    {
+      "n": 47,
+      "en": "discover new interests",
+      "jp": "新しい興味を発見する",
+      "hira": "あたらしいきょうみをはっけんする",
+      "mp3": "br_v47_discover_new_interests.mp3"
+    },
+    {
+      "n": 48,
+      "en": "develop patience",
+      "jp": "忍耐力を育てる",
+      "hira": "にんたいりょくをはぐくむ",
+      "mp3": "br_v48_develop_patience.mp3"
+    },
+    {
+      "n": 49,
+      "en": "take part in festivals",
+      "jp": "祭りに参加する",
+      "hira": "まつりにさんかする",
+      "mp3": "br_v49_take_part_in_festivals.mp3"
+    },
+    {
+      "n": 50,
+      "en": "enjoy outdoor adventures",
+      "jp": "屋外の冒険を楽しむ",
+      "hira": "おくがいのぼうけんをたのしむ",
+      "mp3": "br_v50_enjoy_outdoor_adventures.mp3"
+    },
+    {
+      "n": 51,
+      "en": "make new friends",
+      "jp": "新しい友達を作る",
+      "hira": "あたらしいともだちをつくる",
+      "mp3": "br_v51_make_new_friends.mp3"
+    },
+    {
+      "n": 52,
+      "en": "embrace challenges",
+      "jp": "挑戦を受け入れる",
+      "hira": "ちょうせんをうけいれる",
+      "mp3": "br_v52_embrace_challenges.mp3"
+    },
+    {
+      "n": 53,
+      "en": "explore personal interests",
+      "jp": "個人的な興味を探求する",
+      "hira": "こじんてきなきょうみをたんきゅうする",
+      "mp3": "br_v53_explore_personal_interests.mp3"
+    },
+    {
+      "n": 54,
+      "en": "manage time wisely",
+      "jp": "時間を賢く管理する",
+      "hira": "じかんをかしこくかんりする",
+      "mp3": "br_v54_manage_time_wisely.mp3"
+    },
+    {
+      "n": 55,
+      "en": "create a vision board",
+      "jp": "ビジョンボードを作成する",
+      "hira": "びじょんぼーどをさくせいする",
+      "mp3": "br_v55_create_a_vision_board.mp3"
+    },
+    {
+      "n": 56,
+      "en": "learn from experiences",
+      "jp": "経験から学ぶ",
+      "hira": "けいけんからまなぶ",
+      "mp3": "br_v56_learn_from_experiences.mp3"
+    },
+    {
+      "n": 57,
+      "en": "initiate conversations",
+      "jp": "会話を始める",
+      "hira": "かいわをはじめる",
+      "mp3": "br_v57_initiate_conversations.mp3"
+    },
+    {
+      "n": 58,
+      "en": "establish a routine",
+      "jp": "ルーチンを確立する",
+      "hira": "るーちんをかくりつする",
+      "mp3": "br_v58_establish_a_routine.mp3"
+    },
+    {
+      "n": 59,
+      "en": "evaluate progress",
+      "jp": "進捗を評価する",
+      "hira": "しんちょくをひょうかする",
+      "mp3": "br_v59_evaluate_progress.mp3"
+    },
+    {
+      "n": 60,
+      "en": "celebrate achievements",
+      "jp": "成果を祝う",
+      "hira": "せいかをいわう",
+      "mp3": "br_v60_celebrate_achievements.mp3"
+    }
   ]
 }

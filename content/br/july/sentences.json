@@ -1,76 +1,424 @@
-
 {
   "cards": [
-    { "n": 1, "en": "Once upon a time, there was a brave hero.", "jp": "昔々、勇敢なヒーローがいました。", "hira": "むかしむかし ゆうかん な ひーろー が いました", "mp3": "br_s01_once_upon_a_time_there_was_a_brave_hero.mp3" },
-    { "n": 2, "en": "There was a big castle in the forest.", "jp": "森の中に大きな城がありました。", "hira": "もり の なか に おおきな しろ が ありました", "mp3": "br_s02_there_was_a_big_castle_in_the_forest.mp3" },
-    { "n": 3, "en": "The hero met a witch in the forest.", "jp": "ヒーローは森で魔女に会いました。", "hira": "ひーろー は もり で まじょ に あいました", "mp3": "br_s03_the_hero_met_a_witch_in_the_forest.mp3" },
-    { "n": 4, "en": "The witch gave him a magic spell.", "jp": "魔女は彼に魔法の呪文をあげました。", "hira": "まじょ は かれ に まほう の じゅもん を あげました", "mp3": "br_s04_the_witch_gave_him_a_magic_spell.mp3" },
-    { "n": 5, "en": "He fought a dragon and won the battle.", "jp": "彼はドラゴンと戦い、勝ちました。", "hira": "かれ は どらごん と たたかい かちました", "mp3": "br_s05_he_fought_a_dragon_and_won_the_battle.mp3" },
-
-    { "n": 6, "en": "The giant guarded the treasure.", "jp": "巨人は宝物を守っていました。", "hira": "きょじん は たからもの を まもっていました", "mp3": "br_s06_the_giant_guarded_the_treasure.mp3" },
-    { "n": 7, "en": "The wolf was hiding behind a tree.", "jp": "オオカミは木の後ろに隠れていました。", "hira": "おおかみ は き の うしろ に かくれていました", "mp3": "br_s07_the_wolf_was_hiding_behind_a_tree.mp3" },
-    { "n": 8, "en": "The princess lived in a tall tower.", "jp": "お姫様は高い塔に住んでいました。", "hira": "おひめさま は たかい とう に すんでいました", "mp3": "br_s08_the_princess_lived_in_a_tall_tower.mp3" },
-    { "n": 9, "en": "The hero opened the secret door.", "jp": "ヒーローは秘密のドアを開けました。", "hira": "ひーろー は ひみつ の どあ を あけました", "mp3": "br_s09_the_hero_opened_the_secret_door.mp3" },
-    { "n": 10, "en": "They found a map inside the castle.", "jp": "彼らは城の中で地図を見つけました。", "hira": "かれら は しろ の なか で ちず を みつけました", "mp3": "br_s10_they_found_a_map_inside_the_castle.mp3" },
-
-    { "n": 11, "en": "The spell broke at midnight.", "jp": "呪文は真夜中に解けました。", "hira": "じゅもん は まよなか に とけました", "mp3": "br_s11_the_spell_broke_at_midnight.mp3" },
-    { "n": 12, "en": "The hero saved the village.", "jp": "ヒーローは村を救いました。", "hira": "ひーろー は むら を すくいました", "mp3": "br_s12_the_hero_saved_the_village.mp3" },
-    { "n": 13, "en": "In the end, peace returned to the land.", "jp": "最後に、その地に平和が戻りました。", "hira": "さいご に その ち に へいわ が もどりました", "mp3": "br_s13_in_the_end_peace_returned_to_the_land.mp3" },
-    { "n": 14, "en": "This tale teaches an important lesson.", "jp": "この物語は大切な教訓を教えます。", "hira": "この ものがたり は たいせつ な きょうくん を おしえます", "mp3": "br_s14_this_tale_teaches_an_important_lesson.mp3" },
-    { "n": 15, "en": "Everyone celebrated the victory.", "jp": "みんなが勝利を祝いました。", "hira": "みんな が しょうり を いわいました", "mp3": "br_s15_everyone_celebrated_the_victory.mp3" },
-
-    { "n": 16, "en": "First, I choose a setting for my story.", "jp": "まず、物語の設定を選びます。", "hira": "まず ものがたり の せってい を えらびます", "mp3": "br_s16_first_i_choose_a_setting_for_my_story.mp3" },
-    { "n": 17, "en": "Next, I plan the plot.", "jp": "次に、あらすじを考えます。", "hira": "つぎ に あらすじ を かんがえます", "mp3": "br_s17_next_i_plan_the_plot.mp3" },
-    { "n": 18, "en": "Then I write a draft.", "jp": "それから下書きを書きます。", "hira": "それから したがき を かきます", "mp3": "br_s18_then_i_write_a_draft.mp3" },
-    { "n": 19, "en": "I add dialogue between the characters.", "jp": "登場人物の会話を書き加えます。", "hira": "とうじょうじんぶつ の かいわ を かきくわえます", "mp3": "br_s19_i_add_dialogue_between_the_characters.mp3" },
-    { "n": 20, "en": "I describe the setting clearly.", "jp": "設定をわかりやすく説明します。", "hira": "せってい を わかりやすく せつめい します", "mp3": "br_s20_i_describe_the_setting_clearly.mp3" },
-
-    { "n": 21, "en": "The narrator tells the story.", "jp": "語り手が物語を語ります。", "hira": "かたりて が ものがたり を かたります", "mp3": "br_s21_the_narrator_tells_the_story.mp3" },
-    { "n": 22, "en": "The conflict makes the story exciting.", "jp": "対立が物語を面白くします。", "hira": "たいりつ が ものがたり を おもしろく します", "mp3": "br_s22_the_conflict_makes_the_story_exciting.mp3" },
-    { "n": 23, "en": "The solution surprised the readers.", "jp": "解決は読者を驚かせました。", "hira": "かいけつ は どくしゃ を おどろかせました", "mp3": "br_s23_the_solution_surprised_the_readers.mp3" },
-    { "n": 24, "en": "Each paragraph has one main idea.", "jp": "各段落には一つの主な考えがあります。", "hira": "かく だんらく に は ひとつ の おもな かんがえ が あります", "mp3": "br_s24_each_paragraph_has_one_main_idea.mp3" },
-    { "n": 25, "en": "I checked my sentences carefully.", "jp": "文を注意して確認しました。", "hira": "ぶん を ちゅうい して かくにん しました", "mp3": "br_s25_i_checked_my_sentences_carefully.mp3" },
-
-    { "n": 26, "en": "After that, I edited my story.", "jp": "その後、物語を編集しました。", "hira": "そのあと ものがたり を へんしゅう しました", "mp3": "br_s26_after_that_i_edited_my_story.mp3" },
-    { "n": 27, "en": "Finally, I wrote the ending.", "jp": "最後に結末を書きました。", "hira": "さいご に けつまつ を かきました", "mp3": "br_s27_finally_i_wrote_the_ending.mp3" },
-    { "n": 28, "en": "My story has a happy ending.", "jp": "私の物語はハッピーエンドです。", "hira": "わたし の ものがたり は はっぴーえんど です", "mp3": "br_s28_my_story_has_a_happy_ending.mp3" },
-    { "n": 29, "en": "The climax was very dramatic.", "jp": "クライマックスはとても劇的でした。", "hira": "くらいまっくす は とても げきてき でした", "mp3": "br_s29_the_climax_was_very_dramatic.mp3" },
-    { "n": 30, "en": "Let’s share our stories with the class.", "jp": "クラスで物語を共有しましょう。", "hira": "くらす で ものがたり を きょうゆう しましょう", "mp3": "br_s30_lets_share_our_stories_with_the_class.mp3" },
-
-    { "n": 31, "en": "My character is brave and kind.", "jp": "私の登場人物は勇敢で優しいです。", "hira": "わたし の とうじょうじんぶつ は ゆうかん で やさしい です", "mp3": "br_s31_my_character_is_brave_and_kind.mp3" },
-    { "n": 32, "en": "He is shy but clever.", "jp": "彼は恥ずかしがり屋ですが賢いです。", "hira": "かれ は はずかしがりや ですが かしこい です", "mp3": "br_s32_he_is_shy_but_clever.mp3" },
-    { "n": 33, "en": "She has a strong personality.", "jp": "彼女は強い性格を持っています。", "hira": "かのじょ は つよい せいかく を もっています", "mp3": "br_s33_she_has_a_strong_personality.mp3" },
-    { "n": 34, "en": "He has a special power.", "jp": "彼は特別な力を持っています。", "hira": "かれ は とくべつ な ちから を もっています", "mp3": "br_s34_he_has_a_special_power.mp3" },
-    { "n": 35, "en": "They can talk to animals.", "jp": "彼らは動物と話せます。", "hira": "かれら は どうぶつ と はなせます", "mp3": "br_s35_they_can_talk_to_animals.mp3" },
-
-    { "n": 36, "en": "She was afraid of the dark.", "jp": "彼女は暗闇を怖がっていました。", "hira": "かのじょ は くらやみ を こわがっていました", "mp3": "br_s36_she_was_afraid_of_the_dark.mp3" },
-    { "n": 37, "en": "He learned from his mistake.", "jp": "彼は自分の間違いから学びました。", "hira": "かれ は じぶん の まちがい から まなびました", "mp3": "br_s37_he_learned_from_his_mistake.mp3" },
-    { "n": 38, "en": "They worked together as a team.", "jp": "彼らはチームとして協力しました。", "hira": "かれら は ちーむ として きょうりょく しました", "mp3": "br_s38_they_worked_together_as_a_team.mp3" },
-    { "n": 39, "en": "The sidekick helped the hero.", "jp": "相棒がヒーローを助けました。", "hira": "あいぼう が ひーろー を たすけました", "mp3": "br_s39_the_sidekick_helped_the_hero.mp3" },
-    { "n": 40, "en": "Her goal was to save her family.", "jp": "彼女の目標は家族を救うことでした。", "hira": "かのじょ の もくひょう は かぞく を すくう こと でした", "mp3": "br_s40_her_goal_was_to_save_her_family.mp3" },
-
-    { "n": 41, "en": "He never gave up.", "jp": "彼は決してあきらめませんでした。", "hira": "かれ は けっして あきらめませんでした", "mp3": "br_s41_he_never_gave_up.mp3" },
-    { "n": 42, "en": "She became stronger than before.", "jp": "彼女は前より強くなりました。", "hira": "かのじょ は まえ より つよく なりました", "mp3": "br_s42_she_became_stronger_than_before.mp3" },
-    { "n": 43, "en": "They trusted each other.", "jp": "彼らはお互いを信じていました。", "hira": "かれら は おたがい を しんじていました", "mp3": "br_s43_they_trusted_each_other.mp3" },
-    { "n": 44, "en": "Fear made him hesitate.", "jp": "恐れが彼をためらわせました。", "hira": "おそれ が かれ を ためらわせました", "mp3": "br_s44_fear_made_him_hesitate.mp3" },
-    { "n": 45, "en": "In the end, they achieved their goal.", "jp": "最後に、彼らは目標を達成しました。", "hira": "さいご に かれら は もくひょう を たっせい しました", "mp3": "br_s45_in_the_end_they_achieved_their_goal.mp3" },
-
-    { "n": 46, "en": "First, they prepared for the journey.", "jp": "まず、彼らは旅の準備をしました。", "hira": "まず かれら は たび の じゅんび を しました", "mp3": "br_s46_first_they_prepared_for_the_journey.mp3" },
-    { "n": 47, "en": "Next, they entered the dark forest.", "jp": "次に、暗い森に入りました。", "hira": "つぎ に くらい もり に はいりました", "mp3": "br_s47_next_they_entered_the_dark_forest.mp3" },
-    { "n": 48, "en": "Then they heard a strange sound.", "jp": "それから奇妙な音を聞きました。", "hira": "それから きみょう な おと を ききました", "mp3": "br_s48_then_they_heard_a_strange_sound.mp3" },
-    { "n": 49, "en": "Because it was late, they stopped.", "jp": "遅かったので、彼らは止まりました。", "hira": "おそかった ので かれら は とまりました", "mp3": "br_s49_because_it_was_late_they_stopped.mp3" },
-    { "n": 50, "en": "But they did not lose hope.", "jp": "しかし、彼らは希望を失いませんでした。", "hira": "しかし かれら は きぼう を うしないませんでした", "mp3": "br_s50_but_they_did_not_lose_hope.mp3" },
-
-    { "n": 51, "en": "Meanwhile, the villain was watching.", "jp": "その間に、悪役は見ていました。", "hira": "そのあいだ に あくやく は みていました", "mp3": "br_s51_meanwhile_the_villain_was_watching.mp3" },
-    { "n": 52, "en": "Suddenly, the door opened.", "jp": "突然、ドアが開きました。", "hira": "とつぜん どあ が あきました", "mp3": "br_s52_suddenly_the_door_opened.mp3" },
-    { "n": 53, "en": "After that, everything changed.", "jp": "その後、すべてが変わりました。", "hira": "そのあと すべて が かわりました", "mp3": "br_s53_after_that_everything_changed.mp3" },
-    { "n": 54, "en": "Therefore, they made a new plan.", "jp": "そのため、彼らは新しい計画を立てました。", "hira": "そのため かれら は あたらしい けいかく を たてました", "mp3": "br_s54_therefore_they_made_a_new_plan.mp3" },
-    { "n": 55, "en": "Finally, they returned home.", "jp": "最後に、彼らは家に帰りました。", "hira": "さいご に かれら は いえ に かえりました", "mp3": "br_s55_finally_they_returned_home.mp3" },
-
-    { "n": 56, "en": "In contrast, the villain felt lonely.", "jp": "対照的に、悪役は孤独を感じていました。", "hira": "たいしょうてき に あくやく は こどく を かんじていました", "mp3": "br_s56_in_contrast_the_villain_felt_lonely.mp3" },
-    { "n": 57, "en": "As a result, the village was safe.", "jp": "その結果、村は安全でした。", "hira": "そのけっか むら は あんぜん でした", "mp3": "br_s57_as_a_result_the_village_was_safe.mp3" },
-    { "n": 58, "en": "At first, they were confused.", "jp": "最初、彼らは混乱していました。", "hira": "さいしょ かれら は こんらん していました", "mp3": "br_s58_at_first_they_were_confused.mp3" },
-    { "n": 59, "en": "Later, they understood the truth.", "jp": "後で、彼らは真実を理解しました。", "hira": "あとで かれら は しんじつ を りかい しました", "mp3": "br_s59_later_they_understood_the_truth.mp3" },
-    { "n": 60, "en": "And so, a new adventure began.", "jp": "そして、新しい冒険が始まりました。", "hira": "そして あたらしい ぼうけん が はじまりました", "mp3": "br_s60_and_so_a_new_adventure_began.mp3" }
+    {
+      "n": 1,
+      "en": "During summer, I enjoy swimming in the ocean.",
+      "jp": "夏の間、私は海で泳ぐのを楽しみます。",
+      "hira": "なつのあいだ、わたしはうみでおよぐのをたのしみます。",
+      "mp3": "br_s01_during_summer_i_enjoy_swimming_in_the_ocean.mp3"
+    },
+    {
+      "n": 2,
+      "en": "I like to read books under a tree while it’s sunny.",
+      "jp": "私は晴れているときに木の下で本を読むのが好きです。",
+      "hira": "わたしははれているときにきのしたでほんをよむのがすきです。",
+      "mp3": "br_s02_i_like_to_read_books_under_a_tree_while_it_s_sunny.mp3"
+    },
+    {
+      "n": 3,
+      "en": "My favorite summer activity is going to the beach with friends.",
+      "jp": "私の好きな夏の活動は友達と海に行くことです。",
+      "hira": "わたしのすきななつのかつどうはともだちとうみにいくことです。",
+      "mp3": "br_s03_my_favorite_summer_activity_is_going_to_the_beach_with_friends.mp3"
+    },
+    {
+      "n": 4,
+      "en": "I often visit my grandparents' house during the summer.",
+      "jp": "私は夏の間に祖父母の家を訪れます。",
+      "hira": "わたしはなつのあいだにそふぼのいえをおとずれます。",
+      "mp3": "br_s04_i_often_visit_my_grandparents_house_during_the_summer.mp3"
+    },
+    {
+      "n": 5,
+      "en": "Every summer, I learn a new skill like painting or cooking.",
+      "jp": "毎年夏、私は絵を描いたり料理を学んだりします。",
+      "hira": "まいとしなつ、わたしはえをかいたりりょうりをまなったりします。",
+      "mp3": "br_s05_every_summer_i_learn_a_new_skill_like_painting_or_cooking.mp3"
+    },
+    {
+      "n": 6,
+      "en": "I usually go camping with my family in the mountains.",
+      "jp": "私は通常、家族と一緒に山でキャンプをします。",
+      "hira": "わたしはつうじょう、かぞくといっしょにやまできゃんぷをします。",
+      "mp3": "br_s06_i_usually_go_camping_with_my_family_in_the_mountains.mp3"
+    },
+    {
+      "n": 7,
+      "en": "My friends and I often play soccer at the park in summer.",
+      "jp": "私の友達と私は夏に公園でサッカーをよくします。",
+      "hira": "わたしのともだちとわたしはなつにこうえんでさっかーをよくします。",
+      "mp3": "br_s07_my_friends_and_i_often_play_soccer_at_the_park_in_summer.mp3"
+    },
+    {
+      "n": 8,
+      "en": "I love going for walks in the evenings when it’s cooler.",
+      "jp": "私は涼しい夕方に散歩するのが大好きです。",
+      "hira": "わたしはすずしいゆうがたにさんぽするのがだいすきです。",
+      "mp3": "br_s08_i_love_going_for_walks_in_the_evenings_when_it_s_cooler.mp3"
+    },
+    {
+      "n": 9,
+      "en": "This summer, I want to visit a festival with my friends.",
+      "jp": "今夏、私は友達と一緒に祭りを訪れたいです。",
+      "hira": "こんなつ、わたしはともだちといっしょにまつりをおとずれたいです。",
+      "mp3": "br_s09_this_summer_i_want_to_visit_a_festival_with_my_friends.mp3"
+    },
+    {
+      "n": 10,
+      "en": "I plan to take more photos to remember my summer adventures.",
+      "jp": "私は夏の冒険を思い出すためにもっと写真を撮る予定です。",
+      "hira": "わたしはなつのぼうけんをおもいだすためにもっとしゃしんをとるよていです。",
+      "mp3": "br_s10_i_plan_to_take_more_photos_to_remember_my_summer_adventures.mp3"
+    },
+    {
+      "n": 11,
+      "en": "I enjoy biking on the beach while feeling the breeze.",
+      "jp": "私は風を感じながら海岸で自転車に乗るのを楽しみます。",
+      "hira": "わたしはかぜをかんじながらかいがんでじてんしゃにのるのをたのしみます。",
+      "mp3": "br_s11_i_enjoy_biking_on_the_beach_while_feeling_the_breeze.mp3"
+    },
+    {
+      "n": 12,
+      "en": "Visiting a zoo is a fun summer activity for me.",
+      "jp": "動物園を訪れることは私にとって楽しい夏の活動です。",
+      "hira": "どうぶつえんをおとずれることはわたしにとってたのしいなつのかつどうです。",
+      "mp3": "br_s12_visiting_a_zoo_is_a_fun_summer_activity_for_me.mp3"
+    },
+    {
+      "n": 13,
+      "en": "I often play video games with my friends online during summer.",
+      "jp": "私は夏の間に友達とオンラインでビデオゲームをよくします。",
+      "hira": "わたしはなつのあいだにともだちとおんらいんでびでおげーむをよくします。",
+      "mp3": "br_s13_i_often_play_video_games_with_my_friends_online_during_summer.mp3"
+    },
+    {
+      "n": 14,
+      "en": "I like to try new ice cream flavors during hot days.",
+      "jp": "私は暑い日には新しいアイスクリームの味を試すのが好きです。",
+      "hira": "わたしはあついひにはあたらしいあいすくりーむのあじをためすのがすきです。",
+      "mp3": "br_s14_i_like_to_try_new_ice_cream_flavors_during_hot_days.mp3"
+    },
+    {
+      "n": 15,
+      "en": "Summer nights are perfect for stargazing with friends.",
+      "jp": "夏の夜は友達と星を見るのに最適です。",
+      "hira": "なつのよるはともだちとほしをみるのにさいてきです。",
+      "mp3": "br_s15_summer_nights_are_perfect_for_stargazing_with_friends.mp3"
+    },
+    {
+      "n": 16,
+      "en": "I usually make a scrapbook of my summer memories.",
+      "jp": "私は通常、夏の思い出のスクラップブックを作ります。",
+      "hira": "わたしはつうじょう、なつのおもいでのすくらっぷぶっくをつくります。",
+      "mp3": "br_s16_i_usually_make_a_scrapbook_of_my_summer_memories.mp3"
+    },
+    {
+      "n": 17,
+      "en": "I want to learn how to cook a new dish this summer.",
+      "jp": "私は今夏、新しい料理を作る方法を学びたいです。",
+      "hira": "わたしはこんなつ、あたらしいりょうりをつくるほうほうをまなびたいです.",
+      "mp3": "br_s17_i_want_to_learn_how_to_cook_a_new_dish_this_summer.mp3"
+    },
+    {
+      "n": 18,
+      "en": "My friends and I will organize a picnic at the park soon.",
+      "jp": "私の友達と私はすぐに公園でピクニックを計画します。",
+      "hira": "わたしのともだちとわたしはすぐにこうえんでぴくにっくをけいかくします。",
+      "mp3": "br_s18_my_friends_and_i_will_organize_a_picnic_at_the_park_soon.mp3"
+    },
+    {
+      "n": 19,
+      "en": "I often write in my journal during quiet summer evenings.",
+      "jp": "私は静かな夏の夕方に日記を書くことがよくあります。",
+      "hira": "わたしはしずかななつのゆうがたににっきをかくことがよくあります。",
+      "mp3": "br_s19_i_often_write_in_my_journal_during_quiet_summer_evenings.mp3"
+    },
+    {
+      "n": 20,
+      "en": "This year, I aim to read five new books before school starts.",
+      "jp": "今年、私は学校が始まる前に5冊の新しい本を読むことを目指しています。",
+      "hira": "ことし、わたしはがっこうがはじまるまえにごさつのあたらしいほんをよむことをめざしています。",
+      "mp3": "br_s20_this_year_i_aim_to_read_five_new_books_before_school_starts.mp3"
+    },
+    {
+      "n": 21,
+      "en": "Going to summer camp helps me make new friends.",
+      "jp": "夏のキャンプに行くことは新しい友達を作るのに役立ちます。",
+      "hira": "なつのきゃんぷにいくことはあたらしいともだちをつくるのにやくだちます。",
+      "mp3": "br_s21_going_to_summer_camp_helps_me_make_new_friends.mp3"
+    },
+    {
+      "n": 22,
+      "en": "I often help my parents with gardening during the summer.",
+      "jp": "私は夏の間に両親の庭仕事を手伝うことがよくあります。",
+      "hira": "わたしはなつのあいだにりょうしんのにわしごとをてつだうことがよくあります。",
+      "mp3": "br_s22_i_often_help_my_parents_with_gardening_during_the_summer.mp3"
+    },
+    {
+      "n": 23,
+      "en": "I plan to attend a workshop to learn about photography.",
+      "jp": "私は写真について学ぶためのワークショップに参加する予定です。",
+      "hira": "わたしはしゃしんについてまなぶためのわーくしょっぷにさんかするよていです。",
+      "mp3": "br_s23_i_plan_to_attend_a_workshop_to_learn_about_photography.mp3"
+    },
+    {
+      "n": 24,
+      "en": "My summer goal is to become better at playing the guitar.",
+      "jp": "私の夏の目標はギターを上達させることです。",
+      "hira": "わたしのなつのもくひょうはぎたーをじょうたつさせることです。",
+      "mp3": "br_s24_my_summer_goal_is_to_become_better_at_playing_the_guitar.mp3"
+    },
+    {
+      "n": 25,
+      "en": "I enjoy cooking meals and trying new recipes in summer.",
+      "jp": "私は夏に料理を作り、新しいレシピを試すのが楽しいです。",
+      "hira": "わたしはなつにりょうりをつくり、あたらしいれしぴをためすのがたのしいです。",
+      "mp3": "br_s25_i_enjoy_cooking_meals_and_trying_new_recipes_in_summer.mp3"
+    },
+    {
+      "n": 26,
+      "en": "Having a barbecue with friends is a great summer activity.",
+      "jp": "友達とバーベキューをすることは素晴らしい夏の活動です。",
+      "hira": "ともだちとばーべきゅーをすることはすばらしいなつのかつどうです。",
+      "mp3": "br_s26_having_a_barbecue_with_friends_is_a_great_summer_activity.mp3"
+    },
+    {
+      "n": 27,
+      "en": "I like to collect seashells when I walk along the shore.",
+      "jp": "海岸を歩くときに貝殻を集めるのが好きです。",
+      "hira": "かいがんをあるくときにかいがらをあつめるのがすきです。",
+      "mp3": "br_s27_i_like_to_collect_seashells_when_i_walk_along_the_shore.mp3"
+    },
+    {
+      "n": 28,
+      "en": "I often watch movies with my family during rainy summer days.",
+      "jp": "私は雨の日の夏に家族と映画をよく見ます。",
+      "hira": "わたしはあめのひのなつにかぞくとえいがをよくみます。",
+      "mp3": "br_s28_i_often_watch_movies_with_my_family_during_rainy_summer_days.mp3"
+    },
+    {
+      "n": 29,
+      "en": "I want to improve my English skills before school starts.",
+      "jp": "学校が始まる前に英語のスキルを向上させたいです。",
+      "hira": "がっこうがはじまるまえにえいごのすきるをこうじょうさせたいです。",
+      "mp3": "br_s29_i_want_to_improve_my_english_skills_before_school_starts.mp3"
+    },
+    {
+      "n": 30,
+      "en": "I plan to volunteer at a local charity this summer.",
+      "jp": "私は今夏、地元の慈善団体でボランティアをする予定です。",
+      "hira": "わたしはこんなつ、じもとのじえんだんたいでぼらんてぃあをするよていです。",
+      "mp3": "br_s30_i_plan_to_volunteer_at_a_local_charity_this_summer.mp3"
+    },
+    {
+      "n": 31,
+      "en": "I enjoy creating art projects during my free time.",
+      "jp": "私は自由な時間にアートプロジェクトを作るのを楽しみます。",
+      "hira": "わたしはじゆうなじかんにあーとぷろじぇくとをつくるのをたのしみます。",
+      "mp3": "br_s31_i_enjoy_creating_art_projects_during_my_free_time.mp3"
+    },
+    {
+      "n": 32,
+      "en": "I often play board games with my family on weekends.",
+      "jp": "私は週末に家族とボードゲームをよくします。",
+      "hira": "わたしはしゅうまつにかぞくとぼーどげーむをよくします。",
+      "mp3": "br_s32_i_often_play_board_games_with_my_family_on_weekends.mp3"
+    },
+    {
+      "n": 33,
+      "en": "I want to explore new places in my city this summer.",
+      "jp": "私は今夏、自分の街の新しい場所を探検したいです。",
+      "hira": "わたしはこんなつ、じぶんのまちのあたらしいばしょをたんけんしたいです。",
+      "mp3": "br_s33_i_want_to_explore_new_places_in_my_city_this_summer.mp3"
+    },
+    {
+      "n": 34,
+      "en": "I like to visit parks where I can relax and enjoy nature.",
+      "jp": "私はリラックスして自然を楽しめる公園を訪れるのが好きです。",
+      "hira": "わたしはりらっくすしてしぜんをたのしめるこうえんをおとずれるのがすきです。",
+      "mp3": "br_s34_i_like_to_visit_parks_where_i_can_relax_and_enjoy_nature.mp3"
+    },
+    {
+      "n": 35,
+      "en": "I want to take swimming lessons to improve my skills.",
+      "jp": "私はスキルを向上させるために水泳のレッスンを受けたいです。",
+      "hira": "わたしはすきるをこうじょうさせるためにすいえいのれっすんをうけたいです。",
+      "mp3": "br_s35_i_want_to_take_swimming_lessons_to_improve_my_skills.mp3"
+    },
+    {
+      "n": 36,
+      "en": "I often help my neighbors with their gardens during summer.",
+      "jp": "私は夏の間に隣人の庭仕事を手伝います。",
+      "hira": "わたしはなつのあいだにりんじんのにわしごとをてつだいます。",
+      "mp3": "br_s36_i_often_help_my_neighbors_with_their_gardens_during_summer.mp3"
+    },
+    {
+      "n": 37,
+      "en": "I look forward to going on a family trip this summer.",
+      "jp": "私は今夏、家族旅行に行くのを楽しみにしています。",
+      "hira": "わたしはこんなつ、かぞくりょこうにいくのをたのしみにしています。",
+      "mp3": "br_s37_i_look_forward_to_going_on_a_family_trip_this_summer.mp3"
+    },
+    {
+      "n": 38,
+      "en": "I enjoy listening to music while relaxing at home.",
+      "jp": "私は家でリラックスしながら音楽を聞くのが好きです。",
+      "hira": "わたしはうちでりらっくすしながらおんがくをきくのがすきです。",
+      "mp3": "br_s38_i_enjoy_listening_to_music_while_relaxing_at_home.mp3"
+    },
+    {
+      "n": 39,
+      "en": "I hope to take a trip to a new country next year.",
+      "jp": "来年、新しい国に旅行に行きたいと思っています。",
+      "hira": "らいねん、あたらしいくににりょこうにいきたいとおもっています。",
+      "mp3": "br_s39_i_hope_to_take_a_trip_to_a_new_country_next_year.mp3"
+    },
+    {
+      "n": 40,
+      "en": "I often help my friends with their homework during summer break.",
+      "jp": "私は夏休み中に友達の宿題を手伝うことがよくあります。",
+      "hira": "わたしはなつやすみちゅうにともだちのしゅくだいをてつだうことがよくあります。",
+      "mp3": "br_s40_i_often_help_my_friends_with_their_homework_during_summer_break.mp3"
+    },
+    {
+      "n": 41,
+      "en": "I enjoy visiting new places and meeting new people.",
+      "jp": "新しい場所を訪れたり、新しい人に会ったりするのが楽しいです。",
+      "hira": "あたらしいばしょをおとずれたり、あたらしいひとにあったりするのがたのしいです。",
+      "mp3": "br_s41_i_enjoy_visiting_new_places_and_meeting_new_people.mp3"
+    },
+    {
+      "n": 42,
+      "en": "I like to practice my sports skills during the summer.",
+      "jp": "私は夏の間にスポーツのスキルを練習するのが好きです。",
+      "hira": "わたしはなつのあいだにすぽーつのすきるをれんしゅうするのがすきです。",
+      "mp3": "br_s42_i_like_to_practice_my_sports_skills_during_the_summer.mp3"
+    },
+    {
+      "n": 43,
+      "en": "I plan to join a summer reading club at the library.",
+      "jp": "私は図書館で夏の読書クラブに参加する予定です。",
+      "hira": "わたしはとしょかんでなつのどくしょくらぶにさんかするよていです.",
+      "mp3": "br_s43_i_plan_to_join_a_summer_reading_club_at_the_library.mp3"
+    },
+    {
+      "n": 44,
+      "en": "I like to take long walks in nature to clear my mind.",
+      "jp": "私は心をすっきりさせるために自然の中を長く歩くのが好きです。",
+      "hira": "わたしはこころをすっきりさせるためにしぜんのなかをながくあるくのがすきです。",
+      "mp3": "br_s44_i_like_to_take_long_walks_in_nature_to_clear_my_mind.mp3"
+    },
+    {
+      "n": 45,
+      "en": "I want to learn how to play a new musical instrument this summer.",
+      "jp": "私は今夏、新しい楽器の演奏を学びたいです。",
+      "hira": "わたしはこんなつ、あたらしいがっきのえんそうをまなびたいです。",
+      "mp3": "br_s45_i_want_to_learn_how_to_play_a_new_musical_instrument_this_summer.mp3"
+    },
+    {
+      "n": 46,
+      "en": "I plan to attend online classes to improve my skills.",
+      "jp": "私はスキルを向上させるためにオンラインクラスに参加する予定です。",
+      "hira": "わたしはすきるをこうじょうさせるためにおんらいんくらすにさんかするよていです。",
+      "mp3": "br_s46_i_plan_to_attend_online_classes_to_improve_my_skills.mp3"
+    },
+    {
+      "n": 47,
+      "en": "I enjoy visiting art galleries to appreciate different styles.",
+      "jp": "私はさまざまなスタイルを鑑賞するためにアートギャラリーを訪れるのが好きです。",
+      "hira": "わたしはさまざまなすたいるをかんしょうするためにあーとぎゃらりーをおとずれるのがすきです。",
+      "mp3": "br_s47_i_enjoy_visiting_art_galleries_to_appreciate_different_styles.mp3"
+    },
+    {
+      "n": 48,
+      "en": "I often go hiking in the mountains to enjoy the fresh air.",
+      "jp": "私は新鮮な空気を楽しむために山にハイキングに行くことがよくあります。",
+      "hira": "わたしはしんせんなくうきをたのしむためにやまにはいきんぐにいくことがよくあります。",
+      "mp3": "br_s48_i_often_go_hiking_in_the_mountains_to_enjoy_the_fresh_air.mp3"
+    },
+    {
+      "n": 49,
+      "en": "I'm excited to plan a surprise party for my friend's birthday.",
+      "jp": "私は友達の誕生日のサプライズパーティーを計画するのが楽しみです。",
+      "hira": "わたしはともだちのたんじょうびのさぷらいずぱーてぃーをけいかくするのがたのしみです。",
+      "mp3": "br_s49_i_m_excited_to_plan_a_surprise_party_for_my_friend_s_birthday.mp3"
+    },
+    {
+      "n": 50,
+      "en": "I want to make new friends by joining summer sports teams.",
+      "jp": "私は夏のスポーツチームに参加して新しい友達を作りたいです。",
+      "hira": "わたしはなつのすぽーつちーむにさんかしてあたらしいともだちをつくりたいです。",
+      "mp3": "br_s50_i_want_to_make_new_friends_by_joining_summer_sports_teams.mp3"
+    },
+    {
+      "n": 51,
+      "en": "I enjoy watching fireworks displays during summer festivals.",
+      "jp": "私は夏祭りの花火を見るのが楽しいです。",
+      "hira": "わたしはなつまつりのはなびを見るのがたのしいです。",
+      "mp3": "br_s51_i_enjoy_watching_fireworks_displays_during_summer_festivals.mp3"
+    },
+    {
+      "n": 52,
+      "en": "I am planning to go on a road trip with my family this summer.",
+      "jp": "私は今夏、家族と一緒にロードトリップに行く予定です。",
+      "hira": "わたしはこんなつ、かぞくといっしょにろーどとりっぷにいくよていです。",
+      "mp3": "br_s52_i_am_planning_to_go_on_a_road_trip_with_my_family_this_summer.mp3"
+    },
+    {
+      "n": 53,
+      "en": "I hope to volunteer at an animal shelter next summer.",
+      "jp": "来年の夏には動物保護施設でボランティアをしたいと考えています。",
+      "hira": "らいねんのなつにはどうぶつほごしせつでぼらんてぃあをしたいとかんがえています。",
+      "mp3": "br_s53_i_hope_to_volunteer_at_an_animal_shelter_next_summer.mp3"
+    },
+    {
+      "n": 54,
+      "en": "I plan to take a photography class to improve my skills.",
+      "jp": "私はスキルを向上させるために写真のクラスを受講する予定です。",
+      "hira": "わたしはすきるをこうじょうさせるためにしゃしんのくらすをじゅこうするよていです。",
+      "mp3": "br_s54_i_plan_to_take_a_photography_class_to_improve_my_skills.mp3"
+    },
+    {
+      "n": 55,
+      "en": "I enjoy playing outdoor games with my friends in the summer.",
+      "jp": "私は夏に友達と屋外でゲームをするのが楽しいです。",
+      "hira": "わたしはなつにともだちとおくがいでげーむをするのがたのしいです。",
+      "mp3": "br_s55_i_enjoy_playing_outdoor_games_with_my_friends_in_the_summer.mp3"
+    },
+    {
+      "n": 56,
+      "en": "I want to explore local parks and nature trails this summer.",
+      "jp": "私は今夏、地元の公園や自然の小道を探検したいです。",
+      "hira": "わたしはこんなつ、じもとのこうえんやしぜんのこみちをたんけんしたいです。",
+      "mp3": "br_s56_i_want_to_explore_local_parks_and_nature_trails_this_summer.mp3"
+    },
+    {
+      "n": 57,
+      "en": "I am looking forward to seeing my cousins during the summer vacation.",
+      "jp": "私は夏休みにいとこたちに会うのを楽しみにしています。",
+      "hira": "わたしはなつやすみにいとこたちにあうのをたのしみにしています。",
+      "mp3": "br_s57_i_am_looking_forward_to_seeing_my_cousins_during_the_summer_vacation.mp3"
+    },
+    {
+      "n": 58,
+      "en": "I like to try new sports like surfing or paddleboarding.",
+      "jp": "私はサーフィンやパドルボードのような新しいスポーツに挑戦するのが好きです。",
+      "hira": "わたしはさーふぃんやぱどるぼーどのようなあたらしいすぽーつにちょうせんするのがすきです。",
+      "mp3": "br_s58_i_like_to_try_new_sports_like_surfing_or_paddleboarding.mp3"
+    },
+    {
+      "n": 59,
+      "en": "I plan to visit a national park to see beautiful landscapes.",
+      "jp": "私は美しい風景を見るために国立公園を訪れる予定です。",
+      "hira": "わたしはうつくしいふうけいをみるためにこくりつこうえんをおとずれるよていです。",
+      "mp3": "br_s59_i_plan_to_visit_a_national_park_to_see_beautiful_landscapes.mp3"
+    },
+    {
+      "n": 60,
+      "en": "I want to reflect on my goals for the next year during the summer.",
+      "jp": "夏の間に来年の目標を振り返りたいです。",
+      "hira": "なつのあいだにらいねんのもくひょうをふりかえりたいです.",
+      "mp3": "br_s60_i_want_to_reflect_on_my_goals_for_the_next_year_during_the_summer.mp3"
+    }
   ]
 }
