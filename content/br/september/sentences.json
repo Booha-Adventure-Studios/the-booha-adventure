@@ -2,423 +2,423 @@
   "cards": [
     {
       "n": 1,
-      "en": "This is my desk.",
-      "jp": "これは私の机です。",
-      "hira": "これ は わたし の つくえ です",
-      "mp3": "br_s01_this_is_my_desk.mp3"
+      "en": "Students should help each other with homework.",
+      "jp": "生徒は宿題を手伝うべきです。",
+      "hira": "せいとはしゅくだいをてつだうべきです。",
+      "mp3": "br_s01_students_should_help_each_other_with_homework.mp3"
     },
     {
       "n": 2,
-      "en": "That is the teacher’s chair.",
-      "jp": "あれは先生のいすです。",
-      "hira": "あれ は せんせい の いす です",
-      "mp3": "br_s02_that_is_the_teachers_chair.mp3"
+      "en": "We learn many subjects at school every day.",
+      "jp": "私たちは毎日学校で多くの科目を学びます。",
+      "hira": "わたしたちはまいにちがっこうでおおくのかもくをまなびます。",
+      "mp3": "br_s02_we_learn_many_subjects_at_school_every_day.mp3"
     },
     {
       "n": 3,
-      "en": "Use your notebook, please.",
-      "jp": "ノートを使ってください。",
-      "hira": "のーと を つかって ください",
-      "mp3": "br_s03_use_your_notebook_please.mp3"
+      "en": "Respecting your classmates is very important.",
+      "jp": "クラスメートを尊重することはとても重要です。",
+      "hira": "くらすめーとをそんちょうすることはとてもじゅうようです。",
+      "mp3": "br_s03_respecting_your_classmates_is_very_important.mp3"
     },
     {
       "n": 4,
-      "en": "Don’t write on the desk.",
-      "jp": "机に書かないでください。",
-      "hira": "つくえ に かか ないで ください",
-      "mp3": "br_s04_dont_write_on_the_desk.mp3"
+      "en": "Please raise your hand before speaking in class.",
+      "jp": "授業中に話す前に手を挙げてください。",
+      "hira": "じゅぎょうちゅうにはなすまえにてをあげてください。",
+      "mp3": "br_s04_please_raise_your_hand_before_speaking_in_class.mp3"
     },
     {
       "n": 5,
-      "en": "You must bring your textbook.",
-      "jp": "教科書を持ってこなければなりません。",
-      "hira": "きょうかしょ を もって こなければ なり ません",
-      "mp3": "br_s05_you_must_bring_your_textbook.mp3"
+      "en": "Every student must bring their own materials to class.",
+      "jp": "すべての生徒は自分の教材を授業に持ってくる必要があります。",
+      "hira": "すべてのせいとはじぶんのきょうざいをじゅぎょうにもってくるひつようがあります。",
+      "mp3": "br_s05_every_student_must_bring_their_own_materials_to_class.mp3"
     },
     {
       "n": 6,
-      "en": "You mustn’t run in the classroom.",
-      "jp": "教室で走ってはいけません。",
-      "hira": "きょうしつ で はしって は いけ ません",
-      "mp3": "br_s06_you_mustnt_run_in_the_classroom.mp3"
+      "en": "Our classroom is a place for learning and sharing.",
+      "jp": "私たちの教室は学びと共有の場所です。",
+      "hira": "わたしたちのきょうしつはまなびときょうゆうのばしょです。",
+      "mp3": "br_s06_our_classroom_is_a_place_for_learning_and_sharing.mp3"
     },
     {
       "n": 7,
-      "en": "Raise your hand before speaking.",
-      "jp": "話す前に手を上げてください。",
-      "hira": "はなす まえ に て を あげて ください",
-      "mp3": "br_s07_raise_your_hand_before_speaking.mp3"
+      "en": "Homework helps us understand the lessons better.",
+      "jp": "宿題は私たちが授業をよりよく理解するのに役立ちます。",
+      "hira": "しゅくだいはわたしたちがじゅぎょうをよりよくりかいするのにやくだちます。",
+      "mp3": "br_s07_homework_helps_us_understand_the_lessons_better.mp3"
     },
     {
       "n": 8,
-      "en": "Be kind and share.",
-      "jp": "やさしくして、分け合ってください。",
-      "hira": "やさしく して、 わけ あって ください",
-      "mp3": "br_s08_be_kind_and_share.mp3"
+      "en": "Teachers give us assignments to improve our skills.",
+      "jp": "先生は私たちのスキルを向上させるために課題を出します。",
+      "hira": "せんせいはわたしたちのすきるをこうじょうさせるためにかだいをだします。",
+      "mp3": "br_s08_teachers_give_us_assignments_to_improve_our_skills.mp3"
     },
     {
       "n": 9,
-      "en": "Keep your locker clean.",
-      "jp": "ロッカーをきれいに保ってください。",
-      "hira": "ろっかー を きれい に たもって ください",
-      "mp3": "br_s09_keep_your_locker_clean.mp3"
+      "en": "We should listen carefully to our teachers.",
+      "jp": "私たちは先生の話を注意深く聞くべきです。",
+      "hira": "わたしたちはせんせいのはなしをちゅういぶかくきくべきです。",
+      "mp3": "br_s09_we_should_listen_carefully_to_our_teachers.mp3"
     },
     {
       "n": 10,
-      "en": "You can borrow a ruler.",
-      "jp": "定規を借りてもいいです。",
-      "hira": "じょうぎ を かりて も いい です",
-      "mp3": "br_s10_you_can_borrow_a_ruler.mp3"
+      "en": "Students are encouraged to ask questions during lessons.",
+      "jp": "生徒は授業中に質問することが奨励されています。",
+      "hira": "せいとはじゅぎょうちゅうにしつもんすることがしょうれいされています。",
+      "mp3": "br_s10_students_are_encouraged_to_ask_questions_during_lessons.mp3"
     },
     {
       "n": 11,
-      "en": "Can I use the projector?",
-      "jp": "プロジェクターを使ってもいいですか。",
-      "hira": "ぷろじぇくたー を つかって も いい です か",
-      "mp3": "br_s11_can_i_use_the_projector.mp3"
+      "en": "Keeping the classroom tidy is everyone's responsibility.",
+      "jp": "教室をきれいに保つことはみんなの責任です。",
+      "hira": "きょうしつをきれいにたもつことはみんなのせきにんです。",
+      "mp3": "br_s11_keeping_the_classroom_tidy_is_everyone_s_responsibility.mp3"
     },
     {
       "n": 12,
-      "en": "Put trash in the trash can.",
-      "jp": "ゴミはゴミ箱に入れてください。",
-      "hira": "ごみ は ごみばこ に いれて ください",
-      "mp3": "br_s12_put_trash_in_the_trash_can.mp3"
+      "en": "We can work together on group projects.",
+      "jp": "私たちはグループプロジェクトで一緒に働くことができます。",
+      "hira": "わたしたちはぐるーぷぷろじぇくとでいっしょにはたらくことができます。",
+      "mp3": "br_s12_we_can_work_together_on_group_projects.mp3"
     },
     {
       "n": 13,
-      "en": "Line up quietly.",
-      "jp": "静かに並びましょう。",
-      "hira": "しずか に ならび ましょう",
-      "mp3": "br_s13_line_up_quietly.mp3"
+      "en": "Students help clean the classroom at the end of the day.",
+      "jp": "生徒は一日の終わりに教室を掃除します。",
+      "hira": "せいとはいちにちのおわりにきょうしつをそうじします。",
+      "mp3": "br_s13_students_help_clean_the_classroom_at_the_end_of_the_day.mp3"
     },
     {
       "n": 14,
-      "en": "We must listen to the teacher.",
-      "jp": "先生の話を聞かなければなりません。",
-      "hira": "せんせい の はなし を きかなければ なり ません",
-      "mp3": "br_s14_we_must_listen_to_the_teacher.mp3"
+      "en": "Each class has its own unique rules.",
+      "jp": "各クラスには独自のルールがあります。",
+      "hira": "かくくらすにはどくじのるーるがあります。",
+      "mp3": "br_s14_each_class_has_its_own_unique_rules.mp3"
     },
     {
       "n": 15,
-      "en": "Let’s follow the rules.",
-      "jp": "ルールにしたがいましょう。",
-      "hira": "るーる に したがい ましょう",
-      "mp3": "br_s15_lets_follow_the_rules.mp3"
+      "en": "Learning about different cultures is exciting.",
+      "jp": "異なる文化について学ぶことは楽しいです。",
+      "hira": "ことなるぶんかについてまなぶことはたのしいです。",
+      "mp3": "br_s15_learning_about_different_cultures_is_exciting.mp3"
     },
     {
       "n": 16,
-      "en": "I like English.",
-      "jp": "私は英語が好きです。",
-      "hira": "わたし は えいご が すき です",
-      "mp3": "br_s16_i_like_english.mp3"
+      "en": "I enjoy participating in school events and activities.",
+      "jp": "私は学校のイベントや活動に参加することを楽しみます。",
+      "hira": "わたしはがっこうのいべんとやかつどうにさんかすることをたのしみます。",
+      "mp3": "br_s16_i_enjoy_participating_in_school_events_and_activities.mp3"
     },
     {
       "n": 17,
-      "en": "I’m good at math.",
-      "jp": "私は数学が得意です。",
-      "hira": "わたし は すうがく が とくい です",
-      "mp3": "br_s17_im_good_at_math.mp3"
+      "en": "Studying together helps us learn faster.",
+      "jp": "一緒に勉強することは私たちが早く学ぶ手助けになります。",
+      "hira": "いっしょにべんきょうすることはわたしたちがはやくまなぶてだすけになります。",
+      "mp3": "br_s17_studying_together_helps_us_learn_faster.mp3"
     },
     {
       "n": 18,
-      "en": "I’m not good at history.",
-      "jp": "私は歴史が得意ではありません。",
-      "hira": "わたし は れきし が とくい では ありません",
-      "mp3": "br_s18_im_not_good_at_history.mp3"
+      "en": "We should treat our classrooms with respect.",
+      "jp": "私たちは教室を大切に扱うべきです。",
+      "hira": "わたしたちはきょうしつをたいせつにあつかうべきです。",
+      "mp3": "br_s18_we_should_treat_our_classrooms_with_respect.mp3"
     },
     {
       "n": 19,
-      "en": "My favorite subject is science.",
-      "jp": "私の一番好きな教科は理科です。",
-      "hira": "わたし の いちばん すき な きょうか は りか です",
-      "mp3": "br_s19_my_favorite_subject_is_science.mp3"
+      "en": "Students are responsible for their own learning.",
+      "jp": "生徒は自分の学びに責任があります。",
+      "hira": "せいとはじぶんのまなびにせきにんがあります。",
+      "mp3": "br_s19_students_are_responsible_for_their_own_learning.mp3"
     },
     {
       "n": 20,
-      "en": "On Monday, we have PE and music.",
-      "jp": "月曜日は体育と音楽があります。",
-      "hira": "げつようび は たいいく と おんがく が あり ます",
-      "mp3": "br_s20_on_monday_we_have_pe_and_music.mp3"
+      "en": "The school provides support for students who need help.",
+      "jp": "学校は助けが必要な生徒にサポートを提供します。",
+      "hira": "がっこうはたすけがひつようなせいとにさぽーとをていきょうします。",
+      "mp3": "br_s20_the_school_provides_support_for_students_who_need_help.mp3"
     },
     {
       "n": 21,
-      "en": "Do you like art?",
-      "jp": "美術は好きですか。",
-      "hira": "びじゅつ は すき です か",
-      "mp3": "br_s21_do_you_like_art.mp3"
+      "en": "It's important to be friends with everyone in class.",
+      "jp": "クラスの皆と友達でいることは大切です。",
+      "hira": "くらすのみんなとともだちでいることはたいせつです。",
+      "mp3": "br_s21_it_s_important_to_be_friends_with_everyone_in_class.mp3"
     },
     {
       "n": 22,
-      "en": "We study geography this term.",
-      "jp": "今学期は地理を勉強します。",
-      "hira": "こん がっき は ちり を べんきょう し ます",
-      "mp3": "br_s22_we_study_geography_this_term.mp3"
+      "en": "I look forward to our art class every week.",
+      "jp": "私は毎週の美術の授業を楽しみにしています。",
+      "hira": "わたしはまいしゅうのびじゅつのじゅぎょうをたのしみにしています。",
+      "mp3": "br_s22_i_look_forward_to_our_art_class_every_week.mp3"
     },
     {
       "n": 23,
-      "en": "We learn about health in class.",
-      "jp": "授業で保健について学びます。",
-      "hira": "じゅぎょう で ほけん について まなび ます",
-      "mp3": "br_s23_we_learn_about_health_in_class.mp3"
+      "en": "We learn how to solve problems in math class.",
+      "jp": "数学の授業で問題を解決する方法を学びます。",
+      "hira": "すうがくのじゅぎょうでもんだいをかいけつするほうほうをまなびます。",
+      "mp3": "br_s23_we_learn_how_to_solve_problems_in_math_class.mp3"
     },
     {
       "n": 24,
-      "en": "In ICT, we use computers.",
-      "jp": "情報の授業ではコンピューターを使います。",
-      "hira": "じょうほう の じゅぎょう で は こんぴゅーたー を つかい ます",
-      "mp3": "br_s24_in_ict_we_use_computers.mp3"
+      "en": "Science class teaches us about the natural world.",
+      "jp": "科学の授業は私たちに自然の世界について教えます。",
+      "hira": "かがくのじゅぎょうはわたしたちにしぜんのせかいについておしえます。",
+      "mp3": "br_s24_science_class_teaches_us_about_the_natural_world.mp3"
     },
     {
       "n": 25,
-      "en": "Home economics is useful.",
-      "jp": "家庭科は役に立ちます。",
-      "hira": "かていか は やく に たち ます",
-      "mp3": "br_s25_home_economics_is_useful.mp3"
+      "en": "We should respect the opinions of our classmates.",
+      "jp": "私たちはクラスメートの意見を尊重すべきです。",
+      "hira": "わたしたちはくらすめーとのいけんをそんちょうすべきです。",
+      "mp3": "br_s25_we_should_respect_the_opinions_of_our_classmates.mp3"
     },
     {
       "n": 26,
-      "en": "Let’s practice for music class.",
-      "jp": "音楽の授業のために練習しましょう。",
-      "hira": "おんがく の じゅぎょう の ため に れんしゅう し ましょう",
-      "mp3": "br_s26_lets_practice_for_music_class.mp3"
+      "en": "I am excited to join the school club this year.",
+      "jp": "私は今年学校のクラブに参加するのが楽しみです。",
+      "hira": "わたしはことしがっこうのくらぶにさんかするのがたのしみです。",
+      "mp3": "br_s26_i_am_excited_to_join_the_school_club_this_year.mp3"
     },
     {
       "n": 27,
-      "en": "We have a science test on Friday.",
-      "jp": "金曜日に理科のテストがあります。",
-      "hira": "きんようび に りか の てすと が あり ます",
-      "mp3": "br_s27_we_have_a_science_test_on_friday.mp3"
+      "en": "Our school offers a variety of extracurricular activities.",
+      "jp": "私たちの学校はさまざまな課外活動を提供しています。",
+      "hira": "わたしたちのがっこうはさまざまなかがいかつどうをていきょうしています。",
+      "mp3": "br_s27_our_school_offers_a_variety_of_extracurricular_activities.mp3"
     },
     {
       "n": 28,
-      "en": "Club activities start at four.",
-      "jp": "部活動は4時に始まります。",
-      "hira": "ぶかつどう は よじ に はじまり ます",
-      "mp3": "br_s28_club_activities_start_at_four.mp3"
+      "en": "It is my duty to help clean up after lunch.",
+      "jp": "ランチの後に掃除を手伝うことは私の義務です。",
+      "hira": "らんちのあとにそうじをてつだうことはわたしのぎむです。",
+      "mp3": "br_s28_it_is_my_duty_to_help_clean_up_after_lunch.mp3"
     },
     {
       "n": 29,
-      "en": "Do you like homeroom time?",
-      "jp": "ホームルームの時間は好きですか。",
-      "hira": "ほーむるーむ の じかん は すき です か",
-      "mp3": "br_s29_do_you_like_homeroom_time.mp3"
+      "en": "We can share our ideas during group discussions.",
+      "jp": "グループディスカッション中に私たちのアイデアを共有できます。",
+      "hira": "ぐるーぷでぃすかっしょんちゅうにわたしたちのあいであをきょうゆうできます。",
+      "mp3": "br_s29_we_can_share_our_ideas_during_group_discussions.mp3"
     },
     {
       "n": 30,
-      "en": "We study hard and have fun.",
-      "jp": "一生けんめい勉強して、楽しく過ごします。",
-      "hira": "いっしょうけんめい べんきょう して、 たのしく すごし ます",
-      "mp3": "br_s30_we_study_hard_and_have_fun.mp3"
+      "en": "Understanding rules helps create a good learning environment.",
+      "jp": "ルールを理解することは良い学習環境を作るのに役立ちます。",
+      "hira": "るーるをりかいすることはよいがくしゅうかんきょうをつくるのにやくだちます。",
+      "mp3": "br_s30_understanding_rules_helps_create_a_good_learning_environment.mp3"
     },
     {
       "n": 31,
-      "en": "Who is your homeroom teacher?",
-      "jp": "あなたの担任の先生はだれですか。",
-      "hira": "あなた の たんにん の せんせい は だれ です か",
-      "mp3": "br_s31_who_is_your_homeroom_teacher.mp3"
+      "en": "We can celebrate our achievements together.",
+      "jp": "私たちは一緒に成果を祝うことができます。",
+      "hira": "わたしたちはいっしょにせいかをいわうことができます。",
+      "mp3": "br_s31_we_can_celebrate_our_achievements_together.mp3"
     },
     {
       "n": 32,
-      "en": "He is our principal.",
-      "jp": "彼は私たちの校長先生です。",
-      "hira": "かれ は わたしたち の こうちょう せんせい です",
-      "mp3": "br_s32_he_is_our_principal.mp3"
+      "en": "I always try to be on time for class.",
+      "jp": "私は必ず授業に時間通りに出席しようとします。",
+      "hira": "わたしはかならずじゅぎょうにじかんどおりにしゅっせきしようとします。",
+      "mp3": "br_s32_i_always_try_to_be_on_time_for_class.mp3"
     },
     {
       "n": 33,
-      "en": "She is the librarian.",
-      "jp": "彼女は司書です。",
-      "hira": "かのじょ は ししょ です",
-      "mp3": "br_s33_she_is_the_librarian.mp3"
+      "en": "The school library is a quiet place to study.",
+      "jp": "学校の図書館は勉強するための静かな場所です。",
+      "hira": "がっこうのとしょかんはべんきょうするためのしずかなばしょです。",
+      "mp3": "br_s33_the_school_library_is_a_quiet_place_to_study.mp3"
     },
     {
       "n": 34,
-      "en": "They are office staff.",
-      "jp": "彼らは事務の人たちです。",
-      "hira": "かれら は じむ の ひと たち です",
-      "mp3": "br_s34_they_are_office_staff.mp3"
+      "en": "We learn about teamwork in physical education.",
+      "jp": "体育の授業でチームワークについて学びます。",
+      "hira": "たいいくのじゅぎょうでちーむわーくについてまなびます。",
+      "mp3": "br_s34_we_learn_about_teamwork_in_physical_education.mp3"
     },
     {
       "n": 35,
-      "en": "The nurse helps students.",
-      "jp": "保健の先生は生徒を助けます。",
-      "hira": "ほけん の せんせい は せいと を たすけ ます",
-      "mp3": "br_s35_the_nurse_helps_students.mp3"
+      "en": "I feel proud when I help my friends succeed.",
+      "jp": "友達の成功を手伝うと誇りに思います。",
+      "hira": "ともだちのせいこうをてつだうとほこりにおもいます。",
+      "mp3": "br_s35_i_feel_proud_when_i_help_my_friends_succeed.mp3"
     },
     {
       "n": 36,
-      "en": "Ask the counselor for help.",
-      "jp": "カウンセラーに助けを求めてください。",
-      "hira": "かうんせらー に たすけ を もとめて ください",
-      "mp3": "br_s36_ask_the_counselor_for_help.mp3"
+      "en": "Asking for help shows strength, not weakness.",
+      "jp": "助けを求めることは弱さではなく強さを示します。",
+      "hira": "たすけをもとめることはよわさではなくつよさをしめします。",
+      "mp3": "br_s36_asking_for_help_shows_strength_not_weakness.mp3"
     },
     {
       "n": 37,
-      "en": "The janitor keeps the school clean.",
-      "jp": "用務員さんは学校をきれいに保ちます。",
-      "hira": "ようむいん さん は がっこう を きれい に たもち ます",
-      "mp3": "br_s37_the_janitor_keeps_the_school_clean.mp3"
+      "en": "We should take care of our school property.",
+      "jp": "私たちは学校の財産を大切にしなければなりません。",
+      "hira": "わたしたちはがっこうのざいさんをたいせつにしなければなりません。",
+      "mp3": "br_s37_we_should_take_care_of_our_school_property.mp3"
     },
     {
       "n": 38,
-      "en": "Our coach is kind and strict.",
-      "jp": "私たちのコーチはやさしくて厳しいです。",
-      "hira": "わたしたち の こーち は やさしくて きびしい です",
-      "mp3": "br_s38_our_coach_is_kind_and_strict.mp3"
+      "en": "Listening to instructions helps us complete tasks correctly.",
+      "jp": "指示を聞くことは私たちがタスクを正しく完了するのに役立ちます。",
+      "hira": "しじをきくことはわたしたちがたすくをただしくかんりょうするのにやくだちます。",
+      "mp3": "br_s38_listening_to_instructions_helps_us_complete_tasks_correctly.mp3"
     },
     {
       "n": 39,
-      "en": "My classmate helps me with math.",
-      "jp": "私のクラスメートが数学の勉強を手伝ってくれます。",
-      "hira": "わたし の くらすめーと が すうがく の べんきょう を てつだって くれます",
-      "mp3": "br_s39_my_classmate_helps_me_with_math.mp3"
+      "en": "Sharing responsibilities makes work easier for everyone.",
+      "jp": "責任を分担することで、みんなの仕事が楽になります。",
+      "hira": "せきにんをぶんたんすることで、みんなのしごとがらくになります。",
+      "mp3": "br_s39_sharing_responsibilities_makes_work_easier_for_everyone.mp3"
     },
     {
       "n": 40,
-      "en": "Where is the principal’s office?",
-      "jp": "校長室はどこですか。",
-      "hira": "こうちょうしつ は どこ です か",
-      "mp3": "br_s40_where_is_the_principals_office.mp3"
+      "en": "Being organized helps us manage our time better.",
+      "jp": "整理整頓は私たちが時間をうまく管理するのに役立ちます。",
+      "hira": "せいりせいとんはわたしたちがじかんをうまくかんりするのにやくだちます。",
+      "mp3": "br_s40_being_organized_helps_us_manage_our_time_better.mp3"
     },
     {
       "n": 41,
-      "en": "Can I talk to the counselor?",
-      "jp": "カウンセラーと話してもいいですか。",
-      "hira": "かうんせらー と はなして も いい です か",
-      "mp3": "br_s41_can_i_talk_to_the_counselor.mp3"
+      "en": "We can learn from each other's different experiences.",
+      "jp": "私たちはお互いの違った経験から学ぶことができます。",
+      "hira": "わたしたちはおたがいのちがったけいけんからまなぶことができます。",
+      "mp3": "br_s41_we_can_learn_from_each_other_s_different_experiences.mp3"
     },
     {
       "n": 42,
-      "en": "Please ask the librarian about this book.",
-      "jp": "この本について司書にたずねてください。",
-      "hira": "この ほん について ししょ に たずねて ください",
-      "mp3": "br_s42_please_ask_the_librarian_about_this_book.mp3"
+      "en": "Taking notes during class helps with studying later.",
+      "jp": "授業中にノートを取ることは後で勉強するのに役立ちます。",
+      "hira": "じゅぎょうちゅうにのーとをとることはあとでべんきょうするのにやくだちます。",
+      "mp3": "br_s42_taking_notes_during_class_helps_with_studying_later.mp3"
     },
     {
       "n": 43,
-      "en": "Our advisor checks the club plan.",
-      "jp": "顧問の先生が部活動の計画を確認します。",
-      "hira": "こもん の せんせい が ぶかつどう の けいかく を かくにん します",
-      "mp3": "br_s43_our_advisor_checks_the_club_plan.mp3"
+      "en": "We enjoy learning about science experiments.",
+      "jp": "私たちは科学の実験について学ぶことを楽しみます。",
+      "hira": "わたしたちはかがくのじっけんについてまなぶことをたのしみます。",
+      "mp3": "br_s43_we_enjoy_learning_about_science_experiments.mp3"
     },
     {
       "n": 44,
-      "en": "Say “thank you” to staff.",
-      "jp": "職員に「ありがとう」と言いましょう。",
-      "hira": "しょくいん に「ありがとう」 と いい ましょう",
-      "mp3": "br_s44_say_thank_you_to_staff.mp3"
+      "en": "Setting goals encourages us to try harder.",
+      "jp": "目標を設定することは私たちをより努力させます。",
+      "hira": "もくひょうをせっていすることはわたしたちをよりどりょくさせます。",
+      "mp3": "br_s44_setting_goals_encourages_us_to_try_harder.mp3"
     },
     {
       "n": 45,
-      "en": "Let’s help underclassmen.",
-      "jp": "後輩を助けましょう。",
-      "hira": "こうはい を たすけ ましょう",
-      "mp3": "br_s45_lets_help_underclassmen.mp3"
+      "en": "Teachers provide feedback to help us improve.",
+      "jp": "先生は私たちが成長できるようにフィードバックを提供します。",
+      "hira": "せんせいはわたしたちがせいちょうできるようにふぃーどばっくをていきょうします。",
+      "mp3": "br_s45_teachers_provide_feedback_to_help_us_improve.mp3"
     },
     {
       "n": 46,
-      "en": "School starts at eight thirty.",
-      "jp": "学校は8時30分に始まります。",
-      "hira": "がっこう は はちじ さんじゅっぷん に はじまり ます",
-      "mp3": "br_s46_school_starts_at_eight_thirty.mp3"
+      "en": "Participating in discussions helps us learn from others.",
+      "jp": "ディスカッションに参加することで、他の人から学ぶことができます。",
+      "hira": "でぃすかっしょんにさんかすることで、ほかのひとからまなぶことができます。",
+      "mp3": "br_s46_participating_in_discussions_helps_us_learn_from_others.mp3"
     },
     {
       "n": 47,
-      "en": "Classes finish at three thirty.",
-      "jp": "授業は3時30分に終わります。",
-      "hira": "じゅぎょう は さんじ さんじゅっぷん に おわり ます",
-      "mp3": "br_s47_classes_finish_at_three_thirty.mp3"
+      "en": "I appreciate my teachers for their hard work.",
+      "jp": "私は先生の努力に感謝しています。",
+      "hira": "わたしはせんせいのどりょくにかんしゃしています。",
+      "mp3": "br_s47_i_appreciate_my_teachers_for_their_hard_work.mp3"
     },
     {
       "n": 48,
-      "en": "We have five periods today.",
-      "jp": "今日は5時間あります。",
-      "hira": "きょう は ご じかん あり ます",
-      "mp3": "br_s48_we_have_five_periods_today.mp3"
+      "en": "Taking breaks helps us stay focused on our studies.",
+      "jp": "休憩を取ることで、私たちは勉強に集中できます。",
+      "hira": "きゅうけいをとることで、わたしたちはべんきょうにしゅうちゅうできます。",
+      "mp3": "br_s48_taking_breaks_helps_us_stay_focused_on_our_studies.mp3"
     },
     {
       "n": 49,
-      "en": "English is from nine to nine forty-five.",
-      "jp": "英語は9時から9時45分までです。",
-      "hira": "えいご は くじ から くじ よんじゅうごふん まで です",
-      "mp3": "br_s49_english_is_from_nine_to_nine_fortyfive.mp3"
+      "en": "We respect the school rules to create a good environment.",
+      "jp": "私たちは良い環境を作るために学校のルールを尊重します。",
+      "hira": "わたしたちはよいかんきょうをつくるためにがっこうのるーるをそんちょうします。",
+      "mp3": "br_s49_we_respect_the_school_rules_to_create_a_good_environment.mp3"
     },
     {
       "n": 50,
-      "en": "Lunch break is from twelve to twelve forty.",
-      "jp": "昼休みは12時から12時40分までです。",
-      "hira": "ひるやすみ は じゅうにじ から じゅうにじ よんじゅっぷん まで です",
-      "mp3": "br_s50_lunch_break_is_from_twelve_to_twelve_forty.mp3"
+      "en": "Learning new things every day is exciting.",
+      "jp": "毎日新しいことを学ぶことはワクワクします。",
+      "hira": "まいにちあたらしいことをまなぶことはわくわくします。",
+      "mp3": "br_s50_learning_new_things_every_day_is_exciting.mp3"
     },
     {
       "n": 51,
-      "en": "Before school, I read a book.",
-      "jp": "登校前に本を読みます。",
-      "hira": "とうこう まえ に ほん を よみ ます",
-      "mp3": "br_s51_before_school_i_read_a_book.mp3"
+      "en": "Students should support each other in challenging times.",
+      "jp": "生徒は困難な時にお互いを支えるべきです。",
+      "hira": "せいとはこんなんなときにおたがいをささえるべきです。",
+      "mp3": "br_s51_students_should_support_each_other_in_challenging_times.mp3"
     },
     {
       "n": 52,
-      "en": "After school, we have club activities.",
-      "jp": "放課後に部活動があります。",
-      "hira": "ほうかご に ぶかつどう が あり ます",
-      "mp3": "br_s52_after_school_we_have_club_activities.mp3"
+      "en": "It is important to keep our classroom clean and organized.",
+      "jp": "教室をきれいに整頓することは重要です。",
+      "hira": "きょうしつをきれいにせいとんすることはじゅうようです。",
+      "mp3": "br_s52_it_is_important_to_keep_our_classroom_clean_and_organized.mp3"
     },
     {
       "n": 53,
-      "en": "The bell rings at the start of each period.",
-      "jp": "各授業の始まりにチャイムが鳴ります。",
-      "hira": "かく じゅぎょう の はじまり に ちゃいむ が なります",
-      "mp3": "br_s53_the_bell_rings_at_the_start_of_each_period.mp3"
+      "en": "We learn how to express our thoughts clearly.",
+      "jp": "私たちは自分の考えを明確に表現する方法を学びます。",
+      "hira": "わたしたちはじぶんのかんがえをめいかくにひょうげんするほうほうをまなびます。",
+      "mp3": "br_s53_we_learn_how_to_express_our_thoughts_clearly.mp3"
     },
     {
       "n": 54,
-      "en": "There is an assembly on Monday morning.",
-      "jp": "月曜日の朝に全校集会があります。",
-      "hira": "げつようび の あさ に ぜんこう しゅうかい が あり ます",
-      "mp3": "br_s54_there_is_an_assembly_on_monday_morning.mp3"
+      "en": "Setting up a study group can be very helpful.",
+      "jp": "勉強グループを作ることはとても役立ちます。",
+      "hira": "べんきょうぐるーぷをつくることはとてもやくだちます。",
+      "mp3": "br_s54_setting_up_a_study_group_can_be_very_helpful.mp3"
     },
     {
       "n": 55,
-      "en": "We have an exam next week.",
-      "jp": "来週、試験があります。",
-      "hira": "らいしゅう、 しけん が あり ます",
-      "mp3": "br_s55_we_have_an_exam_next_week.mp3"
+      "en": "We should appreciate our teachers for their dedication.",
+      "jp": "私たちは先生の献身に感謝すべきです。",
+      "hira": "わたしたちはせんせいのけんしんにかんしゃすべきです。",
+      "mp3": "br_s55_we_should_appreciate_our_teachers_for_their_dedication.mp3"
     },
     {
       "n": 56,
-      "en": "Is there a holiday this month?",
-      "jp": "今月、休みはありますか。",
-      "hira": "こんげつ、 やすみ は あり ます か",
-      "mp3": "br_s56_is_there_a_holiday_this_month.mp3"
+      "en": "Sharing knowledge with others is a great way to learn.",
+      "jp": "他の人と知識を共有することは学ぶ素晴らしい方法です。",
+      "hira": "ほかのひととちしきをきょうゆうすることはまなぶすばらしいほうほうです。",
+      "mp3": "br_s56_sharing_knowledge_with_others_is_a_great_way_to_learn.mp3"
     },
     {
       "n": 57,
-      "en": "There is a parent meeting after school.",
-      "jp": "放課後に保護者会があります。",
-      "hira": "ほうかご に ほごしゃ かい が あり ます",
-      "mp3": "br_s57_there_is_a_parent_meeting_after_school.mp3"
+      "en": "We should always try our best in every subject.",
+      "jp": "私たちはすべての科目で常に最善を尽くすべきです。",
+      "hira": "わたしたちはすべてのかもくでつねにさいぜんをつくすべきです。",
+      "mp3": "br_s57_we_should_always_try_our_best_in_every_subject.mp3"
     },
     {
       "n": 58,
-      "en": "We will have a make-up class on Friday.",
-      "jp": "金曜日に補講があります。",
-      "hira": "きんようび に ほこう が あり ます",
-      "mp3": "br_s58_we_will_have_a_makeup_class_on_friday.mp3"
+      "en": "Learning about history helps us understand our world better.",
+      "jp": "歴史について学ぶことは私たちが世界をよりよく理解するのに役立ちます。",
+      "hira": "れきしについてまなぶことはわたしたちがせかいをよりよくりかいするのにやくだちます。",
+      "mp3": "br_s58_learning_about_history_helps_us_understand_our_world_better.mp3"
     },
     {
       "n": 59,
-      "en": "Please check the timetable.",
-      "jp": "時間割を確認してください。",
-      "hira": "じかんわり を かくにん して ください",
-      "mp3": "br_s59_please_check_the_timetable.mp3"
+      "en": "We enjoy reading books during library time.",
+      "jp": "図書館の時間に本を読むことを楽しみます。",
+      "hira": "としょかんのじかんにほんをよむことをたのしみます。",
+      "mp3": "br_s59_we_enjoy_reading_books_during_library_time.mp3"
     },
     {
       "n": 60,
-      "en": "Let’s be on time for every class.",
-      "jp": "どの授業にも遅れないようにしましょう。",
-      "hira": "どの じゅぎょう にも おくれない よう に しましょう",
-      "mp3": "br_s60_lets_be_on_time_for_every_class.mp3"
+      "en": "We can express our creativity in art class.",
+      "jp": "美術の授業では私たちの創造性を表現できます。",
+      "hira": "びじゅつのじゅぎょうではわたしたちのそうぞうせいをひょうげんできます.",
+      "mp3": "br_s60_we_can_express_our_creativity_in_art_class.mp3"
     }
   ]
 }
