@@ -1,0 +1,858 @@
+{
+  "curriculum": "br",
+  "month": "april",
+  "weeks": [
+    {
+      "week": 1,
+      "passage": {
+        "text": "During the thoughtful travel and cultural discovery unit, Booha and Nuppi focus first on “travel itinerary.” They discuss “local cuisine” and consider “safety tips” with their teacher. The class connects these ideas to “travel essentials” and “cultural exchange.” During a discussion, students share examples of “travel insurance” and decide how it can make their next activity clearer. By the end of the lesson, everyone understands that preparation, reflection, and cooperation strengthen learning.",
+        "comprehension": [
+          {
+            "n": 1,
+            "q": "Which idea do Booha and Nuppi focus on first?",
+            "choices": [
+              "travel itinerary",
+              "local cuisine",
+              "safety tips",
+              "travel essentials"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "Which additional term do they consider with their teacher?",
+            "choices": [
+              "safety tips",
+              "travel itinerary",
+              "local cuisine",
+              "travel essentials"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "Which idea do students share examples of?",
+            "choices": [
+              "travel insurance",
+              "travel essentials",
+              "cultural exchange",
+              "local cuisine"
+            ],
+            "correct": 0
+          }
+        ]
+      },
+      "writingPrompt": {
+        "id": "apr-br-w1-writing",
+        "jp": "「travel itinerary」と「local cuisine」を つかって、1〜3ぶんで かいてね。",
+        "en": "Write 1–3 sentences about thoughtful travel and cultural discovery using travel itinerary and local cuisine.",
+        "targets": [
+          "travel itinerary",
+          "local cuisine"
+        ]
+      },
+      "definitions": [
+        {
+          "n": 1,
+          "def": "a way of arranging tasks and time in advance",
+          "pos": "phrase"
+        },
+        {
+          "n": 2,
+          "def": "an activity or information connected with visiting another place",
+          "pos": "phrase"
+        },
+        {
+          "n": 3,
+          "def": "a step or resource that helps people avoid harm",
+          "pos": "phrase"
+        },
+        {
+          "n": 4,
+          "def": "an activity or information connected with visiting another place",
+          "pos": "phrase"
+        },
+        {
+          "n": 5,
+          "def": "an idea or activity that helps people understand different communities",
+          "pos": "phrase"
+        },
+        {
+          "n": 6,
+          "def": "an activity or information connected with visiting another place",
+          "pos": "phrase"
+        },
+        {
+          "n": 7,
+          "def": "an activity or information connected with visiting another place",
+          "pos": "phrase"
+        },
+        {
+          "n": 8,
+          "def": "an action or process carried out over time",
+          "pos": "phrase"
+        },
+        {
+          "n": 9,
+          "def": "an activity or information connected with visiting another place",
+          "pos": "phrase"
+        },
+        {
+          "n": 10,
+          "def": "an activity or information connected with visiting another place",
+          "pos": "phrase"
+        },
+        {
+          "n": 11,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 12,
+          "def": "an idea or activity that helps people understand different communities",
+          "pos": "phrase"
+        },
+        {
+          "n": 13,
+          "def": "an activity or information connected with visiting another place",
+          "pos": "phrase"
+        },
+        {
+          "n": 14,
+          "def": "an activity or information connected with visiting another place",
+          "pos": "phrase"
+        },
+        {
+          "n": 15,
+          "def": "an activity or information connected with visiting another place",
+          "pos": "phrase"
+        }
+      ],
+      "questions": [
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Before the activity, Booha chooses to focus on “public transport” because it will help the class prepare.",
+          "q": "What idea does Booha choose to focus on?",
+          "choices": [
+            "public transport",
+            "souvenir shopping",
+            "travel budget",
+            "travel advisory"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "During the lesson, Nuppi explains what “souvenir shopping” means to the group.",
+          "q": "What does Nuppi explain to the group?",
+          "choices": [
+            "souvenir shopping",
+            "public transport",
+            "travel budget",
+            "travel advisory"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "At the end, the class discusses “travel budget” and decides how to improve next time.",
+          "q": "What does the class discuss at the end?",
+          "choices": [
+            "travel budget",
+            "public transport",
+            "souvenir shopping",
+            "travel advisory"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "旅行は異なる文化について学ぶのに役立ちます。",
+          "en": "Traveling can help you learn about different cultures",
+          "accepted": [
+            "Traveling can help you learn about different cultures."
+          ]
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "新しい場所を訪れるときは、地元の習慣を尊重することが重要です。",
+          "en": "It is important to respect local customs when visiting new places",
+          "accepted": [
+            "It is important to respect local customs when visiting new places."
+          ]
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "旅行の前に天気を確認することを忘れないでください。",
+          "en": "Make sure to check the weather before your trip",
+          "accepted": [
+            "Make sure to check the weather before your trip."
+          ]
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "旅行の計画",
+          "en": "travel itinerary"
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "地元の料理",
+          "en": "local cuisine"
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "安全のアドバイス",
+          "en": "safety tips"
+        }
+      ]
+    },
+    {
+      "week": 2,
+      "passage": {
+        "text": "During the thoughtful travel and cultural discovery unit, Booha and Nuppi focus first on “emergency contact.” They discuss “cultural sensitivity” and consider “travel guidebook” with their teacher. The class connects these ideas to “local etiquette” and “itinerary changes.” During a discussion, students share examples of “sightseeing tour” and decide how it can make their next activity clearer. By the end of the lesson, everyone understands that preparation, reflection, and cooperation strengthen learning.",
+        "comprehension": [
+          {
+            "n": 1,
+            "q": "Which idea do Booha and Nuppi focus on first?",
+            "choices": [
+              "emergency contact",
+              "cultural sensitivity",
+              "travel guidebook",
+              "local etiquette"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "Which additional term do they consider with their teacher?",
+            "choices": [
+              "travel guidebook",
+              "emergency contact",
+              "cultural sensitivity",
+              "local etiquette"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "Which idea do students share examples of?",
+            "choices": [
+              "sightseeing tour",
+              "local etiquette",
+              "itinerary changes",
+              "cultural sensitivity"
+            ],
+            "correct": 0
+          }
+        ]
+      },
+      "writingPrompt": {
+        "id": "apr-br-w2-writing",
+        "jp": "「emergency contact」と「cultural sensitivity」を つかって、1〜3ぶんで かいてね。",
+        "en": "Write 1–3 sentences about thoughtful travel and cultural discovery using emergency contact and cultural sensitivity.",
+        "targets": [
+          "emergency contact",
+          "cultural sensitivity"
+        ]
+      },
+      "definitions": [
+        {
+          "n": 16,
+          "def": "a step or resource that helps people avoid harm",
+          "pos": "phrase"
+        },
+        {
+          "n": 17,
+          "def": "an idea or activity that helps people understand different communities",
+          "pos": "phrase"
+        },
+        {
+          "n": 18,
+          "def": "an activity or information connected with visiting another place",
+          "pos": "phrase"
+        },
+        {
+          "n": 19,
+          "def": "an activity or information connected with visiting another place",
+          "pos": "phrase"
+        },
+        {
+          "n": 20,
+          "def": "a way of arranging tasks and time in advance",
+          "pos": "phrase"
+        },
+        {
+          "n": 21,
+          "def": "an activity or information connected with visiting another place",
+          "pos": "phrase"
+        },
+        {
+          "n": 22,
+          "def": "an activity or information connected with visiting another place",
+          "pos": "phrase"
+        },
+        {
+          "n": 23,
+          "def": "a step or resource that helps people avoid harm",
+          "pos": "phrase"
+        },
+        {
+          "n": 24,
+          "def": "an activity or information connected with visiting another place",
+          "pos": "phrase"
+        },
+        {
+          "n": 25,
+          "def": "an idea or activity that helps people understand different communities",
+          "pos": "phrase"
+        },
+        {
+          "n": 26,
+          "def": "an activity or information connected with visiting another place",
+          "pos": "phrase"
+        },
+        {
+          "n": 27,
+          "def": "a way of arranging tasks and time in advance",
+          "pos": "phrase"
+        },
+        {
+          "n": 28,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 29,
+          "def": "an activity or information connected with visiting another place",
+          "pos": "phrase"
+        },
+        {
+          "n": 30,
+          "def": "an idea or activity that helps people understand different communities",
+          "pos": "phrase"
+        }
+      ],
+      "questions": [
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Before the activity, Booha chooses to focus on “sustainable travel” because it will help the class prepare.",
+          "q": "What idea does Booha choose to focus on?",
+          "choices": [
+            "sustainable travel",
+            "safety precautions",
+            "travel rewards",
+            "cultural landmarks"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "During the lesson, Nuppi explains what “safety precautions” means to the group.",
+          "q": "What does Nuppi explain to the group?",
+          "choices": [
+            "safety precautions",
+            "sustainable travel",
+            "travel rewards",
+            "cultural landmarks"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "At the end, the class discusses “travel rewards” and decides how to improve next time.",
+          "q": "What does the class discuss at the end?",
+          "choices": [
+            "travel rewards",
+            "sustainable travel",
+            "safety precautions",
+            "cultural landmarks"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "旅行中は常に小さな応急処置キットを持ち歩きましょう。",
+          "en": "Always carry a small first aid kit while traveling",
+          "accepted": [
+            "Always carry a small first aid kit while traveling."
+          ]
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "地元の人々に笑顔で挨拶することは礼儀正しいです。",
+          "en": "Be polite and greet locals with a smile",
+          "accepted": [
+            "Be polite and greet locals with a smile."
+          ]
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "面白い場所を見つけるために旅行ガイドブックを使いましょう。",
+          "en": "Use a travel guidebook to find interesting places",
+          "accepted": [
+            "Use a travel guidebook to find interesting places."
+          ]
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "緊急連絡先",
+          "en": "emergency contact"
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "文化的配慮",
+          "en": "cultural sensitivity"
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "旅行ガイドブック",
+          "en": "travel guidebook"
+        }
+      ]
+    },
+    {
+      "week": 3,
+      "passage": {
+        "text": "During the thoughtful travel and cultural discovery unit, Booha and Nuppi focus first on “travel policies.” They discuss “environmental impact” and consider “local festivals” with their teacher. The class connects these ideas to “trip itinerary” and “cultural understanding.” During a discussion, students share examples of “travel arrangements” and decide how it can make their next activity clearer. By the end of the lesson, everyone understands that preparation, reflection, and cooperation strengthen learning.",
+        "comprehension": [
+          {
+            "n": 1,
+            "q": "Which idea do Booha and Nuppi focus on first?",
+            "choices": [
+              "travel policies",
+              "environmental impact",
+              "local festivals",
+              "trip itinerary"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "Which additional term do they consider with their teacher?",
+            "choices": [
+              "local festivals",
+              "travel policies",
+              "environmental impact",
+              "trip itinerary"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "Which idea do students share examples of?",
+            "choices": [
+              "travel arrangements",
+              "trip itinerary",
+              "cultural understanding",
+              "environmental impact"
+            ],
+            "correct": 0
+          }
+        ]
+      },
+      "writingPrompt": {
+        "id": "apr-br-w3-writing",
+        "jp": "「travel policies」と「environmental impact」を つかって、1〜3ぶんで かいてね。",
+        "en": "Write 1–3 sentences about thoughtful travel and cultural discovery using travel policies and environmental impact.",
+        "targets": [
+          "travel policies",
+          "environmental impact"
+        ]
+      },
+      "definitions": [
+        {
+          "n": 31,
+          "def": "an activity or information connected with visiting another place",
+          "pos": "phrase"
+        },
+        {
+          "n": 32,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 33,
+          "def": "an activity or information connected with visiting another place",
+          "pos": "phrase"
+        },
+        {
+          "n": 34,
+          "def": "a way of arranging tasks and time in advance",
+          "pos": "phrase"
+        },
+        {
+          "n": 35,
+          "def": "an idea or activity that helps people understand different communities",
+          "pos": "phrase"
+        },
+        {
+          "n": 36,
+          "def": "an activity or information connected with visiting another place",
+          "pos": "phrase"
+        },
+        {
+          "n": 37,
+          "def": "an activity or information connected with visiting another place",
+          "pos": "phrase"
+        },
+        {
+          "n": 38,
+          "def": "an activity or information connected with visiting another place",
+          "pos": "phrase"
+        },
+        {
+          "n": 39,
+          "def": "an idea or activity that helps people understand different communities",
+          "pos": "phrase"
+        },
+        {
+          "n": 40,
+          "def": "a way of arranging tasks and time in advance",
+          "pos": "phrase"
+        },
+        {
+          "n": 41,
+          "def": "a step or resource that helps people avoid harm",
+          "pos": "phrase"
+        },
+        {
+          "n": 42,
+          "def": "an activity or information connected with visiting another place",
+          "pos": "phrase"
+        },
+        {
+          "n": 43,
+          "def": "an activity or information connected with visiting another place",
+          "pos": "phrase"
+        },
+        {
+          "n": 44,
+          "def": "an activity or information connected with visiting another place",
+          "pos": "phrase"
+        },
+        {
+          "n": 45,
+          "def": "an activity or information connected with visiting another place",
+          "pos": "phrase"
+        }
+      ],
+      "questions": [
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Before the activity, Booha chooses to focus on “transportation options” because it will help the class prepare.",
+          "q": "What idea does Booha choose to focus on?",
+          "choices": [
+            "transportation options",
+            "sightseeing spots",
+            "cultural practices",
+            "planning tools"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "During the lesson, Nuppi explains what “sightseeing spots” means to the group.",
+          "q": "What does Nuppi explain to the group?",
+          "choices": [
+            "sightseeing spots",
+            "transportation options",
+            "cultural practices",
+            "planning tools"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "At the end, the class discusses “cultural practices” and decides how to improve next time.",
+          "q": "What does the class discuss at the end?",
+          "choices": [
+            "cultural practices",
+            "transportation options",
+            "sightseeing spots",
+            "planning tools"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "その地域の伝統について学ぶ時間を取りましょう。",
+          "en": "Take time to learn about the traditions of the area",
+          "accepted": [
+            "Take time to learn about the traditions of the area."
+          ]
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "寺院を訪れるときは、地元の服装規定に注意しましょう。",
+          "en": "Be mindful of local dress codes when visiting temples",
+          "accepted": [
+            "Be mindful of local dress codes when visiting temples."
+          ]
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "道を見つけるために地図やナビゲーションアプリを使用しましょう。",
+          "en": "Use a map or a navigation app to find your way",
+          "accepted": [
+            "Use a map or a navigation app to find your way."
+          ]
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "旅行方針",
+          "en": "travel policies"
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "環境への影響",
+          "en": "environmental impact"
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "地元の祭り",
+          "en": "local festivals"
+        }
+      ]
+    },
+    {
+      "week": 4,
+      "passage": {
+        "text": "During the thoughtful travel and cultural discovery unit, Booha and Nuppi focus first on “travel habits.” They discuss “personal safety” and consider “travel resources” with their teacher. The class connects these ideas to “cultural insights” and “transportation hubs.” During a discussion, students share examples of “responsible tourism” and decide how it can make their next activity clearer. By the end of the lesson, everyone understands that preparation, reflection, and cooperation strengthen learning.",
+        "comprehension": [
+          {
+            "n": 1,
+            "q": "Which idea do Booha and Nuppi focus on first?",
+            "choices": [
+              "travel habits",
+              "personal safety",
+              "travel resources",
+              "cultural insights"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "Which additional term do they consider with their teacher?",
+            "choices": [
+              "travel resources",
+              "travel habits",
+              "personal safety",
+              "cultural insights"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "Which idea do students share examples of?",
+            "choices": [
+              "responsible tourism",
+              "cultural insights",
+              "transportation hubs",
+              "personal safety"
+            ],
+            "correct": 0
+          }
+        ]
+      },
+      "writingPrompt": {
+        "id": "apr-br-w4-writing",
+        "jp": "「travel habits」と「personal safety」を つかって、1〜3ぶんで かいてね。",
+        "en": "Write 1–3 sentences about thoughtful travel and cultural discovery using travel habits and personal safety.",
+        "targets": [
+          "travel habits",
+          "personal safety"
+        ]
+      },
+      "definitions": [
+        {
+          "n": 46,
+          "def": "an activity or information connected with visiting another place",
+          "pos": "phrase"
+        },
+        {
+          "n": 47,
+          "def": "a step or resource that helps people avoid harm",
+          "pos": "phrase"
+        },
+        {
+          "n": 48,
+          "def": "an activity or information connected with visiting another place",
+          "pos": "phrase"
+        },
+        {
+          "n": 49,
+          "def": "an idea or activity that helps people understand different communities",
+          "pos": "phrase"
+        },
+        {
+          "n": 50,
+          "def": "an activity or information connected with visiting another place",
+          "pos": "phrase"
+        },
+        {
+          "n": 51,
+          "def": "an activity or information connected with visiting another place",
+          "pos": "phrase"
+        },
+        {
+          "n": 52,
+          "def": "an activity or information connected with visiting another place",
+          "pos": "phrase"
+        },
+        {
+          "n": 53,
+          "def": "a step or resource that helps people avoid harm",
+          "pos": "phrase"
+        },
+        {
+          "n": 54,
+          "def": "people working together and supporting one another",
+          "pos": "phrase"
+        },
+        {
+          "n": 55,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 56,
+          "def": "an activity or information connected with visiting another place",
+          "pos": "phrase"
+        },
+        {
+          "n": 57,
+          "def": "an idea or activity that helps people understand different communities",
+          "pos": "phrase"
+        },
+        {
+          "n": 58,
+          "def": "an aim or result that someone works toward",
+          "pos": "phrase"
+        },
+        {
+          "n": 59,
+          "def": "an activity or information connected with visiting another place",
+          "pos": "phrase"
+        },
+        {
+          "n": 60,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        }
+      ],
+      "questions": [
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Before the activity, Booha chooses to focus on “travel preferences” because it will help the class prepare.",
+          "q": "What idea does Booha choose to focus on?",
+          "choices": [
+            "travel preferences",
+            "cultural awareness",
+            "travel community",
+            "adventure activities"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "During the lesson, Nuppi explains what “cultural awareness” means to the group.",
+          "q": "What does Nuppi explain to the group?",
+          "choices": [
+            "cultural awareness",
+            "travel preferences",
+            "travel community",
+            "adventure activities"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "At the end, the class discusses “travel community” and decides how to improve next time.",
+          "q": "What does the class discuss at the end?",
+          "choices": [
+            "travel community",
+            "travel preferences",
+            "cultural awareness",
+            "adventure activities"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "文化をよりよく理解するために博物館を訪れましょう。",
+          "en": "Visit museums to understand the culture better",
+          "accepted": [
+            "Visit museums to understand the culture better."
+          ]
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "新しい友達を作るために、親しみやすく接しましょう。",
+          "en": "Be friendly and approachable to make new friends",
+          "accepted": [
+            "Be friendly and approachable to make new friends."
+          ]
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "異なる文化において時間厳守の重要性を理解しましょう。",
+          "en": "Understand the importance of being punctual in different cultures",
+          "accepted": [
+            "Understand the importance of being punctual in different cultures."
+          ]
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "旅行の習慣",
+          "en": "travel habits"
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "個人の安全",
+          "en": "personal safety"
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "旅行資源",
+          "en": "travel resources"
+        }
+      ]
+    }
+  ]
+}

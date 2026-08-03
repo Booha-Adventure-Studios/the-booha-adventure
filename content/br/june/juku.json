@@ -1,0 +1,858 @@
+{
+  "curriculum": "br",
+  "month": "june",
+  "weeks": [
+    {
+      "week": 1,
+      "passage": {
+        "text": "During the safe and enjoyable outdoor summer activities unit, Booha and Nuppi focus first on “outdoor picnic.” They discuss “nature hike” and consider “campfire gathering” with their teacher. The class connects these ideas to “road trip adventure” and “wildlife observation.” During a discussion, students share examples of “garden barbecue” and decide how it can make their next activity clearer. By the end of the lesson, everyone understands that preparation, reflection, and cooperation strengthen learning.",
+        "comprehension": [
+          {
+            "n": 1,
+            "q": "Which idea do Booha and Nuppi focus on first?",
+            "choices": [
+              "outdoor picnic",
+              "nature hike",
+              "campfire gathering",
+              "road trip adventure"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "Which additional term do they consider with their teacher?",
+            "choices": [
+              "campfire gathering",
+              "outdoor picnic",
+              "nature hike",
+              "road trip adventure"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "Which idea do students share examples of?",
+            "choices": [
+              "garden barbecue",
+              "road trip adventure",
+              "wildlife observation",
+              "nature hike"
+            ],
+            "correct": 0
+          }
+        ]
+      },
+      "writingPrompt": {
+        "id": "jun-br-w1-writing",
+        "jp": "「outdoor picnic」と「nature hike」を つかって、1〜3ぶんで かいてね。",
+        "en": "Write 1–3 sentences about safe and enjoyable outdoor summer activities using outdoor picnic and nature hike.",
+        "targets": [
+          "outdoor picnic",
+          "nature hike"
+        ]
+      },
+      "definitions": [
+        {
+          "n": 1,
+          "def": "an activity or experience enjoyed outside",
+          "pos": "phrase"
+        },
+        {
+          "n": 2,
+          "def": "an activity or experience enjoyed outside",
+          "pos": "phrase"
+        },
+        {
+          "n": 3,
+          "def": "an activity or role that helps bring people together",
+          "pos": "phrase"
+        },
+        {
+          "n": 4,
+          "def": "an activity or information connected with visiting another place",
+          "pos": "phrase"
+        },
+        {
+          "n": 5,
+          "def": "an activity or experience enjoyed outside",
+          "pos": "phrase"
+        },
+        {
+          "n": 6,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 7,
+          "def": "an activity or experience enjoyed outside",
+          "pos": "phrase"
+        },
+        {
+          "n": 8,
+          "def": "an activity or experience enjoyed outside",
+          "pos": "phrase"
+        },
+        {
+          "n": 9,
+          "def": "an activity or experience enjoyed outside",
+          "pos": "phrase"
+        },
+        {
+          "n": 10,
+          "def": "an action or process carried out over time",
+          "pos": "phrase"
+        },
+        {
+          "n": 11,
+          "def": "a step or resource that helps people avoid harm",
+          "pos": "phrase"
+        },
+        {
+          "n": 12,
+          "def": "an activity or experience enjoyed outside",
+          "pos": "phrase"
+        },
+        {
+          "n": 13,
+          "def": "an activity or information connected with visiting another place",
+          "pos": "phrase"
+        },
+        {
+          "n": 14,
+          "def": "an activity or experience enjoyed outside",
+          "pos": "phrase"
+        },
+        {
+          "n": 15,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        }
+      ],
+      "questions": [
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Before the activity, Booha chooses to focus on “sunset view” because it will help the class prepare.",
+          "q": "What idea does Booha choose to focus on?",
+          "choices": [
+            "sunset view",
+            "outdoor games",
+            "camping gear",
+            "star gazing"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "During the lesson, Nuppi explains what “outdoor games” means to the group.",
+          "q": "What does Nuppi explain to the group?",
+          "choices": [
+            "outdoor games",
+            "sunset view",
+            "camping gear",
+            "star gazing"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "At the end, the class discusses “camping gear” and decides how to improve next time.",
+          "q": "What does the class discuss at the end?",
+          "choices": [
+            "camping gear",
+            "sunset view",
+            "outdoor games",
+            "star gazing"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "夏には友達と屋外ピクニックを楽しみます。",
+          "en": "During summer, I enjoy outdoor picnics with my friends",
+          "accepted": [
+            "During summer, I enjoy outdoor picnics with my friends."
+          ]
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "今週末はハイキングのために山を訪れる予定です。",
+          "en": "We plan to visit the mountains for hiking this weekend",
+          "accepted": [
+            "We plan to visit the mountains for hiking this weekend."
+          ]
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "暑い日にはレモネードを作るのが大好きです。",
+          "en": "I love making lemonade on hot days",
+          "accepted": [
+            "I love making lemonade on hot days."
+          ]
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "アウトドアピクニック",
+          "en": "outdoor picnic"
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "自然ハイキング",
+          "en": "nature hike"
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "キャンプファイヤーの集まり",
+          "en": "campfire gathering"
+        }
+      ]
+    },
+    {
+      "week": 2,
+      "passage": {
+        "text": "During the safe and enjoyable outdoor summer activities unit, Booha and Nuppi focus first on “family reunion.” They discuss “cooking class” and consider “cultural exchange” with their teacher. The class connects these ideas to “outdoor concert” and “safety tips.” During a discussion, students share examples of “beach volleyball” and decide how it can make their next activity clearer. By the end of the lesson, everyone understands that preparation, reflection, and cooperation strengthen learning.",
+        "comprehension": [
+          {
+            "n": 1,
+            "q": "Which idea do Booha and Nuppi focus on first?",
+            "choices": [
+              "family reunion",
+              "cooking class",
+              "cultural exchange",
+              "outdoor concert"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "Which additional term do they consider with their teacher?",
+            "choices": [
+              "cultural exchange",
+              "family reunion",
+              "cooking class",
+              "outdoor concert"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "Which idea do students share examples of?",
+            "choices": [
+              "beach volleyball",
+              "outdoor concert",
+              "safety tips",
+              "cooking class"
+            ],
+            "correct": 0
+          }
+        ]
+      },
+      "writingPrompt": {
+        "id": "jun-br-w2-writing",
+        "jp": "「family reunion」と「cooking class」を つかって、1〜3ぶんで かいてね。",
+        "en": "Write 1–3 sentences about safe and enjoyable outdoor summer activities using family reunion and cooking class.",
+        "targets": [
+          "family reunion",
+          "cooking class"
+        ]
+      },
+      "definitions": [
+        {
+          "n": 16,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 17,
+          "def": "an idea, resource, or activity that supports learning",
+          "pos": "phrase"
+        },
+        {
+          "n": 18,
+          "def": "an idea or activity that helps people understand different communities",
+          "pos": "phrase"
+        },
+        {
+          "n": 19,
+          "def": "an activity or experience enjoyed outside",
+          "pos": "phrase"
+        },
+        {
+          "n": 20,
+          "def": "a step or resource that helps people avoid harm",
+          "pos": "phrase"
+        },
+        {
+          "n": 21,
+          "def": "an activity or experience enjoyed outside",
+          "pos": "phrase"
+        },
+        {
+          "n": 22,
+          "def": "an activity or experience enjoyed outside",
+          "pos": "phrase"
+        },
+        {
+          "n": 23,
+          "def": "an activity or information connected with visiting another place",
+          "pos": "phrase"
+        },
+        {
+          "n": 24,
+          "def": "a step or resource that helps people avoid harm",
+          "pos": "phrase"
+        },
+        {
+          "n": 25,
+          "def": "an activity or experience enjoyed outside",
+          "pos": "phrase"
+        },
+        {
+          "n": 26,
+          "def": "an activity or experience enjoyed outside",
+          "pos": "phrase"
+        },
+        {
+          "n": 27,
+          "def": "an activity or information connected with visiting another place",
+          "pos": "phrase"
+        },
+        {
+          "n": 28,
+          "def": "a step or resource that helps people avoid harm",
+          "pos": "phrase"
+        },
+        {
+          "n": 29,
+          "def": "an activity or experience enjoyed outside",
+          "pos": "phrase"
+        },
+        {
+          "n": 30,
+          "def": "an activity or experience enjoyed outside",
+          "pos": "phrase"
+        }
+      ],
+      "questions": [
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Before the activity, Booha chooses to focus on “camping site” because it will help the class prepare.",
+          "q": "What idea does Booha choose to focus on?",
+          "choices": [
+            "camping site",
+            "fishing trip",
+            "safety gear",
+            "nature reserve"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "During the lesson, Nuppi explains what “fishing trip” means to the group.",
+          "q": "What does Nuppi explain to the group?",
+          "choices": [
+            "fishing trip",
+            "camping site",
+            "safety gear",
+            "nature reserve"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "At the end, the class discusses “safety gear” and decides how to improve next time.",
+          "q": "What does the class discuss at the end?",
+          "choices": [
+            "safety gear",
+            "camping site",
+            "fishing trip",
+            "nature reserve"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "来週の土曜日に湖で釣りをする予定です。",
+          "en": "I plan to go fishing at the lake next Saturday",
+          "accepted": [
+            "I plan to go fishing at the lake next Saturday."
+          ]
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "暑い日が終わった後、夏の風は心地よいです。",
+          "en": "The summer breeze feels nice after a hot day",
+          "accepted": [
+            "The summer breeze feels nice after a hot day."
+          ]
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "友達と星の下でキャンプを楽しみます。",
+          "en": "I enjoy camping under the stars with my friends",
+          "accepted": [
+            "I enjoy camping under the stars with my friends."
+          ]
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "家族の再会",
+          "en": "family reunion"
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "料理教室",
+          "en": "cooking class"
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "文化交流",
+          "en": "cultural exchange"
+        }
+      ]
+    },
+    {
+      "week": 3,
+      "passage": {
+        "text": "During the safe and enjoyable outdoor summer activities unit, Booha and Nuppi focus first on “fishing gear.” They discuss “nature trail” and consider “cooking outdoors” with their teacher. The class connects these ideas to “camping checklist” and “outdoor festival.” During a discussion, students share examples of “safety advice” and decide how it can make their next activity clearer. By the end of the lesson, everyone understands that preparation, reflection, and cooperation strengthen learning.",
+        "comprehension": [
+          {
+            "n": 1,
+            "q": "Which idea do Booha and Nuppi focus on first?",
+            "choices": [
+              "fishing gear",
+              "nature trail",
+              "cooking outdoors",
+              "camping checklist"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "Which additional term do they consider with their teacher?",
+            "choices": [
+              "cooking outdoors",
+              "fishing gear",
+              "nature trail",
+              "camping checklist"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "Which idea do students share examples of?",
+            "choices": [
+              "safety advice",
+              "camping checklist",
+              "outdoor festival",
+              "nature trail"
+            ],
+            "correct": 0
+          }
+        ]
+      },
+      "writingPrompt": {
+        "id": "jun-br-w3-writing",
+        "jp": "「fishing gear」と「nature trail」を つかって、1〜3ぶんで かいてね。",
+        "en": "Write 1–3 sentences about safe and enjoyable outdoor summer activities using fishing gear and nature trail.",
+        "targets": [
+          "fishing gear",
+          "nature trail"
+        ]
+      },
+      "definitions": [
+        {
+          "n": 31,
+          "def": "an activity or experience enjoyed outside",
+          "pos": "phrase"
+        },
+        {
+          "n": 32,
+          "def": "an activity or experience enjoyed outside",
+          "pos": "phrase"
+        },
+        {
+          "n": 33,
+          "def": "an activity or experience enjoyed outside",
+          "pos": "phrase"
+        },
+        {
+          "n": 34,
+          "def": "a way of arranging tasks and time in advance",
+          "pos": "phrase"
+        },
+        {
+          "n": 35,
+          "def": "an idea or activity that helps people understand different communities",
+          "pos": "phrase"
+        },
+        {
+          "n": 36,
+          "def": "a step or resource that helps people avoid harm",
+          "pos": "phrase"
+        },
+        {
+          "n": 37,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 38,
+          "def": "an activity or experience enjoyed outside",
+          "pos": "phrase"
+        },
+        {
+          "n": 39,
+          "def": "an activity or experience enjoyed outside",
+          "pos": "phrase"
+        },
+        {
+          "n": 40,
+          "def": "an activity or experience enjoyed outside",
+          "pos": "phrase"
+        },
+        {
+          "n": 41,
+          "def": "an activity or experience enjoyed outside",
+          "pos": "phrase"
+        },
+        {
+          "n": 42,
+          "def": "an activity or information connected with visiting another place",
+          "pos": "phrase"
+        },
+        {
+          "n": 43,
+          "def": "an activity or experience enjoyed outside",
+          "pos": "phrase"
+        },
+        {
+          "n": 44,
+          "def": "an activity or experience enjoyed outside",
+          "pos": "phrase"
+        },
+        {
+          "n": 45,
+          "def": "an activity or experience enjoyed outside",
+          "pos": "phrase"
+        }
+      ],
+      "questions": [
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Before the activity, Booha chooses to focus on “starry night” because it will help the class prepare.",
+          "q": "What idea does Booha choose to focus on?",
+          "choices": [
+            "starry night",
+            "sunset picnic",
+            "outdoor party",
+            "summer harvest"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "During the lesson, Nuppi explains what “sunset picnic” means to the group.",
+          "q": "What does Nuppi explain to the group?",
+          "choices": [
+            "sunset picnic",
+            "starry night",
+            "outdoor party",
+            "summer harvest"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "At the end, the class discusses “outdoor party” and decides how to improve next time.",
+          "q": "What does the class discuss at the end?",
+          "choices": [
+            "outdoor party",
+            "starry night",
+            "sunset picnic",
+            "summer harvest"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "夏の夜は星空観察に最適です。",
+          "en": "The summer nights are perfect for stargazing",
+          "accepted": [
+            "The summer nights are perfect for stargazing."
+          ]
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "公園でスケートボードを学んでいます。",
+          "en": "I am learning to skateboard at the park",
+          "accepted": [
+            "I am learning to skateboard at the park."
+          ]
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "今週末に自然散策をします。",
+          "en": "We will go on a nature walk this weekend",
+          "accepted": [
+            "We will go on a nature walk this weekend."
+          ]
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "釣り道具",
+          "en": "fishing gear"
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "自然の小道",
+          "en": "nature trail"
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "屋外料理",
+          "en": "cooking outdoors"
+        }
+      ]
+    },
+    {
+      "week": 4,
+      "passage": {
+        "text": "During the safe and enjoyable outdoor summer activities unit, Booha and Nuppi focus first on “biking adventure.” They discuss “outdoor fitness” and consider “group activities” with their teacher. The class connects these ideas to “weather changes” and “tropical fruits.” During a discussion, students share examples of “cooking competition” and decide how it can make their next activity clearer. By the end of the lesson, everyone understands that preparation, reflection, and cooperation strengthen learning.",
+        "comprehension": [
+          {
+            "n": 1,
+            "q": "Which idea do Booha and Nuppi focus on first?",
+            "choices": [
+              "biking adventure",
+              "outdoor fitness",
+              "group activities",
+              "weather changes"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "Which additional term do they consider with their teacher?",
+            "choices": [
+              "group activities",
+              "biking adventure",
+              "outdoor fitness",
+              "weather changes"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "Which idea do students share examples of?",
+            "choices": [
+              "cooking competition",
+              "weather changes",
+              "tropical fruits",
+              "outdoor fitness"
+            ],
+            "correct": 0
+          }
+        ]
+      },
+      "writingPrompt": {
+        "id": "jun-br-w4-writing",
+        "jp": "「biking adventure」と「outdoor fitness」を つかって、1〜3ぶんで かいてね。",
+        "en": "Write 1–3 sentences about safe and enjoyable outdoor summer activities using biking adventure and outdoor fitness.",
+        "targets": [
+          "biking adventure",
+          "outdoor fitness"
+        ]
+      },
+      "definitions": [
+        {
+          "n": 46,
+          "def": "an activity or experience enjoyed outside",
+          "pos": "phrase"
+        },
+        {
+          "n": 47,
+          "def": "an activity or experience enjoyed outside",
+          "pos": "phrase"
+        },
+        {
+          "n": 48,
+          "def": "people working together and supporting one another",
+          "pos": "phrase"
+        },
+        {
+          "n": 49,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 50,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 51,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 52,
+          "def": "an activity or experience enjoyed outside",
+          "pos": "phrase"
+        },
+        {
+          "n": 53,
+          "def": "a way of arranging tasks and time in advance",
+          "pos": "phrase"
+        },
+        {
+          "n": 54,
+          "def": "a step or resource that helps people avoid harm",
+          "pos": "phrase"
+        },
+        {
+          "n": 55,
+          "def": "an activity or experience enjoyed outside",
+          "pos": "phrase"
+        },
+        {
+          "n": 56,
+          "def": "an activity or experience enjoyed outside",
+          "pos": "phrase"
+        },
+        {
+          "n": 57,
+          "def": "an activity or experience enjoyed outside",
+          "pos": "phrase"
+        },
+        {
+          "n": 58,
+          "def": "an idea or activity that helps people understand different communities",
+          "pos": "phrase"
+        },
+        {
+          "n": 59,
+          "def": "a step or resource that helps people avoid harm",
+          "pos": "phrase"
+        },
+        {
+          "n": 60,
+          "def": "an activity or information connected with visiting another place",
+          "pos": "phrase"
+        }
+      ],
+      "questions": [
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Before the activity, Booha chooses to focus on “summer activities” because it will help the class prepare.",
+          "q": "What idea does Booha choose to focus on?",
+          "choices": [
+            "summer activities",
+            "adventure planning",
+            "safety measures",
+            "summer fairs"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "During the lesson, Nuppi explains what “adventure planning” means to the group.",
+          "q": "What does Nuppi explain to the group?",
+          "choices": [
+            "adventure planning",
+            "summer activities",
+            "safety measures",
+            "summer fairs"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "At the end, the class discusses “safety measures” and decides how to improve next time.",
+          "q": "What does the class discuss at the end?",
+          "choices": [
+            "safety measures",
+            "summer activities",
+            "adventure planning",
+            "summer fairs"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "夏のスムージーの作り方を学びたいです。",
+          "en": "I want to learn how to make summer smoothies",
+          "accepted": [
+            "I want to learn how to make summer smoothies."
+          ]
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "この夏、海で家族の再会をします。",
+          "en": "We will have a family reunion at the beach this summer",
+          "accepted": [
+            "We will have a family reunion at the beach this summer."
+          ]
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "ビーチに行くときに貝殻を集めるのが好きです。",
+          "en": "I enjoy collecting seashells when I go to the beach",
+          "accepted": [
+            "I enjoy collecting seashells when I go to the beach."
+          ]
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "自転車の冒険",
+          "en": "biking adventure"
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "屋外フィットネス",
+          "en": "outdoor fitness"
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "グループ活動",
+          "en": "group activities"
+        }
+      ]
+    }
+  ]
+}

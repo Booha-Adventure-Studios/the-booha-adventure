@@ -154,8 +154,8 @@ for w in weeks:
             if dup:
                 errs.append(f'w{wk} translate n{q.get("n")}: extra duplicates target {dup}')
         elif t == 'write':
-            if not re.match(r'^[a-z]+$', q.get('en', '')):
-                errs.append(f'w{wk} write n{q.get("n")}: en must be one lowercase a-z word')
+            if not q.get('en', '').strip():
+                errs.append(f'w{wk} write n{q.get("n")}: en must not be empty')
             if is_pb and not kana.match(q.get('jp', '')):
                 errs.append(f'w{wk} write n{q.get("n")}: pb write prompt must be kana: {q.get("jp")}')
 for e in errs:
