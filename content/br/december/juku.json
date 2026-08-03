@@ -5,181 +5,853 @@
     {
       "week": 1,
       "passage": {
-        "text": "During winter break, the Booha friends compare the ways people enjoy the holiday season. Nuppi hangs decorations, holiday lights, and a holiday tree for Christmas. Mimo builds a snowman and rides a sled before warming up with a hot drink. Booha practices ice skating, although he falls several times. On New Year's Eve, everyone joins a countdown. The next morning, they make their first shrine visit and later attend a family gathering. The activities are different, but each one brings people together during the cold winter.",
+        "text": "During the community celebrations, reflection, and future goals unit, Booha and Nuppi focus first on “hosting duties.” They discuss “event itinerary” and consider “invitation list” with their teacher. The class connects these ideas to “guest of honor” and “dietary preference.” During a discussion, students share examples of “accessibility needs” and decide how it can make their next activity clearer. By the end of the lesson, everyone understands that preparation, reflection, and cooperation strengthen learning.",
         "comprehension": [
-          { "n": 1, "q": "What does Mimo do before having a hot drink?", "choices": ["He joins a countdown", "He builds a snowman and rides a sled", "He visits a shrine", "He decorates a tree"], "correct": 1 },
-          { "n": 2, "q": "When does everyone join the countdown?", "choices": ["during the first shrine visit", "on New Year's Eve", "after winter break", "at the family gathering"], "correct": 1 },
-          { "n": 3, "q": "What do the activities have in common?", "choices": ["They happen at school", "They require snow", "They bring people together", "They are all sports"], "correct": 2 }
+          {
+            "n": 1,
+            "q": "Which idea do Booha and Nuppi focus on first?",
+            "choices": [
+              "hosting duties",
+              "event itinerary",
+              "invitation list",
+              "guest of honor"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "Which additional term do they consider with their teacher?",
+            "choices": [
+              "invitation list",
+              "hosting duties",
+              "event itinerary",
+              "guest of honor"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "Which idea do students share examples of?",
+            "choices": [
+              "accessibility needs",
+              "guest of honor",
+              "dietary preference",
+              "event itinerary"
+            ],
+            "correct": 0
+          }
         ]
       },
       "writingPrompt": {
         "id": "dec-br-w1-writing",
-        "jp": "winter break と first shrine visit を つかって、ふゆの よていを 1〜3ぶんで かいてね。",
-        "en": "Write 1–3 sentences about winter plans using winter break and first shrine visit.",
-        "targets": ["winter break", "first shrine visit"]
+        "jp": "「hosting duties」と「event itinerary」を つかって、1〜3ぶんで かいてね。",
+        "en": "Write 1–3 sentences about community celebrations, reflection, and future goals using hosting duties and event itinerary.",
+        "targets": [
+          "hosting duties",
+          "event itinerary"
+        ]
       },
       "definitions": [
-        { "n": 1, "def": "a period without school during the coldest season of the year", "pos": "noun" },
-        { "n": 2, "def": "the coldest season, following autumn and before spring", "pos": "noun" },
-        { "n": 3, "def": "a day or period when regular school or work stops for rest or celebration", "pos": "noun" },
-        { "n": 4, "def": "a December holiday celebrated by many people around the world", "pos": "noun" },
-        { "n": 5, "def": "the beginning of a new calendar year and its celebration", "pos": "noun" },
-        { "n": 6, "def": "the act of counting backward to an important moment", "pos": "noun" },
-        { "n": 7, "def": "the traditional first trip of the year to a place of worship", "pos": "noun" },
-        { "n": 8, "def": "a human-shaped figure made by packing together snow", "pos": "noun" },
-        { "n": 9, "def": "a low vehicle that slides over snow and is often pulled or ridden downhill", "pos": "noun" },
-        { "n": 10, "def": "the activity of moving over frozen water on special boots with blades", "pos": "noun" },
-        { "n": 11, "def": "an object used to make a place look special or attractive", "pos": "noun" },
-        { "n": 12, "def": "a tree displayed and decorated for a winter celebration", "pos": "noun" },
-        { "n": 13, "def": "small electric lights displayed as seasonal decorations", "pos": "noun" },
-        { "n": 14, "def": "a warm liquid such as tea or cocoa that is served to drink", "pos": "noun" },
-        { "n": 15, "def": "an occasion when relatives meet and spend time together", "pos": "noun" }
+        {
+          "n": 1,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 2,
+          "def": "a way of arranging tasks and time in advance",
+          "pos": "phrase"
+        },
+        {
+          "n": 3,
+          "def": "an activity or role that helps bring people together",
+          "pos": "phrase"
+        },
+        {
+          "n": 4,
+          "def": "an activity or role that helps bring people together",
+          "pos": "phrase"
+        },
+        {
+          "n": 5,
+          "def": "a habit or choice that supports physical or mental well-being",
+          "pos": "phrase"
+        },
+        {
+          "n": 6,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 7,
+          "def": "an idea or activity that helps people understand different communities",
+          "pos": "phrase"
+        },
+        {
+          "n": 8,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 9,
+          "def": "an action or process carried out over time",
+          "pos": "phrase"
+        },
+        {
+          "n": 10,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 11,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 12,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 13,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 14,
+          "def": "an activity or role that helps bring people together",
+          "pos": "phrase"
+        },
+        {
+          "n": 15,
+          "def": "an activity or role that helps bring people together",
+          "pos": "phrase"
+        }
       ],
       "questions": [
-        { "n": 1, "type": "read", "text": "The snow is too soft for skating, but it is perfect for building a snowman.", "q": "Which activity can the friends do?", "choices": ["ice skating", "building a snowman", "swimming", "planting a tree"], "correct": 1 },
-        { "n": 2, "type": "read", "text": "After the countdown ends, Booha turns off the holiday lights before going to sleep.", "q": "What happens first?", "choices": ["Booha goes to sleep", "Booha turns off the lights", "The countdown ends", "The shrine opens"], "correct": 2 },
-        { "n": 3, "type": "read", "text": "The family gathering was planned outside, but the winter weather moves it indoors.", "q": "Why does the gathering move indoors?", "choices": ["because of the winter weather", "because the lights are bright", "because the holiday ends", "because there is no hot drink"], "correct": 0 },
-        { "n": 4, "type": "translate", "jp": "ふゆは さむくて ゆきが ふります。", "en": "It's cold and snowy in winter", "accepted": ["Winter is cold and snowy"], "extra": ["summer", "warm"] },
-        { "n": 5, "type": "translate", "jp": "にわで ゆきだるまを つくります。", "en": "We make a snowman in the yard", "accepted": ["We build a snowman in the yard"], "extra": ["sled", "makes"] },
-        { "n": 6, "type": "translate", "jp": "りんくで すけーとを します。", "en": "We skate at the rink", "accepted": ["We go ice skating at the rink"], "extra": ["snow", "skates"] },
-        { "n": 7, "type": "write", "jp": "ふゆ", "en": "winter" },
-        { "n": 8, "type": "write", "jp": "かうんとだうん", "en": "countdown" },
-        { "n": 9, "type": "write", "jp": "ゆきだるま", "en": "snowman" }
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Before the activity, Booha chooses to focus on “cultural etiquette” because it will help the class prepare.",
+          "q": "What idea does Booha choose to focus on?",
+          "choices": [
+            "cultural etiquette",
+            "conversation starter",
+            "mutual understanding",
+            "thoughtful choice"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "During the lesson, Nuppi explains what “conversation starter” means to the group.",
+          "q": "What does Nuppi explain to the group?",
+          "choices": [
+            "conversation starter",
+            "cultural etiquette",
+            "mutual understanding",
+            "thoughtful choice"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "At the end, the class discusses “mutual understanding” and decides how to improve next time.",
+          "q": "What does the class discuss at the end?",
+          "choices": [
+            "mutual understanding",
+            "cultural etiquette",
+            "conversation starter",
+            "thoughtful choice"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "この季節、私たちは友達や家族と温かい食事と笑いを共有します。",
+          "en": "This season, we gather with friends and family to share warm meals and laughter",
+          "accepted": [
+            "This season, we gather with friends and family to share warm meals and laughter."
+          ]
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "私たちの伝統を知らない人々に説明することは重要です。",
+          "en": "It is important to explain our traditions to those who are unfamiliar with them",
+          "accepted": [
+            "It is important to explain our traditions to those who are unfamiliar with them."
+          ]
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "個人の興味を反映した贈り物を選ぶことは、私たちがどれほど気にかけているかを示すことができます。",
+          "en": "Choosing gifts that reflect personal interests can show how much we care",
+          "accepted": [
+            "Choosing gifts that reflect personal interests can show how much we care."
+          ]
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "ホスティングの義務",
+          "en": "hosting duties"
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "イベントの旅程",
+          "en": "event itinerary"
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "招待リスト",
+          "en": "invitation list"
+        }
       ]
     },
     {
       "week": 2,
       "passage": {
-        "text": "Every family creates memories in a different way. Mister Happy's New Year tradition is a large family dinner with a special holiday meal. Nuppi follows a custom of making a card and cake for her grandparents. Mimo chooses music, hangs an ornament, and teaches everyone a traditional song. Booha takes a photo after they exchange a small gift. The celebration is simple, but the shared family time creates many smiles. Years later, the food and decorations may be forgotten, while the warm memory remains.",
+        "text": "During the community celebrations, reflection, and future goals unit, Booha and Nuppi focus first on “community outreach.” They discuss “inclusive atmosphere” and consider “seasonal gathering” with their teacher. The class connects these ideas to “local custom” and “cultural exchange.” During a discussion, students share examples of “shared experience” and decide how it can make their next activity clearer. By the end of the lesson, everyone understands that preparation, reflection, and cooperation strengthen learning.",
         "comprehension": [
-          { "n": 1, "q": "What is Mister Happy's tradition?", "choices": ["a family dinner", "an ice-skating trip", "a school concert", "a morning exam"], "correct": 0 },
-          { "n": 2, "q": "Who teaches a traditional song?", "choices": ["Booha", "Nuppi", "Mimo", "Mister Happy"], "correct": 2 },
-          { "n": 3, "q": "What does the passage suggest people remember longest?", "choices": ["the price of the gift", "the shared warm memory", "the exact decorations", "the size of the cake"], "correct": 1 }
+          {
+            "n": 1,
+            "q": "Which idea do Booha and Nuppi focus on first?",
+            "choices": [
+              "community outreach",
+              "inclusive atmosphere",
+              "seasonal gathering",
+              "local custom"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "Which additional term do they consider with their teacher?",
+            "choices": [
+              "seasonal gathering",
+              "community outreach",
+              "inclusive atmosphere",
+              "local custom"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "Which idea do students share examples of?",
+            "choices": [
+              "shared experience",
+              "local custom",
+              "cultural exchange",
+              "inclusive atmosphere"
+            ],
+            "correct": 0
+          }
         ]
       },
       "writingPrompt": {
         "id": "dec-br-w2-writing",
-        "jp": "tradition と family time を つかって、たいせつな おもいでを 1〜3ぶんで かいてね。",
-        "en": "Write 1–3 sentences about an important memory using tradition and family time.",
-        "targets": ["tradition", "family time"]
+        "jp": "「community outreach」と「inclusive atmosphere」を つかって、1〜3ぶんで かいてね。",
+        "en": "Write 1–3 sentences about community celebrations, reflection, and future goals using community outreach and inclusive atmosphere.",
+        "targets": [
+          "community outreach",
+          "inclusive atmosphere"
+        ]
       },
       "definitions": [
-        { "n": 16, "def": "a belief or way of doing something passed down over a long time", "pos": "noun" },
-        { "n": 17, "def": "a usual way of behaving that belongs to a group or place", "pos": "noun" },
-        { "n": 18, "def": "an enjoyable event held to honor a special occasion", "pos": "noun" },
-        { "n": 19, "def": "an evening meal shared by members of a family", "pos": "noun" },
-        { "n": 20, "def": "food prepared especially for a seasonal celebration", "pos": "noun" },
-        { "n": 21, "def": "something given to another person without payment", "pos": "noun" },
-        { "n": 22, "def": "a folded piece of paper carrying a greeting or message", "pos": "noun" },
-        { "n": 23, "def": "a sweet baked food often served at celebrations", "pos": "noun" },
-        { "n": 24, "def": "organized sounds created by voices or instruments", "pos": "noun" },
-        { "n": 25, "def": "a small object used to decorate a tree or room", "pos": "noun" },
-        { "n": 26, "def": "a picture made with a camera", "pos": "noun" },
-        { "n": 27, "def": "time when relatives are together and focus on one another", "pos": "noun" },
-        { "n": 28, "def": "a happy expression made by turning up the corners of the mouth", "pos": "noun" },
-        { "n": 29, "def": "something remembered from a past experience", "pos": "noun" },
-        { "n": 30, "def": "music with words that has been shared through generations", "pos": "noun" }
+        {
+          "n": 16,
+          "def": "people working together and supporting one another",
+          "pos": "phrase"
+        },
+        {
+          "n": 17,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 18,
+          "def": "an activity or role that helps bring people together",
+          "pos": "phrase"
+        },
+        {
+          "n": 19,
+          "def": "an activity or information connected with visiting another place",
+          "pos": "phrase"
+        },
+        {
+          "n": 20,
+          "def": "an idea or activity that helps people understand different communities",
+          "pos": "phrase"
+        },
+        {
+          "n": 21,
+          "def": "people working together and supporting one another",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 22,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 23,
+          "def": "a way of arranging tasks and time in advance",
+          "pos": "phrase"
+        },
+        {
+          "n": 24,
+          "def": "an activity or role that helps bring people together",
+          "pos": "phrase"
+        },
+        {
+          "n": 25,
+          "def": "an activity or role that helps bring people together",
+          "pos": "phrase"
+        },
+        {
+          "n": 26,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 27,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 28,
+          "def": "an activity or role that helps bring people together",
+          "pos": "phrase"
+        },
+        {
+          "n": 29,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 30,
+          "def": "people working together and supporting one another",
+          "pos": "phrase"
+        }
       ],
       "questions": [
-        { "n": 1, "type": "read", "text": "The custom began with Booha's grandparents and is now followed by the whole family.", "q": "Who began the custom?", "choices": ["Booha's friends", "Booha's grandparents", "the whole town", "the music teacher"], "correct": 1 },
-        { "n": 2, "type": "read", "text": "Nuppi places the ornament on the tree before taking a family photo.", "q": "What does Nuppi do first?", "choices": ["takes a photo", "eats the meal", "places the ornament", "opens a gift"], "correct": 2 },
-        { "n": 3, "type": "read", "text": "Although the card is handmade and simple, its kind message makes Grandmother smile.", "q": "Why does Grandmother smile?", "choices": ["The card is expensive", "The message is kind", "The cake is large", "The song is loud"], "correct": 1 },
-        { "n": 4, "type": "translate", "jp": "まいとし おしょうがつに かぞくで ゆうしょくを たべます。", "en": "We have a family dinner every New Year", "accepted": ["Every New Year we have a family dinner"], "extra": ["breakfast", "has"] },
-        { "n": 5, "type": "translate", "jp": "いっしょに けーきを つくります。", "en": "We make a cake together", "accepted": ["Together we make a cake"], "extra": ["card", "makes"] },
-        { "n": 6, "type": "translate", "jp": "いっしょに おもいでを つくります。", "en": "We make memories together", "accepted": ["Together we make memories"], "extra": ["photos", "makes"] },
-        { "n": 7, "type": "write", "jp": "でんとう", "en": "tradition" },
-        { "n": 8, "type": "write", "jp": "おいわい", "en": "celebration" },
-        { "n": 9, "type": "write", "jp": "おもいで", "en": "memory" }
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Before the activity, Booha chooses to focus on “meaningful occasion” because it will help the class prepare.",
+          "q": "What idea does Booha choose to focus on?",
+          "choices": [
+            "meaningful occasion",
+            "celebration planning",
+            "event coordinator",
+            "guest list"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "During the lesson, Nuppi explains what “celebration planning” means to the group.",
+          "q": "What does Nuppi explain to the group?",
+          "choices": [
+            "celebration planning",
+            "meaningful occasion",
+            "event coordinator",
+            "guest list"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "At the end, the class discusses “event coordinator” and decides how to improve next time.",
+          "q": "What does the class discuss at the end?",
+          "choices": [
+            "event coordinator",
+            "meaningful occasion",
+            "celebration planning",
+            "guest list"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "地域に恩返しをすることで、私たちは社会としてより近くなります。",
+          "en": "Giving back to the community can bring us closer together as a society",
+          "accepted": [
+            "Giving back to the community can bring us closer together as a society."
+          ]
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "私たちは、空間を思慮深く飾ることで、歓迎する雰囲気を作ることができます。",
+          "en": "We can create a welcoming atmosphere by decorating our spaces thoughtfully",
+          "accepted": [
+            "We can create a welcoming atmosphere by decorating our spaces thoughtfully."
+          ]
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "他の人に自分の話を共有するよう促すことで、私たちの集まりを豊かにすることができます。",
+          "en": "Encouraging others to share their stories can enrich our gatherings",
+          "accepted": [
+            "Encouraging others to share their stories can enrich our gatherings."
+          ]
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "地域への支援",
+          "en": "community outreach"
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "包括的な雰囲気",
+          "en": "inclusive atmosphere"
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "季節の集まり",
+          "en": "seasonal gathering"
+        }
       ]
     },
     {
       "week": 3,
       "passage": {
-        "text": "The friends plan a surprise for a child who will spend New Year in the hospital. Nuppi chooses a book and toy, while Booha writes a kind letter and thank-you card for the hospital staff. Mimo places each present in a box, adds gift wrapping, and ties it with a ribbon. Mister Happy prepares a gift bag and a New Year's money envelope. They do not expect to receive anything. Their purpose is to give thanks and show kindness. When the child opens the gifts, the biggest surprise is knowing that other people care.",
+        "text": "During the community celebrations, reflection, and future goals unit, Booha and Nuppi focus first on “annual review.” They discuss “personal milestone” and consider “progress tracker” with their teacher. The class connects these ideas to “learning objective” and “realistic target.” During a discussion, students share examples of “manageable step” and decide how it can make their next activity clearer. By the end of the lesson, everyone understands that preparation, reflection, and cooperation strengthen learning.",
         "comprehension": [
-          { "n": 1, "q": "Who writes to the hospital staff?", "choices": ["Nuppi", "Booha", "Mimo", "the child"], "correct": 1 },
-          { "n": 2, "q": "What does Mimo tie around the box?", "choices": ["a letter", "a card", "a ribbon", "an envelope"], "correct": 2 },
-          { "n": 3, "q": "What is the friends' main purpose?", "choices": ["to receive money", "to show kindness and thanks", "to practice wrapping", "to borrow a book"], "correct": 1 }
+          {
+            "n": 1,
+            "q": "Which idea do Booha and Nuppi focus on first?",
+            "choices": [
+              "annual review",
+              "personal milestone",
+              "progress tracker",
+              "learning objective"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "Which additional term do they consider with their teacher?",
+            "choices": [
+              "progress tracker",
+              "annual review",
+              "personal milestone",
+              "learning objective"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "Which idea do students share examples of?",
+            "choices": [
+              "manageable step",
+              "learning objective",
+              "realistic target",
+              "personal milestone"
+            ],
+            "correct": 0
+          }
         ]
       },
       "writingPrompt": {
         "id": "dec-br-w3-writing",
-        "jp": "thank-you card と kindness を つかって、かんしゃを 1〜3ぶんで つたえてね。",
-        "en": "Express gratitude in 1–3 sentences using thank-you card and kindness.",
-        "targets": ["thank-you card", "kindness"]
+        "jp": "「annual review」と「personal milestone」を つかって、1〜3ぶんで かいてね。",
+        "en": "Write 1–3 sentences about community celebrations, reflection, and future goals using annual review and personal milestone.",
+        "targets": [
+          "annual review",
+          "personal milestone"
+        ]
       },
       "definitions": [
-        { "n": 31, "def": "something given to another person as a gift", "pos": "noun" },
-        { "n": 32, "def": "to hand or provide something to another person", "pos": "verb" },
-        { "n": 33, "def": "to be given or accept something from another person", "pos": "verb" },
-        { "n": 34, "def": "a written message that expresses gratitude", "pos": "noun" },
-        { "n": 35, "def": "an unexpected event or gift that causes a strong feeling", "pos": "noun" },
-        { "n": 36, "def": "paper and decoration used to cover a present", "pos": "noun" },
-        { "n": 37, "def": "a container with a flat base, sides, and usually a lid", "pos": "noun" },
-        { "n": 38, "def": "a decorated bag used to hold and present a gift", "pos": "noun" },
-        { "n": 39, "def": "a narrow strip of material used to tie or decorate something", "pos": "noun" },
-        { "n": 40, "def": "a written message sent from one person to another", "pos": "noun" },
-        { "n": 41, "def": "words or feelings that show gratitude", "pos": "noun" },
-        { "n": 42, "def": "friendly and caring behavior toward other people", "pos": "noun" },
-        { "n": 43, "def": "a decorated packet traditionally used to give children money at New Year", "pos": "noun" },
-        { "n": 44, "def": "an object made for children to play with", "pos": "noun" },
-        { "n": 45, "def": "a set of written or printed pages fastened together", "pos": "noun" }
+        {
+          "n": 31,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 32,
+          "def": "an aim or result that someone works toward",
+          "pos": "phrase"
+        },
+        {
+          "n": 33,
+          "def": "a way of arranging tasks and time in advance",
+          "pos": "phrase"
+        },
+        {
+          "n": 34,
+          "def": "an aim or result that someone works toward",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 35,
+          "def": "an aim or result that someone works toward",
+          "pos": "phrase"
+        },
+        {
+          "n": 36,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 37,
+          "def": "a way of arranging tasks and time in advance",
+          "pos": "phrase"
+        },
+        {
+          "n": 38,
+          "def": "a way of arranging tasks and time in advance",
+          "pos": "phrase"
+        },
+        {
+          "n": 39,
+          "def": "people working together and supporting one another",
+          "pos": "phrase"
+        },
+        {
+          "n": 40,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 41,
+          "def": "an idea, resource, or activity that supports learning",
+          "pos": "phrase"
+        },
+        {
+          "n": 42,
+          "def": "a way of arranging tasks and time in advance",
+          "pos": "phrase"
+        },
+        {
+          "n": 43,
+          "def": "a way of arranging tasks and time in advance",
+          "pos": "phrase"
+        },
+        {
+          "n": 44,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "noun"
+        },
+        {
+          "n": 45,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        }
       ],
       "questions": [
-        { "n": 1, "type": "read", "text": "Booha receives a present from Nuppi and sends a thank-you card the following day.", "q": "What does Booha do after receiving the present?", "choices": ["sends a thank-you card", "buys a toy", "asks for money", "wraps the same gift"], "correct": 0 },
-        { "n": 2, "type": "read", "text": "The gift bag is too small for the book, so Mimo uses a box instead.", "q": "Why does Mimo use a box?", "choices": ["The ribbon is missing", "The bag is too small", "The book is a surprise", "The letter is too long"], "correct": 1 },
-        { "n": 3, "type": "read", "text": "Nuppi gives her time rather than money, showing that kindness does not need to be expensive.", "q": "What does Nuppi give?", "choices": ["her time", "money", "a ribbon", "an envelope"], "correct": 0 },
-        { "n": 4, "type": "translate", "jp": "ともだちに ぷれぜんとを あげました。", "en": "I gave a present to my friend", "accepted": ["I gave my friend a present"], "extra": ["teacher", "gives"] },
-        { "n": 5, "type": "translate", "jp": "りぼんで ぷれぜんとを つつみました。", "en": "I wrapped the gift with ribbon", "accepted": ["I used ribbon to wrap the gift"], "extra": ["letter", "wrap"] },
-        { "n": 6, "type": "translate", "jp": "すてきな さぷらいずでした。", "en": "It was a nice surprise", "accepted": ["That was a nice surprise"], "extra": ["present", "were"] },
-        { "n": 7, "type": "write", "jp": "ぷれぜんと", "en": "present" },
-        { "n": 8, "type": "write", "jp": "しんせつ", "en": "kindness" },
-        { "n": 9, "type": "write", "jp": "りぼん", "en": "ribbon" }
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Before the activity, Booha chooses to focus on “action deadline” because it will help the class prepare.",
+          "q": "What idea does Booha choose to focus on?",
+          "choices": [
+            "action deadline",
+            "weekly routine",
+            "accountability partner",
+            "self-discipline"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "During the lesson, Nuppi explains what “weekly routine” means to the group.",
+          "q": "What does Nuppi explain to the group?",
+          "choices": [
+            "weekly routine",
+            "action deadline",
+            "accountability partner",
+            "self-discipline"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "At the end, the class discusses “accountability partner” and decides how to improve next time.",
+          "q": "What does the class discuss at the end?",
+          "choices": [
+            "accountability partner",
+            "action deadline",
+            "weekly routine",
+            "self-discipline"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "私たちの経験について話し合うことは、お互いの理解を深めることができます。",
+          "en": "Engaging in discussions about our experiences can deepen our understanding of each other",
+          "accepted": [
+            "Engaging in discussions about our experiences can deepen our understanding of each other."
+          ]
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "私たちの達成を振り返ることは、新しい挑戦を追求する動機になります。",
+          "en": "Reflecting on our achievements can motivate us to pursue new challenges",
+          "accepted": [
+            "Reflecting on our achievements can motivate us to pursue new challenges."
+          ]
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "自己反省の時間を設けることは、私たちの目標を明確にするのに役立ちます。",
+          "en": "Setting aside time for self-reflection can help clarify our goals",
+          "accepted": [
+            "Setting aside time for self-reflection can help clarify our goals."
+          ]
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "年次レビュー",
+          "en": "annual review"
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "個人的なマイルストーン",
+          "en": "personal milestone"
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "進捗トラッカー",
+          "en": "progress tracker"
+        }
       ]
     },
     {
       "week": 4,
       "passage": {
-        "text": "At the end of the year, Booha prepares a year in review. Each month taught him a different lesson. His greatest success was finishing a difficult activity, while his biggest challenge was continuing after a mistake. A friend and teacher helped him notice his improvement. He also discovered a favorite new skill: writing short English stories. Booha chooses a goal for next year that is clear enough to follow and difficult enough to matter. Reflection does not change the past, but it helps him decide what to do next.",
+        "text": "During the community celebrations, reflection, and future goals unit, Booha and Nuppi focus first on “backup plan.” They discuss “self-confidence” and consider “growth mindset” with their teacher. The class connects these ideas to “personal strengths” and “area for improvement.” During a discussion, students share examples of “constructive habit” and decide how it can make their next activity clearer. By the end of the lesson, everyone understands that preparation, reflection, and cooperation strengthen learning.",
         "comprehension": [
-          { "n": 1, "q": "What was Booha's greatest success?", "choices": ["finishing a difficult activity", "avoiding every mistake", "choosing a favorite month", "teaching his friend"], "correct": 0 },
-          { "n": 2, "q": "Who helped Booha notice his improvement?", "choices": ["a friend and teacher", "his family", "a doctor", "a coach"], "correct": 0 },
-          { "n": 3, "q": "How does reflection help Booha?", "choices": ["It changes the past", "It removes every challenge", "It helps him choose what comes next", "It makes goals unnecessary"], "correct": 2 }
+          {
+            "n": 1,
+            "q": "Which idea do Booha and Nuppi focus on first?",
+            "choices": [
+              "backup plan",
+              "self-confidence",
+              "growth mindset",
+              "personal strengths"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "Which additional term do they consider with their teacher?",
+            "choices": [
+              "growth mindset",
+              "backup plan",
+              "self-confidence",
+              "personal strengths"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "Which idea do students share examples of?",
+            "choices": [
+              "constructive habit",
+              "personal strengths",
+              "area for improvement",
+              "self-confidence"
+            ],
+            "correct": 0
+          }
         ]
       },
       "writingPrompt": {
         "id": "dec-br-w4-writing",
-        "jp": "improvement と goal for next year を つかって、せいちょうを 1〜3ぶんで かいてね。",
-        "en": "Write 1–3 reflective sentences using improvement and goal for next year.",
-        "targets": ["improvement", "goal for next year"]
+        "jp": "「backup plan」と「self-confidence」を つかって、1〜3ぶんで かいてね。",
+        "en": "Write 1–3 sentences about community celebrations, reflection, and future goals using backup plan and self-confidence.",
+        "targets": [
+          "backup plan",
+          "self-confidence"
+        ]
       },
       "definitions": [
-        { "n": 46, "def": "a period of twelve months", "pos": "noun" },
-        { "n": 47, "def": "one of the twelve named divisions of a year", "pos": "noun" },
-        { "n": 48, "def": "a thoughtful look back at the events and progress of the past year", "pos": "noun" },
-        { "n": 49, "def": "something learned through teaching, study, or experience", "pos": "noun" },
-        { "n": 50, "def": "something a person plans and works to achieve", "pos": "noun" },
-        { "n": 51, "def": "the achievement of a desired result", "pos": "noun" },
-        { "n": 52, "def": "a difficult task or situation that tests ability", "pos": "noun" },
-        { "n": 53, "def": "an action or answer that is not correct", "pos": "noun" },
-        { "n": 54, "def": "a person someone likes, trusts, and enjoys spending time with", "pos": "noun" },
-        { "n": 55, "def": "a person whose work is helping others learn", "pos": "noun" },
-        { "n": 56, "def": "liked more than all other choices of the same kind", "pos": "adjective" },
-        { "n": 57, "def": "something a person does for work, learning, exercise, or enjoyment", "pos": "noun" },
-        { "n": 58, "def": "a specific result a person plans to work toward during the coming year", "pos": "noun" },
-        { "n": 59, "def": "a change that makes ability, quality, or results better", "pos": "noun" },
-        { "n": 60, "def": "an ability that a person has recently learned", "pos": "noun" }
+        {
+          "n": 46,
+          "def": "a way of arranging tasks and time in advance",
+          "pos": "phrase"
+        },
+        {
+          "n": 47,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 48,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 49,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 50,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 51,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 52,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 53,
+          "def": "an aim or result that someone works toward",
+          "pos": "phrase"
+        },
+        {
+          "n": 54,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 55,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 56,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 57,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 58,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 59,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 60,
+          "def": "a way of arranging tasks and time in advance",
+          "pos": "phrase"
+        }
       ],
       "questions": [
-        { "n": 1, "type": "read", "text": "Mimo's first attempt failed, but he used the mistake to improve his second attempt.", "q": "How did the mistake help Mimo?", "choices": ["It helped him improve", "It ended the activity", "It removed the challenge", "It changed his teacher"], "correct": 0 },
-        { "n": 2, "type": "read", "text": "Nuppi's goal is specific: she will practice reading for ten minutes every day.", "q": "What makes Nuppi's goal specific?", "choices": ["It is her favorite", "It includes an exact action and time", "It has no challenge", "It began last year"], "correct": 1 },
-        { "n": 3, "type": "read", "text": "Booha's year in review includes both his success and the challenge he has not solved yet.", "q": "What does Booha include?", "choices": ["only success", "only mistakes", "success and an unfinished challenge", "his next twelve months"], "correct": 2 },
-        { "n": 4, "type": "translate", "jp": "たくさんの あたらしい たんごを まなびました。", "en": "I learned many new words", "accepted": ["I learnt many new words"], "extra": ["old", "learn"] },
-        { "n": 5, "type": "translate", "jp": "まちがいから まなびました。", "en": "I learned from my mistakes", "accepted": ["I learnt from my mistakes"], "extra": ["success", "learn"] },
-        { "n": 6, "type": "translate", "jp": "らいねんは もっと べんきょうします。", "en": "Next year I will study more", "accepted": ["I will study more next year"], "extra": ["month", "studied"] },
-        { "n": 7, "type": "write", "jp": "とし", "en": "year" },
-        { "n": 8, "type": "write", "jp": "ちょうせん", "en": "challenge" },
-        { "n": 9, "type": "write", "jp": "かいぜん", "en": "improvement" }
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Before the activity, Booha chooses to focus on “long-term vision” because it will help the class prepare.",
+          "q": "What idea does Booha choose to focus on?",
+          "choices": [
+            "long-term vision",
+            "short-term aim",
+            "personal commitment",
+            "reflection journal"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "During the lesson, Nuppi explains what “short-term aim” means to the group.",
+          "q": "What does Nuppi explain to the group?",
+          "choices": [
+            "short-term aim",
+            "long-term vision",
+            "personal commitment",
+            "reflection journal"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "At the end, the class discusses “personal commitment” and decides how to improve next time.",
+          "q": "What does the class discuss at the end?",
+          "choices": [
+            "personal commitment",
+            "long-term vision",
+            "short-term aim",
+            "reflection journal"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "地域の組織にボランティアすることは、私たちのコミュニティの絆を強化します。",
+          "en": "Volunteering for local organizations can strengthen our community ties",
+          "accepted": [
+            "Volunteering for local organizations can strengthen our community ties."
+          ]
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "未来のビジョンを作ることは、私たちが今日行動を起こすインスピレーションになります。",
+          "en": "Creating a vision for the future can inspire us to take action today",
+          "accepted": [
+            "Creating a vision for the future can inspire us to take action today."
+          ]
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "私たちのコミュニティの強みを振り返ることは、改善が必要な分野を特定するのに役立ちます。",
+          "en": "Reflecting on our community's strengths can help us identify areas for improvement",
+          "accepted": [
+            "Reflecting on our community's strengths can help us identify areas for improvement."
+          ]
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "バックアッププラン",
+          "en": "backup plan"
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "自己信頼",
+          "en": "self-confidence"
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "成長マインドセット",
+          "en": "growth mindset"
+        }
       ]
     }
   ]

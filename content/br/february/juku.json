@@ -1,0 +1,858 @@
+{
+  "curriculum": "br",
+  "month": "february",
+  "weeks": [
+    {
+      "week": 1,
+      "passage": {
+        "text": "During the feelings, relationships, and helping others unit, Booha and Nuppi focus first on “frustrated.” They discuss “relieved” and consider “curious” with their teacher. The class connects these ideas to “disappointed” and “enthusiastic.” During a discussion, students share examples of “confident” and decide how it can make their next activity clearer. By the end of the lesson, everyone understands that preparation, reflection, and cooperation strengthen learning.",
+        "comprehension": [
+          {
+            "n": 1,
+            "q": "Which idea do Booha and Nuppi focus on first?",
+            "choices": [
+              "frustrated",
+              "relieved",
+              "curious",
+              "disappointed"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "Which additional term do they consider with their teacher?",
+            "choices": [
+              "curious",
+              "frustrated",
+              "relieved",
+              "disappointed"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "Which idea do students share examples of?",
+            "choices": [
+              "confident",
+              "disappointed",
+              "enthusiastic",
+              "relieved"
+            ],
+            "correct": 0
+          }
+        ]
+      },
+      "writingPrompt": {
+        "id": "feb-br-w1-writing",
+        "jp": "「frustrated」と「relieved」を つかって、1〜3ぶんで かいてね。",
+        "en": "Write 1–3 sentences about feelings, relationships, and helping others using frustrated and relieved.",
+        "targets": [
+          "frustrated",
+          "relieved"
+        ]
+      },
+      "definitions": [
+        {
+          "n": 1,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "adjective"
+        },
+        {
+          "n": 2,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "adjective"
+        },
+        {
+          "n": 3,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "adjective"
+        },
+        {
+          "n": 4,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "adjective"
+        },
+        {
+          "n": 5,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "adjective"
+        },
+        {
+          "n": 6,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "adjective"
+        },
+        {
+          "n": 7,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "adjective"
+        },
+        {
+          "n": 8,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "adjective"
+        },
+        {
+          "n": 9,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "adjective"
+        },
+        {
+          "n": 10,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "adjective"
+        },
+        {
+          "n": 11,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "adjective"
+        },
+        {
+          "n": 12,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "adjective"
+        },
+        {
+          "n": 13,
+          "def": "an action or process carried out over time",
+          "pos": "noun"
+        },
+        {
+          "n": 14,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "noun"
+        },
+        {
+          "n": 15,
+          "def": "an activity or role that helps bring people together",
+          "pos": "noun"
+        }
+      ],
+      "questions": [
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Before the activity, Booha chooses to focus on “grateful” because it will help the class prepare.",
+          "q": "What idea does Booha choose to focus on?",
+          "choices": [
+            "grateful",
+            "embarrassed",
+            "optimistic",
+            "generous"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "During the lesson, Nuppi explains what “embarrassed” means to the group.",
+          "q": "What does Nuppi explain to the group?",
+          "choices": [
+            "embarrassed",
+            "grateful",
+            "optimistic",
+            "generous"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "At the end, the class discusses “optimistic” and decides how to improve next time.",
+          "q": "What does the class discuss at the end?",
+          "choices": [
+            "optimistic",
+            "grateful",
+            "embarrassed",
+            "generous"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "友達を見ると私は嬉しいです。",
+          "en": "I feel joyful when I see my friends",
+          "accepted": [
+            "I feel joyful when I see my friends."
+          ]
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "家にいるとき、時々寂しく感じます。",
+          "en": "Sometimes I feel lonely when I'm at home",
+          "accepted": [
+            "Sometimes I feel lonely when I'm at home."
+          ]
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "大変なときは冷静にしようとします。",
+          "en": "I try to stay calm when things get tough",
+          "accepted": [
+            "I try to stay calm when things get tough."
+          ]
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "いらいらしている",
+          "en": "frustrated"
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "ほっとしている",
+          "en": "relieved"
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "きょうみがある",
+          "en": "curious"
+        }
+      ]
+    },
+    {
+      "week": 2,
+      "passage": {
+        "text": "During the feelings, relationships, and helping others unit, Booha and Nuppi focus first on “communication.” They discuss “tradition” and consider “gathering” with their teacher. The class connects these ideas to “encourage” and “navigate.” During a discussion, students share examples of “emergency kit” and decide how it can make their next activity clearer. By the end of the lesson, everyone understands that preparation, reflection, and cooperation strengthen learning.",
+        "comprehension": [
+          {
+            "n": 1,
+            "q": "Which idea do Booha and Nuppi focus on first?",
+            "choices": [
+              "communication",
+              "tradition",
+              "gathering",
+              "encourage"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "Which additional term do they consider with their teacher?",
+            "choices": [
+              "gathering",
+              "communication",
+              "tradition",
+              "encourage"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "Which idea do students share examples of?",
+            "choices": [
+              "emergency kit",
+              "encourage",
+              "navigate",
+              "tradition"
+            ],
+            "correct": 0
+          }
+        ]
+      },
+      "writingPrompt": {
+        "id": "feb-br-w2-writing",
+        "jp": "「communication」と「tradition」を つかって、1〜3ぶんで かいてね。",
+        "en": "Write 1–3 sentences about feelings, relationships, and helping others using communication and tradition.",
+        "targets": [
+          "communication",
+          "tradition"
+        ]
+      },
+      "definitions": [
+        {
+          "n": 16,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "noun"
+        },
+        {
+          "n": 17,
+          "def": "an idea or activity that helps people understand different communities",
+          "pos": "noun"
+        },
+        {
+          "n": 18,
+          "def": "an activity or role that helps bring people together",
+          "pos": "noun"
+        },
+        {
+          "n": 19,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb"
+        },
+        {
+          "n": 20,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "noun"
+        },
+        {
+          "n": 21,
+          "def": "a step or resource that helps people avoid harm",
+          "pos": "phrase"
+        },
+        {
+          "n": 22,
+          "def": "a step or resource that helps people avoid harm",
+          "pos": "phrase"
+        },
+        {
+          "n": 23,
+          "def": "a step or resource that helps people avoid harm",
+          "pos": "noun"
+        },
+        {
+          "n": 24,
+          "def": "a step or resource that helps people avoid harm",
+          "pos": "noun"
+        },
+        {
+          "n": 25,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 26,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb"
+        },
+        {
+          "n": 27,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb"
+        },
+        {
+          "n": 28,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb"
+        },
+        {
+          "n": 29,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb"
+        },
+        {
+          "n": 30,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        }
+      ],
+      "questions": [
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Before the activity, Booha chooses to focus on “first aid” because it will help the class prepare.",
+          "q": "What idea does Booha choose to focus on?",
+          "choices": [
+            "first aid",
+            "safety",
+            "alert",
+            "calm down"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "During the lesson, Nuppi explains what “safety” means to the group.",
+          "q": "What does Nuppi explain to the group?",
+          "choices": [
+            "safety",
+            "first aid",
+            "alert",
+            "calm down"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "At the end, the class discusses “alert” and decides how to improve next time.",
+          "q": "What does the class discuss at the end?",
+          "choices": [
+            "alert",
+            "first aid",
+            "safety",
+            "calm down"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "家の仕事を手伝って両親を助けます。",
+          "en": "I help my parents with chores around the house",
+          "accepted": [
+            "I help my parents with chores around the house."
+          ]
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "プレゼンテーションの前に緊張します。",
+          "en": "I feel nervous before giving a presentation",
+          "accepted": [
+            "I feel nervous before giving a presentation."
+          ]
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "友達と明確にコミュニケーションを取ることが大切です。",
+          "en": "It is important to communicate clearly with friends",
+          "accepted": [
+            "It is important to communicate clearly with friends."
+          ]
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "つうしん",
+          "en": "communication"
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "でんとう",
+          "en": "tradition"
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "あつまり",
+          "en": "gathering"
+        }
+      ]
+    },
+    {
+      "week": 3,
+      "passage": {
+        "text": "During the feelings, relationships, and helping others unit, Booha and Nuppi focus first on “help out.” They discuss “offer assistance” and consider “show kindness” with their teacher. The class connects these ideas to “be considerate” and “listen carefully.” During a discussion, students share examples of “give directions” and decide how it can make their next activity clearer. By the end of the lesson, everyone understands that preparation, reflection, and cooperation strengthen learning.",
+        "comprehension": [
+          {
+            "n": 1,
+            "q": "Which idea do Booha and Nuppi focus on first?",
+            "choices": [
+              "help out",
+              "offer assistance",
+              "show kindness",
+              "be considerate"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "Which additional term do they consider with their teacher?",
+            "choices": [
+              "show kindness",
+              "help out",
+              "offer assistance",
+              "be considerate"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "Which idea do students share examples of?",
+            "choices": [
+              "give directions",
+              "be considerate",
+              "listen carefully",
+              "offer assistance"
+            ],
+            "correct": 0
+          }
+        ]
+      },
+      "writingPrompt": {
+        "id": "feb-br-w3-writing",
+        "jp": "「help out」と「offer assistance」を つかって、1〜3ぶんで かいてね。",
+        "en": "Write 1–3 sentences about feelings, relationships, and helping others using help out and offer assistance.",
+        "targets": [
+          "help out",
+          "offer assistance"
+        ]
+      },
+      "definitions": [
+        {
+          "n": 31,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 32,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 33,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 34,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 35,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 36,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 37,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 38,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 39,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 40,
+          "def": "a habit or choice that supports physical or mental well-being",
+          "pos": "phrase"
+        },
+        {
+          "n": 41,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 42,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 43,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 44,
+          "def": "an aim or result that someone works toward",
+          "pos": "phrase"
+        },
+        {
+          "n": 45,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        }
+      ],
+      "questions": [
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Before the activity, Booha chooses to focus on “stay calm” because it will help the class prepare.",
+          "q": "What idea does Booha choose to focus on?",
+          "choices": [
+            "stay calm",
+            "take responsibility",
+            "be honest",
+            "handle stress"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "During the lesson, Nuppi explains what “take responsibility” means to the group.",
+          "q": "What does Nuppi explain to the group?",
+          "choices": [
+            "take responsibility",
+            "stay calm",
+            "be honest",
+            "handle stress"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "At the end, the class discusses “be honest” and decides how to improve next time.",
+          "q": "What does the class discuss at the end?",
+          "choices": [
+            "be honest",
+            "stay calm",
+            "take responsibility",
+            "handle stress"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "友達の気持ちを理解しようとします。",
+          "en": "I try to understand my friends' feelings",
+          "accepted": [
+            "I try to understand my friends' feelings."
+          ]
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "地域を助けるとき、私は幸せを感じます。",
+          "en": "I feel happy when I help my community",
+          "accepted": [
+            "I feel happy when I help my community."
+          ]
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "話し合いのとき、自分の考えをはっきり伝えます。",
+          "en": "I communicate my thoughts clearly during discussions",
+          "accepted": [
+            "I communicate my thoughts clearly during discussions."
+          ]
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "てつだう",
+          "en": "help out"
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "たすけをさしだす",
+          "en": "offer assistance"
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "しんせつにする",
+          "en": "show kindness"
+        }
+      ]
+    },
+    {
+      "week": 4,
+      "passage": {
+        "text": "During the feelings, relationships, and helping others unit, Booha and Nuppi focus first on “be supportive.” They discuss “stay connected” and consider “help in emergencies” with their teacher. The class connects these ideas to “be a good listener” and “solve problems.” During a discussion, students share examples of “be patient” and decide how it can make their next activity clearer. By the end of the lesson, everyone understands that preparation, reflection, and cooperation strengthen learning.",
+        "comprehension": [
+          {
+            "n": 1,
+            "q": "Which idea do Booha and Nuppi focus on first?",
+            "choices": [
+              "be supportive",
+              "stay connected",
+              "help in emergencies",
+              "be a good listener"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "Which additional term do they consider with their teacher?",
+            "choices": [
+              "help in emergencies",
+              "be supportive",
+              "stay connected",
+              "be a good listener"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "Which idea do students share examples of?",
+            "choices": [
+              "be patient",
+              "be a good listener",
+              "solve problems",
+              "stay connected"
+            ],
+            "correct": 0
+          }
+        ]
+      },
+      "writingPrompt": {
+        "id": "feb-br-w4-writing",
+        "jp": "「be supportive」と「stay connected」を つかって、1〜3ぶんで かいてね。",
+        "en": "Write 1–3 sentences about feelings, relationships, and helping others using be supportive and stay connected.",
+        "targets": [
+          "be supportive",
+          "stay connected"
+        ]
+      },
+      "definitions": [
+        {
+          "n": 46,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 47,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 48,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 49,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 50,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 51,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 52,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 53,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 54,
+          "def": "people working together and supporting one another",
+          "pos": "phrase"
+        },
+        {
+          "n": 55,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 56,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 57,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 58,
+          "def": "a step or resource that helps people avoid harm",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 59,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 60,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        }
+      ],
+      "questions": [
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Before the activity, Booha chooses to focus on “show empathy” because it will help the class prepare.",
+          "q": "What idea does Booha choose to focus on?",
+          "choices": [
+            "show empathy",
+            "be inclusive",
+            "encourage teamwork",
+            "make compromises"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "During the lesson, Nuppi explains what “be inclusive” means to the group.",
+          "q": "What does Nuppi explain to the group?",
+          "choices": [
+            "be inclusive",
+            "show empathy",
+            "encourage teamwork",
+            "make compromises"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "At the end, the class discusses “encourage teamwork” and decides how to improve next time.",
+          "q": "What does the class discuss at the end?",
+          "choices": [
+            "encourage teamwork",
+            "show empathy",
+            "be inclusive",
+            "make compromises"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "プロジェクトを終えた後、達成感を感じます。",
+          "en": "I feel a sense of achievement after completing a project",
+          "accepted": [
+            "I feel a sense of achievement after completing a project."
+          ]
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "敬意を示すために、いつも「お願いします」と「ありがとう」と言います。",
+          "en": "I always say please and thank you to show respect",
+          "accepted": [
+            "I always say please and thank you to show respect."
+          ]
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "友達の問題を解決する手助けをすると嬉しいです。",
+          "en": "I feel happy when I help my friends solve problems",
+          "accepted": [
+            "I feel happy when I help my friends solve problems."
+          ]
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "しえんする",
+          "en": "be supportive"
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "つながりをもつ",
+          "en": "stay connected"
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "きんきゅうじたいにたすける",
+          "en": "help in emergencies"
+        }
+      ]
+    }
+  ]
+}

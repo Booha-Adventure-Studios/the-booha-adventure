@@ -5,181 +5,853 @@
     {
       "week": 1,
       "passage": {
-        "text": "Booha must choose a vehicle for a trip across Booha City. A bicycle is quick on the quiet streets, but a bus can carry more people. He takes the subway to the main station and watches a tram pass a taxi. Outside, a truck stops to let an ambulance, police car, and fire engine pass. At the river, Booha boards a ferry. He can see an airplane above him and a train on the bridge. By evening, he understands why each kind of transportation is useful.",
+        "text": "During the autumn weather, food, and seasonal activities unit, Booha and Nuppi focus first on “autumn.” They discuss “season” and consider “cool” with their teacher. The class connects these ideas to “temperature” and “forecast.” During a discussion, students share examples of “cloudy” and decide how it can make their next activity clearer. By the end of the lesson, everyone understands that preparation, reflection, and cooperation strengthen learning.",
         "comprehension": [
-          { "n": 1, "q": "Why might Booha choose the bus?", "choices": ["It can carry more people", "It flies above the city", "It travels on the river", "It is smaller than a bicycle"], "correct": 0 },
-          { "n": 2, "q": "Which vehicles does the truck let pass?", "choices": ["a tram and taxi", "a bicycle and bus", "an ambulance, police car, and fire engine", "a ferry and train"], "correct": 2 },
-          { "n": 3, "q": "How does Booha cross the river?", "choices": ["by subway", "by ferry", "by motorbike", "by truck"], "correct": 1 }
+          {
+            "n": 1,
+            "q": "Which idea do Booha and Nuppi focus on first?",
+            "choices": [
+              "autumn",
+              "season",
+              "cool",
+              "temperature"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "Which additional term do they consider with their teacher?",
+            "choices": [
+              "cool",
+              "autumn",
+              "season",
+              "temperature"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "Which idea do students share examples of?",
+            "choices": [
+              "cloudy",
+              "temperature",
+              "forecast",
+              "season"
+            ],
+            "correct": 0
+          }
         ]
       },
       "writingPrompt": {
         "id": "oct-br-w1-writing",
-        "jp": "bus と train を つかって、まちの いどうを 1〜3ぶんで かいてね。",
-        "en": "Write 1–3 sentences about traveling through a city using bus and train.",
-        "targets": ["bus", "train"]
+        "jp": "「autumn」と「season」を つかって、1〜3ぶんで かいてね。",
+        "en": "Write 1–3 sentences about autumn weather, food, and seasonal activities using autumn and season.",
+        "targets": [
+          "autumn",
+          "season"
+        ]
       },
       "definitions": [
-        { "n": 1, "def": "a machine used to carry people or goods from one place to another", "pos": "noun" },
-        { "n": 2, "def": "a road vehicle with four wheels, usually for a small number of people", "pos": "noun" },
-        { "n": 3, "def": "a large road vehicle that carries many passengers along a route", "pos": "noun" },
-        { "n": 4, "def": "a group of connected railway cars pulled or powered along tracks", "pos": "noun" },
-        { "n": 5, "def": "an underground city railway system", "pos": "noun" },
-        { "n": 6, "def": "a passenger vehicle that runs on rails laid in city streets", "pos": "noun" },
-        { "n": 7, "def": "a two-wheeled vehicle moved by pushing pedals", "pos": "noun" },
-        { "n": 8, "def": "a powered two-wheeled vehicle with a motor", "pos": "noun" },
-        { "n": 9, "def": "a car with a driver that passengers pay for a ride", "pos": "noun" },
-        { "n": 10, "def": "a vessel that carries people or vehicles across water", "pos": "noun" },
-        { "n": 11, "def": "a powered flying vehicle with wings", "pos": "noun" },
-        { "n": 12, "def": "a large road vehicle used to carry heavy goods", "pos": "noun" },
-        { "n": 13, "def": "a special vehicle that takes sick or injured people to a hospital", "pos": "noun" },
-        { "n": 14, "def": "a vehicle used by officers to respond to crime and emergencies", "pos": "noun" },
-        { "n": 15, "def": "a large emergency vehicle carrying firefighters and equipment", "pos": "noun" }
+        {
+          "n": 1,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "noun"
+        },
+        {
+          "n": 2,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "noun"
+        },
+        {
+          "n": 3,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "adjective"
+        },
+        {
+          "n": 4,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "noun"
+        },
+        {
+          "n": 5,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "noun"
+        },
+        {
+          "n": 6,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "adjective"
+        },
+        {
+          "n": 7,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "noun"
+        },
+        {
+          "n": 8,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "adjective"
+        },
+        {
+          "n": 9,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 10,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "noun"
+        },
+        {
+          "n": 11,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "noun"
+        },
+        {
+          "n": 12,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "noun"
+        },
+        {
+          "n": 13,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "noun"
+        },
+        {
+          "n": 14,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 15,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "noun"
+        }
       ],
       "questions": [
-        { "n": 1, "type": "read", "text": "The subway is faster during rush hour because it travels below the crowded streets.", "q": "Why is the subway faster?", "choices": ["It has no passengers", "It travels below the crowded streets", "It follows the ferry", "It stops at every corner"], "correct": 1 },
-        { "n": 2, "type": "read", "text": "A tram uses city rails, while a bus shares the road with cars and trucks.", "q": "Which vehicle uses city rails?", "choices": ["the bus", "the truck", "the tram", "the taxi"], "correct": 2 },
-        { "n": 3, "type": "read", "text": "The ambulance reaches the hospital first because the other vehicles move aside.", "q": "What do the other vehicles do?", "choices": ["move aside", "follow the ambulance", "stop at the hospital", "carry the patient"], "correct": 0 },
-        { "n": 4, "type": "translate", "jp": "わたしは ばすで がっこうに いきます。", "en": "I go to school by bus", "accepted": ["I take the bus to school"], "extra": ["train", "goes"] },
-        { "n": 5, "type": "translate", "jp": "たくしーに のりましょう。", "en": "Let's take a taxi", "accepted": ["Let us take a taxi"], "extra": ["tram", "takes"] },
-        { "n": 6, "type": "translate", "jp": "ばすと でんしゃでは どちらが すきですか。", "en": "Do you prefer buses or trains", "accepted": ["Which do you prefer, buses or trains"], "extra": ["ferry", "prefers"] },
-        { "n": 7, "type": "write", "jp": "のりもの", "en": "vehicle" },
-        { "n": 8, "type": "write", "jp": "たくしー", "en": "taxi" },
-        { "n": 9, "type": "write", "jp": "きゅうきゅうしゃ", "en": "ambulance" }
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Before the activity, Booha chooses to focus on “shower” because it will help the class prepare.",
+          "q": "What idea does Booha choose to focus on?",
+          "choices": [
+            "shower",
+            "windy",
+            "changing leaves",
+            "fall"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "During the lesson, Nuppi explains what “windy” means to the group.",
+          "q": "What does Nuppi explain to the group?",
+          "choices": [
+            "windy",
+            "shower",
+            "changing leaves",
+            "fall"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "At the end, the class discusses “changing leaves” and decides how to improve next time.",
+          "q": "What does the class discuss at the end?",
+          "choices": [
+            "changing leaves",
+            "shower",
+            "windy",
+            "fall"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "秋は涼しいので、私の一番好きな季節です。",
+          "en": "Autumn is my favorite season because the weather is cool",
+          "accepted": [
+            "Autumn is my favorite season because the weather is cool."
+          ]
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "10月は日没後に気温がすぐ下がります。",
+          "en": "The temperature drops quickly after sunset in October",
+          "accepted": [
+            "The temperature drops quickly after sunset in October."
+          ]
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "家を出る前に天気予報を確認します。",
+          "en": "I check the weather forecast before leaving home",
+          "accepted": [
+            "I check the weather forecast before leaving home."
+          ]
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "秋",
+          "en": "autumn"
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "季節",
+          "en": "season"
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "涼しい",
+          "en": "cool"
+        }
       ]
     },
     {
       "week": 2,
       "passage": {
-        "text": "Nuppi commutes to a new school and asks Booha for directions. From the station, she walks through the ticket gate and turns left at the first corner. She continues straight for two blocks to a busy intersection. The school is across from a library, between a park and a bank, and next to a small shop. A crosswalk and traffic light make the street safer. The route is not far, but Nuppi checks every bus stop and platform so she can find the quickest way home.",
+        "text": "During the autumn weather, food, and seasonal activities unit, Booha and Nuppi focus first on “mushroom.” They discuss “seasonal” and consider “recipe” with their teacher. The class connects these ideas to “ingredient” and “flavor.” During a discussion, students share examples of “festival” and decide how it can make their next activity clearer. By the end of the lesson, everyone understands that preparation, reflection, and cooperation strengthen learning.",
         "comprehension": [
-          { "n": 1, "q": "Where does Nuppi turn left?", "choices": ["at the first corner", "at the bus stop", "on the platform", "across from the library"], "correct": 0 },
-          { "n": 2, "q": "What is across from the school?", "choices": ["a bank", "a park", "a library", "a station"], "correct": 2 },
-          { "n": 3, "q": "What makes the busy street safer?", "choices": ["a ticket gate", "a crosswalk and traffic light", "two blocks", "a small shop"], "correct": 1 }
+          {
+            "n": 1,
+            "q": "Which idea do Booha and Nuppi focus on first?",
+            "choices": [
+              "mushroom",
+              "seasonal",
+              "recipe",
+              "ingredient"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "Which additional term do they consider with their teacher?",
+            "choices": [
+              "recipe",
+              "mushroom",
+              "seasonal",
+              "ingredient"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "Which idea do students share examples of?",
+            "choices": [
+              "festival",
+              "ingredient",
+              "flavor",
+              "seasonal"
+            ],
+            "correct": 0
+          }
         ]
       },
       "writingPrompt": {
         "id": "oct-br-w2-writing",
-        "jp": "between と across from を つかって、ばしょの みちあんないを 1〜3ぶんで かいてね。",
-        "en": "Write 1–3 sentences giving directions using between and across from.",
-        "targets": ["between", "across from"]
+        "jp": "「mushroom」と「seasonal」を つかって、1〜3ぶんで かいてね。",
+        "en": "Write 1–3 sentences about autumn weather, food, and seasonal activities using mushroom and seasonal.",
+        "targets": [
+          "mushroom",
+          "seasonal"
+        ]
       },
       "definitions": [
-        { "n": 16, "def": "to travel regularly between home and school or work", "pos": "verb" },
-        { "n": 17, "def": "a place where trains arrive and passengers get on or off", "pos": "noun" },
-        { "n": 18, "def": "a raised area beside railway tracks where passengers wait", "pos": "noun" },
-        { "n": 19, "def": "a barrier where passengers enter or leave a paid railway area", "pos": "noun" },
-        { "n": 20, "def": "a marked place where a bus picks up and drops off passengers", "pos": "noun" },
-        { "n": 21, "def": "a place where two or more roads meet or cross", "pos": "noun" },
-        { "n": 22, "def": "a marked part of a road where people can walk across", "pos": "noun" },
-        { "n": 23, "def": "a set of colored lights that controls road traffic", "pos": "noun" },
-        { "n": 24, "def": "the place where two sides or streets meet", "pos": "noun" },
-        { "n": 25, "def": "a section of a street between two crossings", "pos": "noun" },
-        { "n": 26, "def": "at the side of and very close to something", "pos": "phrase" },
-        { "n": 27, "def": "in the space separating two people or things", "pos": "preposition" },
-        { "n": 28, "def": "on the opposite side from a place or object", "pos": "phrase" },
-        { "n": 29, "def": "positioned on one side or the other", "pos": "phrase" },
-        { "n": 30, "def": "at a great or small distance from a place", "pos": "adjective" }
+        {
+          "n": 16,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "noun"
+        },
+        {
+          "n": 17,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "adjective"
+        },
+        {
+          "n": 18,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "noun"
+        },
+        {
+          "n": 19,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "noun"
+        },
+        {
+          "n": 20,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "noun"
+        },
+        {
+          "n": 21,
+          "def": "an idea or activity that helps people understand different communities",
+          "pos": "noun"
+        },
+        {
+          "n": 22,
+          "def": "an activity or information connected with visiting another place",
+          "pos": "phrase"
+        },
+        {
+          "n": 23,
+          "def": "an idea or activity that helps people understand different communities",
+          "pos": "noun"
+        },
+        {
+          "n": 24,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb"
+        },
+        {
+          "n": 25,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "noun"
+        },
+        {
+          "n": 26,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "noun"
+        },
+        {
+          "n": 27,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "noun"
+        },
+        {
+          "n": 28,
+          "def": "people working together and supporting one another",
+          "pos": "noun"
+        },
+        {
+          "n": 29,
+          "def": "an activity or role that helps bring people together",
+          "pos": "noun"
+        },
+        {
+          "n": 30,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb"
+        }
       ],
       "questions": [
-        { "n": 1, "type": "read", "text": "After leaving the ticket gate, walk one block and turn right at the traffic light.", "q": "Where should you turn right?", "choices": ["at the ticket gate", "at the traffic light", "on the platform", "at the bus stop"], "correct": 1 },
-        { "n": 2, "type": "read", "text": "The museum is next to the station, but its entrance is across from the bus stop.", "q": "What is across from the bus stop?", "choices": ["the station", "the platform", "the museum entrance", "the intersection"], "correct": 2 },
-        { "n": 3, "type": "read", "text": "Booha's commute takes ten minutes by bicycle and twenty minutes on foot.", "q": "Which way is quicker?", "choices": ["by bicycle", "on foot", "both take the same time", "the text does not say"], "correct": 0 },
-        { "n": 4, "type": "translate", "jp": "にぶろっく まっすぐ すすんでください。", "en": "Go straight for two blocks", "accepted": ["Continue straight for two blocks"], "extra": ["corner", "left"] },
-        { "n": 5, "type": "translate", "jp": "がっこうは こうえんと ぎんこうの あいだに あります。", "en": "The school is between the park and the bank", "accepted": ["Between the park and the bank is the school"], "extra": ["station", "across"] },
-        { "n": 6, "type": "translate", "jp": "どのくらい とおいですか。", "en": "How far is it", "accepted": ["How far away is it"], "extra": ["near", "many"] },
-        { "n": 7, "type": "write", "jp": "つうきん", "en": "commute" },
-        { "n": 8, "type": "write", "jp": "えき", "en": "station" },
-        { "n": 9, "type": "write", "jp": "かど", "en": "corner" }
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Before the activity, Booha chooses to focus on “local event” because it will help the class prepare.",
+          "q": "What idea does Booha choose to focus on?",
+          "choices": [
+            "local event",
+            "tradition",
+            "celebrate",
+            "costume"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "During the lesson, Nuppi explains what “tradition” means to the group.",
+          "q": "What does Nuppi explain to the group?",
+          "choices": [
+            "tradition",
+            "local event",
+            "celebrate",
+            "costume"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "At the end, the class discusses “celebrate” and decides how to improve next time.",
+          "q": "What does the class discuss at the end?",
+          "choices": [
+            "celebrate",
+            "local event",
+            "tradition",
+            "costume"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "このレシピは風味が豊かですが、作るのは簡単です。",
+          "en": "This recipe has a rich flavor but is easy to make",
+          "accepted": [
+            "This recipe has a rich flavor but is easy to make."
+          ]
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "その町では10月の最初の週末に祭りが開かれます。",
+          "en": "The town holds a festival on the first weekend of October",
+          "accepted": [
+            "The town holds a festival on the first weekend of October."
+          ]
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "地域の行事は近所の人々が会う機会になります。",
+          "en": "The local event gives neighbors a chance to meet",
+          "accepted": [
+            "The local event gives neighbors a chance to meet."
+          ]
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "きのこ",
+          "en": "mushroom"
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "季節の",
+          "en": "seasonal"
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "レシピ",
+          "en": "recipe"
+        }
       ]
     },
     {
       "week": 3,
       "passage": {
-        "text": "Mimo joins a school safety walk through the city. In a car, everyone wears a seat belt; on a bicycle, everyone uses a helmet and stays in the bike lane. At the crosswalk, Mimo waits because every pedestrian must check for traffic. At the station, the group stands behind the yellow line and leaves the priority seat open. Their teacher points out the emergency stop button, the lost and found, a warning sign, and a first aid kit. She also explains insurance, identification, and the emergency number. Mimo learns that noticing a hazard early can prevent danger.",
+        "text": "During the autumn weather, food, and seasonal activities unit, Booha and Nuppi focus first on “outdoors.” They discuss “hike” and consider “camping” with their teacher. The class connects these ideas to “picnic” and “scenery.” During a discussion, students share examples of “viewpoint” and decide how it can make their next activity clearer. By the end of the lesson, everyone understands that preparation, reflection, and cooperation strengthen learning.",
         "comprehension": [
-          { "n": 1, "q": "Where should a bicycle rider stay?", "choices": ["in the bike lane", "on the platform edge", "in the priority seat", "at lost and found"], "correct": 0 },
-          { "n": 2, "q": "Why does Mimo wait at the crosswalk?", "choices": ["He lost his helmet", "He must check for traffic", "He needs first aid", "The teacher calls insurance"], "correct": 1 },
-          { "n": 3, "q": "What can prevent danger?", "choices": ["leaving identification at home", "noticing a hazard early", "standing on the yellow line", "using a priority seat"], "correct": 1 }
+          {
+            "n": 1,
+            "q": "Which idea do Booha and Nuppi focus on first?",
+            "choices": [
+              "outdoors",
+              "hike",
+              "camping",
+              "picnic"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "Which additional term do they consider with their teacher?",
+            "choices": [
+              "camping",
+              "outdoors",
+              "hike",
+              "picnic"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "Which idea do students share examples of?",
+            "choices": [
+              "viewpoint",
+              "picnic",
+              "scenery",
+              "hike"
+            ],
+            "correct": 0
+          }
         ]
       },
       "writingPrompt": {
         "id": "oct-br-w3-writing",
-        "jp": "warning sign と emergency number を つかって、あんぜんの るーるを 1〜3ぶんで かいてね。",
-        "en": "Write 1–3 safety sentences using warning sign and emergency number.",
-        "targets": ["warning sign", "emergency number"]
+        "jp": "「outdoors」と「hike」を つかって、1〜3ぶんで かいてね。",
+        "en": "Write 1–3 sentences about autumn weather, food, and seasonal activities using outdoors and hike.",
+        "targets": [
+          "outdoors",
+          "hike"
+        ]
       },
       "definitions": [
-        { "n": 31, "def": "a strap in a vehicle that holds a passenger safely in place", "pos": "noun" },
-        { "n": 32, "def": "a hard protective covering worn on the head", "pos": "noun" },
-        { "n": 33, "def": "a marked part of the road reserved for bicycles", "pos": "noun" },
-        { "n": 34, "def": "a person who is walking, especially near a road", "pos": "noun" },
-        { "n": 35, "def": "the dangerous area beside a railway track where passengers must take care", "pos": "noun" },
-        { "n": 36, "def": "a public transport seat reserved for people who especially need it", "pos": "noun" },
-        { "n": 37, "def": "a control used to stop a vehicle or machine during a serious problem", "pos": "noun" },
-        { "n": 38, "def": "a service that keeps objects people have misplaced", "pos": "noun" },
-        { "n": 39, "def": "something that may cause injury, damage, or danger", "pos": "noun" },
-        { "n": 40, "def": "a notice that tells people about possible danger", "pos": "noun" },
-        { "n": 41, "def": "a box containing basic medical supplies for injuries", "pos": "noun" },
-        { "n": 42, "def": "a trained person who watches swimmers and rescues people in danger", "pos": "noun" },
-        { "n": 43, "def": "an agreement that provides money or help after loss, damage, or injury", "pos": "noun" },
-        { "n": 44, "def": "a document or card that proves who a person is", "pos": "noun" },
-        { "n": 45, "def": "a telephone number used to call for urgent help", "pos": "noun" }
+        {
+          "n": 31,
+          "def": "an activity or experience enjoyed outside",
+          "pos": "noun"
+        },
+        {
+          "n": 32,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "noun"
+        },
+        {
+          "n": 33,
+          "def": "an activity or experience enjoyed outside",
+          "pos": "noun"
+        },
+        {
+          "n": 34,
+          "def": "an activity or experience enjoyed outside",
+          "pos": "noun"
+        },
+        {
+          "n": 35,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "noun"
+        },
+        {
+          "n": 36,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "noun"
+        },
+        {
+          "n": 37,
+          "def": "an activity or experience enjoyed outside",
+          "pos": "noun"
+        },
+        {
+          "n": 38,
+          "def": "an activity or experience enjoyed outside",
+          "pos": "noun"
+        },
+        {
+          "n": 39,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 40,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "noun"
+        },
+        {
+          "n": 41,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "noun"
+        },
+        {
+          "n": 42,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "noun"
+        },
+        {
+          "n": 43,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "noun"
+        },
+        {
+          "n": 44,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb"
+        },
+        {
+          "n": 45,
+          "def": "a way of arranging tasks and time in advance",
+          "pos": "noun"
+        }
       ],
       "questions": [
-        { "n": 1, "type": "read", "text": "The cyclist wears a helmet and uses the bike lane even when the road is quiet.", "q": "Which two safety actions does the cyclist take?", "choices": ["wearing a helmet and using the bike lane", "walking and using a seat belt", "calling a lifeguard and stopping", "carrying ID and insurance"], "correct": 0 },
-        { "n": 2, "type": "read", "text": "Nuppi finds a wallet on the train, so she takes it to lost and found.", "q": "Why does Nuppi go to lost and found?", "choices": ["She needs first aid", "She found a wallet", "She lost her helmet", "She saw a hazard"], "correct": 1 },
-        { "n": 3, "type": "read", "text": "The warning sign says the path is closed because water has made it dangerous.", "q": "Why is the path closed?", "choices": ["A bike is missing", "The sign is old", "Water made it dangerous", "There is no emergency number"], "correct": 2 },
-        { "n": 4, "type": "translate", "jp": "くるまでは しーとべるとを しなければ なりません。", "en": "You must wear a seat belt in the car", "accepted": ["You have to wear a seat belt in the car"], "extra": ["helmet", "wears"] },
-        { "n": 5, "type": "translate", "jp": "ばすでは てすりに つかまってください。", "en": "Hold the handrail on the bus", "accepted": ["Please hold the handrail on the bus"], "extra": ["button", "held"] },
-        { "n": 6, "type": "translate", "jp": "かばんや もちものから めを はなさないでください。", "en": "Keep an eye on your bags and belongings", "accepted": ["Watch your bags and belongings carefully"], "extra": ["ticket", "eyes"] },
-        { "n": 7, "type": "write", "jp": "へるめっと", "en": "helmet" },
-        { "n": 8, "type": "write", "jp": "ほこうしゃ", "en": "pedestrian" },
-        { "n": 9, "type": "write", "jp": "ほけん", "en": "insurance" }
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Before the activity, Booha chooses to focus on “nature” because it will help the class prepare.",
+          "q": "What idea does Booha choose to focus on?",
+          "choices": [
+            "nature",
+            "wildlife",
+            "exercise",
+            "layer"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "During the lesson, Nuppi explains what “wildlife” means to the group.",
+          "q": "What does Nuppi explain to the group?",
+          "choices": [
+            "wildlife",
+            "nature",
+            "exercise",
+            "layer"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "At the end, the class discusses “exercise” and decides how to improve next time.",
+          "q": "What does the class discuss at the end?",
+          "choices": [
+            "exercise",
+            "nature",
+            "wildlife",
+            "layer"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "寒くなった場合に備えて、かばんにセーターを入れています。",
+          "en": "I keep a sweater in my bag in case it gets cold",
+          "accepted": [
+            "I keep a sweater in my bag in case it gets cold."
+          ]
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "冬に備えて庭を準備する必要があります。",
+          "en": "We need to prepare the garden for winter",
+          "accepted": [
+            "We need to prepare the garden for winter."
+          ]
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "私の秋の習慣には、夕食後に散歩することが含まれます。",
+          "en": "My autumn routine includes taking a walk after dinner",
+          "accepted": [
+            "My autumn routine includes taking a walk after dinner."
+          ]
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "屋外",
+          "en": "outdoors"
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "ハイキングをする",
+          "en": "hike"
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "キャンプ",
+          "en": "camping"
+        }
       ]
     },
     {
       "week": 4,
       "passage": {
-        "text": "Booha plans a railway journey and compares the fare for a one-way ticket with a round-trip ticket. At the ticket machine, he adds value to his IC card and checks the timetable. He must take a local train, transfer to an express, and find the correct platform number and carriage number. An announcement reports a short delay, so the departure and arrival times change. Booha waits near the priority seat area without blocking it. When the train reaches the end of the line, he checks that he has all his belongings before leaving the terminal.",
+        "text": "During the autumn weather, food, and seasonal activities unit, Booha and Nuppi focus first on “memory.” They discuss “cozy” and consider “relax” with their teacher. The class connects these ideas to “sunset” and “shorter days.” During a discussion, students share examples of “winter” and decide how it can make their next activity clearer. By the end of the lesson, everyone understands that preparation, reflection, and cooperation strengthen learning.",
         "comprehension": [
-          { "n": 1, "q": "What does Booha add value to?", "choices": ["the timetable", "his IC card", "the carriage number", "the fare sign"], "correct": 1 },
-          { "n": 2, "q": "Why do the departure and arrival times change?", "choices": ["There is a short delay", "The fare is lower", "The train is local", "Booha loses his ticket"], "correct": 0 },
-          { "n": 3, "q": "What does Booha check before leaving?", "choices": ["the priority seat", "the ticket machine", "his belongings", "the train driver"], "correct": 2 }
+          {
+            "n": 1,
+            "q": "Which idea do Booha and Nuppi focus on first?",
+            "choices": [
+              "memory",
+              "cozy",
+              "relax",
+              "sunset"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "Which additional term do they consider with their teacher?",
+            "choices": [
+              "relax",
+              "memory",
+              "cozy",
+              "sunset"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "Which idea do students share examples of?",
+            "choices": [
+              "winter",
+              "sunset",
+              "shorter days",
+              "cozy"
+            ],
+            "correct": 0
+          }
         ]
       },
       "writingPrompt": {
         "id": "oct-br-w4-writing",
-        "jp": "transfer と platform number を つかって、でんしゃの たびを 1〜3ぶんで かいてね。",
-        "en": "Write 1–3 sentences about a train journey using transfer and platform number.",
-        "targets": ["transfer", "platform number"]
+        "jp": "「memory」と「cozy」を つかって、1〜3ぶんで かいてね。",
+        "en": "Write 1–3 sentences about autumn weather, food, and seasonal activities using memory and cozy.",
+        "targets": [
+          "memory",
+          "cozy"
+        ]
       },
       "definitions": [
-        { "n": 46, "def": "the amount of money paid to travel on public transportation", "pos": "noun" },
-        { "n": 47, "def": "a ticket for travel in one direction or for going and returning", "pos": "noun" },
-        { "n": 48, "def": "a machine where passengers select and buy travel tickets", "pos": "noun" },
-        { "n": 49, "def": "a stored-value electronic card used to pay transportation fares", "pos": "noun" },
-        { "n": 50, "def": "to put more money into the balance of an electronic card", "pos": "verb" },
-        { "n": 51, "def": "a chart listing the planned times of trains or buses", "pos": "noun" },
-        { "n": 52, "def": "different train services that stop at many, some, or few stations", "pos": "noun" },
-        { "n": 53, "def": "a change from one vehicle or route to another during a journey", "pos": "noun" },
-        { "n": 54, "def": "the identifying number of the railway platform a train uses", "pos": "noun" },
-        { "n": 55, "def": "the identifying number of one passenger section of a train", "pos": "noun" },
-        { "n": 56, "def": "the part of a train where seats are reserved for people who need them", "pos": "noun" },
-        { "n": 57, "def": "the act or time of leaving and the act or time of reaching a place", "pos": "noun" },
-        { "n": 58, "def": "a situation in which transportation happens later than planned", "pos": "noun" },
-        { "n": 59, "def": "a spoken public message giving travel information", "pos": "noun" },
-        { "n": 60, "def": "the final station or stopping place on a route", "pos": "noun" }
+        {
+          "n": 46,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "noun"
+        },
+        {
+          "n": 47,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "adjective"
+        },
+        {
+          "n": 48,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb"
+        },
+        {
+          "n": 49,
+          "def": "an activity or experience enjoyed outside",
+          "pos": "noun"
+        },
+        {
+          "n": 50,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "adjective"
+        },
+        {
+          "n": 51,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "noun"
+        },
+        {
+          "n": 52,
+          "def": "an action or process carried out over time",
+          "pos": "noun"
+        },
+        {
+          "n": 53,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb"
+        },
+        {
+          "n": 54,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "noun"
+        },
+        {
+          "n": 55,
+          "def": "an action or process carried out over time",
+          "pos": "phrase"
+        },
+        {
+          "n": 56,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb"
+        },
+        {
+          "n": 57,
+          "def": "a responsibility or practice for caring for a shared home",
+          "pos": "noun"
+        },
+        {
+          "n": 58,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "noun"
+        },
+        {
+          "n": 59,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 60,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        }
       ],
       "questions": [
-        { "n": 1, "type": "read", "text": "The express is delayed, so Mimo takes the local train and transfers at the next station.", "q": "Why does Mimo change his plan?", "choices": ["The express is delayed", "The local fare is missing", "His IC card is full", "The terminal is closed"], "correct": 0 },
-        { "n": 2, "type": "read", "text": "Nuppi buys a round-trip ticket because she will return on the same route tonight.", "q": "Why does Nuppi need a round-trip ticket?", "choices": ["She will travel in one direction", "She will return tonight", "She missed the announcement", "She needs two seats"], "correct": 1 },
-        { "n": 3, "type": "read", "text": "The announcement changes the departure from platform three to platform five.", "q": "Where will the train now depart?", "choices": ["platform two", "platform three", "platform four", "platform five"], "correct": 3 },
-        { "n": 4, "type": "translate", "jp": "おおさかまでの かたみちきっぷを いちまい ください。", "en": "Can I have a one-way ticket to Osaka", "accepted": ["One one-way ticket to Osaka, please"], "extra": ["round-trip", "Tokyo"] },
-        { "n": 5, "type": "translate", "jp": "しんじゅくへ いく でんしゃは どれですか。", "en": "Which train goes to Shinjuku", "accepted": ["Which is the train for Shinjuku"], "extra": ["bus", "go"] },
-        { "n": 6, "type": "translate", "jp": "でんしゃは なんばんせんから でますか。", "en": "Which platform does the train leave from", "accepted": ["What platform does the train depart from"], "extra": ["terminal", "leaves"] },
-        { "n": 7, "type": "write", "jp": "あなうんす", "en": "announcement" },
-        { "n": 8, "type": "write", "jp": "じこくひょう", "en": "timetable" },
-        { "n": 9, "type": "write", "jp": "おくれ", "en": "delay" }
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Before the activity, Booha chooses to focus on “heating” because it will help the class prepare.",
+          "q": "What idea does Booha choose to focus on?",
+          "choices": [
+            "heating",
+            "migrate",
+            "equinox",
+            "moon viewing"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "During the lesson, Nuppi explains what “migrate” means to the group.",
+          "q": "What does Nuppi explain to the group?",
+          "choices": [
+            "migrate",
+            "heating",
+            "equinox",
+            "moon viewing"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "At the end, the class discusses “equinox” and decides how to improve next time.",
+          "q": "What does the class discuss at the end?",
+          "choices": [
+            "equinox",
+            "heating",
+            "migrate",
+            "moon viewing"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "夜の行事に参加するなら、暖かい服を持ってきてください。",
+          "en": "Please bring warm clothes if you join the evening event",
+          "accepted": [
+            "Please bring warm clothes if you join the evening event."
+          ]
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "連休は親戚を訪ねるのによい時期です。",
+          "en": "A long weekend is a good time to visit relatives",
+          "accepted": [
+            "A long weekend is a good time to visit relatives."
+          ]
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "屋外行事が中止になった場合に備えて計画を立てました。",
+          "en": "We made a plan in case the outdoor event was canceled",
+          "accepted": [
+            "We made a plan in case the outdoor event was canceled."
+          ]
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "思い出",
+          "en": "memory"
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "居心地がよい",
+          "en": "cozy"
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "くつろぐ",
+          "en": "relax"
+        }
       ]
     }
   ]

@@ -1,4 +1,3 @@
-
 {
   "curriculum": "br",
   "month": "july",
@@ -6,277 +5,853 @@
     {
       "week": 1,
       "passage": {
-        "text": "Booha reads an old tale about a prince and princess who live in a castle beside Karasuki Forest. A witch uses a spell to wake a stone giant, and the giant steals the royal treasure. The prince begins a quest to bring it home. On the way, a clever wolf leads him to a dragon's cave. Everyone calls the dragon a villain, but it becomes the true hero by using its magic to stop the giant.",
+        "text": "During the purposeful summer growth and exploration unit, Booha and Nuppi focus first on “reflect on my goals.” They discuss “create a summer schedule” and consider “develop new habits” with their teacher. The class connects these ideas to “explore new hobbies” and “plan outdoor activities.” During a discussion, students share examples of “connect with friends” and decide how it can make their next activity clearer. By the end of the lesson, everyone understands that preparation, reflection, and cooperation strengthen learning.",
         "comprehension": [
-          { "n": 1, "q": "Why does the prince begin his quest?",
-            "choices": ["to find the witch", "to bring back the treasure", "to wake the dragon", "to leave the castle"], "correct": 1 },
-          { "n": 2, "q": "How does the prince find the dragon's cave?",
-            "choices": ["The princess gives him a map", "The giant carries him there", "A clever wolf leads him", "The witch tells him a spell"], "correct": 2 },
-          { "n": 3, "q": "Who becomes the true hero?",
-            "choices": ["the prince", "the wolf", "the dragon", "the giant"], "correct": 2 }
+          {
+            "n": 1,
+            "q": "Which idea do Booha and Nuppi focus on first?",
+            "choices": [
+              "reflect on my goals",
+              "create a summer schedule",
+              "develop new habits",
+              "explore new hobbies"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "Which additional term do they consider with their teacher?",
+            "choices": [
+              "develop new habits",
+              "reflect on my goals",
+              "create a summer schedule",
+              "explore new hobbies"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "Which idea do students share examples of?",
+            "choices": [
+              "connect with friends",
+              "explore new hobbies",
+              "plan outdoor activities",
+              "create a summer schedule"
+            ],
+            "correct": 0
+          }
         ]
       },
       "writingPrompt": {
         "id": "jul-br-w1-writing",
-        "jp": "hero と villain を つかって、1〜3ぶんの ものがたりを かいてね。",
-        "en": "Write 1–3 sentences using hero and villain.",
-        "targets": ["hero", "villain"]
+        "jp": "「reflect on my goals」と「create a summer schedule」を つかって、1〜3ぶんで かいてね。",
+        "en": "Write 1–3 sentences about purposeful summer growth and exploration using reflect on my goals and create a summer schedule.",
+        "targets": [
+          "reflect on my goals",
+          "create a summer schedule"
+        ]
       },
       "definitions": [
-        { "n": 1, "def": "a story, especially one that may not be true", "pos": "noun" },
-        { "n": 2, "def": "a brave main character who helps others", "pos": "noun" },
-        { "n": 3, "def": "the character who causes harm or trouble", "pos": "noun" },
-        { "n": 4, "def": "the son of a king or queen", "pos": "noun" },
-        { "n": 5, "def": "the daughter of a king or queen", "pos": "noun" },
-        { "n": 6, "def": "a large imaginary creature, often with wings", "pos": "noun" },
-        { "n": 7, "def": "a wild animal related to a dog", "pos": "noun" },
-        { "n": 8, "def": "a woman in stories who uses magic", "pos": "noun" },
-        { "n": 9, "def": "an imaginary person of enormous size", "pos": "noun" },
-        { "n": 10, "def": "a large strong building where royalty may live", "pos": "noun" },
-        { "n": 11, "def": "a large area covered with trees", "pos": "noun" },
-        { "n": 12, "def": "a special power that makes impossible things happen", "pos": "noun" },
-        { "n": 13, "def": "words said to make magic happen", "pos": "noun" },
-        { "n": 14, "def": "a long and difficult search or adventure", "pos": "noun" },
-        { "n": 15, "def": "valuable objects such as gold, jewels, or coins", "pos": "noun" }
+        {
+          "n": 1,
+          "def": "an aim or result that someone works toward",
+          "pos": "phrase"
+        },
+        {
+          "n": 2,
+          "def": "a way of arranging tasks and time in advance",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 3,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 4,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 5,
+          "def": "a way of arranging tasks and time in advance",
+          "pos": "phrase"
+        },
+        {
+          "n": 6,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 7,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 8,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 9,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 10,
+          "def": "a habit or choice that supports physical or mental well-being",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 11,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 12,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 13,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 14,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 15,
+          "def": "a skill, task, or situation connected with employment",
+          "pos": "phrase"
+        }
       ],
       "questions": [
-        { "n": 1, "type": "read",
-          "text": "The witch hides the treasure in the forest, so the princess asks the hero for help.",
-          "q": "Why does the princess ask for help?",
-          "choices": ["The castle is empty", "The witch hid the treasure", "The dragon is sleeping", "The prince knows magic"], "correct": 1 },
-        { "n": 2, "type": "read",
-          "text": "Although the wolf looks dangerous, it guides the prince safely through the dark forest.",
-          "q": "What does the wolf do?",
-          "choices": ["It attacks the prince", "It guards the treasure", "It guides the prince", "It wakes the giant"], "correct": 2 },
-        { "n": 3, "type": "read",
-          "text": "The dragon cannot break the spell, but its fire opens the castle gate.",
-          "q": "What opens the castle gate?",
-          "choices": ["the dragon's fire", "the magic spell", "the giant's hand", "the hero's key"], "correct": 0 },
-        { "n": 4, "type": "translate",
-          "jp": "おうじは たからものを さがす ぼうけんを はじめます。",
-          "en": "The prince begins a quest to find the treasure",
-          "accepted": ["The prince starts a quest to find the treasure"],
-          "extra": ["castle", "began"] },
-        { "n": 5, "type": "translate",
-          "jp": "その どらごんは あくやくでは ありません。",
-          "en": "The dragon is not a villain",
-          "accepted": ["That dragon is not a villain", "The dragon isn't a villain"],
-          "extra": ["hero", "are"] },
-        { "n": 6, "type": "translate",
-          "jp": "まじょは もりで まほうを つかいます。",
-          "en": "The witch uses magic in the forest",
-          "accepted": ["The witch uses her magic in the forest"],
-          "extra": ["castle", "use"] },
-        { "n": 7, "type": "write", "jp": "悪役", "en": "villain" },
-        { "n": 8, "type": "write", "jp": "呪文", "en": "spell" },
-        { "n": 9, "type": "write", "jp": "冒険", "en": "quest" }
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Before the activity, Booha chooses to focus on “share experiences” because it will help the class prepare.",
+          "q": "What idea does Booha choose to focus on?",
+          "choices": [
+            "share experiences",
+            "set personal challenges",
+            "enjoy quiet moments",
+            "practice mindfulness"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "During the lesson, Nuppi explains what “set personal challenges” means to the group.",
+          "q": "What does Nuppi explain to the group?",
+          "choices": [
+            "set personal challenges",
+            "share experiences",
+            "enjoy quiet moments",
+            "practice mindfulness"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "At the end, the class discusses “enjoy quiet moments” and decides how to improve next time.",
+          "q": "What does the class discuss at the end?",
+          "choices": [
+            "enjoy quiet moments",
+            "share experiences",
+            "set personal challenges",
+            "practice mindfulness"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "夏の間、私は海で泳ぐのを楽しみます。",
+          "en": "During summer, I enjoy swimming in the ocean",
+          "accepted": [
+            "During summer, I enjoy swimming in the ocean."
+          ]
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "私は晴れているときに木の下で本を読むのが好きです。",
+          "en": "I like to read books under a tree while it’s sunny",
+          "accepted": [
+            "I like to read books under a tree while it’s sunny."
+          ]
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "私の好きな夏の活動は友達と海に行くことです。",
+          "en": "My favorite summer activity is going to the beach with friends",
+          "accepted": [
+            "My favorite summer activity is going to the beach with friends."
+          ]
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "目標を振り返る",
+          "en": "reflect on my goals"
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "夏のスケジュールを作成する",
+          "en": "create a summer schedule"
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "新しい習慣を身につける",
+          "en": "develop new habits"
+        }
       ]
     },
     {
       "week": 2,
       "passage": {
-        "text": "Mister Happy writes a draft about a lost character in Utsuroba. The setting is an empty school, and the narrator describes each strange scene. In the first chapter, the character hears dialogue behind a locked door. This creates the main conflict. Mister Happy edits one confusing paragraph and adds a clear sentence about the character's solution. He changes the ending too. The final plot is simple, but its moral about helping strangers is strong.",
+        "text": "During the purposeful summer growth and exploration unit, Booha and Nuppi focus first on “write in a journal.” They discuss “cultivate friendships” and consider “explore nature” with their teacher. The class connects these ideas to “visit local events” and “reflect on past experiences.” During a discussion, students share examples of “set future goals” and decide how it can make their next activity clearer. By the end of the lesson, everyone understands that preparation, reflection, and cooperation strengthen learning.",
         "comprehension": [
-          { "n": 1, "q": "Where is Mister Happy's story set?",
-            "choices": ["in an empty school", "inside a forest castle", "beside a quiet river", "under a tall tower"], "correct": 0 },
-          { "n": 2, "q": "What creates the main conflict?",
-            "choices": ["The narrator changes", "A chapter is missing", "The character hears dialogue behind a door", "The ending is too simple"], "correct": 2 },
-          { "n": 3, "q": "What is the moral of the final story?",
-            "choices": ["Never enter an empty school", "Always write a long plot", "Helping strangers is important", "Every conflict needs magic"], "correct": 2 }
+          {
+            "n": 1,
+            "q": "Which idea do Booha and Nuppi focus on first?",
+            "choices": [
+              "write in a journal",
+              "cultivate friendships",
+              "explore nature",
+              "visit local events"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "Which additional term do they consider with their teacher?",
+            "choices": [
+              "explore nature",
+              "write in a journal",
+              "cultivate friendships",
+              "visit local events"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "Which idea do students share examples of?",
+            "choices": [
+              "set future goals",
+              "visit local events",
+              "reflect on past experiences",
+              "cultivate friendships"
+            ],
+            "correct": 0
+          }
         ]
       },
       "writingPrompt": {
         "id": "jul-br-w2-writing",
-        "jp": "setting と conflict を つかって、1〜3ぶんの ものがたりを かいてね。",
-        "en": "Write 1–3 sentences using setting and conflict.",
-        "targets": ["setting", "conflict"]
+        "jp": "「write in a journal」と「cultivate friendships」を つかって、1〜3ぶんで かいてね。",
+        "en": "Write 1–3 sentences about purposeful summer growth and exploration using write in a journal and cultivate friendships.",
+        "targets": [
+          "write in a journal",
+          "cultivate friendships"
+        ]
       },
       "definitions": [
-        { "n": 16, "def": "the connected events that make up a story", "pos": "noun" },
-        { "n": 17, "def": "the time and place in which a story happens", "pos": "noun" },
-        { "n": 18, "def": "a person or creature in a story", "pos": "noun" },
-        { "n": 19, "def": "the voice or person that tells a story", "pos": "noun" },
-        { "n": 20, "def": "the words spoken between characters", "pos": "noun" },
-        { "n": 21, "def": "one part of a story that happens in a particular place or time", "pos": "noun" },
-        { "n": 22, "def": "one main section of a book", "pos": "noun" },
-        { "n": 23, "def": "a group of sentences about one main idea", "pos": "noun" },
-        { "n": 24, "def": "a group of words that expresses a complete idea", "pos": "noun" },
-        { "n": 25, "def": "the first version of a piece of writing", "pos": "noun" },
-        { "n": 26, "def": "to change writing in order to improve it", "pos": "verb" },
-        { "n": 27, "def": "the main struggle or problem in a story", "pos": "noun" },
-        { "n": 28, "def": "the answer to a problem", "pos": "noun" },
-        { "n": 29, "def": "the final part of a story", "pos": "noun" },
-        { "n": 30, "def": "a lesson about life taught by a story", "pos": "noun" }
+        {
+          "n": 16,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 17,
+          "def": "people working together and supporting one another",
+          "pos": "phrase"
+        },
+        {
+          "n": 18,
+          "def": "an activity or experience enjoyed outside",
+          "pos": "phrase"
+        },
+        {
+          "n": 19,
+          "def": "an activity or information connected with visiting another place",
+          "pos": "phrase"
+        },
+        {
+          "n": 20,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 21,
+          "def": "an aim or result that someone works toward",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 22,
+          "def": "people working together and supporting one another",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 23,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 24,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 25,
+          "def": "people working together and supporting one another",
+          "pos": "phrase"
+        },
+        {
+          "n": 26,
+          "def": "an activity or information connected with visiting another place",
+          "pos": "phrase"
+        },
+        {
+          "n": 27,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 28,
+          "def": "a skill, task, or situation connected with employment",
+          "pos": "phrase"
+        },
+        {
+          "n": 29,
+          "def": "an activity or experience enjoyed outside",
+          "pos": "phrase"
+        },
+        {
+          "n": 30,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        }
       ],
       "questions": [
-        { "n": 1, "type": "read",
-          "text": "The narrator does not join the adventure but explains what every character thinks and feels.",
-          "q": "What is the narrator's job?",
-          "choices": ["to solve the conflict", "to explain the characters", "to change the setting", "to write the dialogue"], "correct": 1 },
-        { "n": 2, "type": "read",
-          "text": "In the final scene, Booha finds the key and opens the door, solving the main conflict.",
-          "q": "What is the solution?",
-          "choices": ["Booha finds the key", "The narrator leaves", "The door disappears", "A new conflict begins"], "correct": 0 },
-        { "n": 3, "type": "read",
-          "text": "Nuppi removes two unnecessary sentences while editing the second paragraph of her draft.",
-          "q": "What does Nuppi remove?",
-          "choices": ["two chapters", "the whole draft", "two sentences", "the ending"], "correct": 2 },
-        { "n": 4, "type": "translate",
-          "jp": "この ものがたりの せっていは からすきです。",
-          "en": "The setting of this tale is Karasuki",
-          "accepted": ["The setting of this story is Karasuki", "This tale is set in Karasuki"],
-          "extra": ["scene", "are"] },
-        { "n": 5, "type": "translate",
-          "jp": "かたりては とうじょうじんぶつを しょうかいします。",
-          "en": "The narrator introduces the character",
-          "accepted": ["The narrator introduces a character"],
-          "extra": ["dialogue", "introduce"] },
-        { "n": 6, "type": "translate",
-          "jp": "わたしは したがきの けつまつを へんしゅうしました。",
-          "en": "I edited the ending of my draft",
-          "accepted": ["I edited my draft's ending", "I edited the ending in my draft"],
-          "extra": ["edit", "chapter"] },
-        { "n": 7, "type": "write", "jp": "設定", "en": "setting" },
-        { "n": 8, "type": "write", "jp": "対立", "en": "conflict" },
-        { "n": 9, "type": "write", "jp": "教訓", "en": "moral" }
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Before the activity, Booha chooses to focus on “practice teamwork” because it will help the class prepare.",
+          "q": "What idea does Booha choose to focus on?",
+          "choices": [
+            "practice teamwork",
+            "enjoy family time",
+            "learn a new skill",
+            "organize community service"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "During the lesson, Nuppi explains what “enjoy family time” means to the group.",
+          "q": "What does Nuppi explain to the group?",
+          "choices": [
+            "enjoy family time",
+            "practice teamwork",
+            "learn a new skill",
+            "organize community service"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "At the end, the class discusses “learn a new skill” and decides how to improve next time.",
+          "q": "What does the class discuss at the end?",
+          "choices": [
+            "learn a new skill",
+            "practice teamwork",
+            "enjoy family time",
+            "organize community service"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "私は通常、夏の思い出のスクラップブックを作ります。",
+          "en": "I usually make a scrapbook of my summer memories",
+          "accepted": [
+            "I usually make a scrapbook of my summer memories."
+          ]
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "私は今夏、新しい料理を作る方法を学びたいです。",
+          "en": "I want to learn how to cook a new dish this summer",
+          "accepted": [
+            "I want to learn how to cook a new dish this summer."
+          ]
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "私の友達と私はすぐに公園でピクニックを計画します。",
+          "en": "My friends and I will organize a picnic at the park soon",
+          "accepted": [
+            "My friends and I will organize a picnic at the park soon."
+          ]
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "日記を書く",
+          "en": "write in a journal"
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "友情を育む",
+          "en": "cultivate friendships"
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "自然を探検する",
+          "en": "explore nature"
+        }
       ]
     },
     {
       "week": 3,
       "passage": {
-        "text": "Nuppi begins a journey through Karasuki with a shy but friendly ghost named Mimo. Mimo's goal is to discover the secret behind his strange power. His personality is kind and funny, although fear often stops him from speaking. During their adventure, a strong creature blocks the road. Nuppi promises not to leave him. Mimo becomes brave and uses a clever plan instead of fighting. Together, they pass the creature and continue toward Utsuroba.",
+        "text": "During the purposeful summer growth and exploration unit, Booha and Nuppi focus first on “take time for self-care.” They discuss “explore different genres” and consider “engage in discussions” with their teacher. The class connects these ideas to “develop a reading habit” and “reflect on personal growth.” During a discussion, students share examples of “set priorities for the year” and decide how it can make their next activity clearer. By the end of the lesson, everyone understands that preparation, reflection, and cooperation strengthen learning.",
         "comprehension": [
-          { "n": 1, "q": "What is Mimo's goal?",
-            "choices": ["to become the strongest ghost", "to discover the secret of his power", "to leave Karasuki alone", "to fight every creature"], "correct": 1 },
-          { "n": 2, "q": "What often stops Mimo from speaking?",
-            "choices": ["his fear", "his power", "his promise", "his goal"], "correct": 0 },
-          { "n": 3, "q": "How do Nuppi and Mimo pass the creature?",
-            "choices": ["Nuppi fights it", "Mimo uses a clever plan", "The creature becomes friendly", "They run back home"], "correct": 1 }
+          {
+            "n": 1,
+            "q": "Which idea do Booha and Nuppi focus on first?",
+            "choices": [
+              "take time for self-care",
+              "explore different genres",
+              "engage in discussions",
+              "develop a reading habit"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "Which additional term do they consider with their teacher?",
+            "choices": [
+              "engage in discussions",
+              "take time for self-care",
+              "explore different genres",
+              "develop a reading habit"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "Which idea do students share examples of?",
+            "choices": [
+              "set priorities for the year",
+              "develop a reading habit",
+              "reflect on personal growth",
+              "explore different genres"
+            ],
+            "correct": 0
+          }
         ]
       },
       "writingPrompt": {
         "id": "jul-br-w3-writing",
-        "jp": "goal と promise を つかって、1〜3ぶんの ものがたりを かいてね。",
-        "en": "Write 1–3 sentences using goal and promise.",
-        "targets": ["goal", "promise"]
+        "jp": "「take time for self-care」と「explore different genres」を つかって、1〜3ぶんで かいてね。",
+        "en": "Write 1–3 sentences about purposeful summer growth and exploration using take time for self-care and explore different genres.",
+        "targets": [
+          "take time for self-care",
+          "explore different genres"
+        ]
       },
       "definitions": [
-        { "n": 31, "def": "the qualities that make a person behave in a certain way", "pos": "noun" },
-        { "n": 32, "def": "caring and helpful toward others", "pos": "adjective" },
-        { "n": 33, "def": "willing to face danger or fear", "pos": "adjective" },
-        { "n": 34, "def": "nervous or uncomfortable around other people", "pos": "adjective" },
-        { "n": 35, "def": "quick to understand or solve problems", "pos": "adjective" },
-        { "n": 36, "def": "causing laughter or amusement", "pos": "adjective" },
-        { "n": 37, "def": "having great physical or mental power", "pos": "adjective" },
-        { "n": 38, "def": "pleasant and easy to talk to", "pos": "adjective" },
-        { "n": 39, "def": "something that a person wants to achieve", "pos": "noun" },
-        { "n": 40, "def": "the feeling of being afraid", "pos": "noun" },
-        { "n": 41, "def": "the ability or strength to do something", "pos": "noun" },
-        { "n": 42, "def": "something known by only a small number of people", "pos": "noun" },
-        { "n": 43, "def": "a firm statement that you will do something", "pos": "noun" },
-        { "n": 44, "def": "an unusual and exciting experience", "pos": "noun" },
-        { "n": 45, "def": "the act of traveling from one place to another", "pos": "noun" }
+        {
+          "n": 31,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 32,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 33,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 34,
+          "def": "an idea, resource, or activity that supports learning",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 35,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 36,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 37,
+          "def": "an idea or activity that helps people understand different communities",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 38,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 39,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 40,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 41,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 42,
+          "def": "a way of arranging tasks and time in advance",
+          "pos": "phrase"
+        },
+        {
+          "n": 43,
+          "def": "an action or process carried out over time",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 44,
+          "def": "an activity or information connected with visiting another place",
+          "pos": "phrase"
+        },
+        {
+          "n": 45,
+          "def": "people working together and supporting one another",
+          "pos": "phrase"
+        }
       ],
       "questions": [
-        { "n": 1, "type": "read",
-          "text": "Although Kuro is shy, his friendly personality makes the other ghosts feel comfortable.",
-          "q": "How does Kuro make the other ghosts feel?",
-          "choices": ["afraid", "comfortable", "angry", "powerful"], "correct": 1 },
-        { "n": 2, "type": "read",
-          "text": "Nuppi's goal is difficult, but she keeps her promise and continues the journey.",
-          "q": "What does Nuppi keep?",
-          "choices": ["her secret", "her power", "her promise", "her fear"], "correct": 2 },
-        { "n": 3, "type": "read",
-          "text": "The creature is stronger than Booha, so he needs a clever plan to escape.",
-          "q": "Why does Booha need a clever plan?",
-          "choices": ["The creature is stronger", "Booha is too friendly", "His journey is over", "He forgot his goal"], "correct": 0 },
-        { "n": 4, "type": "translate",
-          "jp": "かれは はずかしがりやですが、とても ふれんどりーです。",
-          "en": "He is shy but very friendly",
-          "accepted": ["He is very friendly but shy"],
-          "extra": ["brave", "are"] },
-        { "n": 5, "type": "translate",
-          "jp": "ぬっぴの もくひょうは ひみつを みつけることです。",
-          "en": "Nuppi's goal is to discover the secret",
-          "accepted": ["Nuppi's goal is discovering the secret"],
-          "extra": ["fear", "finds"] },
-        { "n": 6, "type": "translate",
-          "jp": "わたしたちは やくそくを まもりました。",
-          "en": "We kept our promise",
-          "accepted": ["We kept the promise"],
-          "extra": ["keep", "power"] },
-        { "n": 7, "type": "write", "jp": "性格", "en": "personality" },
-        { "n": 8, "type": "write", "jp": "賢い", "en": "clever" },
-        { "n": 9, "type": "write", "jp": "約束", "en": "promise" }
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Before the activity, Booha chooses to focus on “learn about different cultures” because it will help the class prepare.",
+          "q": "What idea does Booha choose to focus on?",
+          "choices": [
+            "learn about different cultures",
+            "explore photography",
+            "experience new things",
+            "make a scrapbook"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "During the lesson, Nuppi explains what “explore photography” means to the group.",
+          "q": "What does Nuppi explain to the group?",
+          "choices": [
+            "explore photography",
+            "learn about different cultures",
+            "experience new things",
+            "make a scrapbook"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "At the end, the class discusses “experience new things” and decides how to improve next time.",
+          "q": "What does the class discuss at the end?",
+          "choices": [
+            "experience new things",
+            "learn about different cultures",
+            "explore photography",
+            "make a scrapbook"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "私は自由な時間にアートプロジェクトを作るのを楽しみます。",
+          "en": "I enjoy creating art projects during my free time",
+          "accepted": [
+            "I enjoy creating art projects during my free time."
+          ]
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "私は週末に家族とボードゲームをよくします。",
+          "en": "I often play board games with my family on weekends",
+          "accepted": [
+            "I often play board games with my family on weekends."
+          ]
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "私は今夏、自分の街の新しい場所を探検したいです。",
+          "en": "I want to explore new places in my city this summer",
+          "accepted": [
+            "I want to explore new places in my city this summer."
+          ]
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "自己ケアの時間を作る",
+          "en": "take time for self-care"
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "異なるジャンルを探求する",
+          "en": "explore different genres"
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "議論に参加する",
+          "en": "engage in discussions"
+        }
       ]
     },
     {
       "week": 4,
       "passage": {
-        "text": "Once upon a time, Booha heard a crash outside Mister Happy's house. First, he opened the door. Next, a shadow suddenly crossed the garden, so he followed it. Meanwhile, Mister Happy searched upstairs because another sound effect came from the roof. Then the lights went out, but Booha heard a quiet voice quote a warning: “Find me before midnight.” After that, the clock struck twelve. Finally, the chapter reached its climax—and ended with a cliffhanger.",
+        "text": "During the purposeful summer growth and exploration unit, Booha and Nuppi focus first on “plan for future events.” They discuss “discover new interests” and consider “develop patience” with their teacher. The class connects these ideas to “take part in festivals” and “enjoy outdoor adventures.” During a discussion, students share examples of “make new friends” and decide how it can make their next activity clearer. By the end of the lesson, everyone understands that preparation, reflection, and cooperation strengthen learning.",
         "comprehension": [
-          { "n": 1, "q": "Why does Booha follow the shadow?",
-            "choices": ["It crosses the garden", "It calls Mister Happy", "It opens the front door", "It makes the lights brighter"], "correct": 0 },
-          { "n": 2, "q": "Where does Mister Happy search?",
-            "choices": ["in the garden", "under the house", "upstairs", "outside the door"], "correct": 2 },
-          { "n": 3, "q": "Why is the ending a cliffhanger?",
-            "choices": ["The mystery is not solved", "Booha returns home", "The shadow explains everything", "The chapter has no climax"], "correct": 0 }
+          {
+            "n": 1,
+            "q": "Which idea do Booha and Nuppi focus on first?",
+            "choices": [
+              "plan for future events",
+              "discover new interests",
+              "develop patience",
+              "take part in festivals"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "Which additional term do they consider with their teacher?",
+            "choices": [
+              "develop patience",
+              "plan for future events",
+              "discover new interests",
+              "take part in festivals"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "Which idea do students share examples of?",
+            "choices": [
+              "make new friends",
+              "take part in festivals",
+              "enjoy outdoor adventures",
+              "discover new interests"
+            ],
+            "correct": 0
+          }
         ]
       },
       "writingPrompt": {
         "id": "jul-br-w4-writing",
-        "jp": "suddenly と finally を つかって、1〜3ぶんの ものがたりを かいてね。",
-        "en": "Write 1–3 sentences using suddenly and finally.",
-        "targets": ["suddenly", "finally"]
+        "jp": "「plan for future events」と「discover new interests」を つかって、1〜3ぶんで かいてね。",
+        "en": "Write 1–3 sentences about purposeful summer growth and exploration using plan for future events and discover new interests.",
+        "targets": [
+          "plan for future events",
+          "discover new interests"
+        ]
       },
       "definitions": [
-        { "n": 46, "def": "a traditional phrase used to begin a story", "pos": "phrase" },
-        { "n": 47, "def": "quickly and unexpectedly", "pos": "adverb" },
-        { "n": 48, "def": "at the same time as another event", "pos": "adverb" },
-        { "n": 49, "def": "for the reason that", "pos": "conjunction" },
-        { "n": 50, "def": "therefore or for that reason", "pos": "conjunction" },
-        { "n": 51, "def": "used to introduce a different or opposite idea", "pos": "conjunction" },
-        { "n": 52, "def": "before anything else", "pos": "adverb" },
-        { "n": 53, "def": "immediately following the current step or event", "pos": "adverb" },
-        { "n": 54, "def": "after that; at the following time", "pos": "adverb" },
-        { "n": 55, "def": "following the event just mentioned", "pos": "phrase" },
-        { "n": 56, "def": "at the end, after everything else", "pos": "adverb" },
-        { "n": 57, "def": "the most exciting or important point of a story", "pos": "noun" },
-        { "n": 58, "def": "an ending that leaves a serious question unanswered", "pos": "noun" },
-        { "n": 59, "def": "the exact words repeated from a person or text", "pos": "noun" },
-        { "n": 60, "def": "a recorded or created noise added to a story or scene", "pos": "noun" }
+        {
+          "n": 46,
+          "def": "a way of arranging tasks and time in advance",
+          "pos": "phrase"
+        },
+        {
+          "n": 47,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 48,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 49,
+          "def": "an idea or activity that helps people understand different communities",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 50,
+          "def": "an activity or experience enjoyed outside",
+          "pos": "phrase"
+        },
+        {
+          "n": 51,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 52,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 53,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 54,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 55,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 56,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 57,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 58,
+          "def": "a way of arranging tasks and time in advance",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 59,
+          "def": "an aim or result that someone works toward",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 60,
+          "def": "an aim or result that someone works toward",
+          "pos": "phrase"
+        }
       ],
       "questions": [
-        { "n": 1, "type": "read",
-          "text": "First, Nuppi sees a footprint. Next, she hears a strange sound behind the door.",
-          "q": "What happens next?",
-          "choices": ["She sees a footprint", "She hears a strange sound", "She opens the door", "She finds a quote"], "correct": 1 },
-        { "n": 2, "type": "read",
-          "text": "The chapter reaches its climax when the dragon suddenly appears above the castle.",
-          "q": "When does the chapter reach its climax?",
-          "choices": ["when the castle disappears", "when the hero gives a quote", "when the dragon appears", "when the story begins"], "correct": 2 },
-        { "n": 3, "type": "read",
-          "text": "The door slowly opens, but the chapter ends before the reader sees who is there.",
-          "q": "What kind of ending is this?",
-          "choices": ["a moral", "a setting", "a sound effect", "a cliffhanger"], "correct": 3 },
-        { "n": 4, "type": "translate",
-          "jp": "とつぜん、おおきな おとが きこえました。",
-          "en": "Suddenly I heard a loud sound",
-          "accepted": ["I suddenly heard a loud sound", "Suddenly I heard a big sound"],
-          "extra": ["quiet", "hear"] },
-        { "n": 5, "type": "translate",
-          "jp": "そのあいだに、ぶーはーは どあを さがしました。",
-          "en": "Meanwhile Booha searched for the door",
-          "accepted": ["Meanwhile Booha looked for the door"],
-          "extra": ["searches", "because"] },
-        { "n": 6, "type": "translate",
-          "jp": "さいごに、ものがたりは くりふはんがーで おわります。",
-          "en": "Finally the tale ends with a cliffhanger",
-          "accepted": ["Finally the story ends with a cliffhanger"],
-          "extra": ["ending", "end"] },
-        { "n": 7, "type": "write", "jp": "突然", "en": "suddenly" },
-        { "n": 8, "type": "write", "jp": "最後に", "en": "finally" },
-        { "n": 9, "type": "write", "jp": "引用", "en": "quote" }
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Before the activity, Booha chooses to focus on “embrace challenges” because it will help the class prepare.",
+          "q": "What idea does Booha choose to focus on?",
+          "choices": [
+            "embrace challenges",
+            "explore personal interests",
+            "manage time wisely",
+            "create a vision board"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "During the lesson, Nuppi explains what “explore personal interests” means to the group.",
+          "q": "What does Nuppi explain to the group?",
+          "choices": [
+            "explore personal interests",
+            "embrace challenges",
+            "manage time wisely",
+            "create a vision board"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "At the end, the class discusses “manage time wisely” and decides how to improve next time.",
+          "q": "What does the class discuss at the end?",
+          "choices": [
+            "manage time wisely",
+            "embrace challenges",
+            "explore personal interests",
+            "create a vision board"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "私はスキルを向上させるためにオンラインクラスに参加する予定です。",
+          "en": "I plan to attend online classes to improve my skills",
+          "accepted": [
+            "I plan to attend online classes to improve my skills."
+          ]
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "私はさまざまなスタイルを鑑賞するためにアートギャラリーを訪れるのが好きです。",
+          "en": "I enjoy visiting art galleries to appreciate different styles",
+          "accepted": [
+            "I enjoy visiting art galleries to appreciate different styles."
+          ]
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "私は新鮮な空気を楽しむために山にハイキングに行くことがよくあります。",
+          "en": "I often go hiking in the mountains to enjoy the fresh air",
+          "accepted": [
+            "I often go hiking in the mountains to enjoy the fresh air."
+          ]
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "将来のイベントを計画する",
+          "en": "plan for future events"
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "新しい興味を発見する",
+          "en": "discover new interests"
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "忍耐力を育てる",
+          "en": "develop patience"
+        }
       ]
     }
   ]
