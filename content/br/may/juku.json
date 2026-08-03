@@ -1,0 +1,858 @@
+{
+  "curriculum": "br",
+  "month": "may",
+  "weeks": [
+    {
+      "week": 1,
+      "passage": {
+        "text": "During the healthy daily habits and personal organization unit, Booha and Nuppi focus first on “Maintain a balanced diet.” They discuss “Create a weekly plan” and consider “Set achievable goals” with their teacher. The class connects these ideas to “Prioritize your tasks” and “Take regular breaks.” During a discussion, students share examples of “Stay organized” and decide how it can make their next activity clearer. By the end of the lesson, everyone understands that preparation, reflection, and cooperation strengthen learning.",
+        "comprehension": [
+          {
+            "n": 1,
+            "q": "Which idea do Booha and Nuppi focus on first?",
+            "choices": [
+              "Maintain a balanced diet.",
+              "Create a weekly plan.",
+              "Set achievable goals.",
+              "Prioritize your tasks."
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "Which additional term do they consider with their teacher?",
+            "choices": [
+              "Set achievable goals.",
+              "Maintain a balanced diet.",
+              "Create a weekly plan.",
+              "Prioritize your tasks."
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "Which idea do students share examples of?",
+            "choices": [
+              "Stay organized.",
+              "Prioritize your tasks.",
+              "Take regular breaks.",
+              "Create a weekly plan."
+            ],
+            "correct": 0
+          }
+        ]
+      },
+      "writingPrompt": {
+        "id": "may-br-w1-writing",
+        "jp": "「Maintain a balanced diet.」と「Create a weekly plan.」を つかって、1〜3ぶんで かいてね。",
+        "en": "Write 1–3 sentences about healthy daily habits and personal organization using Maintain a balanced diet. and Create a weekly plan..",
+        "targets": [
+          "Maintain a balanced diet.",
+          "Create a weekly plan."
+        ]
+      },
+      "definitions": [
+        {
+          "n": 1,
+          "def": "a habit or choice that supports physical or mental well-being",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 2,
+          "def": "a way of arranging tasks and time in advance",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 3,
+          "def": "an aim or result that someone works toward",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 4,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 5,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 6,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 7,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 8,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 9,
+          "def": "a way of arranging tasks and time in advance",
+          "pos": "phrase"
+        },
+        {
+          "n": 10,
+          "def": "a habit or choice that supports physical or mental well-being",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 11,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 12,
+          "def": "a habit or choice that supports physical or mental well-being",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 13,
+          "def": "a habit or choice that supports physical or mental well-being",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 14,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 15,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        }
+      ],
+      "questions": [
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Before the activity, Booha chooses to focus on “Exercise daily” because it will help the class prepare.",
+          "q": "What idea does Booha choose to focus on?",
+          "choices": [
+            "Exercise daily.",
+            "Read for pleasure.",
+            "Plan your study sessions.",
+            "Maintain good hygiene."
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "During the lesson, Nuppi explains what “Read for pleasure” means to the group.",
+          "q": "What does Nuppi explain to the group?",
+          "choices": [
+            "Read for pleasure.",
+            "Exercise daily.",
+            "Plan your study sessions.",
+            "Maintain good hygiene."
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "At the end, the class discusses “Plan your study sessions” and decides how to improve next time.",
+          "q": "What does the class discuss at the end?",
+          "choices": [
+            "Plan your study sessions.",
+            "Exercise daily.",
+            "Read for pleasure.",
+            "Maintain good hygiene."
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "毎朝、体を伸ばして起きます。",
+          "en": "I wake up and stretch my body every morning",
+          "accepted": [
+            "I wake up and stretch my body every morning."
+          ]
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "学校に出かける前に、かばんを準備します。",
+          "en": "Before I leave for school, I prepare my bag",
+          "accepted": [
+            "Before I leave for school, I prepare my bag."
+          ]
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "私は日中におやつとして果物を食べるのが好きです。",
+          "en": "I like to have fruits as snacks during the day",
+          "accepted": [
+            "I like to have fruits as snacks during the day."
+          ]
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "バランスの取れた食事を心がける。",
+          "en": "Maintain a balanced diet."
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "週間プランを作成する。",
+          "en": "Create a weekly plan."
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "達成可能な目標を設定する。",
+          "en": "Set achievable goals."
+        }
+      ]
+    },
+    {
+      "week": 2,
+      "passage": {
+        "text": "During the healthy daily habits and personal organization unit, Booha and Nuppi focus first on “Reflect on your day.” They discuss “Keep a journal” and consider “Balance work and leisure” with their teacher. The class connects these ideas to “Prepare healthy snacks” and “Practice gratitude.” During a discussion, students share examples of “Limit distractions while studying” and decide how it can make their next activity clearer. By the end of the lesson, everyone understands that preparation, reflection, and cooperation strengthen learning.",
+        "comprehension": [
+          {
+            "n": 1,
+            "q": "Which idea do Booha and Nuppi focus on first?",
+            "choices": [
+              "Reflect on your day.",
+              "Keep a journal.",
+              "Balance work and leisure.",
+              "Prepare healthy snacks."
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "Which additional term do they consider with their teacher?",
+            "choices": [
+              "Balance work and leisure.",
+              "Reflect on your day.",
+              "Keep a journal.",
+              "Prepare healthy snacks."
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "Which idea do students share examples of?",
+            "choices": [
+              "Limit distractions while studying.",
+              "Prepare healthy snacks.",
+              "Practice gratitude.",
+              "Keep a journal."
+            ],
+            "correct": 0
+          }
+        ]
+      },
+      "writingPrompt": {
+        "id": "may-br-w2-writing",
+        "jp": "「Reflect on your day.」と「Keep a journal.」を つかって、1〜3ぶんで かいてね。",
+        "en": "Write 1–3 sentences about healthy daily habits and personal organization using Reflect on your day. and Keep a journal..",
+        "targets": [
+          "Reflect on your day.",
+          "Keep a journal."
+        ]
+      },
+      "definitions": [
+        {
+          "n": 16,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 17,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 18,
+          "def": "a skill, task, or situation connected with employment",
+          "pos": "phrase"
+        },
+        {
+          "n": 19,
+          "def": "a habit or choice that supports physical or mental well-being",
+          "pos": "phrase"
+        },
+        {
+          "n": 20,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 21,
+          "def": "an idea, resource, or activity that supports learning",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 22,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 23,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 24,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 25,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 26,
+          "def": "people working together and supporting one another",
+          "pos": "phrase"
+        },
+        {
+          "n": 27,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 28,
+          "def": "a habit or choice that supports physical or mental well-being",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 29,
+          "def": "a way of arranging tasks and time in advance",
+          "pos": "phrase"
+        },
+        {
+          "n": 30,
+          "def": "a habit or choice that supports physical or mental well-being",
+          "pos": "verb phrase"
+        }
+      ],
+      "questions": [
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Before the activity, Booha chooses to focus on “Focus on one task at a time” because it will help the class prepare.",
+          "q": "What idea does Booha choose to focus on?",
+          "choices": [
+            "Focus on one task at a time.",
+            "Stay positive.",
+            "Connect with friends.",
+            "Help others when you can."
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "During the lesson, Nuppi explains what “Stay positive” means to the group.",
+          "q": "What does Nuppi explain to the group?",
+          "choices": [
+            "Stay positive.",
+            "Focus on one task at a time.",
+            "Connect with friends.",
+            "Help others when you can."
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "At the end, the class discusses “Connect with friends” and decides how to improve next time.",
+          "q": "What does the class discuss at the end?",
+          "choices": [
+            "Connect with friends.",
+            "Focus on one task at a time.",
+            "Stay positive.",
+            "Help others when you can."
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "授業で質問することで新しいことを学びます。",
+          "en": "I learn new things by asking questions in class",
+          "accepted": [
+            "I learn new things by asking questions in class."
+          ]
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "勉強するために、部屋をきれいに保ちます。",
+          "en": "I keep my room tidy to create a better space for studying",
+          "accepted": [
+            "I keep my room tidy to create a better space for studying."
+          ]
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "集中力を保つために勉強中に休憩を取ります。",
+          "en": "I take breaks during studying to stay focused",
+          "accepted": [
+            "I take breaks during studying to stay focused."
+          ]
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "自分の一日を振り返る。",
+          "en": "Reflect on your day."
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "日記をつける。",
+          "en": "Keep a journal."
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "仕事と余暇のバランスを取る。",
+          "en": "Balance work and leisure."
+        }
+      ]
+    },
+    {
+      "week": 3,
+      "passage": {
+        "text": "During the healthy daily habits and personal organization unit, Booha and Nuppi focus first on “Develop a morning routine.” They discuss “Limit junk food” and consider “Organize your workspace” with their teacher. The class connects these ideas to “Practice deep breathing” and “Engage in physical activities.” During a discussion, students share examples of “Limit social media usage” and decide how it can make their next activity clearer. By the end of the lesson, everyone understands that preparation, reflection, and cooperation strengthen learning.",
+        "comprehension": [
+          {
+            "n": 1,
+            "q": "Which idea do Booha and Nuppi focus on first?",
+            "choices": [
+              "Develop a morning routine.",
+              "Limit junk food.",
+              "Organize your workspace.",
+              "Practice deep breathing."
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "Which additional term do they consider with their teacher?",
+            "choices": [
+              "Organize your workspace.",
+              "Develop a morning routine.",
+              "Limit junk food.",
+              "Practice deep breathing."
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "Which idea do students share examples of?",
+            "choices": [
+              "Limit social media usage.",
+              "Practice deep breathing.",
+              "Engage in physical activities.",
+              "Limit junk food."
+            ],
+            "correct": 0
+          }
+        ]
+      },
+      "writingPrompt": {
+        "id": "may-br-w3-writing",
+        "jp": "「Develop a morning routine.」と「Limit junk food.」を つかって、1〜3ぶんで かいてね。",
+        "en": "Write 1–3 sentences about healthy daily habits and personal organization using Develop a morning routine. and Limit junk food..",
+        "targets": [
+          "Develop a morning routine.",
+          "Limit junk food."
+        ]
+      },
+      "definitions": [
+        {
+          "n": 31,
+          "def": "a way of arranging tasks and time in advance",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 32,
+          "def": "a habit or choice that supports physical or mental well-being",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 33,
+          "def": "a skill, task, or situation connected with employment",
+          "pos": "phrase"
+        },
+        {
+          "n": 34,
+          "def": "an action or process carried out over time",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 35,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 36,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 37,
+          "def": "a way of arranging tasks and time in advance",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 38,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 39,
+          "def": "an aim or result that someone works toward",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 40,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 41,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 42,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 43,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 44,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 45,
+          "def": "people working together and supporting one another",
+          "pos": "verb phrase"
+        }
+      ],
+      "questions": [
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Before the activity, Booha chooses to focus on “Establish a bedtime routine” because it will help the class prepare.",
+          "q": "What idea does Booha choose to focus on?",
+          "choices": [
+            "Establish a bedtime routine.",
+            "Make a to-do list.",
+            "Evaluate your progress.",
+            "Seek help when needed."
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "During the lesson, Nuppi explains what “Make a to-do list” means to the group.",
+          "q": "What does Nuppi explain to the group?",
+          "choices": [
+            "Make a to-do list.",
+            "Establish a bedtime routine.",
+            "Evaluate your progress.",
+            "Seek help when needed."
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "At the end, the class discusses “Evaluate your progress” and decides how to improve next time.",
+          "q": "What does the class discuss at the end?",
+          "choices": [
+            "Evaluate your progress.",
+            "Establish a bedtime routine.",
+            "Make a to-do list.",
+            "Seek help when needed."
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "テストの準備をしながら音楽を聴きます。",
+          "en": "I listen to music while preparing for my tests",
+          "accepted": [
+            "I listen to music while preparing for my tests."
+          ]
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "毎日終わらせるべきタスクのリストを作ります。",
+          "en": "I make a list of tasks to complete each day",
+          "accepted": [
+            "I make a list of tasks to complete each day."
+          ]
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "家族と健康的なレシピを作るのが楽しいです。",
+          "en": "I enjoy cooking healthy recipes with my family",
+          "accepted": [
+            "I enjoy cooking healthy recipes with my family."
+          ]
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "朝のルーチンを作る。",
+          "en": "Develop a morning routine."
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "ジャンクフードを制限する。",
+          "en": "Limit junk food."
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "作業スペースを整理する。",
+          "en": "Organize your workspace."
+        }
+      ]
+    },
+    {
+      "week": 4,
+      "passage": {
+        "text": "During the healthy daily habits and personal organization unit, Booha and Nuppi focus first on “Stay motivated.” They discuss “Limit multitasking” and consider “Cultivate positive habits” with their teacher. The class connects these ideas to “Create a gratitude list” and “Foster healthy relationships.” During a discussion, students share examples of “Be mindful of your choices” and decide how it can make their next activity clearer. By the end of the lesson, everyone understands that preparation, reflection, and cooperation strengthen learning.",
+        "comprehension": [
+          {
+            "n": 1,
+            "q": "Which idea do Booha and Nuppi focus on first?",
+            "choices": [
+              "Stay motivated.",
+              "Limit multitasking.",
+              "Cultivate positive habits.",
+              "Create a gratitude list."
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "Which additional term do they consider with their teacher?",
+            "choices": [
+              "Cultivate positive habits.",
+              "Stay motivated.",
+              "Limit multitasking.",
+              "Create a gratitude list."
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "Which idea do students share examples of?",
+            "choices": [
+              "Be mindful of your choices.",
+              "Create a gratitude list.",
+              "Foster healthy relationships.",
+              "Limit multitasking."
+            ],
+            "correct": 0
+          }
+        ]
+      },
+      "writingPrompt": {
+        "id": "may-br-w4-writing",
+        "jp": "「Stay motivated.」と「Limit multitasking.」を つかって、1〜3ぶんで かいてね。",
+        "en": "Write 1–3 sentences about healthy daily habits and personal organization using Stay motivated. and Limit multitasking..",
+        "targets": [
+          "Stay motivated.",
+          "Limit multitasking."
+        ]
+      },
+      "definitions": [
+        {
+          "n": 46,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 47,
+          "def": "an action or process carried out over time",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 48,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 49,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 50,
+          "def": "a habit or choice that supports physical or mental well-being",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 51,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 52,
+          "def": "people working together and supporting one another",
+          "pos": "phrase"
+        },
+        {
+          "n": 53,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 54,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 55,
+          "def": "an aim or result that someone works toward",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 56,
+          "def": "a way of arranging tasks and time in advance",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 57,
+          "def": "a way of arranging tasks and time in advance",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 58,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 59,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 60,
+          "def": "an aim or result that someone works toward",
+          "pos": "phrase"
+        }
+      ],
+      "questions": [
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Before the activity, Booha chooses to focus on “Encourage teamwork” because it will help the class prepare.",
+          "q": "What idea does Booha choose to focus on?",
+          "choices": [
+            "Encourage teamwork.",
+            "Track your habits.",
+            "Identify your priorities.",
+            "Share your goals with others."
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "During the lesson, Nuppi explains what “Track your habits” means to the group.",
+          "q": "What does Nuppi explain to the group?",
+          "choices": [
+            "Track your habits.",
+            "Encourage teamwork.",
+            "Identify your priorities.",
+            "Share your goals with others."
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "At the end, the class discusses “Identify your priorities” and decides how to improve next time.",
+          "q": "What does the class discuss at the end?",
+          "choices": [
+            "Identify your priorities.",
+            "Encourage teamwork.",
+            "Track your habits.",
+            "Share your goals with others."
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "休暇中に新しい場所を訪れるのが楽しいです。",
+          "en": "I enjoy visiting new places during my vacations",
+          "accepted": [
+            "I enjoy visiting new places during my vacations."
+          ]
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "学校のプロジェクトの進捗を追跡します。",
+          "en": "I keep track of my progress in school projects",
+          "accepted": [
+            "I keep track of my progress in school projects."
+          ]
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "挑戦に対して前向きな態度を保つようにしています。",
+          "en": "I try to maintain a positive attitude towards challenges",
+          "accepted": [
+            "I try to maintain a positive attitude towards challenges."
+          ]
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "モチベーションを保つ。",
+          "en": "Stay motivated."
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "マルチタスクを制限する。",
+          "en": "Limit multitasking."
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "ポジティブな習慣を育てる。",
+          "en": "Cultivate positive habits."
+        }
+      ]
+    }
+  ]
+}

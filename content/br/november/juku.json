@@ -5,181 +5,853 @@
     {
       "week": 1,
       "passage": {
-        "text": "Booha visits three very different homes while looking for Mimo. The first is an apartment on the fifth floor of a tall condominium. Its living room opens onto a balcony above the city. The second is a detached house with a quiet yard and garden. A wide entrance leads to the dining room and kitchen, while the bedrooms and bathroom are upstairs. The third home is small, with only one main room, but every space has a purpose. Booha realizes that a comfortable home depends less on its size than on how people use it.",
+        "text": "During the shared-home responsibility and sustainable living unit, Booha and Nuppi focus first on “shared responsibilities.” They discuss “communication skills” and consider “privacy agreement” with their teacher. The class connects these ideas to “visitor policy” and “daily chores.” During a discussion, students share examples of “common area” and decide how it can make their next activity clearer. By the end of the lesson, everyone understands that preparation, reflection, and cooperation strengthen learning.",
         "comprehension": [
-          { "n": 1, "q": "Where is the first apartment?", "choices": ["on the fifth floor", "beside a garden", "under the kitchen", "behind the entrance"], "correct": 0 },
-          { "n": 2, "q": "What is upstairs in the detached house?", "choices": ["the balcony and yard", "the bedrooms and bathroom", "the entrance and kitchen", "the living and dining rooms"], "correct": 1 },
-          { "n": 3, "q": "What does Booha learn about a comfortable home?", "choices": ["It must be large", "It needs a balcony", "How people use the space matters", "It must be detached"], "correct": 2 }
+          {
+            "n": 1,
+            "q": "Which idea do Booha and Nuppi focus on first?",
+            "choices": [
+              "shared responsibilities",
+              "communication skills",
+              "privacy agreement",
+              "visitor policy"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "Which additional term do they consider with their teacher?",
+            "choices": [
+              "privacy agreement",
+              "shared responsibilities",
+              "communication skills",
+              "visitor policy"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "Which idea do students share examples of?",
+            "choices": [
+              "common area",
+              "visitor policy",
+              "daily chores",
+              "communication skills"
+            ],
+            "correct": 0
+          }
         ]
       },
       "writingPrompt": {
         "id": "nov-br-w1-writing",
-        "jp": "living room と balcony を つかって、いえを 1〜3ぶんで せつめいしてね。",
-        "en": "Describe a home in 1–3 sentences using living room and balcony.",
-        "targets": ["living room", "balcony"]
+        "jp": "「shared responsibilities」と「communication skills」を つかって、1〜3ぶんで かいてね。",
+        "en": "Write 1–3 sentences about shared-home responsibility and sustainable living using shared responsibilities and communication skills.",
+        "targets": [
+          "shared responsibilities",
+          "communication skills"
+        ]
       },
       "definitions": [
-        { "n": 1, "def": "a building where one person or family lives", "pos": "noun" },
-        { "n": 2, "def": "a set of rooms for living in, usually inside a larger building", "pos": "noun" },
-        { "n": 3, "def": "an apartment in a building where each home is individually owned", "pos": "noun" },
-        { "n": 4, "def": "a house that stands separately and does not share walls with another home", "pos": "noun" },
-        { "n": 5, "def": "one complete level of a building", "pos": "noun" },
-        { "n": 6, "def": "a separate area inside a building, enclosed by walls", "pos": "noun" },
-        { "n": 7, "def": "a comfortable room where people relax and spend time together", "pos": "noun" },
-        { "n": 8, "def": "a room where people sit together to eat meals", "pos": "noun" },
-        { "n": 9, "def": "a room where food is prepared and cooked", "pos": "noun" },
-        { "n": 10, "def": "a room mainly used for sleeping", "pos": "noun" },
-        { "n": 11, "def": "a room containing a bath or shower and usually a sink", "pos": "noun" },
-        { "n": 12, "def": "a small room containing a fixture used for human waste", "pos": "noun" },
-        { "n": 13, "def": "the place where people enter a building", "pos": "noun" },
-        { "n": 14, "def": "a platform that extends from an upper floor outside a building", "pos": "noun" },
-        { "n": 15, "def": "an outdoor area beside a house where grass, flowers, or plants may grow", "pos": "noun" }
+        {
+          "n": 1,
+          "def": "people working together and supporting one another",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 2,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 3,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 4,
+          "def": "a responsibility or practice for caring for a shared home",
+          "pos": "phrase"
+        },
+        {
+          "n": 5,
+          "def": "a responsibility or practice for caring for a shared home",
+          "pos": "phrase"
+        },
+        {
+          "n": 6,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 7,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 8,
+          "def": "people working together and supporting one another",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 9,
+          "def": "a way of arranging tasks and time in advance",
+          "pos": "phrase"
+        },
+        {
+          "n": 10,
+          "def": "a responsibility or practice for caring for a shared home",
+          "pos": "phrase"
+        },
+        {
+          "n": 11,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 12,
+          "def": "a responsibility or practice for caring for a shared home",
+          "pos": "phrase"
+        },
+        {
+          "n": 13,
+          "def": "people working together and supporting one another",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 14,
+          "def": "an action or process carried out over time",
+          "pos": "phrase"
+        },
+        {
+          "n": 15,
+          "def": "a step or resource that helps people avoid harm",
+          "pos": "phrase"
+        }
       ],
       "questions": [
-        { "n": 1, "type": "read", "text": "The apartment has no yard, but its balcony is large enough for several plants.", "q": "Where are the plants?", "choices": ["in the yard", "on the balcony", "in the entrance", "on another floor"], "correct": 1 },
-        { "n": 2, "type": "read", "text": "The dining room is between the kitchen and living room, so serving dinner is easy.", "q": "Why is serving dinner easy?", "choices": ["The home is detached", "The dining room is beside the kitchen", "The bedroom is upstairs", "The entrance is wide"], "correct": 1 },
-        { "n": 3, "type": "read", "text": "Although the condominium has ten stories, Nuppi's apartment is on the ground floor.", "q": "Where is Nuppi's apartment?", "choices": ["on the ground floor", "on the fifth floor", "on the balcony", "on the tenth floor"], "correct": 0 },
-        { "n": 4, "type": "translate", "jp": "わたしの いえには きっちんが あります。", "en": "There is a kitchen in my house", "accepted": ["My house has a kitchen"], "extra": ["bedroom", "are"] },
-        { "n": 5, "type": "translate", "jp": "だいにんぐの となりに ばるこにーが あります。", "en": "There is a balcony next to the dining room", "accepted": ["A balcony is next to the dining room"], "extra": ["bathroom", "between"] },
-        { "n": 6, "type": "translate", "jp": "げんかんに げたばこが あります。", "en": "There is a shoe cabinet at the entrance", "accepted": ["The entrance has a shoe cabinet"], "extra": ["garden", "are"] },
-        { "n": 7, "type": "write", "jp": "いえ", "en": "house" },
-        { "n": 8, "type": "write", "jp": "あぱーと", "en": "apartment" },
-        { "n": 9, "type": "write", "jp": "ばるこにー", "en": "balcony" }
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Before the activity, Booha chooses to focus on “conflict resolution” because it will help the class prepare.",
+          "q": "What idea does Booha choose to focus on?",
+          "choices": [
+            "conflict resolution",
+            "shared expenses",
+            "cleaning schedule",
+            "house rules"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "During the lesson, Nuppi explains what “shared expenses” means to the group.",
+          "q": "What does Nuppi explain to the group?",
+          "choices": [
+            "shared expenses",
+            "conflict resolution",
+            "cleaning schedule",
+            "house rules"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "At the end, the class discusses “cleaning schedule” and decides how to improve next time.",
+          "q": "What does the class discuss at the end?",
+          "choices": [
+            "cleaning schedule",
+            "conflict resolution",
+            "shared expenses",
+            "house rules"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "家を共有する際は、お互いのプライバシーと個人のスペースを尊重することが重要です。",
+          "en": "When sharing a home, it is important to respect each other's privacy and personal space",
+          "accepted": [
+            "When sharing a home, it is important to respect each other's privacy and personal space."
+          ]
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "ルームメイトとの定期的なミーティングを持つことで、発生する問題に対処できます。",
+          "en": "Having regular meetings with housemates can help address any issues that arise",
+          "accepted": [
+            "Having regular meetings with housemates can help address any issues that arise."
+          ]
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "家事やイベントのために共有カレンダーを作成することが役立ちます。",
+          "en": "It is helpful to create a shared calendar for household chores and events",
+          "accepted": [
+            "It is helpful to create a shared calendar for household chores and events."
+          ]
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "共有の責任",
+          "en": "shared responsibilities"
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "コミュニケーション能力",
+          "en": "communication skills"
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "プライバシー契約",
+          "en": "privacy agreement"
+        }
       ]
     },
     {
       "week": 2,
       "passage": {
-        "text": "Mister Happy rearranges his living room before his friends arrive. He moves the sofa closer to the TV and places a lamp beside the chair. A soft rug goes under the table, while a new bookshelf stands near his desk. In the kitchen, he checks the refrigerator, stove, and microwave before preparing snacks. Nuppi puts clean towels in the closet and starts the washing machine. The air conditioner keeps the rooms comfortable. When everyone arrives, the furniture and appliances are ready, but Mister Happy is too tired to sit on his own bed.",
+        "text": "During the shared-home responsibility and sustainable living unit, Booha and Nuppi focus first on “maintenance tasks.” They discuss “shared calendar” and consider “household budget” with their teacher. The class connects these ideas to “energy-saving tips” and “cleaning supplies.” During a discussion, students share examples of “household meeting” and decide how it can make their next activity clearer. By the end of the lesson, everyone understands that preparation, reflection, and cooperation strengthen learning.",
         "comprehension": [
-          { "n": 1, "q": "What does Mister Happy put under the table?", "choices": ["a lamp", "a rug", "a bookshelf", "a chair"], "correct": 1 },
-          { "n": 2, "q": "Where does Nuppi put the towels?", "choices": ["in the closet", "on the sofa", "under the desk", "in the refrigerator"], "correct": 0 },
-          { "n": 3, "q": "What keeps the rooms comfortable?", "choices": ["the stove", "the microwave", "the air conditioner", "the washing machine"], "correct": 2 }
+          {
+            "n": 1,
+            "q": "Which idea do Booha and Nuppi focus on first?",
+            "choices": [
+              "maintenance tasks",
+              "shared calendar",
+              "household budget",
+              "energy-saving tips"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "Which additional term do they consider with their teacher?",
+            "choices": [
+              "household budget",
+              "maintenance tasks",
+              "shared calendar",
+              "energy-saving tips"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "Which idea do students share examples of?",
+            "choices": [
+              "household meeting",
+              "energy-saving tips",
+              "cleaning supplies",
+              "shared calendar"
+            ],
+            "correct": 0
+          }
         ]
       },
       "writingPrompt": {
         "id": "nov-br-w2-writing",
-        "jp": "bookshelf と washing machine を つかって、へやの なかを 1〜3ぶんで かいてね。",
-        "en": "Describe the inside of a home in 1–3 sentences using bookshelf and washing machine.",
-        "targets": ["bookshelf", "washing machine"]
+        "jp": "「maintenance tasks」と「shared calendar」を つかって、1〜3ぶんで かいてね。",
+        "en": "Write 1–3 sentences about shared-home responsibility and sustainable living using maintenance tasks and shared calendar.",
+        "targets": [
+          "maintenance tasks",
+          "shared calendar"
+        ]
       },
       "definitions": [
-        { "n": 16, "def": "a long comfortable seat with space for several people", "pos": "noun" },
-        { "n": 17, "def": "a piece of furniture with a flat top supported by legs", "pos": "noun" },
-        { "n": 18, "def": "a seat for one person, usually with a back", "pos": "noun" },
-        { "n": 19, "def": "a piece of furniture designed for sleeping", "pos": "noun" },
-        { "n": 20, "def": "a piece of furniture with a flat surface for study or office work", "pos": "noun" },
-        { "n": 21, "def": "a piece of furniture with shelves for storing books", "pos": "noun" },
-        { "n": 22, "def": "a tall storage space with doors for clothes and other belongings", "pos": "noun" },
-        { "n": 23, "def": "a device that produces light, often placed on a table or floor", "pos": "noun" },
-        { "n": 24, "def": "a thick fabric covering placed over part or all of a floor", "pos": "noun" },
-        { "n": 25, "def": "a large cold appliance used to keep food fresh", "pos": "noun" },
-        { "n": 26, "def": "a kitchen appliance with heated surfaces used for cooking", "pos": "noun" },
-        { "n": 27, "def": "an appliance that heats food quickly using electromagnetic energy", "pos": "noun" },
-        { "n": 28, "def": "an appliance that cleans clothes with water and movement", "pos": "noun" },
-        { "n": 29, "def": "a machine that cools and controls the air inside a room", "pos": "noun" },
-        { "n": 30, "def": "an electronic screen used for watching programs and videos", "pos": "noun" }
+        {
+          "n": 16,
+          "def": "a responsibility or practice for caring for a shared home",
+          "pos": "phrase"
+        },
+        {
+          "n": 17,
+          "def": "a way of arranging tasks and time in advance",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 18,
+          "def": "a responsibility or practice for caring for a shared home",
+          "pos": "phrase"
+        },
+        {
+          "n": 19,
+          "def": "a responsibility or practice for caring for a shared home",
+          "pos": "phrase"
+        },
+        {
+          "n": 20,
+          "def": "a responsibility or practice for caring for a shared home",
+          "pos": "phrase"
+        },
+        {
+          "n": 21,
+          "def": "a responsibility or practice for caring for a shared home",
+          "pos": "phrase"
+        },
+        {
+          "n": 22,
+          "def": "people working together and supporting one another",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 23,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 24,
+          "def": "people working together and supporting one another",
+          "pos": "phrase"
+        },
+        {
+          "n": 25,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 26,
+          "def": "a step or resource that helps people avoid harm",
+          "pos": "phrase"
+        },
+        {
+          "n": 27,
+          "def": "people working together and supporting one another",
+          "pos": "verb phrase"
+        },
+        {
+          "n": 28,
+          "def": "a responsibility or practice for caring for a shared home",
+          "pos": "phrase"
+        },
+        {
+          "n": 29,
+          "def": "a responsibility or practice for caring for a shared home",
+          "pos": "phrase"
+        },
+        {
+          "n": 30,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        }
       ],
       "questions": [
-        { "n": 1, "type": "read", "text": "The lamp is on the desk, and the chair is between the desk and the bookshelf.", "q": "What is between the desk and bookshelf?", "choices": ["the lamp", "the chair", "the sofa", "the rug"], "correct": 1 },
-        { "n": 2, "type": "read", "text": "The refrigerator keeps the fruit cold, while the microwave makes the soup hot.", "q": "Which appliance heats the soup?", "choices": ["the refrigerator", "the washing machine", "the microwave", "the air conditioner"], "correct": 2 },
-        { "n": 3, "type": "read", "text": "Booha looks in the closet for a blanket before lying down on the bed.", "q": "What does Booha look for?", "choices": ["a blanket", "a rug", "a lamp", "a table"], "correct": 0 },
-        { "n": 4, "type": "translate", "jp": "わたしの へやには つくえが あります。", "en": "I have a desk in my room", "accepted": ["There is a desk in my room"], "extra": ["chair", "has"] },
-        { "n": 5, "type": "translate", "jp": "ほんを ほんだなに おいてください。", "en": "Put the books on the bookshelf", "accepted": ["Please put the books on the bookshelf"], "extra": ["desk", "puts"] },
-        { "n": 6, "type": "translate", "jp": "せんたくきは あたらしいです。", "en": "The washing machine is new", "accepted": ["It is a new washing machine"], "extra": ["microwave", "are"] },
-        { "n": 7, "type": "write", "jp": "そふぁ", "en": "sofa" },
-        { "n": 8, "type": "write", "jp": "ほんだな", "en": "bookshelf" },
-        { "n": 9, "type": "write", "jp": "でんしれんじ", "en": "microwave" }
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Before the activity, Booha chooses to focus on “shared responsibilities chart” because it will help the class prepare.",
+          "q": "What idea does Booha choose to focus on?",
+          "choices": [
+            "shared responsibilities chart",
+            "confidentiality agreement",
+            "community events",
+            "time management"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "During the lesson, Nuppi explains what “confidentiality agreement” means to the group.",
+          "q": "What does Nuppi explain to the group?",
+          "choices": [
+            "confidentiality agreement",
+            "shared responsibilities chart",
+            "community events",
+            "time management"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "At the end, the class discusses “community events” and decides how to improve next time.",
+          "q": "What does the class discuss at the end?",
+          "choices": [
+            "community events",
+            "shared responsibilities chart",
+            "confidentiality agreement",
+            "time management"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "費用を共有するためのシステムを確立することで、誤解や争いを防ぐことができます。",
+          "en": "Establishing a system for sharing expenses can prevent misunderstandings and disputes",
+          "accepted": [
+            "Establishing a system for sharing expenses can prevent misunderstandings and disputes."
+          ]
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "お互いの持ち物を尊重することは、家の中での良好な雰囲気を維持するために重要です。",
+          "en": "Respecting each other's belongings is vital for maintaining a positive atmosphere in the home",
+          "accepted": [
+            "Respecting each other's belongings is vital for maintaining a positive atmosphere in the home."
+          ]
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "共有の食料品リストを作成することで、全員が食事の計画に貢献できるようになります。",
+          "en": "Creating a shared grocery list can help everyone contribute to meal planning",
+          "accepted": [
+            "Creating a shared grocery list can help everyone contribute to meal planning."
+          ]
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "メンテナンスタスク",
+          "en": "maintenance tasks"
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "共有カレンダー",
+          "en": "shared calendar"
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "家計予算",
+          "en": "household budget"
+        }
       ]
     },
     {
       "week": 3,
       "passage": {
-        "text": "The Booha friends divide their chores so the housework will finish quickly. Booha sweeps and vacuums the floors before Mimo mops them. Nuppi washes the dishes, does the laundry, and folds the clean clothes. Mister Happy takes out the trash and sorts cans for recycling. Everyone shares a responsibility: Booha waters the plants, Mimo feeds the pet, and Nuppi makes the beds. Finally, they set the table together. Because each person does a fair part, the home becomes clean without anyone doing all the work.",
+        "text": "During the shared-home responsibility and sustainable living unit, Booha and Nuppi focus first on “energy-saving habits.” They discuss “water-efficient fixtures” and consider “seasonal maintenance” with their teacher. The class connects these ideas to “safety measures” and “community involvement.” During a discussion, students share examples of “reduce waste” and decide how it can make their next activity clearer. By the end of the lesson, everyone understands that preparation, reflection, and cooperation strengthen learning.",
         "comprehension": [
-          { "n": 1, "q": "What happens before Mimo mops?", "choices": ["Booha sweeps and vacuums", "Nuppi sets the table", "Mister Happy feeds the pet", "Everyone makes a bed"], "correct": 0 },
-          { "n": 2, "q": "Who folds the clean clothes?", "choices": ["Booha", "Mimo", "Nuppi", "Mister Happy"], "correct": 2 },
-          { "n": 3, "q": "Why does the housework finish fairly?", "choices": ["One person does everything", "Each person shares responsibility", "They leave the trash", "The pet cleans the floor"], "correct": 1 }
+          {
+            "n": 1,
+            "q": "Which idea do Booha and Nuppi focus on first?",
+            "choices": [
+              "energy-saving habits",
+              "water-efficient fixtures",
+              "seasonal maintenance",
+              "safety measures"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "Which additional term do they consider with their teacher?",
+            "choices": [
+              "seasonal maintenance",
+              "energy-saving habits",
+              "water-efficient fixtures",
+              "safety measures"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "Which idea do students share examples of?",
+            "choices": [
+              "reduce waste",
+              "safety measures",
+              "community involvement",
+              "water-efficient fixtures"
+            ],
+            "correct": 0
+          }
         ]
       },
       "writingPrompt": {
         "id": "nov-br-w3-writing",
-        "jp": "recycle と responsibility を つかって、かじの るーるを 1〜3ぶんで かいてね。",
-        "en": "Write 1–3 sentences about household rules using recycle and responsibility.",
-        "targets": ["recycle", "responsibility"]
+        "jp": "「energy-saving habits」と「water-efficient fixtures」を つかって、1〜3ぶんで かいてね。",
+        "en": "Write 1–3 sentences about shared-home responsibility and sustainable living using energy-saving habits and water-efficient fixtures.",
+        "targets": [
+          "energy-saving habits",
+          "water-efficient fixtures"
+        ]
       },
       "definitions": [
-        { "n": 31, "def": "a regular task needed to take care of a home", "pos": "noun" },
-        { "n": 32, "def": "to remove dirt and make something neat", "pos": "verb" },
-        { "n": 33, "def": "to clean a floor by moving a brush across it", "pos": "verb" },
-        { "n": 34, "def": "to clean a surface using a machine that pulls in dust", "pos": "verb" },
-        { "n": 35, "def": "to clean a hard floor using a wet cleaning tool", "pos": "verb" },
-        { "n": 36, "def": "to clean plates, bowls, cups, and cooking tools", "pos": "verb" },
-        { "n": 37, "def": "to wash clothes and other fabric items", "pos": "verb" },
-        { "n": 38, "def": "to bend clean clothing neatly for storage", "pos": "verb" },
-        { "n": 39, "def": "to carry household waste outside for collection", "pos": "verb" },
-        { "n": 40, "def": "to process used material so it can be made into something new", "pos": "verb" },
-        { "n": 41, "def": "to give plants the water they need", "pos": "verb" },
-        { "n": 42, "def": "to give food to an animal kept at home", "pos": "verb" },
-        { "n": 43, "def": "to arrange the sheets and covers neatly after sleeping", "pos": "verb" },
-        { "n": 44, "def": "to place dishes and eating tools ready for a meal", "pos": "verb" },
-        { "n": 45, "def": "a duty that a person is expected to take care of", "pos": "noun" }
+        {
+          "n": 31,
+          "def": "a responsibility or practice for caring for a shared home",
+          "pos": "phrase"
+        },
+        {
+          "n": 32,
+          "def": "a responsibility or practice for caring for a shared home",
+          "pos": "phrase"
+        },
+        {
+          "n": 33,
+          "def": "a responsibility or practice for caring for a shared home",
+          "pos": "phrase"
+        },
+        {
+          "n": 34,
+          "def": "a step or resource that helps people avoid harm",
+          "pos": "phrase"
+        },
+        {
+          "n": 35,
+          "def": "people working together and supporting one another",
+          "pos": "phrase"
+        },
+        {
+          "n": 36,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 37,
+          "def": "a responsibility or practice for caring for a shared home",
+          "pos": "phrase"
+        },
+        {
+          "n": 38,
+          "def": "a responsibility or practice for caring for a shared home",
+          "pos": "phrase"
+        },
+        {
+          "n": 39,
+          "def": "a step or resource that helps people avoid harm",
+          "pos": "phrase"
+        },
+        {
+          "n": 40,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 41,
+          "def": "people working together and supporting one another",
+          "pos": "phrase"
+        },
+        {
+          "n": 42,
+          "def": "a responsibility or practice for caring for a shared home",
+          "pos": "phrase"
+        },
+        {
+          "n": 43,
+          "def": "a responsibility or practice for caring for a shared home",
+          "pos": "phrase"
+        },
+        {
+          "n": 44,
+          "def": "a step or resource that helps people avoid harm",
+          "pos": "phrase"
+        },
+        {
+          "n": 45,
+          "def": "an activity or information connected with visiting another place",
+          "pos": "phrase"
+        }
       ],
       "questions": [
-        { "n": 1, "type": "read", "text": "Booha cannot mop the floor yet because Nuppi is still vacuuming it.", "q": "What must finish before Booha mops?", "choices": ["watering", "vacuuming", "recycling", "setting the table"], "correct": 1 },
-        { "n": 2, "type": "read", "text": "Mimo folds the dry clothes while the next load is still in the washing machine.", "q": "Which clothes does Mimo fold?", "choices": ["the wet clothes", "the dry clothes", "the dirty clothes", "the clothes in the machine"], "correct": 1 },
-        { "n": 3, "type": "read", "text": "The pet has food, but the plants are dry, so Nuppi gets the watering can.", "q": "What needs attention?", "choices": ["the pet", "the dishes", "the plants", "the bed"], "correct": 2 },
-        { "n": 4, "type": "translate", "jp": "わたしは へやを そうじしなければ なりません。", "en": "I have to clean my room", "accepted": ["I must clean my room"], "extra": ["kitchen", "cleans"] },
-        { "n": 5, "type": "translate", "jp": "わたしは にちようびに せんたくを します。", "en": "I do the laundry on Sundays", "accepted": ["On Sundays I do the laundry"], "extra": ["dishes", "does"] },
-        { "n": 6, "type": "translate", "jp": "あさ、ねこに えさを あげてください。", "en": "Please feed the cat in the morning", "accepted": ["Feed the cat in the morning, please"], "extra": ["dog", "feeds"] },
-        { "n": 7, "type": "write", "jp": "そうじする", "en": "clean" },
-        { "n": 8, "type": "write", "jp": "そうじきを かける", "en": "vacuum" },
-        { "n": 9, "type": "write", "jp": "せきにん", "en": "responsibility" }
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Before the activity, Booha chooses to focus on “energy audit” because it will help the class prepare.",
+          "q": "What idea does Booha choose to focus on?",
+          "choices": [
+            "energy audit",
+            "water-saving techniques",
+            "home safety checks",
+            "seasonal preparation"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "During the lesson, Nuppi explains what “water-saving techniques” means to the group.",
+          "q": "What does Nuppi explain to the group?",
+          "choices": [
+            "water-saving techniques",
+            "energy audit",
+            "home safety checks",
+            "seasonal preparation"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "At the end, the class discusses “home safety checks” and decides how to improve next time.",
+          "q": "What does the class discuss at the end?",
+          "choices": [
+            "home safety checks",
+            "energy audit",
+            "water-saving techniques",
+            "seasonal preparation"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "雨水を集めるシステムを導入することで、家庭の水使用量を大幅に減らすことができます。",
+          "en": "Implementing a rainwater collection system can significantly reduce water usage in your home",
+          "accepted": [
+            "Implementing a rainwater collection system can significantly reduce water usage in your home."
+          ]
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "省エネの電球を使用することで、電気を節約できるだけでなく、従来の電球よりも長持ちします。",
+          "en": "Using energy-efficient light bulbs not only saves electricity but also lasts longer than traditional bulbs",
+          "accepted": [
+            "Using energy-efficient light bulbs not only saves electricity but also lasts longer than traditional bulbs."
+          ]
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "定期的に窓を点検し、密閉することで、隙間風を防ぎ、家のエネルギー効率を改善できます。",
+          "en": "Regularly checking and sealing windows can prevent drafts and improve energy efficiency in your home",
+          "accepted": [
+            "Regularly checking and sealing windows can prevent drafts and improve energy efficiency in your home."
+          ]
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "省エネ習慣",
+          "en": "energy-saving habits"
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "節水器具",
+          "en": "water-efficient fixtures"
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "季節ごとのメンテナンス",
+          "en": "seasonal maintenance"
+        }
       ]
     },
     {
       "week": 4,
       "passage": {
-        "text": "Nuppi designs an eco-friendly dream house for the Booha friends. The main rooms are spacious, bright, quiet, and cozy. A rooftop garden keeps the building cooler, while energy-efficient windows reduce wasted power. Booha asks for a study, Mimo chooses a playroom, and Mister Happy plans a small home theater. Hidden storage keeps the shared spaces tidy. The neighborhood is near a station but still peaceful, and the building is pet-friendly. Nuppi's design is not only exciting; it also responds to the needs of everyone who will live there.",
+        "text": "During the shared-home responsibility and sustainable living unit, Booha and Nuppi focus first on “preventive maintenance.” They discuss “energy-efficient lighting” and consider “water usage awareness” with their teacher. The class connects these ideas to “safety protocols” and “community support.” During a discussion, students share examples of “energy-saving strategies” and decide how it can make their next activity clearer. By the end of the lesson, everyone understands that preparation, reflection, and cooperation strengthen learning.",
         "comprehension": [
-          { "n": 1, "q": "How does the rooftop garden help?", "choices": ["It keeps the building cooler", "It makes the station closer", "It stores the furniture", "It becomes a theater"], "correct": 0 },
-          { "n": 2, "q": "Which room does Mimo choose?", "choices": ["the study", "the playroom", "the home theater", "the storage room"], "correct": 1 },
-          { "n": 3, "q": "Why is the design successful?", "choices": ["It is the biggest house", "It uses no windows", "It meets everyone's needs", "It is far from the station"], "correct": 2 }
+          {
+            "n": 1,
+            "q": "Which idea do Booha and Nuppi focus on first?",
+            "choices": [
+              "preventive maintenance",
+              "energy-efficient lighting",
+              "water usage awareness",
+              "safety protocols"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "Which additional term do they consider with their teacher?",
+            "choices": [
+              "water usage awareness",
+              "preventive maintenance",
+              "energy-efficient lighting",
+              "safety protocols"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "Which idea do students share examples of?",
+            "choices": [
+              "energy-saving strategies",
+              "safety protocols",
+              "community support",
+              "energy-efficient lighting"
+            ],
+            "correct": 0
+          }
         ]
       },
       "writingPrompt": {
         "id": "nov-br-w4-writing",
-        "jp": "energy-efficient と pet-friendly を つかって、ゆめの いえを 1〜3ぶんで かいてね。",
-        "en": "Describe a dream home in 1–3 sentences using energy-efficient and pet-friendly.",
-        "targets": ["energy-efficient", "pet-friendly"]
+        "jp": "「preventive maintenance」と「energy-efficient lighting」を つかって、1〜3ぶんで かいてね。",
+        "en": "Write 1–3 sentences about shared-home responsibility and sustainable living using preventive maintenance and energy-efficient lighting.",
+        "targets": [
+          "preventive maintenance",
+          "energy-efficient lighting"
+        ]
       },
       "definitions": [
-        { "n": 46, "def": "an imagined perfect home that contains the features a person most wants", "pos": "noun" },
-        { "n": 47, "def": "having a large amount of open space", "pos": "adjective" },
-        { "n": 48, "def": "warm, comfortable, and pleasant", "pos": "adjective" },
-        { "n": 49, "def": "filled with plenty of light", "pos": "adjective" },
-        { "n": 50, "def": "making little or no unwanted sound", "pos": "adjective" },
-        { "n": 51, "def": "the flat upper surface of a building", "pos": "noun" },
-        { "n": 52, "def": "an outdoor area where flowers, vegetables, or other plants grow", "pos": "noun" },
-        { "n": 53, "def": "a room used for reading, studying, or working at home", "pos": "noun" },
-        { "n": 54, "def": "a room designed especially for children to play in", "pos": "noun" },
-        { "n": 55, "def": "a room with a large screen and sound system for watching films", "pos": "noun" },
-        { "n": 56, "def": "space used to keep objects that are not currently needed", "pos": "noun" },
-        { "n": 57, "def": "using less power to provide the same result", "pos": "adjective" },
-        { "n": 58, "def": "designed to cause less harm to the natural environment", "pos": "adjective" },
-        { "n": 59, "def": "the area and community around a person's home", "pos": "noun" },
-        { "n": 60, "def": "allowing and welcoming animals kept as companions", "pos": "adjective" }
+        {
+          "n": 46,
+          "def": "a responsibility or practice for caring for a shared home",
+          "pos": "phrase"
+        },
+        {
+          "n": 47,
+          "def": "a responsibility or practice for caring for a shared home",
+          "pos": "phrase"
+        },
+        {
+          "n": 48,
+          "def": "a step or resource that helps people avoid harm",
+          "pos": "phrase"
+        },
+        {
+          "n": 49,
+          "def": "a step or resource that helps people avoid harm",
+          "pos": "phrase"
+        },
+        {
+          "n": 50,
+          "def": "people working together and supporting one another",
+          "pos": "phrase"
+        },
+        {
+          "n": 51,
+          "def": "a responsibility or practice for caring for a shared home",
+          "pos": "phrase"
+        },
+        {
+          "n": 52,
+          "def": "a responsibility or practice for caring for a shared home",
+          "pos": "phrase"
+        },
+        {
+          "n": 53,
+          "def": "a step or resource that helps people avoid harm",
+          "pos": "phrase"
+        },
+        {
+          "n": 54,
+          "def": "people working together and supporting one another",
+          "pos": "phrase"
+        },
+        {
+          "n": 55,
+          "def": "a responsibility or practice for caring for a shared home",
+          "pos": "phrase"
+        },
+        {
+          "n": 56,
+          "def": "a responsibility or practice for caring for a shared home",
+          "pos": "phrase"
+        },
+        {
+          "n": 57,
+          "def": "a step or resource that helps people avoid harm",
+          "pos": "phrase"
+        },
+        {
+          "n": 58,
+          "def": "people working together and supporting one another",
+          "pos": "phrase"
+        },
+        {
+          "n": 59,
+          "def": "a responsibility or practice for caring for a shared home",
+          "pos": "phrase"
+        },
+        {
+          "n": 60,
+          "def": "a responsibility or practice for caring for a shared home",
+          "pos": "phrase"
+        }
       ],
       "questions": [
-        { "n": 1, "type": "read", "text": "The room is spacious but feels cold, so Booha adds a rug and warm lights to make it cozy.", "q": "Why does Booha add a rug and warm lights?", "choices": ["to create storage", "to make the room cozy", "to make a rooftop", "to reduce its size"], "correct": 1 },
-        { "n": 2, "type": "read", "text": "The home office faces the quiet garden instead of the busy street.", "q": "What does the home office face?", "choices": ["the busy street", "the station", "the quiet garden", "the rooftop"], "correct": 2 },
-        { "n": 3, "type": "read", "text": "Because the apartment is pet-friendly, Mimo can move in with his cat.", "q": "What makes it possible for the cat to live there?", "choices": ["the storage", "the home theater", "the bright room", "the pet-friendly rule"], "correct": 3 },
-        { "n": 4, "type": "translate", "jp": "あかるい きっちんが ほしいです。", "en": "I want a bright kitchen", "accepted": ["I would like a bright kitchen"], "extra": ["dark", "wants"] },
-        { "n": 5, "type": "translate", "jp": "こどもたちの ための あそびべやが ほしいです。", "en": "I'd like a playroom for kids", "accepted": ["I would like a playroom for children"], "extra": ["study", "likes"] },
-        { "n": 6, "type": "translate", "jp": "かんきょうに やさしい いえが いいです。", "en": "I'd like an eco-friendly home", "accepted": ["I would like an eco-friendly home"], "extra": ["spacious", "likes"] },
-        { "n": 7, "type": "write", "jp": "ひろびろした", "en": "spacious" },
-        { "n": 8, "type": "write", "jp": "いごこちの よい", "en": "cozy" },
-        { "n": 9, "type": "write", "jp": "きんじょ", "en": "neighborhood" }
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Before the activity, Booha chooses to focus on “water-efficient landscaping” because it will help the class prepare.",
+          "q": "What idea does Booha choose to focus on?",
+          "choices": [
+            "water-efficient landscaping",
+            "safety inspections",
+            "community workshops",
+            "energy conservation tips"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "During the lesson, Nuppi explains what “safety inspections” means to the group.",
+          "q": "What does Nuppi explain to the group?",
+          "choices": [
+            "safety inspections",
+            "water-efficient landscaping",
+            "community workshops",
+            "energy conservation tips"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "At the end, the class discusses “community workshops” and decides how to improve next time.",
+          "q": "What does the class discuss at the end?",
+          "choices": [
+            "community workshops",
+            "water-efficient landscaping",
+            "safety inspections",
+            "energy conservation tips"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "エネルギー監査を促進することで、家庭がエネルギー使用の改善点を特定する手助けになります。",
+          "en": "Encouraging energy audits can help households identify areas for improvement in energy use",
+          "accepted": [
+            "Encouraging energy audits can help households identify areas for improvement in energy use."
+          ]
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "季節ごとのメンテナンスチェックリストを作成することで、変わりゆく天候に備えることができます。",
+          "en": "Creating a seasonal maintenance checklist can help prepare your home for changing weather conditions",
+          "accepted": [
+            "Creating a seasonal maintenance checklist can help prepare your home for changing weather conditions."
+          ]
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "屋外照明にタイマーを使用することで、エネルギーを節約し、近所の安全性を高めることができます。",
+          "en": "Using timers for outdoor lights can save energy and enhance security in your neighborhood",
+          "accepted": [
+            "Using timers for outdoor lights can save energy and enhance security in your neighborhood."
+          ]
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "予防保守",
+          "en": "preventive maintenance"
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "省エネ照明",
+          "en": "energy-efficient lighting"
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "水使用の意識",
+          "en": "water usage awareness"
+        }
       ]
     }
   ]

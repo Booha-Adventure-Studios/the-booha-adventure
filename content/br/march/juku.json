@@ -1,0 +1,858 @@
+{
+  "curriculum": "br",
+  "month": "march",
+  "weeks": [
+    {
+      "week": 1,
+      "passage": {
+        "text": "During the career readiness and workplace skills unit, Booha and Nuppi focus first on “customer service.” They discuss “technical skills” and consider “creative thinking” with their teacher. The class connects these ideas to “communication skills” and “problem-solving.” During a discussion, students share examples of “team collaboration” and decide how it can make their next activity clearer. By the end of the lesson, everyone understands that preparation, reflection, and cooperation strengthen learning.",
+        "comprehension": [
+          {
+            "n": 1,
+            "q": "Which idea do Booha and Nuppi focus on first?",
+            "choices": [
+              "customer service",
+              "technical skills",
+              "creative thinking",
+              "communication skills"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "Which additional term do they consider with their teacher?",
+            "choices": [
+              "creative thinking",
+              "customer service",
+              "technical skills",
+              "communication skills"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "Which idea do students share examples of?",
+            "choices": [
+              "team collaboration",
+              "communication skills",
+              "problem-solving",
+              "technical skills"
+            ],
+            "correct": 0
+          }
+        ]
+      },
+      "writingPrompt": {
+        "id": "mar-br-w1-writing",
+        "jp": "「customer service」と「technical skills」を つかって、1〜3ぶんで かいてね。",
+        "en": "Write 1–3 sentences about career readiness and workplace skills using customer service and technical skills.",
+        "targets": [
+          "customer service",
+          "technical skills"
+        ]
+      },
+      "definitions": [
+        {
+          "n": 1,
+          "def": "an idea or activity that helps people understand different communities",
+          "pos": "phrase"
+        },
+        {
+          "n": 2,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 3,
+          "def": "an action or process carried out over time",
+          "pos": "phrase"
+        },
+        {
+          "n": 4,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 5,
+          "def": "an action or process carried out over time",
+          "pos": "phrase"
+        },
+        {
+          "n": 6,
+          "def": "people working together and supporting one another",
+          "pos": "phrase"
+        },
+        {
+          "n": 7,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 8,
+          "def": "an idea or activity that helps people understand different communities",
+          "pos": "phrase"
+        },
+        {
+          "n": 9,
+          "def": "a skill, task, or situation connected with employment",
+          "pos": "phrase"
+        },
+        {
+          "n": 10,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 11,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "noun"
+        },
+        {
+          "n": 12,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "noun"
+        },
+        {
+          "n": 13,
+          "def": "a skill, task, or situation connected with employment",
+          "pos": "phrase"
+        },
+        {
+          "n": 14,
+          "def": "a skill, task, or situation connected with employment",
+          "pos": "noun"
+        },
+        {
+          "n": 15,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        }
+      ],
+      "questions": [
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Before the activity, Booha chooses to focus on “time management” because it will help the class prepare.",
+          "q": "What idea does Booha choose to focus on?",
+          "choices": [
+            "time management",
+            "customer satisfaction",
+            "work ethic",
+            "interpersonal skills"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "During the lesson, Nuppi explains what “customer satisfaction” means to the group.",
+          "q": "What does Nuppi explain to the group?",
+          "choices": [
+            "customer satisfaction",
+            "time management",
+            "work ethic",
+            "interpersonal skills"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "At the end, the class discusses “work ethic” and decides how to improve next time.",
+          "q": "What does the class discuss at the end?",
+          "choices": [
+            "work ethic",
+            "time management",
+            "customer satisfaction",
+            "interpersonal skills"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "私は将来エンジニアとして働きたいです。",
+          "en": "I hope to work as an engineer in the future",
+          "accepted": [
+            "I hope to work as an engineer in the future."
+          ]
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "私はグラフィックデザイナーになって美しい画像を作りたいです。",
+          "en": "I want to be a graphic designer and create beautiful images",
+          "accepted": [
+            "I want to be a graphic designer and create beautiful images."
+          ]
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "私はいつか自分のビジネスを始めるつもりです。",
+          "en": "I plan to start my own business someday",
+          "accepted": [
+            "I plan to start my own business someday."
+          ]
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "カスタマーサービス",
+          "en": "customer service"
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "テクニカルスキル",
+          "en": "technical skills"
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "クリエイティブシンキング",
+          "en": "creative thinking"
+        }
+      ]
+    },
+    {
+      "week": 2,
+      "passage": {
+        "text": "During the career readiness and workplace skills unit, Booha and Nuppi focus first on “goal setting.” They discuss “work environment” and consider “professional skills” with their teacher. The class connects these ideas to “project management” and “digital literacy.” During a discussion, students share examples of “critical thinking” and decide how it can make their next activity clearer. By the end of the lesson, everyone understands that preparation, reflection, and cooperation strengthen learning.",
+        "comprehension": [
+          {
+            "n": 1,
+            "q": "Which idea do Booha and Nuppi focus on first?",
+            "choices": [
+              "goal setting",
+              "work environment",
+              "professional skills",
+              "project management"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "Which additional term do they consider with their teacher?",
+            "choices": [
+              "professional skills",
+              "goal setting",
+              "work environment",
+              "project management"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "Which idea do students share examples of?",
+            "choices": [
+              "critical thinking",
+              "project management",
+              "digital literacy",
+              "work environment"
+            ],
+            "correct": 0
+          }
+        ]
+      },
+      "writingPrompt": {
+        "id": "mar-br-w2-writing",
+        "jp": "「goal setting」と「work environment」を つかって、1〜3ぶんで かいてね。",
+        "en": "Write 1–3 sentences about career readiness and workplace skills using goal setting and work environment.",
+        "targets": [
+          "goal setting",
+          "work environment"
+        ]
+      },
+      "definitions": [
+        {
+          "n": 16,
+          "def": "an aim or result that someone works toward",
+          "pos": "phrase"
+        },
+        {
+          "n": 17,
+          "def": "a skill, task, or situation connected with employment",
+          "pos": "phrase"
+        },
+        {
+          "n": 18,
+          "def": "a skill, task, or situation connected with employment",
+          "pos": "phrase"
+        },
+        {
+          "n": 19,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 20,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 21,
+          "def": "an action or process carried out over time",
+          "pos": "phrase"
+        },
+        {
+          "n": 22,
+          "def": "an idea or activity that helps people understand different communities",
+          "pos": "phrase"
+        },
+        {
+          "n": 23,
+          "def": "a skill, task, or situation connected with employment",
+          "pos": "noun"
+        },
+        {
+          "n": 24,
+          "def": "a way of arranging tasks and time in advance",
+          "pos": "phrase"
+        },
+        {
+          "n": 25,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 26,
+          "def": "a skill, task, or situation connected with employment",
+          "pos": "phrase"
+        },
+        {
+          "n": 27,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "noun"
+        },
+        {
+          "n": 28,
+          "def": "a skill, task, or situation connected with employment",
+          "pos": "phrase"
+        },
+        {
+          "n": 29,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "noun"
+        },
+        {
+          "n": 30,
+          "def": "a skill, task, or situation connected with employment",
+          "pos": "phrase"
+        }
+      ],
+      "questions": [
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Before the activity, Booha chooses to focus on “customer feedback” because it will help the class prepare.",
+          "q": "What idea does Booha choose to focus on?",
+          "choices": [
+            "customer feedback",
+            "workshop",
+            "business plan",
+            "sales strategy"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "During the lesson, Nuppi explains what “workshop” means to the group.",
+          "q": "What does Nuppi explain to the group?",
+          "choices": [
+            "workshop",
+            "customer feedback",
+            "business plan",
+            "sales strategy"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "At the end, the class discusses “business plan” and decides how to improve next time.",
+          "q": "What does the class discuss at the end?",
+          "choices": [
+            "business plan",
+            "customer feedback",
+            "workshop",
+            "sales strategy"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "私は協力を重視するチームで働きたいです。",
+          "en": "I hope to work in a team that values collaboration",
+          "accepted": [
+            "I hope to work in a team that values collaboration."
+          ]
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "私はプロジェクトを効果的に管理する方法を学びたいです。",
+          "en": "I want to learn how to manage a project effectively",
+          "accepted": [
+            "I want to learn how to manage a project effectively."
+          ]
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "私はテクノロジー分野で働くことに興味があります。",
+          "en": "I am interested in working in the technology sector",
+          "accepted": [
+            "I am interested in working in the technology sector."
+          ]
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "目標設定",
+          "en": "goal setting"
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "職場環境",
+          "en": "work environment"
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "専門スキル",
+          "en": "professional skills"
+        }
+      ]
+    },
+    {
+      "week": 3,
+      "passage": {
+        "text": "During the career readiness and workplace skills unit, Booha and Nuppi focus first on “networking event.” They discuss “resume writing” and consider “interview skills” with their teacher. The class connects these ideas to “personal branding” and “skill assessment.” During a discussion, students share examples of “performance review” and decide how it can make their next activity clearer. By the end of the lesson, everyone understands that preparation, reflection, and cooperation strengthen learning.",
+        "comprehension": [
+          {
+            "n": 1,
+            "q": "Which idea do Booha and Nuppi focus on first?",
+            "choices": [
+              "networking event",
+              "resume writing",
+              "interview skills",
+              "personal branding"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "Which additional term do they consider with their teacher?",
+            "choices": [
+              "interview skills",
+              "networking event",
+              "resume writing",
+              "personal branding"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "Which idea do students share examples of?",
+            "choices": [
+              "performance review",
+              "personal branding",
+              "skill assessment",
+              "resume writing"
+            ],
+            "correct": 0
+          }
+        ]
+      },
+      "writingPrompt": {
+        "id": "mar-br-w3-writing",
+        "jp": "「networking event」と「resume writing」を つかって、1〜3ぶんで かいてね。",
+        "en": "Write 1–3 sentences about career readiness and workplace skills using networking event and resume writing.",
+        "targets": [
+          "networking event",
+          "resume writing"
+        ]
+      },
+      "definitions": [
+        {
+          "n": 31,
+          "def": "a skill, task, or situation connected with employment",
+          "pos": "phrase"
+        },
+        {
+          "n": 32,
+          "def": "a skill, task, or situation connected with employment",
+          "pos": "phrase"
+        },
+        {
+          "n": 33,
+          "def": "a skill, task, or situation connected with employment",
+          "pos": "phrase"
+        },
+        {
+          "n": 34,
+          "def": "an action or process carried out over time",
+          "pos": "phrase"
+        },
+        {
+          "n": 35,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 36,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 37,
+          "def": "a skill, task, or situation connected with employment",
+          "pos": "phrase"
+        },
+        {
+          "n": 38,
+          "def": "a skill, task, or situation connected with employment",
+          "pos": "phrase"
+        },
+        {
+          "n": 39,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 40,
+          "def": "a skill, task, or situation connected with employment",
+          "pos": "phrase"
+        },
+        {
+          "n": 41,
+          "def": "a skill, task, or situation connected with employment",
+          "pos": "phrase"
+        },
+        {
+          "n": 42,
+          "def": "a skill, task, or situation connected with employment",
+          "pos": "phrase"
+        },
+        {
+          "n": 43,
+          "def": "a skill, task, or situation connected with employment",
+          "pos": "phrase"
+        },
+        {
+          "n": 44,
+          "def": "a skill, task, or situation connected with employment",
+          "pos": "phrase"
+        },
+        {
+          "n": 45,
+          "def": "an idea or activity that helps people understand different communities",
+          "pos": "phrase"
+        }
+      ],
+      "questions": [
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Before the activity, Booha chooses to focus on “job application” because it will help the class prepare.",
+          "q": "What idea does Booha choose to focus on?",
+          "choices": [
+            "job application",
+            "work experience",
+            "skill development",
+            "career counseling"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "During the lesson, Nuppi explains what “work experience” means to the group.",
+          "q": "What does Nuppi explain to the group?",
+          "choices": [
+            "work experience",
+            "job application",
+            "skill development",
+            "career counseling"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "At the end, the class discusses “skill development” and decides how to improve next time.",
+          "q": "What does the class discuss at the end?",
+          "choices": [
+            "skill development",
+            "job application",
+            "work experience",
+            "career counseling"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "私は分析的思考のスキルを向上させたいです。",
+          "en": "I want to improve my analytical thinking skills",
+          "accepted": [
+            "I want to improve my analytical thinking skills."
+          ]
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "私は自分を挑戦させる役割で働きたいです。",
+          "en": "I hope to work in a role that challenges me",
+          "accepted": [
+            "I hope to work in a role that challenges me."
+          ]
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "私はポジティブな職場環境を作りたいです。",
+          "en": "I want to create a positive work environment",
+          "accepted": [
+            "I want to create a positive work environment."
+          ]
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "ネットワーキングイベント",
+          "en": "networking event"
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "履歴書作成",
+          "en": "resume writing"
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "面接スキル",
+          "en": "interview skills"
+        }
+      ]
+    },
+    {
+      "week": 4,
+      "passage": {
+        "text": "During the career readiness and workplace skills unit, Booha and Nuppi focus first on “employee benefits.” They discuss “career advancement” and consider “work-related skills” with their teacher. The class connects these ideas to “business communication” and “work ethics training.” During a discussion, students share examples of “social skills” and decide how it can make their next activity clearer. By the end of the lesson, everyone understands that preparation, reflection, and cooperation strengthen learning.",
+        "comprehension": [
+          {
+            "n": 1,
+            "q": "Which idea do Booha and Nuppi focus on first?",
+            "choices": [
+              "employee benefits",
+              "career advancement",
+              "work-related skills",
+              "business communication"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "Which additional term do they consider with their teacher?",
+            "choices": [
+              "work-related skills",
+              "employee benefits",
+              "career advancement",
+              "business communication"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "Which idea do students share examples of?",
+            "choices": [
+              "social skills",
+              "business communication",
+              "work ethics training",
+              "career advancement"
+            ],
+            "correct": 0
+          }
+        ]
+      },
+      "writingPrompt": {
+        "id": "mar-br-w4-writing",
+        "jp": "「employee benefits」と「career advancement」を つかって、1〜3ぶんで かいてね。",
+        "en": "Write 1–3 sentences about career readiness and workplace skills using employee benefits and career advancement.",
+        "targets": [
+          "employee benefits",
+          "career advancement"
+        ]
+      },
+      "definitions": [
+        {
+          "n": 46,
+          "def": "a skill, task, or situation connected with employment",
+          "pos": "phrase"
+        },
+        {
+          "n": 47,
+          "def": "a skill, task, or situation connected with employment",
+          "pos": "phrase"
+        },
+        {
+          "n": 48,
+          "def": "a skill, task, or situation connected with employment",
+          "pos": "phrase"
+        },
+        {
+          "n": 49,
+          "def": "a skill, task, or situation connected with employment",
+          "pos": "phrase"
+        },
+        {
+          "n": 50,
+          "def": "a skill, task, or situation connected with employment",
+          "pos": "phrase"
+        },
+        {
+          "n": 51,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 52,
+          "def": "a skill, task, or situation connected with employment",
+          "pos": "phrase"
+        },
+        {
+          "n": 53,
+          "def": "a skill, task, or situation connected with employment",
+          "pos": "phrase"
+        },
+        {
+          "n": 54,
+          "def": "a skill, task, or situation connected with employment",
+          "pos": "phrase"
+        },
+        {
+          "n": 55,
+          "def": "a skill, task, or situation connected with employment",
+          "pos": "phrase"
+        },
+        {
+          "n": 56,
+          "def": "a skill, task, or situation connected with employment",
+          "pos": "phrase"
+        },
+        {
+          "n": 57,
+          "def": "a skill, task, or situation connected with employment",
+          "pos": "phrase"
+        },
+        {
+          "n": 58,
+          "def": "an important idea, action, or resource in this month’s unit",
+          "pos": "phrase"
+        },
+        {
+          "n": 59,
+          "def": "an aim or result that someone works toward",
+          "pos": "phrase"
+        },
+        {
+          "n": 60,
+          "def": "a skill, task, or situation connected with employment",
+          "pos": "phrase"
+        }
+      ],
+      "questions": [
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Before the activity, Booha chooses to focus on “career exploration” because it will help the class prepare.",
+          "q": "What idea does Booha choose to focus on?",
+          "choices": [
+            "career exploration",
+            "job shadowing experience",
+            "workplace diversity",
+            "professional network"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "During the lesson, Nuppi explains what “job shadowing experience” means to the group.",
+          "q": "What does Nuppi explain to the group?",
+          "choices": [
+            "job shadowing experience",
+            "career exploration",
+            "workplace diversity",
+            "professional network"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "At the end, the class discusses “workplace diversity” and decides how to improve next time.",
+          "q": "What does the class discuss at the end?",
+          "choices": [
+            "workplace diversity",
+            "career exploration",
+            "job shadowing experience",
+            "professional network"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "私は金融リテラシーについて学びたいです。",
+          "en": "I would like to learn about financial literacy",
+          "accepted": [
+            "I would like to learn about financial literacy."
+          ]
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "私は健康とウェルネスに関連する分野で働きたいです。",
+          "en": "I want to work in a field related to health and wellness",
+          "accepted": [
+            "I want to work in a field related to health and wellness."
+          ]
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "私は交渉スキルを伸ばしたいです。",
+          "en": "I hope to develop my negotiation skills",
+          "accepted": [
+            "I hope to develop my negotiation skills."
+          ]
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "従業員福利厚生",
+          "en": "employee benefits"
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "キャリアの進展",
+          "en": "career advancement"
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "職務関連スキル",
+          "en": "work-related skills"
+        }
+      ]
+    }
+  ]
+}
