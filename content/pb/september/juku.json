@@ -5,157 +5,781 @@
     {
       "week": 1,
       "passage": {
-        "text": "Booha is in his classroom. His notebook and pencil are on the desk. His bag is under the chair. Nuppi writes on the board. Mimo has a ruler, an eraser, and a pencil case. The teacher gives them scissors and glue for a picture. After class, Booha puts the textbook in his locker and paper in the trash can. Then he turns off the computer.",
+        "text": "Today, Booha and Nuppi learn about “desk.” They look at “chair” and “board.” The teacher shows “pencil” and “eraser.” Booha talks about “notebook.” They learn together.",
         "comprehension": [
-          { "n": 1, "q": "Where is Booha's bag?", "choices": ["under the chair", "in the locker", "on the board", "by the computer"], "correct": 0 },
-          { "n": 2, "q": "What does Nuppi write on?", "choices": ["the textbook", "the ruler", "the board", "the locker"], "correct": 2 },
-          { "n": 3, "q": "What does Booha turn off?", "choices": ["the computer", "the pencil", "the chair", "the glue"], "correct": 0 }
+          {
+            "n": 1,
+            "q": "What do Booha and Nuppi learn about?",
+            "choices": [
+              "desk",
+              "chair",
+              "board",
+              "pencil"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "What does the teacher show?",
+            "choices": [
+              "pencil",
+              "desk",
+              "chair",
+              "board"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "What does Booha talk about?",
+            "choices": [
+              "notebook",
+              "board",
+              "pencil",
+              "eraser"
+            ],
+            "correct": 0
+          }
         ]
       },
       "definitions": [
-        { "n": 1, "def": "a table used for schoolwork", "pos": "noun" },
-        { "n": 2, "def": "a seat for one person", "pos": "noun" },
-        { "n": 3, "def": "a large classroom surface for writing", "pos": "noun" },
-        { "n": 4, "def": "a tool with a dark center used for writing or drawing", "pos": "noun" },
-        { "n": 5, "def": "a small object used to remove pencil marks", "pos": "noun" },
-        { "n": 6, "def": "a book of blank or lined pages for school notes", "pos": "noun" },
-        { "n": 7, "def": "a school book that teaches one subject", "pos": "noun" },
-        { "n": 8, "def": "a small container for pencils and erasers", "pos": "noun" },
-        { "n": 9, "def": "a straight tool used to measure or draw lines", "pos": "noun" },
-        { "n": 10, "def": "a tool with two blades used for cutting", "pos": "noun" },
-        { "n": 11, "def": "a sticky material used to join things", "pos": "noun" },
-        { "n": 12, "def": "an electronic machine used for schoolwork and games", "pos": "noun" },
-        { "n": 13, "def": "a small cupboard for keeping school things", "pos": "noun" },
-        { "n": 14, "def": "a room where a group of students has lessons", "pos": "noun" },
-        { "n": 15, "def": "a container for things that are thrown away", "pos": "noun" }
+        {
+          "n": 1,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 2,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 3,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 4,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 5,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 6,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 7,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 8,
+          "def": "a word from this lesson",
+          "pos": "phrase"
+        },
+        {
+          "n": 9,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 10,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 11,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 12,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 13,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 14,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 15,
+          "def": "a word from this lesson",
+          "pos": "phrase"
+        }
       ],
       "questions": [
-        { "n": 1, "type": "read", "text": "The pencil is on the notebook, and the eraser is in the pencil case.", "q": "Where is the eraser?", "choices": ["on the notebook", "in the pencil case", "under the chair", "by the board"], "correct": 1 },
-        { "n": 2, "type": "read", "text": "Booha uses scissors to cut the paper and glue to put the pieces together.", "q": "What does Booha use to cut?", "choices": ["a ruler", "an eraser", "scissors", "glue"], "correct": 2 },
-        { "n": 3, "type": "read", "text": "Please put the old paper in the trash can before you leave the classroom.", "q": "What goes in the trash can?", "choices": ["old paper", "the computer", "the desk", "the textbook"], "correct": 0 },
-        { "n": 4, "type": "translate", "jp": "これ は わたし の つくえ です", "en": "This is my desk", "extra": ["chair", "your"] },
-        { "n": 5, "type": "translate", "jp": "わたし は けしごむ を もって います", "en": "I have an eraser", "extra": ["ruler", "has"] },
-        { "n": 6, "type": "translate", "jp": "はさみ に き を つけて ください", "en": "Be careful with scissors", "extra": ["glue", "is"] },
-        { "n": 7, "type": "write", "jp": "つくえ", "en": "desk" },
-        { "n": 8, "type": "write", "jp": "のーと", "en": "notebook" },
-        { "n": 9, "type": "write", "jp": "じょうぎ", "en": "ruler" }
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Booha reads the word “textbook.”",
+          "q": "What word does Booha read?",
+          "choices": [
+            "textbook",
+            "pencil case",
+            "ruler",
+            "scissors"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "Nuppi talks about “pencil case.”",
+          "q": "What does Nuppi talk about?",
+          "choices": [
+            "pencil case",
+            "textbook",
+            "ruler",
+            "scissors"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "The class talks about “ruler.”",
+          "q": "What does the class talk about?",
+          "choices": [
+            "ruler",
+            "textbook",
+            "pencil case",
+            "scissors"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "これは私の机です。",
+          "en": "This is my desk"
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "これは私のいすです。",
+          "en": "This is my chair"
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "あれは黒板です。",
+          "en": "That is the board"
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "つくえ",
+          "en": "desk"
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "いす",
+          "en": "chair"
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "こくばん",
+          "en": "board"
+        }
       ]
     },
     {
       "week": 2,
       "passage": {
-        "text": "Booha has many classes at school. He reads a story in Japanese and speaks in English. He uses numbers in math and does a test in science. In social studies, he learns about history and geography. After lunch, he runs in PE and sings in music. He draws a picture in art and cooks in home economics. Computer class is fun, but Booha must finish his homework before tomorrow's test.",
+        "text": "Today, Booha and Nuppi learn about “English.” They look at “Japanese” and “math.” The teacher shows “science” and “social studies.” Booha talks about “history.” They learn together.",
         "comprehension": [
-          { "n": 1, "q": "Where does Booha use numbers?", "choices": ["in math", "in music", "in art", "in PE"], "correct": 0 },
-          { "n": 2, "q": "What does Booha do in music?", "choices": ["He cooks", "He runs", "He sings", "He draws"], "correct": 2 },
-          { "n": 3, "q": "What must Booha finish?", "choices": ["his lunch", "his homework", "his picture", "his song"], "correct": 1 }
+          {
+            "n": 1,
+            "q": "What do Booha and Nuppi learn about?",
+            "choices": [
+              "English",
+              "Japanese",
+              "math",
+              "science"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "What does the teacher show?",
+            "choices": [
+              "science",
+              "English",
+              "Japanese",
+              "math"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "What does Booha talk about?",
+            "choices": [
+              "history",
+              "math",
+              "science",
+              "social studies"
+            ],
+            "correct": 0
+          }
         ]
       },
       "definitions": [
-        { "n": 16, "def": "the language spoken in Japan", "pos": "noun" },
-        { "n": 17, "def": "the language spoken in places such as the UK and US", "pos": "noun" },
-        { "n": 18, "def": "the school subject about numbers and shapes", "pos": "noun" },
-        { "n": 19, "def": "the school subject about nature and experiments", "pos": "noun" },
-        { "n": 20, "def": "the school subject about people and society", "pos": "noun" },
-        { "n": 21, "def": "the study of people and events from the past", "pos": "noun" },
-        { "n": 22, "def": "the study of places and the Earth", "pos": "noun" },
-        { "n": 23, "def": "a school subject with exercise and sports", "pos": "noun" },
-        { "n": 24, "def": "sounds arranged for singing or playing", "pos": "noun" },
-        { "n": 25, "def": "a school subject for drawing and making things", "pos": "noun" },
-        { "n": 26, "def": "a subject about cooking and taking care of a home", "pos": "noun" },
-        { "n": 27, "def": "a lesson about using computers", "pos": "noun" },
-        { "n": 28, "def": "the condition of your body and mind", "pos": "noun" },
-        { "n": 29, "def": "schoolwork that a student does at home", "pos": "noun" },
-        { "n": 30, "def": "a set of questions used to check learning", "pos": "noun" }
+        {
+          "n": 16,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 17,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 18,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 19,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 20,
+          "def": "a word from this lesson",
+          "pos": "phrase"
+        },
+        {
+          "n": 21,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 22,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 23,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 24,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 25,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 26,
+          "def": "a word from this lesson",
+          "pos": "phrase"
+        },
+        {
+          "n": 27,
+          "def": "a word from this lesson",
+          "pos": "phrase"
+        },
+        {
+          "n": 28,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 29,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 30,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        }
       ],
       "questions": [
-        { "n": 1, "type": "read", "text": "Nuppi draws a map in geography and reads about old cities in history.", "q": "What does Nuppi draw?", "choices": ["a map", "a number", "a song", "a meal"], "correct": 0 },
-        { "n": 2, "type": "read", "text": "Mimo drinks water after PE because exercise makes him thirsty.", "q": "Why is Mimo thirsty?", "choices": ["He had a test", "He did exercise", "He sang a song", "He used a computer"], "correct": 1 },
-        { "n": 3, "type": "read", "text": "Booha studies his homework before the math test.", "q": "What happens last?", "choices": ["Booha studies", "Booha gets homework", "Booha takes the test", "Booha draws"], "correct": 2 },
-        { "n": 4, "type": "translate", "jp": "わたし は えいご が すき です", "en": "I like English", "extra": ["Japanese", "likes"] },
-        { "n": 5, "type": "translate", "jp": "きょう は しゃかい の じゅぎょう が あります", "en": "We have social studies today", "extra": ["science", "tomorrow"] },
-        { "n": 6, "type": "translate", "jp": "ずこう の じゅぎょう で え を かきます", "en": "We draw pictures in art class", "extra": ["music", "draws"] },
-        { "n": 7, "type": "write", "jp": "えいご", "en": "english" },
-        { "n": 8, "type": "write", "jp": "れきし", "en": "history" },
-        { "n": 9, "type": "write", "jp": "おんがく", "en": "music" }
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Booha reads the word “geography.”",
+          "q": "What word does Booha read?",
+          "choices": [
+            "geography",
+            "PE",
+            "music",
+            "art"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "Nuppi talks about “PE.”",
+          "q": "What does Nuppi talk about?",
+          "choices": [
+            "PE",
+            "geography",
+            "music",
+            "art"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "The class talks about “music.”",
+          "q": "What does the class talk about?",
+          "choices": [
+            "music",
+            "geography",
+            "PE",
+            "art"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "私は英語が好きです。",
+          "en": "I like English"
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "私たちは日本語を勉強します。",
+          "en": "We study Japanese"
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "算数は簡単です。",
+          "en": "Math is easy"
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "えいご",
+          "en": "English"
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "にほんご",
+          "en": "Japanese"
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "さんすう",
+          "en": "math"
+        }
       ]
     },
     {
       "week": 3,
       "passage": {
-        "text": "A new student comes to Booha's school. The teacher shows her the classroom. The principal says hello, and the school nurse shows her the health room. A librarian helps her find a book. Her classmate Nuppi asks her to play at break. An older student shows her the office, and a younger student smiles at her. The coach helps everyone practice. At the end of the day, the new student thanks the school staff.",
+        "text": "Today, Booha and Nuppi learn about “teacher.” They look at “principal” and “school nurse.” The teacher shows “librarian” and “coach.” Booha talks about “student.” They learn together.",
         "comprehension": [
-          { "n": 1, "q": "Who helps the new student find a book?", "choices": ["the coach", "the librarian", "the principal", "the classmate"], "correct": 1 },
-          { "n": 2, "q": "Who shows her the office?", "choices": ["an older student", "a younger student", "the nurse", "the coach"], "correct": 0 },
-          { "n": 3, "q": "What does the new student do at the end?", "choices": ["She goes home alone", "She takes a test", "She thanks the staff", "She opens a book"], "correct": 2 }
+          {
+            "n": 1,
+            "q": "What do Booha and Nuppi learn about?",
+            "choices": [
+              "teacher",
+              "principal",
+              "school nurse",
+              "librarian"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "What does the teacher show?",
+            "choices": [
+              "librarian",
+              "teacher",
+              "principal",
+              "school nurse"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "What does Booha talk about?",
+            "choices": [
+              "student",
+              "school nurse",
+              "librarian",
+              "coach"
+            ],
+            "correct": 0
+          }
         ]
       },
       "definitions": [
-        { "n": 31, "def": "a person who helps students learn", "pos": "noun" },
-        { "n": 32, "def": "the person who leads a school", "pos": "noun" },
-        { "n": 33, "def": "a person at school who helps sick or hurt students", "pos": "noun" },
-        { "n": 34, "def": "a person who helps people find and use books", "pos": "noun" },
-        { "n": 35, "def": "a person who teaches and trains a sports team", "pos": "noun" },
-        { "n": 36, "def": "a young person who learns at school", "pos": "noun" },
-        { "n": 37, "def": "a student in the same class as you", "pos": "noun" },
-        { "n": 38, "def": "a person you like and enjoy spending time with", "pos": "noun" },
-        { "n": 39, "def": "a student in a higher grade", "pos": "noun" },
-        { "n": 40, "def": "a student in a lower grade", "pos": "noun" },
-        { "n": 41, "def": "the adults who work at a school", "pos": "noun" },
-        { "n": 42, "def": "a room where school workers answer calls and do paperwork", "pos": "noun" },
-        { "n": 43, "def": "to make something easier or better for another person", "pos": "verb" },
-        { "n": 44, "def": "to say a question because you want information", "pos": "verb" },
-        { "n": 45, "def": "to tell someone you are grateful", "pos": "verb" }
+        {
+          "n": 31,
+          "def": "a person",
+          "pos": "noun"
+        },
+        {
+          "n": 32,
+          "def": "a person",
+          "pos": "noun"
+        },
+        {
+          "n": 33,
+          "def": "a person",
+          "pos": "phrase"
+        },
+        {
+          "n": 34,
+          "def": "a person",
+          "pos": "noun"
+        },
+        {
+          "n": 35,
+          "def": "a person",
+          "pos": "noun"
+        },
+        {
+          "n": 36,
+          "def": "a person",
+          "pos": "noun"
+        },
+        {
+          "n": 37,
+          "def": "a person",
+          "pos": "noun"
+        },
+        {
+          "n": 38,
+          "def": "a person",
+          "pos": "noun"
+        },
+        {
+          "n": 39,
+          "def": "a person",
+          "pos": "phrase"
+        },
+        {
+          "n": 40,
+          "def": "a person",
+          "pos": "phrase"
+        },
+        {
+          "n": 41,
+          "def": "a person",
+          "pos": "phrase"
+        },
+        {
+          "n": 42,
+          "def": "a place",
+          "pos": "noun"
+        },
+        {
+          "n": 43,
+          "def": "an action word",
+          "pos": "verb"
+        },
+        {
+          "n": 44,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 45,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        }
       ],
       "questions": [
-        { "n": 1, "type": "read", "text": "The school nurse helps Mimo, and Mimo thanks her before he leaves.", "q": "What does Mimo do before leaving?", "choices": ["He asks a question", "He thanks the nurse", "He calls the coach", "He finds a book"], "correct": 1 },
-        { "n": 2, "type": "read", "text": "A younger student asks an older student where the library is.", "q": "Who asks the question?", "choices": ["the librarian", "the older student", "the younger student", "the principal"], "correct": 2 },
-        { "n": 3, "type": "read", "text": "The coach helps Booha and his classmates practice as a team.", "q": "Who practices with Booha?", "choices": ["his classmates", "the office staff", "the nurse", "the principal"], "correct": 0 },
-        { "n": 4, "type": "translate", "jp": "こちら は わたし の せんせい です", "en": "This is my teacher", "extra": ["student", "these"] },
-        { "n": 5, "type": "translate", "jp": "わたしたち の こーち は やさしい です", "en": "Our coach is nice", "extra": ["nurse", "are"] },
-        { "n": 6, "type": "translate", "jp": "かのじょ は こうはい です", "en": "She is a younger student", "extra": ["older", "are"] },
-        { "n": 7, "type": "write", "jp": "せんせい", "en": "teacher" },
-        { "n": 8, "type": "write", "jp": "こーち", "en": "coach" },
-        { "n": 9, "type": "write", "jp": "ともだち", "en": "friend" }
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Booha reads the word “classmate.”",
+          "q": "What word does Booha read?",
+          "choices": [
+            "classmate",
+            "friend",
+            "older student",
+            "younger student"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "Nuppi talks about “friend.”",
+          "q": "What does Nuppi talk about?",
+          "choices": [
+            "friend",
+            "classmate",
+            "older student",
+            "younger student"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "The class talks about “older student.”",
+          "q": "What does the class talk about?",
+          "choices": [
+            "older student",
+            "classmate",
+            "friend",
+            "younger student"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "こちらは私の先生です。",
+          "en": "This is my teacher"
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "校長先生はやさしいです。",
+          "en": "The principal is kind"
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "保健室の先生は私たちを助けてくれます。",
+          "en": "The school nurse helps us"
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "せんせい",
+          "en": "teacher"
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "こうちょう せんせい",
+          "en": "principal"
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "ほけんしつ の せんせい",
+          "en": "school nurse"
+        }
       ]
     },
     {
       "week": 4,
       "passage": {
-        "text": "Booha looks at his school schedule. In the morning, class starts when the bell rings. He eats lunch at noon and plays outside during break. In the afternoon, he has one more class. School finishes at three. After school, Booha plays with Nuppi, but they watch the clock and go home on time. On Monday, they will start a new schedule.",
+        "text": "Today, Booha and Nuppi learn about “schedule.” They look at “time” and “clock.” The teacher shows “morning” and “afternoon.” Booha talks about “Monday.” They learn together.",
         "comprehension": [
-          { "n": 1, "q": "What tells Booha that class starts?", "choices": ["the lunch", "the bell", "the break", "Monday"], "correct": 1 },
-          { "n": 2, "q": "When does Booha play outside?", "choices": ["before school", "during break", "in class", "at night"], "correct": 1 },
-          { "n": 3, "q": "Why do Booha and Nuppi watch the clock?", "choices": ["to go home on time", "to start lunch early", "to miss the bell", "to finish on Monday"], "correct": 0 }
+          {
+            "n": 1,
+            "q": "What do Booha and Nuppi learn about?",
+            "choices": [
+              "schedule",
+              "time",
+              "clock",
+              "morning"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "What does the teacher show?",
+            "choices": [
+              "morning",
+              "schedule",
+              "time",
+              "clock"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "What does Booha talk about?",
+            "choices": [
+              "Monday",
+              "clock",
+              "morning",
+              "afternoon"
+            ],
+            "correct": 0
+          }
         ]
       },
       "definitions": [
-        { "n": 46, "def": "a plan that shows when things will happen", "pos": "noun" },
-        { "n": 47, "def": "what a clock shows", "pos": "noun" },
-        { "n": 48, "def": "a tool that shows the time", "pos": "noun" },
-        { "n": 49, "def": "the early part of the day", "pos": "noun" },
-        { "n": 50, "def": "the part of the day after noon", "pos": "noun" },
-        { "n": 51, "def": "the day after Sunday and before Tuesday", "pos": "noun" },
-        { "n": 52, "def": "a time when students learn with a teacher", "pos": "noun" },
-        { "n": 53, "def": "the meal eaten around the middle of the day", "pos": "noun" },
-        { "n": 54, "def": "a short time to rest between lessons", "pos": "noun" },
-        { "n": 55, "def": "a metal object at school that makes a ringing sound", "pos": "noun" },
-        { "n": 56, "def": "to begin doing something", "pos": "verb" },
-        { "n": 57, "def": "to reach the end of something", "pos": "verb" },
-        { "n": 58, "def": "during the time earlier than the first class", "pos": "phrase" },
-        { "n": 59, "def": "during the time following the last class", "pos": "phrase" },
-        { "n": 60, "def": "at the correct planned time, not late", "pos": "phrase" }
+        {
+          "n": 46,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 47,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 48,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 49,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 50,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 51,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 52,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 53,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 54,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 55,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 56,
+          "def": "an action word",
+          "pos": "verb"
+        },
+        {
+          "n": 57,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 58,
+          "def": "a word from this lesson",
+          "pos": "phrase"
+        },
+        {
+          "n": 59,
+          "def": "a word from this lesson",
+          "pos": "phrase"
+        },
+        {
+          "n": 60,
+          "def": "a word from this lesson",
+          "pos": "phrase"
+        }
       ],
       "questions": [
-        { "n": 1, "type": "read", "text": "The bell rings at nine, so the first class starts on time.", "q": "What happens at nine?", "choices": ["Lunch finishes", "The bell rings", "School finishes", "Break starts"], "correct": 1 },
-        { "n": 2, "type": "read", "text": "Booha has English before lunch and music after lunch.", "q": "Which class is first?", "choices": ["music", "English", "PE", "math"], "correct": 1 },
-        { "n": 3, "type": "read", "text": "Nuppi is late on Monday, but she is on time on Tuesday.", "q": "When is Nuppi on time?", "choices": ["Monday", "Tuesday", "both days", "neither day"], "correct": 1 },
-        { "n": 4, "type": "translate", "jp": "これ は わたし の よていひょう です", "en": "This is my schedule", "extra": ["clock", "your"] },
-        { "n": 5, "type": "translate", "jp": "ごご に さっかー を します", "en": "I play soccer in the afternoon", "extra": ["morning", "plays"] },
-        { "n": 6, "type": "translate", "jp": "ちゃいむ が なります", "en": "The bell rings", "extra": ["clock", "ring"] },
-        { "n": 7, "type": "write", "jp": "よていひょう", "en": "schedule" },
-        { "n": 8, "type": "write", "jp": "とけい", "en": "clock" },
-        { "n": 9, "type": "write", "jp": "べる", "en": "bell" }
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Booha reads the word “class.”",
+          "q": "What word does Booha read?",
+          "choices": [
+            "class",
+            "lunch",
+            "break",
+            "bell"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "Nuppi talks about “lunch.”",
+          "q": "What does Nuppi talk about?",
+          "choices": [
+            "lunch",
+            "class",
+            "break",
+            "bell"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "The class talks about “break.”",
+          "q": "What does the class talk about?",
+          "choices": [
+            "break",
+            "class",
+            "lunch",
+            "bell"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "これは私の予定表です。",
+          "en": "This is my schedule"
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "何時ですか。",
+          "en": "What time is it"
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "時計は壁にあります。",
+          "en": "The clock is on the wall"
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "よていひょう",
+          "en": "schedule"
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "じかん",
+          "en": "time"
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "とけい",
+          "en": "clock"
+        }
       ]
     }
   ]

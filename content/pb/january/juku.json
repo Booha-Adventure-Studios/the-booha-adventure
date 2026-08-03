@@ -1,20 +1,20 @@
 {
   "curriculum": "pb",
-  "month": "december",
+  "month": "january",
   "weeks": [
     {
       "week": 1,
       "passage": {
-        "text": "Today, Booha and Nuppi learn about “winter.” They look at “winter break” and “holiday.” The teacher shows “Christmas” and “New Year.” Booha talks about “New Year’s Eve.” They learn together.",
+        "text": "Today, Booha and Nuppi learn about “goal.” They look at “plan” and “dream.” The teacher shows “future” and “try.” Booha talks about “start.” They learn together.",
         "comprehension": [
           {
             "n": 1,
             "q": "What do Booha and Nuppi learn about?",
             "choices": [
-              "winter",
-              "winter break",
-              "holiday",
-              "Christmas"
+              "goal",
+              "plan",
+              "dream",
+              "future"
             ],
             "correct": 0
           },
@@ -22,10 +22,10 @@
             "n": 2,
             "q": "What does the teacher show?",
             "choices": [
-              "Christmas",
-              "winter",
-              "winter break",
-              "holiday"
+              "future",
+              "goal",
+              "plan",
+              "dream"
             ],
             "correct": 0
           },
@@ -33,10 +33,10 @@
             "n": 3,
             "q": "What does Booha talk about?",
             "choices": [
-              "New Year’s Eve",
-              "holiday",
-              "Christmas",
-              "New Year"
+              "start",
+              "dream",
+              "future",
+              "try"
             ],
             "correct": 0
           }
@@ -50,8 +50,8 @@
         },
         {
           "n": 2,
-          "def": "a word from this lesson",
-          "pos": "phrase"
+          "def": "an action word",
+          "pos": "verb"
         },
         {
           "n": 3,
@@ -65,151 +65,151 @@
         },
         {
           "n": 5,
-          "def": "a word from this lesson",
-          "pos": "phrase"
+          "def": "an action word",
+          "pos": "verb"
         },
         {
           "n": 6,
-          "def": "a word from this lesson",
-          "pos": "phrase"
+          "def": "an action word",
+          "pos": "verb"
         },
         {
           "n": 7,
-          "def": "a word from this lesson",
-          "pos": "phrase"
+          "def": "an action word",
+          "pos": "verb"
         },
         {
           "n": 8,
-          "def": "a place",
+          "def": "a word from this lesson",
           "pos": "noun"
         },
         {
           "n": 9,
-          "def": "a place",
-          "pos": "noun"
+          "def": "an action word",
+          "pos": "verb"
         },
         {
           "n": 10,
-          "def": "a word from this lesson",
-          "pos": "noun"
+          "def": "an action word",
+          "pos": "verb"
         },
         {
           "n": 11,
-          "def": "a word from this lesson",
-          "pos": "noun"
+          "def": "an action word",
+          "pos": "verb"
         },
         {
           "n": 12,
-          "def": "a word from this lesson",
-          "pos": "noun"
+          "def": "an action word",
+          "pos": "verb"
         },
         {
           "n": 13,
-          "def": "a word from this lesson",
-          "pos": "phrase"
+          "def": "an action word",
+          "pos": "verb"
         },
         {
           "n": 14,
           "def": "a word from this lesson",
-          "pos": "phrase"
+          "pos": "noun"
         },
         {
           "n": 15,
-          "def": "a word from this lesson",
-          "pos": "phrase"
+          "def": "a word that describes a person or thing",
+          "pos": "adjective"
         }
       ],
       "questions": [
         {
           "n": 1,
           "type": "read",
-          "text": "Booha reads the word “New Year’s Day.”",
+          "text": "Booha reads the word “change.”",
           "q": "What word does Booha read?",
           "choices": [
-            "New Year’s Day",
-            "shrine",
-            "temple",
-            "snow"
+            "change",
+            "habit",
+            "study",
+            "practice"
           ],
           "correct": 0
         },
         {
           "n": 2,
           "type": "read",
-          "text": "Nuppi talks about “shrine.”",
+          "text": "Nuppi talks about “habit.”",
           "q": "What does Nuppi talk about?",
           "choices": [
-            "shrine",
-            "New Year’s Day",
-            "temple",
-            "snow"
+            "habit",
+            "change",
+            "study",
+            "practice"
           ],
           "correct": 0
         },
         {
           "n": 3,
           "type": "read",
-          "text": "The class talks about “temple.”",
+          "text": "The class talks about “study.”",
           "q": "What does the class talk about?",
           "choices": [
-            "temple",
-            "New Year’s Day",
-            "shrine",
-            "snow"
+            "study",
+            "change",
+            "habit",
+            "practice"
           ],
           "correct": 0
         },
         {
           "n": 4,
           "type": "translate",
-          "jp": "冬は寒いです。",
-          "en": "Winter is cold"
+          "jp": "私の目標は英語を勉強することです。",
+          "en": "My goal is to study English"
         },
         {
           "n": 5,
           "type": "translate",
-          "jp": "冬休みは来週始まります。",
-          "en": "Winter break starts next week"
+          "jp": "計画があります。",
+          "en": "I have a plan"
         },
         {
           "n": 6,
           "type": "translate",
-          "jp": "長い休日があります。",
-          "en": "We have a long holiday"
+          "jp": "新しい単語を学びたいです。",
+          "en": "I want to learn new words"
         },
         {
           "n": 7,
           "type": "write",
-          "jp": "ふゆ",
-          "en": "winter"
+          "jp": "もくひょう",
+          "en": "goal"
         },
         {
           "n": 8,
           "type": "write",
-          "jp": "ふゆやすみ",
-          "en": "winter break"
+          "jp": "けいかく",
+          "en": "plan"
         },
         {
           "n": 9,
           "type": "write",
-          "jp": "きゅうじつ",
-          "en": "holiday"
+          "jp": "ゆめ",
+          "en": "dream"
         }
       ]
     },
     {
       "week": 2,
       "passage": {
-        "text": "Today, Booha and Nuppi learn about “tradition.” They look at “celebration” and “family dinner.” The teacher shows “special food” and “cake.” Booha talks about “card.” They learn together.",
+        "text": "Today, Booha and Nuppi learn about “morning.” They look at “afternoon” and “evening.” The teacher shows “night” and “breakfast.” Booha talks about “lunch.” They learn together.",
         "comprehension": [
           {
             "n": 1,
             "q": "What do Booha and Nuppi learn about?",
             "choices": [
-              "tradition",
-              "celebration",
-              "family dinner",
-              "special food"
+              "morning",
+              "afternoon",
+              "evening",
+              "night"
             ],
             "correct": 0
           },
@@ -217,10 +217,10 @@
             "n": 2,
             "q": "What does the teacher show?",
             "choices": [
-              "special food",
-              "tradition",
-              "celebration",
-              "family dinner"
+              "night",
+              "morning",
+              "afternoon",
+              "evening"
             ],
             "correct": 0
           },
@@ -228,10 +228,10 @@
             "n": 3,
             "q": "What does Booha talk about?",
             "choices": [
-              "card",
-              "family dinner",
-              "special food",
-              "cake"
+              "lunch",
+              "evening",
+              "night",
+              "breakfast"
             ],
             "correct": 0
           }
@@ -251,12 +251,12 @@
         {
           "n": 18,
           "def": "a word from this lesson",
-          "pos": "phrase"
+          "pos": "noun"
         },
         {
           "n": 19,
           "def": "a word from this lesson",
-          "pos": "phrase"
+          "pos": "noun"
         },
         {
           "n": 20,
@@ -275,136 +275,136 @@
         },
         {
           "n": 23,
-          "def": "a word from this lesson",
-          "pos": "noun"
+          "def": "an action word",
+          "pos": "verb"
         },
         {
           "n": 24,
-          "def": "a word from this lesson",
-          "pos": "noun"
+          "def": "an action word",
+          "pos": "verb"
         },
         {
           "n": 25,
-          "def": "a word from this lesson",
-          "pos": "noun"
+          "def": "an action word",
+          "pos": "verb"
         },
         {
           "n": 26,
-          "def": "a word from this lesson",
-          "pos": "noun"
+          "def": "an action word",
+          "pos": "verb"
         },
         {
           "n": 27,
-          "def": "a person",
+          "def": "a word from this lesson",
           "pos": "noun"
         },
         {
           "n": 28,
-          "def": "a word from this lesson",
-          "pos": "noun"
+          "def": "an action word",
+          "pos": "verb"
         },
         {
           "n": 29,
-          "def": "a word from this lesson",
-          "pos": "noun"
+          "def": "an action word",
+          "pos": "verb"
         },
         {
           "n": 30,
           "def": "a word from this lesson",
-          "pos": "phrase"
+          "pos": "noun"
         }
       ],
       "questions": [
         {
           "n": 1,
           "type": "read",
-          "text": "Booha reads the word “music.”",
+          "text": "Booha reads the word “dinner.”",
           "q": "What word does Booha read?",
           "choices": [
-            "music",
-            "song",
-            "photo",
-            "game"
+            "dinner",
+            "wake up",
+            "get dressed",
+            "go to school"
           ],
           "correct": 0
         },
         {
           "n": 2,
           "type": "read",
-          "text": "Nuppi talks about “song.”",
+          "text": "Nuppi talks about “wake up.”",
           "q": "What does Nuppi talk about?",
           "choices": [
-            "song",
-            "music",
-            "photo",
-            "game"
+            "wake up",
+            "dinner",
+            "get dressed",
+            "go to school"
           ],
           "correct": 0
         },
         {
           "n": 3,
           "type": "read",
-          "text": "The class talks about “photo.”",
+          "text": "The class talks about “get dressed.”",
           "q": "What does the class talk about?",
           "choices": [
-            "photo",
-            "music",
-            "song",
-            "game"
+            "get dressed",
+            "dinner",
+            "wake up",
+            "go to school"
           ],
           "correct": 0
         },
         {
           "n": 4,
           "type": "translate",
-          "jp": "これは私たちの家族の伝統です。",
-          "en": "This is our family tradition"
+          "jp": "7時に起きます。",
+          "en": "I wake up at seven"
         },
         {
           "n": 5,
           "type": "translate",
-          "jp": "お祝いは6時に始まります。",
-          "en": "The celebration starts at six"
+          "jp": "毎日朝ごはんを食べます。",
+          "en": "I eat breakfast every day"
         },
         {
           "n": 6,
           "type": "translate",
-          "jp": "私たちは家族で夕食を食べます。",
-          "en": "We have a family dinner"
+          "jp": "朝ごはんの後に歯をみがきます。",
+          "en": "I brush my teeth after breakfast"
         },
         {
           "n": 7,
           "type": "write",
-          "jp": "でんとう",
-          "en": "tradition"
+          "jp": "あさ",
+          "en": "morning"
         },
         {
           "n": 8,
           "type": "write",
-          "jp": "おいわい",
-          "en": "celebration"
+          "jp": "ごご",
+          "en": "afternoon"
         },
         {
           "n": 9,
           "type": "write",
-          "jp": "かぞく の ゆうしょく",
-          "en": "family dinner"
+          "jp": "ゆうがた",
+          "en": "evening"
         }
       ]
     },
     {
       "week": 3,
       "passage": {
-        "text": "Today, Booha and Nuppi learn about “present.” They look at “give” and “get.” The teacher shows “thank-you card” and “surprise.” Booha talks about “wrap.” They learn together.",
+        "text": "Today, Booha and Nuppi learn about “body.” They look at “head” and “stomach.” The teacher shows “healthy” and “sick.” Booha talks about “tired.” They learn together.",
         "comprehension": [
           {
             "n": 1,
             "q": "What do Booha and Nuppi learn about?",
             "choices": [
-              "present",
-              "give",
-              "get",
-              "thank-you card"
+              "body",
+              "head",
+              "stomach",
+              "healthy"
             ],
             "correct": 0
           },
@@ -412,10 +412,10 @@
             "n": 2,
             "q": "What does the teacher show?",
             "choices": [
-              "thank-you card",
-              "present",
-              "give",
-              "get"
+              "healthy",
+              "body",
+              "head",
+              "stomach"
             ],
             "correct": 0
           },
@@ -423,10 +423,10 @@
             "n": 3,
             "q": "What does Booha talk about?",
             "choices": [
-              "wrap",
-              "get",
-              "thank-you card",
-              "surprise"
+              "tired",
+              "stomach",
+              "healthy",
+              "sick"
             ],
             "correct": 0
           }
@@ -440,38 +440,38 @@
         },
         {
           "n": 32,
-          "def": "an action word",
-          "pos": "verb"
+          "def": "a word from this lesson",
+          "pos": "noun"
         },
         {
           "n": 33,
-          "def": "an action word",
-          "pos": "verb"
+          "def": "a word from this lesson",
+          "pos": "noun"
         },
         {
           "n": 34,
-          "def": "a word from this lesson",
-          "pos": "phrase"
+          "def": "a word that describes a person or thing",
+          "pos": "adjective"
         },
         {
           "n": 35,
-          "def": "a word from this lesson",
-          "pos": "noun"
+          "def": "a word that describes a person or thing",
+          "pos": "adjective"
         },
         {
           "n": 36,
-          "def": "an action word",
-          "pos": "verb"
+          "def": "a word that describes a person or thing",
+          "pos": "adjective"
         },
         {
           "n": 37,
-          "def": "a word from this lesson",
-          "pos": "noun"
+          "def": "a word that describes a person or thing",
+          "pos": "adjective"
         },
         {
           "n": 38,
-          "def": "a word from this lesson",
-          "pos": "phrase"
+          "def": "a word that describes a person or thing",
+          "pos": "adjective"
         },
         {
           "n": 39,
@@ -486,22 +486,22 @@
         {
           "n": 41,
           "def": "a word from this lesson",
-          "pos": "phrase"
+          "pos": "noun"
         },
         {
           "n": 42,
-          "def": "a word from this lesson",
-          "pos": "noun"
+          "def": "an action word",
+          "pos": "verb"
         },
         {
           "n": 43,
-          "def": "a word from this lesson",
-          "pos": "phrase"
+          "def": "an action word",
+          "pos": "verb"
         },
         {
           "n": 44,
-          "def": "a word from this lesson",
-          "pos": "noun"
+          "def": "an action word",
+          "pos": "verb"
         },
         {
           "n": 45,
@@ -513,93 +513,93 @@
         {
           "n": 1,
           "type": "read",
-          "text": "Booha reads the word “box.”",
+          "text": "Booha reads the word “hungry.”",
           "q": "What word does Booha read?",
           "choices": [
-            "box",
-            "gift bag",
-            "ribbon",
-            "letter"
+            "hungry",
+            "thirsty",
+            "water",
+            "fruit"
           ],
           "correct": 0
         },
         {
           "n": 2,
           "type": "read",
-          "text": "Nuppi talks about “gift bag.”",
+          "text": "Nuppi talks about “thirsty.”",
           "q": "What does Nuppi talk about?",
           "choices": [
-            "gift bag",
-            "box",
-            "ribbon",
-            "letter"
+            "thirsty",
+            "hungry",
+            "water",
+            "fruit"
           ],
           "correct": 0
         },
         {
           "n": 3,
           "type": "read",
-          "text": "The class talks about “ribbon.”",
+          "text": "The class talks about “water.”",
           "q": "What does the class talk about?",
           "choices": [
-            "ribbon",
-            "box",
-            "gift bag",
-            "letter"
+            "water",
+            "hungry",
+            "thirsty",
+            "fruit"
           ],
           "correct": 0
         },
         {
           "n": 4,
           "type": "translate",
-          "jp": "私はプレゼントをもらいました。",
-          "en": "I got a present"
+          "jp": "毎朝果物を食べます。",
+          "en": "I eat fruit every morning"
         },
         {
           "n": 5,
           "type": "translate",
-          "jp": "私は友だちにカードをあげました。",
-          "en": "I gave my friend a card"
+          "jp": "夕食に野菜を食べます。",
+          "en": "I eat vegetables with dinner"
         },
         {
           "n": 6,
           "type": "translate",
-          "jp": "私は先生から本をもらいました。",
-          "en": "I got a book from my teacher"
+          "jp": "水をたくさん飲みます。",
+          "en": "I drink a lot of water"
         },
         {
           "n": 7,
           "type": "write",
-          "jp": "ぷれぜんと",
-          "en": "present"
+          "jp": "からだ",
+          "en": "body"
         },
         {
           "n": 8,
           "type": "write",
-          "jp": "あげる",
-          "en": "give"
+          "jp": "あたま",
+          "en": "head"
         },
         {
           "n": 9,
           "type": "write",
-          "jp": "もらう",
-          "en": "get"
+          "jp": "おなか",
+          "en": "stomach"
         }
       ]
     },
     {
       "week": 4,
       "passage": {
-        "text": "Today, Booha and Nuppi learn about “this year.” They look at “last year” and “next year.” The teacher shows “lesson” and “goal.” Booha talks about “success.” They learn together.",
+        "text": "Today, Booha and Nuppi learn about “happy.” They look at “sad” and “nervous.” The teacher shows “excited” and “difficult.” Booha talks about “easy.” They learn together.",
         "comprehension": [
           {
             "n": 1,
             "q": "What do Booha and Nuppi learn about?",
             "choices": [
-              "this year",
-              "last year",
-              "next year",
-              "lesson"
+              "happy",
+              "sad",
+              "nervous",
+              "excited"
             ],
             "correct": 0
           },
@@ -607,10 +607,10 @@
             "n": 2,
             "q": "What does the teacher show?",
             "choices": [
-              "lesson",
-              "this year",
-              "last year",
-              "next year"
+              "excited",
+              "happy",
+              "sad",
+              "nervous"
             ],
             "correct": 0
           },
@@ -618,10 +618,10 @@
             "n": 3,
             "q": "What does Booha talk about?",
             "choices": [
-              "success",
-              "next year",
-              "lesson",
-              "goal"
+              "easy",
+              "nervous",
+              "excited",
+              "difficult"
             ],
             "correct": 0
           }
@@ -630,33 +630,33 @@
       "definitions": [
         {
           "n": 46,
-          "def": "a word from this lesson",
-          "pos": "phrase"
+          "def": "a word that describes a person or thing",
+          "pos": "adjective"
         },
         {
           "n": 47,
-          "def": "a word from this lesson",
-          "pos": "phrase"
+          "def": "a word that describes a person or thing",
+          "pos": "adjective"
         },
         {
           "n": 48,
-          "def": "a word from this lesson",
-          "pos": "phrase"
+          "def": "a word that describes a person or thing",
+          "pos": "adjective"
         },
         {
           "n": 49,
-          "def": "a word from this lesson",
-          "pos": "noun"
+          "def": "a word that describes a person or thing",
+          "pos": "adjective"
         },
         {
           "n": 50,
-          "def": "a word from this lesson",
-          "pos": "noun"
+          "def": "a word that describes a person or thing",
+          "pos": "adjective"
         },
         {
           "n": 51,
-          "def": "a word from this lesson",
-          "pos": "noun"
+          "def": "a word that describes a person or thing",
+          "pos": "adjective"
         },
         {
           "n": 52,
@@ -665,17 +665,17 @@
         },
         {
           "n": 53,
-          "def": "a word from this lesson",
-          "pos": "noun"
+          "def": "an action word",
+          "pos": "verb"
         },
         {
           "n": 54,
-          "def": "a person",
-          "pos": "noun"
+          "def": "an action word",
+          "pos": "verb"
         },
         {
           "n": 55,
-          "def": "a person",
+          "def": "a word from this lesson",
           "pos": "noun"
         },
         {
@@ -696,89 +696,89 @@
         {
           "n": 59,
           "def": "a word from this lesson",
-          "pos": "phrase"
+          "pos": "noun"
         },
         {
           "n": 60,
-          "def": "a word that describes a person or thing",
-          "pos": "adjective"
+          "def": "a word from this lesson",
+          "pos": "noun"
         }
       ],
       "questions": [
         {
           "n": 1,
           "type": "read",
-          "text": "Booha reads the word “challenge.”",
+          "text": "Booha reads the word “mistake.”",
           "q": "What word does Booha read?",
           "choices": [
-            "challenge",
             "mistake",
-            "friend",
-            "teacher"
+            "learn",
+            "improve",
+            "focus"
           ],
           "correct": 0
         },
         {
           "n": 2,
           "type": "read",
-          "text": "Nuppi talks about “mistake.”",
+          "text": "Nuppi talks about “learn.”",
           "q": "What does Nuppi talk about?",
           "choices": [
+            "learn",
             "mistake",
-            "challenge",
-            "friend",
-            "teacher"
+            "improve",
+            "focus"
           ],
           "correct": 0
         },
         {
           "n": 3,
           "type": "read",
-          "text": "The class talks about “friend.”",
+          "text": "The class talks about “improve.”",
           "q": "What does the class talk about?",
           "choices": [
-            "friend",
-            "challenge",
+            "improve",
             "mistake",
-            "teacher"
+            "learn",
+            "focus"
           ],
           "correct": 0
         },
         {
           "n": 4,
           "type": "translate",
-          "jp": "私は今年たくさんの単語を学びました。",
-          "en": "I learned many words this year"
+          "jp": "英語を学びたいです。",
+          "en": "I want to learn English"
         },
         {
           "n": 5,
           "type": "translate",
-          "jp": "去年は楽しかったです。",
-          "en": "Last year was fun"
+          "jp": "少し英語が話せます。",
+          "en": "I can speak a little English"
         },
         {
           "n": 6,
           "type": "translate",
-          "jp": "私は来年もっと勉強します。",
-          "en": "I will study more next year"
+          "jp": "絵を描くのが得意です。",
+          "en": "I am good at drawing"
         },
         {
           "n": 7,
           "type": "write",
-          "jp": "ことし",
-          "en": "this year"
+          "jp": "うれしい",
+          "en": "happy"
         },
         {
           "n": 8,
           "type": "write",
-          "jp": "きょねん",
-          "en": "last year"
+          "jp": "かなしい",
+          "en": "sad"
         },
         {
           "n": 9,
           "type": "write",
-          "jp": "らいねん",
-          "en": "next year"
+          "jp": "きんちょう した",
+          "en": "nervous"
         }
       ]
     }
