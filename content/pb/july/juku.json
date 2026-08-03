@@ -1,4 +1,3 @@
-
 {
   "curriculum": "pb",
   "month": "july",
@@ -6,38 +5,38 @@
     {
       "week": 1,
       "passage": {
-        "text": "Booha finds a story under a tree in Karasuki. It is about a brave hero who lives near a dark forest. A bad guy takes the king and queen from their castle. The prince and princess ask a fairy for help. In the forest, the hero sees a wolf, a witch, and a giant monster. A red dragon guards the castle door, but the hero has a kind plan.",
+        "text": "Today, Booha and Nuppi learn about “story.” They look at “hero” and “bad guy.” The teacher shows “king” and “queen.” Booha talks about “prince.” They learn together.",
         "comprehension": [
           {
             "n": 1,
-            "q": "Where does Booha find the story?",
+            "q": "What do Booha and Nuppi learn about?",
             "choices": [
-              "under a tree",
-              "inside the castle",
-              "near a river",
-              "at school"
+              "story",
+              "hero",
+              "bad guy",
+              "king"
             ],
             "correct": 0
           },
           {
             "n": 2,
-            "q": "Who asks the fairy for help?",
+            "q": "What does the teacher show?",
             "choices": [
-              "the king and queen",
-              "the wolf and witch",
-              "the prince and princess",
-              "the giant and dragon"
+              "king",
+              "story",
+              "hero",
+              "bad guy"
             ],
-            "correct": 2
+            "correct": 0
           },
           {
             "n": 3,
-            "q": "What guards the castle door?",
+            "q": "What does Booha talk about?",
             "choices": [
-              "a red dragon",
-              "a giant monster",
-              "a brave hero",
-              "a bad wolf"
+              "prince",
+              "bad guy",
+              "king",
+              "queen"
             ],
             "correct": 0
           }
@@ -46,77 +45,77 @@
       "definitions": [
         {
           "n": 1,
-          "def": "a tale about people and events",
+          "def": "a word from this lesson",
           "pos": "noun"
         },
         {
           "n": 2,
-          "def": "the good and brave person in a story",
+          "def": "a person",
           "pos": "noun"
         },
         {
           "n": 3,
-          "def": "a person who does bad things in a story",
-          "pos": "noun"
+          "def": "a person",
+          "pos": "phrase"
         },
         {
           "n": 4,
-          "def": "a man who rules a country",
+          "def": "a person",
           "pos": "noun"
         },
         {
           "n": 5,
-          "def": "a woman who rules a country",
+          "def": "a person",
           "pos": "noun"
         },
         {
           "n": 6,
-          "def": "the son of a king or queen",
+          "def": "a person",
           "pos": "noun"
         },
         {
           "n": 7,
-          "def": "the daughter of a king or queen",
+          "def": "a person",
           "pos": "noun"
         },
         {
           "n": 8,
-          "def": "a large story creature with wings",
+          "def": "a word from this lesson",
           "pos": "noun"
         },
         {
           "n": 9,
-          "def": "a wild animal that looks like a large dog",
+          "def": "a word from this lesson",
           "pos": "noun"
         },
         {
           "n": 10,
-          "def": "a woman in stories who uses magic",
+          "def": "a person",
           "pos": "noun"
         },
         {
           "n": 11,
-          "def": "a story person who is much bigger than a human",
+          "def": "a word from this lesson",
           "pos": "noun"
         },
         {
           "n": 12,
-          "def": "a small story creature with wings and magic",
+          "def": "a person",
           "pos": "noun"
         },
         {
           "n": 13,
-          "def": "a strange and often scary creature",
+          "def": "a word from this lesson",
           "pos": "noun"
         },
         {
           "n": 14,
-          "def": "a large strong home for a king or queen",
+          "def": "a place",
           "pos": "noun"
         },
         {
           "n": 15,
-          "def": "a large place with many trees",
+          "def": "a word from this lesson",
           "pos": "noun"
         }
       ],
@@ -124,127 +123,115 @@
         {
           "n": 1,
           "type": "read",
-          "text": "The king and queen live in a castle near the forest.",
-          "q": "Where do the king and queen live?",
+          "text": "Booha reads the word “princess.”",
+          "q": "What word does Booha read?",
           "choices": [
-            "in a castle",
-            "under a tree",
-            "in a school",
-            "on a boat"
+            "princess",
+            "dragon",
+            "wolf",
+            "witch"
           ],
           "correct": 0
         },
         {
           "n": 2,
           "type": "read",
-          "text": "The fairy is small, but the giant is very big.",
-          "q": "Who is very big?",
+          "text": "Nuppi talks about “dragon.”",
+          "q": "What does Nuppi talk about?",
           "choices": [
-            "the fairy",
-            "the giant",
-            "the queen",
-            "the hero"
+            "dragon",
+            "princess",
+            "wolf",
+            "witch"
           ],
-          "correct": 1
+          "correct": 0
         },
         {
           "n": 3,
           "type": "read",
-          "text": "The princess sees a wolf and runs back to the castle.",
-          "q": "What does the princess see?",
+          "text": "The class talks about “wolf.”",
+          "q": "What does the class talk about?",
           "choices": [
-            "a dragon",
-            "a witch",
-            "a wolf",
-            "a monster"
+            "wolf",
+            "princess",
+            "dragon",
+            "witch"
           ],
-          "correct": 2
+          "correct": 0
         },
         {
           "n": 4,
           "type": "translate",
-          "jp": "ひーろーは もりに います。",
-          "en": "The hero is in the forest",
-          "extra": [
-            "castle",
-            "under"
-          ]
+          "jp": "これは物語です。",
+          "en": "This is a story"
         },
         {
           "n": 5,
           "type": "translate",
-          "jp": "どらごんは とても おおきいです。",
-          "en": "The dragon is very big",
-          "extra": [
-            "small",
-            "are"
-          ]
+          "jp": "ヒーローは勇敢です。",
+          "en": "The hero is brave"
         },
         {
           "n": 6,
           "type": "translate",
-          "jp": "これは まじょの ものがたりです。",
-          "en": "This is a story about a witch",
-          "extra": [
-            "wolf",
-            "these"
-          ]
+          "jp": "悪者は怖いです。",
+          "en": "The bad guy is scary"
         },
         {
           "n": 7,
           "type": "write",
-          "jp": "しろ",
-          "en": "castle"
+          "jp": "ものがたり",
+          "en": "story"
         },
         {
           "n": 8,
           "type": "write",
-          "jp": "じょおう",
-          "en": "queen"
+          "jp": "ひーろー",
+          "en": "hero"
         },
         {
           "n": 9,
           "type": "write",
-          "jp": "ようせい",
-          "en": "fairy"
+          "jp": "わるもの",
+          "en": "bad guy"
         }
       ]
     },
     {
       "week": 2,
       "passage": {
-        "text": "Today, Nuppi begins an adventure with Booha and a new friend. They find a map beside an old tower. The map shows a cave with treasure inside. Nuppi rides a horse, and Booha carries a sword and shield. At the cave, they see a locked door. A magic spell does not open it, but their small key does. An enemy waits inside, so the three friends work as a team.",
+        "text": "Today, Booha and Nuppi learn about “magic.” They look at “spell” and “sword.” The teacher shows “shield” and “treasure.” Booha talks about “map.” They learn together.",
         "comprehension": [
           {
             "n": 1,
-            "q": "Where do the friends find the map?",
+            "q": "What do Booha and Nuppi learn about?",
             "choices": [
-              "beside an old tower",
-              "behind a school",
-              "under a horse",
-              "inside a shop"
+              "magic",
+              "spell",
+              "sword",
+              "shield"
             ],
             "correct": 0
           },
           {
             "n": 2,
-            "q": "What opens the cave door?",
+            "q": "What does the teacher show?",
             "choices": [
-              "a sword",
-              "a spell",
-              "a small key",
-              "a shield"
+              "shield",
+              "magic",
+              "spell",
+              "sword"
             ],
-            "correct": 2
+            "correct": 0
           },
           {
             "n": 3,
-            "q": "How do the three friends face the enemy?",
+            "q": "What does Booha talk about?",
             "choices": [
-              "as a team",
-              "with a map",
-              "on one horse",
-              "from the tower"
+              "map",
+              "sword",
+              "shield",
+              "treasure"
             ],
             "correct": 0
           }
@@ -253,77 +240,77 @@
       "definitions": [
         {
           "n": 16,
-          "def": "a special power that can do impossible things",
+          "def": "a word from this lesson",
           "pos": "noun"
         },
         {
           "n": 17,
-          "def": "special words used to make magic happen",
+          "def": "a word from this lesson",
           "pos": "noun"
         },
         {
           "n": 18,
-          "def": "a long sharp weapon",
+          "def": "a word from this lesson",
           "pos": "noun"
         },
         {
           "n": 19,
-          "def": "something carried to protect your body",
+          "def": "a word from this lesson",
           "pos": "noun"
         },
         {
           "n": 20,
-          "def": "special things like gold that people want to find",
+          "def": "a word from this lesson",
           "pos": "noun"
         },
         {
           "n": 21,
-          "def": "a picture that shows where places are",
+          "def": "a word from this lesson",
           "pos": "noun"
         },
         {
           "n": 22,
-          "def": "the part of a room or building that opens and closes",
+          "def": "a word from this lesson",
           "pos": "noun"
         },
         {
           "n": 23,
-          "def": "a small metal object used to open a lock",
+          "def": "a word from this lesson",
           "pos": "noun"
         },
         {
           "n": 24,
-          "def": "a large hole in the side of a hill or under the ground",
+          "def": "a word from this lesson",
           "pos": "noun"
         },
         {
           "n": 25,
-          "def": "a tall narrow building",
+          "def": "a place",
           "pos": "noun"
         },
         {
           "n": 26,
-          "def": "a large animal that people can ride",
+          "def": "a word from this lesson",
           "pos": "noun"
         },
         {
           "n": 27,
-          "def": "a person you know and like",
+          "def": "a person",
           "pos": "noun"
         },
         {
           "n": 28,
-          "def": "a person or group that fights against you",
+          "def": "a person",
           "pos": "noun"
         },
         {
           "n": 29,
-          "def": "a group of people who work or play together",
+          "def": "a word from this lesson",
           "pos": "noun"
         },
         {
           "n": 30,
-          "def": "an exciting trip or experience",
+          "def": "a word from this lesson",
           "pos": "noun"
         }
       ],
@@ -331,206 +318,194 @@
         {
           "n": 1,
           "type": "read",
-          "text": "Booha uses the map to find a tall tower beside the river.",
-          "q": "What does Booha find?",
+          "text": "Booha reads the word “door.”",
+          "q": "What word does Booha read?",
           "choices": [
-            "a cave",
-            "a tower",
-            "a door",
-            "a horse"
+            "door",
+            "key",
+            "cave",
+            "tower"
           ],
-          "correct": 1
+          "correct": 0
         },
         {
           "n": 2,
           "type": "read",
-          "text": "Nuppi has the key, and Booha has the sword and shield.",
-          "q": "Who has the key?",
+          "text": "Nuppi talks about “key.”",
+          "q": "What does Nuppi talk about?",
           "choices": [
-            "Nuppi",
-            "Booha",
-            "the enemy",
-            "their friend"
+            "key",
+            "door",
+            "cave",
+            "tower"
           ],
           "correct": 0
         },
         {
           "n": 3,
           "type": "read",
-          "text": "The treasure is not in the tower. It is inside the dark cave.",
-          "q": "Where is the treasure?",
+          "text": "The class talks about “cave.”",
+          "q": "What does the class talk about?",
           "choices": [
-            "in the tower",
-            "under the map",
-            "inside the cave",
-            "on the horse"
+            "cave",
+            "door",
+            "key",
+            "tower"
           ],
-          "correct": 2
+          "correct": 0
         },
         {
           "n": 4,
           "type": "translate",
-          "jp": "かれらは ちーむです。",
-          "en": "They are a team",
-          "extra": [
-            "is",
-            "enemy"
-          ]
+          "jp": "ヒーローはドアを開けます。",
+          "en": "The hero opens the door"
         },
         {
           "n": 5,
           "type": "translate",
-          "jp": "かぎは どあの そばに あります。",
-          "en": "The key is beside the door",
-          "extra": [
-            "under",
-            "keys"
-          ]
+          "jp": "ドラゴンは火を吐きます。",
+          "en": "The dragon breathes fire"
         },
         {
           "n": 6,
           "type": "translate",
-          "jp": "ぶーはーは うまに のります。",
-          "en": "Booha rides a horse",
-          "extra": [
-            "ride",
-            "map"
-          ]
+          "jp": "悪者は笑います。",
+          "en": "The bad guy laughs"
         },
         {
           "n": 7,
           "type": "write",
-          "jp": "けん",
-          "en": "sword"
+          "jp": "まほう",
+          "en": "magic"
         },
         {
           "n": 8,
           "type": "write",
-          "jp": "ちず",
-          "en": "map"
+          "jp": "じゅもん",
+          "en": "spell"
         },
         {
           "n": 9,
           "type": "write",
-          "jp": "ともだち",
-          "en": "friend"
+          "jp": "けん",
+          "en": "sword"
         }
       ]
     },
     {
       "week": 3,
       "passage": {
-        "text": "Mister Happy hears a funny sound behind his house. He opens a small door and sees a big, dark room. At first, he is scared because a strong monster is inside. The monster looks angry, but it is really sad. It cannot find its tiny light. Mister Happy is brave and kind, so he helps. The monster is slow, but Mister Happy is fast. They find the light together, and both are happy.",
+        "text": "Today, Booha and Nuppi learn about “happy.” They look at “sad” and “angry.” The teacher shows “scared” and “brave.” Booha talks about “strong.” They learn together.",
         "comprehension": [
           {
             "n": 1,
-            "q": "Why is Mister Happy scared at first?",
+            "q": "What do Booha and Nuppi learn about?",
             "choices": [
-              "The room is small",
-              "A strong monster is inside",
-              "The light is too bright",
-              "The door is fast"
+              "happy",
+              "sad",
+              "angry",
+              "scared"
             ],
-            "correct": 1
+            "correct": 0
           },
           {
             "n": 2,
-            "q": "Why is the monster sad?",
+            "q": "What does the teacher show?",
             "choices": [
-              "It cannot find its light",
-              "It does not have a house",
-              "Mister Happy is angry",
-              "The room is too small"
+              "scared",
+              "happy",
+              "sad",
+              "angry"
             ],
             "correct": 0
           },
           {
             "n": 3,
-            "q": "What do they find together?",
+            "q": "What does Booha talk about?",
             "choices": [
-              "a secret door",
-              "a funny book",
-              "the monster's light",
-              "a brave friend"
+              "strong",
+              "angry",
+              "scared",
+              "brave"
             ],
-            "correct": 2
+            "correct": 0
           }
         ]
       },
       "definitions": [
         {
           "n": 31,
-          "def": "feeling good and pleased",
+          "def": "a word that describes a person or thing",
           "pos": "adjective"
         },
         {
           "n": 32,
-          "def": "feeling unhappy",
+          "def": "a word that describes a person or thing",
           "pos": "adjective"
         },
         {
           "n": 33,
-          "def": "feeling mad about something",
+          "def": "a word that describes a person or thing",
           "pos": "adjective"
         },
         {
           "n": 34,
-          "def": "feeling afraid",
+          "def": "a word that describes a person or thing",
           "pos": "adjective"
         },
         {
           "n": 35,
-          "def": "ready to face something scary or difficult",
+          "def": "a word that describes a person or thing",
           "pos": "adjective"
         },
         {
           "n": 36,
-          "def": "having a lot of power",
-          "pos": "adjective"
+          "def": "a word from this lesson",
+          "pos": "noun"
         },
         {
           "n": 37,
-          "def": "moving or happening quickly",
+          "def": "a word that describes a person or thing",
           "pos": "adjective"
         },
         {
           "n": 38,
-          "def": "moving or happening without much speed",
+          "def": "a word that describes a person or thing",
           "pos": "adjective"
         },
         {
           "n": 39,
-          "def": "large in size",
+          "def": "a word that describes a person or thing",
           "pos": "adjective"
         },
         {
           "n": 40,
-          "def": "little in size",
+          "def": "a word that describes a person or thing",
           "pos": "adjective"
         },
         {
           "n": 41,
-          "def": "having little or no light",
+          "def": "a word that describes a person or thing",
           "pos": "adjective"
         },
         {
           "n": 42,
-          "def": "bright and easy to see in",
+          "def": "a word that describes a person or thing",
           "pos": "adjective"
         },
         {
           "n": 43,
-          "def": "making you laugh",
+          "def": "a word that describes a person or thing",
           "pos": "adjective"
         },
         {
           "n": 44,
-          "def": "caring and helpful to others",
+          "def": "a word that describes a person or thing",
           "pos": "adjective"
         },
         {
           "n": 45,
-          "def": "something known by only a few people",
+          "def": "a word from this lesson",
           "pos": "noun"
         }
       ],
@@ -538,71 +513,59 @@
         {
           "n": 1,
           "type": "read",
-          "text": "The small wolf is fast, but the big monster is slow.",
-          "q": "Which one is fast?",
+          "text": "Booha reads the word “fast.”",
+          "q": "What word does Booha read?",
           "choices": [
-            "the small wolf",
-            "the big monster",
-            "both of them",
-            "neither of them"
+            "fast",
+            "slow",
+            "big",
+            "small"
           ],
           "correct": 0
         },
         {
           "n": 2,
           "type": "read",
-          "text": "Nuppi is scared of the dark room, but her brave friend goes inside.",
-          "q": "Who goes inside?",
+          "text": "Nuppi talks about “slow.”",
+          "q": "What does Nuppi talk about?",
           "choices": [
-            "Nuppi",
-            "her brave friend",
-            "the monster",
-            "Mister Happy"
+            "slow",
+            "fast",
+            "big",
+            "small"
           ],
-          "correct": 1
+          "correct": 0
         },
         {
           "n": 3,
           "type": "read",
-          "text": "Booha tells a funny story, and the sad prince becomes happy.",
-          "q": "How does the prince feel at the end?",
+          "text": "The class talks about “big.”",
+          "q": "What does the class talk about?",
           "choices": [
-            "angry",
-            "scared",
-            "sad",
-            "happy"
+            "big",
+            "fast",
+            "slow",
+            "small"
           ],
-          "correct": 3
+          "correct": 0
         },
         {
           "n": 4,
           "type": "translate",
-          "jp": "その もんすたーは とても つよいです。",
-          "en": "The monster is very strong",
-          "extra": [
-            "small",
-            "are"
-          ]
+          "jp": "ヒーローは嬉しいです。",
+          "en": "The hero is happy"
         },
         {
           "n": 5,
           "type": "translate",
-          "jp": "わたしの ともだちは とても やさしいです。",
-          "en": "My friend is very kind",
-          "extra": [
-            "angry",
-            "are"
-          ]
+          "jp": "お姫様は悲しいです。",
+          "en": "The princess is sad"
         },
         {
           "n": 6,
           "type": "translate",
-          "jp": "この へやは くらいです。",
-          "en": "This room is dark",
-          "extra": [
-            "light",
-            "these"
-          ]
+          "jp": "悪者は怒っています。",
+          "en": "The bad guy is angry"
         },
         {
           "n": 7,
@@ -613,52 +576,52 @@
         {
           "n": 8,
           "type": "write",
-          "jp": "ゆうかんな",
-          "en": "brave"
+          "jp": "かなしい",
+          "en": "sad"
         },
         {
           "n": 9,
           "type": "write",
-          "jp": "ひみつ",
-          "en": "secret"
+          "jp": "おこっている",
+          "en": "angry"
         }
       ]
     },
     {
       "week": 4,
       "passage": {
-        "text": "Today, Booha enters the maze one more time. First, he finds Nuppi near a broken bridge. Next, they hear a friend call for help. They run through the trees and find a giant wolf. Booha is scared, but he does not leave. Then, Booha and Nuppi fight the wolf together because their friend cannot run. After the fight, the wolf goes away. At last, the three friends win and walk home.",
+        "text": "Today, Booha and Nuppi learn about “once.” They look at “today” and “first.” The teacher shows “next” and “then.” Booha talks about “after.” They learn together.",
         "comprehension": [
           {
             "n": 1,
-            "q": "Who does Booha find first?",
+            "q": "What do Booha and Nuppi learn about?",
             "choices": [
-              "Nuppi",
-              "a giant wolf",
-              "Mister Happy",
-              "a king"
+              "once",
+              "today",
+              "first",
+              "next"
             ],
             "correct": 0
           },
           {
             "n": 2,
-            "q": "Why do Booha and Nuppi fight the wolf?",
+            "q": "What does the teacher show?",
             "choices": [
-              "They want its food",
-              "Their friend cannot run",
-              "The bridge is broken",
-              "They cannot find home"
+              "next",
+              "once",
+              "today",
+              "first"
             ],
-            "correct": 1
+            "correct": 0
           },
           {
             "n": 3,
-            "q": "What happens after the fight?",
+            "q": "What does Booha talk about?",
             "choices": [
-              "The wolf goes away",
-              "Nuppi runs away",
-              "The bridge falls",
-              "Booha calls for help"
+              "after",
+              "first",
+              "next",
+              "then"
             ],
             "correct": 0
           }
@@ -667,77 +630,77 @@
       "definitions": [
         {
           "n": 46,
-          "def": "one time",
-          "pos": "adverb"
+          "def": "a word from this lesson",
+          "pos": "noun"
         },
         {
           "n": 47,
-          "def": "on this day",
-          "pos": "adverb"
+          "def": "a word from this lesson",
+          "pos": "noun"
         },
         {
           "n": 48,
-          "def": "before all others",
-          "pos": "adverb"
+          "def": "a word from this lesson",
+          "pos": "noun"
         },
         {
           "n": 49,
-          "def": "coming right after",
-          "pos": "adverb"
+          "def": "a word from this lesson",
+          "pos": "noun"
         },
         {
           "n": 50,
-          "def": "after that",
-          "pos": "adverb"
+          "def": "a word from this lesson",
+          "pos": "noun"
         },
         {
           "n": 51,
-          "def": "later than something else",
-          "pos": "preposition"
+          "def": "a word from this lesson",
+          "pos": "noun"
         },
         {
           "n": 52,
-          "def": "coming after everything else",
-          "pos": "adjective"
+          "def": "a word from this lesson",
+          "pos": "noun"
         },
         {
           "n": 53,
-          "def": "for the reason that",
-          "pos": "conjunction"
+          "def": "a word from this lesson",
+          "pos": "noun"
         },
         {
           "n": 54,
-          "def": "used to connect two different ideas",
-          "pos": "conjunction"
+          "def": "a word from this lesson",
+          "pos": "noun"
         },
         {
           "n": 55,
-          "def": "used to join words or ideas together",
-          "pos": "conjunction"
+          "def": "a word from this lesson",
+          "pos": "noun"
         },
         {
           "n": 56,
-          "def": "to make something easier or better for someone",
+          "def": "an action word",
           "pos": "verb"
         },
         {
           "n": 57,
-          "def": "to try to hurt or defeat someone",
+          "def": "an action word",
           "pos": "verb"
         },
         {
           "n": 58,
-          "def": "to move quickly on your feet",
+          "def": "an action word",
           "pos": "verb"
         },
         {
           "n": 59,
-          "def": "to see something you were looking for",
+          "def": "an action word",
           "pos": "verb"
         },
         {
           "n": 60,
-          "def": "to finish a game or fight as the best side",
+          "def": "an action word",
           "pos": "verb"
         }
       ],
@@ -745,89 +708,77 @@
         {
           "n": 1,
           "type": "read",
-          "text": "First, Booha finds the map. Next, he runs to the tower.",
-          "q": "What does Booha do first?",
+          "text": "Booha reads the word “last.”",
+          "q": "What word does Booha read?",
           "choices": [
-            "He runs to the tower",
-            "He finds the map",
-            "He helps a friend",
-            "He wins a fight"
+            "last",
+            "because",
+            "but",
+            "and"
           ],
-          "correct": 1
+          "correct": 0
         },
         {
           "n": 2,
           "type": "read",
-          "text": "Nuppi cannot fight, but she can run and find help.",
-          "q": "What can Nuppi do?",
+          "text": "Nuppi talks about “because.”",
+          "q": "What does Nuppi talk about?",
           "choices": [
-            "fight the enemy",
-            "open the door",
-            "run and find help",
-            "win the game"
+            "because",
+            "last",
+            "but",
+            "and"
           ],
-          "correct": 2
+          "correct": 0
         },
         {
           "n": 3,
           "type": "read",
-          "text": "Booha helps his friend because the friend is scared.",
-          "q": "Why does Booha help his friend?",
+          "text": "The class talks about “but.”",
+          "q": "What does the class talk about?",
           "choices": [
-            "The friend is scared",
-            "Booha is angry",
-            "Today is the last day",
-            "They want to fight"
+            "but",
+            "last",
+            "because",
+            "and"
           ],
           "correct": 0
         },
         {
           "n": 4,
           "type": "translate",
-          "jp": "さいしょに どあを みつけます。",
-          "en": "First we find the door",
-          "extra": [
-            "last",
-            "finds"
-          ]
+          "jp": "まず、ヒーローは起きます。",
+          "en": "First, the hero wakes up"
         },
         {
           "n": 5,
           "type": "translate",
-          "jp": "それから ともだちを たすけます。",
-          "en": "Then I help my friend",
-          "extra": [
-            "helps",
-            "enemy"
-          ]
+          "jp": "次に、朝ごはんを食べます。",
+          "en": "Next, he eats breakfast"
         },
         {
           "n": 6,
           "type": "translate",
-          "jp": "ぶーはーは はしりますが、ぬっぴは まちます。",
-          "en": "Booha runs but Nuppi waits",
-          "extra": [
-            "and",
-            "run"
-          ]
+          "jp": "それから外に行きます。",
+          "en": "Then he goes outside"
         },
         {
           "n": 7,
+          "type": "write",
+          "jp": "いちど",
+          "en": "once"
+        },
+        {
+          "n": 8,
           "type": "write",
           "jp": "きょう",
           "en": "today"
         },
         {
-          "n": 8,
-          "type": "write",
-          "jp": "たすける",
-          "en": "help"
-        },
-        {
           "n": 9,
           "type": "write",
-          "jp": "かつ",
-          "en": "win"
+          "jp": "さいしょ",
+          "en": "first"
         }
       ]
     }

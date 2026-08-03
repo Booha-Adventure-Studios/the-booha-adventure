@@ -1,0 +1,786 @@
+{
+  "curriculum": "pb",
+  "month": "april",
+  "weeks": [
+    {
+      "week": 1,
+      "passage": {
+        "text": "Today, Booha and Nuppi learn about “country.” They look at “world” and “map.” The teacher shows “flag” and “city.” Booha talks about “town.” They learn together.",
+        "comprehension": [
+          {
+            "n": 1,
+            "q": "What do Booha and Nuppi learn about?",
+            "choices": [
+              "country",
+              "world",
+              "map",
+              "flag"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "What does the teacher show?",
+            "choices": [
+              "flag",
+              "country",
+              "world",
+              "map"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "What does Booha talk about?",
+            "choices": [
+              "town",
+              "map",
+              "flag",
+              "city"
+            ],
+            "correct": 0
+          }
+        ]
+      },
+      "definitions": [
+        {
+          "n": 1,
+          "def": "a place",
+          "pos": "noun"
+        },
+        {
+          "n": 2,
+          "def": "a place",
+          "pos": "noun"
+        },
+        {
+          "n": 3,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 4,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 5,
+          "def": "a place",
+          "pos": "noun"
+        },
+        {
+          "n": 6,
+          "def": "a place",
+          "pos": "noun"
+        },
+        {
+          "n": 7,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 8,
+          "def": "a place",
+          "pos": "noun"
+        },
+        {
+          "n": 9,
+          "def": "a place",
+          "pos": "noun"
+        },
+        {
+          "n": 10,
+          "def": "a place",
+          "pos": "noun"
+        },
+        {
+          "n": 11,
+          "def": "a place",
+          "pos": "noun"
+        },
+        {
+          "n": 12,
+          "def": "a place",
+          "pos": "noun"
+        },
+        {
+          "n": 13,
+          "def": "a place",
+          "pos": "noun"
+        },
+        {
+          "n": 14,
+          "def": "a place",
+          "pos": "noun"
+        },
+        {
+          "n": 15,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        }
+      ],
+      "questions": [
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Booha reads the word “place.”",
+          "q": "What word does Booha read?",
+          "choices": [
+            "place",
+            "home",
+            "school",
+            "park"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "Nuppi talks about “home.”",
+          "q": "What does Nuppi talk about?",
+          "choices": [
+            "home",
+            "place",
+            "school",
+            "park"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "The class talks about “school.”",
+          "q": "What does the class talk about?",
+          "choices": [
+            "school",
+            "place",
+            "home",
+            "park"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "私は日本の出身です。",
+          "en": "I am from Japan"
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "私は学生です。",
+          "en": "I am a student"
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "私は千葉に住んでいます。",
+          "en": "I live in Chiba"
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "くに",
+          "en": "country"
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "せかい",
+          "en": "world"
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "ちず",
+          "en": "map"
+        }
+      ]
+    },
+    {
+      "week": 2,
+      "passage": {
+        "text": "Today, Booha and Nuppi learn about “water.” They look at “road” and “bridge.” The teacher shows “building” and “tower.” Booha talks about “temple.” They learn together.",
+        "comprehension": [
+          {
+            "n": 1,
+            "q": "What do Booha and Nuppi learn about?",
+            "choices": [
+              "water",
+              "road",
+              "bridge",
+              "building"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "What does the teacher show?",
+            "choices": [
+              "building",
+              "water",
+              "road",
+              "bridge"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "What does Booha talk about?",
+            "choices": [
+              "temple",
+              "bridge",
+              "building",
+              "tower"
+            ],
+            "correct": 0
+          }
+        ]
+      },
+      "definitions": [
+        {
+          "n": 16,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 17,
+          "def": "a place",
+          "pos": "noun"
+        },
+        {
+          "n": 18,
+          "def": "a place",
+          "pos": "noun"
+        },
+        {
+          "n": 19,
+          "def": "a place",
+          "pos": "noun"
+        },
+        {
+          "n": 20,
+          "def": "a place",
+          "pos": "noun"
+        },
+        {
+          "n": 21,
+          "def": "a place",
+          "pos": "noun"
+        },
+        {
+          "n": 22,
+          "def": "a place",
+          "pos": "noun"
+        },
+        {
+          "n": 23,
+          "def": "a place",
+          "pos": "noun"
+        },
+        {
+          "n": 24,
+          "def": "a place",
+          "pos": "noun"
+        },
+        {
+          "n": 25,
+          "def": "a place",
+          "pos": "noun"
+        },
+        {
+          "n": 26,
+          "def": "a place",
+          "pos": "noun"
+        },
+        {
+          "n": 27,
+          "def": "a place",
+          "pos": "noun"
+        },
+        {
+          "n": 28,
+          "def": "a place",
+          "pos": "noun"
+        },
+        {
+          "n": 29,
+          "def": "a place",
+          "pos": "noun"
+        },
+        {
+          "n": 30,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        }
+      ],
+      "questions": [
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Booha reads the word “shrine.”",
+          "q": "What word does Booha read?",
+          "choices": [
+            "shrine",
+            "castle",
+            "shop",
+            "market"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "Nuppi talks about “castle.”",
+          "q": "What does Nuppi talk about?",
+          "choices": [
+            "castle",
+            "shrine",
+            "shop",
+            "market"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "The class talks about “shop.”",
+          "q": "What does the class talk about?",
+          "choices": [
+            "shop",
+            "shrine",
+            "castle",
+            "market"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "タワーがあります。",
+          "en": "There is a tower"
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "寺があります。",
+          "en": "There is a temple"
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "神社があります。",
+          "en": "There is a shrine"
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "みず",
+          "en": "water"
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "みち",
+          "en": "road"
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "はし",
+          "en": "bridge"
+        }
+      ]
+    },
+    {
+      "week": 3,
+      "passage": {
+        "text": "Today, Booha and Nuppi learn about “ticket.” They look at “bag” and “money.” The teacher shows “food” and “drink.” Booha talks about “gift.” They learn together.",
+        "comprehension": [
+          {
+            "n": 1,
+            "q": "What do Booha and Nuppi learn about?",
+            "choices": [
+              "ticket",
+              "bag",
+              "money",
+              "food"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "What does the teacher show?",
+            "choices": [
+              "food",
+              "ticket",
+              "bag",
+              "money"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "What does Booha talk about?",
+            "choices": [
+              "gift",
+              "money",
+              "food",
+              "drink"
+            ],
+            "correct": 0
+          }
+        ]
+      },
+      "definitions": [
+        {
+          "n": 31,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 32,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 33,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 34,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 35,
+          "def": "an action word",
+          "pos": "verb"
+        },
+        {
+          "n": 36,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 37,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 38,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 39,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 40,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 41,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 42,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 43,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 44,
+          "def": "a person",
+          "pos": "noun"
+        },
+        {
+          "n": 45,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        }
+      ],
+      "questions": [
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Booha reads the word “camera.”",
+          "q": "What word does Booha read?",
+          "choices": [
+            "camera",
+            "phone",
+            "picture",
+            "book"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "Nuppi talks about “phone.”",
+          "q": "What does Nuppi talk about?",
+          "choices": [
+            "phone",
+            "camera",
+            "picture",
+            "book"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "The class talks about “picture.”",
+          "q": "What does the class talk about?",
+          "choices": [
+            "picture",
+            "camera",
+            "phone",
+            "book"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "かばんを持っています。",
+          "en": "I have a bag"
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "お金があります。",
+          "en": "I have money"
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "チケットがあります。",
+          "en": "I have a ticket"
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "ちけっと",
+          "en": "ticket"
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "かばん",
+          "en": "bag"
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "おかね",
+          "en": "money"
+        }
+      ]
+    },
+    {
+      "week": 4,
+      "passage": {
+        "text": "Today, Booha and Nuppi learn about “family.” They look at “teacher” and “student.” The teacher shows “tourist” and “guide.” Booha talks about “go.” They learn together.",
+        "comprehension": [
+          {
+            "n": 1,
+            "q": "What do Booha and Nuppi learn about?",
+            "choices": [
+              "family",
+              "teacher",
+              "student",
+              "tourist"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "What does the teacher show?",
+            "choices": [
+              "tourist",
+              "family",
+              "teacher",
+              "student"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "What does Booha talk about?",
+            "choices": [
+              "go",
+              "student",
+              "tourist",
+              "guide"
+            ],
+            "correct": 0
+          }
+        ]
+      },
+      "definitions": [
+        {
+          "n": 46,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 47,
+          "def": "a person",
+          "pos": "noun"
+        },
+        {
+          "n": 48,
+          "def": "a person",
+          "pos": "noun"
+        },
+        {
+          "n": 49,
+          "def": "a person",
+          "pos": "noun"
+        },
+        {
+          "n": 50,
+          "def": "a person",
+          "pos": "noun"
+        },
+        {
+          "n": 51,
+          "def": "an action word",
+          "pos": "verb"
+        },
+        {
+          "n": 52,
+          "def": "an action word",
+          "pos": "verb"
+        },
+        {
+          "n": 53,
+          "def": "an action word",
+          "pos": "verb"
+        },
+        {
+          "n": 54,
+          "def": "an action word",
+          "pos": "verb"
+        },
+        {
+          "n": 55,
+          "def": "an action word",
+          "pos": "verb"
+        },
+        {
+          "n": 56,
+          "def": "an action word",
+          "pos": "verb"
+        },
+        {
+          "n": 57,
+          "def": "an action word",
+          "pos": "verb"
+        },
+        {
+          "n": 58,
+          "def": "an action word",
+          "pos": "verb"
+        },
+        {
+          "n": 59,
+          "def": "an action word",
+          "pos": "verb"
+        },
+        {
+          "n": 60,
+          "def": "an action word",
+          "pos": "verb"
+        }
+      ],
+      "questions": [
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Booha reads the word “come.”",
+          "q": "What word does Booha read?",
+          "choices": [
+            "come",
+            "see",
+            "look",
+            "walk"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "Nuppi talks about “see.”",
+          "q": "What does Nuppi talk about?",
+          "choices": [
+            "see",
+            "come",
+            "look",
+            "walk"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "The class talks about “look.”",
+          "q": "What does the class talk about?",
+          "choices": [
+            "look",
+            "come",
+            "see",
+            "walk"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "行きたいです。",
+          "en": "I want to go"
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "食べたいです。",
+          "en": "I want to eat"
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "飲みたいです。",
+          "en": "I want to drink"
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "かぞく",
+          "en": "family"
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "せんせい",
+          "en": "teacher"
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "せいと",
+          "en": "student"
+        }
+      ]
+    }
+  ]
+}

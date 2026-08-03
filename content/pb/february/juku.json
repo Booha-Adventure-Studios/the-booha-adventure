@@ -1,0 +1,786 @@
+{
+  "curriculum": "pb",
+  "month": "february",
+  "weeks": [
+    {
+      "week": 1,
+      "passage": {
+        "text": "Today, Booha and Nuppi learn about “happy.” They look at “sad” and “angry.” The teacher shows “tired” and “nervous.” Booha talks about “excited.” They learn together.",
+        "comprehension": [
+          {
+            "n": 1,
+            "q": "What do Booha and Nuppi learn about?",
+            "choices": [
+              "happy",
+              "sad",
+              "angry",
+              "tired"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "What does the teacher show?",
+            "choices": [
+              "tired",
+              "happy",
+              "sad",
+              "angry"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "What does Booha talk about?",
+            "choices": [
+              "excited",
+              "angry",
+              "tired",
+              "nervous"
+            ],
+            "correct": 0
+          }
+        ]
+      },
+      "definitions": [
+        {
+          "n": 1,
+          "def": "a word that describes a person or thing",
+          "pos": "adjective"
+        },
+        {
+          "n": 2,
+          "def": "a word that describes a person or thing",
+          "pos": "adjective"
+        },
+        {
+          "n": 3,
+          "def": "a word that describes a person or thing",
+          "pos": "adjective"
+        },
+        {
+          "n": 4,
+          "def": "a word that describes a person or thing",
+          "pos": "adjective"
+        },
+        {
+          "n": 5,
+          "def": "a word that describes a person or thing",
+          "pos": "adjective"
+        },
+        {
+          "n": 6,
+          "def": "a word that describes a person or thing",
+          "pos": "adjective"
+        },
+        {
+          "n": 7,
+          "def": "a word that describes a person or thing",
+          "pos": "adjective"
+        },
+        {
+          "n": 8,
+          "def": "a word that describes a person or thing",
+          "pos": "adjective"
+        },
+        {
+          "n": 9,
+          "def": "a word that describes a person or thing",
+          "pos": "adjective"
+        },
+        {
+          "n": 10,
+          "def": "a word that describes a person or thing",
+          "pos": "adjective"
+        },
+        {
+          "n": 11,
+          "def": "a word that describes a person or thing",
+          "pos": "adjective"
+        },
+        {
+          "n": 12,
+          "def": "a word that describes a person or thing",
+          "pos": "adjective"
+        },
+        {
+          "n": 13,
+          "def": "a word that describes a person or thing",
+          "pos": "adjective"
+        },
+        {
+          "n": 14,
+          "def": "a word that describes a person or thing",
+          "pos": "adjective"
+        },
+        {
+          "n": 15,
+          "def": "a word that describes a person or thing",
+          "pos": "adjective"
+        }
+      ],
+      "questions": [
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Booha reads the word “bored.”",
+          "q": "What word does Booha read?",
+          "choices": [
+            "bored",
+            "surprised",
+            "scared",
+            "calm"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "Nuppi talks about “surprised.”",
+          "q": "What does Nuppi talk about?",
+          "choices": [
+            "surprised",
+            "bored",
+            "scared",
+            "calm"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "The class talks about “scared.”",
+          "q": "What does the class talk about?",
+          "choices": [
+            "scared",
+            "bored",
+            "surprised",
+            "calm"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "今日はうれしいです。",
+          "en": "I am happy today"
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "悲しい気持ちです。",
+          "en": "I feel sad"
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "今は怒っています。",
+          "en": "I am angry now"
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "うれしい",
+          "en": "happy"
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "かなしい",
+          "en": "sad"
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "おこって いる",
+          "en": "angry"
+        }
+      ]
+    },
+    {
+      "week": 2,
+      "passage": {
+        "text": "Today, Booha and Nuppi learn about “friend.” They look at “kind” and “nice.” The teacher shows “polite” and “honest.” Booha talks about “friendly.” They learn together.",
+        "comprehension": [
+          {
+            "n": 1,
+            "q": "What do Booha and Nuppi learn about?",
+            "choices": [
+              "friend",
+              "kind",
+              "nice",
+              "polite"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "What does the teacher show?",
+            "choices": [
+              "polite",
+              "friend",
+              "kind",
+              "nice"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "What does Booha talk about?",
+            "choices": [
+              "friendly",
+              "nice",
+              "polite",
+              "honest"
+            ],
+            "correct": 0
+          }
+        ]
+      },
+      "definitions": [
+        {
+          "n": 16,
+          "def": "a person",
+          "pos": "noun"
+        },
+        {
+          "n": 17,
+          "def": "a word that describes a person or thing",
+          "pos": "adjective"
+        },
+        {
+          "n": 18,
+          "def": "a word that describes a person or thing",
+          "pos": "adjective"
+        },
+        {
+          "n": 19,
+          "def": "a word that describes a person or thing",
+          "pos": "adjective"
+        },
+        {
+          "n": 20,
+          "def": "a word that describes a person or thing",
+          "pos": "adjective"
+        },
+        {
+          "n": 21,
+          "def": "a word that describes a person or thing",
+          "pos": "adjective"
+        },
+        {
+          "n": 22,
+          "def": "a word that describes a person or thing",
+          "pos": "adjective"
+        },
+        {
+          "n": 23,
+          "def": "a word that describes a person or thing",
+          "pos": "adjective"
+        },
+        {
+          "n": 24,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 25,
+          "def": "a word that describes a person or thing",
+          "pos": "adjective"
+        },
+        {
+          "n": 26,
+          "def": "an action word",
+          "pos": "verb"
+        },
+        {
+          "n": 27,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 28,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 29,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 30,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        }
+      ],
+      "questions": [
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Booha reads the word “patient.”",
+          "q": "What word does Booha read?",
+          "choices": [
+            "patient",
+            "brave",
+            "share",
+            "helpful"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "Nuppi talks about “brave.”",
+          "q": "What does Nuppi talk about?",
+          "choices": [
+            "brave",
+            "patient",
+            "share",
+            "helpful"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "The class talks about “share.”",
+          "q": "What does the class talk about?",
+          "choices": [
+            "share",
+            "patient",
+            "brave",
+            "helpful"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "私の友達は親切です。",
+          "en": "My friend is kind"
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "私たちは同じクラスです。",
+          "en": "We are in the same class"
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "友達と昼ごはんを分け合います。",
+          "en": "I share my lunch with my friend"
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "ともだち",
+          "en": "friend"
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "しんせつ な",
+          "en": "kind"
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "やさしい",
+          "en": "nice"
+        }
+      ]
+    },
+    {
+      "week": 3,
+      "passage": {
+        "text": "Today, Booha and Nuppi learn about “mother.” They look at “father” and “sister.” The teacher shows “brother” and “grandmother.” Booha talks about “grandfather.” They learn together.",
+        "comprehension": [
+          {
+            "n": 1,
+            "q": "What do Booha and Nuppi learn about?",
+            "choices": [
+              "mother",
+              "father",
+              "sister",
+              "brother"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "What does the teacher show?",
+            "choices": [
+              "brother",
+              "mother",
+              "father",
+              "sister"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "What does Booha talk about?",
+            "choices": [
+              "grandfather",
+              "sister",
+              "brother",
+              "grandmother"
+            ],
+            "correct": 0
+          }
+        ]
+      },
+      "definitions": [
+        {
+          "n": 31,
+          "def": "a person",
+          "pos": "noun"
+        },
+        {
+          "n": 32,
+          "def": "a person",
+          "pos": "noun"
+        },
+        {
+          "n": 33,
+          "def": "a person",
+          "pos": "noun"
+        },
+        {
+          "n": 34,
+          "def": "a person",
+          "pos": "noun"
+        },
+        {
+          "n": 35,
+          "def": "a person",
+          "pos": "noun"
+        },
+        {
+          "n": 36,
+          "def": "a person",
+          "pos": "noun"
+        },
+        {
+          "n": 37,
+          "def": "a person",
+          "pos": "noun"
+        },
+        {
+          "n": 38,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 39,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 40,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 41,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 42,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 43,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 44,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 45,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        }
+      ],
+      "questions": [
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Booha reads the word “cousin.”",
+          "q": "What word does Booha read?",
+          "choices": [
+            "cousin",
+            "family",
+            "love",
+            "gift"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "Nuppi talks about “family.”",
+          "q": "What does Nuppi talk about?",
+          "choices": [
+            "family",
+            "cousin",
+            "love",
+            "gift"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "The class talks about “love.”",
+          "q": "What does the class talk about?",
+          "choices": [
+            "love",
+            "cousin",
+            "family",
+            "gift"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "私の家族は少人数です。",
+          "en": "I have a small family"
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "母は花が好きです。",
+          "en": "My mother likes flowers"
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "父は夕食を作ります。",
+          "en": "My father cooks dinner"
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "はは",
+          "en": "mother"
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "ちち",
+          "en": "father"
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "あね または いもうと",
+          "en": "sister"
+        }
+      ]
+    },
+    {
+      "week": 4,
+      "passage": {
+        "text": "Today, Booha and Nuppi learn about “help.” They look at “carry” and “open.” The teacher shows “close” and “lend.” Booha talks about “borrow.” They learn together.",
+        "comprehension": [
+          {
+            "n": 1,
+            "q": "What do Booha and Nuppi learn about?",
+            "choices": [
+              "help",
+              "carry",
+              "open",
+              "close"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "What does the teacher show?",
+            "choices": [
+              "close",
+              "help",
+              "carry",
+              "open"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "What does Booha talk about?",
+            "choices": [
+              "borrow",
+              "open",
+              "close",
+              "lend"
+            ],
+            "correct": 0
+          }
+        ]
+      },
+      "definitions": [
+        {
+          "n": 46,
+          "def": "an action word",
+          "pos": "verb"
+        },
+        {
+          "n": 47,
+          "def": "an action word",
+          "pos": "verb"
+        },
+        {
+          "n": 48,
+          "def": "an action word",
+          "pos": "verb"
+        },
+        {
+          "n": 49,
+          "def": "an action word",
+          "pos": "verb"
+        },
+        {
+          "n": 50,
+          "def": "an action word",
+          "pos": "verb"
+        },
+        {
+          "n": 51,
+          "def": "an action word",
+          "pos": "verb"
+        },
+        {
+          "n": 52,
+          "def": "a word that describes a person or thing",
+          "pos": "adjective"
+        },
+        {
+          "n": 53,
+          "def": "a word that describes a person or thing",
+          "pos": "adjective"
+        },
+        {
+          "n": 54,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 55,
+          "def": "a word that describes a person or thing",
+          "pos": "adjective"
+        },
+        {
+          "n": 56,
+          "def": "an action word",
+          "pos": "verb"
+        },
+        {
+          "n": 57,
+          "def": "an action word",
+          "pos": "verb"
+        },
+        {
+          "n": 58,
+          "def": "a word that describes a person or thing",
+          "pos": "adjective"
+        },
+        {
+          "n": 59,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 60,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        }
+      ],
+      "questions": [
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Booha reads the word “heavy.”",
+          "q": "What word does Booha read?",
+          "choices": [
+            "heavy",
+            "light",
+            "directions",
+            "broken"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "Nuppi talks about “light.”",
+          "q": "What does Nuppi talk about?",
+          "choices": [
+            "light",
+            "heavy",
+            "directions",
+            "broken"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "The class talks about “directions.”",
+          "q": "What does the class talk about?",
+          "choices": [
+            "directions",
+            "heavy",
+            "light",
+            "broken"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "助けてくれますか。",
+          "en": "Can you help me"
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "この箱を運んでくれますか。",
+          "en": "Could you carry this box"
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "あなたのペンを借りてもいいですか。",
+          "en": "Can I borrow your pen"
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "たすける",
+          "en": "help"
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "はこぶ",
+          "en": "carry"
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "あける",
+          "en": "open"
+        }
+      ]
+    }
+  ]
+}
