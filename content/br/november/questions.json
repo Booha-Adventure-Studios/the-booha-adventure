@@ -2,423 +2,423 @@
   "cards": [
     {
       "n": 1,
-      "en": "Do you live in a house or an apartment?",
-      "jp": "一戸建てとアパートのどちらに住んでいますか。",
-      "hira": "いっこだて と あぱーと の どちら に すんで います か",
-      "mp3": "br_q01_do_you_live_in_a_house_or_an_apartment.mp3"
+      "en": "How do you communicate with your housemates when there is a disagreement?",
+      "jp": "家族と意見が合わないとき、どのようにコミュニケーションをとりますか？",
+      "hira": "かぞくといけんがあわないとき、どのようにこみゅにけーしょんをとりますか？",
+      "mp3": "br_q01_how_do_you_communicate_with_your_housemates_when_there_is_a_disagreement.mp3"
     },
     {
       "n": 2,
-      "en": "How many rooms does your home have?",
-      "jp": "あなたの家には部屋がいくつありますか。",
-      "hira": "あなた の いえ には へや が いくつ あります か",
-      "mp3": "br_q02_how_many_rooms_does_your_home_have.mp3"
+      "en": "What strategies do you use to keep shared spaces organized?",
+      "jp": "共有スペースを整理するためにどんな戦略を使いますか？",
+      "hira": "きょうゆうすぺーすをせいりするためにどんなせんりゃくをつかいますか？",
+      "mp3": "br_q02_what_strategies_do_you_use_to_keep_shared_spaces_organized.mp3"
     },
     {
       "n": 3,
-      "en": "Where is your bedroom?",
-      "jp": "あなたの寝室はどこにありますか。",
-      "hira": "あなた の しんしつ は どこ に あり ます か",
-      "mp3": "br_q03_where_is_your_bedroom.mp3"
+      "en": "How do you ensure that everyone respects each other's privacy in a shared home?",
+      "jp": "共有の家でお互いのプライバシーを尊重するためにどうしていますか？",
+      "hira": "きょうゆうのいえでおたがいのぷらいばしーをそんちょうするためにどうしていますか？",
+      "mp3": "br_q03_how_do_you_ensure_that_everyone_respects_each_other_s_privacy_in_a_shared_home.mp3"
     },
     {
       "n": 4,
-      "en": "Is the toilet separate from the bathroom?",
-      "jp": "トイレは浴室と別ですか。",
-      "hira": "といれ は よくしつ と べつ です か",
-      "mp3": "br_q04_is_the_toilet_separate_from_the_bathroom.mp3"
+      "en": "What is your approach to managing visitors in your shared living space?",
+      "jp": "共有の居住空間で訪問者を管理するためのアプローチは何ですか？",
+      "hira": "きょうゆうのきょじゅうくうかんでほうもんしゃをかんりするためのあぷろーちわなんですか？",
+      "mp3": "br_q04_what_is_your_approach_to_managing_visitors_in_your_shared_living_space.mp3"
     },
     {
       "n": 5,
-      "en": "Which room do you like best?",
-      "jp": "どの部屋が一番好きですか。",
-      "hira": "どの へや が いちばん すき です か",
-      "mp3": "br_q05_which_room_do_you_like_best.mp3"
+      "en": "How do you handle daily chores to ensure fairness among housemates?",
+      "jp": "家族の間で公平を保つために、日々の家事をどのように処理しますか？",
+      "hira": "かぞくのあいだでこうへいをたもつために、ひびのかじをどのようにしょりしますか？",
+      "mp3": "br_q05_how_do_you_handle_daily_chores_to_ensure_fairness_among_housemates.mp3"
     },
     {
       "n": 6,
-      "en": "Is there a balcony?",
-      "jp": "バルコニーはありますか。",
-      "hira": "ばるこにー は あり ます か",
-      "mp3": "br_q06_is_there_a_balcony.mp3"
+      "en": "What methods do you use to discuss household responsibilities with your roommates?",
+      "jp": "ルームメイトと家事の責任について話し合うためにどんな方法を使いますか？",
+      "hira": "るーむめいととかじのせきにんについてはなしあうためにどんなほうほうをつかいますか？",
+      "mp3": "br_q06_what_methods_do_you_use_to_discuss_household_responsibilities_with_your_roommates.mp3"
     },
     {
       "n": 7,
-      "en": "What is on the first floor?",
-      "jp": "1階には何がありますか。",
-      "hira": "いっかい に は なに が あり ます か",
-      "mp3": "br_q07_what_is_on_the_first_floor.mp3"
+      "en": "How do you prioritize your personal space while living with others?",
+      "jp": "他の人と住んでいる間に、個人のスペースをどう優先しますか？",
+      "hira": "ほかのひととすんでいるあいだに、こじんのすぺーすをどうゆうせんしますか？",
+      "mp3": "br_q07_how_do_you_prioritize_your_personal_space_while_living_with_others.mp3"
     },
     {
       "n": 8,
-      "en": "Do you have a yard or garden?",
-      "jp": "庭はありますか。",
-      "hira": "にわ は あり ます か",
-      "mp3": "br_q08_do_you_have_a_yard_or_garden.mp3"
+      "en": "What challenges do you face when sharing responsibilities in a household?",
+      "jp": "家の中で責任を分担する際にどんな課題に直面しますか？",
+      "hira": "いえのなかでせきにんをぶんたんするさいにどんなかだいにちょくめんしますか？",
+      "mp3": "br_q08_what_challenges_do_you_face_when_sharing_responsibilities_in_a_household.mp3"
     },
     {
       "n": 9,
-      "en": "Where do you eat dinner?",
-      "jp": "どこで夕食を食べますか。",
-      "hira": "どこ で ゆうしょく を たべ ます か",
-      "mp3": "br_q09_where_do_you_eat_dinner.mp3"
+      "en": "How do you negotiate shared expenses with your housemates?",
+      "jp": "ルームメイトと共有の費用を交渉する方法は？",
+      "hira": "るーむめいとときょうゆうのひようをこうしょうするほうほうは？",
+      "mp3": "br_q09_how_do_you_negotiate_shared_expenses_with_your_housemates.mp3"
     },
     {
       "n": 10,
-      "en": "Is your kitchen big or small?",
-      "jp": "あなたのキッチンは大きいですか、小さいですか。",
-      "hira": "あなた の きっちん は おおきい です か、 ちいさい です か",
-      "mp3": "br_q10_is_your_kitchen_big_or_small.mp3"
+      "en": "What role does communication play in maintaining a harmonious living environment?",
+      "jp": "調和のとれた生活環境を維持するためにコミュニケーションはどのような役割を果たしますか？",
+      "hira": "ちょうわのとれたせいかつかんきょうをいじするためにこみゅにけーしょんはどのようなやくわりをはたしますか？",
+      "mp3": "br_q10_what_role_does_communication_play_in_maintaining_a_harmonious_living_environment.mp3"
     },
     {
       "n": 11,
-      "en": "What is next to the entrance?",
-      "jp": "玄関のとなりには何がありますか。",
-      "hira": "げんかん の となり に は なに が あり ます か",
-      "mp3": "br_q11_what_is_next_to_the_entrance.mp3"
+      "en": "How can you effectively share your daily routines with your housemates?",
+      "jp": "家族と日常のルーチンを効果的に共有するにはどうすればよいですか？",
+      "hira": "かぞくとにちじょうのるーちんをこうかてきにきょうゆうするにはどうすればよいですか？",
+      "mp3": "br_q11_how_can_you_effectively_share_your_daily_routines_with_your_housemates.mp3"
     },
     {
       "n": 12,
-      "en": "Where do you keep your shoes?",
-      "jp": "靴はどこにしまいますか。",
-      "hira": "くつ は どこ に しまいます か",
-      "mp3": "br_q12_where_do_you_keep_your_shoes.mp3"
+      "en": "What are some effective ways to resolve conflicts that arise in shared living situations?",
+      "jp": "共有の生活状況で発生する対立を解決するための効果的な方法は何ですか？",
+      "hira": "きょうゆうのせいかつじょうきょうではっせいするたいりつをかいけつするためのこうかてきなほうほうはなんですか？",
+      "mp3": "br_q12_what_are_some_effective_ways_to_resolve_conflicts_that_arise_in_shared_living_situations.mp3"
     },
     {
       "n": 13,
-      "en": "Is your living room bright?",
-      "jp": "リビングは明るいですか。",
-      "hira": "りびんぐ は あかるい です か",
-      "mp3": "br_q13_is_your_living_room_bright.mp3"
+      "en": "How do you maintain a balance between personal time and shared activities?",
+      "jp": "個人の時間と共有の活動のバランスをどう保ちますか？",
+      "hira": "こじんのじかんときょうゆうのかつどうのばらんすをどうたもちますか？",
+      "mp3": "br_q13_how_do_you_maintain_a_balance_between_personal_time_and_shared_activities.mp3"
     },
     {
       "n": 14,
-      "en": "Do you share a room with someone?",
-      "jp": "だれかと同じ部屋を使っていますか。",
-      "hira": "だれか と おなじ へや を つかって います か",
-      "mp3": "br_q14_do_you_share_a_room_with_someone.mp3"
+      "en": "What strategies do you use to keep common areas clean and tidy?",
+      "jp": "共用エリアを清潔に保つためにどんな戦略を使いますか？",
+      "hira": "きょうようえりあをせいけつにたもつためにどんなせんりゃくをつかいますか？",
+      "mp3": "br_q14_what_strategies_do_you_use_to_keep_common_areas_clean_and_tidy.mp3"
     },
     {
       "n": 15,
-      "en": "What’s your address?",
-      "jp": "あなたの住所は何ですか。",
-      "hira": "あなた の じゅうしょ は なん です か",
-      "mp3": "br_q15_whats_your_address.mp3"
+      "en": "How do you approach sharing household items with your roommates?",
+      "jp": "ルームメイトと家庭用品を共有する際のアプローチはどうですか？",
+      "hira": "るーむめいととかていようひんをきょうゆうするさいのあぷろーちわどうですか？",
+      "mp3": "br_q15_how_do_you_approach_sharing_household_items_with_your_roommates.mp3"
     },
     {
       "n": 16,
-      "en": "What furniture is in your room?",
-      "jp": "あなたの部屋にはどんな家具がありますか。",
-      "hira": "あなた の へや に は どんな かぐ が あり ます か",
-      "mp3": "br_q16_what_furniture_is_in_your_room.mp3"
+      "en": "What is your method for discussing house rules with new housemates?",
+      "jp": "新しいルームメイトと家のルールについて話し合う方法は何ですか？",
+      "hira": "あたらしいるーむめいとといえのるーるについてはなしあうほうほうはなんですか？",
+      "mp3": "br_q16_what_is_your_method_for_discussing_house_rules_with_new_housemates.mp3"
     },
     {
       "n": 17,
-      "en": "Where do you keep your clothes?",
-      "jp": "服はどこにしまいますか。",
-      "hira": "ふく は どこ に しまい ます か",
-      "mp3": "br_q17_where_do_you_keep_your_clothes.mp3"
+      "en": "How do you handle noise levels in a shared living space?",
+      "jp": "共有の居住空間での騒音レベルをどのように管理しますか？",
+      "hira": "きょうゆうのきょじゅうくうかんでのそうおんれべるをどのようにかんりしますか？",
+      "mp3": "br_q17_how_do_you_handle_noise_levels_in_a_shared_living_space.mp3"
     },
     {
       "n": 18,
-      "en": "Do you have a desk?",
-      "jp": "机はありますか。",
-      "hira": "つくえ は あり ます か",
-      "mp3": "br_q18_do_you_have_a_desk.mp3"
+      "en": "What are some ways to encourage cooperation among housemates?",
+      "jp": "ルームメイトの協力を促すための方法は何ですか？",
+      "hira": "るーむめいとのきょうりょくをうながすためのほうほうはなんですか？",
+      "mp3": "br_q18_what_are_some_ways_to_encourage_cooperation_among_housemates.mp3"
     },
     {
       "n": 19,
-      "en": "What do you put on your bookshelf?",
-      "jp": "本棚に何を置きますか。",
-      "hira": "ほんだな に なに を おき ます か",
-      "mp3": "br_q19_what_do_you_put_on_your_bookshelf.mp3"
+      "en": "How do you ensure that everyone contributes to household chores?",
+      "jp": "全員が家事に貢献するようにどうしていますか？",
+      "hira": "ぜんいんがかじにこうけんするようにどうしていますか？",
+      "mp3": "br_q19_how_do_you_ensure_that_everyone_contributes_to_household_chores.mp3"
     },
     {
       "n": 20,
-      "en": "Do you turn off the TV before bed?",
-      "jp": "寝る前にテレビを消しますか。",
-      "hira": "ねる まえ に てれび を けし ます か",
-      "mp3": "br_q20_do_you_turn_off_the_tv_before_bed.mp3"
+      "en": "What is your approach to managing shared utilities and bills?",
+      "jp": "共有の光熱費や請求書を管理するためのアプローチは何ですか？",
+      "hira": "きょうゆうのこうねつひやせいきゅうしょをかんりするためのあぷろーちわなんですか？",
+      "mp3": "br_q20_what_is_your_approach_to_managing_shared_utilities_and_bills.mp3"
     },
     {
       "n": 21,
-      "en": "How often do you use the microwave?",
-      "jp": "電子レンジをどのくらいの頻度で使いますか。",
-      "hira": "でんし れんじ を どの くらい の ひんど で つかいます か",
-      "mp3": "br_q21_how_often_do_you_use_the_microwave.mp3"
+      "en": "How do you deal with unexpected situations that affect your shared living arrangements?",
+      "jp": "共有の生活環境に影響を与える予期しない状況にどう対処しますか？",
+      "hira": "きょうゆうのせいかつかんきょうにえいきょうをあたえるよきしないじょうきょうにどうたいしょしますか？",
+      "mp3": "br_q21_how_do_you_deal_with_unexpected_situations_that_affect_your_shared_living_arrangements.mp3"
     },
     {
       "n": 22,
-      "en": "Is your refrigerator big?",
-      "jp": "冷蔵庫は大きいですか。",
-      "hira": "れいぞうこ は おおきい です か",
-      "mp3": "br_q22_is_your_refrigerator_big.mp3"
+      "en": "What are some effective ways to establish boundaries with housemates?",
+      "jp": "ルームメイトとの境界を確立するための効果的な方法は何ですか？",
+      "hira": "るーむめいととのきょうかいをかくりつするためのこうかてきなほうほうはなんですか？",
+      "mp3": "br_q22_what_are_some_effective_ways_to_establish_boundaries_with_housemates.mp3"
     },
     {
       "n": 23,
-      "en": "Do you have an air conditioner or a fan?",
-      "jp": "エアコンか扇風機はありますか。",
-      "hira": "えあこん か せんぷうき は あります か",
-      "mp3": "br_q23_do_you_have_an_air_conditioner_or_a_fan.mp3"
+      "en": "How do you ensure that common supplies are replenished regularly?",
+      "jp": "共有の備品が定期的に補充されるようにどうしていますか？",
+      "hira": "きょうゆうのびひんがていきてきにほじゅうされるようにどうしていますか？",
+      "mp3": "br_q23_how_do_you_ensure_that_common_supplies_are_replenished_regularly.mp3"
     },
     {
       "n": 24,
-      "en": "Where is your bed?",
-      "jp": "ベッドはどこにありますか。",
-      "hira": "べっど は どこ に あり ます か",
-      "mp3": "br_q24_where_is_your_bed.mp3"
+      "en": "What is your strategy for dealing with different cleaning habits among housemates?",
+      "jp": "ルームメイトの異なる掃除習慣に対処するための戦略は何ですか？",
+      "hira": "るーむめいとのことなるそうじしゅうかんにたいしょするためのせんりゃくはなんですか？",
+      "mp3": "br_q24_what_is_your_strategy_for_dealing_with_different_cleaning_habits_among_housemates.mp3"
     },
     {
       "n": 25,
-      "en": "What color is your rug?",
-      "jp": "カーペットは何色ですか。",
-      "hira": "かーぺっと は なにいろ です か",
-      "mp3": "br_q25_what_color_is_your_rug.mp3"
+      "en": "How do you approach discussing shared responsibilities for maintenance tasks?",
+      "jp": "メンテナンス作業の共有責任について話し合う際のアプローチはどうですか？",
+      "hira": "めんてなんすさぎょうのきょうゆうせきにんについてはなしあうさいのあぷろーちわどうですか？",
+      "mp3": "br_q25_how_do_you_approach_discussing_shared_responsibilities_for_maintenance_tasks.mp3"
     },
     {
       "n": 26,
-      "en": "Do you have a lamp on your desk?",
-      "jp": "机にランプはありますか。",
-      "hira": "つくえ に らんぷ は あり ます か",
-      "mp3": "br_q26_do_you_have_a_lamp_on_your_desk.mp3"
+      "en": "What methods do you use to encourage a sense of community among housemates?",
+      "jp": "ルームメイトの間にコミュニティ意識を促すためにどんな方法を使いますか？",
+      "hira": "るーむめいとのあいだにこみゅにてぃいしきをうながすためにどんなほうほうをつかいますか？",
+      "mp3": "br_q26_what_methods_do_you_use_to_encourage_a_sense_of_community_among_housemates.mp3"
     },
     {
       "n": 27,
-      "en": "What appliance do you use every day?",
-      "jp": "毎日使う家電は何ですか。",
-      "hira": "まいにち つかう かでん は なん です か",
-      "mp3": "br_q27_what_appliance_do_you_use_every_day.mp3"
+      "en": "How do you manage your personal belongings in a shared space?",
+      "jp": "共有のスペースで個人の持ち物をどのように管理しますか？",
+      "hira": "きょうゆうのすぺーすでこじんのもちものをどのようにかんりしますか？",
+      "mp3": "br_q27_how_do_you_manage_your_personal_belongings_in_a_shared_space.mp3"
     },
     {
       "n": 28,
-      "en": "Can you move the table?",
-      "jp": "テーブルを動かせますか。",
-      "hira": "てーぶる を うごかせ ます か",
-      "mp3": "br_q28_can_you_move_the_table.mp3"
+      "en": "What are some effective ways to communicate about shared schedules?",
+      "jp": "共有のスケジュールについて効果的にコミュニケーションをとる方法は何ですか？",
+      "hira": "きょうゆうのすけじゅーるについてこうかてきにこみゅにけーしょんをとるほうほうはなんですか？",
+      "mp3": "br_q28_what_are_some_effective_ways_to_communicate_about_shared_schedules.mp3"
     },
     {
       "n": 29,
-      "en": "Where should I put this?",
-      "jp": "これはどこに置けばいいですか。",
-      "hira": "これ は どこ に おけば いい です か",
-      "mp3": "br_q29_where_should_i_put_this.mp3"
+      "en": "How do you address issues of cleanliness in shared living areas?",
+      "jp": "共有の居住空間の清潔さの問題にどのように対処しますか？",
+      "hira": "きょうゆうのきょじゅうくうかんのせいけつさのもんだいにどのようにたいしょしますか？",
+      "mp3": "br_q29_how_do_you_address_issues_of_cleanliness_in_shared_living_areas.mp3"
     },
     {
       "n": 30,
-      "en": "What would you like to add to your room?",
-      "jp": "部屋に何を追加したいですか。",
-      "hira": "へや に なに を ついか したい です か",
-      "mp3": "br_q30_what_would_you_like_to_add_to_your_room.mp3"
+      "en": "What strategies do you use to foster respect among housemates?",
+      "jp": "ルームメイトの間に尊重を育むためにどんな戦略を使いますか？",
+      "hira": "るーむめいとのあいだにそんちょうをはぐくむためにどんなせんりゃくをつかいますか？",
+      "mp3": "br_q30_what_strategies_do_you_use_to_foster_respect_among_housemates.mp3"
     },
     {
       "n": 31,
-      "en": "What chores do you do at home?",
-      "jp": "家でどんな家事をしますか。",
-      "hira": "いえ で どんな かじ を し ます か",
-      "mp3": "br_q31_what_chores_do_you_do_at_home.mp3"
+      "en": "How do you conserve energy during the colder months?",
+      "jp": "寒い季節にエネルギーを節約する方法は何ですか？",
+      "hira": "さむいきせつにえねるぎーをせつやくするほうほうはなんですか？",
+      "mp3": "br_q31_how_do_you_conserve_energy_during_the_colder_months.mp3"
     },
     {
       "n": 32,
-      "en": "How often do you take out the trash?",
-      "jp": "どのくらいの頻度でゴミを出しますか。",
-      "hira": "どの くらい の ひんど で ごみ を だします か",
-      "mp3": "br_q32_how_often_do_you_take_out_the_trash.mp3"
+      "en": "What steps can you take to reduce water usage at home?",
+      "jp": "家での水の使用を減らすためにどのような手段を取れますか？",
+      "hira": "いえでのみにのしようをへらすためにどのようなしゅだんをとれますか？",
+      "mp3": "br_q32_what_steps_can_you_take_to_reduce_water_usage_at_home.mp3"
     },
     {
       "n": 33,
-      "en": "Who washes the dishes?",
-      "jp": "だれが皿を洗いますか。",
-      "hira": "だれ が さら を あらい ます か",
-      "mp3": "br_q33_who_washes_the_dishes.mp3"
+      "en": "How do you prepare your home for heavy rain or snow?",
+      "jp": "大雨や雪に備えて家をどのように準備しますか？",
+      "hira": "おおあめやゆきにそなえていえをどのようにじゅんびしますか？",
+      "mp3": "br_q33_how_do_you_prepare_your_home_for_heavy_rain_or_snow.mp3"
     },
     {
       "n": 34,
-      "en": "Do you recycle at home?",
-      "jp": "家でリサイクルしますか。",
-      "hira": "いえ で りさいくる し ます か",
-      "mp3": "br_q34_do_you_recycle_at_home.mp3"
+      "en": "What are some effective ways to prevent food waste in your household?",
+      "jp": "家庭での食品廃棄を防ぐための効果的な方法は何ですか？",
+      "hira": "かていでのしょくひんはいきょうをふせぐためのこうかてきなほうほうはなんですか？",
+      "mp3": "br_q34_what_are_some_effective_ways_to_prevent_food_waste_in_your_household.mp3"
     },
     {
       "n": 35,
-      "en": "When do you do laundry?",
-      "jp": "いつ洗濯をしますか。",
-      "hira": "いつ せんたく を し ます か",
-      "mp3": "br_q35_when_do_you_do_laundry.mp3"
+      "en": "How can you ensure safety during home maintenance tasks?",
+      "jp": "家のメンテナンス作業中に安全を確保するためにはどうすればよいですか？",
+      "hira": "いえのめんてなんすさぎょうちゅうにあんぜんをかくほするためにはどうすればよいですか？",
+      "mp3": "br_q35_how_can_you_ensure_safety_during_home_maintenance_tasks.mp3"
     },
     {
       "n": 36,
-      "en": "Can you vacuum the living room?",
-      "jp": "リビングに掃除機をかけられますか。",
-      "hira": "りびんぐ に そうじき を かけられ ます か",
-      "mp3": "br_q36_can_you_vacuum_the_living_room.mp3"
+      "en": "What methods do you use to improve indoor air quality?",
+      "jp": "室内の空気質を改善するためにどのような方法を使いますか？",
+      "hira": "しつないのくうきしつをかいぜんするためにどのようなほうほうをつかいますか？",
+      "mp3": "br_q36_what_methods_do_you_use_to_improve_indoor_air_quality.mp3"
     },
     {
       "n": 37,
-      "en": "Do you water the plants?",
-      "jp": "植物に水をやりますか。",
-      "hira": "しょくぶつ に みず を やります か",
-      "mp3": "br_q37_do_you_water_the_plants.mp3"
+      "en": "How do you participate in local environmental initiatives?",
+      "jp": "地域の環境イニシアティブにどのように参加しますか？",
+      "hira": "ちいきのかんきょういにしあてぃぶにどのようにさんかしますか？",
+      "mp3": "br_q37_how_do_you_participate_in_local_environmental_initiatives.mp3"
     },
     {
       "n": 38,
-      "en": "Do you have any pets to feed?",
-      "jp": "えさをあげるペットはいますか。",
-      "hira": "えさ を あげる ぺっと は い ます か",
-      "mp3": "br_q38_do_you_have_any_pets_to_feed.mp3"
+      "en": "What strategies do you use to keep your living space organized?",
+      "jp": "生活空間を整理整頓するためにどのような戦略を使いますか？",
+      "hira": "せいかつくうかんをせいりせいとんするためにどのようなせんりゃくをつかいますか？",
+      "mp3": "br_q38_what_strategies_do_you_use_to_keep_your_living_space_organized.mp3"
     },
     {
       "n": 39,
-      "en": "Who sets the table?",
-      "jp": "だれが食卓を用意しますか。",
-      "hira": "だれ が しょくたく を ようい し ます か",
-      "mp3": "br_q39_who_sets_the_table.mp3"
+      "en": "How do you communicate with neighbors about community events?",
+      "jp": "地域のイベントについて近所の人とどのようにコミュニケーションを取りますか？",
+      "hira": "ちいきのいべんとについてきんじょのひととどのようにこみゅにけーしょんをとりますか？",
+      "mp3": "br_q39_how_do_you_communicate_with_neighbors_about_community_events.mp3"
     },
     {
       "n": 40,
-      "en": "What chore do you dislike?",
-      "jp": "きらいな家事は何ですか。",
-      "hira": "きらい な かじ は なん です か",
-      "mp3": "br_q40_what_chore_do_you_dislike.mp3"
+      "en": "What are your thoughts on using renewable energy sources at home?",
+      "jp": "家で再生可能エネルギー源を使用することについてどう思いますか？",
+      "hira": "いえでさいせいかのうえねるぎーげんをしようすることについてどうおもいますか？",
+      "mp3": "br_q40_what_are_your_thoughts_on_using_renewable_energy_sources_at_home.mp3"
     },
     {
       "n": 41,
-      "en": "What chore are you good at?",
-      "jp": "得意な家事は何ですか。",
-      "hira": "とくい な かじ は なん です か",
-      "mp3": "br_q41_what_chore_are_you_good_at.mp3"
+      "en": "How do you manage shared responsibilities in a communal living situation?",
+      "jp": "共同生活の中での共有責任をどのように管理しますか？",
+      "hira": "きょうどうせいかつのなかでのきょうゆうせきにんをどのようにかんりしますか？",
+      "mp3": "br_q41_how_do_you_manage_shared_responsibilities_in_a_communal_living_situation.mp3"
     },
     {
       "n": 42,
-      "en": "Should children help with chores?",
-      "jp": "子どもも家事を手伝うべきですか。",
-      "hira": "こども も かじ を てつだう べき です か",
-      "mp3": "br_q42_should_children_help_with_chores.mp3"
+      "en": "What are some practical ways to reduce energy consumption in daily life?",
+      "jp": "日常生活でエネルギー消費を減らすための実用的な方法は何ですか？",
+      "hira": "にちじょうせいかつでえねるぎーしょうひをへらすためのじつようてきなほうほうはなんですか？",
+      "mp3": "br_q42_what_are_some_practical_ways_to_reduce_energy_consumption_in_daily_life.mp3"
     },
     {
       "n": 43,
-      "en": "How do you share chores?",
-      "jp": "どうやって家事を分担しますか。",
-      "hira": "どうやって かじ を ぶんたん し ます か",
-      "mp3": "br_q43_how_do_you_share_chores.mp3"
+      "en": "How can you encourage your family to participate in recycling efforts?",
+      "jp": "家族がリサイクル活動に参加するようにどう促しますか？",
+      "hira": "かぞくがりさいくるかつどうにさんかするようにどううながしますか？",
+      "mp3": "br_q43_how_can_you_encourage_your_family_to_participate_in_recycling_efforts.mp3"
     },
     {
       "n": 44,
-      "en": "What will you do after cleaning?",
-      "jp": "掃除のあと、何をしますか。",
-      "hira": "そうじ の あと、 なに を し ます か",
-      "mp3": "br_q44_what_will_you_do_after_cleaning.mp3"
+      "en": "What is your approach to discussing energy bills with housemates?",
+      "jp": "ルームメイトとエネルギー料金について話し合う際のアプローチは何ですか？",
+      "hira": "るーむめいととえねるぎーりょうきんについてはなしあうさいのあぷろーちわなんですか？",
+      "mp3": "br_q44_what_is_your_approach_to_discussing_energy_bills_with_housemates.mp3"
     },
     {
       "n": 45,
-      "en": "How do you thank your family?",
-      "jp": "家族にどうやって感謝しますか。",
-      "hira": "かぞく に どうやって かんしゃ し ます か",
-      "mp3": "br_q45_how_do_you_thank_your_family.mp3"
+      "en": "How do you handle seasonal changes in your home environment?",
+      "jp": "家の環境における季節の変化をどのように対処しますか？",
+      "hira": "いえのかんきょうにおけるきせつのへんかをどのようにたいしょしますか？",
+      "mp3": "br_q45_how_do_you_handle_seasonal_changes_in_your_home_environment.mp3"
     },
     {
       "n": 46,
-      "en": "What is your ideal home like?",
-      "jp": "あなたの理想の家はどんな感じですか。",
-      "hira": "あなた の りそう の いえ は どんな かんじ です か",
-      "mp3": "br_q46_what_is_your_ideal_home_like.mp3"
+      "en": "What are some ways to maintain a comfortable temperature in your home?",
+      "jp": "家の快適な温度を維持するための方法は何ですか？",
+      "hira": "いえのかいてきなおんどをいじするためのほうほうはなんですか？",
+      "mp3": "br_q46_what_are_some_ways_to_maintain_a_comfortable_temperature_in_your_home.mp3"
     },
     {
       "n": 47,
-      "en": "Do you prefer a house or an apartment?",
-      "jp": "家とアパートではどちらが好きですか。",
-      "hira": "いえ と あぱーと では どちら が すき です か",
-      "mp3": "br_q47_do_you_prefer_a_house_or_an_apartment.mp3"
+      "en": "How do you ensure that your neighborhood is a safe place to live?",
+      "jp": "あなたの地域が住みやすい安全な場所であることをどのように確保しますか？",
+      "hira": "あなたのちいきがすみやすいあんぜんなばしょであることをどのようにかくほしますか？",
+      "mp3": "br_q47_how_do_you_ensure_that_your_neighborhood_is_a_safe_place_to_live.mp3"
     },
     {
       "n": 48,
-      "en": "How many rooms would your ideal home have?",
-      "jp": "理想の家には部屋がいくつあるといいですか。",
-      "hira": "りそう の いえ には へや が いくつ ある と いい です か",
-      "mp3": "br_q48_how_many_rooms_would_your_ideal_home_have.mp3"
+      "en": "What role does community involvement play in improving local living conditions?",
+      "jp": "地域の生活環境を改善するために地域参加はどのような役割を果たしますか？",
+      "hira": "ちいきのせいかつかんきょうをかいぜんするためにちいきさんかはどのようなやくわりをはたしますか？",
+      "mp3": "br_q48_what_role_does_community_involvement_play_in_improving_local_living_conditions.mp3"
     },
     {
       "n": 49,
-      "en": "What kind of kitchen do you want?",
-      "jp": "どんなキッチンがほしいですか。",
-      "hira": "どんな きっちん が ほしい です か",
-      "mp3": "br_q49_what_kind_of_kitchen_do_you_want.mp3"
+      "en": "How do you balance personal space with communal living needs?",
+      "jp": "個人の空間と共同生活のニーズをどのようにバランスを取りますか？",
+      "hira": "こじんのくうかんときょうどうせいかつのにーずをどのようにばらんすをとりますか？",
+      "mp3": "br_q49_how_do_you_balance_personal_space_with_communal_living_needs.mp3"
     },
     {
       "n": 50,
-      "en": "Do you want a garden or a balcony?",
-      "jp": "庭がいいですか、バルコニーがいいですか。",
-      "hira": "にわ が いい です か、 ばるこにー が いい です か",
-      "mp3": "br_q50_do_you_want_a_garden_or_a_balcony.mp3"
+      "en": "What are some effective ways to encourage energy-saving habits among family members?",
+      "jp": "家族の間でエネルギー節約の習慣を促すための効果的な方法は何ですか？",
+      "hira": "かぞくのあいだでえねるぎーせつやくのしゅうかんをうながすためのこうかてきなほうほうはなんですか？",
+      "mp3": "br_q50_what_are_some_effective_ways_to_encourage_energy_saving_habits_among_family_members.mp3"
     },
     {
       "n": 51,
-      "en": "Where would your ideal home be?",
-      "jp": "理想の家はどこにあるといいですか。",
-      "hira": "りそう の いえ は どこ に ある と いい です か",
-      "mp3": "br_q51_where_would_your_ideal_home_be.mp3"
+      "en": "How do you approach discussions about neighborhood safety with your friends?",
+      "jp": "友達と地域の安全について話し合う際のアプローチは何ですか？",
+      "hira": "ともだちとちいきのあんぜんについてはなしあうさいのあぷろーちわなんですか？",
+      "mp3": "br_q51_how_do_you_approach_discussions_about_neighborhood_safety_with_your_friends.mp3"
     },
     {
       "n": 52,
-      "en": "What makes a home cozy for you?",
-      "jp": "あなたにとって居心地のよい家の条件は何ですか。",
-      "hira": "あなた に とって いごこち の よい いえ の じょうけん は なん です か",
-      "mp3": "br_q52_what_makes_a_home_cozy_for_you.mp3"
+      "en": "What strategies do you use to manage shared resources in your home?",
+      "jp": "家の中での共有資源を管理するためにどのような戦略を使いますか？",
+      "hira": "いえのなかでのきょうゆうしげんをかんりするためにどのようなせんりゃくをつかいますか？",
+      "mp3": "br_q52_what_strategies_do_you_use_to_manage_shared_resources_in_your_home.mp3"
     },
     {
       "n": 53,
-      "en": "Do you need a study or office?",
-      "jp": "書斎／オフィスは必要ですか。",
-      "hira": "しょさい／おふぃす は ひつよう です か",
-      "mp3": "br_q53_do_you_need_a_study_or_office.mp3"
+      "en": "How do you keep track of maintenance schedules for your home?",
+      "jp": "家のメンテナンススケジュールをどのように管理しますか？",
+      "hira": "いえのめんてなんすすけじゅーるをどのようにかんりしますか？",
+      "mp3": "br_q53_how_do_you_keep_track_of_maintenance_schedules_for_your_home.mp3"
     },
     {
       "n": 54,
-      "en": "Is energy efficiency important?",
-      "jp": "省エネは大切ですか。",
-      "hira": "しょうえね は たいせつ です か",
-      "mp3": "br_q54_is_energy_efficiency_important.mp3"
+      "en": "What are some ways to engage with your community to promote sustainability?",
+      "jp": "持続可能性を促進するために地域と関わる方法は何ですか？",
+      "hira": "じぞくかのうせいをそくしんするためにちいきとかかわるほうほうはなんですか？",
+      "mp3": "br_q54_what_are_some_ways_to_engage_with_your_community_to_promote_sustainability.mp3"
     },
     {
       "n": 55,
-      "en": "Would you like to live near the station?",
-      "jp": "駅の近くに住みたいですか。",
-      "hira": "えき の ちかく に すみたい です か",
-      "mp3": "br_q55_would_you_like_to_live_near_the_station.mp3"
+      "en": "How do you ensure that your home is prepared for emergencies?",
+      "jp": "家が緊急事態に備えていることをどのように確認しますか？",
+      "hira": "いえがきんきゅうじたいにそなえていることをどのようにかくにんしますか？",
+      "mp3": "br_q55_how_do_you_ensure_that_your_home_is_prepared_for_emergencies.mp3"
     },
     {
       "n": 56,
-      "en": "Do you want a pet-friendly place?",
-      "jp": "ペット可の家がいいですか。",
-      "hira": "ぺっと か の いえ が いい です か",
-      "mp3": "br_q56_do_you_want_a_petfriendly_place.mp3"
+      "en": "What are your thoughts on community gardens as a way to improve local food access?",
+      "jp": "地域の食料アクセスを改善する手段としてのコミュニティガーデンについてどう思いますか？",
+      "hira": "ちいきのしょくりょうあくせすをかいぜんするしゅだんとしてのこみゅにてぃがーでんについてどうおもいますか？",
+      "mp3": "br_q56_what_are_your_thoughts_on_community_gardens_as_a_way_to_improve_local_food_access.mp3"
     },
     {
       "n": 57,
-      "en": "How big should your bedroom be?",
-      "jp": "寝室はどのくらいの広さがいいですか。",
-      "hira": "しんしつ は どの くらい の ひろさ が いい です か",
-      "mp3": "br_q57_how_big_should_your_bedroom_be.mp3"
+      "en": "How do you handle disagreements with housemates regarding shared expenses?",
+      "jp": "共有費用に関するルームメイトとの意見の不一致をどのように処理しますか？",
+      "hira": "きょうゆうひようにかんするるーむめいととのいけんのふいっちをどのようにしょりしますか？",
+      "mp3": "br_q57_how_do_you_handle_disagreements_with_housemates_regarding_shared_expenses.mp3"
     },
     {
       "n": 58,
-      "en": "What view do you want from the window?",
-      "jp": "窓からどんな景色が見たいですか。",
-      "hira": "まど から どんな けしき が みたい です か",
-      "mp3": "br_q58_what_view_do_you_want_from_the_window.mp3"
+      "en": "What are some effective ways to discuss household rules with new roommates?",
+      "jp": "新しいルームメイトと家のルールについて話し合うための効果的な方法は何ですか？",
+      "hira": "あたらしいるーむめいとといえのるーるについてはなしあうためのこうかてきなほうほうはなんですか？",
+      "mp3": "br_q58_what_are_some_effective_ways_to_discuss_household_rules_with_new_roommates.mp3"
     },
     {
       "n": 59,
-      "en": "What color would your walls be?",
-      "jp": "壁の色は何色がいいですか。",
-      "hira": "かべ の いろ は なにいろ が いい です か",
-      "mp3": "br_q59_what_color_would_your_walls_be.mp3"
+      "en": "How do you prioritize energy efficiency when making home improvements?",
+      "jp": "家の改善を行う際にエネルギー効率をどのように優先しますか？",
+      "hira": "いえのかいぜんをおこなうさいにえねるぎーこうりつをどのようにゆうせんしますか？",
+      "mp3": "br_q59_how_do_you_prioritize_energy_efficiency_when_making_home_improvements.mp3"
     },
     {
       "n": 60,
-      "en": "What is the most important feature?",
-      "jp": "一番大切な特徴は何ですか。",
-      "hira": "いちばん たいせつ な とくちょう は なん です か",
-      "mp3": "br_q60_what_is_the_most_important_feature.mp3"
+      "en": "What community activities do you participate in to foster neighborhood relationships?",
+      "jp": "近隣関係を育むために参加している地域活動は何ですか？",
+      "hira": "きんりんかんけいをはぐくむためにさんかしているちいきかつどうはなんですか？",
+      "mp3": "br_q60_what_community_activities_do_you_participate_in_to_foster_neighborhood_relationships.mp3"
     }
   ]
 }
