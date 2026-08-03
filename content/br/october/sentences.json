@@ -1,424 +1,64 @@
 {
   "cards": [
-    {
-      "n": 1,
-      "en": "I go to school by bus.",
-      "jp": "私はバスで学校に行きます。",
-      "hira": "わたし は ばす で がっこう に いき ます",
-      "mp3": "br_s01_i_go_to_school_by_bus.mp3"
-    },
-    {
-      "n": 2,
-      "en": "I take the train every morning.",
-      "jp": "私は毎朝電車に乗ります。",
-      "hira": "わたし は まいあさ でんしゃ に のり ます",
-      "mp3": "br_s02_i_take_the_train_every_morning.mp3"
-    },
-    {
-      "n": 3,
-      "en": "I ride my bicycle to the station.",
-      "jp": "駅まで自転車に乗ります。",
-      "hira": "えき まで じてんしゃ に のり ます",
-      "mp3": "br_s03_i_ride_my_bicycle_to_the_station.mp3"
-    },
-    {
-      "n": 4,
-      "en": "My dad drives a car to work.",
-      "jp": "父は車で仕事に行きます。",
-      "hira": "ちち は くるま で しごと に いき ます",
-      "mp3": "br_s04_my_dad_drives_a_car_to_work.mp3"
-    },
-    {
-      "n": 5,
-      "en": "Let’s take a taxi.",
-      "jp": "タクシーに乗りましょう。",
-      "hira": "たくしー に のり ましょう",
-      "mp3": "br_s05_lets_take_a_taxi.mp3"
-    },
-    {
-      "n": 6,
-      "en": "I travel by plane on holidays.",
-      "jp": "休みには飛行機で旅行します。",
-      "hira": "やすみ には ひこうき で りょこう します",
-      "mp3": "br_s06_i_travel_by_plane_on_holidays.mp3"
-    },
-    {
-      "n": 7,
-      "en": "We traveled by ferry last summer.",
-      "jp": "去年の夏はフェリーで旅行しました。",
-      "hira": "きょねん の なつ は ふぇりー で りょこう しました",
-      "mp3": "br_s07_we_traveled_by_ferry_last_summer.mp3"
-    },
-    {
-      "n": 8,
-      "en": "The ambulance is fast.",
-      "jp": "救急車は速いです。",
-      "hira": "きゅうきゅうしゃ は はやい です",
-      "mp3": "br_s08_the_ambulance_is_fast.mp3"
-    },
-    {
-      "n": 9,
-      "en": "Trams run through the city.",
-      "jp": "路面電車は市内を走ります。",
-      "hira": "ろめんでんしゃ は しない を はしります",
-      "mp3": "br_s09_trams_run_through_the_city.mp3"
-    },
-    {
-      "n": 10,
-      "en": "Do you prefer buses or trains?",
-      "jp": "バスと電車ではどちらが好きですか。",
-      "hira": "ばす と でんしゃ では どちら が すき です か",
-      "mp3": "br_s10_do_you_prefer_buses_or_trains.mp3"
-    },
-    {
-      "n": 11,
-      "en": "This bus goes to the museum.",
-      "jp": "このバスは博物館へ行きます。",
-      "hira": "この ばす は はくぶつかん へ いき ます",
-      "mp3": "br_s11_this_bus_goes_to_the_museum.mp3"
-    },
-    {
-      "n": 12,
-      "en": "My bike has a light and a bell.",
-      "jp": "私の自転車にはライトとベルがあります。",
-      "hira": "わたし の じてんしゃ に は らいと と べる が あり ます",
-      "mp3": "br_s12_my_bike_has_a_light_and_a_bell.mp3"
-    },
-    {
-      "n": 13,
-      "en": "Can you drive?",
-      "jp": "運転できますか。",
-      "hira": "うんてん でき ます か",
-      "mp3": "br_s13_can_you_drive.mp3"
-    },
-    {
-      "n": 14,
-      "en": "I can’t ride a motorbike.",
-      "jp": "私はバイクに乗れません。",
-      "hira": "わたし は ばいく に のれ ません",
-      "mp3": "br_s14_i_cant_ride_a_motorbike.mp3"
-    },
-    {
-      "n": 15,
-      "en": "Let’s go by car today.",
-      "jp": "今日は車で行きましょう。",
-      "hira": "きょう は くるま で いき ましょう",
-      "mp3": "br_s15_lets_go_by_car_today.mp3"
-    },
-    {
-      "n": 16,
-      "en": "Go straight for two blocks.",
-      "jp": "二ブロックまっすぐ進んでください。",
-      "hira": "に ぶろっく まっすぐ すすんで ください",
-      "mp3": "br_s16_go_straight_for_two_blocks.mp3"
-    },
-    {
-      "n": 17,
-      "en": "Turn left at the traffic light.",
-      "jp": "信号で左に曲がってください。",
-      "hira": "しんごう で ひだり に まがって ください",
-      "mp3": "br_s17_turn_left_at_the_traffic_light.mp3"
-    },
-    {
-      "n": 18,
-      "en": "Turn right at the corner.",
-      "jp": "角で右に曲がってください。",
-      "hira": "かど で みぎ に まがって ください",
-      "mp3": "br_s18_turn_right_at_the_corner.mp3"
-    },
-    {
-      "n": 19,
-      "en": "The station is next to the library.",
-      "jp": "駅は図書館のとなりです。",
-      "hira": "えき は としょかん の となり です",
-      "mp3": "br_s19_the_station_is_next_to_the_library.mp3"
-    },
-    {
-      "n": 20,
-      "en": "The school is between the park and the bank.",
-      "jp": "学校は公園と銀行の間にあります。",
-      "hira": "がっこう は こうえん と ぎんこう の あいだ に あり ます",
-      "mp3": "br_s20_the_school_is_between_the_park_and_the_bank.mp3"
-    },
-    {
-      "n": 21,
-      "en": "The bus stop is across from the hospital.",
-      "jp": "バス停は病院の向かいです。",
-      "hira": "ばすてい は びょういん の むかい です",
-      "mp3": "br_s21_the_bus_stop_is_across_from_the_hospital.mp3"
-    },
-    {
-      "n": 22,
-      "en": "It’s on your right.",
-      "jp": "右側にあります。",
-      "hira": "みぎ がわ に あり ます",
-      "mp3": "br_s22_its_on_your_right.mp3"
-    },
-    {
-      "n": 23,
-      "en": "How long does it take?",
-      "jp": "どのくらい時間がかかりますか。",
-      "hira": "どの くらい じかん が かかり ます か",
-      "mp3": "br_s23_how_long_does_it_take.mp3"
-    },
-    {
-      "n": 24,
-      "en": "It takes about fifteen minutes.",
-      "jp": "約15分かかります。",
-      "hira": "やく じゅうご ふん かかり ます",
-      "mp3": "br_s24_it_takes_about_fifteen_minutes.mp3"
-    },
-    {
-      "n": 25,
-      "en": "How far is it?",
-      "jp": "どのくらい遠いですか。",
-      "hira": "どの くらい とおい です か",
-      "mp3": "br_s25_how_far_is_it.mp3"
-    },
-    {
-      "n": 26,
-      "en": "It’s about one kilometer.",
-      "jp": "約1キロメートルです。",
-      "hira": "やく いち きろめーとる です",
-      "mp3": "br_s26_its_about_one_kilometer.mp3"
-    },
-    {
-      "n": 27,
-      "en": "Please show me the way to the station.",
-      "jp": "駅までの行き方を教えてください。",
-      "hira": "えき まで の いきかた を おしえて ください",
-      "mp3": "br_s27_please_show_me_the_way_to_the_station.mp3"
-    },
-    {
-      "n": 28,
-      "en": "Which platform is for trains to Tokyo?",
-      "jp": "東京行きの電車は何番ホームですか。",
-      "hira": "とうきょう いき の でんしゃ は なんばん ほーむ です か",
-      "mp3": "br_s28_which_platform_is_for_trains_to_tokyo.mp3"
-    },
-    {
-      "n": 29,
-      "en": "Let’s meet at the ticket gate.",
-      "jp": "改札口で会いましょう。",
-      "hira": "かいさつぐち で あい ましょう",
-      "mp3": "br_s29_lets_meet_at_the_ticket_gate.mp3"
-    },
-    {
-      "n": 30,
-      "en": "I commute to school by train and bicycle.",
-      "jp": "私は電車と自転車で通学します。",
-      "hira": "わたし は でんしゃ と じてんしゃ で つうがく します",
-      "mp3": "br_s30_i_commute_to_school_by_train_and_bicycle.mp3"
-    },
-    {
-      "n": 31,
-      "en": "You must wear a seat belt in the car.",
-      "jp": "車ではシートベルトをしなければなりません。",
-      "hira": "くるま で は しーとべると を しなければ なり ません",
-      "mp3": "br_s31_you_must_wear_a_seat_belt_in_the_car.mp3"
-    },
-    {
-      "n": 32,
-      "en": "You mustn’t cross on a red light.",
-      "jp": "赤信号で渡ってはいけません。",
-      "hira": "あか しんごう で わたって は いけ ません",
-      "mp3": "br_s32_you_mustnt_cross_on_a_red_light.mp3"
-    },
-    {
-      "n": 33,
-      "en": "Be careful near the edge of the platform.",
-      "jp": "ホームの端の近くでは気をつけてください。",
-      "hira": "ほーむ の はし の ちかく では き を つけて ください",
-      "mp3": "br_s33_be_careful_near_the_edge_of_the_platform.mp3"
-    },
-    {
-      "n": 34,
-      "en": "Please stand behind the yellow line.",
-      "jp": "黄色い線のうしろに立ってください。",
-      "hira": "きいろい せん の うしろ に たって ください",
-      "mp3": "br_s34_please_stand_behind_the_yellow_line.mp3"
-    },
-    {
-      "n": 35,
-      "en": "Hold the handrail on the bus.",
-      "jp": "バスでは手すりにつかまってください。",
-      "hira": "ばす で は てすり に つかまって ください",
-      "mp3": "br_s35_hold_the_handrail_on_the_bus.mp3"
-    },
-    {
-      "n": 36,
-      "en": "Give your seat to people in need.",
-      "jp": "必要な人に席をゆずってください。",
-      "hira": "ひつよう な ひと に せき を ゆずって ください",
-      "mp3": "br_s36_give_your_seat_to_people_in_need.mp3"
-    },
-    {
-      "n": 37,
-      "en": "Keep your ID with you.",
-      "jp": "身分証明書を持ち歩いてください。",
-      "hira": "みぶん しょうめいしょ を もちあるいて ください",
-      "mp3": "br_s37_keep_your_id_with_you.mp3"
-    },
-    {
-      "n": 38,
-      "en": "Don’t block the doors.",
-      "jp": "ドアをふさがないでください。",
-      "hira": "どあ を ふさが ないで ください",
-      "mp3": "br_s38_dont_block_the_doors.mp3"
-    },
-    {
-      "n": 39,
-      "en": "If you need help, press the button.",
-      "jp": "助けが必要ならボタンを押してください。",
-      "hira": "たすけ が ひつよう なら ぼたん を おして ください",
-      "mp3": "br_s39_if_you_need_help_press_the_button.mp3"
-    },
-    {
-      "n": 40,
-      "en": "Keep an eye on your bags and belongings.",
-      "jp": "かばんや持ち物から目を離さないでください。",
-      "hira": "かばん や もちもの から め を はなさないで ください",
-      "mp3": "br_s40_keep_an_eye_on_your_bags_and_belongings.mp3"
-    },
-    {
-      "n": 41,
-      "en": "Use the crosswalk and look both ways.",
-      "jp": "横断歩道を使って、左右をよく見てください。",
-      "hira": "おうだん ほどう を つかって、 さゆう を よく みて ください",
-      "mp3": "br_s41_use_the_crosswalk_and_look_both_ways.mp3"
-    },
-    {
-      "n": 42,
-      "en": "Don’t run on the platform.",
-      "jp": "ホームで走らないでください。",
-      "hira": "ほーむ で はしら ないで ください",
-      "mp3": "br_s42_dont_run_on_the_platform.mp3"
-    },
-    {
-      "n": 43,
-      "en": "Ask a station staff member if you are lost.",
-      "jp": "道に迷ったら駅員にたずねてください。",
-      "hira": "みち に まよったら えきいん に たずねて ください",
-      "mp3": "br_s43_ask_a_station_staff_member_if_you_are_lost.mp3"
-    },
-    {
-      "n": 44,
-      "en": "Call the emergency number if needed.",
-      "jp": "必要なら緊急電話番号に電話してください。",
-      "hira": "ひつよう なら きんきゅう でんわ ばんごう に でんわ して ください",
-      "mp3": "br_s44_call_the_emergency_number_if_needed.mp3"
-    },
-    {
-      "n": 45,
-      "en": "Travel safely and politely.",
-      "jp": "安全に、そして礼儀正しく移動しましょう。",
-      "hira": "あんぜん に、 そして れいぎ ただしく いどう し ましょう",
-      "mp3": "br_s45_travel_safely_and_politely.mp3"
-    },
-    {
-      "n": 46,
-      "en": "Can I have a one-way ticket to Osaka?",
-      "jp": "大阪までの片道切符を一枚ください。",
-      "hira": "おおさか まで の かたみち きっぷ を いちまい ください",
-      "mp3": "br_s46_can_i_have_a_oneway_ticket_to_osaka.mp3"
-    },
-    {
-      "n": 47,
-      "en": "I’d like to buy a round-trip ticket.",
-      "jp": "往復切符を買いたいです。",
-      "hira": "おうふく きっぷ を かいたい です",
-      "mp3": "br_s47_id_like_to_buy_a_roundtrip_ticket.mp3"
-    },
-    {
-      "n": 48,
-      "en": "How much is the fare?",
-      "jp": "運賃はいくらですか。",
-      "hira": "うんちん は いくら です か",
-      "mp3": "br_s48_how_much_is_the_fare.mp3"
-    },
-    {
-      "n": 49,
-      "en": "I need to top up my IC card.",
-      "jp": "ICカードにチャージする必要があります。",
-      "hira": "あいしー かーど に ちゃーじ する ひつよう が あります",
-      "mp3": "br_s49_i_need_to_top_up_my_ic_card.mp3"
-    },
-    {
-      "n": 50,
-      "en": "Which train goes to Shinjuku?",
-      "jp": "新宿へ行く電車はどれですか。",
-      "hira": "しんじゅく へ いく でんしゃ は どれ です か",
-      "mp3": "br_s50_which_train_goes_to_shinjuku.mp3"
-    },
-    {
-      "n": 51,
-      "en": "Where do I transfer?",
-      "jp": "どこで乗り換えますか。",
-      "hira": "どこ で のりかえ ます か",
-      "mp3": "br_s51_where_do_i_transfer.mp3"
-    },
-    {
-      "n": 52,
-      "en": "Is this the local or the express?",
-      "jp": "これは各停ですか、急行ですか。",
-      "hira": "これ は かくてい です か、 きゅうこう です か",
-      "mp3": "br_s52_is_this_the_local_or_the_express.mp3"
-    },
-    {
-      "n": 53,
-      "en": "The train departs at ten o’clock.",
-      "jp": "電車は10時に出発します。",
-      "hira": "でんしゃ は じゅうじ に しゅっぱつ し ます",
-      "mp3": "br_s53_the_train_departs_at_ten_oclock.mp3"
-    },
-    {
-      "n": 54,
-      "en": "It arrives at ten thirty.",
-      "jp": "10時30分に到着します。",
-      "hira": "じゅうじ さんじゅっぷん に とうちゃく し ます",
-      "mp3": "br_s54_it_arrives_at_ten_thirty.mp3"
-    },
-    {
-      "n": 55,
-      "en": "Which platform does the train leave from?",
-      "jp": "電車は何番線から出ますか。",
-      "hira": "でんしゃ は なんばんせん から でます か",
-      "mp3": "br_s55_which_platform_does_the_train_leave_from.mp3"
-    },
-    {
-      "n": 56,
-      "en": "We are in car number three.",
-      "jp": "私たちは3号車にいます。",
-      "hira": "わたしたち は さん ごうしゃ に い ます",
-      "mp3": "br_s56_we_are_in_car_number_three.mp3"
-    },
-    {
-      "n": 57,
-      "en": "The train is delayed.",
-      "jp": "電車が遅れています。",
-      "hira": "でんしゃ が おくれて い ます",
-      "mp3": "br_s57_the_train_is_delayed.mp3"
-    },
-    {
-      "n": 58,
-      "en": "I heard the announcement.",
-      "jp": "アナウンスを聞きました。",
-      "hira": "あなうんす を ききました",
-      "mp3": "br_s58_i_heard_the_announcement.mp3"
-    },
-    {
-      "n": 59,
-      "en": "This is the end of the line.",
-      "jp": "ここは終点です。",
-      "hira": "ここ は しゅうてん です",
-      "mp3": "br_s59_this_is_the_end_of_the_line.mp3"
-    },
-    {
-      "n": 60,
-      "en": "Please line up on the platform.",
-      "jp": "ホームで整列してください。",
-      "hira": "ほーむ で せいれつ して ください",
-      "mp3": "br_s60_please_line_up_on_the_platform.mp3"
-    }
+    {"n":1,"en":"Autumn is my favorite season because the weather is cool.","jp":"秋は涼しいので、私の一番好きな季節です。","hira":"あきはすずしいので、わたしのいちばんすきなきせつです。","mp3":"br_s01_autumn_is_my_favorite_season_because_the_weather_is_cool.mp3"},
+    {"n":2,"en":"The temperature drops quickly after sunset in October.","jp":"10月は日没後に気温がすぐ下がります。","hira":"じゅうがつはにちぼつごにきおんがすぐさがります。","mp3":"br_s02_the_temperature_drops_quickly_after_sunset_in_october.mp3"},
+    {"n":3,"en":"I check the weather forecast before leaving home.","jp":"家を出る前に天気予報を確認します。","hira":"いえをでるまえにてんきよほうをかくにんします。","mp3":"br_s03_i_check_the_weather_forecast_before_leaving_home.mp3"},
+    {"n":4,"en":"Take an umbrella because there may be a shower this afternoon.","jp":"午後ににわか雨があるかもしれないので、傘を持っていってください。","hira":"ごごににわかあめがあるかもしれないので、かさをもっていってください。","mp3":"br_s04_take_an_umbrella_because_there_may_be_a_shower_this_afternoon.mp3"},
+    {"n":5,"en":"The wind was strong, so I wore a jacket.","jp":"風が強かったので、上着を着ました。","hira":"かぜがつよかったので、うわぎをきました。","mp3":"br_s05_the_wind_was_strong_so_i_wore_a_jacket.mp3"},
+    {"n":6,"en":"The leaves are changing from green to red and yellow.","jp":"葉が緑から赤や黄色に変わっています。","hira":"はがみどりからあかやきいろにかわっています。","mp3":"br_s06_the_leaves_are_changing_from_green_to_red_and_yellow.mp3"},
+    {"n":7,"en":"Many leaves fall from the trees in late autumn.","jp":"晩秋にはたくさんの葉が木から落ちます。","hira":"ばんしゅうにはたくさんのはがきからおちます。","mp3":"br_s07_many_leaves_fall_from_the_trees_in_late_autumn.mp3"},
+    {"n":8,"en":"We visited a park to enjoy the autumn scenery.","jp":"秋の景色を楽しむために公園を訪れました。","hira":"あきのけしきをたのしむためにこうえんをおとずれました。","mp3":"br_s08_we_visited_a_park_to_enjoy_the_autumn_scenery.mp3"},
+    {"n":9,"en":"The viewpoint offers a beautiful view of the mountains.","jp":"その展望台からは美しい山の景色が見えます。","hira":"そのてんぼうだいからはうつくしいやまのけしきがみえます。","mp3":"br_s09_the_viewpoint_offers_a_beautiful_view_of_the_mountains.mp3"},
+    {"n":10,"en":"We should protect nature when we spend time outdoors.","jp":"屋外で過ごすときは自然を守るべきです。","hira":"おくがいですごすときはしぜんをまもるべきです。","mp3":"br_s10_we_should_protect_nature_when_we_spend_time_outdoors.mp3"},
+    {"n":11,"en":"Farmers are busy during the harvest season.","jp":"農家は収穫の季節に忙しいです。","hira":"のうかはしゅうかくのきせつにいそがしいです。","mp3":"br_s11_farmers_are_busy_during_the_harvest_season.mp3"},
+    {"n":12,"en":"This farm grows several kinds of crops.","jp":"この農場では数種類の作物を育てています。","hira":"こののうじょうではすうしゅるいのさくもつをそだてています。","mp3":"br_s12_this_farm_grows_several_kinds_of_crops.mp3"},
+    {"n":13,"en":"Roasted sweet potatoes are a popular autumn snack.","jp":"焼きいもは人気のある秋のおやつです。","hira":"やきいもはにんきのあるあきのおやつです。","mp3":"br_s13_roasted_sweet_potatoes_are_a_popular_autumn_snack.mp3"},
+    {"n":14,"en":"My grandmother makes rice with chestnuts in autumn.","jp":"祖母は秋に栗ご飯を作ります。","hira":"そぼはあきにくりごはんをつくります。","mp3":"br_s14_my_grandmother_makes_rice_with_chestnuts_in_autumn.mp3"},
+    {"n":15,"en":"I used mushrooms as an ingredient in the soup.","jp":"スープの材料にきのこを使いました。","hira":"すーぷのざいりょうにきのこをつかいました。","mp3":"br_s15_i_used_mushrooms_as_an_ingredient_in_the_soup.mp3"},
+    {"n":16,"en":"This recipe has a rich flavor but is easy to make.","jp":"このレシピは風味が豊かですが、作るのは簡単です。","hira":"このれしぴはふうみがゆたかですが、つくるのはかんたんです。","mp3":"br_s16_this_recipe_has_a_rich_flavor_but_is_easy_to_make.mp3"},
+    {"n":17,"en":"The town holds a festival on the first weekend of October.","jp":"その町では10月の最初の週末に祭りが開かれます。","hira":"そのまちではじゅうがつのさいしょのしゅうまつにまつりがひらかれます。","mp3":"br_s17_the_town_holds_a_festival_on_the_first_weekend_of_october.mp3"},
+    {"n":18,"en":"The local event gives neighbors a chance to meet.","jp":"地域の行事は近所の人々が会う機会になります。","hira":"ちいきのぎょうじはきんじょのひとびとがあうきかいになります。","mp3":"br_s18_the_local_event_gives_neighbors_a_chance_to_meet.mp3"},
+    {"n":19,"en":"Our family has a tradition of visiting the same temple every autumn.","jp":"私たちの家族には、毎年秋に同じ寺を訪れる伝統があります。","hira":"わたしたちのかぞくには、まいとしあきにおなじてらをおとずれるでんとうがあります。","mp3":"br_s19_our_family_has_a_tradition_of_visiting_the_same_temple_every_autumn.mp3"},
+    {"n":20,"en":"People celebrate Halloween in different ways.","jp":"人々はさまざまな方法でハロウィンを祝います。","hira":"ひとびとはさまざまなほうほうではろうぃんをいわいます。","mp3":"br_s20_people_celebrate_halloween_in_different_ways.mp3"},
+    {"n":21,"en":"The children wore costumes and carried lanterns.","jp":"子どもたちは仮装をしてランタンを持っていました。","hira":"こどもたちはかそうをしてらんたんをもっていました。","mp3":"br_s21_the_children_wore_costumes_and_carried_lanterns.mp3"},
+    {"n":22,"en":"We made simple decorations for the school event.","jp":"学校行事のために簡単な飾りを作りました。","hira":"がっこうぎょうじのためにかんたんなかざりをつくりました。","mp3":"br_s22_we_made_simple_decorations_for_the_school_event.mp3"},
+    {"n":23,"en":"My class will volunteer at the community festival.","jp":"私のクラスは地域の祭りでボランティアをします。","hira":"わたしのくらすはちいきのまつりでぼらんてぃあをします。","mp3":"br_s23_my_class_will_volunteer_at_the_community_festival.mp3"},
+    {"n":24,"en":"Everyone can participate in the clean-up activity.","jp":"だれでも清掃活動に参加できます。","hira":"だれでもせいそうかつどうにさんかできます。","mp3":"br_s24_everyone_can_participate_in_the_cleanup_activity.mp3"},
+    {"n":25,"en":"We went hiking even though the path was wet.","jp":"道がぬれていましたが、私たちはハイキングに行きました。","hira":"みちがぬれていましたが、わたしたちははいきんぐにいきました。","mp3":"br_s25_we_went_hiking_even_though_the_path_was_wet.mp3"},
+    {"n":26,"en":"Camping is more comfortable when you prepare carefully.","jp":"注意深く準備すれば、キャンプはもっと快適です。","hira":"ちゅういぶかくじゅんびすれば、きゃんぷはもっとかいてきです。","mp3":"br_s26_camping_is_more_comfortable_when_you_prepare_carefully.mp3"},
+    {"n":27,"en":"We had a picnic beside the river on a sunny day.","jp":"晴れた日に川のそばでピクニックをしました。","hira":"はれたひにかわのそばでぴくにっくをしました。","mp3":"br_s27_we_had_a_picnic_beside_the_river_on_a_sunny_day.mp3"},
+    {"n":28,"en":"Some birds migrate to warmer places before winter.","jp":"冬の前に暖かい場所へ移動する鳥もいます。","hira":"ふゆのまえにあたたかいばしょへいどうするとりもいます。","mp3":"br_s28_some_birds_migrate_to_warmer_places_before_winter.mp3"},
+    {"n":29,"en":"Regular exercise helps me stay active in cooler weather.","jp":"定期的な運動は、涼しい時期にも活動的でいるのに役立ちます。","hira":"ていきてきなうんどうは、すずしいじきにもかつどうてきでいるのにやくだちます。","mp3":"br_s29_regular_exercise_helps_me_stay_active_in_cooler_weather.mp3"},
+    {"n":30,"en":"It is useful to wear layers when the temperature changes.","jp":"気温が変わるときは、重ね着をすると便利です。","hira":"きおんがかわるときは、かさねぎをするとべんりです。","mp3":"br_s30_it_is_useful_to_wear_layers_when_the_temperature_changes.mp3"},
+    {"n":31,"en":"I keep a sweater in my bag in case it gets cold.","jp":"寒くなった場合に備えて、かばんにセーターを入れています。","hira":"さむくなったばあいにそなえて、かばんにせーたーをいれています。","mp3":"br_s31_i_keep_a_sweater_in_my_bag_in_case_it_gets_cold.mp3"},
+    {"n":32,"en":"We need to prepare the garden for winter.","jp":"冬に備えて庭を準備する必要があります。","hira":"ふゆにそなえてにわをじゅんびするひつようがあります。","mp3":"br_s32_we_need_to_prepare_the_garden_for_winter.mp3"},
+    {"n":33,"en":"My autumn routine includes taking a walk after dinner.","jp":"私の秋の習慣には、夕食後に散歩することが含まれます。","hira":"わたしのあきのしゅうかんには、ゆうしょくごにさんぽすることがふくまれます。","mp3":"br_s33_my_autumn_routine_includes_taking_a_walk_after_dinner.mp3"},
+    {"n":34,"en":"I have a happy memory of collecting leaves with my friends.","jp":"友達と葉を集めた楽しい思い出があります。","hira":"ともだちとはをあつめたたのしいおもいでがあります。","mp3":"br_s34_i_have_a_happy_memory_of_collecting_leaves_with_my_friends.mp3"},
+    {"n":35,"en":"Reading a book at home feels cozy on a rainy day.","jp":"雨の日に家で本を読むのは居心地がよいです。","hira":"あめのひにいえでほんをよむのはいごこちがよいです。","mp3":"br_s35_reading_a_book_at_home_feels_cozy_on_a_rainy_day.mp3"},
+    {"n":36,"en":"I relax by listening to music in the evening.","jp":"夜は音楽を聞いてくつろぎます。","hira":"よるはおんがくをきいてくつろぎます。","mp3":"br_s36_i_relax_by_listening_to_music_in_the_evening.mp3"},
+    {"n":37,"en":"The days become shorter as autumn continues.","jp":"秋が進むにつれて日が短くなります。","hira":"あきがすすむにつれてひがみじかくなります。","mp3":"br_s37_the_days_become_shorter_as_autumn_continues.mp3"},
+    {"n":38,"en":"We turned on the heating for the first time this year.","jp":"今年初めて暖房をつけました。","hira":"ことしはじめてだんぼうをつけました。","mp3":"br_s38_we_turned_on_the_heating_for_the_first_time_this_year.mp3"},
+    {"n":39,"en":"The autumn equinox is a national holiday in Japan.","jp":"秋分の日は日本の国民の祝日です。","hira":"しゅうぶんのひはにほんのこくみんのしゅくじつです。","mp3":"br_s39_the_autumn_equinox_is_a_national_holiday_in_japan.mp3"},
+    {"n":40,"en":"Many people enjoy moon viewing in autumn.","jp":"多くの人が秋に月見を楽しみます。","hira":"おおくのひとがあきにつきみをたのしみます。","mp3":"br_s40_many_people_enjoy_moon_viewing_in_autumn.mp3"},
+    {"n":41,"en":"I would recommend this seasonal dish to a visitor.","jp":"私はこの季節の料理を訪問者におすすめします。","hira":"わたしはこのきせつのりょうりをほうもんしゃにおすすめします。","mp3":"br_s41_i_would_recommend_this_seasonal_dish_to_a_visitor.mp3"},
+    {"n":42,"en":"Trying local food is a good way to experience a culture.","jp":"地元の食べ物を試すことは、文化を体験するよい方法です。","hira":"じもとのたべものをためすことは、ぶんかをたいけんするよいほうほうです。","mp3":"br_s42_trying_local_food_is_a_good_way_to_experience_a_culture.mp3"},
+    {"n":43,"en":"I look forward to the school festival every October.","jp":"私は毎年10月の学校祭を楽しみにしています。","hira":"わたしはまいとしじゅうがつのがっこうさいをたのしみにしています。","mp3":"br_s43_i_look_forward_to_the_school_festival_every_october.mp3"},
+    {"n":44,"en":"We are planning a short trip during the autumn break.","jp":"秋休みに短い旅行を計画しています。","hira":"あきやすみにみじかいりょこうをけいかくしています。","mp3":"br_s44_we_are_planning_a_short_trip_during_the_autumn_break.mp3"},
+    {"n":45,"en":"The park is less crowded on a cloudy weekday.","jp":"曇りの平日は公園があまり混んでいません。","hira":"くもりのへいじつはこうえんがあまりこんでいません。","mp3":"br_s45_the_park_is_less_crowded_on_a_cloudy_weekday.mp3"},
+    {"n":46,"en":"Please bring warm clothes if you join the evening event.","jp":"夜の行事に参加するなら、暖かい服を持ってきてください。","hira":"よるのぎょうじにさんかするなら、あたたかいふくをもってきてください。","mp3":"br_s46_please_bring_warm_clothes_if_you_join_the_evening_event.mp3"},
+    {"n":47,"en":"A long weekend is a good time to visit relatives.","jp":"連休は親戚を訪ねるのによい時期です。","hira":"れんきゅうはしんせきをたずねるのによいじきです。","mp3":"br_s47_a_long_weekend_is_a_good_time_to_visit_relatives.mp3"},
+    {"n":48,"en":"We made a plan in case the outdoor event was canceled.","jp":"屋外行事が中止になった場合に備えて計画を立てました。","hira":"おくがいぎょうじがちゅうしになったばあいにそなえてけいかくをたてました。","mp3":"br_s48_we_made_a_plan_in_case_the_outdoor_event_was_canceled.mp3"},
+    {"n":49,"en":"The cool air makes it easier to sleep at night.","jp":"涼しい空気のおかげで夜は眠りやすいです。","hira":"すずしいくうきのおかげでよるはねむりやすいです。","mp3":"br_s49_the_cool_air_makes_it_easier_to_sleep_at_night.mp3"},
+    {"n":50,"en":"Our teacher asked us to write about an autumn memory.","jp":"先生は秋の思い出について書くよう私たちに頼みました。","hira":"せんせいはあきのおもいでについてかくようわたしたちにたのみました。","mp3":"br_s50_our_teacher_asked_us_to_write_about_an_autumn_memory.mp3"},
+    {"n":51,"en":"The forest path was covered with colorful leaves.","jp":"森の小道は色とりどりの葉でおおわれていました。","hira":"もりのこみちはいろとりどりのはでおおわれていました。","mp3":"br_s51_the_forest_path_was_covered_with_colorful_leaves.mp3"},
+    {"n":52,"en":"I prefer hot tea to cold drinks in autumn.","jp":"秋には冷たい飲み物より温かいお茶が好きです。","hira":"あきにはつめたいのみものよりあたたかいおちゃがすきです。","mp3":"br_s52_i_prefer_hot_tea_to_cold_drinks_in_autumn.mp3"},
+    {"n":53,"en":"We learned how different countries celebrate the harvest.","jp":"国によって収穫の祝い方が違うことを学びました。","hira":"くにによってしゅうかくのいわいかたがちがうことをまなびました。","mp3":"br_s53_we_learned_how_different_countries_celebrate_the_harvest.mp3"},
+    {"n":54,"en":"My brother takes photos of the changing leaves every year.","jp":"兄は毎年紅葉の写真を撮ります。","hira":"あにはまいとしこうようのしゃしんをとります。","mp3":"br_s54_my_brother_takes_photos_of_the_changing_leaves_every_year.mp3"},
+    {"n":55,"en":"The festival was crowded, but everyone was friendly.","jp":"祭りは混んでいましたが、みんな親切でした。","hira":"まつりはこんでいましたが、みんなしんせつでした。","mp3":"br_s55_the_festival_was_crowded_but_everyone_was_friendly.mp3"},
+    {"n":56,"en":"I want to try a new recipe with autumn vegetables.","jp":"秋の野菜を使った新しいレシピを試したいです。","hira":"あきのやさいをつかったあたらしいれしぴをためしたいです。","mp3":"br_s56_i_want_to_try_a_new_recipe_with_autumn_vegetables.mp3"},
+    {"n":57,"en":"We can enjoy the outdoors without traveling far from home.","jp":"家から遠くへ行かなくても屋外を楽しめます。","hira":"いえからとおくへいかなくてもおくがいをたのしめます。","mp3":"br_s57_we_can_enjoy_the_outdoors_without_traveling_far_from_home.mp3"},
+    {"n":58,"en":"The cold weather reminds us that winter is near.","jp":"寒い天気は冬が近いことを思い出させます。","hira":"さむいてんきはふゆがちかいことをおもいださせます。","mp3":"br_s58_the_cold_weather_reminds_us_that_winter_is_near.mp3"},
+    {"n":59,"en":"I will share my favorite autumn activity with the class.","jp":"好きな秋の活動をクラスで紹介します。","hira":"すきなあきのかつどうをくらすでしょうかいします。","mp3":"br_s59_i_will_share_my_favorite_autumn_activity_with_the_class.mp3"},
+    {"n":60,"en":"Autumn gives us many reasons to spend time with family and friends.","jp":"秋には家族や友達と過ごす理由がたくさんあります。","hira":"あきにはかぞくやともだちとすごすりゆうがたくさんあります。","mp3":"br_s60_autumn_gives_us_many_reasons_to_spend_time_with_family_and_friends.mp3"}
   ]
 }
