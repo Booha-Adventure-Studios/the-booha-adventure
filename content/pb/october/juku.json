@@ -5,157 +5,781 @@
     {
       "week": 1,
       "passage": {
-        "text": "Booha goes to the station. He sees a car, a bus, and a taxi on the street. A bicycle and a motorcycle stop near the bus stop. A truck is big, but the police car is fast. An ambulance and a fire engine go past with loud sounds. At the station, Booha gets on a train. Later, he sees a boat on the river and an airplane in the sky.",
+        "text": "Today, Booha and Nuppi learn about “car.” They look at “bus” and “train.” The teacher shows “subway” and “bicycle.” Booha talks about “motorcycle.” They learn together.",
         "comprehension": [
-          { "n": 1, "q": "Where does Booha go?", "choices": ["to the station", "to the river", "to the airport", "to the fire station"], "correct": 0 },
-          { "n": 2, "q": "What is big?", "choices": ["the taxi", "the truck", "the bicycle", "the boat"], "correct": 1 },
-          { "n": 3, "q": "What does Booha see in the sky?", "choices": ["a train", "a bus", "an airplane", "a motorcycle"], "correct": 2 }
+          {
+            "n": 1,
+            "q": "What do Booha and Nuppi learn about?",
+            "choices": [
+              "car",
+              "bus",
+              "train",
+              "subway"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "What does the teacher show?",
+            "choices": [
+              "subway",
+              "car",
+              "bus",
+              "train"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "What does Booha talk about?",
+            "choices": [
+              "motorcycle",
+              "train",
+              "subway",
+              "bicycle"
+            ],
+            "correct": 0
+          }
         ]
       },
       "definitions": [
-        { "n": 1, "def": "a small road vehicle for a few people", "pos": "noun" },
-        { "n": 2, "def": "a large road vehicle that carries many people", "pos": "noun" },
-        { "n": 3, "def": "a group of cars that travels on railway tracks", "pos": "noun" },
-        { "n": 4, "def": "an underground train in a city", "pos": "noun" },
-        { "n": 5, "def": "a two-wheeled vehicle moved by pedals", "pos": "noun" },
-        { "n": 6, "def": "a two-wheeled vehicle with a motor", "pos": "noun" },
-        { "n": 7, "def": "a car with a driver that you pay for a ride", "pos": "noun" },
-        { "n": 8, "def": "a vehicle that travels on water", "pos": "noun" },
-        { "n": 9, "def": "a flying vehicle with wings", "pos": "noun" },
-        { "n": 10, "def": "a large road vehicle that carries heavy things", "pos": "noun" },
-        { "n": 11, "def": "a vehicle that takes sick or hurt people to a hospital", "pos": "noun" },
-        { "n": 12, "def": "a car used by police officers", "pos": "noun" },
-        { "n": 13, "def": "a large vehicle used by firefighters", "pos": "noun" },
-        { "n": 14, "def": "a place where trains arrive and leave", "pos": "noun" },
-        { "n": 15, "def": "a marked place where people wait for a bus", "pos": "noun" }
+        {
+          "n": 1,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 2,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 3,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 4,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 5,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 6,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 7,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 8,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 9,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 10,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 11,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 12,
+          "def": "a word from this lesson",
+          "pos": "phrase"
+        },
+        {
+          "n": 13,
+          "def": "a word from this lesson",
+          "pos": "phrase"
+        },
+        {
+          "n": 14,
+          "def": "a place",
+          "pos": "noun"
+        },
+        {
+          "n": 15,
+          "def": "a word from this lesson",
+          "pos": "phrase"
+        }
       ],
       "questions": [
-        { "n": 1, "type": "read", "text": "Nuppi rides her bicycle to the station and takes a train from there.", "q": "What does Nuppi ride first?", "choices": ["a train", "a bicycle", "a taxi", "a boat"], "correct": 1 },
-        { "n": 2, "type": "read", "text": "The police car stops, and the ambulance goes quickly to the hospital.", "q": "Which vehicle goes to the hospital?", "choices": ["the bus", "the truck", "the ambulance", "the fire engine"], "correct": 2 },
-        { "n": 3, "type": "read", "text": "The bus is at the bus stop, but the taxi is across the street.", "q": "Where is the bus?", "choices": ["at the bus stop", "at the station", "across the river", "in the sky"], "correct": 0 },
-        { "n": 4, "type": "translate", "jp": "これ は くるま です", "en": "This is a car", "extra": ["bus", "these"] },
-        { "n": 5, "type": "translate", "jp": "わたし は じてんしゃ に のります", "en": "I ride my bicycle", "extra": ["train", "rides"] },
-        { "n": 6, "type": "translate", "jp": "とらっく は おおきい です", "en": "The truck is big", "extra": ["small", "are"] },
-        { "n": 7, "type": "write", "jp": "くるま", "en": "car" },
-        { "n": 8, "type": "write", "jp": "ばす", "en": "bus" },
-        { "n": 9, "type": "write", "jp": "でんしゃ", "en": "train" }
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Booha reads the word “taxi.”",
+          "q": "What word does Booha read?",
+          "choices": [
+            "taxi",
+            "boat",
+            "airplane",
+            "truck"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "Nuppi talks about “boat.”",
+          "q": "What does Nuppi talk about?",
+          "choices": [
+            "boat",
+            "taxi",
+            "airplane",
+            "truck"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "The class talks about “airplane.”",
+          "q": "What does the class talk about?",
+          "choices": [
+            "airplane",
+            "taxi",
+            "boat",
+            "truck"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "これは車です。",
+          "en": "This is a car"
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "私はバスで行きます。",
+          "en": "I go by bus"
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "私は電車に乗ります。",
+          "en": "I take the train"
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "くるま",
+          "en": "car"
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "ばす",
+          "en": "bus"
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "でんしゃ",
+          "en": "train"
+        }
       ]
     },
     {
       "week": 2,
       "passage": {
-        "text": "Mimo has a map, but he does not know the way. Booha says, “Go straight on this street. Turn right at the corner and walk to the traffic light. Use the crosswalk there. The station is near the park and next to a shop. It is between the bank and the bus stop.” Mimo follows the directions. The station is not far, and he gets there in five minutes.",
+        "text": "Today, Booha and Nuppi learn about “street.” They look at “map” and “left.” The teacher shows “right” and “straight.” Booha talks about “corner.” They learn together.",
         "comprehension": [
-          { "n": 1, "q": "Where should Mimo turn right?", "choices": ["at the corner", "at the station", "at the park", "at the bus stop"], "correct": 0 },
-          { "n": 2, "q": "What should Mimo use to cross the street?", "choices": ["the map", "the crosswalk", "the bus stop", "the corner"], "correct": 1 },
-          { "n": 3, "q": "How long does the walk take?", "choices": ["two minutes", "five minutes", "ten minutes", "twenty minutes"], "correct": 1 }
+          {
+            "n": 1,
+            "q": "What do Booha and Nuppi learn about?",
+            "choices": [
+              "street",
+              "map",
+              "left",
+              "right"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "What does the teacher show?",
+            "choices": [
+              "right",
+              "street",
+              "map",
+              "left"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "What does Booha talk about?",
+            "choices": [
+              "corner",
+              "left",
+              "right",
+              "straight"
+            ],
+            "correct": 0
+          }
         ]
       },
       "definitions": [
-        { "n": 16, "def": "a road in a town or city", "pos": "noun" },
-        { "n": 17, "def": "a picture that shows where places and roads are", "pos": "noun" },
-        { "n": 18, "def": "the direction opposite right", "pos": "noun" },
-        { "n": 19, "def": "the direction opposite left", "pos": "noun" },
-        { "n": 20, "def": "forward without turning", "pos": "adverb" },
-        { "n": 21, "def": "the place where two streets or sides meet", "pos": "noun" },
-        { "n": 22, "def": "colored lights that tell road traffic when to stop or go", "pos": "noun" },
-        { "n": 23, "def": "a marked place where people walk across a road", "pos": "noun" },
-        { "n": 24, "def": "a place where two or more roads cross", "pos": "noun" },
-        { "n": 25, "def": "not a long distance away", "pos": "adjective" },
-        { "n": 26, "def": "a long distance away", "pos": "adjective" },
-        { "n": 27, "def": "at the side of and close to something", "pos": "phrase" },
-        { "n": 28, "def": "in the space separating two things", "pos": "preposition" },
-        { "n": 29, "def": "on the other side from something", "pos": "phrase" },
-        { "n": 30, "def": "units used to measure short amounts of time", "pos": "noun" }
+        {
+          "n": 16,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 17,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 18,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 19,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 20,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 21,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 22,
+          "def": "a word from this lesson",
+          "pos": "phrase"
+        },
+        {
+          "n": 23,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 24,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 25,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 26,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 27,
+          "def": "a word from this lesson",
+          "pos": "phrase"
+        },
+        {
+          "n": 28,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 29,
+          "def": "a word from this lesson",
+          "pos": "phrase"
+        },
+        {
+          "n": 30,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        }
       ],
       "questions": [
-        { "n": 1, "type": "read", "text": "Turn left at the traffic light, then go straight to the station.", "q": "What should you do first?", "choices": ["go to the station", "turn left", "cross the park", "turn right"], "correct": 1 },
-        { "n": 2, "type": "read", "text": "The bank is between the shop and the park.", "q": "What is in the middle?", "choices": ["the shop", "the park", "the bank", "the street"], "correct": 2 },
-        { "n": 3, "type": "read", "text": "The bus stop is near, but the train station is far.", "q": "Which place is near?", "choices": ["the bus stop", "the station", "both places", "neither place"], "correct": 0 },
-        { "n": 4, "type": "translate", "jp": "この とおり は こんで います", "en": "This street is busy", "extra": ["quiet", "are"] },
-        { "n": 5, "type": "translate", "jp": "まっすぐ すすんで ください", "en": "Go straight", "extra": ["left", "goes"] },
-        { "n": 6, "type": "translate", "jp": "えき は ちかい です", "en": "The station is near", "extra": ["far", "are"] },
-        { "n": 7, "type": "write", "jp": "みぎ", "en": "right" },
-        { "n": 8, "type": "write", "jp": "かど", "en": "corner" },
-        { "n": 9, "type": "write", "jp": "ちかい", "en": "near" }
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Booha reads the word “traffic light.”",
+          "q": "What word does Booha read?",
+          "choices": [
+            "traffic light",
+            "crosswalk",
+            "intersection",
+            "near"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "Nuppi talks about “crosswalk.”",
+          "q": "What does Nuppi talk about?",
+          "choices": [
+            "crosswalk",
+            "traffic light",
+            "intersection",
+            "near"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "The class talks about “intersection.”",
+          "q": "What does the class talk about?",
+          "choices": [
+            "intersection",
+            "traffic light",
+            "crosswalk",
+            "near"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "この通りは混んでいます。",
+          "en": "This street is busy"
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "私は地図を持っています。",
+          "en": "I have a map"
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "ここで左に曲がってください。",
+          "en": "Turn left here"
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "とおり",
+          "en": "street"
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "ちず",
+          "en": "map"
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "ひだり",
+          "en": "left"
+        }
       ]
     },
     {
       "week": 3,
       "passage": {
-        "text": "Booha learns how to travel safely. In a car, he wears a seat belt. On a bicycle, he wears a helmet and rides on the road, not the sidewalk. At a crosswalk, he watches for pedestrians. At the station, he stands behind the yellow line and holds the handrail on the stairs. He reads every danger sign and knows where the first aid kit is. Booha carries his ID and knows the emergency number if he needs help.",
+        "text": "Today, Booha and Nuppi learn about “seat belt.” They look at “helmet” and “sidewalk.” The teacher shows “pedestrian” and “yellow line.” Booha talks about “priority seat.” They learn together.",
         "comprehension": [
-          { "n": 1, "q": "What does Booha wear on a bicycle?", "choices": ["a seat belt", "a helmet", "an ID card", "a yellow line"], "correct": 1 },
-          { "n": 2, "q": "Where does Booha stand at the station?", "choices": ["on the yellow line", "behind the yellow line", "on a priority seat", "in the road"], "correct": 1 },
-          { "n": 3, "q": "What number does Booha know?", "choices": ["the bus number", "the platform number", "the emergency number", "the ticket number"], "correct": 2 }
+          {
+            "n": 1,
+            "q": "What do Booha and Nuppi learn about?",
+            "choices": [
+              "seat belt",
+              "helmet",
+              "sidewalk",
+              "pedestrian"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "What does the teacher show?",
+            "choices": [
+              "pedestrian",
+              "seat belt",
+              "helmet",
+              "sidewalk"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "What does Booha talk about?",
+            "choices": [
+              "priority seat",
+              "sidewalk",
+              "pedestrian",
+              "yellow line"
+            ],
+            "correct": 0
+          }
         ]
       },
       "definitions": [
-        { "n": 31, "def": "a safety strap worn in a car", "pos": "noun" },
-        { "n": 32, "def": "a hard covering that protects your head", "pos": "noun" },
-        { "n": 33, "def": "a path at the side of a road for people walking", "pos": "noun" },
-        { "n": 34, "def": "a person who is walking near a road", "pos": "noun" },
-        { "n": 35, "def": "a colored line at a station that people must stand behind", "pos": "noun" },
-        { "n": 36, "def": "a special seat for a person who needs it more", "pos": "noun" },
-        { "n": 37, "def": "a bar that you hold to keep your balance", "pos": "noun" },
-        { "n": 38, "def": "a small control that you press", "pos": "noun" },
-        { "n": 39, "def": "something that may hurt a person", "pos": "noun" },
-        { "n": 40, "def": "protected from danger or harm", "pos": "adjective" },
-        { "n": 41, "def": "a notice that gives information or a warning", "pos": "noun" },
-        { "n": 42, "def": "a box with simple medical supplies", "pos": "noun" },
-        { "n": 43, "def": "a card or paper that shows who you are", "pos": "noun" },
-        { "n": 44, "def": "a serious and dangerous situation that needs quick action", "pos": "noun" },
-        { "n": 45, "def": "to make things easier or safer for someone", "pos": "verb" }
+        {
+          "n": 31,
+          "def": "a word from this lesson",
+          "pos": "phrase"
+        },
+        {
+          "n": 32,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 33,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 34,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 35,
+          "def": "a word from this lesson",
+          "pos": "phrase"
+        },
+        {
+          "n": 36,
+          "def": "a word from this lesson",
+          "pos": "phrase"
+        },
+        {
+          "n": 37,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 38,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 39,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 40,
+          "def": "a word that describes a person or thing",
+          "pos": "adjective"
+        },
+        {
+          "n": 41,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 42,
+          "def": "a word from this lesson",
+          "pos": "phrase"
+        },
+        {
+          "n": 43,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 44,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 45,
+          "def": "an action word",
+          "pos": "verb"
+        }
       ],
       "questions": [
-        { "n": 1, "type": "read", "text": "Nuppi sees a danger sign, so she stops before the broken sidewalk.", "q": "Why does Nuppi stop?", "choices": ["She sees a danger sign", "She needs a ticket", "Her helmet is new", "The road is safe"], "correct": 0 },
-        { "n": 2, "type": "read", "text": "Mimo gives his ID to the station worker and asks for help.", "q": "Who helps Mimo?", "choices": ["a pedestrian", "the station worker", "a driver", "a lifeguard"], "correct": 1 },
-        { "n": 3, "type": "read", "text": "The priority seat is open, so the older passenger can sit down safely.", "q": "Who uses the seat?", "choices": ["the driver", "the older passenger", "Booha", "the station worker"], "correct": 1 },
-        { "n": 4, "type": "translate", "jp": "しーとべると を して ください", "en": "Wear your seat belt", "extra": ["helmet", "wears"] },
-        { "n": 5, "type": "translate", "jp": "きいろい せん の うしろ に たって ください", "en": "Stand behind the yellow line", "extra": ["front", "sit"] },
-        { "n": 6, "type": "translate", "jp": "この みち は あんぜん です", "en": "This road is safe", "extra": ["danger", "are"] },
-        { "n": 7, "type": "write", "jp": "へるめっと", "en": "helmet" },
-        { "n": 8, "type": "write", "jp": "きけん", "en": "danger" },
-        { "n": 9, "type": "write", "jp": "あんぜん", "en": "safe" }
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Booha reads the word “handrail.”",
+          "q": "What word does Booha read?",
+          "choices": [
+            "handrail",
+            "button",
+            "danger",
+            "safe"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "Nuppi talks about “button.”",
+          "q": "What does Nuppi talk about?",
+          "choices": [
+            "button",
+            "handrail",
+            "danger",
+            "safe"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "The class talks about “danger.”",
+          "q": "What does the class talk about?",
+          "choices": [
+            "danger",
+            "handrail",
+            "button",
+            "safe"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "シートベルトをしてください。",
+          "en": "Wear your seat belt"
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "ヘルメットをかぶってください。",
+          "en": "Wear a helmet"
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "歩道を歩いてください。",
+          "en": "Walk on the sidewalk"
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "しーとべると",
+          "en": "seat belt"
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "へるめっと",
+          "en": "helmet"
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "ほどう",
+          "en": "sidewalk"
+        }
       ]
     },
     {
       "week": 4,
       "passage": {
-        "text": "Booha takes a train to the last station. He buys a round-trip ticket from the ticket machine and puts money on his IC card. The timetable shows a local train and an express train. Booha waits on platform three. He must transfer once, but an announcement says there is a delay. The departure is ten minutes late. When he finally arrives at the terminal, he checks the arrival time and keeps his ticket.",
+        "text": "Today, Booha and Nuppi learn about “ticket.” They look at “fare” and “one-way.” The teacher shows “round-trip” and “ticket machine.” Booha talks about “IC card.” They learn together.",
         "comprehension": [
-          { "n": 1, "q": "Where does Booha buy his ticket?", "choices": ["from the ticket machine", "on the platform", "at the terminal", "on the train"], "correct": 0 },
-          { "n": 2, "q": "Which platform does Booha use?", "choices": ["platform one", "platform two", "platform three", "platform four"], "correct": 2 },
-          { "n": 3, "q": "How late is the departure?", "choices": ["five minutes", "ten minutes", "fifteen minutes", "twenty minutes"], "correct": 1 }
+          {
+            "n": 1,
+            "q": "What do Booha and Nuppi learn about?",
+            "choices": [
+              "ticket",
+              "fare",
+              "one-way",
+              "round-trip"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "What does the teacher show?",
+            "choices": [
+              "round-trip",
+              "ticket",
+              "fare",
+              "one-way"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "What does Booha talk about?",
+            "choices": [
+              "IC card",
+              "one-way",
+              "round-trip",
+              "ticket machine"
+            ],
+            "correct": 0
+          }
         ]
       },
       "definitions": [
-        { "n": 46, "def": "a paper or digital pass needed for a journey", "pos": "noun" },
-        { "n": 47, "def": "the money paid for a ride", "pos": "noun" },
-        { "n": 48, "def": "travel in one direction only", "pos": "adjective" },
-        { "n": 49, "def": "travel to a place and back again", "pos": "adjective" },
-        { "n": 50, "def": "a machine used to buy travel tickets", "pos": "noun" },
-        { "n": 51, "def": "an electronic card used to pay a train or bus fare", "pos": "noun" },
-        { "n": 52, "def": "a chart showing the times of trains or buses", "pos": "noun" },
-        { "n": 53, "def": "a train that stops at every station", "pos": "noun" },
-        { "n": 54, "def": "a fast train that does not stop at every station", "pos": "noun" },
-        { "n": 55, "def": "to change from one train or bus to another", "pos": "verb" },
-        { "n": 56, "def": "the place beside the railway track where people wait", "pos": "noun" },
-        { "n": 57, "def": "the act or time of leaving a place", "pos": "noun" },
-        { "n": 58, "def": "the act or time of reaching a place", "pos": "noun" },
-        { "n": 59, "def": "a situation in which something happens later than planned", "pos": "noun" },
-        { "n": 60, "def": "the final station on a train or bus route", "pos": "noun" }
+        {
+          "n": 46,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 47,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 48,
+          "def": "a word from this lesson",
+          "pos": "phrase"
+        },
+        {
+          "n": 49,
+          "def": "a word from this lesson",
+          "pos": "phrase"
+        },
+        {
+          "n": 50,
+          "def": "a word from this lesson",
+          "pos": "phrase"
+        },
+        {
+          "n": 51,
+          "def": "a word from this lesson",
+          "pos": "phrase"
+        },
+        {
+          "n": 52,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 53,
+          "def": "a word from this lesson",
+          "pos": "phrase"
+        },
+        {
+          "n": 54,
+          "def": "a word from this lesson",
+          "pos": "phrase"
+        },
+        {
+          "n": 55,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 56,
+          "def": "a place",
+          "pos": "noun"
+        },
+        {
+          "n": 57,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 58,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 59,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 60,
+          "def": "a place",
+          "pos": "noun"
+        }
       ],
       "questions": [
-        { "n": 1, "type": "read", "text": "The local train leaves now, but the express train has a fifteen-minute delay.", "q": "Which train can leave now?", "choices": ["the local train", "the express train", "both trains", "neither train"], "correct": 0 },
-        { "n": 2, "type": "read", "text": "Nuppi needs to come home tonight, so she buys a round-trip ticket.", "q": "Why does Nuppi buy a round-trip ticket?", "choices": ["She will come home", "The train is late", "She lost her IC card", "The platform is closed"], "correct": 0 },
-        { "n": 3, "type": "read", "text": "Booha gets off the first train and transfers to another train on platform two.", "q": "What does Booha do?", "choices": ["He buys a bicycle", "He changes trains", "He misses the terminal", "He makes an announcement"], "correct": 1 },
-        { "n": 4, "type": "translate", "jp": "きっぷ が ひつよう です", "en": "I need a ticket", "extra": ["fare", "needs"] },
-        { "n": 5, "type": "translate", "jp": "けんばいき を つかって ください", "en": "Use the ticket machine", "extra": ["card", "uses"] },
-        { "n": 6, "type": "translate", "jp": "とうきょう えき で のりかえます", "en": "I transfer at Tokyo Station", "extra": ["Osaka", "transfers"] },
-        { "n": 7, "type": "write", "jp": "きっぷ", "en": "ticket" },
-        { "n": 8, "type": "write", "jp": "のりかえ", "en": "transfer" },
-        { "n": 9, "type": "write", "jp": "おくれ", "en": "delay" }
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Booha reads the word “timetable.”",
+          "q": "What word does Booha read?",
+          "choices": [
+            "timetable",
+            "local train",
+            "express train",
+            "transfer"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "Nuppi talks about “local train.”",
+          "q": "What does Nuppi talk about?",
+          "choices": [
+            "local train",
+            "timetable",
+            "express train",
+            "transfer"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "The class talks about “express train.”",
+          "q": "What does the class talk about?",
+          "choices": [
+            "express train",
+            "timetable",
+            "local train",
+            "transfer"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "切符が必要です。",
+          "en": "I need a ticket"
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "運賃は500円です。",
+          "en": "The fare is five hundred yen"
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "片道切符がほしいです。",
+          "en": "I want a one-way ticket"
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "きっぷ",
+          "en": "ticket"
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "うんちん",
+          "en": "fare"
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "かたみち",
+          "en": "one-way"
+        }
       ]
     }
   ]

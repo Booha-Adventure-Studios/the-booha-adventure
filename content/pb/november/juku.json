@@ -5,157 +5,781 @@
     {
       "week": 1,
       "passage": {
-        "text": "Booha visits Nuppi's new home. It is an apartment on the second floor. They take off their shoes at the entrance. The living room has a balcony, and the dining room is next to the kitchen. Nuppi's bedroom and the bathroom are down the hall. From the balcony, Booha can see a house with a yard and garden. He likes the apartment because every room feels warm and bright.",
+        "text": "Today, Booha and Nuppi learn about “house.” They look at “apartment” and “home.” The teacher shows “room” and “living room.” Booha talks about “dining room.” They learn together.",
         "comprehension": [
-          { "n": 1, "q": "Which floor is Nuppi's apartment on?", "choices": ["the first floor", "the second floor", "the third floor", "the fourth floor"], "correct": 1 },
-          { "n": 2, "q": "Where do they take off their shoes?", "choices": ["in the kitchen", "at the entrance", "on the balcony", "in the bedroom"], "correct": 1 },
-          { "n": 3, "q": "What can Booha see from the balcony?", "choices": ["a school", "a station", "a house with a yard and garden", "another bedroom"], "correct": 2 }
+          {
+            "n": 1,
+            "q": "What do Booha and Nuppi learn about?",
+            "choices": [
+              "house",
+              "apartment",
+              "home",
+              "room"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "What does the teacher show?",
+            "choices": [
+              "room",
+              "house",
+              "apartment",
+              "home"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "What does Booha talk about?",
+            "choices": [
+              "dining room",
+              "home",
+              "room",
+              "living room"
+            ],
+            "correct": 0
+          }
         ]
       },
       "definitions": [
-        { "n": 1, "def": "a building where one family lives", "pos": "noun" },
-        { "n": 2, "def": "a home made of rooms inside a larger building", "pos": "noun" },
-        { "n": 3, "def": "the place where a person or family lives", "pos": "noun" },
-        { "n": 4, "def": "one separate space inside a building", "pos": "noun" },
-        { "n": 5, "def": "a room where people relax and watch TV", "pos": "noun" },
-        { "n": 6, "def": "a room where people sit and eat meals", "pos": "noun" },
-        { "n": 7, "def": "a room where food is cooked", "pos": "noun" },
-        { "n": 8, "def": "a room where a person sleeps", "pos": "noun" },
-        { "n": 9, "def": "a room with a bath or shower", "pos": "noun" },
-        { "n": 10, "def": "the place where people go into a building", "pos": "noun" },
-        { "n": 11, "def": "an outdoor platform on an upper floor", "pos": "noun" },
-        { "n": 12, "def": "an outdoor area beside a house", "pos": "noun" },
-        { "n": 13, "def": "a place where flowers, vegetables, or other plants grow", "pos": "noun" },
-        { "n": 14, "def": "the lowest level of a building", "pos": "noun" },
-        { "n": 15, "def": "the level of a building above the first floor", "pos": "noun" }
+        {
+          "n": 1,
+          "def": "a place",
+          "pos": "noun"
+        },
+        {
+          "n": 2,
+          "def": "a place",
+          "pos": "noun"
+        },
+        {
+          "n": 3,
+          "def": "a place",
+          "pos": "noun"
+        },
+        {
+          "n": 4,
+          "def": "a place",
+          "pos": "noun"
+        },
+        {
+          "n": 5,
+          "def": "a place",
+          "pos": "phrase"
+        },
+        {
+          "n": 6,
+          "def": "a place",
+          "pos": "phrase"
+        },
+        {
+          "n": 7,
+          "def": "a place",
+          "pos": "noun"
+        },
+        {
+          "n": 8,
+          "def": "a place",
+          "pos": "noun"
+        },
+        {
+          "n": 9,
+          "def": "a place",
+          "pos": "noun"
+        },
+        {
+          "n": 10,
+          "def": "a place",
+          "pos": "noun"
+        },
+        {
+          "n": 11,
+          "def": "a place",
+          "pos": "noun"
+        },
+        {
+          "n": 12,
+          "def": "a place",
+          "pos": "noun"
+        },
+        {
+          "n": 13,
+          "def": "a place",
+          "pos": "noun"
+        },
+        {
+          "n": 14,
+          "def": "a place",
+          "pos": "phrase"
+        },
+        {
+          "n": 15,
+          "def": "a place",
+          "pos": "phrase"
+        }
       ],
       "questions": [
-        { "n": 1, "type": "read", "text": "The kitchen is on the first floor, but the bedrooms are on the second floor.", "q": "What is upstairs?", "choices": ["the kitchen", "the entrance", "the bedrooms", "the garden"], "correct": 2 },
-        { "n": 2, "type": "read", "text": "Mimo waters the flowers in the garden and then sits in the yard.", "q": "What does Mimo water?", "choices": ["the flowers", "the balcony", "the entrance", "the room"], "correct": 0 },
-        { "n": 3, "type": "read", "text": "The family eats in the dining room and watches TV in the living room.", "q": "Where does the family eat?", "choices": ["in the bathroom", "in the bedroom", "in the living room", "in the dining room"], "correct": 3 },
-        { "n": 4, "type": "translate", "jp": "これ は わたし の いえ です", "en": "This is my house", "extra": ["apartment", "these"] },
-        { "n": 5, "type": "translate", "jp": "わたしたち は りびんぐ で てれび を みます", "en": "We watch TV in the living room", "extra": ["kitchen", "watches"] },
-        { "n": 6, "type": "translate", "jp": "げんかん で くつ を ぬいで ください", "en": "Take off your shoes at the entrance", "extra": ["balcony", "takes"] },
-        { "n": 7, "type": "write", "jp": "いえ", "en": "house" },
-        { "n": 8, "type": "write", "jp": "へや", "en": "room" },
-        { "n": 9, "type": "write", "jp": "にわ", "en": "garden" }
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Booha reads the word “kitchen.”",
+          "q": "What word does Booha read?",
+          "choices": [
+            "kitchen",
+            "bedroom",
+            "bathroom",
+            "entrance"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "Nuppi talks about “bedroom.”",
+          "q": "What does Nuppi talk about?",
+          "choices": [
+            "bedroom",
+            "kitchen",
+            "bathroom",
+            "entrance"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "The class talks about “bathroom.”",
+          "q": "What does the class talk about?",
+          "choices": [
+            "bathroom",
+            "kitchen",
+            "bedroom",
+            "entrance"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "これは私の家です。",
+          "en": "This is my house"
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "私はアパートに住んでいます。",
+          "en": "I live in an apartment"
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "私は自分の住まいが好きです。",
+          "en": "I like my home"
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "いえ",
+          "en": "house"
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "あぱーと",
+          "en": "apartment"
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "すまい",
+          "en": "home"
+        }
       ]
     },
     {
       "week": 2,
       "passage": {
-        "text": "Booha cleans his room before Mimo comes. He makes the bed and puts his books on the bookshelf. A lamp and computer are on the desk. The chair is on a soft rug. Booha puts his clothes in the closet. In the kitchen, the milk is in the refrigerator, and soup is in the microwave. The washing machine is running. When Mimo arrives, they sit on the sofa and watch TV under the air conditioner.",
+        "text": "Today, Booha and Nuppi learn about “sofa.” They look at “table” and “chair.” The teacher shows “bed” and “desk.” Booha talks about “bookshelf.” They learn together.",
         "comprehension": [
-          { "n": 1, "q": "Where does Booha put his books?", "choices": ["on the bookshelf", "in the refrigerator", "under the rug", "on the bed"], "correct": 0 },
-          { "n": 2, "q": "What is in the microwave?", "choices": ["milk", "soup", "clothes", "books"], "correct": 1 },
-          { "n": 3, "q": "Where do Booha and Mimo sit?", "choices": ["on the chair", "on the desk", "on the sofa", "on the table"], "correct": 2 }
+          {
+            "n": 1,
+            "q": "What do Booha and Nuppi learn about?",
+            "choices": [
+              "sofa",
+              "table",
+              "chair",
+              "bed"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "What does the teacher show?",
+            "choices": [
+              "bed",
+              "sofa",
+              "table",
+              "chair"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "What does Booha talk about?",
+            "choices": [
+              "bookshelf",
+              "chair",
+              "bed",
+              "desk"
+            ],
+            "correct": 0
+          }
         ]
       },
       "definitions": [
-        { "n": 16, "def": "a long soft seat for several people", "pos": "noun" },
-        { "n": 17, "def": "a piece of furniture with a flat top", "pos": "noun" },
-        { "n": 18, "def": "a seat for one person", "pos": "noun" },
-        { "n": 19, "def": "a piece of furniture used for sleeping", "pos": "noun" },
-        { "n": 20, "def": "a table used for studying or working", "pos": "noun" },
-        { "n": 21, "def": "furniture with shelves for holding books", "pos": "noun" },
-        { "n": 22, "def": "a tall space with doors for keeping clothes", "pos": "noun" },
-        { "n": 23, "def": "a device that gives light", "pos": "noun" },
-        { "n": 24, "def": "a thick piece of fabric put on the floor", "pos": "noun" },
-        { "n": 25, "def": "a cold machine that keeps food fresh", "pos": "noun" },
-        { "n": 26, "def": "a machine that heats food quickly", "pos": "noun" },
-        { "n": 27, "def": "a machine that washes clothes", "pos": "noun" },
-        { "n": 28, "def": "a machine that cools the air in a room", "pos": "noun" },
-        { "n": 29, "def": "a screen used to watch shows and videos", "pos": "noun" },
-        { "n": 30, "def": "an opening in a wall that lets in light and air", "pos": "noun" }
+        {
+          "n": 16,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 17,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 18,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 19,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 20,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 21,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 22,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 23,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 24,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 25,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 26,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 27,
+          "def": "a word from this lesson",
+          "pos": "phrase"
+        },
+        {
+          "n": 28,
+          "def": "a word from this lesson",
+          "pos": "phrase"
+        },
+        {
+          "n": 29,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 30,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        }
       ],
       "questions": [
-        { "n": 1, "type": "read", "text": "The lamp is on the table, and the rug is under the chair.", "q": "What is under the chair?", "choices": ["the lamp", "the rug", "the table", "the sofa"], "correct": 1 },
-        { "n": 2, "type": "read", "text": "Nuppi takes the cold juice from the refrigerator and heats food in the microwave.", "q": "Where is the cold juice?", "choices": ["in the closet", "in the microwave", "in the refrigerator", "in the washing machine"], "correct": 2 },
-        { "n": 3, "type": "read", "text": "The air conditioner is on because the room is hot.", "q": "Why is the air conditioner on?", "choices": ["The room is hot", "The TV is new", "The window is open", "The bed is soft"], "correct": 0 },
-        { "n": 4, "type": "translate", "jp": "そふぁ は やわらかい です", "en": "The sofa is soft", "extra": ["hard", "are"] },
-        { "n": 5, "type": "translate", "jp": "わたし は つくえ で しゅくだい を します", "en": "I do my homework at my desk", "extra": ["bed", "does"] },
-        { "n": 6, "type": "translate", "jp": "ぎゅうにゅう は れいぞうこ に あります", "en": "The milk is in the refrigerator", "extra": ["microwave", "are"] },
-        { "n": 7, "type": "write", "jp": "そふぁ", "en": "sofa" },
-        { "n": 8, "type": "write", "jp": "つくえ", "en": "desk" },
-        { "n": 9, "type": "write", "jp": "まど", "en": "window" }
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Booha reads the word “closet.”",
+          "q": "What word does Booha read?",
+          "choices": [
+            "closet",
+            "lamp",
+            "rug",
+            "refrigerator"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "Nuppi talks about “lamp.”",
+          "q": "What does Nuppi talk about?",
+          "choices": [
+            "lamp",
+            "closet",
+            "rug",
+            "refrigerator"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "The class talks about “rug.”",
+          "q": "What does the class talk about?",
+          "choices": [
+            "rug",
+            "closet",
+            "lamp",
+            "refrigerator"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "ソファはやわらかいです。",
+          "en": "The sofa is soft"
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "夕食はテーブルの上にあります。",
+          "en": "Dinner is on the table"
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "いすが三脚あります。",
+          "en": "There are three chairs"
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "そふぁ",
+          "en": "sofa"
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "てーぶる",
+          "en": "table"
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "いす",
+          "en": "chair"
+        }
       ]
     },
     {
       "week": 3,
       "passage": {
-        "text": "Saturday is housework day. Booha cleans his room, sweeps the floor, and uses the vacuum. Mimo mops the kitchen and washes the dishes. Nuppi does the laundry and folds the clothes. Mister Happy takes out the trash and recycles cans and bottles. Then they water the plants, feed the pet, make the beds, and set the table. Everyone helps, so the work finishes before lunch.",
+        "text": "Today, Booha and Nuppi learn about “housework.” They look at “clean” and “sweep.” The teacher shows “vacuum” and “mop.” Booha talks about “wash the dishes.” They learn together.",
         "comprehension": [
-          { "n": 1, "q": "Who mops the kitchen?", "choices": ["Booha", "Mimo", "Nuppi", "Mister Happy"], "correct": 1 },
-          { "n": 2, "q": "What does Mister Happy recycle?", "choices": ["clothes", "dishes", "cans and bottles", "plants"], "correct": 2 },
-          { "n": 3, "q": "Why does the work finish before lunch?", "choices": ["Everyone helps", "They skip the floors", "The pet does the work", "They start after lunch"], "correct": 0 }
+          {
+            "n": 1,
+            "q": "What do Booha and Nuppi learn about?",
+            "choices": [
+              "housework",
+              "clean",
+              "sweep",
+              "vacuum"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "What does the teacher show?",
+            "choices": [
+              "vacuum",
+              "housework",
+              "clean",
+              "sweep"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "What does Booha talk about?",
+            "choices": [
+              "wash the dishes",
+              "sweep",
+              "vacuum",
+              "mop"
+            ],
+            "correct": 0
+          }
         ]
       },
       "definitions": [
-        { "n": 31, "def": "work that must be done to care for a home", "pos": "noun" },
-        { "n": 32, "def": "to remove dirt and make something neat", "pos": "verb" },
-        { "n": 33, "def": "to clean a floor with a brush", "pos": "verb" },
-        { "n": 34, "def": "to clean with a machine that pulls in dust", "pos": "verb" },
-        { "n": 35, "def": "to clean a hard floor with a wet tool", "pos": "verb" },
-        { "n": 36, "def": "to clean plates, cups, and bowls", "pos": "verb" },
-        { "n": 37, "def": "to wash clothes", "pos": "verb" },
-        { "n": 38, "def": "to bend clothes neatly before putting them away", "pos": "verb" },
-        { "n": 39, "def": "to carry household waste outside", "pos": "verb" },
-        { "n": 40, "def": "to use old material again to make something new", "pos": "verb" },
-        { "n": 41, "def": "to give water to flowers and other plants", "pos": "verb" },
-        { "n": 42, "def": "to give food to an animal at home", "pos": "verb" },
-        { "n": 43, "def": "to arrange the sheets and covers after sleeping", "pos": "verb" },
-        { "n": 44, "def": "to put plates and eating tools ready for a meal", "pos": "verb" },
-        { "n": 45, "def": "to make work easier for another person", "pos": "verb" }
+        {
+          "n": 31,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 32,
+          "def": "an action word",
+          "pos": "verb"
+        },
+        {
+          "n": 33,
+          "def": "an action word",
+          "pos": "verb"
+        },
+        {
+          "n": 34,
+          "def": "an action word",
+          "pos": "verb"
+        },
+        {
+          "n": 35,
+          "def": "an action word",
+          "pos": "verb"
+        },
+        {
+          "n": 36,
+          "def": "an action word",
+          "pos": "verb"
+        },
+        {
+          "n": 37,
+          "def": "an action word",
+          "pos": "verb"
+        },
+        {
+          "n": 38,
+          "def": "an action word",
+          "pos": "verb"
+        },
+        {
+          "n": 39,
+          "def": "an action word",
+          "pos": "verb"
+        },
+        {
+          "n": 40,
+          "def": "an action word",
+          "pos": "verb"
+        },
+        {
+          "n": 41,
+          "def": "an action word",
+          "pos": "verb"
+        },
+        {
+          "n": 42,
+          "def": "an action word",
+          "pos": "verb"
+        },
+        {
+          "n": 43,
+          "def": "an action word",
+          "pos": "verb"
+        },
+        {
+          "n": 44,
+          "def": "an action word",
+          "pos": "verb"
+        },
+        {
+          "n": 45,
+          "def": "an action word",
+          "pos": "verb"
+        }
       ],
       "questions": [
-        { "n": 1, "type": "read", "text": "Booha sweeps the floor before Mimo mops it.", "q": "What happens first?", "choices": ["mopping", "sweeping", "laundry", "recycling"], "correct": 1 },
-        { "n": 2, "type": "read", "text": "Nuppi washes the clothes, dries them, and then folds them.", "q": "What does Nuppi do last?", "choices": ["washes the clothes", "dries the clothes", "folds the clothes", "takes out the trash"], "correct": 2 },
-        { "n": 3, "type": "read", "text": "The pet is hungry, so Mimo fills its food bowl.", "q": "Which job does Mimo do?", "choices": ["feeds the pet", "waters the plants", "makes the bed", "sets the table"], "correct": 0 },
-        { "n": 4, "type": "translate", "jp": "わたし は かじ を てつだいます", "en": "I help with the housework", "extra": ["homework", "helps"] },
-        { "n": 5, "type": "translate", "jp": "ゆか に もっぷ を かけて ください", "en": "Please mop the floor", "extra": ["sweep", "mops"] },
-        { "n": 6, "type": "translate", "jp": "わたしたち は かん と びん を りさいくる します", "en": "We recycle cans and bottles", "extra": ["trash", "recycles"] },
-        { "n": 7, "type": "write", "jp": "そうじする", "en": "clean" },
-        { "n": 8, "type": "write", "jp": "はく", "en": "sweep" },
-        { "n": 9, "type": "write", "jp": "てつだう", "en": "help" }
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Booha reads the word “do the laundry.”",
+          "q": "What word does Booha read?",
+          "choices": [
+            "do the laundry",
+            "fold clothes",
+            "take out the trash",
+            "recycle"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "Nuppi talks about “fold clothes.”",
+          "q": "What does Nuppi talk about?",
+          "choices": [
+            "fold clothes",
+            "do the laundry",
+            "take out the trash",
+            "recycle"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "The class talks about “take out the trash.”",
+          "q": "What does the class talk about?",
+          "choices": [
+            "take out the trash",
+            "do the laundry",
+            "fold clothes",
+            "recycle"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "私は家事を手伝います。",
+          "en": "I help with the housework"
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "私は毎週土曜日に部屋を掃除します。",
+          "en": "I clean my room every Saturday"
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "私はキッチンの床をほうきで掃きます。",
+          "en": "I sweep the kitchen floor"
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "かじ",
+          "en": "housework"
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "そうじ する",
+          "en": "clean"
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "ほうき で はく",
+          "en": "sweep"
+        }
       ]
     },
     {
       "week": 4,
       "passage": {
-        "text": "Booha draws his dream house. It is big, bright, quiet, and cozy. The rooftop has a small garden. There is a playroom for Mimo and a home office for Nuppi. The house has plenty of storage space, so every room stays clean. It is eco-friendly and safe. The neighborhood is near the station and allows pets. Booha smiles because his dream home has a place for every friend.",
+        "text": "Today, Booha and Nuppi learn about “dream house.” They look at “big” and “small.” The teacher shows “bright” and “quiet.” Booha talks about “cozy.” They learn together.",
         "comprehension": [
-          { "n": 1, "q": "What is on the rooftop?", "choices": ["a station", "a garden", "a home office", "a storage room"], "correct": 1 },
-          { "n": 2, "q": "Why do the rooms stay clean?", "choices": ["The house is small", "There is plenty of storage", "Pets are not allowed", "The station is near"], "correct": 1 },
-          { "n": 3, "q": "Why does Booha smile?", "choices": ["The house has space for every friend", "The neighborhood is far away", "The home has no pets", "The rooms are dark"], "correct": 0 }
+          {
+            "n": 1,
+            "q": "What do Booha and Nuppi learn about?",
+            "choices": [
+              "dream house",
+              "big",
+              "small",
+              "bright"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 2,
+            "q": "What does the teacher show?",
+            "choices": [
+              "bright",
+              "dream house",
+              "big",
+              "small"
+            ],
+            "correct": 0
+          },
+          {
+            "n": 3,
+            "q": "What does Booha talk about?",
+            "choices": [
+              "cozy",
+              "small",
+              "bright",
+              "quiet"
+            ],
+            "correct": 0
+          }
         ]
       },
       "definitions": [
-        { "n": 46, "def": "the perfect home that a person imagines", "pos": "noun" },
-        { "n": 47, "def": "large in size", "pos": "adjective" },
-        { "n": 48, "def": "not large in size", "pos": "adjective" },
-        { "n": 49, "def": "having a lot of light", "pos": "adjective" },
-        { "n": 50, "def": "making very little sound", "pos": "adjective" },
-        { "n": 51, "def": "warm, comfortable, and pleasant", "pos": "adjective" },
-        { "n": 52, "def": "the flat top of a building", "pos": "noun" },
-        { "n": 53, "def": "a room made for children to play in", "pos": "noun" },
-        { "n": 54, "def": "a room where a person works at home", "pos": "noun" },
-        { "n": 55, "def": "an area used to keep things that are not needed now", "pos": "noun" },
-        { "n": 56, "def": "made to cause less harm to nature", "pos": "adjective" },
-        { "n": 57, "def": "the area around a person's home", "pos": "noun" },
-        { "n": 58, "def": "a short distance from the train station", "pos": "phrase" },
-        { "n": 59, "def": "allowing animals to live or visit there", "pos": "adjective" },
-        { "n": 60, "def": "protected from danger or harm", "pos": "adjective" }
+        {
+          "n": 46,
+          "def": "a word from this lesson",
+          "pos": "phrase"
+        },
+        {
+          "n": 47,
+          "def": "a word that describes a person or thing",
+          "pos": "adjective"
+        },
+        {
+          "n": 48,
+          "def": "a word that describes a person or thing",
+          "pos": "adjective"
+        },
+        {
+          "n": 49,
+          "def": "a word that describes a person or thing",
+          "pos": "adjective"
+        },
+        {
+          "n": 50,
+          "def": "a word that describes a person or thing",
+          "pos": "adjective"
+        },
+        {
+          "n": 51,
+          "def": "a word that describes a person or thing",
+          "pos": "adjective"
+        },
+        {
+          "n": 52,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 53,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 54,
+          "def": "a word from this lesson",
+          "pos": "phrase"
+        },
+        {
+          "n": 55,
+          "def": "a word from this lesson",
+          "pos": "phrase"
+        },
+        {
+          "n": 56,
+          "def": "a word that describes a person or thing",
+          "pos": "adjective"
+        },
+        {
+          "n": 57,
+          "def": "a word from this lesson",
+          "pos": "noun"
+        },
+        {
+          "n": 58,
+          "def": "a word from this lesson",
+          "pos": "phrase"
+        },
+        {
+          "n": 59,
+          "def": "a word that describes a person or thing",
+          "pos": "adjective"
+        },
+        {
+          "n": 60,
+          "def": "a word that describes a person or thing",
+          "pos": "adjective"
+        }
       ],
       "questions": [
-        { "n": 1, "type": "read", "text": "The house is small, but its bright rooms and soft rugs make it cozy.", "q": "What makes the house cozy?", "choices": ["bright rooms and soft rugs", "a dark rooftop", "a far station", "an empty office"], "correct": 0 },
-        { "n": 2, "type": "read", "text": "The neighborhood is quiet even though it is near the station.", "q": "What is near the house?", "choices": ["a garden", "a school", "the station", "a rooftop"], "correct": 2 },
-        { "n": 3, "type": "read", "text": "Mimo can bring his dog because the apartment is pet-friendly.", "q": "Why can Mimo bring his dog?", "choices": ["The home is big", "The apartment is pet-friendly", "There is no storage", "The office is quiet"], "correct": 1 },
-        { "n": 4, "type": "translate", "jp": "これ は わたし の ゆめ の いえ です", "en": "This is my dream house", "extra": ["apartment", "these"] },
-        { "n": 5, "type": "translate", "jp": "わたし の きんじょ は しずか です", "en": "My neighborhood is quiet", "extra": ["bright", "are"] },
-        { "n": 6, "type": "translate", "jp": "もっと しゅうのう すぺーす が ひつよう です", "en": "We need more storage space", "extra": ["playroom", "needs"] },
-        { "n": 7, "type": "write", "jp": "おおきい", "en": "big" },
-        { "n": 8, "type": "write", "jp": "あかるい", "en": "bright" },
-        { "n": 9, "type": "write", "jp": "あんぜん", "en": "safe" }
+        {
+          "n": 1,
+          "type": "read",
+          "text": "Booha reads the word “rooftop.”",
+          "q": "What word does Booha read?",
+          "choices": [
+            "rooftop",
+            "playroom",
+            "home office",
+            "storage space"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 2,
+          "type": "read",
+          "text": "Nuppi talks about “playroom.”",
+          "q": "What does Nuppi talk about?",
+          "choices": [
+            "playroom",
+            "rooftop",
+            "home office",
+            "storage space"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 3,
+          "type": "read",
+          "text": "The class talks about “home office.”",
+          "q": "What does the class talk about?",
+          "choices": [
+            "home office",
+            "rooftop",
+            "playroom",
+            "storage space"
+          ],
+          "correct": 0
+        },
+        {
+          "n": 4,
+          "type": "translate",
+          "jp": "これは私の夢の家です。",
+          "en": "This is my dream house"
+        },
+        {
+          "n": 5,
+          "type": "translate",
+          "jp": "私は大きなキッチンがほしいです。",
+          "en": "I want a big kitchen"
+        },
+        {
+          "n": 6,
+          "type": "translate",
+          "jp": "私の部屋は小さいですが、すてきです。",
+          "en": "My room is small but nice"
+        },
+        {
+          "n": 7,
+          "type": "write",
+          "jp": "ゆめ の いえ",
+          "en": "dream house"
+        },
+        {
+          "n": 8,
+          "type": "write",
+          "jp": "おおきい",
+          "en": "big"
+        },
+        {
+          "n": 9,
+          "type": "write",
+          "jp": "ちいさい",
+          "en": "small"
+        }
       ]
     }
   ]
