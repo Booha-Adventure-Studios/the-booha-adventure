@@ -2,423 +2,423 @@
   "cards": [
     {
       "n": 1,
-      "en": "How do you go to school?",
-      "jp": "学校へどうやって行きますか。",
-      "hira": "がっこう へ どうやって いき ます か",
-      "mp3": "br_q01_how_do_you_go_to_school.mp3"
+      "en": "What is your favorite autumn activity?",
+      "jp": "あなたの好きな秋の活動は何ですか？",
+      "hira": "あなたのすきなあきのかつどうはなんですか？",
+      "mp3": "br_q01_what_is_your_favorite_autumn_activity.mp3"
     },
     {
       "n": 2,
-      "en": "Do you ride a bicycle?",
-      "jp": "自転車に乗りますか。",
-      "hira": "じてんしゃ に のり ます か",
-      "mp3": "br_q02_do_you_ride_a_bicycle.mp3"
+      "en": "What kind of food do you like to eat in October?",
+      "jp": "10月に食べたい食べ物は何ですか？",
+      "hira": "じゅうがつにたべたいたべものはなんですか？",
+      "mp3": "br_q02_what_kind_of_food_do_you_like_to_eat_in_october.mp3"
     },
     {
       "n": 3,
-      "en": "Which is faster, a bus or a train?",
-      "jp": "バスと電車ではどちらが速いですか。",
-      "hira": "ばす と でんしゃ では どちら が はやい です か",
-      "mp3": "br_q03_which_is_faster_a_bus_or_a_train.mp3"
+      "en": "How does the weather change in autumn where you live?",
+      "jp": "あなたの住んでいる場所の秋の天気はどう変わりますか？",
+      "hira": "あなたのすんでいるばしょのあきのてんきはどうかわりますか？",
+      "mp3": "br_q03_how_does_the_weather_change_in_autumn_where_you_live.mp3"
     },
     {
       "n": 4,
-      "en": "Have you ever taken a ferry?",
-      "jp": "フェリーに乗ったことがありますか。",
-      "hira": "ふぇりー に のった こと が あります か",
-      "mp3": "br_q04_have_you_ever_taken_a_ferry.mp3"
+      "en": "What celebrations do you have in your community in October?",
+      "jp": "あなたの地域では10月にどんなお祝いがありますか？",
+      "hira": "あなたのちいきではじゅうがつにどんなおいわいがありますか？",
+      "mp3": "br_q04_what_celebrations_do_you_have_in_your_community_in_october.mp3"
     },
     {
       "n": 5,
-      "en": "Do you like trams?",
-      "jp": "路面電車は好きですか。",
-      "hira": "ろめんでんしゃ は すき です か",
-      "mp3": "br_q05_do_you_like_trams.mp3"
+      "en": "Do you enjoy going to autumn festivals?",
+      "jp": "秋の祭りに行くのは楽しいですか？",
+      "hira": "あきのまつりにいくのはたのしいですか？",
+      "mp3": "br_q05_do_you_enjoy_going_to_autumn_festivals.mp3"
     },
     {
       "n": 6,
-      "en": "Can you drive a car?",
-      "jp": "車を運転できますか。",
-      "hira": "くるま を うんてん でき ます か",
-      "mp3": "br_q06_can_you_drive_a_car.mp3"
+      "en": "What seasonal routines do you have in October?",
+      "jp": "10月にどんな季節のルーチンがありますか？",
+      "hira": "じゅうがつにどんなきせつのるーちんがありますか？",
+      "mp3": "br_q06_what_seasonal_routines_do_you_have_in_october.mp3"
     },
     {
       "n": 7,
-      "en": "What color is your bike?",
-      "jp": "あなたの自転車は何色ですか。",
-      "hira": "あなた の じてんしゃ は なにいろ です か",
-      "mp3": "br_q07_what_color_is_your_bike.mp3"
+      "en": "What is your favorite autumn food and why?",
+      "jp": "好きな秋の食べ物と、その理由は何ですか？",
+      "hira": "すきなあきのたべものと、そのりゆうはなんですか？",
+      "mp3": "br_q07_what_is_your_favorite_autumn_food_and_why.mp3"
     },
     {
       "n": 8,
-      "en": "Which vehicle would you like to try?",
-      "jp": "どんな乗り物に乗ってみたいですか。",
-      "hira": "どんな のりもの に のって みたい です か",
-      "mp3": "br_q08_which_vehicle_would_you_like_to_try.mp3"
+      "en": "How do you celebrate Halloween?",
+      "jp": "ハロウィンはどのようにお祝いしますか？",
+      "hira": "はろうぃんはどのようにおいわいしますか？",
+      "mp3": "br_q08_how_do_you_celebrate_halloween.mp3"
     },
     {
       "n": 9,
-      "en": "Is there a subway in your city?",
-      "jp": "あなたの町に地下鉄はありますか。",
-      "hira": "あなた の まち に ちかてつ は あり ます か",
-      "mp3": "br_q09_is_there_a_subway_in_your_city.mp3"
+      "en": "What do you like to do on a rainy autumn day?",
+      "jp": "雨の日の秋に何をするのが好きですか？",
+      "hira": "あめのひのあきになにをするのがすきですか？",
+      "mp3": "br_q09_what_do_you_like_to_do_on_a_rainy_autumn_day.mp3"
     },
     {
       "n": 10,
-      "en": "How often do you take a taxi?",
-      "jp": "どのくらいの頻度でタクシーに乗りますか。",
-      "hira": "どの くらい の ひんど で たくしー に のります か",
-      "mp3": "br_q10_how_often_do_you_take_a_taxi.mp3"
+      "en": "What do you enjoy about the changing leaves in autumn?",
+      "jp": "秋の紅葉について何が楽しみですか？",
+      "hira": "あきのこうようについてなにがたのしみですか？",
+      "mp3": "br_q10_what_do_you_enjoy_about_the_changing_leaves_in_autumn.mp3"
     },
     {
       "n": 11,
-      "en": "What does an ambulance do?",
-      "jp": "救急車は何をしますか。",
-      "hira": "きゅうきゅうしゃ は なに を し ます か",
-      "mp3": "br_q11_what_does_an_ambulance_do.mp3"
+      "en": "Do you like to go apple picking in October?",
+      "jp": "10月にりんご狩りに行くのは好きですか？",
+      "hira": "じゅうがつにりんごがりにいくのはすきですか？",
+      "mp3": "br_q11_do_you_like_to_go_apple_picking_in_october.mp3"
     },
     {
       "n": 12,
-      "en": "Do you get car sick?",
-      "jp": "車酔いをしますか。",
-      "hira": "くるま よい を し ます か",
-      "mp3": "br_q12_do_you_get_car_sick.mp3"
+      "en": "What is your favorite drink in autumn?",
+      "jp": "秋に好きな飲み物は何ですか？",
+      "hira": "あきにすきなのみものはなんですか？",
+      "mp3": "br_q12_what_is_your_favorite_drink_in_autumn.mp3"
     },
     {
       "n": 13,
-      "en": "What vehicle is noisy?",
-      "jp": "どの乗り物がうるさいですか。",
-      "hira": "どの のりもの が うるさい です か",
-      "mp3": "br_q13_what_vehicle_is_noisy.mp3"
+      "en": "How do you prepare for winter during autumn?",
+      "jp": "秋に冬の準備をどうしますか？",
+      "hira": "あきにふゆのじゅんびをどうしますか？",
+      "mp3": "br_q13_how_do_you_prepare_for_winter_during_autumn.mp3"
     },
     {
       "n": 14,
-      "en": "What vehicle is quiet?",
-      "jp": "どの乗り物が静かですか。",
-      "hira": "どの のりもの が しずか です か",
-      "mp3": "br_q14_what_vehicle_is_quiet.mp3"
+      "en": "What is a popular autumn event in your town?",
+      "jp": "あなたの町で人気のある秋のイベントは何ですか？",
+      "hira": "あなたのまちでにんきのあるあきのいべんとはなんですか？",
+      "mp3": "br_q14_what_is_a_popular_autumn_event_in_your_town.mp3"
     },
     {
       "n": 15,
-      "en": "Which vehicle do you use most?",
-      "jp": "一番よく使う乗り物は何ですか。",
-      "hira": "いちばん よく つかう のりもの は なん です か",
-      "mp3": "br_q15_which_vehicle_do_you_use_most.mp3"
+      "en": "What do you like to do with your family in autumn?",
+      "jp": "秋に家族と何をするのが好きですか？",
+      "hira": "あきにかぞくとなにをするのがすきですか？",
+      "mp3": "br_q15_what_do_you_like_to_do_with_your_family_in_autumn.mp3"
     },
     {
       "n": 16,
-      "en": "How do you commute to school?",
-      "jp": "学校へはどうやって通学しますか。",
-      "hira": "がっこう へ は どうやって つうがく し ます か",
-      "mp3": "br_q16_how_do_you_commute_to_school.mp3"
+      "en": "How do you enjoy the cool weather in October?",
+      "jp": "10月の涼しい天気をどう楽しみますか？",
+      "hira": "じゅうがつのすずしいてんきをどうたのしみますか？",
+      "mp3": "br_q16_how_do_you_enjoy_the_cool_weather_in_october.mp3"
     },
     {
       "n": 17,
-      "en": "How long does it take?",
-      "jp": "どのくらい時間がかかりますか。",
-      "hira": "どの くらい じかん が かかり ます か",
-      "mp3": "br_q17_how_long_does_it_take.mp3"
+      "en": "What is your favorite memory from past autumns?",
+      "jp": "過去の秋の思い出で好きなものは何ですか？",
+      "hira": "かこのあきのおもいでですきなものはなんですか？",
+      "mp3": "br_q17_what_is_your_favorite_memory_from_past_autumns.mp3"
     },
     {
       "n": 18,
-      "en": "Can you give me directions to the station?",
-      "jp": "駅までの道案内をしてくれますか。",
-      "hira": "えき まで の みちあんない を して くれ ます か",
-      "mp3": "br_q18_can_you_give_me_directions_to_the_station.mp3"
+      "en": "How do you stay active during the autumn months?",
+      "jp": "秋の間、どのようにアクティブに過ごしますか？",
+      "hira": "あきのあいだ、どのようにあくてぃぶにすごしますか？",
+      "mp3": "br_q18_how_do_you_stay_active_during_the_autumn_months.mp3"
     },
     {
       "n": 19,
-      "en": "Is the bus stop near here?",
-      "jp": "この近くにバス停はありますか。",
-      "hira": "この ちかく に ばすてい は あり ます か",
-      "mp3": "br_q19_is_the_bus_stop_near_here.mp3"
+      "en": "What kind of clothes do you wear in autumn?",
+      "jp": "秋にはどんな服を着ますか？",
+      "hira": "あきにはどんなふくをきますか？",
+      "mp3": "br_q19_what_kind_of_clothes_do_you_wear_in_autumn.mp3"
     },
     {
       "n": 20,
-      "en": "Which way is the library?",
-      "jp": "図書館はどちらですか。",
-      "hira": "としょかん は どちら です か",
-      "mp3": "br_q20_which_way_is_the_library.mp3"
+      "en": "Do you like to watch sports in autumn?",
+      "jp": "秋にスポーツを見るのは好きですか？",
+      "hira": "あきにすぽーつをみるのはすきですか？",
+      "mp3": "br_q20_do_you_like_to_watch_sports_in_autumn.mp3"
     },
     {
       "n": 21,
-      "en": "Should I turn left or right?",
-      "jp": "左と右のどちらに曲がればいいですか。",
-      "hira": "ひだり と みぎ の どちら に まがれば いい です か",
-      "mp3": "br_q21_should_i_turn_left_or_right.mp3"
+      "en": "What is your favorite autumn fruit?",
+      "jp": "好きな秋の果物は何ですか？",
+      "hira": "すきなあきのくだものはなんですか？",
+      "mp3": "br_q21_what_is_your_favorite_autumn_fruit.mp3"
     },
     {
       "n": 22,
-      "en": "Is it far?",
-      "jp": "遠いですか。",
-      "hira": "とおい です か",
-      "mp3": "br_q22_is_it_far.mp3"
+      "en": "What do you usually do during a long weekend in autumn?",
+      "jp": "秋の連休にはふだん何をしますか？",
+      "hira": "あきのれんきゅうにはふだんなにをしますか？",
+      "mp3": "br_q22_what_do_you_usually_do_during_a_long_weekend_in_autumn.mp3"
     },
     {
       "n": 23,
-      "en": "Which platform does our train leave from?",
-      "jp": "私たちの電車は何番ホームから出ますか。",
-      "hira": "わたしたち の でんしゃ は なんばん ほーむ から でます か",
-      "mp3": "br_q23_which_platform_does_our_train_leave_from.mp3"
+      "en": "What outdoor activities do you enjoy in autumn?",
+      "jp": "秋に楽しむ屋外活動は何ですか？",
+      "hira": "あきにたのしむおくがいかつどうはなんですか？",
+      "mp3": "br_q23_what_outdoor_activities_do_you_enjoy_in_autumn.mp3"
     },
     {
       "n": 24,
-      "en": "Where shall we meet?",
-      "jp": "どこで会いましょうか。",
-      "hira": "どこ で あい ましょう か",
-      "mp3": "br_q24_where_shall_we_meet.mp3"
+      "en": "What do you like to do on a sunny autumn day?",
+      "jp": "晴れた秋の日に何をするのが好きですか？",
+      "hira": "はれたあきのひになにをするのがすきですか？",
+      "mp3": "br_q24_what_do_you_like_to_do_on_a_sunny_autumn_day.mp3"
     },
     {
       "n": 25,
-      "en": "Can you read this map?",
-      "jp": "この地図を読めますか。",
-      "hira": "この ちず を よめ ます か",
-      "mp3": "br_q25_can_you_read_this_map.mp3"
+      "en": "How do you decorate your home for autumn?",
+      "jp": "秋に家をどのように飾りますか？",
+      "hira": "あきにいえをどのようにかざりますか？",
+      "mp3": "br_q25_how_do_you_decorate_your_home_for_autumn.mp3"
     },
     {
       "n": 26,
-      "en": "What’s across from the station?",
-      "jp": "駅の向かいには何がありますか。",
-      "hira": "えき の むかい に は なに が あり ます か",
-      "mp3": "br_q26_whats_across_from_the_station.mp3"
+      "en": "What is your favorite autumn memory with friends?",
+      "jp": "友達との秋の思い出で好きなものは何ですか？",
+      "hira": "ともだちとのあきのおもいでですきなものはなんですか？",
+      "mp3": "br_q26_what_is_your_favorite_autumn_memory_with_friends.mp3"
     },
     {
       "n": 27,
-      "en": "What’s between the bank and the park?",
-      "jp": "銀行と公園の間には何がありますか。",
-      "hira": "ぎんこう と こうえん の あいだ に は なに が あり ます か",
-      "mp3": "br_q27_whats_between_the_bank_and_the_park.mp3"
+      "en": "Do you enjoy cooking seasonal dishes in October?",
+      "jp": "10月に季節の料理を作るのは楽しいですか？",
+      "hira": "じゅうがつにきせつのりょうりをつくるのはたのしいですか？",
+      "mp3": "br_q27_do_you_enjoy_cooking_seasonal_dishes_in_october.mp3"
     },
     {
       "n": 28,
-      "en": "How many blocks away is it?",
-      "jp": "何ブロック先ですか。",
-      "hira": "なん ぶろっく さき です か",
-      "mp3": "br_q28_how_many_blocks_away_is_it.mp3"
+      "en": "What is your favorite way to enjoy the autumn scenery?",
+      "jp": "秋の景色を楽しむ好きな方法は何ですか？",
+      "hira": "あきのけしきをたのしむすきなほうほうはなんですか？",
+      "mp3": "br_q28_what_is_your_favorite_way_to_enjoy_the_autumn_scenery.mp3"
     },
     {
       "n": 29,
-      "en": "Is there a crosswalk?",
-      "jp": "横断歩道はありますか。",
-      "hira": "おうだん ほどう は あり ます か",
-      "mp3": "br_q29_is_there_a_crosswalk.mp3"
+      "en": "How do you feel about the shorter days in autumn?",
+      "jp": "秋の短い日々についてどう感じますか？",
+      "hira": "あきのみじかいひびについてどうかんじますか？",
+      "mp3": "br_q29_how_do_you_feel_about_the_shorter_days_in_autumn.mp3"
     },
     {
       "n": 30,
-      "en": "Shall we go straight together?",
-      "jp": "いっしょにまっすぐ行きましょうか。",
-      "hira": "いっしょ に まっすぐ いきましょう か",
-      "mp3": "br_q30_shall_we_go_straight_together.mp3"
+      "en": "What traditions does your family have in October?",
+      "jp": "10月にあなたの家族はどんな伝統がありますか？",
+      "hira": "じゅうがつにあなたのかぞくはどんなでんとうがありますか？",
+      "mp3": "br_q30_what_traditions_does_your_family_have_in_october.mp3"
     },
     {
       "n": 31,
-      "en": "What safety rules do you know?",
-      "jp": "どんな安全ルールを知っていますか。",
-      "hira": "どんな あんぜん るーる を しって い ます か",
-      "mp3": "br_q31_what_safety_rules_do_you_know.mp3"
+      "en": "What is your favorite place to see autumn leaves?",
+      "jp": "あなたの好きな紅葉を見る場所はどこですか？",
+      "hira": "あなたのすきなこうようをみるばしょはどこですか？",
+      "mp3": "br_q31_what_is_your_favorite_place_to_see_autumn_leaves.mp3"
     },
     {
       "n": 32,
-      "en": "When must you wear a seat belt?",
-      "jp": "いつシートベルトをしなければなりませんか。",
-      "hira": "いつ しーとべると を しなければ なり ません か",
-      "mp3": "br_q32_when_must_you_wear_a_seat_belt.mp3"
+      "en": "What special foods do you eat during autumn festivals?",
+      "jp": "秋祭りの時に食べる特別な食べ物は何ですか？",
+      "hira": "あきまつりのときにたべるとくべつなたべものはなんですか？",
+      "mp3": "br_q32_what_special_foods_do_you_eat_during_autumn_festivals.mp3"
     },
     {
       "n": 33,
-      "en": "Where is the yellow line?",
-      "jp": "黄色い線はどこにありますか。",
-      "hira": "きいろい せん は どこ に あり ます か",
-      "mp3": "br_q33_where_is_the_yellow_line.mp3"
+      "en": "How do you feel about the colder weather in October?",
+      "jp": "10月の寒くなる天気についてどう思いますか？",
+      "hira": "じゅうがつのさむくなるてんきについてどうおもいますか？",
+      "mp3": "br_q33_how_do_you_feel_about_the_colder_weather_in_october.mp3"
     },
     {
       "n": 34,
-      "en": "Who should use priority seats?",
-      "jp": "優先席はどのような人のための席ですか。",
-      "hira": "ゆうせんせき は どの よう な ひと の ため の せき です か",
-      "mp3": "br_q34_who_should_use_priority_seats.mp3"
+      "en": "What community events do you look forward to in October?",
+      "jp": "10月に楽しみにしている地域のイベントは何ですか？",
+      "hira": "じゅうがつにたのしみにしているちいきのいべんとはなんですか？",
+      "mp3": "br_q34_what_community_events_do_you_look_forward_to_in_october.mp3"
     },
     {
       "n": 35,
-      "en": "What do you do if you are lost?",
-      "jp": "道に迷ったらどうしますか。",
-      "hira": "みち に まよったら どう し ます か",
-      "mp3": "br_q35_what_do_you_do_if_you_are_lost.mp3"
+      "en": "Do you enjoy making Halloween decorations?",
+      "jp": "ハロウィンの飾りを作るのは楽しいですか？",
+      "hira": "はろうぃんのかざりをつくるのはたのしいですか？",
+      "mp3": "br_q35_do_you_enjoy_making_halloween_decorations.mp3"
     },
     {
       "n": 36,
-      "en": "What should you not do on the platform?",
-      "jp": "ホームでしてはいけないことは何ですか。",
-      "hira": "ほーむ で して は いけない こと は なん です か",
-      "mp3": "br_q36_what_should_you_not_do_on_the_platform.mp3"
+      "en": "What is your favorite autumn sport or activity?",
+      "jp": "あなたの好きな秋のスポーツや活動は何ですか？",
+      "hira": "あなたのすきなあきのすぽーつやかつどうはなんですか？",
+      "mp3": "br_q36_what_is_your_favorite_autumn_sport_or_activity.mp3"
     },
     {
       "n": 37,
-      "en": "How do you ask staff for help?",
-      "jp": "職員にどうやって助けを求めますか。",
-      "hira": "しょくいん に どうやって たすけ を もとめます か",
-      "mp3": "br_q37_how_do_you_ask_staff_for_help.mp3"
+      "en": "How do you celebrate the changing of the seasons?",
+      "jp": "季節の変わり目をどう祝いますか？",
+      "hira": "きせつのかわりめをどういわいますか？",
+      "mp3": "br_q37_how_do_you_celebrate_the_changing_of_the_seasons.mp3"
     },
     {
       "n": 38,
-      "en": "Where is the lost and found?",
-      "jp": "遺失物取扱所はどこですか。",
-      "hira": "いしつぶつ とりあつかいじょ は どこ です か",
-      "mp3": "br_q38_where_is_the_lost_and_found.mp3"
+      "en": "What are some activities you do with friends in autumn?",
+      "jp": "秋に友達とする活動は何ですか？",
+      "hira": "あきにともだちとするかつどうはなんですか？",
+      "mp3": "br_q38_what_are_some_activities_you_do_with_friends_in_autumn.mp3"
     },
     {
       "n": 39,
-      "en": "Do you carry your ID?",
-      "jp": "身分証を持ち歩きますか。",
-      "hira": "みぶんしょう を もちあるき ます か",
-      "mp3": "br_q39_do_you_carry_your_id.mp3"
+      "en": "What is your favorite autumn dessert?",
+      "jp": "あなたの好きな秋のデザートは何ですか？",
+      "hira": "あなたのすきなあきのでざーとはなんですか？",
+      "mp3": "br_q39_what_is_your_favorite_autumn_dessert.mp3"
     },
     {
       "n": 40,
-      "en": "What is the emergency number?",
-      "jp": "緊急電話番号は何ですか。",
-      "hira": "きんきゅう でんわ ばんごう は なん です か",
-      "mp3": "br_q40_what_is_the_emergency_number.mp3"
+      "en": "How do you prepare for Halloween?",
+      "jp": "ハロウィンの準備はどうしますか？",
+      "hira": "はろうぃんのじゅんびはどうしますか？",
+      "mp3": "br_q40_how_do_you_prepare_for_halloween.mp3"
     },
     {
       "n": 41,
-      "en": "How can you keep your bag safe?",
-      "jp": "かばんを安全に保つにはどうしますか。",
-      "hira": "かばん を あんぜん に たもつ には どう し ます か",
-      "mp3": "br_q41_how_can_you_keep_your_bag_safe.mp3"
+      "en": "What is a seasonal food you would recommend to a visitor?",
+      "jp": "訪問者におすすめしたい季節の食べ物は何ですか？",
+      "hira": "ほうもんしゃにおすすめしたいきせつのたべものはなんですか？",
+      "mp3": "br_q41_what_is_a_seasonal_food_you_would_recommend_to_a_visitor.mp3"
     },
     {
       "n": 42,
-      "en": "Do you wear a helmet when cycling?",
-      "jp": "自転車に乗るときヘルメットをかぶりますか。",
-      "hira": "じてんしゃ に のる とき へるめっと を かぶります か",
-      "mp3": "br_q42_do_you_wear_a_helmet_when_cycling.mp3"
+      "en": "How do you stay warm during chilly autumn days?",
+      "jp": "肌寒い秋の日にどうやって暖かく過ごしますか？",
+      "hira": "はだざむいあきのひにどうやってあたたかくすごしますか？",
+      "mp3": "br_q42_how_do_you_stay_warm_during_chilly_autumn_days.mp3"
     },
     {
       "n": 43,
-      "en": "Who can you call in an emergency?",
-      "jp": "緊急時にはだれに電話できますか。",
-      "hira": "きんきゅう じ に は だれ に でんわ でき ます か",
-      "mp3": "br_q43_who_can_you_call_in_an_emergency.mp3"
+      "en": "What is a traditional autumn dish in your culture?",
+      "jp": "あなたの文化での伝統的な秋の料理は何ですか？",
+      "hira": "あなたのぶんかでのでんとうてきなあきのりょうりはなんですか？",
+      "mp3": "br_q43_what_is_a_traditional_autumn_dish_in_your_culture.mp3"
     },
     {
       "n": 44,
-      "en": "Which signs indicate danger?",
-      "jp": "危険を示す表示はどれですか。",
-      "hira": "きけん を しめす ひょうじ は どれ です か",
-      "mp3": "br_q44_which_signs_indicate_danger.mp3"
+      "en": "How do you enjoy stargazing in autumn?",
+      "jp": "秋の星空観察をどう楽しみますか？",
+      "hira": "あきのほしぞらかんさつをどうたのしみますか？",
+      "mp3": "br_q44_how_do_you_enjoy_stargazing_in_autumn.mp3"
     },
     {
       "n": 45,
-      "en": "What does “Be careful” mean in Japanese?",
-      "jp": "「Be careful」は日本語で何と言いますか。",
-      "hira": "びー けあふる は にほんご で なん と いいます か",
-      "mp3": "br_q45_what_does_be_careful_mean_in_japanese.mp3"
+      "en": "What is the best way to spend a cozy autumn evening?",
+      "jp": "居心地の良い秋の夜を過ごすための最良の方法は何ですか？",
+      "hira": "いごこちのよいあきのよるをすごすためのさいりょうのほうほうはなんですか？",
+      "mp3": "br_q45_what_is_the_best_way_to_spend_a_cozy_autumn_evening.mp3"
     },
     {
       "n": 46,
-      "en": "Where can I buy a ticket?",
-      "jp": "どこで切符を買えますか。",
-      "hira": "どこ で きっぷ を かえ ます か",
-      "mp3": "br_q46_where_can_i_buy_a_ticket.mp3"
+      "en": "What types of crafts do you enjoy making in autumn?",
+      "jp": "秋に作るのが楽しいクラフトは何ですか？",
+      "hira": "あきにつくるのがたのしいくらふとはなんですか？",
+      "mp3": "br_q46_what_types_of_crafts_do_you_enjoy_making_in_autumn.mp3"
     },
     {
       "n": 47,
-      "en": "How do I top up an IC card?",
-      "jp": "ICカードはどうやってチャージしますか。",
-      "hira": "あいしー かーど は どうやって ちゃーじ します か",
-      "mp3": "br_q47_how_do_i_top_up_an_ic_card.mp3"
+      "en": "How do you feel about the harvest season?",
+      "jp": "収穫の季節についてどう感じますか？",
+      "hira": "しゅうかくのきせつについてどうかんじますか？",
+      "mp3": "br_q47_how_do_you_feel_about_the_harvest_season.mp3"
     },
     {
       "n": 48,
-      "en": "Which platform does the express train leave from?",
-      "jp": "急行は何番線から出ますか。",
-      "hira": "きゅうこう は なんばんせん から でます か",
-      "mp3": "br_q48_which_platform_does_the_express_train_leave_from.mp3"
+      "en": "What is your favorite memory of autumn as a child?",
+      "jp": "子供の頃の秋の思い出で好きなものは何ですか？",
+      "hira": "こどものころのあきのおもいではすきなものはなんですか？",
+      "mp3": "br_q48_what_is_your_favorite_memory_of_autumn_as_a_child.mp3"
     },
     {
       "n": 49,
-      "en": "Where do I transfer to the subway?",
-      "jp": "地下鉄へはどこで乗り換えますか。",
-      "hira": "ちかてつ へ は どこ で のりかえ ます か",
-      "mp3": "br_q49_where_do_i_transfer_to_the_subway.mp3"
+      "en": "How do you enjoy the flavors of autumn in your meals?",
+      "jp": "食事で秋の味をどう楽しみますか？",
+      "hira": "しょくじであきのあじをどうたのしみますか？",
+      "mp3": "br_q49_how_do_you_enjoy_the_flavors_of_autumn_in_your_meals.mp3"
     },
     {
       "n": 50,
-      "en": "How much is a round-trip ticket?",
-      "jp": "往復切符はいくらですか。",
-      "hira": "おうふく きっぷ は いくら です か",
-      "mp3": "br_q50_how_much_is_a_roundtrip_ticket.mp3"
+      "en": "What are some fun activities to do on a rainy autumn day?",
+      "jp": "雨の日の秋に楽しい活動は何ですか？",
+      "hira": "あめのひのあきにたのしいかつどうはなんですか？",
+      "mp3": "br_q50_what_are_some_fun_activities_to_do_on_a_rainy_autumn_day.mp3"
     },
     {
       "n": 51,
-      "en": "What time does it depart?",
-      "jp": "何時に出発しますか。",
-      "hira": "なんじ に しゅっぱつ し ます か",
-      "mp3": "br_q51_what_time_does_it_depart.mp3"
+      "en": "How do you feel when the leaves start to fall?",
+      "jp": "葉が落ち始めるとき、どう感じますか？",
+      "hira": "はがおちはじめるとき、どうかんじますか？",
+      "mp3": "br_q51_how_do_you_feel_when_the_leaves_start_to_fall.mp3"
     },
     {
       "n": 52,
-      "en": "What time does it arrive?",
-      "jp": "何時に到着しますか。",
-      "hira": "なんじ に とうちゃく し ます か",
-      "mp3": "br_q52_what_time_does_it_arrive.mp3"
+      "en": "What is your favorite autumn drink to warm up?",
+      "jp": "温まるために好きな秋の飲み物は何ですか？",
+      "hira": "あたたまるためにすきなあきののみものはなんですか？",
+      "mp3": "br_q52_what_is_your_favorite_autumn_drink_to_warm_up.mp3"
     },
     {
       "n": 53,
-      "en": "Is this seat available?",
-      "jp": "この席は空いていますか。",
-      "hira": "この せき は あいて い ます か",
-      "mp3": "br_q53_is_this_seat_available.mp3"
+      "en": "How do you participate in community events in October?",
+      "jp": "10月の地域イベントにどのように参加しますか？",
+      "hira": "じゅうがつのちいきいべんとにどのようにさんかしますか？",
+      "mp3": "br_q53_how_do_you_participate_in_community_events_in_october.mp3"
     },
     {
       "n": 54,
-      "en": "Can I sit in the priority seat?",
-      "jp": "優先席に座ってもいいですか。",
-      "hira": "ゆうせんせき に すわって も いい です か",
-      "mp3": "br_q54_can_i_sit_in_the_priority_seat.mp3"
+      "en": "What is your favorite autumn tradition in your family?",
+      "jp": "あなたの家族の好きな秋の伝統は何ですか？",
+      "hira": "あなたのかぞくのすきなあきのでんとうはなんですか？",
+      "mp3": "br_q54_what_is_your_favorite_autumn_tradition_in_your_family.mp3"
     },
     {
       "n": 55,
-      "en": "What does the announcement say?",
-      "jp": "アナウンスは何と言っていますか。",
-      "hira": "あなうんす は なん と いって います か",
-      "mp3": "br_q55_what_does_the_announcement_say.mp3"
+      "en": "How do you enjoy the harvest festivals in your area?",
+      "jp": "あなたの地域の収穫祭をどのように楽しみますか？",
+      "hira": "あなたのちいきのしゅうかくさいをどのようにたのしみますか？",
+      "mp3": "br_q55_how_do_you_enjoy_the_harvest_festivals_in_your_area.mp3"
     },
     {
       "n": 56,
-      "en": "Is there a delay today?",
-      "jp": "今日は遅延がありますか。",
-      "hira": "きょう は ちえん が あり ます か",
-      "mp3": "br_q56_is_there_a_delay_today.mp3"
+      "en": "What is your favorite way to relax in autumn?",
+      "jp": "秋にリラックスする好きな方法は何ですか？",
+      "hira": "あきにりらっくすするすきなほうほうはなんですか？",
+      "mp3": "br_q56_what_is_your_favorite_way_to_relax_in_autumn.mp3"
     },
     {
       "n": 57,
-      "en": "Where is car number one?",
-      "jp": "1号車はどこですか。",
-      "hira": "いち ごうしゃ は どこ です か",
-      "mp3": "br_q57_where_is_car_number_one.mp3"
+      "en": "How do you celebrate the autumn equinox?",
+      "jp": "秋分の日をどう祝いますか？",
+      "hira": "しゅうぶんのひをどういわいますか？",
+      "mp3": "br_q57_how_do_you_celebrate_the_autumn_equinox.mp3"
     },
     {
       "n": 58,
-      "en": "How do I get to the terminal?",
-      "jp": "終点へはどうやって行きますか。",
-      "hira": "しゅうてん へ は どうやって いき ます か",
-      "mp3": "br_q58_how_do_i_get_to_the_terminal.mp3"
+      "en": "What is your favorite outdoor place to visit in autumn?",
+      "jp": "秋に訪れるのが好きな屋外の場所はどこですか？",
+      "hira": "あきにおとずれるのがすきなおくがいのばしょはどこですか？",
+      "mp3": "br_q58_what_is_your_favorite_outdoor_place_to_visit_in_autumn.mp3"
     },
     {
       "n": 59,
-      "en": "Can I use this ticket on the bus?",
-      "jp": "この切符はバスで使えますか。",
-      "hira": "この きっぷ は ばす で つかえ ます か",
-      "mp3": "br_q59_can_i_use_this_ticket_on_the_bus.mp3"
+      "en": "How do you connect with nature in autumn?",
+      "jp": "秋に自然とどのように繋がりますか？",
+      "hira": "あきにしぜんとどのようにつながりますか？",
+      "mp3": "br_q59_how_do_you_connect_with_nature_in_autumn.mp3"
     },
     {
       "n": 60,
-      "en": "Where should we line up?",
-      "jp": "どこに並べばいいですか。",
-      "hira": "どこ に ならべ ば いい です か",
-      "mp3": "br_q60_where_should_we_line_up.mp3"
+      "en": "What is your favorite autumn memory with your family?",
+      "jp": "家族との秋の好きな思い出は何ですか？",
+      "hira": "かぞくとのあきのすきなおもいではなんですか？",
+      "mp3": "br_q60_what_is_your_favorite_autumn_memory_with_your_family.mp3"
     }
   ]
 }
