@@ -281,9 +281,15 @@
     blocks: [],
     debTimer: 0,
     cardTitle: '', cardSub: '', cardAccent: '#fff',
+    cardMeta: '', cardMetaGood: false,
     scale: 1, offX: 0, offY: 0,
     runScore: 0,
     roundScore: 0,
+    shotsUsed: 0,
+    collapseCount: 0,
+    powerUsed: new Set(),
+    contractComplete: false,
+    contractBonus: 0,
     combo: 0,
     lives: MAX_RUN_LIVES,
     runStartedAt: 0,
@@ -317,6 +323,7 @@
   }
 
   const LEVELS = window.BOOHA_DESTRUCTION_LEVELS || [];
+  const CHAPTERS = window.BOOHA_DESTRUCTION_CHAPTERS || [];
   if (!LEVELS.length) console.error('Booha: no levels');
 
   // ── Helpers ─────────────────────────────────────────
@@ -325,6 +332,37 @@
   const dist  = (ax, ay, bx, by) => Math.hypot(ax - bx, ay - by);
   const pick  = arr => arr[Math.floor(Math.random() * arr.length)];
   const scoreText = n => Math.round(n || 0).toLocaleString('en-US');
+
+  function currentLevel() { return LEVELS[gs.round] || {}; }
+  function currentChapter() {
+    return CHAPTERS[(currentLevel().chapter || 1) - 1] || {};
+  }
+
+  function evaluateContract(shotsLeft) {
+    const contract = currentLevel().contract;
+    if (!contract) return { complete:false, bonus:0, label:'NO CONTRACT' };
+    const checks = [];
+    if (contract.maxShots != null) checks.push(gs.shotsUsed <= contract.maxShots);
+    if (contract.power) checks.push(gs.powerUsed.has(contract.power));
+    if (contract.minCollapses != null) checks.push(gs.collapseCount >= contract.minCollapses);
+    if (contract.minPowers != null) checks.push(gs.powerUsed.size >= contract.minPowers);
+    const complete = checks.every(Boolean);
+    gs.contractComplete = complete;
+    gs.contractBonus = complete ? (contract.bonus || 0) : 0;
+    return {
+      ...contract,
+      complete,
+      bonus: gs.contractBonus,
+      shotsLeft,
+    };
+  }
+
+  function contractResultText(contract) {
+    if (!contract) return '';
+    return contract.complete
+      ? `✦ ${contract.label} +${scoreText(contract.bonus)}`
+      : `CONTRACT MISSED · ${contract.label}`;
+  }
 
   function readHighScore() {
     try {
@@ -389,12 +427,14 @@
     return result;
   }
 
-  function awardRoundScore(shotsLeft) {
+  function awardRoundScore(shotsLeft, contract) {
     gs.combo++;
     const destruction = Math.round(gs.pct * 8);
     const shotBonus = shotsLeft * 140;
+    const contractBonus = contract && contract.complete ? contract.bonus : 0;
+    const bossBonus = currentLevel().boss ? (currentLevel().bossBonus || 0) : 0;
     const comboMultiplier = 1 + Math.min(1.5, (gs.combo - 1) * 0.08);
-    gs.roundScore = Math.round((1000 + destruction + shotBonus) * comboMultiplier);
+    gs.roundScore = Math.round((1000 + destruction + shotBonus + contractBonus + bossBonus) * comboMultiplier);
     gs.runScore += gs.roundScore;
   }
 
@@ -1003,6 +1043,7 @@ function traitGlowColor(block) {
         if (block.broken || block.falling) continue;
         if (!isBlockSupported(block, i)) {
           block.falling = true;
+          gs.collapseCount++;
           block.vy = block.vy || 0;
           changed = true;
           spawnDust(block.x, block.y + block.h / 2);
@@ -1166,6 +1207,8 @@ function traitGlowColor(block) {
     CRACKS.clear(); shake.v=0;
     gs.dragging=false; gs.pullPlayed=false; gs.bestShot=0; gs.pct=0; gs.brokenBlocks=0;
     gs.roundScore=0;
+    gs.shotsUsed=0; gs.collapseCount=0; gs.powerUsed=new Set();
+    gs.contractComplete=false; gs.contractBonus=0;
     gs.debTimer=0; gs.shotLock=false; gs.flash=0;
     gs.fireTrail=[]; gs.minis=[]; gs.frozen=new Map(); gs.bounces=0;
     gs.isLastBooha=false; gs.timeScale=1;
@@ -1199,6 +1242,7 @@ function traitGlowColor(block) {
   function showCard(phase, title, sub, accent) {
     gs.phase    = phase;
     gs.cardTitle= title; gs.cardSub=sub; gs.cardAccent=accent;
+    gs.cardMeta=''; gs.cardMetaGood=false;
     gs.running  = false;
     gs.booha    = null; gs.minis=[]; gs.damageConfetti=[];
     gs.fireTrail= []; gs.frozen=new Map();
@@ -1691,9 +1735,11 @@ function traitGlowColor(block) {
     const shotsLeft=bst.stocks.reduce((a,v)=>a+v,0);
     gs.ghostsLeft=shotsLeft;
     gs.pct=(gs.brokenBlocks/Math.max(1,gs.totalBlocks))*100;
-    const target=(LEVELS[gs.round]?.targetPercent)||100;
+    const level = currentLevel();
+    const target=(level.targetPercent)||100;
     if (gs.pct>=target) {
-      awardRoundScore(shotsLeft);
+      const contract = evaluateContract(shotsLeft);
+      awardRoundScore(shotsLeft, contract);
       sndWin();
       const r=ROSTER[bst.sel], cfg=r.conf, cnt=~~(cfg.burst*1.4*BURST_SCALE);
       for(let i=0;i<cnt;i++){
@@ -1714,8 +1760,10 @@ function traitGlowColor(block) {
         submitRunScore(true);
         showCard(P.WIN, 'CAMPAIGN CLEAR!', `${LEVELS.length} rounds smashed · ${scoreText(gs.runScore)} points`, '#ffdd44');
       } else {
-        showCard(P.WIN, `ROUND ${gs.roundN} CLEAR!`, `+${scoreText(gs.roundScore)} points · ${scoreText(gs.runScore)} total`, '#ffdd44');
+        showCard(P.WIN, level.boss ? `BOSS ${gs.roundN} CLEARED!` : `ROUND ${gs.roundN} CLEAR!`, `+${scoreText(gs.roundScore)} points · ${scoreText(gs.runScore)} total`, '#ffdd44');
       }
+      gs.cardMeta = `${level.chapterName || 'CAMPAIGN'} · ${level.name || ''}  ·  ${contractResultText(contract)}`;
+      gs.cardMetaGood = contract.complete;
     } else if (shotsLeft<=0) {
       sndFail();
       gs.combo=0;
@@ -1724,8 +1772,9 @@ function traitGlowColor(block) {
         submitRunScore(false);
         showCard(P.FAIL, 'RUN OVER', `${Math.round(gs.pct)}% destruction · ${scoreText(gs.runScore)} points`, '#ff6666');
       } else {
-        showCard(P.FAIL, 'ROUND OVER', `${Math.round(gs.pct)}% destruction · ${gs.lives} lives left`, '#ff6666');
+        showCard(P.FAIL, level.boss ? 'BOSS ROUND OVER' : 'ROUND OVER', `${Math.round(gs.pct)}% destruction · ${gs.lives} lives left`, '#ff6666');
       }
+      gs.cardMeta = `${level.chapterName || 'CAMPAIGN'} · ${level.name || ''}  ·  ${level.contract?.label || 'CONTRACT'}`;
     } else {
       gs.shotLock=false;
       advanceSelector();
@@ -1827,6 +1876,8 @@ function traitGlowColor(block) {
     const dx=SLING_X-gs.booha.x,dy=SLING_Y-gs.booha.y,mag=Math.hypot(dx,dy);
     if(mag<12){gs.booha.x=SLING_X;gs.booha.y=SLING_Y;return;}
     bst.stocks[bst.sel]=Math.max(0,bst.stocks[bst.sel]-1);
+    gs.shotsUsed++;
+    gs.powerUsed.add(gs.booha.power);
     gs.booha.vx=dx*0.19;gs.booha.vy=dy*0.19;gs.booha.launched=true;gs.booha.damageThisShot=0;
     const remaining=bst.stocks.reduce((a,v)=>a+v,0);
     gs.isLastBooha=remaining===0;
@@ -2148,9 +2199,15 @@ function traitGlowColor(block) {
   }
   function drawHUD(){
     ctx.save();ctx.textBaseline='middle';ctx.textAlign='left';
+    const level = currentLevel();
+    const chapter = currentChapter();
     if(gs.isLastBooha&&gs.phase===P.PLAY){
       const pulse=REDUCED_MOTION?0.65:0.5+0.5*Math.sin(performance.now()*0.005);
       ctx.save();ctx.globalAlpha=0.22*pulse;ctx.strokeStyle='#ff4444';ctx.lineWidth=6;ctx.strokeRect(0,0,W,H);ctx.restore();
+    }
+    if (level.boss) {
+      const pulse = REDUCED_MOTION ? 0.6 : 0.45 + 0.2 * Math.sin(performance.now() * 0.004);
+      ctx.save();ctx.globalAlpha=pulse;ctx.strokeStyle=chapter.accent || '#ffdf80';ctx.lineWidth=3;ctx.strokeRect(8,10,W-16,H-18);ctx.restore();
     }
     const barW=W*clamp(gs.pct/100,0,1);
     ctx.save();ctx.globalAlpha=0.55;ctx.fillStyle='rgba(255,255,255,0.1)';ctx.fillRect(0,3,W,5);
@@ -2162,11 +2219,19 @@ function traitGlowColor(block) {
     ctx.fillStyle='#fff';ctx.font='bold 20px system-ui,sans-serif';ctx.fillText(String(gs.roundN),SX+SW/2-ctx.measureText(String(gs.roundN)).width/2,44);
     ctx.fillStyle='#ffdf80';ctx.font='bold 13px system-ui,sans-serif';ctx.fillText(`SCORE ${scoreText(gs.runScore)}`,SX+SW+14,27);
     ctx.fillStyle='#ff8fa3';ctx.font='bold 12px system-ui,sans-serif';ctx.fillText(`LIVES ${'♥'.repeat(Math.max(0,gs.lives)) || '—'}`,SX+SW+14,46);
+    ctx.fillStyle=chapter.accent || '#fff';ctx.font='bold 10px system-ui,sans-serif';
+    ctx.fillText(`CH ${level.chapter || 1} · ${level.chapterName || 'CAMPAIGN'}`,SX+SW+14,61);
+    ctx.fillStyle='rgba(255,255,255,0.72)';ctx.font='bold 11px system-ui,sans-serif';
+    ctx.fillText(`R${gs.roundN} · ${level.name || ''}`,SX+SW+14,76);
+    if (level.contract) {
+      ctx.fillStyle=level.boss ? '#ffdf80' : 'rgba(255,255,255,0.5)';ctx.font='10px system-ui,sans-serif';
+      ctx.fillText(`✦ ${level.contract.label}: ${level.contract.detail}`,SX+SW+14,91);
+    }
     const pills=[
       {label:'SCORE',  value:scoreText(gs.runScore), accent:'#ffdf80'},
       {label:'SHOTS',  value:String(gs.ghostsLeft), accent:gs.isLastBooha?'#ff4444':'#ff9f7f'},
       {label:'DAMAGE', value:`${Math.round(gs.pct)}%`, accent:'#7cfff8'},
-      {label:'TARGET', value:`${(LEVELS[gs.round]?.targetPercent||100)}%`, accent:'#ffdf80'}
+      {label:'TARGET', value:`${(level.targetPercent||100)}%`, accent:'#ffdf80'}
     ];
     const pw=90,ph=44,pg2=10;let px=W-14-pills.length*(pw+pg2)+pg2;
     for(const pill of pills){
@@ -2197,7 +2262,7 @@ function traitGlowColor(block) {
     ctx.fillStyle='#1a0e00';ctx.font='bold 30px system-ui,sans-serif';ctx.fillText('START',W/2,by+bh/2);
     ctx.font='13px system-ui,sans-serif';ctx.fillStyle='rgba(255,255,255,0.38)';
      
-    ctx.fillText(`${LEVELS.length} rounds · ${ROSTER.length} Booha types · Best ${scoreText(gs.highScore)}`,W/2,H/2+100);
+    ctx.fillText(`${CHAPTERS.length || 5} chapters · ${LEVELS.length} rounds · ${ROSTER.length} Booha types · Best ${scoreText(gs.highScore)}`,W/2,H/2+100);
     ctx.save();ctx.globalAlpha=0.55;ctx.fillStyle='rgba(255,255,255,0.08)';ctx.strokeStyle='rgba(255,255,255,0.18)';ctx.lineWidth=1;rr(ctx,W/2-100,H/2+118,200,36,10,true,true);
     ctx.fillStyle='rgba(255,255,255,0.45)';ctx.font='13px system-ui,sans-serif';ctx.fillText('✕ カラスキに戻る · Exit',W/2,H/2+136);ctx.restore();
      
@@ -2213,9 +2278,13 @@ function traitGlowColor(block) {
     ctx.font='20px system-ui,sans-serif';ctx.fillStyle='rgba(255,255,255,0.75)';ctx.fillText(gs.cardSub,W/2,H/2-28);
     ctx.font='14px system-ui,sans-serif';ctx.fillStyle='rgba(255,255,255,0.45)';
     ctx.fillText(`${Math.round(gs.pct)}% destruction  ·  Run ${scoreText(gs.runScore)}  ·  Best ${scoreText(gs.highScore)}`,W/2,H/2+18);
+    if (gs.cardMeta) {
+      ctx.font='13px system-ui,sans-serif';ctx.fillStyle=gs.cardMetaGood?'#7cfff8':'rgba(255,255,255,0.5)';
+      ctx.fillText(gs.cardMeta,W/2,H/2+43);
+    }
     if (gs.lastScoreIsBest && gs.runScore > 0) {
       ctx.font='bold 13px system-ui,sans-serif';ctx.fillStyle='#ffdf80';
-      ctx.fillText('✦ NEW HIGH SCORE ✦',W/2,H/2+43);
+      ctx.fillText('✦ NEW HIGH SCORE ✦',W/2,H/2+62);
     }
     const bx=W/2-130,by=H*0.62,bw=260,bh=58;
     const bg=ctx.createLinearGradient(bx,by,bx,by+bh);
