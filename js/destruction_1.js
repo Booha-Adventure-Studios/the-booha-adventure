@@ -81,6 +81,7 @@
   // ── FX pools ────────────────────────────────────────
   const sparks      = [];
   const waves       = [];
+  const impactBursts = [];
   const dusts       = [];
   const confetti    = [];
   const powers      = [];
@@ -92,6 +93,7 @@
     // valuable than hundreds of particles fighting the playfield and HUD.
     sparks: LOW_POWER ? 58 : 78,
     waves:  LOW_POWER ? 8  : 12,
+    impactBursts: LOW_POWER ? 5 : 8,
     dusts:  LOW_POWER ? 14 : 20,
     confetti: LOW_POWER ? 42 : 64,
     damageConfetti: LOW_POWER ? 16 : 24,
@@ -112,6 +114,7 @@
     };
     trim(sparks, CAP.sparks);
     trim(waves, CAP.waves);
+    trim(impactBursts, CAP.impactBursts);
     trim(dusts, CAP.dusts);
     trim(confetti, CAP.confetti);
     trim(scorchMarks, CAP.scorchMarks);
@@ -377,6 +380,7 @@
     running: false,
     dragging: false, pullPlayed: false,
     lastHit: 0, flash: 0, bestShot: 0,
+    hitStop: 0,
     pct: 0, totalBlocks: 0, brokenBlocks: 0,
     ghostsLeft: 0,
     shotLock: false,
@@ -384,6 +388,7 @@
     blocks: [],
     debTimer: 0,
     cardTitle: '', cardSub: '', cardAccent: '#fff',
+    cardIntro: 0,
     cardMeta: '', cardMetaGood: false,
     roundBestScore: 0,
     roundMedal: 0,
@@ -852,7 +857,7 @@
     const src = mat==='stone'?AUDIO.stone : mat==='glass'?AUDIO.glass : mat==='soft'?AUDIO.soft : AUDIO.wood;
     const volMult = gs.booha?.power === 'monster' ? Math.min(2, 1 + gs.bounces * 0.15) : 1;
     playSFX(src, Math.max(0.2, Math.min(1, spd/14)) * volMult, 0.92+rnd()*0.18);
-    gs.flash = 1;
+    gs.flash = Math.max(gs.flash, spd > 12 ? 0.72 : 0.42);
   }
   function sndBreak() { playSFX(AUDIO.break, 0.95, 0.94+rnd()*0.08); }
   function sndRub()   { playSFX(AUDIO.rubble, 0.55, 0.98+rnd()*0.08); setTimeout(() => playSFX(AUDIO.rubble, 0.28, 1.07), 130); }
@@ -899,6 +904,16 @@
     pushCapped(scorchMarks, CAP.scorchMarks, {x, y, r:rnd(12,22), life:1, decay:0.005});
   }
   function addShake(v) { shake.v = Math.max(shake.v, v); }
+  function spawnImpact(x, y, col='#ffffff', spd=8, kind='hit') {
+    const breakHit = kind === 'break' || kind === 'collapse';
+    pushCapped(impactBursts, CAP.impactBursts, {
+      x, y, r:Math.max(3, spd * 0.45),
+      maxR:breakHit ? Math.min(92, 38 + spd * 2.4) : kind === 'immune' ? 42 : Math.min(58, 24 + spd * 1.5),
+      life:1, decay:breakHit ? 0.095 : 0.16,
+      col, thick:breakHit ? 4 : kind === 'immune' ? 2.5 : 3,
+      kind,
+    });
+  }
   function spawnRingCrack(x, y) {
     pushCapped(waves, CAP.waves, {x, y, r:2, maxR:55, life:1, col:'#ffffff', thick:3});
     pushCapped(waves, CAP.waves, {x, y, r:4, maxR:38, life:1, col:'#aaeeff', thick:2});
@@ -1381,8 +1396,11 @@ function traitGlowColor(block) {
           gs.collapseCount++;
           block.vy = block.vy || 0;
           changed = true;
+          block.shake = 0.9;
+          block.hitFlash = 0.5;
+          spawnImpact(block.x, block.y, '#ffd27c', 7, 'collapse');
           spawnDust(block.x, block.y + block.h / 2);
-          addShake(1.5);
+          addShake(2.5);
         }
       }
     }
@@ -1537,7 +1555,7 @@ function traitGlowColor(block) {
 
   // ── Atomic round management ──────────────────────────
   function resetRound() {
-    sparks.length=0; waves.length=0; dusts.length=0; confetti.length=0;
+    sparks.length=0; waves.length=0; impactBursts.length=0; dusts.length=0; confetti.length=0;
     powers.length=0; scorchMarks.length=0;
     CRACKS.clear(); shake.v=0;
     gs.dragging=false; gs.pullPlayed=false; gs.bestShot=0; gs.pct=0; gs.brokenBlocks=0;
@@ -1547,7 +1565,7 @@ function traitGlowColor(block) {
     gs.ruleComplete=false; gs.ruleBonus=0; gs.ruleFailed=false; gs.ruleTime=0; gs.markedTargetIndex=-1;
     gs.nearMiss=false;
     gs.comboPulse=0;
-    gs.debTimer=0; gs.shotLock=false; gs.flash=0;
+    gs.debTimer=0; gs.shotLock=false; gs.flash=0; gs.hitStop=0; gs.cardIntro=0;
     gs.fireTrail=[]; gs.minis=[]; gs.frozen=new Map(); gs.bounces=0;
     gs.isLastBooha=false; gs.timeScale=1;
     gs.nightmareFlicker=false; gs.nightmareFlickerTimer=0;
@@ -1601,11 +1619,13 @@ function traitGlowColor(block) {
   function showCard(phase, title, sub, accent) {
     gs.phase    = phase;
     gs.cardTitle= title; gs.cardSub=sub; gs.cardAccent=accent;
+    gs.cardIntro=18;
+    gs.flash = phase===P.WIN ? 1.1 : 0.35;
     gs.cardMeta=''; gs.cardMetaGood=false;
     gs.running  = false;
     gs.booha    = null; gs.minis=[]; gs.damageConfetti=[];
     gs.fireTrail= []; gs.frozen=new Map();
-    sparks.length=0; waves.length=0; dusts.length=0;
+    sparks.length=0; waves.length=0; impactBursts.length=0; dusts.length=0;
     scorchMarks.length=0; shake.v=0;
   }
 
@@ -1734,7 +1754,9 @@ function traitGlowColor(block) {
     // Check full immunity first
     if (power && powerBlocked(block, power, 'hit')) {
       spawnWave(hx, hy, '#ffffff', 26);
+      spawnImpact(hx, hy, traitGlowColor(block) || '#ffffff', spd, 'immune');
       block.hitFlash = 0.35;
+      block.shake = 0.65;
       addShake(1.5);
       return;
     }
@@ -1745,10 +1767,11 @@ function traitGlowColor(block) {
     if (actualAmount <= 0) return;
 
     block.hp -= actualAmount;
-    block.shake=1; block.hitFlash=1;
+    block.shake=1.15; block.hitFlash=1;
     const mat=block.material, m=MAT[mat]||MAT.wood;
     spawnSparks(hx, hy, mat, spd, ~~(6+spd*0.5));
     spawnWave(hx, hy, m.spark, 35+spd*2);
+    spawnImpact(hx, hy, m.spark, spd, block.hp<=0 ? 'break' : 'hit');
     if (spd>10) addShake(Math.min(6, spd*0.4));
     if (block.hp<=0) {
       block.broken=true; gs.brokenBlocks++;
@@ -1760,6 +1783,7 @@ function traitGlowColor(block) {
         const nearby=gs.blocks.filter(bl=>!bl.broken&&dist(bl.x,bl.y,block.x,block.y)<120);
         nearby.slice(0,2).forEach(nb=>{spawnSparks(nb.x,nb.y,nb.material,spd*0.6,8);nb.hitFlash=0.5;});
       }
+      gs.hitStop=Math.max(gs.hitStop, spd>12 ? 5 : 3);
       addShake(Math.min(10, spd*0.6+4));
       if (doSFX) sndBreak();
       gs.debTimer=18;
@@ -1801,6 +1825,7 @@ function traitGlowColor(block) {
     if (fullyBlocked) {
       spawnWave(cx, cy, '#ffffff', 32);
       spawnWave(cx, cy, traitGlowColor(block) || '#ffffff', 22);
+      spawnImpact(cx, cy, traitGlowColor(block) || '#ffffff', spd, 'immune');
       for (let i = 0; i < 10; i++) {
         const a = rnd(0, Math.PI*2), mag = rnd(2, 7);
         pushCapped(sparks, CAP.sparks, {
@@ -2183,6 +2208,7 @@ function traitGlowColor(block) {
   // ── FX update ────────────────────────────────────────
   function updateFX() {
     gs.comboPulse *= 0.92;
+    if (gs.cardIntro > 0) gs.cardIntro--;
     if (gs.phase === P.WIN || gs.phase === P.FAIL) {
       updateConfetti();
       return;
@@ -2196,6 +2222,12 @@ function traitGlowColor(block) {
       if(p.life<=0)sparks.splice(i,1);
     }
     for(let i=waves.length-1;i>=0;i--){const w=waves[i];w.r+=(w.maxR-w.r)*0.18;w.life-=0.07;if(w.life<=0)waves.splice(i,1);}
+    for(let i=impactBursts.length-1;i>=0;i--){
+      const p=impactBursts[i];
+      p.r+=(p.maxR-p.r)*0.28;
+      p.life-=p.decay;
+      if(p.life<=0)impactBursts.splice(i,1);
+    }
     for(let i=dusts.length-1;i>=0;i--){
       const d=dusts[i];
       if(d.falling){d.y=(d.y||0)+(d.vy||2);}
@@ -2596,6 +2628,16 @@ function traitGlowColor(block) {
   }
   function drawFXFront(){
     drawGhostSparks();
+    for(const p of impactBursts){
+      if(offscreen(p.x,p.y,p.maxR))continue;
+      ctx.globalAlpha=clamp(p.life,0,1)*0.9;
+      ctx.strokeStyle=p.col;ctx.lineWidth=p.thick*(0.65+0.35*p.life);
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.stroke();
+      if(p.kind==='break'){
+        ctx.globalAlpha*=0.55;ctx.lineWidth=1.5;
+        ctx.beginPath();ctx.arc(p.x,p.y,Math.max(2,p.r*0.58),0,Math.PI*2);ctx.stroke();
+      }
+    }
     for(const p of sparks){
       if(p.type==='ghost')continue;
       if(offscreen(p.x,p.y,p.r))continue;
@@ -2615,8 +2657,8 @@ function traitGlowColor(block) {
   }
   function drawFlash(){
     if(gs.flash<=0)return;
-    ctx.save();ctx.fillStyle=`rgba(255,255,255,${0.07*gs.flash})`;ctx.fillRect(0,0,W,H);ctx.restore();
-    gs.flash*=0.84;
+    ctx.save();ctx.fillStyle=`rgba(255,255,255,${0.11*gs.flash})`;ctx.fillRect(0,0,W,H);ctx.restore();
+    gs.flash*=0.74;
   }
 
   function drawHelpButton(){
@@ -2851,8 +2893,11 @@ function traitGlowColor(block) {
     const win=gs.phase===P.WIN;
     ctx.fillStyle=win?'rgba(0,18,0,0.62)':'rgba(28,0,0,0.62)';ctx.fillRect(0,0,W,H);
     ctx.save();ctx.textAlign='center';ctx.textBaseline='middle';
+    const introP=1-clamp(gs.cardIntro/18,0,1);
+    const titleScale=0.84+introP*0.16;
+    ctx.save();ctx.globalAlpha=0.35+introP*0.65;ctx.translate(W/2,H/2-88);ctx.scale(titleScale,titleScale);
     ctx.font='bold 70px system-ui,sans-serif';ctx.fillStyle=gs.cardAccent;
-    ctx.shadowColor=gs.cardAccent;ctx.shadowBlur=28;ctx.fillText(gs.cardTitle,W/2,H/2-88);ctx.shadowBlur=0;
+    ctx.shadowColor=gs.cardAccent;ctx.shadowBlur=18;ctx.fillText(gs.cardTitle,0,0);ctx.restore();
     ctx.font='20px system-ui,sans-serif';ctx.fillStyle='rgba(255,255,255,0.75)';ctx.fillText(gs.cardSub,W/2,H/2-28);
     ctx.font='14px system-ui,sans-serif';ctx.fillStyle='rgba(255,255,255,0.45)';
     ctx.fillText(`${Math.round(gs.pct)}% damage / はかい  ·  Run / ラン ${scoreText(gs.runScore)}  ·  Best / ベスト ${scoreText(gs.highScore)}`,W/2,H/2+18);
@@ -2929,7 +2974,9 @@ function traitGlowColor(block) {
       while(physicsCarry>=FIXED_STEP&&steps<4){
         updateRuleTimer();
         if(gs.phase!==P.PLAY){physicsCarry=0;break;}
-        updateFX();updateBlocks();updateBooha();
+        updateFX();
+        if(gs.hitStop>0) gs.hitStop--;
+        else { updateBlocks(); updateBooha(); }
         physicsCarry-=FIXED_STEP;steps++;
         if(gs.phase!==P.PLAY){physicsCarry=0;break;}
       }
