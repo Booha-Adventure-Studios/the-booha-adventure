@@ -1118,6 +1118,26 @@ function traitGlowColor(block) {
     }
     return '#dddddd';
   }
+
+  function traitBadge(block) {
+    if (hasTrait(block, 'ultimateproof')) return 'ULT';
+    if (hasTrait(block, 'fireproof')) return 'FIRE';
+    if (hasTrait(block, 'iceproof')) return 'ICE';
+    if (hasTrait(block, 'heavyproof')) return 'HEAVY';
+    if (hasTrait(block, 'rockproof')) return 'ROCK';
+    if (hasTrait(block, 'rainbowproof')) return 'RAINBOW';
+    if (hasTrait(block, 'burnimmune')) return 'BURN';
+    if (hasTrait(block, 'freezeimmune')) return 'FREEZE';
+    if (hasTrait(block, 'convertimmune')) return 'CONVERT';
+    if (block.resist) {
+      const keys = Object.keys(block.resist);
+      if (keys.length) {
+        const dominant = keys.reduce((a, b) => block.resist[a] <= block.resist[b] ? a : b);
+        return dominant.toUpperCase();
+      }
+    }
+    return '';
+  }
   // ── Death explosions ─────────────────────────────────
   function triggerDeathExplosion(b) {
     const x = b.x, y = b.y, power = b.power, ri = b.ri;
@@ -2657,6 +2677,18 @@ function traitGlowColor(block) {
           ctx.fillText('◆', block.x, by - 14);
           ctx.restore();
         }
+        const badge=traitBadge(block);
+        if (badge && block.w>=46 && block.h>=24) {
+          const badgeW=Math.min(block.w-6,Math.max(30,badge.length*6.2+10));
+          const badgeX=block.x-badgeW/2;
+          const badgeY=Math.max(5,by-14);
+          ctx.save();
+          ctx.fillStyle='rgba(4,7,12,0.9)';ctx.strokeStyle=glowCol||'#fff';ctx.lineWidth=1;
+          rr(ctx,badgeX,badgeY,badgeW,13,5,true,true);
+          ctx.fillStyle='#fff';ctx.font='bold 8px system-ui,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+          ctx.fillText(badge,block.x,badgeY+6.5);
+          ctx.restore();
+        }
       }
 
       ctx.restore();
@@ -2821,7 +2853,10 @@ function traitGlowColor(block) {
     const statsWidth=panels.length*pw+(panels.length-1)*gap;
     const statsX=W-14-statsWidth;
     const barX=118,barW=Math.max(260,Math.min(460,statsX-barX-28)),barY=84;
-    ctx.save();ctx.fillStyle='rgba(255,255,255,0.16)';rr(ctx,barX,barY,barW,9,5,true,false);
+    const headerW=Math.max(260,statsX-112);
+    ctx.save();ctx.fillStyle='rgba(5,8,14,0.78)';ctx.strokeStyle='rgba(255,255,255,0.2)';ctx.lineWidth=1.5;rr(ctx,104,10,headerW,68,12,true,true);ctx.restore();
+    ctx.save();ctx.fillStyle='rgba(0,0,0,0.42)';ctx.strokeStyle='rgba(255,255,255,0.2)';ctx.lineWidth=1;rr(ctx,barX-4,barY-3,barW+8,15,7,true,true);
+    ctx.fillStyle='rgba(255,255,255,0.2)';rr(ctx,barX,barY,barW,9,5,true,false);
     const pg=ctx.createLinearGradient(barX,0,barX+barW,0);pg.addColorStop(0,'#ff7cfb');pg.addColorStop(0.5,'#7cfff8');pg.addColorStop(1,'#ffdf80');
     ctx.fillStyle=pg;rr(ctx,barX,barY,barW*clamp(gs.pct/100,0,1),9,5,true,false);ctx.restore();
 
@@ -2842,7 +2877,7 @@ function traitGlowColor(block) {
     for(const panel of panels){
       ctx.save();ctx.fillStyle='rgba(8,6,16,0.88)';ctx.strokeStyle='rgba(255,255,255,0.18)';ctx.lineWidth=1.5;rr(ctx,px,12,pw,ph,12,true,true);ctx.restore();
       ctx.textAlign='center';ctx.fillStyle='rgba(255,255,255,0.78)';ctx.font='bold 11px system-ui,sans-serif';ctx.fillText(panel.en,px+pw/2,27);
-      ctx.fillStyle='rgba(255,255,255,0.52)';ctx.font='10px system-ui,sans-serif';ctx.fillText(panel.jp,px+pw/2,40);
+      ctx.fillStyle='rgba(255,255,255,0.62)';ctx.font='11px system-ui,sans-serif';ctx.fillText(panel.jp,px+pw/2,40);
       ctx.fillStyle=panel.accent;ctx.font='bold 22px system-ui,sans-serif';ctx.fillText(panel.value,px+pw/2,61);px+=pw+gap;
     }
 
