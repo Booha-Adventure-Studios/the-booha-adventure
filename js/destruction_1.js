@@ -2662,10 +2662,39 @@ function traitGlowColor(block) {
 
   function drawTraj(){
     if(!gs.dragging||!gs.booha)return;
-    const b=gs.booha;let tx=b.x,ty=b.y,tvx=(SLING_X-b.x)*0.19,tvy=(SLING_Y-b.y)*0.19;
+    const b=gs.booha;
+    let tx=b.x,ty=b.y,tvx=(SLING_X-b.x)*0.19,tvy=(SLING_Y-b.y)*0.19;
+    const points=[];
+    for(let i=0;i<22;i++){
+      tvy+=GRAVITY;tvx*=AIR;tvy*=AIR;tx+=tvx;ty+=tvy;
+      points.push({x:tx,y:ty});
+    }
+    const accent=ROSTER[bst.sel]?.conf?.cols?.[0] || '#7cfff8';
     ctx.save();
-    for(let i=0;i<22;i++){tvy+=GRAVITY;tvx*=AIR;tvy*=AIR;tx+=tvx;ty+=tvy;
-      ctx.globalAlpha=(1-i/22)*0.55;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(tx,ty,Math.max(1.5,5.5-i*0.2),0,Math.PI*2);ctx.fill();}
+    for(let i=0;i<points.length;i++){
+      const point=points[i], fade=(1-i/points.length)*0.72;
+      const radius=Math.max(1.8,5.5-i*0.2);
+      // A dark keyline keeps the guide visible over bright forest and blocks.
+      ctx.globalAlpha=fade*0.85;ctx.fillStyle='rgba(0,0,0,0.72)';
+      ctx.beginPath();ctx.arc(point.x,point.y,radius+2.2,0,Math.PI*2);ctx.fill();
+      ctx.globalAlpha=fade;ctx.fillStyle=accent;
+      ctx.beginPath();ctx.arc(point.x,point.y,radius,0,Math.PI*2);ctx.fill();
+    }
+    const end=points[points.length-1];
+    if(end){
+      ctx.globalAlpha=0.82;ctx.strokeStyle=accent;ctx.lineWidth=2;
+      ctx.beginPath();ctx.arc(end.x,end.y,11,0,Math.PI*2);ctx.stroke();
+      ctx.globalAlpha=0.5;ctx.beginPath();ctx.moveTo(end.x-17,end.y);ctx.lineTo(end.x+17,end.y);ctx.moveTo(end.x,end.y-17);ctx.lineTo(end.x,end.y+17);ctx.stroke();
+    }
+    const pull=clamp(Math.hypot(b.x-SLING_X,b.y-SLING_Y)/MAX_PULL,0,1);
+    const meterX=SLING_X-58,meterY=SLING_Y+56,meterW=116,meterH=28;
+    ctx.globalAlpha=0.9;ctx.fillStyle='rgba(5,8,14,0.84)';ctx.strokeStyle='rgba(255,255,255,0.28)';ctx.lineWidth=1;
+    rr(ctx,meterX,meterY,meterW,meterH,9,true,true);
+    ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='rgba(255,255,255,0.86)';ctx.font='bold 9px system-ui,sans-serif';
+    ctx.fillText('POWER / ちから',SLING_X,meterY+8);
+    ctx.fillStyle='rgba(255,255,255,0.16)';rr(ctx,meterX+10,meterY+16,meterW-20,5,3,true,false);
+    const pg=ctx.createLinearGradient(meterX+10,0,meterX+meterW-10,0);pg.addColorStop(0,'#44ffcc');pg.addColorStop(0.7,'#ffdf44');pg.addColorStop(1,'#ff5555');
+    ctx.fillStyle=pg;rr(ctx,meterX+10,meterY+16,(meterW-20)*pull,5,3,true,false);
     ctx.restore();
   }
   function drawGround(){
