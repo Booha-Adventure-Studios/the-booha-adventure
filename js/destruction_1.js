@@ -49,11 +49,19 @@
     window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   const LOW_POWER = IS_MOBILE || REDUCED_MOTION ||
     (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4);
-  const BURST_SCALE = LOW_POWER ? 0.65 : 1.0;
+  // Canvas 2D effects are fill-rate heavy on scaled iPad displays. Start
+  // conservatively and let the governor earn quality back after the scene is
+  // proven stable. The game should feel responsive before it feels flashy.
+  const BURST_SCALE = LOW_POWER ? 0.42 : 0.68;
   const PERF = {
-    fxScale: LOW_POWER ? 0.55 : 1,
+    fxScale: LOW_POWER ? 0.42 : 0.68,
+    targetScale: LOW_POWER ? 0.5 : 0.82,
     slowFrames: 0,
     fastFrames: 0,
+    frameMs: 0,
+    updateMs: 0,
+    renderMs: 0,
+    qualityChanges: 0,
   };
 
   // ── Canvas ──────────────────────────────────────────
@@ -77,17 +85,37 @@
   const shake       = { v:0, decay:0.87 };
 
   const CAP = {
-    sparks: LOW_POWER ? 120 : 180,
-    waves:  LOW_POWER ? 20  : 30,
-    dusts:  LOW_POWER ? 28  : 40,
-    confetti: LOW_POWER ? 180 : 280,
-    damageConfetti: LOW_POWER ? 50 : 80,
-    scorchMarks: LOW_POWER ? 8 : 12
+    // These are intentionally conservative. A short, readable burst is more
+    // valuable than hundreds of particles fighting the playfield and HUD.
+    sparks: LOW_POWER ? 58 : 78,
+    waves:  LOW_POWER ? 8  : 12,
+    dusts:  LOW_POWER ? 14 : 20,
+    confetti: LOW_POWER ? 42 : 64,
+    damageConfetti: LOW_POWER ? 16 : 24,
+    scorchMarks: LOW_POWER ? 5 : 7
   };
   function pushCapped(arr, cap, item) {
     const limit = Math.max(1, Math.floor(cap * PERF.fxScale));
     if (arr.length < limit) arr.push(item);
   }
+  function burstCount(base, minimum=1) {
+    const factor = clamp(PERF.fxScale / 0.68, 0.42, 1);
+    return Math.max(minimum, Math.round(base * factor));
+  }
+  function trimFX() {
+    const trim = (arr, cap) => {
+      const limit = Math.max(1, Math.floor(cap * PERF.fxScale));
+      if (arr.length > limit) arr.splice(0, arr.length - limit);
+    };
+    trim(sparks, CAP.sparks);
+    trim(waves, CAP.waves);
+    trim(dusts, CAP.dusts);
+    trim(confetti, CAP.confetti);
+    trim(scorchMarks, CAP.scorchMarks);
+    if (typeof gs !== 'undefined' && gs.damageConfetti) trim(gs.damageConfetti, CAP.damageConfetti);
+  }
+  // Useful during device testing without adding an on-screen debug panel.
+  window.__BOOHA_DESTRUCTION_PERF = PERF;
 
   // ── Landscape lock overlay ───────────────────────────
   let rotateOverlay = null;
@@ -661,11 +689,16 @@
     } catch (e) { return 0; }
   }
 
-  function adaptPerformance(frameMs) {
-    if (frameMs > 28) {
+  function adaptPerformance(frameMs, updateMs=0, renderMs=0) {
+    PERF.frameMs = PERF.frameMs ? PERF.frameMs * 0.85 + frameMs * 0.15 : frameMs;
+    PERF.updateMs = PERF.updateMs ? PERF.updateMs * 0.85 + updateMs * 0.15 : updateMs;
+    PERF.renderMs = PERF.renderMs ? PERF.renderMs * 0.85 + renderMs * 0.15 : renderMs;
+    const pressureMs = Math.max(PERF.frameMs, PERF.updateMs + PERF.renderMs);
+
+    if (pressureMs > 24 || renderMs > 14) {
       PERF.slowFrames++;
       PERF.fastFrames = 0;
-    } else if (frameMs < 18) {
+    } else if (pressureMs < 17 && renderMs < 10) {
       PERF.fastFrames++;
       PERF.slowFrames = 0;
     } else {
@@ -673,12 +706,14 @@
       PERF.fastFrames = 0;
     }
 
-    if (PERF.slowFrames >= 18) {
-      PERF.fxScale = Math.max(0.38, PERF.fxScale - 0.08);
+    if (PERF.slowFrames >= 8) {
+      PERF.fxScale = Math.max(0.30, PERF.fxScale - 0.10);
+      PERF.qualityChanges++;
+      trimFX();
       PERF.slowFrames = 0;
-    } else if (PERF.fastFrames >= 90) {
-      const target = LOW_POWER ? 0.55 : 1;
-      PERF.fxScale = Math.min(target, PERF.fxScale + 0.08);
+    } else if (PERF.fastFrames >= 75) {
+      PERF.fxScale = Math.min(PERF.targetScale, PERF.fxScale + 0.06);
+      PERF.qualityChanges++;
       PERF.fastFrames = 0;
     }
   }
@@ -830,7 +865,7 @@
   // ── FX Spawners ──────────────────────────────────────
   function spawnSparks(x, y, mat, spd, n=8) {
     const m = MAT[mat] || MAT.wood;
-    for (let i = 0; i < n; i++) {
+    for (let i = 0; i < burstCount(n); i++) {
       const a = rnd(0, Math.PI*2), mag = rnd(1.5, Math.min(12, spd*0.7)), chip = mat!=='glass' && rnd()<0.4;
       pushCapped(sparks, CAP.sparks, {x, y, vx:Math.cos(a)*mag, vy:Math.sin(a)*mag-rnd(0,3),
         life:1, r:chip?rnd(2.5,5):rnd(1,2.5), col:rnd()<0.5?m.spark:m.chip,
@@ -838,7 +873,7 @@
     }
   }
   function spawnGlass(x, y, w, h) {
-    for (let i = 0, n = 10+~~rnd(0,8); i < n; i++) {
+    for (let i = 0, n = burstCount(10+~~rnd(0,8), 4); i < n; i++) {
       const a = rnd(0,Math.PI*2), mag = rnd(3,14);
       pushCapped(sparks, CAP.sparks, {x:x+rnd(-w*0.4,w*0.4), y:y+rnd(-h*0.4,h*0.4),
         vx:Math.cos(a)*mag, vy:Math.sin(a)*mag-rnd(1,5),
@@ -847,7 +882,7 @@
     }
   }
   function spawnIce(x, y, w, h) {
-    for (let i = 0; i < 14; i++) {
+    for (let i = 0; i < burstCount(14, 5); i++) {
       const a = rnd(0,Math.PI*2), mag = rnd(2,9);
       pushCapped(sparks, CAP.sparks, {x:x+rnd(-w*0.3,w*0.3), y:y+rnd(-h*0.3,h*0.3),
         vx:Math.cos(a)*mag, vy:Math.sin(a)*mag-rnd(0,4),
@@ -877,7 +912,7 @@
       col:`hsl(${hue},100%,70%)`, type:'dot', grav:0.02, rot:0, rotV:0, decay:rnd(0.012,0.022)});
   }
   function spawnTeleport(x, y) {
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < burstCount(30, 8); i++) {
       const a = rnd(0,Math.PI*2), mag = rnd(5,22);
       pushCapped(sparks, CAP.sparks, {x, y, vx:Math.cos(a)*mag, vy:Math.sin(a)*mag, life:1,
         r:rnd(3,9), col:pick(['#550088','#bb00ff','#ff00ff','#220033']), type:'dot', grav:0.15, rot:0, rotV:0});
@@ -928,7 +963,7 @@
 
    
   function spawnDetonation(x, y) {
-    for (let i = 0; i < 80; i++) {
+    for (let i = 0; i < burstCount(80, 16); i++) {
       const a = rnd(0,Math.PI*2), mag = rnd(8,32);
       pushCapped(sparks, CAP.sparks, {x, y, vx:Math.cos(a)*mag, vy:Math.sin(a)*mag-rnd(0,5), life:1,
         r:rnd(4,14), col:pick(['#ff0088','#ff8800','#ffff00','#00ffaa','#0088ff','#cc00ff']),
@@ -2342,11 +2377,11 @@ function traitGlowColor(block) {
   function drawBooha(){
     const b=gs.booha; if(!b)return;
     if(b.power==='nightmare'&&gs.nightmareFlicker)return;
-    if(b.power==='monster'&&gs.bounces>0){ctx.save();ctx.globalAlpha=0.3;ctx.shadowColor='#44ff44';ctx.shadowBlur=20;ctx.beginPath();ctx.arc(b.x,b.y,b.radius,0,Math.PI*2);ctx.fillStyle='#22aa22';ctx.fill();ctx.restore();}
+    if(b.power==='monster'&&gs.bounces>0){ctx.save();ctx.globalAlpha=0.28;ctx.strokeStyle='#44ff44';ctx.lineWidth=5;ctx.beginPath();ctx.arc(b.x,b.y,b.radius+5,0,Math.PI*2);ctx.stroke();ctx.restore();}
     if(b.power==='ice'){ctx.save();ctx.globalAlpha=0.35;ctx.beginPath();ctx.arc(b.x,b.y,b.radius+4,0,Math.PI*2);ctx.fillStyle='#aaeeff';ctx.fill();ctx.restore();}
-    if(b.power==='rainbow'){const hue=(performance.now()*0.25)%360;ctx.save();ctx.globalAlpha=0.4;ctx.beginPath();ctx.arc(b.x,b.y,b.radius+6,0,Math.PI*2);ctx.fillStyle=`hsl(${hue},100%,65%)`;ctx.fill();ctx.restore();}
-    if(b.tellGlow>0){ctx.save();ctx.globalAlpha=b.tellGlow*0.85;ctx.shadowColor='#ffffff';ctx.shadowBlur=30*b.tellGlow;ctx.beginPath();ctx.arc(b.x,b.y,b.radius*b.tellScaleX*1.1,0,Math.PI*2);ctx.fillStyle='rgba(255,255,255,0.5)';ctx.fill();ctx.restore();}
-    if(gs.isLastBooha&&b.launched){const pulse=0.5+0.5*Math.sin(performance.now()*0.006);ctx.save();ctx.globalAlpha=0.3*pulse;ctx.shadowColor='#ffdd44';ctx.shadowBlur=22;ctx.beginPath();ctx.arc(b.x,b.y,b.radius+10,0,Math.PI*2);ctx.fillStyle='#ffdd44';ctx.fill();ctx.restore();}
+    if(b.power==='rainbow'){ctx.save();ctx.globalAlpha=0.38;ctx.strokeStyle='#d68cff';ctx.lineWidth=5;ctx.beginPath();ctx.arc(b.x,b.y,b.radius+6,0,Math.PI*2);ctx.stroke();ctx.restore();}
+    if(b.tellGlow>0){ctx.save();ctx.globalAlpha=b.tellGlow*0.85;ctx.strokeStyle='#ffffff';ctx.lineWidth=4;ctx.beginPath();ctx.arc(b.x,b.y,b.radius*b.tellScaleX*1.1,0,Math.PI*2);ctx.stroke();ctx.restore();}
+    if(gs.isLastBooha&&b.launched){const pulse=0.5+0.5*Math.sin(performance.now()*0.006);ctx.save();ctx.globalAlpha=0.3*pulse;ctx.strokeStyle='#ffdd44';ctx.lineWidth=5;ctx.beginPath();ctx.arc(b.x,b.y,b.radius+10,0,Math.PI*2);ctx.stroke();ctx.restore();}
     const img=bst.imgs[b.ri];
     ctx.save();ctx.translate(b.x,b.y);
     if(b.launched)ctx.rotate(Math.atan2(b.vy,b.vx)*0.2);
@@ -2359,21 +2394,21 @@ function traitGlowColor(block) {
   function drawGhostSparks(){
     for(const p of sparks){
       if(p.type!=='ghost')continue;
-      ctx.save();ctx.globalAlpha=clamp(p.life,0,1)*0.35;
+      ctx.globalAlpha=clamp(p.life,0,1)*0.35;
       const img=bst.imgs[p.ri];
       if(img)ctx.drawImage(img,p.x-p.r,p.y-p.r,p.r*2,p.r*2);
       else{ctx.beginPath();ctx.arc(p.x,p.y,p.r*0.5,0,Math.PI*2);ctx.fillStyle='#9900ff';ctx.fill();}
-      ctx.restore();
     }
+    ctx.globalAlpha=1;
   }
   function drawMinis(){
     for(const m of gs.minis){
-      ctx.save();ctx.globalAlpha=clamp(m.life,0,1)*0.85;
+      ctx.globalAlpha=clamp(m.life,0,1)*0.85;
       const img=bst.imgs[m.ri];
       if(img)ctx.drawImage(img,m.x-m.radius*1.4,m.y-m.radius*1.4,m.radius*2.8,m.radius*2.8);
       else{ctx.fillStyle='#ffaacc';ctx.beginPath();ctx.arc(m.x,m.y,m.radius,0,Math.PI*2);ctx.fill();}
-      ctx.restore();
     }
+    ctx.globalAlpha=1;
   }
 
   // Static block art is rendered once and reused. The old path rebuilt these
@@ -2478,8 +2513,6 @@ function traitGlowColor(block) {
           ctx.globalAlpha = pulse * 0.72;
           ctx.strokeStyle = glowCol;
           ctx.lineWidth = 3.5;
-          ctx.shadowColor = glowCol;
-          ctx.shadowBlur = LOW_POWER ? 0 : 8;
           rr(ctx, bx - 1, by - 1, bw + 2, bh + 2, 9, false, true);
           ctx.restore();
         }
@@ -2520,21 +2553,26 @@ function traitGlowColor(block) {
     ctx.fillStyle=g;ctx.fillRect(0,FLOOR_Y-8,W,16);ctx.restore();
   }
   function drawFXBehind(){
-    for(const d of dusts){if(offscreen(d.x,d.y||0,d.r))continue;ctx.save();ctx.globalAlpha=d.life*0.22;ctx.beginPath();ctx.arc(d.x,d.y||0,d.r,0,Math.PI*2);ctx.fillStyle='rgba(200,190,180,0.5)';ctx.fill();ctx.restore();}
-    for(const w of waves){if(offscreen(w.x,w.y,w.r))continue;ctx.save();ctx.globalAlpha=w.life*0.7;ctx.strokeStyle=w.col;ctx.lineWidth=(w.thick||2.5)*w.life;ctx.beginPath();ctx.arc(w.x,w.y,w.r,0,Math.PI*2);ctx.stroke();ctx.restore();}
+    for(const d of dusts){if(offscreen(d.x,d.y||0,d.r))continue;ctx.globalAlpha=d.life*0.22;ctx.beginPath();ctx.arc(d.x,d.y||0,d.r,0,Math.PI*2);ctx.fillStyle='rgba(200,190,180,0.5)';ctx.fill();}
+    for(const w of waves){if(offscreen(w.x,w.y,w.r))continue;ctx.globalAlpha=w.life*0.7;ctx.strokeStyle=w.col;ctx.lineWidth=(w.thick||2.5)*w.life;ctx.beginPath();ctx.arc(w.x,w.y,w.r,0,Math.PI*2);ctx.stroke();}
+    ctx.globalAlpha=1;
   }
   function drawFXFront(){
     drawGhostSparks();
     for(const p of sparks){
       if(p.type==='ghost')continue;
       if(offscreen(p.x,p.y,p.r))continue;
-      ctx.save();ctx.globalAlpha=clamp(p.life,0,1)*(p.alpha||1);ctx.fillStyle=p.col;
-      ctx.translate(p.x,p.y);if(p.rot!==undefined)ctx.rotate(p.rot);
-      if(p.type==='shard'){const s=p.r;ctx.beginPath();ctx.moveTo(0,-s);ctx.lineTo(s*0.7,s*0.6);ctx.lineTo(-s*0.7,s*0.4);ctx.closePath();ctx.fillStyle=p.col;ctx.strokeStyle='rgba(180,240,255,0.6)';ctx.lineWidth=0.8;ctx.fill();ctx.stroke();}
-      else if(p.type==='chip'){ctx.fillRect(-p.r*0.6,-p.r*0.4,p.r*1.2,p.r*0.8);}
-      else{ctx.beginPath();ctx.arc(0,0,p.r,0,Math.PI*2);ctx.fill();}
-      ctx.restore();
+      ctx.globalAlpha=clamp(p.life,0,1)*(p.alpha||1);ctx.fillStyle=p.col;
+      if(p.type==='shard'){
+        ctx.save();ctx.translate(p.x,p.y);if(p.rot!==undefined)ctx.rotate(p.rot);
+        const s=p.r;ctx.beginPath();ctx.moveTo(0,-s);ctx.lineTo(s*0.7,s*0.6);ctx.lineTo(-s*0.7,s*0.4);ctx.closePath();ctx.fillStyle=p.col;ctx.strokeStyle='rgba(180,240,255,0.6)';ctx.lineWidth=0.8;ctx.fill();ctx.stroke();ctx.restore();
+      } else if(p.type==='chip'){
+        ctx.fillRect(p.x-p.r*0.6,p.y-p.r*0.4,p.r*1.2,p.r*0.8);
+      } else {
+        ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();
+      }
     }
+    ctx.globalAlpha=1;
     drawScorchMarks();
     drawClangLabels();
   }
@@ -2831,7 +2869,7 @@ function traitGlowColor(block) {
   function tick(now){
     const frameMs = lastT ? Math.min(now-lastT,50) : FIXED_STEP;
     lastT=now;
-    adaptPerformance(frameMs);
+    const workStart = performance.now();
 
     if(gs.phase===P.PLAY){
       physicsCarry=Math.min(FIXED_STEP*4,physicsCarry+frameMs);
@@ -2847,7 +2885,10 @@ function traitGlowColor(block) {
       physicsCarry=0;
       updateFX();
     }
+    const updateMs = performance.now() - workStart;
+    const renderStart = performance.now();
     render();
+    adaptPerformance(frameMs, updateMs, performance.now() - renderStart);
     requestAnimationFrame(tick);
   }
 
