@@ -155,7 +155,11 @@
   // ── Audio ────────────────────────────────────────────
   let AC = null;
   const AUDIO_PREF_KEY = 'booha_destruction_muted';
-  const AUDIO_STATE = { muted:false, warned:new Set(), ready:false };
+  const AUDIO_STATE = {
+    muted:false, warned:new Set(), ready:false,
+    master:0.82, maxVoices:4, activeVoices:0,
+    lastPlayed:new Map(), activeSFX:[]
+  };
 
   function audioWarn(key, error) {
     if (AUDIO_STATE.warned.has(key)) return;
@@ -203,11 +207,14 @@
   function playBuffer(key, vol=1) {
     if (AUDIO_STATE.muted) return;
     const buf = audioBuffers[key]; if (!buf) return;
+    if (AUDIO_STATE.activeVoices >= AUDIO_STATE.maxVoices) return;
     try {
       const ac = getAC(); if (!ac) return;
       const src = ac.createBufferSource(), gain = ac.createGain();
-      src.buffer = buf; gain.gain.value = Math.max(0, Math.min(1, vol));
+      src.buffer = buf; gain.gain.value = Math.max(0, Math.min(1, vol * AUDIO_STATE.master));
       src.connect(gain); gain.connect(ac.destination); src.start();
+      AUDIO_STATE.activeVoices++;
+      src.onended = () => { AUDIO_STATE.activeVoices=Math.max(0,AUDIO_STATE.activeVoices-1); };
     } catch(e) {}
   }
   const SFX_POOL_SIZE = 5;
@@ -225,28 +232,42 @@
     pool.sort((a, b) => b.currentTime - a.currentTime);
     const oldest = pool[0]; oldest.pause(); oldest.currentTime = 0; return oldest;
   }
-  function playSFX(src, vol=1, rate=1) {
+  function playSFX(src, vol=1, rate=1, channel=src, cooldownMs=0, priority=0) {
     if (!src || AUDIO_STATE.muted) return;
+    const now=performance.now();
+    const last=AUDIO_STATE.lastPlayed.get(channel)||0;
+    if (cooldownMs && now-last<cooldownMs) return;
+    AUDIO_STATE.lastPlayed.set(channel,now);
+    AUDIO_STATE.activeSFX=AUDIO_STATE.activeSFX.filter(a=>!a.paused&&!a.ended);
+    if (AUDIO_STATE.activeSFX.length>=AUDIO_STATE.maxVoices) {
+      if (priority<2) return;
+      const oldest=AUDIO_STATE.activeSFX.shift();
+      try { oldest.pause(); oldest.currentTime=0; } catch(e) {}
+    }
     try {
       const a = getSFXNode(src);
       a.preload = 'auto';
-      a.volume = Math.max(0, Math.min(1, vol));
+      a.volume = Math.max(0, Math.min(1, vol * AUDIO_STATE.master));
       a.playbackRate = rate; a.currentTime = 0;
       const play = a.play();
+      AUDIO_STATE.activeSFX.push(a);
       if (play?.catch) play.catch(e => audioWarn(src, e));
     } catch(e) { audioWarn(src, e); }
   }
   function synthPop(freq=500, vol=0.3, dur=0.08) {
     try {
       if (AUDIO_STATE.muted) return;
+      if (AUDIO_STATE.activeVoices >= AUDIO_STATE.maxVoices) return;
       const ac = getAC(); if (!ac) return;
       const o = ac.createOscillator(), g = ac.createGain();
       o.connect(g); g.connect(ac.destination); o.type = 'sine';
       o.frequency.setValueAtTime(freq, ac.currentTime);
       o.frequency.exponentialRampToValueAtTime(freq * 0.38, ac.currentTime + dur);
-      g.gain.setValueAtTime(vol, ac.currentTime);
+      g.gain.setValueAtTime(vol * AUDIO_STATE.master, ac.currentTime);
       g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + dur);
       o.start(ac.currentTime); o.stop(ac.currentTime + dur + 0.01);
+      AUDIO_STATE.activeVoices++;
+      o.onended = () => { AUDIO_STATE.activeVoices=Math.max(0,AUDIO_STATE.activeVoices-1); };
     } catch(e) {}
   }
 
@@ -268,12 +289,17 @@
 
   function toggleMute() {
     AUDIO_STATE.muted = !AUDIO_STATE.muted;
+    if (AUDIO_STATE.muted) {
+      AUDIO_STATE.activeSFX.forEach(a => { try { a.pause(); a.currentTime=0; } catch(e) {} });
+      AUDIO_STATE.activeSFX=[];
+      AUDIO_STATE.lastPlayed.clear();
+    }
     try { window.localStorage?.setItem(AUDIO_PREF_KEY, AUDIO_STATE.muted ? '1' : '0'); }
     catch (e) {}
     setToast(AUDIO_STATE.muted ? 'Sound off / 音声オフ' : 'Sound on / 音声オン', AUDIO_STATE.muted ? '#aaa' : '#7cfff8');
   }
   function celebPops(baseFreq=420) {
-    [0,55,120,195,280].forEach((d,i) => setTimeout(() => synthPop(baseFreq + i*100, 0.26, 0.09), d));
+    [0,90,190].forEach((d,i) => setTimeout(() => synthPop(baseFreq + i*125, 0.24, 0.09), d));
   }
 
   // ── Booha roster ────────────────────────────────────
@@ -842,12 +868,12 @@
   }
 
   // ── Audio helpers ────────────────────────────────────
-  function sndPull()   { if (gs.pullPlayed) return; gs.pullPlayed = true; playSFX(AUDIO.pull, 0.5, 0.98+rnd()*0.06); }
+  function sndPull()   { if (gs.pullPlayed) return; gs.pullPlayed = true; playSFX(AUDIO.pull, 0.5, 0.98+rnd()*0.06, 'pull', 90, 1); }
   function sndLaunch() {
-    playSFX(AUDIO.launch, 0.88, 0.98+rnd()*0.06);
+    playSFX(AUDIO.launch, 0.88, 0.98+rnd()*0.06, 'launch', 120, 2);
     const r = ROSTER[bst.sel];
     if (!r) return;
-    const playVoice = () => setTimeout(() => playBuffer(r.id, 0.85), 55);
+    const playVoice = () => playBuffer(r.id, 0.85);
     if (audioBuffers[r.id]) playVoice();
     else loadBuffer(r.id, r.sfx).then(() => { if (audioBuffers[r.id]) playVoice(); });
   }
@@ -856,17 +882,17 @@
     gs.lastHit = now;
     const src = mat==='stone'?AUDIO.stone : mat==='glass'?AUDIO.glass : mat==='soft'?AUDIO.soft : AUDIO.wood;
     const volMult = gs.booha?.power === 'monster' ? Math.min(2, 1 + gs.bounces * 0.15) : 1;
-    playSFX(src, Math.max(0.2, Math.min(1, spd/14)) * volMult, 0.92+rnd()*0.18);
+    playSFX(src, Math.max(0.2, Math.min(1, spd/14)) * volMult, 0.92+rnd()*0.18, 'hit', HIT_COOL, 1);
     gs.flash = Math.max(gs.flash, spd > 12 ? 0.72 : 0.42);
   }
-  function sndBreak() { playSFX(AUDIO.break, 0.95, 0.94+rnd()*0.08); }
-  function sndRub()   { playSFX(AUDIO.rubble, 0.55, 0.98+rnd()*0.08); setTimeout(() => playSFX(AUDIO.rubble, 0.28, 1.07), 130); }
-  function sndGnd(s)  { if (s < 12) return; playSFX(AUDIO.ground, Math.min(0.9, s/22), 0.96+rnd()*0.08); }
-  function sndWin()   { playSFX(AUDIO.win,  1, 1); }
-  function sndFail()  { playSFX(AUDIO.fail, 0.85, 1); }
+  function sndBreak() { playSFX(AUDIO.break, 0.95, 0.94+rnd()*0.08, 'break', 110, 2); }
+  function sndRub()   { playSFX(AUDIO.rubble, 0.48, 0.98+rnd()*0.08, 'rubble', 260, 1); }
+  function sndGnd(s)  { if (s < 12) return; playSFX(AUDIO.ground, Math.min(0.72, s/28), 0.96+rnd()*0.08, 'ground', 170, 1); }
+  function sndWin()   { playSFX(AUDIO.win,  1, 1, 'win', 300, 3); }
+  function sndFail()  { playSFX(AUDIO.fail, 0.85, 1, 'fail', 300, 3); }
   function sndUnlock() {
-    [0, 80, 170, 280].forEach((delay, index) => {
-      setTimeout(() => synthPop(520 + index * 140, 0.28, 0.1), delay);
+    [0, 120, 250].forEach((delay, index) => {
+      setTimeout(() => synthPop(520 + index * 160, 0.25, 0.1), delay);
     });
   }
 
