@@ -65,7 +65,7 @@
   let backgroundCache = null;
 
   // ── Phase enum ──────────────────────────────────────
-  const P = { TITLE:'title', PLAY:'play', WIN:'win', FAIL:'fail' };
+  const P = { TITLE:'title', BRIEF:'brief', PLAY:'play', WIN:'win', FAIL:'fail' };
 
   // ── FX pools ────────────────────────────────────────
   const sparks      = [];
@@ -282,6 +282,13 @@
     debTimer: 0,
     cardTitle: '', cardSub: '', cardAccent: '#fff',
     cardMeta: '', cardMetaGood: false,
+    roundBestScore: 0,
+    roundMedal: 0,
+    roundClears: 0,
+    roundNewBest: false,
+    roundMedalUp: false,
+    comboPulse: 0,
+    nearMiss: false,
     scale: 1, offX: 0, offY: 0,
     runScore: 0,
     roundScore: 0,
@@ -324,6 +331,8 @@
 
   const LEVELS = window.BOOHA_DESTRUCTION_LEVELS || [];
   const CHAPTERS = window.BOOHA_DESTRUCTION_CHAPTERS || [];
+  const ROUND_RECORD_KEY = 'booha_destruction_round_records_v1';
+  let roundRecords = {};
   if (!LEVELS.length) console.error('Booha: no levels');
 
   // ── Helpers ─────────────────────────────────────────
@@ -336,6 +345,76 @@
   function currentLevel() { return LEVELS[gs.round] || {}; }
   function currentChapter() {
     return CHAPTERS[(currentLevel().chapter || 1) - 1] || {};
+  }
+
+  function loadRoundRecords() {
+    try {
+      const stored = window.localStorage && window.localStorage.getItem(ROUND_RECORD_KEY);
+      const parsed = stored ? JSON.parse(stored) : {};
+      roundRecords = parsed && typeof parsed === 'object' ? parsed : {};
+    } catch (e) { roundRecords = {}; }
+  }
+
+  function saveRoundRecords() {
+    try {
+      if (window.localStorage) window.localStorage.setItem(ROUND_RECORD_KEY, JSON.stringify(roundRecords));
+    } catch (e) { /* Storage can be unavailable in private browsing. */ }
+  }
+
+  function medalThresholds(level) {
+    const bronze = 1800 + Math.min(2200, (level.blocks || []).length * 70);
+    return { bronze, silver:Math.round(bronze * 1.28), gold:Math.round(bronze * 1.62) };
+  }
+
+  function medalForScore(level, score) {
+    const t = medalThresholds(level);
+    return score >= t.gold ? 3 : score >= t.silver ? 2 : score >= t.bronze ? 1 : 0;
+  }
+
+  function medalText(medal) { return medal > 0 ? '★'.repeat(medal) : '—'; }
+
+  function getRoundRecord(level = currentLevel()) {
+    const record = roundRecords[String(level.id)] || {};
+    return {
+      best: Number(record.best) || 0,
+      medal: Number(record.medal) || 0,
+      clears: Number(record.clears) || 0,
+      contractClears: Number(record.contractClears) || 0,
+      bestShots: Number(record.bestShots) || 0,
+    };
+  }
+
+  function recordRoundResult(level, score, contractComplete, shotsUsed) {
+    const key = String(level.id);
+    const previous = getRoundRecord(level);
+    const medal = medalForScore(level, score);
+    const next = {
+      best: Math.max(previous.best, Math.round(score)),
+      medal: Math.max(previous.medal, medal),
+      clears: previous.clears + 1,
+      contractClears: previous.contractClears + (contractComplete ? 1 : 0),
+      bestShots: previous.bestShots && previous.bestShots <= shotsUsed
+        ? previous.bestShots : shotsUsed,
+    };
+    roundRecords[key] = next;
+    saveRoundRecords();
+    return {
+      ...next,
+      isNewBest: score > previous.best,
+      medalUp: medal > previous.medal,
+      medal,
+      thresholds: medalThresholds(level),
+    };
+  }
+
+  function contractProgress(level = currentLevel()) {
+    const c = level.contract;
+    if (!c) return '';
+    if (c.maxShots != null) return `${gs.shotsUsed}/${c.maxShots} shots`;
+    if (c.power) return gs.powerUsed.has(c.power) ? 'READY' : `NEED ${c.power.toUpperCase()}`;
+    if (c.minCollapses != null) return `${Math.min(gs.collapseCount, c.minCollapses)}/${c.minCollapses} falls`;
+    if (c.minPowers != null) return `${Math.min(gs.powerUsed.size, c.minPowers)}/${c.minPowers} powers`;
+    return 'READY';
   }
 
   function evaluateContract(shotsLeft) {
@@ -401,6 +480,7 @@
     gs.lives = MAX_RUN_LIVES;
     gs.combo = 0;
     gs.lastScoreIsBest = false;
+    gs.nearMiss = false;
     gs.runStartedAt = performance.now();
     gs.campaignActive = true;
     gs.campaignComplete = false;
@@ -429,6 +509,7 @@
 
   function awardRoundScore(shotsLeft, contract) {
     gs.combo++;
+    gs.comboPulse=1;
     const destruction = Math.round(gs.pct * 8);
     const shotBonus = shotsLeft * 140;
     const contractBonus = contract && contract.complete ? contract.bonus : 0;
@@ -1209,6 +1290,8 @@ function traitGlowColor(block) {
     gs.roundScore=0;
     gs.shotsUsed=0; gs.collapseCount=0; gs.powerUsed=new Set();
     gs.contractComplete=false; gs.contractBonus=0;
+    gs.nearMiss=false;
+    gs.comboPulse=0;
     gs.debTimer=0; gs.shotLock=false; gs.flash=0;
     gs.fireTrail=[]; gs.minis=[]; gs.frozen=new Map(); gs.bounces=0;
     gs.isLastBooha=false; gs.timeScale=1;
@@ -1228,6 +1311,12 @@ function traitGlowColor(block) {
     resetRound();
     gs.round  = clamp(idx, 0, LEVELS.length - 1);
     gs.roundN = gs.round + 1;
+    const record = getRoundRecord(LEVELS[gs.round]);
+    gs.roundBestScore = record.best;
+    gs.roundMedal = record.medal;
+    gs.roundClears = record.clears;
+    gs.roundNewBest = false;
+    gs.roundMedalUp = false;
 
     const lvl = LEVELS[gs.round];
     gs.blocks      = lvl.blocks.map((def, i) => cloneBlock(def, i));
@@ -1235,6 +1324,12 @@ function traitGlowColor(block) {
     buildBlockIndex();
     gs.booha   = makeBooha();
     gs.running = false;
+  }
+
+  function showBriefing() {
+    gs.phase = P.BRIEF;
+    gs.running = false;
+    gs.booha = makeBooha();
   }
 
   function startRound() { gs.running=true; gs.phase=P.PLAY; }
@@ -1253,7 +1348,7 @@ function traitGlowColor(block) {
   function advanceRound() {
     if (gs.round >= LEVELS.length - 1) return;
     loadRound(gs.round + 1);
-    startRound();
+    showBriefing();
   }
 
   // ── Game objects ────────────────────────────────────
@@ -1740,6 +1835,12 @@ function traitGlowColor(block) {
     if (gs.pct>=target) {
       const contract = evaluateContract(shotsLeft);
       awardRoundScore(shotsLeft, contract);
+      const roundResult = recordRoundResult(level, gs.roundScore, contract.complete, gs.shotsUsed);
+      gs.roundBestScore = roundResult.best;
+      gs.roundMedal = roundResult.medal;
+      gs.roundClears = roundResult.clears;
+      gs.roundNewBest = roundResult.isNewBest;
+      gs.roundMedalUp = roundResult.medalUp;
       sndWin();
       const r=ROSTER[bst.sel], cfg=r.conf, cnt=~~(cfg.burst*1.4*BURST_SCALE);
       for(let i=0;i<cnt;i++){
@@ -1762,19 +1863,24 @@ function traitGlowColor(block) {
       } else {
         showCard(P.WIN, level.boss ? `BOSS ${gs.roundN} CLEARED!` : `ROUND ${gs.roundN} CLEAR!`, `+${scoreText(gs.roundScore)} points · ${scoreText(gs.runScore)} total`, '#ffdd44');
       }
-      gs.cardMeta = `${level.chapterName || 'CAMPAIGN'} · ${level.name || ''}  ·  ${contractResultText(contract)}`;
-      gs.cardMetaGood = contract.complete;
+      const recordTag = roundResult.isNewBest ? 'NEW ROUND BEST' : `BEST ${scoreText(roundResult.best)}`;
+      gs.cardMeta = `${contractResultText(contract)}  ·  ${medalText(roundResult.medal)}  ·  ${recordTag}`;
+      gs.cardMetaGood = contract.complete || roundResult.isNewBest || roundResult.medalUp;
     } else if (shotsLeft<=0) {
       sndFail();
       gs.combo=0;
+      gs.nearMiss = gs.pct >= Math.max(0, target - 10);
       gs.lives=Math.max(0,gs.lives-1);
       if (gs.lives===0) {
         submitRunScore(false);
         showCard(P.FAIL, 'RUN OVER', `${Math.round(gs.pct)}% destruction · ${scoreText(gs.runScore)} points`, '#ff6666');
       } else {
-        showCard(P.FAIL, level.boss ? 'BOSS ROUND OVER' : 'ROUND OVER', `${Math.round(gs.pct)}% destruction · ${gs.lives} lives left`, '#ff6666');
+        showCard(P.FAIL, gs.nearMiss ? 'SO CLOSE!' : (level.boss ? 'BOSS ROUND OVER' : 'ROUND OVER'), `${Math.round(gs.pct)}% destruction · ${gs.lives} lives left`, gs.nearMiss ? '#ffcf70' : '#ff6666');
       }
-      gs.cardMeta = `${level.chapterName || 'CAMPAIGN'} · ${level.name || ''}  ·  ${level.contract?.label || 'CONTRACT'}`;
+      gs.cardMeta = gs.nearMiss
+        ? `NEAR MISS · ${Math.round(target - gs.pct)}% more damage needed`
+        : `${level.contract?.label || 'CONTRACT'} · ${contractProgress(level)}`;
+      gs.cardMetaGood = gs.nearMiss;
     } else {
       gs.shotLock=false;
       advanceSelector();
@@ -1790,6 +1896,7 @@ function traitGlowColor(block) {
 
   // ── FX update ────────────────────────────────────────
   function updateFX() {
+    gs.comboPulse *= 0.92;
     if (gs.phase === P.WIN || gs.phase === P.FAIL) {
       updateConfetti();
       return;
@@ -1837,12 +1944,17 @@ function traitGlowColor(block) {
     const p=worldPt(evt);
      
     if(htHelp(p.x,p.y)&&(gs.phase===P.TITLE||gs.phase===P.PLAY)){openHelp();evt.preventDefault();return;}
-    if(gs.phase===P.TITLE){if(htStart(p.x,p.y)){beginCampaign();loadRound(0);startRound();}else if(htExit(p.x,p.y)){leaveGame();}evt.preventDefault();return;}
+    if(gs.phase===P.TITLE){if(htStart(p.x,p.y)){beginCampaign();loadRound(0);showBriefing();}else if(htExit(p.x,p.y)){leaveGame();}evt.preventDefault();return;}
+    if(gs.phase===P.BRIEF){
+      if(htAction(p.x,p.y)) startRound();
+      else if(htExit(p.x,p.y)) leaveGame();
+      evt.preventDefault();return;
+    }
     if(gs.phase===P.WIN||gs.phase===P.FAIL){
       if(htAction(p.x,p.y)){
         if(gs.phase===P.WIN && !gs.campaignComplete) advanceRound();
-        else if(gs.phase===P.FAIL && gs.campaignActive){loadRound(gs.round);startRound();}
-        else {beginCampaign();loadRound(0);startRound();}
+        else if(gs.phase===P.FAIL && gs.campaignActive){loadRound(gs.round);showBriefing();}
+        else {beginCampaign();loadRound(0);showBriefing();}
       }
       else if(htExit(p.x,p.y)){leaveGame();}
       evt.preventDefault();return;
@@ -2224,8 +2336,19 @@ function traitGlowColor(block) {
     ctx.fillStyle='rgba(255,255,255,0.72)';ctx.font='bold 11px system-ui,sans-serif';
     ctx.fillText(`R${gs.roundN} · ${level.name || ''}`,SX+SW+14,76);
     if (level.contract) {
-      ctx.fillStyle=level.boss ? '#ffdf80' : 'rgba(255,255,255,0.5)';ctx.font='10px system-ui,sans-serif';
-      ctx.fillText(`✦ ${level.contract.label}: ${level.contract.detail}`,SX+SW+14,91);
+      const progress = contractProgress(level);
+      const contractDone = level.contract.maxShots != null
+        ? gs.shotsUsed <= level.contract.maxShots
+        : progress === 'READY' || (level.contract.minCollapses != null && gs.collapseCount >= level.contract.minCollapses) || (level.contract.minPowers != null && gs.powerUsed.size >= level.contract.minPowers);
+      ctx.fillStyle=contractDone ? '#7cfff8' : (level.boss ? '#ffdf80' : 'rgba(255,255,255,0.5)');ctx.font='10px system-ui,sans-serif';
+      ctx.fillText(`✦ ${level.contract.label}: ${progress}`,SX+SW+14,91);
+    }
+    ctx.fillStyle='rgba(255,255,255,0.42)';ctx.font='10px system-ui,sans-serif';
+    ctx.fillText(`ROUND BEST ${scoreText(gs.roundBestScore)}  ${medalText(gs.roundMedal)}`,SX+SW+14,106);
+    if (gs.combo > 0 && gs.phase === P.PLAY) {
+      ctx.globalAlpha=0.55 + gs.comboPulse * 0.45;ctx.fillStyle='#ffcf70';ctx.font='bold 12px system-ui,sans-serif';
+      ctx.fillText(`STREAK ×${gs.combo}`,SX+SW+14,121);
+      ctx.globalAlpha=1;
     }
     const pills=[
       {label:'SCORE',  value:scoreText(gs.runScore), accent:'#ffdf80'},
@@ -2269,6 +2392,37 @@ function traitGlowColor(block) {
     ctx.restore();
     drawHelpButton();
   }
+
+  function drawBriefing(){
+    const level = currentLevel();
+    const chapter = currentChapter();
+    const thresholds = medalThresholds(level);
+    ctx.save();
+    ctx.fillStyle='rgba(7,5,18,0.82)';ctx.fillRect(0,0,W,H);
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillStyle=chapter.accent || '#ffdf80';ctx.font='bold 16px system-ui,sans-serif';
+    ctx.fillText(`CHAPTER ${level.chapter || 1} · ${level.chapterName || 'CAMPAIGN'}`,W/2,H/2-148);
+    ctx.fillStyle='rgba(255,255,255,0.52)';ctx.font='13px system-ui,sans-serif';
+    ctx.fillText(chapter.subtitle || '',W/2,H/2-122);
+    ctx.fillStyle='#fff';ctx.font='bold 44px system-ui,sans-serif';
+    ctx.fillText(level.boss ? `BOSS ROUND ${gs.roundN}` : `ROUND ${gs.roundN}`,W/2,H/2-76);
+    ctx.fillStyle='rgba(255,255,255,0.78)';ctx.font='bold 21px system-ui,sans-serif';
+    ctx.fillText(level.name || '',W/2,H/2-35);
+    ctx.save();ctx.fillStyle='rgba(255,255,255,0.07)';ctx.strokeStyle=level.boss ? (chapter.accent || '#ffdf80') : 'rgba(255,255,255,0.18)';ctx.lineWidth=1.5;
+    rr(ctx,W/2-250,H/2-2,500,104,16,true,true);ctx.restore();
+    ctx.fillStyle=level.boss ? '#ffdf80' : '#7cfff8';ctx.font='bold 13px system-ui,sans-serif';
+    ctx.fillText(`✦ ${level.contract?.label || 'MISSION'}`,W/2,H/2+21);
+    ctx.fillStyle='rgba(255,255,255,0.78)';ctx.font='16px system-ui,sans-serif';
+    ctx.fillText(level.contract?.detail || 'Clear the structure',W/2,H/2+49);
+    ctx.fillStyle='rgba(255,255,255,0.48)';ctx.font='12px system-ui,sans-serif';
+    ctx.fillText(`Best ${scoreText(gs.roundBestScore)} · Medal ${medalText(gs.roundMedal)} · Gold at ${scoreText(thresholds.gold)}`,W/2,H/2+77);
+    const bx=W/2-130,by=H*0.62,bw=260,bh=58;
+    const bg=ctx.createLinearGradient(bx,by,bx,by+bh);bg.addColorStop(0,level.boss?'#ffdf80':'#44ffcc');bg.addColorStop(1,level.boss?'#ff8c44':'#009977');
+    ctx.shadowColor=level.boss?'#ffcf70':'#44ffcc';ctx.shadowBlur=18;ctx.fillStyle=bg;rr(ctx,bx,by,bw,bh,16,true,false);ctx.shadowBlur=0;
+    ctx.fillStyle='#07121a';ctx.font='bold 22px system-ui,sans-serif';ctx.fillText('BEGIN ROUND →',W/2,by+bh/2);
+    ctx.restore();
+  }
+
   function drawCard(){
     const win=gs.phase===P.WIN;
     ctx.fillStyle=win?'rgba(0,18,0,0.62)':'rgba(28,0,0,0.62)';ctx.fillRect(0,0,W,H);
@@ -2316,6 +2470,7 @@ function traitGlowColor(block) {
     ctx.restore();
      
     if(gs.phase===P.TITLE)drawTitle();
+    else if(gs.phase===P.BRIEF){drawHUD();drawBriefing();}
     else if(gs.phase===P.WIN||gs.phase===P.FAIL){drawHUD();drawCard();}
     else drawHUD();
   }
@@ -2460,6 +2615,7 @@ function traitGlowColor(block) {
   // ── Boot ─────────────────────────────────────────────
   async function boot(){
     resize();
+    loadRoundRecords();
     gs.highScore=readHighScore();
     window.addEventListener('resize',resize);
     canvas.addEventListener('mousedown',  onDown);
