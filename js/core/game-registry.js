@@ -2,7 +2,7 @@
 /**
  * game-registry.js
  * The Booha Adventure — Game Registry
- * Single source of truth for all 9 games × 3 curriculums (27 total entries).
+ * Single source of truth for all curriculum games plus bonus-game definitions.
  *
  * Save IDs are scoped per curriculum: e.g. "bc:ask_question"
  * This keeps scores separate per curriculum as intended.
@@ -99,6 +99,21 @@ const BoohaGameRegistry = (() => {
     },
   ];
 
+  // Bonus games are intentionally kept outside the curriculum summaries.
+  // They still receive the same score/stars machinery through their saveId.
+  const BONUS_GAMES = [
+    {
+      id:             'booha_destruction',
+      name:           'Booha Destruction',
+      file:           'booha_destruction.html',
+      category:       'bonus',
+      scoreMax:       100000,
+      starThresholds: [15000, 40000, 80000],
+      saveId:         'bonus:booha_destruction',
+      bonus:          true,
+    },
+  ];
+
   // ── Build full entries (9 games × 3 curriculums = 27) ────────────────────
   const GAMES = [];
   CURRICULUMS.forEach(curriculum => {
@@ -127,9 +142,11 @@ const BoohaGameRegistry = (() => {
     _byCurriculum[g.curriculum].push(g);
   });
 
+  BONUS_GAMES.forEach(g => { _bySaveId[g.saveId] = g; });
+
   // ── Public API ────────────────────────────────────────────────────────────
 
-  /** All 27 expanded entries */
+  /** All 27 curriculum entries */
   function getAll() { return [...GAMES]; }
 
   /** Lookup by full save ID e.g. "bc:ask_question" */
@@ -144,8 +161,13 @@ const BoohaGameRegistry = (() => {
   /** All base game definitions (9, curriculum-agnostic) */
   function getBaseGames() { return [...BASE_GAMES]; }
 
-  /** All valid save IDs (27 total) */
-  function getAllSaveIds() { return GAMES.map(g => g.saveId); }
+  /** Bonus games, kept separate from curriculum game summaries */
+  function getBonusGames() { return [...BONUS_GAMES]; }
+
+  /** All valid save IDs, including bonus games */
+  function getAllSaveIds() {
+    return [...GAMES, ...BONUS_GAMES].map(g => g.saveId);
+  }
 
   /**
    * Build the save ID from parts — use this in game pages instead of
@@ -178,11 +200,13 @@ const BoohaGameRegistry = (() => {
   const api = {
     CURRICULUMS,
     BASE_GAMES,
+    BONUS_GAMES,
     getAll,
     getById,
     getForCurriculum,
     getAllVariants,
     getBaseGames,
+    getBonusGames,
     getAllSaveIds,
     saveId,
     starsForScore,
