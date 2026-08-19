@@ -65,7 +65,7 @@
   let backgroundCache = null;
 
   // ── Phase enum ──────────────────────────────────────
-  const P = { TITLE:'title', BRIEF:'brief', PLAY:'play', WIN:'win', FAIL:'fail' };
+  const P = { TITLE:'title', HALL:'hall', BRIEF:'brief', PLAY:'play', WIN:'win', FAIL:'fail' };
 
   // ── FX pools ────────────────────────────────────────
   const sparks      = [];
@@ -360,6 +360,7 @@
     roundNewBest: false,
     roundMedalUp: false,
     cardUnlock: '',
+    cardChapter: '',
     comboPulse: 0,
     nearMiss: false,
     toast: '',
@@ -495,6 +496,22 @@
       if (complete) chapters++;
     }
     return { rounds, medals, bosses, chapters, finalRound:getRoundRecord(LEVELS[LEVELS.length - 1]).clears > 0 };
+  }
+
+  function isChapterComplete(chapterNumber) {
+    return LEVELS.slice((chapterNumber - 1) * 10, chapterNumber * 10)
+      .every(level => getRoundRecord(level).clears > 0);
+  }
+
+  function hallStats() {
+    const records = LEVELS.map(level => getRoundRecord(level));
+    return {
+      rounds: records.filter(record => record.clears > 0).length,
+      medals: records.reduce((sum, record) => sum + record.medal, 0),
+      contractClears: records.reduce((sum, record) => sum + record.contractClears, 0),
+      ruleClears: records.reduce((sum, record) => sum + record.ruleClears, 0),
+      unlocked: bst.unlocked.filter(Boolean).length,
+    };
   }
 
   function loadRosterUnlocks() {
@@ -804,6 +821,11 @@
   function sndGnd(s)  { if (s < 12) return; playSFX(AUDIO.ground, Math.min(0.9, s/22), 0.96+rnd()*0.08); }
   function sndWin()   { playSFX(AUDIO.win,  1, 1); }
   function sndFail()  { playSFX(AUDIO.fail, 0.85, 1); }
+  function sndUnlock() {
+    [0, 80, 170, 280].forEach((delay, index) => {
+      setTimeout(() => synthPop(520 + index * 140, 0.28, 0.1), delay);
+    });
+  }
 
   // ── FX Spawners ──────────────────────────────────────
   function spawnSparks(x, y, mat, spd, n=8) {
@@ -1483,7 +1505,7 @@ function traitGlowColor(block) {
     gs.dragging=false; gs.pullPlayed=false; gs.bestShot=0; gs.pct=0; gs.brokenBlocks=0;
     gs.roundScore=0;
     gs.shotsUsed=0; gs.collapseCount=0; gs.powerUsed=new Set();
-    gs.contractComplete=false; gs.contractBonus=0; gs.cardUnlock='';
+    gs.contractComplete=false; gs.contractBonus=0; gs.cardUnlock=''; gs.cardChapter='';
     gs.ruleComplete=false; gs.ruleBonus=0; gs.ruleFailed=false; gs.ruleTime=0; gs.markedTargetIndex=-1;
     gs.nearMiss=false;
     gs.comboPulse=0;
@@ -2042,15 +2064,20 @@ function traitGlowColor(block) {
       const contract = evaluateContract(shotsLeft);
       const rule = evaluateRule();
       awardRoundScore(shotsLeft, contract, rule);
+      const chapterWasComplete = isChapterComplete(level.chapter);
       const roundResult = recordRoundResult(level, gs.roundScore, contract.complete, rule.complete, gs.shotsUsed);
       const newlyUnlocked = syncRosterUnlocks();
       gs.cardUnlock = newlyUnlocked.map(booha => `${booha.name} / ${booha.jpName}`).join(' · ');
+      gs.cardChapter = !chapterWasComplete && isChapterComplete(level.chapter)
+        ? `${level.chapterName} / チャプター${level.chapter} CLEAR`
+        : '';
       gs.roundBestScore = roundResult.best;
       gs.roundMedal = roundResult.medal;
       gs.roundClears = roundResult.clears;
       gs.roundNewBest = roundResult.isNewBest;
       gs.roundMedalUp = roundResult.medalUp;
       sndWin();
+      if (newlyUnlocked.length || gs.cardChapter) sndUnlock();
       const r=ROSTER[bst.sel], cfg=r.conf, cnt=~~(cfg.burst*1.4*BURST_SCALE);
       for(let i=0;i<cnt;i++){
         const ang=rnd(-Math.PI*0.85,-Math.PI*0.15), mag=rnd(4,20);
@@ -2070,7 +2097,7 @@ function traitGlowColor(block) {
         submitRunScore(true);
         showCard(P.WIN, 'CAMPAIGN CLEAR!', `${LEVELS.length} rounds smashed · ${scoreText(gs.runScore)} points`, '#ffdd44');
       } else {
-        showCard(P.WIN, level.boss ? `BOSS ${gs.roundN} CLEARED!` : `ROUND ${gs.roundN} CLEAR!`, `+${scoreText(gs.roundScore)} points · ${scoreText(gs.runScore)} total`, '#ffdd44');
+        showCard(P.WIN, gs.cardChapter ? `CHAPTER ${level.chapter} CLEAR!` : (level.boss ? `BOSS ${gs.roundN} CLEARED!` : `ROUND ${gs.roundN} CLEAR!`), `+${scoreText(gs.roundScore)} points · ${scoreText(gs.runScore)} total`, '#ffdd44');
       }
       const recordTag = roundResult.isNewBest ? 'NEW ROUND BEST' : `BEST ${scoreText(roundResult.best)}`;
       gs.cardMeta = `${contractResultText(contract)}  ·  ${ruleResultText(rule)}  ·  ${medalText(roundResult.medal)}  ·  ${recordTag}`;
@@ -2152,10 +2179,15 @@ function traitGlowColor(block) {
   }
   function selHit(px,py){for(let i=0;i<ROSTER.length;i++){const sy=SY+i*(SH+SGAP);if(px>=SX&&px<=SX+SW&&py>=sy&&py<=sy+SH)return i;}return -1;}
   function htStart(px,py){const bx=W/2-140,by=H/2+10;return px>=bx&&px<=bx+280&&py>=by&&py<=by+70;}
+  function htHall(px,py){const bx=W/2-220,by=H/2+118;return px>=bx&&px<=bx+200&&py>=by&&py<=by+36;}
   function htAction(px,py){const bx=W/2-130,by=H*0.62;return px>=bx&&px<=bx+260&&py>=by&&py<=by+58;}
   function htHelp(px,py){return px>=W-48&&px<=W-8&&py>=8&&py<=48;}
   function htMute(px,py){return px>=W-92&&px<=W-52&&py>=8&&py<=48;}
-  function htExit(px,py){const bx=W/2-100,by=H/2+118;return px>=bx&&px<=bx+200&&py>=by&&py<=by+36;} 
+  function htExit(px,py){const bx=gs.phase===P.TITLE?W/2+20:W/2-100,by=gs.phase===P.HALL?H-52:H/2+118;return px>=bx&&px<=bx+200&&py>=by&&py<=by+36;}
+  function showHall(){
+    gs.phase=P.HALL;gs.running=false;gs.booha=null;
+    ROSTER.forEach((_, index) => { if (isBoohaUnlocked(index)) ensureRosterImage(index); });
+  }
   function leaveGame() {
     if (gs.campaignActive && gs.runScore > 0) submitRunScore(false);
     window.location.href='karasuki.html?room=room_12';
@@ -2168,7 +2200,11 @@ function traitGlowColor(block) {
     getAC();
      
     if(htHelp(p.x,p.y)&&(gs.phase===P.TITLE||gs.phase===P.PLAY)){openHelp();evt.preventDefault();return;}
-    if(gs.phase===P.TITLE){if(htStart(p.x,p.y)){beginCampaign();loadRound(0);showBriefing();}else if(htExit(p.x,p.y)){leaveGame();}evt.preventDefault();return;}
+    if(gs.phase===P.TITLE){if(htStart(p.x,p.y)){beginCampaign();loadRound(0);showBriefing();}else if(htHall(p.x,p.y)){showHall();}else if(htExit(p.x,p.y)){leaveGame();}evt.preventDefault();return;}
+    if(gs.phase===P.HALL){
+      if(htExit(p.x,p.y)){gs.phase=P.TITLE;}
+      evt.preventDefault();return;
+    }
     if(gs.phase===P.BRIEF){
       if(htAction(p.x,p.y)) startRound();
       else if(htExit(p.x,p.y)) leaveGame();
@@ -2625,11 +2661,72 @@ function traitGlowColor(block) {
     ctx.font='13px system-ui,sans-serif';ctx.fillStyle='rgba(255,255,255,0.38)';
      
     ctx.fillText(`${CHAPTERS.length || 5} chapters / チャプター · ${LEVELS.length} rounds / ラウンド · Best / ベスト ${scoreText(gs.highScore)}`,W/2,H/2+100);
-    ctx.save();ctx.globalAlpha=0.55;ctx.fillStyle='rgba(255,255,255,0.08)';ctx.strokeStyle='rgba(255,255,255,0.18)';ctx.lineWidth=1;rr(ctx,W/2-100,H/2+118,200,36,10,true,true);
-    ctx.fillStyle='rgba(255,255,255,0.45)';ctx.font='13px system-ui,sans-serif';ctx.fillText('✕ Exit / もどる',W/2,H/2+136);ctx.restore();
+    ctx.save();ctx.globalAlpha=0.7;ctx.fillStyle='rgba(255,223,128,0.1)';ctx.strokeStyle='rgba(255,223,128,0.38)';ctx.lineWidth=1;rr(ctx,W/2-220,H/2+118,200,36,10,true,true);
+    ctx.fillStyle='#ffdf80';ctx.font='bold 13px system-ui,sans-serif';ctx.fillText('★ HALL / 殿堂',W/2-120,H/2+136);ctx.restore();
+    ctx.save();ctx.globalAlpha=0.55;ctx.fillStyle='rgba(255,255,255,0.08)';ctx.strokeStyle='rgba(255,255,255,0.18)';ctx.lineWidth=1;rr(ctx,W/2+20,H/2+118,200,36,10,true,true);
+    ctx.fillStyle='rgba(255,255,255,0.45)';ctx.font='13px system-ui,sans-serif';ctx.fillText('✕ Exit / もどる',W/2+120,H/2+136);ctx.restore();
      
     ctx.restore();
     drawHelpButton();
+  }
+
+  function drawHall(){
+    const stats=hallStats();
+    ctx.fillStyle='rgba(5,4,14,0.94)';ctx.fillRect(0,0,W,H);
+    ctx.save();ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillStyle='#ffdf80';ctx.font='bold 34px system-ui,sans-serif';ctx.fillText('HALL OF FAME / 殿堂',W/2,30);
+    ctx.fillStyle='rgba(255,255,255,0.5)';ctx.font='12px system-ui,sans-serif';ctx.fillText(`Your records / きろく · Contracts ${stats.contractClears} · Rules ${stats.ruleClears}`,W/2,54);
+    const summary=[
+      ['BEST / ベスト',scoreText(gs.highScore),'#ffdf80'],
+      ['ROUNDS / ラウンド',`${stats.rounds}/${LEVELS.length}`,'#7cfff8'],
+      ['MEDALS / メダル',`${stats.medals}`,'#ffe66d'],
+      ['BOOHA / ブーハー',`${stats.unlocked}/${ROSTER.length}`,'#ff9f7f'],
+    ];
+    const sw=176,sg=12;let sx=(W-summary.length*(sw+sg)+sg)/2;
+    for(const item of summary){
+      ctx.save();ctx.fillStyle='rgba(255,255,255,0.07)';ctx.strokeStyle='rgba(255,255,255,0.18)';ctx.lineWidth=1;rr(ctx,sx,68,sw,48,10,true,true);ctx.restore();
+      ctx.fillStyle='rgba(255,255,255,0.55)';ctx.font='bold 9px system-ui,sans-serif';ctx.fillText(item[0],sx+sw/2,81);
+      ctx.fillStyle=item[2];ctx.font='bold 18px system-ui,sans-serif';ctx.fillText(item[1],sx+sw/2,101);sx+=sw+sg;
+    }
+
+    ctx.textAlign='left';
+    for(let chapterIndex=0;chapterIndex<5;chapterIndex++){
+      const chapter=CHAPTERS[chapterIndex]||{};
+      const y=130+chapterIndex*62;
+      const levels=LEVELS.slice(chapterIndex*10,chapterIndex*10+10);
+      const cleared=levels.filter(level=>getRoundRecord(level).clears>0).length;
+      const complete=cleared===10;
+      ctx.save();ctx.fillStyle='rgba(255,255,255,0.055)';ctx.strokeStyle=complete?(chapter.accent||'#7cfff8'):'rgba(255,255,255,0.12)';ctx.lineWidth=complete?1.5:1;rr(ctx,28,y,1224,52,10,true,true);ctx.restore();
+      ctx.fillStyle=chapter.accent||'#fff';ctx.font='bold 11px system-ui,sans-serif';ctx.fillText(`CH ${chapterIndex+1} / チャプター${chapterIndex+1}`,44,y+16);
+      ctx.fillStyle='#fff';ctx.font='bold 13px system-ui,sans-serif';ctx.fillText(chapter.name||'',44,y+34);
+      ctx.fillStyle='rgba(255,255,255,0.48)';ctx.font='10px system-ui,sans-serif';ctx.fillText(`${cleared}/10 cleared · ${complete?'COMPLETE / クリア':'IN PROGRESS / ちょうせん中'}`,196,y+27);
+      for(let round=0;round<10;round++){
+        const level=levels[round],record=getRoundRecord(level),x=390+round*84;
+        ctx.save();ctx.fillStyle=record.clears>0?'rgba(124,255,248,0.13)':'rgba(0,0,0,0.25)';ctx.strokeStyle=record.clears>0?(chapter.accent||'#7cfff8'):'rgba(255,255,255,0.12)';ctx.lineWidth=1;rr(ctx,x,y+7,76,38,7,true,true);ctx.restore();
+        ctx.textAlign='center';ctx.fillStyle='rgba(255,255,255,0.55)';ctx.font='9px system-ui,sans-serif';ctx.fillText(`R${level.id}`,x+38,y+17);
+        ctx.fillStyle=record.clears>0?'#fff':'rgba(255,255,255,0.28)';ctx.font='bold 11px system-ui,sans-serif';
+        const shortScore=record.best>=1000?`${(record.best/1000).toFixed(1)}k`:String(record.best||'—');ctx.fillText(shortScore,x+38,y+31);
+        ctx.fillStyle=record.medal? '#ffe66d':'rgba(255,255,255,0.24)';ctx.font='10px system-ui,sans-serif';ctx.fillText(medalText(record.medal),x+64,y+17);
+        ctx.fillStyle=record.contractClears?'#7cfff8':'rgba(255,255,255,0.2)';ctx.font='bold 8px system-ui,sans-serif';ctx.fillText(record.contractClears?'C':'',x+12,y+44);
+        ctx.fillStyle=record.ruleClears?'#ffe66d':'rgba(255,255,255,0.2)';ctx.fillText(record.ruleClears?'◆':'',x+26,y+44);
+        ctx.textAlign='left';
+      }
+    }
+
+    ctx.textAlign='left';ctx.fillStyle='#ffdf80';ctx.font='bold 14px system-ui,sans-serif';ctx.fillText('BOOHA COLLECTION / ブーハーコレクション',34,456);
+    for(let index=0;index<ROSTER.length;index++){
+      const col=index%5,row=Math.floor(index/5),x=34+col*247,y=468+row*76,booha=ROSTER[index],unlocked=isBoohaUnlocked(index);
+      ctx.save();ctx.fillStyle=unlocked?'rgba(124,255,248,0.1)':'rgba(255,255,255,0.045)';ctx.strokeStyle=unlocked?'rgba(124,255,248,0.4)':'rgba(255,223,128,0.24)';ctx.lineWidth=1;rr(ctx,x,y,232,64,10,true,true);ctx.restore();
+      if(unlocked&&bst.imgs[index])ctx.drawImage(bst.imgs[index],x+8,y+7,50,50);
+      else {ctx.fillStyle='#ffdf80';ctx.font='bold 20px system-ui,sans-serif';ctx.textAlign='center';ctx.fillText('🔒',x+33,y+31);}
+      ctx.textAlign='left';ctx.fillStyle=unlocked?'#fff':'rgba(255,255,255,0.5)';ctx.font='bold 11px system-ui,sans-serif';ctx.fillText(`${unlocked?'':'LOCKED · '}${booha.name}`,x+66,y+23);
+      ctx.fillStyle=unlocked?'#7cfff8':'rgba(255,223,128,0.68)';ctx.font='10px system-ui,sans-serif';ctx.fillText(unlocked?booha.jpName:unlockRequirement(index),x+66,y+41);
+    }
+
+    const bx=W/2-100,by=H-52;
+    ctx.save();ctx.fillStyle='rgba(255,255,255,0.08)';ctx.strokeStyle='rgba(255,255,255,0.25)';ctx.lineWidth=1;rr(ctx,bx,by,200,36,10,true,true);ctx.restore();
+    ctx.textAlign='center';ctx.fillStyle='#fff';ctx.font='bold 14px system-ui,sans-serif';ctx.fillText('BACK / もどる',W/2,by+19);
+    ctx.restore();
   }
 
   function drawBriefing(){
@@ -2683,6 +2780,10 @@ function traitGlowColor(block) {
       ctx.font='bold 13px system-ui,sans-serif';ctx.fillStyle='#ffdf80';
       ctx.fillText(`NEW BOOHA / あたらしいブーハー: ${gs.cardUnlock}`,W/2,H/2+82);
     }
+    if (gs.cardChapter) {
+      ctx.font='bold 13px system-ui,sans-serif';ctx.fillStyle='#ffcf70';
+      ctx.fillText(`CHAPTER COMPLETE / チャプタークリア: ${gs.cardChapter}`,W/2,H/2+103);
+    }
     if (gs.lastScoreIsBest && gs.runScore > 0) {
       ctx.font='bold 13px system-ui,sans-serif';ctx.fillStyle='#ffdf80';
       ctx.fillText('✦ NEW HIGH SCORE ✦',W/2,H/2+62);
@@ -2712,11 +2813,12 @@ function traitGlowColor(block) {
     ctx.clearRect(-10,-10,W+20,H+20);
     drawBG();
     drawFXBehind();
-    if(gs.phase!==P.TITLE){drawTraj();drawBlocks();drawGround();drawSling();drawBooha();drawMinis();}
+    if(gs.phase!==P.TITLE&&gs.phase!==P.HALL){drawTraj();drawBlocks();drawGround();drawSling();drawBooha();drawMinis();}
     drawFXFront();drawConfetti();drawFlash();
     ctx.restore();
      
     if(gs.phase===P.TITLE)drawTitle();
+    else if(gs.phase===P.HALL)drawHall();
     else if(gs.phase===P.BRIEF){drawHUD();drawBriefing();}
     else if(gs.phase===P.WIN||gs.phase===P.FAIL){drawHUD();drawCard();}
     else drawHUD();
