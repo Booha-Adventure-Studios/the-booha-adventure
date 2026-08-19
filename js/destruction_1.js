@@ -623,6 +623,12 @@
     return requirement ? `${requirement.unlockEN} / ${requirement.unlockJP}` : 'Clear more rounds / もっとラウンドをクリア';
   }
 
+  function nextRosterUnlock() {
+    const index = ROSTER.findIndex((_, i) => i > 0 && !bst.unlocked[i]);
+    if (index < 0) return null;
+    return { index, booha:ROSTER[index], requirement:ROSTER_UNLOCKS[index] };
+  }
+
   function recordRoundResult(level, score, contractComplete, ruleComplete, shotsUsed) {
     const key = String(level.id);
     const previous = getRoundRecord(level);
@@ -685,7 +691,9 @@
 
   function ruleResultText(rule) {
     if (!rule) return '';
-    return rule.complete ? `◆ ${rule.label} +${scoreText(rule.bonus)}` : `RULE MISSED · ${rule.label}`;
+    return rule.complete
+      ? `◆ CHALLENGE EARNED · ${rule.label} +${scoreText(rule.bonus)}`
+      : `◆ CHALLENGE TO TRY · ${rule.label}`;
   }
 
   function evaluateContract(shotsLeft) {
@@ -708,10 +716,10 @@
   }
 
   function contractResultText(contract) {
-    if (!contract) return '';
+    if (!contract || contract.label === 'NO CONTRACT') return '';
     return contract.complete
-      ? `✦ ${contract.label} +${scoreText(contract.bonus)}`
-      : `CONTRACT MISSED · ${contract.label}`;
+      ? `✦ BONUS EARNED · ${contract.label} +${scoreText(contract.bonus)}`
+      : `✦ BONUS TO TRY · ${contract.label}`;
   }
 
   function readHighScore() {
@@ -2189,7 +2197,9 @@ function traitGlowColor(block) {
         showCard(P.WIN, gs.cardChapter ? `CHAPTER ${level.chapter} CLEAR!` : (level.boss ? `BOSS ${gs.roundN} CLEARED!` : `ROUND ${gs.roundN} CLEAR!`), `+${scoreText(gs.roundScore)} points · ${scoreText(gs.runScore)} total`, '#ffdd44');
       }
       const recordTag = roundResult.isNewBest ? 'NEW ROUND BEST' : `BEST ${scoreText(roundResult.best)}`;
-      gs.cardMeta = `${contractResultText(contract)}  ·  ${ruleResultText(rule)}  ·  ${medalText(roundResult.medal)}  ·  ${recordTag}`;
+      const medalTag = roundResult.medal ? `${medalText(roundResult.medal)} MEDAL` : 'MEDAL TO EARN';
+      gs.cardMeta = [contractResultText(contract), ruleResultText(rule), medalTag, recordTag]
+        .filter(Boolean).join('  ·  ');
       gs.cardMetaGood = contract.complete || rule.complete || roundResult.isNewBest || roundResult.medalUp;
     } else if (ruleFailed || shotsLeft<=0) {
       sndFail();
@@ -2899,12 +2909,12 @@ function traitGlowColor(block) {
     ctx.save();ctx.fillStyle='rgba(255,255,255,0.07)';ctx.strokeStyle=level.boss ? (chapter.accent || '#ffdf80') : 'rgba(255,255,255,0.18)';ctx.lineWidth=1.5;
     rr(ctx,W/2-250,H/2-2,500,132,16,true,true);ctx.restore();
     ctx.fillStyle=level.boss ? '#ffdf80' : '#7cfff8';ctx.font='bold 13px system-ui,sans-serif';
-    ctx.fillText(`✦ ${level.contract?.label || 'MISSION'}`,W/2,H/2+21);
+    ctx.fillText(`✦ ${level.contract?.label ? `BONUS / ボーナス · ${level.contract.label}` : 'BONUS / ボーナス · OPTIONAL'}`,W/2,H/2+21);
     ctx.fillStyle='rgba(255,255,255,0.78)';ctx.font='16px system-ui,sans-serif';
     ctx.fillText(level.contract?.detail || 'Clear the structure',W/2,H/2+49);
     if (level.rule) {
       ctx.fillStyle='#ffe66d';ctx.font='bold 12px system-ui,sans-serif';
-      ctx.fillText(`◆ ${level.rule.label}: ${level.rule.detail}`,W/2,H/2+76);
+      ctx.fillText(`◆ OPTIONAL CHALLENGE / チャレンジ · ${level.rule.label}: ${level.rule.detail}`,W/2,H/2+76);
     }
     ctx.fillStyle='rgba(255,255,255,0.48)';ctx.font='12px system-ui,sans-serif';
     ctx.fillText(`Best ${scoreText(gs.roundBestScore)} · Medal ${medalText(gs.roundMedal)} · Gold at ${scoreText(thresholds.gold)}`,W/2,H/2+104);
@@ -2928,12 +2938,26 @@ function traitGlowColor(block) {
     ctx.font='14px system-ui,sans-serif';ctx.fillStyle='rgba(255,255,255,0.45)';
     ctx.fillText(`${Math.round(gs.pct)}% damage / はかい  ·  Run / ラン ${scoreText(gs.runScore)}  ·  Best / ベスト ${scoreText(gs.highScore)}`,W/2,H/2+18);
     if (gs.cardMeta) {
-      ctx.font='13px system-ui,sans-serif';ctx.fillStyle=gs.cardMetaGood?'#7cfff8':'rgba(255,255,255,0.5)';
+      ctx.font='13px system-ui,sans-serif';
+      if (ctx.measureText(gs.cardMeta).width > W*0.86) ctx.font='10px system-ui,sans-serif';
+      ctx.fillStyle=gs.cardMetaGood?'#7cfff8':'rgba(255,255,255,0.5)';
       ctx.fillText(gs.cardMeta,W/2,H/2+43);
     }
     if (gs.cardUnlock) {
-      ctx.font='bold 13px system-ui,sans-serif';ctx.fillStyle='#ffdf80';
-      ctx.fillText(`NEW BOOHA / あたらしいブーハー: ${gs.cardUnlock}`,W/2,H/2+82);
+      const unlockText=`NEW BOOHA / あたらしいブーハー: ${gs.cardUnlock}`;
+      ctx.font='bold 13px system-ui,sans-serif';
+      if (ctx.measureText(unlockText).width > W*0.86) ctx.font='bold 11px system-ui,sans-serif';
+      ctx.fillStyle='#ffdf80';
+      ctx.fillText(unlockText,W/2,H/2+82);
+    } else if (win) {
+      const next = nextRosterUnlock();
+      if (next) {
+        const nextText=`NEXT BOOHA / つぎ: ${next.booha.name} / ${next.booha.jpName} · ${next.requirement.unlockEN} / ${next.requirement.unlockJP}`;
+        ctx.font='12px system-ui,sans-serif';
+        if (ctx.measureText(nextText).width > W*0.86) ctx.font='10px system-ui,sans-serif';
+        ctx.fillStyle='rgba(255,223,128,0.82)';
+        ctx.fillText(nextText,W/2,H/2+82);
+      }
     }
     if (gs.cardChapter) {
       ctx.font='bold 13px system-ui,sans-serif';ctx.fillStyle='#ffcf70';
