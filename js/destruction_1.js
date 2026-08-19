@@ -2846,7 +2846,7 @@ function traitGlowColor(block) {
     }
     if(level.boss){
       const pulse=REDUCED_MOTION?0.6:0.45+0.2*Math.sin(performance.now()*0.004);
-      ctx.save();ctx.globalAlpha=pulse;ctx.strokeStyle=chapter.accent||'#ffdf80';ctx.lineWidth=3;ctx.strokeRect(8,10,W-16,H-18);ctx.restore();
+      ctx.save();ctx.globalAlpha=pulse;ctx.strokeStyle=level.bossProfile?.accent || chapter.accent || '#ffdf80';ctx.lineWidth=3;ctx.strokeRect(8,10,W-16,H-18);ctx.restore();
     }
 
     const pw=120,ph=62,gap=8;
@@ -2979,6 +2979,7 @@ function traitGlowColor(block) {
   function drawBriefing(){
     const level = currentLevel();
     const chapter = currentChapter();
+    const bossProfile = level.bossProfile;
     const thresholds = medalThresholds(level);
     const fewestShots = gs.roundBestShots > 0 ? scoreText(gs.roundBestShots) : '—';
     ctx.save();
@@ -2988,8 +2989,12 @@ function traitGlowColor(block) {
     ctx.fillText(`CHAPTER ${level.chapter || 1} · ${level.chapterName || 'CAMPAIGN'}`,W/2,H/2-148);
     ctx.fillStyle='rgba(255,255,255,0.52)';ctx.font='13px system-ui,sans-serif';
     ctx.fillText(chapter.subtitle || '',W/2,H/2-122);
-    ctx.fillStyle=chapter.accent || '#ffdf80';ctx.font='bold 11px system-ui,sans-serif';
-    ctx.fillText(level.chapterDifficulty || '',W/2,H/2-104);
+    ctx.fillStyle=bossProfile?.accent || chapter.accent || '#ffdf80';ctx.font='bold 11px system-ui,sans-serif';
+    const identityLine=bossProfile
+      ? `BOSS PROFILE / ボス · ${bossProfile.name} / ${bossProfile.jpName}`
+      : (level.chapterDifficulty || '');
+    if (ctx.measureText(identityLine).width > 500) ctx.font='10px system-ui,sans-serif';
+    ctx.fillText(identityLine,W/2,H/2-104);
     ctx.fillStyle='#fff';ctx.font='bold 44px system-ui,sans-serif';
     ctx.fillText(level.boss ? `BOSS ROUND ${gs.roundN}` : `ROUND ${gs.roundN}`,W/2,H/2-76);
     ctx.fillStyle='rgba(255,255,255,0.78)';ctx.font='bold 21px system-ui,sans-serif';
@@ -3000,8 +3005,10 @@ function traitGlowColor(block) {
     ctx.fillText(`✦ ${level.contract?.label ? `BONUS / ボーナス · ${level.contract.label}` : 'BONUS / ボーナス · OPTIONAL'}`,W/2,H/2+21);
     ctx.fillStyle='rgba(255,255,255,0.78)';ctx.font='16px system-ui,sans-serif';
     ctx.fillText(level.contract?.detail || 'Clear the structure',W/2,H/2+43);
+    const focusLine=`${bossProfile ? 'BOSS PLAN / ボスのさくせん' : 'FOCUS / ねらい'} · ${level.focus || 'Read the structure'}`;
     ctx.fillStyle='rgba(255,255,255,0.58)';ctx.font='12px system-ui,sans-serif';
-    ctx.fillText(`FOCUS / ねらい · ${level.focus || 'Read the structure'}`,W/2,H/2+64);
+    if (ctx.measureText(focusLine).width > 500) ctx.font='10px system-ui,sans-serif';
+    ctx.fillText(focusLine,W/2,H/2+64);
     if (level.rule) {
       ctx.fillStyle='#ffe66d';ctx.font='bold 12px system-ui,sans-serif';
       ctx.fillText(`◆ OPTIONAL CHALLENGE / チャレンジ · ${level.rule.label}: ${level.rule.detail}`,W/2,H/2+85);
