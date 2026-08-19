@@ -417,6 +417,7 @@
     cardIntro: 0,
     cardMeta: '', cardMetaGood: false,
     roundBestScore: 0,
+    roundBestShots: 0,
     roundMedal: 0,
     roundClears: 0,
     roundNewBest: false,
@@ -431,6 +432,9 @@
     scale: 1, offX: 0, offY: 0,
     runScore: 0,
     roundScore: 0,
+    roundMultiplier: 1,
+    roundShotBonus: 0,
+    roundDestructionScore: 0,
     shotsUsed: 0,
     collapseCount: 0,
     powerUsed: new Set(),
@@ -647,6 +651,7 @@
     return {
       ...next,
       isNewBest: score > previous.best,
+      isNewFewestShots: !previous.bestShots || shotsUsed < previous.bestShots,
       medalUp: medal > previous.medal,
       medal,
       thresholds: medalThresholds(level),
@@ -802,6 +807,9 @@
     const ruleBonus = rule && rule.complete ? rule.bonus : 0;
     const bossBonus = currentLevel().boss ? (currentLevel().bossBonus || 0) : 0;
     const comboMultiplier = 1 + Math.min(1.5, (gs.combo - 1) * 0.08);
+    gs.roundMultiplier = comboMultiplier;
+    gs.roundShotBonus = shotBonus;
+    gs.roundDestructionScore = destruction;
     gs.roundScore = Math.round((1000 + destruction + shotBonus + contractBonus + ruleBonus + bossBonus) * comboMultiplier);
     gs.runScore += gs.roundScore;
   }
@@ -1594,6 +1602,7 @@ function traitGlowColor(block) {
     CRACKS.clear(); shake.v=0;
     gs.dragging=false; gs.pullPlayed=false; gs.bestShot=0; gs.pct=0; gs.brokenBlocks=0;
     gs.roundScore=0;
+    gs.roundMultiplier=1; gs.roundShotBonus=0; gs.roundDestructionScore=0;
     gs.shotsUsed=0; gs.collapseCount=0; gs.powerUsed=new Set();
     gs.contractComplete=false; gs.contractBonus=0; gs.cardUnlock=''; gs.cardChapter='';
     gs.ruleComplete=false; gs.ruleBonus=0; gs.ruleFailed=false; gs.ruleTime=0; gs.markedTargetIndex=-1;
@@ -1621,6 +1630,7 @@ function traitGlowColor(block) {
     gs.roundN = gs.round + 1;
     const record = getRoundRecord(LEVELS[gs.round]);
     gs.roundBestScore = record.best;
+    gs.roundBestShots = record.bestShots;
     gs.roundMedal = record.medal;
     gs.roundClears = record.clears;
     gs.roundNewBest = false;
@@ -2192,17 +2202,22 @@ function traitGlowColor(block) {
       const finalRound = gs.round >= LEVELS.length - 1;
       if (finalRound) {
         submitRunScore(true);
-        showCard(P.WIN, 'CAMPAIGN CLEAR!', `${LEVELS.length} rounds smashed · ${scoreText(gs.runScore)} points`, '#ffdd44');
+        const streakNote = gs.combo > 1 ? ` · STREAK / れんぞく ×${gs.combo}` : '';
+        showCard(P.WIN, 'CAMPAIGN CLEAR!', `${LEVELS.length} rounds smashed · ${scoreText(gs.runScore)} points${streakNote}`, '#ffdd44');
       } else {
-        showCard(P.WIN, gs.cardChapter ? `CHAPTER ${level.chapter} CLEAR!` : (level.boss ? `BOSS ${gs.roundN} CLEARED!` : `ROUND ${gs.roundN} CLEAR!`), `+${scoreText(gs.roundScore)} points · ${scoreText(gs.runScore)} total`, '#ffdd44');
+        const streakNote = gs.combo > 1 ? ` · STREAK / れんぞく ×${gs.combo}` : '';
+        showCard(P.WIN, gs.cardChapter ? `CHAPTER ${level.chapter} CLEAR!` : (level.boss ? `BOSS ${gs.roundN} CLEARED!` : `ROUND ${gs.roundN} CLEAR!`), `+${scoreText(gs.roundScore)} points · ${scoreText(gs.runScore)} total${streakNote}`, '#ffdd44');
       }
       const recordTag = roundResult.isNewBest ? 'NEW ROUND BEST' : `BEST ${scoreText(roundResult.best)}`;
       const medalTag = roundResult.medal ? `${medalText(roundResult.medal)} MEDAL` : 'MEDAL TO EARN';
-      gs.cardMeta = [contractResultText(contract), ruleResultText(rule), medalTag, recordTag]
+      const shotTag = roundResult.isNewFewestShots ? `NEW SHOT RECORD · ${gs.shotsUsed} SHOTS` : `FEWEST ${roundResult.bestShots} SHOTS`;
+      const streakTag = gs.combo > 1 ? `STREAK ×${gs.combo} · SCORE ×${gs.roundMultiplier.toFixed(2)}` : 'STREAK STARTED';
+      gs.cardMeta = [contractResultText(contract), ruleResultText(rule), medalTag, shotTag, streakTag, recordTag]
         .filter(Boolean).join('  ·  ');
       gs.cardMetaGood = contract.complete || rule.complete || roundResult.isNewBest || roundResult.medalUp;
     } else if (ruleFailed || shotsLeft<=0) {
       sndFail();
+      const lostStreak = gs.combo;
       gs.combo=0;
       gs.nearMiss = gs.pct >= Math.max(0, target - 10);
       gs.lives=Math.max(0,gs.lives-1);
@@ -2212,11 +2227,12 @@ function traitGlowColor(block) {
       } else {
         showCard(P.FAIL, ruleFailed ? 'TIME UP!' : (gs.nearMiss ? 'SO CLOSE!' : (level.boss ? 'BOSS ROUND OVER' : 'ROUND OVER')), `${Math.round(gs.pct)}% destruction · ${gs.lives} lives left`, ruleFailed ? '#ff9f7f' : (gs.nearMiss ? '#ffcf70' : '#ff6666'));
       }
-      gs.cardMeta = ruleFailed
+      const failMeta = ruleFailed
         ? `TIME ATTACK FAILED · ${Math.ceil(Math.max(0, gs.ruleTime))}s remaining`
         : gs.nearMiss
         ? `NEAR MISS · ${Math.round(target - gs.pct)}% more damage needed`
         : `${level.contract?.label || 'CONTRACT'} · ${contractProgress(level)}`;
+      gs.cardMeta = [failMeta, lostStreak > 1 ? `STREAK ENDED ×${lostStreak}` : ''].filter(Boolean).join('  ·  ');
       gs.cardMetaGood = gs.nearMiss;
     } else {
       gs.shotLock=false;
@@ -2754,6 +2770,7 @@ function traitGlowColor(block) {
     const addPanel=(en,jp,value,accent)=>panels.push({en,jp,value,accent});
     addPanel('SCORE','スコア',scoreText(gs.runScore),'#ffdf80');
     addPanel('SHOTS','のこり',String(gs.ghostsLeft),gs.isLastBooha?'#ff5555':'#ff9f7f');
+    addPanel('LIVES','いのち',`${gs.lives}/${MAX_RUN_LIVES}`,gs.lives<=1?'#ff5555':'#ffcf70');
     addPanel('DAMAGE','はかい',`${Math.round(gs.pct)}%`,'#7cfff8');
     addPanel('GOAL','もくひょう',`${level.targetPercent||100}%`,'#ffdf80');
     if(rule?.type==='time_attack') addPanel('TIME','じかん',`${Math.ceil(Math.max(0,gs.ruleTime))}s`,gs.ruleTime<10?'#ff5555':'#ff9f7f');
@@ -2895,6 +2912,7 @@ function traitGlowColor(block) {
     const level = currentLevel();
     const chapter = currentChapter();
     const thresholds = medalThresholds(level);
+    const fewestShots = gs.roundBestShots > 0 ? scoreText(gs.roundBestShots) : '—';
     ctx.save();
     ctx.fillStyle='rgba(7,5,18,0.82)';ctx.fillRect(0,0,W,H);
     ctx.textAlign='center';ctx.textBaseline='middle';
@@ -2916,8 +2934,10 @@ function traitGlowColor(block) {
       ctx.fillStyle='#ffe66d';ctx.font='bold 12px system-ui,sans-serif';
       ctx.fillText(`◆ OPTIONAL CHALLENGE / チャレンジ · ${level.rule.label}: ${level.rule.detail}`,W/2,H/2+76);
     }
+    const recordLine=`Best ${scoreText(gs.roundBestScore)} · Fewest / さいしょう ${fewestShots} · Medal ${medalText(gs.roundMedal)} · Gold ${scoreText(thresholds.gold)}`;
     ctx.fillStyle='rgba(255,255,255,0.48)';ctx.font='12px system-ui,sans-serif';
-    ctx.fillText(`Best ${scoreText(gs.roundBestScore)} · Medal ${medalText(gs.roundMedal)} · Gold at ${scoreText(thresholds.gold)}`,W/2,H/2+104);
+    if (ctx.measureText(recordLine).width > 460) ctx.font='10px system-ui,sans-serif';
+    ctx.fillText(recordLine,W/2,H/2+104);
     const bx=W/2-130,by=H*0.62,bw=260,bh=58;
     const bg=ctx.createLinearGradient(bx,by,bx,by+bh);bg.addColorStop(0,level.boss?'#ffdf80':'#44ffcc');bg.addColorStop(1,level.boss?'#ff8c44':'#009977');
     ctx.shadowColor=level.boss?'#ffcf70':'#44ffcc';ctx.shadowBlur=18;ctx.fillStyle=bg;rr(ctx,bx,by,bw,bh,16,true,false);ctx.shadowBlur=0;
