@@ -297,6 +297,11 @@
     powerUsed: new Set(),
     contractComplete: false,
     contractBonus: 0,
+    ruleComplete: false,
+    ruleBonus: 0,
+    ruleFailed: false,
+    ruleTime: 0,
+    markedTargetIndex: -1,
     combo: 0,
     lives: MAX_RUN_LIVES,
     runStartedAt: 0,
@@ -380,11 +385,12 @@
       medal: Number(record.medal) || 0,
       clears: Number(record.clears) || 0,
       contractClears: Number(record.contractClears) || 0,
+      ruleClears: Number(record.ruleClears) || 0,
       bestShots: Number(record.bestShots) || 0,
     };
   }
 
-  function recordRoundResult(level, score, contractComplete, shotsUsed) {
+  function recordRoundResult(level, score, contractComplete, ruleComplete, shotsUsed) {
     const key = String(level.id);
     const previous = getRoundRecord(level);
     const medal = medalForScore(level, score);
@@ -393,6 +399,7 @@
       medal: Math.max(previous.medal, medal),
       clears: previous.clears + 1,
       contractClears: previous.contractClears + (contractComplete ? 1 : 0),
+      ruleClears: previous.ruleClears + (ruleComplete ? 1 : 0),
       bestShots: previous.bestShots && previous.bestShots <= shotsUsed
         ? previous.bestShots : shotsUsed,
     };
@@ -415,6 +422,37 @@
     if (c.minCollapses != null) return `${Math.min(gs.collapseCount, c.minCollapses)}/${c.minCollapses} falls`;
     if (c.minPowers != null) return `${Math.min(gs.powerUsed.size, c.minPowers)}/${c.minPowers} powers`;
     return 'READY';
+  }
+
+  function currentRule() { return currentLevel().rule || null; }
+
+  function ruleProgress(level = currentLevel()) {
+    const rule = level.rule;
+    if (!rule) return '';
+    if (rule.type === 'time_attack') return `${Math.ceil(Math.max(0, gs.ruleTime))}s left`;
+    if (rule.type === 'spotlight') return gs.powerUsed.has(rule.power) ? 'READY' : `NEED ${rule.power.toUpperCase()}`;
+    if (rule.type === 'marked_target') {
+      const target = gs.blocks[gs.markedTargetIndex];
+      return target && target.broken ? 'BROKEN' : 'GLOWING';
+    }
+    return 'READY';
+  }
+
+  function evaluateRule() {
+    const rule = currentRule();
+    if (!rule) return { complete:false, bonus:0, label:'' };
+    let complete = false;
+    if (rule.type === 'time_attack') complete = !gs.ruleFailed;
+    if (rule.type === 'spotlight') complete = gs.powerUsed.has(rule.power);
+    if (rule.type === 'marked_target') complete = !!gs.blocks[gs.markedTargetIndex]?.broken;
+    gs.ruleComplete = complete;
+    gs.ruleBonus = complete ? (rule.bonus || 0) : 0;
+    return { ...rule, complete, bonus:gs.ruleBonus };
+  }
+
+  function ruleResultText(rule) {
+    if (!rule) return '';
+    return rule.complete ? `◆ ${rule.label} +${scoreText(rule.bonus)}` : `RULE MISSED · ${rule.label}`;
   }
 
   function evaluateContract(shotsLeft) {
@@ -507,15 +545,16 @@
     return result;
   }
 
-  function awardRoundScore(shotsLeft, contract) {
+  function awardRoundScore(shotsLeft, contract, rule) {
     gs.combo++;
     gs.comboPulse=1;
     const destruction = Math.round(gs.pct * 8);
     const shotBonus = shotsLeft * 140;
     const contractBonus = contract && contract.complete ? contract.bonus : 0;
+    const ruleBonus = rule && rule.complete ? rule.bonus : 0;
     const bossBonus = currentLevel().boss ? (currentLevel().bossBonus || 0) : 0;
     const comboMultiplier = 1 + Math.min(1.5, (gs.combo - 1) * 0.08);
-    gs.roundScore = Math.round((1000 + destruction + shotBonus + contractBonus + bossBonus) * comboMultiplier);
+    gs.roundScore = Math.round((1000 + destruction + shotBonus + contractBonus + ruleBonus + bossBonus) * comboMultiplier);
     gs.runScore += gs.roundScore;
   }
 
@@ -1290,6 +1329,7 @@ function traitGlowColor(block) {
     gs.roundScore=0;
     gs.shotsUsed=0; gs.collapseCount=0; gs.powerUsed=new Set();
     gs.contractComplete=false; gs.contractBonus=0;
+    gs.ruleComplete=false; gs.ruleBonus=0; gs.ruleFailed=false; gs.ruleTime=0; gs.markedTargetIndex=-1;
     gs.nearMiss=false;
     gs.comboPulse=0;
     gs.debTimer=0; gs.shotLock=false; gs.flash=0;
@@ -1321,6 +1361,14 @@ function traitGlowColor(block) {
     const lvl = LEVELS[gs.round];
     gs.blocks      = lvl.blocks.map((def, i) => cloneBlock(def, i));
     gs.totalBlocks = gs.blocks.length;
+    if (lvl.rule?.type === 'time_attack') gs.ruleTime = lvl.rule.timeLimit || 55;
+    if (lvl.rule?.type === 'marked_target') {
+      gs.markedTargetIndex = gs.blocks.reduce((best, block, i) => {
+        if (best < 0) return i;
+        return block.y < gs.blocks[best].y ? i : best;
+      }, -1);
+      if (gs.markedTargetIndex >= 0) gs.blocks[gs.markedTargetIndex].marked = true;
+    }
     buildBlockIndex();
     gs.booha   = makeBooha();
     gs.running = false;
@@ -1379,6 +1427,7 @@ function traitGlowColor(block) {
       x:def.x, y, w:def.w, h:def.h, material:def.material||'wood',
       hp:def.hp||1, maxHp:def.hp||1,
       broken:false,
+      marked:false,
       falling:false,
       shake:0, vy:0, fallen:false, hitFlash:0,
       frozen:false, burning:false, burnTimer:0, ringCrack:false, compressY:0,
@@ -1831,11 +1880,13 @@ function traitGlowColor(block) {
     gs.ghostsLeft=shotsLeft;
     gs.pct=(gs.brokenBlocks/Math.max(1,gs.totalBlocks))*100;
     const level = currentLevel();
+    const ruleFailed = gs.ruleFailed;
     const target=(level.targetPercent)||100;
-    if (gs.pct>=target) {
+    if (!ruleFailed && gs.pct>=target) {
       const contract = evaluateContract(shotsLeft);
-      awardRoundScore(shotsLeft, contract);
-      const roundResult = recordRoundResult(level, gs.roundScore, contract.complete, gs.shotsUsed);
+      const rule = evaluateRule();
+      awardRoundScore(shotsLeft, contract, rule);
+      const roundResult = recordRoundResult(level, gs.roundScore, contract.complete, rule.complete, gs.shotsUsed);
       gs.roundBestScore = roundResult.best;
       gs.roundMedal = roundResult.medal;
       gs.roundClears = roundResult.clears;
@@ -1864,9 +1915,9 @@ function traitGlowColor(block) {
         showCard(P.WIN, level.boss ? `BOSS ${gs.roundN} CLEARED!` : `ROUND ${gs.roundN} CLEAR!`, `+${scoreText(gs.roundScore)} points · ${scoreText(gs.runScore)} total`, '#ffdd44');
       }
       const recordTag = roundResult.isNewBest ? 'NEW ROUND BEST' : `BEST ${scoreText(roundResult.best)}`;
-      gs.cardMeta = `${contractResultText(contract)}  ·  ${medalText(roundResult.medal)}  ·  ${recordTag}`;
-      gs.cardMetaGood = contract.complete || roundResult.isNewBest || roundResult.medalUp;
-    } else if (shotsLeft<=0) {
+      gs.cardMeta = `${contractResultText(contract)}  ·  ${ruleResultText(rule)}  ·  ${medalText(roundResult.medal)}  ·  ${recordTag}`;
+      gs.cardMetaGood = contract.complete || rule.complete || roundResult.isNewBest || roundResult.medalUp;
+    } else if (ruleFailed || shotsLeft<=0) {
       sndFail();
       gs.combo=0;
       gs.nearMiss = gs.pct >= Math.max(0, target - 10);
@@ -1875,9 +1926,11 @@ function traitGlowColor(block) {
         submitRunScore(false);
         showCard(P.FAIL, 'RUN OVER', `${Math.round(gs.pct)}% destruction · ${scoreText(gs.runScore)} points`, '#ff6666');
       } else {
-        showCard(P.FAIL, gs.nearMiss ? 'SO CLOSE!' : (level.boss ? 'BOSS ROUND OVER' : 'ROUND OVER'), `${Math.round(gs.pct)}% destruction · ${gs.lives} lives left`, gs.nearMiss ? '#ffcf70' : '#ff6666');
+        showCard(P.FAIL, ruleFailed ? 'TIME UP!' : (gs.nearMiss ? 'SO CLOSE!' : (level.boss ? 'BOSS ROUND OVER' : 'ROUND OVER')), `${Math.round(gs.pct)}% destruction · ${gs.lives} lives left`, ruleFailed ? '#ff9f7f' : (gs.nearMiss ? '#ffcf70' : '#ff6666'));
       }
-      gs.cardMeta = gs.nearMiss
+      gs.cardMeta = ruleFailed
+        ? `TIME ATTACK FAILED · ${Math.ceil(Math.max(0, gs.ruleTime))}s remaining`
+        : gs.nearMiss
         ? `NEAR MISS · ${Math.round(target - gs.pct)}% more damage needed`
         : `${level.contract?.label || 'CONTRACT'} · ${contractProgress(level)}`;
       gs.cardMetaGood = gs.nearMiss;
@@ -1892,6 +1945,16 @@ function traitGlowColor(block) {
   }
   function advanceSelector() {
     for(let i=0;i<ROSTER.length;i++){const t=(bst.sel+i)%ROSTER.length;if(bst.stocks[t]>0){bst.sel=t;return;}}
+  }
+
+  function updateRuleTimer() {
+    const rule = currentRule();
+    if (gs.phase !== P.PLAY || !rule || rule.type !== 'time_attack' || gs.ruleFailed || gs.shotLock) return;
+    gs.ruleTime = Math.max(0, gs.ruleTime - FIXED_STEP / 1000);
+    if (gs.ruleTime <= 0) {
+      gs.ruleFailed = gs.pct < (currentLevel().targetPercent || 100);
+      finishShot();
+    }
   }
 
   // ── FX update ────────────────────────────────────────
@@ -2219,6 +2282,22 @@ function traitGlowColor(block) {
           rr(ctx, bx - 1, by - 1, bw + 2, bh + 2, 9, false, true);
           ctx.restore();
         }
+        if (block.marked) {
+          const pulse = REDUCED_MOTION ? 0.75 : 0.55 + 0.35 * Math.sin(performance.now() * 0.006);
+          ctx.save();
+          ctx.globalAlpha = pulse;
+          ctx.strokeStyle = '#ffe66d';
+          ctx.lineWidth = 2.5;
+          ctx.setLineDash([8, 5]);
+          rr(ctx, bx - 6, by - 6, bw + 12, bh + 12, 12, false, true);
+          ctx.setLineDash([]);
+          ctx.fillStyle = '#ffe66d';
+          ctx.font = 'bold 13px system-ui,sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('◆', block.x, by - 14);
+          ctx.restore();
+        }
       }
 
       ctx.restore();
@@ -2313,6 +2392,7 @@ function traitGlowColor(block) {
     ctx.save();ctx.textBaseline='middle';ctx.textAlign='left';
     const level = currentLevel();
     const chapter = currentChapter();
+    const rule = currentRule();
     if(gs.isLastBooha&&gs.phase===P.PLAY){
       const pulse=REDUCED_MOTION?0.65:0.5+0.5*Math.sin(performance.now()*0.005);
       ctx.save();ctx.globalAlpha=0.22*pulse;ctx.strokeStyle='#ff4444';ctx.lineWidth=6;ctx.strokeRect(0,0,W,H);ctx.restore();
@@ -2350,12 +2430,19 @@ function traitGlowColor(block) {
       ctx.fillText(`STREAK ×${gs.combo}`,SX+SW+14,121);
       ctx.globalAlpha=1;
     }
+    if (rule) {
+      ctx.fillStyle=rule.type === 'time_attack' ? '#ff9f7f' : '#ffe66d';ctx.font='bold 10px system-ui,sans-serif';
+      ctx.fillText(`◆ ${rule.label}: ${ruleProgress(level)}`,SX+SW+14,136);
+    }
     const pills=[
       {label:'SCORE',  value:scoreText(gs.runScore), accent:'#ffdf80'},
       {label:'SHOTS',  value:String(gs.ghostsLeft), accent:gs.isLastBooha?'#ff4444':'#ff9f7f'},
       {label:'DAMAGE', value:`${Math.round(gs.pct)}%`, accent:'#7cfff8'},
       {label:'TARGET', value:`${(level.targetPercent||100)}%`, accent:'#ffdf80'}
     ];
+    if (rule?.type === 'time_attack') {
+      pills.push({label:'TIME', value:`${Math.ceil(Math.max(0, gs.ruleTime))}s`, accent:gs.ruleTime < 10 ? '#ff5555' : '#ff9f7f'});
+    }
     const pw=90,ph=44,pg2=10;let px=W-14-pills.length*(pw+pg2)+pg2;
     for(const pill of pills){
       ctx.save();ctx.globalAlpha=0.85;ctx.fillStyle='rgba(8,6,16,0.72)';ctx.strokeStyle='rgba(255,255,255,0.08)';ctx.lineWidth=1;rr(ctx,px,12,pw,ph,10,true,true);ctx.restore();
@@ -2409,13 +2496,17 @@ function traitGlowColor(block) {
     ctx.fillStyle='rgba(255,255,255,0.78)';ctx.font='bold 21px system-ui,sans-serif';
     ctx.fillText(level.name || '',W/2,H/2-35);
     ctx.save();ctx.fillStyle='rgba(255,255,255,0.07)';ctx.strokeStyle=level.boss ? (chapter.accent || '#ffdf80') : 'rgba(255,255,255,0.18)';ctx.lineWidth=1.5;
-    rr(ctx,W/2-250,H/2-2,500,104,16,true,true);ctx.restore();
+    rr(ctx,W/2-250,H/2-2,500,132,16,true,true);ctx.restore();
     ctx.fillStyle=level.boss ? '#ffdf80' : '#7cfff8';ctx.font='bold 13px system-ui,sans-serif';
     ctx.fillText(`✦ ${level.contract?.label || 'MISSION'}`,W/2,H/2+21);
     ctx.fillStyle='rgba(255,255,255,0.78)';ctx.font='16px system-ui,sans-serif';
     ctx.fillText(level.contract?.detail || 'Clear the structure',W/2,H/2+49);
+    if (level.rule) {
+      ctx.fillStyle='#ffe66d';ctx.font='bold 12px system-ui,sans-serif';
+      ctx.fillText(`◆ ${level.rule.label}: ${level.rule.detail}`,W/2,H/2+76);
+    }
     ctx.fillStyle='rgba(255,255,255,0.48)';ctx.font='12px system-ui,sans-serif';
-    ctx.fillText(`Best ${scoreText(gs.roundBestScore)} · Medal ${medalText(gs.roundMedal)} · Gold at ${scoreText(thresholds.gold)}`,W/2,H/2+77);
+    ctx.fillText(`Best ${scoreText(gs.roundBestScore)} · Medal ${medalText(gs.roundMedal)} · Gold at ${scoreText(thresholds.gold)}`,W/2,H/2+104);
     const bx=W/2-130,by=H*0.62,bw=260,bh=58;
     const bg=ctx.createLinearGradient(bx,by,bx,by+bh);bg.addColorStop(0,level.boss?'#ffdf80':'#44ffcc');bg.addColorStop(1,level.boss?'#ff8c44':'#009977');
     ctx.shadowColor=level.boss?'#ffcf70':'#44ffcc';ctx.shadowBlur=18;ctx.fillStyle=bg;rr(ctx,bx,by,bw,bh,16,true,false);ctx.shadowBlur=0;
@@ -2487,6 +2578,8 @@ function traitGlowColor(block) {
       physicsCarry=Math.min(FIXED_STEP*4,physicsCarry+frameMs);
       let steps=0;
       while(physicsCarry>=FIXED_STEP&&steps<4){
+        updateRuleTimer();
+        if(gs.phase!==P.PLAY){physicsCarry=0;break;}
         updateFX();updateBlocks();updateBooha();
         physicsCarry-=FIXED_STEP;steps++;
         if(gs.phase!==P.PLAY){physicsCarry=0;break;}

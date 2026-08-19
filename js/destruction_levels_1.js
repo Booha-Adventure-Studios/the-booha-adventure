@@ -2244,5 +2244,25 @@ window.BOOHA_DESTRUCTION_LEVELS = [
     level.boss = boss;
     level.bossBonus = boss ? 1200 : 0;
     level.contract = contract;
+
+    if (roundInChapter === 4) {
+      const spotlight = ['heavy','fire','ice','rainbow','ultimate'][chapterIndex];
+      level.rule = {
+        type:'spotlight', label:'POWER SPOTLIGHT',
+        detail:`Use ${spotlight.toUpperCase()} Booha for a bonus`, power:spotlight, bonus:900,
+      };
+    } else if (roundInChapter === 5) {
+      level.rule = {
+        type:'marked_target', label:'MARKED TARGET',
+        detail:'Break the glowing target block for a bonus', bonus:1000,
+      };
+    } else if (roundInChapter === 8) {
+      level.rule = {
+        type:'time_attack', label:'TIME ATTACK',
+        detail:'Clear the structure before the clock hits zero', timeLimit:55, bonus:900,
+      };
+    } else {
+      level.rule = null;
+    }
   });
 })();
