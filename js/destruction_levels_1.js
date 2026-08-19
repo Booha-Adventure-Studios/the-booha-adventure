@@ -2180,3 +2180,69 @@ window.BOOHA_DESTRUCTION_LEVELS = [
 
 
 ]; // end BOOHA_DESTRUCTION_LEVELS
+
+// ── Campaign layer ─────────────────────────────────────────────
+// The layouts stay readable and forgiving; these optional contracts add
+// variety, replay value, and a reason to experiment with the full roster.
+(() => {
+  const chapters = [
+    { id:1, name:'TRAINING GROUNDS', subtitle:'Learn the collapse', accent:'#7cfff8' },
+    { id:2, name:'TRAITWORKS', subtitle:'Read the resistances', accent:'#ffcf70' },
+    { id:3, name:'POWER PUZZLES', subtitle:'Pick the right Booha', accent:'#c68cff' },
+    { id:4, name:'CHAIN REACTION LAB', subtitle:'Make gravity do the work', accent:'#66ffbb' },
+    { id:5, name:'THE ENDGAME', subtitle:'Master the whole roster', accent:'#ff6677' },
+  ];
+  const precisionShots = [4,4,3,4,3,4,3,3,2,4];
+  const contractPowers = ['fire','ice','heavy','rainbow','rock','fire','ice','heavy','rainbow','rock'];
+  const collapseCounts = [3,4,5,4,6,5,6,5,7,6];
+
+  window.BOOHA_DESTRUCTION_CHAPTERS = chapters;
+  window.BOOHA_DESTRUCTION_LEVELS.forEach((level, index) => {
+    const chapterIndex = Math.floor(index / 10);
+    const roundInChapter = (index % 10) + 1;
+    const chapter = chapters[chapterIndex];
+    const boss = roundInChapter === 10;
+    let contract;
+
+    if (chapterIndex === 0) {
+      const maxShots = precisionShots[roundInChapter - 1];
+      contract = {
+        type:'precision', label:'SHOT SAVER',
+        detail:`Clear in ${maxShots} shots or fewer`, maxShots, bonus:500,
+      };
+    } else if (chapterIndex === 1) {
+      const power = contractPowers[roundInChapter - 1];
+      contract = {
+        type:'power', label:'POWER CALL',
+        detail:`Launch ${power.toUpperCase()} Booha once`, power, bonus:700,
+      };
+    } else if (chapterIndex === 2) {
+      const maxShots = [6,5,5,5,4,5,4,5,4,4][roundInChapter - 1];
+      contract = {
+        type:'precision', label:'SURGICAL STRIKE',
+        detail:`Clear in ${maxShots} shots or fewer`, maxShots, bonus:900,
+      };
+    } else if (chapterIndex === 3) {
+      const minCollapses = collapseCounts[roundInChapter - 1];
+      contract = {
+        type:'collapse', label:'LET IT FALL',
+        detail:`Trigger ${minCollapses} unsupported blocks`, minCollapses, bonus:1100,
+      };
+    } else {
+      const minPowers = boss ? 3 : 2;
+      contract = {
+        type:'power_mix', label: boss ? 'BOSS MIX' : 'MIX IT UP',
+        detail:`Use ${minPowers} different powers`, minPowers, bonus:boss ? 1800 : 1300,
+      };
+    }
+
+    level.chapter = chapter.id;
+    level.chapterName = chapter.name;
+    level.chapterSubtitle = chapter.subtitle;
+    level.chapterAccent = chapter.accent;
+    level.roundInChapter = roundInChapter;
+    level.boss = boss;
+    level.bossBonus = boss ? 1200 : 0;
+    level.contract = contract;
+  });
+})();
