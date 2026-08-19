@@ -319,15 +319,24 @@ window.BoohaDailyCheck = (function () {
       background:linear-gradient(135deg,var(--pink,#ff3bbd),var(--pink2,#ff79d7));
       box-shadow:0 8px 22px rgba(255,59,189,.45);transition:transform .12s;}
     .dc-btn:active{transform:translateY(2px) scale(.98);}
+    .dc-btn.dc-start-ready{animation:dcStartGlow 1.8s ease-in-out infinite;}
+    @keyframes dcStartGlow{
+      0%,100%{box-shadow:0 8px 22px rgba(255,59,189,.45),0 0 0 0 rgba(255,121,215,0);}
+      50%{box-shadow:0 8px 26px rgba(255,59,189,.7),0 0 0 7px rgba(255,121,215,.18),0 0 34px rgba(255,59,189,.55);}
+    }
     .dc-btn.ghost{background:transparent;border:1.5px solid rgba(255,255,255,.4);
       box-shadow:none;color:var(--muted,rgba(255,255,255,.8));font-weight:700;}
     .dc-tiles{display:flex;flex-direction:column;gap:12px;width:min(92vw,420px);margin-top:6px;}
     .dc-tile{--h:200deg;display:flex;align-items:center;gap:14px;padding:16px 18px;border-radius:18px;
       border:1.5px solid hsla(var(--h),90%,65%,.5);background:hsla(var(--h),80%,30%,.28);
-      color:#fff;cursor:pointer;text-align:left;transition:transform .12s,border-color .2s,background .2s;}
+      color:#fff;cursor:pointer;text-align:left;position:relative;transition:transform .12s,border-color .2s,background .2s,box-shadow .2s;}
     .dc-tile:active{transform:scale(.98);}
     .dc-tile.sel{border-color:hsla(var(--h),95%,72%,1);background:hsla(var(--h),85%,42%,.42);
-      box-shadow:0 0 0 3px hsla(var(--h),90%,65%,.35);}
+      box-shadow:0 0 0 3px hsla(var(--h),90%,65%,.5),0 0 24px hsla(var(--h),90%,65%,.45);
+      transform:translateY(-2px);}
+    .dc-tile.sel::after{content:'✓';display:grid;place-items:center;flex:0 0 28px;width:28px;height:28px;
+      margin-left:auto;border-radius:50%;background:hsla(var(--h),95%,72%,1);color:#190b22;
+      font-size:1.05rem;font-weight:900;box-shadow:0 0 12px hsla(var(--h),90%,75%,.8);}
     .dc-tile .tn{font-weight:800;font-size:1.1rem;}
     .dc-tile .tj{font-size:.85rem;color:var(--muted,rgba(255,255,255,.75));}
     .dc-choices{display:flex;flex-direction:column;gap:11px;width:min(92vw,520px);margin-top:18px;}
@@ -367,6 +376,7 @@ window.BoohaDailyCheck = (function () {
     }
     @media (prefers-reduced-motion: reduce){
       .dc-ghost{animation:none;} .dc-burst{display:none;}
+      .dc-btn.dc-start-ready{animation:none;box-shadow:0 8px 26px rgba(255,59,189,.7),0 0 0 4px rgba(255,121,215,.18),0 0 28px rgba(255,59,189,.45);}
     }`;
     const el = document.createElement('style');
     el.id = 'dc-styles';
@@ -468,23 +478,32 @@ window.BoohaDailyCheck = (function () {
         const tile = document.createElement('button');
         tile.className = 'dc-tile' + (selected === c.id ? ' sel' : '');
         tile.type = 'button'; tile.style.setProperty('--h', c.hue + 'deg');
+        tile.setAttribute('aria-pressed', selected === c.id ? 'true' : 'false');
         const nm = document.createElement('div'); nm.className = 'tn'; nm.textContent = c.name;
         const jp = document.createElement('div'); jp.className = 'tj'; jp.textContent = c.jp;
         const col = document.createElement('div'); col.appendChild(nm); col.appendChild(jp);
         tile.appendChild(col);
         tile.addEventListener('click', () => {
           selected = c.id;
-          Object.values(tiles).forEach(x => x.classList.remove('sel'));
+          Object.values(tiles).forEach(x => {
+            x.classList.remove('sel');
+            x.setAttribute('aria-pressed', 'false');
+          });
           tile.classList.add('sel');
-          go.disabled = false; go.style.opacity = '1';
+          tile.setAttribute('aria-pressed', 'true');
+          go.disabled = false;
+          go.style.opacity = '1';
+          go.classList.add('dc-start-ready');
         });
         tiles[c.id] = tile; wrap.appendChild(tile);
       });
       root.appendChild(wrap);
 
       const go = document.createElement('button');
-      go.className = 'dc-btn'; go.type = 'button'; go.textContent = 'はじめる';
-      if (!selected) { go.disabled = true; go.style.opacity = '.5'; }
+      go.className = 'dc-btn' + (selected ? ' dc-start-ready' : '');
+      go.type = 'button'; go.textContent = 'はじめる';
+      go.disabled = !selected;
+      if (!selected) go.style.opacity = '.5';
       go.addEventListener('click', () => {
         if (!selected) return;
         localStorage.setItem('booha_last_curr', selected);  // one source of truth
