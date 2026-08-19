@@ -2228,6 +2228,20 @@ window.BOOHA_DESTRUCTION_LEVELS = [
     ],
   ];
   const timeLimits = [65, 60, 55, 50, 45];
+  const bossProfiles = [
+    { name:'THE FIRST TEST', jpName:'はじめのしけん', focus:'Break the marked target and prove your aim.', focusJP:'ひかったもくひょうをこわして、ねらいをしめす。', accent:'#7cfff8' },
+    { name:'THE RESISTANCE TEST', jpName:'ていこうのしけん', focus:'Read the trait, then choose the counter.', focusJP:'とくせいをよんで、あいてをえらぶ。', accent:'#ffcf70' },
+    { name:'THE POWER TEST', jpName:'パワーのしけん', focus:'Use the right Booha at the right moment.', focusJP:'ただしいブーハーを、ただしいときにつかう。', accent:'#c68cff' },
+    { name:'THE CHAIN TEST', jpName:'れんさのしけん', focus:'Start one collapse and let the whole field fall.', focusJP:'ひとつをたおして、ぜんたいをたおす。', accent:'#66ffbb' },
+    { name:'THE MASTER TEST', jpName:'きわめのしけん', focus:'Mix your best powers and protect the streak.', focusJP:'さいこうのパワーをくみあわせ、れんぞくをまもる。', accent:'#ff6677' },
+  ];
+  const bossRules = [
+    { type:'marked_target', label:'BOSS TARGET', detail:'Break the marked target for a bonus', bonus:1200 },
+    { type:'spotlight', label:'BOSS POWER', detail:'Use ICE Booha for a bonus', power:'ice', bonus:1200 },
+    { type:'spotlight', label:'BOSS POWER', detail:'Use FIRE Booha for a bonus', power:'fire', bonus:1400 },
+    { type:'spotlight', label:'BOSS POWER', detail:'Use HEAVY Booha for a bonus', power:'heavy', bonus:1400 },
+    { type:'marked_target', label:'FINAL TARGET', detail:'Break the marked target for a bonus', bonus:1800 },
+  ];
   const precisionShots = [4,4,3,4,3,4,3,3,2,4];
   const contractPowers = ['fire','ice','heavy','rainbow','rock','fire','ice','heavy','rainbow','rock'];
   const collapseCounts = [3,4,5,4,6,5,6,5,7,6];
@@ -2283,8 +2297,14 @@ window.BOOHA_DESTRUCTION_LEVELS = [
     level.boss = boss;
     level.bossBonus = boss ? 1200 : 0;
     level.contract = contract;
+    if (boss) {
+      level.bossProfile = bossProfiles[chapterIndex];
+      level.focus = `${level.bossProfile.focus} / ${level.bossProfile.focusJP}`;
+    }
 
-    if (roundInChapter === 4) {
+    if (boss) {
+      level.rule = { ...bossRules[chapterIndex] };
+    } else if (roundInChapter === 4) {
       const spotlight = ['heavy','fire','ice','rainbow','ultimate'][chapterIndex];
       level.rule = {
         type:'spotlight', label:'POWER SPOTLIGHT',
