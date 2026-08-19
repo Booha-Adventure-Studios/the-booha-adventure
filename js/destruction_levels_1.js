@@ -2184,12 +2184,50 @@ window.BOOHA_DESTRUCTION_LEVELS = [
 // variety, replay value, and a reason to experiment with the full roster.
 (() => {
   const chapters = [
-    { id:1, name:'TRAINING GROUNDS', subtitle:'Learn the collapse', accent:'#7cfff8' },
-    { id:2, name:'TRAITWORKS', subtitle:'Read the resistances', accent:'#ffcf70' },
-    { id:3, name:'POWER PUZZLES', subtitle:'Pick the right Booha', accent:'#c68cff' },
-    { id:4, name:'CHAIN REACTION LAB', subtitle:'Make gravity do the work', accent:'#66ffbb' },
-    { id:5, name:'THE ENDGAME', subtitle:'Master the whole roster', accent:'#ff6677' },
+    { id:1, name:'TRAINING GROUNDS', subtitle:'Learn the collapse / たおれかたをまなぶ', accent:'#7cfff8', sceneTint:'rgba(20,140,160,0.07)', difficulty:'WARM UP / じゅんび' },
+    { id:2, name:'TRAITWORKS', subtitle:'Read the resistances / ていこうをよむ', accent:'#ffcf70', sceneTint:'rgba(180,120,20,0.08)', difficulty:'READ THE RULES / ルールをよむ' },
+    { id:3, name:'POWER PUZZLES', subtitle:'Pick the right Booha / ただしいブーハーをえらぶ', accent:'#c68cff', sceneTint:'rgba(120,60,180,0.08)', difficulty:'CHOOSE WELL / えらんでうつ' },
+    { id:4, name:'CHAIN REACTION LAB', subtitle:'Make gravity do the work / じゅうりょくをつかう', accent:'#66ffbb', sceneTint:'rgba(20,180,100,0.07)', difficulty:'SET UP THE FALL / たおれかたをつくる' },
+    { id:5, name:'THE ENDGAME', subtitle:'Master the whole roster / ぜんいんをきわめる', accent:'#ff6677', sceneTint:'rgba(180,40,70,0.09)', difficulty:'MASTER / きわめる' },
   ];
+  const chapterLessons = [
+    [
+      'Aim and release / ねらってはなす', 'Break the support / ささえをこわす',
+      'Use the angle / かくどをつかう', 'Try a power / パワーをためす',
+      'Find the center / まんなかをねらう', 'Start a chain / れんさをはじめる',
+      'Save a shot / ショットをのこす', 'Read the opening / すきをみつける',
+      'Set up the finish / さいごをととのえる', 'Prove the basics / きほんをしめす',
+    ],
+    [
+      'Spot the trait / とくせいをみつける', 'Use the counter / あいてをえらぶ',
+      'Protect your shots / ショットをたいせつに', 'Break the soft route / やわらかいみちをこわす',
+      'Mark the target / もくひょうをみつける', 'Read the safe lane / あんぜんなみちをよむ',
+      'Burn with purpose / ねらってやく', 'Beat the clock / じかんにまにあわせる',
+      'Choose the clean line / きれいなせんをえらぶ', 'Pass the trait test / とくせいをこえる',
+    ],
+    [
+      'Match power to material / ざいりょうにあわせる', 'Freeze the base / そこをこおらせる',
+      'Convert the wall / かべをかえる', 'Spotlight your choice / えらびをみせる',
+      'Break the marked core / ひかったコアをこわす', 'Chain two powers / ふたつのパワーをつなぐ',
+      'Save the finisher / さいごのいちげきをのこす', 'Beat the clock / じかんにまにあわせる',
+      'Aim for the center / まんなかをねらう', 'Solve the power test / パワーのもんだいをとく',
+    ],
+    [
+      'Find the weak link / よわいところをみつける', 'Build a domino / ドミノをつくる',
+      'Wait for the fall / たおれるのをまつ', 'Spotlight the setup / じゅんびをみせる',
+      'Mark the first break / はじめのこわすばしょ', 'Leave a bridge / はしをのこす',
+      'Let gravity work / じゅうりょくにまかせる', 'Beat the clock / じかんにまにあわせる',
+      'Collapse from one hit / ひとつのいちげきでたおす', 'Make the whole chain fall / ぜんぶをれんさでたおす',
+    ],
+    [
+      'Mix two powers / ふたつをくみあわせる', 'Read the whole field / ぜんたいをみる',
+      'Save the right tool / ただしいパワーをのこす', 'Spotlight your best / いちばんをみせる',
+      'Mark the winning hit / かちのいちげきをねらう', 'Change the plan / さくせんをかえる',
+      'Protect the streak / れんぞくをまもる', 'Beat the final clock / さいごのじかんにかつ',
+      'Use every advantage / すべてをつかう', 'Master the endgame / エンドゲームをきわめる',
+    ],
+  ];
+  const timeLimits = [65, 60, 55, 50, 45];
   const precisionShots = [4,4,3,4,3,4,3,3,2,4];
   const contractPowers = ['fire','ice','heavy','rainbow','rock','fire','ice','heavy','rainbow','rock'];
   const collapseCounts = [3,4,5,4,6,5,6,5,7,6];
@@ -2238,6 +2276,9 @@ window.BOOHA_DESTRUCTION_LEVELS = [
     level.chapterName = chapter.name;
     level.chapterSubtitle = chapter.subtitle;
     level.chapterAccent = chapter.accent;
+    level.chapterTint = chapter.sceneTint;
+    level.chapterDifficulty = chapter.difficulty;
+    level.focus = chapterLessons[chapterIndex][roundInChapter - 1];
     level.roundInChapter = roundInChapter;
     level.boss = boss;
     level.bossBonus = boss ? 1200 : 0;
@@ -2257,7 +2298,7 @@ window.BOOHA_DESTRUCTION_LEVELS = [
     } else if (roundInChapter === 8) {
       level.rule = {
         type:'time_attack', label:'TIME ATTACK',
-        detail:'Clear the structure before the clock hits zero', timeLimit:55, bonus:900,
+        detail:`Clear the structure in ${timeLimits[chapterIndex]} seconds`, timeLimit:timeLimits[chapterIndex], bonus:900,
       };
     } else {
       level.rule = null;

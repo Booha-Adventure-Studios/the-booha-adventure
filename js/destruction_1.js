@@ -2428,6 +2428,10 @@ function traitGlowColor(block) {
       ctx.fillStyle='rgba(5,10,10,0.24)';
       ctx.fillRect(0,0,W,H);
     }
+    if(gs.phase!==P.TITLE&&gs.phase!==P.HALL&&currentLevel().chapterTint){
+      ctx.fillStyle=currentLevel().chapterTint;
+      ctx.fillRect(0,0,W,H);
+    }
     if(gs.nightmareFlicker){
       const flk=(gs.nightmareFlickerTimer%8<4)?0.18:0;
       if(flk>0){ctx.fillStyle=`rgba(80,0,128,${flk})`;ctx.fillRect(0,0,W,H);}
@@ -2949,6 +2953,8 @@ function traitGlowColor(block) {
     ctx.fillText(`CHAPTER ${level.chapter || 1} · ${level.chapterName || 'CAMPAIGN'}`,W/2,H/2-148);
     ctx.fillStyle='rgba(255,255,255,0.52)';ctx.font='13px system-ui,sans-serif';
     ctx.fillText(chapter.subtitle || '',W/2,H/2-122);
+    ctx.fillStyle=chapter.accent || '#ffdf80';ctx.font='bold 11px system-ui,sans-serif';
+    ctx.fillText(level.chapterDifficulty || '',W/2,H/2-104);
     ctx.fillStyle='#fff';ctx.font='bold 44px system-ui,sans-serif';
     ctx.fillText(level.boss ? `BOSS ROUND ${gs.roundN}` : `ROUND ${gs.roundN}`,W/2,H/2-76);
     ctx.fillStyle='rgba(255,255,255,0.78)';ctx.font='bold 21px system-ui,sans-serif';
@@ -2958,15 +2964,17 @@ function traitGlowColor(block) {
     ctx.fillStyle=level.boss ? '#ffdf80' : '#7cfff8';ctx.font='bold 13px system-ui,sans-serif';
     ctx.fillText(`✦ ${level.contract?.label ? `BONUS / ボーナス · ${level.contract.label}` : 'BONUS / ボーナス · OPTIONAL'}`,W/2,H/2+21);
     ctx.fillStyle='rgba(255,255,255,0.78)';ctx.font='16px system-ui,sans-serif';
-    ctx.fillText(level.contract?.detail || 'Clear the structure',W/2,H/2+49);
+    ctx.fillText(level.contract?.detail || 'Clear the structure',W/2,H/2+43);
+    ctx.fillStyle='rgba(255,255,255,0.58)';ctx.font='12px system-ui,sans-serif';
+    ctx.fillText(`FOCUS / ねらい · ${level.focus || 'Read the structure'}`,W/2,H/2+64);
     if (level.rule) {
       ctx.fillStyle='#ffe66d';ctx.font='bold 12px system-ui,sans-serif';
-      ctx.fillText(`◆ OPTIONAL CHALLENGE / チャレンジ · ${level.rule.label}: ${level.rule.detail}`,W/2,H/2+76);
+      ctx.fillText(`◆ OPTIONAL CHALLENGE / チャレンジ · ${level.rule.label}: ${level.rule.detail}`,W/2,H/2+85);
     }
     const recordLine=`Best ${scoreText(gs.roundBestScore)} · Fewest / さいしょう ${fewestShots} · Medal ${medalText(gs.roundMedal)} · Gold ${scoreText(thresholds.gold)}`;
     ctx.fillStyle='rgba(255,255,255,0.48)';ctx.font='12px system-ui,sans-serif';
     if (ctx.measureText(recordLine).width > 460) ctx.font='10px system-ui,sans-serif';
-    ctx.fillText(recordLine,W/2,H/2+104);
+    ctx.fillText(recordLine,W/2,H/2+108);
     const bx=W/2-130,by=H*0.62,bw=260,bh=58;
     const bg=ctx.createLinearGradient(bx,by,bx,by+bh);bg.addColorStop(0,level.boss?'#ffdf80':'#44ffcc');bg.addColorStop(1,level.boss?'#ff8c44':'#009977');
     ctx.shadowColor=level.boss?'#ffcf70':'#44ffcc';ctx.shadowBlur=18;ctx.fillStyle=bg;rr(ctx,bx,by,bw,bh,16,true,false);ctx.shadowBlur=0;
