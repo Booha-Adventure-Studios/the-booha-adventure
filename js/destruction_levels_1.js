@@ -117,13 +117,11 @@ window.BOOHA_DESTRUCTION_LEVELS = [
     { x:900, y:572, w:90, h:40, material:'wood', hp:1 },
     { x:900, y:524, w:90, h:40, material:'wood', hp:1 },
 
-    // ── TOP CAP (burnimmune) ──
-    { x:900, y:480, w:120, h:24, material:'stone', hp:2,
-      traits:['burnimmune'] },
+    // ── TOP CAP ──
+    { x:900, y:480, w:120, h:24, material:'stone', hp:2 },
 
     // ── REAR BLOCKER flush on floor ──
-    { x:980, y:540, w:40, h:200, material:'stone', hp:2,
-      traits:['ultimateproof'] },
+    { x:980, y:540, w:40, h:200, material:'stone', hp:2 },
 
     // ── SIDE JUNK: leaning towers ──
     // Left: tall glass spine + soft cap leaning right
@@ -156,10 +154,10 @@ window.BOOHA_DESTRUCTION_LEVELS = [
     { x:930, y:512, w:180, h:24, material:'wood', hp:1 },
 
     // anti-fire cap
-    { x:930, y:474, w:210, h:24, material:'stone', hp:2, traits:['burnimmune'] },
+    { x:930, y:474, w:210, h:24, material:'stone', hp:2 },
 
     // rear blocker flush on floor
-    { x:1060, y:555, w:34, h:170, material:'stone', hp:2, traits:['ultimateproof'] },
+    { x:1060, y:555, w:34, h:170, material:'stone', hp:2 },
 
     // SIDE JUNK: scattered rubble — random heights, no symmetry
     { x:700, y:620, w:60, h:40, material:'soft', hp:1 },
@@ -191,10 +189,10 @@ window.BOOHA_DESTRUCTION_LEVELS = [
     { x:930, y:524, w:80, h:40, material:'wood', hp:1 },
 
     // anti-fire top
-    { x:930, y:480, w:140, h:24, material:'stone', hp:2, traits:['burnimmune'] },
+    { x:930, y:480, w:140, h:24, material:'stone', hp:2 },
 
     // rear blocker flush on floor
-    { x:1070, y:550, w:34, h:180, material:'stone', hp:2, traits:['ultimateproof'] },
+    { x:1070, y:550, w:34, h:180, material:'stone', hp:2 },
 
     // SIDE JUNK: pyramid stacks — wide base tapering up
     { x:700, y:620, w:100, h:36, material:'soft', hp:1 },
@@ -225,10 +223,10 @@ window.BOOHA_DESTRUCTION_LEVELS = [
     { x:920, y:536, w:120, h:48, material:'wood', hp:1 },
 
     // anti-fire top
-    { x:920, y:488, w:160, h:24, material:'stone', hp:2, traits:['burnimmune'] },
+    { x:920, y:488, w:160, h:24, material:'stone', hp:2 },
 
     // rear blocker flush on floor
-    { x:1090, y:555, w:36, h:170, material:'stone', hp:2, traits:['ultimateproof'] },
+    { x:1090, y:555, w:36, h:170, material:'stone', hp:2 },
 
     // SIDE JUNK: dominoes — thin tall planks spaced apart
     { x:690, y:582, w:20, h:76, material:'wood', hp:1 },
@@ -262,10 +260,10 @@ window.BOOHA_DESTRUCTION_LEVELS = [
     { x:920, y:570, w:120, h:24, material:'wood', hp:1 },
 
     // top anti-fire plate
-    { x:920, y:524, w:160, h:24, material:'stone', hp:2, traits:['burnimmune'] },
+    { x:920, y:524, w:160, h:24, material:'stone', hp:2 },
 
     // rear blocker flush on floor
-    { x:1110, y:555, w:34, h:170, material:'stone', hp:2, traits:['ultimateproof'] },
+    { x:1110, y:555, w:34, h:170, material:'stone', hp:2 },
 
     // SIDE JUNK: arch — two short pillars + lintel cap
     { x:686, y:598, w:22, h:60, material:'stone', hp:2 },
@@ -297,10 +295,10 @@ window.BOOHA_DESTRUCTION_LEVELS = [
     { x:980, y:620, w:60, h:40, material:'wood', hp:1 },
 
     // top fire cap
-    { x:900, y:382, w:120, h:24, material:'stone', hp:2, traits:['burnimmune'] },
+    { x:900, y:382, w:120, h:24, material:'stone', hp:2 },
 
     // rear blocker flush on floor
-    { x:1010, y:535, w:32, h:210, material:'stone', hp:2, traits:['ultimateproof'] },
+    { x:1010, y:535, w:32, h:210, material:'stone', hp:2 },
 
     // SIDE JUNK: stepped shelves — horizontal planks at staggered heights
     { x:700, y:620, w:90, h:28, material:'wood', hp:1 },
@@ -333,11 +331,11 @@ window.BOOHA_DESTRUCTION_LEVELS = [
     { x:1020, y:524, w:80, h:40, material:'stone', hp:2 },
 
     // anti-fire protection
-    { x:820, y:456, w:130, h:24, material:'stone', hp:2, traits:['burnimmune'] },
-    { x:1020, y:478, w:120, h:24, material:'stone', hp:2, traits:['burnimmune'] },
+    { x:820, y:456, w:130, h:24, material:'stone', hp:2 },
+    { x:1020, y:478, w:120, h:24, material:'stone', hp:2 },
 
     // rear blocker flush on floor
-    { x:1100, y:551, w:34, h:178, material:'stone', hp:2, traits:['ultimateproof'] },
+    { x:1100, y:551, w:34, h:178, material:'stone', hp:2 },
 
     // center mess
     { x:920, y:620, w:90, h:36, material:'soft', hp:1 },
@@ -370,10 +368,10 @@ window.BOOHA_DESTRUCTION_LEVELS = [
     { x:1000, y:428, w:80, h:40, material:'soft', hp:1 },
 
     // top cap
-    { x:1000, y:382, w:130, h:24, material:'stone', hp:2, traits:['burnimmune'] },
+    { x:1000, y:382, w:130, h:24, material:'stone', hp:2 },
 
     // rear blocker flush on floor
-    { x:1080, y:540, w:34, h:200, material:'stone', hp:2, traits:['ultimateproof'] },
+    { x:1080, y:540, w:34, h:200, material:'stone', hp:2 },
 
     // SIDE JUNK: staircases — ascending blocks left-to-right
     // Left stair (ascending right)
@@ -405,10 +403,10 @@ window.BOOHA_DESTRUCTION_LEVELS = [
     { x:920, y:530, w:120, h:40, material:'wood', hp:1 },
 
     // anti-fire cap
-    { x:920, y:486, w:150, h:24, material:'stone', hp:2, traits:['burnimmune'] },
+    { x:920, y:486, w:150, h:24, material:'stone', hp:2 },
 
     // rear blocker flush on floor
-    { x:1065, y:553, w:34, h:174, material:'stone', hp:2, traits:['ultimateproof'] },
+    { x:1065, y:553, w:34, h:174, material:'stone', hp:2 },
 
     // SIDE JUNK: T-shapes — vertical post + wide horizontal arm
     // Left T
@@ -440,10 +438,10 @@ window.BOOHA_DESTRUCTION_LEVELS = [
     { x:920, y:446, w:120, h:40, material:'soft', hp:1 },
 
     // top blocker
-    { x:920, y:398, w:160, h:24, material:'stone', hp:2, traits:['burnimmune'] },
+    { x:920, y:398, w:160, h:24, material:'stone', hp:2 },
 
     // rear blocker flush on floor
-    { x:1050, y:549, w:34, h:182, material:'stone', hp:2, traits:['ultimateproof'] },
+    { x:1050, y:549, w:34, h:182, material:'stone', hp:2 },
 
     // SIDE JUNK: zigzag — alternating left/right offset blocks stacked
     { x:686, y:620, w:50, h:36, material:'soft', hp:1 },
