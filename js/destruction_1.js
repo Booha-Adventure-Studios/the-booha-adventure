@@ -120,9 +120,28 @@
 
   // ── Audio ────────────────────────────────────────────
   let AC = null;
+  const AUDIO_PREF_KEY = 'booha_destruction_muted';
+  const AUDIO_STATE = { muted:false, warned:new Set(), ready:false };
+
+  function audioWarn(key, error) {
+    if (AUDIO_STATE.warned.has(key)) return;
+    AUDIO_STATE.warned.add(key);
+    console.warn(`[Booha Destruction] Audio unavailable: ${key}`, error || '');
+    if (typeof setToast === 'function') setToast('Sound unavailable / 音声なし', '#ff9f7f');
+  }
+
   function getAC() {
-    if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)();
-    if (AC.state === 'suspended') AC.resume();
+    if (!AC) {
+      const AudioCtor = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtor) { audioWarn('AudioContext'); return null; }
+      try { AC = new AudioCtor(); }
+      catch (e) { audioWarn('AudioContext', e); return null; }
+    }
+    if (AC.state === 'suspended') {
+      try { const resume = AC.resume(); if (resume?.catch) resume.catch(e => audioWarn('resume', e)); }
+      catch (e) { audioWarn('resume', e); }
+    }
+    AUDIO_STATE.ready = true;
     return AC;
   }
   const audioBuffers = {};
@@ -134,9 +153,12 @@
       try {
         const res = await fetch(src);
         const ab  = await res.arrayBuffer();
-        audioBuffers[key] = await getAC().decodeAudioData(ab);
+        const ac = getAC();
+        if (!ac) return null;
+        audioBuffers[key] = await ac.decodeAudioData(ab);
         return audioBuffers[key];
       } catch(e) {
+        audioWarn(`voice:${key}`, e);
         return null;
       } finally {
         delete audioPromises[key];
@@ -145,9 +167,11 @@
     return audioPromises[key];
   }
   function playBuffer(key, vol=1) {
+    if (AUDIO_STATE.muted) return;
     const buf = audioBuffers[key]; if (!buf) return;
     try {
-      const ac = getAC(), src = ac.createBufferSource(), gain = ac.createGain();
+      const ac = getAC(); if (!ac) return;
+      const src = ac.createBufferSource(), gain = ac.createGain();
       src.buffer = buf; gain.gain.value = Math.max(0, Math.min(1, vol));
       src.connect(gain); gain.connect(ac.destination); src.start();
     } catch(e) {}
@@ -155,7 +179,12 @@
   const SFX_POOL_SIZE = 5;
   const sfxPool = {};
   function getSFXNode(src) {
-    if (!sfxPool[src]) sfxPool[src] = Array.from({length: SFX_POOL_SIZE}, () => new Audio(src));
+    if (!sfxPool[src]) sfxPool[src] = Array.from({length: SFX_POOL_SIZE}, () => {
+      const audio = new Audio(src);
+      audio.preload = 'auto';
+      audio.onerror = () => audioWarn(src, audio.error || 'file load failed');
+      return audio;
+    });
     const pool = sfxPool[src];
     const free = pool.find(a => a.ended || (a.paused && a.currentTime === 0));
     if (free) return free;
@@ -163,16 +192,21 @@
     const oldest = pool[0]; oldest.pause(); oldest.currentTime = 0; return oldest;
   }
   function playSFX(src, vol=1, rate=1) {
-    if (!src) return;
+    if (!src || AUDIO_STATE.muted) return;
     try {
       const a = getSFXNode(src);
+      a.preload = 'auto';
       a.volume = Math.max(0, Math.min(1, vol));
-      a.playbackRate = rate; a.currentTime = 0; a.play().catch(()=>{});
-    } catch(e) {}
+      a.playbackRate = rate; a.currentTime = 0;
+      const play = a.play();
+      if (play?.catch) play.catch(e => audioWarn(src, e));
+    } catch(e) { audioWarn(src, e); }
   }
   function synthPop(freq=500, vol=0.3, dur=0.08) {
     try {
-      const ac = getAC(), o = ac.createOscillator(), g = ac.createGain();
+      if (AUDIO_STATE.muted) return;
+      const ac = getAC(); if (!ac) return;
+      const o = ac.createOscillator(), g = ac.createGain();
       o.connect(g); g.connect(ac.destination); o.type = 'sine';
       o.frequency.setValueAtTime(freq, ac.currentTime);
       o.frequency.exponentialRampToValueAtTime(freq * 0.38, ac.currentTime + dur);
@@ -180,6 +214,29 @@
       g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + dur);
       o.start(ac.currentTime); o.stop(ac.currentTime + dur + 0.01);
     } catch(e) {}
+  }
+
+  function preloadAudio() {
+    const sources = Object.values(AUDIO).filter(Boolean);
+    sources.forEach(src => {
+      try {
+        const audio = new Audio(src);
+        audio.preload = 'auto';
+        audio.load?.();
+      } catch (e) { audioWarn(src, e); }
+    });
+  }
+
+  function readMutePreference() {
+    try { AUDIO_STATE.muted = window.localStorage?.getItem(AUDIO_PREF_KEY) === '1'; }
+    catch (e) { AUDIO_STATE.muted = false; }
+  }
+
+  function toggleMute() {
+    AUDIO_STATE.muted = !AUDIO_STATE.muted;
+    try { window.localStorage?.setItem(AUDIO_PREF_KEY, AUDIO_STATE.muted ? '1' : '0'); }
+    catch (e) {}
+    setToast(AUDIO_STATE.muted ? 'Sound off / 音声オフ' : 'Sound on / 音声オン', AUDIO_STATE.muted ? '#aaa' : '#7cfff8');
   }
   function celebPops(baseFreq=420) {
     [0,55,120,195,280].forEach((d,i) => setTimeout(() => synthPop(baseFreq + i*100, 0.26, 0.09), d));
@@ -259,10 +316,25 @@
       conf:{cols:['#f08','#f80','#ff0','#0fa','#08f','#c0f','#f48','#4fc'],sh:['star','heart','crystal','sparkle','flame'],sz:[5,16],burst:170,spin:true}},
   ];
 
-  const SX=14, SY=70, SW=52, SH=52, SGAP=5;
+  const ROSTER_UNLOCK_KEY = 'booha_destruction:roster:';
+  const ROSTER_UNLOCK_STORAGE_KEY = 'booha_destruction_roster_unlocks_v1';
+  const ROSTER_UNLOCKS = [
+    { unlockEN:'Starter Booha', unlockJP:'最初から使えます' },
+    { unlockEN:'Clear 1 round', unlockJP:'1ラウンドをクリア', test:p=>p.rounds>=1 },
+    { unlockEN:'Clear 3 rounds', unlockJP:'3ラウンドをクリア', test:p=>p.rounds>=3 },
+    { unlockEN:'Clear 5 rounds', unlockJP:'5ラウンドをクリア', test:p=>p.rounds>=5 },
+    { unlockEN:'Clear 10 rounds', unlockJP:'10ラウンドをクリア', test:p=>p.rounds>=10 },
+    { unlockEN:'Clear Chapter 1', unlockJP:'チャプター1をクリア', test:p=>p.chapters>=1 },
+    { unlockEN:'Earn 3 medals', unlockJP:'メダルを3こ獲得', test:p=>p.medals>=3 },
+    { unlockEN:'Clear Chapter 2', unlockJP:'チャプター2をクリア', test:p=>p.chapters>=2 },
+    { unlockEN:'Clear 3 boss rounds', unlockJP:'ボスラウンドを3回クリア', test:p=>p.bosses>=3 },
+    { unlockEN:'Clear the final round', unlockJP:'さいごのラウンドをクリア', test:p=>p.finalRound },
+  ];
+  const SX=14, SY=92, SW=62, SH=48, SGAP=5;
   const bst = {
     sel: 0,
-    stocks: ROSTER.map(b => b.stock),
+    unlocked: ROSTER.map((_, i) => i === 0),
+    stocks: ROSTER.map((b, i) => i === 0 ? b.stock : 0),
     imgs: new Array(ROSTER.length).fill(null),
     totalShots() { return ROSTER.reduce((a,b) => a + b.stock, 0); }
   };
@@ -287,8 +359,12 @@
     roundClears: 0,
     roundNewBest: false,
     roundMedalUp: false,
+    cardUnlock: '',
     comboPulse: 0,
     nearMiss: false,
+    toast: '',
+    toastAccent: '#fff',
+    toastUntil: 0,
     scale: 1, offX: 0, offY: 0,
     runScore: 0,
     roundScore: 0,
@@ -347,6 +423,23 @@
   const pick  = arr => arr[Math.floor(Math.random() * arr.length)];
   const scoreText = n => Math.round(n || 0).toLocaleString('en-US');
 
+  function setToast(message, accent='#fff', duration=2800) {
+    gs.toast = message;
+    gs.toastAccent = accent;
+    gs.toastUntil = performance.now() + duration;
+  }
+
+  function drawToast() {
+    if (!gs.toast || performance.now() >= gs.toastUntil) return;
+    ctx.save();
+    ctx.globalAlpha = clamp((gs.toastUntil - performance.now()) / 500, 0, 1);
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillStyle='rgba(5,5,12,0.9)';ctx.strokeStyle=gs.toastAccent;ctx.lineWidth=2;
+    rr(ctx,W/2-220,H-72,440,42,14,true,true);
+    ctx.fillStyle='#fff';ctx.font='bold 16px system-ui,sans-serif';ctx.fillText(gs.toast,W/2,H-51);
+    ctx.restore();
+  }
+
   function currentLevel() { return LEVELS[gs.round] || {}; }
   function currentChapter() {
     return CHAPTERS[(currentLevel().chapter || 1) - 1] || {};
@@ -388,6 +481,67 @@
       ruleClears: Number(record.ruleClears) || 0,
       bestShots: Number(record.bestShots) || 0,
     };
+  }
+
+  function rosterProgress() {
+    const records = LEVELS.map(level => getRoundRecord(level));
+    const rounds = records.filter(record => record.clears > 0).length;
+    const medals = records.reduce((sum, record) => sum + record.medal, 0);
+    const bosses = LEVELS.filter(level => level.boss && getRoundRecord(level).clears > 0).length;
+    let chapters = 0;
+    for (let chapter = 0; chapter < 5; chapter++) {
+      const complete = LEVELS.slice(chapter * 10, chapter * 10 + 10)
+        .every(level => getRoundRecord(level).clears > 0);
+      if (complete) chapters++;
+    }
+    return { rounds, medals, bosses, chapters, finalRound:getRoundRecord(LEVELS[LEVELS.length - 1]).clears > 0 };
+  }
+
+  function loadRosterUnlocks() {
+    let saved = {};
+    try {
+      const data = window.BoohaAdventure?.save?.load?.();
+      saved = data?.unlocks || {};
+    } catch (e) {}
+    try {
+      const local = JSON.parse(window.localStorage?.getItem(ROSTER_UNLOCK_STORAGE_KEY) || '{}');
+      saved = {...local, ...saved};
+    } catch (e) {}
+    bst.unlocked = ROSTER.map((booha, index) => index === 0 || !!saved[ROSTER_UNLOCK_KEY + booha.id]);
+  }
+
+  function persistRosterUnlock(index) {
+    const booha = ROSTER[index];
+    const item = { unlockedAt:Date.now(), source:'booha_destruction' };
+    try {
+      window.BoohaAdventure?.save?.patch?.('unlocks', { [ROSTER_UNLOCK_KEY + booha.id]:item });
+    } catch (e) {}
+    try {
+      const local = JSON.parse(window.localStorage?.getItem(ROSTER_UNLOCK_STORAGE_KEY) || '{}');
+      local[ROSTER_UNLOCK_KEY + booha.id] = item;
+      window.localStorage?.setItem(ROSTER_UNLOCK_STORAGE_KEY, JSON.stringify(local));
+    } catch (e) {}
+  }
+
+  function syncRosterUnlocks() {
+    const progress = rosterProgress();
+    const newlyUnlocked = [];
+    ROSTER.forEach((booha, index) => {
+      if (bst.unlocked[index] || !ROSTER_UNLOCKS[index]?.test) return;
+      if (ROSTER_UNLOCKS[index].test(progress)) {
+        bst.unlocked[index] = true;
+        persistRosterUnlock(index);
+        newlyUnlocked.push(booha);
+      }
+    });
+    return newlyUnlocked;
+  }
+
+  function isBoohaUnlocked(index) { return !!bst.unlocked[index]; }
+
+  function unlockRequirement(index) {
+    const requirement = ROSTER_UNLOCKS[index];
+    return requirement ? `${requirement.unlockEN} / ${requirement.unlockJP}` : 'Clear more rounds / もっとラウンドをクリア';
   }
 
   function recordRoundResult(level, score, contractComplete, ruleComplete, shotsUsed) {
@@ -623,6 +777,7 @@
     // Only the scene background and first Booha block the title screen.
     // Other images/audio load on demand when the student selects them.
     await ensureRosterImage(0);
+    preloadAudio();
     buildBackgroundCache();
   }
 
@@ -1328,7 +1483,7 @@ function traitGlowColor(block) {
     gs.dragging=false; gs.pullPlayed=false; gs.bestShot=0; gs.pct=0; gs.brokenBlocks=0;
     gs.roundScore=0;
     gs.shotsUsed=0; gs.collapseCount=0; gs.powerUsed=new Set();
-    gs.contractComplete=false; gs.contractBonus=0;
+    gs.contractComplete=false; gs.contractBonus=0; gs.cardUnlock='';
     gs.ruleComplete=false; gs.ruleBonus=0; gs.ruleFailed=false; gs.ruleTime=0; gs.markedTargetIndex=-1;
     gs.nearMiss=false;
     gs.comboPulse=0;
@@ -1337,8 +1492,9 @@ function traitGlowColor(block) {
     gs.isLastBooha=false; gs.timeScale=1;
     gs.nightmareFlicker=false; gs.nightmareFlickerTimer=0;
     gs.damageConfetti=[];
-    bst.stocks=ROSTER.map(b => b.stock);
-    bst.sel=0;
+    bst.stocks=ROSTER.map((b, i) => isBoohaUnlocked(i) ? b.stock : 0);
+    bst.sel=ROSTER.findIndex((_, i) => isBoohaUnlocked(i));
+    if (bst.sel < 0) bst.sel = 0;
     gs.ghostsLeft=bst.totalShots();
     blockIndexDirty = false;
   }
@@ -1887,6 +2043,8 @@ function traitGlowColor(block) {
       const rule = evaluateRule();
       awardRoundScore(shotsLeft, contract, rule);
       const roundResult = recordRoundResult(level, gs.roundScore, contract.complete, rule.complete, gs.shotsUsed);
+      const newlyUnlocked = syncRosterUnlocks();
+      gs.cardUnlock = newlyUnlocked.map(booha => `${booha.name} / ${booha.jpName}`).join(' · ');
       gs.roundBestScore = roundResult.best;
       gs.roundMedal = roundResult.medal;
       gs.roundClears = roundResult.clears;
@@ -1996,6 +2154,7 @@ function traitGlowColor(block) {
   function htStart(px,py){const bx=W/2-140,by=H/2+10;return px>=bx&&px<=bx+280&&py>=by&&py<=by+70;}
   function htAction(px,py){const bx=W/2-130,by=H*0.62;return px>=bx&&px<=bx+260&&py>=by&&py<=by+58;}
   function htHelp(px,py){return px>=W-48&&px<=W-8&&py>=8&&py<=48;}
+  function htMute(px,py){return px>=W-92&&px<=W-52&&py>=8&&py<=48;}
   function htExit(px,py){const bx=W/2-100,by=H/2+118;return px>=bx&&px<=bx+200&&py>=by&&py<=by+36;} 
   function leaveGame() {
     if (gs.campaignActive && gs.runScore > 0) submitRunScore(false);
@@ -2003,8 +2162,10 @@ function traitGlowColor(block) {
   }
 
   function onDown(evt){
-    getAC();
     const p=worldPt(evt);
+
+    if(htMute(p.x,p.y)){toggleMute();evt.preventDefault();return;}
+    getAC();
      
     if(htHelp(p.x,p.y)&&(gs.phase===P.TITLE||gs.phase===P.PLAY)){openHelp();evt.preventDefault();return;}
     if(gs.phase===P.TITLE){if(htStart(p.x,p.y)){beginCampaign();loadRound(0);showBriefing();}else if(htExit(p.x,p.y)){leaveGame();}evt.preventDefault();return;}
@@ -2024,6 +2185,10 @@ function traitGlowColor(block) {
     }
      
     const slot=selHit(p.x,p.y);
+    if(slot!==-1&&!isBoohaUnlocked(slot)){
+      setToast(`${ROSTER[slot].name}: ${unlockRequirement(slot)}`, '#ffdf80', 4200);
+      evt.preventDefault();evt.stopPropagation();return;
+    }
     if(slot!==-1&&bst.stocks[slot]>0&&!gs.shotLock){
       bst.sel=slot;if(gs.booha&&!gs.booha.launched)gs.booha=makeBooha();
       ensureRosterImage(slot);
@@ -2347,6 +2512,12 @@ function traitGlowColor(block) {
     if(gs.phase!==P.TITLE&&gs.phase!==P.PLAY)return;
     ctx.save();
     ctx.fillStyle='rgba(255,255,255,0.12)';ctx.strokeStyle='rgba(255,255,255,0.3)';ctx.lineWidth=1.5;
+    rr(ctx,W-92,10,36,36,8,true,true);
+    ctx.fillStyle=AUDIO_STATE.muted?'#aaa':'#7cfff8';ctx.font='bold 18px system-ui,sans-serif';
+    ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(AUDIO_STATE.muted?'×':'♪',W-74,28);
+    ctx.restore();
+    ctx.save();
+    ctx.fillStyle='rgba(255,255,255,0.12)';ctx.strokeStyle='rgba(255,255,255,0.3)';ctx.lineWidth=1.5;
     rr(ctx,W-46,10,36,36,8,true,true);
     ctx.fillStyle='rgba(255,255,255,0.7)';ctx.font='bold 18px system-ui,sans-serif';
     ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('?',W-28,28);
@@ -2357,100 +2528,81 @@ function traitGlowColor(block) {
     ctx.save();
     for(let i=0;i<ROSTER.length;i++){
       const sx=SX,sy=SY+i*(SH+SGAP);
-      const stock=bst.stocks[i],isSel=i===bst.sel,isAvail=stock>0;
-      ctx.save();ctx.globalAlpha=isSel?0.92:0.62;
-      ctx.fillStyle=isSel?'rgba(255,255,255,0.16)':'rgba(8,6,16,0.62)';
-      ctx.strokeStyle=isSel?'rgba(255,255,255,0.55)':'rgba(255,255,255,0.07)';ctx.lineWidth=isSel?2:1;
+      const unlocked=isBoohaUnlocked(i),stock=bst.stocks[i],isSel=i===bst.sel,isAvail=unlocked&&stock>0;
+      ctx.save();ctx.globalAlpha=isSel?0.96:(unlocked?0.72:0.52);
+      ctx.fillStyle=isSel?'rgba(255,255,255,0.2)':(unlocked?'rgba(8,6,16,0.7)':'rgba(8,6,16,0.86)');
+      ctx.strokeStyle=isSel?'#7cfff8':(unlocked?'rgba(255,255,255,0.12)':'rgba(255,223,128,0.25)');ctx.lineWidth=isSel?2.5:1;
       rr(ctx,sx,sy,SW,SH,10,true,true);ctx.restore();
       const img=bst.imgs[i];
-      ctx.save();ctx.globalAlpha=isAvail?(isSel?1:0.68):0.18;
-      if(img)ctx.drawImage(img,sx+4,sy+4,SW-8,SH-18);
-      else{ctx.beginPath();ctx.arc(sx+SW/2,sy+SH/2-6,14,0,Math.PI*2);ctx.fillStyle='#aaa';ctx.fill();}
+      ctx.save();ctx.globalAlpha=isAvail?(isSel?1:0.72):0.16;
+      if(!unlocked){
+        ctx.fillStyle='#ffdf80';ctx.font='bold 18px system-ui,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('🔒',sx+SW/2,sy+SH/2-3);
+      } else if(img)ctx.drawImage(img,sx+4,sy+3,SW-8,SH-16);
+      else{ctx.beginPath();ctx.arc(sx+SW/2,sy+SH/2-5,14,0,Math.PI*2);ctx.fillStyle='#aaa';ctx.fill();}
       ctx.restore();
-      const bw=stock>=10?22:16;
-      ctx.save();ctx.globalAlpha=isAvail?1:0.35;
-      ctx.fillStyle=isAvail?(isSel?'#fff':'rgba(255,255,255,0.55)'):'rgba(255,255,255,0.15)';
+      const bw=stock>=10?26:22;
+      ctx.save();ctx.globalAlpha=unlocked?1:0.55;
+      ctx.fillStyle=unlocked?(isSel?'#fff':'rgba(255,255,255,0.55)'):'rgba(255,223,128,0.22)';
       ctx.strokeStyle='rgba(0,0,0,0.4)';ctx.lineWidth=1;rr(ctx,sx+SW-bw-2,sy+SH-14,bw,12,6,true,true);
-      ctx.fillStyle=isAvail?(isSel?'#111':'#333'):'#888';ctx.font='bold 8px system-ui,sans-serif';ctx.textBaseline='middle';
-      ctx.fillText(String(stock),sx+SW-bw*0.5-2,sy+SH-8);ctx.restore();
-      if(isSel){
+      ctx.fillStyle=unlocked?(isSel?'#111':'#333'):'#ffdf80';ctx.font='bold 8px system-ui,sans-serif';ctx.textBaseline='middle';
+      ctx.fillText(unlocked?`×${stock}`:'LOCK',sx+SW-bw*0.5-2,sy+SH-8);ctx.restore();
+      if(isSel&&unlocked){
         const pulse=REDUCED_MOTION?0.65:0.5+0.5*Math.sin(performance.now()*0.004);
         ctx.save();ctx.globalAlpha=0.25*pulse;ctx.strokeStyle='#fff';ctx.lineWidth=3;rr(ctx,sx-2,sy-2,SW+4,SH+4,12,false,true);ctx.restore();
-        const r=ROSTER[i];
-        ctx.save();ctx.globalAlpha=0.65;ctx.fillStyle='#fff';ctx.font='bold 10px system-ui,sans-serif';
-        ctx.fillText(r.name,sx,sy+SH+14);ctx.restore();
-        ctx.save();ctx.globalAlpha=0.45;ctx.fillStyle='#ffe';ctx.font='9px system-ui,sans-serif';
-        const words=r.desc.split(' ');let line='',dy=0;
-        for(const w of words){const test=line?line+' '+w:w;if(ctx.measureText(test).width>SW*2.2&&line){ctx.fillText(line,sx,sy+SH+26+dy);line=w;dy+=11;}else line=test;}
-        if(line)ctx.fillText(line,sx,sy+SH+26+dy);
-        ctx.restore();
       }
     }
     ctx.restore();
   }
   function drawHUD(){
-    ctx.save();ctx.textBaseline='middle';ctx.textAlign='left';
-    const level = currentLevel();
-    const chapter = currentChapter();
-    const rule = currentRule();
+    const level=currentLevel(), chapter=currentChapter(), rule=currentRule();
+    const panels=[];
+    const addPanel=(en,jp,value,accent)=>panels.push({en,jp,value,accent});
+    addPanel('SCORE','スコア',scoreText(gs.runScore),'#ffdf80');
+    addPanel('SHOTS','のこり',String(gs.ghostsLeft),gs.isLastBooha?'#ff5555':'#ff9f7f');
+    addPanel('DAMAGE','はかい',`${Math.round(gs.pct)}%`,'#7cfff8');
+    addPanel('GOAL','もくひょう',`${level.targetPercent||100}%`,'#ffdf80');
+    if(rule?.type==='time_attack') addPanel('TIME','じかん',`${Math.ceil(Math.max(0,gs.ruleTime))}s`,gs.ruleTime<10?'#ff5555':'#ff9f7f');
+
     if(gs.isLastBooha&&gs.phase===P.PLAY){
       const pulse=REDUCED_MOTION?0.65:0.5+0.5*Math.sin(performance.now()*0.005);
       ctx.save();ctx.globalAlpha=0.22*pulse;ctx.strokeStyle='#ff4444';ctx.lineWidth=6;ctx.strokeRect(0,0,W,H);ctx.restore();
     }
-    if (level.boss) {
-      const pulse = REDUCED_MOTION ? 0.6 : 0.45 + 0.2 * Math.sin(performance.now() * 0.004);
-      ctx.save();ctx.globalAlpha=pulse;ctx.strokeStyle=chapter.accent || '#ffdf80';ctx.lineWidth=3;ctx.strokeRect(8,10,W-16,H-18);ctx.restore();
+    if(level.boss){
+      const pulse=REDUCED_MOTION?0.6:0.45+0.2*Math.sin(performance.now()*0.004);
+      ctx.save();ctx.globalAlpha=pulse;ctx.strokeStyle=chapter.accent||'#ffdf80';ctx.lineWidth=3;ctx.strokeRect(8,10,W-16,H-18);ctx.restore();
     }
-    const barW=W*clamp(gs.pct/100,0,1);
-    ctx.save();ctx.globalAlpha=0.55;ctx.fillStyle='rgba(255,255,255,0.1)';ctx.fillRect(0,3,W,5);
-    const pg=ctx.createLinearGradient(0,0,W,0);
-    pg.addColorStop(0,'#ff7cfb');pg.addColorStop(0.5,'#7cfff8');pg.addColorStop(1,'#ffdf80');
-    ctx.fillStyle=pg;ctx.fillRect(0,3,barW,5);ctx.restore();
-    ctx.save();ctx.globalAlpha=0.88;ctx.fillStyle='rgba(8,6,16,0.75)';ctx.strokeStyle='rgba(255,255,255,0.1)';ctx.lineWidth=1;rr(ctx,SX,12,SW,50,10,true,true);ctx.restore();
-    ctx.fillStyle='rgba(255,255,255,0.45)';ctx.font='bold 9px system-ui,sans-serif';ctx.fillText('ROUND',SX+SW/2-ctx.measureText('ROUND').width/2,24);
-    ctx.fillStyle='#fff';ctx.font='bold 20px system-ui,sans-serif';ctx.fillText(String(gs.roundN),SX+SW/2-ctx.measureText(String(gs.roundN)).width/2,44);
-    ctx.fillStyle='#ffdf80';ctx.font='bold 13px system-ui,sans-serif';ctx.fillText(`SCORE ${scoreText(gs.runScore)}`,SX+SW+14,27);
-    ctx.fillStyle='#ff8fa3';ctx.font='bold 12px system-ui,sans-serif';ctx.fillText(`LIVES ${'♥'.repeat(Math.max(0,gs.lives)) || '—'}`,SX+SW+14,46);
-    ctx.fillStyle=chapter.accent || '#fff';ctx.font='bold 10px system-ui,sans-serif';
-    ctx.fillText(`CH ${level.chapter || 1} · ${level.chapterName || 'CAMPAIGN'}`,SX+SW+14,61);
-    ctx.fillStyle='rgba(255,255,255,0.72)';ctx.font='bold 11px system-ui,sans-serif';
-    ctx.fillText(`R${gs.roundN} · ${level.name || ''}`,SX+SW+14,76);
-    if (level.contract) {
-      const progress = contractProgress(level);
-      const contractDone = level.contract.maxShots != null
-        ? gs.shotsUsed <= level.contract.maxShots
-        : progress === 'READY' || (level.contract.minCollapses != null && gs.collapseCount >= level.contract.minCollapses) || (level.contract.minPowers != null && gs.powerUsed.size >= level.contract.minPowers);
-      ctx.fillStyle=contractDone ? '#7cfff8' : (level.boss ? '#ffdf80' : 'rgba(255,255,255,0.5)');ctx.font='10px system-ui,sans-serif';
-      ctx.fillText(`✦ ${level.contract.label}: ${progress}`,SX+SW+14,91);
+
+    const barX=112,barW=Math.min(500,W-650),barY=78;
+    ctx.save();ctx.fillStyle='rgba(255,255,255,0.16)';rr(ctx,barX,barY,barW,9,5,true,false);
+    const pg=ctx.createLinearGradient(barX,0,barX+barW,0);pg.addColorStop(0,'#ff7cfb');pg.addColorStop(0.5,'#7cfff8');pg.addColorStop(1,'#ffdf80');
+    ctx.fillStyle=pg;rr(ctx,barX,barY,barW*clamp(gs.pct/100,0,1),9,5,true,false);ctx.restore();
+
+    ctx.save();ctx.fillStyle='rgba(8,6,16,0.86)';ctx.strokeStyle='rgba(255,255,255,0.22)';ctx.lineWidth=1.5;rr(ctx,14,12,84,62,12,true,true);ctx.restore();
+    ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='rgba(255,255,255,0.6)';ctx.font='bold 9px system-ui,sans-serif';ctx.fillText('ROUND / ラウンド',56,27);
+    ctx.fillStyle='#fff';ctx.font='bold 24px system-ui,sans-serif';ctx.fillText(String(gs.roundN),56,53);
+
+    ctx.textAlign='left';ctx.fillStyle=chapter.accent||'#fff';ctx.font='bold 12px system-ui,sans-serif';
+    ctx.fillText(`CHAPTER ${level.chapter||1} / チャプター${level.chapter||1} · ${level.chapterName||'CAMPAIGN'}`,112,28);
+    ctx.fillStyle='#fff';ctx.font='bold 16px system-ui,sans-serif';ctx.fillText(`${level.name||''}`,112,49);
+    const selected=ROSTER[bst.sel]||ROSTER[0];
+    ctx.fillStyle='rgba(255,255,255,0.66)';ctx.font='11px system-ui,sans-serif';
+    ctx.fillText(`BOOHA / ブーハー: ${selected.name} · ${selected.jpName}`,112,66);
+
+    const pw=116,ph=62,gap=8;let px=W-14-panels.length*(pw+gap)+gap;
+    for(const panel of panels){
+      ctx.save();ctx.fillStyle='rgba(8,6,16,0.88)';ctx.strokeStyle='rgba(255,255,255,0.18)';ctx.lineWidth=1.5;rr(ctx,px,12,pw,ph,12,true,true);ctx.restore();
+      ctx.textAlign='center';ctx.fillStyle='rgba(255,255,255,0.72)';ctx.font='bold 10px system-ui,sans-serif';ctx.fillText(panel.en,px+pw/2,27);
+      ctx.fillStyle='rgba(255,255,255,0.46)';ctx.font='9px system-ui,sans-serif';ctx.fillText(panel.jp,px+pw/2,39);
+      ctx.fillStyle=panel.accent;ctx.font='bold 20px system-ui,sans-serif';ctx.fillText(panel.value,px+pw/2,59);px+=pw+gap;
     }
-    ctx.fillStyle='rgba(255,255,255,0.42)';ctx.font='10px system-ui,sans-serif';
-    ctx.fillText(`ROUND BEST ${scoreText(gs.roundBestScore)}  ${medalText(gs.roundMedal)}`,SX+SW+14,106);
-    if (gs.combo > 0 && gs.phase === P.PLAY) {
-      ctx.globalAlpha=0.55 + gs.comboPulse * 0.45;ctx.fillStyle='#ffcf70';ctx.font='bold 12px system-ui,sans-serif';
-      ctx.fillText(`STREAK ×${gs.combo}`,SX+SW+14,121);
-      ctx.globalAlpha=1;
-    }
-    if (rule) {
-      ctx.fillStyle=rule.type === 'time_attack' ? '#ff9f7f' : '#ffe66d';ctx.font='bold 10px system-ui,sans-serif';
-      ctx.fillText(`◆ ${rule.label}: ${ruleProgress(level)}`,SX+SW+14,136);
-    }
-    const pills=[
-      {label:'SCORE',  value:scoreText(gs.runScore), accent:'#ffdf80'},
-      {label:'SHOTS',  value:String(gs.ghostsLeft), accent:gs.isLastBooha?'#ff4444':'#ff9f7f'},
-      {label:'DAMAGE', value:`${Math.round(gs.pct)}%`, accent:'#7cfff8'},
-      {label:'TARGET', value:`${(level.targetPercent||100)}%`, accent:'#ffdf80'}
-    ];
-    if (rule?.type === 'time_attack') {
-      pills.push({label:'TIME', value:`${Math.ceil(Math.max(0, gs.ruleTime))}s`, accent:gs.ruleTime < 10 ? '#ff5555' : '#ff9f7f'});
-    }
-    const pw=90,ph=44,pg2=10;let px=W-14-pills.length*(pw+pg2)+pg2;
-    for(const pill of pills){
-      ctx.save();ctx.globalAlpha=0.85;ctx.fillStyle='rgba(8,6,16,0.72)';ctx.strokeStyle='rgba(255,255,255,0.08)';ctx.lineWidth=1;rr(ctx,px,12,pw,ph,10,true,true);ctx.restore();
-      ctx.fillStyle='rgba(255,255,255,0.45)';ctx.font='bold 9px system-ui,sans-serif';ctx.fillText(pill.label,px+pw/2-ctx.measureText(pill.label).width/2,12+13);
-      ctx.fillStyle=pill.accent;ctx.font='bold 16px system-ui,sans-serif';ctx.fillText(pill.value,px+pw/2-ctx.measureText(pill.value).width/2,12+31);
-      px+=pw+pg2;
-    }
-    ctx.restore();
+
+    ctx.textAlign='left';ctx.fillStyle='rgba(255,255,255,0.64)';ctx.font='11px system-ui,sans-serif';
+    if(level.contract)ctx.fillText(`MISSION / ミッション: ✦ ${level.contract.label}: ${contractProgress(level)}`,112,96);
+    if(rule)ctx.fillStyle=rule.type==='time_attack'?'#ff9f7f':'#ffe66d';
+    if(rule)ctx.fillText(`◆ ${rule.label}: ${ruleProgress(level)} / ${rule.detail}`,112,113);
+    if(gs.combo>0&&gs.phase===P.PLAY){ctx.globalAlpha=0.6+gs.comboPulse*0.4;ctx.fillStyle='#ffcf70';ctx.font='bold 13px system-ui,sans-serif';ctx.fillText(`STREAK / れんぞく ×${gs.combo}`,112,131);ctx.globalAlpha=1;}
+    ctx.fillStyle='rgba(255,255,255,0.5)';ctx.font='11px system-ui,sans-serif';ctx.fillText(`ROUND BEST / ベスト ${scoreText(gs.roundBestScore)} ${medalText(gs.roundMedal)}`,112,148);
+    ctx.textAlign='left';
     drawSelector();
     drawHelpButton();
   }
@@ -2463,18 +2615,18 @@ function traitGlowColor(block) {
     ctx.font='bold 40px system-ui,sans-serif';ctx.fillStyle='#ffdd44';ctx.shadowColor='#ffaa00';ctx.shadowBlur=12;
     ctx.fillText('DESTRUCTION',W/2,H/2-58);ctx.shadowBlur=0;
     ctx.font='15px system-ui,sans-serif';ctx.fillStyle='rgba(255,255,255,0.55)';
-    ctx.fillText('Pull your Booha back and let fly. Smash everything!',W/2,H/2-16);
+    ctx.fillText('Pull back and let fly! / ひっぱって、はなそう！',W/2,H/2-16);
     const bx=W/2-140,by=H/2+10,bw=280,bh=70;
     const bg=ctx.createLinearGradient(bx,by,bx,by+bh);bg.addColorStop(0,'#ffe566');bg.addColorStop(1,'#ff9900');
     ctx.shadowColor='#ffdd44';ctx.shadowBlur=18;
     ctx.fillStyle=bg;rr(ctx,bx,by,bw,bh,18,true,false);ctx.shadowBlur=0;
     ctx.strokeStyle='rgba(255,255,255,0.35)';ctx.lineWidth=2;rr(ctx,bx,by,bw,bh,18,false,true);
-    ctx.fillStyle='#1a0e00';ctx.font='bold 30px system-ui,sans-serif';ctx.fillText('START',W/2,by+bh/2);
+    ctx.fillStyle='#1a0e00';ctx.font='bold 25px system-ui,sans-serif';ctx.fillText('START / はじめる',W/2,by+bh/2);
     ctx.font='13px system-ui,sans-serif';ctx.fillStyle='rgba(255,255,255,0.38)';
      
-    ctx.fillText(`${CHAPTERS.length || 5} chapters · ${LEVELS.length} rounds · ${ROSTER.length} Booha types · Best ${scoreText(gs.highScore)}`,W/2,H/2+100);
+    ctx.fillText(`${CHAPTERS.length || 5} chapters / チャプター · ${LEVELS.length} rounds / ラウンド · Best / ベスト ${scoreText(gs.highScore)}`,W/2,H/2+100);
     ctx.save();ctx.globalAlpha=0.55;ctx.fillStyle='rgba(255,255,255,0.08)';ctx.strokeStyle='rgba(255,255,255,0.18)';ctx.lineWidth=1;rr(ctx,W/2-100,H/2+118,200,36,10,true,true);
-    ctx.fillStyle='rgba(255,255,255,0.45)';ctx.font='13px system-ui,sans-serif';ctx.fillText('✕ カラスキに戻る · Exit',W/2,H/2+136);ctx.restore();
+    ctx.fillStyle='rgba(255,255,255,0.45)';ctx.font='13px system-ui,sans-serif';ctx.fillText('✕ Exit / もどる',W/2,H/2+136);ctx.restore();
      
     ctx.restore();
     drawHelpButton();
@@ -2510,7 +2662,7 @@ function traitGlowColor(block) {
     const bx=W/2-130,by=H*0.62,bw=260,bh=58;
     const bg=ctx.createLinearGradient(bx,by,bx,by+bh);bg.addColorStop(0,level.boss?'#ffdf80':'#44ffcc');bg.addColorStop(1,level.boss?'#ff8c44':'#009977');
     ctx.shadowColor=level.boss?'#ffcf70':'#44ffcc';ctx.shadowBlur=18;ctx.fillStyle=bg;rr(ctx,bx,by,bw,bh,16,true,false);ctx.shadowBlur=0;
-    ctx.fillStyle='#07121a';ctx.font='bold 22px system-ui,sans-serif';ctx.fillText('BEGIN ROUND →',W/2,by+bh/2);
+    ctx.fillStyle='#07121a';ctx.font='bold 20px system-ui,sans-serif';ctx.fillText('BEGIN / はじめる →',W/2,by+bh/2);
     ctx.restore();
   }
 
@@ -2522,10 +2674,14 @@ function traitGlowColor(block) {
     ctx.shadowColor=gs.cardAccent;ctx.shadowBlur=28;ctx.fillText(gs.cardTitle,W/2,H/2-88);ctx.shadowBlur=0;
     ctx.font='20px system-ui,sans-serif';ctx.fillStyle='rgba(255,255,255,0.75)';ctx.fillText(gs.cardSub,W/2,H/2-28);
     ctx.font='14px system-ui,sans-serif';ctx.fillStyle='rgba(255,255,255,0.45)';
-    ctx.fillText(`${Math.round(gs.pct)}% destruction  ·  Run ${scoreText(gs.runScore)}  ·  Best ${scoreText(gs.highScore)}`,W/2,H/2+18);
+    ctx.fillText(`${Math.round(gs.pct)}% damage / はかい  ·  Run / ラン ${scoreText(gs.runScore)}  ·  Best / ベスト ${scoreText(gs.highScore)}`,W/2,H/2+18);
     if (gs.cardMeta) {
       ctx.font='13px system-ui,sans-serif';ctx.fillStyle=gs.cardMetaGood?'#7cfff8':'rgba(255,255,255,0.5)';
       ctx.fillText(gs.cardMeta,W/2,H/2+43);
+    }
+    if (gs.cardUnlock) {
+      ctx.font='bold 13px system-ui,sans-serif';ctx.fillStyle='#ffdf80';
+      ctx.fillText(`NEW BOOHA / あたらしいブーハー: ${gs.cardUnlock}`,W/2,H/2+82);
     }
     if (gs.lastScoreIsBest && gs.runScore > 0) {
       ctx.font='bold 13px system-ui,sans-serif';ctx.fillStyle='#ffdf80';
@@ -2539,12 +2695,12 @@ function traitGlowColor(block) {
     ctx.strokeStyle='rgba(255,255,255,0.3)';ctx.lineWidth=1.5;rr(ctx,bx,by,bw,bh,16,false,true);
     ctx.fillStyle='#fff';ctx.font='bold 24px system-ui,sans-serif';
     const actionLabel = win
-      ? (gs.campaignComplete ? 'PLAY AGAIN →' : 'NEXT ROUND →')
-      : (gs.campaignActive ? 'RETRY ROUND' : 'NEW RUN');
+      ? (gs.campaignComplete ? 'PLAY AGAIN / もういちど →' : 'NEXT / つぎへ →')
+      : (gs.campaignActive ? 'RETRY / もういちど' : 'NEW RUN / あたらしいラン');
     ctx.fillText(actionLabel,W/2,by+bh/2);
 
     ctx.save();ctx.globalAlpha=0.5;ctx.fillStyle='rgba(255,255,255,0.06)';ctx.strokeStyle='rgba(255,255,255,0.15)';ctx.lineWidth=1;rr(ctx,W/2-100,by+bh+38,200,36,10,true,true);
-    ctx.fillStyle='rgba(255,255,255,0.4)';ctx.font='13px system-ui,sans-serif';ctx.fillText('✕ カラスキに戻る · Exit',W/2,by+bh+56);ctx.restore();     
+    ctx.fillStyle='rgba(255,255,255,0.4)';ctx.font='13px system-ui,sans-serif';ctx.fillText('✕ Exit / もどる',W/2,by+bh+56);ctx.restore();
      
     ctx.restore();
   }
@@ -2564,6 +2720,7 @@ function traitGlowColor(block) {
     else if(gs.phase===P.BRIEF){drawHUD();drawBriefing();}
     else if(gs.phase===P.WIN||gs.phase===P.FAIL){drawHUD();drawCard();}
     else drawHUD();
+    drawToast();
   }
 
   // ── Main loop ────────────────────────────────────────
@@ -2708,7 +2865,10 @@ function traitGlowColor(block) {
   // ── Boot ─────────────────────────────────────────────
   async function boot(){
     resize();
+    readMutePreference();
     loadRoundRecords();
+    loadRosterUnlocks();
+    syncRosterUnlocks();
     gs.highScore=readHighScore();
     window.addEventListener('resize',resize);
     canvas.addEventListener('mousedown',  onDown);
