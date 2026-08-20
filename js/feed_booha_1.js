@@ -55,6 +55,8 @@
     || window.FEED_BOOHA_DEBUG === true;
 
   let starContainer = null;
+  let helpReturnFocus = null;
+  let exitReturnFocus = null;
 
   const W       = canvas.width;   // 540
   const H       = canvas.height;  // 960
@@ -822,7 +824,7 @@
       writeFeedProgress();
     }
     syncProgressHud();
-    setHud(index + 1, 'Ready / 準備OK');
+    setHud(index + 1, options.assist ? 'Helper / たすけモード' : 'Ready / 準備OK');
   }
 
   // ─────────────────────────────────────────────────
@@ -902,6 +904,7 @@
     else if (starContainer) starContainer.innerHTML = '';
     messageOverlay.classList.add('overlay--show');
     messageOverlay.setAttribute('aria-hidden', 'false');
+    window.setTimeout(() => (nextVisible ? nextBtn : retryBtn).focus(), 0);
   }
 
   function showFailureMessage() {
@@ -917,6 +920,7 @@
     if (starContainer) starContainer.innerHTML = '';
     messageOverlay.classList.add('overlay--show');
     messageOverlay.setAttribute('aria-hidden', 'false');
+    window.setTimeout(() => (state.continuesLeft > 0 ? continueBtn : retryBtn).focus(), 0);
   }
 
   function hideMessage() {
@@ -925,14 +929,34 @@
   }
 
   function toggleHelp(show) {
+    if (show) {
+      helpReturnFocus = document.activeElement;
+      helpPanel.classList.add('help-panel--show');
+      helpPanel.setAttribute('aria-hidden', 'false');
+      window.setTimeout(() => closeHelpBtn.focus(), 0);
+      return;
+    }
     helpPanel.classList.toggle('help-panel--show', show);
     helpPanel.setAttribute('aria-hidden', String(!show));
+    if (helpReturnFocus && typeof helpReturnFocus.focus === 'function') {
+      window.setTimeout(() => helpReturnFocus.focus(), 0);
+    }
   }
 
   function toggleExitConfirm(show) {
     if (!exitConfirmOverlay) return;
+    if (show) {
+      exitReturnFocus = document.activeElement;
+      exitConfirmOverlay.classList.add('overlay--show');
+      exitConfirmOverlay.setAttribute('aria-hidden', 'false');
+      window.setTimeout(() => cancelExitBtn.focus(), 0);
+      return;
+    }
     exitConfirmOverlay.classList.toggle('overlay--show', show);
     exitConfirmOverlay.setAttribute('aria-hidden', String(!show));
+    if (exitReturnFocus && typeof exitReturnFocus.focus === 'function') {
+      window.setTimeout(() => exitReturnFocus.focus(), 0);
+    }
   }
 
   function requestExit() {

@@ -33,6 +33,8 @@ assert.doesNotMatch(engineSource, /pendingFailTimeout2\s*=\s*setTimeout\(/,
 assert.match(htmlSource, /id="exitConfirmOverlay"/, 'exit must have a confirmation overlay');
 assert.match(engineSource, /function requestExit\(\)/, 'exit buttons must ask for confirmation');
 assert.match(htmlSource, /How to Play \/ あそびかた/, 'help panel must be bilingual');
+assert.match(engineSource, /function toggleHelp\(show\)/, 'help panel must manage focus');
+assert.match(engineSource, /function toggleExitConfirm\(show\)/, 'exit dialog must manage focus');
 
 levels.forEach((level, index) => {
   const label = `level ${index + 1}`;

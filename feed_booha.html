@@ -107,7 +107,7 @@
             <strong id="levelText" class="hud-level-num">1</strong>
           </div>
           <div class="hud-pill">
-            <strong id="stateText">Ready / 準備OK</strong>
+            <strong id="stateText" aria-live="polite">Ready / 準備OK</strong>
           </div>
           <div class="hud-pill">
             <span class="hud-label">Score / スコア</span>
@@ -128,12 +128,12 @@
            START OVERLAY
       ═══════════════════════════════ -->
       <section id="startOverlay" class="overlay overlay--show" aria-label="Start screen / スタート画面">
-        <div class="overlay-card">
+        <div class="overlay-card" role="dialog" aria-modal="true" aria-labelledby="startTitle">
 
           <!-- Mascot block — styled circle, no emoji -->
           <div class="start-mascot" aria-hidden="true">Boo</div>
 
-          <h2>Feed Booha / ブーハにキャンディをあげよう</h2>
+          <h2 id="startTitle">Feed Booha / ブーハにキャンディをあげよう</h2>
           <p class="overlay-subtitle">ブーハにキャンディをあげよう</p>
           <p id="bestScoreText">Best score / ベストスコア: 0</p>
           <p>Cut ropes &middot; Drop the candy &middot; Make Booha chomp!<br />ロープを切ってキャンディを落とし、ブーハに食べさせよう！</p>
@@ -187,7 +187,7 @@
            WIN / FAIL OVERLAY
       ═══════════════════════════════ -->
       <section id="messageOverlay" class="overlay" aria-label="Round result / ラウンド結果" aria-hidden="true">
-        <div class="overlay-card overlay-card--small">
+        <div class="overlay-card overlay-card--small" role="dialog" aria-modal="true" aria-labelledby="messageTitle">
           <h2 id="messageTitle">Nice! / いいね！</h2>
           <p id="messageText">Booha is happy! / ブーハはうれしい！</p>
           <p id="continueStatusText" class="continue-status" aria-live="polite"></p>
@@ -205,8 +205,8 @@
            EXIT CONFIRMATION
       ═══════════════════════════════ -->
       <section id="exitConfirmOverlay" class="overlay" aria-label="Exit confirmation / 終了確認" aria-hidden="true">
-        <div class="overlay-card overlay-card--small">
-          <h2>Exit game? / ゲームをやめる？</h2>
+        <div class="overlay-card overlay-card--small" role="dialog" aria-modal="true" aria-labelledby="exitConfirmTitle">
+          <h2 id="exitConfirmTitle">Exit game? / ゲームをやめる？</h2>
           <p>Completed progress and best scores are saved. / クリアした進行とベストスコアは保存されます。</p>
           <div class="message-actions">
             <button id="confirmExitBtn" class="ui-btn exit-confirm-btn" type="button">Exit / 終了</button>
@@ -219,8 +219,8 @@
            HELP PANEL
       ═══════════════════════════════ -->
       <section id="helpPanel" class="help-panel" aria-label="How to play / あそびかた" aria-hidden="true">
-        <div class="help-card">
-          <h2>How to Play / あそびかた</h2>
+        <div class="help-card" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+          <h2 id="helpTitle">How to Play / あそびかた</h2>
           <p>Get the candy into Booha&rsquo;s mouth!<br />キャンディをブーハの口に入れよう！</p>
           <ul>
             <li>Swipe across a rope to cut it<br />ロープをスワイプして切ろう</li>
