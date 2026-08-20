@@ -31,6 +31,9 @@ assert.match(engineSource, /function showFailureMessage\(\)/,
 assert.doesNotMatch(engineSource, /pendingFailTimeout2\s*=\s*setTimeout\(/,
   'failures must not automatically reset before the student chooses');
 assert.match(htmlSource, /id="exitConfirmOverlay"/, 'exit must have a confirmation overlay');
+assert.match(htmlSource, /id="bottomExitBtn"/, 'exit must be available at the bottom during play');
+assert.match(htmlSource, /id="bottomRestartBtn"/, 'restart game must be available as a real button');
+assert.match(htmlSource, /id="restartConfirmOverlay"/, 'restart game must have a confirmation overlay');
 assert.match(engineSource, /function requestExit\(\)/, 'exit buttons must ask for confirmation');
 assert.match(htmlSource, /How to Play \/ あそびかた/, 'help panel must be bilingual');
 assert.match(engineSource, /function toggleHelp\(show\)/, 'help panel must manage focus');
@@ -41,9 +44,12 @@ assert.doesNotMatch(htmlSource, /Score \/ スコア|Stars \/ スター|Ready \/ 
   'visible HUD labels must use stacked bilingual markup');
 
 const level4 = levels.find(level => level.id === 4);
-assert.strictEqual(level4.booha.x, 420, 'level 4 Booha should wait on the bounce landing side');
-assert.ok(level4.objects.some(object => object.type === 'bounce' && object.x === 360 && object.width === 240),
-  'level 4 bounce pad should overlap the candy drop path');
+assert.strictEqual(level4.booha.x, 300, 'level 4 Booha should sit beyond the first bounce');
+assert.strictEqual(level4.launchVx, 0, 'level 4 should not drift away from its bounce pad');
+assert.ok(level4.objects.some(object => object.type === 'bounce' && object.x === 180 && object.width === 140 && object.pushX > 0),
+  'level 4 bounce pad should launch the candy away from its starting column');
+assert.match(engineSource, /SAFETY_CATCH_Y\s*=\s*FLOOR_Y\s*-\s*220/,
+  'late safety catch should protect otherwise unreachable falls');
 
 levels.forEach((level, index) => {
   const label = `level ${index + 1}`;
