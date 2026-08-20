@@ -519,10 +519,10 @@ window.QuestionBlitz = (() => {
         font-size: clamp(12px,2.5vw,16px);
         color: rgba(255,255,255,0.65); font-style: italic;
       }
-      #qb-wrong-time {
-        font-size: clamp(24px,6vw,44px);
-        font-weight: 900; color: rgba(255,255,255,0.35);
-        margin-top: 6px; font-variant-numeric: tabular-nums;
+      #qb-wrong-status {
+        font-size: clamp(18px,4vw,28px);
+        font-weight: 900; color: rgba(255,255,255,0.62);
+        margin-top: 6px; letter-spacing: 1px;
       }
       #qb-wrong-close {
         margin-top: 14px;
@@ -721,7 +721,7 @@ window.QuestionBlitz = (() => {
         <div class="qb-wrong-scold-jp"   id="qbsj"></div>
         <div class="qb-wrong-scold-hira" id="qbsh"></div>
         <div class="qb-wrong-scold-en"   id="qbse"></div>
-        <div id="qb-wrong-time"></div>
+        <div id="qb-wrong-status">RUN ENDED — NO SCORE</div>
         <button id="qb-wrong-close" type="button">もどる</button>
       </div>
       
@@ -861,11 +861,12 @@ window.QuestionBlitz = (() => {
     // State
     const queue = shuffle(weekCards);
     let current = 0, startTime = null, elapsed = 0;
+    let clearElapsed = null;
     let rafId = null, locked = false, bgIndex = 0;
 
     function tick() {
       if (startTime === null) { rafId = requestAnimationFrame(tick); return; }
-      elapsed = Date.now() - startTime;
+      elapsed = performance.now() - startTime;
       timerEl.textContent = fmtTime(elapsed);
       rafId = requestAnimationFrame(tick);
     }
@@ -942,7 +943,7 @@ window.QuestionBlitz = (() => {
      setTimeout(() => {
         if (current >= queue.length) {
           stopTimer(); stopBGM();
-          showWin(elapsed, curr, palette, overlay, winScreen, monthSlug, weekNumber);
+          showWin(clearElapsed ?? elapsed, curr, palette, overlay, winScreen, monthSlug, weekNumber);
         } else {
           optionsEl.style.visibility = 'hidden';
           renderQuestion();
@@ -988,7 +989,7 @@ window.QuestionBlitz = (() => {
         optionsEl.appendChild(btn);
       });
 
-      if (current === 0 && startTime === null) startTime = Date.now();
+      if (current === 0 && startTime === null) startTime = performance.now();
     }
 
     /* ── handleAnswer ── */
@@ -1000,6 +1001,7 @@ window.QuestionBlitz = (() => {
       if (chosen.n === correct.n) {
         btn.classList.add('correct');
         current++;
+        if (current >= queue.length) clearElapsed = performance.now() - startTime;
         correctDetonate(btn);
       } else {
         btn.classList.add('wrong');
@@ -1009,12 +1011,12 @@ window.QuestionBlitz = (() => {
         overlay.classList.add('shake');
         overlay.addEventListener('animationend', () => overlay.classList.remove('shake'), { once: true });
         stopTimer(); stopBGM();
-        setTimeout(() => showWrongPopup(correct, wrongPopup, elapsed), 480);
+        setTimeout(() => showWrongPopup(correct, wrongPopup), 480);
       }
     }
 
     /* ── Wrong popup ── */
-    function showWrongPopup(correct, popup, ms) {
+    function showWrongPopup(correct, popup) {
       const scold = SCOLDS[Math.floor(Math.random() * SCOLDS.length)];
       overlay.querySelector('#qbwj').textContent = correct.jp;
       overlay.querySelector('#qbwh').textContent = correct.hira;
@@ -1022,7 +1024,6 @@ window.QuestionBlitz = (() => {
       overlay.querySelector('#qbsj').textContent = scold.jp;
       overlay.querySelector('#qbsh').textContent = scold.hira;
       overlay.querySelector('#qbse').textContent = scold.en;
-      overlay.querySelector('#qb-wrong-time').textContent = fmtTime(ms);
       popup.classList.add('show');
     }
 
