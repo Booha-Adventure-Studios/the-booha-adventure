@@ -323,11 +323,14 @@ canvas {
 
 .popup-en,
 .popup-ja,
+.bilingual-en,
+.bilingual-ja,
 .button-en,
 .button-ja {
   display: block;
 }
-.popup-ja {
+.popup-ja,
+.bilingual-ja {
   margin-top: 4px;
   font-size: 0.82em;
   line-height: 1.45;
@@ -507,6 +510,24 @@ canvas {
 }
 .continue-note { margin: 8px 0 0; }
 .continue-status { margin: 10px 0 0; }
+.hud-pill .bilingual-en,
+.hud-pill .bilingual-ja,
+.hud-label span { display: block; }
+.hud-pill .bilingual-ja,
+.hud-label span + span { margin-top: 1px; font-size: 0.78em; line-height: 1.05; }
+.hud-label { display: flex; flex-direction: column; gap: 1px; line-height: 1.05; }
+.start-exit-btn {
+  margin-top: 14px;
+  background: none;
+  border: none;
+  color: rgba(255,255,255,.28);
+  font-size: .72rem;
+  cursor: pointer;
+  letter-spacing: .06em;
+  font-family: inherit;
+}
+.start-exit-btn:hover,
+.start-exit-btn:focus-visible { color: rgba(255,255,255,.62); }
 .continue-btn {
   color: #ffe6a3;
   border-color: rgba(255,214,110,0.45);
