@@ -23,6 +23,7 @@
   const startOverlay   = document.getElementById('startOverlay');
   const messageOverlay = document.getElementById('messageOverlay');
   const helpPanel      = document.getElementById('helpPanel');
+  const exitConfirmOverlay = document.getElementById('exitConfirmOverlay');
   const startBtn       = document.getElementById('startBtn');
   const restartBtn     = document.getElementById('restartBtn');
   const retryBtn       = document.getElementById('retryBtn');
@@ -30,6 +31,8 @@
   const nextBtn        = document.getElementById('nextBtn');
   const helpBtn        = document.getElementById('helpBtn');
   const closeHelpBtn   = document.getElementById('closeHelpBtn');
+  const confirmExitBtn = document.getElementById('confirmExitBtn');
+  const cancelExitBtn  = document.getElementById('cancelExitBtn');
   const LEVELS         = window.FEED_BOOHA_LEVELS || [];
   const levelText      = document.getElementById('levelText');
   const stateText      = document.getElementById('stateText');
@@ -633,7 +636,7 @@
   // v7: HUD shows "Cuts: X / par" live during play
   function setHudCuts() {
     const par = getParCuts();
-    setHud(state.levelIndex + 1, `Cuts: ${state.cutCount} / ${par}`);
+    setHud(state.levelIndex + 1, `Cuts: ${state.cutCount} / ${par} · カット`);
   }
 
   function cloneLevel(l) { return JSON.parse(JSON.stringify(l)); }
@@ -819,7 +822,7 @@
       writeFeedProgress();
     }
     syncProgressHud();
-    setHud(index + 1, 'Ready');
+    setHud(index + 1, 'Ready / 準備OK');
   }
 
   // ─────────────────────────────────────────────────
@@ -924,6 +927,20 @@
   function toggleHelp(show) {
     helpPanel.classList.toggle('help-panel--show', show);
     helpPanel.setAttribute('aria-hidden', String(!show));
+  }
+
+  function toggleExitConfirm(show) {
+    if (!exitConfirmOverlay) return;
+    exitConfirmOverlay.classList.toggle('overlay--show', show);
+    exitConfirmOverlay.setAttribute('aria-hidden', String(!show));
+  }
+
+  function requestExit() {
+    toggleExitConfirm(true);
+  }
+
+  function confirmExit() {
+    window.location.href = 'karasuki.html?room=room_10';
   }
 
   // A pending delayed rope has been requested, but it still holds the candy
@@ -1147,7 +1164,7 @@
     const m = boohaMouthPoint();
     state.missDir = c.x < m.x ? -1 : 1;
     state.boohaSprite = 'booSad';
-    setHud(state.levelIndex+1, 'Miss');
+    setHud(state.levelIndex+1, 'Miss / ミス');
     playSfxMiss();
     state.pendingFailTimeout = setTimeout(() => {
       showFailureMessage();
@@ -1458,12 +1475,10 @@
     nextBtn.addEventListener('click', nextLevel);
     helpBtn.addEventListener('click', () => toggleHelp(true));
     closeHelpBtn.addEventListener('click', () => toggleHelp(false));
-    document.getElementById('startExitBtn')?.addEventListener('click', () => {
-      window.location.href = 'karasuki.html?room=room_10';
-    });
-    document.getElementById('exitBtn')?.addEventListener('click', () => {
-      window.location.href = 'karasuki.html?room=room_10';
-    });    
+    document.getElementById('startExitBtn')?.addEventListener('click', requestExit);
+    document.getElementById('exitBtn')?.addEventListener('click', requestExit);
+    confirmExitBtn?.addEventListener('click', confirmExit);
+    cancelExitBtn?.addEventListener('click', () => toggleExitConfirm(false));
     canvas.addEventListener('click', evt => handleTap(getCanvasPoint(evt)));
     canvas.addEventListener('touchstart', evt => {
       if (!state.started) return;
@@ -1485,11 +1500,11 @@
   }
 
   async function boot() {
-    setHud(1, 'Loading');
+    setHud(1, 'Loading / 読み込み中');
     buildDomParticles();
     bindEvents();
     await preloadAssets();
-    setHud(1, 'Ready');
+    setHud(1, 'Ready / 準備OK');
     requestAnimationFrame(frame);
   }
 
