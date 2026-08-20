@@ -52,17 +52,17 @@ const FEED_BOOHA_LEVELS = [
   },
 
   // Level 4 — Bounce pad (trajectory + platform)
-  // Fixed: the old pad started at x=250 while the candy fell at x=180,
-  // and Booha was outside the catch-assist range after the bounce.
+  // Fixed: the candy launches right after the cut, so the pad must sit in
+  // its real flight path and Booha must wait on the landing side.
   {
     id: 4, parCuts: 1,
     candy: { x: 180, y: 230 },
-    booha: { x: 300, y: 800, behavior: 'idle' },
+    booha: { x: 420, y: 800, behavior: 'idle' },
     ropes: [
       { id: 'r1', anchor: { x: 180, y: 110 }, type: 'normal' }
     ],
     objects: [
-      { type: 'bounce', x: 260, y: 580, width: 180, height: 20 }
+      { type: 'bounce', x: 360, y: 580, width: 240, height: 20 }
     ]
   },
 
