@@ -321,70 +321,80 @@
   // ── Booha roster ────────────────────────────────────
   const ROSTER = [
     { id:'booha', name:'Yellow Booha', jpName:'イエローブーハー',
-      img:'./assets/destruction/booha_helmet.png',
+      img:'./assets/destruction/optimized/booha_helmet_512.png',
+      thumb:'./assets/destruction/optimized/booha_helmet_256.png',
       sfx:'./assets/destruction/boo-boo.mp3', stock:5, power:'normal',
       desc:'Classic. Reliable. Friendly.',
       jp:'ベーシックであんていしたブーハーです。',
       tip:'Aim for the middle of tall stacks — the ricochet does the work.',
       conf:{cols:['#fff','#ffe','#ddf','#fdd','#dfd','#ffd'],sh:['circle','star','sparkle'],sz:[4,10],burst:65,spin:true}},
     { id:'heavy', name:'Heavy Booha', jpName:'ヘビーブーハー',
-      img:'./assets/destruction/heavy_booha.png',
+      img:'./assets/destruction/optimized/heavy_booha_512.png',
+      thumb:'./assets/destruction/optimized/heavy_booha_256.png',
       sfx:'./assets/destruction/boo-heavy.mp3', stock:3, power:'heavy',
       desc:'2× damage. Craters on landing.',
       jp:'とても強く、かたいブロックをこわします。',
       tip:'Drop it from high up — vertical hits compress blocks hardest.',
       conf:{cols:['#f60','#f90','#fc0','#f40','#fa0','#c30'],sh:['chunk','rect','circle'],sz:[7,18],burst:90,spin:false}},
     { id:'rock', name:'Rock Booha', jpName:'ロックブーハー',
-      img:'./assets/destruction/rock_booha.png',
+      img:'./assets/destruction/optimized/rock_booha_512.png',
+      thumb:'./assets/destruction/optimized/rock_booha_256.png',
       sfx:'./assets/destruction/boo-rock.mp3', stock:2, power:'rock',
       desc:'Pierces one block. Keeps going.',
       jp:'ブロックをつきぬけて、さらに進みます。',
       tip:'Angle through multiple blocks in a line for chain damage.',
       conf:{cols:['#9ab','#cde','#678','#e0e','#456','#abc'],sh:['shard','rect','crystal'],sz:[5,13],burst:58,spin:true}},
     { id:'ice', name:'Ice Booha', jpName:'アイスブーハー',
-      img:'./assets/destruction/ice_booha.png',
+      img:'./assets/destruction/optimized/ice_booha_512.png',
+      thumb:'./assets/destruction/optimized/ice_booha_256.png',
       sfx:'./assets/destruction/boo-ice.mp3', stock:2, power:'ice',
       desc:'Freezes blocks. They shatter.',
       jp:'ブロックをこおらせます。こおったブロックはこわれやすいです。',
       tip:'Freeze a structural base block — when it shatters, everything above falls.',
       conf:{cols:['#aef','#dff','#8df','#fff','#bcf','#6df'],sh:['crystal','sparkle','star'],sz:[4,12],burst:80,spin:true}},
     { id:'fire', name:'Fire Booha', jpName:'ファイアブーハー',
-      img:'./assets/destruction/fire_booha.png',
+      img:'./assets/destruction/optimized/fire_booha_512.png',
+      thumb:'./assets/destruction/optimized/fire_booha_256.png',
       sfx:'./assets/destruction/boo-fire.mp3', stock:2, power:'fire',
       desc:'Burns nearby blocks over time.',
       jp:'まわりのブロックをだんだんもやします。',
       tip:'Hit a central block — the burn spreads to everything within range.',
       conf:{cols:['#f22','#f70','#fa0','#fe0','#f50','#f33'],sh:['flame','circle','sparkle'],sz:[5,14],burst:105,spin:false}},
     { id:'princess', name:'Princess Booha', jpName:'プリンセスブーハー',
-      img:'./assets/destruction/princess_booha.png',
+      img:'./assets/destruction/optimized/princess_booha_512.png',
+      thumb:'./assets/destruction/optimized/princess_booha_256.png',
       sfx:'./assets/destruction/boo-princess.mp3', stock:1, power:'princess',
       desc:'Light & bouncy. Spawns 3 minis on first hit!',
       jp:'あたると、ちいさいブーハーに３つに分かれます。',
       tip:'The minis scatter unpredictably — hit a dense cluster for max chaos.',
       conf:{cols:['#f8c','#fae','#c4a','#fde','#fff','#fbd'],sh:['heart','star','sparkle','circle'],sz:[4,11],burst:125,spin:true}},
     { id:'rainbow', name:'Rainbow Booha', jpName:'レインボーブーハー',
-      img:'./assets/destruction/rainbow_booha.png',
+      img:'./assets/destruction/optimized/rainbow_booha_512.png',
+      thumb:'./assets/destruction/optimized/rainbow_booha_256.png',
       sfx:'./assets/destruction/boo-rainbow.mp3', stock:1, power:'rainbow',
       desc:'Turns blocks to glass. Shimmer trail.',
       jp:'ブロックをガラスに変えます。',
       tip:'Glass breaks with one hit — convert a whole wall, then finish it off.',
       conf:{cols:['#f06','#f80','#ff0','#0f6','#08f','#80f','#f0f'],sh:['sparkle','star','crystal'],sz:[5,13],burst:130,spin:true}},
     { id:'nightmare', name:'Nightmare Booha', jpName:'ナイトメアブーハー',
-      img:'./assets/destruction/nightmare_booha.png',
+      img:'./assets/destruction/optimized/nightmare_booha_512.png',
+      thumb:'./assets/destruction/optimized/nightmare_booha_256.png',
       sfx:'./assets/destruction/boo-nightmare.mp3', stock:1, power:'nightmare',
       desc:'Teleports behind the target!',
       jp:'ブロックのうしろにテレポートします。',
       tip:'Works best when blocks are clustered — it warps to the nearest surviving block.',
       conf:{cols:['#508','#80c','#b0f','#d4f','#304','#f0f'],sh:['shard','star','sparkle'],sz:[4,13],burst:88,spin:true}},
     { id:'monster', name:'Monster Booha', jpName:'モンスターブーハー',
-      img:'./assets/destruction/monster_booha.png',
+      img:'./assets/destruction/optimized/monster_booha_512.png',
+      thumb:'./assets/destruction/optimized/monster_booha_256.png',
       sfx:'./assets/destruction/boo-monster.mp3', stock:1, power:'monster',
       desc:'Grows with every bounce. HUGE settle.',
       jp:'はねるたびに大きくなります。',
       tip:'Let it bounce off the floor a few times before it hits the blocks.',
       conf:{cols:['#0c4','#4f8','#cf0','#0f6','#3a0','#8f0'],sh:['chunk','circle','sparkle'],sz:[6,16],burst:95,spin:false}},
     { id:'ultimate', name:'Ultimate Booha', jpName:'アルティメットブーハー',
-      img:'./assets/destruction/ultimate_booha.png',
+      img:'./assets/destruction/optimized/ultimate_booha_512.png',
+      thumb:'./assets/destruction/optimized/ultimate_booha_256.png',
       sfx:'./assets/destruction/boo-ultimate.mp3', stock:1, power:'ultimate',
       desc:'On settle — EVERYTHING in range explodes!',
       jp:'ばくはつして、まわりをすべてこわします。',
@@ -412,6 +422,7 @@
     unlocked: ROSTER.map((_, i) => i === 0),
     stocks: ROSTER.map((b, i) => i === 0 ? b.stock : 0),
     imgs: new Array(ROSTER.length).fill(null),
+    thumbs: new Array(ROSTER.length).fill(null),
     totalShots() { return ROSTER.reduce((a,b) => a + b.stock, 0); }
   };
 
@@ -901,12 +912,20 @@
     bst.imgs[index] = img;
     return img;
   }
+  async function ensureRosterThumb(index) {
+    if (bst.thumbs[index]) return bst.thumbs[index];
+    const img = await loadImg(ROSTER[index]?.thumb || ROSTER[index]?.img);
+    bst.thumbs[index] = img;
+    return img;
+  }
   async function preload() {
     const bgPromise = loadImg(ASSETS.bg);
     // The selector is visible as soon as a round starts, so every available
     // Booha needs to be ready before the first frame. Lazy loading here made
     // the roster look like broken placeholders on fast transitions.
-    const rosterPromise = Promise.all(ROSTER.map((_, index) => ensureRosterImage(index)));
+    const rosterPromise = Promise.all(ROSTER.map((_, index) => Promise.all([
+      ensureRosterImage(index), ensureRosterThumb(index)
+    ])));
     gs.imgs.bg = await bgPromise;
     await rosterPromise;
     preloadAudio();
@@ -2403,7 +2422,7 @@ function traitGlowColor(block) {
   function showHall(){
     gs.phase=P.HALL;gs.running=false;gs.booha=null;gs.dragging=false;
     gs.campaignActive=false;
-    ROSTER.forEach((_, index) => { if (isBoohaUnlocked(index)) ensureRosterImage(index); });
+    ROSTER.forEach((_, index) => { if (isBoohaUnlocked(index)) ensureRosterThumb(index); });
   }
   function leaveGame() {
     if (!window.confirm('Are you sure you want to exit?')) return;
@@ -2517,7 +2536,12 @@ function traitGlowColor(block) {
     playBackgroundCache.width=W;playBackgroundCache.height=H;
     const play=playBackgroundCache.getContext('2d');
     play.drawImage(backgroundCache,0,0);
-    play.fillStyle='rgba(5,10,10,0.24)';play.fillRect(0,0,W,H);
+    play.fillStyle='rgba(5,10,10,0.28)';play.fillRect(0,0,W,H);
+    const vignette=play.createRadialGradient(W*0.52,H*0.46,140,W*0.52,H*0.46,780);
+    vignette.addColorStop(0,'rgba(0,0,0,0)');
+    vignette.addColorStop(0.72,'rgba(0,0,0,0.05)');
+    vignette.addColorStop(1,'rgba(0,0,0,0.28)');
+    play.fillStyle=vignette;play.fillRect(0,0,W,H);
   }
   function drawBG(){
     buildBackgroundCache();
@@ -2695,6 +2719,17 @@ function traitGlowColor(block) {
       c.restore();
     }
 
+    // Cheap baked edge lighting makes the blocks read as objects with mass,
+    // rather than flat interface cards. It costs nothing during animation.
+    c.save();
+    rrClip(c, 0, 0, w, h, 8);
+    c.lineCap='round';c.lineWidth=2;
+    c.strokeStyle='rgba(255,255,255,0.22)';
+    c.beginPath();c.moveTo(7,1);c.lineTo(Math.max(7,w-8),1);c.moveTo(1,7);c.lineTo(1,Math.max(7,h-8));c.stroke();
+    c.strokeStyle='rgba(0,0,0,0.24)';c.lineWidth=2;
+    c.beginPath();c.moveTo(7,h-1);c.lineTo(Math.max(7,w-8),h-1);c.moveTo(w-1,7);c.lineTo(w-1,Math.max(7,h-8));c.stroke();
+    c.restore();
+
     BLOCK_TEXTURE_CACHE.set(key, out);
     return out;
   }
@@ -2724,6 +2759,10 @@ function traitGlowColor(block) {
       if(block.frozen){
         ctx.fillStyle='#c0f0ff';ctx.strokeStyle='#88ddff';ctx.lineWidth=2;rr(ctx,bx,by,bw,bh,8,true,true);
         ctx.globalAlpha*=0.5;ctx.fillStyle='rgba(170,240,255,0.4)';rr(ctx,bx,by,bw,bh,8,true,false);ctx.restore();continue;
+      }
+      if(!block.broken&&!block.falling){
+        ctx.save();ctx.globalAlpha=0.22;ctx.fillStyle='#071014';
+        ctx.beginPath();ctx.ellipse(block.x,by+bh+3,Math.max(8,bw*0.34),3,0,0,Math.PI*2);ctx.fill();ctx.restore();
       }
       if(block.burning&&!block.broken){ctx.save();ctx.globalAlpha=(block.burnTimer/120)*0.4;ctx.fillStyle='#ff6600';rr(ctx,bx-2,by-2,bw+4,bh+4,10,true,false);ctx.restore();}
       ctx.drawImage(getBlockTexture(block), bx, by, bw, bh);
@@ -2900,7 +2939,7 @@ function traitGlowColor(block) {
       ctx.fillStyle=isSel?'rgba(255,255,255,0.2)':(unlocked?'rgba(8,6,16,0.7)':'rgba(8,6,16,0.86)');
       ctx.strokeStyle=isSel?'#7cfff8':(unlocked?'rgba(255,255,255,0.12)':'rgba(255,223,128,0.25)');ctx.lineWidth=isSel?2.5:1;
       rr(ctx,sx,sy,SEL_CARD_W,SEL_CARD_H,10,true,true);ctx.restore();
-      const img=bst.imgs[i];
+      const img=bst.thumbs[i] || bst.imgs[i];
       ctx.save();ctx.globalAlpha=isAvail?(isSel?1:0.72):0.16;
       if(!unlocked){
         ctx.fillStyle='#ffdf80';ctx.font='bold 18px system-ui,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('🔒',sx+SEL_CARD_W/2,sy+SEL_CARD_H/2-3);
@@ -2928,7 +2967,7 @@ function traitGlowColor(block) {
     addPanel('SHOTS','のこり',String(gs.ghostsLeft),gs.isLastBooha?'#ff5555':'#ff9f7f');
     addPanel('LIVES','いのち',`${gs.lives}/${MAX_RUN_LIVES}`,gs.lives<=1?'#ff5555':'#ffcf70');
     addPanel('DAMAGE','はかい',`${Math.round(gs.pct)}%`,'#7cfff8');
-    addPanel('GOAL','もくひょう',`${level.targetPercent||100}%`,'#ffdf80');
+    if(gs.phase!==P.PLAY) addPanel('GOAL','もくひょう',`${level.targetPercent||100}%`,'#ffdf80');
     if(rule?.type==='time_attack') addPanel('TIME','じかん',`${Math.ceil(Math.max(0,gs.ruleTime))}s`,gs.ruleTime<10?'#ff5555':'#ff9f7f');
 
     if(gs.isLastBooha&&gs.phase===P.PLAY){
@@ -3055,7 +3094,7 @@ function traitGlowColor(block) {
     for(let index=0;index<ROSTER.length;index++){
       const col=index%5,row=Math.floor(index/5),x=34+col*247,y=468+row*76,booha=ROSTER[index],unlocked=isBoohaUnlocked(index);
       ctx.save();ctx.fillStyle=unlocked?'rgba(124,255,248,0.1)':'rgba(255,255,255,0.045)';ctx.strokeStyle=unlocked?'rgba(124,255,248,0.4)':'rgba(255,223,128,0.24)';ctx.lineWidth=1;rr(ctx,x,y,232,64,10,true,true);ctx.restore();
-      if(unlocked&&bst.imgs[index])ctx.drawImage(bst.imgs[index],x+8,y+7,50,50);
+      if(unlocked&&(bst.thumbs[index]||bst.imgs[index]))ctx.drawImage(bst.thumbs[index]||bst.imgs[index],x+8,y+7,50,50);
       else {ctx.fillStyle='#ffdf80';ctx.font='bold 20px system-ui,sans-serif';ctx.textAlign='center';ctx.fillText('🔒',x+33,y+31);}
       ctx.textAlign='left';ctx.fillStyle=unlocked?'#fff':'rgba(255,255,255,0.5)';ctx.font='bold 11px system-ui,sans-serif';ctx.fillText(`${unlocked?'':'LOCKED · '}${booha.name}`,x+66,y+23);
       ctx.fillStyle=unlocked?'#7cfff8':'rgba(255,223,128,0.68)';ctx.font='10px system-ui,sans-serif';ctx.fillText(unlocked?booha.jpName:unlockRequirement(index),x+66,y+41);
