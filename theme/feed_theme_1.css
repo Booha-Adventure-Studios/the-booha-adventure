@@ -499,6 +499,16 @@ canvas {
   background: rgba(255,184,64,0.24);
   border-color: rgba(255,226,145,0.7);
 }
+.exit-confirm-btn {
+  color: #ffd0e8;
+  border-color: rgba(255,128,190,0.42);
+  background: rgba(210,52,132,0.14);
+}
+.exit-confirm-btn:hover,
+.exit-confirm-btn:focus-visible {
+  background: rgba(210,52,132,0.26);
+  border-color: rgba(255,170,215,0.72);
+}
 
 /* ── Responsive ──────────────────────────────────── */
 @media (max-width: 400px) {

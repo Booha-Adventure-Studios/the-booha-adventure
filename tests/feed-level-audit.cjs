@@ -8,6 +8,7 @@ const vm = require('vm');
 
 const ROOT = path.resolve(__dirname, '..');
 const engineSource = fs.readFileSync(path.join(ROOT, 'js/feed_booha_1.js'), 'utf8');
+const htmlSource = fs.readFileSync(path.join(ROOT, 'feed_booha.html'), 'utf8');
 const context = { window: {}, console };
 vm.createContext(context);
 vm.runInContext(
@@ -29,6 +30,9 @@ assert.match(engineSource, /function showFailureMessage\(\)/,
   'failures must present an explicit choice screen');
 assert.doesNotMatch(engineSource, /pendingFailTimeout2\s*=\s*setTimeout\(/,
   'failures must not automatically reset before the student chooses');
+assert.match(htmlSource, /id="exitConfirmOverlay"/, 'exit must have a confirmation overlay');
+assert.match(engineSource, /function requestExit\(\)/, 'exit buttons must ask for confirmation');
+assert.match(htmlSource, /How to Play \/ あそびかた/, 'help panel must be bilingual');
 
 levels.forEach((level, index) => {
   const label = `level ${index + 1}`;
