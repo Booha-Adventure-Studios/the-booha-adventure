@@ -224,7 +224,9 @@ S.textContent = `
 }
 .sw-dot.active{ background:var(--game-primary); border-color:var(--game-primary); box-shadow:0 0 8px var(--game-primary); }
 .sw-dot.done{ background:#22c55e; border-color:#22c55e; box-shadow:0 0 7px rgba(34,197,94,.7); }
+.sw-dot.assisted{ background:#ffcc00; border-color:#ffcc00; box-shadow:0 0 7px rgba(255,204,0,.7); }
 [data-curriculum="pb"] .sw-dot{ background:rgba(255,110,180,.15); border-color:rgba(255,110,180,.25); }
+[data-curriculum="pb"] .sw-dot.assisted{ background:#ffcc00; border-color:#ffcc00; box-shadow:0 0 7px rgba(255,204,0,.7); }
 
 /* ── HUD pills ── */
 .sw-hud{ display:flex; justify-content:center; gap:8px; margin-bottom:.5rem; flex-wrap:wrap; }
@@ -316,6 +318,10 @@ S.textContent = `
   transform:translateY(-2px);
 }
 .sw-slot.filled:active{ transform:scale(.92); }
+.sw-space-gap{
+  width:clamp(12px,3vw,24px); height:clamp(42px,9vw,60px);
+  flex:0 0 clamp(12px,3vw,24px); pointer-events:none;
+}
 [data-curriculum="pb"] .sw-slot.filled{
   background:#fff; border:2.5px solid #cc88ff; color:#2a1020;
   box-shadow:0 4px 0 #ddb8ff;
@@ -468,6 +474,23 @@ S.textContent = `
 .sw-check-btn:hover{ transform:translateY(-2px) scale(1.04); }
 .sw-check-btn:active{ transform:scale(.96); box-shadow:none; }
 .sw-check-btn:disabled{ opacity:.32; pointer-events:none; box-shadow:none; }
+
+/* PRE-CHECK — one-use assist, available only after all letters are placed */
+.sw-precheck-btn{
+  display:none; font-family:var(--game-font-title);
+  font-size:clamp(12px,2.5vw,16px); letter-spacing:.06em;
+  padding:10px 20px; border-radius:999px;
+  border:2px solid rgba(255,204,0,.65); background:rgba(255,204,0,.14);
+  color:#ffcc00; font-weight:900; cursor:pointer;
+  transition:transform .15s, background .18s, border-color .15s;
+  -webkit-tap-highlight-color:transparent;
+}
+.sw-precheck-btn.ready{
+  display:block; animation:swPrecheckIn .28s cubic-bezier(.34,1.56,.64,1);
+}
+.sw-precheck-btn.ready:hover{ background:rgba(255,204,0,.24); border-color:#ffcc00; transform:scale(1.04); }
+.sw-precheck-btn.ready:active{ transform:scale(.94); }
+@keyframes swPrecheckIn{ from{ transform:scale(0); opacity:0; } to{ transform:none; opacity:1; } }
 
 /* CLEAR */
 .sw-clear-btn{
@@ -648,6 +671,7 @@ S.textContent = `
 }
 @keyframes swScorePop{ from{ transform:scale(.55) rotate(-6deg); opacity:0; } 50%{ transform:scale(1.08) rotate(2deg); } to{ transform:none; opacity:1; } }
 .sw-res-pct{ font-size:clamp(11px,2.1vw,15px); color:var(--game-muted); font-weight:700; margin-bottom:9px; animation:swFadeUp .4s ease .5s both; }
+.sw-res-assisted{ font-size:clamp(11px,2vw,14px); color:var(--game-muted); font-weight:800; margin-bottom:12px; animation:swFadeUp .4s ease .54s both; }
 .sw-res-label{
   font-family:var(--game-font-title); font-size:clamp(21px,5vw,36px);
   background:linear-gradient(90deg,#ff2288,#ffcc00,#aaff22,#22ddff,#cc88ff,#ff2288);
@@ -703,6 +727,7 @@ U.mount(`
   <div class="sw-tiles" id="sw-tiles"></div>
   <div class="sw-bottom-bar">
     <button class="sw-clear-btn"   id="sw-clear">CLEAR</button>
+    <button class="sw-precheck-btn" id="sw-precheck" disabled>PRE-CHECK</button>
     <button class="sw-speaker-btn" id="sw-speaker" aria-label="Listen">${SPEAKER_SVG}</button>
     <button class="sw-check-btn"   id="sw-check" disabled>CHECK</button>
     <button class="sw-help-btn"    id="sw-help">?</button>
@@ -712,6 +737,7 @@ U.mount(`
     <div class="sw-res-inner">
       <div class="sw-res-score" id="sw-rs"></div>
       <div class="sw-res-pct"   id="sw-rp"></div>
+      <div class="sw-res-assisted" id="sw-ra"></div>
       <div class="sw-res-label" id="sw-rl"></div>
       <div class="sw-res-divider"></div>
       <div class="sw-res-en"    id="sw-re"></div>
@@ -748,6 +774,10 @@ U.mount(`
         <div class="sw-how-jp">CHECKを押そう。一発正解でポイントゲット！</div>
       </div></div>
       <div class="sw-how-step"><div class="sw-how-num">5</div><div>
+        <div class="sw-how-en">PRE-CHECK appears when all letters are placed. You may use it once; an assisted clear earns 0 points.</div>
+        <div class="sw-how-jp">文字を全部入れるとPRE-CHECKが出ます。一回だけ使えて、アシスト正解は0ポイントです。</div>
+      </div></div>
+      <div class="sw-how-step"><div class="sw-how-num">6</div><div>
         <div class="sw-how-en">After 3 wrong tries the speaker button appears — tap to hear the word.</div>
         <div class="sw-how-jp">3回まちがえるとスピーカーボタンで言葉を聞けるよ。</div>
       </div></div>
@@ -769,6 +799,7 @@ const tilesEl    = document.getElementById('sw-tiles');
 const feedbackEl = document.getElementById('sw-feedback');
 const checkBtn   = document.getElementById('sw-check');
 const clearBtn   = document.getElementById('sw-clear');
+const precheckBtn = document.getElementById('sw-precheck');
 const speakerBtn = document.getElementById('sw-speaker');
 const helpBtn    = document.getElementById('sw-help');
 const dotsRow    = document.getElementById('sw-dots');
@@ -808,14 +839,48 @@ let placed     = [];
 let firstTry   = true;
 let locked     = false;
 let wrongCount = 0;
+let precheckUsed = false;
+let assistedCount = 0;
+const assistedItems = new Set();
 let lastCheckAt = 0;
 const CHECK_DEBOUNCE = 700;
 
+function answerChars(card) {
+  return Array.from(String(card.en || '').toLowerCase()).filter(ch => !/\s/.test(ch));
+}
+
+function answerText(card) {
+  return answerChars(card).join('');
+}
+
+function allLettersPlaced() {
+  return placed.length > 0 && placed.every(Boolean);
+}
+
+function updateAnswerControls() {
+  const complete = allLettersPlaced();
+  checkBtn.disabled = !complete;
+  const canPrecheck = complete && !precheckUsed && !locked;
+  precheckBtn.classList.toggle('ready', canPrecheck);
+  precheckBtn.disabled = !canPrecheck;
+}
+
+function markAssisted() {
+  firstTry = false;
+  if (!assistedItems.has(idx)) {
+    assistedItems.add(idx);
+    assistedCount++;
+  }
+}
+
 function updateDots() {
-  for (let i = 0; i < 15; i++) {
+  for (let i = 0; i < allCards.length; i++) {
     const d = document.getElementById(`sw-d${i}`);
     if (!d) continue;
-    d.className = 'sw-dot' + (i < idx ? ' done' : i === idx ? ' active' : '');
+    d.className = 'sw-dot' + (
+      i < idx ? (assistedItems.has(i) ? ' assisted' : ' done') :
+      i === idx ? ' active' : ''
+    );
   }
 }
 
@@ -823,12 +888,14 @@ function updateDots() {
    SHOW CARD
    ══════════════════════════════════════════════════════════════ */
 function showCard() {
-  locked = false; firstTry = true; wrongCount = 0; placed = [];
+  locked = false; firstTry = true; wrongCount = 0; precheckUsed = false; placed = [];
   feedbackEl.textContent = ''; feedbackEl.style.color = '';
   clearBtn.classList.remove('visible');
+  precheckBtn.classList.remove('ready');
   speakerBtn.classList.remove('visible');
   speakerBtn.disabled = false;
   checkBtn.disabled = true;
+  precheckBtn.disabled = true;
 
   const card = allCards[idx];
   numEl.textContent  = idx + 1;
@@ -844,13 +911,15 @@ function showCard() {
    ══════════════════════════════════════════════════════════════ */
 function buildTiles(card) {
   tilesEl.innerHTML = '';
-  const letters = U.shuffle(card.en.toLowerCase().split(''));
+  const letters = U.shuffle(answerChars(card));
   letters.forEach((letter, ti) => {
     const tile = document.createElement('button');
     tile.type = 'button';
     tile.className = 'sw-tile sw-tile-in';
     tile.textContent = letter;          /* lowercase only, no audio */
-    tile.dataset.ti = ti;
+    /* Existing curriculum palettes cover 13 colors; cycle them for longer words. */
+    tile.dataset.ti = ti % 13;
+    tile.dataset.tileIndex = ti;
     tile.dataset.letter = letter;
     tile.style.setProperty('--ti', ti);
     tile.addEventListener('touchstart', e => { e.preventDefault(); handleTileTap(tile); }, { passive: false });
@@ -867,13 +936,23 @@ function buildTiles(card) {
    ══════════════════════════════════════════════════════════════ */
 function buildSlots(card) {
   slotsEl.innerHTML = '';
-  placed = new Array(card.en.length).fill(null);
-  for (let i = 0; i < card.en.length; i++) {
+  const chars = Array.from(String(card.en || '').toLowerCase());
+  placed = new Array(answerChars(card).length).fill(null);
+  let slotIndex = 0;
+  chars.forEach(ch => {
+    if (/\s/.test(ch)) {
+      const gap = document.createElement('span');
+      gap.className = 'sw-space-gap';
+      gap.setAttribute('aria-hidden', 'true');
+      slotsEl.appendChild(gap);
+      return;
+    }
     const slot = document.createElement('button');
-    slot.type = 'button'; slot.className = 'sw-slot empty'; slot.dataset.idx = i;
-    attachSlot(slot, i);
+    slot.type = 'button'; slot.className = 'sw-slot empty'; slot.dataset.idx = slotIndex;
+    attachSlot(slot, slotIndex);
     slotsEl.appendChild(slot);
-  }
+    slotIndex++;
+  });
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -886,7 +965,7 @@ function handleTileTap(tile) {
   tile.classList.add('used');
   placed[emptyIdx] = { letter: tile.dataset.letter, tileEl: tile };
   renderSlots();
-  checkBtn.disabled = placed.some(p => !p);
+  updateAnswerControls();
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -897,7 +976,7 @@ function handleSlotTap(i) {
   placed[i].tileEl.classList.remove('used');
   placed[i] = null;
   renderSlots();
-  checkBtn.disabled = placed.some(p => !p);
+  updateAnswerControls();
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -934,10 +1013,10 @@ function attachSlot(slot, i) {
 clearBtn.addEventListener('click', () => {
   if (locked) return;
   placed.forEach(p => { if (p) p.tileEl.classList.remove('used'); });
-  placed = new Array(allCards[idx].en.length).fill(null);
+  placed = new Array(answerChars(allCards[idx]).length).fill(null);
   renderSlots();
   feedbackEl.textContent = '';
-  checkBtn.disabled = true;
+  updateAnswerControls();
 });
 
 /* ══════════════════════════════════════════════════════════════
@@ -949,88 +1028,116 @@ clearBtn.addEventListener('click', () => {
    4. after dance completes → word audio plays
    5. word.onended → advance to next card
    ══════════════════════════════════════════════════════════════ */
+function resolveCorrect(card, slotEls) {
+  locked = true;
+  updateAnswerControls();
+
+  /* 1. slots go green */
+  slotEls.forEach((sl, i) => {
+    setTimeout(() => {
+      sl.classList.remove('sw-wrong', 'filled', 'empty');
+      sl.classList.add('sw-correct');
+    }, i * 55);
+  });
+
+  if (assistedItems.has(idx)) {
+    feedbackEl.textContent = 'ASSISTED — 0 POINTS';
+    feedbackEl.style.color = '#ffcc00';
+  } else {
+    feedbackEl.textContent = '';
+  }
+
+  if (firstTry) { score++; scoreEl.textContent = score; }
+  updateDots();
+
+  /* 2. ding after slots finish */
+  setTimeout(() => {
+    U.playSFX('ding', () => {
+      /* 3. confetti */
+      fireConfetti(false);
+
+      /* 3. dance on slots */
+      Array.from(slotsEl.querySelectorAll('.sw-slot')).forEach((sl, i) => {
+        setTimeout(() => {
+          sl.classList.add('sw-dance');
+          sl.addEventListener('animationend', () => sl.classList.remove('sw-dance'), { once: true });
+        }, i * 50);
+      });
+
+      /* 4 & 5. word audio → advance */
+      const danceMs = slotEls.length * 50 + 280;
+      setTimeout(() => {
+        playAudio(card.mp3, () => {
+          setTimeout(() => {
+            idx++;
+            if (idx >= allCards.length) showResults();
+            else showCard();
+          }, 300);
+        });
+      }, danceMs);
+    });
+  }, slotEls.length * 55 + 20);
+}
+
+function resolveWrong(card, slotEls, fromPrecheck = false) {
+  locked = true;
+  updateAnswerControls();
+  if (!fromPrecheck) { firstTry = false; wrongCount++; }
+  clearBtn.classList.add('visible');
+  if (wrongCount >= 3) speakerBtn.classList.add('visible');
+
+  const target = answerText(card);
+  slotEls.forEach((sl, i) => {
+    setTimeout(() => {
+      sl.classList.remove('filled', 'empty');
+      sl.classList.add(placed[i] && placed[i].letter === target[i] ? 'sw-correct' : 'sw-wrong');
+    }, i * 50);
+  });
+
+  feedbackEl.textContent = fromPrecheck ? 'Not yet — try again!' : 'Not quite — try again!';
+  feedbackEl.style.color = fromPrecheck ? '#ffcc00' : '#ef4444';
+  U.playSFX('fart');
+
+  setTimeout(() => {
+    locked = false;
+    updateAnswerControls();
+  }, slotEls.length * 50 + 620);
+}
+
+function evaluateAnswer(fromPrecheck = false) {
+  if (locked) return;
+
+  const card = allCards[idx];
+  if (!allLettersPlaced()) {
+    feedbackEl.textContent = 'Fill all the letters first!';
+    feedbackEl.style.color = '#ffaa00';
+    updateAnswerControls();
+    return;
+  }
+
+  if (fromPrecheck) markAssisted();
+
+  const answer  = placed.map(p => p.letter).join('').toLowerCase();
+  const correct = answer === answerText(card);
+  const slotEls = Array.from(slotsEl.querySelectorAll('.sw-slot'));
+
+  if (correct) resolveCorrect(card, slotEls);
+  else resolveWrong(card, slotEls, fromPrecheck);
+}
+
 checkBtn.addEventListener('click', () => {
   if (locked) return;
   const now = Date.now();
   if (now - lastCheckAt < CHECK_DEBOUNCE) return;
   lastCheckAt = now;
+  evaluateAnswer();
+});
 
-  const card = allCards[idx];
-  if (placed.some(p => !p)) {
-    feedbackEl.textContent = 'Fill all the letters first!';
-    feedbackEl.style.color = '#ffaa00';
-    return;
-  }
-
-  const answer  = placed.map(p => p.letter).join('').toLowerCase();
-  const correct = answer === card.en.toLowerCase();
-  const slotEls = Array.from(slotsEl.querySelectorAll('.sw-slot'));
-
-  if (correct) {
-    locked = true;
-
-    /* 1. slots go green */
-    slotEls.forEach((sl, i) => {
-      setTimeout(() => {
-        sl.classList.remove('sw-wrong', 'filled', 'empty');
-        sl.classList.add('sw-correct');
-      }, i * 55);
-    });
-
-    /* clear feedback — no correct-answer text */
-    feedbackEl.textContent = '';
-
-    if (firstTry) { score++; scoreEl.textContent = score; }
-    updateDots();
-
-    /* 2. ding after slots finish */
-    setTimeout(() => {
-      U.playSFX('ding', () => {
-        /* 3. confetti */
-        fireConfetti(false);
-
-        /* 3. dance on slots */
-        Array.from(slotsEl.querySelectorAll('.sw-slot')).forEach((sl, i) => {
-          setTimeout(() => {
-            sl.classList.add('sw-dance');
-            sl.addEventListener('animationend', () => sl.classList.remove('sw-dance'), { once: true });
-          }, i * 50);
-        });
-
-        /* 4 & 5. word audio → advance */
-        const danceMs = slotEls.length * 50 + 280;
-        setTimeout(() => {
-          playAudio(card.mp3, () => {
-            setTimeout(() => {
-              idx++;
-              if (idx >= allCards.length) showResults();
-              else showCard();
-            }, 300);
-          });
-        }, danceMs);
-      });
-    }, slotEls.length * 55 + 20);
-
-  } else {
-    /* wrong */
-    locked = true; firstTry = false; wrongCount++;
-    clearBtn.classList.add('visible');
-    if (wrongCount >= 3) speakerBtn.classList.add('visible');
-
-    const target = card.en.toLowerCase();
-    slotEls.forEach((sl, i) => {
-      setTimeout(() => {
-        sl.classList.remove('filled', 'empty');
-        sl.classList.add(placed[i] && placed[i].letter === target[i] ? 'sw-correct' : 'sw-wrong');
-      }, i * 50);
-    });
-
-    feedbackEl.textContent = 'Not quite — try again!';
-    feedbackEl.style.color = '#ef4444';
-    U.playSFX('fart');
-
-    setTimeout(() => { locked = false; }, slotEls.length * 50 + 620);
-  }
+precheckBtn.addEventListener('click', () => {
+  if (locked || precheckUsed || !allLettersPlaced()) return;
+  precheckUsed = true;
+  updateAnswerControls();
+  evaluateAnswer(true);
 });
 
 /* ══════════════════════════════════════════════════════════════
@@ -1085,10 +1192,10 @@ function showResults() {
   document.querySelector('.sw-hud').style.display      = 'none';
   /* .sw-dots-row intentionally kept visible — shows all-done state */
 
-  /* Mark all dots done */
+  /* Mark all dots done, preserving assisted items in amber */
   for (let i = 0; i < 15; i++) {
     const d = document.getElementById(`sw-d${i}`);
-    if (d) d.className = 'sw-dot done';
+    if (d) d.className = `sw-dot ${assistedItems.has(i) ? 'assisted' : 'done'}`;
   }
 
    
@@ -1096,21 +1203,24 @@ function showResults() {
   results.classList.add('show');
 
   const tier = getTier(score);
-  const pct  = Math.round((score / 15) * 100);
+  const total = allCards.length;
+  const pct  = Math.round((score / total) * 100);
 
   /* ── Save score to Booha Adventure save system ── */
  document.dispatchEvent(new CustomEvent('booha:gameEnd', {
     detail: {
       saveId:    `${CFG.curriculum}:spell_word`,
       score:     pct,
-      completed: pct >= 40,
+      completed: true,
+      assisted: assistedCount,
     }
   }));
 
   /* Populate scorecard — sw-* IDs matching this game's HTML */
   results.style.setProperty('--tier-color', tier.color);
-  document.getElementById('sw-rs').textContent = `${score} / 15`;
-  document.getElementById('sw-rp').textContent = `${pct}%`;
+  document.getElementById('sw-rs').textContent = `${score} / ${total}`;
+  document.getElementById('sw-rp').textContent = `${pct}% first-try accuracy`;
+  document.getElementById('sw-ra').textContent = `${total} / ${total} completed • ${assistedCount} assisted`;
   document.getElementById('sw-rl').textContent = tier.label;
   document.getElementById('sw-re').textContent = tier.en;
   document.getElementById('sw-rj').textContent = tier.jp;
@@ -1134,6 +1244,8 @@ function showResults() {
     /* Reset state — spell-word uses idx/score/allCards/showCard */
     idx   = 0;
     score = 0;
+    assistedCount = 0;
+    assistedItems.clear();
     scoreEl.textContent = '0';
     allCards = U.shuffle(allCards);
     showCard();
@@ -1143,7 +1255,7 @@ function showResults() {
     window.location.assign(CFG.navTarget + '?week=' + encodeURIComponent(CFG.weekParam));
   });
 
-  if (score === 15) {
+  if (score === allCards.length) {
     setTimeout(() => fireConfetti(false), 400);
     setTimeout(() => fireConfetti(true),  900);
   }
