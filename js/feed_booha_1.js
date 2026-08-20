@@ -79,10 +79,13 @@
   const FAIL_BUFFER        = 36;
   const TRAIL_LENGTH       = 8;
   const TRAIL_SPEED_THRESH = 6;
-  const MAGNET_DIST        = 140;
-  const MAGNET_FORCE       = 0.40;
-  const SAFETY_CATCH_Y     = FLOOR_Y - 220;
-  const SAFETY_CATCH_STEER = 0.10;
+  // Keep normal throws skill-based. The rescue only wakes up very late and
+  // very close to Booha, so it cannot pull a bad throw across the stage.
+  const MAGNET_DIST        = 78;
+  const MAGNET_FORCE       = 0.12;
+  const SAFETY_CATCH_Y     = FLOOR_Y - 84;
+  const SAFETY_CATCH_DIST  = 96;
+  const SAFETY_CATCH_STEER = 0.08;
   const LAST_CHANCE_DIST   = 90;
 
   const swipe        = { active: false, x0: 0, y0: 0, x1: 0, y1: 0 };
@@ -1101,16 +1104,15 @@
     if (!state.booha || state.won || state.lost) return;
     const c = state.candy, m = boohaMouthPoint();
     const dx = m.x - c.x, dy = m.y - c.y, dist = Math.hypot(dx, dy);
-    const leavingPlayfield = c.x < CANDY_R * 2 || c.x > W - CANDY_R * 2;
-    if ((c.y >= SAFETY_CATCH_Y || leavingPlayfield) && dist > 0) {
-      // Late rescue keeps a missed route forgiving without changing the
-      // puzzle's earlier rope, fan, and bounce decisions.
+    if (c.y >= SAFETY_CATCH_Y && dist > 0 && dist <= SAFETY_CATCH_DIST) {
+      // Last-second rescue is a small near-floor nudge, not a homing vector.
+      // It can save a near miss without turning a bad throw into a guarantee.
       c.vx = dx * SAFETY_CATCH_STEER;
       c.vy = dy * SAFETY_CATCH_STEER;
       return;
     }
-    const magnetDist = state.continueAssist ? MAGNET_DIST * 1.7 : MAGNET_DIST;
-    const magnetForce = state.continueAssist ? MAGNET_FORCE * 1.8 : MAGNET_FORCE;
+    const magnetDist = state.continueAssist ? MAGNET_DIST * 1.35 : MAGNET_DIST;
+    const magnetForce = state.continueAssist ? MAGNET_FORCE * 1.35 : MAGNET_FORCE;
     if (dist > magnetDist || dist < 1) return;
     const str = magnetForce * (1 - dist / magnetDist);
     c.vx += (dx/dist) * str; c.vy += (dy/dist) * str;
@@ -1120,6 +1122,15 @@
     const c = state.candy;
     c.vy += GRAVITY; c.x += c.vx; c.y += c.vy;
     c.vx *= AIR_DRAG; c.vy *= AIR_DRAG;
+    // Screen edges are part of the puzzle: a wide miss can rebound and still
+    // be recovered with a well-timed throw, while a near miss remains fair.
+    if (c.x < c.r) {
+      c.x = c.r;
+      if (c.vx < 0) c.vx = Math.abs(c.vx) * 0.82;
+    } else if (c.x > W - c.r) {
+      c.x = W - c.r;
+      if (c.vx > 0) c.vx = -Math.abs(c.vx) * 0.82;
+    }
   }
 
   function updateFans(dt) {

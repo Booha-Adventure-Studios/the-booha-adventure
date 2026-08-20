@@ -20,8 +20,11 @@ const FLOOR_Y = 900;
 const CANDY_R = 26;
 const GRAVITY = 0.45;
 const AIR_DRAG = 0.999;
-const MAGNET_DIST = 140;
-const MAGNET_FORCE = 0.40;
+const MAGNET_DIST = 78;
+const MAGNET_FORCE = 0.12;
+const SAFETY_CATCH_Y = FLOOR_Y - 84;
+const SAFETY_CATCH_DIST = 96;
+const SAFETY_CATCH_STEER = 0.08;
 const FRAME_MS = 16.667;
 
 function permutations(items) {
@@ -34,7 +37,7 @@ function permutations(items) {
   return result;
 }
 
-function simulate(level, order, gap) {
+function simulate(level, order, gap, startFrame = 0) {
   const ropeCount = level.ropes.length;
   const avgX = ropeCount > 1
     ? level.ropes.reduce((sum, rope) => sum + rope.anchor.x, 0) / ropeCount
@@ -60,7 +63,7 @@ function simulate(level, order, gap) {
   let boohaDir = level.booha.range
     ? (level.booha.x <= (level.booha.range.min + level.booha.range.max) / 2 ? 1 : -1)
     : 0;
-  const cutFrames = order.map((_, index) => index * gap);
+  const cutFrames = order.map((_, index) => startFrame + index * gap);
 
   function activeRopes() { return ropes.filter(rope => !rope.cut); }
 
@@ -125,6 +128,13 @@ function simulate(level, order, gap) {
       candy.y += candy.vy;
       candy.vx *= AIR_DRAG;
       candy.vy *= AIR_DRAG;
+      if (candy.x < CANDY_R) {
+        candy.x = CANDY_R;
+        if (candy.vx < 0) candy.vx = Math.abs(candy.vx) * 0.82;
+      } else if (candy.x > 540 - CANDY_R) {
+        candy.x = 540 - CANDY_R;
+        if (candy.vx > 0) candy.vx = -Math.abs(candy.vx) * 0.82;
+      }
 
       for (const object of bounces) {
         if (object.used) continue;
@@ -156,10 +166,9 @@ function simulate(level, order, gap) {
       const dx = boohaX - candy.x;
       const dy = level.booha.y - 12 - candy.y;
       const distance = Math.hypot(dx, dy);
-      const leavingPlayfield = candy.x < CANDY_R * 2 || candy.x > 540 - CANDY_R * 2;
-      if ((candy.y >= FLOOR_Y - 220 || leavingPlayfield) && distance > 0) {
-        candy.vx = dx * 0.10;
-        candy.vy = dy * 0.10;
+      if (candy.y >= SAFETY_CATCH_Y && distance > 0 && distance <= SAFETY_CATCH_DIST) {
+        candy.vx = dx * SAFETY_CATCH_STEER;
+        candy.vy = dy * SAFETY_CATCH_STEER;
       } else if (distance > 0 && distance < MAGNET_DIST) {
         const strength = MAGNET_FORCE * (1 - distance / MAGNET_DIST);
         candy.vx += dx / distance * strength;
@@ -178,7 +187,10 @@ for (const level of levels) {
   let playable = false;
   for (const order of orders) {
     for (const gap of [0, 8, 15, 25, 35]) {
-      if (simulate(level, order, gap)) { playable = true; break; }
+      for (const startFrame of [0, 8, 16, 24, 32, 40, 48, 56, 64, 72, 80, 88]) {
+        if (simulate(level, order, gap, startFrame)) { playable = true; break; }
+      }
+      if (playable) break;
     }
     if (playable) break;
   }
