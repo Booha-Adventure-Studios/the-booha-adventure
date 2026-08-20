@@ -1007,13 +1007,14 @@
   }
   function addShake(v) { shake.v = Math.max(shake.v, v); }
   function spawnImpact(x, y, col='#ffffff', spd=8, kind='hit') {
-    const breakHit = kind === 'break' || kind === 'collapse';
+    const breakHit = kind === 'break' || kind === 'break-weak' || kind === 'collapse';
+    const weakHit = kind === 'weak' || kind === 'break-weak';
     pushCapped(impactBursts, CAP.impactBursts, {
       x, y, r:Math.max(3, spd * 0.45),
-      maxR:breakHit ? Math.min(92, 38 + spd * 2.4) : kind === 'immune' ? 42 : Math.min(58, 24 + spd * 1.5),
+      maxR:breakHit ? Math.min(92, 38 + spd * 2.4) : kind === 'immune' ? 42 : weakHit ? Math.min(72, 32 + spd * 1.8) : Math.min(58, 24 + spd * 1.5),
       life:1, decay:breakHit ? 0.095 : 0.16,
-      col, thick:breakHit ? 4 : kind === 'immune' ? 2.5 : 3,
-      kind,
+      col:weakHit ? '#ffcf70' : col, thick:breakHit ? 4 : weakHit ? 4 : kind === 'immune' ? 2.5 : 3,
+      kind, weak:weakHit,
     });
   }
   function spawnRingCrack(x, y) {
@@ -1911,13 +1912,22 @@ function traitGlowColor(block) {
     const actualAmount = amount * resist;
     if (actualAmount <= 0) return;
 
+    const load=supportLoad(block,idx);
+    const weakHit=block.marked||load>1;
     block.hp -= actualAmount;
-    block.shake=1.15; block.hitFlash=1;
+    if (gs.booha) gs.booha.damageThisShot=Math.max(gs.booha.damageThisShot,actualAmount);
+    block.shake=weakHit?1.45:1.15; block.hitFlash=1;
+    block.compressY=Math.max(block.compressY||0,weakHit?8:3);
     const mat=block.material, m=MAT[mat]||MAT.wood;
     spawnSparks(hx, hy, mat, spd, ~~(6+spd*0.5));
     spawnWave(hx, hy, m.spark, 35+spd*2);
-    spawnImpact(hx, hy, m.spark, spd, block.hp<=0 ? 'break' : 'hit');
-    if (spd>10) addShake(Math.min(6, spd*0.4));
+    spawnImpact(hx, hy, m.spark, spd, block.hp<=0 ? (weakHit?'break-weak':'break') : (weakHit?'weak':'hit'));
+    if (weakHit) {
+      spawnWave(hx,hy,'#ffcf70',Math.min(76,42+spd*1.5));
+      gs.hitStop=Math.max(gs.hitStop,2);
+      gs.flash=Math.max(gs.flash,0.5);
+      addShake(Math.min(8,spd*0.5+2));
+    } else if (spd>10) addShake(Math.min(6, spd*0.4));
     if (block.hp<=0) {
       block.broken=true; gs.brokenBlocks++;
       gs.pct=(gs.brokenBlocks/gs.totalBlocks)*100;
@@ -2337,6 +2347,9 @@ function traitGlowColor(block) {
       gs.cardMeta = [failMeta, lostStreak > 1 ? `STREAK ENDED ×${lostStreak}` : ''].filter(Boolean).join('  ·  ');
       gs.cardMetaGood = gs.nearMiss;
     } else {
+      if (gs.booha && gs.booha.damageThisShot <= 0) {
+        setToast('MISS · AIM FOR THE LOAD', '#aab8c4', 1100);
+      }
       gs.shotLock=false;
       advanceSelector();
       const remaining=bst.stocks.reduce((a,v)=>a+v,0);
@@ -2517,6 +2530,7 @@ function traitGlowColor(block) {
     const remaining=bst.stocks.reduce((a,v)=>a+v,0);
     gs.isLastBooha=remaining===0;
     if(gs.isLastBooha){addShake(5);gs.timeScale=0.8;}
+    spawnWave(SLING_X,SLING_Y,ROSTER[bst.sel]?.conf?.cols?.[0]||'#7cfff8',26);
     sndLaunch();
   }
 
@@ -2907,9 +2921,17 @@ function traitGlowColor(block) {
       ctx.globalAlpha=clamp(p.life,0,1)*0.9;
       ctx.strokeStyle=p.col;ctx.lineWidth=p.thick*(0.65+0.35*p.life);
       ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.stroke();
-      if(p.kind==='break'){
+      if(p.kind==='break'||p.kind==='break-weak'){
         ctx.globalAlpha*=0.55;ctx.lineWidth=1.5;
         ctx.beginPath();ctx.arc(p.x,p.y,Math.max(2,p.r*0.58),0,Math.PI*2);ctx.stroke();
+      }
+      if(p.weak){
+        ctx.globalAlpha*=0.7;ctx.lineWidth=1.5;
+        const tick=Math.max(5,p.r*0.32),gap=Math.max(7,p.r*0.58);
+        ctx.beginPath();
+        ctx.moveTo(p.x-gap,p.y-tick);ctx.lineTo(p.x-gap,p.y-tick-4);ctx.lineTo(p.x-gap+4,p.y-tick-4);
+        ctx.moveTo(p.x+gap,p.y+tick);ctx.lineTo(p.x+gap,p.y+tick+4);ctx.lineTo(p.x+gap-4,p.y+tick+4);
+        ctx.stroke();
       }
     }
     for(const p of sparks){
