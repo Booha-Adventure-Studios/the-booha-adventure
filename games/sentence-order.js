@@ -9,8 +9,8 @@
    - Correct sequence (nothing overlaps):
        chips go green → ding plays → ding.onended fires →
        sparkles + dance → sentence audio plays → advance
-   - No feedback text shown on a normal correct answer; assisted answers are labelled.
-   - One-use PRE-CHECK validates the whole sentence without revealing positions.
+   - No feedback text shown on a normal correct answer; recovery answers are labelled.
+   - Wrong positions auto-clear for an immediate half-credit recovery attempt.
    - Cards can provide acceptedAnswers for alternate valid word orders.
    - LISTEN replaced with themed speaker SVG circle button.
    - First placed word capitalised; last placed word gets period.
@@ -145,13 +145,13 @@ function displayChip(token, isFirst, isLast) {
 let allCards = U.shuffle(CFG.cards.slice(0, 15));
 
 const TIERS = [
-  { min:0,  max:5,  sound:'result_0-5.mp3',
+  { min:0,  max:5.5,  sound:'result_0-5.mp3',
     label:'TRY AGAIN', en:"Sentences are tricky — keep at it!",
     jp:'文は難しい！あきらめないで！', kanji:'文章は難しい！諦めないで！', color:'#ef4444' },
-  { min:6,  max:10, sound:'result_6-10.mp3',
+  { min:6,  max:10.5, sound:'result_6-10.mp3',
     label:'KEEP GOING', en:"Good effort! The order is clicking!",
     jp:'いい感じ！もっと練習しよう！', kanji:'良い調子！もっと練習しよう！', color:'#f97316' },
-  { min:11, max:14, sound:'result_11-14.mp3',
+  { min:11, max:14.5, sound:'result_11-14.mp3',
     label:'SO CLOSE!', en:"Your word order is really flowing!",
     jp:'ほぼペラペラ！惜しい！', kanji:'ほぼ流暢！惜しい！', color:'#22ddff' },
   { min:15, max:15, sound:'result_15.mp3',
@@ -159,6 +159,7 @@ const TIERS = [
     jp:'パーフェクト！全問正解！', kanji:'完璧！全問正解！', color:'#ffcc00' },
 ];
 const getTier = s => TIERS.find(t => s >= t.min && s <= t.max) ?? TIERS[0];
+const formatScore = s => Number.isInteger(s) ? String(s) : s.toFixed(1);
 
 /* ══════════════════════════════════════════════════════════════
    LABEL HELPERS
@@ -235,7 +236,7 @@ S.textContent = `
 }
 .so-dot.active{ background:var(--game-primary); border-color:var(--game-primary); box-shadow:0 0 8px var(--game-primary); }
 .so-dot.done{ background:#22c55e; border-color:#22c55e; box-shadow:0 0 7px rgba(34,197,94,.7); }
-.so-dot.assisted{ background:#ffcc00; border-color:#ffcc00; box-shadow:0 0 7px rgba(255,204,0,.7); }
+.so-dot.recovered{ background:#ffcc00; border-color:#ffcc00; box-shadow:0 0 7px rgba(255,204,0,.7); }
 [data-curriculum="pb"] .so-dot{ background:rgba(255,110,180,.15); border-color:rgba(255,110,180,.25); }
 
 /* ── HUD pills ── */
@@ -318,6 +319,15 @@ body.hira-mode .so-jp-hira{ display:block; }
   letter-spacing:.1em; text-transform:uppercase; color:rgba(255,255,255,.2); pointer-events:none;
 }
 [data-curriculum="pb"] .so-answer-empty-hint{ color:rgba(58,26,46,.25); }
+
+/* Fixed positions keep correct words anchored during recovery. */
+.so-answer-slot{
+  display:inline-flex; align-items:center; justify-content:center;
+  min-width:clamp(42px,10vw,72px); height:clamp(34px,8vw,46px);
+  border-radius:12px; border:2px dashed rgba(255,255,255,.22);
+  background:rgba(255,255,255,.025); flex:0 0 auto;
+}
+[data-curriculum="pb"] .so-answer-slot{ border-color:rgba(204,136,255,.42); background:rgba(204,136,255,.06); }
 
 /* ── placed word chip ── */
 .so-placed-chip{
@@ -491,24 +501,6 @@ body.hira-mode .so-hira-icon{ transform:rotate(180deg); }
 @keyframes soClearIn{ from{ transform:scale(0) rotate(-12deg); opacity:0; } to{ transform:none; opacity:1; } }
 .so-clear-btn:hover{ background:rgba(239,68,68,.22); border-color:#ef4444; transform:scale(1.05) rotate(-2deg); }
 .so-clear-btn:active{ transform:scale(.93); }
-
-/* PRE-CHECK — one whole-sentence assist per item */
-.so-precheck-btn{
-  font-family:var(--game-font-title); font-size:clamp(11px,2.1vw,14px); letter-spacing:.05em;
-  padding:10px 15px; border-radius:999px;
-  border:2px solid rgba(255,204,0,.42); background:rgba(255,204,0,.1);
-  color:#ffcc00; font-weight:900; cursor:pointer; white-space:nowrap;
-  transition:transform .15s, background .18s, border-color .18s, opacity .2s;
-  -webkit-tap-highlight-color:transparent;
-}
-.so-precheck-btn.ready{ animation:soPrecheckPulse 1.7s ease-in-out infinite; }
-.so-precheck-btn.ready:hover{ background:rgba(255,204,0,.22); border-color:#ffcc00; transform:scale(1.04); }
-.so-precheck-btn.ready:active{ transform:scale(.94); }
-.so-precheck-btn:disabled{ opacity:.32; pointer-events:none; animation:none; }
-@keyframes soPrecheckPulse{
-  0%,100%{ box-shadow:0 0 0 rgba(255,204,0,0); }
-  50%{ box-shadow:0 0 18px rgba(255,204,0,.25); }
-}
 
 /* ── SPEAKER button — themed circle ── */
 .so-speaker-btn{
@@ -688,7 +680,7 @@ body.hira-mode .so-hira-icon{ transform:rotate(180deg); }
 }
 @keyframes soScorePop{ from{ transform:scale(.55) rotate(-6deg); opacity:0; } 50%{ transform:scale(1.08) rotate(2deg); } to{ transform:none; opacity:1; } }
 .so-res-pct{ font-size:clamp(11px,2.1vw,15px); color:var(--game-muted); font-weight:700; margin-bottom:9px; animation:soFadeUp .4s ease .5s both; }
-.so-res-assisted{ font-size:clamp(11px,2vw,14px); color:var(--game-muted); font-weight:800; margin-bottom:12px; animation:soFadeUp .4s ease .54s both; }
+.so-res-recovery{ font-size:clamp(11px,2vw,14px); color:var(--game-muted); font-weight:800; margin-bottom:12px; animation:soFadeUp .4s ease .54s both; }
 .so-res-label{
   font-family:var(--game-font-title); font-size:clamp(21px,5vw,36px);
   background:linear-gradient(90deg,#ff2288,#ffcc00,#aaff22,#22ddff,#cc88ff,#ff2288);
@@ -754,7 +746,6 @@ U.mount(`
       <span id="so-hira-label">ひらがな</span>
     </button>
     <button class="so-clear-btn"   id="so-clear">CLEAR</button>
-    <button class="so-precheck-btn" id="so-precheck" disabled>PRE-CHECK</button>
     <button class="so-speaker-btn" id="so-speaker" aria-label="Listen">${SPEAKER_SVG}</button>
     <button class="so-check-btn"   id="so-check" disabled>CHECK</button>
     <button class="so-help-btn"    id="so-help">?</button>
@@ -764,7 +755,7 @@ U.mount(`
     <div class="so-res-inner">
       <div class="so-res-score" id="so-rs"></div>
       <div class="so-res-pct"   id="so-rp"></div>
-      <div class="so-res-assisted" id="so-ra"></div>
+      <div class="so-res-recovery" id="so-ra"></div>
       <div class="so-res-label" id="so-rl"></div>
       <div class="so-res-divider"></div>
       <div class="so-res-en"    id="so-re"></div>
@@ -797,12 +788,20 @@ U.mount(`
         <div class="so-how-jp">置いた単語をタップすると戻るよ。できたらCHECK！</div>
       </div></div>
       <div class="so-how-step"><div class="so-how-num">4</div><div>
-        <div class="so-how-en">When all words are placed, PRE-CHECK gives you one whole-sentence check. It does not reveal the answer.</div>
-        <div class="so-how-jp">単語を全部置いたら、PRE-CHECKを1回使えるよ。答えは表示されません。</div>
+        <div class="so-how-en">Press CHECK when ready. First try = 1 point; recovery = 0.5 point.</div>
+        <div class="so-how-jp">できたらCHECK！一発正解は1ポイント、やり直しは0.5ポイント。</div>
       </div></div>
       <div class="so-how-step"><div class="so-how-num">5</div><div>
-        <div class="so-how-en">After 3 regular wrong tries the speaker button appears — tap to hear the sentence!</div>
-        <div class="so-how-jp">通常のチェックを3回まちがえると、スピーカーで文を聞けるよ！</div>
+        <div class="so-how-en">Wrong words shake and return to the bank. Correct positions stay in place.</div>
+        <div class="so-how-jp">まちがった単語はゆれて、もどります。正しい場所はそのままです。</div>
+      </div></div>
+      <div class="so-how-step"><div class="so-how-num">6</div><div>
+        <div class="so-how-en">After a wrong try the speaker button appears — tap to hear the sentence.</div>
+        <div class="so-how-jp">まちがえるとスピーカーボタンが出ます。文を聞いてみよう。</div>
+      </div></div>
+      <div class="so-how-step"><div class="so-how-num">7</div><div>
+        <div class="so-how-en">After three tough sentences, a Recovery Boost can restore half a lost point.</div>
+        <div class="so-how-jp">3問たいへんだったら、リカバリーブーストで半分もどせるよ。</div>
       </div></div>
       <div class="so-how-step"><div class="so-how-num">あ</div><div>
         <div class="so-how-en">Press あ to switch between kanji and hiragana.</div>
@@ -828,7 +827,6 @@ const tilesEl    = document.getElementById('so-tiles');
 const feedbackEl = document.getElementById('so-feedback');
 const checkBtn   = document.getElementById('so-check');
 const clearBtn   = document.getElementById('so-clear');
-const precheckBtn = document.getElementById('so-precheck');
 const speakerBtn = document.getElementById('so-speaker');
 const helpBtn    = document.getElementById('so-help');
 const hiraBtn    = document.getElementById('so-hira-toggle');
@@ -879,12 +877,16 @@ let currentCard = null;
 let tokens      = [];
 let placed      = [];
 let tileEls     = [];
-let firstTry    = true;
 let locked      = false;
 let wrongCount  = 0;
-let precheckUsed = false;
-let assistedCount = 0;
-const assistedItems = new Set();
+let recoveryActive = false;
+let pendingLoss = 0;
+let difficultStreak = 0;
+let recoveryBank = 0;
+let recoveryBoostReady = false;
+let recoveredCount = 0;
+let recoveryBoostCount = 0;
+const recoveredItems = new Set();
 let lastCheckAt = 0;
 const CHECK_DEBOUNCE = 700;
 
@@ -905,7 +907,7 @@ function acceptedSentences(card) {
 }
 
 function placedSentence() {
-  return placed.map(origIdx => tokens[origIdx]?.raw || '').join(' ');
+  return placed.map(origIdx => origIdx == null ? '' : (tokens[origIdx]?.raw || '')).join(' ');
 }
 
 function isAcceptedOrder(card) {
@@ -913,20 +915,29 @@ function isAcceptedOrder(card) {
   return acceptedSentences(card).includes(answer);
 }
 
-function updateAnswerControls() {
-  const complete = placed.length === tokens.length && tokens.length > 0;
-  checkBtn.disabled = !complete;
-  const canPrecheck = complete && !precheckUsed && !locked;
-  precheckBtn.classList.toggle('ready', canPrecheck);
-  precheckBtn.disabled = !canPrecheck;
+function renderScore() {
+  scoreEl.textContent = formatScore(score);
 }
 
-function markAssisted() {
-  firstTry = false;
-  if (!assistedItems.has(idx)) {
-    assistedItems.add(idx);
-    assistedCount++;
-  }
+function armRecoveryBoostIfReady() {
+  if (difficultStreak >= 3 && recoveryBank > 0) recoveryBoostReady = true;
+}
+
+function applyRecoveryBoost() {
+  if (!recoveryBoostReady || recoveryBank <= 0 || score >= allCards.length) return 0;
+  const bonus = Math.min(0.5, recoveryBank, allCards.length - score);
+  score += bonus;
+  recoveryBank -= bonus;
+  recoveryBoostReady = false;
+  difficultStreak = 0;
+  recoveryBoostCount++;
+  renderScore();
+  return bonus;
+}
+
+function updateAnswerControls() {
+  const complete = placed.length === tokens.length && tokens.length > 0 && placed.every(v => v != null);
+  checkBtn.disabled = !complete;
 }
 
 function updateDots() {
@@ -934,7 +945,7 @@ function updateDots() {
     const d = document.getElementById(`so-d${i}`);
     if (!d) continue;
     d.className = 'so-dot' + (
-      i < idx ? (assistedItems.has(i) ? ' assisted' : ' done') :
+      i < idx ? (recoveredItems.has(i) ? ' recovered' : ' done') :
       i === idx ? ' active' : ''
     );
   }
@@ -944,14 +955,12 @@ function updateDots() {
    SHOW CARD
    ══════════════════════════════════════════════════════════════ */
 function showCard() {
-  locked = false; firstTry = true; wrongCount = 0; precheckUsed = false; placed = [];
+  locked = false; wrongCount = 0; recoveryActive = false; pendingLoss = 0;
   feedbackEl.textContent = ''; feedbackEl.style.color = '';
   clearBtn.classList.remove('visible');
-  precheckBtn.classList.remove('ready');
   speakerBtn.classList.remove('visible');
   speakerBtn.disabled = false;
   checkBtn.disabled = true;
-  precheckBtn.disabled = true;
 
   currentCard = allCards[idx];
   numEl.textContent  = idx + 1;
@@ -959,6 +968,7 @@ function showCard() {
   hiraEl.textContent = currentCard.hira || '';
   updateDots();
   tokens = tokenise(currentCard.en);
+  placed = new Array(tokens.length).fill(null);
   buildTiles();
   renderAnswer();
   updateAnswerControls();
@@ -998,8 +1008,10 @@ function buildTiles() {
    ══════════════════════════════════════════════════════════════ */
 function handleTileTap(tile, origIdx) {
   if (locked || tile.classList.contains('used')) return;
+  const slotIndex = placed.indexOf(null);
+  if (slotIndex === -1) return;
   tile.classList.add('used');
-  placed.push(origIdx);
+  placed[slotIndex] = origIdx;
   renderAnswer();
   updateAnswerControls();
 }
@@ -1012,13 +1024,22 @@ function renderAnswer() {
     if (!el.classList.contains('so-answer-empty-hint')) el.remove();
   });
 
-  emptyHint.style.display = placed.length === 0 ? '' : 'none';
-  answerEl.classList.toggle('has-words', placed.length > 0);
+  const hasWords = placed.some(origIdx => origIdx != null);
+  emptyHint.style.display = hasWords ? 'none' : '';
+  answerEl.classList.toggle('has-words', hasWords);
 
   const n = tokens.length;
   placed.forEach((origIdx, pi) => {
+    if (origIdx == null) {
+      if (!recoveryActive) return;
+      const slot = document.createElement('span');
+      slot.className = 'so-answer-slot';
+      slot.setAttribute('aria-hidden', 'true');
+      answerEl.appendChild(slot);
+      return;
+    }
     const isFirst = pi === 0;
-    const isLast  = pi === placed.length - 1 && placed.length === n;
+    const isLast  = pi === placed.length - 1 && placed.every(v => v != null) && placed.length === n;
     const label   = displayChip(tokens[origIdx], isFirst, isLast);
 
     const chip = document.createElement('button');
@@ -1040,7 +1061,8 @@ function renderAnswer() {
 function handleChipTap(pi) {
   if (locked) return;
   const origIdx = placed[pi];
-  placed.splice(pi, 1);
+  if (origIdx == null) return;
+  placed[pi] = null;
   if (tileEls[origIdx]) tileEls[origIdx].classList.remove('used');
   renderAnswer();
   updateAnswerControls();
@@ -1049,167 +1071,162 @@ function handleChipTap(pi) {
 /* ── clear ── */
 clearBtn.addEventListener('click', () => {
   if (locked) return;
-  placed.forEach(origIdx => { if (tileEls[origIdx]) tileEls[origIdx].classList.remove('used'); });
-  placed = [];
+  placed.forEach(origIdx => { if (origIdx != null && tileEls[origIdx]) tileEls[origIdx].classList.remove('used'); });
+  placed = new Array(tokens.length).fill(null);
   renderAnswer();
   feedbackEl.textContent = '';
   updateAnswerControls();
 });
 
 /* ══════════════════════════════════════════════════════════════
-   CHECK
-   Correct sequence — nothing overlaps:
-   1. chips go green (staggered)
-   2. ding plays
-   3. ding.onended → sparkles + dance chips
-   4. after dance → sentence audio
-   5. audio.onended → advance
+   CHECK / TWO-STRIKE RECOVERY
    ══════════════════════════════════════════════════════════════ */
+function resolveCorrect(chips) {
+  locked = true;
+  updateAnswerControls();
+
+  chips.forEach((chip, i) => {
+    setTimeout(() => {
+      chip.classList.remove('so-wrong');
+      chip.classList.add('so-correct');
+    }, i * 55);
+  });
+
+  const isRecovery = recoveryActive;
+  const bankBefore = recoveryBank;
+  if (isRecovery) {
+    recoveredItems.add(idx);
+    recoveredCount++;
+    score += 0.5;
+    recoveryBank += pendingLoss;
+    pendingLoss = 0;
+    armRecoveryBoostIfReady();
+    feedbackEl.textContent = 'NICE RECOVERY +0.5';
+    feedbackEl.style.color = '#ffcc00';
+  } else {
+    score += 1;
+    difficultStreak = 0;
+    feedbackEl.textContent = '';
+  }
+  renderScore();
+
+  if (bankBefore > 0) {
+    const boost = applyRecoveryBoost();
+    if (boost) {
+      feedbackEl.textContent = `RECOVERY BOOST +${formatScore(boost)}`;
+      feedbackEl.style.color = '#ffcc00';
+    }
+  }
+  updateDots();
+
+  setTimeout(() => {
+    U.playSFX('ding', () => {
+      if (!isRecovery) fireSparkles(answerEl, false);
+
+      Array.from(answerEl.querySelectorAll('.so-placed-chip')).forEach((chip, i) => {
+        setTimeout(() => {
+          chip.classList.add('so-dance');
+          chip.addEventListener('animationend', () => chip.classList.remove('so-dance'), { once: true });
+        }, i * 50);
+      });
+
+      const danceMs = chips.length * 50 + 280;
+      setTimeout(() => {
+        playAudio(currentCard.mp3, () => {
+          setTimeout(() => {
+            idx++;
+            if (idx >= allCards.length) showResults();
+            else showCard();
+          }, 300);
+        });
+      }, danceMs);
+    });
+  }, chips.length * 55 + 20);
+}
+
+function resolveWrong() {
+  locked = true;
+  updateAnswerControls();
+  const isFinalAttempt = recoveryActive;
+  wrongCount++;
+
+  if (isFinalAttempt) {
+    recoveryBank += pendingLoss + 0.5;
+    pendingLoss = 0;
+  } else {
+    recoveryActive = true;
+    pendingLoss = 0.5;
+    difficultStreak++;
+  }
+  armRecoveryBoostIfReady();
+
+  clearBtn.classList.add('visible');
+  if (wrongCount >= 1) speakerBtn.classList.add('visible');
+
+  const chips = Array.from(answerEl.querySelectorAll('.so-placed-chip'));
+  chips.forEach(chip => {
+    const pi = Number(chip.dataset.pi);
+    setTimeout(() => {
+      chip.classList.remove('so-correct');
+      chip.classList.add(placed[pi] === pi ? 'so-correct' : 'so-wrong');
+    }, pi * 55);
+  });
+
+  feedbackEl.textContent = isFinalAttempt
+    ? 'Tough one — the answer is shown, then we move on.'
+    : 'Good — fix the shaking words for 0.5 point!';
+  feedbackEl.style.color = isFinalAttempt ? '#ffcc00' : '#ef4444';
+  U.playSFX('fart');
+
+  const settleMs = tokens.length * 55 + 620;
+  setTimeout(() => {
+    if (isFinalAttempt) {
+      placed = tokens.map((_, i) => i);
+      tileEls.forEach(tile => tile.classList.add('used'));
+      renderAnswer();
+      Array.from(answerEl.querySelectorAll('.so-placed-chip')).forEach((chip, i) => {
+        setTimeout(() => {
+          chip.classList.remove('so-wrong');
+          chip.classList.add('so-correct');
+        }, i * 45);
+      });
+      setTimeout(() => {
+        idx++;
+        if (idx >= allCards.length) showResults();
+        else showCard();
+      }, 950);
+      return;
+    }
+
+    placed.forEach((origIdx, pi) => {
+      if (origIdx != null && origIdx !== pi) {
+        if (tileEls[origIdx]) tileEls[origIdx].classList.remove('used');
+        placed[pi] = null;
+      }
+    });
+    renderAnswer();
+    locked = false;
+    updateAnswerControls();
+  }, settleMs);
+}
+
 checkBtn.addEventListener('click', () => {
   if (locked) return;
   const now = Date.now();
   if (now - lastCheckAt < CHECK_DEBOUNCE) return;
   lastCheckAt = now;
 
-  if (placed.length < tokens.length) {
+  if (!placed.every(v => v != null)) {
     feedbackEl.textContent = 'Place all the words first!';
     feedbackEl.style.color = '#ffaa00';
     return;
   }
 
-  const n = tokens.length;
-  const correct = isAcceptedOrder(currentCard);
-
-  const chips = Array.from(answerEl.querySelectorAll('.so-placed-chip'));
-
-  if (correct) {
-    locked = true;
-    updateAnswerControls();
-
-    /* 1. chips green */
-    chips.forEach((chip, i) => {
-      setTimeout(() => {
-        chip.classList.remove('so-wrong');
-        chip.classList.add('so-correct');
-      }, i * 55);
-    });
-
-    /* no feedback text on correct */
-    feedbackEl.textContent = '';
-
-    if (firstTry) { score++; scoreEl.textContent = score; }
-    updateDots();
-
-    /* 2. ding after chips */
-    setTimeout(() => {
-      U.playSFX('ding', () => {
-        /* 3. sparkles */
-        if (firstTry) fireSparkles(answerEl, false);
-
-        /* 3. dance */
-        Array.from(answerEl.querySelectorAll('.so-placed-chip')).forEach((chip, i) => {
-          setTimeout(() => {
-            chip.classList.add('so-dance');
-            chip.addEventListener('animationend', () => chip.classList.remove('so-dance'), { once: true });
-          }, i * 50);
-        });
-
-        /* 4 & 5. sentence audio → advance */
-        const danceMs = chips.length * 50 + 280;
-        setTimeout(() => {
-          playAudio(currentCard.mp3, () => {
-            setTimeout(() => {
-              idx++;
-              if (idx >= allCards.length) showResults();
-              else showCard();
-            }, 300);
-          });
-        }, danceMs);
-      });
-    }, chips.length * 55 + 20);
-
+  if (isAcceptedOrder(currentCard)) {
+    resolveCorrect(Array.from(answerEl.querySelectorAll('.so-placed-chip')));
   } else {
-    locked = true; firstTry = false; wrongCount++;
-    updateAnswerControls();
-    clearBtn.classList.add('visible');
-    if (wrongCount >= 3) speakerBtn.classList.add('visible');
-
-    chips.forEach((chip, pi) => {
-      const placedOi = placed[pi];
-      setTimeout(() => {
-        chip.classList.remove('so-correct');
-        chip.classList.add(placedOi === pi ? 'so-correct' : 'so-wrong');
-      }, pi * 55);
-    });
-
-    feedbackEl.textContent = 'Try again!';
-    feedbackEl.style.color = '#ef4444';
-    U.playSFX('fart');
-
-    setTimeout(() => { locked = false; }, chips.length * 55 + 620);
+    resolveWrong();
   }
-});
-
-/* PRE-CHECK — one whole-sentence assist, with no position-by-position reveal. */
-precheckBtn.addEventListener('click', () => {
-  if (locked || precheckUsed || placed.length < tokens.length) return;
-  precheckUsed = true;
-  markAssisted();
-  updateAnswerControls();
-
-  const correct = isAcceptedOrder(currentCard);
-  const chips = Array.from(answerEl.querySelectorAll('.so-placed-chip'));
-
-  if (correct) {
-    locked = true;
-    updateAnswerControls();
-    chips.forEach((chip, i) => {
-      setTimeout(() => {
-        chip.classList.remove('so-wrong');
-        chip.classList.add('so-correct');
-      }, i * 55);
-    });
-
-    feedbackEl.textContent = 'ASSISTED — 0 POINTS';
-    feedbackEl.style.color = '#ffcc00';
-    updateDots();
-
-    setTimeout(() => {
-      U.playSFX('ding', () => {
-        Array.from(answerEl.querySelectorAll('.so-placed-chip')).forEach((chip, i) => {
-          setTimeout(() => {
-            chip.classList.add('so-dance');
-            chip.addEventListener('animationend', () => chip.classList.remove('so-dance'), { once: true });
-          }, i * 50);
-        });
-
-        const danceMs = chips.length * 50 + 280;
-        setTimeout(() => {
-          playAudio(currentCard.mp3, () => {
-            setTimeout(() => {
-              idx++;
-              if (idx >= allCards.length) showResults();
-              else showCard();
-            }, 300);
-          });
-        }, danceMs);
-      });
-    }, chips.length * 55 + 20);
-    return;
-  }
-
-  /* PRE-CHECK does not identify individual word positions. */
-  chips.forEach(chip => chip.classList.remove('so-correct', 'so-wrong'));
-  locked = true;
-  updateAnswerControls();
-  clearBtn.classList.add('visible');
-  feedbackEl.textContent = 'Not yet — rearrange and try again!';
-  feedbackEl.style.color = '#ffcc00';
-  U.playSFX('fart');
-  setTimeout(() => {
-    locked = false;
-    updateAnswerControls();
-  }, 620);
 });
 
 /* ══════════════════════════════════════════════════════════════
@@ -1268,10 +1285,10 @@ function showResults() {
   document.querySelector('.so-hud').style.display       = 'none';
   /* .so-dots-row intentionally kept visible — shows all-done state */
 
-  /* Mark all dots done, preserving assisted items in amber */
+  /* Mark all dots done, preserving recovered items in amber */
   for (let i = 0; i < 15; i++) {
     const d = document.getElementById(`so-d${i}`);
-    if (d) d.className = `so-dot ${assistedItems.has(i) ? 'assisted' : 'done'}`;
+    if (d) d.className = `so-dot ${recoveredItems.has(i) ? 'recovered' : 'done'}`;
   }
 
   /* Show results card */
@@ -1287,15 +1304,16 @@ function showResults() {
       saveId:    `${CFG.curriculum}:sentence_order`,
       score:     pct,
       completed: true,
-      assisted: assistedCount,
+      recovered: recoveredCount,
+      recoveryBoosts: recoveryBoostCount,
     }
   }));
 
   /* Populate scorecard */
   results.style.setProperty('--tier-color', tier.color);
-  document.getElementById('so-rs').textContent = `${score} / ${total}`;
-  document.getElementById('so-rp').textContent = `${pct}% first-try accuracy`;
-  document.getElementById('so-ra').textContent = `${total} / ${total} completed • ${assistedCount} assisted`;
+  document.getElementById('so-rs').textContent = `${formatScore(score)} / ${total}`;
+  document.getElementById('so-rp').textContent = `${pct}% score`;
+  document.getElementById('so-ra').textContent = `${total} / ${total} completed • ${recoveredCount} recovered • ${recoveryBoostCount} boosts`;
   document.getElementById('so-rl').textContent = tier.label;
   document.getElementById('so-re').textContent = tier.en;
   document.getElementById('so-rj').textContent = tier.jp;
@@ -1319,8 +1337,14 @@ function showResults() {
     /* Reset state */
     idx   = 0;
     score = 0;
-    assistedCount = 0;
-    assistedItems.clear();
+    recoveryActive = false;
+    pendingLoss = 0;
+    difficultStreak = 0;
+    recoveryBank = 0;
+    recoveryBoostReady = false;
+    recoveredCount = 0;
+    recoveryBoostCount = 0;
+    recoveredItems.clear();
     scoreEl.textContent = '0';
     document.body.classList.remove('hira-mode');
     hiraMode = false;
