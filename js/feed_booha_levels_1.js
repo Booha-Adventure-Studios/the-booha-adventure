@@ -52,17 +52,18 @@ const FEED_BOOHA_LEVELS = [
   },
 
   // Level 4 — Bounce pad (trajectory + platform)
-  // Fixed: the candy launches right after the cut, so the pad must sit in
-  // its real flight path and Booha must wait on the landing side.
+  // Fixed: this is the first bounce lesson. The pad gives a small rightward
+  // launch so the candy leaves the pad instead of bouncing in place forever.
   {
     id: 4, parCuts: 1,
     candy: { x: 180, y: 230 },
-    booha: { x: 420, y: 800, behavior: 'idle' },
+    booha: { x: 300, y: 800, behavior: 'idle' },
+    launchVx: 0,
     ropes: [
       { id: 'r1', anchor: { x: 180, y: 110 }, type: 'normal' }
     ],
     objects: [
-      { type: 'bounce', x: 360, y: 580, width: 240, height: 20 }
+      { type: 'bounce', x: 180, y: 580, width: 140, height: 20, pushX: 3.5 }
     ]
   },
 

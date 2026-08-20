@@ -435,6 +435,48 @@ canvas {
   margin-top: 14px;
   flex-wrap: wrap;
 }
+.message-actions .ui-btn--ghost {
+  color: rgba(255,255,255,0.86);
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.25);
+  min-width: 92px;
+}
+.message-actions .ui-btn--ghost:hover,
+.message-actions .ui-btn--ghost:focus-visible {
+  background: rgba(255,255,255,0.17);
+  border-color: rgba(255,255,255,0.5);
+}
+
+.bottom-actions {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 68px;
+  z-index: 12;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  pointer-events: none;
+}
+.bottom-actions .ui-btn { pointer-events: auto; }
+.bottom-action-btn {
+  padding: 5px 10px;
+  border-radius: 9px;
+  font-size: 10px;
+  background: rgba(0,0,0,0.48);
+  border-color: rgba(255,255,255,0.22);
+}
+.bottom-exit-btn { border-color: rgba(255,150,205,0.35); }
+.restart-confirm-btn {
+  color: #d9f4ff;
+  border-color: rgba(130,220,255,0.45);
+  background: rgba(70,165,210,0.16);
+}
+.restart-confirm-btn:hover,
+.restart-confirm-btn:focus-visible {
+  background: rgba(70,165,210,0.28);
+  border-color: rgba(180,240,255,0.75);
+}
 
 /* ── In-overlay star rating ──────────────────────── */
 #starRating {
@@ -566,6 +608,8 @@ canvas {
   .hud-pill { font-size: 10px; padding: 4px 7px; }
   .hud-label { font-size: 8px; }
   .hud-stars { padding-left: 8px; padding-right: 8px; }
+  .bottom-actions { left: 7px; right: 7px; gap: 4px; }
+  .bottom-action-btn { padding-left: 7px; padding-right: 7px; }
   .overlay-card { padding-left: 18px; padding-right: 18px; }
   .overlay-card h2 { font-size: 26px; }
 }

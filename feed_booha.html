@@ -95,7 +95,7 @@
         </div>
         <div class="topbar-actions">
           <button id="helpBtn"    class="ui-btn" type="button" aria-label="How to play / あそびかた">?</button>
-          <button id="restartBtn" class="ui-btn" type="button" aria-label="Restart / リスタート">&#8635;</button>
+          <button id="restartBtn" class="ui-btn" type="button" aria-label="Restart level / レベルをリスタート">&#8635;</button>
         </div>
       </header>
 
@@ -123,6 +123,15 @@
           <span class="hud-star-count" id="totalStars">0</span>
         </div>
       </section>
+
+      <nav class="bottom-actions" aria-label="Game controls / ゲーム操作">
+        <button id="bottomRestartBtn" class="ui-btn bottom-action-btn" type="button">
+          <span class="button-en">Restart Game</span><span class="button-ja">ゲームを最初から</span>
+        </button>
+        <button id="bottomExitBtn" class="ui-btn bottom-action-btn bottom-exit-btn" type="button">
+          <span class="button-en">Exit Game</span><span class="button-ja">ゲームを終了</span>
+        </button>
+      </nav>
 
       <!-- ═══════════════════════════════
            START OVERLAY
@@ -211,6 +220,17 @@
           <div class="message-actions">
             <button id="confirmExitBtn" class="ui-btn exit-confirm-btn" type="button"><span class="button-en">Exit</span><span class="button-ja">終了</span></button>
             <button id="cancelExitBtn" class="ui-btn ui-btn--ghost" type="button"><span class="button-en">Keep playing</span><span class="button-ja">続ける</span></button>
+          </div>
+        </div>
+      </section>
+
+      <section id="restartConfirmOverlay" class="overlay" aria-label="Restart confirmation / リスタート確認" aria-hidden="true">
+        <div class="overlay-card overlay-card--small" role="dialog" aria-modal="true" aria-labelledby="restartConfirmTitle">
+          <h2 id="restartConfirmTitle"><span class="popup-en">Restart game?</span><span class="popup-ja">ゲームを最初から？</span></h2>
+          <p><span class="popup-en">Your current run will reset. Best scores stay saved.</span><span class="popup-ja">今のプレイをリセットします。ベストスコアは保存されます。</span></p>
+          <div class="message-actions">
+            <button id="confirmRestartBtn" class="ui-btn restart-confirm-btn" type="button"><span class="button-en">Restart Game</span><span class="button-ja">最初から</span></button>
+            <button id="cancelRestartBtn" class="ui-btn ui-btn--ghost" type="button"><span class="button-en">Keep playing</span><span class="button-ja">続ける</span></button>
           </div>
         </div>
       </section>

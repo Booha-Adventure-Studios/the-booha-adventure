@@ -169,11 +169,19 @@ PYEOF
 fi
 
 # ── 8. Feed Booha level fairness guardrails ─────────────────
-echo "[8/8] Feed Booha level audit"
+echo "[8/9] Feed Booha level audit"
 if node tests/feed-level-audit.cjs >/dev/null 2>&1; then
   ok "Feed Booha geometry and timing guardrails pass"
 else
   bad "Feed Booha level audit failed"
+fi
+
+# ── 9. Feed Booha playability simulation ────────────────────
+echo "[9/9] Feed Booha playability simulation"
+if node tests/feed-playability-audit.cjs >/dev/null 2>&1; then
+  ok "Feed Booha has a simulated successful feed path for all 50 levels"
+else
+  bad "Feed Booha playability simulation failed"
 fi
 
 # ── Summary ──────────────────────────────────────────────────
