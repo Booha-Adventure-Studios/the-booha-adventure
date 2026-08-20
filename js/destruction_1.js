@@ -64,8 +64,13 @@
     frameMs: 0,
     updateMs: 0,
     renderMs: 0,
+    frames: 0,
+    maxFrameMs: 0,
     qualityChanges: 0,
   };
+  let needsRender = true;
+  let staticRenderKey = '';
+  let toastWasVisible = false;
 
   // ── Canvas ──────────────────────────────────────────
   const canvas = document.getElementById(CFG.canvasId || 'gameCanvas');
@@ -74,6 +79,14 @@
   canvas.width  = W;
   canvas.height = H;
   let backgroundCache = null;
+  let playBackgroundCache = null;
+  const tintedBackgroundCache = new Map();
+  let viewportBackdropCache = null;
+  let viewportBackdropHeight = 0;
+  let hudMeterGradient = null;
+  let hudMeterGradientWidth = 0;
+  let goalGradient = null;
+  let goalGradientWidth = 0;
   let VIEW_H = H;
   let SCENE_Y = 0;
   let FULL_BLEED = false;
@@ -506,6 +519,7 @@
     gs.toast = message;
     gs.toastAccent = accent;
     gs.toastUntil = performance.now() + duration;
+    needsRender = true;
   }
 
   function drawToast() {
@@ -875,6 +889,7 @@
     if (imagePromises.has(src)) return imagePromises.get(src);
     const promise = new Promise(res => {
       const img = new Image();
+      img.decoding = 'async';
       img.onload = () => res(img); img.onerror = () => res(null); img.src = src;
     });
     imagePromises.set(src, promise);
@@ -887,11 +902,13 @@
     return img;
   }
   async function preload() {
-    gs.imgs.bg = await loadImg(ASSETS.bg);
+    const bgPromise = loadImg(ASSETS.bg);
     // The selector is visible as soon as a round starts, so every available
     // Booha needs to be ready before the first frame. Lazy loading here made
     // the roster look like broken placeholders on fast transitions.
-    await Promise.all(ROSTER.map((_, index) => ensureRosterImage(index)));
+    const rosterPromise = Promise.all(ROSTER.map((_, index) => ensureRosterImage(index)));
+    gs.imgs.bg = await bgPromise;
+    await rosterPromise;
     preloadAudio();
     buildBackgroundCache();
   }
@@ -2492,19 +2509,32 @@ function traitGlowColor(block) {
       c.fillStyle=g;c.fillRect(0,0,W,H);
     }
     c.fillStyle='rgba(0,0,0,0.18)';c.fillRect(0,H-80,W,80);
+
+    // The playfield uses a quieter version of the same art. Bake that veil
+    // once instead of painting a full-screen translucent rectangle every
+    // frame on the iPad-sized canvas.
+    playBackgroundCache=document.createElement('canvas');
+    playBackgroundCache.width=W;playBackgroundCache.height=H;
+    const play=playBackgroundCache.getContext('2d');
+    play.drawImage(backgroundCache,0,0);
+    play.fillStyle='rgba(5,10,10,0.24)';play.fillRect(0,0,W,H);
   }
   function drawBG(){
     buildBackgroundCache();
-    ctx.drawImage(backgroundCache,0,0);
-    // The forest is a title-screen asset; during play it needs a quieter
-    // treatment so the Booha, structure, and trajectory become the heroes.
-    if(gs.phase===P.PLAY){
-      ctx.fillStyle='rgba(5,10,10,0.24)';
-      ctx.fillRect(0,0,W,H);
-    }
-    if(gs.phase!==P.TITLE&&gs.phase!==P.HALL&&currentLevel().chapterTint){
-      ctx.fillStyle=currentLevel().chapterTint;
-      ctx.fillRect(0,0,W,H);
+    const isPlay=gs.phase===P.PLAY;
+    const tint=gs.phase!==P.TITLE&&gs.phase!==P.HALL ? currentLevel().chapterTint : '';
+    const base=isPlay ? playBackgroundCache : backgroundCache;
+    if (tint) {
+      const key=`${isPlay?'play':'base'}:${tint}`;
+      let tinted=tintedBackgroundCache.get(key);
+      if (!tinted) {
+        tinted=document.createElement('canvas');tinted.width=W;tinted.height=H;
+        const c=tinted.getContext('2d');c.drawImage(base,0,0);c.fillStyle=tint;c.fillRect(0,0,W,H);
+        tintedBackgroundCache.set(key,tinted);
+      }
+      ctx.drawImage(tinted,0,0);
+    } else {
+      ctx.drawImage(base,0,0);
     }
     if(gs.nightmareFlicker){
       const flk=(gs.nightmareFlickerTimer%8<4)?0.18:0;
@@ -2513,25 +2543,29 @@ function traitGlowColor(block) {
   }
   function drawViewportBackdrop(){
     if(!FULL_BLEED)return;
-    ctx.fillStyle='#081014';
-    ctx.fillRect(0,0,W,VIEW_H);
-    const g=ctx.createLinearGradient(0,0,0,VIEW_H);
-    g.addColorStop(0,'rgba(10,22,25,0.95)');
-    g.addColorStop(0.5,'rgba(3,8,12,0.5)');
-    g.addColorStop(1,'rgba(8,15,18,0.95)');
-    ctx.fillStyle=g;
-    ctx.fillRect(0,0,W,VIEW_H);
-    ctx.fillStyle='rgba(124,255,248,0.09)';
-    ctx.fillRect(0,SCENE_Y,W,1);
-    ctx.fillRect(0,SCENE_Y+H-1,W,1);
+    if (!viewportBackdropCache || viewportBackdropHeight !== VIEW_H) {
+      viewportBackdropCache=document.createElement('canvas');
+      viewportBackdropCache.width=W;viewportBackdropCache.height=VIEW_H;
+      viewportBackdropHeight=VIEW_H;
+      const c=viewportBackdropCache.getContext('2d');
+      c.fillStyle='#081014';c.fillRect(0,0,W,VIEW_H);
+      const g=c.createLinearGradient(0,0,0,VIEW_H);
+      g.addColorStop(0,'rgba(10,22,25,0.95)');
+      g.addColorStop(0.5,'rgba(3,8,12,0.5)');
+      g.addColorStop(1,'rgba(8,15,18,0.95)');
+      c.fillStyle=g;c.fillRect(0,0,W,VIEW_H);
+      c.fillStyle='rgba(124,255,248,0.09)';
+      c.fillRect(0,SCENE_Y,W,1);c.fillRect(0,SCENE_Y+H-1,W,1);
+    }
+    ctx.drawImage(viewportBackdropCache,0,0);
   }
   function drawScorchMarks(){
     for(const s of scorchMarks){
       if(offscreen(s.x,s.y,s.r))continue;
-      ctx.save();ctx.globalAlpha=s.life*0.55;
-      const sg=ctx.createRadialGradient(s.x,s.y,0,s.x,s.y,s.r);
-      sg.addColorStop(0,'rgba(0,0,0,0.8)');sg.addColorStop(0.5,'rgba(80,20,0,0.4)');sg.addColorStop(1,'rgba(0,0,0,0)');
-      ctx.fillStyle=sg;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fill();ctx.restore();
+      ctx.save();ctx.globalAlpha=s.life*0.46;ctx.fillStyle='#20140d';
+      ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fill();
+      ctx.globalAlpha=s.life*0.22;ctx.strokeStyle='#c75b22';ctx.lineWidth=2;
+      ctx.beginPath();ctx.arc(s.x,s.y,s.r*0.72,0,Math.PI*2);ctx.stroke();ctx.restore();
     }
   }
   function drawSling(){
@@ -2539,15 +2573,13 @@ function traitGlowColor(block) {
     const baseX=SLING_X,baseY=FLOOR_Y+4,topY=SLING_Y-52,lx=SLING_X-26,rx=SLING_X+26;
     ctx.save();ctx.lineCap='round';ctx.lineJoin='round';
     ctx.beginPath();ctx.ellipse(baseX,baseY+7,14,5,0,0,Math.PI*2);ctx.fillStyle='rgba(0,0,0,0.3)';ctx.fill();
-    const wg=ctx.createLinearGradient(baseX-18,0,baseX+18,0);
-    wg.addColorStop(0,'#3a2210');wg.addColorStop(0.35,'#5c3318');wg.addColorStop(0.65,'#6e3e1e');wg.addColorStop(1,'#3a2210');
     for(const[sx,ex]of[[-6,lx],[6,rx]]){
       ctx.beginPath();ctx.moveTo(baseX+sx,baseY);ctx.quadraticCurveTo(baseX+sx*4.5,baseY-80,ex,topY);
       ctx.lineWidth=18;ctx.strokeStyle='#2a1608';ctx.stroke();
-      ctx.lineWidth=13;ctx.strokeStyle=wg;ctx.stroke();
+      ctx.lineWidth=13;ctx.strokeStyle='#5c3318';ctx.stroke();
     }
     ctx.beginPath();ctx.moveTo(baseX,baseY);ctx.lineTo(baseX,baseY-45);
-    ctx.lineWidth=20;ctx.strokeStyle='#2a1608';ctx.stroke();ctx.lineWidth=15;ctx.strokeStyle=wg;ctx.stroke();
+    ctx.lineWidth=20;ctx.strokeStyle='#2a1608';ctx.stroke();ctx.lineWidth=15;ctx.strokeStyle='#5c3318';ctx.stroke();
     ctx.globalAlpha=0.18;ctx.strokeStyle='#e8a060';ctx.lineWidth=2;
     for(const[gsx,gex]of[[-3,lx+2],[3,rx-2]]){ctx.beginPath();ctx.moveTo(baseX+gsx,baseY-10);ctx.quadraticCurveTo(baseX+gsx*8,baseY-75,gex,topY+10);ctx.stroke();}
     ctx.globalAlpha=1;
@@ -2564,9 +2596,7 @@ function traitGlowColor(block) {
       ctx.beginPath();ctx.moveTo(lx,topY);ctx.lineTo(bx,by);ctx.stroke();
       ctx.beginPath();ctx.moveTo(rx,topY);ctx.lineTo(bx,by);ctx.stroke();
       ctx.globalAlpha=1;
-      const eg=ctx.createLinearGradient(lx,topY,bx,by);
-      eg.addColorStop(0,'#8b5a30');eg.addColorStop(0.5,'#c07838');eg.addColorStop(1,'#8b5a30');
-      ctx.strokeStyle=eg;ctx.lineWidth=bw;
+      ctx.strokeStyle='#b06e35';ctx.lineWidth=bw;
       ctx.beginPath();ctx.moveTo(lx,topY);ctx.lineTo(bx,by);ctx.stroke();
       ctx.beginPath();ctx.moveTo(rx,topY);ctx.lineTo(bx,by);ctx.stroke();
       if(!gs.dragging){ctx.fillStyle='#5c3018';ctx.strokeStyle='#3a1e08';ctx.lineWidth=1.5;ctx.beginPath();ctx.ellipse(bx,by,12,9,0,0,Math.PI*2);ctx.fill();ctx.stroke();}
@@ -2671,10 +2701,12 @@ function traitGlowColor(block) {
 
   // v4: drawBlocks — adds trait glow border on immune/resistant blocks
   function drawBlocks(){
+    const glowTime=performance.now();
     for(let i=0;i<gs.blocks.length;i++){
       const block=gs.blocks[i];
       if(offscreen(block.x,block.y,Math.max(block.w,block.h)))continue;
-      const sx=(rnd()-0.5)*8*block.shake,sy=(rnd()-0.5)*6*block.shake;
+      const sx=block.shake ? (rnd()-0.5)*8*block.shake : 0;
+      const sy=block.shake ? (rnd()-0.5)*6*block.shake : 0;
       const compY=block.compressY||0;
       const bx=block.x-block.w/2,by=block.y-block.h/2+compY,bw=block.w,bh=block.h-compY;
 
@@ -2707,7 +2739,7 @@ function traitGlowColor(block) {
       if (!block.broken) {
         const glowCol = traitGlowColor(block);
         if (glowCol) {
-          const pulse = 0.45 + 0.35 * Math.sin(performance.now() * 0.004 + i);
+          const pulse = LOW_POWER ? 0.62 : 0.45 + 0.35 * Math.sin(glowTime * 0.004 + i);
           ctx.save();
           ctx.globalAlpha = pulse * 0.72;
           ctx.strokeStyle = glowCol;
@@ -2750,19 +2782,19 @@ function traitGlowColor(block) {
     }
   }
 
+  const TRAJ_POINTS = Array.from({length:22}, () => ({x:0,y:0}));
   function drawTraj(){
     if(!gs.dragging||!gs.booha)return;
     const b=gs.booha;
     let tx=b.x,ty=b.y,tvx=(SLING_X-b.x)*0.19,tvy=(SLING_Y-b.y)*0.19;
-    const points=[];
     for(let i=0;i<22;i++){
       tvy+=GRAVITY;tvx*=AIR;tvy*=AIR;tx+=tvx;ty+=tvy;
-      points.push({x:tx,y:ty});
+      TRAJ_POINTS[i].x=tx;TRAJ_POINTS[i].y=ty;
     }
     const accent=ROSTER[bst.sel]?.conf?.cols?.[0] || '#7cfff8';
     ctx.save();
-    for(let i=0;i<points.length;i++){
-      const point=points[i], fade=(1-i/points.length)*0.72;
+    for(let i=0;i<TRAJ_POINTS.length;i++){
+      const point=TRAJ_POINTS[i], fade=(1-i/TRAJ_POINTS.length)*0.72;
       const radius=Math.max(1.8,5.5-i*0.2);
       // A dark keyline keeps the guide visible over bright forest and blocks.
       ctx.globalAlpha=fade*0.85;ctx.fillStyle='rgba(0,0,0,0.72)';
@@ -2770,27 +2802,30 @@ function traitGlowColor(block) {
       ctx.globalAlpha=fade;ctx.fillStyle=accent;
       ctx.beginPath();ctx.arc(point.x,point.y,radius,0,Math.PI*2);ctx.fill();
     }
-    const end=points[points.length-1];
+    const end=TRAJ_POINTS[TRAJ_POINTS.length-1];
     if(end){
       ctx.globalAlpha=0.82;ctx.strokeStyle=accent;ctx.lineWidth=2;
       ctx.beginPath();ctx.arc(end.x,end.y,11,0,Math.PI*2);ctx.stroke();
       ctx.globalAlpha=0.5;ctx.beginPath();ctx.moveTo(end.x-17,end.y);ctx.lineTo(end.x+17,end.y);ctx.moveTo(end.x,end.y-17);ctx.lineTo(end.x,end.y+17);ctx.stroke();
     }
     const pull=clamp(Math.hypot(b.x-SLING_X,b.y-SLING_Y)/MAX_PULL,0,1);
-    const meterX=SLING_X-58,meterY=SLING_Y+56,meterW=116,meterH=28;
+    const meterX=SLING_X+64,meterY=FLOOR_Y-58,meterW=138,meterH=28;
     ctx.globalAlpha=0.9;ctx.fillStyle='rgba(5,8,14,0.84)';ctx.strokeStyle='rgba(255,255,255,0.28)';ctx.lineWidth=1;
     rr(ctx,meterX,meterY,meterW,meterH,9,true,true);
     ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='rgba(255,255,255,0.86)';ctx.font='bold 9px system-ui,sans-serif';
-    ctx.fillText('POWER / ちから',SLING_X,meterY+8);
+    ctx.fillText('POWER / ちから',meterX+meterW/2,meterY+8);
     ctx.fillStyle='rgba(255,255,255,0.16)';rr(ctx,meterX+10,meterY+16,meterW-20,5,3,true,false);
-    const pg=ctx.createLinearGradient(meterX+10,0,meterX+meterW-10,0);pg.addColorStop(0,'#44ffcc');pg.addColorStop(0.7,'#ffdf44');pg.addColorStop(1,'#ff5555');
-    ctx.fillStyle=pg;rr(ctx,meterX+10,meterY+16,(meterW-20)*pull,5,3,true,false);
+    if (!hudMeterGradient || hudMeterGradientWidth !== meterW) {
+      hudMeterGradient=ctx.createLinearGradient(meterX+10,0,meterX+meterW-10,0);
+      hudMeterGradient.addColorStop(0,'#44ffcc');hudMeterGradient.addColorStop(0.7,'#ffdf44');hudMeterGradient.addColorStop(1,'#ff5555');
+      hudMeterGradientWidth=meterW;
+    }
+    ctx.fillStyle=hudMeterGradient;rr(ctx,meterX+10,meterY+16,(meterW-20)*pull,5,3,true,false);
     ctx.restore();
   }
   function drawGround(){
-    ctx.save();const g=ctx.createLinearGradient(0,FLOOR_Y-8,0,FLOOR_Y+20);
-    g.addColorStop(0,'rgba(255,255,255,0.28)');g.addColorStop(1,'rgba(255,255,255,0)');
-    ctx.fillStyle=g;ctx.fillRect(0,FLOOR_Y-8,W,16);ctx.restore();
+    ctx.fillStyle='rgba(255,255,255,0.18)';ctx.fillRect(0,FLOOR_Y-6,W,3);
+    ctx.fillStyle='rgba(255,255,255,0.06)';ctx.fillRect(0,FLOOR_Y-3,W,7);
   }
   function drawFXBehind(){
     for(const d of dusts){if(offscreen(d.x,d.y||0,d.r))continue;ctx.globalAlpha=d.life*0.22;ctx.beginPath();ctx.arc(d.x,d.y||0,d.r,0,Math.PI*2);ctx.fillStyle='rgba(200,190,180,0.5)';ctx.fill();}
@@ -2913,8 +2948,12 @@ function traitGlowColor(block) {
     ctx.save();ctx.fillStyle='rgba(5,8,14,0.82)';ctx.strokeStyle='rgba(255,255,255,0.24)';ctx.lineWidth=1.5;rr(ctx,104,10,headerW,80,12,true,true);ctx.restore();
     ctx.save();ctx.fillStyle='rgba(0,0,0,0.42)';ctx.strokeStyle='rgba(255,255,255,0.2)';ctx.lineWidth=1;rr(ctx,barX-4,barY-3,barW+8,15,7,true,true);
     ctx.fillStyle='rgba(255,255,255,0.2)';rr(ctx,barX,barY,barW,9,5,true,false);
-    const pg=ctx.createLinearGradient(barX,0,barX+barW,0);pg.addColorStop(0,'#ff7cfb');pg.addColorStop(0.5,'#7cfff8');pg.addColorStop(1,'#ffdf80');
-    ctx.fillStyle=pg;rr(ctx,barX,barY,barW*clamp(gs.pct/100,0,1),9,5,true,false);ctx.restore();
+    if (!goalGradient || goalGradientWidth !== barW) {
+      goalGradient=ctx.createLinearGradient(barX,0,barX+barW,0);
+      goalGradient.addColorStop(0,'#ff7cfb');goalGradient.addColorStop(0.5,'#7cfff8');goalGradient.addColorStop(1,'#ffdf80');
+      goalGradientWidth=barW;
+    }
+    ctx.fillStyle=goalGradient;rr(ctx,barX,barY,barW*clamp(gs.pct/100,0,1),9,5,true,false);ctx.restore();
 
     ctx.save();ctx.fillStyle='rgba(8,6,16,0.86)';ctx.strokeStyle='rgba(255,255,255,0.22)';ctx.lineWidth=1.5;rr(ctx,14,12,84,62,12,true,true);ctx.restore();
     ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='rgba(255,255,255,0.6)';ctx.font='bold 9px system-ui,sans-serif';ctx.fillText('ROUND / ラウンド',56,27);
@@ -3157,14 +3196,33 @@ function traitGlowColor(block) {
         physicsCarry-=FIXED_STEP;steps++;
         if(gs.phase!==P.PLAY){physicsCarry=0;break;}
       }
-    } else {
+    } else if (gs.phase===P.WIN || gs.phase===P.FAIL) {
       physicsCarry=0;
       updateFX();
+    } else {
+      physicsCarry=0;
+      // Menus and briefings are static. Only keep the loop alive while a
+      // toast is fading; otherwise they cost a full canvas render every frame.
+      if (gs.toast && performance.now() < gs.toastUntil) updateFX();
     }
     const updateMs = performance.now() - workStart;
-    const renderStart = performance.now();
-    render();
-    adaptPerformance(frameMs, updateMs, performance.now() - renderStart);
+    const animated = gs.phase===P.PLAY || gs.phase===P.WIN || gs.phase===P.FAIL;
+    const renderKey = `${gs.phase}:${gs.roundN}:${gs.cardTitle}`;
+    const toastVisible = !!(gs.toast && performance.now() < gs.toastUntil);
+    const shouldRender = animated || needsRender || staticRenderKey !== renderKey ||
+      toastVisible || toastWasVisible;
+    let renderMs = 0;
+    if (shouldRender) {
+      const renderStart = performance.now();
+      render();
+      renderMs = performance.now() - renderStart;
+      needsRender = false;
+      staticRenderKey = renderKey;
+    }
+    toastWasVisible = toastVisible;
+    PERF.frames++;
+    PERF.maxFrameMs=Math.max(PERF.maxFrameMs,frameMs);
+    adaptPerformance(frameMs, updateMs, renderMs);
     requestAnimationFrame(tick);
   }
 
@@ -3172,6 +3230,13 @@ function traitGlowColor(block) {
   function resize(){
     const vw=window.innerWidth,vh=window.innerHeight;
     const viewportRatio=vw/Math.max(1,vh);
+    viewportBackdropCache=null;
+    viewportBackdropHeight=0;
+    hudMeterGradient=null;
+    hudMeterGradientWidth=0;
+    goalGradient=null;
+    goalGradientWidth=0;
+    needsRender=true;
     FULL_BLEED=viewportRatio < W/H;
     if(FULL_BLEED){
       VIEW_H=Math.max(H,Math.round(W/viewportRatio));
