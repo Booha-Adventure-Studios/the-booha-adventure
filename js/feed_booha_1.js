@@ -26,6 +26,7 @@
   const startBtn       = document.getElementById('startBtn');
   const restartBtn     = document.getElementById('restartBtn');
   const retryBtn       = document.getElementById('retryBtn');
+  const continueBtn    = document.getElementById('continueBtn');
   const nextBtn        = document.getElementById('nextBtn');
   const helpBtn        = document.getElementById('helpBtn');
   const closeHelpBtn   = document.getElementById('closeHelpBtn');
@@ -39,11 +40,13 @@
   const scoreTextEl    = document.getElementById('scoreText');
   const levelStarsEl   = document.getElementById('levelStarsText');
   const bestScoreEl    = document.getElementById('bestScoreText');
+  const continueStatusEl = document.getElementById('continueStatusText');
 
   const GAME_ID           = 'bonus:feed_booha';
   const LEVEL_BASE_SCORE  = 1000;
   const LEVEL_STAR_BONUS  = 250;
   const EXTRA_CUT_PENALTY = 150;
+  const MAX_CONTINUES     = 3;
   const TOTAL_LEVELS      = LEVELS.length;
   const DEBUG_MODE        = new URLSearchParams(window.location.search).has('debug')
     || window.FEED_BOOHA_DEBUG === true;
@@ -437,7 +440,7 @@
     booha: null, boohaSprite: 'booWait',
     effectTimers: [], lastTime: 0,
     bounceCooldown: 0,
-    pendingSuccessTimeout: null, pendingFailTimeout: null, pendingFailTimeout2: null, 
+    pendingSuccessTimeout: null, pendingFailTimeout: null,
     bouncePattern: null,
     shakeFrames: 0, shakeAmt: 0,
     trail: [],
@@ -448,7 +451,9 @@
     campaignStartedAt: 0,
     campaignScore: 0,
     campaignStars: 0,
-    campaignComplete: false
+    campaignComplete: false,
+    continuesLeft: MAX_CONTINUES,
+    continueAssist: false
   };
 
   const DEFAULT_PROGRESS = () => ({
@@ -463,6 +468,8 @@
     completedLevels: [],
     attempts: 0,
     campaignComplete: false,
+    continuesChapter: 1,
+    continuesLeft: MAX_CONTINUES,
     lastPlayedAt: null
   });
 
@@ -503,6 +510,8 @@
     next.bestScore = Math.max(0, Number(next.bestScore) || 0);
     next.totalStars = Math.max(0, Number(next.totalStars) || 0);
     next.attempts = Math.max(0, Number(next.attempts) || 0);
+    next.continuesChapter = Math.max(1, Number(next.continuesChapter) || 1);
+    next.continuesLeft = Math.max(0, Math.min(MAX_CONTINUES, Number(next.continuesLeft) || 0));
     return next;
   }
 
@@ -536,6 +545,21 @@
     if (scoreTextEl) scoreTextEl.textContent = String(Math.round(state.campaignScore || 0));
     if (totalStarsEl) totalStarsEl.textContent = String(feedProgress.totalStars || 0);
     if (bestScoreEl) bestScoreEl.textContent = `Best score / ベストスコア: ${Math.round(feedProgress.bestScore || 0)}`;
+    if (continueStatusEl) continueStatusEl.textContent = `Continues / コンティニュー: ${state.continuesLeft} / ${MAX_CONTINUES}`;
+  }
+
+  function chapterForLevel(index) {
+    return Math.floor(index / 10) + 1;
+  }
+
+  function ensureChapterContinues(index) {
+    const chapter = chapterForLevel(index);
+    if (feedProgress.continuesChapter !== chapter) {
+      feedProgress.continuesChapter = chapter;
+      feedProgress.continuesLeft = MAX_CONTINUES;
+    }
+    state.continuesLeft = Math.max(0, Math.min(MAX_CONTINUES, Number(feedProgress.continuesLeft) || 0));
+    syncProgressHud();
   }
 
   function hydrateProgress() {
@@ -553,6 +577,7 @@
     state.campaignScore = feedProgress.currentScore;
     state.campaignStars = feedProgress.currentStars;
     state.campaignComplete = !!feedProgress.campaignComplete;
+    ensureChapterContinues(state.levelIndex);
     persistenceReady = true;
     syncProgressHud();
   }
@@ -594,7 +619,6 @@
   function stopAllTimers() {
     if (state.pendingSuccessTimeout) { clearTimeout(state.pendingSuccessTimeout); state.pendingSuccessTimeout = null; }
     if (state.pendingFailTimeout)    { clearTimeout(state.pendingFailTimeout);    state.pendingFailTimeout    = null; }
-    if (state.pendingFailTimeout2) { clearTimeout(state.pendingFailTimeout2); state.pendingFailTimeout2 = null; }
     for (const id of state.effectTimers) clearTimeout(id);
     state.effectTimers = [];
     for (const id of Object.values(state.cutTimers)) clearTimeout(id);
@@ -707,7 +731,7 @@
   // ─────────────────────────────────────────────────
   // Level build
   // ─────────────────────────────────────────────────
-  function buildLevel(index) {
+  function buildLevel(index, options = {}) {
     stopAllTimers();
     poofEffects.length = 0;
     confetti.length    = 0;
@@ -734,6 +758,9 @@
     state.boohaJumpFrame  = 0;
     state.fallSoundPlayed = false;
     state.perfectTextLife = 0;
+    state.continueAssist = !!options.assist;
+
+    ensureChapterContinues(index);
 
     updateHudStars();
 
@@ -820,6 +847,18 @@
   }
 
   function resetLevel() { buildLevel(state.levelIndex); }
+
+  function useContinue() {
+    if (state.continuesLeft <= 0 || state.won) return;
+    state.continuesLeft--;
+    feedProgress.continuesLeft = state.continuesLeft;
+    feedProgress.lastPlayedAt = Date.now();
+    writeFeedProgress();
+    hideMessage();
+    // A continue is a protected restart: Booha's pull is stronger for this attempt.
+    buildLevel(state.levelIndex, { assist: true });
+  }
+
   function resetCampaign() {
     state.levelIndex = 0;
     state.campaignScore = 0;
@@ -850,12 +889,29 @@
     messageText.textContent  = text;
     const stars = starsForCuts(cutCount, hitBounce);
     nextBtn.style.display  = nextVisible ? 'inline-flex' : 'none';
+    if (continueBtn) continueBtn.style.display = 'none';
+    if (continueStatusEl) continueStatusEl.style.display = 'none';
     nextBtn.textContent = state.campaignComplete
       ? 'Play Again / もう一度'
       : 'Next / 次へ';
     retryBtn.style.display = (!nextVisible || stars < 3) ? 'inline-flex' : 'none';
     if (nextVisible) showStars(cutCount, hitBounce);
     else if (starContainer) starContainer.innerHTML = '';
+    messageOverlay.classList.add('overlay--show');
+    messageOverlay.setAttribute('aria-hidden', 'false');
+  }
+
+  function showFailureMessage() {
+    messageTitle.textContent = 'Oops! / ざんねん！';
+    messageText.textContent = 'Booha missed the candy. Retry for free, or use a continue for a helpful restart. / ブーハがキャンディを逃がしたよ。無料でもう一度やるか、コンティニューでたすけモードを使おう。';
+    nextBtn.style.display = 'none';
+    retryBtn.style.display = 'inline-flex';
+    if (continueBtn) continueBtn.style.display = state.continuesLeft > 0 ? 'inline-flex' : 'none';
+    if (continueStatusEl) {
+      continueStatusEl.textContent = `Continues / コンティニュー: ${state.continuesLeft} / ${MAX_CONTINUES}`;
+      continueStatusEl.style.display = 'block';
+    }
+    if (starContainer) starContainer.innerHTML = '';
     messageOverlay.classList.add('overlay--show');
     messageOverlay.setAttribute('aria-hidden', 'false');
   }
@@ -925,8 +981,10 @@
     if (!state.booha || state.won || state.lost) return;
     const c = state.candy, m = boohaMouthPoint();
     const dx = m.x - c.x, dy = m.y - c.y, dist = Math.hypot(dx, dy);
-    if (dist > MAGNET_DIST || dist < 1) return;
-    const str = MAGNET_FORCE * (1 - dist / MAGNET_DIST);
+    const magnetDist = state.continueAssist ? MAGNET_DIST * 1.7 : MAGNET_DIST;
+    const magnetForce = state.continueAssist ? MAGNET_FORCE * 1.8 : MAGNET_FORCE;
+    if (dist > magnetDist || dist < 1) return;
+    const str = magnetForce * (1 - dist / magnetDist);
     c.vx += (dx/dist) * str; c.vy += (dy/dist) * str;
   }
 
@@ -1092,8 +1150,7 @@
     setHud(state.levelIndex+1, 'Miss');
     playSfxMiss();
     state.pendingFailTimeout = setTimeout(() => {
-    showMessage('Oops!', 'Booha missed the candy.', false);
-    state.pendingFailTimeout2 = setTimeout(() => { hideMessage(); resetLevel(); }, 1400);
+      showFailureMessage();
     }, 300);
   }
 
@@ -1397,6 +1454,7 @@
     startBtn.addEventListener('click', startGame);
     restartBtn.addEventListener('click', resetLevel);
     retryBtn.addEventListener('click', () => { hideMessage(); resetLevel(); });
+    continueBtn?.addEventListener('click', useContinue);
     nextBtn.addEventListener('click', nextLevel);
     helpBtn.addEventListener('click', () => toggleHelp(true));
     closeHelpBtn.addEventListener('click', () => toggleHelp(false));
