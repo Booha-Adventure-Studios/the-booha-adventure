@@ -1506,6 +1506,27 @@ function traitGlowColor(block) {
     return false;
   }
 
+  // Visual-only companion to isBlockSupported(). It exposes where the stack
+  // is carrying weight so the player can read a collapse before committing a
+  // shot. This is intentionally cheap: the levels contain only a few dozen
+  // blocks, and it runs only while the playfield is being drawn.
+  function supportLoad(block, idx) {
+    if (block.broken || block.falling) return 0;
+    const myLeft=block.x-block.w/2, myRight=block.x+block.w/2;
+    const myTop=block.y-block.h/2;
+    let load=0;
+    for(let i=0;i<gs.blocks.length;i++){
+      if(i===idx)continue;
+      const above=gs.blocks[i];
+      if(above.broken||above.falling)continue;
+      const aboveBottom=above.y+above.h/2;
+      if(Math.abs(aboveBottom-myTop)>16)continue;
+      const overlap=Math.min(myRight,above.x+above.w/2)-Math.max(myLeft,above.x-above.w/2);
+      if(overlap>=Math.min(block.w,above.w)*SUPPORT_OVERLAP)load++;
+    }
+    return load;
+  }
+
   function checkSupport() {
     let changed = true;
     while (changed) {
@@ -2744,6 +2765,7 @@ function traitGlowColor(block) {
       const sy=block.shake ? (rnd()-0.5)*6*block.shake : 0;
       const compY=block.compressY||0;
       const bx=block.x-block.w/2,by=block.y-block.h/2+compY,bw=block.w,bh=block.h-compY;
+      const load=supportLoad(block,i);
 
       ctx.save();
       ctx.globalAlpha = block.broken ? 0.28 : (block.falling ? 0.88 : 1);
@@ -2763,6 +2785,13 @@ function traitGlowColor(block) {
       if(!block.broken&&!block.falling){
         ctx.save();ctx.globalAlpha=0.22;ctx.fillStyle='#071014';
         ctx.beginPath();ctx.ellipse(block.x,by+bh+3,Math.max(8,bw*0.34),3,0,0,Math.PI*2);ctx.fill();ctx.restore();
+      }
+      if(load>0&&!block.broken){
+        const emphasis=gs.dragging||load>1;
+        ctx.save();ctx.globalAlpha=emphasis?0.78:0.42;
+        ctx.fillStyle=load>1?'#ffcf70':'#7cfff8';
+        rr(ctx,bx+8,by+bh+6,Math.min(bw-16,12+load*18),3,2,true,false);
+        ctx.restore();
       }
       if(block.burning&&!block.broken){ctx.save();ctx.globalAlpha=(block.burnTimer/120)*0.4;ctx.fillStyle='#ff6600';rr(ctx,bx-2,by-2,bw+4,bh+4,10,true,false);ctx.restore();}
       ctx.drawImage(getBlockTexture(block), bx, by, bw, bh);
