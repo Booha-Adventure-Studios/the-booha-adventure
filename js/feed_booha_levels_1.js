@@ -534,7 +534,7 @@ const FEED_BOOHA_LEVELS = [
       x: 350, y: 800,
       behavior: 'horizontal',
       range: { min: 160, max: 430 },
-      speed: 3.1
+      speed: 3.0
     },
     ropes: [
       { id: 'r1', anchor: { x: 130, y: 140 }, type: 'delayed', delayMs: 340 }
@@ -592,7 +592,7 @@ const FEED_BOOHA_LEVELS = [
       x: 390, y: 800,
       behavior: 'horizontal',
       range: { min: 220, max: 420 },
-      speed: 3.2
+      speed: 3.0
     },
     ropes: [
       { id: 'r1', anchor: { x: 150, y: 110 }, type: 'normal' }
@@ -620,7 +620,7 @@ const FEED_BOOHA_LEVELS = [
       x: 340, y: 800,
       behavior: 'horizontal',
       range: { min: 220, max: 430 },
-      speed: 3.2
+      speed: 3.0
     },
     ropes: [
       { id: 'r1', anchor: { x: 140, y: 125 }, type: 'delayed', delayMs: 300 },
@@ -654,13 +654,13 @@ const FEED_BOOHA_LEVELS = [
       x: 400, y: 800,
       behavior: 'horizontal',
       range: { min: 200, max: 420 },
-      speed: 3.4
+      speed: 3.0
     },
     ropes: [
       { id: 'r1', anchor: { x: 150, y: 110 }, type: 'normal' }
     ],
     objects: [
-      { type: 'bounce', x: 260, y: 600, width: 60, height: 20 },
+      { type: 'bounce', x: 260, y: 600, width: 80, height: 20 },
       { type: 'fan',    x: 320, y: 520, direction: 'right' }
     ]
   },
@@ -681,7 +681,7 @@ const FEED_BOOHA_LEVELS = [
       x: 230, y: 800,
       behavior: 'horizontal',
       range: { min: 140, max: 340 },
-      speed: 3.4
+      speed: 3.0
     },
     ropes: [
       { id: 'r1', anchor: { x: 240, y: 210 }, type: 'normal' },
@@ -707,7 +707,7 @@ const FEED_BOOHA_LEVELS = [
       x: 240, y: 800,
       behavior: 'horizontal',
       range: { min: 140, max: 360 },
-      speed: 3.6
+      speed: 3.0
     },
     ropes: [
       { id: 'r1', anchor: { x: 150, y: 120 }, type: 'delayed', delayMs: 280 },
@@ -735,7 +735,7 @@ const FEED_BOOHA_LEVELS = [
 
   // Level 40 — Double bounce staircase into moving Booha
   // Unchanged — two descending bounce pads walk candy rightward in a
-  // staircase. Moving Booha at speed 3.8 means the player must read
+  // staircase. Moving Booha at speed 3.0 means the player must read
   // the full travel time through both pads, not just the initial drop.
   // Demands forward planning across the whole chain.
   {
@@ -745,14 +745,14 @@ const FEED_BOOHA_LEVELS = [
       x: 360, y: 800,
       behavior: 'horizontal',
       range: { min: 160, max: 420 },
-      speed: 3.8
+      speed: 3.0
     },
     ropes: [
       { id: 'r1', anchor: { x: 180, y: 110 }, type: 'normal' }
     ],
     objects: [
-      { type: 'bounce', x: 260, y: 600, width: 60, height: 20 },
-      { type: 'bounce', x: 340, y: 520, width: 60, height: 20 }
+      { type: 'bounce', x: 260, y: 600, width: 80, height: 20 },
+      { type: 'bounce', x: 340, y: 520, width: 80, height: 20 }
     ]
   },
 
@@ -768,7 +768,7 @@ const FEED_BOOHA_LEVELS = [
       { id: 'r1', anchor: { x: 220, y: 110 }, type: 'delayed', delayMs: 300 }
     ],
     objects: [
-      { type: 'bounce', x: 300, y: 610, width: 60, height: 20 }
+      { type: 'bounce', x: 300, y: 610, width: 80, height: 20 }
     ]
   },
 
@@ -789,7 +789,7 @@ const FEED_BOOHA_LEVELS = [
       x: 350, y: 800,
       behavior: 'horizontal',
       range: { min: 230, max: 430 },
-      speed: 3.2
+      speed: 3.0
     },
     ropes: [
       { id: 'r1', anchor: { x: 140, y: 120 }, type: 'normal' },
@@ -808,7 +808,7 @@ const FEED_BOOHA_LEVELS = [
       { id: 'r1', anchor: { x: 150, y: 110 }, type: 'normal' }
     ],
     objects: [
-      { type: 'bounce', x: 235, y: 620, width: 60, height: 20 },
+      { type: 'bounce', x: 235, y: 620, width: 80, height: 20 },
       { type: 'fan',    x: 305, y: 540, direction: 'right' }
     ]
   },
@@ -836,7 +836,7 @@ const FEED_BOOHA_LEVELS = [
   },
 
   // Level 45 — Double fan carry into moving Booha
-  // Unchanged structurally, but speed reduced 4.2→3.4. Two fans already
+  // Unchanged structurally, but speed reduced 4.2→3.0. Two fans already
   // make this hard enough; the extra speed was making it a reflex test.
   {
     id: 45, parCuts: 1,
@@ -845,7 +845,7 @@ const FEED_BOOHA_LEVELS = [
       x: 400, y: 800,
       behavior: 'horizontal',
       range: { min: 200, max: 420 },
-      speed: 3.4
+      speed: 3.0
     },
     ropes: [
       { id: 'r1', anchor: { x: 140, y: 110 }, type: 'delayed', delayMs: 320 }
@@ -857,7 +857,7 @@ const FEED_BOOHA_LEVELS = [
   },
 
   // Level 46 — Tiny bounce, moving target
-  // Speed reduced 4.2→3.3. The 55px pad is already the real difficulty;
+  // Speed reduced 4.2→3.0. The widened pad keeps the challenge readable;
   // hitting it precisely while timing a moving Booha is enough.
   {
     id: 46, parCuts: 1,
@@ -866,13 +866,13 @@ const FEED_BOOHA_LEVELS = [
       x: 350, y: 800,
       behavior: 'horizontal',
       range: { min: 180, max: 420 },
-      speed: 3.3
+      speed: 3.0
     },
     ropes: [
       { id: 'r1', anchor: { x: 200, y: 110 }, type: 'normal' }
     ],
     objects: [
-      { type: 'bounce', x: 290, y: 610, width: 55, height: 20 }
+      { type: 'bounce', x: 290, y: 610, width: 80, height: 20 }
     ]
   },
 
@@ -889,7 +889,7 @@ const FEED_BOOHA_LEVELS = [
       { id: 'r2', anchor: { x: 310, y: 130 }, type: 'delayed', delayMs: 300 }
     ],
     objects: [
-      { type: 'bounce', x: 250, y: 620, width: 55, height: 20 },
+      { type: 'bounce', x: 250, y: 620, width: 80, height: 20 },
       { type: 'fan',    x: 315, y: 540, direction: 'right' }
     ]
   },
@@ -911,7 +911,7 @@ const FEED_BOOHA_LEVELS = [
       x: 230, y: 800,
       behavior: 'horizontal',
       range: { min: 140, max: 340 },
-      speed: 3.4
+      speed: 3.0
     },
     ropes: [
       { id: 'r1', anchor: { x: 145, y: 115 }, type: 'normal' },
@@ -922,7 +922,7 @@ const FEED_BOOHA_LEVELS = [
 
   // Level 49 — Narrow staircase route
   // Unchanged — three-step chain (bounce → bounce → fan) is already
-  // the hardest routing puzzle in the set. Speed reduced 4.3→3.3 so
+  // the hardest routing puzzle in the set. Speed reduced 4.3→3.0 so
   // the staircase timing is the challenge, not the reflex.
   {
     id: 49, parCuts: 1,
@@ -931,14 +931,14 @@ const FEED_BOOHA_LEVELS = [
       x: 400, y: 800,
       behavior: 'horizontal',
       range: { min: 220, max: 420 },
-      speed: 3.3
+      speed: 3.0
     },
     ropes: [
       { id: 'r1', anchor: { x: 150, y: 110 }, type: 'normal' }
     ],
     objects: [
-      { type: 'bounce', x: 235, y: 640, width: 55, height: 20 },
-      { type: 'bounce', x: 310, y: 540, width: 55, height: 20 },
+      { type: 'bounce', x: 235, y: 640, width: 80, height: 20 },
+      { type: 'bounce', x: 310, y: 540, width: 80, height: 20 },
       { type: 'fan',    x: 360, y: 470, direction: 'right' }
     ]
   },
@@ -953,7 +953,7 @@ const FEED_BOOHA_LEVELS = [
   // the fan, which carries it into Booha's right-side sweep. Cutting
   // r2 first idles too long — candy falls before the delayed snap and
   // misses the bounce pad entirely. One correct sequence, three elements
-  // all doing real work, speed kept at 3.5 so mastery — not reflexes —
+  // all doing real work, speed kept at 3.0 so mastery — not reflexes —
   // decides the final level.
   {
     id: 50, parCuts: 2,
@@ -962,14 +962,14 @@ const FEED_BOOHA_LEVELS = [
       x: 360, y: 800,
       behavior: 'horizontal',
       range: { min: 220, max: 430 },
-      speed: 3.5
+      speed: 3.0
     },
     ropes: [
       { id: 'r1', anchor: { x: 130, y: 120 }, type: 'normal' },
       { id: 'r2', anchor: { x: 370, y: 115 }, type: 'delayed', delayMs: 350 }
     ],
     objects: [
-      { type: 'bounce', x: 230, y: 600, width: 60, height: 20 },
+      { type: 'bounce', x: 230, y: 600, width: 80, height: 20 },
       { type: 'fan',    x: 300, y: 520, direction: 'right' }
     ]
   },
@@ -977,4 +977,3 @@ const FEED_BOOHA_LEVELS = [
 ];
 
 window.FEED_BOOHA_LEVELS = FEED_BOOHA_LEVELS;
-

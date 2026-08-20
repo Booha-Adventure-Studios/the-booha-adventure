@@ -45,6 +45,8 @@
   const LEVEL_STAR_BONUS  = 250;
   const EXTRA_CUT_PENALTY = 150;
   const TOTAL_LEVELS      = LEVELS.length;
+  const DEBUG_MODE        = new URLSearchParams(window.location.search).has('debug')
+    || window.FEED_BOOHA_DEBUG === true;
 
   let starContainer = null;
 
@@ -386,6 +388,44 @@
     }
   }
 
+  function drawDebugOverlay() {
+    if (!DEBUG_MODE || !state.currentLevel || !state.candy || !state.booha) return;
+    const c = state.candy;
+    const m = boohaMouthPoint();
+    ctx.save();
+    ctx.font = '12px monospace';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+    ctx.fillStyle = 'rgba(0,0,0,0.72)';
+    ctx.fillRect(8, 70, 250, 112);
+    ctx.fillStyle = '#9fffd0';
+    const lines = [
+      `DEBUG L${state.levelIndex + 1}  cuts:${state.cutCount}`,
+      `candy ${Math.round(c.x)},${Math.round(c.y)} v:${c.vx.toFixed(1)},${c.vy.toFixed(1)}`,
+      `booha ${Math.round(state.booha.x)} mouth:${Math.round(m.x)},${Math.round(m.y)}`,
+      `attached:${c.attached} ropes:${state.ropes.filter(r => !r.cut).length}`,
+      `pending:${state.ropes.filter(r => r.pending).length} dist:${Math.round(Math.hypot(c.x-m.x,c.y-m.y))}`
+    ];
+    lines.forEach((line, i) => ctx.fillText(line, 16, 78 + i * 19));
+
+    ctx.strokeStyle = 'rgba(120,255,220,0.65)';
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2); ctx.stroke();
+    ctx.strokeStyle = 'rgba(255,120,180,0.65)';
+    ctx.beginPath(); ctx.arc(m.x, m.y, 52, 0, Math.PI * 2); ctx.stroke();
+    for (const obj of state.objects) {
+      if (obj.type === 'bounce') {
+        ctx.strokeStyle = 'rgba(255,230,100,0.7)';
+        ctx.strokeRect(obj.x - obj.width / 2, obj.y - obj.height / 2, obj.width, obj.height);
+      }
+      if (obj.type === 'fan') {
+        ctx.strokeStyle = 'rgba(120,180,255,0.7)';
+        ctx.beginPath(); ctx.arc(obj.x, obj.y, 48, 0, Math.PI * 2); ctx.stroke();
+      }
+    }
+    ctx.restore();
+  }
+
   // ─────────────────────────────────────────────────
   // State
   // ─────────────────────────────────────────────────
@@ -719,6 +759,7 @@
       type:    r.type    || 'normal',
       delayMs: r.delayMs || 400,
       pending: false,
+      releaseAt: 0,
       length:  Math.hypot(level.candy.x - r.anchor.x, level.candy.y - r.anchor.y)
     }));
 
@@ -829,7 +870,10 @@
     helpPanel.setAttribute('aria-hidden', String(!show));
   }
 
-  function getActiveRopes() { return state.ropes.filter(r => !r.cut && !r.pending); }
+  // A pending delayed rope has been requested, but it still holds the candy
+  // until its release timer fires. Excluding it here makes delayed ropes
+  // release immediately and only delays their visual cleanup.
+  function getActiveRopes() { return state.ropes.filter(r => !r.cut); }
 
   // ─────────────────────────────────────────────────
   // Booha movement
@@ -1074,14 +1118,16 @@
     if (rope.cut || rope.pending) return false;
     if (rope.type === 'delayed') {
       rope.pending = true;
+      rope.releaseAt = performance.now() + rope.delayMs;
+      state.cutCount++;
+      playSfxCut();
+      if (navigator.vibrate) navigator.vibrate(40);
+      updateHudStars();
+      setHudCuts();
       const id = setTimeout(() => {
-        rope.cut = true; rope.pending = false; state.cutCount++;
+        rope.cut = true; rope.pending = false; rope.releaseAt = 0;
         spawnPoofAtRope(rope);
-        playSfxCut();
-        if (navigator.vibrate) navigator.vibrate(40);
         if (!getActiveRopes().length) state.candy.attached = false;
-        updateHudStars();
-        setHudCuts();
       }, rope.delayMs);
       state.cutTimers[rope.id] = id;
       return true;
@@ -1287,6 +1333,7 @@
     drawCandy();
     drawBooha();
     drawConfetti();
+    drawDebugOverlay();
     ctx.restore();
   }
 
@@ -1386,6 +1433,29 @@
     await preloadAssets();
     setHud(1, 'Ready');
     requestAnimationFrame(frame);
+  }
+
+  if (DEBUG_MODE) {
+    window.FEED_BOOHA_DEBUG_STATE = () => ({
+      levelIndex: state.levelIndex,
+      levelId: state.currentLevel && state.currentLevel.id,
+      cutCount: state.cutCount,
+      candy: state.candy && {
+        x: state.candy.x, y: state.candy.y,
+        vx: state.candy.vx, vy: state.candy.vy,
+        attached: state.candy.attached
+      },
+      booha: state.booha && { x: state.booha.x, y: state.booha.y },
+      ropes: state.ropes.map(rope => ({
+        id: rope.id, cut: rope.cut, pending: rope.pending,
+        releaseAt: rope.releaseAt
+      })),
+      objects: state.objects.map(obj => ({
+        type: obj.type, x: obj.x, y: obj.y,
+        width: obj.width, height: obj.height,
+        direction: obj.direction
+      }))
+    });
   }
 
   boot();
