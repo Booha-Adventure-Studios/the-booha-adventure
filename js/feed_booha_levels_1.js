@@ -63,7 +63,7 @@ const FEED_BOOHA_LEVELS = [
       { id: 'r1', anchor: { x: 180, y: 110 }, type: 'normal' }
     ],
     objects: [
-      { type: 'bounce', x: 180, y: 580, width: 140, height: 20, pushX: 3.5 }
+      { type: 'bounce', x: 180, y: 580, width: 140, height: 20, pushX: 1.5 }
     ]
   },
 
@@ -600,7 +600,7 @@ const FEED_BOOHA_LEVELS = [
       { id: 'r1', anchor: { x: 150, y: 110 }, type: 'normal' }
     ],
     objects: [
-      { type: 'bounce', x: 235, y: 625, width: 70, height: 20 },
+      { type: 'bounce', x: 190, y: 625, width: 100, height: 20, pushX: 2.0 },
       { type: 'fan',    x: 305, y: 540, direction: 'right' }
     ]
   },
