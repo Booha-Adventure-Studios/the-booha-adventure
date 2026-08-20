@@ -137,6 +137,7 @@
           <p class="overlay-subtitle">ブーハにキャンディをあげよう</p>
           <p id="bestScoreText">Best score / ベストスコア: 0</p>
           <p>Cut ropes &middot; Drop the candy &middot; Make Booha chomp!</p>
+          <p class="continue-note">3 continues per chapter / チャプターごとに3回コンティニュー</p>
 
           <ul class="start-rule-list">
             <li>
@@ -189,11 +190,13 @@
         <div class="overlay-card overlay-card--small">
           <h2 id="messageTitle">Nice!</h2>
           <p id="messageText">Booha is happy.</p>
+          <p id="continueStatusText" class="continue-status" aria-live="polite"></p>
           <!-- starRating div injected by JS here -->
           <div class="message-actions">
             <button id="nextBtn"  class="cta-btn"             type="button">Next &#9654;</button>
-            <button id="retryBtn" class="ui-btn ui-btn--ghost" type="button">Retry</button>
-            <button id="exitBtn"  class="ui-btn ui-btn--ghost" type="button">✕ Exit</button>
+            <button id="continueBtn" class="ui-btn continue-btn" type="button">Use Continue / コンティニュー</button>
+            <button id="retryBtn" class="ui-btn ui-btn--ghost" type="button">Retry / もう一度</button>
+            <button id="exitBtn"  class="ui-btn ui-btn--ghost" type="button">✕ Exit / 終了</button>
           </div>
         </div>
       </section>
