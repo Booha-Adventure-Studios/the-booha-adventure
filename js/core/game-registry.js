@@ -103,6 +103,16 @@ const BoohaGameRegistry = (() => {
   // They still receive the same score/stars machinery through their saveId.
   const BONUS_GAMES = [
     {
+      id:             'feed_booha',
+      name:           'Feed Booha',
+      file:           'feed_booha.html',
+      category:       'bonus',
+      scoreMax:       87500,
+      starThresholds: [20000, 50000, 75000],
+      saveId:         'bonus:feed_booha',
+      bonus:          true,
+    },
+    {
       id:             'booha_destruction',
       name:           'Booha Destruction',
       file:           'booha_destruction.html',

@@ -36,6 +36,15 @@
   const messageText    = document.getElementById('messageText');
   const totalStarsEl   = document.getElementById('totalStars');
   const hudStarsEl     = document.getElementById('hudStars');
+  const scoreTextEl    = document.getElementById('scoreText');
+  const levelStarsEl   = document.getElementById('levelStarsText');
+  const bestScoreEl    = document.getElementById('bestScoreText');
+
+  const GAME_ID           = 'bonus:feed_booha';
+  const LEVEL_BASE_SCORE  = 1000;
+  const LEVEL_STAR_BONUS  = 250;
+  const EXTRA_CUT_PENALTY = 150;
+  const TOTAL_LEVELS      = LEVELS.length;
 
   let starContainer = null;
 
@@ -104,9 +113,9 @@
   }
 
   // v7: Play exactly one eat sound, then advance the global index
-  // Index cycles: 0 (get-1) → 1 (get-2) → 2 (get-3) → 3 (get-4) → 0 …
+  // Index cycles through the four shipped catch sounds.
   function playEatSound() {
-    const files = ['get-1.mp3', 'get-2.mp3', 'get-3.mp3', 'get-4.mp3'];
+    const files = ['get-1.mp3', 'get-2.mp3', 'get-3.mp3', 'get-0.mp3'];
     const src   = './assets/feed/' + files[eatSoundIndex % files.length];
     eatSoundIndex = (eatSoundIndex + 1) % files.length;
     const a = new Audio(src);
@@ -187,8 +196,6 @@
   // 2★ = cutCount ≤ parCuts + 1
   // 1★ = anything else that still clears
   // ─────────────────────────────────────────────────
-  let totalStarsEarned = 0;
-
   function getParCuts() {
     const lvl = state.currentLevel;
     // Fall back to 1 if level author didn't set parCuts
@@ -210,9 +217,9 @@
   }
 
   function updateHudStars() {
-    if (!hudStarsEl) return;
+    if (!levelStarsEl) return;
     const s = starsForCuts(state.cutCount, state.hitBounce);
-    hudStarsEl.textContent = '★'.repeat(s) + '☆'.repeat(3 - s);
+    levelStarsEl.textContent = '★'.repeat(s) + '☆'.repeat(3 - s);
   }
 
   // ─────────────────────────────────────────────────
@@ -396,8 +403,122 @@
     trail: [],
     lastChanceFired: false, boohaJumpOffset: 0, boohaJumpFrame: 0,
     cutTimers: {}, missDir: 0, fallSoundPlayed: false,
-    perfectTextLife: 0
+    perfectTextLife: 0,
+    levelStartedAt: 0,
+    campaignStartedAt: 0,
+    campaignScore: 0,
+    campaignStars: 0,
+    campaignComplete: false
   };
+
+  const DEFAULT_PROGRESS = () => ({
+    version: 1,
+    currentLevel: 0,
+    currentScore: 0,
+    currentStars: 0,
+    bestScore: 0,
+    totalStars: 0,
+    levelStars: {},
+    levelScores: {},
+    completedLevels: [],
+    attempts: 0,
+    campaignComplete: false,
+    lastPlayedAt: null
+  });
+
+  let feedProgress = DEFAULT_PROGRESS();
+  let persistenceReady = false;
+
+  function getSaveSystem() {
+    try {
+      return window.BoohaAdventure && BoohaAdventure.save;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function getScoreSystem() {
+    try {
+      return window.BoohaScoreSystem || (window.BoohaAdventure && BoohaAdventure.scores);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function levelKey(index) {
+    const level = LEVELS[index];
+    return String(level && level.id != null ? level.id : index + 1);
+  }
+
+  function normalizeProgress(raw) {
+    const next = Object.assign(DEFAULT_PROGRESS(), raw || {});
+    next.levelStars = Object.assign({}, raw && raw.levelStars);
+    next.levelScores = Object.assign({}, raw && raw.levelScores);
+    next.completedLevels = Array.isArray(next.completedLevels)
+      ? next.completedLevels.map(Number).filter(Number.isFinite)
+      : [];
+    next.currentLevel = Math.max(0, Math.min(Math.max(0, TOTAL_LEVELS - 1), Number(next.currentLevel) || 0));
+    next.currentScore = Math.max(0, Number(next.currentScore) || 0);
+    next.currentStars = Math.max(0, Number(next.currentStars) || 0);
+    next.bestScore = Math.max(0, Number(next.bestScore) || 0);
+    next.totalStars = Math.max(0, Number(next.totalStars) || 0);
+    next.attempts = Math.max(0, Number(next.attempts) || 0);
+    return next;
+  }
+
+  function readFeedProgress() {
+    const save = getSaveSystem();
+    if (!save || typeof save.load !== 'function') return DEFAULT_PROGRESS();
+    try {
+      const data = save.load();
+      return normalizeProgress(data && data.stats && data.stats.feed_booha);
+    } catch (e) {
+      console.warn('[Feed Booha] Progress load failed:', e);
+      return DEFAULT_PROGRESS();
+    }
+  }
+
+  function writeFeedProgress() {
+    const save = getSaveSystem();
+    if (!save || typeof save.load !== 'function' || typeof save.save !== 'function') return false;
+    try {
+      const data = save.load();
+      if (!data.stats || typeof data.stats !== 'object') data.stats = {};
+      data.stats.feed_booha = normalizeProgress(feedProgress);
+      return save.save(data);
+    } catch (e) {
+      console.warn('[Feed Booha] Progress save failed:', e);
+      return false;
+    }
+  }
+
+  function syncProgressHud() {
+    if (scoreTextEl) scoreTextEl.textContent = String(Math.round(state.campaignScore || 0));
+    if (totalStarsEl) totalStarsEl.textContent = String(feedProgress.totalStars || 0);
+    if (bestScoreEl) bestScoreEl.textContent = `Best score / ベストスコア: ${Math.round(feedProgress.bestScore || 0)}`;
+  }
+
+  function hydrateProgress() {
+    if (persistenceReady) return;
+    feedProgress = readFeedProgress();
+    const scores = getScoreSystem();
+    if (scores && typeof scores.getHighScore === 'function') {
+      feedProgress.bestScore = Math.max(
+        feedProgress.bestScore,
+        Number(scores.getHighScore(GAME_ID)) || 0
+      );
+    }
+    if (feedProgress.campaignComplete) feedProgress.currentLevel = 0;
+    state.levelIndex = feedProgress.currentLevel;
+    state.campaignScore = feedProgress.currentScore;
+    state.campaignStars = feedProgress.currentStars;
+    state.campaignComplete = !!feedProgress.campaignComplete;
+    persistenceReady = true;
+    syncProgressHud();
+  }
+
+  document.addEventListener('booha:ready', hydrateProgress, { once: true });
+  if (window.BOOHA_READY) hydrateProgress();
 
   // ─────────────────────────────────────────────────
   // Assets
@@ -478,12 +599,69 @@
       if (i < stars) s.style.animationDelay = `${i * 0.13}s`;
       starContainer.appendChild(s);
     }
-    totalStarsEarned += stars;
-    if (totalStarsEl) totalStarsEl.textContent = totalStarsEarned;
     if (hudStarsEl) {
       hudStarsEl.classList.add('star-flash');
       setTimeout(() => hudStarsEl.classList.remove('star-flash'), 600);
     }
+  }
+
+  function calculateLevelScore(cutCount, stars) {
+    const extraCuts = Math.max(0, cutCount - getParCuts());
+    return Math.max(
+      100,
+      LEVEL_BASE_SCORE + stars * LEVEL_STAR_BONUS - extraCuts * EXTRA_CUT_PENALTY
+    );
+  }
+
+  function persistRoundResult(stars, levelScore) {
+    state.campaignScore += levelScore;
+    state.campaignStars += stars;
+    state.campaignComplete = state.levelIndex >= TOTAL_LEVELS - 1;
+
+    if (!persistenceReady) {
+      syncProgressHud();
+      return;
+    }
+
+    const key = levelKey(state.levelIndex);
+    const previousBestStars = Number(feedProgress.levelStars[key]) || 0;
+    const previousBestScore = Number(feedProgress.levelScores[key]) || 0;
+
+    feedProgress.levelStars[key] = Math.max(previousBestStars, stars);
+    feedProgress.levelScores[key] = Math.max(previousBestScore, levelScore);
+    feedProgress.totalStars = Object.values(feedProgress.levelStars)
+      .reduce((sum, value) => sum + (Number(value) || 0), 0);
+    if (!feedProgress.completedLevels.includes(state.levelIndex + 1)) {
+      feedProgress.completedLevels.push(state.levelIndex + 1);
+    }
+    feedProgress.currentLevel = state.campaignComplete ? 0 : state.levelIndex + 1;
+    feedProgress.currentScore = state.campaignScore;
+    feedProgress.currentStars = state.campaignStars;
+    feedProgress.campaignComplete = state.campaignComplete;
+    feedProgress.lastPlayedAt = Date.now();
+
+    const scores = getScoreSystem();
+    if (scores && typeof scores.submit === 'function') {
+      const elapsed = state.campaignComplete && state.campaignStartedAt
+        ? performance.now() - state.campaignStartedAt
+        : null;
+      document.dispatchEvent(new CustomEvent('booha:gameEnd', {
+        detail: {
+          saveId: GAME_ID,
+          score: state.campaignScore,
+          completed: state.campaignComplete,
+          time: elapsed
+        }
+      }));
+      feedProgress.bestScore = Math.max(
+        feedProgress.bestScore,
+        Number(scores.getHighScore(GAME_ID)) || 0
+      );
+    }
+
+    feedProgress.bestScore = Math.max(feedProgress.bestScore, state.campaignScore);
+    writeFeedProgress();
+    syncProgressHud();
   }
 
   // ─────────────────────────────────────────────────
@@ -566,6 +744,13 @@
       w: BOOHA_W, h: BOOHA_H
     };
 
+    state.levelStartedAt = performance.now();
+    if (persistenceReady) {
+      feedProgress.attempts++;
+      feedProgress.lastPlayedAt = Date.now();
+      writeFeedProgress();
+    }
+    syncProgressHud();
     setHud(index + 1, 'Ready');
   }
 
@@ -574,7 +759,19 @@
   // ─────────────────────────────────────────────────
   function startGame() {
     if (!LEVELS.length) return;
+    if (state.campaignComplete) {
+      state.levelIndex = 0;
+      state.campaignScore = 0;
+      state.campaignStars = 0;
+      state.campaignComplete = false;
+      feedProgress.currentLevel = 0;
+      feedProgress.currentScore = 0;
+      feedProgress.currentStars = 0;
+      feedProgress.campaignComplete = false;
+      writeFeedProgress();
+    }
     state.started = true;
+    state.campaignStartedAt = performance.now();
     startOverlay.classList.remove('overlay--show');
     startOverlay.setAttribute('aria-hidden', 'true');
     setTimeout(() => { startOverlay.style.display = 'none'; }, 300);
@@ -582,13 +779,39 @@
   }
 
   function resetLevel() { buildLevel(state.levelIndex); }
-  function nextLevel()  { state.levelIndex = (state.levelIndex + 1) % LEVELS.length; hideMessage(); buildLevel(state.levelIndex); }
+  function resetCampaign() {
+    state.levelIndex = 0;
+    state.campaignScore = 0;
+    state.campaignStars = 0;
+    state.campaignComplete = false;
+    state.campaignStartedAt = performance.now();
+    feedProgress.currentLevel = 0;
+    feedProgress.currentScore = 0;
+    feedProgress.currentStars = 0;
+    feedProgress.campaignComplete = false;
+    writeFeedProgress();
+    hideMessage();
+    buildLevel(0);
+  }
+
+  function nextLevel() {
+    if (state.campaignComplete) {
+      resetCampaign();
+      return;
+    }
+    state.levelIndex++;
+    hideMessage();
+    buildLevel(state.levelIndex);
+  }
 
   function showMessage(title, text, nextVisible = true, cutCount = 0, hitBounce = false) {
     messageTitle.textContent = title;
     messageText.textContent  = text;
     const stars = starsForCuts(cutCount, hitBounce);
     nextBtn.style.display  = nextVisible ? 'inline-flex' : 'none';
+    nextBtn.textContent = state.campaignComplete
+      ? 'Play Again / もう一度'
+      : 'Next / 次へ';
     retryBtn.style.display = (!nextVisible || stars < 3) ? 'inline-flex' : 'none';
     if (nextVisible) showStars(cutCount, hitBounce);
     else if (starContainer) starContainer.innerHTML = '';
@@ -779,6 +1002,8 @@
     const cuts      = state.cutCount;
     const hitBounce = state.hitBounce;
     const stars     = starsForCuts(cuts, hitBounce);
+    const levelScore = calculateLevelScore(cuts, stars);
+    persistRoundResult(stars, levelScore);
 
     if (stars === 3) {
       spawnConfetti(m.x, m.y);
@@ -790,8 +1015,25 @@
     state.pendingSuccessTimeout = setTimeout(() => {
       state.boohaSprite = 'booWin';
       if (stars < 3) playSfxWin();
-      const title = stars === 3 ? 'Perfect!' : stars === 2 ? 'Tasty!' : 'Good job!';
-      showMessage(title, 'Booha is happy!', true, cuts, hitBounce);
+      const chapterComplete = (state.levelIndex + 1) % 10 === 0;
+      let title;
+      let text;
+      if (state.campaignComplete) {
+        title = 'Campaign Clear! / キャンペーンクリア！';
+        text = `Score: ${Math.round(state.campaignScore)} · Best: ${Math.round(feedProgress.bestScore)} · Stars: ${state.campaignStars} / スコア: ${Math.round(state.campaignScore)} · ベスト: ${Math.round(feedProgress.bestScore)} · スター: ${state.campaignStars}`;
+      } else if (chapterComplete) {
+        const chapter = Math.floor(state.levelIndex / 10) + 1;
+        title = `Chapter ${chapter} Clear! / チャプター${chapter}クリア！`;
+        text = `Score: ${Math.round(state.campaignScore)} · Best: ${Math.round(feedProgress.bestScore)} · Stars: ${state.campaignStars} / スコア: ${Math.round(state.campaignScore)} · ベスト: ${Math.round(feedProgress.bestScore)} · スター: ${state.campaignStars}`;
+      } else {
+        title = stars === 3
+          ? 'Perfect! / パーフェクト！'
+          : stars === 2
+            ? 'Tasty! / おいしい！'
+            : 'Good job! / よくできた！';
+        text = 'Booha is happy! / ブーハはうれしい！';
+      }
+      showMessage(title, text, true, cuts, hitBounce);
     }, 1400);
   }
 
