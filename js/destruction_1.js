@@ -71,6 +71,8 @@
   let needsRender = true;
   let staticRenderKey = '';
   let toastWasVisible = false;
+  let exitConfirmOpen = false;
+  let hallReturnState = null;
 
   // ── Canvas ──────────────────────────────────────────
   const canvas = document.getElementById(CFG.canvasId || 'gameCanvas');
@@ -181,7 +183,6 @@
     if (AUDIO_STATE.warned.has(key)) return;
     AUDIO_STATE.warned.add(key);
     console.warn(`[Booha Destruction] Audio unavailable: ${key}`, error || '');
-    if (typeof setToast === 'function') setToast('Sound unavailable / 音声なし', '#ff9f7f');
   }
 
   function getAC() {
@@ -524,6 +525,33 @@
     let end = value.length;
     while (end > 1 && ctx.measureText(`${value.slice(0, end - 1)}…`).width > maxWidth) end--;
     return `${value.slice(0, Math.max(1, end - 1))}…`;
+  }
+
+  function simpleJapanese(text) {
+    const value = String(text || '');
+    let match = value.match(/^Clear in (\d+) shots or fewer$/i);
+    if (match) return `${match[1]}発以内でクリア`;
+    match = value.match(/^Launch ([A-Z]+) Booha once$/i);
+    if (match) return `${match[1]}ブーハーを1回使う`;
+    match = value.match(/^Trigger (\d+) unsupported blocks$/i);
+    if (match) return `支えのないブロックを${match[1]}個落とす`;
+    match = value.match(/^Use (\d+) different powers$/i);
+    if (match) return `ちがうパワーを${match[1]}つ使う`;
+    if (/Break the marked target/i.test(value)) return '光るターゲットをこわしてボーナス';
+    if (/Break the glowing target block/i.test(value)) return '光るブロックをこわしてボーナス';
+    match = value.match(/^Use ([A-Z]+) Booha for a bonus$/i);
+    if (match) return `${match[1]}ブーハーを使ってボーナス`;
+    match = value.match(/^Clear the structure in (\d+) seconds$/i);
+    if (match) return `${match[1]}秒以内にクリア`;
+    return '';
+  }
+
+  function bilingualParts(text, explicitJP='') {
+    const parts = String(text || '').split(' / ');
+    return {
+      en: parts[0] || '',
+      jp: parts.slice(1).join(' / ') || explicitJP || simpleJapanese(text),
+    };
   }
 
   function setToast(message, accent='#fff', duration=2800) {
@@ -2318,7 +2346,7 @@ function traitGlowColor(block) {
         showCard(P.WIN, 'CAMPAIGN CLEAR!', `${LEVELS.length} rounds smashed · ${scoreText(gs.runScore)} points${streakNote}`, '#ffdd44');
       } else {
         const streakNote = gs.combo > 1 ? ` · STREAK / れんぞく ×${gs.combo}` : '';
-        showCard(P.WIN, gs.cardChapter ? `CHAPTER ${level.chapter} CLEAR!` : (level.boss ? `BOSS ${gs.roundN} CLEARED!` : `ROUND ${gs.roundN} CLEAR!`), `+${scoreText(gs.roundScore)} points · ${scoreText(gs.runScore)} total${streakNote}`, '#ffdd44');
+        showCard(P.WIN, gs.cardChapter ? `CHAPTER ${level.chapter} CLEAR!` : (level.boss ? `BOSS ${gs.roundN} CLEARED!` : `ROUND ${gs.roundN} COMPLETE!`), `+${scoreText(gs.roundScore)} points · ${scoreText(gs.runScore)} total${streakNote}`, '#ffdd44');
       }
       const recordTag = roundResult.isNewBest ? 'NEW ROUND BEST' : `BEST ${scoreText(roundResult.best)}`;
       const medalTag = roundResult.medal ? `${medalText(roundResult.medal)} MEDAL` : 'MEDAL TO EARN';
@@ -2422,6 +2450,7 @@ function traitGlowColor(block) {
     };
   }
   const ACTION_RECT = { x: W / 2 - 145, y: H / 2 + 105, w: 290, h: 58 };
+  const EXIT_MODAL = { x: W / 2 - 250, y: H / 2 - 104, w: 500, h: 208 };
   const CONTROL_DOCK = [
     { id:'hall',  label:'★ HALL', w:70 },
     { id:'mute',  label:'♪',      w:36 },
@@ -2454,25 +2483,59 @@ function traitGlowColor(block) {
   function htStart(px,py){const bx=W/2-140,by=H/2+10;return px>=bx&&px<=bx+280&&py>=by&&py<=by+70;}
   function htAction(px,py){return px>=ACTION_RECT.x&&px<=ACTION_RECT.x+ACTION_RECT.w&&py>=ACTION_RECT.y&&py<=ACTION_RECT.y+ACTION_RECT.h;}
   function showHall(){
+    hallReturnState = {
+      phase:gs.phase, round:gs.round, roundN:gs.roundN, running:gs.running,
+      dragging:gs.dragging, booha:gs.booha, campaignActive:gs.campaignActive,
+      campaignComplete:gs.campaignComplete, shotLock:gs.shotLock,
+      isLastBooha:gs.isLastBooha, timeScale:gs.timeScale, goalReached:gs.goalReached,
+    };
     gs.phase=P.HALL;gs.running=false;gs.booha=null;gs.dragging=false;
     gs.campaignActive=false;
     ROSTER.forEach((_, index) => { if (isBoohaUnlocked(index)) ensureRosterThumb(index); });
+    needsRender=true;
   }
-  function leaveGame() {
-    if (!window.confirm('Are you sure you want to exit?')) return;
+  function returnFromHall() {
+    if (hallReturnState) Object.assign(gs, hallReturnState);
+    else gs.phase=P.TITLE;
+    hallReturnState=null;
+    needsRender=true;
+  }
+  function performExit() {
+    // Hall is a temporary view. Restore the run before saving so exiting from
+    // Hall cannot silently discard the active campaign state.
+    if (hallReturnState) {
+      Object.assign(gs, hallReturnState);
+      hallReturnState=null;
+    }
     if (gs.campaignActive && gs.runScore > 0) submitRunScore(false);
     window.location.href='karasuki.html?room=room_12';
+  }
+  function leaveGame() {
+    exitConfirmOpen=true;
+    needsRender=true;
+  }
+  function exitModalHit(px, py, choice) {
+    const y=EXIT_MODAL.y+132, h=46;
+    const cancel={x:EXIT_MODAL.x+82,y,w:150,h};
+    const exit={x:EXIT_MODAL.x+268,y,w:150,h};
+    const hit=choice==='exit'?exit:cancel;
+    return px>=hit.x&&px<=hit.x+hit.w&&py>=hit.y&&py<=hit.y+hit.h;
   }
 
   function onDown(evt){
     const p=worldPt(evt);
+    if(exitConfirmOpen){
+      if(exitModalHit(p.x,p.y,'cancel')){exitConfirmOpen=false;needsRender=true;}
+      else if(exitModalHit(p.x,p.y,'exit')){exitConfirmOpen=false;performExit();}
+      evt.preventDefault();return;
+    }
     const dockAction = controlDockHit(p.x, p.y);
 
     if(dockAction === 'mute'){toggleMute();evt.preventDefault();return;}
     if(dockAction === 'help'){openHelp();evt.preventDefault();return;}
     if(dockAction === 'hall' && gs.phase !== P.HALL){showHall();evt.preventDefault();return;}
     if(dockAction === 'exit'){leaveGame();evt.preventDefault();return;}
-    if(dockAction === 'hall' && gs.phase === P.HALL){gs.phase=P.TITLE;evt.preventDefault();return;}
+    if(dockAction === 'hall' && gs.phase === P.HALL){returnFromHall();evt.preventDefault();return;}
     getAC();
 
     if(gs.phase===P.TITLE){if(htStart(p.x,p.y)){beginCampaign();loadRound(0);showBriefing();}evt.preventDefault();return;}
@@ -3134,7 +3197,8 @@ function traitGlowColor(block) {
         ctx.textAlign='center';ctx.fillStyle='rgba(255,255,255,0.55)';ctx.font='9px system-ui,sans-serif';ctx.fillText(`R${level.id}`,x+38,y+17);
         ctx.fillStyle=record.clears>0?'#fff':'rgba(255,255,255,0.28)';ctx.font='bold 11px system-ui,sans-serif';
         const shortScore=record.best>=1000?`${(record.best/1000).toFixed(1)}k`:String(record.best||'—');ctx.fillText(shortScore,x+38,y+31);
-        ctx.fillStyle=record.medal? '#ffe66d':'rgba(255,255,255,0.24)';ctx.font='10px system-ui,sans-serif';ctx.fillText(medalText(record.medal),x+64,y+17);
+        ctx.fillStyle=record.medal? '#ffe66d':'rgba(255,255,255,0.24)';ctx.font='10px system-ui,sans-serif';
+        ctx.fillText(fitText(medalText(record.medal),24),x+59,y+17);
         ctx.fillStyle=record.contractClears?'#7cfff8':'rgba(255,255,255,0.2)';ctx.font='bold 8px system-ui,sans-serif';ctx.fillText(record.contractClears?'C':'',x+12,y+44);
         ctx.fillStyle=record.ruleClears?'#ffe66d':'rgba(255,255,255,0.2)';ctx.fillText(record.ruleClears?'◆':'',x+26,y+44);
         ctx.textAlign='left';
@@ -3147,8 +3211,10 @@ function traitGlowColor(block) {
       ctx.save();ctx.fillStyle=unlocked?'rgba(124,255,248,0.1)':'rgba(255,255,255,0.045)';ctx.strokeStyle=unlocked?'rgba(124,255,248,0.4)':'rgba(255,223,128,0.24)';ctx.lineWidth=1;rr(ctx,x,y,232,64,10,true,true);ctx.restore();
       if(unlocked&&(bst.thumbs[index]||bst.imgs[index]))ctx.drawImage(bst.thumbs[index]||bst.imgs[index],x+8,y+7,50,50);
       else {ctx.fillStyle='#ffdf80';ctx.font='bold 20px system-ui,sans-serif';ctx.textAlign='center';ctx.fillText('🔒',x+33,y+31);}
-      ctx.textAlign='left';ctx.fillStyle=unlocked?'#fff':'rgba(255,255,255,0.5)';ctx.font='bold 11px system-ui,sans-serif';ctx.fillText(`${unlocked?'':'LOCKED · '}${booha.name}`,x+66,y+23);
-      ctx.fillStyle=unlocked?'#7cfff8':'rgba(255,223,128,0.68)';ctx.font='10px system-ui,sans-serif';ctx.fillText(unlocked?booha.jpName:unlockRequirement(index),x+66,y+41);
+      ctx.textAlign='left';ctx.fillStyle=unlocked?'#fff':'rgba(255,255,255,0.5)';ctx.font='bold 11px system-ui,sans-serif';
+      ctx.fillText(fitText(`${unlocked?'':'LOCKED · '}${booha.name}`,158),x+66,y+23);
+      ctx.fillStyle=unlocked?'#7cfff8':'rgba(255,223,128,0.68)';ctx.font='10px system-ui,sans-serif';
+      ctx.fillText(fitText(unlocked?booha.jpName:unlockRequirement(index),158),x+66,y+41);
     }
 
     drawControlDock();
@@ -3167,18 +3233,24 @@ function traitGlowColor(block) {
     ctx.fillText(level.boss ? `BOSS ROUND ${gs.roundN}` : `ROUND ${gs.roundN}`,W/2,H/2-96);
     ctx.fillStyle='rgba(255,255,255,0.82)';ctx.font='bold 21px system-ui,sans-serif';
     ctx.fillText(level.name || '',W/2,H/2-58);
-    const panelX=W/2-300,panelY=H/2-28,panelW=600,panelH=118;
+    const panelX=W/2-300,panelY=H/2-46,panelW=600,panelH=140;
     ctx.save();ctx.fillStyle='rgba(255,255,255,0.08)';ctx.strokeStyle=level.boss ? (chapter.accent || '#ffdf80') : 'rgba(255,255,255,0.18)';ctx.lineWidth=1.5;
     rr(ctx,panelX,panelY,panelW,panelH,16,true,true);ctx.restore();
     ctx.fillStyle=level.boss ? '#ffdf80' : '#7cfff8';ctx.font='bold 13px system-ui,sans-serif';
-    ctx.fillText(`✦ BONUS · ${level.contract?.label || 'CLEAR THE STACK'}`,W/2,panelY+26);
-    ctx.fillStyle='rgba(255,255,255,0.78)';ctx.font='15px system-ui,sans-serif';
-    ctx.fillText(fitText(level.contract?.detail || 'Break every block.', 520),W/2,panelY+51);
-    ctx.fillStyle='rgba(255,255,255,0.62)';ctx.font='12px system-ui,sans-serif';
-    ctx.fillText(fitText(`AIM · ${level.focus || 'Find the weak point.'}`, 520),W/2,panelY+76);
-    ctx.fillStyle='#ffe66d';ctx.font='bold 11px system-ui,sans-serif';
+    ctx.fillText(`✦ BONUS · ${level.contract?.label || 'CLEAR THE STACK'}`,W/2,panelY+18);
+    const contractLines=bilingualParts(level.contract?.detail || 'Break every block.');
+    ctx.fillStyle='rgba(255,255,255,0.86)';ctx.font='13px system-ui,sans-serif';
+    ctx.fillText(fitText(contractLines.en,520),W/2,panelY+37);
+    ctx.fillStyle='rgba(255,255,255,0.58)';ctx.font='11px system-ui,sans-serif';
+    ctx.fillText(fitText(contractLines.jp || 'ブロックをぜんぶこわそう',520),W/2,panelY+51);
+    const focusLines=bilingualParts(level.focus || 'Find the weak point.', level.focusJP || 'よわいところをみつけよう');
+    ctx.fillStyle='rgba(255,255,255,0.78)';ctx.font='bold 12px system-ui,sans-serif';
+    ctx.fillText(fitText(`AIM · ${focusLines.en}`,520),W/2,panelY+73);
+    ctx.fillStyle='rgba(255,255,255,0.58)';ctx.font='11px system-ui,sans-serif';
+    ctx.fillText(fitText(focusLines.jp || 'ねらいをさだめよう',520),W/2,panelY+87);
+    ctx.fillStyle='#ffe66d';ctx.font='bold 10px system-ui,sans-serif';
     const challenge = level.rule ? `CHALLENGE · ${level.rule.label}` : `BEST · ${scoreText(gs.roundBestScore)}  ·  MEDAL · ${medalText(gs.roundMedal)}`;
-    ctx.fillText(fitText(challenge, 520),W/2,panelY+98);
+    ctx.fillText(fitText(challenge, 520),W/2,panelY+108);
     const bx=ACTION_RECT.x,by=ACTION_RECT.y,bw=ACTION_RECT.w,bh=ACTION_RECT.h;
     const bg=ctx.createLinearGradient(bx,by,bx,by+bh);bg.addColorStop(0,level.boss?'#ffdf80':'#44ffcc');bg.addColorStop(1,level.boss?'#ff8c44':'#009977');
     ctx.shadowColor=level.boss?'#ffcf70':'#44ffcc';ctx.shadowBlur=18;ctx.fillStyle=bg;rr(ctx,bx,by,bw,bh,16,true,false);ctx.shadowBlur=0;
@@ -3190,6 +3262,25 @@ function traitGlowColor(block) {
     const win=gs.phase===P.WIN;
     ctx.fillStyle=win?'rgba(0,18,0,0.62)':'rgba(28,0,0,0.62)';ctx.fillRect(0,0,W,H);
     ctx.save();ctx.textAlign='center';ctx.textBaseline='middle';
+    const panelX=W/2-470,panelY=H/2-220,panelW=940,panelH=410;
+    ctx.fillStyle=win?'rgba(4,18,15,0.92)':'rgba(22,8,12,0.92)';
+    ctx.strokeStyle=win?'rgba(255,221,68,0.72)':'rgba(255,120,110,0.58)';ctx.lineWidth=2;
+    rr(ctx,panelX,panelY,panelW,panelH,24,true,true);
+    if(win){
+      const pulse=0.55+0.45*Math.sin(performance.now()*0.004);
+      ctx.save();ctx.globalAlpha=0.32+0.18*pulse;ctx.strokeStyle='#ffdf44';ctx.lineWidth=2;
+      for(let i=0;i<10;i++){
+        const a=i*Math.PI/5+performance.now()*0.00035;
+        const r1=158,r2=186;
+        ctx.beginPath();ctx.moveTo(W/2+Math.cos(a)*r1,H/2-126+Math.sin(a)*r1*0.38);ctx.lineTo(W/2+Math.cos(a)*r2,H/2-126+Math.sin(a)*r2*0.38);ctx.stroke();
+      }
+      ctx.restore();
+      ctx.fillStyle='#ffdf44';ctx.font='bold 13px system-ui,sans-serif';
+      ctx.fillText('✦ ROUND COMPLETE · ラウンドクリア ✦',W/2,panelY+30);
+    } else {
+      ctx.fillStyle='#ff9f7f';ctx.font='bold 13px system-ui,sans-serif';
+      ctx.fillText('TRY AGAIN · もういちど',W/2,panelY+30);
+    }
     const introP=1-clamp(gs.cardIntro/18,0,1);
     const titleScale=0.84+introP*0.16;
     ctx.save();ctx.globalAlpha=0.35+introP*0.65;ctx.translate(W/2,H/2-110);ctx.scale(titleScale,titleScale);
@@ -3241,6 +3332,25 @@ function traitGlowColor(block) {
     ctx.restore();
   }
 
+  function drawExitConfirm(){
+    if(!exitConfirmOpen)return;
+    const m=EXIT_MODAL;
+    ctx.save();
+    ctx.fillStyle='rgba(0,0,0,0.64)';ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='rgba(8,10,18,0.97)';ctx.strokeStyle='rgba(255,159,127,0.82)';ctx.lineWidth=2;
+    rr(ctx,m.x,m.y,m.w,m.h,18,true,true);
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillStyle='#ffb0a8';ctx.font='bold 22px system-ui,sans-serif';ctx.fillText('EXIT GAME?',W/2,m.y+43);
+    ctx.fillStyle='rgba(255,255,255,0.92)';ctx.font='bold 15px system-ui,sans-serif';ctx.fillText('ゲームを終了しますか？',W/2,m.y+76);
+    ctx.fillStyle='rgba(255,255,255,0.52)';ctx.font='12px system-ui,sans-serif';ctx.fillText('Your current run will be saved.',W/2,m.y+99);
+    const y=m.y+132;
+    ctx.fillStyle='rgba(255,105,105,0.18)';ctx.strokeStyle='rgba(255,150,150,0.72)';ctx.lineWidth=1.5;rr(ctx,m.x+268,y,150,46,10,true,true);
+    ctx.fillStyle='rgba(255,255,255,0.08)';ctx.strokeStyle='rgba(255,255,255,0.34)';rr(ctx,m.x+82,y,150,46,10,true,true);
+    ctx.font='bold 13px system-ui,sans-serif';ctx.fillStyle='#fff';ctx.fillText('CANCEL / いいえ',m.x+157,y+23);
+    ctx.fillStyle='#ffb0a8';ctx.fillText('EXIT / はい',m.x+343,y+23);
+    ctx.restore();
+  }
+
   // ── Render ───────────────────────────────────────────
   function render(){
     const sx=shake.v>0.3?(rnd()-0.5)*shake.v*2:0,sy=shake.v>0.3?(rnd()-0.5)*shake.v*1.4:0;
@@ -3263,6 +3373,7 @@ function traitGlowColor(block) {
     else if(gs.phase===P.WIN||gs.phase===P.FAIL){drawHUD();drawCard();}
     else drawHUD();
     drawToast();
+    drawExitConfirm();
     ctx.restore();
   }
 
