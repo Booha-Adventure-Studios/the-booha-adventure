@@ -568,12 +568,12 @@ const SCOLDS = [
         font-style: italic;
         margin-top: 2px;
       }
-      #vb-wrong-time {
-        font-size: clamp(28px,7vw,52px);
+      #vb-wrong-status {
+        font-size: clamp(18px,4vw,28px);
         font-weight: 900;
-        color: rgba(255,255,255,0.4);
+        color: rgba(255,255,255,0.62);
         margin-top: 8px;
-        font-variant-numeric: tabular-nums;
+        letter-spacing: 1px;
       }
       #vb-wrong-close {
         margin-top: 16px;
@@ -788,7 +788,7 @@ const SCOLDS = [
         <div class="vb-wrong-scold-jp"   id="vsj"></div>
         <div class="vb-wrong-scold-hira" id="vsh"></div>
         <div class="vb-wrong-scold-en"   id="vse"></div>
-        <div id="vb-wrong-time"></div>
+        <div id="vb-wrong-status">RUN ENDED — NO SCORE</div>
         <button id="vb-wrong-close" type="button">もどる</button>
       </div>
 
@@ -953,6 +953,7 @@ function stopBGM() {
     let current = 0;
     let startTime = null;
     let elapsed = 0;
+    let clearElapsed = null;
     let rafId = null;
     let locked = false;
     let bgIndex = 0;
@@ -960,7 +961,7 @@ function stopBGM() {
     // Timer
     function tick() {
       if (startTime === null) { rafId = requestAnimationFrame(tick); return; }
-      elapsed = Date.now() - startTime;
+      elapsed = performance.now() - startTime;
       timerEl.textContent = fmtTime(elapsed);
       rafId = requestAnimationFrame(tick);
     }
@@ -1010,7 +1011,7 @@ function stopBGM() {
 
       // Start timer on first question
       if (current === 0 && startTime === null) {
-        startTime = Date.now();
+        startTime = performance.now();
       }
     }
 
@@ -1100,7 +1101,7 @@ function stopBGM() {
     if (current >= queue.length) {
       stopTimer();
       stopBGM();
-      showWin(elapsed, curr, palette, overlay, winScreen,
+      showWin(clearElapsed ?? elapsed, curr, palette, overlay, winScreen,
         monthSlug, weekNumber, queue);
     } else {
       optionsEl.style.visibility = 'hidden';
@@ -1121,6 +1122,7 @@ function stopBGM() {
     // ── CORRECT ──
   btn.classList.add('correct');
     current++;
+    if (current >= queue.length) clearElapsed = performance.now() - startTime;
     correctDetonate(overlay, btn, optionsEl, jpWordEl, hiraEl, palette);
 
   } else {
@@ -1135,13 +1137,13 @@ function stopBGM() {
     overlay.addEventListener('animationend', () => overlay.classList.remove('shake'), { once: true });
     stopTimer();
     stopBGM();
-    setTimeout(() => showWrongPopup(correct, overlay, wrongPopup, elapsed), 500);
+    setTimeout(() => showWrongPopup(correct, overlay, wrongPopup), 500);
   }
 }
 
      
     // Wrong popup
-    function showWrongPopup(correct, overlay, popup, ms) {
+    function showWrongPopup(correct, overlay, popup) {
       const scold = SCOLDS[Math.floor(Math.random() * SCOLDS.length)];
       overlay.querySelector('#vwk').textContent = correct.jp;
       overlay.querySelector('#vwh').textContent = correct.hira;
@@ -1149,7 +1151,6 @@ function stopBGM() {
       overlay.querySelector('#vsj').textContent = scold.jp;
       overlay.querySelector('#vsh').textContent = scold.hira;
       overlay.querySelector('#vse').textContent = scold.en;
-      overlay.querySelector('#vb-wrong-time').textContent = fmtTime(ms);
       popup.classList.add('show');
     }
 
