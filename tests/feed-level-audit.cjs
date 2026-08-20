@@ -35,6 +35,13 @@ assert.match(engineSource, /function requestExit\(\)/, 'exit buttons must ask fo
 assert.match(htmlSource, /How to Play \/ あそびかた/, 'help panel must be bilingual');
 assert.match(engineSource, /function toggleHelp\(show\)/, 'help panel must manage focus');
 assert.match(engineSource, /function toggleExitConfirm\(show\)/, 'exit dialog must manage focus');
+assert.match(htmlSource, /Use Helper/, 'the failure action must explain the helper mechanic');
+assert.doesNotMatch(htmlSource, /Use Continue \/ コンティニュー/, 'the confusing continue label must be removed');
+
+const level4 = levels.find(level => level.id === 4);
+assert.strictEqual(level4.booha.x, 300, 'level 4 Booha should be within helper range after the bounce');
+assert.ok(level4.objects.some(object => object.type === 'bounce' && object.x === 260 && object.width === 180),
+  'level 4 bounce pad should overlap the candy drop path');
 
 levels.forEach((level, index) => {
   const label = `level ${index + 1}`;
