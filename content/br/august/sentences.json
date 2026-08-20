@@ -311,6 +311,9 @@
     {
       "n": 45,
       "en": "We are planning a farewell party for summer at the park.",
+      "acceptedAnswers": [
+        "We are planning a farewell party at the park for summer."
+      ],
       "jp": "私たちは公園で夏のお別れパーティーを計画しています。",
       "hira": "わたしたちはこうえんでなつのおわかれぱーてぃーをけいかくしています。",
       "mp3": "br_s45_we_are_planning_a_farewell_party_for_summer_at_the_park.mp3"

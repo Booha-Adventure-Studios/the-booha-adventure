@@ -1,6 +1,6 @@
 
 /* ══════════════════════════════════════════════════════════════
-   sentence-order.js  —  Sentence Order  v4
+   sentence-order.js  —  Sentence Order  v5
    ══════════════════════════════════════════════════════════════
    FIXES v4:
    - Audio unlock uses SILENT AudioContext oscillator — fixes the
@@ -9,7 +9,9 @@
    - Correct sequence (nothing overlaps):
        chips go green → ding plays → ding.onended fires →
        sparkles + dance → sentence audio plays → advance
-   - No feedback text shown on correct answer.
+   - No feedback text shown on a normal correct answer; assisted answers are labelled.
+   - One-use PRE-CHECK validates the whole sentence without revealing positions.
+   - Cards can provide acceptedAnswers for alternate valid word orders.
    - LISTEN replaced with themed speaker SVG circle button.
    - First placed word capitalised; last placed word gets period.
      Bank tiles always fully lowercase.
@@ -233,6 +235,7 @@ S.textContent = `
 }
 .so-dot.active{ background:var(--game-primary); border-color:var(--game-primary); box-shadow:0 0 8px var(--game-primary); }
 .so-dot.done{ background:#22c55e; border-color:#22c55e; box-shadow:0 0 7px rgba(34,197,94,.7); }
+.so-dot.assisted{ background:#ffcc00; border-color:#ffcc00; box-shadow:0 0 7px rgba(255,204,0,.7); }
 [data-curriculum="pb"] .so-dot{ background:rgba(255,110,180,.15); border-color:rgba(255,110,180,.25); }
 
 /* ── HUD pills ── */
@@ -489,6 +492,24 @@ body.hira-mode .so-hira-icon{ transform:rotate(180deg); }
 .so-clear-btn:hover{ background:rgba(239,68,68,.22); border-color:#ef4444; transform:scale(1.05) rotate(-2deg); }
 .so-clear-btn:active{ transform:scale(.93); }
 
+/* PRE-CHECK — one whole-sentence assist per item */
+.so-precheck-btn{
+  font-family:var(--game-font-title); font-size:clamp(11px,2.1vw,14px); letter-spacing:.05em;
+  padding:10px 15px; border-radius:999px;
+  border:2px solid rgba(255,204,0,.42); background:rgba(255,204,0,.1);
+  color:#ffcc00; font-weight:900; cursor:pointer; white-space:nowrap;
+  transition:transform .15s, background .18s, border-color .18s, opacity .2s;
+  -webkit-tap-highlight-color:transparent;
+}
+.so-precheck-btn.ready{ animation:soPrecheckPulse 1.7s ease-in-out infinite; }
+.so-precheck-btn.ready:hover{ background:rgba(255,204,0,.22); border-color:#ffcc00; transform:scale(1.04); }
+.so-precheck-btn.ready:active{ transform:scale(.94); }
+.so-precheck-btn:disabled{ opacity:.32; pointer-events:none; animation:none; }
+@keyframes soPrecheckPulse{
+  0%,100%{ box-shadow:0 0 0 rgba(255,204,0,0); }
+  50%{ box-shadow:0 0 18px rgba(255,204,0,.25); }
+}
+
 /* ── SPEAKER button — themed circle ── */
 .so-speaker-btn{
   width:46px; height:46px; border-radius:50%; padding:0;
@@ -667,6 +688,7 @@ body.hira-mode .so-hira-icon{ transform:rotate(180deg); }
 }
 @keyframes soScorePop{ from{ transform:scale(.55) rotate(-6deg); opacity:0; } 50%{ transform:scale(1.08) rotate(2deg); } to{ transform:none; opacity:1; } }
 .so-res-pct{ font-size:clamp(11px,2.1vw,15px); color:var(--game-muted); font-weight:700; margin-bottom:9px; animation:soFadeUp .4s ease .5s both; }
+.so-res-assisted{ font-size:clamp(11px,2vw,14px); color:var(--game-muted); font-weight:800; margin-bottom:12px; animation:soFadeUp .4s ease .54s both; }
 .so-res-label{
   font-family:var(--game-font-title); font-size:clamp(21px,5vw,36px);
   background:linear-gradient(90deg,#ff2288,#ffcc00,#aaff22,#22ddff,#cc88ff,#ff2288);
@@ -732,6 +754,7 @@ U.mount(`
       <span id="so-hira-label">ひらがな</span>
     </button>
     <button class="so-clear-btn"   id="so-clear">CLEAR</button>
+    <button class="so-precheck-btn" id="so-precheck" disabled>PRE-CHECK</button>
     <button class="so-speaker-btn" id="so-speaker" aria-label="Listen">${SPEAKER_SVG}</button>
     <button class="so-check-btn"   id="so-check" disabled>CHECK</button>
     <button class="so-help-btn"    id="so-help">?</button>
@@ -741,6 +764,7 @@ U.mount(`
     <div class="so-res-inner">
       <div class="so-res-score" id="so-rs"></div>
       <div class="so-res-pct"   id="so-rp"></div>
+      <div class="so-res-assisted" id="so-ra"></div>
       <div class="so-res-label" id="so-rl"></div>
       <div class="so-res-divider"></div>
       <div class="so-res-en"    id="so-re"></div>
@@ -773,8 +797,12 @@ U.mount(`
         <div class="so-how-jp">置いた単語をタップすると戻るよ。できたらCHECK！</div>
       </div></div>
       <div class="so-how-step"><div class="so-how-num">4</div><div>
-        <div class="so-how-en">After 3 wrong tries the speaker button appears — tap to hear it!</div>
-        <div class="so-how-jp">3回まちがえるとスピーカーで文を聞けるよ！</div>
+        <div class="so-how-en">When all words are placed, PRE-CHECK gives you one whole-sentence check. It does not reveal the answer.</div>
+        <div class="so-how-jp">単語を全部置いたら、PRE-CHECKを1回使えるよ。答えは表示されません。</div>
+      </div></div>
+      <div class="so-how-step"><div class="so-how-num">5</div><div>
+        <div class="so-how-en">After 3 regular wrong tries the speaker button appears — tap to hear the sentence!</div>
+        <div class="so-how-jp">通常のチェックを3回まちがえると、スピーカーで文を聞けるよ！</div>
       </div></div>
       <div class="so-how-step"><div class="so-how-num">あ</div><div>
         <div class="so-how-en">Press あ to switch between kanji and hiragana.</div>
@@ -800,6 +828,7 @@ const tilesEl    = document.getElementById('so-tiles');
 const feedbackEl = document.getElementById('so-feedback');
 const checkBtn   = document.getElementById('so-check');
 const clearBtn   = document.getElementById('so-clear');
+const precheckBtn = document.getElementById('so-precheck');
 const speakerBtn = document.getElementById('so-speaker');
 const helpBtn    = document.getElementById('so-help');
 const hiraBtn    = document.getElementById('so-hira-toggle');
@@ -853,14 +882,61 @@ let tileEls     = [];
 let firstTry    = true;
 let locked      = false;
 let wrongCount  = 0;
+let precheckUsed = false;
+let assistedCount = 0;
+const assistedItems = new Set();
 let lastCheckAt = 0;
 const CHECK_DEBOUNCE = 700;
+
+function normalizeSentence(sentence) {
+  return String(sentence || '')
+    .trim()
+    .replace(/[.!?]+$/, '')
+    .toLowerCase()
+    .replace(/[.,!?]/g, '')
+    .replace(/\s+/g, ' ');
+}
+
+/* Cards may optionally provide acceptedAnswers for equally valid orders. */
+function acceptedSentences(card) {
+  const extras = [card?.acceptedAnswers, card?.alternatives, card?.validOrders]
+    .flatMap(value => Array.isArray(value) ? value : []);
+  return [card?.en, ...extras].map(normalizeSentence).filter(Boolean);
+}
+
+function placedSentence() {
+  return placed.map(origIdx => tokens[origIdx]?.raw || '').join(' ');
+}
+
+function isAcceptedOrder(card) {
+  const answer = normalizeSentence(placedSentence());
+  return acceptedSentences(card).includes(answer);
+}
+
+function updateAnswerControls() {
+  const complete = placed.length === tokens.length && tokens.length > 0;
+  checkBtn.disabled = !complete;
+  const canPrecheck = complete && !precheckUsed && !locked;
+  precheckBtn.classList.toggle('ready', canPrecheck);
+  precheckBtn.disabled = !canPrecheck;
+}
+
+function markAssisted() {
+  firstTry = false;
+  if (!assistedItems.has(idx)) {
+    assistedItems.add(idx);
+    assistedCount++;
+  }
+}
 
 function updateDots() {
   for (let i = 0; i < 15; i++) {
     const d = document.getElementById(`so-d${i}`);
     if (!d) continue;
-    d.className = 'so-dot' + (i < idx ? ' done' : i === idx ? ' active' : '');
+    d.className = 'so-dot' + (
+      i < idx ? (assistedItems.has(i) ? ' assisted' : ' done') :
+      i === idx ? ' active' : ''
+    );
   }
 }
 
@@ -868,12 +944,14 @@ function updateDots() {
    SHOW CARD
    ══════════════════════════════════════════════════════════════ */
 function showCard() {
-  locked = false; firstTry = true; wrongCount = 0; placed = [];
+  locked = false; firstTry = true; wrongCount = 0; precheckUsed = false; placed = [];
   feedbackEl.textContent = ''; feedbackEl.style.color = '';
   clearBtn.classList.remove('visible');
+  precheckBtn.classList.remove('ready');
   speakerBtn.classList.remove('visible');
   speakerBtn.disabled = false;
   checkBtn.disabled = true;
+  precheckBtn.disabled = true;
 
   currentCard = allCards[idx];
   numEl.textContent  = idx + 1;
@@ -883,6 +961,7 @@ function showCard() {
   tokens = tokenise(currentCard.en);
   buildTiles();
   renderAnswer();
+  updateAnswerControls();
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -922,7 +1001,7 @@ function handleTileTap(tile, origIdx) {
   tile.classList.add('used');
   placed.push(origIdx);
   renderAnswer();
-  checkBtn.disabled = placed.length < tokens.length;
+  updateAnswerControls();
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -964,7 +1043,7 @@ function handleChipTap(pi) {
   placed.splice(pi, 1);
   if (tileEls[origIdx]) tileEls[origIdx].classList.remove('used');
   renderAnswer();
-  checkBtn.disabled = placed.length < tokens.length;
+  updateAnswerControls();
 }
 
 /* ── clear ── */
@@ -974,7 +1053,7 @@ clearBtn.addEventListener('click', () => {
   placed = [];
   renderAnswer();
   feedbackEl.textContent = '';
-  checkBtn.disabled = true;
+  updateAnswerControls();
 });
 
 /* ══════════════════════════════════════════════════════════════
@@ -999,14 +1078,13 @@ checkBtn.addEventListener('click', () => {
   }
 
   const n = tokens.length;
-  const answerStr = placed.map((oi, pi) => displayChip(tokens[oi], pi===0, pi===n-1)).join(' ');
-  const targetStr = tokens.map((t, i) => displayChip(t, i===0, i===n-1)).join(' ');
-  const correct   = answerStr.toLowerCase() === targetStr.toLowerCase();
+  const correct = isAcceptedOrder(currentCard);
 
   const chips = Array.from(answerEl.querySelectorAll('.so-placed-chip'));
 
   if (correct) {
     locked = true;
+    updateAnswerControls();
 
     /* 1. chips green */
     chips.forEach((chip, i) => {
@@ -1052,6 +1130,7 @@ checkBtn.addEventListener('click', () => {
 
   } else {
     locked = true; firstTry = false; wrongCount++;
+    updateAnswerControls();
     clearBtn.classList.add('visible');
     if (wrongCount >= 3) speakerBtn.classList.add('visible');
 
@@ -1069,6 +1148,68 @@ checkBtn.addEventListener('click', () => {
 
     setTimeout(() => { locked = false; }, chips.length * 55 + 620);
   }
+});
+
+/* PRE-CHECK — one whole-sentence assist, with no position-by-position reveal. */
+precheckBtn.addEventListener('click', () => {
+  if (locked || precheckUsed || placed.length < tokens.length) return;
+  precheckUsed = true;
+  markAssisted();
+  updateAnswerControls();
+
+  const correct = isAcceptedOrder(currentCard);
+  const chips = Array.from(answerEl.querySelectorAll('.so-placed-chip'));
+
+  if (correct) {
+    locked = true;
+    updateAnswerControls();
+    chips.forEach((chip, i) => {
+      setTimeout(() => {
+        chip.classList.remove('so-wrong');
+        chip.classList.add('so-correct');
+      }, i * 55);
+    });
+
+    feedbackEl.textContent = 'ASSISTED — 0 POINTS';
+    feedbackEl.style.color = '#ffcc00';
+    updateDots();
+
+    setTimeout(() => {
+      U.playSFX('ding', () => {
+        Array.from(answerEl.querySelectorAll('.so-placed-chip')).forEach((chip, i) => {
+          setTimeout(() => {
+            chip.classList.add('so-dance');
+            chip.addEventListener('animationend', () => chip.classList.remove('so-dance'), { once: true });
+          }, i * 50);
+        });
+
+        const danceMs = chips.length * 50 + 280;
+        setTimeout(() => {
+          playAudio(currentCard.mp3, () => {
+            setTimeout(() => {
+              idx++;
+              if (idx >= allCards.length) showResults();
+              else showCard();
+            }, 300);
+          });
+        }, danceMs);
+      });
+    }, chips.length * 55 + 20);
+    return;
+  }
+
+  /* PRE-CHECK does not identify individual word positions. */
+  chips.forEach(chip => chip.classList.remove('so-correct', 'so-wrong'));
+  locked = true;
+  updateAnswerControls();
+  clearBtn.classList.add('visible');
+  feedbackEl.textContent = 'Not yet — rearrange and try again!';
+  feedbackEl.style.color = '#ffcc00';
+  U.playSFX('fart');
+  setTimeout(() => {
+    locked = false;
+    updateAnswerControls();
+  }, 620);
 });
 
 /* ══════════════════════════════════════════════════════════════
@@ -1127,31 +1268,34 @@ function showResults() {
   document.querySelector('.so-hud').style.display       = 'none';
   /* .so-dots-row intentionally kept visible — shows all-done state */
 
-  /* Mark all dots done */
+  /* Mark all dots done, preserving assisted items in amber */
   for (let i = 0; i < 15; i++) {
     const d = document.getElementById(`so-d${i}`);
-    if (d) d.className = 'so-dot done';
+    if (d) d.className = `so-dot ${assistedItems.has(i) ? 'assisted' : 'done'}`;
   }
 
   /* Show results card */
   results.classList.add('show');
 
   const tier = getTier(score);
-  const pct  = Math.round((score / 15) * 100);
+  const total = allCards.length;
+  const pct  = Math.round((score / total) * 100);
 
   /* ── Save score to Booha Adventure save system ── */
   document.dispatchEvent(new CustomEvent('booha:gameEnd', {
     detail: {
       saveId:    `${CFG.curriculum}:sentence_order`,
       score:     pct,
-      completed: pct >= 40,
+      completed: true,
+      assisted: assistedCount,
     }
   }));
 
   /* Populate scorecard */
   results.style.setProperty('--tier-color', tier.color);
-  document.getElementById('so-rs').textContent = `${score} / 15`;
-  document.getElementById('so-rp').textContent = `${pct}%`;
+  document.getElementById('so-rs').textContent = `${score} / ${total}`;
+  document.getElementById('so-rp').textContent = `${pct}% first-try accuracy`;
+  document.getElementById('so-ra').textContent = `${total} / ${total} completed • ${assistedCount} assisted`;
   document.getElementById('so-rl').textContent = tier.label;
   document.getElementById('so-re').textContent = tier.en;
   document.getElementById('so-rj').textContent = tier.jp;
@@ -1175,6 +1319,8 @@ function showResults() {
     /* Reset state */
     idx   = 0;
     score = 0;
+    assistedCount = 0;
+    assistedItems.clear();
     scoreEl.textContent = '0';
     document.body.classList.remove('hira-mode');
     hiraMode = false;
@@ -1189,7 +1335,7 @@ function showResults() {
     window.location.assign(CFG.navTarget + '?week=' + encodeURIComponent(CFG.weekParam));
   });
 
-  if (score === 15) {
+  if (score === total) {
     setTimeout(() => fireSparkles(null, true),  400);
     setTimeout(() => fireSparkles(null, true),  900);
   }
