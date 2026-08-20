@@ -24,6 +24,7 @@
   const messageOverlay = document.getElementById('messageOverlay');
   const helpPanel      = document.getElementById('helpPanel');
   const exitConfirmOverlay = document.getElementById('exitConfirmOverlay');
+  const restartConfirmOverlay = document.getElementById('restartConfirmOverlay');
   const startBtn       = document.getElementById('startBtn');
   const restartBtn     = document.getElementById('restartBtn');
   const retryBtn       = document.getElementById('retryBtn');
@@ -33,6 +34,10 @@
   const closeHelpBtn   = document.getElementById('closeHelpBtn');
   const confirmExitBtn = document.getElementById('confirmExitBtn');
   const cancelExitBtn  = document.getElementById('cancelExitBtn');
+  const bottomRestartBtn = document.getElementById('bottomRestartBtn');
+  const bottomExitBtn = document.getElementById('bottomExitBtn');
+  const confirmRestartBtn = document.getElementById('confirmRestartBtn');
+  const cancelRestartBtn = document.getElementById('cancelRestartBtn');
   const LEVELS         = window.FEED_BOOHA_LEVELS || [];
   const levelText      = document.getElementById('levelText');
   const stateText      = document.getElementById('stateText');
@@ -57,6 +62,7 @@
   let starContainer = null;
   let helpReturnFocus = null;
   let exitReturnFocus = null;
+  let restartReturnFocus = null;
 
   const W       = canvas.width;   // 540
   const H       = canvas.height;  // 960
@@ -75,6 +81,8 @@
   const TRAIL_SPEED_THRESH = 6;
   const MAGNET_DIST        = 140;
   const MAGNET_FORCE       = 0.40;
+  const SAFETY_CATCH_Y     = FLOOR_Y - 220;
+  const SAFETY_CATCH_STEER = 0.10;
   const LAST_CHANCE_DIST   = 90;
 
   const swipe        = { active: false, x0: 0, y0: 0, x1: 0, y1: 0 };
@@ -806,7 +814,9 @@
 
     const ropeCount = (level.ropes || []).length;
     let kickVx;
-    if (ropeCount >= 2) {
+    if (typeof level.launchVx === 'number') {
+      kickVx = level.launchVx;
+    } else if (ropeCount >= 2) {
       const avgX = level.ropes.reduce((s, r) => s + r.anchor.x, 0) / ropeCount;
       kickVx = (avgX >= W / 2 ? -1 : 1) * 6;
     } else {
@@ -833,7 +843,8 @@
     state.objects = (level.objects || []).map(o => ({
       ...o,
       activated: false,
-      fanTimer: 0
+      fanTimer: 0,
+      used: false
     }));
 
     const bh = level.booha;
@@ -1010,6 +1021,31 @@
     window.location.href = 'karasuki.html?room=room_10';
   }
 
+  function toggleRestartConfirm(show) {
+    if (!restartConfirmOverlay) return;
+    if (show) {
+      restartReturnFocus = document.activeElement;
+      restartConfirmOverlay.classList.add('overlay--show');
+      restartConfirmOverlay.setAttribute('aria-hidden', 'false');
+      window.setTimeout(() => cancelRestartBtn.focus(), 0);
+      return;
+    }
+    restartConfirmOverlay.classList.remove('overlay--show');
+    restartConfirmOverlay.setAttribute('aria-hidden', 'true');
+    if (restartReturnFocus && typeof restartReturnFocus.focus === 'function') {
+      window.setTimeout(() => restartReturnFocus.focus(), 0);
+    }
+  }
+
+  function requestRestartGame() {
+    toggleRestartConfirm(true);
+  }
+
+  function confirmRestartGame() {
+    toggleRestartConfirm(false);
+    resetCampaign();
+  }
+
   // A pending delayed rope has been requested, but it still holds the candy
   // until its release timer fires. Excluding it here makes delayed ropes
   // release immediately and only delays their visual cleanup.
@@ -1065,6 +1101,14 @@
     if (!state.booha || state.won || state.lost) return;
     const c = state.candy, m = boohaMouthPoint();
     const dx = m.x - c.x, dy = m.y - c.y, dist = Math.hypot(dx, dy);
+    const leavingPlayfield = c.x < CANDY_R * 2 || c.x > W - CANDY_R * 2;
+    if ((c.y >= SAFETY_CATCH_Y || leavingPlayfield) && dist > 0) {
+      // Late rescue keeps a missed route forgiving without changing the
+      // puzzle's earlier rope, fan, and bounce decisions.
+      c.vx = dx * SAFETY_CATCH_STEER;
+      c.vy = dy * SAFETY_CATCH_STEER;
+      return;
+    }
     const magnetDist = state.continueAssist ? MAGNET_DIST * 1.7 : MAGNET_DIST;
     const magnetForce = state.continueAssist ? MAGNET_FORCE * 1.8 : MAGNET_FORCE;
     if (dist > magnetDist || dist < 1) return;
@@ -1118,12 +1162,17 @@
     if (!c || c.attached) return;
     for (const obj of state.objects) {
       if (obj.type !== 'bounce') continue;
+      if (obj.used) continue;
       const l = obj.x - obj.width/2, r = obj.x + obj.width/2;
       const top = obj.y - obj.height/2;
-      if (c.x+c.r > l && c.x-c.r < r && c.y+c.r >= top && c.y+c.r <= top+22 && c.vy > 0) {
+      const previousBottom = c.y - c.vy + c.r;
+      const crossedTop = previousBottom <= top && c.y + c.r >= top;
+      const insideLandingBand = c.y + c.r >= top && c.y + c.r <= top + 22;
+      if (c.x+c.r > l && c.x-c.r < r && (crossedTop || insideLandingBand) && c.vy > 0) {
+        obj.used = true;
         c.y = top - c.r;
         c.vy = -Math.max(10, Math.abs(c.vy) * 0.95);
-        c.vx *= 1.02;
+        c.vx = c.vx * 1.02 + (obj.pushX || 0);
         // Only flag hitBounce if level cares about it (noBounce levels)
         if (state.currentLevel && state.currentLevel.noBounce) {
           state.hitBounce = true;
@@ -1550,8 +1599,12 @@
     closeHelpBtn.addEventListener('click', () => toggleHelp(false));
     document.getElementById('startExitBtn')?.addEventListener('click', requestExit);
     document.getElementById('exitBtn')?.addEventListener('click', requestExit);
+    bottomExitBtn?.addEventListener('click', requestExit);
+    bottomRestartBtn?.addEventListener('click', requestRestartGame);
     confirmExitBtn?.addEventListener('click', confirmExit);
     cancelExitBtn?.addEventListener('click', () => toggleExitConfirm(false));
+    confirmRestartBtn?.addEventListener('click', confirmRestartGame);
+    cancelRestartBtn?.addEventListener('click', () => toggleRestartConfirm(false));
     canvas.addEventListener('click', evt => handleTap(getCanvasPoint(evt)));
     canvas.addEventListener('touchstart', evt => {
       if (!state.started) return;
