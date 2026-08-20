@@ -546,11 +546,40 @@
     }
   }
 
+  function setBilingual(element, english, japanese) {
+    if (!element) return;
+    element.replaceChildren();
+    const en = document.createElement('span');
+    en.className = 'popup-en';
+    en.textContent = english;
+    const ja = document.createElement('span');
+    ja.className = 'popup-ja';
+    ja.textContent = japanese;
+    element.append(en, ja);
+  }
+
+  function setButtonLabel(button, english, japanese) {
+    if (!button) return;
+    button.replaceChildren();
+    const en = document.createElement('span');
+    en.className = 'button-en';
+    en.textContent = english;
+    const ja = document.createElement('span');
+    ja.className = 'button-ja';
+    ja.textContent = japanese;
+    button.append(en, ja);
+    if (english === 'Next' || english === 'Play Again') {
+      button.append(document.createTextNode(' ▶'));
+    }
+  }
+
   function syncProgressHud() {
     if (scoreTextEl) scoreTextEl.textContent = String(Math.round(state.campaignScore || 0));
     if (totalStarsEl) totalStarsEl.textContent = String(feedProgress.totalStars || 0);
     if (bestScoreEl) bestScoreEl.textContent = `Best score / ベストスコア: ${Math.round(feedProgress.bestScore || 0)}`;
-    if (continueStatusEl) continueStatusEl.textContent = `Continues / コンティニュー: ${state.continuesLeft} / ${MAX_CONTINUES}`;
+    setBilingual(continueStatusEl,
+      `Helpers left: ${state.continuesLeft} / ${MAX_CONTINUES}`,
+      `のこりのたすけ: ${state.continuesLeft} / ${MAX_CONTINUES}`);
   }
 
   function chapterForLevel(index) {
@@ -860,7 +889,7 @@
     feedProgress.lastPlayedAt = Date.now();
     writeFeedProgress();
     hideMessage();
-    // A continue is a protected restart: Booha's pull is stronger for this attempt.
+    // A helper is a protected restart: Booha's pull is stronger for this attempt.
     buildLevel(state.levelIndex, { assist: true });
   }
 
@@ -890,15 +919,15 @@
   }
 
   function showMessage(title, text, nextVisible = true, cutCount = 0, hitBounce = false) {
-    messageTitle.textContent = title;
-    messageText.textContent  = text;
+    setBilingual(messageTitle, title.en, title.ja);
+    setBilingual(messageText, text.en, text.ja);
     const stars = starsForCuts(cutCount, hitBounce);
     nextBtn.style.display  = nextVisible ? 'inline-flex' : 'none';
     if (continueBtn) continueBtn.style.display = 'none';
     if (continueStatusEl) continueStatusEl.style.display = 'none';
-    nextBtn.textContent = state.campaignComplete
-      ? 'Play Again / もう一度'
-      : 'Next / 次へ';
+    setButtonLabel(nextBtn,
+      state.campaignComplete ? 'Play Again' : 'Next',
+      state.campaignComplete ? 'もう一度' : '次へ');
     retryBtn.style.display = (!nextVisible || stars < 3) ? 'inline-flex' : 'none';
     if (nextVisible) showStars(cutCount, hitBounce);
     else if (starContainer) starContainer.innerHTML = '';
@@ -908,13 +937,17 @@
   }
 
   function showFailureMessage() {
-    messageTitle.textContent = 'Oops! / ざんねん！';
-    messageText.textContent = 'Booha missed the candy. Retry for free, or use a continue for a helpful restart. / ブーハがキャンディを逃がしたよ。無料でもう一度やるか、コンティニューでたすけモードを使おう。';
+    setBilingual(messageTitle, 'Oops!', 'ざんねん！');
+    setBilingual(messageText,
+      'Booha missed the candy. Retry for free, or use a helper to make this level easier.',
+      'ブーハーがキャンディを逃がしたよ。無料でもう一度やるか、たすけモードでこのレベルをかんたんにできるよ。');
     nextBtn.style.display = 'none';
     retryBtn.style.display = 'inline-flex';
     if (continueBtn) continueBtn.style.display = state.continuesLeft > 0 ? 'inline-flex' : 'none';
     if (continueStatusEl) {
-      continueStatusEl.textContent = `Continues / コンティニュー: ${state.continuesLeft} / ${MAX_CONTINUES}`;
+      setBilingual(continueStatusEl,
+        `Helpers left: ${state.continuesLeft} / ${MAX_CONTINUES}`,
+        `のこりのたすけ: ${state.continuesLeft} / ${MAX_CONTINUES}`);
       continueStatusEl.style.display = 'block';
     }
     if (starContainer) starContainer.innerHTML = '';
@@ -1162,19 +1195,25 @@
       let title;
       let text;
       if (state.campaignComplete) {
-        title = 'Campaign Clear! / キャンペーンクリア！';
-        text = `Score: ${Math.round(state.campaignScore)} · Best: ${Math.round(feedProgress.bestScore)} · Stars: ${state.campaignStars} / スコア: ${Math.round(state.campaignScore)} · ベスト: ${Math.round(feedProgress.bestScore)} · スター: ${state.campaignStars}`;
+        title = { en: 'Campaign Clear!', ja: 'キャンペーンクリア！' };
+        text = {
+          en: `Score: ${Math.round(state.campaignScore)} · Best: ${Math.round(feedProgress.bestScore)} · Stars: ${state.campaignStars}`,
+          ja: `スコア: ${Math.round(state.campaignScore)} · ベスト: ${Math.round(feedProgress.bestScore)} · スター: ${state.campaignStars}`
+        };
       } else if (chapterComplete) {
         const chapter = Math.floor(state.levelIndex / 10) + 1;
-        title = `Chapter ${chapter} Clear! / チャプター${chapter}クリア！`;
-        text = `Score: ${Math.round(state.campaignScore)} · Best: ${Math.round(feedProgress.bestScore)} · Stars: ${state.campaignStars} / スコア: ${Math.round(state.campaignScore)} · ベスト: ${Math.round(feedProgress.bestScore)} · スター: ${state.campaignStars}`;
+        title = { en: `Chapter ${chapter} Clear!`, ja: `チャプター${chapter}クリア！` };
+        text = {
+          en: `Score: ${Math.round(state.campaignScore)} · Best: ${Math.round(feedProgress.bestScore)} · Stars: ${state.campaignStars}`,
+          ja: `スコア: ${Math.round(state.campaignScore)} · ベスト: ${Math.round(feedProgress.bestScore)} · スター: ${state.campaignStars}`
+        };
       } else {
         title = stars === 3
-          ? 'Perfect! / パーフェクト！'
+          ? { en: 'Perfect!', ja: 'パーフェクト！' }
           : stars === 2
-            ? 'Tasty! / おいしい！'
-            : 'Good job! / よくできた！';
-        text = 'Booha is happy! / ブーハはうれしい！';
+            ? { en: 'Tasty!', ja: 'おいしい！' }
+            : { en: 'Good job!', ja: 'よくできた！' };
+        text = { en: 'Booha is happy!', ja: 'ブーハーはうれしい！' };
       }
       showMessage(title, text, true, cuts, hitBounce);
     }, 1400);
