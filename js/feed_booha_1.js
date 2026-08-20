@@ -550,10 +550,10 @@
     if (!element) return;
     element.replaceChildren();
     const en = document.createElement('span');
-    en.className = 'popup-en';
+    en.className = 'bilingual-en';
     en.textContent = english;
     const ja = document.createElement('span');
-    ja.className = 'popup-ja';
+    ja.className = 'bilingual-ja';
     ja.textContent = japanese;
     element.append(en, ja);
   }
@@ -576,7 +576,8 @@
   function syncProgressHud() {
     if (scoreTextEl) scoreTextEl.textContent = String(Math.round(state.campaignScore || 0));
     if (totalStarsEl) totalStarsEl.textContent = String(feedProgress.totalStars || 0);
-    if (bestScoreEl) bestScoreEl.textContent = `Best score / ベストスコア: ${Math.round(feedProgress.bestScore || 0)}`;
+    const bestScore = Math.round(feedProgress.bestScore || 0);
+    setBilingual(bestScoreEl, `Best score: ${bestScore}`, `ベストスコア: ${bestScore}`);
     setBilingual(continueStatusEl,
       `Helpers left: ${state.continuesLeft} / ${MAX_CONTINUES}`,
       `のこりのたすけ: ${state.continuesLeft} / ${MAX_CONTINUES}`);
@@ -659,15 +660,20 @@
     state.cutTimers = {};
   }
 
-  function setHud(lvl, status) {
+  function setHud(lvl, englishStatus, japaneseStatus = '') {
     if (levelText) levelText.textContent = String(lvl);
-    if (stateText) stateText.textContent = status;
+    if (japaneseStatus) setBilingual(stateText, englishStatus, japaneseStatus);
+    else if (stateText) stateText.textContent = englishStatus;
   }
 
   // v7: HUD shows "Cuts: X / par" live during play
   function setHudCuts() {
     const par = getParCuts();
-    setHud(state.levelIndex + 1, `Cuts: ${state.cutCount} / ${par} · カット`);
+    setHud(
+      state.levelIndex + 1,
+      `Cuts ${state.cutCount} · Goal ${par}`,
+      `カット ${state.cutCount} · 目標 ${par}`
+    );
   }
 
   function cloneLevel(l) { return JSON.parse(JSON.stringify(l)); }
@@ -853,7 +859,11 @@
       writeFeedProgress();
     }
     syncProgressHud();
-    setHud(index + 1, options.assist ? 'Helper / たすけモード' : 'Ready / 準備OK');
+    setHud(
+      index + 1,
+      options.assist ? 'Helper' : 'Ready',
+      options.assist ? 'たすけモード' : '準備OK'
+    );
   }
 
   // ─────────────────────────────────────────────────
@@ -1227,7 +1237,7 @@
     const m = boohaMouthPoint();
     state.missDir = c.x < m.x ? -1 : 1;
     state.boohaSprite = 'booSad';
-    setHud(state.levelIndex+1, 'Miss / ミス');
+    setHud(state.levelIndex + 1, 'Miss', 'ミス');
     playSfxMiss();
     state.pendingFailTimeout = setTimeout(() => {
       showFailureMessage();
@@ -1563,11 +1573,11 @@
   }
 
   async function boot() {
-    setHud(1, 'Loading / 読み込み中');
+    setHud(1, 'Loading', '読み込み中');
     buildDomParticles();
     bindEvents();
     await preloadAssets();
-    setHud(1, 'Ready / 準備OK');
+    setHud(1, 'Ready', '準備OK');
     requestAnimationFrame(frame);
   }
 
