@@ -23,6 +23,12 @@ assert.match(engineSource, /function getActiveRopes\(\) \{ return state\.ropes\.
   'delayed ropes must remain active until their release timer fires');
 assert.match(engineSource, /rope\.releaseAt = performance\.now\(\) \+ rope\.delayMs/,
   'delayed ropes must expose their release timing for debugging');
+assert.match(engineSource, /const MAX_CONTINUES\s*=\s*3/,
+  'each chapter must provide three continues');
+assert.match(engineSource, /function showFailureMessage\(\)/,
+  'failures must present an explicit choice screen');
+assert.doesNotMatch(engineSource, /pendingFailTimeout2\s*=\s*setTimeout\(/,
+  'failures must not automatically reset before the student chooses');
 
 levels.forEach((level, index) => {
   const label = `level ${index + 1}`;

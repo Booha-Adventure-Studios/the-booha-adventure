@@ -481,6 +481,25 @@ canvas {
   border-left: 3px solid rgba(200,80,255,0.5);
 }
 
+.continue-note,
+.continue-status {
+  color: rgba(255,255,255,0.58);
+  font-size: 12px;
+  line-height: 1.45;
+}
+.continue-note { margin: 8px 0 0; }
+.continue-status { margin: 10px 0 0; }
+.continue-btn {
+  color: #ffe6a3;
+  border-color: rgba(255,214,110,0.45);
+  background: rgba(255,184,64,0.12);
+}
+.continue-btn:hover,
+.continue-btn:focus-visible {
+  background: rgba(255,184,64,0.24);
+  border-color: rgba(255,226,145,0.7);
+}
+
 /* ── Responsive ──────────────────────────────────── */
 @media (max-width: 400px) {
   .game-wrap  { max-width: 100%; }
