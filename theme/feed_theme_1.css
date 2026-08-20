@@ -516,3 +516,26 @@ canvas {
   .hud-pill   { font-size: 11px; padding: 4px 9px; }
   .game-title { font-size: 18px; }
 }
+
+@media (max-width: 360px) {
+  .topbar { padding-left: 9px; padding-right: 9px; }
+  .game-title { font-size: 17px; }
+  .topbar-actions { gap: 4px; }
+  .ui-btn { padding: 6px 9px; }
+  .hud { padding-left: 8px; padding-right: 8px; }
+  .hud-left { gap: 4px; max-width: calc(100% - 48px); flex-wrap: wrap; }
+  .hud-pill { font-size: 10px; padding: 4px 7px; }
+  .hud-label { font-size: 8px; }
+  .hud-stars { padding-left: 8px; padding-right: 8px; }
+  .overlay-card { padding-left: 18px; padding-right: 18px; }
+  .overlay-card h2 { font-size: 26px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
