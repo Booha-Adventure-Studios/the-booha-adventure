@@ -134,13 +134,13 @@ function playListen(mp3) {
 let allCards = U.shuffle(CFG.cards.slice(0, 15));
 
 const TIERS = [
-  { min:0,  max:5,  sound:'result_0-5.mp3',
+  { min:0,  max:5.5,  sound:'result_0-5.mp3',
     label:'TRY AGAIN', en:"Rough start — but you've got this!",
     jp:'もう一回やってみよう！', kanji:'もう一回挑戦！', color:'#ef4444' },
-  { min:6,  max:10, sound:'result_6-10.mp3',
+  { min:6,  max:10.5, sound:'result_6-10.mp3',
     label:'KEEP GOING', en:'Nice effort. You are getting stronger!',
     jp:'いい感じ！どんどん上手！', kanji:'良い調子！どんどん上達！', color:'#f97316' },
-  { min:11, max:14, sound:'result_11-14.mp3',
+  { min:11, max:14.5, sound:'result_11-14.mp3',
     label:'SO CLOSE!', en:'Almost perfect. Really strong work!',
     jp:'おしい！すごく上手！', kanji:'惜しい！とても上手！', color:'#22ddff' },
   { min:15, max:15, sound:'result_15.mp3',
@@ -148,6 +148,7 @@ const TIERS = [
     jp:'パーフェクト！全問正解！', kanji:'完璧！全問正解！', color:'#ffcc00' },
 ];
 const getTier = s => TIERS.find(t => s >= t.min && s <= t.max) ?? TIERS[0];
+const formatScore = s => Number.isInteger(s) ? String(s) : s.toFixed(1);
 
 /* ══════════════════════════════════════════════════════════════
    LABEL HELPERS
@@ -224,9 +225,9 @@ S.textContent = `
 }
 .sw-dot.active{ background:var(--game-primary); border-color:var(--game-primary); box-shadow:0 0 8px var(--game-primary); }
 .sw-dot.done{ background:#22c55e; border-color:#22c55e; box-shadow:0 0 7px rgba(34,197,94,.7); }
-.sw-dot.assisted{ background:#ffcc00; border-color:#ffcc00; box-shadow:0 0 7px rgba(255,204,0,.7); }
+.sw-dot.recovered{ background:#ffcc00; border-color:#ffcc00; box-shadow:0 0 7px rgba(255,204,0,.7); }
 [data-curriculum="pb"] .sw-dot{ background:rgba(255,110,180,.15); border-color:rgba(255,110,180,.25); }
-[data-curriculum="pb"] .sw-dot.assisted{ background:#ffcc00; border-color:#ffcc00; box-shadow:0 0 7px rgba(255,204,0,.7); }
+[data-curriculum="pb"] .sw-dot.recovered{ background:#ffcc00; border-color:#ffcc00; box-shadow:0 0 7px rgba(255,204,0,.7); }
 
 /* ── HUD pills ── */
 .sw-hud{ display:flex; justify-content:center; gap:8px; margin-bottom:.5rem; flex-wrap:wrap; }
@@ -475,23 +476,6 @@ S.textContent = `
 .sw-check-btn:active{ transform:scale(.96); box-shadow:none; }
 .sw-check-btn:disabled{ opacity:.32; pointer-events:none; box-shadow:none; }
 
-/* PRE-CHECK — one-use assist, available only after all letters are placed */
-.sw-precheck-btn{
-  display:none; font-family:var(--game-font-title);
-  font-size:clamp(12px,2.5vw,16px); letter-spacing:.06em;
-  padding:10px 20px; border-radius:999px;
-  border:2px solid rgba(255,204,0,.65); background:rgba(255,204,0,.14);
-  color:#ffcc00; font-weight:900; cursor:pointer;
-  transition:transform .15s, background .18s, border-color .15s;
-  -webkit-tap-highlight-color:transparent;
-}
-.sw-precheck-btn.ready{
-  display:block; animation:swPrecheckIn .28s cubic-bezier(.34,1.56,.64,1);
-}
-.sw-precheck-btn.ready:hover{ background:rgba(255,204,0,.24); border-color:#ffcc00; transform:scale(1.04); }
-.sw-precheck-btn.ready:active{ transform:scale(.94); }
-@keyframes swPrecheckIn{ from{ transform:scale(0); opacity:0; } to{ transform:none; opacity:1; } }
-
 /* CLEAR */
 .sw-clear-btn{
   font-family:var(--game-font-title);
@@ -671,7 +655,7 @@ S.textContent = `
 }
 @keyframes swScorePop{ from{ transform:scale(.55) rotate(-6deg); opacity:0; } 50%{ transform:scale(1.08) rotate(2deg); } to{ transform:none; opacity:1; } }
 .sw-res-pct{ font-size:clamp(11px,2.1vw,15px); color:var(--game-muted); font-weight:700; margin-bottom:9px; animation:swFadeUp .4s ease .5s both; }
-.sw-res-assisted{ font-size:clamp(11px,2vw,14px); color:var(--game-muted); font-weight:800; margin-bottom:12px; animation:swFadeUp .4s ease .54s both; }
+.sw-res-recovery{ font-size:clamp(11px,2vw,14px); color:var(--game-muted); font-weight:800; margin-bottom:12px; animation:swFadeUp .4s ease .54s both; }
 .sw-res-label{
   font-family:var(--game-font-title); font-size:clamp(21px,5vw,36px);
   background:linear-gradient(90deg,#ff2288,#ffcc00,#aaff22,#22ddff,#cc88ff,#ff2288);
@@ -727,7 +711,6 @@ U.mount(`
   <div class="sw-tiles" id="sw-tiles"></div>
   <div class="sw-bottom-bar">
     <button class="sw-clear-btn"   id="sw-clear">CLEAR</button>
-    <button class="sw-precheck-btn" id="sw-precheck" disabled>PRE-CHECK</button>
     <button class="sw-speaker-btn" id="sw-speaker" aria-label="Listen">${SPEAKER_SVG}</button>
     <button class="sw-check-btn"   id="sw-check" disabled>CHECK</button>
     <button class="sw-help-btn"    id="sw-help">?</button>
@@ -737,7 +720,7 @@ U.mount(`
     <div class="sw-res-inner">
       <div class="sw-res-score" id="sw-rs"></div>
       <div class="sw-res-pct"   id="sw-rp"></div>
-      <div class="sw-res-assisted" id="sw-ra"></div>
+      <div class="sw-res-recovery" id="sw-ra"></div>
       <div class="sw-res-label" id="sw-rl"></div>
       <div class="sw-res-divider"></div>
       <div class="sw-res-en"    id="sw-re"></div>
@@ -770,16 +753,20 @@ U.mount(`
         <div class="sw-how-jp">スロットをタップすると文字が消えるよ。</div>
       </div></div>
       <div class="sw-how-step"><div class="sw-how-num">4</div><div>
-        <div class="sw-how-en">Press CHECK when done. First-try correct = 1 point!</div>
-        <div class="sw-how-jp">CHECKを押そう。一発正解でポイントゲット！</div>
+        <div class="sw-how-en">Press CHECK when done. First try = 1 point; recovery = 0.5 point.</div>
+        <div class="sw-how-jp">できたらCHECK！一発正解は1ポイント、やり直しは0.5ポイント。</div>
       </div></div>
       <div class="sw-how-step"><div class="sw-how-num">5</div><div>
-        <div class="sw-how-en">PRE-CHECK appears when all letters are placed. You may use it once; an assisted clear earns 0 points.</div>
-        <div class="sw-how-jp">文字を全部入れるとPRE-CHECKが出ます。一回だけ使えて、アシスト正解は0ポイントです。</div>
+        <div class="sw-how-en">If letters are wrong, they shake and return to the bank. Fix them for 0.5 point.</div>
+        <div class="sw-how-jp">まちがった文字はゆれて、もどります。なおせたら0.5ポイント。</div>
       </div></div>
       <div class="sw-how-step"><div class="sw-how-num">6</div><div>
-        <div class="sw-how-en">After 3 wrong tries the speaker button appears — tap to hear the word.</div>
-        <div class="sw-how-jp">3回まちがえるとスピーカーボタンで言葉を聞けるよ。</div>
+        <div class="sw-how-en">After a wrong try the speaker button appears — tap to hear the word.</div>
+        <div class="sw-how-jp">まちがえるとスピーカーボタンが出ます。言葉を聞いてみよう。</div>
+      </div></div>
+      <div class="sw-how-step"><div class="sw-how-num">7</div><div>
+        <div class="sw-how-en">After three tough words, a Recovery Boost can restore half a lost point.</div>
+        <div class="sw-how-jp">3問たいへんだったら、リカバリーブーストで半分もどせるよ。</div>
       </div></div>
       <button class="sw-modal-close" id="sw-modal-ok">Got it! / わかった！</button>
     </div>
@@ -799,7 +786,6 @@ const tilesEl    = document.getElementById('sw-tiles');
 const feedbackEl = document.getElementById('sw-feedback');
 const checkBtn   = document.getElementById('sw-check');
 const clearBtn   = document.getElementById('sw-clear');
-const precheckBtn = document.getElementById('sw-precheck');
 const speakerBtn = document.getElementById('sw-speaker');
 const helpBtn    = document.getElementById('sw-help');
 const dotsRow    = document.getElementById('sw-dots');
@@ -836,12 +822,16 @@ speakerBtn.addEventListener('click', e => {
 let idx        = 0;
 let score      = 0;
 let placed     = [];
-let firstTry   = true;
 let locked     = false;
 let wrongCount = 0;
-let precheckUsed = false;
-let assistedCount = 0;
-const assistedItems = new Set();
+let recoveryActive = false;
+let pendingLoss = 0;
+let difficultStreak = 0;
+let recoveryBank = 0;
+let recoveryBoostReady = false;
+let recoveredCount = 0;
+let recoveryBoostCount = 0;
+const recoveredItems = new Set();
 let lastCheckAt = 0;
 const CHECK_DEBOUNCE = 700;
 
@@ -857,20 +847,29 @@ function allLettersPlaced() {
   return placed.length > 0 && placed.every(Boolean);
 }
 
+function renderScore() {
+  scoreEl.textContent = formatScore(score);
+}
+
+function armRecoveryBoostIfReady() {
+  if (difficultStreak >= 3 && recoveryBank > 0) recoveryBoostReady = true;
+}
+
+function applyRecoveryBoost() {
+  if (!recoveryBoostReady || recoveryBank <= 0 || score >= allCards.length) return 0;
+  const bonus = Math.min(0.5, recoveryBank, allCards.length - score);
+  score += bonus;
+  recoveryBank -= bonus;
+  recoveryBoostReady = false;
+  difficultStreak = 0;
+  recoveryBoostCount++;
+  renderScore();
+  return bonus;
+}
+
 function updateAnswerControls() {
   const complete = allLettersPlaced();
   checkBtn.disabled = !complete;
-  const canPrecheck = complete && !precheckUsed && !locked;
-  precheckBtn.classList.toggle('ready', canPrecheck);
-  precheckBtn.disabled = !canPrecheck;
-}
-
-function markAssisted() {
-  firstTry = false;
-  if (!assistedItems.has(idx)) {
-    assistedItems.add(idx);
-    assistedCount++;
-  }
 }
 
 function updateDots() {
@@ -878,7 +877,7 @@ function updateDots() {
     const d = document.getElementById(`sw-d${i}`);
     if (!d) continue;
     d.className = 'sw-dot' + (
-      i < idx ? (assistedItems.has(i) ? ' assisted' : ' done') :
+      i < idx ? (recoveredItems.has(i) ? ' recovered' : ' done') :
       i === idx ? ' active' : ''
     );
   }
@@ -888,14 +887,12 @@ function updateDots() {
    SHOW CARD
    ══════════════════════════════════════════════════════════════ */
 function showCard() {
-  locked = false; firstTry = true; wrongCount = 0; precheckUsed = false; placed = [];
+  locked = false; wrongCount = 0; recoveryActive = false; pendingLoss = 0; placed = [];
   feedbackEl.textContent = ''; feedbackEl.style.color = '';
   clearBtn.classList.remove('visible');
-  precheckBtn.classList.remove('ready');
   speakerBtn.classList.remove('visible');
   speakerBtn.disabled = false;
   checkBtn.disabled = true;
-  precheckBtn.disabled = true;
 
   const card = allCards[idx];
   numEl.textContent  = idx + 1;
@@ -1040,14 +1037,30 @@ function resolveCorrect(card, slotEls) {
     }, i * 55);
   });
 
-  if (assistedItems.has(idx)) {
-    feedbackEl.textContent = 'ASSISTED — 0 POINTS';
+  const isRecovery = recoveryActive;
+  const bankBefore = recoveryBank;
+  if (isRecovery) {
+    recoveredItems.add(idx);
+    recoveredCount++;
+    score += 0.5;
+    recoveryBank += pendingLoss;
+    pendingLoss = 0;
+    armRecoveryBoostIfReady();
+    feedbackEl.textContent = 'NICE RECOVERY +0.5';
     feedbackEl.style.color = '#ffcc00';
   } else {
     feedbackEl.textContent = '';
+    score += 1;
+    difficultStreak = 0;
   }
-
-  if (firstTry) { score++; scoreEl.textContent = score; }
+  renderScore();
+  if (bankBefore > 0) {
+    const boost = applyRecoveryBoost();
+    if (boost) {
+      feedbackEl.textContent = `RECOVERY BOOST +${formatScore(boost)}`;
+      feedbackEl.style.color = '#ffcc00';
+    }
+  }
   updateDots();
 
   /* 2. ding after slots finish */
@@ -1079,12 +1092,22 @@ function resolveCorrect(card, slotEls) {
   }, slotEls.length * 55 + 20);
 }
 
-function resolveWrong(card, slotEls, fromPrecheck = false) {
+function resolveWrong(card, slotEls) {
   locked = true;
   updateAnswerControls();
-  if (!fromPrecheck) { firstTry = false; wrongCount++; }
+  const isFinalAttempt = recoveryActive;
+  wrongCount++;
+  if (isFinalAttempt) {
+    recoveryBank += 1;
+    pendingLoss = 0;
+  } else {
+    recoveryActive = true;
+    pendingLoss = 0.5;
+    difficultStreak++;
+  }
+  armRecoveryBoostIfReady();
   clearBtn.classList.add('visible');
-  if (wrongCount >= 3) speakerBtn.classList.add('visible');
+  if (wrongCount >= 1) speakerBtn.classList.add('visible');
 
   const target = answerText(card);
   slotEls.forEach((sl, i) => {
@@ -1094,17 +1117,43 @@ function resolveWrong(card, slotEls, fromPrecheck = false) {
     }, i * 50);
   });
 
-  feedbackEl.textContent = fromPrecheck ? 'Not yet — try again!' : 'Not quite — try again!';
-  feedbackEl.style.color = fromPrecheck ? '#ffcc00' : '#ef4444';
+  feedbackEl.textContent = isFinalAttempt
+    ? 'Tough one — the answer is shown, then we move on.'
+    : 'Good — fix the shaking letters for 0.5 point!';
+  feedbackEl.style.color = isFinalAttempt ? '#ffcc00' : '#ef4444';
   U.playSFX('fart');
 
+  const settleMs = slotEls.length * 50 + 620;
   setTimeout(() => {
+    if (isFinalAttempt) {
+      const target = answerText(card);
+      slotEls.forEach((sl, i) => {
+        sl.textContent = target[i] || '';
+        sl.classList.remove('sw-wrong', 'filled', 'empty');
+        sl.classList.add('sw-correct');
+      });
+      setTimeout(() => {
+        idx++;
+        if (idx >= allCards.length) showResults();
+        else showCard();
+      }, 900);
+      return;
+    }
+
+    const target = answerText(card);
+    placed.forEach((p, i) => {
+      if (p && p.letter !== target[i]) {
+        p.tileEl.classList.remove('used');
+        placed[i] = null;
+      }
+    });
+    renderSlots();
     locked = false;
     updateAnswerControls();
-  }, slotEls.length * 50 + 620);
+  }, settleMs);
 }
 
-function evaluateAnswer(fromPrecheck = false) {
+function evaluateAnswer() {
   if (locked) return;
 
   const card = allCards[idx];
@@ -1115,14 +1164,12 @@ function evaluateAnswer(fromPrecheck = false) {
     return;
   }
 
-  if (fromPrecheck) markAssisted();
-
   const answer  = placed.map(p => p.letter).join('').toLowerCase();
   const correct = answer === answerText(card);
   const slotEls = Array.from(slotsEl.querySelectorAll('.sw-slot'));
 
   if (correct) resolveCorrect(card, slotEls);
-  else resolveWrong(card, slotEls, fromPrecheck);
+  else resolveWrong(card, slotEls);
 }
 
 checkBtn.addEventListener('click', () => {
@@ -1131,13 +1178,6 @@ checkBtn.addEventListener('click', () => {
   if (now - lastCheckAt < CHECK_DEBOUNCE) return;
   lastCheckAt = now;
   evaluateAnswer();
-});
-
-precheckBtn.addEventListener('click', () => {
-  if (locked || precheckUsed || !allLettersPlaced()) return;
-  precheckUsed = true;
-  updateAnswerControls();
-  evaluateAnswer(true);
 });
 
 /* ══════════════════════════════════════════════════════════════
@@ -1192,10 +1232,10 @@ function showResults() {
   document.querySelector('.sw-hud').style.display      = 'none';
   /* .sw-dots-row intentionally kept visible — shows all-done state */
 
-  /* Mark all dots done, preserving assisted items in amber */
+  /* Mark all dots done, preserving recovered items in amber */
   for (let i = 0; i < 15; i++) {
     const d = document.getElementById(`sw-d${i}`);
-    if (d) d.className = `sw-dot ${assistedItems.has(i) ? 'assisted' : 'done'}`;
+    if (d) d.className = `sw-dot ${recoveredItems.has(i) ? 'recovered' : 'done'}`;
   }
 
    
@@ -1212,15 +1252,16 @@ function showResults() {
       saveId:    `${CFG.curriculum}:spell_word`,
       score:     pct,
       completed: true,
-      assisted: assistedCount,
+      recovered: recoveredCount,
+      recoveryBoosts: recoveryBoostCount,
     }
   }));
 
   /* Populate scorecard — sw-* IDs matching this game's HTML */
   results.style.setProperty('--tier-color', tier.color);
-  document.getElementById('sw-rs').textContent = `${score} / ${total}`;
-  document.getElementById('sw-rp').textContent = `${pct}% first-try accuracy`;
-  document.getElementById('sw-ra').textContent = `${total} / ${total} completed • ${assistedCount} assisted`;
+  document.getElementById('sw-rs').textContent = `${formatScore(score)} / ${total}`;
+  document.getElementById('sw-rp').textContent = `${pct}% score`;
+  document.getElementById('sw-ra').textContent = `${total} / ${total} completed • ${recoveredCount} recovered • ${recoveryBoostCount} boosts`;
   document.getElementById('sw-rl').textContent = tier.label;
   document.getElementById('sw-re').textContent = tier.en;
   document.getElementById('sw-rj').textContent = tier.jp;
@@ -1244,8 +1285,14 @@ function showResults() {
     /* Reset state — spell-word uses idx/score/allCards/showCard */
     idx   = 0;
     score = 0;
-    assistedCount = 0;
-    assistedItems.clear();
+    recoveryActive = false;
+    pendingLoss = 0;
+    difficultStreak = 0;
+    recoveryBank = 0;
+    recoveryBoostReady = false;
+    recoveredCount = 0;
+    recoveryBoostCount = 0;
+    recoveredItems.clear();
     scoreEl.textContent = '0';
     allCards = U.shuffle(allCards);
     showCard();
