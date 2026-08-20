@@ -321,6 +321,24 @@ canvas {
   line-height: 1.6;
 }
 
+.popup-en,
+.popup-ja,
+.button-en,
+.button-ja {
+  display: block;
+}
+.popup-ja {
+  margin-top: 4px;
+  font-size: 0.82em;
+  line-height: 1.45;
+}
+.button-ja {
+  margin-top: 2px;
+  font-size: 0.82em;
+  line-height: 1.2;
+  font-weight: 700;
+}
+
 /* ── Start screen ────────────────────────────────── */
 .start-mascot {
   width: 72px;
