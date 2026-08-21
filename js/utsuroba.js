@@ -459,10 +459,11 @@
   const music = { play: () => Promise.resolve(), pause: () => {}, currentTime: 0 };
 
   let app, stage, canvas, ctx, roomLayer, echoLayer;
-  let coordToggle, coordReadout, pinLog, readingJournalButton;
+  let coordToggle, coordReadout, pinLog, readingJournalButton, readingChallengeButton;
   let exitPopOverlay = null, exitPopCooldownUntil = 0;
   let drifterPanel = null, drifterPanelOpen = false, drifterPanelCooldown = 0;
   let readingJournalOverlay = null, readingJournalOpen = false;
+  let weeklyChallengeOverlay = null, weeklyChallengeOpen = false;
   let convergenceOverlay = null, convergenceOpen = false;
   let gardenOverlay = null, gardenOpen = false;
 
@@ -607,6 +608,10 @@
       #utsuroba-reading-journal-button:hover,#utsuroba-reading-journal-button:focus-visible{background:rgba(46,12,68,.94);border-color:#d8a8ff;transform:translateY(-1px);outline:none;}
       #utsuroba-reading-journal-button span{display:block;margin-top:2px;color:rgba(241,217,255,.5);font-size:9px;font-weight:400;}
       #utsuroba-reading-journal-button .journal-count{display:inline-block;margin-left:6px;padding:2px 5px;border-radius:999px;background:#ffcb75;color:#241507;font:700 9px/1 monospace;vertical-align:1px;}
+      #utsuroba-reading-challenge-button{position:fixed;top:60px;right:16px;z-index:220;background:rgba(8,20,19,.9);border:1px solid rgba(159,228,186,.44);border-radius:999px;padding:8px 13px;color:#d7ffe3;font:700 11px/1.2 Georgia,serif;letter-spacing:.03em;cursor:pointer;box-shadow:0 0 18px rgba(39,153,112,.18);transition:background .18s,border-color .18s,transform .18s;}
+      #utsuroba-reading-challenge-button:hover,#utsuroba-reading-challenge-button:focus-visible{background:rgba(12,52,40,.94);border-color:#9fe4ba;transform:translateY(-1px);outline:none;}
+      #utsuroba-reading-challenge-button span{display:block;margin-top:2px;color:rgba(215,255,227,.52);font-size:9px;font-weight:400;}
+      #utsuroba-reading-challenge-button .challenge-count{display:inline-block;margin-left:6px;padding:2px 5px;border-radius:999px;background:#9fe4ba;color:#082016;font:700 9px/1 monospace;vertical-align:1px;}
       #utsuroba-reading-journal{position:fixed;inset:0;z-index:9300;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(4,0,12,.86);font-family:Georgia,serif;}
       .reading-journal-card{position:relative;width:min(760px,100%);max-height:calc(100vh - 36px);overflow:auto;padding:clamp(22px,4vw,36px);box-sizing:border-box;border:1px solid rgba(216,168,255,.42);border-radius:16px;background:linear-gradient(160deg,#171020,#0b0712 68%,#130b1b);box-shadow:0 0 70px rgba(100,30,160,.3);animation:utsuPopIn .22s ease-out;}
       .reading-journal-close{position:absolute;right:14px;top:12px;background:transparent;border:0;color:rgba(255,255,255,.55);font-size:18px;cursor:pointer;padding:8px;}
@@ -662,6 +667,27 @@
       .reading-journal-empty,.reading-journal-loading{padding:28px 12px;text-align:center;color:#f1dcff;line-height:1.55;}
       .reading-journal-empty small,.reading-journal-loading small{display:block;color:rgba(245,232,255,.52);font-size:.8em;}
       @media(max-width:700px){#utsuroba-reading-journal-button{top:10px;right:10px;padding:7px 10px;font-size:10px}.reading-journal-card{padding:21px 16px}.reading-journal-card h2{font-size:1.35rem}}
+      #utsuroba-weekly-reading{position:fixed;inset:0;z-index:9300;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(1,12,9,.88);font-family:Georgia,serif;}
+      .weekly-reading-card{position:relative;width:min(700px,100%);max-height:calc(100vh - 36px);overflow:auto;padding:clamp(22px,4vw,36px);box-sizing:border-box;border:1px solid rgba(159,228,186,.46);border-radius:16px;background:linear-gradient(160deg,#10221b,#08120f 68%,#101a19);box-shadow:0 0 70px rgba(39,153,112,.3);animation:utsuPopIn .22s ease-out;}
+      .weekly-reading-close{position:absolute;right:14px;top:12px;background:transparent;border:0;color:rgba(255,255,255,.58);font-size:18px;cursor:pointer;padding:8px;}
+      .weekly-reading-eyebrow{color:#9fe4ba;font:700 11px/1.4 monospace;letter-spacing:.16em;text-transform:uppercase;margin-bottom:8px;}
+      .weekly-reading-card h2{margin:0 42px 6px;color:#effff4;font-size:clamp(1.35rem,3vw,2rem);}
+      .weekly-reading-card h2 span{display:block;color:rgba(215,255,227,.6);font-size:.5em;font-weight:400;margin-top:4px;}
+      .weekly-reading-intro{margin:0 0 17px;color:#e5fff0;font-size:.88rem;line-height:1.5;}
+      .weekly-reading-intro small{display:block;margin-top:3px;color:rgba(229,255,240,.56);font-size:.82em;}
+      .weekly-reading-goals{display:grid;gap:8px;margin:0 0 17px;}
+      .weekly-reading-goal{padding:10px 11px;border:1px solid rgba(159,228,186,.24);border-radius:8px;background:rgba(255,255,255,.045);}
+      .weekly-reading-goal.is-complete{border-color:rgba(159,228,186,.62);background:rgba(159,228,186,.09);}
+      .weekly-reading-goal-head{display:flex;justify-content:space-between;gap:10px;color:#fff;font-size:.78rem;line-height:1.35;}
+      .weekly-reading-goal-head strong{color:#d7ffe3;}
+      .weekly-reading-goal-head span{color:rgba(215,255,227,.58);font:700 .68rem monospace;white-space:nowrap;}
+      .weekly-reading-goal small{display:block;margin-top:3px;color:rgba(229,255,240,.52);font-size:.84em;}
+      .weekly-reading-bar{height:5px;margin-top:8px;border-radius:999px;background:rgba(255,255,255,.1);overflow:hidden;}
+      .weekly-reading-bar i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#6fd09e,#d7ffe3);}
+      .weekly-reading-complete{margin:0;padding:10px;border-left:3px solid #9fe4ba;color:#d7ffe3;font-size:.78rem;line-height:1.45;}
+      .weekly-reading-complete small{display:block;margin-top:3px;color:rgba(215,255,227,.58);font-size:.9em;}
+      .weekly-reading-close-btn{margin-top:17px;padding:9px 18px;border:1px solid #9fe4ba;border-radius:7px;background:rgba(159,228,186,.12);color:#d7ffe3;cursor:pointer;font:700 .78rem Georgia,serif;}
+      @media(max-width:700px){#utsuroba-reading-challenge-button{top:51px;right:10px;padding:7px 10px;font-size:10px}.weekly-reading-card{padding:21px 16px}}
       /* ══ DRIFTER PANEL ══ */
       #utsuroba-drifter-panel{position:fixed;bottom:0;left:0;right:0;z-index:9100;background:linear-gradient(180deg,#f7f2e8 0%,#ede5d0 100%);border-top:2px solid #c8b48a;border-radius:20px 20px 0 0;box-shadow:0 -6px 32px rgba(0,0,0,0.5);transform:translateY(100%);transition:transform ${PANEL_SLIDE_MS}ms cubic-bezier(0.22,1,0.36,1);font-family:'Georgia',serif;pointer-events:none;}
       #utsuroba-drifter-panel.open{transform:translateY(0);pointer-events:auto;}
@@ -1015,6 +1041,100 @@
     return Array.isArray(entries) ? entries : [];
   }
 
+  function readingWeekKey() {
+    try {
+      const cw = window.CALENDAR?.getCurrentCurriculumWeek?.();
+      return cw && cw.monthSlug && Number.isInteger(cw.weekNumber)
+        ? `${cw.monthSlug}:w${cw.weekNumber}` : null;
+    } catch (_) { return null; }
+  }
+
+  function weeklyReadingChallengeState() {
+    const data = loadSave();
+    const weekKey = readingWeekKey();
+    if (!weekKey) return { data, state: null };
+    if (!data.weekly) data.weekly = {};
+    let state = data.weekly.readingChallenge;
+    if (!state || state.weekKey !== weekKey) {
+      state = { weekKey, evidenceUsed: false, postcardSaved: false, lensReplayed: false, completedAt: null };
+      data.weekly.readingChallenge = state;
+      writeSave(data);
+    }
+    return { data, state };
+  }
+
+  function weeklyReadingChallengeProgress() {
+    const challenge = DATA.readingChallenge;
+    const bundle = weeklyReadingChallengeState();
+    const state = bundle.state || { evidenceUsed: false, postcardSaved: false, lensReplayed: false };
+    const restoredCount = Object.keys(bundle.data.utsuroba?.readingEchoes || {}).length;
+    const values = {
+      memories: restoredCount,
+      evidence: state.evidenceUsed ? 1 : 0,
+      postcard: state.postcardSaved ? 1 : 0,
+      lens: state.lensReplayed ? 1 : 0,
+    };
+    const goals = (challenge?.goals || []).map(goal => ({
+      ...goal,
+      value: Math.min(goal.target, values[goal.id] || 0),
+      complete: (values[goal.id] || 0) >= goal.target,
+    }));
+    const complete = goals.length > 0 && goals.every(goal => goal.complete);
+    if (complete && bundle.state && !bundle.state.completedAt) {
+      bundle.state.completedAt = Date.now();
+      writeSave(bundle.data);
+    }
+    return { challenge, goals, complete };
+  }
+
+  function recordWeeklyReadingEvent(eventName) {
+    const bundle = weeklyReadingChallengeState();
+    if (!bundle.state) return;
+    if (eventName === 'evidence') bundle.state.evidenceUsed = true;
+    if (eventName === 'postcard') bundle.state.postcardSaved = true;
+    if (eventName === 'lens') bundle.state.lensReplayed = true;
+    bundle.state.lastActivityAt = Date.now();
+    writeSave(bundle.data);
+    refreshReadingChallengeButton();
+  }
+
+  function refreshReadingChallengeButton() {
+    if (!readingChallengeButton) return;
+    const progress = weeklyReadingChallengeProgress();
+    const count = progress.goals.filter(goal => goal.complete).length;
+    readingChallengeButton.innerHTML = `Weekly Trail<b class="challenge-count">${count}/${progress.goals.length}</b><span>週間読書</span>`;
+    readingChallengeButton.setAttribute('aria-label', `Weekly Reading Trail, ${count} of ${progress.goals.length} goals complete`);
+  }
+
+  function closeWeeklyReadingChallenge() {
+    weeklyChallengeOpen = false;
+    if (weeklyChallengeOverlay) weeklyChallengeOverlay.remove();
+    weeklyChallengeOverlay = null;
+    state.inputLocked = false;
+  }
+
+  function openWeeklyReadingChallenge() {
+    if (weeklyChallengeOpen || readingJournalOpen || drifterPanelOpen || convergenceOpen || gardenOpen || state.celebrating) return;
+    const progress = weeklyReadingChallengeProgress();
+    if (!progress.challenge) return;
+    weeklyChallengeOpen = true;
+    state.inputLocked = true;
+    weeklyChallengeOverlay = document.createElement('div');
+    weeklyChallengeOverlay.id = 'utsuroba-weekly-reading';
+    const goals = progress.goals.map(goal => {
+      const percent = Math.round((goal.value / goal.target) * 100);
+      return `<article class="weekly-reading-goal${goal.complete ? ' is-complete' : ''}"><div class="weekly-reading-goal-head"><strong>${goal.complete ? '✓ ' : ''}${escapeHTML(goal.label)}</strong><span>${goal.value} / ${goal.target}</span></div><small>${escapeHTML(goal.complete ? goal.completeJP : goal.labelJP)}</small><div class="weekly-reading-bar"><i style="width:${percent}%"></i></div></article>`;
+    }).join('');
+    const completion = progress.complete
+      ? `<p class="weekly-reading-complete">${escapeHTML(progress.challenge.complete)}<small>${escapeHTML(progress.challenge.completeJP)}</small></p>`
+      : '';
+    weeklyChallengeOverlay.innerHTML = `<div class="weekly-reading-card"><button class="weekly-reading-close" type="button" aria-label="Close weekly reading trail">✕</button><div class="weekly-reading-eyebrow">WEEKLY READING TRAIL / 週間読書</div><h2>${escapeHTML(progress.challenge.title)}<span>${escapeHTML(progress.challenge.titleJP)}</span></h2><p class="weekly-reading-intro">${escapeHTML(progress.challenge.intro)}<small>${escapeHTML(progress.challenge.introJP)}</small></p><div class="weekly-reading-goals">${goals}</div>${completion}<button class="weekly-reading-close-btn" type="button" id="weekly-reading-done">Close trail / トレイルを閉じる</button></div>`;
+    document.body.appendChild(weeklyChallengeOverlay);
+    weeklyChallengeOverlay.querySelector('.weekly-reading-close').addEventListener('click', closeWeeklyReadingChallenge);
+    weeklyChallengeOverlay.querySelector('#weekly-reading-done').addEventListener('click', closeWeeklyReadingChallenge);
+    weeklyChallengeOverlay.addEventListener('click', event => { if (event.target === weeklyChallengeOverlay) closeWeeklyReadingChallenge(); });
+  }
+
   function recordWordPracticeResult(item, correct) {
     const data = loadSave();
     const entries = data.utsuroba.wordCabinet?.entries;
@@ -1067,6 +1187,7 @@
       adaptiveMode,
       quest: { episodeId: reviewEntry.episodeId, readingIndex: 0, mechanicIndex: 0, postcard: reviewEntry.postcard || null },
       onClose: () => { state.inputLocked = false; },
+      onReadingEvent: recordWeeklyReadingEvent,
       onReviewComplete: result => recordReadingReview(reviewEntry, result),
       onPostcardSave: postcard => recordReadingPostcard(reviewEntry, postcard),
     });
@@ -1107,10 +1228,11 @@
     if (!current) return;
     current.postcard = { text: postcard.text, savedAt: postcard.savedAt || Date.now() };
     writeSave(data);
+    recordWeeklyReadingEvent('postcard');
   }
 
   async function openReadingJournal() {
-    if (readingJournalOpen || drifterPanelOpen || state.celebrating) return;
+    if (readingJournalOpen || weeklyChallengeOpen || drifterPanelOpen || state.celebrating) return;
     readingJournalOpen = true;
     state.inputLocked = true;
     readingJournalOverlay = document.createElement('div');
@@ -1221,6 +1343,16 @@
     readingJournalButton.addEventListener('click', openReadingJournal);
     document.body.appendChild(readingJournalButton);
     refreshReadingJournalButton();
+  }
+
+  function injectWeeklyReadingChallenge() {
+    if (readingChallengeButton) return;
+    readingChallengeButton = document.createElement('button');
+    readingChallengeButton.id = 'utsuroba-reading-challenge-button';
+    readingChallengeButton.type = 'button';
+    readingChallengeButton.addEventListener('click', openWeeklyReadingChallenge);
+    document.body.appendChild(readingChallengeButton);
+    refreshReadingChallengeButton();
   }
 
   function openDrifterPanel(drifter, forcedQuest = null) {
@@ -1467,6 +1599,7 @@
       adaptiveMode: readUtsuroba().readingOnboarding?.calibration || 'guided',
       onboarding: readUtsuroba().readingOnboarding,
       persistOnboarding: persistReadingOnboarding,
+      onReadingEvent: recordWeeklyReadingEvent,
       onClose: () => {
         state.inputLocked = false;
         try { music.play().catch(() => {}); } catch(_) {}
@@ -1474,6 +1607,7 @@
       onComplete: () => {
         if (completeMemory(drifter.id, quest.memIdx)) {
           refreshReadingJournalButton();
+          refreshReadingChallengeButton();
           refreshMemoryEchoes();
           startCelebration(drifter);
         }
@@ -1600,6 +1734,7 @@
     injectExitPopOverlay();
     buildDrifterPanel();
     injectReadingJournal();
+    injectWeeklyReadingChallenge();
     if (DEV_MODE) { injectDevPanel(); }
     const ro = document.createElement('div'); ro.id = 'rotate-overlay';
     ro.innerHTML = `<span class="rotate-phone">📱</span><div class="rotate-bar"></div><p class="rotate-title">横にして遊ぼう！</p><p class="rotate-sub">うつろばは<strong style="color:#c45fa3">横画面</strong>で遊べるよ。<br>スマホを横にしてね。</p>`;
@@ -2097,6 +2232,7 @@
       drifterPanelOpen        ||
       convergenceOpen        ||
       gardenOpen              ||
+      weeklyChallengeOpen    ||
       (window.UtsurobaReading && window.UtsurobaReading.isOpen()) ||
       isExitPopOpen()
     );

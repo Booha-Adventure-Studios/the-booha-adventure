@@ -223,6 +223,7 @@
 
     function startLensReplay(lens) {
       if (!episode.replayLenses?.[lens]) return;
+      if (typeof opts.onReadingEvent === 'function') opts.onReadingEvent('lens');
       start({
         ...opts,
         reviewLens: lens,
@@ -569,6 +570,7 @@
       const evidenceButton = overlay.querySelector('#reading-evidence-btn');
       if (evidenceButton) evidenceButton.addEventListener('click', () => {
         usedEvidence = true;
+        if (typeof opts.onReadingEvent === 'function') opts.onReadingEvent('evidence');
         showEvidence = true;
         render();
         const firstEvidence = overlay.querySelector('.reading-line.is-evidence');
