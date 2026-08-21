@@ -284,6 +284,8 @@
       active           : id,
       state            : 'accepted',
       memIdx,
+      episodeId        : id === 'ks' ? 'ks_lantern_v1' : null,
+      readingState     : 'locked',
       decoys,
       collectedMemoryId: null,
       orbIsCorrect     : false,
@@ -363,6 +365,9 @@
   let isMemoryPlaying  = false;
   let drifterFadeStart = 0;
   let _lastWrongId     = '';
+  let readingChallengeOpen = false;
+  let readingChallengeEl = null;
+  let readingStyleEl = null;
 
   const CELEBRATE_MS = 8000;
 
@@ -634,6 +639,12 @@
           <button class="dp-btn no" id="dp-cancel-quest-btn">Cancel / キャンセル</button>
         </div>`;
 
+    } else if (quest && quest.active === drifter.id && quest.state === 'reading') {
+      actionHTML = `
+        <p class="dp-line-en" style="margin-bottom:2px;">The memory is open. Reconstruct it.</p>
+        <p class="dp-line-jp" style="margin-bottom:10px;">記憶が開いている。再構成しよう。</p>
+        <div class="dp-btns"><button class="dp-btn yes" id="dp-resume-reading">Resume reading / 読み直す</button></div>`;
+
     } else if (quest && quest.active === drifter.id && quest.state === 'collected') {
       actionHTML = `
         <p class="dp-line-en" style="margin-bottom:2px;">You have a memory… give it to me?</p>
@@ -794,6 +805,12 @@
         }
       }
 
+      const resumeReadingBtn = drifterPanel.querySelector('#dp-resume-reading');
+      if (resumeReadingBtn) resumeReadingBtn.addEventListener('click', () => {
+        const q = getCachedQuest();
+        if (!q || !startReadingChallenge(drifter, q)) closeDrifterPanel();
+      });
+
       const cancelQuestBtn = drifterPanel.querySelector('#dp-cancel-quest-btn');
       if (cancelQuestBtn) cancelQuestBtn.addEventListener('click', () => {
         stopActiveAudio();
@@ -807,10 +824,15 @@
         if (!q || q.state !== 'collected') { closeDrifterPanel(); return; }
         const expectedMemKey = `${drifter.id}_a${String(q.memIdx).padStart(2,'0')}`;
         const correct = q.orbIsCorrect === true && q.collectedMemoryId === expectedMemKey;
-        closeDrifterPanel();
         if (correct) {
-          if (completeMemory(drifter.id, q.memIdx)) startCelebration(drifter);
+          if (q.episodeId && readingEpisodeFor(q)) {
+            startReadingChallenge(drifter, q);
+          } else {
+            closeDrifterPanel();
+            if (completeMemory(drifter.id, q.memIdx)) startCelebration(drifter);
+          }
         } else {
+          closeDrifterPanel();
           try { sessionStorage.setItem('karasuki_return_wrong_orb', q.collectedMemoryId || ''); } catch(_) {}
           showWrongMemoryMsg();
           markDrifterWrong(drifter.id);
@@ -830,6 +852,170 @@
     isMemoryPlaying = false;
     setTimeout(() => { state.inputLocked = false; }, PANEL_SLIDE_MS);
     try { music.play().catch(() => {}); } catch(_) {}
+  }
+
+  /* ═══════════════════════════════════════════
+     READING CHALLENGE — PASS 1 VERTICAL SLICE
+  ═══════════════════════════════════════════ */
+  function readingEpisodeFor(quest) {
+    return window.UTSUROBA_EPISODES && quest && quest.episodeId
+      ? window.UTSUROBA_EPISODES[quest.episodeId]
+      : null;
+  }
+
+  function escapeReadingText(value) {
+    return String(value == null ? '' : value)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function persistQuestPatch(patch) {
+    const data = loadSave();
+    if (!data.weekly) data.weekly = {};
+    if (!data.weekly.drifterQuest) return false;
+    Object.assign(data.weekly.drifterQuest, patch);
+    const ok = writeSave(data);
+    invalidateQuestCache();
+    return ok;
+  }
+
+  function closeReadingChallenge() {
+    readingChallengeOpen = false;
+    if (readingChallengeEl) {
+      readingChallengeEl.remove();
+      readingChallengeEl = null;
+    }
+    if (readingStyleEl) {
+      readingStyleEl.remove();
+      readingStyleEl = null;
+    }
+    state.inputLocked = false;
+    try { music.play().catch(() => {}); } catch(_) {}
+  }
+
+  function startReadingChallenge(drifter, quest) {
+    const episode = readingEpisodeFor(quest);
+    if (!episode) return false;
+
+    closeDrifterPanel();
+    persistQuestPatch({ state: 'reading', readingState: 'active', readingIndex: 0 });
+    readingChallengeOpen = true;
+    state.inputLocked = true;
+
+    readingStyleEl = document.createElement('style');
+    readingStyleEl.textContent = `
+      #utsuroba-reading-challenge .reading-card{position:relative;width:min(920px,100%);max-height:calc(100vh - 36px);overflow:auto;background:linear-gradient(160deg,#171020,#0b0712 65%,#130b1b);border:1px solid rgba(220,160,255,.45);border-radius:16px;padding:clamp(20px,3vw,34px);box-shadow:0 0 70px rgba(100,30,160,.34);box-sizing:border-box;}
+      #utsuroba-reading-challenge .reading-close{position:absolute;right:14px;top:12px;background:transparent;border:0;color:rgba(255,255,255,.55);font-size:18px;cursor:pointer;padding:8px;}
+      #utsuroba-reading-challenge .reading-eyebrow{color:#d8a8ff;font:700 11px/1.4 monospace;letter-spacing:.16em;text-transform:uppercase;margin-bottom:8px;}
+      #utsuroba-reading-challenge h2{margin:0 42px 8px;color:#fff4ff;font-size:clamp(1.25rem,3vw,2rem);}
+      #utsuroba-reading-challenge h2 span{display:block;color:rgba(255,220,255,.58);font-size:.52em;font-weight:400;margin-top:4px;}
+      #utsuroba-reading-challenge h3{margin:5px 0 2px;color:#fff;font-size:clamp(1rem,2.3vw,1.25rem);}
+      #utsuroba-reading-challenge .reading-intro{margin:0;color:#f5e8ff;line-height:1.5;font-size:clamp(.86rem,1.8vw,1rem);}
+      #utsuroba-reading-challenge .reading-jp{margin:2px 0 12px;color:rgba(245,232,255,.54);font-size:.78rem;line-height:1.45;}
+      #utsuroba-reading-challenge .reading-transcript{display:grid;gap:8px;margin:18px 0 20px;padding:14px;background:rgba(255,255,255,.045);border:1px solid rgba(220,160,255,.16);border-radius:10px;}
+      #utsuroba-reading-challenge .reading-line{padding-left:12px;border-left:2px solid rgba(216,168,255,.45);}
+      #utsuroba-reading-challenge .reading-speaker{color:#d8a8ff;font-size:.74rem;font-weight:700;letter-spacing:.05em;}
+      #utsuroba-reading-challenge .reading-speaker span{color:rgba(216,168,255,.48);font-weight:400;margin-left:5px;}
+      #utsuroba-reading-challenge .reading-en{color:#fff;font-size:.9rem;line-height:1.35;margin-top:2px;}
+      #utsuroba-reading-challenge .reading-line .reading-jp{margin:1px 0 0;}
+      #utsuroba-reading-challenge .reading-question-label{color:#ffcb75;font:700 10px/1.4 monospace;letter-spacing:.14em;margin-top:8px;}
+      #utsuroba-reading-challenge .reading-choices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:14px;}
+      #utsuroba-reading-challenge .reading-choice{min-height:72px;text-align:left;padding:11px 12px;background:rgba(255,255,255,.06);border:1px solid rgba(220,160,255,.34);border-radius:9px;color:#fff;cursor:pointer;font:inherit;transition:transform .15s,border-color .15s,background .15s;}
+      #utsuroba-reading-challenge .reading-choice:hover{transform:translateY(-2px);background:rgba(216,168,255,.14);border-color:#d8a8ff;}
+      #utsuroba-reading-challenge .reading-choice small{display:block;color:rgba(255,255,255,.48);font-size:.72rem;line-height:1.35;margin-top:5px;}
+      #utsuroba-reading-challenge .reading-feedback{margin-top:12px;padding:10px 12px;border-left:3px solid #ffcb75;background:rgba(255,203,117,.08);color:#ffe7b2;font-size:.82rem;line-height:1.4;}
+      #utsuroba-reading-challenge .reading-progress{margin-top:14px;text-align:right;color:rgba(255,255,255,.42);font:700 11px monospace;}
+      #utsuroba-reading-challenge .reading-complete{text-align:center;padding:clamp(36px,8vw,82px) clamp(20px,6vw,80px);}
+      #utsuroba-reading-challenge .reading-success{color:#ffe8a8;font-size:clamp(1rem,2.5vw,1.35rem);line-height:1.5;margin:22px auto 4px;max-width:650px;}
+      #utsuroba-reading-challenge .reading-primary{margin-top:24px;padding:12px 24px;border:1px solid #ffcb75;border-radius:8px;background:linear-gradient(135deg,#ffe7a8,#c78b31);color:#241507;font:700 .9rem Georgia,serif;cursor:pointer;}
+      @media(max-width:700px){#utsuroba-reading-challenge .reading-choices{grid-template-columns:1fr;}#utsuroba-reading-challenge .reading-card{padding:20px 16px;}}
+    `;
+    document.head.appendChild(readingStyleEl);
+
+    readingChallengeEl = document.createElement('div');
+    readingChallengeEl.id = 'utsuroba-reading-challenge';
+    readingChallengeEl.style.cssText = [
+      'position:fixed','inset:0','z-index:9600','display:flex',
+      'align-items:center','justify-content:center','padding:18px',
+      'background:rgba(4,0,12,.90)','font-family:Georgia,serif',
+      'color:#f7f2e8'
+    ].join(';');
+    document.body.appendChild(readingChallengeEl);
+
+    let questionIndex = Number.isInteger(quest.readingIndex) ? quest.readingIndex : 0;
+    let lastFeedback = '';
+
+    const finishEpisode = () => {
+      const ok = completeMemory(drifter.id, quest.memIdx);
+      closeReadingChallenge();
+      if (ok) startCelebration(drifter);
+    };
+
+    const render = () => {
+      const question = episode.checks[questionIndex];
+      const done = !question;
+      const lines = episode.lines.map(line => `
+        <div class="reading-line">
+          <div class="reading-speaker">${escapeReadingText(line.speaker)} <span>${escapeReadingText(line.speakerJP)}</span></div>
+          <div class="reading-en">${escapeReadingText(line.en)}</div>
+          <div class="reading-jp">${escapeReadingText(line.jp)}</div>
+        </div>`).join('');
+
+      if (done) {
+        readingChallengeEl.innerHTML = `
+          <div class="reading-card reading-complete">
+            <div class="reading-eyebrow">${escapeReadingText(episode.eyebrow)}</div>
+            <h2>${escapeReadingText(episode.title)}</h2>
+            <p class="reading-success">${escapeReadingText(episode.success)}</p>
+            <p class="reading-jp">${escapeReadingText(episode.successJP)}</p>
+            <button class="reading-primary" id="reading-return-btn">Restore memory / 記憶を戻す</button>
+          </div>`;
+        readingChallengeEl.querySelector('#reading-return-btn').addEventListener('click', finishEpisode);
+        return;
+      }
+
+      const choices = question.choices.map((choice, i) => `
+        <button class="reading-choice" data-choice="${i}">
+          <span>${escapeReadingText(choice)}</span>
+          <small>${escapeReadingText(question.choicesJP[i] || '')}</small>
+        </button>`).join('');
+
+      readingChallengeEl.innerHTML = `
+        <div class="reading-card">
+          <button class="reading-close" id="reading-close-btn">✕</button>
+          <div class="reading-eyebrow">${escapeReadingText(episode.eyebrow)}</div>
+          <h2>${escapeReadingText(episode.title)} <span>${escapeReadingText(episode.titleJP)}</span></h2>
+          <p class="reading-intro">${escapeReadingText(episode.intro)}</p>
+          <p class="reading-jp">${escapeReadingText(episode.introJP)}</p>
+          <div class="reading-transcript">${lines}</div>
+          <div class="reading-question-label">${escapeReadingText(question.label)} · ${escapeReadingText(question.labelJP)}</div>
+          <h3>${escapeReadingText(question.prompt)}</h3>
+          <p class="reading-jp">${escapeReadingText(question.promptJP)}</p>
+          ${lastFeedback ? `<div class="reading-feedback">${escapeReadingText(lastFeedback)}</div>` : ''}
+          <div class="reading-choices">${choices}</div>
+          <div class="reading-progress">${questionIndex + 1} / ${episode.checks.length}</div>
+        </div>`;
+
+      readingChallengeEl.querySelector('#reading-close-btn').addEventListener('click', closeReadingChallenge);
+      readingChallengeEl.querySelectorAll('.reading-choice').forEach(button => {
+        button.addEventListener('click', () => {
+          const choice = Number(button.dataset.choice);
+          if (choice === question.correct) {
+            lastFeedback = '';
+            questionIndex += 1;
+            persistQuestPatch({ readingIndex: questionIndex });
+            render();
+          } else {
+            lastFeedback = `Not quite. Look again at the lines. ${question.evidence}`;
+            button.classList.add('reading-wrong');
+            setTimeout(render, 320);
+          }
+        });
+      });
+    };
+
+    render();
+    return true;
   }
 
   function showWrongMemoryMsg() {
@@ -1447,6 +1633,7 @@
       state.exitingToKarasuki ||
       state.celebrating       ||
       drifterPanelOpen        ||
+      readingChallengeOpen    ||
       isExitPopOpen()
     );
   }
