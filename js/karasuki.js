@@ -870,6 +870,118 @@ const HAPPY_HOUSE_PORTAL = {
   }
 
   /* ═══════════════════════════════════════════
+     WORLD POPUP — shared shell for every destination
+     confirm dialog (locked games, Happy House, Utsuroba,
+     profile). One responsive, bilingual template themed
+     per call, instead of four hand-copied implementations.
+  ═══════════════════════════════════════════ */
+  const WPOP_LOCK_SVG = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg>';
+
+  function wpopMarkup(p) {
+    return `
+      <div id="${p}-box" class="wpop-box" role="dialog" aria-modal="true" aria-labelledby="${p}-title-en">
+        <div class="wpop-shimmer"></div>
+        <div class="wpop-corner wpop-corner--tl"></div>
+        <div class="wpop-corner wpop-corner--tr"></div>
+        <div class="wpop-corner wpop-corner--bl"></div>
+        <div class="wpop-corner wpop-corner--br"></div>
+        <button id="${p}-close" class="wpop-close" type="button" aria-label="Close / 閉じる">&#10005;</button>
+        <div id="${p}-icon-wrap" class="wpop-icon-wrap">
+          <img id="${p}-icon-img" alt="" style="display:none;" />
+          <div id="${p}-icon-orb" class="wpop-icon-orb" style="display:none;"></div>
+          <div id="${p}-lock-badge" class="wpop-lock-badge" style="display:none;" aria-hidden="true">${WPOP_LOCK_SVG}</div>
+        </div>
+        <p id="${p}-eyebrow-en" class="wpop-eyebrow-en"></p>
+        <p id="${p}-eyebrow-jp" class="wpop-eyebrow-jp"></p>
+        <h2 id="${p}-title-en" class="wpop-title-en"></h2>
+        <p id="${p}-title-jp" class="wpop-title-jp"></p>
+        <p id="${p}-body-en" class="wpop-body-en"></p>
+        <p id="${p}-body-jp" class="wpop-body-jp"></p>
+        <div id="${p}-actions" class="wpop-actions"></div>
+      </div>`;
+  }
+
+  function wpopSetText(el, text) {
+    if (!el) return;
+    if (text) { el.textContent = text; el.style.display = ''; }
+    else      { el.textContent = '';   el.style.display = 'none'; }
+  }
+
+  function wpopSetIconImage(prefix, src, alt) {
+    const img = document.getElementById(prefix + '-icon-img');
+    const orb = document.getElementById(prefix + '-icon-orb');
+    if (orb) orb.style.display = 'none';
+    if (img) { img.src = src; img.alt = alt || ''; img.style.display = ''; }
+  }
+
+  function wpopSetIconOrb(prefix, background, glow) {
+    const img = document.getElementById(prefix + '-icon-img');
+    const orb = document.getElementById(prefix + '-icon-orb');
+    if (img) img.style.display = 'none';
+    if (orb) {
+      orb.style.display    = '';
+      orb.style.background = background;
+      orb.style.boxShadow  = glow || '';
+    }
+  }
+
+  function wpopSetLock(prefix, show) {
+    const badge = document.getElementById(prefix + '-lock-badge');
+    if (badge) badge.style.display = show ? 'flex' : 'none';
+  }
+
+  function wpopButton(en, jp, onClick) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'wpop-btn';
+    b.innerHTML = `<span>${en}</span><span class="wbtn-jp">${jp}</span>`;
+    b.addEventListener('click', onClick);
+    return b;
+  }
+
+  function wpopSetActions(prefix, buttons) {
+    const el = document.getElementById(prefix + '-actions');
+    if (!el) return;
+    el.innerHTML = '';
+    buttons.forEach(cfg => {
+      const b = wpopButton(cfg.en, cfg.jp, cfg.onClick);
+      if (cfg.border)     b.style.border     = cfg.border;
+      if (cfg.color)      b.style.color      = cfg.color;
+      if (cfg.background) b.style.background = cfg.background;
+      if (cfg.boxShadow)  b.style.boxShadow  = cfg.boxShadow;
+      el.appendChild(b);
+    });
+  }
+
+  // Applies an accent-color theme to a popup box: border, glow,
+  // the shimmer bar / corner CSS vars, and the title color.
+  function wpopThemeBox(prefix, theme) {
+    const box = document.getElementById(prefix + '-box');
+    if (!box) return;
+    box.style.background = theme.bg;
+    box.style.border     = `1px solid ${theme.border}`;
+    box.style.boxShadow  = theme.shadow ||
+      `0 0 0 1px ${theme.accent1}44,0 0 40px ${theme.glow1},0 0 90px ${theme.glow2},inset 0 0 50px rgba(0,0,0,.5)`;
+    box.style.setProperty('--wc1', theme.accent1);
+    box.style.setProperty('--wc2', theme.accent2 || theme.accent1);
+    const titleEn = document.getElementById(prefix + '-title-en');
+    if (titleEn) { titleEn.style.color = theme.accent1; titleEn.style.textShadow = `0 0 16px ${theme.accent1}99`; }
+    const eyebrowEn = document.getElementById(prefix + '-eyebrow-en');
+    if (eyebrowEn) eyebrowEn.style.color = theme.accent1;
+  }
+
+  function openWpopOverlay(overlay, bg) {
+    overlay.style.display    = 'flex';
+    overlay.style.background = bg || 'rgba(0,0,0,0.86)';
+    state.clickTarget = null;
+  }
+
+  function closeWpopOverlay(overlay, delay) {
+    overlay.style.background = 'rgba(0,0,0,0)';
+    setTimeout(() => { overlay.style.display = 'none'; }, delay || 300);
+  }
+
+  /* ═══════════════════════════════════════════
      BONUS TREES
   ═══════════════════════════════════════════ */
   const BONUS_TREES = [
@@ -894,70 +1006,61 @@ const HAPPY_HOUSE_PORTAL = {
     if (bonusPopOverlay) return;
     bonusPopOverlay = document.createElement('div');
     bonusPopOverlay.id = 'bonus-pop-overlay';
-    bonusPopOverlay.style.cssText = `display:none;position:fixed;inset:0;z-index:9150;align-items:center;justify-content:center;background:rgba(0,0,0,0);transition:background 0.3s ease;`;
-    bonusPopOverlay.innerHTML = `
-        <div id="bonus-pop-box" style="border-radius:8px;padding:36px 40px 30px;max-width:min(420px,92vw);width:92vw;max-height:90vh;overflow-y:auto;text-align:center;font-family:'Georgia',serif;position:relative;animation:portalAppear 0.25s ease-out;">
-        <div id="bp-corner-tl" style="position:absolute;top:10px;left:10px;width:18px;height:18px;border-style:solid;border-width:1.5px 0 0 1.5px;"></div>
-        <div id="bp-corner-br" style="position:absolute;bottom:10px;right:10px;width:18px;height:18px;border-style:solid;border-width:0 1.5px 1.5px 0;"></div>
-        
-       <button id="bonus-pop-close" style="position:sticky;top:10px;float:right;margin-right:4px;background:transparent;border:none;cursor:pointer;font-size:1.1rem;line-height:1;padding:4px 8px;opacity:.5;transition:opacity .18s;z-index:2;">✕</button>
-        
-        <div id="bonus-pop-orb" style="width:60px;height:60px;border-radius:50%;margin:0 auto 18px;position:relative;"></div>
-        <div id="bonus-pop-lock" style="font-size:1.6rem;margin-bottom:8px;display:none;">🔒</div>
-        <h2 id="bonus-pop-name" style="font-size:clamp(1.1rem,3.5vw,1.4rem);margin:0 0 3px;letter-spacing:.08em;"></h2>
-        <p id="bonus-pop-jp" style="font-size:clamp(.78rem,2.4vw,.9rem);margin:0 0 20px;opacity:.8;letter-spacing:.08em;color:#ffffff;"></p>
-        <p id="bonus-pop-desc" style="font-size:clamp(.82rem,2.6vw,.95rem);line-height:1.65;margin:0 0 8px;color:#ffffff;"></p>
-        <p id="bonus-pop-desc-jp" style="font-size:clamp(.74rem,2.2vw,.85rem);line-height:1.6;margin:0 0 26px;color:#ffffff;opacity:.8;"></p>
-        <div id="bonus-pop-btns" style="display:none;gap:16px;justify-content:center;flex-wrap:wrap;">
-          <button id="bonus-pop-yes" class="bonus-pop-btn" style="background:transparent;font-family:'Georgia',serif;font-size:clamp(.8rem,2.6vw,.92rem);letter-spacing:.12em;cursor:pointer;padding:8px 28px;border-radius:3px;transition:all .18s;">はい / Yes</button>
-          <button id="bonus-pop-no"  class="bonus-pop-btn" style="background:transparent;font-family:'Georgia',serif;font-size:clamp(.8rem,2.6vw,.92rem);letter-spacing:.12em;cursor:pointer;padding:8px 28px;border-radius:3px;transition:all .18s;">いいえ / No</button>
-        </div>
-        <button id="bonus-pop-ok" style="background:transparent;font-family:'Georgia',serif;font-size:.9rem;letter-spacing:.12em;cursor:pointer;padding:8px 30px;border-radius:3px;display:none;transition:all .18s;">OK</button>
-      </div>`;
+    bonusPopOverlay.className = 'wpop-overlay';
+    bonusPopOverlay.innerHTML = wpopMarkup('bonus-pop');
     document.body.appendChild(bonusPopOverlay);
     document.getElementById('bonus-pop-close').addEventListener('click', closeBonusPop);
-    document.getElementById('bonus-pop-ok').addEventListener('click',    closeBonusPop);
-    document.getElementById('bonus-pop-no').addEventListener('click',    closeBonusPop);
-    document.getElementById('bonus-pop-yes').addEventListener('click',   () => { if (bonusPopCurrentTree) { try { sessionStorage.setItem('booha_bonus_return_room', bonusPopCurrentTree.roomId); } catch(_) {} window.location.href = bonusPopCurrentTree.url; } });
     bonusPopOverlay.addEventListener('click', e => { if (e.target === bonusPopOverlay) closeBonusPop(); });
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeBonusPop(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && isBonusPopOpen()) closeBonusPop(); });
   }
 
   function openBonusPop(tree) {
     bonusPopCurrentTree = tree;
     const unlocked = _bonusUnlocked(tree.id);
     const t = BONUS_THEMES[tree.theme] || BONUS_THEMES.mystery;
-    const box = document.getElementById('bonus-pop-box');
-    box.style.background  = t.bg; box.style.border = `1px solid ${t.border}`;
-    box.style.boxShadow   = `0 0 0 1px ${t.accent1}44,0 0 35px ${t.glow1},0 0 80px ${t.glow2},inset 0 0 40px rgba(0,0,0,.5)`;
-    ['bp-corner-tl','bp-corner-br'].forEach(id => { document.getElementById(id).style.borderColor = `${t.accent1}88`; });
-    document.getElementById('bonus-pop-close').style.color = t.accent1;
-    const orb = document.getElementById('bonus-pop-orb');
-    orb.textContent = '🧿'; orb.style.fontSize = '1.8rem'; orb.style.lineHeight = '60px';
-    if      (tree.theme === 'invaders') { orb.style.background = `radial-gradient(circle at 35% 35%,#ccffdd,#44ff88,#005522)`; }
-    else if (tree.theme === 'blocks')   { orb.style.background = `radial-gradient(circle at 35% 35%,#cce8ff,#44aaff,#002244)`; }
-    else                                { orb.style.background = `radial-gradient(circle at 35% 35%,#fff,${t.orbColors[0]},${t.orbColors[1]})`; }
-    orb.style.boxShadow = `0 0 14px ${t.orbColors[0]}cc,0 0 32px ${t.orbColors[0]}88,0 0 60px ${t.orbColors[1]}55`;
-    document.getElementById('bonus-pop-lock').style.display = unlocked ? 'none' : 'block';
-    const nameEl = document.getElementById('bonus-pop-name');
-    nameEl.textContent = tree.nameEN; nameEl.style.color = t.accent1; nameEl.style.textShadow = `0 0 16px ${t.accent1}99`;
-    document.getElementById('bonus-pop-jp').textContent   = tree.nameJP;
-    document.getElementById('bonus-pop-jp').style.color   = t.accent3;
-    const descEl   = document.getElementById('bonus-pop-desc');
-    const descJpEl = document.getElementById('bonus-pop-desc-jp');
-    if (unlocked) { descEl.textContent = tree.descUnlocked; descJpEl.textContent = tree.descUnlockedJP; }
-    else          { descEl.textContent = tree.descLocked;   descJpEl.textContent = tree.descLockedJP;   }
-    const btnsEl = document.getElementById('bonus-pop-btns'); const okEl  = document.getElementById('bonus-pop-ok');
-    const yesEl  = document.getElementById('bonus-pop-yes');  const noEl  = document.getElementById('bonus-pop-no');
-    if (unlocked) { btnsEl.style.display = 'flex'; okEl.style.display = 'none'; yesEl.style.border = `1.5px solid ${t.btnBorder}`; yesEl.style.color = t.btnColor; noEl.style.border = `1.5px solid ${t.accent1}44`; noEl.style.color = `${t.accent3}99`; }
-    else          { btnsEl.style.display = 'none'; okEl.style.display = 'inline-block'; okEl.style.border = `1.5px solid ${t.btnBorder}`; okEl.style.color = t.btnColor; }
-    bonusPopOverlay.style.display = 'flex'; bonusPopOverlay.style.background = 'rgba(0,0,0,0.85)';
-    state.clickTarget = null;
+    wpopThemeBox('bonus-pop', t);
+
+    // Pure CSS/canvas-style gradient orb — no emoji standing in as the icon.
+    wpopSetIconOrb('bonus-pop',
+      `radial-gradient(circle at 35% 32%,#ffffff,${t.orbColors[0]},${t.orbColors[1]})`,
+      `0 0 14px ${t.orbColors[0]}cc,0 0 32px ${t.orbColors[0]}88,0 0 60px ${t.orbColors[1]}55`);
+    wpopSetLock('bonus-pop', !unlocked);
+
+    wpopSetText(document.getElementById('bonus-pop-eyebrow-en'), unlocked ? 'GAME UNLOCKED' : 'GAME LOCKED');
+    const eyebrowJp = document.getElementById('bonus-pop-eyebrow-jp');
+    wpopSetText(eyebrowJp, unlocked ? 'ゲーム解放ずみ' : 'ゲームはロック中');
+    eyebrowJp.style.color = t.accent3;
+
+    wpopSetText(document.getElementById('bonus-pop-title-en'), tree.nameEN);
+    const jpEl = document.getElementById('bonus-pop-title-jp');
+    wpopSetText(jpEl, tree.nameJP);
+    jpEl.style.color = t.accent3;
+
+    const bodyEn = document.getElementById('bonus-pop-body-en');
+    const bodyJp = document.getElementById('bonus-pop-body-jp');
+    bodyEn.style.color = '#ffffff'; bodyJp.style.color = '#ffffff';
+    if (unlocked) { wpopSetText(bodyEn, tree.descUnlocked); wpopSetText(bodyJp, tree.descUnlockedJP); }
+    else          { wpopSetText(bodyEn, tree.descLocked);   wpopSetText(bodyJp, tree.descLockedJP);   }
+
+    if (unlocked) {
+      wpopSetActions('bonus-pop', [
+        { en: 'Yes', jp: 'はい', border: `1.5px solid ${t.btnBorder}`, color: t.btnColor, background: `${t.accent1}1e`,
+          onClick: () => { try { sessionStorage.setItem('booha_bonus_return_room', tree.roomId); } catch(_) {} window.location.href = tree.url; } },
+        { en: 'No', jp: 'いいえ', border: `1.5px solid ${t.accent1}44`, color: `${t.accent3}99`,
+          onClick: closeBonusPop }
+      ]);
+    } else {
+      wpopSetActions('bonus-pop', [
+        { en: 'OK', jp: 'わかった', border: `1.5px solid ${t.btnBorder}`, color: t.btnColor, background: `${t.accent1}1e`,
+          onClick: closeBonusPop }
+      ]);
+    }
+
+    openWpopOverlay(bonusPopOverlay, 'rgba(0,0,0,0.85)');
   }
 
   function closeBonusPop() {
-    bonusPopOverlay.style.background = 'rgba(0,0,0,0)';
-    setTimeout(() => { bonusPopOverlay.style.display = 'none'; }, 300);
+    closeWpopOverlay(bonusPopOverlay, 300);
     bonusPopCurrentTree   = null;
     bonusPopCooldownUntil = performance.now() + POPUP_COOLDOWN_MS;
   }
@@ -1057,7 +1160,9 @@ const HAPPY_HOUSE_PORTAL = {
      HAPPY HOUSE PORTAL
   ═══════════════════════════════════════════ */
  
-  const HAPPY_HOUSE_PORTAL_COLORS = ['#8b00ff','#00bfff','#ff007f','#00ff99','#ffaa00','#aa00ff'];
+  // Warm amber/coral funhouse palette — was an exact copy of the profile
+  // portal's colors, so the two were visually indistinguishable on the map.
+  const HAPPY_HOUSE_PORTAL_COLORS = ['#ff9a3c','#ffcf5c','#ff5e7e','#ff7b54','#ffb347','#ff477e'];
  
   function drawHappyHouseOrb(now) {
     if (state.roomId !== HAPPY_HOUSE_PORTAL.roomId) return;
@@ -1116,7 +1221,9 @@ const HAPPY_HOUSE_PORTAL = {
     ctx.beginPath(); ctx.arc(cx, cy + bob, innerR * 2.8, 0, Math.PI * 2); ctx.fill();
     ctx.shadowBlur  = 0;
  
-    // Orbiting dots
+    // Orbiting confetti — alternating dots and tiny tumbling squares,
+    // a festive funhouse touch distinct from the profile portal's
+    // plain energy-dot ring (the two used to share this exact loop).
     const dotCount = 8;
     for (let d = 0; d < dotCount; d++) {
       const ringR  = 18 + pulse * 4 + (d % 2) * 8;
@@ -1125,14 +1232,20 @@ const HAPPY_HOUSE_PORTAL = {
       const dx     = cx + Math.cos(angle) * ringR;
       const dy     = cy + bob + Math.sin(angle) * ringR;
       const sparkA = 0.3 + 0.7 * Math.abs(Math.sin(sec * 2.5 + d * 0.8));
-      const sparkR = 1.2 + pulse * 1.0;
+      const sparkR = 1.4 + pulse * 1.1;
       ctx.globalAlpha = moveReveal * sparkA;
       const sparkCol = d % 2 === 0 ? col : col2;
       ctx.fillStyle  = sparkCol; ctx.shadowBlur = 8; ctx.shadowColor = sparkCol;
-      ctx.beginPath(); ctx.arc(dx, dy, sparkR, 0, Math.PI * 2); ctx.fill();
+      if (d % 3 === 0) {
+        ctx.save(); ctx.translate(dx, dy); ctx.rotate(sec * 3 + d);
+        ctx.fillRect(-sparkR, -sparkR, sparkR * 2, sparkR * 2);
+        ctx.restore();
+      } else {
+        ctx.beginPath(); ctx.arc(dx, dy, sparkR, 0, Math.PI * 2); ctx.fill();
+      }
       ctx.shadowBlur = 0;
     }
- 
+
     // Sweep arcs
     for (let w = 0; w < 3; w++) {
       const wAngle = (sec * 0.4) + (w / 3) * Math.PI * 2;
@@ -1154,44 +1267,58 @@ const HAPPY_HOUSE_PORTAL = {
     if (happyHousePopOverlay) return;
     happyHousePopOverlay = document.createElement('div');
     happyHousePopOverlay.id = 'happy-house-pop-overlay';
-    happyHousePopOverlay.style.cssText = `display:none;position:fixed;inset:0;z-index:9300;align-items:center;justify-content:center;background:rgba(0,0,0,0);transition:background 0.3s ease;`;
-    happyHousePopOverlay.innerHTML = `
-      <div id="happy-house-pop-box" style="
-        background:#080810;border:1px solid rgba(160,70,210,.55);
-        border-radius:8px;padding:clamp(28px,5vw,44px) clamp(24px,6vw,52px) clamp(22px,4vw,36px);
-        max-width:min(420px,92vw);width:92vw;text-align:center;
-        box-shadow:0 0 0 1px rgba(160,40,220,.5),0 0 40px rgba(160,40,220,.65),0 0 90px rgba(120,0,180,.4),inset 0 0 50px rgba(0,0,0,.5);
-        font-family:'Georgia',serif;position:relative;animation:portalAppear 0.25s ease-out;">
-        <div style="position:absolute;top:10px;left:10px;width:18px;height:18px;border:1.5px solid rgba(160,60,255,.55);border-right:none;border-bottom:none;"></div>
-        <div style="position:absolute;top:10px;right:10px;width:18px;height:18px;border:1.5px solid rgba(160,60,255,.55);border-left:none;border-bottom:none;"></div>
-        <div style="position:absolute;bottom:10px;left:10px;width:18px;height:18px;border:1.5px solid rgba(160,60,255,.55);border-right:none;border-top:none;"></div>
-        <div style="position:absolute;bottom:10px;right:10px;width:18px;height:18px;border:1.5px solid rgba(160,60,255,.55);border-left:none;border-top:none;"></div>
-        <button id="happy-house-pop-close" style="position:absolute;top:12px;right:14px;background:transparent;border:none;cursor:pointer;font-size:1rem;color:rgba(160,80,255,.4);transition:color .18s;padding:4px 8px;">✕</button>
-        <p id="happy-house-pop-en" style="font-size:clamp(.9rem,3.5vw,1.1rem);margin:0 0 10px;letter-spacing:.04em;color:#f0e8ff;line-height:1.55;text-shadow:0 0 20px rgba(200,180,255,.5);">Do you want to go into Mister Happy's house?</p>
-        <p id="happy-house-pop-ja" style="font-size:clamp(.78rem,3vw,.92rem);margin:0 0 clamp(18px,4vw,32px);color:#cdb8e8;letter-spacing:.05em;">ミスター・ハッピーの家に入りますか？</p>
-        <button id="happy-house-yes" style="background:transparent;font-family:'Georgia',serif;font-size:clamp(.82rem,3vw,.95rem);letter-spacing:.12em;cursor:pointer;padding:clamp(6px,2vw,10px) clamp(20px,5vw,34px);border-radius:3px;border:1.5px solid rgba(160,70,210,.9);color:#e8d8ff;margin-right:16px;background:rgba(100,30,150,.15);transition:all .18s;">はい</button>
-        <button id="happy-house-no"  style="background:transparent;font-family:'Georgia',serif;font-size:clamp(.82rem,3vw,.95rem);letter-spacing:.12em;cursor:pointer;padding:clamp(6px,2vw,10px) clamp(20px,5vw,34px);border-radius:3px;border:1.5px solid rgba(70,45,90,.8);color:#b8a8c8;transition:all .18s;">いいえ</button>
-      </div>`;
+    happyHousePopOverlay.className = 'wpop-overlay';
+    happyHousePopOverlay.innerHTML = wpopMarkup('happy-house-pop');
     document.body.appendChild(happyHousePopOverlay);
     document.getElementById('happy-house-pop-close').addEventListener('click', closeHappyHousePop);
-    document.getElementById('happy-house-no').addEventListener('click',        closeHappyHousePop);
-    document.getElementById('happy-house-yes').addEventListener('click',       _startHappyHouseTransition);
     happyHousePopOverlay.addEventListener('click', e => { if (e.target === happyHousePopOverlay) closeHappyHousePop(); });
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && isHappyHousePopOpen()) closeHappyHousePop(); });
   }
- 
+
+  // Warm amber/coral funhouse identity — matches the map orb above,
+  // and no longer borrows Utsuroba's purple.
+  const HAPPY_HOUSE_THEME = {
+    bg: 'linear-gradient(160deg,#1a0e05 0%,#2a1206 55%,#160a02 100%)',
+    border: 'rgba(255,154,60,.55)',
+    accent1: '#ff9a3c', accent2: '#ff5e7e', accent3: '#ffcf5c',
+    glow1: 'rgba(255,154,60,.6)', glow2: 'rgba(255,94,126,.4)',
+    btnBorder: 'rgba(255,154,60,.9)', btnColor: '#ffe6c2',
+  };
+
   function openHappyHousePop() {
-    happyHousePopOverlay.style.display    = 'flex';
-    happyHousePopOverlay.style.background = 'rgba(0,0,0,0.88)';
-    state.clickTarget = null;
+    wpopThemeBox('happy-house-pop', HAPPY_HOUSE_THEME);
+    wpopSetIconImage('happy-house-pop', 'assets/happy_house/mister_happy-1.png', 'Mister Happy');
+    wpopSetLock('happy-house-pop', false);
+
+    wpopSetText(document.getElementById('happy-house-pop-eyebrow-en'), 'AN INVITATION');
+    const eyebrowJp = document.getElementById('happy-house-pop-eyebrow-jp');
+    wpopSetText(eyebrowJp, 'しょうたい');
+    eyebrowJp.style.color = HAPPY_HOUSE_THEME.accent3;
+
+    wpopSetText(document.getElementById('happy-house-pop-title-en'), '');
+    wpopSetText(document.getElementById('happy-house-pop-title-jp'), '');
+
+    const bodyEn = document.getElementById('happy-house-pop-body-en');
+    const bodyJp = document.getElementById('happy-house-pop-body-jp');
+    bodyEn.style.color = '#fff0dd'; bodyJp.style.color = '#e8cbb0';
+    wpopSetText(bodyEn, "Do you want to go into Mister Happy's house?");
+    wpopSetText(bodyJp, 'ミスター・ハッピーの家に入りますか？');
+
+    wpopSetActions('happy-house-pop', [
+      { en: 'Yes', jp: 'はい', border: `1.5px solid ${HAPPY_HOUSE_THEME.btnBorder}`, color: HAPPY_HOUSE_THEME.btnColor, background: `${HAPPY_HOUSE_THEME.accent1}22`,
+        onClick: _startHappyHouseTransition },
+      { en: 'No', jp: 'いいえ', border: `1.5px solid ${HAPPY_HOUSE_THEME.accent1}44`, color: `${HAPPY_HOUSE_THEME.accent3}99`,
+        onClick: closeHappyHousePop }
+    ]);
+
+    openWpopOverlay(happyHousePopOverlay, 'rgba(0,0,0,0.88)');
   }
- 
+
   function closeHappyHousePop() {
     happyHouseCooldownUntil = performance.now() + POPUP_COOLDOWN_MS;
-    happyHousePopOverlay.style.background = 'rgba(0,0,0,0)';
-    setTimeout(() => { happyHousePopOverlay.style.display = 'none'; }, 300);
+    closeWpopOverlay(happyHousePopOverlay, 300);
   }
- 
+
   function isHappyHousePopOpen() {
     return happyHousePopOverlay && happyHousePopOverlay.style.display === 'flex';
   }
@@ -1312,43 +1439,23 @@ const HAPPY_HOUSE_PORTAL = {
     if (utsurubaPopOverlay) return;
     utsurubaPopOverlay = document.createElement('div');
     utsurubaPopOverlay.id = 'utsuroba-pop-overlay';
-    utsurubaPopOverlay.style.cssText = `display:none;position:fixed;inset:0;z-index:9300;align-items:center;justify-content:center;background:rgba(0,0,0,0);transition:background 0.4s ease;`;
-    utsurubaPopOverlay.innerHTML = `
-      <div id="utsuroba-pop-box" style="background:linear-gradient(160deg,#06000f 0%,#0c0018 60%,#04000a 100%);border:1px solid rgba(120,0,200,.45);border-radius:8px;padding:0 0 clamp(22px,4vw,36px);max-width:min(420px,94vw);width:94vw;text-align:center;box-shadow:0 0 0 1px rgba(100,0,160,.4),0 0 50px rgba(60,0,110,.85),0 0 110px rgba(30,0,70,.6),0 0 200px rgba(15,0,40,.4),inset 0 0 80px rgba(0,0,0,.6);font-family:'Georgia',serif;position:relative;overflow:hidden;animation:utsuPopAppear 0.4s cubic-bezier(.22,.8,.36,1) both;">
-        <div style="height:2px;width:100%;background:linear-gradient(90deg,transparent,rgba(180,80,255,.9),rgba(100,200,255,.7),rgba(180,80,255,.9),transparent);animation:utsuShimmer 2.4s ease-in-out infinite;"></div>
-        <div style="position:absolute;top:12px;left:12px;width:18px;height:18px;border:1.5px solid rgba(160,60,255,.55);border-right:none;border-bottom:none;"></div>
-        <div style="position:absolute;top:12px;right:12px;width:18px;height:18px;border:1.5px solid rgba(160,60,255,.55);border-left:none;border-bottom:none;"></div>
-        <div style="position:absolute;bottom:12px;left:12px;width:18px;height:18px;border:1.5px solid rgba(160,60,255,.55);border-right:none;border-top:none;"></div>
-        <div style="position:absolute;bottom:12px;right:12px;width:18px;height:18px;border:1.5px solid rgba(160,60,255,.55);border-left:none;border-top:none;"></div>
-        <button id="utsuroba-pop-close" style="position:absolute;top:12px;right:14px;background:transparent;border:none;cursor:pointer;font-size:1rem;color:rgba(160,80,255,.4);transition:color .18s;padding:4px 8px;z-index:2;">✕</button>
-        <div id="utsuroba-pop-icon-wrap" style="padding:clamp(20px,4vw,32px) 0 clamp(10px,2vw,16px);position:relative;">
-          <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 60%,rgba(120,0,200,.35),transparent 70%);pointer-events:none;"></div>
-          <img id="utsuroba-pop-icon" src="assets/img/utsuroba_icon.png" alt="" style="width:clamp(64px,16vw,96px);height:clamp(64px,16vw,96px);object-fit:contain;position:relative;z-index:1;filter:drop-shadow(0 0 18px rgba(180,80,255,.8)) drop-shadow(0 0 40px rgba(100,0,200,.5));animation:utsuIconPulse 2.8s ease-in-out infinite;"/>
-        </div>
-        <div id="utsuroba-locked" style="display:none;padding:0 clamp(20px,6vw,40px);">
-          <p style="font-size:clamp(.7rem,2vw,.78rem);color:rgba(140,80,200,.6);letter-spacing:.22em;margin:0 0 14px;text-transform:uppercase;">— 封印 —</p>
-          <p id="utsuroba-locked-en" style="font-size:clamp(.86rem,2.8vw,1rem);color:#c8b8d8;margin:0 0 10px;line-height:1.65;letter-spacing:.04em;white-space:pre-line;"></p>
-          <p id="utsuroba-locked-jp" style="font-size:clamp(.76rem,2.4vw,.9rem);color:#a890c0;margin:0 0 22px;letter-spacing:.06em;white-space:pre-line;"></p>
-          <button id="utsuroba-locked-ok" style="background:transparent;font-family:'Georgia',serif;font-size:clamp(.8rem,2.5vw,.9rem);letter-spacing:.14em;cursor:pointer;padding:8px 28px;border-radius:2px;border:1px solid rgba(80,0,120,.5);color:#c0a0e0;transition:all .2s;">— 閉じる —</button>
-        </div>
-        <div id="utsuroba-unlocked" style="display:none;padding:0 clamp(20px,6vw,40px);">
-          <p style="font-size:clamp(.68rem,1.9vw,.76rem);color:rgba(180,120,255,.7);letter-spacing:.22em;margin:0 0 12px;text-transform:uppercase;text-shadow:0 0 12px rgba(180,80,255,.4);">— 新しい世界 —</p>
-          <p id="utsuroba-unlocked-en" style="font-size:clamp(.9rem,3vw,1.08rem);color:#d8b8f8;margin:0 0 8px;line-height:1.6;letter-spacing:.04em;text-shadow:0 0 24px rgba(180,80,255,.45);white-space:pre-line;"></p>
-          <p id="utsuroba-unlocked-jp" style="font-size:clamp(.78rem,2.5vw,.92rem);color:#c0a0e8;margin:0 0 24px;letter-spacing:.07em;white-space:pre-line;"></p>
-          <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
-            <button id="utsuroba-yes" style="background:rgba(60,0,100,.35);font-family:'Georgia',serif;font-size:clamp(.82rem,2.6vw,.94rem);letter-spacing:.12em;cursor:pointer;padding:10px 32px;border-radius:3px;border:1px solid rgba(160,60,255,.75);color:#e0c0ff;box-shadow:0 0 18px rgba(140,40,220,.3);transition:all .22s;">はい / Yes</button>
-            <button id="utsuroba-no"  style="background:transparent;font-family:'Georgia',serif;font-size:clamp(.82rem,2.6vw,.94rem);letter-spacing:.12em;cursor:pointer;padding:10px 32px;border-radius:3px;border:1px solid rgba(60,20,80,.65);color:#c0a0e0;transition:all .22s;">いいえ / No</button>
-          </div>
-        </div>
-      </div>`;
+    utsurubaPopOverlay.className = 'wpop-overlay';
+    utsurubaPopOverlay.innerHTML = wpopMarkup('utsuroba-pop');
     document.body.appendChild(utsurubaPopOverlay);
-    document.getElementById('utsuroba-pop-close').addEventListener('click',  closeUtsurobaPopClose);
-    document.getElementById('utsuroba-locked-ok').addEventListener('click',  closeUtsurobaPopClose);
-    document.getElementById('utsuroba-no').addEventListener('click',          closeUtsurobaPopClose);
-    document.getElementById('utsuroba-yes').addEventListener('click',         startUtsuobaTransition);
+    document.getElementById('utsuroba-pop-close').addEventListener('click', closeUtsurobaPopClose);
     utsurubaPopOverlay.addEventListener('click', e => { if (e.target === utsurubaPopOverlay) closeUtsurobaPopClose(); });
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && isUtsuobaPopOpen()) closeUtsurobaPopClose(); });
   }
+
+  // Utsuroba keeps its established deep-violet "sealed world" identity.
+  const UTSUROBA_THEME = {
+    bg: 'linear-gradient(160deg,#06000f 0%,#0c0018 60%,#04000a 100%)',
+    border: 'rgba(120,0,200,.45)',
+    accent1: '#b866ff', accent2: '#66c8ff', accent3: '#d8b8f8',
+    glow1: 'rgba(60,0,110,.85)', glow2: 'rgba(30,0,70,.6)',
+    btnBorder: 'rgba(160,60,255,.85)', btnColor: '#e0c0ff',
+    shadow: '0 0 0 1px rgba(100,0,160,.4),0 0 50px rgba(60,0,110,.85),0 0 110px rgba(30,0,70,.6),0 0 200px rgba(15,0,40,.4),inset 0 0 80px rgba(0,0,0,.6)',
+  };
 
   const UTSUROBA_LOCKED_COPY = {
     en: 'Something waits behind this light.\nComplete nine lessons in one path\nbefore it will open to you.',
@@ -1360,27 +1467,48 @@ const HAPPY_HOUSE_PORTAL = {
   };
 
   function openUtsuobaPopup() {
-    const unlocked   = _utsurobaCurriculumUnlocked();
-    const lockedEl   = document.getElementById('utsuroba-locked');
-    const unlockedEl = document.getElementById('utsuroba-unlocked');
+    const unlocked = _utsurobaCurriculumUnlocked();
+    wpopThemeBox('utsuroba-pop', UTSUROBA_THEME);
+    wpopSetIconImage('utsuroba-pop', 'assets/img/utsuroba_icon.png', 'Utsuroba');
+    wpopSetLock('utsuroba-pop', false);
+    wpopSetText(document.getElementById('utsuroba-pop-title-en'), '');
+    wpopSetText(document.getElementById('utsuroba-pop-title-jp'), '');
+
+    const eyebrowEn = document.getElementById('utsuroba-pop-eyebrow-en');
+    const eyebrowJp = document.getElementById('utsuroba-pop-eyebrow-jp');
+    const bodyEn    = document.getElementById('utsuroba-pop-body-en');
+    const bodyJp    = document.getElementById('utsuroba-pop-body-jp');
+
     if (unlocked) {
-      lockedEl.style.display = 'none'; unlockedEl.style.display = 'block';
-      document.getElementById('utsuroba-unlocked-en').textContent = UTSUROBA_UNLOCKED_COPY.en;
-      document.getElementById('utsuroba-unlocked-jp').textContent = UTSUROBA_UNLOCKED_COPY.jp;
+      wpopSetText(eyebrowEn, 'A NEW WORLD');
+      wpopSetText(eyebrowJp, '新しい世界'); eyebrowJp.style.color = UTSUROBA_THEME.accent3;
+      bodyEn.style.color = '#d8b8f8'; bodyEn.style.textShadow = '0 0 24px rgba(180,80,255,.45)';
+      bodyJp.style.color = '#c0a0e8';
+      wpopSetText(bodyEn, UTSUROBA_UNLOCKED_COPY.en);
+      wpopSetText(bodyJp, UTSUROBA_UNLOCKED_COPY.jp);
+      wpopSetActions('utsuroba-pop', [
+        { en: 'Yes', jp: 'はい', border: `1px solid ${UTSUROBA_THEME.btnBorder}`, color: UTSUROBA_THEME.btnColor,
+          background: 'rgba(60,0,100,.35)', boxShadow: '0 0 18px rgba(140,40,220,.3)', onClick: startUtsuobaTransition },
+        { en: 'No', jp: 'いいえ', border: '1px solid rgba(60,20,80,.65)', color: '#c0a0e0', onClick: closeUtsurobaPopClose }
+      ]);
     } else {
-      lockedEl.style.display = 'block'; unlockedEl.style.display = 'none';
-      document.getElementById('utsuroba-locked-en').textContent = UTSUROBA_LOCKED_COPY.en;
-      document.getElementById('utsuroba-locked-jp').textContent = UTSUROBA_LOCKED_COPY.jp;
+      wpopSetText(eyebrowEn, 'SEALED');
+      wpopSetText(eyebrowJp, '封印'); eyebrowJp.style.color = 'rgba(180,130,230,.85)';
+      bodyEn.style.color = '#c8b8d8'; bodyEn.style.textShadow = 'none';
+      bodyJp.style.color = '#a890c0';
+      wpopSetText(bodyEn, UTSUROBA_LOCKED_COPY.en);
+      wpopSetText(bodyJp, UTSUROBA_LOCKED_COPY.jp);
+      wpopSetActions('utsuroba-pop', [
+        { en: 'Close', jp: '閉じる', border: '1px solid rgba(80,0,120,.5)', color: '#c0a0e0', onClick: closeUtsurobaPopClose }
+      ]);
     }
-    utsurubaPopOverlay.style.display    = 'flex';
-    utsurubaPopOverlay.style.background = 'rgba(0,0,0,0.88)';
-    state.clickTarget = null;
+
+    openWpopOverlay(utsurubaPopOverlay, 'rgba(0,0,0,0.88)');
   }
 
   function closeUtsurobaPopClose() {
     utsurobaCooldownUntil = performance.now() + POPUP_COOLDOWN_MS;
-    utsurubaPopOverlay.style.background = 'rgba(0,0,0,0)';
-    setTimeout(() => { utsurubaPopOverlay.style.display = 'none'; }, 400);
+    closeWpopOverlay(utsurubaPopOverlay, 400);
   }
 
   function isUtsuobaPopOpen() { return utsurubaPopOverlay && utsurubaPopOverlay.style.display === 'flex'; }
@@ -1518,10 +1646,11 @@ const HAPPY_HOUSE_PORTAL = {
       #kara-fade{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none;z-index:20;}
       #rotate-overlay{display:none;position:fixed;inset:0;z-index:9999;background:#000;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center;padding:32px;}
       @media screen and (orientation:portrait) and (max-width:1023px){#rotate-overlay{display:flex !important;}}
-      .rotate-phone{font-size:64px;display:block;animation:rotatehint 2.4s ease-in-out infinite;transform-origin:center;}
+      .rotate-phone{display:inline-flex;align-items:center;justify-content:center;color:#fff;animation:rotatehint 2.4s ease-in-out infinite;transform-origin:center;}
       @keyframes rotatehint{0%,100%{transform:rotate(0deg);}40%,60%{transform:rotate(-90deg);}}
       .rotate-bar{width:120px;height:3px;border-radius:999px;background:linear-gradient(90deg,#ff3bbd,#ff79d7,#ff3bbd);background-size:200%;animation:barshimmer 2s linear infinite;box-shadow:0 0 14px rgba(255,59,189,.5);}
       @keyframes barshimmer{0%{background-position:0%}100%{background-position:200%}}
+      .rotate-title-en{font-family:system-ui,-apple-system,sans-serif;font-size:clamp(13px,3.6vw,17px);font-weight:800;letter-spacing:.06em;color:rgba(255,255,255,.72);margin:0;}
       .rotate-title{font-family:system-ui,-apple-system,sans-serif;font-size:clamp(18px,5vw,28px);font-weight:900;letter-spacing:1px;color:#fff;margin:0;text-shadow:0 0 28px rgba(255,140,255,.7);}
       .rotate-sub{font-size:14px;color:rgba(255,255,255,.55);margin:0;line-height:1.7;}
       #coord-toggle{position:fixed;bottom:18px;right:18px;z-index:200;display:flex;align-items:center;gap:8px;background:rgba(0,0,0,.80);color:#ff8ae2;font:700 11px/1 monospace;padding:7px 13px;border-radius:20px;cursor:pointer;border:1px solid rgba(255,138,226,.40);user-select:none;letter-spacing:.06em;}
@@ -1546,27 +1675,43 @@ const HAPPY_HOUSE_PORTAL = {
       #pin-log .clear-btn:hover{color:#fff;border-color:rgba(255,138,226,.6);}
       #copy-toast{position:fixed;top:52px;left:50%;transform:translateX(-50%);z-index:300;background:rgba(20,0,30,.92);color:#fff;font:700 12px/1 monospace;padding:6px 18px;border-radius:20px;pointer-events:none;opacity:0;transition:opacity .18s;letter-spacing:.05em;}
       #copy-toast.show{opacity:1;}
-      #portal-overlay{display:none;position:fixed;inset:0;z-index:9000;align-items:center;justify-content:center;background:rgba(0,0,0,0);transition:background 0.3s ease;}
-      #portal-overlay.active{display:flex;background:rgba(0,0,0,0.82);}
-      #portal-box{background:#080810;border:1px solid #3a1055;border-radius:6px;padding:clamp(24px,5vw,44px) clamp(20px,6vw,52px) clamp(20px,4vw,36px);max-width:min(440px,92vw);width:92vw;text-align:center;box-shadow:0 0 0 1px rgba(160,40,220,.6),0 0 40px rgba(160,40,220,.7),0 0 90px rgba(120,0,180,.45),0 0 160px rgba(100,0,160,.2),inset 0 0 50px rgba(0,0,0,.5);font-family:'Georgia',serif;position:relative;animation:portalAppear 0.25s ease-out;}
-      @keyframes portalAppear{from{opacity:0;transform:scale(0.92) translateY(8px);}to{opacity:1;transform:scale(1) translateY(0);}}
-      @keyframes utsuPopAppear{from{opacity:0;transform:scale(0.88) translateY(12px);}to{opacity:1;transform:scale(1) translateY(0);}}
-      @keyframes utsuShimmer{0%,100%{opacity:.4;transform:translateX(-30%);}50%{opacity:1;transform:translateX(30%);}}
-      @keyframes utsuIconPulse{0%,100%{filter:drop-shadow(0 0 18px rgba(180,80,255,.8)) drop-shadow(0 0 40px rgba(100,0,200,.5));transform:scale(1);}50%{filter:drop-shadow(0 0 28px rgba(200,120,255,1)) drop-shadow(0 0 60px rgba(140,0,255,.7));transform:scale(1.06);}}
-      #portal-box::before,#portal-box::after{content:"";position:absolute;width:20px;height:20px;border-color:rgba(180,80,220,.7);border-style:solid;}
-      #portal-box::before{top:10px;left:10px;border-width:1.5px 0 0 1.5px;}
-      #portal-box::after{bottom:10px;right:10px;border-width:0 1.5px 1.5px 0;}
-      #portal-en{font-size:clamp(.9rem,3.5vw,1.1rem);margin:0 0 10px;letter-spacing:.04em;color:#f0e8ff;line-height:1.55;text-shadow:0 0 20px rgba(200,180,255,.5);}
-      #portal-ja{font-size:clamp(.78rem,3vw,.92rem);margin:0 0 clamp(18px,4vw,32px);color:#cdb8e8;letter-spacing:.05em;}
-      .portal-btn{background:transparent;font-family:'Georgia',serif;font-size:clamp(.82rem,3vw,.95rem);letter-spacing:.12em;cursor:pointer;transition:color .18s,border-color .18s,box-shadow .18s,background .18s;padding:clamp(6px,2vw,10px) clamp(20px,5vw,34px);border-radius:3px;}
-      #portal-yes{border:1.5px solid rgba(160,70,210,.9);color:#e8d8ff;margin-right:16px;background:rgba(100,30,150,.15);}
-      #portal-yes:hover{color:#fff;border-color:rgba(210,120,255,1);background:rgba(140,50,200,.3);box-shadow:0 0 20px rgba(180,80,240,.6),0 0 40px rgba(140,40,200,.3);}
-      #portal-no{border:1.5px solid rgba(70,45,90,.8);color:#b8a8c8;background:rgba(40,25,60,.2);}
-      #portal-no:hover{color:#ddd0ff;border-color:rgba(130,90,160,.9);background:rgba(70,45,100,.3);}
+      /* ── Shared "world popup" component ───────────────
+         One shell used by every destination confirm dialog
+         (locked games, Happy House, Utsuroba, profile). Themed
+         per-open via inline styles + the --wc1/--wc2 CSS vars. */
+      .wpop-overlay{display:none;position:fixed;inset:0;z-index:9300;align-items:center;justify-content:center;background:rgba(0,0,0,0);transition:background .32s ease;padding:16px;box-sizing:border-box;}
+      .wpop-box{position:relative;width:100%;max-width:min(440px,94vw);max-height:88vh;overflow-y:auto;overflow-x:hidden;border-radius:14px;padding:clamp(30px,5.5vw,46px) clamp(22px,6vw,44px) clamp(22px,4vw,34px);text-align:center;font-family:'Georgia',serif;animation:wpopAppear .32s cubic-bezier(.22,.8,.36,1) both;box-sizing:border-box;}
+      @keyframes wpopAppear{from{opacity:0;transform:scale(.92) translateY(10px);}to{opacity:1;transform:scale(1) translateY(0);}}
+      @keyframes portalAppear{from{opacity:0;transform:scale(0.92) translateY(8px);}to{opacity:1;transform:scale(1) translateY(0);}} /* kept for #wanderer-pop-box, outside this pass's scope */
+      .wpop-shimmer{position:absolute;top:0;left:0;height:2px;width:100%;background:linear-gradient(90deg,transparent,var(--wc1,#fff),var(--wc2,#fff),var(--wc1,#fff),transparent);background-size:200% 100%;animation:wpopShimmer 2.6s ease-in-out infinite;opacity:.85;}
+      @keyframes wpopShimmer{0%{background-position:0% 0;}100%{background-position:200% 0;}}
+      .wpop-corner{position:absolute;width:16px;height:16px;border-style:solid;border-width:0;border-color:var(--wc1,rgba(255,255,255,.4));opacity:.75;pointer-events:none;}
+      .wpop-corner--tl{top:12px;left:12px;border-width:1.5px 0 0 1.5px;}
+      .wpop-corner--tr{top:12px;right:12px;border-width:1.5px 1.5px 0 0;}
+      .wpop-corner--bl{bottom:12px;left:12px;border-width:0 0 1.5px 1.5px;}
+      .wpop-corner--br{bottom:12px;right:12px;border-width:0 1.5px 1.5px 0;}
+      .wpop-close{position:absolute;top:2px;right:2px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:transparent;border:none;cursor:pointer;font-size:1.05rem;line-height:1;padding:0;opacity:.5;transition:opacity .18s;z-index:3;color:inherit;}
+      .wpop-close:hover,.wpop-close:focus-visible{opacity:1;}
+      .wpop-icon-wrap{width:clamp(60px,15vw,80px);height:clamp(60px,15vw,80px);margin:0 auto 14px;position:relative;border-radius:50%;display:flex;align-items:center;justify-content:center;animation:wpopIconPulse 2.8s ease-in-out infinite;}
+      @keyframes wpopIconPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.05);}}
+      .wpop-icon-wrap img{width:100%;height:100%;object-fit:cover;border-radius:50%;position:relative;z-index:1;}
+      .wpop-icon-wrap .wpop-icon-orb{width:100%;height:100%;border-radius:50%;position:relative;z-index:1;}
+      .wpop-lock-badge{position:absolute;bottom:-2px;right:-2px;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;z-index:2;background:#170f22;border:1.5px solid rgba(255,255,255,.3);color:#fff;}
+      .wpop-eyebrow-en{font-size:clamp(.6rem,1.7vw,.68rem);letter-spacing:.22em;text-transform:uppercase;margin:0 0 2px;opacity:.75;font-family:'Nunito',system-ui,sans-serif;font-weight:800;}
+      .wpop-eyebrow-jp{font-size:clamp(.62rem,1.9vw,.7rem);letter-spacing:.1em;margin:0 0 14px;opacity:.55;}
+      .wpop-title-en{font-size:clamp(1.02rem,3.6vw,1.3rem);margin:0 0 3px;letter-spacing:.05em;line-height:1.35;}
+      .wpop-title-jp{font-size:clamp(.74rem,2.6vw,.86rem);margin:0 0 16px;letter-spacing:.05em;opacity:.72;line-height:1.5;}
+      .wpop-body-en{font-size:clamp(.84rem,2.8vw,.98rem);line-height:1.65;margin:0 0 6px;white-space:pre-line;}
+      .wpop-body-jp{font-size:clamp(.74rem,2.3vw,.85rem);line-height:1.6;margin:0 0 22px;opacity:.78;white-space:pre-line;}
+      .wpop-actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:4px;}
+      .wpop-btn{min-height:44px;min-width:104px;display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;background:transparent;font-family:'Georgia',serif;font-size:clamp(.8rem,2.6vw,.92rem);letter-spacing:.1em;cursor:pointer;padding:8px 22px;border-radius:7px;transition:all .2s;border:1.5px solid transparent;}
+      .wpop-btn .wbtn-jp{font-size:.76em;letter-spacing:.06em;opacity:.85;}
       #wanderer-pop-box::-webkit-scrollbar{width:4px;}
       #wanderer-pop-box::-webkit-scrollbar-track{background:transparent;}
       #wanderer-pop-box::-webkit-scrollbar-thumb{background:rgba(255,255,255,.18);border-radius:4px;}
-      #utsuroba-locked-en,#utsuroba-locked-jp,#utsuroba-unlocked-en,#utsuroba-unlocked-jp{white-space:pre-line;}
+      .wpop-box::-webkit-scrollbar{width:4px;}
+      .wpop-box::-webkit-scrollbar-track{background:transparent;}
+      .wpop-box::-webkit-scrollbar-thumb{background:rgba(255,255,255,.18);border-radius:4px;}
       #orb-panel{touch-action:none;}
       #orb-swap-overlay{touch-action:none;}
     `;
@@ -1653,8 +1798,8 @@ const HAPPY_HOUSE_PORTAL = {
     pinLog = document.createElement("div"); pinLog.id = "pin-log";
     pinLog.innerHTML = `<div class="log-header"><span>PINS — ${state.roomId}</span><span class="clear-btn" id="clear-pins">CLEAR</span></div><div id="pin-rows"></div>`;
     const toast = document.createElement("div"); toast.id = "copy-toast"; toast.textContent = "copied!";
-    portalOverlay = document.createElement("div"); portalOverlay.id = "portal-overlay";
-    portalOverlay.innerHTML = `<div id="portal-box"><p id="portal-en">Do you want to go to your profile page?</p><p id="portal-ja">プロフィールページに行きますか？</p><button class="portal-btn" id="portal-yes">Yes</button><button class="portal-btn" id="portal-no">No</button></div>`;
+    portalOverlay = document.createElement("div"); portalOverlay.id = "portal-overlay"; portalOverlay.className = "wpop-overlay";
+    portalOverlay.innerHTML = wpopMarkup('portal');
     document.body.innerHTML = "";
     document.body.appendChild(app);
     
@@ -1665,18 +1810,46 @@ const HAPPY_HOUSE_PORTAL = {
         injectBonusPopOverlay(); injectWandererPopOverlay(); injectUtsuobaPopOverlay(); injectOrbPanel(); injectSwapOverlay(); injectObserverPop(); injectHappyHousePop();
     
     const rotateOverlay = document.createElement("div"); rotateOverlay.id = "rotate-overlay";
-    rotateOverlay.innerHTML = `<span class="rotate-phone">📱</span><div class="rotate-bar"></div><p class="rotate-title">横にして遊ぼう！</p><p class="rotate-sub">カラスキは<strong style="color:#ff79d7">横画面</strong>で遊べるよ。<br>スマホを横にしてね。</p>`;
+    rotateOverlay.innerHTML = `<span class="rotate-phone" aria-hidden="true"><svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2.4"></rect><line x1="11" y1="18.4" x2="13" y2="18.4"></line></svg></span><div class="rotate-bar"></div><p class="rotate-title-en">Turn your device sideways!</p><p class="rotate-title">横にして遊ぼう！</p><p class="rotate-sub">カラスキは<strong style="color:#ff79d7">横画面</strong>で遊べるよ。<br>スマホを横にしてね。</p>`;
     document.body.appendChild(rotateOverlay);
     ctx = canvas.getContext("2d");
-   
-    document.getElementById("portal-yes").addEventListener("click", () => { try { sessionStorage.setItem('karasuki_return_room', 'room_08'); } catch (_) {} window.location.href = PORTAL.href; });
-    document.getElementById("portal-no").addEventListener("click", closePortal);
+
+    // Teal/gold "personal" identity — was a copy-pasted purple that made
+    // this indistinguishable from the Utsuroba popup.
+    const PROFILE_THEME = {
+      bg: 'linear-gradient(160deg,#031a18 0%,#052a24 55%,#02120f 100%)',
+      border: 'rgba(45,212,191,.5)',
+      accent1: '#2dd4bf', accent2: '#ffd66b', accent3: '#8be8d8',
+      glow1: 'rgba(45,212,191,.6)', glow2: 'rgba(255,214,107,.35)',
+      btnBorder: 'rgba(45,212,191,.9)', btnColor: '#d6fff6',
+    };
+    wpopThemeBox('portal', PROFILE_THEME);
+    wpopSetIconImage('portal', 'assets/img/profile.png', 'Your profile');
+    wpopSetLock('portal', false);
+    wpopSetText(document.getElementById('portal-title-en'), '');
+    wpopSetText(document.getElementById('portal-title-jp'), '');
+    wpopSetText(document.getElementById('portal-eyebrow-en'), 'YOUR PROFILE');
+    const portalEyebrowJp = document.getElementById('portal-eyebrow-jp');
+    wpopSetText(portalEyebrowJp, 'プロフィール');
+    portalEyebrowJp.style.color = PROFILE_THEME.accent3;
+    const portalBodyEn = document.getElementById('portal-body-en');
+    const portalBodyJp = document.getElementById('portal-body-jp');
+    portalBodyEn.style.color = '#e6fff9'; portalBodyEn.style.textShadow = '0 0 20px rgba(45,212,191,.4)';
+    portalBodyJp.style.color = '#b8ece2';
+    wpopSetText(portalBodyEn, 'Do you want to go to your profile page?');
+    wpopSetText(portalBodyJp, 'プロフィールページに行きますか？');
+    wpopSetActions('portal', [
+      { en: 'Yes', jp: 'はい', border: `1.5px solid ${PROFILE_THEME.btnBorder}`, color: PROFILE_THEME.btnColor, background: `${PROFILE_THEME.accent1}22`,
+        onClick: () => { try { sessionStorage.setItem('karasuki_return_room', 'room_08'); } catch (_) {} window.location.href = PORTAL.href; } },
+      { en: 'No', jp: 'いいえ', border: `1.5px solid ${PROFILE_THEME.accent1}44`, color: `${PROFILE_THEME.accent3}99`,
+        onClick: closePortal }
+    ]);
     portalOverlay.addEventListener("click", (e) => { if (e.target === portalOverlay) closePortal(); });
   }
 
-  function openPortal()   { portalOverlay.classList.add("active"); state.clickTarget = null; }
-  function closePortal()  { portalOverlay.classList.remove("active"); }
-  function isPortalOpen() { return portalOverlay.classList.contains("active"); }
+  function openPortal()   { openWpopOverlay(portalOverlay, 'rgba(0,0,0,0.86)'); }
+  function closePortal()  { closeWpopOverlay(portalOverlay, 300); }
+  function isPortalOpen() { return portalOverlay && portalOverlay.style.display === 'flex'; }
 
   function exitToMaze() {
     if (state.mazeExiting) return;
@@ -1866,7 +2039,9 @@ const HAPPY_HOUSE_PORTAL = {
   /* ═══════════════════════════════════════════
      DRAW PORTAL ORB
   ═══════════════════════════════════════════ */
-  const PORTAL_COLORS = ['#8b00ff','#00bfff','#ff007f','#00ff99','#ffaa00','#aa00ff'];
+  // Teal/gold "waypoint" palette — this used to be an exact copy of
+  // Happy House's color array, making the two indistinguishable on the map.
+  const PORTAL_COLORS = ['#2dd4bf','#5eead4','#ffd66b','#38bdf8','#7dd8c6','#ffe08a'];
 
   function drawPortalOrb(now) {
     if (state.roomId !== "room_08") return;
@@ -1902,6 +2077,19 @@ const HAPPY_HOUSE_PORTAL = {
       const wAngle = (sec*0.4)+(w/3)*Math.PI*2; const wR = 14+pulse2*5;
       ctx.globalAlpha = 0.18+pulse*0.14; ctx.strokeStyle = w%2===0?col:col2; ctx.lineWidth = 1.5; ctx.shadowBlur = 10; ctx.shadowColor = col;
       ctx.beginPath(); ctx.arc(PORTAL.x,PORTAL.y,wR,wAngle,wAngle+Math.PI*0.7); ctx.stroke(); ctx.shadowBlur = 0;
+    }
+    // Waypoint ring — small compass-like tick marks, giving the profile
+    // portal its own "personal marker" silhouette instead of just being
+    // Happy House's swirl in a different color.
+    const tickCount = 12;
+    for (let i = 0; i < tickCount; i++) {
+      const tickAngle = (i / tickCount) * Math.PI * 2 + sec * 0.15;
+      const tickR1 = 34, tickR2 = i % 3 === 0 ? 41 : 38;
+      const x1 = PORTAL.x + Math.cos(tickAngle) * tickR1, y1 = PORTAL.y + Math.sin(tickAngle) * tickR1;
+      const x2 = PORTAL.x + Math.cos(tickAngle) * tickR2, y2 = PORTAL.y + Math.sin(tickAngle) * tickR2;
+      ctx.globalAlpha = 0.35 + pulse2 * 0.25;
+      ctx.strokeStyle = i % 3 === 0 ? col2 : col; ctx.lineWidth = i % 3 === 0 ? 1.8 : 1.1;
+      ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
     }
     ctx.restore();
   }
