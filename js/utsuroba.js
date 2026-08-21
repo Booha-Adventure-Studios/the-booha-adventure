@@ -362,6 +362,8 @@
           independentSessions: 0,
         });
       }
+      const journalEntry = existing || entries[0];
+      if (journalEntry && quest.postcard && quest.postcard.text) journalEntry.postcard = quest.postcard;
       if (existing) {
         if (!Number.isInteger(existing.masteryLevel)) existing.masteryLevel = 0;
         if (!Number.isInteger(existing.guidedSessions)) existing.guidedSessions = 0;
@@ -573,6 +575,9 @@
       .reading-journal-mastery{display:inline-block;margin-top:9px;padding:4px 7px;border:1px solid rgba(255,203,117,.4);border-radius:999px;background:rgba(255,203,117,.08);color:#ffe7b2;font-size:.68rem;font-weight:700;}
       .reading-journal-mastery small{margin-left:5px;color:rgba(255,231,178,.58);font-size:.9em;font-weight:400;}
       .reading-journal-meta{margin:7px 0 9px;color:rgba(245,232,255,.54);font-size:.73rem;line-height:1.4;}
+      .reading-journal-postcard{margin:0 0 9px;padding:6px 8px;border:1px solid rgba(216,168,255,.34);border-radius:7px;background:rgba(216,168,255,.05);color:#e4c2ff;font-size:.66rem;}
+      .reading-journal-postcard summary{cursor:pointer;font-weight:700;}
+      .reading-journal-postcard p{margin:6px 0 0;color:rgba(245,232,255,.7);font-size:.72rem;line-height:1.4;}
       .reading-journal-vocab{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:11px;}
       .reading-journal-vocab span{padding:4px 7px;border:1px solid rgba(216,168,255,.27);border-radius:999px;color:#e4c2ff;font-size:.68rem;}
       .reading-journal-review{padding:7px 12px;border:1px solid #ffcb75;border-radius:6px;background:rgba(255,203,117,.1);color:#ffe7b2;cursor:pointer;font:700 .76rem Georgia,serif;}
@@ -848,11 +853,12 @@
     const adaptiveMode = Number(reviewEntry.masteryLevel) >= 1 ? 'independent' : 'guided';
     window.UtsurobaReading.start({
       drifter,
-      quest: { episodeId: reviewEntry.episodeId, readingIndex: 0, mechanicIndex: 0 },
       reviewOnly: true,
       adaptiveMode,
+      quest: { episodeId: reviewEntry.episodeId, readingIndex: 0, mechanicIndex: 0, postcard: reviewEntry.postcard || null },
       onClose: () => { state.inputLocked = false; },
       onReviewComplete: result => recordReadingReview(reviewEntry, result),
+      onPostcardSave: postcard => recordReadingPostcard(reviewEntry, postcard),
     });
   }
 
@@ -879,6 +885,17 @@
       usedEvidence: result?.usedEvidence === true,
       completedAt: Date.now(),
     };
+    writeSave(data);
+  }
+
+  function recordReadingPostcard(entry, postcard) {
+    if (!postcard || !postcard.text) return;
+    const data = loadSave();
+    const entries = data.utsuroba.readingJournal?.entries;
+    const current = Array.isArray(entries)
+      ? entries.find(item => item.episodeId === entry.episodeId) : null;
+    if (!current) return;
+    current.postcard = { text: postcard.text, savedAt: postcard.savedAt || Date.now() };
     writeSave(data);
   }
 
@@ -972,7 +989,8 @@
           : masteryLevel === 1
             ? { en: 'Ready for independent review', jp: '自力復習の準備完了', action: 'Try without hints / ヒントなしで挑戦' }
             : { en: 'Guided review next', jp: 'まずは案内付き復習', action: 'Guided review / 案内付き復習' };
-        return `<article class="reading-journal-entry"><h3>${escapeHTML(episode.title)}<span>${escapeHTML(episode.titleJP)}</span></h3><div class="reading-journal-mastery">${mastery.en}<small>${mastery.jp}</small></div><p class="reading-journal-meta">${reviews} reading ${reviews === 1 ? 'completed' : 'sessions'} · ${escapeHTML(episode.eyebrow)}<br>${reviews === 1 ? '1回読了' : `${reviews}回読み返しました`}</p>${words ? `<div class="reading-journal-vocab" aria-label="Vocabulary">${words}</div>` : ''}<button class="reading-journal-review" type="button" data-journal-entry="${index}">${mastery.action}</button></article>`;
+        const postcardNote = entry.postcard ? `<details class="reading-journal-postcard"><summary>Postcard saved / 文章カードあり</summary><p>${escapeHTML(entry.postcard.text)}</p></details>` : '';
+        return `<article class="reading-journal-entry"><h3>${escapeHTML(episode.title)}<span>${escapeHTML(episode.titleJP)}</span></h3><div class="reading-journal-mastery">${mastery.en}<small>${mastery.jp}</small></div><p class="reading-journal-meta">${reviews} reading ${reviews === 1 ? 'completed' : 'sessions'} · ${escapeHTML(episode.eyebrow)}<br>${reviews === 1 ? '1回読了' : `${reviews}回読み返しました`}</p>${postcardNote}${words ? `<div class="reading-journal-vocab" aria-label="Vocabulary">${words}</div>` : ''}<button class="reading-journal-review" type="button" data-journal-entry="${index}">${mastery.action}</button></article>`;
       }).join('');
       list.querySelectorAll('[data-journal-entry]').forEach(button => button.addEventListener('click', () => {
         const entry = entries[Number(button.dataset.journalEntry)];

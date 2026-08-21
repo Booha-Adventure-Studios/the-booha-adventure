@@ -491,6 +491,7 @@
     rescueFxFrames: 0, rescueFxX: 0, rescueFxY: 0,
     trail: [],
     lastChanceFired: false, boohaJumpOffset: 0, boohaJumpFrame: 0,
+    boohaJumpTotal: 16, boohaJumpAmt: 1,
     cutTimers: {}, missDir: 0, fallSoundPlayed: false,
     perfectTextLife: 0,
     levelStartedAt: 0,
@@ -849,6 +850,8 @@
     state.lastChanceFired = false;
     state.boohaJumpOffset = 0;
     state.boohaJumpFrame  = 0;
+    state.boohaJumpTotal  = 16;
+    state.boohaJumpAmt    = 1;
     state.fallSoundPlayed = false;
     state.perfectTextLife = 0;
     state.continueAssist = !!options.assist;
@@ -1101,6 +1104,17 @@
   // ─────────────────────────────────────────────────
   // Booha movement
   // ─────────────────────────────────────────────────
+  // Starts (or restarts) a Booha hop: `frames` sets how long it lasts,
+  // `amt` scales how high it goes (1 = the original last-chance-save
+  // hop height). Used both for the last-chance surprise jump and for the
+  // per-star-count celebration hop in checkSuccess(), so one curve drives
+  // every "Booha physically reacts" moment instead of duplicating it.
+  function triggerBoohaHop(frames, amt) {
+    state.boohaJumpFrame = frames;
+    state.boohaJumpTotal = frames;
+    state.boohaJumpAmt   = amt;
+  }
+
   function updateBooha(dt) {
     if (!state.booha) return;
     const b = state.booha;
@@ -1111,8 +1125,8 @@
     }
     if (state.boohaJumpFrame > 0) {
       state.boohaJumpFrame--;
-      const p = 1 - state.boohaJumpFrame / 16;
-      state.boohaJumpOffset = -18 * Math.sin(p * Math.PI);
+      const p = 1 - state.boohaJumpFrame / state.boohaJumpTotal;
+      state.boohaJumpOffset = -18 * state.boohaJumpAmt * Math.sin(p * Math.PI);
       if (state.boohaJumpFrame === 0) state.boohaJumpOffset = 0;
     }
   }
@@ -1310,7 +1324,7 @@
     if (!c || c.attached) return;
     if (c.y + c.r >= FLOOR_Y - LAST_CHANCE_DIST && c.vy > 0) {
       state.lastChanceFired = true;
-      state.boohaJumpFrame  = 16;
+      triggerBoohaHop(16, 1);
     }
   }
 
@@ -1358,12 +1372,21 @@
     const levelScore = calculateLevelScore(cuts, stars);
     persistRoundResult(stars, levelScore);
 
+    // Reaction intensity scales with the star grade, so a clean 3★ throw
+    // reads as a real celebration and a scraped-through 1★ reads calmer —
+    // distinct from each other, not just a different HUD number.
     if (stars === 3) {
       spawnConfetti(m.x, m.y);
       state.shakeFrames = 18;
       state.shakeAmt    = 4;
       playSfxPerfect();
+      triggerBoohaHop(26, 1.6);
+    } else if (stars === 2) {
+      state.shakeFrames = 8;
+      state.shakeAmt    = 2;
+      triggerBoohaHop(16, 1);
     }
+    // 1★: no shake, no hop — a plain, relieved catch rather than a party.
 
     state.pendingSuccessTimeout = setTimeout(() => {
       state.boohaSprite = 'booWin';
@@ -1390,7 +1413,14 @@
           : stars === 2
             ? { en: 'Tasty!', ja: 'おいしい！' }
             : { en: 'Good job!', ja: 'よくできた！' };
-        text = { en: 'Booha is happy!', ja: 'ブーハーはうれしい！' };
+        // Flavor text also varies by star count now, not just the title —
+        // pairs with the hop/shake intensity above for a reaction that
+        // actually differs by outcome instead of always being the same line.
+        text = stars === 3
+          ? { en: 'Booha does a happy dance!', ja: 'ブーハーが よろこんで ダンス！' }
+          : stars === 2
+            ? { en: 'Booha licks his lips!', ja: 'ブーハーが したをぺろり！' }
+            : { en: 'Booha caught it just in time!', ja: 'ブーハーが ぎりぎりキャッチ！' };
       }
       showMessage(title, text, true, cuts, hitBounce);
     }, 1400);

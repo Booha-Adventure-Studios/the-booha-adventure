@@ -47,5 +47,6 @@
   ],
   "success": "The memory settles. Kurobane remembers the part he could not say aloud.",
   "successJP": "記憶が落ち着いた。クロバネは、声に出せなかったことを思い出した。",
-  "worldEcho": {"roomId":"room_02","x":0.70,"y":0.49,"motif":"lantern","label":"The lantern remembers","labelJP":"灯りが覚えている"}
+  "worldEcho": {"roomId":"room_02","x":0.70,"y":0.49,"motif":"lantern","label":"The lantern remembers","labelJP":"灯りが覚えている"},
+  "postcard": {"title":"Memory postcard","titleJP":"記憶カード","instruction":"Build a short summary in the best order.","instructionJP":"短いまとめを、よい順番に作りましょう。","chunks":["The lantern went out.","Chiyo could not find the way home.","Kurobane remembered why she left."],"chunksJP":["灯りが消えた。","チヨは帰り道が分からなかった。","クロバネは彼女が帰った理由を思い出した。"],"order":[0,1,2],"savedText":"The lantern went out. Chiyo could not find the way home. Kurobane remembered why she left."}
 }

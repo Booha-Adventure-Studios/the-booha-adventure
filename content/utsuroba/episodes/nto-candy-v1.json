@@ -47,5 +47,6 @@
   ],
   "success": "The memory settles. Ned laughs because the mystery was inside his own stomach.",
   "successJP": "記憶が落ち着きました。謎は自分のお腹の中にあったので、ネドは笑います。",
-  "worldEcho": {"roomId":"room_07","x":0.64,"y":0.53,"motif":"candy","label":"A sweet little echo","labelJP":"小さな甘い残響"}
+  "worldEcho": {"roomId":"room_07","x":0.64,"y":0.53,"motif":"candy","label":"A sweet little echo","labelJP":"小さな甘い残響"},
+  "postcard": {"title":"Memory postcard","titleJP":"記憶カード","instruction":"Build a short summary in the best order.","instructionJP":"短いまとめを、よい順番に作りましょう。","chunks":["Ned saved one red candy.","His pocket was empty.","He may have eaten it and forgotten."],"chunksJP":["ネドは赤いキャンディを一つ取っておいた。","彼のポケットは空っぽだった。","彼は食べて忘れたのかもしれない。"],"order":[0,1,2],"savedText":"Ned saved one red candy. His pocket was empty. He may have eaten it and forgotten."}
 }

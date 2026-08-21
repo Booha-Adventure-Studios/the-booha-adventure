@@ -103,6 +103,20 @@
       #utsuroba-reading-challenge .reading-secondary{margin-top:24px;padding:11px 20px;border:1px solid rgba(216,168,255,.55);border-radius:8px;background:rgba(216,168,255,.08);color:#f3ddff;font:700 .86rem Georgia,serif;cursor:pointer;}
       #utsuroba-reading-challenge .reading-secondary:hover{background:rgba(216,168,255,.18);border-color:#d8a8ff;}
       #utsuroba-reading-challenge .reading-complete-actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;}
+      #utsuroba-reading-challenge .reading-postcard{margin:18px 0;padding:13px;text-align:left;border:1px solid rgba(216,168,255,.28);border-radius:10px;background:rgba(216,168,255,.045);}
+      #utsuroba-reading-challenge .reading-postcard-heading{color:#e4c2ff;font:700 .78rem Georgia,serif;}
+      #utsuroba-reading-challenge .reading-postcard-heading span{display:block;margin-top:3px;color:rgba(245,232,255,.5);font-size:.88em;font-weight:400;}
+      #utsuroba-reading-challenge .reading-postcard-instruction{margin:8px 0;color:rgba(245,232,255,.7);font-size:.74rem;line-height:1.4;}
+      #utsuroba-reading-challenge .reading-postcard-instruction small{display:block;margin-top:3px;color:rgba(245,232,255,.48);font-size:.9em;}
+      #utsuroba-reading-challenge .reading-postcard-picked{min-height:34px;margin-bottom:9px;padding:7px 9px;border-radius:7px;background:rgba(0,0,0,.2);color:rgba(255,255,255,.68);font-size:.74rem;line-height:1.4;}
+      #utsuroba-reading-challenge .reading-postcard-option{display:block;width:100%;margin-top:7px;padding:8px 9px;text-align:left;border:1px solid rgba(216,168,255,.3);border-radius:6px;background:rgba(255,255,255,.05);color:#fff;cursor:pointer;font:inherit;font-size:.75rem;line-height:1.35;}
+      #utsuroba-reading-challenge .reading-postcard-option:hover,#utsuroba-reading-challenge .reading-postcard-option:focus-visible{background:rgba(216,168,255,.14);border-color:#d8a8ff;outline:none;}
+      #utsuroba-reading-challenge .reading-postcard-option small{display:block;margin-top:3px;color:rgba(255,255,255,.48);font-size:.9em;}
+      #utsuroba-reading-challenge .reading-postcard-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px;}
+      #utsuroba-reading-challenge .reading-postcard-save{padding:7px 11px;border:1px solid #ffcb75;border-radius:6px;background:rgba(255,203,117,.12);color:#ffe7b2;cursor:pointer;font:700 .72rem Georgia,serif;}
+      #utsuroba-reading-challenge .reading-postcard-save:hover,#utsuroba-reading-challenge .reading-postcard-save:focus-visible{background:rgba(255,203,117,.22);outline:none;}
+      #utsuroba-reading-challenge .reading-postcard-success{padding:8px 9px;border-left:3px solid #ffcb75;color:#ffe7b2;font-size:.76rem;line-height:1.45;}
+      #utsuroba-reading-challenge .reading-postcard-success small{display:block;margin-top:3px;color:rgba(255,231,178,.58);font-size:.9em;}
       #utsuroba-reading-challenge .reading-review-note{margin:14px auto 0;color:rgba(245,232,255,.48);font-size:.72rem;line-height:1.4;}
       #utsuroba-reading-challenge .reading-loading{text-align:center;padding:80px 24px;color:#f1dcff;}
       @media(max-width:700px){#utsuroba-reading-challenge .reading-choices{grid-template-columns:1fr;}#utsuroba-reading-challenge .reading-card{padding:20px 16px;}}
@@ -161,6 +175,11 @@
     const supportLevel = opts.adaptiveMode === 'independent' ? 'independent' : 'guided';
     let mistakeCount = 0;
     let usedEvidence = false;
+    let postcardOpen = false;
+    let postcardSelection = [];
+    let postcardBuilt = false;
+    let postcardSaved = !!(opts.quest && opts.quest.postcard && opts.quest.postcard.text);
+    let postcardFeedback = '';
 
     function renderVocabulary() {
       if (!Array.isArray(episode.vocabulary) || !episode.vocabulary.length) return '';
@@ -226,6 +245,37 @@
         </section>`;
     }
 
+    function renderPostcard() {
+      const postcard = episode.postcard;
+      if (!postcard) return '';
+      if (!postcardOpen) {
+        return `<section class="reading-postcard"><div class="reading-postcard-heading">${escapeText(postcard.title)}<span>${escapeText(postcard.titleJP)}</span></div><button class="reading-secondary" id="reading-postcard-open" type="button">Write a postcard / 文章カードを書く</button></section>`;
+      }
+      if (postcardSaved) {
+        return `<section class="reading-postcard"><div class="reading-postcard-success"><strong>Postcard saved.</strong> You can read it again in your Journal.<small>保存しました。Journalで読み返せます。</small></div></section>`;
+      }
+      if (postcardBuilt) {
+        const text = postcardSelection.map(index => postcard.chunks[index]).join(' ');
+        return `<section class="reading-postcard"><div class="reading-postcard-heading">${escapeText(postcard.title)}<span>${escapeText(postcard.titleJP)}</span></div><p class="reading-postcard-instruction">Your postcard:<small>あなたの文章カード：</small></p><div class="reading-postcard-picked">${escapeText(text)}</div><div class="reading-postcard-actions"><button class="reading-postcard-save" id="reading-postcard-save" type="button">Save postcard / 保存する</button><button class="reading-task-action" id="reading-postcard-reset" type="button">Try again / もう一度</button></div></section>`;
+      }
+      const chunks = postcard.chunks.map((chunk, index) => postcardSelection.includes(index) ? '' : `<button class="reading-postcard-option" type="button" data-postcard-chunk="${index}">${escapeText(chunk)}<small>${escapeText(postcard.chunksJP[index] || '')}</small></button>`).join('');
+      const picked = postcardSelection.length
+        ? postcardSelection.map((index, order) => `<strong>${order + 1}.</strong> ${escapeText(postcard.chunks[index])}`).join('<br>')
+        : 'Your summary will appear here.';
+      return `<section class="reading-postcard"><div class="reading-postcard-heading">${escapeText(postcard.title)}<span>${escapeText(postcard.titleJP)}</span></div><p class="reading-postcard-instruction">${escapeText(postcard.instruction)}<small>${escapeText(postcard.instructionJP)}</small></p>${postcardFeedback ? `<div class="reading-postcard-success">${postcardFeedback}</div>` : ''}<div class="reading-postcard-picked">${picked}</div><div class="reading-postcard-options">${chunks || '<span style="color:rgba(255,255,255,.55);font-size:.74rem;">All pieces selected. Check your summary.</span>'}</div><div class="reading-postcard-actions"><button class="reading-task-action" id="reading-postcard-reset" type="button">Start over / 最初から</button><button class="reading-task-action primary" id="reading-postcard-check" type="button">Check summary / まとめを確認</button></div></section>`;
+    }
+
+    function savePostcard() {
+      const postcard = episode.postcard;
+      if (!postcard || !postcardSaved) {
+        const payload = { text: postcardSelection.map(index => postcard.chunks[index]).join(' '), savedAt: Date.now() };
+        if (opts.persist) opts.persist({ postcard: payload });
+        if (typeof opts.onPostcardSave === 'function') opts.onPostcardSave(payload);
+        postcardSaved = true;
+      }
+      render();
+    }
+
     const finish = () => {
       if (opts.reviewOnly) {
         if (typeof opts.onReviewComplete === 'function') {
@@ -253,6 +303,10 @@
       inferenceAnswerChosen = false;
       mistakeCount = 0;
       usedEvidence = false;
+      postcardOpen = false;
+      postcardSelection = [];
+      postcardBuilt = false;
+      postcardFeedback = '';
       if (opts.persist) {
         const progress = { state: 'reading', readingState: 'review', readingIndex: 0, mechanicIndex: 0 };
         if (mechanic && mechanic.type === 'memory-theatre') progress.theatreIndex = 0;
@@ -374,6 +428,7 @@
             <p class="reading-success">${escapeText(episode.success)}</p>
             <p class="reading-jp">${escapeText(episode.successJP)}</p>
             ${reviewResult ? `<p class="reading-review-note">${reviewResult}</p>` : ''}
+            ${renderPostcard()}
             <div class="reading-complete-actions">
               ${completeActions}
             </div>
@@ -381,6 +436,28 @@
           </div>`;
         overlay.querySelector('#reading-return-btn').addEventListener('click', finish);
         overlay.querySelector('#reading-review-btn').addEventListener('click', review);
+        const postcardOpenButton = overlay.querySelector('#reading-postcard-open');
+        if (postcardOpenButton) postcardOpenButton.addEventListener('click', () => { postcardOpen = true; render(); });
+        overlay.querySelectorAll('[data-postcard-chunk]').forEach(button => button.addEventListener('click', () => {
+          const index = Number(button.dataset.postcardChunk);
+          if (!postcardSelection.includes(index)) { postcardSelection.push(index); postcardFeedback = ''; render(); }
+        }));
+        const postcardResetButton = overlay.querySelector('#reading-postcard-reset');
+        if (postcardResetButton) postcardResetButton.addEventListener('click', () => { postcardSelection = []; postcardBuilt = false; postcardFeedback = ''; render(); });
+        const postcardCheckButton = overlay.querySelector('#reading-postcard-check');
+        if (postcardCheckButton) postcardCheckButton.addEventListener('click', () => {
+          const postcard = episode.postcard;
+          const expected = Array.isArray(postcard?.order) ? postcard.order : [];
+          if (postcardSelection.length === expected.length && postcardSelection.every((value, index) => value === expected[index])) {
+            postcardBuilt = true;
+            postcardFeedback = '<strong>That summary makes sense.</strong><small>このまとめで大丈夫です。</small>';
+          } else {
+            postcardFeedback = '<strong>Try a different order.</strong> Read the memory once more.<small>別の順番を試しましょう。もう一度記憶を読みましょう。</small>';
+          }
+          render();
+        });
+        const postcardSaveButton = overlay.querySelector('#reading-postcard-save');
+        if (postcardSaveButton) postcardSaveButton.addEventListener('click', savePostcard);
         bindVocabulary();
         return;
       }
