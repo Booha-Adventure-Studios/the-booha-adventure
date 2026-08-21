@@ -21,9 +21,7 @@ window.UTSUROBA_DATA = {
       nameKanji       : '黒羽 静魔',
      
       greeting        : ['…What.', 'You\'re not from here.', 'Don\'t just stand there staring.'],
-      greetingJP      : ['…何だ。', 'ここにいるやつじゃないな。', 'じっと見てるな。'],
       questLines      : ['…What.', 'You again.', 'Don\'t just stand there.', 'I lost something.', 'A memory.', 'Go find it.'],
-      questLinesJP    : ['…何だ。', 'またお前か。', 'ぼーっと突っ立ってるな。', '失くしたものがある。', '記憶だ。', '探してこい。'],
       sprite1         : './assets/img/drifters/kurobane_shizuma-1.png',
       sprite2         : './assets/img/drifters/kurobane_shizuma-2.png',
       audioPrefix     : 'ks',
@@ -36,9 +34,7 @@ window.UTSUROBA_DATA = {
       nameKanji       : 'ネド・ザ・オーグル',
       
       greeting        : ['Oh! Hey!', 'You\'re new, right?', 'Hehe… I like you already!'],
-      greetingJP      : ['あっ！ねえ！', 'はじめて見るよね？', 'えへへ…なんか好きかも！'],
       questLines      : ['Oh! Hey hey hey!', 'You came back!', 'I\'ve been waiting!', 'I lost a memory somewhere out there…', 'Will you find it for me? Please please please?'],
-      questLinesJP    : ['あっ！ねえねえねえ！', '戻ってきてくれた！', 'ずっと待ってたよ！', 'どこかに記憶を失くしちゃって…', '探してきてくれる？お願いお願いお願い！'],
       sprite1         : './assets/img/drifters/ned-the-oogle-1.png',
       sprite2         : './assets/img/drifters/ned-the-oogle-2.png',
       audioPrefix     : 'nto',
@@ -51,9 +47,7 @@ window.UTSUROBA_DATA = {
       nameKanji       : 'チャグリン・ゴビト',
       
       greeting        : ['Ah—!', 'S-sorry…', 'I didn\'t see you there…'],
-      greetingJP      : ['あっ…！', 'ご、ごめん…', 'そこにいるの気づかなかった…'],
       questLines      : ['Ah—!', 'Oh… it\'s you.', 'Sorry, you startled me again…', 'Um…', 'I think I lost something.', 'A memory…', 'Would you… maybe… help me find it?'],
-      questLinesJP    : ['あっ…！', 'あ…君か。', 'ごめん、またびっくりしちゃった…', 'あの…', 'なんか失くしたと思って。', '記憶…', '…もしよかったら、探すの手伝ってくれる？'],
       sprite1         : './assets/img/drifters/chagrin_gobito-1.png',
       sprite2         : './assets/img/drifters/chagrin_gobito-2.png',
       audioPrefix     : 'cg',
@@ -66,7 +60,6 @@ window.UTSUROBA_DATA = {
       nameKanji   : 'ブライアン・ハーパー',
      
       greeting    : ['Hey…', 'You made it this far, huh.', 'I just got here myself.', 'Come back later.'],
-      greetingJP  : ['おい…', 'ここまで来たのか。', '俺も今来たところだ。', 'またあとで来い。'],
       sprite1     : './assets/img/drifters/bryan_harper-1.png',
       sprite2     : './assets/img/drifters/bryan_harper-2.png',
       audioPrefix : 'bh',
@@ -79,7 +72,6 @@ window.UTSUROBA_DATA = {
       nameKanji   : 'ブレイクスリー・カシディ',
       
       greeting    : ['…What are you.', 'Don\'t answer that.', 'You look like something someone stepped on.', 'Come back later.'],
-      greetingJP  : ['…何だコレ。', 'いや、答えなくていい。', 'おまえ、踏まれた何かみたい。', 'あとで来て。'],
       sprite1     : './assets/img/drifters/blakesly_kassidy-1.png',
       sprite2     : './assets/img/drifters/blakesly_kassidy-2.png',
       audioPrefix : 'bk',
@@ -92,7 +84,6 @@ window.UTSUROBA_DATA = {
       nameKanji   : 'パトリシア・ホリングスヘッド',
       
       greeting    : ['Oh my…', 'You\'re just the cutest thing, aren\'t you.', 'Don\'t wander too far, okay?', 'Come back and see me later.'],
-      greetingJP  : ['あら…', 'ほんとにかわいい子ね。', 'あんまり遠くに行っちゃだめよ？', 'あとでまたいらっしゃい。'],
       sprite1     : './assets/img/drifters/patricia_hollingshead-1.png',
       sprite2     : './assets/img/drifters/patricia_hollingshead-2.png',
       audioPrefix : 'ph',
