@@ -11,6 +11,15 @@
   let closeCallback = null;
   let previousFocus = null;
 
+  /* Pass 4: same motif palette used for orbs (karasuki.js) and the Three
+     Echoes tracker (utsuroba.js), reused here so a memory's color identity
+     is consistent everywhere a kid sees it. */
+  const MOTIF_COLORS = {
+    lantern:    { ring: '#ffd966', glow: 'rgba(255,217,102,.5)' },
+    candy:      { ring: '#ff85a1', glow: 'rgba(255,133,161,.5)' },
+    reflection: { ring: '#a8edff', glow: 'rgba(168,237,255,.5)' },
+  };
+
   function escapeText(value) {
     return String(value == null ? '' : value)
       .replace(/&/g, '&amp;').replace(/</g, '&lt;')
@@ -60,8 +69,15 @@
       #utsuroba-reading-challenge .reading-eyebrow{color:#d8a8ff;font:700 11px/1.4 monospace;letter-spacing:.16em;text-transform:uppercase;margin-bottom:8px;}
       #utsuroba-reading-challenge .reading-support-badge{display:inline-block;margin:0 0 9px;padding:4px 7px;border:1px solid rgba(216,168,255,.35);border-radius:999px;color:#e4c2ff;font:700 9px/1.2 monospace;letter-spacing:.08em;}
       #utsuroba-reading-challenge .reading-support-badge.independent{border-color:rgba(255,203,117,.48);color:#ffe0a0;}
-      #utsuroba-reading-challenge h2{margin:0 42px 8px;color:#fff4ff;font-size:clamp(1.25rem,3vw,2rem);}
+      #utsuroba-reading-challenge h2{margin:0 0 8px;color:#fff4ff;font-size:clamp(1.25rem,3vw,2rem);}
       #utsuroba-reading-challenge h2 span{display:block;color:rgba(255,220,255,.58);font-size:.52em;font-weight:400;margin-top:4px;}
+      #utsuroba-reading-challenge .reading-header{display:flex;align-items:flex-start;justify-content:space-between;gap:clamp(10px,3vw,20px);}
+      #utsuroba-reading-challenge .reading-header-text{flex:1;min-width:0;padding-right:38px;}
+      #utsuroba-reading-challenge .reading-portrait{flex-shrink:0;width:clamp(60px,13vw,100px);height:clamp(60px,13vw,100px);margin-top:22px;border-radius:14px;overflow:hidden;background:radial-gradient(circle at 35% 28%,rgba(255,255,255,.14),rgba(0,0,0,.4));border:2px solid var(--portrait-ring,#d8a8ff);box-shadow:0 0 20px var(--portrait-glow,rgba(216,168,255,.4)),inset 0 0 12px rgba(0,0,0,.4);}
+      #utsuroba-reading-challenge .reading-portrait img{width:100%;height:100%;object-fit:contain;display:block;filter:drop-shadow(0 2px 6px rgba(0,0,0,.55));}
+      #utsuroba-reading-challenge .reading-portrait-hero{width:clamp(84px,18vw,132px);height:clamp(84px,18vw,132px);margin:0 auto 14px;border-radius:18px;overflow:hidden;background:radial-gradient(circle at 35% 28%,rgba(255,255,255,.14),rgba(0,0,0,.4));border:2px solid var(--portrait-ring,#d8a8ff);box-shadow:0 0 28px var(--portrait-glow,rgba(216,168,255,.45)),inset 0 0 14px rgba(0,0,0,.4);}
+      #utsuroba-reading-challenge .reading-portrait-hero img{width:100%;height:100%;object-fit:contain;display:block;filter:drop-shadow(0 2px 8px rgba(0,0,0,.55));}
+      #utsuroba-reading-challenge .reading-complete .reading-portrait-hero{margin-top:4px;}
       #utsuroba-reading-challenge h3{margin:5px 0 2px;color:#fff;font-size:clamp(1rem,2.3vw,1.25rem);}
       #utsuroba-reading-challenge .reading-intro{margin:0;color:#f5e8ff;line-height:1.5;font-size:clamp(.86rem,1.8vw,1rem);}
       #utsuroba-reading-challenge .reading-jp{margin:2px 0 12px;color:rgba(245,232,255,.54);font-size:.78rem;line-height:1.45;}
@@ -119,7 +135,8 @@
       #utsuroba-reading-challenge .reading-mechanic-evidence-board{background:linear-gradient(160deg,rgba(102,179,255,.12),transparent 45%),linear-gradient(180deg,#152238,#0b1019);}
       #utsuroba-reading-challenge .reading-mechanic-emotion-thread{background:linear-gradient(160deg,rgba(255,145,175,.13),transparent 45%),linear-gradient(180deg,#281a2b,#100c16);}
       #utsuroba-reading-challenge .reading-theatre-stage::before{content:"";position:absolute;left:50%;top:0;width:2px;height:100%;background:linear-gradient(180deg,rgba(255,223,155,.55),transparent 70%);box-shadow:0 0 22px 9px rgba(255,203,117,.09);transform:translateX(-50%);pointer-events:none;}
-      #utsuroba-reading-challenge .reading-theatre-act{position:relative;z-index:1;min-height:92px;padding:10px 8px;border:1px solid rgba(255,255,255,.1);border-radius:7px;background:rgba(0,0,0,.22);opacity:.48;transition:all .28s ease;box-sizing:border-box;}
+      #utsuroba-reading-challenge .reading-theatre-act{position:relative;z-index:1;min-height:92px;padding:10px 8px;border:1px solid rgba(255,255,255,.1);border-radius:7px;background-color:rgba(0,0,0,.22);background-size:cover;background-position:center;opacity:.48;transition:all .28s ease;box-sizing:border-box;}
+      #utsuroba-reading-challenge .reading-theatre-act .act-title,#utsuroba-reading-challenge .reading-theatre-act .act-caption{text-shadow:0 1px 4px rgba(0,0,0,.7);}
       #utsuroba-reading-challenge .reading-theatre-act.is-current{opacity:1;border-color:rgba(255,203,117,.72);background:rgba(255,203,117,.1);box-shadow:0 0 18px rgba(255,203,117,.12);animation:readingActPulse 1.8s ease-in-out infinite;}
       #utsuroba-reading-challenge .reading-theatre-act.is-restored{opacity:1;border-color:rgba(216,168,255,.62);background:rgba(216,168,255,.1);}
       #utsuroba-reading-challenge .reading-theatre-act.is-restored::after{content:"✓";position:absolute;right:7px;top:5px;color:#ffe39c;font-weight:700;}
@@ -179,7 +196,7 @@
       #utsuroba-reading-challenge .reading-calibration-option small{display:block;margin-top:5px;color:rgba(255,255,255,.55);font-size:.72rem;line-height:1.35;}
       #utsuroba-reading-challenge .reading-onboarding-note{margin:13px 0 0;color:rgba(245,232,255,.5);font-size:.7rem;line-height:1.4;}
       #utsuroba-reading-challenge .reading-loading{text-align:center;padding:80px 24px;color:#f1dcff;}
-      @media(max-width:700px){#utsuroba-reading-challenge{padding:10px;}#utsuroba-reading-challenge .reading-choices{grid-template-columns:1fr;}#utsuroba-reading-challenge .reading-onboarding-steps,.reading-calibration-options,.reading-lens-options{grid-template-columns:1fr;}#utsuroba-reading-challenge .reading-card{max-height:calc(100vh - 20px);padding:20px 16px;}#utsuroba-reading-challenge .reading-close{min-width:44px;min-height:44px;}}
+      @media(max-width:700px){#utsuroba-reading-challenge{padding:10px;}#utsuroba-reading-challenge .reading-choices{grid-template-columns:1fr;}#utsuroba-reading-challenge .reading-onboarding-steps,.reading-calibration-options,.reading-lens-options{grid-template-columns:1fr;}#utsuroba-reading-challenge .reading-card{max-height:calc(100vh - 20px);padding:20px 16px;}#utsuroba-reading-challenge .reading-close{min-width:44px;min-height:44px;}#utsuroba-reading-challenge .reading-header{flex-direction:row-reverse;}#utsuroba-reading-challenge .reading-header-text{padding-right:0;}#utsuroba-reading-challenge .reading-portrait{width:52px;height:52px;margin-top:24px;}}
       @media(max-height:520px) and (orientation:landscape){#utsuroba-reading-challenge{align-items:flex-start;padding:8px;}#utsuroba-reading-challenge .reading-card{max-height:calc(100vh - 16px);padding:16px 18px;}}
       @media(prefers-reduced-motion:reduce){#utsuroba-reading-challenge *,#utsuroba-reading-challenge *::before,#utsuroba-reading-challenge *::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;scroll-behavior:auto !important;transition-duration:.01ms !important;}}
     `;
@@ -286,9 +303,14 @@
       overlay.innerHTML = `
         <div class="reading-card reading-onboarding">
           <button class="reading-close" id="reading-onboarding-close" type="button" aria-label="Close reading guide">✕</button>
-          <div class="reading-eyebrow">READING MAP / 読み方</div>
-          <h2>How to read a memory <span>記憶の読み方</span></h2>
-          <p class="reading-onboarding-intro">Read the English lines, use help when you need it, and choose answers from the evidence.<small>英語の文を読み、必要なときにヘルプを使い、手がかりから答えを選びます。</small></p>
+          <div class="reading-header">
+            <div class="reading-header-text">
+              <div class="reading-eyebrow">READING MAP / 読み方</div>
+              <h2>How to read a memory <span>記憶の読み方</span></h2>
+              <p class="reading-onboarding-intro">Read the English lines, use help when you need it, and choose answers from the evidence.<small>英語の文を読み、必要なときにヘルプを使い、手がかりから答えを選びます。</small></p>
+            </div>
+            ${renderPortrait('inline')}
+          </div>
           <div class="reading-onboarding-steps">
             <article class="reading-onboarding-step"><b>STEP 1</b><strong>Read the lines.</strong><small>文を読みます。</small></article>
             <article class="reading-onboarding-step"><b>STEP 2</b><strong>Notice the details.</strong><small>細かい点に気づきます。</small></article>
@@ -312,6 +334,24 @@
         render();
       }));
       focusFirstControl();
+    }
+
+    function renderPortrait(variant) {
+      const drifter = opts.drifter;
+      const src = drifter && (drifter.sprite2 || drifter.sprite1);
+      if (!src) return '';
+      const motif = episode.worldEcho && episode.worldEcho.motif;
+      const colors = MOTIF_COLORS[motif] || { ring: '#d8a8ff', glow: 'rgba(216,168,255,.4)' };
+      const className = variant === 'hero' ? 'reading-portrait-hero' : 'reading-portrait';
+      return `<div class="${className}" style="--portrait-ring:${colors.ring};--portrait-glow:${colors.glow}"><img src="${escapeText(src)}" alt="${escapeText(drifter.name || '')}"></div>`;
+    }
+
+    function sceneImageFor(index) {
+      const trailEntry = Array.isArray(episode.trail) ? episode.trail[index] : null;
+      const roomId = trailEntry && trailEntry.roomId;
+      const rooms = window.UTSUROBA_DATA && window.UTSUROBA_DATA.rooms;
+      const room = roomId && rooms ? rooms[roomId] : null;
+      return room && room.bg ? room.bg : null;
     }
 
     function renderVocabulary() {
@@ -355,8 +395,16 @@
         const state = index < restoredCount ? 'is-restored' : (index === restoredCount ? 'is-current' : 'is-locked');
         const locked = index > restoredCount;
         const numberLabel = mechanic.type === 'memory-theatre' ? 'ACT' : (mechanic.type === 'evidence-board' ? 'CLUE' : 'BEAT');
+        /* Pass 4: revealed acts show the actual room the memory happened in
+           (reusing the same room art Karasuki already loads) instead of a
+           flat text tile — locked acts stay plain so the scene is still a
+           small reveal, not a spoiler. */
+        const scene = !locked ? sceneImageFor(index) : null;
+        const sceneStyle = scene
+          ? ` style="background-image:linear-gradient(180deg,rgba(10,6,16,.55),rgba(10,6,16,.85)),url('${escapeText(scene)}')"`
+          : '';
         return `
-          <div class="reading-theatre-act ${state}">
+          <div class="reading-theatre-act ${state}"${sceneStyle}>
             <span class="act-number">${numberLabel} ${String(index + 1).padStart(2, '0')}</span>
             <span class="act-title">${escapeText(item.title)}</span>
             <span class="act-title-jp">${escapeText(item.titleJP)}</span>
@@ -553,6 +601,7 @@
           : 'Review as many times as you like before restoring the memory.<br>記憶を戻す前に、何度でも読み返せます。';
         overlay.innerHTML = `
           <div class="reading-card reading-complete">
+            ${renderPortrait('hero')}
             <div class="reading-eyebrow">${escapeText(episode.eyebrow)}</div>
             <div class="reading-support-badge${supportLevel === 'independent' ? ' independent' : ''}">${modeLabel}</div>
             <h2>${escapeText(episode.title)}</h2>
@@ -601,11 +650,16 @@
       overlay.innerHTML = `
         <div class="reading-card">
           <button class="reading-close" id="reading-close-btn">✕</button>
-          <div class="reading-eyebrow">${escapeText(episode.eyebrow)}</div>
-          <div class="reading-support-badge${supportLevel === 'independent' ? ' independent' : ''}">${opts.reviewOnly ? reviewModeLabel() : 'FIRST READING / はじめての読書'}</div>
-          <h2>${escapeText(episode.title)} <span>${escapeText(episode.titleJP)}</span></h2>
-          <p class="reading-intro">${escapeText(episode.intro)}</p>
-          <p class="reading-jp">${escapeText(episode.introJP)}</p>
+          <div class="reading-header">
+            <div class="reading-header-text">
+              <div class="reading-eyebrow">${escapeText(episode.eyebrow)}</div>
+              <div class="reading-support-badge${supportLevel === 'independent' ? ' independent' : ''}">${opts.reviewOnly ? reviewModeLabel() : 'FIRST READING / はじめての読書'}</div>
+              <h2>${escapeText(episode.title)} <span>${escapeText(episode.titleJP)}</span></h2>
+              <p class="reading-intro">${escapeText(episode.intro)}</p>
+              <p class="reading-jp">${escapeText(episode.introJP)}</p>
+            </div>
+            ${renderPortrait('inline')}
+          </div>
           ${renderVocabulary()}
           ${renderMechanic(mechanicIndex)}
           <div class="reading-transcript">${lines}</div>
