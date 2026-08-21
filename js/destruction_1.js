@@ -2117,7 +2117,7 @@ function traitGlowColor(block) {
         }
         block.vy *= 0.985;
         if (block.compressY > 0) { block.compressY *= 0.7; if (block.compressY < 0.5) block.compressY = 0; }
-        block.shake *= 0.84; block.hitFlash *= 0.88;
+        block.shake *= 0.84; block.hitFlash *= 0.8;
         continue;
       }
 
@@ -2179,7 +2179,7 @@ function traitGlowColor(block) {
 
       if (block.compressY > 0) { block.compressY *= 0.7; if (block.compressY < 0.5) block.compressY = 0; }
       block.shake   *= 0.84;
-      block.hitFlash *= 0.88;
+      block.hitFlash *= 0.8;
     }
 
     if (anyFallingLanded) {
@@ -2765,6 +2765,14 @@ function traitGlowColor(block) {
   // Static block art is rendered once and reused. The old path rebuilt these
   // gradients, grain dots, and glass highlights on every animation frame.
   const BLOCK_TEXTURE_CACHE = new Map();
+  // Deterministic 0..1 hash, used for speckle/grain placement so a block's
+  // texture only ever gets *lighter or darker* as its damage tier changes —
+  // never re-randomized. Seeding on (w, h, index) rather than on hp/fill
+  // means every tier's rebuild lands on the exact same dot layout.
+  function detRand(a, b) {
+    const s = Math.sin(a * 12.9898 + b * 78.233) * 43758.5453;
+    return s - Math.floor(s);
+  }
   function getBlockTexture(block) {
     const fill = matFill(block);
     const key = [block.material, fill, Math.round(block.w), Math.round(block.h)].join('|');
@@ -2793,26 +2801,35 @@ function traitGlowColor(block) {
       rrClip(c, 0, 0, w, h, 8); c.fillRect(0, 0, w, h); c.restore();
     } else if (block.material === 'stone') {
       c.save(); c.globalAlpha = 0.08; rrClip(c, 0, 0, w, h, 8);
-      for (let d = 0; d < ~~(w * h / 200); d++) {
+      const n = ~~(w * h / 200);
+      for (let d = 0; d < n; d++) {
+        const dx = 6 + detRand(w, d * 1.7 + 1) * Math.max(1, w - 12);
+        const dy = 6 + detRand(h, d * 2.3 + 7) * Math.max(1, h - 12);
+        const dr = 1 + detRand(d, w + h) * 1.5;
         c.beginPath();
-        c.arc(rnd(6, Math.max(6, w - 6)), rnd(6, Math.max(6, h - 6)), rnd(1, 2.5), 0, Math.PI * 2);
-        c.fillStyle = rnd() < 0.5 ? 'rgba(255,255,255,0.8)' : 'rgba(0,0,0,0.6)';
+        c.arc(dx, dy, dr, 0, Math.PI * 2);
+        c.fillStyle = detRand(d * 3.1, h - w) < 0.5 ? 'rgba(255,255,255,0.8)' : 'rgba(0,0,0,0.6)';
         c.fill();
       }
       c.restore();
     } else if (block.material === 'soft') {
       c.save(); c.globalAlpha = 0.13; rrClip(c, 0, 0, w, h, 8);
       for (let d = 0; d < 6; d++) {
+        const dx = 6 + detRand(w, d * 2.9 + 3) * Math.max(1, w - 12);
+        const dy = 6 + detRand(h, d * 4.1 + 5) * Math.max(1, h - 12);
+        const dr = 1.5 + detRand(d, w * h) * 1.5;
         c.beginPath();
-        c.arc(rnd(6, Math.max(6, w - 6)), rnd(6, Math.max(6, h - 6)), rnd(1.5, 3), 0, Math.PI * 2);
+        c.arc(dx, dy, dr, 0, Math.PI * 2);
         c.fillStyle = 'rgba(255,255,255,0.9)'; c.fill();
       }
       c.restore();
     } else if (m.grain) {
       c.save(); c.globalAlpha = 0.09; c.strokeStyle = 'rgba(255,210,160,0.5)'; c.lineWidth = 1;
       rrClip(c, 0, 0, w, h, 8);
-      for (let y = 0; y < h; y += 8) {
-        c.beginPath(); c.moveTo(0, y + rnd(-1, 1)); c.lineTo(w, y + rnd(-1, 1)); c.stroke();
+      for (let y = 0, gi = 0; y < h; y += 8, gi++) {
+        const j1 = (detRand(w, gi * 5.3 + 2) - 0.5) * 2;
+        const j2 = (detRand(h, gi * 6.1 + 9) - 0.5) * 2;
+        c.beginPath(); c.moveTo(0, y + j1); c.lineTo(w, y + j2); c.stroke();
       }
       c.restore();
     }
@@ -2877,7 +2894,13 @@ function traitGlowColor(block) {
         ctx.fillStyle='rgba(0,0,0,0.35)';rr(ctx,bx+8,by+bh-12,bw-16,7,3,true,false);
         ctx.fillStyle=hr>0.66?'#44ee77':hr>0.33?'#ffcc33':'#ff4444';rr(ctx,bx+8,by+bh-12,(bw-16)*hr,7,3,true,false);
       }
-      if(block.hitFlash>0){ctx.fillStyle=`rgba(255,255,255,${0.42*block.hitFlash})`;rr(ctx,bx,by,bw,bh,8,true,false);}
+      if(block.hitFlash>0){
+        ctx.save();
+        ctx.globalCompositeOperation='lighter';
+        ctx.fillStyle=`rgba(255,255,255,${0.22*block.hitFlash})`;
+        rr(ctx,bx,by,bw,bh,8,true,false);
+        ctx.restore();
+      }
       ctx.strokeStyle='rgba(0,0,0,0.25)';ctx.lineWidth=1.5;rr(ctx,bx+1.5,by+1.5,bw-3,bh-3,7,false,true);
 
       // v4: trait glow — pulsing coloured border signals immunity to player
