@@ -31,6 +31,21 @@ for (const entry of index.episodes) {
   assert.ok(Array.isArray(episode.trail) && episode.trail.length >= 2,
     `${entry.id}: episode needs an authored evidence trail`);
 
+  if (episode.mechanic) {
+    assert.strictEqual(episode.mechanic.type, 'memory-theatre',
+      `${entry.id}: unsupported mechanic type`);
+    assert.ok(episode.mechanic.name && episode.mechanic.nameJP &&
+      episode.mechanic.instruction && episode.mechanic.instructionJP,
+      `${entry.id}: mechanic needs bilingual UI copy`);
+    assert.ok(Array.isArray(episode.mechanic.acts) &&
+      episode.mechanic.acts.length === episode.checks.length,
+      `${entry.id}: Memory Theatre acts must match comprehension checks`);
+    for (const [actIndex, act] of episode.mechanic.acts.entries()) {
+      assert.ok(act.title && act.titleJP && act.caption && act.captionJP,
+        `${entry.id} act ${actIndex + 1}: bilingual scene copy is required`);
+    }
+  }
+
   for (const [lineIndex, line] of episode.lines.entries()) {
     assert.ok(line.speaker && line.en,
       `${entry.id} line ${lineIndex + 1}: English speaker and dialogue are required`);
@@ -64,7 +79,13 @@ for (const entry of index.episodes) {
     assert.ok(Number.isInteger(check.correct) && check.correct >= 0 &&
       check.correct < check.choices.length,
       `${label}: correct answer index is invalid`);
-    assert.ok(check.evidence, `${label}: evidence feedback is required`);
+    assert.ok(check.evidence && check.evidenceJP,
+      `${label}: bilingual evidence feedback is required`);
+    if (episode.mechanic) {
+      assert.ok(Number.isInteger(check.revealAct) && check.revealAct >= 0 &&
+        check.revealAct < episode.mechanic.acts.length,
+        `${label}: Memory Theatre revealAct is invalid`);
+    }
   }
 }
 
