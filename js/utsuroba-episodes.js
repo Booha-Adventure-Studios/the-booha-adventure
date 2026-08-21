@@ -1,0 +1,61 @@
+/*
+ * Utsuroba reading episodes.
+ *
+ * Pass 1 intentionally contains one vertical slice. The renderer is still
+ * small and local, but the conversation already lives outside the game loop
+ * so future episodes can be authored without rewriting quest logic.
+ */
+window.UTSUROBA_EPISODES = {
+  ks_lantern_v1: {
+    id: 'ks_lantern_v1',
+    title: 'The Lantern That Went Out',
+    titleJP: '消えた灯り',
+    eyebrow: 'MEMORY RECONSTRUCTION / 記憶の再構成',
+    intro: 'Kurobane remembers the lantern. He does not remember why Chiyo left.',
+    introJP: 'クロバネは灯りを覚えている。チヨがなぜ帰ったのかは覚えていない。',
+    lines: [
+      { speaker: 'Kurobane', speakerJP: 'クロバネ', en: 'Wait by the lantern. I will come back before the second bell.', jp: '灯りのそばで待て。二つ目の鐘が鳴る前に戻る。' },
+      { speaker: 'Chiyo', speakerJP: 'チヨ', en: 'You said the bridge was safe.', jp: '橋は安全だと言ったよね。' },
+      { speaker: 'Kurobane', speakerJP: 'クロバネ', en: 'It was safe when I said it.', jp: 'そう言ったときは安全だった。' },
+      { speaker: 'Narrator', speakerJP: '語り手', en: 'The second bell rang. The lantern went out.', jp: '二つ目の鐘が鳴った。灯りが消えた。' },
+      { speaker: 'Chiyo', speakerJP: 'チヨ', en: 'If the light is gone, I cannot find the way home.', jp: '灯りが消えたら、家への道が分からない。' }
+    ],
+    checks: [
+      {
+        type: 'sequence',
+        label: '01 / SEQUENCE',
+        labelJP: '順番',
+        prompt: 'What happened first?',
+        promptJP: '最初に何が起きましたか？',
+        choices: ['Kurobane told Chiyo to wait.', 'The second bell rang.', 'The lantern went out.'],
+        choicesJP: ['クロバネはチヨに待つように言った。', '二つ目の鐘が鳴った。', '灯りが消えた。'],
+        correct: 0,
+        evidence: 'The first line gives the starting instruction.'
+      },
+      {
+        type: 'detail',
+        label: '02 / DETAIL',
+        labelJP: '細部',
+        prompt: 'Why did Chiyo need the lantern?',
+        promptJP: 'チヨはなぜ灯りが必要でしたか？',
+        choices: ['To find the way home.', 'To signal the second bell.', 'To see whether Kurobane was angry.'],
+        choicesJP: ['家への道を見つけるため。', '二つ目の鐘を知らせるため。', 'クロバネが怒っているか見るため。'],
+        correct: 0,
+        evidence: 'Chiyo says the light helps her find the way home.'
+      },
+      {
+        type: 'inference',
+        label: '03 / INFERENCE',
+        labelJP: '推測',
+        prompt: 'Why did Chiyo leave?',
+        promptJP: 'チヨはなぜ帰ったのでしょう？',
+        choices: ['She could no longer find the way home.', 'She wanted to frighten Kurobane.', 'She was waiting for the first bell.'],
+        choicesJP: ['家への道が分からなくなったから。', 'クロバネを怖がらせたかったから。', '一つ目の鐘を待っていたから。'],
+        correct: 0,
+        evidence: 'The final line connects the lost light to Chiyo losing her way.'
+      }
+    ],
+    success: 'The memory settles. Kurobane remembers the part he could not say aloud.',
+    successJP: '記憶が落ち着いた。クロバネは、声に出せなかったことを思い出した。'
+  }
+};
