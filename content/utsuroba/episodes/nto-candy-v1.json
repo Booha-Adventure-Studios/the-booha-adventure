@@ -5,6 +5,13 @@
   "eyebrow": "MEMORY RECONSTRUCTION / 記憶の再構成",
   "intro": "Ned remembers a candy, a wrapper, and a question he kept asking.",
   "introJP": "ネドはキャンディと包み紙、そして何度も聞いた質問を覚えています。",
+  "vocabulary": [
+    {"word":"save","definition":"to keep something for later","definitionJP":"あとで使うために取っておく"},
+    {"word":"wrapper","definition":"paper or plastic around something","definitionJP":"物を包む紙やビニール"},
+    {"word":"pocket","definition":"a small part of clothing for carrying things","definitionJP":"物を入れる服の小さな袋"},
+    {"word":"empty","definition":"with nothing inside","definitionJP":"中に何もない"},
+    {"word":"forget","definition":"to not remember something","definitionJP":"覚えていたことを思い出せない"}
+  ],
   "mechanic": {
     "type": "evidence-board",
     "name": "Evidence Board",

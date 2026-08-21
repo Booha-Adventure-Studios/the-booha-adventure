@@ -27,6 +27,16 @@ for (const entry of index.episodes) {
     `${entry.id}: episode needs at least three conversation lines`);
   assert.ok(Array.isArray(episode.checks) && episode.checks.length >= 2,
     `${entry.id}: episode needs at least two comprehension checks`);
+  assert.ok(Array.isArray(episode.vocabulary) && episode.vocabulary.length >= 3,
+    `${entry.id}: episode needs authored ESL vocabulary support`);
+  const vocabularyWords = new Set();
+  for (const [vocabularyIndex, item] of episode.vocabulary.entries()) {
+    assert.ok(item.word && item.definition && item.definitionJP,
+      `${entry.id} vocabulary ${vocabularyIndex + 1}: bilingual word help is required`);
+    assert.ok(!vocabularyWords.has(item.word),
+      `${entry.id}: vocabulary words must be unique`);
+    vocabularyWords.add(item.word);
+  }
 
   assert.ok(Array.isArray(episode.trail) && episode.trail.length >= 2,
     `${entry.id}: episode needs an authored evidence trail`);

@@ -5,6 +5,13 @@
   "eyebrow": "MEMORY RECONSTRUCTION / 記憶の再構成",
   "intro": "Chagrin remembers a sound, a shadow, and the moment fear changed shape.",
   "introJP": "チャグリンは音と影、そして恐怖の形が変わった瞬間を覚えています。",
+  "vocabulary": [
+    {"word":"hall","definition":"a long space inside a building","definitionJP":"建物の中にある長い通路"},
+    {"word":"shape","definition":"the form of something","definitionJP":"物の形"},
+    {"word":"reflection","definition":"an image seen in glass or a mirror","definitionJP":"ガラスや鏡に見える姿"},
+    {"word":"afraid","definition":"feeling fear","definitionJP":"怖いと感じる"},
+    {"word":"breathe","definition":"to take air in and out","definitionJP":"息を吸ったり吐いたりする"}
+  ],
   "mechanic": {
     "type": "emotion-thread",
     "name": "Emotion Thread",
