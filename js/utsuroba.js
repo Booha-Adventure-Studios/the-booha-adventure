@@ -1060,7 +1060,7 @@
     gardenOverlay = document.createElement('div');
     gardenOverlay.id = 'utsuroba-memory-garden';
     const quotes = garden.quotes.map(quote => `<article class="memory-garden-quote"><strong>${escapeHTML(quote.name)}</strong><p>${escapeHTML(quote.quote)}</p></article>`).join('');
-    gardenOverlay.innerHTML = `<div class="memory-garden-card"><button class="memory-garden-close" type="button" aria-label="Close memory garden">✕</button><div class="memory-garden-eyebrow">WORLD AFTERMATH / 世界の変化</div><h2>${escapeHTML(garden.title)}<span>${escapeHTML(garden.titleJP)}</span></h2><p class="memory-garden-intro">${escapeHTML(garden.intro)}<small>${escapeHTML(garden.introJP)}</small></p><div class="memory-garden-quotes">${quotes}</div><p class="memory-garden-return">${escapeHTML(garden.returnText)}<small>${escapeHTML(garden.returnTextJP)}</small></p><button class="memory-garden-close-btn" type="button" id="memory-garden-done">Close the garden / 庭を閉じる</button></div>`;
+    gardenOverlay.innerHTML = `<div class="memory-garden-card"><button class="memory-garden-close" type="button" aria-label="Close memory garden">✕</button><div class="memory-garden-eyebrow">THE WORLD NOW / 世界の変化</div><h2>${escapeHTML(garden.title)}<span>${escapeHTML(garden.titleJP)}</span></h2><p class="memory-garden-intro">${escapeHTML(garden.intro)}<small>${escapeHTML(garden.introJP)}</small></p><div class="memory-garden-quotes">${quotes}</div><p class="memory-garden-return">${escapeHTML(garden.returnText)}<small>${escapeHTML(garden.returnTextJP)}</small></p><button class="memory-garden-close-btn" type="button" id="memory-garden-done">Close the garden / 庭を閉じる</button></div>`;
     document.body.appendChild(gardenOverlay);
     gardenOverlay.querySelector('.memory-garden-close').addEventListener('click', closeMemoryGarden);
     gardenOverlay.querySelector('#memory-garden-done').addEventListener('click', closeMemoryGarden);
@@ -1474,10 +1474,10 @@
         const reviews = Math.max(1, Number(entry.reviewCount) || 1);
         const masteryLevel = Math.max(0, Math.min(2, Number(entry.masteryLevel) || 0));
         const mastery = masteryLevel >= 2
-          ? { en: 'Mastered', jp: '習得済み', action: 'Mastery check / 習得チェック' }
+          ? { en: 'You know this!', jp: '習得済み', action: 'Check again / 習得チェック' }
           : masteryLevel === 1
-            ? { en: 'Ready for independent review', jp: '自力復習の準備完了', action: 'Try without hints / ヒントなしで挑戦' }
-            : { en: 'Guided review next', jp: 'まずは案内付き復習', action: 'Guided review / 案内付き復習' };
+            ? { en: 'Try it on your own now', jp: '自力復習の準備完了', action: 'Try without hints / ヒントなしで挑戦' }
+            : { en: 'Read with help next', jp: 'まずは案内付き復習', action: 'Read with help / 案内付き復習' };
         const postcardNote = entry.postcard ? `<details class="reading-journal-postcard"><summary>Postcard saved / 文章カードあり</summary><p>${escapeHTML(entry.postcard.text)}</p></details>` : '';
         return `<article class="reading-journal-entry"><h3>${escapeHTML(episode.title)}<span>${escapeHTML(episode.titleJP)}</span></h3><div class="reading-journal-mastery">${mastery.en}<small>${mastery.jp}</small></div><p class="reading-journal-meta">${reviews} reading ${reviews === 1 ? 'completed' : 'sessions'} · ${escapeHTML(episode.eyebrow)}<br>${reviews === 1 ? '1回読了' : `${reviews}回読み返しました`}</p>${postcardNote}${words ? `<div class="reading-journal-vocab" aria-label="Vocabulary">${words}</div>` : ''}<button class="reading-journal-review" type="button" data-journal-entry="${index}">${mastery.action}</button></article>`;
       }).join('');

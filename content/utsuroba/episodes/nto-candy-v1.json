@@ -2,7 +2,7 @@
   "id": "nto_candy_v1",
   "title": "The Candy That Stayed",
   "titleJP": "残ったキャンディ",
-  "eyebrow": "MEMORY RECONSTRUCTION / 記憶の再構成",
+  "eyebrow": "REMEMBER THE STORY / 物語を思い出そう",
   "intro": "Ned remembers a candy, a wrapper, and a question he kept asking.",
   "introJP": "ネドはキャンディと包み紙、そして何度も聞いた質問を覚えています。",
   "vocabulary": [
@@ -14,7 +14,7 @@
   ],
   "mechanic": {
     "type": "evidence-board",
-    "name": "Evidence Board",
+    "name": "Clue Board",
     "nameJP": "手がかりの掲示板",
     "instruction": "Pin the clues in your mind. The loudest idea is not always true.",
     "instructionJP": "手がかりを心に並べます。大きな声の考えが、いつも正しいとは限りません。",
@@ -42,13 +42,13 @@
   ],
   "checks": [
     {"type":"detail","matchLine":0,"revealAct":0,"evidenceLines":[0],"restoreText":"The first clue is pinned.","restoreTextJP":"最初の手がかりを留めました。","label":"01 / DETAIL","labelJP":"細部","prompt":"Which line tells us what Ned saved?","promptJP":"ネドが何を取っておいたか分かる行はどれですか？","choices":["One red candy.","A blue wrapper.","A warm meal."],"choicesJP":["赤いキャンディを一つ。","青い包み紙。","温かい食事。"],"correct":0,"evidence":"Ned says he saved one red candy.","evidenceJP":"ネドは赤いキャンディを一つ取っておいたと言っています。"},
-    {"type":"sequence","sequenceOrder":[0,1,2],"revealAct":1,"evidenceLines":[0,2,4],"restoreText":"The second clue is pinned.","restoreTextJP":"二つ目の手がかりを留めました。","label":"02 / SEQUENCE","labelJP":"順番","prompt":"Put Ned's memory in order.","promptJP":"ネドの記憶を順番に並べましょう。","choices":["Ned saved one red candy.","Ned found a wrapper and an empty pocket.","Ned realized he may have eaten it."],"choicesJP":["ネドは赤いキャンディを一つ取っておいた。","ネドは包み紙と空っぽのポケットを見つけた。","ネドは自分が食べたのかもしれないと気づいた。"],"correct":0,"evidence":"The saved candy comes first, the empty pocket comes next, and the possibility comes last.","evidenceJP":"最初にキャンディを取っておき、次に空っぽのポケットを見つけ、最後に可能性に気づきます。"},
-    {"type":"inference","supportingLine":4,"revealAct":2,"evidenceLines":[4],"restoreText":"The silly truth is pinned.","restoreTextJP":"小さな真実を留めました。","label":"03 / INFERENCE","labelJP":"推測","prompt":"What most likely happened to the red candy? Then prove it with a line.","promptJP":"赤いキャンディに何が起きたと考えられますか？その証拠の行も選びましょう。","choices":["Ned ate it and forgot.","Someone hid it in the gate.","It turned blue in his pocket."],"choicesJP":["ネドが食べて、忘れました。","誰かが門に隠しました。","ポケットの中で青くなりました。"],"correct":0,"evidence":"Ned connects the empty pocket with the possibility that he forgot eating it.","evidenceJP":"ネドは、空っぽのポケットと食べたことを忘れた可能性を結びつけています。"}
+    {"type":"sequence","sequenceOrder":[0,1,2],"revealAct":1,"evidenceLines":[0,2,4],"restoreText":"The second clue is pinned.","restoreTextJP":"二つ目の手がかりを留めました。","label":"02 / ORDER","labelJP":"順番","prompt":"Put Ned's memory in order.","promptJP":"ネドの記憶を順番に並べましょう。","choices":["Ned saved one red candy.","Ned found a wrapper and an empty pocket.","Ned realized he may have eaten it."],"choicesJP":["ネドは赤いキャンディを一つ取っておいた。","ネドは包み紙と空っぽのポケットを見つけた。","ネドは自分が食べたのかもしれないと気づいた。"],"correct":0,"evidence":"The saved candy comes first, the empty pocket comes next, and the possibility comes last.","evidenceJP":"最初にキャンディを取っておき、次に空っぽのポケットを見つけ、最後に可能性に気づきます。"},
+    {"type":"inference","supportingLine":4,"revealAct":2,"evidenceLines":[4],"restoreText":"The silly truth is pinned.","restoreTextJP":"小さな真実を留めました。","label":"03 / GUESS WHY","labelJP":"推測","prompt":"What most likely happened to the red candy? Then prove it with a line.","promptJP":"赤いキャンディに何が起きたと考えられますか？その証拠の行も選びましょう。","choices":["Ned ate it and forgot.","Someone hid it in the gate.","It turned blue in his pocket."],"choicesJP":["ネドが食べて、忘れました。","誰かが門に隠しました。","ポケットの中で青くなりました。"],"correct":0,"evidence":"Ned connects the empty pocket with the possibility that he forgot eating it.","evidenceJP":"ネドは、空っぽのポケットと食べたことを忘れた可能性を結びつけています。"}
   ],
   "replayLenses": {
-    "detail": {"label":"DETAIL HUNT","labelJP":"細部ハント","prompt":"Which detail shows that Ned may have eaten the candy?","promptJP":"ネドがキャンディを食べたかもしれないことを示す細部はどれですか？","choices":["The red wrapper and empty pocket.","The blue candy stayed in his pocket.","The gate was open."],"choicesJP":["赤い包み紙と空っぽのポケット。","青いキャンディがポケットに残った。","門が開いていた。"],"correct":0,"evidenceLines":[2,3],"evidence":"The wrapper remains, but the pocket is empty when Ned checks it again.","evidenceJP":"包み紙は残っていますが、ネドがもう一度見るとポケットは空っぽです。"},
-    "emotion": {"label":"EMOTION HUNT","labelJP":"気持ちハント","prompt":"How does Ned's feeling change across the memory?","promptJP":"記憶の中で、ネドの気持ちはどのように変わりますか？","choices":["Confidence, confusion, then a silly realization.","Fear, anger, then silence.","Boredom, sleep, then sadness."],"choicesJP":["自信、混乱、そして小さな気づき。","恐怖、怒り、そして沈黙。","退屈、眠り、そして悲しみ。"],"correct":0,"evidenceLines":[0,2,4],"evidence":"Ned is sure he saved the candy, becomes confused by the empty pocket, and then laughs at his own possibility.","evidenceJP":"ネドは取っておいたと確信し、空っぽのポケットで混乱し、最後に自分の可能性を笑います。"},
-    "inference": {"label":"INFERENCE HUNT","labelJP":"推測ハント","prompt":"What most likely happened to the red candy?","promptJP":"赤いキャンディに何が起きたと考えられますか？","choices":["Ned ate it and forgot.","Someone hid it at the gate.","It changed into the blue candy."],"choicesJP":["ネドが食べて、忘れた。","誰かが門に隠した。","青いキャンディに変わった。"],"correct":0,"evidenceLines":[4],"evidence":"Ned connects the empty pocket with the possibility that he forgot eating the candy.","evidenceJP":"ネドは、空っぽのポケットと食べたことを忘れた可能性を結びつけています。"}
+    "detail": {"label":"FIND THE DETAIL","labelJP":"細部ハント","prompt":"Which detail shows that Ned may have eaten the candy?","promptJP":"ネドがキャンディを食べたかもしれないことを示す細部はどれですか？","choices":["The red wrapper and empty pocket.","The blue candy stayed in his pocket.","The gate was open."],"choicesJP":["赤い包み紙と空っぽのポケット。","青いキャンディがポケットに残った。","門が開いていた。"],"correct":0,"evidenceLines":[2,3],"evidence":"The wrapper remains, but the pocket is empty when Ned checks it again.","evidenceJP":"包み紙は残っていますが、ネドがもう一度見るとポケットは空っぽです。"},
+    "emotion": {"label":"FIND THE FEELING","labelJP":"気持ちハント","prompt":"How does Ned's feeling change across the memory?","promptJP":"記憶の中で、ネドの気持ちはどのように変わりますか？","choices":["Confidence, confusion, then a silly realization.","Fear, anger, then silence.","Boredom, sleep, then sadness."],"choicesJP":["自信、混乱、そして小さな気づき。","恐怖、怒り、そして沈黙。","退屈、眠り、そして悲しみ。"],"correct":0,"evidenceLines":[0,2,4],"evidence":"Ned is sure he saved the candy, becomes confused by the empty pocket, and then laughs at his own possibility.","evidenceJP":"ネドは取っておいたと確信し、空っぽのポケットで混乱し、最後に自分の可能性を笑います。"},
+    "inference": {"label":"GUESS WHY","labelJP":"推測ハント","prompt":"What most likely happened to the red candy?","promptJP":"赤いキャンディに何が起きたと考えられますか？","choices":["Ned ate it and forgot.","Someone hid it at the gate.","It changed into the blue candy."],"choicesJP":["ネドが食べて、忘れた。","誰かが門に隠した。","青いキャンディに変わった。"],"correct":0,"evidenceLines":[4],"evidence":"Ned connects the empty pocket with the possibility that he forgot eating the candy.","evidenceJP":"ネドは、空っぽのポケットと食べたことを忘れた可能性を結びつけています。"}
   },
   "success": "The memory settles. Ned laughs because the mystery was inside his own stomach.",
   "successJP": "記憶が落ち着きました。謎は自分のお腹の中にあったので、ネドは笑います。",

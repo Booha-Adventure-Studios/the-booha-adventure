@@ -262,13 +262,13 @@
 
     function reviewModeLabel() {
       if (replayLens) return `${replayLens.label} / ${replayLens.labelJP}`;
-      if (supportLevel === 'independent') return 'INDEPENDENT REVIEW / 自力復習';
-      return 'GUIDED REVIEW / 案内付き復習';
+      if (supportLevel === 'independent') return 'ON YOUR OWN / 自力復習';
+      return 'WITH HELP / 案内付き復習';
     }
 
     function renderLensReplay() {
       if (!opts.reviewOnly || replayLens || !episode.replayLenses) return '';
-      return `<section class="reading-lens"><p class="reading-lens-heading">Choose a replay lens.<small>読み返す視点を選びましょう。</small></p><div class="reading-lens-options"><button class="reading-lens-option" type="button" data-reading-lens="detail">Detail Hunt<small>細部ハント</small></button><button class="reading-lens-option" type="button" data-reading-lens="emotion">Emotion Hunt<small>気持ちハント</small></button><button class="reading-lens-option" type="button" data-reading-lens="inference">Inference Hunt<small>推測ハント</small></button></div></section>`;
+      return `<section class="reading-lens"><p class="reading-lens-heading">Choose how to read it again.<small>読み返す視点を選びましょう。</small></p><div class="reading-lens-options"><button class="reading-lens-option" type="button" data-reading-lens="detail">Find the Detail<small>細部ハント</small></button><button class="reading-lens-option" type="button" data-reading-lens="emotion">Find the Feeling<small>気持ちハント</small></button><button class="reading-lens-option" type="button" data-reading-lens="inference">Guess Why<small>推測ハント</small></button></div></section>`;
     }
 
     function startLensReplay(lens) {
@@ -543,7 +543,7 @@
           ? reviewModeLabel()
           : 'FIRST READING / はじめての読書';
         const reviewResult = opts.reviewOnly
-          ? `${mistakeCount === 0 && !usedEvidence ? 'Clean recall.' : 'Support was available when you needed it.'}<small>${mistakeCount === 0 && !usedEvidence ? 'ヒントなしで思い出せました。' : '必要なときにサポートを使いました。'}</small>`
+          ? `${mistakeCount === 0 && !usedEvidence ? 'You remembered it well.' : 'You used help when you needed it.'}<small>${mistakeCount === 0 && !usedEvidence ? 'ヒントなしで思い出せました。' : '必要なときにサポートを使いました。'}</small>`
           : '';
         const completeActions = opts.reviewOnly
           ? `<button class="reading-secondary" id="reading-review-btn">Read again / もう一度読む</button><button class="reading-primary" id="reading-return-btn">Close journal review / ノートを閉じる</button>`
@@ -612,7 +612,7 @@
           <div class="reading-question-label">${escapeText(question.label)} · ${escapeText(question.labelJP)}</div>
           <h3>${escapeText(question.prompt)}</h3>
           <p class="reading-jp">${escapeText(question.promptJP)}</p>
-          ${lastFeedback ? `<div class="reading-feedback" role="status" aria-live="polite">${escapeText(lastFeedback)}<small>${escapeText(lastFeedbackJP)}</small>${supportLevel === 'guided' || mistakeCount >= 2 ? '<button class="reading-evidence-btn" id="reading-evidence-btn" type="button">Show evidence / 根拠を見る</button>' : ''}</div>` : ''}
+          ${lastFeedback ? `<div class="reading-feedback" role="status" aria-live="polite">${escapeText(lastFeedback)}<small>${escapeText(lastFeedbackJP)}</small>${supportLevel === 'guided' || mistakeCount >= 2 ? '<button class="reading-evidence-btn" id="reading-evidence-btn" type="button">Show evidence / 証拠を見る</button>' : ''}</div>` : ''}
           ${renderInteraction(question)}
           <div class="reading-progress" role="status" aria-live="polite">Question ${questionIndex + 1} of ${questions.length}<small>問題 ${questionIndex + 1} / ${questions.length}</small></div>
         </div>`;
