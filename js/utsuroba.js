@@ -195,20 +195,29 @@
       }
     }
 
-    /* ── Weekly drifter reset ───────────────────────────────
-       Drifter memories reset with the weekly content.
-       Self-guarding stamp, same pattern as meta.blitz.
+    /* ── Weekly drifter tracking (Pass 1 fix, see
+       claude/utsuroba-audit-and-pass-plan.md) ───────────────
+       This block used to WIPE every drifter's completed
+       memories and readingEchoes on every curriculum-week
+       rollover. But the Three Echoes convergence needs
+       ks + nto + cg restored at the same time, only one quest
+       can be active at once, and every current drifter has
+       memoryCount:1 — so a weekly wipe never unlocked new
+       content, it only forced re-doing the same one-shot story
+       and made convergence nearly impossible to reach before
+       progress reset out from under a kid. Drifter memories and
+       readingEchoes are now permanent once earned. We still
+       stamp driftersWeekKey (unused for resets now) so a future
+       drifter with memoryCount > 1 can opt into a real weekly
+       rotation without anyone touching this block again.
        Only rolls when CALENDAR gives an authoritative week —
-       never wipe on an unknown week. */
+       never guess on an unknown week. */
     try {
       if (window.CALENDAR?.getCurrentCurriculumWeek) {
         const cw = CALENDAR.getCurrentCurriculumWeek();
         const wk = `${cw.monthSlug}:w${cw.weekNumber}`;
         if (data.utsuroba.driftersWeekKey !== wk) {
-        data.utsuroba.drifters        = {};
-        data.utsuroba.driftersWeekKey = wk;
-        data.utsuroba.readingEchoes  = {};
-        if (data.weekly) data.weekly.drifterQuest = null;
+          data.utsuroba.driftersWeekKey = wk;
           dirty = true;
         }
       }
@@ -460,7 +469,45 @@
   music.loop = true;
   music.volume = 0.65;
 
-  let app, stage, canvas, ctx, roomLayer, echoLayer;
+  /* ── small SFX (Pass 1) — no drifter voice, just light feedback
+     for typing/collecting, per house convention (ding.mp3 is the
+     same "correct/success" cue used across the curriculum games). ── */
+  function playChime(pitch = 1) {
+    try {
+      const a = new Audio('./assets/audio/ding.mp3');
+      a.volume = 0.55;
+      a.playbackRate = pitch;
+      a.play().catch(() => {});
+    } catch (_) {}
+  }
+  function playCelebrationChime() {
+    playChime(1);
+    setTimeout(() => playChime(1.28), 150);
+  }
+
+  /* Tiny WebAudio blip for the dialogue typewriter — a real audio
+     file per character would be heavy; a short oscillator tone is
+     the standard, cheap way to give text reveal a "typing" feel. */
+  let typeAudioCtx = null;
+  function playTypeTick() {
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      if (!typeAudioCtx) typeAudioCtx = new AC();
+      if (typeAudioCtx.state === 'suspended') typeAudioCtx.resume().catch(() => {});
+      const now  = typeAudioCtx.currentTime;
+      const osc  = typeAudioCtx.createOscillator();
+      const gain = typeAudioCtx.createGain();
+      osc.type = 'square';
+      osc.frequency.value = 560 + Math.random() * 90;
+      gain.gain.setValueAtTime(0.05, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.045);
+      osc.connect(gain); gain.connect(typeAudioCtx.destination);
+      osc.start(now); osc.stop(now + 0.05);
+    } catch (_) {}
+  }
+
+  let app, stage, canvas, ctx, roomLayer, echoLayer, echoesTrackerEl;
   let coordToggle, coordReadout, pinLog, readingJournalButton, readingChallengeButton;
   let exitPopOverlay = null, exitPopCooldownUntil = 0;
   let drifterPanel = null, drifterPanelOpen = false, drifterPanelCooldown = 0;
@@ -617,6 +664,17 @@
       #utsuroba-reading-challenge-button:hover,#utsuroba-reading-challenge-button:focus-visible{background:rgba(12,52,40,.94);border-color:#9fe4ba;transform:translateY(-1px);outline:none;}
       #utsuroba-reading-challenge-button span{display:block;margin-top:2px;color:rgba(215,255,227,.52);font-size:9px;font-weight:400;}
       #utsuroba-reading-challenge-button .challenge-count{display:inline-block;margin-left:6px;padding:2px 5px;border-radius:999px;background:#9fe4ba;color:#082016;font:700 9px/1 monospace;vertical-align:1px;}
+      #utsu-echoes-tracker{position:fixed;top:16px;left:16px;z-index:220;background:rgba(9,0,18,.84);border:1px solid rgba(216,168,255,.42);border-radius:14px;padding:9px 12px;box-shadow:0 0 18px rgba(100,30,160,.18);font-family:Georgia,serif;}
+      #utsu-echoes-tracker .utsu-echoes-label{color:#f1d9ff;font:700 10px/1.3 monospace;letter-spacing:.1em;text-transform:uppercase;}
+      #utsu-echoes-tracker .utsu-echoes-label span{display:block;margin-top:2px;color:rgba(241,217,255,.5);font-size:9px;font-weight:400;letter-spacing:.02em;text-transform:none;}
+      #utsu-echoes-tracker .utsu-echoes-dots{display:flex;gap:8px;margin-top:8px;}
+      #utsu-echoes-tracker .utsu-echo-dot{width:30px;height:30px;border-radius:50%;padding:0;display:flex;align-items:center;justify-content:center;font-size:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);color:rgba(255,255,255,.28);cursor:default;transition:transform .15s,background .15s,border-color .15s;}
+      #utsu-echoes-tracker .utsu-echo-dot.is-lit{cursor:pointer;border-color:transparent;}
+      #utsu-echoes-tracker .utsu-echo-dot.is-lit:hover,#utsu-echoes-tracker .utsu-echo-dot.is-lit:focus-visible{transform:translateY(-2px);outline:none;}
+      #utsu-echoes-tracker .utsu-echo-dot.motif-lantern.is-lit{background:radial-gradient(circle at 35% 30%,#fffde0,#ffd966 55%,#c8860a);box-shadow:0 0 12px rgba(255,217,102,.55);}
+      #utsu-echoes-tracker .utsu-echo-dot.motif-candy.is-lit{background:radial-gradient(circle at 35% 30%,#fff0f4,#ff85a1 55%,#c23a5e);box-shadow:0 0 12px rgba(255,133,161,.55);}
+      #utsu-echoes-tracker .utsu-echo-dot.motif-reflection.is-lit{background:radial-gradient(circle at 35% 30%,#eafcff,#a8edff 55%,#3b8fbf);box-shadow:0 0 12px rgba(168,237,255,.55);}
+      @media(max-width:700px){#utsu-echoes-tracker{top:10px;left:10px;padding:7px 9px;}#utsu-echoes-tracker .utsu-echo-dot{width:26px;height:26px;font-size:12px;}}
       #utsuroba-reading-journal{position:fixed;inset:0;z-index:9300;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(4,0,12,.86);font-family:Georgia,serif;}
       .reading-journal-card{position:relative;width:min(760px,100%);max-height:calc(100vh - 36px);overflow:auto;padding:clamp(22px,4vw,36px);box-sizing:border-box;border:1px solid rgba(216,168,255,.42);border-radius:16px;background:linear-gradient(160deg,#171020,#0b0712 68%,#130b1b);box-shadow:0 0 70px rgba(100,30,160,.3);animation:utsuPopIn .22s ease-out;}
       .reading-journal-close{position:absolute;right:14px;top:12px;background:transparent;border:0;color:rgba(255,255,255,.55);font-size:18px;cursor:pointer;padding:8px;}
@@ -918,6 +976,57 @@
       }
       echoLayer.appendChild(gardenButton);
     }
+    renderEchoesTracker();
+  }
+
+  /* Persistent "Three Echoes" tracker — Pass 1 (see
+     claude/utsuroba-audit-and-pass-plan.md). Unlike the room-scoped
+     echo buttons above, this is visible from anywhere in Utsuroba so a
+     kid always knows how many of the three convergence memories they
+     have, without needing to stand in the right room to see it. */
+  function injectEchoesTracker() {
+    if (echoesTrackerEl) return;
+    echoesTrackerEl = document.createElement('div');
+    echoesTrackerEl.id = 'utsu-echoes-tracker';
+    echoesTrackerEl.style.display = 'none';
+    document.body.appendChild(echoesTrackerEl);
+  }
+
+  function renderEchoesTracker() {
+    if (!echoesTrackerEl) return;
+    const convergence = DATA.readingConvergence;
+    const requiredIds = convergence?.requiredDrifterIds;
+    const episodeDrifters = Array.isArray(requiredIds) && requiredIds.length
+      ? DATA.drifters.filter(d => requiredIds.includes(d.id))
+      : [];
+    if (!episodeDrifters.length) { echoesTrackerEl.style.display = 'none'; return; }
+
+    const utsu = readUtsuroba();
+    const restored = utsu.readingEchoes || {};
+    const episodes = window.UTSUROBA_EPISODES || {};
+    const iconFor = { lantern: '✦', candy: '●', reflection: '◈' };
+    const worldUnderstood = !!utsu.flags?.convergenceSeen;
+    const garden = convergence.garden;
+    const label   = worldUnderstood && garden ? garden.title   : convergence.title;
+    const labelJP = worldUnderstood && garden ? garden.titleJP : convergence.titleJP;
+
+    const dots = episodeDrifters.map(d => {
+      const episode = d.episodeId ? episodes[d.episodeId] : null;
+      const motif = episode?.worldEcho?.motif && iconFor[episode.worldEcho.motif] ? episode.worldEcho.motif : 'lantern';
+      const isLit = !!(d.episodeId && restored[d.episodeId]);
+      const status = isLit ? 'found' : 'not found yet';
+      return `<button type="button" class="utsu-echo-dot motif-${motif}${isLit ? ' is-lit' : ''}" ${isLit ? '' : 'disabled tabindex="-1"'} data-echo-episode="${escapeHTML(d.episodeId || '')}" aria-label="${escapeHTML(`${d.name} — ${status}`)}"><span aria-hidden="true">${iconFor[motif]}</span></button>`;
+    }).join('');
+
+    echoesTrackerEl.style.display = 'block';
+    echoesTrackerEl.innerHTML = `<div class="utsu-echoes-label">${escapeHTML(label || 'The Three Echoes')}<span>${escapeHTML(labelJP || '')}</span></div><div class="utsu-echoes-dots">${dots}</div>`;
+    echoesTrackerEl.querySelectorAll('.utsu-echo-dot.is-lit').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const episodeId = btn.dataset.echoEpisode;
+        const entry = episodeId ? restored[episodeId] : null;
+        if (episodeId && entry) openReadingReview({ episodeId, drifterId: entry.drifterId });
+      });
+    });
   }
 
   function allReadingMemoriesRestored() {
@@ -1550,6 +1659,7 @@
         const enLine = enLines[lineIdx];
         if (charIdx <= enLine.length) {
           currentEnEl.textContent = enLine.slice(0, charIdx);
+          if (charIdx > 0 && enLine[charIdx - 1] !== ' ') playTypeTick();
           charIdx++;
           setTimeout(typeChar, CHAR_MS);
         } else {
@@ -1700,6 +1810,7 @@
     state.celebrateDrifter   = drifter;
     danceSparkles            = [];
     try { music.pause(); } catch(_) {}
+    playCelebrationChime();
 
     const pos = drifterWorldPos(drifter, weeklyRooms[DATA.drifters.indexOf(drifter)]);
     state.celebrateOrbitX = pos.x;
@@ -1783,6 +1894,7 @@
     buildDrifterPanel();
     injectReadingJournal();
     injectWeeklyReadingChallenge();
+    injectEchoesTracker();
     if (DEV_MODE) { injectDevPanel(); }
     const ro = document.createElement('div'); ro.id = 'rotate-overlay';
     ro.innerHTML = `<span class="rotate-phone">📱</span><div class="rotate-bar"></div><p class="rotate-title">横にして遊ぼう！</p><p class="rotate-sub">うつろばは<strong style="color:#c45fa3">横画面</strong>で遊べるよ。<br>スマホを横にしてね。</p>`;
