@@ -82,11 +82,14 @@
   const TRAIL_SPEED_THRESH = 6;
   // Keep normal throws skill-based. The rescue only wakes up very late and
   // very close to Booha, so it cannot pull a bad throw across the stage.
-  const MAGNET_DIST        = 78;
-  const MAGNET_FORCE       = 0.12;
-  const SAFETY_CATCH_Y     = FLOOR_Y - 84;
-  const SAFETY_CATCH_DIST  = 96;
-  const SAFETY_CATCH_STEER = 0.08;
+  // v8: both assist zones used to reach well past the actual catch radius
+  // (52px — see checkSuccess), so most throws were being steered in before
+  // a miss was even possible. Tightened to sit just outside that radius.
+  const MAGNET_DIST        = 60;
+  const MAGNET_FORCE       = 0.09;
+  const SAFETY_CATCH_Y     = FLOOR_Y - 50;
+  const SAFETY_CATCH_DIST  = 62;
+  const SAFETY_CATCH_STEER = 0.045;
   const LAST_CHANCE_DIST   = 90;
 
   const swipe        = { active: false, x0: 0, y0: 0, x1: 0, y1: 0, startX: 0, startY: 0 };
@@ -580,7 +583,18 @@
   }
 
   function syncProgressHud() {
-    if (scoreTextEl) scoreTextEl.textContent = String(Math.round(state.campaignScore || 0));
+    if (scoreTextEl) {
+      const nextScore = Math.round(state.campaignScore || 0);
+      const prevScore = Number(scoreTextEl.textContent) || 0;
+      scoreTextEl.textContent = String(nextScore);
+      // v8: give the score a little punch when it actually goes up, so the
+      // board reads as alive instead of a number that silently changes.
+      if (nextScore > prevScore) {
+        scoreTextEl.classList.remove('score-pop');
+        void scoreTextEl.offsetWidth; // restart the animation
+        scoreTextEl.classList.add('score-pop');
+      }
+    }
     if (totalStarsEl) totalStarsEl.textContent = String(feedProgress.totalStars || 0);
     const bestScore = Math.round(feedProgress.bestScore || 0);
     setBilingual(bestScoreEl, `Best score: ${bestScore}`, `ベストスコア: ${bestScore}`);
@@ -1095,28 +1109,32 @@
     c.vx *= 0.999; c.vy *= 0.999;
   }
 
-  function applyMagnet() {
+  function applyMagnet(dt) {
     if (!state.booha || state.won || state.lost) return;
+    const k = dt ? dt / 16.667 : 1;
     const c = state.candy, m = boohaMouthPoint();
     const dx = m.x - c.x, dy = m.y - c.y, dist = Math.hypot(dx, dy);
     if (c.y >= SAFETY_CATCH_Y && dist > 0 && dist <= SAFETY_CATCH_DIST) {
-      // Last-second rescue is a small near-floor nudge, not a homing vector.
-      // It can save a near miss without turning a bad throw into a guarantee.
-      c.vx = dx * SAFETY_CATCH_STEER;
-      c.vy = dy * SAFETY_CATCH_STEER;
+      // Last-second rescue is a small near-floor nudge, not a homing vector:
+      // it ADDS a gentle pull on top of the player's real velocity instead
+      // of replacing it, so a genuinely bad throw can still miss.
+      const steer = SAFETY_CATCH_STEER * k;
+      c.vx += dx * steer;
+      c.vy += dy * steer;
       return;
     }
     const magnetDist = state.continueAssist ? MAGNET_DIST * 1.35 : MAGNET_DIST;
     const magnetForce = state.continueAssist ? MAGNET_FORCE * 1.35 : MAGNET_FORCE;
     if (dist > magnetDist || dist < 1) return;
-    const str = magnetForce * (1 - dist / magnetDist);
+    const str = magnetForce * (1 - dist / magnetDist) * k;
     c.vx += (dx/dist) * str; c.vy += (dy/dist) * str;
   }
 
-  function updateFreeCandy() {
+  function updateFreeCandy(dt) {
     const c = state.candy;
-    c.vy += GRAVITY; c.x += c.vx; c.y += c.vy;
-    c.vx *= AIR_DRAG; c.vy *= AIR_DRAG;
+    const k = dt ? dt / 16.667 : 1;
+    c.vy += GRAVITY * k; c.x += c.vx * k; c.y += c.vy * k;
+    c.vx *= Math.pow(AIR_DRAG, k); c.vy *= Math.pow(AIR_DRAG, k);
     // Screen edges are part of the puzzle: a wide miss can rebound and still
     // be recovered with a well-timed throw, while a near miss remains fair.
     if (c.x < c.r) {
@@ -1447,8 +1465,8 @@
         updateAttachedCandy(dt);
       } else {
         checkFallSound();
-        applyMagnet();
-        updateFreeCandy();
+        applyMagnet(dt);
+        updateFreeCandy(dt);
         updateFans(dt);
         handleBouncePads();
         checkLastChance();
