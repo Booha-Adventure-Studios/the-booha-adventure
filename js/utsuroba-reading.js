@@ -28,6 +28,16 @@
       #utsuroba-reading-challenge h3{margin:5px 0 2px;color:#fff;font-size:clamp(1rem,2.3vw,1.25rem);}
       #utsuroba-reading-challenge .reading-intro{margin:0;color:#f5e8ff;line-height:1.5;font-size:clamp(.86rem,1.8vw,1rem);}
       #utsuroba-reading-challenge .reading-jp{margin:2px 0 12px;color:rgba(245,232,255,.54);font-size:.78rem;line-height:1.45;}
+      #utsuroba-reading-challenge .reading-vocab{margin:14px 0 18px;border:1px solid rgba(216,168,255,.2);border-radius:9px;background:rgba(255,255,255,.035);}
+      #utsuroba-reading-challenge .reading-vocab summary{cursor:pointer;padding:10px 12px;color:#e4c2ff;font-size:.78rem;font-weight:700;list-style-position:inside;}
+      #utsuroba-reading-challenge .reading-vocab summary span{display:block;margin:3px 0 0 18px;color:rgba(245,232,255,.5);font-size:.68rem;font-weight:400;}
+      #utsuroba-reading-challenge .reading-vocab-body{padding:0 12px 12px;}
+      #utsuroba-reading-challenge .reading-vocab-list{display:flex;flex-wrap:wrap;gap:7px;}
+      #utsuroba-reading-challenge .reading-vocab-word{padding:6px 9px;border:1px solid rgba(216,168,255,.35);border-radius:999px;background:rgba(216,168,255,.08);color:#fff;cursor:pointer;font:700 .74rem Georgia,serif;}
+      #utsuroba-reading-challenge .reading-vocab-word:hover,#utsuroba-reading-challenge .reading-vocab-word:focus-visible{border-color:#d8a8ff;background:rgba(216,168,255,.2);outline:none;}
+      #utsuroba-reading-challenge .reading-vocab-detail{min-height:34px;margin-top:10px;padding:8px 10px;border-left:2px solid #ffcb75;background:rgba(255,203,117,.07);color:#ffe7b2;font-size:.78rem;line-height:1.4;}
+      #utsuroba-reading-challenge .reading-vocab-detail strong{color:#fff;font-size:.86rem;}
+      #utsuroba-reading-challenge .reading-vocab-detail small{display:block;margin-top:3px;color:rgba(255,231,178,.65);font-size:.9em;}
       #utsuroba-reading-challenge .reading-transcript{display:grid;gap:8px;margin:18px 0 20px;padding:14px;background:rgba(255,255,255,.045);border:1px solid rgba(220,160,255,.16);border-radius:10px;}
       #utsuroba-reading-challenge .reading-line{padding-left:12px;border-left:2px solid rgba(216,168,255,.45);}
       #utsuroba-reading-challenge .reading-speaker{color:#d8a8ff;font-size:.74rem;font-weight:700;letter-spacing:.05em;}
@@ -117,6 +127,33 @@
     let lastFeedback = '';
     let lastFeedbackJP = '';
 
+    function renderVocabulary() {
+      if (!Array.isArray(episode.vocabulary) || !episode.vocabulary.length) return '';
+      const words = episode.vocabulary.map((item, index) => `
+        <button class="reading-vocab-word" type="button" data-vocab="${index}">${escapeText(item.word)}</button>`).join('');
+      return `
+        <details class="reading-vocab" id="reading-vocabulary">
+          <summary>Word help / 言葉のヘルプ<span>Tap a word for a simple meaning. / 言葉をタップすると意味が出ます。</span></summary>
+          <div class="reading-vocab-body">
+            <div class="reading-vocab-list">${words}</div>
+            <div class="reading-vocab-detail" id="reading-vocab-detail">Choose a word to see help.<small>言葉を一つ選んでください。</small></div>
+          </div>
+        </details>`;
+    }
+
+    function bindVocabulary() {
+      const vocabulary = overlay.querySelector('#reading-vocabulary');
+      if (!vocabulary || !Array.isArray(episode.vocabulary)) return;
+      const detail = vocabulary.querySelector('#reading-vocab-detail');
+      vocabulary.querySelectorAll('[data-vocab]').forEach(button => {
+        button.addEventListener('click', () => {
+          const item = episode.vocabulary[Number(button.dataset.vocab)];
+          if (!item || !detail) return;
+          detail.innerHTML = `<strong>${escapeText(item.word)}</strong> — ${escapeText(item.definition)}<small>${escapeText(item.definitionJP)}</small>`;
+        });
+      });
+    }
+
     function renderMechanic(restoredCount) {
       if (!mechanic) return '';
       const items = mechanic.acts || mechanic.items || mechanic.beats || [];
@@ -170,12 +207,14 @@
           <div class="reading-card reading-complete">
             <div class="reading-eyebrow">${escapeText(episode.eyebrow)}</div>
             <h2>${escapeText(episode.title)}</h2>
+            ${renderVocabulary()}
             ${renderMechanic(mechanic ? (mechanic.acts || mechanic.items || mechanic.beats || []).length : mechanicIndex)}
             <p class="reading-success">${escapeText(episode.success)}</p>
             <p class="reading-jp">${escapeText(episode.successJP)}</p>
             <button class="reading-primary" id="reading-return-btn">Restore memory / 記憶を戻す</button>
           </div>`;
         overlay.querySelector('#reading-return-btn').addEventListener('click', finish);
+        bindVocabulary();
         return;
       }
 
@@ -192,6 +231,7 @@
           <h2>${escapeText(episode.title)} <span>${escapeText(episode.titleJP)}</span></h2>
           <p class="reading-intro">${escapeText(episode.intro)}</p>
           <p class="reading-jp">${escapeText(episode.introJP)}</p>
+          ${renderVocabulary()}
           ${renderMechanic(mechanicIndex)}
           <div class="reading-transcript">${lines}</div>
           <div class="reading-question-label">${escapeText(question.label)} · ${escapeText(question.labelJP)}</div>
@@ -203,6 +243,7 @@
         </div>`;
 
       overlay.querySelector('#reading-close-btn').addEventListener('click', close);
+      bindVocabulary();
       overlay.querySelectorAll('.reading-choice').forEach(button => {
         button.addEventListener('click', () => {
           const choice = Number(button.dataset.choice);

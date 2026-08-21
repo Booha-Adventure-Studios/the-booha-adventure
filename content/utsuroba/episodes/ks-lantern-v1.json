@@ -5,6 +5,13 @@
   "eyebrow": "MEMORY RECONSTRUCTION / 記憶の再構成",
   "intro": "Kurobane remembers the lantern. He does not remember why Chiyo left.",
   "introJP": "クロバネは灯りを覚えている。チヨがなぜ帰ったのかは覚えていない。",
+  "vocabulary": [
+    {"word":"lantern","definition":"a lamp that you can carry","definitionJP":"持ち運べるランプ"},
+    {"word":"bridge","definition":"a path built over water or a gap","definitionJP":"水や道の上に作った通り道"},
+    {"word":"bell","definition":"an object that makes a ringing sound","definitionJP":"音を鳴らす道具"},
+    {"word":"go out","definition":"to stop shining or burning","definitionJP":"光や火が消える"},
+    {"word":"find the way home","definition":"to know how to return home","definitionJP":"家へ帰る道が分かる"}
+  ],
   "mechanic": {
     "type": "memory-theatre",
     "name": "Memory Theatre",
