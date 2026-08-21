@@ -182,6 +182,16 @@
       delete q.collectedMemKey;
       dirty = true;
     }
+    if (q && q.active) {
+      const questDrifter = DATA.drifters.find(d => d.id === q.active);
+      if (questDrifter && questDrifter.episodeId && q.episodeId !== questDrifter.episodeId) {
+        q.episodeId = questDrifter.episodeId;
+        if (!Number.isInteger(q.trailIndex)) q.trailIndex = 0;
+        if (!Array.isArray(q.collectedFragments)) q.collectedFragments = [];
+        if (!Number.isInteger(q.mechanicIndex)) q.mechanicIndex = Number.isInteger(q.theatreIndex) ? q.theatreIndex : 0;
+        dirty = true;
+      }
+    }
     if (dirty) writeSave(data);
     return data;
   }
@@ -278,17 +288,19 @@
   function activateQuest(id) {
     const memIdx = pickRandomMemory(id); if (memIdx === null) return null;
     const decoys = pickDecoys(DATA.decoysPerQuest);
+    const drifter = DATA.drifters.find(d => d.id === id);
     const data   = loadSave();
     if (!data.weekly) data.weekly = {};
     data.weekly.drifterQuest = {
       active           : id,
       state            : 'accepted',
       memIdx,
-      episodeId        : id === 'ks' ? 'ks_lantern_v1' : null,
+      episodeId        : drifter && drifter.episodeId ? drifter.episodeId : null,
       readingState     : 'locked',
       trailIndex       : 0,
       collectedFragments: [],
       theatreIndex     : 0,
+      mechanicIndex    : 0,
       decoys,
       collectedMemoryId: null,
       orbIsCorrect     : false,

@@ -32,17 +32,18 @@ for (const entry of index.episodes) {
     `${entry.id}: episode needs an authored evidence trail`);
 
   if (episode.mechanic) {
-    assert.strictEqual(episode.mechanic.type, 'memory-theatre',
+    assert.ok(['memory-theatre', 'evidence-board', 'emotion-thread'].includes(episode.mechanic.type),
       `${entry.id}: unsupported mechanic type`);
     assert.ok(episode.mechanic.name && episode.mechanic.nameJP &&
-      episode.mechanic.instruction && episode.mechanic.instructionJP,
+      episode.mechanic.instruction && episode.mechanic.instructionJP &&
+      episode.mechanic.complete && episode.mechanic.completeJP,
       `${entry.id}: mechanic needs bilingual UI copy`);
-    assert.ok(Array.isArray(episode.mechanic.acts) &&
-      episode.mechanic.acts.length === episode.checks.length,
-      `${entry.id}: Memory Theatre acts must match comprehension checks`);
-    for (const [actIndex, act] of episode.mechanic.acts.entries()) {
-      assert.ok(act.title && act.titleJP && act.caption && act.captionJP,
-        `${entry.id} act ${actIndex + 1}: bilingual scene copy is required`);
+    const mechanicItems = episode.mechanic.acts || episode.mechanic.items || episode.mechanic.beats;
+    assert.ok(Array.isArray(mechanicItems) && mechanicItems.length === episode.checks.length,
+      `${entry.id}: mechanic pieces must match comprehension checks`);
+    for (const [itemIndex, item] of mechanicItems.entries()) {
+      assert.ok(item.title && item.titleJP && item.caption && item.captionJP,
+        `${entry.id} mechanic piece ${itemIndex + 1}: bilingual scene copy is required`);
     }
   }
 
@@ -82,8 +83,9 @@ for (const entry of index.episodes) {
     assert.ok(check.evidence && check.evidenceJP,
       `${label}: bilingual evidence feedback is required`);
     if (episode.mechanic) {
+      const mechanicItems = episode.mechanic.acts || episode.mechanic.items || episode.mechanic.beats;
       assert.ok(Number.isInteger(check.revealAct) && check.revealAct >= 0 &&
-        check.revealAct < episode.mechanic.acts.length,
+        check.revealAct < mechanicItems.length,
         `${label}: Memory Theatre revealAct is invalid`);
     }
   }

@@ -1,0 +1,43 @@
+{
+  "id": "nto_candy_v1",
+  "title": "The Candy That Stayed",
+  "titleJP": "残ったキャンディ",
+  "eyebrow": "MEMORY RECONSTRUCTION / 記憶の再構成",
+  "intro": "Ned remembers a candy, a wrapper, and a question he kept asking.",
+  "introJP": "ネドはキャンディと包み紙、そして何度も聞いた質問を覚えています。",
+  "mechanic": {
+    "type": "evidence-board",
+    "name": "Evidence Board",
+    "nameJP": "手がかりの掲示板",
+    "instruction": "Pin the clues in your mind. The loudest idea is not always true.",
+    "instructionJP": "手がかりを心に並べます。大きな声の考えが、いつも正しいとは限りません。",
+    "complete": "The clues make one silly truth.",
+    "completeJP": "手がかりが、ひとつの小さな真実になりました。",
+    "items": [
+      {"title":"The saved sweet","titleJP":"取っておいた甘い物","caption":"Ned saved one red candy for later.","captionJP":"ネドは赤いキャンディを一つ、あとで食べるために取っておきました。"},
+      {"title":"The empty pocket","titleJP":"空っぽのポケット","caption":"A wrapper remained, but the candy was gone.","captionJP":"包み紙は残りましたが、キャンディはなくなっていました。"},
+      {"title":"The forgotten bite","titleJP":"忘れた一口","caption":"Ned may have eaten the candy and forgotten.","captionJP":"ネドはキャンディを食べたことを忘れたのかもしれません。"}
+    ]
+  },
+  "trailIntro": "Follow Ned's clues before you decide what happened.",
+  "trailIntroJP": "何が起きたか決める前に、ネドの手がかりを追いましょう。",
+  "trail": [
+    {"id":"nto_candy_evidence_01","roomId":"room_05","type":"detail","label":"01 / SAVED SWEET","labelJP":"取っておいた甘い物","title":"The saved sweet","titleJP":"取っておいた甘い物","text":"I saved one red candy for the walk home.","hint":"The next clue is near a place where travelers wait at the gate.","hintJP":"次の手がかりは、旅人が門で待つ場所の近くです。"},
+    {"id":"nto_candy_evidence_02","roomId":"room_11","type":"event","label":"02 / EMPTY POCKET","labelJP":"空っぽのポケット","title":"The empty pocket","titleJP":"空っぽのポケット","text":"At the gate, Ned found a red wrapper and an empty pocket.","hint":"The last clue is near the room where people talk too long.","hintJP":"最後の手がかりは、人が長く話す部屋の近くです。"},
+    {"id":"nto_candy_evidence_03","roomId":"room_07","type":"inference","label":"03 / FORGOTTEN BITE","labelJP":"忘れた一口","title":"The forgotten bite","titleJP":"忘れた一口","text":"Maybe I did not lose the candy. Maybe I forgot eating it.","hint":"Return to Ned with the three clues.","hintJP":"三つの手がかりを持って、ネドのところへ戻りましょう。"}
+  ],
+  "lines": [
+    {"speaker":"Ned","en":"I saved one red candy for the walk home."},
+    {"speaker":"Ned","en":"I ate the blue one, but the red one stayed in my pocket."},
+    {"speaker":"Narrator","en":"At the gate, Ned found a red wrapper and an empty pocket."},
+    {"speaker":"Ned","en":"I checked the pocket again. It was still empty."},
+    {"speaker":"Ned","en":"Maybe I did not lose the candy. Maybe I forgot eating it."}
+  ],
+  "checks": [
+    {"type":"detail","revealAct":0,"restoreText":"The first clue is pinned.","restoreTextJP":"最初の手がかりを留めました。","label":"01 / DETAIL","labelJP":"細部","prompt":"What did Ned save for the walk home?","promptJP":"ネドは帰り道のために何を取っておきましたか？","choices":["One red candy.","A blue wrapper.","A warm meal."],"choicesJP":["赤いキャンディを一つ。","青い包み紙。","温かい食事。"],"correct":0,"evidence":"Ned says he saved one red candy.","evidenceJP":"ネドは赤いキャンディを一つ取っておいたと言っています。"},
+    {"type":"sequence","revealAct":1,"restoreText":"The second clue is pinned.","restoreTextJP":"二つ目の手がかりを留めました。","label":"02 / SEQUENCE","labelJP":"順番","prompt":"What did Ned find at the gate?","promptJP":"ネドは門で何を見つけましたか？","choices":["A red wrapper and an empty pocket.","A blue candy in his hand.","A door with no handle."],"choicesJP":["赤い包み紙と空っぽのポケット。","手の中の青いキャンディ。","取っ手のない扉。"],"correct":0,"evidence":"The narrator describes the wrapper and empty pocket at the gate.","evidenceJP":"語り手は、門で包み紙と空っぽのポケットを見つけたと説明しています。"},
+    {"type":"inference","revealAct":2,"restoreText":"The silly truth is pinned.","restoreTextJP":"小さな真実を留めました。","label":"03 / INFERENCE","labelJP":"推測","prompt":"What most likely happened to the red candy?","promptJP":"赤いキャンディに何が起きたと考えられますか？","choices":["Ned ate it and forgot.","Someone hid it in the gate.","It turned blue in his pocket."],"choicesJP":["ネドが食べて、忘れました。","誰かが門に隠しました。","ポケットの中で青くなりました。"],"correct":0,"evidence":"Ned connects the empty pocket with the possibility that he forgot eating it.","evidenceJP":"ネドは、空っぽのポケットと食べたことを忘れた可能性を結びつけています。"}
+  ],
+  "success": "The memory settles. Ned laughs because the mystery was inside his own stomach.",
+  "successJP": "記憶が落ち着きました。謎は自分のお腹の中にあったので、ネドは笑います。"
+}

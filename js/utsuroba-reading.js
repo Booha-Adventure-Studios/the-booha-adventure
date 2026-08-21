@@ -45,7 +45,9 @@
       #utsuroba-reading-challenge .reading-mechanic-heading span{color:rgba(255,223,155,.58);font-weight:400;letter-spacing:.04em;text-transform:none;}
       #utsuroba-reading-challenge .reading-mechanic-intro{margin:6px 0 2px;color:#fff4d7;font-size:.8rem;line-height:1.4;}
       #utsuroba-reading-challenge .reading-mechanic-intro-jp{margin:0;color:rgba(255,231,178,.58);font-size:.7rem;line-height:1.4;}
-      #utsuroba-reading-challenge .reading-theatre-stage{position:relative;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:13px;padding:12px 8px 8px;overflow:hidden;border:1px solid rgba(216,168,255,.18);border-radius:9px;background:radial-gradient(circle at 50% 0%,rgba(255,213,111,.18),transparent 42%),linear-gradient(180deg,#211832,#0d0916);}
+      #utsuroba-reading-challenge .reading-theatre-stage,#utsuroba-reading-challenge .reading-mechanic-board{position:relative;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:13px;padding:12px 8px 8px;overflow:hidden;border:1px solid rgba(216,168,255,.18);border-radius:9px;background:radial-gradient(circle at 50% 0%,rgba(255,213,111,.18),transparent 42%),linear-gradient(180deg,#211832,#0d0916);}
+      #utsuroba-reading-challenge .reading-mechanic-evidence-board{background:linear-gradient(160deg,rgba(102,179,255,.12),transparent 45%),linear-gradient(180deg,#152238,#0b1019);}
+      #utsuroba-reading-challenge .reading-mechanic-emotion-thread{background:linear-gradient(160deg,rgba(255,145,175,.13),transparent 45%),linear-gradient(180deg,#281a2b,#100c16);}
       #utsuroba-reading-challenge .reading-theatre-stage::before{content:"";position:absolute;left:50%;top:0;width:2px;height:100%;background:linear-gradient(180deg,rgba(255,223,155,.55),transparent 70%);box-shadow:0 0 22px 9px rgba(255,203,117,.09);transform:translateX(-50%);pointer-events:none;}
       #utsuroba-reading-challenge .reading-theatre-act{position:relative;z-index:1;min-height:92px;padding:10px 8px;border:1px solid rgba(255,255,255,.1);border-radius:7px;background:rgba(0,0,0,.22);opacity:.48;transition:all .28s ease;box-sizing:border-box;}
       #utsuroba-reading-challenge .reading-theatre-act.is-current{opacity:1;border-color:rgba(255,203,117,.72);background:rgba(255,203,117,.1);box-shadow:0 0 18px rgba(255,203,117,.12);animation:readingActPulse 1.8s ease-in-out infinite;}
@@ -108,36 +110,44 @@
     let questionIndex = Number.isInteger(opts.quest && opts.quest.readingIndex)
       ? opts.quest.readingIndex : 0;
     const mechanic = episode.mechanic || null;
-    let theatreIndex = mechanic && Number.isInteger(opts.quest && opts.quest.theatreIndex)
-      ? opts.quest.theatreIndex : questionIndex;
+    let mechanicIndex = mechanic && Number.isInteger(opts.quest && opts.quest.mechanicIndex)
+      ? opts.quest.mechanicIndex
+      : (mechanic && Number.isInteger(opts.quest && opts.quest.theatreIndex)
+        ? opts.quest.theatreIndex : questionIndex);
     let lastFeedback = '';
     let lastFeedbackJP = '';
 
     function renderMechanic(restoredCount) {
-      if (!mechanic || mechanic.type !== 'memory-theatre' || !Array.isArray(mechanic.acts)) return '';
-      const acts = mechanic.acts.map((act, index) => {
+      if (!mechanic) return '';
+      const items = mechanic.acts || mechanic.items || mechanic.beats || [];
+      if (!items.length) return '';
+      const className = mechanic.type === 'memory-theatre'
+        ? 'reading-theatre-stage'
+        : `reading-mechanic-board reading-mechanic-${escapeText(mechanic.type)}`;
+      const cards = items.map((item, index) => {
         const state = index < restoredCount ? 'is-restored' : (index === restoredCount ? 'is-current' : 'is-locked');
         const locked = index > restoredCount;
+        const numberLabel = mechanic.type === 'memory-theatre' ? 'ACT' : (mechanic.type === 'evidence-board' ? 'CLUE' : 'BEAT');
         return `
           <div class="reading-theatre-act ${state}">
-            <span class="act-number">ACT ${String(index + 1).padStart(2, '0')}</span>
-            <span class="act-title">${escapeText(act.title)}</span>
-            <span class="act-title-jp">${escapeText(act.titleJP)}</span>
+            <span class="act-number">${numberLabel} ${String(index + 1).padStart(2, '0')}</span>
+            <span class="act-title">${escapeText(item.title)}</span>
+            <span class="act-title-jp">${escapeText(item.titleJP)}</span>
             ${locked
-              ? '<span class="reading-theatre-locked">Answer the next question to restore this scene.<br>次の問題に答えると場面が戻ります。</span>'
-              : `<span class="act-caption">${escapeText(act.caption)}</span><span class="act-caption-jp">${escapeText(act.captionJP)}</span>`}
+              ? '<span class="reading-theatre-locked">Answer the next question to reveal this piece.<br>次の問題に答えると手がかりが現れます。</span>'
+              : `<span class="act-caption">${escapeText(item.caption)}</span><span class="act-caption-jp">${escapeText(item.captionJP)}</span>`}
           </div>`;
       }).join('');
-      const complete = restoredCount >= mechanic.acts.length;
+      const complete = restoredCount >= items.length;
+      const statusJP = complete ? mechanic.completeJP : `${restoredCount} / ${items.length} 発見`;
+      const statusEN = complete ? mechanic.complete : `${restoredCount} / ${items.length} ${mechanic.type === 'memory-theatre' ? 'acts restored' : 'pieces revealed'}`;
       return `
         <section class="reading-mechanic" aria-label="${escapeText(mechanic.name)}">
           <div class="reading-mechanic-heading">${escapeText(mechanic.name)} <span>${escapeText(mechanic.nameJP)}</span></div>
           <p class="reading-mechanic-intro">${escapeText(mechanic.instruction)}</p>
           <p class="reading-mechanic-intro-jp">${escapeText(mechanic.instructionJP)}</p>
-          <div class="reading-theatre-stage">${acts}</div>
-          <div class="reading-theatre-status">${complete ? escapeText(mechanic.complete) : `${restoredCount} / ${mechanic.acts.length} acts restored`}
-            <small>${complete ? escapeText(mechanic.completeJP) : `${restoredCount} / ${mechanic.acts.length} 場面を復元`}</small>
-          </div>
+          <div class="${className}">${cards}</div>
+          <div class="reading-theatre-status">${escapeText(statusEN)}<small>${escapeText(statusJP)}</small></div>
         </section>`;
     }
 
@@ -160,7 +170,7 @@
           <div class="reading-card reading-complete">
             <div class="reading-eyebrow">${escapeText(episode.eyebrow)}</div>
             <h2>${escapeText(episode.title)}</h2>
-            ${renderMechanic(mechanic && Array.isArray(mechanic.acts) ? mechanic.acts.length : theatreIndex)}
+            ${renderMechanic(mechanic ? (mechanic.acts || mechanic.items || mechanic.beats || []).length : mechanicIndex)}
             <p class="reading-success">${escapeText(episode.success)}</p>
             <p class="reading-jp">${escapeText(episode.successJP)}</p>
             <button class="reading-primary" id="reading-return-btn">Restore memory / 記憶を戻す</button>
@@ -182,7 +192,7 @@
           <h2>${escapeText(episode.title)} <span>${escapeText(episode.titleJP)}</span></h2>
           <p class="reading-intro">${escapeText(episode.intro)}</p>
           <p class="reading-jp">${escapeText(episode.introJP)}</p>
-          ${renderMechanic(theatreIndex)}
+          ${renderMechanic(mechanicIndex)}
           <div class="reading-transcript">${lines}</div>
           <div class="reading-question-label">${escapeText(question.label)} · ${escapeText(question.labelJP)}</div>
           <h3>${escapeText(question.prompt)}</h3>
@@ -199,14 +209,18 @@
           if (choice === question.correct) {
             questionIndex += 1;
             if (mechanic && question.revealAct != null) {
-              theatreIndex = Math.max(theatreIndex, question.revealAct + 1);
+              mechanicIndex = Math.max(mechanicIndex, question.revealAct + 1);
               lastFeedback = question.restoreText || 'The scene returns.';
               lastFeedbackJP = question.restoreTextJP || '場面が戻ります。';
             } else {
               lastFeedback = '';
               lastFeedbackJP = '';
             }
-            if (opts.persist) opts.persist({ readingIndex: questionIndex, theatreIndex });
+            if (opts.persist) {
+              const progress = { readingIndex: questionIndex, mechanicIndex };
+              if (mechanic.type === 'memory-theatre') progress.theatreIndex = mechanicIndex;
+              opts.persist(progress);
+            }
             render();
           } else {
             lastFeedback = `Not quite. Look again at the lines. ${question.evidence}`;
@@ -217,7 +231,11 @@
       });
     };
 
-    if (opts.persist) opts.persist({ state: 'reading', readingState: 'active', readingIndex: questionIndex, theatreIndex });
+    if (opts.persist) {
+      const progress = { state: 'reading', readingState: 'active', readingIndex: questionIndex, mechanicIndex };
+      if (mechanic && mechanic.type === 'memory-theatre') progress.theatreIndex = mechanicIndex;
+      opts.persist(progress);
+    }
     render();
     return true;
   }
