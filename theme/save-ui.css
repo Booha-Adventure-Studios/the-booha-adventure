@@ -124,6 +124,18 @@
   text-transform: uppercase;
 }
 
+/* Simple Japanese line under any English label — headings, section titles,
+   button labels. Kept as one shared class so every EN string in this panel
+   can get a JP line the same way the rest of the game already does. */
+.booha-jp {
+  display:     block;
+  font-size:   0.68rem;
+  font-weight: 400;
+  opacity:     0.62;
+  letter-spacing: 0;
+  margin-top:  0.15rem;
+}
+
 /* Close button */
 .booha-close-btn {
   position:   absolute;

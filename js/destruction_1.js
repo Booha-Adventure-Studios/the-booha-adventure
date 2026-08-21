@@ -2483,6 +2483,7 @@ function traitGlowColor(block) {
     return -1;
   }
   function htStart(px,py){const bx=W/2-140,by=H/2+10;return px>=bx&&px<=bx+280&&py>=by&&py<=by+70;}
+  function htSave(px,py){const bx=W/2-95,by=H/2+128;return px>=bx&&px<=bx+190&&py>=by&&py<=by+44;}
   function htAction(px,py){return px>=ACTION_RECT.x&&px<=ACTION_RECT.x+ACTION_RECT.w&&py>=ACTION_RECT.y&&py<=ACTION_RECT.y+ACTION_RECT.h;}
   function showHall(){
     hallReturnState = {
@@ -2544,7 +2545,7 @@ function traitGlowColor(block) {
     const rows = [
       { id:'resume',  en:'RESUME',        jp:'つづける',       accent:true  },
       { id:'restart', en:'RESTART ROUND', jp:'ラウンドをやりなおす', accent:false },
-      { id:'save',    en:'SAVE',          jp:'セーブ',         accent:false, disabled:true },
+      { id:'save',    en:'SAVE',          jp:'セーブ',         accent:false },
       { id:'exit',    en:'EXIT',          jp:'おわる',         accent:false, danger:true },
     ];
     return rows.map((row, i) => ({ ...row, x:m.x+30, y:startY+i*(bh+gap), w:bw, h:bh }));
@@ -2564,7 +2565,7 @@ function traitGlowColor(block) {
       const hit = pauseHit(p.x,p.y);
       if(hit === 'resume') closePause();
       else if(hit === 'restart'){ closePause(); loadRound(gs.round); showBriefing(); }
-      else if(hit === 'save') setToast('Save menu — coming in the next pass / つぎのアップデートで', '#7cfff8', 2400);
+      else if(hit === 'save'){ if(window.BoohaSaveMenu) BoohaSaveMenu.open(); }
       else if(hit === 'exit'){ closePause(); leaveGame(); }
       evt.preventDefault();return;
     }
@@ -2577,7 +2578,11 @@ function traitGlowColor(block) {
     if(dockAction === 'hall' && gs.phase === P.HALL){returnFromHall();evt.preventDefault();return;}
     getAC();
 
-    if(gs.phase===P.TITLE){if(htStart(p.x,p.y)){beginCampaign();loadRound(0);showBriefing();}evt.preventDefault();return;}
+    if(gs.phase===P.TITLE){
+      if(htStart(p.x,p.y)){beginCampaign();loadRound(0);showBriefing();}
+      else if(htSave(p.x,p.y)){ if(window.BoohaSaveMenu) BoohaSaveMenu.open(); }
+      evt.preventDefault();return;
+    }
     if(gs.phase===P.HALL){
       evt.preventDefault();return;
     }
@@ -3220,6 +3225,12 @@ function traitGlowColor(block) {
     ctx.fillStyle='#1a0e00';ctx.font='bold 25px system-ui,sans-serif';ctx.fillText('START / はじめる',W/2,by+bh/2);
     ctx.font='13px system-ui,sans-serif';ctx.fillStyle='rgba(255,255,255,0.62)';
     ctx.fillText(`${CHAPTERS.length || 5} chapters · ${LEVELS.length} rounds · Best ${scoreText(gs.highScore)}`,W/2,H/2+100);
+
+    const sbx=W/2-95,sby=H/2+128,sbw=190,sbh=44;
+    ctx.fillStyle='rgba(124,255,248,0.1)';ctx.strokeStyle='rgba(124,255,248,0.5)';ctx.lineWidth=1.5;
+    rr(ctx,sbx,sby,sbw,sbh,14,true,true);
+    ctx.fillStyle='#7cfff8';ctx.font='bold 15px system-ui,sans-serif';
+    ctx.fillText('💾 SAVE / セーブ',W/2,sby+sbh/2);
 
     ctx.restore();
     drawControlDock();
