@@ -12,7 +12,8 @@
 //             Bounce no longer penalizes UNLESS level sets noBounce:true
 //   • CUT FX: Slash replaced with soft sparkle/poof burst
 //             Pastel circles + tiny stars, fades gently
-//   • HUD: Shows "Cuts: X / parCuts" live
+//   • HUD: Keeps score and total stars visible while per-level cut feedback
+//             remains in the result popup
 // =====================================================
 
 (() => {
@@ -40,13 +41,11 @@
   const cancelRestartBtn = document.getElementById('cancelRestartBtn');
   const LEVELS         = window.FEED_BOOHA_LEVELS || [];
   const levelText      = document.getElementById('levelText');
-  const stateText      = document.getElementById('stateText');
   const messageTitle   = document.getElementById('messageTitle');
   const messageText    = document.getElementById('messageText');
   const totalStarsEl   = document.getElementById('totalStars');
   const hudStarsEl     = document.getElementById('hudStars');
   const scoreTextEl    = document.getElementById('scoreText');
-  const levelStarsEl   = document.getElementById('levelStarsText');
   const bestScoreEl    = document.getElementById('bestScoreText');
   const continueStatusEl = document.getElementById('continueStatusText');
 
@@ -70,7 +69,9 @@
 
   const GRAVITY            = 0.45;
   const AIR_DRAG           = 0.999;
-  const ROPE_CUT_RADIUS    = 32;
+  // Generous touch target: the visible rope is narrow, but the playable
+  // slash/tap target should feel forgiving on a phone or tablet.
+  const ROPE_CUT_RADIUS    = 54;
   const BOOHA_W            = 160;
   const BOOHA_H            = 160;
   const CANDY_R            = 26;
@@ -88,7 +89,7 @@
   const SAFETY_CATCH_STEER = 0.08;
   const LAST_CHANCE_DIST   = 90;
 
-  const swipe        = { active: false, x0: 0, y0: 0, x1: 0, y1: 0 };
+  const swipe        = { active: false, x0: 0, y0: 0, x1: 0, y1: 0, startX: 0, startY: 0 };
   // v7: poof effects replace slash effects
   const poofEffects  = [];
   const confetti     = [];
@@ -235,12 +236,6 @@
     if (cutCount <= par)     return 3;
     if (cutCount <= par + 1) return 2;
     return 1;
-  }
-
-  function updateHudStars() {
-    if (!levelStarsEl) return;
-    const s = starsForCuts(state.cutCount, state.hitBounce);
-    levelStarsEl.textContent = '★'.repeat(s) + '☆'.repeat(3 - s);
   }
 
   // ─────────────────────────────────────────────────
@@ -673,8 +668,6 @@
 
   function setHud(lvl, englishStatus, japaneseStatus = '') {
     if (levelText) levelText.textContent = String(lvl);
-    if (japaneseStatus) setBilingual(stateText, englishStatus, japaneseStatus);
-    else if (stateText) stateText.textContent = englishStatus;
   }
 
   // v7: HUD shows "Cuts: X / par" live during play
@@ -813,8 +806,6 @@
 
     ensureChapterContinues(index);
 
-    updateHudStars();
-
     const ropeCount = (level.ropes || []).length;
     let kickVx;
     if (typeof level.launchVx === 'number') {
@@ -947,12 +938,14 @@
     setBilingual(messageText, text.en, text.ja);
     const stars = starsForCuts(cutCount, hitBounce);
     nextBtn.style.display  = nextVisible ? 'inline-flex' : 'none';
+    nextBtn.classList.toggle('message-primary', nextVisible);
     if (continueBtn) continueBtn.style.display = 'none';
     if (continueStatusEl) continueStatusEl.style.display = 'none';
     setButtonLabel(nextBtn,
       state.campaignComplete ? 'Play Again' : 'Next',
       state.campaignComplete ? 'もう一度' : '次へ');
     retryBtn.style.display = (!nextVisible || stars < 3) ? 'inline-flex' : 'none';
+    retryBtn.classList.toggle('retry-centered', nextVisible || state.continuesLeft <= 0);
     if (nextVisible) showStars(cutCount, hitBounce);
     else if (starContainer) starContainer.innerHTML = '';
     messageOverlay.classList.add('overlay--show');
@@ -966,7 +959,9 @@
       'Booha missed the candy. Retry for free, or use a helper to make this level easier.',
       'ブーハーがキャンディを逃がしたよ。無料でもう一度やるか、たすけモードでこのレベルをかんたんにできるよ。');
     nextBtn.style.display = 'none';
+    nextBtn.classList.remove('message-primary');
     retryBtn.style.display = 'inline-flex';
+    retryBtn.classList.toggle('retry-centered', state.continuesLeft <= 0);
     if (continueBtn) continueBtn.style.display = state.continuesLeft > 0 ? 'inline-flex' : 'none';
     if (continueStatusEl) {
       setBilingual(continueStatusEl,
@@ -1187,7 +1182,6 @@
         // Only flag hitBounce if level cares about it (noBounce levels)
         if (state.currentLevel && state.currentLevel.noBounce) {
           state.hitBounce = true;
-          updateHudStars();
         }
         if (state.bounceCooldown <= 0) {
           playSfxBounce();
@@ -1329,7 +1323,6 @@
       state.cutCount++;
       playSfxCut();
       if (navigator.vibrate) navigator.vibrate(40);
-      updateHudStars();
       setHudCuts();
       const id = setTimeout(() => {
         rope.cut = true; rope.pending = false; rope.releaseAt = 0;
@@ -1344,9 +1337,44 @@
     playSfxCut();
     if (navigator.vibrate) navigator.vibrate(40);
     if (!getActiveRopes().length) state.candy.attached = false;
-    updateHudStars();
     setHudCuts();
     return true;
+  }
+
+  function ropeCurvePoint(rope, t) {
+    const c = state.candy;
+    const ax = rope.anchor.x, ay = rope.anchor.y;
+    const bx = c.x, by = c.y;
+    const mx = (ax + bx) / 2, my = (ay + by) / 2;
+    const straightD = Math.hypot(bx - ax, by - ay);
+    const slack = Math.max(0, (rope.length || straightD) - straightD);
+    const sagY = Math.min(slack * 0.5 + straightD * 0.08, 70);
+    const u = 1 - t;
+    return {
+      x: u * u * ax + 2 * u * t * mx + t * t * bx,
+      y: u * u * ay + 2 * u * t * (my + sagY) + t * t * by
+    };
+  }
+
+  function distanceToRopePath(x, y, rope) {
+    let best = Infinity;
+    let previous = ropeCurvePoint(rope, 0);
+    for (let i = 1; i <= 12; i++) {
+      const current = ropeCurvePoint(rope, i / 12);
+      best = Math.min(best, distPtSeg(x, y, previous.x, previous.y, current.x, current.y));
+      previous = current;
+    }
+    return best;
+  }
+
+  function distanceBetweenSegments(ax, ay, bx, by, cx, cy, dx, dy) {
+    if (segmentsIntersect(ax, ay, bx, by, cx, cy, dx, dy)) return 0;
+    return Math.min(
+      distPtSeg(ax, ay, cx, cy, dx, dy),
+      distPtSeg(bx, by, cx, cy, dx, dy),
+      distPtSeg(cx, cy, ax, ay, bx, by),
+      distPtSeg(dx, dy, ax, ay, bx, by)
+    );
   }
 
   function cutNearestRope(mx, my) {
@@ -1355,7 +1383,7 @@
     if (!active.length) return;
     let best = null, bestD = Infinity;
     for (const rope of active) {
-      const d = distPtSeg(mx, my, rope.anchor.x, rope.anchor.y, state.candy.x, state.candy.y);
+      const d = distanceToRopePath(mx, my, rope);
       if (d < bestD) { bestD = d; best = rope; }
     }
     if (best && bestD <= ROPE_CUT_RADIUS) tryCutRope(best);
@@ -1381,8 +1409,19 @@
   function checkSwipeCuts() {
     if (!state.currentLevel || state.won || state.lost) return;
     for (const rope of state.ropes.filter(r => !r.cut && !r.pending)) {
-      if (segmentsIntersect(swipe.x0, swipe.y0, swipe.x1, swipe.y1,
-        rope.anchor.x, rope.anchor.y, state.candy.x, state.candy.y)) tryCutRope(rope);
+      const crossed = segmentsIntersect(swipe.x0, swipe.y0, swipe.x1, swipe.y1,
+        rope.anchor.x, rope.anchor.y, state.candy.x, state.candy.y);
+      let closeToCurve = false;
+      let previous = ropeCurvePoint(rope, 0);
+      for (let i = 1; i <= 12 && !closeToCurve; i++) {
+        const current = ropeCurvePoint(rope, i / 12);
+        closeToCurve = distanceBetweenSegments(
+          swipe.x0, swipe.y0, swipe.x1, swipe.y1,
+          previous.x, previous.y, current.x, current.y
+        ) <= ROPE_CUT_RADIUS;
+        previous = current;
+      }
+      if (crossed || closeToCurve) tryCutRope(rope);
     }
   }
 
@@ -1609,31 +1648,44 @@
     helpBtn.addEventListener('click', () => toggleHelp(true));
     closeHelpBtn.addEventListener('click', () => toggleHelp(false));
     document.getElementById('startExitBtn')?.addEventListener('click', requestExit);
-    document.getElementById('exitBtn')?.addEventListener('click', requestExit);
     bottomExitBtn?.addEventListener('click', requestExit);
     bottomRestartBtn?.addEventListener('click', requestRestartGame);
     confirmExitBtn?.addEventListener('click', confirmExit);
     cancelExitBtn?.addEventListener('click', () => toggleExitConfirm(false));
     confirmRestartBtn?.addEventListener('click', confirmRestartGame);
     cancelRestartBtn?.addEventListener('click', () => toggleRestartConfirm(false));
-    canvas.addEventListener('click', evt => handleTap(getCanvasPoint(evt)));
-    canvas.addEventListener('touchstart', evt => {
+    // Pointer events unify touch, stylus, and mouse. A short press is a tap;
+    // any longer stroke is treated as a slash across the rope path.
+    canvas.addEventListener('pointerdown', evt => {
       if (!state.started) return;
       evt.preventDefault();
+      canvas.setPointerCapture?.(evt.pointerId);
       const p = getCanvasPoint(evt);
-      swipe.active=true; swipe.x0=p.x; swipe.y0=p.y; swipe.x1=p.x; swipe.y1=p.y;
-    }, { passive: false });
-    canvas.addEventListener('touchmove', evt => {
-      if (!state.started||!swipe.active) return;
+      swipe.active = true;
+      swipe.startX = swipe.x0 = swipe.x1 = p.x;
+      swipe.startY = swipe.y0 = swipe.y1 = p.y;
+    });
+    canvas.addEventListener('pointermove', evt => {
+      if (!state.started || !swipe.active) return;
       evt.preventDefault();
       const p = getCanvasPoint(evt);
-      swipe.x1=p.x; swipe.y1=p.y; checkSwipeCuts(); swipe.x0=p.x; swipe.y0=p.y;
-    }, { passive: false });
-    canvas.addEventListener('touchend', evt => {
+      swipe.x1 = p.x; swipe.y1 = p.y;
+      checkSwipeCuts();
+      swipe.x0 = p.x; swipe.y0 = p.y;
+    });
+    const finishPointerStroke = evt => {
+      if (!swipe.active) return;
       evt.preventDefault();
-      if (Math.hypot(swipe.x1-swipe.x0, swipe.y1-swipe.y0) < 10) handleTap({x:swipe.x0,y:swipe.y0});
+      const p = getCanvasPoint(evt);
+      swipe.x1 = p.x; swipe.y1 = p.y;
+      checkSwipeCuts();
+      if (Math.hypot(swipe.x1 - swipe.startX, swipe.y1 - swipe.startY) < 14) {
+        handleTap({ x: swipe.x1, y: swipe.y1 });
+      }
       swipe.active = false;
-    }, { passive: false });
+    };
+    canvas.addEventListener('pointerup', finishPointerStroke);
+    canvas.addEventListener('pointercancel', finishPointerStroke);
   }
 
   async function boot() {
