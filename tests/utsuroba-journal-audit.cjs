@@ -18,9 +18,13 @@ assert.match(utsuroba, /definitionJP/, 'Word Cabinet entries must retain simple 
 assert.match(utsuroba, /readingEchoes/, 'Restored memories must create weekly world echoes');
 assert.match(utsuroba, /renderMemoryEchoes/, 'Utsuroba must render restored memory echoes');
 assert.match(utsuroba, /restoredGreeting/, 'Drifters must have post-memory dialogue');
+assert.match(utsuroba, /masteryLevel/, 'Journal entries must persist adaptive reading mastery');
+assert.match(utsuroba, /recordReadingReview/, 'Review results must update the learner reading state');
 assert.match(utsuroba, /reviewOnly:\s*true/, 'Journal replay must use review-only mode');
 assert.match(utsuroba, /completeMemory[\s\S]*readingJournal/, 'Restored reading memories must be recorded before quest cleanup');
 assert.match(reading, /opts\.reviewOnly/, 'Reading engine must understand review-only sessions');
+assert.match(reading, /adaptiveMode/, 'Reading engine must support adaptive review modes');
+assert.match(reading, /usedEvidence/, 'Reading engine must track evidence support use');
 assert.match(reading, /Close journal review \/ ノートを閉じる/, 'Review-only sessions must not offer quest completion');
 
 console.log('Utsuroba reading journal audit passed');

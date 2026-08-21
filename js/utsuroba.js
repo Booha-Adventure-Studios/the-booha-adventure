@@ -158,6 +158,12 @@
       data.utsuroba.readingJournal.entries = [];
       dirty = true;
     }
+    data.utsuroba.readingJournal.entries.forEach(entry => {
+      if (!Number.isInteger(entry.masteryLevel)) { entry.masteryLevel = 0; dirty = true; }
+      if (!Number.isInteger(entry.guidedSessions)) { entry.guidedSessions = 0; dirty = true; }
+      if (!Number.isInteger(entry.independentSessions)) { entry.independentSessions = 0; dirty = true; }
+      if (!Number.isInteger(entry.reviewCount)) { entry.reviewCount = 1; dirty = true; }
+    });
     if (!data.utsuroba.wordCabinet) {
       data.utsuroba.wordCabinet = { entries: [] };
       dirty = true;
@@ -345,7 +351,15 @@
           memIdx,
           completedAt: Date.now(),
           reviewCount: 1,
+          masteryLevel: 0,
+          guidedSessions: 0,
+          independentSessions: 0,
         });
+      }
+      if (existing) {
+        if (!Number.isInteger(existing.masteryLevel)) existing.masteryLevel = 0;
+        if (!Number.isInteger(existing.guidedSessions)) existing.guidedSessions = 0;
+        if (!Number.isInteger(existing.independentSessions)) existing.independentSessions = 0;
       }
       journal.entries = entries.slice(0, 12);
       data.utsuroba.readingJournal = journal;
@@ -526,6 +540,8 @@
       .reading-journal-entry{padding:14px;border:1px solid rgba(216,168,255,.22);border-radius:10px;background:rgba(255,255,255,.045);}
       .reading-journal-entry h3{margin:0;color:#fff;font-size:1rem;line-height:1.35;}
       .reading-journal-entry h3 span{display:block;margin-top:3px;color:rgba(255,231,178,.58);font-size:.72rem;font-weight:400;}
+      .reading-journal-mastery{display:inline-block;margin-top:9px;padding:4px 7px;border:1px solid rgba(255,203,117,.4);border-radius:999px;background:rgba(255,203,117,.08);color:#ffe7b2;font-size:.68rem;font-weight:700;}
+      .reading-journal-mastery small{margin-left:5px;color:rgba(255,231,178,.58);font-size:.9em;font-weight:400;}
       .reading-journal-meta{margin:7px 0 9px;color:rgba(245,232,255,.54);font-size:.73rem;line-height:1.4;}
       .reading-journal-vocab{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:11px;}
       .reading-journal-vocab span{padding:4px 7px;border:1px solid rgba(216,168,255,.27);border-radius:999px;color:#e4c2ff;font-size:.68rem;}
@@ -770,17 +786,48 @@
   }
 
   async function openReadingReview(entry) {
-    const drifter = DATA.drifters.find(item => item.id === entry.drifterId) || {
-      id: entry.drifterId || 'memory', name: 'A restored memory', nameKanji: '記憶'
+    const savedEntry = readingJournalEntries().find(item => item.episodeId === entry.episodeId);
+    const reviewEntry = savedEntry || entry;
+    const drifter = DATA.drifters.find(item => item.id === reviewEntry.drifterId) || {
+      id: reviewEntry.drifterId || 'memory', name: 'A restored memory', nameKanji: '記憶'
     };
     closeReadingJournal();
     if (!window.UtsurobaReading) return;
+    const adaptiveMode = Number(reviewEntry.masteryLevel) >= 1 ? 'independent' : 'guided';
     window.UtsurobaReading.start({
       drifter,
-      quest: { episodeId: entry.episodeId, readingIndex: 0, mechanicIndex: 0 },
+      quest: { episodeId: reviewEntry.episodeId, readingIndex: 0, mechanicIndex: 0 },
       reviewOnly: true,
+      adaptiveMode,
       onClose: () => { state.inputLocked = false; },
+      onReviewComplete: result => recordReadingReview(reviewEntry, result),
     });
+  }
+
+  function recordReadingReview(entry, result) {
+    const data = loadSave();
+    const journalEntries = data.utsuroba.readingJournal?.entries;
+    const current = Array.isArray(journalEntries)
+      ? journalEntries.find(item => item.episodeId === entry.episodeId) : null;
+    if (!current) return;
+    const mode = result && result.supportLevel === 'independent' ? 'independent' : 'guided';
+    current.reviewCount = (current.reviewCount || 1) + 1;
+    current.guidedSessions = (current.guidedSessions || 0) + (mode === 'guided' ? 1 : 0);
+    current.independentSessions = (current.independentSessions || 0) + (mode === 'independent' ? 1 : 0);
+    if (mode === 'guided') {
+      current.masteryLevel = Math.max(1, Number(current.masteryLevel) || 0);
+    } else if (Number(result?.mistakes) === 0 && result?.usedEvidence !== true) {
+      current.masteryLevel = 2;
+    } else {
+      current.masteryLevel = Math.max(1, Number(current.masteryLevel) || 0);
+    }
+    current.lastReview = {
+      mode,
+      mistakes: Number(result?.mistakes) || 0,
+      usedEvidence: result?.usedEvidence === true,
+      completedAt: Date.now(),
+    };
+    writeSave(data);
   }
 
   async function openReadingJournal() {
@@ -819,7 +866,13 @@
         if (!episode) return '';
         const words = Array.isArray(episode.vocabulary) ? episode.vocabulary.slice(0, 5).map(item => `<span>${escapeHTML(item.word)}</span>`).join('') : '';
         const reviews = Math.max(1, Number(entry.reviewCount) || 1);
-        return `<article class="reading-journal-entry"><h3>${escapeHTML(episode.title)}<span>${escapeHTML(episode.titleJP)}</span></h3><p class="reading-journal-meta">${reviews} reading ${reviews === 1 ? 'completed' : 'reviews'} · ${escapeHTML(episode.eyebrow)}<br>${reviews === 1 ? '1回読了' : `${reviews}回読み返しました`}</p>${words ? `<div class="reading-journal-vocab" aria-label="Vocabulary">${words}</div>` : ''}<button class="reading-journal-review" type="button" data-journal-entry="${index}">Read again / もう一度読む</button></article>`;
+        const masteryLevel = Math.max(0, Math.min(2, Number(entry.masteryLevel) || 0));
+        const mastery = masteryLevel >= 2
+          ? { en: 'Mastered', jp: '習得済み', action: 'Mastery check / 習得チェック' }
+          : masteryLevel === 1
+            ? { en: 'Ready for independent review', jp: '自力復習の準備完了', action: 'Try without hints / ヒントなしで挑戦' }
+            : { en: 'Guided review next', jp: 'まずは案内付き復習', action: 'Guided review / 案内付き復習' };
+        return `<article class="reading-journal-entry"><h3>${escapeHTML(episode.title)}<span>${escapeHTML(episode.titleJP)}</span></h3><div class="reading-journal-mastery">${mastery.en}<small>${mastery.jp}</small></div><p class="reading-journal-meta">${reviews} reading ${reviews === 1 ? 'completed' : 'sessions'} · ${escapeHTML(episode.eyebrow)}<br>${reviews === 1 ? '1回読了' : `${reviews}回読み返しました`}</p>${words ? `<div class="reading-journal-vocab" aria-label="Vocabulary">${words}</div>` : ''}<button class="reading-journal-review" type="button" data-journal-entry="${index}">${mastery.action}</button></article>`;
       }).join('');
       list.querySelectorAll('[data-journal-entry]').forEach(button => button.addEventListener('click', () => {
         const entry = entries[Number(button.dataset.journalEntry)];
