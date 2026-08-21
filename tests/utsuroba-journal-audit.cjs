@@ -8,6 +8,7 @@ const path = require('path');
 const ROOT = path.resolve(__dirname, '..');
 const utsuroba = fs.readFileSync(path.join(ROOT, 'js', 'utsuroba.js'), 'utf8');
 const reading = fs.readFileSync(path.join(ROOT, 'js', 'utsuroba-reading.js'), 'utf8');
+const karasuki = fs.readFileSync(path.join(ROOT, 'js', 'karasuki.js'), 'utf8');
 const data = fs.readFileSync(path.join(ROOT, 'js', 'utsuroba-data.js'), 'utf8');
 
 assert.match(utsuroba, /readingJournal/, 'Utsuroba save migration must initialize the reading journal');
@@ -61,6 +62,10 @@ assert.match(reading, /focusFirstControl/, 'Reading sessions must move focus int
 assert.match(reading, /trapFocus/, 'Reading sessions must keep keyboard focus inside the active modal');
 assert.match(reading, /aria-live="polite"/, 'Reading feedback must be announced accessibly');
 assert.match(reading, /prefers-reduced-motion/, 'Reading UI must respect reduced-motion preferences');
+assert.match(utsuroba, /new Audio\('\.\/assets\/audio\/utsuroba-music\.mp3'\)/, 'Utsuroba must restore its world music asset');
+assert.match(utsuroba, /music\.loop\s*=\s*true/, 'Utsuroba music must loop');
+assert.match(karasuki, /new Audio\('assets\/audio\/karasuki-music\.mp3'\)/, 'Karasuki must restore its world music asset');
+assert.match(karasuki, /music\.loop\s*=\s*true/, 'Karasuki music must loop');
 assert.match(reading, /adaptiveMode/, 'Reading engine must support adaptive review modes');
 assert.match(reading, /usedEvidence/, 'Reading engine must track evidence support use');
 assert.match(reading, /renderPostcard/, 'Reading engine must render optional memory postcards');
