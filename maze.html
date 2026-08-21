@@ -65,6 +65,17 @@
     .overlay.hidden{ opacity:0; pointer-events:none; }
     .overlay.gone{ display:none; }
     .overlayHeading{ font-family:'Bowlby One',sans-serif; font-size:clamp(20px,4.5vw,46px); letter-spacing:2px; margin:0; color:#fff; line-height:1.2; text-shadow:0 0 32px rgba(255,140,255,.7),0 0 80px rgba(255,80,200,.35),0 2px 8px rgba(0,0,0,.9); }
+    #overlay2{ gap:clamp(7px,1.6vmin,16px); background:radial-gradient(ellipse at center,rgba(45,10,75,.34) 0%,rgba(0,0,0,.78) 54%,rgba(0,0,0,.97) 100%); }
+    .arrivalKicker{ margin:0; font-family:system-ui,-apple-system,sans-serif; font-size:clamp(10px,1.8vw,14px); font-weight:900; letter-spacing:.34em; text-transform:uppercase; color:#f5b8ff; opacity:.84; text-shadow:0 0 18px rgba(255,110,230,.72); }
+    .arrivalHeadingEn{ margin:0; font-size:clamp(25px,5.4vw,56px); letter-spacing:.12em; line-height:1.05; }
+    .arrivalHeadingJp{ margin:0; font-size:clamp(15px,2.8vw,28px); font-weight:900; letter-spacing:.16em; color:rgba(255,235,255,.88); text-shadow:0 0 24px rgba(255,120,230,.72),0 2px 8px rgba(0,0,0,.9); }
+    .arrivalStage{ position:relative; display:grid; place-items:center; width:min(72vmin,420px); height:min(40vmin,300px); margin:clamp(2px,1vmin,10px) 0 0; }
+    .arrivalStage::before,.arrivalStage::after{ content:""; position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); border-radius:50%; pointer-events:none; }
+    .arrivalStage::before{ width:clamp(150px,31vmin,320px); aspect-ratio:1; border:1px solid rgba(255,176,255,.42); box-shadow:0 0 22px rgba(255,82,210,.38),inset 0 0 24px rgba(145,72,255,.24); animation:arrivalRing 4.8s ease-in-out infinite; }
+    .arrivalStage::after{ width:clamp(190px,40vmin,390px); aspect-ratio:1; border:1px solid rgba(105,205,255,.18); box-shadow:0 0 52px rgba(120,90,255,.28); animation:arrivalRing 6.4s ease-in-out infinite reverse; }
+    @keyframes arrivalRing{ 0%,100%{ opacity:.42; transform:translate(-50%,-50%) scale(.92) rotate(0deg); } 50%{ opacity:.9; transform:translate(-50%,-50%) scale(1.04) rotate(8deg); } }
+    .arrivalInstructionEn{ margin:0; font-family:Georgia,serif; font-size:clamp(14px,2.3vw,22px); color:#fff; text-shadow:0 0 18px rgba(255,140,255,.62); }
+    .arrivalInstructionJp{ margin:-3px 0 0; font-size:clamp(12px,1.9vw,18px); color:rgba(255,220,255,.76); letter-spacing:.08em; }
     .mazeNameSub {
   margin: -8px 0 0;
   font-size: clamp(14px, 3vmin, 24px);
@@ -103,10 +114,10 @@
     #overlay2.show{ display:flex; }
     .ghostBtnWrap{ position:relative; display:inline-flex; align-items:center; justify-content:center; background:none; border:none; padding:0; cursor:pointer; -webkit-tap-highlight-color:transparent; }
     .ghostBtnWrap:active #startGhost{ transform:scale(.88) translateY(-5px); filter:drop-shadow(0 0 44px rgba(255,100,220,1)) drop-shadow(0 14px 30px rgba(0,0,0,.7)); }
-    .ghostSparkleField{ position:absolute; inset:-35%; pointer-events:none; z-index:0; }
+    .ghostSparkleField{ position:absolute; inset:-18%; pointer-events:none; z-index:0; }
     
     .ghostSparkleField .sp{ box-shadow:0 0 6px 2px rgba(255,255,255,.95),0 0 16px 5px rgba(255,100,220,.75); }
-    #startGhost{ width:clamp(80px,20vmin,200px); height:clamp(80px,20vmin,200px); object-fit:contain; user-select:none; -webkit-user-drag:none; filter:drop-shadow(0 0 26px rgba(255,100,220,.6)) drop-shadow(0 14px 30px rgba(0,0,0,.7)); animation:floaty 3.6s ease-in-out infinite; transform-origin:50% 60%; transition:transform 120ms ease,filter 120ms ease; position:relative; z-index:1; }
+    #startGhost{ width:clamp(128px,29vmin,280px); height:clamp(128px,29vmin,280px); object-fit:contain; user-select:none; -webkit-user-drag:none; filter:drop-shadow(0 0 32px rgba(255,100,220,.82)) drop-shadow(0 0 76px rgba(150,80,255,.42)) drop-shadow(0 18px 30px rgba(0,0,0,.72)); animation:floaty 3.6s ease-in-out infinite; transform-origin:50% 60%; transition:transform 120ms ease,filter 120ms ease; position:relative; z-index:1; }
     @keyframes floaty{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-8px); } }
     #mazeScene{ position:absolute; inset:0; background:#000; }
     #stage{ position:absolute; inset:0; overflow:hidden; }
@@ -801,6 +812,15 @@
        MOBILE FIXES
     ═══════════════════════════════════════ */
     @media (max-width:767px),(pointer:coarse) and (max-width:900px){
+      #overlay2{ gap:5px; padding-left:18px; padding-right:18px; }
+      .arrivalKicker{ font-size:9px; letter-spacing:.24em; }
+      .arrivalHeadingEn{ font-size:clamp(21px,5.5vw,34px); letter-spacing:.08em; }
+      .arrivalHeadingJp{ font-size:clamp(13px,3.2vw,20px); }
+      .arrivalStage{ width:min(80vmin,330px); height:min(39vmin,210px); margin-top:0; }
+      #startGhost{ width:clamp(118px,29vmin,220px); height:clamp(118px,29vmin,220px); }
+      .arrivalInstructionEn{ font-size:clamp(12px,2.8vw,17px); }
+      .arrivalInstructionJp{ font-size:clamp(10px,2.4vw,14px); }
+
       #cpPopup{
         max-width:min(88vw,320px);
         padding:16px 16px 14px;
@@ -937,12 +957,18 @@
       <source src="assets/video/ttmaze.mp4" type="video/mp4" />
     </video>
   </div>
-  <div id="overlay2" class="overlay" aria-label="スタート">
-    <h1 class="overlayHeading">ブーハーをタッチしてはじめよう！</h1>
-    <button id="mazeStartBtn" class="ghostBtnWrap" type="button" aria-label="スタート">
-      <div class="ghostSparkleField" id="startSparkles" aria-hidden="true"></div>
-      <img id="startGhost" alt="ブーハー" />
-    </button>
+  <div id="overlay2" class="overlay" aria-label="Welcome to the maze / めいろへようこそ">
+    <p class="arrivalKicker">A NEW WORLD OPENS</p>
+    <h1 class="overlayHeading arrivalHeadingEn">WELCOME TO THE MAZE</h1>
+    <p class="arrivalHeadingJp">めいろへようこそ！</p>
+    <div class="arrivalStage">
+      <button id="mazeStartBtn" class="ghostBtnWrap" type="button" aria-label="Touch Booha to begin / ブーハーをタッチしてはじめよう">
+        <div class="ghostSparkleField" id="startSparkles" aria-hidden="true"></div>
+        <img id="startGhost" alt="Booha / ブーハー" />
+      </button>
+    </div>
+    <p class="arrivalInstructionEn">Touch Booha to begin your adventure.</p>
+    <p class="arrivalInstructionJp">ブーハーをタッチしてはじめよう！</p>
   </div>
   <section id="mazeScene" aria-label="めいろ">
     <div id="stage">
@@ -2258,7 +2284,7 @@ function buildSparkles(container,count=24,wide=false){
   }
 }
   
-buildSparkles(confirmSp,24);buildSparkles(startSp,36,true);
+buildSparkles(confirmSp,24);buildSparkles(startSp,28,false);
 
 returnBtn.addEventListener('click',()=>{fadeOut();setTimeout(()=>goToHub(),FADE_MS);});
 
