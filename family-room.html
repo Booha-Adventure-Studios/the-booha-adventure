@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#050505" />
+  <title>Family Room // Utsuroba</title>
+  <link rel="stylesheet" href="family-room.css" />
+</head>
+<body>
+  <main id="game-shell" aria-label="Family Room observation game">
+    <canvas id="room-canvas" aria-label="A dark family room to inspect"></canvas>
+
+    <header class="hud">
+      <div class="hud-brand">
+        <span class="eyebrow">UTSUROBA / PREDEVELOPMENT</span>
+        <span class="title">FAMILY ROOM</span>
+      </div>
+      <div class="hud-right">
+        <div class="loop-readout"><span id="round-number">01</span><span class="slash">/</span><span>07</span></div>
+        <button id="sound-toggle" class="sound-toggle" type="button" aria-pressed="true">SOUND <span id="sound-state">ON</span></button>
+      </div>
+    </header>
+
+    <div id="observation-note" class="observation-note">OBSERVE THE ROOM</div>
+
+    <section id="controls" class="controls" aria-label="Choose a direction">
+      <button id="back-button" class="choice-button" type="button" data-choice="back">
+        <span class="choice-arrow">↶</span>
+        <span><b>GO BACK</b><small>the room is different</small></span>
+      </button>
+      <button id="straight-button" class="choice-button" type="button" data-choice="straight">
+        <span><b>GO STRAIGHT</b><small>the room is normal</small></span>
+        <span class="choice-arrow">↷</span>
+      </button>
+    </section>
+
+    <section id="start-panel" class="panel visible" aria-labelledby="start-title">
+      <p class="panel-kicker">CASE FILE 07 / FAMILY ROOM</p>
+      <h1 id="start-title">DON'T BLINK.</h1>
+      <p class="panel-copy">The room repeats. If it looks normal, go straight. If anything has changed, go back.</p>
+      <button id="start-button" class="primary-button" type="button">ENTER THE ROOM <span>→</span></button>
+      <p class="panel-foot">Keyboard: <kbd>↑</kbd> straight &nbsp; <kbd>↓</kbd> back</p>
+    </section>
+
+    <section id="message-panel" class="panel" aria-live="polite">
+      <p id="message-kicker" class="panel-kicker"></p>
+      <h2 id="message-title"></h2>
+      <p id="message-copy" class="panel-copy"></p>
+      <button id="message-button" class="primary-button" type="button"></button>
+    </section>
+
+    <div id="transition-curtain" aria-hidden="true"></div>
+    <div class="grain" aria-hidden="true"></div>
+  </main>
+  <script src="family-room.js"></script>
+</body>
+</html>
