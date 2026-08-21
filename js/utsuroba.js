@@ -582,6 +582,8 @@
       .rotate-title{font-family:system-ui,-apple-system,sans-serif;font-size:clamp(18px,5vw,28px);font-weight:900;color:#fff;margin:0;}
       .rotate-sub{font-size:14px;color:rgba(255,255,255,.55);margin:0;line-height:1.7;}
       @keyframes utsuPopIn{from{opacity:0;transform:scale(0.94) translateY(8px);}to{opacity:1;transform:scale(1) translateY(0);}}
+      #utsuroba-app button:focus-visible,#utsuroba-reading-journal button:focus-visible,#utsuroba-weekly-reading button:focus-visible{outline:3px solid #d7ffe3;outline-offset:3px;}
+      @media(prefers-reduced-motion:reduce){#utsuroba-app *,#utsuroba-app *::before,#utsuroba-app *::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;scroll-behavior:auto !important;transition-duration:.01ms !important;}}
       #buki-coord-toggle{position:fixed;bottom:18px;right:18px;z-index:200;display:flex;align-items:center;gap:8px;background:rgba(0,0,0,.85);color:#ff8ae2;font:700 11px/1 monospace;padding:7px 13px;border-radius:20px;cursor:pointer;border:1px solid rgba(255,138,226,.40);user-select:none;letter-spacing:.06em;}
       .toggle-pill{width:30px;height:16px;border-radius:8px;background:rgba(255,138,226,.18);position:relative;transition:background .2s;}
       .toggle-pill::after{content:"";position:absolute;top:3px;left:3px;width:10px;height:10px;border-radius:50%;background:#ff8ae2;transition:transform .2s;}
@@ -1121,18 +1123,24 @@
     state.inputLocked = true;
     weeklyChallengeOverlay = document.createElement('div');
     weeklyChallengeOverlay.id = 'utsuroba-weekly-reading';
+    weeklyChallengeOverlay.setAttribute('role', 'dialog');
+    weeklyChallengeOverlay.setAttribute('aria-modal', 'true');
+    weeklyChallengeOverlay.setAttribute('aria-label', 'Weekly Reading Trail');
+    weeklyChallengeOverlay.tabIndex = -1;
     const goals = progress.goals.map(goal => {
       const percent = Math.round((goal.value / goal.target) * 100);
-      return `<article class="weekly-reading-goal${goal.complete ? ' is-complete' : ''}"><div class="weekly-reading-goal-head"><strong>${goal.complete ? '✓ ' : ''}${escapeHTML(goal.label)}</strong><span>${goal.value} / ${goal.target}</span></div><small>${escapeHTML(goal.complete ? goal.completeJP : goal.labelJP)}</small><div class="weekly-reading-bar"><i style="width:${percent}%"></i></div></article>`;
+      return `<article class="weekly-reading-goal${goal.complete ? ' is-complete' : ''}"><div class="weekly-reading-goal-head"><strong>${goal.complete ? '✓ ' : ''}${escapeHTML(goal.label)}</strong><span>${goal.value} / ${goal.target}</span></div><small>${escapeHTML(goal.complete ? goal.complete : goal.labelJP)}<br>${escapeHTML(goal.complete ? goal.completeJP : goal.labelJP)}</small><div class="weekly-reading-bar"><i style="width:${percent}%"></i></div></article>`;
     }).join('');
     const completion = progress.complete
       ? `<p class="weekly-reading-complete">${escapeHTML(progress.challenge.complete)}<small>${escapeHTML(progress.challenge.completeJP)}</small></p>`
       : '';
     weeklyChallengeOverlay.innerHTML = `<div class="weekly-reading-card"><button class="weekly-reading-close" type="button" aria-label="Close weekly reading trail">✕</button><div class="weekly-reading-eyebrow">WEEKLY READING TRAIL / 週間読書</div><h2>${escapeHTML(progress.challenge.title)}<span>${escapeHTML(progress.challenge.titleJP)}</span></h2><p class="weekly-reading-intro">${escapeHTML(progress.challenge.intro)}<small>${escapeHTML(progress.challenge.introJP)}</small></p><div class="weekly-reading-goals">${goals}</div>${completion}<button class="weekly-reading-close-btn" type="button" id="weekly-reading-done">Close trail / トレイルを閉じる</button></div>`;
     document.body.appendChild(weeklyChallengeOverlay);
+    weeklyChallengeOverlay.addEventListener('keydown', event => { if (event.key === 'Escape') { event.preventDefault(); closeWeeklyReadingChallenge(); } });
     weeklyChallengeOverlay.querySelector('.weekly-reading-close').addEventListener('click', closeWeeklyReadingChallenge);
     weeklyChallengeOverlay.querySelector('#weekly-reading-done').addEventListener('click', closeWeeklyReadingChallenge);
     weeklyChallengeOverlay.addEventListener('click', event => { if (event.target === weeklyChallengeOverlay) closeWeeklyReadingChallenge(); });
+    requestAnimationFrame(() => weeklyChallengeOverlay.querySelector('.weekly-reading-close')?.focus());
   }
 
   function recordWordPracticeResult(item, correct) {
