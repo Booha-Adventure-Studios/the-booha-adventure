@@ -42,6 +42,15 @@
   <script src="./js/core/game-registry.js"></script>
   <script src="./js/core/score-system.js"></script>
   <script src="./js/core/unlock-system.js"></script>
+
+  <!-- Adventure Save panel — same save/memory-code system as
+       adventure-profile.html. day-record.js above stays excluded;
+       none of these touch it. -->
+  <script src="./js/core/save-utils.js"></script>
+  <script src="./js/core/save-code.js"></script>
+  <script src="./js/ui/memory-code-ui.js"></script>
+  <script src="./js/ui/save-menu.js"></script>
+
   <script>
     (function () {
       'use strict';
@@ -75,6 +84,7 @@
 
   
   <link rel="preload" href="./assets/destruction/destruction-1.png" as="image" />
+  <link rel="stylesheet" href="./theme/save-ui.css" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body {
@@ -154,5 +164,20 @@
 
   <script src="./js/destruction_levels_1.js"></script>
   <script src="./js/destruction_1.js"></script>
+
+  <script>
+    // Inject the save panel once the core stack is up, but skip the
+    // floating 💾 toggle button it normally adds — Destruction has its
+    // own canvas buttons for this (title screen + pause menu) so a
+    // second, DOM-level button floating over the canvas would be
+    // redundant and could eat touch input meant for the sling.
+    document.addEventListener('booha:ready', function () {
+      if (!window.BoohaSaveMenu) return;
+      BoohaSaveMenu.init().then(function () {
+        var toggle = document.getElementById('booha-save-toggle');
+        if (toggle) toggle.remove();
+      });
+    });
+  </script>
 </body>
 </html>
