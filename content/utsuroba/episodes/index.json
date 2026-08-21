@@ -16,6 +16,14 @@
     {
       "id": "bh_window_v1",
       "file": "bh-window-v1.json"
+    },
+    {
+      "id": "bk_badge_v1",
+      "file": "bk-badge-v1.json"
+    },
+    {
+      "id": "ph_ribbon_v1",
+      "file": "ph-ribbon-v1.json"
     }
   ]
 }

@@ -556,6 +556,12 @@
       .utsu-memory-echo.motif-reflection{filter:drop-shadow(0 0 16px rgba(145,210,255,.34));}
       .utsu-memory-echo.motif-reflection .echo-aura{background:radial-gradient(circle,rgba(145,210,255,.3),rgba(100,170,255,.08) 42%,transparent 70%);}
       .utsu-memory-echo.motif-reflection .echo-icon{color:#b8e4ff;text-shadow:0 0 14px #7dc8ff;}
+      .utsu-memory-echo.motif-thorn{filter:drop-shadow(0 0 16px rgba(217,80,58,.4));}
+      .utsu-memory-echo.motif-thorn .echo-aura{background:radial-gradient(circle,rgba(217,110,80,.32),rgba(150,50,30,.08) 42%,transparent 70%);}
+      .utsu-memory-echo.motif-thorn .echo-icon{color:#e88a6e;text-shadow:0 0 14px #d9503a;}
+      .utsu-memory-echo.motif-ribbon{filter:drop-shadow(0 0 16px rgba(217,168,255,.36));}
+      .utsu-memory-echo.motif-ribbon .echo-aura{background:radial-gradient(circle,rgba(225,180,255,.3),rgba(160,110,220,.08) 42%,transparent 70%);}
+      .utsu-memory-echo.motif-ribbon .echo-icon{color:#e4c2ff;text-shadow:0 0 14px #d9a8ff;}
       @keyframes echoBreathe{0%,100%{transform:scale(.82);opacity:.55}50%{transform:scale(1.12);opacity:1}}
       @keyframes echoFloat{0%,100%{transform:translate(-50%,-48%)}50%{transform:translate(-50%,-58%)}}
       .utsu-memory-gate{position:absolute;transform:translate(-50%,-50%);width:140px;height:120px;padding:0;border:0;background:transparent;pointer-events:auto;cursor:pointer;filter:drop-shadow(0 0 20px rgba(216,168,255,.48));}
@@ -936,12 +942,12 @@
     echoLayer.innerHTML = '';
     const restored = readUtsuroba().readingEchoes || {};
     const episodes = window.UTSUROBA_EPISODES || {};
-    const iconFor = { lantern: '✦', candy: '●', reflection: '◈' };
+    const iconFor = { lantern: '✦', candy: '●', reflection: '◈', thorn: '◆', ribbon: '✿' };
     Object.entries(restored).forEach(([episodeId, entry]) => {
       const episode = episodes[episodeId];
       const echo = episode && episode.worldEcho;
       if (!echo || echo.roomId !== state.roomId) return;
-      const motif = ['lantern', 'candy', 'reflection'].includes(echo.motif) ? echo.motif : 'lantern';
+      const motif = Object.prototype.hasOwnProperty.call(iconFor, echo.motif) ? echo.motif : 'lantern';
       const button = document.createElement('button');
       button.type = 'button';
       button.className = `utsu-memory-echo motif-${motif}`;

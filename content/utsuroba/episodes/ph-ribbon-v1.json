@@ -1,0 +1,57 @@
+{
+  "id": "ph_ribbon_v1",
+  "title": "The Ribbon Nobody Claimed",
+  "titleJP": "誰も取りに来なかったリボン",
+  "eyebrow": "REMEMBER THE STORY / 物語を思い出そう",
+  "intro": "Patricia remembers the ribbon. She still isn't sure why she kept the matching one.",
+  "introJP": "パトリシアはリボンを覚えています。なぜ対のリボンを取っておいたのか、まだよく分かりません。",
+  "vocabulary": [
+    {"word":"ribbon","definition":"a long thin strip of cloth used for tying or decorating","definitionJP":"結んだり飾ったりする細長い布"},
+    {"word":"straighten","definition":"to make something neat or in order","definitionJP":"きちんと整えること"},
+    {"word":"wave","definition":"to move your hand to say hello or goodbye","definitionJP":"挨拶やさよならで手を振ること"},
+    {"word":"wait","definition":"to stay in one place until something happens","definitionJP":"何かが起こるまでその場にいること"},
+    {"word":"keep","definition":"to hold onto something and not let it go","definitionJP":"何かを手放さずに持っておくこと"}
+  ],
+  "mechanic": {
+    "type": "memory-theatre",
+    "name": "The Keepsake Box",
+    "nameJP": "思い出の箱",
+    "instruction": "Open one keepsake at a time, darling.",
+    "instructionJP": "一つずつ、思い出を開きましょう、ダーリン。",
+    "complete": "The whole box is open now.",
+    "completeJP": "箱が全部開きました。",
+    "acts": [
+      {"title":"Tying the ribbon","titleJP":"リボンを結ぶ","caption":"Patricia ties a ribbon and straightens a collar.","captionJP":"パトリシアはリボンを結び、襟を整えます。"},
+      {"title":"The wave goodbye","titleJP":"さよならの手振り","caption":"Someone waves and walks away.","captionJP":"誰かが手を振って去っていきます。"},
+      {"title":"The empty hook","titleJP":"空っぽのフック","caption":"No one comes back for the matching ribbon.","captionJP":"対になるリボンを取りに、誰も戻ってきません。"}
+    ]
+  },
+  "trailIntro": "Follow the little moments Patricia kept.",
+  "trailIntroJP": "パトリシアが取っておいた小さな瞬間を追いましょう。",
+  "trail": [
+    {"id":"ph_ribbon_evidence_01","roomId":"room_13","type":"event","label":"01 / TYING THE RIBBON","labelJP":"リボンを結ぶ","title":"A ribbon, tied carefully","titleJP":"丁寧に結ばれたリボン","text":"I tied a ribbon and straightened a collar, just so.","hint":"The next memory is near a room where paths lead away.","hintJP":"次の記憶は、道が離れていく部屋の近くです。"},
+    {"id":"ph_ribbon_evidence_02","roomId":"room_08","type":"detail","label":"02 / THE WAVE GOODBYE","labelJP":"さよならの手振り","title":"A wave, then gone","titleJP":"手を振って、そして消えた","text":"They waved once, and then they were gone.","hint":"The final memory is near a quiet corner you keep passing.","hintJP":"最後の記憶は、いつも通り過ぎる静かな角の近くです。"},
+    {"id":"ph_ribbon_evidence_03","roomId":"room_01","type":"inference","label":"03 / THE EMPTY HOOK","labelJP":"空っぽのフック","title":"A matching ribbon, unclaimed","titleJP":"取りに来られなかった対のリボン","text":"I still have the matching ribbon. No one came back for it.","hint":"Return to Patricia with the three little moments.","hintJP":"三つの小さな瞬間を持って、パトリシアのところへ戻りましょう。"}
+  ],
+  "lines": [
+    {"speaker":"Patricia","en":"I tied a ribbon and straightened a collar, just so."},
+    {"speaker":"Narrator","en":"It was something Patricia did for everyone she cared about."},
+    {"speaker":"Patricia","en":"They waved once, and then they were gone."},
+    {"speaker":"Narrator","en":"Patricia kept the matching ribbon, just in case."},
+    {"speaker":"Patricia","en":"No one ever came back for it. So I keep fussing over everyone else instead."}
+  ],
+  "checks": [
+    {"type":"sequence","sequenceOrder":[0,1,2],"revealAct":0,"evidenceLines":[0],"restoreText":"The first moment returns.","restoreTextJP":"最初の瞬間が戻りました。","label":"01 / ORDER","labelJP":"順番","prompt":"Put Patricia's memory in order.","promptJP":"パトリシアの記憶を順番に並べましょう。","choices":["Patricia tied a ribbon.","They waved and left.","Patricia kept the matching ribbon."],"choicesJP":["パトリシアはリボンを結んだ。","その人は手を振って去った。","パトリシアは対のリボンを取っておいた。"],"correct":0,"evidence":"The ribbon comes first, then the wave goodbye, then the keeping.","evidenceJP":"最初にリボンを結び、次に手を振って別れ、最後に取っておきます。"},
+    {"type":"detail","matchLine":3,"revealAct":1,"evidenceLines":[3],"restoreText":"The empty hook returns.","restoreTextJP":"空っぽのフックが戻りました。","label":"02 / DETAIL","labelJP":"細部","prompt":"Which line tells us what Patricia still has?","promptJP":"パトリシアがまだ持っているものが分かる行はどれですか？","choices":["The matching ribbon.","A new collar.","A second wave goodbye."],"choicesJP":["対のリボン。","新しい襟。","二回目のさよならの手振り。"],"correct":0,"evidence":"The narrator says Patricia kept the matching ribbon, just in case.","evidenceJP":"語り手は、パトリシアが念のため対のリボンを取っておいたと言っています。"},
+    {"type":"inference","supportingLine":4,"revealAct":2,"evidenceLines":[4],"restoreText":"The fussing makes sense now.","restoreTextJP":"世話を焼く理由が分かりました。","label":"03 / GUESS WHY","labelJP":"推測","prompt":"Why does Patricia fuss over every visitor? Then choose the line that proves it.","promptJP":"パトリシアはなぜすべての訪問者の世話を焼くのでしょう？その証拠の行も選びましょう。","choices":["She never got to finish caring for the one she lost.","She collects ribbons as a hobby.","She wants everyone to wave at her."],"choicesJP":["彼女は失った人の世話を最後までできなかったから。","彼女はリボン集めが趣味だから。","彼女はみんなに手を振ってほしいから。"],"correct":0,"evidence":"The final line connects the unclaimed ribbon with fussing over everyone who visits now.","evidenceJP":"最後の行が、取りに来られなかったリボンと、今すべての訪問者の世話を焼くことを結びつけています。"}
+  ],
+  "replayLenses": {
+    "detail": {"label":"FIND THE DETAIL","labelJP":"細部ハント","prompt":"Which detail shows what Patricia still has?","promptJP":"パトリシアがまだ持っているものを示す細部はどれですか？","choices":["The matching ribbon.","A new collar.","A second wave goodbye."],"choicesJP":["対のリボン。","新しい襟。","二回目のさよならの手振り。"],"correct":0,"evidenceLines":[3],"evidence":"The narrator says Patricia kept the matching ribbon, just in case.","evidenceJP":"語り手は、パトリシアが念のため対のリボンを取っておいたと言っています。"},
+    "emotion": {"label":"FIND THE FEELING","labelJP":"気持ちハント","prompt":"How does Patricia's feeling change?","promptJP":"パトリシアの気持ちはどのように変わりますか？","choices":["Caring, then losing, then still caring.","Angry, then bored, then sleepy.","Excited, then shy, then silent."],"choicesJP":["世話をし、そして失い、それでも世話をし続ける。","怒り、そして退屈、そして眠く。","興奮、そして恥ずかしがり、そして沈黙。"],"correct":0,"evidenceLines":[0,2,4],"evidence":"Patricia cares for someone, loses them without warning, and keeps caring for everyone since.","evidenceJP":"パトリシアは誰かの世話をし、突然その人を失い、それ以来みんなの世話を焼き続けています。"},
+    "inference": {"label":"GUESS WHY","labelJP":"推測ハント","prompt":"Why does Patricia fuss over every visitor?","promptJP":"パトリシアはなぜすべての訪問者の世話を焼くのでしょう？","choices":["She never got to finish caring for the one she lost.","She collects ribbons as a hobby.","She wants everyone to wave at her."],"choicesJP":["彼女は失った人の世話を最後までできなかったから。","彼女はリボン集めが趣味だから。","彼女はみんなに手を振ってほしいから。"],"correct":0,"evidenceLines":[4],"evidence":"The final line connects the unclaimed ribbon with fussing over everyone who visits now.","evidenceJP":"最後の行が、取りに来られなかったリボンと、今すべての訪問者の世話を焼くことを結びつけています。"}
+  },
+  "success": "The memory settles. Patricia still fusses over everyone, but now she knows why — and she keeps a spare ribbon ready, just in case.",
+  "successJP": "記憶が落ち着きました。パトリシアは相変わらずみんなの世話を焼きますが、今はその理由が分かります。そして念のため、予備のリボンを用意しています。",
+  "worldEcho": {"roomId":"room_01","x":0.45,"y":0.60,"motif":"ribbon","label":"A ribbon, kept just in case","labelJP":"念のため取っておいたリボン"},
+  "postcard": {"title":"Memory postcard","titleJP":"記憶カード","instruction":"Build a short summary in the best order.","instructionJP":"短いまとめを、よい順番に作りましょう。","chunks":["Patricia tied a ribbon for someone she cared about.","They waved goodbye and never came back.","She keeps a spare ribbon, just in case."],"chunksJP":["パトリシアは大切な人にリボンを結んだ。","その人は手を振って去り、二度と戻らなかった。","彼女は念のため予備のリボンを持っている。"],"order":[0,1,2],"savedText":"Patricia tied a ribbon for someone she cared about. They waved goodbye and never came back. She keeps a spare ribbon, just in case."}
+}

@@ -199,9 +199,12 @@ window.UTSUROBA_DATA = {
       nameKanji   : 'ブレイクスリー・カシディ',
       
       greeting    : ['…What are you.', 'Don\'t answer that.', 'You look like something someone stepped on.', 'Come back later.'],
+      questLines  : ['…Still here.', 'Ugh. Fine.', 'I lost something.', 'Don\'t ask why it matters.', 'Find it. Don\'t make a thing of it.'],
       sprite1     : './assets/img/drifters/blakesly_kassidy-1.png',
       sprite2     : './assets/img/drifters/blakesly_kassidy-2.png',
-      memoryCount : 0,
+      episodeId   : 'bk_badge_v1',
+      restoredGreeting: ['…You actually found it.', 'Don\'t look so pleased with yourself.', 'Fine. You\'re not completely useless.'],
+      memoryCount : 1,
       scale       : 0.22,
     },
     {
@@ -210,9 +213,12 @@ window.UTSUROBA_DATA = {
       nameKanji   : 'パトリシア・ホリングスヘッド',
       
       greeting    : ['Oh my…', 'You\'re just the cutest thing, aren\'t you.', 'Don\'t wander too far, okay?', 'Come back and see me later.'],
+      questLines  : ['Oh, you again! Wonderful.', 'Come here, let me fix your collar.', 'I lost something of mine, sweetpea.', 'Would you find it for me? Pretty please?'],
       sprite1     : './assets/img/drifters/patricia_hollingshead-1.png',
       sprite2     : './assets/img/drifters/patricia_hollingshead-2.png',
-      memoryCount : 0,
+      episodeId   : 'ph_ribbon_v1',
+      restoredGreeting: ['There you are!', 'You found it — come here, let me squeeze your cheeks.', 'I knew you had a good heart.'],
+      memoryCount : 1,
       scale       : 0.24,
     },
   ],
