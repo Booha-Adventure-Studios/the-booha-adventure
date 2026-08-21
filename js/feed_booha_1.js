@@ -91,6 +91,10 @@
   const SAFETY_CATCH_DIST  = 62;
   const SAFETY_CATCH_STEER = 0.045;
   const LAST_CHANCE_DIST   = 90;
+  // Fans only push while activated by a tap (see activateFan/tapObjects).
+  // Full impulse while active, so a tap reads as a clear, controllable
+  // shove instead of a constant ambient breeze the player never asked for.
+  const FAN_FORCE          = 0.58;
 
   const swipe        = { active: false, x0: 0, y0: 0, x1: 0, y1: 0, startX: 0, startY: 0 };
   // v7: poof effects replace slash effects
@@ -1150,14 +1154,12 @@
     const c = state.candy;
     if (!c || c.attached) return;
     for (const obj of state.objects) {
-      if (obj.type !== 'fan') continue;
-      const baseForce  = 0.32 * (dt / 16.667);
-      const burstForce = obj.fanTimer > 0 ? 0.26 * (dt / 16.667) : 0;
-      const f = baseForce + burstForce;
+      if (obj.type !== 'fan' || obj.fanTimer <= 0) continue;
+      const f = FAN_FORCE * (dt / 16.667);
       if (obj.direction === 'right') c.vx += f;
       else if (obj.direction === 'left')  c.vx -= f;
       else if (obj.direction === 'up')    c.vy -= f * 1.2;
-      if (obj.fanTimer > 0) obj.fanTimer -= dt;
+      obj.fanTimer -= dt;
     }
   }
 
