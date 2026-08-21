@@ -910,6 +910,8 @@ const HAPPY_HOUSE_PORTAL = {
   function wpopSetIconImage(prefix, src, alt) {
     const img = document.getElementById(prefix + '-icon-img');
     const orb = document.getElementById(prefix + '-icon-orb');
+    const wrap = document.getElementById(prefix + '-icon-wrap');
+    if (wrap) { wrap.classList.add('image-mode'); wrap.classList.remove('orb-mode'); }
     if (orb) orb.style.display = 'none';
     if (img) { img.src = src; img.alt = alt || ''; img.style.display = ''; }
   }
@@ -917,6 +919,8 @@ const HAPPY_HOUSE_PORTAL = {
   function wpopSetIconOrb(prefix, background, glow) {
     const img = document.getElementById(prefix + '-icon-img');
     const orb = document.getElementById(prefix + '-icon-orb');
+    const wrap = document.getElementById(prefix + '-icon-wrap');
+    if (wrap) { wrap.classList.add('orb-mode'); wrap.classList.remove('image-mode'); }
     if (img) img.style.display = 'none';
     if (orb) {
       orb.style.display    = '';
@@ -1002,6 +1006,13 @@ const HAPPY_HOUSE_PORTAL = {
     destruction: { bg:'#0e0800', border:'#3d1a00', accent1:'#ff6644', accent2:'#ffaa22', accent3:'#ffcc88', glow1:'rgba(255,102,68,.55)',  glow2:'rgba(255,170,34,.35)',  btnBorder:'rgba(255,102,68,.85)',  btnColor:'#ffddcc', orbColors:['#ff6644','#cc3311','#ffaa22'] },
   };
 
+  const BONUS_POP_IMAGES = {
+    booha_destruction: { src: 'assets/destruction/optimized/booha_helmet_256.png', alt: 'Booha helmet' },
+    feed_booha:        { src: 'assets/feed/boo-eat.png',                       alt: 'Booha eating' },
+    booha_invaders:    { src: 'assets/invaders/bug-1.png',                     alt: 'Booha invader' },
+    booha_blocks:      { src: 'assets/blocks/red_block.png',                   alt: 'Red block' },
+  };
+
   function injectBonusPopOverlay() {
     if (bonusPopOverlay) return;
     bonusPopOverlay = document.createElement('div');
@@ -1020,10 +1031,14 @@ const HAPPY_HOUSE_PORTAL = {
     const t = BONUS_THEMES[tree.theme] || BONUS_THEMES.mystery;
     wpopThemeBox('bonus-pop', t);
 
-    // Pure CSS/canvas-style gradient orb — no emoji standing in as the icon.
-    wpopSetIconOrb('bonus-pop',
-      `radial-gradient(circle at 35% 32%,#ffffff,${t.orbColors[0]},${t.orbColors[1]})`,
-      `0 0 14px ${t.orbColors[0]}cc,0 0 32px ${t.orbColors[0]}88,0 0 60px ${t.orbColors[1]}55`);
+    const bonusImage = BONUS_POP_IMAGES[tree.id];
+    if (bonusImage) {
+      wpopSetIconImage('bonus-pop', bonusImage.src, bonusImage.alt);
+    } else {
+      wpopSetIconOrb('bonus-pop',
+        `radial-gradient(circle at 35% 32%,#ffffff,${t.orbColors[0]},${t.orbColors[1]})`,
+        `0 0 14px ${t.orbColors[0]}cc,0 0 32px ${t.orbColors[0]}88,0 0 60px ${t.orbColors[1]}55`);
+    }
     wpopSetLock('bonus-pop', !unlocked);
 
     wpopSetText(document.getElementById('bonus-pop-eyebrow-en'), unlocked ? 'GAME UNLOCKED' : 'GAME LOCKED');
@@ -1287,7 +1302,7 @@ const HAPPY_HOUSE_PORTAL = {
 
   function openHappyHousePop() {
     wpopThemeBox('happy-house-pop', HAPPY_HOUSE_THEME);
-    wpopSetIconImage('happy-house-pop', 'assets/happy_house/mister_happy-1.png', 'Mister Happy');
+    wpopSetIconImage('happy-house-pop', 'assets/happy_house/mister_happy-2.png', 'Mister Happy');
     wpopSetLock('happy-house-pop', false);
 
     wpopSetText(document.getElementById('happy-house-pop-eyebrow-en'), 'AN INVITATION');
@@ -1693,8 +1708,11 @@ const HAPPY_HOUSE_PORTAL = {
       .wpop-close{position:absolute;top:2px;right:2px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:transparent;border:none;cursor:pointer;font-size:1.05rem;line-height:1;padding:0;opacity:.5;transition:opacity .18s;z-index:3;color:inherit;}
       .wpop-close:hover,.wpop-close:focus-visible{opacity:1;}
       .wpop-icon-wrap{width:clamp(60px,15vw,80px);height:clamp(60px,15vw,80px);margin:0 auto 14px;position:relative;border-radius:50%;display:flex;align-items:center;justify-content:center;animation:wpopIconPulse 2.8s ease-in-out infinite;}
+      .wpop-icon-wrap.image-mode{width:clamp(88px,19vw,122px);height:clamp(106px,25vw,156px);border-radius:12px;filter:drop-shadow(0 0 8px var(--wc1,#fff)) drop-shadow(0 0 26px var(--wc2,#fff));}
+      .wpop-icon-wrap.image-mode::before{content:"";position:absolute;inset:-28%;z-index:0;border-radius:50%;background:radial-gradient(ellipse,var(--wc1,#fff) 0%,var(--wc2,#fff) 34%,transparent 72%);opacity:.28;filter:blur(14px);pointer-events:none;}
       @keyframes wpopIconPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.05);}}
-      .wpop-icon-wrap img{width:100%;height:100%;object-fit:cover;border-radius:50%;position:relative;z-index:1;}
+      .wpop-icon-wrap img{width:100%;height:100%;object-fit:contain;border-radius:10px;position:relative;z-index:1;}
+      .wpop-icon-wrap.orb-mode img{border-radius:50%;}
       .wpop-icon-wrap .wpop-icon-orb{width:100%;height:100%;border-radius:50%;position:relative;z-index:1;}
       .wpop-lock-badge{position:absolute;bottom:-2px;right:-2px;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;z-index:2;background:#170f22;border:1.5px solid rgba(255,255,255,.3);color:#fff;}
       .wpop-eyebrow-en{font-size:clamp(.6rem,1.7vw,.68rem);letter-spacing:.22em;text-transform:uppercase;margin:0 0 2px;opacity:.75;font-family:'Nunito',system-ui,sans-serif;font-weight:800;}
@@ -1824,7 +1842,7 @@ const HAPPY_HOUSE_PORTAL = {
       btnBorder: 'rgba(45,212,191,.9)', btnColor: '#d6fff6',
     };
     wpopThemeBox('portal', PROFILE_THEME);
-    wpopSetIconImage('portal', 'assets/img/profile.png', 'Your profile');
+    wpopSetIconImage('portal', 'assets/img/boo-moon.png', 'Your profile');
     wpopSetLock('portal', false);
     wpopSetText(document.getElementById('portal-title-en'), '');
     wpopSetText(document.getElementById('portal-title-jp'), '');
