@@ -20,7 +20,9 @@ assert.match(start, /endVideoEl\.style\.opacity="0"/);
 
 const audio = engine.slice(engine.indexOf('function retryAudioElement'), engine.indexOf('// ════════════════════════════════════════\n// ASSETS'));
 assert.match(audio, /catch \(_\) \{ retryAudioElement\(el\); \}/);
-assert.match(audio, /if \(!el \|\| paused\) return/);
+// Pass 10 added a `|| muted` arm to this same early-return — still the
+// same "no element, paused, or (now) muted → don't play" guard.
+assert.match(audio, /if \(!el \|\| paused(?: \|\| muted)?\) return/);
 
 assert.match(data, /introDelaySec:\s*0\.35/);
 assert.match(data, /waveCardSec:\s*1\.15/);

@@ -43,6 +43,26 @@ let audioCtx = null, audioMaster = null, audioReady = false;
 let audioRetryTimer = 0, lastFireSfxAt = 0;
 let bossMusicIdx = 0;
 
+// Mute — a per-game preference (matches Booha Destruction's pattern),
+// gated at every playback entry point rather than a volume/gain change so
+// it's an unambiguous on/off.
+const INVADERS_MUTE_KEY = "booha_invaders_muted";
+let muted = false;
+function readMutePreference() {
+  try { muted = window.localStorage?.getItem(INVADERS_MUTE_KEY) === "1"; }
+  catch (_) { muted = false; }
+}
+function toggleMute() {
+  muted = !muted;
+  try { window.localStorage?.setItem(INVADERS_MUTE_KEY, muted ? "1" : "0"); } catch (_) {}
+  if (muted) {
+    pauseAllMusic();
+    for (const el of candySfxPool) { try { el.pause(); el.currentTime = 0; } catch (_) {} }
+  } else if (started && !paused) {
+    resumeAllMusic();
+  }
+}
+
 // A small rotating pool of persistently-referenced candy-pickup clones.
 // Cloning-and-discarding a single Audio() per pickup left the clone with no
 // live reference anywhere, so it could be garbage-collected mid-playback
@@ -62,6 +82,7 @@ const HUD_PAD = 12;
 const PAUSE_BTN = { x: 0, y: 0, w: 36, h: 36 };
 const PAUSE_EXIT_BTN = { x: 0, y: 0, w: 0, h: 0 };
 const PAUSE_SAVE_BTN = { x: 0, y: 0, w: 0, h: 0 };
+const PAUSE_MUTE_BTN = { x: 0, y: 0, w: 0, h: 0 };
 
 // Lives / score / combo
 let lives = PLAYER_CONFIG.maxLives;
@@ -380,6 +401,7 @@ function playTone(kind) {
 }
 
 function playSfx(kind) {
+  if (muted) return;
   ensureAudio();
   if (kind === "fire" || kind === "weakFire") {
     const now = performance.now();
@@ -395,7 +417,7 @@ function retryAudioElement(el) {
   audioRetryTimer = setTimeout(() => playAudioElement(el), 900);
 }
 function playAudioElement(el) {
-  if (!el || paused) return;
+  if (!el || paused || muted) return;
   try {
     const promise = el.play();
     if (promise?.catch) promise.catch(() => retryAudioElement(el));
@@ -419,6 +441,7 @@ function setPaused(on) {
   if (paused) pauseAllMusic(); else resumeAllMusic();
 }
 function playCandySfx() {
+  if (muted) return;
   try {
     ensureAudio();
     if (!candySfxPool.length) { playSfx("pickup"); return; }
@@ -2087,20 +2110,35 @@ function drawPauseOverlay() {
   ctx.fillText("▶  RESUME",cx,resumeY+btnH/2-7);
   ctx.font=`700 ${Math.max(9,rfsz*0.62)}px system-ui,sans-serif`; ctx.fillStyle="#152040"; ctx.fillText("つづける",cx,resumeY+btnH/2+13); ctx.restore();
 
-  const saveW=clamp(W()*0.52,180,340), saveH=clamp(H()*0.065,38,52), saveX=cx-saveW/2;
-  const saveY=resumeY+btnH+clamp(H()*0.018,8,16);
-  PAUSE_SAVE_BTN.x=saveX; PAUSE_SAVE_BTN.y=saveY; PAUSE_SAVE_BTN.w=saveW; PAUSE_SAVE_BTN.h=saveH;
+  // SAVE and MUTE share one row (instead of stacking a 4th full-width row)
+  // so adding mute doesn't push the pause menu further past short-viewport
+  // landscape heights than it already was after the save row landed.
+  const rowW=clamp(W()*0.52,180,340), rowH=clamp(H()*0.065,38,52), rowGap=10;
+  const halfW=(rowW-rowGap)/2, rowX=cx-rowW/2, saveY=resumeY+btnH+clamp(H()*0.018,8,16);
+  const saveX=rowX, muteX=rowX+halfW+rowGap;
+  PAUSE_SAVE_BTN.x=saveX; PAUSE_SAVE_BTN.y=saveY; PAUSE_SAVE_BTN.w=halfW; PAUSE_SAVE_BTN.h=rowH;
+  PAUSE_MUTE_BTN.x=muteX; PAUSE_MUTE_BTN.y=saveY; PAUSE_MUTE_BTN.w=halfW; PAUSE_MUTE_BTN.h=rowH;
+
   ctx.save(); ctx.fillStyle="rgba(168,245,196,0.10)"; ctx.strokeStyle="rgba(168,245,196,0.55)"; ctx.lineWidth=1.5;
-  roundRect(saveX,saveY,saveW,saveH,saveH/2); ctx.fill(); ctx.stroke();
+  roundRect(saveX,saveY,halfW,rowH,rowH/2); ctx.fill(); ctx.stroke();
   ctx.textAlign="center"; ctx.textBaseline="middle";
-  const svsz=clamp(W()*0.030,12,20); ctx.font=`900 ${svsz}px system-ui,sans-serif`;
+  const svsz=clamp(W()*0.026,11,17); ctx.font=`900 ${svsz}px system-ui,sans-serif`;
   ctx.shadowBlur=10; ctx.shadowColor="rgba(168,245,196,.8)"; ctx.fillStyle="rgba(168,245,196,.95)";
-  ctx.fillText("💾 SAVE",cx,saveY+saveH/2-6);
-  ctx.font=`700 ${Math.max(9,svsz*0.62)}px system-ui,sans-serif`; ctx.shadowBlur=0; ctx.fillStyle="rgba(220,255,230,.85)";
-  ctx.fillText("セーブ",cx,saveY+saveH/2+12); ctx.restore();
+  ctx.fillText("💾 SAVE",saveX+halfW/2,saveY+rowH/2-6);
+  ctx.font=`700 ${Math.max(8,svsz*0.62)}px system-ui,sans-serif`; ctx.shadowBlur=0; ctx.fillStyle="rgba(220,255,230,.85)";
+  ctx.fillText("セーブ",saveX+halfW/2,saveY+rowH/2+11); ctx.restore();
+
+  ctx.save(); ctx.fillStyle="rgba(255,255,255,0.06)"; ctx.strokeStyle="rgba(255,255,255,0.30)"; ctx.lineWidth=1.5;
+  roundRect(muteX,saveY,halfW,rowH,rowH/2); ctx.fill(); ctx.stroke();
+  ctx.textAlign="center"; ctx.textBaseline="middle";
+  const mtsz=clamp(W()*0.026,11,17); ctx.font=`900 ${mtsz}px system-ui,sans-serif`;
+  ctx.shadowBlur=8; ctx.shadowColor="rgba(255,255,255,.5)"; ctx.fillStyle="rgba(255,255,255,.9)";
+  ctx.fillText(muted ? "🔇 OFF" : "🔊 ON",muteX+halfW/2,saveY+rowH/2-6);
+  ctx.font=`700 ${Math.max(8,mtsz*0.62)}px system-ui,sans-serif`; ctx.shadowBlur=0; ctx.fillStyle="rgba(220,220,230,.75)";
+  ctx.fillText(muted ? "サウンドオフ" : "サウンドオン",muteX+halfW/2,saveY+rowH/2+11); ctx.restore();
 
   const exitW=clamp(W()*0.52,180,340), exitH=clamp(H()*0.065,38,52), exitX=cx-exitW/2;
-  const exitY=saveY+saveH+clamp(H()*0.018,8,16);
+  const exitY=saveY+rowH+clamp(H()*0.018,8,16);
   PAUSE_EXIT_BTN.x=exitX; PAUSE_EXIT_BTN.y=exitY; PAUSE_EXIT_BTN.w=exitW; PAUSE_EXIT_BTN.h=exitH;
   ctx.save(); ctx.fillStyle="rgba(255,255,255,0.07)"; ctx.strokeStyle="rgba(255,80,80,0.60)"; ctx.lineWidth=1.5;
   roundRect(exitX,exitY,exitW,exitH,exitH/2); ctx.fill(); ctx.stroke();
@@ -2433,9 +2471,13 @@ if (IS_COARSE && mobileControls) {
     if (inEdgeZone(e.clientX,30)) return;
     if (paused) {
       e.preventDefault();
-      const ex=PAUSE_EXIT_BTN, sv=PAUSE_SAVE_BTN;
+      const ex=PAUSE_EXIT_BTN, sv=PAUSE_SAVE_BTN, mt=PAUSE_MUTE_BTN;
       if (e.clientX>=sv.x&&e.clientX<=sv.x+sv.w&&e.clientY>=sv.y&&e.clientY<=sv.y+sv.h) {
         if (window.BoohaSaveMenu) BoohaSaveMenu.open();
+        return;
+      }
+      if (e.clientX>=mt.x&&e.clientX<=mt.x+mt.w&&e.clientY>=mt.y&&e.clientY<=mt.y+mt.h) {
+        toggleMute();
         return;
       }
       if (e.clientX>=ex.x&&e.clientX<=ex.x+ex.w&&e.clientY>=ex.y&&e.clientY<=ex.y+ex.h) {
@@ -2459,9 +2501,13 @@ canvas.addEventListener("pointerdown", (e) => {
   if (IS_COARSE && !paused && !hitPauseBtn(e.clientX,e.clientY)) return;
   if (paused) {
     e.preventDefault();
-    const ex=PAUSE_EXIT_BTN, sv=PAUSE_SAVE_BTN;
+    const ex=PAUSE_EXIT_BTN, sv=PAUSE_SAVE_BTN, mt=PAUSE_MUTE_BTN;
     if (e.clientX>=sv.x&&e.clientX<=sv.x+sv.w&&e.clientY>=sv.y&&e.clientY<=sv.y+sv.h) {
       if (window.BoohaSaveMenu) BoohaSaveMenu.open();
+      return;
+    }
+    if (e.clientX>=mt.x&&e.clientX<=mt.x+mt.w&&e.clientY>=mt.y&&e.clientY<=mt.y+mt.h) {
+      toggleMute();
       return;
     }
     if (e.clientX>=ex.x&&e.clientX<=ex.x+ex.w&&e.clientY>=ex.y&&e.clientY<=ex.y+ex.h) {
@@ -2640,6 +2686,7 @@ function startInvadersRun(continueRun) {
 
 (async function boot() {
   resize();
+  readMutePreference();
 
   // Load friend images at runtime
   for (const fd of FRIENDS_RUNTIME) {
