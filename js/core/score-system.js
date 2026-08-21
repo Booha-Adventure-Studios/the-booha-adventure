@@ -21,6 +21,10 @@ const BoohaScoreSystem = (() => {
       attempts:     0,
       bestTime:     null,
       lastTime:     null,
+      bestLines:    0,
+      lastLines:    0,
+      bestLevel:    0,
+      bestCombo:    0,
       lastPlayedAt: null,
     };
   }
@@ -51,6 +55,13 @@ const BoohaScoreSystem = (() => {
         isBestTime = true;
       }
     }
+
+    if (Number.isFinite(opts.lines)) {
+      entry.lastLines = Math.max(0, opts.lines);
+      entry.bestLines = Math.max(entry.bestLines || 0, opts.lines);
+    }
+    if (Number.isFinite(opts.level)) entry.bestLevel = Math.max(entry.bestLevel || 0, opts.level);
+    if (Number.isFinite(opts.maxCombo)) entry.bestCombo = Math.max(entry.bestCombo || 0, opts.maxCombo);
 
     entry.attempts++;
     entry.lastPlayedAt = Date.now();

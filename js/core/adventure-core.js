@@ -137,13 +137,13 @@ const BoohaAdventure = (() => {
 
     // ── Auto-submit scores from booha:gameEnd ────────────────────────────────
     document.addEventListener('booha:gameEnd', (e) => {
-      const { saveId, score, completed, time } = e.detail || {};
+      const { saveId, score, completed, time, lines, level, maxCombo } = e.detail || {};
       if (!saveId || score == null) {
         console.warn('[BoohaAdventure] booha:gameEnd missing saveId or score.', e.detail);
         return;
       }
       if (BoohaAdventure.scores) {
-        BoohaAdventure.scores.submit(saveId, score, { completed, time });
+        BoohaAdventure.scores.submit(saveId, score, { completed, time, lines, level, maxCombo });
         if (window.BoohaSync) BoohaSync.checkpoint('adventure');
       } else {
         console.warn('[BoohaAdventure] booha:gameEnd fired before scoreSystem ready.');
