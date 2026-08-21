@@ -280,14 +280,8 @@
     for (let i = 1; i <= d.memoryCount; i++) if (!rec.completed.includes(i)) pool.push(i);
     return pool.length ? pool[Math.floor(Math.random() * pool.length)] : null;
   }
-  function pickDecoys(n) {
-    const pool = Array.from({ length: DATA.decoyCount }, (_,i) => i+1);
-    return seededShuffle(pool, Math.floor(Math.random()*999999)).slice(0, n);
-  }
-
   function activateQuest(id) {
     const memIdx = pickRandomMemory(id); if (memIdx === null) return null;
-    const decoys = pickDecoys(DATA.decoysPerQuest);
     const drifter = DATA.drifters.find(d => d.id === id);
     const data   = loadSave();
     if (!data.weekly) data.weekly = {};
@@ -301,7 +295,6 @@
       collectedFragments: [],
       theatreIndex     : 0,
       mechanicIndex    : 0,
-      decoys,
       collectedMemoryId: null,
       orbIsCorrect     : false,
     };
@@ -340,18 +333,6 @@
     return (utsu.drifters?.[id]?.wrongWeek ?? -1) === getWeekSeed();
   }
 
-  function questAudioSrc(id, memIdx) {
-    const d = DATA.drifters.find(x => x.id === id); if (!d) return null;
-    return `./assets/audio/memories/${d.audioPrefix}_q${String(memIdx).padStart(2,'0')}.mp3`;
-  }
-
-  let activeAudio = null;
-  function stopActiveAudio() {
-    if (!activeAudio) return;
-    try { activeAudio.pause(); activeAudio.currentTime = 0; } catch(_) {}
-    activeAudio = null;
-  }
-
   /* ═══════════════════════════════════════════
      STATE
   ═══════════════════════════════════════════ */
@@ -370,14 +351,13 @@
 
   let pins = [], trail = [], ripples = [];
   const ghostImg = new Image(); ghostImg.src = './assets/img/booha_ghost.png';
-  const music = new Audio('./assets/audio/utsuroba-music.mp3'); music.loop = true; music.volume = 0.65;
+  const music = { play: () => Promise.resolve(), pause: () => {}, currentTime: 0 };
 
   let app, stage, canvas, ctx, roomLayer;
   let coordToggle, coordReadout, pinLog;
   let exitPopOverlay = null, exitPopCooldownUntil = 0;
   let drifterPanel = null, drifterPanelOpen = false, drifterPanelCooldown = 0;
 
-  let isMemoryPlaying  = false;
   let drifterFadeStart = 0;
   let _lastWrongId     = '';
 
@@ -462,9 +442,6 @@
       .dp-btn.yes:hover{background:#3a2810;}
       .dp-btn.no{background:transparent;border:1px solid #b8a478;color:#9a7850;}
       .dp-btn.no:hover{border-color:#806030;color:#4a2c08;}
-      .dp-audio-btn{display:flex;align-items:center;gap:7px;background:#f0e8d0;border:1px solid #c0a060;color:#4a2c08;font-family:'Georgia',serif;font-size:clamp(.70rem,1.8vw,.82rem);letter-spacing:.08em;padding:7px 16px;border-radius:4px;cursor:pointer;transition:all .16s;margin-bottom:9px;}
-      .dp-audio-btn:hover{background:#e8dab8;}
-      .dp-audio-btn:disabled{opacity:.45;cursor:default;}
     `;
     document.head.appendChild(s);
   }
@@ -589,7 +566,6 @@
   function doExitToKarasuki() {
     if (state.exitingToKarasuki) return;
     state.exitingToKarasuki = true; state.clickTarget = null; state.moving = false;
-    stopActiveAudio();
     try { music.pause(); music.currentTime = 0; } catch(_) {}
     exitPopOverlay.style.display = 'none';
     const fadeEl = document.getElementById('buki-fade');
@@ -624,10 +600,6 @@
     const quest       = forcedQuest || getCachedQuest();
     const hasMemories = drifterHasMemories(drifter.id);
 
-    const currentAudioSrc = (quest && quest.active === drifter.id)
-      ? questAudioSrc(quest.active, quest.memIdx)
-      : null;
-
     /* ── build post-greeting action HTML ── */
     let actionHTML = '';
 
@@ -646,7 +618,6 @@
         <p class="dp-line-en" style="margin-bottom:2px;">${wl.en}</p>
         <div class="dp-divider"></div>
         <div style="display:flex;align-items:center;gap:10px;margin-top:10px;">
-          <button class="dp-audio-btn" id="dp-replay-btn" style="margin-bottom:0;">▶ Play / 聴く</button>
           <button class="dp-btn no" id="dp-cancel-quest-btn">Cancel / キャンセル</button>
         </div>`;
 
@@ -661,7 +632,6 @@
         <p class="dp-line-en" style="margin-bottom:2px;">You have a memory… give it to me?</p>
         <div class="dp-divider"></div>
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:9px;margin-top:10px;">
-          <button class="dp-audio-btn" id="dp-replay-btn" style="margin-bottom:0;">▶ Play / 聴く</button>
           <button class="dp-btn no" id="dp-cancel-quest-btn">Cancel / キャンセル</button>
         </div>
         <div class="dp-btns">
@@ -778,33 +748,6 @@
         }, PANEL_SLIDE_MS + 20);
       });
 
-      const replayBtn = drifterPanel.querySelector('#dp-replay-btn');
-      if (replayBtn) {
-        if (!currentAudioSrc) {
-          replayBtn.disabled = true;
-        } else {
-          if (isMemoryPlaying) replayBtn.disabled = true;
-          replayBtn.addEventListener('click', () => {
-            if (isMemoryPlaying) return;
-            isMemoryPlaying       = true;
-            replayBtn.disabled    = true;
-            replayBtn.textContent = '▶ Playing…';
-            stopActiveAudio();
-            const a = new Audio(currentAudioSrc);
-            activeAudio = a;
-            a.play().catch(() => {});
-            a.onended = () => {
-              if (activeAudio === a) activeAudio = null;
-              isMemoryPlaying = false;
-              if (replayBtn.isConnected) {
-                replayBtn.disabled    = false;
-                replayBtn.textContent = '▶ Play / 聴く';
-              }
-            };
-          });
-        }
-      }
-
       const resumeReadingBtn = drifterPanel.querySelector('#dp-resume-reading');
       if (resumeReadingBtn) resumeReadingBtn.addEventListener('click', () => {
         const q = getCachedQuest();
@@ -813,7 +756,6 @@
 
       const cancelQuestBtn = drifterPanel.querySelector('#dp-cancel-quest-btn');
       if (cancelQuestBtn) cancelQuestBtn.addEventListener('click', () => {
-        stopActiveAudio();
         clearQuest();
         closeDrifterPanel();
       });
@@ -848,8 +790,6 @@
     drifterPanelCooldown = performance.now() + POPUP_COOLDOWN_MS;
     drifterPanelOpen     = false;
     drifterPanel.classList.remove('open');
-    stopActiveAudio();
-    isMemoryPlaying = false;
     setTimeout(() => { state.inputLocked = false; }, PANEL_SLIDE_MS);
     try { music.play().catch(() => {}); } catch(_) {}
   }
@@ -919,21 +859,18 @@
     state.celebrateSpinStart = performance.now();
     state.celebrateDrifter   = drifter;
     danceSparkles            = [];
-    stopActiveAudio();
     try { music.pause(); } catch(_) {}
 
     const pos = drifterWorldPos(drifter, weeklyRooms[DATA.drifters.indexOf(drifter)]);
     state.celebrateOrbitX = pos.x;
     state.celebrateOrbitY = pos.y;
 
-    const danceAudio = new Audio('./assets/audio/boo-dance.mp3');
-    danceAudio.volume = 0.85;
-    setTimeout(() => { danceAudio.play().catch(() => {}); }, 300);
-
-    danceAudio.onended = () => {
+    const finishCelebration = () => {
+      if (!state.celebrating) return;
       state.celebrateSettling    = true;
       state.celebrateSettleStart = performance.now();
       setTimeout(() => {
+        if (!state.celebrating) return;
         state.celebrateDancing  = false;
         state.celebrateSettling = false;
         state.celebrating       = false;
@@ -946,9 +883,7 @@
       }, 1000);
     };
 
-    setTimeout(() => {
-      if (state.celebrating) danceAudio.dispatchEvent(new Event('ended'));
-    }, 18000);
+    setTimeout(finishCelebration, 2200);
 
     state.celebrateDancing = true;
   }
@@ -1527,7 +1462,7 @@
   /* ═══════════════════════════════════════════
      MUSIC + INPUT
   ═══════════════════════════════════════════ */
-  function startMusic() { if (state.musicStarted) return; state.musicStarted=true; music.play().catch(()=>{}); }
+  function startMusic() { if (state.musicStarted) return; state.musicStarted=true; }
 
   function stagePointToWorld(cx,cy) {
     const rect = stage.getBoundingClientRect();

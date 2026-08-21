@@ -24,7 +24,6 @@ window.UTSUROBA_DATA = {
       questLines      : ['…What.', 'You again.', 'Don\'t just stand there.', 'I lost something.', 'A memory.', 'Go find it.'],
       sprite1         : './assets/img/drifters/kurobane_shizuma-1.png',
       sprite2         : './assets/img/drifters/kurobane_shizuma-2.png',
-      audioPrefix     : 'ks',
       episodeId       : 'ks_lantern_v1',
       memoryCount     : 1,
       scale           : 0.18,
@@ -38,7 +37,6 @@ window.UTSUROBA_DATA = {
       questLines      : ['Oh! Hey hey hey!', 'You came back!', 'I\'ve been waiting!', 'I lost a memory somewhere out there…', 'Will you find it for me? Please please please?'],
       sprite1         : './assets/img/drifters/ned-the-oogle-1.png',
       sprite2         : './assets/img/drifters/ned-the-oogle-2.png',
-      audioPrefix     : 'nto',
       episodeId       : 'nto_candy_v1',
       memoryCount     : 1,
       scale           : 0.18,
@@ -52,7 +50,6 @@ window.UTSUROBA_DATA = {
       questLines      : ['Ah—!', 'Oh… it\'s you.', 'Sorry, you startled me again…', 'Um…', 'I think I lost something.', 'A memory…', 'Would you… maybe… help me find it?'],
       sprite1         : './assets/img/drifters/chagrin_gobito-1.png',
       sprite2         : './assets/img/drifters/chagrin_gobito-2.png',
-      audioPrefix     : 'cg',
       episodeId       : 'cg_door_v1',
       memoryCount     : 1,
       scale           : 0.11,
@@ -65,7 +62,6 @@ window.UTSUROBA_DATA = {
       greeting    : ['Hey…', 'You made it this far, huh.', 'I just got here myself.', 'Come back later.'],
       sprite1     : './assets/img/drifters/bryan_harper-1.png',
       sprite2     : './assets/img/drifters/bryan_harper-2.png',
-      audioPrefix : 'bh',
       memoryCount : 0,
       scale       : 0.25,
     },
@@ -77,7 +73,6 @@ window.UTSUROBA_DATA = {
       greeting    : ['…What are you.', 'Don\'t answer that.', 'You look like something someone stepped on.', 'Come back later.'],
       sprite1     : './assets/img/drifters/blakesly_kassidy-1.png',
       sprite2     : './assets/img/drifters/blakesly_kassidy-2.png',
-      audioPrefix : 'bk',
       memoryCount : 0,
       scale       : 0.22,
     },
@@ -89,21 +84,10 @@ window.UTSUROBA_DATA = {
       greeting    : ['Oh my…', 'You\'re just the cutest thing, aren\'t you.', 'Don\'t wander too far, okay?', 'Come back and see me later.'],
       sprite1     : './assets/img/drifters/patricia_hollingshead-1.png',
       sprite2     : './assets/img/drifters/patricia_hollingshead-2.png',
-      audioPrefix : 'ph',
       memoryCount : 0,
       scale       : 0.24,
     },
   ],
-
-  /* ─────────────────────────────────────────────────────────
-     DECOY COUNT
-     How many decoy audio files exist (decoy_01.mp3 … decoy_NN.mp3).
-     Increment when you add more decoys.
-  ───────────────────────────────────────────────────────── */
-  decoyCount: 6,
-
-  /* How many decoys appear alongside the correct orb */
-  decoysPerQuest: 3,
 
   rooms: {
 

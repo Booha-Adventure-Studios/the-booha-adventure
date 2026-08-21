@@ -65,6 +65,7 @@ for (const entry of index.episodes) {
     assert.ok(trail.hint && trail.hintJP,
       `${label}: bilingual next-step direction is required`);
     assert.ok(!('textJP' in trail), `${label}: conversation evidence must be English-only`);
+    assert.ok(!('audioFile' in trail), `${label}: evidence trail must not depend on audio`);
   }
 
   for (const [checkIndex, check] of episode.checks.entries()) {
