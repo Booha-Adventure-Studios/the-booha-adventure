@@ -99,23 +99,16 @@
         </div>
       </header>
 
-      <!-- HUD: Level + State left | Stars right -->
+      <!-- HUD: Level + Score left | Total stars right -->
       <section id="hud" class="hud" aria-label="Game status / ゲームの状態">
         <div class="hud-left">
-          <div class="hud-pill">
-            <span class="hud-label">Lv</span>
+          <div class="hud-pill hud-level-pill">
+            <span class="hud-label">LV</span>
             <strong id="levelText" class="hud-level-num">1</strong>
           </div>
-          <div class="hud-pill">
-            <strong id="stateText" aria-live="polite"><span class="bilingual-en">Ready</span><span class="bilingual-ja">準備OK</span></strong>
-          </div>
-          <div class="hud-pill">
+          <div class="hud-pill hud-score-pill">
             <span class="hud-label"><span>Score</span><span>スコア</span></span>
-            <strong id="scoreText">0</strong>
-          </div>
-          <div class="hud-pill">
-            <span class="hud-label"><span>Stars</span><span>スター</span></span>
-            <strong id="levelStarsText">☆☆☆</strong>
+            <strong id="scoreText" aria-live="polite">0</strong>
           </div>
         </div>
         <div class="hud-stars" id="hudStars" aria-label="Total stars earned / 合計スター">
@@ -125,7 +118,7 @@
       </section>
 
       <nav class="bottom-actions" aria-label="Game controls / ゲーム操作">
-        <button id="bottomRestartBtn" class="ui-btn bottom-action-btn" type="button">
+        <button id="bottomRestartBtn" class="ui-btn bottom-action-btn bottom-restart-btn" type="button">
           <span class="button-en">Restart Game</span><span class="button-ja">ゲームを最初から</span>
         </button>
         <button id="bottomExitBtn" class="ui-btn bottom-action-btn bottom-exit-btn" type="button">
@@ -204,8 +197,7 @@
           <div class="message-actions">
             <button id="nextBtn"  class="cta-btn"             type="button"><span class="button-en">Next</span><span class="button-ja">次へ</span> &#9654;</button>
             <button id="continueBtn" class="ui-btn continue-btn" type="button"><span class="button-en">Use Helper</span><span class="button-ja">たすけモードを使う</span></button>
-            <button id="retryBtn" class="ui-btn ui-btn--ghost" type="button"><span class="button-en">Retry</span><span class="button-ja">もう一度</span></button>
-            <button id="exitBtn"  class="ui-btn ui-btn--ghost" type="button"><span class="button-en">✕ Exit</span><span class="button-ja">終了</span></button>
+            <button id="retryBtn" class="ui-btn retry-btn" type="button"><span class="button-en">Retry</span><span class="button-ja">もう一度</span></button>
           </div>
         </div>
       </section>
