@@ -12,6 +12,10 @@
     {
       "id": "cg_door_v1",
       "file": "cg-door-v1.json"
+    },
+    {
+      "id": "bh_window_v1",
+      "file": "bh-window-v1.json"
     }
   ]
 }

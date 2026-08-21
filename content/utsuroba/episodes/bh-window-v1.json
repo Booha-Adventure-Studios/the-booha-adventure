@@ -1,0 +1,57 @@
+{
+  "id": "bh_window_v1",
+  "title": "The Name in the Window",
+  "titleJP": "窓の名前",
+  "eyebrow": "MEMORY RECONSTRUCTION / 記憶の再構成",
+  "intro": "Bryan remembers a name in the rain, a message underneath it, and the reason he stayed.",
+  "introJP": "ブライアンは雨の中の名前と、その下の言葉、そして残った理由を覚えています。",
+  "vocabulary": [
+    {"word":"window","definition":"glass in a wall that lets you see outside","definitionJP":"外が見える壁のガラス"},
+    {"word":"rain","definition":"water that falls from the sky","definitionJP":"空から降る水"},
+    {"word":"name","definition":"a word used to identify a person","definitionJP":"人を呼ぶための言葉"},
+    {"word":"stay","definition":"to remain in a place","definitionJP":"場所に残る"},
+    {"word":"welcome","definition":"a friendly feeling for someone arriving","definitionJP":"来た人を受け入れる気持ち"}
+  ],
+  "mechanic": {
+    "type":"emotion-thread",
+    "name":"Welcome Thread",
+    "nameJP":"歓迎の糸",
+    "instruction":"Follow the feeling from being lost to feeling welcome.",
+    "instructionJP":"迷子の気持ちから、歓迎される気持ちまで追いましょう。",
+    "complete":"The welcome has a place now.",
+    "completeJP":"歓迎の気持ちに、今は場所があります。",
+    "beats":[
+      {"title":"A name alone","titleJP":"ひとりの名前","caption":"Bryan writes his name on the window.","captionJP":"ブライアンは窓に自分の名前を書きます。"},
+      {"title":"A name changing","titleJP":"変わる名前","caption":"Rain makes the letters look like someone else's name.","captionJP":"雨が文字を別の人の名前のように見せます。"},
+      {"title":"A place to stay","titleJP":"残れる場所","caption":"A message says that Bryan can stay.","captionJP":"ブライアンが残ってよいという言葉が現れます。"}
+    ]
+  },
+  "trailIntro":"Follow the words that change Bryan's feeling.",
+  "trailIntroJP":"ブライアンの気持ちを変える言葉を追いましょう。",
+  "trail":[
+    {"id":"bh_window_evidence_01","roomId":"room_04","type":"detail","label":"01 / A NAME ALONE","labelJP":"ひとりの名前","title":"A name on the glass","titleJP":"ガラスの名前","text":"I wrote my name on the window so I would not forget it.","hint":"The next memory is near a room where paths cross.","hintJP":"次の記憶は、道が交わる部屋の近くです。"},
+    {"id":"bh_window_evidence_02","roomId":"room_12","type":"event","label":"02 / A NAME CHANGING","labelJP":"変わる名前","title":"Letters in the rain","titleJP":"雨の中の文字","text":"Rain crossed the letters and made them look like another person's name.","hint":"The final memory is near the place where you first came in.","hintJP":"最後の記憶は、最初に入った場所の近くです。"},
+    {"id":"bh_window_evidence_03","roomId":"room_03","type":"inference","label":"03 / A PLACE TO STAY","labelJP":"残れる場所","title":"The message underneath","titleJP":"下にあった言葉","text":"Someone wrote, You can stay, below my name.","hint":"Return to Bryan with the reason he stayed.","hintJP":"残った理由を持って、ブライアンのところへ戻りましょう。"}
+  ],
+  "lines":[
+    {"speaker":"Bryan","en":"I wrote my name on the window so I would not forget it."},
+    {"speaker":"Narrator","en":"Rain crossed the letters and made them look like another person's name."},
+    {"speaker":"Bryan","en":"I thought the window was telling me to leave."},
+    {"speaker":"Narrator","en":"Then someone wrote, You can stay, below my name."},
+    {"speaker":"Bryan","en":"I forgot who wrote it, but I remembered that I was welcome."}
+  ],
+  "checks":[
+    {"type":"sequence","sequenceOrder":[0,1,2],"revealAct":0,"evidenceLines":[0],"restoreText":"The first piece returns.","restoreTextJP":"最初の記憶が戻りました。","label":"01 / SEQUENCE","labelJP":"順番","prompt":"Put Bryan's memory in order.","promptJP":"ブライアンの記憶を順番に並べましょう。","choices":["Bryan wrote his name on the window.","Rain changed the letters.","Someone wrote that Bryan could stay."],"choicesJP":["ブライアンは窓に名前を書いた。","雨が文字を変えた。","誰かがブライアンに残ってよいと書いた。"],"correct":0,"evidence":"The name comes first, then the rain changes it, and the message comes last.","evidenceJP":"最初に名前を書き、次に雨が変え、最後に言葉が現れます。"},
+    {"type":"detail","matchLine":3,"revealAct":1,"evidenceLines":[3],"restoreText":"The changing letters return.","restoreTextJP":"変わる文字が戻りました。","label":"02 / DETAIL","labelJP":"細部","prompt":"Which line tells Bryan that he can stay?","promptJP":"ブライアンが残ってよいと分かる行はどれですか？","choices":["You can stay.","Do not forget your name.","The rain is stopping."],"choicesJP":["残っていい。","名前を忘れないで。","雨が止みます。"],"correct":0,"evidence":"The message below Bryan's name says, You can stay.","evidenceJP":"ブライアンの名前の下に、残っていいという言葉があります。"},
+    {"type":"inference","supportingLine":4,"revealAct":2,"evidenceLines":[4],"restoreText":"The welcome becomes clear.","restoreTextJP":"歓迎の意味が分かりました。","label":"03 / INFERENCE","labelJP":"推測","prompt":"Why did Bryan decide to stay? Then choose the line that proves it.","promptJP":"ブライアンはなぜ残ることにしましたか？その証拠の行も選びましょう。","choices":["He understood that someone welcomed him.","He wanted to write a bigger name.","The rain made the window warm."],"choicesJP":["誰かが自分を歓迎していると分かったから。","もっと大きな名前を書きたかったから。","雨で窓が暖かくなったから。"],"correct":0,"evidence":"Bryan remembers that the message made him feel welcome.","evidenceJP":"その言葉が、歓迎されている気持ちをくれたとブライアンは覚えています。"}
+  ],
+  "replayLenses":{
+    "detail":{"label":"DETAIL HUNT","labelJP":"細部ハント","prompt":"Which detail tells Bryan that he can stay?","promptJP":"ブライアンが残ってよいと分かる細部はどれですか？","choices":["The words You can stay.","The rain crossed the letters.","Bryan wrote his name."],"choicesJP":["残っていいという言葉。","雨が文字を横切ったこと。","ブライアンが名前を書いたこと。"],"correct":0,"evidenceLines":[3],"evidence":"The message below his name says that Bryan can stay.","evidenceJP":"名前の下の言葉が、ブライアンに残ってよいと伝えています。"},
+    "emotion":{"label":"EMOTION HUNT","labelJP":"気持ちハント","prompt":"How does Bryan's feeling change?","promptJP":"ブライアンの気持ちはどのように変わりますか？","choices":["Lonely, worried, then welcome.","Angry, hungry, then sleepy.","Excited, bored, then surprised."],"choicesJP":["孤独、不安、そして歓迎。","怒り、空腹、そして眠り。","興奮、退屈、そして驚き。"],"correct":0,"evidenceLines":[0,2,4],"evidence":"Bryan writes alone, fears the window is telling him to leave, and finally remembers that he is welcome.","evidenceJP":"一人で名前を書き、出ていけと言われたと思い、最後に歓迎されていると覚えます。"},
+    "inference":{"label":"INFERENCE HUNT","labelJP":"推測ハント","prompt":"What did the message under Bryan's name mean?","promptJP":"ブライアンの名前の下の言葉は何を意味しましたか？","choices":["He had a place in Utsuroba.","He needed to erase his name.","He had to follow the rain."],"choicesJP":["うつろばに彼の居場所がある。","彼は名前を消す必要がある。","彼は雨を追わなければならない。"],"correct":0,"evidenceLines":[3,4],"evidence":"The message and Bryan's final feeling show that someone wanted him to stay.","evidenceJP":"言葉と最後の気持ちから、誰かが彼に残ってほしかったと分かります。"}
+  },
+  "success":"The memory settles. Bryan remembers that belonging can begin with a few quiet words.",
+  "successJP":"記憶が落ち着きました。居場所は、静かな短い言葉から始まることをブライアンは思い出しました。",
+  "worldEcho":{"roomId":"room_03","x":0.42,"y":0.57,"motif":"reflection","label":"A welcome in the glass","labelJP":"ガラスの歓迎"},
+  "postcard":{"title":"Memory postcard","titleJP":"記憶カード","instruction":"Build a short summary in the best order.","instructionJP":"短いまとめを、よい順番に作りましょう。","chunks":["Bryan wrote his name on the window.","Rain changed the letters.","A message told him he could stay."],"chunksJP":["ブライアンは窓に名前を書いた。","雨が文字を変えた。","言葉が彼に残ってよいと伝えた。"],"order":[0,1,2],"savedText":"Bryan wrote his name on the window. Rain changed the letters. A message told him he could stay."}
+}
