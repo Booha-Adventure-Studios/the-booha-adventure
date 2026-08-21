@@ -198,6 +198,10 @@
     }
 
     const finish = () => {
+      if (opts.reviewOnly) {
+        close();
+        return;
+      }
       const onComplete = opts.onComplete;
       close();
       if (onComplete) onComplete();
@@ -226,6 +230,12 @@
         </div>`).join('');
 
       if (!question) {
+        const completeActions = opts.reviewOnly
+          ? `<button class="reading-secondary" id="reading-review-btn">Read again / もう一度読む</button><button class="reading-primary" id="reading-return-btn">Close journal review / ノートを閉じる</button>`
+          : `<button class="reading-secondary" id="reading-review-btn">Review reading / 読み返す</button><button class="reading-primary" id="reading-return-btn">Restore memory / 記憶を戻す</button>`;
+        const completeNote = opts.reviewOnly
+          ? 'This is a quiet review. It does not change your quest.<br>これは読み返しです。クエストは変わりません。'
+          : 'Review as many times as you like before restoring the memory.<br>記憶を戻す前に、何度でも読み返せます。';
         overlay.innerHTML = `
           <div class="reading-card reading-complete">
             <div class="reading-eyebrow">${escapeText(episode.eyebrow)}</div>
@@ -235,10 +245,9 @@
             <p class="reading-success">${escapeText(episode.success)}</p>
             <p class="reading-jp">${escapeText(episode.successJP)}</p>
             <div class="reading-complete-actions">
-              <button class="reading-secondary" id="reading-review-btn">Review reading / 読み返す</button>
-              <button class="reading-primary" id="reading-return-btn">Restore memory / 記憶を戻す</button>
+              ${completeActions}
             </div>
-            <p class="reading-review-note">Review as many times as you like before restoring the memory.<br>記憶を戻す前に、何度でも読み返せます。</p>
+            <p class="reading-review-note">${completeNote}</p>
           </div>`;
         overlay.querySelector('#reading-return-btn').addEventListener('click', finish);
         overlay.querySelector('#reading-review-btn').addEventListener('click', review);
