@@ -32,6 +32,14 @@ for (const entry of index.episodes) {
   assert.ok(Number.isFinite(episode.worldEcho.x) && episode.worldEcho.x >= 0 && episode.worldEcho.x <= 1 &&
     Number.isFinite(episode.worldEcho.y) && episode.worldEcho.y >= 0 && episode.worldEcho.y <= 1,
     `${entry.id}: world echo position must be normalized`);
+  assert.ok(episode.postcard && episode.postcard.title && episode.postcard.titleJP &&
+    episode.postcard.instruction && episode.postcard.instructionJP && episode.postcard.savedText,
+    `${entry.id}: memory postcard contract is required`);
+  assert.ok(Array.isArray(episode.postcard.chunks) && episode.postcard.chunks.length === 3 &&
+    Array.isArray(episode.postcard.chunksJP) && episode.postcard.chunksJP.length === 3,
+    `${entry.id}: memory postcards need three bilingual chunks`);
+  assert.deepStrictEqual([...episode.postcard.order].sort((a, b) => a - b), [0, 1, 2],
+    `${entry.id}: memory postcard order must contain each chunk exactly once`);
   assert.ok(Array.isArray(episode.lines) && episode.lines.length >= 3,
     `${entry.id}: episode needs at least three conversation lines`);
   assert.ok(Array.isArray(episode.checks) && episode.checks.length >= 2,
