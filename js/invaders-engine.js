@@ -115,6 +115,7 @@ let bgOverlay = { h:240,s:60,l:30,a:0, th:240,ts:60,tl:30,ta:0 };
 let bossCinematic = { active: false, t: 0, phase: "", bossRef: null };
 
 // Milestone
+const MILESTONE_LIFETIME = 3.5;
 let milestoneAnim = { active: false, t: 0, wave: 0, text: "", subtext: "" };
 
 // Flash
@@ -1183,6 +1184,31 @@ function easeInCubic(t)    { return t*t*t; }
 function easeInOutSine(t)  { return -(Math.cos(Math.PI*t) - 1) / 2; }
 function easeOutBack(t)    { const c=1.70158,p=c+1; return 1+p*Math.pow(t-1,3)+c*Math.pow(t-1,2); }
 
+// Fade in over `inDur`, hold, fade out over the final `outDur` of a `dur`-
+// long window. Every announcement card (wave banner, milestone banner —
+// see drawWaveBanner/drawMilestone) drives its alpha off this single
+// function, so their timing "feel" is tuned in one place instead of each
+// reimplementing the same enter/exit clamp-and-min shape slightly
+// differently. Pass outDur=0 for a fade-in with no exit (holds at 1).
+function announceEnvelope(t, dur, inDur, outDur) {
+  const enter = inDur > 0 ? clamp(t / inDur, 0, 1) : 1;
+  const exit  = outDur > 0 ? clamp((dur - t) / outDur, 0, 1) : 1;
+  return Math.min(enter, exit);
+}
+
+// Shared "card" chrome — a filled, bordered rounded rect. Currently used by
+// the wave banner; factored out so any future card (or a restyle of this
+// one) is a single call instead of copy-pasted fill/stroke boilerplate.
+function drawAnnounceCard(x, y, w, h, r, fillStyle, strokeStyle, lineWidth) {
+  roundRect(x, y, w, h, r);
+  ctx.fillStyle = fillStyle;
+  ctx.fill();
+  roundRect(x, y, w, h, r);
+  ctx.strokeStyle = strokeStyle;
+  ctx.lineWidth = lineWidth;
+  ctx.stroke();
+}
+
 // ════════════════════════════════════════
 // MAIN UPDATE
 // ════════════════════════════════════════
@@ -1238,7 +1264,7 @@ function update(dt) {
   // Milestone timer
   if (milestoneAnim.active) {
     milestoneAnim.t += dt;
-    if (milestoneAnim.t > 3.5) milestoneAnim.active = false;
+    if (milestoneAnim.t > MILESTONE_LIFETIME) milestoneAnim.active = false;
   }
 
   // Player movement
@@ -1729,18 +1755,22 @@ function drawWaveBanner() {
   // A wave callout should orient the player, not take over the playfield.
   const dur = Math.max(0.001, WAVE_SCALE.waveCardSec);
   const t = clamp(WS.phaseT, 0, dur);
-  const enter = clamp(t / 0.18, 0, 1);
-  const exit = clamp((dur - t) / 0.22, 0, 1);
-  const alpha = Math.min(enter, exit);
+  const inDur = 0.18, outDur = 0.22;
+  const alpha = announceEnvelope(t, dur, inDur, outDur);
+  // A small scale-in on top of the fade — subtle on purpose (0.94→1, not
+  // the punchy easeOutBack pop the boss cinematic/milestone use) so the
+  // card feels alive without competing for attention.
+  const pop = 0.94 + 0.06 * easeOutCubic(clamp(t / inDur, 0, 1));
   const isBoss = isBossWave(WS.wave);
   const cardW = clamp(W()*0.54, 230, 460), cardH = 72;
   const cardX = W()/2-cardW/2, cardY = SAFE.top + 42;
+  const cardCx = W()/2, cardCy = cardY + cardH/2;
   ctx.save();
   ctx.globalAlpha = alpha;
-  ctx.fillStyle = isBoss ? "rgba(70,8,20,0.88)" : "rgba(18,15,70,0.88)";
-  roundRect(cardX, cardY, cardW, cardH, 14); ctx.fill();
-  ctx.strokeStyle = isBoss ? "rgba(255,90,100,0.75)" : "rgba(160,130,255,0.72)";
-  ctx.lineWidth = 1.5; roundRect(cardX, cardY, cardW, cardH, 14); ctx.stroke();
+  ctx.translate(cardCx, cardCy); ctx.scale(pop, pop); ctx.translate(-cardCx, -cardCy);
+  drawAnnounceCard(cardX, cardY, cardW, cardH, 14,
+    isBoss ? "rgba(70,8,20,0.88)" : "rgba(18,15,70,0.88)",
+    isBoss ? "rgba(255,90,100,0.75)" : "rgba(160,130,255,0.72)", 1.5);
   drawBilingual(
     isBoss ? "BOSS INCOMING" : `WAVE ${WS.wave}`,
     isBoss ? "ボスが くるよ！" : `ウェーブ ${WS.wave}`,
@@ -1794,7 +1824,10 @@ function drawBossCinematic() {
 function drawMilestone() {
   if (!milestoneAnim.active) return;
   const t = milestoneAnim.t;
-  const a = t < 0.4 ? t/0.4 : t > 2.8 ? clamp(1-(t-2.8)/0.7,0,1) : 1;
+  // Same shared fade-in/hold/fade-out envelope the wave banner uses
+  // (0.4s in, hold, 0.7s out over the milestone's MILESTONE_LIFETIME) —
+  // reproduces this banner's original hand-written curve exactly.
+  const a = announceEnvelope(t, MILESTONE_LIFETIME, 0.4, 0.7);
   const bigSize = clamp(W()*0.085, 36, 80);
   const subSize = clamp(W()*0.034, 14, 26);
   const scl = t < 0.4 ? easeOutBack(t/0.4) : 1;
