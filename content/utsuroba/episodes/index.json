@@ -4,6 +4,14 @@
     {
       "id": "ks_lantern_v1",
       "file": "ks-lantern-v1.json"
+    },
+    {
+      "id": "nto_candy_v1",
+      "file": "nto-candy-v1.json"
+    },
+    {
+      "id": "cg_door_v1",
+      "file": "cg-door-v1.json"
     }
   ]
 }
