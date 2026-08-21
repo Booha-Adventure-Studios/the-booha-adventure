@@ -890,7 +890,10 @@
   }
 
   function allReadingMemoriesRestored() {
-    const episodeDrifters = DATA.drifters.filter(drifter => drifter.episodeId);
+    const requiredIds = DATA.readingConvergence?.requiredDrifterIds;
+    const episodeDrifters = Array.isArray(requiredIds) && requiredIds.length
+      ? DATA.drifters.filter(drifter => requiredIds.includes(drifter.id))
+      : DATA.drifters.filter(drifter => drifter.episodeId);
     return episodeDrifters.length >= 3 && episodeDrifters.every(drifter => !drifterHasMemories(drifter.id));
   }
 
@@ -936,7 +939,10 @@
       await window.UTSUROBA_EPISODES_READY;
       if (!convergenceOpen) return;
       const convergence = DATA.readingConvergence;
-      const episodeDrifters = DATA.drifters.filter(drifter => drifter.episodeId);
+      const requiredIds = convergence.requiredDrifterIds;
+      const episodeDrifters = Array.isArray(requiredIds) && requiredIds.length
+        ? DATA.drifters.filter(drifter => requiredIds.includes(drifter.id))
+        : DATA.drifters.filter(drifter => drifter.episodeId);
       const memories = episodeDrifters.map(drifter => window.UTSUROBA_EPISODES[drifter.episodeId]).filter(Boolean);
       let revealed = !!readUtsuroba().flags?.convergenceSeen;
       const selectedClues = new Set(revealed ? convergence.clueChecks.map(check => check.episodeId) : []);
@@ -1230,6 +1236,8 @@
     const hasMemories = drifterHasMemories(drifter.id);
     const hasRestoredMemory = drifterMemoryRestored(drifter);
     const worldUnderstood = !!readUtsuroba().flags?.convergenceSeen && allReadingMemoriesRestored();
+    const relationshipEpisodeId = DATA.readingRelationships?.triggerEpisodeId;
+    const relationshipAwake = worldUnderstood && !!relationshipEpisodeId && !!readUtsuroba().readingEchoes?.[relationshipEpisodeId];
 
     /* ── build post-greeting action HTML ── */
     let actionHTML = '';
@@ -1317,9 +1325,11 @@
     const hasQuestOffer = !quest && drifter.memoryCount > 0 && drifterHasMemories(drifter.id);
     const enLines = (hasQuestOffer && drifter.questLines)
       ? drifter.questLines
-      : (worldUnderstood && drifter.convergenceGreeting
+      : (relationshipAwake && drifter.relationshipGreeting
+        ? drifter.relationshipGreeting
+        : (worldUnderstood && drifter.convergenceGreeting
         ? drifter.convergenceGreeting
-        : (hasRestoredMemory && drifter.restoredGreeting ? drifter.restoredGreeting : drifter.greeting));
+        : (hasRestoredMemory && drifter.restoredGreeting ? drifter.restoredGreeting : drifter.greeting)));
     
     let   finished    = false;
 

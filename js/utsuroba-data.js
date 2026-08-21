@@ -7,6 +7,7 @@ window.UTSUROBA_DATA = {
     gateRoom: "room_03",
     x: 0.50,
     y: 0.31,
+    requiredDrifterIds: ["ks", "nto", "cg"],
     title: "The Three Echoes",
     titleJP: "三つの残響",
     intro: "The memories are different, but each person found a small truth inside the fear.",
@@ -97,6 +98,12 @@ window.UTSUROBA_DATA = {
     }
   },
 
+  readingRelationships: {
+    triggerEpisodeId: "bh_window_v1",
+    title: "A shared welcome",
+    titleJP: "共有された歓迎"
+  },
+
   roomStandingCoords: {
     room_01: { x: 491, y: 557 },
     room_05: { x: 820, y: 580 },
@@ -121,6 +128,7 @@ window.UTSUROBA_DATA = {
       episodeId       : 'ks_lantern_v1',
       restoredGreeting: ['You came back.', 'The lantern is quiet now.', 'I remember what I could not say.'],
       convergenceGreeting: ['The garden is open.', 'Three memories can make one path.', 'I think I know where Chiyo went now.'],
+      relationshipGreeting: ['Bryan remembers a welcome.', 'Maybe Utsuroba is learning how to keep people here.', 'I want to hear the whole story.'],
       memoryCount     : 1,
       scale           : 0.18,
     },
@@ -136,6 +144,7 @@ window.UTSUROBA_DATA = {
       episodeId       : 'nto_candy_v1',
       restoredGreeting: ['You found it!', 'The candy was in my memory all along.', 'Want to hear the silly part again?'],
       convergenceGreeting: ['The garden is growing!', 'My silly mystery belongs with the others.', 'Maybe remembering together is the best part.'],
+      relationshipGreeting: ['Bryan has a welcome memory!', 'That is much better than losing a candy.', 'We should save the sentence somewhere safe.'],
       memoryCount     : 1,
       scale           : 0.18,
     },
@@ -151,6 +160,7 @@ window.UTSUROBA_DATA = {
       episodeId       : 'cg_door_v1',
       restoredGreeting: ['You came back…', 'The hallway feels smaller now.', 'I can say what frightened me.'],
       convergenceGreeting: ['The garden is quiet.', 'The three memories make the dark feel different.', 'I can look at the glass now.'],
+      relationshipGreeting: ['Bryan found words under the rain.', 'Someone told him he could stay.', 'I like that memory.'],
       memoryCount     : 1,
       scale           : 0.11,
     },
@@ -162,7 +172,10 @@ window.UTSUROBA_DATA = {
       greeting    : ['Hey…', 'You made it this far, huh.', 'I just got here myself.', 'Come back later.'],
       sprite1     : './assets/img/drifters/bryan_harper-1.png',
       sprite2     : './assets/img/drifters/bryan_harper-2.png',
-      memoryCount : 0,
+      episodeId   : 'bh_window_v1',
+      restoredGreeting: ['You found my name.', 'The window was not asking me to leave.', 'I remember why I stayed.'],
+      relationshipGreeting: ['The others heard my memory.', 'Their stories made the welcome feel real.', 'I do not feel new here anymore.'],
+      memoryCount : 1,
       scale       : 0.25,
     },
     {
