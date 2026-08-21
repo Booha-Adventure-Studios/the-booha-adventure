@@ -87,35 +87,36 @@
       <!-- Canvas: 540×960 (9:16) -->
       <canvas id="gameCanvas" width="540" height="960" aria-label="Game canvas / ゲームキャンバス"></canvas>
 
-      <!-- Top bar -->
+      <!-- Top bar: title left · scoreboard centered · controls right -->
       <header class="topbar">
         <div class="title-stack">
           <h1 class="game-title">Feed Booha</h1>
           <p class="game-subtitle">ブーハーにキャンディをあげよう</p>
         </div>
+
+        <!-- Scoreboard: one centered pill, Level · Score · Stars -->
+        <div class="scoreboard" id="scoreboard" aria-label="Game status / ゲームの状態">
+          <div class="score-chip score-chip--level">
+            <span class="chip-label">LV</span>
+            <strong id="levelText" class="chip-value">1</strong>
+          </div>
+          <span class="score-divider" aria-hidden="true"></span>
+          <div class="score-chip score-chip--score">
+            <span class="chip-label">Score<span class="chip-label-ja">スコア</span></span>
+            <strong id="scoreText" class="chip-value chip-value--score" aria-live="polite">0</strong>
+          </div>
+          <span class="score-divider" aria-hidden="true"></span>
+          <div class="score-chip score-chip--stars" id="hudStars" aria-label="Total stars earned / 合計スター">
+            <span class="chip-star-icon" aria-hidden="true">&#9733;</span>
+            <strong id="totalStars" class="chip-value">0</strong>
+          </div>
+        </div>
+
         <div class="topbar-actions">
           <button id="helpBtn"    class="ui-btn" type="button" aria-label="How to play / あそびかた">?</button>
           <button id="restartBtn" class="ui-btn" type="button" aria-label="Restart level / レベルをリスタート">&#8635;</button>
         </div>
       </header>
-
-      <!-- HUD: Level + Score left | Total stars right -->
-      <section id="hud" class="hud" aria-label="Game status / ゲームの状態">
-        <div class="hud-left">
-          <div class="hud-pill hud-level-pill">
-            <span class="hud-label">LV</span>
-            <strong id="levelText" class="hud-level-num">1</strong>
-          </div>
-          <div class="hud-pill hud-score-pill">
-            <span class="hud-label"><span>Score</span><span>スコア</span></span>
-            <strong id="scoreText" aria-live="polite">0</strong>
-          </div>
-        </div>
-        <div class="hud-stars" id="hudStars" aria-label="Total stars earned / 合計スター">
-          <span class="hud-star-icon">&#9733;</span>
-          <span class="hud-star-count" id="totalStars">0</span>
-        </div>
-      </section>
 
       <nav class="bottom-actions" aria-label="Game controls / ゲーム操作">
         <button id="bottomRestartBtn" class="ui-btn bottom-action-btn bottom-restart-btn" type="button">
