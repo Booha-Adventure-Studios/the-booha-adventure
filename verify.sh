@@ -168,15 +168,22 @@ PYEOF
   [ $juku_bad -eq 0 ] && ok "$juku_ok juku.json file(s) pass all content checks"
 fi
 
-# ── 8. Feed Booha level fairness guardrails ─────────────────
-echo "[8/10] Utsuroba episode audit"
+# ── 8. Utsuroba reading contracts ───────────────────────────
+echo "[8/11] Utsuroba episode audit"
 if node tests/utsuroba-episode-audit.cjs >/dev/null 2>&1; then
   ok "Utsuroba episode data and answer contracts pass"
 else
   bad "Utsuroba episode audit failed"
 fi
 
-echo "[9/10] Feed Booha level audit"
+echo "[9/11] Utsuroba journal audit"
+if node tests/utsuroba-journal-audit.cjs >/dev/null 2>&1; then
+  ok "Utsuroba reading journal contracts pass"
+else
+  bad "Utsuroba journal audit failed"
+fi
+
+echo "[10/11] Feed Booha level audit"
 if node tests/feed-level-audit.cjs >/dev/null 2>&1; then
   ok "Feed Booha geometry and timing guardrails pass"
 else
@@ -184,7 +191,7 @@ else
 fi
 
 # ── 9. Feed Booha playability simulation ────────────────────
-echo "[10/10] Feed Booha playability simulation"
+echo "[11/11] Feed Booha playability simulation"
 if node tests/feed-playability-audit.cjs >/dev/null 2>&1; then
   ok "Feed Booha has a simulated successful feed path for all 50 levels"
 else
