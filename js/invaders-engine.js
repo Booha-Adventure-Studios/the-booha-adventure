@@ -378,17 +378,17 @@ function playSfx(kind) {
   playTone(kind);
 }
 
+function retryAudioElement(el) {
+  if (!el || !started || paused) return;
+  clearTimeout(audioRetryTimer);
+  audioRetryTimer = setTimeout(() => playAudioElement(el), 900);
+}
 function playAudioElement(el) {
-  if (!el || !audioReady || paused) return;
-  const promise = el.play();
-  if (promise?.catch) {
-    promise.catch(() => {
-      clearTimeout(audioRetryTimer);
-      audioRetryTimer = setTimeout(() => {
-        if (started && !paused) playAudioElement(el);
-      }, 900);
-    });
-  }
+  if (!el || paused) return;
+  try {
+    const promise = el.play();
+    if (promise?.catch) promise.catch(() => retryAudioElement(el));
+  } catch (_) { retryAudioElement(el); }
 }
 
 function pauseAllMusic() {
@@ -431,8 +431,7 @@ function setBossMusic(on) {
         bossBgm.loop = true; bossBgm.preload = "auto"; bossBgm.volume = 0.9; bossBgm._src = src;
         bossBgm.addEventListener("error", () => {
           if (started && !paused) {
-            clearTimeout(audioRetryTimer);
-            audioRetryTimer = setTimeout(() => playAudioElement(bossBgm), 900);
+            retryAudioElement(bossBgm);
           }
         });
       } else {
@@ -1686,67 +1685,6 @@ function drawWaveBanner() {
     isBoss ? "#ffb0b5" : "#fff", isBoss ? "#ffd0d0" : "#d9d0ff"
   );
   ctx.restore();
-  return;
-
-  /* Legacy full-screen card retained below for easy rollback during tuning. */
-  {
-  const dur      = Math.max(0.001, WAVE_SCALE.waveCardSec);
-  const pauseSec = 1.2;
-  const moveSec  = Math.max(0.001, dur - pauseSec);
-  const enterSec = moveSec * 0.60;
-  const exitSec  = Math.max(0.001, moveSec - enterSec);
-  const t        = clamp(WS.phaseT, 0, dur);
-  let dropP = 0;
-  if (t < enterSec)              dropP = easeOutBack(t / enterSec);
-  else if (t < enterSec+pauseSec) dropP = 1;
-  else                            dropP = 1 - easeInCubic((t - enterSec - pauseSec) / exitSec);
-
-  const isBoss   = isBossWave(WS.wave);
-  const bigText  = isBoss ? `!! BOSS INCOMING !!` : `NEXT WAVE`;
-  const waveNum  = `${WS.wave}`;
-  const sub      = isBoss ? `ボスが くるよ！きをつけて！` : `ドッティが くるよ！`;
-  const bigSize  = clamp(W()*0.065, 30, 62);
-  const numSize  = clamp(W()*0.24,  80, 200);
-  const subSize  = clamp(W()*0.030, 13, 22);
-  const cardH    = numSize*1.15 + bigSize*1.4 + subSize*2.0 + 24;
-  const cardW    = clamp(W()*0.80, 280, 640);
-  const cardX    = W()/2 - cardW/2;
-  const cardY    = (-cardH-20) + (H()/2 - cardH/2 - (-cardH-20)) * dropP;
-
-  ctx.save();
-  const cardGrad = ctx.createLinearGradient(cardX,cardY,cardX+cardW,cardY+cardH);
-  if (isBoss) { cardGrad.addColorStop(0,"rgba(80,10,10,0.96)"); cardGrad.addColorStop(0.5,"rgba(50,0,0,0.98)"); cardGrad.addColorStop(1,"rgba(80,20,10,0.96)"); }
-  else        { cardGrad.addColorStop(0,"rgba(10,10,60,0.95)"); cardGrad.addColorStop(0.5,"rgba(5,5,40,0.98)");  cardGrad.addColorStop(1,"rgba(15,5,60,0.95)"); }
-  roundRect(cardX,cardY,cardW,cardH,22); ctx.fillStyle = cardGrad; ctx.fill();
-  ctx.strokeStyle = isBoss ? "rgba(255,60,60,0.7)" : "rgba(255,100,220,0.6)"; ctx.lineWidth = 2;
-  roundRect(cardX,cardY,cardW,cardH,22); ctx.stroke();
-
-  ctx.globalCompositeOperation = "lighter";
-  const gc = isBoss ? "rgba(255,80,80,0.35)" : "rgba(120,100,255,0.32)";
-  ctx.globalAlpha = dropP;
-  for (let r = cardH*0.9; r > 0; r -= 16) { ctx.fillStyle = gc; ctx.beginPath(); ctx.arc(W()/2, cardY+cardH/2, r, 0, Math.PI*2); ctx.fill(); }
-  ctx.globalCompositeOperation = "source-over"; ctx.globalAlpha = 1;
-
-  const innerX = W()/2;
-  let iy = cardY + 16;
-  ctx.textAlign = "center"; ctx.textBaseline = "top";
-  ctx.font = `900 ${bigSize}px system-ui,sans-serif`;
-  const labelShadow = isBoss ? "rgba(255,60,60,1)" : "rgba(140,100,255,1)";
-  ctx.lineWidth = bigSize*0.09; ctx.strokeStyle = "rgba(0,0,0,0.85)"; ctx.strokeText(bigText,innerX,iy);
-  ctx.shadowBlur = 28; ctx.shadowColor = labelShadow; ctx.fillStyle = "#ffffff"; ctx.fillText(bigText,innerX,iy);
-  iy += bigSize * 1.15;
-
-  ctx.font = `900 ${numSize}px system-ui,sans-serif`;
-  ctx.shadowBlur = clamp(numSize*0.55,28,80); ctx.shadowColor = isBoss?"rgba(255,80,80,1)":"rgba(255,200,80,1)";
-  ctx.lineWidth = numSize*0.09; ctx.strokeStyle = "rgba(0,0,0,0.88)"; ctx.strokeText(waveNum,innerX,iy);
-  ctx.fillStyle = "#ffffff"; ctx.fillText(waveNum,innerX,iy);
-  iy += numSize * 0.98;
-
-  ctx.font = `800 ${subSize}px system-ui,sans-serif`;
-  ctx.lineWidth = subSize*0.12; ctx.strokeStyle = "rgba(0,0,0,0.75)"; ctx.strokeText(sub,innerX,iy);
-  ctx.shadowBlur = 14; ctx.shadowColor = "rgba(180,255,200,0.9)"; ctx.fillStyle = "rgba(210,255,220,0.96)"; ctx.fillText(sub,innerX,iy);
-  ctx.restore();
-  }
 }
 
 function drawBossCinematic() {
@@ -2614,6 +2552,12 @@ function startInvadersRun(continueRun) {
   updateOrientationGate(); LOCKED_SCALE=GAME_SCALE;
   document.getElementById("startOverlay").style.display="none";
   setupEndVideo();
+  if (endVideoEl) {
+    endVideoEl.style.opacity="0"; endVideoEl.style.pointerEvents="none";
+    endVideoEl.pause(); endVideoEl.currentTime=0; endVideoEl.muted=true;
+    endVideoEl.play().catch(()=>{});
+    setTimeout(()=>{ try { endVideoEl.pause(); endVideoEl.currentTime=0; endVideoEl.muted=false; } catch(_){} }, 60);
+  }
   try {
     if (candySfx) { candySfx.muted=true; candySfx.play().catch(()=>{}); setTimeout(()=>{ candySfx.pause(); candySfx.currentTime=0; candySfx.muted=false; },50); }
   } catch(_){}
@@ -2643,8 +2587,7 @@ function startInvadersRun(continueRun) {
     bgm.volume = 0.6;
     bgm.addEventListener("error", () => {
       if (started && !paused) {
-        clearTimeout(audioRetryTimer);
-        audioRetryTimer = setTimeout(() => playAudioElement(bgm), 900);
+        retryAudioElement(bgm);
       }
     });
   } catch(_){}
@@ -2678,34 +2621,7 @@ function startInvadersRun(continueRun) {
 
   const startBtn = document.getElementById("startBtn");
   if (startBtn) {
-    startBtn.addEventListener("click", () => {
-      startInvadersRun(false); return;
-      ensureAudio();
-      started=true;
-      if (IS_COARSE && mobileControls) mobileControls.style.display="block";
-      updateOrientationGate();
-      LOCKED_SCALE=GAME_SCALE;
-      document.getElementById("startOverlay").style.display="none";
-      try {
-        if (candySfx) { candySfx.muted=true; candySfx.play().catch(()=>{}); setTimeout(()=>{ candySfx.pause(); candySfx.currentTime=0; candySfx.muted=false; },50); }
-     } catch(_){}
-      endVideoEl = document.getElementById("endVideo");
-      if (endVideoEl) {
-        endVideoEl.pause(); endVideoEl.currentTime=0; endVideoEl.muted=true;
-        endVideoEl.play().catch(()=>{});
-        setTimeout(()=>{ try{ endVideoEl.pause(); endVideoEl.currentTime=0; endVideoEl.muted=false; }catch(_){} },60);
-        
-        endVideoEl.addEventListener("ended", ()=>{
-          endVideoEl.pause(); endVideoEl.currentTime=0;
-          endVideoEl.style.opacity="0"; endVideoEl.style.pointerEvents="none";
-          window.location.href = "karasuki.html?room=room_07";
-        });
-      }
-
-      resetGame();
-      try { resumeAllMusic(); } catch(_){}
-      startWave(1);
-    });
+    startBtn.addEventListener("click", () => startInvadersRun(false));
   }
   const continueBtn = document.getElementById("invadersContinueBtn");
   if (continueBtn) continueBtn.addEventListener("click", () => startInvadersRun(true));
