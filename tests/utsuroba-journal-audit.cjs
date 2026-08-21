@@ -51,6 +51,11 @@ assert.match(reading, /opts\.reviewOnly/, 'Reading engine must understand review
 assert.match(reading, /renderOnboarding/, 'Reading engine must show first-session guidance');
 assert.match(reading, /data-reading-calibration/, 'Reading engine must offer initial support calibration');
 assert.match(reading, /skipOnboarding/, 'Journal replay must skip first-session onboarding');
+assert.match(reading, /role', 'dialog'/, 'Reading sessions must expose a dialog role');
+assert.match(reading, /event\.key === 'Escape'/, 'Reading sessions must close with Escape');
+assert.match(reading, /focusFirstControl/, 'Reading sessions must move focus into the active control');
+assert.match(reading, /aria-live="polite"/, 'Reading feedback must be announced accessibly');
+assert.match(reading, /prefers-reduced-motion/, 'Reading UI must respect reduced-motion preferences');
 assert.match(reading, /adaptiveMode/, 'Reading engine must support adaptive review modes');
 assert.match(reading, /usedEvidence/, 'Reading engine must track evidence support use');
 assert.match(reading, /renderPostcard/, 'Reading engine must render optional memory postcards');
