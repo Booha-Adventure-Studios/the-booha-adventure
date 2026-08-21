@@ -61,6 +61,7 @@ const SAFE = { top: 0, right: 0 };
 const HUD_PAD = 12;
 const PAUSE_BTN = { x: 0, y: 0, w: 36, h: 36 };
 const PAUSE_EXIT_BTN = { x: 0, y: 0, w: 0, h: 0 };
+const PAUSE_SAVE_BTN = { x: 0, y: 0, w: 0, h: 0 };
 
 // Lives / score / combo
 let lives = PLAYER_CONFIG.maxLives;
@@ -2086,8 +2087,20 @@ function drawPauseOverlay() {
   ctx.fillText("▶  RESUME",cx,resumeY+btnH/2-7);
   ctx.font=`700 ${Math.max(9,rfsz*0.62)}px system-ui,sans-serif`; ctx.fillStyle="#152040"; ctx.fillText("つづける",cx,resumeY+btnH/2+13); ctx.restore();
 
+  const saveW=clamp(W()*0.52,180,340), saveH=clamp(H()*0.065,38,52), saveX=cx-saveW/2;
+  const saveY=resumeY+btnH+clamp(H()*0.018,8,16);
+  PAUSE_SAVE_BTN.x=saveX; PAUSE_SAVE_BTN.y=saveY; PAUSE_SAVE_BTN.w=saveW; PAUSE_SAVE_BTN.h=saveH;
+  ctx.save(); ctx.fillStyle="rgba(168,245,196,0.10)"; ctx.strokeStyle="rgba(168,245,196,0.55)"; ctx.lineWidth=1.5;
+  roundRect(saveX,saveY,saveW,saveH,saveH/2); ctx.fill(); ctx.stroke();
+  ctx.textAlign="center"; ctx.textBaseline="middle";
+  const svsz=clamp(W()*0.030,12,20); ctx.font=`900 ${svsz}px system-ui,sans-serif`;
+  ctx.shadowBlur=10; ctx.shadowColor="rgba(168,245,196,.8)"; ctx.fillStyle="rgba(168,245,196,.95)";
+  ctx.fillText("💾 SAVE",cx,saveY+saveH/2-6);
+  ctx.font=`700 ${Math.max(9,svsz*0.62)}px system-ui,sans-serif`; ctx.shadowBlur=0; ctx.fillStyle="rgba(220,255,230,.85)";
+  ctx.fillText("セーブ",cx,saveY+saveH/2+12); ctx.restore();
+
   const exitW=clamp(W()*0.52,180,340), exitH=clamp(H()*0.065,38,52), exitX=cx-exitW/2;
-  const exitY=resumeY+btnH+clamp(H()*0.020,10,18);
+  const exitY=saveY+saveH+clamp(H()*0.018,8,16);
   PAUSE_EXIT_BTN.x=exitX; PAUSE_EXIT_BTN.y=exitY; PAUSE_EXIT_BTN.w=exitW; PAUSE_EXIT_BTN.h=exitH;
   ctx.save(); ctx.fillStyle="rgba(255,255,255,0.07)"; ctx.strokeStyle="rgba(255,80,80,0.60)"; ctx.lineWidth=1.5;
   roundRect(exitX,exitY,exitW,exitH,exitH/2); ctx.fill(); ctx.stroke();
@@ -2420,7 +2433,11 @@ if (IS_COARSE && mobileControls) {
     if (inEdgeZone(e.clientX,30)) return;
     if (paused) {
       e.preventDefault();
-      const ex=PAUSE_EXIT_BTN;
+      const ex=PAUSE_EXIT_BTN, sv=PAUSE_SAVE_BTN;
+      if (e.clientX>=sv.x&&e.clientX<=sv.x+sv.w&&e.clientY>=sv.y&&e.clientY<=sv.y+sv.h) {
+        if (window.BoohaSaveMenu) BoohaSaveMenu.open();
+        return;
+      }
       if (e.clientX>=ex.x&&e.clientX<=ex.x+ex.w&&e.clientY>=ex.y&&e.clientY<=ex.y+ex.h) {
         setPaused(false); started=false; pauseAllMusic(); resetGame(); window.location.href="karasuki.html";
       } else { setPaused(false); }
@@ -2442,7 +2459,11 @@ canvas.addEventListener("pointerdown", (e) => {
   if (IS_COARSE && !paused && !hitPauseBtn(e.clientX,e.clientY)) return;
   if (paused) {
     e.preventDefault();
-    const ex=PAUSE_EXIT_BTN;
+    const ex=PAUSE_EXIT_BTN, sv=PAUSE_SAVE_BTN;
+    if (e.clientX>=sv.x&&e.clientX<=sv.x+sv.w&&e.clientY>=sv.y&&e.clientY<=sv.y+sv.h) {
+      if (window.BoohaSaveMenu) BoohaSaveMenu.open();
+      return;
+    }
     if (e.clientX>=ex.x&&e.clientX<=ex.x+ex.w&&e.clientY>=ex.y&&e.clientY<=ex.y+ex.h) {
       setPaused(false); started=false; pauseAllMusic(); resetGame(); window.location.href="karasuki.html"; return;
     }
@@ -2680,6 +2701,8 @@ function startInvadersRun(continueRun) {
   }
   const continueBtn = document.getElementById("invadersContinueBtn");
   if (continueBtn) continueBtn.addEventListener("click", () => startInvadersRun(true));
+  const saveMenuBtn = document.getElementById("invadersSaveMenuBtn");
+  if (saveMenuBtn) saveMenuBtn.addEventListener("click", () => { if (window.BoohaSaveMenu) BoohaSaveMenu.open(); });
 
   // If a browser rejected music during a background/visibility transition,
   // the next real user gesture gives us a safe opportunity to resume it.
