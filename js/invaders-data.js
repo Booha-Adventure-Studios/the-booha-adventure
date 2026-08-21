@@ -89,7 +89,9 @@ const CANDY_CONFIG = {
 // Each tier defines how many bugs spawn per group (4 groups per wave).
 // Progress within a tier smoothly interpolates between min and max group sizes.
 const WAVE_TIERS = [
-  { from:  1, to:  4,  groups: [1,  2,  4,  5]  },
+  // The first four waves are the onboarding runway. Keep four formations,
+  // but make them small enough that the player reaches the first boss quickly.
+  { from:  1, to:  4,  groups: [2,  3,  4,  4]  },
   { from:  5, to: 10,  groups: [4,  8, 12, 16]  },
   { from: 11, to: 20,  groups: [6, 12, 18, 24]  },
   { from: 21, to: 30,  groups: [10, 18, 26, 34] },
@@ -107,10 +109,10 @@ const WAVE_EXTRA_BUGS = {
 
 // ── WAVE PACING ──────────────────────────────────────────────
 const WAVE_SCALE = {
-  introDelaySec:         1.5,   // pause before wave card appears
-  waveCardSec:           3.8,   // how long the wave number card shows
+  introDelaySec:         0.35,  // short breath before the wave begins
+  waveCardSec:           1.15,  // cards should announce, not block play
 
-  spawnIntervalBase:     0.55,  // seconds between bug spawns at wave 1
+  spawnIntervalBase:     0.38,  // seconds between bug spawns at wave 1
   spawnIntervalMin:      0.09,  // fastest possible spawn interval
   spawnIntervalDropPerWave: 0.010, // how much faster each wave gets
 
@@ -192,6 +194,7 @@ const DROPPER_CONFIG = {
   fallSpeedMax:    320,        // px/s max fall speed
   aimSpread:       0.20,       // ±fraction of screen width aim randomness
   playerDamage:    22,         // energy damage on direct player hit
+  rockDamage:      3,          // bomber contact damages a rock; it does not delete it
 };
 
 // ── HIT STOP ─────────────────────────────────────────────────
@@ -234,7 +237,7 @@ const SHAKE_CONFIG = {
   bossPhase:    { mag: 10, dur: 0.25 },
   bossPhase3:   { mag: 14, dur: 0.30 },
   bossDeath:    { mag: 28, dur: 1.20 },
-  dropperRock:  { mag: 10, dur: 0.30 }, // dropper destroys a rock — currently unused (visual only)
+  dropperRock:  { mag:  4, dur: 0.10 }, // small impact cue when a bomber damages a rock
   dropperPlayer:{ mag: 10, dur: 0.30 },
   bossCinematic:{ mag: 25, dur: 1.00 },
 };
@@ -252,4 +255,5 @@ const ROCK_CONFIG = {
   baseHp:      8,
   hpGainPerWave: 2,
   maxHp:       30,
+  shotDamage:  1,
 };

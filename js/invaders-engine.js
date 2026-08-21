@@ -38,7 +38,9 @@ let TILT_ENABLED = false;
 let tiltGamma = 0, tiltSmooth = 0, tiltBaseline = 0, tiltVx = 0;
 
 // Audio
-let bgm = null, bossBgm = null, candySfx = null, lifelossSfx = null;
+let bgm = null, bossBgm = null, candySfx = null;
+let audioCtx = null, audioMaster = null, audioReady = false;
+let audioRetryTimer = 0, lastFireSfxAt = 0;
 let bossMusicIdx = 0;
 
 // Boss
@@ -172,15 +174,85 @@ scheduleOrientationGate();
 // ════════════════════════════════════════
 // AUDIO
 // ════════════════════════════════════════
+function audioNow() { return audioCtx ? audioCtx.currentTime : 0; }
+
+function ensureAudio() {
+  try {
+    const AudioContextCtor = window.AudioContext || window.webkitAudioContext;
+    if (AudioContextCtor && !audioCtx) {
+      audioCtx = new AudioContextCtor();
+      audioMaster = audioCtx.createGain();
+      audioMaster.gain.value = 0.52;
+      audioMaster.connect(audioCtx.destination);
+    }
+    if (audioCtx?.state === "suspended") audioCtx.resume().catch(() => {});
+    audioReady = true;
+  } catch (_) {
+    audioReady = false;
+  }
+}
+
+function playTone(kind) {
+  if (!audioReady || !audioCtx || !audioMaster) return;
+  const now = audioNow();
+  const settings = {
+    fire:     { freq: 420, end: 180, dur: 0.055, type: "square", gain: 0.045 },
+    weakFire: { freq: 270, end: 120, dur: 0.045, type: "triangle", gain: 0.030 },
+    hit:      { freq: 180, end: 95,  dur: 0.075, type: "square", gain: 0.060 },
+    kill:     { freq: 520, end: 760, dur: 0.11,  type: "triangle", gain: 0.070 },
+    rock:     { freq: 110, end: 65,  dur: 0.12,  type: "sawtooth", gain: 0.075 },
+    player:   { freq: 150, end: 55,  dur: 0.20,  type: "sawtooth", gain: 0.11  },
+    boss:     { freq: 90,  end: 42,  dur: 0.32,  type: "sawtooth", gain: 0.13  },
+    pickup:   { freq: 620, end: 980, dur: 0.16,  type: "triangle", gain: 0.085 },
+  }[kind];
+  if (!settings) return;
+  try {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = settings.type;
+    osc.frequency.setValueAtTime(settings.freq, now);
+    osc.frequency.exponentialRampToValueAtTime(Math.max(30, settings.end), now + settings.dur);
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(settings.gain, now + 0.008);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + settings.dur);
+    osc.connect(gain); gain.connect(audioMaster);
+    osc.start(now); osc.stop(now + settings.dur + 0.02);
+  } catch (_) {}
+}
+
+function playSfx(kind) {
+  ensureAudio();
+  if (kind === "fire" || kind === "weakFire") {
+    const now = performance.now();
+    if (now - lastFireSfxAt < 85) return;
+    lastFireSfxAt = now;
+  }
+  playTone(kind);
+}
+
+function playAudioElement(el) {
+  if (!el || !audioReady || paused) return;
+  const promise = el.play();
+  if (promise?.catch) {
+    promise.catch(() => {
+      clearTimeout(audioRetryTimer);
+      audioRetryTimer = setTimeout(() => {
+        if (started && !paused) playAudioElement(el);
+      }, 900);
+    });
+  }
+}
+
 function pauseAllMusic() {
   try { if (bgm    && !bgm.paused)    bgm.pause();    } catch (_) {}
   try { if (bossBgm && !bossBgm.paused) bossBgm.pause(); } catch (_) {}
 }
 function resumeAllMusic() {
+  ensureAudio();
   try {
-    if (bossAlive && bossBgm) { bossBgm.play().catch(() => {}); return; }
+    if (bossAlive && bossBgm) { playAudioElement(bossBgm); return; }
   } catch (_) {}
-  try { if (bgm) bgm.play().catch(() => {}); } catch (_) {}
+  try { if (bgm) playAudioElement(bgm); } catch (_) {}
 }
 function setPaused(on) {
   if (paused === on) return;
@@ -189,14 +261,16 @@ function setPaused(on) {
 }
 function playCandySfx() {
   try {
-    if (!candySfx) return;
+    ensureAudio();
+    if (!candySfx) { playSfx("pickup"); return; }
     const s = candySfx.cloneNode();
     s.volume = 1;
-    s.play().catch(() => {});
+    const promise = s.play();
+    if (promise?.catch) promise.catch(() => playSfx("pickup"));
   } catch (_) {}
 }
 function playLifeloss() {
-  try { if (!lifelossSfx) return; lifelossSfx.currentTime = 0; lifelossSfx.play().catch(() => {}); } catch (_) {}
+  playSfx("player");
 }
 function setBossMusic(on) {
   try {
@@ -206,15 +280,21 @@ function setBossMusic(on) {
       if (!bossBgm || bossBgm._src !== src) {
         if (bossBgm) { try { bossBgm.pause(); } catch (_) {} }
         bossBgm = new Audio(src);
-        bossBgm.loop = true; bossBgm.volume = 0.9; bossBgm._src = src;
+        bossBgm.loop = true; bossBgm.preload = "auto"; bossBgm.volume = 0.9; bossBgm._src = src;
+        bossBgm.addEventListener("error", () => {
+          if (started && !paused) {
+            clearTimeout(audioRetryTimer);
+            audioRetryTimer = setTimeout(() => playAudioElement(bossBgm), 900);
+          }
+        });
       } else {
         bossBgm.pause(); bossBgm.currentTime = 0;
       }
-      if (!paused) bossBgm.play().catch(() => {});
+      if (!paused) playAudioElement(bossBgm);
     } else {
       if (bossBgm) { bossBgm.pause(); bossBgm.currentTime = 0; }
       bossMusicIdx = (bossMusicIdx + 1) % ASSET_PATHS.bossMusic.length;
-      if (bgm && !paused) bgm.play().catch(() => {});
+      if (bgm && !paused) playAudioElement(bgm);
     }
   } catch (_) {}
 }
@@ -241,11 +321,25 @@ const droppers = [];
 
 let booFireTimer = 0, booAutoCD = 0;
 let dropperTimer = 0;
-let candyTimer   = 8;
+let candyTimer   = 4.5;
 
 // Shake
-let shakeX = 0, shakeY = 0, shakeDecay = 0;
-function doShake(mag, dur) { shakeX = mag; shakeY = mag; shakeDecay = dur || 0.3; }
+let shakeX = 0, shakeY = 0, shakeDecay = 0, shakeDuration = 0;
+function doShake(mag, dur) {
+  const duration = dur || 0.3;
+  shakeX = Math.max(shakeX, mag || 0);
+  shakeY = Math.max(shakeY, mag || 0);
+  shakeDecay = Math.max(shakeDecay, duration);
+  shakeDuration = Math.max(shakeDuration, duration);
+}
+function updateShake(dt) {
+  if (shakeDecay <= 0) {
+    shakeX = shakeY = shakeDuration = 0;
+    return;
+  }
+  shakeDecay = Math.max(0, shakeDecay - Math.max(0, dt));
+  if (shakeDecay === 0) shakeX = shakeY = shakeDuration = 0;
+}
 
 // ════════════════════════════════════════
 // WEAPON HELPERS
@@ -275,7 +369,9 @@ function candyWeight(wave) {
 // ════════════════════════════════════════
 // WAVE SYSTEM
 // ════════════════════════════════════════
-const DOTTY_SHIELD_POST = 2.0;
+// A brief spawn shield protects the entrance animation without making the
+// first minute feel like the player is shooting at untouchable targets.
+const DOTTY_SHIELD_POST = 0.65;
 
 const WS = {
   wave:1, groupIdx:0, targetCount:0, spawned:0, killed:0, spawnTimer:0,
@@ -355,7 +451,7 @@ function spawnRocks(wave) {
   const ry = player.y - rh - rPad;
   const hp = clamp(ROCK_CONFIG.baseHp + wave * ROCK_CONFIG.hpGainPerWave, ROCK_CONFIG.baseHp, ROCK_CONFIG.maxHp);
   for (let i = 0; i < rCount; i++) {
-    rocks.push({ x: gap + i * (rw + gap), y: ry, w: rw, h: rh, hp, maxHp: hp });
+    rocks.push({ x: gap + i * (rw + gap), y: ry, w: rw, h: rh, hp, maxHp: hp, hitT: 0 });
   }
 }
 
@@ -601,10 +697,9 @@ function spawnBug() {
   const enterDur  = rand(0.8, 1.2);
   const tp = tierProgress01(WS.wave);
   let hp = 1;
-  if (tp > 0.20) hp = 2;
-  if (tp > 0.45) hp = 3;
-  if (tp > 0.70) hp = 4;
-  if (WS.groupIdx >= 2) hp += 1;
+  if (WS.wave >= 3 && tp > 0.30) hp = 2;
+  if (WS.wave >= 4 && tp > 0.75) hp = 3;
+  if (WS.wave >= 5 && WS.groupIdx >= 2) hp += 1;
   hp += skillBonusHp();
   hp = clamp(hp, 1, 7);
   const tintHue = (bgHue + WS.groupIdx * 30) % 360;
@@ -657,8 +752,12 @@ function updateDroppers(dt) {
     for (const r of rocks) {
       if (r.hp <= 0) continue;
       if (aabb(d.x, d.y, d.w, d.h, r.x, r.y, r.w, r.h)) {
-        r.hp = 0; d.dead = true;
+        r.hp = Math.max(0, r.hp - DROPPER_CONFIG.rockDamage);
+        r.hitT = 0.28;
+        d.dead = true;
         addBigExplosion(r.x + r.w/2, r.y + r.h/2, "boss");
+        playSfx("rock");
+        doShake(SHAKE_CONFIG.dropperRock.mag, SHAKE_CONFIG.dropperRock.dur);
         screenFlash.alpha = 0.25; screenFlash.color = "#ff8844";
         break;
       }
@@ -670,6 +769,7 @@ function updateDroppers(dt) {
         player.hitIFrames = 0.6; player.boost = 0;
         breakCombo();
         addSpark(player.x + player.w/2, player.y + player.h/2, 16, "boss");
+        playSfx("player");
         doShake(SHAKE_CONFIG.dropperPlayer.mag, SHAKE_CONFIG.dropperPlayer.dur);
         screenFlash.alpha = 0.4; screenFlash.color = "#ff2244";
         if (player.energy <= 0) {
@@ -774,6 +874,7 @@ function fireBooShot(isMoving) {
     const cols = ["#ffcc44","#ff66cc","#66ffcc","#cc88ff","#ffaa44","#ff4444","#44ffcc"];
     for (let i = 0; i < 7; i++) spawn(((i-3)*38 + lean*0.2)*sm, cols[i%cols.length], true);
   }
+  playSfx(isMoving ? "weakFire" : "fire");
   player.glow = isMoving ? 0.05 : 0.15;
   booFireTimer = 0.12;
 }
@@ -858,6 +959,8 @@ function easeOutBack(t)    { const c=1.70158,p=c+1; return 1+p*Math.pow(t-1,3)+c
 function update(dt) {
   if (player.energy <= 0) return;
   stageTime += dt;
+
+  for (const r of rocks) r.hitT = Math.max(0, (r.hitT || 0) - dt);
 
   // Timed weapon countdown
   if (timedWeapon.remaining > 0) {
@@ -1086,6 +1189,7 @@ function updateDiveCollisions() {
     b.alive = false; WS.killed++;
     addSpark(player.x+player.w/2, player.y+player.h/2, 18, "slime");
     addSpark(b.x+b.w/2, b.y+b.h/2, 12, "boss");
+    playSfx("player");
     doShake(SHAKE_CONFIG.playerHit.mag, SHAKE_CONFIG.playerHit.dur);
     screenFlash.alpha = 0.35; screenFlash.color = "#ff2244";
     if (player.energy <= 0) {
@@ -1117,6 +1221,7 @@ function updateProjectiles(dt) {
       b.shakeT = b.isBoss ? 0.18 : 0.10; b.shakeMag = b.isBoss ? 8 : 4;
       b.hurtFlash = DOTTY_SPRITES.hurtFlashDur; // trigger hurt sprite
       s.dead = true;
+      playSfx(b.isBoss ? "boss" : "hit");
       addSpark(b.x+b.w/2, b.y+b.h/2, b.isBoss?16:10, s.isFriend?"friend":s.isPink?"pink":"gold");
       if (b.isBoss) {
         hitStopTimer = Math.max(hitStopTimer, HIT_STOP.bossHit);
@@ -1126,6 +1231,7 @@ function updateProjectiles(dt) {
       }
       if (b.hp <= 0) {
         b.alive = false; WS.killed++;
+        playSfx("kill");
         const pts = b.isBoss ? 500 : 10 + WS.wave * 2;
         registerKill(pts);
         if (b.isBoss) {
@@ -1169,7 +1275,9 @@ function updateProjectiles(dt) {
     for (const r of rocks) {
       if (r.hp <= 0) continue;
       if (aabb(bl.x-bl.r, bl.y-bl.r, bl.r*2, bl.r*2, r.x, r.y, r.w, r.h)) {
-        r.hp = Math.max(0, r.hp - 3); bl.dead = true; addSpark(bl.x, bl.y, 4, "slime"); break;
+        r.hp = Math.max(0, r.hp - ROCK_CONFIG.shotDamage);
+        r.hitT = 0.16;
+        bl.dead = true; addSpark(bl.x, bl.y, 4, "slime"); playSfx("rock"); break;
       }
     }
     if (!bl.dead && player.hitIFrames <= 0) {
@@ -1186,6 +1294,7 @@ function updateProjectiles(dt) {
           player.hitIFrames = PLAYER_CONFIG.iFramesDuration; player.boost = 0;
           breakCombo();
           addSpark(player.x+player.w/2, player.y+player.h/2, 14, "slime");
+          playSfx("player");
           doShake(SHAKE_CONFIG.bugHit.mag, SHAKE_CONFIG.bugHit.dur);
           screenFlash.alpha = 0.4; screenFlash.color = "#ff2244";
           if (player.energy <= 0) {
@@ -1786,7 +1895,11 @@ function drawScreenFlash() {
 // ════════════════════════════════════════
 function draw() {
   let sx=0, sy=0;
-  if (shakeDecay > 0) { const m=shakeDecay*10; sx=rand(-m,m); sy=rand(-m,m); }
+  if (shakeDecay > 0 && shakeDuration > 0) {
+    const envelope = clamp(shakeDecay / shakeDuration, 0, 1);
+    sx = rand(-shakeX, shakeX) * envelope;
+    sy = rand(-shakeY, shakeY) * envelope;
+  }
   ctx.save(); ctx.translate(sx,sy);
   drawBackground();
 
@@ -1798,6 +1911,14 @@ function draw() {
     const img = IMG.rocks?.[idx];
     if (img) ctx.drawImage(img, r.x, r.y, r.w, r.h);
     else { ctx.fillStyle=`rgba(${Math.round(80+pct*80)},70,50,0.9)`; roundRect(r.x,r.y,r.w,r.h,8); ctx.fill(); }
+    if (r.hitT > 0) {
+      ctx.save();
+      ctx.globalAlpha = Math.min(0.65, r.hitT * 2.3);
+      ctx.fillStyle = "#fff1b0";
+      roundRect(r.x, r.y, r.w, r.h, 8);
+      ctx.fill();
+      ctx.restore();
+    }
     if (pct < 0.99) {
       const bx=r.x+r.w*0.1, bw=r.w*0.8, bh=4, by=r.y+r.h+3;
       ctx.fillStyle="rgba(0,0,0,0.4)"; roundRect(bx,by,bw,bh,2); ctx.fill();
@@ -2115,9 +2236,9 @@ function resetGame() {
   combo=0; comboTimer=0; comboDisplay=0; comboPop=0;
   score=0; totalKills=0; lives=PLAYER_CONFIG.maxLives;
   playerShield=0; timedWeapon.level=0; timedWeapon.remaining=0;
-  stageTime=0; candyTimer=8; bossAlive=false; bossMusicIdx=0;
+  stageTime=0; candyTimer=4.5; bossAlive=false; bossMusicIdx=0;
   WS.skillMult=1.0; WS.skillDisplay=1.0; WS.skillHeat=0; WS.groupStartT=0;
-  booFireTimer=0; booAutoCD=0; shakeDecay=0; shakeX=0; shakeY=0; hitStopTimer=0;
+  booFireTimer=0; booAutoCD=0; shakeDecay=0; shakeDuration=0; shakeX=0; shakeY=0; hitStopTimer=0;
   screenFlash.alpha=0;
   bgOverlay={h:240,s:60,l:30,a:0,th:240,ts:60,tl:30,ta:0};
   bossCinematic.active=false; bossCinematic.t=0;
@@ -2153,6 +2274,7 @@ function tick(ts) {
     const t=ts/1000;
     const rawDt=Math.min(0.033, (t-last)||0);
     last=t;
+    updateShake(rawDt);
 
     // Hit stop — count down in real time but skip gameplay updates
     if (hitStopTimer > 0) {
@@ -2188,8 +2310,23 @@ function tick(ts) {
     }).catch(()=>{});
   }
 
-  try { bgm=new Audio(ASSET_PATHS.bgm); bgm.loop=true; bgm.volume=0.6; } catch(_){}
-  try { candySfx=new Audio(ASSET_PATHS.candySfx); candySfx.volume=1; } catch(_){}
+  try {
+    bgm = new Audio(ASSET_PATHS.bgm);
+    bgm.loop = true;
+    bgm.preload = "auto";
+    bgm.volume = 0.6;
+    bgm.addEventListener("error", () => {
+      if (started && !paused) {
+        clearTimeout(audioRetryTimer);
+        audioRetryTimer = setTimeout(() => playAudioElement(bgm), 900);
+      }
+    });
+  } catch(_){}
+  try {
+    candySfx = new Audio(ASSET_PATHS.candySfx);
+    candySfx.preload = "auto";
+    candySfx.volume = 1;
+  } catch(_){}
 
   try {
     const [bg,b1,b2,bugN,bugH,bugB,candy,r1,r2,r3,r4] = await Promise.all([
@@ -2213,6 +2350,7 @@ function tick(ts) {
   const startBtn = document.getElementById("startBtn");
   if (startBtn) {
     startBtn.addEventListener("click", () => {
+      ensureAudio();
       started=true;
       if (IS_COARSE && mobileControls) mobileControls.style.display="block";
       updateOrientationGate();
@@ -2235,10 +2373,23 @@ function tick(ts) {
       }
 
       resetGame();
-      try { if (bgm) bgm.play().catch(()=>{}); } catch(_){}
+      try { resumeAllMusic(); } catch(_){}
       startWave(1);
     });
   }
+
+  // If a browser rejected music during a background/visibility transition,
+  // the next real user gesture gives us a safe opportunity to resume it.
+  const retryAudioFromGesture = () => {
+    if (!started) return;
+    ensureAudio();
+    if (!paused) resumeAllMusic();
+  };
+  addEventListener("pointerdown", retryAudioFromGesture, { passive: true });
+  addEventListener("keydown", retryAudioFromGesture, { passive: true });
+  addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible" && started && !paused) resumeAllMusic();
+  });
 
  document.getElementById("startExitBtn")?.addEventListener("pointerdown", e => {
     e.preventDefault(); e.stopPropagation();
