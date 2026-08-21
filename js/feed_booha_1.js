@@ -95,6 +95,14 @@
   // Full impulse while active, so a tap reads as a clear, controllable
   // shove instead of a constant ambient breeze the player never asked for.
   const FAN_FORCE          = 0.58;
+  // Near-miss camera beat: the instant the safety-catch magnet first grabs
+  // a throw (see applyMagnet), briefly slow time and punch the camera in
+  // toward the catch point, so the save reads as a dramatic near-miss
+  // instead of an invisible nudge — this is also the exact moment that
+  // now costs the round a star (see starsForCuts).
+  const RESCUE_FX_FRAMES     = 14;   // real frames the beat lasts
+  const RESCUE_SLOWMO_SCALE  = 0.35; // time scale while the beat plays
+  const RESCUE_ZOOM_MAX      = 0.05; // peak camera punch-in, tapers to 0
 
   const swipe        = { active: false, x0: 0, y0: 0, x1: 0, y1: 0, startX: 0, startY: 0 };
   // v7: poof effects replace slash effects
@@ -480,6 +488,7 @@
     pendingSuccessTimeout: null, pendingFailTimeout: null,
     bouncePattern: null,
     shakeFrames: 0, shakeAmt: 0,
+    rescueFxFrames: 0, rescueFxX: 0, rescueFxY: 0,
     trail: [],
     lastChanceFired: false, boohaJumpOffset: 0, boohaJumpFrame: 0,
     cutTimers: {}, missDir: 0, fallSoundPlayed: false,
@@ -836,6 +845,7 @@
     state.cutTimers       = {};
     state.bounceCooldown  = 0;
     state.shakeFrames     = 0;
+    state.rescueFxFrames  = 0;
     state.lastChanceFired = false;
     state.boohaJumpOffset = 0;
     state.boohaJumpFrame  = 0;
@@ -1146,6 +1156,14 @@
       const steer = SAFETY_CATCH_STEER * k;
       c.vx += dx * steer;
       c.vy += dy * steer;
+      if (!state.usedSafetyCatch) {
+        // First frame of the rescue only — fire the beat once per attempt,
+        // centered on the midpoint of the catch so it reads as "zooming in
+        // on the save" rather than snapping toward either point.
+        state.rescueFxFrames = RESCUE_FX_FRAMES;
+        state.rescueFxX = (c.x + m.x) / 2;
+        state.rescueFxY = (c.y + m.y) / 2;
+      }
       state.usedSafetyCatch = true;
       return;
     }
@@ -1664,7 +1682,18 @@
     const sx = state.shakeFrames>0 ? (Math.random()-0.5)*state.shakeAmt*2 : 0;
     const sy = state.shakeFrames>0 ? (Math.random()-0.5)*state.shakeAmt*2 : 0;
     ctx.save(); ctx.translate(sx, sy);
+    // Clear in the untransformed frame first — the rescue zoom below only
+    // ever scales content *up*, so clearing before it applies keeps the
+    // full canvas covered regardless of zoom.
     ctx.clearRect(-10,-10,W+20,H+20);
+    if (state.rescueFxFrames > 0) {
+      const p    = state.rescueFxFrames / RESCUE_FX_FRAMES; // 1 → 0
+      const ease = Math.sin(p * Math.PI / 2);                // eased taper
+      const zoom = 1 + RESCUE_ZOOM_MAX * ease;
+      ctx.translate(state.rescueFxX, state.rescueFxY);
+      ctx.scale(zoom, zoom);
+      ctx.translate(-state.rescueFxX, -state.rescueFxY);
+    }
     if (!state.currentLevel) { ctx.restore(); return; }
     drawFloor();
     drawObjects();
@@ -1710,9 +1739,16 @@
   // Main loop
   // ─────────────────────────────────────────────────
   function frame(ts) {
-    const dt = state.lastTime ? Math.min(ts - state.lastTime, 50) : 16.67;
+    const rawDt = state.lastTime ? Math.min(ts - state.lastTime, 50) : 16.67;
     state.lastTime = ts;
-    update(dt); draw();
+    // While the near-miss beat is playing, stretch time briefly so the
+    // save reads as a beat, not a blip — draw() reads rescueFxFrames for
+    // its own zoom-taper below, so decrement after drawing this frame.
+    const rescueActive = state.rescueFxFrames > 0;
+    const dt = rescueActive ? rawDt * RESCUE_SLOWMO_SCALE : rawDt;
+    update(dt);
+    draw();
+    if (rescueActive) state.rescueFxFrames--;
     requestAnimationFrame(frame);
   }
 
