@@ -57,7 +57,7 @@ let lives = PLAYER_CONFIG.maxLives;
 let score = 0, totalKills = 0, highScore = 0;
 try { highScore = parseInt(localStorage.getItem("booha_hiscore") || "0") || 0; } catch (_) {}
 
-let combo = 0, comboTimer = 0, comboDisplay = 0, comboPop = 0;
+let combo = 0, maxCombo = 0, comboTimer = 0, comboDisplay = 0, comboPop = 0;
 
 // Friends
 const activeFriends = [];
@@ -66,7 +66,7 @@ const _seenFriends = new Set();
 const FRIENDS_RUNTIME = FRIENDS_UNLOCK.map(fd => ({ ...fd, img: null }));
 
 // Weapon
-let timedWeapon = { level: 0, remaining: 0 };
+let timedWeapon = { level: 0, mode: null, remaining: 0 };
 
 // BG / overlay
 let bgHue = 240;
@@ -204,6 +204,7 @@ function playTone(kind) {
     player:   { freq: 150, end: 55,  dur: 0.20,  type: "sawtooth", gain: 0.11  },
     boss:     { freq: 90,  end: 42,  dur: 0.32,  type: "sawtooth", gain: 0.13  },
     pickup:   { freq: 620, end: 980, dur: 0.16,  type: "triangle", gain: 0.085 },
+    streak:   { freq: 740, end: 1180,dur: 0.22,  type: "square", gain: 0.075 },
   }[kind];
   if (!settings) return;
   try {
@@ -355,6 +356,14 @@ function weaponLevel() {
   const timedLevel = timedWeapon.remaining > 0 ? timedWeapon.level : 0;
   return clamp(Math.max(comboLevel, timedLevel), 1, 4);
 }
+function weaponMode() {
+  if (timedWeapon.remaining > 0 && timedWeapon.mode) return timedWeapon.mode;
+  const wl = weaponLevelFromCombo(combo);
+  if (wl >= 4) return "pierce";
+  if (wl >= 3) return "burst";
+  if (wl >= 2) return "spread";
+  return "pulse";
+}
 
 // ════════════════════════════════════════
 // CANDY WEIGHT HELPER
@@ -485,6 +494,7 @@ function advanceGroupOrBoss() {
         triggerBossCinematic();
         return;
       }
+      awardWaveClear();
       WS.phase = "run_done"; return;
     }
     WS.phase = "run_done"; return;
@@ -590,7 +600,7 @@ function updateFriendUnlocks(wave) {
         _seenFriends.add(fd.id);
         const names   = { blue:"Blue-Boo joined!",  green:"Green-Boo joined!",  pink:"Pink-Boo joined!",   purple:"Purple-Boo joined!"  };
         const namesJP = { blue:"ブルー・ブーが なかまになった！", green:"グリーン・ブーが なかまになった！", pink:"ピンク・ブーが なかまになった！", purple:"パープル・ブーが なかまになった！" };
-        window._friendToast = { msg: `${names[fd.id]||fd.id} ／ ${namesJP[fd.id]||""}`, color: fd.color, t: 4.0 };
+        window._friendToast = { en: names[fd.id]||fd.id, jp: namesJP[fd.id]||"", color: fd.color, t: 4.0 };
         screenFlash.alpha = 0.25; screenFlash.color = fd.color;
       }
     }
@@ -630,10 +640,12 @@ function updateFriends(dt) {
 function fireFriendShot(f) {
   const sm  = shotScale();
   const cx  = f.x + f.w/2;
-  const wl  = weaponLevel();
-  const angles = wl >= 3 ? [-300,-150,0,150,300] : wl >= 2 ? [-200,0,200] : [0];
+  const mode = weaponMode();
+  const angles = mode === "spread" ? [-150,150] : mode === "burst" ? [-80,0,80] : [0];
   for (const vx of angles) {
-    booShots.push({ x:cx, y:f.y, vx:vx*sm, vy:-950*sm, isPink:true, isFriend:true, color:f.shotColor||"#a8e8ff", dead:false });
+    booShots.push({ x:cx, y:f.y, vx:vx*sm, vy:-950*sm, isPink:false, isFriend:true,
+      color:f.shotColor||"#a8e8ff", damage:1, pierce:mode === "pierce" ? 1 : 0,
+      hitBugs:[], isPiercing:mode === "pierce", dead:false });
   }
 }
 
@@ -860,19 +872,26 @@ function fireBooShot(isMoving) {
   const sm   = shotScale();
   const x0   = player.x + player.w/2;
   const y0   = player.y + 6;
-  const wl   = weaponLevel();
+  const mode = weaponMode();
   const vy   = -920 * sm * (isMoving ? 0.80 : 1.0);
   const lean = clamp(nearestBugLean(x0) * 0.4, -80, 80) * sm;
-  function spawn(vx, col, pink) {
-    booShots.push({ x:x0, y:y0, vx, vy, isPink:pink||false, isFriend:false, color:col||null, dead:false, isWeak:isMoving });
+  function spawn(vx, col, opts) {
+    opts = opts || {};
+    booShots.push({ x:x0, y:y0, vx, vy, isPink:!!opts.pink, isFriend:false,
+      color:col||null, damage:opts.damage ?? (opts.pink ? 2 : 1),
+      pierce:opts.pierce || 0, hitBugs:[], isPiercing:!!opts.pierce,
+      dead:false, isWeak:isMoving });
   }
-  if (isMoving) { spawn(lean, null, false); }
-  else if (wl <= 1) { spawn(lean, null, false); }
-  else if (wl === 2) { spawn(lean,null,false); spawn(-130*sm+lean*0.3,null,false); spawn(130*sm+lean*0.3,null,false); }
-  else if (wl === 3) { spawn(lean,null,true); spawn(-170*sm,null,true); spawn(170*sm,null,true); spawn(-85*sm,null,false); spawn(85*sm,null,false); }
-  else {
-    const cols = ["#ffcc44","#ff66cc","#66ffcc","#cc88ff","#ffaa44","#ff4444","#44ffcc"];
-    for (let i = 0; i < 7; i++) spawn(((i-3)*38 + lean*0.2)*sm, cols[i%cols.length], true);
+  if (isMoving || mode === "pulse") {
+    spawn(lean, null, {});
+  } else if (mode === "spread") {
+    spawn(lean, null, {}); spawn(-130*sm+lean*0.3, null, {}); spawn(130*sm+lean*0.3, null, {});
+  } else if (mode === "burst") {
+    spawn(lean, "#ff66cc", { pink:true, damage:2 });
+    spawn(-70*sm+lean*0.2, "#ff9adf", { pink:true, damage:2 });
+    spawn(70*sm+lean*0.2, "#ff9adf", { pink:true, damage:2 });
+  } else {
+    spawn(lean, "#d2a5ff", { damage:2, pierce:2 });
   }
   playSfx(isMoving ? "weakFire" : "fire");
   player.glow = isMoving ? 0.05 : 0.15;
@@ -929,8 +948,9 @@ function fireBossSpiral(b) {
 // ════════════════════════════════════════
 // COMBO
 // ════════════════════════════════════════
-function registerKill(points) {
+function registerKill(points, px, py) {
   combo++;
+  maxCombo = Math.max(maxCombo, combo);
   comboTimer   = COMBO_CONFIG.decaySeconds;
   comboPop     = 1;
   comboDisplay = combo;
@@ -939,10 +959,32 @@ function registerKill(points) {
   score       += earned;
   totalKills++;
   window._scorePopups = window._scorePopups || [];
-  window._scorePopups.push({ x:player.x+player.w/2, y:player.y-10, val:`+${earned}`, t:1.2, life:0 });
+  px = px ?? player.x+player.w/2;
+  py = py ?? player.y-10;
+  window._scorePopups.push({ x:px, y:py, val:`+${earned}`, t:1.2, life:0 });
+  const streaks = [5, 10, 15, 25, 30];
+  if (streaks.includes(combo)) {
+    const bonus = combo * 10;
+    score += bonus;
+    window._scorePopups.push({ x:px, y:py-24, val:`+${bonus} BONUS`, t:1.35, life:0 });
+    window._rewardToast = { en:`${combo} HIT STREAK!`, jp:`${combo}れんぞく！`, detail:`+${bonus}`, color:"#ffdd55", t:2.0 };
+    playSfx("streak");
+  }
 }
 function breakCombo() {
   if (combo > 0) { combo = 0; comboTimer = 0; comboDisplay = 0; }
+}
+
+function awardWaveClear() {
+  const bonus = WS.wave * 75 + Math.max(0, combo) * 5;
+  score += bonus;
+  window._rewardToast = {
+    en: `WAVE ${WS.wave} CLEAR!`, jp: `ウェーブ ${WS.wave} クリア！`,
+    detail: `+${bonus}`, color: "#a8f5c4", t: 2.25,
+  };
+  window._scorePopups = window._scorePopups || [];
+  window._scorePopups.push({ x:W()/2, y:H()*0.30, val:`+${bonus}`, t:1.5, life:0 });
+  playSfx("streak");
 }
 
 // ════════════════════════════════════════
@@ -965,7 +1007,14 @@ function update(dt) {
   // Timed weapon countdown
   if (timedWeapon.remaining > 0) {
     timedWeapon.remaining = Math.max(0, timedWeapon.remaining - dt);
-    if (timedWeapon.remaining === 0) timedWeapon.level = 0;
+    if (timedWeapon.remaining === 0) { timedWeapon.level = 0; timedWeapon.mode = null; }
+  }
+
+  for (const key of ["_friendToast", "_candyToast", "_rewardToast"]) {
+    const toast = window[key];
+    if (!toast) continue;
+    toast.t -= dt;
+    if (toast.t <= 0) window[key] = null;
   }
 
   // Combo decay
@@ -1214,13 +1263,16 @@ function updateProjectiles(dt) {
     }
     for (const b of bugs) {
       if (!b.alive || s.dead) continue;
+      if (s.hitBugs?.includes(b)) continue;
       if (!aabb(s.x-5, s.y-12, 10, 20, b.x, b.y, b.w, b.h)) continue;
       if (b.shieldT > 0) { s.dead = true; addSpark(b.x+b.w/2, b.y+b.h/2, 20, "gold"); break; }
-      const dmg = s.isPink || s.isFriend ? 2 : 1;
+      const dmg = s.damage ?? (s.isPink || s.isFriend ? 2 : 1);
       b.hp -= dmg; b.hitsTaken = (b.hitsTaken||0) + 1;
       b.shakeT = b.isBoss ? 0.18 : 0.10; b.shakeMag = b.isBoss ? 8 : 4;
       b.hurtFlash = DOTTY_SPRITES.hurtFlashDur; // trigger hurt sprite
-      s.dead = true;
+      if (s.hitBugs) s.hitBugs.push(b);
+      if ((s.pierce || 0) > 0) s.pierce--;
+      else s.dead = true;
       playSfx(b.isBoss ? "boss" : "hit");
       addSpark(b.x+b.w/2, b.y+b.h/2, b.isBoss?16:10, s.isFriend?"friend":s.isPink?"pink":"gold");
       if (b.isBoss) {
@@ -1232,8 +1284,8 @@ function updateProjectiles(dt) {
       if (b.hp <= 0) {
         b.alive = false; WS.killed++;
         playSfx("kill");
-        const pts = b.isBoss ? 500 : 10 + WS.wave * 2;
-        registerKill(pts);
+        const pts = b.isBoss ? 500 : 20 + WS.wave * 4;
+        registerKill(pts, b.x+b.w/2, b.y+b.h/2);
         if (b.isBoss) {
           // Staged boss death — small pops then the big bang
           hitStopTimer = Math.max(hitStopTimer, HIT_STOP.bossDeath);
@@ -1330,17 +1382,17 @@ function updateCandy(dt) {
         player.boost  = clamp((player.boost||0)+1, 0, 3);
         player.energy = Math.min(100, player.energy + 30);
       } else if (c.type==="blue") {
-        timedWeapon.level = 2; timedWeapon.remaining = CANDY_CONFIG.timedWeaponSecs;
+        timedWeapon.level = 2; timedWeapon.mode = "spread"; timedWeapon.remaining = CANDY_CONFIG.timedWeaponSecs;
         player.energy = Math.min(100, player.energy + 15);
-        window._candyToast = { msg:`3x SHOT — ${CANDY_CONFIG.timedWeaponSecs}秒（びょう）！`, color:"rgba(100,200,255,1)", t:2.5 };
+        window._candyToast = { en:`SPREAD GUN — ${CANDY_CONFIG.timedWeaponSecs}s`, jp:"ひろがる じゅう！", color:"rgba(100,200,255,1)", t:2.5 };
       } else if (c.type==="star") {
-        timedWeapon.level = 3; timedWeapon.remaining = CANDY_CONFIG.timedWeaponSecs;
+        timedWeapon.level = 4; timedWeapon.mode = "pierce"; timedWeapon.remaining = CANDY_CONFIG.timedWeaponSecs;
         player.energy = Math.min(100, player.energy + 15);
-        window._candyToast = { msg:`5x SHOT — ${CANDY_CONFIG.timedWeaponSecs}秒（びょう）！`, color:"rgba(255,255,100,1)", t:2.5 };
+        window._candyToast = { en:`PIERCE GUN — ${CANDY_CONFIG.timedWeaponSecs}s`, jp:"かんつう じゅう！", color:"rgba(255,255,100,1)", t:2.5 };
       } else if (c.type==="gold") {
         score += 500;
         screenFlash.alpha = 0.7; screenFlash.color = "#ffdd44";
-        for (const b of bugs) { if (!b.alive || b.isBoss) continue; addBigExplosion(b.x+b.w/2, b.y+b.h/2,"gold"); b.alive=false; WS.killed++; registerKill(10); }
+        for (const b of bugs) { if (!b.alive || b.isBoss) continue; addBigExplosion(b.x+b.w/2, b.y+b.h/2,"gold"); b.alive=false; WS.killed++; registerKill(20 + WS.wave * 4, b.x+b.w/2, b.y+b.h/2); }
       } else if (c.type==="green") {
         playerShield = CANDY_CONFIG.shieldDuration;
         player.energy = Math.min(100, player.energy + 20);
@@ -1396,6 +1448,19 @@ function drawBackground() {
 // ════════════════════════════════════════
 // HUD
 // ════════════════════════════════════════
+function drawBilingual(en, jp, x, y, enSize, jpSize, color, jpColor) {
+  ctx.save();
+  ctx.textAlign = "center"; ctx.textBaseline = "top";
+  ctx.font = `900 ${enSize}px system-ui,sans-serif`;
+  ctx.fillStyle = color || "#fff"; ctx.fillText(en, x, y);
+  if (jp) {
+    ctx.font = `800 ${jpSize || Math.max(9, enSize*0.58)}px system-ui,sans-serif`;
+    ctx.fillStyle = jpColor || "rgba(220,255,230,0.88)";
+    ctx.fillText(jp, x, y + enSize * 1.05);
+  }
+  ctx.restore();
+}
+
 function drawWaveCounter() {
   if (!started) return;
   const t = performance.now()/1000;
@@ -1411,10 +1476,14 @@ function drawWaveCounter() {
     ctx.fillStyle  = `rgba(255,${Math.round(60+pulse*40)},60,1)`;
     const k = bossIndexForWave(WS.wave);
     ctx.fillText(`BOSS WAVE ${WS.wave} ` + ("★".repeat(Math.min(k,4))), bx, by);
+    ctx.shadowBlur = 0; ctx.font = `800 ${Math.max(9,sz*0.58)}px system-ui,sans-serif`;
+    ctx.fillStyle = "rgba(255,190,190,0.88)"; ctx.fillText(`ボス ウェーブ ${WS.wave}`, bx, by+sz*1.05);
   } else {
     ctx.shadowBlur = 8; ctx.shadowColor = "rgba(255,200,80,0.6)";
     ctx.fillStyle  = "rgba(255,255,255,0.92)";
     ctx.fillText(`WAVE  ${WS.wave}`, bx, by);
+    ctx.shadowBlur = 0; ctx.font = `800 ${Math.max(9,sz*0.58)}px system-ui,sans-serif`;
+    ctx.fillStyle = "rgba(220,255,230,0.82)"; ctx.fillText(`ウェーブ ${WS.wave}`, bx, by+sz*1.05);
   }
   ctx.restore();
 }
@@ -1432,13 +1501,46 @@ function drawScoreHUD() {
   ctx.font = `700 ${hsz}px system-ui,sans-serif`;
   ctx.shadowBlur = 0; ctx.fillStyle = "rgba(255,255,255,0.45)";
   ctx.fillText(`BEST: ${Math.max(score,highScore).toLocaleString()}`, rx, by+sz+3);
+  ctx.font = `700 ${Math.max(8,hsz*0.72)}px system-ui,sans-serif`;
+  ctx.fillStyle = "rgba(255,255,255,0.34)";
+  ctx.fillText(`ベスト`, rx, by+sz+hsz+3);
+  ctx.font = `700 ${hsz}px system-ui,sans-serif`;
   ctx.fillStyle = "rgba(255,180,80,0.65)";
-  ctx.fillText(`KILLS: ${totalKills}`, rx, by+sz+hsz+7);
+  ctx.fillText(`KILLS: ${totalKills}`, rx, by+sz+hsz+16);
+  ctx.font = `700 ${Math.max(8,hsz*0.72)}px system-ui,sans-serif`;
+  ctx.fillStyle = "rgba(255,180,80,0.48)";
+  ctx.fillText(`キル`, rx, by+sz+hsz+16+hsz);
   ctx.restore();
 }
 
 function drawWaveBanner() {
   if (!started || WS.phase !== "card") return;
+  // A wave callout should orient the player, not take over the playfield.
+  const dur = Math.max(0.001, WAVE_SCALE.waveCardSec);
+  const t = clamp(WS.phaseT, 0, dur);
+  const enter = clamp(t / 0.18, 0, 1);
+  const exit = clamp((dur - t) / 0.22, 0, 1);
+  const alpha = Math.min(enter, exit);
+  const isBoss = isBossWave(WS.wave);
+  const cardW = clamp(W()*0.54, 230, 460), cardH = 72;
+  const cardX = W()/2-cardW/2, cardY = SAFE.top + 42;
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle = isBoss ? "rgba(70,8,20,0.88)" : "rgba(18,15,70,0.88)";
+  roundRect(cardX, cardY, cardW, cardH, 14); ctx.fill();
+  ctx.strokeStyle = isBoss ? "rgba(255,90,100,0.75)" : "rgba(160,130,255,0.72)";
+  ctx.lineWidth = 1.5; roundRect(cardX, cardY, cardW, cardH, 14); ctx.stroke();
+  drawBilingual(
+    isBoss ? "BOSS INCOMING" : `WAVE ${WS.wave}`,
+    isBoss ? "ボスが くるよ！" : `ウェーブ ${WS.wave}`,
+    W()/2, cardY+10, clamp(W()*0.045, 20, 32), clamp(W()*0.022, 10, 15),
+    isBoss ? "#ffb0b5" : "#fff", isBoss ? "#ffd0d0" : "#d9d0ff"
+  );
+  ctx.restore();
+  return;
+
+  /* Legacy full-screen card retained below for easy rollback during tuning. */
+  {
   const dur      = Math.max(0.001, WAVE_SCALE.waveCardSec);
   const pauseSec = 1.2;
   const moveSec  = Math.max(0.001, dur - pauseSec);
@@ -1495,6 +1597,7 @@ function drawWaveBanner() {
   ctx.lineWidth = subSize*0.12; ctx.strokeStyle = "rgba(0,0,0,0.75)"; ctx.strokeText(sub,innerX,iy);
   ctx.shadowBlur = 14; ctx.shadowColor = "rgba(180,255,200,0.9)"; ctx.fillStyle = "rgba(210,255,220,0.96)"; ctx.fillText(sub,innerX,iy);
   ctx.restore();
+  }
 }
 
 function drawBossCinematic() {
@@ -1525,9 +1628,13 @@ function drawBossCinematic() {
   ctx.lineWidth  = bigSize*0.04; ctx.strokeStyle = "rgba(0,0,0,0.8)";
   ctx.strokeText(`!! BOSS ${k>1?"★".repeat(Math.min(k,4)):"ARRIVES"} !!`, W()/2, H()/2-subSize*1.2);
   ctx.fillText(`!! BOSS ${k>1?"★".repeat(Math.min(k,4)):"ARRIVES"} !!`, W()/2, H()/2-subSize*1.2);
+  ctx.font = `800 ${subSize*0.62}px system-ui,sans-serif`; ctx.shadowBlur = 0; ctx.fillStyle = "rgba(255,210,210,0.90)";
+  ctx.fillText("ボスが あらわれる！", W()/2, H()/2-subSize*0.15);
   ctx.font = `900 ${subSize}px system-ui,sans-serif`;
   ctx.shadowBlur = 20; ctx.shadowColor = "rgba(255,200,80,0.8)"; ctx.fillStyle = "rgba(255,220,80,0.97)";
   ctx.fillText(`WAVE ${WS.wave} — DOTTY BOSS #${k}`, W()/2, H()/2+subSize*0.5);
+  ctx.font = `800 ${subSize*0.62}px system-ui,sans-serif`; ctx.shadowBlur = 0; ctx.fillStyle = "rgba(255,240,180,0.86)";
+  ctx.fillText(`ウェーブ ${WS.wave} — ドッティ ボス ${k}`, W()/2, H()/2+subSize*1.35);
   ctx.font = `900 ${subSize*0.75}px system-ui,sans-serif`;
   ctx.fillStyle = "rgba(255,200,200,0.85)";
   ctx.fillText("ボスが あらわれた！たたかえ！", W()/2, H()/2+subSize*2.2);
@@ -1567,6 +1674,8 @@ function drawBossHealthBar() {
   ctx.fillStyle = "rgba(255,255,255,0.9)";
   const k = bossIndexForWave(WS.wave);
   ctx.fillText(`★ DOTTY BOSS ${k>1?"★".repeat(k):""}`, W()/2, by+2);
+  ctx.font="700 9px system-ui,sans-serif"; ctx.fillStyle="rgba(255,210,210,.75)";
+  ctx.fillText(`ドッティ ボス`, W()/2, by+16);
   ctx.fillStyle = "rgba(0,0,0,0.5)"; roundRect(bx,by+14,bw,bh,bh/2); ctx.fill();
   const phase = boss.phase||1;
   let fillColor;
@@ -1601,9 +1710,16 @@ function drawComboHUD() {
   ctx.font = `900 ${big}px system-ui,sans-serif`;
   ctx.lineWidth = big*0.15; ctx.strokeStyle = "rgba(0,0,0,0.92)"; ctx.strokeText(`${combo}×`,0,0);
   ctx.shadowBlur = comboPop>0.1?48:20; ctx.shadowColor = col; ctx.fillStyle = col; ctx.fillText(`${combo}×`,0,0);
+  const streakSize = clamp(W()*0.018, 9, 13);
+  ctx.font = `800 ${streakSize}px system-ui,sans-serif`;
+  ctx.fillStyle = "rgba(255,255,255,0.82)"; ctx.shadowBlur = 0;
+  ctx.fillText("STREAK", 0, big*0.92);
+  ctx.font = `700 ${Math.max(8,streakSize*0.78)}px system-ui,sans-serif`;
+  ctx.fillStyle = "rgba(220,255,230,0.75)"; ctx.fillText("れんぞく", 0, big*0.92+streakSize*1.05);
   if (wl > 1) {
-    const labels = ["","DOUBLE","TRIPLE","CHAOS","★ULTRA★"];
-    const lbl    = labels[Math.min(wl-1,4)];
+    const mode = WEAPON_MODES[weaponMode()] || WEAPON_MODES.pulse;
+    const lbl    = mode.en;
+    const jpLbl  = mode.jp;
     const sz     = clamp(W()*0.025, 10, 18);
     ctx.font     = `900 ${sz}px system-ui,sans-serif`;
     const lw     = ctx.measureText(lbl).width + 18;
@@ -1611,6 +1727,8 @@ function drawComboHUD() {
     roundRect(-lw/2,big*1.05,lw,sz+8,5); ctx.fill(); ctx.globalAlpha = 1;
     ctx.lineWidth = sz*0.16; ctx.strokeStyle = "rgba(0,0,0,0.85)"; ctx.strokeText(lbl,0,big*1.14);
     ctx.shadowBlur = 18; ctx.shadowColor = col; ctx.fillStyle = col; ctx.fillText(lbl,0,big*1.14);
+    ctx.font = `800 ${Math.max(8,sz*0.72)}px system-ui,sans-serif`;
+    ctx.fillStyle = col; ctx.fillText(jpLbl,0,big*1.14+sz*1.02);
   }
   if (combo > 0 && comboTimer > 0) {
     const barW = clamp(W()*0.12,50,100), barH = 4;
@@ -1648,7 +1766,8 @@ function drawEnergyBar() {
   for (let i=1;i<SEGMENTS;i++) { const nx=bx+segW*i; if(nx<bx+bw*pct){ctx.fillStyle="rgba(0,0,0,0.4)";ctx.fillRect(nx-1,by,2,bh);} }
   ctx.strokeStyle=danger?`rgba(255,80,80,${0.5+0.5*pulse})`:"rgba(255,255,255,0.18)"; ctx.lineWidth=1.5; roundRect(bx,by,bw,bh,bh/2); ctx.stroke();
   ctx.shadowBlur=0; ctx.font="700 10px system-ui,sans-serif";
-  ctx.fillStyle=danger?`rgba(255,100,100,${pulse})`:"rgba(255,255,255,0.65)"; ctx.textBaseline="top"; ctx.fillText("BOOHA",bx,by+bh+3);
+  ctx.fillStyle=danger?`rgba(255,100,100,${pulse})`:"rgba(255,255,255,0.65)"; ctx.textBaseline="top"; ctx.fillText("ENERGY",bx,by+bh+3);
+  ctx.font="700 8px system-ui,sans-serif"; ctx.fillStyle="rgba(220,255,230,0.60)"; ctx.fillText("エネルギー",bx,by+bh+14);
   for (let i=0;i<PLAYER_CONFIG.maxLives;i++) {
     const lx=bx+52+i*14, ly=by+bh+7, filled=i<lives;
     ctx.beginPath(); ctx.arc(lx,ly,4,0,Math.PI*2);
@@ -1670,31 +1789,28 @@ function drawTimedWeaponHUD() {
   if (timedWeapon.remaining <= 0) return;
   const t     = performance.now()/1000;
   const pulse = 0.5 + 0.5*Math.sin(t*6);
-  const isStar  = timedWeapon.level >= 3;
+  const mode  = WEAPON_MODES[timedWeapon.mode] || WEAPON_MODES.spread;
+  const isStar  = timedWeapon.mode === "pierce";
   const col   = isStar ? "rgba(255,255,80,1)" : "rgba(100,200,255,1)";
   const glow  = isStar ? "rgba(255,255,80,0.7)" : "rgba(100,200,255,0.7)";
-  const label = isStar ? "5x SHOT" : "3x SHOT";
   const bx = 16, by = SAFE.top + HUD_PAD + 56, barW = 100;
   const pct  = timedWeapon.remaining / CANDY_CONFIG.timedWeaponSecs;
   const secs = Math.ceil(timedWeapon.remaining);
   ctx.save();
   ctx.textBaseline = "top"; ctx.font = "900 11px system-ui,sans-serif";
   ctx.shadowBlur = 8+pulse*5; ctx.shadowColor=glow; ctx.fillStyle=col; ctx.globalAlpha=0.9+pulse*0.1;
-  ctx.fillText(`${label} ${secs}s`, bx, by);
-  const barY = by+14; ctx.globalAlpha=1;
+  ctx.fillText(`${mode.en} GUN  ${secs}s`, bx, by);
+  ctx.font = "800 9px system-ui,sans-serif"; ctx.fillStyle = col;
+  ctx.fillText(`${mode.jp} じゅう`, bx, by+12);
+  const barY = by+25; ctx.globalAlpha=1;
   ctx.fillStyle="rgba(0,0,0,0.45)"; roundRect(bx,barY,barW,4,2); ctx.fill();
   ctx.fillStyle=col; ctx.shadowBlur=isStar?12:7; roundRect(bx,barY,barW*pct,4,2); ctx.fill();
   ctx.restore();
   if (window._candyToast) {
-    const ct = window._candyToast; ct.t -= 1/60;
-    if (ct.t <= 0) { window._candyToast = null; }
-    else {
-      const a = Math.min(1, ct.t/0.5);
-      ctx.save(); ctx.globalAlpha=a; ctx.textAlign="center"; ctx.textBaseline="middle";
-      ctx.font=`900 ${clamp(W()*0.042,17,26)}px system-ui,sans-serif`;
-      ctx.shadowBlur=20; ctx.shadowColor=ct.color; ctx.fillStyle=ct.color;
-      ctx.fillText(ct.msg, W()/2, H()*0.55); ctx.restore();
-    }
+    const ct = window._candyToast; const a = Math.min(1, ct.t/0.5);
+    ctx.save(); ctx.globalAlpha=a; ctx.shadowBlur=20; ctx.shadowColor=ct.color;
+    drawBilingual(ct.en, ct.jp, W()/2, H()*0.52, clamp(W()*0.042,17,26), clamp(W()*0.024,11,16), ct.color, "#fff");
+    ctx.restore();
   }
 }
 
@@ -1705,7 +1821,7 @@ function drawSkillHeat() {
   const heat = WS.skillHeat;
   const t    = performance.now()/1000;
   const bx   = 16, by = SAFE.top + HUD_PAD + 38;
-  const label = sm>=1.9?"★ CHAOS":sm>=1.6?"HOT!!":sm>=1.3?"HEATED":"WARM";
+  const label = sm>=1.9?["CHAOS","カオス"]:sm>=1.6?["HOT","あつい"]:sm>=1.3?["HEATED","ねつい"]:["WARM","あたたかい"];
   const sz    = clamp(W()*0.022, 9, 15);
   const pulse = 0.5 + 0.5*Math.sin(t*(4+heat*6));
   const r=255, g=Math.round((1-heat)*180);
@@ -1713,13 +1829,15 @@ function drawSkillHeat() {
   ctx.save();
   ctx.font=`900 ${sz}px system-ui,sans-serif`; ctx.textBaseline="top";
   ctx.shadowBlur=clamp(pulse*heat*24,0,28); ctx.shadowColor=col; ctx.fillStyle=col; ctx.globalAlpha=0.75+pulse*0.25;
-  ctx.fillText(`!! ${label}`, bx, by); ctx.restore();
+  ctx.fillText(`!! ${label[0]}`, bx, by);
+  ctx.font=`700 ${Math.max(8,sz*0.72)}px system-ui,sans-serif`; ctx.fillStyle=col;
+  ctx.fillText(label[1], bx, by+sz*1.05); ctx.restore();
 }
 
 function drawPauseButton() {
   const sz  = clamp(W()*0.028,11,18);
   const hsz = clamp(W()*0.020, 9,13);
-  const killsY = SAFE.top + HUD_PAD + sz + hsz + 7;
+  const killsY = SAFE.top + HUD_PAD + sz + hsz * 2 + 16;
   PAUSE_BTN.w=34; PAUSE_BTN.h=34;
   PAUSE_BTN.x=W()-SAFE.right-HUD_PAD-PAUSE_BTN.w;
   PAUSE_BTN.y=killsY+hsz+10;
@@ -1745,14 +1863,23 @@ function drawScorePopups() {
   }
 }
 
+function drawRewardToast() {
+  const rw = window._rewardToast;
+  if (!rw) return;
+  const a = clamp(rw.t/0.45, 0, 1);
+  ctx.save(); ctx.globalAlpha = a; ctx.shadowBlur = 22; ctx.shadowColor = rw.color || "#fff";
+  drawBilingual(rw.en, `${rw.jp}  ${rw.detail}`, W()/2, H()*0.27,
+    clamp(W()*0.050, 22, 36), clamp(W()*0.023, 11, 16), rw.color || "#fff", "#fff");
+  ctx.restore();
+}
+
 function drawFriendUnlockToast() {
   if (!window._friendToast) return;
-  const ft = window._friendToast; ft.t -= 1/60;
-  if (ft.t <= 0) { window._friendToast = null; return; }
+  const ft = window._friendToast;
   const a = Math.min(1, ft.t/0.8);
-  ctx.save(); ctx.globalAlpha=a; ctx.font=`900 ${clamp(W()*0.040,16,24)}px system-ui,sans-serif`;
-  ctx.textAlign="center"; ctx.fillStyle=ft.color||"#fff"; ctx.shadowBlur=18; ctx.shadowColor=ft.color||"#fff";
-  ctx.fillText(ft.msg, W()/2, H()*0.62); ctx.restore();
+  ctx.save(); ctx.globalAlpha=a; ctx.shadowBlur=18; ctx.shadowColor=ft.color||"#fff";
+  drawBilingual(ft.en, ft.jp, W()/2, H()*0.60, clamp(W()*0.040,16,24), clamp(W()*0.022,10,15), ft.color||"#fff", "#fff");
+  ctx.restore();
 }
 
 function drawFriends() {
@@ -1819,7 +1946,9 @@ function drawPauseOverlay() {
   ctx.fillText(score.toLocaleString(),cx,cardY+cardH*0.30);
   const dtsz=clamp(W()*0.024,10,16);
   ctx.font=`700 ${dtsz}px system-ui,sans-serif`; ctx.shadowBlur=0; ctx.fillStyle="rgba(255,255,255,.75)";
-  ctx.fillText(`Wave ${WS.wave}（ウェーブ）  ·  ${totalKills} Kills（キル）`,cx,cardY+cardH*0.68); ctx.restore();
+  ctx.fillText(`WAVE ${WS.wave}  ·  KILLS ${totalKills}`,cx,cardY+cardH*0.68);
+  ctx.font=`600 ${Math.max(9,dtsz*0.72)}px system-ui,sans-serif`; ctx.fillStyle="rgba(220,255,230,.65)";
+  ctx.fillText(`ウェーブ ${WS.wave}  ·  キル ${totalKills}`,cx,cardY+cardH*0.68+18); ctx.restore();
 
   const btnW=clamp(W()*0.52,180,340), btnH=clamp(H()*0.075,44,58), btnX=cx-btnW/2, resumeY=H()*0.57;
   const rg=ctx.createLinearGradient(btnX,resumeY,btnX+btnW,resumeY);
@@ -1828,7 +1957,8 @@ function drawPauseOverlay() {
   roundRect(btnX,resumeY,btnW,btnH,btnH/2); ctx.fill();
   ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.shadowBlur=0;
   const rfsz=clamp(W()*0.038,15,24); ctx.font=`900 ${rfsz}px system-ui,sans-serif`; ctx.fillStyle="#000";
-  ctx.fillText("▶  RESUME  /  もどる",cx,resumeY+btnH/2); ctx.restore();
+  ctx.fillText("▶  RESUME",cx,resumeY+btnH/2-7);
+  ctx.font=`700 ${Math.max(9,rfsz*0.62)}px system-ui,sans-serif`; ctx.fillStyle="#152040"; ctx.fillText("つづける",cx,resumeY+btnH/2+13); ctx.restore();
 
   const exitW=clamp(W()*0.52,180,340), exitH=clamp(H()*0.065,38,52), exitX=cx-exitW/2;
   const exitY=resumeY+btnH+clamp(H()*0.020,10,18);
@@ -1838,12 +1968,15 @@ function drawPauseOverlay() {
   ctx.textAlign="center"; ctx.textBaseline="middle";
   const exsz=clamp(W()*0.030,12,20); ctx.font=`900 ${exsz}px system-ui,sans-serif`;
   ctx.shadowBlur=10; ctx.shadowColor="rgba(255,80,80,.8)"; ctx.fillStyle="rgba(255,120,120,.95)";
-  ctx.fillText("EXIT  /  森（もり）へもどる",cx,exitY+exitH/2); ctx.restore();
+  ctx.fillText("EXIT",cx,exitY+exitH/2-6);
+  ctx.font=`700 ${Math.max(9,exsz*0.62)}px system-ui,sans-serif`; ctx.fillStyle="rgba(255,190,190,.9)"; ctx.fillText("森へ もどる",cx,exitY+exitH/2+12); ctx.restore();
 
   const hintsz=clamp(W()*0.022,9,14);
   ctx.save(); ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.font=`600 ${hintsz}px system-ui,sans-serif`;
   ctx.fillStyle="rgba(255,255,255,0.35)";
-  ctx.fillText("Tap anywhere else to resume  /  他をタップしてもどる",cx,exitY+exitH+clamp(H()*0.025,12,22));
+  ctx.fillText("Tap anywhere else to resume",cx,exitY+exitH+clamp(H()*0.025,12,22));
+  ctx.font=`600 ${Math.max(8,hintsz*0.72)}px system-ui,sans-serif`; ctx.fillStyle="rgba(220,255,230,.30)";
+  ctx.fillText("ほかをタップして つづける",cx,exitY+exitH+clamp(H()*0.025,12,22)+15);
   ctx.restore(); ctx.restore();
 }
 
@@ -1860,6 +1993,8 @@ function drawGameOver() {
   ctx.textAlign="center"; ctx.textBaseline="middle"; const cx=W()/2;
   ctx.font="900 44px system-ui,sans-serif"; ctx.shadowBlur=30; ctx.shadowColor="rgba(255,80,80,0.9)"; ctx.fillStyle="rgba(255,255,255,0.97)";
   ctx.fillText("GAME OVER",cx,H()*0.18);
+  ctx.font="800 15px system-ui,sans-serif"; ctx.shadowBlur=0; ctx.fillStyle="rgba(255,190,190,0.9)";
+  ctx.fillText("ゲームオーバー",cx,H()*0.18+34);
   const starSize=clamp(W()*0.10,28,58), starY=H()*0.34;
   for (let i=0;i<3;i++) {
     const filled=i<stars, sx=cx+(i-1)*starSize*1.5, pulse=filled?(0.9+0.1*Math.sin(t*3+i*1.2)):1;
@@ -1870,18 +2005,28 @@ function drawGameOver() {
   }
   const entry = STAR_LABELS[stars] || STAR_LABELS[0];
   ctx.font=`800 ${clamp(W()*0.035,14,22)}px system-ui,sans-serif`; ctx.shadowBlur=8; ctx.shadowColor="rgba(255,220,80,0.7)"; ctx.fillStyle="rgba(255,220,80,0.95)";
-  ctx.fillText(`${entry.jp} ${entry.en}`,cx,H()*0.46);
+  ctx.fillText(entry.en,cx,H()*0.46);
+  ctx.font=`700 ${clamp(W()*0.022,10,15)}px system-ui,sans-serif`; ctx.shadowBlur=0; ctx.fillStyle="rgba(255,240,180,0.8)";
+  ctx.fillText(entry.jp,cx,H()*0.46+24);
   ctx.font=`900 ${clamp(W()*0.060,22,48)}px system-ui,sans-serif`; ctx.shadowBlur=16; ctx.shadowColor="rgba(255,200,80,0.8)"; ctx.fillStyle="rgba(255,220,80,1)";
   ctx.fillText(score.toLocaleString(),cx,H()*0.55);
+  ctx.font=`700 ${clamp(W()*0.020,9,13)}px system-ui,sans-serif`; ctx.shadowBlur=0; ctx.fillStyle="rgba(255,255,255,0.62)";
+  ctx.fillText("SCORE / スコア",cx,H()*0.55+28);
   ctx.font=`700 ${clamp(W()*0.025,11,16)}px system-ui,sans-serif`; ctx.fillStyle="rgba(255,255,255,0.65)";
   ctx.fillText(`WAVE ${WS.wave}  •  KILLS ${totalKills}  •  BEST ${Math.max(score,highScore).toLocaleString()}`,cx,H()*0.62);
+  ctx.font=`600 ${clamp(W()*0.018,9,12)}px system-ui,sans-serif`; ctx.fillStyle="rgba(220,255,230,0.65)";
+  ctx.fillText(`ウェーブ ${WS.wave}  •  キル ${totalKills}  •  ベスト  •  最大れんぞく ${maxCombo}`,cx,H()*0.62+20);
   if (newHigh) {
     const p=0.5+0.5*Math.sin(t*5);
     ctx.font=`900 ${clamp(W()*0.040,16,28)}px system-ui,sans-serif`; ctx.shadowBlur=20+p*10; ctx.shadowColor="rgba(255,220,80,1)"; ctx.fillStyle=`rgba(255,${Math.round(200+p*55)},80,1)`;
     ctx.fillText("🏆 NEW HIGH SCORE! 🏆",cx,H()*0.69);
+    ctx.font=`700 ${clamp(W()*0.020,9,13)}px system-ui,sans-serif`; ctx.fillStyle="rgba(255,240,180,0.85)";
+    ctx.fillText("新記録！",cx,H()*0.69+25);
   }
   ctx.font=`700 ${clamp(W()*0.028,12,18)}px system-ui,sans-serif`; ctx.shadowBlur=0; ctx.fillStyle="rgba(255,255,255,0.65)";
-  ctx.fillText("Press R to Restart  /  タップで リスタート",cx,H()*0.78);
+  ctx.fillText("Press R to Restart",cx,H()*0.78);
+  ctx.font=`600 ${clamp(W()*0.020,9,13)}px system-ui,sans-serif`; ctx.fillStyle="rgba(220,255,230,0.70)";
+  ctx.fillText("Rキー または タップで再開",cx,H()*0.78+22);
   ctx.restore();
 }
 
@@ -2017,10 +2162,11 @@ function draw() {
   // Player shots
   for (const s of booShots) {
     if (s.dead) continue;
-    const sm=shotScale(), r=16*sm, w=4*sm, h=14*sm;
+    const sm=shotScale(), piercing=!!s.isPiercing, r=(piercing?20:16)*sm, w=(piercing?7:4)*sm, h=(piercing?22:14)*sm;
     const col=s.color||(s.isFriend?"#a8e8ff":s.isPink?"#ffd1ef":"#fff2c7");
-    const gc=s.isFriend?"rgba(100,200,255,.6)":s.isPink?"rgba(255,100,220,.6)":"rgba(255,200,80,.6)";
+    const gc=piercing?"rgba(210,150,255,.8)":s.isFriend?"rgba(100,200,255,.6)":s.isPink?"rgba(255,100,220,.6)":"rgba(255,200,80,.6)";
     drawGlow(s.x,s.y,r,0.22,gc); ctx.fillStyle=col; ctx.fillRect(s.x-w/2,s.y-h,w,h);
+    if (piercing) { ctx.fillStyle="rgba(255,255,255,.85)"; ctx.fillRect(s.x-w/2,s.y-h,w,3*sm); }
   }
 
   // Candy
@@ -2122,6 +2268,7 @@ function draw() {
     drawPauseButton();
     drawComboHUD();
     drawWaveBanner();
+    drawRewardToast();
     drawFriendUnlockToast();
     drawScorePopups();
   }
@@ -2233,9 +2380,9 @@ function resetGame() {
   bugs.length=0; booShots.length=0; bugShots.length=0; sparkles.length=0; candies.length=0;
   droppers.length=0; dropperTimer=0;
   activeFriends.length=0; _seenFriends.clear();
-  combo=0; comboTimer=0; comboDisplay=0; comboPop=0;
+  combo=0; maxCombo=0; comboTimer=0; comboDisplay=0; comboPop=0;
   score=0; totalKills=0; lives=PLAYER_CONFIG.maxLives;
-  playerShield=0; timedWeapon.level=0; timedWeapon.remaining=0;
+  playerShield=0; timedWeapon.level=0; timedWeapon.mode=null; timedWeapon.remaining=0;
   stageTime=0; candyTimer=4.5; bossAlive=false; bossMusicIdx=0;
   WS.skillMult=1.0; WS.skillDisplay=1.0; WS.skillHeat=0; WS.groupStartT=0;
   booFireTimer=0; booAutoCD=0; shakeDecay=0; shakeDuration=0; shakeX=0; shakeY=0; hitStopTimer=0;
@@ -2243,7 +2390,7 @@ function resetGame() {
   bgOverlay={h:240,s:60,l:30,a:0,th:240,ts:60,tl:30,ta:0};
   bossCinematic.active=false; bossCinematic.t=0;
   milestoneAnim.active=false;
-  window._scorePopups=[]; window._friendToast=null; window._candyToast=null;
+  window._scorePopups=[]; window._friendToast=null; window._candyToast=null; window._rewardToast=null;
   drawEnergyBar._hitFlash=0; drawEnergyBar._prevEnergy=100;
 }
 
