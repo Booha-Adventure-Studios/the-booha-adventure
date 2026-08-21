@@ -757,7 +757,7 @@
       .dp-handle{width:38px;height:4px;border-radius:2px;background:#c0aa80;margin:10px auto 0;}
       .dp-inner{display:flex;align-items:flex-start;gap:clamp(10px,2.5vw,22px);padding:12px clamp(14px,3.5vw,28px) 22px;}
       .dp-portrait{flex-shrink:0;width:clamp(68px,13vw,108px);height:clamp(68px,13vw,108px);border-radius:10px;border:1.5px solid #c8b48a;background:#e8dfc8;display:flex;align-items:center;justify-content:center;overflow:hidden;}
-      .dp-portrait img{width:100%;height:100%;object-fit:contain;display:block;}
+      .dp-portrait img{width:100%;height:100%;object-fit:contain;display:block;transition:opacity .16s ease;}
       .dp-body{flex:1;min-width:0;position:relative;}
       .dp-close-x{position:absolute;top:0;right:0;background:transparent;border:none;cursor:pointer;font-size:.95rem;color:#b8a070;padding:2px 5px;line-height:1;}
       .dp-close-x:hover{color:#5a3010;}
@@ -1573,10 +1573,14 @@
         <div class="dp-btns"><button class="dp-btn no dp-dismiss">Close / 閉じる</button></div>`;
 
     } else {
-      /* no active quest — offer one using questLines */
+      /* no active quest — offer one using questLines. Pass 6: the actual
+         ask already plays through the typewriter above (each drifter's own
+         questLines, e.g. Ned's "Will you find it for me? Please please
+         please?") — this used to repeat a flat, identical "Will you help
+         me find a memory?" line for every drifter right after that, which
+         just duplicated it in a less personal voice. Buttons only now. */
       actionHTML = `
         <div class="dp-divider"></div>
-        <p class="dp-line-en" style="margin-bottom:2px;">Will you help me find a memory?</p>
         <div class="dp-btns">
           <button class="dp-btn yes" id="dp-yes-btn">はい / Yes</button>
           <button class="dp-btn no dp-dismiss">いいえ / No</button>
@@ -1589,7 +1593,7 @@
     drifterPanel.innerHTML = `
       <div class="dp-handle"></div>
       <div class="dp-inner">
-        <div class="dp-portrait"><img src="${drifter.sprite2}" alt="${drifter.name}"></div>
+        <div class="dp-portrait"><img id="dp-portrait-img" src="${drifter.sprite1 || drifter.sprite2}" alt="${drifter.name}"></div>
         <div class="dp-body">
           <button class="dp-close-x dp-dismiss">✕</button>
           <p class="dp-name-en">${drifter.name}</p>
@@ -1622,6 +1626,21 @@
     
     let   finished    = false;
 
+    /* Pass 6: swap the portrait from sprite1 to sprite2 the moment the
+       conversation reaches its "live" moment (the action buttons appear)
+       — the same idle→engaged pairing already used for on-map drifters
+       (drawDrifters() switches to img2 once a quest is active with them),
+       just applied to the drawer portrait so it isn't a frozen plaque. */
+    function swapPortraitEngaged() {
+      const portraitImg = drifterPanel.querySelector('#dp-portrait-img');
+      if (!portraitImg || !drifter.sprite2) return;
+      portraitImg.style.opacity = '0';
+      setTimeout(() => {
+        portraitImg.src = drifter.sprite2;
+        portraitImg.style.opacity = '1';
+      }, 140);
+    }
+
     function showActionArea() {
       if (finished) return;
       finished = true;
@@ -1629,6 +1648,7 @@
         `<p class="dp-line-en" style="margin-bottom:6px;">${en}</p>`
       ).join('');
       actionArea.style.opacity = '1';
+      swapPortraitEngaged();
       drifterPanel.querySelectorAll('.dp-dismiss').forEach(btn =>
         btn.addEventListener('click', closeDrifterPanel));
       bindActionButtons();
