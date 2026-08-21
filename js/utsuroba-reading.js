@@ -18,8 +18,35 @@
   }
 
   function focusFirstControl() {
-    const control = overlay && overlay.querySelector('button:not(.reading-close)');
+    if (!overlay) return;
+    const controls = Array.from(overlay.querySelectorAll('button:not([disabled])'));
+    const control = controls.find(button => {
+      const details = button.closest('details');
+      return (!details || details.open) && button.getClientRects().length > 0;
+    }) || controls[0];
     if (control && typeof control.focus === 'function') requestAnimationFrame(() => control.focus());
+  }
+
+  function trapFocus(event) {
+    if (event.key !== 'Tab' || !overlay) return;
+    const controls = Array.from(overlay.querySelectorAll('button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'))
+      .filter(control => {
+        const details = control.closest('details');
+        return (!details || details.open) && control.getClientRects().length > 0;
+      });
+    if (!controls.length) return;
+    const first = controls[0];
+    const last = controls[controls.length - 1];
+    if (!overlay.contains(document.activeElement)) {
+      event.preventDefault();
+      first.focus();
+    } else if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
   }
 
   function installStyle() {
@@ -152,7 +179,7 @@
       #utsuroba-reading-challenge .reading-calibration-option small{display:block;margin-top:5px;color:rgba(255,255,255,.55);font-size:.72rem;line-height:1.35;}
       #utsuroba-reading-challenge .reading-onboarding-note{margin:13px 0 0;color:rgba(245,232,255,.5);font-size:.7rem;line-height:1.4;}
       #utsuroba-reading-challenge .reading-loading{text-align:center;padding:80px 24px;color:#f1dcff;}
-      @media(max-width:700px){#utsuroba-reading-challenge{padding:10px;}#utsuroba-reading-challenge .reading-choices{grid-template-columns:1fr;}#utsuroba-reading-challenge .reading-onboarding-steps,.reading-calibration-options,.reading-lens-options{grid-template-columns:1fr;}#utsuroba-reading-challenge .reading-card{max-height:calc(100vh - 20px);padding:20px 16px;}}
+      @media(max-width:700px){#utsuroba-reading-challenge{padding:10px;}#utsuroba-reading-challenge .reading-choices{grid-template-columns:1fr;}#utsuroba-reading-challenge .reading-onboarding-steps,.reading-calibration-options,.reading-lens-options{grid-template-columns:1fr;}#utsuroba-reading-challenge .reading-card{max-height:calc(100vh - 20px);padding:20px 16px;}#utsuroba-reading-challenge .reading-close{min-width:44px;min-height:44px;}}
       @media(max-height:520px) and (orientation:landscape){#utsuroba-reading-challenge{align-items:flex-start;padding:8px;}#utsuroba-reading-challenge .reading-card{max-height:calc(100vh - 16px);padding:16px 18px;}}
       @media(prefers-reduced-motion:reduce){#utsuroba-reading-challenge *,#utsuroba-reading-challenge *::before,#utsuroba-reading-challenge *::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;scroll-behavior:auto !important;transition-duration:.01ms !important;}}
     `;
@@ -189,7 +216,10 @@
     overlay.style.cssText = 'position:fixed;inset:0;z-index:9600;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(4,0,12,.90);font-family:Georgia,serif;color:#f7f2e8;';
     overlay.innerHTML = '<div class="reading-card reading-loading">Opening the memory…<br><span>記憶を開いています…</span></div>';
     document.body.appendChild(overlay);
-    overlay.addEventListener('keydown', event => { if (event.key === 'Escape') { event.preventDefault(); close(); } });
+    overlay.addEventListener('keydown', event => {
+      if (event.key === 'Escape') { event.preventDefault(); close(); return; }
+      trapFocus(event);
+    });
 
     let episode;
     try {
@@ -564,6 +594,7 @@
         const postcardSaveButton = overlay.querySelector('#reading-postcard-save');
         if (postcardSaveButton) postcardSaveButton.addEventListener('click', savePostcard);
         bindVocabulary();
+        focusFirstControl();
         return;
       }
 
@@ -632,6 +663,7 @@
         if (choice === question.correct) advanceQuestion(question);
         else showWrong(question);
       }));
+      focusFirstControl();
     };
 
     if (opts.persist) {

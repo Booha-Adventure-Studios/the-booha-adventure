@@ -464,6 +464,7 @@
   let drifterPanel = null, drifterPanelOpen = false, drifterPanelCooldown = 0;
   let readingJournalOverlay = null, readingJournalOpen = false;
   let weeklyChallengeOverlay = null, weeklyChallengeOpen = false;
+  let modalPreviousFocus = null;
   let convergenceOverlay = null, convergenceOpen = false;
   let gardenOverlay = null, gardenOpen = false;
 
@@ -689,7 +690,7 @@
       .weekly-reading-complete{margin:0;padding:10px;border-left:3px solid #9fe4ba;color:#d7ffe3;font-size:.78rem;line-height:1.45;}
       .weekly-reading-complete small{display:block;margin-top:3px;color:rgba(215,255,227,.58);font-size:.9em;}
       .weekly-reading-close-btn{margin-top:17px;padding:9px 18px;border:1px solid #9fe4ba;border-radius:7px;background:rgba(159,228,186,.12);color:#d7ffe3;cursor:pointer;font:700 .78rem Georgia,serif;}
-      @media(max-width:700px){#utsuroba-reading-challenge-button{top:51px;right:10px;padding:7px 10px;font-size:10px}.weekly-reading-card{padding:21px 16px}}
+      @media(max-width:700px){#utsuroba-reading-challenge-button{top:51px;right:10px;padding:7px 10px;font-size:10px}.weekly-reading-card{padding:21px 16px}.weekly-reading-close,.weekly-reading-close-btn,.reading-journal-close{min-width:44px;min-height:44px}}
       /* ══ DRIFTER PANEL ══ */
       #utsuroba-drifter-panel{position:fixed;bottom:0;left:0;right:0;z-index:9100;background:linear-gradient(180deg,#f7f2e8 0%,#ede5d0 100%);border-top:2px solid #c8b48a;border-radius:20px 20px 0 0;box-shadow:0 -6px 32px rgba(0,0,0,0.5);transform:translateY(100%);transition:transform ${PANEL_SLIDE_MS}ms cubic-bezier(0.22,1,0.36,1);font-family:'Georgia',serif;pointer-events:none;}
       #utsuroba-drifter-panel.open{transform:translateY(0);pointer-events:auto;}
@@ -1113,12 +1114,34 @@
     if (weeklyChallengeOverlay) weeklyChallengeOverlay.remove();
     weeklyChallengeOverlay = null;
     state.inputLocked = false;
+    if (modalPreviousFocus && typeof modalPreviousFocus.focus === 'function') modalPreviousFocus.focus();
+    modalPreviousFocus = null;
+  }
+
+  function trapOverlayFocus(container, event) {
+    if (event.key !== 'Tab' || !container) return;
+    const controls = Array.from(container.querySelectorAll('button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'))
+      .filter(control => control.getClientRects().length > 0);
+    if (!controls.length) return;
+    const first = controls[0];
+    const last = controls[controls.length - 1];
+    if (!container.contains(document.activeElement)) {
+      event.preventDefault();
+      first.focus();
+    } else if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
   }
 
   function openWeeklyReadingChallenge() {
     if (weeklyChallengeOpen || readingJournalOpen || drifterPanelOpen || convergenceOpen || gardenOpen || state.celebrating) return;
     const progress = weeklyReadingChallengeProgress();
     if (!progress.challenge) return;
+    modalPreviousFocus = document.activeElement;
     weeklyChallengeOpen = true;
     state.inputLocked = true;
     weeklyChallengeOverlay = document.createElement('div');
@@ -1136,7 +1159,10 @@
       : '';
     weeklyChallengeOverlay.innerHTML = `<div class="weekly-reading-card"><button class="weekly-reading-close" type="button" aria-label="Close weekly reading trail">✕</button><div class="weekly-reading-eyebrow">WEEKLY READING TRAIL / 週間読書</div><h2>${escapeHTML(progress.challenge.title)}<span>${escapeHTML(progress.challenge.titleJP)}</span></h2><p class="weekly-reading-intro">${escapeHTML(progress.challenge.intro)}<small>${escapeHTML(progress.challenge.introJP)}</small></p><div class="weekly-reading-goals">${goals}</div>${completion}<button class="weekly-reading-close-btn" type="button" id="weekly-reading-done">Close trail / トレイルを閉じる</button></div>`;
     document.body.appendChild(weeklyChallengeOverlay);
-    weeklyChallengeOverlay.addEventListener('keydown', event => { if (event.key === 'Escape') { event.preventDefault(); closeWeeklyReadingChallenge(); } });
+    weeklyChallengeOverlay.addEventListener('keydown', event => {
+      if (event.key === 'Escape') { event.preventDefault(); closeWeeklyReadingChallenge(); return; }
+      trapOverlayFocus(weeklyChallengeOverlay, event);
+    });
     weeklyChallengeOverlay.querySelector('.weekly-reading-close').addEventListener('click', closeWeeklyReadingChallenge);
     weeklyChallengeOverlay.querySelector('#weekly-reading-done').addEventListener('click', closeWeeklyReadingChallenge);
     weeklyChallengeOverlay.addEventListener('click', event => { if (event.target === weeklyChallengeOverlay) closeWeeklyReadingChallenge(); });
@@ -1177,6 +1203,8 @@
     if (readingJournalOverlay) readingJournalOverlay.remove();
     readingJournalOverlay = null;
     state.inputLocked = false;
+    if (modalPreviousFocus && typeof modalPreviousFocus.focus === 'function') modalPreviousFocus.focus();
+    modalPreviousFocus = null;
   }
 
   async function openReadingReview(entry) {
@@ -1241,6 +1269,7 @@
 
   async function openReadingJournal() {
     if (readingJournalOpen || weeklyChallengeOpen || drifterPanelOpen || state.celebrating) return;
+    modalPreviousFocus = document.activeElement;
     readingJournalOpen = true;
     state.inputLocked = true;
     readingJournalOverlay = document.createElement('div');
@@ -1248,7 +1277,16 @@
     readingJournalOverlay.innerHTML = `<div class="reading-journal-card"><button class="reading-journal-close" type="button" aria-label="Close journal">✕</button><div class="reading-journal-eyebrow">READING JOURNAL / 読書ノート</div><h2>Restored memories <span>戻した記憶</span></h2><p class="reading-journal-intro">Read a memory again whenever you want. Try to remember the details.<small>いつでも記憶を読み返せます。細かい部分を思い出してみましょう。</small></p><details class="reading-journal-cabinet" id="reading-word-cabinet"><summary>Word Cabinet / 言葉箱<span>Words from the memories you restored. / 戻した記憶の言葉です。</span></summary><div class="reading-journal-cabinet-body"><div class="reading-journal-words"></div><div class="reading-journal-word-detail" id="reading-word-detail">Choose a word for help.<small>言葉を選ぶと意味が出ます。</small></div></div></details><section class="reading-journal-practice" id="reading-word-practice"><div class="reading-journal-practice-heading">Word practice / 言葉の練習<span>Review three words with no pressure. / 三つの言葉を気軽に練習しましょう。</span></div><p class="reading-journal-practice-intro">Choose the simple meaning. Words you miss will return sooner.<small>やさしい意味を選びましょう。間違えた言葉は早く戻ります。</small></p><button class="reading-journal-practice-start" id="reading-word-practice-start" type="button">Practice 3 words / 3語を練習</button><div class="reading-word-practice-panel" id="reading-word-practice-panel" hidden></div></section><div class="reading-journal-list"><div class="reading-journal-loading">Opening your journal…<small>ノートを開いています…</small></div></div></div>`;
     document.body.appendChild(readingJournalOverlay);
     readingJournalOverlay.querySelector('.reading-journal-close').addEventListener('click', closeReadingJournal);
+    readingJournalOverlay.setAttribute('role', 'dialog');
+    readingJournalOverlay.setAttribute('aria-modal', 'true');
+    readingJournalOverlay.setAttribute('aria-label', 'Reading Journal');
+    readingJournalOverlay.tabIndex = -1;
+    readingJournalOverlay.addEventListener('keydown', event => {
+      if (event.key === 'Escape') { event.preventDefault(); closeReadingJournal(); return; }
+      trapOverlayFocus(readingJournalOverlay, event);
+    });
     readingJournalOverlay.addEventListener('click', event => { if (event.target === readingJournalOverlay) closeReadingJournal(); });
+    requestAnimationFrame(() => readingJournalOverlay?.querySelector('.reading-journal-close')?.focus());
     try {
       await window.UTSUROBA_EPISODES_READY;
       if (!readingJournalOpen) return;
