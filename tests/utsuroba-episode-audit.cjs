@@ -93,6 +93,12 @@ for (const entry of index.episodes) {
       `${label}: correct answer index is invalid`);
     assert.ok(check.evidence && check.evidenceJP,
       `${label}: bilingual evidence feedback is required`);
+    assert.ok(Array.isArray(check.evidenceLines) && check.evidenceLines.length > 0,
+      `${label}: at least one evidence line is required`);
+    for (const lineIndex of check.evidenceLines) {
+      assert.ok(Number.isInteger(lineIndex) && lineIndex >= 0 && lineIndex < episode.lines.length,
+        `${label}: evidence line index is invalid`);
+    }
     if (episode.mechanic) {
       const mechanicItems = episode.mechanic.acts || episode.mechanic.items || episode.mechanic.beats;
       assert.ok(Number.isInteger(check.revealAct) && check.revealAct >= 0 &&

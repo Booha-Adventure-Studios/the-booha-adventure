@@ -40,6 +40,7 @@
       #utsuroba-reading-challenge .reading-vocab-detail small{display:block;margin-top:3px;color:rgba(255,231,178,.65);font-size:.9em;}
       #utsuroba-reading-challenge .reading-transcript{display:grid;gap:8px;margin:18px 0 20px;padding:14px;background:rgba(255,255,255,.045);border:1px solid rgba(220,160,255,.16);border-radius:10px;}
       #utsuroba-reading-challenge .reading-line{padding-left:12px;border-left:2px solid rgba(216,168,255,.45);}
+      #utsuroba-reading-challenge .reading-line.is-evidence{border-left-color:#ffcb75;background:rgba(255,203,117,.12);box-shadow:inset 3px 0 0 #ffcb75;padding-top:5px;padding-bottom:5px;border-radius:0 5px 5px 0;animation:readingEvidenceIn .32s ease-out both;}
       #utsuroba-reading-challenge .reading-speaker{color:#d8a8ff;font-size:.74rem;font-weight:700;letter-spacing:.05em;}
       #utsuroba-reading-challenge .reading-en{color:#fff;font-size:.9rem;line-height:1.35;margin-top:2px;}
       #utsuroba-reading-challenge .reading-question-label{color:#ffcb75;font:700 10px/1.4 monospace;letter-spacing:.14em;margin-top:8px;}
@@ -49,6 +50,8 @@
       #utsuroba-reading-challenge .reading-choice small{display:block;color:rgba(255,255,255,.48);font-size:.72rem;line-height:1.35;margin-top:5px;}
       #utsuroba-reading-challenge .reading-feedback{margin-top:12px;padding:10px 12px;border-left:3px solid #ffcb75;background:rgba(255,203,117,.08);color:#ffe7b2;font-size:.82rem;line-height:1.4;}
       #utsuroba-reading-challenge .reading-feedback small{display:block;color:rgba(255,231,178,.68);margin-top:3px;font-size:.9em;}
+      #utsuroba-reading-challenge .reading-evidence-btn{display:block;margin-top:8px;padding:6px 10px;border:1px solid rgba(255,203,117,.48);border-radius:6px;background:rgba(255,203,117,.08);color:#ffe7b2;cursor:pointer;font:700 .72rem Georgia,serif;}
+      #utsuroba-reading-challenge .reading-evidence-btn:hover,#utsuroba-reading-challenge .reading-evidence-btn:focus-visible{background:rgba(255,203,117,.18);outline:none;}
       #utsuroba-reading-challenge .reading-progress{margin-top:14px;text-align:right;color:rgba(255,255,255,.42);font:700 11px monospace;}
       #utsuroba-reading-challenge .reading-mechanic{margin:18px 0 20px;padding:13px 14px 15px;background:rgba(255,255,255,.035);border:1px solid rgba(255,203,117,.22);border-radius:12px;}
       #utsuroba-reading-challenge .reading-mechanic-heading{display:flex;justify-content:space-between;gap:12px;color:#ffdf9b;font:700 10px/1.4 monospace;letter-spacing:.14em;text-transform:uppercase;}
@@ -72,6 +75,7 @@
       #utsuroba-reading-challenge .reading-theatre-status{margin:8px 0 0;text-align:center;color:#ffdf9b;font-size:.72rem;line-height:1.4;}
       #utsuroba-reading-challenge .reading-theatre-status small{display:block;color:rgba(255,231,178,.54);font-size:.9em;}
       @keyframes readingActPulse{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+      @keyframes readingEvidenceIn{from{opacity:.45;transform:translateX(-4px)}to{opacity:1;transform:translateX(0)}}
       #utsuroba-reading-challenge .reading-complete{text-align:center;padding:clamp(36px,8vw,82px) clamp(20px,6vw,80px);}
       #utsuroba-reading-challenge .reading-success{color:#ffe8a8;font-size:clamp(1rem,2.5vw,1.35rem);line-height:1.5;margin:22px auto 4px;max-width:650px;}
       #utsuroba-reading-challenge .reading-primary{margin-top:24px;padding:12px 24px;border:1px solid #ffcb75;border-radius:8px;background:linear-gradient(135deg,#ffe7a8,#c78b31);color:#241507;font:700 .9rem Georgia,serif;cursor:pointer;}
@@ -130,6 +134,7 @@
         ? opts.quest.theatreIndex : questionIndex);
     let lastFeedback = '';
     let lastFeedbackJP = '';
+    let showEvidence = false;
 
     function renderVocabulary() {
       if (!Array.isArray(episode.vocabulary) || !episode.vocabulary.length) return '';
@@ -213,8 +218,9 @@
 
     const render = () => {
       const question = episode.checks[questionIndex];
-      const lines = episode.lines.map(line => `
-        <div class="reading-line">
+      const evidenceLines = question && Array.isArray(question.evidenceLines) ? question.evidenceLines : [];
+      const lines = episode.lines.map((line, lineIndex) => `
+        <div class="reading-line${showEvidence && evidenceLines.includes(lineIndex) ? ' is-evidence' : ''}" data-line-index="${lineIndex}">
           <div class="reading-speaker">${escapeText(line.speaker)}</div>
           <div class="reading-en">${escapeText(line.en)}</div>
         </div>`).join('');
@@ -259,18 +265,26 @@
           <div class="reading-question-label">${escapeText(question.label)} · ${escapeText(question.labelJP)}</div>
           <h3>${escapeText(question.prompt)}</h3>
           <p class="reading-jp">${escapeText(question.promptJP)}</p>
-          ${lastFeedback ? `<div class="reading-feedback">${escapeText(lastFeedback)}<small>${escapeText(lastFeedbackJP)}</small></div>` : ''}
+          ${lastFeedback ? `<div class="reading-feedback">${escapeText(lastFeedback)}<small>${escapeText(lastFeedbackJP)}</small><button class="reading-evidence-btn" id="reading-evidence-btn" type="button">Show evidence / 根拠を見る</button></div>` : ''}
           <div class="reading-choices">${choices}</div>
           <div class="reading-progress">${questionIndex + 1} / ${episode.checks.length}</div>
         </div>`;
 
       overlay.querySelector('#reading-close-btn').addEventListener('click', close);
       bindVocabulary();
+      const evidenceButton = overlay.querySelector('#reading-evidence-btn');
+      if (evidenceButton) evidenceButton.addEventListener('click', () => {
+        showEvidence = true;
+        render();
+        const firstEvidence = overlay.querySelector('.reading-line.is-evidence');
+        if (firstEvidence) firstEvidence.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      });
       overlay.querySelectorAll('.reading-choice').forEach(button => {
         button.addEventListener('click', () => {
           const choice = Number(button.dataset.choice);
           if (choice === question.correct) {
             questionIndex += 1;
+            showEvidence = false;
             if (mechanic && question.revealAct != null) {
               mechanicIndex = Math.max(mechanicIndex, question.revealAct + 1);
               lastFeedback = question.restoreText || 'The scene returns.';
@@ -286,6 +300,7 @@
             }
             render();
           } else {
+            showEvidence = false;
             lastFeedback = `Not quite. Look again at the lines. ${question.evidence}`;
             lastFeedbackJP = question.evidenceJP || 'もう一度、会話を読み直しましょう。';
             setTimeout(render, 320);
