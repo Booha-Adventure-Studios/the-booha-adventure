@@ -43,6 +43,16 @@ let audioCtx = null, audioMaster = null, audioReady = false;
 let audioRetryTimer = 0, lastFireSfxAt = 0;
 let bossMusicIdx = 0;
 
+// A small rotating pool of persistently-referenced candy-pickup clones.
+// Cloning-and-discarding a single Audio() per pickup left the clone with no
+// live reference anywhere, so it could be garbage-collected mid-playback
+// (or never actually start) with no error raised — that silent drop was
+// why the sound sometimes didn't fire. Reusing a pool of long-lived clones
+// keeps each one referenced for the life of the run.
+const CANDY_SFX_POOL_SIZE = 4;
+let candySfxPool = [];
+let candySfxPoolIdx = 0;
+
 // Boss
 let bossAlive = false;
 
@@ -410,8 +420,12 @@ function setPaused(on) {
 function playCandySfx() {
   try {
     ensureAudio();
-    if (!candySfx) { playSfx("pickup"); return; }
-    const s = candySfx.cloneNode();
+    if (!candySfxPool.length) { playSfx("pickup"); return; }
+    // Round-robin the pool instead of creating a fresh clone per pickup —
+    // see the CANDY_SFX_POOL_SIZE comment above for why that was flaky.
+    const s = candySfxPool[candySfxPoolIdx % candySfxPool.length];
+    candySfxPoolIdx++;
+    s.currentTime = 0;
     s.volume = 1;
     const promise = s.play();
     if (promise?.catch) promise.catch(() => playSfx("pickup"));
@@ -2587,7 +2601,13 @@ function startInvadersRun(continueRun) {
     setTimeout(()=>{ try { endVideoEl.pause(); endVideoEl.currentTime=0; endVideoEl.muted=false; } catch(_){} }, 60);
   }
   try {
-    if (candySfx) { candySfx.muted=true; candySfx.play().catch(()=>{}); setTimeout(()=>{ candySfx.pause(); candySfx.currentTime=0; candySfx.muted=false; },50); }
+    // Warm up every pooled clone during this user-gesture handler, not just
+    // the primary element — a clone created and played for the first time
+    // later, outside a gesture, is the case mobile autoplay rules tend to
+    // block.
+    const warmSfx = candySfxPool.length ? candySfxPool : (candySfx ? [candySfx] : []);
+    for (const el of warmSfx) { el.muted=true; el.play().catch(()=>{}); }
+    setTimeout(()=>{ for (const el of warmSfx) { try { el.pause(); el.currentTime=0; el.muted=false; } catch(_){} } }, 50);
   } catch(_){}
   if (continueRun && restoreInvadersCheckpoint()) {
     window._rewardToast = { en:"RUN RESTORED", jp:"つづきから スタート！", detail:"", color:"#a8f5c4", t:2.0 };
@@ -2623,6 +2643,13 @@ function startInvadersRun(continueRun) {
     candySfx = new Audio(ASSET_PATHS.candySfx);
     candySfx.preload = "auto";
     candySfx.volume = 1;
+    candySfxPool = [candySfx];
+    for (let i = 1; i < CANDY_SFX_POOL_SIZE; i++) {
+      const clone = candySfx.cloneNode();
+      clone.preload = "auto";
+      clone.volume = 1;
+      candySfxPool.push(clone);
+    }
   } catch(_){}
 
   try {
