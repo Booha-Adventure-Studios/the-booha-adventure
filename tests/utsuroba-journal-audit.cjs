@@ -20,6 +20,9 @@ assert.match(utsuroba, /readingEchoes/, 'Restored memories must create weekly wo
 assert.match(utsuroba, /renderMemoryEchoes/, 'Utsuroba must render restored memory echoes');
 assert.match(utsuroba, /readingOnboarding/, 'Reading onboarding state must persist in the save');
 assert.match(utsuroba, /persistReadingOnboarding/, 'Utsuroba must persist the reading calibration choice');
+assert.match(utsuroba, /weeklyReadingChallengeState/, 'Weekly reading progress must have a scoped save state');
+assert.match(utsuroba, /openWeeklyReadingChallenge/, 'Utsuroba must expose the weekly Reading Trail');
+assert.match(utsuroba, /recordWeeklyReadingEvent/, 'Reading actions must update weekly goals');
 assert.match(utsuroba, /restoredGreeting/, 'Drifters must have post-memory dialogue');
 assert.match(utsuroba, /openMemoryConvergence/, 'Utsuroba must expose the world-level convergence scene');
 assert.match(utsuroba, /convergenceSeen/, 'Convergence completion must persist');
@@ -30,6 +33,7 @@ assert.match(utsuroba, /convergenceGreeting/, 'Drifters must acknowledge the com
 assert.match(data, /readingConvergence/, 'Utsuroba data must define the world-level reading convergence');
 assert.match(data, /requiredDrifterIds/, 'The core convergence must define its required memory group');
 assert.match(data, /readingRelationships/, 'Utsuroba data must define cross-drifter reading relationships');
+assert.match(data, /readingChallenge/, 'Utsuroba data must define weekly reading goals');
 assert.match(data, /clueChecks/, 'Convergence data must define authored evidence checks');
 assert.match(data, /cluePromptJP/, 'Convergence evidence instructions must include simple Japanese support');
 assert.match(data, /garden/, 'Convergence data must define the persistent Memory Garden');
