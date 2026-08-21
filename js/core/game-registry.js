@@ -132,6 +132,16 @@ const BoohaGameRegistry = (() => {
       saveId:         'bonus:booha_destruction',
       bonus:          true,
     },
+    {
+      id:             'booha_invaders',
+      name:           'Booha Invaders',
+      file:           'booha_invaders.html',
+      category:       'bonus',
+      scoreMax:       100000,
+      starThresholds: [2500, 10000, 25000],
+      saveId:         'bonus:booha_invaders',
+      bonus:          true,
+    },
   ];
 
   // ── Build full entries (9 games × 3 curriculums = 27) ────────────────────

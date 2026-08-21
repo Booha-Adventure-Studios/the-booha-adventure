@@ -68,6 +68,13 @@ const FRIENDS_RUNTIME = FRIENDS_UNLOCK.map(fd => ({ ...fd, img: null }));
 // Weapon
 let timedWeapon = { level: 0, mode: null, remaining: 0 };
 
+// Persistent progression. Checkpoints are intentionally taken at safe wave
+// boundaries; restoring a half-finished formation would be fragile and unfair.
+const INVADERS_SAVE_ID = "bonus:booha_invaders";
+const INVADERS_PAGE_ID = "booha_invaders";
+let invadersRecord = null;
+let runStartedAt = 0;
+
 // BG / overlay
 let bgHue = 240;
 let bgOverlay = { h:240,s:60,l:30,a:0, th:240,ts:60,tl:30,ta:0 };
@@ -100,6 +107,146 @@ function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
 function rand(a, b)     { return a + Math.random() * (b - a); }
 function aabb(ax, ay, aw, ah, bx, by, bw, bh) {
   return ax < bx+bw && ax+aw > bx && ay < by+bh && ay+ah > by;
+}
+
+function invadersSaveApi() {
+  try {
+    const api = window.BoohaSaveFile;
+    return api && typeof api.load === "function" && typeof api.patch === "function" &&
+      typeof api.key === "function" && api.key() ? api : null;
+  } catch (_) { return null; }
+}
+function defaultInvadersRecord() {
+  return {
+    version: 1, active: false, checkpoint: null,
+    totalRuns: 0, totalDeaths: 0, totalScore: 0, totalKills: 0,
+    bestWave: 0, bestCombo: 0, highScore: 0,
+    lastRun: null, updatedAt: 0,
+  };
+}
+function normalizeInvadersRecord(raw) {
+  const base = defaultInvadersRecord();
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return base;
+  const n = (key, min=0) => Number.isFinite(Number(raw[key])) ? Math.max(min, Number(raw[key])) : base[key];
+  const out = { ...base, ...raw };
+  out.version = 1;
+  out.active = raw.active === true;
+  out.totalRuns = Math.floor(n("totalRuns"));
+  out.totalDeaths = Math.floor(n("totalDeaths"));
+  out.totalScore = Math.floor(n("totalScore"));
+  out.totalKills = Math.floor(n("totalKills"));
+  out.bestWave = Math.floor(clamp(n("bestWave"), 0, 999));
+  out.bestCombo = Math.floor(clamp(n("bestCombo"), 0, 9999));
+  out.highScore = Math.floor(n("highScore"));
+  if (raw.checkpoint && typeof raw.checkpoint === "object" && !Array.isArray(raw.checkpoint)) {
+    const cp = raw.checkpoint;
+    const wave = Math.floor(Number(cp.wave));
+    if (Number.isFinite(wave) && wave >= 1 && wave <= 999) {
+      out.checkpoint = {
+        wave,
+        score: Math.floor(Math.max(0, Number(cp.score) || 0)),
+        totalKills: Math.floor(Math.max(0, Number(cp.totalKills) || 0)),
+        lives: Math.floor(clamp(Number(cp.lives) || 1, 1, PLAYER_CONFIG.maxLives)),
+        maxCombo: Math.floor(Math.max(0, Number(cp.maxCombo) || 0)),
+        savedAt: Number(cp.savedAt) || 0,
+      };
+    } else out.checkpoint = null;
+  } else out.checkpoint = null;
+  return out;
+}
+function loadInvadersRecord() {
+  const api = invadersSaveApi();
+  if (!api) return normalizeInvadersRecord(invadersRecord);
+  try {
+    const data = api.load();
+    const record = normalizeInvadersRecord(data.pageState?.[INVADERS_PAGE_ID]);
+    invadersRecord = record;
+    return record;
+  } catch (_) { return normalizeInvadersRecord(invadersRecord); }
+}
+function saveInvadersRecord(record) {
+  const api = invadersSaveApi();
+  invadersRecord = normalizeInvadersRecord(record);
+  if (!api) return false;
+  try {
+    invadersRecord.updatedAt = Date.now();
+    return api.patch("pageState", { [INVADERS_PAGE_ID]: invadersRecord });
+  } catch (_) { return false; }
+}
+function saveInvadersCheckpoint(reason) {
+  if (!started || endPlaying) return false;
+  const record = loadInvadersRecord();
+  record.active = true;
+  record.bestWave = Math.max(record.bestWave || 0, WS.wave);
+  record.bestCombo = Math.max(record.bestCombo || 0, maxCombo);
+  record.highScore = Math.max(record.highScore || 0, score);
+  record.checkpoint = {
+    wave: WS.wave, score, totalKills, lives, maxCombo,
+    savedAt: Date.now(), reason: reason || "checkpoint",
+  };
+  const ok = saveInvadersRecord(record);
+  if (ok) updateInvadersSaveOverlay();
+  return ok;
+}
+function finishInvadersRun(completed=false) {
+  if (!runStartedAt && !started) return;
+  const record = loadInvadersRecord();
+  const runScore = Math.max(0, Math.floor(score));
+  record.active = false;
+  record.checkpoint = null;
+  record.totalRuns = (record.totalRuns || 0) + 1;
+  if (!completed) record.totalDeaths = (record.totalDeaths || 0) + 1;
+  record.totalScore = (record.totalScore || 0) + runScore;
+  record.totalKills = (record.totalKills || 0) + totalKills;
+  record.bestWave = Math.max(record.bestWave || 0, WS.wave);
+  record.bestCombo = Math.max(record.bestCombo || 0, maxCombo);
+  record.highScore = Math.max(record.highScore || 0, runScore);
+  record.lastRun = { score:runScore, wave:WS.wave, kills:totalKills, maxCombo, completed, playedAt:Date.now() };
+  saveInvadersRecord(record);
+  try {
+    const scores = window.BoohaScoreSystem || window.BoohaAdventure?.scores;
+    if (scores && typeof scores.submit === "function") {
+      scores.submit(INVADERS_SAVE_ID, runScore, {
+        completed, maxCombo,
+        recentRun: { wave:WS.wave, kills:totalKills, lives, completed },
+      });
+    }
+    if (window.BoohaSync) BoohaSync.checkpoint("adventure");
+  } catch (e) { console.warn("[Booha Invaders] Score could not be saved:", e); }
+  runStartedAt = 0;
+  updateInvadersSaveOverlay();
+}
+function updateInvadersSaveOverlay() {
+  const status = document.getElementById("invadersSaveStatus");
+  const continueBtn = document.getElementById("invadersContinueBtn");
+  if (!status || !continueBtn) return;
+  const record = loadInvadersRecord();
+  try {
+    const scores = window.BoohaScoreSystem || window.BoohaAdventure?.scores;
+    if (scores && typeof scores.getHighScore === "function") highScore = Math.max(highScore, scores.getHighScore(INVADERS_SAVE_ID) || 0);
+  } catch (_) {}
+  const cp = record.checkpoint;
+  if (cp && record.active) {
+    continueBtn.hidden = false;
+    continueBtn.querySelector(".save-en").textContent = `CONTINUE — WAVE ${cp.wave}`;
+    continueBtn.querySelector(".save-jp").textContent = `つづきから — ウェーブ ${cp.wave}`;
+    status.innerHTML = `Checkpoint saved · ${cp.score.toLocaleString()} points<br><span>セーブずみ · ${cp.score.toLocaleString()}ポイント</span>`;
+  } else {
+    continueBtn.hidden = true;
+    const best = Math.max(record.highScore || 0, highScore || 0);
+    status.innerHTML = best > 0
+      ? `Best run: ${best.toLocaleString()} points<br><span>ベストスコア：${best.toLocaleString()}ポイント</span>`
+      : `Auto-save ready<br><span>じどうセーブの準備 OK</span>`;
+  }
+}
+function restoreInvadersCheckpoint() {
+  const cp = loadInvadersRecord().checkpoint;
+  if (!cp) return false;
+  resetGame();
+  score = cp.score; totalKills = cp.totalKills; lives = cp.lives; maxCombo = cp.maxCombo;
+  highScore = Math.max(highScore, loadInvadersRecord().highScore || 0);
+  startWave(cp.wave);
+  return true;
 }
 
 function computeGameScale() {
@@ -475,6 +622,7 @@ function startWave(n) {
   dropperTimer = dropperSpawnInterval(n) + rand(2, 5);
   if (n > 1 && isMilestoneWave(n)) triggerMilestone(n);
   beginGroup();
+  saveInvadersCheckpoint("wave-start");
 }
 function beginGroup() {
   WS.spawned = 0; WS.killed = 0;
@@ -1001,6 +1149,7 @@ function easeOutBack(t)    { const c=1.70158,p=c+1; return 1+p*Math.pow(t-1,3)+c
 function update(dt) {
   if (player.energy <= 0) return;
   stageTime += dt;
+
 
   for (const r of rocks) r.hitT = Math.max(0, (r.hitT || 0) - dt);
 
@@ -2320,7 +2469,7 @@ canvas.addEventListener("pointerdown", (e) => {
     setPaused(false); return;
   }
   if (started && player.energy>0 && hitPauseBtn(e.clientX,e.clientY)) { e.preventDefault(); setPaused(true); return; }
-  if (player.energy<=0 && lives<=0) { e.preventDefault(); resetGame(); startWave(1); return; }
+  if (player.energy<=0 && lives<=0) { e.preventDefault(); startInvadersRun(false); return; }
   if (!IS_COARSE) {
     e.preventDefault(); pointerDown=true; pointerX=e.clientX;
     dragOffsetX=pointerX-(player.x+player.w/2);
@@ -2333,7 +2482,7 @@ canvas.addEventListener("pointercancel",()  => { if (IS_COARSE) return; pointerD
 addEventListener("mousemove", (e) => { if (!pointerDown) return; pointerX=e.clientX; });
 
 addEventListener("keydown", (e) => {
-  if (player.energy<=0 && lives<=0) { if (e.key==="r"||e.key==="R") { e.preventDefault(); resetGame(); startWave(1); } return; }
+  if (player.energy<=0 && lives<=0) { if (e.key==="r"||e.key==="R") { e.preventDefault(); startInvadersRun(false); } return; }
   if (started && player.energy>0 && !paused) { if (e.key==="p"||e.key==="P") { e.preventDefault(); setPaused(!paused); return; } }
   if (paused) return;
   if (e.key==="ArrowLeft"||e.key==="ArrowRight") { e.preventDefault(); pointerX=null; }
@@ -2401,6 +2550,7 @@ let endVideoEl = null;
 
 function triggerEndVideo() {
   if (endPlaying) return;
+  finishInvadersRun(false);
   endPlaying=true;
   if (IS_COARSE && mobileControls) mobileControls.style.display="none";
   setPaused(false); pointerDown=false; pointerX=null;
@@ -2446,6 +2596,35 @@ function tick(ts) {
 // ════════════════════════════════════════
 // BOOT
 // ════════════════════════════════════════
+function setupEndVideo() {
+  if (endVideoEl) return;
+  endVideoEl = document.getElementById("endVideo");
+  if (!endVideoEl) return;
+  endVideoEl.addEventListener("ended", ()=>{
+    endVideoEl.pause(); endVideoEl.currentTime=0;
+    endVideoEl.style.opacity="0"; endVideoEl.style.pointerEvents="none";
+    window.location.href = "karasuki.html?room=room_07";
+  });
+}
+function startInvadersRun(continueRun) {
+  ensureAudio();
+  started=true; endPlaying=false;
+  runStartedAt=performance.now();
+  if (IS_COARSE && mobileControls) mobileControls.style.display="block";
+  updateOrientationGate(); LOCKED_SCALE=GAME_SCALE;
+  document.getElementById("startOverlay").style.display="none";
+  setupEndVideo();
+  try {
+    if (candySfx) { candySfx.muted=true; candySfx.play().catch(()=>{}); setTimeout(()=>{ candySfx.pause(); candySfx.currentTime=0; candySfx.muted=false; },50); }
+  } catch(_){}
+  if (continueRun && restoreInvadersCheckpoint()) {
+    window._rewardToast = { en:"RUN RESTORED", jp:"つづきから スタート！", detail:"", color:"#a8f5c4", t:2.0 };
+  } else {
+    resetGame(); startWave(1);
+  }
+  try { resumeAllMusic(); } catch(_){}
+}
+
 (async function boot() {
   resize();
 
@@ -2492,11 +2671,15 @@ function tick(ts) {
   } catch(err) { console.warn("Asset load:", err); }
 
   resetGame();
+  updateInvadersSaveOverlay();
+  document.addEventListener("booha:ready", updateInvadersSaveOverlay);
+  document.addEventListener("booha:saved", updateInvadersSaveOverlay);
   window.addEventListener("deviceorientation", handleTiltEvent, true);
 
   const startBtn = document.getElementById("startBtn");
   if (startBtn) {
     startBtn.addEventListener("click", () => {
+      startInvadersRun(false); return;
       ensureAudio();
       started=true;
       if (IS_COARSE && mobileControls) mobileControls.style.display="block";
@@ -2524,6 +2707,8 @@ function tick(ts) {
       startWave(1);
     });
   }
+  const continueBtn = document.getElementById("invadersContinueBtn");
+  if (continueBtn) continueBtn.addEventListener("click", () => startInvadersRun(true));
 
   // If a browser rejected music during a background/visibility transition,
   // the next real user gesture gives us a safe opportunity to resume it.

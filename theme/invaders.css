@@ -108,6 +108,25 @@ canvas {
 .friends-text { font-weight: 800; font-size: clamp(11px,2.8vw,15px); color: rgba(180,230,255,.95); }
 .friends-jp { font-size: clamp(9px,2.2vw,12px); color: rgba(100,200,255,.80); width: 100%; text-align: center; margin-top: 2px; }
 
+#invadersSavePanel {
+  margin: 10px 0 2px; padding: 9px 10px;
+  border: 1px solid rgba(168,245,196,.22); border-radius: 13px;
+  background: rgba(168,245,196,.06); text-align: center;
+}
+#invadersSaveStatus { color: rgba(220,255,230,.78); font-size: clamp(9px,2.2vw,12px); line-height: 1.45; font-weight: 700; }
+#invadersSaveStatus span { color: rgba(168,245,196,.62); font-size: .92em; }
+#invadersContinueBtn {
+  display: block; width: min(360px,90vw); margin: 8px auto 0;
+  border: 1px solid rgba(168,245,196,.55); border-radius: 999px;
+  padding: 8px 14px; cursor: pointer; color: #071b16;
+  background: linear-gradient(90deg, #a8f5c4, #74d9ff);
+  box-shadow: 0 0 22px rgba(168,245,196,.25); font-family: inherit;
+}
+#invadersContinueBtn .save-en, #invadersContinueBtn .save-jp { display: block; font-weight: 900; }
+#invadersContinueBtn .save-en { font-size: clamp(11px,2.8vw,14px); letter-spacing: .04em; }
+#invadersContinueBtn .save-jp { font-size: clamp(10px,2.4vw,12px); margin-top: 2px; }
+#invadersContinueBtn:active { transform: scale(.97); }
+
 #startBtn {
   display: block; width: min(360px,90vw); margin: clamp(10px,2.5vw,16px) auto 0;
   border: none; border-radius: 999px;
