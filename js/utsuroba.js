@@ -151,6 +151,13 @@
     if (!data.utsuroba.drifters)     { data.utsuroba.drifters     = {}; dirty = true; }
     if (!data.utsuroba.visitedRooms) { data.utsuroba.visitedRooms = {}; dirty = true; }
     if (!data.utsuroba.flags)        { data.utsuroba.flags        = {}; dirty = true; }
+    if (!data.utsuroba.readingJournal) {
+      data.utsuroba.readingJournal = { entries: [] };
+      dirty = true;
+    } else if (!Array.isArray(data.utsuroba.readingJournal.entries)) {
+      data.utsuroba.readingJournal.entries = [];
+      dirty = true;
+    }
 
     /* ── Weekly drifter reset ───────────────────────────────
        Drifter memories reset with the weekly content.
@@ -309,6 +316,28 @@
     if (!data.utsuroba.drifters[id]) data.utsuroba.drifters[id] = { completed: [] };
     if (!data.utsuroba.drifters[id].completed.includes(memIdx))
       data.utsuroba.drifters[id].completed.push(memIdx);
+    const quest = data.weekly?.drifterQuest;
+    if (quest && quest.active === id && quest.memIdx === memIdx && quest.episodeId) {
+      const journal = data.utsuroba.readingJournal || { entries: [] };
+      const entries = Array.isArray(journal.entries) ? journal.entries : [];
+      const existing = entries.find(entry => entry.episodeId === quest.episodeId);
+      if (existing) {
+        existing.completedAt = Date.now();
+        existing.reviewCount = (existing.reviewCount || 1) + 1;
+        existing.drifterId = id;
+        existing.memIdx = memIdx;
+      } else {
+        entries.unshift({
+          episodeId: quest.episodeId,
+          drifterId: id,
+          memIdx,
+          completedAt: Date.now(),
+          reviewCount: 1,
+        });
+      }
+      journal.entries = entries.slice(0, 12);
+      data.utsuroba.readingJournal = journal;
+    }
     if (data.weekly) data.weekly.drifterQuest = null;
     const ok = writeSave(data);
     invalidateQuestCache();
@@ -354,9 +383,10 @@
   const music = { play: () => Promise.resolve(), pause: () => {}, currentTime: 0 };
 
   let app, stage, canvas, ctx, roomLayer;
-  let coordToggle, coordReadout, pinLog;
+  let coordToggle, coordReadout, pinLog, readingJournalButton;
   let exitPopOverlay = null, exitPopCooldownUntil = 0;
   let drifterPanel = null, drifterPanelOpen = false, drifterPanelCooldown = 0;
+  let readingJournalOverlay = null, readingJournalOpen = false;
 
   let drifterFadeStart = 0;
   let _lastWrongId     = '';
@@ -419,6 +449,30 @@
       #buki-pin-log .clear-btn:hover{color:#fff;border-color:rgba(255,138,226,.6);}
       #buki-copy-toast{position:fixed;top:52px;left:50%;transform:translateX(-50%);z-index:300;background:rgba(20,0,30,.92);color:#fff;font:700 12px/1 monospace;padding:6px 18px;border-radius:20px;pointer-events:none;opacity:0;transition:opacity .18s;letter-spacing:.05em;}
       #buki-copy-toast.show{opacity:1;}
+      #utsuroba-reading-journal-button{position:fixed;top:16px;right:16px;z-index:220;background:rgba(9,0,18,.84);border:1px solid rgba(216,168,255,.42);border-radius:999px;padding:8px 13px;color:#f1d9ff;font:700 11px/1.2 Georgia,serif;letter-spacing:.03em;cursor:pointer;box-shadow:0 0 18px rgba(100,30,160,.18);transition:background .18s,border-color .18s,transform .18s;}
+      #utsuroba-reading-journal-button:hover,#utsuroba-reading-journal-button:focus-visible{background:rgba(46,12,68,.94);border-color:#d8a8ff;transform:translateY(-1px);outline:none;}
+      #utsuroba-reading-journal-button span{display:block;margin-top:2px;color:rgba(241,217,255,.5);font-size:9px;font-weight:400;}
+      #utsuroba-reading-journal-button .journal-count{display:inline-block;margin-left:6px;padding:2px 5px;border-radius:999px;background:#ffcb75;color:#241507;font:700 9px/1 monospace;vertical-align:1px;}
+      #utsuroba-reading-journal{position:fixed;inset:0;z-index:9300;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(4,0,12,.86);font-family:Georgia,serif;}
+      .reading-journal-card{position:relative;width:min(760px,100%);max-height:calc(100vh - 36px);overflow:auto;padding:clamp(22px,4vw,36px);box-sizing:border-box;border:1px solid rgba(216,168,255,.42);border-radius:16px;background:linear-gradient(160deg,#171020,#0b0712 68%,#130b1b);box-shadow:0 0 70px rgba(100,30,160,.3);animation:utsuPopIn .22s ease-out;}
+      .reading-journal-close{position:absolute;right:14px;top:12px;background:transparent;border:0;color:rgba(255,255,255,.55);font-size:18px;cursor:pointer;padding:8px;}
+      .reading-journal-eyebrow{color:#d8a8ff;font:700 11px/1.4 monospace;letter-spacing:.16em;text-transform:uppercase;margin-bottom:8px;}
+      .reading-journal-card h2{margin:0 42px 5px;color:#fff4ff;font-size:clamp(1.3rem,3vw,2rem);}
+      .reading-journal-card h2 span{display:block;color:rgba(255,220,255,.58);font-size:.5em;font-weight:400;margin-top:4px;}
+      .reading-journal-intro{margin:0 0 18px;color:#f5e8ff;line-height:1.5;font-size:.9rem;}
+      .reading-journal-intro small{display:block;margin-top:3px;color:rgba(245,232,255,.54);font-size:.82em;}
+      .reading-journal-list{display:grid;gap:11px;}
+      .reading-journal-entry{padding:14px;border:1px solid rgba(216,168,255,.22);border-radius:10px;background:rgba(255,255,255,.045);}
+      .reading-journal-entry h3{margin:0;color:#fff;font-size:1rem;line-height:1.35;}
+      .reading-journal-entry h3 span{display:block;margin-top:3px;color:rgba(255,231,178,.58);font-size:.72rem;font-weight:400;}
+      .reading-journal-meta{margin:7px 0 9px;color:rgba(245,232,255,.54);font-size:.73rem;line-height:1.4;}
+      .reading-journal-vocab{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:11px;}
+      .reading-journal-vocab span{padding:4px 7px;border:1px solid rgba(216,168,255,.27);border-radius:999px;color:#e4c2ff;font-size:.68rem;}
+      .reading-journal-review{padding:7px 12px;border:1px solid #ffcb75;border-radius:6px;background:rgba(255,203,117,.1);color:#ffe7b2;cursor:pointer;font:700 .76rem Georgia,serif;}
+      .reading-journal-review:hover,.reading-journal-review:focus-visible{background:rgba(255,203,117,.2);outline:none;}
+      .reading-journal-empty,.reading-journal-loading{padding:28px 12px;text-align:center;color:#f1dcff;line-height:1.55;}
+      .reading-journal-empty small,.reading-journal-loading small{display:block;color:rgba(245,232,255,.52);font-size:.8em;}
+      @media(max-width:700px){#utsuroba-reading-journal-button{top:10px;right:10px;padding:7px 10px;font-size:10px}.reading-journal-card{padding:21px 16px}.reading-journal-card h2{font-size:1.35rem}}
       /* ══ DRIFTER PANEL ══ */
       #utsuroba-drifter-panel{position:fixed;bottom:0;left:0;right:0;z-index:9100;background:linear-gradient(180deg,#f7f2e8 0%,#ede5d0 100%);border-top:2px solid #c8b48a;border-radius:20px 20px 0 0;box-shadow:0 -6px 32px rgba(0,0,0,0.5);transform:translateY(100%);transition:transform ${PANEL_SLIDE_MS}ms cubic-bezier(0.22,1,0.36,1);font-family:'Georgia',serif;pointer-events:none;}
       #utsuroba-drifter-panel.open{transform:translateY(0);pointer-events:auto;}
@@ -586,6 +640,92 @@
     drifterPanel.id = 'utsuroba-drifter-panel';
     document.body.appendChild(drifterPanel);
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && drifterPanelOpen) closeDrifterPanel(); });
+  }
+
+  function escapeHTML(value) {
+    return String(value == null ? '' : value)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function readingJournalEntries() {
+    const entries = readUtsuroba().readingJournal?.entries;
+    return Array.isArray(entries) ? entries : [];
+  }
+
+  function refreshReadingJournalButton() {
+    if (!readingJournalButton) return;
+    const count = readingJournalEntries().length;
+    readingJournalButton.innerHTML = `Reading Journal${count ? `<b class="journal-count">${count}</b>` : ''}<span>読書ノート</span>`;
+    readingJournalButton.setAttribute('aria-label', `Reading Journal, ${count} completed memories`);
+  }
+
+  function closeReadingJournal() {
+    readingJournalOpen = false;
+    if (readingJournalOverlay) readingJournalOverlay.remove();
+    readingJournalOverlay = null;
+    state.inputLocked = false;
+  }
+
+  async function openReadingReview(entry) {
+    const drifter = DATA.drifters.find(item => item.id === entry.drifterId) || {
+      id: entry.drifterId || 'memory', name: 'A restored memory', nameKanji: '記憶'
+    };
+    closeReadingJournal();
+    if (!window.UtsurobaReading) return;
+    window.UtsurobaReading.start({
+      drifter,
+      quest: { episodeId: entry.episodeId, readingIndex: 0, mechanicIndex: 0 },
+      reviewOnly: true,
+      onClose: () => { state.inputLocked = false; },
+    });
+  }
+
+  async function openReadingJournal() {
+    if (readingJournalOpen || drifterPanelOpen || state.celebrating) return;
+    readingJournalOpen = true;
+    state.inputLocked = true;
+    readingJournalOverlay = document.createElement('div');
+    readingJournalOverlay.id = 'utsuroba-reading-journal';
+    readingJournalOverlay.innerHTML = `<div class="reading-journal-card"><button class="reading-journal-close" type="button" aria-label="Close journal">✕</button><div class="reading-journal-eyebrow">READING JOURNAL / 読書ノート</div><h2>Restored memories <span>戻した記憶</span></h2><p class="reading-journal-intro">Read a memory again whenever you want. Try to remember the details.<small>いつでも記憶を読み返せます。細かい部分を思い出してみましょう。</small></p><div class="reading-journal-list"><div class="reading-journal-loading">Opening your journal…<small>ノートを開いています…</small></div></div></div>`;
+    document.body.appendChild(readingJournalOverlay);
+    readingJournalOverlay.querySelector('.reading-journal-close').addEventListener('click', closeReadingJournal);
+    readingJournalOverlay.addEventListener('click', event => { if (event.target === readingJournalOverlay) closeReadingJournal(); });
+    try {
+      await window.UTSUROBA_EPISODES_READY;
+      if (!readingJournalOpen) return;
+      const entries = readingJournalEntries();
+      const list = readingJournalOverlay.querySelector('.reading-journal-list');
+      if (!entries.length) {
+        list.innerHTML = '<div class="reading-journal-empty">Restore a memory to place it here.<small>記憶を戻すと、ここに記録されます。</small></div>';
+        return;
+      }
+      list.innerHTML = entries.map((entry, index) => {
+        const episode = window.UTSUROBA_EPISODES[entry.episodeId];
+        if (!episode) return '';
+        const words = Array.isArray(episode.vocabulary) ? episode.vocabulary.slice(0, 5).map(item => `<span>${escapeHTML(item.word)}</span>`).join('') : '';
+        const reviews = Math.max(1, Number(entry.reviewCount) || 1);
+        return `<article class="reading-journal-entry"><h3>${escapeHTML(episode.title)}<span>${escapeHTML(episode.titleJP)}</span></h3><p class="reading-journal-meta">${reviews} reading ${reviews === 1 ? 'completed' : 'reviews'} · ${escapeHTML(episode.eyebrow)}<br>${reviews === 1 ? '1回読了' : `${reviews}回読み返しました`}</p>${words ? `<div class="reading-journal-vocab" aria-label="Vocabulary">${words}</div>` : ''}<button class="reading-journal-review" type="button" data-journal-entry="${index}">Read again / もう一度読む</button></article>`;
+      }).join('');
+      list.querySelectorAll('[data-journal-entry]').forEach(button => button.addEventListener('click', () => {
+        const entry = entries[Number(button.dataset.journalEntry)];
+        if (entry) openReadingReview(entry);
+      }));
+    } catch (error) {
+      console.error('[Utsuroba Journal] Could not load journal:', error);
+      const list = readingJournalOverlay.querySelector('.reading-journal-list');
+      if (list) list.innerHTML = '<div class="reading-journal-empty">The journal is cloudy. Please try again.<small>ノートがぼやけています。もう一度試してください。</small></div>';
+    }
+  }
+
+  function injectReadingJournal() {
+    if (readingJournalButton) return;
+    readingJournalButton = document.createElement('button');
+    readingJournalButton.id = 'utsuroba-reading-journal-button';
+    readingJournalButton.type = 'button';
+    readingJournalButton.addEventListener('click', openReadingJournal);
+    document.body.appendChild(readingJournalButton);
+    refreshReadingJournalButton();
   }
 
   function openDrifterPanel(drifter, forcedQuest = null) {
@@ -818,7 +958,10 @@
         try { music.play().catch(() => {}); } catch(_) {}
       },
       onComplete: () => {
-        if (completeMemory(drifter.id, quest.memIdx)) startCelebration(drifter);
+        if (completeMemory(drifter.id, quest.memIdx)) {
+          refreshReadingJournalButton();
+          startCelebration(drifter);
+        }
       }
     });
     return true;
@@ -940,6 +1083,7 @@
     document.body.appendChild(toast);
     injectExitPopOverlay();
     buildDrifterPanel();
+    injectReadingJournal();
     if (DEV_MODE) { injectDevPanel(); }
     const ro = document.createElement('div'); ro.id = 'rotate-overlay';
     ro.innerHTML = `<span class="rotate-phone">📱</span><div class="rotate-bar"></div><p class="rotate-title">横にして遊ぼう！</p><p class="rotate-sub">うつろばは<strong style="color:#c45fa3">横画面</strong>で遊べるよ。<br>スマホを横にしてね。</p>`;
