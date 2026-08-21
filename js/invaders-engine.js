@@ -2147,11 +2147,14 @@ function draw() {
     if (img) ctx.drawImage(img, r.x, r.y, r.w, r.h);
     else { ctx.fillStyle=`rgba(${Math.round(80+pct*80)},70,50,0.9)`; roundRect(r.x,r.y,r.w,r.h,8); ctx.fill(); }
     if (r.hitT > 0) {
+      // "source-atop" only paints over pixels the rock art (or the fallback
+      // rounded-rect) just drew as opaque, so the flash hugs the rock's real
+      // silhouette instead of lighting up its whole (mostly transparent) box.
       ctx.save();
+      ctx.globalCompositeOperation = "source-atop";
       ctx.globalAlpha = Math.min(0.65, r.hitT * 2.3);
       ctx.fillStyle = "#fff1b0";
-      roundRect(r.x, r.y, r.w, r.h, 8);
-      ctx.fill();
+      ctx.fillRect(r.x, r.y, r.w, r.h);
       ctx.restore();
     }
     if (pct < 0.99) {

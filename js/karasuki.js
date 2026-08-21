@@ -907,11 +907,16 @@ const HAPPY_HOUSE_PORTAL = {
     else      { el.textContent = '';   el.style.display = 'none'; }
   }
 
-  function wpopSetIconImage(prefix, src, alt) {
+  function wpopSetIconImage(prefix, src, alt, variant) {
     const img = document.getElementById(prefix + '-icon-img');
     const orb = document.getElementById(prefix + '-icon-orb');
     const wrap = document.getElementById(prefix + '-icon-wrap');
-    if (wrap) { wrap.classList.add('image-mode'); wrap.classList.remove('orb-mode'); }
+    if (wrap) {
+      wrap.classList.add('image-mode');
+      wrap.classList.remove('orb-mode', 'image-feed', 'image-blocks', 'image-invaders',
+        'image-destruction', 'image-happy', 'image-utsuroba', 'image-profile');
+      if (variant) wrap.classList.add(variant);
+    }
     if (orb) orb.style.display = 'none';
     if (img) { img.src = src; img.alt = alt || ''; img.style.display = ''; }
   }
@@ -1033,7 +1038,7 @@ const HAPPY_HOUSE_PORTAL = {
 
     const bonusImage = BONUS_POP_IMAGES[tree.id];
     if (bonusImage) {
-      wpopSetIconImage('bonus-pop', bonusImage.src, bonusImage.alt);
+      wpopSetIconImage('bonus-pop', bonusImage.src, bonusImage.alt, `image-${tree.theme}`);
     } else {
       wpopSetIconOrb('bonus-pop',
         `radial-gradient(circle at 35% 32%,#ffffff,${t.orbColors[0]},${t.orbColors[1]})`,
@@ -1302,7 +1307,7 @@ const HAPPY_HOUSE_PORTAL = {
 
   function openHappyHousePop() {
     wpopThemeBox('happy-house-pop', HAPPY_HOUSE_THEME);
-    wpopSetIconImage('happy-house-pop', 'assets/happy_house/mister_happy-2.png', 'Mister Happy');
+    wpopSetIconImage('happy-house-pop', 'assets/happy_house/mister_happy-2.png', 'Mister Happy', 'image-happy');
     wpopSetLock('happy-house-pop', false);
 
     wpopSetText(document.getElementById('happy-house-pop-eyebrow-en'), 'AN INVITATION');
@@ -1484,7 +1489,7 @@ const HAPPY_HOUSE_PORTAL = {
   function openUtsuobaPopup() {
     const unlocked = _utsurobaCurriculumUnlocked();
     wpopThemeBox('utsuroba-pop', UTSUROBA_THEME);
-    wpopSetIconImage('utsuroba-pop', 'assets/img/utsuroba_icon.png', 'Utsuroba');
+    wpopSetIconImage('utsuroba-pop', 'assets/img/utsuroba_icon.png', 'Utsuroba', 'image-utsuroba');
     wpopSetLock('utsuroba-pop', false);
     wpopSetText(document.getElementById('utsuroba-pop-title-en'), '');
     wpopSetText(document.getElementById('utsuroba-pop-title-jp'), '');
@@ -1708,9 +1713,20 @@ const HAPPY_HOUSE_PORTAL = {
       .wpop-close{position:absolute;top:2px;right:2px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:transparent;border:none;cursor:pointer;font-size:1.05rem;line-height:1;padding:0;opacity:.5;transition:opacity .18s;z-index:3;color:inherit;}
       .wpop-close:hover,.wpop-close:focus-visible{opacity:1;}
       .wpop-icon-wrap{width:clamp(60px,15vw,80px);height:clamp(60px,15vw,80px);margin:0 auto 14px;position:relative;border-radius:50%;display:flex;align-items:center;justify-content:center;animation:wpopIconPulse 2.8s ease-in-out infinite;}
-      .wpop-icon-wrap.image-mode{width:clamp(88px,19vw,122px);height:clamp(106px,25vw,156px);border-radius:12px;filter:drop-shadow(0 0 8px var(--wc1,#fff)) drop-shadow(0 0 26px var(--wc2,#fff));}
-      .wpop-icon-wrap.image-mode::before{content:"";position:absolute;inset:-28%;z-index:0;border-radius:50%;background:radial-gradient(ellipse,var(--wc1,#fff) 0%,var(--wc2,#fff) 34%,transparent 72%);opacity:.28;filter:blur(14px);pointer-events:none;}
-      @keyframes wpopIconPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.05);}}
+      .wpop-icon-wrap.image-mode{width:clamp(86px,18vw,116px);height:clamp(88px,19vw,122px);border-radius:0;background:transparent;filter:none;overflow:visible;}
+      .wpop-icon-wrap.image-mode::before{content:"";position:absolute;inset:-18%;z-index:0;border-radius:50%;background:radial-gradient(ellipse,var(--wc1,#fff) 0%,var(--wc2,#fff) 38%,transparent 72%);opacity:.16;filter:blur(15px);pointer-events:none;animation:wpopGlowPulse 2.8s ease-in-out infinite;}
+      @keyframes wpopIconPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.025);}}
+      @keyframes wpopGlowPulse{0%,100%{opacity:.11;transform:scale(.92);}50%{opacity:.27;transform:scale(1.08);}}
+      .wpop-icon-wrap.image-mode img{width:100%;height:100%;object-fit:contain;border-radius:0;background:transparent;border:0;box-shadow:none;padding:0;position:relative;z-index:1;filter:drop-shadow(0 0 6px var(--wc1,#fff)) drop-shadow(0 0 18px var(--wc2,#fff));}
+      .wpop-icon-wrap.image-mode.image-feed{width:clamp(148px,30vw,188px);height:clamp(98px,20vw,124px);margin-bottom:10px;}
+      .wpop-icon-wrap.image-mode.image-feed img{transform:scale(1.06);}
+      .wpop-icon-wrap.image-mode.image-blocks{width:clamp(78px,16vw,94px);height:clamp(78px,16vw,94px);}
+      .wpop-icon-wrap.image-mode.image-blocks img{transform:scale(.86);mix-blend-mode:screen;}
+      .wpop-icon-wrap.image-mode.image-invaders{width:clamp(92px,19vw,122px);height:clamp(92px,19vw,122px);}
+      .wpop-icon-wrap.image-mode.image-destruction{width:clamp(96px,20vw,126px);height:clamp(96px,20vw,126px);}
+      .wpop-icon-wrap.image-mode.image-happy{width:clamp(104px,22vw,136px);height:clamp(120px,25vw,154px);}
+      .wpop-icon-wrap.image-mode.image-utsuroba{width:clamp(96px,20vw,126px);height:clamp(96px,20vw,126px);}
+      .wpop-icon-wrap.image-mode.image-profile{width:clamp(96px,20vw,126px);height:clamp(96px,20vw,126px);}
       .wpop-icon-wrap img{width:100%;height:100%;object-fit:contain;border-radius:10px;position:relative;z-index:1;}
       .wpop-icon-wrap.orb-mode img{border-radius:50%;}
       .wpop-icon-wrap .wpop-icon-orb{width:100%;height:100%;border-radius:50%;position:relative;z-index:1;}
@@ -1842,7 +1858,7 @@ const HAPPY_HOUSE_PORTAL = {
       btnBorder: 'rgba(45,212,191,.9)', btnColor: '#d6fff6',
     };
     wpopThemeBox('portal', PROFILE_THEME);
-    wpopSetIconImage('portal', 'assets/img/boo-moon.png', 'Your profile');
+    wpopSetIconImage('portal', 'assets/img/boo-moon.png', 'Your profile', 'image-profile');
     wpopSetLock('portal', false);
     wpopSetText(document.getElementById('portal-title-en'), '');
     wpopSetText(document.getElementById('portal-title-jp'), '');
