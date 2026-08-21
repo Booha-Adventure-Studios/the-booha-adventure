@@ -3328,7 +3328,7 @@ function traitGlowColor(block) {
     ctx.fillStyle=chapter.accent || '#ffdf80';ctx.font='bold 15px system-ui,sans-serif';
     ctx.fillText(`CHAPTER ${level.chapter || 1} · ${level.chapterName || 'CAMPAIGN'}`,W/2,H/2-145);
     ctx.fillStyle='#fff';ctx.font='bold 44px system-ui,sans-serif';
-    ctx.fillText(level.boss ? `BOSS ROUND ${gs.roundN}` : `ROUND ${gs.roundN}`,W/2,H/2-96);
+    ctx.fillText(level.boss ? `BOSS ROUND ${gs.roundN} · ボスラウンド` : `ROUND ${gs.roundN} · ラウンド`,W/2,H/2-96);
     ctx.fillStyle='rgba(255,255,255,0.82)';ctx.font='bold 21px system-ui,sans-serif';
     ctx.fillText(level.name || '',W/2,H/2-58);
     const panelX=W/2-300,panelY=H/2-46,panelW=600,panelH=140;
@@ -3352,7 +3352,7 @@ function traitGlowColor(block) {
     const bx=ACTION_RECT.x,by=ACTION_RECT.y,bw=ACTION_RECT.w,bh=ACTION_RECT.h;
     const bg=ctx.createLinearGradient(bx,by,bx,by+bh);bg.addColorStop(0,level.boss?'#ffdf80':'#44ffcc');bg.addColorStop(1,level.boss?'#ff8c44':'#009977');
     ctx.shadowColor=level.boss?'#ffcf70':'#44ffcc';ctx.shadowBlur=18;ctx.fillStyle=bg;rr(ctx,bx,by,bw,bh,16,true,false);ctx.shadowBlur=0;
-    ctx.fillStyle='#07121a';ctx.font='bold 20px system-ui,sans-serif';ctx.fillText('BEGIN  →',W/2,by+bh/2);
+    ctx.fillStyle='#07121a';ctx.font='bold 18px system-ui,sans-serif';ctx.fillText('BEGIN / はじめる →',W/2,by+bh/2);
     ctx.restore();
   }
 
@@ -3422,14 +3422,14 @@ function traitGlowColor(block) {
       sg.addColorStop(0,'rgba(216,140,255,0.28)');sg.addColorStop(1,'rgba(216,140,255,0)');
       ctx.fillStyle=sg;ctx.fillRect(W/2-150,H/2-14,300,100);
       ctx.restore();
-      const unlockText=`✦ NEW BOOHA · ${gs.cardUnlock}`;
+      const unlockText=`✦ NEW BOOHA / あたらしいブーハー · ${gs.cardUnlock}`;
       ctx.font='bold 13px system-ui,sans-serif';
       ctx.fillStyle='#e8b8ff';
       ctx.fillText(fitText(unlockText, 820),W/2,H/2+36);
     } else if (win) {
       const next = nextRosterUnlock();
       if (next) {
-        const nextText=`NEXT BOOHA · ${next.booha.name} · ${next.requirement.unlockEN}`;
+        const nextText=`NEXT BOOHA / つぎのブーハー · ${next.booha.name} · ${next.requirement.unlockEN}`;
         ctx.font='12px system-ui,sans-serif';
         ctx.fillStyle='rgba(255,223,128,0.82)';
         ctx.fillText(fitText(nextText, 820),W/2,H/2+36);
@@ -3437,11 +3437,11 @@ function traitGlowColor(block) {
     }
     if (gs.cardChapter) {
       ctx.font='bold 13px system-ui,sans-serif';ctx.fillStyle='#ffcf70';
-      ctx.fillText(fitText(`★ CHAPTER CLEAR · ${gs.cardChapter}`, 820),W/2,H/2+58);
+      ctx.fillText(fitText(`★ CHAPTER CLEAR / チャプタークリア · ${gs.cardChapter}`, 820),W/2,H/2+58);
     }
     if (gs.lastScoreIsBest && gs.runScore > 0) {
       ctx.font='bold 13px system-ui,sans-serif';ctx.fillStyle='#ffdf80';
-      ctx.fillText('✦ NEW HIGH SCORE ✦',W/2,H/2+62);
+      ctx.fillText(fitText('✦ NEW HIGH SCORE · ハイスコア更新 ✦', 820),W/2,H/2+62);
       // Fixed twinkling sparkles around the line — positions come from
       // detRand (same deterministic hash as the block textures), so they
       // only fade in and out, never jump around.
@@ -3482,7 +3482,8 @@ function traitGlowColor(block) {
     ctx.textAlign='center';ctx.textBaseline='middle';
     ctx.fillStyle='#ffb0a8';ctx.font='bold 22px system-ui,sans-serif';ctx.fillText('EXIT GAME?',W/2,m.y+43);
     ctx.fillStyle='rgba(255,255,255,0.92)';ctx.font='bold 15px system-ui,sans-serif';ctx.fillText('ゲームを終了しますか？',W/2,m.y+76);
-    ctx.fillStyle='rgba(255,255,255,0.52)';ctx.font='12px system-ui,sans-serif';ctx.fillText('Your current run will be saved.',W/2,m.y+99);
+    ctx.fillStyle='rgba(255,255,255,0.52)';ctx.font='11px system-ui,sans-serif';
+    ctx.fillText(fitText('Your current run will be saved. / げんざいのランは ほぞんされます',m.w-70),W/2,m.y+99);
     const y=m.y+132;
     ctx.fillStyle='rgba(255,105,105,0.18)';ctx.strokeStyle='rgba(255,150,150,0.72)';ctx.lineWidth=1.5;rr(ctx,m.x+268,y,150,46,10,true,true);
     ctx.fillStyle='rgba(255,255,255,0.08)';ctx.strokeStyle='rgba(255,255,255,0.34)';rr(ctx,m.x+82,y,150,46,10,true,true);
@@ -3514,7 +3515,7 @@ function traitGlowColor(block) {
       ctx.font='bold 15px system-ui,sans-serif';
       ctx.fillText(b.en, W/2, b.y+b.h/2-10);
       ctx.fillStyle='rgba(255,255,255,0.5)';ctx.font='11px system-ui,sans-serif';
-      ctx.fillText(dim ? `${b.jp} · Pass 3` : b.jp, W/2, b.y+b.h/2+11);
+      ctx.fillText(b.jp, W/2, b.y+b.h/2+11);
       ctx.restore();
     }
     ctx.restore();
