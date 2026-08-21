@@ -31,9 +31,7 @@
       #utsuroba-reading-challenge .reading-transcript{display:grid;gap:8px;margin:18px 0 20px;padding:14px;background:rgba(255,255,255,.045);border:1px solid rgba(220,160,255,.16);border-radius:10px;}
       #utsuroba-reading-challenge .reading-line{padding-left:12px;border-left:2px solid rgba(216,168,255,.45);}
       #utsuroba-reading-challenge .reading-speaker{color:#d8a8ff;font-size:.74rem;font-weight:700;letter-spacing:.05em;}
-      #utsuroba-reading-challenge .reading-speaker span{color:rgba(216,168,255,.48);font-weight:400;margin-left:5px;}
       #utsuroba-reading-challenge .reading-en{color:#fff;font-size:.9rem;line-height:1.35;margin-top:2px;}
-      #utsuroba-reading-challenge .reading-line .reading-jp{margin:1px 0 0;}
       #utsuroba-reading-challenge .reading-question-label{color:#ffcb75;font:700 10px/1.4 monospace;letter-spacing:.14em;margin-top:8px;}
       #utsuroba-reading-challenge .reading-choices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:14px;}
       #utsuroba-reading-challenge .reading-choice{min-height:72px;text-align:left;padding:11px 12px;background:rgba(255,255,255,.06);border:1px solid rgba(220,160,255,.34);border-radius:9px;color:#fff;cursor:pointer;font:inherit;transition:transform .15s,border-color .15s,background .15s;}
@@ -100,9 +98,8 @@
       const question = episode.checks[questionIndex];
       const lines = episode.lines.map(line => `
         <div class="reading-line">
-          <div class="reading-speaker">${escapeText(line.speaker)} <span>${escapeText(line.speakerJP)}</span></div>
+          <div class="reading-speaker">${escapeText(line.speaker)}</div>
           <div class="reading-en">${escapeText(line.en)}</div>
-          <div class="reading-jp">${escapeText(line.jp)}</div>
         </div>`).join('');
 
       if (!question) {
