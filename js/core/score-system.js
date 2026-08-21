@@ -25,6 +25,9 @@ const BoohaScoreSystem = (() => {
       lastLines:    0,
       bestLevel:    0,
       bestCombo:    0,
+      totalScore:   0,
+      totalLines:   0,
+      recentRuns:   [],
       lastPlayedAt: null,
     };
   }
@@ -62,6 +65,20 @@ const BoohaScoreSystem = (() => {
     }
     if (Number.isFinite(opts.level)) entry.bestLevel = Math.max(entry.bestLevel || 0, opts.level);
     if (Number.isFinite(opts.maxCombo)) entry.bestCombo = Math.max(entry.bestCombo || 0, opts.maxCombo);
+
+    // Optional run memory for arcade games. The shared score entry remains
+    // compact, but can still recall a player's recent attempts and lifetime
+    // totals without creating a second unscoped save system in each game.
+    entry.totalScore = (entry.totalScore || 0) + Math.max(0, Number(score) || 0);
+    if (Number.isFinite(opts.lines)) {
+      entry.totalLines = (entry.totalLines || 0) + Math.max(0, opts.lines);
+    }
+    if (opts.recentRun && typeof opts.recentRun === 'object' && !Array.isArray(opts.recentRun)) {
+      entry.recentRuns = [
+        { ...opts.recentRun, score: Math.max(0, Number(score) || 0), playedAt: Date.now() },
+        ...(Array.isArray(entry.recentRuns) ? entry.recentRuns : []),
+      ].slice(0, 8);
+    }
 
     entry.attempts++;
     entry.lastPlayedAt = Date.now();
