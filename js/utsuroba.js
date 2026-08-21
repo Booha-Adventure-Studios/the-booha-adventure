@@ -451,6 +451,7 @@
   let drifterPanel = null, drifterPanelOpen = false, drifterPanelCooldown = 0;
   let readingJournalOverlay = null, readingJournalOpen = false;
   let convergenceOverlay = null, convergenceOpen = false;
+  let gardenOverlay = null, gardenOpen = false;
 
   let drifterFadeStart = 0;
   let _lastWrongId     = '';
@@ -499,6 +500,13 @@
       .utsu-memory-gate .gate-label{position:absolute;left:50%;top:calc(100% - 5px);transform:translateX(-50%);min-width:150px;padding:5px 8px;border:1px solid rgba(216,168,255,.42);border-radius:6px;background:rgba(18,7,28,.9);color:#f1d9ff;text-align:center;font:700 10px/1.2 Georgia,serif;white-space:nowrap;}
       .utsu-memory-gate .gate-label small{display:block;margin-top:3px;color:rgba(241,217,255,.6);font-size:9px;font-weight:400;}
       @keyframes gatePulse{0%,100%{transform:translate(-50%,-50%) rotate(45deg) scale(.86);opacity:.65}50%{transform:translate(-50%,-50%) rotate(45deg) scale(1.08);opacity:1}}
+      .utsu-memory-garden{position:absolute;transform:translate(-50%,-50%);width:164px;height:138px;padding:0;border:0;background:transparent;pointer-events:auto;cursor:pointer;filter:drop-shadow(0 0 22px rgba(159,228,186,.5));}
+      .utsu-memory-garden .garden-bloom{position:absolute;left:50%;top:44%;width:82px;height:60px;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(ellipse,rgba(159,228,186,.9) 0 7%,rgba(104,212,178,.48) 18%,rgba(216,168,255,.28) 42%,transparent 72%);animation:gardenBreathe 3.4s ease-in-out infinite;}
+      .utsu-memory-garden .garden-spark{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);color:#dcffe8;font-size:31px;text-shadow:0 0 18px #9fe4ba;animation:gardenSpark 2.4s ease-in-out infinite;}
+      .utsu-memory-garden .garden-label{position:absolute;left:50%;top:calc(100% - 8px);transform:translateX(-50%);min-width:154px;padding:5px 8px;border:1px solid rgba(159,228,186,.48);border-radius:6px;background:rgba(7,25,22,.92);color:#d7ffe3;text-align:center;font:700 10px/1.2 Georgia,serif;white-space:nowrap;}
+      .utsu-memory-garden .garden-label small{display:block;margin-top:3px;color:rgba(215,255,227,.62);font-size:9px;font-weight:400;}
+      @keyframes gardenBreathe{0%,100%{transform:translate(-50%,-50%) scale(.84);opacity:.7}50%{transform:translate(-50%,-50%) scale(1.12);opacity:1}}
+      @keyframes gardenSpark{0%,100%{transform:translate(-50%,-50%) rotate(-5deg) scale(.9)}50%{transform:translate(-50%,-57%) rotate(6deg) scale(1.08)}}
       #utsuroba-memory-convergence{position:fixed;inset:0;z-index:9350;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(4,0,12,.88);font-family:Georgia,serif;}
       .memory-convergence-card{position:relative;width:min(760px,100%);max-height:calc(100vh - 36px);overflow:auto;padding:clamp(22px,4vw,36px);box-sizing:border-box;border:1px solid rgba(216,168,255,.48);border-radius:16px;background:linear-gradient(160deg,#171020,#0b0712 68%,#130b1b);box-shadow:0 0 75px rgba(100,30,160,.38);animation:utsuPopIn .22s ease-out;}
       .memory-convergence-close{position:absolute;right:14px;top:12px;background:transparent;border:0;color:rgba(255,255,255,.55);font-size:18px;cursor:pointer;padding:8px;}
@@ -532,6 +540,22 @@
       .memory-convergence-feedback small{display:block;margin-top:3px;color:rgba(255,231,178,.58);font-size:.9em;}
       .memory-convergence-close-btn{margin-top:17px;padding:9px 18px;border:1px solid #ffcb75;border-radius:7px;background:rgba(255,203,117,.12);color:#ffe7b2;cursor:pointer;font:700 .78rem Georgia,serif;}
       @media(max-width:700px){.memory-convergence-map,.memory-convergence-clue-grid{grid-template-columns:1fr}.memory-convergence-card{padding:21px 16px}}
+      #utsuroba-memory-garden{position:fixed;inset:0;z-index:9350;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(1,12,9,.88);font-family:Georgia,serif;}
+      .memory-garden-card{position:relative;width:min(700px,100%);max-height:calc(100vh - 36px);overflow:auto;padding:clamp(22px,4vw,36px);box-sizing:border-box;border:1px solid rgba(159,228,186,.5);border-radius:16px;background:linear-gradient(160deg,#10221b,#08120f 68%,#101a19);box-shadow:0 0 75px rgba(39,153,112,.34);animation:utsuPopIn .22s ease-out;}
+      .memory-garden-close{position:absolute;right:14px;top:12px;background:transparent;border:0;color:rgba(255,255,255,.58);font-size:18px;cursor:pointer;padding:8px;}
+      .memory-garden-eyebrow{color:#9fe4ba;font:700 11px/1.4 monospace;letter-spacing:.16em;text-transform:uppercase;margin-bottom:8px;}
+      .memory-garden-card h2{margin:0 42px 6px;color:#effff4;font-size:clamp(1.35rem,3vw,2rem);}
+      .memory-garden-card h2 span{display:block;color:rgba(215,255,227,.6);font-size:.5em;font-weight:400;margin-top:4px;}
+      .memory-garden-intro{margin:0 0 16px;color:#e5fff0;font-size:.88rem;line-height:1.5;}
+      .memory-garden-intro small{display:block;margin-top:3px;color:rgba(229,255,240,.56);font-size:.82em;}
+      .memory-garden-quotes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:0 0 17px;}
+      .memory-garden-quote{padding:11px 10px;border:1px solid rgba(159,228,186,.24);border-radius:8px;background:rgba(255,255,255,.045);}
+      .memory-garden-quote strong{display:block;color:#d7ffe3;font-size:.74rem;line-height:1.3;}
+      .memory-garden-quote p{margin:7px 0 0;color:#fff;font-size:.72rem;line-height:1.45;}
+      .memory-garden-return{margin:0;padding:10px;border-left:3px solid #9fe4ba;color:#d7ffe3;font-size:.78rem;line-height:1.45;}
+      .memory-garden-return small{display:block;margin-top:3px;color:rgba(215,255,227,.58);font-size:.9em;}
+      .memory-garden-close-btn{margin-top:17px;padding:9px 18px;border:1px solid #9fe4ba;border-radius:7px;background:rgba(159,228,186,.12);color:#d7ffe3;cursor:pointer;font:700 .78rem Georgia,serif;}
+      @media(max-width:700px){.memory-garden-quotes{grid-template-columns:1fr}.memory-garden-card{padding:21px 16px}}
       .utsuroba-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;display:block;pointer-events:none;user-select:none;}
       #buki-canvas{position:absolute;inset:0;z-index:10;pointer-events:none;}
       #buki-fade{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none;z-index:20;}
@@ -831,15 +855,24 @@
     });
     const gate = DATA.readingConvergence;
     if (gate && gate.gateRoom === state.roomId && allReadingMemoriesRestored()) {
-      const gateButton = document.createElement('button');
-      gateButton.type = 'button';
-      gateButton.className = 'utsu-memory-gate';
-      gateButton.style.left = `${Math.max(0, Math.min(1, gate.x)) * 100}%`;
-      gateButton.style.top = `${Math.max(0, Math.min(1, gate.y)) * 100}%`;
-      gateButton.setAttribute('aria-label', `${gate.title}. Open convergence reading.`);
-      gateButton.innerHTML = `<span class="gate-ring"></span><span class="gate-core" aria-hidden="true">✦</span><span class="gate-label">${escapeHTML(gate.title)}<small>${escapeHTML(gate.titleJP)}</small></span>`;
-      gateButton.addEventListener('click', event => { event.stopPropagation(); openMemoryConvergence(); });
-      echoLayer.appendChild(gateButton);
+      const worldUnderstood = !!readUtsuroba().flags?.convergenceSeen;
+      const gardenButton = document.createElement('button');
+      gardenButton.type = 'button';
+      gardenButton.style.left = `${Math.max(0, Math.min(1, gate.x)) * 100}%`;
+      gardenButton.style.top = `${Math.max(0, Math.min(1, gate.y)) * 100}%`;
+      if (worldUnderstood) {
+        const garden = gate.garden;
+        gardenButton.className = 'utsu-memory-garden';
+        gardenButton.setAttribute('aria-label', `${garden.title}. Open the memory garden.`);
+        gardenButton.innerHTML = `<span class="garden-bloom"></span><span class="garden-spark" aria-hidden="true">✿</span><span class="garden-label">${escapeHTML(garden.title)}<small>${escapeHTML(garden.titleJP)}</small></span>`;
+        gardenButton.addEventListener('click', event => { event.stopPropagation(); openMemoryGarden(); });
+      } else {
+        gardenButton.className = 'utsu-memory-gate';
+        gardenButton.setAttribute('aria-label', `${gate.title}. Open convergence reading.`);
+        gardenButton.innerHTML = `<span class="gate-ring"></span><span class="gate-core" aria-hidden="true">✦</span><span class="gate-label">${escapeHTML(gate.title)}<small>${escapeHTML(gate.titleJP)}</small></span>`;
+        gardenButton.addEventListener('click', event => { event.stopPropagation(); openMemoryConvergence(); });
+      }
+      echoLayer.appendChild(gardenButton);
     }
   }
 
@@ -853,6 +886,29 @@
     if (convergenceOverlay) convergenceOverlay.remove();
     convergenceOverlay = null;
     state.inputLocked = false;
+  }
+
+  function closeMemoryGarden() {
+    gardenOpen = false;
+    if (gardenOverlay) gardenOverlay.remove();
+    gardenOverlay = null;
+    state.inputLocked = false;
+  }
+
+  function openMemoryGarden() {
+    if (gardenOpen || !allReadingMemoriesRestored() || !readUtsuroba().flags?.convergenceSeen || drifterPanelOpen || readingJournalOpen || convergenceOpen) return;
+    const garden = DATA.readingConvergence?.garden;
+    if (!garden) return;
+    gardenOpen = true;
+    state.inputLocked = true;
+    gardenOverlay = document.createElement('div');
+    gardenOverlay.id = 'utsuroba-memory-garden';
+    const quotes = garden.quotes.map(quote => `<article class="memory-garden-quote"><strong>${escapeHTML(quote.name)}</strong><p>${escapeHTML(quote.quote)}</p></article>`).join('');
+    gardenOverlay.innerHTML = `<div class="memory-garden-card"><button class="memory-garden-close" type="button" aria-label="Close memory garden">✕</button><div class="memory-garden-eyebrow">WORLD AFTERMATH / 世界の変化</div><h2>${escapeHTML(garden.title)}<span>${escapeHTML(garden.titleJP)}</span></h2><p class="memory-garden-intro">${escapeHTML(garden.intro)}<small>${escapeHTML(garden.introJP)}</small></p><div class="memory-garden-quotes">${quotes}</div><p class="memory-garden-return">${escapeHTML(garden.returnText)}<small>${escapeHTML(garden.returnTextJP)}</small></p><button class="memory-garden-close-btn" type="button" id="memory-garden-done">Close the garden / 庭を閉じる</button></div>`;
+    document.body.appendChild(gardenOverlay);
+    gardenOverlay.querySelector('.memory-garden-close').addEventListener('click', closeMemoryGarden);
+    gardenOverlay.querySelector('#memory-garden-done').addEventListener('click', closeMemoryGarden);
+    gardenOverlay.addEventListener('click', event => { if (event.target === gardenOverlay) closeMemoryGarden(); });
   }
 
   async function openMemoryConvergence() {
@@ -905,6 +961,7 @@
             const data = loadSave();
             data.utsuroba.flags.convergenceSeen = true;
             writeSave(data);
+            renderMemoryEchoes();
             revealed = true;
             clueFeedback = '';
             finalFeedback = '';
@@ -1158,6 +1215,7 @@
     const quest       = forcedQuest || getCachedQuest();
     const hasMemories = drifterHasMemories(drifter.id);
     const hasRestoredMemory = drifterMemoryRestored(drifter);
+    const worldUnderstood = !!readUtsuroba().flags?.convergenceSeen && allReadingMemoriesRestored();
 
     /* ── build post-greeting action HTML ── */
     let actionHTML = '';
@@ -1245,7 +1303,9 @@
     const hasQuestOffer = !quest && drifter.memoryCount > 0 && drifterHasMemories(drifter.id);
     const enLines = (hasQuestOffer && drifter.questLines)
       ? drifter.questLines
-      : (hasRestoredMemory && drifter.restoredGreeting ? drifter.restoredGreeting : drifter.greeting);
+      : (worldUnderstood && drifter.convergenceGreeting
+        ? drifter.convergenceGreeting
+        : (hasRestoredMemory && drifter.restoredGreeting ? drifter.restoredGreeting : drifter.greeting));
     
     let   finished    = false;
 
@@ -2003,6 +2063,7 @@
       state.celebrating       ||
       drifterPanelOpen        ||
       convergenceOpen        ||
+      gardenOpen              ||
       (window.UtsurobaReading && window.UtsurobaReading.isOpen()) ||
       isExitPopOpen()
     );
