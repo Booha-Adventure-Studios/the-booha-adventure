@@ -412,6 +412,33 @@ body {
 .name-skip   { background:none;border:none;color:rgba(255,255,255,.22);font-size:.68rem;cursor:pointer;padding:7px;width:100%; }
 .lb-title small { display:block; margin-top:3px; font-family:'Noto Sans JP',sans-serif; font-size:.68em; letter-spacing:0; color:rgba(255,255,255,.34); }
 .lb-btn small { display:block; margin-top:2px; font-family:'Noto Sans JP',sans-serif; font-size:.85em; color:inherit; opacity:.7; }
+
+/* ── MEMORY HALL ── */
+#memoryOverlay { position:fixed;inset:0;z-index:250;display:none;align-items:center;justify-content:center;background:rgba(3,2,10,.93);backdrop-filter:blur(14px);padding:max(14px,var(--sat)) 14px max(14px,var(--sab)); }
+.memory-card { width:min(430px,94vw);max-height:min(86vh,680px);display:flex;flex-direction:column;border-radius:20px;border:1px solid rgba(125,211,252,.2);background:rgba(6,5,14,.98);overflow:hidden;box-shadow:0 0 50px rgba(125,211,252,.08); }
+.memory-header { padding:15px 17px 11px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between;flex-shrink:0; }
+.memory-title { font-family:'Cinzel',serif;font-weight:900;font-size:1rem;letter-spacing:.1em;color:#7dd3fc; }
+.memory-title small { display:block;margin-top:3px;font-family:'Noto Sans JP',sans-serif;font-size:.68em;letter-spacing:0;color:rgba(255,255,255,.34); }
+.memory-close { width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.7);font-size:15px;display:flex;align-items:center;justify-content:center;cursor:pointer; }
+.memory-scroll { overflow-y:auto;padding:13px;flex:1; }
+.hall-grid { display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-bottom:14px; }
+.hall-stat { min-width:0;padding:9px 3px 8px;border-radius:10px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);text-align:center; }
+.hall-value { display:block;font-family:'Space Mono',monospace;font-size:.82rem;font-weight:700;color:#7dd3fc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+.hall-stat:nth-child(2) .hall-value { color:#ffd166; }.hall-stat:nth-child(3) .hall-value { color:#c084fc; }.hall-stat:nth-child(4) .hall-value { color:#7ee7c1; }.hall-stat:nth-child(5) .hall-value { color:#ff8dc7; }
+.hall-stat span { display:block;margin-top:4px;font-family:'Space Mono',monospace;font-size:.42rem;color:rgba(255,255,255,.38); }
+.hall-stat small { display:block;margin-top:2px;font-size:.48rem;color:rgba(255,255,255,.23); }
+.memory-section-title { display:flex;justify-content:space-between;align-items:baseline;margin:3px 2px 8px;font-family:'Space Mono',monospace;font-size:.58rem;letter-spacing:.1em;color:rgba(255,255,255,.5); }
+.memory-section-title small { font-family:'Noto Sans JP',sans-serif;font-size:.8em;letter-spacing:0;color:rgba(255,255,255,.25); }
+.memory-empty { padding:24px 10px;text-align:center;color:rgba(255,255,255,.25);font-size:.75rem;line-height:1.7; }
+.memory-run { display:grid;grid-template-columns:28px 1fr auto;align-items:center;gap:8px;padding:8px 9px;margin-bottom:5px;border-radius:9px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.06); }
+.memory-run:last-child { margin-bottom:0; }
+.memory-run-index { font-family:'Space Mono',monospace;font-size:.68rem;color:rgba(255,255,255,.28);text-align:center; }
+.memory-run-main { min-width:0; }.memory-run-score { font-family:'Space Mono',monospace;font-size:.82rem;font-weight:700;color:#fff; }.memory-run-meta { display:flex;gap:7px;flex-wrap:wrap;margin-top:2px;font-size:.56rem;color:rgba(255,255,255,.34); }.memory-run-meta small { display:block;color:rgba(255,255,255,.2);font-size:.9em; }
+.memory-run-date { font-family:'Space Mono',monospace;font-size:.56rem;color:rgba(255,255,255,.25);text-align:right;white-space:nowrap; }
+.memory-footer { padding:9px 13px;border-top:1px solid rgba(255,255,255,.06);display:flex;gap:8px;flex-shrink:0; }
+.memory-footer button { flex:1;padding:9px 11px;border-radius:9px;font-size:.7rem;font-weight:700;cursor:pointer;border:1px solid rgba(255,255,255,.11);background:rgba(255,255,255,.05);color:rgba(255,255,255,.55); }
+.memory-footer button small { display:block;margin-top:2px;font-family:'Noto Sans JP',sans-serif;font-size:.85em;opacity:.7; }
+@media (max-width:360px) { .hall-grid { gap:3px; }.hall-stat { padding-left:1px;padding-right:1px; }.hall-value { font-size:.7rem; }.hall-stat span { font-size:.36rem; } }
 </style>
 </head>
 <body>
@@ -541,6 +568,31 @@ body {
     <div class="lb-footer">
       <button class="lb-btn"    id="lbClear" type="button">RESET<small>リセット</small></button>
       <button class="lb-btn ok" id="lbDone"  type="button">CLOSE<small>閉じる</small></button>
+    </div>
+  </div>
+</div>
+
+<!-- MEMORY HALL -->
+<div id="memoryOverlay">
+  <div class="memory-card">
+    <div class="memory-header">
+      <div class="memory-title">MEMORY HALL<small>きろくのへや · Your Booha Blocks history</small></div>
+      <button class="memory-close" id="memoryClose" type="button">&#10005;</button>
+    </div>
+    <div class="memory-scroll">
+      <div class="hall-grid">
+        <div class="hall-stat"><strong class="hall-value" id="hallBestScore">0</strong><span>BEST</span><small>最高スコア</small></div>
+        <div class="hall-stat"><strong class="hall-value" id="hallBestLines">0</strong><span>LINES</span><small>最高ライン</small></div>
+        <div class="hall-stat"><strong class="hall-value" id="hallBestCombo">0</strong><span>COMBO</span><small>最高コンボ</small></div>
+        <div class="hall-stat"><strong class="hall-value" id="hallRuns">0</strong><span>RUNS</span><small>プレイ回数</small></div>
+        <div class="hall-stat"><strong class="hall-value" id="hallTotalLines">0</strong><span>TOTAL</span><small>累計ライン</small></div>
+      </div>
+      <div class="memory-section-title"><span>RECENT RUNS</span><small>最近のプレイ</small></div>
+      <div id="memoryRecentList"></div>
+    </div>
+    <div class="memory-footer">
+      <button id="memoryLocalBtn" type="button">LOCAL SCORES<small>この端末のランキング</small></button>
+      <button id="memoryDone" type="button">CLOSE<small>閉じる</small></button>
     </div>
   </div>
 </div>
@@ -1113,7 +1165,10 @@ function updateMemoryCard(){
   if(linesNode) linesNode.textContent=bestLines;
   if(runsNode) runsNode.textContent=runs;
 }
-document.addEventListener('booha:scoreSubmitted',updateMemoryCard);
+document.addEventListener('booha:scoreSubmitted',()=>{
+  updateMemoryCard();
+  if(document.getElementById('memoryOverlay')?.style.display==='flex') renderMemoryHall();
+});
 
 /* ── DRAW CELL ── */
 function drawCell(x,y,color,alpha=1,sx=1,sy=1,age=0){
@@ -1408,9 +1463,59 @@ function renderBoard(){
     return`<div class="lb-row ${rc}"><div class="lb-rank ${rl}">#${i+1}</div><div class="lb-info"><div class="lb-name">${e.name}</div><div class="lb-meta"><div class="lb-chip">Score <span>${e.score}</span><small>スコア</small></div><div class="lb-chip">Lv <span>${e.level}</span><small>レベル</small></div><div class="lb-chip">${fmtTime(e.time||0)}<small>時間</small></div><div class="lb-chip">${d}<small>日付</small></div></div></div><div class="lb-lines">${e.lines}<small>LINES<br>ライン</small></div></div>`;
   }).join('');
 }
+
+/* ── MEMORY HALL ── */
+const memoryOverlay=document.getElementById('memoryOverlay');
+const memoryRecentList=document.getElementById('memoryRecentList');
+let memoryFromGame=false;
+function memoryEntry(){
+  try{return window.BoohaAdventure?.scores?.getEntry(SAVE_ID)||null;}catch(_){return null;}
+}
+function memoryDate(ts){
+  if(!ts)return '—';
+  try{return new Date(ts).toLocaleDateString('ja-JP',{timeZone:'Asia/Tokyo',month:'2-digit',day:'2-digit'});}catch(_){return '—';}
+}
+function renderMemoryHall(){
+  const entry=memoryEntry()||{};
+  const local=getBoard();
+  const bestScore=entry.highScore||local.reduce((m,e)=>Math.max(m,Number(e.score)||0),0);
+  const bestLines=entry.bestLines||local.reduce((m,e)=>Math.max(m,Number(e.lines)||0),0);
+  const bestCombo=entry.bestCombo||0;
+  const runs=entry.attempts||local.length||0;
+  const totalLines=entry.totalLines||local.reduce((m,e)=>m+(Number(e.lines)||0),0);
+  document.getElementById('hallBestScore').textContent=Number(bestScore).toLocaleString('en-US');
+  document.getElementById('hallBestLines').textContent=bestLines;
+  document.getElementById('hallBestCombo').textContent=bestCombo;
+  document.getElementById('hallRuns').textContent=runs;
+  document.getElementById('hallTotalLines').textContent=totalLines;
+
+  let recent=Array.isArray(entry.recentRuns)?entry.recentRuns:[];
+  if(!recent.length) recent=local.slice(0,8).map(e=>({score:e.score,lines:e.lines,level:e.level,maxCombo:0,time:e.time,playedAt:e.at}));
+  if(!recent.length){memoryRecentList.innerHTML='<div class="memory-empty">No memories yet.<br>まだ記録がありません。<br>Play a run and your history will appear here.</div>';return;}
+  memoryRecentList.innerHTML=recent.slice(0,8).map((run,i)=>{
+    const scoreValue=Number(run.score||0).toLocaleString('en-US');
+    const time=run.time!=null?fmtTime(run.time):'—';
+    return `<div class="memory-run"><div class="memory-run-index">#${i+1}</div><div class="memory-run-main"><div class="memory-run-score">${scoreValue} <span style="font-size:.55rem;color:rgba(255,255,255,.35);">SCORE</span></div><div class="memory-run-meta"><span>${run.lines||0} lines<small>ライン</small></span><span>Lv ${run.level||1}<small>レベル</small></span><span>Combo ${run.maxCombo||0}<small>コンボ</small></span><span>${time}<small>時間</small></span></div></div><div class="memory-run-date">${memoryDate(run.playedAt)}</div></div>`;
+  }).join('');
+}
+function openMemoryHall(){
+  memoryFromGame=gameStarted&&!isGameOver;
+  if(memoryFromGame){isPaused=true;pauseBGM();pauseOverlay.style.display='none';}
+  renderMemoryHall();memoryOverlay.style.display='flex';
+}
+function closeMemoryHall(){
+  memoryOverlay.style.display='none';
+  if(memoryFromGame){isPaused=false;resumeLoop();resumeBGM();}
+  else if(isGameOver){showStartOverlay();}
+}
+document.getElementById('trophyBtn')?.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();openMemoryHall();},{passive:false});
+document.getElementById('memoryClose')?.addEventListener('pointerdown',e=>{e.preventDefault();closeMemoryHall();},{passive:false});
+document.getElementById('memoryDone')?.addEventListener('pointerdown',e=>{e.preventDefault();closeMemoryHall();},{passive:false});
+document.getElementById('memoryLocalBtn')?.addEventListener('pointerdown',e=>{e.preventDefault();memoryOverlay.style.display='none';openLeaderboard();},{passive:false});
+memoryOverlay?.addEventListener('pointerdown',e=>{if(e.target===memoryOverlay)closeMemoryHall();},{passive:false});
+
 function openLeaderboard(){lbFromGame=gameStarted&&!isGameOver;if(lbFromGame){isPaused=true;pauseBGM();}renderBoard();lbOverlay.style.display='flex';}
 function closeLeaderboard(){lbOverlay.style.display='none';if(isGameOver){showStartOverlay();return;}if(lbFromGame){isPaused=false;resumeLoop();resumeBGM();}else showStartOverlay();}
-document.getElementById('trophyBtn')?.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();openLeaderboard();},{passive:false});
 document.getElementById('lbClose')?.addEventListener('pointerdown', e=>{e.preventDefault();closeLeaderboard();},{passive:false});
 document.getElementById('lbDone')?.addEventListener('pointerdown',  e=>{e.preventDefault();closeLeaderboard();},{passive:false});
 document.getElementById('lbClear')?.addEventListener('pointerdown', e=>{e.preventDefault();if(confirm('スコアをリセットしますか？')){setBoard([]);renderBoard();}},{passive:false});
@@ -1448,7 +1553,8 @@ function finalizeGameOver(){
     runSubmitted=true;
     document.dispatchEvent(new CustomEvent('booha:gameEnd',{detail:{
       saveId:SAVE_ID, score, completed:linesTotal>0, time:elapsedMs,
-      lines:linesTotal, level:currentLevel, maxCombo
+      lines:linesTotal, level:currentLevel, maxCombo,
+      recentRun:{lines:linesTotal, level:currentLevel, maxCombo, time:elapsedMs, completed:linesTotal>0}
     }}));
     updateMemoryCard();
   }
