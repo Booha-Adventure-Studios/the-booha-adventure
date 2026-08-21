@@ -564,6 +564,9 @@ function waveFireCooldown(w) {
   return clamp(base / WS.skillMult, WAVE_SCALE.fireCooldownMin * 0.7, 99);
 }
 function skillBonusHp() {
+  // Early waves teach movement and combo timing. A fast player should be
+  // rewarded with a clean runway, not silently upgraded enemies.
+  if (WS.wave < 5) return 0;
   for (const tier of [...SKILL_CONFIG.bonusHpTiers].reverse()) {
     if (WS.skillMult >= tier.threshold) return tier.bonus;
   }
