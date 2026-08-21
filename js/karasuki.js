@@ -229,13 +229,6 @@ const HAPPY_HOUSE_PORTAL = {
   /* ═══════════════════════════════════════════
      ORB SYSTEM
   ═══════════════════════════════════════════ */
-  const ORB_AUDIO_BASE  = './assets/audio/memories/';
-  const ORB_COUNT       = 4;
-  const ORB_ROOMS       = ['room_01','room_02','room_03','room_04','room_05',
-                            'room_06','room_07','room_08','room_09','room_10',
-                            'room_11','room_12','room_13','room_14','room_15'];
-  const ORB_DECOY_COUNT = 9;
-
   const ORB_R    = 10;
   const ORB_GLOW = 28;
 
@@ -248,7 +241,6 @@ const HAPPY_HOUSE_PORTAL = {
   let weeklyOrbs  = [];
   let orbPanelOpen = false;
   let orbPanelOrb  = null;
-  let orbAudio     = null;
 
   function seededRng(seed) {
     let s = seed >>> 0;
@@ -256,15 +248,6 @@ const HAPPY_HOUSE_PORTAL = {
       s ^= s << 13; s ^= s >> 17; s ^= s << 5;
       return ((s >>> 0) / 0xffffffff);
     };
-  }
-
-  function seededShuffle(arr, rng) {
-    const a = arr.slice();
-    for (let i = a.length - 1; i > 0; i--) {
-      const j = Math.floor(rng() * (i + 1));
-      [a[i], a[j]] = [a[j], a[i]];
-    }
-    return a;
   }
 
   function getWandererCoordsForRoom(roomId) {
@@ -340,29 +323,13 @@ const HAPPY_HOUSE_PORTAL = {
         roomId: entry.roomId,
         x: pos.x,
         y: pos.y,
-        audioFile: ORB_AUDIO_BASE + correctMemoryId + '.mp3',
         collected: false,
         isCorrect: true,
         isTrail: true,
       }];
     }
 
-    const roomOrder = seededShuffle(ORB_ROOMS, rng).slice(0, ORB_COUNT);
-    const allDecoys = Array.from({ length: ORB_DECOY_COUNT }, (_, i) =>
-      'decoy_' + String(i + 1).padStart(2, '0'));
-    const pickedDecoys = seededShuffle(allDecoys, rng).slice(0, 3);
-
-    const orbs = [];
-    roomOrder.forEach((roomId, i) => {
-      const pos       = generateOrbPosition(roomId, rng);
-      const isCorrect = (i === 0);
-      const memoryId    = isCorrect ? correctMemoryId : pickedDecoys[i - 1];
-      const audioFile = isCorrect
-        ? ORB_AUDIO_BASE + correctMemoryId + '.mp3'
-        : ORB_AUDIO_BASE + pickedDecoys[i - 1] + '.mp3';
-      orbs.push({ memoryId, roomId, x: pos.x, y: pos.y, audioFile, collected: false, isCorrect });
-    });
-    return orbs;
+    return [];
   }
 
   // Routed through BoohaSaveFile. Utsuroba writes the quest to the scoped
@@ -428,30 +395,6 @@ const HAPPY_HOUSE_PORTAL = {
         updateTrailHud();
       }).catch(() => {});
     }
-  }
-
-  // Must run AFTER initOrbs() — weeklyOrbs is empty before that, so the
-  // lookup silently fails and the session key is consumed for nothing.
-  function processWrongOrbReturn() {
-    try {
-      const key = sessionStorage.getItem('karasuki_return_wrong_orb');
-      if (!key) return;
-      sessionStorage.removeItem('karasuki_return_wrong_orb');
-      returnOrbToKarasuki(key);
-    } catch (_) {}
-  }
-
-  function returnOrbToKarasuki(memoryId) {
-    const orb = weeklyOrbs.find(o => o.memoryId === memoryId);
-    if (!orb) return;
-    orb.collected = false;
-    const rng      = seededRng(boohaWeek * 3571 + Date.now() % 997);
-    const otherRooms = ORB_ROOMS.filter(r => r !== orb.roomId);
-    const newRoom  = otherRooms[Math.floor(rng() * otherRooms.length)];
-    orb.roomId     = newRoom;
-    const newPos   = generateOrbPosition(newRoom, rng);
-    orb.x          = newPos.x;
-    orb.y          = newPos.y;
   }
 
   function getOrbsForRoom(roomId) {
@@ -563,52 +506,23 @@ const HAPPY_HOUSE_PORTAL = {
         <h2 id="orb-panel-title" style="text-align:center;margin:0 0 4px;font-size:clamp(1.1rem,3.5vw,1.35rem);color:#3a2400;letter-spacing:.08em;text-shadow:0 1px 0 rgba(255,255,255,0.7);">You found a memory!</h2>
         <p id="orb-panel-subtitle" style="text-align:center;margin:0 0 9px;font-size:clamp(.8rem,2.5vw,.95rem);color:#5a3c00;letter-spacing:.06em;opacity:0.75;">記憶を見つけた！</p>
         <p id="orb-panel-fragment" style="text-align:center;margin:0 auto 18px;max-width:440px;font-size:clamp(.86rem,2.6vw,1rem);line-height:1.55;color:#3a2400;"></p>
-        <div style="text-align:center;margin-bottom:18px;">
-          <button id="orb-play-btn" style="background:linear-gradient(135deg,#fdf3d0,#f5dfa0);border:1.5px solid #c8a030;border-radius:50%;width:56px;height:56px;cursor:pointer;font-size:1.5rem;box-shadow:0 2px 10px rgba(180,140,0,0.25);transition:all .18s;display:inline-flex;align-items:center;justify-content:center;color:#5a3800;">▶</button>
-        </div>
+        <p style="text-align:center;margin:0 0 18px;font-size:clamp(.76rem,2.3vw,.88rem);color:#7a5010;line-height:1.45;">Read the clue, then keep it in your trail.<br><span style="opacity:.72;">手がかりを読んで、記憶の道に残しましょう。</span></p>
         <div style="display:flex;gap:14px;justify-content:center;margin-bottom:14px;">
           <button id="orb-collect-btn" style="background:linear-gradient(135deg,#fdf3d0,#f0dfa0);border:1.5px solid #b8900a;border-radius:6px;font-family:'Georgia',serif;font-size:clamp(.82rem,2.6vw,.95rem);letter-spacing:.1em;cursor:pointer;padding:10px 30px;color:#3a2000;box-shadow:0 2px 8px rgba(180,140,0,0.2);transition:all .18s;">COLLECT / 持つ</button>
           <button id="orb-leave-btn" style="background:transparent;border:1.5px solid rgba(139,105,20,0.35);border-radius:6px;font-family:'Georgia',serif;font-size:clamp(.82rem,2.6vw,.95rem);letter-spacing:.1em;cursor:pointer;padding:10px 30px;color:#7a5c1e;transition:all .18s;">LEAVE</button>
         </div>
-        <p style="text-align:center;font-size:clamp(.68rem,2vw,.78rem);color:#7a5010;opacity:0.7;margin:0 0 2px;font-style:italic;">Only one memory can be carried at a time.</p>
-        <p style="text-align:center;font-size:clamp(.66rem,1.9vw,.76rem);color:#7a5010;opacity:0.5;margin:0;font-style:italic;">※記憶は一つしか持てません。</p>
+        <p style="text-align:center;font-size:clamp(.68rem,2vw,.78rem);color:#7a5010;opacity:0.7;margin:0;font-style:italic;">The trail keeps every clue in order. / 手がかりは順番に残ります。</p>
       </div>`;
     document.body.appendChild(orbPanelEl);
     document.getElementById('orb-panel-close').addEventListener('click', closeOrbPanel);
     document.getElementById('orb-leave-btn').addEventListener('click',   closeOrbPanel);
-    document.getElementById('orb-play-btn').addEventListener('click',    playOrbAudio);
     document.getElementById('orb-collect-btn').addEventListener('click', collectOrb);
-  }
-
-  /* ── Swap confirmation overlay ── */
-  let swapOverlayEl = null;
-
-  function injectSwapOverlay() {
-    if (swapOverlayEl) return;
-    swapOverlayEl = document.createElement('div');
-    swapOverlayEl.id = 'orb-swap-overlay';
-    swapOverlayEl.style.cssText = `display:none;position:fixed;inset:0;z-index:9500;align-items:center;justify-content:center;background:rgba(0,0,0,0.72);`;
-    swapOverlayEl.innerHTML = `
-      <div style="background:linear-gradient(180deg,#f7f2e8,#ede5d0);border:1.5px solid #c8a96e;border-radius:14px;padding:32px 36px 28px;max-width:min(360px,90vw);text-align:center;font-family:'Georgia',serif;box-shadow:0 8px 40px rgba(0,0,0,0.5);">
-        <p style="color:#3a2400;font-size:clamp(.9rem,3vw,1.05rem);margin:0 0 8px;line-height:1.6;letter-spacing:.03em;">You're already carrying a memory — swap?</p>
-        <p style="color:#7a5010;font-size:clamp(.76rem,2.3vw,.88rem);margin:0 0 22px;opacity:0.7;letter-spacing:.04em;">すでに記憶を持っています。交換しますか？</p>
-        <div style="display:flex;gap:14px;justify-content:center;">
-          <button id="swap-yes" style="background:linear-gradient(135deg,#fdf3d0,#f0dfa0);border:1.5px solid #b8900a;border-radius:6px;font-family:'Georgia',serif;font-size:.9rem;letter-spacing:.1em;cursor:pointer;padding:9px 28px;color:#3a2000;box-shadow:0 2px 8px rgba(180,140,0,0.2);">YES</button>
-          <button id="swap-no"  style="background:transparent;border:1.5px solid rgba(139,105,20,0.35);border-radius:6px;font-family:'Georgia',serif;font-size:.9rem;letter-spacing:.1em;cursor:pointer;padding:9px 28px;color:#7a5c1e;">NO</button>
-        </div>
-      </div>`;
-    document.body.appendChild(swapOverlayEl);
-    document.getElementById('swap-yes').addEventListener('click', confirmSwap);
-    document.getElementById('swap-no').addEventListener('click', () => { swapOverlayEl.style.display = 'none'; });
   }
 
   function openOrbPanel(orb) {
     orbPanelOrb  = orb;
     orbPanelOpen = true;
-    stopOrbAudio();
     try { if (state.musicStarted) { music.pause(); } } catch (_) {}
-    const playBtn = document.getElementById('orb-play-btn');
-    if (playBtn) playBtn.textContent = '▶';
     const title = document.getElementById('orb-panel-title');
     const subtitle = document.getElementById('orb-panel-subtitle');
     const fragment = document.getElementById('orb-panel-fragment');
@@ -626,7 +540,6 @@ const HAPPY_HOUSE_PORTAL = {
   function closeOrbPanel() {
     orbPanelOpen = false;
     orbPanelOrb  = null;
-    stopOrbAudio();
     try { if (state.musicStarted) { music.play().catch(() => {}); } } catch (_) {}
     orbPanelEl.style.transform = 'translateY(100%)';
     setTimeout(() => { if (!orbPanelOpen) orbPanelEl.style.display = 'none'; }, 380);
@@ -635,45 +548,13 @@ const HAPPY_HOUSE_PORTAL = {
 
   function isOrbPanelOpen() { return orbPanelOpen; }
 
-  function playOrbAudio() {
-    if (!orbPanelOrb) return;
-    stopOrbAudio();
-    orbAudio = new Audio(orbPanelOrb.audioFile);
-    orbAudio.volume = 1.0;
-    const btn = document.getElementById('orb-play-btn');
-    if (btn) btn.textContent = '■';
-    orbAudio.play().catch(() => {});
-    orbAudio.onended = () => { if (btn) btn.textContent = '▶'; };
-  }
-
-  function stopOrbAudio() {
-    if (orbAudio) {
-      try { orbAudio.onended = null; orbAudio.pause(); orbAudio.currentTime = 0; } catch (_) {}
-      orbAudio = null;
-    }
-    const btn = document.getElementById('orb-play-btn');
-    if (btn) btn.textContent = '▶';
-  }
-
   function collectOrb() {
     if (!orbPanelOrb) return;
-    const quest = loadDrifterQuest();
-    const alreadyCarrying = quest && quest.collectedMemoryId;
-    if (alreadyCarrying && quest.collectedMemoryId !== orbPanelOrb.memoryId) {
-      swapOverlayEl.style.display = 'flex';
-      return;
-    }
     doCollect(orbPanelOrb);
-  }
-
-  function confirmSwap() {
-    swapOverlayEl.style.display = 'none';
-    if (orbPanelOrb) doCollect(orbPanelOrb);
   }
 
   function doCollect(orb) {
     orb.collected = true;
-    stopOrbAudio();
     if (orb.isTrail) {
       const quest = loadDrifterQuest();
       const episode = getQuestEpisode(quest);
@@ -1753,7 +1634,7 @@ const HAPPY_HOUSE_PORTAL = {
   const ghostImg = new Image(); ghostImg.src = "assets/img/booha_ghost.png";
   const observerImg = new Image();
   observerImg.src = 'assets/img/karasuki/observer-1.png';
-  const music    = new Audio("assets/audio/karasuki-music.mp3"); music.loop = true; music.volume = 0.65;
+  const music    = { play: () => Promise.resolve(), pause: () => {}, currentTime: 0 };
 
   let app, stage, canvas, ctx, roomLayer, coordToggle, coordReadout, pinLog;
   let portalOverlay = null;
@@ -1855,7 +1736,6 @@ const HAPPY_HOUSE_PORTAL = {
       .wpop-box::-webkit-scrollbar-track{background:transparent;}
       .wpop-box::-webkit-scrollbar-thumb{background:rgba(255,255,255,.18);border-radius:4px;}
       #orb-panel{touch-action:none;}
-      #orb-swap-overlay{touch-action:none;}
     `;
     document.head.appendChild(s);
   }
@@ -1949,7 +1829,7 @@ const HAPPY_HOUSE_PORTAL = {
     
     document.body.appendChild(toast);
     document.body.appendChild(portalOverlay);
-        injectBonusPopOverlay(); injectWandererPopOverlay(); injectUtsuobaPopOverlay(); injectOrbPanel(); injectSwapOverlay(); injectObserverPop(); injectHappyHousePop();
+        injectBonusPopOverlay(); injectWandererPopOverlay(); injectUtsuobaPopOverlay(); injectOrbPanel(); injectObserverPop(); injectHappyHousePop();
     
     const rotateOverlay = document.createElement("div"); rotateOverlay.id = "rotate-overlay";
     rotateOverlay.innerHTML = `<span class="rotate-phone" aria-hidden="true"><svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2.4"></rect><line x1="11" y1="18.4" x2="13" y2="18.4"></line></svg></span><div class="rotate-bar"></div><p class="rotate-title-en">Turn your device sideways!</p><p class="rotate-title">横にして遊ぼう！</p><p class="rotate-sub">カラスキは<strong style="color:#ff79d7">横画面</strong>で遊べるよ。<br>スマホを横にしてね。</p>`;
@@ -2431,7 +2311,7 @@ function tick(now) {
   /* ═══════════════════════════════════════════
      MUSIC + INPUT
   ═══════════════════════════════════════════ */
-  function startMusic() { if(state.musicStarted)return; state.musicStarted=true; music.play().catch(()=>{}); }
+  function startMusic() { if(state.musicStarted)return; state.musicStarted=true; }
 
   function getGamesThisWeek() {
   try {
@@ -3040,7 +2920,7 @@ function drawObserver(now) {
   function init() {
     injectStyles(); buildApp(); injectTrailHud(); KarasukiAtmos.init(stage);
     fitStage(); resizeCanvas();
-    initOrbs(); processWrongOrbReturn(); updateTrailHud(); renderInitialRoom(); initWanderers(); initNuppi(); bindInput();
+    initOrbs(); updateTrailHud(); renderInitialRoom(); initWanderers(); initNuppi(); bindInput();
     
     window.addEventListener("resize",()=>{ fitStage(); resizeCanvas(); });
     requestAnimationFrame(tick);
