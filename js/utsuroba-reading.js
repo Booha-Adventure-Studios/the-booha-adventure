@@ -118,8 +118,25 @@
       #utsuroba-reading-challenge .reading-postcard-success{padding:8px 9px;border-left:3px solid #ffcb75;color:#ffe7b2;font-size:.76rem;line-height:1.45;}
       #utsuroba-reading-challenge .reading-postcard-success small{display:block;margin-top:3px;color:rgba(255,231,178,.58);font-size:.9em;}
       #utsuroba-reading-challenge .reading-review-note{margin:14px auto 0;color:rgba(245,232,255,.48);font-size:.72rem;line-height:1.4;}
+      #utsuroba-reading-challenge .reading-onboarding{text-align:left;padding:clamp(24px,5vw,46px);}
+      #utsuroba-reading-challenge .reading-onboarding-intro{margin:0 0 18px;color:#f5e8ff;font-size:.9rem;line-height:1.5;}
+      #utsuroba-reading-challenge .reading-onboarding-intro small{display:block;margin-top:3px;color:rgba(245,232,255,.54);font-size:.84em;}
+      #utsuroba-reading-challenge .reading-onboarding-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:0 0 20px;}
+      #utsuroba-reading-challenge .reading-onboarding-step{padding:11px 10px;border:1px solid rgba(216,168,255,.24);border-radius:9px;background:rgba(255,255,255,.045);}
+      #utsuroba-reading-challenge .reading-onboarding-step b{display:block;color:#ffcb75;font:700 .7rem monospace;letter-spacing:.1em;}
+      #utsuroba-reading-challenge .reading-onboarding-step strong{display:block;margin-top:6px;color:#fff;font-size:.76rem;line-height:1.3;}
+      #utsuroba-reading-challenge .reading-onboarding-step small{display:block;margin-top:4px;color:rgba(255,231,178,.58);font-size:.68rem;line-height:1.35;}
+      #utsuroba-reading-challenge .reading-calibration{padding:13px;border:1px solid rgba(255,203,117,.27);border-radius:10px;background:rgba(255,203,117,.045);}
+      #utsuroba-reading-challenge .reading-calibration-heading{margin:0;color:#ffe0a0;font-size:.8rem;line-height:1.4;}
+      #utsuroba-reading-challenge .reading-calibration-heading small{display:block;margin-top:3px;color:rgba(255,231,178,.58);font-size:.88em;}
+      #utsuroba-reading-challenge .reading-calibration-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:11px;}
+      #utsuroba-reading-challenge .reading-calibration-option{min-height:78px;padding:10px;text-align:left;border:1px solid rgba(216,168,255,.34);border-radius:8px;background:rgba(255,255,255,.055);color:#fff;cursor:pointer;font:inherit;line-height:1.35;}
+      #utsuroba-reading-challenge .reading-calibration-option:hover,#utsuroba-reading-challenge .reading-calibration-option:focus-visible{background:rgba(216,168,255,.15);border-color:#d8a8ff;outline:none;}
+      #utsuroba-reading-challenge .reading-calibration-option strong{display:block;color:#fff0c9;font-size:.8rem;}
+      #utsuroba-reading-challenge .reading-calibration-option small{display:block;margin-top:5px;color:rgba(255,255,255,.55);font-size:.72rem;line-height:1.35;}
+      #utsuroba-reading-challenge .reading-onboarding-note{margin:13px 0 0;color:rgba(245,232,255,.5);font-size:.7rem;line-height:1.4;}
       #utsuroba-reading-challenge .reading-loading{text-align:center;padding:80px 24px;color:#f1dcff;}
-      @media(max-width:700px){#utsuroba-reading-challenge .reading-choices{grid-template-columns:1fr;}#utsuroba-reading-challenge .reading-card{padding:20px 16px;}}
+      @media(max-width:700px){#utsuroba-reading-challenge .reading-choices{grid-template-columns:1fr;}#utsuroba-reading-challenge .reading-onboarding-steps,.reading-calibration-options{grid-template-columns:1fr;}#utsuroba-reading-challenge .reading-card{padding:20px 16px;}}
     `;
     document.head.appendChild(style);
   }
@@ -172,7 +189,9 @@
     let showEvidence = false;
     let sequenceSelection = [];
     let inferenceAnswerChosen = false;
-    const supportLevel = opts.adaptiveMode === 'independent' ? 'independent' : 'guided';
+    let supportLevel = opts.adaptiveMode === 'independent' ? 'independent' : 'guided';
+    const onboardingState = opts.onboarding || {};
+    const needsOnboarding = !opts.reviewOnly && !opts.skipOnboarding && onboardingState.seen !== true;
     let mistakeCount = 0;
     let usedEvidence = false;
     let postcardOpen = false;
@@ -180,6 +199,37 @@
     let postcardBuilt = false;
     let postcardSaved = !!(opts.quest && opts.quest.postcard && opts.quest.postcard.text);
     let postcardFeedback = '';
+
+    function renderOnboarding() {
+      overlay.innerHTML = `
+        <div class="reading-card reading-onboarding">
+          <button class="reading-close" id="reading-onboarding-close" type="button" aria-label="Close reading guide">✕</button>
+          <div class="reading-eyebrow">READING MAP / 読み方</div>
+          <h2>How to read a memory <span>記憶の読み方</span></h2>
+          <p class="reading-onboarding-intro">Read the English lines, use help when you need it, and choose answers from the evidence.<small>英語の文を読み、必要なときにヘルプを使い、手がかりから答えを選びます。</small></p>
+          <div class="reading-onboarding-steps">
+            <article class="reading-onboarding-step"><b>STEP 1</b><strong>Read the lines.</strong><small>文を読みます。</small></article>
+            <article class="reading-onboarding-step"><b>STEP 2</b><strong>Notice the details.</strong><small>細かい点に気づきます。</small></article>
+            <article class="reading-onboarding-step"><b>STEP 3</b><strong>Show your evidence.</strong><small>証拠を示します。</small></article>
+          </div>
+          <section class="reading-calibration">
+            <p class="reading-calibration-heading">Choose your first reading style.<small>最初の読み方を選びましょう。</small></p>
+            <div class="reading-calibration-options">
+              <button class="reading-calibration-option" type="button" data-reading-calibration="guided"><strong>Guided</strong><small>Show evidence after a mistake. Good when you want support.<br>間違えたら証拠を見ます。サポートがほしい人向けです。</small></button>
+              <button class="reading-calibration-option" type="button" data-reading-calibration="independent"><strong>Try first</strong><small>Try without evidence at first. Good when you want a challenge.<br>最初は証拠を見ずに挑戦します。挑戦したい人向けです。</small></button>
+            </div>
+          </section>
+          <p class="reading-onboarding-note">You can still ask for evidence after two mistakes.<br>二回間違えたら、証拠を見ることができます。</p>
+        </div>`;
+      overlay.querySelector('#reading-onboarding-close').addEventListener('click', close);
+      overlay.querySelectorAll('[data-reading-calibration]').forEach(button => button.addEventListener('click', () => {
+        supportLevel = button.dataset.readingCalibration === 'independent' ? 'independent' : 'guided';
+        if (typeof opts.persistOnboarding === 'function') {
+          opts.persistOnboarding({ seen: true, calibration: supportLevel });
+        }
+        render();
+      }));
+    }
 
     function renderVocabulary() {
       if (!Array.isArray(episode.vocabulary) || !episode.vocabulary.length) return '';
@@ -533,7 +583,8 @@
       if (mechanic && mechanic.type === 'memory-theatre') progress.theatreIndex = mechanicIndex;
       opts.persist(progress);
     }
-    render();
+    if (needsOnboarding) renderOnboarding();
+    else render();
     return true;
   }
 
