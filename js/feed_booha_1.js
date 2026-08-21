@@ -108,6 +108,7 @@
   // v7: poof effects replace slash effects
   const poofEffects  = [];
   const confetti     = [];
+  const comboTexts   = [];
   const images       = {};
 
   const imageSources = {
@@ -436,6 +437,50 @@
     }
   }
 
+  // ─────────────────────────────────────────────────
+  // Bounce-chain combo readout
+  // state.bounceCombo counts consecutive top-face bounce-pad launches
+  // within one fall (see handleBouncePads) — a chain always ends the
+  // instant the candy misses (touching the floor is itself a fail
+  // condition, see checkFail), so there's no separate "reset on floor
+  // touch" case to handle: buildLevel() resetting it per attempt is enough.
+  // ×1 isn't shown — the popup only starts once there's an actual chain.
+  // ─────────────────────────────────────────────────
+  function spawnComboText(x, y, combo) {
+    comboTexts.push({ x, y, vy: -1.1, life: 1.0, text: `×${combo}` });
+  }
+
+  function updateComboTexts(dt) {
+    const f = dt / 16.667;
+    for (let i = comboTexts.length - 1; i >= 0; i--) {
+      const t = comboTexts[i];
+      t.y    += t.vy * f;
+      t.vy   *= 0.97;
+      t.life -= 0.022 * f;
+      if (t.life <= 0) comboTexts.splice(i, 1);
+    }
+  }
+
+  function drawComboTexts() {
+    for (const t of comboTexts) {
+      const alpha = Math.max(0, Math.min(1, t.life * 1.3));
+      const scale = 1 + 0.25 * (1 - Math.max(0, t.life));
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.translate(t.x, t.y);
+      ctx.scale(scale, scale);
+      ctx.font = 'bold 30px system-ui';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = 'rgba(255,255,255,0.85)';
+      ctx.strokeText(t.text, 0, 0);
+      ctx.fillStyle = '#ffcc00';
+      ctx.fillText(t.text, 0, 0);
+      ctx.restore();
+    }
+  }
+
   function drawDebugOverlay() {
     if (!DEBUG_MODE || !state.currentLevel || !state.candy || !state.booha) return;
     const c = state.candy;
@@ -489,6 +534,7 @@
     bouncePattern: null,
     shakeFrames: 0, shakeAmt: 0,
     rescueFxFrames: 0, rescueFxX: 0, rescueFxY: 0,
+    bounceCombo: 0,
     trail: [],
     lastChanceFired: false, boohaJumpOffset: 0, boohaJumpFrame: 0,
     boohaJumpTotal: 16, boohaJumpAmt: 1,
@@ -827,6 +873,7 @@
     stopAllTimers();
     poofEffects.length = 0;
     confetti.length    = 0;
+    comboTexts.length  = 0;
     state.trail.length = 0;
 
     const rawLevel = LEVELS[index] || LEVELS[0];
@@ -847,6 +894,7 @@
     state.bounceCooldown  = 0;
     state.shakeFrames     = 0;
     state.rescueFxFrames  = 0;
+    state.bounceCombo     = 0;
     state.lastChanceFired = false;
     state.boohaJumpOffset = 0;
     state.boohaJumpFrame  = 0;
@@ -1297,6 +1345,10 @@
         if (state.currentLevel && state.currentLevel.noBounce) {
           state.hitBounce = true;
         }
+        state.bounceCombo++;
+        if (state.bounceCombo >= 2) {
+          spawnComboText(obj.x, obj.y - obj.height / 2 - c.r - 14, state.bounceCombo);
+        }
       } else if (hit.ny === 1) {
         // Bonked the underside — it's a solid block, not a landing pad:
         // stop the rise and let the candy fall back, don't consume the pad.
@@ -1584,6 +1636,7 @@
     updateTrail();
     updateConfetti(dt);
     updatePoofEffects(dt);   // v7
+    updateComboTexts(dt);
     if (state.shakeFrames > 0) state.shakeFrames--;
     if (state.running) {
       if (state.candy.attached) {
@@ -1733,6 +1786,7 @@
     drawCandy();
     drawBooha();
     drawConfetti();
+    drawComboTexts();
     drawDebugOverlay();
     ctx.restore();
   }
