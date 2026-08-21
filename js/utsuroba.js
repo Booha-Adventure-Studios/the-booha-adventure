@@ -288,6 +288,7 @@
       readingState     : 'locked',
       trailIndex       : 0,
       collectedFragments: [],
+      theatreIndex     : 0,
       decoys,
       collectedMemoryId: null,
       orbIsCorrect     : false,

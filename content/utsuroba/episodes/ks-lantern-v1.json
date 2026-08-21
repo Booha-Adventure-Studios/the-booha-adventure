@@ -5,6 +5,20 @@
   "eyebrow": "MEMORY RECONSTRUCTION / 記憶の再構成",
   "intro": "Kurobane remembers the lantern. He does not remember why Chiyo left.",
   "introJP": "クロバネは灯りを覚えている。チヨがなぜ帰ったのかは覚えていない。",
+  "mechanic": {
+    "type": "memory-theatre",
+    "name": "Memory Theatre",
+    "nameJP": "記憶劇場",
+    "instruction": "Restore the scene one answer at a time.",
+    "instructionJP": "一問ずつ答えて、場面を戻しましょう。",
+    "complete": "The whole scene is visible.",
+    "completeJP": "場面全体が見えました。",
+    "acts": [
+      {"title":"The promise","titleJP":"約束","caption":"Someone is waiting in the dark.","captionJP":"暗闇で誰かが待っています。"},
+      {"title":"The missing light","titleJP":"消えた灯り","caption":"The way home disappears.","captionJP":"帰り道が消えていきます。"},
+      {"title":"The silence","titleJP":"沈黙","caption":"The truth arrives after the bell.","captionJP":"鐘のあとに真実が届きます。"}
+    ]
+  },
   "trailIntro": "Follow the memories in order. Each fragment points to the next room.",
   "trailIntroJP": "記憶を順番に追いましょう。それぞれの手がかりが次の部屋を示します。",
   "trail": [
@@ -20,9 +34,9 @@
     {"speaker":"Chiyo","en":"If the light is gone, I cannot find the way home."}
   ],
   "checks": [
-    {"type":"sequence","label":"01 / SEQUENCE","labelJP":"順番","prompt":"What happened first?","promptJP":"最初に何が起きましたか？","choices":["Kurobane told Chiyo to wait.","The second bell rang.","The lantern went out."],"choicesJP":["クロバネはチヨに待つように言った。","二つ目の鐘が鳴った。","灯りが消えた。"],"correct":0,"evidence":"The first line gives the starting instruction."},
-    {"type":"detail","label":"02 / DETAIL","labelJP":"細部","prompt":"Why did Chiyo need the lantern?","promptJP":"チヨはなぜ灯りが必要でしたか？","choices":["To find the way home.","To signal the second bell.","To see whether Kurobane was angry."],"choicesJP":["家への道を見つけるため。","二つ目の鐘を知らせるため。","クロバネが怒っているか見るため。"],"correct":0,"evidence":"Chiyo says the light helps her find the way home."},
-    {"type":"inference","label":"03 / INFERENCE","labelJP":"推測","prompt":"Why did Chiyo leave?","promptJP":"チヨはなぜ帰ったのでしょう？","choices":["She could no longer find the way home.","She wanted to frighten Kurobane.","She was waiting for the first bell."],"choicesJP":["家への道が分からなくなったから。","クロバネを怖がらせたかったから。","一つ目の鐘を待っていたから。"],"correct":0,"evidence":"The final line connects the lost light to Chiyo losing her way."}
+    {"type":"sequence","revealAct":0,"restoreText":"The first scene returns.","restoreTextJP":"最初の場面が戻りました。","label":"01 / SEQUENCE","labelJP":"順番","prompt":"What happened first?","promptJP":"最初に何が起きましたか？","choices":["Kurobane told Chiyo to wait.","The second bell rang.","The lantern went out."],"choicesJP":["クロバネはチヨに待つように言った。","二つ目の鐘が鳴った。","灯りが消えた。"],"correct":0,"evidence":"The first line gives the starting instruction.","evidenceJP":"最初の行が、始まりの指示を伝えています。"},
+    {"type":"detail","revealAct":1,"restoreText":"The missing light returns.","restoreTextJP":"消えた灯りが戻りました。","label":"02 / DETAIL","labelJP":"細部","prompt":"Why did Chiyo need the lantern?","promptJP":"チヨはなぜ灯りが必要でしたか？","choices":["To find the way home.","To signal the second bell.","To see whether Kurobane was angry."],"choicesJP":["家への道を見つけるため。","二つ目の鐘を知らせるため。","クロバネが怒っているか見るため。"],"correct":0,"evidence":"Chiyo says the light helps her find the way home.","evidenceJP":"チヨは、灯りが帰り道を見つける助けになると言っています。"},
+    {"type":"inference","revealAct":2,"restoreText":"The silence finally speaks.","restoreTextJP":"沈黙がついに語り始めました。","label":"03 / INFERENCE","labelJP":"推測","prompt":"Why did Chiyo leave?","promptJP":"チヨはなぜ帰ったのでしょう？","choices":["She could no longer find the way home.","She wanted to frighten Kurobane.","She was waiting for the first bell."],"choicesJP":["家への道が分からなくなったから。","クロバネを怖がらせたかったから。","一つ目の鐘を待っていたから。"],"correct":0,"evidence":"The final line connects the lost light to Chiyo losing her way.","evidenceJP":"最後の行が、灯りが消えたことと道を失ったことを結びつけています。"}
   ],
   "success": "The memory settles. Kurobane remembers the part he could not say aloud.",
   "successJP": "記憶が落ち着いた。クロバネは、声に出せなかったことを思い出した。"

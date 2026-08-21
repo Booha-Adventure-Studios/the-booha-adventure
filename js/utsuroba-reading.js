@@ -1,5 +1,5 @@
 /*
- * Utsuroba Reading Engine — Pass 2
+ * Utsuroba Reading Engine — Pass 4
  *
  * This module owns the reading UI and episode contract. Utsuroba only tells it
  * which drifter/quest is active and what to do when the episode is complete.
@@ -38,7 +38,28 @@
       #utsuroba-reading-challenge .reading-choice:hover{transform:translateY(-2px);background:rgba(216,168,255,.14);border-color:#d8a8ff;}
       #utsuroba-reading-challenge .reading-choice small{display:block;color:rgba(255,255,255,.48);font-size:.72rem;line-height:1.35;margin-top:5px;}
       #utsuroba-reading-challenge .reading-feedback{margin-top:12px;padding:10px 12px;border-left:3px solid #ffcb75;background:rgba(255,203,117,.08);color:#ffe7b2;font-size:.82rem;line-height:1.4;}
+      #utsuroba-reading-challenge .reading-feedback small{display:block;color:rgba(255,231,178,.68);margin-top:3px;font-size:.9em;}
       #utsuroba-reading-challenge .reading-progress{margin-top:14px;text-align:right;color:rgba(255,255,255,.42);font:700 11px monospace;}
+      #utsuroba-reading-challenge .reading-mechanic{margin:18px 0 20px;padding:13px 14px 15px;background:rgba(255,255,255,.035);border:1px solid rgba(255,203,117,.22);border-radius:12px;}
+      #utsuroba-reading-challenge .reading-mechanic-heading{display:flex;justify-content:space-between;gap:12px;color:#ffdf9b;font:700 10px/1.4 monospace;letter-spacing:.14em;text-transform:uppercase;}
+      #utsuroba-reading-challenge .reading-mechanic-heading span{color:rgba(255,223,155,.58);font-weight:400;letter-spacing:.04em;text-transform:none;}
+      #utsuroba-reading-challenge .reading-mechanic-intro{margin:6px 0 2px;color:#fff4d7;font-size:.8rem;line-height:1.4;}
+      #utsuroba-reading-challenge .reading-mechanic-intro-jp{margin:0;color:rgba(255,231,178,.58);font-size:.7rem;line-height:1.4;}
+      #utsuroba-reading-challenge .reading-theatre-stage{position:relative;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:13px;padding:12px 8px 8px;overflow:hidden;border:1px solid rgba(216,168,255,.18);border-radius:9px;background:radial-gradient(circle at 50% 0%,rgba(255,213,111,.18),transparent 42%),linear-gradient(180deg,#211832,#0d0916);}
+      #utsuroba-reading-challenge .reading-theatre-stage::before{content:"";position:absolute;left:50%;top:0;width:2px;height:100%;background:linear-gradient(180deg,rgba(255,223,155,.55),transparent 70%);box-shadow:0 0 22px 9px rgba(255,203,117,.09);transform:translateX(-50%);pointer-events:none;}
+      #utsuroba-reading-challenge .reading-theatre-act{position:relative;z-index:1;min-height:92px;padding:10px 8px;border:1px solid rgba(255,255,255,.1);border-radius:7px;background:rgba(0,0,0,.22);opacity:.48;transition:all .28s ease;box-sizing:border-box;}
+      #utsuroba-reading-challenge .reading-theatre-act.is-current{opacity:1;border-color:rgba(255,203,117,.72);background:rgba(255,203,117,.1);box-shadow:0 0 18px rgba(255,203,117,.12);animation:readingActPulse 1.8s ease-in-out infinite;}
+      #utsuroba-reading-challenge .reading-theatre-act.is-restored{opacity:1;border-color:rgba(216,168,255,.62);background:rgba(216,168,255,.1);}
+      #utsuroba-reading-challenge .reading-theatre-act.is-restored::after{content:"✓";position:absolute;right:7px;top:5px;color:#ffe39c;font-weight:700;}
+      #utsuroba-reading-challenge .reading-theatre-act .act-number{color:#ffcb75;font:700 .68rem monospace;letter-spacing:.1em;}
+      #utsuroba-reading-challenge .reading-theatre-act .act-title{display:block;margin-top:7px;color:#fff;font-size:.78rem;line-height:1.25;}
+      #utsuroba-reading-challenge .reading-theatre-act .act-title-jp{display:block;margin-top:3px;color:rgba(255,231,178,.55);font-size:.66rem;line-height:1.25;}
+      #utsuroba-reading-challenge .reading-theatre-act .act-caption{display:block;margin-top:8px;color:rgba(255,255,255,.76);font-size:.68rem;line-height:1.3;}
+      #utsuroba-reading-challenge .reading-theatre-act .act-caption-jp{display:block;margin-top:2px;color:rgba(255,231,178,.46);font-size:.61rem;line-height:1.3;}
+      #utsuroba-reading-challenge .reading-theatre-locked{margin:8px 0 0;color:rgba(255,255,255,.34);font-size:.67rem;line-height:1.3;}
+      #utsuroba-reading-challenge .reading-theatre-status{margin:8px 0 0;text-align:center;color:#ffdf9b;font-size:.72rem;line-height:1.4;}
+      #utsuroba-reading-challenge .reading-theatre-status small{display:block;color:rgba(255,231,178,.54);font-size:.9em;}
+      @keyframes readingActPulse{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
       #utsuroba-reading-challenge .reading-complete{text-align:center;padding:clamp(36px,8vw,82px) clamp(20px,6vw,80px);}
       #utsuroba-reading-challenge .reading-success{color:#ffe8a8;font-size:clamp(1rem,2.5vw,1.35rem);line-height:1.5;margin:22px auto 4px;max-width:650px;}
       #utsuroba-reading-challenge .reading-primary{margin-top:24px;padding:12px 24px;border:1px solid #ffcb75;border-radius:8px;background:linear-gradient(135deg,#ffe7a8,#c78b31);color:#241507;font:700 .9rem Georgia,serif;cursor:pointer;}
@@ -86,7 +107,39 @@
 
     let questionIndex = Number.isInteger(opts.quest && opts.quest.readingIndex)
       ? opts.quest.readingIndex : 0;
+    const mechanic = episode.mechanic || null;
+    let theatreIndex = mechanic && Number.isInteger(opts.quest && opts.quest.theatreIndex)
+      ? opts.quest.theatreIndex : questionIndex;
     let lastFeedback = '';
+    let lastFeedbackJP = '';
+
+    function renderMechanic(restoredCount) {
+      if (!mechanic || mechanic.type !== 'memory-theatre' || !Array.isArray(mechanic.acts)) return '';
+      const acts = mechanic.acts.map((act, index) => {
+        const state = index < restoredCount ? 'is-restored' : (index === restoredCount ? 'is-current' : 'is-locked');
+        const locked = index > restoredCount;
+        return `
+          <div class="reading-theatre-act ${state}">
+            <span class="act-number">ACT ${String(index + 1).padStart(2, '0')}</span>
+            <span class="act-title">${escapeText(act.title)}</span>
+            <span class="act-title-jp">${escapeText(act.titleJP)}</span>
+            ${locked
+              ? '<span class="reading-theatre-locked">Answer the next question to restore this scene.<br>次の問題に答えると場面が戻ります。</span>'
+              : `<span class="act-caption">${escapeText(act.caption)}</span><span class="act-caption-jp">${escapeText(act.captionJP)}</span>`}
+          </div>`;
+      }).join('');
+      const complete = restoredCount >= mechanic.acts.length;
+      return `
+        <section class="reading-mechanic" aria-label="${escapeText(mechanic.name)}">
+          <div class="reading-mechanic-heading">${escapeText(mechanic.name)} <span>${escapeText(mechanic.nameJP)}</span></div>
+          <p class="reading-mechanic-intro">${escapeText(mechanic.instruction)}</p>
+          <p class="reading-mechanic-intro-jp">${escapeText(mechanic.instructionJP)}</p>
+          <div class="reading-theatre-stage">${acts}</div>
+          <div class="reading-theatre-status">${complete ? escapeText(mechanic.complete) : `${restoredCount} / ${mechanic.acts.length} acts restored`}
+            <small>${complete ? escapeText(mechanic.completeJP) : `${restoredCount} / ${mechanic.acts.length} 場面を復元`}</small>
+          </div>
+        </section>`;
+    }
 
     const finish = () => {
       const onComplete = opts.onComplete;
@@ -107,6 +160,7 @@
           <div class="reading-card reading-complete">
             <div class="reading-eyebrow">${escapeText(episode.eyebrow)}</div>
             <h2>${escapeText(episode.title)}</h2>
+            ${renderMechanic(mechanic && Array.isArray(mechanic.acts) ? mechanic.acts.length : theatreIndex)}
             <p class="reading-success">${escapeText(episode.success)}</p>
             <p class="reading-jp">${escapeText(episode.successJP)}</p>
             <button class="reading-primary" id="reading-return-btn">Restore memory / 記憶を戻す</button>
@@ -128,11 +182,12 @@
           <h2>${escapeText(episode.title)} <span>${escapeText(episode.titleJP)}</span></h2>
           <p class="reading-intro">${escapeText(episode.intro)}</p>
           <p class="reading-jp">${escapeText(episode.introJP)}</p>
+          ${renderMechanic(theatreIndex)}
           <div class="reading-transcript">${lines}</div>
           <div class="reading-question-label">${escapeText(question.label)} · ${escapeText(question.labelJP)}</div>
           <h3>${escapeText(question.prompt)}</h3>
           <p class="reading-jp">${escapeText(question.promptJP)}</p>
-          ${lastFeedback ? `<div class="reading-feedback">${escapeText(lastFeedback)}</div>` : ''}
+          ${lastFeedback ? `<div class="reading-feedback">${escapeText(lastFeedback)}<small>${escapeText(lastFeedbackJP)}</small></div>` : ''}
           <div class="reading-choices">${choices}</div>
           <div class="reading-progress">${questionIndex + 1} / ${episode.checks.length}</div>
         </div>`;
@@ -142,19 +197,27 @@
         button.addEventListener('click', () => {
           const choice = Number(button.dataset.choice);
           if (choice === question.correct) {
-            lastFeedback = '';
             questionIndex += 1;
-            if (opts.persist) opts.persist({ readingIndex: questionIndex });
+            if (mechanic && question.revealAct != null) {
+              theatreIndex = Math.max(theatreIndex, question.revealAct + 1);
+              lastFeedback = question.restoreText || 'The scene returns.';
+              lastFeedbackJP = question.restoreTextJP || '場面が戻ります。';
+            } else {
+              lastFeedback = '';
+              lastFeedbackJP = '';
+            }
+            if (opts.persist) opts.persist({ readingIndex: questionIndex, theatreIndex });
             render();
           } else {
             lastFeedback = `Not quite. Look again at the lines. ${question.evidence}`;
+            lastFeedbackJP = question.evidenceJP || 'もう一度、会話を読み直しましょう。';
             setTimeout(render, 320);
           }
         });
       });
     };
 
-    if (opts.persist) opts.persist({ state: 'reading', readingState: 'active', readingIndex: questionIndex });
+    if (opts.persist) opts.persist({ state: 'reading', readingState: 'active', readingIndex: questionIndex, theatreIndex });
     render();
     return true;
   }
