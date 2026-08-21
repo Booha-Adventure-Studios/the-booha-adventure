@@ -158,6 +158,13 @@
       data.utsuroba.readingJournal.entries = [];
       dirty = true;
     }
+    if (!data.utsuroba.wordCabinet) {
+      data.utsuroba.wordCabinet = { entries: [] };
+      dirty = true;
+    } else if (!Array.isArray(data.utsuroba.wordCabinet.entries)) {
+      data.utsuroba.wordCabinet.entries = [];
+      dirty = true;
+    }
 
     /* ── Weekly drifter reset ───────────────────────────────
        Drifter memories reset with the weekly content.
@@ -337,6 +344,27 @@
       }
       journal.entries = entries.slice(0, 12);
       data.utsuroba.readingJournal = journal;
+      const episode = window.UTSUROBA_EPISODES?.[quest.episodeId];
+      if (episode && Array.isArray(episode.vocabulary)) {
+        const cabinet = data.utsuroba.wordCabinet || { entries: [] };
+        const words = Array.isArray(cabinet.entries) ? cabinet.entries : [];
+        episode.vocabulary.slice(0, 8).forEach(item => {
+          if (!item?.word || !item.definition || !item.definitionJP) return;
+          const key = `${quest.episodeId}:${item.word}`;
+          if (!words.some(word => word.key === key)) {
+            words.unshift({
+              key,
+              episodeId: quest.episodeId,
+              word: item.word,
+              definition: item.definition,
+              definitionJP: item.definitionJP,
+              discoveredAt: Date.now(),
+            });
+          }
+        });
+        cabinet.entries = words.slice(0, 60);
+        data.utsuroba.wordCabinet = cabinet;
+      }
     }
     if (data.weekly) data.weekly.drifterQuest = null;
     const ok = writeSave(data);
@@ -461,6 +489,16 @@
       .reading-journal-card h2 span{display:block;color:rgba(255,220,255,.58);font-size:.5em;font-weight:400;margin-top:4px;}
       .reading-journal-intro{margin:0 0 18px;color:#f5e8ff;line-height:1.5;font-size:.9rem;}
       .reading-journal-intro small{display:block;margin-top:3px;color:rgba(245,232,255,.54);font-size:.82em;}
+      .reading-journal-cabinet{margin:0 0 18px;border:1px solid rgba(255,203,117,.24);border-radius:10px;background:rgba(255,203,117,.045);}
+      .reading-journal-cabinet summary{cursor:pointer;padding:10px 12px;color:#ffe0a0;font-size:.78rem;font-weight:700;list-style-position:inside;}
+      .reading-journal-cabinet summary span{display:block;margin:3px 0 0 18px;color:rgba(255,231,178,.52);font-size:.68rem;font-weight:400;}
+      .reading-journal-cabinet-body{padding:0 12px 12px;}
+      .reading-journal-words{display:flex;flex-wrap:wrap;gap:6px;}
+      .reading-journal-word{padding:5px 8px;border:1px solid rgba(255,203,117,.34);border-radius:999px;background:rgba(255,203,117,.08);color:#fff0c9;cursor:pointer;font:700 .7rem Georgia,serif;}
+      .reading-journal-word:hover,.reading-journal-word:focus-visible{background:rgba(255,203,117,.18);border-color:#ffcb75;outline:none;}
+      .reading-journal-word-detail{min-height:30px;margin-top:10px;padding:8px 10px;border-left:2px solid #ffcb75;color:#ffe7b2;font-size:.76rem;line-height:1.4;}
+      .reading-journal-word-detail strong{color:#fff;font-size:.84rem;}
+      .reading-journal-word-detail small{display:block;margin-top:3px;color:rgba(255,231,178,.65);font-size:.9em;}
       .reading-journal-list{display:grid;gap:11px;}
       .reading-journal-entry{padding:14px;border:1px solid rgba(216,168,255,.22);border-radius:10px;background:rgba(255,255,255,.045);}
       .reading-journal-entry h3{margin:0;color:#fff;font-size:1rem;line-height:1.35;}
@@ -653,6 +691,11 @@
     return Array.isArray(entries) ? entries : [];
   }
 
+  function wordCabinetEntries() {
+    const entries = readUtsuroba().wordCabinet?.entries;
+    return Array.isArray(entries) ? entries : [];
+  }
+
   function refreshReadingJournalButton() {
     if (!readingJournalButton) return;
     const count = readingJournalEntries().length;
@@ -687,7 +730,7 @@
     state.inputLocked = true;
     readingJournalOverlay = document.createElement('div');
     readingJournalOverlay.id = 'utsuroba-reading-journal';
-    readingJournalOverlay.innerHTML = `<div class="reading-journal-card"><button class="reading-journal-close" type="button" aria-label="Close journal">✕</button><div class="reading-journal-eyebrow">READING JOURNAL / 読書ノート</div><h2>Restored memories <span>戻した記憶</span></h2><p class="reading-journal-intro">Read a memory again whenever you want. Try to remember the details.<small>いつでも記憶を読み返せます。細かい部分を思い出してみましょう。</small></p><div class="reading-journal-list"><div class="reading-journal-loading">Opening your journal…<small>ノートを開いています…</small></div></div></div>`;
+    readingJournalOverlay.innerHTML = `<div class="reading-journal-card"><button class="reading-journal-close" type="button" aria-label="Close journal">✕</button><div class="reading-journal-eyebrow">READING JOURNAL / 読書ノート</div><h2>Restored memories <span>戻した記憶</span></h2><p class="reading-journal-intro">Read a memory again whenever you want. Try to remember the details.<small>いつでも記憶を読み返せます。細かい部分を思い出してみましょう。</small></p><details class="reading-journal-cabinet" id="reading-word-cabinet"><summary>Word Cabinet / 言葉箱<span>Words from the memories you restored. / 戻した記憶の言葉です。</span></summary><div class="reading-journal-cabinet-body"><div class="reading-journal-words"></div><div class="reading-journal-word-detail" id="reading-word-detail">Choose a word for help.<small>言葉を選ぶと意味が出ます。</small></div></div></details><div class="reading-journal-list"><div class="reading-journal-loading">Opening your journal…<small>ノートを開いています…</small></div></div></div>`;
     document.body.appendChild(readingJournalOverlay);
     readingJournalOverlay.querySelector('.reading-journal-close').addEventListener('click', closeReadingJournal);
     readingJournalOverlay.addEventListener('click', event => { if (event.target === readingJournalOverlay) closeReadingJournal(); });
@@ -696,6 +739,18 @@
       if (!readingJournalOpen) return;
       const entries = readingJournalEntries();
       const list = readingJournalOverlay.querySelector('.reading-journal-list');
+      const cabinetWords = wordCabinetEntries();
+      const wordList = readingJournalOverlay.querySelector('.reading-journal-words');
+      const wordDetail = readingJournalOverlay.querySelector('#reading-word-detail');
+      if (!cabinetWords.length) {
+        wordList.innerHTML = '<span style="color:rgba(255,231,178,.55);font-size:.72rem;">Restore a memory to collect words.<br>記憶を戻すと、言葉を集められます。</span>';
+      } else {
+        wordList.innerHTML = cabinetWords.map((item, index) => `<button class="reading-journal-word" type="button" data-cabinet-word="${index}">${escapeHTML(item.word)}</button>`).join('');
+        wordList.querySelectorAll('[data-cabinet-word]').forEach(button => button.addEventListener('click', () => {
+          const item = cabinetWords[Number(button.dataset.cabinetWord)];
+          if (item && wordDetail) wordDetail.innerHTML = `<strong>${escapeHTML(item.word)}</strong> — ${escapeHTML(item.definition)}<small>${escapeHTML(item.definitionJP)}</small>`;
+        }));
+      }
       if (!entries.length) {
         list.innerHTML = '<div class="reading-journal-empty">Restore a memory to place it here.<small>記憶を戻すと、ここに記録されます。</small></div>';
         return;

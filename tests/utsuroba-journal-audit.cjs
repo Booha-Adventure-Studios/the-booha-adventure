@@ -12,6 +12,9 @@ const reading = fs.readFileSync(path.join(ROOT, 'js', 'utsuroba-reading.js'), 'u
 assert.match(utsuroba, /readingJournal/, 'Utsuroba save migration must initialize the reading journal');
 assert.match(utsuroba, /readingJournalButton/, 'Utsuroba must expose the journal from the world UI');
 assert.match(utsuroba, /data-journal-entry/, 'Journal entries must have replay controls');
+assert.match(utsuroba, /wordCabinet/, 'Utsuroba save migration must initialize the Word Cabinet');
+assert.match(utsuroba, /data-cabinet-word/, 'Journal must expose interactive vocabulary entries');
+assert.match(utsuroba, /definitionJP/, 'Word Cabinet entries must retain simple Japanese help');
 assert.match(utsuroba, /reviewOnly:\s*true/, 'Journal replay must use review-only mode');
 assert.match(utsuroba, /completeMemory[\s\S]*readingJournal/, 'Restored reading memories must be recorded before quest cleanup');
 assert.match(reading, /opts\.reviewOnly/, 'Reading engine must understand review-only sessions');
