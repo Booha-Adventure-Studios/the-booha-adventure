@@ -3209,17 +3209,40 @@ function traitGlowColor(block) {
   }
 
   function drawTitle(){
-    ctx.fillStyle='rgba(0,0,0,0.55)';ctx.fillRect(0,0,W,H);
+    const t=performance.now();
+
+    // Atmospheric vignette instead of a flat dim, so the background art and
+    // the rising embers (see tick()) actually read, while text stays legible.
+    const vg=ctx.createRadialGradient(W/2,H*0.42,60,W/2,H*0.42,W*0.62);
+    vg.addColorStop(0,'rgba(24,12,4,0.30)');vg.addColorStop(0.6,'rgba(6,4,10,0.56)');vg.addColorStop(1,'rgba(2,1,4,0.82)');
+    ctx.fillStyle=vg;ctx.fillRect(0,0,W,H);
+
     ctx.save();ctx.textAlign='center';ctx.textBaseline='middle';
+
+    // A slow shockwave — one cyan ring, one ember-orange ring — pulses out
+    // from behind the wordmark on a loop. A preview of "impact" before
+    // you've thrown anything yet.
+    const cyc=(t%2600)/2600;
+    for(let i=0;i<2;i++){
+      const ph=(cyc+i*0.5)%1, r=40+ph*230;
+      ctx.save();ctx.globalAlpha=(1-ph)*0.28;ctx.strokeStyle=i===0?'#7cfff8':'#ffaa33';ctx.lineWidth=2.5;
+      ctx.beginPath();ctx.arc(W/2,H/2-86,r,0,Math.PI*2);ctx.stroke();ctx.restore();
+    }
+
+    const glowPulse=0.5+0.5*Math.sin(t*0.0016);
     ctx.font='bold 76px system-ui,sans-serif';ctx.fillStyle='#fff';
-    ctx.shadowColor='#aaa';ctx.shadowBlur=12;ctx.fillText('BOOHA',W/2,H/2-115);ctx.shadowBlur=0;
-    ctx.font='bold 40px system-ui,sans-serif';ctx.fillStyle='#ffdd44';ctx.shadowColor='#ffaa00';ctx.shadowBlur=12;
+    ctx.shadowColor='#aaa';ctx.shadowBlur=10+glowPulse*6;ctx.fillText('BOOHA',W/2,H/2-115);ctx.shadowBlur=0;
+    ctx.font='bold 40px system-ui,sans-serif';ctx.fillStyle='#ffdd44';ctx.shadowColor='#ffaa00';ctx.shadowBlur=10+glowPulse*8;
     ctx.fillText('DESTRUCTION',W/2,H/2-58);ctx.shadowBlur=0;
-    ctx.font='15px system-ui,sans-serif';ctx.fillStyle='rgba(255,255,255,0.55)';
+
+    ctx.strokeStyle='rgba(124,255,248,0.4)';ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(W/2-80,H/2-34);ctx.lineTo(W/2+80,H/2-34);ctx.stroke();
+
+    ctx.font='15px system-ui,sans-serif';ctx.fillStyle='rgba(255,255,255,0.6)';
     ctx.fillText('Pull back and let fly! / ひっぱって、はなそう！',W/2,H/2-16);
     const bx=W/2-140,by=H/2+10,bw=280,bh=70;
     const bg=ctx.createLinearGradient(bx,by,bx,by+bh);bg.addColorStop(0,'#ffe566');bg.addColorStop(1,'#ff9900');
-    ctx.shadowColor='#ffdd44';ctx.shadowBlur=18;
+    ctx.shadowColor='#ffdd44';ctx.shadowBlur=16+glowPulse*10;
     ctx.fillStyle=bg;rr(ctx,bx,by,bw,bh,18,true,false);ctx.shadowBlur=0;
     ctx.strokeStyle='rgba(255,255,255,0.35)';ctx.lineWidth=2;rr(ctx,bx,by,bw,bh,18,false,true);
     ctx.fillStyle='#1a0e00';ctx.font='bold 25px system-ui,sans-serif';ctx.fillText('START / はじめる',W/2,by+bh/2);
@@ -3335,12 +3358,34 @@ function traitGlowColor(block) {
 
   function drawCard(){
     const win=gs.phase===P.WIN;
+    const cardNow=performance.now();
     ctx.fillStyle=win?'rgba(0,18,0,0.62)':'rgba(28,0,0,0.62)';ctx.fillRect(0,0,W,H);
     ctx.save();ctx.textAlign='center';ctx.textBaseline='middle';
     const panelX=W/2-470,panelY=H/2-220,panelW=940,panelH=410;
     ctx.fillStyle=win?'rgba(4,18,15,0.92)':'rgba(22,8,12,0.92)';
     ctx.strokeStyle=win?'rgba(255,221,68,0.72)':'rgba(255,120,110,0.58)';ctx.lineWidth=2;
     rr(ctx,panelX,panelY,panelW,panelH,24,true,true);
+
+    // Chapter Clear gets a second, pulsing halo outside the panel border —
+    // visibly a bigger moment than an ordinary round win, not just the same
+    // chrome with an extra line of text.
+    if (gs.cardChapter) {
+      const hp=0.4+0.35*Math.sin(cardNow*0.0035);
+      ctx.save();ctx.globalAlpha=hp;ctx.strokeStyle='#ffcf70';ctx.lineWidth=3;
+      rr(ctx,panelX-7,panelY-7,panelW+14,panelH+14,28,false,true);
+      ctx.restore();
+    }
+
+    // Defeat gets its own identity too, instead of being a duller copy of
+    // the win panel — a couple of small crack lines at the top corners.
+    if (!win) {
+      ctx.save();ctx.strokeStyle='rgba(255,150,130,0.5)';ctx.lineWidth=1.5;
+      ctx.beginPath();
+      ctx.moveTo(panelX+26,panelY+2);ctx.lineTo(panelX+38,panelY+22);ctx.lineTo(panelX+30,panelY+30);ctx.lineTo(panelX+46,panelY+50);
+      ctx.moveTo(panelX+panelW-26,panelY+2);ctx.lineTo(panelX+panelW-40,panelY+20);ctx.lineTo(panelX+panelW-30,panelY+28);ctx.lineTo(panelX+panelW-48,panelY+48);
+      ctx.stroke();ctx.restore();
+    }
+
     if(win){
       const pulse=0.55+0.45*Math.sin(performance.now()*0.004);
       ctx.save();ctx.globalAlpha=0.32+0.18*pulse;ctx.strokeStyle='#ffdf44';ctx.lineWidth=2;
@@ -3370,9 +3415,16 @@ function traitGlowColor(block) {
       ctx.fillText(fitText(gs.cardMeta, 820),W/2,H/2+8);
     }
     if (gs.cardUnlock) {
-      const unlockText=`NEW BOOHA · ${gs.cardUnlock}`;
+      // New-unlock spotlight — a soft violet glow behind the line, so a new
+      // roster member reads as its own reveal rather than another gold line.
+      ctx.save();
+      const sg=ctx.createRadialGradient(W/2,H/2+36,4,W/2,H/2+36,150);
+      sg.addColorStop(0,'rgba(216,140,255,0.28)');sg.addColorStop(1,'rgba(216,140,255,0)');
+      ctx.fillStyle=sg;ctx.fillRect(W/2-150,H/2-14,300,100);
+      ctx.restore();
+      const unlockText=`✦ NEW BOOHA · ${gs.cardUnlock}`;
       ctx.font='bold 13px system-ui,sans-serif';
-      ctx.fillStyle='#ffdf80';
+      ctx.fillStyle='#e8b8ff';
       ctx.fillText(fitText(unlockText, 820),W/2,H/2+36);
     } else if (win) {
       const next = nextRosterUnlock();
@@ -3385,11 +3437,24 @@ function traitGlowColor(block) {
     }
     if (gs.cardChapter) {
       ctx.font='bold 13px system-ui,sans-serif';ctx.fillStyle='#ffcf70';
-      ctx.fillText(fitText(`CHAPTER CLEAR · ${gs.cardChapter}`, 820),W/2,H/2+58);
+      ctx.fillText(fitText(`★ CHAPTER CLEAR · ${gs.cardChapter}`, 820),W/2,H/2+58);
     }
     if (gs.lastScoreIsBest && gs.runScore > 0) {
       ctx.font='bold 13px system-ui,sans-serif';ctx.fillStyle='#ffdf80';
       ctx.fillText('✦ NEW HIGH SCORE ✦',W/2,H/2+62);
+      // Fixed twinkling sparkles around the line — positions come from
+      // detRand (same deterministic hash as the block textures), so they
+      // only fade in and out, never jump around.
+      ctx.save();
+      for (let i=0;i<6;i++){
+        const ang=detRand(i,7.3)*Math.PI*2;
+        const rad=70+detRand(i,3.1)*60;
+        const sx=W/2+Math.cos(ang)*rad, sy=H/2+62+Math.sin(ang)*rad*0.4;
+        const tw=0.4+0.6*Math.abs(Math.sin(cardNow*0.003+i*1.7));
+        ctx.globalAlpha=tw;ctx.fillStyle='#fff4c2';ctx.font=`${10+detRand(i,9)*6}px system-ui,sans-serif`;
+        ctx.fillText('✦',sx,sy);
+      }
+      ctx.restore();
     }
     const bx=ACTION_RECT.x,by=ACTION_RECT.y,bw=ACTION_RECT.w,bh=ACTION_RECT.h;
     const bg=ctx.createLinearGradient(bx,by,bx,by+bh);
@@ -3510,6 +3575,14 @@ function traitGlowColor(block) {
     } else if (gs.phase===P.WIN || gs.phase===P.FAIL) {
       physicsCarry=0;
       updateFX();
+    } else if (gs.phase===P.TITLE) {
+      // The title screen gets its own light ambient motion — rising embers,
+      // out of the same spark pool the game already uses — so it keeps
+      // animating every frame like PLAY/WIN/FAIL do below.
+      physicsCarry=0;
+      gs.titleEmberTimer = (gs.titleEmberTimer||0) + 1;
+      if (gs.titleEmberTimer % 24 === 0) spawnEmber(rnd(W*0.12,W*0.88), H+8);
+      updateFX();
     } else {
       physicsCarry=0;
       // Menus and briefings are static. Only keep the loop alive while a
@@ -3517,7 +3590,7 @@ function traitGlowColor(block) {
       if (gs.toast && performance.now() < gs.toastUntil) updateFX();
     }
     const updateMs = performance.now() - workStart;
-    const animated = gs.phase===P.PLAY || gs.phase===P.WIN || gs.phase===P.FAIL;
+    const animated = gs.phase===P.PLAY || gs.phase===P.WIN || gs.phase===P.FAIL || gs.phase===P.TITLE;
     const renderKey = `${gs.phase}:${gs.roundN}:${gs.cardTitle}`;
     const toastVisible = !!(gs.toast && performance.now() < gs.toastUntil);
     const shouldRender = animated || needsRender || staticRenderKey !== renderKey ||
