@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "episodes": [
+    {
+      "id": "ks_lantern_v1",
+      "file": "ks-lantern-v1.json"
+    }
+  ]
+}
