@@ -9,11 +9,17 @@
   let style = null;
   let open = false;
   let closeCallback = null;
+  let previousFocus = null;
 
   function escapeText(value) {
     return String(value == null ? '' : value)
       .replace(/&/g, '&amp;').replace(/</g, '&lt;')
       .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function focusFirstControl() {
+    const control = overlay && overlay.querySelector('button:not(.reading-close)');
+    if (control && typeof control.focus === 'function') requestAnimationFrame(() => control.focus());
   }
 
   function installStyle() {
@@ -22,6 +28,8 @@
     style.textContent = `
       #utsuroba-reading-challenge .reading-card{position:relative;width:min(920px,100%);max-height:calc(100vh - 36px);overflow:auto;background:linear-gradient(160deg,#171020,#0b0712 65%,#130b1b);border:1px solid rgba(220,160,255,.45);border-radius:16px;padding:clamp(20px,3vw,34px);box-shadow:0 0 70px rgba(100,30,160,.34);box-sizing:border-box;}
       #utsuroba-reading-challenge .reading-close{position:absolute;right:14px;top:12px;background:transparent;border:0;color:rgba(255,255,255,.55);font-size:18px;cursor:pointer;padding:8px;}
+      #utsuroba-reading-challenge button:focus-visible{outline:3px solid #ffdf9b;outline-offset:3px;}
+      #utsuroba-reading-challenge{overscroll-behavior:contain;}
       #utsuroba-reading-challenge .reading-eyebrow{color:#d8a8ff;font:700 11px/1.4 monospace;letter-spacing:.16em;text-transform:uppercase;margin-bottom:8px;}
       #utsuroba-reading-challenge .reading-support-badge{display:inline-block;margin:0 0 9px;padding:4px 7px;border:1px solid rgba(216,168,255,.35);border-radius:999px;color:#e4c2ff;font:700 9px/1.2 monospace;letter-spacing:.08em;}
       #utsuroba-reading-challenge .reading-support-badge.independent{border-color:rgba(255,203,117,.48);color:#ffe0a0;}
@@ -74,6 +82,7 @@
       #utsuroba-reading-challenge .reading-evidence-btn{display:block;margin-top:8px;padding:6px 10px;border:1px solid rgba(255,203,117,.48);border-radius:6px;background:rgba(255,203,117,.08);color:#ffe7b2;cursor:pointer;font:700 .72rem Georgia,serif;}
       #utsuroba-reading-challenge .reading-evidence-btn:hover,#utsuroba-reading-challenge .reading-evidence-btn:focus-visible{background:rgba(255,203,117,.18);outline:none;}
       #utsuroba-reading-challenge .reading-progress{margin-top:14px;text-align:right;color:rgba(255,255,255,.42);font:700 11px monospace;}
+      #utsuroba-reading-challenge .reading-progress small{display:block;margin-top:3px;color:rgba(255,255,255,.3);font-size:.9em;font-weight:400;}
       #utsuroba-reading-challenge .reading-mechanic{margin:18px 0 20px;padding:13px 14px 15px;background:rgba(255,255,255,.035);border:1px solid rgba(255,203,117,.22);border-radius:12px;}
       #utsuroba-reading-challenge .reading-mechanic-heading{display:flex;justify-content:space-between;gap:12px;color:#ffdf9b;font:700 10px/1.4 monospace;letter-spacing:.14em;text-transform:uppercase;}
       #utsuroba-reading-challenge .reading-mechanic-heading span{color:rgba(255,223,155,.58);font-weight:400;letter-spacing:.04em;text-transform:none;}
@@ -143,7 +152,9 @@
       #utsuroba-reading-challenge .reading-calibration-option small{display:block;margin-top:5px;color:rgba(255,255,255,.55);font-size:.72rem;line-height:1.35;}
       #utsuroba-reading-challenge .reading-onboarding-note{margin:13px 0 0;color:rgba(245,232,255,.5);font-size:.7rem;line-height:1.4;}
       #utsuroba-reading-challenge .reading-loading{text-align:center;padding:80px 24px;color:#f1dcff;}
-      @media(max-width:700px){#utsuroba-reading-challenge .reading-choices{grid-template-columns:1fr;}#utsuroba-reading-challenge .reading-onboarding-steps,.reading-calibration-options,.reading-lens-options{grid-template-columns:1fr;}#utsuroba-reading-challenge .reading-card{padding:20px 16px;}}
+      @media(max-width:700px){#utsuroba-reading-challenge{padding:10px;}#utsuroba-reading-challenge .reading-choices{grid-template-columns:1fr;}#utsuroba-reading-challenge .reading-onboarding-steps,.reading-calibration-options,.reading-lens-options{grid-template-columns:1fr;}#utsuroba-reading-challenge .reading-card{max-height:calc(100vh - 20px);padding:20px 16px;}}
+      @media(max-height:520px) and (orientation:landscape){#utsuroba-reading-challenge{align-items:flex-start;padding:8px;}#utsuroba-reading-challenge .reading-card{max-height:calc(100vh - 16px);padding:16px 18px;}}
+      @media(prefers-reduced-motion:reduce){#utsuroba-reading-challenge *,#utsuroba-reading-challenge *::before,#utsuroba-reading-challenge *::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;scroll-behavior:auto !important;transition-duration:.01ms !important;}}
     `;
     document.head.appendChild(style);
   }
@@ -157,20 +168,28 @@
     overlay = null;
     style = null;
     if (callback) callback();
+    if (previousFocus && typeof previousFocus.focus === 'function') previousFocus.focus();
+    previousFocus = null;
   }
 
   async function start(options) {
     const opts = options || {};
     if (open) close();
+    previousFocus = document.activeElement;
     closeCallback = typeof opts.onClose === 'function' ? opts.onClose : null;
     open = true;
     installStyle();
 
     overlay = document.createElement('div');
     overlay.id = 'utsuroba-reading-challenge';
+    overlay.setAttribute('role', 'dialog');
+    overlay.setAttribute('aria-modal', 'true');
+    overlay.setAttribute('aria-label', 'Reading memory');
+    overlay.tabIndex = -1;
     overlay.style.cssText = 'position:fixed;inset:0;z-index:9600;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(4,0,12,.90);font-family:Georgia,serif;color:#f7f2e8;';
     overlay.innerHTML = '<div class="reading-card reading-loading">Opening the memory…<br><span>記憶を開いています…</span></div>';
     document.body.appendChild(overlay);
+    overlay.addEventListener('keydown', event => { if (event.key === 'Escape') { event.preventDefault(); close(); } });
 
     let episode;
     try {
@@ -181,6 +200,7 @@
       console.error('[Utsuroba Reading] Could not open episode:', error);
       overlay.innerHTML = '<div class="reading-card reading-loading">This memory is cloudy. Please try again.<br><span>記憶がぼやけています。もう一度試してください。</span><br><button class="reading-primary" id="reading-error-close">Close / 閉じる</button></div>';
       overlay.querySelector('#reading-error-close').addEventListener('click', close);
+      focusFirstControl();
       return false;
     }
 
@@ -261,6 +281,7 @@
         }
         render();
       }));
+      focusFirstControl();
     }
 
     function renderVocabulary() {
@@ -560,9 +581,9 @@
           <div class="reading-question-label">${escapeText(question.label)} · ${escapeText(question.labelJP)}</div>
           <h3>${escapeText(question.prompt)}</h3>
           <p class="reading-jp">${escapeText(question.promptJP)}</p>
-          ${lastFeedback ? `<div class="reading-feedback">${escapeText(lastFeedback)}<small>${escapeText(lastFeedbackJP)}</small>${supportLevel === 'guided' || mistakeCount >= 2 ? '<button class="reading-evidence-btn" id="reading-evidence-btn" type="button">Show evidence / 根拠を見る</button>' : ''}</div>` : ''}
+          ${lastFeedback ? `<div class="reading-feedback" role="status" aria-live="polite">${escapeText(lastFeedback)}<small>${escapeText(lastFeedbackJP)}</small>${supportLevel === 'guided' || mistakeCount >= 2 ? '<button class="reading-evidence-btn" id="reading-evidence-btn" type="button">Show evidence / 根拠を見る</button>' : ''}</div>` : ''}
           ${renderInteraction(question)}
-          <div class="reading-progress">${questionIndex + 1} / ${questions.length}</div>
+          <div class="reading-progress" role="status" aria-live="polite">Question ${questionIndex + 1} of ${questions.length}<small>問題 ${questionIndex + 1} / ${questions.length}</small></div>
         </div>`;
 
       overlay.querySelector('#reading-close-btn').addEventListener('click', close);
@@ -619,7 +640,7 @@
       opts.persist(progress);
     }
     if (needsOnboarding) renderOnboarding();
-    else render();
+    else { render(); focusFirstControl(); }
     return true;
   }
 
