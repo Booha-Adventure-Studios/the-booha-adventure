@@ -18,6 +18,8 @@ assert.match(utsuroba, /data-cabinet-word/, 'Journal must expose interactive voc
 assert.match(utsuroba, /definitionJP/, 'Word Cabinet entries must retain simple Japanese help');
 assert.match(utsuroba, /readingEchoes/, 'Restored memories must create weekly world echoes');
 assert.match(utsuroba, /renderMemoryEchoes/, 'Utsuroba must render restored memory echoes');
+assert.match(utsuroba, /readingOnboarding/, 'Reading onboarding state must persist in the save');
+assert.match(utsuroba, /persistReadingOnboarding/, 'Utsuroba must persist the reading calibration choice');
 assert.match(utsuroba, /restoredGreeting/, 'Drifters must have post-memory dialogue');
 assert.match(utsuroba, /openMemoryConvergence/, 'Utsuroba must expose the world-level convergence scene');
 assert.match(utsuroba, /convergenceSeen/, 'Convergence completion must persist');
@@ -39,6 +41,9 @@ assert.match(utsuroba, /postcardNote/, 'Journal entries must expose saved postca
 assert.match(utsuroba, /reviewOnly:\s*true/, 'Journal replay must use review-only mode');
 assert.match(utsuroba, /completeMemory[\s\S]*readingJournal/, 'Restored reading memories must be recorded before quest cleanup');
 assert.match(reading, /opts\.reviewOnly/, 'Reading engine must understand review-only sessions');
+assert.match(reading, /renderOnboarding/, 'Reading engine must show first-session guidance');
+assert.match(reading, /data-reading-calibration/, 'Reading engine must offer initial support calibration');
+assert.match(reading, /skipOnboarding/, 'Journal replay must skip first-session onboarding');
 assert.match(reading, /adaptiveMode/, 'Reading engine must support adaptive review modes');
 assert.match(reading, /usedEvidence/, 'Reading engine must track evidence support use');
 assert.match(reading, /renderPostcard/, 'Reading engine must render optional memory postcards');
