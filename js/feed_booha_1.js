@@ -59,6 +59,7 @@
     || window.FEED_BOOHA_DEBUG === true;
 
   let starContainer = null;
+  let bestBadge = null;
   let helpReturnFocus = null;
   let exitReturnFocus = null;
   let restartReturnFocus = null;
@@ -368,16 +369,22 @@
   // ─────────────────────────────────────────────────
   const CONFETTI_COLORS = ['#ff5fa8','#ffdd44','#44ddff','#ff8fd1','#ffe066','#a8ffee'];
 
-  function spawnConfetti(x, y) {
+  // `big` scales the burst up for a chapter/campaign-clear milestone, which
+  // deserves more than an ordinary 3★ win regardless of that last level's
+  // star count (see checkSuccess). The floating "PERFECT!" text is a
+  // separate, accuracy-specific reward — callers set state.perfectTextLife
+  // themselves rather than this function assuming every burst earned it.
+  function spawnConfetti(x, y, big) {
     confetti.length = 0;
-    for (let i = 0; i < 60; i++) {
+    const count = big ? 110 : 60;
+    for (let i = 0; i < count; i++) {
       const angle = Math.random() * Math.PI * 2;
-      const speed = Math.random() * 14 + 4;
+      const speed = Math.random() * (big ? 20 : 14) + (big ? 6 : 4);
       confetti.push({
         x, y,
         vx:    Math.cos(angle) * speed,
-        vy:    Math.sin(angle) * speed - 6,
-        size:  Math.random() * 8 + 4,
+        vy:    Math.sin(angle) * speed - (big ? 8 : 6),
+        size:  Math.random() * (big ? 10 : 8) + 4,
         color: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
         rot:   Math.random() * Math.PI * 2,
         rotV:  (Math.random() - 0.5) * 0.3,
@@ -385,7 +392,6 @@
         shape: Math.random() > 0.5 ? 'rect' : 'circle'
       });
     }
-    state.perfectTextLife = 120;
   }
 
   function updateConfetti(dt) {
@@ -807,6 +813,28 @@
     }
   }
 
+  // "New Best!" ribbon — shown on an ordinary level-clear when this run's
+  // score beats that level's previous best (see persistRoundResult). Built
+  // once, lazily, the same way buildStarUI() is; inserted right after the
+  // star row so the win card reads title → stars → "new best" → buttons.
+  function buildBestBadge() {
+    if (bestBadge) return;
+    buildStarUI();
+    const card = messageOverlay.querySelector('.overlay-card');
+    if (!card) return;
+    bestBadge = document.createElement('div');
+    bestBadge.id = 'newBestBadge';
+    bestBadge.innerHTML =
+      '<span class="bilingual-en">New Best!</span><span class="bilingual-ja">ベストスコア更新！</span>';
+    if (starContainer) starContainer.after(bestBadge); else card.prepend(bestBadge);
+  }
+
+  function showBestBadge(show) {
+    buildBestBadge();
+    if (!bestBadge) return;
+    bestBadge.classList.toggle('best-badge--show', !!show);
+  }
+
   function calculateLevelScore(cutCount, stars) {
     const extraCuts = Math.max(0, cutCount - getParCuts());
     return Math.max(
@@ -822,12 +850,16 @@
 
     if (!persistenceReady) {
       syncProgressHud();
-      return;
+      return false;
     }
 
     const key = levelKey(state.levelIndex);
     const previousBestStars = Number(feedProgress.levelStars[key]) || 0;
     const previousBestScore = Number(feedProgress.levelScores[key]) || 0;
+    // Only a real improvement over an *established* best counts — a level's
+    // very first clear trivially "beats" a previousBestScore of 0, but that
+    // isn't a meaningful new best worth celebrating.
+    const isNewBest = previousBestScore > 0 && levelScore > previousBestScore;
 
     feedProgress.levelStars[key] = Math.max(previousBestStars, stars);
     feedProgress.levelScores[key] = Math.max(previousBestScore, levelScore);
@@ -864,6 +896,7 @@
     feedProgress.bestScore = Math.max(feedProgress.bestScore, state.campaignScore);
     writeFeedProgress();
     syncProgressHud();
+    return isNewBest;
   }
 
   // ─────────────────────────────────────────────────
@@ -1033,7 +1066,7 @@
     buildLevel(state.levelIndex);
   }
 
-  function showMessage(title, text, nextVisible = true, cutCount = 0, hitBounce = false) {
+  function showMessage(title, text, nextVisible = true, cutCount = 0, hitBounce = false, isNewBest = false) {
     setBilingual(messageTitle, title.en, title.ja);
     setBilingual(messageText, text.en, text.ja);
     const stars = starsForCuts(cutCount, hitBounce);
@@ -1048,6 +1081,7 @@
     retryBtn.classList.toggle('retry-centered', nextVisible || state.continuesLeft <= 0);
     if (nextVisible) showStars(cutCount, hitBounce);
     else if (starContainer) starContainer.innerHTML = '';
+    showBestBadge(nextVisible && isNewBest);
     messageOverlay.classList.add('overlay--show');
     messageOverlay.setAttribute('aria-hidden', 'false');
     window.setTimeout(() => (nextVisible ? nextBtn : retryBtn).focus(), 0);
@@ -1070,6 +1104,7 @@
       continueStatusEl.style.display = 'block';
     }
     if (starContainer) starContainer.innerHTML = '';
+    showBestBadge(false);
     messageOverlay.classList.add('overlay--show');
     messageOverlay.setAttribute('aria-hidden', 'false');
     window.setTimeout(() => (state.continuesLeft > 0 ? continueBtn : retryBtn).focus(), 0);
@@ -1422,13 +1457,25 @@
     const hitBounce = state.hitBounce;
     const stars     = starsForCuts(cuts, hitBounce);
     const levelScore = calculateLevelScore(cuts, stars);
-    persistRoundResult(stars, levelScore);
+    const isNewBest = persistRoundResult(stars, levelScore);
+    // Chapter/campaign completion is itself worth celebrating bigger than
+    // an ordinary win, regardless of that last level's star count.
+    // persistRoundResult() already resolved campaignComplete, and
+    // chapterComplete only depends on the now-final levelIndex, so both
+    // are known immediately instead of only inside the delayed message.
+    const chapterComplete = (state.levelIndex + 1) % 10 === 0;
+    const milestone = state.campaignComplete || chapterComplete;
 
-    // Reaction intensity scales with the star grade, so a clean 3★ throw
-    // reads as a real celebration and a scraped-through 1★ reads calmer —
-    // distinct from each other, not just a different HUD number.
-    if (stars === 3) {
-      spawnConfetti(m.x, m.y);
+    // Reaction intensity scales with the star grade — and a milestone gets
+    // the biggest treatment of all, on top of whatever the star grade gave.
+    if (milestone) {
+      spawnConfetti(m.x, m.y, true);
+      state.shakeFrames = 26;
+      state.shakeAmt    = 6;
+      playSfxPerfect();
+      triggerBoohaHop(30, 1.9);
+    } else if (stars === 3) {
+      spawnConfetti(m.x, m.y, false);
       state.shakeFrames = 18;
       state.shakeAmt    = 4;
       playSfxPerfect();
@@ -1438,12 +1485,14 @@
       state.shakeAmt    = 2;
       triggerBoohaHop(16, 1);
     }
+    // The floating "PERFECT!" text is specifically an accuracy reward, kept
+    // separate from the milestone/confetti decision above.
+    if (stars === 3) state.perfectTextLife = 120;
     // 1★: no shake, no hop — a plain, relieved catch rather than a party.
 
     state.pendingSuccessTimeout = setTimeout(() => {
       state.boohaSprite = 'booWin';
       if (stars < 3) playSfxWin();
-      const chapterComplete = (state.levelIndex + 1) % 10 === 0;
       let title;
       let text;
       if (state.campaignComplete) {
@@ -1474,7 +1523,11 @@
             ? { en: 'Booha licks his lips!', ja: 'ブーハーが したをぺろり！' }
             : { en: 'Booha caught it just in time!', ja: 'ブーハーが ぎりぎりキャッチ！' };
       }
-      showMessage(title, text, true, cuts, hitBounce);
+      // The per-level "New Best!" badge is its own signal, distinct from
+      // the milestone screens' campaign-wide score summary above — only
+      // surface it on an ordinary win so the two don't compete for
+      // attention on the same card.
+      showMessage(title, text, true, cuts, hitBounce, isNewBest && !milestone);
     }, 1400);
   }
 
@@ -1730,12 +1783,32 @@
     }
   }
 
+  // Interpolates two "#rrggbb" colors at t∈[0,1]. Used to warm the candy's
+  // trail up as it nears Booha's mouth (see drawTrail) — a small, reusable
+  // helper rather than one-off math dropped inline in the draw loop.
+  function lerpHexColor(c1, c2, t) {
+    const p = h => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
+    const [r1, g1, b1] = p(c1), [r2, g2, b2] = p(c2);
+    const r = Math.round(r1 + (r2 - r1) * t);
+    const g = Math.round(g1 + (g2 - g1) * t);
+    const b = Math.round(b1 + (b2 - b1) * t);
+    return `rgb(${r},${g},${b})`;
+  }
+
   function drawTrail() {
     const c = state.candy;
     if (!c||!c.alive) return;
+    // Warm the trail from pink toward gold as the candy closes in on
+    // Booha's mouth — reuses the same "getting close" range Booha's own
+    // sprite already reacts to (MOUTH_TRIGGER_DIST), so the cue lines up
+    // with behavior the player can already see.
+    const m = boohaMouthPoint();
+    const dist = Math.hypot(c.x - m.x, c.y - m.y);
+    const near = Math.max(0, Math.min(1, 1 - dist / MOUTH_TRIGGER_DIST));
+    const trailColor = near > 0 ? lerpHexColor('#ff88cc', '#ffcc44', near) : '#ff88cc';
     for (let i=0;i<state.trail.length;i++) {
       const t=state.trail[i], ratio=1-i/state.trail.length;
-      ctx.save(); ctx.globalAlpha=t.alpha*ratio*0.45; ctx.fillStyle='#ff88cc';
+      ctx.save(); ctx.globalAlpha=t.alpha*ratio*0.45; ctx.fillStyle=trailColor;
       ctx.beginPath(); ctx.arc(t.x,t.y,CANDY_R*ratio*0.8,0,Math.PI*2); ctx.fill();
       ctx.restore();
     }
@@ -1744,20 +1817,49 @@
   function drawCandy() {
     const c = state.candy;
     if (!c.alive) return;
-    if (images.candy) { ctx.drawImage(images.candy, c.x-c.r, c.y-c.r, c.r*2, c.r*2); return; }
-    ctx.save(); ctx.fillStyle='#ff5fa8';
-    ctx.beginPath(); ctx.arc(c.x,c.y,c.r,0,Math.PI*2); ctx.fill();
+    // Squash-and-stretch: elongate along the direction of travel when the
+    // candy is moving fast in free fall, easing back to round when it's
+    // slow or still on a rope — a classic bit of "juice" so the candy
+    // reads as something with weight and speed, not a rigid dot.
+    const speed = c.attached ? 0 : Math.hypot(c.vx, c.vy);
+    const stretch = Math.min(0.35, speed * 0.012);
+    ctx.save();
+    ctx.translate(c.x, c.y);
+    if (stretch > 0.01) {
+      ctx.rotate(Math.atan2(c.vy, c.vx));
+      ctx.scale(1 + stretch, 1 - stretch * 0.7);
+    }
+    if (images.candy) {
+      ctx.drawImage(images.candy, -c.r, -c.r, c.r * 2, c.r * 2);
+    } else {
+      ctx.fillStyle = '#ff5fa8';
+      ctx.beginPath(); ctx.arc(0, 0, c.r, 0, Math.PI * 2); ctx.fill();
+    }
     ctx.restore();
   }
 
   function drawBooha() {
     const b=state.booha, img=images[state.boohaSprite]||images.booWait;
-    const yOff=state.boohaJumpOffset;
-    const dx=b.x-b.w/2+(state.lost&&state.missDir?state.missDir*8:0);
-    const dy=b.y+yOff-b.h/2;
-    if (img) { ctx.drawImage(img,dx,dy,b.w,b.h); return; }
+    // Idle sway: a gentle breathing bob while Booha is just waiting for a
+    // throw, so it doesn't read as a static cutout between rounds. Only
+    // applies at rest — mid-hop, eating, and win/miss poses are untouched,
+    // and the geometry below reduces to the original math when idle=false.
+    const idle    = state.boohaSprite === 'booWait' && state.boohaJumpFrame === 0;
+    const sway    = idle ? Math.sin(state.lastTime * 0.0025) : 0;
+    const yOff    = state.boohaJumpOffset + sway * 3;
+    const breathe = 1 + (idle ? 0.015 * sway : 0);
+    const cx = b.x + (state.lost && state.missDir ? state.missDir * 8 : 0);
+    const cy = b.y + yOff;
+    if (img) {
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.scale(breathe, breathe);
+      ctx.drawImage(img, -b.w / 2, -b.h / 2, b.w, b.h);
+      ctx.restore();
+      return;
+    }
     ctx.save(); ctx.fillStyle='#fff';
-    ctx.beginPath(); ctx.arc(b.x,b.y+yOff,70,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(cx, cy, 70, 0, Math.PI*2); ctx.fill();
     ctx.restore();
   }
 

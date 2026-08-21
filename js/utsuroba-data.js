@@ -81,7 +81,20 @@ window.UTSUROBA_DATA = {
     ],
     correct: 0,
     success: "The gate opens. Utsuroba is no longer only a place where memories disappear.",
-    successJP: "門が開いた。うつろばは、記憶が消えるだけの場所ではなくなった。"
+    successJP: "門が開いた。うつろばは、記憶が消えるだけの場所ではなくなった。",
+    garden: {
+      title: "The Memory Garden",
+      titleJP: "記憶の庭",
+      intro: "The three memories have changed the place. Their truths can grow here now.",
+      introJP: "三つの記憶が、この場所を変えました。真実がここで育ちます。",
+      returnText: "Come back when a new memory needs a place to grow.",
+      returnTextJP: "新しい記憶が育つ場所を必要としたら、また来てください。",
+      quotes: [
+        { drifterId: "ks", name: "Kurobane", quote: "A lost light can still show us why someone left." },
+        { drifterId: "nto", name: "Ned", quote: "Sometimes the mystery is hiding in the person who remembers it." },
+        { drifterId: "cg", name: "Chagrin", quote: "A frightening shape becomes smaller when we can name it." }
+      ]
+    }
   },
 
   roomStandingCoords: {
@@ -107,6 +120,7 @@ window.UTSUROBA_DATA = {
       sprite2         : './assets/img/drifters/kurobane_shizuma-2.png',
       episodeId       : 'ks_lantern_v1',
       restoredGreeting: ['You came back.', 'The lantern is quiet now.', 'I remember what I could not say.'],
+      convergenceGreeting: ['The garden is open.', 'Three memories can make one path.', 'I think I know where Chiyo went now.'],
       memoryCount     : 1,
       scale           : 0.18,
     },
@@ -121,6 +135,7 @@ window.UTSUROBA_DATA = {
       sprite2         : './assets/img/drifters/ned-the-oogle-2.png',
       episodeId       : 'nto_candy_v1',
       restoredGreeting: ['You found it!', 'The candy was in my memory all along.', 'Want to hear the silly part again?'],
+      convergenceGreeting: ['The garden is growing!', 'My silly mystery belongs with the others.', 'Maybe remembering together is the best part.'],
       memoryCount     : 1,
       scale           : 0.18,
     },
@@ -135,6 +150,7 @@ window.UTSUROBA_DATA = {
       sprite2         : './assets/img/drifters/chagrin_gobito-2.png',
       episodeId       : 'cg_door_v1',
       restoredGreeting: ['You came back…', 'The hallway feels smaller now.', 'I can say what frightened me.'],
+      convergenceGreeting: ['The garden is quiet.', 'The three memories make the dark feel different.', 'I can look at the glass now.'],
       memoryCount     : 1,
       scale           : 0.11,
     },
