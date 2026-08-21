@@ -622,3 +622,219 @@ canvas {
     scroll-behavior: auto !important;
   }
 }
+
+/* ── Gameplay layout refresh ───────────────────────
+   Keep the portrait stage for reliable canvas physics, but
+   reserve the playfield for gameplay and keep controls out of it.
+*/
+.game-wrap {
+  width: min(100%, calc(100vh * 9 / 16));
+  max-width: 540px;
+}
+
+.hud {
+  top: 54px;
+  bottom: auto;
+  padding: 8px 14px 10px;
+  align-items: center;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.48) 0%, transparent 100%);
+}
+
+.hud-left { gap: 8px; }
+
+.hud-pill {
+  min-height: 42px;
+  padding: 6px 13px;
+}
+
+.hud-level-pill {
+  min-width: 72px;
+  justify-content: center;
+  gap: 8px;
+}
+
+.hud-level-pill .hud-label {
+  opacity: 0.72;
+  font-size: 12px;
+}
+
+.hud-level-num {
+  font-size: 25px;
+}
+
+.hud-score-pill {
+  min-width: 118px;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.hud-score-pill .hud-label {
+  opacity: 0.76;
+  font-size: 10px;
+}
+
+#scoreText {
+  font-family: 'Fredoka One', cursive;
+  font-size: 22px;
+  color: #fff;
+  line-height: 1;
+  text-shadow: 0 0 10px rgba(255,255,255,0.28);
+}
+
+.hud-stars {
+  min-height: 42px;
+  padding: 6px 15px;
+  gap: 7px;
+}
+
+.hud-star-icon { font-size: 21px; }
+.hud-star-count { font-size: 24px; }
+
+.bottom-actions {
+  left: 14px;
+  right: 14px;
+  bottom: 14px;
+  justify-content: center;
+  gap: 10px;
+}
+
+.bottom-action-btn {
+  min-width: 132px;
+  min-height: 48px;
+  padding: 7px 12px;
+  border-radius: 13px;
+  font-size: 12px;
+  background: rgba(0,0,0,0.68);
+}
+
+.bottom-action-btn .button-ja { font-size: 0.76em; }
+
+.bottom-restart-btn {
+  color: #d9ffd9;
+  border-color: rgba(110,255,130,0.7);
+  background: linear-gradient(135deg, rgba(18,150,70,0.95), rgba(20,104,54,0.95));
+  box-shadow: 0 0 18px rgba(70,220,100,0.25);
+}
+
+.bottom-restart-btn:hover,
+.bottom-restart-btn:focus-visible {
+  background: linear-gradient(135deg, rgba(35,190,88,0.98), rgba(24,130,65,0.98));
+  border-color: rgba(165,255,175,0.95);
+}
+
+.bottom-exit-btn {
+  color: #ffe2eb;
+  border-color: rgba(255,105,135,0.78);
+  background: linear-gradient(135deg, rgba(196,42,82,0.95), rgba(130,24,62,0.95));
+  box-shadow: 0 0 18px rgba(255,55,110,0.23);
+}
+
+.bottom-exit-btn:hover,
+.bottom-exit-btn:focus-visible {
+  background: linear-gradient(135deg, rgba(225,58,96,0.98), rgba(158,28,72,0.98));
+  border-color: rgba(255,175,190,0.95);
+}
+
+.start-exit-btn {
+  width: 100%;
+  min-height: 52px;
+  margin-top: 12px;
+  padding: 12px 28px;
+  border: 1px solid rgba(255,125,165,0.78);
+  border-radius: 14px;
+  color: #fff;
+  background: linear-gradient(135deg, #d22f63, #92204d);
+  box-shadow: 0 5px 20px rgba(210,35,100,0.4), 0 0 0 1px rgba(255,170,190,0.12);
+  font-family: 'Fredoka One', cursive;
+  font-size: 18px;
+  letter-spacing: 0.5px;
+  transition: transform 0.12s, filter 0.12s, background 0.12s;
+}
+
+.start-exit-btn:hover,
+.start-exit-btn:focus-visible {
+  color: #fff;
+  background: linear-gradient(135deg, #e34273, #a82a5b);
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.start-exit-btn:active { transform: scale(0.95); }
+
+.message-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: stretch;
+}
+
+.message-actions > button {
+  width: 100%;
+  min-height: 52px;
+}
+
+.message-actions > .message-primary {
+  grid-column: 1 / -1;
+}
+
+.message-actions > .retry-centered {
+  grid-column: 1 / -1;
+  max-width: 220px;
+  justify-self: center;
+}
+
+.message-actions > .cta-btn:only-child,
+.message-actions > .cta-btn:first-child:last-child {
+  grid-column: 1 / -1;
+}
+
+.message-actions .continue-btn,
+.message-actions .retry-btn {
+  min-width: 0;
+  border-radius: 13px;
+  font-size: 14px;
+}
+
+.continue-btn {
+  color: #fff8bf;
+  border-color: rgba(255,224,74,0.95);
+  background: linear-gradient(135deg, #e9a900, #c56b00);
+  box-shadow: 0 0 10px rgba(255,211,46,0.78), 0 0 28px rgba(255,180,0,0.42);
+  animation: helperGlow 1.6s ease-in-out infinite;
+}
+
+.continue-btn:hover,
+.continue-btn:focus-visible {
+  color: #fff;
+  background: linear-gradient(135deg, #ffc928, #dc8000);
+  border-color: #fff2a0;
+}
+
+.retry-btn {
+  color: #e7ffe9;
+  border-color: rgba(109,244,125,0.92);
+  background: linear-gradient(135deg, #15944a, #126c3a);
+  box-shadow: 0 0 14px rgba(63,222,93,0.25);
+}
+
+.retry-btn:hover,
+.retry-btn:focus-visible {
+  background: linear-gradient(135deg, #20b55c, #16864a);
+  border-color: #b5ffbd;
+}
+
+@keyframes helperGlow {
+  0%, 100% { box-shadow: 0 0 10px rgba(255,211,46,0.72), 0 0 25px rgba(255,180,0,0.32); }
+  50% { box-shadow: 0 0 17px rgba(255,232,88,1), 0 0 38px rgba(255,180,0,0.58); }
+}
+
+@media (max-width: 380px) {
+  .hud { padding-left: 8px; padding-right: 8px; }
+  .hud-pill { padding-left: 9px; padding-right: 9px; }
+  .hud-level-pill { min-width: 64px; }
+  .hud-score-pill { min-width: 106px; gap: 7px; }
+  .hud-level-num { font-size: 22px; }
+  #scoreText { font-size: 19px; }
+  .hud-star-count { font-size: 21px; }
+  .bottom-actions { left: 8px; right: 8px; gap: 6px; }
+  .bottom-action-btn { min-width: 0; flex: 1; }
+}
