@@ -22,6 +22,10 @@ assert.match(utsuroba, /readingOnboarding/, 'Reading onboarding state must persi
 assert.match(utsuroba, /persistReadingOnboarding/, 'Utsuroba must persist the reading calibration choice');
 assert.match(utsuroba, /weeklyReadingChallengeState/, 'Weekly reading progress must have a scoped save state');
 assert.match(utsuroba, /openWeeklyReadingChallenge/, 'Utsuroba must expose the weekly Reading Trail');
+assert.match(utsuroba, /trapOverlayFocus/, 'World reading overlays must keep keyboard focus inside the active modal');
+assert.match(utsuroba, /modalPreviousFocus/, 'World reading overlays must restore focus after closing');
+assert.match(utsuroba, /readingJournalOverlay.setAttribute\('role', 'dialog'\)/, 'Reading Journal must expose a dialog role');
+assert.match(utsuroba, /readingJournalOverlay[\s\S]*event\.key === 'Escape'/, 'Reading Journal must close with Escape');
 assert.match(utsuroba, /recordWeeklyReadingEvent/, 'Reading actions must update weekly goals');
 assert.match(utsuroba, /restoredGreeting/, 'Drifters must have post-memory dialogue');
 assert.match(utsuroba, /openMemoryConvergence/, 'Utsuroba must expose the world-level convergence scene');
@@ -54,6 +58,7 @@ assert.match(reading, /skipOnboarding/, 'Journal replay must skip first-session 
 assert.match(reading, /role', 'dialog'/, 'Reading sessions must expose a dialog role');
 assert.match(reading, /event\.key === 'Escape'/, 'Reading sessions must close with Escape');
 assert.match(reading, /focusFirstControl/, 'Reading sessions must move focus into the active control');
+assert.match(reading, /trapFocus/, 'Reading sessions must keep keyboard focus inside the active modal');
 assert.match(reading, /aria-live="polite"/, 'Reading feedback must be announced accessibly');
 assert.match(reading, /prefers-reduced-motion/, 'Reading UI must respect reduced-motion preferences');
 assert.match(reading, /adaptiveMode/, 'Reading engine must support adaptive review modes');
