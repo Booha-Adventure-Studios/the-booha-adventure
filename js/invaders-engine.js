@@ -876,7 +876,7 @@ function spawnBug() {
     driftSpeed: waveDriftSpeed(WS.wave),
     fireCD: rand(waveFireCooldown(WS.wave)*0.75, waveFireCooldown(WS.wave)*1.1),
     glow:0, shakeT:0, shakeMag:0,
-    panicking:false, panicT:0,
+    panicking:false, panicT:0, panicDur:0, panicSeed:rand(0,100), panicAwayX:0, panicAwayY:0,
     hurtFlash:0,
     isBoss:false,
   });
@@ -1282,10 +1282,14 @@ function update(dt) {
       continue;
     }
 
-    let dMult = 1;
-    if (player.boost >= 3) dMult = 1.7;
-    if (b.panicking)       dMult = 2.5;
-    b.driftSpeed = driftNow * dMult;
+    let targetMult = 1;
+    if (player.boost >= 3) targetMult = 1.7;
+    if (b.panicking)       targetMult = 2.5;
+    // Ease toward the target multiplier instead of snapping to it — an
+    // instant 2.5x speed jump the frame a nearby Dotty dies is what read
+    // as a "pop" rather than a reaction. ~0.15-0.2s to settle.
+    b.dMult = (b.dMult ?? 1) + (targetMult - (b.dMult ?? 1)) * Math.min(1, dt * 6);
+    b.driftSpeed = driftNow * b.dMult;
 
     if (b.isBoss) {
       if (b.phase === 1) {
@@ -1336,8 +1340,18 @@ function update(dt) {
         }
       }
       if (b.panicking) {
-        b.x = b.tx + Math.sin(b.bob*2.8 + b.x) * b.driftSpeed * 1.8;
-        b.y = b.ty + Math.cos(b.bob*3.0) * b.driftSpeed * 0.5;
+        // Fixed per-bug seed instead of feeding the bug's own (large,
+        // fast-moving) x position into sin() — that fed-back phase was the
+        // source of the chaotic teleport-y jitter, since a tiny frame-to-
+        // frame position change could spin the phase through many full
+        // cycles. Also push outward from the kill point for the first
+        // stretch of the panic (decaying via panicT/panicDur) so nearby
+        // Dottys visibly scatter away from it instead of clumping onto the
+        // same shared oscillation.
+        const seed = b.panicSeed || 0;
+        const flee = clamp((b.panicT||0) / (b.panicDur||1), 0, 1) * 44;
+        b.x = b.tx + (b.panicAwayX||0) * flee + Math.sin(b.bob*1.6 + seed) * b.driftSpeed * 0.6;
+        b.y = b.ty + (b.panicAwayY||0) * flee * 0.6 + Math.cos(b.bob*1.8 + seed) * b.driftSpeed * 0.5 * 0.32;
       } else {
         b.x = b.tx + Math.sin(b.bob*0.9) * b.driftSpeed;
         b.y = b.ty + Math.cos(b.bob*1.1) * b.driftSpeed * 0.32;
@@ -1461,7 +1475,15 @@ function updateProjectiles(dt) {
           for (const nb of bugs) {
             if (!nb.alive || nb.isBoss) continue;
             const dx = nb.x - b.x, dy = nb.y - b.y;
-            if (Math.sqrt(dx*dx+dy*dy) < b.w*2.5) { nb.panicking = true; nb.panicT = rand(0.6,1.4); }
+            const dist = Math.sqrt(dx*dx+dy*dy);
+            if (dist < b.w*2.5) {
+              nb.panicking = true;
+              nb.panicT = nb.panicDur = rand(0.6,1.4);
+              // Flee directly away from the kill point so nearby Dottys
+              // scatter instead of all riding the same oscillation inward.
+              const inv = dist > 1 ? 1/dist : 0;
+              nb.panicAwayX = dx * inv; nb.panicAwayY = dy * inv;
+            }
           }
         }
       }
