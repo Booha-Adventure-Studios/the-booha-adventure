@@ -21,7 +21,10 @@ assert.match(utsuroba, /renderMemoryEchoes/, 'Utsuroba must render restored memo
 assert.match(utsuroba, /restoredGreeting/, 'Drifters must have post-memory dialogue');
 assert.match(utsuroba, /openMemoryConvergence/, 'Utsuroba must expose the world-level convergence scene');
 assert.match(utsuroba, /convergenceSeen/, 'Convergence completion must persist');
+assert.match(utsuroba, /data-convergence-clue-choice/, 'Convergence must require evidence selection before the final question');
 assert.match(data, /readingConvergence/, 'Utsuroba data must define the world-level reading convergence');
+assert.match(data, /clueChecks/, 'Convergence data must define authored evidence checks');
+assert.match(data, /cluePromptJP/, 'Convergence evidence instructions must include simple Japanese support');
 assert.match(utsuroba, /masteryLevel/, 'Journal entries must persist adaptive reading mastery');
 assert.match(utsuroba, /recordReadingReview/, 'Review results must update the learner reading state');
 assert.match(utsuroba, /recordWordPracticeResult/, 'Word practice must persist vocabulary review results');

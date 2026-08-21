@@ -511,6 +511,18 @@
       .memory-convergence-memory{padding:10px 8px;border:1px solid rgba(216,168,255,.24);border-radius:8px;background:rgba(255,255,255,.045);}
       .memory-convergence-memory strong{display:block;color:#fff;font-size:.77rem;line-height:1.3;}
       .memory-convergence-memory small{display:block;margin-top:4px;color:rgba(255,231,178,.58);font-size:.66rem;line-height:1.3;}
+      .memory-convergence-stage{margin:0 0 10px;color:#d8a8ff;font-size:.76rem;font-weight:700;line-height:1.4;}
+      .memory-convergence-stage small{display:block;margin-top:3px;color:rgba(216,168,255,.58);font-size:.9em;font-weight:400;}
+      .memory-convergence-clue-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:0 0 17px;}
+      .memory-convergence-clue{padding:10px 9px;border:1px solid rgba(216,168,255,.27);border-radius:8px;background:rgba(255,255,255,.04);}
+      .memory-convergence-clue h3{margin:0 0 8px;color:#fff;font-size:.74rem;line-height:1.3;}
+      .memory-convergence-clue h3 span{display:block;margin-top:3px;color:rgba(255,255,255,.48);font-size:.86em;font-weight:400;}
+      .memory-convergence-clue-choice{display:block;width:100%;margin-top:6px;padding:8px;text-align:left;border:1px solid rgba(216,168,255,.2);border-radius:6px;background:rgba(255,255,255,.045);color:#f6efff;cursor:pointer;font:inherit;font-size:.68rem;line-height:1.35;}
+      .memory-convergence-clue-choice:hover,.memory-convergence-clue-choice:focus-visible{background:rgba(216,168,255,.14);border-color:#d8a8ff;outline:none;}
+      .memory-convergence-clue-choice small{display:block;margin-top:3px;color:rgba(255,255,255,.46);font-size:.9em;}
+      .memory-convergence-clue-selected{padding:8px;border-left:3px solid #9fe4ba;color:#d7ffe3;font-size:.68rem;line-height:1.4;}
+      .memory-convergence-clue-selected small{display:block;margin-top:3px;color:rgba(215,255,227,.56);font-size:.9em;}
+      .memory-convergence-clue-status{display:block;margin-top:7px;color:#9fe4ba;font-size:.62rem;line-height:1.3;}
       .memory-convergence-question{margin:0 0 8px;color:#ffdf9b;font-size:.86rem;line-height:1.4;}
       .memory-convergence-question small{display:block;margin-top:3px;color:rgba(255,231,178,.58);font-size:.86em;}
       .memory-convergence-choice{display:block;width:100%;margin-top:7px;padding:9px 10px;text-align:left;border:1px solid rgba(216,168,255,.32);border-radius:7px;background:rgba(255,255,255,.055);color:#fff;cursor:pointer;font:inherit;font-size:.78rem;line-height:1.35;}
@@ -519,7 +531,7 @@
       .memory-convergence-feedback{margin-top:11px;padding:9px 10px;border-left:3px solid #ffcb75;color:#ffe7b2;font-size:.78rem;line-height:1.45;}
       .memory-convergence-feedback small{display:block;margin-top:3px;color:rgba(255,231,178,.58);font-size:.9em;}
       .memory-convergence-close-btn{margin-top:17px;padding:9px 18px;border:1px solid #ffcb75;border-radius:7px;background:rgba(255,203,117,.12);color:#ffe7b2;cursor:pointer;font:700 .78rem Georgia,serif;}
-      @media(max-width:700px){.memory-convergence-map{grid-template-columns:1fr}.memory-convergence-card{padding:21px 16px}}
+      @media(max-width:700px){.memory-convergence-map,.memory-convergence-clue-grid{grid-template-columns:1fr}.memory-convergence-card{padding:21px 16px}}
       .utsuroba-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;display:block;pointer-events:none;user-select:none;}
       #buki-canvas{position:absolute;inset:0;z-index:10;pointer-events:none;}
       #buki-fade{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none;z-index:20;}
@@ -857,13 +869,36 @@
       const convergence = DATA.readingConvergence;
       const episodeDrifters = DATA.drifters.filter(drifter => drifter.episodeId);
       const memories = episodeDrifters.map(drifter => window.UTSUROBA_EPISODES[drifter.episodeId]).filter(Boolean);
-      const cards = memories.map(episode => `<article class="memory-convergence-memory"><strong>${escapeHTML(episode.title)}</strong><small>${escapeHTML(episode.worldEcho.label)}</small></article>`).join('');
       let revealed = !!readUtsuroba().flags?.convergenceSeen;
-      const render = (feedback = '') => {
-        convergenceOverlay.innerHTML = `<div class="memory-convergence-card"><button class="memory-convergence-close" type="button" aria-label="Close memory gate">✕</button><div class="memory-convergence-eyebrow">MEMORY GATE / 記憶の門</div><h2>${escapeHTML(convergence.title)}<span>${escapeHTML(convergence.titleJP)}</span></h2><p class="memory-convergence-intro">${escapeHTML(convergence.intro)}<small>${escapeHTML(convergence.introJP)}</small></p><div class="memory-convergence-map">${cards}</div>${revealed ? `<div class="memory-convergence-feedback">${escapeHTML(convergence.success)}<small>${escapeHTML(convergence.successJP)}</small></div><button class="memory-convergence-close-btn" id="memory-convergence-done" type="button">Close the gate / 門を閉じる</button>` : `<p class="memory-convergence-question">${escapeHTML(convergence.prompt)}<small>${escapeHTML(convergence.promptJP)}</small></p>${feedback ? `<div class="memory-convergence-feedback">${feedback}</div>` : ''}${convergence.choices.map((choice, index) => `<button class="memory-convergence-choice" type="button" data-convergence-choice="${index}">${escapeHTML(choice)}<small>${escapeHTML(convergence.choicesJP[index] || '')}</small></button>`).join('')}`}</div>`;
+      const selectedClues = new Set(revealed ? convergence.clueChecks.map(check => check.episodeId) : []);
+      let clueFeedback = '';
+      let finalFeedback = '';
+      const memoryCards = memories.map(episode => `<article class="memory-convergence-memory"><strong>${escapeHTML(episode.title)}</strong><small>${escapeHTML(episode.worldEcho.label)}</small></article>`).join('');
+      const clueCards = () => convergence.clueChecks.map(check => {
+        const episode = memories.find(item => item.id === check.episodeId);
+        const selected = selectedClues.has(check.episodeId);
+        const selectedChoice = check.choices[check.correct];
+        return `<section class="memory-convergence-clue"><h3>${escapeHTML(check.title)}<span>${escapeHTML(check.titleJP)}${episode ? ` · ${escapeHTML(episode.title)}` : ''}</span></h3>${selected ? `<div class="memory-convergence-clue-selected">${escapeHTML(selectedChoice)}<small>${escapeHTML(check.choicesJP[check.correct] || '')}</small></div><span class="memory-convergence-clue-status">✓ Clue connected / 手がかりがつながりました</span>` : check.choices.map((choice, index) => `<button class="memory-convergence-clue-choice" type="button" data-convergence-clue="${escapeHTML(check.episodeId)}" data-convergence-clue-choice="${index}">${escapeHTML(choice)}<small>${escapeHTML(check.choicesJP[index] || '')}</small></button>`).join('')}</section>`;
+      }).join('');
+      const render = () => {
+        const cluesComplete = convergence.clueChecks.every(check => selectedClues.has(check.episodeId));
+        const activity = revealed ? `<div class="memory-convergence-feedback">${escapeHTML(convergence.success)}<small>${escapeHTML(convergence.successJP)}</small></div><button class="memory-convergence-close-btn" id="memory-convergence-done" type="button">Close the gate / 門を閉じる</button>` : `<p class="memory-convergence-stage">${escapeHTML(convergence.cluePrompt)}<small>${escapeHTML(convergence.cluePromptJP)}</small></p><div class="memory-convergence-clue-grid">${clueCards()}</div>${clueFeedback ? `<div class="memory-convergence-feedback">${clueFeedback}</div>` : ''}${cluesComplete ? `<p class="memory-convergence-question">${escapeHTML(convergence.prompt)}<small>${escapeHTML(convergence.promptJP)}</small></p>${finalFeedback ? `<div class="memory-convergence-feedback">${finalFeedback}</div>` : ''}${convergence.choices.map((choice, index) => `<button class="memory-convergence-choice" type="button" data-convergence-choice="${index}">${escapeHTML(choice)}<small>${escapeHTML(convergence.choicesJP[index] || '')}</small></button>`).join('')}` : ''}`;
+        convergenceOverlay.innerHTML = `<div class="memory-convergence-card"><button class="memory-convergence-close" type="button" aria-label="Close memory gate">✕</button><div class="memory-convergence-eyebrow">MEMORY GATE / 記憶の門</div><h2>${escapeHTML(convergence.title)}<span>${escapeHTML(convergence.titleJP)}</span></h2><p class="memory-convergence-intro">${escapeHTML(convergence.intro)}<small>${escapeHTML(convergence.introJP)}</small></p><div class="memory-convergence-map">${memoryCards}</div>${activity}</div>`;
         convergenceOverlay.querySelector('.memory-convergence-close').addEventListener('click', closeMemoryConvergence);
         const done = convergenceOverlay.querySelector('#memory-convergence-done');
         if (done) done.addEventListener('click', closeMemoryConvergence);
+        convergenceOverlay.querySelectorAll('[data-convergence-clue-choice]').forEach(button => button.addEventListener('click', () => {
+          const check = convergence.clueChecks.find(item => item.episodeId === button.dataset.convergenceClue);
+          const choice = Number(button.dataset.convergenceClueChoice);
+          if (!check) return;
+          if (choice === check.correct) {
+            selectedClues.add(check.episodeId);
+            clueFeedback = `<strong>${escapeHTML(convergence.clueSuccess)}</strong><small>${escapeHTML(convergence.clueSuccessJP)}</small>`;
+          } else {
+            clueFeedback = `<strong>${escapeHTML(convergence.clueRetry)}</strong><small>${escapeHTML(convergence.clueRetryJP)}</small>`;
+          }
+          render();
+        }));
         convergenceOverlay.querySelectorAll('[data-convergence-choice]').forEach(button => button.addEventListener('click', () => {
           const choice = Number(button.dataset.convergenceChoice);
           if (choice === convergence.correct) {
@@ -871,9 +906,12 @@
             data.utsuroba.flags.convergenceSeen = true;
             writeSave(data);
             revealed = true;
+            clueFeedback = '';
+            finalFeedback = '';
             render();
           } else {
-            render('<strong>Look at all three memories again.</strong> The connection is about understanding fear.<small>三つの記憶をもう一度見ましょう。恐怖を理解することがつながりです。</small>');
+            finalFeedback = '<strong>Look at all three clues again.</strong> The connection is about understanding fear.<small>三つの手がかりをもう一度見ましょう。恐怖を理解することがつながりです。</small>';
+            render();
           }
         }));
       };
