@@ -75,6 +75,10 @@
       #utsuroba-reading-challenge .reading-complete{text-align:center;padding:clamp(36px,8vw,82px) clamp(20px,6vw,80px);}
       #utsuroba-reading-challenge .reading-success{color:#ffe8a8;font-size:clamp(1rem,2.5vw,1.35rem);line-height:1.5;margin:22px auto 4px;max-width:650px;}
       #utsuroba-reading-challenge .reading-primary{margin-top:24px;padding:12px 24px;border:1px solid #ffcb75;border-radius:8px;background:linear-gradient(135deg,#ffe7a8,#c78b31);color:#241507;font:700 .9rem Georgia,serif;cursor:pointer;}
+      #utsuroba-reading-challenge .reading-secondary{margin-top:24px;padding:11px 20px;border:1px solid rgba(216,168,255,.55);border-radius:8px;background:rgba(216,168,255,.08);color:#f3ddff;font:700 .86rem Georgia,serif;cursor:pointer;}
+      #utsuroba-reading-challenge .reading-secondary:hover{background:rgba(216,168,255,.18);border-color:#d8a8ff;}
+      #utsuroba-reading-challenge .reading-complete-actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;}
+      #utsuroba-reading-challenge .reading-review-note{margin:14px auto 0;color:rgba(245,232,255,.48);font-size:.72rem;line-height:1.4;}
       #utsuroba-reading-challenge .reading-loading{text-align:center;padding:80px 24px;color:#f1dcff;}
       @media(max-width:700px){#utsuroba-reading-challenge .reading-choices{grid-template-columns:1fr;}#utsuroba-reading-challenge .reading-card{padding:20px 16px;}}
     `;
@@ -194,6 +198,19 @@
       if (onComplete) onComplete();
     };
 
+    const review = () => {
+      questionIndex = 0;
+      mechanicIndex = 0;
+      lastFeedback = '';
+      lastFeedbackJP = '';
+      if (opts.persist) {
+        const progress = { state: 'reading', readingState: 'review', readingIndex: 0, mechanicIndex: 0 };
+        if (mechanic && mechanic.type === 'memory-theatre') progress.theatreIndex = 0;
+        opts.persist(progress);
+      }
+      render();
+    };
+
     const render = () => {
       const question = episode.checks[questionIndex];
       const lines = episode.lines.map(line => `
@@ -211,9 +228,14 @@
             ${renderMechanic(mechanic ? (mechanic.acts || mechanic.items || mechanic.beats || []).length : mechanicIndex)}
             <p class="reading-success">${escapeText(episode.success)}</p>
             <p class="reading-jp">${escapeText(episode.successJP)}</p>
-            <button class="reading-primary" id="reading-return-btn">Restore memory / 記憶を戻す</button>
+            <div class="reading-complete-actions">
+              <button class="reading-secondary" id="reading-review-btn">Review reading / 読み返す</button>
+              <button class="reading-primary" id="reading-return-btn">Restore memory / 記憶を戻す</button>
+            </div>
+            <p class="reading-review-note">Review as many times as you like before restoring the memory.<br>記憶を戻す前に、何度でも読み返せます。</p>
           </div>`;
         overlay.querySelector('#reading-return-btn').addEventListener('click', finish);
+        overlay.querySelector('#reading-review-btn').addEventListener('click', review);
         bindVocabulary();
         return;
       }
