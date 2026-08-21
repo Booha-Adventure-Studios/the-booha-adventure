@@ -118,6 +118,13 @@
       #utsuroba-reading-challenge .reading-postcard-success{padding:8px 9px;border-left:3px solid #ffcb75;color:#ffe7b2;font-size:.76rem;line-height:1.45;}
       #utsuroba-reading-challenge .reading-postcard-success small{display:block;margin-top:3px;color:rgba(255,231,178,.58);font-size:.9em;}
       #utsuroba-reading-challenge .reading-review-note{margin:14px auto 0;color:rgba(245,232,255,.48);font-size:.72rem;line-height:1.4;}
+      #utsuroba-reading-challenge .reading-lens{margin:18px 0 0;padding:13px;text-align:left;border:1px solid rgba(216,168,255,.24);border-radius:10px;background:rgba(216,168,255,.045);}
+      #utsuroba-reading-challenge .reading-lens-heading{margin:0;color:#e4c2ff;font:700 .78rem Georgia,serif;line-height:1.4;}
+      #utsuroba-reading-challenge .reading-lens-heading small{display:block;margin-top:3px;color:rgba(245,232,255,.52);font-size:.88em;font-weight:400;}
+      #utsuroba-reading-challenge .reading-lens-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:10px;}
+      #utsuroba-reading-challenge .reading-lens-option{padding:8px 9px;text-align:left;border:1px solid rgba(216,168,255,.3);border-radius:7px;background:rgba(255,255,255,.05);color:#fff;cursor:pointer;font:700 .7rem Georgia,serif;line-height:1.3;}
+      #utsuroba-reading-challenge .reading-lens-option:hover,#utsuroba-reading-challenge .reading-lens-option:focus-visible{background:rgba(216,168,255,.14);border-color:#d8a8ff;outline:none;}
+      #utsuroba-reading-challenge .reading-lens-option small{display:block;margin-top:3px;color:rgba(255,255,255,.5);font-size:.86em;font-weight:400;}
       #utsuroba-reading-challenge .reading-onboarding{text-align:left;padding:clamp(24px,5vw,46px);}
       #utsuroba-reading-challenge .reading-onboarding-intro{margin:0 0 18px;color:#f5e8ff;font-size:.9rem;line-height:1.5;}
       #utsuroba-reading-challenge .reading-onboarding-intro small{display:block;margin-top:3px;color:rgba(245,232,255,.54);font-size:.84em;}
@@ -136,7 +143,7 @@
       #utsuroba-reading-challenge .reading-calibration-option small{display:block;margin-top:5px;color:rgba(255,255,255,.55);font-size:.72rem;line-height:1.35;}
       #utsuroba-reading-challenge .reading-onboarding-note{margin:13px 0 0;color:rgba(245,232,255,.5);font-size:.7rem;line-height:1.4;}
       #utsuroba-reading-challenge .reading-loading{text-align:center;padding:80px 24px;color:#f1dcff;}
-      @media(max-width:700px){#utsuroba-reading-challenge .reading-choices{grid-template-columns:1fr;}#utsuroba-reading-challenge .reading-onboarding-steps,.reading-calibration-options{grid-template-columns:1fr;}#utsuroba-reading-challenge .reading-card{padding:20px 16px;}}
+      @media(max-width:700px){#utsuroba-reading-challenge .reading-choices{grid-template-columns:1fr;}#utsuroba-reading-challenge .reading-onboarding-steps,.reading-calibration-options,.reading-lens-options{grid-template-columns:1fr;}#utsuroba-reading-challenge .reading-card{padding:20px 16px;}}
     `;
     document.head.appendChild(style);
   }
@@ -177,8 +184,11 @@
       return false;
     }
 
-    let questionIndex = Number.isInteger(opts.quest && opts.quest.readingIndex)
-      ? opts.quest.readingIndex : 0;
+    const replayLens = opts.reviewLens && episode.replayLenses?.[opts.reviewLens]
+      ? episode.replayLenses[opts.reviewLens] : null;
+    const questions = replayLens ? [replayLens] : episode.checks;
+    let questionIndex = replayLens ? 0 : (Number.isInteger(opts.quest && opts.quest.readingIndex)
+      ? opts.quest.readingIndex : 0);
     const mechanic = episode.mechanic || null;
     let mechanicIndex = mechanic && Number.isInteger(opts.quest && opts.quest.mechanicIndex)
       ? opts.quest.mechanicIndex
@@ -199,6 +209,27 @@
     let postcardBuilt = false;
     let postcardSaved = !!(opts.quest && opts.quest.postcard && opts.quest.postcard.text);
     let postcardFeedback = '';
+
+    function reviewModeLabel() {
+      if (replayLens) return `${replayLens.label} / ${replayLens.labelJP}`;
+      if (supportLevel === 'independent') return 'INDEPENDENT REVIEW / 自力復習';
+      return 'GUIDED REVIEW / 案内付き復習';
+    }
+
+    function renderLensReplay() {
+      if (!opts.reviewOnly || replayLens || !episode.replayLenses) return '';
+      return `<section class="reading-lens"><p class="reading-lens-heading">Choose a replay lens.<small>読み返す視点を選びましょう。</small></p><div class="reading-lens-options"><button class="reading-lens-option" type="button" data-reading-lens="detail">Detail Hunt<small>細部ハント</small></button><button class="reading-lens-option" type="button" data-reading-lens="emotion">Emotion Hunt<small>気持ちハント</small></button><button class="reading-lens-option" type="button" data-reading-lens="inference">Inference Hunt<small>推測ハント</small></button></div></section>`;
+    }
+
+    function startLensReplay(lens) {
+      if (!episode.replayLenses?.[lens]) return;
+      start({
+        ...opts,
+        reviewLens: lens,
+        skipOnboarding: true,
+        quest: { ...(opts.quest || {}), readingIndex: 0, mechanicIndex: 0 }
+      });
+    }
 
     function renderOnboarding() {
       overlay.innerHTML = `
@@ -297,7 +328,7 @@
 
     function renderPostcard() {
       const postcard = episode.postcard;
-      if (!postcard) return '';
+      if (!postcard || replayLens) return '';
       if (!postcardOpen) {
         return `<section class="reading-postcard"><div class="reading-postcard-heading">${escapeText(postcard.title)}<span>${escapeText(postcard.titleJP)}</span></div><button class="reading-secondary" id="reading-postcard-open" type="button">Write a postcard / 文章カードを書く</button></section>`;
       }
@@ -333,7 +364,7 @@
             supportLevel,
             mistakes: mistakeCount,
             usedEvidence,
-            totalQuestions: episode.checks.length,
+            totalQuestions: questions.length,
           });
         }
         close();
@@ -447,7 +478,7 @@
     }
 
     const render = () => {
-      const question = episode.checks[questionIndex];
+      const question = questions[questionIndex];
       const evidenceLines = question && Array.isArray(question.evidenceLines) ? question.evidenceLines : [];
       const lines = episode.lines.map((line, lineIndex) => `
         <div class="reading-line${showEvidence && evidenceLines.includes(lineIndex) ? ' is-evidence' : ''}" data-line-index="${lineIndex}">
@@ -457,7 +488,7 @@
 
       if (!question) {
         const modeLabel = opts.reviewOnly
-          ? (supportLevel === 'independent' ? 'INDEPENDENT REVIEW / 自力復習' : 'GUIDED REVIEW / 案内付き復習')
+          ? reviewModeLabel()
           : 'FIRST READING / はじめての読書';
         const reviewResult = opts.reviewOnly
           ? `${mistakeCount === 0 && !usedEvidence ? 'Clean recall.' : 'Support was available when you needed it.'}<small>${mistakeCount === 0 && !usedEvidence ? 'ヒントなしで思い出せました。' : '必要なときにサポートを使いました。'}</small>`
@@ -479,6 +510,7 @@
             <p class="reading-jp">${escapeText(episode.successJP)}</p>
             ${reviewResult ? `<p class="reading-review-note">${reviewResult}</p>` : ''}
             ${renderPostcard()}
+            ${renderLensReplay()}
             <div class="reading-complete-actions">
               ${completeActions}
             </div>
@@ -486,6 +518,7 @@
           </div>`;
         overlay.querySelector('#reading-return-btn').addEventListener('click', finish);
         overlay.querySelector('#reading-review-btn').addEventListener('click', review);
+        overlay.querySelectorAll('[data-reading-lens]').forEach(button => button.addEventListener('click', () => startLensReplay(button.dataset.readingLens)));
         const postcardOpenButton = overlay.querySelector('#reading-postcard-open');
         if (postcardOpenButton) postcardOpenButton.addEventListener('click', () => { postcardOpen = true; render(); });
         overlay.querySelectorAll('[data-postcard-chunk]').forEach(button => button.addEventListener('click', () => {
@@ -516,7 +549,7 @@
         <div class="reading-card">
           <button class="reading-close" id="reading-close-btn">✕</button>
           <div class="reading-eyebrow">${escapeText(episode.eyebrow)}</div>
-          <div class="reading-support-badge${supportLevel === 'independent' ? ' independent' : ''}">${opts.reviewOnly ? (supportLevel === 'independent' ? 'INDEPENDENT REVIEW / 自力復習' : 'GUIDED REVIEW / 案内付き復習') : 'FIRST READING / はじめての読書'}</div>
+          <div class="reading-support-badge${supportLevel === 'independent' ? ' independent' : ''}">${opts.reviewOnly ? reviewModeLabel() : 'FIRST READING / はじめての読書'}</div>
           <h2>${escapeText(episode.title)} <span>${escapeText(episode.titleJP)}</span></h2>
           <p class="reading-intro">${escapeText(episode.intro)}</p>
           <p class="reading-jp">${escapeText(episode.introJP)}</p>
@@ -528,7 +561,7 @@
           <p class="reading-jp">${escapeText(question.promptJP)}</p>
           ${lastFeedback ? `<div class="reading-feedback">${escapeText(lastFeedback)}<small>${escapeText(lastFeedbackJP)}</small>${supportLevel === 'guided' || mistakeCount >= 2 ? '<button class="reading-evidence-btn" id="reading-evidence-btn" type="button">Show evidence / 根拠を見る</button>' : ''}</div>` : ''}
           ${renderInteraction(question)}
-          <div class="reading-progress">${questionIndex + 1} / ${episode.checks.length}</div>
+          <div class="reading-progress">${questionIndex + 1} / ${questions.length}</div>
         </div>`;
 
       overlay.querySelector('#reading-close-btn').addEventListener('click', close);

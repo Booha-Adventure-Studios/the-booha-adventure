@@ -48,6 +48,9 @@ assert.match(reading, /adaptiveMode/, 'Reading engine must support adaptive revi
 assert.match(reading, /usedEvidence/, 'Reading engine must track evidence support use');
 assert.match(reading, /renderPostcard/, 'Reading engine must render optional memory postcards');
 assert.match(reading, /onPostcardSave/, 'Reading engine must persist saved postcard output');
+assert.match(reading, /renderLensReplay/, 'Reading completion must expose replay lenses');
+assert.match(reading, /reviewLens/, 'Reading engine must support focused replay lenses');
+assert.match(reading, /data-reading-lens/, 'Reading replay lens controls must be interactive');
 assert.match(reading, /Close journal review \/ ノートを閉じる/, 'Review-only sessions must not offer quest completion');
 
 console.log('Utsuroba reading journal audit passed');

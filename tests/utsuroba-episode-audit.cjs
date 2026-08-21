@@ -44,6 +44,27 @@ for (const entry of index.episodes) {
     `${entry.id}: episode needs at least three conversation lines`);
   assert.ok(Array.isArray(episode.checks) && episode.checks.length >= 2,
     `${entry.id}: episode needs at least two comprehension checks`);
+  assert.ok(episode.replayLenses && typeof episode.replayLenses === 'object',
+    `${entry.id}: replay lenses are required`);
+  assert.deepStrictEqual(Object.keys(episode.replayLenses).sort(), ['detail', 'emotion', 'inference'],
+    `${entry.id}: replay lenses must include detail, emotion, and inference`);
+  for (const lens of ['detail', 'emotion', 'inference']) {
+    const check = episode.replayLenses[lens];
+    const label = `${entry.id} ${lens} replay`;
+    assert.ok(check.label && check.labelJP && check.prompt && check.promptJP,
+      `${label}: bilingual prompt is required`);
+    assert.ok(Array.isArray(check.choices) && check.choices.length >= 2 &&
+      Array.isArray(check.choicesJP) && check.choicesJP.length === check.choices.length,
+      `${label}: bilingual choices must align`);
+    assert.ok(Number.isInteger(check.correct) && check.correct >= 0 && check.correct < check.choices.length,
+      `${label}: correct answer index is invalid`);
+    assert.ok(check.evidence && check.evidenceJP && Array.isArray(check.evidenceLines) && check.evidenceLines.length > 0,
+      `${label}: evidence feedback is required`);
+    for (const lineIndex of check.evidenceLines) {
+      assert.ok(Number.isInteger(lineIndex) && lineIndex >= 0 && lineIndex < episode.lines.length,
+        `${label}: evidence line index is invalid`);
+    }
+  }
   assert.ok(Array.isArray(episode.vocabulary) && episode.vocabulary.length >= 3,
     `${entry.id}: episode needs authored ESL vocabulary support`);
   const vocabularyWords = new Set();
