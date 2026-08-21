@@ -11,6 +11,25 @@ html.token-checking body {
   visibility: hidden;
 }
 
+/* ── SAVE PANEL Z-INDEX OVERRIDE ──────────────────────────────
+   save-ui.css's default stack (panel z-index 9001) sits BELOW
+   Invaders' own overlays — #mobileHoldControls is 9990 and covers
+   the bottom 42% of the screen with real (if invisible) touch
+   targets for the whole run, including while paused. Left as-is,
+   opening the save panel on a touch device would show it but the
+   hold-controls zones underneath would still win every tap in that
+   band. #startOverlay (9999) needs clearing too, since the title
+   screen's save button lives inside it. Raise the whole save-ui
+   stack above both — this only touches this page via :root, so
+   Destruction and anything else using save-ui.css are unaffected. */
+:root {
+  --booha-z-overlay: 99900;
+  --booha-z-panel:   99901;
+  --booha-z-modal:   99902;
+  --booha-z-toast:   99903;
+  --booha-z-toggle:  99899;
+}
+
 /* ── RESET & BASE ── */
 *, *::before, *::after {
   box-sizing: border-box;
@@ -126,6 +145,19 @@ canvas {
 #invadersContinueBtn .save-en { font-size: clamp(11px,2.8vw,14px); letter-spacing: .04em; }
 #invadersContinueBtn .save-jp { font-size: clamp(10px,2.4vw,12px); margin-top: 2px; }
 #invadersContinueBtn:active { transform: scale(.97); }
+
+/* Secondary to Continue — outline style so Continue stays the one
+   obvious call-to-action when a checkpoint exists. */
+#invadersSaveMenuBtn {
+  display: block; width: min(360px,90vw); margin: 8px auto 0;
+  border: 1px solid rgba(168,245,196,.35); border-radius: 999px;
+  padding: 7px 14px; cursor: pointer; color: rgba(220,255,230,.85);
+  background: rgba(168,245,196,.05); font-family: inherit;
+}
+#invadersSaveMenuBtn .save-en, #invadersSaveMenuBtn .save-jp { display: block; font-weight: 800; }
+#invadersSaveMenuBtn .save-en { font-size: clamp(10px,2.5vw,13px); letter-spacing: .04em; }
+#invadersSaveMenuBtn .save-jp { font-size: clamp(9px,2.2vw,11px); margin-top: 2px; opacity: .85; }
+#invadersSaveMenuBtn:active { transform: scale(.97); }
 
 #startBtn {
   display: block; width: min(360px,90vw); margin: clamp(10px,2.5vw,16px) auto 0;

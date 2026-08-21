@@ -42,6 +42,15 @@
   <script src="./js/core/game-registry.js"></script>
   <script src="./js/core/score-system.js"></script>
   <script src="./js/core/unlock-system.js"></script>
+
+  <!-- Adventure Save panel — same save/memory-code system as
+       Booha Destruction (js/ui/save-menu.js), opened from a button on
+       the title screen and from the pause menu. -->
+  <script src="./js/core/save-utils.js"></script>
+  <script src="./js/core/save-code.js"></script>
+  <script src="./js/ui/memory-code-ui.js"></script>
+  <script src="./js/ui/save-menu.js"></script>
+
   <script>
     (function () {
       'use strict';
@@ -72,6 +81,7 @@
   </script>
   <!-- ═══════════════════════════════════════════════════════ -->
 
+<link rel="stylesheet" href="./theme/save-ui.css"/>
 <link rel="stylesheet" href="theme/invaders.css"/>
 </head>
 <body>
@@ -132,6 +142,10 @@
         <span class="save-en">CONTINUE</span>
         <span class="save-jp">つづきから</span>
       </button>
+      <button id="invadersSaveMenuBtn" type="button">
+        <span class="save-en">💾 SAVE MENU</span>
+        <span class="save-jp">セーブメニュー</span>
+      </button>
     </div>
     <button id="startBtn" type="button">
       <span class="jp">スタート！</span>
@@ -146,6 +160,20 @@
 
 <script src="js/invaders-data.js"></script>
 <script src="js/invaders-engine.js"></script>
+
+<script>
+  // Inject the save panel once the core stack is up, but skip the
+  // floating 💾 toggle it normally adds — Invaders already has dedicated
+  // canvas/DOM buttons for this (title screen + pause menu), same as
+  // Booha Destruction.
+  document.addEventListener('booha:ready', function () {
+    if (!window.BoohaSaveMenu) return;
+    BoohaSaveMenu.init().then(function () {
+      var toggle = document.getElementById('booha-save-toggle');
+      if (toggle) toggle.remove();
+    });
+  });
+</script>
 
 </body>
 </html>
