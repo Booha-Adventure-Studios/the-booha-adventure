@@ -138,10 +138,10 @@ body {
 @keyframes hdrShimmer { 0%{transform:translateX(-100%)} 100%{transform:translateX(200%)} }
 
 .hdr-top {
-  display:grid; grid-template-columns:38px 1fr 78px;
+  display:grid; grid-template-columns:74px 1fr 78px;
   align-items:center; gap:4px;
 }
-.hdr-left  { display:flex; }
+.hdr-left  { display:flex; gap:5px; }
 .hdr-right { display:flex; justify-content:flex-end; gap:5px; }
 
 .hdr-btn {
@@ -153,6 +153,7 @@ body {
   cursor:pointer; -webkit-appearance:none; appearance:none; flex-shrink:0;
   transition:background .12s, transform .08s;
 }
+.hdr-btn.exit { color:#ff9ca9; border-color:rgba(255,122,144,.28); background:rgba(255,122,144,.06); }
 .hdr-btn:active { transform:scale(.86); background:rgba(255,255,255,.18); }
 
 .hdr-title { text-align:center; }
@@ -175,6 +176,7 @@ body {
 }
 .stat-pill  { display:flex; flex-direction:column; align-items:center; gap:1px; flex:1; }
 .stat-lbl   { font-family:'Space Mono',monospace; font-size:clamp(.42rem,1.6vw,.52rem); letter-spacing:.08em; color:rgba(255,255,255,.32); text-transform:uppercase; }
+.stat-lbl small { display:block; font-family:'Noto Sans JP',sans-serif; font-size:.48rem; letter-spacing:0; text-transform:none; color:rgba(255,255,255,.22); margin-top:2px; }
 .stat-val   { font-family:'Space Mono',monospace; font-size:clamp(.8rem,3.2vw,.96rem); font-weight:700; color:rgba(255,255,255,.9); line-height:1; }
 .stat-val.accent {
   color:color-mix(in srgb, var(--c0) 78%, #fff);
@@ -296,6 +298,7 @@ body {
   font-size:clamp(.7rem,2.8vw,.8rem); line-height:1.8;
   color:rgba(255,255,255,.75); position:relative;
 }
+.help-card p small { display:block; margin-top:2px; color:rgba(255,255,255,.38); font-size:.86em; }
 .help-title {
   font-family:'Cinzel',serif; font-size:clamp(.82rem,3.5vw,.96rem);
   text-align:center; margin-bottom:10px;
@@ -316,7 +319,7 @@ body {
   padding:max(16px,var(--sat)) 16px max(16px,var(--sab));
 }
 #startInner {
-  pointer-events:none; text-align:center;
+  pointer-events:auto; text-align:center;
   padding:36px 28px 32px; border-radius:24px;
   position:relative; overflow:hidden; max-width:310px; width:100%;
   background:rgba(255,255,255,.025); border:1px solid rgba(255,255,255,.10);
@@ -343,6 +346,20 @@ body {
 .start-tap   { display:inline-block; padding:9px 22px; border-radius:999px; border:1px solid rgba(125,211,252,.4); background:rgba(125,211,252,.08); font-size:clamp(.78rem,3.2vw,.9rem); font-weight:700; letter-spacing:.06em; color:rgba(255,255,255,.82); margin-bottom:16px; animation:tapBreath 2s ease-in-out infinite; }
 @keyframes tapBreath { 0%,100%{opacity:.75;transform:scale(1)} 50%{opacity:1;transform:scale(1.03)} }
 .start-desc  { font-size:clamp(.68rem,2.6vw,.76rem); color:rgba(255,255,255,.3); line-height:1.65; }
+.menu-label { display:block; line-height:1.15; }
+.menu-label small { display:block; margin-top:3px; font-family:'Noto Sans JP',sans-serif; font-size:.7em; letter-spacing:0; color:rgba(255,255,255,.38); }
+.start-memory { margin:18px 0 4px; padding:11px 10px 10px; border:1px solid rgba(125,211,252,.13); border-radius:14px; background:rgba(125,211,252,.035); }
+.memory-heading { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px; font-family:'Space Mono',monospace; font-size:.57rem; letter-spacing:.12em; color:rgba(255,255,255,.48); }
+.memory-heading small { font-family:'Noto Sans JP',sans-serif; font-size:.68rem; letter-spacing:0; color:rgba(255,255,255,.25); }
+.memory-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:5px; }
+.memory-stat { display:flex; flex-direction:column; align-items:center; gap:2px; }
+.memory-value { font-family:'Space Mono',monospace; font-size:.9rem; font-weight:700; color:#7dd3fc; }
+.memory-stat:nth-child(2) .memory-value { color:#ffd166; }
+.memory-stat:nth-child(3) .memory-value { color:#c084fc; }
+.memory-stat span { font-family:'Space Mono',monospace; font-size:.45rem; color:rgba(255,255,255,.3); }
+.memory-stat small { font-size:.52rem; color:rgba(255,255,255,.22); }
+.start-exit { margin-top:14px; width:100%; padding:9px 12px; border:1px solid rgba(255,122,144,.25); border-radius:10px; background:rgba(255,122,144,.06); color:#ffb2bd; font-size:.72rem; cursor:pointer; letter-spacing:.04em; }
+.start-exit small { display:block; margin-top:2px; font-family:'Noto Sans JP',sans-serif; color:rgba(255,178,189,.6); }
 .big-countdown { font-family:'Cinzel',serif; font-size:clamp(3.5rem,18vw,5rem); font-weight:900; color:#fff; text-shadow:0 0 30px rgba(125,211,252,.8); animation:countPop .28s cubic-bezier(.34,1.56,.64,1); }
 @keyframes countPop { 0%{transform:scale(.35);opacity:0} 100%{transform:scale(1);opacity:1} }
 
@@ -369,6 +386,7 @@ body {
 .lb-meta   { display:flex;gap:7px;flex-wrap:wrap; }
 .lb-chip   { font-family:'Space Mono',monospace;font-size:.58rem;color:rgba(255,255,255,.32); }
 .lb-chip span{color:rgba(255,255,255,.65);}
+.lb-chip small{display:block;font-family:'Noto Sans JP',sans-serif;font-size:.62rem;color:rgba(255,255,255,.22);}
 .lb-lines  { font-family:'Space Mono',monospace;font-size:.88rem;font-weight:700;color:#7dd3fc;text-align:right;white-space:nowrap; }
 .lb-lines small{font-size:.54rem;color:rgba(255,255,255,.26);display:block;text-align:right;}
 .lb-footer { padding:9px 13px;border-top:1px solid rgba(255,255,255,.06);display:flex;gap:8px;flex-shrink:0; }
@@ -385,11 +403,15 @@ body {
 .name-sv.a{color:#7dd3fc}.name-sv.g{color:#ffd166}.name-sv.p{color:#c084fc}
 .name-sl     { font-family:'Space Mono',monospace;font-size:.54rem;letter-spacing:.1em;color:rgba(255,255,255,.3);text-transform:uppercase; }
 .name-prompt { font-size:.76rem;color:rgba(255,255,255,.45);margin-bottom:8px; }
+.name-prompt small { display:block; margin-top:3px; font-size:.7em; color:rgba(255,255,255,.28); }
 .name-input  { width:100%;padding:11px 13px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:#fff;font-size:16px;font-weight:700;text-align:center;outline:none;margin-bottom:9px;font-family:'Noto Sans JP',sans-serif; }
 .name-input:focus { border-color:rgba(125,211,252,.45);background:rgba(125,211,252,.06); }
 .name-ok     { width:100%;padding:12px;border-radius:10px;border:none;background:linear-gradient(135deg,#7dd3fc,#c084fc);color:#06030f;font-size:.84rem;font-weight:900;letter-spacing:.06em;cursor:pointer;-webkit-appearance:none;appearance:none;box-shadow:0 4px 16px rgba(125,211,252,.3); }
+.name-ok small, .name-skip small { display:block; margin-top:2px; font-family:'Noto Sans JP',sans-serif; font-size:.78em; letter-spacing:0; }
 .name-hint   { font-size:.62rem;color:rgba(255,255,255,.22);margin-top:7px; }
 .name-skip   { background:none;border:none;color:rgba(255,255,255,.22);font-size:.68rem;cursor:pointer;padding:7px;width:100%; }
+.lb-title small { display:block; margin-top:3px; font-family:'Noto Sans JP',sans-serif; font-size:.68em; letter-spacing:0; color:rgba(255,255,255,.34); }
+.lb-btn small { display:block; margin-top:2px; font-family:'Noto Sans JP',sans-serif; font-size:.85em; color:inherit; opacity:.7; }
 </style>
 </head>
 <body>
@@ -397,7 +419,10 @@ body {
 
   <div class="hdr">
     <div class="hdr-top">
-      <div class="hdr-left"><button class="hdr-btn" id="helpBtn" type="button">?</button></div>
+      <div class="hdr-left">
+        <button class="hdr-btn" id="helpBtn" type="button" aria-label="How to play / 遊び方">?</button>
+        <button class="hdr-btn exit" id="headerExitBtn" type="button" aria-label="Exit game / ゲームを終了">↩</button>
+      </div>
       <div class="hdr-title">
         <span class="title-main">Booha Blocks</span>
         <span class="title-sub">BOOHA ADVENTURE</span>
@@ -408,14 +433,14 @@ body {
       </div>
     </div>
     <div class="hdr-stats">
-      <div class="stat-pill"><div class="stat-lbl">LINES</div><div class="stat-val accent" id="linesVal">0</div></div>
+      <div class="stat-pill"><div class="stat-lbl">LINES<small>ライン</small></div><div class="stat-val accent" id="linesVal">0</div></div>
       <div class="stat-div"></div>
-      <div class="stat-pill"><div class="stat-lbl">SCORE</div><div class="stat-val accent" id="scoreVal">0</div></div>
+      <div class="stat-pill"><div class="stat-lbl">SCORE<small>スコア</small></div><div class="stat-val accent" id="scoreVal">0</div></div>
       <div class="stat-div"></div>
-      <div class="stat-pill"><div class="stat-lbl">LEVEL</div><div class="stat-val accent" id="levelVal">1</div></div>
+      <div class="stat-pill"><div class="stat-lbl">LEVEL<small>レベル</small></div><div class="stat-val accent" id="levelVal">1</div></div>
       <div class="stat-div"></div>
       <div class="stat-pill">
-        <div class="stat-lbl">TIME</div>
+        <div class="stat-lbl">TIME<small>時間</small></div>
         <div class="stat-val" id="timeVal">0:00</div>
       </div>
       <div id="multiBadge">2x</div>
@@ -426,29 +451,25 @@ body {
     <canvas id="game" width="300" height="600"></canvas>
 
     <div id="pauseOverlay">
-      <div class="pause-title">PAUSED</div>
-      <button class="pause-btn pause-btn-resume" id="pauseResumeBtn" type="button">&#9654; 再開 · Resume</button>
-      <button class="pause-btn pause-btn-exit"   id="pauseExitBtn"   type="button">&#8617; カラスキに戻る · Exit</button>
+      <div class="pause-title menu-label">PAUSED<small>一時停止</small></div>
+      <button class="pause-btn pause-btn-resume" id="pauseResumeBtn" type="button">&#9654; RESUME<small>再開</small></button>
+      <button class="pause-btn pause-btn-exit"   id="pauseExitBtn"   type="button">&#8617; EXIT GAME<small>ゲームを終了</small></button>
     </div>
 
     <div id="helpOverlay">
       <div class="help-card">
         <button id="helpClose">&#10005;</button>
-        <div class="help-title">遊び方 · How to Play</div>
-        <p>&#8592; &#8594; &nbsp; ブロックを左右に動かす</p>
-        <p>&#8635; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 回転させる</p>
-        <p>&#8595; タップ &nbsp; 1マス落とす</p>
-        <p>&#8595; 長押し &nbsp; 速く落とす</p>
-        <p>SPACE &nbsp;&nbsp; ハードドロップ</p>
+        <div class="help-title menu-label">HOW TO PLAY<small>遊び方</small></div>
+        <p>&#8592; &#8594; &nbsp; Move left / right<small>ブロックを左右に動かす</small></p>
+        <p>&#8635; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Rotate<small>回転させる</small></p>
+        <p>&#8595; Tap &nbsp; Drop one square<small>タップで1マス落とす</small></p>
+        <p>&#8595; Hold &nbsp; Drop faster<small>長押しで速く落とす</small></p>
+        <p>SPACE &nbsp;&nbsp; Hard drop<small>ハードドロップ</small></p>
         <br>
-        <p>&#8592; &#8594; &nbsp; Move · &#8635; Rotate</p>
-        <p>&#8595; Tap = drop one &nbsp; Hold = fast</p>
-        <p>SPACE = hard drop</p>
-        <br>
-        <p style="color:#ffd166;font-size:.75rem;">&#9733; Special blocks:</p>
-        <p>&#128165; Bomb — explodes 3x3 area</p>
-        <p>&#9733;2x — double points next clear</p>
-        <p>&#9733;3x — triple points next clear</p>
+        <p style="color:#ffd166;font-size:.75rem;">&#9733; Special blocks<small>スペシャルブロック</small></p>
+        <p>&#128165; Bomb — explodes 3x3 area<small>ボム — 3×3を爆発させる</small></p>
+        <p>&#9733;2x — double points next clear<small>次の消去が2倍</small></p>
+        <p>&#9733;3x — triple points next clear<small>次の消去が3倍</small></p>
       </div>
     </div>
   </div>
@@ -475,31 +496,37 @@ body {
     </div>
     <div class="start-title">Booha Blocks</div>
     <div class="start-sub">BOOHA ADVENTURE</div>
-    <div class="start-tap">タップしてスタート</div>
-    
-   <div class="start-tap">タップしてスタート</div>
-    <div class="start-desc">ブロックを動かしてラインを消そう<br>Move blocks &middot; clear lines &middot; go!</div>
-    <button id="startExitBtn" style="margin-top:14px;background:none;border:none;color:rgba(255,255,255,.28);font-size:.72rem;cursor:pointer;letter-spacing:.06em;" type="button">✕ カラスキに戻る · Exit</button>
+    <div class="start-tap menu-label">TAP TO START<small>タップしてスタート</small></div>
+    <div class="start-desc">Move blocks · clear lines · go!<br><span>ブロックを動かしてラインを消そう</span></div>
+    <div class="start-memory" id="memoryCard">
+      <div class="memory-heading"><span>YOUR MEMORY</span><small>きろく</small></div>
+      <div class="memory-grid">
+        <div class="memory-stat"><strong class="memory-value" id="memoryBestScore">0</strong><span>BEST SCORE</span><small>最高スコア</small></div>
+        <div class="memory-stat"><strong class="memory-value" id="memoryBestLines">0</strong><span>BEST LINES</span><small>最高ライン</small></div>
+        <div class="memory-stat"><strong class="memory-value" id="memoryRuns">0</strong><span>RUNS</span><small>プレイ回数</small></div>
+      </div>
+    </div>
+    <button id="startExitBtn" class="start-exit" type="button">✕ EXIT GAME<small>ゲームを終了 · カラスキに戻る</small></button>
   </div>
 </div>
 
 <!-- NAME -->
 <div id="nameOverlay">
   <div class="name-card">
-    <div class="name-go">GAME OVER</div>
+    <div class="name-go menu-label">GAME OVER<small>ゲームオーバー</small></div>
     <div class="name-scores">
       <div class="name-stat"><div class="name-sv a" id="goLines">0</div><div class="name-sl">LINES</div></div>
       <div class="name-stat"><div class="name-sv g" id="goScore">0</div><div class="name-sl">SCORE</div></div>
       <div class="name-stat"><div class="name-sv p" id="goLevel">1</div><div class="name-sl">LEVEL</div></div>
       <div class="name-stat"><div class="name-sv"   id="goTime">0:00</div><div class="name-sl">TIME</div></div>
     </div>
-    <div class="name-prompt">なまえ を いれてね</div>
+    <div class="name-prompt">LOCAL SCOREBOARD NAME<small>この端末のランキングに名前を保存</small></div>
     <input id="nameInput" class="name-input" type="text" inputmode="text"
       autocomplete="off" autocapitalize="off" spellcheck="false"
       placeholder="（れい）ブーハー" maxlength="18"/>
-    <button id="nameOkBtn"   class="name-ok"   type="button">保存してランキングを見る</button>
-    <div class="name-hint">&#x203B; えいごでもOK &middot; 18文字まで</div>
-    <button id="nameSkipBtn" class="name-skip"  type="button">スキップ</button>
+    <button id="nameOkBtn"   class="name-ok"   type="button">SAVE SCORE<small>保存してランキングを見る</small></button>
+    <div class="name-hint">&#x203B; Your adventure record is already saved.<br>アドベンチャーの記録は自動保存されています。</div>
+    <button id="nameSkipBtn" class="name-skip"  type="button">SKIP<small>スキップ</small></button>
   </div>
 </div>
 
@@ -507,20 +534,20 @@ body {
 <div id="leaderboardOverlay">
   <div class="lb-card">
     <div class="lb-header">
-      <div class="lb-title">&#9733; スコアボード</div>
+      <div class="lb-title">&#9733; SCOREBOARD<small>スコアボード（この端末）</small></div>
       <button class="lb-close" id="lbClose" type="button">&#10005;</button>
     </div>
     <div class="lb-scroll"><div id="leaderList"></div></div>
     <div class="lb-footer">
-      <button class="lb-btn"    id="lbClear" type="button">リセット</button>
-      <button class="lb-btn ok" id="lbDone"  type="button">閉じる</button>
+      <button class="lb-btn"    id="lbClear" type="button">RESET<small>リセット</small></button>
+      <button class="lb-btn ok" id="lbDone"  type="button">CLOSE<small>閉じる</small></button>
     </div>
   </div>
 </div>
 
 <script>
 /* ██████████████████████████████████████████████████████
-   BOOHA-BLOCKS-V2-FIXED
+   BOOHA-BLOCKS-V3-MEMORY
    If you can find this text in View Source, this is the
    correct patched file. Look for it before uploading.
 ██████████████████████████████████████████████████████ */
@@ -627,6 +654,8 @@ let score=0, linesTotal=0, currentLevel=1;
 let gameStartTime=0, elapsedMs=0;
 let gravityFrames=42, frameCounter=0, rafId=0;
 let scoreMultiplier=1;
+let combo=0, maxCombo=0, runSubmitted=false;
+const SAVE_ID='bonus:booha_blocks';
 
 /* ── COLOR OVERRIDE (Booha Fever) ───────────────────────
    colorOverride = null | 'silver' | 'gold'
@@ -788,6 +817,7 @@ function getGhost(){ let g=piece.row; while(valid(piece.matrix,g+1,piece.col))g+
 
 /* ── PARTICLES ── */
 const parts=[];
+const callouts=[];
 const CLEAR_COLORS=[
   ['#67e8f9','#a7f3d0'],
   ['#c084fc','#f472b6','#7dd3fc'],
@@ -873,6 +903,27 @@ function drawParts(){
   }
 }
 
+function spawnCallout(title, subtitle, color){
+  callouts.push({title,subtitle,color,x:CW/2,y:CH*.47,life:1,vy:-.55,scale:.72});
+}
+
+function drawCallouts(){
+  for(let i=callouts.length-1;i>=0;i--){
+    const c=callouts[i];
+    c.y+=c.vy; c.vy*=.985; c.life-=.024; c.scale+=(1.08-c.scale)*.16;
+    if(c.life<=0){callouts.splice(i,1);continue;}
+    ctx.save();
+    ctx.globalAlpha=Math.min(1,c.life*1.8);
+    ctx.translate(c.x,c.y); ctx.scale(c.scale,c.scale);
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.font='900 28px Cinzel, serif'; ctx.fillStyle=c.color;
+    ctx.shadowBlur=18; ctx.shadowColor=c.color; ctx.fillText(c.title,0,0);
+    ctx.shadowBlur=0; ctx.font='700 11px "Noto Sans JP", sans-serif';
+    ctx.fillStyle='rgba(255,255,255,.82)'; ctx.fillText(c.subtitle,0,20);
+    ctx.restore();
+  }
+}
+
 /* ── LOCK SQUISH ── */
 const lockAnims=[];
 function spawnLockAnim(col,row,color){ lockAnims.push({col,row,t:1.0,color}); }
@@ -892,7 +943,10 @@ let isClearing=false, clearRows=[], clearTick=0, clearN=0;
 const LINE_PTS=[0,100,300,500,800];
 function scoreLines(n){
   const pts=(LINE_PTS[n]||0)*currentLevel*scoreMultiplier;
-  score+=pts;
+  combo=Math.min(99,combo+1);
+  maxCombo=Math.max(maxCombo,combo);
+  const comboBonus=combo>1 ? (combo-1)*50*currentLevel : 0;
+  score+=pts+comboBonus;
   /* Color override keeps multiplier alive for its duration.
      Plain (non-override) multiplier is consumed on clear. */
   if(scoreMultiplier>1 && !colorOverride) scoreMultiplier=1;
@@ -916,6 +970,7 @@ function activateBomb(landRow, landCol){
     isClearing=true; clearRows=filledRows.slice(); clearTick=14; clearN=filledRows.length;
     spawnLineClear(filledRows, 4);
   } else {
+    combo=0;
     piece=nextP; nextP=mkPiece(); updateHud(); updateDanger();
   }
 }
@@ -959,6 +1014,7 @@ function lockPiece(){
   if(isX3){ scoreMultiplier=3; setColorOverride('gold');   playSFX(SFX.levelUp,.9); }
 
   if(isX2||isX3){
+    combo=0;
     piece=nextP; nextP=mkPiece();
     updateHud(); updateDanger(); return;
   }
@@ -980,6 +1036,7 @@ function lockPiece(){
     playSFX(SFX.line,.9);
     return;
   }
+  combo=0;
   piece=nextP; nextP=mkPiece(); updateHud(); updateDanger();
 }
 
@@ -988,6 +1045,9 @@ function commitClear(){
   clearRows.sort((a,b)=>b-a).forEach(r=>playfield.splice(r,1));
   for(let i=0;i<n;i++) playfield.unshift(Array(COLS).fill(null));
   linesTotal+=n; scoreLines(n);
+  if(n===4) spawnCallout('BOOHA!','ブーハー！','#ffd166');
+  else if(combo>1) spawnCallout('COMBO x'+combo,'コンボ '+combo,'#7dd3fc');
+  else if(n>1) spawnCallout(n+' LINES',n+'ライン消去','#c084fc');
   const nl=calcLevel();
   if(nl!==currentLevel){ currentLevel=nl; playSFX(SFX.levelUp,.9); applyTheme(currentLevel); updateGravity(); }
   isClearing=false; clearRows=[];
@@ -1038,6 +1098,22 @@ function updateHud(){
     el.style.textShadow= feverColor ? '0 0 10px '+feverColor : '';
   });
 }
+
+function updateMemoryCard(){
+  let entry=null;
+  try{ entry=window.BoohaAdventure?.scores?.getEntry(SAVE_ID) || null; }catch(_){}
+  const local=getBoard();
+  const bestScore=entry?.highScore || local.reduce((m,e)=>Math.max(m,Number(e.score)||0),0);
+  const bestLines=entry?.bestLines || local.reduce((m,e)=>Math.max(m,Number(e.lines)||0),0);
+  const runs=entry?.attempts || local.length || 0;
+  const scoreNode=document.getElementById('memoryBestScore');
+  const linesNode=document.getElementById('memoryBestLines');
+  const runsNode=document.getElementById('memoryRuns');
+  if(scoreNode) scoreNode.textContent=bestScore;
+  if(linesNode) linesNode.textContent=bestLines;
+  if(runsNode) runsNode.textContent=runs;
+}
+document.addEventListener('booha:scoreSubmitted',updateMemoryCard);
 
 /* ── DRAW CELL ── */
 function drawCell(x,y,color,alpha=1,sx=1,sy=1,age=0){
@@ -1119,8 +1195,10 @@ function draw(){
   /* Board BG */
   ctx.fillStyle='#030610'; ctx.fillRect(0,0,CW,CH);
 
-  /* Grid */
-  ctx.strokeStyle='rgba(255,255,255,.025)'; ctx.lineWidth=.5;
+  /* Grid — the playfield becomes warmer and more urgent as the stack rises. */
+  const danger=Math.min(1,stackH()/20);
+  const pulse=.5+.5*Math.sin(Date.now()/180);
+  ctx.strokeStyle=`rgba(${125+120*danger},${211-95*danger},${252-125*danger},${.025+danger*.09+pulse*danger*.025})`; ctx.lineWidth=.5;
   for(let c=1;c<COLS;c++){ctx.beginPath();ctx.moveTo(c*CELL,0);ctx.lineTo(c*CELL,CH);ctx.stroke();}
   for(let r=1;r<ROWS;r++){ctx.beginPath();ctx.moveTo(0,r*CELL);ctx.lineTo(CW,r*CELL);ctx.stroke();}
 
@@ -1199,6 +1277,7 @@ function draw(){
 
   /* Particles */
   drawParts();
+  drawCallouts();
 
   /* Canvas flash */
   if(flashAlpha>0.005){
@@ -1276,6 +1355,10 @@ bindHold(document.getElementById('moveDownBtn'), stepD,90,35);
 /* ── PAUSE ── */
 const pauseBtn=document.getElementById('pauseBtn');
 const pauseOverlay=document.getElementById('pauseOverlay');
+function exitToAdventure(){
+  isPaused=true; pauseBGM(); stopDanger();
+  window.location.href='karasuki.html?room=room_02';
+}
 function setPaused(v){
   isPaused=v; pauseOverlay.style.display=v?'flex':'none';
   if(v){pauseBGM();shakeMag=0;shakeFrames=0;}
@@ -1285,10 +1368,10 @@ pauseBtn?.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagatio
 document.getElementById('pauseResumeBtn')?.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();setPaused(false);},{passive:false});
 document.getElementById('pauseExitBtn')?.addEventListener('pointerdown',e=>{
   e.preventDefault(); e.stopPropagation();
-  setPaused(false);
-  pauseBGM(); stopDanger();
-  /* ── EXIT → room_02 ── */
-  window.location.href='karasuki.html?room=room_02';
+  exitToAdventure();
+},{passive:false});
+document.getElementById('headerExitBtn')?.addEventListener('pointerdown',e=>{
+  e.preventDefault(); e.stopPropagation(); exitToAdventure();
 },{passive:false});
 
 /* ── HELP ── */
@@ -1300,7 +1383,7 @@ helpClose?.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagati
 
 /* ── LEADERBOARD ── */
 const LB_KEY='booha_blocks_lb_v2',NAME_KEY='booha_blocks_name';
-function getBoard(){try{return JSON.parse(localStorage.getItem(LB_KEY)||'[]');}catch(_){return[];}}
+function getBoard(){try{const b=JSON.parse(localStorage.getItem(LB_KEY)||'[]');return Array.isArray(b)?b:[];}catch(_){return[];}}
 function setBoard(a){try{localStorage.setItem(LB_KEY,JSON.stringify(a));}catch(_){}}
 function getSavedName(){try{return(localStorage.getItem(NAME_KEY)||'').trim();}catch(_){return'';}}
 function saveName(n){try{localStorage.setItem(NAME_KEY,n);}catch(_){}}
@@ -1308,8 +1391,9 @@ function saveScore(name){
   name=String(name||'').trim().slice(0,18)||'ブーハー'; saveName(name);
   const b=getBoard();
   b.push({name,lines:linesTotal,score,level:currentLevel,time:elapsedMs,at:Date.now()});
-  b.sort((a,b2)=>(b2.lines-a.lines)||(b2.score-a.score)||(b2.at-a.at));
+  b.sort((a,b2)=>(b2.score-a.score)||(b2.lines-a.lines)||(b2.at-a.at));
   setBoard(b.slice(0,20));
+  updateMemoryCard();
 }
 const lbOverlay=document.getElementById('leaderboardOverlay');
 const lbList=document.getElementById('leaderList');
@@ -1321,7 +1405,7 @@ function renderBoard(){
     const rc=i===0?'r1':i===1?'r2':i===2?'r3':'';
     const rl=i===0?'g':i===1?'p':i===2?'a':'';
     const d=new Date(e.at).toLocaleDateString('ja-JP',{timeZone:'Asia/Tokyo',month:'2-digit',day:'2-digit'});
-    return`<div class="lb-row ${rc}"><div class="lb-rank ${rl}">#${i+1}</div><div class="lb-info"><div class="lb-name">${e.name}</div><div class="lb-meta"><div class="lb-chip">Score <span>${e.score}</span></div><div class="lb-chip">Lv <span>${e.level}</span></div><div class="lb-chip">${fmtTime(e.time||0)}</div><div class="lb-chip">${d}</div></div></div><div class="lb-lines">${e.lines}<small>LINES</small></div></div>`;
+    return`<div class="lb-row ${rc}"><div class="lb-rank ${rl}">#${i+1}</div><div class="lb-info"><div class="lb-name">${e.name}</div><div class="lb-meta"><div class="lb-chip">Score <span>${e.score}</span><small>スコア</small></div><div class="lb-chip">Lv <span>${e.level}</span><small>レベル</small></div><div class="lb-chip">${fmtTime(e.time||0)}<small>時間</small></div><div class="lb-chip">${d}<small>日付</small></div></div></div><div class="lb-lines">${e.lines}<small>LINES<br>ライン</small></div></div>`;
   }).join('');
 }
 function openLeaderboard(){lbFromGame=gameStarted&&!isGameOver;if(lbFromGame){isPaused=true;pauseBGM();}renderBoard();lbOverlay.style.display='flex';}
@@ -1360,6 +1444,14 @@ function finalizeGameOver(){
   isEnding=false;isGameOver=true;
   ctx.fillStyle='#000';ctx.fillRect(0,0,CW,CH);
   shakeMag=0;shakeFrames=0;openNameOverlay();
+  if(!runSubmitted){
+    runSubmitted=true;
+    document.dispatchEvent(new CustomEvent('booha:gameEnd',{detail:{
+      saveId:SAVE_ID, score, completed:linesTotal>0, time:elapsedMs,
+      lines:linesTotal, level:currentLevel, maxCombo
+    }}));
+    updateMemoryCard();
+  }
 }
 
 /* ── RESET ── */
@@ -1367,7 +1459,8 @@ function hardReset(){
   isGameOver=isPaused=isEnding=isClearing=false;
   score=linesTotal=frameCounter=0;
   currentLevel=1;gravityFrames=42;elapsedMs=0;endTimer=0;
-  clearRows=[];clearTick=0;clearN=0;parts.length=0;lockAnims.length=0;
+  combo=0;maxCombo=0;runSubmitted=false;
+  clearRows=[];clearTick=0;clearN=0;parts.length=0;callouts.length=0;lockAnims.length=0;
   flashAlpha=0;shakeMag=0;shakeFrames=0;stackAge=0;
   /* Clear override state — do NOT call clearColorOverride() here because
      that scans the playfield; just zero the vars directly */
@@ -1383,6 +1476,7 @@ const startOverlay=document.getElementById('startOverlay');
 const startInner=document.getElementById('startInner');
 function showStartOverlay(){
   gameStarted=false;
+  updateMemoryCard();
   startOverlay.style.display='flex';startOverlay.style.pointerEvents='auto';
   startInner.innerHTML=`
     <span class="corner corner-tl"></span><span class="corner corner-tr"></span>
@@ -1393,9 +1487,17 @@ function showStartOverlay(){
     </div>
     <div class="start-title">Booha Blocks</div>
     <div class="start-sub">BOOHA ADVENTURE</div>
-    <div class="start-tap">タップしてスタート</div>
-    <div class="start-desc">ブロックを動かしてラインを消そう<br>Move blocks &middot; clear lines &middot; go!</div>
-    <button id="startExitBtn" style="margin-top:14px;background:none;border:none;color:rgba(255,255,255,.28);font-size:.72rem;cursor:pointer;letter-spacing:.06em;" type="button">✕ カラスキに戻る · Exit</button>`;
+    <div class="start-tap menu-label">TAP TO START<small>タップしてスタート</small></div>
+    <div class="start-desc">Move blocks · clear lines · go!<br><span>ブロックを動かしてラインを消そう</span></div>
+    <div class="start-memory" id="memoryCard">
+      <div class="memory-heading"><span>YOUR MEMORY</span><small>きろく</small></div>
+      <div class="memory-grid">
+        <div class="memory-stat"><strong class="memory-value" id="memoryBestScore">0</strong><span>BEST SCORE</span><small>最高スコア</small></div>
+        <div class="memory-stat"><strong class="memory-value" id="memoryBestLines">0</strong><span>BEST LINES</span><small>最高ライン</small></div>
+        <div class="memory-stat"><strong class="memory-value" id="memoryRuns">0</strong><span>RUNS</span><small>プレイ回数</small></div>
+      </div>
+    </div>
+    <button id="startExitBtn" class="start-exit" type="button">✕ EXIT GAME<small>ゲームを終了 · カラスキに戻る</small></button>`;
 }
 function startFromOverlay(){
   if(gameStarted)return;
@@ -1416,7 +1518,11 @@ function startFromOverlay(){
     }
   },660);
 }
-startOverlay?.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();startFromOverlay();},{passive:false});
+startOverlay?.addEventListener('pointerdown',e=>{
+  if(e.target.closest && e.target.closest('.start-tap')){
+    e.preventDefault();e.stopPropagation();startFromOverlay();
+  }
+},{passive:false});
 
 document.addEventListener('pointerdown', e => {
   if (e.target && e.target.id === 'startExitBtn') {
@@ -1426,6 +1532,7 @@ document.addEventListener('pointerdown', e => {
 }, { passive: false });  
 
 applyTheme(1);
+updateMemoryCard();
 draw();
 </script>
 </body>
