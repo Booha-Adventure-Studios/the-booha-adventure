@@ -104,6 +104,21 @@ window.UTSUROBA_DATA = {
     titleJP: "共有された歓迎"
   },
 
+  readingChallenge: {
+    title: "Weekly Reading Trail",
+    titleJP: "週間読書トレイル",
+    intro: "Collect four small wins before the curriculum week changes.",
+    introJP: "カリキュラムの週が変わる前に、小さな成功を四つ集めましょう。",
+    complete: "The trail is complete. Your reading has a shape this week.",
+    completeJP: "トレイル達成。今週の読書が形になりました。",
+    goals: [
+      {id: "memories", target: 2, label: "Restore 2 memories", labelJP: "記憶を2つ戻す", complete: "Two memories are glowing.", completeJP: "二つの記憶が光っています。"},
+      {id: "evidence", target: 1, label: "Use evidence once", labelJP: "証拠を1回使う", complete: "You looked closely.", completeJP: "よく読みました。"},
+      {id: "postcard", target: 1, label: "Save a postcard", labelJP: "文章カードを保存する", complete: "Your summary is saved.", completeJP: "まとめを保存しました。"},
+      {id: "lens", target: 1, label: "Try a replay lens", labelJP: "読み返しの視点を試す", complete: "You changed the way you read.", completeJP: "読み方を変えてみました。"}
+    ]
+  },
+
   roomStandingCoords: {
     room_01: { x: 491, y: 557 },
     room_05: { x: 820, y: 580 },
