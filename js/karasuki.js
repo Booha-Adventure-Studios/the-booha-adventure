@@ -242,6 +242,12 @@ const HAPPY_HOUSE_PORTAL = {
     lantern:    { glowRGBA: '255,240,180', coreHi: '#fffde0', coreMid: '#ffd966', coreLo: '#c8860a', shadow: '#ffd966' },
     candy:      { glowRGBA: '255,190,205', coreHi: '#fff0f4', coreMid: '#ff85a1', coreLo: '#c23a5e', shadow: '#ff85a1' },
     reflection: { glowRGBA: '190,235,255', coreHi: '#eafcff', coreMid: '#a8edff', coreLo: '#3b8fbf', shadow: '#a8edff' },
+    /* Pass 9 (Blakesly + Patricia): kept deliberately apart from the hues
+       above so neither reads as a recolor of an existing memory — thorn is
+       a hot brick-red (sharp/guarded), ribbon a soft lavender-pink (warm,
+       gentler than candy's brighter pink). */
+    thorn:      { glowRGBA: '255,150,120', coreHi: '#ffe8e0', coreMid: '#d9503a', coreLo: '#6b1f10', shadow: '#d9503a' },
+    ribbon:     { glowRGBA: '230,190,255', coreHi: '#fff5ff', coreMid: '#d9a8ff', coreLo: '#7a3fa0', shadow: '#d9a8ff' },
   };
 
   const ORB_MIN_FROM_CENTER   = 220;

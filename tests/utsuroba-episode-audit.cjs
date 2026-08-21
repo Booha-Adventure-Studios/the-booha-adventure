@@ -27,7 +27,7 @@ for (const entry of index.episodes) {
     `${entry.id}: restored memories need a bilingual world echo`);
   assert.ok(/^room_\d{2}$/.test(episode.worldEcho.roomId),
     `${entry.id}: world echo roomId is invalid`);
-  assert.ok(['lantern', 'candy', 'reflection'].includes(episode.worldEcho.motif),
+  assert.ok(['lantern', 'candy', 'reflection', 'thorn', 'ribbon'].includes(episode.worldEcho.motif),
     `${entry.id}: world echo motif is unsupported`);
   assert.ok(Number.isFinite(episode.worldEcho.x) && episode.worldEcho.x >= 0 && episode.worldEcho.x <= 1 &&
     Number.isFinite(episode.worldEcho.y) && episode.worldEcho.y >= 0 && episode.worldEcho.y <= 1,
