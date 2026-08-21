@@ -181,6 +181,19 @@
       data.utsuroba.readingEchoes = {};
       dirty = true;
     }
+    if (!data.utsuroba.readingOnboarding || typeof data.utsuroba.readingOnboarding !== 'object') {
+      data.utsuroba.readingOnboarding = { seen: false, calibration: null };
+      dirty = true;
+    } else {
+      if (typeof data.utsuroba.readingOnboarding.seen !== 'boolean') {
+        data.utsuroba.readingOnboarding.seen = false;
+        dirty = true;
+      }
+      if (!['guided', 'independent', null].includes(data.utsuroba.readingOnboarding.calibration)) {
+        data.utsuroba.readingOnboarding.calibration = null;
+        dirty = true;
+      }
+    }
 
     /* ── Weekly drifter reset ───────────────────────────────
        Drifter memories reset with the weekly content.
@@ -1044,6 +1057,7 @@
     window.UtsurobaReading.start({
       drifter,
       reviewOnly: true,
+      skipOnboarding: true,
       adaptiveMode,
       quest: { episodeId: reviewEntry.episodeId, readingIndex: 0, mechanicIndex: 0, postcard: reviewEntry.postcard || null },
       onClose: () => { state.inputLocked = false; },
@@ -1425,6 +1439,12 @@
     return ok;
   }
 
+  function persistReadingOnboarding(patch) {
+    const data = loadSave();
+    data.utsuroba.readingOnboarding = { ...(data.utsuroba.readingOnboarding || {}), ...patch };
+    return writeSave(data);
+  }
+
   /* Pass 2 adapter: quest code supplies state callbacks; the reading module
      owns the episode loading, transcript UI, and comprehension interaction. */
   function startReadingChallenge(drifter, quest) {
@@ -1434,6 +1454,9 @@
       drifter,
       quest,
       persist: persistQuestPatch,
+      adaptiveMode: readUtsuroba().readingOnboarding?.calibration || 'guided',
+      onboarding: readUtsuroba().readingOnboarding,
+      persistOnboarding: persistReadingOnboarding,
       onClose: () => {
         state.inputLocked = false;
         try { music.play().catch(() => {}); } catch(_) {}
