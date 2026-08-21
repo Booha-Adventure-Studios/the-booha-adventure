@@ -58,9 +58,18 @@ const BOSS_CONFIG = {
 // ── WEAPON LEVELS ────────────────────────────────────────────
 // Combo thresholds that unlock higher spread levels
 const WEAPON_COMBO_THRESHOLDS = {
-  level2: 7,   // triple shot
-  level3: 15,  // five-way
-  level4: 30,  // seven-chaos
+  level2: 7,   // spread gun
+  level3: 15,  // burst gun
+  level4: 30,  // pierce gun
+};
+
+// Weapon identity matters more than raw projectile count. Combo weapons stay
+// readable and capped; candy weapons temporarily grant a distinct mode.
+const WEAPON_MODES = {
+  pulse:  { en: "PULSE",  jp: "パルス",  color: "#fff0a8" },
+  spread: { en: "SPREAD", jp: "ひろがる", color: "#74d9ff" },
+  burst:  { en: "BURST",  jp: "れんしゃ", color: "#ff8bd8" },
+  pierce: { en: "PIERCE", jp: "かんつう", color: "#d2a5ff" },
 };
 
 // ── CANDY ────────────────────────────────────────────────────
@@ -68,8 +77,8 @@ const CANDY_TYPES = ["pink", "blue", "gold", "green", "star"];
 
 // Pool of candy types to randomly pick from per wave bracket.
 // pink  = energy + boost
-// blue  = 30s triple-shot (weapon level 2)
-// star  = 30s five-way    (weapon level 3)
+// blue  = 30s spread gun
+// star  = 30s pierce gun
 // gold  = score bomb (wipes all normal bugs)
 // green = shield (8s)
 const CANDY_WEIGHTS = {
