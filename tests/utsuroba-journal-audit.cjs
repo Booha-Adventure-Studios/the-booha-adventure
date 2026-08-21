@@ -8,6 +8,7 @@ const path = require('path');
 const ROOT = path.resolve(__dirname, '..');
 const utsuroba = fs.readFileSync(path.join(ROOT, 'js', 'utsuroba.js'), 'utf8');
 const reading = fs.readFileSync(path.join(ROOT, 'js', 'utsuroba-reading.js'), 'utf8');
+const data = fs.readFileSync(path.join(ROOT, 'js', 'utsuroba-data.js'), 'utf8');
 
 assert.match(utsuroba, /readingJournal/, 'Utsuroba save migration must initialize the reading journal');
 assert.match(utsuroba, /readingJournalButton/, 'Utsuroba must expose the journal from the world UI');
@@ -18,6 +19,9 @@ assert.match(utsuroba, /definitionJP/, 'Word Cabinet entries must retain simple 
 assert.match(utsuroba, /readingEchoes/, 'Restored memories must create weekly world echoes');
 assert.match(utsuroba, /renderMemoryEchoes/, 'Utsuroba must render restored memory echoes');
 assert.match(utsuroba, /restoredGreeting/, 'Drifters must have post-memory dialogue');
+assert.match(utsuroba, /openMemoryConvergence/, 'Utsuroba must expose the world-level convergence scene');
+assert.match(utsuroba, /convergenceSeen/, 'Convergence completion must persist');
+assert.match(data, /readingConvergence/, 'Utsuroba data must define the world-level reading convergence');
 assert.match(utsuroba, /masteryLevel/, 'Journal entries must persist adaptive reading mastery');
 assert.match(utsuroba, /recordReadingReview/, 'Review results must update the learner reading state');
 assert.match(utsuroba, /recordWordPracticeResult/, 'Word practice must persist vocabulary review results');

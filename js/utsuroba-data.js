@@ -3,6 +3,31 @@ window.UTSUROBA_DATA = {
 
   startRoom: "room_03",
 
+  readingConvergence: {
+    gateRoom: "room_03",
+    x: 0.50,
+    y: 0.31,
+    title: "The Three Echoes",
+    titleJP: "三つの残響",
+    intro: "The memories are different, but each person found a small truth inside the fear.",
+    introJP: "記憶は違いますが、三人とも恐怖の中に小さな真実を見つけました。",
+    prompt: "What connects the three memories?",
+    promptJP: "三つの記憶をつなぐものは何ですか？",
+    choices: [
+      "Each person understood something that first frightened them.",
+      "Everyone lost the same object.",
+      "None of them remembered another person."
+    ],
+    choicesJP: [
+      "三人とも、最初は怖かったことを理解した。",
+      "全員が同じ物をなくした。",
+      "誰も他の人を覚えていなかった。"
+    ],
+    correct: 0,
+    success: "The gate opens. Utsuroba is no longer only a place where memories disappear.",
+    successJP: "門が開いた。うつろばは、記憶が消えるだけの場所ではなくなった。"
+  },
+
   roomStandingCoords: {
     room_01: { x: 491, y: 557 },
     room_05: { x: 820, y: 580 },

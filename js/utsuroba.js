@@ -450,6 +450,7 @@
   let exitPopOverlay = null, exitPopCooldownUntil = 0;
   let drifterPanel = null, drifterPanelOpen = false, drifterPanelCooldown = 0;
   let readingJournalOverlay = null, readingJournalOpen = false;
+  let convergenceOverlay = null, convergenceOpen = false;
 
   let drifterFadeStart = 0;
   let _lastWrongId     = '';
@@ -492,6 +493,33 @@
       .utsu-memory-echo.motif-reflection .echo-icon{color:#b8e4ff;text-shadow:0 0 14px #7dc8ff;}
       @keyframes echoBreathe{0%,100%{transform:scale(.82);opacity:.55}50%{transform:scale(1.12);opacity:1}}
       @keyframes echoFloat{0%,100%{transform:translate(-50%,-48%)}50%{transform:translate(-50%,-58%)}}
+      .utsu-memory-gate{position:absolute;transform:translate(-50%,-50%);width:140px;height:120px;padding:0;border:0;background:transparent;pointer-events:auto;cursor:pointer;filter:drop-shadow(0 0 20px rgba(216,168,255,.48));}
+      .utsu-memory-gate .gate-ring{position:absolute;left:50%;top:50%;width:72px;height:72px;transform:translate(-50%,-50%) rotate(45deg);border:2px solid rgba(216,168,255,.78);box-shadow:0 0 24px rgba(216,168,255,.48),inset 0 0 22px rgba(216,168,255,.18);animation:gatePulse 2.6s ease-in-out infinite;}
+      .utsu-memory-gate .gate-core{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);color:#f1d9ff;font-size:28px;text-shadow:0 0 18px #d8a8ff;animation:echoFloat 2.2s ease-in-out infinite;}
+      .utsu-memory-gate .gate-label{position:absolute;left:50%;top:calc(100% - 5px);transform:translateX(-50%);min-width:150px;padding:5px 8px;border:1px solid rgba(216,168,255,.42);border-radius:6px;background:rgba(18,7,28,.9);color:#f1d9ff;text-align:center;font:700 10px/1.2 Georgia,serif;white-space:nowrap;}
+      .utsu-memory-gate .gate-label small{display:block;margin-top:3px;color:rgba(241,217,255,.6);font-size:9px;font-weight:400;}
+      @keyframes gatePulse{0%,100%{transform:translate(-50%,-50%) rotate(45deg) scale(.86);opacity:.65}50%{transform:translate(-50%,-50%) rotate(45deg) scale(1.08);opacity:1}}
+      #utsuroba-memory-convergence{position:fixed;inset:0;z-index:9350;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(4,0,12,.88);font-family:Georgia,serif;}
+      .memory-convergence-card{position:relative;width:min(760px,100%);max-height:calc(100vh - 36px);overflow:auto;padding:clamp(22px,4vw,36px);box-sizing:border-box;border:1px solid rgba(216,168,255,.48);border-radius:16px;background:linear-gradient(160deg,#171020,#0b0712 68%,#130b1b);box-shadow:0 0 75px rgba(100,30,160,.38);animation:utsuPopIn .22s ease-out;}
+      .memory-convergence-close{position:absolute;right:14px;top:12px;background:transparent;border:0;color:rgba(255,255,255,.55);font-size:18px;cursor:pointer;padding:8px;}
+      .memory-convergence-eyebrow{color:#d8a8ff;font:700 11px/1.4 monospace;letter-spacing:.16em;text-transform:uppercase;margin-bottom:8px;}
+      .memory-convergence-card h2{margin:0 42px 6px;color:#fff4ff;font-size:clamp(1.35rem,3vw,2rem);}
+      .memory-convergence-card h2 span{display:block;color:rgba(255,220,255,.58);font-size:.5em;font-weight:400;margin-top:4px;}
+      .memory-convergence-intro{margin:0 0 16px;color:#f5e8ff;font-size:.88rem;line-height:1.5;}
+      .memory-convergence-intro small{display:block;margin-top:3px;color:rgba(245,232,255,.54);font-size:.82em;}
+      .memory-convergence-map{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0 0 18px;}
+      .memory-convergence-memory{padding:10px 8px;border:1px solid rgba(216,168,255,.24);border-radius:8px;background:rgba(255,255,255,.045);}
+      .memory-convergence-memory strong{display:block;color:#fff;font-size:.77rem;line-height:1.3;}
+      .memory-convergence-memory small{display:block;margin-top:4px;color:rgba(255,231,178,.58);font-size:.66rem;line-height:1.3;}
+      .memory-convergence-question{margin:0 0 8px;color:#ffdf9b;font-size:.86rem;line-height:1.4;}
+      .memory-convergence-question small{display:block;margin-top:3px;color:rgba(255,231,178,.58);font-size:.86em;}
+      .memory-convergence-choice{display:block;width:100%;margin-top:7px;padding:9px 10px;text-align:left;border:1px solid rgba(216,168,255,.32);border-radius:7px;background:rgba(255,255,255,.055);color:#fff;cursor:pointer;font:inherit;font-size:.78rem;line-height:1.35;}
+      .memory-convergence-choice:hover,.memory-convergence-choice:focus-visible{background:rgba(216,168,255,.14);border-color:#d8a8ff;outline:none;}
+      .memory-convergence-choice small{display:block;margin-top:3px;color:rgba(255,255,255,.48);font-size:.9em;}
+      .memory-convergence-feedback{margin-top:11px;padding:9px 10px;border-left:3px solid #ffcb75;color:#ffe7b2;font-size:.78rem;line-height:1.45;}
+      .memory-convergence-feedback small{display:block;margin-top:3px;color:rgba(255,231,178,.58);font-size:.9em;}
+      .memory-convergence-close-btn{margin-top:17px;padding:9px 18px;border:1px solid #ffcb75;border-radius:7px;background:rgba(255,203,117,.12);color:#ffe7b2;cursor:pointer;font:700 .78rem Georgia,serif;}
+      @media(max-width:700px){.memory-convergence-map{grid-template-columns:1fr}.memory-convergence-card{padding:21px 16px}}
       .utsuroba-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;display:block;pointer-events:none;user-select:none;}
       #buki-canvas{position:absolute;inset:0;z-index:10;pointer-events:none;}
       #buki-fade{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none;z-index:20;}
@@ -789,6 +817,73 @@
       });
       echoLayer.appendChild(button);
     });
+    const gate = DATA.readingConvergence;
+    if (gate && gate.gateRoom === state.roomId && allReadingMemoriesRestored()) {
+      const gateButton = document.createElement('button');
+      gateButton.type = 'button';
+      gateButton.className = 'utsu-memory-gate';
+      gateButton.style.left = `${Math.max(0, Math.min(1, gate.x)) * 100}%`;
+      gateButton.style.top = `${Math.max(0, Math.min(1, gate.y)) * 100}%`;
+      gateButton.setAttribute('aria-label', `${gate.title}. Open convergence reading.`);
+      gateButton.innerHTML = `<span class="gate-ring"></span><span class="gate-core" aria-hidden="true">✦</span><span class="gate-label">${escapeHTML(gate.title)}<small>${escapeHTML(gate.titleJP)}</small></span>`;
+      gateButton.addEventListener('click', event => { event.stopPropagation(); openMemoryConvergence(); });
+      echoLayer.appendChild(gateButton);
+    }
+  }
+
+  function allReadingMemoriesRestored() {
+    const episodeDrifters = DATA.drifters.filter(drifter => drifter.episodeId);
+    return episodeDrifters.length >= 3 && episodeDrifters.every(drifter => !drifterHasMemories(drifter.id));
+  }
+
+  function closeMemoryConvergence() {
+    convergenceOpen = false;
+    if (convergenceOverlay) convergenceOverlay.remove();
+    convergenceOverlay = null;
+    state.inputLocked = false;
+  }
+
+  async function openMemoryConvergence() {
+    if (convergenceOpen || !allReadingMemoriesRestored() || drifterPanelOpen || readingJournalOpen) return;
+    convergenceOpen = true;
+    state.inputLocked = true;
+    convergenceOverlay = document.createElement('div');
+    convergenceOverlay.id = 'utsuroba-memory-convergence';
+    convergenceOverlay.innerHTML = '<div class="memory-convergence-card"><div class="memory-convergence-eyebrow">MEMORY GATE / 記憶の門</div><h2>Opening the gate…<span>門を開いています…</span></h2></div>';
+    document.body.appendChild(convergenceOverlay);
+    try {
+      await window.UTSUROBA_EPISODES_READY;
+      if (!convergenceOpen) return;
+      const convergence = DATA.readingConvergence;
+      const episodeDrifters = DATA.drifters.filter(drifter => drifter.episodeId);
+      const memories = episodeDrifters.map(drifter => window.UTSUROBA_EPISODES[drifter.episodeId]).filter(Boolean);
+      const cards = memories.map(episode => `<article class="memory-convergence-memory"><strong>${escapeHTML(episode.title)}</strong><small>${escapeHTML(episode.worldEcho.label)}</small></article>`).join('');
+      let revealed = !!readUtsuroba().flags?.convergenceSeen;
+      const render = (feedback = '') => {
+        convergenceOverlay.innerHTML = `<div class="memory-convergence-card"><button class="memory-convergence-close" type="button" aria-label="Close memory gate">✕</button><div class="memory-convergence-eyebrow">MEMORY GATE / 記憶の門</div><h2>${escapeHTML(convergence.title)}<span>${escapeHTML(convergence.titleJP)}</span></h2><p class="memory-convergence-intro">${escapeHTML(convergence.intro)}<small>${escapeHTML(convergence.introJP)}</small></p><div class="memory-convergence-map">${cards}</div>${revealed ? `<div class="memory-convergence-feedback">${escapeHTML(convergence.success)}<small>${escapeHTML(convergence.successJP)}</small></div><button class="memory-convergence-close-btn" id="memory-convergence-done" type="button">Close the gate / 門を閉じる</button>` : `<p class="memory-convergence-question">${escapeHTML(convergence.prompt)}<small>${escapeHTML(convergence.promptJP)}</small></p>${feedback ? `<div class="memory-convergence-feedback">${feedback}</div>` : ''}${convergence.choices.map((choice, index) => `<button class="memory-convergence-choice" type="button" data-convergence-choice="${index}">${escapeHTML(choice)}<small>${escapeHTML(convergence.choicesJP[index] || '')}</small></button>`).join('')}`}</div>`;
+        convergenceOverlay.querySelector('.memory-convergence-close').addEventListener('click', closeMemoryConvergence);
+        const done = convergenceOverlay.querySelector('#memory-convergence-done');
+        if (done) done.addEventListener('click', closeMemoryConvergence);
+        convergenceOverlay.querySelectorAll('[data-convergence-choice]').forEach(button => button.addEventListener('click', () => {
+          const choice = Number(button.dataset.convergenceChoice);
+          if (choice === convergence.correct) {
+            const data = loadSave();
+            data.utsuroba.flags.convergenceSeen = true;
+            writeSave(data);
+            revealed = true;
+            render();
+          } else {
+            render('<strong>Look at all three memories again.</strong> The connection is about understanding fear.<small>三つの記憶をもう一度見ましょう。恐怖を理解することがつながりです。</small>');
+          }
+        }));
+      };
+      render();
+      convergenceOverlay.addEventListener('click', event => { if (event.target === convergenceOverlay) closeMemoryConvergence(); });
+    } catch (error) {
+      console.error('[Utsuroba] Could not open memory gate:', error);
+      convergenceOverlay.innerHTML = '<div class="memory-convergence-card"><button class="memory-convergence-close" type="button">Close / 閉じる</button><p class="memory-convergence-intro">The gate is cloudy. Please try again.<small>門がぼやけています。もう一度試してください。</small></p></div>';
+      convergenceOverlay.querySelector('.memory-convergence-close').addEventListener('click', closeMemoryConvergence);
+    }
   }
 
   function refreshMemoryEchoes() {
@@ -1869,6 +1964,7 @@
       state.exitingToKarasuki ||
       state.celebrating       ||
       drifterPanelOpen        ||
+      convergenceOpen        ||
       (window.UtsurobaReading && window.UtsurobaReading.isOpen()) ||
       isExitPopOpen()
     );
