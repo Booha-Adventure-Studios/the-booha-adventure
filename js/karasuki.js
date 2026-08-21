@@ -393,8 +393,66 @@ const HAPPY_HOUSE_PORTAL = {
       window.UTSUROBA_EPISODES_READY.then(() => {
         weeklyOrbs = buildWeeklyOrbs();
         updateTrailHud();
+        renderEchoesTracker();
       }).catch(() => {});
     }
+  }
+
+  /* Persistent "Three Echoes" tracker — Pass 1 (see
+     claude/utsuroba-audit-and-pass-plan.md). Display-only mirror of
+     Utsuroba's tracker so a kid can see the same 0-3 progress while
+     hunting orbs here, without needing to walk back to Utsuroba to
+     check. utsuroba-data.js isn't loaded on this page, so the three
+     required episodes are listed here directly — keep this in sync
+     with UTSUROBA_DATA.readingConvergence.requiredDrifterIds if that
+     ever changes. */
+  const THREE_ECHOES_EPISODES = [
+    { drifterId: 'ks',  episodeId: 'ks_lantern_v1' },
+    { drifterId: 'nto', episodeId: 'nto_candy_v1' },
+    { drifterId: 'cg',  episodeId: 'cg_door_v1' },
+  ];
+  const ECHO_ICON_FOR  = { lantern: '✦', candy: '●', reflection: '◈' };
+  const ECHO_STYLE_FOR = {
+    lantern:    { bg: 'radial-gradient(circle at 35% 30%,#fffde0,#ffd966 55%,#c8860a)', glow: 'rgba(255,217,102,.55)' },
+    candy:      { bg: 'radial-gradient(circle at 35% 30%,#fff0f4,#ff85a1 55%,#c23a5e)', glow: 'rgba(255,133,161,.55)' },
+    reflection: { bg: 'radial-gradient(circle at 35% 30%,#eafcff,#a8edff 55%,#3b8fbf)', glow: 'rgba(168,237,255,.55)' },
+  };
+  let echoesTrackerEl = null;
+
+  function injectEchoesTracker() {
+    if (echoesTrackerEl) return;
+    echoesTrackerEl = document.createElement('div');
+    echoesTrackerEl.id = 'karasuki-echoes-tracker';
+    echoesTrackerEl.style.cssText = `
+      display:none;position:fixed;right:14px;top:14px;z-index:7000;
+      padding:9px 12px;border:1px solid rgba(216,168,255,.42);border-radius:14px;
+      background:rgba(9,0,18,.84);box-shadow:0 0 18px rgba(100,30,160,.18);
+      color:#f1d9ff;font-family:Georgia,serif;pointer-events:none;`;
+    document.body.appendChild(echoesTrackerEl);
+  }
+
+  function renderEchoesTracker() {
+    if (!echoesTrackerEl || !window.UTSUROBA_EPISODES) return;
+    const episodes = window.UTSUROBA_EPISODES;
+    let restored = {};
+    try {
+      const data = (window.BoohaAdventure && BoohaAdventure.save) ? BoohaAdventure.save.load() : null;
+      restored = (data && data.utsuroba && data.utsuroba.readingEchoes) || {};
+    } catch (_) {}
+    const dots = THREE_ECHOES_EPISODES.map(entry => {
+      const episode = episodes[entry.episodeId];
+      const motif = episode?.worldEcho?.motif && ECHO_ICON_FOR[episode.worldEcho.motif] ? episode.worldEcho.motif : 'lantern';
+      const isLit = !!restored[entry.episodeId];
+      const colors = ECHO_STYLE_FOR[motif];
+      const dotStyle = isLit
+        ? `background:${colors.bg};box-shadow:0 0 10px ${colors.glow};color:#241507;`
+        : `background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);color:rgba(255,255,255,.28);`;
+      return `<span style="width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:13px;${dotStyle}">${ECHO_ICON_FOR[motif]}</span>`;
+    }).join('');
+    echoesTrackerEl.style.display = 'block';
+    echoesTrackerEl.innerHTML = `
+      <div style="font:700 10px/1.3 monospace;letter-spacing:.1em;text-transform:uppercase;">Three Echoes<span style="display:block;margin-top:2px;color:rgba(241,217,255,.5);font-size:9px;font-weight:400;letter-spacing:.02em;text-transform:none;">三つの残響</span></div>
+      <div style="margin-top:8px;display:flex;gap:6px;">${dots}</div>`;
   }
 
   function getOrbsForRoom(roomId) {
@@ -555,6 +613,7 @@ const HAPPY_HOUSE_PORTAL = {
 
   function doCollect(orb) {
     orb.collected = true;
+    playCollectChime();
     if (orb.isTrail) {
       const quest = loadDrifterQuest();
       const episode = getQuestEpisode(quest);
@@ -1637,6 +1696,17 @@ const HAPPY_HOUSE_PORTAL = {
   const music    = new Audio('assets/audio/karasuki-music.mp3');
   music.loop     = true;
   music.volume   = 0.65;
+
+  /* Small SFX (Pass 1) — a light chime on evidence pickup. Same
+     ding.mp3 used as the "correct/success" cue across the
+     curriculum games, so it stays consistent with house sound. */
+  function playCollectChime() {
+    try {
+      const a = new Audio('assets/audio/ding.mp3');
+      a.volume = 0.5;
+      a.play().catch(() => {});
+    } catch (_) {}
+  }
 
   let app, stage, canvas, ctx, roomLayer, coordToggle, coordReadout, pinLog;
   let portalOverlay = null;
@@ -2924,7 +2994,7 @@ function drawObserver(now) {
      INIT
   ═══════════════════════════════════════════ */
   function init() {
-    injectStyles(); buildApp(); injectTrailHud(); KarasukiAtmos.init(stage);
+    injectStyles(); buildApp(); injectTrailHud(); injectEchoesTracker(); KarasukiAtmos.init(stage);
     fitStage(); resizeCanvas();
     initOrbs(); updateTrailHud(); renderInitialRoom(); initWanderers(); initNuppi(); bindInput();
     
