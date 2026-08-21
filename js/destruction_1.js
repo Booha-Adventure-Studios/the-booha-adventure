@@ -72,6 +72,7 @@
   let staticRenderKey = '';
   let toastWasVisible = false;
   let exitConfirmOpen = false;
+  let pauseOpen = false;
   let hallReturnState = null;
 
   // ── Canvas ──────────────────────────────────────────
@@ -2451,6 +2452,7 @@ function traitGlowColor(block) {
   }
   const ACTION_RECT = { x: W / 2 - 145, y: H / 2 + 105, w: 290, h: 58 };
   const EXIT_MODAL = { x: W / 2 - 250, y: H / 2 - 104, w: 500, h: 208 };
+  const PAUSE_MODAL = { x: W / 2 - 220, y: H / 2 - 222, w: 440, h: 444 };
   const CONTROL_DOCK = [
     { id:'hall',  label:'★ HALL', w:70 },
     { id:'mute',  label:'♪',      w:36 },
@@ -2522,6 +2524,35 @@ function traitGlowColor(block) {
     return px>=hit.x&&px<=hit.x+hit.w&&py>=hit.y&&py<=hit.y+hit.h;
   }
 
+  // ── Pause menu ─────────────────────────────────────────
+  // A real pause: unlike the old exit-only dialog, opening this does not
+  // leave the sim running behind it — see tick(), which now checks
+  // pauseOpen before stepping physics/FX at all.
+  function openPause() {
+    if (gs.phase !== P.PLAY) return;
+    pauseOpen = true;
+    gs.dragging = false; gs.pullPlayed = false;
+    needsRender = true;
+  }
+  function closePause() {
+    pauseOpen = false;
+    needsRender = true;
+  }
+  function pauseLayout() {
+    const m = PAUSE_MODAL, bw = m.w - 60, bh = 56, gap = 14;
+    const startY = m.y + 128;
+    const rows = [
+      { id:'resume',  en:'RESUME',        jp:'つづける',       accent:true  },
+      { id:'restart', en:'RESTART ROUND', jp:'ラウンドをやりなおす', accent:false },
+      { id:'save',    en:'SAVE',          jp:'セーブ',         accent:false, disabled:true },
+      { id:'exit',    en:'EXIT',          jp:'おわる',         accent:false, danger:true },
+    ];
+    return rows.map((row, i) => ({ ...row, x:m.x+30, y:startY+i*(bh+gap), w:bw, h:bh }));
+  }
+  function pauseHit(px, py) {
+    return pauseLayout().find(b => px>=b.x&&px<=b.x+b.w&&py>=b.y&&py<=b.y+b.h)?.id || '';
+  }
+
   function onDown(evt){
     const p=worldPt(evt);
     if(exitConfirmOpen){
@@ -2529,12 +2560,20 @@ function traitGlowColor(block) {
       else if(exitModalHit(p.x,p.y,'exit')){exitConfirmOpen=false;performExit();}
       evt.preventDefault();return;
     }
+    if(pauseOpen){
+      const hit = pauseHit(p.x,p.y);
+      if(hit === 'resume') closePause();
+      else if(hit === 'restart'){ closePause(); loadRound(gs.round); showBriefing(); }
+      else if(hit === 'save') setToast('Save menu — coming in the next pass / つぎのアップデートで', '#7cfff8', 2400);
+      else if(hit === 'exit'){ closePause(); leaveGame(); }
+      evt.preventDefault();return;
+    }
     const dockAction = controlDockHit(p.x, p.y);
 
     if(dockAction === 'mute'){toggleMute();evt.preventDefault();return;}
     if(dockAction === 'help'){openHelp();evt.preventDefault();return;}
     if(dockAction === 'hall' && gs.phase !== P.HALL){showHall();evt.preventDefault();return;}
-    if(dockAction === 'exit'){leaveGame();evt.preventDefault();return;}
+    if(dockAction === 'exit'){ if(gs.phase===P.PLAY) openPause(); else leaveGame(); evt.preventDefault();return;}
     if(dockAction === 'hall' && gs.phase === P.HALL){returnFromHall();evt.preventDefault();return;}
     getAC();
 
@@ -3050,13 +3089,15 @@ function traitGlowColor(block) {
     for (const item of items) {
       const isBack = item.id === 'hall' && gs.phase === P.HALL;
       const isExit = item.id === 'exit';
-      ctx.fillStyle = isExit ? 'rgba(255,108,108,0.16)' : 'rgba(5,8,14,0.84)';
-      ctx.strokeStyle = isExit ? 'rgba(255,150,150,0.64)' : 'rgba(255,255,255,0.35)';
+      const isPauseBtn = isExit && gs.phase === P.PLAY;
+      ctx.fillStyle = isPauseBtn ? 'rgba(124,255,248,0.14)' : isExit ? 'rgba(255,108,108,0.16)' : 'rgba(5,8,14,0.84)';
+      ctx.strokeStyle = isPauseBtn ? 'rgba(124,255,248,0.55)' : isExit ? 'rgba(255,150,150,0.64)' : 'rgba(255,255,255,0.35)';
       ctx.lineWidth = 1.5;
       rr(ctx,item.x,item.y,item.w,item.h,10,true,true);
-      ctx.fillStyle = isExit ? '#ffb0a8' : (item.id === 'mute' && !AUDIO_STATE.muted ? '#7cfff8' : '#fff');
-      ctx.font = `bold ${item.id === 'hall' ? 11 : 13}px system-ui,sans-serif`;
-      ctx.fillText(isBack ? 'BACK' : item.id === 'mute' && AUDIO_STATE.muted ? '×' : item.label, item.x + item.w / 2, item.y + item.h / 2);
+      ctx.fillStyle = isPauseBtn ? '#7cfff8' : isExit ? '#ffb0a8' : (item.id === 'mute' && !AUDIO_STATE.muted ? '#7cfff8' : '#fff');
+      ctx.font = `bold ${item.id === 'hall' ? 11 : isPauseBtn ? 15 : 13}px system-ui,sans-serif`;
+      const label = isBack ? 'BACK' : isPauseBtn ? '❚❚' : (item.id === 'mute' && AUDIO_STATE.muted ? '×' : item.label);
+      ctx.fillText(label, item.x + item.w / 2, item.y + item.h / 2);
     }
     ctx.restore();
   }
@@ -3374,6 +3415,35 @@ function traitGlowColor(block) {
     ctx.restore();
   }
 
+  function drawPause(){
+    if(!pauseOpen)return;
+    const m=PAUSE_MODAL;
+    ctx.save();
+    ctx.fillStyle='rgba(0,0,0,0.66)';ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='rgba(8,10,18,0.97)';ctx.strokeStyle='rgba(124,255,248,0.55)';ctx.lineWidth=2;
+    rr(ctx,m.x,m.y,m.w,m.h,20,true,true);
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillStyle='#7cfff8';ctx.font='bold 26px system-ui,sans-serif';ctx.fillText('PAUSED',W/2,m.y+50);
+    ctx.fillStyle='rgba(255,255,255,0.6)';ctx.font='13px system-ui,sans-serif';ctx.fillText('いちじていし',W/2,m.y+76);
+
+    for (const b of pauseLayout()){
+      const danger=b.danger, dim=b.disabled;
+      ctx.save();
+      if (dim) ctx.globalAlpha=0.42;
+      ctx.fillStyle = b.accent ? 'rgba(124,255,248,0.16)' : danger ? 'rgba(255,105,105,0.14)' : 'rgba(255,255,255,0.06)';
+      ctx.strokeStyle = b.accent ? 'rgba(124,255,248,0.75)' : danger ? 'rgba(255,150,150,0.55)' : 'rgba(255,255,255,0.24)';
+      ctx.lineWidth=1.5;
+      rr(ctx,b.x,b.y,b.w,b.h,12,true,true);
+      ctx.fillStyle = b.accent ? '#7cfff8' : danger ? '#ffb0a8' : '#fff';
+      ctx.font='bold 15px system-ui,sans-serif';
+      ctx.fillText(b.en, W/2, b.y+b.h/2-10);
+      ctx.fillStyle='rgba(255,255,255,0.5)';ctx.font='11px system-ui,sans-serif';
+      ctx.fillText(dim ? `${b.jp} · Pass 3` : b.jp, W/2, b.y+b.h/2+11);
+      ctx.restore();
+    }
+    ctx.restore();
+  }
+
   // ── Render ───────────────────────────────────────────
   function render(){
     const sx=shake.v>0.3?(rnd()-0.5)*shake.v*2:0,sy=shake.v>0.3?(rnd()-0.5)*shake.v*1.4:0;
@@ -3396,6 +3466,7 @@ function traitGlowColor(block) {
     else if(gs.phase===P.WIN||gs.phase===P.FAIL){drawHUD();drawCard();}
     else drawHUD();
     drawToast();
+    drawPause();
     drawExitConfirm();
     ctx.restore();
   }
@@ -3408,7 +3479,7 @@ function traitGlowColor(block) {
     lastT=now;
     const workStart = performance.now();
 
-    if(gs.phase===P.PLAY){
+    if(gs.phase===P.PLAY && !pauseOpen){
       physicsCarry=Math.min(FIXED_STEP*4,physicsCarry+frameMs);
       let steps=0;
       while(physicsCarry>=FIXED_STEP&&steps<4){
@@ -3420,6 +3491,11 @@ function traitGlowColor(block) {
         physicsCarry-=FIXED_STEP;steps++;
         if(gs.phase!==P.PLAY){physicsCarry=0;break;}
       }
+    } else if (gs.phase===P.PLAY && pauseOpen) {
+      // Paused: freeze the sim entirely, including FX. Don't let carry build
+      // up while paused either, or resuming dumps a stutter-step of queued
+      // physics in one frame.
+      physicsCarry=0;
     } else if (gs.phase===P.WIN || gs.phase===P.FAIL) {
       physicsCarry=0;
       updateFX();
