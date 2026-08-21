@@ -11,6 +11,62 @@ window.UTSUROBA_DATA = {
     titleJP: "三つの残響",
     intro: "The memories are different, but each person found a small truth inside the fear.",
     introJP: "記憶は違いますが、三人とも恐怖の中に小さな真実を見つけました。",
+    cluePrompt: "Choose the key clue from each memory.",
+    cluePromptJP: "それぞれの記憶から、大切な手がかりを選びましょう。",
+    clueChecks: [
+      {
+        episodeId: "ks_lantern_v1",
+        title: "Kurobane's clue",
+        titleJP: "クロバネの手がかり",
+        choices: [
+          "The missing lantern explained why Chiyo could not find the way home.",
+          "The second bell made Chiyo forget every room.",
+          "Kurobane wanted to hide a new lantern."
+        ],
+        choicesJP: [
+          "消えた灯りが、チヨが帰り道を見つけられなかった理由を説明した。",
+          "二つ目の鐘が、チヨにすべての部屋を忘れさせた。",
+          "クロバネは新しい灯りを隠したかった。"
+        ],
+        correct: 0
+      },
+      {
+        episodeId: "nto_candy_v1",
+        title: "Ned's clue",
+        titleJP: "ネドの手がかり",
+        choices: [
+          "The missing candy may have been eaten and forgotten.",
+          "The red wrapper proved that someone stole the candy.",
+          "Ned never had a candy in the first place."
+        ],
+        choicesJP: [
+          "なくなったキャンディは、食べて忘れたのかもしれない。",
+          "赤い包み紙は、誰かがキャンディを盗んだ証拠だった。",
+          "ネドは、最初からキャンディを持っていなかった。"
+        ],
+        correct: 0
+      },
+      {
+        episodeId: "cg_door_v1",
+        title: "Chagrin's clue",
+        titleJP: "チャグリンの手がかり",
+        choices: [
+          "The frightening shape was only Chagrin's reflection.",
+          "The door became a person in the dark.",
+          "The hall was empty, so Chagrin had no reason to be afraid."
+        ],
+        choicesJP: [
+          "怖い形は、チャグリン自身の反射だった。",
+          "暗闇の中で、扉が人になった。",
+          "廊下は空っぽだったので、チャグリンが怖がる理由はなかった。"
+        ],
+        correct: 0
+      }
+    ],
+    clueSuccess: "Good clue. Keep building the connection.",
+    clueSuccessJP: "よい手がかりです。つながりを作り続けましょう。",
+    clueRetry: "Read that memory again and choose the clue it proves.",
+    clueRetryJP: "その記憶をもう一度読み、証明される手がかりを選びましょう。",
     prompt: "What connects the three memories?",
     promptJP: "三つの記憶をつなぐものは何ですか？",
     choices: [
