@@ -48,8 +48,8 @@ assert.strictEqual(level4.booha.x, 300, 'level 4 Booha should sit beyond the fir
 assert.strictEqual(level4.launchVx, 0, 'level 4 should not drift away from its bounce pad');
 assert.ok(level4.objects.some(object => object.type === 'bounce' && object.x === 180 && object.width === 140 && object.pushX === 1.5),
   'level 4 bounce pad should launch the candy away from its starting column');
-assert.match(engineSource, /SAFETY_CATCH_Y\s*=\s*FLOOR_Y\s*-\s*84/,
-  'last-second safety catch should remain narrow');
+assert.match(engineSource, /SAFETY_CATCH_Y\s*=\s*FLOOR_Y\s*-\s*50/,
+  'v8 last-second safety catch should remain narrow');
 assert.match(engineSource, /if \(c\.x < c\.r\)/,
   'candy should bounce off the left screen edge');
 
