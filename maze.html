@@ -1395,6 +1395,35 @@ function getCover(){ const scale=Math.max(cssW/IMG_W,cssH/IMG_H); return{scale,o
 function imgToCSS(ix,iy){ const{scale,ox,oy}=getCover(); return{x:ix*scale-ox,y:iy*scale-oy}; }
 function cssToImg(cx,cy){ const{scale,ox,oy}=getCover(); return{ix:Math.round(Math.max(0,Math.min((cx+ox)/scale,IMG_W))),iy:Math.round(Math.max(0,Math.min((cy+oy)/scale,IMG_H)))}; }
 
+// ── Pre-rendered glow sprite cache (perf) ───────────────────────────────────
+// Building a radial gradient + filling a circle for every trail particle /
+// fairy every frame was the single biggest CPU cost in this file — trails
+// alone can be 250-300+ createRadialGradient() calls a frame in steady state.
+// Pre-render one soft white-to-transparent dot per color, once, and reuse it
+// forever after: every particle becomes a single drawImage() instead of a
+// fresh gradient build + fill. Visually identical, much cheaper per call.
+// Only used for single-color (color→transparent) glows — the handful of
+// two-color checkpoint/ghost-body gradients are low-frequency (≤14/frame)
+// and left as-is since caching them wouldn't move the needle.
+const GLOW_SPRITE_SIZE=64;
+const _glowSpriteCache=new Map();
+function getGlowSprite(color){
+  let spr=_glowSpriteCache.get(color);
+  if(spr)return spr;
+  const s=document.createElement('canvas');s.width=s.height=GLOW_SPRITE_SIZE;
+  const sctx=s.getContext('2d');const r=GLOW_SPRITE_SIZE/2;
+  const g=sctx.createRadialGradient(r,r,0,r,r,r);
+  g.addColorStop(0,color);g.addColorStop(1,'transparent');
+  sctx.fillStyle=g;sctx.beginPath();sctx.arc(r,r,r,0,Math.PI*2);sctx.fill();
+  _glowSpriteCache.set(color,s);
+  return s;
+}
+function drawGlow(x,y,radius,color,alpha){
+  if(alpha<=0||radius<=0)return;
+  ctx.globalAlpha=alpha;
+  ctx.drawImage(getGlowSprite(color),x-radius,y-radius,radius*2,radius*2);
+}
+
 // Ghost images
 // Playable ghost images — the sacred main five.
 const ghostImgs = GHOSTS.map(src => {
@@ -1534,6 +1563,11 @@ function restoreMazeFromCheckpoint(){
 }
 
 const GHOST_SIZE=48,WANDER_TRAIL_MAX=60;
+// Extras get a shorter, cheaper trail than the main friend-ghosts — spawn
+// less often and cap lower, since there can be up to 10 of them on screen
+// at once vs. 4 mains. Cheap now that trails are sprite-based (drawImage),
+// not gradient-based, but still worth keeping proportionate.
+const EXTRA_TRAIL_MAX=20,EXTRA_TRAIL_CHANCE=.22;
 let wanderers=[];
 
 function getGamesThisWeekForMaze() {
@@ -1639,7 +1673,16 @@ function tickWanderers(nowMs){
     const sec=nowMs/1000,wob=Math.sin(sec*w.wobbleFreq*Math.PI*2+w.wobblePhase)*w.wobbleAmp,bob=Math.sin(sec*w.bobFreq*Math.PI*2)*w.bobAmp;
     const bx=w.sx+dx*et+nx*wob,by=w.sy+dy*et+ny*wob+bob;
     w.opacity=Math.min(t*6,1,(1-t)*6)*.82;
-    if(w.kind!=='extra'&&Math.random()<.35){const col=MONTH_COLORS[Math.floor(Math.random()*MONTH_COLORS.length)];w.trail.push({x:bx,y:by,life:1,size:2+Math.random()*3.5,color:col[Math.random()<.5?0:1],dx:(Math.random()-.5)*.3,dy:-Math.random()*.4});if(w.trail.length>WANDER_TRAIL_MAX)w.trail.shift();}
+    const _isExtra=w.kind==='extra';
+    if(Math.random()<(_isExtra?EXTRA_TRAIL_CHANCE:.35)){
+      // Main ghosts keep their random rainbow trail; extras trail in their
+      // OWN identity color (the same set their body-glow halo uses) so each
+      // unlockable ghost reads as a consistent little character, not a
+      // random smear.
+      const col=_isExtra?MONTH_COLORS[(GHOSTS.length+w.extraIdx)%MONTH_COLORS.length]:MONTH_COLORS[Math.floor(Math.random()*MONTH_COLORS.length)];
+      w.trail.push({x:bx,y:by,life:1,size:2+Math.random()*3.5,color:col[Math.random()<.5?0:1],dx:(Math.random()-.5)*.3,dy:-Math.random()*.4});
+      if(w.trail.length>(_isExtra?EXTRA_TRAIL_MAX:WANDER_TRAIL_MAX))w.trail.shift();
+    }
     w.cx=bx;w.cy=by;if(t>=1)w.done=true;
   }
   
@@ -1690,22 +1733,34 @@ const col2 = colSet[1];
 const sec = nowMs / 1000;
 const pulseG = .5 + .5 * Math.sin(sec * 2.1 + colorKey * .8);
 
-    // Extras: cheap render — no trail, no radial gradients.
-    // Just the sprite with a gentle opacity breathe + one soft shadow glow.
+    ctx.save();
+
+    // Trail — sprite-based now (drawGlow), so it's cheap enough that the
+    // unlockable "extra" ghosts get one too: shorter, and in their OWN
+    // identity color (set in tickWanderers) rather than a full rainbow, so
+    // it still reads as the lighter/quieter atmospheric visitor it's meant
+    // to be, not a second copy of the main friend-ghost effect.
+    const _trailAlphaMul = w.kind==='extra' ? .28 : .35;
+    for(let pi=w.trail.length-1;pi>=0;pi--){
+      const p=w.trail[pi];
+      drawGlow(p.x,p.y,p.size*2.3,p.color,p.life*_trailAlphaMul*w.opacity);
+      ctx.globalAlpha=p.life*.70*w.opacity;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(p.x,p.y,p.size*.34,0,Math.PI*2);ctx.fill();
+      ctx.globalAlpha=1;p.life-=.018;p.x+=p.dx;p.y+=p.dy;
+    }
+    w.trail=w.trail.filter(p=>p.life>0);
+
+    // Extras: cheap body render — sprite + one breathing shadow glow, no
+    // two-color radial gradient (that part stays main-ghost-only).
     if (w.kind === 'extra') {
-  ctx.save();
   ctx.globalAlpha = w.opacity;                      // sprite always full colour
   ctx.shadowBlur  = (8 + pulseG * 12) * _wScale;    // the halo breathes
   ctx.shadowColor = col1;
   ctx.drawImage(img, gx - drawR, gy - drawR, drawR * 2, drawR * 2);
+  ctx.shadowBlur = 0;
   ctx.restore();
   continue;
 }
-    
-    ctx.save();
-    
-    for(let pi=w.trail.length-1;pi>=0;pi--){const p=w.trail[pi];const gr=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.size*2.3);gr.addColorStop(0,p.color);gr.addColorStop(1,'transparent');ctx.globalAlpha=p.life*.35*w.opacity;ctx.fillStyle=gr;ctx.beginPath();ctx.arc(p.x,p.y,p.size*2.3,0,Math.PI*2);ctx.fill();ctx.globalAlpha=p.life*.70*w.opacity;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(p.x,p.y,p.size*.34,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;p.life-=.018;p.x+=p.dx;p.y+=p.dy;}
-    w.trail=w.trail.filter(p=>p.life>0);
+
     ctx.globalAlpha=w.opacity*(.18+pulseG*.09);const ga=ctx.createRadialGradient(gx,gy+3,0,gx,gy+3,drawR*2);ga.addColorStop(0,col1);ga.addColorStop(.5,col2);ga.addColorStop(1,'transparent');ctx.fillStyle=ga;ctx.beginPath();ctx.arc(gx,gy+3,drawR*2,0,Math.PI*2);ctx.fill();
     ctx.globalAlpha=w.opacity;ctx.drawImage(img,gx-drawR,gy-drawR,drawR*2,drawR*2);ctx.globalAlpha=1;ctx.restore();
   }
@@ -1786,7 +1841,7 @@ function drawTrees(now){
       if(karasuki1Img.complete&&karasuki1Img.naturalWidth>0&&karasukiBlend<1){ctx.globalAlpha=(1-karasukiBlend)*kOp;ctx.drawImage(karasuki1Img,cx-drawW/2,cy-drawH/2,drawW,drawH);}
       if(karasuki2Img.complete&&karasuki2Img.naturalWidth>0&&karasukiBlend>0){ctx.globalAlpha=karasukiBlend*kOp;ctx.drawImage(karasuki2Img,cx-drawW/2,cy-drawH/2,drawW,drawH);}
     }
-    for(const p of karasukiPuffParticles){const pg=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.size*2);pg.addColorStop(0,p.color);pg.addColorStop(1,'transparent');ctx.globalAlpha=p.life*.7;ctx.fillStyle=pg;ctx.beginPath();ctx.arc(p.x,p.y,p.size*2,0,Math.PI*2);ctx.fill();ctx.globalAlpha=p.life*.9;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(p.x,p.y,p.size*.3,0,Math.PI*2);ctx.fill();}
+    for(const p of karasukiPuffParticles){drawGlow(p.x,p.y,p.size*2,p.color,p.life*.7);ctx.globalAlpha=p.life*.9;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(p.x,p.y,p.size*.3,0,Math.PI*2);ctx.fill();}
     ctx.globalAlpha=1;ctx.restore();
   }
 }
@@ -1852,8 +1907,7 @@ function drawFrame(now){
   // ── Layer 2: trail particles ─────────────────────────────────────────────
   for(let i=trail.length-1;i>=0;i--){
     const p=trail[i];const{x,y}=imgToCSS(p.ix,p.iy);
-    const gr=ctx.createRadialGradient(x,y,0,x,y,p.size*2.3);gr.addColorStop(0,p.color);gr.addColorStop(1,'transparent');
-    ctx.globalAlpha=p.life*.40;ctx.fillStyle=gr;ctx.beginPath();ctx.arc(x,y,p.size*2.3,0,Math.PI*2);ctx.fill();
+    drawGlow(x,y,p.size*2.3,p.color,p.life*.40);
     ctx.globalAlpha=p.life*.80;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(x,y,p.size*.34,0,Math.PI*2);ctx.fill();
     ctx.globalAlpha=1;p.life-=.016;p.ix+=p.dx;p.iy+=p.dy;
   }
@@ -1888,7 +1942,7 @@ function drawFrame(now){
       const r=f.orbit*coverScale*(.82+state.extra*.08)*(.92+.08*Math.sin(sec*1.1+f.phase));
       const fx=x+Math.cos(angle)*r,fy=y+Math.sin(angle)*r*.84;
       const fColor=f.useSecondary?col2:col1,fAlpha=twinkle*alpha*(.70+state.extra*.15),fSize=f.size*coverScale*(.65+twinkle*.45);
-      ctx.globalAlpha=fAlpha*.42;const fg=ctx.createRadialGradient(fx,fy,0,fx,fy,fSize*3.2);fg.addColorStop(0,fColor);fg.addColorStop(1,'transparent');ctx.fillStyle=fg;ctx.beginPath();ctx.arc(fx,fy,fSize*3.2,0,Math.PI*2);ctx.fill();
+      drawGlow(fx,fy,fSize*3.2,fColor,fAlpha*.42);
       ctx.globalAlpha=fAlpha;ctx.strokeStyle='#fff';ctx.lineWidth=fSize*.55;ctx.shadowBlur=6;ctx.shadowColor=fColor;const sl=fSize*1.9;ctx.beginPath();ctx.moveTo(fx,fy-sl);ctx.lineTo(fx,fy+sl);ctx.moveTo(fx-sl,fy);ctx.lineTo(fx+sl,fy);ctx.stroke();
       ctx.globalAlpha=fAlpha;ctx.fillStyle='#fff';ctx.shadowBlur=5;ctx.shadowColor=fColor;ctx.beginPath();ctx.arc(fx,fy,fSize*.48,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
     });
