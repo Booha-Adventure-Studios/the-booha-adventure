@@ -18,41 +18,14 @@
     lantern:    { ring: '#ffd966', glow: 'rgba(255,217,102,.5)' },
     candy:      { ring: '#ff85a1', glow: 'rgba(255,133,161,.5)' },
     reflection: { ring: '#a8edff', glow: 'rgba(168,237,255,.5)' },
+    thorn:      { ring: '#d9503a', glow: 'rgba(217,80,58,.5)' },
+    ribbon:     { ring: '#d9a8ff', glow: 'rgba(217,168,255,.5)' },
   };
 
   function escapeText(value) {
     return String(value == null ? '' : value)
       .replace(/&/g, '&amp;').replace(/</g, '&lt;')
       .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-  }
-
-  /* Pass 7: the reading challenge was the one place in Utsuroba's audio
-     pass (Pass 1) that stayed silent on a wrong answer — everything else
-     got a tick or a chime, but a miss here just changed text. This is a
-     soft two-note dip (sine waves, same cheap oscillator-tone approach as
-     utsuroba.js's typewriter tick), not a buzzer — a "try again" nudge,
-     not a punishment, since these are ESL readers working through a story. */
-  let wrongAudioCtx = null;
-  function playWrongTone() {
-    try {
-      const AC = window.AudioContext || window.webkitAudioContext;
-      if (!AC) return;
-      if (!wrongAudioCtx) wrongAudioCtx = new AC();
-      if (wrongAudioCtx.state === 'suspended') wrongAudioCtx.resume().catch(() => {});
-      const now = wrongAudioCtx.currentTime;
-      [392, 330].forEach((freq, i) => {
-        const start = now + i * 0.09;
-        const osc = wrongAudioCtx.createOscillator();
-        const gain = wrongAudioCtx.createGain();
-        osc.type = 'sine';
-        osc.frequency.value = freq;
-        gain.gain.setValueAtTime(0.0001, start);
-        gain.gain.linearRampToValueAtTime(0.085, start + 0.02);
-        gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.17);
-        osc.connect(gain); gain.connect(wrongAudioCtx.destination);
-        osc.start(start); osc.stop(start + 0.18);
-      });
-    } catch (_) {}
   }
 
   function focusFirstControl() {
@@ -601,7 +574,6 @@
     function showWrong(question) {
       mistakeCount += 1;
       showEvidence = false;
-      playWrongTone();
       lastFeedback = `Not quite. Look again at the lines. ${question.evidence}`;
       lastFeedbackJP = question.evidenceJP || 'もう一度、会話を読み直しましょう。';
       setTimeout(render, 320);
