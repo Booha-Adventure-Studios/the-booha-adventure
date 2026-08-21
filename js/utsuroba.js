@@ -456,7 +456,9 @@
 
   let pins = [], trail = [], ripples = [];
   const ghostImg = new Image(); ghostImg.src = './assets/img/booha_ghost.png';
-  const music = { play: () => Promise.resolve(), pause: () => {}, currentTime: 0 };
+  const music = new Audio('./assets/audio/utsuroba-music.mp3');
+  music.loop = true;
+  music.volume = 0.65;
 
   let app, stage, canvas, ctx, roomLayer, echoLayer;
   let coordToggle, coordReadout, pinLog, readingJournalButton, readingChallengeButton;
@@ -2307,7 +2309,11 @@
   /* ═══════════════════════════════════════════
      MUSIC + INPUT
   ═══════════════════════════════════════════ */
-  function startMusic() { if (state.musicStarted) return; state.musicStarted=true; }
+  function startMusic() {
+    if (state.musicStarted) return;
+    state.musicStarted = true;
+    music.play().catch(() => { state.musicStarted = false; });
+  }
 
   function stagePointToWorld(cx,cy) {
     const rect = stage.getBoundingClientRect();

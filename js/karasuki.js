@@ -1634,7 +1634,9 @@ const HAPPY_HOUSE_PORTAL = {
   const ghostImg = new Image(); ghostImg.src = "assets/img/booha_ghost.png";
   const observerImg = new Image();
   observerImg.src = 'assets/img/karasuki/observer-1.png';
-  const music    = { play: () => Promise.resolve(), pause: () => {}, currentTime: 0 };
+  const music    = new Audio('assets/audio/karasuki-music.mp3');
+  music.loop     = true;
+  music.volume   = 0.65;
 
   let app, stage, canvas, ctx, roomLayer, coordToggle, coordReadout, pinLog;
   let portalOverlay = null;
@@ -2311,7 +2313,11 @@ function tick(now) {
   /* ═══════════════════════════════════════════
      MUSIC + INPUT
   ═══════════════════════════════════════════ */
-  function startMusic() { if(state.musicStarted)return; state.musicStarted=true; }
+  function startMusic() {
+    if (state.musicStarted) return;
+    state.musicStarted = true;
+    music.play().catch(() => { state.musicStarted = false; });
+  }
 
   function getGamesThisWeek() {
   try {
