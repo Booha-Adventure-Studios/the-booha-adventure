@@ -224,6 +224,19 @@
   // 3★ = cutCount ≤ parCuts
   // 2★ = cutCount ≤ parCuts + 1
   // 1★ = anything else that still clears
+  //
+  // v8: parCuts is set equal to a level's total rope count for every one
+  // of the 50 levels (see tests/feed-level-audit.cjs), and a level can't
+  // be won without cutting every rope — so cutCount === par on literally
+  // every legitimate clear, and the tiers above always land on 3★ by
+  // themselves. The real differentiators are now the two assists below,
+  // which dock a star each (floor of 1★) since a round that needed
+  // rescuing wasn't actually a clean throw: using a Helper/continue
+  // (state.continueAssist — a fresh attempt with a wider, stronger
+  // magnet), or needing the last-second safety-catch steer near Booha's
+  // mouth (state.usedSafetyCatch, set in applyMagnet()). Most players
+  // never touch the Helper, so the safety-catch is the one that actually
+  // gives most rounds real variation.
   // ─────────────────────────────────────────────────
   function getParCuts() {
     const lvl = state.currentLevel;
@@ -235,14 +248,20 @@
     const par = getParCuts();
     // Only penalize bounce if the level explicitly opts in
     const bouncePenalty = hitBounce && state.currentLevel && state.currentLevel.noBounce;
+    let stars;
     if (bouncePenalty) {
       // Bounce disqualifies 3★ on noBounce levels
-      if (cutCount <= par + 1) return 2;
-      return 1;
+      stars = (cutCount <= par + 1) ? 2 : 1;
+    } else if (cutCount <= par) {
+      stars = 3;
+    } else if (cutCount <= par + 1) {
+      stars = 2;
+    } else {
+      stars = 1;
     }
-    if (cutCount <= par)     return 3;
-    if (cutCount <= par + 1) return 2;
-    return 1;
+    if (state.continueAssist)  stars -= 1;
+    if (state.usedSafetyCatch) stars -= 1;
+    return Math.max(1, Math.min(3, stars));
   }
 
   // ─────────────────────────────────────────────────
@@ -471,7 +490,8 @@
     campaignStars: 0,
     campaignComplete: false,
     continuesLeft: MAX_CONTINUES,
-    continueAssist: false
+    continueAssist: false,
+    usedSafetyCatch: false
   };
 
   const DEFAULT_PROGRESS = () => ({
@@ -806,6 +826,7 @@
     state.currentLevel    = level;
     state.cutCount        = 0;
     state.hitBounce       = false;
+    state.usedSafetyCatch = false;
     state.won             = false;
     state.lost            = false;
     state.missDir         = 0;
@@ -1125,6 +1146,7 @@
       const steer = SAFETY_CATCH_STEER * k;
       c.vx += dx * steer;
       c.vy += dy * steer;
+      state.usedSafetyCatch = true;
       return;
     }
     const magnetDist = state.continueAssist ? MAGNET_DIST * 1.35 : MAGNET_DIST;
