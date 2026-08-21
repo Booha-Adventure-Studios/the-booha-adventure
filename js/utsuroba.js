@@ -165,6 +165,10 @@
       data.utsuroba.wordCabinet.entries = [];
       dirty = true;
     }
+    if (!data.utsuroba.readingEchoes || typeof data.utsuroba.readingEchoes !== 'object') {
+      data.utsuroba.readingEchoes = {};
+      dirty = true;
+    }
 
     /* ── Weekly drifter reset ───────────────────────────────
        Drifter memories reset with the weekly content.
@@ -176,9 +180,10 @@
         const cw = CALENDAR.getCurrentCurriculumWeek();
         const wk = `${cw.monthSlug}:w${cw.weekNumber}`;
         if (data.utsuroba.driftersWeekKey !== wk) {
-          data.utsuroba.drifters        = {};
-          data.utsuroba.driftersWeekKey = wk;
-          if (data.weekly) data.weekly.drifterQuest = null;
+        data.utsuroba.drifters        = {};
+        data.utsuroba.driftersWeekKey = wk;
+        data.utsuroba.readingEchoes  = {};
+        if (data.weekly) data.weekly.drifterQuest = null;
           dirty = true;
         }
       }
@@ -365,6 +370,10 @@
         cabinet.entries = words.slice(0, 60);
         data.utsuroba.wordCabinet = cabinet;
       }
+      data.utsuroba.readingEchoes[quest.episodeId] = {
+        drifterId: id,
+        restoredAt: Date.now(),
+      };
     }
     if (data.weekly) data.weekly.drifterQuest = null;
     const ok = writeSave(data);
@@ -410,7 +419,7 @@
   const ghostImg = new Image(); ghostImg.src = './assets/img/booha_ghost.png';
   const music = { play: () => Promise.resolve(), pause: () => {}, currentTime: 0 };
 
-  let app, stage, canvas, ctx, roomLayer;
+  let app, stage, canvas, ctx, roomLayer, echoLayer;
   let coordToggle, coordReadout, pinLog, readingJournalButton;
   let exitPopOverlay = null, exitPopCooldownUntil = 0;
   let drifterPanel = null, drifterPanelOpen = false, drifterPanelCooldown = 0;
@@ -443,6 +452,20 @@
       #utsuroba-app{position:relative;width:100vw;height:100vh;overflow:hidden;background:#000;}
       #utsuroba-stage{position:absolute;left:50%;top:50%;width:${WORLD_W}px;height:${WORLD_H}px;transform-origin:50% 50%;overflow:hidden;cursor:crosshair;}
       #utsuroba-room-layer{position:absolute;inset:0;}
+      #utsuroba-memory-echo-layer{position:absolute;inset:0;z-index:8;pointer-events:none;overflow:hidden;}
+      .utsu-memory-echo{position:absolute;transform:translate(-50%,-50%);width:110px;height:110px;padding:0;border:0;background:transparent;pointer-events:auto;cursor:pointer;filter:drop-shadow(0 0 16px rgba(255,203,117,.34));}
+      .utsu-memory-echo .echo-aura{position:absolute;inset:18px;border-radius:50%;background:radial-gradient(circle,rgba(255,230,150,.3),rgba(255,203,117,.08) 42%,transparent 70%);animation:echoBreathe 2.8s ease-in-out infinite;}
+      .utsu-memory-echo .echo-icon{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:31px;line-height:1;color:#ffe7a8;text-shadow:0 0 14px #ffcb75;animation:echoFloat 2.2s ease-in-out infinite;}
+      .utsu-memory-echo .echo-label{position:absolute;left:50%;top:calc(100% - 7px);transform:translateX(-50%);min-width:130px;padding:5px 8px;border:1px solid rgba(255,203,117,.35);border-radius:6px;background:rgba(18,7,28,.86);color:#ffe7b2;text-align:center;font:700 10px/1.2 Georgia,serif;white-space:nowrap;opacity:.88;}
+      .utsu-memory-echo .echo-label small{display:block;margin-top:3px;color:rgba(255,231,178,.6);font-size:9px;font-weight:400;}
+      .utsu-memory-echo.motif-candy{filter:drop-shadow(0 0 16px rgba(255,145,175,.38));}
+      .utsu-memory-echo.motif-candy .echo-aura{background:radial-gradient(circle,rgba(255,167,194,.3),rgba(255,126,180,.08) 42%,transparent 70%);}
+      .utsu-memory-echo.motif-candy .echo-icon{color:#ffb4d0;text-shadow:0 0 14px #ff70b0;}
+      .utsu-memory-echo.motif-reflection{filter:drop-shadow(0 0 16px rgba(145,210,255,.34));}
+      .utsu-memory-echo.motif-reflection .echo-aura{background:radial-gradient(circle,rgba(145,210,255,.3),rgba(100,170,255,.08) 42%,transparent 70%);}
+      .utsu-memory-echo.motif-reflection .echo-icon{color:#b8e4ff;text-shadow:0 0 14px #7dc8ff;}
+      @keyframes echoBreathe{0%,100%{transform:scale(.82);opacity:.55}50%{transform:scale(1.12);opacity:1}}
+      @keyframes echoFloat{0%,100%{transform:translate(-50%,-48%)}50%{transform:translate(-50%,-58%)}}
       .utsuroba-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;display:block;pointer-events:none;user-select:none;}
       #buki-canvas{position:absolute;inset:0;z-index:10;pointer-events:none;}
       #buki-fade{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none;z-index:20;}
@@ -686,6 +709,42 @@
       .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
+  function drifterMemoryRestored(drifter) {
+    const episodeId = drifter && drifter.episodeId;
+    return !!(episodeId && readUtsuroba().readingEchoes?.[episodeId]);
+  }
+
+  function renderMemoryEchoes() {
+    if (!echoLayer) return;
+    echoLayer.innerHTML = '';
+    const restored = readUtsuroba().readingEchoes || {};
+    const episodes = window.UTSUROBA_EPISODES || {};
+    const iconFor = { lantern: '✦', candy: '●', reflection: '◈' };
+    Object.entries(restored).forEach(([episodeId, entry]) => {
+      const episode = episodes[episodeId];
+      const echo = episode && episode.worldEcho;
+      if (!echo || echo.roomId !== state.roomId) return;
+      const motif = ['lantern', 'candy', 'reflection'].includes(echo.motif) ? echo.motif : 'lantern';
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = `utsu-memory-echo motif-${motif}`;
+      button.style.left = `${Math.max(0, Math.min(1, echo.x)) * 100}%`;
+      button.style.top = `${Math.max(0, Math.min(1, echo.y)) * 100}%`;
+      button.setAttribute('aria-label', `${echo.label}. Read memory again.`);
+      button.innerHTML = `<span class="echo-aura"></span><span class="echo-icon" aria-hidden="true">${iconFor[motif]}</span><span class="echo-label">${escapeHTML(echo.label)}<small>${escapeHTML(echo.labelJP)}</small></span>`;
+      button.addEventListener('click', event => {
+        event.stopPropagation();
+        openReadingReview({ episodeId, drifterId: entry.drifterId });
+      });
+      echoLayer.appendChild(button);
+    });
+  }
+
+  function refreshMemoryEchoes() {
+    if (!echoLayer || !window.UTSUROBA_EPISODES_READY) return;
+    window.UTSUROBA_EPISODES_READY.then(renderMemoryEchoes).catch(() => {});
+  }
+
   function readingJournalEntries() {
     const entries = readUtsuroba().readingJournal?.entries;
     return Array.isArray(entries) ? entries : [];
@@ -794,6 +853,7 @@
     invalidateQuestCache();
     const quest       = forcedQuest || getCachedQuest();
     const hasMemories = drifterHasMemories(drifter.id);
+    const hasRestoredMemory = drifterMemoryRestored(drifter);
 
     /* ── build post-greeting action HTML ── */
     let actionHTML = '';
@@ -879,7 +939,9 @@
     
     /* use questLines for quest-offer state, greeting for everything else */
     const hasQuestOffer = !quest && drifter.memoryCount > 0 && drifterHasMemories(drifter.id);
-    const enLines = (hasQuestOffer && drifter.questLines)   ? drifter.questLines   : drifter.greeting;
+    const enLines = (hasQuestOffer && drifter.questLines)
+      ? drifter.questLines
+      : (hasRestoredMemory && drifter.restoredGreeting ? drifter.restoredGreeting : drifter.greeting);
     
     let   finished    = false;
 
@@ -1015,6 +1077,7 @@
       onComplete: () => {
         if (completeMemory(drifter.id, quest.memIdx)) {
           refreshReadingJournalButton();
+          refreshMemoryEchoes();
           startCelebration(drifter);
         }
       }
@@ -1128,9 +1191,10 @@
     app      = document.createElement('div'); app.id = 'utsuroba-app';
     stage    = document.createElement('div'); stage.id = 'utsuroba-stage';
     roomLayer= document.createElement('div'); roomLayer.id = 'utsuroba-room-layer';
+    echoLayer = document.createElement('div'); echoLayer.id = 'utsuroba-memory-echo-layer';
     canvas   = document.createElement('canvas'); canvas.id = 'buki-canvas';
     const fade = document.createElement('div'); fade.id = 'buki-fade';
-    stage.appendChild(roomLayer); stage.appendChild(canvas); stage.appendChild(fade);
+    stage.appendChild(roomLayer); stage.appendChild(echoLayer); stage.appendChild(canvas); stage.appendChild(fade);
     app.appendChild(stage);
     const toast = document.createElement('div'); toast.id = 'buki-copy-toast'; toast.textContent = 'copied!';
     document.body.innerHTML = '';
@@ -1260,6 +1324,7 @@
       const nextBg = makeBg(nextRoom.bg); roomLayer.innerHTML = ''; roomLayer.appendChild(nextBg); currentBg = nextBg;
       state.roomId  = exit.to; state.spawnId = exit.spawn || 'default';
       arriveInRoom(nextRoom, state.spawnId, exit.dir);
+      refreshMemoryEchoes();
       fadeEl.style.transition = `opacity ${FADE_MS/2}ms ease-out`; fadeEl.style.opacity = '0';
       setTimeout(() => { state.transitioning = false; }, FADE_MS/2+30);
     }, FADE_MS/2+20);
@@ -1711,6 +1776,7 @@
     fitStage();
     resizeCanvas();
     renderInitialRoom();
+    refreshMemoryEchoes();
     bindInput();
     window.addEventListener('resize', () => { fitStage(); resizeCanvas(); });
     markVisited();
