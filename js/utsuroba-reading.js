@@ -23,6 +23,8 @@
       #utsuroba-reading-challenge .reading-card{position:relative;width:min(920px,100%);max-height:calc(100vh - 36px);overflow:auto;background:linear-gradient(160deg,#171020,#0b0712 65%,#130b1b);border:1px solid rgba(220,160,255,.45);border-radius:16px;padding:clamp(20px,3vw,34px);box-shadow:0 0 70px rgba(100,30,160,.34);box-sizing:border-box;}
       #utsuroba-reading-challenge .reading-close{position:absolute;right:14px;top:12px;background:transparent;border:0;color:rgba(255,255,255,.55);font-size:18px;cursor:pointer;padding:8px;}
       #utsuroba-reading-challenge .reading-eyebrow{color:#d8a8ff;font:700 11px/1.4 monospace;letter-spacing:.16em;text-transform:uppercase;margin-bottom:8px;}
+      #utsuroba-reading-challenge .reading-support-badge{display:inline-block;margin:0 0 9px;padding:4px 7px;border:1px solid rgba(216,168,255,.35);border-radius:999px;color:#e4c2ff;font:700 9px/1.2 monospace;letter-spacing:.08em;}
+      #utsuroba-reading-challenge .reading-support-badge.independent{border-color:rgba(255,203,117,.48);color:#ffe0a0;}
       #utsuroba-reading-challenge h2{margin:0 42px 8px;color:#fff4ff;font-size:clamp(1.25rem,3vw,2rem);}
       #utsuroba-reading-challenge h2 span{display:block;color:rgba(255,220,255,.58);font-size:.52em;font-weight:400;margin-top:4px;}
       #utsuroba-reading-challenge h3{margin:5px 0 2px;color:#fff;font-size:clamp(1rem,2.3vw,1.25rem);}
@@ -156,14 +158,20 @@
     let showEvidence = false;
     let sequenceSelection = [];
     let inferenceAnswerChosen = false;
+    const supportLevel = opts.adaptiveMode === 'independent' ? 'independent' : 'guided';
+    let mistakeCount = 0;
+    let usedEvidence = false;
 
     function renderVocabulary() {
       if (!Array.isArray(episode.vocabulary) || !episode.vocabulary.length) return '';
       const words = episode.vocabulary.map((item, index) => `
         <button class="reading-vocab-word" type="button" data-vocab="${index}">${escapeText(item.word)}</button>`).join('');
+      const summary = supportLevel === 'independent'
+        ? 'Word help is optional. Try to remember first. / まず思い出してから、言葉のヘルプを使いましょう。'
+        : 'Tap a word for a simple meaning. / 言葉をタップすると意味が出ます。';
       return `
         <details class="reading-vocab" id="reading-vocabulary">
-          <summary>Word help / 言葉のヘルプ<span>Tap a word for a simple meaning. / 言葉をタップすると意味が出ます。</span></summary>
+          <summary>Word help / 言葉のヘルプ<span>${summary}</span></summary>
           <div class="reading-vocab-body">
             <div class="reading-vocab-list">${words}</div>
             <div class="reading-vocab-detail" id="reading-vocab-detail">Choose a word to see help.<small>言葉を一つ選んでください。</small></div>
@@ -220,6 +228,14 @@
 
     const finish = () => {
       if (opts.reviewOnly) {
+        if (typeof opts.onReviewComplete === 'function') {
+          opts.onReviewComplete({
+            supportLevel,
+            mistakes: mistakeCount,
+            usedEvidence,
+            totalQuestions: episode.checks.length,
+          });
+        }
         close();
         return;
       }
@@ -235,6 +251,8 @@
       lastFeedbackJP = '';
       sequenceSelection = [];
       inferenceAnswerChosen = false;
+      mistakeCount = 0;
+      usedEvidence = false;
       if (opts.persist) {
         const progress = { state: 'reading', readingState: 'review', readingIndex: 0, mechanicIndex: 0 };
         if (mechanic && mechanic.type === 'memory-theatre') progress.theatreIndex = 0;
@@ -317,6 +335,7 @@
     }
 
     function showWrong(question) {
+      mistakeCount += 1;
       showEvidence = false;
       lastFeedback = `Not quite. Look again at the lines. ${question.evidence}`;
       lastFeedbackJP = question.evidenceJP || 'もう一度、会話を読み直しましょう。';
@@ -333,6 +352,12 @@
         </div>`).join('');
 
       if (!question) {
+        const modeLabel = opts.reviewOnly
+          ? (supportLevel === 'independent' ? 'INDEPENDENT REVIEW / 自力復習' : 'GUIDED REVIEW / 案内付き復習')
+          : 'FIRST READING / はじめての読書';
+        const reviewResult = opts.reviewOnly
+          ? `${mistakeCount === 0 && !usedEvidence ? 'Clean recall.' : 'Support was available when you needed it.'}<small>${mistakeCount === 0 && !usedEvidence ? 'ヒントなしで思い出せました。' : '必要なときにサポートを使いました。'}</small>`
+          : '';
         const completeActions = opts.reviewOnly
           ? `<button class="reading-secondary" id="reading-review-btn">Read again / もう一度読む</button><button class="reading-primary" id="reading-return-btn">Close journal review / ノートを閉じる</button>`
           : `<button class="reading-secondary" id="reading-review-btn">Review reading / 読み返す</button><button class="reading-primary" id="reading-return-btn">Restore memory / 記憶を戻す</button>`;
@@ -342,11 +367,13 @@
         overlay.innerHTML = `
           <div class="reading-card reading-complete">
             <div class="reading-eyebrow">${escapeText(episode.eyebrow)}</div>
+            <div class="reading-support-badge${supportLevel === 'independent' ? ' independent' : ''}">${modeLabel}</div>
             <h2>${escapeText(episode.title)}</h2>
             ${renderVocabulary()}
             ${renderMechanic(mechanic ? (mechanic.acts || mechanic.items || mechanic.beats || []).length : mechanicIndex)}
             <p class="reading-success">${escapeText(episode.success)}</p>
             <p class="reading-jp">${escapeText(episode.successJP)}</p>
+            ${reviewResult ? `<p class="reading-review-note">${reviewResult}</p>` : ''}
             <div class="reading-complete-actions">
               ${completeActions}
             </div>
@@ -362,6 +389,7 @@
         <div class="reading-card">
           <button class="reading-close" id="reading-close-btn">✕</button>
           <div class="reading-eyebrow">${escapeText(episode.eyebrow)}</div>
+          <div class="reading-support-badge${supportLevel === 'independent' ? ' independent' : ''}">${opts.reviewOnly ? (supportLevel === 'independent' ? 'INDEPENDENT REVIEW / 自力復習' : 'GUIDED REVIEW / 案内付き復習') : 'FIRST READING / はじめての読書'}</div>
           <h2>${escapeText(episode.title)} <span>${escapeText(episode.titleJP)}</span></h2>
           <p class="reading-intro">${escapeText(episode.intro)}</p>
           <p class="reading-jp">${escapeText(episode.introJP)}</p>
@@ -371,7 +399,7 @@
           <div class="reading-question-label">${escapeText(question.label)} · ${escapeText(question.labelJP)}</div>
           <h3>${escapeText(question.prompt)}</h3>
           <p class="reading-jp">${escapeText(question.promptJP)}</p>
-          ${lastFeedback ? `<div class="reading-feedback">${escapeText(lastFeedback)}<small>${escapeText(lastFeedbackJP)}</small><button class="reading-evidence-btn" id="reading-evidence-btn" type="button">Show evidence / 根拠を見る</button></div>` : ''}
+          ${lastFeedback ? `<div class="reading-feedback">${escapeText(lastFeedback)}<small>${escapeText(lastFeedbackJP)}</small>${supportLevel === 'guided' || mistakeCount >= 2 ? '<button class="reading-evidence-btn" id="reading-evidence-btn" type="button">Show evidence / 根拠を見る</button>' : ''}</div>` : ''}
           ${renderInteraction(question)}
           <div class="reading-progress">${questionIndex + 1} / ${episode.checks.length}</div>
         </div>`;
@@ -380,6 +408,7 @@
       bindVocabulary();
       const evidenceButton = overlay.querySelector('#reading-evidence-btn');
       if (evidenceButton) evidenceButton.addEventListener('click', () => {
+        usedEvidence = true;
         showEvidence = true;
         render();
         const firstEvidence = overlay.querySelector('.reading-line.is-evidence');
