@@ -44,23 +44,23 @@ const BoohaSaveMenu = (() => {
 <div id="booha-save-overlay" class="booha-overlay" aria-hidden="true"></div>
 <aside id="booha-save-panel" class="booha-save-panel" role="dialog" aria-label="Save Menu" aria-hidden="true">
   <button id="booha-save-close" class="booha-close-btn" aria-label="Close save menu">✕</button>
-  <h2 class="booha-panel-title">Adventure Save</h2>
+  <h2 class="booha-panel-title">Adventure Save<span class="booha-jp">アドベンチャー セーブ</span></h2>
 
   <section class="booha-save-section">
-    <h3>Save &amp; Load</h3>
-    <button id="booha-btn-export-file" class="booha-btn">📥 Export Save File</button>
-    <button id="booha-btn-import-file" class="booha-btn" hidden>📤 Import Save File</button>
+    <h3 class="booha-section-title">Save &amp; Load<span class="booha-jp">セーブ・よみこみ</span></h3>
+    <button id="booha-btn-export-file" class="booha-btn"><span class="booha-btn-icon">📥</span><span class="booha-btn-label">Export Save File<span class="booha-jp">ファイルにほぞんする</span></span></button>
+    <button id="booha-btn-import-file" class="booha-btn" hidden><span class="booha-btn-icon">📤</span><span class="booha-btn-label">Import Save File<span class="booha-jp">ファイルをよみこむ</span></span></button>
   </section>
 
   <section class="booha-save-section">
-    <h3>Memory Code</h3>
-    <button id="booha-btn-show-code"  class="booha-btn">🔑 Show Memory Code</button>
-    <button id="booha-btn-enter-code" class="booha-btn" hidden>📋 Enter Memory Code</button>
+    <h3 class="booha-section-title">Memory Code<span class="booha-jp">きおくコード</span></h3>
+    <button id="booha-btn-show-code"  class="booha-btn"><span class="booha-btn-icon">🔑</span><span class="booha-btn-label">Show Memory Code<span class="booha-jp">コードをみる</span></span></button>
+    <button id="booha-btn-enter-code" class="booha-btn" hidden><span class="booha-btn-icon">📋</span><span class="booha-btn-label">Enter Memory Code<span class="booha-jp">コードをいれる</span></span></button>
   </section>
 
   <section class="booha-save-section booha-danger-zone" hidden>
-    <h3>Reset</h3>
-    <button id="booha-btn-reset" class="booha-btn booha-btn-danger">🗑 Reset Adventure</button>
+    <h3 class="booha-section-title">Reset<span class="booha-jp">全消去</span></h3>
+    <button id="booha-btn-reset" class="booha-btn booha-btn-danger"><span class="booha-btn-icon">🗑</span><span class="booha-btn-label">Reset Adventure<span class="booha-jp">全消去</span></span></button>
   </section>
 
   <p class="booha-save-status" id="booha-save-status" aria-live="polite"></p>
