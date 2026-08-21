@@ -28,9 +28,12 @@ assert.match(utsuroba, /openMemoryGarden/, 'Convergence completion must expose t
 assert.match(utsuroba, /memory-garden-quote/, 'Memory Garden must show the shared drifter aftermath');
 assert.match(utsuroba, /convergenceGreeting/, 'Drifters must acknowledge the completed convergence');
 assert.match(data, /readingConvergence/, 'Utsuroba data must define the world-level reading convergence');
+assert.match(data, /requiredDrifterIds/, 'The core convergence must define its required memory group');
+assert.match(data, /readingRelationships/, 'Utsuroba data must define cross-drifter reading relationships');
 assert.match(data, /clueChecks/, 'Convergence data must define authored evidence checks');
 assert.match(data, /cluePromptJP/, 'Convergence evidence instructions must include simple Japanese support');
 assert.match(data, /garden/, 'Convergence data must define the persistent Memory Garden');
+assert.match(utsuroba, /relationshipGreeting/, 'Drifters must react when the new memory joins the shared world');
 assert.match(utsuroba, /masteryLevel/, 'Journal entries must persist adaptive reading mastery');
 assert.match(utsuroba, /recordReadingReview/, 'Review results must update the learner reading state');
 assert.match(utsuroba, /recordWordPracticeResult/, 'Word practice must persist vocabulary review results');
