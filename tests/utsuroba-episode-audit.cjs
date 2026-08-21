@@ -105,6 +105,21 @@ for (const entry of index.episodes) {
         check.revealAct < mechanicItems.length,
         `${label}: Memory Theatre revealAct is invalid`);
     }
+    if (check.type === 'sequence') {
+      assert.ok(Array.isArray(check.sequenceOrder) && check.sequenceOrder.length === check.choices.length,
+        `${label}: sequence checks need an order for every choice`);
+      assert.deepStrictEqual([...check.sequenceOrder].sort((a, b) => a - b),
+        check.choices.map((_, index) => index),
+        `${label}: sequenceOrder must contain each choice exactly once`);
+    }
+    if (check.type === 'detail') {
+      assert.ok(Number.isInteger(check.matchLine) && check.matchLine >= 0 && check.matchLine < episode.lines.length,
+        `${label}: detail checks need a valid matchLine`);
+    }
+    if (check.type === 'inference') {
+      assert.ok(Number.isInteger(check.supportingLine) && check.supportingLine >= 0 && check.supportingLine < episode.lines.length,
+        `${label}: inference checks need a valid supportingLine`);
+    }
   }
 }
 

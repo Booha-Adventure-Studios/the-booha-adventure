@@ -48,6 +48,25 @@
       #utsuroba-reading-challenge .reading-choice{min-height:72px;text-align:left;padding:11px 12px;background:rgba(255,255,255,.06);border:1px solid rgba(220,160,255,.34);border-radius:9px;color:#fff;cursor:pointer;font:inherit;transition:transform .15s,border-color .15s,background .15s;}
       #utsuroba-reading-challenge .reading-choice:hover{transform:translateY(-2px);background:rgba(216,168,255,.14);border-color:#d8a8ff;}
       #utsuroba-reading-challenge .reading-choice small{display:block;color:rgba(255,255,255,.48);font-size:.72rem;line-height:1.35;margin-top:5px;}
+      #utsuroba-reading-challenge .reading-interaction{margin-top:14px;padding:12px;border:1px solid rgba(255,203,117,.24);border-radius:10px;background:rgba(255,203,117,.045);}
+      #utsuroba-reading-challenge .reading-interaction-instruction{margin:0 0 10px;color:#ffe0a0;font-size:.78rem;line-height:1.4;}
+      #utsuroba-reading-challenge .reading-interaction-instruction small{display:block;margin-top:3px;color:rgba(255,231,178,.58);font-size:.9em;}
+      #utsuroba-reading-challenge .reading-sequence-picked{min-height:34px;margin-bottom:10px;padding:7px 9px;border-radius:7px;background:rgba(0,0,0,.2);color:rgba(255,255,255,.62);font-size:.75rem;line-height:1.4;}
+      #utsuroba-reading-challenge .reading-sequence-picked strong{color:#fff0c9;}
+      #utsuroba-reading-challenge .reading-sequence-options{display:grid;gap:7px;}
+      #utsuroba-reading-challenge .reading-task-choice,#utsuroba-reading-challenge .reading-line-choice{width:100%;text-align:left;padding:9px 10px;border:1px solid rgba(216,168,255,.32);border-radius:7px;background:rgba(255,255,255,.055);color:#fff;cursor:pointer;font:inherit;line-height:1.35;transition:background .15s,border-color .15s,transform .15s;}
+      #utsuroba-reading-challenge .reading-task-choice:hover,#utsuroba-reading-challenge .reading-line-choice:hover{background:rgba(216,168,255,.14);border-color:#d8a8ff;transform:translateX(2px);}
+      #utsuroba-reading-challenge .reading-task-choice small{display:block;margin-top:3px;color:rgba(255,255,255,.48);font-size:.72rem;}
+      #utsuroba-reading-challenge .reading-line-choice{display:block;margin-top:7px;border-left:3px solid rgba(216,168,255,.5);}
+      #utsuroba-reading-challenge .reading-line-choice .line-speaker{display:block;color:#d8a8ff;font-size:.7rem;font-weight:700;letter-spacing:.04em;}
+      #utsuroba-reading-challenge .reading-line-choice .line-text{display:block;margin-top:2px;color:#fff;font-size:.82rem;}
+      #utsuroba-reading-challenge .reading-sequence-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+      #utsuroba-reading-challenge .reading-task-action{padding:7px 11px;border:1px solid rgba(216,168,255,.4);border-radius:6px;background:rgba(216,168,255,.08);color:#f3ddff;cursor:pointer;font:700 .72rem Georgia,serif;}
+      #utsuroba-reading-challenge .reading-task-action.primary{border-color:#ffcb75;background:rgba(255,203,117,.12);color:#ffe7b2;}
+      #utsuroba-reading-challenge .reading-task-action:hover,#utsuroba-reading-challenge .reading-task-action:focus-visible{background:rgba(216,168,255,.2);outline:none;}
+      #utsuroba-reading-challenge .reading-task-action.primary:hover{background:rgba(255,203,117,.22);}
+      #utsuroba-reading-challenge .reading-picked-answer{margin:0 0 10px;padding:8px 10px;border-left:3px solid #ffcb75;background:rgba(255,203,117,.08);color:#ffe7b2;font-size:.8rem;line-height:1.4;}
+      #utsuroba-reading-challenge .reading-picked-answer small{display:block;margin-top:3px;color:rgba(255,231,178,.58);font-size:.9em;}
       #utsuroba-reading-challenge .reading-feedback{margin-top:12px;padding:10px 12px;border-left:3px solid #ffcb75;background:rgba(255,203,117,.08);color:#ffe7b2;font-size:.82rem;line-height:1.4;}
       #utsuroba-reading-challenge .reading-feedback small{display:block;color:rgba(255,231,178,.68);margin-top:3px;font-size:.9em;}
       #utsuroba-reading-challenge .reading-evidence-btn{display:block;margin-top:8px;padding:6px 10px;border:1px solid rgba(255,203,117,.48);border-radius:6px;background:rgba(255,203,117,.08);color:#ffe7b2;cursor:pointer;font:700 .72rem Georgia,serif;}
@@ -135,6 +154,8 @@
     let lastFeedback = '';
     let lastFeedbackJP = '';
     let showEvidence = false;
+    let sequenceSelection = [];
+    let inferenceAnswerChosen = false;
 
     function renderVocabulary() {
       if (!Array.isArray(episode.vocabulary) || !episode.vocabulary.length) return '';
@@ -212,6 +233,8 @@
       mechanicIndex = 0;
       lastFeedback = '';
       lastFeedbackJP = '';
+      sequenceSelection = [];
+      inferenceAnswerChosen = false;
       if (opts.persist) {
         const progress = { state: 'reading', readingState: 'review', readingIndex: 0, mechanicIndex: 0 };
         if (mechanic && mechanic.type === 'memory-theatre') progress.theatreIndex = 0;
@@ -219,6 +242,86 @@
       }
       render();
     };
+
+    function resetQuestionInteraction() {
+      sequenceSelection = [];
+      inferenceAnswerChosen = false;
+    }
+
+    function renderLineChoices(question, mode) {
+      const selectedLine = mode === 'inference' ? question.supportingLine : question.matchLine;
+      const instruction = mode === 'inference'
+        ? 'Now choose the line that proves your idea.'
+        : 'Tap the exact line that contains the answer.';
+      const instructionJP = mode === 'inference'
+        ? '次に、考えを証明する行を選びましょう。'
+        : '答えが書かれている行をタップしましょう。';
+      const lines = episode.lines.map((line, index) => `
+        <button class="reading-line-choice" type="button" data-line-choice="${index}">
+          <span class="line-speaker">${escapeText(line.speaker)}</span>
+          <span class="line-text">${escapeText(line.en)}</span>
+        </button>`).join('');
+      return `<div class="reading-interaction reading-line-interaction" data-correct-line="${Number.isInteger(selectedLine) ? selectedLine : -1}">
+        <p class="reading-interaction-instruction">${instruction}<small>${instructionJP}</small></p>
+        <div class="reading-line-choices">${lines}</div>
+      </div>`;
+    }
+
+    function renderInteraction(question) {
+      if (question.type === 'sequence') {
+        const choices = question.choices.map((choice, index) => {
+          if (sequenceSelection.includes(index)) return '';
+          return `<button class="reading-task-choice" type="button" data-sequence-choice="${index}"><span>${escapeText(choice)}</span><small>${escapeText(question.choicesJP[index] || '')}</small></button>`;
+        }).join('');
+        const picked = sequenceSelection.length
+          ? sequenceSelection.map((index, order) => `<strong>${order + 1}.</strong> ${escapeText(question.choices[index])}`).join('<br>')
+          : 'Your order will appear here.';
+        return `<div class="reading-interaction reading-sequence-interaction">
+          <p class="reading-interaction-instruction">Tap each event in the order it happened.<small>出来事が起きた順番にタップしましょう。</small></p>
+          <div class="reading-sequence-picked">${picked}</div>
+          <div class="reading-sequence-options">${choices || '<span style="color:rgba(255,255,255,.55);font-size:.75rem;">All events selected. Check your order.</span>'}</div>
+          <div class="reading-sequence-actions"><button class="reading-task-action" type="button" id="reading-sequence-reset">Start over / 最初から</button><button class="reading-task-action primary" type="button" id="reading-sequence-submit">Check order / 順番を確認</button></div>
+        </div>`;
+      }
+      if (question.type === 'detail') return renderLineChoices(question, 'detail');
+      if (question.type === 'inference') {
+        if (!inferenceAnswerChosen) {
+          const choices = question.choices.map((choice, index) => `<button class="reading-task-choice" type="button" data-inference-choice="${index}"><span>${escapeText(choice)}</span><small>${escapeText(question.choicesJP[index] || '')}</small></button>`).join('');
+          return `<div class="reading-interaction reading-inference-interaction"><p class="reading-interaction-instruction">Choose the meaning you infer from the conversation.<small>会話から分かる意味を選びましょう。</small></p><div class="reading-sequence-options">${choices}</div></div>`;
+        }
+        const chosen = question.choices[question.correct];
+        return `<div class="reading-interaction reading-inference-interaction"><p class="reading-picked-answer">Your idea: ${escapeText(chosen)}<small>あなたの考え：${escapeText(question.choicesJP[question.correct] || '')}</small></p>${renderLineChoices(question, 'inference')}</div>`;
+      }
+      const choices = question.choices.map((choice, i) => `<button class="reading-choice" data-choice="${i}"><span>${escapeText(choice)}</span><small>${escapeText(question.choicesJP[i] || '')}</small></button>`).join('');
+      return `<div class="reading-choices">${choices}</div>`;
+    }
+
+    function advanceQuestion(question) {
+      questionIndex += 1;
+      showEvidence = false;
+      resetQuestionInteraction();
+      if (mechanic && question.revealAct != null) {
+        mechanicIndex = Math.max(mechanicIndex, question.revealAct + 1);
+        lastFeedback = question.restoreText || 'The scene returns.';
+        lastFeedbackJP = question.restoreTextJP || '場面が戻ります。';
+      } else {
+        lastFeedback = '';
+        lastFeedbackJP = '';
+      }
+      if (opts.persist) {
+        const progress = { readingIndex: questionIndex, mechanicIndex };
+        if (mechanic && mechanic.type === 'memory-theatre') progress.theatreIndex = mechanicIndex;
+        opts.persist(progress);
+      }
+      render();
+    }
+
+    function showWrong(question) {
+      showEvidence = false;
+      lastFeedback = `Not quite. Look again at the lines. ${question.evidence}`;
+      lastFeedbackJP = question.evidenceJP || 'もう一度、会話を読み直しましょう。';
+      setTimeout(render, 320);
+    }
 
     const render = () => {
       const question = episode.checks[questionIndex];
@@ -255,12 +358,6 @@
         return;
       }
 
-      const choices = question.choices.map((choice, i) => `
-        <button class="reading-choice" data-choice="${i}">
-          <span>${escapeText(choice)}</span>
-          <small>${escapeText(question.choicesJP[i] || '')}</small>
-        </button>`).join('');
-
       overlay.innerHTML = `
         <div class="reading-card">
           <button class="reading-close" id="reading-close-btn">✕</button>
@@ -275,7 +372,7 @@
           <h3>${escapeText(question.prompt)}</h3>
           <p class="reading-jp">${escapeText(question.promptJP)}</p>
           ${lastFeedback ? `<div class="reading-feedback">${escapeText(lastFeedback)}<small>${escapeText(lastFeedbackJP)}</small><button class="reading-evidence-btn" id="reading-evidence-btn" type="button">Show evidence / 根拠を見る</button></div>` : ''}
-          <div class="reading-choices">${choices}</div>
+          ${renderInteraction(question)}
           <div class="reading-progress">${questionIndex + 1} / ${episode.checks.length}</div>
         </div>`;
 
@@ -288,34 +385,41 @@
         const firstEvidence = overlay.querySelector('.reading-line.is-evidence');
         if (firstEvidence) firstEvidence.scrollIntoView({ block: 'center', behavior: 'smooth' });
       });
-      overlay.querySelectorAll('.reading-choice').forEach(button => {
-        button.addEventListener('click', () => {
-          const choice = Number(button.dataset.choice);
-          if (choice === question.correct) {
-            questionIndex += 1;
-            showEvidence = false;
-            if (mechanic && question.revealAct != null) {
-              mechanicIndex = Math.max(mechanicIndex, question.revealAct + 1);
-              lastFeedback = question.restoreText || 'The scene returns.';
-              lastFeedbackJP = question.restoreTextJP || '場面が戻ります。';
-            } else {
-              lastFeedback = '';
-              lastFeedbackJP = '';
-            }
-            if (opts.persist) {
-              const progress = { readingIndex: questionIndex, mechanicIndex };
-              if (mechanic.type === 'memory-theatre') progress.theatreIndex = mechanicIndex;
-              opts.persist(progress);
-            }
-            render();
-          } else {
-            showEvidence = false;
-            lastFeedback = `Not quite. Look again at the lines. ${question.evidence}`;
-            lastFeedbackJP = question.evidenceJP || 'もう一度、会話を読み直しましょう。';
-            setTimeout(render, 320);
-          }
-        });
+      overlay.querySelectorAll('[data-sequence-choice]').forEach(button => button.addEventListener('click', () => {
+        const choice = Number(button.dataset.sequenceChoice);
+        if (!sequenceSelection.includes(choice)) {
+          sequenceSelection.push(choice);
+          render();
+        }
+      }));
+      const sequenceReset = overlay.querySelector('#reading-sequence-reset');
+      if (sequenceReset) sequenceReset.addEventListener('click', () => { sequenceSelection = []; lastFeedback = ''; lastFeedbackJP = ''; render(); });
+      const sequenceSubmit = overlay.querySelector('#reading-sequence-submit');
+      if (sequenceSubmit) sequenceSubmit.addEventListener('click', () => {
+        const expected = Array.isArray(question.sequenceOrder) ? question.sequenceOrder : question.choices.map((_, index) => index);
+        if (sequenceSelection.length === expected.length && sequenceSelection.every((value, index) => value === expected[index])) advanceQuestion(question);
+        else showWrong(question);
       });
+      overlay.querySelectorAll('[data-line-choice]').forEach(button => button.addEventListener('click', () => {
+        const lineIndex = Number(button.dataset.lineChoice);
+        const expected = question.type === 'inference' ? question.supportingLine : question.matchLine;
+        if (lineIndex === expected) advanceQuestion(question);
+        else showWrong(question);
+      }));
+      overlay.querySelectorAll('[data-inference-choice]').forEach(button => button.addEventListener('click', () => {
+        const choice = Number(button.dataset.inferenceChoice);
+        if (choice === question.correct) {
+          inferenceAnswerChosen = true;
+          lastFeedback = 'Good. Now prove your idea with a line.';
+          lastFeedbackJP = 'いいですね。次に、証拠の行を選びましょう。';
+          render();
+        } else showWrong(question);
+      }));
+      overlay.querySelectorAll('[data-choice]').forEach(button => button.addEventListener('click', () => {
+        const choice = Number(button.dataset.choice);
+        if (choice === question.correct) advanceQuestion(question);
+        else showWrong(question);
+      }));
     };
 
     if (opts.persist) {
