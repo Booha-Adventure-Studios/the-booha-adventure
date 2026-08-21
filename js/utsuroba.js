@@ -286,6 +286,8 @@
       memIdx,
       episodeId        : id === 'ks' ? 'ks_lantern_v1' : null,
       readingState     : 'locked',
+      trailIndex       : 0,
+      collectedFragments: [],
       decoys,
       collectedMemoryId: null,
       orbIsCorrect     : false,
@@ -369,14 +371,14 @@
   const CELEBRATE_MS = 8000;
 
   const THANK_YOU = {
-    ks:  { en:"Thank you… don't slow me down again.", jp:"ありがとう…。もう足を引っ張るなよ。" },
-    nto: { en:"Thank you! You're the best!",          jp:"ありがとう！あなたが一番だよ！" },
-    cg:  { en:"Thank you… I really mean it.",         jp:"ありがとう…。本当に、心から。" },
+    ks:  { en:"Thank you… don't slow me down again." },
+    nto: { en:"Thank you! You're the best!" },
+    cg:  { en:"Thank you… I really mean it." },
   };
   const WAITING_LINES = {
-    ks:  { en:"Hurry up, you little blob.",                 jp:"さっさと行けよ、このチビ。" },
-    nto: { en:"See you soon, cutie.",                       jp:"じゃあね、かわいい子ちゃん。またね。" },
-    cg:  { en:"I'll be waiting here… don't take too long.", jp:"ここで待ってるよ…あまり遅くなるなよ。" },
+    ks:  { en:"Hurry up, you little blob." },
+    nto: { en:"See you soon, cutie." },
+    cg:  { en:"I'll be waiting here… don't take too long." },
   };
 
   /* ═══════════════════════════════════════════
@@ -626,10 +628,9 @@
         <div class="dp-btns"><button class="dp-btn no dp-dismiss">Close / 閉じる</button></div>`;
 
     } else if (quest && quest.active === drifter.id && quest.state === 'accepted') {
-      const wl = WAITING_LINES[drifter.id] || { en:"I'll be waiting…", jp:"待ってるよ…" };
+      const wl = WAITING_LINES[drifter.id] || { en:"I'll be waiting…" };
       actionHTML = `
         <p class="dp-line-en" style="margin-bottom:2px;">${wl.en}</p>
-        <p class="dp-line-jp" style="margin-bottom:10px;">${wl.jp}</p>
         <div class="dp-divider"></div>
         <div style="display:flex;align-items:center;gap:10px;margin-top:10px;">
           <button class="dp-audio-btn" id="dp-replay-btn" style="margin-bottom:0;">▶ Play / 聴く</button>
@@ -645,7 +646,6 @@
     } else if (quest && quest.active === drifter.id && quest.state === 'collected') {
       actionHTML = `
         <p class="dp-line-en" style="margin-bottom:2px;">You have a memory… give it to me?</p>
-        <p class="dp-line-jp" style="margin-bottom:10px;">記憶を持っている…くれる？</p>
         <div class="dp-divider"></div>
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:9px;margin-top:10px;">
           <button class="dp-audio-btn" id="dp-replay-btn" style="margin-bottom:0;">▶ Play / 聴く</button>
@@ -666,7 +666,6 @@
       actionHTML = `
         <div class="dp-divider"></div>
         <p class="dp-line-en" style="margin-bottom:2px;">Will you help me find a memory?</p>
-        <p class="dp-line-jp" style="margin-bottom:10px;">記憶を探すのを手伝ってくれる？</p>
         <div class="dp-btns">
           <button class="dp-btn yes" id="dp-yes-btn">はい / Yes</button>
           <button class="dp-btn no dp-dismiss">いいえ / No</button>
@@ -703,16 +702,14 @@
     /* use questLines for quest-offer state, greeting for everything else */
     const hasQuestOffer = !quest && drifter.memoryCount > 0 && drifterHasMemories(drifter.id);
     const enLines = (hasQuestOffer && drifter.questLines)   ? drifter.questLines   : drifter.greeting;
-    const jpLines = (hasQuestOffer && drifter.questLinesJP) ? drifter.questLinesJP : drifter.greetingJP;
     
     let   finished    = false;
 
     function showActionArea() {
       if (finished) return;
       finished = true;
-      twContainer.innerHTML = enLines.map((en, i) =>
-        `<p class="dp-line-en" style="margin-bottom:2px;">${en}</p>
-         <p class="dp-line-jp" style="margin-bottom:6px;">${jpLines[i] || ''}</p>`
+      twContainer.innerHTML = enLines.map(en =>
+        `<p class="dp-line-en" style="margin-bottom:6px;">${en}</p>`
       ).join('');
       actionArea.style.opacity = '1';
       drifterPanel.querySelectorAll('.dp-dismiss').forEach(btn =>
@@ -726,7 +723,7 @@
       drifterPanel.addEventListener('click', showActionArea, { once: true });
 
       let lineIdx = 0, charIdx = 0;
-      let currentEnEl = null, currentJpEl = null;
+      let currentEnEl = null;
       const CHAR_MS = 38, LINE_PAUSE_MS = 320;
 
       function typeLine() {
@@ -735,11 +732,7 @@
         currentEnEl = document.createElement('p');
         currentEnEl.className = 'dp-line-en';
         currentEnEl.style.marginBottom = '2px';
-        currentJpEl = document.createElement('p');
-        currentJpEl.className = 'dp-line-jp';
-        currentJpEl.style.marginBottom = '6px';
         twContainer.appendChild(currentEnEl);
-        twContainer.appendChild(currentJpEl);
         charIdx = 0;
         typeChar();
       }
@@ -747,11 +740,8 @@
       function typeChar() {
         if (finished) return;
         const enLine = enLines[lineIdx];
-        const jpLine = jpLines[lineIdx] || '';
         if (charIdx <= enLine.length) {
           currentEnEl.textContent = enLine.slice(0, charIdx);
-          const jpProgress = Math.round((charIdx / enLine.length) * jpLine.length);
-          currentJpEl.textContent = jpLine.slice(0, jpProgress);
           charIdx++;
           setTimeout(typeChar, CHAR_MS);
         } else {
@@ -951,7 +941,7 @@
   }
 
   function showThankYouPanel(drifter) {
-    const ty = THANK_YOU[drifter.id] || { en:'Thank you!', jp:'ありがとう！' };
+    const ty = THANK_YOU[drifter.id] || { en:'Thank you!' };
     const panel = document.createElement('div');
     panel.style.cssText = `
       position:fixed;bottom:0;left:0;right:0;z-index:9200;
@@ -973,7 +963,7 @@
             <p style="font-size:clamp(.62rem,1.7vw,.75rem);color:#9a7850;letter-spacing:.14em;text-transform:uppercase;margin:0 0 2px;">${drifter.name}</p>
             <div style="width:44px;height:1px;background:#c8b48a;margin:0 0 10px;"></div>
             <p style="font-size:clamp(.88rem,2.4vw,1.04rem);color:#1e140a;line-height:1.6;margin:0 0 4px;">${ty.en}</p>
-            <p style="font-size:clamp(.76rem,2vw,.9rem);color:#6a5030;line-height:1.65;margin:0 0 14px;">${ty.jp}</p>
+            <div style="height:10px;"></div>
             <button id="ty-close-btn" style="background:transparent;border:1px solid #b8a478;color:#9a7850;font-family:'Georgia',serif;font-size:clamp(.73rem,1.9vw,.86rem);letter-spacing:.1em;cursor:pointer;padding:7px 20px;border-radius:4px;transition:all .16s;">Close / 閉じる</button>
           </div>
         </div>

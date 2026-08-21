@@ -308,18 +308,49 @@ const HAPPY_HOUSE_PORTAL = {
     return { x: Math.round(cx + 300), y: Math.round(cy + 250) };
   }
 
-  function buildWeeklyOrbs() {
-    const rng        = seededRng(boohaWeek * 7919 + 3);
-    const roomOrder  = seededShuffle(ORB_ROOMS, rng).slice(0, ORB_COUNT);
-    const allDecoys  = Array.from({ length: ORB_DECOY_COUNT }, (_, i) =>
-      'decoy_' + String(i + 1).padStart(2, '0'));
-    const pickedDecoys = seededShuffle(allDecoys, rng).slice(0, 3);
+  function getQuestEpisode(quest) {
+    return quest && quest.episodeId && window.UTSUROBA_EPISODES
+      ? window.UTSUROBA_EPISODES[quest.episodeId] : null;
+  }
 
-    const quest     = loadDrifterQuest();
+  function buildWeeklyOrbs() {
+    const rng = seededRng(boohaWeek * 7919 + 3);
+    const quest = loadDrifterQuest();
     const memIdx    = (quest && quest.memIdx != null) ? quest.memIdx : 1;
     const drifterId = (quest && quest.active) ? quest.active : 'ks';
-
     const correctMemoryId = `${drifterId}_a${String(memIdx).padStart(2, '0')}`;
+
+    /* Pass 3: an episode with a trail gets one authored evidence orb at a
+       time. The next room is earned by reading the current fragment, not by
+       sweeping Karasuki for an invisible random target. */
+    const episode = getQuestEpisode(quest);
+    if (quest && quest.active === drifterId && episode && Array.isArray(episode.trail) && episode.trail.length) {
+      const trailIndex = Number.isInteger(quest.trailIndex) ? quest.trailIndex : 0;
+      const entry = episode.trail[trailIndex];
+      if (!entry) return [];
+      const pos = Number.isFinite(entry.x) && Number.isFinite(entry.y)
+        ? { x: entry.x, y: entry.y }
+        : generateOrbPosition(entry.roomId, rng);
+      return [{
+        memoryId: entry.id,
+        finalMemoryId: correctMemoryId,
+        trailId: entry.id,
+        trailIndex,
+        trailEntry: entry,
+        roomId: entry.roomId,
+        x: pos.x,
+        y: pos.y,
+        audioFile: ORB_AUDIO_BASE + correctMemoryId + '.mp3',
+        collected: false,
+        isCorrect: true,
+        isTrail: true,
+      }];
+    }
+
+    const roomOrder = seededShuffle(ORB_ROOMS, rng).slice(0, ORB_COUNT);
+    const allDecoys = Array.from({ length: ORB_DECOY_COUNT }, (_, i) =>
+      'decoy_' + String(i + 1).padStart(2, '0'));
+    const pickedDecoys = seededShuffle(allDecoys, rng).slice(0, 3);
 
     const orbs = [];
     roomOrder.forEach((roomId, i) => {
@@ -390,6 +421,12 @@ const HAPPY_HOUSE_PORTAL = {
       for (const orb of weeklyOrbs) {
         if (orb.memoryId === quest.collectedMemoryId) { orb.collected = true; break; }
       }
+    }
+    if (window.UTSUROBA_EPISODES_READY) {
+      window.UTSUROBA_EPISODES_READY.then(() => {
+        weeklyOrbs = buildWeeklyOrbs();
+        updateTrailHud();
+      }).catch(() => {});
     }
   }
 
@@ -468,6 +505,46 @@ const HAPPY_HOUSE_PORTAL = {
      ORB PANEL
   ═══════════════════════════════════════════ */
   let orbPanelEl = null;
+  let trailHudEl = null;
+
+  function injectTrailHud() {
+    if (trailHudEl) return;
+    trailHudEl = document.createElement('div');
+    trailHudEl.id = 'memory-trail-hud';
+    trailHudEl.style.cssText = `
+      display:none;position:fixed;left:14px;top:14px;z-index:7000;max-width:min(310px,calc(100vw - 28px));
+      padding:11px 14px 12px;border:1px solid rgba(255,217,102,.55);border-radius:10px;
+      background:rgba(29,19,6,.88);box-shadow:0 4px 18px rgba(0,0,0,.3);color:#fff4cf;
+      font-family:Georgia,serif;pointer-events:none;`;
+    trailHudEl.innerHTML = `
+      <div id="trail-hud-title" style="font-size:.76rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;"></div>
+      <div id="trail-hud-title-jp" style="font-size:.68rem;color:#e4c889;margin-top:2px;"></div>
+      <div id="trail-hud-step" style="font-size:.78rem;margin-top:8px;"></div>
+      <div id="trail-hud-hint" style="font-size:.76rem;line-height:1.35;margin-top:6px;color:#fff;"></div>
+      <div id="trail-hud-hint-jp" style="font-size:.68rem;line-height:1.35;margin-top:2px;color:#e4c889;"></div>`;
+    document.body.appendChild(trailHudEl);
+  }
+
+  function updateTrailHud() {
+    if (!trailHudEl) return;
+    const quest = loadDrifterQuest();
+    const episode = getQuestEpisode(quest);
+    const trail = episode && Array.isArray(episode.trail) ? episode.trail : null;
+    if (!quest || !quest.active || !trail || !trail.length) {
+      trailHudEl.style.display = 'none';
+      return;
+    }
+    const step = Math.max(0, Math.min(trail.length, Number.isInteger(quest.trailIndex) ? quest.trailIndex : 0));
+    const next = trail[step];
+    trailHudEl.style.display = 'block';
+    trailHudEl.querySelector('#trail-hud-title').textContent = 'Memory trail';
+    trailHudEl.querySelector('#trail-hud-title-jp').textContent = '記憶の道';
+    trailHudEl.querySelector('#trail-hud-step').textContent = step >= trail.length
+      ? `All evidence found · ${trail.length}/${trail.length} / すべて発見`
+      : `Evidence ${step}/${trail.length} / 手がかり ${step}/${trail.length}`;
+    trailHudEl.querySelector('#trail-hud-hint').textContent = next ? `Next: ${next.hint}` : 'Return to Kurobane.';
+    trailHudEl.querySelector('#trail-hud-hint-jp').textContent = next ? next.hintJP : 'クロバネのところへ戻りましょう。';
+  }
 
   function injectOrbPanel() {
     if (orbPanelEl) return;
@@ -484,12 +561,13 @@ const HAPPY_HOUSE_PORTAL = {
         <div style="width:44px;height:4px;border-radius:2px;background:#c8a96e;margin:0 auto 18px;opacity:0.55;"></div>
         <button id="orb-panel-close" style="position:absolute;top:16px;right:20px;background:transparent;border:none;cursor:pointer;font-size:1.1rem;color:#8b6914;opacity:0.55;padding:4px 8px;font-family:'Georgia',serif;">✕</button>
         <h2 id="orb-panel-title" style="text-align:center;margin:0 0 4px;font-size:clamp(1.1rem,3.5vw,1.35rem);color:#3a2400;letter-spacing:.08em;text-shadow:0 1px 0 rgba(255,255,255,0.7);">You found a memory!</h2>
-        <p style="text-align:center;margin:0 0 18px;font-size:clamp(.8rem,2.5vw,.95rem);color:#5a3c00;letter-spacing:.06em;opacity:0.75;">記憶を見つけた！</p>
+        <p id="orb-panel-subtitle" style="text-align:center;margin:0 0 9px;font-size:clamp(.8rem,2.5vw,.95rem);color:#5a3c00;letter-spacing:.06em;opacity:0.75;">記憶を見つけた！</p>
+        <p id="orb-panel-fragment" style="text-align:center;margin:0 auto 18px;max-width:440px;font-size:clamp(.86rem,2.6vw,1rem);line-height:1.55;color:#3a2400;"></p>
         <div style="text-align:center;margin-bottom:18px;">
           <button id="orb-play-btn" style="background:linear-gradient(135deg,#fdf3d0,#f5dfa0);border:1.5px solid #c8a030;border-radius:50%;width:56px;height:56px;cursor:pointer;font-size:1.5rem;box-shadow:0 2px 10px rgba(180,140,0,0.25);transition:all .18s;display:inline-flex;align-items:center;justify-content:center;color:#5a3800;">▶</button>
         </div>
         <div style="display:flex;gap:14px;justify-content:center;margin-bottom:14px;">
-          <button id="orb-collect-btn" style="background:linear-gradient(135deg,#fdf3d0,#f0dfa0);border:1.5px solid #b8900a;border-radius:6px;font-family:'Georgia',serif;font-size:clamp(.82rem,2.6vw,.95rem);letter-spacing:.1em;cursor:pointer;padding:10px 30px;color:#3a2000;box-shadow:0 2px 8px rgba(180,140,0,0.2);transition:all .18s;">COLLECT</button>
+          <button id="orb-collect-btn" style="background:linear-gradient(135deg,#fdf3d0,#f0dfa0);border:1.5px solid #b8900a;border-radius:6px;font-family:'Georgia',serif;font-size:clamp(.82rem,2.6vw,.95rem);letter-spacing:.1em;cursor:pointer;padding:10px 30px;color:#3a2000;box-shadow:0 2px 8px rgba(180,140,0,0.2);transition:all .18s;">COLLECT / 持つ</button>
           <button id="orb-leave-btn" style="background:transparent;border:1.5px solid rgba(139,105,20,0.35);border-radius:6px;font-family:'Georgia',serif;font-size:clamp(.82rem,2.6vw,.95rem);letter-spacing:.1em;cursor:pointer;padding:10px 30px;color:#7a5c1e;transition:all .18s;">LEAVE</button>
         </div>
         <p style="text-align:center;font-size:clamp(.68rem,2vw,.78rem);color:#7a5010;opacity:0.7;margin:0 0 2px;font-style:italic;">Only one memory can be carried at a time.</p>
@@ -531,6 +609,15 @@ const HAPPY_HOUSE_PORTAL = {
     try { if (state.musicStarted) { music.pause(); } } catch (_) {}
     const playBtn = document.getElementById('orb-play-btn');
     if (playBtn) playBtn.textContent = '▶';
+    const title = document.getElementById('orb-panel-title');
+    const subtitle = document.getElementById('orb-panel-subtitle');
+    const fragment = document.getElementById('orb-panel-fragment');
+    const collectBtn = document.getElementById('orb-collect-btn');
+    const entry = orb.trailEntry;
+    if (title) title.textContent = entry ? entry.title : 'You found a memory!';
+    if (subtitle) subtitle.textContent = entry ? entry.titleJP : '記憶を見つけた！';
+    if (fragment) fragment.textContent = entry ? entry.text : '';
+    if (collectBtn) collectBtn.textContent = entry ? 'KEEP EVIDENCE / 手がかりを持つ' : 'COLLECT / 持つ';
     orbPanelEl.style.display = 'block';
     requestAnimationFrame(() => { orbPanelEl.style.transform = 'translateY(0)'; });
     state.clickTarget = null;
@@ -587,6 +674,27 @@ const HAPPY_HOUSE_PORTAL = {
   function doCollect(orb) {
     orb.collected = true;
     stopOrbAudio();
+    if (orb.isTrail) {
+      const quest = loadDrifterQuest();
+      const episode = getQuestEpisode(quest);
+      const trail = episode && Array.isArray(episode.trail) ? episode.trail : [];
+      const fragments = Array.isArray(quest && quest.collectedFragments)
+        ? quest.collectedFragments.slice() : [];
+      if (!fragments.includes(orb.trailId)) fragments.push(orb.trailId);
+      const nextIndex = orb.trailIndex + 1;
+      const complete = nextIndex >= trail.length;
+      saveDrifterQuest({
+        collectedFragments: fragments,
+        trailIndex: nextIndex,
+        collectedMemoryId: complete ? orb.finalMemoryId : null,
+        orbIsCorrect: complete,
+        state: complete ? 'collected' : 'accepted',
+      });
+      weeklyOrbs = buildWeeklyOrbs();
+      updateTrailHud();
+      closeOrbPanel();
+      return;
+    }
     saveDrifterQuest({
       collectedMemoryId : orb.memoryId,
       orbIsCorrect    : orb.isCorrect,
@@ -2930,9 +3038,9 @@ function drawObserver(now) {
      INIT
   ═══════════════════════════════════════════ */
   function init() {
-    injectStyles(); buildApp(); KarasukiAtmos.init(stage);
+    injectStyles(); buildApp(); injectTrailHud(); KarasukiAtmos.init(stage);
     fitStage(); resizeCanvas();
-    initOrbs(); processWrongOrbReturn(); renderInitialRoom(); initWanderers(); initNuppi(); bindInput();
+    initOrbs(); processWrongOrbReturn(); updateTrailHud(); renderInitialRoom(); initWanderers(); initNuppi(); bindInput();
     
     window.addEventListener("resize",()=>{ fitStage(); resizeCanvas(); });
     requestAnimationFrame(tick);

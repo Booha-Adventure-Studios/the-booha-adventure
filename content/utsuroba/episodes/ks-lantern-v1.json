@@ -5,12 +5,19 @@
   "eyebrow": "MEMORY RECONSTRUCTION / 記憶の再構成",
   "intro": "Kurobane remembers the lantern. He does not remember why Chiyo left.",
   "introJP": "クロバネは灯りを覚えている。チヨがなぜ帰ったのかは覚えていない。",
+  "trailIntro": "Follow the memories in order. Each fragment points to the next room.",
+  "trailIntroJP": "記憶を順番に追いましょう。それぞれの手がかりが次の部屋を示します。",
+  "trail": [
+    {"id":"ks_lantern_evidence_01","roomId":"room_14","type":"event","label":"01 / FIRST LIGHT","labelJP":"最初の灯り","title":"A promise by the lantern","titleJP":"灯りのそばの約束","text":"Wait by the lantern. I will come back before the second bell.","hint":"The next memory is near the room where the second bell can be heard.","hintJP":"次の記憶は、二つ目の鐘が聞こえる部屋の近くです。"},
+    {"id":"ks_lantern_evidence_02","roomId":"room_06","type":"detail","label":"02 / MISSING DETAIL","labelJP":"消えた細部","title":"A light for the way home","titleJP":"帰り道の灯り","text":"If the light is gone, I cannot find the way home.","hint":"The final memory is where the path divides.","hintJP":"最後の記憶は、道が分かれる場所にあります。"},
+    {"id":"ks_lantern_evidence_03","roomId":"room_02","type":"inference","label":"03 / SILENCE","labelJP":"沈黙","title":"What the silence meant","titleJP":"沈黙の意味","text":"The second bell rang. The lantern went out.","hint":"Return to Kurobane with the three pieces.","hintJP":"三つの記憶を持って、クロバネのところへ戻りましょう。"}
+  ],
   "lines": [
-    {"speaker":"Kurobane","speakerJP":"クロバネ","en":"Wait by the lantern. I will come back before the second bell.","jp":"灯りのそばで待て。二つ目の鐘が鳴る前に戻る。"},
-    {"speaker":"Chiyo","speakerJP":"チヨ","en":"You said the bridge was safe.","jp":"橋は安全だと言ったよね。"},
-    {"speaker":"Kurobane","speakerJP":"クロバネ","en":"It was safe when I said it.","jp":"そう言ったときは安全だった。"},
-    {"speaker":"Narrator","speakerJP":"語り手","en":"The second bell rang. The lantern went out.","jp":"二つ目の鐘が鳴った。灯りが消えた。"},
-    {"speaker":"Chiyo","speakerJP":"チヨ","en":"If the light is gone, I cannot find the way home.","jp":"灯りが消えたら、家への道が分からない。"}
+    {"speaker":"Kurobane","en":"Wait by the lantern. I will come back before the second bell."},
+    {"speaker":"Chiyo","en":"You said the bridge was safe."},
+    {"speaker":"Kurobane","en":"It was safe when I said it."},
+    {"speaker":"Narrator","en":"The second bell rang. The lantern went out."},
+    {"speaker":"Chiyo","en":"If the light is gone, I cannot find the way home."}
   ],
   "checks": [
     {"type":"sequence","label":"01 / SEQUENCE","labelJP":"順番","prompt":"What happened first?","promptJP":"最初に何が起きましたか？","choices":["Kurobane told Chiyo to wait.","The second bell rang.","The lantern went out."],"choicesJP":["クロバネはチヨに待つように言った。","二つ目の鐘が鳴った。","灯りが消えた。"],"correct":0,"evidence":"The first line gives the starting instruction."},

@@ -28,9 +28,27 @@ for (const entry of index.episodes) {
   assert.ok(Array.isArray(episode.checks) && episode.checks.length >= 2,
     `${entry.id}: episode needs at least two comprehension checks`);
 
+  assert.ok(Array.isArray(episode.trail) && episode.trail.length >= 2,
+    `${entry.id}: episode needs an authored evidence trail`);
+
   for (const [lineIndex, line] of episode.lines.entries()) {
-    assert.ok(line.speaker && line.speakerJP && line.en && line.jp,
-      `${entry.id} line ${lineIndex + 1}: speaker and bilingual text are required`);
+    assert.ok(line.speaker && line.en,
+      `${entry.id} line ${lineIndex + 1}: English speaker and dialogue are required`);
+    assert.ok(!('speakerJP' in line) && !('jp' in line),
+      `${entry.id} line ${lineIndex + 1}: conversation lines must be English-only`);
+  }
+
+  const trailIds = new Set();
+  for (const [trailIndex, trail] of episode.trail.entries()) {
+    const label = `${entry.id} trail ${trailIndex + 1}`;
+    assert.ok(trail.id && !trailIds.has(trail.id), `${label}: unique id is required`);
+    trailIds.add(trail.id);
+    assert.ok(/^room_\d{2}$/.test(trail.roomId), `${label}: valid roomId is required`);
+    assert.ok(trail.title && trail.titleJP && trail.text,
+      `${label}: English evidence text and bilingual UI title are required`);
+    assert.ok(trail.hint && trail.hintJP,
+      `${label}: bilingual next-step direction is required`);
+    assert.ok(!('textJP' in trail), `${label}: conversation evidence must be English-only`);
   }
 
   for (const [checkIndex, check] of episode.checks.entries()) {
