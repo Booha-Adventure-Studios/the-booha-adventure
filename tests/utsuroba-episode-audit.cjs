@@ -23,6 +23,15 @@ for (const entry of index.episodes) {
   const episode = JSON.parse(fs.readFileSync(filename, 'utf8'));
   assert.strictEqual(episode.id, entry.id, `${entry.id}: file id must match index`);
   assert.ok(episode.title && episode.titleJP, `${entry.id}: title is required`);
+  assert.ok(episode.worldEcho && episode.worldEcho.roomId && episode.worldEcho.label && episode.worldEcho.labelJP,
+    `${entry.id}: restored memories need a bilingual world echo`);
+  assert.ok(/^room_\d{2}$/.test(episode.worldEcho.roomId),
+    `${entry.id}: world echo roomId is invalid`);
+  assert.ok(['lantern', 'candy', 'reflection'].includes(episode.worldEcho.motif),
+    `${entry.id}: world echo motif is unsupported`);
+  assert.ok(Number.isFinite(episode.worldEcho.x) && episode.worldEcho.x >= 0 && episode.worldEcho.x <= 1 &&
+    Number.isFinite(episode.worldEcho.y) && episode.worldEcho.y >= 0 && episode.worldEcho.y <= 1,
+    `${entry.id}: world echo position must be normalized`);
   assert.ok(Array.isArray(episode.lines) && episode.lines.length >= 3,
     `${entry.id}: episode needs at least three conversation lines`);
   assert.ok(Array.isArray(episode.checks) && episode.checks.length >= 2,

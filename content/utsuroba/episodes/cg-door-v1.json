@@ -46,5 +46,6 @@
     {"type":"inference","supportingLine":4,"revealAct":2,"evidenceLines":[4],"restoreText":"The fear becomes understandable.","restoreTextJP":"恐怖の意味が分かりました。","label":"03 / INFERENCE","labelJP":"推測","prompt":"Why could Chagrin breathe again? Then prove it with a line.","promptJP":"チャグリンはなぜまた息ができましたか？その証拠の行も選びましょう。","choices":["He understood that the shape was his reflection.","The door opened by itself.","He found a red candy."],"choicesJP":["その形が自分の姿だと分かったから。","扉がひとりでに開いたから。","赤いキャンディを見つけたから。"],"correct":0,"evidence":"Recognizing his reflection changes the frightening shape into something he understands.","evidenceJP":"自分の姿だと分かり、怖い形が理解できるものに変わったからです。"}
   ],
   "success": "The memory settles. Chagrin is still nervous, but the dark no longer owns the whole story.",
-  "successJP": "記憶が落ち着きました。チャグリンはまだ緊張していますが、暗闇だけが物語のすべてではありません。"
+  "successJP": "記憶が落ち着きました。チャグリンはまだ緊張していますが、暗闇だけが物語のすべてではありません。",
+  "worldEcho": {"roomId":"room_03","x":0.53,"y":0.47,"motif":"reflection","label":"A kinder reflection","labelJP":"やさしい反射"}
 }

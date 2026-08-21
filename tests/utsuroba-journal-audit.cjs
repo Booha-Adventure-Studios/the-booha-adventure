@@ -15,6 +15,9 @@ assert.match(utsuroba, /data-journal-entry/, 'Journal entries must have replay c
 assert.match(utsuroba, /wordCabinet/, 'Utsuroba save migration must initialize the Word Cabinet');
 assert.match(utsuroba, /data-cabinet-word/, 'Journal must expose interactive vocabulary entries');
 assert.match(utsuroba, /definitionJP/, 'Word Cabinet entries must retain simple Japanese help');
+assert.match(utsuroba, /readingEchoes/, 'Restored memories must create weekly world echoes');
+assert.match(utsuroba, /renderMemoryEchoes/, 'Utsuroba must render restored memory echoes');
+assert.match(utsuroba, /restoredGreeting/, 'Drifters must have post-memory dialogue');
 assert.match(utsuroba, /reviewOnly:\s*true/, 'Journal replay must use review-only mode');
 assert.match(utsuroba, /completeMemory[\s\S]*readingJournal/, 'Restored reading memories must be recorded before quest cleanup');
 assert.match(reading, /opts\.reviewOnly/, 'Reading engine must understand review-only sessions');
