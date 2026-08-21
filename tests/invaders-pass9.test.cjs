@@ -57,10 +57,16 @@ assert.ok(pauseDraw.indexOf('PAUSE_SAVE_BTN.x=saveX') < pauseDraw.indexOf('PAUSE
 const saveHandlers = engine.match(/if \(e\.clientX>=sv\.x&&e\.clientX<=sv\.x\+sv\.w&&e\.clientY>=sv\.y&&e\.clientY<=sv\.y\+sv\.h\) \{\n\s*if \(window\.BoohaSaveMenu\) BoohaSaveMenu\.open\(\);\n\s*return;\n\s*\}/g);
 assert.strictEqual(saveHandlers ? saveHandlers.length : 0, 2, 'save hit-test must be wired in both the canvas and mobileHoldControls pointerdown handlers');
 
-// Opening the save menu from pause must not itself unpause/navigate — that
-// branch returns before the resume/exit logic runs.
+// Opening the save menu from pause must not itself unpause/navigate — the
+// save branch must appear (and return) before the exit branch runs. (Pass
+// 10 inserted a mute check between them, which is fine — order, not
+// adjacency, is what matters here.)
 const canvasPause = engine.slice(engine.indexOf('canvas.addEventListener("pointerdown"'), engine.indexOf('canvas.addEventListener("pointermove"'));
-assert.match(canvasPause, /sv\.x[\s\S]*?BoohaSaveMenu\.open\(\);\s*\n\s*return;\s*\n\s*\}\s*\n\s*if \(e\.clientX>=ex\.x/);
+const svIdx = canvasPause.indexOf('sv.x');
+const saveReturnIdx = canvasPause.indexOf('BoohaSaveMenu.open();', svIdx);
+const exIdx = canvasPause.indexOf('e.clientX>=ex.x');
+assert.ok(svIdx !== -1 && saveReturnIdx !== -1 && exIdx !== -1 && svIdx < saveReturnIdx && saveReturnIdx < exIdx,
+  'save branch must be checked, and return, before the exit branch');
 
 // z-index override: save-ui.css's stack must be raised above both
 // #mobileHoldControls (9990) and #startOverlay (9999) or the save panel
