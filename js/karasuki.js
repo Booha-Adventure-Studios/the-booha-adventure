@@ -232,6 +232,18 @@ const HAPPY_HOUSE_PORTAL = {
   const ORB_R    = 10;
   const ORB_GLOW = 28;
 
+  /* Pass 2 (see claude/utsuroba-audit-and-pass-plan.md) — tint each
+     orb by its episode's worldEcho.motif instead of one hardcoded
+     gold for everyone, so Ned's candy memory reads red/pink, Chagrin's
+     reflection reads cool blue, etc. glowRGBA feeds the same
+     createRadialGradient calls drawOrbs() already made; only the
+     color values are new. */
+  const ORB_MOTIF_COLORS = {
+    lantern:    { glowRGBA: '255,240,180', coreHi: '#fffde0', coreMid: '#ffd966', coreLo: '#c8860a', shadow: '#ffd966' },
+    candy:      { glowRGBA: '255,190,205', coreHi: '#fff0f4', coreMid: '#ff85a1', coreLo: '#c23a5e', shadow: '#ff85a1' },
+    reflection: { glowRGBA: '190,235,255', coreHi: '#eafcff', coreMid: '#a8edff', coreLo: '#3b8fbf', shadow: '#a8edff' },
+  };
+
   const ORB_MIN_FROM_CENTER   = 220;
   const ORB_MIN_FROM_WANDERER = 90;
   const ORB_MIN_FROM_TREE     = 80;
@@ -314,6 +326,10 @@ const HAPPY_HOUSE_PORTAL = {
       const pos = Number.isFinite(entry.x) && Number.isFinite(entry.y)
         ? { x: entry.x, y: entry.y }
         : generateOrbPosition(entry.roomId, rng);
+      // Audit Pass 2: carry the episode's motif onto the orb so drawOrbs()
+      // can tint it instead of hardcoding gold for every drifter.
+      const motif = (episode.worldEcho && ORB_MOTIF_COLORS[episode.worldEcho.motif])
+        ? episode.worldEcho.motif : 'lantern';
       return [{
         memoryId: entry.id,
         finalMemoryId: correctMemoryId,
@@ -326,6 +342,7 @@ const HAPPY_HOUSE_PORTAL = {
         collected: false,
         isCorrect: true,
         isTrail: true,
+        motif,
       }];
     }
 
@@ -474,31 +491,69 @@ const HAPPY_HOUSE_PORTAL = {
   function drawOrbs(now) {
     const orbs = getOrbsForRoom(state.roomId);
     if (!orbs.length) return;
+    drawOrbTrail(now, orbs);
     const sec = now / 1000;
     orbs.forEach((orb, i) => {
+      const colors = ORB_MOTIF_COLORS[orb.motif] || ORB_MOTIF_COLORS.lantern;
       const pulse  = 0.5 + 0.5 * Math.sin(sec * 1.8 + i * 1.1);
       const pulse2 = 0.5 + 0.5 * Math.sin(sec * 2.6 + i * 0.7);
       const bob    = Math.sin(sec * 1.4 + i * 0.9) * 5;
       const ox = orb.x, oy = orb.y + bob;
       ctx.save();
       const glow = ctx.createRadialGradient(ox, oy, 0, ox, oy, ORB_GLOW);
-      glow.addColorStop(0,   'rgba(255,240,180,0.55)');
-      glow.addColorStop(0.4, 'rgba(255,220,100,0.25)');
+      glow.addColorStop(0,   `rgba(${colors.glowRGBA},0.55)`);
+      glow.addColorStop(0.4, `rgba(${colors.glowRGBA},0.25)`);
       glow.addColorStop(1,   'transparent');
       ctx.globalAlpha = 0.5 + pulse * 0.35; ctx.fillStyle = glow;
       ctx.beginPath(); ctx.arc(ox, oy, ORB_GLOW, 0, Math.PI * 2); ctx.fill();
       const coreR = ORB_R * (0.85 + pulse * 0.18);
       const core  = ctx.createRadialGradient(ox - coreR * 0.3, oy - coreR * 0.3, 0, ox, oy, coreR);
       core.addColorStop(0,    '#ffffff');
-      core.addColorStop(0.35, '#fffde0');
-      core.addColorStop(0.7,  '#ffd966');
-      core.addColorStop(1,    '#c8860a');
-      ctx.globalAlpha = 0.95; ctx.shadowBlur = 14 + pulse2 * 10; ctx.shadowColor = '#ffd966';
+      core.addColorStop(0.35, colors.coreHi);
+      core.addColorStop(0.7,  colors.coreMid);
+      core.addColorStop(1,    colors.coreLo);
+      ctx.globalAlpha = 0.95; ctx.shadowBlur = 14 + pulse2 * 10; ctx.shadowColor = colors.shadow;
       ctx.fillStyle = core; ctx.beginPath(); ctx.arc(ox, oy, coreR, 0, Math.PI * 2); ctx.fill();
       ctx.shadowBlur = 0;
       ctx.globalAlpha = 0.55 + pulse * 0.2; ctx.fillStyle = '#ffffff';
       ctx.beginPath(); ctx.arc(ox - coreR * 0.28, oy - coreR * 0.28, coreR * 0.28, 0, Math.PI * 2); ctx.fill();
       ctx.restore();
+    });
+  }
+
+  /* Pass 2 — a soft glowing trail from the player to the active orb,
+     tinted to match it, so finding it is "follow the glow" instead of
+     parsing the trail-hint text. Cheap on purpose: a handful of small
+     filled dots along a gently curved line, no per-point gradients
+     (the Maze audit flagged createRadialGradient-per-particle as the
+     real perf trap — this avoids that entirely). Only draws once the
+     player is far enough away that the orb's own glow doesn't already
+     cover the gap. */
+  const ORB_TRAIL_POINTS = 7;
+  function drawOrbTrail(now, orbs) {
+    if (!orbs.length || state.transitioning) return;
+    const sec = now / 1000;
+    orbs.forEach(orb => {
+      const colors = ORB_MOTIF_COLORS[orb.motif] || ORB_MOTIF_COLORS.lantern;
+      const dx = orb.x - state.x, dy = orb.y - state.y;
+      const dist = Math.hypot(dx, dy);
+      if (dist < ORB_GLOW * 2) return;
+      const nx = -dy / dist, ny = dx / dist;
+      const flowPos = (sec * 2.1) % 1;
+      for (let i = 1; i < ORB_TRAIL_POINTS; i++) {
+        const t = i / ORB_TRAIL_POINTS;
+        const wave = Math.sin(t * Math.PI) * 12 * Math.sin(sec * 1.5);
+        const px = state.x + dx * t + nx * wave;
+        const py = state.y + dy * t + ny * wave;
+        const flowDist = Math.abs(((t - flowPos + 1.5) % 1) - 0.5);
+        const alpha = 0.10 + 0.28 * Math.max(0, 1 - flowDist * 2.4);
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = `rgba(${colors.glowRGBA},1)`;
+        ctx.shadowBlur = 7; ctx.shadowColor = colors.shadow;
+        ctx.beginPath(); ctx.arc(px, py, 2.6 + t * 1.6, 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
+      }
     });
   }
 
