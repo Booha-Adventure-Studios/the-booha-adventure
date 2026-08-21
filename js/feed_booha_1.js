@@ -1182,31 +1182,84 @@
     }
   }
 
+  // Swept point-vs-box test: finds where the segment (x0,y0)-(x1,y1) first
+  // enters the box [left,right]x[top,bottom], if it does. Returns the entry
+  // fraction t and which face was crossed (nx/ny is the outward normal of
+  // that face), or null if the segment never enters the box. This replaces
+  // a "did we land on the top edge this exact frame" check, which missed
+  // fast/diagonal approaches (candy's center can jump clean across a pad's
+  // width in one physics step) and had no notion of the other three faces
+  // at all, so candy arriving from the side or from underneath just passed
+  // through with no collision.
+  function sweptBoxHit(x0, y0, x1, y1, left, right, top, bottom) {
+    const dx = x1 - x0, dy = y1 - y0;
+    let tMin = 0, tMax = 1, nx = 0, ny = 0;
+
+    if (dx !== 0) {
+      const tx1 = (left - x0) / dx, tx2 = (right - x0) / dx;
+      const txEnter = Math.min(tx1, tx2), txExit = Math.max(tx1, tx2);
+      if (txEnter > tMin) { tMin = txEnter; nx = dx > 0 ? -1 : 1; ny = 0; }
+      tMax = Math.min(tMax, txExit);
+    } else if (x0 <= left || x0 >= right) {
+      return null;
+    }
+
+    if (dy !== 0) {
+      const ty1 = (top - y0) / dy, ty2 = (bottom - y0) / dy;
+      const tyEnter = Math.min(ty1, ty2), tyExit = Math.max(ty1, ty2);
+      if (tyEnter > tMin) { tMin = tyEnter; nx = 0; ny = dy > 0 ? -1 : 1; }
+      tMax = Math.min(tMax, tyExit);
+    } else if (y0 <= top || y0 >= bottom) {
+      return null;
+    }
+
+    if (tMin > tMax || tMin < 0 || tMin > 1) return null;
+    if (nx === 0 && ny === 0) return null; // started inside; nothing to resolve
+    return { t: tMin, nx, ny };
+  }
+
   function handleBouncePads() {
     if (state.bounceCooldown > 0) state.bounceCooldown--;
     const c = state.candy;
     if (!c || c.attached) return;
+    const prevX = c.x - c.vx, prevY = c.y - c.vy;
     for (const obj of state.objects) {
-      if (obj.type !== 'bounce') continue;
-      if (obj.used) continue;
-      const l = obj.x - obj.width/2, r = obj.x + obj.width/2;
-      const top = obj.y - obj.height/2;
-      const previousBottom = c.y - c.vy + c.r;
-      const crossedTop = previousBottom <= top && c.y + c.r >= top;
-      const insideLandingBand = c.y + c.r >= top && c.y + c.r <= top + 22;
-      if (c.x+c.r > l && c.x-c.r < r && (crossedTop || insideLandingBand) && c.vy > 0) {
+      if (obj.type !== 'bounce' || obj.used) continue;
+      // Expand the box by the candy's radius so we can test the swept
+      // *center point* against it (Minkowski-sum trick) instead of trying
+      // to sweep a full circle, which keeps this a simple line-vs-box test.
+      const halfW = obj.width / 2 + c.r, halfH = obj.height / 2 + c.r;
+      const hit = sweptBoxHit(prevX, prevY, c.x, c.y,
+        obj.x - halfW, obj.x + halfW, obj.y - halfH, obj.y + halfH);
+      if (!hit) continue;
+
+      if (hit.ny === -1) {
+        // Landed on the top face — the pad's actual launch mechanic.
         obj.used = true;
-        c.y = top - c.r;
+        c.y = obj.y - obj.height / 2 - c.r;
         c.vy = -Math.max(10, Math.abs(c.vy) * 0.95);
         c.vx = c.vx * 1.02 + (obj.pushX || 0);
         // Only flag hitBounce if level cares about it (noBounce levels)
         if (state.currentLevel && state.currentLevel.noBounce) {
           state.hitBounce = true;
         }
-        if (state.bounceCooldown <= 0) {
-          playSfxBounce();
-          state.shakeFrames = 7; state.shakeAmt = 3; state.bounceCooldown = 8;
-        }
+      } else if (hit.ny === 1) {
+        // Bonked the underside — it's a solid block, not a landing pad:
+        // stop the rise and let the candy fall back, don't consume the pad.
+        c.y = obj.y + obj.height / 2 + c.r;
+        c.vy = Math.abs(c.vy) * 0.5;
+      } else if (hit.nx === -1) {
+        c.x = obj.x - obj.width / 2 - c.r;
+        c.vx = -Math.abs(c.vx) * 0.82;
+      } else if (hit.nx === 1) {
+        c.x = obj.x + obj.width / 2 + c.r;
+        c.vx = Math.abs(c.vx) * 0.82;
+      }
+
+      if (state.bounceCooldown <= 0) {
+        playSfxBounce();
+        state.shakeFrames = 7; state.shakeAmt = hit.ny === -1 ? 3 : 2;
+        state.bounceCooldown = 8;
       }
     }
   }
