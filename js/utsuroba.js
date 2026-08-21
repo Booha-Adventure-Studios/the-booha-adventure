@@ -171,6 +171,12 @@
       data.utsuroba.wordCabinet.entries = [];
       dirty = true;
     }
+    data.utsuroba.wordCabinet.entries.forEach(entry => {
+      if (!Number.isInteger(entry.reviewCount)) { entry.reviewCount = 0; dirty = true; }
+      if (!Number.isInteger(entry.attempts)) { entry.attempts = 0; dirty = true; }
+      if (!Number.isInteger(entry.misses)) { entry.misses = 0; dirty = true; }
+      if (!Number.isFinite(entry.nextReviewAt)) { entry.nextReviewAt = 0; dirty = true; }
+    });
     if (!data.utsuroba.readingEchoes || typeof data.utsuroba.readingEchoes !== 'object') {
       data.utsuroba.readingEchoes = {};
       dirty = true;
@@ -378,6 +384,10 @@
               definition: item.definition,
               definitionJP: item.definitionJP,
               discoveredAt: Date.now(),
+              reviewCount: 0,
+              attempts: 0,
+              misses: 0,
+              nextReviewAt: 0,
             });
           }
         });
@@ -536,6 +546,26 @@
       .reading-journal-word-detail{min-height:30px;margin-top:10px;padding:8px 10px;border-left:2px solid #ffcb75;color:#ffe7b2;font-size:.76rem;line-height:1.4;}
       .reading-journal-word-detail strong{color:#fff;font-size:.84rem;}
       .reading-journal-word-detail small{display:block;margin-top:3px;color:rgba(255,231,178,.65);font-size:.9em;}
+      .reading-journal-practice{margin:0 0 18px;padding:13px;border:1px solid rgba(216,168,255,.25);border-radius:10px;background:rgba(216,168,255,.045);}
+      .reading-journal-practice-heading{color:#e4c2ff;font:700 .78rem Georgia,serif;}
+      .reading-journal-practice-heading span{display:block;margin-top:3px;color:rgba(245,232,255,.52);font-size:.88em;font-weight:400;}
+      .reading-journal-practice-intro{margin:8px 0 10px;color:rgba(245,232,255,.7);font-size:.73rem;line-height:1.4;}
+      .reading-journal-practice-intro small{display:block;margin-top:3px;color:rgba(245,232,255,.48);font-size:.9em;}
+      .reading-journal-practice-start{padding:7px 12px;border:1px solid rgba(216,168,255,.48);border-radius:6px;background:rgba(216,168,255,.1);color:#f3ddff;cursor:pointer;font:700 .74rem Georgia,serif;}
+      .reading-journal-practice-start:hover,.reading-journal-practice-start:focus-visible{background:rgba(216,168,255,.2);outline:none;}
+      .reading-journal-practice-start:disabled{cursor:not-allowed;opacity:.45;}
+      .reading-word-practice-panel{margin-top:12px;padding:12px;border:1px solid rgba(255,203,117,.28);border-radius:8px;background:rgba(255,203,117,.055);}
+      .reading-word-practice-progress{color:rgba(255,231,178,.58);font:700 .66rem monospace;letter-spacing:.1em;text-transform:uppercase;}
+      .reading-word-practice-word{margin:9px 0;color:#fff;font-size:1.18rem;font-weight:700;}
+      .reading-word-practice-prompt{margin:0 0 9px;color:#ffe7b2;font-size:.78rem;line-height:1.4;}
+      .reading-word-practice-prompt small{display:block;margin-top:3px;color:rgba(255,231,178,.55);font-size:.9em;}
+      .reading-word-practice-options{display:grid;gap:7px;}
+      .reading-word-practice-option{padding:8px 9px;text-align:left;border:1px solid rgba(255,203,117,.3);border-radius:6px;background:rgba(255,255,255,.05);color:#fff;cursor:pointer;font:inherit;font-size:.75rem;line-height:1.35;}
+      .reading-word-practice-option:hover,.reading-word-practice-option:focus-visible{background:rgba(255,203,117,.14);border-color:#ffcb75;outline:none;}
+      .reading-word-practice-option small{display:block;margin-top:3px;color:rgba(255,231,178,.55);font-size:.9em;}
+      .reading-word-practice-feedback{margin-top:10px;padding:8px 9px;border-left:3px solid #ffcb75;color:#ffe7b2;font-size:.76rem;line-height:1.4;}
+      .reading-word-practice-feedback small{display:block;margin-top:3px;color:rgba(255,231,178,.58);font-size:.9em;}
+      .reading-word-practice-next{margin-top:9px;padding:6px 10px;border:1px solid rgba(216,168,255,.45);border-radius:6px;background:rgba(216,168,255,.1);color:#f3ddff;cursor:pointer;font:700 .72rem Georgia,serif;}
       .reading-journal-list{display:grid;gap:11px;}
       .reading-journal-entry{padding:14px;border:1px solid rgba(216,168,255,.22);border-radius:10px;background:rgba(255,255,255,.045);}
       .reading-journal-entry h3{margin:0;color:#fff;font-size:1rem;line-height:1.35;}
@@ -771,6 +801,28 @@
     return Array.isArray(entries) ? entries : [];
   }
 
+  function recordWordPracticeResult(item, correct) {
+    const data = loadSave();
+    const entries = data.utsuroba.wordCabinet?.entries;
+    const current = Array.isArray(entries)
+      ? entries.find(word => (word.key || `${word.episodeId}:${word.word}`) === (item.key || `${item.episodeId}:${item.word}`))
+      : null;
+    if (!current) return;
+    const now = Date.now();
+    current.attempts = (current.attempts || 0) + 1;
+    if (correct) {
+      current.reviewCount = (current.reviewCount || 0) + 1;
+      current.lastReviewedAt = now;
+      const intervals = [1, 3, 7, 14];
+      const days = intervals[Math.min(intervals.length - 1, current.reviewCount - 1)];
+      current.nextReviewAt = now + days * 24 * 60 * 60 * 1000;
+    } else {
+      current.misses = (current.misses || 0) + 1;
+      current.nextReviewAt = now;
+    }
+    writeSave(data);
+  }
+
   function refreshReadingJournalButton() {
     if (!readingJournalButton) return;
     const count = readingJournalEntries().length;
@@ -836,7 +888,7 @@
     state.inputLocked = true;
     readingJournalOverlay = document.createElement('div');
     readingJournalOverlay.id = 'utsuroba-reading-journal';
-    readingJournalOverlay.innerHTML = `<div class="reading-journal-card"><button class="reading-journal-close" type="button" aria-label="Close journal">✕</button><div class="reading-journal-eyebrow">READING JOURNAL / 読書ノート</div><h2>Restored memories <span>戻した記憶</span></h2><p class="reading-journal-intro">Read a memory again whenever you want. Try to remember the details.<small>いつでも記憶を読み返せます。細かい部分を思い出してみましょう。</small></p><details class="reading-journal-cabinet" id="reading-word-cabinet"><summary>Word Cabinet / 言葉箱<span>Words from the memories you restored. / 戻した記憶の言葉です。</span></summary><div class="reading-journal-cabinet-body"><div class="reading-journal-words"></div><div class="reading-journal-word-detail" id="reading-word-detail">Choose a word for help.<small>言葉を選ぶと意味が出ます。</small></div></div></details><div class="reading-journal-list"><div class="reading-journal-loading">Opening your journal…<small>ノートを開いています…</small></div></div></div>`;
+    readingJournalOverlay.innerHTML = `<div class="reading-journal-card"><button class="reading-journal-close" type="button" aria-label="Close journal">✕</button><div class="reading-journal-eyebrow">READING JOURNAL / 読書ノート</div><h2>Restored memories <span>戻した記憶</span></h2><p class="reading-journal-intro">Read a memory again whenever you want. Try to remember the details.<small>いつでも記憶を読み返せます。細かい部分を思い出してみましょう。</small></p><details class="reading-journal-cabinet" id="reading-word-cabinet"><summary>Word Cabinet / 言葉箱<span>Words from the memories you restored. / 戻した記憶の言葉です。</span></summary><div class="reading-journal-cabinet-body"><div class="reading-journal-words"></div><div class="reading-journal-word-detail" id="reading-word-detail">Choose a word for help.<small>言葉を選ぶと意味が出ます。</small></div></div></details><section class="reading-journal-practice" id="reading-word-practice"><div class="reading-journal-practice-heading">Word practice / 言葉の練習<span>Review three words with no pressure. / 三つの言葉を気軽に練習しましょう。</span></div><p class="reading-journal-practice-intro">Choose the simple meaning. Words you miss will return sooner.<small>やさしい意味を選びましょう。間違えた言葉は早く戻ります。</small></p><button class="reading-journal-practice-start" id="reading-word-practice-start" type="button">Practice 3 words / 3語を練習</button><div class="reading-word-practice-panel" id="reading-word-practice-panel" hidden></div></section><div class="reading-journal-list"><div class="reading-journal-loading">Opening your journal…<small>ノートを開いています…</small></div></div></div>`;
     document.body.appendChild(readingJournalOverlay);
     readingJournalOverlay.querySelector('.reading-journal-close').addEventListener('click', closeReadingJournal);
     readingJournalOverlay.addEventListener('click', event => { if (event.target === readingJournalOverlay) closeReadingJournal(); });
@@ -848,6 +900,8 @@
       const cabinetWords = wordCabinetEntries();
       const wordList = readingJournalOverlay.querySelector('.reading-journal-words');
       const wordDetail = readingJournalOverlay.querySelector('#reading-word-detail');
+      const practiceStart = readingJournalOverlay.querySelector('#reading-word-practice-start');
+      const practicePanel = readingJournalOverlay.querySelector('#reading-word-practice-panel');
       if (!cabinetWords.length) {
         wordList.innerHTML = '<span style="color:rgba(255,231,178,.55);font-size:.72rem;">Restore a memory to collect words.<br>記憶を戻すと、言葉を集められます。</span>';
       } else {
@@ -856,6 +910,52 @@
           const item = cabinetWords[Number(button.dataset.cabinetWord)];
           if (item && wordDetail) wordDetail.innerHTML = `<strong>${escapeHTML(item.word)}</strong> — ${escapeHTML(item.definition)}<small>${escapeHTML(item.definitionJP)}</small>`;
         }));
+      }
+      if (cabinetWords.length < 3) {
+        practiceStart.disabled = true;
+        practiceStart.textContent = 'Collect 3 words first / まず3語集めましょう';
+      } else {
+        const practiceQueue = cabinetWords.slice().sort((a, b) => (a.nextReviewAt || 0) - (b.nextReviewAt || 0)).slice(0, 3);
+        let practiceIndex = 0;
+        let practiceMistakes = 0;
+
+        const closePractice = () => {
+          practicePanel.hidden = true;
+          practicePanel.innerHTML = '';
+          practiceStart.hidden = false;
+        };
+
+        const renderPractice = (feedback = '') => {
+          if (practiceIndex >= practiceQueue.length) {
+            practicePanel.innerHTML = `<div class="reading-word-practice-feedback">Practice complete. You reviewed ${practiceQueue.length} words.<small>練習完了。${practiceQueue.length}語を復習しました。</small>${practiceMistakes ? `<br>You needed another try on ${practiceMistakes} answer${practiceMistakes === 1 ? '' : 's'}.<small>${practiceMistakes}問をもう一度考えました。</small>` : '<br>Clean round.<small>きれいにできました。</small>'}</div><button class="reading-word-practice-next" type="button" id="reading-word-practice-close">Close practice / 練習を閉じる</button>`;
+            practicePanel.hidden = false;
+            practicePanel.querySelector('#reading-word-practice-close').addEventListener('click', closePractice);
+            return;
+          }
+          const target = practiceQueue[practiceIndex];
+          const distractors = cabinetWords.filter(item => item.word !== target.word && item.definition !== target.definition).slice(0, 2);
+          const options = [target, ...distractors].sort((a, b) => (a.word === target.word ? -1 : b.word === target.word ? 1 : a.word.localeCompare(b.word)));
+          practicePanel.innerHTML = `<div class="reading-word-practice-progress">WORD ${practiceIndex + 1} / ${practiceQueue.length}</div><div class="reading-word-practice-word">${escapeHTML(target.word)}</div><p class="reading-word-practice-prompt">What does this word mean?<small>この言葉の意味は何ですか？</small></p>${feedback ? `<div class="reading-word-practice-feedback">${feedback}</div>` : ''}<div class="reading-word-practice-options">${options.map((item, index) => `<button class="reading-word-practice-option" type="button" data-practice-option="${index}">${escapeHTML(item.definition)}<small>${escapeHTML(item.definitionJP)}</small></button>`).join('')}</div>`;
+          practicePanel.hidden = false;
+          practicePanel.querySelectorAll('[data-practice-option]').forEach(button => button.addEventListener('click', () => {
+            const choice = options[Number(button.dataset.practiceOption)];
+            if (choice.word === target.word) {
+              recordWordPracticeResult(target, true);
+              practiceIndex += 1;
+              renderPractice('<strong>Correct.</strong> The word is clearer now.<small>正解。言葉が少し分かりやすくなりました。</small>');
+            } else {
+              recordWordPracticeResult(target, false);
+              practiceMistakes += 1;
+              renderPractice('<strong>Not yet.</strong> Try the meaning again.<small>もう一度、意味を考えましょう。</small>');
+            }
+          }));
+        };
+        practiceStart.addEventListener('click', () => {
+          practiceStart.hidden = true;
+          practiceIndex = 0;
+          practiceMistakes = 0;
+          renderPractice();
+        });
       }
       if (!entries.length) {
         list.innerHTML = '<div class="reading-journal-empty">Restore a memory to place it here.<small>記憶を戻すと、ここに記録されます。</small></div>';

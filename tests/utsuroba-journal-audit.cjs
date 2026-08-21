@@ -20,6 +20,9 @@ assert.match(utsuroba, /renderMemoryEchoes/, 'Utsuroba must render restored memo
 assert.match(utsuroba, /restoredGreeting/, 'Drifters must have post-memory dialogue');
 assert.match(utsuroba, /masteryLevel/, 'Journal entries must persist adaptive reading mastery');
 assert.match(utsuroba, /recordReadingReview/, 'Review results must update the learner reading state');
+assert.match(utsuroba, /recordWordPracticeResult/, 'Word practice must persist vocabulary review results');
+assert.match(utsuroba, /reading-word-practice-start/, 'Journal must expose optional word practice');
+assert.match(utsuroba, /nextReviewAt/, 'Vocabulary must use a return schedule');
 assert.match(utsuroba, /reviewOnly:\s*true/, 'Journal replay must use review-only mode');
 assert.match(utsuroba, /completeMemory[\s\S]*readingJournal/, 'Restored reading memories must be recorded before quest cleanup');
 assert.match(reading, /opts\.reviewOnly/, 'Reading engine must understand review-only sessions');
