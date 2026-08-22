@@ -687,13 +687,14 @@ const HAPPY_HOUSE_PORTAL = {
     trailHudEl.id = 'memory-trail-hud';
     trailHudEl.className = 'utsu-hud-chip is-left is-trail is-passive';
     trailHudEl.style.display = 'none';
+    const R = window.UtsuFurigana ? window.UtsuFurigana.rb : (kanji) => kanji;
     trailHudEl.innerHTML = `
       <div class="utsu-hud-chip-icon"><span aria-hidden="true">❖</span></div>
       <div class="utsu-hud-chip-count" id="trail-hud-count"></div>
       <div class="utsu-hud-chip-text">
         <span class="utsu-hud-chip-primary" id="trail-hud-hint"></span>
         <span class="utsu-hud-chip-secondary" id="trail-hud-hint-jp"></span>
-        <span class="utsu-hud-chip-nav" id="trail-hud-nav"><span class="utsu-hud-chip-nav-arrow" aria-hidden="true">➜</span>Follow the glowing arrow / 光る矢印について行こう</span>
+        <span class="utsu-hud-chip-nav" id="trail-hud-nav">Follow the gold arrows / ${R('金色','きんいろ')}の${R('矢印','やじるし')}について${R('行','い')}こう</span>
       </div>`;
     document.body.appendChild(trailHudEl);
   }
@@ -753,8 +754,15 @@ const HAPPY_HOUSE_PORTAL = {
     const returnTarget = drifterReturnLabel(quest.active);
     trailHudEl.querySelector('#trail-hud-hint').textContent = next
       ? next.hint : `Return to ${returnTarget.en}.`;
-    trailHudEl.querySelector('#trail-hud-hint-jp').textContent = next
-      ? next.hintJP : `${returnTarget.jp}のところへ戻りましょう。`;
+    /* trail[].hintJP now carries authored <ruby> furigana markup (single
+       consumer — only this line reads it, confirmed by grep before
+       editing the episode JSON), so this needs innerHTML, not
+       textContent, to actually render the ruby instead of showing the
+       tags as text. The fallback line gets its own inline ruby call. */
+    const hintJPHTML = next
+      ? next.hintJP
+      : `${returnTarget.jp}のところへ${window.UtsuFurigana ? window.UtsuFurigana.rb('戻', 'もど') : '戻'}りましょう。`;
+    trailHudEl.querySelector('#trail-hud-hint-jp').innerHTML = hintJPHTML;
     trailHudEl.querySelector('#trail-hud-nav').classList.toggle('is-shown', !!questNavTargetRoomId);
   }
 
@@ -796,24 +804,30 @@ const HAPPY_HOUSE_PORTAL = {
      orb's own motif color (candy/lantern/reflection/thorn/ribbon)
      instead of a fixed gold, the same color language the orb itself and
      its glow trail already use. See claude/utsuroba-audit-and-pass-plan.md. */
+  /* Round 2 Pass 17 ("massive!"): switched to the same .is-floating
+     treatment the drifter drawer uses — a centered, width/height-capped
+     card — instead of a full-bleed bar stretching edge to edge with a
+     narrow column of content in the middle of it. */
   function injectOrbPanel() {
     if (orbPanelEl) return;
     orbPanelEl = document.createElement('div');
     orbPanelEl.id = 'orb-panel';
-    orbPanelEl.className = 'utsu-card';
+    orbPanelEl.className = 'utsu-card is-floating';
     orbPanelEl.innerHTML = `
       <div class="dp-handle"></div>
-      <div class="dp-inner" style="max-width:520px;margin:0 auto;">
+      <div class="dp-inner" style="max-width:480px;margin:0 auto;">
         <div class="dp-body" style="text-align:center;">
           <button id="orb-panel-close" class="dp-close-x">✕</button>
-          <h2 id="orb-panel-title" class="dp-name-kanji" style="font-size:clamp(1.02rem,3vw,1.22rem);">You found a memory box!</h2>
+          <h2 id="orb-panel-title" style="font-size:clamp(1.08rem,3.2vw,1.32rem);font-weight:700;color:#1e140a;margin:0 0 1px;">You found a memory box!</h2>
           <p id="orb-panel-subtitle" class="dp-line-jp" style="margin-bottom:8px;">記憶の箱を見つけた！</p>
           <div class="dp-divider" style="margin-left:auto;margin-right:auto;"></div>
-          <p id="orb-panel-fragment" class="dp-line-en" style="max-width:440px;margin-left:auto;margin-right:auto;"></p>
-          <p class="dp-status" style="margin-top:6px;">Read the clue, then carry it along the trail.<br>手がかりを読んで、記憶の道に持っていきましょう。</p>
-          <div class="dp-btns" style="justify-content:center;">
-            <button id="orb-collect-btn" class="dp-btn yes">TAKE THE CLUE / 手がかりを持つ</button>
-            <button id="orb-leave-btn" class="dp-btn no">LEAVE BOX / 箱を残す</button>
+          <p id="orb-panel-fragment" style="max-width:440px;margin:0 auto 4px;min-height:1.6em;font-size:clamp(1.08rem,3.2vw,1.32rem);font-weight:700;color:#1e140a;line-height:1.5;"></p>
+          <div id="orb-panel-actions" style="opacity:0;transition:opacity .3s;">
+            <p class="dp-status" style="margin-top:6px;">Read the clue, then carry it along the trail.<br>手がかりを読んで、記憶の道に持っていきましょう。</p>
+            <div class="dp-btns" style="justify-content:center;">
+              <button id="orb-collect-btn" class="dp-btn yes">TAKE THE CLUE / 手がかりを持つ</button>
+              <button id="orb-leave-btn" class="dp-btn no">LEAVE BOX / 箱を残す</button>
+            </div>
           </div>
         </div>
       </div>`;
@@ -821,12 +835,31 @@ const HAPPY_HOUSE_PORTAL = {
     document.getElementById('orb-panel-close').addEventListener('click', closeOrbPanel);
     document.getElementById('orb-leave-btn').addEventListener('click',   closeOrbPanel);
     document.getElementById('orb-collect-btn').addEventListener('click', collectOrb);
-    /* Round 2 Pass 3: one delegated listener covers all three buttons
-       above (close-x, leave, collect) — same pattern as the drifter
-       panel's own delegated .dp-btn listener in utsuroba.js. */
+    /* Tapping the card while the clue is still typing jumps straight to
+       the finished text — same "don't make anyone wait on a re-read"
+       escape hatch the drifter drawer's typewriter already offers. */
     orbPanelEl.addEventListener('click', e => {
       if (window.UtsuSfx && (e.target.closest('.dp-btn') || e.target.closest('.dp-close-x'))) window.UtsuSfx.buttonPress();
+      if (!e.target.closest('.dp-btn') && !e.target.closest('.dp-close-x')) finishOrbTypewriter();
     });
+  }
+
+  // Round 2 Pass 17: the clue text now types out instead of appearing all
+  // at once, and the Take/Leave buttons stay hidden until it finishes —
+  // so a kid reads the line instead of it dumping in ahead of the actual
+  // reveal. orbTypeTimer/orbTypeDone track one in-flight typewriter so
+  // reopening the panel on a second pickup can't leave two running.
+  let orbTypeTimer = null;
+  let orbTypeDone  = true;
+
+  function finishOrbTypewriter() {
+    if (orbTypeDone) return;
+    clearTimeout(orbTypeTimer);
+    orbTypeDone = true;
+    const fragment = document.getElementById('orb-panel-fragment');
+    const actions  = document.getElementById('orb-panel-actions');
+    if (fragment) fragment.textContent = fragment.dataset.fullText || '';
+    if (actions) actions.style.opacity = '1';
   }
 
   function openOrbPanel(orb) {
@@ -837,21 +870,43 @@ const HAPPY_HOUSE_PORTAL = {
     const title = document.getElementById('orb-panel-title');
     const subtitle = document.getElementById('orb-panel-subtitle');
     const fragment = document.getElementById('orb-panel-fragment');
+    const actions  = document.getElementById('orb-panel-actions');
     const entry = orb.trailEntry;
     if (title) title.textContent = entry ? entry.title : 'You found a memory box!';
-    if (subtitle) subtitle.textContent = entry ? entry.titleJP : '記憶の箱を見つけた！';
-    if (fragment) fragment.textContent = entry ? entry.text : '';
+    // entry.titleJP now carries authored <ruby> furigana (single consumer
+    // — only this line reads trail[].titleJP, confirmed before editing
+    // the episode JSON) — innerHTML so the markup actually renders.
+    if (subtitle) subtitle.innerHTML = entry
+      ? entry.titleJP
+      : `${window.UtsuFurigana ? window.UtsuFurigana.rb('記憶', 'きおく') : '記憶'}の${window.UtsuFurigana ? window.UtsuFurigana.rb('箱', 'はこ') : '箱'}を${window.UtsuFurigana ? window.UtsuFurigana.rb('見', 'み') : '見'}つけた！`;
     const colors = ORB_MOTIF_COLORS[orb.motif] || ORB_MOTIF_COLORS.lantern;
     orbPanelEl.style.setProperty('--card-ring', colors.shadow);
     orbPanelEl.style.setProperty('--card-glow', `rgba(${colors.glowRGBA},.45)`);
     requestAnimationFrame(() => requestAnimationFrame(() => orbPanelEl.classList.add('open')));
     state.clickTarget = null;
+
+    clearTimeout(orbTypeTimer);
+    const fullText = entry ? entry.text : '';
+    if (fragment) { fragment.textContent = ''; fragment.dataset.fullText = fullText; }
+    if (actions) actions.style.opacity = '0';
+    if (!fullText) { orbTypeDone = true; if (actions) actions.style.opacity = '1'; return; }
+    orbTypeDone = false;
+    const CHAR_MS = 32;
+    let i = 0;
+    (function typeChar() {
+      if (orbTypeDone) return;
+      if (i > fullText.length) { finishOrbTypewriter(); return; }
+      fragment.textContent = fullText.slice(0, i);
+      i++;
+      orbTypeTimer = setTimeout(typeChar, CHAR_MS);
+    })();
   }
 
   function closeOrbPanel() {
     if (window.UtsuSfx) window.UtsuSfx.panelClose();
     orbPanelOpen = false;
     orbPanelOrb  = null;
+    finishOrbTypewriter();
     try { if (state.musicStarted) { music.play().catch(() => {}); } } catch (_) {}
     orbPanelEl.classList.remove('open');
     orbPopCooldownUntil = performance.now() + POPUP_COOLDOWN_MS;

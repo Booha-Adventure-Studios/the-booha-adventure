@@ -22,6 +22,16 @@
     ribbon:     { ring: '#d9a8ff', glow: 'rgba(217,168,255,.5)' },
   };
 
+  /* Round 2 Pass 18: this screen's own instructional chrome (mode badges,
+     onboarding, calibration, vocab/postcard/sequence task copy) was hardcoded
+     plain Japanese with no furigana at all — unlike the episode content,
+     none of these strings are shared/multi-consumer, so it's safe to run
+     them straight through the shared sentence() renderer instead of writing
+     <ruby> by hand. Falls back to plain text if the helper hasn't loaded. */
+  const FURI = (window.UtsuFurigana && window.UtsuFurigana.sentence)
+    ? window.UtsuFurigana
+    : { sentence: function (value) { return String(value == null ? '' : value); } };
+
   function escapeText(value) {
     return String(value == null ? '' : value)
       .replace(/&/g, '&amp;').replace(/</g, '&lt;')
@@ -69,7 +79,7 @@
       #utsuroba-reading-challenge button:focus-visible{outline:3px solid #ffdf9b;outline-offset:3px;}
       #utsuroba-reading-challenge{overscroll-behavior:contain;}
       #utsuroba-reading-challenge .reading-eyebrow{color:#d8a8ff;font:700 11px/1.4 monospace;letter-spacing:.16em;text-transform:uppercase;margin-bottom:8px;}
-      #utsuroba-reading-challenge .reading-support-badge{display:inline-block;margin:0 0 9px;padding:4px 7px;border:1px solid rgba(216,168,255,.35);border-radius:999px;color:#e4c2ff;font:700 9px/1.2 monospace;letter-spacing:.08em;}
+      #utsuroba-reading-challenge .reading-support-badge{display:inline-block;margin:0 0 9px;padding:4px 8px;border:1px solid rgba(216,168,255,.35);border-radius:999px;color:#e4c2ff;font:700 10px/1.35 monospace;letter-spacing:.06em;}
       #utsuroba-reading-challenge .reading-support-badge.independent{border-color:rgba(255,203,117,.48);color:#ffe0a0;}
       #utsuroba-reading-challenge h2{margin:0 0 8px;color:#fff4ff;font-size:clamp(1.25rem,3vw,2rem);}
       #utsuroba-reading-challenge h2 span{display:block;color:rgba(255,220,255,.58);font-size:.52em;font-weight:400;margin-top:4px;}
@@ -82,17 +92,17 @@
       #utsuroba-reading-challenge .reading-complete .reading-portrait-hero{margin-top:4px;}
       #utsuroba-reading-challenge h3{margin:5px 0 2px;color:#fff;font-size:clamp(1rem,2.3vw,1.25rem);}
       #utsuroba-reading-challenge .reading-intro{margin:0;color:#f5e8ff;line-height:1.5;font-size:clamp(.86rem,1.8vw,1rem);}
-      #utsuroba-reading-challenge .reading-jp{margin:2px 0 12px;color:rgba(245,232,255,.54);font-size:.78rem;line-height:1.45;}
+      #utsuroba-reading-challenge .reading-jp{margin:2px 0 12px;color:rgba(245,232,255,.6);font-size:.86rem;line-height:1.5;}
       #utsuroba-reading-challenge .reading-vocab{margin:14px 0 18px;border:1px solid rgba(216,168,255,.2);border-radius:9px;background:rgba(255,255,255,.035);}
       #utsuroba-reading-challenge .reading-vocab summary{cursor:pointer;padding:10px 12px;color:#e4c2ff;font-size:.78rem;font-weight:700;list-style-position:inside;}
-      #utsuroba-reading-challenge .reading-vocab summary span{display:block;margin:3px 0 0 18px;color:rgba(245,232,255,.5);font-size:.68rem;font-weight:400;}
+      #utsuroba-reading-challenge .reading-vocab summary span{display:block;margin:3px 0 0 18px;color:rgba(245,232,255,.56);font-size:.76rem;font-weight:400;}
       #utsuroba-reading-challenge .reading-vocab-body{padding:0 12px 12px;}
       #utsuroba-reading-challenge .reading-vocab-list{display:flex;flex-wrap:wrap;gap:7px;}
       #utsuroba-reading-challenge .reading-vocab-word{padding:6px 9px;border:1px solid rgba(216,168,255,.35);border-radius:999px;background:rgba(216,168,255,.08);color:#fff;cursor:pointer;font:700 .74rem Georgia,serif;}
       #utsuroba-reading-challenge .reading-vocab-word:hover,#utsuroba-reading-challenge .reading-vocab-word:focus-visible{border-color:#d8a8ff;background:rgba(216,168,255,.2);outline:none;}
       #utsuroba-reading-challenge .reading-vocab-detail{min-height:34px;margin-top:10px;padding:8px 10px;border-left:2px solid #ffcb75;background:rgba(255,203,117,.07);color:#ffe7b2;font-size:.78rem;line-height:1.4;}
       #utsuroba-reading-challenge .reading-vocab-detail strong{color:#fff;font-size:.86rem;}
-      #utsuroba-reading-challenge .reading-vocab-detail small{display:block;margin-top:3px;color:rgba(255,231,178,.65);font-size:.9em;}
+      #utsuroba-reading-challenge .reading-vocab-detail small{display:block;margin-top:3px;color:rgba(255,231,178,.65);font-size:.95em;}
       #utsuroba-reading-challenge .reading-transcript{display:grid;gap:8px;margin:18px 0 20px;padding:14px;background:rgba(255,255,255,.045);border:1px solid rgba(220,160,255,.16);border-radius:10px;}
       #utsuroba-reading-challenge .reading-line{padding-left:12px;border-left:2px solid rgba(216,168,255,.45);}
       #utsuroba-reading-challenge .reading-line.is-evidence{border-left-color:#ffcb75;background:rgba(255,203,117,.12);box-shadow:inset 3px 0 0 #ffcb75;padding-top:5px;padding-bottom:5px;border-radius:0 5px 5px 0;animation:readingEvidenceIn .32s ease-out both;}
@@ -105,7 +115,7 @@
       #utsuroba-reading-challenge .reading-choice small{display:block;color:rgba(255,255,255,.48);font-size:.72rem;line-height:1.35;margin-top:5px;}
       #utsuroba-reading-challenge .reading-interaction{margin-top:14px;padding:12px;border:1px solid rgba(255,203,117,.24);border-radius:10px;background:rgba(255,203,117,.045);}
       #utsuroba-reading-challenge .reading-interaction-instruction{margin:0 0 10px;color:#ffe0a0;font-size:.78rem;line-height:1.4;}
-      #utsuroba-reading-challenge .reading-interaction-instruction small{display:block;margin-top:3px;color:rgba(255,231,178,.58);font-size:.9em;}
+      #utsuroba-reading-challenge .reading-interaction-instruction small{display:block;margin-top:3px;color:rgba(255,231,178,.58);font-size:.95em;}
       #utsuroba-reading-challenge .reading-sequence-picked{min-height:34px;margin-bottom:10px;padding:7px 9px;border-radius:7px;background:rgba(0,0,0,.2);color:rgba(255,255,255,.62);font-size:.75rem;line-height:1.4;}
       #utsuroba-reading-challenge .reading-sequence-picked strong{color:#fff0c9;}
       #utsuroba-reading-challenge .reading-sequence-options{display:grid;gap:7px;}
@@ -123,16 +133,16 @@
       #utsuroba-reading-challenge .reading-picked-answer{margin:0 0 10px;padding:8px 10px;border-left:3px solid #ffcb75;background:rgba(255,203,117,.08);color:#ffe7b2;font-size:.8rem;line-height:1.4;}
       #utsuroba-reading-challenge .reading-picked-answer small{display:block;margin-top:3px;color:rgba(255,231,178,.58);font-size:.9em;}
       #utsuroba-reading-challenge .reading-feedback{margin-top:12px;padding:10px 12px;border-left:3px solid #ffcb75;background:rgba(255,203,117,.08);color:#ffe7b2;font-size:.82rem;line-height:1.4;}
-      #utsuroba-reading-challenge .reading-feedback small{display:block;color:rgba(255,231,178,.68);margin-top:3px;font-size:.9em;}
+      #utsuroba-reading-challenge .reading-feedback small{display:block;color:rgba(255,231,178,.68);margin-top:3px;font-size:.95em;}
       #utsuroba-reading-challenge .reading-evidence-btn{display:block;margin-top:8px;padding:6px 10px;border:1px solid rgba(255,203,117,.48);border-radius:6px;background:rgba(255,203,117,.08);color:#ffe7b2;cursor:pointer;font:700 .72rem Georgia,serif;}
       #utsuroba-reading-challenge .reading-evidence-btn:hover,#utsuroba-reading-challenge .reading-evidence-btn:focus-visible{background:rgba(255,203,117,.18);outline:none;}
       #utsuroba-reading-challenge .reading-progress{margin-top:14px;text-align:right;color:rgba(255,255,255,.42);font:700 11px monospace;}
-      #utsuroba-reading-challenge .reading-progress small{display:block;margin-top:3px;color:rgba(255,255,255,.3);font-size:.9em;font-weight:400;}
+      #utsuroba-reading-challenge .reading-progress small{display:block;margin-top:3px;color:rgba(255,255,255,.38);font-size:.98em;font-weight:400;}
       #utsuroba-reading-challenge .reading-mechanic{margin:18px 0 20px;padding:13px 14px 15px;background:rgba(255,255,255,.035);border:1px solid rgba(255,203,117,.22);border-radius:12px;}
       #utsuroba-reading-challenge .reading-mechanic-heading{display:flex;justify-content:space-between;gap:12px;color:#ffdf9b;font:700 10px/1.4 monospace;letter-spacing:.14em;text-transform:uppercase;}
       #utsuroba-reading-challenge .reading-mechanic-heading span{color:rgba(255,223,155,.58);font-weight:400;letter-spacing:.04em;text-transform:none;}
       #utsuroba-reading-challenge .reading-mechanic-intro{margin:6px 0 2px;color:#fff4d7;font-size:.8rem;line-height:1.4;}
-      #utsuroba-reading-challenge .reading-mechanic-intro-jp{margin:0;color:rgba(255,231,178,.58);font-size:.7rem;line-height:1.4;}
+      #utsuroba-reading-challenge .reading-mechanic-intro-jp{margin:0;color:rgba(255,231,178,.6);font-size:.78rem;line-height:1.45;}
       #utsuroba-reading-challenge .reading-theatre-stage,#utsuroba-reading-challenge .reading-mechanic-board{position:relative;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:13px;padding:12px 8px 8px;overflow:hidden;border:1px solid rgba(216,168,255,.18);border-radius:9px;background:radial-gradient(circle at 50% 0%,rgba(255,213,111,.18),transparent 42%),linear-gradient(180deg,#211832,#0d0916);}
       #utsuroba-reading-challenge .reading-mechanic-evidence-board{background:linear-gradient(160deg,rgba(102,179,255,.12),transparent 45%),linear-gradient(180deg,#152238,#0b1019);}
       #utsuroba-reading-challenge .reading-mechanic-emotion-thread{background:linear-gradient(160deg,rgba(255,145,175,.13),transparent 45%),linear-gradient(180deg,#281a2b,#100c16);}
@@ -144,12 +154,12 @@
       #utsuroba-reading-challenge .reading-theatre-act.is-restored::after{content:"✓";position:absolute;right:7px;top:5px;color:#ffe39c;font-weight:700;}
       #utsuroba-reading-challenge .reading-theatre-act .act-number{color:#ffcb75;font:700 .68rem monospace;letter-spacing:.1em;}
       #utsuroba-reading-challenge .reading-theatre-act .act-title{display:block;margin-top:7px;color:#fff;font-size:.78rem;line-height:1.25;}
-      #utsuroba-reading-challenge .reading-theatre-act .act-title-jp{display:block;margin-top:3px;color:rgba(255,231,178,.55);font-size:.66rem;line-height:1.25;}
+      #utsuroba-reading-challenge .reading-theatre-act .act-title-jp{display:block;margin-top:4px;color:rgba(255,231,178,.62);font-size:.75rem;line-height:1.35;}
       #utsuroba-reading-challenge .reading-theatre-act .act-caption{display:block;margin-top:8px;color:rgba(255,255,255,.76);font-size:.68rem;line-height:1.3;}
-      #utsuroba-reading-challenge .reading-theatre-act .act-caption-jp{display:block;margin-top:2px;color:rgba(255,231,178,.46);font-size:.61rem;line-height:1.3;}
+      #utsuroba-reading-challenge .reading-theatre-act .act-caption-jp{display:block;margin-top:3px;color:rgba(255,231,178,.52);font-size:.7rem;line-height:1.35;}
       #utsuroba-reading-challenge .reading-theatre-locked{margin:8px 0 0;color:rgba(255,255,255,.34);font-size:.67rem;line-height:1.3;}
       #utsuroba-reading-challenge .reading-theatre-status{margin:8px 0 0;text-align:center;color:#ffdf9b;font-size:.72rem;line-height:1.4;}
-      #utsuroba-reading-challenge .reading-theatre-status small{display:block;color:rgba(255,231,178,.54);font-size:.9em;}
+      #utsuroba-reading-challenge .reading-theatre-status small{display:block;color:rgba(255,231,178,.58);font-size:.95em;}
       @keyframes readingActPulse{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
       @keyframes readingEvidenceIn{from{opacity:.45;transform:translateX(-4px)}to{opacity:1;transform:translateX(0)}}
       #utsuroba-reading-challenge .reading-complete{text-align:center;padding:clamp(36px,8vw,82px) clamp(20px,6vw,80px);}
@@ -161,8 +171,8 @@
       #utsuroba-reading-challenge .reading-postcard{margin:18px 0;padding:13px;text-align:left;border:1px solid rgba(216,168,255,.28);border-radius:10px;background:rgba(216,168,255,.045);}
       #utsuroba-reading-challenge .reading-postcard-heading{color:#e4c2ff;font:700 .78rem Georgia,serif;}
       #utsuroba-reading-challenge .reading-postcard-heading span{display:block;margin-top:3px;color:rgba(245,232,255,.5);font-size:.88em;font-weight:400;}
-      #utsuroba-reading-challenge .reading-postcard-instruction{margin:8px 0;color:rgba(245,232,255,.7);font-size:.74rem;line-height:1.4;}
-      #utsuroba-reading-challenge .reading-postcard-instruction small{display:block;margin-top:3px;color:rgba(245,232,255,.48);font-size:.9em;}
+      #utsuroba-reading-challenge .reading-postcard-instruction{margin:8px 0;color:rgba(245,232,255,.7);font-size:.8rem;line-height:1.45;}
+      #utsuroba-reading-challenge .reading-postcard-instruction small{display:block;margin-top:3px;color:rgba(245,232,255,.54);font-size:.95em;}
       #utsuroba-reading-challenge .reading-postcard-picked{min-height:34px;margin-bottom:9px;padding:7px 9px;border-radius:7px;background:rgba(0,0,0,.2);color:rgba(255,255,255,.68);font-size:.74rem;line-height:1.4;}
       #utsuroba-reading-challenge .reading-postcard-option{display:block;width:100%;margin-top:7px;padding:8px 9px;text-align:left;border:1px solid rgba(216,168,255,.3);border-radius:6px;background:rgba(255,255,255,.05);color:#fff;cursor:pointer;font:inherit;font-size:.75rem;line-height:1.35;}
       #utsuroba-reading-challenge .reading-postcard-option:hover,#utsuroba-reading-challenge .reading-postcard-option:focus-visible{background:rgba(216,168,255,.14);border-color:#d8a8ff;outline:none;}
@@ -175,28 +185,28 @@
       #utsuroba-reading-challenge .reading-review-note{margin:14px auto 0;color:rgba(245,232,255,.48);font-size:.72rem;line-height:1.4;}
       #utsuroba-reading-challenge .reading-lens{margin:18px 0 0;padding:13px;text-align:left;border:1px solid rgba(216,168,255,.24);border-radius:10px;background:rgba(216,168,255,.045);}
       #utsuroba-reading-challenge .reading-lens-heading{margin:0;color:#e4c2ff;font:700 .78rem Georgia,serif;line-height:1.4;}
-      #utsuroba-reading-challenge .reading-lens-heading small{display:block;margin-top:3px;color:rgba(245,232,255,.52);font-size:.88em;font-weight:400;}
+      #utsuroba-reading-challenge .reading-lens-heading small{display:block;margin-top:3px;color:rgba(245,232,255,.58);font-size:.95em;font-weight:400;}
       #utsuroba-reading-challenge .reading-lens-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:10px;}
       #utsuroba-reading-challenge .reading-lens-option{padding:8px 9px;text-align:left;border:1px solid rgba(216,168,255,.3);border-radius:7px;background:rgba(255,255,255,.05);color:#fff;cursor:pointer;font:700 .7rem Georgia,serif;line-height:1.3;}
       #utsuroba-reading-challenge .reading-lens-option:hover,#utsuroba-reading-challenge .reading-lens-option:focus-visible{background:rgba(216,168,255,.14);border-color:#d8a8ff;outline:none;}
-      #utsuroba-reading-challenge .reading-lens-option small{display:block;margin-top:3px;color:rgba(255,255,255,.5);font-size:.86em;font-weight:400;}
+      #utsuroba-reading-challenge .reading-lens-option small{display:block;margin-top:3px;color:rgba(255,255,255,.56);font-size:.95em;font-weight:400;}
       #utsuroba-reading-challenge .reading-onboarding{text-align:left;padding:clamp(24px,5vw,46px);}
       #utsuroba-reading-challenge .reading-onboarding-intro{margin:0 0 18px;color:#f5e8ff;font-size:.9rem;line-height:1.5;}
-      #utsuroba-reading-challenge .reading-onboarding-intro small{display:block;margin-top:3px;color:rgba(245,232,255,.54);font-size:.84em;}
+      #utsuroba-reading-challenge .reading-onboarding-intro small{display:block;margin-top:3px;color:rgba(245,232,255,.6);font-size:.92em;}
       #utsuroba-reading-challenge .reading-onboarding-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:0 0 20px;}
       #utsuroba-reading-challenge .reading-onboarding-step{padding:11px 10px;border:1px solid rgba(216,168,255,.24);border-radius:9px;background:rgba(255,255,255,.045);}
       #utsuroba-reading-challenge .reading-onboarding-step b{display:block;color:#ffcb75;font:700 .7rem monospace;letter-spacing:.1em;}
       #utsuroba-reading-challenge .reading-onboarding-step strong{display:block;margin-top:6px;color:#fff;font-size:.76rem;line-height:1.3;}
-      #utsuroba-reading-challenge .reading-onboarding-step small{display:block;margin-top:4px;color:rgba(255,231,178,.58);font-size:.68rem;line-height:1.35;}
+      #utsuroba-reading-challenge .reading-onboarding-step small{display:block;margin-top:4px;color:rgba(255,231,178,.62);font-size:.76rem;line-height:1.4;}
       #utsuroba-reading-challenge .reading-calibration{padding:13px;border:1px solid rgba(255,203,117,.27);border-radius:10px;background:rgba(255,203,117,.045);}
       #utsuroba-reading-challenge .reading-calibration-heading{margin:0;color:#ffe0a0;font-size:.8rem;line-height:1.4;}
-      #utsuroba-reading-challenge .reading-calibration-heading small{display:block;margin-top:3px;color:rgba(255,231,178,.58);font-size:.88em;}
+      #utsuroba-reading-challenge .reading-calibration-heading small{display:block;margin-top:3px;color:rgba(255,231,178,.62);font-size:.95em;}
       #utsuroba-reading-challenge .reading-calibration-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:11px;}
       #utsuroba-reading-challenge .reading-calibration-option{min-height:78px;padding:10px;text-align:left;border:1px solid rgba(216,168,255,.34);border-radius:8px;background:rgba(255,255,255,.055);color:#fff;cursor:pointer;font:inherit;line-height:1.35;}
       #utsuroba-reading-challenge .reading-calibration-option:hover,#utsuroba-reading-challenge .reading-calibration-option:focus-visible{background:rgba(216,168,255,.15);border-color:#d8a8ff;outline:none;}
       #utsuroba-reading-challenge .reading-calibration-option strong{display:block;color:#fff0c9;font-size:.8rem;}
-      #utsuroba-reading-challenge .reading-calibration-option small{display:block;margin-top:5px;color:rgba(255,255,255,.55);font-size:.72rem;line-height:1.35;}
-      #utsuroba-reading-challenge .reading-onboarding-note{margin:13px 0 0;color:rgba(245,232,255,.5);font-size:.7rem;line-height:1.4;}
+      #utsuroba-reading-challenge .reading-calibration-option small{display:block;margin-top:5px;color:rgba(255,255,255,.6);font-size:.8rem;line-height:1.4;}
+      #utsuroba-reading-challenge .reading-onboarding-note{margin:13px 0 0;color:rgba(245,232,255,.56);font-size:.78rem;line-height:1.45;}
       #utsuroba-reading-challenge .reading-loading{text-align:center;padding:80px 24px;color:#f1dcff;}
       @media(max-width:700px){#utsuroba-reading-challenge{padding:10px;}#utsuroba-reading-challenge .reading-choices{grid-template-columns:1fr;}#utsuroba-reading-challenge .reading-onboarding-steps,.reading-calibration-options,.reading-lens-options{grid-template-columns:1fr;}#utsuroba-reading-challenge .reading-card{max-height:calc(100vh - 20px);padding:20px 16px;}#utsuroba-reading-challenge .reading-close{min-width:44px;min-height:44px;}#utsuroba-reading-challenge .reading-header{flex-direction:row-reverse;}#utsuroba-reading-challenge .reading-header-text{padding-right:0;}#utsuroba-reading-challenge .reading-portrait{width:52px;height:52px;margin-top:24px;}}
       @media(max-height:520px) and (orientation:landscape){#utsuroba-reading-challenge{align-items:flex-start;padding:8px;}#utsuroba-reading-challenge .reading-card{max-height:calc(100vh - 16px);padding:16px 18px;}}
@@ -233,7 +243,7 @@
     overlay.setAttribute('aria-label', 'Reading memory');
     overlay.tabIndex = -1;
     overlay.style.cssText = 'position:fixed;inset:0;z-index:9600;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(4,0,12,.90);font-family:Georgia,serif;color:#f7f2e8;';
-    overlay.innerHTML = '<div class="reading-card reading-loading">Opening the memory…<br><span>記憶を開いています…</span></div>';
+    overlay.innerHTML = `<div class="reading-card reading-loading">Opening the memory…<br><span>${FURI.sentence('記憶を開いています…', { '記憶': 'きおく', '開': 'ひら' })}</span></div>`;
     document.body.appendChild(overlay);
     overlay.addEventListener('keydown', event => {
       if (event.key === 'Escape') { event.preventDefault(); close(); return; }
@@ -247,7 +257,7 @@
       if (!episode) throw new Error(`Unknown episode: ${opts.quest && opts.quest.episodeId}`);
     } catch (error) {
       console.error('[Utsuroba Reading] Could not open episode:', error);
-      overlay.innerHTML = '<div class="reading-card reading-loading">This memory is cloudy. Please try again.<br><span>記憶がぼやけています。もう一度試してください。</span><br><button class="reading-primary" id="reading-error-close">Close / 閉じる</button></div>';
+      overlay.innerHTML = `<div class="reading-card reading-loading">This memory is cloudy. Please try again.<br><span>${FURI.sentence('記憶がぼやけています。もう一度試してください。', { '記憶': 'きおく', '試': 'ため' })}</span><br><button class="reading-primary" id="reading-error-close">Close / ${FURI.sentence('閉じる', { '閉': 'と' })}</button></div>`;
       overlay.querySelector('#reading-error-close').addEventListener('click', close);
       focusFirstControl();
       return false;
@@ -281,13 +291,13 @@
 
     function reviewModeLabel() {
       if (replayLens) return `${replayLens.label} / ${replayLens.labelJP}`;
-      if (supportLevel === 'independent') return 'ON YOUR OWN / 自力復習';
-      return 'WITH HELP / 案内付き復習';
+      if (supportLevel === 'independent') return `ON YOUR OWN / ${FURI.sentence('自力復習', { '自力': 'じりき', '復習': 'ふくしゅう' })}`;
+      return `WITH HELP / ${FURI.sentence('案内付き復習', { '案内': 'あんない', '付き': 'つき', '復習': 'ふくしゅう' })}`;
     }
 
     function renderLensReplay() {
       if (!opts.reviewOnly || replayLens || !episode.replayLenses) return '';
-      return `<section class="reading-lens"><p class="reading-lens-heading">Choose how to read it again.<small>読み返す視点を選びましょう。</small></p><div class="reading-lens-options"><button class="reading-lens-option" type="button" data-reading-lens="detail">Find the Detail<small>細部ハント</small></button><button class="reading-lens-option" type="button" data-reading-lens="emotion">Find the Feeling<small>気持ちハント</small></button><button class="reading-lens-option" type="button" data-reading-lens="inference">Guess Why<small>推測ハント</small></button></div></section>`;
+      return `<section class="reading-lens"><p class="reading-lens-heading">Choose how to read it again.<small>${FURI.sentence('読み返す視点を選びましょう。', { '読み返す': 'よみかえす', '視点': 'してん', '選びましょう': 'えらびましょう' })}</small></p><div class="reading-lens-options"><button class="reading-lens-option" type="button" data-reading-lens="detail">Find the Detail<small>${FURI.sentence('細部ハント', { '細部': 'さいぶ' })}</small></button><button class="reading-lens-option" type="button" data-reading-lens="emotion">Find the Feeling<small>${FURI.sentence('気持ちハント', { '気持ち': 'きもち' })}</small></button><button class="reading-lens-option" type="button" data-reading-lens="inference">Guess Why<small>${FURI.sentence('推測ハント', { '推測': 'すいそく' })}</small></button></div></section>`;
     }
 
     function startLensReplay(lens) {
@@ -307,25 +317,25 @@
           <button class="reading-close" id="reading-onboarding-close" type="button" aria-label="Close reading guide">✕</button>
           <div class="reading-header">
             <div class="reading-header-text">
-              <div class="reading-eyebrow">READING MAP / 読み方</div>
-              <h2>How to read a memory <span>記憶の読み方</span></h2>
-              <p class="reading-onboarding-intro">Read the English lines, use help when you need it, and choose answers from the evidence.<small>英語の文を読み、必要なときにヘルプを使い、手がかりから答えを選びます。</small></p>
+              <div class="reading-eyebrow">READING MAP / ${FURI.sentence('読み方', { '読み方': 'よみかた' })}</div>
+              <h2>How to read a memory <span>${FURI.sentence('記憶の読み方', { '記憶': 'きおく', '読み方': 'よみかた' })}</span></h2>
+              <p class="reading-onboarding-intro">Read the English lines, use help when you need it, and choose answers from the evidence.<small>${FURI.sentence('英語の文を読み、必要なときにヘルプを使い、手がかりから答えを選びます。', { '英語': 'えいご', '文': 'ぶん', '読み': 'よみ', '必要': 'ひつよう', '使い': 'つかい', '手がかり': 'てがかり', '答え': 'こたえ', '選びます': 'えらびます' })}</small></p>
             </div>
             ${renderPortrait('inline')}
           </div>
           <div class="reading-onboarding-steps">
-            <article class="reading-onboarding-step"><b>STEP 1</b><strong>Read the lines.</strong><small>文を読みます。</small></article>
-            <article class="reading-onboarding-step"><b>STEP 2</b><strong>Notice the details.</strong><small>細かい点に気づきます。</small></article>
-            <article class="reading-onboarding-step"><b>STEP 3</b><strong>Show your evidence.</strong><small>証拠を示します。</small></article>
+            <article class="reading-onboarding-step"><b>STEP 1</b><strong>Read the lines.</strong><small>${FURI.sentence('文を読みます。', { '文': 'ぶん', '読みます': 'よみます' })}</small></article>
+            <article class="reading-onboarding-step"><b>STEP 2</b><strong>Notice the details.</strong><small>${FURI.sentence('細かい点に気づきます。', { '細かい': 'こまかい', '点': 'てん', '気づきます': 'きづきます' })}</small></article>
+            <article class="reading-onboarding-step"><b>STEP 3</b><strong>Show your evidence.</strong><small>${FURI.sentence('証拠を示します。', { '証拠': 'しょうこ', '示します': 'しめします' })}</small></article>
           </div>
           <section class="reading-calibration">
-            <p class="reading-calibration-heading">Choose your first reading style.<small>最初の読み方を選びましょう。</small></p>
+            <p class="reading-calibration-heading">Choose your first reading style.<small>${FURI.sentence('最初の読み方を選びましょう。', { '最初': 'さいしょ', '読み方': 'よみかた', '選びましょう': 'えらびましょう' })}</small></p>
             <div class="reading-calibration-options">
-              <button class="reading-calibration-option" type="button" data-reading-calibration="guided"><strong>Guided</strong><small>Show evidence after a mistake. Good when you want support.<br>間違えたら証拠を見ます。サポートがほしい人向けです。</small></button>
-              <button class="reading-calibration-option" type="button" data-reading-calibration="independent"><strong>Try first</strong><small>Try without evidence at first. Good when you want a challenge.<br>最初は証拠を見ずに挑戦します。挑戦したい人向けです。</small></button>
+              <button class="reading-calibration-option" type="button" data-reading-calibration="guided"><strong>Guided</strong><small>Show evidence after a mistake. Good when you want support.<br>${FURI.sentence('間違えたら証拠を見ます。サポートがほしい人向けです。', { '間違えたら': 'まちがえたら', '証拠': 'しょうこ', '見ます': 'みます', '人向け': 'ひとむけ' })}</small></button>
+              <button class="reading-calibration-option" type="button" data-reading-calibration="independent"><strong>Try first</strong><small>Try without evidence at first. Good when you want a challenge.<br>${FURI.sentence('最初は証拠を見ずに挑戦します。挑戦したい人向けです。', { '最初': 'さいしょ', '証拠': 'しょうこ', '見ずに': 'みずに', '挑戦': 'ちょうせん', '人向け': 'ひとむけ' })}</small></button>
             </div>
           </section>
-          <p class="reading-onboarding-note">You can still ask for evidence after two mistakes.<br>二回間違えたら、証拠を見ることができます。</p>
+          <p class="reading-onboarding-note">You can still ask for evidence after two mistakes.<br>${FURI.sentence('二回間違えたら、証拠を見ることができます。', { '二回': 'にかい', '間違えたら': 'まちがえたら', '証拠': 'しょうこ', '見る': 'みる' })}</p>
         </div>`;
       overlay.querySelector('#reading-onboarding-close').addEventListener('click', close);
       overlay.querySelectorAll('[data-reading-calibration]').forEach(button => button.addEventListener('click', () => {
@@ -361,14 +371,14 @@
       const words = episode.vocabulary.map((item, index) => `
         <button class="reading-vocab-word" type="button" data-vocab="${index}">${escapeText(item.word)}</button>`).join('');
       const summary = supportLevel === 'independent'
-        ? 'Word help is optional. Try to remember first. / まず思い出してから、言葉のヘルプを使いましょう。'
-        : 'Tap a word for a simple meaning. / 言葉をタップすると意味が出ます。';
+        ? `Word help is optional. Try to remember first. / ${FURI.sentence('まず思い出してから、言葉のヘルプを使いましょう。', { '思い出して': 'おもいだして', '言葉': 'ことば', '使いましょう': 'つかいましょう' })}`
+        : `Tap a word for a simple meaning. / ${FURI.sentence('言葉をタップすると意味が出ます。', { '言葉': 'ことば', '意味': 'いみ', '出ます': 'でます' })}`;
       return `
         <details class="reading-vocab" id="reading-vocabulary">
-          <summary>Word help / 言葉のヘルプ<span>${summary}</span></summary>
+          <summary>Word help / ${FURI.sentence('言葉のヘルプ', { '言葉': 'ことば' })}<span>${summary}</span></summary>
           <div class="reading-vocab-body">
             <div class="reading-vocab-list">${words}</div>
-            <div class="reading-vocab-detail" id="reading-vocab-detail">Choose a word to see help.<small>言葉を一つ選んでください。</small></div>
+            <div class="reading-vocab-detail" id="reading-vocab-detail">Choose a word to see help.<small>${FURI.sentence('言葉を一つ選んでください。', { '言葉': 'ことば', '一つ': 'ひとつ', '選んで': 'えらんで' })}</small></div>
           </div>
         </details>`;
     }
@@ -411,7 +421,7 @@
             <span class="act-title">${escapeText(item.title)}</span>
             <span class="act-title-jp">${escapeText(item.titleJP)}</span>
             ${locked
-              ? '<span class="reading-theatre-locked">Answer the next question to reveal this piece.<br>次の問題に答えると手がかりが現れます。</span>'
+              ? `<span class="reading-theatre-locked">Answer the next question to reveal this piece.<br>${FURI.sentence('次の問題に答えると手がかりが現れます。', { '次': 'つぎ', '問題': 'もんだい', '答える': 'こたえる', '手がかり': 'てがかり', '現れます': 'あらわれます' })}</span>`
               : `<span class="act-caption">${escapeText(item.caption)}</span><span class="act-caption-jp">${escapeText(item.captionJP)}</span>`}
           </div>`;
       }).join('');
@@ -432,20 +442,20 @@
       const postcard = episode.postcard;
       if (!postcard || replayLens) return '';
       if (!postcardOpen) {
-        return `<section class="reading-postcard"><div class="reading-postcard-heading">${escapeText(postcard.title)}<span>${escapeText(postcard.titleJP)}</span></div><button class="reading-secondary" id="reading-postcard-open" type="button">Write a postcard / 文章カードを書く</button></section>`;
+        return `<section class="reading-postcard"><div class="reading-postcard-heading">${escapeText(postcard.title)}<span>${escapeText(postcard.titleJP)}</span></div><button class="reading-secondary" id="reading-postcard-open" type="button">Write a postcard / ${FURI.sentence('文章カードを書く', { '文章': 'ぶんしょう', '書く': 'かく' })}</button></section>`;
       }
       if (postcardSaved) {
-        return `<section class="reading-postcard"><div class="reading-postcard-success"><strong>Postcard saved.</strong> You can read it again in your Journal.<small>保存しました。Journalで読み返せます。</small></div></section>`;
+        return `<section class="reading-postcard"><div class="reading-postcard-success"><strong>Postcard saved.</strong> You can read it again in your Journal.<small>${FURI.sentence('保存しました。Journalで読み返せます。', { '保存しました': 'ほぞんしました', '読み返せます': 'よみかえせます' })}</small></div></section>`;
       }
       if (postcardBuilt) {
         const text = postcardSelection.map(index => postcard.chunks[index]).join(' ');
-        return `<section class="reading-postcard"><div class="reading-postcard-heading">${escapeText(postcard.title)}<span>${escapeText(postcard.titleJP)}</span></div><p class="reading-postcard-instruction">Your postcard:<small>あなたの文章カード：</small></p><div class="reading-postcard-picked">${escapeText(text)}</div><div class="reading-postcard-actions"><button class="reading-postcard-save" id="reading-postcard-save" type="button">Save postcard / 保存する</button><button class="reading-task-action" id="reading-postcard-reset" type="button">Try again / もう一度</button></div></section>`;
+        return `<section class="reading-postcard"><div class="reading-postcard-heading">${escapeText(postcard.title)}<span>${escapeText(postcard.titleJP)}</span></div><p class="reading-postcard-instruction">Your postcard:<small>${FURI.sentence('あなたの文章カード：', { '文章': 'ぶんしょう' })}</small></p><div class="reading-postcard-picked">${escapeText(text)}</div><div class="reading-postcard-actions"><button class="reading-postcard-save" id="reading-postcard-save" type="button">Save postcard / ${FURI.sentence('保存する', { '保存する': 'ほぞんする' })}</button><button class="reading-task-action" id="reading-postcard-reset" type="button">Try again / ${FURI.sentence('もう一度', { '一度': 'いちど' })}</button></div></section>`;
       }
       const chunks = postcard.chunks.map((chunk, index) => postcardSelection.includes(index) ? '' : `<button class="reading-postcard-option" type="button" data-postcard-chunk="${index}">${escapeText(chunk)}<small>${escapeText(postcard.chunksJP[index] || '')}</small></button>`).join('');
       const picked = postcardSelection.length
         ? postcardSelection.map((index, order) => `<strong>${order + 1}.</strong> ${escapeText(postcard.chunks[index])}`).join('<br>')
         : 'Your summary will appear here.';
-      return `<section class="reading-postcard"><div class="reading-postcard-heading">${escapeText(postcard.title)}<span>${escapeText(postcard.titleJP)}</span></div><p class="reading-postcard-instruction">${escapeText(postcard.instruction)}<small>${escapeText(postcard.instructionJP)}</small></p>${postcardFeedback ? `<div class="reading-postcard-success">${postcardFeedback}</div>` : ''}<div class="reading-postcard-picked">${picked}</div><div class="reading-postcard-options">${chunks || '<span style="color:rgba(255,255,255,.55);font-size:.74rem;">All pieces selected. Check your summary.</span>'}</div><div class="reading-postcard-actions"><button class="reading-task-action" id="reading-postcard-reset" type="button">Start over / 最初から</button><button class="reading-task-action primary" id="reading-postcard-check" type="button">Check summary / まとめを確認</button></div></section>`;
+      return `<section class="reading-postcard"><div class="reading-postcard-heading">${escapeText(postcard.title)}<span>${escapeText(postcard.titleJP)}</span></div><p class="reading-postcard-instruction">${escapeText(postcard.instruction)}<small>${escapeText(postcard.instructionJP)}</small></p>${postcardFeedback ? `<div class="reading-postcard-success">${postcardFeedback}</div>` : ''}<div class="reading-postcard-picked">${picked}</div><div class="reading-postcard-options">${chunks || '<span style="color:rgba(255,255,255,.55);font-size:.74rem;">All pieces selected. Check your summary.</span>'}</div><div class="reading-postcard-actions"><button class="reading-task-action" id="reading-postcard-reset" type="button">Start over / ${FURI.sentence('最初から', { '最初': 'さいしょ' })}</button><button class="reading-task-action primary" id="reading-postcard-check" type="button">Check summary / ${FURI.sentence('まとめを確認', { '確認': 'かくにん' })}</button></div></section>`;
     }
 
     function savePostcard() {
@@ -509,8 +519,8 @@
         ? 'Now choose the line that proves your idea.'
         : 'Tap the exact line that contains the answer.';
       const instructionJP = mode === 'inference'
-        ? '次に、考えを証明する行を選びましょう。'
-        : '答えが書かれている行をタップしましょう。';
+        ? FURI.sentence('次に、考えを証明する行を選びましょう。', { '次に': 'つぎに', '考え': 'かんがえ', '証明する': 'しょうめいする', '行': 'ぎょう', '選びましょう': 'えらびましょう' })
+        : FURI.sentence('答えが書かれている行をタップしましょう。', { '答え': 'こたえ', '書かれている': 'かかれている', '行': 'ぎょう' });
       const lines = episode.lines.map((line, index) => `
         <button class="reading-line-choice" type="button" data-line-choice="${index}">
           <span class="line-speaker">${escapeText(line.speaker)}</span>
@@ -532,20 +542,20 @@
           ? sequenceSelection.map((index, order) => `<strong>${order + 1}.</strong> ${escapeText(question.choices[index])}`).join('<br>')
           : 'Your order will appear here.';
         return `<div class="reading-interaction reading-sequence-interaction">
-          <p class="reading-interaction-instruction">Tap each event in the order it happened.<small>出来事が起きた順番にタップしましょう。</small></p>
+          <p class="reading-interaction-instruction">Tap each event in the order it happened.<small>${FURI.sentence('出来事が起きた順番にタップしましょう。', { '出来事': 'できごと', '起きた': 'おきた', '順番': 'じゅんばん' })}</small></p>
           <div class="reading-sequence-picked">${picked}</div>
           <div class="reading-sequence-options">${choices || '<span style="color:rgba(255,255,255,.55);font-size:.75rem;">All events selected. Check your order.</span>'}</div>
-          <div class="reading-sequence-actions"><button class="reading-task-action" type="button" id="reading-sequence-reset">Start over / 最初から</button><button class="reading-task-action primary" type="button" id="reading-sequence-submit">Check order / 順番を確認</button></div>
+          <div class="reading-sequence-actions"><button class="reading-task-action" type="button" id="reading-sequence-reset">Start over / ${FURI.sentence('最初から', { '最初': 'さいしょ' })}</button><button class="reading-task-action primary" type="button" id="reading-sequence-submit">Check order / ${FURI.sentence('順番を確認', { '順番': 'じゅんばん', '確認': 'かくにん' })}</button></div>
         </div>`;
       }
       if (question.type === 'detail') return renderLineChoices(question, 'detail');
       if (question.type === 'inference') {
         if (!inferenceAnswerChosen) {
           const choices = question.choices.map((choice, index) => `<button class="reading-task-choice" type="button" data-inference-choice="${index}"><span>${escapeText(choice)}</span><small>${escapeText(question.choicesJP[index] || '')}</small></button>`).join('');
-          return `<div class="reading-interaction reading-inference-interaction"><p class="reading-interaction-instruction">Choose the meaning you infer from the conversation.<small>会話から分かる意味を選びましょう。</small></p><div class="reading-sequence-options">${choices}</div></div>`;
+          return `<div class="reading-interaction reading-inference-interaction"><p class="reading-interaction-instruction">Choose the meaning you infer from the conversation.<small>${FURI.sentence('会話から分かる意味を選びましょう。', { '会話': 'かいわ', '分かる': 'わかる', '意味': 'いみ', '選びましょう': 'えらびましょう' })}</small></p><div class="reading-sequence-options">${choices}</div></div>`;
         }
         const chosen = question.choices[question.correct];
-        return `<div class="reading-interaction reading-inference-interaction"><p class="reading-picked-answer">Your idea: ${escapeText(chosen)}<small>あなたの考え：${escapeText(question.choicesJP[question.correct] || '')}</small></p>${renderLineChoices(question, 'inference')}</div>`;
+        return `<div class="reading-interaction reading-inference-interaction"><p class="reading-picked-answer">Your idea: ${escapeText(chosen)}<small>${FURI.sentence('あなたの考え：', { '考え': 'かんがえ' })}${escapeText(question.choicesJP[question.correct] || '')}</small></p>${renderLineChoices(question, 'inference')}</div>`;
       }
       const choices = question.choices.map((choice, i) => `<button class="reading-choice" data-choice="${i}"><span>${escapeText(choice)}</span><small>${escapeText(question.choicesJP[i] || '')}</small></button>`).join('');
       return `<div class="reading-choices">${choices}</div>`;
@@ -593,16 +603,16 @@
       if (!question) {
         const modeLabel = opts.reviewOnly
           ? reviewModeLabel()
-          : 'FIRST READING / はじめての読書';
+          : `FIRST READING / ${FURI.sentence('はじめての読書', { '読書': 'どくしょ' })}`;
         const reviewResult = opts.reviewOnly
-          ? `${mistakeCount === 0 && !usedEvidence ? 'You remembered it well.' : 'You used help when you needed it.'}<small>${mistakeCount === 0 && !usedEvidence ? 'ヒントなしで思い出せました。' : '必要なときにサポートを使いました。'}</small>`
+          ? `${mistakeCount === 0 && !usedEvidence ? 'You remembered it well.' : 'You used help when you needed it.'}<small>${mistakeCount === 0 && !usedEvidence ? FURI.sentence('ヒントなしで思い出せました。', { '思い出せました': 'おもいだせました' }) : FURI.sentence('必要なときにサポートを使いました。', { '必要': 'ひつよう', '使いました': 'つかいました' })}</small>`
           : '';
         const completeActions = opts.reviewOnly
-          ? `<button class="reading-secondary" id="reading-review-btn">Read again / もう一度読む</button><button class="reading-primary" id="reading-return-btn">Close journal review / ノートを閉じる</button>`
-          : `<button class="reading-secondary" id="reading-review-btn">Review reading / 読み返す</button><button class="reading-primary" id="reading-return-btn">Restore memory / 記憶を戻す</button>`;
+          ? `<button class="reading-secondary" id="reading-review-btn">Read again / ${FURI.sentence('もう一度読む', { '一度': 'いちど', '読む': 'よむ' })}</button><button class="reading-primary" id="reading-return-btn">Close journal review / ${FURI.sentence('ノートを閉じる', { '閉じる': 'とじる' })}</button>`
+          : `<button class="reading-secondary" id="reading-review-btn">Review reading / ${FURI.sentence('読み返す', { '読み返す': 'よみかえす' })}</button><button class="reading-primary" id="reading-return-btn">Restore memory / ${FURI.sentence('記憶を戻す', { '記憶': 'きおく', '戻す': 'もどす' })}</button>`;
         const completeNote = opts.reviewOnly
-          ? 'This is a quiet review. It does not change your quest.<br>これは読み返しです。クエストは変わりません。'
-          : 'Review as many times as you like before restoring the memory.<br>記憶を戻す前に、何度でも読み返せます。';
+          ? `This is a quiet review. It does not change your quest.<br>${FURI.sentence('これは読み返しです。クエストは変わりません。', { '読み返し': 'よみかえし', '変わりません': 'かわりません' })}`
+          : `Review as many times as you like before restoring the memory.<br>${FURI.sentence('記憶を戻す前に、何度でも読み返せます。', { '記憶': 'きおく', '戻す前に': 'もどすまえに', '何度でも': 'なんども', '読み返せます': 'よみかえせます' })}`;
         overlay.innerHTML = `
           <div class="reading-card reading-complete">
             ${renderPortrait('hero')}
@@ -638,9 +648,9 @@
           const expected = Array.isArray(postcard?.order) ? postcard.order : [];
           if (postcardSelection.length === expected.length && postcardSelection.every((value, index) => value === expected[index])) {
             postcardBuilt = true;
-            postcardFeedback = '<strong>That summary makes sense.</strong><small>このまとめで大丈夫です。</small>';
+            postcardFeedback = `<strong>That summary makes sense.</strong><small>${FURI.sentence('このまとめで大丈夫です。', { '大丈夫': 'だいじょうぶ' })}</small>`;
           } else {
-            postcardFeedback = '<strong>Try a different order.</strong> Read the memory once more.<small>別の順番を試しましょう。もう一度記憶を読みましょう。</small>';
+            postcardFeedback = `<strong>Try a different order.</strong> Read the memory once more.<small>${FURI.sentence('別の順番を試しましょう。もう一度記憶を読みましょう。', { '別': 'べつ', '順番': 'じゅんばん', '試しましょう': 'ためしましょう', '一度': 'いちど', '記憶': 'きおく', '読みましょう': 'よみましょう' })}</small>`;
           }
           render();
         });
@@ -657,7 +667,7 @@
           <div class="reading-header">
             <div class="reading-header-text">
               <div class="reading-eyebrow">${escapeText(episode.eyebrow)}</div>
-              <div class="reading-support-badge${supportLevel === 'independent' ? ' independent' : ''}">${opts.reviewOnly ? reviewModeLabel() : 'FIRST READING / はじめての読書'}</div>
+              <div class="reading-support-badge${supportLevel === 'independent' ? ' independent' : ''}">${opts.reviewOnly ? reviewModeLabel() : `FIRST READING / ${FURI.sentence('はじめての読書', { '読書': 'どくしょ' })}`}</div>
               <h2>${escapeText(episode.title)} <span>${escapeText(episode.titleJP)}</span></h2>
               <p class="reading-intro">${escapeText(episode.intro)}</p>
               <p class="reading-jp">${escapeText(episode.introJP)}</p>
@@ -670,9 +680,9 @@
           <div class="reading-question-label">${escapeText(question.label)} · ${escapeText(question.labelJP)}</div>
           <h3>${escapeText(question.prompt)}</h3>
           <p class="reading-jp">${escapeText(question.promptJP)}</p>
-          ${lastFeedback ? `<div class="reading-feedback" role="status" aria-live="polite">${escapeText(lastFeedback)}<small>${escapeText(lastFeedbackJP)}</small>${supportLevel === 'guided' || mistakeCount >= 2 ? '<button class="reading-evidence-btn" id="reading-evidence-btn" type="button">Show evidence / 証拠を見る</button>' : ''}</div>` : ''}
+          ${lastFeedback ? `<div class="reading-feedback" role="status" aria-live="polite">${escapeText(lastFeedback)}<small>${escapeText(lastFeedbackJP)}</small>${supportLevel === 'guided' || mistakeCount >= 2 ? `<button class="reading-evidence-btn" id="reading-evidence-btn" type="button">Show evidence / ${FURI.sentence('証拠を見る', { '証拠': 'しょうこ', '見る': 'みる' })}</button>` : ''}</div>` : ''}
           ${renderInteraction(question)}
-          <div class="reading-progress" role="status" aria-live="polite">Question ${questionIndex + 1} of ${questions.length}<small>問題 ${questionIndex + 1} / ${questions.length}</small></div>
+          <div class="reading-progress" role="status" aria-live="polite">Question ${questionIndex + 1} of ${questions.length}<small>${FURI.sentence('問題', { '問題': 'もんだい' })} ${questionIndex + 1} / ${questions.length}</small></div>
         </div>`;
 
       overlay.querySelector('#reading-close-btn').addEventListener('click', close);
