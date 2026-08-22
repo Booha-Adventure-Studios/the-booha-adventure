@@ -444,20 +444,31 @@
       background: rgba(239,225,194,.08);
     }
     .profile-network a {
-      display: inline-flex; align-items: center; gap: 5px; min-height: 32px;
-      padding: 5px 11px; border: 1px solid transparent; border-radius: 999px;
-      color: #7a603a; text-decoration: none; font-size: 11px; letter-spacing: .04em;
-      transition: color .18s, border-color .18s, background .18s, transform .18s;
+      display: inline-flex; align-items: center; gap: 6px; min-height: 38px;
+      padding: 7px 14px; border: 1px solid rgba(112,82,40,.38); border-radius: 10px;
+      color: #ead29a; text-decoration: none; font-size: 11px; font-weight: 900; letter-spacing: .04em;
+      text-shadow: 0 1px 2px rgba(0,0,0,.7);
+      background: linear-gradient(180deg, rgba(255,255,255,.2), rgba(199,163,98,.1));
+      box-shadow: 0 2px 0 rgba(65,42,14,.24), inset 0 1px rgba(255,255,255,.3);
+      transition: color .18s, border-color .18s, background .18s, transform .18s, box-shadow .18s;
     }
-    .profile-network a small { color: #a38a61; font-size: 10px; }
+    .profile-network a small { color: #c9aa72; font-size: 10px; font-weight: 800; }
     .profile-network a:hover, .profile-network a:focus-visible {
-      color: #3a2c1a; border-color: rgba(184,137,47,.65);
-      background: rgba(255,255,255,.22); outline: none; transform: translateY(-1px);
+      color: #2f2111; border-color: rgba(184,137,47,.85);
+      background: rgba(255,255,255,.34); outline: none; transform: translateY(-1px);
+      box-shadow: 0 4px 0 rgba(65,42,14,.2), 0 0 14px rgba(184,137,47,.18), inset 0 1px rgba(255,255,255,.45);
     }
     .profile-network a[aria-current="page"] {
-      color: #3a2c1a; border-color: rgba(184,137,47,.55);
-      background: rgba(255,255,255,.25); box-shadow: inset 0 1px rgba(255,255,255,.35);
+      color: #2b1d0e; border-color: rgba(184,137,47,.9);
+      background: linear-gradient(180deg, rgba(255,255,255,.48), rgba(215,178,105,.26));
+      box-shadow: 0 3px 0 rgba(65,42,14,.22), 0 0 16px rgba(184,137,47,.28), inset 0 1px rgba(255,255,255,.55);
+      animation: outputProfileButtonPulse 2.6s ease-in-out infinite;
     }
+    @keyframes outputProfileButtonPulse {
+      0%, 100% { box-shadow: 0 3px 0 rgba(65,42,14,.22), 0 0 12px rgba(184,137,47,.2), inset 0 1px rgba(255,255,255,.5); }
+      50% { box-shadow: 0 4px 0 rgba(65,42,14,.18), 0 0 25px rgba(184,137,47,.48), inset 0 1px rgba(255,255,255,.7); }
+    }
+    @media (prefers-reduced-motion: reduce) { .profile-network a[aria-current="page"] { animation: none; } }
   </style>
 </head>
 <body>
