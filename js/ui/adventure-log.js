@@ -162,21 +162,21 @@ const BoohaAdventureLog = (() => {
     mount.appendChild(el('div', 'alog-count',
       `ゲーム ${status.advDone}/9 ・ ブリッツ ${status.blitzDone}/3`));
 
-    // Weekly progress (completion) + score on completion
+    // Weekly record + score once the full weekly set is recorded
     const total    = status.gameStamps.length + status.blitzStamps.length;
     const done     = status.advDone + status.blitzDone;
     const progress = Math.round((done / total) * 100);
 
     const prog = el('div', 'alog-progress');
     prog.appendChild(el('div', 'alog-progress-label',
-      `こんしゅうのたっせい ${progress}%`));
+      `こんしゅうのきろく ${progress}%`));
     const barWrap = el('div', 'alog-bar');
     const barFill = el('div', 'alog-bar-fill' + (status.complete ? ' full' : ''));
     barFill.style.width = progress + '%';
     barWrap.appendChild(barFill);
     prog.appendChild(barWrap);
     prog.appendChild(el('div', 'alog-progress-en',
-      `${done} / ${total} COMPLETE`));
+      `${done} / ${total} RECORDED`));
     mount.appendChild(prog);
 
     if (status.complete) {
@@ -268,10 +268,10 @@ const BoohaAdventureLog = (() => {
 
     const sum = el('div', 'alog-term');
     sum.appendChild(el('div', 'alog-term-jp',
-      `きろくのある ${keys.length}しゅうのうち ${full.length}しゅう かんりょう`));
+      `きろくのある ${keys.length}しゅうのうち ${full.length}しゅう すべて きろく`));
     sum.appendChild(el('div', 'alog-term-en',
-      `${full.length} OF ${keys.length} RECORDED WEEKS COMPLETE` +
-      (avg != null ? ` · COMPLETE-WEEK AVG ${avg}%` : '')));
+      `${full.length} OF ${keys.length} RECORDED WEEKS FULLY LOGGED` +
+      (avg != null ? ` · FULL-WEEK AVG ${avg}%` : '')));
     mount.appendChild(sum);
 
     const strip = el('div', 'alog-past-strip');
