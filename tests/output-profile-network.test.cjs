@@ -12,6 +12,7 @@ const pages = {
   utsuroba: fs.readFileSync(path.join(ROOT, 'utsuroba-profile.html'), 'utf8'),
 };
 const utsurobaWorld = fs.readFileSync(path.join(ROOT, 'js/utsuroba.js'), 'utf8');
+const utsurobaPage = fs.readFileSync(path.join(ROOT, 'utsuroba.html'), 'utf8');
 
 Object.entries(pages).forEach(([name, source]) => {
   assert.match(source, /aria-label="Output profiles"/, `${name} should expose the Output profile network`);
@@ -59,5 +60,11 @@ assert.match(utsurobaWorld, /state\.roomId === DATA\.startRoom\)[\s\S]*?return;/
   'the Utsuroba start room should stay clear of memory overlays');
 assert.match(utsurobaWorld, /visitedRooms\[state\.roomId\]/,
   'Utsuroba should record each room visited');
+assert.match(utsurobaPage, /src="js\/utsuroba-dialogue\.js"/,
+  'the Utsuroba world should load the rotating drifter dialogue');
+assert.match(utsurobaWorld, /dialogueVariantFor\(drifter\)/,
+  'the Utsuroba world should select dialogue by drifter and week');
+assert.match(utsurobaWorld, /UtsuFurigana\.sentence/,
+  'drifter dialogue should render Japanese support with furigana');
 
 console.log('Output profile network tests passed.');
