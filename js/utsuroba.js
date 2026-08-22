@@ -491,6 +491,13 @@
   const music = new Audio('./assets/audio/utsuroba-music.mp3');
   music.loop = true;
   music.volume = 0.65;
+  const booDance = new Audio('./assets/audio/boo-dance.mp3');
+  booDance.loop = true;
+  booDance.volume = 0.72;
+
+  function stopBooDance() {
+    try { booDance.pause(); booDance.currentTime = 0; } catch (_) {}
+  }
 
   /* ── small SFX (Pass 1) — no drifter voice, just light feedback
      for typing/collecting, per house convention (ding.mp3 is the
@@ -970,13 +977,28 @@
     Object.entries(restored).forEach(([episodeId, entry]) => {
       const episode = episodes[episodeId];
       const echo = episode && episode.worldEcho;
-      if (!echo || echo.roomId !== state.roomId) return;
+      if (!echo) return;
+      let echoRoomId = echo.roomId;
+      let echoX = Number(echo.x);
+      let echoY = Number(echo.y);
+      if (echo.anchorDrifterId) {
+        const drifterIndex = DATA.drifters.findIndex(drifter => drifter.id === echo.anchorDrifterId);
+        const anchorRoomId = drifterIndex >= 0 ? weeklyRooms[drifterIndex] : null;
+        const anchorCoords = anchorRoomId ? DATA.roomStandingCoords[anchorRoomId] : null;
+        const authoredCoords = DATA.roomStandingCoords[echo.roomId];
+        if (anchorRoomId && anchorCoords && authoredCoords) {
+          echoRoomId = anchorRoomId;
+          echoX = (anchorCoords.x + (echo.x * WORLD_W - authoredCoords.x)) / WORLD_W;
+          echoY = (anchorCoords.y + (echo.y * WORLD_H - authoredCoords.y)) / WORLD_H;
+        }
+      }
+      if (echoRoomId !== state.roomId) return;
       const motif = Object.prototype.hasOwnProperty.call(iconFor, echo.motif) ? echo.motif : 'lantern';
       const button = document.createElement('button');
       button.type = 'button';
       button.className = `utsu-memory-echo motif-${motif}`;
-      button.style.left = `${Math.max(0, Math.min(1, echo.x)) * 100}%`;
-      button.style.top = `${Math.max(0, Math.min(1, echo.y)) * 100}%`;
+      button.style.left = `${Math.max(0, Math.min(1, echoX)) * 100}%`;
+      button.style.top = `${Math.max(0, Math.min(1, echoY)) * 100}%`;
       button.setAttribute('aria-label', `${echo.label}. Read memory again.`);
       button.innerHTML = `<span class="echo-aura"></span><span class="echo-icon" aria-hidden="true">${iconFor[motif]}</span><span class="echo-label">${escapeHTML(echo.label)}<small>${escapeHTML(echo.labelJP)}</small></span>`;
       button.addEventListener('click', event => {
@@ -1803,6 +1825,7 @@
   function startReadingChallenge(drifter, quest) {
     if (!window.UtsurobaReading) return false;
     closeDrifterPanel();
+    try { music.pause(); } catch (_) {}
     window.UtsurobaReading.start({
       drifter,
       quest,
@@ -1813,7 +1836,11 @@
       onReadingEvent: recordWeeklyReadingEvent,
       onClose: () => {
         state.inputLocked = false;
-        try { music.play().catch(() => {}); } catch(_) {}
+        setTimeout(() => {
+          if (!state.celebrating && !state.exitingToKarasuki) {
+            try { music.play().catch(() => {}); } catch(_) {}
+          }
+        }, 0);
       },
       onComplete: () => {
         if (completeMemory(drifter.id, quest.memIdx)) {
@@ -1863,6 +1890,7 @@
     state.celebrateDrifter   = drifter;
     danceSparkles            = [];
     try { music.pause(); } catch(_) {}
+    try { booDance.currentTime = 0; booDance.play().catch(() => {}); } catch(_) {}
     playCelebrationChime();
 
     const pos = drifterWorldPos(drifter, weeklyRooms[DATA.drifters.indexOf(drifter)]);
@@ -1881,6 +1909,7 @@
         danceSparkles           = [];
         state.x = state.celebrateOrbitX;
         state.y = state.celebrateOrbitY;
+        stopBooDance();
         try { music.play().catch(() => {}); } catch(_) {}
         state.inputLocked = false;
         showThankYouPanel(drifter);
