@@ -579,7 +579,16 @@
   let drifterFadeStart = 0;
   let _lastWrongId     = '';
 
-  const CELEBRATE_MS = 8000;
+  /* The user asked for the celebration dance to run "00:11" — the same
+     length as boo-dance.mp3 (~10.6s measured). DANCE_MS is the energetic
+     phase; DANCE_SETTLE_MS is the wind-down that follows it (shared with
+     the settleEase calc in drawFrame() so the two can't drift apart);
+     together they land on 11000ms. THANK_YOU_PANEL_MS is unrelated to
+     the dance itself — just how long the post-celebration card stays up
+     before auto-dismissing. */
+  const DANCE_MS           = 10100;
+  const DANCE_SETTLE_MS    = 900;
+  const THANK_YOU_PANEL_MS = 7200;
 
   const THANK_YOU = {
     ks:  { en:"Thank you… don't slow me down again." },
@@ -1696,15 +1705,29 @@
     const twContainer = drifterPanel.querySelector('#dp-typewriter-lines');
     const actionArea  = drifterPanel.querySelector('#dp-action-area');
     
-    /* use questLines for quest-offer state, greeting for everything else */
+    /* use questLines for quest-offer state, greeting for everything else.
+       Bug fix (caught directly by the user in Bryan's dialogue): a quest
+       already in progress with THIS drifter (accepted / reading /
+       collected) fell all the way through to drifter.greeting here —
+       greeting was only ever authored as "nothing going on" chat filler
+       ("Come back later."), so it was printing above actionHTML's own
+       state-specific line ("You have a memory… give it to me?" + Give
+       Memory buttons) and flatly contradicting it. Each of those three
+       states already has its own status text baked into actionHTML above
+       (WAITING_LINES, "The memory is open…", the give-memory prompt), so
+       no separate greeting line belongs on top of it — every drifter,
+       not just Bryan, had this bug. */
     const hasQuestOffer = !quest && drifter.memoryCount > 0 && drifterHasMemories(drifter.id);
+    const questInProgressWithThisDrifter = !!(quest && quest.active === drifter.id);
     const enLines = (hasQuestOffer && drifter.questLines)
       ? drifter.questLines
-      : (relationshipAwake && drifter.relationshipGreeting
-        ? drifter.relationshipGreeting
-        : (worldUnderstood && drifter.convergenceGreeting
-        ? drifter.convergenceGreeting
-        : (hasRestoredMemory && drifter.restoredGreeting ? drifter.restoredGreeting : drifter.greeting)));
+      : questInProgressWithThisDrifter
+        ? []
+        : (relationshipAwake && drifter.relationshipGreeting
+          ? drifter.relationshipGreeting
+          : (worldUnderstood && drifter.convergenceGreeting
+          ? drifter.convergenceGreeting
+          : (hasRestoredMemory && drifter.restoredGreeting ? drifter.restoredGreeting : drifter.greeting)));
     
     let   finished    = false;
 
@@ -1941,10 +1964,10 @@
         try { music.play().catch(() => {}); } catch(_) {}
         state.inputLocked = false;
         showThankYouPanel(drifter);
-      }, 1000);
+      }, DANCE_SETTLE_MS);
     };
 
-    setTimeout(finishCelebration, 2200);
+    setTimeout(finishCelebration, DANCE_MS);
 
     state.celebrateDancing = true;
   }
@@ -1975,7 +1998,7 @@
     requestAnimationFrame(() => requestAnimationFrame(() => panel.classList.add('open')));
     function dismissPanel() { panel.classList.remove('open'); setTimeout(() => panel.remove(), 360); }
     panel.querySelector('#ty-close-btn').addEventListener('click', dismissPanel);
-    setTimeout(dismissPanel, CELEBRATE_MS - 800 + 600);
+    setTimeout(dismissPanel, THANK_YOU_PANEL_MS);
   }
 
   /* ═══════════════════════════════════════════
@@ -2372,7 +2395,7 @@
       const elapsed = (now - state.celebrateSpinStart) / 1000;
 
       const settleEase = state.celebrateSettling
-        ? Math.max(0, 1 - ((now - state.celebrateSettleStart) / 900))
+        ? Math.max(0, 1 - ((now - state.celebrateSettleStart) / DANCE_SETTLE_MS))
         : 1;
 
       const driftX = (Math.sin(elapsed * 1.1) * 60 + Math.sin(elapsed * 2.3) * 25) * settleEase;

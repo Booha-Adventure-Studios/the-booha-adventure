@@ -493,15 +493,40 @@ const HAPPY_HOUSE_PORTAL = {
       const boxW = MEMORY_BOX_W + pulse * 2;
       const boxH = MEMORY_BOX_H + pulse * 1.5;
       const left = ox - boxW / 2, top = oy - boxH / 2;
+      const glowCx = ox, glowCy = oy + boxH * 0.1;
 
-      // A soft motif-tinted aura keeps the chest legible against dark rooms.
-      ctx.globalAlpha = 0.18 + pulse * 0.08;
-      ctx.fillStyle = `rgba(${colors.glowRGBA},1)`;
-      ctx.shadowBlur = MEMORY_BOX_GLOW + pulse2 * 12;
-      ctx.shadowColor = colors.shadow;
+      /* A soft motif-tinted glow keeps the chest legible against dark
+         rooms. Was a flat, solid-color ellipse with shadowBlur softening
+         only its rim — at a glance that reads as a plain translucent
+         disc/circle behind the chest (flagged directly: "odd circle
+         around it"), not a glow. A true radial gradient fading to
+         transparent reads as a glow because it actually has no edge. */
+      const glowR = Math.max(boxW, boxH) * 0.95 + pulse2 * 7;
+      const glow = ctx.createRadialGradient(glowCx, glowCy, 0, glowCx, glowCy, glowR);
+      glow.addColorStop(0,    `rgba(${colors.glowRGBA},${(0.30 + pulse * 0.16).toFixed(3)})`);
+      glow.addColorStop(0.55, `rgba(${colors.glowRGBA},${(0.12 + pulse * 0.06).toFixed(3)})`);
+      glow.addColorStop(1,    'transparent');
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = glow;
       ctx.beginPath();
-      ctx.ellipse(ox, oy + boxH * 0.1, boxW * 0.72, boxH * 0.62, 0, 0, Math.PI * 2);
+      ctx.arc(glowCx, glowCy, glowR, 0, Math.PI * 2);
       ctx.fill();
+
+      /* A couple of small twinkling sparkles — cheap (plain filled dots,
+         no per-sparkle gradient) rather than a second glow layer, same
+         cost discipline as the orb trail dots below. */
+      for (let s = 0; s < 2; s++) {
+        const sAngle = sec * (s === 0 ? 1.3 : -1.7) + s * Math.PI;
+        const sR = boxW * (0.42 + s * 0.12);
+        const sx = glowCx + Math.cos(sAngle) * sR;
+        const sy = glowCy + Math.sin(sAngle) * sR * 0.7;
+        const twinkle = 0.5 + 0.5 * Math.sin(sec * 3.4 + i * 2 + s * 2.6);
+        ctx.globalAlpha = twinkle * 0.85;
+        ctx.fillStyle = '#fff';
+        ctx.beginPath();
+        ctx.arc(sx, sy, 1.1 + twinkle * 0.9, 0, Math.PI * 2);
+        ctx.fill();
+      }
 
       if (memoryBoxImg.complete && memoryBoxImg.naturalWidth > 0) {
         ctx.globalAlpha = 0.96;
@@ -576,12 +601,27 @@ const HAPPY_HOUSE_PORTAL = {
   let orbPanelEl = null;
   let trailHudEl = null;
 
+  /* Round 2 Pass 14: the room a quest-in-progress trail step is waiting
+     in. Set by updateTrailHud() (called on init and every collect/quest
+     -state change — the only things that ever move the target room);
+     read every frame by drawExitArrows() together with the player's
+     current state.roomId, which changes far more often than the target
+     does. Caching it here means drawExitArrows() never has to re-derive
+     the quest/episode/trail chain itself, just run the room-graph BFS. */
+  let questNavTargetRoomId = null;
+
   /* Round 2 Pass 2: was a bordered rectangle with five stacked text
      rows (title, JP title, step counter, EN hint, JP hint) — textbook
      "food label" anatomy per the audit. Rebuilt on the shared
      .utsu-hud-chip shape: an icon + progress badge replace the old
      title/step rows, leaving just the hint (primary) and its JP
-     translation (secondary, smaller) — two rows instead of five. */
+     translation (secondary, smaller) — two rows instead of five.
+     Round 2 Pass 14: the counter moved out of the icon's corner into its
+     own bigger pill (was 9px, unreadable as "a counter" per feedback),
+     and a nav line was added that points at the highlighted exit arrow
+     (see findNextDirTo() / drawExitArrows()) instead of only offering
+     the authored, scene-setting hint text — which on its own doesn't
+     say which physical room to walk to. */
   function injectTrailHud() {
     if (trailHudEl) return;
     trailHudEl = document.createElement('div');
@@ -589,10 +629,12 @@ const HAPPY_HOUSE_PORTAL = {
     trailHudEl.className = 'utsu-hud-chip is-left is-trail is-passive';
     trailHudEl.style.display = 'none';
     trailHudEl.innerHTML = `
-      <div class="utsu-hud-chip-icon"><span aria-hidden="true">❖</span><span class="utsu-hud-chip-count" id="trail-hud-count"></span></div>
+      <div class="utsu-hud-chip-icon"><span aria-hidden="true">❖</span></div>
+      <div class="utsu-hud-chip-count" id="trail-hud-count"></div>
       <div class="utsu-hud-chip-text">
         <span class="utsu-hud-chip-primary" id="trail-hud-hint"></span>
         <span class="utsu-hud-chip-secondary" id="trail-hud-hint-jp"></span>
+        <span class="utsu-hud-chip-nav" id="trail-hud-nav"><span class="utsu-hud-chip-nav-arrow" aria-hidden="true">➜</span>Follow the glowing arrow / 光る矢印について行こう</span>
       </div>`;
     document.body.appendChild(trailHudEl);
   }
@@ -604,14 +646,48 @@ const HAPPY_HOUSE_PORTAL = {
     const trail = episode && Array.isArray(episode.trail) ? episode.trail : null;
     if (!quest || !quest.active || !trail || !trail.length) {
       trailHudEl.style.display = 'none';
+      questNavTargetRoomId = null;
       return;
     }
     const step = Math.max(0, Math.min(trail.length, Number.isInteger(quest.trailIndex) ? quest.trailIndex : 0));
     const next = trail[step];
+    questNavTargetRoomId = next ? next.roomId : null;
     trailHudEl.style.display = 'flex';
-    trailHudEl.querySelector('#trail-hud-count').textContent = `${step}/${trail.length}`;
+    trailHudEl.querySelector('#trail-hud-count').textContent = `${step} / ${trail.length}`;
     trailHudEl.querySelector('#trail-hud-hint').textContent = next ? next.hint : 'Return to Kurobane.';
     trailHudEl.querySelector('#trail-hud-hint-jp').textContent = next ? next.hintJP : 'クロバネのところへ戻りましょう。';
+    trailHudEl.querySelector('#trail-hud-nav').classList.toggle('is-shown', !!questNavTargetRoomId);
+  }
+
+  /* Round 2 Pass 14: room-graph pathfinding so the exit arrows themselves
+     can point toward a quest's target room, instead of the corner hint
+     being the only (and, per feedback, not very helpful) navigation aid.
+     NPP already IS a small adjacency graph — every room lists its exits
+     with a direction and a destination room id — so this is a plain
+     breadth-first search over it: cheap (≈15 rooms, a few edges each),
+     safe to re-run every frame in drawExitArrows() rather than caching,
+     since the player's current room changes far more often than the
+     quest's target room does. Returns the first-hop direction to take
+     from fromRoomId, or null if there's no path (or already there). */
+  function findNextDirTo(fromRoomId, targetRoomId) {
+    if (!fromRoomId || !targetRoomId || fromRoomId === targetRoomId) return null;
+    const visited = new Set([fromRoomId]);
+    const queue = [{ room: fromRoomId, firstDir: null }];
+    while (queue.length) {
+      const { room, firstDir } = queue.shift();
+      const exits = NPP[room];
+      if (!exits) continue;
+      for (const exit of exits) {
+        if (!exit.to) continue;
+        const dir = firstDir || exit.dir;
+        if (exit.to === targetRoomId) return dir;
+        if (!visited.has(exit.to)) {
+          visited.add(exit.to);
+          queue.push({ room: exit.to, firstDir: dir });
+        }
+      }
+    }
+    return null;
   }
 
   /* Round 2 Pass 1: was a fully hand-rolled inline-style bottom sheet,
@@ -711,6 +787,21 @@ const HAPPY_HOUSE_PORTAL = {
       weeklyOrbs = buildWeeklyOrbs();
       updateTrailHud();
       closeOrbPanel();
+      /* Round 2 Pass 14: an actual pickup used to be just a sound plus
+         the orb quietly vanishing — easy to miss. A bigger card that
+         pops for a couple seconds makes "you got it" unmistakable,
+         and doubles the trail counter here so it reads at a glance
+         without needing to look over at the corner HUD. */
+      if (window.UtsuCard) {
+        window.UtsuCard.showRewardPop(complete ? {
+          motif: orb.motif, icon: '✦',
+          title: 'Memory complete!', sub: '記憶が完成した！',
+        } : {
+          motif: orb.motif, icon: '❖',
+          title: `Clue found! ${nextIndex} / ${trail.length}`,
+          sub: `手がかりを見つけた！ ${nextIndex} / ${trail.length}`,
+        });
+      }
       return;
     }
     saveDrifterQuest({
@@ -719,6 +810,9 @@ const HAPPY_HOUSE_PORTAL = {
       state           : 'collected',
     });
     closeOrbPanel();
+    if (window.UtsuCard) {
+      window.UtsuCard.showRewardPop({ motif: orb.motif, icon: '✦', title: 'Memory found!', sub: '記憶を見つけた！' });
+    }
   }
 
 /* ═══════════════════════════════════════════
@@ -2187,25 +2281,34 @@ const HAPPY_HOUSE_PORTAL = {
     const sec = now/1000; const [col1,col2] = roomColorPair(state.roomId);
     const OPPOSITE = { left:"right", right:"left", up:"down", down:"up" };
     const arrivalExit = state.arrivalDir ? OPPOSITE[state.arrivalDir] : null;
+    /* Round 2 Pass 14: which exit (if any) leads toward the active
+       quest's next trail room — see findNextDirTo(). Re-derived every
+       frame (cheap BFS, ~15 rooms) since state.roomId changes far more
+       than questNavTargetRoomId does. */
+    const questNextDir = questNavTargetRoomId ? findNextDirTo(state.roomId, questNavTargetRoomId) : null;
     npps.forEach((npp, i) => {
       if (!npp.dir) return;
       const isBackDir = (npp.dir === arrivalExit);
       const hiddenUntil = isBackDir ? arrivalArrowBackHiddenUntil : arrivalArrowHiddenUntil;
       const delayRemaining = hiddenUntil - now; if (delayRemaining > 400) return;
       const revealFade = Math.min(1, Math.max(0, 1-(delayRemaining/(isBackDir?ARRIVAL_ARROW_DELAY_MS*ARRIVAL_ARROW_BACK_MULTIPLIER:ARRIVAL_ARROW_DELAY_MS))));
+      const isQuestDir = npp.dir === questNextDir;
+      const arrowCol1 = isQuestDir ? '#ffd966' : col1;
+      const arrowCol2 = isQuestDir ? '#fff4cf' : col2;
       const angle = DIR_ANGLE[npp.dir]??0; const pulse = 0.5+0.5*Math.sin(sec*2.2+i*1.3);
-      const bounce = Math.sin(sec*2.2+i*1.3)*6;
+      const bounce = Math.sin(sec*(isQuestDir?3.4:2.2)+i*1.3)*(isQuestDir?9:6);
       const ax = npp.x+Math.cos(angle)*bounce; const ay = npp.y+Math.sin(angle)*bounce;
       const fadeAlpha = revealFade*moveReveal;
       ctx.save(); ctx.translate(ax,ay); ctx.rotate(angle);
-      const ga = ctx.createRadialGradient(0,0,0,0,0,40); ga.addColorStop(0,col1); ga.addColorStop(1,"transparent");
-      ctx.globalAlpha = fadeAlpha*(0.10+pulse*0.08); ctx.fillStyle = ga; ctx.beginPath(); ctx.arc(0,0,40,0,Math.PI*2); ctx.fill();
+      const haloR = isQuestDir ? 52 : 40;
+      const ga = ctx.createRadialGradient(0,0,0,0,0,haloR); ga.addColorStop(0,arrowCol1); ga.addColorStop(1,"transparent");
+      ctx.globalAlpha = fadeAlpha*((isQuestDir?0.20:0.10)+pulse*(isQuestDir?0.14:0.08)); ctx.fillStyle = ga; ctx.beginPath(); ctx.arc(0,0,haloR,0,Math.PI*2); ctx.fill();
       [{ox:-11,a:0.65},{ox:4,a:1.0}].forEach(({ox,a}) => {
-        ctx.globalAlpha = fadeAlpha*a*(0.38+pulse*0.32); ctx.strokeStyle = col1; ctx.lineWidth = 2.5; ctx.lineCap = "round"; ctx.lineJoin = "round"; ctx.shadowBlur = 12; ctx.shadowColor = col2;
+        ctx.globalAlpha = fadeAlpha*a*(0.38+pulse*0.32); ctx.strokeStyle = arrowCol1; ctx.lineWidth = isQuestDir?3.4:2.5; ctx.lineCap = "round"; ctx.lineJoin = "round"; ctx.shadowBlur = isQuestDir?18:12; ctx.shadowColor = arrowCol2;
         ctx.beginPath(); ctx.moveTo(ox-7,-10); ctx.lineTo(ox+7,0); ctx.lineTo(ox-7,10); ctx.stroke(); ctx.shadowBlur = 0;
       });
-      ctx.globalAlpha = fadeAlpha*(0.60+pulse*0.38); ctx.fillStyle = "#fff"; ctx.shadowBlur = 14; ctx.shadowColor = col1;
-      ctx.beginPath(); ctx.arc(0,0,5,0,Math.PI*2); ctx.fill(); ctx.shadowBlur = 0; ctx.restore();
+      ctx.globalAlpha = fadeAlpha*(0.60+pulse*0.38); ctx.fillStyle = "#fff"; ctx.shadowBlur = isQuestDir?20:14; ctx.shadowColor = arrowCol1;
+      ctx.beginPath(); ctx.arc(0,0,isQuestDir?6.5:5,0,Math.PI*2); ctx.fill(); ctx.shadowBlur = 0; ctx.restore();
     });
   }
 
