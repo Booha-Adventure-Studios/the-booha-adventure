@@ -2037,14 +2037,10 @@ const HAPPY_HOUSE_PORTAL = {
   }
 
   function _utsurobaCurriculumUnlocked() {
-    if (window.__devAllGames || window.__devUtsuroba) return true;
-    try {
-      if (window.BoohaAdventure && BoohaAdventure.scores) {
-        const curricula = ['bc', 'br', 'pb'];
-        for (const c of curricula) { if (BoohaAdventure.scores.weeklyCompletedFor(c) >= 9) return true; }
-      }
-    } catch (_) {}
-    return false;
+    return window.BoohaUnlockSystem &&
+      typeof BoohaUnlockSystem.isWeeklyWorldGateOpen === 'function'
+      ? BoohaUnlockSystem.isWeeklyWorldGateOpen()
+      : false;
   }
 
   /* ═══════════════════════════════════════════
