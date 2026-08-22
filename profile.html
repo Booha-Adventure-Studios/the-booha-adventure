@@ -427,6 +427,29 @@
     .alog-past-week { font-size: 8px; letter-spacing: 1px; opacity: .85;
                       font-family: 'Cinzel Decorative', serif; }
     .alog-past-empty { text-align: center; color: #8a7048; padding: 8px; font-size: 15px; }
+
+    /* ── Output profile switcher ─────────────────────── */
+    .profile-network {
+      max-width: 680px; margin: 0 auto 14px; padding: 8px;
+      display: flex; justify-content: center; flex-wrap: wrap; gap: 7px;
+      border: 1px solid rgba(58,44,26,.28); border-radius: 999px;
+      background: rgba(239,225,194,.08);
+    }
+    .profile-network a {
+      display: inline-flex; align-items: center; gap: 5px; min-height: 32px;
+      padding: 5px 11px; border: 1px solid transparent; border-radius: 999px;
+      color: #7a603a; text-decoration: none; font-size: 11px; letter-spacing: .04em;
+      transition: color .18s, border-color .18s, background .18s, transform .18s;
+    }
+    .profile-network a small { color: #a38a61; font-size: 10px; }
+    .profile-network a:hover, .profile-network a:focus-visible {
+      color: #3a2c1a; border-color: rgba(184,137,47,.65);
+      background: rgba(255,255,255,.22); outline: none; transform: translateY(-1px);
+    }
+    .profile-network a[aria-current="page"] {
+      color: #3a2c1a; border-color: rgba(184,137,47,.55);
+      background: rgba(255,255,255,.25); box-shadow: inset 0 1px rgba(255,255,255,.35);
+    }
   </style>
 </head>
 <body>
@@ -437,6 +460,12 @@
     <h1 id="alog-title">ぼうけんログ</h1>
     <div class="plate-en">THE BOOHA ADVENTURE — RECORD OF DEEDS</div>
   </div>
+
+  <nav class="profile-network" aria-label="Output profiles">
+    <a href="profile.html" aria-current="page">LOG <small>ぼうけんログ</small></a>
+    <a href="adventure-profile.html">ADVENTURE <small>ぼうけん</small></a>
+    <a href="utsuroba-profile.html">UTSUROBA <small>うつろば</small></a>
+  </nav>
 
  <div class="paper">
     <div class="ink-head">
