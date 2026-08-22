@@ -675,9 +675,9 @@
   const THANK_YOU_PANEL_MS = 7200;
 
   const THANK_YOU = {
-    ks:  { en:"Thank you… don't slow me down again." },
-    nto: { en:"Thank you! You're the best!" },
-    cg:  { en:"Thank you… I really mean it." },
+    ks:  { en:"Thank you… don't slow me down again.", jp:'ありがとう…もう遅れないで。', readings:{ '遅れないで':'おくれないで' } },
+    nto: { en:"Thank you! You're the best!", jp:'ありがとう！最高だよ！', readings:{ '最高':'さいこう' } },
+    cg:  { en:"Thank you… I really mean it.", jp:'ありがとう…本当にそう思ってる。', readings:{ '本当':'ほんとう', '思ってる':'おもってる' } },
   };
   const WAITING_LINES = {
     ks:  { en:"Hurry up, you little blob." },
@@ -1125,6 +1125,55 @@
     return String(value == null ? '' : value)
       .replace(/&/g, '&amp;').replace(/</g, '&lt;')
       .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  /* The drifter names and quest controls live in this renderer, not in the
+     episode JSON. Keeping their readings here lets the profile/world UI get
+     full support now while the authored story content waits for its own
+     content pass. */
+  const DRIFTER_NAME_READINGS = {
+    ks: { '黒羽': 'くろばね', '静魔': 'しずま' },
+  };
+  const DRIFTER_UI_READINGS = {
+    '手がかりを探す': 'てがかりをさがす',
+    '記憶を戻す': 'きおくをもどす',
+    '助けを続ける': 'たすけをつづける',
+    '助けをやめる': 'たすけをやめる',
+    '記憶が開いている。再構成しよう。': 'きおくがひらいている。さいこうせいしよう。',
+    '先に友達を助けてあげて…': 'さきにともだちをたすけてあげて…',
+    'すべての記憶が見つかりました。': 'すべてのきおくがみつかりました。',
+  };
+
+  function furiJP(value, readings) {
+    const renderer = window.UtsuFurigana && window.UtsuFurigana.sentence;
+    const map = readings || DRIFTER_UI_READINGS;
+    return renderer ? renderer(value, map) : escapeHTML(value);
+  }
+
+  function drifterNameJP(drifter) {
+    return furiJP(drifter && drifter.nameKanji ? drifter.nameKanji : '', DRIFTER_NAME_READINGS[drifter && drifter.id] || {});
+  }
+
+  function questTrackHTML(drifter, quest, restored) {
+    if (!drifter || !drifter.memoryCount) return '';
+    const active = !!(quest && quest.active === drifter.id);
+    const episodeId = active && quest.episodeId ? quest.episodeId : drifter.episodeId;
+    const episode = (window.UTSUROBA_EPISODES || {})[episodeId];
+    const trailLength = Math.max(1, Array.isArray(episode && episode.trail) ? episode.trail.length : 3);
+    const collected = active ? Math.max(0, Math.min(trailLength, Number(quest.trailIndex) || 0)) : (restored ? trailLength : 0);
+    const complete = !active && restored;
+    const state = complete ? 'restored' : active && (quest.state === 'collected' || quest.state === 'reading') ? 'restore' : active ? 'trail' : 'offer';
+    const steps = [
+      { label: 'Ask', jp: 'たずねる', done: state !== 'offer', current: state === 'offer' },
+      { label: 'Find clues', jp: '手がかりを探す', done: state === 'restore' || complete, current: state === 'trail' },
+      { label: 'Restore', jp: '記憶を戻す', done: complete, current: state === 'restore' },
+    ];
+    return `<div class="dp-quest-track${complete ? ' is-restored' : ''}" aria-label="Memory quest progress">
+      ${steps.map((step, index) => `<div class="dp-quest-step${step.done ? ' is-done' : ''}${step.current ? ' is-current' : ''}">
+        <span class="dp-quest-step-mark">${step.done ? '' : index + 1}</span>
+        <span class="dp-quest-step-copy">${step.label}${index === 1 && active ? ` <small>${collected}/${trailLength}</small>` : `<small>${furiJP(step.jp, {})}</small>`}</span>
+      </div>`).join('')}
+    </div>`;
   }
 
   function drifterMemoryRestored(drifter) {
@@ -1884,6 +1933,7 @@
     const quest       = forcedQuest || getCachedQuest();
     const hasMemories = drifterHasMemories(drifter.id);
     const hasRestoredMemory = drifterMemoryRestored(drifter);
+    const questTrack = questTrackHTML(drifter, quest, hasRestoredMemory);
     const worldUnderstood = !!readUtsuroba().flags?.convergenceSeen && allReadingMemoriesRestored();
     const relationshipEpisodeId = DATA.readingRelationships?.triggerEpisodeId;
     const relationshipAwake = worldUnderstood && !!relationshipEpisodeId && !!readUtsuroba().readingEchoes?.[relationshipEpisodeId];
@@ -1897,7 +1947,7 @@
 
     } else if (!hasMemories) {
       actionHTML = `
-        <p class="dp-status">✦ All memories found. ✦<br>すべての記憶が見つかりました。</p>
+        <p class="dp-status">✦ All memories found. ✦<br>${furiJP('すべての記憶が見つかりました。')}</p>
         <div class="dp-btns"><button class="dp-btn no dp-dismiss">Close / 閉じる</button></div>`;
 
     } else if (quest && quest.active === drifter.id && quest.state === 'accepted') {
@@ -1906,14 +1956,14 @@
         <p class="dp-line-en" style="margin-bottom:2px;">${wl.en}</p>
         <div class="dp-divider"></div>
         <div class="dp-btns">
-          <button class="dp-btn yes dp-dismiss">Continue helping / 助けを続ける</button>
-          <button class="dp-btn no" id="dp-cancel-quest-btn">Cancel help / 助けをやめる</button>
+          <button class="dp-btn yes dp-dismiss">Continue helping / ${furiJP('助けを続ける')}</button>
+          <button class="dp-btn no" id="dp-cancel-quest-btn">Cancel help / ${furiJP('助けをやめる')}</button>
         </div>`;
 
     } else if (quest && quest.active === drifter.id && quest.state === 'reading') {
       actionHTML = `
         <p class="dp-line-en" style="margin-bottom:2px;">The memory is open. Reconstruct it.</p>
-        <p class="dp-line-jp" style="margin-bottom:10px;">記憶が開いている。再構成しよう。</p>
+        <p class="dp-line-jp" style="margin-bottom:10px;">${furiJP('記憶が開いている。再構成しよう。')}</p>
         <div class="dp-btns"><button class="dp-btn yes" id="dp-resume-reading">Resume reading / 読み直す</button></div>`;
 
     } else if (quest && quest.active === drifter.id && quest.state === 'collected') {
@@ -1930,7 +1980,7 @@
 
     } else if (quest && quest.active !== drifter.id) {
       actionHTML = `
-        <p class="dp-status">Please help my friend first…<br>先に友達を助けてあげて…</p>
+        <p class="dp-status">Please help my friend first…<br>${furiJP('先に友達を助けてあげて…')}</p>
         <div class="dp-btns"><button class="dp-btn no dp-dismiss">Close / 閉じる</button></div>`;
 
     } else {
@@ -1957,8 +2007,9 @@
         <div class="dp-portrait-wrap"><span class="dp-portrait-halo"></span><div class="dp-portrait"><img id="dp-portrait-img" src="${drifter.sprite1 || drifter.sprite2}" alt="${drifter.name}"></div></div>
         <div class="dp-body">
           <button class="dp-close-x dp-dismiss">✕</button>
-          <p class="dp-name-en">${drifter.name}</p>
-          <p class="dp-name-kanji">${drifter.nameKanji}</p>
+          <p class="dp-name-en">${escapeHTML(drifter.name)}</p>
+          <p class="dp-name-kanji">${drifterNameJP(drifter)}</p>
+          ${questTrack}
           
           <div class="dp-divider"></div>
           <div id="dp-typewriter-lines"></div>
@@ -2263,7 +2314,7 @@
   }
 
   function showThankYouPanel(drifter) {
-    const ty = THANK_YOU[drifter.id] || { en:'Thank you!' };
+    const ty = THANK_YOU[drifter.id] || { en:'Thank you!', jp:'ありがとう！', readings:{} };
     const panel = document.createElement('div');
     panel.className = 'utsu-card';
     if (window.UtsuCard) {
@@ -2279,9 +2330,11 @@
         </div>
         <div class="dp-body">
           <p class="dp-name-en">${escapeHTML(drifter.name)}</p>
+          <p class="dp-name-kanji">${drifterNameJP(drifter)}</p>
           <div class="dp-divider"></div>
           <p class="dp-line-en">${escapeHTML(ty.en)}</p>
-          <div class="dp-btns"><button class="dp-btn no" id="ty-close-btn">Close / 閉じる</button></div>
+          ${ty.jp ? `<p class="dp-line-jp">${furiJP(ty.jp, ty.readings)}</p>` : ''}
+          <div class="dp-btns"><button class="dp-btn no" id="ty-close-btn">Close / ${furiJP('閉じる', { '閉じる': 'とじる' })}</button></div>
         </div>
       </div>`;
     document.body.appendChild(panel);

@@ -127,6 +127,8 @@
       .dp-close-x:hover{color:#5a3010;}
       .dp-name-en{font-size:clamp(.6rem,1.6vw,.72rem);color:#9a7850;letter-spacing:.13em;text-transform:uppercase;margin:0 0 2px;}
       .dp-name-kanji{font-size:clamp(.9rem,2.4vw,1.06rem);color:#1e140a;font-weight:700;margin:0 0 1px;}
+      .dp-name-kanji ruby,.dp-line-jp ruby{ruby-position:over;line-height:1.45;}
+      .dp-name-kanji rt,.dp-line-jp rt{font-size:clamp(11px,.82em,15px);color:#8a6a42;opacity:.95;}
       .dp-divider{width:40px;height:1px;background:var(--card-ring,#c8b48a);opacity:.8;margin:0 0 8px;}
       .dp-line-en{font-size:clamp(.76rem,1.9vw,.86rem);color:#181004;line-height:1.45;margin:0 0 2px;}
       .dp-line-jp{font-size:clamp(.68rem,1.7vw,.78rem);color:#6a5030;line-height:1.5;margin:0 0 4px;}
@@ -138,6 +140,30 @@
       .dp-btn.no{background:transparent;border:1px solid #b8a478;color:#8a6c44;}
       .dp-btn.no:hover{border-color:#806030;color:#4a2c08;}
       @media(max-width:700px){.dp-inner{padding:9px 12px 12px}.dp-portrait{width:52px;height:52px}.dp-btn{padding:6px 12px}}
+
+      /* A drifter quest is a short loop, not a year-long progression. This
+         strip makes that loop visible without turning the card into a
+         checklist: one warm step at a time, with the active step glowing. */
+      .dp-quest-track{display:flex;align-items:stretch;gap:4px;margin:7px 0 9px;padding:6px 7px;
+        border:1px solid rgba(190,142,64,.32);border-radius:9px;background:rgba(146,92,23,.07);}
+      .dp-quest-step{position:relative;display:flex;align-items:center;gap:5px;min-width:0;flex:1;color:#9b7b52;}
+      .dp-quest-step:not(:last-child)::after{content:'';height:1px;flex:1;margin:0 2px;background:rgba(156,113,56,.3);}
+      .dp-quest-step-mark{display:grid;place-items:center;flex:0 0 19px;width:19px;height:19px;border-radius:50%;
+        border:1px solid rgba(145,104,47,.45);font:700 .62rem/1 Georgia,serif;color:#9a7a50;background:rgba(255,255,255,.18);}
+      .dp-quest-step-copy{display:flex;flex-direction:column;min-width:0;font:700 .61rem/1.1 Georgia,serif;white-space:nowrap;}
+      .dp-quest-step-copy small{margin-top:3px;color:#9a7952;font-size:.9em;font-weight:400;white-space:normal;}
+      .dp-quest-step.is-current{color:#4a2b09;text-shadow:0 0 10px rgba(255,203,117,.55);}
+      .dp-quest-step.is-current .dp-quest-step-mark{border-color:#c58d2d;color:#5b3306;background:#ffe09a;box-shadow:0 0 12px rgba(255,203,117,.48);animation:dpQuestPulse 1.8s ease-in-out infinite;}
+      .dp-quest-step.is-done .dp-quest-step-mark{border-color:#b38642;color:#fff5d5;background:#8c5d1c;}
+      .dp-quest-step.is-done .dp-quest-step-mark::before{content:'✓';}
+      .dp-quest-step.is-done .dp-quest-step-mark{font-size:0;}
+      .dp-quest-step.is-done .dp-quest-step-copy{color:#75552f;}
+      .dp-quest-step.is-done .dp-quest-step-copy small{color:#937249;}
+      @keyframes dpQuestPulse{0%,100%{transform:scale(1);box-shadow:0 0 8px rgba(255,203,117,.3);}50%{transform:scale(1.12);box-shadow:0 0 15px rgba(255,203,117,.75);}}
+      .dp-quest-track.is-restored{border-color:rgba(86,145,102,.45);background:rgba(91,154,107,.08);}
+      .dp-quest-track.is-restored .dp-quest-step-mark{background:#39714a;border-color:#9fe4ba;color:#effff0;}
+      .dp-quest-track.is-restored .dp-quest-step-copy{color:#496f52;}
+      @media(max-width:430px){.dp-quest-track{gap:2px;padding:5px 4px}.dp-quest-step{gap:3px}.dp-quest-step-copy{font-size:.55rem}.dp-quest-step-mark{flex-basis:17px;width:17px;height:17px;font-size:.56rem}.dp-quest-step:not(:last-child)::after{margin:0;}}
 
       /* ── small centered toast card (wrong-memory message) ── */
       .utsu-toast-card{background:linear-gradient(180deg,#f7f2e8 0%,#ede5d0 100%);
@@ -276,6 +302,8 @@
       .utsu-reward-pop-text{display:flex;flex-direction:column;gap:2px;}
       .utsu-reward-pop-title{font-size:.98rem;font-weight:700;}
       .utsu-reward-pop-sub{font-size:.76rem;color:rgba(251,238,255,.68);}
+      .utsu-reward-pop-sub ruby{ruby-position:over;line-height:1.45;}
+      .utsu-reward-pop-sub rt{font-size:clamp(10px,.8em,14px);color:#ffe4a4;}
       /* Spark burst: a handful of dots/glyphs spawned fresh per pickup
          (see spawnBurst() below) that fly outward from the card center
          and fade — each carries its own --dx/--dy set inline in JS so
@@ -366,7 +394,8 @@
     rewardPopEl.style.setProperty('--card-glow', glowFor(opts.motif));
     rewardPopEl.querySelector('.utsu-reward-pop-icon').textContent = opts.icon || '✦';
     rewardPopEl.querySelector('.utsu-reward-pop-title').textContent = opts.title || '';
-    rewardPopEl.querySelector('.utsu-reward-pop-sub').textContent = opts.sub || '';
+    if (opts.subHTML) rewardPopEl.querySelector('.utsu-reward-pop-sub').innerHTML = opts.subHTML;
+    else rewardPopEl.querySelector('.utsu-reward-pop-sub').textContent = opts.sub || '';
     spawnBurst(rewardPopEl.querySelector('.utsu-reward-pop-burst'));
     clearTimeout(rewardPopHideTimer);
     rewardPopEl.classList.remove('is-shown');

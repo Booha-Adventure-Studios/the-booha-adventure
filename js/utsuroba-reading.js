@@ -136,8 +136,15 @@
       #utsuroba-reading-challenge .reading-feedback small{display:block;color:rgba(255,231,178,.68);margin-top:3px;font-size:.95em;}
       #utsuroba-reading-challenge .reading-evidence-btn{display:block;margin-top:8px;padding:6px 10px;border:1px solid rgba(255,203,117,.48);border-radius:6px;background:rgba(255,203,117,.08);color:#ffe7b2;cursor:pointer;font:700 .72rem Georgia,serif;}
       #utsuroba-reading-challenge .reading-evidence-btn:hover,#utsuroba-reading-challenge .reading-evidence-btn:focus-visible{background:rgba(255,203,117,.18);outline:none;}
-      #utsuroba-reading-challenge .reading-progress{margin-top:14px;text-align:right;color:rgba(255,255,255,.42);font:700 11px monospace;}
-      #utsuroba-reading-challenge .reading-progress small{display:block;margin-top:3px;color:rgba(255,255,255,.38);font-size:.98em;font-weight:400;}
+      #utsuroba-reading-challenge ruby{ruby-position:over;line-height:1.45;}
+      #utsuroba-reading-challenge ruby rt{font-size:clamp(11px,.82em,15px);opacity:.95;}
+      #utsuroba-reading-challenge .reading-progress{position:relative;margin-top:14px;padding:8px 9px 7px;text-align:right;color:rgba(255,255,255,.66);font:700 11px monospace;border:1px solid rgba(255,203,117,.2);border-radius:8px;background:rgba(255,203,117,.045);overflow:hidden;}
+      #utsuroba-reading-challenge .reading-progress::before{content:'✦';position:absolute;left:9px;top:7px;color:#ffcb75;text-shadow:0 0 10px rgba(255,203,117,.8);animation:readingStarPulse 1.8s ease-in-out infinite;}
+      #utsuroba-reading-challenge .reading-progress-top{position:relative;z-index:1;}
+      #utsuroba-reading-challenge .reading-progress small{display:block;margin-top:3px;color:rgba(255,231,178,.68);font-size:.98em;font-weight:400;}
+      #utsuroba-reading-challenge .reading-progress-track{position:relative;height:4px;margin-top:7px;border-radius:9px;background:rgba(255,255,255,.12);overflow:hidden;}
+      #utsuroba-reading-challenge .reading-progress-fill{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#9f69cb,#ffcb75);box-shadow:0 0 12px rgba(255,203,117,.6);transition:width .35s ease;}
+      @keyframes readingStarPulse{0%,100%{opacity:.65;transform:scale(.85)}50%{opacity:1;transform:scale(1.15)}}
       #utsuroba-reading-challenge .reading-mechanic{margin:18px 0 20px;padding:13px 14px 15px;background:rgba(255,255,255,.035);border:1px solid rgba(255,203,117,.22);border-radius:12px;}
       #utsuroba-reading-challenge .reading-mechanic-heading{display:flex;justify-content:space-between;gap:12px;color:#ffdf9b;font:700 10px/1.4 monospace;letter-spacing:.14em;text-transform:uppercase;}
       #utsuroba-reading-challenge .reading-mechanic-heading span{color:rgba(255,223,155,.58);font-weight:400;letter-spacing:.04em;text-transform:none;}
@@ -682,7 +689,7 @@
           <p class="reading-jp">${escapeText(question.promptJP)}</p>
           ${lastFeedback ? `<div class="reading-feedback" role="status" aria-live="polite">${escapeText(lastFeedback)}<small>${escapeText(lastFeedbackJP)}</small>${supportLevel === 'guided' || mistakeCount >= 2 ? `<button class="reading-evidence-btn" id="reading-evidence-btn" type="button">Show evidence / ${FURI.sentence('証拠を見る', { '証拠': 'しょうこ', '見る': 'みる' })}</button>` : ''}</div>` : ''}
           ${renderInteraction(question)}
-          <div class="reading-progress" role="status" aria-live="polite">Question ${questionIndex + 1} of ${questions.length}<small>${FURI.sentence('問題', { '問題': 'もんだい' })} ${questionIndex + 1} / ${questions.length}</small></div>
+          <div class="reading-progress" role="status" aria-live="polite"><div class="reading-progress-top">Question ${questionIndex + 1} of ${questions.length}<small>${FURI.sentence('問題', { '問題': 'もんだい' })} ${questionIndex + 1} / ${questions.length}</small></div><div class="reading-progress-track" aria-hidden="true"><span class="reading-progress-fill" style="width:${Math.round(((questionIndex + 1) / Math.max(1, questions.length)) * 100)}%"></span></div></div>
         </div>`;
 
       overlay.querySelector('#reading-close-btn').addEventListener('click', close);
