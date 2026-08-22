@@ -19,6 +19,10 @@ const profileSource = fs.readFileSync(
   path.join(ROOT, 'profile.html'),
   'utf8'
 );
+const utsurobaSource = fs.readFileSync(
+  path.join(ROOT, 'js/utsuroba.js'),
+  'utf8'
+);
 
 function gateFor(counts, devFlags = {}) {
   let unlockSystem = null;
@@ -69,11 +73,19 @@ assert.match(profileSource, /id="world-doors" hidden/,
   'Output profile doors must be hidden by default');
 assert.match(profileSource, /BoohaUnlockSystem\.isWeeklyWorldGateOpen/,
   'Output profile doors must consume the shared weekly gate');
-assert.match(profileSource, /href="karasuki\.html"/,
+assert.match(profileSource, /href="karasuki\.html\?from=profile"/,
   'Output profile must provide a Karasuki door when open');
-assert.match(profileSource, /href="utsuroba\.html"/,
+assert.match(profileSource, /href="utsuroba\.html\?from=profile"/,
   'Output profile must provide an Utsuroba door when open');
 assert.doesNotMatch(profileSource, /href="juku\.html"/, 
   'Output world doors must not add a Juku route');
+assert.match(karasukiSource, /getSpawnPoint\(PAGE_ID\)/,
+  'Karasuki should resume its saved room for a profile entry');
+assert.match(karasukiSource, /URLSearchParams\(window\.location\.search\)[\s\S]*from.*profile/,
+  'Karasuki should distinguish direct profile entry');
+assert.match(utsurobaSource, /getSpawnPoint\(PAGE_ID\)/,
+  'Utsuroba should resume its saved room for a profile entry');
+assert.match(utsurobaSource, /href = 'profile\.html'/,
+  'Direct Utsuroba entry should provide a return to the Output profile');
 
 console.log('Weekly Output-world gate tests passed.');

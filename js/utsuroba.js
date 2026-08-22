@@ -56,6 +56,35 @@
     r      : isTouchDevice ? 58 : 44,
     href   : 'karasuki.html',
   };
+  const PAGE_ID = 'utsuroba';
+
+  function isProfileEntry() {
+    try { return new URLSearchParams(window.location.search).get('from') === 'profile'; }
+    catch (_) { return false; }
+  }
+
+  function saveCurrentRoom() {
+    try {
+      const pageState = window.BoohaAdventure && BoohaAdventure.pageState;
+      if (pageState && typeof pageState.setSpawnPoint === 'function') {
+        pageState.setSpawnPoint({ roomId: state.roomId, spawnId: state.spawnId }, PAGE_ID);
+      }
+    } catch (_) {}
+  }
+
+  function restoreProfileRoom() {
+    if (!isProfileEntry()) return;
+    try {
+      const pageState = window.BoohaAdventure && BoohaAdventure.pageState;
+      const saved = pageState && typeof pageState.getSpawnPoint === 'function'
+        ? pageState.getSpawnPoint(PAGE_ID)
+        : null;
+      if (saved && DATA.rooms[saved.roomId]) {
+        state.roomId = saved.roomId;
+        state.spawnId = saved.spawnId || 'default';
+      }
+    } catch (_) {}
+  }
 
   /* ═══════════════════════════════════════════
      DEV MODE
@@ -697,6 +726,8 @@
       .utsuroba-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;display:block;pointer-events:none;user-select:none;}
       #buki-canvas{position:absolute;inset:0;z-index:10;pointer-events:none;}
       #buki-fade{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none;z-index:20;}
+      .booha-profile-exit{position:fixed;left:16px;top:16px;z-index:260;display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border:1px solid rgba(216,168,255,.46);border-radius:999px;background:rgba(9,0,18,.82);color:#f1d9ff;font:700 11px/1.2 Georgia,serif;letter-spacing:.03em;text-decoration:none;box-shadow:0 0 16px rgba(100,30,160,.18);transition:background .18s,border-color .18s,transform .18s;}
+      .booha-profile-exit:hover,.booha-profile-exit:focus-visible{background:rgba(39,0,65,.92);border-color:#d8a8ff;outline:none;transform:translateY(-1px);}
       #rotate-overlay{display:none;position:fixed;inset:0;z-index:9999;background:#000;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center;padding:32px;}
       @media screen and (orientation:portrait) and (max-width:1023px){#rotate-overlay{display:flex !important;}}
       .rotate-phone{font-size:64px;display:block;animation:rotatehint 2.4s ease-in-out infinite;transform-origin:center;}
@@ -2100,6 +2131,7 @@
     arrivalArrowHiddenUntil     = now + ARRIVAL_ARROW_DELAY_MS;
     arrivalArrowBackHiddenUntil = now + ARRIVAL_ARROW_DELAY_MS * ARRIVAL_ARROW_BACK_MULTIPLIER;
     state.distMovedSinceSpawn = 0; state.moving = false; state.spawnLockUntil = now+500;
+    saveCurrentRoom();
   }
 
   function arriveInRoom(nextRoom, spawnId, arrivalDir) {
@@ -2142,6 +2174,7 @@
     setTimeout(() => {
       const nextBg = makeBg(nextRoom.bg); roomLayer.innerHTML = ''; roomLayer.appendChild(nextBg); currentBg = nextBg;
       state.roomId  = exit.to; state.spawnId = exit.spawn || 'default';
+      saveCurrentRoom();
       arriveInRoom(nextRoom, state.spawnId, exit.dir);
       refreshMemoryEchoes();
       fadeEl.style.transition = `opacity ${FADE_MS/2}ms ease-out`; fadeEl.style.opacity = '0';
@@ -2641,6 +2674,17 @@
   function init() {
     injectStyles();
     buildApp();
+    restoreProfileRoom();
+    if (isProfileEntry()) {
+      const exit = document.createElement('a');
+      exit.id = 'booha-profile-exit';
+      exit.className = 'booha-profile-exit';
+      exit.href = 'profile.html';
+      exit.innerHTML = '← <span>Output profile</span>';
+      exit.setAttribute('aria-label', 'Back to Output profile');
+      exit.addEventListener('click', saveCurrentRoom);
+      document.body.appendChild(exit);
+    }
     fitStage();
     resizeCanvas();
     renderInitialRoom();
