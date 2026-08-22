@@ -488,6 +488,29 @@
 
   let pins = [], trail = [], ripples = [];
   const ghostImg = new Image(); ghostImg.src = './assets/img/booha_ghost.png';
+
+  /* Round 2 Pass 13 (celebration dance): three dedicated dance-pose
+     frames, swapped on a beat during startCelebration() instead of
+     just spinning the base sprite. Measured each PNG's own opaque
+     content as a fraction of its canvas (booha_ghost.png: ~65% of a
+     1024×1024 square; the three dance frames: ~80-84% of their own,
+     slightly taller-than-wide canvases, since the raised/spread poses
+     were cropped tight) — contentScale below shrinks the destination
+     draw box just enough that the character reads as the same size in
+     every pose instead of visibly growing when a dance frame swaps in
+     (the "these files' ghosts are a tad bigger" the user flagged).
+     offsetX/offsetY (a few percent of the frame, also measured from
+     each PNG's content bounding box) re-centers each pose on the same
+     point booha_ghost.png centers on, so the swap doesn't nudge the
+     ghost sideways either. */
+  const danceArmsUpImg = new Image(); danceArmsUpImg.src = './assets/img/booha_ghost_dance_arms_up.png';
+  const danceSwayImg   = new Image(); danceSwayImg.src   = './assets/img/booha_ghost_dance_sway.png';
+  const danceWaveImg   = new Image(); danceWaveImg.src   = './assets/img/booha_ghost_dance_wave.png';
+  const DANCE_FRAMES = [
+    { img: danceArmsUpImg, contentScale: 0.817, offsetX: -0.007, offsetY: -0.026 },
+    { img: danceSwayImg,   contentScale: 0.801, offsetX:  0.009, offsetY: -0.015 },
+    { img: danceWaveImg,   contentScale: 0.811, offsetX:  0.009, offsetY: -0.009 },
+  ];
   const music = new Audio('./assets/audio/utsuroba-music.mp3');
   music.loop = true;
   music.volume = 0.65;
@@ -511,6 +534,12 @@
     } catch (_) {}
   }
   function playCelebrationChime() {
+    /* Round 2 Pass 3: a memory handed back to its drifter now gets its
+       own distinct three-note rise (UtsuSfx.giveMemory) instead of the
+       same ding.mp3 the reading challenge's correct-answer feel and
+       the orb pickup also use. Falls back to the old two-ding chime if
+       utsu-sfx.js somehow isn't loaded. */
+    if (window.UtsuSfx) { window.UtsuSfx.giveMemory(); return; }
     playChime(1);
     setTimeout(() => playChime(1.28), 150);
   }
@@ -700,17 +729,8 @@
       #utsuroba-reading-challenge-button:hover,#utsuroba-reading-challenge-button:focus-visible{background:rgba(12,52,40,.94);border-color:#9fe4ba;transform:translateY(-1px);outline:none;}
       #utsuroba-reading-challenge-button span{display:block;margin-top:2px;color:rgba(215,255,227,.52);font-size:9px;font-weight:400;}
       #utsuroba-reading-challenge-button .challenge-count{display:inline-block;margin-left:6px;padding:2px 5px;border-radius:999px;background:#9fe4ba;color:#082016;font:700 9px/1 monospace;vertical-align:1px;}
-      #utsu-echoes-tracker{position:fixed;top:16px;left:16px;z-index:220;background:rgba(9,0,18,.84);border:1px solid rgba(216,168,255,.42);border-radius:14px;padding:9px 12px;box-shadow:0 0 18px rgba(100,30,160,.18);font-family:Georgia,serif;}
-      #utsu-echoes-tracker .utsu-echoes-label{color:#f1d9ff;font:700 10px/1.3 monospace;letter-spacing:.1em;text-transform:uppercase;}
-      #utsu-echoes-tracker .utsu-echoes-label span{display:block;margin-top:2px;color:rgba(241,217,255,.5);font-size:9px;font-weight:400;letter-spacing:.02em;text-transform:none;}
-      #utsu-echoes-tracker .utsu-echoes-dots{display:flex;gap:8px;margin-top:8px;}
-      #utsu-echoes-tracker .utsu-echo-dot{width:30px;height:30px;border-radius:50%;padding:0;display:flex;align-items:center;justify-content:center;font-size:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);color:rgba(255,255,255,.28);cursor:default;transition:transform .15s,background .15s,border-color .15s;}
-      #utsu-echoes-tracker .utsu-echo-dot.is-lit{cursor:pointer;border-color:transparent;}
-      #utsu-echoes-tracker .utsu-echo-dot.is-lit:hover,#utsu-echoes-tracker .utsu-echo-dot.is-lit:focus-visible{transform:translateY(-2px);outline:none;}
-      #utsu-echoes-tracker .utsu-echo-dot.motif-lantern.is-lit{background:radial-gradient(circle at 35% 30%,#fffde0,#ffd966 55%,#c8860a);box-shadow:0 0 12px rgba(255,217,102,.55);}
-      #utsu-echoes-tracker .utsu-echo-dot.motif-candy.is-lit{background:radial-gradient(circle at 35% 30%,#fff0f4,#ff85a1 55%,#c23a5e);box-shadow:0 0 12px rgba(255,133,161,.55);}
-      #utsu-echoes-tracker .utsu-echo-dot.motif-reflection.is-lit{background:radial-gradient(circle at 35% 30%,#eafcff,#a8edff 55%,#3b8fbf);box-shadow:0 0 12px rgba(168,237,255,.55);}
-      @media(max-width:700px){#utsu-echoes-tracker{top:10px;left:10px;padding:7px 9px;}#utsu-echoes-tracker .utsu-echo-dot{width:26px;height:26px;font-size:12px;}}
+      /* Round 2 Pass 2: #utsu-echoes-tracker's own CSS moved into the
+         shared .utsu-hud-chip definition in js/utsu-card.js. */
       #utsuroba-reading-journal{position:fixed;inset:0;z-index:9300;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(4,0,12,.86);font-family:Georgia,serif;}
       .reading-journal-card{position:relative;width:min(760px,100%);max-height:calc(100vh - 36px);overflow:auto;padding:clamp(22px,4vw,36px);box-sizing:border-box;border:1px solid rgba(216,168,255,.42);border-radius:16px;background:linear-gradient(160deg,#171020,#0b0712 68%,#130b1b);box-shadow:0 0 70px rgba(100,30,160,.3);animation:utsuPopIn .22s ease-out;}
       .reading-journal-close{position:absolute;right:14px;top:12px;background:transparent;border:0;color:rgba(255,255,255,.55);font-size:18px;cursor:pointer;padding:8px;}
@@ -787,30 +807,14 @@
       .weekly-reading-complete small{display:block;margin-top:3px;color:rgba(215,255,227,.58);font-size:.9em;}
       .weekly-reading-close-btn{margin-top:17px;padding:9px 18px;border:1px solid #9fe4ba;border-radius:7px;background:rgba(159,228,186,.12);color:#d7ffe3;cursor:pointer;font:700 .78rem Georgia,serif;}
       @media(max-width:700px){#utsuroba-reading-challenge-button{top:51px;right:10px;padding:7px 10px;font-size:10px}.weekly-reading-card{padding:21px 16px}.weekly-reading-close,.weekly-reading-close-btn,.reading-journal-close{min-width:44px;min-height:44px}}
-      /* ══ DRIFTER PANEL ══ */
-      #utsuroba-drifter-panel{position:fixed;left:50%;bottom:clamp(10px,2.5vh,26px);z-index:9100;width:min(760px,calc(100vw - 28px));max-height:min(42vh,320px);overflow:auto;background:linear-gradient(180deg,#f7f2e8 0%,#ede5d0 100%);border:1px solid #c8b48a;border-radius:16px;box-shadow:0 10px 36px rgba(0,0,0,0.52);transform:translate(-50%,calc(100% + 24px));transition:transform ${PANEL_SLIDE_MS}ms cubic-bezier(0.22,1,0.36,1);font-family:'Georgia',serif;pointer-events:none;}
-      #utsuroba-drifter-panel.open{transform:translate(-50%,0);pointer-events:auto;}
-      .dp-handle{width:38px;height:4px;border-radius:2px;background:#c0aa80;margin:10px auto 0;}
-      .dp-inner{display:flex;align-items:flex-start;gap:clamp(10px,2.5vw,18px);padding:10px clamp(14px,3vw,22px) 15px;}
-      .dp-portrait{flex-shrink:0;width:clamp(60px,10vw,84px);height:clamp(60px,10vw,84px);border-radius:9px;border:1.5px solid #c8b48a;background:#e8dfc8;display:flex;align-items:center;justify-content:center;overflow:hidden;}
-      .dp-portrait img{width:100%;height:100%;object-fit:contain;display:block;transition:opacity .16s ease;}
-      .dp-body{flex:1;min-width:0;position:relative;}
-      .dp-close-x{position:absolute;top:0;right:0;background:transparent;border:none;cursor:pointer;font-size:.95rem;color:#b8a070;padding:2px 5px;line-height:1;}
-      .dp-close-x:hover{color:#5a3010;}
-      .dp-name-en{font-size:clamp(.62rem,1.7vw,.75rem);color:#9a7850;letter-spacing:.14em;text-transform:uppercase;margin:0 0 2px;}
-      .dp-name-kanji{font-size:clamp(.95rem,2.6vw,1.14rem);color:#1e140a;font-weight:700;margin:0 0 1px;}
-      
-      .dp-divider{width:44px;height:1px;background:#c8b48a;margin:0 0 9px;}
-      .dp-line-en{font-size:clamp(.78rem,2vw,.88rem);color:#120c04;line-height:1.45;margin:0 0 2px;}
-      .dp-line-jp{font-size:clamp(.70rem,1.8vw,.80rem);color:#6a5030;line-height:1.5;margin:0 0 4px;}
-      .dp-status{font-size:clamp(.68rem,1.7vw,.78rem);color:#806040;line-height:1.45;margin:0 0 8px;font-style:italic;}
-      .dp-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
-      .dp-btn{font-family:'Georgia',serif;font-size:clamp(.70rem,1.8vw,.80rem);letter-spacing:.06em;cursor:pointer;padding:7px 14px;border-radius:5px;transition:all .16s;}
-      .dp-btn.yes{background:#2a1a06;border:1px solid #4a3010;color:#f0ddb0;}
-      .dp-btn.yes:hover{background:#3a2810;}
-      .dp-btn.no{background:transparent;border:1px solid #b8a478;color:#9a7850;}
-      .dp-btn.no:hover{border-color:#806030;color:#4a2c08;}
-      @media(max-width:700px){#utsuroba-drifter-panel{width:calc(100vw - 16px);max-height:52vh;bottom:8px}.dp-inner{padding:9px 12px 13px}.dp-portrait{width:58px;height:58px}.dp-btn{padding:7px 11px}}
+      /* ══ DRIFTER PANEL ══
+         Round 2 Pass 1: the drifter-panel-specific CSS that used to live
+         here (its own #utsuroba-drifter-panel sizing plus a full copy of
+         the .dp-* content classes) has moved into js/utsu-card.js, the
+         shared "parchment card" component now also used by the orb
+         panel, thank-you panel, and wrong-memory toast. That file also
+         fixes the old mobile-bigger-than-desktop max-height bug. See
+         claude/utsuroba-audit-and-pass-plan.md, Round 2. */
     `;
     document.head.appendChild(s);
   }
@@ -953,8 +957,15 @@
     if (drifterPanel) return;
     drifterPanel = document.createElement('div');
     drifterPanel.id = 'utsuroba-drifter-panel';
+    drifterPanel.className = 'utsu-card is-floating';
     document.body.appendChild(drifterPanel);
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && drifterPanelOpen) closeDrifterPanel(); });
+    /* Round 2 Pass 3: one delegated listener covers every .dp-btn this
+       panel will ever render (its innerHTML is rebuilt per-quest-state),
+       so a fresh listener never needs to be attached after each render. */
+    drifterPanel.addEventListener('click', e => {
+      if (window.UtsuSfx && e.target.closest('.dp-btn')) window.UtsuSfx.buttonPress();
+    });
   }
 
   function escapeHTML(value) {
@@ -1040,6 +1051,11 @@
     if (echoesTrackerEl) return;
     echoesTrackerEl = document.createElement('div');
     echoesTrackerEl.id = 'utsu-echoes-tracker';
+    /* Round 2 Pass 2: was its own bordered-rectangle "food label" box
+       (see claude/utsuroba-audit-and-pass-plan.md); now built on the
+       shared .utsu-hud-chip shape/layout from js/utsu-card.js, same as
+       Karasuki's mirror tracker and the Memory Trail hint. */
+    echoesTrackerEl.className = 'utsu-hud-chip is-left';
     echoesTrackerEl.style.display = 'none';
     document.body.appendChild(echoesTrackerEl);
   }
@@ -1067,12 +1083,12 @@
       const motif = episode?.worldEcho?.motif && iconFor[episode.worldEcho.motif] ? episode.worldEcho.motif : 'lantern';
       const isLit = !!(d.episodeId && restored[d.episodeId]);
       const status = isLit ? 'found' : 'not found yet';
-      return `<button type="button" class="utsu-echo-dot motif-${motif}${isLit ? ' is-lit' : ''}" ${isLit ? '' : 'disabled tabindex="-1"'} data-echo-episode="${escapeHTML(d.episodeId || '')}" aria-label="${escapeHTML(`${d.name} — ${status}`)}"><span aria-hidden="true">${iconFor[motif]}</span></button>`;
+      return `<button type="button" class="utsu-hud-chip-dot motif-${motif}${isLit ? ' is-lit' : ''}" ${isLit ? '' : 'disabled tabindex="-1"'} data-echo-episode="${escapeHTML(d.episodeId || '')}" aria-label="${escapeHTML(`${d.name} — ${status}`)}"><span aria-hidden="true">${iconFor[motif]}</span></button>`;
     }).join('');
 
-    echoesTrackerEl.style.display = 'block';
-    echoesTrackerEl.innerHTML = `<div class="utsu-echoes-label">${escapeHTML(label || 'The Three Echoes')}<span>${escapeHTML(labelJP || '')}</span></div><div class="utsu-echoes-dots">${dots}</div>`;
-    echoesTrackerEl.querySelectorAll('.utsu-echo-dot.is-lit').forEach(btn => {
+    echoesTrackerEl.style.display = 'flex';
+    echoesTrackerEl.innerHTML = `<div class="utsu-hud-chip-dots">${dots}</div><div class="utsu-hud-chip-text"><span class="utsu-hud-chip-primary">${escapeHTML(label || 'The Three Echoes')}</span><span class="utsu-hud-chip-secondary">${escapeHTML(labelJP || '')}</span></div>`;
+    echoesTrackerEl.querySelectorAll('.utsu-hud-chip-dot.is-lit').forEach(btn => {
       btn.addEventListener('click', () => {
         const episodeId = btn.dataset.echoEpisode;
         const entry = episodeId ? restored[episodeId] : null;
@@ -1569,10 +1585,21 @@
   function openDrifterPanel(drifter, forcedQuest = null) {
     if (performance.now() < drifterPanelCooldown || !drifter || !drifterPanel) return;
 
+    if (window.UtsuSfx) window.UtsuSfx.panelOpen();
     drifterPanelOpen  = true;
     state.inputLocked = true;
     state.clickTarget = null;
     try { music.pause(); } catch(_) {}
+
+    /* Round 2 Pass 1: accent the shared card with this drifter's own
+       motif color (same lantern/candy/reflection/thorn/ribbon language
+       already used by their orb and reading-modal portrait ring) so six
+       different voices don't all get the identical tan box. */
+    if (window.UtsuCard) {
+      const motif = window.UtsuCard.motifForDrifter(drifter);
+      drifterPanel.style.setProperty('--card-ring', window.UtsuCard.ringFor(motif));
+      drifterPanel.style.setProperty('--card-glow', window.UtsuCard.glowFor(motif));
+    }
 
     invalidateQuestCache();
     const quest       = forcedQuest || getCachedQuest();
@@ -1797,6 +1824,7 @@
   }
 
   function closeDrifterPanel() {
+    if (window.UtsuSfx) window.UtsuSfx.panelClose();
     drifterPanelCooldown = performance.now() + POPUP_COOLDOWN_MS;
     drifterPanelOpen     = false;
     drifterPanel.classList.remove('open');
@@ -1857,9 +1885,9 @@
   function showWrongMemoryMsg() {
     const msg = document.createElement('div');
     msg.style.cssText = 'position:fixed;inset:0;z-index:9500;display:flex;align-items:center;justify-content:center;pointer-events:none;';
-    msg.innerHTML = `<div style="background:rgba(247,242,232,0.97);border:1.5px solid #c8b48a;border-radius:10px;padding:24px 36px;text-align:center;font-family:Georgia,serif;box-shadow:0 8px 32px rgba(0,0,0,0.35);animation:utsuPopIn .22s ease-out;">
-      <p style="margin:0 0 6px;font-size:1.04rem;color:#1e140a;">Sorry… this isn't for me.</p>
-      <p style="margin:0;font-size:.84rem;color:#806040;">ごめん…これは私のじゃない。</p></div>`;
+    msg.innerHTML = `<div class="utsu-toast-card" style="text-align:center;animation:utsuPopIn .22s ease-out;">
+      <p class="dp-line-en" style="margin:0 0 4px;">Sorry… this isn't for me.</p>
+      <p class="dp-line-jp" style="margin:0;">ごめん…これは私のじゃない。</p></div>`;
     document.body.appendChild(msg);
     setTimeout(() => { msg.style.opacity='0'; msg.style.transition='opacity .5s'; setTimeout(() => msg.remove(), 520); }, 3200);
   }
@@ -1924,34 +1952,28 @@
   function showThankYouPanel(drifter) {
     const ty = THANK_YOU[drifter.id] || { en:'Thank you!' };
     const panel = document.createElement('div');
-    panel.style.cssText = `
-      position:fixed;bottom:0;left:0;right:0;z-index:9200;
-      background:linear-gradient(180deg,#f7f2e8 0%,#ede5d0 100%);
-      border-top:2px solid #c8b48a;border-radius:20px 20px 0 0;
-      box-shadow:0 -6px 32px rgba(0,0,0,0.5);
-      font-family:'Georgia',serif;
-      transform:translateY(100%);
-      transition:transform 0.32s cubic-bezier(0.22,1,0.36,1);
-      pointer-events:auto;`;
+    panel.className = 'utsu-card';
+    if (window.UtsuCard) {
+      const motif = window.UtsuCard.motifForDrifter(drifter);
+      panel.style.setProperty('--card-ring', window.UtsuCard.ringFor(motif));
+      panel.style.setProperty('--card-glow', window.UtsuCard.glowFor(motif));
+    }
     panel.innerHTML = `
-      <div style="max-width:480px;margin:0 auto;padding:14px clamp(14px,3.5vw,28px) 26px;">
-        <div style="width:38px;height:4px;border-radius:2px;background:#c0aa80;margin:0 auto 14px;"></div>
-        <div style="display:flex;align-items:flex-start;gap:clamp(10px,2.5vw,20px);">
-          <div style="flex-shrink:0;width:clamp(60px,12vw,96px);height:clamp(60px,12vw,96px);border-radius:10px;border:1.5px solid #c8b48a;background:#e8dfc8;display:flex;align-items:center;justify-content:center;overflow:hidden;">
-            <img src="${drifter.sprite2}" alt="${drifter.name}" style="width:100%;height:100%;object-fit:contain;">
-          </div>
-          <div style="flex:1;min-width:0;">
-            <p style="font-size:clamp(.62rem,1.7vw,.75rem);color:#9a7850;letter-spacing:.14em;text-transform:uppercase;margin:0 0 2px;">${drifter.name}</p>
-            <div style="width:44px;height:1px;background:#c8b48a;margin:0 0 10px;"></div>
-            <p style="font-size:clamp(.88rem,2.4vw,1.04rem);color:#1e140a;line-height:1.6;margin:0 0 4px;">${ty.en}</p>
-            <div style="height:10px;"></div>
-            <button id="ty-close-btn" style="background:transparent;border:1px solid #b8a478;color:#9a7850;font-family:'Georgia',serif;font-size:clamp(.73rem,1.9vw,.86rem);letter-spacing:.1em;cursor:pointer;padding:7px 20px;border-radius:4px;transition:all .16s;">Close / 閉じる</button>
-          </div>
+      <div class="dp-handle"></div>
+      <div class="dp-inner" style="max-width:480px;margin:0 auto;padding-bottom:20px;">
+        <div class="dp-portrait" style="width:clamp(60px,12vw,92px);height:clamp(60px,12vw,92px);">
+          <img src="${drifter.sprite2}" alt="${escapeHTML(drifter.name)}">
+        </div>
+        <div class="dp-body">
+          <p class="dp-name-en">${escapeHTML(drifter.name)}</p>
+          <div class="dp-divider"></div>
+          <p class="dp-line-en">${escapeHTML(ty.en)}</p>
+          <div class="dp-btns"><button class="dp-btn no" id="ty-close-btn">Close / 閉じる</button></div>
         </div>
       </div>`;
     document.body.appendChild(panel);
-    requestAnimationFrame(() => requestAnimationFrame(() => { panel.style.transform = 'translateY(0)'; }));
-    function dismissPanel() { panel.style.transform = 'translateY(100%)'; setTimeout(() => panel.remove(), 360); }
+    requestAnimationFrame(() => requestAnimationFrame(() => panel.classList.add('open')));
+    function dismissPanel() { panel.classList.remove('open'); setTimeout(() => panel.remove(), 360); }
     panel.querySelector('#ty-close-btn').addEventListener('click', dismissPanel);
     setTimeout(dismissPanel, CELEBRATE_MS - 800 + 600);
   }
@@ -2227,6 +2249,17 @@
       const dw = img.naturalWidth  * drifter.scale;
       const dh = img.naturalHeight * drifter.scale;
 
+      /* Round 2 Pass 13: the drifter receiving the memory now visibly
+         reacts during Booha's celebration dance too — a small beat-
+         synced bounce (same 6.2 rad/s beat the ghost's squash/stretch
+         already uses, so the two read as dancing together) plus a
+         gold glow, instead of standing there as a static portrait
+         while Booha does all the celebrating alone. */
+      const isCelebratingDrifter = state.celebrating && state.celebrateDrifter && state.celebrateDrifter.id === drifter.id;
+      const bounceY = isCelebratingDrifter
+        ? -Math.abs(Math.sin(((now - state.celebrateSpinStart) / 1000) * 6.2)) * dh * 0.06
+        : 0;
+
       /* ── wrong-memory fade ── */
       const FADE_OUT_MS = 2500;
       if (drifterIsWrong(drifter.id) && drifterFadeStart === 0) return;
@@ -2239,15 +2272,21 @@
         alpha = (hasMemories || drifter.memoryCount === 0) ? 1 : 0.35;
       }
 
-      if (questActive) {
+      if (questActive || isCelebratingDrifter) {
         const slowPulse = 0.5 + 0.5 * Math.sin(sec * 1.4);
         const bloomR    = Math.max(dw, dh) * 1.1 + slowPulse * 18;
-        const cx = pos.x, cy = pos.y - dh * 0.5;
+        const cx = pos.x, cy = pos.y + bounceY - dh * 0.5;
         ctx.save();
         const bloom = ctx.createRadialGradient(cx, cy, 0, cx, cy, bloomR);
-        bloom.addColorStop(0,   `rgba(255,210,60,${0.55 + slowPulse*0.30})`);
-        bloom.addColorStop(0.45,`rgba(255,160,20,${0.22 + slowPulse*0.18})`);
-        bloom.addColorStop(0.75,`rgba(255,100,10,${0.08 + slowPulse*0.06})`);
+        if (isCelebratingDrifter) {
+          bloom.addColorStop(0,   `rgba(255,215,0,${0.6 + slowPulse*0.30})`);
+          bloom.addColorStop(0.45,`rgba(255,170,0,${0.25 + slowPulse*0.18})`);
+          bloom.addColorStop(0.75,`rgba(255,100,10,${0.10 + slowPulse*0.06})`);
+        } else {
+          bloom.addColorStop(0,   `rgba(255,210,60,${0.55 + slowPulse*0.30})`);
+          bloom.addColorStop(0.45,`rgba(255,160,20,${0.22 + slowPulse*0.18})`);
+          bloom.addColorStop(0.75,`rgba(255,100,10,${0.08 + slowPulse*0.06})`);
+        }
         bloom.addColorStop(1,   'transparent');
         ctx.globalAlpha = 1;
         ctx.fillStyle   = bloom;
@@ -2259,16 +2298,18 @@
       ctx.globalAlpha = alpha;
       if (img.complete && img.naturalWidth > 0) {
         if (shadowsEnabled && (hasMemories || drifter.memoryCount === 0)) {
-          ctx.shadowBlur  = questActive ? 28 : 18;
-          ctx.shadowColor = questActive
-            ? (isCollected ? '#44ffaa' : '#ffcc40')
-            : '#d8c0f8';
+          ctx.shadowBlur  = (questActive || isCelebratingDrifter) ? 28 : 18;
+          ctx.shadowColor = isCelebratingDrifter
+            ? '#ffd700'
+            : questActive
+              ? (isCollected ? '#44ffaa' : '#ffcc40')
+              : '#d8c0f8';
         }
-        ctx.drawImage(img, pos.x-dw/2, pos.y-dh, dw, dh);
+        ctx.drawImage(img, pos.x-dw/2, pos.y-dh+bounceY, dw, dh);
         ctx.shadowBlur = 0;
       } else {
         ctx.fillStyle = '#c090e8';
-        ctx.beginPath(); ctx.arc(pos.x, pos.y-40, 24, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(pos.x, pos.y-40+bounceY, 24, 0, Math.PI*2); ctx.fill();
       }
       ctx.restore();
     });
@@ -2326,6 +2367,7 @@
 
     /* ── Dance celebration ── */
     let gx, gy, wobble, sx, sy;
+    let drawImg = ghostImg, drawScale = 1, drawOffX = 0, drawOffY = 0;
     if (state.celebrateDancing) {
       const elapsed = (now - state.celebrateSpinStart) / 1000;
 
@@ -2337,14 +2379,34 @@
       const driftY = (Math.cos(elapsed * 1.4) * 40 + Math.cos(elapsed * 2.9) * 16) * settleEase;
       const bigBob = (Math.sin(elapsed * 6.2) * 20 + Math.sin(elapsed * 3.7) * 9) * settleEase;
 
-      const spinAngle = elapsed * 3.8 * settleEase;
-      const beat      = Math.sin(elapsed * 6.2);
-      sx = (1.0 + beat * 0.18) * settleEase + (1 - settleEase);
-      sy = (1.0 - beat * 0.22) * settleEase + (1 - settleEase);
+      /* Round 2 Pass 13: a bounded side-to-side tilt reads as dancing.
+         The old build rotated the whole sprite continuously (spinAngle
+         = elapsed * 3.8, a full 360°+ per second) — past a certain
+         speed that just reads as spinning in place, face included, not
+         dancing, which is exactly what the Round 2 audit called out as
+         the likely reason this didn't land as a "dance." */
+      const beat = Math.sin(elapsed * 6.2);
+      wobble = Math.sin(elapsed * 3.1) * 16 * settleEase;
+      sx = (1.0 + beat * 0.16) * settleEase + (1 - settleEase);
+      sy = (1.0 - beat * 0.2)  * settleEase + (1 - settleEase);
 
       gx     = state.celebrateOrbitX + driftX;
       gy     = state.celebrateOrbitY + driftY + bigBob;
-      wobble = spinAngle * (180 / Math.PI);
+
+      /* Swap between the three dance-pose frames every half beat (0.5s
+         — matches the ~1s squash/stretch cycle above), so the pose
+         itself changes on rhythm instead of one static image just
+         spinning. During the final wind-down, hold on a single "ta-da"
+         arms-up pose rather than continuing to cycle poses while
+         everything else is calming down — a finishing beat, not a jump
+         cut mid-cycle. */
+      const frame = state.celebrateSettling
+        ? DANCE_FRAMES[0]
+        : DANCE_FRAMES[Math.floor(elapsed / 0.5) % DANCE_FRAMES.length];
+      drawImg   = frame.img;
+      drawScale = frame.contentScale;
+      drawOffX  = frame.offsetX;
+      drawOffY  = frame.offsetY;
 
       if (settleEase > 0 && Math.random() < 0.45) spawnDanceSparkle(gx, gy);
 
@@ -2381,12 +2443,14 @@
     shd.addColorStop(0,'rgba(0,0,0,.65)'); shd.addColorStop(1,'transparent');
     ctx.fillStyle = shd; ctx.beginPath(); ctx.arc(gx,gy+GHOST_R*.85,GHOST_R*.9,0,Math.PI*2); ctx.fill(); ctx.restore();
     ctx.save(); ctx.translate(gx,gy); ctx.rotate(wobble*Math.PI/180); ctx.scale(sx,sy);
-    if (ghostImg.complete && ghostImg.naturalWidth > 0) {
+    if (drawImg.complete && drawImg.naturalWidth > 0) {
       if (shadowsEnabled) {
         ctx.shadowBlur  = state.celebrating ? 28+pulse*14 : 14+pulse*8;
         ctx.shadowColor = state.celebrating ? '#ffd700' : col1;
       }
-      ctx.drawImage(ghostImg,-GHOST_R,-GHOST_R,GHOST_R*2,GHOST_R*2); ctx.shadowBlur=0;
+      const boxSize = GHOST_R * 2 * drawScale;
+      ctx.drawImage(drawImg, -boxSize/2 + drawOffX*boxSize, -boxSize/2 + drawOffY*boxSize, boxSize, boxSize);
+      ctx.shadowBlur=0;
     } else { ctx.globalAlpha=1; ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(0,0,GHOST_R*.7,0,Math.PI*2); ctx.fill(); }
     ctx.restore();
     if (state.coordMode) drawPins(now);

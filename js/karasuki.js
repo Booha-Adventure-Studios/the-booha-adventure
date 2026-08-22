@@ -422,24 +422,22 @@ const HAPPY_HOUSE_PORTAL = {
   /* Persistent "Three Echoes" tracker — display-only mirror of
      Utsuroba's tracker. The required episode IDs come from the shared
      episode index loaded on this page, so adding a convergence memory
-     does not require editing Karasuki's runtime code too. */
-  const ECHO_ICON_FOR  = { lantern: '✦', candy: '●', reflection: '◈' };
-  const ECHO_STYLE_FOR = {
-    lantern:    { bg: 'radial-gradient(circle at 35% 30%,#fffde0,#ffd966 55%,#c8860a)', glow: 'rgba(255,217,102,.55)' },
-    candy:      { bg: 'radial-gradient(circle at 35% 30%,#fff0f4,#ff85a1 55%,#c23a5e)', glow: 'rgba(255,133,161,.55)' },
-    reflection: { bg: 'radial-gradient(circle at 35% 30%,#eafcff,#a8edff 55%,#3b8fbf)', glow: 'rgba(168,237,255,.55)' },
-  };
+     does not require editing Karasuki's runtime code too.
+     Round 2 Pass 2: rebuilt on the shared .utsu-hud-chip shape/layout
+     from js/utsu-card.js (same "food label" fix as Utsuroba's own
+     tracker and the Memory Trail hint below) — dropped the separate
+     ECHO_STYLE_FOR gradient table since .utsu-hud-chip-dot.motif-*.is-lit
+     already provides the same per-motif glow, one definition instead
+     of two. */
+  const ECHO_ICON_FOR = { lantern: '✦', candy: '●', reflection: '◈' };
   let echoesTrackerEl = null;
 
   function injectEchoesTracker() {
     if (echoesTrackerEl) return;
     echoesTrackerEl = document.createElement('div');
     echoesTrackerEl.id = 'karasuki-echoes-tracker';
-    echoesTrackerEl.style.cssText = `
-      display:none;position:fixed;right:14px;top:14px;z-index:7000;
-      padding:9px 12px;border:1px solid rgba(216,168,255,.42);border-radius:14px;
-      background:rgba(9,0,18,.84);box-shadow:0 0 18px rgba(100,30,160,.18);
-      color:#f1d9ff;font-family:Georgia,serif;pointer-events:none;`;
+    echoesTrackerEl.className = 'utsu-hud-chip is-right is-passive';
+    echoesTrackerEl.style.display = 'none';
     document.body.appendChild(echoesTrackerEl);
   }
 
@@ -458,16 +456,10 @@ const HAPPY_HOUSE_PORTAL = {
       const episode = episodes[episodeId];
       const motif = episode?.worldEcho?.motif && ECHO_ICON_FOR[episode.worldEcho.motif] ? episode.worldEcho.motif : 'lantern';
       const isLit = !!restored[episodeId];
-      const colors = ECHO_STYLE_FOR[motif];
-      const dotStyle = isLit
-        ? `background:${colors.bg};box-shadow:0 0 10px ${colors.glow};color:#241507;`
-        : `background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);color:rgba(255,255,255,.28);`;
-      return `<span style="width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:13px;${dotStyle}">${ECHO_ICON_FOR[motif]}</span>`;
+      return `<span class="utsu-hud-chip-dot motif-${motif}${isLit ? ' is-lit' : ''}"><span aria-hidden="true">${ECHO_ICON_FOR[motif]}</span></span>`;
     }).join('');
-    echoesTrackerEl.style.display = 'block';
-    echoesTrackerEl.innerHTML = `
-      <div style="font:700 10px/1.3 monospace;letter-spacing:.1em;text-transform:uppercase;">Three Echoes<span style="display:block;margin-top:2px;color:rgba(241,217,255,.5);font-size:9px;font-weight:400;letter-spacing:.02em;text-transform:none;">三つの残響</span></div>
-      <div style="margin-top:8px;display:flex;gap:6px;">${dots}</div>`;
+    echoesTrackerEl.style.display = 'flex';
+    echoesTrackerEl.innerHTML = `<div class="utsu-hud-chip-dots">${dots}</div><div class="utsu-hud-chip-text"><span class="utsu-hud-chip-primary">Three Echoes</span><span class="utsu-hud-chip-secondary">三つの残響</span></div>`;
   }
 
   function getOrbsForRoom(roomId) {
@@ -584,21 +576,24 @@ const HAPPY_HOUSE_PORTAL = {
   let orbPanelEl = null;
   let trailHudEl = null;
 
+  /* Round 2 Pass 2: was a bordered rectangle with five stacked text
+     rows (title, JP title, step counter, EN hint, JP hint) — textbook
+     "food label" anatomy per the audit. Rebuilt on the shared
+     .utsu-hud-chip shape: an icon + progress badge replace the old
+     title/step rows, leaving just the hint (primary) and its JP
+     translation (secondary, smaller) — two rows instead of five. */
   function injectTrailHud() {
     if (trailHudEl) return;
     trailHudEl = document.createElement('div');
     trailHudEl.id = 'memory-trail-hud';
-    trailHudEl.style.cssText = `
-      display:none;position:fixed;left:14px;top:14px;z-index:7000;max-width:min(310px,calc(100vw - 28px));
-      padding:11px 14px 12px;border:1px solid rgba(255,217,102,.55);border-radius:10px;
-      background:rgba(29,19,6,.88);box-shadow:0 4px 18px rgba(0,0,0,.3);color:#fff4cf;
-      font-family:Georgia,serif;pointer-events:none;`;
+    trailHudEl.className = 'utsu-hud-chip is-left is-trail is-passive';
+    trailHudEl.style.display = 'none';
     trailHudEl.innerHTML = `
-      <div id="trail-hud-title" style="font-size:.76rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;"></div>
-      <div id="trail-hud-title-jp" style="font-size:.68rem;color:#e4c889;margin-top:2px;"></div>
-      <div id="trail-hud-step" style="font-size:.78rem;margin-top:8px;"></div>
-      <div id="trail-hud-hint" style="font-size:.76rem;line-height:1.35;margin-top:6px;color:#fff;"></div>
-      <div id="trail-hud-hint-jp" style="font-size:.68rem;line-height:1.35;margin-top:2px;color:#e4c889;"></div>`;
+      <div class="utsu-hud-chip-icon"><span aria-hidden="true">❖</span><span class="utsu-hud-chip-count" id="trail-hud-count"></span></div>
+      <div class="utsu-hud-chip-text">
+        <span class="utsu-hud-chip-primary" id="trail-hud-hint"></span>
+        <span class="utsu-hud-chip-secondary" id="trail-hud-hint-jp"></span>
+      </div>`;
     document.body.appendChild(trailHudEl);
   }
 
@@ -613,70 +608,77 @@ const HAPPY_HOUSE_PORTAL = {
     }
     const step = Math.max(0, Math.min(trail.length, Number.isInteger(quest.trailIndex) ? quest.trailIndex : 0));
     const next = trail[step];
-    trailHudEl.style.display = 'block';
-    trailHudEl.querySelector('#trail-hud-title').textContent = 'Memory trail';
-    trailHudEl.querySelector('#trail-hud-title-jp').textContent = '記憶の道';
-    trailHudEl.querySelector('#trail-hud-step').textContent = step >= trail.length
-      ? `All evidence found · ${trail.length}/${trail.length} / すべて発見`
-      : `Evidence ${step}/${trail.length} / 手がかり ${step}/${trail.length}`;
-    trailHudEl.querySelector('#trail-hud-hint').textContent = next ? `Next: ${next.hint}` : 'Return to Kurobane.';
+    trailHudEl.style.display = 'flex';
+    trailHudEl.querySelector('#trail-hud-count').textContent = `${step}/${trail.length}`;
+    trailHudEl.querySelector('#trail-hud-hint').textContent = next ? next.hint : 'Return to Kurobane.';
     trailHudEl.querySelector('#trail-hud-hint-jp').textContent = next ? next.hintJP : 'クロバネのところへ戻りましょう。';
   }
 
+  /* Round 2 Pass 1: was a fully hand-rolled inline-style bottom sheet,
+     the second of four independent copies of the same "parchment card"
+     recipe. Now built on the shared .utsu-card / .dp-* classes from
+     js/utsu-card.js — one definition, and this panel now accents to the
+     orb's own motif color (candy/lantern/reflection/thorn/ribbon)
+     instead of a fixed gold, the same color language the orb itself and
+     its glow trail already use. See claude/utsuroba-audit-and-pass-plan.md. */
   function injectOrbPanel() {
     if (orbPanelEl) return;
     orbPanelEl = document.createElement('div');
     orbPanelEl.id = 'orb-panel';
-    orbPanelEl.style.cssText = `
-      display:none;position:fixed;bottom:0;left:0;right:0;z-index:9400;
-      background:linear-gradient(180deg,#f7f2e8 0%,#ede5d0 100%);
-      border-top:2px solid #c8a96e;border-radius:18px 18px 0 0;padding:0;
-      font-family:'Georgia',serif;box-shadow:0 -6px 40px rgba(0,0,0,0.45);
-      transform:translateY(100%);transition:transform 0.35s cubic-bezier(.22,.8,.36,1);`;
+    orbPanelEl.className = 'utsu-card';
     orbPanelEl.innerHTML = `
-      <div style="max-width:520px;margin:0 auto;padding:22px 28px 28px;">
-        <div style="width:44px;height:4px;border-radius:2px;background:#c8a96e;margin:0 auto 18px;opacity:0.55;"></div>
-        <button id="orb-panel-close" style="position:absolute;top:16px;right:20px;background:transparent;border:none;cursor:pointer;font-size:1.1rem;color:#8b6914;opacity:0.55;padding:4px 8px;font-family:'Georgia',serif;">✕</button>
-        <h2 id="orb-panel-title" style="text-align:center;margin:0 0 4px;font-size:clamp(1.1rem,3.5vw,1.35rem);color:#3a2400;letter-spacing:.08em;text-shadow:0 1px 0 rgba(255,255,255,0.7);">You found a memory box!</h2>
-        <p id="orb-panel-subtitle" style="text-align:center;margin:0 0 9px;font-size:clamp(.8rem,2.5vw,.95rem);color:#5a3c00;letter-spacing:.06em;opacity:0.75;">記憶の箱を見つけた！</p>
-        <p id="orb-panel-fragment" style="text-align:center;margin:0 auto 18px;max-width:440px;font-size:clamp(.86rem,2.6vw,1rem);line-height:1.55;color:#3a2400;"></p>
-        <p style="text-align:center;margin:0 0 18px;font-size:clamp(.76rem,2.3vw,.88rem);color:#7a5010;line-height:1.45;">Read the clue, then carry it along the trail.<br><span style="opacity:.72;">手がかりを読んで、記憶の道に持っていきましょう。</span></p>
-        <div style="display:flex;gap:14px;justify-content:center;margin-bottom:14px;">
-          <button id="orb-collect-btn" style="background:linear-gradient(135deg,#fdf3d0,#f0dfa0);border:1.5px solid #b8900a;border-radius:6px;font-family:'Georgia',serif;font-size:clamp(.82rem,2.6vw,.95rem);letter-spacing:.1em;cursor:pointer;padding:10px 30px;color:#3a2000;box-shadow:0 2px 8px rgba(180,140,0,0.2);transition:all .18s;">TAKE THE CLUE / 手がかりを持つ</button>
-          <button id="orb-leave-btn" style="background:transparent;border:1.5px solid rgba(139,105,20,0.35);border-radius:6px;font-family:'Georgia',serif;font-size:clamp(.82rem,2.6vw,.95rem);letter-spacing:.1em;cursor:pointer;padding:10px 30px;color:#7a5c1e;transition:all .18s;">LEAVE BOX / 箱を残す</button>
+      <div class="dp-handle"></div>
+      <div class="dp-inner" style="max-width:520px;margin:0 auto;">
+        <div class="dp-body" style="text-align:center;">
+          <button id="orb-panel-close" class="dp-close-x">✕</button>
+          <h2 id="orb-panel-title" class="dp-name-kanji" style="font-size:clamp(1.02rem,3vw,1.22rem);">You found a memory box!</h2>
+          <p id="orb-panel-subtitle" class="dp-line-jp" style="margin-bottom:8px;">記憶の箱を見つけた！</p>
+          <div class="dp-divider" style="margin-left:auto;margin-right:auto;"></div>
+          <p id="orb-panel-fragment" class="dp-line-en" style="max-width:440px;margin-left:auto;margin-right:auto;"></p>
+          <p class="dp-status" style="margin-top:6px;">Read the clue, then carry it along the trail.<br>手がかりを読んで、記憶の道に持っていきましょう。</p>
+          <div class="dp-btns" style="justify-content:center;">
+            <button id="orb-collect-btn" class="dp-btn yes">TAKE THE CLUE / 手がかりを持つ</button>
+            <button id="orb-leave-btn" class="dp-btn no">LEAVE BOX / 箱を残す</button>
+          </div>
         </div>
-        <p style="text-align:center;font-size:clamp(.68rem,2vw,.78rem);color:#7a5010;opacity:0.7;margin:0;font-style:italic;">The trail keeps every clue in order. / 手がかりは順番に残ります。</p>
       </div>`;
     document.body.appendChild(orbPanelEl);
     document.getElementById('orb-panel-close').addEventListener('click', closeOrbPanel);
     document.getElementById('orb-leave-btn').addEventListener('click',   closeOrbPanel);
     document.getElementById('orb-collect-btn').addEventListener('click', collectOrb);
+    /* Round 2 Pass 3: one delegated listener covers all three buttons
+       above (close-x, leave, collect) — same pattern as the drifter
+       panel's own delegated .dp-btn listener in utsuroba.js. */
+    orbPanelEl.addEventListener('click', e => {
+      if (window.UtsuSfx && (e.target.closest('.dp-btn') || e.target.closest('.dp-close-x'))) window.UtsuSfx.buttonPress();
+    });
   }
 
   function openOrbPanel(orb) {
+    if (window.UtsuSfx) window.UtsuSfx.panelOpen();
     orbPanelOrb  = orb;
     orbPanelOpen = true;
     try { if (state.musicStarted) { music.pause(); } } catch (_) {}
     const title = document.getElementById('orb-panel-title');
     const subtitle = document.getElementById('orb-panel-subtitle');
     const fragment = document.getElementById('orb-panel-fragment');
-    const collectBtn = document.getElementById('orb-collect-btn');
     const entry = orb.trailEntry;
     if (title) title.textContent = entry ? entry.title : 'You found a memory box!';
     if (subtitle) subtitle.textContent = entry ? entry.titleJP : '記憶の箱を見つけた！';
     if (fragment) fragment.textContent = entry ? entry.text : '';
-    if (collectBtn) collectBtn.textContent = entry ? 'TAKE THE CLUE / 手がかりを持つ' : 'TAKE THE CLUE / 手がかりを持つ';
-    orbPanelEl.style.display = 'block';
-    requestAnimationFrame(() => { orbPanelEl.style.transform = 'translateY(0)'; });
+    const colors = ORB_MOTIF_COLORS[orb.motif] || ORB_MOTIF_COLORS.lantern;
+    orbPanelEl.style.setProperty('--card-ring', colors.shadow);
+    orbPanelEl.style.setProperty('--card-glow', `rgba(${colors.glowRGBA},.45)`);
+    requestAnimationFrame(() => requestAnimationFrame(() => orbPanelEl.classList.add('open')));
     state.clickTarget = null;
   }
 
   function closeOrbPanel() {
+    if (window.UtsuSfx) window.UtsuSfx.panelClose();
     orbPanelOpen = false;
     orbPanelOrb  = null;
     try { if (state.musicStarted) { music.play().catch(() => {}); } } catch (_) {}
-    orbPanelEl.style.transform = 'translateY(100%)';
-    setTimeout(() => { if (!orbPanelOpen) orbPanelEl.style.display = 'none'; }, 380);
+    orbPanelEl.classList.remove('open');
     orbPopCooldownUntil = performance.now() + POPUP_COOLDOWN_MS;
   }
 
