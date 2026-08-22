@@ -94,9 +94,9 @@ const HAPPY_HOUSE_PORTAL = {
     return MONTH_COLORS[(n - 1) % MONTH_COLORS.length];
   }
 
-  // booha_active_week is never written by anything in the repo, so this read
-  // resolved to 1 on every visit for every student — the weekly orb layout
-  // has been frozen at week 1 since it shipped. CALENDAR is the authority.
+  // CALENDAR is loaded before this file. Use its numeric academic week for
+  // seeded orb placement so layouts can change intentionally by curriculum
+  // week instead of silently falling back to week 1.
   const boohaWeek = (() => {
     try {
       const cw = window.CALENDAR.getCurrentCurriculumWeek();
@@ -229,15 +229,14 @@ const HAPPY_HOUSE_PORTAL = {
   /* ═══════════════════════════════════════════
      ORB SYSTEM
   ═══════════════════════════════════════════ */
-  const ORB_R    = 10;
-  const ORB_GLOW = 28;
+  const MEMORY_BOX_W       = 34;
+  const MEMORY_BOX_H       = 28;
+  const MEMORY_BOX_HIT_R   = 30;
+  const MEMORY_BOX_GLOW    = 42;
 
-  /* Pass 2 (see claude/utsuroba-audit-and-pass-plan.md) — tint each
-     orb by its episode's worldEcho.motif instead of one hardcoded
-     gold for everyone, so Ned's candy memory reads red/pink, Chagrin's
-     reflection reads cool blue, etc. glowRGBA feeds the same
-     createRadialGradient calls drawOrbs() already made; only the
-     color values are new. */
+  /* Each evidence pickup is a locked memory box, not another round orb.
+     The motif tint keeps the story identity while the lid, clasp, and
+     keyhole make it visually different from room-navigation arrows. */
   const ORB_MOTIF_COLORS = {
     lantern:    { glowRGBA: '255,240,180', coreHi: '#fffde0', coreMid: '#ffd966', coreLo: '#c8860a', shadow: '#ffd966' },
     candy:      { glowRGBA: '255,190,205', coreHi: '#fff0f4', coreMid: '#ff85a1', coreLo: '#c23a5e', shadow: '#ff85a1' },
@@ -321,7 +320,7 @@ const HAPPY_HOUSE_PORTAL = {
     const drifterId = (quest && quest.active) ? quest.active : 'ks';
     const correctMemoryId = `${drifterId}_a${String(memIdx).padStart(2, '0')}`;
 
-    /* Pass 3: an episode with a trail gets one authored evidence orb at a
+    /* Pass 3: an episode with a trail gets one authored evidence box at a
        time. The next room is earned by reading the current fragment, not by
        sweeping Karasuki for an invisible random target. */
     const episode = getQuestEpisode(quest);
@@ -332,8 +331,7 @@ const HAPPY_HOUSE_PORTAL = {
       const pos = Number.isFinite(entry.x) && Number.isFinite(entry.y)
         ? { x: entry.x, y: entry.y }
         : generateOrbPosition(entry.roomId, rng);
-      // Audit Pass 2: carry the episode's motif onto the orb so drawOrbs()
-      // can tint it instead of hardcoding gold for every drifter.
+      // Carry the episode's motif onto the box so drawOrbs() can tint it.
       const motif = (episode.worldEcho && ORB_MOTIF_COLORS[episode.worldEcho.motif])
         ? episode.worldEcho.motif : 'lantern';
       return [{
@@ -421,19 +419,10 @@ const HAPPY_HOUSE_PORTAL = {
     }
   }
 
-  /* Persistent "Three Echoes" tracker — Pass 1 (see
-     claude/utsuroba-audit-and-pass-plan.md). Display-only mirror of
-     Utsuroba's tracker so a kid can see the same 0-3 progress while
-     hunting orbs here, without needing to walk back to Utsuroba to
-     check. utsuroba-data.js isn't loaded on this page, so the three
-     required episodes are listed here directly — keep this in sync
-     with UTSUROBA_DATA.readingConvergence.requiredDrifterIds if that
-     ever changes. */
-  const THREE_ECHOES_EPISODES = [
-    { drifterId: 'ks',  episodeId: 'ks_lantern_v1' },
-    { drifterId: 'nto', episodeId: 'nto_candy_v1' },
-    { drifterId: 'cg',  episodeId: 'cg_door_v1' },
-  ];
+  /* Persistent "Three Echoes" tracker — display-only mirror of
+     Utsuroba's tracker. The required episode IDs come from the shared
+     episode index loaded on this page, so adding a convergence memory
+     does not require editing Karasuki's runtime code too. */
   const ECHO_ICON_FOR  = { lantern: '✦', candy: '●', reflection: '◈' };
   const ECHO_STYLE_FOR = {
     lantern:    { bg: 'radial-gradient(circle at 35% 30%,#fffde0,#ffd966 55%,#c8860a)', glow: 'rgba(255,217,102,.55)' },
@@ -457,15 +446,18 @@ const HAPPY_HOUSE_PORTAL = {
   function renderEchoesTracker() {
     if (!echoesTrackerEl || !window.UTSUROBA_EPISODES) return;
     const episodes = window.UTSUROBA_EPISODES;
+    const convergenceEpisodeIds = Array.isArray(window.UTSUROBA_CONVERGENCE_EPISODE_IDS)
+      ? window.UTSUROBA_CONVERGENCE_EPISODE_IDS : [];
+    if (!convergenceEpisodeIds.length) { echoesTrackerEl.style.display = 'none'; return; }
     let restored = {};
     try {
       const data = (window.BoohaAdventure && BoohaAdventure.save) ? BoohaAdventure.save.load() : null;
       restored = (data && data.utsuroba && data.utsuroba.readingEchoes) || {};
     } catch (_) {}
-    const dots = THREE_ECHOES_EPISODES.map(entry => {
-      const episode = episodes[entry.episodeId];
+    const dots = convergenceEpisodeIds.map(episodeId => {
+      const episode = episodes[episodeId];
       const motif = episode?.worldEcho?.motif && ECHO_ICON_FOR[episode.worldEcho.motif] ? episode.worldEcho.motif : 'lantern';
-      const isLit = !!restored[entry.episodeId];
+      const isLit = !!restored[episodeId];
       const colors = ECHO_STYLE_FOR[motif];
       const dotStyle = isLit
         ? `background:${colors.bg};box-shadow:0 0 10px ${colors.glow};color:#241507;`
@@ -489,7 +481,7 @@ const HAPPY_HOUSE_PORTAL = {
     if (isEntryDriftActive()) return false;
     const orbs = getOrbsForRoom(state.roomId);
     for (const orb of orbs) {
-      if (Math.hypot(worldX - orb.x, worldY - orb.y) <= ORB_R * 3.5) { openOrbPanel(orb); return true; }
+      if (Math.hypot(worldX - orb.x, worldY - orb.y) <= MEMORY_BOX_HIT_R) { openOrbPanel(orb); return true; }
     }
     return false;
   }
@@ -506,28 +498,73 @@ const HAPPY_HOUSE_PORTAL = {
       const bob    = Math.sin(sec * 1.4 + i * 0.9) * 5;
       const ox = orb.x, oy = orb.y + bob;
       ctx.save();
-      const glow = ctx.createRadialGradient(ox, oy, 0, ox, oy, ORB_GLOW);
-      glow.addColorStop(0,   `rgba(${colors.glowRGBA},0.55)`);
-      glow.addColorStop(0.4, `rgba(${colors.glowRGBA},0.25)`);
-      glow.addColorStop(1,   'transparent');
-      ctx.globalAlpha = 0.5 + pulse * 0.35; ctx.fillStyle = glow;
-      ctx.beginPath(); ctx.arc(ox, oy, ORB_GLOW, 0, Math.PI * 2); ctx.fill();
-      const coreR = ORB_R * (0.85 + pulse * 0.18);
-      const core  = ctx.createRadialGradient(ox - coreR * 0.3, oy - coreR * 0.3, 0, ox, oy, coreR);
-      core.addColorStop(0,    '#ffffff');
-      core.addColorStop(0.35, colors.coreHi);
-      core.addColorStop(0.7,  colors.coreMid);
-      core.addColorStop(1,    colors.coreLo);
-      ctx.globalAlpha = 0.95; ctx.shadowBlur = 14 + pulse2 * 10; ctx.shadowColor = colors.shadow;
-      ctx.fillStyle = core; ctx.beginPath(); ctx.arc(ox, oy, coreR, 0, Math.PI * 2); ctx.fill();
+      const boxW = MEMORY_BOX_W + pulse * 2;
+      const boxH = MEMORY_BOX_H + pulse * 1.3;
+      const left = ox - boxW / 2, top = oy - boxH / 2;
+      const body = ctx.createLinearGradient(left, top, left, top + boxH);
+      body.addColorStop(0, colors.coreHi);
+      body.addColorStop(0.42, colors.coreMid);
+      body.addColorStop(1, colors.coreLo);
+
+      ctx.globalAlpha = 0.28 + pulse * 0.16;
+      ctx.fillStyle = `rgba(${colors.glowRGBA},0.34)`;
+      ctx.shadowBlur = MEMORY_BOX_GLOW + pulse2 * 12;
+      ctx.shadowColor = colors.shadow;
+      roundedRectPath(left - 3, top - 3, boxW + 6, boxH + 6, 6);
+      ctx.fill();
+
+      ctx.globalAlpha = 0.96;
+      ctx.shadowBlur = 16 + pulse2 * 8;
+      ctx.fillStyle = body;
+      roundedRectPath(left, top, boxW, boxH, 5);
+      ctx.fill();
+
       ctx.shadowBlur = 0;
-      ctx.globalAlpha = 0.55 + pulse * 0.2; ctx.fillStyle = '#ffffff';
-      ctx.beginPath(); ctx.arc(ox - coreR * 0.28, oy - coreR * 0.28, coreR * 0.28, 0, Math.PI * 2); ctx.fill();
+      ctx.globalAlpha = 0.9;
+      ctx.fillStyle = colors.coreHi;
+      ctx.beginPath();
+      ctx.moveTo(left + 2, top + 2);
+      ctx.lineTo(ox, top - 5 - pulse * 1.5);
+      ctx.lineTo(left + boxW - 2, top + 2);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.globalAlpha = 0.72;
+      ctx.strokeStyle = colors.coreLo;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(left + 4, oy); ctx.lineTo(left + boxW - 4, oy); ctx.stroke();
+
+      ctx.globalAlpha = 0.98;
+      ctx.fillStyle = '#fff8d6';
+      roundedRectPath(ox - 5, oy - 2, 10, 9, 2);
+      ctx.fill();
+      ctx.strokeStyle = colors.coreLo;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      ctx.fillStyle = colors.coreLo;
+      ctx.beginPath(); ctx.arc(ox, oy + 1, 1.5, 0, Math.PI * 2); ctx.fill();
+      ctx.fillRect(ox - 0.75, oy + 1, 1.5, 4);
+
+      ctx.globalAlpha = 0.72 + pulse * 0.18;
+      ctx.fillStyle = '#ffffff';
+      roundedRectPath(left + 5, top + 5, 7, 3, 1.5);
+      ctx.fill();
       ctx.restore();
     });
   }
 
-  /* Pass 2 — a soft glowing trail from the player to the active orb,
+  function roundedRectPath(x, y, w, h, r) {
+    const radius = Math.min(r, w / 2, h / 2);
+    ctx.beginPath();
+    ctx.moveTo(x + radius, y);
+    ctx.arcTo(x + w, y, x + w, y + h, radius);
+    ctx.arcTo(x + w, y + h, x, y + h, radius);
+    ctx.arcTo(x, y + h, x, y, radius);
+    ctx.arcTo(x, y, x + w, y, radius);
+    ctx.closePath();
+  }
+
+  /* A soft glowing trail from the player to the active memory box,
      tinted to match it, so finding it is "follow the glow" instead of
      parsing the trail-hint text. Cheap on purpose: a handful of small
      filled dots along a gently curved line, no per-point gradients
@@ -543,7 +580,7 @@ const HAPPY_HOUSE_PORTAL = {
       const colors = ORB_MOTIF_COLORS[orb.motif] || ORB_MOTIF_COLORS.lantern;
       const dx = orb.x - state.x, dy = orb.y - state.y;
       const dist = Math.hypot(dx, dy);
-      if (dist < ORB_GLOW * 2) return;
+      if (dist < MEMORY_BOX_GLOW * 1.25) return;
       const nx = -dy / dist, ny = dx / dist;
       const flowPos = (sec * 2.1) % 1;
       for (let i = 1; i < ORB_TRAIL_POINTS; i++) {
@@ -557,7 +594,10 @@ const HAPPY_HOUSE_PORTAL = {
         ctx.globalAlpha = alpha;
         ctx.fillStyle = `rgba(${colors.glowRGBA},1)`;
         ctx.shadowBlur = 7; ctx.shadowColor = colors.shadow;
-        ctx.beginPath(); ctx.arc(px, py, 2.6 + t * 1.6, 0, Math.PI * 2); ctx.fill();
+        const size = 3 + t * 1.8;
+        ctx.translate(px, py);
+        ctx.rotate(Math.PI / 4);
+        ctx.fillRect(-size / 2, -size / 2, size, size);
         ctx.restore();
       }
     });
@@ -622,13 +662,13 @@ const HAPPY_HOUSE_PORTAL = {
       <div style="max-width:520px;margin:0 auto;padding:22px 28px 28px;">
         <div style="width:44px;height:4px;border-radius:2px;background:#c8a96e;margin:0 auto 18px;opacity:0.55;"></div>
         <button id="orb-panel-close" style="position:absolute;top:16px;right:20px;background:transparent;border:none;cursor:pointer;font-size:1.1rem;color:#8b6914;opacity:0.55;padding:4px 8px;font-family:'Georgia',serif;">✕</button>
-        <h2 id="orb-panel-title" style="text-align:center;margin:0 0 4px;font-size:clamp(1.1rem,3.5vw,1.35rem);color:#3a2400;letter-spacing:.08em;text-shadow:0 1px 0 rgba(255,255,255,0.7);">You found a memory!</h2>
-        <p id="orb-panel-subtitle" style="text-align:center;margin:0 0 9px;font-size:clamp(.8rem,2.5vw,.95rem);color:#5a3c00;letter-spacing:.06em;opacity:0.75;">記憶を見つけた！</p>
+        <h2 id="orb-panel-title" style="text-align:center;margin:0 0 4px;font-size:clamp(1.1rem,3.5vw,1.35rem);color:#3a2400;letter-spacing:.08em;text-shadow:0 1px 0 rgba(255,255,255,0.7);">You found a memory box!</h2>
+        <p id="orb-panel-subtitle" style="text-align:center;margin:0 0 9px;font-size:clamp(.8rem,2.5vw,.95rem);color:#5a3c00;letter-spacing:.06em;opacity:0.75;">記憶の箱を見つけた！</p>
         <p id="orb-panel-fragment" style="text-align:center;margin:0 auto 18px;max-width:440px;font-size:clamp(.86rem,2.6vw,1rem);line-height:1.55;color:#3a2400;"></p>
-        <p style="text-align:center;margin:0 0 18px;font-size:clamp(.76rem,2.3vw,.88rem);color:#7a5010;line-height:1.45;">Read the clue, then keep it in your trail.<br><span style="opacity:.72;">手がかりを読んで、記憶の道に残しましょう。</span></p>
+        <p style="text-align:center;margin:0 0 18px;font-size:clamp(.76rem,2.3vw,.88rem);color:#7a5010;line-height:1.45;">Read the clue, then carry it along the trail.<br><span style="opacity:.72;">手がかりを読んで、記憶の道に持っていきましょう。</span></p>
         <div style="display:flex;gap:14px;justify-content:center;margin-bottom:14px;">
-          <button id="orb-collect-btn" style="background:linear-gradient(135deg,#fdf3d0,#f0dfa0);border:1.5px solid #b8900a;border-radius:6px;font-family:'Georgia',serif;font-size:clamp(.82rem,2.6vw,.95rem);letter-spacing:.1em;cursor:pointer;padding:10px 30px;color:#3a2000;box-shadow:0 2px 8px rgba(180,140,0,0.2);transition:all .18s;">COLLECT / 持つ</button>
-          <button id="orb-leave-btn" style="background:transparent;border:1.5px solid rgba(139,105,20,0.35);border-radius:6px;font-family:'Georgia',serif;font-size:clamp(.82rem,2.6vw,.95rem);letter-spacing:.1em;cursor:pointer;padding:10px 30px;color:#7a5c1e;transition:all .18s;">LEAVE</button>
+          <button id="orb-collect-btn" style="background:linear-gradient(135deg,#fdf3d0,#f0dfa0);border:1.5px solid #b8900a;border-radius:6px;font-family:'Georgia',serif;font-size:clamp(.82rem,2.6vw,.95rem);letter-spacing:.1em;cursor:pointer;padding:10px 30px;color:#3a2000;box-shadow:0 2px 8px rgba(180,140,0,0.2);transition:all .18s;">TAKE THE CLUE / 手がかりを持つ</button>
+          <button id="orb-leave-btn" style="background:transparent;border:1.5px solid rgba(139,105,20,0.35);border-radius:6px;font-family:'Georgia',serif;font-size:clamp(.82rem,2.6vw,.95rem);letter-spacing:.1em;cursor:pointer;padding:10px 30px;color:#7a5c1e;transition:all .18s;">LEAVE BOX / 箱を残す</button>
         </div>
         <p style="text-align:center;font-size:clamp(.68rem,2vw,.78rem);color:#7a5010;opacity:0.7;margin:0;font-style:italic;">The trail keeps every clue in order. / 手がかりは順番に残ります。</p>
       </div>`;
@@ -647,10 +687,10 @@ const HAPPY_HOUSE_PORTAL = {
     const fragment = document.getElementById('orb-panel-fragment');
     const collectBtn = document.getElementById('orb-collect-btn');
     const entry = orb.trailEntry;
-    if (title) title.textContent = entry ? entry.title : 'You found a memory!';
-    if (subtitle) subtitle.textContent = entry ? entry.titleJP : '記憶を見つけた！';
+    if (title) title.textContent = entry ? entry.title : 'You found a memory box!';
+    if (subtitle) subtitle.textContent = entry ? entry.titleJP : '記憶の箱を見つけた！';
     if (fragment) fragment.textContent = entry ? entry.text : '';
-    if (collectBtn) collectBtn.textContent = entry ? 'KEEP EVIDENCE / 手がかりを持つ' : 'COLLECT / 持つ';
+    if (collectBtn) collectBtn.textContent = entry ? 'TAKE THE CLUE / 手がかりを持つ' : 'TAKE THE CLUE / 手がかりを持つ';
     orbPanelEl.style.display = 'block';
     requestAnimationFrame(() => { orbPanelEl.style.transform = 'translateY(0)'; });
     state.clickTarget = null;
@@ -1886,7 +1926,7 @@ const HAPPY_HOUSE_PORTAL = {
       <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:4px;"><input type="checkbox" id="dev-all-wanderers"> All wanderers</label>
       <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:4px;"><input type="checkbox" id="dev-all-games"> All games unlocked</label>
       <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:4px;"><input type="checkbox" id="dev-utsuroba"> Utsuroba unlocked</label>
-      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:4px;"><input type="checkbox" id="dev-all-orbs"> Show all orbs</label>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:4px;"><input type="checkbox" id="dev-all-orbs"> Show all memory boxes</label>
       <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:4px;"><input type="checkbox" id="dev-coords-toggle"> Coord mode</label>
       <button id="dev-clear-quest" style="margin-top:4px;font:700 11px monospace;color:#ffd700;background:transparent;border:1px solid rgba(255,200,0,.4);border-radius:4px;padding:3px 8px;cursor:pointer;width:100%;">Clear quest</button>
       <div id="dev-room-info" style="font-size:9px;color:rgba(255,200,0,.45);margin-top:8px;"></div>`;

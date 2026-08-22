@@ -137,6 +137,22 @@
     }
   }
 
+  function curriculumWeekKey(cw) {
+    if (!cw || typeof cw !== 'object') return String(cw == null ? '' : cw);
+    return `${cw.monthSlug || cw.month || 'week'}-w${cw.weekNumber || 0}`;
+  }
+
+  function seedToUint32(seed) {
+    if (typeof seed === 'number' && Number.isFinite(seed)) return seed >>> 0;
+    const text = String(seed == null ? '' : seed);
+    let hash = 2166136261;
+    for (let i = 0; i < text.length; i++) {
+      hash ^= text.charCodeAt(i);
+      hash = Math.imul(hash, 16777619);
+    }
+    return hash >>> 0;
+  }
+
   function migrateUtsurobaSave(data) {
     let dirty = false;
     if (!data.utsuroba) { data.utsuroba = {}; dirty = true; }
@@ -195,6 +211,13 @@
       }
     }
 
+    Object.values(data.utsuroba.drifters).forEach(record => {
+      if (record && record.wrongWeek && typeof record.wrongWeek === 'object') {
+        record.wrongWeek = curriculumWeekKey(record.wrongWeek);
+        dirty = true;
+      }
+    });
+
     /* ── Weekly drifter tracking (Pass 1 fix, see
        claude/utsuroba-audit-and-pass-plan.md) ───────────────
        This block used to WIPE every drifter's completed
@@ -215,7 +238,7 @@
     try {
       if (window.CALENDAR?.getCurrentCurriculumWeek) {
         const cw = CALENDAR.getCurrentCurriculumWeek();
-        const wk = `${cw.monthSlug}:w${cw.weekNumber}`;
+        const wk = curriculumWeekKey(cw);
         if (data.utsuroba.driftersWeekKey !== wk) {
           data.utsuroba.driftersWeekKey = wk;
           dirty = true;
@@ -274,7 +297,7 @@
      DRIFTER SYSTEM
   ═══════════════════════════════════════════ */
   function seededShuffle(arr, seed) {
-    const a = arr.slice(); let s = seed;
+    const a = arr.slice(); let s = seedToUint32(seed);
     for (let i = a.length-1; i > 0; i--) {
       s = (s*1664525+1013904223) & 0xffffffff;
       const j = Math.abs(s) % (i+1); [a[i],a[j]] = [a[j],a[i]];
@@ -284,7 +307,7 @@
   
   function getWeekSeed() {
     if (window.CALENDAR?.getCurrentCurriculumWeek) {
-      return CALENDAR.getCurrentCurriculumWeek();
+      return curriculumWeekKey(CALENDAR.getCurrentCurriculumWeek());
     }
     // calendar.js missing or API changed — fail LOUDLY, never guess the week
     const msg = '[Utsuroba] calendar.js is not loaded — cannot compute week seed.';
@@ -758,11 +781,11 @@
       .weekly-reading-close-btn{margin-top:17px;padding:9px 18px;border:1px solid #9fe4ba;border-radius:7px;background:rgba(159,228,186,.12);color:#d7ffe3;cursor:pointer;font:700 .78rem Georgia,serif;}
       @media(max-width:700px){#utsuroba-reading-challenge-button{top:51px;right:10px;padding:7px 10px;font-size:10px}.weekly-reading-card{padding:21px 16px}.weekly-reading-close,.weekly-reading-close-btn,.reading-journal-close{min-width:44px;min-height:44px}}
       /* ══ DRIFTER PANEL ══ */
-      #utsuroba-drifter-panel{position:fixed;bottom:0;left:0;right:0;z-index:9100;background:linear-gradient(180deg,#f7f2e8 0%,#ede5d0 100%);border-top:2px solid #c8b48a;border-radius:20px 20px 0 0;box-shadow:0 -6px 32px rgba(0,0,0,0.5);transform:translateY(100%);transition:transform ${PANEL_SLIDE_MS}ms cubic-bezier(0.22,1,0.36,1);font-family:'Georgia',serif;pointer-events:none;}
-      #utsuroba-drifter-panel.open{transform:translateY(0);pointer-events:auto;}
+      #utsuroba-drifter-panel{position:fixed;left:50%;bottom:clamp(10px,2.5vh,26px);z-index:9100;width:min(760px,calc(100vw - 28px));max-height:min(42vh,320px);overflow:auto;background:linear-gradient(180deg,#f7f2e8 0%,#ede5d0 100%);border:1px solid #c8b48a;border-radius:16px;box-shadow:0 10px 36px rgba(0,0,0,0.52);transform:translate(-50%,calc(100% + 24px));transition:transform ${PANEL_SLIDE_MS}ms cubic-bezier(0.22,1,0.36,1);font-family:'Georgia',serif;pointer-events:none;}
+      #utsuroba-drifter-panel.open{transform:translate(-50%,0);pointer-events:auto;}
       .dp-handle{width:38px;height:4px;border-radius:2px;background:#c0aa80;margin:10px auto 0;}
-      .dp-inner{display:flex;align-items:flex-start;gap:clamp(10px,2.5vw,22px);padding:12px clamp(14px,3.5vw,28px) 22px;}
-      .dp-portrait{flex-shrink:0;width:clamp(68px,13vw,108px);height:clamp(68px,13vw,108px);border-radius:10px;border:1.5px solid #c8b48a;background:#e8dfc8;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+      .dp-inner{display:flex;align-items:flex-start;gap:clamp(10px,2.5vw,18px);padding:10px clamp(14px,3vw,22px) 15px;}
+      .dp-portrait{flex-shrink:0;width:clamp(60px,10vw,84px);height:clamp(60px,10vw,84px);border-radius:9px;border:1.5px solid #c8b48a;background:#e8dfc8;display:flex;align-items:center;justify-content:center;overflow:hidden;}
       .dp-portrait img{width:100%;height:100%;object-fit:contain;display:block;transition:opacity .16s ease;}
       .dp-body{flex:1;min-width:0;position:relative;}
       .dp-close-x{position:absolute;top:0;right:0;background:transparent;border:none;cursor:pointer;font-size:.95rem;color:#b8a070;padding:2px 5px;line-height:1;}
@@ -771,15 +794,16 @@
       .dp-name-kanji{font-size:clamp(.95rem,2.6vw,1.14rem);color:#1e140a;font-weight:700;margin:0 0 1px;}
       
       .dp-divider{width:44px;height:1px;background:#c8b48a;margin:0 0 9px;}
-      .dp-line-en{font-size:clamp(.80rem,2.1vw,.94rem);color:#120c04;line-height:1.6;margin:0 0 2px;}
-      .dp-line-jp{font-size:clamp(.72rem,1.9vw,.84rem);color:#6a5030;line-height:1.65;margin:0 0 4px;}
-      .dp-status{font-size:clamp(.70rem,1.8vw,.82rem);color:#806040;line-height:1.6;margin:0 0 10px;font-style:italic;}
-      .dp-btns{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px;}
-      .dp-btn{font-family:'Georgia',serif;font-size:clamp(.73rem,1.9vw,.86rem);letter-spacing:.1em;cursor:pointer;padding:8px 20px;border-radius:4px;transition:all .16s;}
+      .dp-line-en{font-size:clamp(.78rem,2vw,.88rem);color:#120c04;line-height:1.45;margin:0 0 2px;}
+      .dp-line-jp{font-size:clamp(.70rem,1.8vw,.80rem);color:#6a5030;line-height:1.5;margin:0 0 4px;}
+      .dp-status{font-size:clamp(.68rem,1.7vw,.78rem);color:#806040;line-height:1.45;margin:0 0 8px;font-style:italic;}
+      .dp-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
+      .dp-btn{font-family:'Georgia',serif;font-size:clamp(.70rem,1.8vw,.80rem);letter-spacing:.06em;cursor:pointer;padding:7px 14px;border-radius:5px;transition:all .16s;}
       .dp-btn.yes{background:#2a1a06;border:1px solid #4a3010;color:#f0ddb0;}
       .dp-btn.yes:hover{background:#3a2810;}
       .dp-btn.no{background:transparent;border:1px solid #b8a478;color:#9a7850;}
       .dp-btn.no:hover{border-color:#806030;color:#4a2c08;}
+      @media(max-width:700px){#utsuroba-drifter-panel{width:calc(100vw - 16px);max-height:52vh;bottom:8px}.dp-inner{padding:9px 12px 13px}.dp-portrait{width:58px;height:58px}.dp-btn{padding:7px 11px}}
     `;
     document.head.appendChild(s);
   }
@@ -1040,7 +1064,9 @@
     const episodeDrifters = Array.isArray(requiredIds) && requiredIds.length
       ? DATA.drifters.filter(drifter => requiredIds.includes(drifter.id))
       : DATA.drifters.filter(drifter => drifter.episodeId);
-    return episodeDrifters.length >= 3 && episodeDrifters.every(drifter => !drifterHasMemories(drifter.id));
+    const restored = readUtsuroba().readingEchoes || {};
+    return episodeDrifters.length >= 3 && episodeDrifters.every(drifter =>
+      !!(drifter.episodeId && restored[drifter.episodeId]));
   }
 
   function closeMemoryConvergence() {
@@ -1551,8 +1577,9 @@
       actionHTML = `
         <p class="dp-line-en" style="margin-bottom:2px;">${wl.en}</p>
         <div class="dp-divider"></div>
-        <div style="display:flex;align-items:center;gap:10px;margin-top:10px;">
-          <button class="dp-btn no" id="dp-cancel-quest-btn">Cancel / キャンセル</button>
+        <div class="dp-btns">
+          <button class="dp-btn yes dp-dismiss">Continue helping / 助けを続ける</button>
+          <button class="dp-btn no" id="dp-cancel-quest-btn">Cancel help / 助けをやめる</button>
         </div>`;
 
     } else if (quest && quest.active === drifter.id && quest.state === 'reading') {
