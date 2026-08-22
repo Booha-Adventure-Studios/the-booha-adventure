@@ -15,6 +15,10 @@ const karasukiSource = fs.readFileSync(
   path.join(ROOT, 'js/karasuki.js'),
   'utf8'
 );
+const profileSource = fs.readFileSync(
+  path.join(ROOT, 'profile.html'),
+  'utf8'
+);
 
 function gateFor(counts, devFlags = {}) {
   let unlockSystem = null;
@@ -61,5 +65,15 @@ assert.match(karasukiSource, /BoohaUnlockSystem\.isWeeklyWorldGateOpen/,
   'Karasuki must consume the shared weekly gate');
 assert.doesNotMatch(karasukiSource, /weeklyCompletedFor\(c\)\s*>=\s*9/,
   'Karasuki must not keep its own copied nine-game rule');
+assert.match(profileSource, /id="world-doors" hidden/,
+  'Output profile doors must be hidden by default');
+assert.match(profileSource, /BoohaUnlockSystem\.isWeeklyWorldGateOpen/,
+  'Output profile doors must consume the shared weekly gate');
+assert.match(profileSource, /href="karasuki\.html"/,
+  'Output profile must provide a Karasuki door when open');
+assert.match(profileSource, /href="utsuroba\.html"/,
+  'Output profile must provide an Utsuroba door when open');
+assert.doesNotMatch(profileSource, /href="juku\.html"/, 
+  'Output world doors must not add a Juku route');
 
 console.log('Weekly Output-world gate tests passed.');
