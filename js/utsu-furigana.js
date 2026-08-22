@@ -25,6 +25,37 @@
     return '<ruby>' + kanji + '<rt>' + reading + '</rt></ruby>';
   }
 
+  function escapeHTML(value) {
+    return String(value == null ? '' : value)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  // Render an authored Japanese sentence without making content authors hand
+  // write HTML. `readings` maps exact kanji terms to their readings; text not
+  // in the map stays visible as normal Japanese.
+  function sentence(value, readings) {
+    var text = String(value == null ? '' : value);
+    var map = readings && typeof readings === 'object' ? readings : {};
+    var terms = Object.keys(map).filter(Boolean).sort(function (a, b) {
+      return b.length - a.length;
+    });
+    if (!terms.length) return escapeHTML(text);
+
+    var pattern = new RegExp(terms.map(function (term) {
+      return term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }).join('|'), 'g');
+    var html = '';
+    var cursor = 0;
+    var match;
+    while ((match = pattern.exec(text))) {
+      html += escapeHTML(text.slice(cursor, match.index));
+      html += rb(escapeHTML(match[0]), escapeHTML(map[match[0]]));
+      cursor = match.index + match[0].length;
+    }
+    return html + escapeHTML(text.slice(cursor));
+  }
+
   function injectStyles() {
     if (document.getElementById('utsu-furigana-style')) return;
     var style = document.createElement('style');
@@ -46,6 +77,7 @@
   // Publish the renderer before the DOM-ready branch so pages can safely use
   // it from their own inline renderers as soon as this script has loaded.
   window.UtsuFurigana = { rb: rb };
+  window.UtsuFurigana.sentence = sentence;
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);

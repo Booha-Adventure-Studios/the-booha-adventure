@@ -379,6 +379,28 @@
     throw new Error(msg);
   }
 
+  function dialogueVariantFor(drifter) {
+    const variants = window.UTSUROBA_DIALOGUE?.[drifter && drifter.id];
+    if (!Array.isArray(variants) || !variants.length) return null;
+    const seed = `${getWeekSeed()}:drifter-dialogue:${drifter.id}`;
+    return variants[seedToUint32(seed) % variants.length];
+  }
+
+  function dialogueLineFor(value) {
+    if (typeof value === 'string') return { en: value, jpHTML: '' };
+    if (!value || typeof value !== 'object') return { en: '', jpHTML: '' };
+    const jp = value.jp;
+    let jpHTML = '';
+    if (jp && typeof jp === 'object') {
+      jpHTML = window.UtsuFurigana?.sentence
+        ? window.UtsuFurigana.sentence(jp.text, jp.readings)
+        : escapeHTML(jp.text);
+    } else if (jp) {
+      jpHTML = escapeHTML(jp);
+    }
+    return { en: String(value.en || ''), jpHTML };
+  }
+
   
   const weeklyRooms = (() => {
     const seed  = getWeekSeed();
@@ -1967,7 +1989,7 @@
        not just Bryan, had this bug. */
     const hasQuestOffer = !quest && drifter.memoryCount > 0 && drifterHasMemories(drifter.id);
     const questInProgressWithThisDrifter = !!(quest && quest.active === drifter.id);
-    const enLines = (hasQuestOffer && drifter.questLines)
+    const baseLines = (hasQuestOffer && drifter.questLines)
       ? drifter.questLines
       : questInProgressWithThisDrifter
         ? []
@@ -1976,6 +1998,17 @@
           : (worldUnderstood && drifter.convergenceGreeting
           ? drifter.convergenceGreeting
           : (hasRestoredMemory && drifter.restoredGreeting ? drifter.restoredGreeting : drifter.greeting)));
+    const dialogueMode = hasQuestOffer
+      ? 'offer'
+      : (relationshipAwake || worldUnderstood || hasRestoredMemory ? 'restored' : 'idle');
+    const dialogueVariant = dialogueVariantFor(drifter);
+    const weeklyLine = !questInProgressWithThisDrifter && dialogueVariant
+      ? dialogueVariant[dialogueMode]
+      : null;
+    const dialogueLines = [weeklyLine, ...baseLines]
+      .filter(Boolean)
+      .map(dialogueLineFor)
+      .filter(line => line.en);
     
     let   finished    = false;
 
@@ -1997,8 +2030,8 @@
     function showActionArea() {
       if (finished) return;
       finished = true;
-      twContainer.innerHTML = enLines.map(en =>
-        `<p class="dp-line-en" style="margin-bottom:6px;">${en}</p>`
+      twContainer.innerHTML = dialogueLines.map(line =>
+        `<p class="dp-line-en" style="margin-bottom:2px;">${escapeHTML(line.en)}</p>${line.jpHTML ? `<p class="dp-line-jp" style="margin:0 0 6px;">${line.jpHTML}</p>` : ''}`
       ).join('');
       actionArea.style.opacity = '1';
       swapPortraitEngaged();
@@ -2018,7 +2051,7 @@
 
       function typeLine() {
         if (finished) return;
-        if (lineIdx >= enLines.length) { setTimeout(showActionArea, 400); return; }
+        if (lineIdx >= dialogueLines.length) { setTimeout(showActionArea, 400); return; }
         currentEnEl = document.createElement('p');
         currentEnEl.className = 'dp-line-en';
         currentEnEl.style.marginBottom = '2px';
@@ -2029,13 +2062,20 @@
 
       function typeChar() {
         if (finished) return;
-        const enLine = enLines[lineIdx];
-        if (charIdx <= enLine.length) {
-          currentEnEl.textContent = enLine.slice(0, charIdx);
-          if (charIdx > 0 && enLine[charIdx - 1] !== ' ') playTypeTick();
+        const dialogueLine = dialogueLines[lineIdx];
+        if (charIdx <= dialogueLine.en.length) {
+          currentEnEl.textContent = dialogueLine.en.slice(0, charIdx);
+          if (charIdx > 0 && dialogueLine.en[charIdx - 1] !== ' ') playTypeTick();
           charIdx++;
           setTimeout(typeChar, CHAR_MS);
         } else {
+          if (dialogueLine.jpHTML) {
+            const jpEl = document.createElement('p');
+            jpEl.className = 'dp-line-jp';
+            jpEl.style.margin = '0 0 6px';
+            jpEl.innerHTML = dialogueLine.jpHTML;
+            twContainer.appendChild(jpEl);
+          }
           lineIdx++;
           setTimeout(typeLine, LINE_PAUSE_MS);
         }
