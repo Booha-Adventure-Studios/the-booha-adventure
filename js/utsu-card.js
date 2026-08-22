@@ -201,15 +201,34 @@
          — was previously just a sound + the orb quietly vanishing, easy
          to miss). Motif-themed via --card-ring/--card-glow like the
          parchment cards above. Auto-removed by its caller after a few
-         seconds; purely decorative, never blocks input. ── */
-      .utsu-reward-pop{position:fixed;top:18%;left:50%;transform:translate(-50%,-14px);z-index:7500;
+         seconds; purely decorative, never blocks input.
+         Round 2 Pass 15 ("razzle-dazzle" — the flat fade+slide read as
+         "a simple pill"): added a spark burst, an expanding shockwave
+         ring around the icon, a one-shot light-sweep across the card,
+         and a spring-bounce entrance instead of a linear one. Every
+         piece is plain CSS transforms/opacity plus ~10 small DOM nodes
+         — no images, no canvas, no new assets. ── */
+      .utsu-reward-pop{position:fixed;top:18%;left:50%;transform:translate(-50%,-14px) scale(.72);z-index:7500;
         display:flex;align-items:center;gap:12px;padding:14px 22px;border-radius:16px;
         background:linear-gradient(180deg,#2a1642 0%,#150822 100%);
         border:2px solid var(--card-ring,#d8a8ff);
         box-shadow:0 0 0 1px rgba(255,255,255,.06) inset,0 10px 34px rgba(0,0,0,.5),0 0 26px var(--card-glow,rgba(216,168,255,.5));
         color:#fbeeff;font-family:'Georgia',serif;pointer-events:none;
-        opacity:0;transition:opacity .28s ease,transform .28s ease;}
-      .utsu-reward-pop.is-shown{opacity:1;transform:translate(-50%,0);}
+        opacity:0;transition:opacity .3s ease,transform .5s cubic-bezier(.34,1.56,.64,1);}
+      .utsu-reward-pop.is-shown{opacity:1;transform:translate(-50%,0) scale(1);}
+      /* One-shot diagonal light sweep, clipped to the card's own rounded
+         corners via its own border-radius (no overflow:hidden needed on
+         the card itself, which would otherwise clip the burst below). */
+      .utsu-reward-pop::before{content:'';position:absolute;inset:0;border-radius:inherit;
+        background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.4) 48%,rgba(255,255,255,.05) 58%,transparent 72%);
+        background-size:240% 100%;background-position:160% 0;opacity:0;pointer-events:none;}
+      .utsu-reward-pop.is-shown::before{animation:utsuRewardSweep 1.1s ease-out .16s 1;}
+      @keyframes utsuRewardSweep{0%{background-position:160% 0;opacity:0;}18%{opacity:1;}100%{background-position:-60% 0;opacity:0;}}
+      .utsu-reward-pop-icon-wrap{position:relative;flex-shrink:0;}
+      .utsu-reward-pop-ring{position:absolute;inset:-8px;border-radius:50%;
+        border:2px solid var(--card-ring,#d8a8ff);opacity:0;pointer-events:none;}
+      .utsu-reward-pop.is-shown .utsu-reward-pop-ring{animation:utsuRewardRing .65s ease-out .05s 1;}
+      @keyframes utsuRewardRing{0%{opacity:.85;transform:scale(.5);}100%{opacity:0;transform:scale(2.6);}}
       .utsu-reward-pop-icon{flex-shrink:0;width:40px;height:40px;border-radius:50%;
         display:flex;align-items:center;justify-content:center;font-size:20px;
         background:radial-gradient(circle at 35% 30%,#fff7dd,var(--card-ring,#d8a8ff) 65%,#000 130%);
@@ -217,6 +236,21 @@
       .utsu-reward-pop-text{display:flex;flex-direction:column;gap:2px;}
       .utsu-reward-pop-title{font-size:.98rem;font-weight:700;}
       .utsu-reward-pop-sub{font-size:.76rem;color:rgba(251,238,255,.68);}
+      /* Spark burst: a handful of dots/glyphs spawned fresh per pickup
+         (see spawnBurst() below) that fly outward from the card center
+         and fade — each carries its own --dx/--dy set inline in JS so
+         every pickup's burst looks slightly different. */
+      .utsu-reward-pop-burst{position:absolute;inset:0;pointer-events:none;}
+      .utsu-reward-spark{position:absolute;left:50%;top:50%;width:5px;height:5px;border-radius:50%;
+        background:var(--card-ring,#d8a8ff);box-shadow:0 0 6px 1px var(--card-glow,rgba(216,168,255,.7));
+        opacity:0;transform:translate(-50%,-50%);
+        animation:utsuRewardSpark .8s cubic-bezier(.18,.7,.32,1) forwards;}
+      .utsu-reward-spark.is-star{width:auto;height:auto;background:none;box-shadow:none;
+        color:var(--card-ring,#d8a8ff);font-size:11px;line-height:1;text-shadow:0 0 5px var(--card-glow,rgba(216,168,255,.7));}
+      @keyframes utsuRewardSpark{
+        0%{opacity:1;transform:translate(-50%,-50%) translate(0,0) scale(1);}
+        100%{opacity:0;transform:translate(-50%,-50%) translate(var(--dx),var(--dy)) scale(.25);}
+      }
 
       @media(max-width:700px){
         .utsu-hud-chip{top:9px;padding:7px 13px 7px 13px;max-width:calc(100vw - 20px);}
@@ -229,6 +263,10 @@
         .utsu-reward-pop-icon{width:32px;height:32px;font-size:16px;}
         .utsu-reward-pop-title{font-size:.86rem;}
         .utsu-reward-pop-sub{font-size:.68rem;}
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .utsu-reward-pop{transition:opacity .3s ease;}
+        .utsu-reward-pop-ring,.utsu-reward-spark,.utsu-reward-pop::before{animation:none !important;opacity:0 !important;}
       }
     `;
     document.head.appendChild(s);
@@ -244,14 +282,40 @@
      doesn't need to track a handle or clean anything up. */
   var rewardPopEl = null;
   var rewardPopHideTimer = null;
+  var SPARK_GLYPHS = ['✦', '✧'];
+
+  /* Fills the burst container with a fresh ring of sparks each call —
+     angles spread evenly around the card with a little jitter so the
+     burst reads as organic rather than a mechanical star pattern, and
+     each spark's outward vector is set as an inline --dx/--dy custom
+     property so one shared @keyframes rule can drive all of them. */
+  function spawnBurst(container) {
+    if (!container) return;
+    container.innerHTML = '';
+    var count = 10;
+    for (var i = 0; i < count; i++) {
+      var isStar = Math.random() < 0.4;
+      var spark = document.createElement(isStar ? 'span' : 'i');
+      spark.className = 'utsu-reward-spark' + (isStar ? ' is-star' : '');
+      if (isStar) spark.textContent = SPARK_GLYPHS[Math.floor(Math.random() * SPARK_GLYPHS.length)];
+      var angle = (Math.PI * 2 * i / count) + (Math.random() * 0.5 - 0.25);
+      var dist = 40 + Math.random() * 34;
+      spark.style.setProperty('--dx', (Math.cos(angle) * dist).toFixed(1) + 'px');
+      spark.style.setProperty('--dy', (Math.sin(angle) * dist).toFixed(1) + 'px');
+      spark.style.animationDelay = Math.round(Math.random() * 90) + 'ms';
+      container.appendChild(spark);
+    }
+  }
+
   function showRewardPop(opts) {
     opts = opts || {};
     if (!rewardPopEl) {
       rewardPopEl = document.createElement('div');
       rewardPopEl.className = 'utsu-reward-pop';
       rewardPopEl.innerHTML =
-        '<div class="utsu-reward-pop-icon" aria-hidden="true"></div>' +
-        '<div class="utsu-reward-pop-text"><span class="utsu-reward-pop-title"></span><span class="utsu-reward-pop-sub"></span></div>';
+        '<div class="utsu-reward-pop-icon-wrap"><span class="utsu-reward-pop-ring"></span><div class="utsu-reward-pop-icon" aria-hidden="true"></div></div>' +
+        '<div class="utsu-reward-pop-text"><span class="utsu-reward-pop-title"></span><span class="utsu-reward-pop-sub"></span></div>' +
+        '<div class="utsu-reward-pop-burst" aria-hidden="true"></div>';
       document.body.appendChild(rewardPopEl);
     }
     rewardPopEl.style.setProperty('--card-ring', ringFor(opts.motif));
@@ -259,6 +323,7 @@
     rewardPopEl.querySelector('.utsu-reward-pop-icon').textContent = opts.icon || '✦';
     rewardPopEl.querySelector('.utsu-reward-pop-title').textContent = opts.title || '';
     rewardPopEl.querySelector('.utsu-reward-pop-sub').textContent = opts.sub || '';
+    spawnBurst(rewardPopEl.querySelector('.utsu-reward-pop-burst'));
     clearTimeout(rewardPopHideTimer);
     rewardPopEl.classList.remove('is-shown');
     void rewardPopEl.offsetWidth; /* force reflow so re-triggering works on back-to-back pickups */
