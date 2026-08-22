@@ -68,8 +68,14 @@ assert.match(utsurobaWorld, /dialogueVariantFor\(drifter\)/,
   'the Utsuroba world should select dialogue by drifter and week');
 assert.match(utsurobaWorld, /UtsuFurigana\.sentence/,
   'drifter dialogue should render Japanese support with furigana');
+assert.match(utsurobaWorld, /dp-quest-track/,
+  'drifter cards should show the short ask-find-restore quest loop');
+assert.match(utsurobaWorld, /questTrackHTML\(drifter, quest, hasRestoredMemory\)/,
+  'drifter quest progress should reflect the current save state');
 assert.match(karasukiPage, /src="js\/utsuroba-data\.js"/,
   'Karasuki should load the shared drifter identity data');
+assert.match(karasukiWorld, /subHTML:/,
+  'Karasuki reward popups should support furigana markup');
 assert.match(karasukiWorld, /drifterReturnLabel\(quest\.active\)/,
   'Karasuki should target the active drifter when the trail is complete');
 assert.doesNotMatch(karasukiWorld, /next \? next\.hint : 'Return to Kurobane\.'/,
