@@ -121,4 +121,131 @@
       }
     ]
   };
+
+  // The original drifter arrays were English-only. Keep their wording and
+  // progress behavior, but give every existing line a Japanese companion so
+  // the whole conversation—not only the rotating opener—has reading support.
+  const L = line;
+  window.UTSUROBA_LEGACY_DIALOGUE = {
+    ks: {
+      idle: [
+        L('…What.', '…何だ。', { '何':'なん' }),
+        L('You\'re not from here.', '君は、ここから来た人ではない。', { '君':'きみ', '来':'き' }),
+        L('Don\'t just stand there staring.', 'そこに立って、見つめるだけにするな。', { '立':'た', '見':'み' })
+      ],
+      offer: [
+        L('…What.', '…何だ。', { '何':'なん' }),
+        L('You again.', 'また君か。', { '君':'きみ' }),
+        L('Don\'t just stand there.', 'そこに立っているだけにするな。', { '立':'た' }),
+        L('I lost something.', '何かを失くした。', { '何':'なに', '失':'な' }),
+        L('A memory.', '記憶だ。', { '記憶':'きおく' }),
+        L('Go find it.', 'それを探してこい。', { '探':'さが' })
+      ],
+      restored: [
+        L('You came back.', '君は戻ってきた。', { '君':'きみ', '戻':'もど' }),
+        L('The lantern is quiet now.', '灯りは、今は静かだ。', { '灯り':'あかり', '今':'いま', '静':'しず' }),
+        L('I remember what I could not say.', '言えなかったことを思い出した。', { '言':'い', '思い出':'おもいだ' })
+      ]
+    },
+    nto: {
+      idle: [
+        L('Oh! Hey!', 'あっ、やあ！'),
+        L('You\'re new, right?', '君は新しい人だよね？', { '君':'きみ', '新':'あたら' }),
+        L('Hehe… I like you already!', 'えへへ…もう君が好きだよ！', { '君':'きみ', '好':'す' })
+      ],
+      offer: [
+        L('Oh! Hey hey hey!', 'あっ、やあやあやあ！'),
+        L('You came back!', '戻ってきたね！', { '戻':'もど' }),
+        L('I\'ve been waiting!', 'ずっと待っていたよ！', { '待':'ま' }),
+        L('I lost a memory somewhere out there…', 'あの辺で記憶を失くしたみたい…', { '辺':'へん', '記憶':'きおく', '失':'な' }),
+        L('Will you find it for me? Please please please!', 'ぼくのために見つけてくれる？お願い、お願い、お願い！', { '見':'み', '願':'ねが' })
+      ],
+      restored: [
+        L('You found it!', '見つけてくれたね！', { '見':'み' }),
+        L('The candy was in my memory all along.', 'キャンディは、ずっとぼくの記憶の中にあったんだ。', { '記憶':'きおく', '中':'なか' }),
+        L('Want to hear the silly part again?', 'おかしなところを、もう一度聞く？', { '一度':'いちど', '聞':'き' })
+      ]
+    },
+    cg: {
+      idle: [
+        L('Ah—!', 'あっ—！'),
+        L('S-sorry…', 'ご、ごめんなさい…'),
+        L('I didn\'t see you there…', 'そこにいるのが見えませんでした…', { '見':'み' })
+      ],
+      offer: [
+        L('Ah—!', 'あっ—！'),
+        L('Oh… it\'s you.', 'ああ…君だったんですね。', { '君':'きみ' }),
+        L('Sorry, you startled me again…', 'ごめんなさい、またびっくりしました…'),
+        L('Um…', 'ええと…'),
+        L('I think I lost something.', '何かを失くしたと思います。', { '何':'なに', '失':'な' }),
+        L('A memory…', '記憶を…', { '記憶':'きおく' }),
+        L('Would you… maybe… help me find it?', 'あの…もしかしたら…探すのを手伝ってくれますか？', { '探':'さが', '手伝':'てつだ' })
+      ],
+      restored: [
+        L('You came back…', '戻ってきたんですね…', { '戻':'もど' }),
+        L('The hallway feels smaller now.', '今は廊下が少し小さく感じます。', { '今':'いま', '廊下':'ろうか', '小':'ちい', '感':'かん' }),
+        L('I can say what frightened me.', '怖かったことを言えるようになりました。', { '怖':'こわ', '言':'い' })
+      ]
+    },
+    bh: {
+      idle: [
+        L('Hey…', 'やあ…'),
+        L('You made it this far, huh.', 'ここまで来たんだね。', { '来':'き' }),
+        L('I just got here myself.', 'ぼくも、ちょうどここへ来たところだ。', { '来':'き' }),
+        L('Come back later.', 'あとで戻ってきて。', { '戻':'もど' })
+      ],
+      offer: [
+        L('Hey…', 'やあ…'),
+        L('You made it this far, huh.', 'ここまで来たんだね。', { '来':'き' }),
+        L('I just got here myself.', 'ぼくも、ちょうどここへ来たところだ。', { '来':'き' }),
+        L('I\'m not ready to settle in yet.', 'まだ、ここに落ち着く準備ができていない。', { '落':'お', '着':'つ', '準備':'じゅんび' }),
+        L('But I did lose a memory.', 'でも、記憶を一つ失くした。', { '記憶':'きおく', '一':'ひと', '失':'な' }),
+        L('Could you help me find it?', 'それを見つけるのを手伝ってくれる？', { '見':'み', '手伝':'てつだ' })
+      ],
+      restored: [
+        L('You found my name.', 'ぼくの名前を見つけたんだね。', { '名前':'なまえ', '見':'み' }),
+        L('The window was not asking me to leave.', '窓は、ぼくに出ていけと言っていたのではなかった。', { '窓':'まど', '出':'で', '言':'い' }),
+        L('I remember why I stayed.', 'なぜ残ったのか、思い出した。', { '残':'のこ', '思い出':'おもいだ' })
+      ]
+    },
+    bk: {
+      idle: [
+        L('…What are you.', '…お前は何だ。', { '何':'なん' }),
+        L('Don\'t answer that.', 'それには答えるな。', { '答':'こた' }),
+        L('You look like something someone stepped on.', '誰かに踏まれた何かみたいな顔をしている。', { '誰':'だれ', '踏':'ふ', '何':'なに', '顔':'かお' }),
+        L('Come back later.', 'あとで戻ってこい。', { '戻':'もど' })
+      ],
+      offer: [
+        L('…Still here.', '…まだここにいるのか。', { '今':'いま' }),
+        L('Ugh. Fine.', 'うっ。分かった。', { '分':'わ' }),
+        L('I lost something.', '何かを失くした。', { '何':'なに', '失':'な' }),
+        L('Don\'t ask why it matters.', 'なぜ大事かは聞くな。', { '大事':'だいじ', '聞':'き' }),
+        L('Find it. Don\'t make a thing of it.', '見つけろ。大げさにするな。', { '見':'み' })
+      ],
+      restored: [
+        L('…You actually found it.', '…本当に見つけたのか。', { '本当':'ほんとう', '見':'み' }),
+        L('Don\'t look so pleased with yourself.', 'そんなに得意そうな顔をするな。', { '得意':'とくい', '顔':'かお' }),
+        L('Fine. You\'re not completely useless.', '分かった。まったく役に立たないわけではない。', { '分':'わ', '役':'やく', '立':'た' })
+      ]
+    },
+    ph: {
+      idle: [
+        L('Oh my…', 'まあ…'),
+        L('You\'re just the cutest thing, aren\'t you.', 'あなたは本当にかわいい子ね。', { '本当':'ほんとう', '子':'こ' }),
+        L('Don\'t wander too far, okay?', 'あまり遠くへ行かないでね。', { '遠':'とお', '行':'い' }),
+        L('Come back and see me later.', 'あとで戻ってきて、私に会いに来てね。', { '戻':'もど', '私':'わたし', '会':'あ' })
+      ],
+      offer: [
+        L('Oh, you again! Wonderful.', 'まあ、またあなたね！すばらしいわ。'),
+        L('Come here, let me fix your collar.', 'こちらへ来て、襟を直させてね。', { '来':'き', '襟':'えり', '直':'なお' }),
+        L('I lost something of mine, sweetpea.', '私の大切な物を失くしたの、かわいい子。', { '私':'わたし', '大切':'たいせつ', '物':'もの', '失':'な' }),
+        L('Would you find it for me? Pretty please?', '私のために見つけてくれる？お願いね。', { '私':'わたし', '見':'み', '願':'ねが' })
+      ],
+      restored: [
+        L('There you are!', 'そこにいたのね！'),
+        L('You found it—come here, let me squeeze your cheeks.', '見つけたのね—こちらへ来て、ほっぺをぎゅっとさせて。', { '見':'み', '来':'き' }),
+        L('I knew you had a good heart.', 'あなたが優しい心を持っていると分かっていたわ。', { '優':'やさ', '心':'こころ', '持':'も' })
+      ]
+    }
+  };
 })();
