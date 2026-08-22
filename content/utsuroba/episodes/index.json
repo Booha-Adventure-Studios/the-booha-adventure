@@ -1,5 +1,6 @@
 {
   "version": 1,
+  "convergenceEpisodeIds": ["ks_lantern_v1", "nto_candy_v1", "cg_door_v1"],
   "episodes": [
     {
       "id": "ks_lantern_v1",

@@ -19,6 +19,9 @@
       if (!index || !Array.isArray(index.episodes)) {
         throw new Error('Episode index must contain an episodes array.');
       }
+      window.UTSUROBA_EPISODE_INDEX = index;
+      window.UTSUROBA_CONVERGENCE_EPISODE_IDS = Array.isArray(index.convergenceEpisodeIds)
+        ? index.convergenceEpisodeIds.slice() : [];
       return Promise.all(index.episodes.map(entry => {
         if (!entry || !entry.id || !entry.file) {
           throw new Error('Episode index entry needs id and file.');
