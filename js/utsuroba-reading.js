@@ -552,6 +552,7 @@
     }
 
     function advanceQuestion(question) {
+      if (window.UtsuSfx) window.UtsuSfx.correct();
       questionIndex += 1;
       showEvidence = false;
       resetQuestionInteraction();
@@ -572,6 +573,7 @@
     }
 
     function showWrong(question) {
+      if (window.UtsuSfx) window.UtsuSfx.wrong();
       mistakeCount += 1;
       showEvidence = false;
       lastFeedback = `Not quite. Look again at the lines. ${question.evidence}`;
