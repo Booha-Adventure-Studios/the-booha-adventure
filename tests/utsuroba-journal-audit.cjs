@@ -45,6 +45,8 @@ assert.match(data, /clueChecks/, 'Convergence data must define authored evidence
 assert.match(data, /cluePromptJP/, 'Convergence evidence instructions must include simple Japanese support');
 assert.match(data, /garden/, 'Convergence data must define the persistent Memory Garden');
 assert.match(utsuroba, /relationshipGreeting/, 'Drifters must react when the new memory joins the shared world');
+assert.match(utsuroba, /DRIFTER_NAME_READINGS/, 'Drifter profile names should have local furigana metadata');
+assert.match(utsuroba, /dp-quest-track/, 'Drifter panels should show the short quest loop');
 assert.match(utsuroba, /masteryLevel/, 'Journal entries must persist adaptive reading mastery');
 assert.match(utsuroba, /recordReadingReview/, 'Review results must update the learner reading state');
 assert.match(utsuroba, /recordWordPracticeResult/, 'Word practice must persist vocabulary review results');
@@ -73,6 +75,7 @@ assert.match(reading, /usedEvidence/, 'Reading engine must track evidence suppor
 assert.match(reading, /renderPostcard/, 'Reading engine must render optional memory postcards');
 assert.match(reading, /onPostcardSave/, 'Reading engine must persist saved postcard output');
 assert.match(reading, /renderLensReplay/, 'Reading completion must expose replay lenses');
+assert.match(reading, /reading-progress-fill/, 'Reading sessions should show a visible progress meter');
 assert.match(reading, /reviewLens/, 'Reading engine must support focused replay lenses');
 assert.match(reading, /data-reading-lens/, 'Reading replay lens controls must be interactive');
 assert.match(reading, /Close journal review \/ \$\{FURI\.sentence\('ノートを閉じる'/, 'Review-only sessions must not offer quest completion');

@@ -813,6 +813,8 @@ const HAPPY_HOUSE_PORTAL = {
     orbPanelEl = document.createElement('div');
     orbPanelEl.id = 'orb-panel';
     orbPanelEl.className = 'utsu-card is-floating';
+    const furi = (value, readings) => window.UtsuFurigana && window.UtsuFurigana.sentence
+      ? window.UtsuFurigana.sentence(value, readings || {}) : value;
     orbPanelEl.innerHTML = `
       <div class="dp-handle"></div>
       <div class="dp-inner" style="max-width:480px;margin:0 auto;">
@@ -823,10 +825,10 @@ const HAPPY_HOUSE_PORTAL = {
           <div class="dp-divider" style="margin-left:auto;margin-right:auto;"></div>
           <p id="orb-panel-fragment" style="max-width:440px;margin:0 auto 4px;min-height:1.6em;font-size:clamp(1.08rem,3.2vw,1.32rem);font-weight:700;color:#1e140a;line-height:1.5;"></p>
           <div id="orb-panel-actions" style="opacity:0;transition:opacity .3s;">
-            <p class="dp-status" style="margin-top:6px;">Read the clue, then carry it along the trail.<br>手がかりを読んで、記憶の道に持っていきましょう。</p>
+            <p class="dp-status" style="margin-top:6px;">Read the clue, then carry it along the trail.<br>${furi('手がかりを読んで、記憶の道に持っていきましょう。', { '手がかり': 'てがかり', '読んで': 'よんで', '記憶': 'きおく', '道': 'みち', '持っていきましょう': 'もっていきましょう' })}</p>
             <div class="dp-btns" style="justify-content:center;">
-              <button id="orb-collect-btn" class="dp-btn yes">TAKE THE CLUE / 手がかりを持つ</button>
-              <button id="orb-leave-btn" class="dp-btn no">LEAVE BOX / 箱を残す</button>
+              <button id="orb-collect-btn" class="dp-btn yes">TAKE THE CLUE / ${furi('手がかりを持つ', { '手がかり': 'てがかり', '持つ': 'もつ' })}</button>
+              <button id="orb-leave-btn" class="dp-btn no">LEAVE BOX / ${furi('箱を残す', { '箱': 'はこ', '残す': 'のこす' })}</button>
             </div>
           </div>
         </div>
@@ -949,11 +951,16 @@ const HAPPY_HOUSE_PORTAL = {
       if (window.UtsuCard) {
         window.UtsuCard.showRewardPop(complete ? {
           motif: orb.motif, icon: '✦',
-          title: 'Memory complete!', sub: '記憶が完成した！',
+          title: 'Memory complete!',
+          subHTML: window.UtsuFurigana?.sentence
+            ? window.UtsuFurigana.sentence('記憶が完成した！', { '記憶': 'きおく', '完成': 'かんせい' })
+            : '記憶が完成した！',
         } : {
           motif: orb.motif, icon: '❖',
           title: `Clue found! ${nextIndex} / ${trail.length}`,
-          sub: `手がかりを見つけた！ ${nextIndex} / ${trail.length}`,
+          subHTML: window.UtsuFurigana?.sentence
+            ? `${window.UtsuFurigana.sentence('手がかりを見つけた！', { '手がかり': 'てがかり', '見つけた': 'みつけた' })} ${nextIndex} / ${trail.length}`
+            : `手がかりを見つけた！ ${nextIndex} / ${trail.length}`,
         });
       }
       return;
@@ -965,7 +972,14 @@ const HAPPY_HOUSE_PORTAL = {
     });
     closeOrbPanel();
     if (window.UtsuCard) {
-      window.UtsuCard.showRewardPop({ motif: orb.motif, icon: '✦', title: 'Memory found!', sub: '記憶を見つけた！' });
+      window.UtsuCard.showRewardPop({
+        motif: orb.motif,
+        icon: '✦',
+        title: 'Memory found!',
+        subHTML: window.UtsuFurigana?.sentence
+          ? window.UtsuFurigana.sentence('記憶を見つけた！', { '記憶': 'きおく', '見つけた': 'みつけた' })
+          : '記憶を見つけた！',
+      });
     }
   }
 
