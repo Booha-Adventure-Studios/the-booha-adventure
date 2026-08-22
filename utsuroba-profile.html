@@ -66,6 +66,7 @@
       text-decoration: none; font-size: .78rem; background: rgba(255,255,255,.035);
       transition: border-color .18s, color .18s, transform .18s;
     }
+    .back-link[hidden] { display: none !important; }
     .back-link:hover, .back-link:focus-visible { color: var(--ink); border-color: var(--violet); transform: translateY(-1px); outline: none; }
     .case-label { color: var(--quiet); font: 700 .62rem/1.3 var(--sans); letter-spacing: .18em; text-transform: uppercase; text-align: right; }
 
@@ -77,20 +78,30 @@
       background: rgba(255,255,255,.025);
     }
     .profile-network a {
-      display: inline-flex; align-items: center; gap: 5px; min-height: 30px;
-      padding: 5px 10px; border: 1px solid transparent; border-radius: 999px;
-      color: var(--muted); text-decoration: none; font: 700 .67rem/1.2 var(--sans);
-      letter-spacing: .04em; transition: color .18s, border-color .18s, background .18s, transform .18s;
+      display: inline-flex; align-items: center; gap: 6px; min-height: 38px;
+      padding: 7px 14px; border: 1px solid rgba(216,168,255,.28); border-radius: 10px;
+      color: #f1eaff; text-decoration: none; font: 900 .7rem/1.2 var(--sans);
+      letter-spacing: .04em; text-shadow: 0 1px 2px rgba(0,0,0,.7);
+      background: linear-gradient(180deg, rgba(216,168,255,.14), rgba(10,7,17,.42));
+      box-shadow: 0 2px 0 rgba(0,0,0,.34), inset 0 1px rgba(255,255,255,.12);
+      transition: color .18s, border-color .18s, background .18s, transform .18s, box-shadow .18s;
     }
-    .profile-network a small { color: var(--quiet); font: .9em var(--font); letter-spacing: .02em; }
+    .profile-network a small { color: #d6cbe9; font: 800 .9em var(--font); letter-spacing: .02em; }
     .profile-network a:hover, .profile-network a:focus-visible {
       color: var(--ink); border-color: var(--violet); background: var(--violet-soft);
-      outline: none; transform: translateY(-1px);
+      outline: none; transform: translateY(-1px); box-shadow: 0 4px 0 rgba(0,0,0,.28), 0 0 18px rgba(216,168,255,.22), inset 0 1px rgba(255,255,255,.2);
     }
     .profile-network a[aria-current="page"] {
-      color: var(--ink); border-color: rgba(216,168,255,.58);
-      background: var(--violet-soft); box-shadow: inset 0 1px rgba(255,255,255,.08);
+      color: #fff8ff; border-color: #e4cfff;
+      background: linear-gradient(180deg, rgba(216,168,255,.3), rgba(216,168,255,.12));
+      box-shadow: 0 3px 0 rgba(0,0,0,.28), 0 0 18px rgba(216,168,255,.32), inset 0 1px rgba(255,255,255,.2);
+      animation: outputProfileButtonPulse 2.6s ease-in-out infinite;
     }
+    @keyframes outputProfileButtonPulse {
+      0%, 100% { box-shadow: 0 3px 0 rgba(0,0,0,.28), 0 0 13px rgba(216,168,255,.22), inset 0 1px rgba(255,255,255,.16); }
+      50% { box-shadow: 0 4px 0 rgba(0,0,0,.22), 0 0 28px rgba(216,168,255,.55), inset 0 1px rgba(255,255,255,.3); }
+    }
+    @media (prefers-reduced-motion: reduce) { .profile-network a[aria-current="page"] { animation: none; } }
 
     .hero {
       position: relative; overflow: hidden; padding: clamp(28px, 6vw, 58px) clamp(22px, 6vw, 72px);
@@ -184,7 +195,7 @@
 <body>
   <main class="page">
     <div class="topbar">
-      <a class="back-link" href="profile.html">← Output profile</a>
+      <a class="back-link" id="utsuroba-profile-back" href="utsuroba.html?room=room_03" hidden aria-label="Back to Utsuroba start page">← Utsuroba / うつろばへ</a>
       <div class="case-label">UTSUROBA / MEMORY ARCHIVE<br>記憶の保管場所</div>
     </div>
 
@@ -252,6 +263,17 @@
 
       function episodeFor(id) {
         return window.UTSUROBA_EPISODES && window.UTSUROBA_EPISODES[id];
+      }
+
+      function renderWorldBack() {
+        const link = document.getElementById('utsuroba-profile-back');
+        if (!link) return;
+        let open = false;
+        try {
+          open = !!(window.BoohaUnlockSystem && typeof BoohaUnlockSystem.isWeeklyWorldGateOpen === 'function' && BoohaUnlockSystem.isWeeklyWorldGateOpen());
+        } catch (_) {}
+        link.hidden = !open;
+        if (open) link.href = 'utsuroba.html?room=room_03';
       }
 
       function restoredFor(utsu, drifter) {
@@ -341,12 +363,16 @@
       }
 
       function boot() {
+        renderWorldBack();
         render();
         if (window.UTSUROBA_EPISODES_READY && typeof window.UTSUROBA_EPISODES_READY.then === 'function') {
           window.UTSUROBA_EPISODES_READY.then(render).catch(() => {});
         }
         document.addEventListener('booha:saved', render);
         document.addEventListener('booha:weeklyReset', render);
+        document.addEventListener('booha:saved', renderWorldBack);
+        document.addEventListener('booha:weeklyReset', renderWorldBack);
+        document.addEventListener('booha:newWeek', renderWorldBack);
       }
 
       if (window.BOOHA_READY) boot();

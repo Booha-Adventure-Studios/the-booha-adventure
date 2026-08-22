@@ -101,6 +101,11 @@
   function restoreProfileRoom() {
     if (!isProfileEntry()) return;
     try {
+      const params = new URLSearchParams(window.location.search);
+      /* An explicit room is a deliberate landing point (for example the
+         profile's "back to Utsuroba" button). Only resume the last room when
+         the profile doorway did not specify one. */
+      if (params.has('room')) return;
       const pageState = window.BoohaAdventure && BoohaAdventure.pageState;
       const saved = pageState && typeof pageState.getSpawnPoint === 'function'
         ? pageState.getSpawnPoint(PAGE_ID)
@@ -630,6 +635,8 @@
   let modalPreviousFocus = null;
   let convergenceOverlay = null, convergenceOpen = false;
   let gardenOverlay = null, gardenOpen = false;
+  let utsuProfilePortal = null;
+  let utsuProfileOverlay = null, utsuProfileOpen = false;
 
   let drifterFadeStart = 0;
   let _lastWrongId     = '';
@@ -693,6 +700,37 @@
       .utsu-memory-gate .gate-label{position:absolute;left:50%;top:calc(100% - 5px);transform:translateX(-50%);min-width:150px;padding:5px 8px;border:1px solid rgba(216,168,255,.42);border-radius:6px;background:rgba(18,7,28,.9);color:#f1d9ff;text-align:center;font:700 10px/1.2 Georgia,serif;white-space:nowrap;}
       .utsu-memory-gate .gate-label small{display:block;margin-top:3px;color:rgba(241,217,255,.6);font-size:9px;font-weight:400;}
       @keyframes gatePulse{0%,100%{transform:translate(-50%,-50%) rotate(45deg) scale(.86);opacity:.65}50%{transform:translate(-50%,-50%) rotate(45deg) scale(1.08);opacity:1}}
+      .utsu-profile-portal{position:absolute;transform:translate(-50%,-50%);width:154px;height:142px;padding:0;border:0;background:transparent;pointer-events:auto;cursor:pointer;color:#f1d9ff;filter:drop-shadow(0 0 18px rgba(216,168,255,.42));}
+      .utsu-profile-portal::before{content:"";position:absolute;left:50%;top:43%;width:86px;height:86px;transform:translate(-50%,-50%);border:1px solid rgba(216,168,255,.48);border-radius:50%;background:radial-gradient(circle,rgba(216,168,255,.2),rgba(95,55,140,.08) 50%,transparent 72%);box-shadow:0 0 24px rgba(216,168,255,.34);animation:utsuProfilePortalPulse 2.8s ease-in-out infinite;}
+      .utsu-profile-portal img{position:absolute;left:50%;top:43%;width:72px;height:72px;object-fit:contain;transform:translate(-50%,-50%);filter:drop-shadow(0 0 5px #f1d9ff) drop-shadow(0 0 15px #d8a8ff);animation:utsuProfilePortalFloat 2.6s ease-in-out infinite;}
+      .utsu-profile-portal-label{position:absolute;left:50%;top:calc(100% - 7px);transform:translateX(-50%);min-width:128px;padding:5px 8px;border:1px solid rgba(216,168,255,.46);border-radius:7px;background:rgba(12,6,23,.9);color:#f1d9ff;text-align:center;font:700 10px/1.2 Georgia,serif;white-space:nowrap;}
+      .utsu-profile-portal-label small{display:block;margin-top:3px;color:rgba(241,217,255,.65);font-size:9px;font-weight:400;}
+      @keyframes utsuProfilePortalPulse{0%,100%{transform:translate(-50%,-50%) scale(.86);opacity:.58}50%{transform:translate(-50%,-50%) scale(1.08);opacity:1}}
+      @keyframes utsuProfilePortalFloat{0%,100%{transform:translate(-50%,-48%)}50%{transform:translate(-50%,-58%)}}
+      .utsu-profile-pop-overlay{display:none;position:fixed;inset:0;z-index:9400;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;background:rgba(0,0,0,.86);}
+      .utsu-profile-pop-overlay.is-open{display:flex;animation:utsuProfileOverlayIn .22s ease-out both;}
+      .utsu-profile-pop-box{position:relative;width:min(440px,94vw);max-height:88vh;overflow:auto;padding:38px 30px 28px;box-sizing:border-box;text-align:center;border:1px solid rgba(216,168,255,.7);border-radius:14px;background:linear-gradient(155deg,#211332,#0c0713 72%);box-shadow:0 0 0 1px rgba(216,168,255,.16),0 0 42px rgba(150,75,210,.5),0 0 100px rgba(75,30,110,.34),inset 0 0 50px rgba(0,0,0,.5);font-family:Georgia,serif;animation:utsuProfilePopIn .32s cubic-bezier(.22,.8,.36,1) both;}
+      .utsu-profile-pop-box::before{content:"";position:absolute;left:0;top:0;width:100%;height:2px;background:linear-gradient(90deg,transparent,#d8a8ff,#f1d9ff,#d8a8ff,transparent);background-size:200% 100%;animation:utsuProfileShimmer 2.6s ease-in-out infinite;}
+      .utsu-profile-pop-box::after{content:"";position:absolute;inset:12px;border:1px solid rgba(216,168,255,.18);pointer-events:none;}
+      .utsu-profile-pop-close{position:absolute;right:7px;top:5px;width:40px;height:40px;border:0;background:transparent;color:rgba(255,255,255,.55);font-size:18px;cursor:pointer;z-index:2;}
+      .utsu-profile-pop-close:hover,.utsu-profile-pop-close:focus-visible{color:#fff;outline:none;}
+      .utsu-profile-pop-icon{position:relative;width:104px;height:104px;margin:0 auto 12px;display:grid;place-items:center;z-index:1;}
+      .utsu-profile-pop-icon::before{content:"";position:absolute;inset:-14%;border-radius:50%;background:radial-gradient(ellipse,rgba(216,168,255,.4),transparent 70%);filter:blur(8px);animation:utsuProfilePortalPulse 2.8s ease-in-out infinite;}
+      .utsu-profile-pop-icon img{position:relative;width:92px;height:92px;object-fit:contain;filter:drop-shadow(0 0 6px #f1d9ff) drop-shadow(0 0 18px #d8a8ff);}
+      .utsu-profile-pop-eyebrow{position:relative;margin:0 0 12px;color:#d8a8ff;font:800 .66rem/1.4 system-ui,sans-serif;letter-spacing:.2em;text-transform:uppercase;}
+      .utsu-profile-pop-box h2{position:relative;margin:0 0 3px;color:#f1d9ff;font-size:clamp(1.1rem,3.6vw,1.35rem);letter-spacing:.05em;text-shadow:0 0 16px rgba(216,168,255,.6);}
+      .utsu-profile-pop-title-jp{position:relative;margin:0 0 17px;color:rgba(241,217,255,.72);font-size:.82rem;letter-spacing:.08em;}
+      .utsu-profile-pop-copy{position:relative;margin:0 0 6px;color:#fff4ff;font-size:.92rem;line-height:1.6;}
+      .utsu-profile-pop-copy small{display:block;margin-top:4px;color:rgba(245,232,255,.62);font-size:.84em;}
+      .utsu-profile-pop-actions{position:relative;display:flex;justify-content:center;flex-wrap:wrap;gap:12px;margin-top:20px;z-index:1;}
+      .utsu-profile-pop-actions button{min-width:108px;min-height:44px;padding:8px 18px;border:1px solid rgba(216,168,255,.65);border-radius:7px;background:rgba(216,168,255,.12);color:#f5eaff;font:600 .83rem/1.25 Georgia,serif;cursor:pointer;transition:background .18s,border-color .18s,transform .18s;}
+      .utsu-profile-pop-actions button span{display:block;margin-top:3px;font-size:.74em;opacity:.8;}
+      .utsu-profile-pop-actions button:hover,.utsu-profile-pop-actions button:focus-visible{border-color:#fff;background:rgba(216,168,255,.25);transform:translateY(-1px);outline:none;}
+      .utsu-profile-pop-actions button:last-child{border-color:rgba(255,255,255,.24);background:transparent;color:rgba(255,255,255,.72);}
+      @keyframes utsuProfileOverlayIn{from{background:rgba(0,0,0,0)}to{background:rgba(0,0,0,.86)}}
+      @keyframes utsuProfilePopIn{from{opacity:0;transform:translateY(12px) scale(.97)}to{opacity:1;transform:none}}
+      @keyframes utsuProfileShimmer{0%,100%{background-position:200% 0}50%{background-position:0 0}}
+      @media (prefers-reduced-motion:reduce){.utsu-profile-portal::before,.utsu-profile-portal img,.utsu-profile-pop-icon::before,.utsu-profile-pop-box::before{animation:none;}}
       .utsu-memory-garden{position:absolute;transform:translate(-50%,-50%);width:164px;height:138px;padding:0;border:0;background:transparent;pointer-events:auto;cursor:pointer;filter:drop-shadow(0 0 22px rgba(159,228,186,.5));}
       .utsu-memory-garden .garden-bloom{position:absolute;left:50%;top:44%;width:82px;height:60px;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(ellipse,rgba(159,228,186,.9) 0 7%,rgba(104,212,178,.48) 18%,rgba(216,168,255,.28) 42%,transparent 72%);animation:gardenBreathe 3.4s ease-in-out infinite;}
       .utsu-memory-garden .garden-spark{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);color:#dcffe8;font-size:31px;text-shadow:0 0 18px #9fe4ba;animation:gardenSpark 2.4s ease-in-out infinite;}
@@ -1048,6 +1086,14 @@
   function renderMemoryEchoes() {
     if (!echoLayer) return;
     echoLayer.innerHTML = '';
+    renderUtsurobaProfilePortal();
+    /* The start room is a calm landing page. Reading echoes, the convergence
+       gate, and the persistent tracker remain available elsewhere and are
+       represented in the Utsuroba profile, but do not crowd the entrance. */
+    if (state.roomId === DATA.startRoom) {
+      if (echoesTrackerEl) echoesTrackerEl.style.display = 'none';
+      return;
+    }
     const restored = readUtsuroba().readingEchoes || {};
     const episodes = window.UTSUROBA_EPISODES || {};
     const iconFor = { lantern: '✦', candy: '●', reflection: '◈', thorn: '◆', ribbon: '✿' };
@@ -1106,6 +1152,68 @@
       echoLayer.appendChild(gardenButton);
     }
     renderEchoesTracker();
+  }
+
+  function closeUtsurobaProfilePopup() {
+    utsuProfileOpen = false;
+    if (utsuProfileOverlay) utsuProfileOverlay.classList.remove('is-open');
+    state.inputLocked = false;
+  }
+
+  function openUtsurobaProfilePopup() {
+    if (utsuProfileOpen || state.roomId !== DATA.startRoom || !utsuProfileOverlay) return;
+    utsuProfileOpen = true;
+    state.inputLocked = true;
+    utsuProfileOverlay.classList.add('is-open');
+    const close = utsuProfileOverlay.querySelector('.utsu-profile-pop-close');
+    if (close) close.focus();
+  }
+
+  function injectUtsurobaProfilePopup() {
+    if (utsuProfileOverlay) return;
+    utsuProfileOverlay = document.createElement('div');
+    utsuProfileOverlay.id = 'utsu-profile-pop-overlay';
+    utsuProfileOverlay.className = 'utsu-profile-pop-overlay';
+    utsuProfileOverlay.innerHTML = `
+      <div class="utsu-profile-pop-box" role="dialog" aria-modal="true" aria-labelledby="utsu-profile-pop-title">
+        <button class="utsu-profile-pop-close" type="button" aria-label="Close / 閉じる">✕</button>
+        <div class="utsu-profile-pop-icon"><img src="./assets/img/utsuroba_icon.png" alt="Utsuroba profile"></div>
+        <p class="utsu-profile-pop-eyebrow">MEMORY ARCHIVE / 記憶の記録</p>
+        <h2 id="utsu-profile-pop-title">Utsuroba profile</h2>
+        <p class="utsu-profile-pop-title-jp">うつろばプロフィール</p>
+        <p class="utsu-profile-pop-copy">Open the record of the memories you have found?<small>見つけた記憶の記録をひらきますか？</small></p>
+        <div class="utsu-profile-pop-actions">
+          <button type="button" data-utsu-profile-open>Open profile<span>プロフィールをひらく</span></button>
+          <button type="button" data-utsu-profile-close>Stay here<span>ここにいる</span></button>
+        </div>
+      </div>`;
+    document.body.appendChild(utsuProfileOverlay);
+    utsuProfileOverlay.querySelector('.utsu-profile-pop-close').addEventListener('click', closeUtsurobaProfilePopup);
+    utsuProfileOverlay.querySelector('[data-utsu-profile-close]').addEventListener('click', closeUtsurobaProfilePopup);
+    utsuProfileOverlay.querySelector('[data-utsu-profile-open]').addEventListener('click', () => {
+      saveCurrentRoom();
+      window.location.href = 'utsuroba-profile.html';
+    });
+    utsuProfileOverlay.addEventListener('click', event => {
+      if (event.target === utsuProfileOverlay) closeUtsurobaProfilePopup();
+    });
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && utsuProfileOpen) closeUtsurobaProfilePopup();
+    });
+  }
+
+  function renderUtsurobaProfilePortal() {
+    if (utsuProfilePortal) { utsuProfilePortal.remove(); utsuProfilePortal = null; }
+    if (!echoLayer || state.roomId !== DATA.startRoom) return;
+    utsuProfilePortal = document.createElement('button');
+    utsuProfilePortal.type = 'button';
+    utsuProfilePortal.className = 'utsu-profile-portal';
+    utsuProfilePortal.style.left = '84%';
+    utsuProfilePortal.style.top = '78%';
+    utsuProfilePortal.setAttribute('aria-label', 'Open Utsuroba profile / うつろばプロフィールをひらく');
+    utsuProfilePortal.innerHTML = '<img src="./assets/img/utsuroba_icon.png" alt=""><span class="utsu-profile-portal-label">Profile<small>記憶の記録</small></span>';
+    utsuProfilePortal.addEventListener('click', event => { event.stopPropagation(); openUtsurobaProfilePopup(); });
+    echoLayer.appendChild(utsuProfilePortal);
   }
 
   /* Persistent "Three Echoes" tracker — Pass 1 (see
@@ -2079,6 +2187,7 @@
     injectReadingJournal();
     injectWeeklyReadingChallenge();
     injectEchoesTracker();
+    injectUtsurobaProfilePopup();
     if (DEV_MODE) { injectDevPanel(); }
     const ro = document.createElement('div'); ro.id = 'rotate-overlay';
     ro.innerHTML = `<span class="rotate-phone">📱</span><div class="rotate-bar"></div><p class="rotate-title">横にして遊ぼう！</p><p class="rotate-sub">うつろばは<strong style="color:#c45fa3">横画面</strong>で遊べるよ。<br>スマホを横にしてね。</p>`;
@@ -2200,6 +2309,7 @@
     setTimeout(() => {
       const nextBg = makeBg(nextRoom.bg); roomLayer.innerHTML = ''; roomLayer.appendChild(nextBg); currentBg = nextBg;
       state.roomId  = exit.to; state.spawnId = exit.spawn || 'default';
+      markVisited();
       saveCurrentRoom();
       arriveInRoom(nextRoom, state.spawnId, exit.dir);
       refreshMemoryEchoes();
@@ -2688,9 +2798,16 @@
   function markVisited() {
     try {
       const d = loadSave();
-      if (d.utsuroba.flags.visited) return;
-      d.utsuroba.flags.visited = true;
-      writeSave(d);
+      if (!d.utsuroba || typeof d.utsuroba !== 'object') d.utsuroba = {};
+      if (!d.utsuroba.flags || typeof d.utsuroba.flags !== 'object') d.utsuroba.flags = {};
+      if (!d.utsuroba.visitedRooms || typeof d.utsuroba.visitedRooms !== 'object') d.utsuroba.visitedRooms = {};
+      let dirty = false;
+      if (!d.utsuroba.flags.visited) { d.utsuroba.flags.visited = true; dirty = true; }
+      if (!d.utsuroba.visitedRooms[state.roomId]) {
+        d.utsuroba.visitedRooms[state.roomId] = Date.now();
+        dirty = true;
+      }
+      if (dirty) writeSave(d);
     } catch(_) {}
   }
 
