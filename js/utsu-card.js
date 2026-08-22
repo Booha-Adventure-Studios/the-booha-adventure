@@ -139,7 +139,7 @@
          variants match each widget's existing identity: default purple
          ("memory"), .is-trail gold/brown ("treasure map"). */
       .utsu-hud-chip{position:fixed;top:14px;z-index:7000;display:flex;align-items:center;gap:9px;
-        padding:8px 13px 8px 15px;max-width:min(300px,calc(100vw - 28px));
+        padding:8px 15px 8px 15px;max-width:min(340px,calc(100vw - 28px));
         background:rgba(9,0,18,.86);border:1px solid rgba(216,168,255,.42);
         box-shadow:0 0 16px rgba(100,30,160,.2);color:#f1d9ff;font-family:'Georgia',serif;
         clip-path:polygon(16px 0,100% 0,100% 100%,0 100%,0 16px);}
@@ -149,20 +149,41 @@
       .utsu-hud-chip.is-trail{background:rgba(29,19,6,.9);border-color:rgba(255,217,102,.55);
         box-shadow:0 0 14px rgba(180,130,10,.22);color:#fff4cf;}
 
-      .utsu-hud-chip-icon{position:relative;flex-shrink:0;width:32px;height:32px;border-radius:50%;
+      .utsu-hud-chip-icon{flex-shrink:0;width:32px;height:32px;border-radius:50%;
         display:flex;align-items:center;justify-content:center;font-size:16px;
         background:rgba(255,255,255,.08);}
       .utsu-hud-chip.is-trail .utsu-hud-chip-icon{background:rgba(255,217,102,.14);}
-      .utsu-hud-chip-count{position:absolute;bottom:-4px;right:-6px;background:#2a1a06;
-        border:1px solid rgba(255,217,102,.6);color:#fff4cf;font:700 9px/1 monospace;
-        padding:2px 4px;border-radius:8px;white-space:nowrap;}
+      /* Round 2 Pass 14 fix: was a 9px badge tucked in the icon's corner —
+         too small to actually read as "a counter" (user feedback: "should
+         be bigger... something that looks like a counter"). Now a proper
+         standalone pill between the icon and the hint text, sized to be
+         legible at a glance. */
+      .utsu-hud-chip-count{flex-shrink:0;background:#2a1a06;
+        border:1.5px solid rgba(255,217,102,.65);color:#fff4cf;font:800 .82rem/1 'Georgia',serif;
+        padding:4px 9px;border-radius:11px;white-space:nowrap;letter-spacing:.02em;}
+      .utsu-hud-chip:not(.is-trail) .utsu-hud-chip-count{background:#1f0f33;border-color:rgba(216,168,255,.6);color:#f1d9ff;}
 
       .utsu-hud-chip-text{display:flex;flex-direction:column;gap:1px;min-width:0;}
-      .utsu-hud-chip-primary{font-size:.74rem;font-weight:700;line-height:1.3;
-        overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-      .utsu-hud-chip-secondary{font-size:.64rem;line-height:1.3;color:rgba(241,217,255,.55);
-        overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+      /* Round 2 Pass 14 fix: was single-line nowrap+ellipsis, so any hint
+         longer than the chip's width just got cut off mid-sentence
+         ("...") — flagged directly as unreadable. Now wraps up to two
+         lines before clamping, so the actual hint text is readable
+         instead of trailing into an ellipsis almost every time. */
+      .utsu-hud-chip-primary{font-size:.76rem;font-weight:700;line-height:1.32;
+        display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+      .utsu-hud-chip-secondary{font-size:.65rem;line-height:1.3;color:rgba(241,217,255,.55);
+        display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
       .utsu-hud-chip.is-trail .utsu-hud-chip-secondary{color:rgba(255,244,207,.6);}
+      /* Round 2 Pass 14: a short, concrete line under the poetic authored
+         hint, shown only when Karasuki has actually worked out which exit
+         leads toward the target room — it points at the matching exit
+         arrow (drawExitArrows(), highlighted gold) rather than repeating
+         vague room-lore text. */
+      .utsu-hud-chip-nav{display:none;align-items:center;gap:4px;margin-top:2px;
+        font-size:.68rem;font-weight:700;color:#ffe9a8;}
+      .utsu-hud-chip-nav.is-shown{display:flex;}
+      .utsu-hud-chip-nav-arrow{display:inline-block;animation:utsu-nav-bounce 1.1s ease-in-out infinite;}
+      @keyframes utsu-nav-bounce{0%,100%{transform:translateX(0);}50%{transform:translateX(3px);}}
 
       .utsu-hud-chip-dots{display:flex;gap:6px;}
       .utsu-hud-chip-dot{width:26px;height:26px;border-radius:50%;padding:0;display:flex;
@@ -175,15 +196,74 @@
       .utsu-hud-chip-dot.motif-candy.is-lit{background:radial-gradient(circle at 35% 30%,#fff0f4,#ff85a1 55%,#c23a5e);box-shadow:0 0 10px rgba(255,133,161,.55);}
       .utsu-hud-chip-dot.motif-reflection.is-lit{background:radial-gradient(circle at 35% 30%,#eafcff,#a8edff 55%,#3b8fbf);box-shadow:0 0 10px rgba(168,237,255,.55);}
 
+      /* ── reward pop: a brief, bigger "you got it" card that appears
+         when an orb/memory piece is actually collected (Round 2 Pass 14
+         — was previously just a sound + the orb quietly vanishing, easy
+         to miss). Motif-themed via --card-ring/--card-glow like the
+         parchment cards above. Auto-removed by its caller after a few
+         seconds; purely decorative, never blocks input. ── */
+      .utsu-reward-pop{position:fixed;top:18%;left:50%;transform:translate(-50%,-14px);z-index:7500;
+        display:flex;align-items:center;gap:12px;padding:14px 22px;border-radius:16px;
+        background:linear-gradient(180deg,#2a1642 0%,#150822 100%);
+        border:2px solid var(--card-ring,#d8a8ff);
+        box-shadow:0 0 0 1px rgba(255,255,255,.06) inset,0 10px 34px rgba(0,0,0,.5),0 0 26px var(--card-glow,rgba(216,168,255,.5));
+        color:#fbeeff;font-family:'Georgia',serif;pointer-events:none;
+        opacity:0;transition:opacity .28s ease,transform .28s ease;}
+      .utsu-reward-pop.is-shown{opacity:1;transform:translate(-50%,0);}
+      .utsu-reward-pop-icon{flex-shrink:0;width:40px;height:40px;border-radius:50%;
+        display:flex;align-items:center;justify-content:center;font-size:20px;
+        background:radial-gradient(circle at 35% 30%,#fff7dd,var(--card-ring,#d8a8ff) 65%,#000 130%);
+        box-shadow:0 0 14px var(--card-glow,rgba(216,168,255,.6));}
+      .utsu-reward-pop-text{display:flex;flex-direction:column;gap:2px;}
+      .utsu-reward-pop-title{font-size:.98rem;font-weight:700;}
+      .utsu-reward-pop-sub{font-size:.76rem;color:rgba(251,238,255,.68);}
+
       @media(max-width:700px){
-        .utsu-hud-chip{top:9px;padding:7px 11px 7px 13px;max-width:calc(100vw - 20px);}
+        .utsu-hud-chip{top:9px;padding:7px 13px 7px 13px;max-width:calc(100vw - 20px);}
         .utsu-hud-chip.is-left{left:9px;}
         .utsu-hud-chip.is-right{right:9px;}
         .utsu-hud-chip-icon{width:28px;height:28px;font-size:14px;}
+        .utsu-hud-chip-count{font-size:.72rem;padding:3px 7px;}
         .utsu-hud-chip-dot{width:24px;height:24px;font-size:11px;}
+        .utsu-reward-pop{top:14%;padding:11px 16px;gap:9px;}
+        .utsu-reward-pop-icon{width:32px;height:32px;font-size:16px;}
+        .utsu-reward-pop-title{font-size:.86rem;}
+        .utsu-reward-pop-sub{font-size:.68rem;}
       }
     `;
     document.head.appendChild(s);
+  }
+
+  /* Round 2 Pass 14: a brief, bigger "you got it" card for an actual
+     pickup — see .utsu-reward-pop above. Before this, collecting a
+     memory piece was just a sound plus the orb quietly vanishing off
+     the map, easy to miss ("an actual collection should be a bigger
+     reward card that pops for a few seconds so the player knows").
+     opts: {icon, title, sub, motif, duration}. Reuses one element
+     across calls rather than creating a new one per pickup; caller
+     doesn't need to track a handle or clean anything up. */
+  var rewardPopEl = null;
+  var rewardPopHideTimer = null;
+  function showRewardPop(opts) {
+    opts = opts || {};
+    if (!rewardPopEl) {
+      rewardPopEl = document.createElement('div');
+      rewardPopEl.className = 'utsu-reward-pop';
+      rewardPopEl.innerHTML =
+        '<div class="utsu-reward-pop-icon" aria-hidden="true"></div>' +
+        '<div class="utsu-reward-pop-text"><span class="utsu-reward-pop-title"></span><span class="utsu-reward-pop-sub"></span></div>';
+      document.body.appendChild(rewardPopEl);
+    }
+    rewardPopEl.style.setProperty('--card-ring', ringFor(opts.motif));
+    rewardPopEl.style.setProperty('--card-glow', glowFor(opts.motif));
+    rewardPopEl.querySelector('.utsu-reward-pop-icon').textContent = opts.icon || '✦';
+    rewardPopEl.querySelector('.utsu-reward-pop-title').textContent = opts.title || '';
+    rewardPopEl.querySelector('.utsu-reward-pop-sub').textContent = opts.sub || '';
+    clearTimeout(rewardPopHideTimer);
+    rewardPopEl.classList.remove('is-shown');
+    void rewardPopEl.offsetWidth; /* force reflow so re-triggering works on back-to-back pickups */
+    requestAnimationFrame(() => rewardPopEl.classList.add('is-shown'));
+    rewardPopHideTimer = setTimeout(() => { rewardPopEl.classList.remove('is-shown'); }, opts.duration || 1900);
   }
 
   injectStyles();
@@ -193,5 +273,6 @@
     motifForDrifter: motifForDrifter,
     ringFor: ringFor,
     glowFor: glowFor,
+    showRewardPop: showRewardPop,
   };
 })();
