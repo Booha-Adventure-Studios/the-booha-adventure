@@ -2198,7 +2198,7 @@ function playKarasukiVideoAndGo(){
   function leaveNow(){
     if(left)return;left=true;
     fade.classList.add('on');
-    setTimeout(()=>{ window.location.href='karasuki.html'; },FADE_MS+100);
+    setTimeout(()=>{ window.location.href='karasuki.html?from=maze'; },FADE_MS+100);
   }
   krVideo.onended=leaveNow;
   krVideo.onerror=leaveNow;
