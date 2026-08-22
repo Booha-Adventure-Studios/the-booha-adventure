@@ -606,7 +606,7 @@
       action.className = 'dc-today-action'; action.type = 'button';
 
       if (today.done) {
-        if (today.first == null) score.textContent = '✓ COMPLETED';
+        if (today.first == null) score.textContent = '✓ RECORDED';
         else score.textContent = today.hasRetakes
           ? today.first + '% → ' + today.best + '%'
           : today.first + '% · FIRST ATTEMPT';
@@ -616,7 +616,7 @@
           ? 'れんしゅう / PRACTICE AGAIN'
           : 'もういちど / RETAKE TODAY';
       } else {
-        score.textContent = 'まだ / NOT COMPLETED';
+        score.textContent = 'まだ / NOT RECORDED';
         meta.textContent = today.curr ? today.curr.toUpperCase() : '5 MINUTES';
         action.textContent = 'きょうのチェック / TAKE TODAY’S CHECK';
       }
