@@ -34,32 +34,6 @@
 <title>Karasuki</title>
 </head>
 <body>
-<script>
-const MONTH_COLORS = [
-  ['#ff3bbd','#ff79d7'], ['#ff6b3b','#ffaa5e'], ['#3bc8ff','#a8edff'],
-  ['#3bff8a','#b2ffda'], ['#ffd700','#fff176'], ['#3b6fff','#90aaff'],
-  ['#a03bff','#d49aff'], ['#ff9f3b','#ffd08a'], ['#3bffee','#a8fff8'],
-  ['#c8ff3b','#e8ffaa'], ['#ff3b6f','#ff85a1'],
-];
-function monthPrimary(w) {
-  return MONTH_COLORS[Math.max(0, Math.min(11, Math.floor((w - 1) / 4)))][0];
-}
-function monthSecondary(w) {
-  return MONTH_COLORS[Math.max(0, Math.min(11, Math.floor((w - 1) / 4)))][1];
-}
-
-const boohaWeek = (() => {
-  try {
-    const cw = window.CALENDAR.getCurrentCurriculumWeek();
-    const w  = window.CALENDAR.getAcademicWeekNumber(cw);
-    if (Number.isInteger(w) && w >= 1) return w;
-  } catch (e) {}
-  return 1;
-})();
-const primary   = monthPrimary(boohaWeek);
-const secondary = monthSecondary(boohaWeek); 
- 
-</script>
 <script src="js/calendar.js"></script>
 <script src="js/core/adventure-core.js"></script>
 <script src="js/core/save-file.js"></script>

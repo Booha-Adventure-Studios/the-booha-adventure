@@ -52,6 +52,6 @@
   },
   "success": "The memory settles. Chagrin is still nervous, but the dark no longer owns the whole story.",
   "successJP": "記憶が落ち着きました。チャグリンはまだ緊張していますが、暗闇だけが物語のすべてではありません。",
-  "worldEcho": {"roomId":"room_03","x":0.53,"y":0.47,"motif":"reflection","label":"A kinder reflection","labelJP":"やさしい反射"},
+  "worldEcho": {"roomId":"room_15","x":0.56,"y":0.48,"motif":"reflection","label":"Chagrin's reflection","labelJP":"チャグリンの反射"},
   "postcard": {"title":"Memory postcard","titleJP":"記憶カード","instruction":"Build a short summary in the best order.","instructionJP":"短いまとめを、よい順番に作りましょう。","chunks":["A shape frightened Chagrin.","It was his reflection.","Understanding it helped him breathe."],"chunksJP":["形がチャグリンを怖がらせた。","それは彼の反射だった。","分かると、彼は息ができた。"],"order":[0,1,2],"savedText":"A shape frightened Chagrin. It was his reflection. Understanding it helped him breathe."}
 }
