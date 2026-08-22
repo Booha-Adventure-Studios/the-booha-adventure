@@ -79,6 +79,10 @@ assert.strictEqual(rolloverGate.isWeeklyWorldGateOpen(), false,
 
 assert.match(karasukiSource, /BoohaUnlockSystem\.isWeeklyWorldGateOpen/,
   'Karasuki must consume the shared weekly gate');
+assert.match(karasukiSource, /function guardWorldEntry\(\)/,
+  'Karasuki must guard untrusted direct entries');
+assert.match(karasukiSource, /params\.get\('from'\) === 'maze'/,
+  'Karasuki must preserve the Maze entry route');
 assert.doesNotMatch(karasukiSource, /weeklyCompletedFor\(c\)\s*>=\s*9/,
   'Karasuki must not keep its own copied nine-game rule');
 assert.match(profileSource, /id="world-doors" hidden/,
@@ -101,6 +105,10 @@ assert.match(karasukiSource, /URLSearchParams\(window\.location\.search\)[\s\S]*
   'Karasuki should distinguish direct profile entry');
 assert.match(utsurobaSource, /getSpawnPoint\(PAGE_ID\)/,
   'Utsuroba should resume its saved room for a profile entry');
+assert.match(utsurobaSource, /function worldGateOpen\(\)/,
+  'Utsuroba must guard direct URL entry with the shared weekly gate');
+assert.match(utsurobaSource, /showLockedWorld\(\)/,
+  'Utsuroba should show a friendly locked state');
 assert.match(utsurobaSource, /href = 'profile\.html'/,
   'Direct Utsuroba entry should provide a return to the Output profile');
 
