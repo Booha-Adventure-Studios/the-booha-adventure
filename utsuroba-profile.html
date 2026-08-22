@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Utsuroba — Memory Archive</title>
+  <link rel="manifest" href="/the-booha-adventure/manifest.json">
+  <meta name="theme-color" content="#090511">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Booha Adventure">
+  <link rel="apple-touch-icon" href="/the-booha-adventure/icons/icon-512.png">
+
+  <style>
+    :root {
+      --night: #090511;
+      --ink: #f7efff;
+      --muted: #b9a9c8;
+      --quiet: #81718f;
+      --violet: #d8a8ff;
+      --violet-soft: rgba(216,168,255,.15);
+      --mint: #9fe4ba;
+      --gold: #ffcb75;
+      --line: rgba(216,168,255,.23);
+      --panel: rgba(20,12,30,.84);
+      --font: Georgia, "Times New Roman", serif;
+      --sans: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    * { box-sizing: border-box; }
+    html { min-height: 100%; background: var(--night); }
+    body {
+      min-height: 100vh;
+      margin: 0;
+      color: var(--ink);
+      font-family: var(--font);
+      background:
+        radial-gradient(circle at 50% -10%, rgba(110,54,160,.34), transparent 42rem),
+        radial-gradient(circle at 10% 70%, rgba(30,115,93,.11), transparent 28rem),
+        linear-gradient(160deg, #11091a 0%, #090511 62%, #050308 100%);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .42;
+      background-image:
+        radial-gradient(circle at 12% 18%, #fff 0 1px, transparent 1.5px),
+        radial-gradient(circle at 83% 13%, #d8a8ff 0 1px, transparent 1.5px),
+        radial-gradient(circle at 71% 67%, #fff 0 1px, transparent 1.5px),
+        radial-gradient(circle at 24% 84%, #9fe4ba 0 1px, transparent 1.5px),
+        radial-gradient(circle at 92% 88%, #fff 0 1px, transparent 1.5px);
+      background-size: 310px 270px, 420px 360px, 510px 430px, 370px 330px, 610px 470px;
+    }
+
+    a { color: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+
+    .page { width: min(1040px, calc(100% - 28px)); margin: 0 auto; padding: 28px 0 64px; position: relative; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 26px; }
+    .back-link {
+      display: inline-flex; align-items: center; gap: 8px; padding: 9px 13px;
+      border: 1px solid var(--line); border-radius: 999px; color: var(--muted);
+      text-decoration: none; font-size: .78rem; background: rgba(255,255,255,.035);
+      transition: border-color .18s, color .18s, transform .18s;
+    }
+    .back-link:hover, .back-link:focus-visible { color: var(--ink); border-color: var(--violet); transform: translateY(-1px); outline: none; }
+    .case-label { color: var(--quiet); font: 700 .62rem/1.3 var(--sans); letter-spacing: .18em; text-transform: uppercase; text-align: right; }
+
+    .hero {
+      position: relative; overflow: hidden; padding: clamp(28px, 6vw, 58px) clamp(22px, 6vw, 72px);
+      border: 1px solid var(--line); border-radius: 24px;
+      background: linear-gradient(145deg, rgba(37,18,52,.9), rgba(10,7,17,.78));
+      box-shadow: 0 25px 80px rgba(0,0,0,.34), inset 0 1px rgba(255,255,255,.06);
+    }
+    .hero::after {
+      content: "✦"; position: absolute; right: 7%; top: 16%; color: var(--violet);
+      opacity: .6; font-size: 2.2rem; text-shadow: 0 0 30px var(--violet);
+    }
+    .eyebrow { margin: 0 0 10px; color: var(--mint); font: 700 .68rem/1.4 var(--sans); letter-spacing: .2em; text-transform: uppercase; }
+    h1 { margin: 0; font-size: clamp(2.5rem, 9vw, 5.8rem); font-weight: 400; letter-spacing: -.045em; line-height: .92; text-shadow: 0 0 28px rgba(216,168,255,.28); }
+    .hero-jp { margin: 14px 0 0; color: #ead8f7; font-size: clamp(1rem, 2.8vw, 1.35rem); letter-spacing: .18em; }
+    .hero-copy { max-width: 590px; margin: 22px 0 0; color: var(--muted); font-size: clamp(.95rem, 2vw, 1.08rem); line-height: 1.65; }
+    .hero-copy small { display: block; margin-top: 6px; color: var(--quiet); font-size: .82em; }
+
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 16px 0 28px; }
+    .stat { min-height: 106px; padding: 17px 13px; border: 1px solid var(--line); border-radius: 16px; background: rgba(20,12,30,.7); }
+    .stat-value { color: var(--gold); font-size: clamp(1.65rem, 5vw, 2.5rem); line-height: 1; }
+    .stat-label { margin-top: 9px; color: var(--muted); font: 700 .65rem/1.4 var(--sans); letter-spacing: .08em; text-transform: uppercase; }
+    .stat-jp { display: block; margin-top: 3px; color: var(--quiet); font: .75rem/1.4 var(--font); }
+
+    .section { margin-top: 26px; }
+    .section-heading { display: flex; align-items: end; justify-content: space-between; gap: 14px; margin: 0 2px 11px; }
+    .section-heading h2 { margin: 0; font-size: clamp(1.25rem, 3vw, 1.7rem); font-weight: 400; }
+    .section-heading p { margin: 0; color: var(--quiet); font: .63rem/1.4 var(--sans); letter-spacing: .12em; text-transform: uppercase; text-align: right; }
+
+    .echo-card { padding: 19px; border: 1px solid rgba(159,228,186,.28); border-radius: 18px; background: linear-gradient(135deg, rgba(22,54,43,.56), rgba(17,13,27,.78)); }
+    .echo-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .echo-title { margin: 0; color: #e1ffe9; font-size: 1.2rem; font-weight: 400; }
+    .echo-title small { display: block; margin-top: 4px; color: rgba(225,255,233,.55); font-size: .72em; }
+    .echo-status { color: var(--mint); font: 700 .7rem/1.3 var(--sans); letter-spacing: .08em; text-align: right; text-transform: uppercase; }
+    .echo-dots { display: flex; gap: 9px; margin-top: 18px; }
+    .echo-dot { width: 18px; height: 18px; border: 1px solid rgba(159,228,186,.54); border-radius: 50%; background: transparent; box-shadow: inset 0 0 0 4px rgba(0,0,0,.18); }
+    .echo-dot.lit { border-color: var(--mint); background: var(--mint); box-shadow: 0 0 15px rgba(159,228,186,.7), inset 0 0 0 4px rgba(16,60,43,.2); }
+    .echo-note { margin: 14px 0 0; color: rgba(225,255,233,.63); font-size: .86rem; line-height: 1.5; }
+
+    .drifter-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .drifter-card { min-height: 174px; padding: 14px; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); position: relative; overflow: hidden; }
+    .drifter-card.is-restored { border-color: rgba(216,168,255,.55); background: linear-gradient(145deg, rgba(52,28,68,.78), var(--panel)); }
+    .drifter-card::after { content: ""; position: absolute; width: 86px; height: 86px; right: -28px; bottom: -30px; border-radius: 50%; background: radial-gradient(circle, rgba(216,168,255,.13), transparent 70%); pointer-events: none; }
+    .drifter-card-top { display: flex; align-items: center; gap: 10px; }
+    .drifter-avatar { width: 55px; height: 55px; object-fit: contain; object-position: center bottom; filter: grayscale(.8) saturate(.65); opacity: .55; }
+    .is-restored .drifter-avatar { filter: none; opacity: 1; }
+    .drifter-name { margin: 0; color: #fff6ff; font-size: .95rem; font-weight: 400; line-height: 1.2; }
+    .drifter-name small { display: block; margin-top: 4px; color: var(--quiet); font-size: .7rem; }
+    .drifter-state { margin: 17px 0 0; color: var(--quiet); font: 700 .61rem/1.4 var(--sans); letter-spacing: .09em; text-transform: uppercase; }
+    .is-restored .drifter-state { color: var(--mint); }
+    .drifter-story { margin: 7px 0 0; color: var(--muted); font-size: .78rem; line-height: 1.42; }
+
+    .lower-grid { display: grid; grid-template-columns: 1.25fr .75fr; gap: 16px; }
+    .panel { padding: 19px; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); }
+    .journal-list { display: grid; gap: 10px; }
+    .journal-entry { padding: 13px 14px; border-left: 2px solid var(--violet); background: rgba(216,168,255,.055); }
+    .journal-entry h3 { margin: 0; color: #fff4ff; font-size: .98rem; font-weight: 400; }
+    .journal-entry h3 small { display: block; margin-top: 4px; color: var(--quiet); font-size: .73rem; }
+    .journal-meta { margin: 9px 0 0; color: var(--muted); font: .67rem/1.4 var(--sans); }
+    .journal-empty { margin: 0; color: var(--muted); font-size: .9rem; line-height: 1.55; }
+    .journal-empty small { display: block; margin-top: 6px; color: var(--quiet); font-size: .82em; }
+    .cabinet-count { color: var(--gold); font-size: 2.7rem; line-height: 1; }
+    .cabinet-label { margin: 9px 0 18px; color: var(--muted); font-size: .9rem; }
+    .word-list { display: flex; flex-wrap: wrap; gap: 6px; }
+    .word { padding: 5px 8px; border: 1px solid rgba(255,203,117,.3); border-radius: 999px; color: #ffe7b2; background: rgba(255,203,117,.07); font-size: .7rem; }
+    .word-more { color: var(--quiet); font-size: .72rem; align-self: center; }
+
+    .footer-note { margin: 30px 0 0; color: var(--quiet); font: .65rem/1.6 var(--sans); letter-spacing: .08em; text-align: center; text-transform: uppercase; }
+    .loading { padding: 44px 20px; color: var(--muted); text-align: center; }
+    .loading small { display: block; margin-top: 6px; color: var(--quiet); }
+
+    @media (max-width: 760px) {
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .drifter-grid { grid-template-columns: repeat(2, 1fr); }
+      .lower-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 460px) {
+      .page { width: min(100% - 18px, 1040px); padding-top: 15px; }
+      .topbar { margin-bottom: 15px; }
+      .case-label { display: none; }
+      .hero { border-radius: 19px; padding: 30px 20px 34px; }
+      .echo-top { align-items: start; flex-direction: column; gap: 10px; }
+      .echo-status { text-align: left; }
+      .drifter-grid { grid-template-columns: 1fr; }
+      .drifter-card { min-height: 140px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="topbar">
+      <a class="back-link" href="profile.html">← Output profile</a>
+      <div class="case-label">UTSUROBA / MEMORY ARCHIVE<br>記憶の保管場所</div>
+    </div>
+
+    <section class="hero" aria-labelledby="page-title">
+      <p class="eyebrow">A room for what stayed</p>
+      <h1 id="page-title">Utsuroba</h1>
+      <p class="hero-jp">うつろば — 記憶の記録</p>
+      <p class="hero-copy">
+        Some memories disappear. Some wait for you to notice them again.
+        This is the record of the ones that stayed.
+        <small>消えてしまう記憶もあれば、もう一度気づかれるのを待つ記憶もあります。</small>
+      </p>
+    </section>
+
+    <section id="profile-content" aria-live="polite">
+      <div class="loading">Opening the archive…<small>記録をひらいています…</small></div>
+    </section>
+
+    <p class="footer-note">The stories stay after the week changes · 物語は週が変わっても残ります</p>
+  </main>
+
+  <script src="./js/token.js"></script>
+  <script src="./js/calendar.js"></script>
+  <script src="./js/core/adventure-core.js"></script>
+  <script src="./js/core/save-file.js"></script>
+  <script src="./js/sync-client.js"></script>
+  <script src="./js/core/game-registry.js"></script>
+  <script src="./js/core/score-system.js"></script>
+  <script src="./js/core/unlock-system.js"></script>
+  <script src="./js/utsuroba-data.js"></script>
+  <script src="./js/utsuroba-episodes.js"></script>
+
+  <script>
+    (() => {
+      'use strict';
+
+      const host = document.getElementById('profile-content');
+
+      function esc(value) {
+        return String(value == null ? '' : value)
+          .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      }
+
+      function getSave() {
+        try {
+          return window.BoohaAdventure && BoohaAdventure.save
+            ? BoohaAdventure.save.load() : {};
+        } catch (_) { return {}; }
+      }
+
+      function getName() {
+        try {
+          const raw = localStorage.getItem('booha_first_name') ||
+            (localStorage.getItem('booha_user_name') || '').split(/\s+/)[0];
+          return raw ? raw.trim().slice(0, 12) : 'traveller';
+        } catch (_) { return 'traveller'; }
+      }
+
+      function episodeFor(id) {
+        return window.UTSUROBA_EPISODES && window.UTSUROBA_EPISODES[id];
+      }
+
+      function restoredFor(utsu, drifter) {
+        return !!(drifter && drifter.episodeId && utsu.readingEchoes && utsu.readingEchoes[drifter.episodeId]);
+      }
+
+      function render() {
+        const data = getSave();
+        const utsu = data.utsuroba || {};
+        const drifters = Array.isArray(window.UTSUROBA_DATA?.drifters)
+          ? window.UTSUROBA_DATA.drifters : [];
+        const echoes = utsu.readingEchoes || {};
+        const journal = Array.isArray(utsu.readingJournal?.entries) ? utsu.readingJournal.entries : [];
+        const cabinet = Array.isArray(utsu.wordCabinet?.entries) ? utsu.wordCabinet.entries : [];
+        const rooms = utsu.visitedRooms && typeof utsu.visitedRooms === 'object'
+          ? Object.keys(utsu.visitedRooms).length : 0;
+        const convergenceIds = Array.isArray(window.UTSUROBA_DATA?.readingConvergence?.requiredDrifterIds)
+          ? window.UTSUROBA_DATA.readingConvergence.requiredDrifterIds : ['ks', 'nto', 'cg'];
+        const echoesFound = convergenceIds.filter(id => {
+          const drifter = drifters.find(item => item.id === id);
+          return restoredFor(utsu, drifter);
+        }).length;
+        const convergenceSeen = !!utsu.flags?.convergenceSeen;
+
+        const echoStatus = convergenceSeen ? 'Garden open' : `${echoesFound} of ${convergenceIds.length} found`;
+        const echoNote = convergenceSeen
+          ? 'The three memories have made a place for something new.'
+          : 'Three memories are looking for the shape they share.';
+
+        const drifterCards = drifters.map(drifter => {
+          const restored = restoredFor(utsu, drifter);
+          const episode = episodeFor(drifter.episodeId);
+          const story = restored
+            ? (episode?.success || 'A memory has settled.')
+            : 'A memory is still waiting somewhere in Utsuroba.';
+          return `<article class="drifter-card${restored ? ' is-restored' : ''}">
+            <div class="drifter-card-top">
+              <img class="drifter-avatar" src="${esc(drifter.sprite1 || '')}" alt="">
+              <h3 class="drifter-name">${esc(drifter.name)}<small>${esc(drifter.nameKanji || '')}</small></h3>
+            </div>
+            <p class="drifter-state">${restored ? 'Memory restored · 記憶が戻った' : 'Still wandering · まださまよう'}</p>
+            <p class="drifter-story">${esc(story)}</p>
+          </article>`;
+        }).join('');
+
+        const journalMarkup = journal.length
+          ? `<div class="journal-list">${journal.slice(0, 8).map(entry => {
+              const episode = episodeFor(entry.episodeId);
+              const drifter = drifters.find(item => item.id === entry.drifterId);
+              return `<article class="journal-entry">
+                <h3>${esc(episode?.title || entry.episodeId || 'Untitled memory')}<small>${esc(episode?.titleJP || drifter?.nameKanji || '')}</small></h3>
+                <p class="journal-meta">${esc(drifter?.name || 'Utsuroba')} · ${entry.masteryLevel || 0} memory marks · ${entry.reviewCount || 1} reading${(entry.reviewCount || 1) === 1 ? '' : 's'}</p>
+              </article>`;
+            }).join('')}</div>`
+          : `<p class="journal-empty">No memory has settled into the journal yet.<small>記憶が戻ると、ここに記録されます。</small></p>`;
+
+        const wordMarkup = cabinet.length
+          ? `<div class="word-list">${cabinet.slice(0, 18).map(entry => `<span class="word">${esc(entry.word)}</span>`).join('')}${cabinet.length > 18 ? `<span class="word-more">+${cabinet.length - 18} more</span>` : ''}</div>`
+          : `<p class="journal-empty">No words collected yet.<small>物語の言葉が、ここに集まります。</small></p>`;
+
+        host.innerHTML = `
+          <section class="stats" aria-label="Utsuroba totals">
+            <div class="stat"><div class="stat-value">${Object.keys(echoes).length}</div><div class="stat-label">Memories restored</div><span class="stat-jp">戻った記憶</span></div>
+            <div class="stat"><div class="stat-value">${journal.length}</div><div class="stat-label">Journal entries</div><span class="stat-jp">読書ノート</span></div>
+            <div class="stat"><div class="stat-value">${cabinet.length}</div><div class="stat-label">Words kept</div><span class="stat-jp">集めた言葉</span></div>
+            <div class="stat"><div class="stat-value">${rooms}</div><div class="stat-label">Rooms visited</div><span class="stat-jp">訪れた部屋</span></div>
+          </section>
+
+          <section class="section">
+            <div class="section-heading"><h2>The Three Echoes</h2><p>三つの残響</p></div>
+            <div class="echo-card">
+              <div class="echo-top"><h3 class="echo-title">A shape shared by three memories<small>${esc(getName())}, you have found ${echoesFound} of ${convergenceIds.length} echoes.</small></h3><div class="echo-status">${esc(echoStatus)}</div></div>
+              <div class="echo-dots" aria-label="${echoesFound} of ${convergenceIds.length} echoes found">${convergenceIds.map((_, i) => `<span class="echo-dot${i < echoesFound ? ' lit' : ''}"></span>`).join('')}</div>
+              <p class="echo-note">${esc(echoNote)}<br><span style="opacity:.65">${convergenceSeen ? '記憶の庭が開いています。' : '三つの記憶が、共通する形を探しています。'}</span></p>
+            </div>
+          </section>
+
+          <section class="section">
+            <div class="section-heading"><h2>The Drifters</h2><p>さまよう人たち</p></div>
+            <div class="drifter-grid">${drifterCards || '<p class="journal-empty">The archive is quiet.</p>'}</div>
+          </section>
+
+          <section class="section lower-grid">
+            <div class="panel"><div class="section-heading"><h2>Reading Journal</h2><p>読書ノート</p></div>${journalMarkup}</div>
+            <div class="panel"><div class="section-heading"><h2>Word Cabinet</h2><p>言葉の戸棚</p></div><div class="cabinet-count">${cabinet.length}</div><p class="cabinet-label">words kept from remembered stories</p>${wordMarkup}</div>
+          </section>`;
+      }
+
+      function boot() {
+        render();
+        if (window.UTSUROBA_EPISODES_READY && typeof window.UTSUROBA_EPISODES_READY.then === 'function') {
+          window.UTSUROBA_EPISODES_READY.then(render).catch(() => {});
+        }
+        document.addEventListener('booha:saved', render);
+        document.addEventListener('booha:weeklyReset', render);
+      }
+
+      if (window.BOOHA_READY) boot();
+      else document.addEventListener('booha:ready', boot, { once: true });
+    })();
+  </script>
+</body>
+</html>
