@@ -24,7 +24,7 @@ const utsurobaSource = fs.readFileSync(
   'utf8'
 );
 
-function gateFor(counts, devFlags = {}) {
+function gateSystemFor(counts, devFlags = {}) {
   let unlockSystem = null;
   const BoohaAdventure = {
     scores: {
@@ -49,7 +49,11 @@ function gateFor(counts, devFlags = {}) {
   vm.runInContext(unlockSource, context, { filename: 'js/core/unlock-system.js' });
 
   assert.ok(unlockSystem, 'unlock system should register itself');
-  return unlockSystem.isWeeklyWorldGateOpen();
+  return unlockSystem;
+}
+
+function gateFor(counts, devFlags = {}) {
+  return gateSystemFor(counts, devFlags).isWeeklyWorldGateOpen();
 }
 
 assert.strictEqual(gateFor({ bc: 8, br: 0, pb: 0 }), false,
@@ -65,6 +69,14 @@ assert.strictEqual(gateFor({ bc: 0, br: 0, pb: 0 }, { __devAllGames: true }), tr
 assert.strictEqual(gateFor({ bc: 0, br: 0, pb: 0 }, { __devUtsuroba: true }), true,
   'developer Utsuroba mode must preserve access');
 
+const rolloverCounts = { bc: 9, br: 0, pb: 0 };
+const rolloverGate = gateSystemFor(rolloverCounts);
+assert.strictEqual(rolloverGate.isWeeklyWorldGateOpen(), true,
+  'the world gate should be open before a weekly reset');
+rolloverCounts.bc = 0;
+assert.strictEqual(rolloverGate.isWeeklyWorldGateOpen(), false,
+  'the world gate should re-lock when the weekly count resets');
+
 assert.match(karasukiSource, /BoohaUnlockSystem\.isWeeklyWorldGateOpen/,
   'Karasuki must consume the shared weekly gate');
 assert.doesNotMatch(karasukiSource, /weeklyCompletedFor\(c\)\s*>=\s*9/,
@@ -79,6 +91,10 @@ assert.match(profileSource, /href="utsuroba\.html\?from=profile"/,
   'Output profile must provide an Utsuroba door when open');
 assert.doesNotMatch(profileSource, /href="juku\.html"/, 
   'Output world doors must not add a Juku route');
+assert.match(profileSource, /booha:weeklyReset/,
+  'Output profile must react to the weekly reset event');
+assert.match(profileSource, /booha:newWeek/,
+  'Output profile must also react to the higher-level week rollover event');
 assert.match(karasukiSource, /getSpawnPoint\(PAGE_ID\)/,
   'Karasuki should resume its saved room for a profile entry');
 assert.match(karasukiSource, /URLSearchParams\(window\.location\.search\)[\s\S]*from.*profile/,
