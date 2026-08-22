@@ -11,6 +11,7 @@ const pages = {
   adventure: fs.readFileSync(path.join(ROOT, 'adventure-profile.html'), 'utf8'),
   utsuroba: fs.readFileSync(path.join(ROOT, 'utsuroba-profile.html'), 'utf8'),
 };
+const utsurobaWorld = fs.readFileSync(path.join(ROOT, 'js/utsuroba.js'), 'utf8');
 
 Object.entries(pages).forEach(([name, source]) => {
   assert.match(source, /aria-label="Output profiles"/, `${name} should expose the Output profile network`);
@@ -27,5 +28,29 @@ assert.match(pages.adventure, /href="adventure-profile\.html" aria-current="page
   'the adventure profile should mark itself as current');
 assert.match(pages.utsuroba, /href="utsuroba-profile\.html" aria-current="page"/,
   'the Utsuroba profile should mark itself as current');
+
+assert.match(pages.log, /animation: outputProfileButtonPulse/,
+  'the log profile navigation should visibly pulse its current button');
+assert.match(pages.adventure, /animation: outputProfileButtonPulse/,
+  'the adventure profile navigation should visibly pulse its current button');
+assert.match(pages.utsuroba, /animation: outputProfileButtonPulse/,
+  'the Utsuroba profile navigation should visibly pulse its current button');
+assert.match(pages.utsuroba, /id="utsuroba-profile-back"[^>]+hidden/,
+  'the Utsuroba profile back button should start hidden until the weekly gate opens');
+assert.match(pages.utsuroba, /isWeeklyWorldGateOpen\(\)/,
+  'the Utsuroba profile back button should consume the shared weekly gate');
+assert.match(pages.utsuroba, /utsuroba\.html\?room=room_03/,
+  'the Utsuroba profile back button should return to the clean start room');
+assert.doesNotMatch(pages.utsuroba, /← Output profile/,
+  'the Utsuroba profile should not show a redundant Output profile back button');
+
+assert.match(utsurobaWorld, /utsuroba_icon\.png/,
+  'the Utsuroba world should use the profile icon at its entrance');
+assert.match(utsurobaWorld, /renderUtsurobaProfilePortal\(\)/,
+  'the Utsuroba world should render its profile doorway');
+assert.match(utsurobaWorld, /state\.roomId === DATA\.startRoom\)[\s\S]*?return;/,
+  'the Utsuroba start room should stay clear of memory overlays');
+assert.match(utsurobaWorld, /visitedRooms\[state\.roomId\]/,
+  'Utsuroba should record each room visited');
 
 console.log('Output profile network tests passed.');
