@@ -63,6 +63,32 @@
     catch (_) { return false; }
   }
 
+  function worldGateOpen() {
+    return window.BoohaUnlockSystem &&
+      typeof BoohaUnlockSystem.isWeeklyWorldGateOpen === 'function'
+      ? BoohaUnlockSystem.isWeeklyWorldGateOpen()
+      : false;
+  }
+
+  function showLockedWorld() {
+    const style = document.createElement('style');
+    style.textContent = `
+      html,body{margin:0;min-height:100%;background:#050308;color:#f7efff;}
+      body{display:grid;place-items:center;font-family:Georgia,'Times New Roman',serif;}
+      .world-lock{width:min(440px,calc(100% - 36px));padding:34px 26px 30px;border:1px solid rgba(216,168,255,.32);border-radius:20px;background:linear-gradient(155deg,rgba(40,18,55,.92),rgba(8,5,15,.96));box-shadow:0 24px 70px rgba(0,0,0,.55),0 0 36px rgba(150,75,210,.12);text-align:center;}
+      .world-lock-mark{font-size:2.2rem;color:#d8a8ff;text-shadow:0 0 24px rgba(216,168,255,.7);}
+      .world-lock h1{margin:12px 0 6px;font-size:clamp(1.35rem,5vw,1.9rem);font-weight:400;letter-spacing:.04em;}
+      .world-lock-jp{margin:0;color:#b9a9c8;font-size:.9rem;letter-spacing:.12em;}
+      .world-lock p{margin:22px auto 0;max-width:31em;color:#c9bad5;font-size:.92rem;line-height:1.65;}
+      .world-lock p small{display:block;margin-top:7px;color:#81718f;font-size:.86em;}
+      .world-lock-actions{display:flex;justify-content:center;flex-wrap:wrap;gap:10px;margin-top:24px;}
+      .world-lock-actions a{padding:9px 15px;border:1px solid rgba(216,168,255,.42);border-radius:999px;color:#f5eaff;text-decoration:none;font-size:.78rem;letter-spacing:.04em;background:rgba(216,168,255,.08);}
+      .world-lock-actions a:hover,.world-lock-actions a:focus-visible{border-color:#d8a8ff;background:rgba(216,168,255,.18);outline:none;}
+    `;
+    document.head.appendChild(style);
+    document.body.innerHTML = '<main class="world-lock" aria-labelledby="world-lock-title"><div class="world-lock-mark" aria-hidden="true">✦</div><h1 id="world-lock-title">Utsuroba</h1><p class="world-lock-jp">うつろば</p><p>This room opens after the 9 games for this week.<small>今週の9つのゲームを終えると、この部屋がひらきます。</small></p><div class="world-lock-actions"><a href="profile.html">Output profile</a><a href="maze.html">Back to Maze</a></div></main>';
+  }
+
   function saveCurrentRoom() {
     try {
       const pageState = window.BoohaAdventure && BoohaAdventure.pageState;
@@ -2672,6 +2698,7 @@
      INIT
   ═══════════════════════════════════════════ */
   function init() {
+    if (!worldGateOpen()) { showLockedWorld(); return; }
     injectStyles();
     buildApp();
     restoreProfileRoom();
