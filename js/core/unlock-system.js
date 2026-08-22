@@ -86,6 +86,31 @@ const BoohaUnlockSystem = (() => {
     return BoohaAdventure.save.load().unlocks || {};
   }
 
+  // ── Weekly Output-world gate ────────────────────────────────────────────
+  /**
+   * Returns true when the student has completed all nine games for at least
+   * one curriculum during the current week.
+   *
+   * This is intentionally separate from the permanent achievement unlocks
+   * above. The Output-world doors are a weekly readiness gate, not a lifetime
+   * achievement, so they must read weeklyCompletedFor() rather than
+   * scores.isCompleted().
+   */
+  function isWeeklyWorldGateOpen() {
+    if (window.__devAllGames || window.__devUtsuroba) return true;
+
+    try {
+      const scores = window.BoohaAdventure && window.BoohaAdventure.scores;
+      if (!scores || typeof scores.weeklyCompletedFor !== 'function') return false;
+
+      return ['bc', 'br', 'pb'].some(curriculum =>
+        scores.weeklyCompletedFor(curriculum) >= 9
+      );
+    } catch (_) {
+      return false;
+    }
+  }
+
   function isUnlocked(id) {
     return !!_getUnlocks()[id];
   }
@@ -179,6 +204,7 @@ const BONUS_GAMES = [
   // ── System interface ──────────────────────────────────────────────────────
   const api = {
     isUnlocked,
+    isWeeklyWorldGateOpen,
     checkAll,
     checkWeeklyBonusGames,
     isBonusGameUnlocked,
