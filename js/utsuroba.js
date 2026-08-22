@@ -837,82 +837,104 @@
          shared .utsu-hud-chip definition in js/utsu-card.js. */
       #utsuroba-reading-journal{position:fixed;inset:0;z-index:9300;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(4,0,12,.86);font-family:Georgia,serif;}
       .reading-journal-card{position:relative;width:min(760px,100%);max-height:calc(100vh - 36px);overflow:auto;padding:clamp(22px,4vw,36px);box-sizing:border-box;border:1px solid rgba(216,168,255,.42);border-radius:16px;background:linear-gradient(160deg,#171020,#0b0712 68%,#130b1b);box-shadow:0 0 70px rgba(100,30,160,.3);animation:utsuPopIn .22s ease-out;}
-      .reading-journal-close{position:absolute;right:14px;top:12px;background:transparent;border:0;color:rgba(255,255,255,.55);font-size:18px;cursor:pointer;padding:8px;}
-      .reading-journal-eyebrow{color:#d8a8ff;font:700 11px/1.4 monospace;letter-spacing:.16em;text-transform:uppercase;margin-bottom:8px;}
-      .reading-journal-card h2{margin:0 42px 5px;color:#fff4ff;font-size:clamp(1.3rem,3vw,2rem);}
-      .reading-journal-card h2 span{display:block;color:rgba(255,220,255,.58);font-size:.5em;font-weight:400;margin-top:4px;}
-      .reading-journal-intro{margin:0 0 18px;color:#f5e8ff;line-height:1.5;font-size:.9rem;}
-      .reading-journal-intro small{display:block;margin-top:3px;color:rgba(245,232,255,.54);font-size:.82em;}
-      .reading-journal-cabinet{margin:0 0 18px;border:1px solid rgba(255,203,117,.24);border-radius:10px;background:rgba(255,203,117,.045);}
-      .reading-journal-cabinet summary{cursor:pointer;padding:10px 12px;color:#ffe0a0;font-size:.78rem;font-weight:700;list-style-position:inside;}
-      .reading-journal-cabinet summary span{display:block;margin:3px 0 0 18px;color:rgba(255,231,178,.52);font-size:.68rem;font-weight:400;}
-      .reading-journal-cabinet-body{padding:0 12px 12px;}
-      .reading-journal-words{display:flex;flex-wrap:wrap;gap:6px;}
-      .reading-journal-word{padding:5px 8px;border:1px solid rgba(255,203,117,.34);border-radius:999px;background:rgba(255,203,117,.08);color:#fff0c9;cursor:pointer;font:700 .7rem Georgia,serif;}
-      .reading-journal-word:hover,.reading-journal-word:focus-visible{background:rgba(255,203,117,.18);border-color:#ffcb75;outline:none;}
-      .reading-journal-word-detail{min-height:30px;margin-top:10px;padding:8px 10px;border-left:2px solid #ffcb75;color:#ffe7b2;font-size:.76rem;line-height:1.4;}
-      .reading-journal-word-detail strong{color:#fff;font-size:.84rem;}
-      .reading-journal-word-detail small{display:block;margin-top:3px;color:rgba(255,231,178,.65);font-size:.9em;}
-      .reading-journal-practice{margin:0 0 18px;padding:13px;border:1px solid rgba(216,168,255,.25);border-radius:10px;background:rgba(216,168,255,.045);}
-      .reading-journal-practice-heading{color:#e4c2ff;font:700 .78rem Georgia,serif;}
-      .reading-journal-practice-heading span{display:block;margin-top:3px;color:rgba(245,232,255,.52);font-size:.88em;font-weight:400;}
-      .reading-journal-practice-intro{margin:8px 0 10px;color:rgba(245,232,255,.7);font-size:.73rem;line-height:1.4;}
-      .reading-journal-practice-intro small{display:block;margin-top:3px;color:rgba(245,232,255,.48);font-size:.9em;}
-      .reading-journal-practice-start{padding:7px 12px;border:1px solid rgba(216,168,255,.48);border-radius:6px;background:rgba(216,168,255,.1);color:#f3ddff;cursor:pointer;font:700 .74rem Georgia,serif;}
-      .reading-journal-practice-start:hover,.reading-journal-practice-start:focus-visible{background:rgba(216,168,255,.2);outline:none;}
+      .reading-journal-close{position:absolute;right:14px;top:12px;background:transparent;border:0;color:rgba(255,255,255,.55);font-size:20px;cursor:pointer;padding:8px;}
+      .reading-journal-eyebrow{display:flex;align-items:center;flex-wrap:wrap;color:#d8a8ff;font:700 12px/1.5 monospace;letter-spacing:.14em;text-transform:uppercase;margin-bottom:9px;}
+      .reading-journal-card h2{margin:0 42px 6px;color:#fff4ff;font-size:clamp(1.4rem,3vw,2.1rem);}
+      .reading-journal-card h2 span{display:block;color:rgba(255,220,255,.62);font-size:.56em;font-weight:400;margin-top:5px;}
+      .reading-journal-intro{margin:0 0 18px;color:#f5e8ff;line-height:1.5;font-size:1rem;}
+      .reading-journal-intro small{display:block;margin-top:4px;color:rgba(255,224,168,.72);font-size:.94em;}
+      .reading-journal-cabinet{margin:0 0 18px;border:1px solid rgba(255,203,117,.28);border-radius:10px;background:rgba(255,203,117,.05);}
+      .reading-journal-cabinet summary{cursor:pointer;padding:11px 13px;color:#ffe0a0;font-size:.88rem;font-weight:700;list-style-position:inside;}
+      .reading-journal-cabinet summary span{display:block;margin:4px 0 0 18px;color:rgba(255,231,178,.6);font-size:.76rem;font-weight:400;}
+      .reading-journal-cabinet-body{padding:0 13px 13px;}
+      .reading-journal-words{display:flex;flex-wrap:wrap;gap:7px;}
+      /* Higher-contrast pill: solid-feeling fill + a real border, so a word
+         chip visibly separates from the cabinet's own faint amber wash
+         instead of reading as the same tint at a slightly different alpha. */
+      .reading-journal-word{padding:7px 12px;border:1.5px solid rgba(255,203,117,.8);border-radius:999px;background:rgba(255,203,117,.24);color:#fff8e6;cursor:pointer;font:700 .82rem Georgia,serif;box-shadow:0 1px 0 rgba(0,0,0,.15);}
+      .reading-journal-word:hover,.reading-journal-word:focus-visible{background:#ffcb75;color:#241507;border-color:#ffcb75;outline:none;}
+      .reading-journal-word-detail{min-height:32px;margin-top:11px;padding:9px 11px;border-left:3px solid #ffcb75;color:#ffe7b2;font-size:.88rem;line-height:1.4;background:rgba(255,203,117,.05);}
+      .reading-journal-word-detail strong{color:#fff;font-size:.96rem;}
+      .reading-journal-word-detail small{display:block;margin-top:4px;color:rgba(255,231,178,.75);font-size:.92em;}
+      .reading-journal-practice{margin:0 0 18px;padding:14px;border:1px solid rgba(216,168,255,.28);border-radius:10px;background:rgba(216,168,255,.05);}
+      .reading-journal-practice-heading{color:#e4c2ff;font:700 .9rem Georgia,serif;}
+      .reading-journal-practice-heading span{display:block;margin-top:4px;color:rgba(245,232,255,.6);font-size:.86em;font-weight:400;}
+      .reading-journal-practice-intro{margin:9px 0 11px;color:rgba(245,232,255,.8);font-size:.84rem;line-height:1.4;}
+      .reading-journal-practice-intro small{display:block;margin-top:4px;color:rgba(245,232,255,.58);font-size:.94em;}
+      .reading-journal-practice-start{padding:8px 13px;border:1px solid rgba(216,168,255,.5);border-radius:6px;background:rgba(216,168,255,.12);color:#f3ddff;cursor:pointer;font:700 .84rem Georgia,serif;}
+      .reading-journal-practice-start:hover,.reading-journal-practice-start:focus-visible{background:rgba(216,168,255,.22);outline:none;}
       .reading-journal-practice-start:disabled{cursor:not-allowed;opacity:.45;}
-      .reading-word-practice-panel{margin-top:12px;padding:12px;border:1px solid rgba(255,203,117,.28);border-radius:8px;background:rgba(255,203,117,.055);}
-      .reading-word-practice-progress{color:rgba(255,231,178,.58);font:700 .66rem monospace;letter-spacing:.1em;text-transform:uppercase;}
-      .reading-word-practice-word{margin:9px 0;color:#fff;font-size:1.18rem;font-weight:700;}
-      .reading-word-practice-prompt{margin:0 0 9px;color:#ffe7b2;font-size:.78rem;line-height:1.4;}
-      .reading-word-practice-prompt small{display:block;margin-top:3px;color:rgba(255,231,178,.55);font-size:.9em;}
-      .reading-word-practice-options{display:grid;gap:7px;}
-      .reading-word-practice-option{padding:8px 9px;text-align:left;border:1px solid rgba(255,203,117,.3);border-radius:6px;background:rgba(255,255,255,.05);color:#fff;cursor:pointer;font:inherit;font-size:.75rem;line-height:1.35;}
-      .reading-word-practice-option:hover,.reading-word-practice-option:focus-visible{background:rgba(255,203,117,.14);border-color:#ffcb75;outline:none;}
-      .reading-word-practice-option small{display:block;margin-top:3px;color:rgba(255,231,178,.55);font-size:.9em;}
-      .reading-word-practice-feedback{margin-top:10px;padding:8px 9px;border-left:3px solid #ffcb75;color:#ffe7b2;font-size:.76rem;line-height:1.4;}
-      .reading-word-practice-feedback small{display:block;margin-top:3px;color:rgba(255,231,178,.58);font-size:.9em;}
-      .reading-word-practice-next{margin-top:9px;padding:6px 10px;border:1px solid rgba(216,168,255,.45);border-radius:6px;background:rgba(216,168,255,.1);color:#f3ddff;cursor:pointer;font:700 .72rem Georgia,serif;}
+      .reading-word-practice-panel{margin-top:12px;padding:13px;border:1px solid rgba(255,203,117,.32);border-radius:8px;background:rgba(255,203,117,.06);}
+      .reading-word-practice-progress{color:rgba(255,231,178,.68);font:700 .72rem monospace;letter-spacing:.1em;text-transform:uppercase;}
+      .reading-word-practice-word{margin:10px 0;color:#fff;font-size:1.28rem;font-weight:700;}
+      .reading-word-practice-prompt{margin:0 0 10px;color:#ffe7b2;font-size:.88rem;line-height:1.4;}
+      .reading-word-practice-prompt small{display:block;margin-top:4px;color:rgba(255,231,178,.65);font-size:.94em;}
+      .reading-word-practice-options{display:grid;gap:8px;}
+      .reading-word-practice-option{padding:9px 11px;text-align:left;border:1px solid rgba(255,203,117,.34);border-radius:6px;background:rgba(255,255,255,.06);color:#fff;cursor:pointer;font:inherit;font-size:.86rem;line-height:1.35;}
+      .reading-word-practice-option:hover,.reading-word-practice-option:focus-visible{background:rgba(255,203,117,.16);border-color:#ffcb75;outline:none;}
+      .reading-word-practice-option small{display:block;margin-top:4px;color:rgba(255,231,178,.62);font-size:.92em;}
+      .reading-word-practice-feedback{margin-top:11px;padding:9px 11px;border-left:3px solid #ffcb75;color:#ffe7b2;font-size:.86rem;line-height:1.4;}
+      .reading-word-practice-feedback small{display:block;margin-top:4px;color:rgba(255,231,178,.68);font-size:.92em;}
+      .reading-word-practice-next{margin-top:10px;padding:7px 12px;border:1px solid rgba(216,168,255,.48);border-radius:6px;background:rgba(216,168,255,.12);color:#f3ddff;cursor:pointer;font:700 .82rem Georgia,serif;}
       .reading-journal-list{display:grid;gap:11px;}
-      .reading-journal-entry{padding:14px;border:1px solid rgba(216,168,255,.22);border-radius:10px;background:rgba(255,255,255,.045);}
-      .reading-journal-entry h3{margin:0;color:#fff;font-size:1rem;line-height:1.35;}
-      .reading-journal-entry h3 span{display:block;margin-top:3px;color:rgba(255,231,178,.58);font-size:.72rem;font-weight:400;}
-      /* Plain status caption, not a pill — it used to be bordered/rounded
-         like .reading-journal-review below it, which made a status line and
-         the actual action button look like two competing buttons. */
-      .reading-journal-mastery{display:block;margin-top:6px;color:rgba(255,231,178,.72);font-size:.7rem;font-weight:700;letter-spacing:.02em;}
-      .reading-journal-mastery small{margin-left:5px;color:rgba(255,231,178,.58);font-size:.9em;font-weight:400;}
-      .reading-journal-meta{margin:7px 0 9px;color:rgba(245,232,255,.54);font-size:.73rem;line-height:1.4;}
-      .reading-journal-postcard{margin:0 0 9px;padding:6px 8px;border:1px solid rgba(216,168,255,.34);border-radius:7px;background:rgba(216,168,255,.05);color:#e4c2ff;font-size:.66rem;}
+      /* Collapsible entry: a <details>/<summary> pair (same pattern as the
+         Word Cabinet above) so each memory shows only its title + status by
+         default, and the meta/postcard/vocab/review action only render once
+         a kid taps it open — no custom JS state, the browser handles it. */
+      .reading-journal-entry{border:1px solid rgba(216,168,255,.24);border-radius:10px;background:rgba(255,255,255,.05);overflow:hidden;}
+      .reading-journal-entry-summary{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:14px;cursor:pointer;list-style:none;}
+      .reading-journal-entry-summary::-webkit-details-marker{display:none;}
+      .reading-journal-entry-summary::after{content:'▸';flex:0 0 auto;margin-top:2px;color:rgba(255,255,255,.42);font-size:.9rem;transition:transform .15s ease;}
+      .reading-journal-entry[open] .reading-journal-entry-summary::after{transform:rotate(90deg);}
+      .reading-journal-entry-summary:hover{background:rgba(255,255,255,.04);}
+      .reading-journal-entry-title h3{margin:0;color:#fff;font-size:1.08rem;line-height:1.35;}
+      .reading-journal-entry-title h3 span{display:block;margin-top:4px;color:rgba(255,231,178,.68);font-size:.82rem;font-weight:400;}
+      /* Status chip: color now carries meaning (gray/amber/green = not
+         started/in progress/mastered), so it stands out from the plain text
+         around it instead of every status line sharing one faint tint. */
+      .reading-journal-status{flex:0 0 auto;padding:5px 11px;border-radius:999px;font-size:.72rem;font-weight:700;letter-spacing:.02em;white-space:nowrap;}
+      .reading-journal-status small{display:block;margin-top:3px;font-size:.9em;font-weight:400;opacity:.9;}
+      .reading-journal-status.level-0{border:1px solid rgba(255,255,255,.24);background:rgba(255,255,255,.07);color:rgba(255,255,255,.8);}
+      .reading-journal-status.level-1{border:1px solid rgba(255,203,117,.6);background:rgba(255,203,117,.16);color:#ffcb75;}
+      .reading-journal-status.level-2{border:1px solid rgba(159,228,186,.6);background:rgba(159,228,186,.16);color:#9fe4ba;}
+      .reading-journal-entry-body{padding:0 14px 14px;}
+      .reading-journal-meta{margin:0 0 10px;color:rgba(245,232,255,.66);font-size:.84rem;line-height:1.4;}
+      .reading-journal-postcard{margin:0 0 10px;padding:7px 9px;border:1px solid rgba(216,168,255,.38);border-radius:7px;background:rgba(216,168,255,.06);color:#e4c2ff;font-size:.76rem;}
       .reading-journal-postcard summary{cursor:pointer;font-weight:700;}
-      .reading-journal-postcard p{margin:6px 0 0;color:rgba(245,232,255,.7);font-size:.72rem;line-height:1.4;}
-      .reading-journal-vocab{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:11px;}
-      .reading-journal-vocab span{padding:4px 7px;border:1px solid rgba(216,168,255,.27);border-radius:999px;color:#e4c2ff;font-size:.68rem;}
-      .reading-journal-review{padding:7px 12px;border:1px solid #ffcb75;border-radius:6px;background:rgba(255,203,117,.1);color:#ffe7b2;cursor:pointer;font:700 .76rem Georgia,serif;}
-      .reading-journal-review:hover,.reading-journal-review:focus-visible{background:rgba(255,203,117,.2);outline:none;}
-      .reading-journal-empty,.reading-journal-loading{padding:28px 12px;text-align:center;color:#f1dcff;line-height:1.55;}
-      .reading-journal-empty small,.reading-journal-loading small{display:block;color:rgba(245,232,255,.52);font-size:.8em;}
-      @media(max-width:700px){#utsuroba-reading-journal-button{top:10px;right:10px;padding:7px 10px;font-size:10px}.reading-journal-card{padding:21px 16px}.reading-journal-card h2{font-size:1.35rem}}
+      .reading-journal-postcard p{margin:7px 0 0;color:rgba(245,232,255,.8);font-size:.82rem;line-height:1.4;}
+      .reading-journal-vocab{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;}
+      .reading-journal-vocab span{padding:5px 9px;border:1px solid rgba(216,168,255,.34);border-radius:999px;color:#e9cfff;font-size:.78rem;}
+      .reading-journal-review{padding:8px 13px;border:1px solid #ffcb75;border-radius:6px;background:rgba(255,203,117,.12);color:#ffe7b2;cursor:pointer;font:700 .86rem Georgia,serif;}
+      .reading-journal-review:hover,.reading-journal-review:focus-visible{background:rgba(255,203,117,.22);outline:none;}
+      .reading-journal-empty,.reading-journal-loading{padding:28px 12px;text-align:center;color:#f1dcff;line-height:1.55;font-size:1rem;}
+      .reading-journal-empty small,.reading-journal-loading small{display:block;margin-top:3px;color:rgba(255,224,168,.7);font-size:.86em;}
+      @media(max-width:700px){#utsuroba-reading-journal-button{top:10px;right:10px;padding:7px 10px;font-size:10px}.reading-journal-card{padding:21px 16px}.reading-journal-card h2{font-size:1.4rem}}
       #utsuroba-weekly-reading{position:fixed;inset:0;z-index:9300;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(1,12,9,.88);font-family:Georgia,serif;}
       .weekly-reading-card{position:relative;width:min(700px,100%);max-height:calc(100vh - 36px);overflow:auto;padding:clamp(22px,4vw,36px);box-sizing:border-box;border:1px solid rgba(159,228,186,.46);border-radius:16px;background:linear-gradient(160deg,#10221b,#08120f 68%,#101a19);box-shadow:0 0 70px rgba(39,153,112,.3);animation:utsuPopIn .22s ease-out;}
-      .weekly-reading-close{position:absolute;right:14px;top:12px;background:transparent;border:0;color:rgba(255,255,255,.58);font-size:18px;cursor:pointer;padding:8px;}
-      .weekly-reading-eyebrow{color:#9fe4ba;font:700 11px/1.4 monospace;letter-spacing:.16em;text-transform:uppercase;margin-bottom:8px;}
-      .weekly-reading-card h2{margin:0 42px 6px;color:#effff4;font-size:clamp(1.35rem,3vw,2rem);}
-      .weekly-reading-card h2 span{display:block;color:rgba(215,255,227,.6);font-size:.5em;font-weight:400;margin-top:4px;}
-      .weekly-reading-intro{margin:0 0 17px;color:#e5fff0;font-size:.88rem;line-height:1.5;}
-      .weekly-reading-intro small{display:block;margin-top:3px;color:rgba(229,255,240,.56);font-size:.82em;}
-      .weekly-reading-goals{display:grid;gap:8px;margin:0 0 17px;}
-      .weekly-reading-goal{padding:10px 11px;border:1px solid rgba(159,228,186,.24);border-radius:8px;background:rgba(255,255,255,.045);}
-      .weekly-reading-goal.is-complete{border-color:rgba(159,228,186,.62);background:rgba(159,228,186,.09);}
-      .weekly-reading-goal-head{display:flex;justify-content:space-between;gap:10px;color:#fff;font-size:.78rem;line-height:1.35;}
-      .weekly-reading-goal-head strong{color:#d7ffe3;}
-      .weekly-reading-goal-head span{color:rgba(215,255,227,.58);font:700 .68rem monospace;white-space:nowrap;}
-      .weekly-reading-goal small{display:block;margin-top:3px;color:rgba(229,255,240,.52);font-size:.84em;}
-      .weekly-reading-bar{height:5px;margin-top:8px;border-radius:999px;background:rgba(255,255,255,.1);overflow:hidden;}
+      .weekly-reading-close{position:absolute;right:14px;top:12px;background:transparent;border:0;color:rgba(255,255,255,.58);font-size:20px;cursor:pointer;padding:8px;}
+      .weekly-reading-eyebrow{display:flex;align-items:center;flex-wrap:wrap;color:#9fe4ba;font:700 12px/1.5 monospace;letter-spacing:.14em;text-transform:uppercase;margin-bottom:9px;}
+      /* Trail palette: green is now reserved for the "done" signal (the
+         checkmark badge, the complete-goal border, the progress fill) —
+         everything else (title, body copy, incomplete-goal borders) moved
+         to warm neutrals so green actually reads as a distinct accent
+         instead of every line on the card being another shade of mint. */
+      .weekly-reading-card h2{margin:0 42px 6px;color:#fffaf2;font-size:clamp(1.4rem,3vw,2.1rem);}
+      .weekly-reading-card h2 span{display:block;color:rgba(255,224,168,.78);font-size:.56em;font-weight:400;margin-top:5px;}
+      .weekly-reading-intro{margin:0 0 17px;color:#f7f2e6;font-size:1rem;line-height:1.5;}
+      .weekly-reading-intro small{display:block;margin-top:4px;color:rgba(255,224,168,.72);font-size:.94em;}
+      .weekly-reading-goals{display:grid;gap:9px;margin:0 0 17px;}
+      .weekly-reading-goal{padding:11px 12px;border:1px solid rgba(255,255,255,.16);border-radius:8px;background:rgba(255,255,255,.045);}
+      .weekly-reading-goal.is-complete{border-color:rgba(159,228,186,.68);background:rgba(159,228,186,.1);}
+      .weekly-reading-goal-head{display:flex;justify-content:space-between;gap:10px;color:#fff;font-size:.9rem;line-height:1.35;}
+      .weekly-reading-goal-head strong{color:#fff;}
+      .weekly-reading-goal.is-complete .weekly-reading-goal-head strong{color:#d7ffe3;}
+      .weekly-reading-goal-head span{color:rgba(255,255,255,.6);font:700 .74rem monospace;white-space:nowrap;}
+      .weekly-reading-goal small{display:block;margin-top:4px;color:rgba(255,224,168,.68);font-size:.92em;}
+      .weekly-reading-bar{height:6px;margin-top:9px;border-radius:999px;background:rgba(255,255,255,.12);overflow:hidden;}
       .weekly-reading-bar i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#6fd09e,#d7ffe3);}
-      .weekly-reading-complete{margin:0;padding:10px;border-left:3px solid #9fe4ba;color:#d7ffe3;font-size:.78rem;line-height:1.45;}
-      .weekly-reading-complete small{display:block;margin-top:3px;color:rgba(215,255,227,.58);font-size:.9em;}
-      .weekly-reading-close-btn{margin-top:17px;padding:9px 18px;border:1px solid #9fe4ba;border-radius:7px;background:rgba(159,228,186,.12);color:#d7ffe3;cursor:pointer;font:700 .78rem Georgia,serif;}
+      .weekly-reading-complete{margin:0;padding:11px;border-left:3px solid #9fe4ba;color:#d7ffe3;font-size:.9rem;line-height:1.45;background:rgba(159,228,186,.06);}
+      .weekly-reading-complete small{display:block;margin-top:4px;color:rgba(215,255,227,.68);font-size:.92em;}
+      .weekly-reading-close-btn{margin-top:17px;padding:10px 19px;border:1px solid #9fe4ba;border-radius:7px;background:rgba(159,228,186,.14);color:#d7ffe3;cursor:pointer;font:700 .86rem Georgia,serif;}
       @media(max-width:700px){#utsuroba-reading-challenge-button{top:51px;right:10px;padding:7px 10px;font-size:10px}.weekly-reading-card{padding:21px 16px}.weekly-reading-close,.weekly-reading-close-btn,.reading-journal-close{min-width:44px;min-height:44px}}
       /* ══ DRIFTER PANEL ══
          Round 2 Pass 1: the drifter-panel-specific CSS that used to live
@@ -1765,12 +1787,15 @@
         // button beneath it read as two copies of one instruction — reworded
         // the status side to describe state, not repeat the call to action.
         const mastery = masteryLevel >= 2
-          ? { en: 'Mastered', jp: `${R('習得','しゅうとく')}${R('済','ず')}み`, action: `Check again / ${R('習得','しゅうとく')}チェック` }
+          ? { en: 'Mastered', jp: `${R('習得','しゅうとく')}${R('済','ず')}み`, action: `Check again / ${R('習得','しゅうとく')}チェック`, level: 2 }
           : masteryLevel === 1
-            ? { en: 'Ready to try alone', jp: `${R('自力','じりき')}${R('復習','ふくしゅう')}の${R('準備','じゅんび')}${R('完了','かんりょう')}`, action: `Try without hints / ヒントなしで${R('挑戦','ちょうせん')}` }
-            : { en: 'Not started yet', jp: `まだ${R('挑戦','ちょうせん')}していません`, action: `Read with help / ${R('案内','あんない')}${R('付','つ')}き${R('復習','ふくしゅう')}` };
+            ? { en: 'Ready to try alone', jp: `${R('自力','じりき')}${R('復習','ふくしゅう')}の${R('準備','じゅんび')}${R('完了','かんりょう')}`, action: `Try without hints / ヒントなしで${R('挑戦','ちょうせん')}`, level: 1 }
+            : { en: 'Not started yet', jp: `まだ${R('挑戦','ちょうせん')}していません`, action: `Read with help / ${R('案内','あんない')}${R('付','つ')}き${R('復習','ふくしゅう')}`, level: 0 };
         const postcardNote = entry.postcard ? `<details class="reading-journal-postcard"><summary>Postcard saved / ${R('文章','ぶんしょう')}カードあり</summary><p>${escapeHTML(entry.postcard.text)}</p></details>` : '';
-        return `<article class="reading-journal-entry"><h3>${escapeHTML(episode.title)}<span>${readingJournalTitleJP(episode)}</span></h3><div class="reading-journal-mastery">${mastery.en}<small>${mastery.jp}</small></div><p class="reading-journal-meta">${reviews} reading ${reviews === 1 ? 'completed' : 'sessions'} · ${escapeHTML(episode.eyebrow)}<br>${reviews === 1 ? `1${R('回','かい')}${R('読了','どくりょう')}` : `${reviews}${R('回','かい')}${R('読','よ')}み${R('返','かえ')}しました`}</p>${postcardNote}${words ? `<div class="reading-journal-vocab" aria-label="Vocabulary">${words}</div>` : ''}<button class="reading-journal-review" type="button" data-journal-entry="${index}">${mastery.action}</button></article>`;
+        // Collapsed by default: a <details>/<summary> pair shows only the
+        // title and status chip until a kid taps it — the meta line,
+        // postcard, vocab pills, and review button only render once open.
+        return `<details class="reading-journal-entry"><summary class="reading-journal-entry-summary"><div class="reading-journal-entry-title"><h3>${escapeHTML(episode.title)}<span>${readingJournalTitleJP(episode)}</span></h3></div><span class="reading-journal-status level-${mastery.level}">${mastery.en}<small>${mastery.jp}</small></span></summary><div class="reading-journal-entry-body"><p class="reading-journal-meta">${reviews} reading ${reviews === 1 ? 'completed' : 'sessions'} · ${escapeHTML(episode.eyebrow)}<br>${reviews === 1 ? `1${R('回','かい')}${R('読了','どくりょう')}` : `${reviews}${R('回','かい')}${R('読','よ')}み${R('返','かえ')}しました`}</p>${postcardNote}${words ? `<div class="reading-journal-vocab" aria-label="Vocabulary">${words}</div>` : ''}<button class="reading-journal-review" type="button" data-journal-entry="${index}">${mastery.action}</button></div></details>`;
       }).join('');
       list.querySelectorAll('[data-journal-entry]').forEach(button => button.addEventListener('click', () => {
         const entry = entries[Number(button.dataset.journalEntry)];

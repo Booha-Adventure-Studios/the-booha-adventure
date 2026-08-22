@@ -75,13 +75,21 @@
     var style = document.createElement('style');
     style.id = 'utsu-furigana-style';
     style.textContent =
+      // A fixed px floor via clamp() keeps the reading legible even inside
+      // small captions — the old .55em-of-a-small-parent compounded down to
+      // ~6px in some spots, which is below what anyone can comfortably read.
       'ruby{ruby-position:over;}' +
-      'ruby rt{font-size:.55em;opacity:.82;user-select:none;font-family:inherit;}' +
+      'ruby rt{font-size:clamp(11px,.85em,16px);opacity:.92;user-select:none;font-family:inherit;letter-spacing:0;}' +
       'html.utsu-furigana-off ruby rt{display:none;}' +
-      '.utsu-furi-toggle{display:inline-flex;gap:4px;margin-left:.6em;vertical-align:middle;}' +
-      '.utsu-furi-btn{padding:2px 9px;border-radius:999px;border:1px solid currentColor;background:transparent;color:inherit;opacity:.5;font:700 .6rem inherit;line-height:1.6;cursor:pointer;-webkit-tap-highlight-color:transparent;}' +
-      '.utsu-furi-btn.active{opacity:1;background:rgba(255,255,255,.14);}' +
-      '.utsu-furi-btn:hover{opacity:.85;}';
+      '.utsu-furi-toggle{display:inline-flex;gap:5px;margin-left:.6em;vertical-align:middle;}' +
+      // Fixed amber palette instead of currentColor — the toggle sits inside
+      // both a purple panel and a green one, and "inherit the ambient text
+      // color at 50% opacity" made it nearly invisible in both. Amber is
+      // this site's own accent for "the thing you can interact with," used
+      // the same way on the journal button, word pills, and review button.
+      '.utsu-furi-btn{padding:3px 10px;border-radius:999px;border:1.5px solid rgba(255,203,117,.55);background:rgba(20,14,8,.55);color:#ffe7b2;opacity:.75;font:700 .68rem inherit;line-height:1.6;cursor:pointer;-webkit-tap-highlight-color:transparent;letter-spacing:.02em;}' +
+      '.utsu-furi-btn.active{opacity:1;background:#ffcb75;border-color:#ffcb75;color:#241507;}' +
+      '.utsu-furi-btn:hover{opacity:1;}';
     document.head.appendChild(style);
   }
 
