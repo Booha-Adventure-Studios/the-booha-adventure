@@ -185,6 +185,7 @@ window.UTSUROBA_DATA = {
       nameKanji   : 'ブライアン・ハーパー',
      
       greeting    : ['Hey…', 'You made it this far, huh.', 'I just got here myself.', 'Come back later.'],
+      questLines  : ['Hey…', 'You made it this far, huh.', 'I just got here myself.', 'I’m not ready to settle in yet.', 'But I did lose a memory.', 'Could you help me find it?'],
       sprite1     : './assets/img/drifters/bryan_harper-1.png',
       sprite2     : './assets/img/drifters/bryan_harper-2.png',
       episodeId   : 'bh_window_v1',

@@ -229,10 +229,10 @@ const HAPPY_HOUSE_PORTAL = {
   /* ═══════════════════════════════════════════
      ORB SYSTEM
   ═══════════════════════════════════════════ */
-  const MEMORY_BOX_W       = 34;
-  const MEMORY_BOX_H       = 28;
-  const MEMORY_BOX_HIT_R   = 30;
-  const MEMORY_BOX_GLOW    = 42;
+  const MEMORY_BOX_W       = 58;
+  const MEMORY_BOX_H       = 43;
+  const MEMORY_BOX_HIT_R   = 36;
+  const MEMORY_BOX_GLOW    = 46;
 
   /* Each evidence pickup is a locked memory box, not another round orb.
      The motif tint keeps the story identity while the lid, clasp, and
@@ -499,56 +499,31 @@ const HAPPY_HOUSE_PORTAL = {
       const ox = orb.x, oy = orb.y + bob;
       ctx.save();
       const boxW = MEMORY_BOX_W + pulse * 2;
-      const boxH = MEMORY_BOX_H + pulse * 1.3;
+      const boxH = MEMORY_BOX_H + pulse * 1.5;
       const left = ox - boxW / 2, top = oy - boxH / 2;
-      const body = ctx.createLinearGradient(left, top, left, top + boxH);
-      body.addColorStop(0, colors.coreHi);
-      body.addColorStop(0.42, colors.coreMid);
-      body.addColorStop(1, colors.coreLo);
 
-      ctx.globalAlpha = 0.28 + pulse * 0.16;
-      ctx.fillStyle = `rgba(${colors.glowRGBA},0.34)`;
+      // A soft motif-tinted aura keeps the chest legible against dark rooms.
+      ctx.globalAlpha = 0.18 + pulse * 0.08;
+      ctx.fillStyle = `rgba(${colors.glowRGBA},1)`;
       ctx.shadowBlur = MEMORY_BOX_GLOW + pulse2 * 12;
       ctx.shadowColor = colors.shadow;
-      roundedRectPath(left - 3, top - 3, boxW + 6, boxH + 6, 6);
-      ctx.fill();
-
-      ctx.globalAlpha = 0.96;
-      ctx.shadowBlur = 16 + pulse2 * 8;
-      ctx.fillStyle = body;
-      roundedRectPath(left, top, boxW, boxH, 5);
-      ctx.fill();
-
-      ctx.shadowBlur = 0;
-      ctx.globalAlpha = 0.9;
-      ctx.fillStyle = colors.coreHi;
       ctx.beginPath();
-      ctx.moveTo(left + 2, top + 2);
-      ctx.lineTo(ox, top - 5 - pulse * 1.5);
-      ctx.lineTo(left + boxW - 2, top + 2);
-      ctx.closePath();
+      ctx.ellipse(ox, oy + boxH * 0.1, boxW * 0.72, boxH * 0.62, 0, 0, Math.PI * 2);
       ctx.fill();
 
-      ctx.globalAlpha = 0.72;
-      ctx.strokeStyle = colors.coreLo;
-      ctx.lineWidth = 1.5;
-      ctx.beginPath(); ctx.moveTo(left + 4, oy); ctx.lineTo(left + boxW - 4, oy); ctx.stroke();
-
-      ctx.globalAlpha = 0.98;
-      ctx.fillStyle = '#fff8d6';
-      roundedRectPath(ox - 5, oy - 2, 10, 9, 2);
-      ctx.fill();
-      ctx.strokeStyle = colors.coreLo;
-      ctx.lineWidth = 1;
-      ctx.stroke();
-      ctx.fillStyle = colors.coreLo;
-      ctx.beginPath(); ctx.arc(ox, oy + 1, 1.5, 0, Math.PI * 2); ctx.fill();
-      ctx.fillRect(ox - 0.75, oy + 1, 1.5, 4);
-
-      ctx.globalAlpha = 0.72 + pulse * 0.18;
-      ctx.fillStyle = '#ffffff';
-      roundedRectPath(left + 5, top + 5, 7, 3, 1.5);
-      ctx.fill();
+      if (memoryBoxImg.complete && memoryBoxImg.naturalWidth > 0) {
+        ctx.globalAlpha = 0.96;
+        ctx.shadowBlur = 17 + pulse2 * 9;
+        ctx.shadowColor = colors.shadow;
+        ctx.drawImage(memoryBoxImg, left, top, boxW, boxH);
+      } else {
+        // Keep the pickup visible for the brief image-load race on first entry.
+        ctx.globalAlpha = 0.9;
+        ctx.shadowBlur = 14;
+        ctx.fillStyle = colors.coreMid;
+        roundedRectPath(left, top, boxW, boxH, 6);
+        ctx.fill();
+      }
       ctx.restore();
     });
   }
@@ -1792,6 +1767,7 @@ const HAPPY_HOUSE_PORTAL = {
 
   let pins = [], trail = [], ripples = [];
   const ghostImg = new Image(); ghostImg.src = "assets/img/booha_ghost.png";
+  const memoryBoxImg = new Image(); memoryBoxImg.src = 'assets/img/memory_box.png';
   const observerImg = new Image();
   observerImg.src = 'assets/img/karasuki/observer-1.png';
   const music    = new Audio('assets/audio/karasuki-music.mp3');
