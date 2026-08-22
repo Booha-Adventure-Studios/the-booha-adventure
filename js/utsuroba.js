@@ -1989,23 +1989,25 @@
        not just Bryan, had this bug. */
     const hasQuestOffer = !quest && drifter.memoryCount > 0 && drifterHasMemories(drifter.id);
     const questInProgressWithThisDrifter = !!(quest && quest.active === drifter.id);
-    const baseLines = (hasQuestOffer && drifter.questLines)
-      ? drifter.questLines
-      : questInProgressWithThisDrifter
-        ? []
+    const dialogueMode = hasQuestOffer
+      ? 'offer'
+      : (relationshipAwake || worldUnderstood || hasRestoredMemory ? 'restored' : 'idle');
+    const legacyDialogue = window.UTSUROBA_LEGACY_DIALOGUE?.[drifter.id]?.[dialogueMode];
+    const baseLines = questInProgressWithThisDrifter
+      ? []
+      : (legacyDialogue || ((hasQuestOffer && drifter.questLines)
+        ? drifter.questLines
         : (relationshipAwake && drifter.relationshipGreeting
           ? drifter.relationshipGreeting
           : (worldUnderstood && drifter.convergenceGreeting
           ? drifter.convergenceGreeting
-          : (hasRestoredMemory && drifter.restoredGreeting ? drifter.restoredGreeting : drifter.greeting)));
-    const dialogueMode = hasQuestOffer
-      ? 'offer'
-      : (relationshipAwake || worldUnderstood || hasRestoredMemory ? 'restored' : 'idle');
+          : (hasRestoredMemory && drifter.restoredGreeting ? drifter.restoredGreeting : drifter.greeting)))));
     const dialogueVariant = dialogueVariantFor(drifter);
     const weeklyLine = !questInProgressWithThisDrifter && dialogueVariant
       ? dialogueVariant[dialogueMode]
       : null;
-    const dialogueLines = [weeklyLine, ...baseLines]
+    const weeklyLines = Array.isArray(weeklyLine) ? weeklyLine : [weeklyLine];
+    const dialogueLines = [...weeklyLines, ...baseLines]
       .filter(Boolean)
       .map(dialogueLineFor)
       .filter(line => line.en);

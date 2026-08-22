@@ -13,6 +13,8 @@ const pages = {
 };
 const utsurobaWorld = fs.readFileSync(path.join(ROOT, 'js/utsuroba.js'), 'utf8');
 const utsurobaPage = fs.readFileSync(path.join(ROOT, 'utsuroba.html'), 'utf8');
+const karasukiWorld = fs.readFileSync(path.join(ROOT, 'js/karasuki.js'), 'utf8');
+const karasukiPage = fs.readFileSync(path.join(ROOT, 'karasuki.html'), 'utf8');
 
 Object.entries(pages).forEach(([name, source]) => {
   assert.match(source, /aria-label="Output profiles"/, `${name} should expose the Output profile network`);
@@ -66,5 +68,11 @@ assert.match(utsurobaWorld, /dialogueVariantFor\(drifter\)/,
   'the Utsuroba world should select dialogue by drifter and week');
 assert.match(utsurobaWorld, /UtsuFurigana\.sentence/,
   'drifter dialogue should render Japanese support with furigana');
+assert.match(karasukiPage, /src="js\/utsuroba-data\.js"/,
+  'Karasuki should load the shared drifter identity data');
+assert.match(karasukiWorld, /drifterReturnLabel\(quest\.active\)/,
+  'Karasuki should target the active drifter when the trail is complete');
+assert.doesNotMatch(karasukiWorld, /next \? next\.hint : 'Return to Kurobane\.'/,
+  'Karasuki must not hard-code Kurobane as every return target');
 
 console.log('Output profile network tests passed.');

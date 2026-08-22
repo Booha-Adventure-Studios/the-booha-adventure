@@ -705,6 +705,28 @@ const HAPPY_HOUSE_PORTAL = {
   // the next quest's first paint doesn't compare against a stale number.
   let lastTrailStep = null;
 
+  const DRIFTER_RETURN_LABELS = {
+    ks:  { en: 'Kurobane',  jp: 'クロバネ' },
+    nto: { en: 'Ned',       jp: 'ネド' },
+    cg:  { en: 'Chagrin',   jp: 'チャグリン' },
+    bh:  { en: 'Bryan',     jp: 'ブライアン' },
+    bk:  { en: 'Blakesly',  jp: 'ブレイクスリー' },
+    ph:  { en: 'Patricia',  jp: 'パトリシア' },
+  };
+
+  function drifterReturnLabel(id) {
+    const known = DRIFTER_RETURN_LABELS[id];
+    if (known) return known;
+    const drifter = window.UTSUROBA_DATA?.drifters?.find(item => item.id === id);
+    if (drifter) {
+      return {
+        en: String(drifter.name || 'your drifter').split(/\s+/)[0],
+        jp: drifter.nameKanji || drifter.name || 'その人',
+      };
+    }
+    return { en: 'your drifter', jp: 'その人' };
+  }
+
   function updateTrailHud() {
     if (!trailHudEl) return;
     const quest = loadDrifterQuest();
@@ -728,8 +750,11 @@ const HAPPY_HOUSE_PORTAL = {
       countEl.classList.add('is-bump');
     }
     lastTrailStep = step;
-    trailHudEl.querySelector('#trail-hud-hint').textContent = next ? next.hint : 'Return to Kurobane.';
-    trailHudEl.querySelector('#trail-hud-hint-jp').textContent = next ? next.hintJP : 'クロバネのところへ戻りましょう。';
+    const returnTarget = drifterReturnLabel(quest.active);
+    trailHudEl.querySelector('#trail-hud-hint').textContent = next
+      ? next.hint : `Return to ${returnTarget.en}.`;
+    trailHudEl.querySelector('#trail-hud-hint-jp').textContent = next
+      ? next.hintJP : `${returnTarget.jp}のところへ戻りましょう。`;
     trailHudEl.querySelector('#trail-hud-nav').classList.toggle('is-shown', !!questNavTargetRoomId);
   }
 
