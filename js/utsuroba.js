@@ -877,7 +877,10 @@
       .reading-journal-entry{padding:14px;border:1px solid rgba(216,168,255,.22);border-radius:10px;background:rgba(255,255,255,.045);}
       .reading-journal-entry h3{margin:0;color:#fff;font-size:1rem;line-height:1.35;}
       .reading-journal-entry h3 span{display:block;margin-top:3px;color:rgba(255,231,178,.58);font-size:.72rem;font-weight:400;}
-      .reading-journal-mastery{display:inline-block;margin-top:9px;padding:4px 7px;border:1px solid rgba(255,203,117,.4);border-radius:999px;background:rgba(255,203,117,.08);color:#ffe7b2;font-size:.68rem;font-weight:700;}
+      /* Plain status caption, not a pill — it used to be bordered/rounded
+         like .reading-journal-review below it, which made a status line and
+         the actual action button look like two competing buttons. */
+      .reading-journal-mastery{display:block;margin-top:6px;color:rgba(255,231,178,.72);font-size:.7rem;font-weight:700;letter-spacing:.02em;}
       .reading-journal-mastery small{margin-left:5px;color:rgba(255,231,178,.58);font-size:.9em;font-weight:400;}
       .reading-journal-meta{margin:7px 0 9px;color:rgba(245,232,255,.54);font-size:.73rem;line-height:1.4;}
       .reading-journal-postcard{margin:0 0 9px;padding:6px 8px;border:1px solid rgba(216,168,255,.34);border-radius:7px;background:rgba(216,168,255,.05);color:#e4c2ff;font-size:.66rem;}
@@ -1435,9 +1438,13 @@
     const goals = (challenge?.goals || []).map(goal => ({
       ...goal,
       value: Math.min(goal.target, values[goal.id] || 0),
-      complete: (values[goal.id] || 0) >= goal.target,
+      // Named isComplete (not "complete") on purpose — goal.complete/goal.completeJP
+      // are the authored completion-message strings from utsuroba-data.js, and
+      // spreading ...goal onto a same-named boolean here used to silently clobber
+      // them (rendered the literal word "true" instead of the message).
+      isComplete: (values[goal.id] || 0) >= goal.target,
     }));
-    const complete = goals.length > 0 && goals.every(goal => goal.complete);
+    const complete = goals.length > 0 && goals.every(goal => goal.isComplete);
     if (complete && bundle.state && !bundle.state.completedAt) {
       bundle.state.completedAt = Date.now();
       writeSave(bundle.data);
@@ -1459,7 +1466,7 @@
   function refreshReadingChallengeButton() {
     if (!readingChallengeButton) return;
     const progress = weeklyReadingChallengeProgress();
-    const count = progress.goals.filter(goal => goal.complete).length;
+    const count = progress.goals.filter(goal => goal.isComplete).length;
     readingChallengeButton.innerHTML = `Weekly Trail<b class="challenge-count">${count}/${progress.goals.length}</b><span>週間読書</span>`;
     readingChallengeButton.setAttribute('aria-label', `Weekly Reading Trail, ${count} of ${progress.goals.length} goals complete`);
   }
@@ -1506,8 +1513,15 @@
     weeklyChallengeOverlay.setAttribute('aria-label', 'Weekly Reading Trail');
     weeklyChallengeOverlay.tabIndex = -1;
     const goals = progress.goals.map(goal => {
+      // Complete goals: drop the progress bar (100% is redundant next to a
+      // checkmark) and show the authored completion message, not the label
+      // again — a finished goal shouldn't still be explaining itself.
+      if (goal.isComplete) {
+        return `<article class="weekly-reading-goal is-complete"><div class="weekly-reading-goal-head"><strong>✓ ${escapeHTML(goal.label)}</strong><span>${goal.value} / ${goal.target}</span></div><small>${escapeHTML(goal.complete)}<br>${escapeHTML(goal.completeJP)}</small></article>`;
+      }
+      // Incomplete goals: one JP line, not the same line duplicated twice.
       const percent = Math.round((goal.value / goal.target) * 100);
-      return `<article class="weekly-reading-goal${goal.complete ? ' is-complete' : ''}"><div class="weekly-reading-goal-head"><strong>${goal.complete ? '✓ ' : ''}${escapeHTML(goal.label)}</strong><span>${goal.value} / ${goal.target}</span></div><small>${escapeHTML(goal.complete ? goal.complete : goal.labelJP)}<br>${escapeHTML(goal.complete ? goal.completeJP : goal.labelJP)}</small><div class="weekly-reading-bar"><i style="width:${percent}%"></i></div></article>`;
+      return `<article class="weekly-reading-goal"><div class="weekly-reading-goal-head"><strong>${escapeHTML(goal.label)}</strong><span>${goal.value} / ${goal.target}</span></div><small>${escapeHTML(goal.labelJP)}</small><div class="weekly-reading-bar"><i style="width:${percent}%"></i></div></article>`;
     }).join('');
     const completion = progress.complete
       ? `<p class="weekly-reading-complete">${escapeHTML(progress.challenge.complete)}<small>${escapeHTML(progress.challenge.completeJP)}</small></p>`
@@ -1717,11 +1731,16 @@
         const words = Array.isArray(episode.vocabulary) ? episode.vocabulary.slice(0, 5).map(item => `<span>${escapeHTML(item.word)}</span>`).join('') : '';
         const reviews = Math.max(1, Number(entry.reviewCount) || 1);
         const masteryLevel = Math.max(0, Math.min(2, Number(entry.masteryLevel) || 0));
+        // en/jp are a status label ("where you are"); action is the button's
+        // own imperative label ("what happens if you tap it"). These used to
+        // say almost the same sentence, which is why the status chip and the
+        // button beneath it read as two copies of one instruction — reworded
+        // the status side to describe state, not repeat the call to action.
         const mastery = masteryLevel >= 2
-          ? { en: 'You know this!', jp: '習得済み', action: 'Check again / 習得チェック' }
+          ? { en: 'Mastered', jp: '習得済み', action: 'Check again / 習得チェック' }
           : masteryLevel === 1
-            ? { en: 'Try it on your own now', jp: '自力復習の準備完了', action: 'Try without hints / ヒントなしで挑戦' }
-            : { en: 'Read with help next', jp: 'まずは案内付き復習', action: 'Read with help / 案内付き復習' };
+            ? { en: 'Ready to try alone', jp: '自力復習の準備完了', action: 'Try without hints / ヒントなしで挑戦' }
+            : { en: 'Not started yet', jp: 'まだ挑戦していません', action: 'Read with help / 案内付き復習' };
         const postcardNote = entry.postcard ? `<details class="reading-journal-postcard"><summary>Postcard saved / 文章カードあり</summary><p>${escapeHTML(entry.postcard.text)}</p></details>` : '';
         return `<article class="reading-journal-entry"><h3>${escapeHTML(episode.title)}<span>${escapeHTML(episode.titleJP)}</span></h3><div class="reading-journal-mastery">${mastery.en}<small>${mastery.jp}</small></div><p class="reading-journal-meta">${reviews} reading ${reviews === 1 ? 'completed' : 'sessions'} · ${escapeHTML(episode.eyebrow)}<br>${reviews === 1 ? '1回読了' : `${reviews}回読み返しました`}</p>${postcardNote}${words ? `<div class="reading-journal-vocab" aria-label="Vocabulary">${words}</div>` : ''}<button class="reading-journal-review" type="button" data-journal-entry="${index}">${mastery.action}</button></article>`;
       }).join('');
