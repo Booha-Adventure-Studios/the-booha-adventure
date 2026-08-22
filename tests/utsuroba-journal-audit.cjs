@@ -75,7 +75,7 @@ assert.match(reading, /onPostcardSave/, 'Reading engine must persist saved postc
 assert.match(reading, /renderLensReplay/, 'Reading completion must expose replay lenses');
 assert.match(reading, /reviewLens/, 'Reading engine must support focused replay lenses');
 assert.match(reading, /data-reading-lens/, 'Reading replay lens controls must be interactive');
-assert.match(reading, /Close journal review \/ ノートを閉じる/, 'Review-only sessions must not offer quest completion');
+assert.match(reading, /Close journal review \/ \$\{FURI\.sentence\('ノートを閉じる'/, 'Review-only sessions must not offer quest completion');
 
 assert.doesNotMatch(utsuroba, /toggleHTML|refreshButtons/, 'Reading panels should not carry a redundant furigana toggle');
 assert.doesNotMatch(furigana, /localStorage|utsu-furigana-off|utsu-furi-btn/, 'Furigana support should remain always-on without toggle state');

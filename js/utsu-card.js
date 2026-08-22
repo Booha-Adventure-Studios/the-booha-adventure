@@ -195,21 +195,26 @@
          ("...") — flagged directly as unreadable. Now wraps up to two
          lines before clamping, so the actual hint text is readable
          instead of trailing into an ellipsis almost every time. */
-      .utsu-hud-chip-primary{font-size:.76rem;font-weight:700;line-height:1.32;
+      .utsu-hud-chip-primary{font-size:.84rem;font-weight:700;line-height:1.32;
         display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
-      .utsu-hud-chip-secondary{font-size:.65rem;line-height:1.3;color:rgba(241,217,255,.55);
+      .utsu-hud-chip-secondary{font-size:.76rem;line-height:1.4;color:rgba(241,217,255,.6);
         display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
       .utsu-hud-chip.is-trail .utsu-hud-chip-secondary{color:rgba(255,244,207,.6);}
       /* Round 2 Pass 14: a short, concrete line under the poetic authored
          hint, shown only when Karasuki has actually worked out which exit
          leads toward the target room — it points at the matching exit
          arrow (drawExitArrows(), highlighted gold) rather than repeating
-         vague room-lore text. */
-      .utsu-hud-chip-nav{display:none;align-items:center;gap:4px;margin-top:2px;
-        font-size:.68rem;font-weight:700;color:#ffe9a8;}
-      .utsu-hud-chip-nav.is-shown{display:flex;}
-      .utsu-hud-chip-nav-arrow{display:inline-block;animation:utsu-nav-bounce 1.1s ease-in-out infinite;}
-      @keyframes utsu-nav-bounce{0%,100%{transform:translateX(0);}50%{transform:translateX(3px);}}
+         vague room-lore text.
+         Round 2 Pass 17: dropped the little bouncing ➜ glyph — the text
+         itself now carries a pulsing gold glow (text-shadow, not a
+         separate icon) to say "look for the gold arrows," matching what
+         drawExitArrows() actually highlights. */
+      .utsu-hud-chip-nav{display:none;margin-top:2px;font-size:.76rem;line-height:1.35;
+        font-weight:700;color:#fff3d2;animation:utsuNavGlow 1.8s ease-in-out infinite;}
+      .utsu-hud-chip-nav.is-shown{display:block;}
+      @keyframes utsuNavGlow{
+        0%,100%{text-shadow:0 0 5px rgba(255,217,102,.55),0 0 11px rgba(255,217,102,.3);}
+        50%{text-shadow:0 0 9px rgba(255,217,102,.95),0 0 20px rgba(255,217,102,.6);}}
 
       .utsu-hud-chip-dots{display:flex;gap:6px;}
       .utsu-hud-chip-dot{width:26px;height:26px;border-radius:50%;padding:0;display:flex;
@@ -305,6 +310,7 @@
         .utsu-card.is-floating{transition:transform .34s ease-out;}
         .dp-portrait-halo{animation:none !important;opacity:0 !important;}
         .utsu-hud-chip-count.is-bump,.utsu-hud-chip-dot.is-just-lit{animation:none !important;}
+        .utsu-hud-chip-nav{animation:none !important;text-shadow:0 0 6px rgba(255,217,102,.5) !important;}
       }
     `;
     document.head.appendChild(s);
