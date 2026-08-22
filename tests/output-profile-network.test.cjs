@@ -20,6 +20,7 @@ Object.entries(pages).forEach(([name, source]) => {
   assert.match(source, /href="utsuroba-profile\.html"/, `${name} should link to the Utsuroba profile`);
   assert.doesNotMatch(source, /href="juku(?:\.html|-profile\.html)/,
     `${name} must not add a Juku profile route`);
+  assert.match(source, /(?:\.\/)?js\/utsu-furigana\.js/, `${name} should load the shared furigana helper`);
 });
 
 assert.match(pages.log, /href="profile\.html" aria-current="page"/,
@@ -43,6 +44,12 @@ assert.match(pages.utsuroba, /utsuroba\.html\?room=room_03/,
   'the Utsuroba profile back button should return to the clean start room');
 assert.doesNotMatch(pages.utsuroba, /← Output profile/,
   'the Utsuroba profile should not show a redundant Output profile back button');
+assert.match(pages.adventure, /<ruby>冒険<rt>ぼうけん<\/rt><\/ruby>/,
+  'the adventure profile should show furigana on its kanji header');
+assert.match(pages.utsuroba, /<ruby>記憶<rt>きおく<\/rt><\/ruby>/,
+  'the Utsuroba profile should show furigana on its kanji header');
+assert.match(pages.log, /UtsuFurigana\.rb\(DOW\[i\]\[0\], DOW\[i\]\[1\]\)/,
+  'the log profile should render furigana for its weekday kanji');
 
 assert.match(utsurobaWorld, /utsuroba_icon\.png/,
   'the Utsuroba world should use the profile icon at its entrance');

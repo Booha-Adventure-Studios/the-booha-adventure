@@ -1,7 +1,7 @@
 
 /**
  * utsu-furigana.js
- * The Booha Adventure — shared kanji/furigana toggle for Utsuroba UI text.
+ * The Booha Adventure — shared always-on furigana support for profile/world UI text.
  *
  * The 9 curriculum games toggle between two fully separate authored strings
  * (showKanji ? c.jp : c.hira) — a good fit for short vocab words, where
@@ -9,10 +9,8 @@
  * (journal entries, weekly-trail copy), and Japanese has no spaces between
  * words — kanji is partly doing word-boundary work, not just meaning, so
  * hiragana-only text past a phrase or two actually gets *harder* to read,
- * not easier. So this toggle never removes the kanji: it shows or hides a
- * small furigana reading (<ruby>/<rt>) above it instead, same idea as the
- * games' toggle (a kid who can't read kanji yet gets help), different
- * mechanism because the content shape is different.
+ * not easier. The profile/world surfaces therefore keep the kanji and add a
+ * small furigana reading (<ruby>/<rt>) above it as baseline reading support.
  *
  * Usage at a render call site:
  *   UtsuFurigana.rb('記憶', 'きおく')  ->  <ruby>記憶<rt>きおく</rt></ruby>
@@ -45,11 +43,14 @@
     injectStyles();
   }
 
+  // Publish the renderer before the DOM-ready branch so pages can safely use
+  // it from their own inline renderers as soon as this script has loaded.
+  window.UtsuFurigana = { rb: rb };
+
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
     init();
   }
 
-  window.UtsuFurigana = { rb: rb };
 })();

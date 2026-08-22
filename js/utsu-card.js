@@ -92,18 +92,32 @@
          backwards for a screen with less room to spare. Both
          breakpoints now share the same vh fraction, with a lower
          absolute px cap on mobile so it's never proportionally larger. */
+      /* Round 2 Pass 16 ("razzle-dazzle"): a distinct, bouncier entrance
+         just for the drifter drawer — the bottom-sheet variant (orb
+         panel, thank-you panel) keeps its original ease-out since it
+         wasn't part of this ask. */
       .utsu-card.is-floating{left:50%;right:auto;bottom:clamp(10px,2.5vh,22px);
         width:min(560px,calc(100vw - 24px));max-height:min(38vh,300px);overflow:auto;
         border-radius:16px;border:1.5px solid var(--card-ring,#c8b48a);
         border-top:1.5px solid var(--card-ring,#c8b48a);
         box-shadow:0 10px 30px rgba(0,0,0,.5),0 0 20px var(--card-glow,transparent);
-        transform:translate(-50%,calc(100% + 20px));z-index:9100;}
+        transform:translate(-50%,calc(100% + 20px));z-index:9100;
+        transition:transform .5s cubic-bezier(.34,1.56,.64,1);}
       .utsu-card.is-floating.open{transform:translate(-50%,0);}
       @media(max-width:700px){.utsu-card.is-floating{width:calc(100vw - 16px);max-height:min(38vh,260px);bottom:8px;}}
 
       /* ── shared content classes (dp-* — same names every surface uses) ── */
       .dp-handle{width:36px;height:4px;border-radius:2px;background:var(--card-ring,#c0aa80);opacity:.7;margin:9px auto 0;}
       .dp-inner{display:flex;align-items:flex-start;gap:clamp(10px,2.5vw,16px);padding:10px clamp(13px,3vw,20px) 13px;}
+      /* Optional wrapper + halo (opt-in via markup — only the drifter
+         panel template uses these two classes today) that flashes a
+         motif-colored glow behind the portrait once, right as the panel
+         settles open. */
+      .dp-portrait-wrap{position:relative;flex-shrink:0;}
+      .dp-portrait-halo{position:absolute;inset:-11px;border-radius:50%;pointer-events:none;
+        background:radial-gradient(circle,var(--card-glow,rgba(200,180,138,.5)) 0%,transparent 72%);opacity:0;}
+      .utsu-card.is-floating.open .dp-portrait-halo{animation:dpPortraitHalo .9s ease-out .12s 1;}
+      @keyframes dpPortraitHalo{0%{opacity:0;transform:scale(.4);}32%{opacity:1;}100%{opacity:0;transform:scale(1.7);}}
       .dp-portrait{flex-shrink:0;width:clamp(54px,9vw,76px);height:clamp(54px,9vw,76px);border-radius:9px;
         border:1.5px solid var(--card-ring,#c8b48a);background:#e8dfc8;display:flex;align-items:center;
         justify-content:center;overflow:hidden;box-shadow:0 0 10px var(--card-glow,transparent);}
@@ -129,6 +143,12 @@
       .utsu-toast-card{background:linear-gradient(180deg,#f7f2e8 0%,#ede5d0 100%);
         border:1.5px solid #c8b48a;border-radius:12px;padding:20px 32px;
         box-shadow:0 8px 30px rgba(0,0,0,.4);font-family:'Georgia',serif;max-width:min(360px,86vw);}
+      /* Round 2 Pass 16: a small "no" shake, chained after the card's own
+         pop-in (utsuPopIn, defined in utsuroba.js) via the caller's
+         animation list — reads instantly as "wrong" before a kid even
+         gets to the text. */
+      @keyframes utsuToastShake{0%,100%{transform:translateX(0);}20%{transform:translateX(-7px);}
+        40%{transform:translateX(6px);}60%{transform:translateX(-4px);}80%{transform:translateX(2px);}}
 
       /* ── HUD chip: corner status widgets (Round 2 Pass 2) ──
          Replaces three near-identical bordered-rectangle "food label"
@@ -162,6 +182,12 @@
         border:1.5px solid rgba(255,217,102,.65);color:#fff4cf;font:800 .82rem/1 'Georgia',serif;
         padding:4px 9px;border-radius:11px;white-space:nowrap;letter-spacing:.02em;}
       .utsu-hud-chip:not(.is-trail) .utsu-hud-chip-count{background:#1f0f33;border-color:rgba(216,168,255,.6);color:#f1d9ff;}
+      /* Round 2 Pass 16: caller adds .is-bump for one animation cycle
+         whenever the number it just wrote is actually higher than the
+         last one (see updateTrailHud() in karasuki.js) — a silent
+         textContent swap otherwise gives progress no weight at all. */
+      .utsu-hud-chip-count.is-bump{animation:hudCountBump .5s cubic-bezier(.34,1.56,.64,1) 1;}
+      @keyframes hudCountBump{0%{transform:scale(1);box-shadow:none;}40%{transform:scale(1.32);box-shadow:0 0 14px 2px currentColor;}100%{transform:scale(1);box-shadow:none;}}
 
       .utsu-hud-chip-text{display:flex;flex-direction:column;gap:1px;min-width:0;}
       /* Round 2 Pass 14 fix: was single-line nowrap+ellipsis, so any hint
@@ -195,6 +221,15 @@
       .utsu-hud-chip-dot.motif-lantern.is-lit{background:radial-gradient(circle at 35% 30%,#fffde0,#ffd966 55%,#c8860a);box-shadow:0 0 10px rgba(255,217,102,.55);}
       .utsu-hud-chip-dot.motif-candy.is-lit{background:radial-gradient(circle at 35% 30%,#fff0f4,#ff85a1 55%,#c23a5e);box-shadow:0 0 10px rgba(255,133,161,.55);}
       .utsu-hud-chip-dot.motif-reflection.is-lit{background:radial-gradient(circle at 35% 30%,#eafcff,#a8edff 55%,#3b8fbf);box-shadow:0 0 10px rgba(168,237,255,.55);}
+      /* Round 2 Pass 16: caller adds .is-just-lit for one render only —
+         the render that actually transitions a dot from unlit to lit
+         (see renderEchoesTracker() in karasuki.js/utsuroba.js, which
+         diffs against the previous render to know which dot is new).
+         Without that diff every re-render would replay this, which is
+         wrong — it should read as "you just found this," not repeat on
+         every room change. */
+      .utsu-hud-chip-dot.is-just-lit{animation:hudDotIgnite .6s cubic-bezier(.34,1.56,.64,1) 1;}
+      @keyframes hudDotIgnite{0%{transform:scale(.3);filter:brightness(2.2);}55%{transform:scale(1.4);filter:brightness(1.6);}100%{transform:scale(1);filter:brightness(1);}}
 
       /* ── reward pop: a brief, bigger "you got it" card that appears
          when an orb/memory piece is actually collected (Round 2 Pass 14
@@ -267,6 +302,9 @@
       @media (prefers-reduced-motion: reduce) {
         .utsu-reward-pop{transition:opacity .3s ease;}
         .utsu-reward-pop-ring,.utsu-reward-spark,.utsu-reward-pop::before{animation:none !important;opacity:0 !important;}
+        .utsu-card.is-floating{transition:transform .34s ease-out;}
+        .dp-portrait-halo{animation:none !important;opacity:0 !important;}
+        .utsu-hud-chip-count.is-bump,.utsu-hud-chip-dot.is-just-lit{animation:none !important;}
       }
     `;
     document.head.appendChild(s);

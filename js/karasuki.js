@@ -460,6 +460,10 @@ const HAPPY_HOUSE_PORTAL = {
      of two. */
   const ECHO_ICON_FOR = { lantern: '✦', candy: '●', reflection: '◈' };
   let echoesTrackerEl = null;
+  // Round 2 Pass 16: see the matching comment in utsuroba.js's own
+  // renderEchoesTracker() — null until the first render, so the tracker
+  // never plays the "just lit" flourish for state it merely loaded.
+  let lastLitEchoIds = null;
 
   function injectEchoesTracker() {
     if (echoesTrackerEl) return;
@@ -481,12 +485,16 @@ const HAPPY_HOUSE_PORTAL = {
       const data = (window.BoohaAdventure && BoohaAdventure.save) ? BoohaAdventure.save.load() : null;
       restored = (data && data.utsuroba && data.utsuroba.readingEchoes) || {};
     } catch (_) {}
+    const nextLitEchoIds = new Set();
     const dots = convergenceEpisodeIds.map(episodeId => {
       const episode = episodes[episodeId];
       const motif = episode?.worldEcho?.motif && ECHO_ICON_FOR[episode.worldEcho.motif] ? episode.worldEcho.motif : 'lantern';
       const isLit = !!restored[episodeId];
-      return `<span class="utsu-hud-chip-dot motif-${motif}${isLit ? ' is-lit' : ''}"><span aria-hidden="true">${ECHO_ICON_FOR[motif]}</span></span>`;
+      if (isLit) nextLitEchoIds.add(episodeId);
+      const justLit = isLit && lastLitEchoIds && !lastLitEchoIds.has(episodeId);
+      return `<span class="utsu-hud-chip-dot motif-${motif}${isLit ? ' is-lit' : ''}${justLit ? ' is-just-lit' : ''}"><span aria-hidden="true">${ECHO_ICON_FOR[motif]}</span></span>`;
     }).join('');
+    lastLitEchoIds = nextLitEchoIds;
     echoesTrackerEl.style.display = 'flex';
     echoesTrackerEl.innerHTML = `<div class="utsu-hud-chip-dots">${dots}</div><div class="utsu-hud-chip-text"><span class="utsu-hud-chip-primary">Three Echoes</span><span class="utsu-hud-chip-secondary">三つの残響</span></div>`;
   }
@@ -555,6 +563,28 @@ const HAPPY_HOUSE_PORTAL = {
         ctx.beginPath();
         ctx.arc(sx, sy, 1.1 + twinkle * 0.9, 0, Math.PI * 2);
         ctx.fill();
+      }
+
+      /* Round 2 Pass 16 ("razzle-dazzle"): slow-rising embers on top of
+         the twinkle dots above — those twinkle in a fixed orbit near the
+         box, these actually drift up and away before fading, so an
+         uncollected box reads as "quietly alive" instead of just lit.
+         Looped via a sawtooth on `sec` (no per-particle state to track)
+         — same cost discipline as everything else here: plain filled
+         dots, no extra gradients. */
+      for (let e = 0; e < 2; e++) {
+        const period = 2.6 + e * 0.5;
+        const t = (((sec * 0.6) + i * 0.37 + e * 1.3) % period) / period;
+        const emberX = glowCx + Math.sin(sec * 0.8 + i + e * 2) * (boxW * 0.3);
+        const emberY = glowCy - t * (boxH * 1.8 + 14);
+        const emberAlpha = Math.sin(t * Math.PI) * 0.75;
+        if (emberAlpha > 0.02) {
+          ctx.globalAlpha = emberAlpha;
+          ctx.fillStyle = colors.coreHi;
+          ctx.beginPath();
+          ctx.arc(emberX, emberY, 1.3 - t * 0.6, 0, Math.PI * 2);
+          ctx.fill();
+        }
       }
 
       if (memoryBoxImg.complete && memoryBoxImg.naturalWidth > 0) {
@@ -668,6 +698,13 @@ const HAPPY_HOUSE_PORTAL = {
     document.body.appendChild(trailHudEl);
   }
 
+  // Round 2 Pass 16: last step this HUD actually painted, so a real
+  // advance (collect a piece, walk into the right room) can get a bump
+  // flourish while a fresh quest starting back at step 0 — a decrease,
+  // not a step forward — never does. null whenever the HUD is hidden, so
+  // the next quest's first paint doesn't compare against a stale number.
+  let lastTrailStep = null;
+
   function updateTrailHud() {
     if (!trailHudEl) return;
     const quest = loadDrifterQuest();
@@ -676,13 +713,21 @@ const HAPPY_HOUSE_PORTAL = {
     if (!quest || !quest.active || !trail || !trail.length) {
       trailHudEl.style.display = 'none';
       questNavTargetRoomId = null;
+      lastTrailStep = null;
       return;
     }
     const step = Math.max(0, Math.min(trail.length, Number.isInteger(quest.trailIndex) ? quest.trailIndex : 0));
     const next = trail[step];
     questNavTargetRoomId = next ? next.roomId : null;
     trailHudEl.style.display = 'flex';
-    trailHudEl.querySelector('#trail-hud-count').textContent = `${step} / ${trail.length}`;
+    const countEl = trailHudEl.querySelector('#trail-hud-count');
+    countEl.textContent = `${step} / ${trail.length}`;
+    if (lastTrailStep !== null && step > lastTrailStep) {
+      countEl.classList.remove('is-bump');
+      void countEl.offsetWidth; /* retrigger even if a prior bump is still mid-animation */
+      countEl.classList.add('is-bump');
+    }
+    lastTrailStep = step;
     trailHudEl.querySelector('#trail-hud-hint').textContent = next ? next.hint : 'Return to Kurobane.';
     trailHudEl.querySelector('#trail-hud-hint-jp').textContent = next ? next.hintJP : 'クロバネのところへ戻りましょう。';
     trailHudEl.querySelector('#trail-hud-nav').classList.toggle('is-shown', !!questNavTargetRoomId);
