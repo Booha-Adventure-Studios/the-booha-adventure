@@ -10,6 +10,7 @@ const utsuroba = fs.readFileSync(path.join(ROOT, 'js', 'utsuroba.js'), 'utf8');
 const reading = fs.readFileSync(path.join(ROOT, 'js', 'utsuroba-reading.js'), 'utf8');
 const karasuki = fs.readFileSync(path.join(ROOT, 'js', 'karasuki.js'), 'utf8');
 const data = fs.readFileSync(path.join(ROOT, 'js', 'utsuroba-data.js'), 'utf8');
+const furigana = fs.readFileSync(path.join(ROOT, 'js', 'utsu-furigana.js'), 'utf8');
 
 assert.match(utsuroba, /readingJournal/, 'Utsuroba save migration must initialize the reading journal');
 assert.match(utsuroba, /readingJournalButton/, 'Utsuroba must expose the journal from the world UI');
@@ -74,5 +75,11 @@ assert.match(reading, /renderLensReplay/, 'Reading completion must expose replay
 assert.match(reading, /reviewLens/, 'Reading engine must support focused replay lenses');
 assert.match(reading, /data-reading-lens/, 'Reading replay lens controls must be interactive');
 assert.match(reading, /Close journal review \/ ノートを閉じる/, 'Review-only sessions must not offer quest completion');
+
+assert.doesNotMatch(utsuroba, /toggleHTML|refreshButtons/, 'Reading panels should not carry a redundant furigana toggle');
+assert.doesNotMatch(furigana, /localStorage|utsu-furigana-off|utsu-furi-btn/, 'Furigana support should remain always-on without toggle state');
+assert.match(furigana, /window\.UtsuFurigana\s*=\s*\{\s*rb:\s*rb\s*\}/, 'Furigana helper should expose the trusted ruby renderer');
+assert.doesNotMatch(utsuroba, /utsu-profile-portal-label|Profile<small>/, 'The Utsuroba icon should not carry a redundant profile pill');
+assert.match(utsuroba, /utsuProfilePortal\.innerHTML\s*=\s*'<img src="\.\/assets\/img\/utsuroba_icon\.png" alt="">'/, 'The profile doorway should remain as an icon-only control');
 
 console.log('Utsuroba reading journal audit passed');
