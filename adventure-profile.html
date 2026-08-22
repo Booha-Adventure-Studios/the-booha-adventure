@@ -592,6 +592,40 @@
     }
     .game-row.done .row-sc { color: #e0e8ff; }
 
+    /* ── GAMES ACCORDION ─────────────────────────── */
+    .games-section { margin-bottom:2rem; animation:riseIn .9s .28s cubic-bezier(.16,1,.3,1) both; }
+
+    .games-acc-card { border-radius: var(--radius-lg); overflow: hidden; position: relative; }
+    .games-acc-card .accordion-body .accordion-inner { padding: 0 1rem 1rem; }
+    .games-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(205px,1fr)); gap:.55rem; }
+
+    .g-chip {
+      display:flex; align-items:center; gap:.65rem;
+      padding:.65rem .8rem; border-radius:var(--radius);
+      border:1px solid #c8b8ff14; background:#c8b8ff05;
+      filter:grayscale(.85); opacity:.45; transition:all .2s;
+      position:relative; overflow:hidden;
+      text-decoration:none; cursor:default;
+    }
+    .g-chip.unlocked {
+      filter:none; opacity:1; border-color:#c8b8ff55;
+      background:#c8b8ff0c; box-shadow:0 0 20px #c8b8ff14,inset 0 0 20px #c8b8ff05;
+      cursor:pointer;
+    }
+    .g-chip.unlocked:hover { border-color:var(--glow-moon); box-shadow:0 0 28px #c8b8ff2a; transform:translateY(-2px); }
+    .g-chip.unlocked::before {
+      content:''; position:absolute; top:0; left:-100%; width:55%; height:100%;
+      background:linear-gradient(90deg,transparent,#c8b8ff08,transparent);
+      animation:shimmer 5s 1.5s ease-in-out infinite;
+    }
+    .g-icon { width:34px; height:34px; object-fit:contain; flex-shrink:0; filter:drop-shadow(0 0 6px #00000088); }
+    .g-text { overflow:hidden; min-width:0; }
+    .g-en    { font-family:var(--font-title); font-size:.64rem; font-weight:700; letter-spacing:.05em; color: #ffffff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .g-chip:not(.unlocked) .g-en { color: #8a80b0; }
+    .g-jp    { font-size:.67rem; font-weight:800; color: #c4bce0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .g-score { font-size:.64rem; font-weight:700; color: #c4bce0; margin-top:.08rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .g-chip.unlocked .g-score { color: var(--glow-amber); }
+
     /* ── ACHIEVEMENTS ACCORDION ──────────────────── */
     .unlock-section { margin-bottom:2rem; animation:riseIn .9s .3s cubic-bezier(.16,1,.3,1) both; }
 
@@ -975,6 +1009,38 @@
     <div id="curr-cards"><!-- injected --></div>
   </section>
 
+  <!-- Bonus Games -->
+  <section class="games-section">
+    <div class="eyebrow">
+      <span class="ey-en">Games</span>
+      <span class="ey-jp">ボーナスゲーム</span>
+      <span class="ey-kanji">遊技</span>
+      <div class="ey-line"></div>
+    </div>
+    <div class="accordion-wrap">
+      <div class="glass games-acc-card">
+        <div class="accordion-shimmer"></div>
+        <button class="accordion-trigger" aria-expanded="false" id="acc-games-trigger">
+          <div class="accordion-header">
+            <div class="curr-badge">
+              <div class="orb" style="background:radial-gradient(circle at 35% 35%,#ffe4dc,#ff6644);box-shadow:0 0 20px #ff664499,0 0 40px #ff664433;color:#1a0800;font-size:.9rem;">🎮</div>
+              <div>
+                <div class="curr-name-en" style="color:#ff9977;text-shadow:0 0 16px #ff664499;">Games</div>
+                <div class="curr-name-jp">ボーナスゲーム <span class="curr-name-k">遊技</span></div>
+              </div>
+            </div>
+            <span class="acc-chevron">▼</span>
+          </div>
+        </button>
+        <div class="accordion-body" id="acc-games-body">
+          <div class="accordion-inner">
+            <div class="games-grid" id="games-grid"><!-- injected --></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- Unlocks / Achievements -->
   <section class="unlock-section">
     <div class="eyebrow">
@@ -1133,6 +1199,16 @@ const CURR_INFO = {
   pb:{ en:'PB Curriculum', jp:'PBカリキュラム', k:'PB課程', cc:'c-pb', oc:'orb-pb', fc:'pf-pb' },
 };
 
+/* Bonus games — icons/JP names match the same world-popup art Karasuki
+   already uses for these four portals (see js/karasuki.js WORLD_ICONS),
+   so the profile and the in-world popup read as the same visual language. */
+const BONUS_GAME_META = {
+  booha_invaders:    { icon:'assets/invaders/bug-1.png',                          jp:'ブーハー・インベーダーズ',       k:'侵略者' },
+  booha_blocks:      { icon:'assets/blocks/red_block.png',                        jp:'ブーハー・ブロック',             k:'積木' },
+  feed_booha:        { icon:'assets/feed/boo-eat.png',                            jp:'ブーハーにキャンディをあげよう', k:'給食' },
+  booha_destruction: { icon:'assets/destruction/optimized/booha_helmet_256.png',  jp:'ブーハー・デストラクション',     k:'破壊' },
+};
+
 const UNLOCK_META = {
   first_game:              { icon:'🌟', jp:'さいしょのゲーム', k:'初ゲーム' },
   any_curriculum_complete: { icon:'🎓', jp:'カリキュラムかんりょう', k:'課程完了' },
@@ -1156,6 +1232,40 @@ function setStatus(msg, type='') {
   el.className = `prof-status ${type ? 's-'+type : ''}`;
   clearTimeout(el._t);
   el._t = setTimeout(() => { el.textContent=''; el.className='prof-status'; }, 3500);
+}
+
+/* ── BONUS GAMES ─────────────────────────────────────────────────────── */
+function renderGames() {
+  const R = BoohaAdventure.registry;
+  const S = BoohaAdventure.scores;
+  const U = BoohaAdventure.unlocks;
+  const grid = document.getElementById('games-grid');
+  if (!grid || !R || !S || !U) return;
+
+  grid.innerHTML = '';
+  R.getBonusGames().forEach(g => {
+    const meta     = BONUS_GAME_META[g.id] || {};
+    const unlocked = U.isBonusGameUnlocked(g.id);
+    const entry    = S.getEntry(g.saveId);
+    const played   = entry.attempts > 0;
+
+    let scoreText;
+    if (!unlocked)   scoreText = 'Locked this week';
+    else if (played) scoreText = entry.highScore.toLocaleString();
+    else              scoreText = 'Not played';
+
+    const el = document.createElement(unlocked ? 'a' : 'div');
+    el.className = `g-chip ${unlocked ? 'unlocked' : ''}`;
+    if (unlocked) el.href = g.file;
+    el.innerHTML = `
+      <img class="g-icon" src="${meta.icon || ''}" alt="${g.name}" loading="lazy">
+      <div class="g-text">
+        <div class="g-en">${g.name}</div>
+        <div class="g-jp">${meta.jp || ''}　<span style="font-size:.56rem">${meta.k || ''}</span></div>
+        <div class="g-score">${scoreText}</div>
+      </div>`;
+    grid.appendChild(el);
+  });
 }
 
 /* ── RENDER ──────────────────────────────────────────────────────────── */
@@ -1238,6 +1348,12 @@ function render() {
     });
   });
 
+  // ── Bonus games — weekly gate (2★ on all 9 games in one curriculum),
+  //    high scores permanent. Re-evaluated on every render() call, so a
+  //    weekly reset correctly re-grays these instead of leaving a stale
+  //    "unlocked" chip from before the reset. ─────────────────────────────
+  renderGames();
+
   // ── Achievements accordion — permanent, unchanged ─────────────────────
   const grid = document.getElementById('unlocks-grid');
   grid.innerHTML = '';
@@ -1260,6 +1376,7 @@ function render() {
 document.addEventListener('booha:ready', () => {
   render();
 
+  initAccordion('acc-games-trigger', 'acc-games-body');
   initAccordion('acc-achievements-trigger', 'acc-achievements-body');
 
   document.getElementById('btn-show-code').onclick  = () => BoohaMemoryCodeUI.showCode();
