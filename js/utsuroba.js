@@ -1517,17 +1517,18 @@
       // checkmark) and show the authored completion message, not the label
       // again — a finished goal shouldn't still be explaining itself.
       if (goal.isComplete) {
-        return `<article class="weekly-reading-goal is-complete"><div class="weekly-reading-goal-head"><strong>✓ ${escapeHTML(goal.label)}</strong><span>${goal.value} / ${goal.target}</span></div><small>${escapeHTML(goal.complete)}<br>${escapeHTML(goal.completeJP)}</small></article>`;
+        return `<article class="weekly-reading-goal is-complete"><div class="weekly-reading-goal-head"><strong>✓ ${escapeHTML(goal.label)}</strong><span>${goal.value} / ${goal.target}</span></div><small>${escapeHTML(goal.complete)}<br>${goal.completeJP}</small></article>`;
       }
       // Incomplete goals: one JP line, not the same line duplicated twice.
       const percent = Math.round((goal.value / goal.target) * 100);
-      return `<article class="weekly-reading-goal"><div class="weekly-reading-goal-head"><strong>${escapeHTML(goal.label)}</strong><span>${goal.value} / ${goal.target}</span></div><small>${escapeHTML(goal.labelJP)}</small><div class="weekly-reading-bar"><i style="width:${percent}%"></i></div></article>`;
+      return `<article class="weekly-reading-goal"><div class="weekly-reading-goal-head"><strong>${escapeHTML(goal.label)}</strong><span>${goal.value} / ${goal.target}</span></div><small>${goal.labelJP}</small><div class="weekly-reading-bar"><i style="width:${percent}%"></i></div></article>`;
     }).join('');
     const completion = progress.complete
-      ? `<p class="weekly-reading-complete">${escapeHTML(progress.challenge.complete)}<small>${escapeHTML(progress.challenge.completeJP)}</small></p>`
+      ? `<p class="weekly-reading-complete">${escapeHTML(progress.challenge.complete)}<small>${progress.challenge.completeJP}</small></p>`
       : '';
-    weeklyChallengeOverlay.innerHTML = `<div class="weekly-reading-card"><button class="weekly-reading-close" type="button" aria-label="Close weekly reading trail">✕</button><div class="weekly-reading-eyebrow">WEEKLY READING TRAIL / 週間読書</div><h2>${escapeHTML(progress.challenge.title)}<span>${escapeHTML(progress.challenge.titleJP)}</span></h2><p class="weekly-reading-intro">${escapeHTML(progress.challenge.intro)}<small>${escapeHTML(progress.challenge.introJP)}</small></p><div class="weekly-reading-goals">${goals}</div>${completion}<button class="weekly-reading-close-btn" type="button" id="weekly-reading-done">Close trail / トレイルを閉じる</button></div>`;
+    weeklyChallengeOverlay.innerHTML = `<div class="weekly-reading-card"><button class="weekly-reading-close" type="button" aria-label="Close weekly reading trail">✕</button><div class="weekly-reading-eyebrow">WEEKLY READING TRAIL / 週間読書${UtsuFurigana.toggleHTML()}</div><h2>${escapeHTML(progress.challenge.title)}<span>${progress.challenge.titleJP}</span></h2><p class="weekly-reading-intro">${escapeHTML(progress.challenge.intro)}<small>${progress.challenge.introJP}</small></p><div class="weekly-reading-goals">${goals}</div>${completion}<button class="weekly-reading-close-btn" type="button" id="weekly-reading-done">Close trail / トレイルを閉じる</button></div>`;
     document.body.appendChild(weeklyChallengeOverlay);
+    UtsuFurigana.refreshButtons();
     weeklyChallengeOverlay.addEventListener('keydown', event => {
       if (event.key === 'Escape') { event.preventDefault(); closeWeeklyReadingChallenge(); return; }
       trapOverlayFocus(weeklyChallengeOverlay, event);
@@ -1636,15 +1637,42 @@
     recordWeeklyReadingEvent('postcard');
   }
 
+  // Local, Reading-Journal-scoped furigana for episode titles. The shared
+  // `episode.titleJP` content field has other consumers (Karasuki, the live
+  // reading screen, the profile page) that escape it as plain text — adding
+  // <ruby> markup there would break those. So instead of touching the
+  // content field, this lookup only supplies ruby readings to the journal's
+  // own render call site; anything not in the table falls back to the plain
+  // escaped title, same as before this pass.
+  const READING_JOURNAL_TITLE_JP = {
+    ks_lantern_v1: '消<rt>き</rt>えた灯<rt>あか</rt>り',
+    nto_candy_v1: '残<rt>のこ</rt>ったキャンディ',
+    cg_door_v1: '背後<rt>はいご</rt>の扉<rt>とびら</rt>',
+    bh_window_v1: '窓<rt>まど</rt>の名前<rt>なまえ</rt>',
+    bk_badge_v1: '見張<rt>みは</rt>り続<rt>つづ</rt>けたバッジ',
+    ph_ribbon_v1: '誰<rt>だれ</rt>も取<rt>と</rt>りに来<rt>こ</rt>なかったリボン'
+  };
+
+  function readingJournalTitleJP(episode) {
+    const marked = READING_JOURNAL_TITLE_JP[episode.id];
+    if (!marked) return escapeHTML(episode.titleJP);
+    // The lookup values use bare <rt> tags (no <ruby> wrapper) so each kanji
+    // run can carry its own reading; wrap every kanji+<rt> run for the
+    // browser's ruby renderer.
+    return marked.replace(/([一-鿿]+)(<rt>[^<]*<\/rt>)/g, '<ruby>$1$2</ruby>');
+  }
+
   async function openReadingJournal() {
     if (readingJournalOpen || weeklyChallengeOpen || drifterPanelOpen || state.celebrating) return;
     modalPreviousFocus = document.activeElement;
     readingJournalOpen = true;
     state.inputLocked = true;
+    const R = UtsuFurigana.rb;
     readingJournalOverlay = document.createElement('div');
     readingJournalOverlay.id = 'utsuroba-reading-journal';
-    readingJournalOverlay.innerHTML = `<div class="reading-journal-card"><button class="reading-journal-close" type="button" aria-label="Close journal">✕</button><div class="reading-journal-eyebrow">READING JOURNAL / 読書ノート</div><h2>Restored memories <span>戻した記憶</span></h2><p class="reading-journal-intro">Read a memory again whenever you want. Try to remember the details.<small>いつでも記憶を読み返せます。細かい部分を思い出してみましょう。</small></p><details class="reading-journal-cabinet" id="reading-word-cabinet"><summary>Word Cabinet / 言葉箱<span>Words from the memories you restored. / 戻した記憶の言葉です。</span></summary><div class="reading-journal-cabinet-body"><div class="reading-journal-words"></div><div class="reading-journal-word-detail" id="reading-word-detail">Choose a word for help.<small>言葉を選ぶと意味が出ます。</small></div></div></details><section class="reading-journal-practice" id="reading-word-practice"><div class="reading-journal-practice-heading">Word practice / 言葉の練習<span>Review three words with no pressure. / 三つの言葉を気軽に練習しましょう。</span></div><p class="reading-journal-practice-intro">Choose the simple meaning. Words you miss will return sooner.<small>やさしい意味を選びましょう。間違えた言葉は早く戻ります。</small></p><button class="reading-journal-practice-start" id="reading-word-practice-start" type="button">Practice 3 words / 3語を練習</button><div class="reading-word-practice-panel" id="reading-word-practice-panel" hidden></div></section><div class="reading-journal-list"><div class="reading-journal-loading">Opening your journal…<small>ノートを開いています…</small></div></div></div>`;
+    readingJournalOverlay.innerHTML = `<div class="reading-journal-card"><button class="reading-journal-close" type="button" aria-label="Close journal">✕</button><div class="reading-journal-eyebrow">READING JOURNAL / ${R('読書','どくしょ')}ノート${UtsuFurigana.toggleHTML()}</div><h2>Restored memories <span>${R('戻','もど')}した${R('記憶','きおく')}</span></h2><p class="reading-journal-intro">Read a memory again whenever you want. Try to remember the details.<small>いつでも${R('記憶','きおく')}を${R('読','よ')}み${R('返','かえ')}せます。${R('細','こま')}かい${R('部分','ぶぶん')}を${R('思','おも')}い${R('出','だ')}してみましょう。</small></p><details class="reading-journal-cabinet" id="reading-word-cabinet"><summary>Word Cabinet / ${R('言葉','ことば')}${R('箱','ばこ')}<span>Words from the memories you restored. / ${R('戻','もど')}した${R('記憶','きおく')}の${R('言葉','ことば')}です。</span></summary><div class="reading-journal-cabinet-body"><div class="reading-journal-words"></div><div class="reading-journal-word-detail" id="reading-word-detail">Choose a word for help.<small>${R('言葉','ことば')}を${R('選','えら')}ぶと${R('意味','いみ')}が${R('出','で')}ます。</small></div></div></details><section class="reading-journal-practice" id="reading-word-practice"><div class="reading-journal-practice-heading">Word practice / ${R('言葉','ことば')}の${R('練習','れんしゅう')}<span>Review three words with no pressure. / ${R('三','みっ')}つの${R('言葉','ことば')}を${R('気軽','きがる')}に${R('練習','れんしゅう')}しましょう。</span></div><p class="reading-journal-practice-intro">Choose the simple meaning. Words you miss will return sooner.<small>やさしい${R('意味','いみ')}を${R('選','えら')}びましょう。${R('間違','まちが')}えた${R('言葉','ことば')}は${R('早','はや')}く${R('戻','もど')}ります。</small></p><button class="reading-journal-practice-start" id="reading-word-practice-start" type="button">Practice 3 words / 3${R('語','ご')}を${R('練習','れんしゅう')}</button><div class="reading-word-practice-panel" id="reading-word-practice-panel" hidden></div></section><div class="reading-journal-list"><div class="reading-journal-loading">Opening your journal…<small>ノートを${R('開','ひら')}いています…</small></div></div></div>`;
     document.body.appendChild(readingJournalOverlay);
+    UtsuFurigana.refreshButtons();
     readingJournalOverlay.querySelector('.reading-journal-close').addEventListener('click', closeReadingJournal);
     readingJournalOverlay.setAttribute('role', 'dialog');
     readingJournalOverlay.setAttribute('aria-modal', 'true');
@@ -1667,7 +1695,7 @@
       const practiceStart = readingJournalOverlay.querySelector('#reading-word-practice-start');
       const practicePanel = readingJournalOverlay.querySelector('#reading-word-practice-panel');
       if (!cabinetWords.length) {
-        wordList.innerHTML = '<span style="color:rgba(255,231,178,.55);font-size:.72rem;">Restore a memory to collect words.<br>記憶を戻すと、言葉を集められます。</span>';
+        wordList.innerHTML = `<span style="color:rgba(255,231,178,.55);font-size:.72rem;">Restore a memory to collect words.<br>${R('記憶','きおく')}を${R('戻','もど')}すと、${R('言葉','ことば')}を${R('集','あつ')}められます。</span>`;
       } else {
         wordList.innerHTML = cabinetWords.map((item, index) => `<button class="reading-journal-word" type="button" data-cabinet-word="${index}">${escapeHTML(item.word)}</button>`).join('');
         wordList.querySelectorAll('[data-cabinet-word]').forEach(button => button.addEventListener('click', () => {
@@ -1677,7 +1705,7 @@
       }
       if (cabinetWords.length < 3) {
         practiceStart.disabled = true;
-        practiceStart.textContent = 'Collect 3 words first / まず3語集めましょう';
+        practiceStart.innerHTML = `Collect 3 words first / まず3${R('語','ご')}${R('集','あつ')}めましょう`;
       } else {
         const practiceQueue = cabinetWords.slice().sort((a, b) => (a.nextReviewAt || 0) - (b.nextReviewAt || 0)).slice(0, 3);
         let practiceIndex = 0;
@@ -1691,7 +1719,7 @@
 
         const renderPractice = (feedback = '') => {
           if (practiceIndex >= practiceQueue.length) {
-            practicePanel.innerHTML = `<div class="reading-word-practice-feedback">Practice complete. You reviewed ${practiceQueue.length} words.<small>練習完了。${practiceQueue.length}語を復習しました。</small>${practiceMistakes ? `<br>You needed another try on ${practiceMistakes} answer${practiceMistakes === 1 ? '' : 's'}.<small>${practiceMistakes}問をもう一度考えました。</small>` : '<br>Clean round.<small>きれいにできました。</small>'}</div><button class="reading-word-practice-next" type="button" id="reading-word-practice-close">Close practice / 練習を閉じる</button>`;
+            practicePanel.innerHTML = `<div class="reading-word-practice-feedback">Practice complete. You reviewed ${practiceQueue.length} words.<small>${R('練習','れんしゅう')}${R('完了','かんりょう')}。${practiceQueue.length}${R('語','ご')}を${R('復習','ふくしゅう')}しました。</small>${practiceMistakes ? `<br>You needed another try on ${practiceMistakes} answer${practiceMistakes === 1 ? '' : 's'}.<small>${practiceMistakes}${R('問','もん')}をもう${R('一度','いちど')}${R('考','かんが')}えました。</small>` : '<br>Clean round.<small>きれいにできました。</small>'}</div><button class="reading-word-practice-next" type="button" id="reading-word-practice-close">Close practice / ${R('練習','れんしゅう')}を${R('閉','と')}じる</button>`;
             practicePanel.hidden = false;
             practicePanel.querySelector('#reading-word-practice-close').addEventListener('click', closePractice);
             return;
@@ -1699,18 +1727,18 @@
           const target = practiceQueue[practiceIndex];
           const distractors = cabinetWords.filter(item => item.word !== target.word && item.definition !== target.definition).slice(0, 2);
           const options = [target, ...distractors].sort((a, b) => (a.word === target.word ? -1 : b.word === target.word ? 1 : a.word.localeCompare(b.word)));
-          practicePanel.innerHTML = `<div class="reading-word-practice-progress">WORD ${practiceIndex + 1} / ${practiceQueue.length}</div><div class="reading-word-practice-word">${escapeHTML(target.word)}</div><p class="reading-word-practice-prompt">What does this word mean?<small>この言葉の意味は何ですか？</small></p>${feedback ? `<div class="reading-word-practice-feedback">${feedback}</div>` : ''}<div class="reading-word-practice-options">${options.map((item, index) => `<button class="reading-word-practice-option" type="button" data-practice-option="${index}">${escapeHTML(item.definition)}<small>${escapeHTML(item.definitionJP)}</small></button>`).join('')}</div>`;
+          practicePanel.innerHTML = `<div class="reading-word-practice-progress">WORD ${practiceIndex + 1} / ${practiceQueue.length}</div><div class="reading-word-practice-word">${escapeHTML(target.word)}</div><p class="reading-word-practice-prompt">What does this word mean?<small>この${R('言葉','ことば')}の${R('意味','いみ')}は${R('何','なん')}ですか？</small></p>${feedback ? `<div class="reading-word-practice-feedback">${feedback}</div>` : ''}<div class="reading-word-practice-options">${options.map((item, index) => `<button class="reading-word-practice-option" type="button" data-practice-option="${index}">${escapeHTML(item.definition)}<small>${escapeHTML(item.definitionJP)}</small></button>`).join('')}</div>`;
           practicePanel.hidden = false;
           practicePanel.querySelectorAll('[data-practice-option]').forEach(button => button.addEventListener('click', () => {
             const choice = options[Number(button.dataset.practiceOption)];
             if (choice.word === target.word) {
               recordWordPracticeResult(target, true);
               practiceIndex += 1;
-              renderPractice('<strong>Correct.</strong> The word is clearer now.<small>正解。言葉が少し分かりやすくなりました。</small>');
+              renderPractice(`<strong>Correct.</strong> The word is clearer now.<small>${R('正解','せいかい')}。${R('言葉','ことば')}が${R('少','すこ')}し${R('分','わ')}かりやすくなりました。</small>`);
             } else {
               recordWordPracticeResult(target, false);
               practiceMistakes += 1;
-              renderPractice('<strong>Not yet.</strong> Try the meaning again.<small>もう一度、意味を考えましょう。</small>');
+              renderPractice(`<strong>Not yet.</strong> Try the meaning again.<small>もう${R('一度','いちど')}、${R('意味','いみ')}を${R('考','かんが')}えましょう。</small>`);
             }
           }));
         };
@@ -1722,7 +1750,7 @@
         });
       }
       if (!entries.length) {
-        list.innerHTML = '<div class="reading-journal-empty">Restore a memory to place it here.<small>記憶を戻すと、ここに記録されます。</small></div>';
+        list.innerHTML = `<div class="reading-journal-empty">Restore a memory to place it here.<small>${R('記憶','きおく')}を${R('戻','もど')}すと、ここに${R('記録','きろく')}されます。</small></div>`;
         return;
       }
       list.innerHTML = entries.map((entry, index) => {
@@ -1737,12 +1765,12 @@
         // button beneath it read as two copies of one instruction — reworded
         // the status side to describe state, not repeat the call to action.
         const mastery = masteryLevel >= 2
-          ? { en: 'Mastered', jp: '習得済み', action: 'Check again / 習得チェック' }
+          ? { en: 'Mastered', jp: `${R('習得','しゅうとく')}${R('済','ず')}み`, action: `Check again / ${R('習得','しゅうとく')}チェック` }
           : masteryLevel === 1
-            ? { en: 'Ready to try alone', jp: '自力復習の準備完了', action: 'Try without hints / ヒントなしで挑戦' }
-            : { en: 'Not started yet', jp: 'まだ挑戦していません', action: 'Read with help / 案内付き復習' };
-        const postcardNote = entry.postcard ? `<details class="reading-journal-postcard"><summary>Postcard saved / 文章カードあり</summary><p>${escapeHTML(entry.postcard.text)}</p></details>` : '';
-        return `<article class="reading-journal-entry"><h3>${escapeHTML(episode.title)}<span>${escapeHTML(episode.titleJP)}</span></h3><div class="reading-journal-mastery">${mastery.en}<small>${mastery.jp}</small></div><p class="reading-journal-meta">${reviews} reading ${reviews === 1 ? 'completed' : 'sessions'} · ${escapeHTML(episode.eyebrow)}<br>${reviews === 1 ? '1回読了' : `${reviews}回読み返しました`}</p>${postcardNote}${words ? `<div class="reading-journal-vocab" aria-label="Vocabulary">${words}</div>` : ''}<button class="reading-journal-review" type="button" data-journal-entry="${index}">${mastery.action}</button></article>`;
+            ? { en: 'Ready to try alone', jp: `${R('自力','じりき')}${R('復習','ふくしゅう')}の${R('準備','じゅんび')}${R('完了','かんりょう')}`, action: `Try without hints / ヒントなしで${R('挑戦','ちょうせん')}` }
+            : { en: 'Not started yet', jp: `まだ${R('挑戦','ちょうせん')}していません`, action: `Read with help / ${R('案内','あんない')}${R('付','つ')}き${R('復習','ふくしゅう')}` };
+        const postcardNote = entry.postcard ? `<details class="reading-journal-postcard"><summary>Postcard saved / ${R('文章','ぶんしょう')}カードあり</summary><p>${escapeHTML(entry.postcard.text)}</p></details>` : '';
+        return `<article class="reading-journal-entry"><h3>${escapeHTML(episode.title)}<span>${readingJournalTitleJP(episode)}</span></h3><div class="reading-journal-mastery">${mastery.en}<small>${mastery.jp}</small></div><p class="reading-journal-meta">${reviews} reading ${reviews === 1 ? 'completed' : 'sessions'} · ${escapeHTML(episode.eyebrow)}<br>${reviews === 1 ? `1${R('回','かい')}${R('読了','どくりょう')}` : `${reviews}${R('回','かい')}${R('読','よ')}み${R('返','かえ')}しました`}</p>${postcardNote}${words ? `<div class="reading-journal-vocab" aria-label="Vocabulary">${words}</div>` : ''}<button class="reading-journal-review" type="button" data-journal-entry="${index}">${mastery.action}</button></article>`;
       }).join('');
       list.querySelectorAll('[data-journal-entry]').forEach(button => button.addEventListener('click', () => {
         const entry = entries[Number(button.dataset.journalEntry)];
@@ -1751,7 +1779,7 @@
     } catch (error) {
       console.error('[Utsuroba Journal] Could not load journal:', error);
       const list = readingJournalOverlay.querySelector('.reading-journal-list');
-      if (list) list.innerHTML = '<div class="reading-journal-empty">The journal is cloudy. Please try again.<small>ノートがぼやけています。もう一度試してください。</small></div>';
+      if (list) list.innerHTML = `<div class="reading-journal-empty">The journal is cloudy. Please try again.<small>ノートがぼやけています。もう${R('一度','いちど')}${R('試','ため')}してください。</small></div>`;
     }
   }
 

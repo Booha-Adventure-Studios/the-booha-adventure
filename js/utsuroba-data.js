@@ -104,18 +104,24 @@ window.UTSUROBA_DATA = {
     titleJP: "共有された歓迎"
   },
 
+  // *JP fields below carry <ruby> furigana markup (see js/utsu-furigana.js)
+  // rather than plain text — this object is only ever consumed by the
+  // Weekly Reading Trail renderer in js/utsuroba.js, which renders these
+  // fields directly (not through escapeHTML), so the markup is trusted and
+  // safe to embed here. Do not reuse these *JP fields elsewhere without
+  // checking that assumption still holds.
   readingChallenge: {
     title: "Weekly Reading Trail",
-    titleJP: "週間読書トレイル",
+    titleJP: "<ruby>週間<rt>しゅうかん</rt></ruby><ruby>読書<rt>どくしょ</rt></ruby>トレイル",
     intro: "Collect four small wins before the curriculum week changes.",
-    introJP: "カリキュラムの週が変わる前に、小さな成功を四つ集めましょう。",
+    introJP: "カリキュラムの<ruby>週<rt>しゅう</rt></ruby>が<ruby>変<rt>か</rt></ruby>わる<ruby>前<rt>まえ</rt></ruby>に、<ruby>小<rt>ちい</rt></ruby>さな<ruby>成功<rt>せいこう</rt></ruby>を<ruby>四<rt>よっ</rt></ruby>つ<ruby>集<rt>あつ</rt></ruby>めましょう。",
     complete: "The trail is complete. Your reading has a shape this week.",
-    completeJP: "トレイル達成。今週の読書が形になりました。",
+    completeJP: "トレイル<ruby>達成<rt>たっせい</rt></ruby>。<ruby>今週<rt>こんしゅう</rt></ruby>の<ruby>読書<rt>どくしょ</rt></ruby>が<ruby>形<rt>かたち</rt></ruby>になりました。",
     goals: [
-      {id: "memories", target: 2, label: "Restore 2 memories", labelJP: "記憶を2つ戻す", complete: "Two memories are glowing.", completeJP: "二つの記憶が光っています。"},
-      {id: "evidence", target: 1, label: "Use evidence once", labelJP: "証拠を1回使う", complete: "You looked closely.", completeJP: "よく読みました。"},
-      {id: "postcard", target: 1, label: "Save a postcard", labelJP: "文章カードを保存する", complete: "Your summary is saved.", completeJP: "まとめを保存しました。"},
-      {id: "lens", target: 1, label: "Try a replay lens", labelJP: "読み返しの視点を試す", complete: "You changed the way you read.", completeJP: "読み方を変えてみました。"}
+      {id: "memories", target: 2, label: "Restore 2 memories", labelJP: "<ruby>記憶<rt>きおく</rt></ruby>を2つ<ruby>戻<rt>もど</rt></ruby>す", complete: "Two memories are glowing.", completeJP: "<ruby>二<rt>ふた</rt></ruby>つの<ruby>記憶<rt>きおく</rt></ruby>が<ruby>光<rt>ひか</rt></ruby>っています。"},
+      {id: "evidence", target: 1, label: "Use evidence once", labelJP: "<ruby>証拠<rt>しょうこ</rt></ruby>を1<ruby>回<rt>かい</rt></ruby><ruby>使<rt>つか</rt></ruby>う", complete: "You looked closely.", completeJP: "よく<ruby>読<rt>よ</rt></ruby>みました。"},
+      {id: "postcard", target: 1, label: "Save a postcard", labelJP: "<ruby>文章<rt>ぶんしょう</rt></ruby>カードを<ruby>保存<rt>ほぞん</rt></ruby>する", complete: "Your summary is saved.", completeJP: "まとめを<ruby>保存<rt>ほぞん</rt></ruby>しました。"},
+      {id: "lens", target: 1, label: "Try a replay lens", labelJP: "<ruby>読<rt>よ</rt></ruby>み<ruby>返<rt>かえ</rt></ruby>しの<ruby>視点<rt>してん</rt></ruby>を<ruby>試<rt>ため</rt></ruby>す", complete: "You changed the way you read.", completeJP: "<ruby>読<rt>よ</rt></ruby>み<ruby>方<rt>かた</rt></ruby>を<ruby>変<rt>か</rt></ruby>えてみました。"}
     ]
   },
 
