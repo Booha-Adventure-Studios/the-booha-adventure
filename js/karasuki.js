@@ -834,8 +834,8 @@ const HAPPY_HOUSE_PORTAL = {
       <div class="dp-handle"></div>
       <div class="dp-inner" style="max-width:480px;margin:0 auto;">
         <div class="dp-body" style="text-align:center;" role="dialog" aria-modal="true" aria-labelledby="orb-panel-title" aria-describedby="orb-panel-fragment">
-          <button id="orb-panel-close" class="dp-close-x" aria-label="Close memory reading">✕</button>
-          <h2 id="orb-panel-title" style="font-size:clamp(1.12rem,3.4vw,1.42rem);font-weight:700;color:#1e140a;margin:0 0 1px;">Read the memory</h2>
+          <button id="orb-panel-close" class="dp-close-x" aria-label="Close memory reading" aria-hidden="true" style="visibility:hidden;opacity:0;pointer-events:none;">✕</button>
+          <h2 id="orb-panel-title" tabindex="-1" style="font-size:clamp(1.12rem,3.4vw,1.42rem);font-weight:700;color:#1e140a;margin:0 0 1px;">Read the memory</h2>
           <p id="orb-panel-subtitle" class="dp-line-jp" style="margin-bottom:2px;">${furi('記憶を読もう', { '記憶': 'きおく', '読もう': 'よもう' })}</p>
           <p id="orb-panel-memory-title" style="margin:0 0 8px;color:#806040;font-size:clamp(.68rem,1.7vw,.78rem);line-height:1.35;"></p>
           <div class="dp-divider" style="margin-left:auto;margin-right:auto;"></div>
@@ -875,8 +875,15 @@ const HAPPY_HOUSE_PORTAL = {
     clearTimeout(orbRevealTimer);
     orbTypeDone = true;
     const fragment = document.getElementById('orb-panel-fragment');
+    const closeButton = document.getElementById('orb-panel-close');
     const actions  = document.getElementById('orb-panel-actions');
     if (fragment) fragment.textContent = fragment.dataset.fullText || '';
+    if (closeButton) {
+      closeButton.style.visibility = 'hidden';
+      closeButton.style.opacity = '0';
+      closeButton.style.pointerEvents = 'none';
+      closeButton.setAttribute('aria-hidden', 'true');
+    }
     if (actions) {
       actions.style.opacity = '0';
       actions.style.pointerEvents = 'none';
@@ -887,6 +894,12 @@ const HAPPY_HOUSE_PORTAL = {
          arrive, so the reading task does not visually compete with them. */
       orbRevealTimer = setTimeout(() => {
         if (orbPanelOpen && actions) {
+          if (closeButton) {
+            closeButton.style.visibility = 'visible';
+            closeButton.style.opacity = '1';
+            closeButton.style.pointerEvents = 'auto';
+            closeButton.setAttribute('aria-hidden', 'false');
+          }
           actions.style.opacity = '1';
           actions.style.pointerEvents = 'auto';
           actions.setAttribute('aria-hidden', 'false');
@@ -913,13 +926,20 @@ const HAPPY_HOUSE_PORTAL = {
     orbPanelEl.style.setProperty('--card-ring', colors.shadow);
     orbPanelEl.style.setProperty('--card-glow', `rgba(${colors.glowRGBA},.45)`);
     requestAnimationFrame(() => requestAnimationFrame(() => orbPanelEl.classList.add('open')));
-    requestAnimationFrame(() => document.getElementById('orb-panel-close')?.focus());
+    requestAnimationFrame(() => document.getElementById('orb-panel-title')?.focus());
     state.clickTarget = null;
 
     clearTimeout(orbTypeTimer);
     clearTimeout(orbRevealTimer);
     const fullText = entry ? entry.text : '';
+    const closeButton = document.getElementById('orb-panel-close');
     if (fragment) { fragment.textContent = ''; fragment.dataset.fullText = fullText; }
+    if (closeButton) {
+      closeButton.style.visibility = 'hidden';
+      closeButton.style.opacity = '0';
+      closeButton.style.pointerEvents = 'none';
+      closeButton.setAttribute('aria-hidden', 'true');
+    }
     if (actions) {
       actions.style.opacity = '0';
       actions.style.pointerEvents = 'none';
@@ -931,6 +951,12 @@ const HAPPY_HOUSE_PORTAL = {
         actions.style.opacity = '1';
         actions.style.pointerEvents = 'auto';
         actions.setAttribute('aria-hidden', 'false');
+      }
+      if (closeButton) {
+        closeButton.style.visibility = 'visible';
+        closeButton.style.opacity = '1';
+        closeButton.style.pointerEvents = 'auto';
+        closeButton.setAttribute('aria-hidden', 'false');
       }
       return;
     }

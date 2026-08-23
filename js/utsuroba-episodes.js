@@ -42,4 +42,48 @@
       console.error('[Utsuroba] Episode loading failed:', error);
       throw error;
     });
+
+  /*
+   * Difficulty resolution — Fresh Memory / Deep Memory.
+   *
+   * Story authors may nest a "fresh" object inside an episode (same id,
+   * same rooms/checks shape, simpler wording) as an easier on-ramp for
+   * younger students. The episode's id, title, and worldEcho always stay
+   * the canonical ones — only the reading content itself varies — so every
+   * other part of the save (readingEchoes, readingJournal, convergence,
+   * relationships) keeps working unchanged regardless of which tier a
+   * student reads in.
+   *
+   * Defaults to 'deep' (today's content, unchanged) so existing saves and
+   * students see no difference until they opt into Fresh Memory.
+   */
+  function getReadingDifficulty() {
+    try {
+      const save = window.BoohaAdventure && BoohaAdventure.save
+        ? BoohaAdventure.save.load() : null;
+      return (save && save.utsuroba && save.utsuroba.readingDifficulty === 'fresh')
+        ? 'fresh' : 'deep';
+    } catch (_) { return 'deep'; }
+  }
+
+  // difficultyOverride lets a caller resolve a *specific* tier (e.g. "what
+  // did this student actually read when they completed this memory?") in
+  // contexts like journal history, rather than whatever the live toggle
+  // says right now. Omit it to resolve against the current save setting.
+  function resolveEpisode(id, difficultyOverride) {
+    const episode = episodes[id];
+    if (!episode) return episode;
+    const difficulty = difficultyOverride === 'fresh' || difficultyOverride === 'deep'
+      ? difficultyOverride : getReadingDifficulty();
+    if (difficulty === 'fresh' && episode.fresh) {
+      const merged = Object.assign({}, episode, episode.fresh);
+      delete merged.fresh;
+      merged.difficulty = 'fresh';
+      return merged;
+    }
+    return Object.assign({ difficulty: 'deep' }, episode);
+  }
+
+  window.UTSUROBA_READING_DIFFICULTY = getReadingDifficulty;
+  window.UTSUROBA_EPISODES_RESOLVE = resolveEpisode;
 })();

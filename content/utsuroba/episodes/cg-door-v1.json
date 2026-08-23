@@ -53,5 +53,54 @@
   "success": "The memory settles. Chagrin is still nervous, but the dark no longer owns the whole story.",
   "successJP": "記憶が落ち着きました。チャグリンはまだ緊張していますが、暗闇だけが物語のすべてではありません。",
   "worldEcho": {"roomId":"room_15","x":0.56,"y":0.48,"anchorDrifterId":"cg","motif":"reflection","label":"Chagrin's reflection","labelJP":"チャグリンの反射"},
-  "postcard": {"title":"Memory postcard","titleJP":"記憶カード","instruction":"Build a short summary in the best order.","instructionJP":"短いまとめを、よい順番に作りましょう。","chunks":["A shape frightened Chagrin.","It was his reflection.","Understanding it helped him breathe."],"chunksJP":["形がチャグリンを怖がらせた。","それは彼の反射だった。","分かると、彼は息ができた。"],"order":[0,1,2],"savedText":"A shape frightened Chagrin. It was his reflection. Understanding it helped him breathe."}
+  "postcard": {"title":"Memory postcard","titleJP":"記憶カード","instruction":"Build a short summary in the best order.","instructionJP":"短いまとめを、よい順番に作りましょう。","chunks":["A shape frightened Chagrin.","It was his reflection.","Understanding it helped him breathe."],"chunksJP":["形がチャグリンを怖がらせた。","それは彼の反射だった。","分かると、彼は息ができた。"],"order":[0,1,2],"savedText":"A shape frightened Chagrin. It was his reflection. Understanding it helped him breathe."},
+  "fresh": {
+    "intro": "Chagrin remembers a scary sound. Then a strange shape. Then he understood.",
+    "introJP": "チャグリンは怖い音を覚えています。そして不思議な形。そして分かりました。",
+    "vocabulary": [
+      {"word":"hall","definition":"a long room inside a building","definitionJP":"建物の中の長い場所"},
+      {"word":"shape","definition":"the outside form of something","definitionJP":"物の形"},
+      {"word":"reflection","definition":"your picture in glass or a mirror","definitionJP":"ガラスや鏡に映る自分の姿"},
+      {"word":"afraid","definition":"feeling scared","definitionJP":"怖いと感じること"},
+      {"word":"breathe","definition":"to take in air","definitionJP":"息をすること"}
+    ],
+    "mechanic": {
+      "instruction": "Watch how Chagrin's feeling changes.",
+      "instructionJP": "チャグリンの気持ちがどう変わるか見ましょう。",
+      "complete": "Chagrin is not scared anymore.",
+      "completeJP": "チャグリンはもう怖くありません。",
+      "beats": [
+        {"title":"Alarm","titleJP":"驚き","caption":"A door closes behind Chagrin.","captionJP":"チャグリンの後ろで扉が閉まります。"},
+        {"title":"A shape","titleJP":"形","caption":"Something moves in the glass.","captionJP":"ガラスの中で何かが動きます。"},
+        {"title":"Just me","titleJP":"自分だった","caption":"It was only his reflection.","captionJP":"それはただの自分の姿でした。"}
+      ]
+    },
+    "trailIntro": "Follow Chagrin's feeling, step by step.",
+    "trailIntroJP": "チャグリンの気持ちを一歩ずつ追いましょう。",
+    "trail": [
+      {"id":"cg_door_evidence_01","roomId":"room_06","type":"event","label":"01 / ALARM","labelJP":"驚き","title":"A closing door","titleJP":"<ruby>閉<rt>し</rt></ruby>まる<ruby>扉<rt>とびら</rt></ruby>","text":"A door closes behind Chagrin.","hint":"The next memory is in a shadowy hallway.","hintJP":"<ruby>次<rt>つぎ</rt></ruby>の<ruby>記憶<rt>きおく</rt></ruby>は、<ruby>影<rt>かげ</rt></ruby>の<ruby>多<rt>おお</rt></ruby>い<ruby>廊下<rt>ろうか</rt></ruby>にあります。"},
+      {"id":"cg_door_evidence_02","roomId":"room_15","type":"detail","label":"02 / A SHAPE","labelJP":"形","title":"A moving shape","titleJP":"<ruby>動<rt>うご</rt></ruby>く<ruby>形<rt>かたち</rt></ruby>","text":"Something moves across the glass.","hint":"The final memory is near a mirror.","hintJP":"<ruby>最後<rt>さいご</rt></ruby>の<ruby>記憶<rt>きおく</rt></ruby>は、<ruby>鏡<rt>かがみ</rt></ruby>の<ruby>近<rt>ちか</rt></ruby>くにあります。"},
+      {"id":"cg_door_evidence_03","roomId":"room_03","type":"inference","label":"03 / JUST ME","labelJP":"自分だった","title":"Only a reflection","titleJP":"ただの<ruby>反射<rt>はんしゃ</rt></ruby>","text":"It was only Chagrin's own reflection.","hint":"Return to Chagrin.","hintJP":"チャグリンのところへ<ruby>戻<rt>もど</rt></ruby>りましょう。"}
+    ],
+    "lines": [
+      {"speaker":"Chagrin","en":"A door closed behind me."},
+      {"speaker":"Chagrin","en":"I felt scared."},
+      {"speaker":"Narrator","en":"Something moved in the glass."},
+      {"speaker":"Chagrin","en":"It looked like a person!"},
+      {"speaker":"Chagrin","en":"It was only me. I could breathe again."}
+    ],
+    "checks": [
+      {"type":"sequence","sequenceOrder":[0,1,2],"revealAct":0,"evidenceLines":[0],"restoreText":"The first feeling is clear.","restoreTextJP":"最初の気持ちがはっきりしました。","label":"01 / ORDER","labelJP":"順番","prompt":"Put Chagrin's story in order.","promptJP":"チャグリンの物語を順番に並べましょう。","choices":["A door closed behind him.","Something moved in the glass.","It was only his reflection."],"choicesJP":["後ろで扉が閉まった。","ガラスの中で何かが動いた。","それはただの反射だった。"],"correct":0,"evidence":"The door comes first, then the shape, then the reflection.","evidenceJP":"最初に扉が閉まり、次に形が動き、最後に反射だと分かります。"},
+      {"type":"detail","matchLine":3,"revealAct":1,"evidenceLines":[3],"restoreText":"The shape is clear.","restoreTextJP":"形がはっきりしました。","label":"02 / DETAIL","labelJP":"細部","prompt":"Which line shows Chagrin was scared of the shape?","promptJP":"チャグリンが形を怖がったと分かる行はどれですか？","choices":["It looked like a person!","I like this hallway.","The door is blue."],"choicesJP":["それは人のように見えた！","この廊下が好き。","扉は青い。"],"correct":0,"evidence":"Chagrin says the shape looked like a person.","evidenceJP":"チャグリンは、その形が人のように見えたと言っています。"},
+      {"type":"inference","supportingLine":4,"revealAct":2,"evidenceLines":[3,4],"restoreText":"He can breathe again.","restoreTextJP":"また息ができるようになりました。","label":"03 / GUESS WHY","labelJP":"推測","prompt":"Why could Chagrin breathe again?","promptJP":"チャグリンはなぜまた息ができましたか？","choices":["He saw it was only his reflection.","The door opened by itself.","He found a candy."],"choicesJP":["それがただの反射だと分かったから。","扉がひとりでに開いたから。","キャンディを見つけたから。"],"correct":0,"evidence":"Chagrin understood the shape was just his own reflection.","evidenceJP":"チャグリンは、その形がただの自分の姿だと分かりました。"}
+    ],
+    "replayLenses": {
+      "detail": {"label":"FIND THE DETAIL","labelJP":"細部ハント","prompt":"Which line shows Chagrin was scared of the shape?","promptJP":"チャグリンが形を怖がったと分かる行はどれですか？","choices":["It looked like a person!","I like this hallway.","The door is blue."],"choicesJP":["それは人のように見えた！","この廊下が好き。","扉は青い。"],"correct":0,"evidenceLines":[3],"evidence":"Chagrin says the shape looked like a person.","evidenceJP":"チャグリンは、その形が人のように見えたと言っています。"},
+      "emotion": {"label":"FIND THE FEELING","labelJP":"気持ちハント","prompt":"How does Chagrin's feeling change?","promptJP":"チャグリンの気持ちはどのように変わりますか？","choices":["Scared, then okay.","Happy, then sleepy.","Bored, then excited."],"choicesJP":["怖い、そして大丈夫。","幸せ、そして眠い。","退屈、そして興奮。"],"correct":0,"evidenceLines":[1,4],"evidence":"Chagrin feels scared at first, then okay once he understands.","evidenceJP":"チャグリンは最初は怖がり、分かると大丈夫になります。"},
+      "inference": {"label":"GUESS WHY","labelJP":"推測ハント","prompt":"Why could Chagrin breathe again?","promptJP":"チャグリンはなぜまた息ができましたか？","choices":["He saw it was only his reflection.","The door opened by itself.","He found a candy."],"choicesJP":["それがただの反射だと分かったから。","扉がひとりでに開いたから。","キャンディを見つけたから。"],"correct":0,"evidenceLines":[3,4],"evidence":"Chagrin understood the shape was just his own reflection.","evidenceJP":"チャグリンは、その形がただの自分の姿だと分かりました。"}
+    },
+    "success": "Chagrin feels better — it was only his own reflection.",
+    "successJP": "チャグリンは安心しました。それはただの自分の姿でした。",
+    "postcard": {"chunks":["A door closed behind Chagrin.","A shape moved in the glass.","It was only his reflection."],"chunksJP":["チャグリンの後ろで扉が閉まった。","ガラスの中で形が動いた。","それはただの反射だった。"],"order":[0,1,2],"savedText":"A door closed behind Chagrin. A shape moved in the glass. It was only his reflection."}
+  }
 }

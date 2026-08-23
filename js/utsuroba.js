@@ -227,6 +227,7 @@
     if (!data.utsuroba.drifters)     { data.utsuroba.drifters     = {}; dirty = true; }
     if (!data.utsuroba.visitedRooms) { data.utsuroba.visitedRooms = {}; dirty = true; }
     if (!data.utsuroba.flags)        { data.utsuroba.flags        = {}; dirty = true; }
+    if (!data.utsuroba.readingDifficulty) { data.utsuroba.readingDifficulty = 'deep'; dirty = true; }
     if (!data.utsuroba.readingJournal) {
       data.utsuroba.readingJournal = { entries: [] };
       dirty = true;
@@ -549,6 +550,11 @@
     data.utsuroba.drifters[id].weeklyStatus = 'complete';
     const quest = data.weekly?.drifterQuest;
     if (quest && quest.active === id && quest.memIdx === memIdx && quest.episodeId) {
+      // Fresh Memory / Deep Memory: record which tier the student actually
+      // read, so the journal/profile can stay accurate even if they switch
+      // the toggle later.
+      const completionDifficulty = window.UTSUROBA_READING_DIFFICULTY
+        ? window.UTSUROBA_READING_DIFFICULTY() : 'deep';
       const journal = data.utsuroba.readingJournal || { entries: [] };
       const entries = Array.isArray(journal.entries) ? journal.entries : [];
       const existing = entries.find(entry => entry.episodeId === quest.episodeId);
@@ -557,6 +563,7 @@
         existing.reviewCount = (existing.reviewCount || 1) + 1;
         existing.drifterId = id;
         existing.memIdx = memIdx;
+        existing.difficulty = completionDifficulty;
       } else {
         entries.unshift({
           episodeId: quest.episodeId,
@@ -567,6 +574,7 @@
           masteryLevel: 0,
           guidedSessions: 0,
           independentSessions: 0,
+          difficulty: completionDifficulty,
         });
       }
       const journalEntry = existing || entries[0];
@@ -578,7 +586,9 @@
       }
       journal.entries = entries.slice(0, 12);
       data.utsuroba.readingJournal = journal;
-      const episode = window.UTSUROBA_EPISODES?.[quest.episodeId];
+      const episode = window.UTSUROBA_EPISODES_RESOLVE
+        ? window.UTSUROBA_EPISODES_RESOLVE(quest.episodeId)
+        : window.UTSUROBA_EPISODES?.[quest.episodeId];
       if (episode && Array.isArray(episode.vocabulary)) {
         const cabinet = data.utsuroba.wordCabinet || { entries: [] };
         const words = Array.isArray(cabinet.entries) ? cabinet.entries : [];
@@ -606,6 +616,7 @@
       data.utsuroba.readingEchoes[quest.episodeId] = {
         drifterId: id,
         restoredAt: Date.now(),
+        difficulty: completionDifficulty,
       };
     }
     if (data.weekly) data.weekly.drifterQuest = null;
@@ -1884,7 +1895,9 @@
         return;
       }
       list.innerHTML = entries.map((entry, index) => {
-        const episode = window.UTSUROBA_EPISODES[entry.episodeId];
+        const episode = window.UTSUROBA_EPISODES_RESOLVE
+          ? window.UTSUROBA_EPISODES_RESOLVE(entry.episodeId, entry.difficulty)
+          : window.UTSUROBA_EPISODES[entry.episodeId];
         if (!episode) return '';
         const words = Array.isArray(episode.vocabulary) ? episode.vocabulary.slice(0, 5).map(item => `<span>${escapeHTML(item.word)}</span>`).join('') : '';
         const reviews = Math.max(1, Number(entry.reviewCount) || 1);

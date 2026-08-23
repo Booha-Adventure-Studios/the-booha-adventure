@@ -53,5 +53,54 @@
   "success": "The memory settles. Blakesly still won't say it kindly, but he doesn't send you away either.",
   "successJP": "記憶が落ち着きました。ブレイクスリーは優しくは言いませんが、あなたを追い返しもしません。",
   "worldEcho": {"roomId":"room_10","x":0.55,"y":0.50,"motif":"thorn","label":"A badge, worn less often","labelJP":"あまりつけなくなったバッジ"},
-  "postcard": {"title":"Memory postcard","titleJP":"記憶カード","instruction":"Build a short summary in the best order.","instructionJP":"短いまとめを、よい順番に作りましょう。","chunks":["Someone laughed at Blakesly.","He pinned on a badge to stay sharp.","Being sharp kept people away."],"chunksJP":["誰かがブレイクスリーを笑った。","彼は鋭くいるためにバッジをつけた。","鋭くいることが人を遠ざけた。"],"order":[0,1,2],"savedText":"Someone laughed at Blakesly. He pinned on a badge to stay sharp. Being sharp kept people away."}
+  "postcard": {"title":"Memory postcard","titleJP":"記憶カード","instruction":"Build a short summary in the best order.","instructionJP":"短いまとめを、よい順番に作りましょう。","chunks":["Someone laughed at Blakesly.","He pinned on a badge to stay sharp.","Being sharp kept people away."],"chunksJP":["誰かがブレイクスリーを笑った。","彼は鋭くいるためにバッジをつけた。","鋭くいることが人を遠ざけた。"],"order":[0,1,2],"savedText":"Someone laughed at Blakesly. He pinned on a badge to stay sharp. Being sharp kept people away."},
+  "fresh": {
+    "intro": "Blakesly remembers a badge. He does not like to talk about it.",
+    "introJP": "ブレイクスリーはバッジを覚えています。それについて話したくありません。",
+    "vocabulary": [
+      {"word":"badge","definition":"a small pin on clothes","definitionJP":"服につける小さなピン"},
+      {"word":"laugh","definition":"to make a happy sound","definitionJP":"楽しいときに出す声"},
+      {"word":"tease","definition":"to joke in an unkind way","definitionJP":"意地悪にからかうこと"},
+      {"word":"sharp","definition":"quick, and a little unkind","definitionJP":"すばやくて、少し厳しいこと"},
+      {"word":"guard","definition":"to keep safe","definitionJP":"守ること"}
+    ],
+    "mechanic": {
+      "instruction": "Look at the facts, one by one.",
+      "instructionJP": "事実を一つずつ見ましょう。",
+      "complete": "That is the whole story.",
+      "completeJP": "それが物語のすべてです。",
+      "items": [
+        {"title":"The laugh","titleJP":"笑い声","caption":"Someone laughed at Blakesly.","captionJP":"誰かがブレイクスリーを笑いました。"},
+        {"title":"The badge","titleJP":"バッジ","caption":"Blakesly wore a badge that meant: stay away.","captionJP":"ブレイクスリーは「近づくな」を意味するバッジをつけました。"},
+        {"title":"Alone","titleJP":"一人","caption":"Now no one comes close.","captionJP":"今、誰も近づいてきません。"}
+      ]
+    },
+    "trailIntro": "Follow the facts, one by one.",
+    "trailIntroJP": "事実を一つずつ追いましょう。",
+    "trail": [
+      {"id":"bk_badge_evidence_01","roomId":"room_09","type":"event","label":"01 / THE LAUGH","labelJP":"笑い声","title":"Someone laughed","titleJP":"<ruby>笑<rt>わら</rt></ruby>われた","text":"Someone laughed at Blakesly.","hint":"The next memory is near a room where something was pinned on.","hintJP":"<ruby>次<rt>つぎ</rt></ruby>の<ruby>記憶<rt>きおく</rt></ruby>は、<ruby>何<rt>なに</rt></ruby>かが<ruby>留<rt>と</rt></ruby>められた<ruby>部屋<rt>へや</rt></ruby>の<ruby>近<rt>ちか</rt></ruby>くです。"},
+      {"id":"bk_badge_evidence_02","roomId":"room_04","type":"detail","label":"02 / THE BADGE","labelJP":"バッジ","title":"A badge, pinned on","titleJP":"<ruby>留<rt>と</rt></ruby>められたバッジ","text":"Blakesly wore a badge that meant: stay away.","hint":"The final memory is in a quiet room.","hintJP":"<ruby>最後<rt>さいご</rt></ruby>の<ruby>記憶<rt>きおく</rt></ruby>は、<ruby>静<rt>しず</rt></ruby>かな<ruby>部屋<rt>へや</rt></ruby>にあります。"},
+      {"id":"bk_badge_evidence_03","roomId":"room_10","type":"inference","label":"03 / ALONE","labelJP":"一人","title":"No one close","titleJP":"<ruby>誰<rt>だれ</rt></ruby>も<ruby>近<rt>ちか</rt></ruby>くにいない","text":"Now no one comes close.","hint":"Return to Blakesly.","hintJP":"ブレイクスリーのところへ<ruby>戻<rt>もど</rt></ruby>りましょう。"}
+    ],
+    "lines": [
+      {"speaker":"Blakesly","en":"Someone laughed at me."},
+      {"speaker":"Blakesly","en":"I felt hurt."},
+      {"speaker":"Narrator","en":"So Blakesly wore a badge that meant: stay away."},
+      {"speaker":"Narrator","en":"It worked. People stayed away."},
+      {"speaker":"Blakesly","en":"Now I am alone."}
+    ],
+    "checks": [
+      {"type":"sequence","sequenceOrder":[0,1,2],"revealAct":0,"evidenceLines":[0],"restoreText":"The first fact is pinned.","restoreTextJP":"最初の事実が留まりました。","label":"01 / ORDER","labelJP":"順番","prompt":"Put Blakesly's story in order.","promptJP":"ブレイクスリーの物語を順番に並べましょう。","choices":["Someone laughed at Blakesly.","He wore a badge that meant stay away.","Now he is alone."],"choicesJP":["誰かがブレイクスリーを笑った。","彼は「近づくな」のバッジをつけた。","今、彼は一人だ。"],"correct":0,"evidence":"The laugh comes first, then the badge, then being alone.","evidenceJP":"最初に笑われ、次にバッジをつけ、最後に一人になります。"},
+      {"type":"detail","matchLine":2,"revealAct":1,"evidenceLines":[2],"restoreText":"The badge returns.","restoreTextJP":"バッジが戻りました。","label":"02 / DETAIL","labelJP":"細部","prompt":"Which line shows why Blakesly wore the badge?","promptJP":"ブレイクスリーがバッジをつけた理由が分かる行はどれですか？","choices":["It meant: stay away.","It meant: come closer.","It meant: I am happy."],"choicesJP":["「近づくな」という意味だった。","「もっと近くに」という意味だった。","「嬉しい」という意味だった。"],"correct":0,"evidence":"The badge meant: stay away.","evidenceJP":"バッジは「近づくな」という意味でした。"},
+      {"type":"inference","supportingLine":4,"revealAct":2,"evidenceLines":[3,4],"restoreText":"Being alone makes sense now.","restoreTextJP":"一人でいる理由が分かりました。","label":"03 / GUESS WHY","labelJP":"推測","prompt":"Why is Blakesly alone now?","promptJP":"ブレイクスリーはなぜ今、一人なのでしょう？","choices":["The badge kept everyone away.","No one in Utsuroba likes badges.","He is waiting for a bell."],"choicesJP":["バッジがみんなを遠ざけたから。","うつろばの誰もバッジが好きではないから。","鐘を待っているから。"],"correct":0,"evidence":"Being sharp kept people away, so now Blakesly is alone.","evidenceJP":"鋭くいることが人を遠ざけたので、今ブレイクスリーは一人です。"}
+    ],
+    "replayLenses": {
+      "detail": {"label":"FIND THE DETAIL","labelJP":"細部ハント","prompt":"Which line shows why Blakesly wore the badge?","promptJP":"ブレイクスリーがバッジをつけた理由が分かる行はどれですか？","choices":["It meant: stay away.","It meant: come closer.","It meant: I am happy."],"choicesJP":["「近づくな」という意味だった。","「もっと近くに」という意味だった。","「嬉しい」という意味だった。"],"correct":0,"evidenceLines":[2],"evidence":"The badge meant: stay away.","evidenceJP":"バッジは「近づくな」という意味でした。"},
+      "emotion": {"label":"FIND THE FEELING","labelJP":"気持ちハント","prompt":"How does Blakesly's feeling change?","promptJP":"ブレイクスリーの気持ちはどのように変わりますか？","choices":["Hurt, then alone.","Happy, then sleepy.","Bored, then proud."],"choicesJP":["傷つき、そして一人に。","幸せ、そして眠く。","退屈、そして誇らしく。"],"correct":0,"evidenceLines":[1,4],"evidence":"The laugh hurts Blakesly, and being sharp leaves him alone.","evidenceJP":"笑われて傷つき、鋭くいることで一人になります。"},
+      "inference": {"label":"GUESS WHY","labelJP":"推測ハント","prompt":"Why is Blakesly alone now?","promptJP":"ブレイクスリーはなぜ今、一人なのでしょう？","choices":["The badge kept everyone away.","No one in Utsuroba likes badges.","He is waiting for a bell."],"choicesJP":["バッジがみんなを遠ざけたから。","うつろばの誰もバッジが好きではないから。","鐘を待っているから。"],"correct":0,"evidenceLines":[3,4],"evidence":"Being sharp kept people away, so now Blakesly is alone.","evidenceJP":"鋭くいることが人を遠ざけたので、今ブレイクスリーは一人です。"}
+    },
+    "success": "Blakesly is still guarded, but he lets you stay close.",
+    "successJP": "ブレイクスリーはまだ用心深いですが、あなたのそばにいることを許します。",
+    "postcard": {"chunks":["Someone laughed at Blakesly.","He wore a badge that meant stay away.","Now he is alone."],"chunksJP":["誰かがブレイクスリーを笑った。","彼は「近づくな」のバッジをつけた。","今、彼は一人だ。"],"order":[0,1,2],"savedText":"Someone laughed at Blakesly. He wore a badge that meant stay away. Now he is alone."}
+  }
 }

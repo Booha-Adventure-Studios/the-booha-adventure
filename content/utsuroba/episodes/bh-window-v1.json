@@ -53,5 +53,54 @@
   "success":"The memory settles. Bryan remembers that belonging can begin with a few quiet words.",
   "successJP":"記憶が落ち着きました。居場所は、静かな短い言葉から始まることをブライアンは思い出しました。",
   "worldEcho":{"roomId":"room_03","x":0.42,"y":0.57,"motif":"reflection","label":"A welcome in the glass","labelJP":"ガラスの歓迎"},
-  "postcard":{"title":"Memory postcard","titleJP":"記憶カード","instruction":"Build a short summary in the best order.","instructionJP":"短いまとめを、よい順番に作りましょう。","chunks":["Bryan wrote his name on the window.","Rain changed the letters.","A message told him he could stay."],"chunksJP":["ブライアンは窓に名前を書いた。","雨が文字を変えた。","言葉が彼に残ってよいと伝えた。"],"order":[0,1,2],"savedText":"Bryan wrote his name on the window. Rain changed the letters. A message told him he could stay."}
+  "postcard":{"title":"Memory postcard","titleJP":"記憶カード","instruction":"Build a short summary in the best order.","instructionJP":"短いまとめを、よい順番に作りましょう。","chunks":["Bryan wrote his name on the window.","Rain changed the letters.","A message told him he could stay."],"chunksJP":["ブライアンは窓に名前を書いた。","雨が文字を変えた。","言葉が彼に残ってよいと伝えた。"],"order":[0,1,2],"savedText":"Bryan wrote his name on the window. Rain changed the letters. A message told him he could stay."},
+  "fresh": {
+    "intro": "Bryan remembers his name on a window. Rain changed it. Then he read something new.",
+    "introJP": "ブライアンは窓に書いた名前を覚えています。雨がそれを変えました。そして新しい言葉を読みました。",
+    "vocabulary": [
+      {"word":"window","definition":"glass you can see through","definitionJP":"見えるガラス"},
+      {"word":"rain","definition":"water that falls from the sky","definitionJP":"空から落ちる水"},
+      {"word":"name","definition":"what people call you","definitionJP":"人を呼ぶ言葉"},
+      {"word":"stay","definition":"to not leave","definitionJP":"帰らないこと"},
+      {"word":"welcome","definition":"a happy hello","definitionJP":"うれしい「ようこそ」という気持ち"}
+    ],
+    "mechanic": {
+      "instruction": "Watch Bryan's feeling change.",
+      "instructionJP": "ブライアンの気持ちの変化を見ましょう。",
+      "complete": "Bryan feels welcome now.",
+      "completeJP": "今、ブライアンは歓迎されています。",
+      "beats": [
+        {"title":"A name","titleJP":"名前","caption":"Bryan writes his name on the window.","captionJP":"ブライアンは窓に名前を書きます。"},
+        {"title":"Rain comes","titleJP":"雨が降る","caption":"Rain changes the letters.","captionJP":"雨が文字を変えます。"},
+        {"title":"A new word","titleJP":"新しい言葉","caption":"Someone writes: You can stay.","captionJP":"誰かが「残っていい」と書きます。"}
+      ]
+    },
+    "trailIntro": "Follow Bryan's story, step by step.",
+    "trailIntroJP": "ブライアンの物語を、一歩ずつ追いましょう。",
+    "trail": [
+      {"id":"bh_window_evidence_01","roomId":"room_04","type":"detail","label":"01 / A NAME","labelJP":"名前","title":"A name on the window","titleJP":"<ruby>窓<rt>まど</rt></ruby>の<ruby>名前<rt>なまえ</rt></ruby>","text":"Bryan writes his name on the window.","hint":"The next memory is near a room where paths cross.","hintJP":"<ruby>次<rt>つぎ</rt></ruby>の<ruby>記憶<rt>きおく</rt></ruby>は、<ruby>道<rt>みち</rt></ruby>が<ruby>交<rt>まじ</rt></ruby>わる<ruby>部屋<rt>へや</rt></ruby>の<ruby>近<rt>ちか</rt></ruby>くです。"},
+      {"id":"bh_window_evidence_02","roomId":"room_12","type":"event","label":"02 / RAIN COMES","labelJP":"雨が降る","title":"Rain changes it","titleJP":"<ruby>変<rt>か</rt></ruby>わる<ruby>文字<rt>もじ</rt></ruby>","text":"Rain falls. The letters look different now.","hint":"The final memory is near the place where you first came in.","hintJP":"<ruby>最後<rt>さいご</rt></ruby>の<ruby>記憶<rt>きおく</rt></ruby>は、<ruby>最初<rt>さいしょ</rt></ruby>に<ruby>入<rt>はい</rt></ruby>った<ruby>場所<rt>ばしょ</rt></ruby>の<ruby>近<rt>ちか</rt></ruby>くです。"},
+      {"id":"bh_window_evidence_03","roomId":"room_03","type":"inference","label":"03 / A NEW WORD","labelJP":"新しい言葉","title":"Someone writes a new word","titleJP":"<ruby>新<rt>あたら</rt></ruby>しい<ruby>言葉<rt>ことば</rt></ruby>","text":"Someone writes: You can stay.","hint":"Return to Bryan with the new word.","hintJP":"<ruby>新<rt>あたら</rt></ruby>しい<ruby>言葉<rt>ことば</rt></ruby>を<ruby>持<rt>も</rt></ruby>って、ブライアンのところへ<ruby>戻<rt>もど</rt></ruby>りましょう。"}
+    ],
+    "lines": [
+      {"speaker":"Bryan","en":"I wrote my name on the window."},
+      {"speaker":"Narrator","en":"Rain fell on the glass."},
+      {"speaker":"Bryan","en":"The letters looked different now."},
+      {"speaker":"Narrator","en":"Someone wrote: You can stay."},
+      {"speaker":"Bryan","en":"Now I know I am welcome here."}
+    ],
+    "checks": [
+      {"type":"sequence","sequenceOrder":[0,1,2],"revealAct":0,"evidenceLines":[0],"restoreText":"The first piece returns.","restoreTextJP":"最初の記憶が戻りました。","label":"01 / ORDER","labelJP":"順番","prompt":"Put the story in order.","promptJP":"物語を順番に並べましょう。","choices":["Bryan wrote his name.","Rain fell on the window.","Someone wrote: You can stay."],"choicesJP":["ブライアンは名前を書いた。","雨が窓に降った。","誰かが「残っていい」と書いた。"],"correct":0,"evidence":"The name comes first, then the rain, then the new word.","evidenceJP":"最初に名前を書き、次に雨が降り、最後に新しい言葉が現れます。"},
+      {"type":"detail","matchLine":3,"revealAct":1,"evidenceLines":[3],"restoreText":"The new word returns.","restoreTextJP":"新しい言葉が戻りました。","label":"02 / DETAIL","labelJP":"細部","prompt":"Which line says Bryan can stay?","promptJP":"ブライアンが残っていいと分かる行はどれですか？","choices":["You can stay.","Please leave now.","Come back later."],"choicesJP":["残っていい。","今すぐ帰って。","また今度来て。"],"correct":0,"evidence":"The message says, You can stay.","evidenceJP":"言葉は「残っていい」と伝えています。"},
+      {"type":"inference","supportingLine":4,"revealAct":2,"evidenceLines":[4],"restoreText":"Bryan's feeling is clear.","restoreTextJP":"ブライアンの気持ちが分かりました。","label":"03 / HOW HE FEELS","labelJP":"気持ち","prompt":"How does Bryan feel now?","promptJP":"ブライアンは今、どんな気持ちですか？","choices":["Welcome.","Angry.","Tired."],"choicesJP":["歓迎されている。","怒っている。","疲れている。"],"correct":0,"evidence":"Bryan says he knows he is welcome now.","evidenceJP":"ブライアンは、自分が歓迎されていると分かったと言っています。"}
+    ],
+    "replayLenses": {
+      "detail": {"label":"FIND THE DETAIL","labelJP":"細部ハント","prompt":"Which line says Bryan can stay?","promptJP":"ブライアンが残っていいと分かる行はどれですか？","choices":["You can stay.","Please leave now.","Come back later."],"choicesJP":["残っていい。","今すぐ帰って。","また今度来て。"],"correct":0,"evidenceLines":[3],"evidence":"The message says, You can stay.","evidenceJP":"言葉は「残っていい」と伝えています。"},
+      "emotion": {"label":"FIND THE FEELING","labelJP":"気持ちハント","prompt":"How does Bryan's feeling change?","promptJP":"ブライアンの気持ちはどのように変わりますか？","choices":["Unsure, then welcome.","Angry, then hungry.","Excited, then bored."],"choicesJP":["不安、そして歓迎。","怒り、そして空腹。","興奮、そして退屈。"],"correct":0,"evidenceLines":[0,4],"evidence":"Bryan writes his name alone, then feels welcome by the end.","evidenceJP":"ブライアンは一人で名前を書き、最後には歓迎されていると感じます。"},
+      "inference": {"label":"GUESS WHY","labelJP":"推測ハント","prompt":"Why does Bryan feel welcome now?","promptJP":"ブライアンはなぜ今、歓迎されていると感じるのですか？","choices":["Someone told him he could stay.","He wrote a bigger name.","The rain stopped."],"choicesJP":["誰かが残っていいと言ったから。","もっと大きな名前を書いたから。","雨が止んだから。"],"correct":0,"evidenceLines":[3,4],"evidence":"The new message tells Bryan he can stay, and he feels welcome.","evidenceJP":"新しい言葉がブライアンに残っていいと伝え、彼は歓迎されていると感じます。"}
+    },
+    "success": "Bryan remembers he is welcome.",
+    "successJP": "ブライアンは、自分が歓迎されていることを思い出しました。",
+    "postcard": {"chunks":["Bryan wrote his name.","Rain changed it.","Someone said he could stay."],"chunksJP":["ブライアンは名前を書いた。","雨がそれを変えた。","誰かが残っていいと言った。"],"order":[0,1,2],"savedText":"Bryan wrote his name. Rain changed it. Someone said he could stay."}
+  }
 }
