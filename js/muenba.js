@@ -85,6 +85,8 @@
   let returnPortalOverlay = null;
   let returnPortalOpen = false;
   let returnPortalCooldownUntil = 0;
+  let lobbyOverlay = null;
+  let lobbyOpen = false;
   let motes = [];
   let moteSprite = null;
   const imageCache = new Map();
@@ -101,6 +103,10 @@
   const MOTE_COUNT = 6;
   const ghostImg = new Image();
   ghostImg.src = 'assets/img/booha_ghost.png';
+  // Reusing Nuppi's existing wandering-NPC art from Karasuki (same asset
+  // path, no new files) rather than a new character for the lobby host.
+  const nuppiLobbyImg = new Image();
+  nuppiLobbyImg.src = 'assets/img/wanderers/nuppi-2.png';
   const music = new Audio('assets/img/muenba/muenba_BGM.mp3');
   music.loop = true;
   music.volume = 0.55;
@@ -218,7 +224,24 @@
       #muenba-return-yes:hover, #muenba-return-yes:focus-visible { background:rgba(52,104,78,.44); outline:none; }
       #muenba-return-no { border:1px solid rgba(90,130,112,.5); color:#aec8bb; background:transparent; }
       #muenba-return-no:hover, #muenba-return-no:focus-visible { background:rgba(90,130,112,.16); outline:none; }
-      @media (prefers-reduced-motion: reduce) { #muenba-fade, .muenba-return-box, #muenba-return-overlay { transition:none !important; } }
+      /* Nuppi's lobby briefing — same dark-cemetery popup language as the
+         return prompt, just roomier: it holds a portrait plus a few lines
+         of text instead of a one-line question. Shows every time the
+         player enters Muenba (Pass 3b). */
+      #muenba-lobby-overlay { position:fixed; inset:0; z-index:210; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,0); transition:background .4s ease; padding:20px; box-sizing:border-box; }
+      #muenba-lobby-overlay.open { display:flex; background:rgba(0,0,0,.86); }
+      .muenba-lobby-box { box-sizing:border-box; width:min(480px,100%); max-height:calc(100vh - 40px); overflow-y:auto; padding:28px 26px 26px; border:1px solid rgba(111,166,145,.45); border-radius:18px; background:linear-gradient(155deg,rgba(8,27,20,.97),rgba(1,4,4,.98)); box-shadow:0 24px 70px rgba(0,0,0,.75),0 0 55px rgba(16,65,45,.28),inset 0 0 70px rgba(0,0,0,.58); text-align:center; font-family:Georgia,'Times New Roman',serif; color:#e0eee8; transform:scale(.94); opacity:0; transition:transform .32s cubic-bezier(.34,1.56,.64,1),opacity .26s ease; }
+      #muenba-lobby-overlay.open .muenba-lobby-box { transform:scale(1); opacity:1; }
+      .muenba-lobby-portrait { display:block; width:96px; height:96px; object-fit:contain; margin:0 auto 12px; filter:drop-shadow(0 0 16px rgba(122,180,151,.3)); }
+      .muenba-lobby-box h2 { margin:0 0 4px; font-size:1.2rem; font-weight:400; letter-spacing:.06em; text-transform:uppercase; }
+      .muenba-lobby-box .jp { margin:0 0 16px; color:#aac2b5; font-size:.85rem; letter-spacing:.1em; }
+      .muenba-lobby-box p { margin:0 0 14px; color:#c5d8cd; font-size:.92rem; line-height:1.65; text-align:left; }
+      .muenba-lobby-box p.jp-line { color:#8fa89b; font-size:.82rem; }
+      .muenba-lobby-box p:last-of-type { margin-bottom:20px; }
+      .muenba-lobby-actions { display:flex; justify-content:center; margin-top:4px; }
+      #muenba-lobby-begin { border:1px solid rgba(156,203,182,.7); color:#e0f4e9; background:rgba(52,104,78,.28); box-shadow:0 0 16px rgba(93,162,124,.22); border-radius:999px; padding:10px 28px; font:700 12px ui-monospace,monospace; letter-spacing:.05em; cursor:pointer; }
+      #muenba-lobby-begin:hover, #muenba-lobby-begin:focus-visible { background:rgba(52,104,78,.44); outline:none; }
+      @media (prefers-reduced-motion: reduce) { #muenba-fade, .muenba-return-box, #muenba-return-overlay, .muenba-lobby-box, #muenba-lobby-overlay { transition:none !important; } }
     `;
     document.head.appendChild(style);
   }
@@ -248,6 +271,7 @@
     document.body.appendChild(exitBtn);
 
     buildReturnPortalOverlay();
+    buildNuppiLobbyOverlay();
 
     const dev = document.createElement('div');
     dev.id = 'muenba-dev';
@@ -671,6 +695,71 @@
     return false;
   }
 
+  // ── Player name helper (Pass 3b) ────────────────────────────────────────
+  // muenba.html doesn't load karasuki.js or any of the blitz files, so the
+  // getBoohaFirstName()/getPlayerName() helpers those files already define
+  // aren't reachable here. This reads the exact same localStorage keys
+  // js/token.js writes (which muenba.html DOES load), rather than pulling
+  // in a whole extra script just for one string.
+  function getPlayerFirstName() {
+    try {
+      const direct = localStorage.getItem('booha_first_name');
+      if (direct) return direct.charAt(0).toUpperCase() + direct.slice(1).toLowerCase().slice(0, 12);
+      const full = localStorage.getItem('booha_user_name') || '';
+      const first = full.split(' ')[0].slice(0, 12);
+      return first ? first.charAt(0).toUpperCase() + first.slice(1).toLowerCase() : '';
+    } catch (_) {
+      return '';
+    }
+  }
+
+  // ── Nuppi's lobby briefing (Pass 3b) ────────────────────────────────────
+  // Same themed-popup pattern as the return portal above, not a new screen.
+  // Per the locked decision, this shows every time the player enters
+  // Muenba (not just the first time), in a warm-guide tone, addressing the
+  // player by name when one is on file. It ends on a dismiss button —
+  // Pass 4's briefing-question gate will later hook into that dismiss
+  // point instead of dropping straight to free-roam.
+  function buildNuppiLobbyOverlay() {
+    if (lobbyOverlay) return;
+    const name = getPlayerFirstName();
+    const greetEn = name ? `${name}, there you are.` : 'There you are.';
+    const greetJp = name ? `${name}……ようこそ。` : 'ようこそ。';
+    lobbyOverlay = document.createElement('div');
+    lobbyOverlay.id = 'muenba-lobby-overlay';
+    lobbyOverlay.innerHTML = `
+      <div class="muenba-lobby-box">
+        <img class="muenba-lobby-portrait" src="assets/img/wanderers/nuppi-2.png" alt="Nuppi">
+        <h2>Nuppi</h2>
+        <p class="jp">ヌッピ</p>
+        <p>${greetEn} I'm glad you made it back to Muenba.</p>
+        <p class="jp-line">${greetJp} ムエンバへようこそ戻ってきたね。</p>
+        <p>Somewhere among these fifteen rooms, a ghost is hiding. Some won't notice you at all — others will come looking, and if one gets close, you can hide until it loses interest. When you think you've spotted the right one, walk up and give it a tap.</p>
+        <p class="jp-line">この15の部屋のどこかに、幽霊が隠れているよ。気づかない幽霊もいれば、追いかけてくる幽霊もいる。近づかれたら隠れて、興味をなくすのを待とう。これだと思ったら、そっと近づいてタップしてみて。</p>
+        <div class="muenba-lobby-actions">
+          <button id="muenba-lobby-begin" type="button">Let's begin</button>
+        </div>
+      </div>`;
+    document.body.appendChild(lobbyOverlay);
+    document.getElementById('muenba-lobby-begin').addEventListener('click', closeNuppiLobby);
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && lobbyOpen) closeNuppiLobby();
+    });
+  }
+
+  function openNuppiLobby() {
+    if (lobbyOpen || !lobbyOverlay) return;
+    lobbyOpen = true;
+    state.clickTarget = null;
+    state.moving = false;
+    lobbyOverlay.classList.add('open');
+  }
+
+  function closeNuppiLobby() {
+    lobbyOpen = false;
+    if (lobbyOverlay) lobbyOverlay.classList.remove('open');
+  }
+
   function drawReturnPortal(now) {
     if (!inReturnPortalRoom()) return;
     const seconds = now / 1000;
@@ -870,7 +959,7 @@
 
   function handleInput(clientX, clientY) {
     startMusic();
-    if (state.transitioning || state.inputLocked || returnPortalOpen) return;
+    if (state.transitioning || state.inputLocked || returnPortalOpen || lobbyOpen) return;
     const point = stagePoint(clientX, clientY);
     if (DEV_MODE && state.coordMode) {
       dropPin(point.x, point.y);
@@ -913,7 +1002,7 @@
     const dt = Math.min(32, Math.max(8, now - (state.lastTickTime || now)));
     state.lastTickTime = now;
     state.speed = BASE_SPEED * Math.min(1.6, dt / TARGET_DT);
-    if (!state.transitioning && !returnPortalOpen) {
+    if (!state.transitioning && !returnPortalOpen && !lobbyOpen) {
       const drifting = tickEntryDrift(now);
       if (!drifting && !state.inputLocked) {
         handleMovement(now);
@@ -937,6 +1026,7 @@
     fitStage();
     resizeCanvas();
     setRoom(state.roomId, state.spawnId, null);
+    openNuppiLobby();
     bindInput();
     window.addEventListener('resize', () => { fitStage(); resizeCanvas(); });
     window.requestAnimationFrame(tick);
