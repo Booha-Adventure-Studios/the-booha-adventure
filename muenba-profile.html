@@ -23,6 +23,7 @@
     shaped to light up once Pass 6 starts writing real values into:
       data.muenba.ghostsFound     — { <ghostId>: true, ... }
       data.muenba.orbsCollected   — number
+      data.muenba.caseRecords     — { <caseId>: { completed, difficulty, ... } }
       data.muenba.visitedRooms    — { <roomId>: true, ... }
       data.muenba.huntJournal.entries — [{ ghostId, capturedAt, ... }, ...]
     (Field names are a Pass 5 best guess for Pass 6 to adopt or revise —
@@ -165,6 +166,13 @@
     .journal-entry { padding: 13px 14px; border-left: 2px solid var(--moss); background: rgba(143,220,178,.05); }
     .journal-entry h3 { margin: 0; color: #f2fff7; font-size: .98rem; font-weight: 400; }
     .journal-entry h3 small { display: block; margin-top: 4px; color: var(--quiet); font-size: .73rem; }
+    .journal-case-ghost { margin: 7px 0 0; color: var(--muted); font: .72rem/1.4 var(--sans); letter-spacing: .03em; }
+    .case-record-grid { display: grid; gap: 12px; }
+    .case-record-card { padding: 16px; border-left: 3px solid var(--gold); background: rgba(216,201,139,.06); }
+    .case-record-card h3 { margin: 0; color: #fff5d5; font-size: 1.05rem; font-weight: 400; }
+    .case-record-card small { display: block; margin-top: 5px; color: var(--quiet); font: .68rem/1.4 var(--sans); letter-spacing: .06em; text-transform: uppercase; }
+    .case-record-card ol { margin: 13px 0 0; padding-left: 21px; color: #f2e8c7; }
+    .case-record-card li { margin: 7px 0; padding-left: 4px; font-size: .86rem; line-height: 1.5; }
     .journal-meta { margin: 9px 0 0; color: var(--muted); font: .67rem/1.4 var(--sans); }
     .journal-empty { margin: 0; color: var(--muted); font-size: .9rem; line-height: 1.55; }
     .journal-empty small { display: block; margin-top: 6px; color: var(--quiet); font-size: .82em; }
@@ -276,12 +284,28 @@
         const data = getSave();
         const mu = data.muenba || {};
         const ghosts = Array.isArray(window.MUENBA_DATA?.ghosts) ? window.MUENBA_DATA.ghosts : [];
+        const cases = window.MUENBA_DATA?.cases && typeof window.MUENBA_DATA.cases === 'object' ? window.MUENBA_DATA.cases : {};
         const found = mu.ghostsFound && typeof mu.ghostsFound === 'object' ? mu.ghostsFound : {};
         const orbs = typeof mu.orbsCollected === 'number' ? mu.orbsCollected : 0;
+        const caseRecords = mu.caseRecords && typeof mu.caseRecords === 'object' ? mu.caseRecords : {};
+        const completedCases = Object.entries(caseRecords).filter(([, record]) => record && record.completed);
         const rooms = mu.visitedRooms && typeof mu.visitedRooms === 'object'
           ? Object.keys(mu.visitedRooms).length : 0;
         const journal = Array.isArray(mu.huntJournal?.entries) ? mu.huntJournal.entries : [];
         const foundCount = ghosts.filter(g => found[g.id]).length;
+
+        const caseRecordMarkup = completedCases.length
+          ? `<div class="case-record-grid">${completedCases.map(([caseId, record]) => {
+              const caseData = cases[caseId];
+              if (!caseData) return '';
+              const mode = caseData[record.difficulty] || caseData.fresh;
+              return `<article class="case-record-card">
+                <h3>${esc(caseData.title)}</h3>
+                <small>${esc(record.difficulty || 'fresh')} memory · case settled</small>
+                <ol>${(mode?.clues || []).map(clue => `<li><strong>${esc(clue.title)}</strong><br>${esc(clue.text)}</li>`).join('')}</ol>
+              </article>`;
+            }).join('')}</div>`
+          : `<p class="journal-empty">No case records yet.<small>Complete a ghost case to place its English record here.</small></p>`;
 
         const ghostCards = ghosts.map(ghost => {
           const isFound = !!found[ghost.id];
@@ -295,8 +319,10 @@
         const journalMarkup = journal.length
           ? `<div class="journal-list">${journal.slice(0, 8).map(entry => {
               const ghost = ghosts.find(g => g.id === entry.ghostId);
+              const caseData = entry.caseId ? cases[entry.caseId] : null;
               return `<article class="journal-entry">
-                <h3>${esc(ghost?.name || entry.ghostId || 'Unknown ghost')}<small>Caught</small></h3>
+                <h3>${esc(caseData?.title || ghost?.name || entry.ghostId || 'Unknown ghost')}<small>${caseData ? 'Case settled' : 'Caught'}</small></h3>
+                ${caseData ? `<p class="journal-case-ghost">${esc(ghost?.name || '')} · ${esc(entry.caseDifficulty || 'fresh')} memory</p>` : ''}
                 <p class="journal-meta">${esc(entry.capturedAt ? new Date(entry.capturedAt).toLocaleDateString() : '')}</p>
               </article>`;
             }).join('')}</div>`
@@ -306,13 +332,18 @@
           <section class="stats" aria-label="Muenba totals">
             <div class="stat"><div class="stat-value">${foundCount} / ${ghosts.length}</div><div class="stat-label">Ghosts found</div><span class="stat-jp">つかまえた<ruby>幽霊<rt>ゆうれい</rt></ruby></span></div>
             <div class="stat"><div class="stat-value">${orbs}</div><div class="stat-label">Orbs collected</div><span class="stat-jp"><ruby>集<rt>あつ</rt></ruby>めたエネルギー</span></div>
-            <div class="stat"><div class="stat-value">${journal.length}</div><div class="stat-label">Hunts recorded</div><span class="stat-jp"><ruby>記録<rt>きろく</rt></ruby>した<ruby>探索<rt>たんさく</rt></ruby></span></div>
+            <div class="stat"><div class="stat-value">${completedCases.length}</div><div class="stat-label">Case records</div><span class="stat-jp"><ruby>事件<rt>じけん</rt></ruby>の<ruby>記録<rt>きろく</rt></ruby></span></div>
             <div class="stat"><div class="stat-value">${rooms}</div><div class="stat-label">Rooms visited</div><span class="stat-jp"><ruby>訪<rt>おとず</rt></ruby>れた<ruby>部屋<rt>へや</rt></ruby></span></div>
           </section>
 
           <section class="section">
             <div class="section-heading"><h2>The Ghosts</h2><p><ruby>幽霊<rt>ゆうれい</rt></ruby>たち</p></div>
             <div class="ghost-grid">${ghostCards || '<p class="journal-empty">The ledger is quiet.</p>'}</div>
+          </section>
+
+          <section class="section">
+            <div class="section-heading"><h2>Case Records</h2><p><ruby>事件<rt>じけん</rt></ruby>の<ruby>記録<rt>きろく</rt></ruby></p></div>
+            ${caseRecordMarkup}
           </section>
 
           <section class="section lower-grid">
