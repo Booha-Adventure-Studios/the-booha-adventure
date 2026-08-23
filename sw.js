@@ -5,9 +5,11 @@
 // ============================================================
 
 const CURRENT_CACHES = {
-  pages:  'booha-pages-2026-240',
-  assets: 'booha-assets-2026-240',
-  decks:  'booha-decks-2026-240',
+  // Pass 9H: invalidate the previous deployed bundle so updated Muenba
+  // scripts/data cannot remain trapped behind the cache-first asset route.
+  pages:  'booha-pages-2026-241',
+  assets: 'booha-assets-2026-241',
+  decks:  'booha-decks-2026-241',
 };
 
 const PAGE_CACHE  = CURRENT_CACHES.pages;
