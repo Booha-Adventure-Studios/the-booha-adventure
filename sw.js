@@ -5,11 +5,11 @@
 // ============================================================
 
 const CURRENT_CACHES = {
-  // Pass 3: invalidate the previous deployed bundle so ordered Muenba case
-  // progress and Nuppi's case board cannot remain trapped behind the cache-first route.
-  pages:  'booha-pages-2026-244',
-  assets: 'booha-assets-2026-244',
-  decks:  'booha-decks-2026-244',
+  // Pass 4: invalidate the previous deployed bundle so the expanded Muenba
+  // case roster cannot remain trapped behind the cache-first route.
+  pages:  'booha-pages-2026-245',
+  assets: 'booha-assets-2026-245',
+  decks:  'booha-decks-2026-245',
 };
 
 const PAGE_CACHE  = CURRENT_CACHES.pages;
