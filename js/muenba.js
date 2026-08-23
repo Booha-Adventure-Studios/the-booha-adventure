@@ -1259,6 +1259,7 @@
       @media (prefers-reduced-motion: reduce) { .muenba-rotate-phone, .muenba-rotate-bar { animation:none; } }
       #muenba-dev { position:fixed; left:12px; top:12px; z-index:100; display:${DEV_MODE ? 'block' : 'none'}; color:#bde5e4; background:rgba(0,8,12,.88); border:1px solid rgba(125,220,216,.35); border-radius:10px; padding:9px 10px; font:700 11px/1.5 ui-monospace,monospace; pointer-events:auto; min-width:210px; box-shadow:0 0 20px rgba(0,0,0,.4); }
       #muenba-dev strong { color:#f0ffff; }
+      #muenba-dev-text { white-space:pre-line; }
       #muenba-dev button { border:1px solid rgba(125,220,216,.4); border-radius:5px; background:rgba(10,40,40,.62); color:#bde5e4; padding:4px 7px; font:700 10px ui-monospace,monospace; cursor:pointer; }
       #muenba-dev button.active { background:rgba(75,135,122,.65); color:#f0ffff; }
       #muenba-dev .muenba-dev-small { color:rgba(189,229,228,.64); font-size:10px; margin-top:4px; }
@@ -2423,6 +2424,27 @@
       : 'No exits in this room';
   }
 
+  function getDevQaSummary() {
+    const scale = Math.max(window.innerWidth / WORLD_W, window.innerHeight / WORLD_H);
+    const visibleWorldWidth = window.innerWidth / scale;
+    const visibleWorldHeight = window.innerHeight / scale;
+    const cropX = Math.max(0, (WORLD_W - visibleWorldWidth) / 2);
+    const cropY = Math.max(0, (WORLD_H - visibleWorldHeight) / 2);
+    const exits = getRoom().exits || [];
+    const exitStatus = exits.length
+      ? exits.map(exit => {
+          const visible = exit.x >= cropX && exit.x <= cropX + visibleWorldWidth
+            && exit.y >= cropY && exit.y <= cropY + visibleWorldHeight;
+          return `${exit.dir}:${visible ? 'OK' : 'OFF'}`;
+        }).join(' ')
+      : 'none';
+    const profile = getRoom().atmosphere || {};
+    const orientation = window.innerWidth >= window.innerHeight ? 'LANDSCAPE' : 'PORTRAIT';
+    const rotateWarning = orientation === 'PORTRAIT' && window.innerWidth <= 1023 ? ' ROTATE' : '';
+    const dpr = atmosphereCanvas ? (atmosphereCanvas.width / WORLD_W).toFixed(2) : '?';
+    return `QA ${window.innerWidth}x${window.innerHeight} ${orientation}${rotateWarning}\nscale:${scale.toFixed(3)} crop:${Math.round(cropX)},${Math.round(cropY)} dpr:${dpr} hit:${NPP_RADIUS}\nfog:${profile.fogMood || '—'} exits:${exitStatus}`;
+  }
+
   function dropPin(x, y) {
     pins.push({ x, y, label: `${Math.round(x)}, ${Math.round(y)}` });
     if (pins.length > 30) pins.shift();
@@ -2461,7 +2483,7 @@
     if (DEV_MODE && devReadout) {
       const hover = devHover ? `  mouse:${Math.round(devHover.x)},${Math.round(devHover.y)}` : '';
       const ghostInfo = activeGhost ? `  ghost:${activeGhost.ghost.id}(${activeGhost.behavior}${activeGhost.chasing ? '*chasing*' : ''})` : '';
-      devReadout.textContent = `${state.roomId}  player:${Math.round(state.x)},${Math.round(state.y)}${hover}${ghostInfo}`;
+      devReadout.textContent = `${state.roomId}  player:${Math.round(state.x)},${Math.round(state.y)}${hover}${ghostInfo}\n${getDevQaSummary()}`;
     }
   }
 
