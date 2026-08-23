@@ -2258,7 +2258,7 @@
       // Two overlapping sine waves (instead of one smooth pulse) read as an
       // unsteady, slightly ghostly flicker rather than a mechanical glow.
       const flicker = .68 + .2 * Math.sin(seconds * 1.9 + index) + .12 * Math.sin(seconds * 6.3 + index * 2.4);
-      const bounce = Math.sin(seconds * 1.5 + index) * 6;
+      const bounce = Math.sin(seconds * 1.5 + index) * 4.5;
       const x = exit.x + Math.cos(angle) * bounce;
       const y = exit.y + Math.sin(angle) * bounce;
 
@@ -2271,28 +2271,37 @@
         actorCtx.globalAlpha = fade * flicker * (.15 / t);
         actorCtx.fillStyle = `rgb(${glowStr})`;
         actorCtx.beginPath();
-        actorCtx.arc(-t * 13, 0, 5 - t, 0, Math.PI * 2);
+        actorCtx.arc(-t * 10, 0, 3.5 - t * .8, 0, Math.PI * 2);
         actorCtx.fill();
       }
       actorCtx.restore();
 
+      // Pass 9C: a small eerie chevron replaces the old large filled circle.
+      // The glow is local to the stroke, while NPP_RADIUS remains generous so
+      // the visual can be atmospheric without making the exit hard to use.
       actorCtx.save();
       actorCtx.translate(x, y);
       actorCtx.rotate(angle);
-      actorCtx.globalAlpha = fade * (.55 + flicker * .35);
-      actorCtx.strokeStyle = `rgb(${glowStr})`;
-      actorCtx.lineWidth = 3;
+      actorCtx.globalAlpha = fade * (.48 + flicker * .32);
+      actorCtx.strokeStyle = `rgba(${coreStr},.92)`;
+      actorCtx.shadowColor = `rgba(${glowStr},.72)`;
+      actorCtx.shadowBlur = 9;
+      actorCtx.lineWidth = 2.2;
       actorCtx.lineCap = 'round';
       actorCtx.lineJoin = 'round';
       actorCtx.beginPath();
-      actorCtx.moveTo(-15, -10);
+      actorCtx.moveTo(-11, -7);
       actorCtx.lineTo(0, 0);
-      actorCtx.lineTo(-15, 10);
+      actorCtx.lineTo(-11, 7);
       actorCtx.stroke();
-      actorCtx.globalAlpha = fade * (.16 + flicker * .16);
+
+      // A tiny bright point at the tip gives the arrow a living center without
+      // bringing back a conspicuous circular UI marker.
+      actorCtx.shadowBlur = 0;
+      actorCtx.globalAlpha = fade * (.55 + flicker * .25);
       actorCtx.fillStyle = `rgb(${coreStr})`;
       actorCtx.beginPath();
-      actorCtx.arc(0, 0, 30 + flicker * 10, 0, Math.PI * 2);
+      actorCtx.arc(0, 0, 1.7 + flicker * .7, 0, Math.PI * 2);
       actorCtx.fill();
       actorCtx.restore();
     });
