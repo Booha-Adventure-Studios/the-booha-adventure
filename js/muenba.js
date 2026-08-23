@@ -114,6 +114,7 @@
   let currentBg;
   let vignetteCanvas;
   let fogTexture;
+  let lowFogTexture;
   let lastTouchEnd = 0;
   let entryDrift = null;
   let pins = [];
@@ -1436,10 +1437,12 @@
     vignetteCanvas.width = WORLD_W;
     vignetteCanvas.height = WORLD_H;
     const vctx = vignetteCanvas.getContext('2d');
-    const gradient = vctx.createRadialGradient(CENTER_X, CENTER_Y, 260, CENTER_X, CENTER_Y, 820);
+    const gradient = vctx.createRadialGradient(CENTER_X, CENTER_Y, 280, CENTER_X, CENTER_Y, 860);
     gradient.addColorStop(0, 'rgba(0,0,0,0)');
-    gradient.addColorStop(0.72, 'rgba(0,0,0,.10)');
-    gradient.addColorStop(1, 'rgba(0,0,0,.62)');
+    gradient.addColorStop(0.56, 'rgba(0,0,0,.04)');
+    gradient.addColorStop(0.72, 'rgba(0,0,0,.18)');
+    gradient.addColorStop(0.88, 'rgba(0,0,0,.46)');
+    gradient.addColorStop(1, 'rgba(0,0,0,.76)');
     vctx.fillStyle = gradient;
     vctx.fillRect(0, 0, WORLD_W, WORLD_H);
 
@@ -1448,11 +1451,36 @@
     fogTexture.height = 180;
     const fctx = fogTexture.getContext('2d');
     const fogGradient = fctx.createRadialGradient(320, 90, 4, 320, 90, 310);
-    fogGradient.addColorStop(0, 'rgba(190,215,216,.22)');
-    fogGradient.addColorStop(.42, 'rgba(170,205,210,.11)');
+    fogGradient.addColorStop(0, 'rgba(190,215,216,.30)');
+    fogGradient.addColorStop(.42, 'rgba(170,205,210,.16)');
     fogGradient.addColorStop(1, 'rgba(170,205,210,0)');
     fctx.fillStyle = fogGradient;
     fctx.fillRect(0, 0, fogTexture.width, fogTexture.height);
+
+    // A flatter, lower bank gives the corridor some depth without introducing
+    // a per-frame particle system. It is deliberately softer than the main
+    // fog texture so Booha and the exit hotspots remain readable through it.
+    lowFogTexture = document.createElement('canvas');
+    lowFogTexture.width = 720;
+    lowFogTexture.height = 140;
+    const lowCtx = lowFogTexture.getContext('2d');
+    const lowGradient = lowCtx.createLinearGradient(0, 0, 0, lowFogTexture.height);
+    lowGradient.addColorStop(0, 'rgba(170,205,210,0)');
+    lowGradient.addColorStop(.34, 'rgba(170,205,210,.08)');
+    lowGradient.addColorStop(.72, 'rgba(190,215,216,.18)');
+    lowGradient.addColorStop(1, 'rgba(170,205,210,0)');
+    lowCtx.fillStyle = lowGradient;
+    lowCtx.fillRect(0, 0, lowFogTexture.width, lowFogTexture.height);
+    [120, 350, 590].forEach((x, index) => {
+      const bank = lowCtx.createRadialGradient(x, 78, 6, x, 78, 150 + index * 18);
+      bank.addColorStop(0, 'rgba(205,225,222,.16)');
+      bank.addColorStop(.58, 'rgba(180,210,212,.07)');
+      bank.addColorStop(1, 'rgba(180,210,212,0)');
+      lowCtx.fillStyle = bank;
+      lowCtx.beginPath();
+      lowCtx.ellipse(x, 78, 150 + index * 18, 42, 0, 0, Math.PI * 2);
+      lowCtx.fill();
+    });
   }
 
   // ── Per-room eerie glow + spirit motes ──────────────────────────────────
@@ -2315,11 +2343,23 @@
 
     if (fogTexture && profile.fog > 0) {
       state.fogX = (state.fogX + .12) % 780;
-      const fogAlpha = profile.fog * (.78 + .22 * Math.sin(now / 2600));
+      const fogPulse = .86 + .14 * Math.sin(now / 2600);
+      const fogAlpha = profile.fog * fogPulse;
+      const slowDrift = state.fogX * .46;
       atmosphereCtx.save();
-      atmosphereCtx.globalAlpha = fogAlpha;
-      atmosphereCtx.drawImage(fogTexture, -700 + state.fogX, 180, 760, 215);
-      atmosphereCtx.drawImage(fogTexture, 160 - state.fogX, 560, 840, 205);
+      // Distant haze: broad and slow, kept above the player path.
+      atmosphereCtx.globalAlpha = fogAlpha * .72;
+      atmosphereCtx.drawImage(fogTexture, -700 + slowDrift, 150, 900, 230);
+      atmosphereCtx.drawImage(fogTexture, 140 - slowDrift, 350, 820, 190);
+
+      // Near-ground bank: a second cached texture moving at a different rate
+      // makes the room feel alive without the cost of many individual motes.
+      if (lowFogTexture) {
+        atmosphereCtx.globalAlpha = fogAlpha * .58;
+        atmosphereCtx.drawImage(lowFogTexture, -110 + state.fogX, 620, 980, 170);
+        atmosphereCtx.globalAlpha = fogAlpha * .28;
+        atmosphereCtx.drawImage(lowFogTexture, 760 - state.fogX * .72, 510, 760, 150);
+      }
       atmosphereCtx.restore();
     }
     if (vignetteCanvas) atmosphereCtx.drawImage(vignetteCanvas, 0, 0);
