@@ -2223,7 +2223,15 @@ const HAPPY_HOUSE_PORTAL = {
       .wpop-box::-webkit-scrollbar-thumb{background:rgba(255,255,255,.18);border-radius:4px;}
       /* Keep the reading card vertically scrollable on touch screens while
          still preventing horizontal gesture leakage into the world. */
-      #orb-panel{touch-action:pan-y;}
+      /* The memory reader is a modal reading moment, not a bottom drawer.
+         Keep the shared floating card treatment, but center this one in the
+         viewport so it cannot look like a stuck footer on short screens. */
+      #orb-panel{top:50%;bottom:auto;touch-action:pan-y;
+        opacity:0;visibility:hidden;
+        transform:translate(-50%,-50%) scale(.96);
+        transition:transform .5s cubic-bezier(.34,1.56,.64,1),opacity .18s ease,visibility 0s linear .5s;}
+      #orb-panel.open{opacity:1;visibility:visible;
+        transform:translate(-50%,-50%) scale(1);transition-delay:0s;}
     `;
     document.head.appendChild(s);
   }
