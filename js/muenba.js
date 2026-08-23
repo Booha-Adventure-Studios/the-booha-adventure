@@ -3,9 +3,9 @@
  * briefing Q&A gate that reveals the day's target ghost, durable Muenba
  * save/progress (Pass 6), and the ghost-hunting core loop (Pass 7): one
  * wandering ghost per room, an ignore-vs-chase behavior split, a Hide
- * button, and click-to-attempt capture. Pass 8A now owns the explicit capture
- * session hand-off; the two-lane rhythm game and orb-return loop follow in
- * Pass 8B/8C.
+ * button, and click-to-attempt capture. Pass 8A owns the explicit capture
+ * session hand-off, and Pass 8B supplies the first two-lane rhythm capture;
+ * the orb-return loop follows in Pass 8C.
  */
 (() => {
   'use strict';
@@ -55,6 +55,20 @@
   const GHOST_GIVEUP_HIDE_MS = 1100;
   const GHOST_STARTLE_COOLDOWN_MS = 1400;
   const ORB_REWARD_PER_CAPTURE = 3;
+
+  // Pass 8B — first rhythm chart. It is intentionally short and forgiving:
+  // no simultaneous notes, holds, combos, or punishment yet. The chart is
+  // data-shaped so a later pass can move it into muenba-data.js without
+  // changing the timing engine.
+  const RHYTHM_CHART = ['don', 'kat', 'don', 'kat', 'kat', 'don', 'kat', 'don'];
+  const RHYTHM_BPM = 96;
+  const RHYTHM_NOTE_MS = 60000 / RHYTHM_BPM;
+  const RHYTHM_COUNTDOWN_MS = 1800;
+  const RHYTHM_TRAVEL_MS = 1200;
+  const RHYTHM_NOTE_DISTANCE = 168;
+  const RHYTHM_PERFECT_MS = 110;
+  const RHYTHM_GOOD_MS = 220;
+  const RHYTHM_PASS_ACCURACY = 60;
 
   const params = new URLSearchParams(window.location.search);
   const DEV_MODE = params.get('dev') === '1';
@@ -237,7 +251,7 @@
      migrate*Save() idiom — one top-level data.muenba section, defensive
      shape-fill on every load, single dirty-flag write-back — rather than
      inventing a different pattern for this world. Capture/orb fields
-     exist here but nothing writes to them yet; that's Pass 7/8. This
+     exist here but the successful capture reward writes them in Pass 8C. This
      pass just gives Pass 4's in-memory-only state.targetGhost, and the
      room-visit tracking already implicit in setRoom(), a real home.
      ═══════════════════════════════════════════════════════════════════ */
@@ -328,8 +342,8 @@
      player can walk away). Catching up to the player is a soft startle,
      not a fail state. Tapping a ghost swaps it to ANGRY_CHANGE_IMG; the
      correct (target) ghost resolves as a capture, anything else is a
-     gentle miss. Capture writes ghostsFound/orbsCollected/huntJournal
-     from Pass 6's schema and fires BoohaUnlockSystem.checkAll().
+     gentle miss. The capture hand-off now belongs to Pass 8A/8B; the
+     successful reward transaction and unlock check arrive in Pass 8C.
      ═══════════════════════════════════════════════════════════════════ */
 
   // Which of the 15 rooms gets which of the 5 ghosts, and which ghosts are
@@ -506,6 +520,14 @@
     document.body.appendChild(captureOverlay);
     document.addEventListener('keydown', event => {
       if (event.key === 'Escape' && captureOpen) cancelCaptureSession();
+      if (!captureOpen || event.repeat) return;
+      if (event.key === 'ArrowLeft' || event.key.toLowerCase() === 'a') {
+        event.preventDefault();
+        handleRhythmInput('don');
+      } else if (event.key === 'ArrowRight' || event.key.toLowerCase() === 's') {
+        event.preventDefault();
+        handleRhythmInput('kat');
+      }
     });
   }
 
@@ -578,39 +600,294 @@
 
     const actions = document.createElement('div');
     actions.className = 'muenba-lobby-actions';
-    actions.appendChild(captureButton('Begin rhythm', 'muenba-capture-begin', beginRhythmPlaceholder));
+    actions.appendChild(captureButton('Begin rhythm', 'muenba-capture-begin', beginRhythmCapture));
     box.appendChild(actions);
 
     captureOverlay.classList.add('open');
   }
 
-  // Temporary Pass 8A endpoint. This proves the phase hand-off and keeps the
-  // save boundary honest until Pass 8B supplies real timing input. The
-  // function is deliberately named as a seam so the rhythm engine can
-  // replace its body without touching attemptCapture().
-  function beginRhythmPlaceholder() {
+  function beginRhythmCapture() {
     if (!captureSession || captureSession.phase !== 'ready') return;
-    captureSession.phase = 'playing';
+    const startAt = performance.now() + RHYTHM_COUNTDOWN_MS;
+    captureSession.phase = 'countdown';
+    captureSession.rhythm = {
+      chart: RHYTHM_CHART.slice(),
+      startAt,
+      nextIndex: 0,
+      perfect: 0,
+      good: 0,
+      miss: 0,
+      noteEls: [],
+      statusEl: null,
+      accuracyEl: null,
+      countdownEl: null,
+      rafId: 0
+    };
 
+    pauseWorldMusicForCapture();
+    renderRhythmCapture();
+    captureSession.rhythm.rafId = window.requestAnimationFrame(tickRhythmCapture);
+  }
+
+  function pauseWorldMusicForCapture() {
+    try { music.pause(); } catch (_) {}
+  }
+
+  function resumeWorldMusicAfterCapture() {
+    if (!state.musicStarted) return;
+    music.play().catch(() => {});
+  }
+
+  function rhythmExpectedAt(rhythm, index) {
+    return rhythm.startAt + RHYTHM_TRAVEL_MS + index * RHYTHM_NOTE_MS;
+  }
+
+  function rhythmAccuracy(rhythm) {
+    const total = rhythm.chart.length || 1;
+    return Math.round(((rhythm.perfect + rhythm.good) / total) * 100);
+  }
+
+  function renderRhythmCapture() {
+    if (!captureSession || !captureSession.rhythm || !captureOverlay) return;
+    const rhythm = captureSession.rhythm;
     const ghost = captureSession.ghost;
     const box = captureBox();
     captureImage(box, ghost);
 
     const h2 = document.createElement('h2');
-    h2.textContent = 'Rhythm capture';
+    h2.textContent = 'Keep the rhythm';
     box.appendChild(h2);
     const jp = document.createElement('p');
     jp.className = 'jp';
     jp.textContent = 'リズムでつかまえよう';
     box.appendChild(jp);
 
+    const status = document.createElement('p');
+    status.className = 'muenba-rhythm-status';
+    status.textContent = 'Get ready…';
+    status.setAttribute('aria-live', 'polite');
+    box.appendChild(status);
+    rhythm.statusEl = status;
+
+    const accuracy = document.createElement('p');
+    accuracy.className = 'muenba-rhythm-accuracy';
+    accuracy.textContent = 'Accuracy: 0%';
+    box.appendChild(accuracy);
+    rhythm.accuracyEl = accuracy;
+
+    const board = document.createElement('div');
+    board.className = 'muenba-rhythm-board';
+    board.setAttribute('aria-label', 'Two lane rhythm capture');
+
+    const hitLine = document.createElement('div');
+    hitLine.className = 'muenba-rhythm-hit-line';
+    hitLine.setAttribute('aria-hidden', 'true');
+    board.appendChild(hitLine);
+
+    ['don', 'kat'].forEach(lane => {
+      const laneButton = document.createElement('button');
+      laneButton.type = 'button';
+      laneButton.className = `muenba-rhythm-lane muenba-rhythm-${lane}`;
+      laneButton.setAttribute('aria-label', lane === 'don' ? 'Don lane' : 'Kat lane');
+
+      const label = document.createElement('span');
+      label.className = 'muenba-rhythm-lane-label';
+      label.textContent = lane === 'don' ? 'DON / ドン' : 'KAT / カッ';
+      laneButton.appendChild(label);
+
+      const rail = document.createElement('span');
+      rail.className = 'muenba-rhythm-rail';
+      laneButton.appendChild(rail);
+
+      laneButton.addEventListener('pointerdown', event => {
+        event.preventDefault();
+        handleRhythmInput(lane);
+      });
+      laneButton.addEventListener('keydown', event => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          handleRhythmInput(lane);
+        }
+      });
+
+      rhythm.chart.forEach((noteLane, index) => {
+        if (noteLane !== lane) return;
+        const note = document.createElement('span');
+        note.className = `muenba-rhythm-note muenba-rhythm-note-${lane}`;
+        note.textContent = lane === 'don' ? '●' : '◆';
+        note.setAttribute('aria-hidden', 'true');
+        rail.appendChild(note);
+        rhythm.noteEls[index] = note;
+      });
+
+      board.appendChild(laneButton);
+    });
+
+    box.appendChild(board);
+
+    const hint = document.createElement('p');
+    hint.className = 'muenba-rhythm-hint';
+    hint.textContent = 'Tap a lane, or use ← / A for Don and → / S for Kat.';
+    box.appendChild(hint);
+
+    const actions = document.createElement('div');
+    actions.className = 'muenba-lobby-actions';
+    actions.appendChild(captureButton('Cancel capture', 'muenba-capture-cancel', cancelCaptureSession));
+    box.appendChild(actions);
+
+    captureOverlay.classList.add('open');
+  }
+
+  function tickRhythmCapture(now) {
+    if (!captureSession || !captureSession.rhythm) return;
+    const rhythm = captureSession.rhythm;
+    if (captureSession.phase !== 'countdown' && captureSession.phase !== 'playing') return;
+
+    if (captureSession.phase === 'countdown') {
+      const remaining = rhythm.startAt - now;
+      if (remaining <= 0) {
+        captureSession.phase = 'playing';
+        showRhythmFeedback('GO!', 'go');
+      } else if (rhythm.statusEl) {
+        rhythm.statusEl.textContent = String(Math.ceil(remaining / 600));
+      }
+    }
+
+    if (captureSession.phase === 'playing') {
+      advanceMissedRhythmNotes(now);
+      updateRhythmNotes(now);
+      if (rhythm.nextIndex >= rhythm.chart.length &&
+          now >= rhythmExpectedAt(rhythm, rhythm.chart.length - 1) + RHYTHM_GOOD_MS) {
+        finishRhythmCapture();
+        return;
+      }
+    }
+
+    rhythm.rafId = window.requestAnimationFrame(tickRhythmCapture);
+  }
+
+  function advanceMissedRhythmNotes(now) {
+    const rhythm = captureSession.rhythm;
+    while (rhythm.nextIndex < rhythm.chart.length &&
+           now > rhythmExpectedAt(rhythm, rhythm.nextIndex) + RHYTHM_GOOD_MS) {
+      markRhythmNote('miss');
+    }
+  }
+
+  function updateRhythmNotes(now) {
+    const rhythm = captureSession.rhythm;
+    rhythm.chart.forEach((_, index) => {
+      const note = rhythm.noteEls[index];
+      if (!note) return;
+      if (index < rhythm.nextIndex) {
+        note.classList.add('is-resolved');
+        return;
+      }
+      const progress = (now - (rhythmExpectedAt(rhythm, index) - RHYTHM_TRAVEL_MS)) / RHYTHM_TRAVEL_MS;
+      const y = Math.max(-26, Math.min(RHYTHM_NOTE_DISTANCE, progress * RHYTHM_NOTE_DISTANCE));
+      note.style.transform = `translate(-50%, ${y}px)`;
+    });
+  }
+
+  function markRhythmNote(result) {
+    const rhythm = captureSession.rhythm;
+    const index = rhythm.nextIndex;
+    const note = rhythm.noteEls[index];
+    if (note) note.classList.add(result === 'miss' ? 'is-miss' : 'is-hit');
+    if (result === 'perfect') rhythm.perfect += 1;
+    else if (result === 'good') rhythm.good += 1;
+    else rhythm.miss += 1;
+    rhythm.nextIndex += 1;
+    if (rhythm.accuracyEl) rhythm.accuracyEl.textContent = `Accuracy: ${rhythmAccuracy(rhythm)}%`;
+  }
+
+  function showRhythmFeedback(text, kind) {
+    const rhythm = captureSession && captureSession.rhythm;
+    if (!rhythm || !rhythm.statusEl) return;
+    rhythm.statusEl.textContent = text;
+    rhythm.statusEl.className = `muenba-rhythm-status ${kind || ''}`;
+  }
+
+  function handleRhythmInput(lane) {
+    if (!captureSession || !captureSession.rhythm || captureSession.phase !== 'playing') return;
+    const rhythm = captureSession.rhythm;
+    const now = performance.now();
+    advanceMissedRhythmNotes(now);
+    if (rhythm.nextIndex >= rhythm.chart.length) return;
+
+    const index = rhythm.nextIndex;
+    const expected = rhythmExpectedAt(rhythm, index);
+    const delta = now - expected;
+    if (delta < -RHYTHM_GOOD_MS) {
+      showRhythmFeedback('A little later…', 'early');
+      return;
+    }
+    if (rhythm.chart[index] !== lane) {
+      markRhythmNote('miss');
+      showRhythmFeedback('Wrong lane', 'miss');
+      return;
+    }
+    const absoluteDelta = Math.abs(delta);
+    if (absoluteDelta <= RHYTHM_PERFECT_MS) {
+      markRhythmNote('perfect');
+      showRhythmFeedback('Perfect!', 'perfect');
+    } else if (absoluteDelta <= RHYTHM_GOOD_MS) {
+      markRhythmNote('good');
+      showRhythmFeedback('Good!', 'good');
+    } else {
+      markRhythmNote('miss');
+      showRhythmFeedback(delta < 0 ? 'Too early' : 'Too late', 'miss');
+    }
+  }
+
+  function recordRhythmResult(accuracy) {
+    try {
+      const d = loadSave();
+      if (!d.muenba || typeof d.muenba !== 'object') d.muenba = {};
+      if (!d.muenba.rhythm || typeof d.muenba.rhythm !== 'object') {
+        d.muenba.rhythm = { bestAccuracy: 0, attempts: 0 };
+      }
+      const rhythm = d.muenba.rhythm;
+      rhythm.attempts = (Number.isInteger(rhythm.attempts) ? rhythm.attempts : 0) + 1;
+      rhythm.bestAccuracy = Math.max(Number(rhythm.bestAccuracy) || 0, accuracy);
+      writeSave(d);
+    } catch (_) {}
+  }
+
+  function finishRhythmCapture() {
+    if (!captureSession || !captureSession.rhythm) return;
+    const rhythm = captureSession.rhythm;
+    if (rhythm.rafId) window.cancelAnimationFrame(rhythm.rafId);
+    rhythm.rafId = 0;
+    const accuracy = rhythmAccuracy(rhythm);
+    const success = accuracy >= RHYTHM_PASS_ACCURACY;
+    rhythm.accuracy = accuracy;
+    rhythm.success = success;
+    captureSession.phase = 'result';
+    recordRhythmResult(accuracy);
+    renderRhythmResult(accuracy, success);
+  }
+
+  function renderRhythmResult(accuracy, success) {
+    const ghost = captureSession.ghost;
     const p = document.createElement('p');
-    p.textContent = 'The capture session is ready for the rhythm challenge.';
+    const box = captureBox();
+    captureImage(box, ghost);
+
+    const h2 = document.createElement('h2');
+    h2.textContent = success ? 'Rhythm complete' : 'Try again';
+    box.appendChild(h2);
+    const jp = document.createElement('p');
+    jp.className = 'jp';
+    jp.textContent = success ? 'リズム成功' : 'もう一度';
+    box.appendChild(jp);
+
+    p.textContent = `Accuracy: ${accuracy}%. ${success ? 'The capture is ready for the reward step.' : 'The ghost is still waiting for you.'}`;
     box.appendChild(p);
 
     const p2 = document.createElement('p');
     p2.className = 'jp-line';
-    p2.textContent = 'リズムゲームの準備ができました。';
+    p2.textContent = success ? 'つかまえる準備ができたよ。' : '幽霊はまだ待っているよ。';
     box.appendChild(p2);
 
     const actions = document.createElement('div');
@@ -621,6 +898,7 @@
 
   function cancelCaptureSession() {
     if (!captureOpen) return;
+    stopRhythmCapture();
     captureOpen = false;
     state.captureResolving = false;
     if (captureOverlay) captureOverlay.classList.remove('open');
@@ -629,17 +907,26 @@
     // ghostsFound, huntJournal, or orbs, and the target remains available.
     captureSession = null;
     spawnRoomGhost(state.roomId);
+    resumeWorldMusicAfterCapture();
   }
 
   // Pass 8B will call this only after a successful rhythm result. It remains
   // separate from cancelCaptureSession() so success cannot accidentally
   // respawn the just-captured target or clear a future reward state.
   function closeCaptureOverlay({ resumeHunt = false } = {}) {
+    stopRhythmCapture();
     captureOpen = false;
     state.captureResolving = false;
     if (captureOverlay) captureOverlay.classList.remove('open');
     captureSession = null;
     if (resumeHunt) spawnRoomGhost(state.roomId);
+    resumeWorldMusicAfterCapture();
+  }
+
+  function stopRhythmCapture() {
+    const rhythm = captureSession && captureSession.rhythm;
+    if (rhythm && rhythm.rafId) window.cancelAnimationFrame(rhythm.rafId);
+    if (rhythm) rhythm.rafId = 0;
   }
 
   function drawGhost(now) {
@@ -766,12 +1053,30 @@
       #muenba-hide { position:fixed; left:12px; bottom:12px; z-index:100; border:1px solid rgba(156,203,182,.5); border-radius:8px; background:rgba(0,8,12,.78); color:#d8e8e0; padding:8px 16px; font:700 11px ui-monospace,monospace; letter-spacing:.05em; cursor:pointer; }
       #muenba-hide:hover, #muenba-hide:focus-visible { background:rgba(30,70,60,.8); outline:none; }
       #muenba-hide.active { background:rgba(93,162,124,.42); border-color:#5dd08c; color:#eafff2; }
-      /* Capture session overlay (Pass 8A) — reuses .muenba-lobby-box for the
-         card shell (same as the briefing reveal) while the rhythm phases are
-         added in the next pass. */
+      /* Capture session overlay (Pass 8A/8B) — reuses .muenba-lobby-box for
+         the card shell (same as the briefing reveal) and adds the two-lane
+         rhythm board inside that modal. */
       #muenba-capture-overlay { position:fixed; inset:0; z-index:215; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,0); transition:background .4s ease; padding:20px; box-sizing:border-box; }
       #muenba-capture-overlay.open { display:flex; background:rgba(0,0,0,.86); }
       .muenba-capture-orbs { margin-top:-6px; color:#9ccbb6; font-size:.82rem; letter-spacing:.05em; }
+      .muenba-capture-action { touch-action:manipulation; }
+      .muenba-rhythm-status { min-height:1.5em; margin:2px 0 2px !important; color:#d8f2e2 !important; font:700 1.08rem/1.4 ui-monospace,monospace !important; text-align:center !important; letter-spacing:.08em; }
+      .muenba-rhythm-status.perfect, .muenba-rhythm-status.good, .muenba-rhythm-status.go { color:#8fe0ad !important; }
+      .muenba-rhythm-status.miss, .muenba-rhythm-status.early { color:#e8b0b8 !important; }
+      .muenba-rhythm-accuracy { margin:0 0 7px !important; color:#9ccbb6 !important; font:700 .72rem/1.4 ui-monospace,monospace !important; text-align:center !important; letter-spacing:.08em; }
+      .muenba-rhythm-board { position:relative; display:grid; grid-template-columns:1fr 1fr; gap:8px; height:250px; margin:8px 0 6px; }
+      .muenba-rhythm-lane { position:relative; min-width:0; height:250px; overflow:hidden; padding:0; border:1px solid rgba(156,203,182,.35); border-radius:14px; color:#dcefe4; background:linear-gradient(180deg,rgba(25,55,44,.58),rgba(5,15,12,.86)); cursor:pointer; touch-action:none; user-select:none; }
+      .muenba-rhythm-lane:hover, .muenba-rhythm-lane:focus-visible { border-color:rgba(156,203,182,.8); background:linear-gradient(180deg,rgba(42,88,67,.68),rgba(7,22,17,.92)); outline:none; }
+      .muenba-rhythm-lane:active { background:rgba(57,110,82,.76); }
+      .muenba-rhythm-lane-label { position:absolute; z-index:4; left:0; right:0; top:9px; color:#aacdbb; font:700 .68rem/1.2 ui-monospace,monospace; letter-spacing:.08em; pointer-events:none; }
+      .muenba-rhythm-rail { position:absolute; inset:29px 0 0; pointer-events:none; }
+      .muenba-rhythm-hit-line { position:absolute; z-index:5; left:8px; right:8px; top:218px; height:3px; border-radius:99px; background:rgba(218,249,229,.8); box-shadow:0 0 14px rgba(143,220,178,.72); pointer-events:none; }
+      .muenba-rhythm-note { position:absolute; z-index:3; left:50%; top:0; display:grid; place-items:center; width:42px; height:42px; border:2px solid rgba(220,248,231,.92); border-radius:50%; color:#f0fff5; background:rgba(44,105,76,.92); box-shadow:0 0 16px rgba(112,214,151,.42); font:900 1.1rem/1 ui-monospace,monospace; will-change:transform; }
+      .muenba-rhythm-note-kat { border-radius:10px; background:rgba(75,72,126,.92); box-shadow:0 0 16px rgba(144,137,221,.4); }
+      .muenba-rhythm-note.is-resolved { opacity:.14; box-shadow:none; }
+      .muenba-rhythm-note.is-hit { opacity:.94; border-color:#8fe0ad; }
+      .muenba-rhythm-note.is-miss { opacity:.18; border-color:#e8b0b8; background:rgba(120,48,64,.65); box-shadow:none; }
+      .muenba-rhythm-hint { margin:7px 0 13px !important; color:#8fa89b !important; font-size:.73rem !important; line-height:1.45 !important; text-align:center !important; }
       @media (prefers-reduced-motion: reduce) { #muenba-fade, .muenba-return-box, #muenba-return-overlay, .muenba-lobby-box, #muenba-lobby-overlay, #muenba-briefing-overlay, #muenba-capture-overlay { transition:none !important; } }
     `;
     document.head.appendChild(style);
