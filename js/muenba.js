@@ -344,6 +344,10 @@
       mu.huntJournal.entries = [];
       dirty = true;
     }
+    if (!mu.caseRecords || typeof mu.caseRecords !== 'object') {
+      mu.caseRecords = {};
+      dirty = true;
+    }
     if (!mu.rhythm || typeof mu.rhythm !== 'object') {
       mu.rhythm = { bestAccuracy: 0, attempts: 0 };
       dirty = true;
@@ -544,6 +548,17 @@
     beginCaptureSession(ghost);
   }
 
+  function caseForGhost(ghostId) {
+    const cases = DATA.cases && typeof DATA.cases === 'object' ? DATA.cases : {};
+    return Object.values(cases).find(caseData => caseData && caseData.ghostId === ghostId) || null;
+  }
+
+  function caseRecordComplete(caseData) {
+    if (!caseData) return true;
+    const records = readMuenba().caseRecords;
+    return !!(records && records[caseData.id] && records[caseData.id].completed);
+  }
+
   function buildCaptureOverlay() {
     if (captureOverlay) return;
     captureOverlay = document.createElement('div');
@@ -571,22 +586,28 @@
     });
   }
 
-  // Pass 8A session boundary. No permanent save is written here: the future
+  // Pass 2 / Pass 8A session boundary. No permanent save is written here: the
   // rhythm game must decide whether this session succeeds before the ghost,
   // journal, or orb reward can be committed. The ghost is removed from the
   // scene while the session is open and respawned on cancel, so a failed or
   // abandoned attempt remains a soft miss rather than consuming the target.
   function beginCaptureSession(ghost) {
     captureOpen = true;
+    const caseData = caseForGhost(ghost && ghost.id);
     captureSession = {
       ghost,
-      phase: 'ready',
+      caseData,
+      caseDifficulty: null,
+      caseIndex: 0,
+      caseResolved: false,
+      phase: caseData && !caseRecordComplete(caseData) ? 'case-intro' : 'ready',
       openedAt: performance.now()
     };
     state.clickTarget = null;
     state.moving = false;
     activeGhost = null;
-    renderCaptureReady();
+    if (captureSession.phase === 'case-intro') renderCaseIntro();
+    else renderCaptureReady();
   }
 
   function captureBox() {
@@ -622,6 +643,234 @@
     }, 0);
   }
 
+  function renderCaseDirection(box, english, japaneseHtml) {
+    const direction = document.createElement('div');
+    direction.className = 'muenba-case-direction';
+    const en = document.createElement('p');
+    en.className = 'muenba-case-direction-en';
+    en.textContent = english;
+    const jp = document.createElement('p');
+    jp.className = 'muenba-case-direction-jp';
+    jp.innerHTML = japaneseHtml;
+    direction.append(en, jp);
+    box.appendChild(direction);
+  }
+
+  function caseActionButton(label, japaneseHtml, id, handler) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.id = id;
+    button.className = 'muenba-capture-action muenba-case-action';
+    const en = document.createElement('span');
+    en.textContent = label;
+    const jp = document.createElement('small');
+    jp.innerHTML = japaneseHtml;
+    button.append(en, jp);
+    button.addEventListener('click', handler);
+    return button;
+  }
+
+  function renderCaseIntro() {
+    if (!captureSession || !captureSession.caseData || !captureOverlay) return;
+    const caseData = captureSession.caseData;
+    const box = captureBox();
+    captureImage(box, captureSession.ghost);
+
+    const eyebrow = document.createElement('div');
+    eyebrow.className = 'muenba-case-eyebrow';
+    eyebrow.textContent = caseData.eyebrow;
+    box.appendChild(eyebrow);
+
+    const h2 = document.createElement('h2');
+    h2.textContent = caseData.title;
+    box.appendChild(h2);
+
+    const intro = document.createElement('p');
+    intro.className = 'muenba-case-record';
+    intro.textContent = caseData.intro;
+    box.appendChild(intro);
+
+    renderCaseDirection(
+      box,
+      'Choose how you want to read this case.',
+      '<ruby>この<rt>この</rt></ruby><ruby>事件<rt>じけん</rt></ruby>の<ruby>読<rt>よ</rt></ruby>み<ruby>方<rt>かた</rt></ruby>を<ruby>選<rt>えら</rt></ruby>びましょう。'
+    );
+
+    const actions = document.createElement('div');
+    actions.className = 'muenba-case-actions';
+    actions.append(
+      caseActionButton(
+        'Fresh Memory',
+        '<ruby>新<rt>あたら</rt></ruby>しい<ruby>記憶<rt>きおく</rt></ruby>',
+        'muenba-case-fresh',
+        () => selectCaseDifficulty('fresh')
+      ),
+      caseActionButton(
+        'Deep Memory',
+        '<ruby>深<rt>ふか</rt></ruby>い<ruby>記憶<rt>きおく</rt></ruby>',
+        'muenba-case-deep',
+        () => selectCaseDifficulty('deep')
+      )
+    );
+    box.appendChild(actions);
+
+    captureOverlay.classList.add('open');
+    focusCaptureControl('#muenba-case-fresh');
+  }
+
+  function selectCaseDifficulty(difficulty) {
+    if (!captureSession || !captureSession.caseData) return;
+    if (!['fresh', 'deep'].includes(difficulty)) return;
+    captureSession.caseDifficulty = difficulty;
+    captureSession.caseIndex = 0;
+    captureSession.phase = 'case-clues';
+    renderCaseClue();
+  }
+
+  function renderCaseClue() {
+    if (!captureSession || !captureSession.caseData || !captureOverlay) return;
+    const caseData = captureSession.caseData;
+    const mode = caseData[captureSession.caseDifficulty];
+    const clue = mode.clues[captureSession.caseIndex];
+    const lastClue = captureSession.caseIndex >= mode.clues.length - 1;
+    const box = captureBox();
+    captureImage(box, captureSession.ghost);
+
+    const progress = document.createElement('div');
+    progress.className = 'muenba-case-progress';
+    progress.textContent = `CASE RECORD · ${captureSession.caseIndex + 1} / ${mode.clues.length}`;
+    box.appendChild(progress);
+
+    const h2 = document.createElement('h2');
+    h2.textContent = clue.title;
+    box.appendChild(h2);
+
+    const record = document.createElement('p');
+    record.className = 'muenba-case-record';
+    record.textContent = clue.text;
+    box.appendChild(record);
+
+    renderCaseDirection(
+      box,
+      'Read the record. When you are ready, open the next clue.',
+      '<ruby>記録<rt>きろく</rt></ruby>を<ruby>読<rt>よ</rt></ruby>みましょう。<ruby>準備<rt>じゅんび</rt></ruby>ができたら、<ruby>次<rt>つぎ</rt></ruby>の<ruby>手<rt>て</rt></ruby>がかりを<ruby>開<rt>ひら</rt></ruby>きましょう。'
+    );
+
+    const actions = document.createElement('div');
+    actions.className = 'muenba-case-actions';
+    actions.appendChild(caseActionButton(
+      lastClue ? 'Solve the case' : 'Open next clue',
+      lastClue
+        ? '<ruby>事件<rt>じけん</rt></ruby>を<ruby>解<rt>と</rt></ruby>く'
+        : '<ruby>次<rt>つぎ</rt></ruby>の<ruby>手<rt>て</rt></ruby>がかりを<ruby>開<rt>ひら</rt></ruby>く',
+      'muenba-case-next',
+      () => {
+        if (lastClue) renderCaseQuestion();
+        else {
+          captureSession.caseIndex += 1;
+          renderCaseClue();
+        }
+      }
+    ));
+    box.appendChild(actions);
+    captureOverlay.classList.add('open');
+    focusCaptureControl('#muenba-case-next');
+  }
+
+  function renderCaseQuestion(feedback = '') {
+    if (!captureSession || !captureSession.caseData || !captureOverlay) return;
+    const mode = captureSession.caseData[captureSession.caseDifficulty];
+    const box = captureBox();
+    captureImage(box, captureSession.ghost);
+
+    const progress = document.createElement('div');
+    progress.className = 'muenba-case-progress';
+    progress.textContent = 'CASE RECORD · FINAL CLUE';
+    box.appendChild(progress);
+
+    const records = document.createElement('div');
+    records.className = 'muenba-case-record-list';
+    mode.clues.forEach((clue, index) => {
+      const record = document.createElement('article');
+      record.className = 'muenba-case-record-item';
+      const label = document.createElement('h3');
+      label.textContent = `${index + 1}. ${clue.title}`;
+      const text = document.createElement('p');
+      text.textContent = clue.text;
+      record.append(label, text);
+      records.appendChild(record);
+    });
+    box.appendChild(records);
+
+    renderCaseDirection(box, mode.prompt, mode.promptJP);
+    if (feedback) renderCaseDirection(
+      box,
+      feedback,
+      '<ruby>手<rt>て</rt></ruby>がかりをもう<ruby>一度<rt>いちど</rt></ruby><ruby>見<rt>み</rt></ruby>て、もう<ruby>一度<rt>いちど</rt></ruby><ruby>選<rt>えら</rt></ruby>びましょう。'
+    );
+
+    const choices = document.createElement('div');
+    choices.className = 'muenba-case-choices';
+    mode.choices.forEach((choice, index) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'muenba-case-choice';
+      button.textContent = choice;
+      button.addEventListener('click', () => {
+        if (index === mode.correct) renderCaseResolved();
+        else renderCaseQuestion('That explanation does not fit all three records yet.');
+      });
+      choices.appendChild(button);
+    });
+    box.appendChild(choices);
+    captureOverlay.classList.add('open');
+    focusCaptureControl('.muenba-case-choice');
+  }
+
+  function renderCaseResolved() {
+    if (!captureSession || !captureSession.caseData || !captureOverlay) return;
+    const mode = captureSession.caseData[captureSession.caseDifficulty];
+    captureSession.caseResolved = true;
+    captureSession.phase = 'case-resolved';
+    const box = captureBox();
+    captureImage(box, captureSession.ghost);
+
+    const eyebrow = document.createElement('div');
+    eyebrow.className = 'muenba-case-eyebrow';
+    eyebrow.textContent = 'CASE SETTLED';
+    box.appendChild(eyebrow);
+
+    const h2 = document.createElement('h2');
+    h2.textContent = captureSession.caseData.title;
+    box.appendChild(h2);
+
+    const resolution = document.createElement('p');
+    resolution.className = 'muenba-case-record';
+    resolution.textContent = mode.resolution;
+    box.appendChild(resolution);
+
+    renderCaseDirection(
+      box,
+      'The case is settled. Now begin the energy capture.',
+      '<ruby>事件<rt>じけん</rt></ruby>は<ruby>解決<rt>かいけつ</rt></ruby>しました。<ruby>次<rt>つぎ</rt></ruby>にエネルギーを<ruby>集<rt>あつ</rt></ruby>めましょう。'
+    );
+
+    const actions = document.createElement('div');
+    actions.className = 'muenba-case-actions';
+    actions.appendChild(caseActionButton(
+      'Begin energy capture',
+      'エネルギーを<ruby>集<rt>あつ</rt></ruby>める',
+      'muenba-case-capture',
+      () => {
+        captureSession.phase = 'ready';
+        renderCaptureReady();
+      }
+    ));
+    box.appendChild(actions);
+    captureOverlay.classList.add('open');
+    focusCaptureControl('#muenba-case-capture');
+  }
+
   function renderCaptureReady() {
     if (!captureSession || !captureOverlay) return;
     const ghost = captureSession.ghost;
@@ -631,19 +880,12 @@
     const h2 = document.createElement('h2');
     h2.textContent = 'Capture ready';
     box.appendChild(h2);
-    const jp = document.createElement('p');
-    jp.className = 'jp';
-    jp.textContent = 'つかまえる準備';
-    box.appendChild(jp);
 
-    const p = document.createElement('p');
-    p.textContent = `You found ${ghost.name}. When you are ready, begin the capture sequence.`;
-    box.appendChild(p);
-
-    const p2 = document.createElement('p');
-    p2.className = 'jp-line';
-    p2.textContent = `${ghost.name}を見つけたよ。準備ができたら、つかまえるよ。`;
-    box.appendChild(p2);
+    renderCaseDirection(
+      box,
+      `You found ${ghost.name}. When you are ready, begin the capture sequence.`,
+      `${ghost.name}を<ruby>見<rt>み</rt></ruby>つけました。<ruby>準備<rt>じゅんび</rt></ruby>ができたら、<ruby>捕<rt>つか</rt></ruby>まえましょう。`
+    );
 
     const actions = document.createElement('div');
     actions.className = 'muenba-lobby-actions';
@@ -774,10 +1016,11 @@
 
     box.appendChild(board);
 
-    const hint = document.createElement('p');
-    hint.className = 'muenba-rhythm-hint';
-    hint.textContent = 'Tap a lane, or use ← / A for Don and → / S for Kat.';
-    box.appendChild(hint);
+    renderCaseDirection(
+      box,
+      'Tap a lane, or use ← / A for Don and → / S for Kat.',
+      'レーンを<ruby>押<rt>お</rt></ruby>しましょう。ドンは← / A、カッは→ / Sです。'
+    );
 
     const actions = document.createElement('div');
     actions.className = 'muenba-lobby-actions';
@@ -952,11 +1195,28 @@
     if (!mu.ghostsFound || typeof mu.ghostsFound !== 'object') mu.ghostsFound = {};
     if (!Number.isInteger(mu.orbsPending)) mu.orbsPending = 0;
     if (!mu.huntJournal || !Array.isArray(mu.huntJournal.entries)) mu.huntJournal = { entries: [] };
+    if (!mu.caseRecords || typeof mu.caseRecords !== 'object') mu.caseRecords = {};
 
     const isNewCapture = !mu.ghostsFound[ghost.id];
     mu.ghostsFound[ghost.id] = true;
-    if (!mu.huntJournal.entries.some(entry => entry && entry.ghostId === ghost.id)) {
-      mu.huntJournal.entries.push({ ghostId: ghost.id, capturedAt: Date.now() });
+    let journalEntry = mu.huntJournal.entries.find(entry => entry && entry.ghostId === ghost.id);
+    if (!journalEntry) {
+      journalEntry = { ghostId: ghost.id, capturedAt: Date.now() };
+      mu.huntJournal.entries.push(journalEntry);
+    }
+
+    const caseData = captureSession.caseData;
+    if (caseData && captureSession.caseResolved && captureSession.caseDifficulty) {
+      const completedAt = Date.now();
+      mu.caseRecords[caseData.id] = {
+        completed: true,
+        ghostId: caseData.ghostId,
+        difficulty: captureSession.caseDifficulty,
+        completedAt
+      };
+      journalEntry.caseId = caseData.id;
+      journalEntry.caseDifficulty = captureSession.caseDifficulty;
+      journalEntry.caseCompletedAt = completedAt;
     }
     const rewardCount = isNewCapture ? ORB_REWARD_PER_CAPTURE : 0;
     mu.orbsPending += rewardCount;
@@ -987,10 +1247,13 @@
     p.textContent = message || `Accuracy: ${accuracy}%. ${success ? 'The capture is ready for the reward step.' : 'The ghost is still waiting for you.'}`;
     box.appendChild(p);
 
-    const p2 = document.createElement('p');
-    p2.className = 'jp-line';
-    p2.textContent = success ? 'つかまえる準備ができたよ。' : '幽霊はまだ待っているよ。';
-    box.appendChild(p2);
+    renderCaseDirection(
+      box,
+      success ? 'The capture is ready for the reward step.' : 'The ghost is still waiting. Try the rhythm again.',
+      success
+        ? '<ruby>捕<rt>つか</rt></ruby>まえる<ruby>準備<rt>じゅんび</rt></ruby>ができました。<ruby>次<rt>つぎ</rt></ruby>に<ruby>報酬<rt>ほうしゅう</rt></ruby>を<ruby>受<rt>う</rt></ruby>け<ruby>取<rt>と</rt></ruby>りましょう。'
+        : '<ruby>幽霊<rt>ゆうれい</rt></ruby>はまだ<ruby>待<rt>ま</rt></ruby>っています。リズムをもう<ruby>一度<rt>いちど</rt></ruby><ruby>試<rt>ため</rt></ruby>しましょう。'
+    );
 
     const actions = document.createElement('div');
     actions.className = 'muenba-lobby-actions';
@@ -1019,14 +1282,14 @@
     const h2 = document.createElement('h2');
     h2.textContent = 'Captured!';
     box.appendChild(h2);
-    const jp = document.createElement('p');
-    jp.className = 'jp';
-    jp.textContent = 'つかまえた！';
-    box.appendChild(jp);
-
     const copy = document.createElement('p');
     copy.textContent = `${ghost.name} is safe now. Energy orbs are coming free one at a time.`;
     box.appendChild(copy);
+    renderCaseDirection(
+      box,
+      'Watch the energy release, then return the orbs to Nuppi.',
+      'エネルギーが<ruby>出<rt>で</rt></ruby>てきます。<ruby>見<rt>み</rt></ruby>てから、オーブをヌッピに<ruby>届<rt>とど</rt></ruby>けましょう。'
+    );
 
     const orbList = document.createElement('div');
     orbList.className = 'muenba-orb-release-list';
@@ -1097,20 +1360,17 @@
     const h2 = document.createElement('h2');
     h2.textContent = 'Nuppi receives the orbs';
     box.appendChild(h2);
-    const jp = document.createElement('p');
-    jp.className = 'jp';
-    jp.textContent = 'ヌッピに届けたよ';
-    box.appendChild(jp);
 
     const p = document.createElement('p');
     p.textContent = deposited > 0
       ? `Nuppi smiles. ${deposited} energy orb${deposited === 1 ? '' : 's'} came safely home.`
       : 'Nuppi smiles. The energy trail is already safe.';
     box.appendChild(p);
-    const p2 = document.createElement('p');
-    p2.className = 'jp-line';
-    p2.textContent = 'エネルギーが無事に届いたよ。';
-    box.appendChild(p2);
+    renderCaseDirection(
+      box,
+      'The energy is safe with Nuppi. Return to the hunt when you are ready.',
+      'エネルギーはヌッピのところで<ruby>安全<rt>あんぜん</rt></ruby>です。<ruby>準備<rt>じゅんび</rt></ruby>ができたら、<ruby>探索<rt>たんさく</rt></ruby>に<ruby>戻<rt>もど</rt></ruby>りましょう。'
+    );
 
     const actions = document.createElement('div');
     actions.className = 'muenba-lobby-actions';
@@ -1149,13 +1409,14 @@
     const h2 = document.createElement('h2');
     h2.textContent = 'Your orbs are waiting';
     box.appendChild(h2);
-    const jp = document.createElement('p');
-    jp.className = 'jp';
-    jp.textContent = 'エネルギーを届けよう';
-    box.appendChild(jp);
     const p = document.createElement('p');
     p.textContent = `Nuppi has a safe place for your ${pending} pending energy orb${pending === 1 ? '' : 's'}.`;
     box.appendChild(p);
+    renderCaseDirection(
+      box,
+      'Return the waiting orbs to Nuppi before you continue.',
+      '<ruby>続<rt>つづ</rt></ruby>ける<ruby>前<rt>まえ</rt></ruby>に、<ruby>待<rt>ま</rt></ruby>っているオーブをヌッピに<ruby>届<rt>とど</rt></ruby>けましょう。'
+    );
     const actions = document.createElement('div');
     actions.className = 'muenba-lobby-actions';
     actions.appendChild(captureButton('Return orbs to Nuppi', 'muenba-capture-return', depositOrbsAtNuppi));
@@ -1312,6 +1573,24 @@
       .muenba-lobby-actions { display:flex; justify-content:center; margin-top:4px; }
       #muenba-lobby-begin, .muenba-capture-action { border:1px solid rgba(156,203,182,.7); color:#e0f4e9; background:rgba(52,104,78,.28); box-shadow:0 0 16px rgba(93,162,124,.22); border-radius:999px; padding:10px 28px; font:700 12px ui-monospace,monospace; letter-spacing:.05em; cursor:pointer; }
       #muenba-lobby-begin:hover, #muenba-lobby-begin:focus-visible, .muenba-capture-action:hover, .muenba-capture-action:focus-visible { background:rgba(52,104,78,.44); outline:none; }
+      .muenba-case-eyebrow { margin:0 0 8px; color:#d8c98b; font:700 10px/1.4 ui-monospace,monospace; letter-spacing:.15em; }
+      .muenba-case-progress { margin:0 0 10px; color:#9ccbb6; font:700 10px/1.4 ui-monospace,monospace; letter-spacing:.12em; }
+      .muenba-case-record { margin:15px 0 18px !important; padding:14px 15px; border-left:3px solid #d8c98b; background:rgba(216,201,139,.08); color:#fff5d5 !important; font-size:1rem !important; line-height:1.65 !important; text-align:left !important; }
+      .muenba-case-record-list { display:grid; gap:7px; margin:13px 0 16px; text-align:left; }
+      .muenba-case-record-item { padding:9px 11px; border-left:2px solid rgba(216,201,139,.42); background:rgba(216,201,139,.045); }
+      .muenba-case-record-item h3 { margin:0 0 4px; color:#e7dca9; font:700 .72rem/1.35 ui-monospace,monospace; letter-spacing:.04em; }
+      .muenba-case-record-item p { margin:0; color:#fff5d5; font-size:.82rem; line-height:1.45; }
+      .muenba-case-direction { margin:16px 0; padding:10px 12px; border:1px solid rgba(156,203,182,.24); border-radius:10px; background:rgba(255,255,255,.035); text-align:left; }
+      .muenba-case-direction-en { margin:0; color:#dff5e8; font-size:.86rem; line-height:1.45; }
+      .muenba-case-direction-jp { margin:5px 0 0; color:#9fc3af; font-size:.82rem; line-height:1.55; }
+      .muenba-case-direction ruby, .muenba-case-action ruby { ruby-position:over; line-height:1.45; }
+      .muenba-case-direction rt, .muenba-case-action rt { font-size:.78em; opacity:.95; }
+      .muenba-case-actions { display:flex; justify-content:center; gap:9px; flex-wrap:wrap; margin-top:6px; }
+      .muenba-case-action { min-width:150px; display:inline-flex; flex-direction:column; align-items:center; gap:3px; }
+      .muenba-case-action small { color:#a8cbb8; font:400 .76rem Georgia,'Times New Roman',serif; letter-spacing:0; }
+      .muenba-case-choices { display:grid; gap:9px; margin:14px 0 4px; }
+      .muenba-case-choice { width:100%; padding:12px 14px; border:1px solid rgba(216,201,139,.34); border-radius:10px; background:rgba(216,201,139,.07); color:#fff5d5; font:400 .9rem Georgia,'Times New Roman',serif; line-height:1.4; text-align:left; cursor:pointer; }
+      .muenba-case-choice:hover, .muenba-case-choice:focus-visible { border-color:#d8c98b; background:rgba(216,201,139,.16); outline:none; }
       /* Hide button (Pass 7) — always visible during free-roam, not a DEV
          tool. Matches the exit button's box language but sits bottom-left
          so it never competes with the DEV-only bottom-right room list. */

@@ -182,6 +182,52 @@
   // from the GHOSTS roster above.
   const GHOST_ANGRY_CHANGE_IMG = 'assets/img/muenba/ghosts/angry_change.png';
 
+  // Pass 2 vertical slice: one complete ghost case. Case-record copy is
+  // intentionally English-only. The runtime supplies Japanese furigana
+  // translations only for instructions and directions, so the story itself
+  // remains a clean English reading record.
+  const CASES = {
+    fuzzle_case_01: {
+      id: 'fuzzle_case_01',
+      ghostId: 'fuzzle',
+      title: 'Fuzzle Forgot the Fright',
+      eyebrow: 'GHOST CASE / CASE 01',
+      intro: 'Fuzzle had one job: scare the next visitor. Now Fuzzle cannot remember what the scare was supposed to be.',
+      fresh: {
+        clues: [
+          { title: 'The hiding place', text: 'Fuzzle waited behind a crooked gravestone.' },
+          { title: 'Too many scares', text: 'Fuzzle practiced “Boo,” “Hiss,” and “Ta-da!”' },
+          { title: 'The missing ending', text: 'When Nuppi arrived, Fuzzle could not remember which scare it had chosen.' }
+        ],
+        prompt: 'What tangled Fuzzle’s energy?',
+        promptJP: '<ruby>何<rt>なに</rt></ruby>がフズルのエネルギーを<ruby>絡<rt>から</rt></ruby>ませましたか？',
+        choices: [
+          'Fuzzle practiced too many scares.',
+          'A gravestone swallowed the scare.',
+          'Nuppi used the scare too early.'
+        ],
+        correct: 0,
+        resolution: 'Fuzzle’s energy untangles when one silly scare is chosen.'
+      },
+      deep: {
+        clues: [
+          { title: 'A serious plan', text: 'Fuzzle stood behind a crooked gravestone and prepared one perfect fright.' },
+          { title: 'A growing collection', text: 'The perfect fright became three beginnings: “Boo,” “Hiss,” and “Ta-da!”' },
+          { title: 'A tangled moment', text: 'When Nuppi arrived, Fuzzle’s energy pulled in three directions and none of the scares could finish.' }
+        ],
+        prompt: 'Which explanation best fits the evidence?',
+        promptJP: 'この<ruby>証拠<rt>しょうこ</rt></ruby>に<ruby>一番<rt>いちばん</rt></ruby>よく<ruby>合<rt>あ</rt></ruby>う<ruby>説明<rt>せつめい</rt></ruby>はどれですか？',
+        choices: [
+          'Fuzzle’s energy split between too many unfinished ideas.',
+          'The gravestone borrowed Fuzzle’s voice.',
+          'Nuppi forgot to bring a loud enough bell.'
+        ],
+        correct: 0,
+        resolution: 'Fuzzle’s energy untangles when the unfinished scares become one choice.'
+      }
+    }
+  };
+
   window.MUENBA_DATA = {
     world: 'muenba',
     worldWidth: WORLD_W,
@@ -189,6 +235,7 @@
     startRoom: 'room_01',
     rooms,
     ghosts: GHOSTS,
+    cases: CASES,
     ghostAngryChangeImg: GHOST_ANGRY_CHANGE_IMG
   };
 })();
