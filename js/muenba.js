@@ -1,8 +1,11 @@
 /*
- * Muenba world shell — navigation, atmosphere, Nuppi's lobby briefing, and
- * the briefing Q&A gate that reveals the day's target ghost. Ghost AI
- * (ignore vs. chase), hiding, click-to-attempt capture, the rhythm game,
- * and durable Muenba save/progress still belong to later passes.
+ * Muenba world shell — navigation, atmosphere, Nuppi's lobby briefing, the
+ * briefing Q&A gate that reveals the day's target ghost, durable Muenba
+ * save/progress (Pass 6), and the ghost-hunting core loop (Pass 7): one
+ * wandering ghost per room, an ignore-vs-chase behavior split, a Hide
+ * button, and click-to-attempt capture. Capture currently resolves
+ * immediately on tapping the correct ghost — the real two-lane rhythm game
+ * that gates that resolution, plus the orb-return loop to Nuppi, is Pass 8.
  */
 (() => {
   'use strict';
@@ -39,6 +42,20 @@
   const KARASUKI_RETURN_PORTAL = { roomId: 'room_01', x: 768, y: 830, r: 44, triggerR: 36 };
   const POPUP_COOLDOWN_MS = 900;
 
+  // ── Ghost hunting core loop (Pass 7) ────────────────────────────────────
+  // Chase speed stays well under BASE_SPEED (5.5-8) on purpose — a chasing
+  // ghost can close in if the player stands still or walks toward it, but
+  // never actually corners anyone. Getting caught is a startle, not a fail
+  // state: it bumps the player back a step and costs nothing.
+  const GHOST_WANDER_SPEED = 1.6;
+  const GHOST_CHASE_SPEED = 3.4;
+  const GHOST_DETECT_R = 230;
+  const GHOST_CATCH_R = 54;
+  const GHOST_CLICK_R = 58;
+  const GHOST_GIVEUP_HIDE_MS = 1100;
+  const GHOST_STARTLE_COOLDOWN_MS = 1400;
+  const ORB_REWARD_PER_CAPTURE = 3;
+
   const params = new URLSearchParams(window.location.search);
   const DEV_MODE = params.get('dev') === '1';
   if (DEV_MODE) window.__devMuenba = true;
@@ -63,7 +80,9 @@
     speed: BASE_SPEED,
     fogX: 0,
     returnExiting: false,
-    targetGhost: null
+    targetGhost: null,
+    hiding: false,
+    captureResolving: false
   };
 
   let app;
@@ -91,6 +110,18 @@
   let lobbyOpen = false;
   let briefingOverlay = null;
   let briefingOpen = false;
+  // Ghost hunting core loop (Pass 7): the current room's wandering ghost
+  // (or null when this room has none today), its day-seeded room
+  // assignment, a Hide-button toggle, the capture-result overlay, and a
+  // small transient text bubble for "Boo!"/"Not the one" feedback.
+  let activeGhost = null;
+  let ghostRoomMap = null;
+  let ghostRoomMapDay = null;
+  const ghostSpriteCache = new Map();
+  let hideBtn = null;
+  let captureOverlay = null;
+  let captureOpen = false;
+  let toast = null;
   let motes = [];
   let moteSprite = null;
   const imageCache = new Map();
@@ -282,6 +313,316 @@
     } catch (_) {}
   }
 
+  /* ═══════════════════════════════════════════════════════════════════
+     GHOST HUNTING CORE LOOP (Pass 7)
+     One wandering ghost per room, day-seeded (same _briRng/_briShuffle
+     helpers the briefing quiz and target pick already use, so "today's
+     layout" is stable across re-entries but reshuffles tomorrow). Each
+     ghost is either 'ignore' (wanders, never reacts) or 'chase' (notices
+     the player within range and closes in — but never faster than the
+     player can walk away). Catching up to the player is a soft startle,
+     not a fail state. Tapping a ghost swaps it to ANGRY_CHANGE_IMG; the
+     correct (target) ghost resolves as a capture, anything else is a
+     gentle miss. Capture writes ghostsFound/orbsCollected/huntJournal
+     from Pass 6's schema and fires BoohaUnlockSystem.checkAll().
+     ═══════════════════════════════════════════════════════════════════ */
+
+  // Which of the 15 rooms gets which of the 5 ghosts, and which ghosts are
+  // 'chase' vs 'ignore' today — both reseed on the next calendar day but
+  // hold steady across re-entries the same day, same as the target pick.
+  function getGhostRoomMap() {
+    const today = _briTodayKey() || 'nodate';
+    if (ghostRoomMap && ghostRoomMapDay === today) return ghostRoomMap;
+    const roomIds = Object.keys(DATA.rooms);
+    const pickedRooms = _briShuffle(roomIds, today + '|muenbaGhostRooms').slice(0, GHOSTS.length);
+    const shuffledGhosts = _briShuffle(GHOSTS, today + '|muenbaGhostAssign');
+    const map = {};
+    shuffledGhosts.forEach((ghost, i) => {
+      if (pickedRooms[i]) map[pickedRooms[i]] = ghost;
+    });
+    ghostRoomMap = map;
+    ghostRoomMapDay = today;
+    return map;
+  }
+
+  function ghostBehaviorFor(ghostId) {
+    const today = _briTodayKey() || 'nodate';
+    return _briRng(today + '|muenbaGhostBehavior|' + ghostId)() < 0.5 ? 'ignore' : 'chase';
+  }
+
+  // Random point inside one of this room's walkable rects — same corridor
+  // shape the player moves through, so a wandering ghost never drifts
+  // somewhere the player can't reach it.
+  function pickGhostWanderTarget() {
+    const rects = getRoom().walkable || [];
+    if (!rects.length) return { x: CENTER_X, y: CENTER_Y };
+    const rect = rects[Math.floor(Math.random() * rects.length)];
+    return clampToWorld(rect.x + Math.random() * rect.w, rect.y + Math.random() * rect.h);
+  }
+
+  function getGhostSprite(src) {
+    if (ghostSpriteCache.has(src)) return ghostSpriteCache.get(src);
+    const img = new Image();
+    img.decoding = 'async';
+    img.src = src;
+    ghostSpriteCache.set(src, img);
+    return img;
+  }
+
+  // Called from setRoom() for every room entry. A decoy (non-target) ghost
+  // always spawns fresh — tapping one costs nothing, so there's no reason
+  // to remember it was tapped before. The day's actual target sits out the
+  // rest of the day once caught, so it isn't farmable on repeat visits.
+  function spawnRoomGhost(roomId) {
+    activeGhost = null;
+    const ghost = getGhostRoomMap()[roomId];
+    if (!ghost) return;
+    const mu = readMuenba();
+    if (mu.targetGhost && mu.targetGhost.id === ghost.id && mu.targetGhost.capturedForDay) return;
+    const pos = pickGhostWanderTarget();
+    activeGhost = {
+      ghost,
+      x: pos.x,
+      y: pos.y,
+      behavior: ghostBehaviorFor(ghost.id),
+      chasing: false,
+      wanderTarget: pos,
+      nextWanderAt: performance.now() + 1800 + Math.random() * 1600,
+      angryUntil: 0,
+      startleUntil: 0,
+      hideGiveupAt: 0
+    };
+  }
+
+  function moveGhostToward(g, tx, ty, speed) {
+    const dx = tx - g.x, dy = ty - g.y;
+    const dist = Math.hypot(dx, dy);
+    if (dist < 2) return;
+    const step = Math.min(dist, speed);
+    const next = clampToWorld(g.x + (dx / dist) * step, g.y + (dy / dist) * step);
+    g.x = next.x;
+    g.y = next.y;
+  }
+
+  function showToast(text, jp, x, y, until) {
+    toast = { text, jp, x, y, until };
+  }
+
+  function tickGhost(now) {
+    if (!activeGhost) return;
+    const g = activeGhost;
+    if (state.hiding) {
+      // Only the give-up timer runs while hidden — a chasing ghost that
+      // loses the player takes a beat to wander off, rather than snapping
+      // back to 'ignore' the instant Hide is pressed.
+      if (g.chasing) {
+        if (!g.hideGiveupAt) g.hideGiveupAt = now + GHOST_GIVEUP_HIDE_MS;
+        else if (now >= g.hideGiveupAt) {
+          g.chasing = false;
+          g.hideGiveupAt = 0;
+          g.wanderTarget = pickGhostWanderTarget();
+          g.nextWanderAt = now + 400;
+        }
+      }
+      return;
+    }
+    g.hideGiveupAt = 0;
+    const dist = Math.hypot(g.x - state.x, g.y - state.y);
+    if (g.behavior === 'chase') {
+      if (!g.chasing && dist <= GHOST_DETECT_R) g.chasing = true;
+      if (g.chasing && dist > GHOST_DETECT_R * 1.5) g.chasing = false;
+      if (g.chasing) {
+        moveGhostToward(g, state.x, state.y, GHOST_CHASE_SPEED);
+        if (dist <= GHOST_CATCH_R && now >= g.startleUntil) {
+          g.startleUntil = now + GHOST_STARTLE_COOLDOWN_MS;
+          g.angryUntil = now + 500;
+          showToast('Boo!', 'わっ！', state.x, state.y - 50, now + 900);
+          const away = dist || 1;
+          const pushed = clampToWorld(
+            state.x + ((state.x - g.x) / away) * 46,
+            state.y + ((state.y - g.y) / away) * 46
+          );
+          if (canMoveTo(pushed.x, pushed.y)) { state.x = pushed.x; state.y = pushed.y; }
+          state.clickTarget = null;
+        }
+        return;
+      }
+    }
+    if (now >= (g.nextWanderAt || 0) || Math.hypot(g.wanderTarget.x - g.x, g.wanderTarget.y - g.y) < 8) {
+      g.wanderTarget = pickGhostWanderTarget();
+      g.nextWanderAt = now + 2400 + Math.random() * 1800;
+    }
+    moveGhostToward(g, g.wanderTarget.x, g.wanderTarget.y, GHOST_WANDER_SPEED);
+  }
+
+  function toggleHide() {
+    if (state.transitioning || lobbyOpen || briefingOpen || returnPortalOpen || captureOpen) return;
+    state.hiding = !state.hiding;
+    if (hideBtn) {
+      hideBtn.classList.toggle('active', state.hiding);
+      hideBtn.textContent = state.hiding ? 'Come out' : 'Hide';
+    }
+    if (state.hiding) {
+      state.clickTarget = null;
+      state.moving = false;
+    }
+  }
+
+  function clickCheckGhost(worldX, worldY) {
+    if (!activeGhost || state.captureResolving) return false;
+    if (Math.hypot(worldX - activeGhost.x, worldY - activeGhost.y) <= GHOST_CLICK_R) {
+      attemptCapture();
+      return true;
+    }
+    return false;
+  }
+
+  function attemptCapture() {
+    if (!activeGhost || state.captureResolving) return;
+    const now = performance.now();
+    const ghost = activeGhost.ghost;
+    activeGhost.angryUntil = now + 900;
+    const isTarget = !!(state.targetGhost && ghost.id === state.targetGhost.id);
+    if (isTarget) {
+      state.captureResolving = true;
+      openCaptureOverlay(ghost);
+    } else {
+      showToast('Not the one…', 'これじゃない…', activeGhost.x, activeGhost.y - 46, now + 1200);
+      activeGhost.wanderTarget = pickGhostWanderTarget();
+      activeGhost.nextWanderAt = now + 200;
+      activeGhost.chasing = false;
+    }
+  }
+
+  function buildCaptureOverlay() {
+    if (captureOverlay) return;
+    captureOverlay = document.createElement('div');
+    captureOverlay.id = 'muenba-capture-overlay';
+    document.body.appendChild(captureOverlay);
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && captureOpen) closeCaptureOverlay();
+    });
+  }
+
+  // Pass 7 placeholder resolution: tapping the correct ghost resolves as an
+  // immediate capture. Pass 8 inserts the real two-lane rhythm game between
+  // clickCheckGhost() finding the right ghost and this function running —
+  // this overlay's job then becomes the SUCCESS screen after that minigame
+  // is won, not the whole resolution. The flat per-capture orb reward and
+  // the "release orbs one at a time" animation both belong to Pass 8; this
+  // pass just needs ghostsFound/orbsCollected to be real, saved numbers.
+  function openCaptureOverlay(ghost) {
+    captureOpen = true;
+    state.clickTarget = null;
+    state.moving = false;
+
+    const d = loadSave();
+    if (!d.muenba || typeof d.muenba !== 'object') d.muenba = {};
+    const mu = d.muenba;
+    mu.ghostsFound = { ...(mu.ghostsFound || {}), [ghost.id]: true };
+    mu.orbsCollected = (Number.isInteger(mu.orbsCollected) ? mu.orbsCollected : 0) + ORB_REWARD_PER_CAPTURE;
+    if (!mu.huntJournal || !Array.isArray(mu.huntJournal.entries)) mu.huntJournal = { entries: [] };
+    mu.huntJournal.entries.push({ ghostId: ghost.id, capturedAt: Date.now() });
+    if (mu.targetGhost && mu.targetGhost.id === ghost.id) {
+      mu.targetGhost = { ...mu.targetGhost, capturedForDay: true };
+    }
+    writeSave(d);
+    try {
+      if (window.BoohaUnlockSystem && typeof BoohaUnlockSystem.checkAll === 'function') BoohaUnlockSystem.checkAll();
+    } catch (_) {}
+
+    activeGhost = null;
+
+    captureOverlay.textContent = '';
+    const box = document.createElement('div');
+    box.className = 'muenba-lobby-box';
+
+    const img = document.createElement('img');
+    img.className = 'muenba-lobby-portrait';
+    img.src = ghost.img;
+    img.alt = ghost.name;
+    box.appendChild(img);
+
+    const h2 = document.createElement('h2');
+    h2.textContent = 'Captured!';
+    box.appendChild(h2);
+    const jp = document.createElement('p'); jp.className = 'jp';
+    jp.textContent = 'つかまえた！';
+    box.appendChild(jp);
+
+    const p1 = document.createElement('p');
+    p1.textContent = `${ghost.name} is yours now. Nuppi will be glad to hear it.`;
+    box.appendChild(p1);
+    const p2 = document.createElement('p');
+    p2.className = 'jp-line';
+    p2.textContent = `${ghost.name}をつかまえたよ。ヌッピに教えてあげよう。`;
+    box.appendChild(p2);
+
+    const orbs = document.createElement('p');
+    orbs.className = 'muenba-capture-orbs';
+    orbs.textContent = `Energy orbs: ${mu.orbsCollected}`;
+    box.appendChild(orbs);
+
+    const actions = document.createElement('div');
+    actions.className = 'muenba-lobby-actions';
+    const ok = document.createElement('button');
+    ok.type = 'button';
+    ok.id = 'muenba-capture-ok';
+    ok.textContent = 'Nice!';
+    ok.addEventListener('click', closeCaptureOverlay);
+    actions.appendChild(ok);
+    box.appendChild(actions);
+
+    captureOverlay.appendChild(box);
+    captureOverlay.classList.add('open');
+  }
+
+  function closeCaptureOverlay() {
+    captureOpen = false;
+    state.captureResolving = false;
+    if (captureOverlay) captureOverlay.classList.remove('open');
+  }
+
+  function drawGhost(now) {
+    if (!activeGhost) return;
+    const seconds = now / 1000;
+    const bob = Math.sin(seconds * 3.4 + 1) * 6;
+    const isAngry = now < activeGhost.angryUntil;
+    const src = isAngry ? ANGRY_CHANGE_IMG : activeGhost.ghost.img;
+    const img = src ? getGhostSprite(src) : null;
+    const x = activeGhost.x;
+    const y = activeGhost.y + bob;
+    actorCtx.save();
+    actorCtx.globalAlpha = .95;
+    if (img && img.complete && img.naturalWidth > 0) {
+      actorCtx.drawImage(img, x - GHOST_R, y - GHOST_R, GHOST_R * 2, GHOST_R * 2);
+    } else {
+      actorCtx.fillStyle = isAngry ? '#e0687e' : '#cfe8df';
+      actorCtx.beginPath();
+      actorCtx.arc(x, y, GHOST_R * .7, 0, Math.PI * 2);
+      actorCtx.fill();
+    }
+    actorCtx.restore();
+  }
+
+  function drawToast(now) {
+    if (!toast) return;
+    if (now > toast.until) { toast = null; return; }
+    const remain = toast.until - now;
+    actorCtx.save();
+    actorCtx.globalAlpha = Math.min(1, remain / 300);
+    actorCtx.textAlign = 'center';
+    actorCtx.font = "700 15px Georgia, 'Times New Roman', serif";
+    actorCtx.fillStyle = '#f0e2e6';
+    actorCtx.fillText(toast.text, toast.x, toast.y);
+    if (toast.jp) {
+      actorCtx.font = "400 12px Georgia, 'Times New Roman', serif";
+      actorCtx.fillStyle = '#cbb6bc';
+      actorCtx.fillText(toast.jp, toast.x, toast.y + 18);
+    }
+    actorCtx.restore();
+  }
+
   function injectStyles() {
     const style = document.createElement('style');
     style.textContent = `
@@ -360,7 +701,18 @@
       .muenba-briefing-choice.wrong { border-color:#e0687e; background:rgba(200,70,90,.24); }
       .muenba-briefing-choice.dim { opacity:.4; }
       .muenba-briefing-ghost-portrait { display:block; width:120px; height:120px; object-fit:contain; margin:0 auto 14px; filter:drop-shadow(0 0 20px rgba(122,180,151,.35)); }
-      @media (prefers-reduced-motion: reduce) { #muenba-fade, .muenba-return-box, #muenba-return-overlay, .muenba-lobby-box, #muenba-lobby-overlay, #muenba-briefing-overlay { transition:none !important; } }
+      /* Hide button (Pass 7) — always visible during free-roam, not a DEV
+         tool. Matches the exit button's box language but sits bottom-left
+         so it never competes with the DEV-only bottom-right room list. */
+      #muenba-hide { position:fixed; left:12px; bottom:12px; z-index:100; border:1px solid rgba(156,203,182,.5); border-radius:8px; background:rgba(0,8,12,.78); color:#d8e8e0; padding:8px 16px; font:700 11px ui-monospace,monospace; letter-spacing:.05em; cursor:pointer; }
+      #muenba-hide:hover, #muenba-hide:focus-visible { background:rgba(30,70,60,.8); outline:none; }
+      #muenba-hide.active { background:rgba(93,162,124,.42); border-color:#5dd08c; color:#eafff2; }
+      /* Capture result overlay (Pass 7) — reuses .muenba-lobby-box for the
+         card shell (same as the briefing reveal) rather than new box CSS. */
+      #muenba-capture-overlay { position:fixed; inset:0; z-index:215; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,0); transition:background .4s ease; padding:20px; box-sizing:border-box; }
+      #muenba-capture-overlay.open { display:flex; background:rgba(0,0,0,.86); }
+      .muenba-capture-orbs { margin-top:-6px; color:#9ccbb6; font-size:.82rem; letter-spacing:.05em; }
+      @media (prefers-reduced-motion: reduce) { #muenba-fade, .muenba-return-box, #muenba-return-overlay, .muenba-lobby-box, #muenba-lobby-overlay, #muenba-briefing-overlay, #muenba-capture-overlay { transition:none !important; } }
     `;
     document.head.appendChild(style);
   }
@@ -392,6 +744,14 @@
     buildReturnPortalOverlay();
     buildNuppiLobbyOverlay();
     buildBriefingOverlay();
+    buildCaptureOverlay();
+
+    hideBtn = document.createElement('button');
+    hideBtn.id = 'muenba-hide';
+    hideBtn.type = 'button';
+    hideBtn.textContent = 'Hide';
+    hideBtn.addEventListener('click', toggleHide);
+    document.body.appendChild(hideBtn);
 
     const dev = document.createElement('div');
     dev.id = 'muenba-dev';
@@ -618,7 +978,12 @@
     state.distMovedSinceSpawn = 0;
     state.transitionReadyAt = performance.now() + TRANSITION_COOLDOWN_MS;
     state.spawnLockUntil = performance.now() + 700;
+    state.hiding = false;
+    state.captureResolving = false;
+    toast = null;
+    if (hideBtn) { hideBtn.classList.remove('active'); hideBtn.textContent = 'Hide'; }
     markMuenbaRoomVisited(roomId);
+    spawnRoomGhost(roomId);
     showRoom(roomId);
     reseedMotes(roomId);
     renderDevArrowList();
@@ -1269,8 +1634,12 @@
     const x = state.x;
     const y = state.y + bob;
     const pulse = .5 + .5 * Math.sin(seconds * 2.1);
+    // Hiding (Pass 7) reads visually as faded and slightly smaller —
+    // "crouching out of sight" rather than vanishing outright, since the
+    // player can still see themselves and knows they're still there.
+    const hidingFade = state.hiding ? .4 : 1;
     actorCtx.save();
-    actorCtx.globalAlpha = .18 + pulse * .08;
+    actorCtx.globalAlpha = (.18 + pulse * .08) * hidingFade;
     actorCtx.fillStyle = 'rgba(180,220,215,.55)';
     actorCtx.beginPath();
     actorCtx.ellipse(state.x, state.y + GHOST_R * .88, GHOST_R * .78, GHOST_R * .27, 0, 0, Math.PI * 2);
@@ -1279,7 +1648,8 @@
     actorCtx.save();
     actorCtx.translate(x, y);
     actorCtx.rotate(wobble * Math.PI / 180);
-    actorCtx.globalAlpha = .96;
+    actorCtx.globalAlpha = .96 * hidingFade;
+    if (state.hiding) actorCtx.scale(.82, .82);
     if (ghostImg.complete && ghostImg.naturalWidth > 0) {
       actorCtx.drawImage(ghostImg, -GHOST_R, -GHOST_R, GHOST_R * 2, GHOST_R * 2);
     } else {
@@ -1362,11 +1732,14 @@
     drawAtmosphere(now);
     drawReturnPortal(now);
     drawExitArrows(now);
+    drawGhost(now);
     drawBooha(now);
+    drawToast(now);
     drawPins();
     if (DEV_MODE && devReadout) {
       const hover = devHover ? `  mouse:${Math.round(devHover.x)},${Math.round(devHover.y)}` : '';
-      devReadout.textContent = `${state.roomId}  player:${Math.round(state.x)},${Math.round(state.y)}${hover}`;
+      const ghostInfo = activeGhost ? `  ghost:${activeGhost.ghost.id}(${activeGhost.behavior}${activeGhost.chasing ? '*chasing*' : ''})` : '';
+      devReadout.textContent = `${state.roomId}  player:${Math.round(state.x)},${Math.round(state.y)}${hover}${ghostInfo}`;
     }
   }
 
@@ -1380,13 +1753,14 @@
 
   function handleInput(clientX, clientY) {
     startMusic();
-    if (state.transitioning || state.inputLocked || returnPortalOpen || lobbyOpen || briefingOpen) return;
+    if (state.transitioning || state.inputLocked || returnPortalOpen || lobbyOpen || briefingOpen || captureOpen || state.hiding) return;
     const point = stagePoint(clientX, clientY);
     if (DEV_MODE && state.coordMode) {
       dropPin(point.x, point.y);
       return;
     }
     if (clickCheckReturnPortal(point.x, point.y)) return;
+    if (clickCheckGhost(point.x, point.y)) return;
     if (Math.hypot(point.x - state.x, point.y - state.y) < 30) return;
     state.clickTarget = point;
   }
@@ -1423,13 +1797,16 @@
     const dt = Math.min(32, Math.max(8, now - (state.lastTickTime || now)));
     state.lastTickTime = now;
     state.speed = BASE_SPEED * Math.min(1.6, dt / TARGET_DT);
-    if (!state.transitioning && !returnPortalOpen && !lobbyOpen && !briefingOpen) {
+    if (!state.transitioning && !returnPortalOpen && !lobbyOpen && !briefingOpen && !captureOpen) {
       const drifting = tickEntryDrift(now);
       if (!drifting && !state.inputLocked) {
-        handleMovement(now);
-        const exit = getAvailableExit(now);
-        if (exit) transitionTo(exit);
-        checkReturnPortalProximity(now);
+        if (!state.hiding) {
+          handleMovement(now);
+          const exit = getAvailableExit(now);
+          if (exit) transitionTo(exit);
+          checkReturnPortalProximity(now);
+        }
+        tickGhost(now);
       }
     }
     drawFrame(now);
