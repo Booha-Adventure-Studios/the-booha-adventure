@@ -5,9 +5,9 @@
 // ============================================================
 
 const CURRENT_CACHES = {
-  pages:  'booha-pages-2026-237',
-  assets: 'booha-assets-2026-237',
-  decks:  'booha-decks-2026-237',
+  pages:  'booha-pages-2026-238',
+  assets: 'booha-assets-2026-238',
+  decks:  'booha-decks-2026-238',
 };
 
 const PAGE_CACHE  = CURRENT_CACHES.pages;
@@ -36,6 +36,7 @@ const CORE_FILES = [
   `${BASE}/maze.html`,
   `${BASE}/study-deck.html`,
   `${BASE}/utsuroba.html`,
+  `${BASE}/muenba.html`,
   `${BASE}/curriculum/bc/games-index.html`,
   `${BASE}/curriculum/bc/study-index.html`,
   `${BASE}/curriculum/br/games-index.html`,
