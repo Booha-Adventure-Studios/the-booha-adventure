@@ -226,6 +226,9 @@
       <a href="profile.html">LOG <small>ぼうけんログ</small></a>
       <a href="adventure-profile.html">ADVENTURE <small>ぼうけん</small></a>
       <a href="utsuroba-profile.html" aria-current="page">UTSUROBA <small>うつろば</small></a>
+      <!-- Hidden until BoohaUnlockSystem.isMuenbaUnlocked() — toggled
+           alongside renderWorldBack() below. -->
+      <a href="muenba-profile.html" id="pnet-muenba" hidden>MUENBA <small>むえんば</small></a>
     </nav>
 
     <section class="hero" aria-labelledby="page-title">
@@ -340,6 +343,19 @@
         if (open) link.href = 'utsuroba.html?room=room_03';
       }
 
+      // Muenba's own build-readiness gate, not the shared weekly world
+      // gate above — kept as its own function since it governs a
+      // different element on an unrelated condition.
+      function renderMuenbaTab() {
+        const tab = document.getElementById('pnet-muenba');
+        if (!tab) return;
+        let open = false;
+        try {
+          open = !!(window.BoohaUnlockSystem && typeof BoohaUnlockSystem.isMuenbaUnlocked === 'function' && BoohaUnlockSystem.isMuenbaUnlocked());
+        } catch (_) {}
+        tab.hidden = !open;
+      }
+
       function restoredFor(utsu, drifter) {
         return !!(drifter && drifter.episodeId && utsu.readingEchoes && utsu.readingEchoes[drifter.episodeId]);
       }
@@ -435,6 +451,7 @@
 
       function boot() {
         renderWorldBack();
+        renderMuenbaTab();
         render();
         if (window.UTSUROBA_EPISODES_READY && typeof window.UTSUROBA_EPISODES_READY.then === 'function') {
           window.UTSUROBA_EPISODES_READY.then(render).catch(() => {});
@@ -444,6 +461,8 @@
         document.addEventListener('booha:saved', renderWorldBack);
         document.addEventListener('booha:weeklyReset', renderWorldBack);
         document.addEventListener('booha:newWeek', renderWorldBack);
+        document.addEventListener('booha:saved', renderMuenbaTab);
+        document.addEventListener('booha:weeklyReset', renderMuenbaTab);
       }
 
       if (window.BOOHA_READY) boot();

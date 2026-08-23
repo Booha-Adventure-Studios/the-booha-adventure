@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Muenba — Ghost Ledger</title>
+  <link rel="manifest" href="/the-booha-adventure/manifest.json">
+  <meta name="theme-color" content="#04110c">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Booha Adventure">
+  <link rel="apple-touch-icon" href="/the-booha-adventure/icons/icon-512.png">
+
+  <!--
+    Muenba's case-file profile page (Pass 5) — same shell/pattern as
+    utsuroba-profile.html, recolored to Muenba's own dark-cemetery sage
+    palette (matching the borders/accents muenba.js's in-world popups
+    already use: rgba(111,166,145,*) / rgba(156,203,182,*)) instead of
+    Utsuroba's violet.
+
+    Reads defensively from data.muenba, a section that doesn't exist in
+    the save yet — that's Pass 6. Everything below renders a correct
+    empty/zero state today (0 ghosts found, 0 orbs, empty journal) and is
+    shaped to light up once Pass 6 starts writing real values into:
+      data.muenba.ghostsFound     — { <ghostId>: true, ... }
+      data.muenba.orbsCollected   — number
+      data.muenba.briefingsPassed — number
+      data.muenba.visitedRooms    — { <roomId>: true, ... }
+      data.muenba.huntJournal.entries — [{ ghostId, capturedAt, ... }, ...]
+    (Field names are a Pass 5 best guess for Pass 6 to adopt or revise —
+    not a locked schema.)
+  -->
+
+  <style>
+    :root {
+      --night: #050b09;
+      --ink: #e9f5ee;
+      --muted: #a3c4b4;
+      --quiet: #6f8c7c;
+      --moss: #8fdcb2;
+      --moss-soft: rgba(143,220,178,.15);
+      --spectral: #cfe8da;
+      --gold: #d8c98b;
+      --line: rgba(143,220,178,.2);
+      --panel: rgba(9,24,18,.82);
+      --font: Georgia, "Times New Roman", serif;
+      --sans: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    * { box-sizing: border-box; }
+    html { min-height: 100%; background: var(--night); }
+    body {
+      min-height: 100vh;
+      margin: 0;
+      color: var(--ink);
+      font-family: var(--font);
+      background:
+        radial-gradient(circle at 50% -10%, rgba(70,140,105,.24), transparent 42rem),
+        radial-gradient(circle at 10% 70%, rgba(40,95,75,.13), transparent 28rem),
+        linear-gradient(160deg, #0a1712 0%, #050b09 62%, #030605 100%);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .38;
+      background-image:
+        radial-gradient(circle at 12% 18%, #fff 0 1px, transparent 1.5px),
+        radial-gradient(circle at 83% 13%, #8fdcb2 0 1px, transparent 1.5px),
+        radial-gradient(circle at 71% 67%, #fff 0 1px, transparent 1.5px),
+        radial-gradient(circle at 24% 84%, #d8c98b 0 1px, transparent 1.5px),
+        radial-gradient(circle at 92% 88%, #fff 0 1px, transparent 1.5px);
+      background-size: 310px 270px, 420px 360px, 510px 430px, 370px 330px, 610px 470px;
+    }
+
+    a { color: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+
+    .page { width: min(1040px, calc(100% - 28px)); margin: 0 auto; padding: 28px 0 64px; position: relative; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 26px; }
+    .back-link {
+      display: inline-flex; align-items: center; gap: 8px; padding: 9px 13px;
+      border: 1px solid var(--line); border-radius: 999px; color: var(--muted);
+      text-decoration: none; font-size: .78rem; background: rgba(255,255,255,.035);
+      transition: border-color .18s, color .18s, transform .18s;
+    }
+    .back-link[hidden] { display: none !important; }
+    .back-link:hover, .back-link:focus-visible { color: var(--ink); border-color: var(--moss); transform: translateY(-1px); outline: none; }
+    .case-label { color: var(--quiet); font: 700 .62rem/1.3 var(--sans); letter-spacing: .18em; text-transform: uppercase; text-align: right; }
+
+    /* ── Output profile switcher ─────────────────────── */
+    .profile-network {
+      display: flex; justify-content: center; flex-wrap: wrap; gap: 7px;
+      margin: 0 0 22px; padding: 7px;
+      border: 1px solid var(--line); border-radius: 999px;
+      background: rgba(255,255,255,.025);
+    }
+    .profile-network a {
+      display: inline-flex; align-items: center; gap: 6px; min-height: 38px;
+      padding: 7px 14px; border: 1px solid rgba(143,220,178,.26); border-radius: 10px;
+      color: #eafff2; text-decoration: none; font: 900 .7rem/1.2 var(--sans);
+      letter-spacing: .04em; text-shadow: 0 1px 2px rgba(0,0,0,.7);
+      background: linear-gradient(180deg, rgba(143,220,178,.12), rgba(6,15,11,.42));
+      box-shadow: 0 2px 0 rgba(0,0,0,.34), inset 0 1px rgba(255,255,255,.1);
+      transition: color .18s, border-color .18s, background .18s, transform .18s, box-shadow .18s;
+    }
+    .profile-network a small { color: #cfe8da; font: 800 .9em var(--font); letter-spacing: .02em; }
+    .profile-network a:hover, .profile-network a:focus-visible {
+      color: var(--ink); border-color: var(--moss); background: var(--moss-soft);
+      outline: none; transform: translateY(-1px); box-shadow: 0 4px 0 rgba(0,0,0,.28), 0 0 18px rgba(143,220,178,.2), inset 0 1px rgba(255,255,255,.18);
+    }
+    .profile-network a[aria-current="page"] {
+      color: #f4fff8; border-color: #b9f0d1;
+      background: linear-gradient(180deg, rgba(143,220,178,.28), rgba(143,220,178,.1));
+      box-shadow: 0 3px 0 rgba(0,0,0,.28), 0 0 18px rgba(143,220,178,.3), inset 0 1px rgba(255,255,255,.18);
+      animation: outputProfileButtonPulse 2.6s ease-in-out infinite;
+    }
+    @keyframes outputProfileButtonPulse {
+      0%, 100% { box-shadow: 0 3px 0 rgba(0,0,0,.28), 0 0 13px rgba(143,220,178,.2), inset 0 1px rgba(255,255,255,.14); }
+      50% { box-shadow: 0 4px 0 rgba(0,0,0,.22), 0 0 28px rgba(143,220,178,.5), inset 0 1px rgba(255,255,255,.28); }
+    }
+    @media (prefers-reduced-motion: reduce) { .profile-network a[aria-current="page"] { animation: none; } }
+
+    .hero {
+      position: relative; overflow: hidden; padding: clamp(28px, 6vw, 58px) clamp(22px, 6vw, 72px);
+      border: 1px solid var(--line); border-radius: 24px;
+      background: linear-gradient(145deg, rgba(15,42,31,.9), rgba(6,15,11,.78));
+      box-shadow: 0 25px 80px rgba(0,0,0,.4), inset 0 1px rgba(255,255,255,.05);
+    }
+    .hero::after {
+      content: "✦"; position: absolute; right: 7%; top: 16%; color: var(--moss);
+      opacity: .55; font-size: 2.2rem; text-shadow: 0 0 30px var(--moss);
+    }
+    .eyebrow { margin: 0 0 10px; color: var(--gold); font: 700 .68rem/1.4 var(--sans); letter-spacing: .2em; text-transform: uppercase; }
+    h1 { margin: 0; font-size: clamp(2.5rem, 9vw, 5.8rem); font-weight: 400; letter-spacing: -.045em; line-height: .92; text-shadow: 0 0 28px rgba(143,220,178,.26); }
+    .hero-jp { margin: 14px 0 0; color: #dff6ea; font-size: clamp(1rem, 2.8vw, 1.35rem); letter-spacing: .18em; }
+    .hero-copy { max-width: 590px; margin: 22px 0 0; color: var(--muted); font-size: clamp(.95rem, 2vw, 1.08rem); line-height: 1.65; }
+    .hero-copy small { display: block; margin-top: 6px; color: var(--quiet); font-size: .82em; }
+
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 16px 0 28px; }
+    .stat { min-height: 106px; padding: 17px 13px; border: 1px solid var(--line); border-radius: 16px; background: rgba(9,24,18,.7); }
+    .stat-value { color: var(--gold); font-size: clamp(1.65rem, 5vw, 2.5rem); line-height: 1; }
+    .stat-label { margin-top: 9px; color: var(--muted); font: 700 .65rem/1.4 var(--sans); letter-spacing: .08em; text-transform: uppercase; }
+    .stat-jp { display: block; margin-top: 3px; color: var(--quiet); font: .75rem/1.4 var(--font); }
+
+    .section { margin-top: 26px; }
+    .section-heading { display: flex; align-items: end; justify-content: space-between; gap: 14px; margin: 0 2px 11px; }
+    .section-heading h2 { margin: 0; font-size: clamp(1.25rem, 3vw, 1.7rem); font-weight: 400; }
+    .section-heading p { margin: 0; color: var(--quiet); font: .63rem/1.4 var(--sans); letter-spacing: .12em; text-transform: uppercase; text-align: right; }
+
+    .ghost-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+    .ghost-card { min-height: 174px; padding: 14px; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); position: relative; overflow: hidden; text-align: center; }
+    .ghost-card.is-found { border-color: rgba(143,220,178,.55); background: linear-gradient(145deg, rgba(28,68,50,.78), var(--panel)); }
+    .ghost-card::after { content: ""; position: absolute; width: 86px; height: 86px; right: -28px; bottom: -30px; border-radius: 50%; background: radial-gradient(circle, rgba(143,220,178,.13), transparent 70%); pointer-events: none; }
+    .ghost-avatar { width: 62px; height: 62px; object-fit: contain; margin: 2px auto 8px; display: block; filter: grayscale(.85) brightness(.75); opacity: .5; }
+    .is-found .ghost-avatar { filter: none; opacity: 1; }
+    .ghost-name { margin: 0; color: #f2fff7; font-size: .95rem; font-weight: 400; line-height: 1.2; }
+    .ghost-state { margin: 12px 0 0; color: var(--quiet); font: 700 .61rem/1.4 var(--sans); letter-spacing: .08em; text-transform: uppercase; }
+    .is-found .ghost-state { color: var(--moss); }
+
+    .lower-grid { display: grid; grid-template-columns: 1.25fr .75fr; gap: 16px; }
+    .panel { padding: 19px; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); }
+    .journal-list { display: grid; gap: 10px; }
+    .journal-entry { padding: 13px 14px; border-left: 2px solid var(--moss); background: rgba(143,220,178,.05); }
+    .journal-entry h3 { margin: 0; color: #f2fff7; font-size: .98rem; font-weight: 400; }
+    .journal-entry h3 small { display: block; margin-top: 4px; color: var(--quiet); font-size: .73rem; }
+    .journal-meta { margin: 9px 0 0; color: var(--muted); font: .67rem/1.4 var(--sans); }
+    .journal-empty { margin: 0; color: var(--muted); font-size: .9rem; line-height: 1.55; }
+    .journal-empty small { display: block; margin-top: 6px; color: var(--quiet); font-size: .82em; }
+    .orb-count { color: var(--gold); font-size: 2.7rem; line-height: 1; }
+    .orb-label { margin: 9px 0 4px; color: var(--muted); font-size: .9rem; }
+    .orb-note { margin: 0; color: var(--quiet); font-size: .78rem; line-height: 1.5; }
+
+    .footer-note { margin: 30px 0 0; color: var(--quiet); font: .65rem/1.6 var(--sans); letter-spacing: .08em; text-align: center; text-transform: uppercase; }
+    .loading { padding: 44px 20px; color: var(--muted); text-align: center; }
+    .loading small { display: block; margin-top: 6px; color: var(--quiet); }
+
+    @media (max-width: 760px) {
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .ghost-grid { grid-template-columns: repeat(3, 1fr); }
+      .lower-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 460px) {
+      .page { width: min(100% - 18px, 1040px); padding-top: 15px; }
+      .topbar { margin-bottom: 15px; }
+      .case-label { display: none; }
+      .hero { border-radius: 19px; padding: 30px 20px 34px; }
+      .ghost-grid { grid-template-columns: repeat(2, 1fr); }
+      .ghost-card { min-height: 140px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="topbar">
+      <a class="back-link" id="muenba-profile-back" href="muenba.html" hidden aria-label="Back to Muenba">← Muenba / むえんばへ</a>
+      <div class="case-label">MUENBA / GHOST LEDGER<br><ruby>幽霊<rt>ゆうれい</rt></ruby>の<ruby>記録<rt>きろく</rt></ruby></div>
+    </div>
+
+    <nav class="profile-network" aria-label="Output profiles">
+      <a href="profile.html">LOG <small>ぼうけんログ</small></a>
+      <a href="adventure-profile.html">ADVENTURE <small>ぼうけん</small></a>
+      <a href="utsuroba-profile.html">UTSUROBA <small>うつろば</small></a>
+      <a href="muenba-profile.html" aria-current="page">MUENBA <small>むえんば</small></a>
+    </nav>
+
+    <section class="hero" aria-labelledby="page-title">
+      <p class="eyebrow">A ledger of who's still hiding</p>
+      <h1 id="page-title">Muenba</h1>
+      <p class="hero-jp">むえんば — <ruby>幽霊<rt>ゆうれい</rt></ruby><ruby>探<rt>さが</rt></ruby>しの<ruby>記録<rt>きろく</rt></ruby></p>
+      <p class="hero-copy">
+        Fifteen fog-filled rooms, and something in each one that doesn't
+        always want to be found. This is the record of who's been caught
+        so far — and who's still out there.
+        <small>15の霧に<ruby>包<rt>つつ</rt></ruby>まれた<ruby>部屋<rt>へや</rt></ruby>には、<ruby>見<rt>み</rt></ruby>つかりたがらないものがいます。ここは、これまでに<ruby>捕<rt>つか</rt></ruby>まえたもの — そして、まだ<ruby>外<rt>そと</rt></ruby>にいるものの<ruby>記録<rt>きろく</rt></ruby>です。</small>
+      </p>
+    </section>
+
+    <section id="profile-content" aria-live="polite">
+      <div class="loading">Opening the ledger…<small><ruby>記録<rt>きろく</rt></ruby>をひらいています…</small></div>
+    </section>
+
+    <p class="footer-note">The ledger stays after the week changes · <ruby>記録<rt>きろく</rt></ruby>は<ruby>週<rt>しゅう</rt></ruby>が<ruby>変<rt>か</rt></ruby>わっても<ruby>残<rt>のこ</rt></ruby>ります</p>
+  </main>
+
+  <script src="./js/token.js"></script>
+  <script src="./js/calendar.js"></script>
+  <script src="./js/core/adventure-core.js"></script>
+  <script src="./js/core/save-file.js"></script>
+  <script src="./js/sync-client.js"></script>
+  <script src="./js/core/game-registry.js"></script>
+  <script src="./js/core/score-system.js"></script>
+  <script src="./js/core/unlock-system.js"></script>
+  <script src="./js/muenba-data.js"></script>
+
+  <script>
+    (() => {
+      'use strict';
+
+      const host = document.getElementById('profile-content');
+
+      function esc(value) {
+        return String(value == null ? '' : value)
+          .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      }
+
+      function getSave() {
+        try {
+          return window.BoohaAdventure && BoohaAdventure.save
+            ? BoohaAdventure.save.load() : {};
+        } catch (_) { return {}; }
+      }
+
+      // Back link (and, later, the whole page's "come back here" affordance
+      // from within Muenba) uses the build-readiness gate, not the shared
+      // weekly world gate — Muenba stays its own lock until it's finished,
+      // per the decision in Pass 0.
+      function renderWorldBack() {
+        const link = document.getElementById('muenba-profile-back');
+        if (!link) return;
+        let open = false;
+        try {
+          open = !!(window.BoohaUnlockSystem &&
+            typeof BoohaUnlockSystem.isMuenbaUnlocked === 'function' &&
+            BoohaUnlockSystem.isMuenbaUnlocked());
+        } catch (_) {}
+        link.hidden = !open;
+      }
+
+      function render() {
+        const data = getSave();
+        const mu = data.muenba || {};
+        const ghosts = Array.isArray(window.MUENBA_DATA?.ghosts) ? window.MUENBA_DATA.ghosts : [];
+        const found = mu.ghostsFound && typeof mu.ghostsFound === 'object' ? mu.ghostsFound : {};
+        const orbs = typeof mu.orbsCollected === 'number' ? mu.orbsCollected : 0;
+        const briefings = typeof mu.briefingsPassed === 'number' ? mu.briefingsPassed : 0;
+        const rooms = mu.visitedRooms && typeof mu.visitedRooms === 'object'
+          ? Object.keys(mu.visitedRooms).length : 0;
+        const journal = Array.isArray(mu.huntJournal?.entries) ? mu.huntJournal.entries : [];
+        const foundCount = ghosts.filter(g => found[g.id]).length;
+
+        const ghostCards = ghosts.map(ghost => {
+          const isFound = !!found[ghost.id];
+          return `<article class="ghost-card${isFound ? ' is-found' : ''}">
+            <img class="ghost-avatar" src="${esc(ghost.img)}" alt="">
+            <h3 class="ghost-name">${esc(ghost.name)}</h3>
+            <p class="ghost-state">${isFound ? 'Captured · つかまえた' : 'Still hiding · まだかくれている'}</p>
+          </article>`;
+        }).join('');
+
+        const journalMarkup = journal.length
+          ? `<div class="journal-list">${journal.slice(0, 8).map(entry => {
+              const ghost = ghosts.find(g => g.id === entry.ghostId);
+              return `<article class="journal-entry">
+                <h3>${esc(ghost?.name || entry.ghostId || 'Unknown ghost')}<small>Caught</small></h3>
+                <p class="journal-meta">${esc(entry.capturedAt ? new Date(entry.capturedAt).toLocaleDateString() : '')}</p>
+              </article>`;
+            }).join('')}</div>`
+          : `<p class="journal-empty">No hunts recorded yet.<small><ruby>幽霊<rt>ゆうれい</rt></ruby>を<ruby>捕<rt>つか</rt></ruby>まえると、ここに<ruby>記録<rt>きろく</rt></ruby>されます。</small></p>`;
+
+        host.innerHTML = `
+          <section class="stats" aria-label="Muenba totals">
+            <div class="stat"><div class="stat-value">${foundCount} / ${ghosts.length}</div><div class="stat-label">Ghosts found</div><span class="stat-jp">つかまえた<ruby>幽霊<rt>ゆうれい</rt></ruby></span></div>
+            <div class="stat"><div class="stat-value">${orbs}</div><div class="stat-label">Orbs collected</div><span class="stat-jp"><ruby>集<rt>あつ</rt></ruby>めたエネルギー</span></div>
+            <div class="stat"><div class="stat-value">${briefings}</div><div class="stat-label">Briefings passed</div><span class="stat-jp"><ruby>合格<rt>ごうかく</rt></ruby>したブリーフィング</span></div>
+            <div class="stat"><div class="stat-value">${rooms}</div><div class="stat-label">Rooms visited</div><span class="stat-jp"><ruby>訪<rt>おとず</rt></ruby>れた<ruby>部屋<rt>へや</rt></ruby></span></div>
+          </section>
+
+          <section class="section">
+            <div class="section-heading"><h2>The Ghosts</h2><p><ruby>幽霊<rt>ゆうれい</rt></ruby>たち</p></div>
+            <div class="ghost-grid">${ghostCards || '<p class="journal-empty">The ledger is quiet.</p>'}</div>
+          </section>
+
+          <section class="section lower-grid">
+            <div class="panel"><div class="section-heading"><h2>Hunt Journal</h2><p><ruby>探索<rt>たんさく</rt></ruby>ノート</p></div>${journalMarkup}</div>
+            <div class="panel"><div class="section-heading"><h2>Energy Orbs</h2><p>エネルギー</p></div><div class="orb-count">${orbs}</div><div class="orb-label">orbs returned to Nuppi</div><p class="orb-note">Every ghost you catch leaves a trail of these behind — bring them all back before the trail goes cold.</p></div>
+          </section>`;
+      }
+
+      function boot() {
+        renderWorldBack();
+        render();
+        document.addEventListener('booha:saved', render);
+        document.addEventListener('booha:weeklyReset', render);
+        document.addEventListener('booha:saved', renderWorldBack);
+        document.addEventListener('booha:weeklyReset', renderWorldBack);
+        document.addEventListener('booha:newWeek', renderWorldBack);
+      }
+
+      if (window.BOOHA_READY) boot();
+      else document.addEventListener('booha:ready', boot, { once: true });
+    })();
+  </script>
+</body>
+</html>

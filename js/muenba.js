@@ -106,21 +106,12 @@
   ];
   const MOTE_COUNT = 6;
 
-  // The first 5 hunt-able ghosts (Pass 4) — file names ARE their ids, per
-  // how they were delivered, except Tinklet/"Tinkley": the folder's file is
-  // tinklet.png, so that's what's wired here; flag if the name should
-  // actually be spelled differently and the file needs renaming to match.
-  // "angry_change" isn't in this list on purpose — it's the shared sprite
-  // every ghost swaps to when clicked or when it turns to chase (Pass 7),
-  // not a huntable ghost of its own.
-  const GHOSTS = [
-    { id: 'fuzzle',  name: 'Fuzzle',  img: 'assets/img/muenba/ghosts/fuzzle.png'  },
-    { id: 'glimmer', name: 'Glimmer', img: 'assets/img/muenba/ghosts/glimmer.png' },
-    { id: 'nibsy',   name: 'Nibsy',   img: 'assets/img/muenba/ghosts/nibsy.png'   },
-    { id: 'tinklet', name: 'Tinkley', img: 'assets/img/muenba/ghosts/tinklet.png' },
-    { id: 'twiddle', name: 'Twiddle', img: 'assets/img/muenba/ghosts/twiddle.png' }
-  ];
-  const ANGRY_CHANGE_IMG = 'assets/img/muenba/ghosts/angry_change.png';
+  // The first 5 hunt-able ghosts (Pass 4) now live in muenba-data.js
+  // (Pass 5) so muenba-profile.html's case-file roster reads the exact
+  // same list instead of a second hand-kept copy — see muenba-data.js for
+  // the tinklet/"Tinkley" naming note.
+  const GHOSTS = DATA.ghosts || [];
+  const ANGRY_CHANGE_IMG = DATA.ghostAngryChangeImg || '';
 
   const ghostImg = new Image();
   ghostImg.src = 'assets/img/booha_ghost.png';

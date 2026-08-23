@@ -155,7 +155,11 @@
 
     /* ── Weekly world doors ──────────────────────────────────────────────── */
     #world-doors[hidden] { display: none; }
-    #world-doors .world-door {
+    /* Selector is class-only (not scoped to "#world-doors .world-door") so
+       it also reaches #world-door-muenba below, which is deliberately a
+       sibling of #world-doors rather than nested inside it — see the
+       markup comment for why. */
+    .world-door {
       position: fixed; bottom: calc(14px + env(safe-area-inset-bottom, 0px));
       z-index: 70; width: 86px; min-height: 102px; padding: 5px 4px 3px;
       display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
@@ -165,8 +169,8 @@
       transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease;
       -webkit-tap-highlight-color: transparent;
     }
-    #world-doors .world-door:hover,
-    #world-doors .world-door:focus-visible {
+    .world-door:hover,
+    .world-door:focus-visible {
       transform: translateY(-4px) scale(1.03); outline: none;
     }
     #world-door-karasuki { left: 14px; border-color: rgba(184,137,47,.55); }
@@ -176,6 +180,14 @@
     #world-door-utsuroba { right: 14px; border-color: rgba(91,194,231,.55); }
     #world-door-utsuroba:hover, #world-door-utsuroba:focus-visible {
       border-color: #8edfff; box-shadow: 0 0 22px rgba(70,188,235,.38), 0 6px 18px rgba(0,0,0,.55);
+    }
+    /* Centered rather than transform-positioned, so the shared hover
+       transform above (translateY + scale) doesn't have to fight a
+       translateX(-50%) needed just for centering. */
+    #world-door-muenba[hidden] { display: none; }
+    #world-door-muenba { left: 50%; margin-left: -43px; border-color: rgba(111,166,145,.55); }
+    #world-door-muenba:hover, #world-door-muenba:focus-visible {
+      border-color: #9ccbb6; box-shadow: 0 0 22px rgba(111,166,145,.38), 0 6px 18px rgba(0,0,0,.55);
     }
     .world-door img {
       width: 69px; height: 69px; object-fit: contain; object-position: center bottom;
@@ -190,12 +202,13 @@
     }
     .world-door-label small { display: block; margin-top: 2px; color: #bca989; font-family: inherit; font-size: 8px; letter-spacing: .5px; }
     @media (max-width: 430px) {
-      #world-doors .world-door { width: 72px; min-height: 86px; border-radius: 12px; }
+      .world-door { width: 72px; min-height: 86px; border-radius: 12px; }
       .world-door img { width: 57px; height: 57px; }
       .world-door-label { font-size: 7px; }
       .world-door-label small { font-size: 7px; }
       #world-door-karasuki { left: 8px; }
       #world-door-utsuroba { right: 8px; }
+      #world-door-muenba { margin-left: -36px; }
     }
 
     /* ── Leather header plate ── */
@@ -484,6 +497,9 @@
     <a href="profile.html" aria-current="page">LOG <small>ぼうけんログ</small></a>
     <a href="adventure-profile.html">ADVENTURE <small>ぼうけん</small></a>
     <a href="utsuroba-profile.html">UTSUROBA <small>うつろば</small></a>
+    <!-- Hidden until BoohaUnlockSystem.isMuenbaUnlocked() — see the
+         world-door-muenba script below, which toggles both together. -->
+    <a href="muenba-profile.html" id="pnet-muenba" hidden>MUENBA <small>むえんば</small></a>
   </nav>
 
  <div class="paper">
@@ -527,6 +543,18 @@
     </a>
   </nav>
 
+  <!-- Muenba's door is deliberately its own element, NOT nested inside
+       #world-doors above: that nav's hidden/shown state is driven by the
+       shared weekly world gate (Karasuki/Utsuroba), but Muenba stays
+       gated behind its own build-readiness flag
+       (BoohaUnlockSystem.isMuenbaUnlocked()) independent of whether the
+       weekly gate is open — see Pass 0's lock decoupling and Pass 5's
+       decision to gate this door the same way. -->
+  <a id="world-door-muenba" class="world-door" href="muenba.html?from=profile" hidden aria-hidden="true" aria-label="Enter Muenba / むえんばへ">
+    <img src="assets/img/muenba/muenba_logo.png" alt="">
+    <span class="world-door-label">MUENBA<small>むえんば</small></span>
+  </a>
+
 <script>
   document.getElementById('alog-close').addEventListener('click', () => {
     sessionStorage.setItem('booha_return_to_hub', '1');
@@ -569,6 +597,37 @@
     document.addEventListener('booha:saved', renderWorldDoors);
     document.addEventListener('booha:weeklyReset', renderWorldDoors);
     document.addEventListener('booha:newWeek', renderWorldDoors);
+  })();
+</script>
+<script>
+  (function () {
+    // Independent of renderWorldDoors() above on purpose — Muenba's own
+    // build-readiness gate, not the shared weekly world gate. Toggles both
+    // the in-world door and the profile-network tab together so neither
+    // one shows before the other.
+    var muenbaDoor = document.getElementById('world-door-muenba');
+    var muenbaTab = document.getElementById('pnet-muenba');
+    if (!muenbaDoor && !muenbaTab) return;
+
+    function renderMuenbaDoor() {
+      var open = false;
+      try {
+        open = !!(window.BoohaUnlockSystem &&
+          typeof BoohaUnlockSystem.isMuenbaUnlocked === 'function' &&
+          BoohaUnlockSystem.isMuenbaUnlocked());
+      } catch (_) {}
+      if (muenbaDoor) {
+        muenbaDoor.hidden = !open;
+        muenbaDoor.setAttribute('aria-hidden', open ? 'false' : 'true');
+      }
+      if (muenbaTab) muenbaTab.hidden = !open;
+    }
+
+    if (window.BOOHA_READY) renderMuenbaDoor();
+    else document.addEventListener('booha:ready', renderMuenbaDoor, { once: true });
+    document.addEventListener('booha:saved', renderMuenbaDoor);
+    document.addEventListener('booha:weeklyReset', renderMuenbaDoor);
+    document.addEventListener('booha:newWeek', renderMuenbaDoor);
   })();
 </script>
 <script>
