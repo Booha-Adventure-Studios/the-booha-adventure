@@ -74,6 +74,9 @@
   const DEV_MODE = params.get('dev') === '1';
   if (DEV_MODE) window.__devMuenba = true;
   const requestedRoom = params.get('room');
+  const TOUCH_DEVICE = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+  const REDUCED_MOTION = typeof window.matchMedia === 'function'
+    && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const state = {
     roomId: DATA.rooms[requestedRoom] ? requestedRoom : DATA.startRoom,
@@ -1426,7 +1429,12 @@
   }
 
   function resizeCanvas() {
-    const dpr = Math.min(2, Math.max(1, window.devicePixelRatio || 1));
+    // Two full-world canvases at DPR 2 are unnecessarily expensive on many
+    // touch devices. DPR 1.5 keeps the fixed stage clean while cutting the
+    // backing-store pixels substantially; desktop/high-density screens retain
+    // the sharper DPR 2 path.
+    const maxDpr = TOUCH_DEVICE ? 1.5 : 2;
+    const dpr = Math.min(maxDpr, Math.max(1, window.devicePixelRatio || 1));
     for (const canvas of [atmosphereCanvas, actorCanvas]) {
       canvas.width = Math.round(WORLD_W * dpr);
       canvas.height = Math.round(WORLD_H * dpr);
@@ -1595,7 +1603,7 @@
   function drawMotes(now) {
     const sprite = getMoteSprite();
     motes.forEach(m => {
-      const t = (now - m.startedAt) / 1000;
+      const t = REDUCED_MOTION ? 0 : (now - m.startedAt) / 1000;
       const y = m.baseY - ((t * m.speed) % m.range);
       const x = m.baseX + Math.sin(t * m.swayFreq + m.phase) * m.swayAmp;
       const twinkle = .5 + .5 * Math.sin(t * m.twinkleFreq + m.phase * 2);
@@ -1748,7 +1756,7 @@
     state.moving = moved;
     if (!moved) state.clickTarget = null;
     if (moved) state.distMovedSinceSpawn += Math.hypot(state.x - previousX, state.y - previousY);
-    if (moved && now % 240 < 30) state.fogX += .15;
+    if (!REDUCED_MOTION && moved && now % 240 < 30) state.fogX += .15;
   }
 
   function getAvailableExit(now) {
@@ -2257,8 +2265,10 @@
       const angle = DIR_ANGLE[exit.dir] || 0;
       // Two overlapping sine waves (instead of one smooth pulse) read as an
       // unsteady, slightly ghostly flicker rather than a mechanical glow.
-      const flicker = .68 + .2 * Math.sin(seconds * 1.9 + index) + .12 * Math.sin(seconds * 6.3 + index * 2.4);
-      const bounce = Math.sin(seconds * 1.5 + index) * 4.5;
+      const flicker = REDUCED_MOTION
+        ? .78
+        : .68 + .2 * Math.sin(seconds * 1.9 + index) + .12 * Math.sin(seconds * 6.3 + index * 2.4);
+      const bounce = REDUCED_MOTION ? 0 : Math.sin(seconds * 1.5 + index) * 4.5;
       const x = exit.x + Math.cos(angle) * bounce;
       const y = exit.y + Math.sin(angle) * bounce;
 
@@ -2362,10 +2372,10 @@
     drawMotes(now);
 
     if (fogTexture && profile.fog > 0) {
-      state.fogX = (state.fogX + .12) % 780;
+      if (!REDUCED_MOTION) state.fogX = (state.fogX + .12) % 780;
       const mood = FOG_MOODS[profile.fogMood] || FOG_MOODS.low;
       const fogMotion = state.fogX * mood.speed * mood.direction;
-      const fogPulse = .86 + .14 * Math.sin(now / 2600 + mood.phase);
+      const fogPulse = REDUCED_MOTION ? .90 : .86 + .14 * Math.sin(now / 2600 + mood.phase);
       const fogAlpha = profile.fog * fogPulse;
       const slowDrift = fogMotion * .46;
       atmosphereCtx.save();
