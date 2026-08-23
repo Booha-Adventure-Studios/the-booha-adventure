@@ -87,11 +87,12 @@ const HAPPY_HOUSE_PORTAL = {
   };
 
   const MUENBA_PORTAL = {
-    roomId : "room_13",
-    x      : 1182,
-    y      : 305,
-    r      : 44,
-    href   : "muenba.html?from=karasuki",
+    roomId  : "room_13",
+    x       : 1182,
+    y       : 305,
+    r       : 44,
+    videoSrc: "assets/img/muenba/muenba_intro.mp4",
+    href    : "muenba.html?from=karasuki",
   };
 
   const ARRIVAL_ARROW_DELAY_MS        = 2000;
@@ -2148,9 +2149,36 @@ const HAPPY_HOUSE_PORTAL = {
     fadeEl.style.transition = `opacity ${FADE_MS}ms ease-in`;
     fadeEl.style.opacity = '1';
     setTimeout(() => {
-      const href = window.__devMuenba ? `${MUENBA_PORTAL.href}&dev=1` : MUENBA_PORTAL.href;
-      window.location.href = href;
+      _playMuenbaIntroVideo();
     }, FADE_MS + 60);
+  }
+
+  // Same shape as _playUtsuobaIntroVideo() below — full-screen black overlay,
+  // plays once the kara-fade has already gone to black, navigates on end
+  // (or on error / a 60s failsafe) so the video IS the transition into the
+  // new area rather than something layered on top of a separate fade.
+  function _playMuenbaIntroVideo() {
+    let vOverlay = document.getElementById('muenba-video-overlay');
+    if (!vOverlay) {
+      vOverlay = document.createElement('div');
+      vOverlay.id = 'muenba-video-overlay';
+      vOverlay.style.cssText = `position:fixed;inset:0;z-index:99999;background:#000;display:flex;align-items:center;justify-content:center;`;
+      const vid = document.createElement('video');
+      vid.id = 'muenba-intro-vid'; vid.src = MUENBA_PORTAL.videoSrc;
+      vid.autoplay = true; vid.playsInline = true; vid.muted = false;
+      vid.style.cssText = 'max-width:100%;max-height:100%;object-fit:contain;';
+      vOverlay.appendChild(vid); document.body.appendChild(vOverlay);
+      let redirected = false;
+      function goToMuenba() {
+        if (redirected) return; redirected = true;
+        const href = window.__devMuenba ? `${MUENBA_PORTAL.href}&dev=1` : MUENBA_PORTAL.href;
+        window.location.href = href;
+      }
+      vid.addEventListener('ended', goToMuenba);
+      vid.addEventListener('error', e => { console.warn('[muenba video] error:', e); goToMuenba(); });
+      vid.play().catch(e => { console.warn('[muenba video] play() rejected:', e); goToMuenba(); });
+      setTimeout(goToMuenba, 60000);
+    }
   }
 
   function muenbaUnlocked() {
