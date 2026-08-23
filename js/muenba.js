@@ -253,6 +253,15 @@
       }
       if (!room.spawns?.default) errors.push(`${roomId} has no default spawn`);
     }
+    const ghostIds = new Set();
+    for (const ghost of DATA.ghosts || []) {
+      if (!ghost || !ghost.id || ghostIds.has(ghost.id)) errors.push('ghost roster contains a missing or duplicate id');
+      if (ghost) {
+        ghostIds.add(ghost.id);
+        if (typeof ghost.personality !== 'string' || !ghost.personality.trim()) errors.push(`${ghost.id} has no personality note`);
+        else if (/[\u3040-\u30ff\u3400-\u9fff]/.test(ghost.personality)) errors.push(`${ghost.id} personality note contains Japanese story text`);
+      }
+    }
     if (errors.length) console.error('[Muenba] Data validation failed:', errors);
     else console.info('[Muenba] 15-room data validation passed.');
   }
@@ -977,6 +986,13 @@
     h2.textContent = 'Capture ready';
     box.appendChild(h2);
 
+    if (ghost.personality) {
+      const personality = document.createElement('p');
+      personality.className = 'muenba-ghost-flavor';
+      personality.textContent = ghost.personality;
+      box.appendChild(personality);
+    }
+
     renderCaseDirection(
       box,
       `You found ${ghost.name}. When you are ready, begin the capture sequence.`,
@@ -1672,6 +1688,7 @@
       .muenba-lobby-box p { margin:0 0 14px; color:#c5d8cd; font-size:.92rem; line-height:1.65; text-align:left; }
       .muenba-lobby-box p.jp-line { color:#8fa89b; font-size:.82rem; }
       .muenba-lobby-box p:last-of-type { margin-bottom:20px; }
+      .muenba-ghost-flavor { margin:12px 0 16px !important; padding:10px 12px; border-left:2px solid rgba(216,201,139,.5); background:rgba(216,201,139,.06); color:#e7dca9 !important; font-size:.86rem !important; font-style:italic; line-height:1.5 !important; text-align:center !important; }
       .muenba-lobby-case-board { margin:18px 0 20px; padding:13px 14px 12px; border:1px solid rgba(216,201,139,.28); border-radius:12px; background:rgba(216,201,139,.06); text-align:left; }
       .muenba-lobby-case-board h3 { margin:0 0 8px; color:#e7dca9; font:700 .72rem/1.35 ui-monospace,monospace; letter-spacing:.1em; text-transform:uppercase; }
       .muenba-lobby-case-board p { margin:0 0 5px; color:#fff5d5; font-size:.84rem; line-height:1.5; }

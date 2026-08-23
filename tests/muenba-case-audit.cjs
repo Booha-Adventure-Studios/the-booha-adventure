@@ -18,6 +18,10 @@ const japanese = /[\u3040-\u30ff\u3400-\u9fff]/;
 const ghostIds = new Set((data.ghosts || []).map(ghost => ghost.id));
 const seen = new Set();
 
+for (const ghost of data.ghosts || []) {
+  englishOnly(ghost.personality, `${ghost.id}.personality`);
+}
+
 function englishOnly(value, label) {
   assert.strictEqual(typeof value, 'string', `${label} must be text`);
   assert(value.trim(), `${label} must not be empty`);
