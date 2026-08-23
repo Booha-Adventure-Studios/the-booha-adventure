@@ -788,6 +788,9 @@
       <a href="profile.html">LOG <small>ぼうけんログ</small></a>
       <a href="adventure-profile.html" aria-current="page">ADVENTURE <small>ぼうけん</small></a>
       <a href="utsuroba-profile.html">UTSUROBA <small>うつろば</small></a>
+      <!-- Hidden until BoohaUnlockSystem.isMuenbaUnlocked() — see the
+           small script near the end of body that toggles this. -->
+      <a href="muenba-profile.html" id="pnet-muenba" hidden>MUENBA <small>むえんば</small></a>
     </nav>
   </header>
 
@@ -1432,7 +1435,29 @@ document.addEventListener('booha:ready', () => {
   document.addEventListener('booha:reset',        render);
   document.addEventListener('booha:weeklyReset',  render);
 });
-</script>  
+</script>
+<script>
+  // Muenba's own build-readiness gate (BoohaUnlockSystem.isMuenbaUnlocked),
+  // not the shared weekly world gate — kept as its own small script so it
+  // doesn't have to thread through the render() function above.
+  (function () {
+    var tab = document.getElementById('pnet-muenba');
+    if (!tab) return;
+    function renderMuenbaTab() {
+      var open = false;
+      try {
+        open = !!(window.BoohaUnlockSystem &&
+          typeof BoohaUnlockSystem.isMuenbaUnlocked === 'function' &&
+          BoohaUnlockSystem.isMuenbaUnlocked());
+      } catch (_) {}
+      tab.hidden = !open;
+    }
+    if (window.BOOHA_READY) renderMuenbaTab();
+    else document.addEventListener('booha:ready', renderMuenbaTab, { once: true });
+    document.addEventListener('booha:saved', renderMuenbaTab);
+    document.addEventListener('booha:weeklyReset', renderMuenbaTab);
+  })();
+</script>
 
 
 </body>
