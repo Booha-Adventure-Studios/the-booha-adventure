@@ -193,6 +193,95 @@
     else console.info('[Muenba] 15-room data validation passed.');
   }
 
+  /* ═══════════════════════════════════════════════════════════════════
+     SAVE LAYER (Pass 6)
+     Durable Muenba progress — ghosts found, orbs collected, briefings
+     passed, rooms visited, today's target ghost, and a rhythm-game stat
+     bucket for Pass 8. Mirrors utsuroba.js's own loadSave()/writeSave()/
+     migrate*Save() idiom — one top-level data.muenba section, defensive
+     shape-fill on every load, single dirty-flag write-back — rather than
+     inventing a different pattern for this world. Capture/orb fields
+     exist here but nothing writes to them yet; that's Pass 7/8. This
+     pass just gives Pass 4's in-memory-only state.targetGhost, and the
+     room-visit tracking already implicit in setRoom(), a real home.
+     ═══════════════════════════════════════════════════════════════════ */
+
+  function loadSave() {
+    try {
+      const d = (window.BoohaAdventure && BoohaAdventure.save)
+        ? BoohaAdventure.save.load()
+        : {};
+      return migrateMuenbaSave(d);
+    } catch (e) {
+      console.error('[Muenba] Save read failed:', e);
+    }
+    return { muenba: {} };
+  }
+
+  function writeSave(data) {
+    try {
+      if (window.BoohaAdventure && BoohaAdventure.save) return BoohaAdventure.save.save(data);
+      console.error('[Muenba] Save system unavailable — progress NOT written.');
+      return false;
+    } catch (e) {
+      console.error('[Muenba] Save write failed:', e);
+      return false;
+    }
+  }
+
+  function migrateMuenbaSave(data) {
+    let dirty = false;
+    if (!data.muenba || typeof data.muenba !== 'object') { data.muenba = {}; dirty = true; }
+    const mu = data.muenba;
+    if (!mu.ghostsFound || typeof mu.ghostsFound !== 'object') { mu.ghostsFound = {}; dirty = true; }
+    if (!Number.isInteger(mu.orbsCollected)) { mu.orbsCollected = 0; dirty = true; }
+    if (!Number.isInteger(mu.briefingsPassed)) { mu.briefingsPassed = 0; dirty = true; }
+    if (!mu.visitedRooms || typeof mu.visitedRooms !== 'object') { mu.visitedRooms = {}; dirty = true; }
+    if (!mu.huntJournal || typeof mu.huntJournal !== 'object') {
+      mu.huntJournal = { entries: [] };
+      dirty = true;
+    } else if (!Array.isArray(mu.huntJournal.entries)) {
+      mu.huntJournal.entries = [];
+      dirty = true;
+    }
+    if (!mu.rhythm || typeof mu.rhythm !== 'object') {
+      mu.rhythm = { bestAccuracy: 0, attempts: 0 };
+      dirty = true;
+    }
+    if (mu.targetGhost != null &&
+        (typeof mu.targetGhost !== 'object' || typeof mu.targetGhost.id !== 'string')) {
+      mu.targetGhost = null;
+      dirty = true;
+    }
+    if (dirty) writeSave(data);
+    return data;
+  }
+
+  function readMuenba() {
+    return loadSave().muenba || {};
+  }
+
+  function writeMuenba(patchObj) {
+    const d = loadSave();
+    d.muenba = { ...d.muenba, ...patchObj };
+    return writeSave(d);
+  }
+
+  // Mirrors utsuroba.js's markVisited() — one write site, called from
+  // setRoom() below, only actually writes the first time a given room is
+  // seen (idempotent, so re-entering a room every tick doesn't spam saves).
+  function markMuenbaRoomVisited(roomId) {
+    try {
+      const d = loadSave();
+      if (!d.muenba || typeof d.muenba !== 'object') d.muenba = {};
+      if (!d.muenba.visitedRooms || typeof d.muenba.visitedRooms !== 'object') d.muenba.visitedRooms = {};
+      if (!d.muenba.visitedRooms[roomId]) {
+        d.muenba.visitedRooms[roomId] = Date.now();
+        writeSave(d);
+      }
+    } catch (_) {}
+  }
+
   function injectStyles() {
     const style = document.createElement('style');
     style.textContent = `
@@ -529,6 +618,7 @@
     state.distMovedSinceSpawn = 0;
     state.transitionReadyAt = performance.now() + TRANSITION_COOLDOWN_MS;
     state.spawnLockUntil = performance.now() + 700;
+    markMuenbaRoomVisited(roomId);
     showRoom(roomId);
     reseedMotes(roomId);
     renderDevArrowList();
@@ -917,6 +1007,24 @@
     return GHOSTS[idx];
   }
 
+  // Pass 6: gives Pass 4's seeded-but-in-memory-only pick a real save
+  // record, so a reload mid-hunt reloads the SAME target instead of
+  // recomputing it. The seed is already deterministic per day on its own
+  // (same day → same ghost, with or without a save), so this mostly
+  // guards a persisted record for muenba-profile.html and Pass 7 to read,
+  // rather than guarding against the pick itself ever drifting.
+  function getOrPickTodaysTargetGhost() {
+    const today = _briTodayKey();
+    const mu = readMuenba();
+    if (today && mu.targetGhost && mu.targetGhost.pickedForDay === today) {
+      const saved = GHOSTS.find(g => g.id === mu.targetGhost.id);
+      if (saved) return saved;
+    }
+    const ghost = _pickTargetGhost();
+    if (today) writeMuenba({ targetGhost: { id: ghost.id, pickedForDay: today } });
+    return ghost;
+  }
+
   function buildBriefingOverlay() {
     if (briefingOverlay) return;
     briefingOverlay = document.createElement('div');
@@ -993,7 +1101,24 @@
     box.appendChild(list);
   }
 
+  // Counts every completed briefing (including the auto-skip-on-error
+  // path in openBriefingQuiz()'s .catch()), since the quiz has no real
+  // fail state — reaching the reveal IS "passing" it, per the locked
+  // gentle/no-punishment decision. One combined load+write rather than
+  // readMuenba() then writeMuenba() back to back, to avoid a redundant
+  // round trip on a call site this cheap should stay cheap.
+  function _bumpBriefingsPassed() {
+    try {
+      const d = loadSave();
+      if (!d.muenba || typeof d.muenba !== 'object') d.muenba = {};
+      const prev = Number.isInteger(d.muenba.briefingsPassed) ? d.muenba.briefingsPassed : 0;
+      d.muenba.briefingsPassed = prev + 1;
+      writeSave(d);
+    } catch (_) {}
+  }
+
   function _revealTargetGhost() {
+    _bumpBriefingsPassed();
     const box = _briClear();
     const ghost = state.targetGhost || GHOSTS[0];
 
@@ -1035,7 +1160,7 @@
     state.clickTarget = null;
     state.moving = false;
     briefingOverlay.classList.add('open');
-    state.targetGhost = _pickTargetGhost();
+    state.targetGhost = getOrPickTodaysTargetGhost();
 
     _renderBriefingLoading();
     const curr = _briKnownCurr();
