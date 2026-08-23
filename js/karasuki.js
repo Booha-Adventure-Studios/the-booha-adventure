@@ -2154,9 +2154,14 @@ const HAPPY_HOUSE_PORTAL = {
   }
 
   function muenbaUnlocked() {
+    // Deliberately NOT the weekly world gate — Muenba is still being built,
+    // so it stays locked for real students no matter how many games they
+    // finish. Only the DEV "Muenba unlocked" checkbox (window.__devMuenba)
+    // or BoohaUnlockSystem.isMuenbaUnlocked() once that flag ships opens it.
+    if (window.__devMuenba) return true;
     return window.BoohaUnlockSystem &&
-      typeof BoohaUnlockSystem.isWeeklyWorldGateOpen === 'function'
-      ? BoohaUnlockSystem.isWeeklyWorldGateOpen()
+      typeof BoohaUnlockSystem.isMuenbaUnlocked === 'function'
+      ? BoohaUnlockSystem.isMuenbaUnlocked()
       : false;
   }
 
@@ -2214,8 +2219,8 @@ const HAPPY_HOUSE_PORTAL = {
       wpopSetLock('muenba-pop', true);
       wpopSetText(eyebrowEn, 'THIS WORLD IS LOCKED');
       wpopSetText(eyebrowJp, 'この世界は封印されています');
-      wpopSetText(bodyEn, 'Something waits beyond this path.\nComplete the weekly world gate before Muenba opens.');
-      wpopSetText(bodyJp, 'この道の先で、何かが待っている。\n今週の世界の門を開くと、ムエンバに入れます。');
+      wpopSetText(bodyEn, 'Something waits beyond this path.\nThis path isn\'t open yet.');
+      wpopSetText(bodyJp, 'この道の先で、何かが待っている。\nこの道はまだ開いていません。');
       wpopSetActions('muenba-pop', [
         { en: 'Close', jp: '閉じる', border: '1px solid rgba(80,120,98,.55)', color: '#b6cfc2', onClick: closeMuenbaPopup }
       ]);
