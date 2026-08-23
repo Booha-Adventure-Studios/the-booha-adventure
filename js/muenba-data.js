@@ -134,21 +134,21 @@
   // ambient glow and its exit arrows. Kept desaturated/muted on purpose;
   // this is mood lighting, not a rainbow.
   const ATMOSPHERE = {
-    room_01: { darkness: 0.46, tint: 'rgba(12, 24, 42, 0.10)', fog: 0.12, glow: '#4a9a72' }, // sickly green
-    room_02: { darkness: 0.50, tint: 'rgba(15, 28, 48, 0.11)', fog: 0.15, glow: '#6f5aa8' }, // violet
-    room_03: { darkness: 0.43, tint: 'rgba(18, 32, 38, 0.09)', fog: 0.10, glow: '#4a8a9e' }, // teal-blue
-    room_04: { darkness: 0.48, tint: 'rgba(25, 29, 45, 0.10)', fog: 0.13, glow: '#9e5a72' }, // dusky rose
-    room_05: { darkness: 0.52, tint: 'rgba(9, 20, 34, 0.12)',  fog: 0.17, glow: '#5a6fa8' }, // indigo
-    room_06: { darkness: 0.44, tint: 'rgba(20, 35, 34, 0.09)', fog: 0.09, glow: '#7a9e4a' }, // moss
-    room_07: { darkness: 0.47, tint: 'rgba(16, 29, 44, 0.10)', fog: 0.14, glow: '#a87a4a' }, // rust amber
-    room_08: { darkness: 0.40, tint: 'rgba(24, 35, 37, 0.07)', fog: 0.08, glow: '#4aa89e' }, // cyan-teal
-    room_09: { darkness: 0.51, tint: 'rgba(25, 19, 36, 0.10)', fog: 0.16, glow: '#8a4aa8' }, // plum
-    room_10: { darkness: 0.45, tint: 'rgba(10, 27, 39, 0.10)', fog: 0.12, glow: '#a84a6f' }, // wine
-    room_11: { darkness: 0.55, tint: 'rgba(12, 18, 31, 0.12)', fog: 0.18, glow: '#4a5a9e' }, // steel-indigo
-    room_12: { darkness: 0.49, tint: 'rgba(26, 28, 42, 0.09)', fog: 0.14, glow: '#7aa85a' }, // olive-moss
-    room_13: { darkness: 0.42, tint: 'rgba(20, 36, 34, 0.08)', fog: 0.09, glow: '#a8944a' }, // ochre
-    room_14: { darkness: 0.53, tint: 'rgba(18, 18, 30, 0.12)', fog: 0.17, glow: '#4a7aa8' }, // slate-blue
-    room_15: { darkness: 0.47, tint: 'rgba(22, 30, 42, 0.10)', fog: 0.13, glow: '#9e4a8a' }  // magenta-ash
+    room_01: { darkness: 0.46, tint: 'rgba(12, 24, 42, 0.10)', fog: 0.12, fogMood: 'low',     glow: '#4a9a72' }, // sickly green
+    room_02: { darkness: 0.50, tint: 'rgba(15, 28, 48, 0.11)', fog: 0.15, fogMood: 'high',    glow: '#6f5aa8' }, // violet
+    room_03: { darkness: 0.43, tint: 'rgba(18, 32, 38, 0.09)', fog: 0.10, fogMood: 'sparse',  glow: '#4a8a9e' }, // teal-blue
+    room_04: { darkness: 0.48, tint: 'rgba(25, 29, 45, 0.10)', fog: 0.13, fogMood: 'cross',   glow: '#9e5a72' }, // dusky rose
+    room_05: { darkness: 0.52, tint: 'rgba(9, 20, 34, 0.12)',  fog: 0.17, fogMood: 'sinking', glow: '#5a6fa8' }, // indigo
+    room_06: { darkness: 0.44, tint: 'rgba(20, 35, 34, 0.09)', fog: 0.09, fogMood: 'low',     glow: '#7a9e4a' }, // moss
+    room_07: { darkness: 0.47, tint: 'rgba(16, 29, 44, 0.10)', fog: 0.14, fogMood: 'cross',   glow: '#a87a4a' }, // rust amber
+    room_08: { darkness: 0.40, tint: 'rgba(24, 35, 37, 0.07)', fog: 0.08, fogMood: 'sparse',  glow: '#4aa89e' }, // cyan-teal
+    room_09: { darkness: 0.51, tint: 'rgba(25, 19, 36, 0.10)', fog: 0.16, fogMood: 'high',    glow: '#8a4aa8' }, // plum
+    room_10: { darkness: 0.45, tint: 'rgba(10, 27, 39, 0.10)', fog: 0.12, fogMood: 'sinking', glow: '#a84a6f' }, // wine
+    room_11: { darkness: 0.55, tint: 'rgba(12, 18, 31, 0.12)', fog: 0.18, fogMood: 'high',    glow: '#4a5a9e' }, // steel-indigo
+    room_12: { darkness: 0.49, tint: 'rgba(26, 28, 42, 0.09)', fog: 0.14, fogMood: 'low',     glow: '#7aa85a' }, // olive-moss
+    room_13: { darkness: 0.42, tint: 'rgba(20, 36, 34, 0.08)', fog: 0.09, fogMood: 'sparse',  glow: '#a8944a' }, // ochre
+    room_14: { darkness: 0.53, tint: 'rgba(18, 18, 30, 0.12)', fog: 0.17, fogMood: 'sinking', glow: '#4a7aa8' }, // slate-blue
+    room_15: { darkness: 0.47, tint: 'rgba(22, 30, 42, 0.10)', fog: 0.13, fogMood: 'cross',   glow: '#9e4a8a' }  // magenta-ash
   };
 
   const rooms = {};

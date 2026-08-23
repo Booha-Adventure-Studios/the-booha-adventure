@@ -157,6 +157,17 @@
   ];
   const MOTE_COUNT = 6;
 
+  // 9B: fog is still drawn from the same cached textures, but each room gets
+  // a different composition so the cemetery does not feel like one repeated
+  // filter. The values are deliberately restrained around the walkable path.
+  const FOG_MOODS = {
+    low:     { speed: .72, direction: 1,  upper: .34, middle: .18, low: .92, echo: .38, upperY: 165, middleY: 360, phase: .2 },
+    high:    { speed: .44, direction: -1, upper: .92, middle: .58, low: .24, echo: .16, upperY: 95,  middleY: 275, phase: 1.8 },
+    cross:   { speed: 1.02, direction: 1,  upper: .58, middle: .92, low: .44, echo: .60, upperY: 215, middleY: 405, phase: 3.1 },
+    sparse:  { speed: .38, direction: -1, upper: .30, middle: .24, low: .32, echo: .18, upperY: 125, middleY: 430, phase: 4.5 },
+    sinking: { speed: .66, direction: -1, upper: .52, middle: .52, low: .84, echo: .48, upperY: 255, middleY: 465, phase: 5.7 }
+  };
+
   // The first 5 hunt-able ghosts (Pass 4) now live in muenba-data.js
   // (Pass 5) so muenba-profile.html's case-file roster reads the exact
   // same list instead of a second hand-kept copy — see muenba-data.js for
@@ -2343,22 +2354,25 @@
 
     if (fogTexture && profile.fog > 0) {
       state.fogX = (state.fogX + .12) % 780;
-      const fogPulse = .86 + .14 * Math.sin(now / 2600);
+      const mood = FOG_MOODS[profile.fogMood] || FOG_MOODS.low;
+      const fogMotion = state.fogX * mood.speed * mood.direction;
+      const fogPulse = .86 + .14 * Math.sin(now / 2600 + mood.phase);
       const fogAlpha = profile.fog * fogPulse;
-      const slowDrift = state.fogX * .46;
+      const slowDrift = fogMotion * .46;
       atmosphereCtx.save();
-      // Distant haze: broad and slow, kept above the player path.
-      atmosphereCtx.globalAlpha = fogAlpha * .72;
-      atmosphereCtx.drawImage(fogTexture, -700 + slowDrift, 150, 900, 230);
-      atmosphereCtx.drawImage(fogTexture, 140 - slowDrift, 350, 820, 190);
+      // Distant haze: room moods change its height, strength, and direction.
+      atmosphereCtx.globalAlpha = fogAlpha * mood.upper;
+      atmosphereCtx.drawImage(fogTexture, -700 + slowDrift, mood.upperY, 900, 230);
+      atmosphereCtx.globalAlpha = fogAlpha * mood.middle;
+      atmosphereCtx.drawImage(fogTexture, 140 - slowDrift * 1.35, mood.middleY, 820, 190);
 
       // Near-ground bank: a second cached texture moving at a different rate
       // makes the room feel alive without the cost of many individual motes.
       if (lowFogTexture) {
-        atmosphereCtx.globalAlpha = fogAlpha * .58;
-        atmosphereCtx.drawImage(lowFogTexture, -110 + state.fogX, 620, 980, 170);
-        atmosphereCtx.globalAlpha = fogAlpha * .28;
-        atmosphereCtx.drawImage(lowFogTexture, 760 - state.fogX * .72, 510, 760, 150);
+        atmosphereCtx.globalAlpha = fogAlpha * mood.low;
+        atmosphereCtx.drawImage(lowFogTexture, -110 + fogMotion, 620, 980, 170);
+        atmosphereCtx.globalAlpha = fogAlpha * mood.echo;
+        atmosphereCtx.drawImage(lowFogTexture, 760 - fogMotion * .72, 510, 760, 150);
       }
       atmosphereCtx.restore();
     }
