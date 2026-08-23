@@ -245,8 +245,8 @@
 
   /* ═══════════════════════════════════════════════════════════════════
      SAVE LAYER (Pass 6)
-     Durable Muenba progress — ghosts found, orbs collected, briefings
-     passed, rooms visited, today's target ghost, and a rhythm-game stat
+     Durable Muenba progress — ghosts found, orbs collected, pending orbs,
+     briefings passed, rooms visited, today's target ghost, and a rhythm-game stat
      bucket for Pass 8. Mirrors utsuroba.js's own loadSave()/writeSave()/
      migrate*Save() idiom — one top-level data.muenba section, defensive
      shape-fill on every load, single dirty-flag write-back — rather than
@@ -285,6 +285,7 @@
     const mu = data.muenba;
     if (!mu.ghostsFound || typeof mu.ghostsFound !== 'object') { mu.ghostsFound = {}; dirty = true; }
     if (!Number.isInteger(mu.orbsCollected)) { mu.orbsCollected = 0; dirty = true; }
+    if (!Number.isInteger(mu.orbsPending)) { mu.orbsPending = 0; dirty = true; }
     if (!Number.isInteger(mu.briefingsPassed)) { mu.briefingsPassed = 0; dirty = true; }
     if (!mu.visitedRooms || typeof mu.visitedRooms !== 'object') { mu.visitedRooms = {}; dirty = true; }
     if (!mu.huntJournal || typeof mu.huntJournal !== 'object') {
@@ -519,7 +520,13 @@
     captureOverlay.id = 'muenba-capture-overlay';
     document.body.appendChild(captureOverlay);
     document.addEventListener('keydown', event => {
-      if (event.key === 'Escape' && captureOpen) cancelCaptureSession();
+      if (event.key === 'Escape' && captureOpen) {
+        const phase = captureSession && captureSession.phase;
+        if (phase !== 'reward' && phase !== 'nuppi' && phase !== 'nuppi-recovery') {
+          cancelCaptureSession();
+        }
+        return;
+      }
       if (!captureOpen || event.repeat) return;
       if (event.key === 'ArrowLeft' || event.key.toLowerCase() === 'a') {
         event.preventDefault();
@@ -863,12 +870,68 @@
     const success = accuracy >= RHYTHM_PASS_ACCURACY;
     rhythm.accuracy = accuracy;
     rhythm.success = success;
-    captureSession.phase = 'result';
     recordRhythmResult(accuracy);
-    renderRhythmResult(accuracy, success);
+    if (!success) {
+      captureSession.phase = 'result';
+      renderRhythmResult(accuracy, false);
+      return;
+    }
+
+    const rewardCount = commitSuccessfulCapture();
+    if (rewardCount == null) {
+      captureSession.phase = 'result';
+      renderRhythmResult(accuracy, false, 'The rhythm was good, but the capture could not be saved. Please try again.');
+      return;
+    }
+
+    captureSession.phase = 'reward';
+    captureSession.reward = {
+      total: rewardCount,
+      revealed: 0,
+      revealTimer: 0,
+      orbListEl: null,
+      statusEl: null,
+      actionsEl: null,
+      returnAfter: 'hunt'
+    };
+    renderCaptureReward();
+    releaseNextOrb();
   }
 
-  function renderRhythmResult(accuracy, success) {
+  function commitSuccessfulCapture() {
+    if (!captureSession || !captureSession.ghost) return null;
+    if (captureSession.rewardCommitted) return captureSession.rewardCount || 0;
+
+    const ghost = captureSession.ghost;
+    const d = loadSave();
+    if (!d.muenba || typeof d.muenba !== 'object') d.muenba = {};
+    const mu = d.muenba;
+    if (!mu.ghostsFound || typeof mu.ghostsFound !== 'object') mu.ghostsFound = {};
+    if (!Number.isInteger(mu.orbsPending)) mu.orbsPending = 0;
+    if (!mu.huntJournal || !Array.isArray(mu.huntJournal.entries)) mu.huntJournal = { entries: [] };
+
+    const isNewCapture = !mu.ghostsFound[ghost.id];
+    mu.ghostsFound[ghost.id] = true;
+    if (!mu.huntJournal.entries.some(entry => entry && entry.ghostId === ghost.id)) {
+      mu.huntJournal.entries.push({ ghostId: ghost.id, capturedAt: Date.now() });
+    }
+    if (mu.targetGhost && mu.targetGhost.id === ghost.id) {
+      mu.targetGhost = { ...mu.targetGhost, capturedForDay: true };
+    }
+
+    const rewardCount = isNewCapture ? ORB_REWARD_PER_CAPTURE : 0;
+    mu.orbsPending += rewardCount;
+    if (!writeSave(d)) return null;
+
+    captureSession.rewardCommitted = true;
+    captureSession.rewardCount = rewardCount;
+    try {
+      if (window.BoohaUnlockSystem && typeof BoohaUnlockSystem.checkAll === 'function') BoohaUnlockSystem.checkAll();
+    } catch (_) {}
+    return rewardCount;
+  }
+
+  function renderRhythmResult(accuracy, success, message) {
     const ghost = captureSession.ghost;
     const p = document.createElement('p');
     const box = captureBox();
@@ -882,7 +945,7 @@
     jp.textContent = success ? 'リズム成功' : 'もう一度';
     box.appendChild(jp);
 
-    p.textContent = `Accuracy: ${accuracy}%. ${success ? 'The capture is ready for the reward step.' : 'The ghost is still waiting for you.'}`;
+    p.textContent = message || `Accuracy: ${accuracy}%. ${success ? 'The capture is ready for the reward step.' : 'The ghost is still waiting for you.'}`;
     box.appendChild(p);
 
     const p2 = document.createElement('p');
@@ -896,8 +959,165 @@
     box.appendChild(actions);
   }
 
+  function renderCaptureReward() {
+    if (!captureSession || !captureSession.reward || !captureOverlay) return;
+    const ghost = captureSession.ghost;
+    const reward = captureSession.reward;
+    const box = captureBox();
+    captureImage(box, ghost);
+
+    const h2 = document.createElement('h2');
+    h2.textContent = 'Captured!';
+    box.appendChild(h2);
+    const jp = document.createElement('p');
+    jp.className = 'jp';
+    jp.textContent = 'つかまえた！';
+    box.appendChild(jp);
+
+    const copy = document.createElement('p');
+    copy.textContent = `${ghost.name} is safe now. Energy orbs are coming free one at a time.`;
+    box.appendChild(copy);
+
+    const orbList = document.createElement('div');
+    orbList.className = 'muenba-orb-release-list';
+    orbList.setAttribute('aria-label', 'Released energy orbs');
+    box.appendChild(orbList);
+    reward.orbListEl = orbList;
+
+    const status = document.createElement('p');
+    status.className = 'muenba-orb-release-status';
+    status.textContent = `Energy released: 0 / ${reward.total}`;
+    box.appendChild(status);
+    reward.statusEl = status;
+
+    const actions = document.createElement('div');
+    actions.className = 'muenba-lobby-actions';
+    box.appendChild(actions);
+    reward.actionsEl = actions;
+  }
+
+  function releaseNextOrb() {
+    if (!captureSession || captureSession.phase !== 'reward' || !captureSession.reward) return;
+    const reward = captureSession.reward;
+    if (reward.revealed >= reward.total) {
+      if (reward.statusEl) reward.statusEl.textContent = `Energy released: ${reward.total} / ${reward.total}`;
+      if (reward.actionsEl && !reward.actionsEl.children.length) {
+        reward.actionsEl.appendChild(captureButton('Return to Nuppi', 'muenba-capture-return', depositOrbsAtNuppi));
+      }
+      return;
+    }
+
+    const orb = document.createElement('span');
+    orb.className = 'muenba-orb-release';
+    orb.textContent = '✦';
+    orb.setAttribute('aria-label', `Energy orb ${reward.revealed + 1}`);
+    reward.orbListEl.appendChild(orb);
+    reward.revealed += 1;
+    if (reward.statusEl) reward.statusEl.textContent = `Energy released: ${reward.revealed} / ${reward.total}`;
+    reward.revealTimer = window.setTimeout(releaseNextOrb, 520);
+  }
+
+  function depositOrbsAtNuppi() {
+    if (!captureSession || (captureSession.phase !== 'reward' && captureSession.phase !== 'nuppi-recovery')) return;
+    const d = loadSave();
+    if (!d.muenba || typeof d.muenba !== 'object') d.muenba = {};
+    const mu = d.muenba;
+    const pending = Number.isInteger(mu.orbsPending) ? mu.orbsPending : 0;
+    const collected = Number.isInteger(mu.orbsCollected) ? mu.orbsCollected : 0;
+    mu.orbsCollected = collected + pending;
+    mu.orbsPending = 0;
+    if (!writeSave(d)) return;
+
+    captureSession.phase = 'nuppi';
+    captureSession.depositedOrbs = pending;
+    renderNuppiThanks(pending);
+  }
+
+  function renderNuppiThanks(deposited) {
+    if (!captureSession || !captureOverlay) return;
+    const box = captureBox();
+    const img = document.createElement('img');
+    img.className = 'muenba-lobby-portrait';
+    img.src = 'assets/img/wanderers/nuppi-2.png';
+    img.alt = 'Nuppi';
+    box.appendChild(img);
+
+    const h2 = document.createElement('h2');
+    h2.textContent = 'Nuppi receives the orbs';
+    box.appendChild(h2);
+    const jp = document.createElement('p');
+    jp.className = 'jp';
+    jp.textContent = 'ヌッピに届けたよ';
+    box.appendChild(jp);
+
+    const p = document.createElement('p');
+    p.textContent = deposited > 0
+      ? `Nuppi smiles. ${deposited} energy orb${deposited === 1 ? '' : 's'} came safely home.`
+      : 'Nuppi smiles. The energy trail is already safe.';
+    box.appendChild(p);
+    const p2 = document.createElement('p');
+    p2.className = 'jp-line';
+    p2.textContent = 'エネルギーが無事に届いたよ。';
+    box.appendChild(p2);
+
+    const actions = document.createElement('div');
+    actions.className = 'muenba-lobby-actions';
+    const after = captureSession.reward?.returnAfter || 'hunt';
+    const buttonLabel = after === 'briefing' ? 'Begin today\'s briefing' : 'Back to the hunt';
+    actions.appendChild(captureButton(buttonLabel, 'muenba-capture-finish', () => {
+      const continueToBriefing = captureSession && captureSession.reward?.returnAfter === 'briefing';
+      closeCaptureOverlay({ resumeHunt: !continueToBriefing });
+      if (continueToBriefing) openBriefingQuiz();
+    }));
+    box.appendChild(actions);
+  }
+
+  function openPendingOrbRecovery() {
+    const pending = readMuenba().orbsPending;
+    if (!(pending > 0)) {
+      openBriefingQuiz();
+      return;
+    }
+    captureOpen = true;
+    state.clickTarget = null;
+    state.moving = false;
+    captureSession = {
+      ghost: null,
+      phase: 'nuppi-recovery',
+      reward: { total: pending, revealed: pending, returnAfter: 'briefing' }
+    };
+    renderPendingOrbRecovery(pending);
+  }
+
+  function renderPendingOrbRecovery(pending) {
+    const box = captureBox();
+    const img = document.createElement('img');
+    img.className = 'muenba-lobby-portrait';
+    img.src = 'assets/img/wanderers/nuppi-2.png';
+    img.alt = 'Nuppi';
+    box.appendChild(img);
+
+    const h2 = document.createElement('h2');
+    h2.textContent = 'Your orbs are waiting';
+    box.appendChild(h2);
+    const jp = document.createElement('p');
+    jp.className = 'jp';
+    jp.textContent = 'エネルギーを届けよう';
+    box.appendChild(jp);
+    const p = document.createElement('p');
+    p.textContent = `Nuppi has a safe place for your ${pending} pending energy orb${pending === 1 ? '' : 's'}.`;
+    box.appendChild(p);
+    const actions = document.createElement('div');
+    actions.className = 'muenba-lobby-actions';
+    actions.appendChild(captureButton('Return orbs to Nuppi', 'muenba-capture-return', depositOrbsAtNuppi));
+    box.appendChild(actions);
+    captureOverlay.classList.add('open');
+  }
+
   function cancelCaptureSession() {
     if (!captureOpen) return;
+    const phase = captureSession && captureSession.phase;
+    if (phase === 'reward' || phase === 'nuppi' || phase === 'nuppi-recovery') return;
     stopRhythmCapture();
     captureOpen = false;
     state.captureResolving = false;
@@ -910,7 +1130,7 @@
     resumeWorldMusicAfterCapture();
   }
 
-  // Pass 8B will call this only after a successful rhythm result. It remains
+  // Pass 8C calls this after the reward has been deposited. It remains
   // separate from cancelCaptureSession() so success cannot accidentally
   // respawn the just-captured target or clear a future reward state.
   function closeCaptureOverlay({ resumeHunt = false } = {}) {
@@ -927,6 +1147,9 @@
     const rhythm = captureSession && captureSession.rhythm;
     if (rhythm && rhythm.rafId) window.cancelAnimationFrame(rhythm.rafId);
     if (rhythm) rhythm.rafId = 0;
+    const reward = captureSession && captureSession.reward;
+    if (reward && reward.revealTimer) window.clearTimeout(reward.revealTimer);
+    if (reward) reward.revealTimer = 0;
   }
 
   function drawGhost(now) {
@@ -1053,7 +1276,7 @@
       #muenba-hide { position:fixed; left:12px; bottom:12px; z-index:100; border:1px solid rgba(156,203,182,.5); border-radius:8px; background:rgba(0,8,12,.78); color:#d8e8e0; padding:8px 16px; font:700 11px ui-monospace,monospace; letter-spacing:.05em; cursor:pointer; }
       #muenba-hide:hover, #muenba-hide:focus-visible { background:rgba(30,70,60,.8); outline:none; }
       #muenba-hide.active { background:rgba(93,162,124,.42); border-color:#5dd08c; color:#eafff2; }
-      /* Capture session overlay (Pass 8A/8B) — reuses .muenba-lobby-box for
+      /* Capture session overlay (Pass 8A–8C) — reuses .muenba-lobby-box for
          the card shell (same as the briefing reveal) and adds the two-lane
          rhythm board inside that modal. */
       #muenba-capture-overlay { position:fixed; inset:0; z-index:215; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,0); transition:background .4s ease; padding:20px; box-sizing:border-box; }
@@ -1077,6 +1300,11 @@
       .muenba-rhythm-note.is-hit { opacity:.94; border-color:#8fe0ad; }
       .muenba-rhythm-note.is-miss { opacity:.18; border-color:#e8b0b8; background:rgba(120,48,64,.65); box-shadow:none; }
       .muenba-rhythm-hint { margin:7px 0 13px !important; color:#8fa89b !important; font-size:.73rem !important; line-height:1.45 !important; text-align:center !important; }
+      .muenba-orb-release-list { display:flex; justify-content:center; align-items:center; gap:12px; min-height:52px; margin:5px 0 8px; }
+      .muenba-orb-release { display:grid; place-items:center; width:38px; height:38px; color:#dfffea; border:1px solid rgba(181,238,202,.75); border-radius:50%; background:radial-gradient(circle,rgba(113,206,153,.72),rgba(30,83,59,.68)); box-shadow:0 0 22px rgba(113,206,153,.58); font-size:1.45rem; animation:muenbaOrbRelease .42s cubic-bezier(.2,1.5,.4,1) both; }
+      @keyframes muenbaOrbRelease { from { opacity:0; transform:translateY(12px) scale(.35); } to { opacity:1; transform:translateY(0) scale(1); } }
+      .muenba-orb-release-status { margin:0 0 18px !important; color:#9ccbb6 !important; font:700 .76rem/1.4 ui-monospace,monospace !important; text-align:center !important; letter-spacing:.05em; }
+      @media (prefers-reduced-motion: reduce) { .muenba-orb-release { animation:none; } }
       @media (prefers-reduced-motion: reduce) { #muenba-fade, .muenba-return-box, #muenba-return-overlay, .muenba-lobby-box, #muenba-lobby-overlay, #muenba-briefing-overlay, #muenba-capture-overlay { transition:none !important; } }
     `;
     document.head.appendChild(style);
@@ -1594,7 +1822,8 @@
     document.body.appendChild(lobbyOverlay);
     document.getElementById('muenba-lobby-begin').addEventListener('click', () => {
       closeNuppiLobby();
-      openBriefingQuiz();
+      if (readMuenba().orbsPending > 0) openPendingOrbRecovery();
+      else openBriefingQuiz();
     });
     document.addEventListener('keydown', event => {
       if (event.key === 'Escape' && lobbyOpen) closeNuppiLobby();
