@@ -163,11 +163,32 @@
     };
   }
 
+  // The first 5 huntable ghosts (Pass 4), pulled out here so both muenba.js
+  // (the briefing gate's target pick) and muenba-profile.html (the case-file
+  // roster, Pass 5) read the exact same list instead of two copies drifting
+  // apart. File names ARE their ids, per how they were delivered, except
+  // tinklet/"Tinkley": the file on disk is tinklet.png, so that's what's
+  // wired here with "Tinkley" kept only as the display name — flag if either
+  // should change to match the other.
+  const GHOSTS = [
+    { id: 'fuzzle',  name: 'Fuzzle',  img: 'assets/img/muenba/ghosts/fuzzle.png'  },
+    { id: 'glimmer', name: 'Glimmer', img: 'assets/img/muenba/ghosts/glimmer.png' },
+    { id: 'nibsy',   name: 'Nibsy',   img: 'assets/img/muenba/ghosts/nibsy.png'   },
+    { id: 'tinklet', name: 'Tinkley', img: 'assets/img/muenba/ghosts/tinklet.png' },
+    { id: 'twiddle', name: 'Twiddle', img: 'assets/img/muenba/ghosts/twiddle.png' }
+  ];
+  // Shared sprite every ghost swaps to when clicked or when it turns to
+  // chase (Pass 7) — not a huntable ghost of its own, so it's kept separate
+  // from the GHOSTS roster above.
+  const GHOST_ANGRY_CHANGE_IMG = 'assets/img/muenba/ghosts/angry_change.png';
+
   window.MUENBA_DATA = {
     world: 'muenba',
     worldWidth: WORLD_W,
     worldHeight: WORLD_H,
     startRoom: 'room_01',
-    rooms
+    rooms,
+    ghosts: GHOSTS,
+    ghostAngryChangeImg: GHOST_ANGRY_CHANGE_IMG
   };
 })();
