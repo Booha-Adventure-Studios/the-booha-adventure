@@ -1,7 +1,6 @@
 /*
- * Muenba world shell — navigation, atmosphere, Nuppi's lobby briefing, the
- * briefing Q&A gate that reveals the day's target ghost, durable Muenba
- * save/progress (Pass 6), and the ghost-hunting core loop (Pass 7): one
+ * Muenba world shell — navigation, atmosphere, Nuppi's lobby welcome, durable
+ * Muenba save/progress, and the ghost-hunting core loop: one
  * wandering ghost per room, an ignore-vs-chase behavior split, a Hide
  * button, and click-to-attempt capture. Pass 8A owns the explicit capture
  * session hand-off, Pass 8B supplies the first two-lane rhythm capture, and
@@ -100,7 +99,6 @@
     speed: BASE_SPEED,
     fogX: 0,
     returnExiting: false,
-    targetGhost: null,
     hiding: false,
     captureResolving: false
   };
@@ -129,8 +127,6 @@
   let returnPortalCooldownUntil = 0;
   let lobbyOverlay = null;
   let lobbyOpen = false;
-  let briefingOverlay = null;
-  let briefingOpen = false;
   // Ghost hunting core loop (Pass 7): the current room's wandering ghost
   // (or null when this room has none today), its day-seeded room
   // assignment, a Hide-button toggle, the capture-result overlay, and a
@@ -261,16 +257,52 @@
     else console.info('[Muenba] 15-room data validation passed.');
   }
 
+  // Muenba-only deterministic helpers. They keep the cemetery layout and
+  // ghost behavior stable for one calendar day without reading curriculum
+  // content or participating in the site's daily check.
+  function _muenbaHashStr(str) {
+    let h = 1779033703 ^ str.length;
+    for (let i = 0; i < str.length; i++) {
+      h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
+      h = (h << 13) | (h >>> 19);
+    }
+    return h >>> 0;
+  }
+  function _muenbaRng(seedStr) {
+    let a = _muenbaHashStr(seedStr) || 1;
+    return function () {
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function _muenbaShuffle(arr, seedStr) {
+    const r = _muenbaRng(seedStr);
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(r() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+  function _muenbaTodayKey() {
+    try {
+      return window.CALENDAR && CALENDAR.getTodayKey ? CALENDAR.getTodayKey() : null;
+    } catch (_) {
+      return null;
+    }
+  }
+
   /* ═══════════════════════════════════════════════════════════════════
      SAVE LAYER (Pass 6)
      Durable Muenba progress — ghosts found, orbs collected, pending orbs,
-     briefings passed, rooms visited, today's target ghost, and a rhythm-game stat
-     bucket for Pass 8. Mirrors utsuroba.js's own loadSave()/writeSave()/
+     rooms visited, and a rhythm-game stat bucket. Mirrors utsuroba.js's own
+     loadSave()/writeSave()/
      migrate*Save() idiom — one top-level data.muenba section, defensive
      shape-fill on every load, single dirty-flag write-back — rather than
      inventing a different pattern for this world. Capture/orb fields
      exist here but the successful capture reward writes them in Pass 8C. This
-     pass just gives Pass 4's in-memory-only state.targetGhost, and the
      room-visit tracking already implicit in setRoom(), a real home.
      ═══════════════════════════════════════════════════════════════════ */
 
@@ -304,7 +336,6 @@
     if (!mu.ghostsFound || typeof mu.ghostsFound !== 'object') { mu.ghostsFound = {}; dirty = true; }
     if (!Number.isInteger(mu.orbsCollected)) { mu.orbsCollected = 0; dirty = true; }
     if (!Number.isInteger(mu.orbsPending)) { mu.orbsPending = 0; dirty = true; }
-    if (!Number.isInteger(mu.briefingsPassed)) { mu.briefingsPassed = 0; dirty = true; }
     if (!mu.visitedRooms || typeof mu.visitedRooms !== 'object') { mu.visitedRooms = {}; dirty = true; }
     if (!mu.huntJournal || typeof mu.huntJournal !== 'object') {
       mu.huntJournal = { entries: [] };
@@ -315,11 +346,6 @@
     }
     if (!mu.rhythm || typeof mu.rhythm !== 'object') {
       mu.rhythm = { bestAccuracy: 0, attempts: 0 };
-      dirty = true;
-    }
-    if (mu.targetGhost != null &&
-        (typeof mu.targetGhost !== 'object' || typeof mu.targetGhost.id !== 'string')) {
-      mu.targetGhost = null;
       dirty = true;
     }
     if (dirty) writeSave(data);
@@ -352,28 +378,25 @@
   }
 
   /* ═══════════════════════════════════════════════════════════════════
-     GHOST HUNTING CORE LOOP (Pass 7)
-     One wandering ghost per room, day-seeded (same _briRng/_briShuffle
-     helpers the briefing quiz and target pick already use, so "today's
-     layout" is stable across re-entries but reshuffles tomorrow). Each
-     ghost is either 'ignore' (wanders, never reacts) or 'chase' (notices
-     the player within range and closes in — but never faster than the
-     player can walk away). Catching up to the player is a soft startle,
-     not a fail state. Tapping a ghost swaps it to ANGRY_CHANGE_IMG; the
-     correct (target) ghost resolves as a capture, anything else is a
-     gentle miss. The capture hand-off now belongs to Pass 8A/8B; the
-     successful reward transaction and unlock check arrive in Pass 8C.
+     GHOST HUNTING CORE LOOP
+     One wandering ghost per room, day-seeded so the layout is stable across
+     re-entries but can change tomorrow. Each ghost is either 'ignore'
+     (wanders, never reacts) or 'chase' (notices the player within range and
+     closes in — but never faster than the player can walk away). Catching up
+     to the player is a soft startle, not a fail state. Every encountered ghost
+     is currently capturable; later Muenba casework can attach a personality
+     episode to the encounter without bringing back a daily quiz target.
      ═══════════════════════════════════════════════════════════════════ */
 
   // Which of the 15 rooms gets which of the 5 ghosts, and which ghosts are
   // 'chase' vs 'ignore' today — both reseed on the next calendar day but
-  // hold steady across re-entries the same day, same as the target pick.
+  // hold steady across re-entries the same day.
   function getGhostRoomMap() {
-    const today = _briTodayKey() || 'nodate';
+    const today = _muenbaTodayKey() || 'nodate';
     if (ghostRoomMap && ghostRoomMapDay === today) return ghostRoomMap;
     const roomIds = Object.keys(DATA.rooms);
-    const pickedRooms = _briShuffle(roomIds, today + '|muenbaGhostRooms').slice(0, GHOSTS.length);
-    const shuffledGhosts = _briShuffle(GHOSTS, today + '|muenbaGhostAssign');
+    const pickedRooms = _muenbaShuffle(roomIds, today + '|muenbaGhostRooms').slice(0, GHOSTS.length);
+    const shuffledGhosts = _muenbaShuffle(GHOSTS, today + '|muenbaGhostAssign');
     const map = {};
     shuffledGhosts.forEach((ghost, i) => {
       if (pickedRooms[i]) map[pickedRooms[i]] = ghost;
@@ -384,8 +407,8 @@
   }
 
   function ghostBehaviorFor(ghostId) {
-    const today = _briTodayKey() || 'nodate';
-    return _briRng(today + '|muenbaGhostBehavior|' + ghostId)() < 0.5 ? 'ignore' : 'chase';
+    const today = _muenbaTodayKey() || 'nodate';
+    return _muenbaRng(today + '|muenbaGhostBehavior|' + ghostId)() < 0.5 ? 'ignore' : 'chase';
   }
 
   // Random point inside one of this room's walkable rects — same corridor
@@ -407,16 +430,13 @@
     return img;
   }
 
-  // Called from setRoom() for every room entry. A decoy (non-target) ghost
-  // always spawns fresh — tapping one costs nothing, so there's no reason
-  // to remember it was tapped before. The day's actual target sits out the
-  // rest of the day once caught, so it isn't farmable on repeat visits.
+  // Called from setRoom() for every room entry. The current exploration pass
+  // lets any ghost begin a capture, so there is no daily target to persist or
+  // hide after capture.
   function spawnRoomGhost(roomId) {
     activeGhost = null;
     const ghost = getGhostRoomMap()[roomId];
     if (!ghost) return;
-    const mu = readMuenba();
-    if (mu.targetGhost && mu.targetGhost.id === ghost.id && mu.targetGhost.capturedForDay) return;
     const pos = pickGhostWanderTarget();
     activeGhost = {
       ghost,
@@ -494,7 +514,7 @@
   }
 
   function toggleHide() {
-    if (state.transitioning || lobbyOpen || briefingOpen || returnPortalOpen || captureOpen) return;
+    if (state.transitioning || lobbyOpen || returnPortalOpen || captureOpen) return;
     state.hiding = !state.hiding;
     if (hideBtn) {
       hideBtn.classList.toggle('active', state.hiding);
@@ -520,16 +540,8 @@
     const now = performance.now();
     const ghost = activeGhost.ghost;
     activeGhost.angryUntil = now + 900;
-    const isTarget = !!(state.targetGhost && ghost.id === state.targetGhost.id);
-    if (isTarget) {
-      state.captureResolving = true;
-      beginCaptureSession(ghost);
-    } else {
-      showToast('Not the one…', 'これじゃない…', activeGhost.x, activeGhost.y - 46, now + 1200);
-      activeGhost.wanderTarget = pickGhostWanderTarget();
-      activeGhost.nextWanderAt = now + 200;
-      activeGhost.chasing = false;
-    }
+    state.captureResolving = true;
+    beginCaptureSession(ghost);
   }
 
   function buildCaptureOverlay() {
@@ -946,10 +958,6 @@
     if (!mu.huntJournal.entries.some(entry => entry && entry.ghostId === ghost.id)) {
       mu.huntJournal.entries.push({ ghostId: ghost.id, capturedAt: Date.now() });
     }
-    if (mu.targetGhost && mu.targetGhost.id === ghost.id) {
-      mu.targetGhost = { ...mu.targetGhost, capturedForDay: true };
-    }
-
     const rewardCount = isNewCapture ? ORB_REWARD_PER_CAPTURE : 0;
     mu.orbsPending += rewardCount;
     if (!writeSave(d)) return null;
@@ -1106,12 +1114,9 @@
 
     const actions = document.createElement('div');
     actions.className = 'muenba-lobby-actions';
-    const after = captureSession.reward?.returnAfter || 'hunt';
-    const buttonLabel = after === 'briefing' ? 'Begin today\'s briefing' : 'Back to the hunt';
+    const buttonLabel = 'Back to the hunt';
     actions.appendChild(captureButton(buttonLabel, 'muenba-capture-finish', () => {
-      const continueToBriefing = captureSession && captureSession.reward?.returnAfter === 'briefing';
-      closeCaptureOverlay({ resumeHunt: !continueToBriefing });
-      if (continueToBriefing) openBriefingQuiz();
+      closeCaptureOverlay({ resumeHunt: true });
     }));
     box.appendChild(actions);
     focusCaptureControl('#muenba-capture-finish');
@@ -1120,7 +1125,6 @@
   function openPendingOrbRecovery() {
     const pending = readMuenba().orbsPending;
     if (!(pending > 0)) {
-      openBriefingQuiz();
       return;
     }
     captureOpen = true;
@@ -1129,7 +1133,7 @@
     captureSession = {
       ghost: null,
       phase: 'nuppi-recovery',
-      reward: { total: pending, revealed: pending, returnAfter: 'briefing' }
+      reward: { total: pending, revealed: pending, returnAfter: 'hunt' }
     };
     renderPendingOrbRecovery(pending);
   }
@@ -1169,8 +1173,8 @@
     state.captureResolving = false;
     if (captureOverlay) captureOverlay.classList.remove('open');
 
-    // Re-seed the room ghost after a soft miss/cancel. This does not write
-    // ghostsFound, huntJournal, or orbs, and the target remains available.
+    // Re-seed the room ghost after a cancel. This does not write ghostsFound,
+    // huntJournal, or orbs.
     captureSession = null;
     spawnRoomGhost(state.roomId);
     resumeWorldMusicAfterCapture();
@@ -1291,7 +1295,7 @@
       #muenba-return-yes:hover, #muenba-return-yes:focus-visible { background:rgba(52,104,78,.44); outline:none; }
       #muenba-return-no { border:1px solid rgba(90,130,112,.5); color:#aec8bb; background:transparent; }
       #muenba-return-no:hover, #muenba-return-no:focus-visible { background:rgba(90,130,112,.16); outline:none; }
-      /* Nuppi's lobby briefing — same dark-cemetery popup language as the
+      /* Nuppi's lobby welcome — same dark-cemetery popup language as the
          return prompt, just roomier: it holds a portrait plus a few lines
          of text instead of a one-line question. Shows every time the
          player enters Muenba (Pass 3b). */
@@ -1308,33 +1312,14 @@
       .muenba-lobby-actions { display:flex; justify-content:center; margin-top:4px; }
       #muenba-lobby-begin, .muenba-capture-action { border:1px solid rgba(156,203,182,.7); color:#e0f4e9; background:rgba(52,104,78,.28); box-shadow:0 0 16px rgba(93,162,124,.22); border-radius:999px; padding:10px 28px; font:700 12px ui-monospace,monospace; letter-spacing:.05em; cursor:pointer; }
       #muenba-lobby-begin:hover, #muenba-lobby-begin:focus-visible, .muenba-capture-action:hover, .muenba-capture-action:focus-visible { background:rgba(52,104,78,.44); outline:none; }
-      /* Briefing Q&A gate (Pass 4) — same overlay/box shell as the lobby
-         briefing, just holding a quiz card or the target-ghost reveal
-         instead of static copy. Not dismissible by clicking the backdrop
-         or Escape — it's a gate, not a message. */
-      #muenba-briefing-overlay { position:fixed; inset:0; z-index:220; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,0); transition:background .4s ease; padding:20px; box-sizing:border-box; }
-      #muenba-briefing-overlay.open { display:flex; background:rgba(0,0,0,.88); }
-      #muenba-briefing-overlay.open .muenba-lobby-box { transform:scale(1); opacity:1; }
-      .muenba-briefing-box { text-align:left; }
-      .muenba-briefing-box h2 { text-align:center; }
-      .muenba-briefing-box > .jp { text-align:center; }
-      .muenba-briefing-count { text-align:center; color:#8fa89b; font-size:.76rem; letter-spacing:.08em; text-transform:uppercase; margin:0 0 12px; }
-      .muenba-briefing-box .muenba-briefing-prompt { font-size:1.15rem; text-align:center; color:#e8f2ec; margin:0 0 18px; line-height:1.5; }
-      .muenba-briefing-choices { display:flex; flex-direction:column; gap:9px; margin-bottom:4px; }
-      .muenba-briefing-choice { padding:11px 14px; border-radius:12px; border:1px solid rgba(156,203,182,.32); background:rgba(20,38,32,.5); color:#dcefe4; font:400 .92rem Georgia,'Times New Roman',serif; text-align:left; cursor:pointer; transition:transform .1s,background .2s,border-color .2s; }
-      .muenba-briefing-choice:hover, .muenba-briefing-choice:focus-visible { background:rgba(52,104,78,.32); outline:none; }
-      .muenba-briefing-choice.right { border-color:#5dd08c; background:rgba(56,180,110,.28); }
-      .muenba-briefing-choice.wrong { border-color:#e0687e; background:rgba(200,70,90,.24); }
-      .muenba-briefing-choice.dim { opacity:.4; }
-      .muenba-briefing-ghost-portrait { display:block; width:120px; height:120px; object-fit:contain; margin:0 auto 14px; filter:drop-shadow(0 0 20px rgba(122,180,151,.35)); }
       /* Hide button (Pass 7) — always visible during free-roam, not a DEV
          tool. Matches the exit button's box language but sits bottom-left
          so it never competes with the DEV-only bottom-right room list. */
       #muenba-hide { position:fixed; left:12px; bottom:12px; z-index:100; border:1px solid rgba(156,203,182,.5); border-radius:8px; background:rgba(0,8,12,.78); color:#d8e8e0; padding:8px 16px; font:700 11px ui-monospace,monospace; letter-spacing:.05em; cursor:pointer; }
       #muenba-hide:hover, #muenba-hide:focus-visible { background:rgba(30,70,60,.8); outline:none; }
       #muenba-hide.active { background:rgba(93,162,124,.42); border-color:#5dd08c; color:#eafff2; }
-      /* Capture session overlay (Pass 8A–8C) — reuses .muenba-lobby-box for
-         the card shell (same as the briefing reveal) and adds the two-lane
+      /* Capture session overlay — reuses .muenba-lobby-box for
+         the card shell and adds the two-lane
          rhythm board inside that modal. */
       #muenba-capture-overlay { position:fixed; inset:0; z-index:215; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,0); transition:background .4s ease; padding:20px; box-sizing:border-box; }
       #muenba-capture-overlay.open { display:flex; background:rgba(0,0,0,.86); }
@@ -1363,7 +1348,7 @@
       @keyframes muenbaOrbRelease { from { opacity:0; transform:translateY(12px) scale(.35); } to { opacity:1; transform:translateY(0) scale(1); } }
       .muenba-orb-release-status { margin:0 0 18px !important; color:#9ccbb6 !important; font:700 .76rem/1.4 ui-monospace,monospace !important; text-align:center !important; letter-spacing:.05em; }
       @media (prefers-reduced-motion: reduce) { .muenba-orb-release { animation:none; } }
-      @media (prefers-reduced-motion: reduce) { #muenba-fade, .muenba-return-box, #muenba-return-overlay, .muenba-lobby-box, #muenba-lobby-overlay, #muenba-briefing-overlay, #muenba-capture-overlay { transition:none !important; } }
+      @media (prefers-reduced-motion: reduce) { #muenba-fade, .muenba-return-box, #muenba-return-overlay, .muenba-lobby-box, #muenba-lobby-overlay, #muenba-capture-overlay { transition:none !important; } }
     `;
     document.head.appendChild(style);
   }
@@ -1394,7 +1379,6 @@
 
     buildReturnPortalOverlay();
     buildNuppiLobbyOverlay();
-    buildBriefingOverlay();
     buildCaptureOverlay();
 
     hideBtn = document.createElement('button');
@@ -1444,10 +1428,9 @@
   }
 
   function openDevRhythmTest() {
-    if (!DEV_MODE || captureOpen || lobbyOpen || briefingOpen || returnPortalOpen) return;
-    const ghost = state.targetGhost || getOrPickTodaysTargetGhost();
+    if (!DEV_MODE || captureOpen || lobbyOpen || returnPortalOpen) return;
+    const ghost = activeGhost?.ghost || GHOSTS[0];
     if (!ghost) return;
-    state.targetGhost = ghost;
     state.captureResolving = true;
     beginCaptureSession(ghost);
   }
@@ -1901,13 +1884,12 @@
     }
   }
 
-  // ── Nuppi's lobby briefing (Pass 3b) ────────────────────────────────────
+  // ── Nuppi's lobby welcome ────────────────────────────────────────────────
   // Same themed-popup pattern as the return portal above, not a new screen.
   // Per the locked decision, this shows every time the player enters
   // Muenba (not just the first time), in a warm-guide tone, addressing the
-  // player by name when one is on file. It ends on a dismiss button —
-  // Pass 4's briefing-question gate will later hook into that dismiss
-  // point instead of dropping straight to free-roam.
+  // player by name when one is on file. It ends on a dismiss button and
+  // releases the player directly into free-roam.
   function buildNuppiLobbyOverlay() {
     if (lobbyOverlay) return;
     const name = getPlayerFirstName();
@@ -1922,8 +1904,8 @@
         <p class="jp">ヌッピ</p>
         <p>${greetEn} I'm glad you made it back to Muenba.</p>
         <p class="jp-line">${greetJp} ムエンバへようこそ戻ってきたね。</p>
-        <p>Somewhere among these fifteen rooms, a ghost is hiding. Some won't notice you at all — others will come looking, and if one gets close, you can hide until it loses interest. When you think you've spotted the right one, walk up and give it a tap.</p>
-        <p class="jp-line">この15の部屋のどこかに、幽霊が隠れているよ。気づかない幽霊もいれば、追いかけてくる幽霊もいる。近づかれたら隠れて、興味をなくすのを待とう。これだと思ったら、そっと近づいてタップしてみて。</p>
+        <p>Somewhere among these fifteen rooms, a ghost is hiding. Some won't notice you at all — others will come looking, and if one gets close, you can hide until it loses interest. When you see one, walk up and give it a tap.</p>
+        <p class="jp-line">この15の部屋のどこかに、幽霊が隠れているよ。気づかない幽霊もいれば、追いかけてくる幽霊もいる。近づかれたら隠れて、興味をなくすのを待とう。見つけたら、そっと近づいてタップしてみて。</p>
         <div class="muenba-lobby-actions">
           <button id="muenba-lobby-begin" type="button">Let's begin</button>
         </div>
@@ -1932,7 +1914,6 @@
     document.getElementById('muenba-lobby-begin').addEventListener('click', () => {
       closeNuppiLobby();
       if (readMuenba().orbsPending > 0) openPendingOrbRecovery();
-      else openBriefingQuiz();
     });
     document.addEventListener('keydown', event => {
       if (event.key === 'Escape' && lobbyOpen) closeNuppiLobby();
@@ -1965,303 +1946,6 @@
   function closeNuppiLobby() {
     lobbyOpen = false;
     if (lobbyOverlay) lobbyOverlay.classList.remove('open');
-  }
-
-  // ── Briefing Q&A gate (Pass 4) ───────────────────────────────────────────
-  // Nuppi's "answer a few questions" check, styled after daily-check.js's
-  // own engine (seeded shuffle, this week's curriculum content, tap-only
-  // choices) but run as its own short flow here — it deliberately does NOT
-  // call into BoohaDailyCheck or touch its meta.checkIn/streak record,
-  // since that's a separate feature students already see elsewhere. Runs
-  // right after the lobby's "Let's begin" button, ends with Nuppi
-  // revealing the day's target ghost, then releases the player to
-  // free-roam. Matches the site's no-punishment ESL tone: a wrong answer
-  // just reveals the right one and moves on, nothing blocks completion.
-  const BRIEFING_TYPES = ['vocab', 'sentences', 'questions'];
-  const BRIEFING_LEN = 4;
-  const BRIEFING_CHOICES = 4;
-
-  function _briHashStr(str) {
-    let h = 1779033703 ^ str.length;
-    for (let i = 0; i < str.length; i++) {
-      h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
-      h = (h << 13) | (h >>> 19);
-    }
-    return h >>> 0;
-  }
-  function _briRng(seedStr) {
-    let a = _briHashStr(seedStr) || 1;
-    return function () {
-      a |= 0; a = (a + 0x6D2B79F5) | 0;
-      let t = Math.imul(a ^ (a >>> 15), 1 | a);
-      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-    };
-  }
-  function _briShuffle(arr, seedStr) {
-    const r = _briRng(seedStr);
-    const a = arr.slice();
-    for (let i = a.length - 1; i > 0; i--) {
-      const j = Math.floor(r() * (i + 1));
-      [a[i], a[j]] = [a[j], a[i]];
-    }
-    return a;
-  }
-
-  function _briTodayKey() {
-    try {
-      return window.CALENDAR && CALENDAR.getTodayKey ? CALENDAR.getTodayKey() : null;
-    } catch (_) {
-      return null;
-    }
-  }
-  // Same localStorage key index.html/daily-check.js already write the
-  // selected curriculum to — reused read-only here, no picker screen of
-  // our own. Defaults to 'pb' only so DEV testing never hard-blocks before
-  // a curriculum has been picked elsewhere; production players reaching
-  // Muenba will always have this set already.
-  function _briKnownCurr() {
-    const c = localStorage.getItem('booha_last_curr');
-    return (c === 'pb' || c === 'br' || c === 'bc') ? c : 'pb';
-  }
-  function _briWeekInfo() {
-    try {
-      const cw = CALENDAR.getCurrentCurriculumWeek();
-      return { monthSlug: cw.monthSlug, weekNumber: Math.min(cw.weekNumber || 1, 4) };
-    } catch (_) {
-      return null;
-    }
-  }
-  function _briSliceForWeek(cards, wk) {
-    const lo = (wk - 1) * 15 + 1, hi = wk * 15;
-    return (cards || []).filter(c => c.n >= lo && c.n <= hi);
-  }
-
-  async function _loadBriefingContent(curr) {
-    const wi = _briWeekInfo();
-    if (!wi) throw new Error('[Muenba] briefing: no week info available');
-    const entries = await Promise.all(BRIEFING_TYPES.map(async type => {
-      const url = `content/${curr}/${wi.monthSlug}/${type}.json`;
-      const res = await fetch(url);
-      if (!res.ok) throw new Error(`[Muenba] briefing: ${type} ${res.status}`);
-      const data = await res.json();
-      return [type, _briSliceForWeek(data.cards, wi.weekNumber)];
-    }));
-    const sets = {};
-    entries.forEach(e => { sets[e[0]] = e[1]; });
-    return { curr, sets };
-  }
-
-  // Mirrors daily-check.js's buildDay() quiz step: mixed pool of this
-  // week's vocab/sentences/questions, seeded by today's date so the set is
-  // stable across re-entries the same day, distractors drawn from the same
-  // type as the answer so length alone never gives it away.
-  function _buildBriefingQuiz(content) {
-    const seedBase = (_briTodayKey() || 'nodate') + '|' + content.curr + '|muenbaBriefing';
-    const promptKey = content.curr === 'pb' ? 'hira' : 'jp';
-    const pool = [];
-    BRIEFING_TYPES.forEach(type => {
-      (content.sets[type] || []).forEach(c => pool.push({ ...c, _type: type }));
-    });
-    if (!pool.length) return [];
-    const picked = _briShuffle(pool, seedBase).slice(0, Math.min(BRIEFING_LEN, pool.length));
-    return picked.map(item => {
-      const sameType = (content.sets[item._type] || []).filter(c => c.n !== item.n);
-      const distractors = _briShuffle(sameType, seedBase + '|d' + item._type + item.n)
-        .slice(0, Math.min(BRIEFING_CHOICES - 1, sameType.length));
-      const choices = _briShuffle([item, ...distractors], seedBase + '|c' + item._type + item.n)
-        .map(c => ({ n: c.n, label: c.en }));
-      return {
-        prompt: item[promptKey] || item.jp || item.en,
-        answerN: item.n,
-        choices
-      };
-    });
-  }
-
-  // Picked once per calendar day (not per entry) so re-entering Muenba the
-  // same day keeps pointing at the same ghost rather than reshuffling on
-  // every visit — the lobby greeting re-shows every entry, but the hunt
-  // itself stays put until it's actually caught (Pass 7+).
-  function _pickTargetGhost() {
-    const seedBase = (_briTodayKey() || String(Math.random())) + '|muenbaTargetGhost';
-    const r = _briRng(seedBase);
-    const idx = Math.floor(r() * GHOSTS.length);
-    return GHOSTS[idx];
-  }
-
-  // Pass 6: gives Pass 4's seeded-but-in-memory-only pick a real save
-  // record, so a reload mid-hunt reloads the SAME target instead of
-  // recomputing it. The seed is already deterministic per day on its own
-  // (same day → same ghost, with or without a save), so this mostly
-  // guards a persisted record for muenba-profile.html and Pass 7 to read,
-  // rather than guarding against the pick itself ever drifting.
-  function getOrPickTodaysTargetGhost() {
-    const today = _briTodayKey();
-    const mu = readMuenba();
-    if (today && mu.targetGhost && mu.targetGhost.pickedForDay === today) {
-      const saved = GHOSTS.find(g => g.id === mu.targetGhost.id);
-      if (saved) return saved;
-    }
-    const ghost = _pickTargetGhost();
-    if (today) writeMuenba({ targetGhost: { id: ghost.id, pickedForDay: today } });
-    return ghost;
-  }
-
-  function buildBriefingOverlay() {
-    if (briefingOverlay) return;
-    briefingOverlay = document.createElement('div');
-    briefingOverlay.id = 'muenba-briefing-overlay';
-    document.body.appendChild(briefingOverlay);
-  }
-
-  // House rule carried over from daily-check.js: textContent for every
-  // data-sourced string (curriculum JSON), never innerHTML with card data.
-  function _briClear() {
-    briefingOverlay.textContent = '';
-    const box = document.createElement('div');
-    box.className = 'muenba-lobby-box muenba-briefing-box';
-    briefingOverlay.appendChild(box);
-    return box;
-  }
-
-  function _renderBriefingLoading() {
-    const box = _briClear();
-    const jp = document.createElement('p'); jp.className = 'jp-line';
-    jp.textContent = 'きろくをよみこみ中……';
-    const en = document.createElement('p');
-    en.textContent = "Nuppi is gathering this week's words...";
-    box.append(jp, en);
-  }
-
-  function _runBriefingQuiz(quiz, qi) {
-    const box = _briClear();
-    const q = quiz[qi];
-
-    const count = document.createElement('div');
-    count.className = 'muenba-briefing-count';
-    count.textContent = `Question ${qi + 1} / ${quiz.length}`;
-    box.appendChild(count);
-
-    const h2 = document.createElement('h2');
-    h2.textContent = 'Nuppi asks…';
-    box.appendChild(h2);
-
-    const prompt = document.createElement('p');
-    prompt.className = 'muenba-briefing-prompt';
-    prompt.textContent = q.prompt;
-    box.appendChild(prompt);
-
-    const list = document.createElement('div');
-    list.className = 'muenba-briefing-choices';
-    let answered = false;
-    q.choices.forEach((choice, i) => {
-      const b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'muenba-briefing-choice';
-      b.textContent = choice.label;
-      b.addEventListener('click', () => {
-        if (answered) return;
-        answered = true;
-        const isRight = choice.n === q.answerN;
-        if (isRight) {
-          b.classList.add('right');
-        } else {
-          b.classList.add('wrong');
-          Array.from(list.children).forEach((cb, j) => {
-            if (q.choices[j].n === q.answerN) cb.classList.add('right');
-            else if (cb !== b) cb.classList.add('dim');
-          });
-        }
-        setTimeout(() => {
-          const next = qi + 1;
-          if (next >= quiz.length) _revealTargetGhost();
-          else _runBriefingQuiz(quiz, next);
-        }, isRight ? 550 : 1050);
-      });
-      list.appendChild(b);
-    });
-    box.appendChild(list);
-  }
-
-  // Counts every completed briefing (including the auto-skip-on-error
-  // path in openBriefingQuiz()'s .catch()), since the quiz has no real
-  // fail state — reaching the reveal IS "passing" it, per the locked
-  // gentle/no-punishment decision. One combined load+write rather than
-  // readMuenba() then writeMuenba() back to back, to avoid a redundant
-  // round trip on a call site this cheap should stay cheap.
-  function _bumpBriefingsPassed() {
-    try {
-      const d = loadSave();
-      if (!d.muenba || typeof d.muenba !== 'object') d.muenba = {};
-      const prev = Number.isInteger(d.muenba.briefingsPassed) ? d.muenba.briefingsPassed : 0;
-      d.muenba.briefingsPassed = prev + 1;
-      writeSave(d);
-    } catch (_) {}
-  }
-
-  function _revealTargetGhost() {
-    _bumpBriefingsPassed();
-    const box = _briClear();
-    const ghost = state.targetGhost || GHOSTS[0];
-
-    const img = document.createElement('img');
-    img.className = 'muenba-briefing-ghost-portrait';
-    img.src = ghost.img;
-    img.alt = ghost.name;
-    box.appendChild(img);
-
-    const h2 = document.createElement('h2');
-    h2.textContent = 'Nuppi points...';
-    box.appendChild(h2);
-    const jp = document.createElement('p'); jp.className = 'jp';
-    jp.textContent = '見つけて。';
-    box.appendChild(jp);
-
-    const p1 = document.createElement('p');
-    p1.textContent = `That's the one — ${ghost.name}. Somewhere in these fifteen rooms, ${ghost.name} is waiting for you to find it.`;
-    box.appendChild(p1);
-    const p2 = document.createElement('p');
-    p2.className = 'jp-line';
-    p2.textContent = `${ghost.name}を探して。この15の部屋のどこかに隠れているよ。`;
-    box.appendChild(p2);
-
-    const actions = document.createElement('div');
-    actions.className = 'muenba-lobby-actions';
-    const go = document.createElement('button');
-    go.type = 'button';
-    go.id = 'muenba-briefing-go';
-    go.textContent = "I'll find it";
-    go.addEventListener('click', closeBriefingQuiz);
-    actions.appendChild(go);
-    box.appendChild(actions);
-  }
-
-  function openBriefingQuiz() {
-    if (briefingOpen || !briefingOverlay) return;
-    briefingOpen = true;
-    state.clickTarget = null;
-    state.moving = false;
-    briefingOverlay.classList.add('open');
-    state.targetGhost = getOrPickTodaysTargetGhost();
-
-    _renderBriefingLoading();
-    const curr = _briKnownCurr();
-    _loadBriefingContent(curr).then(content => {
-      const quiz = _buildBriefingQuiz(content);
-      if (!quiz.length) { _revealTargetGhost(); return; }
-      _runBriefingQuiz(quiz, 0);
-    }).catch(err => {
-      // Offline/404/missing week content must never hard-lock the player
-      // out of Muenba — skip straight to the reveal instead.
-      console.warn('[Muenba] Briefing content unavailable, skipping quiz:', err);
-      _revealTargetGhost();
-    });
-  }
-
-  function closeBriefingQuiz() {
-    briefingOpen = false;
-    if (briefingOverlay) briefingOverlay.classList.remove('open');
   }
 
   function drawReturnPortal(now) {
@@ -2533,7 +2217,7 @@
 
   function handleInput(clientX, clientY) {
     startMusic();
-    if (state.transitioning || state.inputLocked || returnPortalOpen || lobbyOpen || briefingOpen || captureOpen || state.hiding) return;
+    if (state.transitioning || state.inputLocked || returnPortalOpen || lobbyOpen || captureOpen || state.hiding) return;
     const point = stagePoint(clientX, clientY);
     if (DEV_MODE && state.coordMode) {
       dropPin(point.x, point.y);
@@ -2581,7 +2265,7 @@
     // waits for it on initial arrival, but this guard also protects any future
     // handoff that opens a modal during the same arrival window.
     const drifting = !state.transitioning && tickEntryDrift(now);
-    if (!state.transitioning && !returnPortalOpen && !lobbyOpen && !briefingOpen && !captureOpen) {
+    if (!state.transitioning && !returnPortalOpen && !lobbyOpen && !captureOpen) {
       if (!drifting && !state.inputLocked) {
         if (!state.hiding) {
           handleMovement(now);

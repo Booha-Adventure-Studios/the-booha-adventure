@@ -93,16 +93,18 @@ const BoohaUnlockSystem = (() => {
       description:'Complete all 27 games across all curriculums.',
       condition() { return _totalCompleted() >= 27; },
     },
-    // Muenba (Pass 6). "Nuppi's Trust" is reachable today, since Pass 4's
-    // briefing gate already writes muenba.briefingsPassed; the other two
-    // wait on Pass 7/8's actual capture loop to ever fire. GHOSTS_TOTAL is
+    // Muenba. "Nuppi's Trust" is earned by entering the cemetery; the other
+    // two wait on the actual capture loop to fire. GHOSTS_TOTAL is
     // hardcoded rather than read from muenba-data.js, since that file
     // isn't loaded on every page unlock-system.js runs on — bump this if
     // Pass 9 adds more huntable ghosts.
     {
       id:'muenba:first_briefing', name:"Nuppi's Trust",
-      description:"Pass Nuppi's briefing in Muenba for the first time.",
-      condition() { return (_muenba().briefingsPassed || 0) >= 1; },
+      description:"Visit Nuppi in Muenba for the first time.",
+      condition() {
+        const rooms = _muenba().visitedRooms;
+        return !!(rooms && typeof rooms === 'object' && Object.keys(rooms).length >= 1);
+      },
     },
     {
       id:'muenba:first_ghost', name:'First Ghost Caught',

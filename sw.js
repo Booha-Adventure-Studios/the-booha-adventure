@@ -5,11 +5,11 @@
 // ============================================================
 
 const CURRENT_CACHES = {
-  // Pass 9H: invalidate the previous deployed bundle so updated Muenba
-  // scripts/data cannot remain trapped behind the cache-first asset route.
-  pages:  'booha-pages-2026-241',
-  assets: 'booha-assets-2026-241',
-  decks:  'booha-decks-2026-241',
+  // Pass 1: invalidate the previous deployed bundle so the new direct-entry
+  // Muenba flow cannot remain trapped behind the cache-first asset route.
+  pages:  'booha-pages-2026-242',
+  assets: 'booha-assets-2026-242',
+  decks:  'booha-decks-2026-242',
 };
 
 const PAGE_CACHE  = CURRENT_CACHES.pages;
