@@ -30,6 +30,14 @@
   const DIR_ANGLE = { right: 0, down: Math.PI / 2, left: Math.PI, up: -Math.PI / 2 };
   const OPPOSITE = { left: 'right', right: 'left', up: 'down', down: 'up' };
 
+  // The real return path (Pass 2) — mirrors Karasuki's own MUENBA_PORTAL
+  // (room_13, glowing orb, click + walk-proximity trigger) so the return
+  // trip uses the exact interaction language the player already learned on
+  // the way in. Sits at the same bottom-of-room_01 spot the 'fromKarasuki'
+  // spawn already uses, so arriving and leaving feel like the same doorway.
+  const KARASUKI_RETURN_PORTAL = { roomId: 'room_01', x: 768, y: 830, r: 44, triggerR: 36 };
+  const POPUP_COOLDOWN_MS = 900;
+
   const params = new URLSearchParams(window.location.search);
   const DEV_MODE = params.get('dev') === '1';
   if (DEV_MODE) window.__devMuenba = true;
@@ -52,7 +60,8 @@
     coordMode: DEV_MODE,
     lastTickTime: 0,
     speed: BASE_SPEED,
-    fogX: 0
+    fogX: 0,
+    returnExiting: false
   };
 
   let app;
@@ -73,6 +82,9 @@
   let lastTouchEnd = 0;
   let entryDrift = null;
   let pins = [];
+  let returnPortalOverlay = null;
+  let returnPortalOpen = false;
+  let returnPortalCooldownUntil = 0;
   let motes = [];
   let moteSprite = null;
   const imageCache = new Map();
@@ -129,11 +141,16 @@
     music.play().catch(() => { state.musicStarted = false; });
   }
 
-  // Stopgap return path (Pass 0). Reads the same 'muenba_return_room' key
-  // enterMuenba() in karasuki.js already writes on the way in, so it lands
-  // back in the right room via karasuki.js's own checkReturnFromMuenba().
-  // Pass 2 replaces this floating button with a proper in-world return.
+  // Reads the same 'muenba_return_room' key enterMuenba() in karasuki.js
+  // already writes on the way in, so it lands back in the right room via
+  // karasuki.js's own checkReturnFromMuenba(). Called either from the
+  // return-portal popup (Pass 2, the real path) or the DEV-only exit
+  // button (Pass 0's stopgap, kept as a fast escape hatch while testing).
   function returnToKarasuki() {
+    if (state.returnExiting) return;
+    state.returnExiting = true;
+    state.clickTarget = null;
+    state.moving = false;
     try { music.pause(); } catch (_) {}
     fadeEl.style.transition = `opacity ${FADE_MS}ms ease-in`;
     fadeEl.style.opacity = '1';
@@ -180,12 +197,28 @@
       #muenba-room-list { position:fixed; right:12px; bottom:12px; z-index:100; display:${DEV_MODE ? 'flex' : 'none'}; flex-wrap:wrap; justify-content:flex-end; gap:4px; max-width:330px; }
       #muenba-room-list button { border:1px solid rgba(125,220,216,.35); border-radius:5px; background:rgba(0,8,12,.8); color:#bde5e4; padding:4px 6px; font:700 10px ui-monospace,monospace; cursor:pointer; }
       #muenba-room-list button:hover { background:rgba(30,80,84,.8); }
-      /* Stopgap exit button — Pass 2 replaces this with a proper in-world
-         return. Kept deliberately plain so it never gets mistaken for a
-         piece of the finished world. */
-      #muenba-exit { position:fixed; right:12px; top:12px; z-index:100; border:1px solid rgba(180,200,192,.4); border-radius:8px; background:rgba(0,8,12,.78); color:#d8e8e0; padding:7px 12px; font:700 11px ui-monospace,monospace; letter-spacing:.04em; cursor:pointer; }
+      /* Pass 0's floating exit button — now DEV-only. The real players'
+         return is the in-world portal in room_01 (Pass 2, below); this stays
+         around purely as a fast escape hatch while testing other passes. */
+      #muenba-exit { position:fixed; right:12px; top:12px; z-index:100; display:${DEV_MODE ? 'block' : 'none'}; border:1px solid rgba(180,200,192,.4); border-radius:8px; background:rgba(0,8,12,.78); color:#d8e8e0; padding:7px 12px; font:700 11px ui-monospace,monospace; letter-spacing:.04em; cursor:pointer; }
       #muenba-exit:hover, #muenba-exit:focus-visible { background:rgba(30,70,60,.8); outline:none; }
-      @media (prefers-reduced-motion: reduce) { #muenba-fade { transition:none !important; } }
+      /* Return-to-Karasuki confirm popup — matches the locked-world screen's
+         parchment-less, dark-cemetery styling so it reads as part of this
+         world rather than a generic browser dialog. */
+      #muenba-return-overlay { position:fixed; inset:0; z-index:200; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,0); transition:background .35s ease; }
+      #muenba-return-overlay.open { display:flex; background:rgba(0,0,0,.82); }
+      .muenba-return-box { box-sizing:border-box; width:min(420px,calc(100% - 40px)); padding:26px 24px 24px; border:1px solid rgba(111,166,145,.45); border-radius:16px; background:linear-gradient(155deg,rgba(8,27,20,.97),rgba(1,4,4,.98)); box-shadow:0 24px 70px rgba(0,0,0,.72),0 0 45px rgba(16,65,45,.26),inset 0 0 60px rgba(0,0,0,.55); text-align:center; font-family:Georgia,'Times New Roman',serif; color:#e0eee8; transform:scale(.94); opacity:0; transition:transform .3s cubic-bezier(.34,1.56,.64,1),opacity .25s ease; }
+      #muenba-return-overlay.open .muenba-return-box { transform:scale(1); opacity:1; }
+      .muenba-return-box h2 { margin:0 0 4px; font-size:1.2rem; font-weight:400; letter-spacing:.06em; text-transform:uppercase; }
+      .muenba-return-box .jp { margin:0 0 16px; color:#aac2b5; font-size:.85rem; letter-spacing:.1em; }
+      .muenba-return-box p { margin:0 0 20px; color:#c5d8cd; font-size:.92rem; line-height:1.6; }
+      .muenba-return-actions { display:flex; gap:10px; justify-content:center; }
+      .muenba-return-actions button { flex:1; max-width:150px; padding:9px 14px; border-radius:999px; font:700 12px ui-monospace,monospace; letter-spacing:.04em; cursor:pointer; }
+      #muenba-return-yes { border:1px solid rgba(156,203,182,.7); color:#e0f4e9; background:rgba(52,104,78,.28); box-shadow:0 0 16px rgba(93,162,124,.22); }
+      #muenba-return-yes:hover, #muenba-return-yes:focus-visible { background:rgba(52,104,78,.44); outline:none; }
+      #muenba-return-no { border:1px solid rgba(90,130,112,.5); color:#aec8bb; background:transparent; }
+      #muenba-return-no:hover, #muenba-return-no:focus-visible { background:rgba(90,130,112,.16); outline:none; }
+      @media (prefers-reduced-motion: reduce) { #muenba-fade, .muenba-return-box, #muenba-return-overlay { transition:none !important; } }
     `;
     document.head.appendChild(style);
   }
@@ -213,6 +246,8 @@
     exitBtn.textContent = 'Exit to Karasuki';
     exitBtn.addEventListener('click', returnToKarasuki);
     document.body.appendChild(exitBtn);
+
+    buildReturnPortalOverlay();
 
     const dev = document.createElement('div');
     dev.id = 'muenba-dev';
@@ -567,6 +602,97 @@
     }, FADE_MS / 2 + 20);
   }
 
+  // ── Return-to-Karasuki portal (Pass 2) ──────────────────────────────────
+  // Same shape as Karasuki's own MUENBA_PORTAL: a glowing spot the player
+  // can either click or simply walk up to, opening a themed confirm popup
+  // rather than leaving instantly — matches the "Enter Muenba?" prompt on
+  // the way in, so the round trip feels like one consistent doorway.
+
+  function buildReturnPortalOverlay() {
+    if (returnPortalOverlay) return;
+    returnPortalOverlay = document.createElement('div');
+    returnPortalOverlay.id = 'muenba-return-overlay';
+    returnPortalOverlay.innerHTML = `
+      <div class="muenba-return-box">
+        <h2>Leave Muenba?</h2>
+        <p class="jp">カラスキに戻りますか？</p>
+        <p>The path back to Karasuki is open here.</p>
+        <div class="muenba-return-actions">
+          <button id="muenba-return-yes" type="button">Yes, return</button>
+          <button id="muenba-return-no" type="button">Stay</button>
+        </div>
+      </div>`;
+    document.body.appendChild(returnPortalOverlay);
+    document.getElementById('muenba-return-yes').addEventListener('click', () => {
+      closeReturnPortalPopup();
+      returnToKarasuki();
+    });
+    document.getElementById('muenba-return-no').addEventListener('click', closeReturnPortalPopup);
+    returnPortalOverlay.addEventListener('click', event => {
+      if (event.target === returnPortalOverlay) closeReturnPortalPopup();
+    });
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && returnPortalOpen) closeReturnPortalPopup();
+    });
+  }
+
+  function openReturnPortalPopup() {
+    if (returnPortalOpen || state.returnExiting) return;
+    returnPortalOpen = true;
+    state.clickTarget = null;
+    state.moving = false;
+    returnPortalOverlay.classList.add('open');
+  }
+
+  function closeReturnPortalPopup() {
+    returnPortalOpen = false;
+    returnPortalOverlay.classList.remove('open');
+    returnPortalCooldownUntil = performance.now() + POPUP_COOLDOWN_MS;
+  }
+
+  function isReturnPortalOpen() { return returnPortalOpen; }
+
+  function inReturnPortalRoom() { return state.roomId === KARASUKI_RETURN_PORTAL.roomId; }
+
+  function checkReturnPortalProximity(now) {
+    if (!inReturnPortalRoom() || returnPortalOpen || now < returnPortalCooldownUntil) return;
+    if (state.inputLocked || state.transitioning) return;
+    const d = Math.hypot(state.x - KARASUKI_RETURN_PORTAL.x, state.y - KARASUKI_RETURN_PORTAL.y);
+    if (d <= KARASUKI_RETURN_PORTAL.triggerR) openReturnPortalPopup();
+  }
+
+  function clickCheckReturnPortal(worldX, worldY) {
+    if (!inReturnPortalRoom() || returnPortalOpen || performance.now() < returnPortalCooldownUntil) return false;
+    const d = Math.hypot(worldX - KARASUKI_RETURN_PORTAL.x, worldY - KARASUKI_RETURN_PORTAL.y);
+    if (d <= KARASUKI_RETURN_PORTAL.r) {
+      openReturnPortalPopup();
+      return true;
+    }
+    return false;
+  }
+
+  function drawReturnPortal(now) {
+    if (!inReturnPortalRoom()) return;
+    const seconds = now / 1000;
+    const pulse = .5 + .5 * Math.sin(seconds * 1.7);
+    const cx = KARASUKI_RETURN_PORTAL.x;
+    const cy = KARASUKI_RETURN_PORTAL.y;
+    actorCtx.save();
+    actorCtx.globalAlpha = .16 + pulse * .1;
+    actorCtx.fillStyle = 'rgba(180,220,205,.9)';
+    actorCtx.beginPath();
+    actorCtx.arc(cx, cy, 46 + pulse * 10, 0, Math.PI * 2);
+    actorCtx.fill();
+    actorCtx.globalAlpha = .55 + pulse * .25;
+    actorCtx.fillStyle = '#d8f4e6';
+    actorCtx.shadowColor = 'rgba(150,210,190,.8)';
+    actorCtx.shadowBlur = 18;
+    actorCtx.beginPath();
+    actorCtx.arc(cx, cy, 12 + pulse * 3, 0, Math.PI * 2);
+    actorCtx.fill();
+    actorCtx.restore();
+  }
+
   function drawExitArrows(now) {
     const exits = getRoom().exits || [];
     const reveal = Math.min(1, state.distMovedSinceSpawn / ARROW_MOVE_THRESHOLD);
@@ -724,6 +850,7 @@
     atmosphereCtx.clearRect(0, 0, WORLD_W, WORLD_H);
     actorCtx.clearRect(0, 0, WORLD_W, WORLD_H);
     drawAtmosphere(now);
+    drawReturnPortal(now);
     drawExitArrows(now);
     drawBooha(now);
     drawPins();
@@ -743,12 +870,13 @@
 
   function handleInput(clientX, clientY) {
     startMusic();
-    if (state.transitioning || state.inputLocked) return;
+    if (state.transitioning || state.inputLocked || returnPortalOpen) return;
     const point = stagePoint(clientX, clientY);
     if (DEV_MODE && state.coordMode) {
       dropPin(point.x, point.y);
       return;
     }
+    if (clickCheckReturnPortal(point.x, point.y)) return;
     if (Math.hypot(point.x - state.x, point.y - state.y) < 30) return;
     state.clickTarget = point;
   }
@@ -785,12 +913,13 @@
     const dt = Math.min(32, Math.max(8, now - (state.lastTickTime || now)));
     state.lastTickTime = now;
     state.speed = BASE_SPEED * Math.min(1.6, dt / TARGET_DT);
-    if (!state.transitioning) {
+    if (!state.transitioning && !returnPortalOpen) {
       const drifting = tickEntryDrift(now);
       if (!drifting && !state.inputLocked) {
         handleMovement(now);
         const exit = getAvailableExit(now);
         if (exit) transitionTo(exit);
+        checkReturnPortalProximity(now);
       }
     }
     drawFrame(now);
