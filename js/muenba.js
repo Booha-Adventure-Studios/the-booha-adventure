@@ -1945,6 +1945,21 @@
     lobbyOverlay.classList.add('open');
   }
 
+  // Pass 9I: the entry drift is part of Muenba's arrival beat. Wait until
+  // Booha has reached the center before opening Nuppi's lobby so the modal
+  // cannot hide or pause a player who is still locked at the doorway spawn.
+  function openNuppiLobbyAfterEntry() {
+    if (!entryDrift) {
+      openNuppiLobby();
+      return;
+    }
+    const waitForArrival = () => {
+      if (!entryDrift) openNuppiLobby();
+      else window.requestAnimationFrame(waitForArrival);
+    };
+    window.requestAnimationFrame(waitForArrival);
+  }
+
   function closeNuppiLobby() {
     lobbyOpen = false;
     if (lobbyOverlay) lobbyOverlay.classList.remove('open');
@@ -2560,8 +2575,11 @@
     const dt = Math.min(32, Math.max(8, now - (state.lastTickTime || now)));
     state.lastTickTime = now;
     state.speed = BASE_SPEED * Math.min(1.6, dt / TARGET_DT);
+    // Entry drift must continue independently of overlays. The lobby now
+    // waits for it on initial arrival, but this guard also protects any future
+    // handoff that opens a modal during the same arrival window.
+    const drifting = !state.transitioning && tickEntryDrift(now);
     if (!state.transitioning && !returnPortalOpen && !lobbyOpen && !briefingOpen && !captureOpen) {
-      const drifting = tickEntryDrift(now);
       if (!drifting && !state.inputLocked) {
         if (!state.hiding) {
           handleMovement(now);
@@ -2587,10 +2605,10 @@
     fitStage();
     resizeCanvas();
     setRoom(state.roomId, state.spawnId, null);
-    openNuppiLobby();
     bindInput();
     window.addEventListener('resize', () => { fitStage(); resizeCanvas(); });
     window.requestAnimationFrame(tick);
+    openNuppiLobbyAfterEntry();
   }
 
   if (window.BOOHA_READY) init();
