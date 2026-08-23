@@ -2280,6 +2280,8 @@
         : state.spawnLockUntil + ARRIVAL_ARROW_DELAY_MS;
       if (now < hiddenUntil) return;
       const fade = Math.min(1, (now - hiddenUntil) / 450) * reveal;
+      const distanceToExit = Math.hypot(state.x - exit.x, state.y - exit.y);
+      const proximity = Math.max(0, Math.min(1, 1 - distanceToExit / (NPP_RADIUS * 5)));
       const angle = DIR_ANGLE[exit.dir] || 0;
       // Two overlapping sine waves (instead of one smooth pulse) read as an
       // unsteady, slightly ghostly flicker rather than a mechanical glow.
@@ -2296,7 +2298,7 @@
       actorCtx.translate(x, y);
       actorCtx.rotate(angle);
       for (let t = 1; t <= 2; t++) {
-        actorCtx.globalAlpha = fade * flicker * (.15 / t);
+        actorCtx.globalAlpha = fade * flicker * ((.18 + proximity * .08) / t);
         actorCtx.fillStyle = `rgb(${glowStr})`;
         actorCtx.beginPath();
         actorCtx.arc(-t * 10, 0, 3.5 - t * .8, 0, Math.PI * 2);
@@ -2310,13 +2312,26 @@
       actorCtx.save();
       actorCtx.translate(x, y);
       actorCtx.rotate(angle);
-      actorCtx.globalAlpha = fade * (.48 + flicker * .32);
-      actorCtx.strokeStyle = `rgba(${coreStr},.92)`;
-      actorCtx.shadowColor = `rgba(${glowStr},.72)`;
-      actorCtx.shadowBlur = 9;
-      actorCtx.lineWidth = 2.2;
+      // Two light strokes make the small arrow survive the room fog: a broad
+      // low-alpha aura underneath, then a thin bright core on top. The arrow
+      // grows clearer as Booha approaches the actual 42px exit hotspot.
+      actorCtx.globalAlpha = fade * (.24 + flicker * .14 + proximity * .12);
+      actorCtx.strokeStyle = `rgba(${glowStr},.9)`;
+      actorCtx.shadowColor = `rgba(${glowStr},.65)`;
+      actorCtx.shadowBlur = 11;
+      actorCtx.lineWidth = 3.6;
       actorCtx.lineCap = 'round';
       actorCtx.lineJoin = 'round';
+      actorCtx.beginPath();
+      actorCtx.moveTo(-11, -7);
+      actorCtx.lineTo(0, 0);
+      actorCtx.lineTo(-11, 7);
+      actorCtx.stroke();
+
+      actorCtx.shadowBlur = 0;
+      actorCtx.globalAlpha = fade * (.62 + flicker * .22 + proximity * .14);
+      actorCtx.strokeStyle = `rgba(${coreStr},.98)`;
+      actorCtx.lineWidth = 1.8;
       actorCtx.beginPath();
       actorCtx.moveTo(-11, -7);
       actorCtx.lineTo(0, 0);
@@ -2326,7 +2341,7 @@
       // A tiny bright point at the tip gives the arrow a living center without
       // bringing back a conspicuous circular UI marker.
       actorCtx.shadowBlur = 0;
-      actorCtx.globalAlpha = fade * (.55 + flicker * .25);
+      actorCtx.globalAlpha = fade * (.58 + flicker * .22 + proximity * .12);
       actorCtx.fillStyle = `rgb(${coreStr})`;
       actorCtx.beginPath();
       actorCtx.arc(0, 0, 1.7 + flicker * .7, 0, Math.PI * 2);
