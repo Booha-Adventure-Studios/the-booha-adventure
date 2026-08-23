@@ -1247,42 +1247,10 @@
       if (echoesTrackerEl) echoesTrackerEl.style.display = 'none';
       return;
     }
-    const restored = readUtsuroba().readingEchoes || {};
-    const episodes = window.UTSUROBA_EPISODES || {};
-    const iconFor = { lantern: '✦', candy: '●', reflection: '◈', thorn: '◆', ribbon: '✿' };
-    Object.entries(restored).forEach(([episodeId, entry]) => {
-      const episode = episodes[episodeId];
-      const echo = episode && episode.worldEcho;
-      if (!echo) return;
-      let echoRoomId = echo.roomId;
-      let echoX = Number(echo.x);
-      let echoY = Number(echo.y);
-      if (echo.anchorDrifterId) {
-        const drifterIndex = DATA.drifters.findIndex(drifter => drifter.id === echo.anchorDrifterId);
-        const anchorRoomId = drifterIndex >= 0 ? weeklyRooms[drifterIndex] : null;
-        const anchorCoords = anchorRoomId ? DATA.roomStandingCoords[anchorRoomId] : null;
-        const authoredCoords = DATA.roomStandingCoords[echo.roomId];
-        if (anchorRoomId && anchorCoords && authoredCoords) {
-          echoRoomId = anchorRoomId;
-          echoX = (anchorCoords.x + (echo.x * WORLD_W - authoredCoords.x)) / WORLD_W;
-          echoY = (anchorCoords.y + (echo.y * WORLD_H - authoredCoords.y)) / WORLD_H;
-        }
-      }
-      if (echoRoomId !== state.roomId) return;
-      const motif = Object.prototype.hasOwnProperty.call(iconFor, echo.motif) ? echo.motif : 'lantern';
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = `utsu-memory-echo motif-${motif}`;
-      button.style.left = `${Math.max(0, Math.min(1, echoX)) * 100}%`;
-      button.style.top = `${Math.max(0, Math.min(1, echoY)) * 100}%`;
-      button.setAttribute('aria-label', `${echo.label}. Read memory again.`);
-      button.innerHTML = `<span class="echo-aura"></span><span class="echo-icon" aria-hidden="true">${iconFor[motif]}</span><span class="echo-label">${escapeHTML(echo.label)}<small>${escapeHTML(echo.labelJP)}</small></span>`;
-      button.addEventListener('click', event => {
-        event.stopPropagation();
-        openReadingReview({ episodeId, drifterId: entry.drifterId });
-      });
-      echoLayer.appendChild(button);
-    });
+    /* Completed memories remain in readingEchoes for the archive, journal,
+       and convergence logic, but they no longer create world-space buttons.
+       The old "The lantern remembers" hotspots were too easy to hit while
+       simply walking through a room. */
     const gate = DATA.readingConvergence;
     if (gate && gate.gateRoom === state.roomId && allReadingMemoriesRestored()) {
       const worldUnderstood = !!readUtsuroba().flags?.convergenceSeen;
@@ -1420,19 +1388,12 @@
       if (isLit && d.episodeId) nextLitEchoIds.add(d.episodeId);
       const justLit = isLit && d.episodeId && lastLitEchoIds && !lastLitEchoIds.has(d.episodeId);
       const status = isLit ? 'found' : 'not found yet';
-      return `<button type="button" class="utsu-hud-chip-dot motif-${motif}${isLit ? ' is-lit' : ''}${justLit ? ' is-just-lit' : ''}" ${isLit ? '' : 'disabled tabindex="-1"'} data-echo-episode="${escapeHTML(d.episodeId || '')}" aria-label="${escapeHTML(`${d.name} — ${status}`)}"><span aria-hidden="true">${iconFor[motif]}</span></button>`;
+      return `<span class="utsu-hud-chip-dot motif-${motif}${isLit ? ' is-lit' : ''}${justLit ? ' is-just-lit' : ''}" role="img" aria-label="${escapeHTML(`${d.name} — ${status}`)}"><span aria-hidden="true">${iconFor[motif]}</span></span>`;
     }).join('');
     lastLitEchoIds = nextLitEchoIds;
 
     echoesTrackerEl.style.display = 'flex';
     echoesTrackerEl.innerHTML = `<div class="utsu-hud-chip-dots">${dots}</div><div class="utsu-hud-chip-text"><span class="utsu-hud-chip-primary">${escapeHTML(label || 'The Three Echoes')}</span><span class="utsu-hud-chip-secondary">${escapeHTML(labelJP || '')}</span></div>`;
-    echoesTrackerEl.querySelectorAll('.utsu-hud-chip-dot.is-lit').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const episodeId = btn.dataset.echoEpisode;
-        const entry = episodeId ? restored[episodeId] : null;
-        if (episodeId && entry) openReadingReview({ episodeId, drifterId: entry.drifterId });
-      });
-    });
   }
 
   function allReadingMemoriesRestored() {

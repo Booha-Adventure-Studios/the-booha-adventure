@@ -247,8 +247,11 @@
         align-items:center;justify-content:center;font-size:12px;background:rgba(255,255,255,.06);
         border:1px solid rgba(255,255,255,.18);color:rgba(255,255,255,.28);cursor:default;
         transition:transform .15s,background .15s,border-color .15s;}
-      .utsu-hud-chip-dot.is-lit{cursor:pointer;border-color:transparent;}
-      .utsu-hud-chip-dot.is-lit:hover,.utsu-hud-chip-dot.is-lit:focus-visible{transform:translateY(-2px);outline:none;}
+      /* Echo dots are progress indicators, not accidental navigation
+         targets. Reading replay belongs in the intentional journal/profile
+         entry point. */
+      .utsu-hud-chip-dot.is-lit{cursor:default;border-color:transparent;}
+      .utsu-hud-chip-dot.is-lit:hover,.utsu-hud-chip-dot.is-lit:focus-visible{transform:none;outline:none;}
       .utsu-hud-chip-dot.motif-lantern.is-lit{background:radial-gradient(circle at 35% 30%,#fffde0,#ffd966 55%,#c8860a);box-shadow:0 0 10px rgba(255,217,102,.55);}
       .utsu-hud-chip-dot.motif-candy.is-lit{background:radial-gradient(circle at 35% 30%,#fff0f4,#ff85a1 55%,#c23a5e);box-shadow:0 0 10px rgba(255,133,161,.55);}
       .utsu-hud-chip-dot.motif-reflection.is-lit{background:radial-gradient(circle at 35% 30%,#eafcff,#a8edff 55%,#3b8fbf);box-shadow:0 0 10px rgba(168,237,255,.55);}
