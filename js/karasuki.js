@@ -111,6 +111,7 @@ const HAPPY_HOUSE_PORTAL = {
   let   wandererPopCooldownUntil    = 0;
   let   utsurobaCooldownUntil       = 0;
   let   muenbaCooldownUntil         = 0;
+  let   muenbaPopOverlay             = null;
   let   observerPopCooldownUntil    = 0;
 
   /* ═══════════════════════════════════════════
@@ -2147,22 +2148,104 @@ const HAPPY_HOUSE_PORTAL = {
     fadeEl.style.transition = `opacity ${FADE_MS}ms ease-in`;
     fadeEl.style.opacity = '1';
     setTimeout(() => {
-      window.location.href = MUENBA_PORTAL.href;
+      const href = window.__devMuenba ? `${MUENBA_PORTAL.href}&dev=1` : MUENBA_PORTAL.href;
+      window.location.href = href;
     }, FADE_MS + 60);
+  }
+
+  function muenbaUnlocked() {
+    return window.BoohaUnlockSystem &&
+      typeof BoohaUnlockSystem.isWeeklyWorldGateOpen === 'function'
+      ? BoohaUnlockSystem.isWeeklyWorldGateOpen()
+      : false;
+  }
+
+  const MUENBA_THEME = {
+    bg: 'linear-gradient(160deg,#020605 0%,#071512 58%,#010202 100%)',
+    border: 'rgba(111,166,145,.46)',
+    accent1: '#9ccbb6', accent2: '#536f66', accent3: '#c9ddd3',
+    glow1: 'rgba(35,88,69,.72)', glow2: 'rgba(8,26,20,.86)',
+    btnBorder: 'rgba(156,203,182,.82)', btnColor: '#e0f4e9',
+    shadow: '0 0 0 1px rgba(111,166,145,.22),0 0 55px rgba(8,38,27,.92),0 0 130px rgba(0,0,0,.88),inset 0 0 80px rgba(0,0,0,.72)',
+  };
+
+  function injectMuenbaPopOverlay() {
+    if (muenbaPopOverlay) return;
+    muenbaPopOverlay = document.createElement('div');
+    muenbaPopOverlay.id = 'muenba-pop-overlay';
+    muenbaPopOverlay.className = 'wpop-overlay';
+    muenbaPopOverlay.innerHTML = wpopMarkup('muenba-pop');
+    document.body.appendChild(muenbaPopOverlay);
+    document.getElementById('muenba-pop-close').addEventListener('click', closeMuenbaPopup);
+    muenbaPopOverlay.addEventListener('click', event => {
+      if (event.target === muenbaPopOverlay) closeMuenbaPopup();
+    });
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && isMuenbaPopupOpen()) closeMuenbaPopup();
+    });
+  }
+
+  function openMuenbaPopup() {
+    if (!muenbaPopOverlay) injectMuenbaPopOverlay();
+    wpopThemeBox('muenba-pop', MUENBA_THEME);
+    wpopSetIconImage('muenba-pop', 'assets/img/muenba/muenba_logo.png', 'Muenba', 'image-muenba');
+    wpopSetText(document.getElementById('muenba-pop-title-en'), '');
+    wpopSetText(document.getElementById('muenba-pop-title-jp'), '');
+
+    const eyebrowEn = document.getElementById('muenba-pop-eyebrow-en');
+    const eyebrowJp = document.getElementById('muenba-pop-eyebrow-jp');
+    const bodyEn = document.getElementById('muenba-pop-body-en');
+    const bodyJp = document.getElementById('muenba-pop-body-jp');
+    eyebrowJp.style.color = MUENBA_THEME.accent3;
+    bodyEn.style.color = '#dceee3';
+    bodyJp.style.color = '#aec8bb';
+
+    if (muenbaUnlocked()) {
+      wpopSetLock('muenba-pop', false);
+      wpopSetText(eyebrowEn, 'A NEW WORLD');
+      wpopSetText(eyebrowJp, '新しい世界');
+      wpopSetText(bodyEn, 'A dark path has opened.\nDo you want to enter Muenba?');
+      wpopSetText(bodyJp, '暗い道が開いた。\nムエンバに入りますか？');
+      wpopSetActions('muenba-pop', [
+        { en: 'Yes', jp: 'はい', border: `1px solid ${MUENBA_THEME.btnBorder}`, color: MUENBA_THEME.btnColor, background: 'rgba(52,104,78,.28)', boxShadow: '0 0 18px rgba(93,162,124,.25)', onClick: () => { closeMuenbaPopup(); enterMuenba(); } },
+        { en: 'No', jp: 'いいえ', border: '1px solid rgba(90,130,112,.55)', color: '#aec8bb', onClick: closeMuenbaPopup }
+      ]);
+    } else {
+      wpopSetLock('muenba-pop', true);
+      wpopSetText(eyebrowEn, 'THIS WORLD IS LOCKED');
+      wpopSetText(eyebrowJp, 'この世界は封印されています');
+      wpopSetText(bodyEn, 'Something waits beyond this path.\nComplete the weekly world gate before Muenba opens.');
+      wpopSetText(bodyJp, 'この道の先で、何かが待っている。\n今週の世界の門を開くと、ムエンバに入れます。');
+      wpopSetActions('muenba-pop', [
+        { en: 'Close', jp: '閉じる', border: '1px solid rgba(80,120,98,.55)', color: '#b6cfc2', onClick: closeMuenbaPopup }
+      ]);
+    }
+    openWpopOverlay(muenbaPopOverlay, 'rgba(0,0,0,0.90)');
+  }
+
+  function closeMuenbaPopup() {
+    muenbaCooldownUntil = performance.now() + POPUP_COOLDOWN_MS;
+    closeWpopOverlay(muenbaPopOverlay, 400);
+  }
+
+  function isMuenbaPopupOpen() {
+    return muenbaPopOverlay && muenbaPopOverlay.style.display === 'flex';
   }
 
   function checkMuenbaPortal() {
     if (state.roomId !== MUENBA_PORTAL.roomId) return;
     if (performance.now() < muenbaCooldownUntil) return;
     if (state.distMovedSinceSpawn < ARROW_MOVE_THRESHOLD) return;
-    if (Math.hypot(state.x - MUENBA_PORTAL.x, state.y - MUENBA_PORTAL.y) <= MUENBA_PORTAL.r) enterMuenba();
+    if (Math.hypot(state.x - MUENBA_PORTAL.x, state.y - MUENBA_PORTAL.y) <= MUENBA_PORTAL.r) {
+      state.clickTarget = null; state.moving = false; openMuenbaPopup();
+    }
   }
 
   function clickCheckMuenbaPortal(worldX, worldY) {
     if (state.roomId !== MUENBA_PORTAL.roomId) return false;
     if (performance.now() < muenbaCooldownUntil) return false;
     if (Math.hypot(worldX - MUENBA_PORTAL.x, worldY - MUENBA_PORTAL.y) <= MUENBA_PORTAL.r) {
-      enterMuenba();
+      openMuenbaPopup();
       return true;
     }
     return false;
@@ -2394,15 +2477,17 @@ const HAPPY_HOUSE_PORTAL = {
       <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:4px;"><input type="checkbox" id="dev-all-wanderers"> All wanderers</label>
       <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:4px;"><input type="checkbox" id="dev-all-games"> All games unlocked</label>
       <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:4px;"><input type="checkbox" id="dev-utsuroba"> Utsuroba unlocked</label>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:4px;"><input type="checkbox" id="dev-muenba"> Muenba unlocked</label>
       <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:4px;"><input type="checkbox" id="dev-all-orbs"> Show all memory boxes</label>
       <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:4px;"><input type="checkbox" id="dev-coords-toggle"> Coord mode</label>
       <button id="dev-clear-quest" style="margin-top:4px;font:700 11px monospace;color:#ffd700;background:transparent;border:1px solid rgba(255,200,0,.4);border-radius:4px;padding:3px 8px;cursor:pointer;width:100%;">Clear quest</button>
       <div id="dev-room-info" style="font-size:9px;color:rgba(255,200,0,.45);margin-top:8px;"></div>`;
     document.body.appendChild(panel);
-    window.__devAllGames = false; window.__devAllWanderers = false; window.__devUtsuroba = false; window.__devAllOrbs = false;
+    window.__devAllGames = false; window.__devAllWanderers = false; window.__devUtsuroba = false; window.__devMuenba = false; window.__devAllOrbs = false;
     document.getElementById('dev-all-games').addEventListener('change',     function() { window.__devAllGames = this.checked; });
     document.getElementById('dev-all-wanderers').addEventListener('change', function() { window.__devAllWanderers = this.checked; refreshWanderersForRoom(); });
     document.getElementById('dev-utsuroba').addEventListener('change',      function() { window.__devUtsuroba = this.checked; });
+    document.getElementById('dev-muenba').addEventListener('change',        function() { window.__devMuenba = this.checked; });
     document.getElementById('dev-all-orbs').addEventListener('change',      function() { window.__devAllOrbs = this.checked; });
     document.getElementById('dev-coords-toggle').addEventListener('change', function() { if (this.checked !== state.coordMode) toggleCoordMode(); });
     document.getElementById('dev-clear-quest').addEventListener('click', () => {
@@ -2502,7 +2587,7 @@ const HAPPY_HOUSE_PORTAL = {
     
     document.body.appendChild(toast);
     document.body.appendChild(portalOverlay);
-        injectBonusPopOverlay(); injectWandererPopOverlay(); injectUtsuobaPopOverlay(); injectOrbPanel(); injectObserverPop(); injectHappyHousePop();
+    injectBonusPopOverlay(); injectWandererPopOverlay(); injectUtsuobaPopOverlay(); injectMuenbaPopOverlay(); injectOrbPanel(); injectObserverPop(); injectHappyHousePop();
     
     const rotateOverlay = document.createElement("div"); rotateOverlay.id = "rotate-overlay";
     rotateOverlay.innerHTML = `<span class="rotate-phone" aria-hidden="true"><svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2.4"></rect><line x1="11" y1="18.4" x2="13" y2="18.4"></line></svg></span><div class="rotate-bar"></div><p class="rotate-title-en">Turn your device sideways!</p><p class="rotate-title">横にして遊ぼう！</p><p class="rotate-sub">カラスキは<strong style="color:#ff79d7">横画面</strong>で遊べるよ。<br>スマホを横にしてね。</p>`;
@@ -2928,6 +3013,7 @@ const HAPPY_HOUSE_PORTAL = {
       isBonusPopOpen()           ||
       isWandererPopOpen()        ||
       isUtsuobaPopOpen()         ||
+      isMuenbaPopupOpen()        ||
       isObserverPopOpen()        ||
       isNuppiPopOpen()           ||
       isOrbPanelOpen()           ||
