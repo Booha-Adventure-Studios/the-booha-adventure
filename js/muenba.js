@@ -3,9 +3,9 @@
  * briefing Q&A gate that reveals the day's target ghost, durable Muenba
  * save/progress (Pass 6), and the ghost-hunting core loop (Pass 7): one
  * wandering ghost per room, an ignore-vs-chase behavior split, a Hide
- * button, and click-to-attempt capture. Capture currently resolves
- * immediately on tapping the correct ghost — the real two-lane rhythm game
- * that gates that resolution, plus the orb-return loop to Nuppi, is Pass 8.
+ * button, and click-to-attempt capture. Pass 8A now owns the explicit capture
+ * session hand-off; the two-lane rhythm game and orb-return loop follow in
+ * Pass 8B/8C.
  */
 (() => {
   'use strict';
@@ -121,6 +121,11 @@
   let hideBtn = null;
   let captureOverlay = null;
   let captureOpen = false;
+  // Pass 8A: one explicit capture session owns the hand-off from the
+  // wandering ghost to the future rhythm game. Keeping the phase here means
+  // Pass 8B can attach timing/input without also changing movement, ghost AI,
+  // or save writes.
+  let captureSession = null;
   let toast = null;
   let motes = [];
   let moteSprite = null;
@@ -485,7 +490,7 @@
     const isTarget = !!(state.targetGhost && ghost.id === state.targetGhost.id);
     if (isTarget) {
       state.captureResolving = true;
-      openCaptureOverlay(ghost);
+      beginCaptureSession(ghost);
     } else {
       showToast('Not the one…', 'これじゃない…', activeGhost.x, activeGhost.y - 46, now + 1200);
       activeGhost.wanderTarget = pickGhostWanderTarget();
@@ -500,87 +505,141 @@
     captureOverlay.id = 'muenba-capture-overlay';
     document.body.appendChild(captureOverlay);
     document.addEventListener('keydown', event => {
-      if (event.key === 'Escape' && captureOpen) closeCaptureOverlay();
+      if (event.key === 'Escape' && captureOpen) cancelCaptureSession();
     });
   }
 
-  // Pass 7 placeholder resolution: tapping the correct ghost resolves as an
-  // immediate capture. Pass 8 inserts the real two-lane rhythm game between
-  // clickCheckGhost() finding the right ghost and this function running —
-  // this overlay's job then becomes the SUCCESS screen after that minigame
-  // is won, not the whole resolution. The flat per-capture orb reward and
-  // the "release orbs one at a time" animation both belong to Pass 8; this
-  // pass just needs ghostsFound/orbsCollected to be real, saved numbers.
-  function openCaptureOverlay(ghost) {
+  // Pass 8A session boundary. No permanent save is written here: the future
+  // rhythm game must decide whether this session succeeds before the ghost,
+  // journal, or orb reward can be committed. The ghost is removed from the
+  // scene while the session is open and respawned on cancel, so a failed or
+  // abandoned attempt remains a soft miss rather than consuming the target.
+  function beginCaptureSession(ghost) {
     captureOpen = true;
+    captureSession = {
+      ghost,
+      phase: 'ready',
+      openedAt: performance.now()
+    };
     state.clickTarget = null;
     state.moving = false;
-
-    const d = loadSave();
-    if (!d.muenba || typeof d.muenba !== 'object') d.muenba = {};
-    const mu = d.muenba;
-    mu.ghostsFound = { ...(mu.ghostsFound || {}), [ghost.id]: true };
-    mu.orbsCollected = (Number.isInteger(mu.orbsCollected) ? mu.orbsCollected : 0) + ORB_REWARD_PER_CAPTURE;
-    if (!mu.huntJournal || !Array.isArray(mu.huntJournal.entries)) mu.huntJournal = { entries: [] };
-    mu.huntJournal.entries.push({ ghostId: ghost.id, capturedAt: Date.now() });
-    if (mu.targetGhost && mu.targetGhost.id === ghost.id) {
-      mu.targetGhost = { ...mu.targetGhost, capturedForDay: true };
-    }
-    writeSave(d);
-    try {
-      if (window.BoohaUnlockSystem && typeof BoohaUnlockSystem.checkAll === 'function') BoohaUnlockSystem.checkAll();
-    } catch (_) {}
-
     activeGhost = null;
+    renderCaptureReady();
+  }
 
+  function captureBox() {
     captureOverlay.textContent = '';
     const box = document.createElement('div');
     box.className = 'muenba-lobby-box';
+    captureOverlay.appendChild(box);
+    return box;
+  }
 
+  function captureImage(box, ghost) {
     const img = document.createElement('img');
     img.className = 'muenba-lobby-portrait';
     img.src = ghost.img;
     img.alt = ghost.name;
     box.appendChild(img);
+  }
+
+  function captureButton(label, id, handler) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.id = id;
+    button.className = 'muenba-capture-action';
+    button.textContent = label;
+    button.addEventListener('click', handler);
+    return button;
+  }
+
+  function renderCaptureReady() {
+    if (!captureSession || !captureOverlay) return;
+    const ghost = captureSession.ghost;
+    const box = captureBox();
+    captureImage(box, ghost);
 
     const h2 = document.createElement('h2');
-    h2.textContent = 'Captured!';
+    h2.textContent = 'Capture ready';
     box.appendChild(h2);
-    const jp = document.createElement('p'); jp.className = 'jp';
-    jp.textContent = 'つかまえた！';
+    const jp = document.createElement('p');
+    jp.className = 'jp';
+    jp.textContent = 'つかまえる準備';
     box.appendChild(jp);
 
-    const p1 = document.createElement('p');
-    p1.textContent = `${ghost.name} is yours now. Nuppi will be glad to hear it.`;
-    box.appendChild(p1);
+    const p = document.createElement('p');
+    p.textContent = `You found ${ghost.name}. When you are ready, begin the capture sequence.`;
+    box.appendChild(p);
+
     const p2 = document.createElement('p');
     p2.className = 'jp-line';
-    p2.textContent = `${ghost.name}をつかまえたよ。ヌッピに教えてあげよう。`;
+    p2.textContent = `${ghost.name}を見つけたよ。準備ができたら、つかまえるよ。`;
     box.appendChild(p2);
-
-    const orbs = document.createElement('p');
-    orbs.className = 'muenba-capture-orbs';
-    orbs.textContent = `Energy orbs: ${mu.orbsCollected}`;
-    box.appendChild(orbs);
 
     const actions = document.createElement('div');
     actions.className = 'muenba-lobby-actions';
-    const ok = document.createElement('button');
-    ok.type = 'button';
-    ok.id = 'muenba-capture-ok';
-    ok.textContent = 'Nice!';
-    ok.addEventListener('click', closeCaptureOverlay);
-    actions.appendChild(ok);
+    actions.appendChild(captureButton('Begin rhythm', 'muenba-capture-begin', beginRhythmPlaceholder));
     box.appendChild(actions);
 
-    captureOverlay.appendChild(box);
     captureOverlay.classList.add('open');
   }
 
-  function closeCaptureOverlay() {
+  // Temporary Pass 8A endpoint. This proves the phase hand-off and keeps the
+  // save boundary honest until Pass 8B supplies real timing input. The
+  // function is deliberately named as a seam so the rhythm engine can
+  // replace its body without touching attemptCapture().
+  function beginRhythmPlaceholder() {
+    if (!captureSession || captureSession.phase !== 'ready') return;
+    captureSession.phase = 'playing';
+
+    const ghost = captureSession.ghost;
+    const box = captureBox();
+    captureImage(box, ghost);
+
+    const h2 = document.createElement('h2');
+    h2.textContent = 'Rhythm capture';
+    box.appendChild(h2);
+    const jp = document.createElement('p');
+    jp.className = 'jp';
+    jp.textContent = 'リズムでつかまえよう';
+    box.appendChild(jp);
+
+    const p = document.createElement('p');
+    p.textContent = 'The capture session is ready for the rhythm challenge.';
+    box.appendChild(p);
+
+    const p2 = document.createElement('p');
+    p2.className = 'jp-line';
+    p2.textContent = 'リズムゲームの準備ができました。';
+    box.appendChild(p2);
+
+    const actions = document.createElement('div');
+    actions.className = 'muenba-lobby-actions';
+    actions.appendChild(captureButton('Return to hunt', 'muenba-capture-cancel', cancelCaptureSession));
+    box.appendChild(actions);
+  }
+
+  function cancelCaptureSession() {
+    if (!captureOpen) return;
     captureOpen = false;
     state.captureResolving = false;
     if (captureOverlay) captureOverlay.classList.remove('open');
+
+    // Re-seed the room ghost after a soft miss/cancel. This does not write
+    // ghostsFound, huntJournal, or orbs, and the target remains available.
+    captureSession = null;
+    spawnRoomGhost(state.roomId);
+  }
+
+  // Pass 8B will call this only after a successful rhythm result. It remains
+  // separate from cancelCaptureSession() so success cannot accidentally
+  // respawn the just-captured target or clear a future reward state.
+  function closeCaptureOverlay({ resumeHunt = false } = {}) {
+    captureOpen = false;
+    state.captureResolving = false;
+    if (captureOverlay) captureOverlay.classList.remove('open');
+    captureSession = null;
+    if (resumeHunt) spawnRoomGhost(state.roomId);
   }
 
   function drawGhost(now) {
@@ -681,8 +740,8 @@
       .muenba-lobby-box p.jp-line { color:#8fa89b; font-size:.82rem; }
       .muenba-lobby-box p:last-of-type { margin-bottom:20px; }
       .muenba-lobby-actions { display:flex; justify-content:center; margin-top:4px; }
-      #muenba-lobby-begin { border:1px solid rgba(156,203,182,.7); color:#e0f4e9; background:rgba(52,104,78,.28); box-shadow:0 0 16px rgba(93,162,124,.22); border-radius:999px; padding:10px 28px; font:700 12px ui-monospace,monospace; letter-spacing:.05em; cursor:pointer; }
-      #muenba-lobby-begin:hover, #muenba-lobby-begin:focus-visible { background:rgba(52,104,78,.44); outline:none; }
+      #muenba-lobby-begin, .muenba-capture-action { border:1px solid rgba(156,203,182,.7); color:#e0f4e9; background:rgba(52,104,78,.28); box-shadow:0 0 16px rgba(93,162,124,.22); border-radius:999px; padding:10px 28px; font:700 12px ui-monospace,monospace; letter-spacing:.05em; cursor:pointer; }
+      #muenba-lobby-begin:hover, #muenba-lobby-begin:focus-visible, .muenba-capture-action:hover, .muenba-capture-action:focus-visible { background:rgba(52,104,78,.44); outline:none; }
       /* Briefing Q&A gate (Pass 4) — same overlay/box shell as the lobby
          briefing, just holding a quiz card or the target-ghost reveal
          instead of static copy. Not dismissible by clicking the backdrop
@@ -707,8 +766,9 @@
       #muenba-hide { position:fixed; left:12px; bottom:12px; z-index:100; border:1px solid rgba(156,203,182,.5); border-radius:8px; background:rgba(0,8,12,.78); color:#d8e8e0; padding:8px 16px; font:700 11px ui-monospace,monospace; letter-spacing:.05em; cursor:pointer; }
       #muenba-hide:hover, #muenba-hide:focus-visible { background:rgba(30,70,60,.8); outline:none; }
       #muenba-hide.active { background:rgba(93,162,124,.42); border-color:#5dd08c; color:#eafff2; }
-      /* Capture result overlay (Pass 7) — reuses .muenba-lobby-box for the
-         card shell (same as the briefing reveal) rather than new box CSS. */
+      /* Capture session overlay (Pass 8A) — reuses .muenba-lobby-box for the
+         card shell (same as the briefing reveal) while the rhythm phases are
+         added in the next pass. */
       #muenba-capture-overlay { position:fixed; inset:0; z-index:215; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,0); transition:background .4s ease; padding:20px; box-sizing:border-box; }
       #muenba-capture-overlay.open { display:flex; background:rgba(0,0,0,.86); }
       .muenba-capture-orbs { margin-top:-6px; color:#9ccbb6; font-size:.82rem; letter-spacing:.05em; }
