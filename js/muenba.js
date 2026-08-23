@@ -1248,6 +1248,15 @@
       #muenba-atmosphere { z-index:4; pointer-events:none; }
       #muenba-canvas { z-index:10; pointer-events:none; }
       #muenba-fade { z-index:30; background:#000; opacity:0; pointer-events:none; }
+      #muenba-rotate-overlay { display:none; position:fixed; inset:0; z-index:9999; background:#000; flex-direction:column; align-items:center; justify-content:center; gap:18px; text-align:center; padding:32px; box-sizing:border-box; }
+      @media screen and (orientation:portrait) and (max-width:1023px) { #muenba-rotate-overlay { display:flex !important; } }
+      .muenba-rotate-phone { display:inline-flex; align-items:center; justify-content:center; color:#d8f4e6; transform-origin:center; animation:muenbaRotateHint 2.4s ease-in-out infinite; }
+      @keyframes muenbaRotateHint { 0%,100% { transform:rotate(0deg); } 40%,60% { transform:rotate(-90deg); } }
+      .muenba-rotate-bar { width:120px; height:3px; border-radius:999px; background:linear-gradient(90deg,#477f6a,#a7e1c5,#477f6a); background-size:200%; animation:muenbaBarShimmer 2s linear infinite; box-shadow:0 0 14px rgba(122,210,170,.46); }
+      @keyframes muenbaBarShimmer { 0% { background-position:0%; } 100% { background-position:200%; } }
+      .muenba-rotate-title { font-family:system-ui,-apple-system,sans-serif; font-size:clamp(18px,5vw,28px); font-weight:900; letter-spacing:.04em; color:#f0fff7; margin:0; text-shadow:0 0 28px rgba(143,220,178,.52); }
+      .muenba-rotate-sub { font-size:14px; color:rgba(216,244,230,.62); margin:0; line-height:1.7; }
+      @media (prefers-reduced-motion: reduce) { .muenba-rotate-phone, .muenba-rotate-bar { animation:none; } }
       #muenba-dev { position:fixed; left:12px; top:12px; z-index:100; display:${DEV_MODE ? 'block' : 'none'}; color:#bde5e4; background:rgba(0,8,12,.88); border:1px solid rgba(125,220,216,.35); border-radius:10px; padding:9px 10px; font:700 11px/1.5 ui-monospace,monospace; pointer-events:auto; min-width:210px; box-shadow:0 0 20px rgba(0,0,0,.4); }
       #muenba-dev strong { color:#f0ffff; }
       #muenba-dev button { border:1px solid rgba(125,220,216,.4); border-radius:5px; background:rgba(10,40,40,.62); color:#bde5e4; padding:4px 7px; font:700 10px ui-monospace,monospace; cursor:pointer; }
@@ -1414,6 +1423,14 @@
       roomList.appendChild(button);
     }
     document.body.appendChild(roomList);
+
+    // Muenba is a landscape world like Karasuki and Utsuroba. In portrait,
+    // cover-scaling would hide the side exits, so give the player a clear
+    // orientation prompt instead of leaving a partially playable room.
+    const rotateOverlay = document.createElement('div');
+    rotateOverlay.id = 'muenba-rotate-overlay';
+    rotateOverlay.innerHTML = '<span class="muenba-rotate-phone" aria-hidden="true"><svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2.4"></rect><line x1="11" y1="18.4" x2="13" y2="18.4"></line></svg></span><div class="muenba-rotate-bar"></div><p class="muenba-rotate-title">Turn your device sideways!</p><p class="muenba-rotate-sub">ムエンバは<strong style="color:#a7e1c5">横画面</strong>で遊べるよ。<br>スマホを横にしてね。</p>';
+    document.body.appendChild(rotateOverlay);
 
     atmosphereCtx = atmosphereCanvas.getContext('2d');
     actorCtx = actorCanvas.getContext('2d');
