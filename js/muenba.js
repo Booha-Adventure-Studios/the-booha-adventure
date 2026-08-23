@@ -4,8 +4,8 @@
  * save/progress (Pass 6), and the ghost-hunting core loop (Pass 7): one
  * wandering ghost per room, an ignore-vs-chase behavior split, a Hide
  * button, and click-to-attempt capture. Pass 8A owns the explicit capture
- * session hand-off, and Pass 8B supplies the first two-lane rhythm capture;
- * the orb-return loop follows in Pass 8C.
+ * session hand-off, Pass 8B supplies the first two-lane rhythm capture, and
+ * Pass 8C/8D complete the orb-return loop and its testing/accessibility polish.
  */
 (() => {
   'use strict';
@@ -518,6 +518,9 @@
     if (captureOverlay) return;
     captureOverlay = document.createElement('div');
     captureOverlay.id = 'muenba-capture-overlay';
+    captureOverlay.setAttribute('role', 'dialog');
+    captureOverlay.setAttribute('aria-modal', 'true');
+    captureOverlay.setAttribute('aria-label', 'Muenba ghost capture');
     document.body.appendChild(captureOverlay);
     document.addEventListener('keydown', event => {
       if (event.key === 'Escape' && captureOpen) {
@@ -582,6 +585,13 @@
     return button;
   }
 
+  function focusCaptureControl(selector) {
+    window.setTimeout(() => {
+      const control = captureOverlay && captureOverlay.querySelector(selector);
+      if (control && typeof control.focus === 'function') control.focus();
+    }, 0);
+  }
+
   function renderCaptureReady() {
     if (!captureSession || !captureOverlay) return;
     const ghost = captureSession.ghost;
@@ -611,6 +621,7 @@
     box.appendChild(actions);
 
     captureOverlay.classList.add('open');
+    focusCaptureControl('#muenba-capture-begin');
   }
 
   function beginRhythmCapture() {
@@ -673,6 +684,7 @@
     status.className = 'muenba-rhythm-status';
     status.textContent = 'Get ready…';
     status.setAttribute('aria-live', 'polite');
+    status.setAttribute('role', 'status');
     box.appendChild(status);
     rhythm.statusEl = status;
 
@@ -743,6 +755,7 @@
     box.appendChild(actions);
 
     captureOverlay.classList.add('open');
+    focusCaptureControl('.muenba-rhythm-lane');
   }
 
   function tickRhythmCapture(now) {
@@ -955,8 +968,19 @@
 
     const actions = document.createElement('div');
     actions.className = 'muenba-lobby-actions';
+    if (!success) {
+      actions.appendChild(captureButton('Try rhythm again', 'muenba-capture-retry', retryRhythmCapture));
+    }
     actions.appendChild(captureButton('Return to hunt', 'muenba-capture-cancel', cancelCaptureSession));
     box.appendChild(actions);
+  }
+
+  function retryRhythmCapture() {
+    if (!captureSession || captureSession.phase !== 'result') return;
+    stopRhythmCapture();
+    captureSession.phase = 'ready';
+    captureSession.rhythm = null;
+    renderCaptureReady();
   }
 
   function renderCaptureReward() {
@@ -987,6 +1011,7 @@
     const status = document.createElement('p');
     status.className = 'muenba-orb-release-status';
     status.textContent = `Energy released: 0 / ${reward.total}`;
+    status.setAttribute('aria-live', 'polite');
     box.appendChild(status);
     reward.statusEl = status;
 
@@ -1003,6 +1028,7 @@
       if (reward.statusEl) reward.statusEl.textContent = `Energy released: ${reward.total} / ${reward.total}`;
       if (reward.actionsEl && !reward.actionsEl.children.length) {
         reward.actionsEl.appendChild(captureButton('Return to Nuppi', 'muenba-capture-return', depositOrbsAtNuppi));
+        focusCaptureControl('#muenba-capture-return');
       }
       return;
     }
@@ -1070,6 +1096,7 @@
       if (continueToBriefing) openBriefingQuiz();
     }));
     box.appendChild(actions);
+    focusCaptureControl('#muenba-capture-finish');
   }
 
   function openPendingOrbRecovery() {
@@ -1112,6 +1139,7 @@
     actions.appendChild(captureButton('Return orbs to Nuppi', 'muenba-capture-return', depositOrbsAtNuppi));
     box.appendChild(actions);
     captureOverlay.classList.add('open');
+    focusCaptureControl('#muenba-capture-return');
   }
 
   function cancelCaptureSession() {
@@ -1348,11 +1376,12 @@
 
     const dev = document.createElement('div');
     dev.id = 'muenba-dev';
-    dev.innerHTML = '<strong>MUENBA DEV</strong><br><span id="muenba-dev-text"></span><br><button id="muenba-dev-coords" type="button">COORDS ON</button><div class="muenba-dev-small">Coords mode: click to pin, movement paused</div><div id="muenba-dev-arrows" class="muenba-dev-arrows"></div>';
+    dev.innerHTML = '<strong>MUENBA DEV</strong><br><span id="muenba-dev-text"></span><br><button id="muenba-dev-coords" type="button">COORDS ON</button> <button id="muenba-dev-rhythm" type="button">RHYTHM TEST</button><div class="muenba-dev-small">Coords mode: click to pin, movement paused</div><div id="muenba-dev-arrows" class="muenba-dev-arrows"></div>';
     document.body.appendChild(dev);
     devReadout = document.getElementById('muenba-dev-text');
     devCoordToggle = document.getElementById('muenba-dev-coords');
     devArrowList = document.getElementById('muenba-dev-arrows');
+    document.getElementById('muenba-dev-rhythm').addEventListener('click', openDevRhythmTest);
     devCoordToggle.classList.toggle('active', state.coordMode);
     devCoordToggle.addEventListener('click', () => {
       state.coordMode = !state.coordMode;
@@ -1373,6 +1402,15 @@
 
     atmosphereCtx = atmosphereCanvas.getContext('2d');
     actorCtx = actorCanvas.getContext('2d');
+  }
+
+  function openDevRhythmTest() {
+    if (!DEV_MODE || captureOpen || lobbyOpen || briefingOpen || returnPortalOpen) return;
+    const ghost = state.targetGhost || getOrPickTodaysTargetGhost();
+    if (!ghost) return;
+    state.targetGhost = ghost;
+    state.captureResolving = true;
+    beginCaptureSession(ghost);
   }
 
   function resizeCanvas() {
