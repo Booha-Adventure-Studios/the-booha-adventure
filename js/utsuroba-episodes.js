@@ -78,6 +78,17 @@
     if (difficulty === 'fresh' && episode.fresh) {
       const merged = Object.assign({}, episode, episode.fresh);
       delete merged.fresh;
+      // mechanic and postcard mix shared branding (type/name; title/
+      // instruction) with tier-specific copy. A fresh block only overrides
+      // the copy, so these two go one level deeper instead of a flat
+      // object replace — everything else in .fresh is a full parallel
+      // array/object and replaces its base counterpart wholesale.
+      if (episode.mechanic && episode.fresh.mechanic) {
+        merged.mechanic = Object.assign({}, episode.mechanic, episode.fresh.mechanic);
+      }
+      if (episode.postcard && episode.fresh.postcard) {
+        merged.postcard = Object.assign({}, episode.postcard, episode.fresh.postcard);
+      }
       merged.difficulty = 'fresh';
       return merged;
     }
