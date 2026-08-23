@@ -257,6 +257,59 @@
     else console.info('[Muenba] 15-room data validation passed.');
   }
 
+  function validateCaseData() {
+    const errors = [];
+    const cases = DATA.cases && typeof DATA.cases === 'object' ? DATA.cases : {};
+    const order = Array.isArray(DATA.caseOrder) ? DATA.caseOrder : [];
+    const ghostIds = new Set((DATA.ghosts || []).map(ghost => ghost.id));
+    const japanese = /[\u3040-\u30ff\u3400-\u9fff]/;
+    const englishOnly = (value, label) => {
+      if (typeof value !== 'string' || !value.trim()) errors.push(`${label} must be non-empty text`);
+      else if (japanese.test(value)) errors.push(`${label} contains Japanese story text`);
+    };
+
+    if (!order.length) errors.push('caseOrder must contain at least one case');
+    const seenIds = new Set();
+    for (const caseId of order) {
+      if (seenIds.has(caseId)) errors.push(`caseOrder repeats ${caseId}`);
+      seenIds.add(caseId);
+      const caseData = cases[caseId];
+      if (!caseData) {
+        errors.push(`caseOrder points to missing ${caseId}`);
+        continue;
+      }
+      if (caseData.id !== caseId) errors.push(`${caseId} has mismatched id`);
+      if (!ghostIds.has(caseData.ghostId)) errors.push(`${caseId} points to missing ghost ${caseData.ghostId}`);
+      englishOnly(caseData.title, `${caseId}.title`);
+      englishOnly(caseData.eyebrow, `${caseId}.eyebrow`);
+      englishOnly(caseData.intro, `${caseId}.intro`);
+      for (const modeName of ['fresh', 'deep']) {
+        const mode = caseData[modeName];
+        if (!mode || !Array.isArray(mode.clues) || !mode.clues.length) {
+          errors.push(`${caseId}.${modeName} needs at least one clue`);
+          continue;
+        }
+        mode.clues.forEach((clue, index) => {
+          englishOnly(clue && clue.title, `${caseId}.${modeName}.clues[${index}].title`);
+          englishOnly(clue && clue.text, `${caseId}.${modeName}.clues[${index}].text`);
+        });
+        englishOnly(mode.prompt, `${caseId}.${modeName}.prompt`);
+        if (typeof mode.promptJP !== 'string' || !mode.promptJP.trim()) errors.push(`${caseId}.${modeName}.promptJP must be non-empty text`);
+        if (!Array.isArray(mode.choices) || !mode.choices.length) errors.push(`${caseId}.${modeName}.choices must be non-empty`);
+        else mode.choices.forEach((choice, index) => englishOnly(choice, `${caseId}.${modeName}.choices[${index}]`));
+        if (!Number.isInteger(mode.correct) || mode.correct < 0 || mode.correct >= (mode.choices || []).length) {
+          errors.push(`${caseId}.${modeName}.correct is out of range`);
+        }
+        englishOnly(mode.resolution, `${caseId}.${modeName}.resolution`);
+      }
+    }
+    Object.keys(cases).forEach(caseId => {
+      if (!seenIds.has(caseId)) errors.push(`${caseId} is missing from caseOrder`);
+    });
+    if (errors.length) console.error('[Muenba] Case contract validation failed:', errors);
+    else console.info(`[Muenba] ${order.length} case contract${order.length === 1 ? '' : 's'} passed.`);
+  }
+
   // Muenba-only deterministic helpers. They keep the cemetery layout and
   // ghost behavior stable for one calendar day without reading curriculum
   // content or participating in the site's daily check.
@@ -346,6 +399,27 @@
     }
     if (!mu.caseRecords || typeof mu.caseRecords !== 'object') {
       mu.caseRecords = {};
+      dirty = true;
+    }
+    if (!mu.caseProgress || typeof mu.caseProgress !== 'object') {
+      mu.caseProgress = { completedCaseIds: [], activeCaseId: null };
+      dirty = true;
+    }
+    if (!Array.isArray(mu.caseProgress.completedCaseIds)) {
+      mu.caseProgress.completedCaseIds = [];
+      dirty = true;
+    }
+    if (mu.caseProgress.activeCaseId !== null && typeof mu.caseProgress.activeCaseId !== 'string') {
+      mu.caseProgress.activeCaseId = null;
+      dirty = true;
+    }
+    const recordedCaseIds = Object.keys(mu.caseRecords).filter(caseId => {
+      const record = mu.caseRecords[caseId];
+      return record && record.completed;
+    });
+    const mergedCaseIds = [...new Set([...mu.caseProgress.completedCaseIds, ...recordedCaseIds])];
+    if (mergedCaseIds.length !== mu.caseProgress.completedCaseIds.length || mergedCaseIds.some((id, index) => id !== mu.caseProgress.completedCaseIds[index])) {
+      mu.caseProgress.completedCaseIds = mergedCaseIds;
       dirty = true;
     }
     if (!mu.rhythm || typeof mu.rhythm !== 'object') {
@@ -548,9 +622,31 @@
     beginCaptureSession(ghost);
   }
 
-  function caseForGhost(ghostId) {
+  function orderedMuenbaCases() {
     const cases = DATA.cases && typeof DATA.cases === 'object' ? DATA.cases : {};
-    return Object.values(cases).find(caseData => caseData && caseData.ghostId === ghostId) || null;
+    const ids = Array.isArray(DATA.caseOrder) ? DATA.caseOrder : Object.keys(cases);
+    return ids.map(caseId => cases[caseId]).filter(Boolean);
+  }
+
+  function completedMuenbaCaseIds() {
+    const mu = readMuenba();
+    const progressIds = mu.caseProgress && Array.isArray(mu.caseProgress.completedCaseIds)
+      ? mu.caseProgress.completedCaseIds
+      : [];
+    const recordIds = mu.caseRecords && typeof mu.caseRecords === 'object'
+      ? Object.keys(mu.caseRecords).filter(caseId => mu.caseRecords[caseId] && mu.caseRecords[caseId].completed)
+      : [];
+    return new Set([...progressIds, ...recordIds]);
+  }
+
+  function nextMuenbaCase() {
+    const completed = completedMuenbaCaseIds();
+    return orderedMuenbaCases().find(caseData => !completed.has(caseData.id)) || null;
+  }
+
+  function caseForGhost(ghostId) {
+    const next = nextMuenbaCase();
+    return next && next.ghostId === ghostId ? next : null;
   }
 
   function caseRecordComplete(caseData) {
@@ -1214,6 +1310,12 @@
         difficulty: captureSession.caseDifficulty,
         completedAt
       };
+      if (!mu.caseProgress || typeof mu.caseProgress !== 'object') {
+        mu.caseProgress = { completedCaseIds: [], activeCaseId: null };
+      }
+      if (!Array.isArray(mu.caseProgress.completedCaseIds)) mu.caseProgress.completedCaseIds = [];
+      if (!mu.caseProgress.completedCaseIds.includes(caseData.id)) mu.caseProgress.completedCaseIds.push(caseData.id);
+      mu.caseProgress.activeCaseId = null;
       journalEntry.caseId = caseData.id;
       journalEntry.caseDifficulty = captureSession.caseDifficulty;
       journalEntry.caseCompletedAt = completedAt;
@@ -1570,6 +1672,10 @@
       .muenba-lobby-box p { margin:0 0 14px; color:#c5d8cd; font-size:.92rem; line-height:1.65; text-align:left; }
       .muenba-lobby-box p.jp-line { color:#8fa89b; font-size:.82rem; }
       .muenba-lobby-box p:last-of-type { margin-bottom:20px; }
+      .muenba-lobby-case-board { margin:18px 0 20px; padding:13px 14px 12px; border:1px solid rgba(216,201,139,.28); border-radius:12px; background:rgba(216,201,139,.06); text-align:left; }
+      .muenba-lobby-case-board h3 { margin:0 0 8px; color:#e7dca9; font:700 .72rem/1.35 ui-monospace,monospace; letter-spacing:.1em; text-transform:uppercase; }
+      .muenba-lobby-case-board p { margin:0 0 5px; color:#fff5d5; font-size:.84rem; line-height:1.5; }
+      .muenba-lobby-case-board p.muenba-case-direction-jp { color:#9fc3af; font-size:.8rem; }
       .muenba-lobby-actions { display:flex; justify-content:center; margin-top:4px; }
       #muenba-lobby-begin, .muenba-capture-action { border:1px solid rgba(156,203,182,.7); color:#e0f4e9; background:rgba(52,104,78,.28); box-shadow:0 0 16px rgba(93,162,124,.22); border-radius:999px; padding:10px 28px; font:700 12px ui-monospace,monospace; letter-spacing:.05em; cursor:pointer; }
       #muenba-lobby-begin:hover, #muenba-lobby-begin:focus-visible, .muenba-capture-action:hover, .muenba-capture-action:focus-visible { background:rgba(52,104,78,.44); outline:none; }
@@ -2185,11 +2291,17 @@
         <p class="jp-line">${greetJp} ムエンバへようこそ戻ってきたね。</p>
         <p>Somewhere among these fifteen rooms, a ghost is hiding. Some won't notice you at all — others will come looking, and if one gets close, you can hide until it loses interest. When you see one, walk up and give it a tap.</p>
         <p class="jp-line">この15の部屋のどこかに、幽霊が隠れているよ。気づかない幽霊もいれば、追いかけてくる幽霊もいる。近づかれたら隠れて、興味をなくすのを待とう。見つけたら、そっと近づいてタップしてみて。</p>
+        <section class="muenba-lobby-case-board" aria-labelledby="muenba-case-board-title">
+          <h3 id="muenba-case-board-title">Nuppi's case board</h3>
+          <p id="muenba-case-board-copy"></p>
+          <p id="muenba-case-board-jp" class="muenba-case-direction-jp"></p>
+        </section>
         <div class="muenba-lobby-actions">
           <button id="muenba-lobby-begin" type="button">Let's begin</button>
         </div>
       </div>`;
     document.body.appendChild(lobbyOverlay);
+    refreshNuppiCaseBoard();
     document.getElementById('muenba-lobby-begin').addEventListener('click', () => {
       closeNuppiLobby();
       if (readMuenba().orbsPending > 0) openPendingOrbRecovery();
@@ -2199,11 +2311,29 @@
     });
   }
 
+  function refreshNuppiCaseBoard() {
+    if (!lobbyOverlay) return;
+    const copy = lobbyOverlay.querySelector('#muenba-case-board-copy');
+    const jp = lobbyOverlay.querySelector('#muenba-case-board-jp');
+    if (!copy || !jp) return;
+    const next = nextMuenbaCase();
+    if (next) {
+      const ghost = (DATA.ghosts || []).find(candidate => candidate.id === next.ghostId);
+      const ghostName = ghost ? ghost.name : next.ghostId;
+      copy.textContent = `Case ready: ${next.title}. Find ${ghostName} and untangle its energy.`;
+      jp.innerHTML = '<ruby>事件<rt>じけん</rt></ruby>の<ruby>準備<rt>じゅんび</rt></ruby>ができたよ。<ruby>幽霊<rt>ゆうれい</rt></ruby>を<ruby>探<rt>さが</rt></ruby>して、エネルギーを<ruby>解<rt>と</rt></ruby>こう。';
+    } else {
+      copy.textContent = 'The case board is quiet. Nuppi is waiting for the next strange ghost.';
+      jp.innerHTML = '<ruby>事件<rt>じけん</rt></ruby>ボードは<ruby>静<rt>しず</rt></ruby>かだよ。<ruby>次<rt>つぎ</rt></ruby>の<ruby>変<rt>へん</rt></ruby>な<ruby>幽霊<rt>ゆうれい</rt></ruby>を<ruby>待<rt>ま</rt></ruby>っているよ。';
+    }
+  }
+
   function openNuppiLobby() {
     if (lobbyOpen || !lobbyOverlay) return;
     lobbyOpen = true;
     state.clickTarget = null;
     state.moving = false;
+    refreshNuppiCaseBoard();
     lobbyOverlay.classList.add('open');
   }
 
@@ -2565,6 +2695,7 @@
       return;
     }
     validateData();
+    validateCaseData();
     injectStyles();
     buildApp();
     fitStage();
