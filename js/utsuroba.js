@@ -343,7 +343,30 @@
   function writeUtsuroba(utsuData) {
     const d = loadSave();
     d.utsuroba = { ...d.utsuroba, ...utsuData };
-    writeSave(d);
+    const ok = writeSave(d);
+    if (ok) invalidateDrifterStateCache();
+    return ok;
+  }
+
+  /* Pass 4 performance guard: drifter rendering runs every animation frame.
+     Keep one short-lived Utsuroba snapshot for read-only checks, then
+     invalidate it immediately whenever this module writes progress. */
+  let _drifterStateCache = null;
+  let _drifterStateCacheAt = 0;
+  const DRIFTER_STATE_CACHE_MS = 250;
+
+  function invalidateDrifterStateCache() {
+    _drifterStateCache = null;
+    _drifterStateCacheAt = 0;
+  }
+
+  function getCachedDrifterState() {
+    const now = performance.now();
+    if (!_drifterStateCache || now - _drifterStateCacheAt > DRIFTER_STATE_CACHE_MS) {
+      _drifterStateCache = readUtsuroba();
+      _drifterStateCacheAt = now;
+    }
+    return _drifterStateCache;
   }
 
   let _cachedQuest = null, _cachedQuestTime = 0;
@@ -428,15 +451,15 @@
   });
 
   function drifterRecord(id, utsu = null) {
-    const data = utsu || readUtsuroba();
+    const data = utsu || getCachedDrifterState();
     const record = data.drifters?.[id];
     return record && typeof record === 'object' ? record : { completed: [] };
   }
 
-  function drifterHasUnfinishedMemory(id) {
+  function drifterHasUnfinishedMemory(id, utsu = null) {
     const d = DATA.drifters.find(x => x.id === id);
     if (!d) return false;
-    const record = drifterRecord(id);
+    const record = drifterRecord(id, utsu);
     return (Array.isArray(record.completed) ? record.completed.length : 0) < d.memoryCount;
   }
 
@@ -460,6 +483,7 @@
     data.utsuroba.drifters[id].lastQuestWeek = getWeekSeed();
     data.utsuroba.drifters[id].weeklyStatus = status;
     const ok = writeSave(data);
+    if (ok) invalidateDrifterStateCache();
     if (ok && window.BoohaSync) BoohaSync.checkpoint('adventure');
     return ok;
   }
@@ -467,11 +491,11 @@
   function drifterHasMemories(id) {
     if (drifterIsWrong(id)) return false;
     if (drifterCompletedThisWeek(id) || drifterRestingThisWeek(id)) return false;
-    const utsu = readUtsuroba();
+    const utsu = getCachedDrifterState();
     const d    = DATA.drifters.find(x => x.id === id);
     if (!d) return false;
     /* A completed memory is replayable once per new curriculum week. */
-    return drifterHasUnfinishedMemory(id) || !!drifterRecord(id, utsu).completed.length;
+    return drifterHasUnfinishedMemory(id, utsu) || !!drifterRecord(id, utsu).completed.length;
   }
   function pickRandomMemory(id) {
     const utsu = readUtsuroba();
@@ -495,7 +519,7 @@
       state            : 'accepted',
       weekKey          : getWeekSeed(),
       memIdx,
-      replay           : !drifterHasUnfinishedMemory(id),
+      replay           : !drifterHasUnfinishedMemory(id, data.utsuroba),
       episodeId        : drifter && drifter.episodeId ? drifter.episodeId : null,
       readingState     : 'locked',
       trailIndex       : 0,
@@ -510,6 +534,7 @@
     data.utsuroba.drifters[id].weeklyStatus = 'active';
     const ok = writeSave(data);
     invalidateQuestCache();
+    if (ok) invalidateDrifterStateCache();
     if (ok && window.BoohaSync) BoohaSync.checkpoint('adventure');
     return ok ? data.weekly.drifterQuest : null;
   }
@@ -586,6 +611,7 @@
     if (data.weekly) data.weekly.drifterQuest = null;
     const ok = writeSave(data);
     invalidateQuestCache();
+    if (ok) invalidateDrifterStateCache();
     if (ok && window.BoohaSync) BoohaSync.checkpoint('adventure');
     return ok;
   }
@@ -593,17 +619,19 @@
   function clearQuest() {
     const data = loadSave();
     if (data.weekly) data.weekly.drifterQuest = null;
-    writeSave(data); invalidateQuestCache();
+    const ok = writeSave(data); invalidateQuestCache();
+    if (ok) invalidateDrifterStateCache();
   }
 
   function markDrifterWrong(id) {
     const data = loadSave();
     if (!data.utsuroba.drifters[id]) data.utsuroba.drifters[id] = { completed: [] };
     data.utsuroba.drifters[id].wrongWeek = getWeekSeed();
-    writeSave(data);
+    const ok = writeSave(data);
+    if (ok) invalidateDrifterStateCache();
   }
   function drifterIsWrong(id) {
-    const utsu = readUtsuroba();
+    const utsu = getCachedDrifterState();
     return (utsu.drifters?.[id]?.wrongWeek ?? -1) === getWeekSeed();
   }
 
@@ -1215,7 +1243,7 @@
 
   function drifterMemoryRestored(drifter) {
     const episodeId = drifter && drifter.episodeId;
-    return !!(episodeId && readUtsuroba().readingEchoes?.[episodeId]);
+    return !!(episodeId && getCachedDrifterState().readingEchoes?.[episodeId]);
   }
 
   function renderMemoryEchoes() {
