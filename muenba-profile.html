@@ -23,7 +23,6 @@
     shaped to light up once Pass 6 starts writing real values into:
       data.muenba.ghostsFound     — { <ghostId>: true, ... }
       data.muenba.orbsCollected   — number
-      data.muenba.briefingsPassed — number
       data.muenba.visitedRooms    — { <roomId>: true, ... }
       data.muenba.huntJournal.entries — [{ ghostId, capturedAt, ... }, ...]
     (Field names are a Pass 5 best guess for Pass 6 to adopt or revise —
@@ -279,7 +278,6 @@
         const ghosts = Array.isArray(window.MUENBA_DATA?.ghosts) ? window.MUENBA_DATA.ghosts : [];
         const found = mu.ghostsFound && typeof mu.ghostsFound === 'object' ? mu.ghostsFound : {};
         const orbs = typeof mu.orbsCollected === 'number' ? mu.orbsCollected : 0;
-        const briefings = typeof mu.briefingsPassed === 'number' ? mu.briefingsPassed : 0;
         const rooms = mu.visitedRooms && typeof mu.visitedRooms === 'object'
           ? Object.keys(mu.visitedRooms).length : 0;
         const journal = Array.isArray(mu.huntJournal?.entries) ? mu.huntJournal.entries : [];
@@ -308,7 +306,7 @@
           <section class="stats" aria-label="Muenba totals">
             <div class="stat"><div class="stat-value">${foundCount} / ${ghosts.length}</div><div class="stat-label">Ghosts found</div><span class="stat-jp">つかまえた<ruby>幽霊<rt>ゆうれい</rt></ruby></span></div>
             <div class="stat"><div class="stat-value">${orbs}</div><div class="stat-label">Orbs collected</div><span class="stat-jp"><ruby>集<rt>あつ</rt></ruby>めたエネルギー</span></div>
-            <div class="stat"><div class="stat-value">${briefings}</div><div class="stat-label">Briefings passed</div><span class="stat-jp"><ruby>合格<rt>ごうかく</rt></ruby>したブリーフィング</span></div>
+            <div class="stat"><div class="stat-value">${journal.length}</div><div class="stat-label">Hunts recorded</div><span class="stat-jp"><ruby>記録<rt>きろく</rt></ruby>した<ruby>探索<rt>たんさく</rt></ruby></span></div>
             <div class="stat"><div class="stat-value">${rooms}</div><div class="stat-label">Rooms visited</div><span class="stat-jp"><ruby>訪<rt>おとず</rt></ruby>れた<ruby>部屋<rt>へや</rt></ruby></span></div>
           </section>
 
