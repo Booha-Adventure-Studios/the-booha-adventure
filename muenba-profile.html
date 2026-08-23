@@ -169,10 +169,14 @@
     .journal-case-ghost { margin: 7px 0 0; color: var(--muted); font: .72rem/1.4 var(--sans); letter-spacing: .03em; }
     .case-record-grid { display: grid; gap: 12px; }
     .case-record-card { padding: 16px; border-left: 3px solid var(--gold); background: rgba(216,201,139,.06); }
+    .case-record-card.is-next { border-left-color: var(--moss); background: rgba(143,220,178,.07); }
+    .case-record-card.is-locked { border-left-color: rgba(143,220,178,.2); opacity: .72; }
     .case-record-card h3 { margin: 0; color: #fff5d5; font-size: 1.05rem; font-weight: 400; }
     .case-record-card small { display: block; margin-top: 5px; color: var(--quiet); font: .68rem/1.4 var(--sans); letter-spacing: .06em; text-transform: uppercase; }
     .case-record-card ol { margin: 13px 0 0; padding-left: 21px; color: #f2e8c7; }
     .case-record-card li { margin: 7px 0; padding-left: 4px; font-size: .86rem; line-height: 1.5; }
+    .case-queue-copy { margin: 13px 0 0; color: var(--muted); font-size: .88rem; line-height: 1.55; }
+    .case-queue-copy small { margin-top: 7px; color: var(--quiet); font-size: .84em; letter-spacing: 0; text-transform: none; }
     .journal-meta { margin: 9px 0 0; color: var(--muted); font: .67rem/1.4 var(--sans); }
     .journal-empty { margin: 0; color: var(--muted); font-size: .9rem; line-height: 1.55; }
     .journal-empty small { display: block; margin-top: 6px; color: var(--quiet); font-size: .82em; }
@@ -285,24 +289,48 @@
         const mu = data.muenba || {};
         const ghosts = Array.isArray(window.MUENBA_DATA?.ghosts) ? window.MUENBA_DATA.ghosts : [];
         const cases = window.MUENBA_DATA?.cases && typeof window.MUENBA_DATA.cases === 'object' ? window.MUENBA_DATA.cases : {};
+        const caseOrder = (Array.isArray(window.MUENBA_DATA?.caseOrder) ? window.MUENBA_DATA.caseOrder : Object.keys(cases))
+          .map(caseId => cases[caseId]).filter(Boolean);
         const found = mu.ghostsFound && typeof mu.ghostsFound === 'object' ? mu.ghostsFound : {};
         const orbs = typeof mu.orbsCollected === 'number' ? mu.orbsCollected : 0;
         const caseRecords = mu.caseRecords && typeof mu.caseRecords === 'object' ? mu.caseRecords : {};
-        const completedCases = Object.entries(caseRecords).filter(([, record]) => record && record.completed);
+        const progressIds = Array.isArray(mu.caseProgress?.completedCaseIds) ? mu.caseProgress.completedCaseIds : [];
+        const completedIds = new Set([
+          ...progressIds,
+          ...Object.keys(caseRecords).filter(caseId => caseRecords[caseId] && caseRecords[caseId].completed)
+        ]);
+        const completedCases = caseOrder.filter(caseData => completedIds.has(caseData.id));
+        const nextCase = caseOrder.find(caseData => !completedIds.has(caseData.id)) || null;
         const rooms = mu.visitedRooms && typeof mu.visitedRooms === 'object'
           ? Object.keys(mu.visitedRooms).length : 0;
         const journal = Array.isArray(mu.huntJournal?.entries) ? mu.huntJournal.entries : [];
         const foundCount = ghosts.filter(g => found[g.id]).length;
 
-        const caseRecordMarkup = completedCases.length
-          ? `<div class="case-record-grid">${completedCases.map(([caseId, record]) => {
-              const caseData = cases[caseId];
-              if (!caseData) return '';
-              const mode = caseData[record.difficulty] || caseData.fresh;
-              return `<article class="case-record-card">
+        const caseRecordMarkup = caseOrder.length
+          ? `<div class="case-record-grid">${caseOrder.map((caseData, index) => {
+              const record = caseRecords[caseData.id] || {};
+              const isCompleted = completedIds.has(caseData.id);
+              const isNext = nextCase && nextCase.id === caseData.id;
+              const ghost = ghosts.find(candidate => candidate.id === caseData.ghostId);
+              if (isCompleted) {
+                const mode = caseData[record.difficulty] || caseData.fresh;
+                return `<article class="case-record-card">
+                  <h3>${esc(caseData.title)}</h3>
+                  <small>Case ${index + 1} · ${esc(record.difficulty || 'fresh')} memory · case settled</small>
+                  <ol>${(mode?.clues || []).map(clue => `<li><strong>${esc(clue.title)}</strong><br>${esc(clue.text)}</li>`).join('')}</ol>
+                </article>`;
+              }
+              if (isNext) {
+                return `<article class="case-record-card is-next">
+                  <h3>${esc(caseData.title)}</h3>
+                  <small>Case ${index + 1} · next case · ${esc(ghost?.name || caseData.ghostId)}</small>
+                  <p class="case-queue-copy">Find ${esc(ghost?.name || caseData.ghostId)} in Muenba to open this case.<small>ムエンバで<ruby>幽霊<rt>ゆうれい</rt></ruby>を<ruby>探<rt>さが</rt></ruby>して、この<ruby>事件<rt>じけん</rt></ruby>を<ruby>開<rt>ひら</rt></ruby>こう。</small></p>
+                </article>`;
+              }
+              return `<article class="case-record-card is-locked">
                 <h3>${esc(caseData.title)}</h3>
-                <small>${esc(record.difficulty || 'fresh')} memory · case settled</small>
-                <ol>${(mode?.clues || []).map(clue => `<li><strong>${esc(clue.title)}</strong><br>${esc(clue.text)}</li>`).join('')}</ol>
+                <small>Case ${index + 1} · waiting</small>
+                <p class="case-queue-copy">This case will open after the earlier case is settled.</p>
               </article>`;
             }).join('')}</div>`
           : `<p class="journal-empty">No case records yet.<small>Complete a ghost case to place its English record here.</small></p>`;
@@ -332,7 +360,7 @@
           <section class="stats" aria-label="Muenba totals">
             <div class="stat"><div class="stat-value">${foundCount} / ${ghosts.length}</div><div class="stat-label">Ghosts found</div><span class="stat-jp">つかまえた<ruby>幽霊<rt>ゆうれい</rt></ruby></span></div>
             <div class="stat"><div class="stat-value">${orbs}</div><div class="stat-label">Orbs collected</div><span class="stat-jp"><ruby>集<rt>あつ</rt></ruby>めたエネルギー</span></div>
-            <div class="stat"><div class="stat-value">${completedCases.length}</div><div class="stat-label">Case records</div><span class="stat-jp"><ruby>事件<rt>じけん</rt></ruby>の<ruby>記録<rt>きろく</rt></ruby></span></div>
+            <div class="stat"><div class="stat-value">${completedCases.length} / ${caseOrder.length}</div><div class="stat-label">Case records</div><span class="stat-jp"><ruby>事件<rt>じけん</rt></ruby>の<ruby>記録<rt>きろく</rt></ruby></span></div>
             <div class="stat"><div class="stat-value">${rooms}</div><div class="stat-label">Rooms visited</div><span class="stat-jp"><ruby>訪<rt>おとず</rt></ruby>れた<ruby>部屋<rt>へや</rt></ruby></span></div>
           </section>
 
