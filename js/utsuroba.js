@@ -1044,6 +1044,22 @@
          panel, thank-you panel, and wrong-memory toast. That file also
          fixes the old mobile-bigger-than-desktop max-height bug. See
          claude/utsuroba-audit-and-pass-plan.md, Round 2. */
+      /* Thank-you panel: was the default edge-to-edge bottom sheet
+         (.utsu-card with no .is-floating), which read as huge next to
+         the compact centered orb reading panel. .ty-panel reuses
+         .is-floating's compact sizing and centers it the same way the
+         orb panel centers itself, so the two feel like one family — the
+         eyebrow label and the portrait's one-time halo flash are what
+         keep this one reading as "quest complete" rather than "read a
+         clue". */
+      .utsu-card.is-floating.ty-panel{top:50%;bottom:auto;
+        transform:translate(-50%,-50%) scale(.94);
+        transition:transform .5s cubic-bezier(.34,1.56,.64,1);}
+      .utsu-card.is-floating.ty-panel.open{transform:translate(-50%,-50%) scale(1);}
+      .ty-eyebrow{font-size:clamp(.6rem,1.7vw,.68rem);letter-spacing:.14em;
+        text-transform:uppercase;color:#9a7850;margin:0 0 8px;opacity:.85;
+        font-family:'Georgia',serif;}
+      .ty-panel .ty-line{font-size:clamp(1rem,3vw,1.2rem);font-weight:700;color:#1e140a;}
     `;
     document.head.appendChild(s);
   }
@@ -2390,7 +2406,7 @@
   function showThankYouPanel(drifter) {
     const ty = THANK_YOU[drifter.id] || { en:'Thank you!', jp:'ありがとう！', readings:{} };
     const panel = document.createElement('div');
-    panel.className = 'utsu-card';
+    panel.className = 'utsu-card is-floating ty-panel';
     if (window.UtsuCard) {
       const motif = window.UtsuCard.motifForDrifter(drifter);
       panel.style.setProperty('--card-ring', window.UtsuCard.ringFor(motif));
@@ -2398,17 +2414,21 @@
     }
     panel.innerHTML = `
       <div class="dp-handle"></div>
-      <div class="dp-inner" style="max-width:480px;margin:0 auto;padding-bottom:20px;">
-        <div class="dp-portrait" style="width:clamp(60px,12vw,92px);height:clamp(60px,12vw,92px);">
-          <img src="${drifter.sprite2}" alt="${escapeHTML(drifter.name)}">
+      <div class="dp-inner" style="max-width:480px;margin:0 auto;flex-direction:column;align-items:center;text-align:center;padding-bottom:clamp(20px,5vw,30px);">
+        <p class="ty-eyebrow">Memory delivered ${furiJP('届いたよ', { '届いた': 'とどいた' })}</p>
+        <div class="dp-portrait-wrap" style="margin-bottom:6px;">
+          <span class="dp-portrait-halo"></span>
+          <div class="dp-portrait" style="width:clamp(64px,13vw,88px);height:clamp(64px,13vw,88px);">
+            <img src="${drifter.sprite2}" alt="${escapeHTML(drifter.name)}">
+          </div>
         </div>
-        <div class="dp-body">
+        <div class="dp-body" style="width:100%;">
           <p class="dp-name-en">${escapeHTML(drifter.name)}</p>
           <p class="dp-name-kanji">${drifterNameJP(drifter)}</p>
-          <div class="dp-divider"></div>
-          <p class="dp-line-en">${escapeHTML(ty.en)}</p>
+          <div class="dp-divider" style="margin-left:auto;margin-right:auto;"></div>
+          <p class="dp-line-en ty-line">${escapeHTML(ty.en)}</p>
           ${ty.jp ? `<p class="dp-line-jp">${furiJP(ty.jp, ty.readings)}</p>` : ''}
-          <div class="dp-btns"><button class="dp-btn no" id="ty-close-btn">Close / ${furiJP('閉じる', { '閉じる': 'とじる' })}</button></div>
+          <div class="dp-btns" style="justify-content:center;"><button class="dp-btn no" id="ty-close-btn">Close / ${furiJP('閉じる', { '閉じる': 'とじる' })}</button></div>
         </div>
       </div>`;
     document.body.appendChild(panel);
