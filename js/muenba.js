@@ -81,10 +81,14 @@
   music.volume = 0.55;
 
   function worldGateOpen() {
+    // Deliberately NOT the weekly world gate — Muenba is still being built,
+    // so it stays locked for real students no matter how many games they
+    // finish this week. Only the ?dev=1 URL / window.__devMuenba bypass, or
+    // BoohaUnlockSystem.isMuenbaUnlocked() once that flag ships, opens it.
     if (DEV_MODE || window.__devMuenba) return true;
     return window.BoohaUnlockSystem &&
-      typeof BoohaUnlockSystem.isWeeklyWorldGateOpen === 'function'
-      ? BoohaUnlockSystem.isWeeklyWorldGateOpen()
+      typeof BoohaUnlockSystem.isMuenbaUnlocked === 'function'
+      ? BoohaUnlockSystem.isMuenbaUnlocked()
       : false;
   }
 
@@ -103,13 +107,26 @@
       .muenba-lock a:hover,.muenba-lock a:focus-visible{background:rgba(111,166,145,.22);outline:none;}
     `;
     document.head.appendChild(style);
-    document.body.innerHTML = `<main class="muenba-lock" aria-labelledby="muenba-lock-title"><img src="assets/img/muenba/muenba_logo.png" alt="Muenba"><h1 id="muenba-lock-title">This world is locked</h1><p class="jp">この世界は封印されています</p><p>Something waits beyond the cemetery path.<small>Complete the weekly world gate before Muenba opens.</small></p><a href="karasuki.html">Return to Karasuki</a></main>`;
+    document.body.innerHTML = `<main class="muenba-lock" aria-labelledby="muenba-lock-title"><img src="assets/img/muenba/muenba_logo.png" alt="Muenba"><h1 id="muenba-lock-title">This world is locked</h1><p class="jp">この世界は封印されています</p><p>Something waits beyond the cemetery path.<small>This path isn't open yet.</small></p><a href="karasuki.html">Return to Karasuki</a></main>`;
   }
 
   function startMusic() {
     if (state.musicStarted) return;
     state.musicStarted = true;
     music.play().catch(() => { state.musicStarted = false; });
+  }
+
+  // Stopgap return path (Pass 0). Reads the same 'muenba_return_room' key
+  // enterMuenba() in karasuki.js already writes on the way in, so it lands
+  // back in the right room via karasuki.js's own checkReturnFromMuenba().
+  // Pass 2 replaces this floating button with a proper in-world return.
+  function returnToKarasuki() {
+    try { music.pause(); } catch (_) {}
+    fadeEl.style.transition = `opacity ${FADE_MS}ms ease-in`;
+    fadeEl.style.opacity = '1';
+    window.setTimeout(() => {
+      window.location.href = 'karasuki.html';
+    }, FADE_MS + 60);
   }
 
   function validateData() {
@@ -150,6 +167,11 @@
       #muenba-room-list { position:fixed; right:12px; bottom:12px; z-index:100; display:${DEV_MODE ? 'flex' : 'none'}; flex-wrap:wrap; justify-content:flex-end; gap:4px; max-width:330px; }
       #muenba-room-list button { border:1px solid rgba(125,220,216,.35); border-radius:5px; background:rgba(0,8,12,.8); color:#bde5e4; padding:4px 6px; font:700 10px ui-monospace,monospace; cursor:pointer; }
       #muenba-room-list button:hover { background:rgba(30,80,84,.8); }
+      /* Stopgap exit button — Pass 2 replaces this with a proper in-world
+         return. Kept deliberately plain so it never gets mistaken for a
+         piece of the finished world. */
+      #muenba-exit { position:fixed; right:12px; top:12px; z-index:100; border:1px solid rgba(180,200,192,.4); border-radius:8px; background:rgba(0,8,12,.78); color:#d8e8e0; padding:7px 12px; font:700 11px ui-monospace,monospace; letter-spacing:.04em; cursor:pointer; }
+      #muenba-exit:hover, #muenba-exit:focus-visible { background:rgba(30,70,60,.8); outline:none; }
       @media (prefers-reduced-motion: reduce) { #muenba-fade { transition:none !important; } }
     `;
     document.head.appendChild(style);
@@ -171,6 +193,13 @@
     stage.append(roomLayer, atmosphereCanvas, actorCanvas, fadeEl);
     app.appendChild(stage);
     document.body.replaceChildren(app);
+
+    const exitBtn = document.createElement('button');
+    exitBtn.id = 'muenba-exit';
+    exitBtn.type = 'button';
+    exitBtn.textContent = 'Exit to Karasuki';
+    exitBtn.addEventListener('click', returnToKarasuki);
+    document.body.appendChild(exitBtn);
 
     const dev = document.createElement('div');
     dev.id = 'muenba-dev';
