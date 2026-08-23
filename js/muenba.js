@@ -73,7 +73,20 @@
   let lastTouchEnd = 0;
   let entryDrift = null;
   let pins = [];
+  let motes = [];
+  let moteSprite = null;
   const imageCache = new Map();
+  const roomGlowCache = new Map();
+  const roomGlowRgbCache = new Map();
+  // Two soft light pools per room (near the up-hallway opening and a
+  // broader ambient wash lower down) — identical placement across rooms
+  // since the corridor framing is identical; only the color (from each
+  // room's ATMOSPHERE.glow) changes.
+  const GLOW_SPOTS = [
+    { x: 767, y: 300, r: 260 },
+    { x: 800, y: 560, r: 320 }
+  ];
+  const MOTE_COUNT = 6;
   const ghostImg = new Image();
   ghostImg.src = 'assets/img/booha_ghost.png';
   const music = new Audio('assets/img/muenba/muenba_BGM.mp3');
@@ -272,6 +285,120 @@
     fctx.fillRect(0, 0, fogTexture.width, fogTexture.height);
   }
 
+  // ── Per-room eerie glow + spirit motes ──────────────────────────────────
+  // Every gradient below is built ONCE (cached in a Map, or lazily once for
+  // the shared mote sprite) and reused with drawImage() every frame after
+  // that. This is the same trick the Maze/Utsuroba passes already used to
+  // keep createRadialGradient() off the per-frame hot path — cheap however
+  // many rooms get visited in a session.
+
+  function hexToRgb(hex) {
+    const n = parseInt(hex.replace('#', ''), 16);
+    return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
+  }
+
+  function lightenRgb(rgb, amt) {
+    return {
+      r: Math.round(rgb.r + (255 - rgb.r) * amt),
+      g: Math.round(rgb.g + (255 - rgb.g) * amt),
+      b: Math.round(rgb.b + (255 - rgb.b) * amt)
+    };
+  }
+
+  function roomGlowHex(roomId) {
+    return (DATA.rooms[roomId].atmosphere && DATA.rooms[roomId].atmosphere.glow) || '#5a7a8a';
+  }
+
+  function getRoomGlow(roomId) {
+    if (roomGlowCache.has(roomId)) return roomGlowCache.get(roomId);
+    const rgb = hexToRgb(roomGlowHex(roomId));
+    const canvas = document.createElement('canvas');
+    canvas.width = WORLD_W;
+    canvas.height = WORLD_H;
+    const gctx = canvas.getContext('2d');
+    GLOW_SPOTS.forEach(spot => {
+      const grad = gctx.createRadialGradient(spot.x, spot.y, 0, spot.x, spot.y, spot.r);
+      grad.addColorStop(0, `rgba(${rgb.r},${rgb.g},${rgb.b},.32)`);
+      grad.addColorStop(.55, `rgba(${rgb.r},${rgb.g},${rgb.b},.12)`);
+      grad.addColorStop(1, `rgba(${rgb.r},${rgb.g},${rgb.b},0)`);
+      gctx.fillStyle = grad;
+      gctx.beginPath();
+      gctx.arc(spot.x, spot.y, spot.r, 0, Math.PI * 2);
+      gctx.fill();
+    });
+    roomGlowCache.set(roomId, canvas);
+    return canvas;
+  }
+
+  // Lightened version of the same color, used for the exit arrows — the raw
+  // glow hex is tuned to sit low and moody as ambient light, but needs a
+  // boost to still read clearly as a UI element against a dark room.
+  function getRoomGlowRgb(roomId) {
+    if (roomGlowRgbCache.has(roomId)) return roomGlowRgbCache.get(roomId);
+    const rgb = lightenRgb(hexToRgb(roomGlowHex(roomId)), .42);
+    roomGlowRgbCache.set(roomId, rgb);
+    return rgb;
+  }
+
+  function getMoteSprite() {
+    if (moteSprite) return moteSprite;
+    const c = document.createElement('canvas');
+    c.width = 28;
+    c.height = 28;
+    const g = c.getContext('2d');
+    const grad = g.createRadialGradient(14, 14, 0, 14, 14, 14);
+    grad.addColorStop(0, 'rgba(224,238,232,.85)');
+    grad.addColorStop(.5, 'rgba(196,220,214,.30)');
+    grad.addColorStop(1, 'rgba(196,220,214,0)');
+    g.fillStyle = grad;
+    g.beginPath();
+    g.arc(14, 14, 14, 0, Math.PI * 2);
+    g.fill();
+    moteSprite = c;
+    return c;
+  }
+
+  // Motes are pure functions of elapsed time (no per-frame position
+  // mutation) — reseeding a room just picks new base points and restarts
+  // the clock, so there's nothing to update() every tick, only draw().
+  function reseedMotes(roomId) {
+    const now = performance.now();
+    const next = [];
+    for (let i = 0; i < MOTE_COUNT; i++) {
+      next.push({
+        baseX: 420 + Math.random() * 700,
+        baseY: 380 + Math.random() * 420,
+        phase: Math.random() * Math.PI * 2,
+        swayAmp: 10 + Math.random() * 14,
+        swayFreq: .4 + Math.random() * .3,
+        speed: 10 + Math.random() * 10,
+        range: 160 + Math.random() * 140,
+        size: 1.6 + Math.random() * 1.8,
+        baseAlpha: .35 + Math.random() * .3,
+        twinkleFreq: .6 + Math.random() * .6,
+        startedAt: now - Math.random() * 5000
+      });
+    }
+    motes = next;
+    void roomId; // motes don't vary by room identity, only by fresh random seed
+  }
+
+  function drawMotes(now) {
+    const sprite = getMoteSprite();
+    motes.forEach(m => {
+      const t = (now - m.startedAt) / 1000;
+      const y = m.baseY - ((t * m.speed) % m.range);
+      const x = m.baseX + Math.sin(t * m.swayFreq + m.phase) * m.swayAmp;
+      const twinkle = .5 + .5 * Math.sin(t * m.twinkleFreq + m.phase * 2);
+      const alpha = m.baseAlpha * (.55 + twinkle * .45);
+      const size = m.size * 8;
+      atmosphereCtx.save();
+      atmosphereCtx.globalAlpha = alpha;
+      atmosphereCtx.drawImage(sprite, x - size / 2, y - size / 2, size, size);
+      atmosphereCtx.restore();
+    });
+  }
+
   function getRoom() { return DATA.rooms[state.roomId]; }
 
   function getImage(roomId) {
@@ -313,6 +440,7 @@
     state.transitionReadyAt = performance.now() + TRANSITION_COOLDOWN_MS;
     state.spawnLockUntil = performance.now() + 700;
     showRoom(roomId);
+    reseedMotes(roomId);
     renderDevArrowList();
     beginEntryDrift();
   }
@@ -445,6 +573,9 @@
     if (reveal <= 0) return;
     const backDir = state.arrivalDir ? OPPOSITE[state.arrivalDir] : null;
     const seconds = now / 1000;
+    const glow = getRoomGlowRgb(state.roomId);
+    const glowStr = `${glow.r},${glow.g},${glow.b}`;
+    const coreStr = `${Math.min(255, glow.r + 35)},${Math.min(255, glow.g + 35)},${Math.min(255, glow.b + 35)}`;
     exits.forEach((exit, index) => {
       const hiddenUntil = exit.dir === backDir
         ? state.spawnLockUntil + ARRIVAL_ARROW_BACK_DELAY_MS
@@ -452,15 +583,32 @@
       if (now < hiddenUntil) return;
       const fade = Math.min(1, (now - hiddenUntil) / 450) * reveal;
       const angle = DIR_ANGLE[exit.dir] || 0;
-      const pulse = .5 + .5 * Math.sin(seconds * 2.2 + index);
-      const bounce = Math.sin(seconds * 2.2 + index) * 5;
+      // Two overlapping sine waves (instead of one smooth pulse) read as an
+      // unsteady, slightly ghostly flicker rather than a mechanical glow.
+      const flicker = .68 + .2 * Math.sin(seconds * 1.9 + index) + .12 * Math.sin(seconds * 6.3 + index * 2.4);
+      const bounce = Math.sin(seconds * 1.5 + index) * 6;
       const x = exit.x + Math.cos(angle) * bounce;
       const y = exit.y + Math.sin(angle) * bounce;
+
+      // Faint spectral trail behind the arrowhead — two small dots, no
+      // extra gradients, cheap.
       actorCtx.save();
       actorCtx.translate(x, y);
       actorCtx.rotate(angle);
-      actorCtx.globalAlpha = fade * (.7 + pulse * .2);
-      actorCtx.strokeStyle = '#d2f0df';
+      for (let t = 1; t <= 2; t++) {
+        actorCtx.globalAlpha = fade * flicker * (.15 / t);
+        actorCtx.fillStyle = `rgb(${glowStr})`;
+        actorCtx.beginPath();
+        actorCtx.arc(-t * 13, 0, 5 - t, 0, Math.PI * 2);
+        actorCtx.fill();
+      }
+      actorCtx.restore();
+
+      actorCtx.save();
+      actorCtx.translate(x, y);
+      actorCtx.rotate(angle);
+      actorCtx.globalAlpha = fade * (.55 + flicker * .35);
+      actorCtx.strokeStyle = `rgb(${glowStr})`;
       actorCtx.lineWidth = 3;
       actorCtx.lineCap = 'round';
       actorCtx.lineJoin = 'round';
@@ -469,10 +617,10 @@
       actorCtx.lineTo(0, 0);
       actorCtx.lineTo(-15, 10);
       actorCtx.stroke();
-      actorCtx.globalAlpha = fade * (.22 + pulse * .12);
-      actorCtx.fillStyle = '#c8f6e1';
+      actorCtx.globalAlpha = fade * (.16 + flicker * .16);
+      actorCtx.fillStyle = `rgb(${coreStr})`;
       actorCtx.beginPath();
-      actorCtx.arc(0, 0, 32 + pulse * 8, 0, Math.PI * 2);
+      actorCtx.arc(0, 0, 30 + flicker * 10, 0, Math.PI * 2);
       actorCtx.fill();
       actorCtx.restore();
     });
@@ -514,6 +662,19 @@
     atmosphereCtx.fillRect(0, 0, WORLD_W, WORLD_H);
     atmosphereCtx.fillStyle = profile.tint;
     atmosphereCtx.fillRect(0, 0, WORLD_W, WORLD_H);
+
+    // Room's eerie glow — cached gradient, screen-blended, slow uneven
+    // pulse so it breathes instead of sitting static.
+    const roomSeed = state.roomId.charCodeAt(state.roomId.length - 1);
+    const glowPulse = .78 + .22 * Math.sin(now / 2100 + roomSeed);
+    atmosphereCtx.save();
+    atmosphereCtx.globalAlpha = glowPulse;
+    atmosphereCtx.globalCompositeOperation = 'screen';
+    atmosphereCtx.drawImage(getRoomGlow(state.roomId), 0, 0);
+    atmosphereCtx.restore();
+
+    drawMotes(now);
+
     if (fogTexture && profile.fog > 0) {
       state.fogX = (state.fogX + .12) % 780;
       const fogAlpha = profile.fog * (.78 + .22 * Math.sin(now / 2600));
