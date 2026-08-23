@@ -833,14 +833,14 @@ const HAPPY_HOUSE_PORTAL = {
     orbPanelEl.innerHTML = `
       <div class="dp-handle"></div>
       <div class="dp-inner" style="max-width:480px;margin:0 auto;">
-        <div class="dp-body" style="text-align:center;">
-          <button id="orb-panel-close" class="dp-close-x">✕</button>
+        <div class="dp-body" style="text-align:center;" role="dialog" aria-modal="true" aria-labelledby="orb-panel-title" aria-describedby="orb-panel-fragment">
+          <button id="orb-panel-close" class="dp-close-x" aria-label="Close memory reading">✕</button>
           <h2 id="orb-panel-title" style="font-size:clamp(1.12rem,3.4vw,1.42rem);font-weight:700;color:#1e140a;margin:0 0 1px;">Read the memory</h2>
           <p id="orb-panel-subtitle" class="dp-line-jp" style="margin-bottom:2px;">${furi('記憶を読もう', { '記憶': 'きおく', '読もう': 'よもう' })}</p>
           <p id="orb-panel-memory-title" style="margin:0 0 8px;color:#806040;font-size:clamp(.68rem,1.7vw,.78rem);line-height:1.35;"></p>
           <div class="dp-divider" style="margin-left:auto;margin-right:auto;"></div>
-          <p id="orb-panel-fragment" style="max-width:460px;margin:0 auto 4px;min-height:1.6em;font-size:clamp(1.18rem,3.6vw,1.5rem);font-weight:700;color:#1e140a;line-height:1.58;letter-spacing:.01em;"></p>
-          <div id="orb-panel-actions" style="opacity:0;transition:opacity .3s;">
+          <p id="orb-panel-fragment" aria-live="polite" style="max-width:460px;margin:0 auto 4px;min-height:1.6em;font-size:clamp(1.18rem,3.6vw,1.5rem);font-weight:700;color:#1e140a;line-height:1.58;letter-spacing:.01em;"></p>
+          <div id="orb-panel-actions" aria-hidden="true" style="opacity:0;pointer-events:none;transition:opacity .3s;">
             <p class="dp-status" style="margin-top:6px;">Read the clue, then carry it along the trail.<br>${furi('手がかりを読んで、記憶の道に持っていきましょう。', { '手がかり': 'てがかり', '読んで': 'よんで', '記憶': 'きおく', '道': 'みち', '持っていきましょう': 'もっていきましょう' })}</p>
             <div class="dp-btns" style="justify-content:center;">
               <button id="orb-collect-btn" class="dp-btn yes">TAKE THE CLUE<span class="orb-panel-btn-jp" style="display:block;margin-top:3px;font-size:.86em;font-weight:400;letter-spacing:0;">${furi('手がかりを持つ', { '手がかり': 'てがかり', '持つ': 'もつ' })}</span></button>
@@ -877,12 +877,20 @@ const HAPPY_HOUSE_PORTAL = {
     const fragment = document.getElementById('orb-panel-fragment');
     const actions  = document.getElementById('orb-panel-actions');
     if (fragment) fragment.textContent = fragment.dataset.fullText || '';
-    if (actions) actions.style.opacity = '0';
+    if (actions) {
+      actions.style.opacity = '0';
+      actions.style.pointerEvents = 'none';
+      actions.setAttribute('aria-hidden', 'true');
+    }
     if (revealActions) {
       /* Let the finished sentence sit alone briefly before the controls
          arrive, so the reading task does not visually compete with them. */
       orbRevealTimer = setTimeout(() => {
-        if (orbPanelOpen && actions) actions.style.opacity = '1';
+        if (orbPanelOpen && actions) {
+          actions.style.opacity = '1';
+          actions.style.pointerEvents = 'auto';
+          actions.setAttribute('aria-hidden', 'false');
+        }
       }, 900);
     }
   }
@@ -905,14 +913,27 @@ const HAPPY_HOUSE_PORTAL = {
     orbPanelEl.style.setProperty('--card-ring', colors.shadow);
     orbPanelEl.style.setProperty('--card-glow', `rgba(${colors.glowRGBA},.45)`);
     requestAnimationFrame(() => requestAnimationFrame(() => orbPanelEl.classList.add('open')));
+    requestAnimationFrame(() => document.getElementById('orb-panel-close')?.focus());
     state.clickTarget = null;
 
     clearTimeout(orbTypeTimer);
     clearTimeout(orbRevealTimer);
     const fullText = entry ? entry.text : '';
     if (fragment) { fragment.textContent = ''; fragment.dataset.fullText = fullText; }
-    if (actions) actions.style.opacity = '0';
-    if (!fullText) { orbTypeDone = true; if (actions) actions.style.opacity = '1'; return; }
+    if (actions) {
+      actions.style.opacity = '0';
+      actions.style.pointerEvents = 'none';
+      actions.setAttribute('aria-hidden', 'true');
+    }
+    if (!fullText) {
+      orbTypeDone = true;
+      if (actions) {
+        actions.style.opacity = '1';
+        actions.style.pointerEvents = 'auto';
+        actions.setAttribute('aria-hidden', 'false');
+      }
+      return;
+    }
     orbTypeDone = false;
     const CHAR_MS = 72;
     let i = 0;
