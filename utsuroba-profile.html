@@ -187,6 +187,29 @@
       .drifter-grid { grid-template-columns: 1fr; }
       .drifter-card { min-height: 140px; }
     }
+    /* ── Reading difficulty toggle ───────────────────── */
+    .difficulty-card { padding: 17px 19px; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); }
+    .difficulty-toggle { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+    .difficulty-option {
+      display: inline-flex; flex-direction: column; align-items: flex-start; gap: 3px; flex: 1 1 160px;
+      padding: 11px 15px; border: 1px solid rgba(216,168,255,.28); border-radius: 12px;
+      color: #f1eaff; font: 700 .82rem/1.2 var(--font); text-align: left; cursor: pointer;
+      background: linear-gradient(180deg, rgba(216,168,255,.1), rgba(10,7,17,.4));
+      transition: color .18s, border-color .18s, background .18s, transform .18s, box-shadow .18s;
+    }
+    .difficulty-option small { color: var(--quiet); font: .7rem/1.3 var(--sans); letter-spacing: .06em; }
+    .difficulty-option:hover, .difficulty-option:focus-visible {
+      color: var(--ink); border-color: var(--violet); background: var(--violet-soft); outline: none; transform: translateY(-1px);
+    }
+    .difficulty-option.is-active {
+      color: #fff8ff; border-color: #e4cfff;
+      background: linear-gradient(180deg, rgba(216,168,255,.28), rgba(216,168,255,.1));
+      box-shadow: 0 3px 0 rgba(0,0,0,.28), 0 0 16px rgba(216,168,255,.28), inset 0 1px rgba(255,255,255,.18);
+    }
+    .difficulty-option.is-active small { color: #d6cbe9; }
+    .difficulty-note { margin: 12px 2px 0; color: var(--muted); font-size: .82rem; line-height: 1.55; }
+    .difficulty-note small { display: block; margin-top: 4px; color: var(--quiet); font-size: .82em; }
+
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
     }
@@ -264,8 +287,46 @@
         } catch (_) { return 'traveller'; }
       }
 
-      function episodeFor(id) {
-        return window.UTSUROBA_EPISODES && window.UTSUROBA_EPISODES[id];
+      function episodeFor(id, difficulty) {
+        return window.UTSUROBA_EPISODES_RESOLVE
+          ? window.UTSUROBA_EPISODES_RESOLVE(id, difficulty)
+          : (window.UTSUROBA_EPISODES && window.UTSUROBA_EPISODES[id]);
+      }
+
+      function getDifficulty() {
+        return window.UTSUROBA_READING_DIFFICULTY ? window.UTSUROBA_READING_DIFFICULTY() : 'deep';
+      }
+
+      function setDifficulty(value) {
+        if (value !== 'fresh' && value !== 'deep') return;
+        try {
+          const data = getSave();
+          if (!data.utsuroba) data.utsuroba = {};
+          if (data.utsuroba.readingDifficulty === value) return;
+          data.utsuroba.readingDifficulty = value;
+          if (window.BoohaAdventure && BoohaAdventure.save) BoohaAdventure.save.save(data);
+        } catch (_) {}
+        render();
+      }
+
+      function difficultyMarkup() {
+        const current = getDifficulty();
+        const note = current === 'fresh'
+          ? 'The same stories, told in shorter, simpler words.'
+          : 'The full stories, the way they were first written.';
+        const noteJP = current === 'fresh'
+          ? '同じ物語を、短くやさしい言葉で伝えます。'
+          : '最初に書かれたままの、完全な物語です。';
+        return `<section class="section">
+          <div class="section-heading"><h2>How This Reads</h2><p>読み方</p></div>
+          <div class="difficulty-card">
+            <div class="difficulty-toggle" role="group" aria-label="Reading difficulty">
+              <button type="button" class="difficulty-option${current === 'fresh' ? ' is-active' : ''}" data-difficulty="fresh" aria-pressed="${current === 'fresh'}">Fresh Memory<small>${rb('新', 'あたら')}しい${rb('記憶', 'きおく')}</small></button>
+              <button type="button" class="difficulty-option${current === 'deep' ? ' is-active' : ''}" data-difficulty="deep" aria-pressed="${current === 'deep'}">Deep Memory<small>${rb('深', 'ふか')}い${rb('記憶', 'きおく')}</small></button>
+            </div>
+            <p class="difficulty-note">${esc(note)}<small>${esc(noteJP)}</small></p>
+          </div>
+        </section>`;
       }
 
       function renderWorldBack() {
@@ -308,7 +369,8 @@
 
         const drifterCards = drifters.map(drifter => {
           const restored = restoredFor(utsu, drifter);
-          const episode = episodeFor(drifter.episodeId);
+          const echo = utsu.readingEchoes && utsu.readingEchoes[drifter.episodeId];
+          const episode = episodeFor(drifter.episodeId, echo && echo.difficulty);
           const story = restored
             ? (episode?.success || 'A memory has settled.')
             : 'A memory is still waiting somewhere in Utsuroba.';
@@ -324,7 +386,7 @@
 
         const journalMarkup = journal.length
           ? `<div class="journal-list">${journal.slice(0, 8).map(entry => {
-              const episode = episodeFor(entry.episodeId);
+              const episode = episodeFor(entry.episodeId, entry.difficulty);
               const drifter = drifters.find(item => item.id === entry.drifterId);
               return `<article class="journal-entry">
                 <h3>${esc(episode?.title || entry.episodeId || 'Untitled memory')}<small>${esc(episode?.titleJP || drifter?.nameKanji || '')}</small></h3>
@@ -338,6 +400,8 @@
           : `<p class="journal-empty">No words collected yet.<small>${rb('物語', 'ものがたり')}の<ruby>言葉<rt>ことば</rt></ruby>が、ここに${rb('集', 'あつ')}まります。</small></p>`;
 
         host.innerHTML = `
+          ${difficultyMarkup()}
+
           <section class="stats" aria-label="Utsuroba totals">
             <div class="stat"><div class="stat-value">${Object.keys(echoes).length}</div><div class="stat-label">Memories restored</div><span class="stat-jp">${rb('戻', 'もど')}った${rb('記憶', 'きおく')}</span></div>
             <div class="stat"><div class="stat-value">${journal.length}</div><div class="stat-label">Journal entries</div><span class="stat-jp"><ruby>読書<rt>どくしょ</rt></ruby>ノート</span></div>
@@ -363,6 +427,10 @@
             <div class="panel"><div class="section-heading"><h2>Reading Journal</h2><p><ruby>読書<rt>どくしょ</rt></ruby>ノート</p></div>${journalMarkup}</div>
             <div class="panel"><div class="section-heading"><h2>Word Cabinet</h2><p><ruby>言葉<rt>ことば</rt></ruby>の<ruby>戸棚<rt>とだな</rt></ruby></p></div><div class="cabinet-count">${cabinet.length}</div><p class="cabinet-label">words kept from remembered stories</p>${wordMarkup}</div>
           </section>`;
+
+        host.querySelectorAll('[data-difficulty]').forEach(button => {
+          button.addEventListener('click', () => setDifficulty(button.dataset.difficulty));
+        });
       }
 
       function boot() {

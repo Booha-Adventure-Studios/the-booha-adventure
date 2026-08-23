@@ -260,7 +260,9 @@
     let episode;
     try {
       await window.UTSUROBA_EPISODES_READY;
-      episode = window.UTSUROBA_EPISODES[opts.quest && opts.quest.episodeId];
+      episode = window.UTSUROBA_EPISODES_RESOLVE
+        ? window.UTSUROBA_EPISODES_RESOLVE(opts.quest && opts.quest.episodeId)
+        : window.UTSUROBA_EPISODES[opts.quest && opts.quest.episodeId];
       if (!episode) throw new Error(`Unknown episode: ${opts.quest && opts.quest.episodeId}`);
     } catch (error) {
       console.error('[Utsuroba Reading] Could not open episode:', error);
