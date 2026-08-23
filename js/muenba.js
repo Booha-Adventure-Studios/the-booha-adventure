@@ -1314,6 +1314,7 @@
          or Escape — it's a gate, not a message. */
       #muenba-briefing-overlay { position:fixed; inset:0; z-index:220; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,0); transition:background .4s ease; padding:20px; box-sizing:border-box; }
       #muenba-briefing-overlay.open { display:flex; background:rgba(0,0,0,.88); }
+      #muenba-briefing-overlay.open .muenba-lobby-box { transform:scale(1); opacity:1; }
       .muenba-briefing-box { text-align:left; }
       .muenba-briefing-box h2 { text-align:center; }
       .muenba-briefing-box > .jp { text-align:center; }
@@ -1337,6 +1338,7 @@
          rhythm board inside that modal. */
       #muenba-capture-overlay { position:fixed; inset:0; z-index:215; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,0); transition:background .4s ease; padding:20px; box-sizing:border-box; }
       #muenba-capture-overlay.open { display:flex; background:rgba(0,0,0,.86); }
+      #muenba-capture-overlay.open .muenba-lobby-box { transform:scale(1); opacity:1; }
       .muenba-capture-orbs { margin-top:-6px; color:#9ccbb6; font-size:.82rem; letter-spacing:.05em; }
       .muenba-capture-action { touch-action:manipulation; }
       .muenba-rhythm-status { min-height:1.5em; margin:2px 0 2px !important; color:#d8f2e2 !important; font:700 1.08rem/1.4 ui-monospace,monospace !important; text-align:center !important; letter-spacing:.08em; }
