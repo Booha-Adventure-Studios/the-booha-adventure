@@ -164,10 +164,9 @@
     };
   }
 
-  // The first 5 huntable ghosts (Pass 4), pulled out here so both muenba.js
-  // (the briefing gate's target pick) and muenba-profile.html (the case-file
-  // roster, Pass 5) read the exact same list instead of two copies drifting
-  // apart. File names ARE their ids, per how they were delivered, except
+  // The first 5 huntable ghosts live here so both muenba.js and
+  // muenba-profile.html read the exact same list instead of two copies
+  // drifting apart. File names ARE their ids, per how they were delivered, except
   // tinklet/"Tinkley": the file on disk is tinklet.png, so that's what's
   // wired here with "Tinkley" kept only as the display name — flag if either
   // should change to match the other.
