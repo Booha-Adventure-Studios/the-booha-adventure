@@ -236,6 +236,9 @@
     rooms,
     ghosts: GHOSTS,
     cases: CASES,
+    // Cases unlock in this order. Keeping progression explicit lets Nuppi's
+    // board and the capture flow share one contract as more ghosts arrive.
+    caseOrder: ['fuzzle_case_01'],
     ghostAngryChangeImg: GHOST_ANGRY_CHANGE_IMG
   };
 })();
