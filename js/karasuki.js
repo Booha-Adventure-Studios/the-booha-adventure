@@ -86,6 +86,14 @@ const HAPPY_HOUSE_PORTAL = {
     href    : "utsuroba.html",
   };
 
+  const MUENBA_PORTAL = {
+    roomId : "room_13",
+    x      : 1182,
+    y      : 305,
+    r      : 44,
+    href   : "muenba.html?from=karasuki",
+  };
+
   const ARRIVAL_ARROW_DELAY_MS        = 2000;
   const ARRIVAL_ARROW_BACK_MULTIPLIER = 3;
   const TRANSITION_COOLDOWN_MS        = 1400;
@@ -102,6 +110,7 @@ const HAPPY_HOUSE_PORTAL = {
   let   bonusPopCooldownUntil       = 0;
   let   wandererPopCooldownUntil    = 0;
   let   utsurobaCooldownUntil       = 0;
+  let   muenbaCooldownUntil         = 0;
   let   observerPopCooldownUntil    = 0;
 
   /* ═══════════════════════════════════════════
@@ -2077,6 +2086,89 @@ const HAPPY_HOUSE_PORTAL = {
   }
 
   /* ═══════════════════════════════════════════
+     MUENBA PORTAL
+  ═══════════════════════════════════════════ */
+  function drawMuenbaOrb(now) {
+    if (state.roomId !== MUENBA_PORTAL.roomId) return;
+    const sec = now / 1000;
+    const moveReveal = Math.max(0.18, Math.min(1, state.distMovedSinceSpawn / ARROW_MOVE_THRESHOLD));
+    const pulse = 0.5 + 0.5 * Math.sin(sec * 1.65);
+    const pulse2 = 0.5 + 0.5 * Math.sin(sec * 2.7 + 1.2);
+    const bob = Math.sin(sec * 1.25) * 3;
+    const cx = MUENBA_PORTAL.x;
+    const cy = MUENBA_PORTAL.y + bob;
+
+    ctx.save();
+    ctx.globalAlpha = moveReveal;
+
+    // Almost-black haze: visible against the cemetery without becoming a
+    // bright waypoint. The thin cold rim is the readable edge.
+    const haze = ctx.createRadialGradient(cx, cy, 2, cx, cy, 78 + pulse * 9);
+    haze.addColorStop(0, 'rgba(0,0,0,0.46)');
+    haze.addColorStop(0.38, 'rgba(12,5,20,0.24)');
+    haze.addColorStop(0.72, 'rgba(48,19,58,0.10)');
+    haze.addColorStop(1, 'transparent');
+    ctx.globalAlpha = moveReveal * (0.72 + pulse * 0.16);
+    ctx.fillStyle = haze;
+    ctx.beginPath(); ctx.arc(cx, cy, 78 + pulse * 9, 0, Math.PI * 2); ctx.fill();
+
+    ctx.globalAlpha = moveReveal * (0.34 + pulse2 * 0.18);
+    ctx.strokeStyle = '#9b7da9';
+    ctx.lineWidth = 1.4;
+    ctx.beginPath(); ctx.arc(cx, cy, 30 + pulse2 * 5, 0, Math.PI * 2); ctx.stroke();
+
+    const coreR = 16 + pulse * 3;
+    const core = ctx.createRadialGradient(cx - 5, cy - 6, 1, cx, cy, coreR);
+    core.addColorStop(0, '#30243a');
+    core.addColorStop(0.25, '#0d0912');
+    core.addColorStop(0.82, '#020205');
+    core.addColorStop(1, '#000000');
+    ctx.globalAlpha = moveReveal * (0.92 + pulse * 0.06);
+    ctx.fillStyle = core;
+    ctx.shadowBlur = 18 + pulse * 12;
+    ctx.shadowColor = 'rgba(76,36,92,0.72)';
+    ctx.beginPath(); ctx.arc(cx, cy, coreR, 0, Math.PI * 2); ctx.fill();
+    ctx.shadowBlur = 0;
+
+    ctx.globalAlpha = moveReveal * (0.24 + pulse2 * 0.18);
+    ctx.fillStyle = '#cbb2d5';
+    ctx.beginPath(); ctx.arc(cx - coreR * 0.32, cy - coreR * 0.34, 2.2, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
+
+  function enterMuenba() {
+    if (state.muenbaExiting) return;
+    state.muenbaExiting = true;
+    state.clickTarget = null;
+    state.moving = false;
+    try { sessionStorage.setItem('muenba_return_room', 'room_13'); } catch (_) {}
+    try { music.pause(); music.currentTime = 0; } catch (_) {}
+    const fadeEl = document.getElementById('kara-fade');
+    fadeEl.style.transition = `opacity ${FADE_MS}ms ease-in`;
+    fadeEl.style.opacity = '1';
+    setTimeout(() => {
+      window.location.href = MUENBA_PORTAL.href;
+    }, FADE_MS + 60);
+  }
+
+  function checkMuenbaPortal() {
+    if (state.roomId !== MUENBA_PORTAL.roomId) return;
+    if (performance.now() < muenbaCooldownUntil) return;
+    if (state.distMovedSinceSpawn < ARROW_MOVE_THRESHOLD) return;
+    if (Math.hypot(state.x - MUENBA_PORTAL.x, state.y - MUENBA_PORTAL.y) <= MUENBA_PORTAL.r) enterMuenba();
+  }
+
+  function clickCheckMuenbaPortal(worldX, worldY) {
+    if (state.roomId !== MUENBA_PORTAL.roomId) return false;
+    if (performance.now() < muenbaCooldownUntil) return false;
+    if (Math.hypot(worldX - MUENBA_PORTAL.x, worldY - MUENBA_PORTAL.y) <= MUENBA_PORTAL.r) {
+      enterMuenba();
+      return true;
+    }
+    return false;
+  }
+
+  /* ═══════════════════════════════════════════
      STATE
   ═══════════════════════════════════════════ */
   const state = {
@@ -2090,7 +2182,7 @@ const HAPPY_HOUSE_PORTAL = {
     spawnId: "default", x: 742, y: 717, spawnX: 742, spawnY: 717,
     arrivalDir: null, transitioning: false, transitionReadyAt: 0,
     clickTarget: null, moving: false, distMovedSinceSpawn: 0,
-    mazeExiting: false, coordMode: false, musicStarted: false,
+    mazeExiting: false, muenbaExiting: false, coordMode: false, musicStarted: false,
     
     lastTrailT: 0, spawnLockUntil: 0, tapCooldownUntil: 0, lastTapPos: null,
   };
@@ -2104,6 +2196,15 @@ const HAPPY_HOUSE_PORTAL = {
       const ret = sessionStorage.getItem('utsuroba_return_room');
       if (!ret) return;
       sessionStorage.removeItem('utsuroba_return_room');
+      if (DATA.rooms[ret]) { state.roomId = ret; state.spawnId = 'default'; }
+    } catch (_) {}
+  })();
+
+  (function checkReturnFromMuenba() {
+    try {
+      const ret = sessionStorage.getItem('muenba_return_room');
+      if (!ret) return;
+      sessionStorage.removeItem('muenba_return_room');
       if (DATA.rooms[ret]) { state.roomId = ret; state.spawnId = 'default'; }
     } catch (_) {}
   })();
@@ -2778,7 +2879,7 @@ const HAPPY_HOUSE_PORTAL = {
       ctx.globalAlpha=1; p.life-=0.022; p.x+=p.vx; p.y+=p.vy;
     }
     trail=trail.filter(p=>p.life>0);
-    drawPortalOrb(now); drawExitArrows(now); drawMazeExitArrow(now); drawHappyHouseOrb(now);
+    drawPortalOrb(now); drawMuenbaOrb(now); drawExitArrows(now); drawMazeExitArrow(now); drawHappyHouseOrb(now);
     drawBonusTrees(now); drawUtsurobPortalMarker(now); drawWanderers(now); drawObserver(now); drawOrbs(now); drawNuppi(now);
     
     const bobFreq=(Math.PI*2)/(HOVER_PERIOD/1000); const bobPhase=sec*bobFreq;
@@ -2822,6 +2923,7 @@ const HAPPY_HOUSE_PORTAL = {
     return (
       state.transitioning        ||
       state.mazeExiting          ||
+      state.muenbaExiting        ||
       isPortalOpen()             ||
       isBonusPopOpen()           ||
       isWandererPopOpen()        ||
@@ -2875,6 +2977,7 @@ function tick(now) {
     }
 
     if (spawnUnlocked) checkUtsuobaPortal();
+    if (spawnUnlocked) checkMuenbaPortal();
     if (spawnUnlocked) checkHappyHousePortal();
 
     if (spawnUnlocked) {
@@ -3461,6 +3564,7 @@ function drawObserver(now) {
     if(clickCheckOrbs(p.x,p.y)){ripples.push({x:p.x,y:p.y,life:1});return;}
     if(isNearPortal(p)){openPortal();ripples.push({x:p.x,y:p.y,life:1});return;}
     if(clickCheckUtsuobaPortal(p.x,p.y)){ripples.push({x:p.x,y:p.y,life:1});return;}
+    if(clickCheckMuenbaPortal(p.x,p.y)){ripples.push({x:p.x,y:p.y,life:1});return;}
     if(clickCheckWanderers(p.x,p.y)){ripples.push({x:p.x,y:p.y,life:1});return;}
     if(clickBonusTree(p.x,p.y)){ripples.push({x:p.x,y:p.y,life:1});return;}
     
