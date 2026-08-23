@@ -685,17 +685,32 @@ const HAPPY_HOUSE_PORTAL = {
     if (trailHudEl) return;
     trailHudEl = document.createElement('div');
     trailHudEl.id = 'memory-trail-hud';
-    trailHudEl.className = 'utsu-hud-chip is-left is-trail is-passive';
+    trailHudEl.className = 'memory-trail-hud-shell';
     trailHudEl.style.display = 'none';
     const R = window.UtsuFurigana ? window.UtsuFurigana.rb : (kanji) => kanji;
     trailHudEl.innerHTML = `
-      <div class="utsu-hud-chip-icon"><span aria-hidden="true">❖</span></div>
-      <div class="utsu-hud-chip-count" id="trail-hud-count"></div>
-      <div class="utsu-hud-chip-text">
-        <span class="utsu-hud-chip-primary" id="trail-hud-hint"></span>
-        <span class="utsu-hud-chip-secondary" id="trail-hud-hint-jp"></span>
-        <span class="utsu-hud-chip-nav" id="trail-hud-nav">Follow the gold arrows / ${R('金色','きんいろ')}の${R('矢印','やじるし')}について${R('行','い')}こう</span>
+      <div class="utsu-hud-chip is-left is-trail is-passive">
+        <div class="utsu-hud-chip-icon"><span aria-hidden="true">❖</span></div>
+        <div class="utsu-hud-chip-count" id="trail-hud-count"></div>
+        <div class="utsu-hud-chip-text">
+          <span class="utsu-hud-chip-primary" id="trail-hud-hint"></span>
+          <span class="utsu-hud-chip-secondary" id="trail-hud-hint-jp"></span>
+        </div>
+      </div>
+      <div class="utsu-hud-chip-nav-below" id="trail-hud-nav">
+        <span class="trail-hud-nav-en">Follow the gold arrows</span>
+        <span class="trail-hud-nav-jp">${R('金色','きんいろ')}の${R('矢印','やじるし')}について${R('行','い')}こう</span>
       </div>`;
+    const style = document.createElement('style');
+    style.textContent = `
+      #memory-trail-hud{position:fixed;left:14px;top:14px;z-index:7000;display:flex;flex-direction:column;align-items:flex-start;gap:6px;max-width:min(340px,calc(100vw - 28px));pointer-events:none;}
+      #memory-trail-hud>.utsu-hud-chip{position:static;left:auto;top:auto;max-width:100%;}
+      #memory-trail-hud .utsu-hud-chip-nav-below{display:none;max-width:100%;padding:6px 11px 7px 15px;clip-path:polygon(10px 0,100% 0,100% 100%,0 100%,0 9px);background:rgba(29,19,6,.92);border:1px solid rgba(255,217,102,.42);box-shadow:0 0 12px rgba(180,130,10,.18);color:#fff3d2;font:700 .76rem/1.35 Georgia,serif;}
+      #memory-trail-hud .utsu-hud-chip-nav-below.is-shown{display:flex;flex-direction:column;}
+      #memory-trail-hud .trail-hud-nav-jp{display:block;margin-top:2px;color:rgba(255,244,207,.68);font-size:.9em;font-weight:400;}
+      @media(max-width:700px){#memory-trail-hud{left:9px;top:9px;max-width:calc(100vw - 18px);}#memory-trail-hud>.utsu-hud-chip{max-width:100%;}}
+    `;
+    document.head.appendChild(style);
     document.body.appendChild(trailHudEl);
   }
 
@@ -820,15 +835,16 @@ const HAPPY_HOUSE_PORTAL = {
       <div class="dp-inner" style="max-width:480px;margin:0 auto;">
         <div class="dp-body" style="text-align:center;">
           <button id="orb-panel-close" class="dp-close-x">✕</button>
-          <h2 id="orb-panel-title" style="font-size:clamp(1.08rem,3.2vw,1.32rem);font-weight:700;color:#1e140a;margin:0 0 1px;">You found a memory box!</h2>
-          <p id="orb-panel-subtitle" class="dp-line-jp" style="margin-bottom:8px;">記憶の箱を見つけた！</p>
+          <h2 id="orb-panel-title" style="font-size:clamp(1.12rem,3.4vw,1.42rem);font-weight:700;color:#1e140a;margin:0 0 1px;">Read the memory</h2>
+          <p id="orb-panel-subtitle" class="dp-line-jp" style="margin-bottom:2px;">${furi('記憶を読もう', { '記憶': 'きおく', '読もう': 'よもう' })}</p>
+          <p id="orb-panel-memory-title" style="margin:0 0 8px;color:#806040;font-size:clamp(.68rem,1.7vw,.78rem);line-height:1.35;"></p>
           <div class="dp-divider" style="margin-left:auto;margin-right:auto;"></div>
-          <p id="orb-panel-fragment" style="max-width:440px;margin:0 auto 4px;min-height:1.6em;font-size:clamp(1.08rem,3.2vw,1.32rem);font-weight:700;color:#1e140a;line-height:1.5;"></p>
+          <p id="orb-panel-fragment" style="max-width:460px;margin:0 auto 4px;min-height:1.6em;font-size:clamp(1.18rem,3.6vw,1.5rem);font-weight:700;color:#1e140a;line-height:1.58;letter-spacing:.01em;"></p>
           <div id="orb-panel-actions" style="opacity:0;transition:opacity .3s;">
             <p class="dp-status" style="margin-top:6px;">Read the clue, then carry it along the trail.<br>${furi('手がかりを読んで、記憶の道に持っていきましょう。', { '手がかり': 'てがかり', '読んで': 'よんで', '記憶': 'きおく', '道': 'みち', '持っていきましょう': 'もっていきましょう' })}</p>
             <div class="dp-btns" style="justify-content:center;">
-              <button id="orb-collect-btn" class="dp-btn yes">TAKE THE CLUE / ${furi('手がかりを持つ', { '手がかり': 'てがかり', '持つ': 'もつ' })}</button>
-              <button id="orb-leave-btn" class="dp-btn no">LEAVE BOX / ${furi('箱を残す', { '箱': 'はこ', '残す': 'のこす' })}</button>
+              <button id="orb-collect-btn" class="dp-btn yes">TAKE THE CLUE<span class="orb-panel-btn-jp" style="display:block;margin-top:3px;font-size:.86em;font-weight:400;letter-spacing:0;">${furi('手がかりを持つ', { '手がかり': 'てがかり', '持つ': 'もつ' })}</span></button>
+              <button id="orb-leave-btn" class="dp-btn no">LEAVE BOX<span class="orb-panel-btn-jp" style="display:block;margin-top:3px;font-size:.86em;font-weight:400;letter-spacing:0;">${furi('箱を残す', { '箱': 'はこ', '残す': 'のこす' })}</span></button>
             </div>
           </div>
         </div>
@@ -837,12 +853,11 @@ const HAPPY_HOUSE_PORTAL = {
     document.getElementById('orb-panel-close').addEventListener('click', closeOrbPanel);
     document.getElementById('orb-leave-btn').addEventListener('click',   closeOrbPanel);
     document.getElementById('orb-collect-btn').addEventListener('click', collectOrb);
-    /* Tapping the card while the clue is still typing jumps straight to
-       the finished text — same "don't make anyone wait on a re-read"
-       escape hatch the drifter drawer's typewriter already offers. */
+    /* The memory text is intentionally not skippable by tapping the card.
+       Students asked for enough time to read it; only an intentional button
+       action should close the popup or advance the quest. */
     orbPanelEl.addEventListener('click', e => {
       if (window.UtsuSfx && (e.target.closest('.dp-btn') || e.target.closest('.dp-close-x'))) window.UtsuSfx.buttonPress();
-      if (!e.target.closest('.dp-btn') && !e.target.closest('.dp-close-x')) finishOrbTypewriter();
     });
   }
 
@@ -852,16 +867,24 @@ const HAPPY_HOUSE_PORTAL = {
   // reveal. orbTypeTimer/orbTypeDone track one in-flight typewriter so
   // reopening the panel on a second pickup can't leave two running.
   let orbTypeTimer = null;
+  let orbRevealTimer = null;
   let orbTypeDone  = true;
 
-  function finishOrbTypewriter() {
-    if (orbTypeDone) return;
+  function finishOrbTypewriter({ revealActions = true } = {}) {
     clearTimeout(orbTypeTimer);
+    clearTimeout(orbRevealTimer);
     orbTypeDone = true;
     const fragment = document.getElementById('orb-panel-fragment');
     const actions  = document.getElementById('orb-panel-actions');
     if (fragment) fragment.textContent = fragment.dataset.fullText || '';
-    if (actions) actions.style.opacity = '1';
+    if (actions) actions.style.opacity = '0';
+    if (revealActions) {
+      /* Let the finished sentence sit alone briefly before the controls
+         arrive, so the reading task does not visually compete with them. */
+      orbRevealTimer = setTimeout(() => {
+        if (orbPanelOpen && actions) actions.style.opacity = '1';
+      }, 900);
+    }
   }
 
   function openOrbPanel(orb) {
@@ -871,16 +894,13 @@ const HAPPY_HOUSE_PORTAL = {
     try { if (state.musicStarted) { music.pause(); } } catch (_) {}
     const title = document.getElementById('orb-panel-title');
     const subtitle = document.getElementById('orb-panel-subtitle');
+    const memoryTitle = document.getElementById('orb-panel-memory-title');
     const fragment = document.getElementById('orb-panel-fragment');
     const actions  = document.getElementById('orb-panel-actions');
     const entry = orb.trailEntry;
-    if (title) title.textContent = entry ? entry.title : 'You found a memory box!';
-    // entry.titleJP now carries authored <ruby> furigana (single consumer
-    // — only this line reads trail[].titleJP, confirmed before editing
-    // the episode JSON) — innerHTML so the markup actually renders.
-    if (subtitle) subtitle.innerHTML = entry
-      ? entry.titleJP
-      : `${window.UtsuFurigana ? window.UtsuFurigana.rb('記憶', 'きおく') : '記憶'}の${window.UtsuFurigana ? window.UtsuFurigana.rb('箱', 'はこ') : '箱'}を${window.UtsuFurigana ? window.UtsuFurigana.rb('見', 'み') : '見'}つけた！`;
+    if (title) title.textContent = 'Read the memory';
+    if (subtitle) subtitle.innerHTML = furi('記憶を読もう', { '記憶': 'きおく', '読もう': 'よもう' });
+    if (memoryTitle) memoryTitle.textContent = entry ? entry.title : '';
     const colors = ORB_MOTIF_COLORS[orb.motif] || ORB_MOTIF_COLORS.lantern;
     orbPanelEl.style.setProperty('--card-ring', colors.shadow);
     orbPanelEl.style.setProperty('--card-glow', `rgba(${colors.glowRGBA},.45)`);
@@ -888,19 +908,23 @@ const HAPPY_HOUSE_PORTAL = {
     state.clickTarget = null;
 
     clearTimeout(orbTypeTimer);
+    clearTimeout(orbRevealTimer);
     const fullText = entry ? entry.text : '';
     if (fragment) { fragment.textContent = ''; fragment.dataset.fullText = fullText; }
     if (actions) actions.style.opacity = '0';
     if (!fullText) { orbTypeDone = true; if (actions) actions.style.opacity = '1'; return; }
     orbTypeDone = false;
-    const CHAR_MS = 32;
+    const CHAR_MS = 72;
     let i = 0;
     (function typeChar() {
       if (orbTypeDone) return;
       if (i > fullText.length) { finishOrbTypewriter(); return; }
       fragment.textContent = fullText.slice(0, i);
+      const currentChar = fullText[i - 1] || '';
       i++;
-      orbTypeTimer = setTimeout(typeChar, CHAR_MS);
+      const punctuationPause = /[.!?]/.test(currentChar)
+        ? 420 : /[,;:]/.test(currentChar) ? 210 : 0;
+      orbTypeTimer = setTimeout(typeChar, CHAR_MS + punctuationPause);
     })();
   }
 
@@ -908,7 +932,7 @@ const HAPPY_HOUSE_PORTAL = {
     if (window.UtsuSfx) window.UtsuSfx.panelClose();
     orbPanelOpen = false;
     orbPanelOrb  = null;
-    finishOrbTypewriter();
+    finishOrbTypewriter({ revealActions: false });
     try { if (state.musicStarted) { music.play().catch(() => {}); } } catch (_) {}
     orbPanelEl.classList.remove('open');
     orbPopCooldownUntil = performance.now() + POPUP_COOLDOWN_MS;
