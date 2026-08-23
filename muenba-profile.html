@@ -157,6 +157,7 @@
     .ghost-avatar { width: 62px; height: 62px; object-fit: contain; margin: 2px auto 8px; display: block; filter: grayscale(.85) brightness(.75); opacity: .5; }
     .is-found .ghost-avatar { filter: none; opacity: 1; }
     .ghost-name { margin: 0; color: #f2fff7; font-size: .95rem; font-weight: 400; line-height: 1.2; }
+    .ghost-personality { min-height: 34px; margin: 8px 0 0; color: var(--muted); font-size: .72rem; line-height: 1.4; }
     .ghost-state { margin: 12px 0 0; color: var(--quiet); font: 700 .61rem/1.4 var(--sans); letter-spacing: .08em; text-transform: uppercase; }
     .is-found .ghost-state { color: var(--moss); }
 
@@ -340,6 +341,7 @@
           return `<article class="ghost-card${isFound ? ' is-found' : ''}">
             <img class="ghost-avatar" src="${esc(ghost.img)}" alt="">
             <h3 class="ghost-name">${esc(ghost.name)}</h3>
+            <p class="ghost-personality">${esc(ghost.personality || '')}</p>
             <p class="ghost-state">${isFound ? 'Captured · つかまえた' : 'Still hiding · まだかくれている'}</p>
           </article>`;
         }).join('');
