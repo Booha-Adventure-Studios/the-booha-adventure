@@ -19,6 +19,19 @@ const BoohaUnlockSystem = (() => {
     return BoohaAdventure.scores.totalCompleted();
   }
 
+  // Muenba (Pass 6) reads its own progress bucket directly rather than
+  // through score-system.js/game-registry.js — like Utsuroba, it's an
+  // output world with a self-contained save section, not a scored
+  // curriculum game, so it was never registered there.
+  function _muenba() {
+    const save = BoohaAdventure.save.load();
+    return save.muenba || {};
+  }
+  function _muenbaGhostsFoundCount() {
+    const found = _muenba().ghostsFound;
+    return found && typeof found === 'object' ? Object.keys(found).length : 0;
+  }
+
   // ── Permanent UNLOCKS (achievements — never reset) ────────────────────────
   const UNLOCKS = [
     {
@@ -79,6 +92,27 @@ const BoohaUnlockSystem = (() => {
       id:'all_complete', name:'Booha Master!',
       description:'Complete all 27 games across all curriculums.',
       condition() { return _totalCompleted() >= 27; },
+    },
+    // Muenba (Pass 6). "Nuppi's Trust" is reachable today, since Pass 4's
+    // briefing gate already writes muenba.briefingsPassed; the other two
+    // wait on Pass 7/8's actual capture loop to ever fire. GHOSTS_TOTAL is
+    // hardcoded rather than read from muenba-data.js, since that file
+    // isn't loaded on every page unlock-system.js runs on — bump this if
+    // Pass 9 adds more huntable ghosts.
+    {
+      id:'muenba:first_briefing', name:"Nuppi's Trust",
+      description:"Pass Nuppi's briefing in Muenba for the first time.",
+      condition() { return (_muenba().briefingsPassed || 0) >= 1; },
+    },
+    {
+      id:'muenba:first_ghost', name:'First Ghost Caught',
+      description:'Catch your first ghost in Muenba.',
+      condition() { return _muenbaGhostsFoundCount() >= 1; },
+    },
+    {
+      id:'muenba:cleared', name:'Muenba Cleared',
+      description:'Catch every ghost in Muenba.',
+      condition() { return _muenbaGhostsFoundCount() >= 5; }, // GHOSTS_TOTAL = 5
     },
   ];
 
