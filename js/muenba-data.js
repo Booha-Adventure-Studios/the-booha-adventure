@@ -263,6 +263,123 @@
         correct: 0,
         resolution: 'Glimmer’s energy settles when it chooses one true sparkle and lets the reflections fade.'
       }
+    },
+    nibsy_case_01: {
+      id: 'nibsy_case_01',
+      ghostId: 'nibsy',
+      title: 'Nibsy Lost the Little Sounds',
+      eyebrow: 'GHOST CASE / CASE 03',
+      intro: 'Nibsy collected tiny noises from every corner of Muenba. Now the sounds have mixed together, and Nibsy cannot remember which one belongs to which place.',
+      fresh: {
+        clues: [
+          { title: 'The little collection', text: 'Nibsy carried three sounds in a pocket: a pebble plink, a leaf scritch, and a distant puff.' },
+          { title: 'The missing labels', text: 'The labels fell off, so Nibsy guessed where each sound had come from.' },
+          { title: 'Everything at once', text: 'When Nuppi asked for one sound, all three noises answered together.' }
+        ],
+        prompt: 'What tangled Nibsy’s energy?',
+        promptJP: 'ニブシーのエネルギーは<ruby>何<rt>なに</rt></ruby>で<ruby>絡<rt>から</rt></ruby>まりましたか？',
+        choices: [
+          'Nibsy mixed up the tiny sounds it was collecting.',
+          'The cemetery swallowed all the sound labels.',
+          'Nuppi made the pocket too small.'
+        ],
+        correct: 0,
+        resolution: 'Nibsy’s energy settles when each little sound gets its own place again.'
+      },
+      deep: {
+        clues: [
+          { title: 'A careful collector', text: 'Nibsy recorded a pebble’s plink, a leaf’s scritch, and a faraway puff as three separate treasures.' },
+          { title: 'A careless shortcut', text: 'When the labels disappeared, Nibsy assigned each sound by memory and quietly swapped all three.' },
+          { title: 'A noisy contradiction', text: 'The pocket could not agree with itself: every sound insisted it belonged somewhere else.' }
+        ],
+        prompt: 'Which explanation best fits the evidence?',
+        promptJP: 'この<ruby>証拠<rt>しょうこ</rt></ruby>に<ruby>一番<rt>いちばん</rt></ruby>よく<ruby>合<rt>あ</rt></ruby>う<ruby>説明<rt>せつめい</rt></ruby>はどれですか？',
+        choices: [
+          'Nibsy’s energy tangled because the sounds lost their places.',
+          'The pebbles learned to make three sounds each.',
+          'Nuppi gave Nibsy a pocket full of silence.'
+        ],
+        correct: 0,
+        resolution: 'Nibsy’s energy settles when every sound is returned to the place that made it.'
+      }
+    },
+    tinkley_case_01: {
+      id: 'tinkley_case_01',
+      ghostId: 'tinklet',
+      title: 'Tinkley Rang Too Soon',
+      eyebrow: 'GHOST CASE / CASE 04',
+      intro: 'Tinkley prepared an invisible bell for a grand entrance. The bell kept ringing before the entrance happened, and the moment never felt right.',
+      fresh: {
+        clues: [
+          { title: 'The invisible bell', text: 'Tinkley held both hands around a bell that nobody else could see.' },
+          { title: 'The early chime', text: 'The bell rang when Tinkley practiced, when Tinkley waited, and once while Tinkley was yawning.' },
+          { title: 'The missed moment', text: 'When Nuppi finally arrived, the bell had already announced him three times.' }
+        ],
+        prompt: 'What tangled Tinkley’s energy?',
+        promptJP: 'ティンクリーのエネルギーは<ruby>何<rt>なに</rt></ruby>で<ruby>絡<rt>から</rt></ruby>まりましたか？',
+        choices: [
+          'Tinkley rang the bell before the right moment arrived.',
+          'Nuppi hid the invisible bell in a tree.',
+          'The cemetery forgot how entrances work.'
+        ],
+        correct: 0,
+        resolution: 'Tinkley’s energy settles when the bell waits for one real moment.'
+      },
+      deep: {
+        clues: [
+          { title: 'A perfect announcement', text: 'Tinkley planned one bright chime to mark Nuppi’s arrival in the cemetery.' },
+          { title: 'Practice without an ending', text: 'Tinkley rehearsed the chime before the footsteps, during the footsteps, and after the footsteps.' },
+          { title: 'A ceremony with no center', text: 'By the time Nuppi arrived, the bell had made every moment feel like the important one.' }
+        ],
+        prompt: 'Which explanation best fits the evidence?',
+        promptJP: 'この<ruby>証拠<rt>しょうこ</rt></ruby>に<ruby>一番<rt>いちばん</rt></ruby>よく<ruby>合<rt>あ</rt></ruby>う<ruby>説明<rt>せつめい</rt></ruby>はどれですか？',
+        choices: [
+          'Tinkley’s energy scattered because it could not wait for the true moment.',
+          'The bell became too heavy for an invisible ghost.',
+          'Nuppi arrived too quietly to be announced.'
+        ],
+        correct: 0,
+        resolution: 'Tinkley’s energy settles when one chime is saved for one unmistakable moment.'
+      }
+    },
+    twiddle_case_01: {
+      id: 'twiddle_case_01',
+      ghostId: 'twiddle',
+      title: 'Twiddle Turned in Circles',
+      eyebrow: 'GHOST CASE / CASE 05',
+      intro: 'Twiddle found two possible paths through the cemetery. Every time a choice felt serious, Twiddle turned around and started the decision again.',
+      fresh: {
+        clues: [
+          { title: 'Two paths', text: 'Twiddle stood between a crooked path and a mossy path, holding one pebble in each hand.' },
+          { title: 'The first turn', text: 'Twiddle chose the crooked path, changed its mind, and walked back before reaching the first stone.' },
+          { title: 'The endless loop', text: 'When Nuppi arrived, Twiddle’s energy was circling the same two choices.' }
+        ],
+        prompt: 'What tangled Twiddle’s energy?',
+        promptJP: 'トゥイドルのエネルギーは<ruby>何<rt>なに</rt></ruby>で<ruby>絡<rt>から</rt></ruby>まりましたか？',
+        choices: [
+          'Twiddle changed its mind before either path could begin.',
+          'The two paths moved while Twiddle was looking away.',
+          'Nuppi placed the pebbles on the wrong side.'
+        ],
+        correct: 0,
+        resolution: 'Twiddle’s energy settles when one path is chosen long enough to take a step.'
+      },
+      deep: {
+        clues: [
+          { title: 'A harmless choice', text: 'Twiddle first chose between a crooked path and a mossy path, certain that either one would be fine.' },
+          { title: 'A serious question', text: 'Then Twiddle wondered which path was more correct, and the easy choice became impossible.' },
+          { title: 'A perfect circle', text: 'Twiddle’s energy repeated the same decision until every turn looked like both a beginning and an ending.' }
+        ],
+        prompt: 'Which explanation best fits the evidence?',
+        promptJP: 'この<ruby>証拠<rt>しょうこ</rt></ruby>に<ruby>一番<rt>いちばん</rt></ruby>よく<ruby>合<rt>あ</rt></ruby>う<ruby>説明<rt>せつめい</rt></ruby>はどれですか？',
+        choices: [
+          'Twiddle’s energy looped because every choice had to be perfect.',
+          'The cemetery paths secretly changed places.',
+          'Nuppi asked Twiddle to walk in a circle.'
+        ],
+        correct: 0,
+        resolution: 'Twiddle’s energy settles when a choice becomes a step instead of another question.'
+      }
     }
   };
 
@@ -276,7 +393,7 @@
     cases: CASES,
     // Cases unlock in this order. Keeping progression explicit lets Nuppi's
     // board and the capture flow share one contract as more ghosts arrive.
-    caseOrder: ['fuzzle_case_01', 'glimmer_case_01'],
+    caseOrder: ['fuzzle_case_01', 'glimmer_case_01', 'nibsy_case_01', 'tinkley_case_01', 'twiddle_case_01'],
     ghostAngryChangeImg: GHOST_ANGRY_CHANGE_IMG
   };
 })();
