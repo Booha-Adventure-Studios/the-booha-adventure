@@ -182,10 +182,9 @@
   // from the GHOSTS roster above.
   const GHOST_ANGRY_CHANGE_IMG = 'assets/img/muenba/ghosts/angry_change.png';
 
-  // Pass 2 vertical slice: one complete ghost case. Case-record copy is
-  // intentionally English-only. The runtime supplies Japanese furigana
-  // translations only for instructions and directions, so the story itself
-  // remains a clean English reading record.
+  // Pass 4 content expansion: authored ghost cases stay English-only. The
+  // runtime supplies Japanese furigana translations only for instructions
+  // and directions, so each case remains a clean English reading record.
   const CASES = {
     fuzzle_case_01: {
       id: 'fuzzle_case_01',
@@ -225,6 +224,45 @@
         correct: 0,
         resolution: 'Fuzzle’s energy untangles when the unfinished scares become one choice.'
       }
+    },
+    glimmer_case_01: {
+      id: 'glimmer_case_01',
+      ghostId: 'glimmer',
+      title: 'Glimmer Chased the Shine',
+      eyebrow: 'GHOST CASE / CASE 02',
+      intro: 'Glimmer wanted one perfect sparkle. After polishing it all night, Glimmer could not stop chasing every reflection it made.',
+      fresh: {
+        clues: [
+          { title: 'The tiny light', text: 'Glimmer sat on a gravestone with one pale spark balanced on its fingertip.' },
+          { title: 'The polishing', text: 'Glimmer polished the spark against leaves, bells, and every shiny pebble nearby.' },
+          { title: 'The runaway shine', text: 'When Nuppi arrived, Glimmer’s energy leapt from reflection to reflection and could not settle.' }
+        ],
+        prompt: 'What made Glimmer’s energy scatter?',
+        promptJP: 'グリマーのエネルギーは<ruby>何<rt>なに</rt></ruby>で<ruby>散<rt>ち</rt></ruby>らばりましたか？',
+        choices: [
+          'Glimmer kept chasing every reflection of its sparkle.',
+          'Nuppi turned on the cemetery lights.',
+          'A firefly carried the brightest shine away.'
+        ],
+        correct: 0,
+        resolution: 'Glimmer’s energy settles when one small sparkle is allowed to shine by itself.'
+      },
+      deep: {
+        clues: [
+          { title: 'A careful display', text: 'Glimmer prepared one pale spark and promised to make it the finest light in Muenba.' },
+          { title: 'More shine, more trouble', text: 'Every polished surface made another reflection, and Glimmer treated each one like a new prize.' },
+          { title: 'An everywhere ghost', text: 'By the time Nuppi arrived, Glimmer’s energy was spread across the cemetery, following a shine that never ended.' }
+        ],
+        prompt: 'Which explanation best fits the evidence?',
+        promptJP: 'この<ruby>証拠<rt>しょうこ</rt></ruby>に<ruby>一番<rt>いちばん</rt></ruby>よく<ruby>合<rt>あ</rt></ruby>う<ruby>説明<rt>せつめい</rt></ruby>はどれですか？',
+        choices: [
+          'Glimmer’s energy scattered because it chased its own reflections.',
+          'The gravestones hid the original sparkle.',
+          'Nuppi brought too many lanterns to the cemetery.'
+        ],
+        correct: 0,
+        resolution: 'Glimmer’s energy settles when it chooses one true sparkle and lets the reflections fade.'
+      }
     }
   };
 
@@ -238,7 +276,7 @@
     cases: CASES,
     // Cases unlock in this order. Keeping progression explicit lets Nuppi's
     // board and the capture flow share one contract as more ghosts arrive.
-    caseOrder: ['fuzzle_case_01'],
+    caseOrder: ['fuzzle_case_01', 'glimmer_case_01'],
     ghostAngryChangeImg: GHOST_ANGRY_CHANGE_IMG
   };
 })();
