@@ -5,11 +5,11 @@
 // ============================================================
 
 const CURRENT_CACHES = {
-  // Next pass: invalidate the previous deployed bundle so the ordered Muenba
-  // case ledger cannot remain trapped behind the cache-first route.
-  pages:  'booha-pages-2026-246',
-  assets: 'booha-assets-2026-246',
-  decks:  'booha-decks-2026-246',
+  // Personality pass: invalidate the previous deployed bundle so the
+  // data-driven Muenba ghost notes cannot remain behind cache-first routing.
+  pages:  'booha-pages-2026-247',
+  assets: 'booha-assets-2026-247',
+  decks:  'booha-decks-2026-247',
 };
 
 const PAGE_CACHE  = CURRENT_CACHES.pages;
