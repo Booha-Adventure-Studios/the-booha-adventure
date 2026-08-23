@@ -2260,11 +2260,22 @@ const HAPPY_HOUSE_PORTAL = {
          Keep the shared floating card treatment, but center this one in the
          viewport so it cannot look like a stuck footer on short screens. */
       #orb-panel{top:50%;bottom:auto;touch-action:pan-y;
+        /* is-floating's shared 38vh/300px cap is sized for a bottom-sheet
+           drawer that has to leave room to see the game world above it.
+           This card is centered instead, so it can afford to grow with
+           longer clue sentences before it needs to scroll at all — and
+           still scrolls gracefully (rather than clipping) if one ever is
+           this long. */
+        max-height:min(82vh,640px);overflow-y:auto;overflow-x:hidden;
         opacity:0;visibility:hidden;
         transform:translate(-50%,-50%) scale(.96);
         transition:transform .5s cubic-bezier(.34,1.56,.64,1),opacity .18s ease,visibility 0s linear .5s;}
       #orb-panel.open{opacity:1;visibility:visible;
         transform:translate(-50%,-50%) scale(1);transition-delay:0s;}
+      /* Extra breathing room below the buttons so they never sit flush
+         against the card's rounded bottom edge, and scale up a little on
+         wider screens instead of staying a fixed pixel value. */
+      #orb-panel .dp-inner{padding-bottom:clamp(20px,5vw,32px);}
     `;
     document.head.appendChild(s);
   }
