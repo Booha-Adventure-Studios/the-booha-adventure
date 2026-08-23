@@ -17,13 +17,14 @@
   const WORLD_W = 1536;
   const WORLD_H = 1024;
 
-  // Measured once against the live room photos — identical across every
-  // room, since the cemetery corridor is framed the same way in all 15.
+  // Pass 9C: nudged toward the corridor edges while keeping generous space
+  // from the viewport crop on landscape phones and tablets. These remain
+  // identical across every room because the cemetery framing is identical.
   const EXIT_XY = {
-    up:    { x: 767, y: 312 },
-    down:  { x: 764, y: 712 },
-    left:  { x: 480, y: 496 },
-    right: { x: 1109, y: 483 }
+    up:    { x: 767, y: 284 },
+    down:  { x: 764, y: 748 },
+    left:  { x: 438, y: 496 },
+    right: { x: 1152, y: 483 }
   };
 
   function exit(dir, to, spawn) {
