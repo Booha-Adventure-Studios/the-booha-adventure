@@ -5,6 +5,11 @@
  * Karasuki and Utsuroba. Coordinates are in the shared 1536x1024 world space.
  * Room-specific walkable areas and atmosphere stay here so the engine does
  * not need special cases for individual cemetery images.
+ *
+ * Pass 1 calibration: every room's cemetery corridor is framed identically,
+ * so all four exit directions share one measured x/y across all 15 rooms
+ * instead of per-room guesses. Walkable area was widened around those same
+ * measured points — Booha was clipping an invisible wall before this pass.
  */
 (() => {
   'use strict';
@@ -12,80 +17,93 @@
   const WORLD_W = 1536;
   const WORLD_H = 1024;
 
+  // Measured once against the live room photos — identical across every
+  // room, since the cemetery corridor is framed the same way in all 15.
+  const EXIT_XY = {
+    up:    { x: 767, y: 312 },
+    down:  { x: 764, y: 712 },
+    left:  { x: 480, y: 496 },
+    right: { x: 1109, y: 483 }
+  };
+
+  function exit(dir, to, spawn) {
+    return { dir, x: EXIT_XY[dir].x, y: EXIT_XY[dir].y, to, spawn };
+  }
+
   const NPP = {
     room_01: [
-      { dir: 'right', x: 1134, y: 473, to: 'room_02', spawn: 'fromLeft' },
-      { dir: 'up',    x: 631,  y: 308, to: 'room_06', spawn: 'fromDown' }
+      exit('right', 'room_02', 'fromLeft'),
+      exit('up',    'room_06', 'fromDown')
     ],
     room_02: [
-      { dir: 'left',  x: 409,  y: 597, to: 'room_01', spawn: 'fromRight' },
-      { dir: 'right', x: 1131, y: 470, to: 'room_03', spawn: 'fromLeft' },
-      { dir: 'up',    x: 559,  y: 318, to: 'room_07', spawn: 'fromDown' }
+      exit('left',  'room_01', 'fromRight'),
+      exit('right', 'room_03', 'fromLeft'),
+      exit('up',    'room_07', 'fromDown')
     ],
     room_03: [
-      { dir: 'left',  x: 411,  y: 426, to: 'room_02', spawn: 'fromRight' },
-      { dir: 'right', x: 1086, y: 426, to: 'room_04', spawn: 'fromLeft' },
-      { dir: 'up',    x: 760,  y: 346, to: 'room_08', spawn: 'fromDown' }
+      exit('left',  'room_02', 'fromRight'),
+      exit('right', 'room_04', 'fromLeft'),
+      exit('up',    'room_08', 'fromDown')
     ],
     room_04: [
-      { dir: 'left',  x: 382,  y: 611, to: 'room_03', spawn: 'fromRight' },
-      { dir: 'right', x: 1101, y: 504, to: 'room_05', spawn: 'fromLeft' },
-      { dir: 'up',    x: 711,  y: 329, to: 'room_09', spawn: 'fromDown' }
+      exit('left',  'room_03', 'fromRight'),
+      exit('right', 'room_05', 'fromLeft'),
+      exit('up',    'room_09', 'fromDown')
     ],
     room_05: [
-      { dir: 'left', x: 413, y: 605, to: 'room_04', spawn: 'fromRight' },
-      { dir: 'up',   x: 710, y: 309, to: 'room_10', spawn: 'fromDown' }
+      exit('left', 'room_04', 'fromRight'),
+      exit('up',   'room_10', 'fromDown')
     ],
     room_06: [
-      { dir: 'right', x: 1069, y: 488, to: 'room_07', spawn: 'fromLeft' },
-      { dir: 'up',    x: 695,  y: 307, to: 'room_11', spawn: 'fromDown' },
-      { dir: 'down',  x: 999,  y: 756, to: 'room_01', spawn: 'fromUp' }
+      exit('right', 'room_07', 'fromLeft'),
+      exit('up',    'room_11', 'fromDown'),
+      exit('down',  'room_01', 'fromUp')
     ],
     room_07: [
-      { dir: 'left',  x: 361,  y: 610, to: 'room_06', spawn: 'fromRight' },
-      { dir: 'right', x: 1111, y: 497, to: 'room_08', spawn: 'fromLeft' },
-      { dir: 'up',    x: 705,  y: 326, to: 'room_12', spawn: 'fromDown' },
-      { dir: 'down',  x: 995,  y: 759, to: 'room_02', spawn: 'fromUp' }
+      exit('left',  'room_06', 'fromRight'),
+      exit('right', 'room_08', 'fromLeft'),
+      exit('up',    'room_12', 'fromDown'),
+      exit('down',  'room_02', 'fromUp')
     ],
     room_08: [
-      { dir: 'left',  x: 352,  y: 603, to: 'room_07', spawn: 'fromRight' },
-      { dir: 'right', x: 1131, y: 498, to: 'room_09', spawn: 'fromLeft' },
-      { dir: 'up',    x: 713,  y: 338, to: 'room_13', spawn: 'fromDown' },
-      { dir: 'down',  x: 1011, y: 770, to: 'room_03', spawn: 'fromUp' }
+      exit('left',  'room_07', 'fromRight'),
+      exit('right', 'room_09', 'fromLeft'),
+      exit('up',    'room_13', 'fromDown'),
+      exit('down',  'room_03', 'fromUp')
     ],
     room_09: [
-      { dir: 'left',  x: 394,  y: 590, to: 'room_08', spawn: 'fromRight' },
-      { dir: 'right', x: 1123, y: 502, to: 'room_10', spawn: 'fromLeft' },
-      { dir: 'up',    x: 707,  y: 318, to: 'room_14', spawn: 'fromDown' },
-      { dir: 'down',  x: 1000, y: 747, to: 'room_04', spawn: 'fromUp' }
+      exit('left',  'room_08', 'fromRight'),
+      exit('right', 'room_10', 'fromLeft'),
+      exit('up',    'room_14', 'fromDown'),
+      exit('down',  'room_04', 'fromUp')
     ],
     room_10: [
-      { dir: 'left', x: 401, y: 603, to: 'room_09', spawn: 'fromRight' },
-      { dir: 'up',   x: 705, y: 316, to: 'room_15', spawn: 'fromDown' },
-      { dir: 'down', x: 994, y: 753, to: 'room_05', spawn: 'fromUp' }
+      exit('left', 'room_09', 'fromRight'),
+      exit('up',   'room_15', 'fromDown'),
+      exit('down', 'room_05', 'fromUp')
     ],
     room_11: [
-      { dir: 'right', x: 1208, y: 322, to: 'room_12', spawn: 'fromLeft' },
-      { dir: 'down',  x: 1006, y: 784, to: 'room_06', spawn: 'fromUp' }
+      exit('right', 'room_12', 'fromLeft'),
+      exit('down',  'room_06', 'fromUp')
     ],
     room_12: [
-      { dir: 'left',  x: 371,  y: 639, to: 'room_11', spawn: 'fromRight' },
-      { dir: 'right', x: 1210, y: 434, to: 'room_13', spawn: 'fromLeft' },
-      { dir: 'down',  x: 1037, y: 800, to: 'room_07', spawn: 'fromUp' }
+      exit('left',  'room_11', 'fromRight'),
+      exit('right', 'room_13', 'fromLeft'),
+      exit('down',  'room_07', 'fromUp')
     ],
     room_13: [
-      { dir: 'left',  x: 368,  y: 626, to: 'room_12', spawn: 'fromRight' },
-      { dir: 'right', x: 1233, y: 322, to: 'room_14', spawn: 'fromLeft' },
-      { dir: 'down',  x: 1078, y: 796, to: 'room_08', spawn: 'fromUp' }
+      exit('left',  'room_12', 'fromRight'),
+      exit('right', 'room_14', 'fromLeft'),
+      exit('down',  'room_08', 'fromUp')
     ],
     room_14: [
-      { dir: 'left',  x: 303,  y: 631, to: 'room_13', spawn: 'fromRight' },
-      { dir: 'right', x: 1210, y: 405, to: 'room_15', spawn: 'fromLeft' },
-      { dir: 'down',  x: 930,  y: 812, to: 'room_09', spawn: 'fromUp' }
+      exit('left',  'room_13', 'fromRight'),
+      exit('right', 'room_15', 'fromLeft'),
+      exit('down',  'room_09', 'fromUp')
     ],
     room_15: [
-      { dir: 'left', x: 402,  y: 614, to: 'room_14', spawn: 'fromRight' },
-      { dir: 'down', x: 1003, y: 790, to: 'room_10', spawn: 'fromUp' }
+      exit('left', 'room_14', 'fromRight'),
+      exit('down', 'room_10', 'fromUp')
     ]
   };
 
@@ -98,32 +116,39 @@
     fromDown:     { x: 768, y: 820 }
   };
 
-  // Broad cross-shaped walkable areas are an intentionally forgiving first
-  // pass. They keep Booha on the photographed paths without pixel-perfect
-  // tracing. Individual rooms can tighten these rectangles later.
+  // Widened cross around the four measured exit points above — the old
+  // rectangles technically covered each exit hotspot but left almost no
+  // breathing room around them, which read as an invisible wall. This
+  // still follows the same "broad shape, not pixel-perfect tracing"
+  // approach Karasuki/Utsuroba started with; identical across rooms since
+  // the corridor is identical across rooms.
   function makeWalkable() {
     return [
-      { x: 450, y: 150, w: 636, h: 874 },
-      { x: 0,   y: 410, w: WORLD_W, h: 260 }
+      { x: 340, y: 110, w: 860,  h: 900 }, // vertical corridor (up/down)
+      { x: 60,  y: 360, w: 1416, h: 380 }  // horizontal corridor (left/right)
     ];
   }
 
+  // One eerie accent color per room so the cemetery doesn't feel like the
+  // same room repeated 15 times — used by the engine to tint that room's
+  // ambient glow and its exit arrows. Kept desaturated/muted on purpose;
+  // this is mood lighting, not a rainbow.
   const ATMOSPHERE = {
-    room_01: { darkness: 0.42, tint: 'rgba(12, 24, 42, 0.10)', fog: 0.08 },
-    room_02: { darkness: 0.46, tint: 'rgba(15, 28, 48, 0.11)', fog: 0.10 },
-    room_03: { darkness: 0.39, tint: 'rgba(18, 32, 38, 0.09)', fog: 0.07 },
-    room_04: { darkness: 0.44, tint: 'rgba(25, 29, 45, 0.10)', fog: 0.08 },
-    room_05: { darkness: 0.48, tint: 'rgba(9, 20, 34, 0.12)',  fog: 0.12 },
-    room_06: { darkness: 0.40, tint: 'rgba(20, 35, 34, 0.09)', fog: 0.06 },
-    room_07: { darkness: 0.43, tint: 'rgba(16, 29, 44, 0.10)', fog: 0.09 },
-    room_08: { darkness: 0.36, tint: 'rgba(24, 35, 37, 0.07)', fog: 0.05 },
-    room_09: { darkness: 0.47, tint: 'rgba(25, 19, 36, 0.10)', fog: 0.11 },
-    room_10: { darkness: 0.41, tint: 'rgba(10, 27, 39, 0.10)', fog: 0.08 },
-    room_11: { darkness: 0.51, tint: 'rgba(12, 18, 31, 0.12)', fog: 0.13 },
-    room_12: { darkness: 0.45, tint: 'rgba(26, 28, 42, 0.09)', fog: 0.09 },
-    room_13: { darkness: 0.38, tint: 'rgba(20, 36, 34, 0.08)', fog: 0.06 },
-    room_14: { darkness: 0.49, tint: 'rgba(18, 18, 30, 0.12)', fog: 0.12 },
-    room_15: { darkness: 0.43, tint: 'rgba(22, 30, 42, 0.10)', fog: 0.08 }
+    room_01: { darkness: 0.42, tint: 'rgba(12, 24, 42, 0.10)', fog: 0.08, glow: '#4a9a72' }, // sickly green
+    room_02: { darkness: 0.46, tint: 'rgba(15, 28, 48, 0.11)', fog: 0.10, glow: '#6f5aa8' }, // violet
+    room_03: { darkness: 0.39, tint: 'rgba(18, 32, 38, 0.09)', fog: 0.07, glow: '#4a8a9e' }, // teal-blue
+    room_04: { darkness: 0.44, tint: 'rgba(25, 29, 45, 0.10)', fog: 0.08, glow: '#9e5a72' }, // dusky rose
+    room_05: { darkness: 0.48, tint: 'rgba(9, 20, 34, 0.12)',  fog: 0.12, glow: '#5a6fa8' }, // indigo
+    room_06: { darkness: 0.40, tint: 'rgba(20, 35, 34, 0.09)', fog: 0.06, glow: '#7a9e4a' }, // moss
+    room_07: { darkness: 0.43, tint: 'rgba(16, 29, 44, 0.10)', fog: 0.09, glow: '#a87a4a' }, // rust amber
+    room_08: { darkness: 0.36, tint: 'rgba(24, 35, 37, 0.07)', fog: 0.05, glow: '#4aa89e' }, // cyan-teal
+    room_09: { darkness: 0.47, tint: 'rgba(25, 19, 36, 0.10)', fog: 0.11, glow: '#8a4aa8' }, // plum
+    room_10: { darkness: 0.41, tint: 'rgba(10, 27, 39, 0.10)', fog: 0.08, glow: '#a84a6f' }, // wine
+    room_11: { darkness: 0.51, tint: 'rgba(12, 18, 31, 0.12)', fog: 0.13, glow: '#4a5a9e' }, // steel-indigo
+    room_12: { darkness: 0.45, tint: 'rgba(26, 28, 42, 0.09)', fog: 0.09, glow: '#7aa85a' }, // olive-moss
+    room_13: { darkness: 0.38, tint: 'rgba(20, 36, 34, 0.08)', fog: 0.06, glow: '#a8944a' }, // ochre
+    room_14: { darkness: 0.49, tint: 'rgba(18, 18, 30, 0.12)', fog: 0.12, glow: '#4a7aa8' }, // slate-blue
+    room_15: { darkness: 0.43, tint: 'rgba(22, 30, 42, 0.10)', fog: 0.08, glow: '#9e4a8a' }  // magenta-ash
   };
 
   const rooms = {};
