@@ -17,6 +17,7 @@ assert(data.cases && typeof data.cases === 'object', 'cases must be an object');
 const japanese = /[\u3040-\u30ff\u3400-\u9fff]/;
 const ghostIds = new Set((data.ghosts || []).map(ghost => ghost.id));
 const seen = new Set();
+const positionMap = new Map();
 
 for (const ghost of data.ghosts || []) {
   englishOnly(ghost.personality, `${ghost.id}.personality`);
@@ -38,11 +39,13 @@ for (const caseId of data.caseOrder) {
   englishOnly(caseData.title, `${caseId}.title`);
   englishOnly(caseData.eyebrow, `${caseId}.eyebrow`);
   englishOnly(caseData.intro, `${caseId}.intro`);
+  const correctPositions = [];
 
   for (const modeName of ['fresh', 'deep']) {
     const mode = caseData[modeName];
     assert(mode, `${caseId}.${modeName} is required`);
-    assert(Array.isArray(mode.clues) && mode.clues.length > 0, `${caseId}.${modeName}.clues must be non-empty`);
+    assert(Array.isArray(mode.clues) && mode.clues.length === 3, `${caseId}.${modeName}.clues must contain exactly three records`);
+    assert.strictEqual(new Set(mode.clues.map(clue => clue.title)).size, mode.clues.length, `${caseId}.${modeName} clue titles must be unique`);
     mode.clues.forEach((clue, index) => {
       englishOnly(clue.title, `${caseId}.${modeName}.clues[${index}].title`);
       englishOnly(clue.text, `${caseId}.${modeName}.clues[${index}].text`);
@@ -50,13 +53,22 @@ for (const caseId of data.caseOrder) {
     englishOnly(mode.prompt, `${caseId}.${modeName}.prompt`);
     assert.strictEqual(typeof mode.promptJP, 'string', `${caseId}.${modeName}.promptJP must be text`);
     assert(mode.promptJP.trim(), `${caseId}.${modeName}.promptJP must not be empty`);
-    assert(Array.isArray(mode.choices) && mode.choices.length > 1, `${caseId}.${modeName}.choices must have options`);
+    assert(mode.promptJP.includes('<ruby>'), `${caseId}.${modeName}.promptJP needs furigana markup`);
+    assert(Array.isArray(mode.choices) && mode.choices.length === 3, `${caseId}.${modeName}.choices must contain exactly three options`);
+    assert.strictEqual(new Set(mode.choices).size, mode.choices.length, `${caseId}.${modeName}.choices must be unique`);
     mode.choices.forEach((choice, index) => englishOnly(choice, `${caseId}.${modeName}.choices[${index}]`));
     assert(Number.isInteger(mode.correct) && mode.correct >= 0 && mode.correct < mode.choices.length, `${caseId}.${modeName}.correct is out of range`);
+    correctPositions.push(mode.correct);
     englishOnly(mode.resolution, `${caseId}.${modeName}.resolution`);
   }
+  assert.notStrictEqual(caseData.fresh.prompt, caseData.deep.prompt, `${caseId} Fresh and Deep prompts must differ`);
+  assert.notStrictEqual(caseData.fresh.resolution, caseData.deep.resolution, `${caseId} Fresh and Deep resolutions must differ`);
+  assert.notDeepStrictEqual(caseData.fresh.choices, caseData.deep.choices, `${caseId} Fresh and Deep choices must differ`);
+  positionMap.set(caseId, correctPositions);
 }
 
 assert.strictEqual(seen.size, data.caseOrder.length, 'caseOrder must contain unique cases');
 assert.deepStrictEqual(Object.keys(data.cases).sort(), [...seen].sort(), 'every case must appear in caseOrder');
+const allCorrectPositions = [...seen].flatMap(caseId => positionMap.get(caseId));
+assert(new Set(allCorrectPositions).size === 3, 'correct answer positions should use all three slots');
 console.log(`Muenba case audit passed: ${seen.size} ordered case${seen.size === 1 ? '' : 's'}.`);

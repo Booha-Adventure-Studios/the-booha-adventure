@@ -201,11 +201,11 @@
         prompt: 'What tangled Fuzzle’s energy?',
         promptJP: '<ruby>何<rt>なに</rt></ruby>がフズルのエネルギーを<ruby>絡<rt>から</rt></ruby>ませましたか？',
         choices: [
-          'Fuzzle practiced too many scares.',
           'A gravestone swallowed the scare.',
+          'Fuzzle practiced too many scares.',
           'Nuppi used the scare too early.'
         ],
-        correct: 0,
+        correct: 1,
         resolution: 'Fuzzle’s energy untangles when one silly scare is chosen.'
       },
       deep: {
@@ -217,11 +217,11 @@
         prompt: 'Which explanation best fits the evidence?',
         promptJP: 'この<ruby>証拠<rt>しょうこ</rt></ruby>に<ruby>一番<rt>いちばん</rt></ruby>よく<ruby>合<rt>あ</rt></ruby>う<ruby>説明<rt>せつめい</rt></ruby>はどれですか？',
         choices: [
-          'Fuzzle’s energy split between too many unfinished ideas.',
           'The gravestone borrowed Fuzzle’s voice.',
-          'Nuppi forgot to bring a loud enough bell.'
+          'Nuppi forgot to bring a loud enough bell.',
+          'Fuzzle’s energy split between too many unfinished ideas.'
         ],
-        correct: 0,
+        correct: 2,
         resolution: 'Fuzzle’s energy untangles when the unfinished scares become one choice.'
       }
     },
@@ -256,11 +256,11 @@
         prompt: 'Which explanation best fits the evidence?',
         promptJP: 'この<ruby>証拠<rt>しょうこ</rt></ruby>に<ruby>一番<rt>いちばん</rt></ruby>よく<ruby>合<rt>あ</rt></ruby>う<ruby>説明<rt>せつめい</rt></ruby>はどれですか？',
         choices: [
-          'Glimmer’s energy scattered because it chased its own reflections.',
           'The gravestones hid the original sparkle.',
+          'Glimmer’s energy scattered because it chased its own reflections.',
           'Nuppi brought too many lanterns to the cemetery.'
         ],
-        correct: 0,
+        correct: 1,
         resolution: 'Glimmer’s energy settles when it chooses one true sparkle and lets the reflections fade.'
       }
     },
@@ -279,11 +279,11 @@
         prompt: 'What tangled Nibsy’s energy?',
         promptJP: 'ニブシーのエネルギーは<ruby>何<rt>なに</rt></ruby>で<ruby>絡<rt>から</rt></ruby>まりましたか？',
         choices: [
-          'Nibsy mixed up the tiny sounds it was collecting.',
           'The cemetery swallowed all the sound labels.',
-          'Nuppi made the pocket too small.'
+          'Nuppi made the pocket too small.',
+          'Nibsy mixed up the tiny sounds it was collecting.'
         ],
-        correct: 0,
+        correct: 2,
         resolution: 'Nibsy’s energy settles when each little sound gets its own place again.'
       },
       deep: {
@@ -318,11 +318,11 @@
         prompt: 'What tangled Tinkley’s energy?',
         promptJP: 'ティンクリーのエネルギーは<ruby>何<rt>なに</rt></ruby>で<ruby>絡<rt>から</rt></ruby>まりましたか？',
         choices: [
-          'Tinkley rang the bell before the right moment arrived.',
           'Nuppi hid the invisible bell in a tree.',
+          'Tinkley rang the bell before the right moment arrived.',
           'The cemetery forgot how entrances work.'
         ],
-        correct: 0,
+        correct: 1,
         resolution: 'Tinkley’s energy settles when the bell waits for one real moment.'
       },
       deep: {
@@ -334,11 +334,11 @@
         prompt: 'Which explanation best fits the evidence?',
         promptJP: 'この<ruby>証拠<rt>しょうこ</rt></ruby>に<ruby>一番<rt>いちばん</rt></ruby>よく<ruby>合<rt>あ</rt></ruby>う<ruby>説明<rt>せつめい</rt></ruby>はどれですか？',
         choices: [
-          'Tinkley’s energy scattered because it could not wait for the true moment.',
           'The bell became too heavy for an invisible ghost.',
-          'Nuppi arrived too quietly to be announced.'
+          'Nuppi arrived too quietly to be announced.',
+          'Tinkley’s energy scattered because it could not wait for the true moment.'
         ],
-        correct: 0,
+        correct: 2,
         resolution: 'Tinkley’s energy settles when one chime is saved for one unmistakable moment.'
       }
     },
@@ -373,11 +373,11 @@
         prompt: 'Which explanation best fits the evidence?',
         promptJP: 'この<ruby>証拠<rt>しょうこ</rt></ruby>に<ruby>一番<rt>いちばん</rt></ruby>よく<ruby>合<rt>あ</rt></ruby>う<ruby>説明<rt>せつめい</rt></ruby>はどれですか？',
         choices: [
-          'Twiddle’s energy looped because every choice had to be perfect.',
           'The cemetery paths secretly changed places.',
+          'Twiddle’s energy looped because every choice had to be perfect.',
           'Nuppi asked Twiddle to walk in a circle.'
         ],
-        correct: 0,
+        correct: 1,
         resolution: 'Twiddle’s energy settles when a choice becomes a step instead of another question.'
       }
     }
