@@ -1,7 +1,8 @@
 /*
- * Muenba world shell — navigation and atmosphere only.
- * Ghost hunting, lobby dialogue, capture, and durable Muenba progress belong
- * to later passes.
+ * Muenba world shell — navigation, atmosphere, Nuppi's lobby briefing, and
+ * the briefing Q&A gate that reveals the day's target ghost. Ghost AI
+ * (ignore vs. chase), hiding, click-to-attempt capture, the rhythm game,
+ * and durable Muenba save/progress still belong to later passes.
  */
 (() => {
   'use strict';
@@ -61,7 +62,8 @@
     lastTickTime: 0,
     speed: BASE_SPEED,
     fogX: 0,
-    returnExiting: false
+    returnExiting: false,
+    targetGhost: null
   };
 
   let app;
@@ -87,6 +89,8 @@
   let returnPortalCooldownUntil = 0;
   let lobbyOverlay = null;
   let lobbyOpen = false;
+  let briefingOverlay = null;
+  let briefingOpen = false;
   let motes = [];
   let moteSprite = null;
   const imageCache = new Map();
@@ -101,6 +105,23 @@
     { x: 800, y: 560, r: 320 }
   ];
   const MOTE_COUNT = 6;
+
+  // The first 5 hunt-able ghosts (Pass 4) — file names ARE their ids, per
+  // how they were delivered, except Tinklet/"Tinkley": the folder's file is
+  // tinklet.png, so that's what's wired here; flag if the name should
+  // actually be spelled differently and the file needs renaming to match.
+  // "angry_change" isn't in this list on purpose — it's the shared sprite
+  // every ghost swaps to when clicked or when it turns to chase (Pass 7),
+  // not a huntable ghost of its own.
+  const GHOSTS = [
+    { id: 'fuzzle',  name: 'Fuzzle',  img: 'assets/img/muenba/ghosts/fuzzle.png'  },
+    { id: 'glimmer', name: 'Glimmer', img: 'assets/img/muenba/ghosts/glimmer.png' },
+    { id: 'nibsy',   name: 'Nibsy',   img: 'assets/img/muenba/ghosts/nibsy.png'   },
+    { id: 'tinklet', name: 'Tinkley', img: 'assets/img/muenba/ghosts/tinklet.png' },
+    { id: 'twiddle', name: 'Twiddle', img: 'assets/img/muenba/ghosts/twiddle.png' }
+  ];
+  const ANGRY_CHANGE_IMG = 'assets/img/muenba/ghosts/angry_change.png';
+
   const ghostImg = new Image();
   ghostImg.src = 'assets/img/booha_ghost.png';
   // Reusing Nuppi's existing wandering-NPC art from Karasuki (same asset
@@ -234,14 +255,32 @@
       #muenba-lobby-overlay.open .muenba-lobby-box { transform:scale(1); opacity:1; }
       .muenba-lobby-portrait { display:block; width:96px; height:96px; object-fit:contain; margin:0 auto 12px; filter:drop-shadow(0 0 16px rgba(122,180,151,.3)); }
       .muenba-lobby-box h2 { margin:0 0 4px; font-size:1.2rem; font-weight:400; letter-spacing:.06em; text-transform:uppercase; }
-      .muenba-lobby-box .jp { margin:0 0 16px; color:#aac2b5; font-size:.85rem; letter-spacing:.1em; }
+      .muenba-lobby-box .jp { margin:0 0 16px; color:#aac2b5; font-size:.85rem; letter-spacing:.1em; text-align:center; }
       .muenba-lobby-box p { margin:0 0 14px; color:#c5d8cd; font-size:.92rem; line-height:1.65; text-align:left; }
       .muenba-lobby-box p.jp-line { color:#8fa89b; font-size:.82rem; }
       .muenba-lobby-box p:last-of-type { margin-bottom:20px; }
       .muenba-lobby-actions { display:flex; justify-content:center; margin-top:4px; }
       #muenba-lobby-begin { border:1px solid rgba(156,203,182,.7); color:#e0f4e9; background:rgba(52,104,78,.28); box-shadow:0 0 16px rgba(93,162,124,.22); border-radius:999px; padding:10px 28px; font:700 12px ui-monospace,monospace; letter-spacing:.05em; cursor:pointer; }
       #muenba-lobby-begin:hover, #muenba-lobby-begin:focus-visible { background:rgba(52,104,78,.44); outline:none; }
-      @media (prefers-reduced-motion: reduce) { #muenba-fade, .muenba-return-box, #muenba-return-overlay, .muenba-lobby-box, #muenba-lobby-overlay { transition:none !important; } }
+      /* Briefing Q&A gate (Pass 4) — same overlay/box shell as the lobby
+         briefing, just holding a quiz card or the target-ghost reveal
+         instead of static copy. Not dismissible by clicking the backdrop
+         or Escape — it's a gate, not a message. */
+      #muenba-briefing-overlay { position:fixed; inset:0; z-index:220; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,0); transition:background .4s ease; padding:20px; box-sizing:border-box; }
+      #muenba-briefing-overlay.open { display:flex; background:rgba(0,0,0,.88); }
+      .muenba-briefing-box { text-align:left; }
+      .muenba-briefing-box h2 { text-align:center; }
+      .muenba-briefing-box > .jp { text-align:center; }
+      .muenba-briefing-count { text-align:center; color:#8fa89b; font-size:.76rem; letter-spacing:.08em; text-transform:uppercase; margin:0 0 12px; }
+      .muenba-briefing-box .muenba-briefing-prompt { font-size:1.15rem; text-align:center; color:#e8f2ec; margin:0 0 18px; line-height:1.5; }
+      .muenba-briefing-choices { display:flex; flex-direction:column; gap:9px; margin-bottom:4px; }
+      .muenba-briefing-choice { padding:11px 14px; border-radius:12px; border:1px solid rgba(156,203,182,.32); background:rgba(20,38,32,.5); color:#dcefe4; font:400 .92rem Georgia,'Times New Roman',serif; text-align:left; cursor:pointer; transition:transform .1s,background .2s,border-color .2s; }
+      .muenba-briefing-choice:hover, .muenba-briefing-choice:focus-visible { background:rgba(52,104,78,.32); outline:none; }
+      .muenba-briefing-choice.right { border-color:#5dd08c; background:rgba(56,180,110,.28); }
+      .muenba-briefing-choice.wrong { border-color:#e0687e; background:rgba(200,70,90,.24); }
+      .muenba-briefing-choice.dim { opacity:.4; }
+      .muenba-briefing-ghost-portrait { display:block; width:120px; height:120px; object-fit:contain; margin:0 auto 14px; filter:drop-shadow(0 0 20px rgba(122,180,151,.35)); }
+      @media (prefers-reduced-motion: reduce) { #muenba-fade, .muenba-return-box, #muenba-return-overlay, .muenba-lobby-box, #muenba-lobby-overlay, #muenba-briefing-overlay { transition:none !important; } }
     `;
     document.head.appendChild(style);
   }
@@ -272,6 +311,7 @@
 
     buildReturnPortalOverlay();
     buildNuppiLobbyOverlay();
+    buildBriefingOverlay();
 
     const dev = document.createElement('div');
     dev.id = 'muenba-dev';
@@ -741,7 +781,10 @@
         </div>
       </div>`;
     document.body.appendChild(lobbyOverlay);
-    document.getElementById('muenba-lobby-begin').addEventListener('click', closeNuppiLobby);
+    document.getElementById('muenba-lobby-begin').addEventListener('click', () => {
+      closeNuppiLobby();
+      openBriefingQuiz();
+    });
     document.addEventListener('keydown', event => {
       if (event.key === 'Escape' && lobbyOpen) closeNuppiLobby();
     });
@@ -758,6 +801,268 @@
   function closeNuppiLobby() {
     lobbyOpen = false;
     if (lobbyOverlay) lobbyOverlay.classList.remove('open');
+  }
+
+  // ── Briefing Q&A gate (Pass 4) ───────────────────────────────────────────
+  // Nuppi's "answer a few questions" check, styled after daily-check.js's
+  // own engine (seeded shuffle, this week's curriculum content, tap-only
+  // choices) but run as its own short flow here — it deliberately does NOT
+  // call into BoohaDailyCheck or touch its meta.checkIn/streak record,
+  // since that's a separate feature students already see elsewhere. Runs
+  // right after the lobby's "Let's begin" button, ends with Nuppi
+  // revealing the day's target ghost, then releases the player to
+  // free-roam. Matches the site's no-punishment ESL tone: a wrong answer
+  // just reveals the right one and moves on, nothing blocks completion.
+  const BRIEFING_TYPES = ['vocab', 'sentences', 'questions'];
+  const BRIEFING_LEN = 4;
+  const BRIEFING_CHOICES = 4;
+
+  function _briHashStr(str) {
+    let h = 1779033703 ^ str.length;
+    for (let i = 0; i < str.length; i++) {
+      h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
+      h = (h << 13) | (h >>> 19);
+    }
+    return h >>> 0;
+  }
+  function _briRng(seedStr) {
+    let a = _briHashStr(seedStr) || 1;
+    return function () {
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function _briShuffle(arr, seedStr) {
+    const r = _briRng(seedStr);
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(r() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function _briTodayKey() {
+    try {
+      return window.CALENDAR && CALENDAR.getTodayKey ? CALENDAR.getTodayKey() : null;
+    } catch (_) {
+      return null;
+    }
+  }
+  // Same localStorage key index.html/daily-check.js already write the
+  // selected curriculum to — reused read-only here, no picker screen of
+  // our own. Defaults to 'pb' only so DEV testing never hard-blocks before
+  // a curriculum has been picked elsewhere; production players reaching
+  // Muenba will always have this set already.
+  function _briKnownCurr() {
+    const c = localStorage.getItem('booha_last_curr');
+    return (c === 'pb' || c === 'br' || c === 'bc') ? c : 'pb';
+  }
+  function _briWeekInfo() {
+    try {
+      const cw = CALENDAR.getCurrentCurriculumWeek();
+      return { monthSlug: cw.monthSlug, weekNumber: Math.min(cw.weekNumber || 1, 4) };
+    } catch (_) {
+      return null;
+    }
+  }
+  function _briSliceForWeek(cards, wk) {
+    const lo = (wk - 1) * 15 + 1, hi = wk * 15;
+    return (cards || []).filter(c => c.n >= lo && c.n <= hi);
+  }
+
+  async function _loadBriefingContent(curr) {
+    const wi = _briWeekInfo();
+    if (!wi) throw new Error('[Muenba] briefing: no week info available');
+    const entries = await Promise.all(BRIEFING_TYPES.map(async type => {
+      const url = `content/${curr}/${wi.monthSlug}/${type}.json`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`[Muenba] briefing: ${type} ${res.status}`);
+      const data = await res.json();
+      return [type, _briSliceForWeek(data.cards, wi.weekNumber)];
+    }));
+    const sets = {};
+    entries.forEach(e => { sets[e[0]] = e[1]; });
+    return { curr, sets };
+  }
+
+  // Mirrors daily-check.js's buildDay() quiz step: mixed pool of this
+  // week's vocab/sentences/questions, seeded by today's date so the set is
+  // stable across re-entries the same day, distractors drawn from the same
+  // type as the answer so length alone never gives it away.
+  function _buildBriefingQuiz(content) {
+    const seedBase = (_briTodayKey() || 'nodate') + '|' + content.curr + '|muenbaBriefing';
+    const promptKey = content.curr === 'pb' ? 'hira' : 'jp';
+    const pool = [];
+    BRIEFING_TYPES.forEach(type => {
+      (content.sets[type] || []).forEach(c => pool.push({ ...c, _type: type }));
+    });
+    if (!pool.length) return [];
+    const picked = _briShuffle(pool, seedBase).slice(0, Math.min(BRIEFING_LEN, pool.length));
+    return picked.map(item => {
+      const sameType = (content.sets[item._type] || []).filter(c => c.n !== item.n);
+      const distractors = _briShuffle(sameType, seedBase + '|d' + item._type + item.n)
+        .slice(0, Math.min(BRIEFING_CHOICES - 1, sameType.length));
+      const choices = _briShuffle([item, ...distractors], seedBase + '|c' + item._type + item.n)
+        .map(c => ({ n: c.n, label: c.en }));
+      return {
+        prompt: item[promptKey] || item.jp || item.en,
+        answerN: item.n,
+        choices
+      };
+    });
+  }
+
+  // Picked once per calendar day (not per entry) so re-entering Muenba the
+  // same day keeps pointing at the same ghost rather than reshuffling on
+  // every visit — the lobby greeting re-shows every entry, but the hunt
+  // itself stays put until it's actually caught (Pass 7+).
+  function _pickTargetGhost() {
+    const seedBase = (_briTodayKey() || String(Math.random())) + '|muenbaTargetGhost';
+    const r = _briRng(seedBase);
+    const idx = Math.floor(r() * GHOSTS.length);
+    return GHOSTS[idx];
+  }
+
+  function buildBriefingOverlay() {
+    if (briefingOverlay) return;
+    briefingOverlay = document.createElement('div');
+    briefingOverlay.id = 'muenba-briefing-overlay';
+    document.body.appendChild(briefingOverlay);
+  }
+
+  // House rule carried over from daily-check.js: textContent for every
+  // data-sourced string (curriculum JSON), never innerHTML with card data.
+  function _briClear() {
+    briefingOverlay.textContent = '';
+    const box = document.createElement('div');
+    box.className = 'muenba-lobby-box muenba-briefing-box';
+    briefingOverlay.appendChild(box);
+    return box;
+  }
+
+  function _renderBriefingLoading() {
+    const box = _briClear();
+    const jp = document.createElement('p'); jp.className = 'jp-line';
+    jp.textContent = 'きろくをよみこみ中……';
+    const en = document.createElement('p');
+    en.textContent = "Nuppi is gathering this week's words...";
+    box.append(jp, en);
+  }
+
+  function _runBriefingQuiz(quiz, qi) {
+    const box = _briClear();
+    const q = quiz[qi];
+
+    const count = document.createElement('div');
+    count.className = 'muenba-briefing-count';
+    count.textContent = `Question ${qi + 1} / ${quiz.length}`;
+    box.appendChild(count);
+
+    const h2 = document.createElement('h2');
+    h2.textContent = 'Nuppi asks…';
+    box.appendChild(h2);
+
+    const prompt = document.createElement('p');
+    prompt.className = 'muenba-briefing-prompt';
+    prompt.textContent = q.prompt;
+    box.appendChild(prompt);
+
+    const list = document.createElement('div');
+    list.className = 'muenba-briefing-choices';
+    let answered = false;
+    q.choices.forEach((choice, i) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'muenba-briefing-choice';
+      b.textContent = choice.label;
+      b.addEventListener('click', () => {
+        if (answered) return;
+        answered = true;
+        const isRight = choice.n === q.answerN;
+        if (isRight) {
+          b.classList.add('right');
+        } else {
+          b.classList.add('wrong');
+          Array.from(list.children).forEach((cb, j) => {
+            if (q.choices[j].n === q.answerN) cb.classList.add('right');
+            else if (cb !== b) cb.classList.add('dim');
+          });
+        }
+        setTimeout(() => {
+          const next = qi + 1;
+          if (next >= quiz.length) _revealTargetGhost();
+          else _runBriefingQuiz(quiz, next);
+        }, isRight ? 550 : 1050);
+      });
+      list.appendChild(b);
+    });
+    box.appendChild(list);
+  }
+
+  function _revealTargetGhost() {
+    const box = _briClear();
+    const ghost = state.targetGhost || GHOSTS[0];
+
+    const img = document.createElement('img');
+    img.className = 'muenba-briefing-ghost-portrait';
+    img.src = ghost.img;
+    img.alt = ghost.name;
+    box.appendChild(img);
+
+    const h2 = document.createElement('h2');
+    h2.textContent = 'Nuppi points...';
+    box.appendChild(h2);
+    const jp = document.createElement('p'); jp.className = 'jp';
+    jp.textContent = '見つけて。';
+    box.appendChild(jp);
+
+    const p1 = document.createElement('p');
+    p1.textContent = `That's the one — ${ghost.name}. Somewhere in these fifteen rooms, ${ghost.name} is waiting for you to find it.`;
+    box.appendChild(p1);
+    const p2 = document.createElement('p');
+    p2.className = 'jp-line';
+    p2.textContent = `${ghost.name}を探して。この15の部屋のどこかに隠れているよ。`;
+    box.appendChild(p2);
+
+    const actions = document.createElement('div');
+    actions.className = 'muenba-lobby-actions';
+    const go = document.createElement('button');
+    go.type = 'button';
+    go.id = 'muenba-briefing-go';
+    go.textContent = "I'll find it";
+    go.addEventListener('click', closeBriefingQuiz);
+    actions.appendChild(go);
+    box.appendChild(actions);
+  }
+
+  function openBriefingQuiz() {
+    if (briefingOpen || !briefingOverlay) return;
+    briefingOpen = true;
+    state.clickTarget = null;
+    state.moving = false;
+    briefingOverlay.classList.add('open');
+    state.targetGhost = _pickTargetGhost();
+
+    _renderBriefingLoading();
+    const curr = _briKnownCurr();
+    _loadBriefingContent(curr).then(content => {
+      const quiz = _buildBriefingQuiz(content);
+      if (!quiz.length) { _revealTargetGhost(); return; }
+      _runBriefingQuiz(quiz, 0);
+    }).catch(err => {
+      // Offline/404/missing week content must never hard-lock the player
+      // out of Muenba — skip straight to the reveal instead.
+      console.warn('[Muenba] Briefing content unavailable, skipping quiz:', err);
+      _revealTargetGhost();
+    });
+  }
+
+  function closeBriefingQuiz() {
+    briefingOpen = false;
+    if (briefingOverlay) briefingOverlay.classList.remove('open');
   }
 
   function drawReturnPortal(now) {
@@ -959,7 +1264,7 @@
 
   function handleInput(clientX, clientY) {
     startMusic();
-    if (state.transitioning || state.inputLocked || returnPortalOpen || lobbyOpen) return;
+    if (state.transitioning || state.inputLocked || returnPortalOpen || lobbyOpen || briefingOpen) return;
     const point = stagePoint(clientX, clientY);
     if (DEV_MODE && state.coordMode) {
       dropPin(point.x, point.y);
@@ -1002,7 +1307,7 @@
     const dt = Math.min(32, Math.max(8, now - (state.lastTickTime || now)));
     state.lastTickTime = now;
     state.speed = BASE_SPEED * Math.min(1.6, dt / TARGET_DT);
-    if (!state.transitioning && !returnPortalOpen && !lobbyOpen) {
+    if (!state.transitioning && !returnPortalOpen && !lobbyOpen && !briefingOpen) {
       const drifting = tickEntryDrift(now);
       if (!drifting && !state.inputLocked) {
         handleMovement(now);
