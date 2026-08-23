@@ -2174,7 +2174,9 @@ const HAPPY_HOUSE_PORTAL = {
       .wpop-box::-webkit-scrollbar{width:4px;}
       .wpop-box::-webkit-scrollbar-track{background:transparent;}
       .wpop-box::-webkit-scrollbar-thumb{background:rgba(255,255,255,.18);border-radius:4px;}
-      #orb-panel{touch-action:none;}
+      /* Keep the reading card vertically scrollable on touch screens while
+         still preventing horizontal gesture leakage into the world. */
+      #orb-panel{touch-action:pan-y;}
     `;
     document.head.appendChild(s);
   }

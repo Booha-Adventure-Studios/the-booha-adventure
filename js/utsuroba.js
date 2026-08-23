@@ -752,24 +752,6 @@
       #utsuroba-stage{position:absolute;left:50%;top:50%;width:${WORLD_W}px;height:${WORLD_H}px;transform-origin:50% 50%;overflow:hidden;cursor:crosshair;}
       #utsuroba-room-layer{position:absolute;inset:0;}
       #utsuroba-memory-echo-layer{position:absolute;inset:0;z-index:8;pointer-events:none;overflow:hidden;}
-      .utsu-memory-echo{position:absolute;transform:translate(-50%,-50%);width:110px;height:110px;padding:0;border:0;background:transparent;pointer-events:auto;cursor:pointer;filter:drop-shadow(0 0 16px rgba(255,203,117,.34));}
-      .utsu-memory-echo .echo-aura{position:absolute;inset:18px;border-radius:50%;background:radial-gradient(circle,rgba(255,230,150,.3),rgba(255,203,117,.08) 42%,transparent 70%);animation:echoBreathe 2.8s ease-in-out infinite;}
-      .utsu-memory-echo .echo-icon{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:31px;line-height:1;color:#ffe7a8;text-shadow:0 0 14px #ffcb75;animation:echoFloat 2.2s ease-in-out infinite;}
-      .utsu-memory-echo .echo-label{position:absolute;left:50%;top:calc(100% - 7px);transform:translateX(-50%);min-width:130px;padding:5px 8px;border:1px solid rgba(255,203,117,.35);border-radius:6px;background:rgba(18,7,28,.86);color:#ffe7b2;text-align:center;font:700 10px/1.2 Georgia,serif;white-space:nowrap;opacity:.88;}
-      .utsu-memory-echo .echo-label small{display:block;margin-top:3px;color:rgba(255,231,178,.6);font-size:9px;font-weight:400;}
-      .utsu-memory-echo.motif-candy{filter:drop-shadow(0 0 16px rgba(255,145,175,.38));}
-      .utsu-memory-echo.motif-candy .echo-aura{background:radial-gradient(circle,rgba(255,167,194,.3),rgba(255,126,180,.08) 42%,transparent 70%);}
-      .utsu-memory-echo.motif-candy .echo-icon{color:#ffb4d0;text-shadow:0 0 14px #ff70b0;}
-      .utsu-memory-echo.motif-reflection{filter:drop-shadow(0 0 16px rgba(145,210,255,.34));}
-      .utsu-memory-echo.motif-reflection .echo-aura{background:radial-gradient(circle,rgba(145,210,255,.3),rgba(100,170,255,.08) 42%,transparent 70%);}
-      .utsu-memory-echo.motif-reflection .echo-icon{color:#b8e4ff;text-shadow:0 0 14px #7dc8ff;}
-      .utsu-memory-echo.motif-thorn{filter:drop-shadow(0 0 16px rgba(217,80,58,.4));}
-      .utsu-memory-echo.motif-thorn .echo-aura{background:radial-gradient(circle,rgba(217,110,80,.32),rgba(150,50,30,.08) 42%,transparent 70%);}
-      .utsu-memory-echo.motif-thorn .echo-icon{color:#e88a6e;text-shadow:0 0 14px #d9503a;}
-      .utsu-memory-echo.motif-ribbon{filter:drop-shadow(0 0 16px rgba(217,168,255,.36));}
-      .utsu-memory-echo.motif-ribbon .echo-aura{background:radial-gradient(circle,rgba(225,180,255,.3),rgba(160,110,220,.08) 42%,transparent 70%);}
-      .utsu-memory-echo.motif-ribbon .echo-icon{color:#e4c2ff;text-shadow:0 0 14px #d9a8ff;}
-      @keyframes echoBreathe{0%,100%{transform:scale(.82);opacity:.55}50%{transform:scale(1.12);opacity:1}}
       @keyframes echoFloat{0%,100%{transform:translate(-50%,-48%)}50%{transform:translate(-50%,-58%)}}
       .utsu-memory-gate{position:absolute;transform:translate(-50%,-50%);width:140px;height:120px;padding:0;border:0;background:transparent;pointer-events:auto;cursor:pointer;filter:drop-shadow(0 0 20px rgba(216,168,255,.48));}
       .utsu-memory-gate .gate-ring{position:absolute;left:50%;top:50%;width:72px;height:72px;transform:translate(-50%,-50%) rotate(45deg);border:2px solid rgba(216,168,255,.78);box-shadow:0 0 24px rgba(216,168,255,.48),inset 0 0 22px rgba(216,168,255,.18);animation:gatePulse 2.6s ease-in-out infinite;}
