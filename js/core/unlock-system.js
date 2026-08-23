@@ -97,7 +97,7 @@ const BoohaUnlockSystem = (() => {
    * scores.isCompleted().
    */
   function isWeeklyWorldGateOpen() {
-    if (window.__devAllGames || window.__devUtsuroba) return true;
+    if (window.__devAllGames || window.__devUtsuroba || window.__devMuenba) return true;
 
     try {
       const scores = window.BoohaAdventure && window.BoohaAdventure.scores;

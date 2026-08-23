@@ -32,6 +32,7 @@
 
   const params = new URLSearchParams(window.location.search);
   const DEV_MODE = params.get('dev') === '1';
+  if (DEV_MODE) window.__devMuenba = true;
   const requestedRoom = params.get('room');
 
   const state = {
@@ -63,14 +64,53 @@
   let actorCtx;
   let fadeEl;
   let devReadout;
+  let devCoordToggle;
+  let devArrowList;
+  let devHover = null;
   let currentBg;
   let vignetteCanvas;
   let fogTexture;
   let lastTouchEnd = 0;
   let entryDrift = null;
+  let pins = [];
   const imageCache = new Map();
   const ghostImg = new Image();
   ghostImg.src = 'assets/img/booha_ghost.png';
+  const music = new Audio('assets/img/muenba/muenba_BGM.mp3');
+  music.loop = true;
+  music.volume = 0.55;
+
+  function worldGateOpen() {
+    if (DEV_MODE || window.__devMuenba) return true;
+    return window.BoohaUnlockSystem &&
+      typeof BoohaUnlockSystem.isWeeklyWorldGateOpen === 'function'
+      ? BoohaUnlockSystem.isWeeklyWorldGateOpen()
+      : false;
+  }
+
+  function showLockedWorld() {
+    const style = document.createElement('style');
+    style.textContent = `
+      html,body{margin:0;min-height:100%;background:#020605;color:#e0eee8;}
+      body{display:grid;place-items:center;font-family:Georgia,'Times New Roman',serif;}
+      .muenba-lock{box-sizing:border-box;width:min(460px,calc(100% - 36px));padding:28px 26px 30px;border:1px solid rgba(111,166,145,.45);border-radius:18px;background:linear-gradient(155deg,rgba(8,27,20,.96),rgba(1,4,4,.98));box-shadow:0 24px 70px rgba(0,0,0,.72),0 0 55px rgba(16,65,45,.28),inset 0 0 70px rgba(0,0,0,.58);text-align:center;}
+      .muenba-lock img{display:block;width:min(150px,38vw);height:auto;max-height:180px;object-fit:contain;margin:0 auto 10px;filter:drop-shadow(0 0 18px rgba(122,180,151,.22));}
+      .muenba-lock h1{margin:6px 0 3px;font-size:clamp(1.25rem,5vw,1.8rem);font-weight:400;letter-spacing:.08em;text-transform:uppercase;}
+      .muenba-lock .jp{margin:0;color:#aac2b5;font-size:.88rem;letter-spacing:.12em;}
+      .muenba-lock p{margin:20px auto 0;max-width:31em;color:#c5d8cd;font-size:.94rem;line-height:1.7;}
+      .muenba-lock p small{display:block;margin-top:8px;color:#7e9c8b;font-size:.86em;}
+      .muenba-lock a{display:inline-block;margin-top:22px;padding:9px 16px;border:1px solid rgba(156,203,182,.58);border-radius:999px;color:#dcefe4;text-decoration:none;font-size:.78rem;letter-spacing:.05em;background:rgba(111,166,145,.10);}
+      .muenba-lock a:hover,.muenba-lock a:focus-visible{background:rgba(111,166,145,.22);outline:none;}
+    `;
+    document.head.appendChild(style);
+    document.body.innerHTML = `<main class="muenba-lock" aria-labelledby="muenba-lock-title"><img src="assets/img/muenba/muenba_logo.png" alt="Muenba"><h1 id="muenba-lock-title">This world is locked</h1><p class="jp">この世界は封印されています</p><p>Something waits beyond the cemetery path.<small>Complete the weekly world gate before Muenba opens.</small></p><a href="karasuki.html">Return to Karasuki</a></main>`;
+  }
+
+  function startMusic() {
+    if (state.musicStarted) return;
+    state.musicStarted = true;
+    music.play().catch(() => { state.musicStarted = false; });
+  }
 
   function validateData() {
     const errors = [];
@@ -101,8 +141,12 @@
       #muenba-atmosphere { z-index:4; pointer-events:none; }
       #muenba-canvas { z-index:10; pointer-events:none; }
       #muenba-fade { z-index:30; background:#000; opacity:0; pointer-events:none; }
-      #muenba-dev { position:fixed; left:12px; top:12px; z-index:100; display:${DEV_MODE ? 'block' : 'none'}; color:#bde5e4; background:rgba(0,8,12,.78); border:1px solid rgba(125,220,216,.35); border-radius:10px; padding:8px 10px; font:700 11px/1.5 ui-monospace,monospace; pointer-events:none; }
+      #muenba-dev { position:fixed; left:12px; top:12px; z-index:100; display:${DEV_MODE ? 'block' : 'none'}; color:#bde5e4; background:rgba(0,8,12,.88); border:1px solid rgba(125,220,216,.35); border-radius:10px; padding:9px 10px; font:700 11px/1.5 ui-monospace,monospace; pointer-events:auto; min-width:210px; box-shadow:0 0 20px rgba(0,0,0,.4); }
       #muenba-dev strong { color:#f0ffff; }
+      #muenba-dev button { border:1px solid rgba(125,220,216,.4); border-radius:5px; background:rgba(10,40,40,.62); color:#bde5e4; padding:4px 7px; font:700 10px ui-monospace,monospace; cursor:pointer; }
+      #muenba-dev button.active { background:rgba(75,135,122,.65); color:#f0ffff; }
+      #muenba-dev .muenba-dev-small { color:rgba(189,229,228,.64); font-size:10px; margin-top:4px; }
+      #muenba-dev .muenba-dev-arrows { margin-top:5px; padding-top:5px; border-top:1px solid rgba(125,220,216,.18); color:rgba(189,229,228,.72); white-space:pre-line; }
       #muenba-room-list { position:fixed; right:12px; bottom:12px; z-index:100; display:${DEV_MODE ? 'flex' : 'none'}; flex-wrap:wrap; justify-content:flex-end; gap:4px; max-width:330px; }
       #muenba-room-list button { border:1px solid rgba(125,220,216,.35); border-radius:5px; background:rgba(0,8,12,.8); color:#bde5e4; padding:4px 6px; font:700 10px ui-monospace,monospace; cursor:pointer; }
       #muenba-room-list button:hover { background:rgba(30,80,84,.8); }
@@ -130,9 +174,17 @@
 
     const dev = document.createElement('div');
     dev.id = 'muenba-dev';
-    dev.innerHTML = '<strong>MUENBA DEV</strong><br><span id="muenba-dev-text"></span>';
+    dev.innerHTML = '<strong>MUENBA DEV</strong><br><span id="muenba-dev-text"></span><br><button id="muenba-dev-coords" type="button">COORDS ON</button><div class="muenba-dev-small">Coords mode: click to pin, movement paused</div><div id="muenba-dev-arrows" class="muenba-dev-arrows"></div>';
     document.body.appendChild(dev);
     devReadout = document.getElementById('muenba-dev-text');
+    devCoordToggle = document.getElementById('muenba-dev-coords');
+    devArrowList = document.getElementById('muenba-dev-arrows');
+    devCoordToggle.classList.toggle('active', state.coordMode);
+    devCoordToggle.addEventListener('click', () => {
+      state.coordMode = !state.coordMode;
+      devCoordToggle.classList.toggle('active', state.coordMode);
+      devCoordToggle.textContent = state.coordMode ? 'COORDS ON' : 'COORDS OFF';
+    });
 
     const roomList = document.createElement('div');
     roomList.id = 'muenba-room-list';
@@ -232,6 +284,7 @@
     state.transitionReadyAt = performance.now() + TRANSITION_COOLDOWN_MS;
     state.spawnLockUntil = performance.now() + 700;
     showRoom(roomId);
+    renderDevArrowList();
     beginEntryDrift();
   }
 
@@ -444,13 +497,50 @@
     if (vignetteCanvas) atmosphereCtx.drawImage(vignetteCanvas, 0, 0);
   }
 
+  function renderDevArrowList() {
+    if (!devArrowList) return;
+    const exits = getRoom().exits || [];
+    devArrowList.textContent = exits.length
+      ? exits.map(exit => `${exit.dir.padEnd(5, ' ')} x:${exit.x} y:${exit.y} → ${exit.to}`).join('\n')
+      : 'No exits in this room';
+  }
+
+  function dropPin(x, y) {
+    pins.push({ x, y, label: `${Math.round(x)}, ${Math.round(y)}` });
+    if (pins.length > 30) pins.shift();
+  }
+
+  function drawPins() {
+    if (!DEV_MODE || !state.coordMode) return;
+    pins.forEach((pin, index) => {
+      actorCtx.save();
+      actorCtx.globalAlpha = .9;
+      actorCtx.strokeStyle = '#8de8d2';
+      actorCtx.lineWidth = 1.5;
+      actorCtx.beginPath();
+      actorCtx.moveTo(pin.x - 12, pin.y); actorCtx.lineTo(pin.x + 12, pin.y);
+      actorCtx.moveTo(pin.x, pin.y - 12); actorCtx.lineTo(pin.x, pin.y + 12);
+      actorCtx.stroke();
+      actorCtx.fillStyle = '#d8fff2';
+      actorCtx.beginPath(); actorCtx.arc(pin.x, pin.y, 4, 0, Math.PI * 2); actorCtx.fill();
+      actorCtx.font = '700 11px ui-monospace,monospace';
+      actorCtx.fillStyle = '#c8f8e8';
+      actorCtx.fillText(`${index + 1}. ${pin.label}`, pin.x + 9, pin.y - 10);
+      actorCtx.restore();
+    });
+  }
+
   function drawFrame(now) {
     atmosphereCtx.clearRect(0, 0, WORLD_W, WORLD_H);
     actorCtx.clearRect(0, 0, WORLD_W, WORLD_H);
     drawAtmosphere(now);
     drawExitArrows(now);
     drawBooha(now);
-    if (DEV_MODE && devReadout) devReadout.textContent = `${state.roomId}  x:${Math.round(state.x)} y:${Math.round(state.y)}  exits:${getRoom().exits.length}`;
+    drawPins();
+    if (DEV_MODE && devReadout) {
+      const hover = devHover ? `  mouse:${Math.round(devHover.x)},${Math.round(devHover.y)}` : '';
+      devReadout.textContent = `${state.roomId}  player:${Math.round(state.x)},${Math.round(state.y)}${hover}`;
+    }
   }
 
   function stagePoint(clientX, clientY) {
@@ -462,8 +552,13 @@
   }
 
   function handleInput(clientX, clientY) {
+    startMusic();
     if (state.transitioning || state.inputLocked) return;
     const point = stagePoint(clientX, clientY);
+    if (DEV_MODE && state.coordMode) {
+      dropPin(point.x, point.y);
+      return;
+    }
     if (Math.hypot(point.x - state.x, point.y - state.y) < 30) return;
     state.clickTarget = point;
   }
@@ -483,9 +578,10 @@
     stage.addEventListener('mousemove', event => {
       if (!DEV_MODE || !devReadout) return;
       const point = stagePoint(event.clientX, event.clientY);
-      devReadout.textContent = `${state.roomId}  x:${Math.round(point.x)} y:${Math.round(point.y)}  exits:${getRoom().exits.length}`;
+      devHover = point;
     });
-    document.addEventListener('click', () => { state.musicStarted = true; }, { once: true });
+    document.addEventListener('click', startMusic, { once: true });
+    document.addEventListener('touchend', startMusic, { once: true, passive: true });
   }
 
   function jumpToRoom(roomId) {
@@ -512,6 +608,10 @@
   }
 
   function init() {
+    if (!worldGateOpen()) {
+      showLockedWorld();
+      return;
+    }
     validateData();
     injectStyles();
     buildApp();
@@ -525,4 +625,14 @@
 
   if (window.BOOHA_READY) init();
   else document.addEventListener('booha:ready', init, { once: true });
+
+  Object.defineProperty(window, 'b_muenba', {
+    value: () => {
+      window.__devMuenba = true;
+      if (!DEV_MODE) window.location.href = 'muenba.html?dev=1';
+    },
+    writable: false,
+    configurable: false,
+    enumerable: false
+  });
 })();
