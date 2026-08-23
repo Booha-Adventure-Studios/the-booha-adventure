@@ -276,31 +276,35 @@
         record.wrongWeek = curriculumWeekKey(record.wrongWeek);
         dirty = true;
       }
+      if (record && !Array.isArray(record.completed)) {
+        record.completed = [];
+        dirty = true;
+      }
+      if (record && record.weeklyStatus && !['active', 'complete', 'resting'].includes(record.weeklyStatus)) {
+        delete record.weeklyStatus;
+        dirty = true;
+      }
     });
 
-    /* ── Weekly drifter tracking (Pass 1 fix, see
-       claude/utsuroba-audit-and-pass-plan.md) ───────────────
-       This block used to WIPE every drifter's completed
-       memories and readingEchoes on every curriculum-week
-       rollover. But the Three Echoes convergence needs
-       ks + nto + cg restored at the same time, only one quest
-       can be active at once, and every current drifter has
-       memoryCount:1 — so a weekly wipe never unlocked new
-       content, it only forced re-doing the same one-shot story
-       and made convergence nearly impossible to reach before
-       progress reset out from under a kid. Drifter memories and
-       readingEchoes are now permanent once earned. We still
-       stamp driftersWeekKey (unused for resets now) so a future
-       drifter with memoryCount > 1 can opt into a real weekly
-       rotation without anyone touching this block again.
-       Only rolls when CALENDAR gives an authoritative week —
-       never guess on an unknown week. */
+    /* ── Weekly drifter tracking ─────────────────────────────
+       Completed memories and readingEchoes stay permanent. A week key is
+       used only to make the already-completed memory available for one
+       replay per new curriculum week. An unfinished quest from an older
+       week cannot block the fresh weekly loop. */
     try {
       if (window.CALENDAR?.getCurrentCurriculumWeek) {
         const cw = CALENDAR.getCurrentCurriculumWeek();
         const wk = curriculumWeekKey(cw);
         if (data.utsuroba.driftersWeekKey !== wk) {
           data.utsuroba.driftersWeekKey = wk;
+          dirty = true;
+        }
+        if (data.weekly.drifterQuest && data.weekly.drifterQuest.weekKey &&
+            data.weekly.drifterQuest.weekKey !== wk) {
+          data.weekly.drifterQuest = null;
+          dirty = true;
+        } else if (data.weekly.drifterQuest && !data.weekly.drifterQuest.weekKey) {
+          data.weekly.drifterQuest.weekKey = wk;
           dirty = true;
         }
       }
@@ -423,19 +427,62 @@
     drifterImgs[d.id] = { img1: load(d.sprite1), img2: load(d.sprite2) };
   });
 
+  function drifterRecord(id, utsu = null) {
+    const data = utsu || readUtsuroba();
+    const record = data.drifters?.[id];
+    return record && typeof record === 'object' ? record : { completed: [] };
+  }
+
+  function drifterHasUnfinishedMemory(id) {
+    const d = DATA.drifters.find(x => x.id === id);
+    if (!d) return false;
+    const record = drifterRecord(id);
+    return (Array.isArray(record.completed) ? record.completed.length : 0) < d.memoryCount;
+  }
+
+  function drifterWeekStatus(id) {
+    const record = drifterRecord(id);
+    return record.lastQuestWeek === getWeekSeed() ? (record.weeklyStatus || null) : null;
+  }
+
+  function drifterCompletedThisWeek(id) {
+    return drifterWeekStatus(id) === 'complete';
+  }
+
+  function drifterRestingThisWeek(id) {
+    return drifterWeekStatus(id) === 'resting';
+  }
+
+  function setDrifterWeekStatus(id, status) {
+    if (!['active', 'complete', 'resting'].includes(status)) return false;
+    const data = loadSave();
+    if (!data.utsuroba.drifters[id]) data.utsuroba.drifters[id] = { completed: [] };
+    data.utsuroba.drifters[id].lastQuestWeek = getWeekSeed();
+    data.utsuroba.drifters[id].weeklyStatus = status;
+    const ok = writeSave(data);
+    if (ok && window.BoohaSync) BoohaSync.checkpoint('adventure');
+    return ok;
+  }
+
   function drifterHasMemories(id) {
     if (drifterIsWrong(id)) return false;
+    if (drifterCompletedThisWeek(id) || drifterRestingThisWeek(id)) return false;
     const utsu = readUtsuroba();
-    const rec  = utsu.drifters?.[id];
     const d    = DATA.drifters.find(x => x.id === id);
-    return d ? (rec?.completed?.length || 0) < d.memoryCount : false;
+    if (!d) return false;
+    /* A completed memory is replayable once per new curriculum week. */
+    return drifterHasUnfinishedMemory(id) || !!drifterRecord(id, utsu).completed.length;
   }
   function pickRandomMemory(id) {
     const utsu = readUtsuroba();
-    const rec  = utsu.drifters?.[id] || { completed: [] };
+    const rec  = drifterRecord(id, utsu);
     const d    = DATA.drifters.find(x => x.id === id); if (!d) return null;
     const pool = [];
-    for (let i = 1; i <= d.memoryCount; i++) if (!rec.completed.includes(i)) pool.push(i);
+    const completed = Array.isArray(rec.completed) ? rec.completed : [];
+    for (let i = 1; i <= d.memoryCount; i++) if (!completed.includes(i)) pool.push(i);
+    /* Once every authored memory is complete, the current week's quest is a
+       replay of one of those memories rather than a permanently locked door. */
+    if (!pool.length && completed.length) return completed[Math.floor(Math.random() * completed.length)];
     return pool.length ? pool[Math.floor(Math.random() * pool.length)] : null;
   }
   function activateQuest(id) {
@@ -446,7 +493,9 @@
     data.weekly.drifterQuest = {
       active           : id,
       state            : 'accepted',
+      weekKey          : getWeekSeed(),
       memIdx,
+      replay           : !drifterHasUnfinishedMemory(id),
       episodeId        : drifter && drifter.episodeId ? drifter.episodeId : null,
       readingState     : 'locked',
       trailIndex       : 0,
@@ -456,6 +505,9 @@
       collectedMemoryId: null,
       orbIsCorrect     : false,
     };
+    if (!data.utsuroba.drifters[id]) data.utsuroba.drifters[id] = { completed: [] };
+    data.utsuroba.drifters[id].lastQuestWeek = getWeekSeed();
+    data.utsuroba.drifters[id].weeklyStatus = 'active';
     const ok = writeSave(data);
     invalidateQuestCache();
     if (ok && window.BoohaSync) BoohaSync.checkpoint('adventure');
@@ -465,8 +517,11 @@
   function completeMemory(id, memIdx) {
     const data = loadSave();
     if (!data.utsuroba.drifters[id]) data.utsuroba.drifters[id] = { completed: [] };
+    if (!Array.isArray(data.utsuroba.drifters[id].completed)) data.utsuroba.drifters[id].completed = [];
     if (!data.utsuroba.drifters[id].completed.includes(memIdx))
       data.utsuroba.drifters[id].completed.push(memIdx);
+    data.utsuroba.drifters[id].lastQuestWeek = getWeekSeed();
+    data.utsuroba.drifters[id].weeklyStatus = 'complete';
     const quest = data.weekly?.drifterQuest;
     if (quest && quest.active === id && quest.memIdx === memIdx && quest.episodeId) {
       const journal = data.utsuroba.readingJournal || { entries: [] };
@@ -1932,6 +1987,10 @@
     invalidateQuestCache();
     const quest       = forcedQuest || getCachedQuest();
     const hasMemories = drifterHasMemories(drifter.id);
+    const hasUnfinishedMemory = drifterHasUnfinishedMemory(drifter.id);
+    const replayOffer = !quest && hasMemories && !hasUnfinishedMemory;
+    const completedThisWeek = drifterCompletedThisWeek(drifter.id);
+    const restingThisWeek = drifterRestingThisWeek(drifter.id);
     const hasRestoredMemory = drifterMemoryRestored(drifter);
     const questTrack = questTrackHTML(drifter, quest, hasRestoredMemory);
     const worldUnderstood = !!readUtsuroba().flags?.convergenceSeen && allReadingMemoriesRestored();
@@ -1943,6 +2002,16 @@
 
     if (drifter.memoryCount === 0) {
       actionHTML = `
+        <div class="dp-btns"><button class="dp-btn no dp-dismiss">Close / 閉じる</button></div>`;
+
+    } else if (completedThisWeek) {
+      actionHTML = `
+        <p class="dp-status">Thanks for helping me! Come back next week.<br>${furiJP('手伝ってくれてありがとう！また来週来てください。', { '手伝ってくれてありがとう': 'てつだってくれてありがとう', '来週': 'らいしゅう', '来てください': 'きてください' })}</p>
+        <div class="dp-btns"><button class="dp-btn no dp-dismiss">Close / 閉じる</button></div>`;
+
+    } else if (restingThisWeek) {
+      actionHTML = `
+        <p class="dp-status">I don’t need help this week. Come back next week.<br>${furiJP('今週は助けがいりません。また来週来てください。', { '今週': 'こんしゅう', '助け': 'たすけ', '来週': 'らいしゅう', '来てください': 'きてください' })}</p>
         <div class="dp-btns"><button class="dp-btn no dp-dismiss">Close / 閉じる</button></div>`;
 
     } else if (!hasMemories) {
@@ -1982,6 +2051,14 @@
       actionHTML = `
         <p class="dp-status">Please help my friend first…<br>${furiJP('先に友達を助けてあげて…')}</p>
         <div class="dp-btns"><button class="dp-btn no dp-dismiss">Close / 閉じる</button></div>`;
+
+    } else if (replayOffer) {
+      actionHTML = `
+        <p class="dp-status">Would you like to remember this memory again this week?<br>${furiJP('今週もこの記憶を思い出しますか？', { '今週': 'こんしゅう', '記憶': 'きおく', '思い出しますか': 'おもいだしますか' })}</p>
+        <div class="dp-btns">
+          <button class="dp-btn yes" id="dp-replay-btn">Remember it again / ${furiJP('もう一度思い出す', { '一度': 'いちど', '思い出す': 'おもいだす' })}</button>
+          <button class="dp-btn no" id="dp-rest-week-btn">Not this week / ${furiJP('今週はいい', { '今週': 'こんしゅう' })}</button>
+        </div>`;
 
     } else {
       /* no active quest — offer one using questLines. Pass 6: the actual
@@ -2040,13 +2117,15 @@
        not just Bryan, had this bug. */
     const hasQuestOffer = !quest && drifter.memoryCount > 0 && drifterHasMemories(drifter.id);
     const questInProgressWithThisDrifter = !!(quest && quest.active === drifter.id);
-    const dialogueMode = hasQuestOffer
+    const dialogueMode = replayOffer
+      ? 'restored'
+      : hasQuestOffer
       ? 'offer'
       : (relationshipAwake || worldUnderstood || hasRestoredMemory ? 'restored' : 'idle');
     const legacyDialogue = window.UTSUROBA_LEGACY_DIALOGUE?.[drifter.id]?.[dialogueMode];
     const baseLines = questInProgressWithThisDrifter
       ? []
-      : (legacyDialogue || ((hasQuestOffer && drifter.questLines)
+      : (legacyDialogue || ((hasQuestOffer && !replayOffer && drifter.questLines)
         ? drifter.questLines
         : (relationshipAwake && drifter.relationshipGreeting
           ? drifter.relationshipGreeting
@@ -2138,8 +2217,7 @@
     }
 
     function bindActionButtons() {
-      const yesBtn = drifterPanel.querySelector('#dp-yes-btn');
-      if (yesBtn) yesBtn.addEventListener('click', () => {
+      const startQuest = () => {
         const newQuest = activateQuest(drifter.id);
         if (!newQuest) { closeDrifterPanel(); return; }
         closeDrifterPanel();
@@ -2147,6 +2225,18 @@
           drifterPanelCooldown = 0;
           openDrifterPanel(drifter, newQuest);
         }, PANEL_SLIDE_MS + 20);
+      };
+
+      const yesBtn = drifterPanel.querySelector('#dp-yes-btn');
+      if (yesBtn) yesBtn.addEventListener('click', startQuest);
+
+      const replayBtn = drifterPanel.querySelector('#dp-replay-btn');
+      if (replayBtn) replayBtn.addEventListener('click', startQuest);
+
+      const restWeekBtn = drifterPanel.querySelector('#dp-rest-week-btn');
+      if (restWeekBtn) restWeekBtn.addEventListener('click', () => {
+        setDrifterWeekStatus(drifter.id, 'resting');
+        closeDrifterPanel();
       });
 
       const resumeReadingBtn = drifterPanel.querySelector('#dp-resume-reading');
@@ -2608,6 +2698,9 @@
 
     drifters.forEach(drifter => {
       const hasMemories = drifterHasMemories(drifter.id);
+      const hasRestoredMemory = drifterMemoryRestored(drifter);
+      const completedThisWeek = drifterCompletedThisWeek(drifter.id);
+      const restingThisWeek = drifterRestingThisWeek(drifter.id);
       const isWaiting   = !!(quest && quest.active === drifter.id && quest.state === 'accepted');
       const isCollected = !!(quest && quest.active === drifter.id && quest.state === 'collected');
       const questActive = isWaiting || isCollected;
@@ -2639,10 +2732,10 @@
         alpha = Math.max(0, 1 - elapsed / FADE_OUT_MS);
         if (alpha === 0) { drifterFadeStart = 0; return; }
       } else {
-        alpha = (hasMemories || drifter.memoryCount === 0) ? 1 : 0.35;
+        alpha = (hasMemories || hasRestoredMemory || drifter.memoryCount === 0) ? 1 : 0.35;
       }
 
-      if (questActive || isCelebratingDrifter) {
+      if (questActive || isCelebratingDrifter || hasRestoredMemory) {
         const slowPulse = 0.5 + 0.5 * Math.sin(sec * 1.4);
         const bloomR    = Math.max(dw, dh) * 1.1 + slowPulse * 18;
         const cx = pos.x, cy = pos.y + bounceY - dh * 0.5;
@@ -2652,10 +2745,20 @@
           bloom.addColorStop(0,   `rgba(255,215,0,${0.6 + slowPulse*0.30})`);
           bloom.addColorStop(0.45,`rgba(255,170,0,${0.25 + slowPulse*0.18})`);
           bloom.addColorStop(0.75,`rgba(255,100,10,${0.10 + slowPulse*0.06})`);
-        } else {
+        } else if (questActive) {
           bloom.addColorStop(0,   `rgba(255,210,60,${0.55 + slowPulse*0.30})`);
           bloom.addColorStop(0.45,`rgba(255,160,20,${0.22 + slowPulse*0.18})`);
           bloom.addColorStop(0.75,`rgba(255,100,10,${0.08 + slowPulse*0.06})`);
+        } else {
+          /* A completed memory remains visibly alive instead of becoming a
+             dim, accidental-looking portrait. Weekly completion/resting
+             uses mint; older restored memories use the softer archive glow. */
+          const aura = completedThisWeek || restingThisWeek
+            ? ['159,228,186', '91,154,107']
+            : ['216,168,255', '128,86,180'];
+          bloom.addColorStop(0,   `rgba(${aura[0]},${0.42 + slowPulse*0.22})`);
+          bloom.addColorStop(0.45,`rgba(${aura[1]},${0.18 + slowPulse*0.12})`);
+          bloom.addColorStop(0.75,`rgba(${aura[1]},${0.07 + slowPulse*0.05})`);
         }
         bloom.addColorStop(1,   'transparent');
         ctx.globalAlpha = 1;
@@ -2667,13 +2770,15 @@
       ctx.save();
       ctx.globalAlpha = alpha;
       if (img.complete && img.naturalWidth > 0) {
-        if (shadowsEnabled && (hasMemories || drifter.memoryCount === 0)) {
-          ctx.shadowBlur  = (questActive || isCelebratingDrifter) ? 28 : 18;
+        if (shadowsEnabled && (hasMemories || hasRestoredMemory || drifter.memoryCount === 0)) {
+          ctx.shadowBlur  = (questActive || isCelebratingDrifter || hasRestoredMemory) ? 28 : 18;
           ctx.shadowColor = isCelebratingDrifter
             ? '#ffd700'
             : questActive
               ? (isCollected ? '#44ffaa' : '#ffcc40')
-              : '#d8c0f8';
+              : completedThisWeek || restingThisWeek
+                ? '#9fe4ba'
+                : '#d8c0f8';
         }
         ctx.drawImage(img, pos.x-dw/2, pos.y-dh+bounceY, dw, dh);
         ctx.shadowBlur = 0;
