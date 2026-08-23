@@ -92,7 +92,10 @@
     spawnLockUntil: 0,
     inputLocked: false,
     musicStarted: false,
-    coordMode: DEV_MODE,
+    // DEV opens in playable mode. Coordinate pinning is still available from
+    // the DEV toggle, but it must not freeze Booha immediately after Nuppi's
+    // lobby closes.
+    coordMode: false,
     lastTickTime: 0,
     speed: BASE_SPEED,
     fogX: 0,
@@ -1401,13 +1404,14 @@
 
     const dev = document.createElement('div');
     dev.id = 'muenba-dev';
-    dev.innerHTML = '<strong>MUENBA DEV</strong><br><span id="muenba-dev-text"></span><br><button id="muenba-dev-coords" type="button">COORDS ON</button> <button id="muenba-dev-rhythm" type="button">RHYTHM TEST</button><div class="muenba-dev-small">Coords mode: click to pin, movement paused</div><div id="muenba-dev-arrows" class="muenba-dev-arrows"></div>';
+    dev.innerHTML = '<strong>MUENBA DEV</strong><br><span id="muenba-dev-text"></span><br><button id="muenba-dev-coords" type="button">COORDS OFF</button> <button id="muenba-dev-rhythm" type="button">RHYTHM TEST</button><div class="muenba-dev-small">Coords ON: click to pin, movement paused</div><div id="muenba-dev-arrows" class="muenba-dev-arrows"></div>';
     document.body.appendChild(dev);
     devReadout = document.getElementById('muenba-dev-text');
     devCoordToggle = document.getElementById('muenba-dev-coords');
     devArrowList = document.getElementById('muenba-dev-arrows');
     document.getElementById('muenba-dev-rhythm').addEventListener('click', openDevRhythmTest);
     devCoordToggle.classList.toggle('active', state.coordMode);
+    devCoordToggle.textContent = state.coordMode ? 'COORDS ON' : 'COORDS OFF';
     devCoordToggle.addEventListener('click', () => {
       state.coordMode = !state.coordMode;
       devCoordToggle.classList.toggle('active', state.coordMode);
@@ -1476,10 +1480,10 @@
     const vctx = vignetteCanvas.getContext('2d');
     const gradient = vctx.createRadialGradient(CENTER_X, CENTER_Y, 280, CENTER_X, CENTER_Y, 860);
     gradient.addColorStop(0, 'rgba(0,0,0,0)');
-    gradient.addColorStop(0.56, 'rgba(0,0,0,.04)');
-    gradient.addColorStop(0.72, 'rgba(0,0,0,.18)');
-    gradient.addColorStop(0.88, 'rgba(0,0,0,.46)');
-    gradient.addColorStop(1, 'rgba(0,0,0,.76)');
+    gradient.addColorStop(0.56, 'rgba(0,0,0,.02)');
+    gradient.addColorStop(0.72, 'rgba(0,0,0,.10)');
+    gradient.addColorStop(0.88, 'rgba(0,0,0,.30)');
+    gradient.addColorStop(1, 'rgba(0,0,0,.58)');
     vctx.fillStyle = gradient;
     vctx.fillRect(0, 0, WORLD_W, WORLD_H);
 
