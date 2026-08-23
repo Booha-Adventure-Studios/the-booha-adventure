@@ -823,23 +823,32 @@ const HAPPY_HOUSE_PORTAL = {
      treatment the drifter drawer uses — a centered, width/height-capped
      card — instead of a full-bleed bar stretching edge to edge with a
      narrow column of content in the middle of it. */
+  // Shared by injectOrbPanel() (builds the markup) and openOrbPanel()
+  // (re-fills it on every open) — was previously a `const` local only to
+  // injectOrbPanel(), which meant openOrbPanel() threw a ReferenceError
+  // the moment it tried to use it (see the note on that function).
+  function furi(value, readings) {
+    return window.UtsuFurigana && window.UtsuFurigana.sentence
+      ? window.UtsuFurigana.sentence(value, readings || {}) : value;
+  }
+
   function injectOrbPanel() {
     if (orbPanelEl) return;
     orbPanelEl = document.createElement('div');
     orbPanelEl.id = 'orb-panel';
     orbPanelEl.className = 'utsu-card is-floating';
-    const furi = (value, readings) => window.UtsuFurigana && window.UtsuFurigana.sentence
-      ? window.UtsuFurigana.sentence(value, readings || {}) : value;
     orbPanelEl.innerHTML = `
       <div class="dp-handle"></div>
       <div class="dp-inner" style="max-width:480px;margin:0 auto;">
-        <div class="dp-body" style="text-align:center;" role="dialog" aria-modal="true" aria-labelledby="orb-panel-title" aria-describedby="orb-panel-fragment">
+        <div id="orb-panel-body" class="dp-body" tabindex="-1" style="text-align:center;outline:none;" role="dialog" aria-modal="true" aria-label="Read the memory" aria-describedby="orb-panel-fragment">
           <button id="orb-panel-close" class="dp-close-x" aria-label="Close memory reading" aria-hidden="true" style="visibility:hidden;opacity:0;pointer-events:none;">✕</button>
-          <h2 id="orb-panel-title" tabindex="-1" style="font-size:clamp(1.12rem,3.4vw,1.42rem);font-weight:700;color:#1e140a;margin:0 0 1px;">Read the memory</h2>
-          <p id="orb-panel-subtitle" class="dp-line-jp" style="margin-bottom:2px;">${furi('記憶を読もう', { '記憶': 'きおく', '読もう': 'よもう' })}</p>
-          <p id="orb-panel-memory-title" style="margin:0 0 8px;color:#806040;font-size:clamp(.68rem,1.7vw,.78rem);line-height:1.35;"></p>
-          <div class="dp-divider" style="margin-left:auto;margin-right:auto;"></div>
-          <p id="orb-panel-fragment" aria-live="polite" style="max-width:460px;margin:0 auto 4px;min-height:1.6em;font-size:clamp(1.18rem,3.6vw,1.5rem);font-weight:700;color:#1e140a;line-height:1.58;letter-spacing:.01em;"></p>
+          <div id="orb-panel-header" aria-hidden="true" style="opacity:0;visibility:hidden;transition:opacity .3s;">
+            <h2 id="orb-panel-title" tabindex="-1" style="font-size:clamp(1.12rem,3.4vw,1.42rem);font-weight:700;color:#1e140a;margin:0 0 1px;">Read the memory</h2>
+            <p id="orb-panel-subtitle" class="dp-line-jp" style="margin-bottom:2px;">${furi('記憶を読もう', { '記憶': 'きおく', '読もう': 'よもう' })}</p>
+            <p id="orb-panel-memory-title" style="margin:0 0 8px;color:#806040;font-size:clamp(.68rem,1.7vw,.78rem);line-height:1.35;"></p>
+            <div class="dp-divider" style="margin-left:auto;margin-right:auto;"></div>
+          </div>
+          <p id="orb-panel-fragment" aria-live="polite" style="max-width:460px;margin:0 auto 4px;min-height:1.6em;font-size:clamp(1.3rem,4vw,1.68rem);font-weight:700;color:#1e140a;line-height:1.5;letter-spacing:.01em;"></p>
           <div id="orb-panel-actions" aria-hidden="true" style="opacity:0;pointer-events:none;transition:opacity .3s;">
             <p class="dp-status" style="margin-top:6px;">Read the clue, then carry it along the trail.<br>${furi('手がかりを読んで、記憶の道に持っていきましょう。', { '手がかり': 'てがかり', '読んで': 'よんで', '記憶': 'きおく', '道': 'みち', '持っていきましょう': 'もっていきましょう' })}</p>
             <div class="dp-btns" style="justify-content:center;">
@@ -876,6 +885,7 @@ const HAPPY_HOUSE_PORTAL = {
     orbTypeDone = true;
     const fragment = document.getElementById('orb-panel-fragment');
     const closeButton = document.getElementById('orb-panel-close');
+    const header = document.getElementById('orb-panel-header');
     const actions  = document.getElementById('orb-panel-actions');
     if (fragment) fragment.textContent = fragment.dataset.fullText || '';
     if (closeButton) {
@@ -884,6 +894,11 @@ const HAPPY_HOUSE_PORTAL = {
       closeButton.style.pointerEvents = 'none';
       closeButton.setAttribute('aria-hidden', 'true');
     }
+    if (header) {
+      header.style.visibility = 'hidden';
+      header.style.opacity = '0';
+      header.setAttribute('aria-hidden', 'true');
+    }
     if (actions) {
       actions.style.opacity = '0';
       actions.style.pointerEvents = 'none';
@@ -891,7 +906,9 @@ const HAPPY_HOUSE_PORTAL = {
     }
     if (revealActions) {
       /* Let the finished sentence sit alone briefly before the controls
-         arrive, so the reading task does not visually compete with them. */
+         arrive, so the reading task does not visually compete with them.
+         The furigana header, the close button, and the Take/Leave
+         buttons all arrive together at this one moment. */
       orbRevealTimer = setTimeout(() => {
         if (orbPanelOpen && actions) {
           if (closeButton) {
@@ -899,6 +916,11 @@ const HAPPY_HOUSE_PORTAL = {
             closeButton.style.opacity = '1';
             closeButton.style.pointerEvents = 'auto';
             closeButton.setAttribute('aria-hidden', 'false');
+          }
+          if (header) {
+            header.style.visibility = 'visible';
+            header.style.opacity = '1';
+            header.setAttribute('aria-hidden', 'false');
           }
           actions.style.opacity = '1';
           actions.style.pointerEvents = 'auto';
@@ -926,19 +948,25 @@ const HAPPY_HOUSE_PORTAL = {
     orbPanelEl.style.setProperty('--card-ring', colors.shadow);
     orbPanelEl.style.setProperty('--card-glow', `rgba(${colors.glowRGBA},.45)`);
     requestAnimationFrame(() => requestAnimationFrame(() => orbPanelEl.classList.add('open')));
-    requestAnimationFrame(() => document.getElementById('orb-panel-title')?.focus());
+    requestAnimationFrame(() => document.getElementById('orb-panel-body')?.focus());
     state.clickTarget = null;
 
     clearTimeout(orbTypeTimer);
     clearTimeout(orbRevealTimer);
     const fullText = entry ? entry.text : '';
     const closeButton = document.getElementById('orb-panel-close');
+    const header = document.getElementById('orb-panel-header');
     if (fragment) { fragment.textContent = ''; fragment.dataset.fullText = fullText; }
     if (closeButton) {
       closeButton.style.visibility = 'hidden';
       closeButton.style.opacity = '0';
       closeButton.style.pointerEvents = 'none';
       closeButton.setAttribute('aria-hidden', 'true');
+    }
+    if (header) {
+      header.style.visibility = 'hidden';
+      header.style.opacity = '0';
+      header.setAttribute('aria-hidden', 'true');
     }
     if (actions) {
       actions.style.opacity = '0';
@@ -947,6 +975,11 @@ const HAPPY_HOUSE_PORTAL = {
     }
     if (!fullText) {
       orbTypeDone = true;
+      if (header) {
+        header.style.visibility = 'visible';
+        header.style.opacity = '1';
+        header.setAttribute('aria-hidden', 'false');
+      }
       if (actions) {
         actions.style.opacity = '1';
         actions.style.pointerEvents = 'auto';
