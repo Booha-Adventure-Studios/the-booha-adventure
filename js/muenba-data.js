@@ -171,11 +171,11 @@
   // wired here with "Tinkley" kept only as the display name — flag if either
   // should change to match the other.
   const GHOSTS = [
-    { id: 'fuzzle',  name: 'Fuzzle',  img: 'assets/img/muenba/ghosts/fuzzle.png',  personality: 'Practices a different scare every time.' },
-    { id: 'glimmer', name: 'Glimmer', img: 'assets/img/muenba/ghosts/glimmer.png', personality: 'Polishes every sparkle until it runs away.' },
-    { id: 'nibsy',   name: 'Nibsy',   img: 'assets/img/muenba/ghosts/nibsy.png',   personality: 'Collects tiny noises and forgets where they came from.' },
-    { id: 'tinklet', name: 'Tinkley', img: 'assets/img/muenba/ghosts/tinklet.png', personality: 'Rings invisible bells at the worst possible moment.' },
-    { id: 'twiddle', name: 'Twiddle', img: 'assets/img/muenba/ghosts/twiddle.png', personality: 'Turns in circles whenever a decision gets too serious.' }
+    { id: 'fuzzle',  name: 'Fuzzle',  kana: 'フズル',       img: 'assets/img/muenba/ghosts/fuzzle.png',  personality: 'Practices a different scare every time.' },
+    { id: 'glimmer', name: 'Glimmer', kana: 'グリマー',     img: 'assets/img/muenba/ghosts/glimmer.png', personality: 'Polishes every sparkle until it runs away.' },
+    { id: 'nibsy',   name: 'Nibsy',   kana: 'ニブシー',     img: 'assets/img/muenba/ghosts/nibsy.png',   personality: 'Collects tiny noises and forgets where they came from.' },
+    { id: 'tinklet', name: 'Tinkley', kana: 'ティンクリー', img: 'assets/img/muenba/ghosts/tinklet.png', personality: 'Rings invisible bells at the worst possible moment.' },
+    { id: 'twiddle', name: 'Twiddle', kana: 'トゥイドル',  img: 'assets/img/muenba/ghosts/twiddle.png', personality: 'Turns in circles whenever a decision gets too serious.' }
   ];
   // Shared sprite every ghost swaps to when clicked or when it turns to
   // chase (Pass 7) — not a huntable ghost of its own, so it's kept separate

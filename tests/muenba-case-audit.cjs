@@ -20,6 +20,8 @@ const seen = new Set();
 const positionMap = new Map();
 
 for (const ghost of data.ghosts || []) {
+  assert.strictEqual(typeof ghost.kana, 'string', `${ghost.id}.kana must be text`);
+  assert(/^[\u30a0-\u30ffー・\s]+$/.test(ghost.kana), `${ghost.id}.kana must use katakana`);
   englishOnly(ghost.personality, `${ghost.id}.personality`);
 }
 
