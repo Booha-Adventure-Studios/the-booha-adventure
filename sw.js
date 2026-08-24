@@ -5,11 +5,11 @@
 // ============================================================
 
 const CURRENT_CACHES = {
-  // Muenba danger rhythm pass: invalidate the previous deployed bundle so
-  // the hostile encounter and its audio cannot remain behind cache-first routing.
-  pages:  'booha-pages-2026-255',
-  assets: 'booha-assets-2026-255',
-  decks:  'booha-decks-2026-255',
+  // Muenba hiding sprite pass: invalidate the previous deployed bundle so
+  // the visible hide state cannot remain behind cache-first routing.
+  pages:  'booha-pages-2026-256',
+  assets: 'booha-assets-2026-256',
+  decks:  'booha-decks-2026-256',
 };
 
 const PAGE_CACHE  = CURRENT_CACHES.pages;
