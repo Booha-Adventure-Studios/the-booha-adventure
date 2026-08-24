@@ -5,11 +5,11 @@
 // ============================================================
 
 const CURRENT_CACHES = {
-  // Muenba ghost teleport pass: invalidate the previous deployed bundle so
-  // the visible room-to-room warning cannot remain behind cache-first routing.
-  pages:  'booha-pages-2026-254',
-  assets: 'booha-assets-2026-254',
-  decks:  'booha-decks-2026-254',
+  // Muenba danger rhythm pass: invalidate the previous deployed bundle so
+  // the hostile encounter and its audio cannot remain behind cache-first routing.
+  pages:  'booha-pages-2026-255',
+  assets: 'booha-assets-2026-255',
+  decks:  'booha-decks-2026-255',
 };
 
 const PAGE_CACHE  = CURRENT_CACHES.pages;
