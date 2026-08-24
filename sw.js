@@ -5,11 +5,11 @@
 // ============================================================
 
 const CURRENT_CACHES = {
-  // Rhythm Pass 1: invalidate the previous bundle so the help menu and safe
-  // practice chart reach returning players.
-  pages:  'booha-pages-2026-283',
-  assets: 'booha-assets-2026-283',
-  decks:  'booha-decks-2026-283',
+  // Rhythm Pass 2: invalidate the previous bundle so permanent capture-based
+  // difficulty reaches returning players.
+  pages:  'booha-pages-2026-284',
+  assets: 'booha-assets-2026-284',
+  decks:  'booha-decks-2026-284',
 };
 
 const PAGE_CACHE  = CURRENT_CACHES.pages;
