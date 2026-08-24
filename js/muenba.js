@@ -318,6 +318,7 @@
   let spiritMaskCanvas = null;
   const imageCache = new Map();
   const roomGlowCache = new Map();
+  let boohaTrailSprite = null;
   const roomGlowRgbCache = new Map();
   // Off-center light pools keep the room from reading like a colored
   // spotlight placed behind Booha. Each room adds a small deterministic
@@ -2460,10 +2461,6 @@
   function addBoohaTrailParticle(originX, originY, now) {
     if (REDUCED_MOTION || now - lastBoohaTrailAt < 58) return;
     lastBoohaTrailAt = now;
-    const glow = getRoomGlowRgb(state.roomId);
-    const color = Math.random() > .42
-      ? `rgb(${glow.r},${glow.g},${glow.b})`
-      : '#fff1b2';
     boohaTrail.push({
       x: originX + (Math.random() - .5) * 13,
       y: originY + BOOHA_R * .46 + (Math.random() - .5) * 10,
@@ -2471,13 +2468,34 @@
       vy: -(0.08 + Math.random() * .22),
       life: 1,
       size: 1.1 + Math.random() * 1.8,
-      color,
       phase: Math.random() * Math.PI * 2
     });
-    if (boohaTrail.length > 22) boohaTrail.shift();
+    if (boohaTrail.length > 18) boohaTrail.shift();
+  }
+
+  function getBoohaTrailSprite() {
+    if (boohaTrailSprite) return boohaTrailSprite;
+    const sprite = document.createElement('canvas');
+    sprite.width = 28;
+    sprite.height = 28;
+    const spriteCtx = sprite.getContext('2d');
+    const glow = spriteCtx.createRadialGradient(14, 14, 0, 14, 14, 14);
+    glow.addColorStop(0, 'rgba(255,253,220,.98)');
+    glow.addColorStop(.16, 'rgba(255,225,112,.92)');
+    glow.addColorStop(.48, 'rgba(255,183,45,.34)');
+    glow.addColorStop(1, 'rgba(255,151,20,0)');
+    spriteCtx.fillStyle = glow;
+    spriteCtx.beginPath();
+    spriteCtx.arc(14, 14, 14, 0, Math.PI * 2);
+    spriteCtx.fill();
+    boohaTrailSprite = sprite;
+    return sprite;
   }
 
   function drawBoohaTrail(now) {
+    if (!boohaTrail.length) return;
+    const sprite = getBoohaTrailSprite();
+    actorCtx.save();
     for (let i = boohaTrail.length - 1; i >= 0; i -= 1) {
       const particle = boohaTrail[i];
       particle.life -= .026;
@@ -2488,22 +2506,11 @@
       particle.x += particle.vx;
       particle.y += particle.vy;
       const twinkle = .55 + .45 * Math.sin(now / 120 + particle.phase);
-      actorCtx.save();
-      actorCtx.globalAlpha = particle.life * twinkle * .32;
-      const glow = actorCtx.createRadialGradient(particle.x, particle.y, 0, particle.x, particle.y, particle.size * 3.4);
-      glow.addColorStop(0, particle.color);
-      glow.addColorStop(1, 'rgba(255,255,255,0)');
-      actorCtx.fillStyle = glow;
-      actorCtx.beginPath();
-      actorCtx.arc(particle.x, particle.y, particle.size * 3.4, 0, Math.PI * 2);
-      actorCtx.fill();
-      actorCtx.globalAlpha = particle.life * twinkle * .78;
-      actorCtx.fillStyle = '#fffbe0';
-      actorCtx.beginPath();
-      actorCtx.arc(particle.x, particle.y, particle.size * .34, 0, Math.PI * 2);
-      actorCtx.fill();
-      actorCtx.restore();
+      const radius = particle.size * 3.2;
+      actorCtx.globalAlpha = particle.life * twinkle * .72;
+      actorCtx.drawImage(sprite, particle.x - radius, particle.y - radius, radius * 2, radius * 2);
     }
+    actorCtx.restore();
   }
 
   function stopMuenbaDance() {
@@ -3395,7 +3402,8 @@
     spawnRoomGhost(roomId);
     showRoom(roomId);
     reseedMotes(roomId);
-    beginEntryDrift();
+    entryDrift = null;
+    if (state.spawnId === 'fromKarasuki') beginEntryDrift();
   }
 
   function beginEntryDrift() {
