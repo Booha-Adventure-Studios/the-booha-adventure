@@ -15,6 +15,7 @@ assert(source.includes("const UTSUROBA_MEMORY_MODES = ['start', 'fresh', 'deep']
 assert(source.includes('completedModes'), 'Utsuroba must persist completion by reading mode');
 assert(source.includes('weeklyStatusByMode'), 'weekly completion must be scoped to the reading mode');
 assert(source.includes('readingDifficulty: mode'), 'quests must remember the selected reading mode');
+assert(source.includes("readingDifficulty: readingMode(reviewEntry.difficulty || 'start')"), 'journal replay must reopen the recorded reading mode');
 assert(loader.includes("const READING_MODES = ['start', 'fresh', 'deep'];"), 'episode loader must resolve Start Memory');
 assert(loader.includes('episode[difficulty]'), 'episode loader must resolve tier-specific content');
 assert(loader.includes("return READING_MODES.includes(value) ? value : 'start';"), 'new Utsuroba saves should default to Starter Memory');
