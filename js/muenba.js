@@ -374,10 +374,10 @@
   muenbaDance.preload = 'auto';
   muenbaDance.loop = false;
   muenbaDance.volume = 0.72;
-  const rhythmHitSfx = new Audio('assets/audio/ding.mp3');
+  const rhythmHitSfx = new Audio('assets/img/muenba/get.mp3');
   rhythmHitSfx.preload = 'auto';
   rhythmHitSfx.volume = 0.42;
-  const rhythmMissSfx = new Audio('assets/destruction/fail.mp3');
+  const rhythmMissSfx = new Audio('assets/img/muenba/miss.mp3');
   rhythmMissSfx.preload = 'auto';
   rhythmMissSfx.volume = 0.24;
 
@@ -1130,7 +1130,7 @@
     renderCaseDirection(
       box,
       'It touched Booha. Face the danger rhythm, or hide now and let it lose interest.',
-      '<ruby>幽霊<rt>ゆうれい</rt></ruby>がブーハに<ruby>触<rt>ふ</rt></ruby>れました。<ruby>危険<rt>きけん</rt></ruby>なリズムに<ruby>挑<rt>いど</rt></ruby>むか、<ruby>今<rt>いま</rt></ruby>すぐ<ruby>隠<rt>かく</rt></ruby>れて<ruby>興味<rt>きょうみ</rt></ruby>をなくすのを<ruby>待<rt>ま</rt></ruby>ちましょう。'
+      '<ruby>幽霊<rt>ゆうれい</rt></ruby>がブーハーに<ruby>触<rt>ふ</rt></ruby>れました。<ruby>危険<rt>きけん</rt></ruby>なリズムに<ruby>挑<rt>いど</rt></ruby>むか、<ruby>今<rt>いま</rt></ruby>すぐ<ruby>隠<rt>かく</rt></ruby>れて<ruby>興味<rt>きょうみ</rt></ruby>をなくすのを<ruby>待<rt>ま</rt></ruby>ちましょう。'
     );
 
     const actions = document.createElement('div');
@@ -2438,6 +2438,8 @@
   }
 
   let muenbaDanceSparkles = [];
+  let boohaTrail = [];
+  let lastBoohaTrailAt = 0;
 
   function spawnMuenbaDanceSparkle(originX, originY) {
     const colors = ['#ffd700', '#ffe066', '#fff0a0', '#c8960a', '#ffffff', '#fffde0'];
@@ -2453,6 +2455,55 @@
       color: colors[Math.floor(Math.random() * colors.length)],
       phase: Math.random() * Math.PI * 2
     });
+  }
+
+  function addBoohaTrailParticle(originX, originY, now) {
+    if (REDUCED_MOTION || now - lastBoohaTrailAt < 58) return;
+    lastBoohaTrailAt = now;
+    const glow = getRoomGlowRgb(state.roomId);
+    const color = Math.random() > .42
+      ? `rgb(${glow.r},${glow.g},${glow.b})`
+      : '#fff1b2';
+    boohaTrail.push({
+      x: originX + (Math.random() - .5) * 13,
+      y: originY + BOOHA_R * .46 + (Math.random() - .5) * 10,
+      vx: (Math.random() - .5) * .28,
+      vy: -(0.08 + Math.random() * .22),
+      life: 1,
+      size: 1.1 + Math.random() * 1.8,
+      color,
+      phase: Math.random() * Math.PI * 2
+    });
+    if (boohaTrail.length > 22) boohaTrail.shift();
+  }
+
+  function drawBoohaTrail(now) {
+    for (let i = boohaTrail.length - 1; i >= 0; i -= 1) {
+      const particle = boohaTrail[i];
+      particle.life -= .026;
+      if (particle.life <= 0) {
+        boohaTrail.splice(i, 1);
+        continue;
+      }
+      particle.x += particle.vx;
+      particle.y += particle.vy;
+      const twinkle = .55 + .45 * Math.sin(now / 120 + particle.phase);
+      actorCtx.save();
+      actorCtx.globalAlpha = particle.life * twinkle * .32;
+      const glow = actorCtx.createRadialGradient(particle.x, particle.y, 0, particle.x, particle.y, particle.size * 3.4);
+      glow.addColorStop(0, particle.color);
+      glow.addColorStop(1, 'rgba(255,255,255,0)');
+      actorCtx.fillStyle = glow;
+      actorCtx.beginPath();
+      actorCtx.arc(particle.x, particle.y, particle.size * 3.4, 0, Math.PI * 2);
+      actorCtx.fill();
+      actorCtx.globalAlpha = particle.life * twinkle * .78;
+      actorCtx.fillStyle = '#fffbe0';
+      actorCtx.beginPath();
+      actorCtx.arc(particle.x, particle.y, particle.size * .34, 0, Math.PI * 2);
+      actorCtx.fill();
+      actorCtx.restore();
+    }
   }
 
   function stopMuenbaDance() {
@@ -2649,34 +2700,6 @@
     const teleportProgress = teleporting
       ? Math.max(0, Math.min(1, (activeGhost.teleportAt - now) / GHOST_TELEPORT_WARNING_MS))
       : 1;
-
-    // A soft, stretched shadow anchors the ghost to the cemetery path. Keep
-    // it at the ground position while the sprite bobs above it, and let it
-    // breathe slightly with that hover so the ghost still feels weightless.
-    const shadowY = activeGhost.y + GHOST_DRAW_R * .72;
-    const shadowScale = Math.max(.82, Math.min(1.18, 1 + bob / 30));
-    actorCtx.save();
-    actorCtx.globalAlpha = (.22 + (isAngry ? .05 : 0)) * (teleporting ? .4 + teleportProgress * .6 : 1);
-    const shadow = actorCtx.createRadialGradient(
-      x, shadowY, 0,
-      x, shadowY, GHOST_DRAW_R * .86 * shadowScale
-    );
-    shadow.addColorStop(0, 'rgba(0, 0, 0, .58)');
-    shadow.addColorStop(.55, 'rgba(0, 0, 0, .24)');
-    shadow.addColorStop(1, 'rgba(0, 0, 0, 0)');
-    actorCtx.fillStyle = shadow;
-    actorCtx.beginPath();
-    actorCtx.ellipse(
-      x,
-      shadowY,
-      GHOST_DRAW_R * .82 * shadowScale,
-      GHOST_DRAW_R * .2,
-      0,
-      0,
-      Math.PI * 2
-    );
-    actorCtx.fill();
-    actorCtx.restore();
 
     actorCtx.save();
     actorCtx.globalAlpha = .95 * (teleporting ? .18 + teleportProgress * .82 : 1);
@@ -3362,6 +3385,8 @@
     state.spawnLockUntil = performance.now() + 700;
     state.hiding = false;
     state.captureResolving = false;
+    boohaTrail = [];
+    lastBoohaTrailAt = 0;
     updateMuenbaProfileLink();
     stopDangerScream();
     setReturnToNuppiPending(Number(readMuenba().orbsPending) > 0 || state.returnToNuppiPending);
@@ -3460,7 +3485,10 @@
     const moved = tryMove(state.x + (dx / distance) * state.speed, state.y + (dy / distance) * state.speed);
     state.moving = moved;
     if (!moved) state.clickTarget = null;
-    if (moved) state.distMovedSinceSpawn += Math.hypot(state.x - previousX, state.y - previousY);
+    if (moved) {
+      state.distMovedSinceSpawn += Math.hypot(state.x - previousX, state.y - previousY);
+      if (!state.hiding && !state.celebrating) addBoohaTrailParticle(state.x, state.y, now);
+    }
     if (!REDUCED_MOTION && moved && now % 240 < 30) state.fogX += .15;
   }
 
@@ -3796,7 +3824,7 @@
         <img class="muenba-lobby-portrait" src="assets/img/wanderers/nuppi-2.png" alt="Nuppi">
         <div class="muenba-case-board-eyebrow">ENERGY RETURNED</div>
         <h2>Thank you, Booha.</h2>
-        <p class="jp">ありがとう、ブーハ。</p>
+        <p class="jp">ありがとう、ブーハー。</p>
         <p>${orbLabel} are safe with Nuppi now.</p>
         <p class="jp-line"><ruby>届<rt>とど</rt></ruby>けてくれてありがとう。エネルギーはヌッピが<ruby>預<rt>あず</rt></ruby>かるよ。</p>
         <p>${canContinue ? 'Would you like to find another ghost?' : 'That is all for this week. The ghosts will return next week.'}</p>
@@ -4009,13 +4037,7 @@
     // "crouching out of sight" rather than vanishing outright, since the
     // player can still see themselves and knows they're still there.
     const hidingFade = state.hiding ? .4 : 1;
-    actorCtx.save();
-    actorCtx.globalAlpha = (dancing ? .24 + pulse * .1 : .18 + pulse * .08) * hidingFade;
-    actorCtx.fillStyle = dancing ? 'rgba(255,213,91,.7)' : 'rgba(180,220,215,.55)';
-    actorCtx.beginPath();
-    actorCtx.ellipse(x, state.y + BOOHA_R * .88, BOOHA_R * (dancing ? 1.05 : .78), BOOHA_R * .27, 0, 0, Math.PI * 2);
-    actorCtx.fill();
-    actorCtx.restore();
+    drawBoohaTrail(now);
 
     if (dancing) {
       if (settleEase > 0 && Math.random() < .45) spawnMuenbaDanceSparkle(x, y);
