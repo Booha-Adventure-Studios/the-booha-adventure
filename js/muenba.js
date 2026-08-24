@@ -50,7 +50,9 @@
   // the way in. Sits at the same bottom-of-room_01 spot the 'fromKarasuki'
   // spawn already uses, so arriving and leaving feel like the same doorway.
   const KARASUKI_RETURN_PORTAL = { roomId: 'room_01', x: 768, y: 830, r: 44, triggerR: 36 };
-  const MUENBA_NUPPI = { roomId: 'room_01', x: 768, y: 250, hitR: 76, drawR: 54 };
+  // Keep Nuppi on the upper path, but clear of room_01's up arrow at x:767,
+  // y:284 so the guide and the exit remain separate targets.
+  const MUENBA_NUPPI = { roomId: 'room_01', x: 940, y: 215, hitR: 76, drawR: 54 };
   const POPUP_COOLDOWN_MS = 900;
 
   // ── Ghost hunting core loop (Pass 7) ────────────────────────────────────
@@ -3498,6 +3500,7 @@
     state.y = spawn.y;
     state.clickTarget = null;
     state.moving = false;
+    state.inputLocked = false;
     state.distMovedSinceSpawn = 0;
     state.transitionReadyAt = performance.now() + TRANSITION_COOLDOWN_MS;
     state.spawnLockUntil = performance.now() + 700;
@@ -3514,7 +3517,7 @@
     showRoom(roomId);
     reseedMotes(roomId);
     entryDrift = null;
-    if (state.spawnId === 'fromKarasuki') beginEntryDrift();
+    if (state.spawnId === 'fromKarasuki' || state.arrivalDir) beginEntryDrift();
   }
 
   function beginEntryDrift() {
@@ -4370,6 +4373,10 @@
     if (clickCheckNuppi(point.x, point.y)) return;
     if (clickCheckGhost(point.x, point.y)) return;
     if (Math.hypot(point.x - state.x, point.y - state.y) < 30) return;
+    // The first valid movement input is the player's acknowledgement that
+    // the new room is ready. Reveal the exits immediately instead of making
+    // the player spend another tap waiting for the old movement threshold.
+    state.distMovedSinceSpawn = Math.max(state.distMovedSinceSpawn, ARROW_MOVE_THRESHOLD);
     state.clickTarget = point;
   }
 
