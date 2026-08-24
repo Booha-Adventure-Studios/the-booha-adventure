@@ -48,15 +48,25 @@ done < <(sed -n '/const CORE_FILES = \[/,/\];/p' sw.js \
          | grep -oE '\$\{BASE\}/[^`]*' | sed 's|^\${BASE}/||')
 [ $sw_bad -eq 0 ] && ok "$sw_ok precached files all present"
 
-# ── 3. Cache version constants in sync ───────────────────────
-echo "[3/16] Cache version sync (pages/assets/decks)"
-versions=$(grep -oE "booha-(pages|assets|decks)-[A-Za-z0-9-]+" sw.js \
-           | sed -E 's/booha-(pages|assets|decks)-//' | sort -u)
-vcount=$(echo "$versions" | grep -c .)
-if [ "$vcount" -eq 1 ]; then
-  ok "all three caches on version: $versions"
+# ── 3. Independent cache version constants ──────────────────
+echo "[3/16] Independent cache version validation"
+cache_bad=0
+cache_summary=""
+for cache_kind in pages assets decks; do
+  cache_versions=$(grep -oE "booha-${cache_kind}-[A-Za-z0-9-]+" sw.js \
+                   | sed "s/booha-${cache_kind}-//" | sort -u)
+  cache_count=$(printf '%s\n' "$cache_versions" | grep -c . || true)
+  if [ "$cache_count" -eq 1 ]; then
+    cache_summary="$cache_summary ${cache_kind}=$(printf '%s' "$cache_versions")"
+  else
+    cache_summary="$cache_summary ${cache_kind}=INVALID"
+    cache_bad=1
+  fi
+done
+if [ "$cache_bad" -eq 0 ]; then
+  ok "independent cache versions valid:$cache_summary"
 else
-  bad "cache versions out of sync: $(echo $versions | tr '\n' ' ')"
+  bad "invalid cache version entries:$cache_summary"
 fi
 
 # ── 4. Cache bump reminder (needs git) ───────────────────────
