@@ -1659,6 +1659,8 @@
       good: 0,
       miss: 0,
       avoided: 0,
+      combo: 0,
+      bestCombo: 0,
       resolvedIndices: new Set(),
       noteEls: [],
       statusEl: null,
@@ -1744,6 +1746,7 @@
     if (!captureSession || !captureOverlay) return;
     setDangerOverlay(false);
     const box = captureBox();
+    box.classList.add('muenba-rhythm-halloween-box');
     box.classList.add('muenba-rhythm-help-box');
 
     const eyebrow = document.createElement('div');
@@ -1797,6 +1800,7 @@
     const danger = !!captureSession.danger && !practice;
     setDangerOverlay(danger);
     const box = captureBox();
+    box.classList.add('muenba-rhythm-halloween-box');
     if (danger) box.classList.add('muenba-danger-box');
     captureImage(box, ghost, danger ? ANGRY_CHANGE_IMG : ghost.img);
 
@@ -1838,6 +1842,33 @@
     box.appendChild(accuracy);
     rhythm.accuracyEl = accuracy;
 
+    const combo = document.createElement('p');
+    combo.className = 'muenba-rhythm-combo';
+    combo.textContent = 'Combo: 0';
+    combo.setAttribute('aria-live', 'polite');
+    box.appendChild(combo);
+    rhythm.comboEl = combo;
+
+    const energy = document.createElement('div');
+    energy.className = 'muenba-rhythm-energy';
+    energy.setAttribute('role', 'progressbar');
+    energy.setAttribute('aria-label', 'Ghost energy captured');
+    energy.setAttribute('aria-valuemin', '0');
+    energy.setAttribute('aria-valuemax', '100');
+    energy.setAttribute('aria-valuenow', '0');
+    const energyLabel = document.createElement('span');
+    energyLabel.className = 'muenba-rhythm-energy-label';
+    energyLabel.textContent = 'GHOST ENERGY';
+    const energyTrack = document.createElement('span');
+    energyTrack.className = 'muenba-rhythm-energy-track';
+    const energyFill = document.createElement('span');
+    energyFill.className = 'muenba-rhythm-energy-fill';
+    energyTrack.appendChild(energyFill);
+    energy.append(energyLabel, energyTrack);
+    box.appendChild(energy);
+    rhythm.energyFillEl = energyFill;
+    rhythm.energyEl = energy;
+
     const board = document.createElement('div');
     board.className = 'muenba-rhythm-board';
     const laneDefs = rhythm.lanes.map(id => RHYTHM_LANE_BY_ID[id]).filter(Boolean);
@@ -1848,6 +1879,7 @@
     hitLine.className = 'muenba-rhythm-hit-line';
     hitLine.setAttribute('aria-hidden', 'true');
     board.appendChild(hitLine);
+    rhythm.boardEl = board;
 
     laneDefs.forEach(laneDef => {
       const lane = laneDef.id;
@@ -1973,16 +2005,45 @@
     else if (result === 'good') rhythm.good += 1;
     else if (result === 'avoid') rhythm.avoided += 1;
     else rhythm.miss += 1;
+    if (result === 'perfect' || result === 'good') {
+      rhythm.combo += 1;
+      rhythm.bestCombo = Math.max(rhythm.bestCombo, rhythm.combo);
+    } else if (result === 'miss') {
+      rhythm.combo = 0;
+    }
     while (rhythm.nextIndex < rhythm.chart.length && rhythm.resolvedIndices.has(rhythm.nextIndex)) {
       rhythm.nextIndex += 1;
     }
     if (rhythm.accuracyEl) rhythm.accuracyEl.textContent = `Accuracy: ${rhythmAccuracy(rhythm)}%`;
+    if (rhythm.comboEl) {
+      rhythm.comboEl.textContent = rhythm.combo >= 2 ? `${rhythm.combo} COMBO` : 'Combo: 0';
+      rhythm.comboEl.classList.toggle('is-hot', rhythm.combo >= 3);
+    }
+    if (rhythm.energyFillEl) {
+      const targetTotal = rhythm.chart.filter(noteData => !noteData.decoy).length || 1;
+      const energyPercent = Math.round(((rhythm.perfect + rhythm.good) / targetTotal) * 100);
+      rhythm.energyFillEl.style.width = `${Math.min(100, energyPercent)}%`;
+      rhythm.energyEl?.setAttribute('aria-valuenow', String(Math.min(100, energyPercent)));
+    }
+    pulseRhythmBoard(result);
+  }
+
+  function pulseRhythmBoard(kind) {
+    const rhythm = captureSession && captureSession.rhythm;
+    const board = rhythm && rhythm.boardEl;
+    if (!board) return;
+    board.classList.remove('is-perfect', 'is-good', 'is-miss', 'is-avoid');
+    void board.offsetWidth;
+    board.classList.add(`is-${kind}`);
   }
 
   function showRhythmFeedback(text, kind) {
     const rhythm = captureSession && captureSession.rhythm;
     if (!rhythm || !rhythm.statusEl) return;
-    rhythm.statusEl.textContent = text;
+    const comboText = (kind === 'perfect' || kind === 'good') && rhythm.combo >= 2
+      ? ` · ${rhythm.combo} COMBO`
+      : '';
+    rhythm.statusEl.textContent = `${text}${comboText}`;
     rhythm.statusEl.className = `muenba-rhythm-status ${kind || ''}`;
   }
 
@@ -2095,6 +2156,7 @@
     if (!captureSession || !captureOverlay) return;
     setDangerOverlay(false);
     const box = captureBox();
+    box.classList.add('muenba-rhythm-halloween-box');
     box.classList.add('muenba-rhythm-help-box');
 
     const h2 = document.createElement('h2');
@@ -2190,6 +2252,7 @@
     const danger = !!captureSession.danger;
     setDangerOverlay(danger);
     const box = captureBox();
+    box.classList.add('muenba-rhythm-halloween-box');
     if (danger) box.classList.add('muenba-danger-box');
     captureImage(box, ghost, danger ? ANGRY_CHANGE_IMG : ghost.img);
 
@@ -2209,6 +2272,13 @@
       ? `Accuracy: ${accuracy}%. ${success ? 'The angry ghost has been calmed. Continue to the capture reward.' : 'The angry ghost knocked Booha back. Hide, or face the danger rhythm again.'}`
       : `Accuracy: ${accuracy}%. ${success ? 'The capture is ready for the reward step.' : 'The ghost is still waiting for you.'}`);
     box.appendChild(p);
+
+    if (captureSession.rhythm && captureSession.rhythm.bestCombo >= 2) {
+      const combo = document.createElement('p');
+      combo.className = 'muenba-rhythm-combo is-hot';
+      combo.textContent = `Best combo: ${captureSession.rhythm.bestCombo}`;
+      box.appendChild(combo);
+    }
 
     renderCaseDirection(
       box,
@@ -2779,31 +2849,52 @@
       .muenba-rhythm-help-button { position:absolute; top:10px; left:10px; z-index:8; display:grid; place-items:center; width:30px; height:30px; padding:0; border:1px solid rgba(216,201,139,.72); border-radius:50%; color:#fff5d5; background:rgba(40,32,12,.72); box-shadow:0 0 14px rgba(216,201,139,.28); font:900 17px/1 Georgia,'Times New Roman',serif; cursor:pointer; }
       .muenba-rhythm-help-button:hover, .muenba-rhythm-help-button:focus-visible { border-color:#fff1ae; background:rgba(126,111,48,.58); box-shadow:0 0 24px rgba(216,201,139,.48); outline:none; }
       .muenba-rhythm-help-box { border-color:rgba(216,201,139,.54); box-shadow:0 24px 80px rgba(0,0,0,.82),0 0 60px rgba(126,111,48,.22),inset 0 0 70px rgba(0,0,0,.58); }
+      .muenba-rhythm-halloween-box { border-color:rgba(157,116,255,.7); background:radial-gradient(circle at 50% 8%,rgba(116,46,168,.22),transparent 42%),linear-gradient(145deg,rgba(19,11,43,.96),rgba(6,13,25,.97)); box-shadow:0 24px 80px rgba(0,0,0,.86),0 0 55px rgba(111,66,210,.25),inset 0 0 55px rgba(49,205,154,.08); }
+      .muenba-rhythm-halloween-box h2 { color:#f4e8ff; text-shadow:0 0 18px rgba(190,119,255,.48); }
       .muenba-rhythm-accuracy { margin:0 0 7px !important; color:#9ccbb6 !important; font:700 .72rem/1.4 ui-monospace,monospace !important; text-align:center !important; letter-spacing:.08em; }
-      .muenba-rhythm-board { position:relative; display:grid; grid-template-columns:1fr 1fr; gap:8px; height:250px; margin:8px 0 6px; }
-      .muenba-rhythm-lane { position:relative; min-width:0; height:250px; overflow:hidden; padding:0; border:1px solid rgba(156,203,182,.35); border-radius:14px; color:#dcefe4; background:linear-gradient(180deg,rgba(25,55,44,.58),rgba(5,15,12,.86)); cursor:pointer; touch-action:none; user-select:none; }
-      .muenba-rhythm-lane:hover, .muenba-rhythm-lane:focus-visible { border-color:rgba(156,203,182,.8); background:linear-gradient(180deg,rgba(42,88,67,.68),rgba(7,22,17,.92)); outline:none; }
-      .muenba-rhythm-lane:active { background:rgba(57,110,82,.76); }
-      .muenba-rhythm-lane-label { position:absolute; z-index:4; left:0; right:0; top:9px; color:#aacdbb; font:700 .68rem/1.2 ui-monospace,monospace; letter-spacing:.08em; pointer-events:none; }
+      .muenba-rhythm-combo { min-height:1.2em; margin:0 0 4px !important; color:#ffb347 !important; font:900 .9rem/1.2 ui-monospace,monospace !important; letter-spacing:.14em; text-align:center !important; text-shadow:0 0 12px rgba(255,145,45,.38); text-transform:uppercase; }
+      .muenba-rhythm-combo.is-hot { color:#c9ff54 !important; animation:muenbaRhythmComboPop .28s ease-out; text-shadow:0 0 16px rgba(164,255,58,.75); }
+      .muenba-rhythm-energy { display:flex; align-items:center; gap:8px; margin:0 auto 7px; width:min(100%,360px); }
+      .muenba-rhythm-energy-label { flex:0 0 auto; color:#88b8ff; font:900 .58rem/1 ui-monospace,monospace; letter-spacing:.1em; }
+      .muenba-rhythm-energy-track { position:relative; flex:1; height:7px; overflow:hidden; border:1px solid rgba(137,184,255,.5); border-radius:99px; background:rgba(7,13,29,.86); box-shadow:inset 0 0 7px rgba(40,21,93,.8); }
+      .muenba-rhythm-energy-fill { display:block; width:0; height:100%; border-radius:inherit; background:linear-gradient(90deg,#8c5bff,#26e6a0,#d8ff4f); box-shadow:0 0 14px rgba(112,255,170,.72); transition:width .18s ease-out; }
+      .muenba-rhythm-board { position:relative; display:grid; grid-template-columns:1fr 1fr; gap:8px; height:250px; margin:8px 0 6px; padding:5px; border:1px solid rgba(143,104,255,.28); border-radius:18px; background:radial-gradient(circle at 50% 100%,rgba(255,122,27,.1),transparent 48%),rgba(5,5,19,.64); box-shadow:inset 0 0 24px rgba(68,35,143,.26); }
+      .muenba-rhythm-lane { position:relative; min-width:0; height:250px; overflow:hidden; padding:0; border:1px solid rgba(156,203,182,.35); border-radius:14px; color:#f2f7ff; background:linear-gradient(180deg,rgba(25,55,44,.58),rgba(5,15,12,.86)); cursor:pointer; touch-action:none; user-select:none; }
+      .muenba-rhythm-don { border-color:rgba(117,255,154,.74); background:linear-gradient(180deg,rgba(20,116,84,.7),rgba(5,35,30,.94)); box-shadow:inset 0 0 28px rgba(39,255,145,.12),0 0 13px rgba(39,255,145,.1); }
+      .muenba-rhythm-kat { border-color:rgba(197,118,255,.72); background:linear-gradient(180deg,rgba(86,35,125,.74),rgba(27,9,51,.95)); box-shadow:inset 0 0 28px rgba(190,85,255,.14),0 0 13px rgba(190,85,255,.12); }
+      .muenba-rhythm-rim { border-color:rgba(102,183,255,.72); background:linear-gradient(180deg,rgba(28,78,139,.76),rgba(7,25,58,.95)); box-shadow:inset 0 0 28px rgba(52,159,255,.14),0 0 13px rgba(52,159,255,.12); }
+      .muenba-rhythm-bell { border-color:rgba(255,175,77,.76); background:linear-gradient(180deg,rgba(142,69,26,.76),rgba(54,21,8,.95)); box-shadow:inset 0 0 28px rgba(255,135,30,.14),0 0 13px rgba(255,135,30,.12); }
+      .muenba-rhythm-lane:hover, .muenba-rhythm-lane:focus-visible { filter:brightness(1.22); outline:none; }
+      .muenba-rhythm-lane:active { filter:brightness(1.45); }
+      .muenba-rhythm-lane-label { position:absolute; z-index:4; left:0; right:0; top:9px; color:#edf5ff; font:900 .68rem/1.2 ui-monospace,monospace; letter-spacing:.08em; pointer-events:none; text-shadow:0 0 9px rgba(255,255,255,.26); }
       .muenba-rhythm-rail { position:absolute; inset:29px 0 0; pointer-events:none; }
-      .muenba-rhythm-hit-line { position:absolute; z-index:5; left:8px; right:8px; top:218px; height:3px; border-radius:99px; background:rgba(218,249,229,.8); box-shadow:0 0 14px rgba(143,220,178,.72); pointer-events:none; }
+      .muenba-rhythm-hit-line { position:absolute; z-index:5; left:8px; right:8px; top:218px; height:3px; border-radius:99px; background:#ffab45; box-shadow:0 0 10px rgba(255,134,35,.72),0 0 24px rgba(255,91,20,.4); pointer-events:none; }
       .muenba-rhythm-note { position:absolute; z-index:3; left:50%; top:0; display:grid; place-items:center; width:42px; height:42px; border:2px solid rgba(220,248,231,.92); border-radius:50%; color:#f0fff5; background:rgba(44,105,76,.92); box-shadow:0 0 16px rgba(112,214,151,.42); font:900 1.1rem/1 ui-monospace,monospace; will-change:transform; }
-      .muenba-rhythm-note-kat { border-radius:10px; background:rgba(75,72,126,.92); box-shadow:0 0 16px rgba(144,137,221,.4); }
-      .muenba-rhythm-note-rim { border-radius:9px 9px 50% 50%; background:rgba(122,76,149,.92); box-shadow:0 0 18px rgba(212,108,255,.46); }
-      .muenba-rhythm-note-bell { border-radius:50%; background:rgba(184,99,44,.94); box-shadow:0 0 18px rgba(255,170,74,.52); }
+      .muenba-rhythm-note-don { border-color:#8affae; background:rgba(21,153,102,.94); box-shadow:0 0 18px rgba(57,255,147,.62); }
+      .muenba-rhythm-note-kat { border-radius:10px; border-color:#e0a5ff; background:rgba(118,46,167,.94); box-shadow:0 0 18px rgba(205,103,255,.62); }
+      .muenba-rhythm-note-rim { border-radius:9px 9px 50% 50%; border-color:#9ad3ff; background:rgba(38,108,177,.94); box-shadow:0 0 18px rgba(65,173,255,.66); }
+      .muenba-rhythm-note-bell { border-radius:50%; border-color:#ffd18d; background:rgba(196,91,27,.96); box-shadow:0 0 18px rgba(255,145,44,.7); }
       .muenba-rhythm-note-decoy { border-style:dashed; color:#ffe0a3; background:rgba(76,35,65,.9); box-shadow:0 0 18px rgba(255,173,91,.48); }
       .muenba-rhythm-note-spiral { border-radius:50%; transform-origin:center; }
       .muenba-rhythm-note.is-avoided { opacity:.1; border-color:#ffd48a; box-shadow:none; }
       .muenba-rhythm-note.is-resolved { opacity:.14; box-shadow:none; }
       .muenba-rhythm-note.is-hit { opacity:.94; border-color:#8fe0ad; }
       .muenba-rhythm-note.is-miss { opacity:.18; border-color:#e8b0b8; background:rgba(120,48,64,.65); box-shadow:none; }
+      .muenba-rhythm-board.is-perfect { animation:muenbaRhythmPerfect .26s ease-out; }
+      .muenba-rhythm-board.is-good { animation:muenbaRhythmGood .2s ease-out; }
+      .muenba-rhythm-board.is-miss { animation:muenbaRhythmMiss .24s ease-out; }
+      @keyframes muenbaRhythmPerfect { 50% { box-shadow:inset 0 0 42px rgba(182,255,71,.25),0 0 24px rgba(67,255,152,.4); } }
+      @keyframes muenbaRhythmGood { 50% { box-shadow:inset 0 0 34px rgba(74,175,255,.22),0 0 18px rgba(74,175,255,.3); } }
+      @keyframes muenbaRhythmMiss { 50% { box-shadow:inset 0 0 42px rgba(255,52,87,.3),0 0 22px rgba(255,52,87,.32); } }
+      @keyframes muenbaRhythmComboPop { 50% { transform:scale(1.12); } }
+      @media (max-width:640px) { .muenba-rhythm-board { gap:4px; padding:3px; } .muenba-rhythm-lane-label { font-size:.52rem; letter-spacing:.01em; } .muenba-rhythm-note { width:34px; height:34px; font-size:.9rem; } }
       .muenba-rhythm-hint { margin:7px 0 13px !important; color:#8fa89b !important; font-size:.73rem !important; line-height:1.45 !important; text-align:center !important; }
       .muenba-orb-release-list { display:flex; justify-content:center; align-items:center; gap:12px; min-height:52px; margin:5px 0 8px; }
       .muenba-orb-release { display:grid; place-items:center; width:38px; height:38px; color:#dfffea; border:1px solid rgba(181,238,202,.75); border-radius:50%; background:radial-gradient(circle,rgba(113,206,153,.72),rgba(30,83,59,.68)); box-shadow:0 0 22px rgba(113,206,153,.58); font-size:1.45rem; animation:muenbaOrbRelease .42s cubic-bezier(.2,1.5,.4,1) both; }
       @keyframes muenbaOrbRelease { from { opacity:0; transform:translateY(12px) scale(.35); } to { opacity:1; transform:translateY(0) scale(1); } }
       .muenba-orb-release-status { margin:0 0 18px !important; color:#9ccbb6 !important; font:700 .76rem/1.4 ui-monospace,monospace !important; text-align:center !important; letter-spacing:.05em; }
       @media (prefers-reduced-motion: reduce) { .muenba-orb-release, .muenba-hunt-ghost-portrait { animation:none; } }
-      @media (prefers-reduced-motion: reduce) { #muenba-fade, .muenba-return-box, #muenba-return-overlay, .muenba-lobby-box, #muenba-lobby-overlay, #muenba-capture-overlay { transition:none !important; } .muenba-lobby-portrait, #muenba-hide, #muenba-celebration-status { animation:none !important; } #muenba-profile-link { transition:none !important; } }
+      @media (prefers-reduced-motion: reduce) { #muenba-fade, .muenba-return-box, #muenba-return-overlay, .muenba-lobby-box, #muenba-lobby-overlay, #muenba-capture-overlay { transition:none !important; } .muenba-lobby-portrait, #muenba-hide, #muenba-celebration-status, .muenba-rhythm-board, .muenba-rhythm-combo { animation:none !important; } .muenba-rhythm-energy-fill { transition:none !important; } #muenba-profile-link { transition:none !important; } }
     `;
     document.head.appendChild(style);
   }
