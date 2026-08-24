@@ -44,7 +44,7 @@
     });
 
   /*
-   * Difficulty resolution — Fresh Memory / Deep Memory.
+   * Difficulty resolution — Start Memory / Fresh Memory / Deep Memory.
    *
    * Story authors may nest a "fresh" object inside an episode (same id,
    * same rooms/checks shape, simpler wording) as an easier on-ramp for
@@ -55,14 +55,16 @@
    * student reads in.
    *
    * Defaults to 'deep' (today's content, unchanged) so existing saves and
-   * students see no difference until they opt into Fresh Memory.
+   * students see no difference until they choose another reading tier.
    */
+  const READING_MODES = ['start', 'fresh', 'deep'];
+
   function getReadingDifficulty() {
     try {
       const save = window.BoohaAdventure && BoohaAdventure.save
         ? BoohaAdventure.save.load() : null;
-      return (save && save.utsuroba && save.utsuroba.readingDifficulty === 'fresh')
-        ? 'fresh' : 'deep';
+      const value = save && save.utsuroba && save.utsuroba.readingDifficulty;
+      return READING_MODES.includes(value) ? value : 'deep';
     } catch (_) { return 'deep'; }
   }
 
@@ -73,28 +75,30 @@
   function resolveEpisode(id, difficultyOverride) {
     const episode = episodes[id];
     if (!episode) return episode;
-    const difficulty = difficultyOverride === 'fresh' || difficultyOverride === 'deep'
+    const difficulty = READING_MODES.includes(difficultyOverride)
       ? difficultyOverride : getReadingDifficulty();
-    if (difficulty === 'fresh' && episode.fresh) {
-      const merged = Object.assign({}, episode, episode.fresh);
+    if (difficulty !== 'deep' && episode[difficulty]) {
+      const merged = Object.assign({}, episode, episode[difficulty]);
+      delete merged.start;
       delete merged.fresh;
       // mechanic and postcard mix shared branding (type/name; title/
       // instruction) with tier-specific copy. A fresh block only overrides
       // the copy, so these two go one level deeper instead of a flat
       // object replace — everything else in .fresh is a full parallel
       // array/object and replaces its base counterpart wholesale.
-      if (episode.mechanic && episode.fresh.mechanic) {
-        merged.mechanic = Object.assign({}, episode.mechanic, episode.fresh.mechanic);
+      if (episode.mechanic && episode[difficulty].mechanic) {
+        merged.mechanic = Object.assign({}, episode.mechanic, episode[difficulty].mechanic);
       }
-      if (episode.postcard && episode.fresh.postcard) {
-        merged.postcard = Object.assign({}, episode.postcard, episode.fresh.postcard);
+      if (episode.postcard && episode[difficulty].postcard) {
+        merged.postcard = Object.assign({}, episode.postcard, episode[difficulty].postcard);
       }
-      merged.difficulty = 'fresh';
+      merged.difficulty = difficulty;
       return merged;
     }
     return Object.assign({ difficulty: 'deep' }, episode);
   }
 
   window.UTSUROBA_READING_DIFFICULTY = getReadingDifficulty;
+  window.UTSUROBA_READING_MODES = READING_MODES.slice();
   window.UTSUROBA_EPISODES_RESOLVE = resolveEpisode;
 })();

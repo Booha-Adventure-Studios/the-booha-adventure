@@ -13,6 +13,7 @@ assert.ok(Array.isArray(index.episodes) && index.episodes.length > 0,
   'Utsuroba episode index must contain at least one episode');
 
 const ids = new Set();
+const readingModes = ['start', 'fresh', 'deep'];
 for (const entry of index.episodes) {
   assert.ok(entry && entry.id && entry.file, 'episode index entries need id and file');
   assert.ok(!ids.has(entry.id), `duplicate episode id: ${entry.id}`);
@@ -157,6 +158,28 @@ for (const entry of index.episodes) {
     if (check.type === 'inference') {
       assert.ok(Number.isInteger(check.supportingLine) && check.supportingLine >= 0 && check.supportingLine < episode.lines.length,
         `${label}: inference checks need a valid supportingLine`);
+    }
+  }
+
+  for (const mode of readingModes) {
+    const tier = mode === 'deep' ? episode : episode[mode];
+    assert.ok(tier && tier.intro && tier.introJP, `${entry.id} ${mode}: reading tier needs an introduction`);
+    assert.ok(Array.isArray(tier.lines) && tier.lines.length >= 3, `${entry.id} ${mode}: reading tier needs at least three English lines`);
+    assert.ok(Array.isArray(tier.checks) && tier.checks.length === 3, `${entry.id} ${mode}: reading tier needs exactly three checks`);
+    assert.ok(tier.mechanic, `${entry.id} ${mode}: reading tier needs a visible mechanic`);
+    assert.ok(tier.postcard && Array.isArray(tier.postcard.chunks) && tier.postcard.chunks.length === 3,
+      `${entry.id} ${mode}: reading tier needs a three-part postcard`);
+    for (const line of tier.lines) {
+      assert.ok(line.speaker && line.en, `${entry.id} ${mode}: conversation lines must be English-only`);
+      assert.ok(!('jp' in line) && !('speakerJP' in line), `${entry.id} ${mode}: conversation lines must not carry Japanese story text`);
+    }
+    for (const check of tier.checks) {
+      assert.ok(check.prompt && check.promptJP, `${entry.id} ${mode}: checks need bilingual prompts`);
+      assert.ok(Array.isArray(check.choices) && check.choices.length === 3, `${entry.id} ${mode}: checks need three choices`);
+      assert.ok(Array.isArray(check.choicesJP) && check.choicesJP.length === 3, `${entry.id} ${mode}: choicesJP must align`);
+      assert.ok(Number.isInteger(check.correct) && check.correct >= 0 && check.correct < 3, `${entry.id} ${mode}: correct answer index is invalid`);
+      assert.ok(Array.isArray(check.evidenceLines) && check.evidenceLines.every(index => index >= 0 && index < tier.lines.length),
+        `${entry.id} ${mode}: evidence line index is invalid`);
     }
   }
 }

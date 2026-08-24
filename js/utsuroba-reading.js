@@ -261,7 +261,7 @@
     try {
       await window.UTSUROBA_EPISODES_READY;
       episode = window.UTSUROBA_EPISODES_RESOLVE
-        ? window.UTSUROBA_EPISODES_RESOLVE(opts.quest && opts.quest.episodeId)
+        ? window.UTSUROBA_EPISODES_RESOLVE(opts.quest && opts.quest.episodeId, opts.quest && opts.quest.readingDifficulty)
         : window.UTSUROBA_EPISODES[opts.quest && opts.quest.episodeId];
       if (!episode) throw new Error(`Unknown episode: ${opts.quest && opts.quest.episodeId}`);
     } catch (error) {
