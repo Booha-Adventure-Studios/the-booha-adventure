@@ -5,11 +5,11 @@
 // ============================================================
 
 const CURRENT_CACHES = {
-  // Muenba spirit-particles and ghost-light pass: invalidate the previous
-  // bundle so the active cemetery atmosphere reaches returning players.
-  pages:  'booha-pages-2026-277',
-  assets: 'booha-assets-2026-277',
-  decks:  'booha-decks-2026-277',
+  // Muenba lantern flicker pass: invalidate the previous bundle so calibrated
+  // amber window lights reach returning players.
+  pages:  'booha-pages-2026-278',
+  assets: 'booha-assets-2026-278',
+  decks:  'booha-decks-2026-278',
 };
 
 const PAGE_CACHE  = CURRENT_CACHES.pages;
