@@ -5,11 +5,11 @@
 // ============================================================
 
 const CURRENT_CACHES = {
-  // Muenba target collection pass: invalidate the previous deployed bundle
-  // so only Nuppi's active case ghost can be captured.
-  pages:  'booha-pages-2026-259',
-  assets: 'booha-assets-2026-259',
-  decks:  'booha-decks-2026-259',
+  // Muenba hostility pass: invalidate the previous deployed bundle so
+  // delayed sight reactions and wrong-collection reactions are live.
+  pages:  'booha-pages-2026-260',
+  assets: 'booha-assets-2026-260',
+  decks:  'booha-decks-2026-260',
 };
 
 const PAGE_CACHE  = CURRENT_CACHES.pages;

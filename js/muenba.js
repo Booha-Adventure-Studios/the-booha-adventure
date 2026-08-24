@@ -1,7 +1,7 @@
 /*
  * Muenba world shell — navigation, atmosphere, Nuppi's lobby welcome, durable
  * Muenba save/progress, and the ghost-hunting core loop: one
- * wandering ghost per room, an ignore-vs-chase behavior split, a Hide
+ * wandering ghost per room, a friendly-vs-hostile behavior split, a Hide
  * button, and click-to-attempt capture. Pass 8A owns the explicit capture
  * session hand-off, Pass 8B supplies the first two-lane rhythm capture, and
  * Pass 8C/8D complete the orb-return loop and its testing/accessibility polish.
@@ -60,6 +60,7 @@
   const GHOST_DETECT_R = 230;
   const GHOST_CATCH_R = 60;
   const GHOST_CLICK_R = 64;
+  const GHOST_NOTICE_DELAY_MS = 2200;
   const GHOST_GIVEUP_HIDE_MS = 1100;
   const GHOST_STARTLE_COOLDOWN_MS = 1400;
   const GHOST_TELEPORT_MIN_MS = 16000;
@@ -537,17 +538,18 @@
   /* ═══════════════════════════════════════════════════════════════════
      GHOST HUNTING CORE LOOP
      One wandering ghost per room, day-seeded so the layout is stable across
-     re-entries but can change tomorrow. Each ghost is either 'ignore'
-     (wanders, never reacts) or 'chase' (notices the player within range and
-     closes in — but never faster than the player can walk away). Catching up
-     to the player is a soft startle, not a fail state. Every encountered ghost
-     is currently capturable; later Muenba casework can attach a personality
-     episode to the encounter without bringing back a daily quiz target.
+     re-entries but can change tomorrow. Nuppi's active case ghost is friendly.
+     Every other ghost is hostile, with one of two readable triggers: some
+     notice Booha after a short delay in the same room, while others only react
+     when Booha tries to collect them. Hostile ghosts move at the same slow
+     speed as their wandering pace; the danger comes from the scream and the
+     touch consequence, not from an unfair speed boost.
      ═══════════════════════════════════════════════════════════════════ */
 
   // Which of the 15 rooms gets which of the 5 ghosts, and which ghosts are
-  // 'chase' vs 'ignore' today — both reseed on the next calendar day but
-  // hold steady across re-entries the same day.
+  // 'sight' vs 'collect' today — both reseed on the next calendar day but
+  // hold steady across re-entries the same day. The active case always
+  // overrides this as friendly.
   function getGhostRoomMap() {
     const today = _muenbaTodayKey() || 'nodate';
     if (ghostRoomMap && ghostRoomMapDay === today) return ghostRoomMap;
@@ -563,9 +565,10 @@
     return map;
   }
 
-  function ghostBehaviorFor(ghostId) {
+  function ghostHostilityFor(ghostId) {
+    if (ghostId === currentHuntGhostId()) return 'friendly';
     const today = _muenbaTodayKey() || 'nodate';
-    return _muenbaRng(today + '|muenbaGhostBehavior|' + ghostId)() < 0.5 ? 'ignore' : 'chase';
+    return _muenbaRng(today + '|muenbaGhostHostility|' + ghostId)() < 0.5 ? 'sight' : 'collect';
   }
 
   // Random point inside one of this room's walkable rects — same corridor
@@ -611,25 +614,30 @@
     const map = getGhostRoomMap();
     if (map[fromRoomId]?.id === g.ghost.id) delete map[fromRoomId];
     map[destinationRoomId] = g.ghost;
+    stopGhostScream(g);
     activeGhost = null;
   }
 
-  // Called from setRoom() for every room entry. The current exploration pass
-  // lets any ghost begin a capture, so there is no daily target to persist or
-  // hide after capture.
+  // Called from setRoom() for every room entry. The active case target is the
+  // only ghost that can begin a capture; other ghosts remain encounters.
   function spawnRoomGhost(roomId) {
     activeGhost = null;
     const ghost = getGhostRoomMap()[roomId];
     if (!ghost) return;
     const pos = pickGhostWanderTarget();
+    const hostility = ghostHostilityFor(ghost.id);
     activeGhost = {
       ghost,
       x: pos.x,
       y: pos.y,
-      behavior: ghostBehaviorFor(ghost.id),
+      behavior: hostility,
+      hostility,
       chasing: false,
       wanderTarget: pos,
       nextWanderAt: performance.now() + 1800 + Math.random() * 1600,
+      noticeStartedAt: 0,
+      screaming: false,
+      screamReason: null,
       angryUntil: 0,
       startleUntil: 0,
       hideGiveupAt: 0,
@@ -650,18 +658,35 @@
     g.y = next.y;
   }
 
+  function startGhostScream(g, now, reason) {
+    if (!g || g.hostility === 'friendly' || g.screaming) return;
+    g.screaming = true;
+    g.screamReason = reason;
+    g.angryUntil = now + 1200;
+    startDangerScream();
+  }
+
+  function stopGhostScream(g) {
+    if (!g || !g.screaming) return;
+    g.screaming = false;
+    g.screamReason = null;
+    stopDangerScream();
+  }
+
   function tickGhost(now) {
     if (!activeGhost) return;
     const g = activeGhost;
     if (state.hiding) {
+      stopGhostScream(g);
       // Only the give-up timer runs while hidden — a chasing ghost that
       // loses the player takes a beat to wander off, rather than snapping
-      // back to 'ignore' the instant Hide is pressed.
+      // back to wandering the instant Hide is pressed.
       if (g.chasing) {
         if (!g.hideGiveupAt) g.hideGiveupAt = now + GHOST_GIVEUP_HIDE_MS;
         else if (now >= g.hideGiveupAt) {
           g.chasing = false;
           g.hideGiveupAt = 0;
+          g.noticeStartedAt = 0;
           g.wanderTarget = pickGhostWanderTarget();
           g.nextWanderAt = now + 400;
         }
@@ -682,10 +707,23 @@
       return;
     }
     const dist = Math.hypot(g.x - state.x, g.y - state.y);
-    if (g.behavior === 'chase') {
-      if (!g.chasing && dist <= GHOST_DETECT_R) g.chasing = true;
-      if (g.chasing && dist > GHOST_DETECT_R * 1.5) g.chasing = false;
-      if (g.chasing) {
+    if (g.hostility === 'sight' && !g.screaming) {
+      if (dist <= GHOST_DETECT_R) {
+        if (!g.noticeStartedAt) g.noticeStartedAt = now;
+        if (now - g.noticeStartedAt >= GHOST_NOTICE_DELAY_MS) {
+          startGhostScream(g, now, 'sight');
+          g.chasing = true;
+        }
+      } else {
+        g.noticeStartedAt = 0;
+      }
+    }
+    if (g.screaming && g.chasing) {
+      if (dist > GHOST_DETECT_R * 1.5) {
+        stopGhostScream(g);
+        g.chasing = false;
+        g.noticeStartedAt = 0;
+      } else {
         moveGhostToward(g, state.x, state.y, GHOST_CHASE_SPEED);
         if (dist <= GHOST_CATCH_R && now >= g.startleUntil) {
           g.startleUntil = now + GHOST_STARTLE_COOLDOWN_MS;
@@ -727,8 +765,13 @@
     if (!activeGhost || state.captureResolving) return false;
     if (Math.hypot(worldX - activeGhost.x, worldY - activeGhost.y) <= GHOST_CLICK_R) {
       if (activeGhost.ghost.id !== currentHuntGhostId()) {
-        activeGhost.notTargetUntil = performance.now() + 500;
         state.clickTarget = null;
+        if (activeGhost.hostility === 'collect') {
+          const now = performance.now();
+          startGhostScream(activeGhost, now, 'collect');
+          activeGhost.chasing = true;
+          activeGhost.hideGiveupAt = 0;
+        }
         return true;
       }
       attemptCapture();
@@ -1876,7 +1919,7 @@
     if (!activeGhost) return;
     const seconds = now / 1000;
     const bob = Math.sin(seconds * 3.4 + 1) * 6;
-    const isAngry = now < activeGhost.angryUntil;
+    const isAngry = activeGhost.screaming || now < activeGhost.angryUntil;
     const src = isAngry ? ANGRY_CHANGE_IMG : activeGhost.ghost.img;
     const img = src ? getGhostSprite(src) : null;
     const x = activeGhost.x;
@@ -2395,6 +2438,7 @@
     state.spawnLockUntil = performance.now() + 700;
     state.hiding = false;
     state.captureResolving = false;
+    stopDangerScream();
     if (hideBtn) { hideBtn.classList.remove('active'); hideBtn.textContent = 'Hide'; }
     markMuenbaRoomVisited(roomId);
     spawnRoomGhost(roomId);
@@ -3039,7 +3083,7 @@
     drawPins();
     if (DEV_MODE && devReadout) {
       const hover = devHover ? `  mouse:${Math.round(devHover.x)},${Math.round(devHover.y)}` : '';
-      const ghostInfo = activeGhost ? `  ghost:${activeGhost.ghost.id}(${activeGhost.behavior}${activeGhost.chasing ? '*chasing*' : ''}${activeGhost.teleporting ? '*teleporting*' : ''})` : '';
+      const ghostInfo = activeGhost ? `  ghost:${activeGhost.ghost.id}(${activeGhost.behavior}${activeGhost.screaming ? '*screaming*' : ''}${activeGhost.chasing ? '*chasing*' : ''}${activeGhost.teleporting ? '*teleporting*' : ''})` : '';
       devReadout.textContent = `${state.roomId}  player:${Math.round(state.x)},${Math.round(state.y)}${hover}${ghostInfo}\n${getDevQaSummary()}`;
     }
   }
