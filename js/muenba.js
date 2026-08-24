@@ -68,9 +68,10 @@
   const GHOST_NOTICE_DELAY_MS = 900;
   const GHOST_GIVEUP_HIDE_MS = 1100;
   const GHOST_STARTLE_COOLDOWN_MS = 1400;
-  const GHOST_TELEPORT_MIN_MS = 16000;
-  const GHOST_TELEPORT_MAX_MS = 24000;
+  const GHOST_TELEPORT_MIN_MS = 8500;
+  const GHOST_TELEPORT_MAX_MS = 14000;
   const GHOST_TELEPORT_WARNING_MS = 1400;
+  const GHOST_ROOM_EXIT_R = 42;
   const ORB_REWARD_PER_CAPTURE = 3;
   const MUENBA_MUSIC_VOLUME = 0.55;
   const MUENBA_SCREAM_DUCK_VOLUME = 0.16;
@@ -665,30 +666,57 @@
 
   function scheduleGhostTeleport(g, now) {
     const delay = GHOST_TELEPORT_MIN_MS + Math.random() * (GHOST_TELEPORT_MAX_MS - GHOST_TELEPORT_MIN_MS);
-    g.teleportAt = now + delay;
-    g.teleportWarningAt = g.teleportAt - GHOST_TELEPORT_WARNING_MS;
+    g.roomTravelAt = now + delay;
+    g.travelExit = null;
+    g.travelingToExit = false;
+    g.teleportAt = 0;
+    g.teleportWarningAt = 0;
     g.teleporting = false;
   }
 
-  function pickGhostTeleportRoom(fromRoomId) {
+  function pickGhostTravelExit(fromRoomId) {
     const map = getGhostRoomMap();
-    const candidates = Object.keys(DATA.rooms).filter(roomId => roomId !== fromRoomId && !map[roomId]);
+    const exits = DATA.rooms[fromRoomId]?.exits || [];
+    const candidates = exits.filter(exit => exit.to !== state.roomId && !map[exit.to]);
     if (!candidates.length) return null;
     return candidates[Math.floor(Math.random() * candidates.length)];
   }
 
+  function pickGhostTeleportRoom(fromRoomId) {
+    const exit = pickGhostTravelExit(fromRoomId);
+    return exit ? exit.to : null;
+  }
+
+  function beginGhostRoomTravel(g, now) {
+    const fromRoomId = g.roomId || state.roomId;
+    const exit = pickGhostTravelExit(fromRoomId);
+    if (!exit) {
+      scheduleGhostTeleport(g, now);
+      return false;
+    }
+    g.travelExit = exit;
+    g.travelingToExit = true;
+    g.teleporting = false;
+    g.teleportAt = 0;
+    g.teleportWarningAt = 0;
+    g.wanderTarget = { x: exit.x, y: exit.y };
+    g.nextWanderAt = 0;
+    return true;
+  }
+
   function teleportGhostToAnotherRoom(g, now) {
     const fromRoomId = g.roomId || state.roomId;
-    const destinationRoomId = pickGhostTeleportRoom(fromRoomId);
+    const destinationRoomId = g.travelExit?.to || pickGhostTeleportRoom(fromRoomId);
     if (!destinationRoomId) {
       scheduleGhostTeleport(g, now);
-      return;
+      return false;
     }
     const map = getGhostRoomMap();
     if (map[fromRoomId]?.id === g.ghost.id) delete map[fromRoomId];
     map[destinationRoomId] = g.ghost;
     stopGhostScream(g);
     activeGhost = null;
+    return true;
   }
 
   // Called from setRoom() for every room entry. The active case target is the
@@ -715,6 +743,9 @@
       startleUntil: 0,
       hideGiveupAt: 0,
       roomId,
+      roomTravelAt: 0,
+      travelExit: null,
+      travelingToExit: false,
       teleportAt: 0,
       teleportWarningAt: 0,
       teleporting: false
@@ -751,32 +782,37 @@
     const g = activeGhost;
     if (state.hiding) {
       stopGhostScream(g);
-      // Only the give-up timer runs while hidden — a chasing ghost that
-      // loses the player takes a beat to wander off, rather than snapping
-      // back to wandering the instant Hide is pressed.
-      if (g.chasing) {
+      // Hiding ends a hostile encounter. Give the ghost a short beat to lose
+      // interest, then let it leave the room entirely instead of waiting in
+      // the same place for Booha to come back out.
+      if (g.hostility !== 'friendly') {
         if (!g.hideGiveupAt) g.hideGiveupAt = now + GHOST_GIVEUP_HIDE_MS;
         else if (now >= g.hideGiveupAt) {
-          g.chasing = false;
-          g.hideGiveupAt = 0;
-          g.noticeStartedAt = 0;
-          g.wanderTarget = pickGhostWanderTarget();
-          g.nextWanderAt = now + 400;
+          if (teleportGhostToAnotherRoom(g, now)) return;
+          g.hideGiveupAt = now + 3000;
         }
       }
       return;
     }
     g.hideGiveupAt = 0;
-    if (!g.teleportAt) scheduleGhostTeleport(g, now);
+    if (!g.roomTravelAt) scheduleGhostTeleport(g, now);
     if (g.teleporting) {
       if (now >= g.teleportAt) teleportGhostToAnotherRoom(g, now);
       return;
     }
-    if (now >= g.teleportWarningAt) {
-      g.teleporting = true;
-      g.chasing = false;
-      g.hideGiveupAt = 0;
-      g.wanderTarget = { x: g.x, y: g.y };
+    if (g.travelingToExit) {
+      moveGhostToward(g, g.travelExit.x, g.travelExit.y, GHOST_WANDER_SPEED);
+      if (Math.hypot(g.x - g.travelExit.x, g.y - g.travelExit.y) <= GHOST_ROOM_EXIT_R) {
+        g.teleporting = true;
+        g.teleportAt = now + GHOST_TELEPORT_WARNING_MS;
+        g.chasing = false;
+        g.noticeStartedAt = 0;
+        g.hideGiveupAt = 0;
+      }
+      return;
+    }
+    if (now >= g.roomTravelAt) {
+      beginGhostRoomTravel(g, now);
       return;
     }
     const dist = Math.hypot(g.x - state.x, g.y - state.y);
