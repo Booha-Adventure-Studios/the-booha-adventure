@@ -58,6 +58,9 @@
   const GHOST_CLICK_R = 64;
   const GHOST_GIVEUP_HIDE_MS = 1100;
   const GHOST_STARTLE_COOLDOWN_MS = 1400;
+  const GHOST_TELEPORT_MIN_MS = 16000;
+  const GHOST_TELEPORT_MAX_MS = 24000;
+  const GHOST_TELEPORT_WARNING_MS = 1400;
   const ORB_REWARD_PER_CAPTURE = 3;
 
   // Pass 8B — first rhythm chart. It is intentionally short and forgiving:
@@ -530,6 +533,33 @@
     return img;
   }
 
+  function scheduleGhostTeleport(g, now) {
+    const delay = GHOST_TELEPORT_MIN_MS + Math.random() * (GHOST_TELEPORT_MAX_MS - GHOST_TELEPORT_MIN_MS);
+    g.teleportAt = now + delay;
+    g.teleportWarningAt = g.teleportAt - GHOST_TELEPORT_WARNING_MS;
+    g.teleporting = false;
+  }
+
+  function pickGhostTeleportRoom(fromRoomId) {
+    const map = getGhostRoomMap();
+    const candidates = Object.keys(DATA.rooms).filter(roomId => roomId !== fromRoomId && !map[roomId]);
+    if (!candidates.length) return null;
+    return candidates[Math.floor(Math.random() * candidates.length)];
+  }
+
+  function teleportGhostToAnotherRoom(g, now) {
+    const fromRoomId = g.roomId || state.roomId;
+    const destinationRoomId = pickGhostTeleportRoom(fromRoomId);
+    if (!destinationRoomId) {
+      scheduleGhostTeleport(g, now);
+      return;
+    }
+    const map = getGhostRoomMap();
+    if (map[fromRoomId]?.id === g.ghost.id) delete map[fromRoomId];
+    map[destinationRoomId] = g.ghost;
+    activeGhost = null;
+  }
+
   // Called from setRoom() for every room entry. The current exploration pass
   // lets any ghost begin a capture, so there is no daily target to persist or
   // hide after capture.
@@ -548,7 +578,11 @@
       nextWanderAt: performance.now() + 1800 + Math.random() * 1600,
       angryUntil: 0,
       startleUntil: 0,
-      hideGiveupAt: 0
+      hideGiveupAt: 0,
+      roomId,
+      teleportAt: 0,
+      teleportWarningAt: 0,
+      teleporting: false
     };
   }
 
@@ -581,6 +615,18 @@
       return;
     }
     g.hideGiveupAt = 0;
+    if (!g.teleportAt) scheduleGhostTeleport(g, now);
+    if (g.teleporting) {
+      if (now >= g.teleportAt) teleportGhostToAnotherRoom(g, now);
+      return;
+    }
+    if (now >= g.teleportWarningAt) {
+      g.teleporting = true;
+      g.chasing = false;
+      g.hideGiveupAt = 0;
+      g.wanderTarget = { x: g.x, y: g.y };
+      return;
+    }
     const dist = Math.hypot(g.x - state.x, g.y - state.y);
     if (g.behavior === 'chase') {
       if (!g.chasing && dist <= GHOST_DETECT_R) g.chasing = true;
@@ -1604,8 +1650,25 @@
     const img = src ? getGhostSprite(src) : null;
     const x = activeGhost.x;
     const y = activeGhost.y + bob;
+    const teleporting = activeGhost.teleporting;
+    const teleportProgress = teleporting
+      ? Math.max(0, Math.min(1, (activeGhost.teleportAt - now) / GHOST_TELEPORT_WARNING_MS))
+      : 1;
     actorCtx.save();
-    actorCtx.globalAlpha = .95;
+    actorCtx.globalAlpha = .95 * (teleporting ? .18 + teleportProgress * .82 : 1);
+    if (teleporting) {
+      const pulse = .5 + .5 * Math.sin(now / 70);
+      actorCtx.strokeStyle = `rgba(190, 154, 255, ${.38 + pulse * .3})`;
+      actorCtx.lineWidth = 3;
+      actorCtx.beginPath();
+      actorCtx.arc(x, y, GHOST_DRAW_R * (1.12 + pulse * .18), 0, Math.PI * 2);
+      actorCtx.stroke();
+      actorCtx.strokeStyle = `rgba(119, 213, 183, ${.24 + pulse * .2})`;
+      actorCtx.lineWidth = 1.5;
+      actorCtx.beginPath();
+      actorCtx.arc(x, y, GHOST_DRAW_R * (.78 + pulse * .12), 0, Math.PI * 2);
+      actorCtx.stroke();
+    }
     if (img && img.complete && img.naturalWidth > 0) {
       actorCtx.drawImage(img, x - GHOST_DRAW_R, y - GHOST_DRAW_R, GHOST_DRAW_R * 2, GHOST_DRAW_R * 2);
     } else {
@@ -2662,7 +2725,7 @@
     drawPins();
     if (DEV_MODE && devReadout) {
       const hover = devHover ? `  mouse:${Math.round(devHover.x)},${Math.round(devHover.y)}` : '';
-      const ghostInfo = activeGhost ? `  ghost:${activeGhost.ghost.id}(${activeGhost.behavior}${activeGhost.chasing ? '*chasing*' : ''})` : '';
+      const ghostInfo = activeGhost ? `  ghost:${activeGhost.ghost.id}(${activeGhost.behavior}${activeGhost.chasing ? '*chasing*' : ''}${activeGhost.teleporting ? '*teleporting*' : ''})` : '';
       devReadout.textContent = `${state.roomId}  player:${Math.round(state.x)},${Math.round(state.y)}${hover}${ghostInfo}\n${getDevQaSummary()}`;
     }
   }
