@@ -5,11 +5,11 @@
 // ============================================================
 
 const CURRENT_CACHES = {
-  // Muenba weekly ghost pass: invalidate the previous deployed bundle so
-  // collected ghosts disappear for the current week and return next week.
-  pages:  'booha-pages-2026-263',
-  assets: 'booha-assets-2026-263',
-  decks:  'booha-decks-2026-263',
+  // Muenba return-route pass: invalidate the previous deployed bundle so
+  // players can travel back to Nuppi in room_01 for the handoff.
+  pages:  'booha-pages-2026-264',
+  assets: 'booha-assets-2026-264',
+  decks:  'booha-decks-2026-264',
 };
 
 const PAGE_CACHE  = CURRENT_CACHES.pages;
