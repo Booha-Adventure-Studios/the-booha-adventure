@@ -105,6 +105,7 @@
   const PRACTICE_RHYTHM_PERFECT_MS = 150;
   const PRACTICE_RHYTHM_GOOD_MS = 300;
   const PRACTICE_RHYTHM_PASS_ACCURACY = 50;
+  const MUENBA_CASE_MODES = ['start', 'fresh', 'deep'];
 
   // Pass 3 — the hostile ghost gets a shorter, faster danger chart. It is
   // intentionally readable rather than punishing: six notes at 150 BPM,
@@ -686,11 +687,34 @@
       mu.caseProgress.activeCaseId = null;
       dirty = true;
     }
-    const recordedCaseIds = Object.keys(mu.caseRecords).filter(caseId => {
+    const legacyCompletedIds = new Set(mu.caseProgress.completedCaseIds);
+    for (const caseId of legacyCompletedIds) {
+      if (!mu.caseRecords[caseId] || typeof mu.caseRecords[caseId] !== 'object') {
+        mu.caseRecords[caseId] = { completed: false, completedModes: { fresh: true }, difficulty: 'fresh' };
+        dirty = true;
+      }
+    }
+    Object.keys(mu.caseRecords).forEach(caseId => {
       const record = mu.caseRecords[caseId];
-      return record && record.completed;
+      if (!record || typeof record !== 'object') return;
+      if (!record.completedModes || typeof record.completedModes !== 'object') {
+        const legacyMode = MUENBA_CASE_MODES.includes(record.difficulty) ? record.difficulty : 'fresh';
+        record.completedModes = record.completed ? { [legacyMode]: true } : {};
+        dirty = true;
+      }
+      MUENBA_CASE_MODES.forEach(mode => {
+        if (record.completedModes[mode] !== true) delete record.completedModes[mode];
+      });
+      const complete = MUENBA_CASE_MODES.every(mode => record.completedModes[mode] === true);
+      if (record.completed !== complete) {
+        record.completed = complete;
+        dirty = true;
+      }
     });
-    const mergedCaseIds = [...new Set([...mu.caseProgress.completedCaseIds, ...recordedCaseIds])];
+    const mergedCaseIds = Object.keys(mu.caseRecords).filter(caseId => {
+      const record = mu.caseRecords[caseId];
+      return record && record.completed === true;
+    });
     if (mergedCaseIds.length !== mu.caseProgress.completedCaseIds.length || mergedCaseIds.some((id, index) => id !== mu.caseProgress.completedCaseIds[index])) {
       mu.caseProgress.completedCaseIds = mergedCaseIds;
       dirty = true;
@@ -719,7 +743,15 @@
 
   function getMuenbaReadingDifficulty() {
     const difficulty = readMuenba().readingDifficulty;
-    return ['start', 'fresh', 'deep'].includes(difficulty) ? difficulty : 'fresh';
+    return MUENBA_CASE_MODES.includes(difficulty) ? difficulty : 'fresh';
+  }
+
+  function caseModeIsComplete(caseData, mode = getMuenbaReadingDifficulty()) {
+    if (!caseData) return true;
+    const record = readMuenba().caseRecords?.[caseData.id];
+    if (!record || typeof record !== 'object') return false;
+    if (record.completedModes && typeof record.completedModes === 'object') return record.completedModes[mode] === true;
+    return record.completed === true && record.difficulty === mode;
   }
 
   function getRhythmDifficulty() {
@@ -775,7 +807,8 @@
     const today = _muenbaTodayKey() || 'nodate';
     const weekKey = _muenbaWeekKey() || 'no-week';
     const weeklyFound = readMuenba().weeklyGhostsFound;
-    const availableGhosts = GHOSTS.filter(ghost => !weeklyFound || !weeklyFound[ghost.id]);
+    const activeCaseGhostId = currentHuntGhostId();
+    const availableGhosts = GHOSTS.filter(ghost => ghost.id === activeCaseGhostId || !weeklyFound || !weeklyFound[ghost.id]);
     const availabilityKey = availableGhosts.map(ghost => ghost.id).join('|');
     if (ghostRoomMap && ghostRoomMapDay === today && ghostRoomMapWeek === weekKey && ghostRoomMapAvailabilityKey === availabilityKey) return ghostRoomMap;
     const roomIds = Object.keys(DATA.rooms);
@@ -1188,8 +1221,8 @@
   }
 
   function nextMuenbaCase() {
-    const completed = completedMuenbaCaseIds();
-    return orderedMuenbaCases().find(caseData => !completed.has(caseData.id)) || null;
+    const mode = getMuenbaReadingDifficulty();
+    return orderedMuenbaCases().find(caseData => !caseModeIsComplete(caseData, mode)) || null;
   }
 
   function availableMuenbaGhostsThisWeek() {
@@ -1214,9 +1247,7 @@
   }
 
   function caseRecordComplete(caseData) {
-    if (!caseData) return true;
-    const records = readMuenba().caseRecords;
-    return !!(records && records[caseData.id] && records[caseData.id].completed);
+    return caseModeIsComplete(caseData, getMuenbaReadingDifficulty());
   }
 
   function buildCaptureOverlay() {
@@ -2248,17 +2279,33 @@
     const caseData = captureSession.caseData;
     if (caseData && captureSession.caseResolved && captureSession.caseDifficulty) {
       const completedAt = Date.now();
+      const mode = MUENBA_CASE_MODES.includes(captureSession.caseDifficulty)
+        ? captureSession.caseDifficulty
+        : 'fresh';
+      const previousRecord = mu.caseRecords[caseData.id] && typeof mu.caseRecords[caseData.id] === 'object'
+        ? mu.caseRecords[caseData.id]
+        : {};
+      const completedModes = previousRecord.completedModes && typeof previousRecord.completedModes === 'object'
+        ? { ...previousRecord.completedModes }
+        : {};
+      completedModes[mode] = true;
+      const allModesComplete = MUENBA_CASE_MODES.every(memoryMode => completedModes[memoryMode] === true);
       mu.caseRecords[caseData.id] = {
-        completed: true,
+        completed: allModesComplete,
+        completedModes,
         ghostId: caseData.ghostId,
-        difficulty: captureSession.caseDifficulty,
+        difficulty: mode,
         completedAt
       };
       if (!mu.caseProgress || typeof mu.caseProgress !== 'object') {
         mu.caseProgress = { completedCaseIds: [], activeCaseId: null };
       }
       if (!Array.isArray(mu.caseProgress.completedCaseIds)) mu.caseProgress.completedCaseIds = [];
-      if (!mu.caseProgress.completedCaseIds.includes(caseData.id)) mu.caseProgress.completedCaseIds.push(caseData.id);
+      if (allModesComplete) {
+        if (!mu.caseProgress.completedCaseIds.includes(caseData.id)) mu.caseProgress.completedCaseIds.push(caseData.id);
+      } else {
+        mu.caseProgress.completedCaseIds = mu.caseProgress.completedCaseIds.filter(caseId => caseId !== caseData.id);
+      }
       mu.caseProgress.activeCaseId = null;
       journalEntry.caseId = caseData.id;
       journalEntry.caseDifficulty = captureSession.caseDifficulty;
