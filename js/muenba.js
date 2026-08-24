@@ -67,6 +67,10 @@
   const GHOST_TELEPORT_MAX_MS = 24000;
   const GHOST_TELEPORT_WARNING_MS = 1400;
   const ORB_REWARD_PER_CAPTURE = 3;
+  const MUENBA_MUSIC_VOLUME = 0.55;
+  const MUENBA_SCREAM_DUCK_VOLUME = 0.16;
+  const MUENBA_SCREAM_VOLUME = 0.78;
+  const MUENBA_DANGER_RHYTHM_VOLUME = 0.62;
 
   // Pass 8B — first rhythm chart. It is intentionally short and forgiving:
   // no simultaneous notes, holds, combos, or punishment yet. The chart is
@@ -210,14 +214,17 @@
   const nuppiLobbyImg = new Image();
   nuppiLobbyImg.src = 'assets/img/wanderers/nuppi-2.png';
   const music = new Audio('assets/img/muenba/muenba_BGM.mp3');
+  music.preload = 'auto';
   music.loop = true;
-  music.volume = 0.55;
+  music.volume = MUENBA_MUSIC_VOLUME;
   const dangerScream = new Audio('assets/img/muenba/scream.mp3');
+  dangerScream.preload = 'auto';
   dangerScream.loop = true;
-  dangerScream.volume = 0.78;
+  dangerScream.volume = MUENBA_SCREAM_VOLUME;
   const dangerRhythmMusic = new Audio('assets/img/muenba/rhythm.mp3');
+  dangerRhythmMusic.preload = 'auto';
   dangerRhythmMusic.loop = true;
-  dangerRhythmMusic.volume = 0.62;
+  dangerRhythmMusic.volume = MUENBA_DANGER_RHYTHM_VOLUME;
 
   function worldGateOpen() {
     // Deliberately NOT the weekly world gate — Muenba is still being built,
@@ -256,6 +263,8 @@
   }
 
   function startDangerScream() {
+    stopDangerRhythmMusic();
+    music.volume = MUENBA_SCREAM_DUCK_VOLUME;
     try {
       dangerScream.currentTime = 0;
       dangerScream.play().catch(() => {});
@@ -267,10 +276,12 @@
       dangerScream.pause();
       dangerScream.currentTime = 0;
     } catch (_) {}
+    music.volume = MUENBA_MUSIC_VOLUME;
   }
 
   function startDangerRhythmMusic() {
     stopDangerScream();
+    pauseWorldMusicForCapture();
     try {
       dangerRhythmMusic.currentTime = 0;
       dangerRhythmMusic.play().catch(() => {});
@@ -282,6 +293,7 @@
       dangerRhythmMusic.pause();
       dangerRhythmMusic.currentTime = 0;
     } catch (_) {}
+    music.volume = MUENBA_MUSIC_VOLUME;
   }
 
   // Reads the same 'muenba_return_room' key enterMuenba() in karasuki.js
