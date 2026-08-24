@@ -177,6 +177,7 @@
     .case-record-card.is-locked { border-left-color: rgba(143,220,178,.2); opacity: .72; }
     .case-record-card h3 { margin: 0; color: #fff5d5; font-size: 1.05rem; font-weight: 400; }
     .case-record-card small { display: block; margin-top: 5px; color: var(--quiet); font: .68rem/1.4 var(--sans); letter-spacing: .06em; text-transform: uppercase; }
+    .case-record-card small.case-memory-progress { color: #b9d9c8; font-size: .62rem; letter-spacing: .04em; }
     .case-record-card ol { margin: 13px 0 0; padding-left: 21px; color: #f2e8c7; }
     .case-record-card li { margin: 7px 0; padding-left: 4px; font-size: .86rem; line-height: 1.5; }
     .case-queue-copy { margin: 13px 0 0; color: var(--muted); font-size: .88rem; line-height: 1.55; }
@@ -354,18 +355,18 @@
         const mu = data.muenba || {};
         const ghosts = Array.isArray(window.MUENBA_DATA?.ghosts) ? window.MUENBA_DATA.ghosts : [];
         const cases = window.MUENBA_DATA?.cases && typeof window.MUENBA_DATA.cases === 'object' ? window.MUENBA_DATA.cases : {};
+        const memoryModes = ['start', 'fresh', 'deep'];
+        const currentMemory = getReadingDifficulty();
         const caseOrder = (Array.isArray(window.MUENBA_DATA?.caseOrder) ? window.MUENBA_DATA.caseOrder : Object.keys(cases))
           .map(caseId => cases[caseId]).filter(Boolean);
         const found = mu.ghostsFound && typeof mu.ghostsFound === 'object' ? mu.ghostsFound : {};
         const orbs = typeof mu.orbsCollected === 'number' ? mu.orbsCollected : 0;
         const caseRecords = mu.caseRecords && typeof mu.caseRecords === 'object' ? mu.caseRecords : {};
-        const progressIds = Array.isArray(mu.caseProgress?.completedCaseIds) ? mu.caseProgress.completedCaseIds : [];
-        const completedIds = new Set([
-          ...progressIds,
-          ...Object.keys(caseRecords).filter(caseId => caseRecords[caseId] && caseRecords[caseId].completed)
-        ]);
+        const modeComplete = (record, mode) => !!(record && ((record.completedModes && record.completedModes[mode] === true) || (!record.completedModes && record.completed === true && record.difficulty === mode)));
+        const allModesComplete = record => memoryModes.every(mode => modeComplete(record, mode));
+        const completedIds = new Set(caseOrder.filter(caseData => allModesComplete(caseRecords[caseData.id])).map(caseData => caseData.id));
         const completedCases = caseOrder.filter(caseData => completedIds.has(caseData.id));
-        const nextCase = caseOrder.find(caseData => !completedIds.has(caseData.id)) || null;
+        const nextCase = caseOrder.find(caseData => !modeComplete(caseRecords[caseData.id], currentMemory)) || null;
         const rooms = mu.visitedRooms && typeof mu.visitedRooms === 'object'
           ? Object.keys(mu.visitedRooms).length : 0;
         const journal = Array.isArray(mu.huntJournal?.entries) ? mu.huntJournal.entries : [];
@@ -379,16 +380,18 @@
               const ghost = ghosts.find(candidate => candidate.id === caseData.ghostId);
               if (isCompleted) {
                 const mode = caseData[record.difficulty] || caseData.fresh;
+                const modeProgress = memoryModes.map(modeName => `${modeName} ${modeComplete(record, modeName) ? 'complete' : 'open'}`).join(' · ');
                 return `<article class="case-record-card">
                   <h3>${esc(caseData.title)}</h3>
-                  <small>Case ${index + 1} · ${esc(record.difficulty || 'fresh')} memory · case settled</small>
+                  <small>Case ${index + 1} · all memory modes complete · case settled</small>
+                  <small class="case-memory-progress">${esc(modeProgress)}</small>
                   <ol>${(mode?.clues || []).map(clue => `<li><strong>${esc(clue.title)}</strong><br>${esc(clue.text)}</li>`).join('')}</ol>
                 </article>`;
               }
               if (isNext) {
                 return `<article class="case-record-card is-next">
                   <h3>${esc(caseData.title)}</h3>
-                  <small>Case ${index + 1} · next case · ${esc(ghost?.name || caseData.ghostId)}</small>
+                  <small>Case ${index + 1} · ${esc(currentMemory)} memory · ${esc(ghost?.name || caseData.ghostId)}</small>
                   <p class="case-queue-copy">Find ${esc(ghost?.name || caseData.ghostId)} in Muenba to open this case.<small>ムエンバで<ruby>幽霊<rt>ゆうれい</rt></ruby>を<ruby>探<rt>さが</rt></ruby>して、この<ruby>事件<rt>じけん</rt></ruby>を<ruby>開<rt>ひら</rt></ruby>こう。</small></p>
                 </article>`;
               }
