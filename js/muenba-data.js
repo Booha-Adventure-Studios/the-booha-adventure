@@ -142,14 +142,14 @@
     room_05: { darkness: 0.44, tint: 'rgba(9, 20, 34, 0.12)',  fog: 0.17, fogMood: 'sinking', glow: '#5a6fa8', lanterns: [[1377,785], [1189,283], [877,246], [292,286], [346,292], [184,331], [607,209], [829,190], [1174,688], [529,164], [768,136]] }, // indigo
     room_06: { darkness: 0.36, tint: 'rgba(20, 35, 34, 0.09)', fog: 0.09, fogMood: 'low',     glow: '#7a9e4a', lanterns: [[354,615], [1340,790], [1357,146], [1109,270], [1051,329], [298,145], [525,286], [477,171], [607,202], [153,368]] }, // moss
     room_07: { darkness: 0.39, tint: 'rgba(16, 29, 44, 0.10)', fog: 0.14, fogMood: 'cross',   glow: '#a87a4a', lanterns: [[290,542], [1252,535], [951,349], [924,267], [767,149], [937,152], [595,276], [208,200]] }, // rust amber
-    room_08: { darkness: 0.32, tint: 'rgba(24, 35, 37, 0.07)', fog: 0.08, fogMood: 'sparse',  glow: '#4aa89e' }, // cyan-teal
+    room_08: { darkness: 0.32, tint: 'rgba(24, 35, 37, 0.07)', fog: 0.08, fogMood: 'sparse',  glow: '#4aa89e', lanterns: [[829,440], [679,415], [889,419]] }, // cyan-teal
     room_09: { darkness: 0.43, tint: 'rgba(25, 19, 36, 0.10)', fog: 0.16, fogMood: 'high',    glow: '#8a4aa8', lanterns: [[1157,762], [947,320], [328,777], [479,609], [658,220], [608,307], [893,254], [765,140]] }, // plum
     room_10: { darkness: 0.37, tint: 'rgba(10, 27, 39, 0.10)', fog: 0.12, fogMood: 'sinking', glow: '#a84a6f', lanterns: [[296,850], [314,331], [421,263], [654,237], [767,135]] }, // wine
     room_11: { darkness: 0.47, tint: 'rgba(12, 18, 31, 0.12)', fog: 0.18, fogMood: 'high',    glow: '#4a5a9e', lanterns: [[1147,638], [505,576], [548,320], [898,287], [593,232], [768,110], [588,144], [409,221], [470,165], [971,159], [898,201]] }, // steel-indigo
     room_12: { darkness: 0.41, tint: 'rgba(26, 28, 42, 0.09)', fog: 0.14, fogMood: 'low',     glow: '#7aa85a', lanterns: [[381,692], [1294,592], [1101,600], [286,285], [380,257], [487,296], [575,265], [1052,328], [912,186], [768,135], [629,189], [228,166]] }, // olive-moss
-    room_13: { darkness: 0.34, tint: 'rgba(20, 36, 34, 0.08)', fog: 0.09, fogMood: 'sparse',  glow: '#a8944a', lanterns: [[1127,634], [522,332], [460,241], [610,286], [943,319], [1035,307], [648,246], [543,149], [765,141], [149,190]] }, // ochre
-    room_14: { darkness: 0.45, tint: 'rgba(18, 18, 30, 0.12)', fog: 0.17, fogMood: 'sinking', glow: '#4a7aa8' }, // slate-blue
-    room_15: { darkness: 0.39, tint: 'rgba(22, 30, 42, 0.10)', fog: 0.13, fogMood: 'cross',   glow: '#9e4a8a' }  // magenta-ash
+    room_13: { darkness: 0.34, tint: 'rgba(20, 36, 34, 0.08)', fog: 0.09, fogMood: 'sparse',  glow: '#a8944a', lanterns: [[1127,634], [522,332], [460,241], [610,286], [943,319], [1035,307], [648,246], [543,149], [765,141], [149,190], [896,186]] }, // ochre
+    room_14: { darkness: 0.45, tint: 'rgba(18, 18, 30, 0.12)', fog: 0.17, fogMood: 'sinking', glow: '#4a7aa8', lanterns: [[301,702], [1320,727], [605,274], [1060,350], [1314,282], [981,201], [575,189], [641,227], [938,226]] }, // slate-blue
+    room_15: { darkness: 0.39, tint: 'rgba(22, 30, 42, 0.10)', fog: 0.13, fogMood: 'cross',   glow: '#9e4a8a', lanterns: [[285,777], [964,307], [1241,296], [612,222], [979,228], [1126,178]] }  // magenta-ash
   };
 
   const rooms = {};
