@@ -163,6 +163,8 @@
   let activeGhost = null;
   let ghostRoomMap = null;
   let ghostRoomMapDay = null;
+  let ghostRoomMapWeek = null;
+  let ghostRoomMapAvailabilityKey = '';
   const ghostSpriteCache = new Map();
   let hideBtn = null;
   let captureOverlay = null;
@@ -431,10 +433,21 @@
     }
   }
 
+  function _muenbaWeekKey() {
+    try {
+      if (!window.CALENDAR || !CALENDAR.getCurrentCurriculumWeek) return null;
+      const week = CALENDAR.getCurrentCurriculumWeek();
+      return `${week.year}-${week.monthSlug}-w${week.weekNumber}`;
+    } catch (_) {
+      return null;
+    }
+  }
+
   /* ═══════════════════════════════════════════════════════════════════
      SAVE LAYER (Pass 6)
-     Durable Muenba progress — ghosts found, orbs collected, pending orbs,
-     rooms visited, and a rhythm-game stat bucket. Mirrors utsuroba.js's own
+     Durable Muenba progress — permanent ghost history, weekly ghost
+     availability, orbs collected, pending orbs, rooms visited, and a
+     rhythm-game stat bucket. Mirrors utsuroba.js's own
      loadSave()/writeSave()/
      migrate*Save() idiom — one top-level data.muenba section, defensive
      shape-fill on every load, single dirty-flag write-back — rather than
@@ -471,6 +484,13 @@
     if (!data.muenba || typeof data.muenba !== 'object') { data.muenba = {}; dirty = true; }
     const mu = data.muenba;
     if (!mu.ghostsFound || typeof mu.ghostsFound !== 'object') { mu.ghostsFound = {}; dirty = true; }
+    if (!mu.weeklyGhostsFound || typeof mu.weeklyGhostsFound !== 'object') { mu.weeklyGhostsFound = {}; dirty = true; }
+    const weekKey = _muenbaWeekKey();
+    if (weekKey && mu.weeklyGhostsFoundWeek !== weekKey) {
+      mu.weeklyGhostsFound = {};
+      mu.weeklyGhostsFoundWeek = weekKey;
+      dirty = true;
+    }
     if (!Number.isInteger(mu.orbsCollected)) { mu.orbsCollected = 0; dirty = true; }
     if (!Number.isInteger(mu.orbsPending)) { mu.orbsPending = 0; dirty = true; }
     if (!mu.visitedRooms || typeof mu.visitedRooms !== 'object') { mu.visitedRooms = {}; dirty = true; }
@@ -558,22 +578,28 @@
      touch consequence, not from an unfair speed boost.
      ═══════════════════════════════════════════════════════════════════ */
 
-  // Which of the 15 rooms gets which of the 5 ghosts, and which ghosts are
-  // 'sight' vs 'collect' today — both reseed on the next calendar day but
-  // hold steady across re-entries the same day. The active case always
-  // overrides this as friendly.
+  // Which of the 15 rooms gets which of the still-available ghosts, and which
+  // non-target ghosts react on sight vs. on a collection attempt today. The
+  // active case always overrides this as friendly. Permanent ghostsFound
+  // history is not used here; weeklyGhostsFound controls availability.
   function getGhostRoomMap() {
     const today = _muenbaTodayKey() || 'nodate';
-    if (ghostRoomMap && ghostRoomMapDay === today) return ghostRoomMap;
+    const weekKey = _muenbaWeekKey() || 'no-week';
+    const weeklyFound = readMuenba().weeklyGhostsFound;
+    const availableGhosts = GHOSTS.filter(ghost => !weeklyFound || !weeklyFound[ghost.id]);
+    const availabilityKey = availableGhosts.map(ghost => ghost.id).join('|');
+    if (ghostRoomMap && ghostRoomMapDay === today && ghostRoomMapWeek === weekKey && ghostRoomMapAvailabilityKey === availabilityKey) return ghostRoomMap;
     const roomIds = Object.keys(DATA.rooms);
-    const pickedRooms = _muenbaShuffle(roomIds, today + '|muenbaGhostRooms').slice(0, GHOSTS.length);
-    const shuffledGhosts = _muenbaShuffle(GHOSTS, today + '|muenbaGhostAssign');
+    const pickedRooms = _muenbaShuffle(roomIds, today + '|muenbaGhostRooms').slice(0, availableGhosts.length);
+    const shuffledGhosts = _muenbaShuffle(availableGhosts, today + '|muenbaGhostAssign');
     const map = {};
     shuffledGhosts.forEach((ghost, i) => {
       if (pickedRooms[i]) map[pickedRooms[i]] = ghost;
     });
     ghostRoomMap = map;
     ghostRoomMapDay = today;
+    ghostRoomMapWeek = weekKey;
+    ghostRoomMapAvailabilityKey = availabilityKey;
     return map;
   }
 
@@ -905,9 +931,20 @@
     return orderedMuenbaCases().find(caseData => !completed.has(caseData.id)) || null;
   }
 
+  function availableMuenbaGhostsThisWeek() {
+    const weeklyFound = readMuenba().weeklyGhostsFound;
+    return GHOSTS.filter(ghost => !weeklyFound || !weeklyFound[ghost.id]);
+  }
+
+  function nextMuenbaHuntGhost() {
+    const nextCase = nextMuenbaCase();
+    if (nextCase) return GHOSTS.find(ghost => ghost.id === nextCase.ghostId) || null;
+    return availableMuenbaGhostsThisWeek()[0] || null;
+  }
+
   function currentHuntGhostId() {
-    const next = nextMuenbaCase();
-    return next ? next.ghostId : null;
+    const ghost = nextMuenbaHuntGhost();
+    return ghost ? ghost.id : null;
   }
 
   function caseForGhost(ghostId) {
@@ -1607,12 +1644,14 @@
     if (!d.muenba || typeof d.muenba !== 'object') d.muenba = {};
     const mu = d.muenba;
     if (!mu.ghostsFound || typeof mu.ghostsFound !== 'object') mu.ghostsFound = {};
+    if (!mu.weeklyGhostsFound || typeof mu.weeklyGhostsFound !== 'object') mu.weeklyGhostsFound = {};
     if (!Number.isInteger(mu.orbsPending)) mu.orbsPending = 0;
     if (!mu.huntJournal || !Array.isArray(mu.huntJournal.entries)) mu.huntJournal = { entries: [] };
     if (!mu.caseRecords || typeof mu.caseRecords !== 'object') mu.caseRecords = {};
 
-    const isNewCapture = !mu.ghostsFound[ghost.id];
+    const isNewWeeklyCapture = !mu.weeklyGhostsFound[ghost.id];
     mu.ghostsFound[ghost.id] = true;
+    mu.weeklyGhostsFound[ghost.id] = true;
     let journalEntry = mu.huntJournal.entries.find(entry => entry && entry.ghostId === ghost.id);
     if (!journalEntry) {
       journalEntry = { ghostId: ghost.id, capturedAt: Date.now() };
@@ -1638,7 +1677,7 @@
       journalEntry.caseDifficulty = captureSession.caseDifficulty;
       journalEntry.caseCompletedAt = completedAt;
     }
-    const rewardCount = isNewCapture ? ORB_REWARD_PER_CAPTURE : 0;
+    const rewardCount = isNewWeeklyCapture ? ORB_REWARD_PER_CAPTURE : 0;
     mu.orbsPending += rewardCount;
     if (!writeSave(d)) return null;
 
@@ -2722,15 +2761,7 @@
   }
 
   function nextNuppiHuntGhost() {
-    const nextCase = nextMuenbaCase();
-    const ghosts = DATA.ghosts || [];
-    if (nextCase) {
-      return ghosts.find(ghost => ghost.id === nextCase.ghostId) || null;
-    }
-    const found = readMuenba().ghostsFound && typeof readMuenba().ghostsFound === 'object'
-      ? readMuenba().ghostsFound
-      : {};
-    return ghosts.find(ghost => !found[ghost.id]) || ghosts[0] || null;
+    return nextMuenbaHuntGhost();
   }
 
   function renderNuppiHuntCard() {
@@ -2745,10 +2776,10 @@
         ${ghost
           ? `<img class="muenba-hunt-ghost-portrait" src="${ghost.img}" alt="${ghostName}">`
           : '<div class="muenba-hunt-ghost-portrait" aria-hidden="true"></div>'}
-        <h2>Find ${ghostName}</h2>
-        <p class="jp">${ghost ? ghost.kana : 'つぎの幽霊'}</p>
-        <p class="muenba-hunt-helper">Not all ghosts are friendly. Run away or hide from the angry ones.${helperName}</p>
-        <p class="muenba-hunt-helper-jp">すべての<ruby>幽霊<rt>ゆうれい</rt></ruby>が<ruby>友好的<rt>ゆうこうてき</rt></ruby>とは<ruby>限<rt>かぎ</rt></ruby>らない。<ruby>怒<rt>おこ</rt></ruby>った<ruby>幽霊<rt>ゆうれい</rt></ruby>からは<ruby>逃<rt>に</rt></ruby>げるか、<ruby>隠<rt>かく</rt></ruby>れよう。${name ? `${name}さん、` : ''}<ruby>気<rt>き</rt></ruby>をつけて。</p>
+        <h2>${ghost ? `Find ${ghostName}` : 'No more ghosts this week'}</h2>
+        <p class="jp">${ghost ? ghost.kana : '<ruby>今週<rt>こんしゅう</rt></ruby>はもう<ruby>幽霊<rt>ゆうれい</rt></ruby>がいません'}</p>
+        <p class="muenba-hunt-helper">${ghost ? `Not all ghosts are friendly. Run away or hide from the angry ones.${helperName}` : 'You found every ghost available this week. They will return next week.'}</p>
+        <p class="muenba-hunt-helper-jp">${ghost ? `すべての<ruby>幽霊<rt>ゆうれい</rt></ruby>が<ruby>友好的<rt>ゆうこうてき</rt></ruby>とは<ruby>限<rt>かぎ</rt></ruby>らない。<ruby>怒<rt>おこ</rt></ruby>った<ruby>幽霊<rt>ゆうれい</rt></ruby>からは<ruby>逃<rt>に</rt></ruby>げるか、<ruby>隠<rt>かく</rt></ruby>れよう。${name ? `${name}さん、` : ''}<ruby>気<rt>き</rt></ruby>をつけて。` : 'この<ruby>週<rt>しゅう</rt></ruby>に<ruby>見<rt>み</rt></ruby>つけられる<ruby>幽霊<rt>ゆうれい</rt></ruby>は<ruby>全部<rt>ぜんぶ</rt></ruby>です。<ruby>来週<rt>らいしゅう</rt></ruby>にまた<ruby>戻<rt>もど</rt></ruby>ってきます。'}</p>
         <div class="muenba-lobby-actions">
           <button id="muenba-hunt-card-begin" type="button">Begin hunt</button>
         </div>
