@@ -22,7 +22,9 @@
   // gameplay footprint to make the visible character read correctly.
   const BOOHA_R = 26;
   const GHOST_R = 36;
-  const GHOST_DRAW_R = 60;
+  // Pass 1 scale pass: enlarge only the visible art. GHOST_R and the click
+  // radius stay unchanged so encounters keep the same gameplay footprint.
+  const GHOST_DRAW_R = 72;
   // The ghost PNGs are 2048px square with wide transparent margins. Draw
   // the useful center crop so the visible ghost, rather than the empty
   // canvas around it, determines its gameplay scale.
@@ -3090,23 +3092,13 @@
     const y = MUENBA_NUPPI.y + bob;
     const highlighted = state.returnToNuppiPending || state.celebrating;
     actorCtx.save();
-    actorCtx.globalAlpha = .22 + pulse * .12;
-    actorCtx.fillStyle = highlighted ? '#d8c98b' : '#7ab497';
-    actorCtx.shadowBlur = highlighted ? 28 : 20;
-    actorCtx.shadowColor = highlighted ? 'rgba(216,201,139,.72)' : 'rgba(122,180,151,.55)';
-    actorCtx.beginPath();
-    actorCtx.arc(x, y + 34, MUENBA_NUPPI.drawR * 1.1, 0, Math.PI * 2);
-    actorCtx.fill();
-    actorCtx.globalAlpha = .48 + pulse * .22;
-    actorCtx.strokeStyle = highlighted ? 'rgba(255,232,158,.9)' : 'rgba(169,226,196,.72)';
-    actorCtx.lineWidth = 2;
-    actorCtx.beginPath();
-    actorCtx.arc(x, y, MUENBA_NUPPI.drawR * (.98 + pulse * .08), 0, Math.PI * 2);
-    actorCtx.stroke();
-    actorCtx.restore();
-
-    actorCtx.save();
-    actorCtx.globalAlpha = .98;
+    // The glow belongs to Nuppi's sprite now. There are no orbiting or
+    // outlined circles, so he reads as a living guide rather than a map pin.
+    actorCtx.globalAlpha = .9 + pulse * .1;
+    actorCtx.shadowBlur = (highlighted ? 30 : 18) + pulse * (highlighted ? 16 : 11);
+    actorCtx.shadowColor = highlighted
+      ? `rgba(255,226,132,${.55 + pulse * .25})`
+      : `rgba(122,224,177,${.42 + pulse * .22})`;
     if (nuppiLobbyImg.complete && nuppiLobbyImg.naturalWidth > 0) {
       actorCtx.drawImage(nuppiLobbyImg, x - MUENBA_NUPPI.drawR, y - MUENBA_NUPPI.drawR, MUENBA_NUPPI.drawR * 2, MUENBA_NUPPI.drawR * 2);
     } else {
