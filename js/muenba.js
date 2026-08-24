@@ -1068,31 +1068,22 @@
 
     renderCaseDirection(
       box,
-      `Your profile is set to ${selectedMode === 'deep' ? 'Deep Memory' : 'Fresh Memory'}. Start with that mode, or choose the other one for this case.`,
-      `プロフィールの<ruby>設定<rt>せってい</rt></ruby>は${selectedModeJP}です。この<ruby>事件<rt>じけん</rt></ruby>ではその<ruby>読<rt>よ</rt></ruby>み<ruby>方<rt>かた</rt></ruby>を<ruby>始<rt>はじ</rt></ruby>めるか、もう<ruby>一<rt>ひと</rt></ruby>つの<ruby>読<rt>よ</rt></ruby>み<ruby>方<rt>かた</rt></ruby>を<ruby>選<rt>えら</rt></ruby>びましょう。`
+      `Your profile is set to ${selectedMode === 'deep' ? 'Deep Memory' : 'Fresh Memory'}. This case will use that mode.`,
+      `プロフィールの<ruby>設定<rt>せってい</rt></ruby>は${selectedModeJP}です。この<ruby>事件<rt>じけん</rt></ruby>ではその<ruby>読<rt>よ</rt></ruby>み<ruby>方<rt>かた</rt></ruby>を<ruby>使<rt>つか</rt></ruby>います。`
     );
 
     const actions = document.createElement('div');
     actions.className = 'muenba-case-actions';
-    const freshButton = caseActionButton(
-      captureSession.caseDifficulty === 'fresh' ? 'Begin Fresh Memory' : 'Use Fresh Memory',
-      '<ruby>新<rt>あたら</rt></ruby>しい<ruby>記憶<rt>きおく</rt></ruby>',
-      'muenba-case-fresh',
-      () => selectCaseDifficulty('fresh')
-    );
-    const deepButton = caseActionButton(
-      captureSession.caseDifficulty === 'deep' ? 'Begin Deep Memory' : 'Use Deep Memory',
-      '<ruby>深<rt>ふか</rt></ruby>い<ruby>記憶<rt>きおく</rt></ruby>',
-      'muenba-case-deep',
-      () => selectCaseDifficulty('deep')
-    );
-    if (captureSession.caseDifficulty === 'fresh') freshButton.classList.add('is-selected');
-    if (captureSession.caseDifficulty === 'deep') deepButton.classList.add('is-selected');
-    actions.append(freshButton, deepButton);
+    actions.appendChild(caseActionButton(
+      'Open first clue',
+      '<ruby>最初<rt>さいしょ</rt></ruby>の<ruby>手<rt>て</rt></ruby>がかりを<ruby>開<rt>ひら</rt></ruby>く',
+      'muenba-case-open',
+      () => selectCaseDifficulty(selectedMode)
+    ));
     box.appendChild(actions);
 
     captureOverlay.classList.add('open');
-    focusCaptureControl(`#muenba-case-${captureSession.caseDifficulty || 'fresh'}`);
+    focusCaptureControl('#muenba-case-open');
   }
 
   function selectCaseDifficulty(difficulty) {
