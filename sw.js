@@ -5,11 +5,11 @@
 // ============================================================
 
 const CURRENT_CACHES = {
-  // Nuppi lobby pass: invalidate the previous deployed bundle so the
-  // two-step welcome and case-board flow cannot remain behind cache-first routing.
-  pages:  'booha-pages-2026-252',
-  assets: 'booha-assets-2026-252',
-  decks:  'booha-decks-2026-252',
+  // Muenba ghost scale pass: invalidate the previous deployed bundle so the
+  // larger, slower ghosts cannot remain behind cache-first routing.
+  pages:  'booha-pages-2026-253',
+  assets: 'booha-assets-2026-253',
+  decks:  'booha-decks-2026-253',
 };
 
 const PAGE_CACHE  = CURRENT_CACHES.pages;
