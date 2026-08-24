@@ -3252,6 +3252,9 @@
     const cy = KARASUKI_RETURN_PORTAL.y;
     const angle = Math.PI / 2;
     const glow = .62 + pulse * .22;
+    const roomColor = getRoomGlowRgb(state.roomId);
+    const roomGlowStr = `${roomColor.r},${roomColor.g},${roomColor.b}`;
+    const roomCoreStr = `${Math.min(255, roomColor.r + 35)},${Math.min(255, roomColor.g + 35)},${Math.min(255, roomColor.b + 35)}`;
 
     // The return point uses the same small chevron language as the room
     // exits, with a destination label instead of a floating orb.
@@ -3259,8 +3262,8 @@
     actorCtx.translate(cx, cy);
     actorCtx.rotate(angle);
     actorCtx.globalAlpha = glow * .42;
-    actorCtx.strokeStyle = 'rgba(180,220,205,.9)';
-    actorCtx.shadowColor = 'rgba(150,210,190,.9)';
+    actorCtx.strokeStyle = `rgba(${roomGlowStr},.92)`;
+    actorCtx.shadowColor = `rgba(${roomGlowStr},.86)`;
     actorCtx.shadowBlur = 18 + pulse * 8;
     actorCtx.lineWidth = 5;
     actorCtx.lineCap = 'round';
@@ -3272,7 +3275,7 @@
     actorCtx.stroke();
     actorCtx.shadowBlur = 0;
     actorCtx.globalAlpha = glow;
-    actorCtx.strokeStyle = '#d8f4e6';
+    actorCtx.strokeStyle = `rgb(${roomCoreStr})`;
     actorCtx.lineWidth = 2;
     actorCtx.beginPath();
     actorCtx.moveTo(-15, -10);
@@ -3283,8 +3286,8 @@
 
     actorCtx.save();
     actorCtx.globalAlpha = .58 + pulse * .2;
-    actorCtx.fillStyle = '#d8f4e6';
-    actorCtx.shadowColor = 'rgba(150,210,190,.78)';
+    actorCtx.fillStyle = `rgb(${roomCoreStr})`;
+    actorCtx.shadowColor = `rgba(${roomGlowStr},.78)`;
     actorCtx.shadowBlur = 12 + pulse * 7;
     actorCtx.font = '700 12px ui-monospace,monospace';
     actorCtx.textAlign = 'center';
