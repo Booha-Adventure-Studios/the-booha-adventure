@@ -5,11 +5,11 @@
 // ============================================================
 
 const CURRENT_CACHES = {
-  // Muenba case-profile pass: invalidate the previous deployed bundle so
-  // case popups use the profile-selected memory mode.
-  pages:  'booha-pages-2026-262',
-  assets: 'booha-assets-2026-262',
-  decks:  'booha-decks-2026-262',
+  // Muenba weekly ghost pass: invalidate the previous deployed bundle so
+  // collected ghosts disappear for the current week and return next week.
+  pages:  'booha-pages-2026-263',
+  assets: 'booha-assets-2026-263',
+  decks:  'booha-decks-2026-263',
 };
 
 const PAGE_CACHE  = CURRENT_CACHES.pages;
