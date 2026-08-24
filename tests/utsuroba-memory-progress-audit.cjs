@@ -7,6 +7,7 @@ const path = require('path');
 
 const source = fs.readFileSync(path.join(__dirname, '..', 'js', 'utsuroba.js'), 'utf8');
 const loader = fs.readFileSync(path.join(__dirname, '..', 'js', 'utsuroba-episodes.js'), 'utf8');
+const profile = fs.readFileSync(path.join(__dirname, '..', 'utsuroba-profile.html'), 'utf8');
 const modes = ['start', 'fresh', 'deep'];
 
 assert(source.includes("const UTSUROBA_MEMORY_MODES = ['start', 'fresh', 'deep'];"), 'Utsuroba must define all three memory modes');
@@ -15,6 +16,11 @@ assert(source.includes('weeklyStatusByMode'), 'weekly completion must be scoped 
 assert(source.includes('readingDifficulty: mode'), 'quests must remember the selected reading mode');
 assert(loader.includes("const READING_MODES = ['start', 'fresh', 'deep'];"), 'episode loader must resolve Start Memory');
 assert(loader.includes('episode[difficulty]'), 'episode loader must resolve tier-specific content');
+assert(loader.includes("return READING_MODES.includes(value) ? value : 'start';"), 'new Utsuroba saves should default to Starter Memory');
+assert(source.includes("data.utsuroba.readingDifficulty = 'start';"), 'save migration should default an unselected mode to Starter Memory');
+assert(profile.includes('Starter Memory'), 'Utsuroba profile should show the Starter Memory label');
+assert(profile.includes('Case Memory'), 'Utsuroba profile should show the Case Memory label');
+assert(profile.includes('memoryModeLabel(entry.difficulty || \'start\')'), 'Utsuroba journal should show the player-facing mode label');
 
 function migrate(record, legacyMode = 'deep') {
   const next = { ...record, completed: Array.isArray(record.completed) ? record.completed.slice() : [] };
