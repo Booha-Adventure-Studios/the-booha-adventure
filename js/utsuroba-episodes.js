@@ -44,18 +44,18 @@
     });
 
   /*
-   * Difficulty resolution — Start Memory / Fresh Memory / Deep Memory.
+   * Reading resolution — Starter Memory / Case Memory / Deep Memory.
    *
-   * Story authors may nest a "fresh" object inside an episode (same id,
-   * same rooms/checks shape, simpler wording) as an easier on-ramp for
-   * younger students. The episode's id, title, and worldEcho always stay
+   * Story authors may nest "start" and "fresh" objects inside an episode
+   * (same id, rooms, and checks shape, but different reading levels). The
+   * episode's id, title, and worldEcho always stay
    * the canonical ones — only the reading content itself varies — so every
    * other part of the save (readingEchoes, readingJournal, convergence,
    * relationships) keeps working unchanged regardless of which tier a
    * student reads in.
    *
-   * Defaults to 'deep' (today's content, unchanged) so existing saves and
-   * students see no difference until they choose another reading tier.
+   * Defaults to 'start' for a new save so younger readers get the safest
+   * first experience. An explicit saved mode is always preserved.
    */
   const READING_MODES = ['start', 'fresh', 'deep'];
 
@@ -64,8 +64,8 @@
       const save = window.BoohaAdventure && BoohaAdventure.save
         ? BoohaAdventure.save.load() : null;
       const value = save && save.utsuroba && save.utsuroba.readingDifficulty;
-      return READING_MODES.includes(value) ? value : 'deep';
-    } catch (_) { return 'deep'; }
+      return READING_MODES.includes(value) ? value : 'start';
+    } catch (_) { return 'start'; }
   }
 
   // difficultyOverride lets a caller resolve a *specific* tier (e.g. "what
