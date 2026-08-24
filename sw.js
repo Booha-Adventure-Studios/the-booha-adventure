@@ -5,11 +5,11 @@
 // ============================================================
 
 const CURRENT_CACHES = {
-  // Muenba access pass: invalidate the previous bundle so the Karasuki arrow
-  // and profile logo link reach players.
-  pages:  'booha-pages-2026-271',
-  assets: 'booha-assets-2026-271',
-  decks:  'booha-decks-2026-271',
+  // Muenba atmosphere pass: invalidate the previous bundle so the gated
+  // profile link, off-center lighting, fog, and vignette reach players.
+  pages:  'booha-pages-2026-272',
+  assets: 'booha-assets-2026-272',
+  decks:  'booha-decks-2026-272',
 };
 
 const PAGE_CACHE  = CURRENT_CACHES.pages;

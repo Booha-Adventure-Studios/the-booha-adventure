@@ -168,6 +168,7 @@
   let vignetteCanvas;
   let fogTexture;
   let lowFogTexture;
+  let wispFogTexture;
   let lastTouchEnd = 0;
   let entryDrift = null;
   let pins = [];
@@ -176,6 +177,7 @@
   let returnPortalCooldownUntil = 0;
   let returnNuppiHint = null;
   let celebrationStatus = null;
+  let muenbaProfileLink = null;
   let lobbyOverlay = null;
   let lobbyOpen = false;
   // Ghost hunting core loop (Pass 7): the current room's wandering ghost
@@ -200,15 +202,17 @@
   const imageCache = new Map();
   const roomGlowCache = new Map();
   const roomGlowRgbCache = new Map();
-  // Two soft light pools per room (near the up-hallway opening and a
-  // broader ambient wash lower down) — identical placement across rooms
-  // since the corridor framing is identical; only the color (from each
-  // room's ATMOSPHERE.glow) changes.
+  // Off-center light pools keep the room from reading like a colored
+  // spotlight placed behind Booha. Each room adds a small deterministic
+  // drift below so the cemetery composition changes without moving exits.
   const GLOW_SPOTS = [
-    { x: 767, y: 300, r: 260 },
-    { x: 800, y: 560, r: 320 }
+    { x: 500, y: 270, r: 320 },
+    { x: 1060, y: 690, r: 350 },
+    { x: 1260, y: 390, r: 210 }
   ];
-  const MOTE_COUNT = 6;
+  // Bright floating motes read as decorative particles, so the atmosphere
+  // pass removes them in favor of slower, layered ground fog.
+  const MOTE_COUNT = 0;
 
   // 9B: fog is still drawn from the same cached textures, but each room gets
   // a different composition so the cemetery does not feel like one repeated
@@ -2310,7 +2314,8 @@
          tool. Matches the exit button's box language but sits bottom-left
          so it never competes with the DEV-only bottom-right room list. */
       #muenba-hide { position:fixed; left:12px; bottom:78px; z-index:100; border:1px solid rgba(156,203,182,.72); border-radius:8px; background:rgba(0,8,12,.82); color:#e6fff1; padding:8px 16px; font:700 11px ui-monospace,monospace; letter-spacing:.05em; cursor:pointer; box-shadow:0 0 12px rgba(93,208,140,.28), inset 0 0 10px rgba(93,208,140,.08); animation:muenbaHideGlow 1.8s ease-in-out infinite; }
-      #muenba-profile-link { position:fixed; left:12px; bottom:12px; z-index:100; display:grid; place-items:center; width:54px; height:54px; padding:5px; border:1px solid rgba(216,201,139,.66); border-radius:12px; background:rgba(6,15,12,.86); box-shadow:0 0 18px rgba(216,201,139,.2), inset 0 0 14px rgba(216,201,139,.08); transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease; }
+      #muenba-profile-link { position:fixed; right:12px; bottom:12px; z-index:100; display:none; place-items:center; width:54px; height:54px; padding:5px; border:1px solid rgba(216,201,139,.66); border-radius:12px; background:rgba(6,15,12,.86); box-shadow:0 0 18px rgba(216,201,139,.2), inset 0 0 14px rgba(216,201,139,.08); transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease; }
+      #muenba-profile-link.is-visible { display:grid; }
       #muenba-profile-link img { display:block; width:100%; height:100%; object-fit:contain; filter:drop-shadow(0 0 8px rgba(216,201,139,.42)); }
       #muenba-profile-link:hover, #muenba-profile-link:focus-visible { transform:translateY(-2px); border-color:#fff0ad; box-shadow:0 0 28px rgba(216,201,139,.44), inset 0 0 16px rgba(216,201,139,.14); outline:none; }
       @keyframes muenbaHideGlow { 0%,100% { box-shadow:0 0 10px rgba(93,208,140,.22), inset 0 0 8px rgba(93,208,140,.06); } 50% { box-shadow:0 0 25px rgba(93,208,140,.58), 0 0 48px rgba(93,208,140,.18), inset 0 0 14px rgba(93,208,140,.16); } }
@@ -2405,13 +2410,13 @@
     hideBtn.addEventListener('click', toggleHide);
     document.body.appendChild(hideBtn);
 
-    const profileLink = document.createElement('a');
-    profileLink.id = 'muenba-profile-link';
-    profileLink.href = 'muenba-profile.html';
-    profileLink.setAttribute('aria-label', 'Open Muenba profile');
-    profileLink.title = 'Open Muenba profile';
-    profileLink.innerHTML = '<img src="assets/img/muenba/muenba_logo.png" alt="Muenba profile">';
-    document.body.appendChild(profileLink);
+    muenbaProfileLink = document.createElement('a');
+    muenbaProfileLink.id = 'muenba-profile-link';
+    muenbaProfileLink.href = 'muenba-profile.html';
+    muenbaProfileLink.setAttribute('aria-label', 'Open Muenba profile');
+    muenbaProfileLink.title = 'Open Muenba profile';
+    muenbaProfileLink.innerHTML = '<img src="assets/img/muenba/muenba_logo.png" alt="Muenba profile">';
+    document.body.appendChild(muenbaProfileLink);
 
     returnNuppiHint = document.createElement('div');
     returnNuppiHint.id = 'muenba-return-nuppi-hint';
@@ -2500,12 +2505,15 @@
     vignetteCanvas.width = WORLD_W;
     vignetteCanvas.height = WORLD_H;
     const vctx = vignetteCanvas.getContext('2d');
-    const gradient = vctx.createRadialGradient(CENTER_X, CENTER_Y, 280, CENTER_X, CENTER_Y, 860);
+    // The safe light is slightly off the central path. The corners stay
+    // darker, and drawAtmosphere modulates this cached layer slowly so the
+    // room feels like it is breathing instead of flashing.
+    const gradient = vctx.createRadialGradient(690, 430, 230, 760, 520, 930);
     gradient.addColorStop(0, 'rgba(0,0,0,0)');
-    gradient.addColorStop(0.56, 'rgba(0,0,0,.02)');
-    gradient.addColorStop(0.72, 'rgba(0,0,0,.10)');
-    gradient.addColorStop(0.88, 'rgba(0,0,0,.30)');
-    gradient.addColorStop(1, 'rgba(0,0,0,.58)');
+    gradient.addColorStop(0.52, 'rgba(0,0,0,.04)');
+    gradient.addColorStop(0.70, 'rgba(0,0,0,.14)');
+    gradient.addColorStop(0.86, 'rgba(0,0,0,.38)');
+    gradient.addColorStop(1, 'rgba(0,0,0,.68)');
     vctx.fillStyle = gradient;
     vctx.fillRect(0, 0, WORLD_W, WORLD_H);
 
@@ -2544,6 +2552,24 @@
       lowCtx.ellipse(x, 78, 150 + index * 18, 42, 0, 0, Math.PI * 2);
       lowCtx.fill();
     });
+
+    // Thin wisps sit between the background and the actor canvas. They are
+    // intentionally soft and stretched so they read as smoke under Booha,
+    // not as bright objects floating around the room.
+    wispFogTexture = document.createElement('canvas');
+    wispFogTexture.width = 900;
+    wispFogTexture.height = 120;
+    const wispCtx = wispFogTexture.getContext('2d');
+    [110, 290, 505, 730].forEach((x, index) => {
+      const wisp = wispCtx.createRadialGradient(x, 60, 2, x, 60, 120 + index * 12);
+      wisp.addColorStop(0, 'rgba(196,220,216,.13)');
+      wisp.addColorStop(.5, 'rgba(174,205,207,.055)');
+      wisp.addColorStop(1, 'rgba(174,205,207,0)');
+      wispCtx.fillStyle = wisp;
+      wispCtx.beginPath();
+      wispCtx.ellipse(x, 60, 120 + index * 12, 24 + (index % 2) * 8, 0, 0, Math.PI * 2);
+      wispCtx.fill();
+    });
   }
 
   // ── Per-room eerie glow + spirit motes ──────────────────────────────────
@@ -2577,14 +2603,19 @@
     canvas.width = WORLD_W;
     canvas.height = WORLD_H;
     const gctx = canvas.getContext('2d');
-    GLOW_SPOTS.forEach(spot => {
-      const grad = gctx.createRadialGradient(spot.x, spot.y, 0, spot.x, spot.y, spot.r);
+    const roomIndex = Number(roomId.slice(-2)) || 1;
+    const driftX = ((roomIndex * 67) % 121) - 60;
+    const driftY = ((roomIndex * 43) % 81) - 40;
+    GLOW_SPOTS.forEach((spot, index) => {
+      const x = spot.x + driftX * (index === 1 ? .55 : 1);
+      const y = spot.y + driftY * (index === 0 ? .7 : 1);
+      const grad = gctx.createRadialGradient(x, y, 0, x, y, spot.r);
       grad.addColorStop(0, `rgba(${rgb.r},${rgb.g},${rgb.b},.32)`);
       grad.addColorStop(.55, `rgba(${rgb.r},${rgb.g},${rgb.b},.12)`);
       grad.addColorStop(1, `rgba(${rgb.r},${rgb.g},${rgb.b},0)`);
       gctx.fillStyle = grad;
       gctx.beginPath();
-      gctx.arc(spot.x, spot.y, spot.r, 0, Math.PI * 2);
+      gctx.arc(x, y, spot.r, 0, Math.PI * 2);
       gctx.fill();
     });
     roomGlowCache.set(roomId, canvas);
@@ -2596,7 +2627,7 @@
   // boost to still read clearly as a UI element against a dark room.
   function getRoomGlowRgb(roomId) {
     if (roomGlowRgbCache.has(roomId)) return roomGlowRgbCache.get(roomId);
-    const rgb = lightenRgb(hexToRgb(roomGlowHex(roomId)), .42);
+    const rgb = lightenRgb(hexToRgb(roomGlowHex(roomId)), .52);
     roomGlowRgbCache.set(roomId, rgb);
     return rgb;
   }
@@ -2645,6 +2676,7 @@
   }
 
   function drawMotes(now) {
+    if (!motes.length) return;
     const sprite = getMoteSprite();
     motes.forEach(m => {
       const t = REDUCED_MOTION ? 0 : (now - m.startedAt) / 1000;
@@ -2688,6 +2720,11 @@
     currentBg = image;
   }
 
+  function updateMuenbaProfileLink() {
+    if (!muenbaProfileLink) return;
+    muenbaProfileLink.classList.toggle('is-visible', state.roomId === 'room_01');
+  }
+
   function setRoom(roomId, spawnId, arrivalDir) {
     state.roomId = roomId;
     state.spawnId = spawnId || 'default';
@@ -2702,6 +2739,7 @@
     state.spawnLockUntil = performance.now() + 700;
     state.hiding = false;
     state.captureResolving = false;
+    updateMuenbaProfileLink();
     stopDangerScream();
     setReturnToNuppiPending(Number(readMuenba().orbsPending) > 0 || state.returnToNuppiPending);
     if (hideBtn) { hideBtn.classList.remove('active'); hideBtn.textContent = 'Hide'; }
@@ -3282,7 +3320,7 @@
       actorCtx.globalAlpha = fade * (.24 + flicker * .14 + proximity * .12);
       actorCtx.strokeStyle = `rgba(${glowStr},.9)`;
       actorCtx.shadowColor = `rgba(${glowStr},.65)`;
-      actorCtx.shadowBlur = 11;
+      actorCtx.shadowBlur = 14;
       actorCtx.lineWidth = 3.6;
       actorCtx.lineCap = 'round';
       actorCtx.lineJoin = 'round';
@@ -3409,7 +3447,7 @@
 
     // Room's eerie glow — cached gradient, screen-blended, slow uneven
     // pulse so it breathes instead of sitting static.
-    const roomSeed = state.roomId.charCodeAt(state.roomId.length - 1);
+    const roomSeed = Number(state.roomId.slice(-2)) || 1;
     const glowPulse = .78 + .22 * Math.sin(now / 2100 + roomSeed);
     atmosphereCtx.save();
     atmosphereCtx.globalAlpha = glowPulse;
@@ -3441,9 +3479,22 @@
         atmosphereCtx.globalAlpha = fogAlpha * mood.echo;
         atmosphereCtx.drawImage(lowFogTexture, 760 - fogMotion * .72, 510, 760, 150);
       }
+      if (wispFogTexture) {
+        const wispMotion = fogMotion * 1.28;
+        atmosphereCtx.globalAlpha = fogAlpha * .62;
+        atmosphereCtx.drawImage(wispFogTexture, -180 + wispMotion, 438, 1120, 150);
+        atmosphereCtx.globalAlpha = fogAlpha * .38;
+        atmosphereCtx.drawImage(wispFogTexture, 640 - wispMotion * .65, 320, 980, 128);
+      }
       atmosphereCtx.restore();
     }
-    if (vignetteCanvas) atmosphereCtx.drawImage(vignetteCanvas, 0, 0);
+    if (vignetteCanvas) {
+      const vignettePulse = REDUCED_MOTION ? .92 : .84 + .16 * Math.sin(now / 3500 + roomSeed * .7);
+      atmosphereCtx.save();
+      atmosphereCtx.globalAlpha = vignettePulse;
+      atmosphereCtx.drawImage(vignetteCanvas, 0, 0);
+      atmosphereCtx.restore();
+    }
   }
 
   function renderDevArrowList() {
