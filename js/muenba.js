@@ -135,7 +135,6 @@
     // DEV opens in playable mode. Coordinate pinning is still available from
     // the DEV toggle, but it must not freeze Booha immediately after Nuppi's
     // lobby closes.
-    coordMode: false,
     lastTickTime: 0,
     speed: BASE_SPEED,
     fogX: 0,
@@ -166,8 +165,6 @@
   let actorCtx;
   let fadeEl;
   let devReadout;
-  let devCoordToggle;
-  let devArrowList;
   let devHover = null;
   let currentBg;
   let vignetteCanvas;
@@ -177,7 +174,6 @@
   let foregroundFogTexture;
   let lastTouchEnd = 0;
   let entryDrift = null;
-  let pins = [];
   let returnPortalOverlay = null;
   let returnPortalOpen = false;
   let returnPortalCooldownUntil = 0;
@@ -351,8 +347,7 @@
   // Reads the same 'muenba_return_room' key enterMuenba() in karasuki.js
   // already writes on the way in, so it lands back in the right room via
   // karasuki.js's own checkReturnFromMuenba(). Called either from the
-  // return-portal popup (Pass 2, the real path) or the DEV-only exit
-  // button (Pass 0's stopgap, kept as a fast escape hatch while testing).
+  // return-portal popup in room_01.
   function returnToKarasuki() {
     if (state.returnExiting) return;
     state.returnExiting = true;
@@ -2278,21 +2273,12 @@
       .muenba-rotate-title { font-family:system-ui,-apple-system,sans-serif; font-size:clamp(18px,5vw,28px); font-weight:900; letter-spacing:.04em; color:#f0fff7; margin:0; text-shadow:0 0 28px rgba(143,220,178,.52); }
       .muenba-rotate-sub { font-size:14px; color:rgba(216,244,230,.62); margin:0; line-height:1.7; }
       @media (prefers-reduced-motion: reduce) { .muenba-rotate-phone, .muenba-rotate-bar { animation:none; } }
-      #muenba-dev { position:fixed; left:12px; top:12px; z-index:100; display:${DEV_MODE ? 'block' : 'none'}; color:#bde5e4; background:rgba(0,8,12,.88); border:1px solid rgba(125,220,216,.35); border-radius:10px; padding:9px 10px; font:700 11px/1.5 ui-monospace,monospace; pointer-events:auto; min-width:210px; box-shadow:0 0 20px rgba(0,0,0,.4); }
+      #muenba-dev { position:fixed; left:12px; top:12px; z-index:100; display:${DEV_MODE ? 'block' : 'none'}; color:#bde5e4; background:rgba(0,8,12,.88); border:1px solid rgba(125,220,216,.35); border-radius:7px; padding:6px 8px; font:700 11px/1.35 ui-monospace,monospace; pointer-events:none; min-width:0; box-shadow:0 0 14px rgba(0,0,0,.4); }
       #muenba-dev strong { color:#f0ffff; }
       #muenba-dev-text { white-space:pre-line; }
-      #muenba-dev button { border:1px solid rgba(125,220,216,.4); border-radius:5px; background:rgba(10,40,40,.62); color:#bde5e4; padding:4px 7px; font:700 10px ui-monospace,monospace; cursor:pointer; }
-      #muenba-dev button.active { background:rgba(75,135,122,.65); color:#f0ffff; }
-      #muenba-dev .muenba-dev-small { color:rgba(189,229,228,.64); font-size:10px; margin-top:4px; }
-      #muenba-dev .muenba-dev-arrows { margin-top:5px; padding-top:5px; border-top:1px solid rgba(125,220,216,.18); color:rgba(189,229,228,.72); white-space:pre-line; }
       #muenba-room-list { position:fixed; right:12px; bottom:12px; z-index:100; display:${DEV_MODE ? 'flex' : 'none'}; flex-wrap:wrap; justify-content:flex-end; gap:4px; max-width:330px; }
       #muenba-room-list button { border:1px solid rgba(125,220,216,.35); border-radius:5px; background:rgba(0,8,12,.8); color:#bde5e4; padding:4px 6px; font:700 10px ui-monospace,monospace; cursor:pointer; }
       #muenba-room-list button:hover { background:rgba(30,80,84,.8); }
-      /* Pass 0's floating exit button — now DEV-only. The real players'
-         return is the in-world portal in room_01 (Pass 2, below); this stays
-         around purely as a fast escape hatch while testing other passes. */
-      #muenba-exit { position:fixed; right:12px; top:12px; z-index:100; display:${DEV_MODE ? 'block' : 'none'}; border:1px solid rgba(180,200,192,.4); border-radius:8px; background:rgba(0,8,12,.78); color:#d8e8e0; padding:7px 12px; font:700 11px ui-monospace,monospace; letter-spacing:.04em; cursor:pointer; }
-      #muenba-exit:hover, #muenba-exit:focus-visible { background:rgba(30,70,60,.8); outline:none; }
       /* Return-to-Karasuki confirm popup — matches the locked-world screen's
          parchment-less, dark-cemetery styling so it reads as part of this
          world rather than a generic browser dialog. */
@@ -2454,13 +2440,6 @@
     app.appendChild(stage);
     document.body.replaceChildren(app);
 
-    const exitBtn = document.createElement('button');
-    exitBtn.id = 'muenba-exit';
-    exitBtn.type = 'button';
-    exitBtn.textContent = 'Exit to Karasuki';
-    exitBtn.addEventListener('click', returnToKarasuki);
-    document.body.appendChild(exitBtn);
-
     buildReturnPortalOverlay();
     buildNuppiLobbyOverlay();
     buildCaptureOverlay();
@@ -2493,19 +2472,9 @@
 
     const dev = document.createElement('div');
     dev.id = 'muenba-dev';
-    dev.innerHTML = '<strong>MUENBA DEV</strong><br><span id="muenba-dev-text"></span><br><button id="muenba-dev-coords" type="button">COORDS OFF</button> <button id="muenba-dev-rhythm" type="button">RHYTHM TEST</button><div class="muenba-dev-small">Coords ON: click to pin, movement paused</div><div id="muenba-dev-arrows" class="muenba-dev-arrows"></div>';
+    dev.innerHTML = '<strong>MUENBA DEV</strong><br><span id="muenba-dev-text"></span>';
     document.body.appendChild(dev);
     devReadout = document.getElementById('muenba-dev-text');
-    devCoordToggle = document.getElementById('muenba-dev-coords');
-    devArrowList = document.getElementById('muenba-dev-arrows');
-    document.getElementById('muenba-dev-rhythm').addEventListener('click', openDevRhythmTest);
-    devCoordToggle.classList.toggle('active', state.coordMode);
-    devCoordToggle.textContent = state.coordMode ? 'COORDS ON' : 'COORDS OFF';
-    devCoordToggle.addEventListener('click', () => {
-      state.coordMode = !state.coordMode;
-      devCoordToggle.classList.toggle('active', state.coordMode);
-      devCoordToggle.textContent = state.coordMode ? 'COORDS ON' : 'COORDS OFF';
-    });
 
     const roomList = document.createElement('div');
     roomList.id = 'muenba-room-list';
@@ -2904,7 +2873,6 @@
     spawnRoomGhost(roomId);
     showRoom(roomId);
     reseedMotes(roomId);
-    renderDevArrowList();
     beginEntryDrift();
   }
 
@@ -3707,60 +3675,6 @@
     atmosphereCtx.restore();
   }
 
-  function renderDevArrowList() {
-    if (!devArrowList) return;
-    const exits = getRoom().exits || [];
-    devArrowList.textContent = exits.length
-      ? exits.map(exit => `${exit.dir.padEnd(5, ' ')} x:${exit.x} y:${exit.y} → ${exit.to}`).join('\n')
-      : 'No exits in this room';
-  }
-
-  function getDevQaSummary() {
-    const scale = Math.max(window.innerWidth / WORLD_W, window.innerHeight / WORLD_H);
-    const visibleWorldWidth = window.innerWidth / scale;
-    const visibleWorldHeight = window.innerHeight / scale;
-    const cropX = Math.max(0, (WORLD_W - visibleWorldWidth) / 2);
-    const cropY = Math.max(0, (WORLD_H - visibleWorldHeight) / 2);
-    const exits = getRoom().exits || [];
-    const exitStatus = exits.length
-      ? exits.map(exit => {
-          const visible = exit.x >= cropX && exit.x <= cropX + visibleWorldWidth
-            && exit.y >= cropY && exit.y <= cropY + visibleWorldHeight;
-          return `${exit.dir}:${visible ? 'OK' : 'OFF'}`;
-        }).join(' ')
-      : 'none';
-    const profile = getRoom().atmosphere || {};
-    const orientation = window.innerWidth >= window.innerHeight ? 'LANDSCAPE' : 'PORTRAIT';
-    const rotateWarning = orientation === 'PORTRAIT' && window.innerWidth <= 1023 ? ' ROTATE' : '';
-    const dpr = atmosphereCanvas ? (atmosphereCanvas.width / WORLD_W).toFixed(2) : '?';
-    return `QA ${window.innerWidth}x${window.innerHeight} ${orientation}${rotateWarning}\nscale:${scale.toFixed(3)} crop:${Math.round(cropX)},${Math.round(cropY)} dpr:${dpr} hit:${NPP_RADIUS}\nfog:${profile.fogMood || '—'} exits:${exitStatus}`;
-  }
-
-  function dropPin(x, y) {
-    pins.push({ x, y, label: `${Math.round(x)}, ${Math.round(y)}` });
-    if (pins.length > 30) pins.shift();
-  }
-
-  function drawPins() {
-    if (!DEV_MODE || !state.coordMode) return;
-    pins.forEach((pin, index) => {
-      actorCtx.save();
-      actorCtx.globalAlpha = .9;
-      actorCtx.strokeStyle = '#8de8d2';
-      actorCtx.lineWidth = 1.5;
-      actorCtx.beginPath();
-      actorCtx.moveTo(pin.x - 12, pin.y); actorCtx.lineTo(pin.x + 12, pin.y);
-      actorCtx.moveTo(pin.x, pin.y - 12); actorCtx.lineTo(pin.x, pin.y + 12);
-      actorCtx.stroke();
-      actorCtx.fillStyle = '#d8fff2';
-      actorCtx.beginPath(); actorCtx.arc(pin.x, pin.y, 4, 0, Math.PI * 2); actorCtx.fill();
-      actorCtx.font = '700 11px ui-monospace,monospace';
-      actorCtx.fillStyle = '#c8f8e8';
-      actorCtx.fillText(`${index + 1}. ${pin.label}`, pin.x + 9, pin.y - 10);
-      actorCtx.restore();
-    });
-  }
-
   function drawDangerFlash(now) {
     if (now >= state.dangerFlashUntil) return;
     const remaining = state.dangerFlashUntil - now;
@@ -3785,11 +3699,11 @@
     drawGhost(now);
     drawBooha(now);
     drawDangerFlash(now);
-    drawPins();
     if (DEV_MODE && devReadout) {
-      const hover = devHover ? `  mouse:${Math.round(devHover.x)},${Math.round(devHover.y)}` : '';
-      const ghostInfo = activeGhost ? `  ghost:${activeGhost.ghost.id}(${activeGhost.behavior}${activeGhost.screaming ? '*screaming*' : ''}${activeGhost.chasing ? '*chasing*' : ''}${activeGhost.teleporting ? '*teleporting*' : ''})` : '';
-      devReadout.textContent = `${state.roomId}  player:${Math.round(state.x)},${Math.round(state.y)}${hover}${ghostInfo}\n${getDevQaSummary()}`;
+      const mouse = devHover
+        ? `${Math.round(devHover.x)},${Math.round(devHover.y)}`
+        : '—,—';
+      devReadout.textContent = `${state.roomId}\nmouse: ${mouse}`;
     }
   }
 
@@ -3805,10 +3719,6 @@
     startMusic();
     if (state.transitioning || state.inputLocked || returnPortalOpen || lobbyOpen || captureOpen || state.hiding) return;
     const point = stagePoint(clientX, clientY);
-    if (DEV_MODE && state.coordMode) {
-      dropPin(point.x, point.y);
-      return;
-    }
     if (clickCheckReturnPortal(point.x, point.y)) return;
     if (clickCheckNuppi(point.x, point.y)) return;
     if (clickCheckGhost(point.x, point.y)) return;

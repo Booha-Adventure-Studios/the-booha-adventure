@@ -5,11 +5,11 @@
 // ============================================================
 
 const CURRENT_CACHES = {
-  // Muenba lantern visibility pass: invalidate the previous bundle so the
-  // brighter calibrated window flicker reaches returning players.
-  pages:  'booha-pages-2026-280',
-  assets: 'booha-assets-2026-280',
-  decks:  'booha-decks-2026-280',
+  // Muenba DEV HUD cleanup: invalidate the previous bundle so the compact
+  // room/mouse readout and removed fixed return control reach testers.
+  pages:  'booha-pages-2026-281',
+  assets: 'booha-assets-2026-281',
+  decks:  'booha-decks-2026-281',
 };
 
 const PAGE_CACHE  = CURRENT_CACHES.pages;
