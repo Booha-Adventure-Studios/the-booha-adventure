@@ -5,11 +5,11 @@
 // ============================================================
 
 const CURRENT_CACHES = {
-  // Muenba return-route pass: invalidate the previous deployed bundle so
-  // players can travel back to Nuppi in room_01 for the handoff.
-  pages:  'booha-pages-2026-264',
-  assets: 'booha-assets-2026-264',
-  decks:  'booha-decks-2026-264',
+  // Muenba handoff pass: invalidate the previous bundle so the Nuppi
+  // handoff, celebration dance, and follow-up choice reach players.
+  pages:  'booha-pages-2026-265',
+  assets: 'booha-assets-2026-265',
+  decks:  'booha-decks-2026-265',
 };
 
 const PAGE_CACHE  = CURRENT_CACHES.pages;
