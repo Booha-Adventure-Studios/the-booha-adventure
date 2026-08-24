@@ -430,11 +430,13 @@
       .muenba-lock .jp{margin:0;color:#aac2b5;font-size:.88rem;letter-spacing:.12em;}
       .muenba-lock p{margin:20px auto 0;max-width:31em;color:#c5d8cd;font-size:.94rem;line-height:1.7;}
       .muenba-lock p small{display:block;margin-top:8px;color:#7e9c8b;font-size:.86em;}
+      .muenba-lock p.jp-line{margin-top:6px;color:#9fc3af;font-size:.86em;letter-spacing:0;}
       .muenba-lock a{display:inline-block;margin-top:22px;padding:9px 16px;border:1px solid rgba(156,203,182,.58);border-radius:999px;color:#dcefe4;text-decoration:none;font-size:.78rem;letter-spacing:.05em;background:rgba(111,166,145,.10);}
       .muenba-lock a:hover,.muenba-lock a:focus-visible{background:rgba(111,166,145,.22);outline:none;}
+      .muenba-lock a small{display:block;margin-top:2px;color:#9fc3af;font-size:.9em;}
     `;
     document.head.appendChild(style);
-    document.body.innerHTML = `<main class="muenba-lock" aria-labelledby="muenba-lock-title"><img src="assets/img/muenba/muenba_logo.png" alt="Muenba"><h1 id="muenba-lock-title">This world is locked</h1><p class="jp">この世界は封印されています</p><p>Something waits beyond the cemetery path.<small>This path isn't open yet.</small></p><a href="karasuki.html">Return to Karasuki</a></main>`;
+    document.body.innerHTML = `<main class="muenba-lock" aria-labelledby="muenba-lock-title"><img src="assets/img/muenba/muenba_logo.png" alt="Muenba"><h1 id="muenba-lock-title">This world is locked</h1><p class="jp">この世界は封印されています</p><p>Something waits beyond the cemetery path.<small>This path isn't open yet.</small></p><p class="jp-line"><ruby>墓地<rt>ぼち</rt></ruby>の<ruby>道<rt>みち</rt></ruby>の<ruby>先<rt>さき</rt></ruby>で<ruby>何<rt>なに</rt></ruby>かが<ruby>待<rt>ま</rt></ruby>っている。<br><small>この<ruby>道<rt>みち</rt></ruby>はまだ<ruby>開<rt>ひら</rt></ruby>いていない。</small></p><a href="karasuki.html">Return to Karasuki<small>カラスキに<ruby>戻<rt>もど</rt></ruby>る</small></a></main>`;
   }
 
   function startMusic() {
@@ -1131,12 +1133,22 @@
     moveGhostToward(g, g.wanderTarget.x, g.wanderTarget.y, GHOST_WANDER_SPEED);
   }
 
+  // Pass 12: the hide button's furigana line changes with its state, so it
+  // needs innerHTML rather than a single textContent assignment — kept in
+  // one place since it's set from four different call sites.
+  function setHideButtonLabel(hiding) {
+    if (!hideBtn) return;
+    hideBtn.innerHTML = hiding
+      ? '<span>Come out</span><small><ruby>出<rt>で</rt></ruby>る</small>'
+      : '<span>Hide</span><small><ruby>隠<rt>かく</rt></ruby>れる</small>';
+  }
+
   function toggleHide() {
     if (state.transitioning || lobbyOpen || returnPortalOpen || captureOpen) return;
     state.hiding = !state.hiding;
     if (hideBtn) {
       hideBtn.classList.toggle('active', state.hiding);
-      hideBtn.textContent = state.hiding ? 'Come out' : 'Hide';
+      setHideButtonLabel(state.hiding);
     }
     if (state.hiding) {
       state.clickTarget = null;
@@ -1206,6 +1218,10 @@
     eyebrow.className = 'muenba-case-eyebrow muenba-danger-eyebrow';
     eyebrow.textContent = 'DANGER ENCOUNTER';
     box.appendChild(eyebrow);
+    const eyebrowJp = document.createElement('p');
+    eyebrowJp.className = 'muenba-case-eyebrow-jp';
+    eyebrowJp.innerHTML = '<ruby>危険<rt>きけん</rt></ruby>な<ruby>出会<rt>であ</rt></ruby>い';
+    box.appendChild(eyebrowJp);
 
     const h2 = document.createElement('h2');
     h2.textContent = 'The ghost is angry';
@@ -1223,8 +1239,8 @@
 
     const actions = document.createElement('div');
     actions.className = 'muenba-lobby-actions';
-    actions.appendChild(captureButton('Face the danger rhythm', 'muenba-danger-begin', beginDangerRhythm));
-    actions.appendChild(captureButton('Hide now', 'muenba-danger-hide', escapeDangerToHide));
+    actions.appendChild(captureButton('Face the danger rhythm', '<ruby>危険<rt>きけん</rt></ruby>なリズムに<ruby>挑<rt>いど</rt></ruby>む', 'muenba-danger-begin', beginDangerRhythm));
+    actions.appendChild(captureButton('Hide now', '<ruby>今<rt>いま</rt></ruby>すぐ<ruby>隠<rt>かく</rt></ruby>れる', 'muenba-danger-hide', escapeDangerToHide));
     box.appendChild(actions);
     captureOverlay.classList.add('open');
     focusCaptureControl('#muenba-danger-begin');
@@ -1251,7 +1267,7 @@
     }
     if (hideBtn) {
       hideBtn.classList.add('active');
-      hideBtn.textContent = 'Come out';
+      setHideButtonLabel(true);
     }
     resumeWorldMusicAfterCapture();
   }
@@ -1390,14 +1406,58 @@
     box.appendChild(img);
   }
 
-  function captureButton(label, id, handler) {
+  // Pass 12: every capture-flow button now carries a furigana translation
+  // under the English label, matching caseActionButton's existing pattern —
+  // japaneseText is optional only so a caller can pass '' for a control
+  // that has no natural short JP phrase yet, not as a general escape hatch.
+  function captureButton(label, japaneseText, id, handler) {
     const button = document.createElement('button');
     button.type = 'button';
     button.id = id;
     button.className = 'muenba-capture-action';
-    button.textContent = label;
+    const en = document.createElement('span');
+    en.textContent = label;
+    button.appendChild(en);
+    if (japaneseText) {
+      const jp = document.createElement('small');
+      jp.innerHTML = japaneseText;
+      button.appendChild(jp);
+    }
     button.addEventListener('click', handler);
     return button;
+  }
+
+  // Pass 12: wraps 2-3 authored keywords in a clue in <span class="kw"> so
+  // the CSS can give them the gold glow, without touching the rest of the
+  // clue's plain English. Keywords always come from our own case data (never
+  // user input), but the surrounding text is still escaped defensively.
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+  }
+
+  function highlightKeywords(text, keywords) {
+    const escaped = escapeHtml(text);
+    if (!Array.isArray(keywords) || !keywords.length) return escaped;
+    const pattern = keywords
+      .slice()
+      .sort((a, b) => b.length - a.length)
+      .map(kw => String(kw).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+      .join('|');
+    if (!pattern) return escaped;
+    return escaped.replace(new RegExp(`\\b(${pattern})\\b`, 'gi'), '<span class="kw">$1</span>');
+  }
+
+  function appendCaseGlossary(box, keywords) {
+    if (!Array.isArray(keywords) || !keywords.length) return;
+    const glossary = document.createElement('div');
+    glossary.className = 'muenba-case-glossary';
+    keywords.forEach(kw => {
+      const chip = document.createElement('span');
+      chip.className = 'muenba-case-glossary-chip';
+      chip.textContent = kw;
+      glossary.appendChild(chip);
+    });
+    box.appendChild(glossary);
   }
 
   function focusCaptureControl(selector) {
@@ -1438,8 +1498,13 @@
     if (!captureSession || !captureSession.caseData || !captureOverlay) return;
     const caseData = captureSession.caseData;
     const box = captureBox();
+    box.classList.add('muenba-case-box');
     captureImage(box, captureSession.ghost);
 
+    // caseData.eyebrow/title/intro (and every clue title/text/resolution
+    // below) are the authored case content — deliberately English-only, per
+    // the note in muenba-data.js, so the reading record stays clean. JP only
+    // covers the surrounding instructions/directions/buttons.
     const eyebrow = document.createElement('div');
     eyebrow.className = 'muenba-case-eyebrow';
     eyebrow.textContent = caseData.eyebrow;
@@ -1496,6 +1561,7 @@
     const clue = mode.clues[captureSession.caseIndex];
     const lastClue = captureSession.caseIndex >= mode.clues.length - 1;
     const box = captureBox();
+    box.classList.add('muenba-case-box');
     captureImage(box, captureSession.ghost);
 
     const modeLabel = document.createElement('div');
@@ -1508,7 +1574,7 @@
 
     renderCaseDirection(
       box,
-      'READ THE RECORD FIRST.',
+      'Read the record first',
       '<ruby>最初<rt>さいしょ</rt></ruby>に<ruby>記録<rt>きろく</rt></ruby>を<ruby>読<rt>よ</rt></ruby>みましょう。',
       'muenba-case-record-instruction'
     );
@@ -1517,15 +1583,24 @@
     progress.className = 'muenba-case-progress';
     progress.textContent = `RECORD ${captureSession.caseIndex + 1} OF ${mode.clues.length}`;
     box.appendChild(progress);
+    const progressJp = document.createElement('p');
+    progressJp.className = 'muenba-case-progress-jp';
+    progressJp.innerHTML = `<ruby>記録<rt>きろく</rt></ruby> ${captureSession.caseIndex + 1} / ${mode.clues.length}`;
+    box.appendChild(progressJp);
 
     const h2 = document.createElement('h2');
     h2.textContent = clue.title;
     box.appendChild(h2);
 
+    // Pass 12: the clue's own English stays untranslated (it's the target
+    // reading content), but 2-3 authored keywords glow gold so the words
+    // most worth remembering stand out, with the rest of the sentence in
+    // plain white for contrast — the "Highlighted Vocabulary" treatment.
     const record = document.createElement('p');
     record.className = 'muenba-case-record';
-    record.textContent = clue.text;
+    record.innerHTML = highlightKeywords(clue.text, clue.keywords);
     box.appendChild(record);
+    appendCaseGlossary(box, clue.keywords);
 
     const actions = document.createElement('div');
     actions.className = 'muenba-case-actions';
@@ -1552,6 +1627,7 @@
     if (!captureSession || !captureSession.caseData || !captureOverlay) return;
     const mode = captureSession.caseData[captureSession.caseDifficulty];
     const box = captureBox();
+    box.classList.add('muenba-case-box');
     captureImage(box, captureSession.ghost);
 
     const modeLabel = document.createElement('div');
@@ -1564,7 +1640,7 @@
 
     renderCaseDirection(
       box,
-      'ANSWER THE QUESTION.',
+      'Answer the question',
       '<ruby>質問<rt>しつもん</rt></ruby>に<ruby>答<rt>こた</rt></ruby>えましょう。',
       'muenba-case-question-instruction'
     );
@@ -1573,6 +1649,10 @@
     progress.className = 'muenba-case-progress';
     progress.textContent = 'RECORDS 1–3 READ · QUESTION';
     box.appendChild(progress);
+    const progressJp = document.createElement('p');
+    progressJp.className = 'muenba-case-progress-jp';
+    progressJp.innerHTML = '<ruby>記録<rt>きろく</rt></ruby>を<ruby>読<rt>よ</rt></ruby>み<ruby>終<rt>お</rt></ruby>えた・<ruby>質問<rt>しつもん</rt></ruby>';
+    box.appendChild(progressJp);
 
     const records = document.createElement('div');
     records.className = 'muenba-case-record-list';
@@ -1582,7 +1662,7 @@
       const label = document.createElement('h3');
       label.textContent = `${index + 1}. ${clue.title}`;
       const text = document.createElement('p');
-      text.textContent = clue.text;
+      text.innerHTML = highlightKeywords(clue.text, clue.keywords);
       record.append(label, text);
       records.appendChild(record);
     });
@@ -1620,12 +1700,17 @@
     captureSession.caseResolved = true;
     captureSession.phase = 'case-resolved';
     const box = captureBox();
+    box.classList.add('muenba-case-box');
     captureImage(box, captureSession.ghost);
 
     const eyebrow = document.createElement('div');
     eyebrow.className = 'muenba-case-eyebrow';
     eyebrow.textContent = 'CASE SETTLED';
     box.appendChild(eyebrow);
+    const eyebrowJp = document.createElement('p');
+    eyebrowJp.className = 'muenba-case-eyebrow-jp';
+    eyebrowJp.innerHTML = '<ruby>事件<rt>じけん</rt></ruby><ruby>解決<rt>かいけつ</rt></ruby>';
+    box.appendChild(eyebrowJp);
 
     const h2 = document.createElement('h2');
     h2.textContent = captureSession.caseData.title;
@@ -1667,12 +1752,22 @@
     const h2 = document.createElement('h2');
     h2.textContent = 'Capture ready';
     box.appendChild(h2);
+    const h2Jp = document.createElement('p');
+    h2Jp.className = 'jp';
+    h2Jp.innerHTML = '<ruby>捕獲<rt>ほかく</rt></ruby>の<ruby>準備<rt>じゅんび</rt></ruby>';
+    box.appendChild(h2Jp);
 
     if (ghost.personality) {
       const personality = document.createElement('p');
       personality.className = 'muenba-ghost-flavor';
       personality.textContent = ghost.personality;
       box.appendChild(personality);
+      if (ghost.personalityJp) {
+        const personalityJp = document.createElement('p');
+        personalityJp.className = 'muenba-ghost-flavor-jp';
+        personalityJp.innerHTML = ghost.personalityJp;
+        box.appendChild(personalityJp);
+      }
     }
 
     renderCaseDirection(
@@ -1683,7 +1778,7 @@
 
     const actions = document.createElement('div');
     actions.className = 'muenba-lobby-actions';
-    actions.appendChild(captureButton('Begin rhythm', 'muenba-capture-begin', beginRhythmCapture));
+    actions.appendChild(captureButton('Begin rhythm', 'リズムを<ruby>始<rt>はじ</rt></ruby>める', 'muenba-capture-begin', beginRhythmCapture));
     box.appendChild(actions);
 
     captureOverlay.classList.add('open');
@@ -1880,6 +1975,10 @@
     eyebrow.className = 'muenba-case-board-eyebrow';
     eyebrow.textContent = 'RHYTHM GUIDE';
     box.appendChild(eyebrow);
+    const eyebrowJp = document.createElement('p');
+    eyebrowJp.className = 'jp';
+    eyebrowJp.textContent = 'リズムガイド';
+    box.appendChild(eyebrowJp);
 
     const h2 = document.createElement('h2');
     h2.textContent = 'How to play';
@@ -1912,8 +2011,8 @@
 
     const actions = document.createElement('div');
     actions.className = 'muenba-lobby-actions';
-    actions.appendChild(captureButton('Practice rhythm', 'muenba-rhythm-practice', startPracticeRhythm));
-    actions.appendChild(captureButton('Back to rhythm', 'muenba-rhythm-help-close', closeRhythmHelp));
+    actions.appendChild(captureButton('Practice rhythm', 'リズムを<ruby>練習<rt>れんしゅう</rt></ruby>する', 'muenba-rhythm-practice', startPracticeRhythm));
+    actions.appendChild(captureButton('Back to rhythm', 'リズムに<ruby>戻<rt>もど</rt></ruby>る', 'muenba-rhythm-help-close', closeRhythmHelp));
     box.appendChild(actions);
     captureOverlay.classList.add('open');
     focusCaptureControl('#muenba-rhythm-practice');
@@ -2060,8 +2159,8 @@
     const actions = document.createElement('div');
     actions.className = 'muenba-lobby-actions';
     actions.appendChild(danger
-      ? captureButton('Hide and escape', 'muenba-danger-hide', escapeDangerToHide)
-      : captureButton('Cancel capture', 'muenba-capture-cancel', cancelCaptureSession));
+      ? captureButton('Hide and escape', '<ruby>隠<rt>かく</rt></ruby>れて<ruby>逃<rt>に</rt></ruby>げる', 'muenba-danger-hide', escapeDangerToHide)
+      : captureButton('Cancel capture', '<ruby>捕獲<rt>ほかく</rt></ruby>をやめる', 'muenba-capture-cancel', cancelCaptureSession));
     box.appendChild(actions);
 
     captureOverlay.classList.add('open');
@@ -2316,8 +2415,8 @@
 
     const actions = document.createElement('div');
     actions.className = 'muenba-lobby-actions';
-    actions.appendChild(captureButton('Practice again', 'muenba-rhythm-practice-again', startPracticeRhythm));
-    actions.appendChild(captureButton('Return to rhythm', 'muenba-rhythm-practice-return', returnFromPractice));
+    actions.appendChild(captureButton('Practice again', 'もう<ruby>一度<rt>いちど</rt></ruby><ruby>練習<rt>れんしゅう</rt></ruby>する', 'muenba-rhythm-practice-again', startPracticeRhythm));
+    actions.appendChild(captureButton('Return to rhythm', 'リズムに<ruby>戻<rt>もど</rt></ruby>る', 'muenba-rhythm-practice-return', returnFromPractice));
     box.appendChild(actions);
     captureOverlay.classList.add('open');
     focusCaptureControl('#muenba-rhythm-practice-again');
@@ -2452,11 +2551,11 @@
     const actions = document.createElement('div');
     actions.className = 'muenba-lobby-actions';
     if (danger) {
-      if (!success) actions.appendChild(captureButton('Try danger rhythm again', 'muenba-danger-retry', retryDangerRhythm));
-      actions.appendChild(captureButton('Hide and escape', 'muenba-danger-hide', escapeDangerToHide));
+      if (!success) actions.appendChild(captureButton('Try danger rhythm again', 'もう<ruby>一度<rt>いちど</rt></ruby><ruby>危険<rt>きけん</rt></ruby>なリズムに<ruby>挑<rt>いど</rt></ruby>む', 'muenba-danger-retry', retryDangerRhythm));
+      actions.appendChild(captureButton('Hide and escape', '<ruby>隠<rt>かく</rt></ruby>れて<ruby>逃<rt>に</rt></ruby>げる', 'muenba-danger-hide', escapeDangerToHide));
     } else {
-      if (!success) actions.appendChild(captureButton('Try rhythm again', 'muenba-capture-retry', retryRhythmCapture));
-      actions.appendChild(captureButton('Return to hunt', 'muenba-capture-cancel', cancelCaptureSession));
+      if (!success) actions.appendChild(captureButton('Try rhythm again', 'もう<ruby>一度<rt>いちど</rt></ruby>リズムに<ruby>挑<rt>いど</rt></ruby>む', 'muenba-capture-retry', retryRhythmCapture));
+      actions.appendChild(captureButton('Return to hunt', '<ruby>探索<rt>たんさく</rt></ruby>に<ruby>戻<rt>もど</rt></ruby>る', 'muenba-capture-cancel', cancelCaptureSession));
     }
     box.appendChild(actions);
   }
@@ -2489,9 +2588,17 @@
     const h2 = document.createElement('h2');
     h2.textContent = 'Captured!';
     box.appendChild(h2);
+    const h2Jp = document.createElement('p');
+    h2Jp.className = 'jp';
+    h2Jp.innerHTML = '<ruby>捕獲<rt>ほかく</rt></ruby><ruby>成功<rt>せいこう</rt></ruby>！';
+    box.appendChild(h2Jp);
     const copy = document.createElement('p');
     copy.textContent = `${ghost.name} is safe now. Energy orbs are coming free one at a time.`;
     box.appendChild(copy);
+    const copyJp = document.createElement('p');
+    copyJp.className = 'jp-line';
+    copyJp.innerHTML = `${ghost.name}はもう<ruby>安全<rt>あんぜん</rt></ruby>。エネルギーオーブが<ruby>一<rt>ひと</rt></ruby>つずつ<ruby>出<rt>で</rt></ruby>てくるよ。`;
+    box.appendChild(copyJp);
     renderCaseDirection(
       box,
       'Watch the energy release, then return the orbs to Nuppi.',
@@ -2534,7 +2641,7 @@
     if (reward.revealed >= reward.total) {
       if (reward.statusEl) reward.statusEl.textContent = `Energy released: ${reward.total} / ${reward.total}`;
       if (reward.actionsEl && !reward.actionsEl.children.length) {
-        reward.actionsEl.appendChild(captureButton('Return to Nuppi', 'muenba-capture-return', leaveCaptureForNuppi));
+        reward.actionsEl.appendChild(captureButton('Return to Nuppi', 'ヌッピのところへ<ruby>戻<rt>もど</rt></ruby>る', 'muenba-capture-return', leaveCaptureForNuppi));
         focusCaptureControl('#muenba-capture-return');
       }
       return;
@@ -2722,12 +2829,22 @@
     const h2 = document.createElement('h2');
     h2.textContent = 'Nuppi receives the orbs';
     box.appendChild(h2);
+    const h2Jp = document.createElement('p');
+    h2Jp.className = 'jp';
+    h2Jp.innerHTML = 'ヌッピがオーブを<ruby>受<rt>う</rt></ruby>け<ruby>取<rt>と</rt></ruby>った';
+    box.appendChild(h2Jp);
 
     const p = document.createElement('p');
     p.textContent = deposited > 0
       ? `Nuppi smiles. ${deposited} energy orb${deposited === 1 ? '' : 's'} came safely home.`
       : 'Nuppi smiles. The energy trail is already safe.';
     box.appendChild(p);
+    const pJp = document.createElement('p');
+    pJp.className = 'jp-line';
+    pJp.innerHTML = deposited > 0
+      ? 'ヌッピが<ruby>微笑<rt>ほほえ</rt></ruby>む。エネルギーオーブが<ruby>無事<rt>ぶじ</rt></ruby>に<ruby>届<rt>とど</rt></ruby>いたよ。'
+      : 'ヌッピが<ruby>微笑<rt>ほほえ</rt></ruby>む。エネルギーの<ruby>道<rt>みち</rt></ruby>はもう<ruby>安全<rt>あんぜん</rt></ruby>だよ。';
+    box.appendChild(pJp);
     renderCaseDirection(
       box,
       'The energy is safe with Nuppi. Return to the hunt when you are ready.',
@@ -2737,7 +2854,7 @@
     const actions = document.createElement('div');
     actions.className = 'muenba-lobby-actions';
     const buttonLabel = 'Back to the hunt';
-    actions.appendChild(captureButton(buttonLabel, 'muenba-capture-finish', () => {
+    actions.appendChild(captureButton(buttonLabel, '<ruby>探索<rt>たんさく</rt></ruby>に<ruby>戻<rt>もど</rt></ruby>る', 'muenba-capture-finish', () => {
       closeCaptureOverlay({ resumeHunt: true });
     }));
     box.appendChild(actions);
@@ -2771,9 +2888,17 @@
     const h2 = document.createElement('h2');
     h2.textContent = 'Your orbs are waiting';
     box.appendChild(h2);
+    const h2Jp = document.createElement('p');
+    h2Jp.className = 'jp';
+    h2Jp.innerHTML = 'オーブが<ruby>待<rt>ま</rt></ruby>っているよ';
+    box.appendChild(h2Jp);
     const p = document.createElement('p');
     p.textContent = `Nuppi has a safe place for your ${pending} pending energy orb${pending === 1 ? '' : 's'}.`;
     box.appendChild(p);
+    const pJp = document.createElement('p');
+    pJp.className = 'jp-line';
+    pJp.innerHTML = 'ヌッピが<ruby>待<rt>ま</rt></ruby>っているエネルギーオーブを<ruby>安全<rt>あんぜん</rt></ruby>に<ruby>保管<rt>ほかん</rt></ruby>しているよ。';
+    box.appendChild(pJp);
     renderCaseDirection(
       box,
       'Return the waiting orbs to Nuppi before you continue.',
@@ -2781,7 +2906,7 @@
     );
     const actions = document.createElement('div');
     actions.className = 'muenba-lobby-actions';
-    actions.appendChild(captureButton('Return to Nuppi', 'muenba-capture-return', leaveCaptureForNuppi));
+    actions.appendChild(captureButton('Return to Nuppi', 'ヌッピのところへ<ruby>戻<rt>もど</rt></ruby>る', 'muenba-capture-return', leaveCaptureForNuppi));
     box.appendChild(actions);
     captureOverlay.classList.add('open');
     focusCaptureControl('#muenba-capture-return');
@@ -2930,6 +3055,13 @@
       #muenba-return-yes:hover, #muenba-return-yes:focus-visible { background:rgba(52,104,78,.44); outline:none; }
       #muenba-return-no { border:1px solid rgba(90,130,112,.5); color:#aec8bb; background:transparent; }
       #muenba-return-no:hover, #muenba-return-no:focus-visible { background:rgba(90,130,112,.16); outline:none; }
+      /* Pass 12: every capture/lobby/return/hide button now carries an EN
+         <span> plus a JP <small> sub-line — stack them instead of letting
+         the label and furigana run together inline. */
+      #muenba-return-yes, #muenba-return-no, #muenba-lobby-begin, #muenba-room-nuppi-close, #muenba-case-board-next, #muenba-hunt-card-begin, #muenba-handoff-later, #muenba-hide, .muenba-capture-action { display:inline-flex; flex-direction:column; align-items:center; gap:3px; }
+      #muenba-return-yes small, #muenba-return-no small, #muenba-lobby-begin small, #muenba-room-nuppi-close small, #muenba-case-board-next small, #muenba-hunt-card-begin small, #muenba-handoff-later small, #muenba-hide small, .muenba-capture-action small { color:#a8cbb8; font:400 .76rem Georgia,'Times New Roman',serif; letter-spacing:0; }
+      #muenba-case-board-next small, #muenba-hunt-card-begin small { color:#e7dca9; }
+      #muenba-hide small { color:#bfe8cf; font-size:.72rem; }
       /* Nuppi's lobby welcome — same dark-cemetery popup language as the
          return prompt, just roomier: it holds a portrait plus a few lines
          of text instead of a one-line question. Shows every time the
@@ -2975,18 +3107,30 @@
       .muenba-case-mode-label { display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin:0 0 10px; color:#f0d98c; font:900 .72rem/1.35 ui-monospace,monospace; letter-spacing:.08em; text-transform:uppercase; }
       .muenba-case-mode-label small { color:#c5b778; font:400 .78rem/1.35 system-ui,sans-serif; letter-spacing:0; text-transform:none; }
       .muenba-case-progress { margin:0 0 10px; color:#fff5d5; font:900 .82rem/1.4 ui-monospace,monospace; letter-spacing:.16em; text-align:left; }
-      .muenba-case-record { margin:15px 0 18px !important; padding:14px 15px; border-left:3px solid #d8c98b; background:rgba(216,201,139,.08); color:#fff5d5 !important; font-size:1rem !important; line-height:1.65 !important; text-align:left !important; }
+      .muenba-case-record { margin:15px 0 18px !important; padding:14px 15px; border-left:3px solid #d8c98b; background:rgba(216,201,139,.08); color:#fff !important; font-size:1rem !important; line-height:1.65 !important; text-align:left !important; }
       .muenba-case-record-list { display:grid; gap:7px; margin:13px 0 16px; text-align:left; }
       .muenba-case-record-item { padding:9px 11px; border-left:2px solid rgba(216,201,139,.42); background:rgba(216,201,139,.045); }
       .muenba-case-record-item h3 { margin:0 0 4px; color:#e7dca9; font:700 .72rem/1.35 ui-monospace,monospace; letter-spacing:.04em; }
-      .muenba-case-record-item p { margin:0; color:#fff5d5; font-size:.82rem; line-height:1.45; }
+      .muenba-case-record-item p { margin:0; color:#fff; font-size:.82rem; line-height:1.45; }
+      /* Pass 12: highlighted-vocabulary clue cards — keywords glow gold
+         against the now-white body text; the glossary chip row echoes them
+         below the clue so learners see the target words twice. */
+      .muenba-case-record .kw, .muenba-case-record-item p .kw { color:#ffe066; font-weight:700; text-shadow:0 0 10px rgba(255,224,102,.65), 0 0 22px rgba(255,196,40,.3); }
+      .muenba-case-glossary { display:flex; flex-wrap:wrap; gap:7px; margin:0 0 16px; }
+      .muenba-case-glossary-chip { padding:4px 12px; border:1px solid rgba(255,224,102,.5); border-radius:999px; background:rgba(255,224,102,.1); color:#ffe066; font:700 .72rem ui-monospace,monospace; letter-spacing:.03em; }
+      /* Case-specific heading treatment, scoped to .muenba-case-box so it
+         never touches the many unrelated screens sharing .muenba-lobby-box. */
+      .muenba-case-box h2 { color:#fff5d5; font-size:1.3rem; font-weight:400; letter-spacing:.01em; text-transform:none; }
       .muenba-case-direction { margin:16px 0; padding:10px 12px; border:1px solid rgba(156,203,182,.24); border-radius:10px; background:rgba(255,255,255,.035); text-align:left; }
       .muenba-case-direction-en { margin:0; color:#dff5e8; font-size:.86rem; line-height:1.45; }
       .muenba-case-direction-jp { margin:5px 0 0; color:#9fc3af; font-size:.82rem; line-height:1.55; }
-      .muenba-case-record-instruction { margin:0 0 10px; border-color:rgba(216,201,139,.74); background:rgba(216,201,139,.13); box-shadow:0 0 20px rgba(216,201,139,.13); }
-      .muenba-case-record-instruction .muenba-case-direction-en, .muenba-case-question-instruction .muenba-case-direction-en { color:#fff; font:900 1rem/1.3 ui-monospace,monospace; letter-spacing:.1em; }
-      .muenba-case-record-instruction .muenba-case-direction-jp, .muenba-case-question-instruction .muenba-case-direction-jp { color:#e7dca9; }
-      .muenba-case-question-instruction { margin:0 0 10px; border-color:rgba(151,126,255,.62); background:rgba(94,67,157,.18); }
+      .muenba-case-record-instruction { margin:0 0 10px; border-color:rgba(156,203,182,.28); background:rgba(255,255,255,.03); box-shadow:none; }
+      .muenba-case-record-instruction .muenba-case-direction-en, .muenba-case-question-instruction .muenba-case-direction-en { color:#cfe3d6; font:600 .72rem/1.4 system-ui,-apple-system,sans-serif; letter-spacing:.08em; text-transform:uppercase; }
+      .muenba-case-record-instruction .muenba-case-direction-jp, .muenba-case-question-instruction .muenba-case-direction-jp { color:#9fc3af; }
+      .muenba-case-question-instruction { margin:0 0 10px; border-color:rgba(151,126,255,.24); background:rgba(94,67,157,.06); box-shadow:none; }
+      .muenba-case-progress-jp { margin:-6px 0 10px; color:#9fc3af; font-size:.76rem; letter-spacing:.04em; text-align:left; }
+      .muenba-case-eyebrow-jp, .muenba-case-board-eyebrow-jp, .muenba-hunt-target-eyebrow-jp { margin:-6px 0 8px; color:#9fc3af; font-size:.76rem; letter-spacing:.04em; }
+      .muenba-ghost-flavor-jp { margin:-12px 0 16px !important; color:#c5b778 !important; font-size:.78rem !important; line-height:1.5 !important; text-align:center !important; font-style:normal; }
       .muenba-case-question { margin:17px 0 12px; border-color:rgba(255,255,255,.48); background:rgba(84,65,132,.22); box-shadow:0 0 22px rgba(100,77,184,.16); }
       .muenba-case-question .muenba-case-direction-en { color:#fff; font-size:1.12rem; font-weight:700; line-height:1.45; }
       .muenba-case-question .muenba-case-direction-jp { color:#d8d0ff; }
@@ -3003,7 +3147,7 @@
       /* Hide button (Pass 7) — always visible during free-roam, not a DEV
          tool. Matches the exit button's box language but sits bottom-left
          so it never competes with the DEV-only bottom-right room list. */
-      #muenba-hide { position:fixed; left:12px; bottom:78px; z-index:100; border:1px solid rgba(156,203,182,.72); border-radius:8px; background:rgba(0,8,12,.82); color:#e6fff1; padding:8px 16px; font:700 11px ui-monospace,monospace; letter-spacing:.05em; cursor:pointer; box-shadow:0 0 12px rgba(93,208,140,.28), inset 0 0 10px rgba(93,208,140,.08); animation:muenbaHideGlow 1.8s ease-in-out infinite; }
+      #muenba-hide { position:fixed; left:12px; bottom:78px; z-index:100; border:1px solid rgba(156,203,182,.72); border-radius:8px; background:rgba(0,8,12,.82); color:#e6fff1; padding:7px 16px; font:700 11px ui-monospace,monospace; letter-spacing:.05em; cursor:pointer; box-shadow:0 0 12px rgba(93,208,140,.28), inset 0 0 10px rgba(93,208,140,.08); animation:muenbaHideGlow 1.8s ease-in-out infinite; }
       #muenba-profile-link { position:fixed; right:max(18px, env(safe-area-inset-right, 0px)); bottom:max(30px, calc(env(safe-area-inset-bottom, 0px) + 22px)); z-index:100; display:none; place-items:center; box-sizing:border-box; width:clamp(44px, 6vw, 62px); height:clamp(44px, 6vw, 62px); padding:clamp(4px, .7vw, 7px); border:1px solid rgba(216,201,139,.66); border-radius:clamp(10px, 1.2vw, 14px); background:rgba(6,15,12,.86); box-shadow:0 0 18px rgba(216,201,139,.2), inset 0 0 14px rgba(216,201,139,.08); transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease; }
       #muenba-profile-link.is-visible { display:grid; }
       #muenba-profile-link img { display:block; width:100%; height:100%; object-fit:contain; filter:drop-shadow(0 0 8px rgba(216,201,139,.42)); }
@@ -3124,7 +3268,7 @@
     hideBtn = document.createElement('button');
     hideBtn.id = 'muenba-hide';
     hideBtn.type = 'button';
-    hideBtn.textContent = 'Hide';
+    setHideButtonLabel(false);
     hideBtn.addEventListener('click', toggleHide);
     document.body.appendChild(hideBtn);
 
@@ -3548,7 +3692,7 @@
     updateMuenbaProfileLink();
     stopDangerScream();
     setReturnToNuppiPending(Number(readMuenba().orbsPending) > 0 || state.returnToNuppiPending);
-    if (hideBtn) { hideBtn.classList.remove('active'); hideBtn.textContent = 'Hide'; }
+    if (hideBtn) { hideBtn.classList.remove('active'); setHideButtonLabel(false); }
     markMuenbaRoomVisited(roomId);
     spawnRoomGhost(roomId);
     showRoom(roomId);
@@ -3699,8 +3843,8 @@
         <p>The path back to Karasuki is open here.</p>
         <p class="jp-line">ここからカラスキへ<ruby>戻<rt>もど</rt></ruby>る<ruby>道<rt>みち</rt></ruby>が<ruby>開<rt>ひら</rt></ruby>いています。</p>
         <div class="muenba-return-actions">
-          <button id="muenba-return-yes" type="button">Yes, return</button>
-          <button id="muenba-return-no" type="button">Stay</button>
+          <button id="muenba-return-yes" type="button"><span>Yes, return</span><small>はい、<ruby>戻<rt>もど</rt></ruby>る</small></button>
+          <button id="muenba-return-no" type="button"><span>Stay</span><small>ここにいる</small></button>
         </div>
       </div>`;
     document.body.appendChild(returnPortalOverlay);
@@ -3810,7 +3954,7 @@
         <p>Somewhere among these fifteen rooms, a ghost is hiding. Some won't notice you at all, while others will come looking. If one gets close, you can hide until it loses interest. When you see one, walk up and give it a tap.</p>
         <p class="jp-line">この15の<ruby>部屋<rt>へや</rt></ruby>のどこかに、<ruby>幽霊<rt>ゆうれい</rt></ruby>が<ruby>隠<rt>かく</rt></ruby>れているよ。<ruby>気<rt>き</rt></ruby>づかない<ruby>幽霊<rt>ゆうれい</rt></ruby>もいれば、<ruby>探<rt>さが</rt></ruby>しに<ruby>来<rt>く</rt></ruby>る<ruby>幽霊<rt>ゆうれい</rt></ruby>もいる。<ruby>近<rt>ちか</rt></ruby>づかれたら、<ruby>隠<rt>かく</rt></ruby>れて<ruby>興味<rt>きょうみ</rt></ruby>をなくすのを<ruby>待<rt>ま</rt></ruby>とう。<ruby>見<rt>み</rt></ruby>つけたら、<ruby>近<rt>ちか</rt></ruby>づいてそっとタップしてみて。</p>
         <div class="muenba-lobby-actions">
-          <button id="muenba-lobby-begin" type="button">Let's begin</button>
+          <button id="muenba-lobby-begin" type="button"><span>Let's begin</span><small><ruby>始<rt>はじ</rt></ruby>めよう</small></button>
         </div>
       </div>`;
     lobbyOverlay.querySelector('#muenba-lobby-begin').addEventListener('click', renderNuppiCaseBoard);
@@ -3823,17 +3967,19 @@
       <div class="muenba-lobby-box is-case-board">
         <img class="muenba-lobby-portrait" src="assets/img/wanderers/nuppi-2.png" alt="Nuppi">
         <div class="muenba-case-board-eyebrow">CASE DESK / NUPPI</div>
+        <p class="jp muenba-case-board-eyebrow-jp"><ruby>事件<rt>じけん</rt></ruby><ruby>受付<rt>うけつけ</rt></ruby> / ヌッピ</p>
         <h2>Nuppi's case board</h2>
         <p class="jp">ヌッピの<ruby>事件<rt>じけん</rt></ruby>ボード</p>
         <section class="muenba-lobby-case-board" aria-labelledby="muenba-case-board-title">
           <h3 id="muenba-case-board-title"></h3>
+          <p id="muenba-case-board-title-jp" class="muenba-case-direction-jp"></p>
           <p id="muenba-case-board-mode" class="muenba-case-board-mode"></p>
           <p id="muenba-case-board-mode-jp" class="muenba-case-board-mode-jp"></p>
           <p id="muenba-case-board-copy" class="muenba-case-board-copy"></p>
           <p id="muenba-case-board-jp" class="muenba-case-direction-jp"></p>
         </section>
         <div class="muenba-lobby-actions">
-          <button id="muenba-case-board-next" type="button">Next</button>
+          <button id="muenba-case-board-next" type="button"><span>Next</span><small><ruby>次<rt>つぎ</rt></ruby>へ</small></button>
         </div>
       </div>`;
     refreshNuppiCaseBoard();
@@ -3854,6 +4000,7 @@
     lobbyOverlay.innerHTML = `
       <div class="muenba-lobby-box muenba-hunt-card">
         <div class="muenba-hunt-target-eyebrow">YOUR HUNT TARGET</div>
+        <p class="jp muenba-hunt-target-eyebrow-jp">あなたの<ruby>目標<rt>もくひょう</rt></ruby></p>
         ${ghost
           ? `<img class="muenba-hunt-ghost-portrait" src="${ghost.img}" alt="${ghostName}">`
           : '<div class="muenba-hunt-ghost-portrait" aria-hidden="true"></div>'}
@@ -3862,7 +4009,7 @@
         <p class="muenba-hunt-helper">${ghost ? `Not all ghosts are friendly. Run away or hide from the angry ones.${helperName}` : 'You found every ghost available this week. They will return next week.'}</p>
         <p class="muenba-hunt-helper-jp">${ghost ? `すべての<ruby>幽霊<rt>ゆうれい</rt></ruby>が<ruby>友好的<rt>ゆうこうてき</rt></ruby>とは<ruby>限<rt>かぎ</rt></ruby>らない。<ruby>怒<rt>おこ</rt></ruby>った<ruby>幽霊<rt>ゆうれい</rt></ruby>からは<ruby>逃<rt>に</rt></ruby>げるか、<ruby>隠<rt>かく</rt></ruby>れよう。${name ? `${name}さん、` : ''}<ruby>気<rt>き</rt></ruby>をつけて。` : 'この<ruby>週<rt>しゅう</rt></ruby>に<ruby>見<rt>み</rt></ruby>つけられる<ruby>幽霊<rt>ゆうれい</rt></ruby>は<ruby>全部<rt>ぜんぶ</rt></ruby>です。<ruby>来週<rt>らいしゅう</rt></ruby>にまた<ruby>戻<rt>もど</rt></ruby>ってきます。'}</p>
         <div class="muenba-lobby-actions">
-          <button id="muenba-hunt-card-begin" type="button">Begin hunt</button>
+          <button id="muenba-hunt-card-begin" type="button"><span>Begin hunt</span><small><ruby>探索<rt>たんさく</rt></ruby>を<ruby>始<rt>はじ</rt></ruby>める</small></button>
         </div>
       </div>`;
     lobbyOverlay.querySelector('#muenba-hunt-card-begin').addEventListener('click', () => {
@@ -3882,23 +4029,28 @@
   function refreshNuppiCaseBoard() {
     if (!lobbyOverlay) return;
     const title = lobbyOverlay.querySelector('#muenba-case-board-title');
+    const titleJp = lobbyOverlay.querySelector('#muenba-case-board-title-jp');
     const mode = lobbyOverlay.querySelector('#muenba-case-board-mode');
     const modeJp = lobbyOverlay.querySelector('#muenba-case-board-mode-jp');
     const copy = lobbyOverlay.querySelector('#muenba-case-board-copy');
     const jp = lobbyOverlay.querySelector('#muenba-case-board-jp');
-    if (!title || !mode || !modeJp || !copy || !jp) return;
+    if (!title || !titleJp || !mode || !modeJp || !copy || !jp) return;
     const next = nextMuenbaCase();
     if (next) {
       const ghost = (DATA.ghosts || []).find(candidate => candidate.id === next.ghostId);
       const ghostName = ghost ? ghost.name : next.ghostId;
       const selectedMode = getMuenbaReadingDifficulty();
+      // next.title is authored case content (English-only by design, see
+      // muenba-data.js), so its JP line stays empty on purpose.
       title.textContent = next.title;
+      titleJp.textContent = '';
       mode.textContent = MUENBA_MEMORY_MODE_LABELS[selectedMode] || MUENBA_MEMORY_MODE_LABELS.fresh;
       modeJp.innerHTML = MUENBA_MEMORY_MODE_JP[selectedMode] || MUENBA_MEMORY_MODE_JP.fresh;
       copy.textContent = `Case ready. Find ${ghostName} and untangle its energy.`;
       jp.innerHTML = '<ruby>事件<rt>じけん</rt></ruby>の<ruby>準備<rt>じゅんび</rt></ruby>ができたよ。<ruby>幽霊<rt>ゆうれい</rt></ruby>を<ruby>探<rt>さが</rt></ruby>して、エネルギーを<ruby>解<rt>と</rt></ruby>こう。';
     } else {
       title.textContent = 'The case board is quiet.';
+      titleJp.innerHTML = '<ruby>事件<rt>じけん</rt></ruby>ボードは<ruby>静<rt>しず</rt></ruby>か。';
       mode.textContent = 'No reading level selected';
       modeJp.innerHTML = '<ruby>読<rt>よ</rt></ruby>み<ruby>方<rt>かた</rt></ruby>はありません';
       copy.textContent = 'Nuppi is waiting for the next strange ghost.';
@@ -3960,8 +4112,8 @@
         <p>${copy}</p>
         <p class="jp-line">${copyJp}</p>
         <div class="muenba-lobby-actions">
-          ${pending ? '<button id="muenba-room-nuppi-handoff" class="muenba-capture-action" type="button">Hand over energy</button>' : ''}
-          <button id="muenba-room-nuppi-close" type="button">Back to the hunt</button>
+          ${pending ? '<button id="muenba-room-nuppi-handoff" class="muenba-capture-action" type="button"><span>Hand over energy</span><small>エネルギーを<ruby>渡<rt>わた</rt></ruby>す</small></button>' : ''}
+          <button id="muenba-room-nuppi-close" type="button"><span>Back to the hunt</span><small><ruby>探索<rt>たんさく</rt></ruby>に<ruby>戻<rt>もど</rt></ruby>る</small></button>
         </div>
       </div>`;
     const handoff = lobbyOverlay.querySelector('#muenba-room-nuppi-handoff');
@@ -3991,6 +4143,7 @@
       <div class="muenba-lobby-box muenba-handoff-box">
         <img class="muenba-lobby-portrait" src="assets/img/wanderers/nuppi-2.png" alt="Nuppi">
         <div class="muenba-case-board-eyebrow">ENERGY RETURNED</div>
+        <p class="jp muenba-case-board-eyebrow-jp">エネルギーが<ruby>戻<rt>もど</rt></ruby>った</p>
         <h2>Thank you, Booha.</h2>
         <p class="jp">ありがとう、ブーハー。</p>
         <p>${orbLabel} are safe with Nuppi now.</p>
@@ -3998,8 +4151,8 @@
         <p>${canContinue ? 'Would you like to find another ghost?' : 'That is all for this week. The ghosts will return next week.'}</p>
         <p class="jp-line">${canContinue ? 'もう<ruby>一度<rt>いちど</rt></ruby>、<ruby>幽霊<rt>ゆうれい</rt></ruby>を<ruby>探<rt>さが</rt></ruby>してみる？' : 'この<ruby>週<rt>しゅう</rt></ruby>はこれでおしまい。<ruby>幽霊<rt>ゆうれい</rt></ruby>は<ruby>来週<rt>らいしゅう</rt></ruby>に<ruby>戻<rt>もど</rt></ruby>ってくるよ。'}</p>
         <div class="muenba-lobby-actions">
-          ${canContinue ? '<button id="muenba-handoff-find" class="muenba-capture-action" type="button">Find another ghost</button>' : ''}
-          <button id="muenba-handoff-later" type="button">Not now</button>
+          ${canContinue ? '<button id="muenba-handoff-find" class="muenba-capture-action" type="button"><span>Find another ghost</span><small><ruby>別<rt>べつ</rt></ruby>の<ruby>幽霊<rt>ゆうれい</rt></ruby>を<ruby>探<rt>さが</rt></ruby>す</small></button>' : ''}
+          <button id="muenba-handoff-later" type="button"><span>Not now</span><small><ruby>今<rt>いま</rt></ruby>はやめる</small></button>
         </div>
       </div>`;
     const find = lobbyOverlay.querySelector('#muenba-handoff-find');
