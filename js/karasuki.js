@@ -2110,38 +2110,68 @@ const HAPPY_HOUSE_PORTAL = {
     ctx.save();
     ctx.globalAlpha = masterAlpha;
 
-    // Almost-black haze: visible against the cemetery without becoming a
-    // bright waypoint. The thin cold rim is the readable edge.
+    // Locked Muenba stays quiet. Once available, it becomes a vivid spectral
+    // presence with a sickly mint edge and a violet shadow beneath it.
     const haze = ctx.createRadialGradient(cx, cy, 2, cx, cy, 78 + pulse * 9);
-    haze.addColorStop(0, 'rgba(0,0,0,0.46)');
-    haze.addColorStop(0.38, 'rgba(12,5,20,0.24)');
-    haze.addColorStop(0.72, 'rgba(48,19,58,0.10)');
+    haze.addColorStop(0, unlocked ? 'rgba(78,255,166,0.30)' : 'rgba(0,0,0,0.46)');
+    haze.addColorStop(0.38, unlocked ? 'rgba(112,46,154,0.22)' : 'rgba(12,5,20,0.24)');
+    haze.addColorStop(0.72, unlocked ? 'rgba(18,75,54,0.14)' : 'rgba(48,19,58,0.10)');
     haze.addColorStop(1, 'transparent');
     ctx.globalAlpha = masterAlpha * (0.72 + pulse * 0.16);
     ctx.fillStyle = haze;
     ctx.beginPath(); ctx.arc(cx, cy, 78 + pulse * 9, 0, Math.PI * 2); ctx.fill();
 
-    ctx.globalAlpha = masterAlpha * (0.34 + pulse2 * 0.18);
-    ctx.strokeStyle = '#9b7da9';
-    ctx.lineWidth = 1.4;
+    ctx.globalAlpha = masterAlpha * (unlocked ? 0.58 + pulse2 * 0.20 : 0.34 + pulse2 * 0.18);
+    ctx.strokeStyle = unlocked ? '#75f2b5' : '#9b7da9';
+    ctx.lineWidth = unlocked ? 1.8 : 1.4;
+    ctx.shadowBlur = unlocked ? 12 : 0;
+    ctx.shadowColor = unlocked ? '#54d995' : 'transparent';
     ctx.beginPath(); ctx.arc(cx, cy, 30 + pulse2 * 5, 0, Math.PI * 2); ctx.stroke();
+    ctx.shadowBlur = 0;
 
     const coreR = 16 + pulse * 3;
     const core = ctx.createRadialGradient(cx - 5, cy - 6, 1, cx, cy, coreR);
-    core.addColorStop(0, '#30243a');
-    core.addColorStop(0.25, '#0d0912');
-    core.addColorStop(0.82, '#020205');
-    core.addColorStop(1, '#000000');
+    core.addColorStop(0, unlocked ? '#f1fff5' : '#30243a');
+    core.addColorStop(0.25, unlocked ? '#9df7bd' : '#0d0912');
+    core.addColorStop(0.62, unlocked ? '#2c9d66' : '#020205');
+    core.addColorStop(0.82, unlocked ? '#092216' : '#020205');
+    core.addColorStop(1, unlocked ? '#010806' : '#000000');
     ctx.globalAlpha = masterAlpha * (0.92 + pulse * 0.06);
     ctx.fillStyle = core;
     ctx.shadowBlur = 18 + pulse * 12;
-    ctx.shadowColor = 'rgba(76,36,92,0.72)';
+    ctx.shadowColor = unlocked ? 'rgba(49,239,145,0.92)' : 'rgba(76,36,92,0.72)';
     ctx.beginPath(); ctx.arc(cx, cy, coreR, 0, Math.PI * 2); ctx.fill();
     ctx.shadowBlur = 0;
 
     ctx.globalAlpha = masterAlpha * (0.24 + pulse2 * 0.18);
-    ctx.fillStyle = '#cbb2d5';
+    ctx.fillStyle = unlocked ? '#d8ffe8' : '#cbb2d5';
     ctx.beginPath(); ctx.arc(cx - coreR * 0.32, cy - coreR * 0.34, 2.2, 0, Math.PI * 2); ctx.fill();
+
+    if (unlocked) {
+      // Broken spirit marks and six tiny wisps give the orb a haunted shape
+      // without adding images, particles, or per-frame allocations.
+      ctx.globalAlpha = masterAlpha * (0.34 + pulse * 0.20);
+      ctx.strokeStyle = '#c4ffe0';
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([4, 7]);
+      ctx.beginPath(); ctx.arc(cx, cy, 41 + pulse * 3, sec * 0.35, sec * 0.35 + Math.PI * 1.45); ctx.stroke();
+      ctx.beginPath(); ctx.arc(cx, cy, 47 + pulse2 * 3, -sec * 0.28 + 1.8, -sec * 0.28 + 1.8 + Math.PI * 1.05); ctx.stroke();
+      ctx.setLineDash([]);
+
+      for (let i = 0; i < 6; i++) {
+        const angle = sec * (i % 2 ? -0.42 : 0.30) + i * Math.PI / 3;
+        const radius = 38 + Math.sin(sec * 2 + i) * 4;
+        const wx = cx + Math.cos(angle) * radius;
+        const wy = cy + Math.sin(angle) * radius * 0.64 - 3;
+        const mote = 1.4 + 0.8 * Math.abs(Math.sin(sec * 3.4 + i));
+        ctx.globalAlpha = masterAlpha * (0.42 + 0.38 * Math.abs(Math.sin(sec * 3 + i)));
+        ctx.fillStyle = i % 2 ? '#b6ffd2' : '#bd72e8';
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = i % 2 ? '#54d995' : '#8f43bd';
+        ctx.beginPath(); ctx.arc(wx, wy, mote, 0, Math.PI * 2); ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+    }
     ctx.restore();
   }
 

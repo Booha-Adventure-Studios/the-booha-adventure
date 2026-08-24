@@ -14,7 +14,7 @@ const CURRENT_CACHES = {
   // counters, danger-encounter false-capture) could otherwise sit invisible
   // on a returning device indefinitely. Bump this string on every future
   // Muenba (or other /js/-touching) fix, not just this one.
-  assets: 'booha-assets-2026-312',
+  assets: 'booha-assets-2026-313',
   decks:  'booha-decks-2026-309',
 };
 
