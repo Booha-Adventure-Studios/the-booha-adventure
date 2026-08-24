@@ -5,11 +5,11 @@
 // ============================================================
 
 const CURRENT_CACHES = {
-  // Profile design pass: invalidate the previous deployed bundle so the
-  // Muenba ledger redesign cannot remain behind cache-first routing.
-  pages:  'booha-pages-2026-250',
-  assets: 'booha-assets-2026-250',
-  decks:  'booha-decks-2026-250',
+  // Reading preference pass: invalidate the previous deployed bundle so the
+  // Muenba Fresh/Deep setting cannot remain behind cache-first routing.
+  pages:  'booha-pages-2026-251',
+  assets: 'booha-assets-2026-251',
+  decks:  'booha-decks-2026-251',
 };
 
 const PAGE_CACHE  = CURRENT_CACHES.pages;

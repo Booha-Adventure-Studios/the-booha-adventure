@@ -412,6 +412,10 @@
       mu.caseRecords = {};
       dirty = true;
     }
+    if (mu.readingDifficulty !== 'fresh' && mu.readingDifficulty !== 'deep') {
+      mu.readingDifficulty = 'fresh';
+      dirty = true;
+    }
     if (!mu.caseProgress || typeof mu.caseProgress !== 'object') {
       mu.caseProgress = { completedCaseIds: [], activeCaseId: null };
       dirty = true;
@@ -443,6 +447,10 @@
 
   function readMuenba() {
     return loadSave().muenba || {};
+  }
+
+  function getMuenbaReadingDifficulty() {
+    return readMuenba().readingDifficulty === 'deep' ? 'deep' : 'fresh';
   }
 
   function writeMuenba(patchObj) {
@@ -704,7 +712,7 @@
     captureSession = {
       ghost,
       caseData,
-      caseDifficulty: null,
+      caseDifficulty: caseData ? getMuenbaReadingDifficulty() : null,
       caseIndex: 0,
       caseResolved: false,
       phase: caseData && !caseRecordComplete(caseData) ? 'case-intro' : 'ready',
@@ -797,32 +805,38 @@
     intro.textContent = caseData.intro;
     box.appendChild(intro);
 
+    const selectedMode = captureSession.caseDifficulty === 'deep' ? 'deep' : 'fresh';
+    const selectedModeJP = selectedMode === 'deep'
+      ? '<ruby>深<rt>ふか</rt></ruby>い<ruby>記憶<rt>きおく</rt></ruby>'
+      : '<ruby>新<rt>あたら</rt></ruby>しい<ruby>記憶<rt>きおく</rt></ruby>';
+
     renderCaseDirection(
       box,
-      'Choose how you want to read this case.',
-      '<ruby>この<rt>この</rt></ruby><ruby>事件<rt>じけん</rt></ruby>の<ruby>読<rt>よ</rt></ruby>み<ruby>方<rt>かた</rt></ruby>を<ruby>選<rt>えら</rt></ruby>びましょう。'
+      `Your profile is set to ${selectedMode === 'deep' ? 'Deep Memory' : 'Fresh Memory'}. Start with that mode, or choose the other one for this case.`,
+      `プロフィールの<ruby>設定<rt>せってい</rt></ruby>は${selectedModeJP}です。この<ruby>事件<rt>じけん</rt></ruby>ではその<ruby>読<rt>よ</rt></ruby>み<ruby>方<rt>かた</rt></ruby>を<ruby>始<rt>はじ</rt></ruby>めるか、もう<ruby>一<rt>ひと</rt></ruby>つの<ruby>読<rt>よ</rt></ruby>み<ruby>方<rt>かた</rt></ruby>を<ruby>選<rt>えら</rt></ruby>びましょう。`
     );
 
     const actions = document.createElement('div');
     actions.className = 'muenba-case-actions';
-    actions.append(
-      caseActionButton(
-        'Fresh Memory',
-        '<ruby>新<rt>あたら</rt></ruby>しい<ruby>記憶<rt>きおく</rt></ruby>',
-        'muenba-case-fresh',
-        () => selectCaseDifficulty('fresh')
-      ),
-      caseActionButton(
-        'Deep Memory',
-        '<ruby>深<rt>ふか</rt></ruby>い<ruby>記憶<rt>きおく</rt></ruby>',
-        'muenba-case-deep',
-        () => selectCaseDifficulty('deep')
-      )
+    const freshButton = caseActionButton(
+      captureSession.caseDifficulty === 'fresh' ? 'Begin Fresh Memory' : 'Use Fresh Memory',
+      '<ruby>新<rt>あたら</rt></ruby>しい<ruby>記憶<rt>きおく</rt></ruby>',
+      'muenba-case-fresh',
+      () => selectCaseDifficulty('fresh')
     );
+    const deepButton = caseActionButton(
+      captureSession.caseDifficulty === 'deep' ? 'Begin Deep Memory' : 'Use Deep Memory',
+      '<ruby>深<rt>ふか</rt></ruby>い<ruby>記憶<rt>きおく</rt></ruby>',
+      'muenba-case-deep',
+      () => selectCaseDifficulty('deep')
+    );
+    if (captureSession.caseDifficulty === 'fresh') freshButton.classList.add('is-selected');
+    if (captureSession.caseDifficulty === 'deep') deepButton.classList.add('is-selected');
+    actions.append(freshButton, deepButton);
     box.appendChild(actions);
 
     captureOverlay.classList.add('open');
-    focusCaptureControl('#muenba-case-fresh');
+    focusCaptureControl(`#muenba-case-${captureSession.caseDifficulty || 'fresh'}`);
   }
 
   function selectCaseDifficulty(difficulty) {
@@ -1712,6 +1726,7 @@
       .muenba-case-direction rt, .muenba-case-action rt { font-size:.78em; opacity:.95; }
       .muenba-case-actions { display:flex; justify-content:center; gap:9px; flex-wrap:wrap; margin-top:6px; }
       .muenba-case-action { min-width:150px; display:inline-flex; flex-direction:column; align-items:center; gap:3px; }
+      .muenba-case-action.is-selected { border-color:#d8c98b; background:rgba(216,201,139,.2); box-shadow:0 0 18px rgba(216,201,139,.2); }
       .muenba-case-action small { color:#a8cbb8; font:400 .76rem Georgia,'Times New Roman',serif; letter-spacing:0; }
       .muenba-case-choices { display:grid; gap:9px; margin:14px 0 4px; }
       .muenba-case-choice { width:100%; padding:12px 14px; border:1px solid rgba(216,201,139,.34); border-radius:10px; background:rgba(216,201,139,.07); color:#fff5d5; font:400 .9rem Georgia,'Times New Roman',serif; line-height:1.4; text-align:left; cursor:pointer; }
