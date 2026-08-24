@@ -207,6 +207,8 @@
       box-shadow: 0 3px 0 rgba(0,0,0,.28), 0 0 16px rgba(216,168,255,.28), inset 0 1px rgba(255,255,255,.18);
     }
     .difficulty-option.is-active small { color: #d6cbe9; }
+    .drifter-memory-progress { margin: 8px 0 0; color: var(--quiet); font: .66rem/1.45 var(--sans); letter-spacing: .04em; }
+    .drifter-memory-progress strong { color: var(--gold); }
     .difficulty-note { margin: 12px 2px 0; color: var(--muted); font-size: .82rem; line-height: 1.55; }
     .difficulty-note small { display: block; margin-top: 4px; color: var(--quiet); font-size: .82em; }
 
@@ -301,7 +303,7 @@
       }
 
       function setDifficulty(value) {
-        if (value !== 'fresh' && value !== 'deep') return;
+        if (!['start', 'fresh', 'deep'].includes(value)) return;
         try {
           const data = getSave();
           if (!data.utsuroba) data.utsuroba = {};
@@ -314,16 +316,21 @@
 
       function difficultyMarkup() {
         const current = getDifficulty();
-        const note = current === 'fresh'
-          ? 'The same stories, told in shorter, simpler words.'
-          : 'The full stories, the way they were first written.';
-        const noteJP = current === 'fresh'
-          ? '同じ物語を、短くやさしい言葉で伝えます。'
-          : '最初に書かれたままの、完全な物語です。';
+        const note = current === 'start'
+          ? 'A gentle first step with very short sentences and clear clues.'
+          : current === 'fresh'
+            ? 'The same stories, told in shorter, simpler words.'
+            : 'The full stories, the way they were first written.';
+        const noteJP = current === 'start'
+          ? '短い文と分かりやすい手がかりで、最初の一歩を始めます。'
+          : current === 'fresh'
+            ? '同じ物語を、短くやさしい言葉で伝えます。'
+            : '最初に書かれたままの、完全な物語です。';
         return `<section class="section">
           <div class="section-heading"><h2>How This Reads</h2><p>読み方</p></div>
           <div class="difficulty-card">
             <div class="difficulty-toggle" role="group" aria-label="Reading difficulty">
+              <button type="button" class="difficulty-option${current === 'start' ? ' is-active' : ''}" data-difficulty="start" aria-pressed="${current === 'start'}">Start Memory<small>${rb('始', 'はじ')}めの${rb('記憶', 'きおく')}</small></button>
               <button type="button" class="difficulty-option${current === 'fresh' ? ' is-active' : ''}" data-difficulty="fresh" aria-pressed="${current === 'fresh'}">Fresh Memory<small>${rb('新', 'あたら')}しい${rb('記憶', 'きおく')}</small></button>
               <button type="button" class="difficulty-option${current === 'deep' ? ' is-active' : ''}" data-difficulty="deep" aria-pressed="${current === 'deep'}">Deep Memory<small>${rb('深', 'ふか')}い${rb('記憶', 'きおく')}</small></button>
             </div>
@@ -360,6 +367,13 @@
         return !!(drifter && drifter.episodeId && utsu.readingEchoes && utsu.readingEchoes[drifter.episodeId]);
       }
 
+      function modeComplete(utsu, drifter, mode) {
+        const record = utsu.drifters && drifter ? utsu.drifters[drifter.id] : null;
+        const completed = record && record.completedModes && record.completedModes[mode];
+        if (Array.isArray(completed)) return completed.length >= Number(drifter?.memoryCount || 1);
+        return mode === 'deep' && Array.isArray(record?.completed) && record.completed.length >= Number(drifter?.memoryCount || 1);
+      }
+
       function render() {
         const data = getSave();
         const utsu = data.utsuroba || {};
@@ -385,6 +399,7 @@
 
         const drifterCards = drifters.map(drifter => {
           const restored = restoredFor(utsu, drifter);
+          const modeProgress = ['start', 'fresh', 'deep'].map(mode => `${mode === 'start' ? 'Start' : mode === 'fresh' ? 'Fresh' : 'Deep'}: ${modeComplete(utsu, drifter, mode) ? 'complete' : 'open'}`).join(' · ');
           const echo = utsu.readingEchoes && utsu.readingEchoes[drifter.episodeId];
           const episode = episodeFor(drifter.episodeId, echo && echo.difficulty);
           const story = restored
@@ -396,6 +411,7 @@
               <h3 class="drifter-name">${esc(drifter.name)}<small>${esc(drifter.nameKanji || '')}</small></h3>
             </div>
             <p class="drifter-state">${restored ? `Memory restored · ${rb('記憶', 'きおく')}が${rb('戻', 'もど')}った` : 'Still wandering · まださまよう'}</p>
+            <p class="drifter-memory-progress"><strong>${esc(getDifficulty().toUpperCase())}</strong> mode · ${esc(modeProgress)}</p>
             <p class="drifter-story">${esc(story)}</p>
           </article>`;
         }).join('');
