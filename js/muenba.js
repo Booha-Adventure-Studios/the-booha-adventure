@@ -142,7 +142,8 @@
     celebrateSettleStart: 0,
     celebrationDeposit: 0,
     celebrationTimer: 0,
-    celebrationFinishing: false
+    celebrationFinishing: false,
+    handoffResolving: false
   };
 
   let app;
@@ -168,6 +169,7 @@
   let returnPortalOpen = false;
   let returnPortalCooldownUntil = 0;
   let returnNuppiHint = null;
+  let celebrationStatus = null;
   let lobbyOverlay = null;
   let lobbyOpen = false;
   // Ghost hunting core loop (Pass 7): the current room's wandering ghost
@@ -1860,7 +1862,7 @@
   }
 
   function depositOrbsAtNuppi() {
-    if (state.roomId !== MUENBA_NUPPI.roomId || !lobbyOpen) return false;
+    if (state.roomId !== MUENBA_NUPPI.roomId || !lobbyOpen || state.handoffResolving) return false;
     const d = loadSave();
     if (!d.muenba || typeof d.muenba !== 'object') d.muenba = {};
     const mu = d.muenba;
@@ -1869,10 +1871,14 @@
       renderRoomNuppiPopup();
       return false;
     }
+    state.handoffResolving = true;
     const collected = Number.isInteger(mu.orbsCollected) ? mu.orbsCollected : 0;
     mu.orbsCollected = collected + pending;
     mu.orbsPending = 0;
-    if (!writeSave(d)) return false;
+    if (!writeSave(d)) {
+      state.handoffResolving = false;
+      return false;
+    }
 
     setReturnToNuppiPending(false);
     lobbyOpen = false;
@@ -1916,6 +1922,10 @@
     state.moving = false;
     activeGhost = null;
     muenbaDanceSparkles = [];
+    if (celebrationStatus) {
+      celebrationStatus.innerHTML = 'ENERGY RETURNED<small>エネルギーが戻った</small>';
+      celebrationStatus.classList.add('open');
+    }
     try { music.pause(); } catch (_) {}
     try {
       muenbaDance.currentTime = 0;
@@ -1941,7 +1951,9 @@
       state.celebrateDancing = false;
       state.celebrateSettling = false;
       state.celebrationFinishing = false;
+      state.handoffResolving = false;
       muenbaDanceSparkles = [];
+      if (celebrationStatus) celebrationStatus.classList.remove('open');
       stopMuenbaDance();
       try { music.play().catch(() => {}); } catch (_) {}
       state.inputLocked = false;
@@ -2243,6 +2255,10 @@
       #muenba-return-nuppi-hint { position:fixed; left:50%; top:12px; z-index:90; display:none; transform:translateX(-50%); padding:8px 14px; border:1px solid rgba(216,201,139,.72); border-radius:999px; background:rgba(20,24,14,.86); color:#fff5d5; box-shadow:0 0 18px rgba(216,201,139,.28); font:700 10px/1.25 ui-monospace,monospace; letter-spacing:.08em; text-align:center; pointer-events:none; }
       #muenba-return-nuppi-hint.open { display:block; }
       #muenba-return-nuppi-hint small { display:block; margin-top:3px; color:#c7d9c5; font:400 .82em Georgia,'Times New Roman',serif; letter-spacing:.04em; }
+      #muenba-celebration-status { position:fixed; left:50%; top:12px; z-index:91; display:none; transform:translateX(-50%); padding:9px 17px; border:1px solid rgba(255,226,120,.82); border-radius:999px; background:rgba(42,31,9,.88); color:#fff5d5; box-shadow:0 0 22px rgba(255,211,75,.4), inset 0 0 12px rgba(255,226,120,.12); font:700 10px/1.25 ui-monospace,monospace; letter-spacing:.1em; text-align:center; pointer-events:none; animation:muenbaCelebrationPulse 1.1s ease-in-out infinite; }
+      #muenba-celebration-status.open { display:block; }
+      #muenba-celebration-status small { display:block; margin-top:3px; color:#f1df9c; font:400 .82em Georgia,'Times New Roman',serif; letter-spacing:.04em; }
+      @keyframes muenbaCelebrationPulse { 0%,100% { box-shadow:0 0 16px rgba(255,211,75,.28), inset 0 0 10px rgba(255,226,120,.08); } 50% { box-shadow:0 0 34px rgba(255,211,75,.62), inset 0 0 16px rgba(255,226,120,.18); } }
       #muenba-hide.active { background:rgba(93,162,124,.48); border-color:#7be8a9; color:#eafff2; box-shadow:0 0 26px rgba(93,208,140,.68), inset 0 0 14px rgba(93,208,140,.18); }
       /* Capture session overlay — reuses .muenba-lobby-box for
          the card shell and adds the two-lane
@@ -2286,7 +2302,7 @@
       @keyframes muenbaOrbRelease { from { opacity:0; transform:translateY(12px) scale(.35); } to { opacity:1; transform:translateY(0) scale(1); } }
       .muenba-orb-release-status { margin:0 0 18px !important; color:#9ccbb6 !important; font:700 .76rem/1.4 ui-monospace,monospace !important; text-align:center !important; letter-spacing:.05em; }
       @media (prefers-reduced-motion: reduce) { .muenba-orb-release, .muenba-hunt-ghost-portrait { animation:none; } }
-      @media (prefers-reduced-motion: reduce) { #muenba-fade, .muenba-return-box, #muenba-return-overlay, .muenba-lobby-box, #muenba-lobby-overlay, #muenba-capture-overlay { transition:none !important; } .muenba-lobby-portrait, #muenba-hide { animation:none !important; } }
+      @media (prefers-reduced-motion: reduce) { #muenba-fade, .muenba-return-box, #muenba-return-overlay, .muenba-lobby-box, #muenba-lobby-overlay, #muenba-capture-overlay { transition:none !important; } .muenba-lobby-portrait, #muenba-hide, #muenba-celebration-status { animation:none !important; } }
     `;
     document.head.appendChild(style);
   }
@@ -2330,6 +2346,12 @@
     returnNuppiHint.id = 'muenba-return-nuppi-hint';
     returnNuppiHint.innerHTML = 'RETURN TO NUPPI<small>ヌッピのところへ戻ろう</small>';
     document.body.appendChild(returnNuppiHint);
+
+    celebrationStatus = document.createElement('div');
+    celebrationStatus.id = 'muenba-celebration-status';
+    celebrationStatus.setAttribute('aria-live', 'polite');
+    celebrationStatus.setAttribute('aria-atomic', 'true');
+    document.body.appendChild(celebrationStatus);
 
     const dev = document.createElement('div');
     dev.id = 'muenba-dev';
@@ -3066,7 +3088,7 @@
     const pulse = REDUCED_MOTION ? .72 : .5 + .5 * Math.sin(seconds * 1.7);
     const x = MUENBA_NUPPI.x;
     const y = MUENBA_NUPPI.y + bob;
-    const highlighted = state.returnToNuppiPending;
+    const highlighted = state.returnToNuppiPending || state.celebrating;
     actorCtx.save();
     actorCtx.globalAlpha = .22 + pulse * .12;
     actorCtx.fillStyle = highlighted ? '#d8c98b' : '#7ab497';
