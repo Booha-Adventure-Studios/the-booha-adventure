@@ -192,6 +192,22 @@
       title: 'Fuzzle Forgot the Fright',
       eyebrow: 'GHOST CASE / CASE 01',
       intro: 'Fuzzle had one job: scare the next visitor. Now Fuzzle cannot remember what the scare was supposed to be.',
+      start: {
+        clues: [
+          { title: 'A hiding place', text: 'Fuzzle hid behind a gravestone.' },
+          { title: 'Three sounds', text: 'Fuzzle made three sounds: “Boo,” “Hiss,” and “Ta-da!”' },
+          { title: 'A lost choice', text: 'Fuzzle forgot which sound to use.' }
+        ],
+        prompt: 'Why was Fuzzle’s energy tangled?',
+        promptJP: 'フズルのエネルギーは<ruby>何<rt>なに</rt></ruby>で<ruby>絡<rt>から</rt></ruby>まりましたか？',
+        choices: [
+          'Fuzzle forgot one scare.',
+          'Fuzzle had too many scares.',
+          'Nuppi came too early.'
+        ],
+        correct: 1,
+        resolution: 'Fuzzle’s energy settles when Fuzzle chooses one scare.'
+      },
       fresh: {
         clues: [
           { title: 'The hiding place', text: 'Fuzzle waited behind a crooked gravestone.' },
@@ -231,6 +247,22 @@
       title: 'Glimmer Chased the Shine',
       eyebrow: 'GHOST CASE / CASE 02',
       intro: 'Glimmer wanted one perfect sparkle. After polishing it all night, Glimmer could not stop chasing every reflection it made.',
+      start: {
+        clues: [
+          { title: 'One small light', text: 'Glimmer had one small light.' },
+          { title: 'Many reflections', text: 'The light shone on leaves and stones.' },
+          { title: 'A busy chase', text: 'Glimmer chased every light it saw.' }
+        ],
+        prompt: 'Why did Glimmer’s energy scatter?',
+        promptJP: 'グリマーのエネルギーは<ruby>何<rt>なに</rt></ruby>で<ruby>散<rt>ち</rt></ruby>らばりましたか？',
+        choices: [
+          'Glimmer chased every reflection.',
+          'Nuppi turned off the lights.',
+          'A leaf hid the small light.'
+        ],
+        correct: 0,
+        resolution: 'Glimmer’s energy settles when Glimmer follows one light.'
+      },
       fresh: {
         clues: [
           { title: 'The tiny light', text: 'Glimmer sat on a gravestone with one pale spark balanced on its fingertip.' },
@@ -270,6 +302,22 @@
       title: 'Nibsy Lost the Little Sounds',
       eyebrow: 'GHOST CASE / CASE 03',
       intro: 'Nibsy collected tiny noises from every corner of Muenba. Now the sounds have mixed together, and Nibsy cannot remember which one belongs to which place.',
+      start: {
+        clues: [
+          { title: 'Three small sounds', text: 'Nibsy had a pebble sound, a leaf sound, and a faraway sound.' },
+          { title: 'Lost labels', text: 'The labels fell off the sounds.' },
+          { title: 'Mixed up', text: 'Nibsy put the sounds in the wrong places.' }
+        ],
+        prompt: 'Why was Nibsy’s energy tangled?',
+        promptJP: 'ニブシーのエネルギーは<ruby>何<rt>なに</rt></ruby>で<ruby>絡<rt>から</rt></ruby>まりましたか？',
+        choices: [
+          'Nibsy mixed up the small sounds.',
+          'The pebble made no sound.',
+          'Nuppi lost the pocket.'
+        ],
+        correct: 0,
+        resolution: 'Nibsy’s energy settles when each sound has its place.'
+      },
       fresh: {
         clues: [
           { title: 'The little collection', text: 'Nibsy carried three sounds in a pocket: a pebble plink, a leaf scritch, and a distant puff.' },
@@ -309,6 +357,22 @@
       title: 'Tinkley Rang Too Soon',
       eyebrow: 'GHOST CASE / CASE 04',
       intro: 'Tinkley prepared an invisible bell for a grand entrance. The bell kept ringing before the entrance happened, and the moment never felt right.',
+      start: {
+        clues: [
+          { title: 'An invisible bell', text: 'Tinkley had a bell that nobody could see.' },
+          { title: 'Too early', text: 'The bell rang before Nuppi came.' },
+          { title: 'Again and again', text: 'The bell rang three times too soon.' }
+        ],
+        prompt: 'Why was Tinkley’s energy tangled?',
+        promptJP: 'ティンクリーのエネルギーは<ruby>何<rt>なに</rt></ruby>で<ruby>絡<rt>から</rt></ruby>まりましたか？',
+        choices: [
+          'Tinkley rang the bell too early.',
+          'Nuppi hid the bell.',
+          'The bell was too quiet.'
+        ],
+        correct: 0,
+        resolution: 'Tinkley’s energy settles when the bell waits.'
+      },
       fresh: {
         clues: [
           { title: 'The invisible bell', text: 'Tinkley held both hands around a bell that nobody else could see.' },
@@ -348,6 +412,22 @@
       title: 'Twiddle Turned in Circles',
       eyebrow: 'GHOST CASE / CASE 05',
       intro: 'Twiddle found two possible paths through the cemetery. Every time a choice felt serious, Twiddle turned around and started the decision again.',
+      start: {
+        clues: [
+          { title: 'Two paths', text: 'Twiddle saw a crooked path and a mossy path.' },
+          { title: 'One choice', text: 'Twiddle chose the crooked path.' },
+          { title: 'A turn back', text: 'Twiddle changed its mind and walked back.' }
+        ],
+        prompt: 'Why was Twiddle’s energy tangled?',
+        promptJP: 'トゥイドルのエネルギーは<ruby>何<rt>なに</rt></ruby>で<ruby>絡<rt>から</rt></ruby>まりましたか？',
+        choices: [
+          'Twiddle changed its mind again and again.',
+          'The paths disappeared.',
+          'Nuppi moved the mossy path.'
+        ],
+        correct: 0,
+        resolution: 'Twiddle’s energy settles when Twiddle takes one path.'
+      },
       fresh: {
         clues: [
           { title: 'Two paths', text: 'Twiddle stood between a crooked path and a mossy path, holding one pebble in each hand.' },
