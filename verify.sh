@@ -17,7 +17,7 @@ echo "🔍 Booha Adventure pre-deploy check"
 echo "───────────────────────────────────"
 
 # ── 1. JSON validity (non-empty files must parse) ────────────
-echo "[1/12] Content JSON validity"
+echo "[1/13] Content JSON validity"
 json_bad=0; json_empty=0; json_ok=0
 while IFS= read -r f; do
   if [ "$(wc -c < "$f")" -le 2 ]; then
@@ -32,7 +32,7 @@ done < <(find content data -name "*.json" 2>/dev/null)
 [ $json_bad -eq 0 ] && ok "$json_ok JSON files valid ($json_empty empty placeholders skipped)"
 
 # ── 2. Service worker manifest: every CORE_FILES path exists ─
-echo "[2/12] sw.js CORE_FILES exist on disk (addAll is all-or-nothing)"
+echo "[2/13] sw.js CORE_FILES exist on disk (addAll is all-or-nothing)"
 sw_bad=0; sw_ok=0
 while IFS= read -r rel; do
   [ -z "$rel" ] && continue
@@ -49,7 +49,7 @@ done < <(sed -n '/const CORE_FILES = \[/,/\];/p' sw.js \
 [ $sw_bad -eq 0 ] && ok "$sw_ok precached files all present"
 
 # ── 3. Cache version constants in sync ───────────────────────
-echo "[3/12] Cache version sync (pages/assets/decks)"
+echo "[3/13] Cache version sync (pages/assets/decks)"
 versions=$(grep -oE "booha-(pages|assets|decks)-[A-Za-z0-9-]+" sw.js \
            | sed -E 's/booha-(pages|assets|decks)-//' | sort -u)
 vcount=$(echo "$versions" | grep -c .)
@@ -60,7 +60,7 @@ else
 fi
 
 # ── 4. Cache bump reminder (needs git) ───────────────────────
-echo "[4/12] Cache bump vs. changed files"
+echo "[4/13] Cache bump vs. changed files"
 if git rev-parse --git-dir >/dev/null 2>&1; then
   changed=$(git diff HEAD --name-only 2>/dev/null; git diff --cached --name-only 2>/dev/null)
   cached_changed=$(echo "$changed" | grep -cE '\.(html|js|css|json)$' || true)
@@ -75,7 +75,7 @@ else
 fi
 
 # ── 5. No leading-slash asset paths (GitHub Pages trap) ──────
-echo "[5/12] Leading-slash paths"
+echo "[5/13] Leading-slash paths"
 ls_hits=$(grep -rnE 'src="/[^/t]|href="/[^/t]' --include="*.html" . 2>/dev/null \
           | grep -v '/the-booha-adventure/' | head -5)
 if [ -z "$ls_hits" ]; then
@@ -85,7 +85,7 @@ else
 fi
 
 # ── 6. Script order: calendar.js before core stack ───────────
-echo "[6/12] calendar.js loads before core stack"
+echo "[6/13] calendar.js loads before core stack"
 order_bad=0
 while IFS= read -r page; do
   cal=$(grep -n 'calendar\.js' "$page" | head -1 | cut -d: -f1)
@@ -99,7 +99,7 @@ done < <(grep -rlE 'adventure-core\.js' --include="*.html" . 2>/dev/null)
 
 
 # ── 7. Juku content validation ───────────────────────────────
-echo "[7/12] juku.json content checks"
+echo "[7/13] juku.json content checks"
 juku_files=$(find content -name "juku.json" 2>/dev/null)
 if [ -z "$juku_files" ]; then
   warn "no juku.json files found"
@@ -169,28 +169,35 @@ PYEOF
 fi
 
 # ── 8. Utsuroba reading contracts ───────────────────────────
-echo "[8/12] Utsuroba episode audit"
+echo "[8/13] Utsuroba episode audit"
 if node tests/utsuroba-episode-audit.cjs >/dev/null 2>&1; then
   ok "Utsuroba episode data and answer contracts pass"
 else
   bad "Utsuroba episode audit failed"
 fi
 
-echo "[9/12] Utsuroba journal audit"
+echo "[9/13] Utsuroba journal audit"
 if node tests/utsuroba-journal-audit.cjs >/dev/null 2>&1; then
   ok "Utsuroba reading journal contracts pass"
 else
   bad "Utsuroba journal audit failed"
 fi
 
-echo "[10/12] Muenba case audit"
+echo "[10/13] Muenba case audit"
 if node tests/muenba-case-audit.cjs >/dev/null 2>&1; then
   ok "Muenba case order and English-only record contracts pass"
 else
   bad "Muenba case audit failed"
 fi
 
-echo "[11/12] Feed Booha level audit"
+echo "[11/13] Muenba memory progress audit"
+if node tests/muenba-memory-progress-audit.cjs >/dev/null 2>&1; then
+  ok "Muenba memory migration and per-mode progress contracts pass"
+else
+  bad "Muenba memory progress audit failed"
+fi
+
+echo "[12/13] Feed Booha level audit"
 if node tests/feed-level-audit.cjs >/dev/null 2>&1; then
   ok "Feed Booha geometry and timing guardrails pass"
 else
@@ -198,7 +205,7 @@ else
 fi
 
 # ── 9. Feed Booha playability simulation ────────────────────
-echo "[12/12] Feed Booha playability simulation"
+echo "[13/13] Feed Booha playability simulation"
 if node tests/feed-playability-audit.cjs >/dev/null 2>&1; then
   ok "Feed Booha has a simulated successful feed path for all 50 levels"
 else

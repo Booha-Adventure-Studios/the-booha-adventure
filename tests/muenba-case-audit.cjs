@@ -43,7 +43,7 @@ for (const caseId of data.caseOrder) {
   englishOnly(caseData.intro, `${caseId}.intro`);
   const correctPositions = [];
 
-  for (const modeName of ['fresh', 'deep']) {
+  for (const modeName of ['start', 'fresh', 'deep']) {
     const mode = caseData[modeName];
     assert(mode, `${caseId}.${modeName} is required`);
     assert(Array.isArray(mode.clues) && mode.clues.length === 3, `${caseId}.${modeName}.clues must contain exactly three records`);
@@ -63,9 +63,15 @@ for (const caseId of data.caseOrder) {
     correctPositions.push(mode.correct);
     englishOnly(mode.resolution, `${caseId}.${modeName}.resolution`);
   }
-  assert.notStrictEqual(caseData.fresh.prompt, caseData.deep.prompt, `${caseId} Fresh and Deep prompts must differ`);
-  assert.notStrictEqual(caseData.fresh.resolution, caseData.deep.resolution, `${caseId} Fresh and Deep resolutions must differ`);
-  assert.notDeepStrictEqual(caseData.fresh.choices, caseData.deep.choices, `${caseId} Fresh and Deep choices must differ`);
+  const modes = ['start', 'fresh', 'deep'];
+  for (const leftMode of modes) {
+    for (const rightMode of modes) {
+      if (leftMode >= rightMode) continue;
+      assert.notStrictEqual(caseData[leftMode].prompt, caseData[rightMode].prompt, `${caseId} ${leftMode} and ${rightMode} prompts must differ`);
+      assert.notStrictEqual(caseData[leftMode].resolution, caseData[rightMode].resolution, `${caseId} ${leftMode} and ${rightMode} resolutions must differ`);
+      assert.notDeepStrictEqual(caseData[leftMode].choices, caseData[rightMode].choices, `${caseId} ${leftMode} and ${rightMode} choices must differ`);
+    }
+  }
   positionMap.set(caseId, correctPositions);
 }
 
