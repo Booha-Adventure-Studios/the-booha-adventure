@@ -5,11 +5,11 @@
 // ============================================================
 
 const CURRENT_CACHES = {
-  // Muenba ghost readability pass: invalidate the previous deployed bundle
-  // so the larger cropped ghosts and glowing Hide button are visible.
-  pages:  'booha-pages-2026-258',
-  assets: 'booha-assets-2026-258',
-  decks:  'booha-decks-2026-258',
+  // Muenba target collection pass: invalidate the previous deployed bundle
+  // so only Nuppi's active case ghost can be captured.
+  pages:  'booha-pages-2026-259',
+  assets: 'booha-assets-2026-259',
+  decks:  'booha-decks-2026-259',
 };
 
 const PAGE_CACHE  = CURRENT_CACHES.pages;

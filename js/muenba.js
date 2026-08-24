@@ -726,6 +726,11 @@
   function clickCheckGhost(worldX, worldY) {
     if (!activeGhost || state.captureResolving) return false;
     if (Math.hypot(worldX - activeGhost.x, worldY - activeGhost.y) <= GHOST_CLICK_R) {
+      if (activeGhost.ghost.id !== currentHuntGhostId()) {
+        activeGhost.notTargetUntil = performance.now() + 500;
+        state.clickTarget = null;
+        return true;
+      }
       attemptCapture();
       return true;
     }
@@ -733,7 +738,7 @@
   }
 
   function attemptCapture() {
-    if (!activeGhost || state.captureResolving) return;
+    if (!activeGhost || state.captureResolving || activeGhost.ghost.id !== currentHuntGhostId()) return;
     const now = performance.now();
     const ghost = activeGhost.ghost;
     activeGhost.angryUntil = now + 900;
@@ -845,6 +850,11 @@
     return orderedMuenbaCases().find(caseData => !completed.has(caseData.id)) || null;
   }
 
+  function currentHuntGhostId() {
+    const next = nextMuenbaCase();
+    return next ? next.ghostId : null;
+  }
+
   function caseForGhost(ghostId) {
     const next = nextMuenbaCase();
     return next && next.ghostId === ghostId ? next : null;
@@ -889,6 +899,10 @@
   // scene while the session is open and respawned on cancel, so a failed or
   // abandoned attempt remains a soft miss rather than consuming the target.
   function beginCaptureSession(ghost) {
+    if (!ghost || ghost.id !== currentHuntGhostId()) {
+      state.captureResolving = false;
+      return;
+    }
     captureOpen = true;
     const caseData = caseForGhost(ghost && ghost.id);
     captureSession = {
@@ -2144,7 +2158,8 @@
 
   function openDevRhythmTest() {
     if (!DEV_MODE || captureOpen || lobbyOpen || returnPortalOpen) return;
-    const ghost = activeGhost?.ghost || GHOSTS[0];
+    const targetId = currentHuntGhostId();
+    const ghost = GHOSTS.find(candidate => candidate.id === targetId);
     if (!ghost) return;
     state.captureResolving = true;
     beginCaptureSession(ghost);
