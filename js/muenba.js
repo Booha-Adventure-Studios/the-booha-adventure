@@ -48,6 +48,7 @@
   // the way in. Sits at the same bottom-of-room_01 spot the 'fromKarasuki'
   // spawn already uses, so arriving and leaving feel like the same doorway.
   const KARASUKI_RETURN_PORTAL = { roomId: 'room_01', x: 768, y: 830, r: 44, triggerR: 36 };
+  const MUENBA_NUPPI = { roomId: 'room_01', x: 768, y: 250, hitR: 76, drawR: 54 };
   const POPUP_COOLDOWN_MS = 900;
 
   // ── Ghost hunting core loop (Pass 7) ────────────────────────────────────
@@ -130,7 +131,8 @@
     returnExiting: false,
     hiding: false,
     captureResolving: false,
-    dangerFlashUntil: 0
+    dangerFlashUntil: 0,
+    returnToNuppiPending: false
   };
 
   let app;
@@ -155,6 +157,7 @@
   let returnPortalOverlay = null;
   let returnPortalOpen = false;
   let returnPortalCooldownUntil = 0;
+  let returnNuppiHint = null;
   let lobbyOverlay = null;
   let lobbyOpen = false;
   // Ghost hunting core loop (Pass 7): the current room's wandering ghost
@@ -1797,13 +1800,24 @@
     reward.actionsEl = actions;
   }
 
+  function setReturnToNuppiPending(pending) {
+    state.returnToNuppiPending = !!pending;
+    if (returnNuppiHint) returnNuppiHint.classList.toggle('open', state.returnToNuppiPending);
+  }
+
+  function leaveCaptureForNuppi() {
+    if (!captureSession || !['reward', 'nuppi-recovery'].includes(captureSession.phase)) return;
+    closeCaptureOverlay({ resumeHunt: true });
+    setReturnToNuppiPending(true);
+  }
+
   function releaseNextOrb() {
     if (!captureSession || captureSession.phase !== 'reward' || !captureSession.reward) return;
     const reward = captureSession.reward;
     if (reward.revealed >= reward.total) {
       if (reward.statusEl) reward.statusEl.textContent = `Energy released: ${reward.total} / ${reward.total}`;
       if (reward.actionsEl && !reward.actionsEl.children.length) {
-        reward.actionsEl.appendChild(captureButton('Return to Nuppi', 'muenba-capture-return', depositOrbsAtNuppi));
+        reward.actionsEl.appendChild(captureButton('Return to Nuppi', 'muenba-capture-return', leaveCaptureForNuppi));
         focusCaptureControl('#muenba-capture-return');
       }
       return;
@@ -1906,7 +1920,7 @@
     );
     const actions = document.createElement('div');
     actions.className = 'muenba-lobby-actions';
-    actions.appendChild(captureButton('Return orbs to Nuppi', 'muenba-capture-return', depositOrbsAtNuppi));
+    actions.appendChild(captureButton('Return to Nuppi', 'muenba-capture-return', leaveCaptureForNuppi));
     box.appendChild(actions);
     captureOverlay.classList.add('open');
     focusCaptureControl('#muenba-capture-return');
@@ -2074,6 +2088,7 @@
       .muenba-lobby-box p { margin:0 0 14px; color:#c5d8cd; font-size:.92rem; line-height:1.65; text-align:left; }
       .muenba-lobby-box p.jp-line { color:#8fa89b; font-size:.82rem; }
       .muenba-lobby-box p:last-of-type { margin-bottom:20px; }
+      .muenba-room-nuppi-box { border-color:rgba(156,203,182,.58); box-shadow:0 24px 80px rgba(0,0,0,.8),0 0 60px rgba(122,180,151,.24),inset 0 0 70px rgba(0,0,0,.58); }
       .muenba-ghost-flavor { margin:12px 0 16px !important; padding:10px 12px; border-left:2px solid rgba(216,201,139,.5); background:rgba(216,201,139,.06); color:#e7dca9 !important; font-size:.86rem !important; font-style:italic; line-height:1.5 !important; text-align:center !important; }
       .muenba-lobby-box.is-case-board { width:min(600px,100%); padding:34px 30px 32px; border-color:rgba(216,201,139,.48); box-shadow:0 24px 80px rgba(0,0,0,.8),0 0 70px rgba(126,111,48,.18),inset 0 0 70px rgba(0,0,0,.58); }
       .muenba-lobby-case-board { margin:22px 0 24px; padding:21px 20px 19px; border:1px solid rgba(216,201,139,.4); border-radius:12px; background:linear-gradient(145deg,rgba(216,201,139,.1),rgba(216,201,139,.025)); text-align:left; }
@@ -2083,7 +2098,7 @@
       .muenba-lobby-case-board p.muenba-case-direction-jp { color:#9fc3af; font-size:.84rem; }
       .muenba-case-board-eyebrow { margin:0 0 8px; color:#d8c98b; font:700 .62rem/1.4 ui-monospace,monospace; letter-spacing:.16em; text-transform:uppercase; }
       .muenba-lobby-actions { display:flex; justify-content:center; margin-top:4px; }
-      #muenba-lobby-begin, .muenba-capture-action { border:1px solid rgba(156,203,182,.7); color:#e0f4e9; background:rgba(52,104,78,.28); box-shadow:0 0 16px rgba(93,162,124,.22); border-radius:999px; padding:10px 28px; font:700 12px ui-monospace,monospace; letter-spacing:.05em; cursor:pointer; }
+      #muenba-lobby-begin, #muenba-room-nuppi-close, .muenba-capture-action { border:1px solid rgba(156,203,182,.7); color:#e0f4e9; background:rgba(52,104,78,.28); box-shadow:0 0 16px rgba(93,162,124,.22); border-radius:999px; padding:10px 28px; font:700 12px ui-monospace,monospace; letter-spacing:.05em; cursor:pointer; }
       #muenba-case-board-next, #muenba-hunt-card-begin { min-width:190px; padding:13px 38px; border-color:rgba(216,201,139,.9); color:#fff5d5; background:rgba(126,111,48,.3); box-shadow:0 0 24px rgba(216,201,139,.34),inset 0 0 12px rgba(216,201,139,.12); font-size:13px; }
       #muenba-case-board-next:hover, #muenba-case-board-next:focus-visible, #muenba-hunt-card-begin:hover, #muenba-hunt-card-begin:focus-visible { background:rgba(126,111,48,.48); box-shadow:0 0 34px rgba(216,201,139,.48),inset 0 0 16px rgba(216,201,139,.16); }
       .muenba-hunt-card { width:min(560px,100%); padding:30px 28px 28px; border-color:rgba(216,201,139,.58); box-shadow:0 24px 80px rgba(0,0,0,.82),0 0 70px rgba(126,111,48,.22),inset 0 0 70px rgba(0,0,0,.58); }
@@ -2093,7 +2108,7 @@
       .muenba-hunt-card h2 { font-size:clamp(1.35rem,4vw,1.85rem); }
       .muenba-hunt-helper { margin:18px 0 10px !important; padding:13px 14px; border:1px solid rgba(219,130,130,.34); border-left:3px solid rgba(219,130,130,.72); border-radius:10px; background:rgba(125,24,34,.12); color:#ffe2df !important; font-size:.92rem !important; line-height:1.55 !important; text-align:left !important; }
       .muenba-hunt-helper-jp { margin:0 0 20px !important; color:#d6b6b1 !important; font-size:.82rem !important; line-height:1.65 !important; text-align:left !important; }
-      #muenba-lobby-begin:hover, #muenba-lobby-begin:focus-visible, .muenba-capture-action:hover, .muenba-capture-action:focus-visible { background:rgba(52,104,78,.44); outline:none; }
+      #muenba-lobby-begin:hover, #muenba-lobby-begin:focus-visible, #muenba-room-nuppi-close:hover, #muenba-room-nuppi-close:focus-visible, .muenba-capture-action:hover, .muenba-capture-action:focus-visible { background:rgba(52,104,78,.44); outline:none; }
       .muenba-case-eyebrow { margin:0 0 8px; color:#d8c98b; font:700 10px/1.4 ui-monospace,monospace; letter-spacing:.15em; }
       .muenba-case-progress { margin:0 0 10px; color:#9ccbb6; font:700 10px/1.4 ui-monospace,monospace; letter-spacing:.12em; }
       .muenba-case-record { margin:15px 0 18px !important; padding:14px 15px; border-left:3px solid #d8c98b; background:rgba(216,201,139,.08); color:#fff5d5 !important; font-size:1rem !important; line-height:1.65 !important; text-align:left !important; }
@@ -2119,6 +2134,9 @@
       #muenba-hide { position:fixed; left:12px; bottom:12px; z-index:100; border:1px solid rgba(156,203,182,.72); border-radius:8px; background:rgba(0,8,12,.82); color:#e6fff1; padding:8px 16px; font:700 11px ui-monospace,monospace; letter-spacing:.05em; cursor:pointer; box-shadow:0 0 12px rgba(93,208,140,.28), inset 0 0 10px rgba(93,208,140,.08); animation:muenbaHideGlow 1.8s ease-in-out infinite; }
       @keyframes muenbaHideGlow { 0%,100% { box-shadow:0 0 10px rgba(93,208,140,.22), inset 0 0 8px rgba(93,208,140,.06); } 50% { box-shadow:0 0 25px rgba(93,208,140,.58), 0 0 48px rgba(93,208,140,.18), inset 0 0 14px rgba(93,208,140,.16); } }
       #muenba-hide:hover, #muenba-hide:focus-visible { background:rgba(30,70,60,.8); outline:none; }
+      #muenba-return-nuppi-hint { position:fixed; left:50%; top:12px; z-index:90; display:none; transform:translateX(-50%); padding:8px 14px; border:1px solid rgba(216,201,139,.72); border-radius:999px; background:rgba(20,24,14,.86); color:#fff5d5; box-shadow:0 0 18px rgba(216,201,139,.28); font:700 10px/1.25 ui-monospace,monospace; letter-spacing:.08em; text-align:center; pointer-events:none; }
+      #muenba-return-nuppi-hint.open { display:block; }
+      #muenba-return-nuppi-hint small { display:block; margin-top:3px; color:#c7d9c5; font:400 .82em Georgia,'Times New Roman',serif; letter-spacing:.04em; }
       #muenba-hide.active { background:rgba(93,162,124,.48); border-color:#7be8a9; color:#eafff2; box-shadow:0 0 26px rgba(93,208,140,.68), inset 0 0 14px rgba(93,208,140,.18); }
       /* Capture session overlay — reuses .muenba-lobby-box for
          the card shell and adds the two-lane
@@ -2201,6 +2219,11 @@
     hideBtn.textContent = 'Hide';
     hideBtn.addEventListener('click', toggleHide);
     document.body.appendChild(hideBtn);
+
+    returnNuppiHint = document.createElement('div');
+    returnNuppiHint.id = 'muenba-return-nuppi-hint';
+    returnNuppiHint.innerHTML = 'RETURN TO NUPPI<small>ヌッピのところへ戻ろう</small>';
+    document.body.appendChild(returnNuppiHint);
 
     const dev = document.createElement('div');
     dev.id = 'muenba-dev';
@@ -2481,6 +2504,7 @@
     state.hiding = false;
     state.captureResolving = false;
     stopDangerScream();
+    setReturnToNuppiPending(Number(readMuenba().orbsPending) > 0 || state.returnToNuppiPending);
     if (hideBtn) { hideBtn.classList.remove('active'); hideBtn.textContent = 'Hide'; }
     markMuenbaRoomVisited(roomId);
     spawnRoomGhost(roomId);
@@ -2681,6 +2705,14 @@
     return false;
   }
 
+  function clickCheckNuppi(worldX, worldY) {
+    if (state.roomId !== MUENBA_NUPPI.roomId || lobbyOpen || captureOpen) return false;
+    const bob = REDUCED_MOTION ? 0 : Math.sin(performance.now() / 1000 * 2.1) * 5;
+    if (Math.hypot(worldX - MUENBA_NUPPI.x, worldY - (MUENBA_NUPPI.y + bob)) > MUENBA_NUPPI.hitR) return false;
+    openRoomNuppiPopup();
+    return true;
+  }
+
   // ── Player name helper (Pass 3b) ────────────────────────────────────────
   // muenba.html doesn't load karasuki.js or any of the blitz files, so the
   // getBoohaFirstName()/getPlayerName() helpers those files already define
@@ -2846,6 +2878,83 @@
   function closeNuppiLobby() {
     lobbyOpen = false;
     if (lobbyOverlay) lobbyOverlay.classList.remove('open');
+  }
+
+  function renderRoomNuppiPopup() {
+    if (!lobbyOverlay) return;
+    const name = getPlayerFirstName();
+    const pending = Number(readMuenba().orbsPending) > 0;
+    const waitingForCase = !pending && !!nextMuenbaCase();
+    const waitingLine = name ? `I'm waiting, ${name}.` : "I'm waiting.";
+    const copy = pending
+      ? 'The ghost energy is waiting here. Nuppi is ready for the handoff.'
+      : waitingForCase
+        ? waitingLine
+        : 'Nuppi is here when you are ready.';
+    const copyJp = pending
+      ? '<ruby>幽霊<rt>ゆうれい</rt></ruby>のエネルギーはここで<ruby>待<rt>ま</rt></ruby>っています。ヌッピは<ruby>受<rt>う</rt></ruby>け<ruby>取<rt>と</rt></ruby>る<ruby>準備<rt>じゅんび</rt></ruby>ができています。'
+      : waitingForCase
+        ? '<ruby>待<rt>ま</rt></ruby>っているよ。'
+        : 'ヌッピはここで<ruby>待<rt>ま</rt></ruby>っているよ。';
+    lobbyOverlay.innerHTML = `
+      <div class="muenba-lobby-box muenba-room-nuppi-box">
+        <img class="muenba-lobby-portrait" src="assets/img/wanderers/nuppi-2.png" alt="Nuppi">
+        <h2>Nuppi</h2>
+        <p class="jp">ヌッピ</p>
+        <p>${copy}</p>
+        <p class="jp-line">${copyJp}</p>
+        <div class="muenba-lobby-actions">
+          <button id="muenba-room-nuppi-close" type="button">Back to the hunt</button>
+        </div>
+      </div>`;
+    lobbyOverlay.querySelector('#muenba-room-nuppi-close').addEventListener('click', closeNuppiLobby);
+    focusLobbyControl('#muenba-room-nuppi-close');
+  }
+
+  function openRoomNuppiPopup() {
+    if (lobbyOpen || captureOpen || returnPortalOpen || !lobbyOverlay) return;
+    lobbyOpen = true;
+    state.clickTarget = null;
+    state.moving = false;
+    renderRoomNuppiPopup();
+    lobbyOverlay.classList.add('open');
+  }
+
+  function drawNuppi(now) {
+    if (state.roomId !== MUENBA_NUPPI.roomId) return;
+    const seconds = now / 1000;
+    const bob = REDUCED_MOTION ? 0 : Math.sin(seconds * 2.1) * 5;
+    const pulse = REDUCED_MOTION ? .72 : .5 + .5 * Math.sin(seconds * 1.7);
+    const x = MUENBA_NUPPI.x;
+    const y = MUENBA_NUPPI.y + bob;
+    const highlighted = state.returnToNuppiPending;
+    actorCtx.save();
+    actorCtx.globalAlpha = .22 + pulse * .12;
+    actorCtx.fillStyle = highlighted ? '#d8c98b' : '#7ab497';
+    actorCtx.shadowBlur = highlighted ? 28 : 20;
+    actorCtx.shadowColor = highlighted ? 'rgba(216,201,139,.72)' : 'rgba(122,180,151,.55)';
+    actorCtx.beginPath();
+    actorCtx.arc(x, y + 34, MUENBA_NUPPI.drawR * 1.1, 0, Math.PI * 2);
+    actorCtx.fill();
+    actorCtx.globalAlpha = .48 + pulse * .22;
+    actorCtx.strokeStyle = highlighted ? 'rgba(255,232,158,.9)' : 'rgba(169,226,196,.72)';
+    actorCtx.lineWidth = 2;
+    actorCtx.beginPath();
+    actorCtx.arc(x, y, MUENBA_NUPPI.drawR * (.98 + pulse * .08), 0, Math.PI * 2);
+    actorCtx.stroke();
+    actorCtx.restore();
+
+    actorCtx.save();
+    actorCtx.globalAlpha = .98;
+    if (nuppiLobbyImg.complete && nuppiLobbyImg.naturalWidth > 0) {
+      actorCtx.drawImage(nuppiLobbyImg, x - MUENBA_NUPPI.drawR, y - MUENBA_NUPPI.drawR, MUENBA_NUPPI.drawR * 2, MUENBA_NUPPI.drawR * 2);
+    } else {
+      actorCtx.fillStyle = '#a7e1c5';
+      actorCtx.beginPath();
+      actorCtx.arc(x, y, MUENBA_NUPPI.drawR * .72, 0, Math.PI * 2);
+      actorCtx.fill();
+    }
+    actorCtx.restore();
   }
 
   function drawReturnPortal(now) {
@@ -3110,6 +3219,7 @@
     actorCtx.clearRect(0, 0, WORLD_W, WORLD_H);
     drawAtmosphere(now);
     drawReturnPortal(now);
+    drawNuppi(now);
     drawExitArrows(now);
     drawGhost(now);
     drawBooha(now);
@@ -3139,6 +3249,7 @@
       return;
     }
     if (clickCheckReturnPortal(point.x, point.y)) return;
+    if (clickCheckNuppi(point.x, point.y)) return;
     if (clickCheckGhost(point.x, point.y)) return;
     if (Math.hypot(point.x - state.x, point.y - state.y) < 30) return;
     state.clickTarget = point;
