@@ -5,11 +5,11 @@
 // ============================================================
 
 const CURRENT_CACHES = {
-  // Muenba audio pass: invalidate the previous deployed bundle so the
-  // synchronized scream/rhythm handoff is live.
-  pages:  'booha-pages-2026-261',
-  assets: 'booha-assets-2026-261',
-  decks:  'booha-decks-2026-261',
+  // Muenba case-profile pass: invalidate the previous deployed bundle so
+  // case popups use the profile-selected memory mode.
+  pages:  'booha-pages-2026-262',
+  assets: 'booha-assets-2026-262',
+  decks:  'booha-decks-2026-262',
 };
 
 const PAGE_CACHE  = CURRENT_CACHES.pages;
