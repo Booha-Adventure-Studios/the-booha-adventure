@@ -6,6 +6,7 @@ const fs = require('fs');
 const path = require('path');
 
 const source = fs.readFileSync(path.join(__dirname, '..', 'js', 'muenba.js'), 'utf8');
+const profileSource = fs.readFileSync(path.join(__dirname, '..', 'muenba-profile.html'), 'utf8');
 const MODES = ['start', 'fresh', 'deep'];
 
 // Keep this audit intentionally small and data-shaped. It verifies the save-state
@@ -16,8 +17,8 @@ function migrateRecord(record) {
     const legacyMode = MODES.includes(next.difficulty) ? next.difficulty : 'fresh';
     next.completedModes = next.completed ? { [legacyMode]: true } : {};
   }
-  for (const mode of MODES) {
-    if (next.completedModes[mode] !== true) delete next.completedModes[mode];
+  for (const mode of Object.keys(next.completedModes)) {
+    if (!MODES.includes(mode) || next.completedModes[mode] !== true) delete next.completedModes[mode];
   }
   next.completed = MODES.every(mode => next.completedModes[mode] === true);
   return next;
@@ -48,16 +49,33 @@ function availableGhostIds(ghostIds, weeklyFound, targetId) {
   return ghostIds.filter(ghostId => ghostId === targetId || !weeklyFound[ghostId]);
 }
 
+function profileRecord(caseId, caseRecords, legacyCompletedIds) {
+  const record = caseRecords[caseId] && typeof caseRecords[caseId] === 'object' ? caseRecords[caseId] : {};
+  return !record.completedModes && legacyCompletedIds.includes(caseId)
+    ? { ...record, completed: false, completedModes: { fresh: true }, difficulty: 'fresh' }
+    : record;
+}
+
 assert(source.includes("const MUENBA_CASE_MODES = ['start', 'fresh', 'deep'];"), 'source must define all three memory modes');
 assert(source.includes('completedModes'), 'source must persist per-mode completion');
 assert(source.includes('caseModeIsComplete'), 'source must check completion for the selected mode');
 assert(source.includes('const availableGhosts = GHOSTS.filter(ghost => ghost.id === activeCaseGhostId || !weeklyFound || !weeklyFound[ghost.id])'), 'unfinished active cases must remain available after weekly capture');
 assert(source.includes('function activeMuenbaCaseGhost()'), 'selected-mode target ghost should have an explicit helper');
 assert(source.includes('ghost.id === (activeCaseGhost && activeCaseGhost.id) || !weeklyFound || !weeklyFound[ghost.id]'), 'weekly availability must preserve an unfinished case target');
+assert(source.includes('previousRecord.completed === true && MUENBA_CASE_MODES.includes(previousRecord.difficulty)'), 'legacy mode completion must survive a new mode capture');
+assert(source.includes('Object.keys(record.completedModes).forEach'), 'migration must clean invalid per-mode values');
+assert(profileSource.includes('const recordForCase = caseData =>'), 'profile should normalize legacy case progress before rendering');
 
 const legacy = migrateRecord({ completed: true, difficulty: 'fresh' });
 assert.deepStrictEqual(legacy.completedModes, { fresh: true }, 'legacy completed records should migrate to their recorded mode');
 assert.strictEqual(legacy.completed, false, 'one completed mode must not mark the whole case complete');
+const legacyProfileRecord = profileRecord('case_01', {}, ['case_01']);
+assert.deepStrictEqual(legacyProfileRecord.completedModes, { fresh: true }, 'profile should render legacy case IDs as Fresh Memory only');
+assert.strictEqual(legacyProfileRecord.completed, false, 'legacy profile progress must not appear fully complete');
+
+const invalidModes = migrateRecord({ completed: true, completedModes: { fresh: true, bogus: true, deep: 'yes' } });
+assert.deepStrictEqual(invalidModes.completedModes, { fresh: true }, 'invalid mode keys and values must be discarded');
+assert.strictEqual(invalidModes.completed, false, 'invalid mode data must not complete a case');
 
 let record = completeMode({ completed: false, completedModes: {} }, 'start');
 assert.strictEqual(isComplete(record, 'start'), true, 'Start Memory should be recorded');
