@@ -72,6 +72,7 @@
   const GHOST_TELEPORT_MAX_MS = 14000;
   const GHOST_TELEPORT_WARNING_MS = 1400;
   const GHOST_ROOM_EXIT_R = 42;
+  const GHOST_MIN_SPAWN_DISTANCE = 170;
   const ORB_REWARD_PER_CAPTURE = 3;
   const MUENBA_MUSIC_VOLUME = 0.55;
   const MUENBA_SCREAM_DUCK_VOLUME = 0.16;
@@ -655,6 +656,15 @@
     return clampToWorld(rect.x + Math.random() * rect.w, rect.y + Math.random() * rect.h);
   }
 
+  function pickGhostSpawnPosition() {
+    let candidate = pickGhostWanderTarget();
+    for (let attempt = 0; attempt < 14; attempt++) {
+      if (Math.hypot(candidate.x - state.x, candidate.y - state.y) >= GHOST_MIN_SPAWN_DISTANCE) return candidate;
+      candidate = pickGhostWanderTarget();
+    }
+    return candidate;
+  }
+
   function getGhostSprite(src) {
     if (ghostSpriteCache.has(src)) return ghostSpriteCache.get(src);
     const img = new Image();
@@ -725,7 +735,7 @@
     activeGhost = null;
     const ghost = getGhostRoomMap()[roomId];
     if (!ghost) return;
-    const pos = pickGhostWanderTarget();
+    const pos = pickGhostSpawnPosition();
     const hostility = ghostHostilityFor(ghost.id);
     activeGhost = {
       ghost,
@@ -782,6 +792,11 @@
     const g = activeGhost;
     if (state.hiding) {
       stopGhostScream(g);
+      // Coming out of hiding should always restart the encounter fairly. If
+      // the ghost cannot find an open neighboring room immediately, it must
+      // not retain an old sight timer or chase state and react on frame one.
+      g.chasing = false;
+      g.noticeStartedAt = 0;
       // Hiding ends a hostile encounter. Give the ghost a short beat to lose
       // interest, then let it leave the room entirely instead of waiting in
       // the same place for Booha to come back out.
