@@ -66,7 +66,12 @@
   // Hostile ghosts should give Booha a short readable beat, not several
   // seconds of silence while they stare at him.
   const GHOST_NOTICE_DELAY_MS = 900;
-  const GHOST_GIVEUP_HIDE_MS = 1100;
+  // Hiding is a deliberate choice, not an instant room reset. Let a hostile
+  // ghost search nearby for a few seconds so the player can feel why hiding
+  // was necessary before it finally slips into another room.
+  const GHOST_GIVEUP_HIDE_MS = 3000;
+  const GHOST_HIDE_SEARCH_SPEED = .45;
+  const GHOST_HIDE_SCREAM_FADE_MS = 650;
   const GHOST_STARTLE_COOLDOWN_MS = 1400;
   const GHOST_TELEPORT_MIN_MS = 8500;
   const GHOST_TELEPORT_MAX_MS = 14000;
@@ -757,6 +762,8 @@
       angryUntil: 0,
       startleUntil: 0,
       hideGiveupAt: 0,
+      hideSearchTarget: null,
+      hideScreamUntil: 0,
       roomId,
       roomTravelAt: 0,
       travelExit: null,
@@ -777,11 +784,23 @@
     g.y = next.y;
   }
 
+  function pickGhostHideSearchTarget() {
+    const angle = Math.random() * Math.PI * 2;
+    const distance = 78 + Math.random() * 58;
+    const target = clampToWorld(
+      state.x + Math.cos(angle) * distance,
+      state.y + Math.sin(angle) * distance,
+      GHOST_R
+    );
+    return canMoveTo(target.x, target.y) ? target : pickGhostWanderTarget();
+  }
+
   function startGhostScream(g, now, reason) {
     if (!g || g.hostility === 'friendly' || g.screaming) return;
     g.screaming = true;
     g.screamReason = reason;
     g.angryUntil = now + 1200;
+    g.hideScreamUntil = 0;
     startDangerScream();
   }
 
@@ -796,25 +815,38 @@
     if (!activeGhost) return;
     const g = activeGhost;
     if (state.hiding) {
-      stopGhostScream(g);
-      // Coming out of hiding should always restart the encounter fairly. If
-      // the ghost cannot find an open neighboring room immediately, it must
-      // not retain an old sight timer or chase state and react on frame one.
+      if (g.hostility === 'friendly') return;
+
+      // The scream fades after Booha hides, but the ghost remains visibly
+      // angry while it searches. This keeps the hide choice tense without
+      // allowing the hidden player to be caught.
+      if (g.screaming) {
+        if (!g.hideScreamUntil) g.hideScreamUntil = now + GHOST_HIDE_SCREAM_FADE_MS;
+        else if (now >= g.hideScreamUntil) stopGhostScream(g);
+      }
       g.chasing = false;
       g.noticeStartedAt = 0;
-      // Hiding ends a hostile encounter. Give the ghost a short beat to lose
-      // interest, then let it leave the room entirely instead of waiting in
-      // the same place for Booha to come back out.
-      if (g.hostility !== 'friendly') {
-        if (!g.hideGiveupAt) g.hideGiveupAt = now + GHOST_GIVEUP_HIDE_MS;
-        else if (now >= g.hideGiveupAt) {
-          if (teleportGhostToAnotherRoom(g, now)) return;
-          g.hideGiveupAt = now + 3000;
+      if (!g.hideGiveupAt) {
+        g.hideGiveupAt = now + GHOST_GIVEUP_HIDE_MS;
+        g.angryUntil = Math.max(g.angryUntil, g.hideGiveupAt);
+        g.hideSearchTarget = pickGhostHideSearchTarget();
+      } else if (now >= g.hideGiveupAt) {
+        if (teleportGhostToAnotherRoom(g, now)) return;
+        g.hideGiveupAt = now + 3000;
+        g.angryUntil = Math.max(g.angryUntil, g.hideGiveupAt);
+        g.hideSearchTarget = pickGhostHideSearchTarget();
+      }
+      if (g.hideSearchTarget) {
+        if (Math.hypot(g.x - g.hideSearchTarget.x, g.y - g.hideSearchTarget.y) < 12) {
+          g.hideSearchTarget = pickGhostHideSearchTarget();
         }
+        moveGhostToward(g, g.hideSearchTarget.x, g.hideSearchTarget.y, GHOST_HIDE_SEARCH_SPEED);
       }
       return;
     }
     g.hideGiveupAt = 0;
+    g.hideSearchTarget = null;
+    g.hideScreamUntil = 0;
     if (!g.roomTravelAt) scheduleGhostTeleport(g, now);
     if (g.teleporting) {
       if (now >= g.teleportAt) teleportGhostToAnotherRoom(g, now);
@@ -828,6 +860,7 @@
         g.chasing = false;
         g.noticeStartedAt = 0;
         g.hideGiveupAt = 0;
+        g.hideSearchTarget = null;
       }
       return;
     }
@@ -2161,6 +2194,35 @@
     const teleportProgress = teleporting
       ? Math.max(0, Math.min(1, (activeGhost.teleportAt - now) / GHOST_TELEPORT_WARNING_MS))
       : 1;
+
+    // A soft, stretched shadow anchors the ghost to the cemetery path. Keep
+    // it at the ground position while the sprite bobs above it, and let it
+    // breathe slightly with that hover so the ghost still feels weightless.
+    const shadowY = activeGhost.y + GHOST_DRAW_R * .72;
+    const shadowScale = Math.max(.82, Math.min(1.18, 1 + bob / 30));
+    actorCtx.save();
+    actorCtx.globalAlpha = (.22 + (isAngry ? .05 : 0)) * (teleporting ? .4 + teleportProgress * .6 : 1);
+    const shadow = actorCtx.createRadialGradient(
+      x, shadowY, 0,
+      x, shadowY, GHOST_DRAW_R * .86 * shadowScale
+    );
+    shadow.addColorStop(0, 'rgba(0, 0, 0, .58)');
+    shadow.addColorStop(.55, 'rgba(0, 0, 0, .24)');
+    shadow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    actorCtx.fillStyle = shadow;
+    actorCtx.beginPath();
+    actorCtx.ellipse(
+      x,
+      shadowY,
+      GHOST_DRAW_R * .82 * shadowScale,
+      GHOST_DRAW_R * .2,
+      0,
+      0,
+      Math.PI * 2
+    );
+    actorCtx.fill();
+    actorCtx.restore();
+
     actorCtx.save();
     actorCtx.globalAlpha = .95 * (teleporting ? .18 + teleportProgress * .82 : 1);
     if (teleporting) {
