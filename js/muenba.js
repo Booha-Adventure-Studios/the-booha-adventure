@@ -4367,8 +4367,23 @@
 
   function handleInput(clientX, clientY) {
     startMusic();
-    if (state.transitioning || state.inputLocked || returnPortalOpen || lobbyOpen || captureOpen || state.hiding) return;
+    if (state.transitioning || returnPortalOpen || lobbyOpen || captureOpen || state.hiding) return;
     const point = stagePoint(clientX, clientY);
+    // Pass 10: a tap during the entry-drift walk-to-center used to be
+    // silently swallowed by the inputLocked check below, so the drift kept
+    // snapping Booha to the room center regardless of what the player just
+    // tapped — that's the "teleport" bug. Treat a real tap as the player
+    // taking over: cancel the drift and walk to the tapped point instead,
+    // the same way any other click sets a destination.
+    if (entryDrift) {
+      if (Math.hypot(point.x - state.x, point.y - state.y) < 30) return;
+      entryDrift = null;
+      state.inputLocked = false;
+      state.distMovedSinceSpawn = Math.max(state.distMovedSinceSpawn, ARROW_MOVE_THRESHOLD);
+      state.clickTarget = point;
+      return;
+    }
+    if (state.inputLocked) return;
     if (clickCheckReturnPortal(point.x, point.y)) return;
     if (clickCheckNuppi(point.x, point.y)) return;
     if (clickCheckGhost(point.x, point.y)) return;
