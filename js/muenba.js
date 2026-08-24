@@ -72,6 +72,8 @@
   const MUENBA_SCREAM_DUCK_VOLUME = 0.16;
   const MUENBA_SCREAM_VOLUME = 0.78;
   const MUENBA_DANGER_RHYTHM_VOLUME = 0.62;
+  const MUENBA_DANCE_FALLBACK_MS = 11000;
+  const MUENBA_DANCE_SETTLE_MS = 750;
 
   // Pass 8B — first rhythm chart. It is intentionally short and forgiving:
   // no simultaneous notes, holds, combos, or punishment yet. The chart is
@@ -132,7 +134,15 @@
     hiding: false,
     captureResolving: false,
     dangerFlashUntil: 0,
-    returnToNuppiPending: false
+    returnToNuppiPending: false,
+    celebrating: false,
+    celebrateDancing: false,
+    celebrateSettling: false,
+    celebrateStart: 0,
+    celebrateSettleStart: 0,
+    celebrationDeposit: 0,
+    celebrationTimer: 0,
+    celebrationFinishing: false
   };
 
   let app;
@@ -230,6 +240,22 @@
   dangerRhythmMusic.preload = 'auto';
   dangerRhythmMusic.loop = true;
   dangerRhythmMusic.volume = MUENBA_DANGER_RHYTHM_VOLUME;
+  const muenbaDance = new Audio('assets/img/muenba/muenba_dance.mp3');
+  muenbaDance.preload = 'auto';
+  muenbaDance.loop = false;
+  muenbaDance.volume = 0.72;
+
+  const danceArmsUpImg = new Image();
+  danceArmsUpImg.src = 'assets/img/booha_ghost_dance_arms_up.png';
+  const danceSwayImg = new Image();
+  danceSwayImg.src = 'assets/img/booha_ghost_dance_sway.png';
+  const danceWaveImg = new Image();
+  danceWaveImg.src = 'assets/img/booha_ghost_dance_wave.png';
+  const MUENBA_DANCE_FRAMES = [
+    { img: danceArmsUpImg, contentScale: 0.817, offsetX: -0.007, offsetY: -0.026 },
+    { img: danceSwayImg, contentScale: 0.801, offsetX: 0.009, offsetY: -0.015 },
+    { img: danceWaveImg, contentScale: 0.811, offsetX: 0.009, offsetY: -0.009 }
+  ];
 
   function worldGateOpen() {
     // Deliberately NOT the weekly world gate — Muenba is still being built,
@@ -1834,20 +1860,97 @@
   }
 
   function depositOrbsAtNuppi() {
-    if (!captureSession || (captureSession.phase !== 'reward' && captureSession.phase !== 'nuppi-recovery')) return;
+    if (state.roomId !== MUENBA_NUPPI.roomId || !lobbyOpen) return false;
     const d = loadSave();
     if (!d.muenba || typeof d.muenba !== 'object') d.muenba = {};
     const mu = d.muenba;
     const pending = Number.isInteger(mu.orbsPending) ? mu.orbsPending : 0;
+    if (pending <= 0) {
+      renderRoomNuppiPopup();
+      return false;
+    }
     const collected = Number.isInteger(mu.orbsCollected) ? mu.orbsCollected : 0;
     mu.orbsCollected = collected + pending;
     mu.orbsPending = 0;
-    if (!writeSave(d)) return;
+    if (!writeSave(d)) return false;
 
-    captureSession.phase = 'nuppi';
-    captureSession.depositedOrbs = pending;
-    renderNuppiThanks(pending);
+    setReturnToNuppiPending(false);
+    lobbyOpen = false;
+    if (lobbyOverlay) lobbyOverlay.classList.remove('open');
+    startMuenbaCelebration(pending);
+    return true;
   }
+
+  let muenbaDanceSparkles = [];
+
+  function spawnMuenbaDanceSparkle(originX, originY) {
+    const colors = ['#ffd700', '#ffe066', '#fff0a0', '#c8960a', '#ffffff', '#fffde0'];
+    const angle = Math.random() * Math.PI * 2;
+    const radius = 12 + Math.random() * 32;
+    muenbaDanceSparkles.push({
+      x: originX + Math.cos(angle) * radius,
+      y: originY + Math.sin(angle) * radius,
+      vx: (Math.random() - 0.5) * 0.35,
+      vy: -(0.2 + Math.random() * 0.4),
+      life: 1,
+      size: 0.8 + Math.random() * 1.8,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      phase: Math.random() * Math.PI * 2
+    });
+  }
+
+  function stopMuenbaDance() {
+    try { muenbaDance.pause(); muenbaDance.currentTime = 0; } catch (_) {}
+  }
+
+  function startMuenbaCelebration(deposited) {
+    state.celebrating = true;
+    state.celebrateDancing = true;
+    state.celebrateSettling = false;
+    state.celebrateStart = performance.now();
+    state.celebrateSettleStart = 0;
+    state.celebrationDeposit = deposited;
+    state.celebrationFinishing = false;
+    state.inputLocked = true;
+    state.clickTarget = null;
+    state.moving = false;
+    activeGhost = null;
+    muenbaDanceSparkles = [];
+    try { music.pause(); } catch (_) {}
+    try {
+      muenbaDance.currentTime = 0;
+      muenbaDance.play().catch(() => {});
+    } catch (_) {}
+
+    const duration = Number.isFinite(muenbaDance.duration) && muenbaDance.duration > 0
+      ? Math.max(1200, Math.ceil(muenbaDance.duration * 1000))
+      : MUENBA_DANCE_FALLBACK_MS;
+    state.celebrationTimer = window.setTimeout(finishMuenbaCelebration, duration);
+  }
+
+  function finishMuenbaCelebration() {
+    if (!state.celebrating || state.celebrationFinishing) return;
+    state.celebrationFinishing = true;
+    state.celebrateSettling = true;
+    state.celebrateSettleStart = performance.now();
+    if (state.celebrationTimer) window.clearTimeout(state.celebrationTimer);
+    state.celebrationTimer = 0;
+    window.setTimeout(() => {
+      if (!state.celebrating) return;
+      state.celebrating = false;
+      state.celebrateDancing = false;
+      state.celebrateSettling = false;
+      state.celebrationFinishing = false;
+      muenbaDanceSparkles = [];
+      stopMuenbaDance();
+      try { music.play().catch(() => {}); } catch (_) {}
+      state.inputLocked = false;
+      spawnRoomGhost(state.roomId);
+      openNuppiAfterHandoff(state.celebrationDeposit);
+    }, MUENBA_DANCE_SETTLE_MS);
+  }
+
+  muenbaDance.addEventListener('ended', finishMuenbaCelebration);
 
   function renderNuppiThanks(deposited) {
     if (!captureSession || !captureOverlay) return;
@@ -2089,6 +2192,7 @@
       .muenba-lobby-box p.jp-line { color:#8fa89b; font-size:.82rem; }
       .muenba-lobby-box p:last-of-type { margin-bottom:20px; }
       .muenba-room-nuppi-box { border-color:rgba(156,203,182,.58); box-shadow:0 24px 80px rgba(0,0,0,.8),0 0 60px rgba(122,180,151,.24),inset 0 0 70px rgba(0,0,0,.58); }
+      .muenba-handoff-box { border-color:rgba(216,201,139,.68); box-shadow:0 24px 80px rgba(0,0,0,.8),0 0 70px rgba(216,201,139,.24),inset 0 0 70px rgba(0,0,0,.58); }
       .muenba-ghost-flavor { margin:12px 0 16px !important; padding:10px 12px; border-left:2px solid rgba(216,201,139,.5); background:rgba(216,201,139,.06); color:#e7dca9 !important; font-size:.86rem !important; font-style:italic; line-height:1.5 !important; text-align:center !important; }
       .muenba-lobby-box.is-case-board { width:min(600px,100%); padding:34px 30px 32px; border-color:rgba(216,201,139,.48); box-shadow:0 24px 80px rgba(0,0,0,.8),0 0 70px rgba(126,111,48,.18),inset 0 0 70px rgba(0,0,0,.58); }
       .muenba-lobby-case-board { margin:22px 0 24px; padding:21px 20px 19px; border:1px solid rgba(216,201,139,.4); border-radius:12px; background:linear-gradient(145deg,rgba(216,201,139,.1),rgba(216,201,139,.025)); text-align:left; }
@@ -2097,9 +2201,11 @@
       .muenba-lobby-case-board p.muenba-case-board-copy { color:#d9d0a5; font-size:.9rem; }
       .muenba-lobby-case-board p.muenba-case-direction-jp { color:#9fc3af; font-size:.84rem; }
       .muenba-case-board-eyebrow { margin:0 0 8px; color:#d8c98b; font:700 .62rem/1.4 ui-monospace,monospace; letter-spacing:.16em; text-transform:uppercase; }
-      .muenba-lobby-actions { display:flex; justify-content:center; margin-top:4px; }
+      .muenba-lobby-actions { display:flex; justify-content:center; gap:9px; flex-wrap:wrap; margin-top:4px; }
       #muenba-lobby-begin, #muenba-room-nuppi-close, .muenba-capture-action { border:1px solid rgba(156,203,182,.7); color:#e0f4e9; background:rgba(52,104,78,.28); box-shadow:0 0 16px rgba(93,162,124,.22); border-radius:999px; padding:10px 28px; font:700 12px ui-monospace,monospace; letter-spacing:.05em; cursor:pointer; }
       #muenba-case-board-next, #muenba-hunt-card-begin { min-width:190px; padding:13px 38px; border-color:rgba(216,201,139,.9); color:#fff5d5; background:rgba(126,111,48,.3); box-shadow:0 0 24px rgba(216,201,139,.34),inset 0 0 12px rgba(216,201,139,.12); font-size:13px; }
+      #muenba-handoff-later { border:1px solid rgba(156,203,182,.48); color:#c5d8cd; background:rgba(52,104,78,.12); box-shadow:none; border-radius:999px; padding:10px 24px; font:700 12px ui-monospace,monospace; letter-spacing:.05em; cursor:pointer; }
+      #muenba-handoff-later:hover, #muenba-handoff-later:focus-visible { background:rgba(52,104,78,.3); border-color:rgba(156,203,182,.8); outline:none; }
       #muenba-case-board-next:hover, #muenba-case-board-next:focus-visible, #muenba-hunt-card-begin:hover, #muenba-hunt-card-begin:focus-visible { background:rgba(126,111,48,.48); box-shadow:0 0 34px rgba(216,201,139,.48),inset 0 0 16px rgba(216,201,139,.16); }
       .muenba-hunt-card { width:min(560px,100%); padding:30px 28px 28px; border-color:rgba(216,201,139,.58); box-shadow:0 24px 80px rgba(0,0,0,.82),0 0 70px rgba(126,111,48,.22),inset 0 0 70px rgba(0,0,0,.58); }
       .muenba-hunt-ghost-portrait { display:block; width:min(220px,58vw); height:min(220px,58vw); object-fit:contain; margin:0 auto 12px; filter:drop-shadow(0 0 22px rgba(216,201,139,.34)); animation:muenbaHuntGhostFloat 3.2s ease-in-out infinite; }
@@ -2904,11 +3010,14 @@
         <p>${copy}</p>
         <p class="jp-line">${copyJp}</p>
         <div class="muenba-lobby-actions">
+          ${pending ? '<button id="muenba-room-nuppi-handoff" class="muenba-capture-action" type="button">Hand over energy</button>' : ''}
           <button id="muenba-room-nuppi-close" type="button">Back to the hunt</button>
         </div>
       </div>`;
+    const handoff = lobbyOverlay.querySelector('#muenba-room-nuppi-handoff');
+    if (handoff) handoff.addEventListener('click', () => depositOrbsAtNuppi());
     lobbyOverlay.querySelector('#muenba-room-nuppi-close').addEventListener('click', closeNuppiLobby);
-    focusLobbyControl('#muenba-room-nuppi-close');
+    focusLobbyControl(pending ? '#muenba-room-nuppi-handoff' : '#muenba-room-nuppi-close');
   }
 
   function openRoomNuppiPopup() {
@@ -2918,6 +3027,36 @@
     state.moving = false;
     renderRoomNuppiPopup();
     lobbyOverlay.classList.add('open');
+  }
+
+  function openNuppiAfterHandoff(deposited) {
+    if (!lobbyOverlay) return;
+    const nextGhost = nextNuppiHuntGhost();
+    const canContinue = !!nextGhost;
+    const orbLabel = `${deposited} energy orb${deposited === 1 ? '' : 's'}`;
+    lobbyOpen = true;
+    state.clickTarget = null;
+    state.moving = false;
+    lobbyOverlay.innerHTML = `
+      <div class="muenba-lobby-box muenba-handoff-box">
+        <img class="muenba-lobby-portrait" src="assets/img/wanderers/nuppi-2.png" alt="Nuppi">
+        <div class="muenba-case-board-eyebrow">ENERGY RETURNED</div>
+        <h2>Thank you, Booha.</h2>
+        <p class="jp">ありがとう、ブーハ。</p>
+        <p>${orbLabel} are safe with Nuppi now.</p>
+        <p class="jp-line"><ruby>届<rt>とど</rt></ruby>けてくれてありがとう。エネルギーはヌッピが<ruby>預<rt>あず</rt></ruby>かるよ。</p>
+        <p>${canContinue ? 'Would you like to find another ghost?' : 'That is all for this week. The ghosts will return next week.'}</p>
+        <p class="jp-line">${canContinue ? 'もう<ruby>一度<rt>いちど</rt></ruby>、<ruby>幽霊<rt>ゆうれい</rt></ruby>を<ruby>探<rt>さが</rt></ruby>してみる？' : 'この<ruby>週<rt>しゅう</rt></ruby>はこれでおしまい。<ruby>幽霊<rt>ゆうれい</rt></ruby>は<ruby>来週<rt>らいしゅう</rt></ruby>に<ruby>戻<rt>もど</rt></ruby>ってくるよ。'}</p>
+        <div class="muenba-lobby-actions">
+          ${canContinue ? '<button id="muenba-handoff-find" class="muenba-capture-action" type="button">Find another ghost</button>' : ''}
+          <button id="muenba-handoff-later" type="button">Not now</button>
+        </div>
+      </div>`;
+    const find = lobbyOverlay.querySelector('#muenba-handoff-find');
+    if (find) find.addEventListener('click', () => renderNuppiCaseBoard());
+    lobbyOverlay.querySelector('#muenba-handoff-later').addEventListener('click', closeNuppiLobby);
+    lobbyOverlay.classList.add('open');
+    focusLobbyControl(canContinue ? '#muenba-handoff-find' : '#muenba-handoff-later');
   }
 
   function drawNuppi(now) {
@@ -3066,9 +3205,30 @@
 
   function drawBooha(now) {
     const seconds = now / 1000;
-    const bob = Math.sin(seconds * 4.18) * 8;
-    const wobble = Math.sin(seconds * 8.36) * 2.2;
-    const x = state.x;
+    const dancing = state.celebrating && state.celebrateDancing;
+    const elapsed = dancing ? Math.max(0, (now - state.celebrateStart) / 1000) : 0;
+    const settleEase = dancing && state.celebrateSettling
+      ? Math.max(0, 1 - ((now - state.celebrateSettleStart) / MUENBA_DANCE_SETTLE_MS))
+      : 1;
+    const danceFrame = dancing
+      ? (REDUCED_MOTION
+        ? MUENBA_DANCE_FRAMES[0]
+        : state.celebrateSettling
+          ? MUENBA_DANCE_FRAMES[0]
+          : MUENBA_DANCE_FRAMES[Math.floor(elapsed / 0.5) % MUENBA_DANCE_FRAMES.length])
+      : null;
+    const danceX = dancing && !REDUCED_MOTION
+      ? (Math.sin(elapsed * 1.1) * 48 + Math.sin(elapsed * 2.3) * 20) * settleEase
+      : 0;
+    const danceY = dancing && !REDUCED_MOTION
+      ? (Math.cos(elapsed * 1.4) * 30 + Math.cos(elapsed * 2.9) * 12 + Math.sin(elapsed * 6.2) * 14) * settleEase
+      : 0;
+    const beat = dancing && !REDUCED_MOTION ? Math.sin(elapsed * 6.2) : 0;
+    const bob = dancing ? danceY : Math.sin(seconds * 4.18) * 8;
+    const wobble = dancing
+      ? Math.sin(elapsed * 3.1) * 14 * settleEase
+      : Math.sin(seconds * 8.36) * 2.2;
+    const x = state.x + danceX;
     const y = state.y + bob;
     const pulse = .5 + .5 * Math.sin(seconds * 2.1);
     // Hiding (Pass 7) reads visually as faded and slightly smaller —
@@ -3076,22 +3236,51 @@
     // player can still see themselves and knows they're still there.
     const hidingFade = state.hiding ? .4 : 1;
     actorCtx.save();
-    actorCtx.globalAlpha = (.18 + pulse * .08) * hidingFade;
-    actorCtx.fillStyle = 'rgba(180,220,215,.55)';
+    actorCtx.globalAlpha = (dancing ? .24 + pulse * .1 : .18 + pulse * .08) * hidingFade;
+    actorCtx.fillStyle = dancing ? 'rgba(255,213,91,.7)' : 'rgba(180,220,215,.55)';
     actorCtx.beginPath();
-    actorCtx.ellipse(state.x, state.y + BOOHA_R * .88, BOOHA_R * .78, BOOHA_R * .27, 0, 0, Math.PI * 2);
+    actorCtx.ellipse(x, state.y + BOOHA_R * .88, BOOHA_R * (dancing ? 1.05 : .78), BOOHA_R * .27, 0, 0, Math.PI * 2);
     actorCtx.fill();
     actorCtx.restore();
+
+    if (dancing) {
+      if (settleEase > 0 && Math.random() < .45) spawnMuenbaDanceSparkle(x, y);
+      for (let i = muenbaDanceSparkles.length - 1; i >= 0; i--) {
+        const sparkle = muenbaDanceSparkles[i];
+        sparkle.life -= .014;
+        if (sparkle.life <= 0) {
+          muenbaDanceSparkles.splice(i, 1);
+          continue;
+        }
+        sparkle.x += sparkle.vx;
+        sparkle.y += sparkle.vy;
+        const twinkle = .5 + .5 * Math.sin(now / 100 + sparkle.phase);
+        actorCtx.save();
+        actorCtx.globalAlpha = sparkle.life * twinkle * .9;
+        actorCtx.shadowBlur = 7;
+        actorCtx.shadowColor = '#ffd700';
+        actorCtx.fillStyle = sparkle.color;
+        actorCtx.beginPath();
+        actorCtx.arc(sparkle.x, sparkle.y, sparkle.size, 0, Math.PI * 2);
+        actorCtx.fill();
+        actorCtx.restore();
+      }
+    }
+
     actorCtx.save();
     actorCtx.translate(x, y);
     actorCtx.rotate(wobble * Math.PI / 180);
-    actorCtx.globalAlpha = .96 * hidingFade;
+    actorCtx.globalAlpha = (dancing ? .98 : .96) * hidingFade;
     if (state.hiding) actorCtx.scale(.82, .82);
-    const boohaSprite = state.hiding ? hidingImg : ghostImg;
+    if (dancing) actorCtx.scale((1 + beat * .16) * settleEase + (1 - settleEase), (1 - beat * .2) * settleEase + (1 - settleEase));
+    const boohaSprite = dancing ? danceFrame.img : (state.hiding ? hidingImg : ghostImg);
     if (boohaSprite.complete && boohaSprite.naturalWidth > 0) {
-      actorCtx.drawImage(boohaSprite, -BOOHA_R, -BOOHA_R, BOOHA_R * 2, BOOHA_R * 2);
+      const boxSize = BOOHA_R * 2 * (dancing ? danceFrame.contentScale : 1);
+      const offsetX = dancing ? danceFrame.offsetX * boxSize : 0;
+      const offsetY = dancing ? danceFrame.offsetY * boxSize : 0;
+      actorCtx.drawImage(boohaSprite, -boxSize / 2 + offsetX, -boxSize / 2 + offsetY, boxSize, boxSize);
     } else {
-      actorCtx.fillStyle = '#ffe56d';
+      actorCtx.fillStyle = dancing ? '#ffd75a' : '#ffe56d';
       actorCtx.beginPath();
       actorCtx.arc(0, 0, BOOHA_R * .72, 0, Math.PI * 2);
       actorCtx.fill();
