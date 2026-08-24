@@ -77,6 +77,18 @@
   const RHYTHM_GOOD_MS = 220;
   const RHYTHM_PASS_ACCURACY = 60;
 
+  // Pass 3 — the hostile ghost gets a shorter, faster danger chart. It is
+  // intentionally readable rather than punishing: six notes at 150 BPM,
+  // with the same 60% pass line as the normal capture.
+  const DANGER_RHYTHM_CHART = ['don', 'kat', 'kat', 'don', 'kat', 'don'];
+  const DANGER_RHYTHM_BPM = 150;
+  const DANGER_RHYTHM_NOTE_MS = 60000 / DANGER_RHYTHM_BPM;
+  const DANGER_RHYTHM_COUNTDOWN_MS = 1000;
+  const DANGER_RHYTHM_TRAVEL_MS = 700;
+  const DANGER_RHYTHM_PERFECT_MS = 80;
+  const DANGER_RHYTHM_GOOD_MS = 170;
+  const DANGER_RHYTHM_PASS_ACCURACY = 60;
+
   const params = new URLSearchParams(window.location.search);
   const DEV_MODE = params.get('dev') === '1';
   if (DEV_MODE) window.__devMuenba = true;
@@ -108,7 +120,8 @@
     fogX: 0,
     returnExiting: false,
     hiding: false,
-    captureResolving: false
+    captureResolving: false,
+    dangerFlashUntil: 0
   };
 
   let app;
@@ -192,6 +205,12 @@
   const music = new Audio('assets/img/muenba/muenba_BGM.mp3');
   music.loop = true;
   music.volume = 0.55;
+  const dangerScream = new Audio('assets/img/muenba/scream.mp3');
+  dangerScream.loop = true;
+  dangerScream.volume = 0.78;
+  const dangerRhythmMusic = new Audio('assets/img/muenba/rhythm.mp3');
+  dangerRhythmMusic.loop = true;
+  dangerRhythmMusic.volume = 0.62;
 
   function worldGateOpen() {
     // Deliberately NOT the weekly world gate — Muenba is still being built,
@@ -227,6 +246,35 @@
     if (state.musicStarted) return;
     state.musicStarted = true;
     music.play().catch(() => { state.musicStarted = false; });
+  }
+
+  function startDangerScream() {
+    try {
+      dangerScream.currentTime = 0;
+      dangerScream.play().catch(() => {});
+    } catch (_) {}
+  }
+
+  function stopDangerScream() {
+    try {
+      dangerScream.pause();
+      dangerScream.currentTime = 0;
+    } catch (_) {}
+  }
+
+  function startDangerRhythmMusic() {
+    stopDangerScream();
+    try {
+      dangerRhythmMusic.currentTime = 0;
+      dangerRhythmMusic.play().catch(() => {});
+    } catch (_) {}
+  }
+
+  function stopDangerRhythmMusic() {
+    try {
+      dangerRhythmMusic.pause();
+      dangerRhythmMusic.currentTime = 0;
+    } catch (_) {}
   }
 
   // Reads the same 'muenba_return_room' key enterMuenba() in karasuki.js
@@ -635,7 +683,8 @@
         moveGhostToward(g, state.x, state.y, GHOST_CHASE_SPEED);
         if (dist <= GHOST_CATCH_R && now >= g.startleUntil) {
           g.startleUntil = now + GHOST_STARTLE_COOLDOWN_MS;
-          g.angryUntil = now + 500;
+          g.angryUntil = now + 1200;
+          state.dangerFlashUntil = now + 900;
           const away = dist || 1;
           const pushed = clampToWorld(
             state.x + ((state.x - g.x) / away) * 46,
@@ -643,6 +692,7 @@
           );
           if (canMoveTo(pushed.x, pushed.y)) { state.x = pushed.x; state.y = pushed.y; }
           state.clickTarget = null;
+          beginDangerEncounter(g.ghost);
         }
         return;
       }
@@ -683,6 +733,88 @@
     activeGhost.angryUntil = now + 900;
     state.captureResolving = true;
     beginCaptureSession(ghost);
+  }
+
+  function beginDangerEncounter(ghost) {
+    if (!ghost || captureOpen || state.captureResolving) return;
+    captureOpen = true;
+    state.captureResolving = true;
+    state.clickTarget = null;
+    state.moving = false;
+    activeGhost = null;
+    captureSession = {
+      ghost,
+      caseData: null,
+      caseDifficulty: null,
+      caseIndex: 0,
+      caseResolved: false,
+      danger: true,
+      phase: 'danger-ready',
+      openedAt: performance.now()
+    };
+    startDangerScream();
+    renderDangerReady();
+  }
+
+  function renderDangerReady() {
+    if (!captureSession || !captureSession.danger || !captureOverlay) return;
+    setDangerOverlay(true);
+    const box = captureBox();
+    box.classList.add('muenba-danger-box');
+    captureImage(box, captureSession.ghost, ANGRY_CHANGE_IMG);
+
+    const eyebrow = document.createElement('div');
+    eyebrow.className = 'muenba-case-eyebrow muenba-danger-eyebrow';
+    eyebrow.textContent = 'DANGER ENCOUNTER';
+    box.appendChild(eyebrow);
+
+    const h2 = document.createElement('h2');
+    h2.textContent = 'The ghost is angry';
+    box.appendChild(h2);
+    const jp = document.createElement('p');
+    jp.className = 'jp';
+    jp.textContent = '幽霊が怒っている';
+    box.appendChild(jp);
+
+    renderCaseDirection(
+      box,
+      'It touched Booha. Face the danger rhythm, or hide now and let it lose interest.',
+      '<ruby>幽霊<rt>ゆうれい</rt></ruby>がブーハに<ruby>触<rt>ふ</rt></ruby>れました。<ruby>危険<rt>きけん</rt></ruby>なリズムに<ruby>挑<rt>いど</rt></ruby>むか、<ruby>今<rt>いま</rt></ruby>すぐ<ruby>隠<rt>かく</rt></ruby>れて<ruby>興味<rt>きょうみ</rt></ruby>をなくすのを<ruby>待<rt>ま</rt></ruby>ちましょう。'
+    );
+
+    const actions = document.createElement('div');
+    actions.className = 'muenba-lobby-actions';
+    actions.appendChild(captureButton('Face the danger rhythm', 'muenba-danger-begin', beginDangerRhythm));
+    actions.appendChild(captureButton('Hide now', 'muenba-danger-hide', escapeDangerToHide));
+    box.appendChild(actions);
+    captureOverlay.classList.add('open');
+    focusCaptureControl('#muenba-danger-begin');
+  }
+
+  function escapeDangerToHide() {
+    if (!captureSession || !captureSession.danger) return;
+    stopRhythmCapture();
+    stopDangerScream();
+    stopDangerRhythmMusic();
+    captureOpen = false;
+    state.captureResolving = false;
+    state.hiding = true;
+    state.clickTarget = null;
+    state.moving = false;
+    setDangerOverlay(false);
+    if (captureOverlay) captureOverlay.classList.remove('open');
+    captureSession = null;
+    spawnRoomGhost(state.roomId);
+    if (activeGhost) {
+      activeGhost.chasing = true;
+      activeGhost.angryUntil = performance.now() + 800;
+      activeGhost.hideGiveupAt = performance.now() + GHOST_GIVEUP_HIDE_MS;
+    }
+    if (hideBtn) {
+      hideBtn.classList.add('active');
+      hideBtn.textContent = 'Come out';
+    }
+    resumeWorldMusicAfterCapture();
   }
 
   function orderedMuenbaCases() {
@@ -777,10 +909,15 @@
     return box;
   }
 
-  function captureImage(box, ghost) {
+  function setDangerOverlay(active) {
+    if (!captureOverlay) return;
+    captureOverlay.classList.toggle('danger', !!active);
+  }
+
+  function captureImage(box, ghost, src = ghost.img) {
     const img = document.createElement('img');
     img.className = 'muenba-lobby-portrait';
-    img.src = ghost.img;
+    img.src = src || ghost.img;
     img.alt = ghost.name;
     box.appendChild(img);
   }
@@ -1070,10 +1207,39 @@
 
   function beginRhythmCapture() {
     if (!captureSession || captureSession.phase !== 'ready') return;
-    const startAt = performance.now() + RHYTHM_COUNTDOWN_MS;
+    startRhythmCapture(false);
+  }
+
+  function beginDangerRhythm() {
+    if (!captureSession || !captureSession.danger || captureSession.phase !== 'danger-ready') return;
+    startRhythmCapture(true);
+  }
+
+  function startRhythmCapture(danger) {
+    const config = danger
+      ? {
+          chart: DANGER_RHYTHM_CHART,
+          noteMs: DANGER_RHYTHM_NOTE_MS,
+          countdownMs: DANGER_RHYTHM_COUNTDOWN_MS,
+          travelMs: DANGER_RHYTHM_TRAVEL_MS,
+          perfectMs: DANGER_RHYTHM_PERFECT_MS,
+          goodMs: DANGER_RHYTHM_GOOD_MS,
+          passAccuracy: DANGER_RHYTHM_PASS_ACCURACY
+        }
+      : {
+          chart: RHYTHM_CHART,
+          noteMs: RHYTHM_NOTE_MS,
+          countdownMs: RHYTHM_COUNTDOWN_MS,
+          travelMs: RHYTHM_TRAVEL_MS,
+          perfectMs: RHYTHM_PERFECT_MS,
+          goodMs: RHYTHM_GOOD_MS,
+          passAccuracy: RHYTHM_PASS_ACCURACY
+        };
+    const startAt = performance.now() + config.countdownMs;
     captureSession.phase = 'countdown';
     captureSession.rhythm = {
-      chart: RHYTHM_CHART.slice(),
+      ...config,
+      chart: config.chart.slice(),
       startAt,
       nextIndex: 0,
       perfect: 0,
@@ -1087,6 +1253,7 @@
     };
 
     pauseWorldMusicForCapture();
+    if (danger) startDangerRhythmMusic();
     renderRhythmCapture();
     captureSession.rhythm.rafId = window.requestAnimationFrame(tickRhythmCapture);
   }
@@ -1101,7 +1268,7 @@
   }
 
   function rhythmExpectedAt(rhythm, index) {
-    return rhythm.startAt + RHYTHM_TRAVEL_MS + index * RHYTHM_NOTE_MS;
+    return rhythm.startAt + rhythm.travelMs + index * rhythm.noteMs;
   }
 
   function rhythmAccuracy(rhythm) {
@@ -1113,15 +1280,18 @@
     if (!captureSession || !captureSession.rhythm || !captureOverlay) return;
     const rhythm = captureSession.rhythm;
     const ghost = captureSession.ghost;
+    const danger = !!captureSession.danger;
+    setDangerOverlay(danger);
     const box = captureBox();
-    captureImage(box, ghost);
+    if (danger) box.classList.add('muenba-danger-box');
+    captureImage(box, ghost, danger ? ANGRY_CHANGE_IMG : ghost.img);
 
     const h2 = document.createElement('h2');
-    h2.textContent = 'Keep the rhythm';
+    h2.textContent = danger ? 'Danger rhythm' : 'Keep the rhythm';
     box.appendChild(h2);
     const jp = document.createElement('p');
     jp.className = 'jp';
-    jp.textContent = 'リズムでつかまえよう';
+    jp.textContent = danger ? '危険なリズム' : 'リズムでつかまえよう';
     box.appendChild(jp);
 
     const status = document.createElement('p');
@@ -1196,7 +1366,9 @@
 
     const actions = document.createElement('div');
     actions.className = 'muenba-lobby-actions';
-    actions.appendChild(captureButton('Cancel capture', 'muenba-capture-cancel', cancelCaptureSession));
+    actions.appendChild(danger
+      ? captureButton('Hide and escape', 'muenba-danger-hide', escapeDangerToHide)
+      : captureButton('Cancel capture', 'muenba-capture-cancel', cancelCaptureSession));
     box.appendChild(actions);
 
     captureOverlay.classList.add('open');
@@ -1214,7 +1386,7 @@
         captureSession.phase = 'playing';
         showRhythmFeedback('GO!', 'go');
       } else if (rhythm.statusEl) {
-        rhythm.statusEl.textContent = String(Math.ceil(remaining / 600));
+        rhythm.statusEl.textContent = String(Math.max(1, Math.ceil(remaining / 600)));
       }
     }
 
@@ -1222,7 +1394,7 @@
       advanceMissedRhythmNotes(now);
       updateRhythmNotes(now);
       if (rhythm.nextIndex >= rhythm.chart.length &&
-          now >= rhythmExpectedAt(rhythm, rhythm.chart.length - 1) + RHYTHM_GOOD_MS) {
+          now >= rhythmExpectedAt(rhythm, rhythm.chart.length - 1) + rhythm.goodMs) {
         finishRhythmCapture();
         return;
       }
@@ -1234,7 +1406,7 @@
   function advanceMissedRhythmNotes(now) {
     const rhythm = captureSession.rhythm;
     while (rhythm.nextIndex < rhythm.chart.length &&
-           now > rhythmExpectedAt(rhythm, rhythm.nextIndex) + RHYTHM_GOOD_MS) {
+           now > rhythmExpectedAt(rhythm, rhythm.nextIndex) + rhythm.goodMs) {
       markRhythmNote('miss');
     }
   }
@@ -1248,7 +1420,7 @@
         note.classList.add('is-resolved');
         return;
       }
-      const progress = (now - (rhythmExpectedAt(rhythm, index) - RHYTHM_TRAVEL_MS)) / RHYTHM_TRAVEL_MS;
+      const progress = (now - (rhythmExpectedAt(rhythm, index) - rhythm.travelMs)) / rhythm.travelMs;
       const y = Math.max(-26, Math.min(RHYTHM_NOTE_DISTANCE, progress * RHYTHM_NOTE_DISTANCE));
       note.style.transform = `translate(-50%, ${y}px)`;
     });
@@ -1283,7 +1455,7 @@
     const index = rhythm.nextIndex;
     const expected = rhythmExpectedAt(rhythm, index);
     const delta = now - expected;
-    if (delta < -RHYTHM_GOOD_MS) {
+    if (delta < -rhythm.goodMs) {
       showRhythmFeedback('A little later…', 'early');
       return;
     }
@@ -1293,10 +1465,10 @@
       return;
     }
     const absoluteDelta = Math.abs(delta);
-    if (absoluteDelta <= RHYTHM_PERFECT_MS) {
+    if (absoluteDelta <= rhythm.perfectMs) {
       markRhythmNote('perfect');
       showRhythmFeedback('Perfect!', 'perfect');
-    } else if (absoluteDelta <= RHYTHM_GOOD_MS) {
+    } else if (absoluteDelta <= rhythm.goodMs) {
       markRhythmNote('good');
       showRhythmFeedback('Good!', 'good');
     } else {
@@ -1325,7 +1497,11 @@
     if (rhythm.rafId) window.cancelAnimationFrame(rhythm.rafId);
     rhythm.rafId = 0;
     const accuracy = rhythmAccuracy(rhythm);
-    const success = accuracy >= RHYTHM_PASS_ACCURACY;
+    const success = accuracy >= rhythm.passAccuracy;
+    if (captureSession.danger) {
+      stopDangerScream();
+      stopDangerRhythmMusic();
+    }
     rhythm.accuracy = accuracy;
     rhythm.success = success;
     recordRhythmResult(accuracy);
@@ -1411,34 +1587,52 @@
   function renderRhythmResult(accuracy, success, message) {
     const ghost = captureSession.ghost;
     const p = document.createElement('p');
+    const danger = !!captureSession.danger;
+    setDangerOverlay(danger);
     const box = captureBox();
-    captureImage(box, ghost);
+    if (danger) box.classList.add('muenba-danger-box');
+    captureImage(box, ghost, danger ? ANGRY_CHANGE_IMG : ghost.img);
 
     const h2 = document.createElement('h2');
-    h2.textContent = success ? 'Rhythm complete' : 'Try again';
+    h2.textContent = danger
+      ? (success ? 'You broke the anger' : 'The ghost broke through')
+      : (success ? 'Rhythm complete' : 'Try again');
     box.appendChild(h2);
     const jp = document.createElement('p');
     jp.className = 'jp';
-    jp.textContent = success ? 'リズム成功' : 'もう一度';
+    jp.textContent = danger
+      ? (success ? '怒りをしずめた' : 'まだ危険')
+      : (success ? 'リズム成功' : 'もう一度');
     box.appendChild(jp);
 
-    p.textContent = message || `Accuracy: ${accuracy}%. ${success ? 'The capture is ready for the reward step.' : 'The ghost is still waiting for you.'}`;
+    p.textContent = message || (danger
+      ? `Accuracy: ${accuracy}%. ${success ? 'The angry ghost has been calmed. Continue to the capture reward.' : 'The angry ghost knocked Booha back. Hide, or face the danger rhythm again.'}`
+      : `Accuracy: ${accuracy}%. ${success ? 'The capture is ready for the reward step.' : 'The ghost is still waiting for you.'}`);
     box.appendChild(p);
 
     renderCaseDirection(
       box,
-      success ? 'The capture is ready for the reward step.' : 'The ghost is still waiting. Try the rhythm again.',
-      success
-        ? '<ruby>捕<rt>つか</rt></ruby>まえる<ruby>準備<rt>じゅんび</rt></ruby>ができました。<ruby>次<rt>つぎ</rt></ruby>に<ruby>報酬<rt>ほうしゅう</rt></ruby>を<ruby>受<rt>う</rt></ruby>け<ruby>取<rt>と</rt></ruby>りましょう。'
-        : '<ruby>幽霊<rt>ゆうれい</rt></ruby>はまだ<ruby>待<rt>ま</rt></ruby>っています。リズムをもう<ruby>一度<rt>いちど</rt></ruby><ruby>試<rt>ため</rt></ruby>しましょう。'
+      danger
+        ? (success ? 'The angry ghost has calmed down. Continue to the capture reward.' : 'Hide to stop the scream, or try the danger rhythm again.')
+        : (success ? 'The capture is ready for the reward step.' : 'The ghost is still waiting. Try the rhythm again.'),
+      danger
+        ? (success
+          ? '<ruby>怒<rt>おこ</rt></ruby>った<ruby>幽霊<rt>ゆうれい</rt></ruby>は<ruby>落<rt>お</rt></ruby>ち<ruby>着<rt>つ</rt></ruby>きました。<ruby>報酬<rt>ほうしゅう</rt></ruby>を<ruby>受<rt>う</rt></ruby>け<ruby>取<rt>と</rt></ruby>りましょう。'
+          : '<ruby>隠<rt>かく</rt></ruby>れると<ruby>叫<rt>さけ</rt></ruby>び<ruby>声<rt>ごえ</rt></ruby>が<ruby>止<rt>と</rt></ruby>まります。もう<ruby>一度<rt>いちど</rt></ruby><ruby>挑<rt>いど</rt></ruby>むこともできます。')
+        : (success
+          ? '<ruby>捕<rt>つか</rt></ruby>まえる<ruby>準備<rt>じゅんび</rt></ruby>ができました。<ruby>次<rt>つぎ</rt></ruby>に<ruby>報酬<rt>ほうしゅう</rt></ruby>を<ruby>受<rt>う</rt></ruby>け<ruby>取<rt>と</rt></ruby>りましょう。'
+          : '<ruby>幽霊<rt>ゆうれい</rt></ruby>はまだ<ruby>待<rt>ま</rt></ruby>っています。リズムをもう<ruby>一度<rt>いちど</rt></ruby><ruby>試<rt>ため</rt></ruby>しましょう。')
     );
 
     const actions = document.createElement('div');
     actions.className = 'muenba-lobby-actions';
-    if (!success) {
-      actions.appendChild(captureButton('Try rhythm again', 'muenba-capture-retry', retryRhythmCapture));
+    if (danger) {
+      if (!success) actions.appendChild(captureButton('Try danger rhythm again', 'muenba-danger-retry', retryDangerRhythm));
+      actions.appendChild(captureButton('Hide and escape', 'muenba-danger-hide', escapeDangerToHide));
+    } else {
+      if (!success) actions.appendChild(captureButton('Try rhythm again', 'muenba-capture-retry', retryRhythmCapture));
+      actions.appendChild(captureButton('Return to hunt', 'muenba-capture-cancel', cancelCaptureSession));
     }
-    actions.appendChild(captureButton('Return to hunt', 'muenba-capture-cancel', cancelCaptureSession));
     box.appendChild(actions);
   }
 
@@ -1450,8 +1644,18 @@
     renderCaptureReady();
   }
 
+  function retryDangerRhythm() {
+    if (!captureSession || !captureSession.danger || captureSession.phase !== 'result') return;
+    stopRhythmCapture();
+    captureSession.phase = 'danger-ready';
+    captureSession.rhythm = null;
+    startDangerScream();
+    renderDangerReady();
+  }
+
   function renderCaptureReward() {
     if (!captureSession || !captureSession.reward || !captureOverlay) return;
+    setDangerOverlay(false);
     const ghost = captureSession.ghost;
     const reward = captureSession.reward;
     const box = captureBox();
@@ -1605,11 +1809,16 @@
 
   function cancelCaptureSession() {
     if (!captureOpen) return;
+    if (captureSession && captureSession.danger) {
+      escapeDangerToHide();
+      return;
+    }
     const phase = captureSession && captureSession.phase;
     if (phase === 'reward' || phase === 'nuppi' || phase === 'nuppi-recovery') return;
     stopRhythmCapture();
     captureOpen = false;
     state.captureResolving = false;
+    setDangerOverlay(false);
     if (captureOverlay) captureOverlay.classList.remove('open');
 
     // Re-seed the room ghost after a cancel. This does not write ghostsFound,
@@ -1626,6 +1835,7 @@
     stopRhythmCapture();
     captureOpen = false;
     state.captureResolving = false;
+    setDangerOverlay(false);
     if (captureOverlay) captureOverlay.classList.remove('open');
     captureSession = null;
     if (resumeHunt) spawnRoomGhost(state.roomId);
@@ -1636,6 +1846,7 @@
     const rhythm = captureSession && captureSession.rhythm;
     if (rhythm && rhythm.rafId) window.cancelAnimationFrame(rhythm.rafId);
     if (rhythm) rhythm.rafId = 0;
+    if (captureSession && captureSession.danger) stopDangerRhythmMusic();
     const reward = captureSession && captureSession.reward;
     if (reward && reward.revealTimer) window.clearTimeout(reward.revealTimer);
     if (reward) reward.revealTimer = 0;
@@ -1791,7 +2002,19 @@
          rhythm board inside that modal. */
       #muenba-capture-overlay { position:fixed; inset:0; z-index:215; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,0); transition:background .4s ease; padding:20px; box-sizing:border-box; }
       #muenba-capture-overlay.open { display:flex; background:rgba(0,0,0,.86); }
+      #muenba-capture-overlay.danger.open { background:rgba(90,0,12,.9); animation:muenbaDangerFlash .38s steps(2,end) infinite; }
       #muenba-capture-overlay.open .muenba-lobby-box { transform:scale(1); opacity:1; }
+      @keyframes muenbaDangerFlash { 0%,100% { box-shadow:inset 0 0 0 rgba(238,36,63,0); } 50% { box-shadow:inset 0 0 120px rgba(238,36,63,.32); } }
+      .muenba-danger-box { border-color:rgba(255,82,96,.82) !important; box-shadow:0 24px 80px rgba(0,0,0,.82),0 0 70px rgba(235,28,57,.35),inset 0 0 70px rgba(98,0,12,.46) !important; }
+      .muenba-danger-box .muenba-danger-eyebrow { color:#ff8290; }
+      .muenba-danger-box .muenba-rhythm-lane { border-color:rgba(255,93,104,.68); background:linear-gradient(180deg,rgba(100,21,31,.74),rgba(24,5,10,.92)); }
+      .muenba-danger-box .muenba-rhythm-lane:hover, .muenba-danger-box .muenba-rhythm-lane:focus-visible { border-color:#ff9aa4; background:linear-gradient(180deg,rgba(142,29,42,.82),rgba(32,5,11,.96)); }
+      .muenba-danger-box .muenba-rhythm-lane:active { background:rgba(177,35,50,.86); }
+      .muenba-danger-box .muenba-rhythm-hit-line { background:#ffb0b8; box-shadow:0 0 18px rgba(255,56,78,.92); }
+      .muenba-danger-box .muenba-rhythm-note { border-color:#ffd5d9; background:rgba(173,34,52,.95); box-shadow:0 0 18px rgba(255,55,81,.58); }
+      .muenba-danger-box .muenba-rhythm-note-kat { background:rgba(113,30,88,.95); box-shadow:0 0 18px rgba(244,65,149,.5); }
+      .muenba-danger-box .muenba-rhythm-note.is-hit { border-color:#b9ffcb; }
+      .muenba-danger-box .muenba-rhythm-note.is-miss { border-color:#ff7180; background:rgba(83,7,19,.8); }
       .muenba-capture-orbs { margin-top:-6px; color:#9ccbb6; font-size:.82rem; letter-spacing:.05em; }
       .muenba-capture-action { touch-action:manipulation; }
       .muenba-rhythm-status { min-height:1.5em; margin:2px 0 2px !important; color:#d8f2e2 !important; font:700 1.08rem/1.4 ui-monospace,monospace !important; text-align:center !important; letter-spacing:.08em; }
@@ -2714,6 +2937,20 @@
     });
   }
 
+  function drawDangerFlash(now) {
+    if (now >= state.dangerFlashUntil) return;
+    const remaining = state.dangerFlashUntil - now;
+    const pulse = .5 + .5 * Math.sin(now / 48);
+    const alpha = Math.min(.34, .12 + pulse * .12, remaining / 260);
+    actorCtx.save();
+    actorCtx.fillStyle = `rgba(190, 12, 35, ${Math.max(.04, alpha)})`;
+    actorCtx.fillRect(0, 0, WORLD_W, WORLD_H);
+    actorCtx.strokeStyle = `rgba(255, 88, 103, ${.18 + pulse * .18})`;
+    actorCtx.lineWidth = 10;
+    actorCtx.strokeRect(6, 6, WORLD_W - 12, WORLD_H - 12);
+    actorCtx.restore();
+  }
+
   function drawFrame(now) {
     atmosphereCtx.clearRect(0, 0, WORLD_W, WORLD_H);
     actorCtx.clearRect(0, 0, WORLD_W, WORLD_H);
@@ -2722,6 +2959,7 @@
     drawExitArrows(now);
     drawGhost(now);
     drawBooha(now);
+    drawDangerFlash(now);
     drawPins();
     if (DEV_MODE && devReadout) {
       const hover = devHover ? `  mouse:${Math.round(devHover.x)},${Math.round(devHover.y)}` : '';
