@@ -64,6 +64,9 @@ for (const caseId of data.caseOrder) {
     englishOnly(mode.resolution, `${caseId}.${modeName}.resolution`);
   }
   const modes = ['start', 'fresh', 'deep'];
+  const wordCount = mode => mode.clues.map(clue => clue.text).concat(mode.prompt, mode.choices).join(' ').trim().split(/\s+/).length;
+  assert(wordCount(caseData.start) < wordCount(caseData.fresh), `${caseId} Starter Memory should be shorter than Case Memory`);
+  assert(wordCount(caseData.fresh) <= wordCount(caseData.deep), `${caseId} Deep Memory should not be shorter than Case Memory`);
   for (const leftMode of modes) {
     for (const rightMode of modes) {
       if (leftMode >= rightMode) continue;
