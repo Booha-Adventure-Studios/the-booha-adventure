@@ -118,6 +118,69 @@
   const DANGER_RHYTHM_GOOD_MS = 170;
   const DANGER_RHYTHM_PASS_ACCURACY = 60;
 
+  // Permanent progression is based on successful ghost captures, not weekly
+  // availability. New mechanics such as extra lanes and decoys can build on
+  // these tiers later; this pass increases chart length and timing pressure
+  // while keeping the two-lane rules familiar.
+  const RHYTHM_DIFFICULTY_TIERS = [
+    {
+      minCaptures: 0,
+      label: 'First haunting',
+      chart: RHYTHM_CHART,
+      bpm: RHYTHM_BPM,
+      travelMs: RHYTHM_TRAVEL_MS,
+      perfectMs: RHYTHM_PERFECT_MS,
+      goodMs: RHYTHM_GOOD_MS,
+      dangerChart: DANGER_RHYTHM_CHART,
+      dangerBpm: DANGER_RHYTHM_BPM,
+      dangerTravelMs: DANGER_RHYTHM_TRAVEL_MS,
+      dangerPerfectMs: DANGER_RHYTHM_PERFECT_MS,
+      dangerGoodMs: DANGER_RHYTHM_GOOD_MS
+    },
+    {
+      minCaptures: 3,
+      label: 'Restless path',
+      chart: ['don', 'kat', 'don', 'kat', 'kat', 'don', 'kat', 'don', 'kat', 'don'],
+      bpm: 102,
+      travelMs: 1140,
+      perfectMs: 105,
+      goodMs: 205,
+      dangerChart: ['don', 'kat', 'kat', 'don', 'kat', 'don', 'don', 'kat'],
+      dangerBpm: 156,
+      dangerTravelMs: 680,
+      dangerPerfectMs: 76,
+      dangerGoodMs: 160
+    },
+    {
+      minCaptures: 7,
+      label: 'Deep cemetery',
+      chart: ['don', 'kat', 'don', 'kat', 'kat', 'don', 'kat', 'don', 'don', 'kat', 'don', 'kat'],
+      bpm: 108,
+      travelMs: 1080,
+      perfectMs: 98,
+      goodMs: 190,
+      dangerChart: ['don', 'kat', 'kat', 'don', 'kat', 'don', 'kat', 'don', 'kat'],
+      dangerBpm: 162,
+      dangerTravelMs: 660,
+      dangerPerfectMs: 72,
+      dangerGoodMs: 152
+    },
+    {
+      minCaptures: 12,
+      label: 'Muenba after dark',
+      chart: ['don', 'kat', 'kat', 'don', 'kat', 'don', 'don', 'kat', 'don', 'kat', 'kat', 'don', 'kat', 'don'],
+      bpm: 114,
+      travelMs: 1020,
+      perfectMs: 92,
+      goodMs: 178,
+      dangerChart: ['don', 'kat', 'kat', 'don', 'kat', 'don', 'kat', 'don', 'don', 'kat'],
+      dangerBpm: 168,
+      dangerTravelMs: 640,
+      dangerPerfectMs: 68,
+      dangerGoodMs: 144
+    }
+  ];
+
   const params = new URLSearchParams(window.location.search);
   const DEV_MODE = params.get('dev') === '1';
   if (DEV_MODE) window.__devMuenba = true;
@@ -584,7 +647,17 @@
       dirty = true;
     }
     if (!mu.rhythm || typeof mu.rhythm !== 'object') {
-      mu.rhythm = { bestAccuracy: 0, attempts: 0 };
+      mu.rhythm = {
+        bestAccuracy: 0,
+        attempts: 0,
+        // Older saves have no cumulative rhythm counter. A completed hunt
+        // journal is the safest historical starting point for this feature.
+        capturesCompleted: Array.isArray(mu.huntJournal.entries) ? mu.huntJournal.entries.length : 0
+      };
+      dirty = true;
+    }
+    if (!Number.isInteger(mu.rhythm.capturesCompleted) || mu.rhythm.capturesCompleted < 0) {
+      mu.rhythm.capturesCompleted = Array.isArray(mu.huntJournal.entries) ? mu.huntJournal.entries.length : 0;
       dirty = true;
     }
     if (dirty) writeSave(data);
@@ -597,6 +670,19 @@
 
   function getMuenbaReadingDifficulty() {
     return readMuenba().readingDifficulty === 'deep' ? 'deep' : 'fresh';
+  }
+
+  function getRhythmDifficulty() {
+    const capturesCompleted = Math.max(0, Number(readMuenba().rhythm?.capturesCompleted) || 0);
+    let tierIndex = 0;
+    RHYTHM_DIFFICULTY_TIERS.forEach((tier, index) => {
+      if (capturesCompleted >= tier.minCaptures) tierIndex = index;
+    });
+    return {
+      ...RHYTHM_DIFFICULTY_TIERS[tierIndex],
+      tierIndex,
+      capturesCompleted
+    };
   }
 
   function writeMuenba(patchObj) {
@@ -1448,6 +1534,7 @@
   }
 
   function startRhythmCapture(danger, practice = false) {
+    const difficulty = practice ? null : getRhythmDifficulty();
     const config = practice
       ? {
           chart: PRACTICE_RHYTHM_CHART,
@@ -1456,26 +1543,32 @@
           travelMs: PRACTICE_RHYTHM_TRAVEL_MS,
           perfectMs: PRACTICE_RHYTHM_PERFECT_MS,
           goodMs: PRACTICE_RHYTHM_GOOD_MS,
-          passAccuracy: PRACTICE_RHYTHM_PASS_ACCURACY
+          passAccuracy: PRACTICE_RHYTHM_PASS_ACCURACY,
+          difficultyTier: null,
+          difficultyLabel: 'Practice'
         }
       : danger
       ? {
-          chart: DANGER_RHYTHM_CHART,
-          noteMs: DANGER_RHYTHM_NOTE_MS,
+          chart: difficulty.dangerChart,
+          noteMs: 60000 / difficulty.dangerBpm,
           countdownMs: DANGER_RHYTHM_COUNTDOWN_MS,
-          travelMs: DANGER_RHYTHM_TRAVEL_MS,
-          perfectMs: DANGER_RHYTHM_PERFECT_MS,
-          goodMs: DANGER_RHYTHM_GOOD_MS,
-          passAccuracy: DANGER_RHYTHM_PASS_ACCURACY
+          travelMs: difficulty.dangerTravelMs,
+          perfectMs: difficulty.dangerPerfectMs,
+          goodMs: difficulty.dangerGoodMs,
+          passAccuracy: DANGER_RHYTHM_PASS_ACCURACY,
+          difficultyTier: difficulty.tierIndex,
+          difficultyLabel: difficulty.label
         }
       : {
-          chart: RHYTHM_CHART,
-          noteMs: RHYTHM_NOTE_MS,
+          chart: difficulty.chart,
+          noteMs: 60000 / difficulty.bpm,
           countdownMs: RHYTHM_COUNTDOWN_MS,
-          travelMs: RHYTHM_TRAVEL_MS,
-          perfectMs: RHYTHM_PERFECT_MS,
-          goodMs: RHYTHM_GOOD_MS,
-          passAccuracy: RHYTHM_PASS_ACCURACY
+          travelMs: difficulty.travelMs,
+          perfectMs: difficulty.perfectMs,
+          goodMs: difficulty.goodMs,
+          passAccuracy: RHYTHM_PASS_ACCURACY,
+          difficultyTier: difficulty.tierIndex,
+          difficultyLabel: difficulty.label
         };
     const startAt = performance.now() + config.countdownMs;
     captureSession.phase = 'countdown';
@@ -1637,6 +1730,13 @@
     jp.className = 'jp';
     jp.textContent = practice ? 'リズムの練習' : (danger ? '危険なリズム' : 'リズムでつかまえよう');
     box.appendChild(jp);
+
+    if (!practice && Number.isInteger(rhythm.difficultyTier)) {
+      const tier = document.createElement('p');
+      tier.className = 'muenba-rhythm-tier';
+      tier.textContent = `Haunting level ${rhythm.difficultyTier + 1} · ${rhythm.difficultyLabel}`;
+      box.appendChild(tier);
+    }
 
     const status = document.createElement('p');
     status.className = 'muenba-rhythm-status';
@@ -1826,7 +1926,7 @@
       const d = loadSave();
       if (!d.muenba || typeof d.muenba !== 'object') d.muenba = {};
       if (!d.muenba.rhythm || typeof d.muenba.rhythm !== 'object') {
-        d.muenba.rhythm = { bestAccuracy: 0, attempts: 0 };
+        d.muenba.rhythm = { bestAccuracy: 0, attempts: 0, capturesCompleted: 0 };
       }
       const rhythm = d.muenba.rhythm;
       rhythm.attempts = (Number.isInteger(rhythm.attempts) ? rhythm.attempts : 0) + 1;
@@ -1928,6 +2028,8 @@
     if (!Number.isInteger(mu.orbsPending)) mu.orbsPending = 0;
     if (!mu.huntJournal || !Array.isArray(mu.huntJournal.entries)) mu.huntJournal = { entries: [] };
     if (!mu.caseRecords || typeof mu.caseRecords !== 'object') mu.caseRecords = {};
+    if (!mu.rhythm || typeof mu.rhythm !== 'object') mu.rhythm = { bestAccuracy: 0, attempts: 0 };
+    if (!Number.isInteger(mu.rhythm.capturesCompleted) || mu.rhythm.capturesCompleted < 0) mu.rhythm.capturesCompleted = 0;
 
     const isNewWeeklyCapture = !mu.weeklyGhostsFound[ghost.id];
     mu.ghostsFound[ghost.id] = true;
@@ -1957,6 +2059,9 @@
       journalEntry.caseDifficulty = captureSession.caseDifficulty;
       journalEntry.caseCompletedAt = completedAt;
     }
+    // This counter is deliberately permanent. Weekly ghost availability may
+    // reset, but every successful capture makes future rhythm charts harder.
+    mu.rhythm.capturesCompleted += 1;
     const rewardCount = isNewWeeklyCapture ? ORB_REWARD_PER_CAPTURE : 0;
     mu.orbsPending += rewardCount;
     if (!writeSave(d)) return null;
@@ -2560,6 +2665,7 @@
       .muenba-rhythm-status { min-height:1.5em; margin:2px 0 2px !important; color:#d8f2e2 !important; font:700 1.08rem/1.4 ui-monospace,monospace !important; text-align:center !important; letter-spacing:.08em; }
       .muenba-rhythm-status.perfect, .muenba-rhythm-status.good, .muenba-rhythm-status.go { color:#8fe0ad !important; }
       .muenba-rhythm-status.miss, .muenba-rhythm-status.early { color:#e8b0b8 !important; }
+      .muenba-rhythm-tier { margin:0 0 7px !important; color:#d8c98b !important; font:700 .68rem/1.35 ui-monospace,monospace !important; letter-spacing:.08em; text-align:center !important; text-transform:uppercase; }
       .muenba-rhythm-help-button { position:absolute; top:10px; left:10px; z-index:8; display:grid; place-items:center; width:30px; height:30px; padding:0; border:1px solid rgba(216,201,139,.72); border-radius:50%; color:#fff5d5; background:rgba(40,32,12,.72); box-shadow:0 0 14px rgba(216,201,139,.28); font:900 17px/1 Georgia,'Times New Roman',serif; cursor:pointer; }
       .muenba-rhythm-help-button:hover, .muenba-rhythm-help-button:focus-visible { border-color:#fff1ae; background:rgba(126,111,48,.58); box-shadow:0 0 24px rgba(216,201,139,.48); outline:none; }
       .muenba-rhythm-help-box { border-color:rgba(216,201,139,.54); box-shadow:0 24px 80px rgba(0,0,0,.82),0 0 60px rgba(126,111,48,.22),inset 0 0 70px rgba(0,0,0,.58); }
