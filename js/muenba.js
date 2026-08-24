@@ -118,6 +118,14 @@
   const DANGER_RHYTHM_GOOD_MS = 170;
   const DANGER_RHYTHM_PASS_ACCURACY = 60;
 
+  const RHYTHM_LANE_DEFS = [
+    { id: 'don', label: 'DON / ドン', key: 'A', shape: 'circle' },
+    { id: 'kat', label: 'KAT / カッ', key: 'S', shape: 'diamond' },
+    { id: 'rim', label: 'RIM / リム', key: 'D', shape: 'triangle' },
+    { id: 'bell', label: 'BELL / ベル', key: 'F', shape: 'star' }
+  ];
+  const RHYTHM_LANE_BY_ID = Object.fromEntries(RHYTHM_LANE_DEFS.map(lane => [lane.id, lane]));
+
   // Permanent progression is based on successful ghost captures, not weekly
   // availability. New mechanics such as extra lanes and decoys can build on
   // these tiers later; this pass increases chart length and timing pressure
@@ -126,6 +134,7 @@
     {
       minCaptures: 0,
       label: 'First haunting',
+      lanes: ['don', 'kat'],
       chart: RHYTHM_CHART,
       bpm: RHYTHM_BPM,
       travelMs: RHYTHM_TRAVEL_MS,
@@ -140,6 +149,7 @@
     {
       minCaptures: 3,
       label: 'Restless path',
+      lanes: ['don', 'kat'],
       chart: ['don', 'kat', 'don', 'kat', 'kat', 'don', 'kat', 'don', 'kat', 'don'],
       bpm: 102,
       travelMs: 1140,
@@ -154,7 +164,21 @@
     {
       minCaptures: 7,
       label: 'Deep cemetery',
-      chart: ['don', 'kat', 'don', 'kat', 'kat', 'don', 'kat', 'don', 'don', 'kat', 'don', 'kat'],
+      lanes: ['don', 'kat', 'rim'],
+      chart: [
+        { lane: 'don', beat: 0 },
+        { lane: 'kat', beat: 1 },
+        { lane: 'rim', beat: 2 },
+        { lane: 'don', beat: 3 },
+        { lane: 'rim', beat: 4, decoy: true, shape: 'skull' },
+        { lane: 'kat', beat: 4 },
+        { lane: 'don', beat: 5 },
+        { lane: 'rim', beat: 6 },
+        { lane: 'kat', beat: 7 },
+        { lane: 'rim', beat: 7 },
+        { lane: 'don', beat: 8 },
+        { lane: 'kat', beat: 9 }
+      ],
       bpm: 108,
       travelMs: 1080,
       perfectMs: 98,
@@ -168,7 +192,25 @@
     {
       minCaptures: 12,
       label: 'Muenba after dark',
-      chart: ['don', 'kat', 'kat', 'don', 'kat', 'don', 'don', 'kat', 'don', 'kat', 'kat', 'don', 'kat', 'don'],
+      lanes: ['don', 'kat', 'rim', 'bell'],
+      chart: [
+        { lane: 'don', beat: 0 },
+        { lane: 'kat', beat: 1 },
+        { lane: 'rim', beat: 2 },
+        { lane: 'bell', beat: 3 },
+        { lane: 'don', beat: 4 },
+        { lane: 'rim', beat: 5, decoy: true, shape: 'skull' },
+        { lane: 'kat', beat: 5 },
+        { lane: 'bell', beat: 6 },
+        { lane: 'don', beat: 7 },
+        { lane: 'kat', beat: 7 },
+        { lane: 'rim', beat: 8 },
+        { lane: 'bell', beat: 9, decoy: true, shape: 'spiral' },
+        { lane: 'don', beat: 9 },
+        { lane: 'kat', beat: 10 },
+        { lane: 'rim', beat: 11 },
+        { lane: 'bell', beat: 12 }
+      ],
       bpm: 114,
       travelMs: 1020,
       perfectMs: 92,
@@ -1190,12 +1232,10 @@
         return;
       }
       if (!captureOpen || event.repeat) return;
-      if (event.key === 'ArrowLeft' || event.key.toLowerCase() === 'a') {
+      const lane = rhythmLaneForKey(event.key);
+      if (lane && captureSession?.rhythm?.lanes?.includes(lane)) {
         event.preventDefault();
-        handleRhythmInput('don');
-      } else if (event.key === 'ArrowRight' || event.key.toLowerCase() === 's') {
-        event.preventDefault();
-        handleRhythmInput('kat');
+        handleRhythmInput(lane);
       }
     });
   }
@@ -1533,6 +1573,39 @@
     startRhythmCapture(true);
   }
 
+  function normalizeRhythmChart(chart) {
+    return chart.map((entry, index) => {
+      const note = typeof entry === 'string' ? { lane: entry } : (entry || {});
+      const lane = RHYTHM_LANE_BY_ID[note.lane] ? note.lane : 'don';
+      const laneDef = RHYTHM_LANE_BY_ID[lane];
+      return {
+        lane,
+        shape: note.shape || laneDef.shape,
+        decoy: !!note.decoy,
+        beat: Number.isFinite(note.beat) ? note.beat : index
+      };
+    });
+  }
+
+  function rhythmLaneForKey(key) {
+    const normalized = String(key || '').toLowerCase();
+    if (normalized === 'arrowleft' || normalized === 'a') return 'don';
+    if (normalized === 'arrowright' || normalized === 's') return 'kat';
+    if (normalized === 'arrowup' || normalized === 'd') return 'rim';
+    if (normalized === 'f') return 'bell';
+    return null;
+  }
+
+  function rhythmNoteGlyph(note) {
+    if (note.decoy) return note.shape === 'spiral' ? '◌' : '☠';
+    return {
+      circle: '●',
+      diamond: '◆',
+      triangle: '▲',
+      star: '✦'
+    }[note.shape] || '●';
+  }
+
   function startRhythmCapture(danger, practice = false) {
     const difficulty = practice ? null : getRhythmDifficulty();
     const config = practice
@@ -1544,6 +1617,7 @@
           perfectMs: PRACTICE_RHYTHM_PERFECT_MS,
           goodMs: PRACTICE_RHYTHM_GOOD_MS,
           passAccuracy: PRACTICE_RHYTHM_PASS_ACCURACY,
+          lanes: ['don', 'kat'],
           difficultyTier: null,
           difficultyLabel: 'Practice'
         }
@@ -1556,6 +1630,7 @@
           perfectMs: difficulty.dangerPerfectMs,
           goodMs: difficulty.dangerGoodMs,
           passAccuracy: DANGER_RHYTHM_PASS_ACCURACY,
+          lanes: ['don', 'kat'],
           difficultyTier: difficulty.tierIndex,
           difficultyLabel: difficulty.label
         }
@@ -1567,6 +1642,7 @@
           perfectMs: difficulty.perfectMs,
           goodMs: difficulty.goodMs,
           passAccuracy: RHYTHM_PASS_ACCURACY,
+          lanes: difficulty.lanes,
           difficultyTier: difficulty.tierIndex,
           difficultyLabel: difficulty.label
         };
@@ -1574,13 +1650,16 @@
     captureSession.phase = 'countdown';
     captureSession.rhythm = {
       ...config,
-      chart: config.chart.slice(),
+      chart: normalizeRhythmChart(config.chart),
+      lanes: config.lanes.slice(),
       startAt,
       nextIndex: 0,
       practice,
       perfect: 0,
       good: 0,
       miss: 0,
+      avoided: 0,
+      resolvedIndices: new Set(),
       noteEls: [],
       statusEl: null,
       accuracyEl: null,
@@ -1651,11 +1730,13 @@
   }
 
   function rhythmExpectedAt(rhythm, index) {
-    return rhythm.startAt + rhythm.travelMs + index * rhythm.noteMs;
+    const note = rhythm.chart[index];
+    const beat = Number.isFinite(note?.beat) ? note.beat : index;
+    return rhythm.startAt + rhythm.travelMs + beat * rhythm.noteMs;
   }
 
   function rhythmAccuracy(rhythm) {
-    const total = rhythm.chart.length || 1;
+    const total = rhythm.chart.filter(note => !note.decoy).length || 1;
     return Math.round(((rhythm.perfect + rhythm.good) / total) * 100);
   }
 
@@ -1687,6 +1768,11 @@
       box,
       'Circle is DON. Diamond is KAT. Keep the beat.',
       '<ruby>丸<rt>まる</rt></ruby>はドン、<ruby>菱形<rt>ひしがた</rt></ruby>はカッです。リズムを<ruby>続<rt>つづ</rt></ruby>けましょう。'
+    );
+    renderCaseDirection(
+      box,
+      'Later levels add lanes. Read the label. Skull and spiral notes are fake. Do not tap them.',
+      '<ruby>後<rt>あと</rt></ruby>のレベルではレーンが<ruby>増<rt>ふ</rt></ruby>えます。ラベルを<ruby>読<rt>よ</rt></ruby>みましょう。<ruby>骸骨<rt>がいこつ</rt></ruby>と<ruby>渦<rt>うず</rt></ruby>の<ruby>音符<rt>おんぷ</rt></ruby>は<ruby>偽物<rt>にせもの</rt></ruby>です。<ruby>押<rt>お</rt></ruby>しません。'
     );
     renderCaseDirection(
       box,
@@ -1754,22 +1840,25 @@
 
     const board = document.createElement('div');
     board.className = 'muenba-rhythm-board';
-    board.setAttribute('aria-label', 'Two lane rhythm capture');
+    const laneDefs = rhythm.lanes.map(id => RHYTHM_LANE_BY_ID[id]).filter(Boolean);
+    board.style.gridTemplateColumns = `repeat(${Math.max(1, laneDefs.length)}, minmax(0, 1fr))`;
+    board.setAttribute('aria-label', `${laneDefs.length} lane rhythm capture`);
 
     const hitLine = document.createElement('div');
     hitLine.className = 'muenba-rhythm-hit-line';
     hitLine.setAttribute('aria-hidden', 'true');
     board.appendChild(hitLine);
 
-    ['don', 'kat'].forEach(lane => {
+    laneDefs.forEach(laneDef => {
+      const lane = laneDef.id;
       const laneButton = document.createElement('button');
       laneButton.type = 'button';
       laneButton.className = `muenba-rhythm-lane muenba-rhythm-${lane}`;
-      laneButton.setAttribute('aria-label', lane === 'don' ? 'Don lane' : 'Kat lane');
+      laneButton.setAttribute('aria-label', `${laneDef.label} lane (${laneDef.key})`);
 
       const label = document.createElement('span');
       label.className = 'muenba-rhythm-lane-label';
-      label.textContent = lane === 'don' ? 'DON / ドン' : 'KAT / カッ';
+      label.textContent = `${laneDef.label} · ${laneDef.key}`;
       laneButton.appendChild(label);
 
       const rail = document.createElement('span');
@@ -1787,11 +1876,12 @@
         }
       });
 
-      rhythm.chart.forEach((noteLane, index) => {
-        if (noteLane !== lane) return;
+      rhythm.chart.forEach((noteData, index) => {
+        if (noteData.lane !== lane) return;
         const note = document.createElement('span');
-        note.className = `muenba-rhythm-note muenba-rhythm-note-${lane}`;
-        note.textContent = lane === 'don' ? '●' : '◆';
+        note.className = `muenba-rhythm-note muenba-rhythm-note-${lane} muenba-rhythm-note-${noteData.shape}`;
+        if (noteData.decoy) note.classList.add('muenba-rhythm-note-decoy');
+        note.textContent = rhythmNoteGlyph(noteData);
         note.setAttribute('aria-hidden', 'true');
         rail.appendChild(note);
         rhythm.noteEls[index] = note;
@@ -1804,8 +1894,8 @@
 
     renderCaseDirection(
       box,
-      'Tap a lane, or use ← / A for Don and → / S for Kat.',
-      'レーンを<ruby>押<rt>お</rt></ruby>しましょう。ドンは← / A、カッは→ / Sです。'
+      `Tap a lane when its note reaches the orange line. Use ${laneDefs.map(lane => `${lane.label.split(' / ')[0]} ${lane.key}`).join(', ')}.`,
+      `<ruby>音符<rt>おんぷ</rt></ruby>がオレンジの<ruby>線<rt>せん</rt></ruby>に<ruby>来<rt>き</rt></ruby>たら、レーンを<ruby>押<rt>お</rt></ruby>します。${laneDefs.map(lane => `${lane.label.split(' / ')[1] || lane.label}は${lane.key}`).join('、')}です。`
     );
 
     const actions = document.createElement('div');
@@ -1851,7 +1941,7 @@
     const rhythm = captureSession.rhythm;
     while (rhythm.nextIndex < rhythm.chart.length &&
            now > rhythmExpectedAt(rhythm, rhythm.nextIndex) + rhythm.goodMs) {
-      markRhythmNote('miss');
+      markRhythmNote(rhythm.chart[rhythm.nextIndex]?.decoy ? 'avoid' : 'miss');
     }
   }
 
@@ -1860,7 +1950,7 @@
     rhythm.chart.forEach((_, index) => {
       const note = rhythm.noteEls[index];
       if (!note) return;
-      if (index < rhythm.nextIndex) {
+      if (rhythm.resolvedIndices.has(index) || index < rhythm.nextIndex) {
         note.classList.add('is-resolved');
         return;
       }
@@ -1870,15 +1960,22 @@
     });
   }
 
-  function markRhythmNote(result) {
+  function markRhythmNote(result, index = captureSession.rhythm.nextIndex) {
     const rhythm = captureSession.rhythm;
-    const index = rhythm.nextIndex;
+    if (rhythm.resolvedIndices.has(index)) return;
     const note = rhythm.noteEls[index];
-    if (note) note.classList.add(result === 'miss' ? 'is-miss' : 'is-hit');
+    if (note) {
+      note.classList.add(result === 'miss' ? 'is-miss' : result === 'avoid' ? 'is-avoided' : 'is-hit');
+      if (result === 'avoid') note.classList.add('is-resolved');
+    }
+    rhythm.resolvedIndices.add(index);
     if (result === 'perfect') rhythm.perfect += 1;
     else if (result === 'good') rhythm.good += 1;
+    else if (result === 'avoid') rhythm.avoided += 1;
     else rhythm.miss += 1;
-    rhythm.nextIndex += 1;
+    while (rhythm.nextIndex < rhythm.chart.length && rhythm.resolvedIndices.has(rhythm.nextIndex)) {
+      rhythm.nextIndex += 1;
+    }
     if (rhythm.accuracyEl) rhythm.accuracyEl.textContent = `Accuracy: ${rhythmAccuracy(rhythm)}%`;
   }
 
@@ -1897,26 +1994,39 @@
     if (rhythm.nextIndex >= rhythm.chart.length) return;
 
     const index = rhythm.nextIndex;
-    const expected = rhythmExpectedAt(rhythm, index);
+    const current = rhythm.chart[index];
+    const beat = current?.beat;
+    let groupEnd = index + 1;
+    while (groupEnd < rhythm.chart.length && rhythm.chart[groupEnd]?.beat === beat) groupEnd += 1;
+    let candidateIndex = -1;
+    for (let i = index; i < groupEnd; i += 1) {
+      const note = rhythm.chart[i];
+      if (!note.decoy && note.lane === lane && !rhythm.resolvedIndices.has(i)) {
+        candidateIndex = i;
+        break;
+      }
+    }
+    if (candidateIndex < 0) {
+      markRhythmNote('miss', index);
+      showRhythmFeedback(current?.decoy && current.lane === lane ? 'Fake note!' : 'Wrong lane', 'miss');
+      return;
+    }
+
+    const expected = rhythmExpectedAt(rhythm, candidateIndex);
     const delta = now - expected;
     if (delta < -rhythm.goodMs) {
       showRhythmFeedback('A little later…', 'early');
       return;
     }
-    if (rhythm.chart[index] !== lane) {
-      markRhythmNote('miss');
-      showRhythmFeedback('Wrong lane', 'miss');
-      return;
-    }
     const absoluteDelta = Math.abs(delta);
     if (absoluteDelta <= rhythm.perfectMs) {
-      markRhythmNote('perfect');
+      markRhythmNote('perfect', candidateIndex);
       showRhythmFeedback('Perfect!', 'perfect');
     } else if (absoluteDelta <= rhythm.goodMs) {
-      markRhythmNote('good');
+      markRhythmNote('good', candidateIndex);
       showRhythmFeedback('Good!', 'good');
     } else {
-      markRhythmNote('miss');
+      markRhythmNote('miss', candidateIndex);
       showRhythmFeedback(delta < 0 ? 'Too early' : 'Too late', 'miss');
     }
   }
@@ -2679,6 +2789,11 @@
       .muenba-rhythm-hit-line { position:absolute; z-index:5; left:8px; right:8px; top:218px; height:3px; border-radius:99px; background:rgba(218,249,229,.8); box-shadow:0 0 14px rgba(143,220,178,.72); pointer-events:none; }
       .muenba-rhythm-note { position:absolute; z-index:3; left:50%; top:0; display:grid; place-items:center; width:42px; height:42px; border:2px solid rgba(220,248,231,.92); border-radius:50%; color:#f0fff5; background:rgba(44,105,76,.92); box-shadow:0 0 16px rgba(112,214,151,.42); font:900 1.1rem/1 ui-monospace,monospace; will-change:transform; }
       .muenba-rhythm-note-kat { border-radius:10px; background:rgba(75,72,126,.92); box-shadow:0 0 16px rgba(144,137,221,.4); }
+      .muenba-rhythm-note-rim { border-radius:9px 9px 50% 50%; background:rgba(122,76,149,.92); box-shadow:0 0 18px rgba(212,108,255,.46); }
+      .muenba-rhythm-note-bell { border-radius:50%; background:rgba(184,99,44,.94); box-shadow:0 0 18px rgba(255,170,74,.52); }
+      .muenba-rhythm-note-decoy { border-style:dashed; color:#ffe0a3; background:rgba(76,35,65,.9); box-shadow:0 0 18px rgba(255,173,91,.48); }
+      .muenba-rhythm-note-spiral { border-radius:50%; transform-origin:center; }
+      .muenba-rhythm-note.is-avoided { opacity:.1; border-color:#ffd48a; box-shadow:none; }
       .muenba-rhythm-note.is-resolved { opacity:.14; box-shadow:none; }
       .muenba-rhythm-note.is-hit { opacity:.94; border-color:#8fe0ad; }
       .muenba-rhythm-note.is-miss { opacity:.18; border-color:#e8b0b8; background:rgba(120,48,64,.65); box-shadow:none; }
