@@ -5,11 +5,11 @@
 // ============================================================
 
 const CURRENT_CACHES = {
-  // Muenba arrow pass: invalidate the previous bundle so room-colored
-  // spectral exit glows reach players.
-  pages:  'booha-pages-2026-274',
-  assets: 'booha-assets-2026-274',
-  decks:  'booha-decks-2026-274',
+  // Muenba hide-search and ghost-shadow pass: invalidate the previous bundle
+  // so the longer hostile linger behavior reaches returning players.
+  pages:  'booha-pages-2026-275',
+  assets: 'booha-assets-2026-275',
+  decks:  'booha-decks-2026-275',
 };
 
 const PAGE_CACHE  = CURRENT_CACHES.pages;
