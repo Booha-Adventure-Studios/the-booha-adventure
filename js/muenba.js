@@ -1313,9 +1313,9 @@
     }, 0);
   }
 
-  function renderCaseDirection(box, english, japaneseHtml) {
+  function renderCaseDirection(box, english, japaneseHtml, variant = '') {
     const direction = document.createElement('div');
-    direction.className = 'muenba-case-direction';
+    direction.className = `muenba-case-direction${variant ? ` ${variant}` : ''}`;
     const en = document.createElement('p');
     en.className = 'muenba-case-direction-en';
     en.textContent = english;
@@ -1403,9 +1403,16 @@
     const box = captureBox();
     captureImage(box, captureSession.ghost);
 
+    renderCaseDirection(
+      box,
+      'READ THE RECORD FIRST.',
+      '<ruby>最初<rt>さいしょ</rt></ruby>に<ruby>記録<rt>きろく</rt></ruby>を<ruby>読<rt>よ</rt></ruby>みましょう。',
+      'muenba-case-record-instruction'
+    );
+
     const progress = document.createElement('div');
     progress.className = 'muenba-case-progress';
-    progress.textContent = `CASE RECORD · ${captureSession.caseIndex + 1} / ${mode.clues.length}`;
+    progress.textContent = `RECORD ${captureSession.caseIndex + 1} OF ${mode.clues.length}`;
     box.appendChild(progress);
 
     const h2 = document.createElement('h2');
@@ -1416,12 +1423,6 @@
     record.className = 'muenba-case-record';
     record.textContent = clue.text;
     box.appendChild(record);
-
-    renderCaseDirection(
-      box,
-      'Read the record. When you are ready, open the next clue.',
-      '<ruby>記録<rt>きろく</rt></ruby>を<ruby>読<rt>よ</rt></ruby>みましょう。<ruby>準備<rt>じゅんび</rt></ruby>ができたら、<ruby>次<rt>つぎ</rt></ruby>の<ruby>手<rt>て</rt></ruby>がかりを<ruby>開<rt>ひら</rt></ruby>きましょう。'
-    );
 
     const actions = document.createElement('div');
     actions.className = 'muenba-case-actions';
@@ -1450,9 +1451,16 @@
     const box = captureBox();
     captureImage(box, captureSession.ghost);
 
+    renderCaseDirection(
+      box,
+      'ANSWER THE QUESTION.',
+      '<ruby>質問<rt>しつもん</rt></ruby>に<ruby>答<rt>こた</rt></ruby>えましょう。',
+      'muenba-case-question-instruction'
+    );
+
     const progress = document.createElement('div');
     progress.className = 'muenba-case-progress';
-    progress.textContent = 'CASE RECORD · FINAL CLUE';
+    progress.textContent = 'RECORDS 1–3 READ · QUESTION';
     box.appendChild(progress);
 
     const records = document.createElement('div');
@@ -1469,11 +1477,12 @@
     });
     box.appendChild(records);
 
-    renderCaseDirection(box, mode.prompt, mode.promptJP);
+    renderCaseDirection(box, mode.prompt, mode.promptJP, 'muenba-case-question');
     if (feedback) renderCaseDirection(
       box,
       feedback,
-      '<ruby>手<rt>て</rt></ruby>がかりをもう<ruby>一度<rt>いちど</rt></ruby><ruby>見<rt>み</rt></ruby>て、もう<ruby>一度<rt>いちど</rt></ruby><ruby>選<rt>えら</rt></ruby>びましょう。'
+      '<ruby>手<rt>て</rt></ruby>がかりをもう<ruby>一度<rt>いちど</rt></ruby><ruby>見<rt>み</rt></ruby>て、もう<ruby>一度<rt>いちど</rt></ruby><ruby>選<rt>えら</rt></ruby>びましょう。',
+      'muenba-case-feedback'
     );
 
     const choices = document.createElement('div');
@@ -2832,7 +2841,7 @@
       .muenba-hunt-helper-jp { margin:0 0 20px !important; color:#d6b6b1 !important; font-size:.82rem !important; line-height:1.65 !important; text-align:left !important; }
       #muenba-lobby-begin:hover, #muenba-lobby-begin:focus-visible, #muenba-room-nuppi-close:hover, #muenba-room-nuppi-close:focus-visible, .muenba-capture-action:hover, .muenba-capture-action:focus-visible { background:rgba(52,104,78,.44); outline:none; }
       .muenba-case-eyebrow { margin:0 0 8px; color:#d8c98b; font:700 10px/1.4 ui-monospace,monospace; letter-spacing:.15em; }
-      .muenba-case-progress { margin:0 0 10px; color:#9ccbb6; font:700 10px/1.4 ui-monospace,monospace; letter-spacing:.12em; }
+      .muenba-case-progress { margin:0 0 10px; color:#fff5d5; font:900 .82rem/1.4 ui-monospace,monospace; letter-spacing:.16em; text-align:left; }
       .muenba-case-record { margin:15px 0 18px !important; padding:14px 15px; border-left:3px solid #d8c98b; background:rgba(216,201,139,.08); color:#fff5d5 !important; font-size:1rem !important; line-height:1.65 !important; text-align:left !important; }
       .muenba-case-record-list { display:grid; gap:7px; margin:13px 0 16px; text-align:left; }
       .muenba-case-record-item { padding:9px 11px; border-left:2px solid rgba(216,201,139,.42); background:rgba(216,201,139,.045); }
@@ -2841,6 +2850,14 @@
       .muenba-case-direction { margin:16px 0; padding:10px 12px; border:1px solid rgba(156,203,182,.24); border-radius:10px; background:rgba(255,255,255,.035); text-align:left; }
       .muenba-case-direction-en { margin:0; color:#dff5e8; font-size:.86rem; line-height:1.45; }
       .muenba-case-direction-jp { margin:5px 0 0; color:#9fc3af; font-size:.82rem; line-height:1.55; }
+      .muenba-case-record-instruction { margin:0 0 10px; border-color:rgba(216,201,139,.74); background:rgba(216,201,139,.13); box-shadow:0 0 20px rgba(216,201,139,.13); }
+      .muenba-case-record-instruction .muenba-case-direction-en, .muenba-case-question-instruction .muenba-case-direction-en { color:#fff; font:900 1rem/1.3 ui-monospace,monospace; letter-spacing:.1em; }
+      .muenba-case-record-instruction .muenba-case-direction-jp, .muenba-case-question-instruction .muenba-case-direction-jp { color:#e7dca9; }
+      .muenba-case-question-instruction { margin:0 0 10px; border-color:rgba(151,126,255,.62); background:rgba(94,67,157,.18); }
+      .muenba-case-question { margin:17px 0 12px; border-color:rgba(255,255,255,.48); background:rgba(84,65,132,.22); box-shadow:0 0 22px rgba(100,77,184,.16); }
+      .muenba-case-question .muenba-case-direction-en { color:#fff; font-size:1.12rem; font-weight:700; line-height:1.45; }
+      .muenba-case-question .muenba-case-direction-jp { color:#d8d0ff; }
+      .muenba-case-feedback { border-color:rgba(219,130,130,.42); background:rgba(125,24,34,.12); }
       .muenba-case-direction ruby, .muenba-case-action ruby { ruby-position:over; line-height:1.45; }
       .muenba-case-direction rt, .muenba-case-action rt { font-size:.78em; opacity:.95; }
       .muenba-case-actions { display:flex; justify-content:center; gap:9px; flex-wrap:wrap; margin-top:6px; }
@@ -2848,8 +2865,8 @@
       .muenba-case-action.is-selected { border-color:#d8c98b; background:rgba(216,201,139,.2); box-shadow:0 0 18px rgba(216,201,139,.2); }
       .muenba-case-action small { color:#a8cbb8; font:400 .76rem Georgia,'Times New Roman',serif; letter-spacing:0; }
       .muenba-case-choices { display:grid; gap:9px; margin:14px 0 4px; }
-      .muenba-case-choice { width:100%; padding:12px 14px; border:1px solid rgba(216,201,139,.34); border-radius:10px; background:rgba(216,201,139,.07); color:#fff5d5; font:400 .9rem Georgia,'Times New Roman',serif; line-height:1.4; text-align:left; cursor:pointer; }
-      .muenba-case-choice:hover, .muenba-case-choice:focus-visible { border-color:#d8c98b; background:rgba(216,201,139,.16); outline:none; }
+      .muenba-case-choice { width:100%; padding:12px 14px; border:1px solid rgba(174,145,255,.5); border-radius:10px; background:rgba(89,65,151,.2); color:#f2edff; font:400 .9rem Georgia,'Times New Roman',serif; line-height:1.4; text-align:left; cursor:pointer; }
+      .muenba-case-choice:hover, .muenba-case-choice:focus-visible { border-color:#c6adff; background:rgba(111,83,184,.34); outline:none; }
       /* Hide button (Pass 7) — always visible during free-roam, not a DEV
          tool. Matches the exit button's box language but sits bottom-left
          so it never competes with the DEV-only bottom-right room list. */
