@@ -139,6 +139,7 @@
     .echo-dot { width: 18px; height: 18px; border: 1px solid rgba(159,228,186,.54); border-radius: 50%; background: transparent; box-shadow: inset 0 0 0 4px rgba(0,0,0,.18); }
     .echo-dot.lit { border-color: var(--mint); background: var(--mint); box-shadow: 0 0 15px rgba(159,228,186,.7), inset 0 0 0 4px rgba(16,60,43,.2); }
     .echo-note { margin: 14px 0 0; color: rgba(225,255,233,.63); font-size: .86rem; line-height: 1.5; }
+    .echo-permanent-note { margin: 8px 0 0; padding-top: 8px; border-top: 1px solid rgba(159,228,186,.18); color: var(--gold); font-size: .78rem; line-height: 1.5; }
 
     .drifter-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
     .drifter-card { min-height: 174px; padding: 14px; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); position: relative; overflow: hidden; }
@@ -149,9 +150,20 @@
     .is-restored .drifter-avatar { filter: none; opacity: 1; }
     .drifter-name { margin: 0; color: #fff6ff; font-size: .95rem; font-weight: 400; line-height: 1.2; }
     .drifter-name small { display: block; margin-top: 4px; color: var(--quiet); font-size: .7rem; }
-    .drifter-state { margin: 17px 0 0; color: var(--quiet); font: 700 .61rem/1.4 var(--sans); letter-spacing: .09em; text-transform: uppercase; }
+    .drifter-state { margin: 15px 0 0; color: var(--quiet); font: 700 .61rem/1.4 var(--sans); letter-spacing: .09em; text-transform: uppercase; }
     .is-restored .drifter-state { color: var(--mint); }
     .drifter-story { margin: 7px 0 0; color: var(--muted); font-size: .78rem; line-height: 1.42; }
+
+    /* ── Per-tier progress pips (Starter/Case/Deep) ──────── */
+    .tier-pips { display: flex; align-items: center; gap: 5px; margin-top: 9px; }
+    .tier-pip {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 17px; height: 17px; border-radius: 5px; border: 1px solid rgba(216,168,255,.4);
+      color: var(--quiet); font: 700 .56rem/1 var(--sans); background: rgba(255,255,255,.03);
+    }
+    .tier-pip.is-lit { border-color: var(--gold); background: rgba(255,203,117,.22); color: var(--gold); }
+    .tier-pip.is-current { box-shadow: 0 0 0 1px var(--violet), 0 0 10px rgba(216,168,255,.45); }
+    .tier-pips-label { margin-left: 2px; color: var(--quiet); font-size: .66rem; }
 
     .lower-grid { display: grid; grid-template-columns: 1.25fr .75fr; gap: 16px; }
     .panel { padding: 19px; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); }
@@ -160,6 +172,8 @@
     .journal-entry h3 { margin: 0; color: #fff4ff; font-size: .98rem; font-weight: 400; }
     .journal-entry h3 small { display: block; margin-top: 4px; color: var(--quiet); font-size: .73rem; }
     .journal-meta { margin: 9px 0 0; color: var(--muted); font: .67rem/1.4 var(--sans); }
+    .journal-next { margin: 7px 0 0; color: var(--mint); font-size: .74rem; line-height: 1.4; }
+    .journal-next.is-done { color: var(--quiet); }
     .journal-empty { margin: 0; color: var(--muted); font-size: .9rem; line-height: 1.55; }
     .journal-empty small { display: block; margin-top: 6px; color: var(--quiet); font-size: .82em; }
     .cabinet-count { color: var(--gold); font-size: 2.7rem; line-height: 1; }
@@ -207,8 +221,6 @@
       box-shadow: 0 3px 0 rgba(0,0,0,.28), 0 0 16px rgba(216,168,255,.28), inset 0 1px rgba(255,255,255,.18);
     }
     .difficulty-option.is-active small { color: #d6cbe9; }
-    .drifter-memory-progress { margin: 8px 0 0; color: var(--quiet); font: .66rem/1.45 var(--sans); letter-spacing: .04em; }
-    .drifter-memory-progress strong { color: var(--gold); }
     .difficulty-note { margin: 12px 2px 0; color: var(--muted); font-size: .82rem; line-height: 1.55; }
     .difficulty-note small { display: block; margin-top: 4px; color: var(--quiet); font-size: .82em; }
 
@@ -228,9 +240,6 @@
       <a href="profile.html">LOG <small>ぼうけんログ</small></a>
       <a href="adventure-profile.html">ADVENTURE <small>ぼうけん</small></a>
       <a href="utsuroba-profile.html" aria-current="page">UTSUROBA <small>うつろば</small></a>
-      <!-- Hidden until BoohaUnlockSystem.isMuenbaUnlocked() — toggled
-           alongside renderWorldBack() below. -->
-      <a href="muenba-profile.html" id="pnet-muenba" hidden>MUENBA <small>むえんば</small></a>
     </nav>
 
     <section class="hero" aria-labelledby="page-title">
@@ -298,12 +307,26 @@
           : (window.UTSUROBA_EPISODES && window.UTSUROBA_EPISODES[id]);
       }
 
+      // Starter Memory / Case Memory / Deep Memory — the same three-tier
+      // naming already shipped in Muenba. All three are fully authored per
+      // episode (utsuroba-episodes.js's resolveEpisode() has supported
+      // 'start'/'fresh'/'deep' since it was written), but this page used to
+      // offer only two of the three buttons, and a brand-new save defaulted
+      // straight to 'deep' — so Starter Memory was never actually reachable.
+      const TIERS = ['start', 'fresh', 'deep'];
+      const TIER_META = {
+        start: { en: 'Starter Memory', jp: `${rb('始', 'はじ')}めの${rb('記憶', 'きおく')}`, pip: 'S', note: 'The simplest words. A good first read.', noteJP: 'いちばんやさしい言葉です。最初に読むのにぴったりです。' },
+        fresh: { en: 'Case Memory', jp: `${rb('新', 'あたら')}しい${rb('記憶', 'きおく')}`, pip: 'C', note: 'The same stories, told in shorter, simpler words.', noteJP: '同じ物語を、短くやさしい言葉で伝えます。' },
+        deep:  { en: 'Deep Memory', jp: `${rb('深', 'ふか')}い${rb('記憶', 'きおく')}`, pip: 'D', note: 'The full stories, the way they were first written.', noteJP: '最初に書かれたままの、完全な物語です。' },
+      };
+
       function getDifficulty() {
-        return window.UTSUROBA_READING_DIFFICULTY ? window.UTSUROBA_READING_DIFFICULTY() : 'start';
+        const value = window.UTSUROBA_READING_DIFFICULTY ? window.UTSUROBA_READING_DIFFICULTY() : 'start';
+        return TIERS.includes(value) ? value : 'start';
       }
 
       function setDifficulty(value) {
-        if (!['start', 'fresh', 'deep'].includes(value)) return;
+        if (!TIERS.includes(value)) return;
         try {
           const data = getSave();
           if (!data.utsuroba) data.utsuroba = {};
@@ -316,31 +339,15 @@
 
       function difficultyMarkup() {
         const current = getDifficulty();
-        const notes = {
-          start: {
-            en: 'Starter Memory uses very short sentences and easy words for younger readers.',
-            jp: `${rb('小', 'ちい')}さい${rb('子', 'こ')}どもが${rb('読', 'よ')}みやすい、${rb('短', 'みじか')}くてやさしい${rb('文', 'ぶん')}です。`
-          },
-          fresh: {
-            en: 'Case Memory adds more detail and asks you to connect the clues.',
-            jp: `${rb('事件', 'じけん')}の${rb('手', 'て')}がかりをつなげて${rb('読', 'よ')}みます。`
-          },
-          deep: {
-            en: 'Deep Memory uses fuller clues and asks you to think about why.',
-            jp: `${rb('深', 'ふか')}い${rb('記憶', 'きおく')}は、${rb('事件', 'じけん')}をじっくり${rb('読', 'よ')}むための、${rb('詳', 'くわ')}しい${rb('手', 'て')}がかりです。`
-          }
-        };
-        const note = (notes[current] || notes.start).en;
-        const noteJP = (notes[current] || notes.start).jp;
+        const meta = TIER_META[current];
         return `<section class="section">
           <div class="section-heading"><h2>How This Reads</h2><p>読み方</p></div>
           <div class="difficulty-card">
             <div class="difficulty-toggle" role="group" aria-label="Reading difficulty">
-              <button type="button" class="difficulty-option${current === 'start' ? ' is-active' : ''}" data-difficulty="start" aria-pressed="${current === 'start'}">Starter Memory<small>${rb('子', 'こ')}ども${rb('向', 'む')}けの${rb('記憶', 'きおく')}</small></button>
-              <button type="button" class="difficulty-option${current === 'fresh' ? ' is-active' : ''}" data-difficulty="fresh" aria-pressed="${current === 'fresh'}">Case Memory<small>${rb('事件', 'じけん')}の${rb('記憶', 'きおく')}</small></button>
-              <button type="button" class="difficulty-option${current === 'deep' ? ' is-active' : ''}" data-difficulty="deep" aria-pressed="${current === 'deep'}">Deep Memory<small>${rb('深', 'ふか')}い${rb('記憶', 'きおく')}</small></button>
+              ${TIERS.map(tier => `<button type="button" class="difficulty-option${tier === current ? ' is-active' : ''}" data-difficulty="${tier}" aria-pressed="${tier === current}">${esc(TIER_META[tier].en)}<small>${TIER_META[tier].jp}</small></button>`).join('')}
             </div>
-            <p class="difficulty-note">${esc(note)}<small>${noteJP}</small></p>
+            <p class="difficulty-note">${esc(meta.note)}<small>${esc(meta.noteJP)}</small></p>
+            <p class="difficulty-note" style="margin-top:8px;opacity:.75">Everything below — the drifters, the journal, the word cabinet, the three echoes — shows what's been restored at whichever memory you're viewing here.<small>下に表示されるドリフター・読書ノート・言葉の戸棚・三つの残響は、ここで選んだ記憶での記録を示します。</small></p>
           </div>
         </section>`;
       }
@@ -356,105 +363,140 @@
         if (open) link.href = 'utsuroba.html?room=room_03';
       }
 
-      // Muenba's own build-readiness gate, not the shared weekly world
-      // gate above — kept as its own function since it governs a
-      // different element on an unrelated condition.
-      function renderMuenbaTab() {
-        const tab = document.getElementById('pnet-muenba');
-        if (!tab) return;
-        let open = false;
-        try {
-          open = !!(window.BoohaUnlockSystem && typeof BoohaUnlockSystem.isMuenbaUnlocked === 'function' && BoohaUnlockSystem.isMuenbaUnlocked());
-        } catch (_) {}
-        tab.hidden = !open;
-      }
-
-      function restoredFor(utsu, drifter) {
+      // Tier-agnostic "has this ever been restored, at any memory" — used
+      // for lifetime badges/pips. Matches how the convergence gate itself
+      // reads readingEchoes in js/utsuroba.js, so a drifter's card and the
+      // in-world gate never disagree about whether a memory counts.
+      function restoredEver(utsu, drifter) {
         return !!(drifter && drifter.episodeId && utsu.readingEchoes && utsu.readingEchoes[drifter.episodeId]);
       }
 
-      function modeComplete(utsu, drifter, mode) {
-        const record = utsu.drifters && drifter ? utsu.drifters[drifter.id] : null;
-        const completed = record && record.completedModes && record.completedModes[mode];
-        if (Array.isArray(completed)) return completed.length >= Number(drifter?.memoryCount || 1);
-        return mode === 'deep' && Array.isArray(record?.completed) && record.completed.length >= Number(drifter?.memoryCount || 1);
+      // Tier-specific — "was this restored at the memory currently being
+      // viewed on this page." This is the one that was missing before: the
+      // page only ever asked restoredEver(), so every drifter that had
+      // *ever* been restored stayed lit no matter which tier you switched
+      // to, and a memory settled at Starter looked identical to one never
+      // read at all once you switched to Deep.
+      function restoredAtTier(utsu, drifter, tier) {
+        const echo = drifter && drifter.episodeId && utsu.readingEchoes && utsu.readingEchoes[drifter.episodeId];
+        return !!(echo && echo.tiers && echo.tiers[tier]);
+      }
+
+      function tiersRestored(utsu, drifter) {
+        const echo = drifter && drifter.episodeId && utsu.readingEchoes && utsu.readingEchoes[drifter.episodeId];
+        return echo && echo.tiers && typeof echo.tiers === 'object' ? echo.tiers : {};
+      }
+
+      function tierPipsMarkup(restoredTiers, currentTier) {
+        return `<div class="tier-pips" aria-hidden="true">${TIERS.map(tier => {
+          const lit = !!restoredTiers[tier];
+          return `<span class="tier-pip${lit ? ' is-lit' : ''}${tier === currentTier ? ' is-current' : ''}" title="${esc(TIER_META[tier].en)}${lit ? ' — restored' : ' — not yet'}">${TIER_META[tier].pip}</span>`;
+        }).join('')}<span class="tier-pips-label">S · C · D</span></div>`;
       }
 
       function render() {
         const data = getSave();
         const utsu = data.utsuroba || {};
-        const memoryModeLabels = { start: 'Starter Memory', fresh: 'Case Memory', deep: 'Deep Memory' };
-        const memoryModeLabel = mode => memoryModeLabels[mode] || memoryModeLabels.start;
+        const currentTier = getDifficulty();
+        const currentTierMeta = TIER_META[currentTier];
         const drifters = Array.isArray(window.UTSUROBA_DATA?.drifters)
           ? window.UTSUROBA_DATA.drifters : [];
-        const echoes = utsu.readingEchoes || {};
         const journal = Array.isArray(utsu.readingJournal?.entries) ? utsu.readingJournal.entries : [];
         const cabinet = Array.isArray(utsu.wordCabinet?.entries) ? utsu.wordCabinet.entries : [];
-        const rooms = utsu.visitedRooms && typeof utsu.visitedRooms === 'object'
-          ? Object.keys(utsu.visitedRooms).length : 0;
         const convergenceIds = Array.isArray(window.UTSUROBA_DATA?.readingConvergence?.requiredDrifterIds)
           ? window.UTSUROBA_DATA.readingConvergence.requiredDrifterIds : ['ks', 'nto', 'cg'];
-        const echoesFound = convergenceIds.filter(id => {
+
+        // Plain running totals — every event counts, replays included, and
+        // none of these ever go backward on a weekly rollover.
+        const memoriesRestoredTotal = Math.max(0, Number(utsu.memoriesRestoredTotal) || 0);
+        const journalReadsTotal = journal.reduce((sum, entry) => sum + (Number(entry.reviewCount) || 0), 0);
+        const wordsTouchedTotal = Math.max(0, Number(utsu.wordsTouchedTotal) || 0);
+        const roomVisitsTotal = Math.max(0, Number(utsu.roomVisitsTotal) || 0);
+
+        // Tier-scoped — how many of the three convergence memories are
+        // restored at the memory currently being viewed on this page. This
+        // used to be a single lifetime count that never changed no matter
+        // which tier the toggle above was set to, which is why it could
+        // read "3 of 3 found" and then never move again.
+        const echoesFoundAtTier = convergenceIds.filter(id => {
           const drifter = drifters.find(item => item.id === id);
-          return restoredFor(utsu, drifter);
+          return restoredAtTier(utsu, drifter, currentTier);
         }).length;
         const convergenceSeen = !!utsu.flags?.convergenceSeen;
 
-        const echoStatus = convergenceSeen ? 'Garden open' : `${echoesFound} of ${convergenceIds.length} found`;
-        const echoNote = convergenceSeen
-          ? 'The three memories have made a place for something new.'
+        const echoStatus = `${echoesFoundAtTier} of ${convergenceIds.length} found at ${currentTierMeta.en}`;
+        const echoNote = echoesFoundAtTier >= convergenceIds.length
+          ? `All three are restored at ${currentTierMeta.en}.`
           : 'Three memories are looking for the shape they share.';
 
         const drifterCards = drifters.map(drifter => {
-          const restored = restoredFor(utsu, drifter);
-          const modeProgress = ['start', 'fresh', 'deep'].map(mode => `${memoryModeLabel(mode)}: ${modeComplete(utsu, drifter, mode) ? 'complete' : 'open'}`).join(' · ');
-          const echo = utsu.readingEchoes && utsu.readingEchoes[drifter.episodeId];
-          const episode = episodeFor(drifter.episodeId, echo && echo.difficulty);
-          const story = restored
-            ? (episode?.success || 'A memory has settled.')
-            : 'A memory is still waiting somewhere in Utsuroba.';
-          return `<article class="drifter-card${restored ? ' is-restored' : ''}">
+          const restoredHere = restoredAtTier(utsu, drifter, currentTier);
+          const restoredTiers = tiersRestored(utsu, drifter);
+          const restoredAny = restoredEver(utsu, drifter);
+          const episode = drifter.episodeId ? episodeFor(drifter.episodeId, currentTier) : null;
+          let storyHTML;
+          if (restoredHere) {
+            storyHTML = esc(episode?.success || 'A memory has settled.');
+          } else if (restoredAny) {
+            storyHTML = `Restored at another memory — switch &ldquo;How This Reads&rdquo; above to see it, or find ${esc(drifter.name)} again to restore it here too.`;
+          } else {
+            storyHTML = esc('A memory is still waiting somewhere in Utsuroba.');
+          }
+          const stateLabel = restoredHere
+            ? `Memory restored · ${rb('記憶', 'きおく')}が${rb('戻', 'もど')}った`
+            : (restoredAny ? `Not yet at ${esc(currentTierMeta.en)} · ${rb('別', 'べつ')}の${rb('記憶', 'きおく')}で${rb('戻', 'もど')}った` : `Still wandering · まださまよう`);
+          return `<article class="drifter-card${restoredHere ? ' is-restored' : ''}">
             <div class="drifter-card-top">
               <img class="drifter-avatar" src="${esc(drifter.sprite1 || '')}" alt="">
               <h3 class="drifter-name">${esc(drifter.name)}<small>${esc(drifter.nameKanji || '')}</small></h3>
             </div>
-            <p class="drifter-state">${restored ? `Memory restored · ${rb('記憶', 'きおく')}が${rb('戻', 'もど')}った` : 'Still wandering · まださまよう'}</p>
-            <p class="drifter-memory-progress"><strong>${esc(memoryModeLabel(getDifficulty()))}</strong> · ${esc(modeProgress)}</p>
-            <p class="drifter-story">${esc(story)}</p>
+            ${drifter.episodeId ? tierPipsMarkup(restoredTiers, currentTier) : ''}
+            <p class="drifter-state">${stateLabel}</p>
+            <p class="drifter-story">${storyHTML}</p>
           </article>`;
         }).join('');
 
         const journalMarkup = journal.length
           ? `<div class="journal-list">${journal.slice(0, 8).map(entry => {
-              const episode = episodeFor(entry.episodeId, entry.difficulty);
+              const episode = episodeFor(entry.episodeId, currentTier);
               const drifter = drifters.find(item => item.id === entry.drifterId);
+              const restoredTiers = tiersRestored(utsu, drifter);
+              const missingTier = TIERS.find(tier => !restoredTiers[tier]);
+              const nextHint = missingTier
+                ? `Try ${esc(TIER_META[missingTier].en)} next to restore it there too.`
+                : `You've restored this memory at every level.`;
+              const reviews = Math.max(1, Number(entry.reviewCount) || 1);
               return `<article class="journal-entry">
                 <h3>${esc(episode?.title || entry.episodeId || 'Untitled memory')}<small>${esc(episode?.titleJP || drifter?.nameKanji || '')}</small></h3>
-                <p class="journal-meta">${esc(drifter?.name || 'Utsuroba')} · ${esc(memoryModeLabel(entry.difficulty || 'start'))} · ${entry.masteryLevel || 0} memory marks · ${entry.reviewCount || 1} reading${(entry.reviewCount || 1) === 1 ? '' : 's'}</p>
+                ${drifter ? tierPipsMarkup(restoredTiers, currentTier) : ''}
+                <p class="journal-meta">${esc(drifter?.name || 'Utsuroba')} · ${reviews} reading${reviews === 1 ? '' : 's'} total (every replay counted)</p>
+                <p class="journal-next${missingTier ? '' : ' is-done'}">${nextHint}</p>
               </article>`;
             }).join('')}</div>`
           : `<p class="journal-empty">No memory has settled into the journal yet.<small>${rb('記憶', 'きおく')}が${rb('戻', 'もど')}ると、ここに${rb('記録', 'きろく')}されます。</small></p>`;
 
-        const wordMarkup = cabinet.length
-          ? `<div class="word-list">${cabinet.slice(0, 18).map(entry => `<span class="word">${esc(entry.word)}</span>`).join('')}${cabinet.length > 18 ? `<span class="word-more">+${cabinet.length - 18} more</span>` : ''}</div>`
-          : `<p class="journal-empty">No words collected yet.<small>${rb('物語', 'ものがたり')}の<ruby>言葉<rt>ことば</rt></ruby>が、ここに${rb('集', 'あつ')}まります。</small></p>`;
+        const cabinetAtTier = cabinet.filter(entry => Array.isArray(entry.tiers) && entry.tiers.includes(currentTier));
+        const wordMarkup = cabinetAtTier.length
+          ? `<div class="word-list">${cabinetAtTier.slice(0, 18).map(entry => `<span class="word">${esc(entry.word)}</span>`).join('')}${cabinetAtTier.length > 18 ? `<span class="word-more">+${cabinetAtTier.length - 18} more</span>` : ''}</div>`
+          : `<p class="journal-empty">No words collected yet at ${esc(currentTierMeta.en)}.<small>${rb('物語', 'ものがたり')}の<ruby>言葉<rt>ことば</rt></ruby>が、ここに${rb('集', 'あつ')}まります。</small></p>`;
 
         host.innerHTML = `
           ${difficultyMarkup()}
 
           <section class="stats" aria-label="Utsuroba totals">
-            <div class="stat"><div class="stat-value">${Object.keys(echoes).length}</div><div class="stat-label">Memories restored</div><span class="stat-jp">${rb('戻', 'もど')}った${rb('記憶', 'きおく')}</span></div>
-            <div class="stat"><div class="stat-value">${journal.length}</div><div class="stat-label">Journal entries</div><span class="stat-jp"><ruby>読書<rt>どくしょ</rt></ruby>ノート</span></div>
-            <div class="stat"><div class="stat-value">${cabinet.length}</div><div class="stat-label">Words kept</div><span class="stat-jp">${rb('集', 'あつ')}めた<ruby>言葉<rt>ことば</rt></ruby></span></div>
-            <div class="stat"><div class="stat-value">${rooms}</div><div class="stat-label">Rooms visited</div><span class="stat-jp"><ruby>訪<rt>おとず</rt></ruby>れた<ruby>部屋<rt>へや</rt></ruby></span></div>
+            <div class="stat"><div class="stat-value">${memoriesRestoredTotal}</div><div class="stat-label">Memories restored</div><span class="stat-jp">${rb('戻', 'もど')}った${rb('記憶', 'きおく')}</span></div>
+            <div class="stat"><div class="stat-value">${journalReadsTotal}</div><div class="stat-label">Journal entries</div><span class="stat-jp"><ruby>読書<rt>どくしょ</rt></ruby>ノート</span></div>
+            <div class="stat"><div class="stat-value">${wordsTouchedTotal}</div><div class="stat-label">Words kept</div><span class="stat-jp">${rb('集', 'あつ')}めた<ruby>言葉<rt>ことば</rt></ruby></span></div>
+            <div class="stat"><div class="stat-value">${roomVisitsTotal}</div><div class="stat-label">Rooms visited</div><span class="stat-jp"><ruby>訪<rt>おとず</rt></ruby>れた<ruby>部屋<rt>へや</rt></ruby></span></div>
           </section>
 
           <section class="section">
             <div class="section-heading"><h2>The Three Echoes</h2><p><ruby>三<rt>みっ</rt></ruby>つの<ruby>残響<rt>ざんきょう</rt></ruby></p></div>
             <div class="echo-card">
-              <div class="echo-top"><h3 class="echo-title">A shape shared by three memories<small>${esc(getName())}, you have found ${echoesFound} of ${convergenceIds.length} echoes.</small></h3><div class="echo-status">${esc(echoStatus)}</div></div>
-              <div class="echo-dots" aria-label="${echoesFound} of ${convergenceIds.length} echoes found">${convergenceIds.map((_, i) => `<span class="echo-dot${i < echoesFound ? ' lit' : ''}"></span>`).join('')}</div>
-              <p class="echo-note">${esc(echoNote)}<br><span style="opacity:.65">${convergenceSeen ? `${rb('記憶', 'きおく')}の<ruby>庭<rt>にわ</rt></ruby>が<ruby>開<rt>ひら</rt></ruby>いています。` : `<ruby>三<rt>みっ</rt></ruby>つの${rb('記憶', 'きおく')}が、<ruby>共通<rt>きょうつう</rt></ruby>する<ruby>形<rt>かたち</rt></ruby>を<ruby>探<rt>さが</rt></ruby>しています。`}</span></p>
+              <div class="echo-top"><h3 class="echo-title">A shape shared by three memories<small>${esc(getName())}, you have found ${echoesFoundAtTier} of ${convergenceIds.length} echoes at ${esc(currentTierMeta.en)}.</small></h3><div class="echo-status">${esc(echoStatus)}</div></div>
+              <div class="echo-dots" aria-label="${echoesFoundAtTier} of ${convergenceIds.length} echoes found at ${esc(currentTierMeta.en)}">${convergenceIds.map((_, i) => `<span class="echo-dot${i < echoesFoundAtTier ? ' lit' : ''}"></span>`).join('')}</div>
+              <p class="echo-note">${esc(echoNote)}<br><span style="opacity:.65">${echoesFoundAtTier >= convergenceIds.length ? `${rb('三', 'みっ')}つとも${esc(currentTierMeta.en)}で${rb('戻', 'もど')}りました。` : `<ruby>三<rt>みっ</rt></ruby>つの${rb('記憶', 'きおく')}が、<ruby>共通<rt>きょうつう</rt></ruby>する<ruby>形<rt>かたち</rt></ruby>を<ruby>探<rt>さが</rt></ruby>しています。`}</span></p>
+              ${convergenceSeen ? `<p class="echo-permanent-note">✦ The memory garden has opened for good — this stays true no matter which memory you're viewing above.<br><span style="opacity:.8">${rb('記憶', 'きおく')}の<ruby>庭<rt>にわ</rt></ruby>はすでに<ruby>開<rt>ひら</rt></ruby>いています。どの<ruby>記憶<rt>きおく</rt></ruby>を<ruby>見<rt>み</rt></ruby>ていても<ruby>変<rt>か</rt></ruby>わりません。</span></p>` : ''}
             </div>
           </section>
 
@@ -465,7 +507,7 @@
 
           <section class="section lower-grid">
             <div class="panel"><div class="section-heading"><h2>Reading Journal</h2><p><ruby>読書<rt>どくしょ</rt></ruby>ノート</p></div>${journalMarkup}</div>
-            <div class="panel"><div class="section-heading"><h2>Word Cabinet</h2><p><ruby>言葉<rt>ことば</rt></ruby>の<ruby>戸棚<rt>とだな</rt></ruby></p></div><div class="cabinet-count">${cabinet.length}</div><p class="cabinet-label">words kept from remembered stories</p>${wordMarkup}</div>
+            <div class="panel"><div class="section-heading"><h2>Word Cabinet</h2><p><ruby>言葉<rt>ことば</rt></ruby>の<ruby>戸棚<rt>とだな</rt></ruby></p></div><div class="cabinet-count">${cabinetAtTier.length}</div><p class="cabinet-label">words remembered at ${esc(currentTierMeta.en)}</p>${wordMarkup}</div>
           </section>`;
 
         host.querySelectorAll('[data-difficulty]').forEach(button => {
@@ -475,7 +517,6 @@
 
       function boot() {
         renderWorldBack();
-        renderMuenbaTab();
         render();
         if (window.UTSUROBA_EPISODES_READY && typeof window.UTSUROBA_EPISODES_READY.then === 'function') {
           window.UTSUROBA_EPISODES_READY.then(render).catch(() => {});
@@ -485,8 +526,6 @@
         document.addEventListener('booha:saved', renderWorldBack);
         document.addEventListener('booha:weeklyReset', renderWorldBack);
         document.addEventListener('booha:newWeek', renderWorldBack);
-        document.addEventListener('booha:saved', renderMuenbaTab);
-        document.addEventListener('booha:weeklyReset', renderMuenbaTab);
       }
 
       if (window.BOOHA_READY) boot();

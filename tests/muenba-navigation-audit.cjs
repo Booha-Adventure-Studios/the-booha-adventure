@@ -20,6 +20,34 @@ assert(karasukiSource.includes('const masterAlpha = unlocked ? 1 : moveReveal;')
 assert(karasukiSource.includes("ctx.strokeStyle = unlocked ? '#75f2b5' : '#9b7da9';"), 'unlocked Muenba must use a vivid spectral rim');
 assert(karasukiSource.includes('ctx.setLineDash([4, 7]);'), 'unlocked Muenba must have a lightweight broken spirit ring');
 
+function readPortal(name) {
+  const block = karasukiSource.match(new RegExp(`const ${name} = \\{([\\s\\S]*?)\\n  \\};`));
+  assert(block, `${name} must remain declared as a portal config`);
+  const read = key => {
+    const match = block[1].match(new RegExp(`\\b${key}\\s*:\\s*(\\d+)`));
+    assert(match, `${name} must keep a numeric ${key}`);
+    return Number(match[1]);
+  };
+  return { x: read('x'), y: read('y'), r: read('r') };
+}
+
+const utsurobaPortal = readPortal('UTSUROBA_PORTAL');
+const muenbaPortal = readPortal('MUENBA_PORTAL');
+
+function insidePortal(portal, x, y) {
+  return Math.hypot(x - portal.x, y - portal.y) <= portal.r;
+}
+
+for (const [name, portal] of [['Utsuroba', utsurobaPortal], ['Muenba', muenbaPortal]]) {
+  assert(insidePortal(portal, portal.x, portal.y), `${name} center must be clickable`);
+  assert(insidePortal(portal, portal.x + portal.r, portal.y), `${name} hit edge must remain clickable`);
+  assert(!insidePortal(portal, portal.x + portal.r + 1, portal.y), `${name} outside edge must not trigger`);
+}
+
+assert(karasukiSource.includes('Math.hypot(worldX - UTSUROBA_PORTAL.x, worldY - UTSUROBA_PORTAL.y) <= UTSUROBA_PORTAL.r'), 'Utsuroba click hit area must use its visible orb radius');
+assert(karasukiSource.includes('Math.hypot(worldX - MUENBA_PORTAL.x, worldY - MUENBA_PORTAL.y) <= MUENBA_PORTAL.r'), 'Muenba click hit area must use its visible orb radius');
+assert(karasukiSource.includes('ctx.restore();\n  }\n\n  function enterMuenba'), 'Muenba orb drawing must restore canvas state');
+
 function shouldDrift(spawnId, arrivalDir) {
   return spawnId === 'fromKarasuki' || !!arrivalDir;
 }
@@ -29,4 +57,4 @@ assert.strictEqual(shouldDrift('fromLeft', 'right'), true, 'left-side room entry
 assert.strictEqual(shouldDrift('fromUp', 'down'), true, 'upper room entry should drift');
 assert.strictEqual(shouldDrift('default', null), false, 'direct room jumps should not invent an arrival drift');
 
-console.log('Muenba/Karasuki navigation audit passed: room entry drift, input unlock, first-tap arrows, Nuppi spacing, and vivid unlocked portals.');
+console.log('Muenba/Karasuki navigation audit passed: room entry drift, input unlock, first-tap arrows, Nuppi spacing, vivid portals, and orb hit boundaries.');
