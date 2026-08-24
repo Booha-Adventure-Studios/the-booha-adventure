@@ -1971,8 +1971,15 @@
       .muenba-case-board-eyebrow { margin:0 0 8px; color:#d8c98b; font:700 .62rem/1.4 ui-monospace,monospace; letter-spacing:.16em; text-transform:uppercase; }
       .muenba-lobby-actions { display:flex; justify-content:center; margin-top:4px; }
       #muenba-lobby-begin, .muenba-capture-action { border:1px solid rgba(156,203,182,.7); color:#e0f4e9; background:rgba(52,104,78,.28); box-shadow:0 0 16px rgba(93,162,124,.22); border-radius:999px; padding:10px 28px; font:700 12px ui-monospace,monospace; letter-spacing:.05em; cursor:pointer; }
-      #muenba-case-board-start { min-width:190px; padding:13px 38px; border-color:rgba(216,201,139,.9); color:#fff5d5; background:rgba(126,111,48,.3); box-shadow:0 0 24px rgba(216,201,139,.34),inset 0 0 12px rgba(216,201,139,.12); font-size:13px; }
-      #muenba-case-board-start:hover, #muenba-case-board-start:focus-visible { background:rgba(126,111,48,.48); box-shadow:0 0 34px rgba(216,201,139,.48),inset 0 0 16px rgba(216,201,139,.16); }
+      #muenba-case-board-next, #muenba-hunt-card-begin { min-width:190px; padding:13px 38px; border-color:rgba(216,201,139,.9); color:#fff5d5; background:rgba(126,111,48,.3); box-shadow:0 0 24px rgba(216,201,139,.34),inset 0 0 12px rgba(216,201,139,.12); font-size:13px; }
+      #muenba-case-board-next:hover, #muenba-case-board-next:focus-visible, #muenba-hunt-card-begin:hover, #muenba-hunt-card-begin:focus-visible { background:rgba(126,111,48,.48); box-shadow:0 0 34px rgba(216,201,139,.48),inset 0 0 16px rgba(216,201,139,.16); }
+      .muenba-hunt-card { width:min(560px,100%); padding:30px 28px 28px; border-color:rgba(216,201,139,.58); box-shadow:0 24px 80px rgba(0,0,0,.82),0 0 70px rgba(126,111,48,.22),inset 0 0 70px rgba(0,0,0,.58); }
+      .muenba-hunt-ghost-portrait { display:block; width:min(220px,58vw); height:min(220px,58vw); object-fit:contain; margin:0 auto 12px; filter:drop-shadow(0 0 22px rgba(216,201,139,.34)); animation:muenbaHuntGhostFloat 3.2s ease-in-out infinite; }
+      @keyframes muenbaHuntGhostFloat { 0%,100% { transform:translateY(0) rotate(-1deg); } 50% { transform:translateY(-6px) rotate(1deg); } }
+      .muenba-hunt-target-eyebrow { margin:0 0 8px; color:#d8c98b; font:700 .66rem/1.4 ui-monospace,monospace; letter-spacing:.17em; text-transform:uppercase; }
+      .muenba-hunt-card h2 { font-size:clamp(1.35rem,4vw,1.85rem); }
+      .muenba-hunt-helper { margin:18px 0 10px !important; padding:13px 14px; border:1px solid rgba(219,130,130,.34); border-left:3px solid rgba(219,130,130,.72); border-radius:10px; background:rgba(125,24,34,.12); color:#ffe2df !important; font-size:.92rem !important; line-height:1.55 !important; text-align:left !important; }
+      .muenba-hunt-helper-jp { margin:0 0 20px !important; color:#d6b6b1 !important; font-size:.82rem !important; line-height:1.65 !important; text-align:left !important; }
       #muenba-lobby-begin:hover, #muenba-lobby-begin:focus-visible, .muenba-capture-action:hover, .muenba-capture-action:focus-visible { background:rgba(52,104,78,.44); outline:none; }
       .muenba-case-eyebrow { margin:0 0 8px; color:#d8c98b; font:700 10px/1.4 ui-monospace,monospace; letter-spacing:.15em; }
       .muenba-case-progress { margin:0 0 10px; color:#9ccbb6; font:700 10px/1.4 ui-monospace,monospace; letter-spacing:.12em; }
@@ -2040,7 +2047,7 @@
       .muenba-orb-release { display:grid; place-items:center; width:38px; height:38px; color:#dfffea; border:1px solid rgba(181,238,202,.75); border-radius:50%; background:radial-gradient(circle,rgba(113,206,153,.72),rgba(30,83,59,.68)); box-shadow:0 0 22px rgba(113,206,153,.58); font-size:1.45rem; animation:muenbaOrbRelease .42s cubic-bezier(.2,1.5,.4,1) both; }
       @keyframes muenbaOrbRelease { from { opacity:0; transform:translateY(12px) scale(.35); } to { opacity:1; transform:translateY(0) scale(1); } }
       .muenba-orb-release-status { margin:0 0 18px !important; color:#9ccbb6 !important; font:700 .76rem/1.4 ui-monospace,monospace !important; text-align:center !important; letter-spacing:.05em; }
-      @media (prefers-reduced-motion: reduce) { .muenba-orb-release { animation:none; } }
+      @media (prefers-reduced-motion: reduce) { .muenba-orb-release, .muenba-hunt-ghost-portrait { animation:none; } }
       @media (prefers-reduced-motion: reduce) { #muenba-fade, .muenba-return-box, #muenba-return-overlay, .muenba-lobby-box, #muenba-lobby-overlay, #muenba-capture-overlay { transition:none !important; } .muenba-lobby-portrait { animation:none !important; } }
     `;
     document.head.appendChild(style);
@@ -2581,7 +2588,7 @@
   // Per the locked decision, this shows every time the player enters
   // Muenba (not just the first time), in a warm-guide tone, addressing the
   // player by name when one is on file. The welcome beat hands off to a
-  // larger case-board beat, which ends on the real Start button.
+  // larger case-board beat, then a final target card before the hunt begins.
   function buildNuppiLobbyOverlay() {
     if (lobbyOverlay) return;
     lobbyOverlay = document.createElement('div');
@@ -2629,15 +2636,51 @@
           <p id="muenba-case-board-jp" class="muenba-case-direction-jp"></p>
         </section>
         <div class="muenba-lobby-actions">
-          <button id="muenba-case-board-start" type="button">Start</button>
+          <button id="muenba-case-board-next" type="button">Next</button>
         </div>
       </div>`;
     refreshNuppiCaseBoard();
-    lobbyOverlay.querySelector('#muenba-case-board-start').addEventListener('click', () => {
+    lobbyOverlay.querySelector('#muenba-case-board-next').addEventListener('click', renderNuppiHuntCard);
+    focusLobbyControl('#muenba-case-board-next');
+  }
+
+  function nextNuppiHuntGhost() {
+    const nextCase = nextMuenbaCase();
+    const ghosts = DATA.ghosts || [];
+    if (nextCase) {
+      return ghosts.find(ghost => ghost.id === nextCase.ghostId) || null;
+    }
+    const found = readMuenba().ghostsFound && typeof readMuenba().ghostsFound === 'object'
+      ? readMuenba().ghostsFound
+      : {};
+    return ghosts.find(ghost => !found[ghost.id]) || ghosts[0] || null;
+  }
+
+  function renderNuppiHuntCard() {
+    if (!lobbyOverlay) return;
+    const name = getPlayerFirstName();
+    const ghost = nextNuppiHuntGhost();
+    const ghostName = ghost ? ghost.name : 'the next ghost';
+    const helperName = name ? ` Be careful, ${name}.` : ' Be careful.';
+    lobbyOverlay.innerHTML = `
+      <div class="muenba-lobby-box muenba-hunt-card">
+        <div class="muenba-hunt-target-eyebrow">YOUR HUNT TARGET</div>
+        ${ghost
+          ? `<img class="muenba-hunt-ghost-portrait" src="${ghost.img}" alt="${ghostName}">`
+          : '<div class="muenba-hunt-ghost-portrait" aria-hidden="true"></div>'}
+        <h2>Find ${ghostName}</h2>
+        <p class="jp">${ghost ? ghost.kana : 'つぎの幽霊'}</p>
+        <p class="muenba-hunt-helper">Not all ghosts are friendly. Run away or hide from the angry ones.${helperName}</p>
+        <p class="muenba-hunt-helper-jp">すべての<ruby>幽霊<rt>ゆうれい</rt></ruby>が<ruby>友好的<rt>ゆうこうてき</rt></ruby>とは<ruby>限<rt>かぎ</rt></ruby>らない。<ruby>怒<rt>おこ</rt></ruby>った<ruby>幽霊<rt>ゆうれい</rt></ruby>からは<ruby>逃<rt>に</rt></ruby>げるか、<ruby>隠<rt>かく</rt></ruby>れよう。${name ? `${name}さん、` : ''}<ruby>気<rt>き</rt></ruby>をつけて。</p>
+        <div class="muenba-lobby-actions">
+          <button id="muenba-hunt-card-begin" type="button">Begin hunt</button>
+        </div>
+      </div>`;
+    lobbyOverlay.querySelector('#muenba-hunt-card-begin').addEventListener('click', () => {
       closeNuppiLobby();
       if (readMuenba().orbsPending > 0) openPendingOrbRecovery();
     });
-    focusLobbyControl('#muenba-case-board-start');
+    focusLobbyControl('#muenba-hunt-card-begin');
   }
 
   function focusLobbyControl(selector) {

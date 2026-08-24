@@ -5,11 +5,11 @@
 // ============================================================
 
 const CURRENT_CACHES = {
-  // Muenba hiding sprite pass: invalidate the previous deployed bundle so
-  // the visible hide state cannot remain behind cache-first routing.
-  pages:  'booha-pages-2026-256',
-  assets: 'booha-assets-2026-256',
-  decks:  'booha-decks-2026-256',
+  // Muenba Nuppi hunt-card pass: invalidate the previous deployed bundle so
+  // the three-step lobby cannot remain behind cache-first routing.
+  pages:  'booha-pages-2026-257',
+  assets: 'booha-assets-2026-257',
+  decks:  'booha-decks-2026-257',
 };
 
 const PAGE_CACHE  = CURRENT_CACHES.pages;
