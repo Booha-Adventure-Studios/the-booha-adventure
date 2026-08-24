@@ -39,10 +39,21 @@ function nextCase(caseIds, records, mode) {
   return caseIds.find(caseId => !isComplete(records[caseId] || {}, mode)) || null;
 }
 
+function targetGhost(caseOrder, records, mode) {
+  const next = caseOrder.find(caseData => !isComplete(records[caseData.id] || {}, mode));
+  return next && next.ghostId;
+}
+
+function availableGhostIds(ghostIds, weeklyFound, targetId) {
+  return ghostIds.filter(ghostId => ghostId === targetId || !weeklyFound[ghostId]);
+}
+
 assert(source.includes("const MUENBA_CASE_MODES = ['start', 'fresh', 'deep'];"), 'source must define all three memory modes');
 assert(source.includes('completedModes'), 'source must persist per-mode completion');
 assert(source.includes('caseModeIsComplete'), 'source must check completion for the selected mode');
 assert(source.includes('const availableGhosts = GHOSTS.filter(ghost => ghost.id === activeCaseGhostId || !weeklyFound || !weeklyFound[ghost.id])'), 'unfinished active cases must remain available after weekly capture');
+assert(source.includes('function activeMuenbaCaseGhost()'), 'selected-mode target ghost should have an explicit helper');
+assert(source.includes('ghost.id === (activeCaseGhost && activeCaseGhost.id) || !weeklyFound || !weeklyFound[ghost.id]'), 'weekly availability must preserve an unfinished case target');
 
 const legacy = migrateRecord({ completed: true, difficulty: 'fresh' });
 assert.deepStrictEqual(legacy.completedModes, { fresh: true }, 'legacy completed records should migrate to their recorded mode');
@@ -52,6 +63,10 @@ let record = completeMode({ completed: false, completedModes: {} }, 'start');
 assert.strictEqual(isComplete(record, 'start'), true, 'Start Memory should be recorded');
 assert.strictEqual(record.completed, false, 'unfinished memory modes should keep the case active');
 assert.strictEqual(nextCase(['case_01'], { case_01: record }, 'fresh'), 'case_01', 'the same case should return for unfinished Fresh Memory');
+const caseOrder = [{ id: 'case_01', ghostId: 'twiddle' }, { id: 'case_02', ghostId: 'fuzzle' }];
+const weeklyFound = { twiddle: true };
+assert.strictEqual(targetGhost(caseOrder, { case_01: record }, 'fresh'), 'twiddle', 'Fresh should keep the same target case when it is unfinished');
+assert.ok(availableGhostIds(['twiddle', 'fuzzle'], weeklyFound, 'twiddle').includes('twiddle'), 'the unfinished target must return after weekly energy capture');
 
 record = completeMode(record, 'fresh');
 assert.strictEqual(record.completed, false, 'Deep Memory should still be required');
