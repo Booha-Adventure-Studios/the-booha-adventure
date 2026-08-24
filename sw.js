@@ -7,9 +7,9 @@
 const CURRENT_CACHES = {
   // Rhythm Pass 2: invalidate the previous bundle so permanent capture-based
   // difficulty reaches returning players.
-  pages:  'booha-pages-2026-303',
-  assets: 'booha-assets-2026-303',
-  decks:  'booha-decks-2026-303',
+  pages:  'booha-pages-2026-304',
+  assets: 'booha-assets-2026-304',
+  decks:  'booha-decks-2026-304',
 };
 
 const PAGE_CACHE  = CURRENT_CACHES.pages;
