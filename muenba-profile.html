@@ -367,8 +367,14 @@
         const currentMemory = getReadingDifficulty();
         const caseOrder = (Array.isArray(window.MUENBA_DATA?.caseOrder) ? window.MUENBA_DATA.caseOrder : Object.keys(cases))
           .map(caseId => cases[caseId]).filter(Boolean);
-        const found = mu.ghostsFound && typeof mu.ghostsFound === 'object' ? mu.ghostsFound : {};
         const orbs = typeof mu.orbsCollected === 'number' ? mu.orbsCollected : 0;
+        // Pass 13: these three are plain running totals (every capture,
+        // every case+tier settled, every room entry — replays included),
+        // not distinct-progress fractions, matching how orbsCollected
+        // already behaved. See migrateMuenbaSave()/commitSuccessfulCapture()/
+        // markMuenbaRoomVisited() in muenba.js for where each one is bumped.
+        const totalCaptures = Number.isInteger(mu.rhythm?.capturesCompleted) ? mu.rhythm.capturesCompleted : 0;
+        const caseSettles = Number.isInteger(mu.caseRecordsSettled) ? mu.caseRecordsSettled : 0;
         const caseRecords = mu.caseRecords && typeof mu.caseRecords === 'object' ? mu.caseRecords : {};
         const legacyCompletedIds = new Set(Array.isArray(mu.caseProgress?.completedCaseIds) ? mu.caseProgress.completedCaseIds : []);
         const recordForCase = caseData => {
@@ -385,18 +391,16 @@
         const modeComplete = (record, mode) => !!(record && ((record.completedModes && record.completedModes[mode] === true) || (!record.completedModes && record.completed === true && record.difficulty === mode)));
         const allModesComplete = record => memoryModes.every(mode => modeComplete(record, mode));
         const completedIds = new Set(caseOrder.filter(caseData => allModesComplete(recordForCase(caseData))).map(caseData => caseData.id));
-        const completedCases = caseOrder.filter(caseData => completedIds.has(caseData.id));
         const nextCase = caseOrder.find(caseData => !modeComplete(recordForCase(caseData), currentMemory)) || null;
-        const rooms = mu.visitedRooms && typeof mu.visitedRooms === 'object'
-          ? Object.keys(mu.visitedRooms).length : 0;
+        const rooms = Number.isInteger(mu.roomVisitsTotal) ? mu.roomVisitsTotal : 0;
         const journal = Array.isArray(mu.huntJournal?.entries) ? mu.huntJournal.entries : [];
-        const foundCount = ghosts.filter(g => found[g.id]).length;
 
         const caseRecordMarkup = caseOrder.length
           ? `<div class="case-record-grid">${caseOrder.map((caseData, index) => {
               const record = recordForCase(caseData);
               const isCompleted = completedIds.has(caseData.id);
               const isNext = nextCase && nextCase.id === caseData.id;
+              const isCurrentModeComplete = modeComplete(record, currentMemory);
               const ghost = ghosts.find(candidate => candidate.id === caseData.ghostId);
               if (isCompleted) {
                 const mode = caseData[record.difficulty] || caseData.fresh;
@@ -404,6 +408,22 @@
                 return `<article class="case-record-card">
                   <h3>${esc(caseData.title)}</h3>
                   <small>Case ${index + 1} · all memory modes complete · case settled</small>
+                  <small class="case-memory-progress">${esc(modeProgress)}</small>
+                  <ol>${(mode?.clues || []).map(clue => `<li><strong>${esc(clue.title)}</strong><br>${esc(clue.text)}</li>`).join('')}</ol>
+                </article>`;
+              }
+              // Pass 13: settled at the currently-selected memory tier but
+              // not every tier yet — the hunt is strictly sequential, so
+              // this can only be true for a case already passed in the
+              // queue. Previously there was no branch for this state, so a
+              // case like this fell all the way through to "waiting" below
+              // and wrongly claimed it hadn't opened yet.
+              if (isCurrentModeComplete) {
+                const mode = caseData[currentMemory] || caseData.fresh;
+                const modeProgress = memoryModes.map(modeName => `${memoryModeLabel(modeName)} ${modeComplete(record, modeName) ? 'complete' : 'open'}`).join(' · ');
+                return `<article class="case-record-card">
+                  <h3>${esc(caseData.title)}</h3>
+                  <small>Case ${index + 1} · settled at ${esc(memoryModeLabel(currentMemory))}</small>
                   <small class="case-memory-progress">${esc(modeProgress)}</small>
                   <ol>${(mode?.clues || []).map(clue => `<li><strong>${esc(clue.title)}</strong><br>${esc(clue.text)}</li>`).join('')}</ol>
                 </article>`;
@@ -424,10 +444,14 @@
           : `<p class="journal-empty">No case records yet.<small>Complete a ghost case to place its English record here.</small></p>`;
 
         const ghostCards = ghosts.map(ghost => {
-          const isFound = !!found[ghost.id];
           const ghostCase = caseOrder.find(caseData => caseData.ghostId === ghost.id);
           const ghostRecord = ghostCase ? recordForCase(ghostCase) : null;
           const currentModeComplete = ghostCase && modeComplete(ghostRecord, currentMemory);
+          // Pass 13: highlighting now tracks whether *this ghost's case is
+          // solved at the currently-selected memory tier*, not lifetime
+          // capture — previously every found-at-least-once ghost stayed lit
+          // up on every tier, even ones you hadn't actually solved there.
+          const isFound = !!currentModeComplete;
           const modeProgress = ghostCase
             ? memoryModes.map(modeName => `${memoryModeLabel(modeName)}: ${modeComplete(ghostRecord, modeName) ? 'complete' : 'open'}`).join(' · ')
             : 'No case memory assigned yet';
@@ -458,9 +482,9 @@
           ${difficultyMarkup()}
 
           <section class="stats" aria-label="Muenba totals">
-            <div class="stat"><div class="stat-value">${foundCount} / ${ghosts.length}</div><div class="stat-label">Energy collected</div><span class="stat-jp"><ruby>集<rt>あつ</rt></ruby>めたエネルギー</span></div>
+            <div class="stat"><div class="stat-value">${totalCaptures}</div><div class="stat-label">Energy collected</div><span class="stat-jp"><ruby>集<rt>あつ</rt></ruby>めたエネルギー</span></div>
             <div class="stat"><div class="stat-value">${orbs}</div><div class="stat-label">Orbs collected</div><span class="stat-jp"><ruby>集<rt>あつ</rt></ruby>めたエネルギー</span></div>
-            <div class="stat"><div class="stat-value">${completedCases.length} / ${caseOrder.length}</div><div class="stat-label">Case records</div><span class="stat-jp"><ruby>事件<rt>じけん</rt></ruby>の<ruby>記録<rt>きろく</rt></ruby></span></div>
+            <div class="stat"><div class="stat-value">${caseSettles}</div><div class="stat-label">Case records</div><span class="stat-jp"><ruby>事件<rt>じけん</rt></ruby>の<ruby>記録<rt>きろく</rt></ruby></span></div>
             <div class="stat"><div class="stat-value">${rooms}</div><div class="stat-label">Rooms visited</div><span class="stat-jp"><ruby>訪<rt>おとず</rt></ruby>れた<ruby>部屋<rt>へや</rt></ruby></span></div>
           </section>
 

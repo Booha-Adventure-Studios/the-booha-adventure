@@ -691,6 +691,14 @@
     if (!Number.isInteger(mu.orbsCollected)) { mu.orbsCollected = 0; dirty = true; }
     if (!Number.isInteger(mu.orbsPending)) { mu.orbsPending = 0; dirty = true; }
     if (!mu.visitedRooms || typeof mu.visitedRooms !== 'object') { mu.visitedRooms = {}; dirty = true; }
+    // Pass 13: the profile page's "Rooms visited"/"Case records" stats are
+    // plain running totals of every room entry / every case settled, not
+    // distinct-count or all-tiers-complete fractions, so replaying content
+    // (a room you've already seen, a case you're re-reading after a weekly
+    // reset) still moves the number. Older saves start these at 0, same as
+    // rhythm.capturesCompleted below already did for the same reason.
+    if (!Number.isInteger(mu.roomVisitsTotal) || mu.roomVisitsTotal < 0) { mu.roomVisitsTotal = 0; dirty = true; }
+    if (!Number.isInteger(mu.caseRecordsSettled) || mu.caseRecordsSettled < 0) { mu.caseRecordsSettled = 0; dirty = true; }
     if (!mu.huntJournal || typeof mu.huntJournal !== 'object') {
       mu.huntJournal = { entries: [] };
       dirty = true;
@@ -807,18 +815,20 @@
     return writeSave(d);
   }
 
-  // Mirrors utsuroba.js's markVisited() — one write site, called from
-  // setRoom() below, only actually writes the first time a given room is
-  // seen (idempotent, so re-entering a room every tick doesn't spam saves).
+  // Mirrors utsuroba.js's markVisited() for the visitedRooms dict — that
+  // part still only writes the first time a given room is seen. Pass 13
+  // layered a second, always-incrementing counter (roomVisitsTotal) on top,
+  // since setRoom() only calls this once per room transition (not per
+  // tick), so a plain +1 here doesn't spam saves either.
   function markMuenbaRoomVisited(roomId) {
     try {
       const d = loadSave();
       if (!d.muenba || typeof d.muenba !== 'object') d.muenba = {};
       if (!d.muenba.visitedRooms || typeof d.muenba.visitedRooms !== 'object') d.muenba.visitedRooms = {};
-      if (!d.muenba.visitedRooms[roomId]) {
-        d.muenba.visitedRooms[roomId] = Date.now();
-        writeSave(d);
-      }
+      if (!Number.isInteger(d.muenba.roomVisitsTotal) || d.muenba.roomVisitsTotal < 0) d.muenba.roomVisitsTotal = 0;
+      if (!d.muenba.visitedRooms[roomId]) d.muenba.visitedRooms[roomId] = Date.now();
+      d.muenba.roomVisitsTotal += 1;
+      writeSave(d);
     } catch (_) {}
   }
 
@@ -2437,6 +2447,7 @@
     if (!mu.caseRecords || typeof mu.caseRecords !== 'object') mu.caseRecords = {};
     if (!mu.rhythm || typeof mu.rhythm !== 'object') mu.rhythm = { bestAccuracy: 0, attempts: 0 };
     if (!Number.isInteger(mu.rhythm.capturesCompleted) || mu.rhythm.capturesCompleted < 0) mu.rhythm.capturesCompleted = 0;
+    if (!Number.isInteger(mu.caseRecordsSettled) || mu.caseRecordsSettled < 0) mu.caseRecordsSettled = 0;
 
     const isNewWeeklyCapture = !mu.weeklyGhostsFound[ghost.id];
     mu.ghostsFound[ghost.id] = true;
@@ -2483,6 +2494,13 @@
       journalEntry.caseId = caseData.id;
       journalEntry.caseDifficulty = captureSession.caseDifficulty;
       journalEntry.caseCompletedAt = completedAt;
+      // Pass 13: the profile page's "Case records" stat is a plain running
+      // total of settle events, same spirit as rhythm.capturesCompleted
+      // below — it only bumps here, once per genuinely new case+tier
+      // completion (the sequential hunt design means this case wasn't
+      // presented as active again once a given tier was already done, so
+      // there's no risk of double-counting the same tier twice).
+      mu.caseRecordsSettled += 1;
     }
     // This counter is deliberately permanent. Weekly ghost availability may
     // reset, but every successful capture makes future rhythm charts harder.
@@ -2602,7 +2620,7 @@
     renderCaseDirection(
       box,
       'Watch the energy release, then return the orbs to Nuppi.',
-      'エネルギーが<ruby>出<rt>で</rt></ruby>てきます。<ruby>見<rt>み</rt></ruby>てから、オーブをヌッピに<ruby>届<rt>とど</rt></ruby>けましょう。'
+      'エネルギーが<ruby>出<rt>で</rt></ruby>てきます。<ruby>見<rt>み</rt></ruby>てから、オーブをヌーピーに<ruby>届<rt>とど</rt></ruby>けましょう。'
     );
 
     const orbList = document.createElement('div');
@@ -2641,7 +2659,7 @@
     if (reward.revealed >= reward.total) {
       if (reward.statusEl) reward.statusEl.textContent = `Energy released: ${reward.total} / ${reward.total}`;
       if (reward.actionsEl && !reward.actionsEl.children.length) {
-        reward.actionsEl.appendChild(captureButton('Return to Nuppi', 'ヌッピのところへ<ruby>戻<rt>もど</rt></ruby>る', 'muenba-capture-return', leaveCaptureForNuppi));
+        reward.actionsEl.appendChild(captureButton('Return to Nuppi', 'ヌーピーのところへ<ruby>戻<rt>もど</rt></ruby>る', 'muenba-capture-return', leaveCaptureForNuppi));
         focusCaptureControl('#muenba-capture-return');
       }
       return;
@@ -2831,7 +2849,7 @@
     box.appendChild(h2);
     const h2Jp = document.createElement('p');
     h2Jp.className = 'jp';
-    h2Jp.innerHTML = 'ヌッピがオーブを<ruby>受<rt>う</rt></ruby>け<ruby>取<rt>と</rt></ruby>った';
+    h2Jp.innerHTML = 'ヌーピーがオーブを<ruby>受<rt>う</rt></ruby>け<ruby>取<rt>と</rt></ruby>った';
     box.appendChild(h2Jp);
 
     const p = document.createElement('p');
@@ -2842,13 +2860,13 @@
     const pJp = document.createElement('p');
     pJp.className = 'jp-line';
     pJp.innerHTML = deposited > 0
-      ? 'ヌッピが<ruby>微笑<rt>ほほえ</rt></ruby>む。エネルギーオーブが<ruby>無事<rt>ぶじ</rt></ruby>に<ruby>届<rt>とど</rt></ruby>いたよ。'
-      : 'ヌッピが<ruby>微笑<rt>ほほえ</rt></ruby>む。エネルギーの<ruby>道<rt>みち</rt></ruby>はもう<ruby>安全<rt>あんぜん</rt></ruby>だよ。';
+      ? 'ヌーピーが<ruby>微笑<rt>ほほえ</rt></ruby>む。エネルギーオーブが<ruby>無事<rt>ぶじ</rt></ruby>に<ruby>届<rt>とど</rt></ruby>いたよ。'
+      : 'ヌーピーが<ruby>微笑<rt>ほほえ</rt></ruby>む。エネルギーの<ruby>道<rt>みち</rt></ruby>はもう<ruby>安全<rt>あんぜん</rt></ruby>だよ。';
     box.appendChild(pJp);
     renderCaseDirection(
       box,
       'The energy is safe with Nuppi. Return to the hunt when you are ready.',
-      'エネルギーはヌッピのところで<ruby>安全<rt>あんぜん</rt></ruby>です。<ruby>準備<rt>じゅんび</rt></ruby>ができたら、<ruby>探索<rt>たんさく</rt></ruby>に<ruby>戻<rt>もど</rt></ruby>りましょう。'
+      'エネルギーはヌーピーのところで<ruby>安全<rt>あんぜん</rt></ruby>です。<ruby>準備<rt>じゅんび</rt></ruby>ができたら、<ruby>探索<rt>たんさく</rt></ruby>に<ruby>戻<rt>もど</rt></ruby>りましょう。'
     );
 
     const actions = document.createElement('div');
@@ -2897,16 +2915,16 @@
     box.appendChild(p);
     const pJp = document.createElement('p');
     pJp.className = 'jp-line';
-    pJp.innerHTML = 'ヌッピが<ruby>待<rt>ま</rt></ruby>っているエネルギーオーブを<ruby>安全<rt>あんぜん</rt></ruby>に<ruby>保管<rt>ほかん</rt></ruby>しているよ。';
+    pJp.innerHTML = 'ヌーピーが<ruby>待<rt>ま</rt></ruby>っているエネルギーオーブを<ruby>安全<rt>あんぜん</rt></ruby>に<ruby>保管<rt>ほかん</rt></ruby>しているよ。';
     box.appendChild(pJp);
     renderCaseDirection(
       box,
       'Return the waiting orbs to Nuppi before you continue.',
-      '<ruby>続<rt>つづ</rt></ruby>ける<ruby>前<rt>まえ</rt></ruby>に、<ruby>待<rt>ま</rt></ruby>っているオーブをヌッピに<ruby>届<rt>とど</rt></ruby>けましょう。'
+      '<ruby>続<rt>つづ</rt></ruby>ける<ruby>前<rt>まえ</rt></ruby>に、<ruby>待<rt>ま</rt></ruby>っているオーブをヌーピーに<ruby>届<rt>とど</rt></ruby>けましょう。'
     );
     const actions = document.createElement('div');
     actions.className = 'muenba-lobby-actions';
-    actions.appendChild(captureButton('Return to Nuppi', 'ヌッピのところへ<ruby>戻<rt>もど</rt></ruby>る', 'muenba-capture-return', leaveCaptureForNuppi));
+    actions.appendChild(captureButton('Return to Nuppi', 'ヌーピーのところへ<ruby>戻<rt>もど</rt></ruby>る', 'muenba-capture-return', leaveCaptureForNuppi));
     box.appendChild(actions);
     captureOverlay.classList.add('open');
     focusCaptureControl('#muenba-capture-return');
@@ -3282,7 +3300,7 @@
 
     returnNuppiHint = document.createElement('div');
     returnNuppiHint.id = 'muenba-return-nuppi-hint';
-    returnNuppiHint.innerHTML = 'RETURN TO NUPPI<small>ヌッピのところへ戻ろう</small>';
+    returnNuppiHint.innerHTML = 'RETURN TO NUPPI<small>ヌーピーのところへ戻ろう</small>';
     document.body.appendChild(returnNuppiHint);
 
     celebrationStatus = document.createElement('div');
@@ -3948,7 +3966,7 @@
       <div class="muenba-lobby-box">
         <img class="muenba-lobby-portrait" src="assets/img/wanderers/nuppi-2.png" alt="Nuppi">
         <h2>Nuppi</h2>
-        <p class="jp">ヌッピ</p>
+        <p class="jp">ヌーピー</p>
         <p>${greetEn}</p>
         <p class="jp-line">${greetJp}</p>
         <p>Somewhere among these fifteen rooms, a ghost is hiding. Some won't notice you at all, while others will come looking. If one gets close, you can hide until it loses interest. When you see one, walk up and give it a tap.</p>
@@ -3967,9 +3985,9 @@
       <div class="muenba-lobby-box is-case-board">
         <img class="muenba-lobby-portrait" src="assets/img/wanderers/nuppi-2.png" alt="Nuppi">
         <div class="muenba-case-board-eyebrow">CASE DESK / NUPPI</div>
-        <p class="jp muenba-case-board-eyebrow-jp"><ruby>事件<rt>じけん</rt></ruby><ruby>受付<rt>うけつけ</rt></ruby> / ヌッピ</p>
+        <p class="jp muenba-case-board-eyebrow-jp"><ruby>事件<rt>じけん</rt></ruby><ruby>受付<rt>うけつけ</rt></ruby> / ヌーピー</p>
         <h2>Nuppi's case board</h2>
-        <p class="jp">ヌッピの<ruby>事件<rt>じけん</rt></ruby>ボード</p>
+        <p class="jp">ヌーピーの<ruby>事件<rt>じけん</rt></ruby>ボード</p>
         <section class="muenba-lobby-case-board" aria-labelledby="muenba-case-board-title">
           <h3 id="muenba-case-board-title"></h3>
           <p id="muenba-case-board-title-jp" class="muenba-case-direction-jp"></p>
@@ -4100,15 +4118,15 @@
         ? waitingLine
         : 'Nuppi is here when you are ready.';
     const copyJp = pending
-      ? '<ruby>幽霊<rt>ゆうれい</rt></ruby>のエネルギーはここで<ruby>待<rt>ま</rt></ruby>っています。ヌッピは<ruby>受<rt>う</rt></ruby>け<ruby>取<rt>と</rt></ruby>る<ruby>準備<rt>じゅんび</rt></ruby>ができています。'
+      ? '<ruby>幽霊<rt>ゆうれい</rt></ruby>のエネルギーはここで<ruby>待<rt>ま</rt></ruby>っています。ヌーピーは<ruby>受<rt>う</rt></ruby>け<ruby>取<rt>と</rt></ruby>る<ruby>準備<rt>じゅんび</rt></ruby>ができています。'
       : waitingForCase
         ? '<ruby>待<rt>ま</rt></ruby>っているよ。'
-        : 'ヌッピはここで<ruby>待<rt>ま</rt></ruby>っているよ。';
+        : 'ヌーピーはここで<ruby>待<rt>ま</rt></ruby>っているよ。';
     lobbyOverlay.innerHTML = `
       <div class="muenba-lobby-box muenba-room-nuppi-box">
         <img class="muenba-lobby-portrait" src="assets/img/wanderers/nuppi-2.png" alt="Nuppi">
         <h2>Nuppi</h2>
-        <p class="jp">ヌッピ</p>
+        <p class="jp">ヌーピー</p>
         <p>${copy}</p>
         <p class="jp-line">${copyJp}</p>
         <div class="muenba-lobby-actions">
@@ -4147,7 +4165,7 @@
         <h2>Thank you, Booha.</h2>
         <p class="jp">ありがとう、ブーハー。</p>
         <p>${orbLabel} are safe with Nuppi now.</p>
-        <p class="jp-line"><ruby>届<rt>とど</rt></ruby>けてくれてありがとう。エネルギーはヌッピが<ruby>預<rt>あず</rt></ruby>かるよ。</p>
+        <p class="jp-line"><ruby>届<rt>とど</rt></ruby>けてくれてありがとう。エネルギーはヌーピーが<ruby>預<rt>あず</rt></ruby>かるよ。</p>
         <p>${canContinue ? 'Would you like to find another ghost?' : 'That is all for this week. The ghosts will return next week.'}</p>
         <p class="jp-line">${canContinue ? 'もう<ruby>一度<rt>いちど</rt></ruby>、<ruby>幽霊<rt>ゆうれい</rt></ruby>を<ruby>探<rt>さが</rt></ruby>してみる？' : 'この<ruby>週<rt>しゅう</rt></ruby>はこれでおしまい。<ruby>幽霊<rt>ゆうれい</rt></ruby>は<ruby>来週<rt>らいしゅう</rt></ruby>に<ruby>戻<rt>もど</rt></ruby>ってくるよ。'}</p>
         <div class="muenba-lobby-actions">
