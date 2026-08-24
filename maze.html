@@ -929,6 +929,112 @@
       #jkPrompt{ transition:none; }
       .sp{ animation:none; opacity:.6; }
     }
+
+    /* ═══════════════════════════════════════════════════════════════
+       MAZE ENTRY BRIEFING — two clear emotional states
+    ═══════════════════════════════════════════════════════════════ */
+    #overlay1.entryOverlay{
+      gap:0;
+      padding:clamp(18px,4vmin,42px);
+      background:
+        radial-gradient(ellipse at 50% 12%,rgba(119,66,255,.26) 0%,transparent 48%),
+        radial-gradient(ellipse at 50% 100%,rgba(0,232,255,.10) 0%,transparent 46%),
+        rgba(4,3,18,.82);
+      backdrop-filter:blur(12px) saturate(120%);
+      -webkit-backdrop-filter:blur(12px) saturate(120%);
+    }
+    #overlay1.entryOverlay::before,
+    #overlay1.entryOverlay::after{
+      content:""; position:absolute; pointer-events:none; border-radius:50%;
+      left:50%; top:50%; transform:translate(-50%,-50%);
+    }
+    #overlay1.entryOverlay::before{
+      width:min(86vw,760px); aspect-ratio:1;
+      border:1px solid rgba(130,174,255,.13);
+      box-shadow:0 0 90px rgba(73,69,255,.12),inset 0 0 90px rgba(44,212,255,.08);
+    }
+    #overlay1.entryOverlay::after{
+      width:min(66vw,580px); aspect-ratio:1;
+      border:1px dashed rgba(255,255,255,.10);
+      animation:entryOrbit 18s linear infinite;
+    }
+    @keyframes entryOrbit{ to{ transform:translate(-50%,-50%) rotate(360deg); } }
+    .entryShell{
+      position:relative; z-index:1; width:min(94vw,700px); max-height:100%;
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      text-align:center; padding:clamp(18px,4vmin,42px) clamp(18px,5vw,58px);
+      border:1px solid rgba(255,255,255,.14); border-radius:clamp(24px,4vmin,38px);
+      background:linear-gradient(145deg,rgba(16,17,48,.86),rgba(8,8,28,.78));
+      box-shadow:0 35px 90px rgba(0,0,0,.58),0 0 90px rgba(100,80,255,.13),inset 0 1px 0 rgba(255,255,255,.11);
+      overflow:hidden;
+    }
+    .entryShell::before{ content:""; position:absolute; inset:0; pointer-events:none; opacity:.25; background-image:radial-gradient(circle,rgba(255,255,255,.75) 0 1px,transparent 1.5px); background-size:42px 42px; mask-image:linear-gradient(to bottom,black,transparent 65%); }
+    .entryStateMark{ position:relative; width:clamp(58px,10vmin,84px); height:clamp(58px,10vmin,84px); display:grid; place-items:center; margin-bottom:clamp(10px,2vmin,18px); border-radius:26px; font-size:clamp(30px,6vmin,48px); background:rgba(123,92,255,.14); border:1px solid rgba(183,168,255,.28); box-shadow:0 0 34px rgba(111,97,255,.28),inset 0 0 20px rgba(255,255,255,.06); }
+    .entryStateMark::before{ content:""; position:absolute; inset:-9px; border:1px solid rgba(177,162,255,.22); border-radius:30px; transform:rotate(12deg); }
+    .entryEyebrow{ position:relative; margin:0 0 8px; font-size:clamp(10px,1.8vw,13px); font-weight:1000; letter-spacing:.28em; text-transform:uppercase; color:#b8b2ff; }
+    .entryTitleEn{ position:relative; margin:0; max-width:620px; font-family:'Bowlby One',sans-serif; font-size:clamp(25px,5.4vw,54px); letter-spacing:.02em; line-height:1.04; color:#fff; text-wrap:balance; text-shadow:0 0 34px rgba(155,135,255,.55),0 3px 10px rgba(0,0,0,.75); }
+    .entryTitleJp{ position:relative; margin:clamp(9px,1.5vmin,14px) 0 0; font-size:clamp(15px,2.8vw,23px); font-weight:900; color:rgba(236,237,255,.88); letter-spacing:.06em; }
+    .entryTitleJp ruby rt,.entryMessageJp ruby rt,.entryPlayerJp ruby rt,.arrivalNameJp ruby rt{ font-size:.52em; color:#aeb8ff; }
+    .entryPlayer{ position:relative; display:flex; align-items:baseline; justify-content:center; flex-wrap:wrap; gap:0 .35em; margin:clamp(12px,2.4vmin,22px) 0 clamp(10px,2vmin,16px); font-size:clamp(12px,1.9vw,15px); color:rgba(255,255,255,.64); }
+    .entryPlayer strong{ color:#fff; font-size:1.2em; letter-spacing:.08em; text-shadow:0 0 20px rgba(255,255,255,.4); }
+    .entryPlayerJp{ width:100%; margin-top:3px; font-size:.92em; color:rgba(215,220,255,.72); }
+    .entryMessageEn{ position:relative; max-width:500px; margin:0; font-family:Georgia,serif; font-size:clamp(14px,2.2vw,19px); line-height:1.5; color:rgba(255,255,255,.90); }
+    .entryMessageJp{ position:relative; max-width:540px; margin:4px 0 0; font-size:clamp(12px,1.8vw,16px); line-height:1.5; color:rgba(214,220,255,.68); }
+    .blitzProgress{ position:relative; width:100%; max-width:470px; margin:clamp(15px,2.8vmin,25px) 0 clamp(18px,3.4vmin,30px); padding:13px 15px 12px; border-radius:18px; background:rgba(0,0,0,.22); border:1px solid rgba(255,255,255,.11); }
+    .blitzProgressHead{ display:flex; justify-content:space-between; gap:10px; margin-bottom:10px; font-size:10px; font-weight:1000; letter-spacing:.16em; text-transform:uppercase; color:rgba(255,255,255,.56); }
+    .blitzPips{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+    .blitzPip{ display:flex; align-items:center; justify-content:center; gap:6px; min-width:0; padding:7px 5px; border-radius:10px; font-size:10px; font-weight:1000; letter-spacing:.04em; color:rgba(255,255,255,.48); background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.09); }
+    .blitzPip i{ width:8px; height:8px; flex:none; border-radius:50%; background:rgba(255,255,255,.26); box-shadow:0 0 0 3px rgba(255,255,255,.04); }
+    .blitzPip.done{ color:#fff; border-color:rgba(125,255,212,.35); background:rgba(64,213,168,.13); }
+    .blitzPip.done i{ background:#79ffd5; box-shadow:0 0 0 3px rgba(121,255,213,.13),0 0 15px rgba(121,255,213,.8); }
+    .entryActions{ position:relative; display:flex; align-items:stretch; justify-content:center; gap:12px; width:100%; flex-wrap:wrap; }
+    .entryAction{ appearance:none; border:0; cursor:pointer; border-radius:16px; min-width:150px; padding:12px 22px 11px; font-weight:1000; transition:transform 140ms ease,filter 140ms ease,box-shadow 140ms ease; }
+    .entryAction:hover{ transform:translateY(-2px); filter:brightness(1.08); }
+    .entryAction:active{ transform:scale(.96); }
+    .entryAction .btnEn{ display:block; font-size:clamp(14px,2.2vw,18px); letter-spacing:.02em; }
+    .entryAction .btnJp{ display:block; margin-top:3px; font-size:clamp(11px,1.7vw,14px); opacity:.78; }
+    .entryAction .btnJp ruby rt{ font-size:.55em; }
+    .entryAction.primary{ color:#090415; background:linear-gradient(145deg,#e4d8ff,#a98bff 52%,#8065ff); box-shadow:0 8px 28px rgba(139,108,255,.42),0 0 0 1px rgba(222,212,255,.44),inset 0 1px 0 rgba(255,255,255,.8); }
+    .entryAction.secondary{ color:rgba(255,255,255,.82); background:rgba(255,255,255,.08); box-shadow:0 7px 20px rgba(0,0,0,.24),inset 0 0 0 1px rgba(255,255,255,.14); }
+
+    /* Completed: celebratory gold/green signal */
+    #overlay1.blitz-complete{ background:radial-gradient(ellipse at 50% 10%,rgba(255,196,68,.22) 0%,transparent 42%),radial-gradient(ellipse at 50% 100%,rgba(58,255,194,.12) 0%,transparent 48%),rgba(8,6,16,.82); }
+    #overlay1.blitz-complete::after{ border-color:rgba(255,210,109,.22); }
+    .blitz-complete .entryShell{ border-color:rgba(255,220,133,.28); background:linear-gradient(145deg,rgba(45,29,38,.91),rgba(12,23,34,.84)); box-shadow:0 35px 90px rgba(0,0,0,.58),0 0 100px rgba(255,175,48,.16),inset 0 1px 0 rgba(255,247,204,.15); }
+    .blitz-complete .entryStateMark{ background:linear-gradient(145deg,rgba(255,218,100,.27),rgba(71,255,195,.17)); border-color:rgba(255,226,132,.50); box-shadow:0 0 40px rgba(255,194,75,.38),inset 0 0 22px rgba(255,255,255,.07); }
+    .blitz-complete .entryEyebrow{ color:#ffe48d; }
+    .blitz-complete .entryTitleEn{ text-shadow:0 0 34px rgba(255,202,78,.55),0 3px 10px rgba(0,0,0,.75); }
+    .blitz-complete .entryTitleJp{ color:#fff4cf; }
+    .blitz-complete .entryTitleJp ruby rt,.blitz-complete .entryMessageJp ruby rt,.blitz-complete .entryPlayerJp ruby rt{ color:#ffd875; }
+    .blitz-complete .entryAction.primary{ color:#171006; background:linear-gradient(145deg,#fff1ab,#ffc94f 52%,#ff9f38); box-shadow:0 8px 30px rgba(255,180,53,.42),0 0 0 1px rgba(255,243,177,.5),inset 0 1px 0 rgba(255,255,255,.85); }
+
+    /* Incomplete: warm, inviting nudge with the recommended action dominant */
+    #overlay1.blitz-incomplete{ background:radial-gradient(ellipse at 50% 6%,rgba(255,104,79,.16) 0%,transparent 42%),radial-gradient(ellipse at 50% 100%,rgba(120,72,255,.16) 0%,transparent 50%),rgba(5,4,20,.84); }
+    #overlay1.blitz-incomplete::after{ border-color:rgba(255,151,106,.15); }
+    .blitz-incomplete .entryShell{ border-color:rgba(255,166,125,.22); background:linear-gradient(145deg,rgba(35,18,47,.90),rgba(10,12,34,.86)); box-shadow:0 35px 90px rgba(0,0,0,.62),0 0 90px rgba(255,101,77,.10),inset 0 1px 0 rgba(255,255,255,.12); }
+    .blitz-incomplete .entryStateMark{ background:rgba(255,121,91,.14); border-color:rgba(255,167,125,.34); box-shadow:0 0 34px rgba(255,103,78,.20),inset 0 0 20px rgba(255,255,255,.05); }
+    .blitz-incomplete .entryEyebrow{ color:#ffae8a; }
+    .blitz-incomplete .entryTitleEn{ text-shadow:0 0 34px rgba(255,118,102,.42),0 3px 10px rgba(0,0,0,.8); }
+    .blitz-incomplete .entryTitleJp ruby rt,.blitz-incomplete .entryMessageJp ruby rt,.blitz-incomplete .entryPlayerJp ruby rt{ color:#ffaf91; }
+    .blitz-incomplete .entryAction.primary{ color:#170a0b; background:linear-gradient(145deg,#ffd1b0,#ff936d 55%,#f46765); box-shadow:0 8px 30px rgba(255,105,83,.38),0 0 0 1px rgba(255,218,190,.42),inset 0 1px 0 rgba(255,255,255,.72); }
+    .blitz-incomplete .entryAction.secondary{ color:rgba(255,255,255,.74); }
+
+    /* The cinematic welcome beat keeps the name as the hand-off moment. */
+    #overlay2 .arrivalName{ margin:clamp(6px,1.2vmin,12px) 0 0; font-size:clamp(19px,3.6vw,34px); font-weight:1000; letter-spacing:.13em; color:#fff; text-shadow:0 0 18px rgba(255,255,255,.8),0 0 35px rgba(255,120,230,.75); }
+    #overlay2 .arrivalNameJp{ margin:-2px 0 0; font-size:clamp(13px,2.4vw,21px); font-weight:900; color:rgba(255,222,255,.86); letter-spacing:.12em; text-shadow:0 0 22px rgba(255,120,230,.66); }
+    #overlay2 .arrivalNameJp ruby rt{ font-size:.52em; color:#ffb4ec; }
+    #overlay2 .arrivalInstructionEn{ margin-top:clamp(4px,1vmin,10px); }
+    @media (max-height:700px),(max-width:767px){
+      .entryShell{ padding:16px 16px 18px; border-radius:24px; }
+      .entryStateMark{ margin-bottom:8px; }
+      .entryPlayer{ margin-top:10px; margin-bottom:8px; }
+      .entryMessageEn{ font-size:14px; }
+      .entryMessageJp{ font-size:11px; }
+      .blitzProgress{ margin:12px 0 14px; padding:10px 11px; }
+      .blitzPip{ font-size:8px; padding:6px 3px; }
+      .entryAction{ min-width:132px; padding:9px 14px 8px; }
+      #overlay2 .arrivalName{ font-size:clamp(17px,4vw,26px); }
+    }
   </style>
 </head>
 <body>
@@ -939,16 +1045,38 @@
     <h1 class="rotateTitle">よこにしてね！</h1>
     <p class="rotateSub">めいろをあそぶには<br>スマホを<strong style="color:#ff79d7">よこむき</strong>にしてください</p>
   </div>
-  <div id="overlay1" class="overlay" aria-label="めいろへいく？">
-    <h1 class="overlayHeading" id="mazeQuestion">
-  ブーハーめいろにいく？
-</h1>
-<p class="mazeNameSub" id="mazeNameSub"></p>
-    <div class="btnRow">
-      <button id="returnBtn" class="btnBlue" type="button">いかない</button>
-      <div class="sparkleWrap">
-        <div class="sparkleField" id="confirmSparkles" aria-hidden="true"></div>
-        <button id="continueBtn" class="btnPink" type="button">いく！</button>
+  <div id="overlay1" class="overlay entryOverlay blitz-incomplete" aria-label="Maze entry briefing">
+    <div class="entryShell">
+      <div class="entryStateMark" id="mazeStateMark" aria-hidden="true">✦</div>
+      <p class="entryEyebrow" id="mazeStatusKicker">BLITZ BEFORE THE MAZE</p>
+      <h1 class="entryTitleEn" id="mazeQuestion">Your warm-up is waiting.</h1>
+      <p class="entryTitleJp" id="mazeQuestionJp"><ruby>準備<rt>じゅんび</rt></ruby>は まだ <ruby>終<rt>お</rt></ruby>わっていないよ。</p>
+      <div class="entryPlayer">
+        <span id="mazeNameLead">Hey,</span>&nbsp;<strong id="mazeEntryName">PLAYER</strong><span id="mazeNameTail">.</span>
+        <span class="entryPlayerJp" id="mazeEntryNameJp"><ruby>きみ<rt>君</rt></ruby>の <ruby>冒険<rt>ぼうけん</rt></ruby>が <ruby>待<rt>ま</rt></ruby>っているよ。</span>
+      </div>
+      <p class="entryMessageEn" id="mazeEntryMessageEn">Finish the 3 Blitz games first. You’ll be sharper when you enter.</p>
+      <p class="entryMessageJp" id="mazeEntryMessageJp"><ruby>3<rt>さん</rt></ruby>つの ブリッツを クリアしてから <ruby>入<rt>はい</rt></ruby>ろう。もっと たのしく なるよ。</p>
+      <div class="blitzProgress" aria-label="Blitz game progress">
+        <div class="blitzProgressHead"><span id="blitzProgressCount">0 / 3 BLITZ GAMES</span><span id="blitzProgressLabel">READY WHEN YOU ARE</span></div>
+        <div class="blitzPips">
+          <span class="blitzPip" data-blitz-type="vocab"><i></i>WORDS</span>
+          <span class="blitzPip" data-blitz-type="sentences"><i></i>SENTENCES</span>
+          <span class="blitzPip" data-blitz-type="questions"><i></i>QUESTIONS</span>
+        </div>
+      </div>
+      <div class="entryActions">
+        <button id="returnBtn" class="entryAction secondary" type="button">
+          <span class="btnEn" id="returnBtnEn">Play Blitz</span>
+          <span class="btnJp" id="returnBtnJp"><ruby>ブリッツ</ruby>へ</span>
+        </button>
+        <div class="sparkleWrap">
+          <div class="sparkleField" id="confirmSparkles" aria-hidden="true"></div>
+          <button id="continueBtn" class="entryAction primary" type="button">
+            <span class="btnEn" id="continueBtnEn">Enter anyway</span>
+            <span class="btnJp" id="continueBtnJp"><ruby>先<rt>さき</rt></ruby>に めいろへ</span>
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -960,7 +1088,9 @@
   <div id="overlay2" class="overlay" aria-label="Welcome to the maze / めいろへようこそ">
     <p class="arrivalKicker">A NEW WORLD OPENS</p>
     <h1 class="overlayHeading arrivalHeadingEn">WELCOME TO THE MAZE</h1>
-    <p class="arrivalHeadingJp">めいろへようこそ！</p>
+    <p class="arrivalHeadingJp"><ruby>迷路<rt>めいろ</rt></ruby>へ <ruby>ようこそ<rt>ようこそ</rt></ruby>！</p>
+    <p class="arrivalName" id="mazeWelcomeName">PLAYER</p>
+    <p class="arrivalNameJp" id="mazeWelcomeNameJp"><ruby>迷路<rt>めいろ</rt></ruby>へ ようこそ、<span>PLAYER</span>さん！</p>
     <div class="arrivalStage">
       <button id="mazeStartBtn" class="ghostBtnWrap" type="button" aria-label="Touch Booha to begin / ブーハーをタッチしてはじめよう">
         <div class="ghostSparkleField" id="startSparkles" aria-hidden="true"></div>
@@ -1316,17 +1446,14 @@ const app=document.getElementById('app'),rotateOverlay=document.getElementById('
   krVideo=document.getElementById('krVideo');
 
  function personalizeMazeIntro() {
-  const sub     = document.getElementById('mazeNameSub');
-  const heading = document.getElementById('mazeQuestion');
-  if (!sub) return;
-
+  const overlay = document.getElementById('overlay1');
   const name = getBoohaFirstName();
+  if (!overlay) return;
 
- /* ── Weekly Blitz completion ────────────────────────────
-     Routed through BoohaSaveFile. A raw read of 'booha_save'
-     hit the orphaned pre-epoch blob, so the maze reflected
-     whichever student last used the device before the bump. */
-  let blitzDone = false;
+  /* ── Weekly Blitz progress ──────────────────────────────
+     Routed through BoohaSaveFile. Each of the three game types gets its
+     own visual pip, while the complete state still requires all three. */
+  const progress = { vocab: false, sentences: false, questions: false };
   try {
     const cw     = getCurrentCurriculumWeek();
     const weekId = `${cw.monthSlug}:w${cw.weekNumber}`;
@@ -1334,45 +1461,80 @@ const app=document.getElementById('app'),rotateOverlay=document.getElementById('
       ? BoohaAdventure.save.load()
       : {};
     const blitz  = (save.meta || {}).blitz || {};
-    
-    if (blitz.weeklyKey === weekId && blitz.weekly) {
-      const w = blitz.weekly;
-      blitzDone = ['pb', 'br', 'bc'].some(c =>
-        (w.vocab     || {})[c] &&
-        (w.sentences || {})[c] &&
-        (w.questions || {})[c]
-      );
+    const w      = blitz.weekly || {};
+    if (blitz.weeklyKey === weekId) {
+      ['vocab', 'sentences', 'questions'].forEach(type => {
+        progress[type] = ['pb', 'br', 'bc'].some(c => !!(w[type] || {})[c]);
+      });
     }
   } catch (e) {}
 
-  if (heading) {
-    heading.textContent = blitzDone
-      ? 'ブリッツぜんぶクリア！'
-      : 'まだブリッツがのこってるよ';
+  const completedCount = Object.values(progress).filter(Boolean).length;
+  const blitzDone = completedCount === 3;
+  overlay.classList.toggle('blitz-complete', blitzDone);
+  overlay.classList.toggle('blitz-incomplete', !blitzDone);
+
+  const setText = (id, value) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value;
+  };
+  const setHTML = (id, value) => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = value;
+  };
+
+  /* Names are always inserted with textContent, never HTML. */
+  setText('mazeEntryName', name);
+  setText('mazeWelcomeName', name);
+  const welcomeNameJp = document.querySelector('#mazeWelcomeNameJp span');
+  if (welcomeNameJp) welcomeNameJp.textContent = name;
+
+  if (blitzDone) {
+    const rBtn = document.getElementById('returnBtn');
+    const cBtn = document.getElementById('continueBtn');
+    if (rBtn) { rBtn.classList.remove('primary'); rBtn.classList.add('secondary'); }
+    if (cBtn) { cBtn.classList.remove('secondary'); cBtn.classList.add('primary'); }
+    setText('mazeStateMark', '✓');
+    setText('mazeStatusKicker', 'BLITZ COMPLETE · MAZE ACCESS GRANTED');
+    setText('mazeQuestion', 'You earned your way in!');
+    setHTML('mazeQuestionJp', '<ruby>全部<rt>ぜんぶ</rt></ruby> クリア！ めいろへ いこう！');
+    setText('mazeNameLead', 'Excellent work,');
+    setText('mazeNameTail', '.');
+    setHTML('mazeEntryNameJp', '<ruby>冒険<rt>ぼうけん</rt></ruby>の <ruby>準備<rt>じゅんび</rt></ruby>は できたよ。');
+    setText('mazeEntryMessageEn', 'All 3 Blitz games are complete. The Maze is ready for you.');
+    setHTML('mazeEntryMessageJp', '<ruby>3<rt>さん</rt></ruby>つの ブリッツを クリアしたよ。めいろが <ruby>待<rt>ま</rt></ruby>っている！');
+    setText('blitzProgressLabel', 'ALL CLEAR');
+    setText('returnBtnEn', 'Back to hub');
+    setHTML('returnBtnJp', '<ruby>戻<rt>もど</rt></ruby>る');
+    setText('continueBtnEn', 'Enter the Maze');
+    setHTML('continueBtnJp', '<ruby>めいろ</ruby>へ <ruby>行<rt>い</rt></ruby>く');
+  } else {
+    const rBtn = document.getElementById('returnBtn');
+    const cBtn = document.getElementById('continueBtn');
+    if (rBtn) { rBtn.classList.remove('secondary'); rBtn.classList.add('primary'); }
+    if (cBtn) { cBtn.classList.remove('primary'); cBtn.classList.add('secondary'); }
+    setText('mazeStateMark', '✦');
+    setText('mazeStatusKicker', 'BLITZ BEFORE THE MAZE');
+    setText('mazeQuestion', 'Your warm-up is waiting.');
+    setHTML('mazeQuestionJp', '<ruby>準備<rt>じゅんび</rt></ruby>は まだ <ruby>終<rt>お</rt></ruby>わっていないよ。');
+    setText('mazeNameLead', 'Hey,');
+    setText('mazeNameTail', '.');
+    setHTML('mazeEntryNameJp', '<ruby>冒険<rt>ぼうけん</rt></ruby>が きみを <ruby>待<rt>ま</rt></ruby>っているよ。');
+    setText('mazeEntryMessageEn', completedCount ? `You’re ${completedCount} of 3 Blitz games in. Finish the warm-up before you enter.` : 'Finish the 3 Blitz games first. You’ll be sharper when you enter.');
+    setHTML('mazeEntryMessageJp', completedCount ? `あと <ruby>${3 - completedCount}<rt>${3 - completedCount}</rt></ruby>つの ブリッツを クリアしてから <ruby>入<rt>はい</rt></ruby>ろう。` : '<ruby>3<rt>さん</rt></ruby>つの ブリッツを クリアしてから <ruby>入<rt>はい</rt></ruby>ろう。もっと たのしく なるよ。');
+    setText('blitzProgressLabel', completedCount ? 'KEEP GOING' : 'READY WHEN YOU ARE');
+    setText('returnBtnEn', 'Play Blitz');
+    setHTML('returnBtnJp', '<ruby>ブリッツ</ruby>へ');
+    setText('continueBtnEn', 'Enter anyway');
+    setHTML('continueBtnJp', '<ruby>先<rt>さき</rt></ruby>に めいろへ');
+    if (rBtn) rBtn.addEventListener('click', () => sessionStorage.setItem('booha_scroll_to_blitz', '1'));
   }
 
-  /* XSS-safe name insertion — names always via textContent */
-  sub.textContent = '';
-  if (blitzDone) sub.appendChild(document.createTextNode('すごい！'));
-  const span = document.createElement('span');
-  span.className   = 'mazePlayerName';
-  span.textContent = name;
-  sub.appendChild(span);
-  sub.appendChild(document.createTextNode(
-    blitzDone ? '、ブーハーがまってるよ。めいろにいく？'
-              : '、それでもめいろにいく？'
-  ));
-
-  /* Buttons per state */
-  const rBtn = document.getElementById('returnBtn');
-  const cBtn = document.getElementById('continueBtn');
-  if (rBtn) rBtn.textContent = blitzDone ? 'あとで' : 'ブリッツへ';
-  if (cBtn) cBtn.textContent = blitzDone ? 'いく！' : 'めいろへ';
-  if (rBtn && !blitzDone) {
-    rBtn.addEventListener('click', () => {
-      sessionStorage.setItem('booha_scroll_to_blitz', '1');
-    });
-  }
+  setText('blitzProgressCount', `${completedCount} / 3 BLITZ GAMES`);
+  Object.keys(progress).forEach(type => {
+    const pip = document.querySelector(`[data-blitz-type="${type}"]`);
+    if (pip) pip.classList.toggle('done', progress[type]);
+  });
 }
 
   
