@@ -12,27 +12,10 @@
     {"word":"go out","definition":"to stop shining or burning","definitionJP":"光や火が消える"},
     {"word":"find the way home","definition":"to know how to return home","definitionJP":"家へ帰る道が分かる"}
   ],
-  "mechanic": {
-    "type": "memory-theatre",
-    "name": "Memory Theatre",
-    "nameJP": "記憶劇場",
-    "instruction": "Restore the scene one answer at a time.",
-    "instructionJP": "一問ずつ答えて、場面を戻しましょう。",
-    "complete": "The whole scene is visible.",
-    "completeJP": "場面全体が見えました。",
-    "acts": [
-      {"title":"The promise","titleJP":"約束","caption":"Someone is waiting in the dark.","captionJP":"暗闇で誰かが待っています。"},
-      {"title":"The missing light","titleJP":"消えた灯り","caption":"The way home disappears.","captionJP":"帰り道が消えていきます。"},
-      {"title":"The silence","titleJP":"沈黙","caption":"The truth arrives after the bell.","captionJP":"鐘のあとに真実が届きます。"}
-    ]
-  },
+  "mechanic": {"type":"memory-theatre","name":"Deep Memory","nameJP":"深い記憶","instruction":"Restore the scene one answer at a time.","instructionJP":"一問ずつ答えて、場面を戻しましょう。","complete":"The whole scene is visible.","completeJP":"場面全体が見えました。","acts":[{"title":"The promise","titleJP":"約束","caption":"Someone is waiting in the dark.","captionJP":"暗闇で誰かが待っています。"},{"title":"The missing light","titleJP":"消えた灯り","caption":"The way home disappears.","captionJP":"帰り道が消えていきます。"},{"title":"The silence","titleJP":"沈黙","caption":"The truth arrives after the bell.","captionJP":"鐘のあとに真実が届きます。"}]},
   "trailIntro": "Follow the memories in order. Each fragment points to the next room.",
   "trailIntroJP": "記憶を順番に追いましょう。それぞれの手がかりが次の部屋を示します。",
-  "trail": [
-    {"id":"ks_lantern_evidence_01","roomId":"room_14","type":"event","label":"01 / FIRST LIGHT","labelJP":"最初の灯り","title":"A promise by the lantern","titleJP":"<ruby>灯<rt>あか</rt></ruby>りのそばの<ruby>約束<rt>やくそく</rt></ruby>","text":"Wait by the lantern. I will come back before the second bell.","hint":"The next memory is near the room where the second bell can be heard.","hintJP":"<ruby>次<rt>つぎ</rt></ruby>の<ruby>記憶<rt>きおく</rt></ruby>は、<ruby>二<rt>ふた</rt></ruby>つ<ruby>目<rt>め</rt></ruby>の<ruby>鐘<rt>かね</rt></ruby>が<ruby>聞<rt>き</rt></ruby>こえる<ruby>部屋<rt>へや</rt></ruby>の<ruby>近<rt>ちか</rt></ruby>くです。"},
-    {"id":"ks_lantern_evidence_02","roomId":"room_06","type":"detail","label":"02 / MISSING DETAIL","labelJP":"消えた細部","title":"A light for the way home","titleJP":"<ruby>帰<rt>かえ</rt></ruby>り<ruby>道<rt>みち</rt></ruby>の<ruby>灯<rt>あか</rt></ruby>り","text":"If the light is gone, I cannot find the way home.","hint":"The final memory is where the path divides.","hintJP":"<ruby>最後<rt>さいご</rt></ruby>の<ruby>記憶<rt>きおく</rt></ruby>は、<ruby>道<rt>みち</rt></ruby>が<ruby>分<rt>わ</rt></ruby>かれる<ruby>場所<rt>ばしょ</rt></ruby>にあります。"},
-    {"id":"ks_lantern_evidence_03","roomId":"room_02","type":"inference","label":"03 / SILENCE","labelJP":"沈黙","title":"What the silence meant","titleJP":"<ruby>沈黙<rt>ちんもく</rt></ruby>の<ruby>意味<rt>いみ</rt></ruby>","text":"The second bell rang. The lantern went out.","hint":"Return to Kurobane with the three pieces.","hintJP":"<ruby>三<rt>みっ</rt></ruby>つの<ruby>記憶<rt>きおく</rt></ruby>を<ruby>持<rt>も</rt></ruby>って、クロバネのところへ<ruby>戻<rt>もど</rt></ruby>りましょう。"}
-  ],
+  "trail": [{"id":"ks_lantern_evidence_01","roomId":"room_14","type":"event","label":"01 / FIRST LIGHT","labelJP":"最初の灯り","title":"A promise by the lantern","titleJP":"<ruby>灯<rt>あか</rt></ruby>りのそばの<ruby>約束<rt>やくそく</rt></ruby>","text":"Wait by the lantern. I will come back before the second bell.","hint":"The next memory is near the room where the second bell can be heard.","hintJP":"<ruby>次<rt>つぎ</rt></ruby>の<ruby>記憶<rt>きおく</rt></ruby>は、<ruby>二<rt>ふた</rt></ruby>つ<ruby>目<rt>め</rt></ruby>の<ruby>鐘<rt>かね</rt></ruby>が<ruby>聞<rt>き</rt></ruby>こえる<ruby>部屋<rt>へや</rt></ruby>の<ruby>近<rt>ちか</rt></ruby>くです。"},{"id":"ks_lantern_evidence_02","roomId":"room_06","type":"detail","label":"02 / MISSING DETAIL","labelJP":"消えた細部","title":"A light for the way home","titleJP":"<ruby>帰<rt>かえ</rt></ruby>り<ruby>道<rt>みち</rt></ruby>の<ruby>灯<rt>あか</rt></ruby>り","text":"If the light is gone, I cannot find the way home.","hint":"The final memory is where the path divides.","hintJP":"<ruby>最後<rt>さいご</rt></ruby>の<ruby>記憶<rt>きおく</rt></ruby>は、<ruby>道<rt>みち</rt></ruby>が<ruby>分<rt>わ</rt></ruby>かれる<ruby>場所<rt>ばしょ</rt></ruby>にあります。"},{"id":"ks_lantern_evidence_03","roomId":"room_02","type":"inference","label":"03 / SILENCE","labelJP":"沈黙","title":"What the silence meant","titleJP":"<ruby>沈黙<rt>ちんもく</rt></ruby>の<ruby>意味<rt>いみ</rt></ruby>","text":"The second bell rang. The lantern went out.","hint":"Return to Kurobane with the three pieces.","hintJP":"<ruby>三<rt>みっ</rt></ruby>つの<ruby>記憶<rt>きおく</rt></ruby>を<ruby>持<rt>も</rt></ruby>って、クロバネのところへ<ruby>戻<rt>もど</rt></ruby>りましょう。"}],
   "lines": [
     {"speaker":"Kurobane","en":"Wait by the lantern. I will come back before the second bell."},
     {"speaker":"Chiyo","en":"You said the bridge was safe."},
@@ -53,7 +36,7 @@
   "success": "The memory settles. Kurobane remembers the part he could not say aloud.",
   "successJP": "記憶が落ち着いた。クロバネは、声に出せなかったことを思い出した。",
   "worldEcho": {"roomId":"room_02","x":0.70,"y":0.49,"motif":"lantern","label":"The lantern remembers","labelJP":"灯りが覚えている"},
-  "postcard": {"title":"Memory postcard","titleJP":"記憶カード","instruction":"Build a short summary in the best order.","instructionJP":"短いまとめを、よい順番に作りましょう。","chunks":["The lantern went out.","Chiyo could not find the way home.","Kurobane remembered why she left."],"chunksJP":["灯りが消えた。","チヨは帰り道が分からなかった。","クロバネは彼女が帰った理由を思い出した。"],"order":[0,1,2],"savedText":"The lantern went out. Chiyo could not find the way home. Kurobane remembered why she left."},
+  "postcard": {"title":"Deep memory postcard","titleJP":"深い記憶カード","instruction":"Build an evidence summary. Put the reason after the clues.","instructionJP":"証拠のまとめを作りましょう。手がかりのあとに理由を置きましょう。","chunks":["The lantern went out.","Chiyo could not find the way home.","Kurobane remembered why she left."],"chunksJP":["灯りが消えた。","チヨは帰り道が分からなかった。","クロバネは彼女が帰った理由を思い出した。"],"order":[0,1,2],"savedText":"The lantern went out. Chiyo could not find the way home. Kurobane remembered why she left."},
   "fresh": {
     "intro": "Kurobane remembers a lantern. The light went out. Chiyo could not find her way home.",
     "introJP": "クロバネは灯りを覚えています。灯りが消えました。チヨは家に帰る道が分からなくなりました。",
@@ -64,24 +47,10 @@
       {"word":"go out","definition":"to stop shining","definitionJP":"光が消えること"},
       {"word":"find the way home","definition":"to know the way home","definitionJP":"家に帰る道が分かること"}
     ],
-    "mechanic": {
-      "instruction": "Connect the clues. What answer fits them all?",
-      "instructionJP": "手がかりをつなぎましょう。全部に合う答えは何ですか？",
-      "complete": "Now you can see the whole story.",
-      "completeJP": "今、物語の全部が見えます。",
-      "acts": [
-        {"title":"Waiting","titleJP":"待つ","caption":"Someone is waiting in the dark.","captionJP":"暗闇で誰かが待っています。"},
-        {"title":"The light is gone","titleJP":"消えた灯り","caption":"The lantern light goes out.","captionJP":"ランプの光が消えます。"},
-        {"title":"Lost in the dark","titleJP":"暗闇で迷う","caption":"Chiyo cannot find her way home.","captionJP":"チヨは家に帰る道が分かりません。"}
-      ]
-    },
-    "trailIntro": "Follow the memory, step by step.",
-    "trailIntroJP": "記憶を一歩ずつ追いましょう。",
-    "trail": [
-      {"id":"ks_lantern_evidence_01","roomId":"room_14","type":"event","label":"01 / WAITING","labelJP":"待つ","title":"A promise","titleJP":"<ruby>約束<rt>やくそく</rt></ruby>","text":"Wait by the lantern. I will come back soon.","hint":"The next memory is near a room where you can hear a bell.","hintJP":"<ruby>次<rt>つぎ</rt></ruby>の<ruby>記憶<rt>きおく</rt></ruby>は、<ruby>鐘<rt>かね</rt></ruby>が<ruby>聞<rt>き</rt></ruby>こえる<ruby>部屋<rt>へや</rt></ruby>の<ruby>近<rt>ちか</rt></ruby>くです。"},
-      {"id":"ks_lantern_evidence_02","roomId":"room_06","type":"detail","label":"02 / LIGHT GONE","labelJP":"消えた灯り","title":"The bell rings, the light goes out","titleJP":"<ruby>鐘<rt>かね</rt></ruby>が<ruby>鳴<rt>な</rt></ruby>り、<ruby>灯<rt>あか</rt></ruby>りが<ruby>消<rt>き</rt></ruby>える","text":"The bell rings. The lantern goes dark.","hint":"The final memory is where the path divides.","hintJP":"<ruby>最後<rt>さいご</rt></ruby>の<ruby>記憶<rt>きおく</rt></ruby>は、<ruby>道<rt>みち</rt></ruby>が<ruby>分<rt>わ</rt></ruby>かれる<ruby>場所<rt>ばしょ</rt></ruby>にあります。"},
-      {"id":"ks_lantern_evidence_03","roomId":"room_02","type":"inference","label":"03 / LOST","labelJP":"迷う","title":"No light, no way home","titleJP":"<ruby>灯<rt>あか</rt></ruby>りがなく、<ruby>帰<rt>かえ</rt></ruby>り<ruby>道<rt>みち</rt></ruby>もない","text":"Without light, Chiyo cannot find her way home.","hint":"Return to Kurobane with the story.","hintJP":"クロバネのところへ<ruby>戻<rt>もど</rt></ruby>りましょう。"}
-    ],
+    "mechanic": {"instruction":"Connect the clues. What answer fits them all?","instructionJP":"手がかりをつなぎましょう。全部に合う答えは何ですか？","complete":"Now you can see the whole story.","completeJP":"今、物語の全部が見えます。","acts":[{"title":"Waiting","titleJP":"待つ","caption":"Someone is waiting in the dark.","captionJP":"暗闇で誰かが待っています。"},{"title":"The light is gone","titleJP":"消えた灯り","caption":"The lantern light goes out.","captionJP":"ランプの光が消えます。"},{"title":"Lost in the dark","titleJP":"暗闇で迷う","caption":"Chiyo cannot find her way home.","captionJP":"チヨは家に帰る道が分かりません。"}],"name":"Case Memory","nameJP":"ケースの記憶","type":"evidence-board"},
+    "trailIntro": "Collect three clues. Then connect them into one case.",
+    "trailIntroJP": "三つの手がかりを集めて、一つのケースにつなぎましょう。",
+    "trail": [{"id":"ks_lantern_evidence_01","roomId":"room_14","type":"event","label":"01 / CLUE","labelJP":"手がかり","title":"A promise","titleJP":"<ruby>約束<rt>やくそく</rt></ruby>","text":"Wait by the lantern. I will come back soon.","hint":"Find the next clue and add it to your case.","hintJP":"次の手がかりを見つけて、ケースに加えましょう。"},{"id":"ks_lantern_evidence_02","roomId":"room_06","type":"detail","label":"02 / LINK","labelJP":"つながり","title":"The bell rings, the light goes out","titleJP":"<ruby>鐘<rt>かね</rt></ruby>が<ruby>鳴<rt>な</rt></ruby>り、<ruby>灯<rt>あか</rt></ruby>りが<ruby>消<rt>き</rt></ruby>える","text":"The bell rings. The lantern goes dark.","hint":"Find the final clue, then connect all three.","hintJP":"最後の手がかりを見つけて、三つをつなぎましょう。"},{"id":"ks_lantern_evidence_03","roomId":"room_02","type":"inference","label":"03 / ANSWER","labelJP":"答え","title":"No light, no way home","titleJP":"<ruby>灯<rt>あか</rt></ruby>りがなく、<ruby>帰<rt>かえ</rt></ruby>り<ruby>道<rt>みち</rt></ruby>もない","text":"Without light, Chiyo cannot find her way home.","hint":"Return with your case answer.","hintJP":"ケースの答えを持って戻りましょう。"}],
     "lines": [
       {"speaker":"Kurobane","en":"Wait by the lantern."},
       {"speaker":"Chiyo","en":"Okay. I will wait here."},
@@ -93,7 +62,7 @@
     "replayLenses": {"detail":{"label":"FIND THE DETAIL","labelJP":"細部ハント","prompt":"Which clue links the dark lantern to Chiyo's problem?","promptJP":"暗い灯りとチヨの問題をつなぐ手がかりはどれですか？","choices":["The light went out, so Chiyo could not see home.","Chiyo liked the bridge.","The bell was blue."],"choicesJP":["灯りが消えたので、チヨは家が見えない。","チヨは橋が好きだった。","鐘は青かった。"],"correct":0,"evidenceLines":[2,3],"evidence":"Chiyo says she cannot see the way home.","evidenceJP":"チヨは、帰り道が見えないと言っています。"},"emotion":{"label":"FIND THE FEELING","labelJP":"気持ちハント","prompt":"How does the feeling change in this memory?","promptJP":"この記憶の中で、気持ちはどのように変わりますか？","choices":["Calm, then worried.","Happy, then sleepy.","Bored, then excited."],"choicesJP":["穏やか、そして不安。","幸せ、そして眠い。","退屈、そして興奮。"],"correct":0,"evidenceLines":[0,3],"evidence":"Chiyo waits calmly at first, then worries when the light is gone.","evidenceJP":"チヨは最初は穏やかに待ち、灯りが消えると不安になります。"},"inference":{"label":"GUESS WHY","labelJP":"推測ハント","prompt":"What is the best explanation? Use two clues.","promptJP":"一番よい説明はどれですか？二つの手がかりを使いましょう。","choices":["The light went out, so Chiyo could not see the way home.","Chiyo wanted to cross before the bell.","Kurobane told Chiyo to leave."],"choicesJP":["灯りが消えたので、チヨは帰り道が見えなかった。","チヨは鐘の前に渡りたかった。","クロバネはチヨに出るように言った。"],"correct":0,"evidenceLines":[2,3],"evidence":"The lantern went dark, so Chiyo could not see the way home.","evidenceJP":"灯りが消えたので、チヨは帰り道が見えなくなりました。"}},
     "success": "Kurobane remembers what happened to the light.",
     "successJP": "クロバネは、灯りに何が起きたかを思い出しました。",
-    "postcard": {"chunks":["Kurobane told Chiyo to wait.","The light went out.","Chiyo could not find her way home."],"chunksJP":["クロバネはチヨに待つように言った。","灯りが消えた。","チヨは帰り道が分からなくなった。"],"order":[0,1,2],"savedText":"Kurobane told Chiyo to wait. The light went out. Chiyo could not find her way home."}
+    "postcard": {"chunks":["Kurobane told Chiyo to wait.","The light went out.","Chiyo could not find her way home."],"chunksJP":["クロバネはチヨに待つように言った。","灯りが消えた。","チヨは帰り道が分からなくなった。"],"order":[0,1,2],"savedText":"Kurobane told Chiyo to wait. The light went out. Chiyo could not find her way home.","title":"Case memory postcard","titleJP":"ケース記憶カード","instruction":"Connect the three clues into a short case summary.","instructionJP":"三つの手がかりをつないで、短いケースのまとめを作りましょう。"}
   },
   "start": {
     "intro":"Kurobane waits by a lantern. The light goes out. Chiyo cannot find the way home.","introJP":"この記憶を短く読みましょう。",
@@ -103,6 +72,6 @@
     "lines":[{"speaker":"Kurobane","en":"Kurobane waits by a lantern."},{"speaker":"Narrator","en":"The light goes out."},{"speaker":"Chiyo","en":"Chiyo cannot find the way home."}],
     "checks":[{"type":"sequence","sequenceOrder":[0,1,2],"revealAct":0,"evidenceLines":[0,1,2],"restoreText":"The first part returns.","restoreTextJP":"最初の場面が戻ります。","label":"01 / ORDER","labelJP":"順番","prompt":"What happens first?","promptJP":"最初に何が起きますか？","choices":["Kurobane waits.","The light goes out.","Chiyo is lost."],"choicesJP":["クロバネは待つ。","灯りが消える。","チヨは迷う。"],"correct":0,"evidence":"The waiting comes first.","evidenceJP":"最初に待ちます。"},{"type":"detail","matchLine":1,"revealAct":1,"evidenceLines":[1],"restoreText":"The next part returns.","restoreTextJP":"次の場面が戻ります。","label":"02 / DETAIL","labelJP":"細部","prompt":"Which sentence shows the problem?","promptJP":"問題が分かる文はどれですか？","choices":["The light goes out.","The bridge is new.","The bell is blue."],"choicesJP":["灯りが消える。","橋が新しい。","鐘が青い。"],"correct":0,"evidence":"The light is gone.","evidenceJP":"灯りが消えました。"},{"type":"inference","supportingLine":2,"revealAct":2,"evidenceLines":[2],"restoreText":"The last part returns.","restoreTextJP":"最後の場面が戻ります。","label":"03 / WHY","labelJP":"理由","prompt":"Why is Chiyo lost?","promptJP":"チヨはなぜ迷いますか？","choices":["The light is gone.","She eats candy.","Kurobane leaves."],"choicesJP":["灯りが消えたから。","彼女はキャンディを食べるから。","クロバネが出ていくから。"],"correct":0,"evidence":"Without the light, Chiyo cannot find home.","evidenceJP":"灯りがないので、チヨは家を見つけられません。"}],
     "replayLenses":{"detail":{"label":"FIND THE DETAIL","labelJP":"細部ハント","prompt":"Which sentence shows the problem?","promptJP":"問題が分かる文はどれですか？","choices":["The light goes out.","The bridge is new.","The bell is blue."],"choicesJP":["灯りが消える。","橋が新しい。","鐘が青い。"],"correct":0,"evidenceLines":[1],"evidence":"The light is gone.","evidenceJP":"灯りが消えました。"},"emotion":{"label":"FIND THE FEELING","labelJP":"気持ちハント","prompt":"How does the feeling change?","promptJP":"気持ちはどう変わりますか？","choices":["Calm, then worried.","Happy, then sleepy.","Angry, then hungry."],"choicesJP":["穏やか、そして不安。","幸せ、そして眠い。","怒り、そして空腹。"],"correct":0,"evidenceLines":[0,2],"evidence":"The story changes from waiting to worry.","evidenceJP":"待つ気持ちから不安に変わります。"},"inference":{"label":"GUESS WHY","labelJP":"理由ハント","prompt":"Why is Chiyo lost?","promptJP":"チヨはなぜ迷いますか？","choices":["The light is gone.","She eats candy.","Kurobane leaves."],"choicesJP":["灯りが消えたから。","彼女はキャンディを食べるから。","クロバネが出ていくから。"],"correct":0,"evidenceLines":[2],"evidence":"Without the light, Chiyo cannot find home.","evidenceJP":"灯りがないので、チヨは家を見つけられません。"}},
-    "success":"Kurobane remembers the simple truth: Chiyo needed the light to find home.","successJP":"記憶が戻りました。","postcard":{"title":"Memory postcard","titleJP":"記憶カード","instruction":"Put the three short sentences in order.","instructionJP":"三つの短い文を順番に並べましょう。","chunks":["Kurobane waits.","The light goes out.","Chiyo cannot find the way home."],"chunksJP":["クロバネは待つ。","灯りが消える。","チヨは帰り道が分からない。"],"order":[0,1,2],"savedText":"Kurobane waits. The light goes out. Chiyo cannot find the way home."}
+    "success":"Kurobane remembers the simple truth: Chiyo needed the light to find home.","successJP":"記憶が戻りました。","postcard":{"title":"Starter memory postcard","titleJP":"スターター記憶カード","instruction":"Put the three simple parts in order.","instructionJP":"三つのやさしい場面を順番に並べましょう。","chunks":["Kurobane waits.","The light goes out.","Chiyo cannot find the way home."],"chunksJP":["クロバネは待つ。","灯りが消える。","チヨは帰り道が分からない。"],"order":[0,1,2],"savedText":"Kurobane waits. The light goes out. Chiyo cannot find the way home."}
   }
 }

@@ -48,6 +48,22 @@ for (const filename of fs.readdirSync(episodeRoot).filter(name => name.endsWith(
   const counts = [englishWordCount(episode.start), englishWordCount(episode.fresh), englishWordCount(deep)];
   assert(counts[0] < counts[1] && counts[1] < counts[2],
     `${filename}: Starter, Case, and Deep English content must increase in scope`);
+  assert.strictEqual(episode.start.mechanic.name, 'Starter Memory',
+    `${filename}: Starter tier needs its player-facing mechanic name`);
+  assert.strictEqual(episode.fresh.mechanic.name, 'Case Memory',
+    `${filename}: Case tier needs its player-facing mechanic name`);
+  assert.strictEqual(deep.mechanic.name, 'Deep Memory',
+    `${filename}: Deep tier needs its player-facing mechanic name`);
+  assert.strictEqual(episode.fresh.mechanic.type, 'evidence-board',
+    `${filename}: Case tier should use the clue-board mechanic`);
+  assert.strictEqual(episode.start.postcard.title, 'Starter memory postcard',
+    `${filename}: Starter postcard should be labeled clearly`);
+  assert.strictEqual(episode.fresh.postcard.title, 'Case memory postcard',
+    `${filename}: Case postcard should be labeled clearly`);
+  assert.strictEqual(deep.postcard.title, 'Deep memory postcard',
+    `${filename}: Deep postcard should be labeled clearly`);
+  assert.deepStrictEqual(episode.fresh.trail.map(clue => clue.label), ['01 / CLUE', '02 / LINK', '03 / ANSWER'],
+    `${filename}: Case trail should move from clue to link to answer`);
   assert(episode.fresh.checks[0].prompt.includes('clues'),
     `${filename}: Case order check should connect clues`);
   assert(episode.fresh.checks[2].prompt.includes('two clues'),
