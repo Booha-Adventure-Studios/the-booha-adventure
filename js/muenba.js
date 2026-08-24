@@ -106,6 +106,11 @@
   const PRACTICE_RHYTHM_GOOD_MS = 300;
   const PRACTICE_RHYTHM_PASS_ACCURACY = 50;
   const MUENBA_CASE_MODES = ['start', 'fresh', 'deep'];
+  const MUENBA_MEMORY_MODE_LABELS = {
+    start: 'Starter Memory',
+    fresh: 'Case Memory',
+    deep: 'Deep Memory'
+  };
 
   // Pass 3 — the hostile ghost gets a shorter, faster danger chart. It is
   // intentionally readable rather than punishing: six notes at 150 BPM,
@@ -1408,14 +1413,12 @@
     const selectedMode = ['start', 'fresh', 'deep'].includes(captureSession.caseDifficulty)
       ? captureSession.caseDifficulty
       : 'fresh';
-    const selectedModeLabel = selectedMode === 'start'
-      ? 'Start Memory'
-      : selectedMode === 'deep' ? 'Deep Memory' : 'Fresh Memory';
+    const selectedModeLabel = MUENBA_MEMORY_MODE_LABELS[selectedMode] || MUENBA_MEMORY_MODE_LABELS.fresh;
     const selectedModeJP = selectedMode === 'start'
-      ? '<ruby>始<rt>はじ</rt></ruby>めの<ruby>記憶<rt>きおく</rt></ruby>'
+      ? '<ruby>子<rt>こ</rt></ruby>ども<ruby>向<rt>む</rt></ruby>けの<ruby>記憶<rt>きおく</rt></ruby>'
       : selectedMode === 'deep'
         ? '<ruby>深<rt>ふか</rt></ruby>い<ruby>記憶<rt>きおく</rt></ruby>'
-        : '<ruby>新<rt>あたら</rt></ruby>しい<ruby>記憶<rt>きおく</rt></ruby>';
+        : '<ruby>事件<rt>じけん</rt></ruby>の<ruby>記憶<rt>きおく</rt></ruby>';
 
     renderCaseDirection(
       box,
