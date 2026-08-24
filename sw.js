@@ -5,11 +5,11 @@
 // ============================================================
 
 const CURRENT_CACHES = {
-  // Muenba atmosphere pass: invalidate the previous bundle so the gated
-  // profile link, off-center lighting, fog, and vignette reach players.
-  pages:  'booha-pages-2026-272',
-  assets: 'booha-assets-2026-272',
-  decks:  'booha-decks-2026-272',
+  // Muenba fog-depth pass: invalidate the previous bundle so the layered
+  // foreground bank reaches players beneath the actors.
+  pages:  'booha-pages-2026-273',
+  assets: 'booha-assets-2026-273',
+  decks:  'booha-decks-2026-273',
 };
 
 const PAGE_CACHE  = CURRENT_CACHES.pages;
