@@ -5,11 +5,11 @@
 // ============================================================
 
 const CURRENT_CACHES = {
-  // Muenba hostility pass: invalidate the previous deployed bundle so
-  // delayed sight reactions and wrong-collection reactions are live.
-  pages:  'booha-pages-2026-260',
-  assets: 'booha-assets-2026-260',
-  decks:  'booha-decks-2026-260',
+  // Muenba audio pass: invalidate the previous deployed bundle so the
+  // synchronized scream/rhythm handoff is live.
+  pages:  'booha-pages-2026-261',
+  assets: 'booha-assets-2026-261',
+  decks:  'booha-decks-2026-261',
 };
 
 const PAGE_CACHE  = CURRENT_CACHES.pages;
