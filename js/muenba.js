@@ -66,12 +66,10 @@
   // Hostile ghosts should give Booha a short readable beat, not several
   // seconds of silence while they stare at him.
   const GHOST_NOTICE_DELAY_MS = 900;
-  // Hiding is a deliberate choice, not an instant room reset. Let a hostile
-  // ghost search nearby for a few seconds so the player can feel why hiding
-  // was necessary before it finally slips into another room.
-  const GHOST_GIVEUP_HIDE_MS = 3000;
+  // Hiding calms the encounter, but does not instantly clear the room. Let a
+  // hostile ghost search nearby for a longer beat before it slips away.
+  const GHOST_GIVEUP_HIDE_MS = 6000;
   const GHOST_HIDE_SEARCH_SPEED = .45;
-  const GHOST_HIDE_SCREAM_FADE_MS = 650;
   const GHOST_STARTLE_COOLDOWN_MS = 1400;
   const GHOST_TELEPORT_MIN_MS = 8500;
   const GHOST_TELEPORT_MAX_MS = 14000;
@@ -768,7 +766,6 @@
       startleUntil: 0,
       hideGiveupAt: 0,
       hideSearchTarget: null,
-      hideScreamUntil: 0,
       roomId,
       roomTravelAt: 0,
       travelExit: null,
@@ -805,7 +802,6 @@
     g.screaming = true;
     g.screamReason = reason;
     g.angryUntil = now + 1200;
-    g.hideScreamUntil = 0;
     startDangerScream();
   }
 
@@ -822,23 +818,19 @@
     if (state.hiding) {
       if (g.hostility === 'friendly') return;
 
-      // The scream fades after Booha hides, but the ghost remains visibly
-      // angry while it searches. This keeps the hide choice tense without
-      // allowing the hidden player to be caught.
-      if (g.screaming) {
-        if (!g.hideScreamUntil) g.hideScreamUntil = now + GHOST_HIDE_SCREAM_FADE_MS;
-        else if (now >= g.hideScreamUntil) stopGhostScream(g);
-      }
+      // Hiding is safe: the ghost returns to its ordinary sprite, stops
+      // screaming and forgets the chase immediately, then searches at its
+      // normal slow pace without being able to catch Booha.
+      stopGhostScream(g);
+      g.angryUntil = 0;
       g.chasing = false;
       g.noticeStartedAt = 0;
       if (!g.hideGiveupAt) {
         g.hideGiveupAt = now + GHOST_GIVEUP_HIDE_MS;
-        g.angryUntil = Math.max(g.angryUntil, g.hideGiveupAt);
         g.hideSearchTarget = pickGhostHideSearchTarget();
       } else if (now >= g.hideGiveupAt) {
         if (teleportGhostToAnotherRoom(g, now)) return;
-        g.hideGiveupAt = now + 3000;
-        g.angryUntil = Math.max(g.angryUntil, g.hideGiveupAt);
+        g.hideGiveupAt = now + GHOST_GIVEUP_HIDE_MS;
         g.hideSearchTarget = pickGhostHideSearchTarget();
       }
       if (g.hideSearchTarget) {
@@ -851,7 +843,6 @@
     }
     g.hideGiveupAt = 0;
     g.hideSearchTarget = null;
-    g.hideScreamUntil = 0;
     if (!g.roomTravelAt) scheduleGhostTeleport(g, now);
     if (g.teleporting) {
       if (now >= g.teleportAt) teleportGhostToAnotherRoom(g, now);
