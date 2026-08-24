@@ -376,7 +376,7 @@
             ? caseRecords[caseData.id]
             : {};
           // Older saves only had completedCaseIds. Treat those as the old
-          // Fresh Memory completion, never as completion of every mode.
+          // Case Memory completion, never as completion of every mode.
           if (!record.completedModes && legacyCompletedIds.has(caseData.id)) {
             return { ...record, completed: false, completedModes: { fresh: true }, difficulty: 'fresh' };
           }

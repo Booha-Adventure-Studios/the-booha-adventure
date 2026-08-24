@@ -111,6 +111,11 @@
     fresh: 'Case Memory',
     deep: 'Deep Memory'
   };
+  const MUENBA_MEMORY_MODE_JP = {
+    start: '<ruby>子<rt>こ</rt></ruby>ども<ruby>向<rt>む</rt></ruby>けの<ruby>記憶<rt>きおく</rt></ruby>',
+    fresh: '<ruby>事件<rt>じけん</rt></ruby>の<ruby>記憶<rt>きおく</rt></ruby>',
+    deep: '<ruby>深<rt>ふか</rt></ruby>い<ruby>記憶<rt>きおく</rt></ruby>'
+  };
 
   // Pass 3 — the hostile ghost gets a shorter, faster danger chart. It is
   // intentionally readable rather than punishing: six notes at 150 BPM,
@@ -1414,11 +1419,7 @@
       ? captureSession.caseDifficulty
       : 'fresh';
     const selectedModeLabel = MUENBA_MEMORY_MODE_LABELS[selectedMode] || MUENBA_MEMORY_MODE_LABELS.fresh;
-    const selectedModeJP = selectedMode === 'start'
-      ? '<ruby>子<rt>こ</rt></ruby>ども<ruby>向<rt>む</rt></ruby>けの<ruby>記憶<rt>きおく</rt></ruby>'
-      : selectedMode === 'deep'
-        ? '<ruby>深<rt>ふか</rt></ruby>い<ruby>記憶<rt>きおく</rt></ruby>'
-        : '<ruby>事件<rt>じけん</rt></ruby>の<ruby>記憶<rt>きおく</rt></ruby>';
+    const selectedModeJP = MUENBA_MEMORY_MODE_JP[selectedMode] || MUENBA_MEMORY_MODE_JP.fresh;
 
     renderCaseDirection(
       box,
@@ -1457,6 +1458,14 @@
     const lastClue = captureSession.caseIndex >= mode.clues.length - 1;
     const box = captureBox();
     captureImage(box, captureSession.ghost);
+
+    const modeLabel = document.createElement('div');
+    modeLabel.className = 'muenba-case-mode-label';
+    modeLabel.textContent = MUENBA_MEMORY_MODE_LABELS[captureSession.caseDifficulty] || MUENBA_MEMORY_MODE_LABELS.fresh;
+    const modeJP = document.createElement('small');
+    modeJP.innerHTML = MUENBA_MEMORY_MODE_JP[captureSession.caseDifficulty] || MUENBA_MEMORY_MODE_JP.fresh;
+    modeLabel.appendChild(modeJP);
+    box.appendChild(modeLabel);
 
     renderCaseDirection(
       box,
@@ -1505,6 +1514,14 @@
     const mode = captureSession.caseData[captureSession.caseDifficulty];
     const box = captureBox();
     captureImage(box, captureSession.ghost);
+
+    const modeLabel = document.createElement('div');
+    modeLabel.className = 'muenba-case-mode-label';
+    modeLabel.textContent = MUENBA_MEMORY_MODE_LABELS[captureSession.caseDifficulty] || MUENBA_MEMORY_MODE_LABELS.fresh;
+    const modeJP = document.createElement('small');
+    modeJP.innerHTML = MUENBA_MEMORY_MODE_JP[captureSession.caseDifficulty] || MUENBA_MEMORY_MODE_JP.fresh;
+    modeLabel.appendChild(modeJP);
+    box.appendChild(modeLabel);
 
     renderCaseDirection(
       box,
@@ -2896,6 +2913,8 @@
       .muenba-lobby-case-board { margin:22px 0 24px; padding:21px 20px 19px; border:1px solid rgba(216,201,139,.4); border-radius:12px; background:linear-gradient(145deg,rgba(216,201,139,.1),rgba(216,201,139,.025)); text-align:left; }
       .muenba-lobby-case-board h3 { margin:0 0 10px; color:#fff5d5; font:400 clamp(1.25rem,4vw,1.7rem)/1.2 Georgia,'Times New Roman',serif; letter-spacing:.01em; }
       .muenba-lobby-case-board p { margin:0 0 7px; color:#fff5d5; font-size:1rem; line-height:1.55; }
+      .muenba-lobby-case-board p.muenba-case-board-mode { margin:0; color:#f0d98c; font:900 .82rem/1.35 ui-monospace,monospace; letter-spacing:.08em; text-transform:uppercase; }
+      .muenba-lobby-case-board p.muenba-case-board-mode-jp { margin:3px 0 10px; color:#c5b778; font-size:.8rem; }
       .muenba-lobby-case-board p.muenba-case-board-copy { color:#d9d0a5; font-size:.9rem; }
       .muenba-lobby-case-board p.muenba-case-direction-jp { color:#9fc3af; font-size:.84rem; }
       .muenba-case-board-eyebrow { margin:0 0 8px; color:#d8c98b; font:700 .62rem/1.4 ui-monospace,monospace; letter-spacing:.16em; text-transform:uppercase; }
@@ -2914,6 +2933,8 @@
       .muenba-hunt-helper-jp { margin:0 0 20px !important; color:#d6b6b1 !important; font-size:.82rem !important; line-height:1.65 !important; text-align:left !important; }
       #muenba-lobby-begin:hover, #muenba-lobby-begin:focus-visible, #muenba-room-nuppi-close:hover, #muenba-room-nuppi-close:focus-visible, .muenba-capture-action:hover, .muenba-capture-action:focus-visible { background:rgba(52,104,78,.44); outline:none; }
       .muenba-case-eyebrow { margin:0 0 8px; color:#d8c98b; font:700 10px/1.4 ui-monospace,monospace; letter-spacing:.15em; }
+      .muenba-case-mode-label { display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin:0 0 10px; color:#f0d98c; font:900 .72rem/1.35 ui-monospace,monospace; letter-spacing:.08em; text-transform:uppercase; }
+      .muenba-case-mode-label small { color:#c5b778; font:400 .78rem/1.35 system-ui,sans-serif; letter-spacing:0; text-transform:none; }
       .muenba-case-progress { margin:0 0 10px; color:#fff5d5; font:900 .82rem/1.4 ui-monospace,monospace; letter-spacing:.16em; text-align:left; }
       .muenba-case-record { margin:15px 0 18px !important; padding:14px 15px; border-left:3px solid #d8c98b; background:rgba(216,201,139,.08); color:#fff5d5 !important; font-size:1rem !important; line-height:1.65 !important; text-align:left !important; }
       .muenba-case-record-list { display:grid; gap:7px; margin:13px 0 16px; text-align:left; }
@@ -3766,6 +3787,8 @@
         <p class="jp">ヌッピの<ruby>事件<rt>じけん</rt></ruby>ボード</p>
         <section class="muenba-lobby-case-board" aria-labelledby="muenba-case-board-title">
           <h3 id="muenba-case-board-title"></h3>
+          <p id="muenba-case-board-mode" class="muenba-case-board-mode"></p>
+          <p id="muenba-case-board-mode-jp" class="muenba-case-board-mode-jp"></p>
           <p id="muenba-case-board-copy" class="muenba-case-board-copy"></p>
           <p id="muenba-case-board-jp" class="muenba-case-direction-jp"></p>
         </section>
@@ -3819,18 +3842,25 @@
   function refreshNuppiCaseBoard() {
     if (!lobbyOverlay) return;
     const title = lobbyOverlay.querySelector('#muenba-case-board-title');
+    const mode = lobbyOverlay.querySelector('#muenba-case-board-mode');
+    const modeJp = lobbyOverlay.querySelector('#muenba-case-board-mode-jp');
     const copy = lobbyOverlay.querySelector('#muenba-case-board-copy');
     const jp = lobbyOverlay.querySelector('#muenba-case-board-jp');
-    if (!title || !copy || !jp) return;
+    if (!title || !mode || !modeJp || !copy || !jp) return;
     const next = nextMuenbaCase();
     if (next) {
       const ghost = (DATA.ghosts || []).find(candidate => candidate.id === next.ghostId);
       const ghostName = ghost ? ghost.name : next.ghostId;
+      const selectedMode = getMuenbaReadingDifficulty();
       title.textContent = next.title;
+      mode.textContent = MUENBA_MEMORY_MODE_LABELS[selectedMode] || MUENBA_MEMORY_MODE_LABELS.fresh;
+      modeJp.innerHTML = MUENBA_MEMORY_MODE_JP[selectedMode] || MUENBA_MEMORY_MODE_JP.fresh;
       copy.textContent = `Case ready. Find ${ghostName} and untangle its energy.`;
       jp.innerHTML = '<ruby>事件<rt>じけん</rt></ruby>の<ruby>準備<rt>じゅんび</rt></ruby>ができたよ。<ruby>幽霊<rt>ゆうれい</rt></ruby>を<ruby>探<rt>さが</rt></ruby>して、エネルギーを<ruby>解<rt>と</rt></ruby>こう。';
     } else {
       title.textContent = 'The case board is quiet.';
+      mode.textContent = 'No reading level selected';
+      modeJp.innerHTML = '<ruby>読<rt>よ</rt></ruby>み<ruby>方<rt>かた</rt></ruby>はありません';
       copy.textContent = 'Nuppi is waiting for the next strange ghost.';
       jp.innerHTML = '<ruby>事件<rt>じけん</rt></ruby>ボードは<ruby>静<rt>しず</rt></ruby>かだよ。<ruby>次<rt>つぎ</rt></ruby>の<ruby>変<rt>へん</rt></ruby>な<ruby>幽霊<rt>ゆうれい</rt></ruby>を<ruby>待<rt>ま</rt></ruby>っているよ。';
     }

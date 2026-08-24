@@ -69,6 +69,8 @@ assert(profileSource.includes('Starter Memory'), 'Muenba should use the younger-
 assert(profileSource.includes('Case Memory'), 'Muenba should use the middle Case Memory label');
 assert(source.includes("start: 'Starter Memory'"), 'case popup should use the Starter Memory label');
 assert(source.includes("fresh: 'Case Memory'"), 'case popup should use the Case Memory label');
+assert(source.includes('id="muenba-case-board-mode"'), 'Nuppi case board should show the selected reading level');
+assert(profileSource.includes("memoryModeLabel(entry.caseDifficulty || 'fresh')"), 'journal should show player-facing memory labels');
 
 const legacy = migrateRecord({ completed: true, difficulty: 'fresh' });
 assert.deepStrictEqual(legacy.completedModes, { fresh: true }, 'legacy completed records should migrate to their recorded mode');
