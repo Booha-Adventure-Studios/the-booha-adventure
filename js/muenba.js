@@ -697,13 +697,16 @@
     Object.keys(mu.caseRecords).forEach(caseId => {
       const record = mu.caseRecords[caseId];
       if (!record || typeof record !== 'object') return;
-      if (!record.completedModes || typeof record.completedModes !== 'object') {
+      if (!record.completedModes || typeof record.completedModes !== 'object' || Array.isArray(record.completedModes)) {
         const legacyMode = MUENBA_CASE_MODES.includes(record.difficulty) ? record.difficulty : 'fresh';
         record.completedModes = record.completed ? { [legacyMode]: true } : {};
         dirty = true;
       }
-      MUENBA_CASE_MODES.forEach(mode => {
-        if (record.completedModes[mode] !== true) delete record.completedModes[mode];
+      Object.keys(record.completedModes).forEach(mode => {
+        if (!MUENBA_CASE_MODES.includes(mode) || record.completedModes[mode] !== true) {
+          delete record.completedModes[mode];
+          dirty = true;
+        }
       });
       const complete = MUENBA_CASE_MODES.every(mode => record.completedModes[mode] === true);
       if (record.completed !== complete) {
@@ -2295,9 +2298,11 @@
       const previousRecord = mu.caseRecords[caseData.id] && typeof mu.caseRecords[caseData.id] === 'object'
         ? mu.caseRecords[caseData.id]
         : {};
-      const completedModes = previousRecord.completedModes && typeof previousRecord.completedModes === 'object'
+      const completedModes = previousRecord.completedModes && typeof previousRecord.completedModes === 'object' && !Array.isArray(previousRecord.completedModes)
         ? { ...previousRecord.completedModes }
-        : {};
+        : (previousRecord.completed === true && MUENBA_CASE_MODES.includes(previousRecord.difficulty)
+          ? { [previousRecord.difficulty]: true }
+          : {});
       completedModes[mode] = true;
       const allModesComplete = MUENBA_CASE_MODES.every(memoryMode => completedModes[memoryMode] === true);
       mu.caseRecords[caseData.id] = {

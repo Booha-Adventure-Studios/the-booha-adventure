@@ -364,11 +364,23 @@
         const found = mu.ghostsFound && typeof mu.ghostsFound === 'object' ? mu.ghostsFound : {};
         const orbs = typeof mu.orbsCollected === 'number' ? mu.orbsCollected : 0;
         const caseRecords = mu.caseRecords && typeof mu.caseRecords === 'object' ? mu.caseRecords : {};
+        const legacyCompletedIds = new Set(Array.isArray(mu.caseProgress?.completedCaseIds) ? mu.caseProgress.completedCaseIds : []);
+        const recordForCase = caseData => {
+          const record = caseRecords[caseData.id] && typeof caseRecords[caseData.id] === 'object'
+            ? caseRecords[caseData.id]
+            : {};
+          // Older saves only had completedCaseIds. Treat those as the old
+          // Fresh Memory completion, never as completion of every mode.
+          if (!record.completedModes && legacyCompletedIds.has(caseData.id)) {
+            return { ...record, completed: false, completedModes: { fresh: true }, difficulty: 'fresh' };
+          }
+          return record;
+        };
         const modeComplete = (record, mode) => !!(record && ((record.completedModes && record.completedModes[mode] === true) || (!record.completedModes && record.completed === true && record.difficulty === mode)));
         const allModesComplete = record => memoryModes.every(mode => modeComplete(record, mode));
-        const completedIds = new Set(caseOrder.filter(caseData => allModesComplete(caseRecords[caseData.id])).map(caseData => caseData.id));
+        const completedIds = new Set(caseOrder.filter(caseData => allModesComplete(recordForCase(caseData))).map(caseData => caseData.id));
         const completedCases = caseOrder.filter(caseData => completedIds.has(caseData.id));
-        const nextCase = caseOrder.find(caseData => !modeComplete(caseRecords[caseData.id], currentMemory)) || null;
+        const nextCase = caseOrder.find(caseData => !modeComplete(recordForCase(caseData), currentMemory)) || null;
         const rooms = mu.visitedRooms && typeof mu.visitedRooms === 'object'
           ? Object.keys(mu.visitedRooms).length : 0;
         const journal = Array.isArray(mu.huntJournal?.entries) ? mu.huntJournal.entries : [];
@@ -376,7 +388,7 @@
 
         const caseRecordMarkup = caseOrder.length
           ? `<div class="case-record-grid">${caseOrder.map((caseData, index) => {
-              const record = caseRecords[caseData.id] || {};
+              const record = recordForCase(caseData);
               const isCompleted = completedIds.has(caseData.id);
               const isNext = nextCase && nextCase.id === caseData.id;
               const ghost = ghosts.find(candidate => candidate.id === caseData.ghostId);
@@ -408,7 +420,7 @@
         const ghostCards = ghosts.map(ghost => {
           const isFound = !!found[ghost.id];
           const ghostCase = caseOrder.find(caseData => caseData.ghostId === ghost.id);
-          const ghostRecord = ghostCase ? (caseRecords[ghostCase.id] || {}) : null;
+          const ghostRecord = ghostCase ? recordForCase(ghostCase) : null;
           const currentModeComplete = ghostCase && modeComplete(ghostRecord, currentMemory);
           const modeProgress = ghostCase
             ? memoryModes.map(modeName => `${modeName}: ${modeComplete(ghostRecord, modeName) ? 'complete' : 'open'}`).join(' · ')
