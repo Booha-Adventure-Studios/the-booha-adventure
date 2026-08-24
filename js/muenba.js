@@ -17,7 +17,12 @@
 
   const WORLD_W = DATA.worldWidth;
   const WORLD_H = DATA.worldHeight;
-  const GHOST_R = 26;
+  // Booha and the Muenba ghosts use separate scales. The ghost artwork has
+  // generous transparent padding, so its draw radius is larger than its
+  // gameplay footprint to make the visible character read correctly.
+  const BOOHA_R = 26;
+  const GHOST_R = 36;
+  const GHOST_DRAW_R = 52;
   const CENTER_X = WORLD_W / 2;
   const CENTER_Y = WORLD_H / 2;
   const BASE_SPEED = ('ontouchstart' in window || navigator.maxTouchPoints > 0) && window.innerWidth < 768 ? 8 : 5.5;
@@ -46,11 +51,11 @@
   // ghost can close in if the player stands still or walks toward it, but
   // never actually corners anyone. Getting caught is a startle, not a fail
   // state: it bumps the player back a step and costs nothing.
-  const GHOST_WANDER_SPEED = 1.6;
-  const GHOST_CHASE_SPEED = 3.4;
+  const GHOST_WANDER_SPEED = 1.1;
+  const GHOST_CHASE_SPEED = 2.7;
   const GHOST_DETECT_R = 230;
-  const GHOST_CATCH_R = 54;
-  const GHOST_CLICK_R = 58;
+  const GHOST_CATCH_R = 60;
+  const GHOST_CLICK_R = 64;
   const GHOST_GIVEUP_HIDE_MS = 1100;
   const GHOST_STARTLE_COOLDOWN_MS = 1400;
   const ORB_REWARD_PER_CAPTURE = 3;
@@ -129,8 +134,7 @@
   let lobbyOpen = false;
   // Ghost hunting core loop (Pass 7): the current room's wandering ghost
   // (or null when this room has none today), its day-seeded room
-  // assignment, a Hide-button toggle, the capture-result overlay, and a
-  // small transient text bubble for "Boo!"/"Not the one" feedback.
+  // assignment, a Hide-button toggle, and the capture-result overlay.
   let activeGhost = null;
   let ghostRoomMap = null;
   let ghostRoomMapDay = null;
@@ -143,7 +147,6 @@
   // Pass 8B can attach timing/input without also changing movement, ghost AI,
   // or save writes.
   let captureSession = null;
-  let toast = null;
   let motes = [];
   let moteSprite = null;
   const imageCache = new Map();
@@ -559,10 +562,6 @@
     g.y = next.y;
   }
 
-  function showToast(text, jp, x, y, until) {
-    toast = { text, jp, x, y, until };
-  }
-
   function tickGhost(now) {
     if (!activeGhost) return;
     const g = activeGhost;
@@ -591,7 +590,6 @@
         if (dist <= GHOST_CATCH_R && now >= g.startleUntil) {
           g.startleUntil = now + GHOST_STARTLE_COOLDOWN_MS;
           g.angryUntil = now + 500;
-          showToast('Boo!', 'わっ！', state.x, state.y - 50, now + 900);
           const away = dist || 1;
           const pushed = clampToWorld(
             state.x + ((state.x - g.x) / away) * 46,
@@ -1609,30 +1607,12 @@
     actorCtx.save();
     actorCtx.globalAlpha = .95;
     if (img && img.complete && img.naturalWidth > 0) {
-      actorCtx.drawImage(img, x - GHOST_R, y - GHOST_R, GHOST_R * 2, GHOST_R * 2);
+      actorCtx.drawImage(img, x - GHOST_DRAW_R, y - GHOST_DRAW_R, GHOST_DRAW_R * 2, GHOST_DRAW_R * 2);
     } else {
       actorCtx.fillStyle = isAngry ? '#e0687e' : '#cfe8df';
       actorCtx.beginPath();
       actorCtx.arc(x, y, GHOST_R * .7, 0, Math.PI * 2);
       actorCtx.fill();
-    }
-    actorCtx.restore();
-  }
-
-  function drawToast(now) {
-    if (!toast) return;
-    if (now > toast.until) { toast = null; return; }
-    const remain = toast.until - now;
-    actorCtx.save();
-    actorCtx.globalAlpha = Math.min(1, remain / 300);
-    actorCtx.textAlign = 'center';
-    actorCtx.font = "700 15px Georgia, 'Times New Roman', serif";
-    actorCtx.fillStyle = '#f0e2e6';
-    actorCtx.fillText(toast.text, toast.x, toast.y);
-    if (toast.jp) {
-      actorCtx.font = "400 12px Georgia, 'Times New Roman', serif";
-      actorCtx.fillStyle = '#cbb6bc';
-      actorCtx.fillText(toast.jp, toast.x, toast.y + 18);
     }
     actorCtx.restore();
   }
@@ -2090,7 +2070,6 @@
     state.spawnLockUntil = performance.now() + 700;
     state.hiding = false;
     state.captureResolving = false;
-    toast = null;
     if (hideBtn) { hideBtn.classList.remove('active'); hideBtn.textContent = 'Hide'; }
     markMuenbaRoomVisited(roomId);
     spawnRoomGhost(roomId);
@@ -2135,32 +2114,32 @@
     return px >= rect.x && px <= rect.x + rect.w && py >= rect.y && py <= rect.y + rect.h;
   }
 
-  function clampToWorld(x, y) {
+  function clampToWorld(x, y, radius = GHOST_R) {
     return {
-      x: Math.max(GHOST_R, Math.min(WORLD_W - GHOST_R, x)),
-      y: Math.max(GHOST_R, Math.min(WORLD_H - GHOST_R, y))
+      x: Math.max(radius, Math.min(WORLD_W - radius, x)),
+      y: Math.max(radius, Math.min(WORLD_H - radius, y))
     };
   }
 
   function canMoveTo(x, y) {
-    const point = clampToWorld(x, y);
+    const point = clampToWorld(x, y, BOOHA_R);
     return (getRoom().walkable || []).some(rect => pointInRect(point.x, point.y, rect));
   }
 
   function tryMove(x, y) {
-    const point = clampToWorld(x, y);
+    const point = clampToWorld(x, y, BOOHA_R);
     if (canMoveTo(point.x, point.y)) {
       state.x = point.x;
       state.y = point.y;
       return true;
     }
-    const horizontal = clampToWorld(x, state.y);
+    const horizontal = clampToWorld(x, state.y, BOOHA_R);
     if (canMoveTo(horizontal.x, horizontal.y)) {
       state.x = horizontal.x;
       state.y = horizontal.y;
       return true;
     }
-    const vertical = clampToWorld(state.x, y);
+    const vertical = clampToWorld(state.x, y, BOOHA_R);
     if (canMoveTo(vertical.x, vertical.y)) {
       state.x = vertical.x;
       state.y = vertical.y;
@@ -2552,7 +2531,7 @@
     actorCtx.globalAlpha = (.18 + pulse * .08) * hidingFade;
     actorCtx.fillStyle = 'rgba(180,220,215,.55)';
     actorCtx.beginPath();
-    actorCtx.ellipse(state.x, state.y + GHOST_R * .88, GHOST_R * .78, GHOST_R * .27, 0, 0, Math.PI * 2);
+    actorCtx.ellipse(state.x, state.y + BOOHA_R * .88, BOOHA_R * .78, BOOHA_R * .27, 0, 0, Math.PI * 2);
     actorCtx.fill();
     actorCtx.restore();
     actorCtx.save();
@@ -2561,11 +2540,11 @@
     actorCtx.globalAlpha = .96 * hidingFade;
     if (state.hiding) actorCtx.scale(.82, .82);
     if (ghostImg.complete && ghostImg.naturalWidth > 0) {
-      actorCtx.drawImage(ghostImg, -GHOST_R, -GHOST_R, GHOST_R * 2, GHOST_R * 2);
+      actorCtx.drawImage(ghostImg, -BOOHA_R, -BOOHA_R, BOOHA_R * 2, BOOHA_R * 2);
     } else {
       actorCtx.fillStyle = '#ffe56d';
       actorCtx.beginPath();
-      actorCtx.arc(0, 0, GHOST_R * .72, 0, Math.PI * 2);
+      actorCtx.arc(0, 0, BOOHA_R * .72, 0, Math.PI * 2);
       actorCtx.fill();
     }
     actorCtx.restore();
@@ -2680,7 +2659,6 @@
     drawExitArrows(now);
     drawGhost(now);
     drawBooha(now);
-    drawToast(now);
     drawPins();
     if (DEV_MODE && devReadout) {
       const hover = devHover ? `  mouse:${Math.round(devHover.x)},${Math.round(devHover.y)}` : '';
