@@ -299,7 +299,7 @@
       }
 
       function getDifficulty() {
-        return window.UTSUROBA_READING_DIFFICULTY ? window.UTSUROBA_READING_DIFFICULTY() : 'deep';
+        return window.UTSUROBA_READING_DIFFICULTY ? window.UTSUROBA_READING_DIFFICULTY() : 'start';
       }
 
       function setDifficulty(value) {
@@ -316,25 +316,31 @@
 
       function difficultyMarkup() {
         const current = getDifficulty();
-        const note = current === 'start'
-          ? 'A gentle first step with very short sentences and clear clues.'
-          : current === 'fresh'
-            ? 'The same stories, told in shorter, simpler words.'
-            : 'The full stories, the way they were first written.';
-        const noteJP = current === 'start'
-          ? '短い文と分かりやすい手がかりで、最初の一歩を始めます。'
-          : current === 'fresh'
-            ? '同じ物語を、短くやさしい言葉で伝えます。'
-            : '最初に書かれたままの、完全な物語です。';
+        const notes = {
+          start: {
+            en: 'Starter Memory uses very short sentences and easy words for younger readers.',
+            jp: `${rb('小', 'ちい')}さい${rb('子', 'こ')}どもが${rb('読', 'よ')}みやすい、${rb('短', 'みじか')}くてやさしい${rb('文', 'ぶん')}です。`
+          },
+          fresh: {
+            en: 'Case Memory adds more detail and asks you to connect the clues.',
+            jp: `${rb('事件', 'じけん')}の${rb('手', 'て')}がかりをつなげて${rb('読', 'よ')}みます。`
+          },
+          deep: {
+            en: 'Deep Memory uses fuller clues and asks you to think about why.',
+            jp: `${rb('深', 'ふか')}い${rb('記憶', 'きおく')}は、${rb('事件', 'じけん')}をじっくり${rb('読', 'よ')}むための、${rb('詳', 'くわ')}しい${rb('手', 'て')}がかりです。`
+          }
+        };
+        const note = (notes[current] || notes.start).en;
+        const noteJP = (notes[current] || notes.start).jp;
         return `<section class="section">
           <div class="section-heading"><h2>How This Reads</h2><p>読み方</p></div>
           <div class="difficulty-card">
             <div class="difficulty-toggle" role="group" aria-label="Reading difficulty">
-              <button type="button" class="difficulty-option${current === 'start' ? ' is-active' : ''}" data-difficulty="start" aria-pressed="${current === 'start'}">Start Memory<small>${rb('始', 'はじ')}めの${rb('記憶', 'きおく')}</small></button>
-              <button type="button" class="difficulty-option${current === 'fresh' ? ' is-active' : ''}" data-difficulty="fresh" aria-pressed="${current === 'fresh'}">Fresh Memory<small>${rb('新', 'あたら')}しい${rb('記憶', 'きおく')}</small></button>
+              <button type="button" class="difficulty-option${current === 'start' ? ' is-active' : ''}" data-difficulty="start" aria-pressed="${current === 'start'}">Starter Memory<small>${rb('子', 'こ')}ども${rb('向', 'む')}けの${rb('記憶', 'きおく')}</small></button>
+              <button type="button" class="difficulty-option${current === 'fresh' ? ' is-active' : ''}" data-difficulty="fresh" aria-pressed="${current === 'fresh'}">Case Memory<small>${rb('事件', 'じけん')}の${rb('記憶', 'きおく')}</small></button>
               <button type="button" class="difficulty-option${current === 'deep' ? ' is-active' : ''}" data-difficulty="deep" aria-pressed="${current === 'deep'}">Deep Memory<small>${rb('深', 'ふか')}い${rb('記憶', 'きおく')}</small></button>
             </div>
-            <p class="difficulty-note">${esc(note)}<small>${esc(noteJP)}</small></p>
+            <p class="difficulty-note">${esc(note)}<small>${noteJP}</small></p>
           </div>
         </section>`;
       }
@@ -377,6 +383,8 @@
       function render() {
         const data = getSave();
         const utsu = data.utsuroba || {};
+        const memoryModeLabels = { start: 'Starter Memory', fresh: 'Case Memory', deep: 'Deep Memory' };
+        const memoryModeLabel = mode => memoryModeLabels[mode] || memoryModeLabels.start;
         const drifters = Array.isArray(window.UTSUROBA_DATA?.drifters)
           ? window.UTSUROBA_DATA.drifters : [];
         const echoes = utsu.readingEchoes || {};
@@ -399,7 +407,7 @@
 
         const drifterCards = drifters.map(drifter => {
           const restored = restoredFor(utsu, drifter);
-          const modeProgress = ['start', 'fresh', 'deep'].map(mode => `${mode === 'start' ? 'Start' : mode === 'fresh' ? 'Fresh' : 'Deep'}: ${modeComplete(utsu, drifter, mode) ? 'complete' : 'open'}`).join(' · ');
+          const modeProgress = ['start', 'fresh', 'deep'].map(mode => `${memoryModeLabel(mode)}: ${modeComplete(utsu, drifter, mode) ? 'complete' : 'open'}`).join(' · ');
           const echo = utsu.readingEchoes && utsu.readingEchoes[drifter.episodeId];
           const episode = episodeFor(drifter.episodeId, echo && echo.difficulty);
           const story = restored
@@ -411,7 +419,7 @@
               <h3 class="drifter-name">${esc(drifter.name)}<small>${esc(drifter.nameKanji || '')}</small></h3>
             </div>
             <p class="drifter-state">${restored ? `Memory restored · ${rb('記憶', 'きおく')}が${rb('戻', 'もど')}った` : 'Still wandering · まださまよう'}</p>
-            <p class="drifter-memory-progress"><strong>${esc(getDifficulty().toUpperCase())}</strong> mode · ${esc(modeProgress)}</p>
+            <p class="drifter-memory-progress"><strong>${esc(memoryModeLabel(getDifficulty()))}</strong> · ${esc(modeProgress)}</p>
             <p class="drifter-story">${esc(story)}</p>
           </article>`;
         }).join('');
@@ -422,7 +430,7 @@
               const drifter = drifters.find(item => item.id === entry.drifterId);
               return `<article class="journal-entry">
                 <h3>${esc(episode?.title || entry.episodeId || 'Untitled memory')}<small>${esc(episode?.titleJP || drifter?.nameKanji || '')}</small></h3>
-                <p class="journal-meta">${esc(drifter?.name || 'Utsuroba')} · ${entry.masteryLevel || 0} memory marks · ${entry.reviewCount || 1} reading${(entry.reviewCount || 1) === 1 ? '' : 's'}</p>
+                <p class="journal-meta">${esc(drifter?.name || 'Utsuroba')} · ${esc(memoryModeLabel(entry.difficulty || 'start'))} · ${entry.masteryLevel || 0} memory marks · ${entry.reviewCount || 1} reading${(entry.reviewCount || 1) === 1 ? '' : 's'}</p>
               </article>`;
             }).join('')}</div>`
           : `<p class="journal-empty">No memory has settled into the journal yet.<small>${rb('記憶', 'きおく')}が${rb('戻', 'もど')}ると、ここに${rb('記録', 'きろく')}されます。</small></p>`;

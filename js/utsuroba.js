@@ -60,14 +60,14 @@
   const UTSUROBA_MEMORY_MODES = ['start', 'fresh', 'deep'];
 
   function readingMode(value) {
-    return UTSUROBA_MEMORY_MODES.includes(value) ? value : 'deep';
+    return UTSUROBA_MEMORY_MODES.includes(value) ? value : 'start';
   }
 
   function currentReadingMode() {
     try {
       return readingMode(window.UTSUROBA_READING_DIFFICULTY
-        ? window.UTSUROBA_READING_DIFFICULTY() : 'deep');
-    } catch (_) { return 'deep'; }
+        ? window.UTSUROBA_READING_DIFFICULTY() : 'start');
+    } catch (_) { return 'start'; }
   }
 
   function isProfileEntry() {
@@ -227,6 +227,7 @@
 
   function migrateUtsurobaSave(data) {
     let dirty = false;
+    const hadExplicitReadingDifficulty = !!(data.utsuroba && UTSUROBA_MEMORY_MODES.includes(data.utsuroba.readingDifficulty));
     if (!data.utsuroba) { data.utsuroba = {}; dirty = true; }
     if (!data.karasuki) { data.karasuki = {}; dirty = true; }
     if (!data.weekly)   { data.weekly   = {}; dirty = true; }
@@ -240,7 +241,7 @@
     if (!data.utsuroba.visitedRooms) { data.utsuroba.visitedRooms = {}; dirty = true; }
     if (!data.utsuroba.flags)        { data.utsuroba.flags        = {}; dirty = true; }
     if (!UTSUROBA_MEMORY_MODES.includes(data.utsuroba.readingDifficulty)) {
-      data.utsuroba.readingDifficulty = 'deep'; dirty = true;
+      data.utsuroba.readingDifficulty = 'start'; dirty = true;
     }
     if (!data.utsuroba.readingJournal) {
       data.utsuroba.readingJournal = { entries: [] };
@@ -296,7 +297,7 @@
         dirty = true;
       }
       if (record && (!record.completedModes || typeof record.completedModes !== 'object')) {
-        const legacyMode = readingMode(record.difficulty || data.utsuroba.readingDifficulty);
+        const legacyMode = readingMode(record.difficulty || (hadExplicitReadingDifficulty ? data.utsuroba.readingDifficulty : 'deep'));
         record.completedModes = record.completed.length ? { [legacyMode]: record.completed.slice() } : {};
         dirty = true;
       }
@@ -624,7 +625,7 @@
     data.utsuroba.drifters[id].lastQuestWeek = getWeekSeed();
     data.utsuroba.drifters[id].weeklyStatus = 'complete';
     if (quest && quest.active === id && quest.memIdx === memIdx && quest.episodeId) {
-      // Fresh Memory / Deep Memory: record which tier the student actually
+      // Case Memory / Deep Memory: record which tier the student actually
       // read, so the journal/profile can stay accurate even if they switch
       // the toggle later.
       const journal = data.utsuroba.readingJournal || { entries: [] };
