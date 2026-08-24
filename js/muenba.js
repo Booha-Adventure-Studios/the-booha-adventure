@@ -2239,6 +2239,9 @@
       .muenba-return-box h2 { margin:0 0 4px; font-size:1.2rem; font-weight:400; letter-spacing:.06em; text-transform:uppercase; }
       .muenba-return-box .jp { margin:0 0 16px; color:#aac2b5; font-size:.85rem; letter-spacing:.1em; }
       .muenba-return-box p { margin:0 0 20px; color:#c5d8cd; font-size:.92rem; line-height:1.6; }
+      .muenba-return-box p.jp-line { margin-top:-10px; color:#8fa89b; font-size:.82rem; line-height:1.55; }
+      .muenba-return-box ruby { ruby-position:over; }
+      .muenba-return-box rt { font-size:.72em; }
       .muenba-return-actions { display:flex; gap:10px; justify-content:center; }
       .muenba-return-actions button { flex:1; max-width:150px; padding:9px 14px; border-radius:999px; font:700 12px ui-monospace,monospace; letter-spacing:.04em; cursor:pointer; }
       #muenba-return-yes { border:1px solid rgba(156,203,182,.7); color:#e0f4e9; background:rgba(52,104,78,.28); box-shadow:0 0 16px rgba(93,162,124,.22); }
@@ -2306,7 +2309,10 @@
       /* Hide button (Pass 7) — always visible during free-roam, not a DEV
          tool. Matches the exit button's box language but sits bottom-left
          so it never competes with the DEV-only bottom-right room list. */
-      #muenba-hide { position:fixed; left:12px; bottom:12px; z-index:100; border:1px solid rgba(156,203,182,.72); border-radius:8px; background:rgba(0,8,12,.82); color:#e6fff1; padding:8px 16px; font:700 11px ui-monospace,monospace; letter-spacing:.05em; cursor:pointer; box-shadow:0 0 12px rgba(93,208,140,.28), inset 0 0 10px rgba(93,208,140,.08); animation:muenbaHideGlow 1.8s ease-in-out infinite; }
+      #muenba-hide { position:fixed; left:12px; bottom:78px; z-index:100; border:1px solid rgba(156,203,182,.72); border-radius:8px; background:rgba(0,8,12,.82); color:#e6fff1; padding:8px 16px; font:700 11px ui-monospace,monospace; letter-spacing:.05em; cursor:pointer; box-shadow:0 0 12px rgba(93,208,140,.28), inset 0 0 10px rgba(93,208,140,.08); animation:muenbaHideGlow 1.8s ease-in-out infinite; }
+      #muenba-profile-link { position:fixed; left:12px; bottom:12px; z-index:100; display:grid; place-items:center; width:54px; height:54px; padding:5px; border:1px solid rgba(216,201,139,.66); border-radius:12px; background:rgba(6,15,12,.86); box-shadow:0 0 18px rgba(216,201,139,.2), inset 0 0 14px rgba(216,201,139,.08); transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease; }
+      #muenba-profile-link img { display:block; width:100%; height:100%; object-fit:contain; filter:drop-shadow(0 0 8px rgba(216,201,139,.42)); }
+      #muenba-profile-link:hover, #muenba-profile-link:focus-visible { transform:translateY(-2px); border-color:#fff0ad; box-shadow:0 0 28px rgba(216,201,139,.44), inset 0 0 16px rgba(216,201,139,.14); outline:none; }
       @keyframes muenbaHideGlow { 0%,100% { box-shadow:0 0 10px rgba(93,208,140,.22), inset 0 0 8px rgba(93,208,140,.06); } 50% { box-shadow:0 0 25px rgba(93,208,140,.58), 0 0 48px rgba(93,208,140,.18), inset 0 0 14px rgba(93,208,140,.16); } }
       #muenba-hide:hover, #muenba-hide:focus-visible { background:rgba(30,70,60,.8); outline:none; }
       #muenba-return-nuppi-hint { position:fixed; left:50%; top:12px; z-index:90; display:none; transform:translateX(-50%); padding:8px 14px; border:1px solid rgba(216,201,139,.72); border-radius:999px; background:rgba(20,24,14,.86); color:#fff5d5; box-shadow:0 0 18px rgba(216,201,139,.28); font:700 10px/1.25 ui-monospace,monospace; letter-spacing:.08em; text-align:center; pointer-events:none; }
@@ -2359,7 +2365,7 @@
       @keyframes muenbaOrbRelease { from { opacity:0; transform:translateY(12px) scale(.35); } to { opacity:1; transform:translateY(0) scale(1); } }
       .muenba-orb-release-status { margin:0 0 18px !important; color:#9ccbb6 !important; font:700 .76rem/1.4 ui-monospace,monospace !important; text-align:center !important; letter-spacing:.05em; }
       @media (prefers-reduced-motion: reduce) { .muenba-orb-release, .muenba-hunt-ghost-portrait { animation:none; } }
-      @media (prefers-reduced-motion: reduce) { #muenba-fade, .muenba-return-box, #muenba-return-overlay, .muenba-lobby-box, #muenba-lobby-overlay, #muenba-capture-overlay { transition:none !important; } .muenba-lobby-portrait, #muenba-hide, #muenba-celebration-status { animation:none !important; } }
+      @media (prefers-reduced-motion: reduce) { #muenba-fade, .muenba-return-box, #muenba-return-overlay, .muenba-lobby-box, #muenba-lobby-overlay, #muenba-capture-overlay { transition:none !important; } .muenba-lobby-portrait, #muenba-hide, #muenba-celebration-status { animation:none !important; } #muenba-profile-link { transition:none !important; } }
     `;
     document.head.appendChild(style);
   }
@@ -2398,6 +2404,14 @@
     hideBtn.textContent = 'Hide';
     hideBtn.addEventListener('click', toggleHide);
     document.body.appendChild(hideBtn);
+
+    const profileLink = document.createElement('a');
+    profileLink.id = 'muenba-profile-link';
+    profileLink.href = 'muenba-profile.html';
+    profileLink.setAttribute('aria-label', 'Open Muenba profile');
+    profileLink.title = 'Open Muenba profile';
+    profileLink.innerHTML = '<img src="assets/img/muenba/muenba_logo.png" alt="Muenba profile">';
+    document.body.appendChild(profileLink);
 
     returnNuppiHint = document.createElement('div');
     returnNuppiHint.id = 'muenba-return-nuppi-hint';
@@ -2836,6 +2850,7 @@
         <h2>Leave Muenba?</h2>
         <p class="jp">カラスキに戻りますか？</p>
         <p>The path back to Karasuki is open here.</p>
+        <p class="jp-line">ここからカラスキへ<ruby>戻<rt>もど</rt></ruby>る<ruby>道<rt>みち</rt></ruby>が<ruby>開<rt>ひら</rt></ruby>いています。</p>
         <div class="muenba-return-actions">
           <button id="muenba-return-yes" type="button">Yes, return</button>
           <button id="muenba-return-no" type="button">Stay</button>
@@ -3168,22 +3183,49 @@
   function drawReturnPortal(now) {
     if (!inReturnPortalRoom()) return;
     const seconds = now / 1000;
-    const pulse = .5 + .5 * Math.sin(seconds * 1.7);
+    const pulse = REDUCED_MOTION ? .72 : .5 + .5 * Math.sin(seconds * 1.7);
     const cx = KARASUKI_RETURN_PORTAL.x;
     const cy = KARASUKI_RETURN_PORTAL.y;
+    const angle = Math.PI / 2;
+    const glow = .62 + pulse * .22;
+
+    // The return point uses the same small chevron language as the room
+    // exits, with a destination label instead of a floating orb.
     actorCtx.save();
-    actorCtx.globalAlpha = .16 + pulse * .1;
-    actorCtx.fillStyle = 'rgba(180,220,205,.9)';
+    actorCtx.translate(cx, cy);
+    actorCtx.rotate(angle);
+    actorCtx.globalAlpha = glow * .42;
+    actorCtx.strokeStyle = 'rgba(180,220,205,.9)';
+    actorCtx.shadowColor = 'rgba(150,210,190,.9)';
+    actorCtx.shadowBlur = 18 + pulse * 8;
+    actorCtx.lineWidth = 5;
+    actorCtx.lineCap = 'round';
+    actorCtx.lineJoin = 'round';
     actorCtx.beginPath();
-    actorCtx.arc(cx, cy, 46 + pulse * 10, 0, Math.PI * 2);
-    actorCtx.fill();
-    actorCtx.globalAlpha = .55 + pulse * .25;
+    actorCtx.moveTo(-15, -10);
+    actorCtx.lineTo(0, 0);
+    actorCtx.lineTo(-15, 10);
+    actorCtx.stroke();
+    actorCtx.shadowBlur = 0;
+    actorCtx.globalAlpha = glow;
+    actorCtx.strokeStyle = '#d8f4e6';
+    actorCtx.lineWidth = 2;
+    actorCtx.beginPath();
+    actorCtx.moveTo(-15, -10);
+    actorCtx.lineTo(0, 0);
+    actorCtx.lineTo(-15, 10);
+    actorCtx.stroke();
+    actorCtx.restore();
+
+    actorCtx.save();
+    actorCtx.globalAlpha = .58 + pulse * .2;
     actorCtx.fillStyle = '#d8f4e6';
-    actorCtx.shadowColor = 'rgba(150,210,190,.8)';
-    actorCtx.shadowBlur = 18;
-    actorCtx.beginPath();
-    actorCtx.arc(cx, cy, 12 + pulse * 3, 0, Math.PI * 2);
-    actorCtx.fill();
+    actorCtx.shadowColor = 'rgba(150,210,190,.78)';
+    actorCtx.shadowBlur = 12 + pulse * 7;
+    actorCtx.font = '700 12px ui-monospace,monospace';
+    actorCtx.textAlign = 'center';
+    actorCtx.textBaseline = 'middle';
+    actorCtx.fillText('KARASUKI', cx, cy + 30);
     actorCtx.restore();
   }
 
