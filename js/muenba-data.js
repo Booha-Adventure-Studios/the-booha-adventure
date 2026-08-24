@@ -182,6 +182,20 @@
   // from the GHOSTS roster above.
   const GHOST_ANGRY_CHANGE_IMG = 'assets/img/muenba/ghosts/angry_change.png';
 
+  // Pass 15: a single generic "Jerk" archetype, spawned as several instances
+  // by muenba.js to keep rooms feeling populated as the week's real ghosts
+  // get caught. It is never huntable and never appears on the profile page,
+  // so it is kept out of the GHOSTS roster on purpose — muenba.js reads it
+  // separately via window.MUENBA_DATA.jerk.
+  const JERK_GHOST = {
+    id: 'jerk',
+    name: 'Jerk',
+    kana: 'イジワル',
+    img: 'assets/img/muenba/ghosts/jerk.png',
+    personality: 'Doesn’t want to be found. Just wants to scare somebody.',
+    personalityJp: '<ruby>見<rt>み</rt></ruby>つかりたくない。ただ<ruby>誰<rt>だれ</rt></ruby>かを<ruby>驚<rt>おどろ</rt></ruby>かしたいだけ。'
+  };
+
   // Pass 4 content expansion: authored ghost cases stay English-only. The
   // runtime supplies Japanese furigana translations only for instructions
   // and directions, so each case remains a clean English reading record.
@@ -474,6 +488,7 @@
     // Cases unlock in this order. Keeping progression explicit lets Nuppi's
     // board and the capture flow share one contract as more ghosts arrive.
     caseOrder: ['fuzzle_case_01', 'glimmer_case_01', 'nibsy_case_01', 'tinkley_case_01', 'twiddle_case_01'],
-    ghostAngryChangeImg: GHOST_ANGRY_CHANGE_IMG
+    ghostAngryChangeImg: GHOST_ANGRY_CHANGE_IMG,
+    jerk: JERK_GHOST
   };
 })();

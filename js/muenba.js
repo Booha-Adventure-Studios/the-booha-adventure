@@ -363,6 +363,15 @@
   // the tinklet/"Tinkley" naming note.
   const GHOSTS = DATA.ghosts || [];
   const ANGRY_CHANGE_IMG = DATA.ghostAngryChangeImg || '';
+  // Pass 15: a generic hostile-only ghost, never huntable and never shown on
+  // the profile page. Several instances of it fill rooms the real ghost
+  // roster has emptied out (see getGhostRoomMap()) so the cemetery keeps
+  // feeling populated as the week's real ghosts get caught.
+  const JERK_GHOST = DATA.jerk || null;
+  const JERK_COUNT = 5;
+  function isJerkGhostId(ghostId) {
+    return typeof ghostId === 'string' && ghostId.indexOf('jerk_') === 0;
+  }
 
   const ghostImg = new Image();
   ghostImg.src = 'assets/img/booha_ghost.png';
@@ -866,6 +875,19 @@
     shuffledGhosts.forEach((ghost, i) => {
       if (pickedRooms[i]) map[pickedRooms[i]] = ghost;
     });
+    // Pass 15: drop a handful of generic "Jerk" ghosts into whatever rooms
+    // are still empty (never room_01, never a room a real ghost already
+    // has). As real ghosts get weekly-captured and their rooms empty out,
+    // this recomputes right along with the rest of the map (same day/week/
+    // availability cache key above) and jerks can spread into the newly
+    // freed rooms.
+    if (JERK_GHOST) {
+      const emptyRoomIds = roomIds.filter(roomId => !map[roomId]);
+      const jerkRoomIds = _muenbaShuffle(emptyRoomIds, today + '|muenbaJerkRooms').slice(0, JERK_COUNT);
+      jerkRoomIds.forEach((roomId, i) => {
+        map[roomId] = Object.assign({}, JERK_GHOST, { id: 'jerk_' + (i + 1) });
+      });
+    }
     ghostRoomMap = map;
     ghostRoomMapDay = today;
     ghostRoomMapWeek = weekKey;
@@ -881,14 +903,20 @@
     // taken but not yet delivered," so it's the right flag to key off of.
     const carryingStolenEnergy = Number(readMuenba().orbsPending) > 0;
     const target = currentHuntGhostId();
-    if (!carryingStolenEnergy && ghostId === target) return 'friendly';
+    const isJerk = isJerkGhostId(ghostId);
+    // Pass 15: a Jerk is purely hostile — never Nuppi's target, never the
+    // "quiet cemetery" exception below, whatever the hunt state is.
+    if (!isJerk) {
+      if (!carryingStolenEnergy && ghostId === target) return 'friendly';
+    }
     if (carryingStolenEnergy) return 'sight';
     // No active hunt target (every case finished at this difficulty, or no
     // ghost left for the week) used to fall through to the same 50/50 roll
     // as an ordinary hunt, which reads as "everyone's still hostile" even
     // though there's nothing left to be hunting. Nothing to hunt should
-    // read as a quiet cemetery instead.
-    if (!target) return 'friendly';
+    // read as a quiet cemetery instead — except Jerks, who stay hostile
+    // regardless so the cemetery never feels completely safe.
+    if (!isJerk && !target) return 'friendly';
     const today = _muenbaTodayKey() || 'nodate';
     return _muenbaRng(today + '|muenbaGhostHostility|' + ghostId)() < 0.5 ? 'sight' : 'collect';
   }
