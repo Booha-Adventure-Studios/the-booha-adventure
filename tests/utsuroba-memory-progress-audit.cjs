@@ -9,6 +9,7 @@ const source = fs.readFileSync(path.join(__dirname, '..', 'js', 'utsuroba.js'), 
 const loader = fs.readFileSync(path.join(__dirname, '..', 'js', 'utsuroba-episodes.js'), 'utf8');
 const profile = fs.readFileSync(path.join(__dirname, '..', 'utsuroba-profile.html'), 'utf8');
 const modes = ['start', 'fresh', 'deep'];
+const episodeRoot = path.join(__dirname, '..', 'content', 'utsuroba', 'episodes');
 
 assert(source.includes("const UTSUROBA_MEMORY_MODES = ['start', 'fresh', 'deep'];"), 'Utsuroba must define all three memory modes');
 assert(source.includes('completedModes'), 'Utsuroba must persist completion by reading mode');
@@ -21,6 +22,41 @@ assert(source.includes("data.utsuroba.readingDifficulty = 'start';"), 'save migr
 assert(profile.includes('Starter Memory'), 'Utsuroba profile should show the Starter Memory label');
 assert(profile.includes('Case Memory'), 'Utsuroba profile should show the Case Memory label');
 assert(profile.includes('memoryModeLabel(entry.difficulty || \'start\')'), 'Utsuroba journal should show the player-facing mode label');
+
+function englishWordCount(value) {
+  let total = 0;
+  const visit = item => {
+    if (typeof item === 'string') {
+      total += item.split(/\s+/).filter(Boolean).length;
+    } else if (Array.isArray(item)) {
+      item.forEach(visit);
+    } else if (item && typeof item === 'object') {
+      Object.entries(item).forEach(([key, child]) => {
+        if (!/JP$/.test(key)) visit(child);
+      });
+    }
+  };
+  visit(value);
+  return total;
+}
+
+for (const filename of fs.readdirSync(episodeRoot).filter(name => name.endsWith('.json') && name !== 'index.json')) {
+  const episode = JSON.parse(fs.readFileSync(path.join(episodeRoot, filename), 'utf8'));
+  const deep = { ...episode };
+  delete deep.start;
+  delete deep.fresh;
+  const counts = [englishWordCount(episode.start), englishWordCount(episode.fresh), englishWordCount(deep)];
+  assert(counts[0] < counts[1] && counts[1] < counts[2],
+    `${filename}: Starter, Case, and Deep English content must increase in scope`);
+  assert(episode.fresh.checks[0].prompt.includes('clues'),
+    `${filename}: Case order check should connect clues`);
+  assert(episode.fresh.checks[2].prompt.includes('two clues'),
+    `${filename}: Case explanation check should use two clues`);
+  assert(!episode.start.checks[2].prompt.includes('two clues'),
+    `${filename}: Starter explanation check should stay direct`);
+  assert(/prove|choose the line/i.test(episode.checks[2].prompt),
+    `${filename}: Deep explanation check should ask for evidence`);
+}
 
 function migrate(record, legacyMode = 'deep') {
   const next = { ...record, completed: Array.isArray(record.completed) ? record.completed.slice() : [] };
@@ -54,4 +90,4 @@ assert.strictEqual(modeComplete(record, 'deep'), false, 'Fresh Memory must leave
 record = complete(record, 'deep');
 assert.ok(modes.every(mode => modeComplete(record, mode)), 'all three modes should be independently completable');
 
-console.log('Utsuroba memory progress audit passed: Start/Fresh/Deep lanes remain independent.');
+console.log('Utsuroba memory progress audit passed: Starter/Case/Deep lanes remain independent and ordered.');
