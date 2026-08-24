@@ -534,7 +534,7 @@
       englishOnly(caseData.title, `${caseId}.title`);
       englishOnly(caseData.eyebrow, `${caseId}.eyebrow`);
       englishOnly(caseData.intro, `${caseId}.intro`);
-      for (const modeName of ['fresh', 'deep']) {
+      for (const modeName of ['start', 'fresh', 'deep']) {
         const mode = caseData[modeName];
         if (!mode || !Array.isArray(mode.clues) || !mode.clues.length) {
           errors.push(`${caseId}.${modeName} needs at least one clue`);
@@ -670,7 +670,7 @@
       mu.caseRecords = {};
       dirty = true;
     }
-    if (mu.readingDifficulty !== 'fresh' && mu.readingDifficulty !== 'deep') {
+    if (!['start', 'fresh', 'deep'].includes(mu.readingDifficulty)) {
       mu.readingDifficulty = 'fresh';
       dirty = true;
     }
@@ -718,7 +718,8 @@
   }
 
   function getMuenbaReadingDifficulty() {
-    return readMuenba().readingDifficulty === 'deep' ? 'deep' : 'fresh';
+    const difficulty = readMuenba().readingDifficulty;
+    return ['start', 'fresh', 'deep'].includes(difficulty) ? difficulty : 'fresh';
   }
 
   function getRhythmDifficulty() {
@@ -1360,14 +1361,21 @@
     intro.textContent = caseData.intro;
     box.appendChild(intro);
 
-    const selectedMode = captureSession.caseDifficulty === 'deep' ? 'deep' : 'fresh';
-    const selectedModeJP = selectedMode === 'deep'
-      ? '<ruby>深<rt>ふか</rt></ruby>い<ruby>記憶<rt>きおく</rt></ruby>'
-      : '<ruby>新<rt>あたら</rt></ruby>しい<ruby>記憶<rt>きおく</rt></ruby>';
+    const selectedMode = ['start', 'fresh', 'deep'].includes(captureSession.caseDifficulty)
+      ? captureSession.caseDifficulty
+      : 'fresh';
+    const selectedModeLabel = selectedMode === 'start'
+      ? 'Start Memory'
+      : selectedMode === 'deep' ? 'Deep Memory' : 'Fresh Memory';
+    const selectedModeJP = selectedMode === 'start'
+      ? '<ruby>始<rt>はじ</rt></ruby>めの<ruby>記憶<rt>きおく</rt></ruby>'
+      : selectedMode === 'deep'
+        ? '<ruby>深<rt>ふか</rt></ruby>い<ruby>記憶<rt>きおく</rt></ruby>'
+        : '<ruby>新<rt>あたら</rt></ruby>しい<ruby>記憶<rt>きおく</rt></ruby>';
 
     renderCaseDirection(
       box,
-      `Your profile is set to ${selectedMode === 'deep' ? 'Deep Memory' : 'Fresh Memory'}. This case will use that mode.`,
+      `Your profile is set to ${selectedModeLabel}. This case will use that mode.`,
       `プロフィールの<ruby>設定<rt>せってい</rt></ruby>は${selectedModeJP}です。この<ruby>事件<rt>じけん</rt></ruby>ではその<ruby>読<rt>よ</rt></ruby>み<ruby>方<rt>かた</rt></ruby>を<ruby>使<rt>つか</rt></ruby>います。`
     );
 
@@ -1387,7 +1395,7 @@
 
   function selectCaseDifficulty(difficulty) {
     if (!captureSession || !captureSession.caseData) return;
-    if (!['fresh', 'deep'].includes(difficulty)) return;
+    if (!['start', 'fresh', 'deep'].includes(difficulty)) return;
     captureSession.caseDifficulty = difficulty;
     captureSession.caseIndex = 0;
     captureSession.phase = 'case-clues';
