@@ -5,11 +5,11 @@
 // ============================================================
 
 const CURRENT_CACHES = {
-  // Muenba room-tint and depth-vignette pass: invalidate the previous bundle
-  // so the grounded cemetery palette reaches returning players.
-  pages:  'booha-pages-2026-276',
-  assets: 'booha-assets-2026-276',
-  decks:  'booha-decks-2026-276',
+  // Muenba spirit-particles and ghost-light pass: invalidate the previous
+  // bundle so the active cemetery atmosphere reaches returning players.
+  pages:  'booha-pages-2026-277',
+  assets: 'booha-assets-2026-277',
+  decks:  'booha-decks-2026-277',
 };
 
 const PAGE_CACHE  = CURRENT_CACHES.pages;
