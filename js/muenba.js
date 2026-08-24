@@ -443,16 +443,33 @@
     music.play().catch(() => { state.musicStarted = false; });
   }
 
+  // Pass 11: dangerScream is one shared <audio> element reused by every
+  // ghost's scream. play() is async — if a pause()/currentTime reset/new
+  // play() lands on the element before a previous play() has resolved, the
+  // browser silently rejects that promise and the scream just doesn't play.
+  // This token guards against that: only the most recent start/stop call
+  // gets to act once its play() promise actually settles.
+  let screamPlayToken = 0;
   function startDangerScream() {
     stopDangerRhythmMusic();
     music.volume = MUENBA_SCREAM_DUCK_VOLUME;
+    const token = ++screamPlayToken;
     try {
       dangerScream.currentTime = 0;
-      dangerScream.play().catch(() => {});
+      const playResult = dangerScream.play();
+      if (playResult && typeof playResult.then === 'function') {
+        playResult.catch(() => {}).then(() => {
+          // If stopDangerScream() (or a newer scream) already moved on by
+          // the time this late-resolving play() settles, don't leave the
+          // old scream running underneath the newer state.
+          if (token !== screamPlayToken) { try { dangerScream.pause(); } catch (_) {} }
+        });
+      }
     } catch (_) {}
   }
 
   function stopDangerScream() {
+    screamPlayToken++;
     try {
       dangerScream.pause();
       dangerScream.currentTime = 0;
@@ -827,7 +844,10 @@
     const availableGhosts = GHOSTS.filter(ghost => ghost.id === activeCaseGhostId || !weeklyFound || !weeklyFound[ghost.id]);
     const availabilityKey = availableGhosts.map(ghost => ghost.id).join('|');
     if (ghostRoomMap && ghostRoomMapDay === today && ghostRoomMapWeek === weekKey && ghostRoomMapAvailabilityKey === availabilityKey) return ghostRoomMap;
-    const roomIds = Object.keys(DATA.rooms);
+    // Pass 11: room_01 is Nuppi's room — no ghost is ever placed there, so
+    // there's always one guaranteed-safe room to reach regardless of how
+    // hostile the rest of the cemetery has gotten.
+    const roomIds = Object.keys(DATA.rooms).filter(roomId => roomId !== MUENBA_NUPPI.roomId);
     const pickedRooms = _muenbaShuffle(roomIds, today + '|muenbaGhostRooms').slice(0, availableGhosts.length);
     const shuffledGhosts = _muenbaShuffle(availableGhosts, today + '|muenbaGhostAssign');
     const map = {};
@@ -842,7 +862,21 @@
   }
 
   function ghostHostilityFor(ghostId) {
-    if (ghostId === currentHuntGhostId()) return 'friendly';
+    // Pass 11: once Booha has taken a ghost's energy, the whole cemetery is
+    // on alert until that energy is safely handed to Nuppi — every ghost he
+    // meets on the way back is fully hostile (sight-triggered, chase and
+    // scream), not the usual 50/50 mix. `orbsPending` is exactly "energy
+    // taken but not yet delivered," so it's the right flag to key off of.
+    const carryingStolenEnergy = Number(readMuenba().orbsPending) > 0;
+    const target = currentHuntGhostId();
+    if (!carryingStolenEnergy && ghostId === target) return 'friendly';
+    if (carryingStolenEnergy) return 'sight';
+    // No active hunt target (every case finished at this difficulty, or no
+    // ghost left for the week) used to fall through to the same 50/50 roll
+    // as an ordinary hunt, which reads as "everyone's still hostile" even
+    // though there's nothing left to be hunting. Nothing to hunt should
+    // read as a quiet cemetery instead.
+    if (!target) return 'friendly';
     const today = _muenbaTodayKey() || 'nodate';
     return _muenbaRng(today + '|muenbaGhostHostility|' + ghostId)() < 0.5 ? 'sight' : 'collect';
   }
@@ -888,7 +922,10 @@
   function pickGhostTravelExit(fromRoomId) {
     const map = getGhostRoomMap();
     const exits = DATA.rooms[fromRoomId]?.exits || [];
-    const candidates = exits.filter(exit => exit.to !== state.roomId && !map[exit.to]);
+    // Pass 11: a wandering/teleporting ghost can never travel into room_01
+    // either — the safe-room guarantee has to hold even as ghosts roam
+    // between rooms on their own, not just at the day's initial placement.
+    const candidates = exits.filter(exit => exit.to !== state.roomId && exit.to !== MUENBA_NUPPI.roomId && !map[exit.to]);
     if (!candidates.length) return null;
     return candidates[Math.floor(Math.random() * candidates.length)];
   }
