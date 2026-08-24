@@ -22,7 +22,11 @@
   // gameplay footprint to make the visible character read correctly.
   const BOOHA_R = 26;
   const GHOST_R = 36;
-  const GHOST_DRAW_R = 52;
+  const GHOST_DRAW_R = 60;
+  // The ghost PNGs are 2048px square with wide transparent margins. Draw
+  // the useful center crop so the visible ghost, rather than the empty
+  // canvas around it, determines its gameplay scale.
+  const GHOST_ART_CROP = { x: 256, y: 256, size: 1536 };
   const CENTER_X = WORLD_W / 2;
   const CENTER_Y = WORLD_H / 2;
   const BASE_SPEED = ('ontouchstart' in window || navigator.maxTouchPoints > 0) && window.innerWidth < 768 ? 8 : 5.5;
@@ -52,7 +56,7 @@
   // never actually corners anyone. Getting caught is a startle, not a fail
   // state: it bumps the player back a step and costs nothing.
   const GHOST_WANDER_SPEED = 1.1;
-  const GHOST_CHASE_SPEED = 2.7;
+  const GHOST_CHASE_SPEED = GHOST_WANDER_SPEED;
   const GHOST_DETECT_R = 230;
   const GHOST_CATCH_R = 60;
   const GHOST_CLICK_R = 64;
@@ -1883,7 +1887,17 @@
       actorCtx.stroke();
     }
     if (img && img.complete && img.naturalWidth > 0) {
-      actorCtx.drawImage(img, x - GHOST_DRAW_R, y - GHOST_DRAW_R, GHOST_DRAW_R * 2, GHOST_DRAW_R * 2);
+      actorCtx.drawImage(
+        img,
+        GHOST_ART_CROP.x,
+        GHOST_ART_CROP.y,
+        GHOST_ART_CROP.size,
+        GHOST_ART_CROP.size,
+        x - GHOST_DRAW_R,
+        y - GHOST_DRAW_R,
+        GHOST_DRAW_R * 2,
+        GHOST_DRAW_R * 2
+      );
     } else {
       actorCtx.fillStyle = isAngry ? '#e0687e' : '#cfe8df';
       actorCtx.beginPath();
@@ -2003,9 +2017,10 @@
       /* Hide button (Pass 7) — always visible during free-roam, not a DEV
          tool. Matches the exit button's box language but sits bottom-left
          so it never competes with the DEV-only bottom-right room list. */
-      #muenba-hide { position:fixed; left:12px; bottom:12px; z-index:100; border:1px solid rgba(156,203,182,.5); border-radius:8px; background:rgba(0,8,12,.78); color:#d8e8e0; padding:8px 16px; font:700 11px ui-monospace,monospace; letter-spacing:.05em; cursor:pointer; }
+      #muenba-hide { position:fixed; left:12px; bottom:12px; z-index:100; border:1px solid rgba(156,203,182,.72); border-radius:8px; background:rgba(0,8,12,.82); color:#e6fff1; padding:8px 16px; font:700 11px ui-monospace,monospace; letter-spacing:.05em; cursor:pointer; box-shadow:0 0 12px rgba(93,208,140,.28), inset 0 0 10px rgba(93,208,140,.08); animation:muenbaHideGlow 1.8s ease-in-out infinite; }
+      @keyframes muenbaHideGlow { 0%,100% { box-shadow:0 0 10px rgba(93,208,140,.22), inset 0 0 8px rgba(93,208,140,.06); } 50% { box-shadow:0 0 25px rgba(93,208,140,.58), 0 0 48px rgba(93,208,140,.18), inset 0 0 14px rgba(93,208,140,.16); } }
       #muenba-hide:hover, #muenba-hide:focus-visible { background:rgba(30,70,60,.8); outline:none; }
-      #muenba-hide.active { background:rgba(93,162,124,.42); border-color:#5dd08c; color:#eafff2; }
+      #muenba-hide.active { background:rgba(93,162,124,.48); border-color:#7be8a9; color:#eafff2; box-shadow:0 0 26px rgba(93,208,140,.68), inset 0 0 14px rgba(93,208,140,.18); }
       /* Capture session overlay — reuses .muenba-lobby-box for
          the card shell and adds the two-lane
          rhythm board inside that modal. */
@@ -2048,7 +2063,7 @@
       @keyframes muenbaOrbRelease { from { opacity:0; transform:translateY(12px) scale(.35); } to { opacity:1; transform:translateY(0) scale(1); } }
       .muenba-orb-release-status { margin:0 0 18px !important; color:#9ccbb6 !important; font:700 .76rem/1.4 ui-monospace,monospace !important; text-align:center !important; letter-spacing:.05em; }
       @media (prefers-reduced-motion: reduce) { .muenba-orb-release, .muenba-hunt-ghost-portrait { animation:none; } }
-      @media (prefers-reduced-motion: reduce) { #muenba-fade, .muenba-return-box, #muenba-return-overlay, .muenba-lobby-box, #muenba-lobby-overlay, #muenba-capture-overlay { transition:none !important; } .muenba-lobby-portrait { animation:none !important; } }
+      @media (prefers-reduced-motion: reduce) { #muenba-fade, .muenba-return-box, #muenba-return-overlay, .muenba-lobby-box, #muenba-lobby-overlay, #muenba-capture-overlay { transition:none !important; } .muenba-lobby-portrait, #muenba-hide { animation:none !important; } }
     `;
     document.head.appendChild(style);
   }
