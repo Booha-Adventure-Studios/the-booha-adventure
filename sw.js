@@ -5,11 +5,11 @@
 // ============================================================
 
 const CURRENT_CACHES = {
-  // Muenba room-travel pass: invalidate the previous bundle so ghosts can
-  // walk to connected exits, vanish, and relocate between rooms.
-  pages:  'booha-pages-2026-269',
-  assets: 'booha-assets-2026-269',
-  decks:  'booha-decks-2026-269',
+  // Muenba balance pass: invalidate the previous bundle so hiding recovery
+  // and fair ghost spawn spacing reach players.
+  pages:  'booha-pages-2026-270',
+  assets: 'booha-assets-2026-270',
+  decks:  'booha-decks-2026-270',
 };
 
 const PAGE_CACHE  = CURRENT_CACHES.pages;
