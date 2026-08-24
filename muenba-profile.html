@@ -307,15 +307,15 @@
         const current = getReadingDifficulty();
         const descriptions = {
           start: {
-            note: 'Start Memory uses very short sentences and clear clues for a first read.',
-            noteJP: '<ruby>始<rt>はじ</rt></ruby>めの<ruby>記憶<rt>きおく</rt></ruby>は、<ruby>最初<rt>さいしょ</rt></ruby>の<ruby>読<rt>よ</rt></ruby>みに<ruby>向<rt>む</rt></ruby>いた、<ruby>短<rt>みじか</rt></ruby>く<ruby>分<rt>わ</rt></ruby>かりやすい<ruby>文<rt>ぶん</rt></ruby>です。'
+            note: 'Starter Memory uses very short sentences and easy words for younger readers.',
+            noteJP: '<ruby>小<rt>ちい</rt></ruby>さい<ruby>子<rt>こ</rt></ruby>どもが<ruby>読<rt>よ</rt></ruby>みやすい、<ruby>短<rt>みじか</rt></ruby>くてやさしい<ruby>文<rt>ぶん</rt></ruby>です。'
           },
           fresh: {
-            note: 'Fresh Memory uses shorter, simpler clues for a gentler first read.',
-            noteJP: '<ruby>新<rt>あたら</rt></ruby>しい<ruby>記憶<rt>きおく</rt></ruby>は、<ruby>最初<rt>さいしょ</rt></ruby>の<ruby>読<rt>よ</rt></ruby>みに<ruby>向<rt>む</rt></ruby>いた<ruby>短<rt>みじか</rt></ruby>く<ruby>簡単<rt>かんたん</rt></ruby>な<ruby>手<rt>て</rt></ruby>がかりです。'
+            note: 'Case Memory adds more detail and asks you to connect the clues.',
+            noteJP: '<ruby>事件<rt>じけん</rt></ruby>の<ruby>手<rt>て</rt></ruby>がかりをつなげて<ruby>読<rt>よ</rt></ruby>みます。'
           },
           deep: {
-            note: 'Deep Memory uses fuller clues for a closer reading of the case.',
+            note: 'Deep Memory uses fuller clues and asks you to think about why.',
             noteJP: '<ruby>深<rt>ふか</rt></ruby>い<ruby>記憶<rt>きおく</rt></ruby>は、<ruby>事件<rt>じけん</rt></ruby>をじっくり<ruby>読<rt>よ</rt></ruby>むための、<ruby>詳<rt>くわ</rt></ruby>しい<ruby>手<rt>て</rt></ruby>がかりです。'
           }
         };
@@ -325,10 +325,10 @@
         return `<section class="section">
           <div class="section-heading"><h2>How It Reads</h2><p><ruby>読<rt>よ</rt></ruby>み<ruby>方<rt>かた</rt></ruby></p></div>
           <div class="difficulty-card">
-            <p class="difficulty-intro">Choose the memory style for new ghost cases.<small><ruby>新<rt>あたら</rt></ruby>しい<ruby>幽霊<rt>ゆうれい</rt></ruby><ruby>事件<rt>じけん</rt></ruby>の<ruby>読<rt>よ</rt></ruby>み<ruby>方<rt>かた</rt></ruby>を<ruby>選<rt>えら</rt></ruby>びます。</small></p>
+            <p class="difficulty-intro">Choose a reading level for new ghost cases.<small><ruby>新<rt>あたら</rt></ruby>しい<ruby>幽霊<rt>ゆうれい</rt></ruby><ruby>事件<rt>じけん</rt></ruby>の<ruby>読<rt>よ</rt></ruby>み<ruby>方<rt>かた</rt></ruby>を<ruby>選<rt>えら</rt></ruby>びます。</small></p>
             <div class="difficulty-toggle" role="group" aria-label="Muenba case reading style">
-              <button type="button" class="difficulty-option${current === 'start' ? ' is-active' : ''}" data-muenba-difficulty="start" aria-pressed="${current === 'start'}">Start Memory<small><ruby>始<rt>はじ</rt></ruby>めの<ruby>記憶<rt>きおく</rt></ruby></small></button>
-              <button type="button" class="difficulty-option${current === 'fresh' ? ' is-active' : ''}" data-muenba-difficulty="fresh" aria-pressed="${current === 'fresh'}">Fresh Memory<small><ruby>新<rt>あたら</rt></ruby>しい<ruby>記憶<rt>きおく</rt></ruby></small></button>
+              <button type="button" class="difficulty-option${current === 'start' ? ' is-active' : ''}" data-muenba-difficulty="start" aria-pressed="${current === 'start'}">Starter Memory<small><ruby>子<rt>こ</rt></ruby>ども<ruby>向<rt>む</rt></ruby>けの<ruby>記憶<rt>きおく</rt></ruby></small></button>
+              <button type="button" class="difficulty-option${current === 'fresh' ? ' is-active' : ''}" data-muenba-difficulty="fresh" aria-pressed="${current === 'fresh'}">Case Memory<small><ruby>事件<rt>じけん</rt></ruby>の<ruby>記憶<rt>きおく</rt></ruby></small></button>
               <button type="button" class="difficulty-option${current === 'deep' ? ' is-active' : ''}" data-muenba-difficulty="deep" aria-pressed="${current === 'deep'}">Deep Memory<small><ruby>深<rt>ふか</rt></ruby>い<ruby>記憶<rt>きおく</rt></ruby></small></button>
             </div>
             <p class="difficulty-note">${note}<small>${noteJP}</small></p>
@@ -358,6 +358,12 @@
         const ghosts = Array.isArray(window.MUENBA_DATA?.ghosts) ? window.MUENBA_DATA.ghosts : [];
         const cases = window.MUENBA_DATA?.cases && typeof window.MUENBA_DATA.cases === 'object' ? window.MUENBA_DATA.cases : {};
         const memoryModes = ['start', 'fresh', 'deep'];
+        const memoryModeLabels = {
+          start: 'Starter Memory',
+          fresh: 'Case Memory',
+          deep: 'Deep Memory'
+        };
+        const memoryModeLabel = mode => memoryModeLabels[mode] || memoryModeLabels.fresh;
         const currentMemory = getReadingDifficulty();
         const caseOrder = (Array.isArray(window.MUENBA_DATA?.caseOrder) ? window.MUENBA_DATA.caseOrder : Object.keys(cases))
           .map(caseId => cases[caseId]).filter(Boolean);
@@ -394,7 +400,7 @@
               const ghost = ghosts.find(candidate => candidate.id === caseData.ghostId);
               if (isCompleted) {
                 const mode = caseData[record.difficulty] || caseData.fresh;
-                const modeProgress = memoryModes.map(modeName => `${modeName} ${modeComplete(record, modeName) ? 'complete' : 'open'}`).join(' · ');
+                const modeProgress = memoryModes.map(modeName => `${memoryModeLabel(modeName)} ${modeComplete(record, modeName) ? 'complete' : 'open'}`).join(' · ');
                 return `<article class="case-record-card">
                   <h3>${esc(caseData.title)}</h3>
                   <small>Case ${index + 1} · all memory modes complete · case settled</small>
@@ -405,7 +411,7 @@
               if (isNext) {
                 return `<article class="case-record-card is-next">
                   <h3>${esc(caseData.title)}</h3>
-                  <small>Case ${index + 1} · ${esc(currentMemory)} memory · ${esc(ghost?.name || caseData.ghostId)}</small>
+                  <small>Case ${index + 1} · ${esc(memoryModeLabel(currentMemory))} · ${esc(ghost?.name || caseData.ghostId)}</small>
                   <p class="case-queue-copy">Find ${esc(ghost?.name || caseData.ghostId)} in Muenba to open this case.<small>ムエンバで<ruby>幽霊<rt>ゆうれい</rt></ruby>を<ruby>探<rt>さが</rt></ruby>して、この<ruby>事件<rt>じけん</rt></ruby>を<ruby>開<rt>ひら</rt></ruby>こう。</small></p>
                 </article>`;
               }
@@ -423,7 +429,7 @@
           const ghostRecord = ghostCase ? recordForCase(ghostCase) : null;
           const currentModeComplete = ghostCase && modeComplete(ghostRecord, currentMemory);
           const modeProgress = ghostCase
-            ? memoryModes.map(modeName => `${modeName}: ${modeComplete(ghostRecord, modeName) ? 'complete' : 'open'}`).join(' · ')
+            ? memoryModes.map(modeName => `${memoryModeLabel(modeName)}: ${modeComplete(ghostRecord, modeName) ? 'complete' : 'open'}`).join(' · ')
             : 'No case memory assigned yet';
           return `<article class="ghost-card${isFound ? ' is-found' : ''}">
             <img class="ghost-avatar" src="${esc(ghost.img)}" alt="">
@@ -432,7 +438,7 @@
             <p class="ghost-personality">${esc(ghost.personality || '')}</p>
             <p class="ghost-state">${isFound ? 'Energy collected' : 'Still hiding'}</p>
             <p class="ghost-state-jp">${isFound ? '<ruby>集<rt>あつ</rt></ruby>めたエネルギー' : 'まだかくれている'}</p>
-            ${ghostCase ? `<p class="ghost-memory-current">${esc(currentMemory)} Memory · ${currentModeComplete ? 'complete' : 'open'}</p><p class="ghost-memory-progress">${esc(modeProgress)}</p>` : '<p class="ghost-memory-progress">No case memory assigned yet</p>'}
+            ${ghostCase ? `<p class="ghost-memory-current">${esc(memoryModeLabel(currentMemory))} · ${currentModeComplete ? 'complete' : 'open'}</p><p class="ghost-memory-progress">${esc(modeProgress)}</p>` : '<p class="ghost-memory-progress">No case memory assigned yet</p>'}
           </article>`;
         }).join('');
 
@@ -442,7 +448,7 @@
               const caseData = entry.caseId ? cases[entry.caseId] : null;
               return `<article class="journal-entry">
                 <h3>${esc(caseData?.title || ghost?.name || entry.ghostId || 'Unknown ghost')}<small>${caseData ? 'Case settled' : 'Caught'}</small></h3>
-                ${caseData ? `<p class="journal-case-ghost">${esc(ghost?.name || '')} · ${esc(entry.caseDifficulty || 'fresh')} memory</p>` : ''}
+                ${caseData ? `<p class="journal-case-ghost">${esc(ghost?.name || '')} · ${esc(memoryModeLabel(entry.caseDifficulty || 'fresh'))}</p>` : ''}
                 <p class="journal-meta">${esc(entry.capturedAt ? new Date(entry.capturedAt).toLocaleDateString() : '')}</p>
               </article>`;
             }).join('')}</div>`
