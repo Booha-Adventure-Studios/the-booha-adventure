@@ -5,11 +5,11 @@
 // ============================================================
 
 const CURRENT_CACHES = {
-  // Muenba visual pass: invalidate the previous bundle so the larger ghosts
-  // and sprite-centered Nuppi glow reach players.
-  pages:  'booha-pages-2026-267',
-  assets: 'booha-assets-2026-267',
-  decks:  'booha-decks-2026-267',
+  // Muenba hostile-response pass: invalidate the previous bundle so faster
+  // reactions and wrong-ghost pursuit reach players.
+  pages:  'booha-pages-2026-268',
+  assets: 'booha-assets-2026-268',
+  decks:  'booha-decks-2026-268',
 };
 
 const PAGE_CACHE  = CURRENT_CACHES.pages;

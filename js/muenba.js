@@ -63,7 +63,9 @@
   const GHOST_DETECT_R = 230;
   const GHOST_CATCH_R = 60;
   const GHOST_CLICK_R = 64;
-  const GHOST_NOTICE_DELAY_MS = 2200;
+  // Hostile ghosts should give Booha a short readable beat, not several
+  // seconds of silence while they stare at him.
+  const GHOST_NOTICE_DELAY_MS = 900;
   const GHOST_GIVEUP_HIDE_MS = 1100;
   const GHOST_STARTLE_COOLDOWN_MS = 1400;
   const GHOST_TELEPORT_MIN_MS = 16000;
@@ -837,12 +839,14 @@
     if (Math.hypot(worldX - activeGhost.x, worldY - activeGhost.y) <= GHOST_CLICK_R) {
       if (activeGhost.ghost.id !== currentHuntGhostId()) {
         state.clickTarget = null;
-        if (activeGhost.hostility === 'collect') {
-          const now = performance.now();
-          startGhostScream(activeGhost, now, 'collect');
-          activeGhost.chasing = true;
-          activeGhost.hideGiveupAt = 0;
-        }
+        const now = performance.now();
+        // Every wrong ghost reacts to being touched. Sight-trigger ghosts
+        // scream here too, so the player gets one consistent rule: only
+        // Nuppi's assigned ghost is safe to tap.
+        startGhostScream(activeGhost, now, 'wrong-ghost');
+        activeGhost.chasing = true;
+        activeGhost.noticeStartedAt = 0;
+        activeGhost.hideGiveupAt = 0;
         return true;
       }
       attemptCapture();
