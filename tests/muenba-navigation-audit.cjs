@@ -17,6 +17,8 @@ assert(dataSource.includes("up:    { x: 767, y: 284 }"), 'room 01 up-arrow coord
 assert(karasukiSource.includes('const masterAlpha = unlocked ? 1 : moveReveal * 0.38;'), 'unlocked Utsuroba must not be dimmed by movement reveal');
 assert(karasukiSource.includes('const unlocked = muenbaUnlocked();'), 'Karasuki must evaluate the Muenba unlocked state before drawing');
 assert(karasukiSource.includes('const masterAlpha = unlocked ? 1 : moveReveal;'), 'unlocked Muenba must not be dimmed by movement reveal');
+assert(karasukiSource.includes("ctx.strokeStyle = unlocked ? '#75f2b5' : '#9b7da9';"), 'unlocked Muenba must use a vivid spectral rim');
+assert(karasukiSource.includes('ctx.setLineDash([4, 7]);'), 'unlocked Muenba must have a lightweight broken spirit ring');
 
 function shouldDrift(spawnId, arrivalDir) {
   return spawnId === 'fromKarasuki' || !!arrivalDir;
