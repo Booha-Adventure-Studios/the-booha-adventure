@@ -169,6 +169,7 @@
   let fogTexture;
   let lowFogTexture;
   let wispFogTexture;
+  let foregroundFogTexture;
   let lastTouchEnd = 0;
   let entryDrift = null;
   let pins = [];
@@ -2553,6 +2554,31 @@
       lowCtx.fill();
     });
 
+    // A broad foreground bank moves more slowly than the thin wisps. It sits
+    // low on the corridor and gives the background depth while remaining on
+    // the atmosphere canvas, beneath every actor and arrow.
+    foregroundFogTexture = document.createElement('canvas');
+    foregroundFogTexture.width = 1200;
+    foregroundFogTexture.height = 180;
+    const foregroundCtx = foregroundFogTexture.getContext('2d');
+    const foregroundGradient = foregroundCtx.createLinearGradient(0, 0, 0, 180);
+    foregroundGradient.addColorStop(0, 'rgba(170,205,210,0)');
+    foregroundGradient.addColorStop(.32, 'rgba(170,205,210,.05)');
+    foregroundGradient.addColorStop(.72, 'rgba(190,215,216,.13)');
+    foregroundGradient.addColorStop(1, 'rgba(160,198,202,.025)');
+    foregroundCtx.fillStyle = foregroundGradient;
+    foregroundCtx.fillRect(0, 0, 1200, 180);
+    [130, 410, 760, 1040].forEach((x, index) => {
+      const bank = foregroundCtx.createRadialGradient(x, 112, 4, x, 112, 190 + index * 15);
+      bank.addColorStop(0, 'rgba(205,225,222,.11)');
+      bank.addColorStop(.56, 'rgba(180,210,212,.045)');
+      bank.addColorStop(1, 'rgba(180,210,212,0)');
+      foregroundCtx.fillStyle = bank;
+      foregroundCtx.beginPath();
+      foregroundCtx.ellipse(x, 112, 190 + index * 15, 42, 0, 0, Math.PI * 2);
+      foregroundCtx.fill();
+    });
+
     // Thin wisps sit between the background and the actor canvas. They are
     // intentionally soft and stretched so they read as smoke under Booha,
     // not as bright objects floating around the room.
@@ -3485,6 +3511,11 @@
         atmosphereCtx.drawImage(wispFogTexture, -180 + wispMotion, 438, 1120, 150);
         atmosphereCtx.globalAlpha = fogAlpha * .38;
         atmosphereCtx.drawImage(wispFogTexture, 640 - wispMotion * .65, 320, 980, 128);
+      }
+      if (foregroundFogTexture) {
+        const foregroundMotion = fogMotion * .34;
+        atmosphereCtx.globalAlpha = fogAlpha * (.34 + mood.low * .12);
+        atmosphereCtx.drawImage(foregroundFogTexture, -250 + foregroundMotion, 706, 1420, 190);
       }
       atmosphereCtx.restore();
     }
