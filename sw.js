@@ -5,11 +5,11 @@
 // ============================================================
 
 const CURRENT_CACHES = {
-  // Muenba DEV HUD cleanup: invalidate the previous bundle so the compact
-  // room/mouse readout and removed fixed return control reach testers.
-  pages:  'booha-pages-2026-281',
-  assets: 'booha-assets-2026-281',
-  decks:  'booha-decks-2026-281',
+  // Muenba profile button pass: invalidate the previous bundle so responsive
+  // sizing and safe-area placement reach returning players.
+  pages:  'booha-pages-2026-282',
+  assets: 'booha-assets-2026-282',
+  decks:  'booha-decks-2026-282',
 };
 
 const PAGE_CACHE  = CURRENT_CACHES.pages;
