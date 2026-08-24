@@ -1916,7 +1916,10 @@ const HAPPY_HOUSE_PORTAL = {
     
     const cx       = UTSUROBA_PORTAL.x, cy = UTSUROBA_PORTAL.y;
     const unlocked = _utsurobaCurriculumUnlocked();
-    const masterAlpha = unlocked ? moveReveal : moveReveal * 0.38;
+    // An unlocked entrance must remain readable before Booha moves. Movement
+    // can still reveal the locked state gradually, but it should never dim an
+    // available world gate.
+    const masterAlpha = unlocked ? 1 : moveReveal * 0.38;
     const pulse  = 0.5 + 0.5 * Math.sin(sec * 1.1);
     const pulse2 = 0.5 + 0.5 * Math.sin(sec * 1.7 + 0.8);
     const bob    = Math.sin(sec * 1.3) * 4;
@@ -2094,6 +2097,10 @@ const HAPPY_HOUSE_PORTAL = {
     if (state.roomId !== MUENBA_PORTAL.roomId) return;
     const sec = now / 1000;
     const moveReveal = Math.max(0.18, Math.min(1, state.distMovedSinceSpawn / ARROW_MOVE_THRESHOLD));
+    const unlocked = muenbaUnlocked();
+    // Keep the locked orb quiet, but make the available entrance readable as
+    // soon as the room is visible, even before Booha takes a movement step.
+    const masterAlpha = unlocked ? 1 : moveReveal;
     const pulse = 0.5 + 0.5 * Math.sin(sec * 1.65);
     const pulse2 = 0.5 + 0.5 * Math.sin(sec * 2.7 + 1.2);
     const bob = Math.sin(sec * 1.25) * 3;
@@ -2101,7 +2108,7 @@ const HAPPY_HOUSE_PORTAL = {
     const cy = MUENBA_PORTAL.y + bob;
 
     ctx.save();
-    ctx.globalAlpha = moveReveal;
+    ctx.globalAlpha = masterAlpha;
 
     // Almost-black haze: visible against the cemetery without becoming a
     // bright waypoint. The thin cold rim is the readable edge.
@@ -2110,11 +2117,11 @@ const HAPPY_HOUSE_PORTAL = {
     haze.addColorStop(0.38, 'rgba(12,5,20,0.24)');
     haze.addColorStop(0.72, 'rgba(48,19,58,0.10)');
     haze.addColorStop(1, 'transparent');
-    ctx.globalAlpha = moveReveal * (0.72 + pulse * 0.16);
+    ctx.globalAlpha = masterAlpha * (0.72 + pulse * 0.16);
     ctx.fillStyle = haze;
     ctx.beginPath(); ctx.arc(cx, cy, 78 + pulse * 9, 0, Math.PI * 2); ctx.fill();
 
-    ctx.globalAlpha = moveReveal * (0.34 + pulse2 * 0.18);
+    ctx.globalAlpha = masterAlpha * (0.34 + pulse2 * 0.18);
     ctx.strokeStyle = '#9b7da9';
     ctx.lineWidth = 1.4;
     ctx.beginPath(); ctx.arc(cx, cy, 30 + pulse2 * 5, 0, Math.PI * 2); ctx.stroke();
@@ -2125,14 +2132,14 @@ const HAPPY_HOUSE_PORTAL = {
     core.addColorStop(0.25, '#0d0912');
     core.addColorStop(0.82, '#020205');
     core.addColorStop(1, '#000000');
-    ctx.globalAlpha = moveReveal * (0.92 + pulse * 0.06);
+    ctx.globalAlpha = masterAlpha * (0.92 + pulse * 0.06);
     ctx.fillStyle = core;
     ctx.shadowBlur = 18 + pulse * 12;
     ctx.shadowColor = 'rgba(76,36,92,0.72)';
     ctx.beginPath(); ctx.arc(cx, cy, coreR, 0, Math.PI * 2); ctx.fill();
     ctx.shadowBlur = 0;
 
-    ctx.globalAlpha = moveReveal * (0.24 + pulse2 * 0.18);
+    ctx.globalAlpha = masterAlpha * (0.24 + pulse2 * 0.18);
     ctx.fillStyle = '#cbb2d5';
     ctx.beginPath(); ctx.arc(cx - coreR * 0.32, cy - coreR * 0.34, 2.2, 0, Math.PI * 2); ctx.fill();
     ctx.restore();
