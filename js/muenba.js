@@ -807,7 +807,8 @@
     const today = _muenbaTodayKey() || 'nodate';
     const weekKey = _muenbaWeekKey() || 'no-week';
     const weeklyFound = readMuenba().weeklyGhostsFound;
-    const activeCaseGhostId = currentHuntGhostId();
+    const activeCaseGhost = activeMuenbaCaseGhost();
+    const activeCaseGhostId = activeCaseGhost && activeCaseGhost.id;
     const availableGhosts = GHOSTS.filter(ghost => ghost.id === activeCaseGhostId || !weeklyFound || !weeklyFound[ghost.id]);
     const availabilityKey = availableGhosts.map(ghost => ghost.id).join('|');
     if (ghostRoomMap && ghostRoomMapDay === today && ghostRoomMapWeek === weekKey && ghostRoomMapAvailabilityKey === availabilityKey) return ghostRoomMap;
@@ -1227,12 +1228,21 @@
 
   function availableMuenbaGhostsThisWeek() {
     const weeklyFound = readMuenba().weeklyGhostsFound;
-    return GHOSTS.filter(ghost => !weeklyFound || !weeklyFound[ghost.id]);
+    const activeCaseGhost = activeMuenbaCaseGhost();
+    return GHOSTS.filter(ghost => ghost.id === (activeCaseGhost && activeCaseGhost.id) || !weeklyFound || !weeklyFound[ghost.id]);
+  }
+
+  // Energy is collected once per week, but the selected memory mode can leave
+  // the same case unfinished. Its target ghost must return even when
+  // weeklyGhostsFound already contains that ghost id.
+  function activeMuenbaCaseGhost() {
+    const nextCase = nextMuenbaCase();
+    return nextCase ? GHOSTS.find(ghost => ghost.id === nextCase.ghostId) || null : null;
   }
 
   function nextMuenbaHuntGhost() {
-    const nextCase = nextMuenbaCase();
-    if (nextCase) return GHOSTS.find(ghost => ghost.id === nextCase.ghostId) || null;
+    const activeCaseGhost = activeMuenbaCaseGhost();
+    if (activeCaseGhost) return activeCaseGhost;
     return availableMuenbaGhostsThisWeek()[0] || null;
   }
 
