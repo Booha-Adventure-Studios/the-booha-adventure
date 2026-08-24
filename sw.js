@@ -5,11 +5,11 @@
 // ============================================================
 
 const CURRENT_CACHES = {
-  // Muenba handoff pass: invalidate the previous bundle so the Nuppi
-  // handoff, celebration dance, and follow-up choice reach players.
-  pages:  'booha-pages-2026-265',
-  assets: 'booha-assets-2026-265',
-  decks:  'booha-decks-2026-265',
+  // Muenba polish pass: invalidate the previous bundle so the handoff cue
+  // and double-activation guard reach players.
+  pages:  'booha-pages-2026-266',
+  assets: 'booha-assets-2026-266',
+  decks:  'booha-decks-2026-266',
 };
 
 const PAGE_CACHE  = CURRENT_CACHES.pages;
