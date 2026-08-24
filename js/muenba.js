@@ -3302,11 +3302,11 @@
         + .18 * Math.sin(seconds * (4.3 + (index % 2) * .37) + phase * 1.8)
       ));
       const gradient = atmosphereCtx.createRadialGradient(x, y, 0, x, y, radius);
-      gradient.addColorStop(0, 'rgba(255,235,166,.96)');
-      gradient.addColorStop(.18, 'rgba(255,205,96,.72)');
-      gradient.addColorStop(.55, 'rgba(244,155,45,.28)');
+      gradient.addColorStop(0, 'rgba(255,242,181,.99)');
+      gradient.addColorStop(.18, 'rgba(255,211,103,.80)');
+      gradient.addColorStop(.55, 'rgba(244,155,45,.34)');
       gradient.addColorStop(1, 'rgba(208,111,31,0)');
-      atmosphereCtx.globalAlpha = .30 + flicker * .42;
+      atmosphereCtx.globalAlpha = .36 + flicker * .46;
       atmosphereCtx.fillStyle = gradient;
       atmosphereCtx.beginPath();
       atmosphereCtx.arc(x, y, radius, 0, Math.PI * 2);
