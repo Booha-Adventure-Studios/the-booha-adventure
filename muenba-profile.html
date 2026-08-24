@@ -11,11 +11,11 @@
   <link rel="apple-touch-icon" href="/the-booha-adventure/icons/icon-512.png">
 
   <!--
-    Muenba's case-file profile page (Pass 5) — same shell/pattern as
-    utsuroba-profile.html, recolored to Muenba's own dark-cemetery sage
-    palette (matching the borders/accents muenba.js's in-world popups
-    already use: rgba(111,166,145,*) / rgba(156,203,182,*)) instead of
-    Utsuroba's violet.
+    Muenba's case-file profile page — a darker field-ledger treatment with
+    its own condensed display face, asymmetrical header, and cemetery-sage
+    palette. The data model still follows the shared profile contract so the
+    page can read the same save safely without inheriting Utsuroba's visual
+    language.
 
     Reads defensively from data.muenba, a section that doesn't exist in
     the save yet — that's Pass 6. Everything below renders a correct
@@ -43,6 +43,7 @@
       --line: rgba(143,220,178,.2);
       --panel: rgba(9,24,18,.82);
       --font: Georgia, "Times New Roman", serif;
+      --muenba-display: "Avenir Next Condensed", "Arial Narrow", "Trebuchet MS", sans-serif;
       --sans: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     }
 
@@ -124,18 +125,17 @@
     @media (prefers-reduced-motion: reduce) { .profile-network a[aria-current="page"] { animation: none; } }
 
     .hero {
-      position: relative; overflow: hidden; padding: clamp(28px, 6vw, 58px) clamp(22px, 6vw, 72px);
-      border: 1px solid var(--line); border-radius: 24px;
-      background: linear-gradient(145deg, rgba(15,42,31,.9), rgba(6,15,11,.78));
-      box-shadow: 0 25px 80px rgba(0,0,0,.4), inset 0 1px rgba(255,255,255,.05);
+      position: relative; overflow: hidden; padding: clamp(30px, 6vw, 62px) clamp(22px, 6vw, 72px);
+      border: 1px solid rgba(118,151,143,.34); border-left: 4px solid rgba(143,220,178,.42);
+      border-radius: 6px 28px 6px 28px;
+      background:
+        linear-gradient(115deg, rgba(3,9,9,.99), rgba(7,16,17,.96) 58%, rgba(4,10,11,.99)),
+        repeating-linear-gradient(0deg, transparent 0 23px, rgba(143,220,178,.025) 24px);
+      box-shadow: 0 25px 80px rgba(0,0,0,.58), inset 0 1px rgba(255,255,255,.035), inset 18px 0 32px rgba(0,0,0,.2);
     }
-    .hero::after {
-      content: "✦"; position: absolute; right: 7%; top: 16%; color: var(--moss);
-      opacity: .55; font-size: 2.2rem; text-shadow: 0 0 30px var(--moss);
-    }
-    .eyebrow { margin: 0 0 10px; color: var(--gold); font: 700 .68rem/1.4 var(--sans); letter-spacing: .2em; text-transform: uppercase; }
-    h1 { margin: 0; font-size: clamp(2.5rem, 9vw, 5.8rem); font-weight: 400; letter-spacing: -.045em; line-height: .92; text-shadow: 0 0 28px rgba(143,220,178,.26); }
-    .hero-jp { margin: 14px 0 0; color: #dff6ea; font-size: clamp(1rem, 2.8vw, 1.35rem); letter-spacing: .18em; }
+    .hero .eyebrow { margin: 0 0 12px; color: #b6c98e; font: 700 .64rem/1.4 var(--muenba-display); letter-spacing: .24em; text-transform: uppercase; }
+    .hero h1 { margin: 0; font-family: var(--muenba-display); font-size: clamp(2.35rem, 9vw, 5.5rem); font-weight: 700; letter-spacing: .12em; line-height: .92; text-transform: uppercase; text-shadow: 0 0 26px rgba(91,167,135,.2); }
+    .hero-jp { margin: 16px 0 0; color: #c6ddd0; font-family: var(--muenba-display); font-size: clamp(.92rem, 2.8vw, 1.2rem); letter-spacing: .2em; }
     .hero-copy { max-width: 590px; margin: 22px 0 0; color: var(--muted); font-size: clamp(.95rem, 2vw, 1.08rem); line-height: 1.65; }
     .hero-copy small { display: block; margin-top: 6px; color: var(--quiet); font-size: .82em; }
 
@@ -157,9 +157,12 @@
     .ghost-avatar { width: 62px; height: 62px; object-fit: contain; margin: 2px auto 8px; display: block; filter: grayscale(.85) brightness(.75); opacity: .5; }
     .is-found .ghost-avatar { filter: none; opacity: 1; }
     .ghost-name { margin: 0; color: #f2fff7; font-size: .95rem; font-weight: 400; line-height: 1.2; }
+    .ghost-name-kana { margin: 4px 0 0; color: var(--quiet); font: .72rem/1.25 var(--muenba-display); letter-spacing: .1em; }
     .ghost-personality { min-height: 34px; margin: 8px 0 0; color: var(--muted); font-size: .72rem; line-height: 1.4; }
     .ghost-state { margin: 12px 0 0; color: var(--quiet); font: 700 .61rem/1.4 var(--sans); letter-spacing: .08em; text-transform: uppercase; }
+    .ghost-state-jp { margin: 3px 0 0; color: var(--quiet); font: .72rem/1.35 var(--font); }
     .is-found .ghost-state { color: var(--moss); }
+    .is-found .ghost-state-jp { color: rgba(143,220,178,.72); }
 
     .lower-grid { display: grid; grid-template-columns: 1.25fr .75fr; gap: 16px; }
     .panel { padding: 19px; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); }
@@ -341,8 +344,10 @@
           return `<article class="ghost-card${isFound ? ' is-found' : ''}">
             <img class="ghost-avatar" src="${esc(ghost.img)}" alt="">
             <h3 class="ghost-name">${esc(ghost.name)}</h3>
+            <p class="ghost-name-kana">${esc(ghost.kana || '')}</p>
             <p class="ghost-personality">${esc(ghost.personality || '')}</p>
-            <p class="ghost-state">${isFound ? 'Captured · つかまえた' : 'Still hiding · まだかくれている'}</p>
+            <p class="ghost-state">${isFound ? 'Captured' : 'Still hiding'}</p>
+            <p class="ghost-state-jp">${isFound ? '<ruby>捕<rt>つか</rt></ruby>まえた' : 'まだかくれている'}</p>
           </article>`;
         }).join('');
 

@@ -258,6 +258,8 @@
       if (!ghost || !ghost.id || ghostIds.has(ghost.id)) errors.push('ghost roster contains a missing or duplicate id');
       if (ghost) {
         ghostIds.add(ghost.id);
+        if (typeof ghost.kana !== 'string' || !ghost.kana.trim()) errors.push(`${ghost.id} has no katakana name`);
+        else if (!/^[\u30a0-\u30ffー・\s]+$/.test(ghost.kana)) errors.push(`${ghost.id} katakana name contains non-katakana text`);
         if (typeof ghost.personality !== 'string' || !ghost.personality.trim()) errors.push(`${ghost.id} has no personality note`);
         else if (/[\u3040-\u30ff\u3400-\u9fff]/.test(ghost.personality)) errors.push(`${ghost.id} personality note contains Japanese story text`);
       }
