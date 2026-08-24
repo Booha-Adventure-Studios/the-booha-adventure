@@ -65,6 +65,10 @@ assert(source.includes('ghost.id === (activeCaseGhost && activeCaseGhost.id) || 
 assert(source.includes('previousRecord.completed === true && MUENBA_CASE_MODES.includes(previousRecord.difficulty)'), 'legacy mode completion must survive a new mode capture');
 assert(source.includes('Object.keys(record.completedModes).forEach'), 'migration must clean invalid per-mode values');
 assert(profileSource.includes('const recordForCase = caseData =>'), 'profile should normalize legacy case progress before rendering');
+assert(profileSource.includes('Starter Memory'), 'Muenba should use the younger-reader Starter Memory label');
+assert(profileSource.includes('Case Memory'), 'Muenba should use the middle Case Memory label');
+assert(source.includes("start: 'Starter Memory'"), 'case popup should use the Starter Memory label');
+assert(source.includes("fresh: 'Case Memory'"), 'case popup should use the Case Memory label');
 
 const legacy = migrateRecord({ completed: true, difficulty: 'fresh' });
 assert.deepStrictEqual(legacy.completedModes, { fresh: true }, 'legacy completed records should migrate to their recorded mode');
