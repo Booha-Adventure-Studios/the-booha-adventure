@@ -206,7 +206,9 @@
   // or save writes.
   let captureSession = null;
   let motes = [];
-  let moteSprite = null;
+  const moteSpriteCache = new Map();
+  const spiritGlowCache = new Map();
+  let spiritMaskCanvas = null;
   const imageCache = new Map();
   const roomGlowCache = new Map();
   const roomGlowRgbCache = new Map();
@@ -218,9 +220,10 @@
     { x: 1060, y: 690, r: 350 },
     { x: 1260, y: 390, r: 210 }
   ];
-  // Bright floating motes read as decorative particles, so the atmosphere
-  // pass removes them in favor of slower, layered ground fog.
-  const MOTE_COUNT = 0;
+  // A restrained field of slow hitodama particles adds life without turning
+  // the cemetery into a glitter effect; layered ground fog remains the main
+  // atmospheric motion.
+  const MOTE_COUNT = 18;
 
   // 9B: fog is still drawn from the same cached textures, but each room gets
   // a different composition so the cemetery does not feel like one repeated
@@ -2587,6 +2590,20 @@
     vctx.fillStyle = gradient;
     vctx.fillRect(0, 0, WORLD_W, WORLD_H);
 
+    // Shared destination-out mask used by the moving spirit light. It is
+    // cached because only its position changes from frame to frame.
+    spiritMaskCanvas = document.createElement('canvas');
+    spiritMaskCanvas.width = 320;
+    spiritMaskCanvas.height = 320;
+    const maskCtx = spiritMaskCanvas.getContext('2d');
+    const maskGradient = maskCtx.createRadialGradient(160, 160, 0, 160, 160, 160);
+    maskGradient.addColorStop(0, 'rgba(0,0,0,.78)');
+    maskGradient.addColorStop(.42, 'rgba(0,0,0,.52)');
+    maskGradient.addColorStop(.78, 'rgba(0,0,0,.14)');
+    maskGradient.addColorStop(1, 'rgba(0,0,0,0)');
+    maskCtx.fillStyle = maskGradient;
+    maskCtx.fillRect(0, 0, spiritMaskCanvas.width, spiritMaskCanvas.height);
+
     fogTexture = document.createElement('canvas');
     fogTexture.width = 640;
     fogTexture.height = 180;
@@ -2727,21 +2744,40 @@
     return rgb;
   }
 
-  function getMoteSprite() {
-    if (moteSprite) return moteSprite;
+  function getMoteSprite(roomId) {
+    if (moteSpriteCache.has(roomId)) return moteSpriteCache.get(roomId);
+    const rgb = getRoomGlowRgb(roomId);
     const c = document.createElement('canvas');
     c.width = 28;
     c.height = 28;
     const g = c.getContext('2d');
     const grad = g.createRadialGradient(14, 14, 0, 14, 14, 14);
-    grad.addColorStop(0, 'rgba(224,238,232,.85)');
-    grad.addColorStop(.5, 'rgba(196,220,214,.30)');
-    grad.addColorStop(1, 'rgba(196,220,214,0)');
+    grad.addColorStop(0, `rgba(${rgb.r},${rgb.g},${rgb.b},.88)`);
+    grad.addColorStop(.5, `rgba(${rgb.r},${rgb.g},${rgb.b},.34)`);
+    grad.addColorStop(1, `rgba(${rgb.r},${rgb.g},${rgb.b},0)`);
     g.fillStyle = grad;
     g.beginPath();
     g.arc(14, 14, 14, 0, Math.PI * 2);
     g.fill();
-    moteSprite = c;
+    moteSpriteCache.set(roomId, c);
+    return c;
+  }
+
+  function getSpiritGlow(roomId) {
+    if (spiritGlowCache.has(roomId)) return spiritGlowCache.get(roomId);
+    const rgb = getRoomGlowRgb(roomId);
+    const c = document.createElement('canvas');
+    c.width = 320;
+    c.height = 320;
+    const g = c.getContext('2d');
+    const glow = g.createRadialGradient(160, 160, 8, 160, 160, 160);
+    glow.addColorStop(0, `rgba(${rgb.r},${rgb.g},${rgb.b},.32)`);
+    glow.addColorStop(.38, `rgba(${rgb.r},${rgb.g},${rgb.b},.20)`);
+    glow.addColorStop(.72, `rgba(${rgb.r},${rgb.g},${rgb.b},.06)`);
+    glow.addColorStop(1, `rgba(${rgb.r},${rgb.g},${rgb.b},0)`);
+    g.fillStyle = glow;
+    g.fillRect(0, 0, c.width, c.height);
+    spiritGlowCache.set(roomId, c);
     return c;
   }
 
@@ -2772,7 +2808,7 @@
 
   function drawMotes(now) {
     if (!motes.length) return;
-    const sprite = getMoteSprite();
+    const sprite = getMoteSprite(state.roomId);
     motes.forEach(m => {
       const t = REDUCED_MOTION ? 0 : (now - m.startedAt) / 1000;
       const y = m.baseY - ((t * m.speed) % m.range);
@@ -3599,6 +3635,7 @@
       atmosphereCtx.drawImage(vignetteCanvas, 0, 0);
       atmosphereCtx.restore();
     }
+    drawSpiritLight(now);
   }
 
   function drawRoomTint(profile) {
@@ -3610,6 +3647,37 @@
     const alpha = Math.max(.30, Math.min(.45, profile.tintAlpha || .34));
     roomTintCtx.fillStyle = `rgba(${rgb.r},${rgb.g},${rgb.b},${alpha})`;
     roomTintCtx.fillRect(0, 0, WORLD_W, WORLD_H);
+  }
+
+  function drawSpiritLight(now) {
+    if (!activeGhost || !spiritMaskCanvas) return;
+    const bob = Math.sin(now / 1000 * 3.4 + 1) * 6;
+    const x = activeGhost.x;
+    const y = activeGhost.y + bob;
+    const pulse = REDUCED_MOTION ? .82 : .72 + .28 * Math.sin(now / 900 + x * .01);
+    const glow = getSpiritGlow(state.roomId);
+
+    // First add a low room-colored halo on top of the vignette, then clear its
+    // center. The actor canvas is drawn afterward, so the ghost appears to
+    // carry the light instead of being washed out by it.
+    atmosphereCtx.save();
+    atmosphereCtx.globalCompositeOperation = 'screen';
+    atmosphereCtx.globalAlpha = .58 + pulse * .16;
+    atmosphereCtx.drawImage(glow, x - 160, y - 160, 320, 320);
+    atmosphereCtx.restore();
+
+    if (roomTintCtx) {
+      roomTintCtx.save();
+      roomTintCtx.globalCompositeOperation = 'destination-out';
+      roomTintCtx.globalAlpha = .48 + pulse * .12;
+      roomTintCtx.drawImage(spiritMaskCanvas, x - 160, y - 160, 320, 320);
+      roomTintCtx.restore();
+    }
+    atmosphereCtx.save();
+    atmosphereCtx.globalCompositeOperation = 'destination-out';
+    atmosphereCtx.globalAlpha = .70 + pulse * .12;
+    atmosphereCtx.drawImage(spiritMaskCanvas, x - 160, y - 160, 320, 320);
+    atmosphereCtx.restore();
   }
 
   function renderDevArrowList() {
