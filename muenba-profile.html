@@ -161,6 +161,8 @@
     .ghost-personality { min-height: 34px; margin: 8px 0 0; color: var(--muted); font-size: .72rem; line-height: 1.4; }
     .ghost-state { margin: 12px 0 0; color: var(--quiet); font: 700 .61rem/1.4 var(--sans); letter-spacing: .08em; text-transform: uppercase; }
     .ghost-state-jp { margin: 3px 0 0; color: var(--quiet); font: .72rem/1.35 var(--font); }
+    .ghost-memory-current { margin: 9px 0 0; color: var(--gold); font: 700 .64rem/1.35 var(--sans); letter-spacing: .04em; }
+    .ghost-memory-progress { margin: 4px 0 0; color: var(--quiet); font: .61rem/1.4 var(--sans); letter-spacing: .02em; }
     .is-found .ghost-state { color: var(--moss); }
     .is-found .ghost-state-jp { color: rgba(143,220,178,.72); }
 
@@ -242,9 +244,9 @@
       <p class="hero-jp">むえんば — <ruby>幽霊<rt>ゆうれい</rt></ruby><ruby>探<rt>さが</rt></ruby>しの<ruby>記録<rt>きろく</rt></ruby></p>
       <p class="hero-copy">
         Fifteen fog-filled rooms, and something in each one that doesn't
-        always want to be found. This is the record of who's been caught
-        so far — and who's still out there.
-        <small>15の霧に<ruby>包<rt>つつ</rt></ruby>まれた<ruby>部屋<rt>へや</rt></ruby>には、<ruby>見<rt>み</rt></ruby>つかりたがらないものがいます。ここは、これまでに<ruby>捕<rt>つか</rt></ruby>まえたもの — そして、まだ<ruby>外<rt>そと</rt></ruby>にいるものの<ruby>記録<rt>きろく</rt></ruby>です。</small>
+        always want to be found. This ledger tracks collected ghost energy
+        separately from the memory styles used to understand each case.
+        <small>15の霧に<ruby>包<rt>つつ</rt></ruby>まれた<ruby>部屋<rt>へや</rt></ruby>には、<ruby>見<rt>み</rt></ruby>つかりたがらないものがいます。ここでは、<ruby>集<rt>あつ</rt></ruby>めた<ruby>幽霊<rt>ゆうれい</rt></ruby>エネルギーと、<ruby>事件<rt>じけん</rt></ruby>の<ruby>記憶<rt>きおく</rt></ruby>を<ruby>別<rt>べつ</rt></ruby>に<ruby>記録<rt>きろく</rt></ruby>します。</small>
       </p>
     </section>
 
@@ -405,13 +407,20 @@
 
         const ghostCards = ghosts.map(ghost => {
           const isFound = !!found[ghost.id];
+          const ghostCase = caseOrder.find(caseData => caseData.ghostId === ghost.id);
+          const ghostRecord = ghostCase ? (caseRecords[ghostCase.id] || {}) : null;
+          const currentModeComplete = ghostCase && modeComplete(ghostRecord, currentMemory);
+          const modeProgress = ghostCase
+            ? memoryModes.map(modeName => `${modeName}: ${modeComplete(ghostRecord, modeName) ? 'complete' : 'open'}`).join(' · ')
+            : 'No case memory assigned yet';
           return `<article class="ghost-card${isFound ? ' is-found' : ''}">
             <img class="ghost-avatar" src="${esc(ghost.img)}" alt="">
             <h3 class="ghost-name">${esc(ghost.name)}</h3>
             <p class="ghost-name-kana">${esc(ghost.kana || '')}</p>
             <p class="ghost-personality">${esc(ghost.personality || '')}</p>
-            <p class="ghost-state">${isFound ? 'Captured' : 'Still hiding'}</p>
-            <p class="ghost-state-jp">${isFound ? '<ruby>捕<rt>つか</rt></ruby>まえた' : 'まだかくれている'}</p>
+            <p class="ghost-state">${isFound ? 'Energy collected' : 'Still hiding'}</p>
+            <p class="ghost-state-jp">${isFound ? '<ruby>集<rt>あつ</rt></ruby>めたエネルギー' : 'まだかくれている'}</p>
+            ${ghostCase ? `<p class="ghost-memory-current">${esc(currentMemory)} Memory · ${currentModeComplete ? 'complete' : 'open'}</p><p class="ghost-memory-progress">${esc(modeProgress)}</p>` : '<p class="ghost-memory-progress">No case memory assigned yet</p>'}
           </article>`;
         }).join('');
 
@@ -431,7 +440,7 @@
           ${difficultyMarkup()}
 
           <section class="stats" aria-label="Muenba totals">
-            <div class="stat"><div class="stat-value">${foundCount} / ${ghosts.length}</div><div class="stat-label">Ghosts found</div><span class="stat-jp">つかまえた<ruby>幽霊<rt>ゆうれい</rt></ruby></span></div>
+            <div class="stat"><div class="stat-value">${foundCount} / ${ghosts.length}</div><div class="stat-label">Energy collected</div><span class="stat-jp"><ruby>集<rt>あつ</rt></ruby>めたエネルギー</span></div>
             <div class="stat"><div class="stat-value">${orbs}</div><div class="stat-label">Orbs collected</div><span class="stat-jp"><ruby>集<rt>あつ</rt></ruby>めたエネルギー</span></div>
             <div class="stat"><div class="stat-value">${completedCases.length} / ${caseOrder.length}</div><div class="stat-label">Case records</div><span class="stat-jp"><ruby>事件<rt>じけん</rt></ruby>の<ruby>記録<rt>きろく</rt></ruby></span></div>
             <div class="stat"><div class="stat-value">${rooms}</div><div class="stat-label">Rooms visited</div><span class="stat-jp"><ruby>訪<rt>おとず</rt></ruby>れた<ruby>部屋<rt>へや</rt></ruby></span></div>
