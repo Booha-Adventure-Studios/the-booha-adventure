@@ -1282,6 +1282,60 @@
     resumeWorldMusicAfterCapture();
   }
 
+  // Pass 14: winning a danger encounter calms whichever hostile ghost caught
+  // Booha and sends it out of the room, reusing the same room-map mutation
+  // teleportGhostToAnotherRoom() already uses for a ghost's own spontaneous
+  // travel — pickGhostTeleportRoom() already excludes room_01 and the
+  // player's current room, so this can never relocate a ghost back into the
+  // fight or into Nuppi's safe room. Deliberately does not touch
+  // ghostsFound/weeklyGhostsFound/orbs — this was never a real capture.
+  function dismissDangerGhost() {
+    if (!captureSession || !captureSession.ghost) return;
+    const roomId = state.roomId;
+    const map = getGhostRoomMap();
+    if (map[roomId] && map[roomId].id === captureSession.ghost.id) {
+      delete map[roomId];
+      const destinationRoomId = pickGhostTeleportRoom(roomId);
+      if (destinationRoomId) map[destinationRoomId] = captureSession.ghost;
+    }
+    activeGhost = null;
+  }
+
+  // Closes the capture overlay after a danger win, once the player has read
+  // the result screen and is ready to keep exploring. No hiding, no ghost
+  // respawn — the threat already left via dismissDangerGhost() above.
+  function closeDangerEncounter() {
+    if (!captureSession || !captureSession.danger) return;
+    stopRhythmCapture();
+    stopDangerScream();
+    stopDangerRhythmMusic();
+    captureOpen = false;
+    state.captureResolving = false;
+    setDangerOverlay(false);
+    if (captureOverlay) captureOverlay.classList.remove('open');
+    captureSession = null;
+    resumeWorldMusicAfterCapture();
+  }
+
+  // Pass 14: a full retreat option for a danger encounter that isn't going
+  // well — sends Booha straight back to room_01 (Nuppi's safe room) the same
+  // way the original Karasuki entry does, drift-walk-in included, "as if he
+  // just entered." Any orbs already pending stay pending; the hostile ghost
+  // that caught him is left exactly where it is, not defeated.
+  function giveUpDangerEncounter() {
+    if (!captureSession || !captureSession.danger) return;
+    stopRhythmCapture();
+    stopDangerScream();
+    stopDangerRhythmMusic();
+    captureOpen = false;
+    state.captureResolving = false;
+    setDangerOverlay(false);
+    if (captureOverlay) captureOverlay.classList.remove('open');
+    captureSession = null;
+    resumeWorldMusicAfterCapture();
+    setRoom(MUENBA_NUPPI.roomId, 'fromKarasuki');
+  }
+
   function orderedMuenbaCases() {
     const cases = DATA.cases && typeof DATA.cases === 'object' ? DATA.cases : {};
     const ids = Array.isArray(DATA.caseOrder) ? DATA.caseOrder : Object.keys(cases);
@@ -2370,6 +2424,22 @@
       return;
     }
     recordRhythmResult(accuracy);
+
+    // Pass 14: a danger encounter is against whichever hostile ghost caught
+    // Booha, never the actual hunt target — beginDangerEncounter() never
+    // sets caseData, so this was never a real capture. Winning it should
+    // just send that ghost away; previously a danger win fell straight
+    // through to the same commitSuccessfulCapture()/renderCaptureReward()
+    // path as a genuine target capture below, wrongly marking whichever
+    // wrong ghost caught you as found/weekly-found and handing out orbs
+    // for a ghost that was never legitimately hunted.
+    if (captureSession.danger) {
+      captureSession.phase = 'result';
+      if (success) dismissDangerGhost();
+      renderRhythmResult(accuracy, success);
+      return;
+    }
+
     if (!success) {
       captureSession.phase = 'result';
       renderRhythmResult(accuracy, false);
@@ -2530,18 +2600,21 @@
 
     const h2 = document.createElement('h2');
     h2.textContent = danger
-      ? (success ? 'You broke the anger' : 'The ghost broke through')
+      ? (success ? 'The ghost flees' : 'The ghost broke through')
       : (success ? 'Rhythm complete' : 'Try again');
     box.appendChild(h2);
     const jp = document.createElement('p');
     jp.className = 'jp';
     jp.textContent = danger
-      ? (success ? '怒りをしずめた' : 'まだ危険')
+      ? (success ? '幽霊は逃げた' : 'まだ危険')
       : (success ? 'リズム成功' : 'もう一度');
     box.appendChild(jp);
 
+    // Pass 14: a danger win calms and sends away whichever hostile ghost
+    // caught Booha — it was never his hunt target, so this never leads to
+    // a capture reward (see finishRhythmCapture()/dismissDangerGhost()).
     p.textContent = message || (danger
-      ? `Accuracy: ${accuracy}%. ${success ? 'The angry ghost has been calmed. Continue to the capture reward.' : 'The angry ghost knocked Booha back. Hide, or face the danger rhythm again.'}`
+      ? `Accuracy: ${accuracy}%. ${success ? 'The angry ghost lost its nerve and slipped away. It will not bother you again for now.' : 'The angry ghost knocked Booha back. Hide, try again, or give up and retreat to Nuppi.'}`
       : `Accuracy: ${accuracy}%. ${success ? 'The capture is ready for the reward step.' : 'The ghost is still waiting for you.'}`);
     box.appendChild(p);
 
@@ -2555,12 +2628,12 @@
     renderCaseDirection(
       box,
       danger
-        ? (success ? 'The angry ghost has calmed down. Continue to the capture reward.' : 'Hide to stop the scream, or try the danger rhythm again.')
+        ? (success ? 'The ghost is gone for now. Continue exploring.' : 'Hide, try the danger rhythm again, or give up and retreat to Nuppi.')
         : (success ? 'The capture is ready for the reward step.' : 'The ghost is still waiting. Try the rhythm again.'),
       danger
         ? (success
-          ? '<ruby>怒<rt>おこ</rt></ruby>った<ruby>幽霊<rt>ゆうれい</rt></ruby>は<ruby>落<rt>お</rt></ruby>ち<ruby>着<rt>つ</rt></ruby>きました。<ruby>報酬<rt>ほうしゅう</rt></ruby>を<ruby>受<rt>う</rt></ruby>け<ruby>取<rt>と</rt></ruby>りましょう。'
-          : '<ruby>隠<rt>かく</rt></ruby>れると<ruby>叫<rt>さけ</rt></ruby>び<ruby>声<rt>ごえ</rt></ruby>が<ruby>止<rt>と</rt></ruby>まります。もう<ruby>一度<rt>いちど</rt></ruby><ruby>挑<rt>いど</rt></ruby>むこともできます。')
+          ? '<ruby>幽霊<rt>ゆうれい</rt></ruby>はいなくなりました。<ruby>探索<rt>たんさく</rt></ruby>を<ruby>続<rt>つづ</rt></ruby>けましょう。'
+          : '<ruby>隠<rt>かく</rt></ruby>れる、もう<ruby>一度<rt>いちど</rt></ruby><ruby>挑<rt>いど</rt></ruby>む、またはあきらめてヌーピーのところへ<ruby>戻<rt>もど</rt></ruby>ることができます。')
         : (success
           ? '<ruby>捕<rt>つか</rt></ruby>まえる<ruby>準備<rt>じゅんび</rt></ruby>ができました。<ruby>次<rt>つぎ</rt></ruby>に<ruby>報酬<rt>ほうしゅう</rt></ruby>を<ruby>受<rt>う</rt></ruby>け<ruby>取<rt>と</rt></ruby>りましょう。'
           : '<ruby>幽霊<rt>ゆうれい</rt></ruby>はまだ<ruby>待<rt>ま</rt></ruby>っています。リズムをもう<ruby>一度<rt>いちど</rt></ruby><ruby>試<rt>ため</rt></ruby>しましょう。')
@@ -2569,8 +2642,13 @@
     const actions = document.createElement('div');
     actions.className = 'muenba-lobby-actions';
     if (danger) {
-      if (!success) actions.appendChild(captureButton('Try danger rhythm again', 'もう<ruby>一度<rt>いちど</rt></ruby><ruby>危険<rt>きけん</rt></ruby>なリズムに<ruby>挑<rt>いど</rt></ruby>む', 'muenba-danger-retry', retryDangerRhythm));
-      actions.appendChild(captureButton('Hide and escape', '<ruby>隠<rt>かく</rt></ruby>れて<ruby>逃<rt>に</rt></ruby>げる', 'muenba-danger-hide', escapeDangerToHide));
+      if (success) {
+        actions.appendChild(captureButton('Continue exploring', '<ruby>探索<rt>たんさく</rt></ruby>を<ruby>続<rt>つづ</rt></ruby>ける', 'muenba-danger-continue', closeDangerEncounter));
+      } else {
+        actions.appendChild(captureButton('Try danger rhythm again', 'もう<ruby>一度<rt>いちど</rt></ruby><ruby>危険<rt>きけん</rt></ruby>なリズムに<ruby>挑<rt>いど</rt></ruby>む', 'muenba-danger-retry', retryDangerRhythm));
+        actions.appendChild(captureButton('Hide and escape', '<ruby>隠<rt>かく</rt></ruby>れて<ruby>逃<rt>に</rt></ruby>げる', 'muenba-danger-hide', escapeDangerToHide));
+        actions.appendChild(captureButton('Give up and retreat', 'あきらめて<ruby>戻<rt>もど</rt></ruby>る', 'muenba-danger-giveup', giveUpDangerEncounter));
+      }
     } else {
       if (!success) actions.appendChild(captureButton('Try rhythm again', 'もう<ruby>一度<rt>いちど</rt></ruby>リズムに<ruby>挑<rt>いど</rt></ruby>む', 'muenba-capture-retry', retryRhythmCapture));
       actions.appendChild(captureButton('Return to hunt', '<ruby>探索<rt>たんさく</rt></ruby>に<ruby>戻<rt>もど</rt></ruby>る', 'muenba-capture-cancel', cancelCaptureSession));
