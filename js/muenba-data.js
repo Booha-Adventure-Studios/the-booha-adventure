@@ -171,7 +171,7 @@
   // wired here with "Tinkley" kept only as the display name — flag if either
   // should change to match the other.
   const GHOSTS = [
-    { id: 'fuzzle',  name: 'Fuzzle',  kana: 'フズル',       img: 'assets/img/muenba/ghosts/fuzzle.png',  personality: 'Practices a different scare every time.', personalityJp: 'いつも<ruby>違<rt>ちが</rt></ruby>う<ruby>驚<rt>おどろ</rt></ruby>かし<ruby>方<rt>かた</rt></ruby>を<ruby>練習<rt>れんしゅう</rt></ruby>する。' },
+    { id: 'fuzzle',  name: 'Fuzzle',  kana: 'ファズル',       img: 'assets/img/muenba/ghosts/fuzzle.png',  personality: 'Practices a different scare every time.', personalityJp: 'いつも<ruby>違<rt>ちが</rt></ruby>う<ruby>驚<rt>おどろ</rt></ruby>かし<ruby>方<rt>かた</rt></ruby>を<ruby>練習<rt>れんしゅう</rt></ruby>する。' },
     { id: 'glimmer', name: 'Glimmer', kana: 'グリマー',     img: 'assets/img/muenba/ghosts/glimmer.png', personality: 'Polishes every sparkle until it runs away.', personalityJp: 'きらめきがなくなるまで<ruby>磨<rt>みが</rt></ruby>き<ruby>続<rt>つづ</rt></ruby>ける。' },
     { id: 'nibsy',   name: 'Nibsy',   kana: 'ニブシー',     img: 'assets/img/muenba/ghosts/nibsy.png',   personality: 'Collects tiny noises and forgets where they came from.', personalityJp: '<ruby>小<rt>ちい</rt></ruby>さな<ruby>音<rt>おと</rt></ruby>を<ruby>集<rt>あつ</rt></ruby>めて、どこから<ruby>来<rt>き</rt></ruby>たか<ruby>忘<rt>わす</rt></ruby>れてしまう。' },
     { id: 'tinklet', name: 'Tinkley', kana: 'ティンクリー', img: 'assets/img/muenba/ghosts/tinklet.png', personality: 'Rings invisible bells at the worst possible moment.', personalityJp: '<ruby>一番<rt>いちばん</rt></ruby><ruby>悪<rt>わる</rt></ruby>いタイミングで<ruby>見<rt>み</rt></ruby>えないベルを<ruby>鳴<rt>な</rt></ruby>らす。' },
@@ -199,7 +199,7 @@
           { title: 'No choice', text: 'Fuzzle could not choose one.', keywords: ['choose'] }
         ],
         prompt: 'Why did Fuzzle’s energy get mixed up?',
-        promptJP: 'フズルのエネルギーは<ruby>何<rt>なに</rt></ruby>で<ruby>混<rt>ま</rt></ruby>ざりましたか？',
+        promptJP: 'ファズルのエネルギーは<ruby>何<rt>なに</rt></ruby>で<ruby>混<rt>ま</rt></ruby>ざりましたか？',
         choices: [
           'Fuzzle tried too many scares.',
           'The stone ate the energy.',
@@ -215,7 +215,7 @@
           { title: 'No ending', text: 'When Nuppi arrived, Fuzzle started all three scares and finished none.', keywords: ['arrived', 'finished'] }
         ],
         prompt: 'What caused Fuzzle’s energy to tangle?',
-        promptJP: '<ruby>何<rt>なに</rt></ruby>がフズルのエネルギーを<ruby>絡<rt>から</rt></ruby>ませましたか？',
+        promptJP: '<ruby>何<rt>なに</rt></ruby>がファズルのエネルギーを<ruby>絡<rt>から</rt></ruby>ませましたか？',
         choices: [
           'Fuzzle kept switching between three unfinished scares.',
           'The gravestone swallowed the planned scare.',
