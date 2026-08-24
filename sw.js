@@ -5,11 +5,11 @@
 // ============================================================
 
 const CURRENT_CACHES = {
-  // Muenba fog-depth pass: invalidate the previous bundle so the layered
-  // foreground bank reaches players beneath the actors.
-  pages:  'booha-pages-2026-273',
-  assets: 'booha-assets-2026-273',
-  decks:  'booha-decks-2026-273',
+  // Muenba arrow pass: invalidate the previous bundle so room-colored
+  // spectral exit glows reach players.
+  pages:  'booha-pages-2026-274',
+  assets: 'booha-assets-2026-274',
+  decks:  'booha-decks-2026-274',
 };
 
 const PAGE_CACHE  = CURRENT_CACHES.pages;
