@@ -57,18 +57,6 @@
     href   : 'karasuki.html',
   };
   const PAGE_ID = 'utsuroba';
-  const UTSUROBA_MEMORY_MODES = ['start', 'fresh', 'deep'];
-
-  function readingMode(value) {
-    return UTSUROBA_MEMORY_MODES.includes(value) ? value : 'start';
-  }
-
-  function currentReadingMode() {
-    try {
-      return readingMode(window.UTSUROBA_READING_DIFFICULTY
-        ? window.UTSUROBA_READING_DIFFICULTY() : 'start');
-    } catch (_) { return 'start'; }
-  }
 
   function isProfileEntry() {
     try { return new URLSearchParams(window.location.search).get('from') === 'profile'; }
@@ -227,7 +215,6 @@
 
   function migrateUtsurobaSave(data) {
     let dirty = false;
-    const hadExplicitReadingDifficulty = !!(data.utsuroba && UTSUROBA_MEMORY_MODES.includes(data.utsuroba.readingDifficulty));
     if (!data.utsuroba) { data.utsuroba = {}; dirty = true; }
     if (!data.karasuki) { data.karasuki = {}; dirty = true; }
     if (!data.weekly)   { data.weekly   = {}; dirty = true; }
@@ -240,9 +227,19 @@
     if (!data.utsuroba.drifters)     { data.utsuroba.drifters     = {}; dirty = true; }
     if (!data.utsuroba.visitedRooms) { data.utsuroba.visitedRooms = {}; dirty = true; }
     if (!data.utsuroba.flags)        { data.utsuroba.flags        = {}; dirty = true; }
-    if (!UTSUROBA_MEMORY_MODES.includes(data.utsuroba.readingDifficulty)) {
-      data.utsuroba.readingDifficulty = 'start'; dirty = true;
-    }
+    // Profile Pass 1: 'start' (Starter Memory) is the documented "safest
+    // first experience" default in utsuroba-episodes.js's own
+    // getReadingDifficulty() — but this default disagreed with it and set
+    // every fresh save straight to 'deep', so the Starter tier was never
+    // actually reachable by a new player. Only affects saves that don't
+    // have a value yet; an existing save's choice is untouched.
+    if (!data.utsuroba.readingDifficulty) { data.utsuroba.readingDifficulty = 'start'; dirty = true; }
+    // Profile Pass 1: plain running totals, mirroring Muenba's
+    // roomVisitsTotal/caseRecordsSettled — every event counts, replays
+    // included, and these never reset on a weekly rollover.
+    if (!Number.isInteger(data.utsuroba.memoriesRestoredTotal) || data.utsuroba.memoriesRestoredTotal < 0) { data.utsuroba.memoriesRestoredTotal = 0; dirty = true; }
+    if (!Number.isInteger(data.utsuroba.wordsTouchedTotal) || data.utsuroba.wordsTouchedTotal < 0) { data.utsuroba.wordsTouchedTotal = 0; dirty = true; }
+    if (!Number.isInteger(data.utsuroba.roomVisitsTotal) || data.utsuroba.roomVisitsTotal < 0) { data.utsuroba.roomVisitsTotal = 0; dirty = true; }
     if (!data.utsuroba.readingJournal) {
       data.utsuroba.readingJournal = { entries: [] };
       dirty = true;
@@ -268,11 +265,38 @@
       if (!Number.isInteger(entry.attempts)) { entry.attempts = 0; dirty = true; }
       if (!Number.isInteger(entry.misses)) { entry.misses = 0; dirty = true; }
       if (!Number.isFinite(entry.nextReviewAt)) { entry.nextReviewAt = 0; dirty = true; }
+      // Profile Pass 1: the Word Cabinet now filters by reading tier, so
+      // every entry needs to record which tier(s) it was actually met in.
+      // Older entries predate this — best guess from that episode's last
+      // known readingEchoes.difficulty (the old, tier-agnostic field),
+      // falling back to 'deep' (the old hardcoded reading-difficulty
+      // default) rather than guessing wrong and hiding a real word.
+      if (!Array.isArray(entry.tiers) || !entry.tiers.length) {
+        const priorEcho = data.utsuroba.readingEchoes && data.utsuroba.readingEchoes[entry.episodeId];
+        entry.tiers = [priorEcho && priorEcho.difficulty ? priorEcho.difficulty : 'deep'];
+        dirty = true;
+      }
     });
     if (!data.utsuroba.readingEchoes || typeof data.utsuroba.readingEchoes !== 'object') {
       data.utsuroba.readingEchoes = {};
       dirty = true;
     }
+    // Profile Pass 1: readingEchoes used to store only the most recently
+    // completed tier (each replay at a different tier overwrote the last
+    // one), so the profile could never show "restored at every tier you've
+    // actually read." Backfill a per-tier `tiers` map from that single old
+    // field so existing restorations aren't lost, then completeMemory()
+    // below adds to it (never overwrites) going forward.
+    Object.keys(data.utsuroba.readingEchoes).forEach(episodeId => {
+      const record = data.utsuroba.readingEchoes[episodeId];
+      if (!record || typeof record !== 'object') return;
+      if (!record.tiers || typeof record.tiers !== 'object') {
+        record.tiers = record.difficulty
+          ? { [record.difficulty]: { restoredAt: record.restoredAt || Date.now() } }
+          : {};
+        dirty = true;
+      }
+    });
     if (!data.utsuroba.readingOnboarding || typeof data.utsuroba.readingOnboarding !== 'object') {
       data.utsuroba.readingOnboarding = { seen: false, calibration: null };
       dirty = true;
@@ -294,27 +318,6 @@
       }
       if (record && !Array.isArray(record.completed)) {
         record.completed = [];
-        dirty = true;
-      }
-      if (record && (!record.completedModes || typeof record.completedModes !== 'object')) {
-        const legacyMode = readingMode(record.difficulty || (hadExplicitReadingDifficulty ? data.utsuroba.readingDifficulty : 'deep'));
-        record.completedModes = record.completed.length ? { [legacyMode]: record.completed.slice() } : {};
-        dirty = true;
-      }
-      if (record && record.completedModes && typeof record.completedModes === 'object') {
-        UTSUROBA_MEMORY_MODES.forEach(mode => {
-          if (record.completedModes[mode] !== undefined && !Array.isArray(record.completedModes[mode])) {
-            delete record.completedModes[mode];
-            dirty = true;
-          }
-        });
-      }
-      if (record && (!record.weeklyStatusByMode || typeof record.weeklyStatusByMode !== 'object')) {
-        record.weeklyStatusByMode = {};
-        if (record.lastQuestWeek === getWeekSeed() && record.weeklyStatus &&
-            UTSUROBA_MEMORY_MODES.includes(record.difficulty || data.utsuroba.readingDifficulty)) {
-          record.weeklyStatusByMode[readingMode(record.difficulty || data.utsuroba.readingDifficulty)] = record.weeklyStatus;
-        }
         dirty = true;
       }
       if (record && record.weeklyStatus && !['active', 'complete', 'resting'].includes(record.weeklyStatus)) {
@@ -493,49 +496,30 @@
     return record && typeof record === 'object' ? record : { completed: [] };
   }
 
-  function completedMemoryIdsForMode(record, mode) {
-    if (record && record.completedModes && Array.isArray(record.completedModes[mode])) {
-      return record.completedModes[mode];
-    }
-    return [];
-  }
-
-  function drifterHasUnfinishedMemory(id, utsu = null, mode = currentReadingMode()) {
+  function drifterHasUnfinishedMemory(id, utsu = null) {
     const d = DATA.drifters.find(x => x.id === id);
     if (!d) return false;
     const record = drifterRecord(id, utsu);
-    return completedMemoryIdsForMode(record, readingMode(mode)).length < d.memoryCount;
+    return (Array.isArray(record.completed) ? record.completed.length : 0) < d.memoryCount;
   }
 
-  function drifterWeekStatus(id, mode = currentReadingMode()) {
+  function drifterWeekStatus(id) {
     const record = drifterRecord(id);
-    const selectedMode = readingMode(mode);
-    if (record.lastQuestWeekByMode && record.lastQuestWeekByMode[selectedMode] === getWeekSeed()) {
-      return record.weeklyStatusByMode?.[selectedMode] || null;
-    }
-    return selectedMode === readingMode(record.difficulty) && record.lastQuestWeek === getWeekSeed()
-      ? (record.weeklyStatus || null) : null;
+    return record.lastQuestWeek === getWeekSeed() ? (record.weeklyStatus || null) : null;
   }
 
-  function drifterCompletedThisWeek(id, mode = currentReadingMode()) {
-    return drifterWeekStatus(id, mode) === 'complete';
+  function drifterCompletedThisWeek(id) {
+    return drifterWeekStatus(id) === 'complete';
   }
 
-  function drifterRestingThisWeek(id, mode = currentReadingMode()) {
-    return drifterWeekStatus(id, mode) === 'resting';
+  function drifterRestingThisWeek(id) {
+    return drifterWeekStatus(id) === 'resting';
   }
 
-  function setDrifterWeekStatus(id, status, mode = currentReadingMode()) {
+  function setDrifterWeekStatus(id, status) {
     if (!['active', 'complete', 'resting'].includes(status)) return false;
-    const selectedMode = readingMode(mode);
     const data = loadSave();
     if (!data.utsuroba.drifters[id]) data.utsuroba.drifters[id] = { completed: [] };
-    const record = data.utsuroba.drifters[id];
-    if (!record.weeklyStatusByMode || typeof record.weeklyStatusByMode !== 'object') record.weeklyStatusByMode = {};
-    if (!record.lastQuestWeekByMode || typeof record.lastQuestWeekByMode !== 'object') record.lastQuestWeekByMode = {};
-    record.lastQuestWeekByMode[selectedMode] = getWeekSeed();
-    record.weeklyStatusByMode[selectedMode] = status;
-    record.difficulty = selectedMode;
     data.utsuroba.drifters[id].lastQuestWeek = getWeekSeed();
     data.utsuroba.drifters[id].weeklyStatus = status;
     const ok = writeSave(data);
@@ -546,22 +530,19 @@
 
   function drifterHasMemories(id) {
     if (drifterIsWrong(id)) return false;
-    const mode = currentReadingMode();
-    if (drifterCompletedThisWeek(id, mode) || drifterRestingThisWeek(id, mode)) return false;
+    if (drifterCompletedThisWeek(id) || drifterRestingThisWeek(id)) return false;
     const utsu = getCachedDrifterState();
     const d    = DATA.drifters.find(x => x.id === id);
     if (!d) return false;
-    /* A completed memory is replayable once per new curriculum week. Each
-       reading mode has its own completion lane, so Start does not consume
-       Fresh or Deep. */
-    return drifterHasUnfinishedMemory(id, utsu, mode) || !!completedMemoryIdsForMode(drifterRecord(id, utsu), mode).length;
+    /* A completed memory is replayable once per new curriculum week. */
+    return drifterHasUnfinishedMemory(id, utsu) || !!drifterRecord(id, utsu).completed.length;
   }
-  function pickRandomMemory(id, mode = currentReadingMode()) {
+  function pickRandomMemory(id) {
     const utsu = readUtsuroba();
     const rec  = drifterRecord(id, utsu);
     const d    = DATA.drifters.find(x => x.id === id); if (!d) return null;
     const pool = [];
-    const completed = completedMemoryIdsForMode(rec, readingMode(mode));
+    const completed = Array.isArray(rec.completed) ? rec.completed : [];
     for (let i = 1; i <= d.memoryCount; i++) if (!completed.includes(i)) pool.push(i);
     /* Once every authored memory is complete, the current week's quest is a
        replay of one of those memories rather than a permanently locked door. */
@@ -569,8 +550,7 @@
     return pool.length ? pool[Math.floor(Math.random() * pool.length)] : null;
   }
   function activateQuest(id) {
-    const mode = currentReadingMode();
-    const memIdx = pickRandomMemory(id, mode); if (memIdx === null) return null;
+    const memIdx = pickRandomMemory(id); if (memIdx === null) return null;
     const drifter = DATA.drifters.find(d => d.id === id);
     const data   = loadSave();
     if (!data.weekly) data.weekly = {};
@@ -579,8 +559,7 @@
       state            : 'accepted',
       weekKey          : getWeekSeed(),
       memIdx,
-      replay           : !drifterHasUnfinishedMemory(id, data.utsuroba, mode),
-      readingDifficulty: mode,
+      replay           : !drifterHasUnfinishedMemory(id, data.utsuroba),
       episodeId        : drifter && drifter.episodeId ? drifter.episodeId : null,
       readingState     : 'locked',
       trailIndex       : 0,
@@ -591,14 +570,8 @@
       orbIsCorrect     : false,
     };
     if (!data.utsuroba.drifters[id]) data.utsuroba.drifters[id] = { completed: [] };
-    const record = data.utsuroba.drifters[id];
-    if (!record.weeklyStatusByMode || typeof record.weeklyStatusByMode !== 'object') record.weeklyStatusByMode = {};
-    if (!record.lastQuestWeekByMode || typeof record.lastQuestWeekByMode !== 'object') record.lastQuestWeekByMode = {};
-    record.lastQuestWeekByMode[mode] = getWeekSeed();
-    record.weeklyStatusByMode[mode] = 'active';
-    record.lastQuestWeek = getWeekSeed();
-    record.weeklyStatus = 'active';
-    record.difficulty = mode;
+    data.utsuroba.drifters[id].lastQuestWeek = getWeekSeed();
+    data.utsuroba.drifters[id].weeklyStatus = 'active';
     const ok = writeSave(data);
     invalidateQuestCache();
     if (ok) invalidateDrifterStateCache();
@@ -609,25 +582,18 @@
   function completeMemory(id, memIdx) {
     const data = loadSave();
     if (!data.utsuroba.drifters[id]) data.utsuroba.drifters[id] = { completed: [] };
-    const record = data.utsuroba.drifters[id];
-    if (!Array.isArray(record.completed)) record.completed = [];
-    if (!record.completed.includes(memIdx)) record.completed.push(memIdx);
-    const quest = data.weekly?.drifterQuest;
-    const completionDifficulty = readingMode(quest && quest.readingDifficulty);
-    if (!record.completedModes || typeof record.completedModes !== 'object') record.completedModes = {};
-    if (!Array.isArray(record.completedModes[completionDifficulty])) record.completedModes[completionDifficulty] = [];
-    if (!record.completedModes[completionDifficulty].includes(memIdx)) record.completedModes[completionDifficulty].push(memIdx);
-    if (!record.weeklyStatusByMode || typeof record.weeklyStatusByMode !== 'object') record.weeklyStatusByMode = {};
-    if (!record.lastQuestWeekByMode || typeof record.lastQuestWeekByMode !== 'object') record.lastQuestWeekByMode = {};
-    record.lastQuestWeekByMode[completionDifficulty] = getWeekSeed();
-    record.weeklyStatusByMode[completionDifficulty] = 'complete';
-    record.difficulty = completionDifficulty;
+    if (!Array.isArray(data.utsuroba.drifters[id].completed)) data.utsuroba.drifters[id].completed = [];
+    if (!data.utsuroba.drifters[id].completed.includes(memIdx))
+      data.utsuroba.drifters[id].completed.push(memIdx);
     data.utsuroba.drifters[id].lastQuestWeek = getWeekSeed();
     data.utsuroba.drifters[id].weeklyStatus = 'complete';
+    const quest = data.weekly?.drifterQuest;
     if (quest && quest.active === id && quest.memIdx === memIdx && quest.episodeId) {
-      // Case Memory / Deep Memory: record which tier the student actually
+      // Fresh Memory / Deep Memory: record which tier the student actually
       // read, so the journal/profile can stay accurate even if they switch
       // the toggle later.
+      const completionDifficulty = window.UTSUROBA_READING_DIFFICULTY
+        ? window.UTSUROBA_READING_DIFFICULTY() : 'deep';
       const journal = data.utsuroba.readingJournal || { entries: [] };
       const entries = Array.isArray(journal.entries) ? journal.entries : [];
       const existing = entries.find(entry => entry.episodeId === quest.episodeId);
@@ -637,9 +603,6 @@
         existing.drifterId = id;
         existing.memIdx = memIdx;
         existing.difficulty = completionDifficulty;
-        existing.completedModes = existing.completedModes && typeof existing.completedModes === 'object'
-          ? existing.completedModes : {};
-        existing.completedModes[completionDifficulty] = true;
       } else {
         entries.unshift({
           episodeId: quest.episodeId,
@@ -651,7 +614,6 @@
           guidedSessions: 0,
           independentSessions: 0,
           difficulty: completionDifficulty,
-          completedModes: { [completionDifficulty]: true },
         });
       }
       const journalEntry = existing || entries[0];
@@ -664,15 +626,22 @@
       journal.entries = entries.slice(0, 12);
       data.utsuroba.readingJournal = journal;
       const episode = window.UTSUROBA_EPISODES_RESOLVE
-        ? window.UTSUROBA_EPISODES_RESOLVE(quest.episodeId, completionDifficulty)
+        ? window.UTSUROBA_EPISODES_RESOLVE(quest.episodeId)
         : window.UTSUROBA_EPISODES?.[quest.episodeId];
       if (episode && Array.isArray(episode.vocabulary)) {
         const cabinet = data.utsuroba.wordCabinet || { entries: [] };
         const words = Array.isArray(cabinet.entries) ? cabinet.entries : [];
-        episode.vocabulary.slice(0, 8).forEach(item => {
-          if (!item?.word || !item.definition || !item.definitionJP) return;
+        const touchedWords = episode.vocabulary.slice(0, 8).filter(item => item?.word && item.definition && item.definitionJP);
+        touchedWords.forEach(item => {
           const key = `${quest.episodeId}:${item.word}`;
-          if (!words.some(word => word.key === key)) {
+          const existingWord = words.find(word => word.key === key);
+          if (existingWord) {
+            // Profile Pass 1: Word Cabinet now filters by tier — a replay at
+            // a tier this word hasn't been tagged with yet should make it
+            // show up there too, without duplicating the cabinet entry.
+            if (!Array.isArray(existingWord.tiers)) existingWord.tiers = [];
+            if (!existingWord.tiers.includes(completionDifficulty)) existingWord.tiers.push(completionDifficulty);
+          } else {
             words.unshift({
               key,
               episodeId: quest.episodeId,
@@ -680,6 +649,7 @@
               definition: item.definition,
               definitionJP: item.definitionJP,
               discoveredAt: Date.now(),
+              tiers: [completionDifficulty],
               reviewCount: 0,
               attempts: 0,
               misses: 0,
@@ -689,17 +659,34 @@
         });
         cabinet.entries = words.slice(0, 60);
         data.utsuroba.wordCabinet = cabinet;
+        // Profile Pass 1: plain running total — every word touched by a
+        // completion counts, including ones already in the cabinet from an
+        // earlier tier or an earlier replay of this same tier.
+        if (!Number.isInteger(data.utsuroba.wordsTouchedTotal) || data.utsuroba.wordsTouchedTotal < 0) data.utsuroba.wordsTouchedTotal = 0;
+        data.utsuroba.wordsTouchedTotal += touchedWords.length;
       }
-      const previousEcho = data.utsuroba.readingEchoes[quest.episodeId];
-      const modes = previousEcho && previousEcho.modes && typeof previousEcho.modes === 'object'
-        ? { ...previousEcho.modes } : {};
-      modes[completionDifficulty] = true;
-      data.utsuroba.readingEchoes[quest.episodeId] = {
-        drifterId: id,
-        restoredAt: Date.now(),
-        difficulty: completionDifficulty,
-        modes,
-      };
+      // Profile Pass 1: readingEchoes now tracks every tier this memory has
+      // ever been restored at (`tiers`), not just whichever tier was read
+      // most recently — the top-level drifterId/restoredAt/difficulty stay
+      // as the "most recent completion" summary other code already reads,
+      // untouched, so allReadingMemoriesRestored()/the convergence gate and
+      // everything else that treats readingEchoes[id] as a simple "have
+      // they ever restored this" flag keeps working exactly as before.
+      if (!data.utsuroba.readingEchoes[quest.episodeId] || typeof data.utsuroba.readingEchoes[quest.episodeId] !== 'object') {
+        data.utsuroba.readingEchoes[quest.episodeId] = {};
+      }
+      const echoRecord = data.utsuroba.readingEchoes[quest.episodeId];
+      echoRecord.drifterId = id;
+      echoRecord.restoredAt = Date.now();
+      echoRecord.difficulty = completionDifficulty;
+      if (!echoRecord.tiers || typeof echoRecord.tiers !== 'object') echoRecord.tiers = {};
+      if (!echoRecord.tiers[completionDifficulty]) {
+        echoRecord.tiers[completionDifficulty] = { restoredAt: Date.now() };
+      }
+      // Profile Pass 1: plain running total — every completion counts,
+      // including a replay of a tier already restored before.
+      if (!Number.isInteger(data.utsuroba.memoriesRestoredTotal) || data.utsuroba.memoriesRestoredTotal < 0) data.utsuroba.memoriesRestoredTotal = 0;
+      data.utsuroba.memoriesRestoredTotal += 1;
     }
     if (data.weekly) data.weekly.drifterQuest = null;
     const ok = writeSave(data);
@@ -1831,13 +1818,7 @@
       reviewOnly: true,
       skipOnboarding: true,
       adaptiveMode,
-      quest: {
-        episodeId: reviewEntry.episodeId,
-        readingDifficulty: readingMode(reviewEntry.difficulty || 'start'),
-        readingIndex: 0,
-        mechanicIndex: 0,
-        postcard: reviewEntry.postcard || null,
-      },
+      quest: { episodeId: reviewEntry.episodeId, readingIndex: 0, mechanicIndex: 0, postcard: reviewEntry.postcard || null },
       onClose: () => { state.inputLocked = false; },
       onReadingEvent: recordWeeklyReadingEvent,
       onReviewComplete: result => recordReadingReview(reviewEntry, result),
@@ -2074,12 +2055,11 @@
 
     invalidateQuestCache();
     const quest       = forcedQuest || getCachedQuest();
-    const mode = currentReadingMode();
     const hasMemories = drifterHasMemories(drifter.id);
-    const hasUnfinishedMemory = drifterHasUnfinishedMemory(drifter.id, null, mode);
+    const hasUnfinishedMemory = drifterHasUnfinishedMemory(drifter.id);
     const replayOffer = !quest && hasMemories && !hasUnfinishedMemory;
-    const completedThisWeek = drifterCompletedThisWeek(drifter.id, mode);
-    const restingThisWeek = drifterRestingThisWeek(drifter.id, mode);
+    const completedThisWeek = drifterCompletedThisWeek(drifter.id);
+    const restingThisWeek = drifterRestingThisWeek(drifter.id);
     const hasRestoredMemory = drifterMemoryRestored(drifter);
     const questTrack = questTrackHTML(drifter, quest, hasRestoredMemory);
     const worldUnderstood = !!readUtsuroba().flags?.convergenceSeen && allReadingMemoriesRestored();
@@ -2324,7 +2304,7 @@
 
       const restWeekBtn = drifterPanel.querySelector('#dp-rest-week-btn');
       if (restWeekBtn) restWeekBtn.addEventListener('click', () => {
-        setDrifterWeekStatus(drifter.id, 'resting', mode);
+        setDrifterWeekStatus(drifter.id, 'resting');
         closeDrifterPanel();
       });
 
@@ -2792,9 +2772,8 @@
     drifters.forEach(drifter => {
       const hasMemories = drifterHasMemories(drifter.id);
       const hasRestoredMemory = drifterMemoryRestored(drifter);
-      const mode = currentReadingMode();
-      const completedThisWeek = drifterCompletedThisWeek(drifter.id, mode);
-      const restingThisWeek = drifterRestingThisWeek(drifter.id, mode);
+      const completedThisWeek = drifterCompletedThisWeek(drifter.id);
+      const restingThisWeek = drifterRestingThisWeek(drifter.id);
       const isWaiting   = !!(quest && quest.active === drifter.id && quest.state === 'accepted');
       const isCollected = !!(quest && quest.active === drifter.id && quest.state === 'collected');
       const questActive = isWaiting || isCollected;
@@ -3184,6 +3163,11 @@
         d.utsuroba.visitedRooms[state.roomId] = Date.now();
         dirty = true;
       }
+      // Profile Pass 1: plain running total, incremented on every entry
+      // (not just the first) — same fix as Muenba's roomVisitsTotal.
+      if (!Number.isInteger(d.utsuroba.roomVisitsTotal) || d.utsuroba.roomVisitsTotal < 0) d.utsuroba.roomVisitsTotal = 0;
+      d.utsuroba.roomVisitsTotal += 1;
+      dirty = true;
       if (dirty) writeSave(d);
     } catch(_) {}
   }

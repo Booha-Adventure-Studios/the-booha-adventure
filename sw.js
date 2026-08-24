@@ -8,13 +8,12 @@ const CURRENT_CACHES = {
   // Rhythm Pass 2: invalidate the previous bundle so permanent capture-based
   // difficulty reaches returning players.
   pages:  'booha-pages-2026-309',
-  // Muenba Pass 15: js/ is served cache-first (see ASSET_PREFIXES below), so
-  // once a device caches muenba.js it never re-fetches it until this string
-  // changes — Passes 10-14's fixes (hostility, furigana, profile-page
-  // counters, danger-encounter false-capture) could otherwise sit invisible
-  // on a returning device indefinitely. Bump this string on every future
-  // Muenba (or other /js/-touching) fix, not just this one.
-  assets: 'booha-assets-2026-313',
+  // js/ is served cache-first (see ASSET_PREFIXES below), so once a device
+  // caches a script it never re-fetches it until this string changes.
+  // Utsuroba profile pass: bumped for js/utsuroba.js's tier-tracking/
+  // running-total save-schema changes. Bump this string on every future
+  // /js/-touching fix, not just this one.
+  assets: 'booha-assets-2026-314',
   decks:  'booha-decks-2026-309',
 };
 
