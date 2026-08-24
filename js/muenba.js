@@ -160,6 +160,8 @@
   let app;
   let stage;
   let roomLayer;
+  let roomTintCanvas;
+  let roomTintCtx;
   let atmosphereCanvas;
   let actorCanvas;
   let atmosphereCtx;
@@ -2266,8 +2268,9 @@
       body { font-family: system-ui, -apple-system, sans-serif; }
       #muenba-app { position:relative; width:100vw; height:100vh; overflow:hidden; background:#000; }
       #muenba-stage { position:absolute; left:50%; top:50%; width:${WORLD_W}px; height:${WORLD_H}px; transform-origin:50% 50%; overflow:hidden; cursor:crosshair; }
-      #muenba-room-layer, #muenba-atmosphere, #muenba-canvas, #muenba-fade { position:absolute; inset:0; }
+      #muenba-room-layer, #muenba-room-tint, #muenba-atmosphere, #muenba-canvas, #muenba-fade { position:absolute; inset:0; }
       #muenba-room-layer { z-index:1; }
+      #muenba-room-tint { z-index:2; pointer-events:none; mix-blend-mode:multiply; }
       .muenba-bg { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center center; display:block; pointer-events:none; user-select:none; }
       #muenba-atmosphere { z-index:4; pointer-events:none; }
       #muenba-canvas { z-index:10; pointer-events:none; }
@@ -2445,13 +2448,15 @@
     stage.id = 'muenba-stage';
     roomLayer = document.createElement('div');
     roomLayer.id = 'muenba-room-layer';
+    roomTintCanvas = document.createElement('canvas');
+    roomTintCanvas.id = 'muenba-room-tint';
     atmosphereCanvas = document.createElement('canvas');
     atmosphereCanvas.id = 'muenba-atmosphere';
     actorCanvas = document.createElement('canvas');
     actorCanvas.id = 'muenba-canvas';
     fadeEl = document.createElement('div');
     fadeEl.id = 'muenba-fade';
-    stage.append(roomLayer, atmosphereCanvas, actorCanvas, fadeEl);
+    stage.append(roomLayer, roomTintCanvas, atmosphereCanvas, actorCanvas, fadeEl);
     app.appendChild(stage);
     document.body.replaceChildren(app);
 
@@ -2527,6 +2532,7 @@
     rotateOverlay.innerHTML = '<span class="muenba-rotate-phone" aria-hidden="true"><svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2.4"></rect><line x1="11" y1="18.4" x2="13" y2="18.4"></line></svg></span><div class="muenba-rotate-bar"></div><p class="muenba-rotate-title">Turn your device sideways!</p><p class="muenba-rotate-sub">ムエンバは<strong style="color:#a7e1c5">横画面</strong>で遊べるよ。<br>スマホを横にしてね。</p>';
     document.body.appendChild(rotateOverlay);
 
+    roomTintCtx = roomTintCanvas.getContext('2d');
     atmosphereCtx = atmosphereCanvas.getContext('2d');
     actorCtx = actorCanvas.getContext('2d');
   }
@@ -2547,7 +2553,7 @@
     // the sharper DPR 2 path.
     const maxDpr = TOUCH_DEVICE ? 1.5 : 2;
     const dpr = Math.min(maxDpr, Math.max(1, window.devicePixelRatio || 1));
-    for (const canvas of [atmosphereCanvas, actorCanvas]) {
+    for (const canvas of [roomTintCanvas, atmosphereCanvas, actorCanvas]) {
       canvas.width = Math.round(WORLD_W * dpr);
       canvas.height = Math.round(WORLD_H * dpr);
       canvas.style.width = `${WORLD_W}px`;
@@ -2571,12 +2577,13 @@
     // The safe light is slightly off the central path. The corners stay
     // darker, and drawAtmosphere modulates this cached layer slowly so the
     // room feels like it is breathing instead of flashing.
-    const gradient = vctx.createRadialGradient(690, 430, 230, 760, 520, 930);
+    const gradient = vctx.createRadialGradient(690, 430, 210, 760, 520, 980);
     gradient.addColorStop(0, 'rgba(0,0,0,0)');
-    gradient.addColorStop(0.52, 'rgba(0,0,0,.04)');
-    gradient.addColorStop(0.70, 'rgba(0,0,0,.14)');
-    gradient.addColorStop(0.86, 'rgba(0,0,0,.38)');
-    gradient.addColorStop(1, 'rgba(0,0,0,.68)');
+    gradient.addColorStop(0.46, 'rgba(0,0,0,.045)');
+    gradient.addColorStop(0.64, 'rgba(0,0,0,.16)');
+    gradient.addColorStop(0.80, 'rgba(0,0,0,.42)');
+    gradient.addColorStop(0.92, 'rgba(0,0,0,.66)');
+    gradient.addColorStop(1, 'rgba(0,0,0,.80)');
     vctx.fillStyle = gradient;
     vctx.fillRect(0, 0, WORLD_W, WORLD_H);
 
@@ -3530,6 +3537,7 @@
 
   function drawAtmosphere(now) {
     const profile = getRoom().atmosphere;
+    drawRoomTint(profile);
     atmosphereCtx.clearRect(0, 0, WORLD_W, WORLD_H);
     atmosphereCtx.fillStyle = `rgba(3, 8, 18, ${profile.darkness})`;
     atmosphereCtx.fillRect(0, 0, WORLD_W, WORLD_H);
@@ -3585,12 +3593,23 @@
       atmosphereCtx.restore();
     }
     if (vignetteCanvas) {
-      const vignettePulse = REDUCED_MOTION ? .92 : .84 + .16 * Math.sin(now / 3500 + roomSeed * .7);
+      const vignettePulse = REDUCED_MOTION ? .94 : .88 + .12 * Math.sin(now / 3500 + roomSeed * .7);
       atmosphereCtx.save();
       atmosphereCtx.globalAlpha = vignettePulse;
       atmosphereCtx.drawImage(vignetteCanvas, 0, 0);
       atmosphereCtx.restore();
     }
+  }
+
+  function drawRoomTint(profile) {
+    if (!roomTintCtx) return;
+    const rgb = hexToRgb(roomGlowHex(state.roomId));
+    roomTintCtx.clearRect(0, 0, WORLD_W, WORLD_H);
+    // CSS composites this canvas with multiply, sinking the accent color into
+    // stone and moss instead of painting a flat wash over the photograph.
+    const alpha = Math.max(.30, Math.min(.45, profile.tintAlpha || .34));
+    roomTintCtx.fillStyle = `rgba(${rgb.r},${rgb.g},${rgb.b},${alpha})`;
+    roomTintCtx.fillRect(0, 0, WORLD_W, WORLD_H);
   }
 
   function renderDevArrowList() {
