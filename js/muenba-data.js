@@ -145,9 +145,9 @@
     room_08: { darkness: 0.32, tint: 'rgba(24, 35, 37, 0.07)', fog: 0.08, fogMood: 'sparse',  glow: '#4aa89e' }, // cyan-teal
     room_09: { darkness: 0.43, tint: 'rgba(25, 19, 36, 0.10)', fog: 0.16, fogMood: 'high',    glow: '#8a4aa8', lanterns: [[1157,762], [947,320], [328,777], [479,609], [658,220], [608,307], [893,254], [765,140]] }, // plum
     room_10: { darkness: 0.37, tint: 'rgba(10, 27, 39, 0.10)', fog: 0.12, fogMood: 'sinking', glow: '#a84a6f', lanterns: [[296,850], [314,331], [421,263], [654,237], [767,135]] }, // wine
-    room_11: { darkness: 0.47, tint: 'rgba(12, 18, 31, 0.12)', fog: 0.18, fogMood: 'high',    glow: '#4a5a9e', lanterns: [[1147,638], [505,576], [548,320], [898,287], [593,232], [768,110], [588,144]] }, // steel-indigo
-    room_12: { darkness: 0.41, tint: 'rgba(26, 28, 42, 0.09)', fog: 0.14, fogMood: 'low',     glow: '#7aa85a' }, // olive-moss
-    room_13: { darkness: 0.34, tint: 'rgba(20, 36, 34, 0.08)', fog: 0.09, fogMood: 'sparse',  glow: '#a8944a' }, // ochre
+    room_11: { darkness: 0.47, tint: 'rgba(12, 18, 31, 0.12)', fog: 0.18, fogMood: 'high',    glow: '#4a5a9e', lanterns: [[1147,638], [505,576], [548,320], [898,287], [593,232], [768,110], [588,144], [409,221], [470,165], [971,159], [898,201]] }, // steel-indigo
+    room_12: { darkness: 0.41, tint: 'rgba(26, 28, 42, 0.09)', fog: 0.14, fogMood: 'low',     glow: '#7aa85a', lanterns: [[381,692], [1294,592], [1101,600], [286,285], [380,257], [487,296], [575,265], [1052,328], [912,186], [768,135], [629,189], [228,166]] }, // olive-moss
+    room_13: { darkness: 0.34, tint: 'rgba(20, 36, 34, 0.08)', fog: 0.09, fogMood: 'sparse',  glow: '#a8944a', lanterns: [[1127,634], [522,332], [460,241], [610,286], [943,319], [1035,307], [648,246], [543,149], [765,141], [149,190]] }, // ochre
     room_14: { darkness: 0.45, tint: 'rgba(18, 18, 30, 0.12)', fog: 0.17, fogMood: 'sinking', glow: '#4a7aa8' }, // slate-blue
     room_15: { darkness: 0.39, tint: 'rgba(22, 30, 42, 0.10)', fog: 0.13, fogMood: 'cross',   glow: '#9e4a8a' }  // magenta-ash
   };
