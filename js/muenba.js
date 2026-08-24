@@ -97,6 +97,14 @@
   const RHYTHM_PERFECT_MS = 110;
   const RHYTHM_GOOD_MS = 220;
   const RHYTHM_PASS_ACCURACY = 60;
+  const PRACTICE_RHYTHM_CHART = ['don', 'kat', 'don', 'don', 'kat', 'don'];
+  const PRACTICE_RHYTHM_BPM = 72;
+  const PRACTICE_RHYTHM_NOTE_MS = 60000 / PRACTICE_RHYTHM_BPM;
+  const PRACTICE_RHYTHM_COUNTDOWN_MS = 1400;
+  const PRACTICE_RHYTHM_TRAVEL_MS = 1050;
+  const PRACTICE_RHYTHM_PERFECT_MS = 150;
+  const PRACTICE_RHYTHM_GOOD_MS = 300;
+  const PRACTICE_RHYTHM_PASS_ACCURACY = 50;
 
   // Pass 3 — the hostile ghost gets a shorter, faster danger chart. It is
   // intentionally readable rather than punishing: six notes at 150 BPM,
@@ -1086,6 +1094,10 @@
     document.addEventListener('keydown', event => {
       if (event.key === 'Escape' && captureOpen) {
         const phase = captureSession && captureSession.phase;
+        if (phase === 'rhythm-help') {
+          closeRhythmHelp();
+          return;
+        }
         if (phase !== 'reward' && phase !== 'nuppi' && phase !== 'nuppi-recovery') {
           cancelCaptureSession();
         }
@@ -1435,8 +1447,18 @@
     startRhythmCapture(true);
   }
 
-  function startRhythmCapture(danger) {
-    const config = danger
+  function startRhythmCapture(danger, practice = false) {
+    const config = practice
+      ? {
+          chart: PRACTICE_RHYTHM_CHART,
+          noteMs: PRACTICE_RHYTHM_NOTE_MS,
+          countdownMs: PRACTICE_RHYTHM_COUNTDOWN_MS,
+          travelMs: PRACTICE_RHYTHM_TRAVEL_MS,
+          perfectMs: PRACTICE_RHYTHM_PERFECT_MS,
+          goodMs: PRACTICE_RHYTHM_GOOD_MS,
+          passAccuracy: PRACTICE_RHYTHM_PASS_ACCURACY
+        }
+      : danger
       ? {
           chart: DANGER_RHYTHM_CHART,
           noteMs: DANGER_RHYTHM_NOTE_MS,
@@ -1462,6 +1484,7 @@
       chart: config.chart.slice(),
       startAt,
       nextIndex: 0,
+      practice,
       perfect: 0,
       good: 0,
       miss: 0,
@@ -1476,6 +1499,53 @@
     if (danger) startDangerRhythmMusic();
     renderRhythmCapture();
     captureSession.rhythm.rafId = window.requestAnimationFrame(tickRhythmCapture);
+  }
+
+  function openRhythmHelp() {
+    if (!captureSession || !captureSession.rhythm) return;
+    if (captureSession.phase !== 'countdown' && captureSession.phase !== 'playing') return;
+    const rhythm = captureSession.rhythm;
+    if (rhythm.rafId) window.cancelAnimationFrame(rhythm.rafId);
+    rhythm.rafId = 0;
+    rhythm.helpOpenedAt = performance.now();
+    captureSession.rhythmHelpPhase = captureSession.phase;
+    captureSession.phase = 'rhythm-help';
+    if (captureSession.danger) stopDangerRhythmMusic();
+    renderRhythmHelp();
+  }
+
+  function closeRhythmHelp() {
+    if (!captureSession || captureSession.phase !== 'rhythm-help' || !captureSession.rhythm) return;
+    const rhythm = captureSession.rhythm;
+    const pausedFor = Math.max(0, performance.now() - (rhythm.helpOpenedAt || performance.now()));
+    rhythm.startAt += pausedFor;
+    captureSession.phase = captureSession.rhythmHelpPhase || 'playing';
+    captureSession.rhythmHelpPhase = null;
+    rhythm.helpOpenedAt = 0;
+    renderRhythmCapture();
+    if (captureSession.danger && !captureSession.practice) startDangerRhythmMusic();
+    rhythm.rafId = window.requestAnimationFrame(tickRhythmCapture);
+  }
+
+  function startPracticeRhythm() {
+    if (!captureSession || !['rhythm-help', 'practice-result'].includes(captureSession.phase)) return;
+    stopRhythmCapture();
+    captureSession.practice = true;
+    startRhythmCapture(false, true);
+  }
+
+  function returnFromPractice() {
+    if (!captureSession || captureSession.phase !== 'practice-result') return;
+    stopRhythmCapture();
+    captureSession.practice = false;
+    captureSession.rhythm = null;
+    captureSession.phase = captureSession.danger ? 'danger-ready' : 'ready';
+    if (captureSession.danger) {
+      startDangerScream();
+      renderDangerReady();
+    } else {
+      renderCaptureReady();
+    }
   }
 
   function pauseWorldMusicForCapture() {
@@ -1496,22 +1566,76 @@
     return Math.round(((rhythm.perfect + rhythm.good) / total) * 100);
   }
 
+  function renderRhythmHelp() {
+    if (!captureSession || !captureOverlay) return;
+    setDangerOverlay(false);
+    const box = captureBox();
+    box.classList.add('muenba-rhythm-help-box');
+
+    const eyebrow = document.createElement('div');
+    eyebrow.className = 'muenba-case-board-eyebrow';
+    eyebrow.textContent = 'RHYTHM GUIDE';
+    box.appendChild(eyebrow);
+
+    const h2 = document.createElement('h2');
+    h2.textContent = 'How to play';
+    box.appendChild(h2);
+    const jp = document.createElement('p');
+    jp.className = 'jp';
+    jp.innerHTML = '<ruby>遊<rt>あそ</rt></ruby>び<ruby>方<rt>かた</rt></ruby>';
+    box.appendChild(jp);
+
+    renderCaseDirection(
+      box,
+      'Tap the lane when its note reaches the orange line.',
+      '<ruby>音符<rt>おんぷ</rt></ruby>がオレンジの<ruby>線<rt>せん</rt></ruby>に<ruby>来<rt>き</rt></ruby>たら、レーンを<ruby>押<rt>お</rt></ruby>します。'
+    );
+    renderCaseDirection(
+      box,
+      'Circle is DON. Diamond is KAT. Keep the beat.',
+      '<ruby>丸<rt>まる</rt></ruby>はドン、<ruby>菱形<rt>ひしがた</rt></ruby>はカッです。リズムを<ruby>続<rt>つづ</rt></ruby>けましょう。'
+    );
+    renderCaseDirection(
+      box,
+      'Practice is safe. It does not change your hunt.',
+      '<ruby>練習<rt>れんしゅう</rt></ruby>は<ruby>安全<rt>あんぜん</rt></ruby>です。ゴースト<ruby>探<rt>さが</rt></ruby>しの<ruby>記録<rt>きろく</rt></ruby>は<ruby>変<rt>か</rt></ruby>わりません。'
+    );
+
+    const actions = document.createElement('div');
+    actions.className = 'muenba-lobby-actions';
+    actions.appendChild(captureButton('Practice rhythm', 'muenba-rhythm-practice', startPracticeRhythm));
+    actions.appendChild(captureButton('Back to rhythm', 'muenba-rhythm-help-close', closeRhythmHelp));
+    box.appendChild(actions);
+    captureOverlay.classList.add('open');
+    focusCaptureControl('#muenba-rhythm-practice');
+  }
+
   function renderRhythmCapture() {
     if (!captureSession || !captureSession.rhythm || !captureOverlay) return;
     const rhythm = captureSession.rhythm;
     const ghost = captureSession.ghost;
-    const danger = !!captureSession.danger;
+    const practice = !!captureSession.practice;
+    const danger = !!captureSession.danger && !practice;
     setDangerOverlay(danger);
     const box = captureBox();
     if (danger) box.classList.add('muenba-danger-box');
     captureImage(box, ghost, danger ? ANGRY_CHANGE_IMG : ghost.img);
 
+    const helpButton = document.createElement('button');
+    helpButton.type = 'button';
+    helpButton.className = 'muenba-rhythm-help-button';
+    helpButton.textContent = '?';
+    helpButton.setAttribute('aria-label', 'Open rhythm instructions');
+    helpButton.title = 'How to play';
+    helpButton.addEventListener('click', openRhythmHelp);
+    box.appendChild(helpButton);
+
     const h2 = document.createElement('h2');
-    h2.textContent = danger ? 'Danger rhythm' : 'Keep the rhythm';
+    h2.textContent = practice ? 'Practice rhythm' : (danger ? 'Danger rhythm' : 'Keep the rhythm');
     box.appendChild(h2);
     const jp = document.createElement('p');
     jp.className = 'jp';
-    jp.textContent = danger ? '危険なリズム' : 'リズムでつかまえよう';
+    jp.textContent = practice ? 'リズムの練習' : (danger ? '危険なリズム' : 'リズムでつかまえよう');
     box.appendChild(jp);
 
     const status = document.createElement('p');
@@ -1724,6 +1848,11 @@
     }
     rhythm.accuracy = accuracy;
     rhythm.success = success;
+    if (captureSession.practice) {
+      captureSession.phase = 'practice-result';
+      renderPracticeResult(accuracy, success);
+      return;
+    }
     recordRhythmResult(accuracy);
     if (!success) {
       captureSession.phase = 'result';
@@ -1750,6 +1879,40 @@
     };
     renderCaptureReward();
     releaseNextOrb();
+  }
+
+  function renderPracticeResult(accuracy, success) {
+    if (!captureSession || !captureOverlay) return;
+    setDangerOverlay(false);
+    const box = captureBox();
+    box.classList.add('muenba-rhythm-help-box');
+
+    const h2 = document.createElement('h2');
+    h2.textContent = success ? 'Practice complete' : 'Keep practicing';
+    box.appendChild(h2);
+    const jp = document.createElement('p');
+    jp.className = 'jp';
+    jp.innerHTML = success
+      ? '<ruby>練習<rt>れんしゅう</rt></ruby>できました'
+      : 'もう<ruby>一度<rt>いちど</rt></ruby><ruby>練習<rt>れんしゅう</rt></ruby>しよう';
+    box.appendChild(jp);
+
+    const p = document.createElement('p');
+    p.textContent = `Practice accuracy: ${accuracy}%. Your hunt progress did not change.`;
+    box.appendChild(p);
+    renderCaseDirection(
+      box,
+      'Try the easy chart again, or return to the ghost rhythm.',
+      'やさしいリズムをもう<ruby>一度<rt>いちど</rt></ruby><ruby>試<rt>ため</rt></ruby>すか、ゴーストのリズムに<ruby>戻<rt>もど</rt></ruby>りましょう。'
+    );
+
+    const actions = document.createElement('div');
+    actions.className = 'muenba-lobby-actions';
+    actions.appendChild(captureButton('Practice again', 'muenba-rhythm-practice-again', startPracticeRhythm));
+    actions.appendChild(captureButton('Return to rhythm', 'muenba-rhythm-practice-return', returnFromPractice));
+    box.appendChild(actions);
+    captureOverlay.classList.add('open');
+    focusCaptureControl('#muenba-rhythm-practice-again');
   }
 
   function commitSuccessfulCapture() {
@@ -2304,7 +2467,7 @@
          player enters Muenba (Pass 3b). */
       #muenba-lobby-overlay { position:fixed; inset:0; z-index:210; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,0); transition:background .4s ease; padding:20px; box-sizing:border-box; }
       #muenba-lobby-overlay.open { display:flex; background:rgba(0,0,0,.86); }
-      .muenba-lobby-box { box-sizing:border-box; width:min(480px,100%); max-height:calc(100vh - 40px); overflow-y:auto; padding:28px 26px 26px; border:1px solid rgba(111,166,145,.45); border-radius:18px; background:linear-gradient(155deg,rgba(8,27,20,.97),rgba(1,4,4,.98)); box-shadow:0 24px 70px rgba(0,0,0,.75),0 0 55px rgba(16,65,45,.28),inset 0 0 70px rgba(0,0,0,.58); text-align:center; font-family:Georgia,'Times New Roman',serif; color:#e0eee8; transform:scale(.94); opacity:0; transition:transform .32s cubic-bezier(.34,1.56,.64,1),opacity .26s ease; }
+      .muenba-lobby-box { position:relative; box-sizing:border-box; width:min(480px,100%); max-height:calc(100vh - 40px); overflow-y:auto; padding:28px 26px 26px; border:1px solid rgba(111,166,145,.45); border-radius:18px; background:linear-gradient(155deg,rgba(8,27,20,.97),rgba(1,4,4,.98)); box-shadow:0 24px 70px rgba(0,0,0,.75),0 0 55px rgba(16,65,45,.28),inset 0 0 70px rgba(0,0,0,.58); text-align:center; font-family:Georgia,'Times New Roman',serif; color:#e0eee8; transform:scale(.94); opacity:0; transition:transform .32s cubic-bezier(.34,1.56,.64,1),opacity .26s ease; }
       #muenba-lobby-overlay.open .muenba-lobby-box { transform:scale(1); opacity:1; }
       .muenba-lobby-portrait { display:block; width:96px; height:96px; object-fit:contain; margin:0 auto 12px; filter:drop-shadow(0 0 16px rgba(122,180,151,.3)); animation:muenbaNuppiTalk 2.8s ease-in-out infinite; transform-origin:50% 86%; }
       @keyframes muenbaNuppiTalk { 0%,100% { transform:translateY(0) rotate(-1deg); } 25% { transform:translateY(-3px) rotate(1deg); } 52% { transform:translateY(1px) rotate(0deg); } 76% { transform:translateY(-2px) rotate(-1deg); } }
@@ -2397,6 +2560,9 @@
       .muenba-rhythm-status { min-height:1.5em; margin:2px 0 2px !important; color:#d8f2e2 !important; font:700 1.08rem/1.4 ui-monospace,monospace !important; text-align:center !important; letter-spacing:.08em; }
       .muenba-rhythm-status.perfect, .muenba-rhythm-status.good, .muenba-rhythm-status.go { color:#8fe0ad !important; }
       .muenba-rhythm-status.miss, .muenba-rhythm-status.early { color:#e8b0b8 !important; }
+      .muenba-rhythm-help-button { position:absolute; top:10px; left:10px; z-index:8; display:grid; place-items:center; width:30px; height:30px; padding:0; border:1px solid rgba(216,201,139,.72); border-radius:50%; color:#fff5d5; background:rgba(40,32,12,.72); box-shadow:0 0 14px rgba(216,201,139,.28); font:900 17px/1 Georgia,'Times New Roman',serif; cursor:pointer; }
+      .muenba-rhythm-help-button:hover, .muenba-rhythm-help-button:focus-visible { border-color:#fff1ae; background:rgba(126,111,48,.58); box-shadow:0 0 24px rgba(216,201,139,.48); outline:none; }
+      .muenba-rhythm-help-box { border-color:rgba(216,201,139,.54); box-shadow:0 24px 80px rgba(0,0,0,.82),0 0 60px rgba(126,111,48,.22),inset 0 0 70px rgba(0,0,0,.58); }
       .muenba-rhythm-accuracy { margin:0 0 7px !important; color:#9ccbb6 !important; font:700 .72rem/1.4 ui-monospace,monospace !important; text-align:center !important; letter-spacing:.08em; }
       .muenba-rhythm-board { position:relative; display:grid; grid-template-columns:1fr 1fr; gap:8px; height:250px; margin:8px 0 6px; }
       .muenba-rhythm-lane { position:relative; min-width:0; height:250px; overflow:hidden; padding:0; border:1px solid rgba(156,203,182,.35); border-radius:14px; color:#dcefe4; background:linear-gradient(180deg,rgba(25,55,44,.58),rgba(5,15,12,.86)); cursor:pointer; touch-action:none; user-select:none; }

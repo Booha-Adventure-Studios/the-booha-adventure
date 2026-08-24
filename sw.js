@@ -5,11 +5,11 @@
 // ============================================================
 
 const CURRENT_CACHES = {
-  // Muenba profile button pass: invalidate the previous bundle so responsive
-  // sizing and safe-area placement reach returning players.
-  pages:  'booha-pages-2026-282',
-  assets: 'booha-assets-2026-282',
-  decks:  'booha-decks-2026-282',
+  // Rhythm Pass 1: invalidate the previous bundle so the help menu and safe
+  // practice chart reach returning players.
+  pages:  'booha-pages-2026-283',
+  assets: 'booha-assets-2026-283',
+  decks:  'booha-decks-2026-283',
 };
 
 const PAGE_CACHE  = CURRENT_CACHES.pages;
