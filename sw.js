@@ -5,11 +5,11 @@
 // ============================================================
 
 const CURRENT_CACHES = {
-  // Muenba balance pass: invalidate the previous bundle so hiding recovery
-  // and fair ghost spawn spacing reach players.
-  pages:  'booha-pages-2026-270',
-  assets: 'booha-assets-2026-270',
-  decks:  'booha-decks-2026-270',
+  // Muenba access pass: invalidate the previous bundle so the Karasuki arrow
+  // and profile logo link reach players.
+  pages:  'booha-pages-2026-271',
+  assets: 'booha-assets-2026-271',
+  decks:  'booha-decks-2026-271',
 };
 
 const PAGE_CACHE  = CURRENT_CACHES.pages;
