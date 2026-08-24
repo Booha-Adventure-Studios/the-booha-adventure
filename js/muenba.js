@@ -374,6 +374,12 @@
   muenbaDance.preload = 'auto';
   muenbaDance.loop = false;
   muenbaDance.volume = 0.72;
+  const rhythmHitSfx = new Audio('assets/audio/ding.mp3');
+  rhythmHitSfx.preload = 'auto';
+  rhythmHitSfx.volume = 0.42;
+  const rhythmMissSfx = new Audio('assets/destruction/fail.mp3');
+  rhythmMissSfx.preload = 'auto';
+  rhythmMissSfx.volume = 0.24;
 
   const danceArmsUpImg = new Image();
   danceArmsUpImg.src = 'assets/img/booha_ghost_dance_arms_up.png';
@@ -1992,6 +1998,14 @@
     });
   }
 
+  function playRhythmSfx(result) {
+    const sound = result === 'miss' ? rhythmMissSfx : rhythmHitSfx;
+    try {
+      sound.currentTime = 0;
+      sound.play().catch(() => {});
+    } catch (_) {}
+  }
+
   function markRhythmNote(result, index = captureSession.rhythm.nextIndex) {
     const rhythm = captureSession.rhythm;
     if (rhythm.resolvedIndices.has(index)) return;
@@ -2025,6 +2039,7 @@
       rhythm.energyFillEl.style.width = `${Math.min(100, energyPercent)}%`;
       rhythm.energyEl?.setAttribute('aria-valuenow', String(Math.min(100, energyPercent)));
     }
+    if (result !== 'avoid') playRhythmSfx(result);
     pulseRhythmBoard(result);
   }
 
@@ -2253,6 +2268,7 @@
     setDangerOverlay(danger);
     const box = captureBox();
     box.classList.add('muenba-rhythm-halloween-box');
+    box.classList.add(success ? 'muenba-rhythm-result-success' : 'muenba-rhythm-result-failure');
     if (danger) box.classList.add('muenba-danger-box');
     captureImage(box, ghost, danger ? ANGRY_CHANGE_IMG : ghost.img);
 
@@ -2851,6 +2867,9 @@
       .muenba-rhythm-help-box { border-color:rgba(216,201,139,.54); box-shadow:0 24px 80px rgba(0,0,0,.82),0 0 60px rgba(126,111,48,.22),inset 0 0 70px rgba(0,0,0,.58); }
       .muenba-rhythm-halloween-box { border-color:rgba(157,116,255,.7); background:radial-gradient(circle at 50% 8%,rgba(116,46,168,.22),transparent 42%),linear-gradient(145deg,rgba(19,11,43,.96),rgba(6,13,25,.97)); box-shadow:0 24px 80px rgba(0,0,0,.86),0 0 55px rgba(111,66,210,.25),inset 0 0 55px rgba(49,205,154,.08); }
       .muenba-rhythm-halloween-box h2 { color:#f4e8ff; text-shadow:0 0 18px rgba(190,119,255,.48); }
+      .muenba-rhythm-result-success { border-color:rgba(183,255,83,.84) !important; box-shadow:0 24px 80px rgba(0,0,0,.86),0 0 70px rgba(79,255,151,.3),inset 0 0 70px rgba(132,255,77,.1) !important; }
+      .muenba-rhythm-result-failure { border-color:rgba(255,135,67,.8) !important; animation:muenbaRhythmResultShake .28s ease-out; }
+      @keyframes muenbaRhythmResultShake { 20% { transform:translateX(-4px); } 50% { transform:translateX(4px); } 80% { transform:translateX(-2px); } }
       .muenba-rhythm-accuracy { margin:0 0 7px !important; color:#9ccbb6 !important; font:700 .72rem/1.4 ui-monospace,monospace !important; text-align:center !important; letter-spacing:.08em; }
       .muenba-rhythm-combo { min-height:1.2em; margin:0 0 4px !important; color:#ffb347 !important; font:900 .9rem/1.2 ui-monospace,monospace !important; letter-spacing:.14em; text-align:center !important; text-shadow:0 0 12px rgba(255,145,45,.38); text-transform:uppercase; }
       .muenba-rhythm-combo.is-hot { color:#c9ff54 !important; animation:muenbaRhythmComboPop .28s ease-out; text-shadow:0 0 16px rgba(164,255,58,.75); }
@@ -2894,7 +2913,7 @@
       @keyframes muenbaOrbRelease { from { opacity:0; transform:translateY(12px) scale(.35); } to { opacity:1; transform:translateY(0) scale(1); } }
       .muenba-orb-release-status { margin:0 0 18px !important; color:#9ccbb6 !important; font:700 .76rem/1.4 ui-monospace,monospace !important; text-align:center !important; letter-spacing:.05em; }
       @media (prefers-reduced-motion: reduce) { .muenba-orb-release, .muenba-hunt-ghost-portrait { animation:none; } }
-      @media (prefers-reduced-motion: reduce) { #muenba-fade, .muenba-return-box, #muenba-return-overlay, .muenba-lobby-box, #muenba-lobby-overlay, #muenba-capture-overlay { transition:none !important; } .muenba-lobby-portrait, #muenba-hide, #muenba-celebration-status, .muenba-rhythm-board, .muenba-rhythm-combo { animation:none !important; } .muenba-rhythm-energy-fill { transition:none !important; } #muenba-profile-link { transition:none !important; } }
+      @media (prefers-reduced-motion: reduce) { #muenba-fade, .muenba-return-box, #muenba-return-overlay, .muenba-lobby-box, #muenba-lobby-overlay, #muenba-capture-overlay { transition:none !important; } .muenba-lobby-portrait, #muenba-hide, #muenba-celebration-status, .muenba-rhythm-board, .muenba-rhythm-combo, .muenba-rhythm-result-failure { animation:none !important; } .muenba-rhythm-energy-fill { transition:none !important; } #muenba-profile-link { transition:none !important; } }
     `;
     document.head.appendChild(style);
   }
