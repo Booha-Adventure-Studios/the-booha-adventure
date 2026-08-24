@@ -136,8 +136,8 @@
   // this is mood lighting, not a rainbow.
   const ATMOSPHERE = {
     room_01: { darkness: 0.38, tint: 'rgba(12, 24, 42, 0.10)', fog: 0.12, fogMood: 'low',     glow: '#4a9a72', lanterns: [[241,697], [927,224], [204,318], [925,226], [767,129], [663,95]] }, // sickly green
-    room_02: { darkness: 0.42, tint: 'rgba(15, 28, 48, 0.11)', fog: 0.15, fogMood: 'high',    glow: '#6f5aa8' }, // violet
-    room_03: { darkness: 0.35, tint: 'rgba(18, 32, 38, 0.09)', fog: 0.10, fogMood: 'sparse',  glow: '#4a8a9e' }, // teal-blue
+    room_02: { darkness: 0.42, tint: 'rgba(15, 28, 48, 0.11)', fog: 0.15, fogMood: 'high',    glow: '#6f5aa8', lanterns: [[358,652], [315,247], [606,296], [1171,715], [931,299], [850,140], [768,127], [607,189], [655,178]] }, // violet
+    room_03: { darkness: 0.35, tint: 'rgba(18, 32, 38, 0.09)', fog: 0.10, fogMood: 'sparse',  glow: '#4a8a9e', lanterns: [[1301,115], [457,109], [769,134], [848,303], [361,803]] }, // teal-blue
     room_04: { darkness: 0.40, tint: 'rgba(25, 29, 45, 0.10)', fog: 0.13, fogMood: 'cross',   glow: '#9e5a72' }, // dusky rose
     room_05: { darkness: 0.44, tint: 'rgba(9, 20, 34, 0.12)',  fog: 0.17, fogMood: 'sinking', glow: '#5a6fa8' }, // indigo
     room_06: { darkness: 0.36, tint: 'rgba(20, 35, 34, 0.09)', fog: 0.09, fogMood: 'low',     glow: '#7a9e4a' }, // moss

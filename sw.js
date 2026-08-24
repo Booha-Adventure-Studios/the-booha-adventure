@@ -5,11 +5,11 @@
 // ============================================================
 
 const CURRENT_CACHES = {
-  // Muenba hide behavior pass: invalidate the previous bundle so hiding
-  // immediately calms ghosts and extends their room search.
-  pages:  'booha-pages-2026-279',
-  assets: 'booha-assets-2026-279',
-  decks:  'booha-decks-2026-279',
+  // Muenba lantern visibility pass: invalidate the previous bundle so the
+  // brighter calibrated window flicker reaches returning players.
+  pages:  'booha-pages-2026-280',
+  assets: 'booha-assets-2026-280',
+  decks:  'booha-decks-2026-280',
 };
 
 const PAGE_CACHE  = CURRENT_CACHES.pages;
