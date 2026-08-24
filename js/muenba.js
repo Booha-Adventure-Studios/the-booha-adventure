@@ -198,6 +198,8 @@
 
   const ghostImg = new Image();
   ghostImg.src = 'assets/img/booha_ghost.png';
+  const hidingImg = new Image();
+  hidingImg.src = 'assets/img/muenba/hiding.png';
   // Reusing Nuppi's existing wandering-NPC art from Karasuki (same asset
   // path, no new files) rather than a new character for the lobby host.
   const nuppiLobbyImg = new Image();
@@ -2825,8 +2827,9 @@
     actorCtx.rotate(wobble * Math.PI / 180);
     actorCtx.globalAlpha = .96 * hidingFade;
     if (state.hiding) actorCtx.scale(.82, .82);
-    if (ghostImg.complete && ghostImg.naturalWidth > 0) {
-      actorCtx.drawImage(ghostImg, -BOOHA_R, -BOOHA_R, BOOHA_R * 2, BOOHA_R * 2);
+    const boohaSprite = state.hiding ? hidingImg : ghostImg;
+    if (boohaSprite.complete && boohaSprite.naturalWidth > 0) {
+      actorCtx.drawImage(boohaSprite, -BOOHA_R, -BOOHA_R, BOOHA_R * 2, BOOHA_R * 2);
     } else {
       actorCtx.fillStyle = '#ffe56d';
       actorCtx.beginPath();
