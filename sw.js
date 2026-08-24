@@ -5,11 +5,11 @@
 // ============================================================
 
 const CURRENT_CACHES = {
-  // Muenba hostile-response pass: invalidate the previous bundle so faster
-  // reactions and wrong-ghost pursuit reach players.
-  pages:  'booha-pages-2026-268',
-  assets: 'booha-assets-2026-268',
-  decks:  'booha-decks-2026-268',
+  // Muenba room-travel pass: invalidate the previous bundle so ghosts can
+  // walk to connected exits, vanish, and relocate between rooms.
+  pages:  'booha-pages-2026-269',
+  assets: 'booha-assets-2026-269',
+  decks:  'booha-decks-2026-269',
 };
 
 const PAGE_CACHE  = CURRENT_CACHES.pages;
