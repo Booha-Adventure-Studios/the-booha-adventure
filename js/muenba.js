@@ -1698,19 +1698,25 @@
       #muenba-lobby-overlay.open { display:flex; background:rgba(0,0,0,.86); }
       .muenba-lobby-box { box-sizing:border-box; width:min(480px,100%); max-height:calc(100vh - 40px); overflow-y:auto; padding:28px 26px 26px; border:1px solid rgba(111,166,145,.45); border-radius:18px; background:linear-gradient(155deg,rgba(8,27,20,.97),rgba(1,4,4,.98)); box-shadow:0 24px 70px rgba(0,0,0,.75),0 0 55px rgba(16,65,45,.28),inset 0 0 70px rgba(0,0,0,.58); text-align:center; font-family:Georgia,'Times New Roman',serif; color:#e0eee8; transform:scale(.94); opacity:0; transition:transform .32s cubic-bezier(.34,1.56,.64,1),opacity .26s ease; }
       #muenba-lobby-overlay.open .muenba-lobby-box { transform:scale(1); opacity:1; }
-      .muenba-lobby-portrait { display:block; width:96px; height:96px; object-fit:contain; margin:0 auto 12px; filter:drop-shadow(0 0 16px rgba(122,180,151,.3)); }
+      .muenba-lobby-portrait { display:block; width:96px; height:96px; object-fit:contain; margin:0 auto 12px; filter:drop-shadow(0 0 16px rgba(122,180,151,.3)); animation:muenbaNuppiTalk 2.8s ease-in-out infinite; transform-origin:50% 86%; }
+      @keyframes muenbaNuppiTalk { 0%,100% { transform:translateY(0) rotate(-1deg); } 25% { transform:translateY(-3px) rotate(1deg); } 52% { transform:translateY(1px) rotate(0deg); } 76% { transform:translateY(-2px) rotate(-1deg); } }
       .muenba-lobby-box h2 { margin:0 0 4px; font-size:1.2rem; font-weight:400; letter-spacing:.06em; text-transform:uppercase; }
       .muenba-lobby-box .jp { margin:0 0 16px; color:#aac2b5; font-size:.85rem; letter-spacing:.1em; text-align:center; }
       .muenba-lobby-box p { margin:0 0 14px; color:#c5d8cd; font-size:.92rem; line-height:1.65; text-align:left; }
       .muenba-lobby-box p.jp-line { color:#8fa89b; font-size:.82rem; }
       .muenba-lobby-box p:last-of-type { margin-bottom:20px; }
       .muenba-ghost-flavor { margin:12px 0 16px !important; padding:10px 12px; border-left:2px solid rgba(216,201,139,.5); background:rgba(216,201,139,.06); color:#e7dca9 !important; font-size:.86rem !important; font-style:italic; line-height:1.5 !important; text-align:center !important; }
-      .muenba-lobby-case-board { margin:18px 0 20px; padding:13px 14px 12px; border:1px solid rgba(216,201,139,.28); border-radius:12px; background:rgba(216,201,139,.06); text-align:left; }
-      .muenba-lobby-case-board h3 { margin:0 0 8px; color:#e7dca9; font:700 .72rem/1.35 ui-monospace,monospace; letter-spacing:.1em; text-transform:uppercase; }
-      .muenba-lobby-case-board p { margin:0 0 5px; color:#fff5d5; font-size:.84rem; line-height:1.5; }
-      .muenba-lobby-case-board p.muenba-case-direction-jp { color:#9fc3af; font-size:.8rem; }
+      .muenba-lobby-box.is-case-board { width:min(600px,100%); padding:34px 30px 32px; border-color:rgba(216,201,139,.48); box-shadow:0 24px 80px rgba(0,0,0,.8),0 0 70px rgba(126,111,48,.18),inset 0 0 70px rgba(0,0,0,.58); }
+      .muenba-lobby-case-board { margin:22px 0 24px; padding:21px 20px 19px; border:1px solid rgba(216,201,139,.4); border-radius:12px; background:linear-gradient(145deg,rgba(216,201,139,.1),rgba(216,201,139,.025)); text-align:left; }
+      .muenba-lobby-case-board h3 { margin:0 0 10px; color:#fff5d5; font:400 clamp(1.25rem,4vw,1.7rem)/1.2 Georgia,'Times New Roman',serif; letter-spacing:.01em; }
+      .muenba-lobby-case-board p { margin:0 0 7px; color:#fff5d5; font-size:1rem; line-height:1.55; }
+      .muenba-lobby-case-board p.muenba-case-board-copy { color:#d9d0a5; font-size:.9rem; }
+      .muenba-lobby-case-board p.muenba-case-direction-jp { color:#9fc3af; font-size:.84rem; }
+      .muenba-case-board-eyebrow { margin:0 0 8px; color:#d8c98b; font:700 .62rem/1.4 ui-monospace,monospace; letter-spacing:.16em; text-transform:uppercase; }
       .muenba-lobby-actions { display:flex; justify-content:center; margin-top:4px; }
       #muenba-lobby-begin, .muenba-capture-action { border:1px solid rgba(156,203,182,.7); color:#e0f4e9; background:rgba(52,104,78,.28); box-shadow:0 0 16px rgba(93,162,124,.22); border-radius:999px; padding:10px 28px; font:700 12px ui-monospace,monospace; letter-spacing:.05em; cursor:pointer; }
+      #muenba-case-board-start { min-width:190px; padding:13px 38px; border-color:rgba(216,201,139,.9); color:#fff5d5; background:rgba(126,111,48,.3); box-shadow:0 0 24px rgba(216,201,139,.34),inset 0 0 12px rgba(216,201,139,.12); font-size:13px; }
+      #muenba-case-board-start:hover, #muenba-case-board-start:focus-visible { background:rgba(126,111,48,.48); box-shadow:0 0 34px rgba(216,201,139,.48),inset 0 0 16px rgba(216,201,139,.16); }
       #muenba-lobby-begin:hover, #muenba-lobby-begin:focus-visible, .muenba-capture-action:hover, .muenba-capture-action:focus-visible { background:rgba(52,104,78,.44); outline:none; }
       .muenba-case-eyebrow { margin:0 0 8px; color:#d8c98b; font:700 10px/1.4 ui-monospace,monospace; letter-spacing:.15em; }
       .muenba-case-progress { margin:0 0 10px; color:#9ccbb6; font:700 10px/1.4 ui-monospace,monospace; letter-spacing:.12em; }
@@ -1767,7 +1773,7 @@
       @keyframes muenbaOrbRelease { from { opacity:0; transform:translateY(12px) scale(.35); } to { opacity:1; transform:translateY(0) scale(1); } }
       .muenba-orb-release-status { margin:0 0 18px !important; color:#9ccbb6 !important; font:700 .76rem/1.4 ui-monospace,monospace !important; text-align:center !important; letter-spacing:.05em; }
       @media (prefers-reduced-motion: reduce) { .muenba-orb-release { animation:none; } }
-      @media (prefers-reduced-motion: reduce) { #muenba-fade, .muenba-return-box, #muenba-return-overlay, .muenba-lobby-box, #muenba-lobby-overlay, #muenba-capture-overlay { transition:none !important; } }
+      @media (prefers-reduced-motion: reduce) { #muenba-fade, .muenba-return-box, #muenba-return-overlay, .muenba-lobby-box, #muenba-lobby-overlay, #muenba-capture-overlay { transition:none !important; } .muenba-lobby-portrait { animation:none !important; } }
     `;
     document.head.appendChild(style);
   }
@@ -2307,57 +2313,89 @@
   // Same themed-popup pattern as the return portal above, not a new screen.
   // Per the locked decision, this shows every time the player enters
   // Muenba (not just the first time), in a warm-guide tone, addressing the
-  // player by name when one is on file. It ends on a dismiss button and
-  // releases the player directly into free-roam.
+  // player by name when one is on file. The welcome beat hands off to a
+  // larger case-board beat, which ends on the real Start button.
   function buildNuppiLobbyOverlay() {
     if (lobbyOverlay) return;
-    const name = getPlayerFirstName();
-    const greetEn = name ? `${name}, there you are.` : 'There you are.';
-    const greetJp = name ? `${name}……ようこそ。` : 'ようこそ。';
     lobbyOverlay = document.createElement('div');
     lobbyOverlay.id = 'muenba-lobby-overlay';
-    lobbyOverlay.innerHTML = `
-      <div class="muenba-lobby-box">
-        <img class="muenba-lobby-portrait" src="assets/img/wanderers/nuppi-2.png" alt="Nuppi">
-        <h2>Nuppi</h2>
-        <p class="jp">ヌッピ</p>
-        <p>${greetEn} I'm glad you made it back to Muenba.</p>
-        <p class="jp-line">${greetJp} ムエンバへようこそ戻ってきたね。</p>
-        <p>Somewhere among these fifteen rooms, a ghost is hiding. Some won't notice you at all — others will come looking, and if one gets close, you can hide until it loses interest. When you see one, walk up and give it a tap.</p>
-        <p class="jp-line">この15の部屋のどこかに、幽霊が隠れているよ。気づかない幽霊もいれば、追いかけてくる幽霊もいる。近づかれたら隠れて、興味をなくすのを待とう。見つけたら、そっと近づいてタップしてみて。</p>
-        <section class="muenba-lobby-case-board" aria-labelledby="muenba-case-board-title">
-          <h3 id="muenba-case-board-title">Nuppi's case board</h3>
-          <p id="muenba-case-board-copy"></p>
-          <p id="muenba-case-board-jp" class="muenba-case-direction-jp"></p>
-        </section>
-        <div class="muenba-lobby-actions">
-          <button id="muenba-lobby-begin" type="button">Let's begin</button>
-        </div>
-      </div>`;
     document.body.appendChild(lobbyOverlay);
-    refreshNuppiCaseBoard();
-    document.getElementById('muenba-lobby-begin').addEventListener('click', () => {
-      closeNuppiLobby();
-      if (readMuenba().orbsPending > 0) openPendingOrbRecovery();
-    });
+    renderNuppiWelcome();
     document.addEventListener('keydown', event => {
       if (event.key === 'Escape' && lobbyOpen) closeNuppiLobby();
     });
   }
 
+  function renderNuppiWelcome() {
+    if (!lobbyOverlay) return;
+    const name = getPlayerFirstName();
+    const greetEn = name ? `${name}, there you are.` : 'There you are.';
+    const greetJp = name ? `${name}……ようこそ。` : 'ようこそ。';
+    lobbyOverlay.innerHTML = `
+      <div class="muenba-lobby-box">
+        <img class="muenba-lobby-portrait" src="assets/img/wanderers/nuppi-2.png" alt="Nuppi">
+        <h2>Nuppi</h2>
+        <p class="jp">ヌッピ</p>
+        <p>${greetEn}</p>
+        <p class="jp-line">${greetJp}</p>
+        <p>Somewhere among these fifteen rooms, a ghost is hiding. Some won't notice you at all, while others will come looking. If one gets close, you can hide until it loses interest. When you see one, walk up and give it a tap.</p>
+        <p class="jp-line">この15の<ruby>部屋<rt>へや</rt></ruby>のどこかに、<ruby>幽霊<rt>ゆうれい</rt></ruby>が<ruby>隠<rt>かく</rt></ruby>れているよ。<ruby>気<rt>き</rt></ruby>づかない<ruby>幽霊<rt>ゆうれい</rt></ruby>もいれば、<ruby>探<rt>さが</rt></ruby>しに<ruby>来<rt>く</rt></ruby>る<ruby>幽霊<rt>ゆうれい</rt></ruby>もいる。<ruby>近<rt>ちか</rt></ruby>づかれたら、<ruby>隠<rt>かく</rt></ruby>れて<ruby>興味<rt>きょうみ</rt></ruby>をなくすのを<ruby>待<rt>ま</rt></ruby>とう。<ruby>見<rt>み</rt></ruby>つけたら、<ruby>近<rt>ちか</rt></ruby>づいてそっとタップしてみて。</p>
+        <div class="muenba-lobby-actions">
+          <button id="muenba-lobby-begin" type="button">Let's begin</button>
+        </div>
+      </div>`;
+    lobbyOverlay.querySelector('#muenba-lobby-begin').addEventListener('click', renderNuppiCaseBoard);
+    focusLobbyControl('#muenba-lobby-begin');
+  }
+
+  function renderNuppiCaseBoard() {
+    if (!lobbyOverlay) return;
+    lobbyOverlay.innerHTML = `
+      <div class="muenba-lobby-box is-case-board">
+        <img class="muenba-lobby-portrait" src="assets/img/wanderers/nuppi-2.png" alt="Nuppi">
+        <div class="muenba-case-board-eyebrow">CASE DESK / NUPPI</div>
+        <h2>Nuppi's case board</h2>
+        <p class="jp">ヌッピの<ruby>事件<rt>じけん</rt></ruby>ボード</p>
+        <section class="muenba-lobby-case-board" aria-labelledby="muenba-case-board-title">
+          <h3 id="muenba-case-board-title"></h3>
+          <p id="muenba-case-board-copy" class="muenba-case-board-copy"></p>
+          <p id="muenba-case-board-jp" class="muenba-case-direction-jp"></p>
+        </section>
+        <div class="muenba-lobby-actions">
+          <button id="muenba-case-board-start" type="button">Start</button>
+        </div>
+      </div>`;
+    refreshNuppiCaseBoard();
+    lobbyOverlay.querySelector('#muenba-case-board-start').addEventListener('click', () => {
+      closeNuppiLobby();
+      if (readMuenba().orbsPending > 0) openPendingOrbRecovery();
+    });
+    focusLobbyControl('#muenba-case-board-start');
+  }
+
+  function focusLobbyControl(selector) {
+    window.setTimeout(() => {
+      const control = lobbyOverlay && lobbyOverlay.querySelector(selector);
+      if (control && typeof control.focus === 'function') control.focus();
+    }, 0);
+  }
+
   function refreshNuppiCaseBoard() {
     if (!lobbyOverlay) return;
+    const title = lobbyOverlay.querySelector('#muenba-case-board-title');
     const copy = lobbyOverlay.querySelector('#muenba-case-board-copy');
     const jp = lobbyOverlay.querySelector('#muenba-case-board-jp');
-    if (!copy || !jp) return;
+    if (!title || !copy || !jp) return;
     const next = nextMuenbaCase();
     if (next) {
       const ghost = (DATA.ghosts || []).find(candidate => candidate.id === next.ghostId);
       const ghostName = ghost ? ghost.name : next.ghostId;
-      copy.textContent = `Case ready: ${next.title}. Find ${ghostName} and untangle its energy.`;
+      title.textContent = next.title;
+      copy.textContent = `Case ready. Find ${ghostName} and untangle its energy.`;
       jp.innerHTML = '<ruby>事件<rt>じけん</rt></ruby>の<ruby>準備<rt>じゅんび</rt></ruby>ができたよ。<ruby>幽霊<rt>ゆうれい</rt></ruby>を<ruby>探<rt>さが</rt></ruby>して、エネルギーを<ruby>解<rt>と</rt></ruby>こう。';
     } else {
-      copy.textContent = 'The case board is quiet. Nuppi is waiting for the next strange ghost.';
+      title.textContent = 'The case board is quiet.';
+      copy.textContent = 'Nuppi is waiting for the next strange ghost.';
       jp.innerHTML = '<ruby>事件<rt>じけん</rt></ruby>ボードは<ruby>静<rt>しず</rt></ruby>かだよ。<ruby>次<rt>つぎ</rt></ruby>の<ruby>変<rt>へん</rt></ruby>な<ruby>幽霊<rt>ゆうれい</rt></ruby>を<ruby>待<rt>ま</rt></ruby>っているよ。';
     }
   }
@@ -2367,6 +2405,7 @@
     lobbyOpen = true;
     state.clickTarget = null;
     state.moving = false;
+    renderNuppiWelcome();
     refreshNuppiCaseBoard();
     lobbyOverlay.classList.add('open');
   }
