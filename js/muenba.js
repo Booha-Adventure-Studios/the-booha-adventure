@@ -579,16 +579,26 @@
     music.volume = MUENBA_MUSIC_VOLUME;
   }
 
+  let dangerRhythmPlayToken = 0;
   function startDangerRhythmMusic() {
     stopDangerScream();
     pauseWorldMusicForCapture();
+    const token = ++dangerRhythmPlayToken;
     try {
       dangerRhythmMusic.currentTime = 0;
-      dangerRhythmMusic.play().catch(() => {});
+      const playResult = dangerRhythmMusic.play();
+      if (playResult && typeof playResult.then === 'function') {
+        playResult.catch(() => {}).then(() => {
+          if (token !== dangerRhythmPlayToken) {
+            try { dangerRhythmMusic.pause(); } catch (_) {}
+          }
+        });
+      }
     } catch (_) {}
   }
 
   function stopDangerRhythmMusic() {
+    dangerRhythmPlayToken++;
     try {
       dangerRhythmMusic.pause();
       dangerRhythmMusic.currentTime = 0;
@@ -605,6 +615,8 @@
     state.returnExiting = true;
     state.clickTarget = null;
     state.moving = false;
+    stopDangerScream();
+    stopDangerRhythmMusic();
     try { music.pause(); } catch (_) {}
     fadeEl.style.transition = `opacity ${FADE_MS}ms ease-in`;
     fadeEl.style.opacity = '1';
