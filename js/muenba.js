@@ -134,6 +134,30 @@
   const DANGER_RHYTHM_PERFECT_MS = 80;
   const DANGER_RHYTHM_GOOD_MS = 170;
   const DANGER_RHYTHM_PASS_ACCURACY = 60;
+  // Pass 4 — carrying energy turns a danger encounter into the return
+  // journey's super-danger chart: faster, four lanes, and decoy notes.
+  const SUPER_DANGER_RHYTHM_CHART = [
+    { lane: 'don', beat: 0 },
+    { lane: 'kat', beat: 1 },
+    { lane: 'rim', beat: 2 },
+    { lane: 'bell', beat: 3, decoy: true, shape: 'spiral' },
+    { lane: 'bell', beat: 3 },
+    { lane: 'don', beat: 4 },
+    { lane: 'rim', beat: 5 },
+    { lane: 'kat', beat: 6, decoy: true, shape: 'skull' },
+    { lane: 'kat', beat: 6 },
+    { lane: 'bell', beat: 7 },
+    { lane: 'don', beat: 8 },
+    { lane: 'rim', beat: 9 },
+    { lane: 'kat', beat: 10 },
+    { lane: 'bell', beat: 11 }
+  ];
+  const SUPER_DANGER_RHYTHM_BPM = 180;
+  const SUPER_DANGER_RHYTHM_COUNTDOWN_MS = 800;
+  const SUPER_DANGER_RHYTHM_TRAVEL_MS = 560;
+  const SUPER_DANGER_RHYTHM_PERFECT_MS = 58;
+  const SUPER_DANGER_RHYTHM_GOOD_MS = 122;
+  const SUPER_DANGER_RHYTHM_PASS_ACCURACY = 65;
 
   const RHYTHM_LANE_DEFS = [
     { id: 'don', label: 'DON / ドン', key: 'A', shape: 'circle' },
@@ -1322,16 +1346,18 @@
     activeGhost = null;
     const encounterRole = ghostRoleFor(ghost);
     const encounterRules = ghostRulesFor(ghost);
+    const carryingEnergy = Number(readMuenba().orbsPending) > 0;
     captureSession = {
       ghost,
       encounterRole,
-      dangerMode: encounterRole === 'jerk' ? 'jerk' : 'main',
+      dangerMode: carryingEnergy ? 'carried-energy' : encounterRole === 'jerk' ? 'jerk' : 'main',
+      carryingEnergy,
       caseData: null,
       caseDifficulty: null,
       caseIndex: 0,
       caseResolved: false,
       danger: true,
-      dangerCanHide: allowHide === true && encounterRules.dangerCanHide === true,
+      dangerCanHide: !carryingEnergy && allowHide === true && encounterRules.dangerCanHide === true,
       phase: 'danger-ready',
       openedAt: performance.now()
     };
@@ -2042,19 +2068,20 @@
   function dangerRhythmConfigFor(difficulty) {
     const encounterRole = captureSession?.encounterRole || ghostRoleFor(captureSession?.ghost);
     const encounterRules = ghostRulesFor(encounterRole);
+    const carryingEnergy = captureSession?.carryingEnergy === true;
     return {
-      chart: difficulty.dangerChart,
-      noteMs: 60000 / difficulty.dangerBpm,
-      countdownMs: DANGER_RHYTHM_COUNTDOWN_MS,
-      travelMs: difficulty.dangerTravelMs,
-      perfectMs: difficulty.dangerPerfectMs,
-      goodMs: difficulty.dangerGoodMs,
-      passAccuracy: DANGER_RHYTHM_PASS_ACCURACY,
-      lanes: ['don', 'kat'],
+      chart: carryingEnergy ? SUPER_DANGER_RHYTHM_CHART : difficulty.dangerChart,
+      noteMs: carryingEnergy ? 60000 / SUPER_DANGER_RHYTHM_BPM : 60000 / difficulty.dangerBpm,
+      countdownMs: carryingEnergy ? SUPER_DANGER_RHYTHM_COUNTDOWN_MS : DANGER_RHYTHM_COUNTDOWN_MS,
+      travelMs: carryingEnergy ? SUPER_DANGER_RHYTHM_TRAVEL_MS : difficulty.dangerTravelMs,
+      perfectMs: carryingEnergy ? SUPER_DANGER_RHYTHM_PERFECT_MS : difficulty.dangerPerfectMs,
+      goodMs: carryingEnergy ? SUPER_DANGER_RHYTHM_GOOD_MS : difficulty.dangerGoodMs,
+      passAccuracy: carryingEnergy ? SUPER_DANGER_RHYTHM_PASS_ACCURACY : DANGER_RHYTHM_PASS_ACCURACY,
+      lanes: carryingEnergy ? ['don', 'kat', 'rim', 'bell'] : ['don', 'kat'],
       difficultyTier: difficulty.tierIndex,
       difficultyLabel: difficulty.label,
       dangerMode: captureSession?.dangerMode || (encounterRole === 'jerk' ? 'jerk' : 'main'),
-      dangerCanHide: captureSession?.dangerCanHide === true && encounterRules.dangerCanHide === true
+      dangerCanHide: !carryingEnergy && captureSession?.dangerCanHide === true && encounterRules.dangerCanHide === true
     };
   }
 
@@ -2570,6 +2597,42 @@
     } catch (_) {}
   }
 
+  function loseCarriedEnergyAndMarkRestart() {
+    if (!captureSession || captureSession.carryingEnergy !== true) return false;
+    const d = loadSave();
+    if (!d.muenba || typeof d.muenba !== 'object') d.muenba = {};
+    const mu = d.muenba;
+    const lost = Math.max(0, Number(mu.orbsPending) || 0);
+    mu.orbsPending = 0;
+    if (!writeSave(d)) return false;
+    captureSession.carriedEnergyLost = true;
+    captureSession.lostOrbCount = lost;
+    setReturnToNuppiPending(false);
+    dismissDangerGhost();
+    return true;
+  }
+
+  function restartHuntAfterCarriedEnergyLoss() {
+    if (!captureSession || captureSession.carriedEnergyLost !== true) return;
+    stopRhythmCapture();
+    stopDangerScream();
+    stopDangerRhythmMusic();
+    captureOpen = false;
+    state.captureResolving = false;
+    state.hiding = false;
+    state.clickTarget = null;
+    state.moving = false;
+    setDangerOverlay(false);
+    if (captureOverlay) captureOverlay.classList.remove('open');
+    captureSession = null;
+    if (hideBtn) {
+      hideBtn.classList.remove('active');
+      setHideButtonLabel(false);
+    }
+    spawnRoomGhost(state.roomId);
+    resumeWorldMusicAfterCapture();
+  }
+
   function finishRhythmCapture() {
     if (!captureSession || !captureSession.rhythm) return;
     const rhythm = captureSession.rhythm;
@@ -2600,6 +2663,9 @@
     // for a ghost that was never legitimately hunted.
     if (captureSession.danger) {
       captureSession.phase = 'result';
+      if (!success && captureSession.carryingEnergy === true) {
+        loseCarriedEnergyAndMarkRestart();
+      }
       if (success) dismissDangerGhost();
       renderRhythmResult(accuracy, success);
       return;
@@ -2777,6 +2843,7 @@
     const ghost = captureSession.ghost;
     const p = document.createElement('p');
     const danger = !!captureSession.danger;
+    const carriedEnergyLost = danger && captureSession.carriedEnergyLost === true;
     const noNewEnergy = !danger && captureSession.noNewEnergy === true;
     setDangerOverlay(danger);
     const box = captureBox();
@@ -2787,7 +2854,9 @@
     captureImage(box, ghost, danger ? ANGRY_CHANGE_IMG : ghost.img);
 
     const h2 = document.createElement('h2');
-    h2.textContent = noNewEnergy
+    h2.textContent = carriedEnergyLost
+      ? 'The orbs are lost'
+      : noNewEnergy
       ? 'Hunt complete'
       : danger
       ? (success ? 'The ghost flees' : 'The ghost broke through')
@@ -2795,7 +2864,9 @@
     box.appendChild(h2);
     const jp = document.createElement('p');
     jp.className = 'jp';
-    jp.textContent = noNewEnergy
+    jp.textContent = carriedEnergyLost
+      ? 'オーブを<ruby>失<rt>うしな</rt></ruby>った'
+      : noNewEnergy
       ? '探索完了'
       : danger
       ? (success ? '幽霊は逃げた' : 'まだ危険')
@@ -2806,7 +2877,9 @@
     // caught Booha — it was never his hunt target, so this never leads to
     // a capture reward (see finishRhythmCapture()/dismissDangerGhost()).
     const dangerCanHide = danger && captureSession.dangerCanHide === true;
-    p.textContent = message || (noNewEnergy
+    p.textContent = message || (carriedEnergyLost
+      ? 'The angry ghosts took the energy orbs. Your hunt starts again.'
+      : noNewEnergy
       ? 'The energy for this hunt is already safe.'
       : danger
       ? `Accuracy: ${accuracy}%. ${success ? 'The angry ghost lost its nerve and slipped away. It will not bother you again for now.' : dangerCanHide ? 'The angry ghost knocked Booha back. Hide, try again, or give up and retreat to Nuppi.' : 'The angry ghost knocked Booha back. Try the danger rhythm again, or give up and retreat to Nuppi.'}`
@@ -2822,12 +2895,16 @@
 
     renderCaseDirection(
       box,
-      noNewEnergy
+      carriedEnergyLost
+        ? 'The orbs are gone. Start the hunt again and find the next ghost.'
+        : noNewEnergy
         ? 'The ghost is gone for now. Continue exploring.'
         : danger
         ? (success ? 'The ghost is gone for now. Continue exploring.' : dangerCanHide ? 'Hide, try the danger rhythm again, or give up and retreat to Nuppi.' : 'Try the danger rhythm again, or give up and retreat to Nuppi.')
         : (success ? 'The capture is ready for the reward step.' : 'The ghost is still waiting. Try the rhythm again.'),
-      noNewEnergy
+      carriedEnergyLost
+        ? '<ruby>オーブ</ruby>はなくなりました。もう<ruby>一度<rt>いちど</rt></ruby><ruby>探索<rt>たんさく</rt></ruby>を<ruby>始<rt>はじ</rt></ruby>めて、<ruby>次<rt>つぎ</rt></ruby>の<ruby>幽霊<rt>ゆうれい</rt></ruby>を<ruby>見<rt>み</rt></ruby>つけましょう。'
+        : noNewEnergy
         ? 'エネルギーはもう<ruby>安全<rt>あんぜん</rt></ruby>です。<ruby>探索<rt>たんさく</rt></ruby>を<ruby>続<rt>つづ</rt></ruby>けましょう。'
         : danger
         ? (success
@@ -2843,7 +2920,9 @@
     const actions = document.createElement('div');
     actions.className = 'muenba-lobby-actions';
     if (danger) {
-      if (success) {
+      if (carriedEnergyLost) {
+        actions.appendChild(captureButton('Start hunt again', '<ruby>探索<rt>たんさく</rt></ruby>をもう<ruby>一度<rt>いちど</rt></ruby>', 'muenba-danger-restart', restartHuntAfterCarriedEnergyLoss));
+      } else if (success) {
         actions.appendChild(captureButton('Continue exploring', '<ruby>探索<rt>たんさく</rt></ruby>を<ruby>続<rt>つづ</rt></ruby>ける', 'muenba-danger-continue', closeDangerEncounter));
       } else {
         actions.appendChild(captureButton('Try danger rhythm again', 'もう<ruby>一度<rt>いちど</rt></ruby><ruby>危険<rt>きけん</rt></ruby>なリズムに<ruby>挑<rt>いど</rt></ruby>む', 'muenba-danger-retry', retryDangerRhythm));
