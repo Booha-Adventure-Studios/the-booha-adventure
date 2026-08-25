@@ -1390,11 +1390,11 @@
 
     const eyebrow = document.createElement('div');
     eyebrow.className = 'muenba-case-eyebrow muenba-danger-eyebrow';
-    eyebrow.textContent = 'DANGER ENCOUNTER';
+    eyebrow.textContent = 'DANGER';
     box.appendChild(eyebrow);
     const eyebrowJp = document.createElement('p');
     eyebrowJp.className = 'muenba-case-eyebrow-jp';
-    eyebrowJp.innerHTML = '<ruby>危険<rt>きけん</rt></ruby>な<ruby>出会<rt>であ</rt></ruby>い';
+    eyebrowJp.innerHTML = '<ruby>危険<rt>きけん</rt></ruby>';
     box.appendChild(eyebrowJp);
 
     const h2 = document.createElement('h2');
@@ -1987,11 +1987,11 @@
 
     const eyebrow = document.createElement('div');
     eyebrow.className = 'muenba-case-eyebrow';
-    eyebrow.textContent = 'CASE SETTLED';
+    eyebrow.textContent = 'CASE FILE';
     box.appendChild(eyebrow);
     const eyebrowJp = document.createElement('p');
     eyebrowJp.className = 'muenba-case-eyebrow-jp';
-    eyebrowJp.innerHTML = '<ruby>事件<rt>じけん</rt></ruby><ruby>解決<rt>かいけつ</rt></ruby>';
+    eyebrowJp.innerHTML = '<ruby>事件<rt>じけん</rt></ruby>ファイル';
     box.appendChild(eyebrowJp);
 
     const h2 = document.createElement('h2');
@@ -2044,7 +2044,7 @@
 
     const phase = document.createElement('div');
     phase.className = 'muenba-capture-phase-label';
-    phase.textContent = 'CAPTURE PHASE';
+    phase.textContent = 'HUNT';
     box.appendChild(phase);
     const h2 = document.createElement('h2');
     h2.textContent = 'Capture ready';
@@ -2283,11 +2283,11 @@
 
     const eyebrow = document.createElement('div');
     eyebrow.className = 'muenba-case-board-eyebrow';
-    eyebrow.textContent = 'RHYTHM GUIDE';
+    eyebrow.textContent = 'HUNT';
     box.appendChild(eyebrow);
     const eyebrowJp = document.createElement('p');
     eyebrowJp.className = 'jp';
-    eyebrowJp.textContent = 'リズムガイド';
+    eyebrowJp.innerHTML = '<ruby>探索<rt>たんさく</rt></ruby>';
     box.appendChild(eyebrowJp);
 
     const h2 = document.createElement('h2');
@@ -3029,7 +3029,7 @@
 
     const phase = document.createElement('div');
     phase.className = 'muenba-capture-phase-label';
-    phase.textContent = 'ENERGY RELEASE';
+    phase.textContent = 'HUNT';
     box.appendChild(phase);
     const h2 = document.createElement('h2');
     h2.textContent = 'Captured!';
@@ -4710,8 +4710,8 @@
     lobbyOverlay.innerHTML = `
       <div class="muenba-lobby-box muenba-nuppi-scene muenba-nuppi-welcome">
         <img class="muenba-lobby-portrait" src="assets/img/wanderers/nuppi-2.png" alt="Nuppi">
-        <div class="muenba-nuppi-kicker">MUENBA / NUPPI'S MESSAGE</div>
-        <p class="jp muenba-nuppi-kicker-jp">ヌーピーのメッセージ</p>
+        <div class="muenba-nuppi-kicker">NUPPI TALK</div>
+        <p class="jp muenba-nuppi-kicker-jp">ヌーピーと<ruby>話<rt>はな</rt></ruby>す</p>
         <div class="muenba-nuppi-nameplate"><h2>Nuppi</h2><span>ヌーピー</span></div>
         <section class="muenba-nuppi-speech" aria-labelledby="muenba-welcome-speech-title">
           <div id="muenba-welcome-speech-title" class="muenba-nuppi-speech-label">NUPPI SAYS</div>
@@ -4739,13 +4739,13 @@
     lobbyOverlay.innerHTML = `
       <div class="muenba-lobby-box is-case-board muenba-nuppi-scene muenba-nuppi-case-board">
         <img class="muenba-lobby-portrait" src="assets/img/wanderers/nuppi-2.png" alt="Nuppi">
-        <div class="muenba-nuppi-kicker">NUPPI'S CASE DESK</div>
-        <p class="jp muenba-nuppi-kicker-jp">ヌーピーの<ruby>事件<rt>じけん</rt></ruby>デスク</p>
-        <div class="muenba-case-board-eyebrow">CASE DESK / NUPPI</div>
-        <p class="jp muenba-case-board-eyebrow-jp"><ruby>事件<rt>じけん</rt></ruby><ruby>受付<rt>うけつけ</rt></ruby> / ヌーピー</p>
+        <div class="muenba-nuppi-kicker">NUPPI TALK</div>
+        <p class="jp muenba-nuppi-kicker-jp">ヌーピーと<ruby>話<rt>はな</rt></ruby>す</p>
+        <div class="muenba-case-board-eyebrow">CASE FILE</div>
+        <p class="jp muenba-case-board-eyebrow-jp"><ruby>事件<rt>じけん</rt></ruby>ファイル</p>
         <div class="muenba-nuppi-nameplate"><h2>Nuppi's case board</h2><span>ヌーピーの<ruby>事件<rt>じけん</rt></ruby>ボード</span></div>
         <section class="muenba-lobby-case-board" aria-labelledby="muenba-case-board-title">
-          <div class="muenba-nuppi-card-label">THE NEXT CASE</div>
+          <div class="muenba-nuppi-card-label">NEXT CASE</div>
           <h3 id="muenba-case-board-title"></h3>
           <p id="muenba-case-board-title-jp" class="muenba-case-direction-jp"></p>
           <p id="muenba-case-board-mode" class="muenba-case-board-mode"></p>
@@ -4774,8 +4774,10 @@
     const helperName = name ? ` Be careful, ${name}.` : ' Be careful.';
     lobbyOverlay.innerHTML = `
       <div class="muenba-lobby-box muenba-hunt-card">
-        <div class="muenba-hunt-target-eyebrow">YOUR HUNT TARGET</div>
-        <p class="jp muenba-hunt-target-eyebrow-jp">あなたの<ruby>目標<rt>もくひょう</rt></ruby></p>
+        <div class="muenba-nuppi-kicker">HUNT</div>
+        <p class="jp muenba-nuppi-kicker-jp"><ruby>探索<rt>たんさく</rt></ruby></p>
+        <div class="muenba-hunt-target-eyebrow">HUNT TARGET</div>
+        <p class="jp muenba-hunt-target-eyebrow-jp"><ruby>探索<rt>たんさく</rt></ruby>の<ruby>目標<rt>もくひょう</rt></ruby></p>
         ${ghost
           ? `<img class="muenba-hunt-ghost-portrait" src="${ghost.img}" alt="${ghostName}">`
           : '<div class="muenba-hunt-ghost-portrait" aria-hidden="true"></div>'}
@@ -4882,8 +4884,8 @@
     lobbyOverlay.innerHTML = `
       <div class="muenba-lobby-box muenba-room-nuppi-box muenba-nuppi-scene muenba-nuppi-waiting">
         <img class="muenba-lobby-portrait" src="assets/img/wanderers/nuppi-2.png" alt="Nuppi">
-        <div class="muenba-nuppi-kicker">ROOM 01 / NUPPI</div>
-        <p class="jp muenba-nuppi-kicker-jp">1<ruby>号室<rt>ごうしつ</rt></ruby> / ヌーピー</p>
+        <div class="muenba-nuppi-kicker">NUPPI TALK</div>
+        <p class="jp muenba-nuppi-kicker-jp">ヌーピーと<ruby>話<rt>はな</rt></ruby>す</p>
         <div class="muenba-nuppi-nameplate"><h2>Nuppi</h2><span>ヌーピー</span></div>
         <section class="muenba-nuppi-speech" aria-labelledby="muenba-waiting-speech-title">
           <div id="muenba-waiting-speech-title" class="muenba-nuppi-speech-label">NUPPI SAYS</div>
@@ -4891,7 +4893,7 @@
           <p class="jp-line">${copyJp}</p>
         </section>
         <section class="muenba-nuppi-status-card${pending ? ' is-ready' : ''}" aria-live="polite">
-          <div class="muenba-nuppi-card-label">${pending ? 'ENERGY HANDOFF READY' : waitingForCase ? 'WAITING AT THE START ROOM' : 'THE START ROOM'}</div>
+          <div class="muenba-nuppi-card-label">NUPPI STATUS</div>
           <p>${pending ? 'Your energy orbs are ready to return here.' : waitingForCase ? 'Finish the case, then bring the energy home.' : 'Nuppi will be here when you need him.'}</p>
         </section>
         <div class="muenba-lobby-actions">
@@ -4925,10 +4927,10 @@
     lobbyOverlay.innerHTML = `
       <div class="muenba-lobby-box muenba-handoff-box muenba-nuppi-scene muenba-nuppi-handoff">
         <img class="muenba-lobby-portrait" src="assets/img/wanderers/nuppi-2.png" alt="Nuppi">
-        <div class="muenba-nuppi-kicker">NUPPI RECEIVES THE ENERGY</div>
-        <p class="jp muenba-nuppi-kicker-jp">ヌーピーがエネルギーを<ruby>受<rt>う</rt></ruby>け<ruby>取<rt>と</rt></ruby>る</p>
-        <div class="muenba-case-board-eyebrow">ENERGY RETURNED</div>
-        <p class="jp muenba-case-board-eyebrow-jp">エネルギーが<ruby>戻<rt>もど</rt></ruby>った</p>
+        <div class="muenba-nuppi-kicker">NUPPI TALK</div>
+        <p class="jp muenba-nuppi-kicker-jp">ヌーピーと<ruby>話<rt>はな</rt></ruby>す</p>
+        <div class="muenba-case-board-eyebrow">HANDOFF COMPLETE</div>
+        <p class="jp muenba-case-board-eyebrow-jp"><ruby>受<rt>う</rt></ruby>け<ruby>渡<rt>わた</rt></ruby>し<ruby>完了<rt>かんりょう</rt></ruby></p>
         <div class="muenba-nuppi-nameplate"><h2>Thank you, Booha.</h2><span>ありがとう、ブーハー。</span></div>
         <section class="muenba-nuppi-success-card">
           <div class="muenba-nuppi-card-label">ENERGY SAFE</div>
