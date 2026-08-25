@@ -2539,6 +2539,16 @@
       return;
     }
 
+    // A legacy or malformed save should never create a fake "return to Nuppi"
+    // step with 0 / 0 orbs. The normal case-mode path now always rewards an
+    // unfinished memory lane, but this guard keeps older saves readable.
+    if (rewardCount <= 0) {
+      captureSession.phase = 'result';
+      captureSession.noNewEnergy = true;
+      renderRhythmResult(accuracy, true, 'The hunt is complete, but there is no new energy to return this week.');
+      return;
+    }
+
     captureSession.phase = 'reward';
     captureSession.reward = {
       total: rewardCount,
@@ -2615,26 +2625,31 @@
     }
 
     const caseData = captureSession.caseData;
-    if (caseData && captureSession.caseResolved && captureSession.caseDifficulty) {
+    const caseMode = caseData && captureSession.caseResolved && captureSession.caseDifficulty
+      ? (MUENBA_CASE_MODES.includes(captureSession.caseDifficulty) ? captureSession.caseDifficulty : 'fresh')
+      : null;
+    const previousRecord = caseData && mu.caseRecords[caseData.id] && typeof mu.caseRecords[caseData.id] === 'object'
+      ? mu.caseRecords[caseData.id]
+      : {};
+    const caseModeAlreadyComplete = !!(caseMode && (
+      previousRecord.completedModes?.[caseMode] === true
+      || (previousRecord.completed === true && previousRecord.difficulty === caseMode)
+    ));
+
+    if (caseData && caseMode) {
       const completedAt = Date.now();
-      const mode = MUENBA_CASE_MODES.includes(captureSession.caseDifficulty)
-        ? captureSession.caseDifficulty
-        : 'fresh';
-      const previousRecord = mu.caseRecords[caseData.id] && typeof mu.caseRecords[caseData.id] === 'object'
-        ? mu.caseRecords[caseData.id]
-        : {};
       const completedModes = previousRecord.completedModes && typeof previousRecord.completedModes === 'object' && !Array.isArray(previousRecord.completedModes)
         ? { ...previousRecord.completedModes }
         : (previousRecord.completed === true && MUENBA_CASE_MODES.includes(previousRecord.difficulty)
           ? { [previousRecord.difficulty]: true }
           : {});
-      completedModes[mode] = true;
+      completedModes[caseMode] = true;
       const allModesComplete = MUENBA_CASE_MODES.every(memoryMode => completedModes[memoryMode] === true);
       mu.caseRecords[caseData.id] = {
         completed: allModesComplete,
         completedModes,
         ghostId: caseData.ghostId,
-        difficulty: mode,
+        difficulty: caseMode,
         completedAt
       };
       if (!mu.caseProgress || typeof mu.caseProgress !== 'object') {
@@ -2661,7 +2676,13 @@
     // This counter is deliberately permanent. Weekly ghost availability may
     // reset, but every successful capture makes future rhythm charts harder.
     mu.rhythm.capturesCompleted += 1;
-    const rewardCount = isNewWeeklyCapture ? ORB_REWARD_PER_CAPTURE : 0;
+    // A case can legitimately return in another memory lane during the same
+    // week. That is a new energy hunt even though weeklyGhostsFound already
+    // contains the ghost id. Reward each unfinished case mode once, while
+    // preserving the ordinary weekly reward for non-case ghost captures.
+    const rewardCount = caseMode && !caseModeAlreadyComplete
+      ? ORB_REWARD_PER_CAPTURE
+      : (isNewWeeklyCapture ? ORB_REWARD_PER_CAPTURE : 0);
     mu.orbsPending += rewardCount;
     if (!writeSave(d)) return null;
 
@@ -2677,6 +2698,7 @@
     const ghost = captureSession.ghost;
     const p = document.createElement('p');
     const danger = !!captureSession.danger;
+    const noNewEnergy = !danger && captureSession.noNewEnergy === true;
     setDangerOverlay(danger);
     const box = captureBox();
     box.classList.add('muenba-rhythm-halloween-box');
@@ -2685,13 +2707,17 @@
     captureImage(box, ghost, danger ? ANGRY_CHANGE_IMG : ghost.img);
 
     const h2 = document.createElement('h2');
-    h2.textContent = danger
+    h2.textContent = noNewEnergy
+      ? 'Hunt complete'
+      : danger
       ? (success ? 'The ghost flees' : 'The ghost broke through')
       : (success ? 'Rhythm complete' : 'Try again');
     box.appendChild(h2);
     const jp = document.createElement('p');
     jp.className = 'jp';
-    jp.textContent = danger
+    jp.textContent = noNewEnergy
+      ? '探索完了'
+      : danger
       ? (success ? '幽霊は逃げた' : 'まだ危険')
       : (success ? 'リズム成功' : 'もう一度');
     box.appendChild(jp);
@@ -2700,7 +2726,9 @@
     // caught Booha — it was never his hunt target, so this never leads to
     // a capture reward (see finishRhythmCapture()/dismissDangerGhost()).
     const dangerCanHide = danger && captureSession.dangerCanHide === true;
-    p.textContent = message || (danger
+    p.textContent = message || (noNewEnergy
+      ? 'The energy for this hunt is already safe.'
+      : danger
       ? `Accuracy: ${accuracy}%. ${success ? 'The angry ghost lost its nerve and slipped away. It will not bother you again for now.' : dangerCanHide ? 'The angry ghost knocked Booha back. Hide, try again, or give up and retreat to Nuppi.' : 'The angry ghost knocked Booha back. Try the danger rhythm again, or give up and retreat to Nuppi.'}`
       : `Accuracy: ${accuracy}%. ${success ? 'The capture is ready for the reward step.' : 'The ghost is still waiting for you.'}`);
     box.appendChild(p);
@@ -2714,10 +2742,14 @@
 
     renderCaseDirection(
       box,
-      danger
+      noNewEnergy
+        ? 'The ghost is gone for now. Continue exploring.'
+        : danger
         ? (success ? 'The ghost is gone for now. Continue exploring.' : dangerCanHide ? 'Hide, try the danger rhythm again, or give up and retreat to Nuppi.' : 'Try the danger rhythm again, or give up and retreat to Nuppi.')
         : (success ? 'The capture is ready for the reward step.' : 'The ghost is still waiting. Try the rhythm again.'),
-      danger
+      noNewEnergy
+        ? 'エネルギーはもう<ruby>安全<rt>あんぜん</rt></ruby>です。<ruby>探索<rt>たんさく</rt></ruby>を<ruby>続<rt>つづ</rt></ruby>けましょう。'
+        : danger
         ? (success
           ? '<ruby>幽霊<rt>ゆうれい</rt></ruby>はいなくなりました。<ruby>探索<rt>たんさく</rt></ruby>を<ruby>続<rt>つづ</rt></ruby>けましょう。'
           : dangerCanHide
@@ -2741,7 +2773,7 @@
         actions.appendChild(captureButton('Give up and retreat', 'あきらめて<ruby>戻<rt>もど</rt></ruby>る', 'muenba-danger-giveup', giveUpDangerEncounter));
       }
     } else {
-      if (!success) actions.appendChild(captureButton('Try rhythm again', 'もう<ruby>一度<rt>いちど</rt></ruby>リズムに<ruby>挑<rt>いど</rt></ruby>む', 'muenba-capture-retry', retryRhythmCapture));
+      if (!success && !noNewEnergy) actions.appendChild(captureButton('Try rhythm again', 'もう<ruby>一度<rt>いちど</rt></ruby>リズムに<ruby>挑<rt>いど</rt></ruby>む', 'muenba-capture-retry', retryRhythmCapture));
       actions.appendChild(captureButton('Return to hunt', '<ruby>探索<rt>たんさく</rt></ruby>に<ruby>戻<rt>もど</rt></ruby>る', 'muenba-capture-cancel', cancelCaptureSession));
     }
     box.appendChild(actions);
