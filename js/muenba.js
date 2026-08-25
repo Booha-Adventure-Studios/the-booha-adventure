@@ -828,7 +828,7 @@
       dirty = true;
     }
     if (!['start', 'fresh', 'deep'].includes(mu.readingDifficulty)) {
-      mu.readingDifficulty = 'fresh';
+      mu.readingDifficulty = 'start';
       dirty = true;
     }
     if (!mu.caseProgress || typeof mu.caseProgress !== 'object') {
@@ -902,7 +902,7 @@
 
   function getMuenbaReadingDifficulty() {
     const difficulty = readMuenba().readingDifficulty;
-    return MUENBA_CASE_MODES.includes(difficulty) ? difficulty : 'fresh';
+    return MUENBA_CASE_MODES.includes(difficulty) ? difficulty : 'start';
   }
 
   function caseModeIsComplete(caseData, mode = getMuenbaReadingDifficulty()) {
@@ -1791,9 +1791,9 @@
 
     const selectedMode = ['start', 'fresh', 'deep'].includes(captureSession.caseDifficulty)
       ? captureSession.caseDifficulty
-      : 'fresh';
-    const selectedModeLabel = MUENBA_MEMORY_MODE_LABELS[selectedMode] || MUENBA_MEMORY_MODE_LABELS.fresh;
-    const selectedModeJP = MUENBA_MEMORY_MODE_JP[selectedMode] || MUENBA_MEMORY_MODE_JP.fresh;
+      : 'start';
+    const selectedModeLabel = MUENBA_MEMORY_MODE_LABELS[selectedMode] || MUENBA_MEMORY_MODE_LABELS.start;
+    const selectedModeJP = MUENBA_MEMORY_MODE_JP[selectedMode] || MUENBA_MEMORY_MODE_JP.start;
 
     renderCaseDirection(
       box,
@@ -1838,9 +1838,9 @@
 
     const modeLabel = document.createElement('div');
     modeLabel.className = 'muenba-case-mode-label';
-    modeLabel.textContent = MUENBA_MEMORY_MODE_LABELS[captureSession.caseDifficulty] || MUENBA_MEMORY_MODE_LABELS.fresh;
+    modeLabel.textContent = MUENBA_MEMORY_MODE_LABELS[captureSession.caseDifficulty] || MUENBA_MEMORY_MODE_LABELS.start;
     const modeJP = document.createElement('small');
-    modeJP.innerHTML = MUENBA_MEMORY_MODE_JP[captureSession.caseDifficulty] || MUENBA_MEMORY_MODE_JP.fresh;
+    modeJP.innerHTML = MUENBA_MEMORY_MODE_JP[captureSession.caseDifficulty] || MUENBA_MEMORY_MODE_JP.start;
     modeLabel.appendChild(modeJP);
     box.appendChild(modeLabel);
 
@@ -1905,9 +1905,9 @@
 
     const modeLabel = document.createElement('div');
     modeLabel.className = 'muenba-case-mode-label';
-    modeLabel.textContent = MUENBA_MEMORY_MODE_LABELS[captureSession.caseDifficulty] || MUENBA_MEMORY_MODE_LABELS.fresh;
+    modeLabel.textContent = MUENBA_MEMORY_MODE_LABELS[captureSession.caseDifficulty] || MUENBA_MEMORY_MODE_LABELS.start;
     const modeJP = document.createElement('small');
-    modeJP.innerHTML = MUENBA_MEMORY_MODE_JP[captureSession.caseDifficulty] || MUENBA_MEMORY_MODE_JP.fresh;
+    modeJP.innerHTML = MUENBA_MEMORY_MODE_JP[captureSession.caseDifficulty] || MUENBA_MEMORY_MODE_JP.start;
     modeLabel.appendChild(modeJP);
     box.appendChild(modeLabel);
 
@@ -2834,7 +2834,7 @@
 
     const caseData = captureSession.caseData;
     const caseMode = caseData && captureSession.caseResolved && captureSession.caseDifficulty
-      ? (MUENBA_CASE_MODES.includes(captureSession.caseDifficulty) ? captureSession.caseDifficulty : 'fresh')
+      ? (MUENBA_CASE_MODES.includes(captureSession.caseDifficulty) ? captureSession.caseDifficulty : 'start')
       : null;
     const previousRecord = caseData && mu.caseRecords[caseData.id] && typeof mu.caseRecords[caseData.id] === 'object'
       ? mu.caseRecords[caseData.id]
@@ -4771,6 +4771,9 @@
     const name = getPlayerFirstName();
     const ghost = nextNuppiHuntGhost();
     const ghostName = ghost ? ghost.name : 'the next ghost';
+    const ghostFindJp = ghost
+      ? `${ghost.kana}を<ruby>見<rt>み</rt></ruby>つけよう。`
+      : '<ruby>次<rt>つぎ</rt></ruby>の<ruby>幽霊<rt>ゆうれい</rt></ruby>を<ruby>探<rt>さが</rt></ruby>そう。';
     const helperName = name ? ` Be careful, ${name}.` : ' Be careful.';
     lobbyOverlay.innerHTML = `
       <div class="muenba-lobby-box muenba-hunt-card">
@@ -4782,7 +4785,7 @@
           ? `<img class="muenba-hunt-ghost-portrait" src="${ghost.img}" alt="${ghostName}">`
           : '<div class="muenba-hunt-ghost-portrait" aria-hidden="true"></div>'}
         <h2>${ghost ? `Find ${ghostName}` : 'No more ghosts this week'}</h2>
-        <p class="jp">${ghost ? ghost.kana : '<ruby>今週<rt>こんしゅう</rt></ruby>はもう<ruby>幽霊<rt>ゆうれい</rt></ruby>がいません'}</p>
+        <p class="jp">${ghost ? ghostFindJp : '<ruby>今週<rt>こんしゅう</rt></ruby>はもう<ruby>幽霊<rt>ゆうれい</rt></ruby>がいません'}</p>
         <p class="muenba-hunt-helper">${ghost ? `Not all ghosts are friendly. Run away or hide from the angry ones.${helperName}` : 'You found every ghost available this week. They will return next week.'}</p>
         <p class="muenba-hunt-helper-jp">${ghost ? `すべての<ruby>幽霊<rt>ゆうれい</rt></ruby>が<ruby>友好的<rt>ゆうこうてき</rt></ruby>とは<ruby>限<rt>かぎ</rt></ruby>らない。<ruby>怒<rt>おこ</rt></ruby>った<ruby>幽霊<rt>ゆうれい</rt></ruby>からは<ruby>逃<rt>に</rt></ruby>げるか、<ruby>隠<rt>かく</rt></ruby>れよう。${name ? `${name}さん、` : ''}<ruby>気<rt>き</rt></ruby>をつけて。` : 'この<ruby>週<rt>しゅう</rt></ruby>に<ruby>見<rt>み</rt></ruby>つけられる<ruby>幽霊<rt>ゆうれい</rt></ruby>は<ruby>全部<rt>ぜんぶ</rt></ruby>です。<ruby>来週<rt>らいしゅう</rt></ruby>にまた<ruby>戻<rt>もど</rt></ruby>ってきます。'}</p>
         <div class="muenba-lobby-actions">
@@ -4821,8 +4824,8 @@
       // muenba-data.js), so its JP line stays empty on purpose.
       title.textContent = next.title;
       titleJp.textContent = '';
-      mode.textContent = MUENBA_MEMORY_MODE_LABELS[selectedMode] || MUENBA_MEMORY_MODE_LABELS.fresh;
-      modeJp.innerHTML = MUENBA_MEMORY_MODE_JP[selectedMode] || MUENBA_MEMORY_MODE_JP.fresh;
+      mode.textContent = MUENBA_MEMORY_MODE_LABELS[selectedMode] || MUENBA_MEMORY_MODE_LABELS.start;
+      modeJp.innerHTML = MUENBA_MEMORY_MODE_JP[selectedMode] || MUENBA_MEMORY_MODE_JP.start;
       copy.textContent = `Case ready. Find ${ghostName} and untangle its energy.`;
       jp.innerHTML = '<ruby>事件<rt>じけん</rt></ruby>の<ruby>準備<rt>じゅんび</rt></ruby>ができたよ。<ruby>幽霊<rt>ゆうれい</rt></ruby>を<ruby>探<rt>さが</rt></ruby>して、エネルギーを<ruby>解<rt>と</rt></ruby>こう。';
     } else {
@@ -4870,16 +4873,33 @@
     const name = getPlayerFirstName();
     const pending = Number(readMuenba().orbsPending) > 0;
     const waitingForCase = !pending && !!nextMuenbaCase();
-    const waitingLine = name ? `I'm waiting, ${name}.` : "I'm waiting.";
+    const waitingGhost = waitingForCase ? nextNuppiHuntGhost() : null;
+    const waitingGhostName = waitingGhost ? waitingGhost.name : 'the next ghost';
+    const waitingLine = name
+      ? `I'm waiting, ${name}. Find ${waitingGhostName}, then come back here.`
+      : `I'm waiting. Find ${waitingGhostName}, then come back here.`;
+    const waitingLineJp = waitingGhost
+      ? `${waitingGhost.kana}を<ruby>見<rt>み</rt></ruby>つけて、ここに<ruby>戻<rt>もど</rt></ruby>ってきてね。`
+      : '<ruby>次<rt>つぎ</rt></ruby>の<ruby>幽霊<rt>ゆうれい</rt></ruby>を<ruby>見<rt>み</rt></ruby>つけて、ここに<ruby>戻<rt>もど</rt></ruby>ってきてね。';
     const copy = pending
       ? 'The ghost energy is waiting here. Nuppi is ready for the handoff.'
       : waitingForCase
         ? waitingLine
         : 'Nuppi is here when you are ready.';
+    const statusCopy = pending
+      ? 'Your energy orbs are ready to return here.'
+      : waitingForCase
+        ? `Find ${waitingGhostName}, then bring the energy home.`
+        : 'Nuppi will be here when you need him.';
+    const statusCopyJp = pending
+      ? '<ruby>集<rt>あつ</rt></ruby>めたエネルギーオーブをここへ<ruby>返<rt>かえ</rt></ruby>せます。'
+      : waitingForCase
+        ? `${waitingGhost ? waitingGhost.kana : '幽霊'}を<ruby>見<rt>み</rt></ruby>つけて、エネルギーをここへ<ruby>持<rt>も</rt></ruby>ってきてね。`
+        : 'ヌーピーは<ruby>必要<rt>ひつよう</rt></ruby>なとき、ここにいるよ。';
     const copyJp = pending
       ? '<ruby>幽霊<rt>ゆうれい</rt></ruby>のエネルギーはここで<ruby>待<rt>ま</rt></ruby>っています。ヌーピーは<ruby>受<rt>う</rt></ruby>け<ruby>取<rt>と</rt></ruby>る<ruby>準備<rt>じゅんび</rt></ruby>ができています。'
-      : waitingForCase
-        ? '<ruby>待<rt>ま</rt></ruby>っているよ。'
+        : waitingForCase
+        ? waitingLineJp
         : 'ヌーピーはここで<ruby>待<rt>ま</rt></ruby>っているよ。';
     lobbyOverlay.innerHTML = `
       <div class="muenba-lobby-box muenba-room-nuppi-box muenba-nuppi-scene muenba-nuppi-waiting">
@@ -4894,7 +4914,8 @@
         </section>
         <section class="muenba-nuppi-status-card${pending ? ' is-ready' : ''}" aria-live="polite">
           <div class="muenba-nuppi-card-label">NUPPI STATUS</div>
-          <p>${pending ? 'Your energy orbs are ready to return here.' : waitingForCase ? 'Finish the case, then bring the energy home.' : 'Nuppi will be here when you need him.'}</p>
+          <p>${statusCopy}</p>
+          <p class="jp-line">${statusCopyJp}</p>
         </section>
         <div class="muenba-lobby-actions">
           ${pending ? '<button id="muenba-room-nuppi-handoff" class="muenba-capture-action" type="button"><span>Hand over energy</span><small>エネルギーを<ruby>渡<rt>わた</rt></ruby>す</small></button>' : ''}
