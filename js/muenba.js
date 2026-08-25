@@ -3716,13 +3716,16 @@
       .muenba-case-resolved .muenba-case-record { margin-top:20px !important; padding:18px; border-left-width:4px; border-color:#e6d278; background:linear-gradient(110deg,rgba(126,111,48,.22),rgba(216,201,139,.05)); color:#fff5d5 !important; font-size:1.05rem !important; line-height:1.64 !important; }
       .muenba-case-resolution-direction { margin-top:16px; border-color:rgba(156,224,193,.38); background:linear-gradient(145deg,rgba(52,104,78,.15),rgba(8,35,27,.28)); }
       .muenba-case-resolution-direction .muenba-case-direction-en { color:#e6f7ec; font-weight:700; }
+      .muenba-case-resolved .muenba-case-resolution-direction { border-color:rgba(241,215,141,.58); background:linear-gradient(145deg,rgba(126,111,48,.22),rgba(83,60,20,.16)); box-shadow:0 0 22px rgba(216,201,139,.14),inset 0 0 18px rgba(216,201,139,.04); }
+      .muenba-case-resolved .muenba-case-resolution-direction .muenba-case-direction-en { color:#fff2c7; text-shadow:0 0 12px rgba(255,224,102,.14); }
+      .muenba-case-resolved .muenba-case-resolution-direction .muenba-case-direction-jp { color:#d7c68f; }
       .muenba-capture-ready { border-color:rgba(170,150,255,.7); background:radial-gradient(circle at 50% 8%,rgba(116,46,168,.2),transparent 42%),linear-gradient(145deg,rgba(19,11,43,.97),rgba(6,13,25,.98)); box-shadow:0 24px 80px rgba(0,0,0,.86),0 0 65px rgba(111,66,210,.28),inset 0 0 55px rgba(49,205,154,.07); }
       .muenba-capture-ready .muenba-lobby-portrait { width:136px; height:136px; filter:drop-shadow(0 0 24px rgba(190,119,255,.42)) drop-shadow(0 0 36px rgba(39,255,145,.12)); }
       .muenba-capture-phase-label { margin:0 0 8px; color:#d8c98b; font:900 .65rem/1.4 ui-monospace,monospace; letter-spacing:.18em; text-align:center; text-transform:uppercase; text-shadow:0 0 14px rgba(216,201,139,.22); }
       .muenba-capture-ready .muenba-capture-phase-label { color:#c9baff; text-shadow:0 0 16px rgba(190,119,255,.3); }
       .muenba-capture-ready h2 { color:#f4e8ff; font-size:clamp(1.42rem,4vw,1.82rem); text-shadow:0 0 18px rgba(190,119,255,.3); }
-      .muenba-capture-ready .muenba-ghost-flavor { margin-top:16px !important; border-left-color:rgba(190,119,255,.75); background:rgba(116,46,168,.13); color:#f0e7ff !important; box-shadow:inset 0 0 18px rgba(190,119,255,.05); }
-      .muenba-capture-ready .muenba-ghost-flavor-jp { color:#c9baff !important; }
+      .muenba-capture-ready .muenba-ghost-flavor { margin-top:16px !important; border:1px solid rgba(241,181,82,.5); border-left:4px solid rgba(255,185,72,.9); border-radius:10px; background:linear-gradient(105deg,rgba(151,83,23,.3),rgba(83,47,18,.2)); color:#ffe6ad !important; box-shadow:0 0 20px rgba(255,145,45,.14),inset 0 0 18px rgba(255,185,72,.05); }
+      .muenba-capture-ready .muenba-ghost-flavor-jp { color:#e6c88e !important; }
       .muenba-capture-direction { border-color:rgba(170,150,255,.36); background:rgba(83,61,155,.12); }
       .muenba-capture-ready .muenba-capture-direction .muenba-case-direction-en { color:#f2edff; font-weight:700; }
       .muenba-capture-ready .muenba-capture-action { min-width:190px; padding:13px 30px; border-color:rgba(190,119,255,.78); background:rgba(116,46,168,.24); box-shadow:0 0 26px rgba(111,66,210,.32),inset 0 0 14px rgba(190,119,255,.08); }
