@@ -319,8 +319,6 @@
   let atmosphereCtx;
   let actorCtx;
   let fadeEl;
-  let devReadout;
-  let devHover = null;
   let currentBg;
   let vignetteCanvas;
   let fogTexture;
@@ -492,10 +490,8 @@
   ];
 
   function worldGateOpen() {
-    // Deliberately NOT the weekly world gate — Muenba is still being built,
-    // so it stays locked for real students no matter how many games they
-    // finish this week. Only the ?dev=1 URL / window.__devMuenba bypass, or
-    // BoohaUnlockSystem.isMuenbaUnlocked() once that flag ships, opens it.
+    // Muenba is live and follows the same weekly nine-game gate as Utsuroba.
+    // The explicit dev URL/bypass remains available for internal testing.
     if (DEV_MODE || window.__devMuenba) return true;
     return window.BoohaUnlockSystem &&
       typeof BoohaUnlockSystem.isMuenbaUnlocked === 'function'
@@ -520,7 +516,7 @@
       .muenba-lock a small{display:block;margin-top:2px;color:#9fc3af;font-size:.9em;}
     `;
     document.head.appendChild(style);
-    document.body.innerHTML = `<main class="muenba-lock" aria-labelledby="muenba-lock-title"><img src="assets/img/muenba/muenba_logo.png" alt="Muenba"><h1 id="muenba-lock-title">This world is locked</h1><p class="jp">この世界は封印されています</p><p>Something waits beyond the cemetery path.<small>This path isn't open yet.</small></p><p class="jp-line"><ruby>墓地<rt>ぼち</rt></ruby>の<ruby>道<rt>みち</rt></ruby>の<ruby>先<rt>さき</rt></ruby>で<ruby>何<rt>なに</rt></ruby>かが<ruby>待<rt>ま</rt></ruby>っている。<br><small>この<ruby>道<rt>みち</rt></ruby>はまだ<ruby>開<rt>ひら</rt></ruby>いていない。</small></p><a href="karasuki.html">Return to Karasuki<small>カラスキに<ruby>戻<rt>もど</rt></ruby>る</small></a></main>`;
+    document.body.innerHTML = `<main class="muenba-lock" aria-labelledby="muenba-lock-title"><img src="assets/img/muenba/muenba_logo.png" alt="Muenba"><h1 id="muenba-lock-title">This world is locked</h1><p class="jp">この世界は封印されています</p><p>Something waits beyond the cemetery path.<small>Complete nine lessons in one path this week before it will open to you.</small></p><p class="jp-line"><ruby>墓地<rt>ぼち</rt></ruby>の<ruby>道<rt>みち</rt></ruby>の<ruby>先<rt>さき</rt></ruby>で<ruby>何<rt>なに</rt></ruby>かが<ruby>待<rt>ま</rt></ruby>っている。<br><small>今週、ひとつの道で九つの学びを終えよ。それまで、ここは開かない。</small></p><a href="karasuki.html">Return to Karasuki<small>カラスキに<ruby>戻<rt>もど</rt></ruby>る</small></a></main>`;
   }
 
   function startMusic() {
@@ -3439,12 +3435,6 @@
       .muenba-rotate-title { font-family:system-ui,-apple-system,sans-serif; font-size:clamp(18px,5vw,28px); font-weight:900; letter-spacing:.04em; color:#f0fff7; margin:0; text-shadow:0 0 28px rgba(143,220,178,.52); }
       .muenba-rotate-sub { font-size:14px; color:rgba(216,244,230,.62); margin:0; line-height:1.7; }
       @media (prefers-reduced-motion: reduce) { .muenba-rotate-phone, .muenba-rotate-bar { animation:none; } }
-      #muenba-dev { position:fixed; left:12px; top:12px; z-index:100; display:${DEV_MODE ? 'block' : 'none'}; color:#bde5e4; background:rgba(0,8,12,.88); border:1px solid rgba(125,220,216,.35); border-radius:7px; padding:6px 8px; font:700 11px/1.35 ui-monospace,monospace; pointer-events:none; min-width:0; box-shadow:0 0 14px rgba(0,0,0,.4); }
-      #muenba-dev strong { color:#f0ffff; }
-      #muenba-dev-text { white-space:pre-line; }
-      #muenba-room-list { position:fixed; right:12px; bottom:12px; z-index:100; display:${DEV_MODE ? 'flex' : 'none'}; flex-wrap:wrap; justify-content:flex-end; gap:4px; max-width:330px; }
-      #muenba-room-list button { border:1px solid rgba(125,220,216,.35); border-radius:5px; background:rgba(0,8,12,.8); color:#bde5e4; padding:4px 6px; font:700 10px ui-monospace,monospace; cursor:pointer; }
-      #muenba-room-list button:hover { background:rgba(30,80,84,.8); }
       /* Return-to-Karasuki confirm popup — matches the locked-world screen's
          parchment-less, dark-cemetery styling so it reads as part of this
          world rather than a generic browser dialog. */
@@ -4028,23 +4018,6 @@
     celebrationStatus.setAttribute('aria-atomic', 'true');
     document.body.appendChild(celebrationStatus);
 
-    const dev = document.createElement('div');
-    dev.id = 'muenba-dev';
-    dev.innerHTML = '<strong>MUENBA DEV</strong><br><span id="muenba-dev-text"></span>';
-    document.body.appendChild(dev);
-    devReadout = document.getElementById('muenba-dev-text');
-
-    const roomList = document.createElement('div');
-    roomList.id = 'muenba-room-list';
-    for (let i = 1; i <= 15; i++) {
-      const roomId = `room_${String(i).padStart(2, '0')}`;
-      const button = document.createElement('button');
-      button.textContent = roomId.replace('room_', '#');
-      button.addEventListener('click', () => jumpToRoom(roomId));
-      roomList.appendChild(button);
-    }
-    document.body.appendChild(roomList);
-
     // Muenba is a landscape world like Karasuki and Utsuroba. In portrait,
     // cover-scaling would hide the side exits, so give the player a clear
     // orientation prompt instead of leaving a partially playable room.
@@ -4056,15 +4029,6 @@
     roomTintCtx = roomTintCanvas.getContext('2d');
     atmosphereCtx = atmosphereCanvas.getContext('2d');
     actorCtx = actorCanvas.getContext('2d');
-  }
-
-  function openDevRhythmTest() {
-    if (!DEV_MODE || captureOpen || lobbyOpen || returnPortalOpen) return;
-    const targetId = currentHuntGhostId();
-    const ghost = GHOSTS.find(candidate => candidate.id === targetId);
-    if (!ghost) return;
-    state.captureResolving = true;
-    beginCaptureSession(ghost);
   }
 
   function resizeCanvas() {
@@ -5308,12 +5272,6 @@
     drawGhost(now);
     drawBooha(now);
     drawDangerFlash(now);
-    if (DEV_MODE && devReadout) {
-      const mouse = devHover
-        ? `${Math.round(devHover.x)},${Math.round(devHover.y)}`
-        : '—,—';
-      devReadout.textContent = `${state.roomId}\nmouse: ${mouse}`;
-    }
   }
 
   function stagePoint(clientX, clientY) {
@@ -5366,20 +5324,8 @@
       handleInput(touch.clientX, touch.clientY);
       event.preventDefault();
     }, { passive: false });
-    stage.addEventListener('mousemove', event => {
-      if (!DEV_MODE || !devReadout) return;
-      const point = stagePoint(event.clientX, event.clientY);
-      devHover = point;
-    });
     document.addEventListener('click', startMusic, { once: true });
     document.addEventListener('touchend', startMusic, { once: true, passive: true });
-  }
-
-  function jumpToRoom(roomId) {
-    if (!DATA.rooms[roomId]) return;
-    state.transitioning = false;
-    fadeEl.style.opacity = '0';
-    setRoom(roomId, 'default', null);
   }
 
   function tick(now) {

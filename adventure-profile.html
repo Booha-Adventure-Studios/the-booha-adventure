@@ -1439,9 +1439,8 @@ document.addEventListener('booha:ready', () => {
 });
 </script>
 <script>
-  // Muenba's own build-readiness gate (BoohaUnlockSystem.isMuenbaUnlocked),
-  // not the shared weekly world gate — kept as its own small script so it
-  // doesn't have to thread through the render() function above.
+  // Muenba follows the live weekly output-world gate. Keep this as its own
+  // small script so it does not have to thread through render() above.
   (function () {
     var tab = document.getElementById('pnet-muenba');
     if (!tab) return;

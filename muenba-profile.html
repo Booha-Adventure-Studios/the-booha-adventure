@@ -227,8 +227,9 @@
 <body>
   <main class="page">
     <div class="topbar">
-      <a class="back-link" id="muenba-profile-back" href="muenba.html" hidden aria-label="Back to Muenba">← Muenba / むえんばへ</a>
+      <a class="back-link" id="muenba-profile-back" href="muenba.html?room=room_01&from=profile" hidden aria-label="Enter Muenba / むえんばへ">← Muenba / むえんばへ</a>
       <div class="case-label">MUENBA / GHOST LEDGER<br><ruby>幽霊<rt>ゆうれい</rt></ruby>の<ruby>記録<rt>きろく</rt></ruby></div>
+      <a class="back-link" id="muenba-profile-karasuki" href="karasuki.html?from=profile" hidden aria-label="Enter Karasuki / カラスキへ">Karasuki / カラスキへ →</a>
     </div>
 
     <nav class="profile-network" aria-label="Output profiles">
@@ -336,20 +337,19 @@
         </section>`;
       }
 
-      // Back link (and, later, the whole page's "come back here" affordance
-      // from within Muenba) uses the build-readiness gate, not the shared
-      // weekly world gate — Muenba stays its own lock until it's finished,
-      // per the decision in Pass 0.
+      // Both world arrows follow the same weekly gate as Utsuroba. They
+      // disappear again when the new week closes the output-world gate.
       function renderWorldBack() {
         const link = document.getElementById('muenba-profile-back');
-        if (!link) return;
         let open = false;
         try {
           open = !!(window.BoohaUnlockSystem &&
-            typeof BoohaUnlockSystem.isMuenbaUnlocked === 'function' &&
-            BoohaUnlockSystem.isMuenbaUnlocked());
+            typeof BoohaUnlockSystem.isWeeklyWorldGateOpen === 'function' &&
+            BoohaUnlockSystem.isWeeklyWorldGateOpen());
         } catch (_) {}
-        link.hidden = !open;
+        if (link) link.hidden = !open;
+        const karasukiLink = document.getElementById('muenba-profile-karasuki');
+        if (karasukiLink) karasukiLink.hidden = !open;
       }
 
       function render() {
