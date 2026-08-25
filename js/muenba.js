@@ -1197,7 +1197,10 @@
           );
           if (canMoveTo(pushed.x, pushed.y)) { state.x = pushed.x; state.y = pushed.y; }
           state.clickTarget = null;
-          beginDangerEncounter(g.ghost);
+          // A sight-angry ghost has already caught Booha, so the popup must
+          // force the danger rhythm. A quiet ghost that was provoked by a
+          // wrong click keeps the Hide escape in its popup.
+          beginDangerEncounter(g.ghost, { allowHide: g.screamReason === 'wrong-ghost' });
         }
         return;
       }
@@ -1262,7 +1265,7 @@
     beginCaptureSession(ghost);
   }
 
-  function beginDangerEncounter(ghost) {
+  function beginDangerEncounter(ghost, { allowHide = false } = {}) {
     if (!ghost || captureOpen || state.captureResolving) return;
     captureOpen = true;
     state.captureResolving = true;
@@ -1276,6 +1279,7 @@
       caseIndex: 0,
       caseResolved: false,
       danger: true,
+      dangerCanHide: allowHide === true,
       phase: 'danger-ready',
       openedAt: performance.now()
     };
@@ -1307,23 +1311,30 @@
     jp.textContent = '幽霊が怒っている';
     box.appendChild(jp);
 
+    const canHide = captureSession.dangerCanHide === true;
     renderCaseDirection(
       box,
-      'It touched Booha. Face the danger rhythm, or hide now and let it lose interest.',
-      '<ruby>幽霊<rt>ゆうれい</rt></ruby>がブーハーに<ruby>触<rt>ふ</rt></ruby>れました。<ruby>危険<rt>きけん</rt></ruby>なリズムに<ruby>挑<rt>いど</rt></ruby>むか、<ruby>今<rt>いま</rt></ruby>すぐ<ruby>隠<rt>かく</rt></ruby>れて<ruby>興味<rt>きょうみ</rt></ruby>をなくすのを<ruby>待<rt>ま</rt></ruby>ちましょう。'
+      canHide
+        ? 'It touched Booha. Face the danger rhythm, or hide now and let it lose interest.'
+        : 'It touched Booha. Face the danger rhythm. You cannot hide from this angry ghost.',
+      canHide
+        ? '<ruby>幽霊<rt>ゆうれい</rt></ruby>がブーハーに<ruby>触<rt>ふ</rt></ruby>れました。<ruby>危険<rt>きけん</rt></ruby>なリズムに<ruby>挑<rt>いど</rt></ruby>むか、<ruby>今<rt>いま</rt></ruby>すぐ<ruby>隠<rt>かく</rt></ruby>れて<ruby>興味<rt>きょうみ</rt></ruby>をなくすのを<ruby>待<rt>ま</rt></ruby>ちましょう。'
+        : '<ruby>幽霊<rt>ゆうれい</rt></ruby>がブーハーに<ruby>触<rt>ふ</rt></ruby>れました。<ruby>危険<rt>きけん</rt></ruby>なリズムに<ruby>挑<rt>いど</rt></ruby>みましょう。この<ruby>怒<rt>おこ</rt></ruby>った<ruby>幽霊<rt>ゆうれい</rt></ruby>からは<ruby>隠<rt>かく</rt></ruby>れられません。'
     );
 
     const actions = document.createElement('div');
     actions.className = 'muenba-lobby-actions';
     actions.appendChild(captureButton('Face the danger rhythm', '<ruby>危険<rt>きけん</rt></ruby>なリズムに<ruby>挑<rt>いど</rt></ruby>む', 'muenba-danger-begin', beginDangerRhythm));
-    actions.appendChild(captureButton('Hide now', '<ruby>今<rt>いま</rt></ruby>すぐ<ruby>隠<rt>かく</rt></ruby>れる', 'muenba-danger-hide', escapeDangerToHide));
+    if (canHide) {
+      actions.appendChild(captureButton('Hide now', '<ruby>今<rt>いま</rt></ruby>すぐ<ruby>隠<rt>かく</rt></ruby>れる', 'muenba-danger-hide', escapeDangerToHide));
+    }
     box.appendChild(actions);
     captureOverlay.classList.add('open');
     focusCaptureControl('#muenba-danger-begin');
   }
 
   function escapeDangerToHide() {
-    if (!captureSession || !captureSession.danger) return;
+    if (!captureSession || !captureSession.danger || captureSession.dangerCanHide !== true) return;
     stopRhythmCapture();
     stopDangerScream();
     stopDangerRhythmMusic();
@@ -2288,9 +2299,13 @@
 
     const actions = document.createElement('div');
     actions.className = 'muenba-lobby-actions';
-    actions.appendChild(danger
-      ? captureButton('Hide and escape', '<ruby>隠<rt>かく</rt></ruby>れて<ruby>逃<rt>に</rt></ruby>げる', 'muenba-danger-hide', escapeDangerToHide)
-      : captureButton('Cancel capture', '<ruby>捕獲<rt>ほかく</rt></ruby>をやめる', 'muenba-capture-cancel', cancelCaptureSession));
+    if (danger) {
+      if (captureSession.dangerCanHide === true) {
+        actions.appendChild(captureButton('Hide and escape', '<ruby>隠<rt>かく</rt></ruby>れて<ruby>逃<rt>に</rt></ruby>げる', 'muenba-danger-hide', escapeDangerToHide));
+      }
+    } else {
+      actions.appendChild(captureButton('Cancel capture', '<ruby>捕獲<rt>ほか</rt></ruby>をやめる', 'muenba-capture-cancel', cancelCaptureSession));
+    }
     box.appendChild(actions);
 
     captureOverlay.classList.add('open');
@@ -2684,8 +2699,9 @@
     // Pass 14: a danger win calms and sends away whichever hostile ghost
     // caught Booha — it was never his hunt target, so this never leads to
     // a capture reward (see finishRhythmCapture()/dismissDangerGhost()).
+    const dangerCanHide = danger && captureSession.dangerCanHide === true;
     p.textContent = message || (danger
-      ? `Accuracy: ${accuracy}%. ${success ? 'The angry ghost lost its nerve and slipped away. It will not bother you again for now.' : 'The angry ghost knocked Booha back. Hide, try again, or give up and retreat to Nuppi.'}`
+      ? `Accuracy: ${accuracy}%. ${success ? 'The angry ghost lost its nerve and slipped away. It will not bother you again for now.' : dangerCanHide ? 'The angry ghost knocked Booha back. Hide, try again, or give up and retreat to Nuppi.' : 'The angry ghost knocked Booha back. Try the danger rhythm again, or give up and retreat to Nuppi.'}`
       : `Accuracy: ${accuracy}%. ${success ? 'The capture is ready for the reward step.' : 'The ghost is still waiting for you.'}`);
     box.appendChild(p);
 
@@ -2699,12 +2715,14 @@
     renderCaseDirection(
       box,
       danger
-        ? (success ? 'The ghost is gone for now. Continue exploring.' : 'Hide, try the danger rhythm again, or give up and retreat to Nuppi.')
+        ? (success ? 'The ghost is gone for now. Continue exploring.' : dangerCanHide ? 'Hide, try the danger rhythm again, or give up and retreat to Nuppi.' : 'Try the danger rhythm again, or give up and retreat to Nuppi.')
         : (success ? 'The capture is ready for the reward step.' : 'The ghost is still waiting. Try the rhythm again.'),
       danger
         ? (success
           ? '<ruby>幽霊<rt>ゆうれい</rt></ruby>はいなくなりました。<ruby>探索<rt>たんさく</rt></ruby>を<ruby>続<rt>つづ</rt></ruby>けましょう。'
-          : '<ruby>隠<rt>かく</rt></ruby>れる、もう<ruby>一度<rt>いちど</rt></ruby><ruby>挑<rt>いど</rt></ruby>む、またはあきらめてヌーピーのところへ<ruby>戻<rt>もど</rt></ruby>ることができます。')
+          : dangerCanHide
+            ? '<ruby>隠<rt>かく</rt></ruby>れる、もう<ruby>一度<rt>いちど</rt></ruby><ruby>挑<rt>いど</rt></ruby>む、またはあきらめてヌーピーのところへ<ruby>戻<rt>もど</rt></ruby>ることができます。'
+            : 'もう<ruby>一度<rt>いちど</rt></ruby><ruby>危険<rt>きけん</rt></ruby>なリズムに<ruby>挑<rt>いど</rt></ruby>むか、あきらめてヌーピーのところへ<ruby>戻<rt>もど</rt></ruby>りましょう。')
         : (success
           ? '<ruby>捕<rt>つか</rt></ruby>まえる<ruby>準備<rt>じゅんび</rt></ruby>ができました。<ruby>次<rt>つぎ</rt></ruby>に<ruby>報酬<rt>ほうしゅう</rt></ruby>を<ruby>受<rt>う</rt></ruby>け<ruby>取<rt>と</rt></ruby>りましょう。'
           : '<ruby>幽霊<rt>ゆうれい</rt></ruby>はまだ<ruby>待<rt>ま</rt></ruby>っています。リズムをもう<ruby>一度<rt>いちど</rt></ruby><ruby>試<rt>ため</rt></ruby>しましょう。')
@@ -2717,7 +2735,9 @@
         actions.appendChild(captureButton('Continue exploring', '<ruby>探索<rt>たんさく</rt></ruby>を<ruby>続<rt>つづ</rt></ruby>ける', 'muenba-danger-continue', closeDangerEncounter));
       } else {
         actions.appendChild(captureButton('Try danger rhythm again', 'もう<ruby>一度<rt>いちど</rt></ruby><ruby>危険<rt>きけん</rt></ruby>なリズムに<ruby>挑<rt>いど</rt></ruby>む', 'muenba-danger-retry', retryDangerRhythm));
-        actions.appendChild(captureButton('Hide and escape', '<ruby>隠<rt>かく</rt></ruby>れて<ruby>逃<rt>に</rt></ruby>げる', 'muenba-danger-hide', escapeDangerToHide));
+        if (dangerCanHide) {
+          actions.appendChild(captureButton('Hide and escape', '<ruby>隠<rt>かく</rt></ruby>れて<ruby>逃<rt>に</rt></ruby>げる', 'muenba-danger-hide', escapeDangerToHide));
+        }
         actions.appendChild(captureButton('Give up and retreat', 'あきらめて<ruby>戻<rt>もど</rt></ruby>る', 'muenba-danger-giveup', giveUpDangerEncounter));
       }
     } else {
