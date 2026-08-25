@@ -10,6 +10,10 @@ const source = fs.readFileSync(path.join(__dirname, '..', 'js', 'muenba.js'), 'u
 assert(source.includes('const GHOST_NOTICE_DELAY_MS = 2000;'), 'sight-angry ghosts must wait exactly two seconds before screaming');
 assert(source.includes('const GHOST_CARRY_CHASE_SPEED = 1.35;'), 'carrying-energy chases must be only slightly faster');
 assert(source.includes("if (roleRules.alwaysAngry) return 'sight';"), 'jerk ghosts must use sight-triggered aggression');
+assert(source.includes('if (state.cemeteryAlert) return \'sight\';'), 'declining the next hint must leave every ghost sight-angry');
+assert(source.includes('state.cemeteryAlert = false;'), 'accepting the next hint must clear the cemetery alert');
+assert(source.includes("Would you like Nuppi's hint for another ghost?"), 'the handoff must ask about accepting a hint');
+assert(source.includes('state.cemeteryAlert = true;'), 'the no response must preserve the angry cemetery state');
 assert(source.includes('function dangerRhythmConfigFor(difficulty)'), 'danger encounters must have an explicit rhythm route');
 assert(source.includes('chart: carryingEnergy ? SUPER_DANGER_RHYTHM_CHART : difficulty.dangerChart,'), 'danger encounters must use the difficult danger chart');
 assert(source.includes("dangerMode: carryingEnergy ? 'carried-energy' : encounterRole === 'jerk' ? 'jerk' : 'main',"), 'danger encounters must preserve the carried-energy, jerk, or main route');
