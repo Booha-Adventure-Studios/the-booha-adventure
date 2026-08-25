@@ -3509,9 +3509,7 @@
         z-index:0;
         border:1px solid rgba(156,224,193,.1);
         border-radius:inherit;
-        background:
-          linear-gradient(90deg,transparent 0 9%,rgba(156,224,193,.12) 9.2%,transparent 9.45% 90.55%,rgba(241,215,141,.1) 90.8%,transparent 91%),
-          linear-gradient(180deg,rgba(156,224,193,.08),transparent 18%);
+        background:linear-gradient(180deg,rgba(156,224,193,.08),transparent 18%);
         content:"";
         pointer-events:none;
       }
