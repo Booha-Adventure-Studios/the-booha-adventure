@@ -275,75 +275,103 @@
       gap: clamp(8px, 1.8vw, 16px);
     }
 
+    .hubTitle {
+      position: relative;
+      display: flex; flex-direction: column; align-items: center;
+      padding: 6px 20px 2px;
+      opacity: 0; transform: translateY(10px) scale(.94);
+      animation: hubTitleIn 900ms cubic-bezier(.18,.9,.2,1.15) 80ms forwards;
+    }
+    @keyframes hubTitleIn {
+      0%   { opacity: 0; transform: translateY(10px) scale(.94); }
+      65%  { opacity: 1; transform: translateY(-2px) scale(1.015); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .hubTitle .sparkleField { inset: -30px -10px; }
+
     .hubHeading {
+      position: relative; z-index: 1;
       text-align: center;
       font-family: 'Bowlby One', system-ui, sans-serif;
       font-size: clamp(20px, 4.5vw, 48px);
       font-weight: 400;
       letter-spacing: 3px;
-      color: #fff;
-      text-shadow:
-        0 0 32px rgba(255,140,255,.65),
-        0 0 80px rgba(255,80,200,.3),
-        0 2px 8px rgba(0,0,0,.9);
       line-height: 1.1;
+      color: #fff;
+      background: linear-gradient(100deg,
+        #ffffff 0%, #ffe6fb 18%, #ffb8f0 32%, #ffffff 48%,
+        #ffd9a8 62%, #ffffff 78%, #ffffff 100%);
+      background-size: 260% 100%;
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: hubHeadingShimmer 6.5s linear infinite;
+      filter:
+        drop-shadow(0 0 26px rgba(255,140,255,.6))
+        drop-shadow(0 0 60px rgba(255,80,200,.28))
+        drop-shadow(0 2px 8px rgba(0,0,0,.9));
+    }
+    @keyframes hubHeadingShimmer {
+      0%   { background-position: 0% 50%; }
+      100% { background-position: -260% 50%; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .hubHeading { animation: none; background-position: 0% 50%; }
+    }
+
+    .hubHeadingJp {
+      position: relative; z-index: 1;
+      margin-top: 1px;
+      font-size: clamp(9px, 1.3vw, 13px);
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      color: rgba(255,225,250,.72);
+      text-shadow: 0 0 12px rgba(255,140,255,.35), 0 1px 4px rgba(0,0,0,.8);
     }
 
     .playerGreeting {
-  margin-top: -2px;
-  min-height: 34px;
-  padding: 7px 18px 8px;
-  border-radius: 999px;
+      margin-top: 2px;
+      min-height: 30px;
+      padding: 5px 18px 6px;
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
 
-  font-family: 'Bowlby One', system-ui, sans-serif;
-  font-size: clamp(13px, 2vw, 22px);
-  font-weight: 400;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  color: rgba(255,255,255,.96);
+      opacity: 0;
+      transform: translateY(8px) scale(.96);
+      transition:
+        opacity 420ms ease,
+        transform 520ms cubic-bezier(.18,.9,.2,1.2);
+    }
 
-  background: transparent;
-  border: none;
-  box-shadow: none;
+    .playerGreeting.show {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
 
-  text-shadow:
-    0 0 10px rgba(255,255,255,.85),
-    0 0 24px rgba(255,90,220,.70),
-    0 0 54px rgba(255,40,190,.45),
-    0 3px 10px rgba(0,0,0,.95);
+    .playerGreeting .greetingEn {
+      font-family: 'Bowlby One', system-ui, sans-serif;
+      font-size: clamp(13px, 2vw, 22px);
+      font-weight: 400;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.96);
+      text-shadow:
+        0 0 10px rgba(255,255,255,.85),
+        0 0 24px rgba(255,90,220,.70),
+        0 0 54px rgba(255,40,190,.45),
+        0 3px 10px rgba(0,0,0,.95);
+    }
 
-  opacity: 0;
-  transform: translateY(8px) scale(.96);
-  transition:
-    opacity 420ms ease,
-    transform 520ms cubic-bezier(.18,.9,.2,1.2);
-}
+    .playerGreeting .greetName {
+      color: inherit;
+      text-shadow: inherit;
+    }
 
-.playerGreeting.show {
-  opacity: 1;
-  transform: translateY(0) scale(1);
-}
-
-.playerGreeting .greetName {
-  color: #ffffff;
-  text-shadow:
-  0 0 8px rgba(255,255,255,.95),
-  0 0 22px rgba(255,255,255,.60),
-  0 0 54px rgba(255,255,255,.30);
-}
-
-.playerGreeting .cursor {
-  display: inline-block;
-  width: .55em;
-  margin-left: 3px;
-  color: #ff8ee8;
-  animation: greetBlink .75s steps(2,end) infinite;
-}
-
-@keyframes greetBlink {
-  0%, 45% { opacity: 1; }
-  46%, 100% { opacity: 0; }
-}
+    .playerGreeting .greetingJp {
+      font-size: clamp(9px, 1.2vw, 12px);
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: rgba(255,255,255,.55);
+      text-shadow: 0 1px 4px rgba(0,0,0,.8);
+    }
 
 
     
@@ -360,18 +388,22 @@
       }
       .weekCard {
         height: auto !important;
-        min-height: 80px;
-        padding: 14px 16px 12px !important;
+        min-height: 60px;
+        padding: 9px 14px 7px !important;
       }
     }
 
-    /* ── Week card ── */
+    /* ── Week card ──
+       Shrunk from the original clamp(100px,14vw,140px)/generous padding —
+       three cards each running their own animated border don't need to be
+       this large, and the extra visual weight was crowding out the Maze
+       CTA below them. */
     .weekCard {
       position: relative;
-      border-radius: clamp(14px,2vw,22px);
+      border-radius: clamp(12px,1.8vw,18px);
       overflow: hidden;
-      padding: clamp(10px,1.6vw,16px) clamp(10px,1.6vw,16px) clamp(8px,1.2vw,12px);
-      height: clamp(100px, 14vw, 140px);
+      padding: clamp(7px,1.1vw,11px) clamp(8px,1.3vw,13px) clamp(5px,.8vw,8px);
+      height: clamp(72px, 9.5vw, 100px);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -448,41 +480,43 @@
     .weekCard:active { transform: scale(.99) translateZ(0); }
 
     .weekTag {
-      font-weight: 900; letter-spacing: 1.5px;
-      font-size: clamp(9px,1.2vw,12px);
+      font-weight: 900; letter-spacing: 1.2px;
+      font-size: clamp(8px,1.05vw,10px);
       text-transform: uppercase;
       color: rgba(255,255,255,.6);
     }
     .weekTag span { color: rgba(255,255,255,.9); margin-left: 4px; }
 
     .weekTitle {
-      font-size: clamp(12px, 2vw, 19px);
-      font-weight: 900; letter-spacing: .4px;
+      font-size: clamp(11px, 1.7vw, 16px);
+      font-weight: 900; letter-spacing: .3px;
       color: #fff;
       text-shadow: 0 2px 12px rgba(0,0,0,.6);
-      margin-top: 4px;
-      line-height: 1.2;
+      margin-top: 3px;
+      line-height: 1.15;
     }
 
     .weekDates {
-      font-size: clamp(9px, 1.2vw, 12px);
+      font-size: clamp(8px, 1.05vw, 10px);
       color: rgba(255,255,255,.65);
-      margin-top: 3px;
-      line-height: 1.3;
+      margin-top: 2px;
+      line-height: 1.25;
     }
 
     .weekHint {
-      font-size: clamp(8px,1vw,10px);
-      letter-spacing: 1.5px;
+      font-size: clamp(7px,.9vw,9px);
+      letter-spacing: 1.2px;
       color: rgba(255,255,255,.40);
       text-transform: uppercase;
     }
 
     .hubBottom {
       display: flex;
-      justify-content: center;
-      gap: 12px;
-      padding-top: 2px;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      padding-top: 6px;
+      width: 100%;
     }
 
     /* ── Shared button ── */
@@ -919,17 +953,6 @@
 }
 .blitzRankBtn:active { transform: scale(.98); }
 
-/* ══ MAZE BUTTON ════════════════════════════════════════════ */
-.btnMaze {
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.22);
-  color: rgba(255,255,255,0.9);
-  box-shadow: 0 6px 18px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.12);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-}
-.btnMaze:hover { background: rgba(255,255,255,0.14); color: #fff; }
-
 @keyframes goldShift {
   0%   { background-position: 0% 50%; }
   50%  { background-position: 100% 50%; }
@@ -960,45 +983,99 @@
   margin-top: 2px;
 }
 
-/* ══ MAZE + FASTEST BUTTONS ══════════════════════════════════ */
-.btnMaze {
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.28);
-  color: #fff;
+/* ══ MAZE CTA ═══════════════════════════════════════════════
+   The one button every kid needs to find. Pulled out of the small
+   button row it used to share with the PWA-install button (equal
+   size/weight to an "add to homescreen" prompt was the actual bug —
+   see the polish pass this replaces), given the app's primary
+   pink→gold gradient treatment, its own breathing glow, and a JP
+   caption so it reads as a destination, not a utility button. */
+.mazeCta {
+  appearance: none; border: 0; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  width: min(420px, 100%);
+  padding: clamp(14px,2.2vw,18px) clamp(20px,3vw,28px);
+  border-radius: 999px;
+  background: linear-gradient(120deg, var(--pink) 0%, #ff9ed0 35%, #ffd9a0 70%, var(--pink2) 100%);
+  background-size: 220% 100%;
+  color: #2a0f22;
   box-shadow:
-    0 0 0 1px rgba(255,255,255,0.12),
-    0 0 18px 4px rgba(255,255,255,0.12),
-    0 0 40px 8px rgba(180,140,255,0.15),
-    0 6px 18px rgba(0,0,0,0.35),
-    inset 0 1px 0 rgba(255,255,255,0.18);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  animation: mazeGlow 3s ease-in-out infinite;
+    0 10px 26px rgba(255,59,189,.35),
+    0 0 0 2px rgba(255,255,255,.18),
+    0 0 30px rgba(255,180,120,.35);
+  -webkit-tap-highlight-color: transparent;
+  transform: translateZ(0);
+  animation: mazeCtaGlow 3.2s ease-in-out infinite, mazeCtaSheen 7s linear infinite;
 }
-.btnMaze:hover {
-  background: rgba(255,255,255,0.12);
+.mazeCta:hover {
   box-shadow:
-    0 0 0 1px rgba(255,255,255,0.22),
-    0 0 28px 6px rgba(255,255,255,0.18),
-    0 0 56px 12px rgba(180,140,255,0.22),
-    0 8px 24px rgba(0,0,0,0.4),
-    inset 0 1px 0 rgba(255,255,255,0.25);
+    0 14px 32px rgba(255,59,189,.45),
+    0 0 0 2px rgba(255,255,255,.3),
+    0 0 42px rgba(255,180,120,.5);
+}
+.mazeCta:active { transform: scale(.98) translateZ(0); }
+
+.mazeCtaMain { display: flex; flex-direction: column; align-items: center; line-height: 1.25; }
+.mazeCtaEn {
+  font-size: clamp(14px,2vw,18px); font-weight: 900; letter-spacing: .4px;
+}
+.mazeCtaJp {
+  font-size: clamp(9px,1.1vw,11px); font-weight: 700; letter-spacing: 1px;
+  color: rgba(42,15,34,.72);
+}
+.mazeCtaArrow {
+  font-size: clamp(16px,2.2vw,20px); font-weight: 900;
+  animation: mazeCtaNudge 1.6s ease-in-out infinite;
 }
 
-@keyframes mazeGlow {
-  0%, 100% { box-shadow:
-    0 0 0 1px rgba(255,255,255,0.12),
-    0 0 18px 4px rgba(255,255,255,0.10),
-    0 0 40px 8px rgba(180,140,255,0.12),
-    0 6px 18px rgba(0,0,0,0.35),
-    inset 0 1px 0 rgba(255,255,255,0.18); }
-  50% { box-shadow:
-    0 0 0 1px rgba(255,255,255,0.20),
-    0 0 26px 7px rgba(255,255,255,0.18),
-    0 0 56px 12px rgba(180,140,255,0.22),
-    0 6px 18px rgba(0,0,0,0.35),
-    inset 0 1px 0 rgba(255,255,255,0.22); }
+@keyframes mazeCtaGlow {
+  0%, 100% {
+    box-shadow:
+      0 10px 26px rgba(255,59,189,.32),
+      0 0 0 2px rgba(255,255,255,.16),
+      0 0 26px rgba(255,180,120,.28);
+  }
+  50% {
+    box-shadow:
+      0 12px 30px rgba(255,59,189,.42),
+      0 0 0 2px rgba(255,255,255,.28),
+      0 0 40px rgba(255,180,120,.44);
+  }
 }
+@keyframes mazeCtaSheen {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 220% 50%; }
+}
+@keyframes mazeCtaNudge {
+  0%, 100% { transform: translateX(0); }
+  50%      { transform: translateX(4px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mazeCta { animation: none; }
+  .mazeCtaArrow { animation: none; }
+}
+
+/* ── PWA install: demoted to a small icon-only control so it never
+   competes with the Maze CTA above (it's also hidden by default —
+   see #pwa-install-btn — and only appears when the browser offers
+   the install prompt at all). ── */
+.pwaIconBtn {
+  /* Centered with text-align/line-height, not flex: pwa-init.js sets
+     this button's inline display style directly (block/none), which
+     would silently break flex centering if we relied on it here. */
+  appearance: none; cursor: pointer;
+  width: 40px; height: 40px; border-radius: 50%;
+  padding: 0; text-align: center; line-height: 40px;
+  font-size: 17px;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.22);
+  color: rgba(255,255,255,.85);
+  box-shadow: 0 4px 12px rgba(0,0,0,.3);
+  -webkit-tap-highlight-color: transparent;
+  transition: background 160ms ease, transform 160ms ease;
+}
+.pwaIconBtn:hover { background: rgba(255,255,255,.16); }
+.pwaIconBtn:active { transform: scale(.92); }
     
     
 .btnGold {
@@ -1108,16 +1185,26 @@
   <section id="hubScene" class="scene" aria-label="Week Hub">
     <div class="hubScroll">
       <div class="hub">
-        <div class="hubHeading">BOOHA ADVENTURE</div>
-        <div id="playerGreeting" class="playerGreeting"></div>
+        <div class="hubTitle">
+          <div class="sparkleField" aria-hidden="true"></div>
+          <div class="hubHeading">BOOHA ADVENTURE</div>
+          <div class="hubHeadingJp">ブーハー・アドベンチャー</div>
+        </div>
+        <div id="playerGreeting" class="playerGreeting">
+          <div class="greetingEn">WELCOME BACK, <span class="greetName" id="greetNameSlot">PLAYER</span></div>
+          <div class="greetingJp">おかえりなさい</div>
+        </div>
         <div class="hubRow" id="weekCards"></div>
         <div class="hubBottom">
-          
-          <button id="mazeBtn" class="btn btnSmall btnMaze" type="button">Go to the Maze</button>
-      
-          <button id="pwa-install-btn" class="btn btnSmall" type="button" onclick="boohaInstallPWA()">
-            📲 インストール
+          <button id="mazeBtn" class="mazeCta" type="button">
+            <span class="mazeCtaMain">
+              <span class="mazeCtaEn">Enter the Maze</span>
+              <span class="mazeCtaJp">今日のゲームはここから</span>
+            </span>
+            <span class="mazeCtaArrow" aria-hidden="true">→</span>
           </button>
+
+          <button id="pwa-install-btn" class="pwaIconBtn" type="button" onclick="boohaInstallPWA()" aria-label="Install app / インストール">📲</button>
         </div>
       </div>
     </div>
@@ -1308,47 +1395,19 @@ function getBoohaFirstName() {
   return capped.toUpperCase();
 }
 
-function typeGreeting() {
+function showGreeting() {
   const greeting = document.getElementById('playerGreeting');
   if (!greeting) return;
 
-  const name = getBoohaFirstName();
-  const prefix = 'WELCOME BACK, ';
-  const fullText = prefix + name;
+  const nameSlot = document.getElementById('greetNameSlot');
+  if (nameSlot) nameSlot.textContent = getBoohaFirstName();
 
+  // No typewriter — the name is set once, then the whole greeting fades/
+  // scales in together (see .playerGreeting.show), matching the title's
+  // one-piece reveal instead of drawing extra attention to the name.
   greeting.classList.remove('show');
-  greeting.innerHTML = '';
-
-  let i = 0;
-
-  setTimeout(() => {
-    greeting.classList.add('show');
-
-    function typeNext() {
-      if (i <= fullText.length) {
-        const typed = fullText.slice(0, i);
-
-        if (typed.length <= prefix.length) {
-          greeting.innerHTML =
-            `${typed}<span class="cursor">|</span>`;
-        } else {
-          const typedName = typed.slice(prefix.length);
-          greeting.innerHTML =
-            `${prefix}<span class="greetName">${typedName}</span><span class="cursor">|</span>`;
-        }
-
-        i++;
-        setTimeout(typeNext, i < prefix.length ? 55 : 75);
-      } else {
-        setTimeout(() => {
-          greeting.innerHTML =
-            `${prefix}<span class="greetName">${name}</span>`;
-        }, 650);
-      }
-    }
-
-    typeNext();
-  }, 450);
+  void greeting.offsetWidth; // restart the transition if this runs twice
+  setTimeout(() => greeting.classList.add('show'), 350);
 }
   
 
@@ -1506,21 +1565,25 @@ checkOrientation();
    SPARKLES
 ════════════════════════════════════════════════════════════ */
 (function () {
-  const field = document.querySelector('.sparkleField');
-  if (!field) return;
-  for (let i = 0; i < 32; i++) {
-    const sp    = document.createElement('div');
-    sp.className = 'sp';
-    const angle = (i / 32) * Math.PI * 2;
-    const r     = 18 + Math.random() * 14;
-    const cx    = 50 + Math.cos(angle) * r;
-    const cy    = 50 + Math.sin(angle) * r;
-    const size  = 2 + Math.random() * 3;
-    const dur   = 1.4 + Math.random() * 2;
-    const delay = -(Math.random() * dur);
-    sp.style.cssText = `--size:${size}px;--x:${cx}%;--y:${cy}%;--dur:${dur}s;--delay:${delay}s;`;
-    field.appendChild(sp);
-  }
+  // querySelectorAll, not querySelector: the hub title now carries its own
+  // .sparkleField too (see hubTitle markup), same particle system as the
+  // start scene's ghost — every field on the page gets seeded, not just
+  // the first one in the DOM.
+  document.querySelectorAll('.sparkleField').forEach(field => {
+    for (let i = 0; i < 32; i++) {
+      const sp    = document.createElement('div');
+      sp.className = 'sp';
+      const angle = (i / 32) * Math.PI * 2;
+      const r     = 18 + Math.random() * 14;
+      const cx    = 50 + Math.cos(angle) * r;
+      const cy    = 50 + Math.sin(angle) * r;
+      const size  = 2 + Math.random() * 3;
+      const dur   = 1.4 + Math.random() * 2;
+      const delay = -(Math.random() * dur);
+      sp.style.cssText = `--size:${size}px;--x:${cx}%;--y:${cy}%;--dur:${dur}s;--delay:${delay}s;`;
+      field.appendChild(sp);
+    }
+  });
 })();
 
 /* ════════════════════════════════════════════════════════════
@@ -1531,13 +1594,9 @@ function renderHub() {
   const container = document.getElementById('weekCards');
   container.innerHTML = '';
 
-  const playerName = getBoohaFirstName();
-
-  const greeting = document.getElementById('playerGreeting');
-  if (greeting) greeting.textContent = '';
-  
-  const mazeButton = document.getElementById('mazeBtn');
-  if (mazeButton) mazeButton.textContent = `Enter the Maze`;
+  // Greeting name + Maze CTA label/caption are static markup now (see
+  // #playerGreeting / #mazeBtn in the HTML) — showGreeting() sets the
+  // name span directly, so there's nothing to reset/rebuild here.
 
   const existing = document.getElementById('blitzArcade');
   if (existing) existing.remove();
@@ -1830,7 +1889,7 @@ async function goToHub() {
    requestAnimationFrame(() => {
   requestAnimationFrame(() => {
     fadeToBlack(false);
-    typeGreeting();
+    showGreeting();
   });
 });
   
@@ -1864,7 +1923,7 @@ function jumpToHub() {
   started   = false;
   try { renderHub(); hubRendered = true; } catch(e2) {}
   
-  setTimeout(typeGreeting, 250);
+  setTimeout(showGreeting, 250);
   sessionStorage.removeItem('booha_return_to_hub');
 
   /* Deep-link from maze: ブリッツへ scrolls to the arcade */
