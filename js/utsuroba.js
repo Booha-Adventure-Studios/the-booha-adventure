@@ -2492,8 +2492,20 @@
   /* ── soft dance sparkles ── */
   let danceSparkles = [];
 
-  function spawnDanceSparkle(originX, originY) {
-    const colors = ['#ffd700','#ffe066','#fff0a0','#c8960a','#ffffff','#fffde0'];
+  /* Pass 3: keep a little gold in every celebration, but let the rescued
+     drifter's motif lead the sparkle palette so the dance feels personal. */
+  const DANCE_SPARKLE_PALETTES = {
+    lantern:    ['#ffd700', '#ffe066', '#fff0a0', '#c8960a', '#ffffff', '#fffde0'],
+    candy:      ['#ff85a1', '#ffc0d2', '#fff0f4', '#ffd700', '#ffffff', '#ffe5ee'],
+    reflection: ['#a8edff', '#eafcff', '#73c9e8', '#ffd700', '#ffffff', '#d8f7ff'],
+    window:     ['#8ff0d0', '#effff9', '#5dc8a8', '#ffd700', '#ffffff', '#d9fff1'],
+    thorn:      ['#d9503a', '#ff9b82', '#ffe8e0', '#ffd700', '#ffffff', '#f3b0a0'],
+    ribbon:     ['#d9a8ff', '#efd6ff', '#fff5ff', '#ffd700', '#ffffff', '#e6c5ff'],
+  };
+
+  function spawnDanceSparkle(originX, originY, drifter) {
+    const motif = window.UtsuCard && drifter ? window.UtsuCard.motifForDrifter(drifter) : null;
+    const colors = DANCE_SPARKLE_PALETTES[motif] || DANCE_SPARKLE_PALETTES.lantern;
     const angle  = Math.random() * Math.PI * 2;
     const radius = 10 + Math.random() * 28;
     danceSparkles.push({
@@ -3030,7 +3042,7 @@
       drawOffX  = frame.offsetX;
       drawOffY  = frame.offsetY;
 
-      if (settleEase > 0 && Math.random() < 0.45) spawnDanceSparkle(gx, gy);
+      if (settleEase > 0 && Math.random() < 0.45) spawnDanceSparkle(gx, gy, state.celebrateDrifter);
 
       for (let i = danceSparkles.length - 1; i >= 0; i--) {
         const sp = danceSparkles[i];
@@ -3040,7 +3052,7 @@
         const twinkle = 0.5 + 0.5 * Math.sin(now / 100 + sp.phase);
         ctx.save();
         ctx.globalAlpha = sp.life * twinkle * 0.9;
-        if (shadowsEnabled) { ctx.shadowBlur = 6; ctx.shadowColor = '#ffd700'; }
+        if (shadowsEnabled) { ctx.shadowBlur = 6; ctx.shadowColor = sp.color; }
         ctx.fillStyle = sp.color;
         ctx.beginPath(); ctx.arc(sp.x, sp.y, sp.size, 0, Math.PI * 2); ctx.fill();
         ctx.shadowBlur = 0; ctx.restore();
