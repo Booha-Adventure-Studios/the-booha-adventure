@@ -1974,7 +1974,7 @@
 
     const actions = document.createElement('div');
     actions.className = 'muenba-case-actions';
-    actions.appendChild(caseActionButton(
+    const captureAction = caseActionButton(
       'Begin energy capture',
       'エネルギーを<ruby>集<rt>あつ</rt></ruby>める',
       'muenba-case-capture',
@@ -1982,7 +1982,9 @@
         captureSession.phase = 'ready';
         renderCaptureReady();
       }
-    ));
+    );
+    captureAction.classList.add('muenba-gold-action');
+    actions.appendChild(captureAction);
     box.appendChild(actions);
     captureOverlay.classList.add('open');
     focusCaptureControl('#muenba-case-capture');
@@ -2029,7 +2031,9 @@
 
     const actions = document.createElement('div');
     actions.className = 'muenba-lobby-actions';
-    actions.appendChild(captureButton('Begin rhythm', 'リズムを<ruby>始<rt>はじ</rt></ruby>める', 'muenba-capture-begin', beginRhythmCapture));
+    const rhythmAction = captureButton('Begin rhythm', 'リズムを<ruby>始<rt>はじ</rt></ruby>める', 'muenba-capture-begin', beginRhythmCapture);
+    rhythmAction.classList.add('muenba-gold-action');
+    actions.appendChild(rhythmAction);
     box.appendChild(actions);
 
     captureOverlay.classList.add('open');
@@ -3893,6 +3897,17 @@
       .muenba-capture-ready .muenba-capture-action { min-width:190px; padding:13px 30px; border-color:rgba(190,119,255,.78); background:rgba(116,46,168,.24); box-shadow:0 0 26px rgba(111,66,210,.32),inset 0 0 14px rgba(190,119,255,.08); }
       .muenba-capture-ready .muenba-capture-action:hover,
       .muenba-capture-ready .muenba-capture-action:focus-visible { border-color:#e2d4ff; background:rgba(116,46,168,.42); box-shadow:0 0 38px rgba(190,119,255,.5),inset 0 0 18px rgba(190,119,255,.14); }
+      /* Direction panels and primary actions: make the next step unmistakable. */
+      .muenba-case-box .muenba-case-resolution-direction { border-color:rgba(196,130,255,.82); background:linear-gradient(145deg,rgba(103,57,164,.3),rgba(28,12,58,.46)); box-shadow:0 0 30px rgba(163,92,255,.34),inset 0 0 22px rgba(148,82,255,.13); }
+      .muenba-case-box .muenba-case-resolution-direction .muenba-case-direction-en { color:#fff4ff; text-shadow:0 0 14px rgba(206,157,255,.34); }
+      .muenba-case-box .muenba-case-resolution-direction .muenba-case-direction-jp { color:#e0caff; }
+      .muenba-capture-ready .muenba-capture-direction { border-color:rgba(255,165,74,.84); background:linear-gradient(145deg,rgba(133,56,22,.32),rgba(62,24,10,.44)); box-shadow:0 0 30px rgba(255,132,45,.36),inset 0 0 22px rgba(255,141,49,.13); }
+      .muenba-capture-ready .muenba-capture-direction .muenba-case-direction-en { color:#fff4e4; text-shadow:0 0 14px rgba(255,166,83,.32); }
+      .muenba-capture-ready .muenba-capture-direction .muenba-case-direction-jp { color:#ffd3a8; }
+      .muenba-gold-action { color:#fff8d5 !important; border-color:#f7d86e !important; background:linear-gradient(180deg,rgba(160,111,20,.58),rgba(80,45,8,.72)) !important; box-shadow:0 0 24px rgba(255,198,64,.5),inset 0 0 14px rgba(255,228,132,.14) !important; text-shadow:0 0 10px rgba(255,232,154,.25); animation:muenbaGoldActionGlow 2.2s ease-in-out infinite; }
+      .muenba-gold-action:hover,
+      .muenba-gold-action:focus-visible { border-color:#fff1a5 !important; background:linear-gradient(180deg,rgba(188,139,27,.72),rgba(103,59,9,.82)) !important; box-shadow:0 0 38px rgba(255,198,64,.68),inset 0 0 18px rgba(255,228,132,.2) !important; }
+      @keyframes muenbaGoldActionGlow { 0%,100% { box-shadow:0 0 20px rgba(255,198,64,.38),inset 0 0 14px rgba(255,228,132,.1); } 50% { box-shadow:0 0 34px rgba(255,211,87,.68),inset 0 0 18px rgba(255,228,132,.18); } }
       .muenba-capture-result { min-height:300px; }
       .muenba-capture-result .muenba-lobby-portrait { width:116px; height:116px; }
       .muenba-capture-result h2 { font-size:clamp(1.3rem,4vw,1.72rem); }
@@ -3958,7 +3973,7 @@
         .muenba-case-choice { min-height:58px; padding:12px 12px 12px 10px; }
         .muenba-nuppi-speech, .muenba-nuppi-mission, .muenba-nuppi-status-card, .muenba-nuppi-success-card, .muenba-nuppi-next-card { padding-left:13px; padding-right:13px; }
       }
-      @media (prefers-reduced-motion: reduce) { .muenba-orb-release, .muenba-hunt-ghost-portrait { animation:none; } }
+      @media (prefers-reduced-motion: reduce) { .muenba-orb-release, .muenba-hunt-ghost-portrait, .muenba-gold-action { animation:none !important; } }
       @media (prefers-reduced-motion: reduce) { #muenba-fade, .muenba-return-box, #muenba-return-overlay, .muenba-lobby-box, #muenba-lobby-overlay, #muenba-capture-overlay { transition:none !important; } .muenba-lobby-portrait, #muenba-hide, #muenba-celebration-status, .muenba-rhythm-board, .muenba-rhythm-combo, .muenba-rhythm-result-failure, .muenba-case-question, .muenba-case-question::before, .muenba-energy-warning { animation:none !important; } .muenba-case-choice, .muenba-case-action, .muenba-capture-action { transition:none !important; } .muenba-rhythm-energy-fill { transition:none !important; } #muenba-profile-link { transition:none !important; } }
     `;
     document.head.appendChild(style);
