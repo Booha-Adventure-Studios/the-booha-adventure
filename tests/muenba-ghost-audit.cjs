@@ -10,6 +10,9 @@ const source = fs.readFileSync(path.join(__dirname, '..', 'js', 'muenba.js'), 'u
 assert(source.includes('const GHOST_NOTICE_DELAY_MS = 2000;'), 'sight-angry ghosts must wait exactly two seconds before screaming');
 assert(source.includes('const GHOST_CARRY_CHASE_SPEED = 1.35;'), 'carrying-energy chases must be only slightly faster');
 assert(source.includes("if (roleRules.alwaysAngry) return 'sight';"), 'jerk ghosts must use sight-triggered aggression');
+assert(source.includes('function dangerRhythmConfigFor(difficulty)'), 'danger encounters must have an explicit rhythm route');
+assert(source.includes('chart: difficulty.dangerChart,'), 'danger encounters must use the difficult danger chart');
+assert(source.includes('dangerMode: encounterRole === \'jerk\' ? \'jerk\' : \'main\','), 'danger encounters must preserve the jerk or main route');
 assert(source.includes('if (carryingStolenEnergy) return \'sight\';'), 'carrying energy must make every ghost sight-angry');
 assert(source.includes("if (!carryingStolenEnergy && ghostId === target) return 'friendly';"), 'the assigned hunt ghost must stay quiet during an ordinary hunt');
 assert(source.includes('chaseSpeed: carryingEnergy ? GHOST_CARRY_CHASE_SPEED : GHOST_CHASE_SPEED,'), 'ghosts must remember the carried-energy chase speed');
