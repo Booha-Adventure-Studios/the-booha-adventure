@@ -245,6 +245,9 @@
       <a href="profile.html">LOG <small>ぼうけんログ</small></a>
       <a href="adventure-profile.html">ADVENTURE <small>ぼうけん</small></a>
       <a href="utsuroba-profile.html" aria-current="page">UTSUROBA <small>うつろば</small></a>
+      <!-- Hidden until BoohaUnlockSystem.isMuenbaUnlocked() — see the
+           small script near the end of body that toggles this. -->
+      <a href="muenba-profile.html" id="pnet-muenba" hidden>MUENBA <small>むえんば</small></a>
     </nav>
 
     <section class="hero" aria-labelledby="page-title">
@@ -548,6 +551,28 @@
 
       if (window.BOOHA_READY) boot();
       else document.addEventListener('booha:ready', boot, { once: true });
+    })();
+  </script>
+  <script>
+    // Muenba uses its own build-readiness gate, independent of the shared
+    // weekly world gate used by Karasuki and Utsuroba.
+    (function () {
+      const tab = document.getElementById('pnet-muenba');
+      if (!tab) return;
+      function renderMuenbaTab() {
+        let open = false;
+        try {
+          open = !!(window.BoohaUnlockSystem &&
+            typeof BoohaUnlockSystem.isMuenbaUnlocked === 'function' &&
+            BoohaUnlockSystem.isMuenbaUnlocked());
+        } catch (_) {}
+        tab.hidden = !open;
+      }
+      if (window.BOOHA_READY) renderMuenbaTab();
+      else document.addEventListener('booha:ready', renderMuenbaTab, { once: true });
+      document.addEventListener('booha:saved', renderMuenbaTab);
+      document.addEventListener('booha:weeklyReset', renderMuenbaTab);
+      document.addEventListener('booha:newWeek', renderMuenbaTab);
     })();
   </script>
 </body>
