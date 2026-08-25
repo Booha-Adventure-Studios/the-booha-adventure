@@ -7,6 +7,7 @@ const path = require('path');
 const vm = require('vm');
 
 const filename = path.join(__dirname, '..', 'js', 'muenba-data.js');
+const runtimeFilename = path.join(__dirname, '..', 'js', 'muenba.js');
 const context = { window: {} };
 vm.runInNewContext(fs.readFileSync(filename, 'utf8'), context, { filename });
 const data = context.window.MUENBA_DATA;
@@ -18,6 +19,24 @@ const japanese = /[\u3040-\u30ff\u3400-\u9fff]/;
 const ghostIds = new Set((data.ghosts || []).map(ghost => ghost.id));
 const seen = new Set();
 const positionMap = new Map();
+
+// Pass 4 accessibility guard: authored reading cards must wait for the
+// read-gate instead of moving keyboard focus straight to their action.
+// Gameplay cards still manage focus normally, so this only protects the
+// intro, clue, and resolved-record screens from regressions.
+const runtimeSource = fs.readFileSync(runtimeFilename, 'utf8');
+function sourceSection(startName, endName) {
+  const start = runtimeSource.indexOf(`function ${startName}`);
+  const end = runtimeSource.indexOf(`function ${endName}`, start + 1);
+  assert(start >= 0 && end > start, `could not inspect ${startName} focus contract`);
+  return runtimeSource.slice(start, end);
+}
+assert(runtimeSource.includes('armCaseReadGate(box, openAction, caseData.intro)'), 'case intro must use the read gate');
+assert(runtimeSource.includes('armCaseReadGate(box, nextAction, clue.text)'), 'case clues must use the read gate');
+assert(runtimeSource.includes('armCaseReadGate(box, captureAction, mode.resolution)'), 'case resolution must use the read gate');
+assert(!sourceSection('renderCaseIntro', 'selectCaseDifficulty').includes('focusCaptureControl('), 'case intro must not auto-focus its action');
+assert(!sourceSection('renderCaseClue', 'renderCaseQuestion').includes('focusCaptureControl('), 'case clue must not auto-focus its action');
+assert(!sourceSection('renderCaseResolved', 'renderCaptureReady').includes('focusCaptureControl('), 'case resolution must not auto-focus its action');
 
 for (const ghost of data.ghosts || []) {
   assert.strictEqual(typeof ghost.kana, 'string', `${ghost.id}.kana must be text`);
