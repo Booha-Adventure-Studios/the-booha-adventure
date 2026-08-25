@@ -297,6 +297,7 @@
     captureResolving: false,
     dangerFlashUntil: 0,
     returnToNuppiPending: false,
+    cemeteryAlert: false,
     celebrating: false,
     celebrateDancing: false,
     celebrateSettling: false,
@@ -1011,6 +1012,7 @@
     const role = ghostRoleFor(ghostId);
     const roleRules = ghostRulesFor(ghostId);
     const isJerk = role === 'jerk';
+    if (state.cemeteryAlert) return 'sight';
     // Pass 15: a Jerk is purely hostile — never Nuppi's target, never the
     // "quiet cemetery" exception below, whatever the hunt state is.
     if (roleRules.alwaysAngry) return 'sight';
@@ -4690,6 +4692,9 @@
 
   function renderNuppiCaseBoard() {
     if (!lobbyOverlay) return;
+    // Accepting Nuppi's hint is the explicit point where the next hunt
+    // begins. Until then, a declined handoff leaves the cemetery alert.
+    state.cemeteryAlert = false;
     lobbyOverlay.innerHTML = `
       <div class="muenba-lobby-box is-case-board muenba-nuppi-scene muenba-nuppi-case-board">
         <img class="muenba-lobby-portrait" src="assets/img/wanderers/nuppi-2.png" alt="Nuppi">
@@ -4891,17 +4896,22 @@
         </section>
         <section class="muenba-nuppi-next-card">
           <div class="muenba-nuppi-card-label">NEXT STEP</div>
-          <p>${canContinue ? 'Would you like to find another ghost?' : 'That is all for this week. The ghosts will return next week.'}</p>
+          <p>${canContinue ? "Would you like Nuppi's hint for another ghost?" : 'That is all for this week. The ghosts will return next week.'}</p>
           <p class="jp-line">${canContinue ? 'もう<ruby>一度<rt>いちど</rt></ruby>、<ruby>幽霊<rt>ゆうれい</rt></ruby>を<ruby>探<rt>さが</rt></ruby>してみる？' : 'この<ruby>週<rt>しゅう</rt></ruby>はこれでおしまい。<ruby>幽霊<rt>ゆうれい</rt></ruby>は<ruby>来週<rt>らいしゅう</rt></ruby>に<ruby>戻<rt>もど</rt></ruby>ってくるよ。'}</p>
         </section>
         <div class="muenba-lobby-actions">
-          ${canContinue ? '<button id="muenba-handoff-find" class="muenba-capture-action" type="button"><span>Find another ghost</span><small><ruby>別<rt>べつ</rt></ruby>の<ruby>幽霊<rt>ゆうれい</rt></ruby>を<ruby>探<rt>さが</rt></ruby>す</small></button>' : ''}
+          ${canContinue ? '<button id="muenba-handoff-find" class="muenba-capture-action" type="button"><span>Accept hint</span><small>ヒントを<ruby>受<rt>う</rt></ruby>ける</small></button>' : ''}
           <button id="muenba-handoff-later" type="button"><span>Not now</span><small><ruby>今<rt>いま</rt></ruby>はやめる</small></button>
         </div>
       </div>`;
     const find = lobbyOverlay.querySelector('#muenba-handoff-find');
     if (find) find.addEventListener('click', () => renderNuppiCaseBoard());
-    lobbyOverlay.querySelector('#muenba-handoff-later').addEventListener('click', closeNuppiLobby);
+    lobbyOverlay.querySelector('#muenba-handoff-later').addEventListener('click', () => {
+      // The player declined Nuppi's next hint. The energy is already safe,
+      // but the ghosts do not calm until the next hint is accepted.
+      state.cemeteryAlert = true;
+      closeNuppiLobby();
+    });
     lobbyOverlay.classList.add('open');
     focusLobbyControl(canContinue ? '#muenba-handoff-find' : '#muenba-handoff-later');
   }
