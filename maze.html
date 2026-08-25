@@ -936,6 +936,9 @@
     #overlay1.entryOverlay{
       gap:0;
       padding:clamp(18px,4vmin,42px);
+      overflow-y:auto;
+      overscroll-behavior:contain;
+      scrollbar-width:thin;
       background:
         radial-gradient(ellipse at 50% 12%,rgba(119,66,255,.26) 0%,transparent 48%),
         radial-gradient(ellipse at 50% 100%,rgba(0,232,255,.10) 0%,transparent 46%),
@@ -966,7 +969,12 @@
       border:1px solid rgba(255,255,255,.14); border-radius:clamp(24px,4vmin,38px);
       background:linear-gradient(145deg,rgba(16,17,48,.86),rgba(8,8,28,.78));
       box-shadow:0 35px 90px rgba(0,0,0,.58),0 0 90px rgba(100,80,255,.13),inset 0 1px 0 rgba(255,255,255,.11);
-      overflow:hidden;
+      min-height:0;
+      overflow-y:auto;
+      overflow-x:hidden;
+      overscroll-behavior:contain;
+      -webkit-overflow-scrolling:touch;
+      scrollbar-width:thin;
     }
     .entryShell::before{ content:""; position:absolute; inset:0; pointer-events:none; opacity:.25; background-image:radial-gradient(circle,rgba(255,255,255,.75) 0 1px,transparent 1.5px); background-size:42px 42px; mask-image:linear-gradient(to bottom,black,transparent 65%); }
     .entryStateMark{ position:relative; width:clamp(58px,10vmin,84px); height:clamp(58px,10vmin,84px); display:grid; place-items:center; margin-bottom:clamp(10px,2vmin,18px); border-radius:26px; font-size:clamp(30px,6vmin,48px); background:rgba(123,92,255,.14); border:1px solid rgba(183,168,255,.28); box-shadow:0 0 34px rgba(111,97,255,.28),inset 0 0 20px rgba(255,255,255,.06); }
@@ -1024,7 +1032,15 @@
     #overlay2 .arrivalNameJp{ margin:-2px 0 0; font-size:clamp(13px,2.4vw,21px); font-weight:900; color:rgba(255,222,255,.86); letter-spacing:.12em; text-shadow:0 0 22px rgba(255,120,230,.66); }
     #overlay2 .arrivalNameJp ruby rt{ font-size:.52em; color:#ffb4ec; }
     #overlay2 .arrivalInstructionEn{ margin-top:clamp(4px,1vmin,10px); }
+    #overlay2{
+      overflow-y:auto;
+      overscroll-behavior:contain;
+      scrollbar-width:thin;
+      justify-content:safe center;
+      -webkit-overflow-scrolling:touch;
+    }
     @media (max-height:700px),(max-width:767px){
+      #overlay2{ padding-top:18px; padding-bottom:18px; }
       .entryShell{ padding:16px 16px 18px; border-radius:24px; }
       .entryStateMark{ margin-bottom:8px; }
       .entryPlayer{ margin-top:10px; margin-bottom:8px; }
