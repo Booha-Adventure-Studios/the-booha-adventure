@@ -147,21 +147,16 @@ const BoohaUnlockSystem = (() => {
     }
   }
 
-  // ── Muenba build-readiness gate ─────────────────────────────────────────
+  // ── Muenba weekly world gate ────────────────────────────────────────────
   /**
-   * Muenba is still being built. This flag is the ONLY thing that controls
-   * whether real students can reach it — it is intentionally NOT derived
-   * from isWeeklyWorldGateOpen() or from game completion, so finishing the
-   * weekly 9 games never unlocks a world that isn't finished yet. Flip this
-   * to true once Muenba actually ships (at that point, decide whether it
-   * should also require isWeeklyWorldGateOpen() like Karasuki/Utsuroba do —
-   * that's a ship-it decision, not this one).
+   * Muenba is now a live output world. It shares Utsuroba's weekly rule:
+   * complete all nine maze games in one curriculum during the current week.
+   * The shared gate reads the week-scoped score bucket, so the next weekly
+   * reset closes Muenba again without touching permanent achievements.
    */
-  const MUENBA_BUILD_READY = false;
-
   function isMuenbaUnlocked() {
     if (window.__devMuenba) return true;
-    return MUENBA_BUILD_READY;
+    return isWeeklyWorldGateOpen();
   }
 
   function isUnlocked(id) {

@@ -570,12 +570,8 @@
   </nav>
 
   <!-- Muenba's door is deliberately its own element, NOT nested inside
-       #world-doors above: that nav's hidden/shown state is driven by the
-       shared weekly world gate (Karasuki/Utsuroba), but Muenba stays
-       gated behind its own build-readiness flag
-       (BoohaUnlockSystem.isMuenbaUnlocked()) independent of whether the
-       weekly gate is open — see Pass 0's lock decoupling and Pass 5's
-       decision to gate this door the same way. -->
+       #world-doors above: it shares the same weekly gate, but keeps its own
+       visual treatment and profile-network tab. -->
   <a id="world-door-muenba" class="world-door" href="muenba.html?from=profile" hidden aria-hidden="true" aria-label="Enter Muenba / むえんばへ">
     <img src="assets/img/muenba/muenba_logo.png" alt="">
     <span class="world-door-label">MUENBA<small>むえんば</small></span>
@@ -627,10 +623,9 @@
 </script>
 <script>
   (function () {
-    // Independent of renderWorldDoors() above on purpose — Muenba's own
-    // build-readiness gate, not the shared weekly world gate. Toggles both
-    // the in-world door and the profile-network tab together so neither
-    // one shows before the other.
+    // Independent of renderWorldDoors() above on purpose — Muenba keeps its
+    // own visual treatment while using the same live weekly gate. Toggle both
+    // the in-world door and profile-network tab together.
     var muenbaDoor = document.getElementById('world-door-muenba');
     var muenbaTab = document.getElementById('pnet-muenba');
     if (!muenbaDoor && !muenbaTab) return;
