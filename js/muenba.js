@@ -1823,7 +1823,14 @@
       const button = document.createElement('button');
       button.type = 'button';
       button.className = 'muenba-case-choice';
-      button.textContent = choice;
+      button.setAttribute('aria-label', `Answer ${index + 1}: ${choice}`);
+      const number = document.createElement('span');
+      number.className = 'muenba-case-choice-number';
+      number.textContent = String(index + 1).padStart(2, '0');
+      const text = document.createElement('span');
+      text.className = 'muenba-case-choice-text';
+      text.textContent = choice;
+      button.append(number, text);
       button.addEventListener('click', () => {
         if (index === mode.correct) renderCaseResolved();
         else renderCaseQuestion('That explanation does not fit all three records yet.');
@@ -3522,15 +3529,81 @@
       }
       .muenba-case-direction.muenba-case-question-instruction,
       .muenba-case-question {
+        position:relative;
+        isolation:isolate;
+        overflow:hidden;
         border-color:rgba(170,150,255,.52);
         background:linear-gradient(135deg,rgba(83,61,155,.2),rgba(38,29,81,.22));
-        box-shadow:0 0 24px rgba(100,77,184,.2),inset 0 0 24px rgba(144,116,255,.05);
+        box-shadow:0 0 26px rgba(100,77,184,.24),inset 0 0 24px rgba(144,116,255,.06);
       }
+      .muenba-case-question {
+        margin-top:20px;
+        padding:17px 18px 16px;
+        border-color:rgba(206,190,255,.72);
+        animation:muenbaQuestionGlow 2.8s ease-in-out infinite;
+      }
+      .muenba-case-question::before {
+        position:absolute;
+        inset:-35%;
+        z-index:0;
+        background:radial-gradient(circle at 50% 45%,rgba(162,125,255,.22),transparent 56%);
+        content:"";
+        opacity:.72;
+        animation:muenbaQuestionBloom 2.8s ease-in-out infinite;
+        pointer-events:none;
+      }
+      .muenba-case-question > * { position:relative; z-index:1; }
+      .muenba-case-question .muenba-case-direction-en { font-size:clamp(1.14rem,3vw,1.32rem); line-height:1.4; letter-spacing:.01em; text-shadow:0 0 14px rgba(228,220,255,.18); }
+      .muenba-case-question .muenba-case-direction-jp { margin-top:9px; font-size:.9rem; }
+      @keyframes muenbaQuestionGlow { 0%,100% { box-shadow:0 0 20px rgba(100,77,184,.2),inset 0 0 20px rgba(144,116,255,.04); } 50% { box-shadow:0 0 36px rgba(133,101,231,.42),inset 0 0 28px rgba(144,116,255,.1); } }
+      @keyframes muenbaQuestionBloom { 0%,100% { transform:scale(.94); opacity:.5; } 50% { transform:scale(1.04); opacity:.86; } }
+      .muenba-case-choices { gap:11px; margin:17px 0 5px; }
+      .muenba-case-choice {
+        display:flex;
+        align-items:flex-start;
+        gap:13px;
+        min-height:62px;
+        box-sizing:border-box;
+        padding:14px 16px 14px 13px;
+        border-color:rgba(183,157,255,.7);
+        border-radius:12px;
+        background:linear-gradient(105deg,rgba(87,61,158,.4),rgba(38,27,78,.52));
+        box-shadow:0 0 12px rgba(91,65,173,.16),inset 0 1px 0 rgba(232,223,255,.08);
+        color:#fffaff;
+        font-size:clamp(.94rem,2.5vw,1.02rem);
+        line-height:1.45;
+      }
+      .muenba-case-choice-number {
+        flex:0 0 auto;
+        display:grid;
+        place-items:center;
+        width:30px;
+        height:30px;
+        margin-top:1px;
+        border:1px solid rgba(224,211,255,.78);
+        border-radius:8px;
+        background:rgba(174,143,255,.2);
+        color:#e7ddff;
+        font:900 .7rem/1 ui-monospace,monospace;
+        letter-spacing:.04em;
+        box-shadow:0 0 12px rgba(169,135,255,.2);
+      }
+      .muenba-case-choice-text { flex:1; min-width:0; }
+      .muenba-case-choice:hover,
+      .muenba-case-choice:focus-visible {
+        border-color:#d9c9ff;
+        background:linear-gradient(105deg,rgba(112,79,202,.58),rgba(51,35,106,.68));
+        box-shadow:0 0 22px rgba(133,101,231,.38),inset 0 1px 0 rgba(255,255,255,.12);
+        filter:none;
+        outline:none;
+      }
+      .muenba-case-choice:hover .muenba-case-choice-number,
+      .muenba-case-choice:focus-visible .muenba-case-choice-number { border-color:#fff1bd; color:#fff5d5; background:rgba(216,201,139,.24); box-shadow:0 0 16px rgba(216,201,139,.28); }
+      .muenba-case-choice:active { transform:translateY(1px) scale(.995); background:rgba(126,91,220,.7); }
+      .muenba-case-choice.is-selected { border-color:#fff1bd; background:rgba(126,91,220,.62); box-shadow:0 0 28px rgba(216,201,139,.28); }
       .muenba-case-choice,
       .muenba-case-action,
-      .muenba-capture-action {
-        transition:transform .18s ease,border-color .18s ease,background .18s ease,box-shadow .18s ease,filter .18s ease;
-      }
+      .muenba-capture-action { transition:transform .18s ease,border-color .18s ease,background .18s ease,box-shadow .18s ease,filter .18s ease; }
       .muenba-case-choice:hover,
       .muenba-case-choice:focus-visible,
       .muenba-case-action:hover,
@@ -3553,9 +3626,11 @@
         .muenba-lobby-box { width:min(100%,calc(100vw - 24px)); max-height:calc(100dvh - 24px); padding:24px 18px 20px; border-radius:16px; }
         .muenba-lobby-box::after { top:11px; width:72px; }
         .muenba-lobby-portrait { width:82px; height:82px; margin-bottom:10px; }
+        .muenba-case-question { padding:15px 14px 14px; }
+        .muenba-case-choice { min-height:58px; padding:12px 12px 12px 10px; }
       }
       @media (prefers-reduced-motion: reduce) { .muenba-orb-release, .muenba-hunt-ghost-portrait { animation:none; } }
-      @media (prefers-reduced-motion: reduce) { #muenba-fade, .muenba-return-box, #muenba-return-overlay, .muenba-lobby-box, #muenba-lobby-overlay, #muenba-capture-overlay { transition:none !important; } .muenba-lobby-portrait, #muenba-hide, #muenba-celebration-status, .muenba-rhythm-board, .muenba-rhythm-combo, .muenba-rhythm-result-failure { animation:none !important; } .muenba-rhythm-energy-fill { transition:none !important; } #muenba-profile-link { transition:none !important; } }
+      @media (prefers-reduced-motion: reduce) { #muenba-fade, .muenba-return-box, #muenba-return-overlay, .muenba-lobby-box, #muenba-lobby-overlay, #muenba-capture-overlay { transition:none !important; } .muenba-lobby-portrait, #muenba-hide, #muenba-celebration-status, .muenba-rhythm-board, .muenba-rhythm-combo, .muenba-rhythm-result-failure, .muenba-case-question, .muenba-case-question::before { animation:none !important; } .muenba-rhythm-energy-fill { transition:none !important; } #muenba-profile-link { transition:none !important; } }
     `;
     document.head.appendChild(style);
   }
