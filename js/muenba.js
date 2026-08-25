@@ -3622,12 +3622,58 @@
       #muenba-room-nuppi-close:focus-visible,
       .muenba-capture-action:hover,
       .muenba-capture-action:focus-visible { border-color:#d5ffe7; box-shadow:0 0 30px rgba(93,208,140,.42),inset 0 0 16px rgba(156,224,193,.14); }
+      /* Pass 3: Nuppi's dialogue and mission cards. The portrait remains the
+         character layer, while these surfaces make his message feel spoken
+         and the next action feel like a scene transition. */
+      .muenba-nuppi-scene { width:min(540px,100%); }
+      .muenba-nuppi-scene .muenba-lobby-portrait { margin-bottom:7px; }
+      .muenba-nuppi-kicker { margin:0 0 2px; color:#e8d794; font:900 .64rem/1.4 ui-monospace,monospace; letter-spacing:.18em; text-align:center; text-transform:uppercase; text-shadow:0 0 12px rgba(241,215,141,.2); }
+      .muenba-nuppi-kicker-jp { margin:0 0 13px !important; color:#b7bd91 !important; font-size:.72rem !important; letter-spacing:.08em !important; }
+      .muenba-nuppi-nameplate { margin:0 0 17px; text-align:center; }
+      .muenba-nuppi-nameplate h2 { margin:0 0 3px; color:#f5f3df; font-size:clamp(1.22rem,3vw,1.42rem); letter-spacing:.1em; }
+      .muenba-nuppi-nameplate span { color:#b5d8c7; font:400 .82rem/1.4 Georgia,'Times New Roman',serif; letter-spacing:.08em; }
+      .muenba-nuppi-speech,
+      .muenba-nuppi-mission,
+      .muenba-nuppi-status-card,
+      .muenba-nuppi-success-card,
+      .muenba-nuppi-next-card { position:relative; box-sizing:border-box; border-radius:14px; text-align:left; }
+      .muenba-nuppi-speech { margin:0 0 14px; padding:16px 17px 13px; border:1px solid rgba(156,224,193,.42); border-left:3px solid rgba(156,224,193,.82); background:linear-gradient(145deg,rgba(52,104,78,.2),rgba(8,35,27,.48)); box-shadow:0 0 22px rgba(93,162,124,.12),inset 0 0 20px rgba(156,224,193,.035); }
+      .muenba-nuppi-speech::after { position:absolute; left:25px; bottom:-8px; width:14px; height:14px; border-right:1px solid rgba(156,224,193,.42); border-bottom:1px solid rgba(156,224,193,.42); background:#0a281f; content:""; transform:rotate(45deg); }
+      .muenba-nuppi-speech-label,
+      .muenba-nuppi-card-label { margin:0 0 8px; color:#9ce0c1; font:900 .62rem/1.35 ui-monospace,monospace; letter-spacing:.15em; text-transform:uppercase; }
+      .muenba-nuppi-speech p { margin:0 0 6px; color:#f0f8f3; font-size:1rem; line-height:1.5; }
+      .muenba-nuppi-speech p.jp-line { margin:0; color:#a8cbbb; font-size:.84rem; line-height:1.55; }
+      .muenba-nuppi-mission { margin:0 0 20px; padding:16px 17px 14px; border:1px solid rgba(216,201,139,.32); background:linear-gradient(145deg,rgba(126,111,48,.13),rgba(35,34,17,.18)); }
+      .muenba-nuppi-mission .muenba-nuppi-card-label,
+      .muenba-nuppi-case-board .muenba-nuppi-card-label { color:#e8d794; }
+      .muenba-nuppi-mission p { margin:0 0 8px; color:#e4ebdf; font-size:.91rem; line-height:1.58; }
+      .muenba-nuppi-mission p.jp-line { margin:0; color:#a9bd9e; font-size:.8rem; line-height:1.6; }
+      .muenba-nuppi-case-board .muenba-nuppi-kicker { margin-top:-4px; }
+      .muenba-nuppi-case-board .muenba-case-board-eyebrow { margin-top:3px; }
+      .muenba-nuppi-case-board .muenba-lobby-case-board { margin-top:18px; border-color:rgba(216,201,139,.52); background:linear-gradient(145deg,rgba(126,111,48,.17),rgba(31,32,19,.3)); box-shadow:inset 0 0 22px rgba(216,201,139,.04); }
+      .muenba-nuppi-case-board .muenba-lobby-case-board h3 { text-shadow:0 0 16px rgba(255,233,148,.16); }
+      .muenba-nuppi-status-card { margin:4px 0 20px; padding:14px 16px 12px; border:1px solid rgba(156,224,193,.24); background:rgba(156,224,193,.045); }
+      .muenba-nuppi-status-card.is-ready { border-color:rgba(241,215,141,.58); background:linear-gradient(145deg,rgba(126,111,48,.18),rgba(83,60,20,.12)); box-shadow:0 0 26px rgba(216,201,139,.14); }
+      .muenba-nuppi-status-card.is-ready .muenba-nuppi-card-label { color:#f1d78d; }
+      .muenba-nuppi-status-card p,
+      .muenba-nuppi-success-card p,
+      .muenba-nuppi-next-card p { margin:0; color:#dae9df; font-size:.9rem; line-height:1.5; }
+      .muenba-nuppi-success-card,
+      .muenba-nuppi-next-card { margin:0 0 12px; padding:14px 16px 12px; }
+      .muenba-nuppi-success-card { border:1px solid rgba(156,224,193,.48); background:linear-gradient(145deg,rgba(52,104,78,.22),rgba(8,35,27,.38)); box-shadow:0 0 28px rgba(93,162,124,.14); }
+      .muenba-nuppi-success-card .muenba-nuppi-card-label { color:#baf4d3; }
+      .muenba-nuppi-success-card p.jp-line,
+      .muenba-nuppi-next-card p.jp-line { margin-top:6px; color:#a8cbbb; font-size:.8rem; }
+      .muenba-nuppi-next-card { border:1px solid rgba(170,150,255,.34); background:linear-gradient(145deg,rgba(83,61,155,.14),rgba(38,29,81,.2)); }
+      .muenba-nuppi-next-card .muenba-nuppi-card-label { color:#c9baff; }
+      .muenba-nuppi-handoff .muenba-nuppi-nameplate { margin-bottom:14px; }
       @media (max-width:640px) {
         .muenba-lobby-box { width:min(100%,calc(100vw - 24px)); max-height:calc(100dvh - 24px); padding:24px 18px 20px; border-radius:16px; }
         .muenba-lobby-box::after { top:11px; width:72px; }
         .muenba-lobby-portrait { width:82px; height:82px; margin-bottom:10px; }
         .muenba-case-question { padding:15px 14px 14px; }
         .muenba-case-choice { min-height:58px; padding:12px 12px 12px 10px; }
+        .muenba-nuppi-speech, .muenba-nuppi-mission, .muenba-nuppi-status-card, .muenba-nuppi-success-card, .muenba-nuppi-next-card { padding-left:13px; padding-right:13px; }
       }
       @media (prefers-reduced-motion: reduce) { .muenba-orb-release, .muenba-hunt-ghost-portrait { animation:none; } }
       @media (prefers-reduced-motion: reduce) { #muenba-fade, .muenba-return-box, #muenba-return-overlay, .muenba-lobby-box, #muenba-lobby-overlay, #muenba-capture-overlay { transition:none !important; } .muenba-lobby-portrait, #muenba-hide, #muenba-celebration-status, .muenba-rhythm-board, .muenba-rhythm-combo, .muenba-rhythm-result-failure, .muenba-case-question, .muenba-case-question::before { animation:none !important; } .muenba-rhythm-energy-fill { transition:none !important; } #muenba-profile-link { transition:none !important; } }
@@ -4338,14 +4384,21 @@
     const greetEn = name ? `${name}, there you are.` : 'There you are.';
     const greetJp = name ? `${name}……ようこそ。` : 'ようこそ。';
     lobbyOverlay.innerHTML = `
-      <div class="muenba-lobby-box">
+      <div class="muenba-lobby-box muenba-nuppi-scene muenba-nuppi-welcome">
         <img class="muenba-lobby-portrait" src="assets/img/wanderers/nuppi-2.png" alt="Nuppi">
-        <h2>Nuppi</h2>
-        <p class="jp">ヌーピー</p>
-        <p>${greetEn}</p>
-        <p class="jp-line">${greetJp}</p>
-        <p>Somewhere among these fifteen rooms, a ghost is hiding. Some won't notice you at all, while others will come looking. If one gets close, you can hide until it loses interest. When you see one, walk up and give it a tap.</p>
-        <p class="jp-line">この15の<ruby>部屋<rt>へや</rt></ruby>のどこかに、<ruby>幽霊<rt>ゆうれい</rt></ruby>が<ruby>隠<rt>かく</rt></ruby>れているよ。<ruby>気<rt>き</rt></ruby>づかない<ruby>幽霊<rt>ゆうれい</rt></ruby>もいれば、<ruby>探<rt>さが</rt></ruby>しに<ruby>来<rt>く</rt></ruby>る<ruby>幽霊<rt>ゆうれい</rt></ruby>もいる。<ruby>近<rt>ちか</rt></ruby>づかれたら、<ruby>隠<rt>かく</rt></ruby>れて<ruby>興味<rt>きょうみ</rt></ruby>をなくすのを<ruby>待<rt>ま</rt></ruby>とう。<ruby>見<rt>み</rt></ruby>つけたら、<ruby>近<rt>ちか</rt></ruby>づいてそっとタップしてみて。</p>
+        <div class="muenba-nuppi-kicker">MUENBA / NUPPI'S MESSAGE</div>
+        <p class="jp muenba-nuppi-kicker-jp">ヌーピーのメッセージ</p>
+        <div class="muenba-nuppi-nameplate"><h2>Nuppi</h2><span>ヌーピー</span></div>
+        <section class="muenba-nuppi-speech" aria-labelledby="muenba-welcome-speech-title">
+          <div id="muenba-welcome-speech-title" class="muenba-nuppi-speech-label">NUPPI SAYS</div>
+          <p>${greetEn}</p>
+          <p class="jp-line">${greetJp}</p>
+        </section>
+        <section class="muenba-nuppi-mission" aria-labelledby="muenba-welcome-mission-title">
+          <div id="muenba-welcome-mission-title" class="muenba-nuppi-card-label">YOUR MISSION</div>
+          <p>Somewhere among these fifteen rooms, a ghost is hiding. Some won't notice you at all, while others will come looking. If one gets close, you can hide until it loses interest. When you see one, walk up and give it a tap.</p>
+          <p class="jp-line">この15の<ruby>部屋<rt>へや</rt></ruby>のどこかに、<ruby>幽霊<rt>ゆうれい</rt></ruby>が<ruby>隠<rt>かく</rt></ruby>れているよ。<ruby>気<rt>き</rt></ruby>づかない<ruby>幽霊<rt>ゆうれい</rt></ruby>もいれば、<ruby>探<rt>さが</rt></ruby>しに<ruby>来<rt>く</rt></ruby>る<ruby>幽霊<rt>ゆうれい</rt></ruby>もいる。<ruby>近<rt>ちか</rt></ruby>づかれたら、<ruby>隠<rt>かく</rt></ruby>れて<ruby>興味<rt>きょうみ</rt></ruby>をなくすのを<ruby>待<rt>ま</rt></ruby>とう。<ruby>見<rt>み</rt></ruby>つけたら、<ruby>近<rt>ちか</rt></ruby>づいてそっとタップしてみて。</p>
+        </section>
         <div class="muenba-lobby-actions">
           <button id="muenba-lobby-begin" type="button"><span>Let's begin</span><small><ruby>始<rt>はじ</rt></ruby>めよう</small></button>
         </div>
@@ -4357,13 +4410,15 @@
   function renderNuppiCaseBoard() {
     if (!lobbyOverlay) return;
     lobbyOverlay.innerHTML = `
-      <div class="muenba-lobby-box is-case-board">
+      <div class="muenba-lobby-box is-case-board muenba-nuppi-scene muenba-nuppi-case-board">
         <img class="muenba-lobby-portrait" src="assets/img/wanderers/nuppi-2.png" alt="Nuppi">
+        <div class="muenba-nuppi-kicker">NUPPI'S CASE DESK</div>
+        <p class="jp muenba-nuppi-kicker-jp">ヌーピーの<ruby>事件<rt>じけん</rt></ruby>デスク</p>
         <div class="muenba-case-board-eyebrow">CASE DESK / NUPPI</div>
         <p class="jp muenba-case-board-eyebrow-jp"><ruby>事件<rt>じけん</rt></ruby><ruby>受付<rt>うけつけ</rt></ruby> / ヌーピー</p>
-        <h2>Nuppi's case board</h2>
-        <p class="jp">ヌーピーの<ruby>事件<rt>じけん</rt></ruby>ボード</p>
+        <div class="muenba-nuppi-nameplate"><h2>Nuppi's case board</h2><span>ヌーピーの<ruby>事件<rt>じけん</rt></ruby>ボード</span></div>
         <section class="muenba-lobby-case-board" aria-labelledby="muenba-case-board-title">
+          <div class="muenba-nuppi-card-label">THE NEXT CASE</div>
           <h3 id="muenba-case-board-title"></h3>
           <p id="muenba-case-board-title-jp" class="muenba-case-direction-jp"></p>
           <p id="muenba-case-board-mode" class="muenba-case-board-mode"></p>
@@ -4498,12 +4553,20 @@
         ? '<ruby>待<rt>ま</rt></ruby>っているよ。'
         : 'ヌーピーはここで<ruby>待<rt>ま</rt></ruby>っているよ。';
     lobbyOverlay.innerHTML = `
-      <div class="muenba-lobby-box muenba-room-nuppi-box">
+      <div class="muenba-lobby-box muenba-room-nuppi-box muenba-nuppi-scene muenba-nuppi-waiting">
         <img class="muenba-lobby-portrait" src="assets/img/wanderers/nuppi-2.png" alt="Nuppi">
-        <h2>Nuppi</h2>
-        <p class="jp">ヌーピー</p>
-        <p>${copy}</p>
-        <p class="jp-line">${copyJp}</p>
+        <div class="muenba-nuppi-kicker">ROOM 01 / NUPPI</div>
+        <p class="jp muenba-nuppi-kicker-jp">1<ruby>号室<rt>ごうしつ</rt></ruby> / ヌーピー</p>
+        <div class="muenba-nuppi-nameplate"><h2>Nuppi</h2><span>ヌーピー</span></div>
+        <section class="muenba-nuppi-speech" aria-labelledby="muenba-waiting-speech-title">
+          <div id="muenba-waiting-speech-title" class="muenba-nuppi-speech-label">NUPPI SAYS</div>
+          <p>${copy}</p>
+          <p class="jp-line">${copyJp}</p>
+        </section>
+        <section class="muenba-nuppi-status-card${pending ? ' is-ready' : ''}" aria-live="polite">
+          <div class="muenba-nuppi-card-label">${pending ? 'ENERGY HANDOFF READY' : waitingForCase ? 'WAITING AT THE START ROOM' : 'THE START ROOM'}</div>
+          <p>${pending ? 'Your energy orbs are ready to return here.' : waitingForCase ? 'Finish the case, then bring the energy home.' : 'Nuppi will be here when you need him.'}</p>
+        </section>
         <div class="muenba-lobby-actions">
           ${pending ? '<button id="muenba-room-nuppi-handoff" class="muenba-capture-action" type="button"><span>Hand over energy</span><small>エネルギーを<ruby>渡<rt>わた</rt></ruby>す</small></button>' : ''}
           <button id="muenba-room-nuppi-close" type="button"><span>Back to the hunt</span><small><ruby>探索<rt>たんさく</rt></ruby>に<ruby>戻<rt>もど</rt></ruby>る</small></button>
@@ -4533,16 +4596,23 @@
     state.clickTarget = null;
     state.moving = false;
     lobbyOverlay.innerHTML = `
-      <div class="muenba-lobby-box muenba-handoff-box">
+      <div class="muenba-lobby-box muenba-handoff-box muenba-nuppi-scene muenba-nuppi-handoff">
         <img class="muenba-lobby-portrait" src="assets/img/wanderers/nuppi-2.png" alt="Nuppi">
+        <div class="muenba-nuppi-kicker">NUPPI RECEIVES THE ENERGY</div>
+        <p class="jp muenba-nuppi-kicker-jp">ヌーピーがエネルギーを<ruby>受<rt>う</rt></ruby>け<ruby>取<rt>と</rt></ruby>る</p>
         <div class="muenba-case-board-eyebrow">ENERGY RETURNED</div>
         <p class="jp muenba-case-board-eyebrow-jp">エネルギーが<ruby>戻<rt>もど</rt></ruby>った</p>
-        <h2>Thank you, Booha.</h2>
-        <p class="jp">ありがとう、ブーハー。</p>
-        <p>${orbLabel} are safe with Nuppi now.</p>
-        <p class="jp-line"><ruby>届<rt>とど</rt></ruby>けてくれてありがとう。エネルギーはヌーピーが<ruby>預<rt>あず</rt></ruby>かるよ。</p>
-        <p>${canContinue ? 'Would you like to find another ghost?' : 'That is all for this week. The ghosts will return next week.'}</p>
-        <p class="jp-line">${canContinue ? 'もう<ruby>一度<rt>いちど</rt></ruby>、<ruby>幽霊<rt>ゆうれい</rt></ruby>を<ruby>探<rt>さが</rt></ruby>してみる？' : 'この<ruby>週<rt>しゅう</rt></ruby>はこれでおしまい。<ruby>幽霊<rt>ゆうれい</rt></ruby>は<ruby>来週<rt>らいしゅう</rt></ruby>に<ruby>戻<rt>もど</rt></ruby>ってくるよ。'}</p>
+        <div class="muenba-nuppi-nameplate"><h2>Thank you, Booha.</h2><span>ありがとう、ブーハー。</span></div>
+        <section class="muenba-nuppi-success-card">
+          <div class="muenba-nuppi-card-label">ENERGY SAFE</div>
+          <p>${orbLabel} are safe with Nuppi now.</p>
+          <p class="jp-line"><ruby>届<rt>とど</rt></ruby>けてくれてありがとう。エネルギーはヌーピーが<ruby>預<rt>あず</rt></ruby>かるよ。</p>
+        </section>
+        <section class="muenba-nuppi-next-card">
+          <div class="muenba-nuppi-card-label">NEXT STEP</div>
+          <p>${canContinue ? 'Would you like to find another ghost?' : 'That is all for this week. The ghosts will return next week.'}</p>
+          <p class="jp-line">${canContinue ? 'もう<ruby>一度<rt>いちど</rt></ruby>、<ruby>幽霊<rt>ゆうれい</rt></ruby>を<ruby>探<rt>さが</rt></ruby>してみる？' : 'この<ruby>週<rt>しゅう</rt></ruby>はこれでおしまい。<ruby>幽霊<rt>ゆうれい</rt></ruby>は<ruby>来週<rt>らいしゅう</rt></ruby>に<ruby>戻<rt>もど</rt></ruby>ってくるよ。'}</p>
+        </section>
         <div class="muenba-lobby-actions">
           ${canContinue ? '<button id="muenba-handoff-find" class="muenba-capture-action" type="button"><span>Find another ghost</span><small><ruby>別<rt>べつ</rt></ruby>の<ruby>幽霊<rt>ゆうれい</rt></ruby>を<ruby>探<rt>さが</rt></ruby>す</small></button>' : ''}
           <button id="muenba-handoff-later" type="button"><span>Not now</span><small><ruby>今<rt>いま</rt></ruby>はやめる</small></button>
