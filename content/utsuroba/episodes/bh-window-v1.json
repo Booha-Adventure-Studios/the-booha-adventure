@@ -35,7 +35,7 @@
   },
   "success":"The memory settles. Bryan remembers that belonging can begin with a few quiet words.",
   "successJP":"記憶が落ち着きました。居場所は、静かな短い言葉から始まることをブライアンは思い出しました。",
-  "worldEcho":{"roomId":"room_03","x":0.42,"y":0.57,"motif":"reflection","label":"A welcome in the glass","labelJP":"ガラスの歓迎"},
+  "worldEcho":{"roomId":"room_03","x":0.42,"y":0.57,"motif":"window","label":"A welcome in the glass","labelJP":"ガラスの歓迎"},
   "postcard":{"title":"Deep memory postcard","titleJP":"深い記憶カード","instruction":"Build an evidence summary. Put the reason after the clues.","instructionJP":"証拠のまとめを作りましょう。手がかりのあとに理由を置きましょう。","chunks":["Bryan wrote his name on the window.","Rain changed the letters.","A message told him he could stay."],"chunksJP":["ブライアンは窓に名前を書いた。","雨が文字を変えた。","言葉が彼に残ってよいと伝えた。"],"order":[0,1,2],"savedText":"Bryan wrote his name on the window. Rain changed the letters. A message told him he could stay."},
   "fresh": {
     "intro": "Bryan remembers his name on a window. Rain changed it. Then he read something new.",

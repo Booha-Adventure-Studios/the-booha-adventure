@@ -1554,7 +1554,7 @@
     const utsu = readUtsuroba();
     const restored = utsu.readingEchoes || {};
     const episodes = window.UTSUROBA_EPISODES || {};
-    const iconFor = { lantern: '✦', candy: '●', reflection: '◈' };
+    const iconFor = { lantern: '✦', candy: '●', reflection: '◈', window: '▱' };
     const worldUnderstood = !!utsu.flags?.convergenceSeen;
     const garden = convergence.garden;
     const label   = worldUnderstood && garden ? garden.title   : convergence.title;
