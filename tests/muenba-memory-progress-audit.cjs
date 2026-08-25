@@ -49,6 +49,12 @@ function availableGhostIds(ghostIds, weeklyFound, targetId) {
   return ghostIds.filter(ghostId => ghostId === targetId || !weeklyFound[ghostId]);
 }
 
+function rewardForCapture({ caseMode, completedModes = {}, weeklyFound }) {
+  const caseModeAlreadyComplete = !!(caseMode && completedModes[caseMode] === true);
+  const isNewWeeklyCapture = !weeklyFound;
+  return caseMode && !caseModeAlreadyComplete ? 3 : (isNewWeeklyCapture ? 3 : 0);
+}
+
 function profileRecord(caseId, caseRecords, legacyCompletedIds) {
   const record = caseRecords[caseId] && typeof caseRecords[caseId] === 'object' ? caseRecords[caseId] : {};
   return !record.completedModes && legacyCompletedIds.includes(caseId)
@@ -71,6 +77,11 @@ assert(source.includes("start: 'Starter Memory'"), 'case popup should use the St
 assert(source.includes("fresh: 'Case Memory'"), 'case popup should use the Case Memory label');
 assert(source.includes('id="muenba-case-board-mode"'), 'Nuppi case board should show the selected reading level');
 assert(profileSource.includes("memoryModeLabel(entry.caseDifficulty || 'fresh')"), 'journal should show player-facing memory labels');
+assert(source.includes('const caseModeAlreadyComplete = !!('), 'capture commits must know whether this memory lane is already complete');
+assert(source.includes('const rewardCount = caseMode && !caseModeAlreadyComplete'), 'unfinished memory lanes must receive energy even after the weekly ghost flag is set');
+assert(source.includes('if (rewardCount <= 0)'), 'zero-orb captures must not create a fake Nuppi handoff');
+assert(source.includes('const pending = Number.isInteger(mu.orbsPending) ? mu.orbsPending : 0;'), 'Nuppi handoff must read the durable pending-orb count');
+assert(source.includes('mu.orbsPending = 0;'), 'Nuppi handoff must clear pending orbs during the saved deposit');
 
 const legacy = migrateRecord({ completed: true, difficulty: 'fresh' });
 assert.deepStrictEqual(legacy.completedModes, { fresh: true }, 'legacy completed records should migrate to their recorded mode');
@@ -95,6 +106,10 @@ assert.ok(availableGhostIds(['twiddle', 'fuzzle'], weeklyFound, 'twiddle').inclu
 record = completeMode(record, 'fresh');
 assert.strictEqual(record.completed, false, 'Deep Memory should still be required');
 assert.strictEqual(nextCase(['case_01'], { case_01: record }, 'deep'), 'case_01', 'the same case should return for unfinished Deep Memory');
+
+assert.strictEqual(rewardForCapture({ caseMode: 'fresh', completedModes: { start: true }, weeklyFound: true }), 3, 'an unfinished Case lane should create new energy after the ghost was captured this week');
+assert.strictEqual(rewardForCapture({ caseMode: 'deep', completedModes: { start: true, fresh: true }, weeklyFound: true }), 3, 'an unfinished Deep lane should create new energy after the ghost was captured this week');
+assert.strictEqual(rewardForCapture({ caseMode: 'fresh', completedModes: { fresh: true }, weeklyFound: true }), 0, 'an already-complete memory lane must not duplicate energy');
 
 record = completeMode(record, 'deep');
 assert.strictEqual(record.completed, true, 'all three modes should complete the case');
