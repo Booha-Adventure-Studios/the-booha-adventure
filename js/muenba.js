@@ -2843,8 +2843,8 @@
     box.appendChild(copyJp);
     renderCaseDirection(
       box,
-      'Watch the energy release, then return the orbs to Nuppi.',
-      'エネルギーが<ruby>出<rt>で</rt></ruby>てきます。<ruby>見<rt>み</rt></ruby>てから、オーブをヌーピーに<ruby>届<rt>とど</rt></ruby>けましょう。',
+      `You caught the energy from ${ghost.name}! Return the orbs to Nuppi now.`,
+      `${ghost.name}のエネルギーを<ruby>捕<rt>つか</rt></ruby>まえた！<ruby>今<rt>いま</rt></ruby>すぐオーブをヌーピーに<ruby>返<rt>かえ</rt></ruby>そう。`,
       'muenba-capture-direction'
     );
 
@@ -2860,6 +2860,13 @@
     status.setAttribute('aria-live', 'polite');
     box.appendChild(status);
     reward.statusEl = status;
+
+    renderCaseDirection(
+      box,
+      'Be careful! All the ghosts are angry now!',
+      '<ruby>気<rt>き</rt></ruby>をつけて！<ruby>今<rt>いま</rt></ruby>、すべての<ruby>幽霊<rt>ゆうれい</rt></ruby>が<ruby>怒<rt>おこ</rt></ruby>っているよ！',
+      'muenba-energy-warning'
+    );
 
     const actions = document.createElement('div');
     actions.className = 'muenba-lobby-actions';
@@ -3743,6 +3750,10 @@
       .muenba-capture-reward > p:not(.jp):not(.muenba-orb-release-status) { color:#e4f7df; font-size:.98rem; line-height:1.58; }
       .muenba-capture-reward .muenba-capture-direction { border-color:rgba(183,255,83,.3); background:rgba(132,255,77,.06); }
       .muenba-capture-reward .muenba-orb-release-list { margin-top:16px; padding:10px 8px; border:1px solid rgba(183,255,83,.2); border-radius:12px; background:rgba(132,255,77,.035); }
+      .muenba-energy-warning { margin:16px 0 14px; border:1px solid rgba(255,82,96,.78); border-left:4px solid #ff7180; border-radius:10px; background:linear-gradient(105deg,rgba(125,24,34,.4),rgba(62,10,20,.34)); box-shadow:0 0 24px rgba(235,28,57,.28),inset 0 0 18px rgba(255,82,96,.08); animation:muenbaEnergyWarningPulse 1.7s ease-in-out infinite; }
+      .muenba-energy-warning .muenba-case-direction-en { color:#fff1f2; font-size:1rem; font-weight:900; text-shadow:0 0 12px rgba(255,116,127,.32); }
+      .muenba-energy-warning .muenba-case-direction-jp { color:#ffc4c9; font-size:.86rem; }
+      @keyframes muenbaEnergyWarningPulse { 0%,100% { box-shadow:0 0 18px rgba(235,28,57,.2),inset 0 0 14px rgba(255,82,96,.06); } 50% { box-shadow:0 0 34px rgba(235,28,57,.48),inset 0 0 20px rgba(255,82,96,.12); } }
       /* Pass 5: final readability and device safeguards. */
       .muenba-lobby-box > *,
       .muenba-lobby-box h2,
@@ -3793,7 +3804,7 @@
         .muenba-nuppi-speech, .muenba-nuppi-mission, .muenba-nuppi-status-card, .muenba-nuppi-success-card, .muenba-nuppi-next-card { padding-left:13px; padding-right:13px; }
       }
       @media (prefers-reduced-motion: reduce) { .muenba-orb-release, .muenba-hunt-ghost-portrait { animation:none; } }
-      @media (prefers-reduced-motion: reduce) { #muenba-fade, .muenba-return-box, #muenba-return-overlay, .muenba-lobby-box, #muenba-lobby-overlay, #muenba-capture-overlay { transition:none !important; } .muenba-lobby-portrait, #muenba-hide, #muenba-celebration-status, .muenba-rhythm-board, .muenba-rhythm-combo, .muenba-rhythm-result-failure, .muenba-case-question, .muenba-case-question::before { animation:none !important; } .muenba-case-choice, .muenba-case-action, .muenba-capture-action { transition:none !important; } .muenba-rhythm-energy-fill { transition:none !important; } #muenba-profile-link { transition:none !important; } }
+      @media (prefers-reduced-motion: reduce) { #muenba-fade, .muenba-return-box, #muenba-return-overlay, .muenba-lobby-box, #muenba-lobby-overlay, #muenba-capture-overlay { transition:none !important; } .muenba-lobby-portrait, #muenba-hide, #muenba-celebration-status, .muenba-rhythm-board, .muenba-rhythm-combo, .muenba-rhythm-result-failure, .muenba-case-question, .muenba-case-question::before, .muenba-energy-warning { animation:none !important; } .muenba-case-choice, .muenba-case-action, .muenba-capture-action { transition:none !important; } .muenba-rhythm-energy-fill { transition:none !important; } #muenba-profile-link { transition:none !important; } }
     `;
     document.head.appendChild(style);
   }
