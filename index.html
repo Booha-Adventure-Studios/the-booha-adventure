@@ -258,7 +258,14 @@
     .hubScroll {
       min-height: 100%;
       display: flex;
-      align-items: center;
+      /* "safe center": on a short viewport where the hub content is taller
+         than the screen, plain align-items:center can clip the TOP of the
+         content when scrolled to the start instead of scrolling cleanly to
+         it (a known flexbox-centering gotcha). "safe" falls back to
+         flex-start once content overflows, so nothing is ever unreachable.
+         Widely supported for a couple years now; degrades to plain center
+         (today's behavior) on anything that doesn't understand it. */
+      align-items: safe center;
       justify-content: center;
       padding:
         calc(clamp(10px,2vw,18px) + var(--safe-top))
@@ -790,8 +797,16 @@
   text-transform: uppercase;
 }
 
+.speedTitleJp {
+  margin-top: 1px;
+  font-size: clamp(7px, .95vw, 9px);
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: rgba(255,230,109,.55);
+}
+
 .speedSub {
-  margin-top: 2px;
+  margin-top: 3px;
   font-size: clamp(8px, 1.1vw, 10px);
   font-weight: 800;
   letter-spacing: 2px;
@@ -799,7 +814,12 @@
   text-transform: uppercase;
 }
 
-/* ── Tabs ── */
+/* ── Tabs ──
+   Two-line now (EN + the katakana already established for these three
+   curricula on the daily-check screen — CURR_TILES in daily-check.js),
+   so the click handler below matches on tab.id via a data attribute
+   instead of comparing button textContent, which would otherwise now
+   include the Japanese line too. */
 .blitzTabs {
   display: flex;
   justify-content: center;
@@ -810,6 +830,7 @@
 .blitzTabs button {
   appearance: none; border: 0;
   background: transparent;
+  display: flex; flex-direction: column; align-items: center; gap: 1px;
   color: rgba(255,255,255,.35);
   font-size: clamp(9px, 1.2vw, 11px);
   font-weight: 900;
@@ -822,6 +843,16 @@
   transition: color 180ms ease, background 180ms ease;
   -webkit-tap-highlight-color: transparent;
 }
+
+.blitzTabJp {
+  font-size: clamp(6px, .85vw, 8px);
+  font-weight: 700;
+  letter-spacing: .5px;
+  text-transform: none;
+  color: rgba(255,255,255,.55);
+}
+
+.blitzTabs button.active .blitzTabJp { color: rgba(26,20,8,.65); }
 
 .blitzTabs button.active {
   color: #1a1408;
@@ -1607,10 +1638,13 @@ function renderHub() {
 const thisWeek = getCurrentCurriculumWeek();
   let activeTab = 'pb';   // activeTab now holds the curriculum id
 
+  // jp values match CURR_TILES in daily-check.js — same three curricula,
+  // same katakana, so a kid sees one consistent name for each track
+  // everywhere on the site rather than a second translation invented here.
   const TABS = [
-  { id: 'pb', label: 'PRE-BOO',       ready: true },
-  { id: 'br', label: 'BOO-RICULUM',   ready: true },
-  { id: 'bc', label: 'BOO-CONTINUUM', ready: true },
+  { id: 'pb', label: 'PRE-BOO',       jp: 'プレブー',           ready: true },
+  { id: 'br', label: 'BOO-RICULUM',   jp: 'ブーリキュラム',      ready: true },
+  { id: 'bc', label: 'BOO-CONTINUUM', jp: 'ブーコンティニュアム', ready: true },
 ];
 
   
@@ -1626,8 +1660,9 @@ const PILLS = [
   arcade.className = 'blitzArcade';
   arcade.innerHTML = `
     <div class="speedTitle">BLITZ GAMES</div>
+    <div class="speedTitleJp">ブリッツゲーム</div>
     <div class="speedSub">${playerName}'S FAST CHALLENGES — THIS WEEK ONLY</div>
-    
+
     <div class="blitzTabs" id="blitzTabs"></div>
     <div class="blitzDivider"></div>
     <div class="blitzGames" id="blitzGames"></div>
@@ -1680,15 +1715,17 @@ const PILLS = [
   TABS.forEach(tab => {
     const btn = document.createElement('button');
     btn.type = 'button';
-    btn.textContent = tab.label;
+    btn.dataset.tabId = tab.id; // matched on below — textContent now has two lines (EN + JP), so it can't double as the lookup key any more
+    // Both lines wrapped in their own span (not a bare text node) so the
+    // flex-column layout stacks them predictably.
+    btn.innerHTML = `<span class="blitzTabEn">${tab.label}</span><span class="blitzTabJp">${tab.jp}</span>`;
     btn.className = tab.ready ? (tab.id === activeTab ? 'active' : '') : 'soon';
     btn.addEventListener('click', () => {
       if (!tab.ready) return;
       activeTab = tab.id;
       tabsEl.querySelectorAll('button').forEach(b => {
-        b.className = TABS.find(t => t.label === b.textContent)?.ready
-          ? (b.textContent === tab.label ? 'active' : '')
-          : 'soon';
+        const bTab = TABS.find(t => t.id === b.dataset.tabId);
+        b.className = bTab?.ready ? (bTab.id === activeTab ? 'active' : '') : 'soon';
       });
       renderPills();
     });
