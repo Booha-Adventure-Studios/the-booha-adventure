@@ -32,6 +32,11 @@ assert(source.includes('chaseSpeed: carryingEnergy'), 'ghosts must remember the 
 assert(source.includes("startGhostScream(activeGhost, performance.now(), 'carried-energy');"), 'carried-energy rooms must begin screaming immediately');
 assert(source.includes("if (g.carryingEnergy && g.hostility === 'sight' && !g.screaming)"), 'coming out of hiding with energy must re-arm the chase immediately');
 assert(source.includes('&& !g.carryingEnergy'), 'ordinary chases may lose interest at range, but carried-energy chases must persist');
+assert(source.includes('let carriedEnergyVignetteCanvas;'), 'carried-energy atmosphere must use its own cached layer');
+assert(source.includes('carriedEnergyVignetteCanvas = document.createElement(\'canvas\');'), 'carried-energy vignette must be cached once');
+assert(source.includes('const returnTripActive = Number(readMuenba().orbsPending) > 0'), 'carried-energy atmosphere must follow pending orbs');
+assert(source.includes('&& state.roomId !== MUENBA_NUPPI.roomId;'), 'room_01 must remain the safe visual reset during the return trip');
+assert(source.includes('atmosphereCtx.drawImage(carriedEnergyVignetteCanvas, 0, 0);'), 'carried-energy atmosphere must composite the cached vignette');
 assert(source.includes('moveGhostToward(g, state.x, state.y, g.chaseSpeed || GHOST_CHASE_SPEED);'), 'chasing must use the carried-energy speed when active');
 assert(source.includes("if (g.hostility === 'sight' && !g.screaming)"), 'sight-angry ghosts must use the delayed notice path');
 assert(source.includes("beginDangerEncounter(g.ghost, { allowHide: g.dangerCanHide === true });"), 'danger encounters must use the ghost role to decide whether hiding is allowed');
