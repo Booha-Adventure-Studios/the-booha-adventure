@@ -337,7 +337,7 @@
 
     /* ── BACK BUTTON — GLOWING ───────────────────── */
     .back-btn {
-      display: inline-flex; align-items: center; gap: .4rem;
+      display: inline-flex; flex-direction: column; align-items: center; gap: .08rem;
       margin-top: 1.1rem; padding: .55rem 1.4rem; border-radius: 99px;
       border: 1.5px solid #c8b8ffaa;
       background: linear-gradient(135deg, #c8b8ff22, #9d80ff14);
@@ -352,6 +352,8 @@
         inset 0 1px 0 #c8b8ff33;
       animation: backBtnPulse 3s ease-in-out infinite;
     }
+    .back-btn .back-en { line-height: 1.1; }
+    .back-btn small { color: #dcd3ff; font-size: .82em; line-height: 1.1; letter-spacing: .08em; }
     @keyframes backBtnPulse {
       0%,100% { box-shadow: 0 0 18px #c8b8ff55, 0 0 40px #c8b8ff22, 0 0 70px #c8b8ff11, inset 0 1px 0 #c8b8ff33; }
       50%      { box-shadow: 0 0 28px #c8b8ffaa, 0 0 60px #c8b8ff44, 0 0 100px #c8b8ff22, inset 0 1px 0 #c8b8ff55; }
@@ -783,7 +785,7 @@
     <div class="h-en">My Adventure</div>
     <div class="h-jp">ぼくのぼうけん</div>
     <div class="h-kanji"><ruby>冒険<rt>ぼうけん</rt></ruby>の<ruby>記録<rt>きろく</rt></ruby></div>
-    <a href="karasuki.html" class="back-btn">← <ruby>戻<rt>もど</rt></ruby>る &nbsp;/&nbsp; Back</a>
+    <a href="karasuki.html" class="back-btn" aria-label="Back to Karasuki"><span class="back-en">← Back</span><small><ruby>戻<rt>もど</rt></ruby>る</small></a>
     <nav class="profile-network" aria-label="Output profiles">
       <a href="profile.html">LOG <small>ぼうけんログ</small></a>
       <a href="adventure-profile.html" aria-current="page">ADVENTURE <small>ぼうけん</small></a>
