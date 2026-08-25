@@ -13,7 +13,7 @@ const CURRENT_CACHES = {
   // Connected-doors pass: bumped for js/karasuki.js's UTSUROBA_LOCKED_COPY
   // wording fix. Bump this string on every future /js/-touching fix, not
   // just this one.
-  assets: 'booha-assets-2026-322',
+  assets: 'booha-assets-2026-323',
   decks:  'booha-decks-2026-309',
 };
 
