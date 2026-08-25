@@ -22,6 +22,7 @@
     thorn:      { ring: '#d9503a', glow: 'rgba(217,80,58,.5)' },
     ribbon:     { ring: '#d9a8ff', glow: 'rgba(217,168,255,.5)' },
   };
+  const POSTCARD_STAMPS = { lantern: '✦', candy: '●', reflection: '◈', window: '▱', thorn: '✣', ribbon: '❧' };
 
   /* Round 2 Pass 18: this screen's own instructional chrome (mode badges,
      onboarding, calibration, vocab/postcard/sequence task copy) was hardcoded
@@ -176,19 +177,21 @@
       #utsuroba-reading-challenge .reading-secondary{margin-top:24px;padding:11px 20px;border:1px solid rgba(216,168,255,.55);border-radius:8px;background:rgba(216,168,255,.08);color:#f3ddff;font:700 .86rem Georgia,serif;cursor:pointer;}
       #utsuroba-reading-challenge .reading-secondary:hover{background:rgba(216,168,255,.18);border-color:#d8a8ff;}
       #utsuroba-reading-challenge .reading-complete-actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;}
-      #utsuroba-reading-challenge .reading-postcard{margin:18px 0;padding:13px;text-align:left;border:1px solid rgba(216,168,255,.28);border-radius:10px;background:rgba(216,168,255,.045);}
-      #utsuroba-reading-challenge .reading-postcard-heading{color:#e4c2ff;font:700 .78rem Georgia,serif;}
+      #utsuroba-reading-challenge .reading-postcard{position:relative;isolation:isolate;margin:18px 0;padding:15px;text-align:left;border:1px solid var(--postcard-ring,rgba(216,168,255,.28));border-left:3px solid var(--postcard-ring,rgba(216,168,255,.5));border-radius:10px;background:linear-gradient(145deg,rgba(255,252,242,.1),rgba(255,255,255,.025)),repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 1px,transparent 1px 4px);box-shadow:0 0 22px var(--postcard-glow,rgba(216,168,255,.12));overflow:hidden;}
+      #utsuroba-reading-challenge .reading-postcard::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(circle at 90% 12%,var(--postcard-glow,rgba(216,168,255,.16)),transparent 32%),linear-gradient(120deg,transparent 0 68%,rgba(255,255,255,.035) 68% 69%,transparent 69%);opacity:.9;}
+      #utsuroba-reading-challenge .reading-postcard-stamp{position:absolute;top:10px;right:12px;display:grid;place-items:center;width:28px;height:28px;border:1px dashed var(--postcard-ring,#d8a8ff);border-radius:5px;color:var(--postcard-ring,#d8a8ff);font:700 1rem Georgia,serif;transform:rotate(7deg);opacity:.86;box-shadow:inset 0 0 0 2px rgba(255,255,255,.035);}
+      #utsuroba-reading-challenge .reading-postcard-heading{padding-right:42px;color:var(--postcard-ring,#e4c2ff);font:700 .78rem Georgia,serif;}
       #utsuroba-reading-challenge .reading-postcard-heading span{display:block;margin-top:3px;color:rgba(245,232,255,.5);font-size:.88em;font-weight:400;}
       #utsuroba-reading-challenge .reading-postcard-instruction{margin:8px 0;color:rgba(245,232,255,.7);font-size:.8rem;line-height:1.45;}
       #utsuroba-reading-challenge .reading-postcard-instruction small{display:block;margin-top:3px;color:rgba(245,232,255,.54);font-size:.95em;}
       #utsuroba-reading-challenge .reading-postcard-picked{min-height:34px;margin-bottom:9px;padding:7px 9px;border-radius:7px;background:rgba(0,0,0,.2);color:rgba(255,255,255,.68);font-size:.74rem;line-height:1.4;}
-      #utsuroba-reading-challenge .reading-postcard-option{display:block;width:100%;margin-top:7px;padding:8px 9px;text-align:left;border:1px solid rgba(216,168,255,.3);border-radius:6px;background:rgba(255,255,255,.05);color:#fff;cursor:pointer;font:inherit;font-size:.75rem;line-height:1.35;}
-      #utsuroba-reading-challenge .reading-postcard-option:hover,#utsuroba-reading-challenge .reading-postcard-option:focus-visible{background:rgba(216,168,255,.14);border-color:#d8a8ff;outline:none;}
+      #utsuroba-reading-challenge .reading-postcard-option{display:block;width:100%;margin-top:7px;padding:8px 9px;text-align:left;border:1px solid var(--postcard-ring,#d8a8ff);border-radius:6px;background:rgba(255,255,255,.05);color:#fff;cursor:pointer;font:inherit;font-size:.75rem;line-height:1.35;}
+      #utsuroba-reading-challenge .reading-postcard-option:hover,#utsuroba-reading-challenge .reading-postcard-option:focus-visible{background:rgba(255,255,255,.12);border-color:var(--postcard-ring,#d8a8ff);outline:none;}
       #utsuroba-reading-challenge .reading-postcard-option small{display:block;margin-top:3px;color:rgba(255,255,255,.48);font-size:.9em;}
       #utsuroba-reading-challenge .reading-postcard-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px;}
       #utsuroba-reading-challenge .reading-postcard-save{padding:7px 11px;border:1px solid #ffcb75;border-radius:6px;background:rgba(255,203,117,.12);color:#ffe7b2;cursor:pointer;font:700 .72rem Georgia,serif;}
       #utsuroba-reading-challenge .reading-postcard-save:hover,#utsuroba-reading-challenge .reading-postcard-save:focus-visible{background:rgba(255,203,117,.22);outline:none;}
-      #utsuroba-reading-challenge .reading-postcard-success{padding:8px 9px;border-left:3px solid #ffcb75;color:#ffe7b2;font-size:.76rem;line-height:1.45;}
+      #utsuroba-reading-challenge .reading-postcard-success{padding:8px 9px;border-left:3px solid var(--postcard-ring,#ffcb75);color:#ffe7b2;font-size:.76rem;line-height:1.45;}
       #utsuroba-reading-challenge .reading-postcard-success small{display:block;margin-top:3px;color:rgba(255,231,178,.58);font-size:.9em;}
       #utsuroba-reading-challenge .reading-review-note{margin:14px auto 0;color:rgba(245,232,255,.48);font-size:.72rem;line-height:1.4;}
       #utsuroba-reading-challenge .reading-lens{margin:18px 0 0;padding:13px;text-align:left;border:1px solid rgba(216,168,255,.24);border-radius:10px;background:rgba(216,168,255,.045);}
@@ -451,21 +454,25 @@
     function renderPostcard() {
       const postcard = episode.postcard;
       if (!postcard || replayLens) return '';
+      const motif = episode.worldEcho && episode.worldEcho.motif;
+      const colors = MOTIF_COLORS[motif] || { ring: '#d8a8ff', glow: 'rgba(216,168,255,.4)' };
+      const stamp = POSTCARD_STAMPS[motif] || '✦';
+      const frame = content => `<section class="reading-postcard" style="--postcard-ring:${colors.ring};--postcard-glow:${colors.glow};"><span class="reading-postcard-stamp" aria-hidden="true">${stamp}</span>${content}</section>`;
       if (!postcardOpen) {
-        return `<section class="reading-postcard"><div class="reading-postcard-heading">${escapeText(postcard.title)}<span>${escapeText(postcard.titleJP)}</span></div><button class="reading-secondary" id="reading-postcard-open" type="button">Write a postcard / ${FURI.sentence('文章カードを書く', { '文章': 'ぶんしょう', '書く': 'かく' })}</button></section>`;
+        return frame(`<div class="reading-postcard-heading">${escapeText(postcard.title)}<span>${escapeText(postcard.titleJP)}</span></div><button class="reading-secondary" id="reading-postcard-open" type="button">Write a postcard / ${FURI.sentence('文章カードを書く', { '文章': 'ぶんしょう', '書く': 'かく' })}</button>`);
       }
       if (postcardSaved) {
-        return `<section class="reading-postcard"><div class="reading-postcard-success"><strong>Postcard saved.</strong> You can read it again in your Journal.<small>${FURI.sentence('保存しました。Journalで読み返せます。', { '保存しました': 'ほぞんしました', '読み返せます': 'よみかえせます' })}</small></div></section>`;
+        return frame(`<div class="reading-postcard-success"><strong>Postcard saved.</strong> You can read it again in your Journal.<small>${FURI.sentence('保存しました。Journalで読み返せます。', { '保存しました': 'ほぞんしました', '読み返せます': 'よみかえせます' })}</small></div>`);
       }
       if (postcardBuilt) {
         const text = postcardSelection.map(index => postcard.chunks[index]).join(' ');
-        return `<section class="reading-postcard"><div class="reading-postcard-heading">${escapeText(postcard.title)}<span>${escapeText(postcard.titleJP)}</span></div><p class="reading-postcard-instruction">Your postcard:<small>${FURI.sentence('あなたの文章カード：', { '文章': 'ぶんしょう' })}</small></p><div class="reading-postcard-picked">${escapeText(text)}</div><div class="reading-postcard-actions"><button class="reading-postcard-save" id="reading-postcard-save" type="button">Save postcard / ${FURI.sentence('保存する', { '保存する': 'ほぞんする' })}</button><button class="reading-task-action" id="reading-postcard-reset" type="button">Try again / ${FURI.sentence('もう一度', { '一度': 'いちど' })}</button></div></section>`;
+        return frame(`<div class="reading-postcard-heading">${escapeText(postcard.title)}<span>${escapeText(postcard.titleJP)}</span></div><p class="reading-postcard-instruction">Your postcard:<small>${FURI.sentence('あなたの文章カード：', { '文章': 'ぶんしょう' })}</small></p><div class="reading-postcard-picked">${escapeText(text)}</div><div class="reading-postcard-actions"><button class="reading-postcard-save" id="reading-postcard-save" type="button">Save postcard / ${FURI.sentence('保存する', { '保存する': 'ほぞんする' })}</button><button class="reading-task-action" id="reading-postcard-reset" type="button">Try again / ${FURI.sentence('もう一度', { '一度': 'いちど' })}</button></div>`);
       }
       const chunks = postcard.chunks.map((chunk, index) => postcardSelection.includes(index) ? '' : `<button class="reading-postcard-option" type="button" data-postcard-chunk="${index}">${escapeText(chunk)}<small>${escapeText(postcard.chunksJP[index] || '')}</small></button>`).join('');
       const picked = postcardSelection.length
         ? postcardSelection.map((index, order) => `<strong>${order + 1}.</strong> ${escapeText(postcard.chunks[index])}`).join('<br>')
         : 'Your summary will appear here.';
-      return `<section class="reading-postcard"><div class="reading-postcard-heading">${escapeText(postcard.title)}<span>${escapeText(postcard.titleJP)}</span></div><p class="reading-postcard-instruction">${escapeText(postcard.instruction)}<small>${escapeText(postcard.instructionJP)}</small></p>${postcardFeedback ? `<div class="reading-postcard-success">${postcardFeedback}</div>` : ''}<div class="reading-postcard-picked">${picked}</div><div class="reading-postcard-options">${chunks || '<span style="color:rgba(255,255,255,.55);font-size:.74rem;">All pieces selected. Check your summary.</span>'}</div><div class="reading-postcard-actions"><button class="reading-task-action" id="reading-postcard-reset" type="button">Start over / ${FURI.sentence('最初から', { '最初': 'さいしょ' })}</button><button class="reading-task-action primary" id="reading-postcard-check" type="button">Check summary / ${FURI.sentence('まとめを確認', { '確認': 'かくにん' })}</button></div></section>`;
+      return frame(`<div class="reading-postcard-heading">${escapeText(postcard.title)}<span>${escapeText(postcard.titleJP)}</span></div><p class="reading-postcard-instruction">${escapeText(postcard.instruction)}<small>${escapeText(postcard.instructionJP)}</small></p>${postcardFeedback ? `<div class="reading-postcard-success">${postcardFeedback}</div>` : ''}<div class="reading-postcard-picked">${picked}</div><div class="reading-postcard-options">${chunks || '<span style="color:rgba(255,255,255,.55);font-size:.74rem;">All pieces selected. Check your summary.</span>'}</div><div class="reading-postcard-actions"><button class="reading-task-action" id="reading-postcard-reset" type="button">Start over / ${FURI.sentence('最初から', { '最初': 'さいしょ' })}</button><button class="reading-task-action primary" id="reading-postcard-check" type="button">Check summary / ${FURI.sentence('まとめを確認', { '確認': 'かくにん' })}</button></div>`);
     }
 
     function savePostcard() {
