@@ -1594,9 +1594,11 @@ function renderHub() {
   const container = document.getElementById('weekCards');
   container.innerHTML = '';
 
-  // Greeting name + Maze CTA label/caption are static markup now (see
-  // #playerGreeting / #mazeBtn in the HTML) — showGreeting() sets the
-  // name span directly, so there's nothing to reset/rebuild here.
+  // Still needed here — used below in the Blitz Games arcade template
+  // ("${playerName}'S FAST CHALLENGES"). The greeting itself no longer
+  // reads this (see #playerGreeting in the HTML / showGreeting()), but
+  // this render still does.
+  const playerName = getBoohaFirstName();
 
   const existing = document.getElementById('blitzArcade');
   if (existing) existing.remove();
