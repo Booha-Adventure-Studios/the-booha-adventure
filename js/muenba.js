@@ -65,13 +65,15 @@
   const GHOST_DETECT_R = 230;
   const GHOST_CATCH_R = 60;
   const GHOST_CLICK_R = 64;
-  // Sight-angry ghosts build tension for two seconds before they reveal the
-  // scream. The delay is intentional: Booha should feel watched before the
-  // chase begins, but the reaction must still be predictable.
+  // Ordinary sight-angry ghosts build tension for two seconds before they
+  // reveal the scream. Jerks use a shorter warning, while carried energy
+  // skips the warning entirely.
   const GHOST_NOTICE_DELAY_MS = 2000;
-  // Carrying energy puts the whole cemetery on alert. The chase remains fair,
-  // but is a little faster than the ordinary angry-ghost pace.
-  const GHOST_CARRY_CHASE_SPEED = 1.35;
+  const JERK_NOTICE_DELAY_MS = 700;
+  const JERK_CHASE_SPEED = 1.55;
+  // Carrying energy puts the whole cemetery on immediate alert. This is fast
+  // enough to make the return trip dangerous, but still below Booha's speed.
+  const GHOST_CARRY_CHASE_SPEED = 1.6;
   // Hiding calms the encounter, but does not instantly clear the room. Let a
   // hostile ghost search nearby for a longer beat before it slips away.
   const GHOST_GIVEUP_HIDE_MS = 6000;
@@ -1145,7 +1147,9 @@
       behavior: hostility,
       hostility,
       carryingEnergy,
-      chaseSpeed: carryingEnergy ? GHOST_CARRY_CHASE_SPEED : GHOST_CHASE_SPEED,
+      chaseSpeed: carryingEnergy
+        ? GHOST_CARRY_CHASE_SPEED
+        : role === 'jerk' ? JERK_CHASE_SPEED : GHOST_CHASE_SPEED,
       chasing: false,
       wanderTarget: pos,
       nextWanderAt: performance.now() + 1800 + Math.random() * 1600,
@@ -1164,6 +1168,10 @@
       teleportWarningAt: 0,
       teleporting: false
     };
+    if (carryingEnergy) {
+      startGhostScream(activeGhost, performance.now(), 'carried-energy');
+      activeGhost.chasing = true;
+    }
   }
 
   function moveGhostToward(g, tx, ty, speed) {
@@ -1254,11 +1262,18 @@
       beginGhostRoomTravel(g, now);
       return;
     }
+    // Carrying energy is an emergency state. Hiding clears the scream for a
+    // moment, but stepping back out immediately re-arms the chase.
+    if (g.carryingEnergy && g.hostility === 'sight' && !g.screaming) {
+      startGhostScream(g, now, 'carried-energy');
+      g.chasing = true;
+    }
     const dist = Math.hypot(g.x - state.x, g.y - state.y);
     if (g.hostility === 'sight' && !g.screaming) {
       if (dist <= GHOST_DETECT_R) {
         if (!g.noticeStartedAt) g.noticeStartedAt = now;
-        if (now - g.noticeStartedAt >= GHOST_NOTICE_DELAY_MS) {
+        const noticeDelay = g.role === 'jerk' ? JERK_NOTICE_DELAY_MS : GHOST_NOTICE_DELAY_MS;
+        if (now - g.noticeStartedAt >= noticeDelay) {
           startGhostScream(g, now, 'sight');
           g.chasing = true;
         }
@@ -1267,7 +1282,7 @@
       }
     }
     if (g.screaming && g.chasing) {
-      if (dist > GHOST_DETECT_R * 1.5) {
+      if (dist > GHOST_DETECT_R * 1.5 && !g.carryingEnergy) {
         stopGhostScream(g);
         g.chasing = false;
         g.noticeStartedAt = 0;
