@@ -177,10 +177,6 @@
     #world-door-karasuki:hover, #world-door-karasuki:focus-visible {
       border-color: #d7aa4c; box-shadow: 0 0 22px rgba(184,137,47,.38), 0 6px 18px rgba(0,0,0,.55);
     }
-    #world-door-utsuroba { right: 14px; border-color: rgba(91,194,231,.55); }
-    #world-door-utsuroba:hover, #world-door-utsuroba:focus-visible {
-      border-color: #8edfff; box-shadow: 0 0 22px rgba(70,188,235,.38), 0 6px 18px rgba(0,0,0,.55);
-    }
     /* Centered rather than transform-positioned, so the shared hover
        transform above (translateY + scale) doesn't have to fight a
        translateX(-50%) needed just for centering. */
@@ -194,7 +190,6 @@
       filter: drop-shadow(0 3px 6px rgba(0,0,0,.72));
     }
     #world-door-karasuki img { transform: scale(1.18); }
-    #world-door-utsuroba img { transform: scale(.84); }
     .world-door-label {
       position: relative; z-index: 1; width: 100%; margin-top: -1px;
       font-family: 'Cinzel Decorative', serif; font-size: 8px; letter-spacing: 1px;
@@ -207,8 +202,39 @@
       .world-door-label { font-size: 7px; }
       .world-door-label small { font-size: 7px; }
       #world-door-karasuki { left: 8px; }
-      #world-door-utsuroba { right: 8px; }
       #world-door-muenba { margin-left: -36px; }
+    }
+
+    /* ── Utsuroba door: bare corner-icon language ──────────────────────────
+       Pass 3 (finalized spec) asks specifically for the Utsuroba door to
+       match index.html's #alog-icon-btn/#juku-icon-btn language — a bare
+       glowing object, not another card — rather than the bordered/labeled
+       .world-door treatment Karasuki and Muenba use. It stays a .world-door
+       for the shared hidden/positioning/hover-lift plumbing, but every card
+       trapping (border, fill, label, padded box) is stripped back off here. */
+    #world-door-utsuroba {
+      right: 14px; width: 76px; min-height: 0; height: 76px; padding: 0;
+      border: none; border-radius: 0; background: transparent; box-shadow: none;
+      align-items: center; justify-content: center;
+      animation: utsurobaDoorGlow 3s ease-in-out infinite;
+    }
+    #world-door-utsuroba:hover, #world-door-utsuroba:focus-visible {
+      border-color: transparent; box-shadow: none;
+    }
+    #world-door-utsuroba img {
+      width: 100%; height: 100%; object-fit: contain; object-position: center; transform: none;
+      filter: drop-shadow(0 4px 14px rgba(0,0,0,.6));
+    }
+    #world-door-utsuroba .world-door-label { display: none; }
+    @keyframes utsurobaDoorGlow {
+      0%, 100% { filter: drop-shadow(0 4px 14px rgba(0,0,0,.6)); }
+      50%      { filter: drop-shadow(0 0 18px rgba(91,194,231,.75)); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #world-door-utsuroba { animation: none; }
+    }
+    @media (max-width: 430px) {
+      #world-door-utsuroba { right: 8px; width: 62px; height: 62px; }
     }
 
     /* ── Leather header plate ── */
