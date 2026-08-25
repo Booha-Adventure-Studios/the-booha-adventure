@@ -777,6 +777,24 @@
     if (ok) invalidateDrifterStateCache();
   }
 
+  /* The first completion of the final required convergence drifter gets a
+     small visual handoff into the Memory Gate. This is checked before the
+     current completion is written, so replaying a completed tier cannot
+     retrigger the beat. */
+  function shouldShowConvergenceBeat(drifterId) {
+    const requiredIds = DATA.readingConvergence?.requiredDrifterIds;
+    if (!Array.isArray(requiredIds) || requiredIds.length < 3 || !requiredIds.includes(drifterId)) return false;
+    const current = DATA.drifters.find(drifter => drifter.id === drifterId);
+    if (!current?.episodeId) return false;
+    const restored = readUtsuroba().readingEchoes || {};
+    if (restored[current.episodeId]) return false;
+    const restoredBeforeCurrent = requiredIds.filter(id => {
+      const drifter = DATA.drifters.find(item => item.id === id);
+      return drifter && drifter.episodeId && restored[drifter.episodeId];
+    }).length;
+    return restoredBeforeCurrent === requiredIds.length - 1;
+  }
+
   function markDrifterWrong(id) {
     const data = loadSave();
     if (!data.utsuroba.drifters[id]) data.utsuroba.drifters[id] = { completed: [] };
@@ -800,7 +818,7 @@
     coordMode:false, musicStarted:false, lastTrailT:0,
     spawnLockUntil:0, exitingToKarasuki:false,
     travelingToCenter:false, inputLocked:false,
-    celebrating:false, celebrateSpinStart:0,
+    celebrating:false, celebrateSpinStart:0, celebrateConvergence:false,
     celebrateOrbitX:CENTER_X, celebrateOrbitY:CENTER_Y,
     celebrateDancing:false, celebrateSettling:false, celebrateSettleStart:0,
   };
@@ -2405,7 +2423,8 @@
             startReadingChallenge(drifter, q);
           } else {
             closeDrifterPanel();
-            if (completeMemory(drifter.id, q.memIdx)) startCelebration(drifter);
+            const convergenceBeat = shouldShowConvergenceBeat(drifter.id);
+            if (completeMemory(drifter.id, q.memIdx)) startCelebration(drifter, { convergenceBeat });
           }
         } else {
           closeDrifterPanel();
@@ -2468,11 +2487,12 @@
         }, 0);
       },
       onComplete: () => {
+        const convergenceBeat = shouldShowConvergenceBeat(drifter.id);
         if (completeMemory(drifter.id, quest.memIdx)) {
           refreshReadingJournalButton();
           refreshReadingChallengeButton();
           refreshMemoryEchoes();
-          startCelebration(drifter);
+          startCelebration(drifter, { convergenceBeat });
         }
       }
     });
@@ -2502,10 +2522,11 @@
     thorn:      ['#d9503a', '#ff9b82', '#ffe8e0', '#ffd700', '#ffffff', '#f3b0a0'],
     ribbon:     ['#d9a8ff', '#efd6ff', '#fff5ff', '#ffd700', '#ffffff', '#e6c5ff'],
   };
+  const DANCE_CONVERGENCE_PALETTE = ['#ffd966', '#ff85a1', '#a8edff', '#8ff0d0', '#d9a8ff', '#ffffff', '#ffd700'];
 
-  function spawnDanceSparkle(originX, originY, drifter) {
+  function spawnDanceSparkle(originX, originY, drifter, paletteOverride) {
     const motif = window.UtsuCard && drifter ? window.UtsuCard.motifForDrifter(drifter) : null;
-    const colors = DANCE_SPARKLE_PALETTES[motif] || DANCE_SPARKLE_PALETTES.lantern;
+    const colors = paletteOverride || DANCE_SPARKLE_PALETTES[motif] || DANCE_SPARKLE_PALETTES.lantern;
     const angle  = Math.random() * Math.PI * 2;
     const radius = 10 + Math.random() * 28;
     danceSparkles.push({
@@ -2520,11 +2541,12 @@
     });
   }
 
-  function startCelebration(drifter) {
+  function startCelebration(drifter, options = {}) {
     state.celebrating        = true;
     state.inputLocked        = true;
     state.celebrateSpinStart = performance.now();
     state.celebrateDrifter   = drifter;
+    state.celebrateConvergence = options.convergenceBeat === true;
     danceSparkles            = [];
     try { music.pause(); } catch(_) {}
     try { booDance.currentTime = 0; booDance.play().catch(() => {}); } catch(_) {}
@@ -2543,6 +2565,7 @@
         state.celebrateDancing  = false;
         state.celebrateSettling = false;
         state.celebrating       = false;
+        state.celebrateConvergence = false;
         danceSparkles           = [];
         state.x = state.celebrateOrbitX;
         state.y = state.celebrateOrbitY;
@@ -3042,7 +3065,11 @@
       drawOffX  = frame.offsetX;
       drawOffY  = frame.offsetY;
 
-      if (settleEase > 0 && Math.random() < 0.45) spawnDanceSparkle(gx, gy, state.celebrateDrifter);
+      const convergenceBurst = state.celebrateConvergence && elapsed < 1.1;
+      if (settleEase > 0 && Math.random() < (convergenceBurst ? 0.78 : 0.45)) {
+        spawnDanceSparkle(gx, gy, state.celebrateDrifter,
+          convergenceBurst ? DANCE_CONVERGENCE_PALETTE : null);
+      }
 
       for (let i = danceSparkles.length - 1; i >= 0; i--) {
         const sp = danceSparkles[i];
