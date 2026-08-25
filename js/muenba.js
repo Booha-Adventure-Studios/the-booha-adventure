@@ -329,6 +329,7 @@
   let fadeEl;
   let currentBg;
   let vignetteCanvas;
+  let carriedEnergyVignetteCanvas;
   let fogTexture;
   let lowFogTexture;
   let wispFogTexture;
@@ -4126,6 +4127,7 @@
       canvas.getContext('2d').setTransform(dpr, 0, 0, dpr, 0, 0);
     }
     vignetteCanvas = null;
+    carriedEnergyVignetteCanvas = null;
     buildAtmosphereCache();
   }
 
@@ -4151,6 +4153,24 @@
     gradient.addColorStop(1, 'rgba(0,0,0,.80)');
     vctx.fillStyle = gradient;
     vctx.fillRect(0, 0, WORLD_W, WORLD_H);
+
+    // A separate return-trip layer is cached once and only composited while
+    // Booha carries energy outside room_01. Its tighter center keeps the path
+    // readable while the heavy black edges make the cemetery feel actively
+    // hostile. One extra drawImage per frame is much cheaper than rebuilding
+    // this gradient during the animation loop.
+    carriedEnergyVignetteCanvas = document.createElement('canvas');
+    carriedEnergyVignetteCanvas.width = WORLD_W;
+    carriedEnergyVignetteCanvas.height = WORLD_H;
+    const carriedCtx = carriedEnergyVignetteCanvas.getContext('2d');
+    const carriedGradient = carriedCtx.createRadialGradient(768, 500, 150, 768, 500, 900);
+    carriedGradient.addColorStop(0, 'rgba(0,0,0,.12)');
+    carriedGradient.addColorStop(.42, 'rgba(0,0,0,.26)');
+    carriedGradient.addColorStop(.68, 'rgba(0,0,0,.52)');
+    carriedGradient.addColorStop(.86, 'rgba(0,0,0,.76)');
+    carriedGradient.addColorStop(1, 'rgba(0,0,0,.90)');
+    carriedCtx.fillStyle = carriedGradient;
+    carriedCtx.fillRect(0, 0, WORLD_W, WORLD_H);
 
     // Shared destination-out mask used by the moving spirit light. It is
     // cached because only its position changes from frame to frame.
@@ -5303,6 +5323,17 @@
       atmosphereCtx.save();
       atmosphereCtx.globalAlpha = vignettePulse;
       atmosphereCtx.drawImage(vignetteCanvas, 0, 0);
+      atmosphereCtx.restore();
+    }
+    const returnTripActive = Number(readMuenba().orbsPending) > 0
+      && state.roomId !== MUENBA_NUPPI.roomId;
+    if (returnTripActive && carriedEnergyVignetteCanvas) {
+      const dreadPulse = REDUCED_MOTION
+        ? .72
+        : .64 + .20 * Math.sin(now / 720 + roomSeed * .53);
+      atmosphereCtx.save();
+      atmosphereCtx.globalAlpha = dreadPulse;
+      atmosphereCtx.drawImage(carriedEnergyVignetteCanvas, 0, 0);
       atmosphereCtx.restore();
     }
     drawLanternFlicker(now);
