@@ -169,6 +169,11 @@ for (const entry of index.episodes) {
     assert.ok(tier.mechanic, `${entry.id} ${mode}: reading tier needs a visible mechanic`);
     assert.ok(tier.postcard && Array.isArray(tier.postcard.chunks) && tier.postcard.chunks.length === 3,
       `${entry.id} ${mode}: reading tier needs a three-part postcard`);
+    if (episode.id === 'ks_lantern_v1' && mode === 'start') {
+      assert.strictEqual(tier.introJP,
+        'クロバネは灯りのそばで待っています。灯りが消えます。チヨは帰り道が分かりません。',
+        `${entry.id} Starter: introJP must translate the authored English introduction`);
+    }
     for (const line of tier.lines) {
       assert.ok(line.speaker && line.en, `${entry.id} ${mode}: conversation lines must be English-only`);
       assert.ok(!('jp' in line) && !('speakerJP' in line), `${entry.id} ${mode}: conversation lines must not carry Japanese story text`);
