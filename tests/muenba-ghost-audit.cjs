@@ -23,6 +23,7 @@ assert(source.includes('chart: carryingEnergy ? SUPER_DANGER_RHYTHM_CHART : diff
 assert(source.includes('function loseCarriedEnergyAndMarkRestart()'), 'failed carried-energy encounters must have a loss path');
 assert(source.includes('restartHuntAfterCarriedEnergyLoss'), 'failed carried-energy encounters must restart the hunt');
 assert(source.includes('if (carryingStolenEnergy) return \'sight\';'), 'carrying energy must make every ghost sight-angry');
+assert(source.includes("if (Number(readMuenba().orbsPending) > 0) return null;"), 'carrying energy must clear capture eligibility until handoff');
 assert(source.includes("if (!carryingStolenEnergy && ghostId === target) return 'friendly';"), 'the assigned hunt ghost must stay quiet during an ordinary hunt');
 assert(source.includes('chaseSpeed: carryingEnergy ? GHOST_CARRY_CHASE_SPEED : GHOST_CHASE_SPEED,'), 'ghosts must remember the carried-energy chase speed');
 assert(source.includes('moveGhostToward(g, state.x, state.y, g.chaseSpeed || GHOST_CHASE_SPEED);'), 'chasing must use the carried-energy speed when active');
