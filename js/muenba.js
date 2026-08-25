@@ -1325,6 +1325,7 @@
     captureSession = {
       ghost,
       encounterRole,
+      dangerMode: encounterRole === 'jerk' ? 'jerk' : 'main',
       caseData: null,
       caseDifficulty: null,
       caseIndex: 0,
@@ -2038,8 +2039,28 @@
     }[note.shape] || '●';
   }
 
+  function dangerRhythmConfigFor(difficulty) {
+    const encounterRole = captureSession?.encounterRole || ghostRoleFor(captureSession?.ghost);
+    const encounterRules = ghostRulesFor(encounterRole);
+    return {
+      chart: difficulty.dangerChart,
+      noteMs: 60000 / difficulty.dangerBpm,
+      countdownMs: DANGER_RHYTHM_COUNTDOWN_MS,
+      travelMs: difficulty.dangerTravelMs,
+      perfectMs: difficulty.dangerPerfectMs,
+      goodMs: difficulty.dangerGoodMs,
+      passAccuracy: DANGER_RHYTHM_PASS_ACCURACY,
+      lanes: ['don', 'kat'],
+      difficultyTier: difficulty.tierIndex,
+      difficultyLabel: difficulty.label,
+      dangerMode: captureSession?.dangerMode || (encounterRole === 'jerk' ? 'jerk' : 'main'),
+      dangerCanHide: captureSession?.dangerCanHide === true && encounterRules.dangerCanHide === true
+    };
+  }
+
   function startRhythmCapture(danger, practice = false) {
     const difficulty = practice ? null : getRhythmDifficulty();
+    const dangerConfig = danger ? dangerRhythmConfigFor(difficulty) : null;
     const config = practice
       ? {
           chart: PRACTICE_RHYTHM_CHART,
@@ -2054,18 +2075,7 @@
           difficultyLabel: 'Practice'
         }
       : danger
-      ? {
-          chart: difficulty.dangerChart,
-          noteMs: 60000 / difficulty.dangerBpm,
-          countdownMs: DANGER_RHYTHM_COUNTDOWN_MS,
-          travelMs: difficulty.dangerTravelMs,
-          perfectMs: difficulty.dangerPerfectMs,
-          goodMs: difficulty.dangerGoodMs,
-          passAccuracy: DANGER_RHYTHM_PASS_ACCURACY,
-          lanes: ['don', 'kat'],
-          difficultyTier: difficulty.tierIndex,
-          difficultyLabel: difficulty.label
-        }
+      ? dangerConfig
       : {
           chart: difficulty.chart,
           noteMs: 60000 / difficulty.bpm,
