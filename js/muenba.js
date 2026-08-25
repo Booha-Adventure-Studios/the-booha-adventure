@@ -1550,6 +1550,11 @@
   }
 
   function currentHuntGhostId() {
+    // Once energy has been collected, the active hunt is over until the
+    // orbs reach Nuppi. This prevents the next unfinished case from becoming
+    // clickable during the return trip and keeps every other ghost on the
+    // danger-encounter path.
+    if (Number(readMuenba().orbsPending) > 0) return null;
     const ghost = nextMuenbaHuntGhost();
     return ghost ? ghost.id : null;
   }
