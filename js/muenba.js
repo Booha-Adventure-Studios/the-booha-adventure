@@ -953,16 +953,15 @@
      GHOST HUNTING CORE LOOP
      One wandering ghost per room, day-seeded so the layout is stable across
      re-entries but can change tomorrow. Nuppi's active case ghost is friendly.
-     Every other ghost is hostile, with one of two readable triggers: some
-     notice Booha after a short delay in the same room, while others only react
-     when Booha tries to collect them. Hostile ghosts move at the same slow
-     speed as their wandering pace; the danger comes from the scream and the
-     touch consequence, not from an unfair speed boost.
+     Every other ghost is hostile and notices Booha after the same short delay
+     in the same room. Only Nuppi's assigned target is quiet during an ordinary
+     hunt. Hostile ghosts move at the same slow speed as their wandering pace
+     for now; later passes tune Jerk and carried-energy speed separately.
      ═══════════════════════════════════════════════════════════════════ */
 
   // Which of the 15 rooms gets which of the still-available ghosts, and which
-  // non-target ghosts react on sight vs. on a collection attempt today. The
-  // active case always overrides this as friendly. Permanent ghostsFound
+  // non-target ghosts react on sight. The active case always overrides this
+  // as friendly. Permanent ghostsFound
   // history is not used here; weeklyGhostsFound controls availability.
   function getGhostRoomMap() {
     const today = _muenbaTodayKey() || 'nodate';
@@ -1021,10 +1020,10 @@
     if (roleRules.neutralDuringHunt) {
       if (!carryingStolenEnergy && ghostId === target) return 'friendly';
     }
-    // The hunt target stays quiet during an ordinary hunt, while the other
-    // ghosts keep the seeded mix of sight-angry and click-reactive behavior.
-    // Once Booha is carrying energy, every ghost becomes sight-angry. This is
-    // the return journey escalation and also covers the target ghost.
+    // The hunt target stays quiet during an ordinary hunt. Every other main
+    // ghost is hostile on sight, so the player never has to guess whether a
+    // non-target ghost will react. Once Booha is carrying energy, every ghost
+    // becomes sight-angry, including the target ghost.
     if (carryingStolenEnergy) return 'sight';
     // No active hunt target (every case finished at this difficulty, or no
     // ghost left for the week) used to fall through to the same 50/50 roll
@@ -1033,8 +1032,7 @@
     // read as a quiet cemetery instead — except Jerks, who stay hostile
     // regardless so the cemetery never feels completely safe.
     if (!isJerk && !target) return 'friendly';
-    const today = _muenbaTodayKey() || 'nodate';
-    return _muenbaRng(today + '|muenbaGhostHostility|' + ghostId)() < 0.5 ? 'sight' : 'collect';
+    return 'sight';
   }
 
   // Random point inside one of this room's walkable rects — same corridor
