@@ -1820,6 +1820,8 @@
 
     const choices = document.createElement('div');
     choices.className = 'muenba-case-choices';
+    choices.setAttribute('role', 'group');
+    choices.setAttribute('aria-label', 'Answer choices');
     mode.choices.forEach((choice, index) => {
       const button = document.createElement('button');
       button.type = 'button';
@@ -3740,6 +3742,47 @@
       .muenba-capture-reward > p:not(.jp):not(.muenba-orb-release-status) { color:#e4f7df; font-size:.98rem; line-height:1.58; }
       .muenba-capture-reward .muenba-capture-direction { border-color:rgba(183,255,83,.3); background:rgba(132,255,77,.06); }
       .muenba-capture-reward .muenba-orb-release-list { margin-top:16px; padding:10px 8px; border:1px solid rgba(183,255,83,.2); border-radius:12px; background:rgba(132,255,77,.035); }
+      /* Pass 5: final readability and device safeguards. */
+      .muenba-lobby-box > *,
+      .muenba-lobby-box h2,
+      .muenba-lobby-box h3,
+      .muenba-lobby-box p,
+      .muenba-case-direction-en,
+      .muenba-case-direction-jp,
+      .muenba-case-choice-text { min-width:0; overflow-wrap:anywhere; }
+      .muenba-case-progress,
+      .muenba-case-progress-jp { overflow-wrap:anywhere; }
+      .muenba-lobby-box ruby { white-space:normal; }
+      .muenba-lobby-actions,
+      .muenba-case-actions { align-items:stretch; }
+      .muenba-lobby-actions button,
+      .muenba-case-actions button { max-width:100%; }
+      .muenba-case-choice { text-align:left; }
+      @media (max-width:420px) {
+        .muenba-lobby-box { padding:20px 14px 17px; }
+        .muenba-lobby-box h2 { font-size:1.12rem; }
+        .muenba-case-intro h2,
+        .muenba-case-resolved h2 { font-size:1.28rem; }
+        .muenba-case-intro .muenba-lobby-portrait,
+        .muenba-case-resolved .muenba-lobby-portrait { width:88px; height:88px; }
+        .muenba-capture-ready .muenba-lobby-portrait,
+        .muenba-capture-reward .muenba-lobby-portrait { width:112px; height:112px; }
+        .muenba-case-choice { gap:9px; min-height:54px; padding:11px 10px 11px 9px; font-size:.9rem; }
+        .muenba-case-choice-number { width:27px; height:27px; font-size:.64rem; }
+        .muenba-case-action,
+        .muenba-capture-ready .muenba-capture-action { min-width:0; width:100%; }
+      }
+      @media (max-height:720px) and (min-width:421px) {
+        .muenba-lobby-box { max-height:calc(100dvh - 20px); padding:19px 22px 18px; }
+        .muenba-lobby-portrait { width:76px; height:76px; margin-bottom:7px; }
+        .muenba-case-intro .muenba-lobby-portrait,
+        .muenba-case-resolved .muenba-lobby-portrait { width:82px; height:82px; }
+        .muenba-capture-ready .muenba-lobby-portrait,
+        .muenba-capture-reward .muenba-lobby-portrait { width:96px; height:96px; }
+        .muenba-case-record { margin-top:11px !important; padding:12px 14px !important; }
+        .muenba-case-intro .muenba-case-record,
+        .muenba-case-resolved .muenba-case-record { font-size:.92rem !important; }
+      }
       @media (max-width:640px) {
         .muenba-lobby-box { width:min(100%,calc(100vw - 24px)); max-height:calc(100dvh - 24px); padding:24px 18px 20px; border-radius:16px; }
         .muenba-lobby-box::after { top:11px; width:72px; }
@@ -3749,7 +3792,7 @@
         .muenba-nuppi-speech, .muenba-nuppi-mission, .muenba-nuppi-status-card, .muenba-nuppi-success-card, .muenba-nuppi-next-card { padding-left:13px; padding-right:13px; }
       }
       @media (prefers-reduced-motion: reduce) { .muenba-orb-release, .muenba-hunt-ghost-portrait { animation:none; } }
-      @media (prefers-reduced-motion: reduce) { #muenba-fade, .muenba-return-box, #muenba-return-overlay, .muenba-lobby-box, #muenba-lobby-overlay, #muenba-capture-overlay { transition:none !important; } .muenba-lobby-portrait, #muenba-hide, #muenba-celebration-status, .muenba-rhythm-board, .muenba-rhythm-combo, .muenba-rhythm-result-failure, .muenba-case-question, .muenba-case-question::before { animation:none !important; } .muenba-rhythm-energy-fill { transition:none !important; } #muenba-profile-link { transition:none !important; } }
+      @media (prefers-reduced-motion: reduce) { #muenba-fade, .muenba-return-box, #muenba-return-overlay, .muenba-lobby-box, #muenba-lobby-overlay, #muenba-capture-overlay { transition:none !important; } .muenba-lobby-portrait, #muenba-hide, #muenba-celebration-status, .muenba-rhythm-board, .muenba-rhythm-combo, .muenba-rhythm-result-failure, .muenba-case-question, .muenba-case-question::before { animation:none !important; } .muenba-case-choice, .muenba-case-action, .muenba-capture-action { transition:none !important; } .muenba-rhythm-energy-fill { transition:none !important; } #muenba-profile-link { transition:none !important; } }
     `;
     document.head.appendChild(style);
   }
