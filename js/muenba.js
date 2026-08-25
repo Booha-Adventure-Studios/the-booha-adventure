@@ -89,6 +89,12 @@
   const MUENBA_DANGER_RHYTHM_VOLUME = 0.62;
   const MUENBA_DANCE_FALLBACK_MS = 11000;
   const MUENBA_DANCE_SETTLE_MS = 750;
+  // Pass 1 reading attention gate. This is a brief, non-punitive pause rather
+  // than a comprehension test: the button stays visible, but becomes active
+  // only after enough time has passed for the English record to be read.
+  const CASE_READ_GATE_MIN_MS = 2000;
+  const CASE_READ_GATE_PER_WORD_MS = 240;
+  const CASE_READ_GATE_MAX_MS = 6500;
 
   // Pass 8B — first rhythm chart. It is intentionally short and forgiving:
   // no simultaneous notes, holds, combos, or punishment yet. The chart is
@@ -1697,6 +1703,33 @@
     }, 0);
   }
 
+  function armCaseReadGate(box, button, englishText) {
+    if (!captureSession || !button) return;
+    const session = captureSession;
+    const gateId = (session.readGateId || 0) + 1;
+    session.readGateId = gateId;
+    const wordCount = String(englishText || '').trim().split(/\s+/).filter(Boolean).length;
+    const delay = Math.min(
+      CASE_READ_GATE_MAX_MS,
+      Math.max(CASE_READ_GATE_MIN_MS, wordCount * CASE_READ_GATE_PER_WORD_MS)
+    );
+
+    button.disabled = true;
+    button.setAttribute('aria-disabled', 'true');
+    button.classList.add('muenba-read-locked');
+    button.classList.remove('muenba-read-ready');
+    if (box) box.classList.add('muenba-reading');
+
+    window.setTimeout(() => {
+      if (captureSession !== session || session.readGateId !== gateId || !button.isConnected) return;
+      button.disabled = false;
+      button.setAttribute('aria-disabled', 'false');
+      button.classList.remove('muenba-read-locked');
+      button.classList.add('muenba-read-ready');
+      if (box) box.classList.remove('muenba-reading');
+    }, delay);
+  }
+
   function renderCaseDirection(box, english, japaneseHtml, variant = '') {
     const direction = document.createElement('div');
     direction.className = `muenba-case-direction${variant ? ` ${variant}` : ''}`;
@@ -1744,6 +1777,13 @@
     h2.textContent = caseData.title;
     box.appendChild(h2);
 
+    renderCaseDirection(
+      box,
+      'READ',
+      '<ruby>読<rt>よ</rt></ruby>んでね',
+      'muenba-case-read-instruction'
+    );
+
     const intro = document.createElement('p');
     intro.className = 'muenba-case-record';
     intro.textContent = caseData.intro;
@@ -1764,16 +1804,17 @@
 
     const actions = document.createElement('div');
     actions.className = 'muenba-case-actions';
-    actions.appendChild(caseActionButton(
+    const openAction = caseActionButton(
       'Open first clue',
       '<ruby>最初<rt>さいしょ</rt></ruby>の<ruby>手<rt>て</rt></ruby>がかりを<ruby>開<rt>ひら</rt></ruby>く',
       'muenba-case-open',
       () => selectCaseDifficulty(selectedMode)
-    ));
+    );
+    actions.appendChild(openAction);
     box.appendChild(actions);
+    armCaseReadGate(box, openAction, caseData.intro);
 
     captureOverlay.classList.add('open');
-    focusCaptureControl('#muenba-case-open');
   }
 
   function selectCaseDifficulty(difficulty) {
@@ -1805,9 +1846,9 @@
 
     renderCaseDirection(
       box,
-      'Read the record first',
-      '<ruby>最初<rt>さいしょ</rt></ruby>に<ruby>記録<rt>きろく</rt></ruby>を<ruby>読<rt>よ</rt></ruby>みましょう。',
-      'muenba-case-record-instruction'
+      'READ',
+      '<ruby>読<rt>よ</rt></ruby>んでね',
+      'muenba-case-record-instruction muenba-case-read-instruction'
     );
 
     const progress = document.createElement('div');
@@ -1835,7 +1876,7 @@
 
     const actions = document.createElement('div');
     actions.className = 'muenba-case-actions';
-    actions.appendChild(caseActionButton(
+    const nextAction = caseActionButton(
       lastClue ? 'Solve the case' : 'Open next clue',
       lastClue
         ? '<ruby>事件<rt>じけん</rt></ruby>を<ruby>解<rt>と</rt></ruby>く'
@@ -1848,10 +1889,11 @@
           renderCaseClue();
         }
       }
-    ));
+    );
+    actions.appendChild(nextAction);
     box.appendChild(actions);
+    armCaseReadGate(box, nextAction, clue.text);
     captureOverlay.classList.add('open');
-    focusCaptureControl('#muenba-case-next');
   }
 
   function renderCaseQuestion(feedback = '') {
@@ -1956,6 +1998,13 @@
     h2.textContent = captureSession.caseData.title;
     box.appendChild(h2);
 
+    renderCaseDirection(
+      box,
+      'READ',
+      '<ruby>読<rt>よ</rt></ruby>んでね',
+      'muenba-case-read-instruction'
+    );
+
     const resolution = document.createElement('p');
     resolution.className = 'muenba-case-record';
     resolution.textContent = mode.resolution;
@@ -1982,8 +2031,8 @@
     captureAction.classList.add('muenba-gold-action');
     actions.appendChild(captureAction);
     box.appendChild(actions);
+    armCaseReadGate(box, captureAction, mode.resolution);
     captureOverlay.classList.add('open');
-    focusCaptureControl('#muenba-case-capture');
   }
 
   function renderCaptureReady() {
@@ -3898,6 +3947,19 @@
       .muenba-gold-action:hover,
       .muenba-gold-action:focus-visible { border-color:#fff1a5 !important; background:linear-gradient(180deg,rgba(188,139,27,.72),rgba(103,59,9,.82)) !important; box-shadow:0 0 38px rgba(255,198,64,.68),inset 0 0 18px rgba(255,228,132,.2) !important; }
       @keyframes muenbaGoldActionGlow { 0%,100% { box-shadow:0 0 20px rgba(255,198,64,.38),inset 0 0 14px rgba(255,228,132,.1); } 50% { box-shadow:0 0 34px rgba(255,211,87,.68),inset 0 0 18px rgba(255,228,132,.18); } }
+      /* Pass 1: reading attention gate. The card remains open and the action
+         remains visible, but it wakes only after the English record has had
+         a short, content-sized reading pause. */
+      .muenba-case-read-instruction { margin:14px 0 10px; border-color:rgba(216,201,139,.42); background:linear-gradient(110deg,rgba(126,111,48,.13),rgba(216,201,139,.035)); box-shadow:0 0 18px rgba(216,201,139,.08),inset 0 0 14px rgba(216,201,139,.03); }
+      .muenba-case-read-instruction .muenba-case-direction-en { color:#ffe9a9; font:900 .72rem/1.4 ui-monospace,monospace; letter-spacing:.18em; text-transform:uppercase; text-shadow:0 0 12px rgba(255,224,102,.2); }
+      .muenba-case-read-instruction .muenba-case-direction-jp { color:#d8c98b; font-size:.82rem; }
+      .muenba-case-action.muenba-read-locked { cursor:wait; opacity:.52; filter:grayscale(.38) saturate(.55); color:#a9b9b0 !important; border-color:rgba(132,157,145,.42) !important; background:rgba(32,53,44,.24) !important; box-shadow:0 0 8px rgba(93,162,124,.08),inset 0 0 10px rgba(156,224,193,.03) !important; animation:none !important; transform:none !important; }
+      .muenba-case-action.muenba-read-locked small { color:#8ea99a; }
+      .muenba-case-action.muenba-read-ready { color:#fff8d5 !important; border-color:#f7d86e !important; background:linear-gradient(180deg,rgba(160,111,20,.58),rgba(80,45,8,.72)) !important; box-shadow:0 0 24px rgba(255,198,64,.5),inset 0 0 14px rgba(255,228,132,.14) !important; text-shadow:0 0 10px rgba(255,232,154,.25); animation:muenbaGoldActionGlow 2.2s ease-in-out infinite; }
+      .muenba-case-action.muenba-read-ready:hover,
+      .muenba-case-action.muenba-read-ready:focus-visible { border-color:#fff1a5 !important; background:linear-gradient(180deg,rgba(188,139,27,.72),rgba(103,59,9,.82)) !important; box-shadow:0 0 38px rgba(255,198,64,.68),inset 0 0 18px rgba(255,228,132,.2) !important; }
+      .muenba-case-action.muenba-read-locked:hover,
+      .muenba-case-action.muenba-read-locked:focus-visible { transform:none !important; }
       .muenba-capture-result { min-height:300px; }
       .muenba-capture-result .muenba-lobby-portrait { width:116px; height:116px; }
       .muenba-capture-result h2 { font-size:clamp(1.3rem,4vw,1.72rem); }
@@ -3963,7 +4025,7 @@
         .muenba-case-choice { min-height:58px; padding:12px 12px 12px 10px; }
         .muenba-nuppi-speech, .muenba-nuppi-mission, .muenba-nuppi-status-card, .muenba-nuppi-success-card, .muenba-nuppi-next-card { padding-left:13px; padding-right:13px; }
       }
-      @media (prefers-reduced-motion: reduce) { .muenba-orb-release, .muenba-hunt-ghost-portrait, .muenba-gold-action { animation:none !important; } }
+      @media (prefers-reduced-motion: reduce) { .muenba-orb-release, .muenba-hunt-ghost-portrait, .muenba-gold-action, .muenba-read-ready { animation:none !important; } }
       @media (prefers-reduced-motion: reduce) { #muenba-fade, .muenba-return-box, #muenba-return-overlay, .muenba-lobby-box, #muenba-lobby-overlay, #muenba-capture-overlay { transition:none !important; } .muenba-lobby-portrait, #muenba-hide, #muenba-celebration-status, .muenba-rhythm-board, .muenba-rhythm-combo, .muenba-rhythm-result-failure, .muenba-case-question, .muenba-case-question::before, .muenba-energy-warning { animation:none !important; } .muenba-case-choice, .muenba-case-action, .muenba-capture-action { transition:none !important; } .muenba-rhythm-energy-fill { transition:none !important; } #muenba-profile-link { transition:none !important; } }
     `;
     document.head.appendChild(style);
