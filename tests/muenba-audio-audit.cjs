@@ -22,6 +22,8 @@ assert(source.includes('const rhythmHitSfxPool = makeRhythmSfxPool'), 'rhythm hi
 assert(source.includes('const rhythmMissSfxPool = makeRhythmSfxPool'), 'rhythm miss sounds must use a playback pool');
 assert(source.includes('sound.pause();\n      sound.currentTime = 0;'), 'rhythm SFX must reset each voice before playback');
 assert(source.includes('const playResult = dangerScream.play();'), 'scream playback must be explicitly started on encounter');
-assert(source.includes('dangerRhythmMusic.play().catch'), 'danger rhythm music must start with the danger chart');
+assert(source.includes('const playResult = dangerRhythmMusic.play();'), 'danger rhythm music must start with the danger chart');
+assert(source.includes('let dangerRhythmPlayToken = 0;'), 'danger rhythm music must guard against stale asynchronous playback');
+assert(source.includes('stopDangerScream();\n    stopDangerRhythmMusic();'), 'leaving Muenba must stop danger audio before navigation');
 
 console.log('Muenba audio audit passed: restored assets, looping BGM, danger audio, and pooled rhythm SFX.');
