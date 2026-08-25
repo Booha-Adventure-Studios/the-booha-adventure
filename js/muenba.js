@@ -407,6 +407,11 @@
   function isMainHuntGhostId(ghostId) {
     return ghostRoleFor(ghostId) === 'hunt-target';
   }
+  function isCurrentHuntTarget(activeGhostState) {
+    return !!activeGhostState
+      && activeGhostState.isHuntTarget === true
+      && activeGhostState.ghost.id === currentHuntGhostId();
+  }
 
   const ghostImg = new Image();
   ghostImg.src = 'assets/img/booha_ghost.png';
@@ -972,6 +977,7 @@
     const isJerk = role === 'jerk';
     // Pass 15: a Jerk is purely hostile — never Nuppi's target, never the
     // "quiet cemetery" exception below, whatever the hunt state is.
+    if (roleRules.alwaysAngry) return 'sight';
     if (roleRules.neutralDuringHunt) {
       if (!carryingStolenEnergy && ghostId === target) return 'friendly';
     }
@@ -1093,6 +1099,7 @@
       role,
       roleRules,
       isHuntTarget: roleRules.huntable === true,
+      isCurrentTarget: roleRules.huntable === true && ghost.id === currentHuntGhostId(),
       alwaysAngry: roleRules.alwaysAngry === true,
       dangerCanHide: roleRules.dangerCanHide === true,
       x: pos.x,
@@ -1239,10 +1246,9 @@
           );
           if (canMoveTo(pushed.x, pushed.y)) { state.x = pushed.x; state.y = pushed.y; }
           state.clickTarget = null;
-          // A sight-angry ghost has already caught Booha, so the popup must
-          // force the danger rhythm. A quiet ghost that was provoked by a
-          // wrong click keeps the Hide escape in its popup.
-          beginDangerEncounter(g.ghost, { allowHide: g.screamReason === 'wrong-ghost' });
+          // Every main ghost can offer Hide in its danger popup. Jerk ghosts
+          // never can, even if a future caller accidentally passes allowHide.
+          beginDangerEncounter(g.ghost, { allowHide: g.dangerCanHide === true });
         }
         return;
       }
@@ -1280,7 +1286,7 @@
   function clickCheckGhost(worldX, worldY) {
     if (!activeGhost || state.captureResolving) return false;
     if (Math.hypot(worldX - activeGhost.x, worldY - activeGhost.y) <= GHOST_CLICK_R) {
-      if (activeGhost.ghost.id !== currentHuntGhostId()) {
+      if (!isCurrentHuntTarget(activeGhost)) {
         state.clickTarget = null;
         const now = performance.now();
         // Every wrong ghost reacts to being touched. Sight-trigger ghosts
@@ -1299,7 +1305,7 @@
   }
 
   function attemptCapture() {
-    if (!activeGhost || state.captureResolving || activeGhost.ghost.id !== currentHuntGhostId()) return;
+    if (!isCurrentHuntTarget(activeGhost) || state.captureResolving) return;
     const now = performance.now();
     const ghost = activeGhost.ghost;
     activeGhost.angryUntil = now + 900;
@@ -1314,15 +1320,17 @@
     state.clickTarget = null;
     state.moving = false;
     activeGhost = null;
+    const encounterRole = ghostRoleFor(ghost);
+    const encounterRules = ghostRulesFor(ghost);
     captureSession = {
       ghost,
-      encounterRole: ghostRoleFor(ghost),
+      encounterRole,
       caseData: null,
       caseDifficulty: null,
       caseIndex: 0,
       caseResolved: false,
       danger: true,
-      dangerCanHide: allowHide === true,
+      dangerCanHide: allowHide === true && encounterRules.dangerCanHide === true,
       phase: 'danger-ready',
       openedAt: performance.now()
     };
@@ -1547,7 +1555,7 @@
   // scene while the session is open and respawned on cancel, so a failed or
   // abandoned attempt remains a soft miss rather than consuming the target.
   function beginCaptureSession(ghost) {
-    if (!ghost || ghost.id !== currentHuntGhostId()) {
+    if (!ghost || ghostRoleFor(ghost) !== 'hunt-target' || ghost.id !== currentHuntGhostId()) {
       state.captureResolving = false;
       return;
     }
