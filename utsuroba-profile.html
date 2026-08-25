@@ -234,6 +234,11 @@
     <div class="topbar">
       <a class="back-link" id="utsuroba-profile-back" href="utsuroba.html?room=room_03" hidden aria-label="Back to Utsuroba start page">← Utsuroba / うつろばへ</a>
       <div class="case-label">UTSUROBA / MEMORY ARCHIVE<br><ruby>記憶<rt>きおく</rt></ruby>の<ruby>保管<rt>ほかん</rt></ruby><ruby>場所<rt>ばしょ</rt></ruby></div>
+      <!-- Pass 4 (finalized spec): utsuroba-profile.html -> Karasuki, the one
+           door this room was missing from the three-profile network. Gated
+           the same as utsuroba-profile-back above, since walking into
+           Karasuki from here is a world door, not a profile-to-profile hop. -->
+      <a class="back-link" id="utsuroba-profile-karasuki" href="karasuki.html?from=profile" hidden aria-label="Enter Karasuki / カラスキへ">Karasuki / カラスキへ →</a>
     </div>
 
     <nav class="profile-network" aria-label="Output profiles">
@@ -353,14 +358,22 @@
       }
 
       function renderWorldBack() {
-        const link = document.getElementById('utsuroba-profile-back');
-        if (!link) return;
         let open = false;
         try {
           open = !!(window.BoohaUnlockSystem && typeof BoohaUnlockSystem.isWeeklyWorldGateOpen === 'function' && BoohaUnlockSystem.isWeeklyWorldGateOpen());
         } catch (_) {}
-        link.hidden = !open;
-        if (open) link.href = 'utsuroba.html?room=room_03';
+
+        const link = document.getElementById('utsuroba-profile-back');
+        if (link) {
+          link.hidden = !open;
+          if (open) link.href = 'utsuroba.html?room=room_03';
+        }
+
+        // Pass 4 (finalized spec): the door this room was missing — same
+        // weekly gate as the Utsuroba-world link above, since walking into
+        // Karasuki from here is a world door, not a profile-to-profile hop.
+        const karasukiLink = document.getElementById('utsuroba-profile-karasuki');
+        if (karasukiLink) karasukiLink.hidden = !open;
       }
 
       // Tier-agnostic "has this ever been restored, at any memory" — used

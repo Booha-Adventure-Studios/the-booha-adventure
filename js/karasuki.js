@@ -1984,8 +1984,8 @@ const HAPPY_HOUSE_PORTAL = {
   };
 
   const UTSUROBA_LOCKED_COPY = {
-    en: 'Something waits behind this light.\nComplete nine lessons in one path\nbefore it will open to you.',
-    jp: 'この光の奥に、何かが待っている。\nひとつの道で九つの学びを終えよ。\nそれまで、ここは開かない。',
+    en: 'Something waits behind this light.\nComplete nine lessons in one path\nthis week before it will open to you.',
+    jp: 'この光の奥に、何かが待っている。\n今週、ひとつの道で九つの学びを終えよ。\nそれまで、ここは開かない。',
   };
   const UTSUROBA_UNLOCKED_COPY = {
     en: 'A new world has opened.\nDo you want to enter Utsuroba?',
