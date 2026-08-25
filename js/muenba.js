@@ -381,7 +381,7 @@
   // path, no new files) rather than a new character for the lobby host.
   const nuppiLobbyImg = new Image();
   nuppiLobbyImg.src = 'assets/img/wanderers/nuppi-2.png';
-  const music = new Audio('assets/img/muenba/muenba_BGM.mp3');
+  const music = new Audio('assets/img/muenba/Muenba_BGM.mp3');
   music.preload = 'auto';
   music.loop = true;
   music.volume = MUENBA_MUSIC_VOLUME;
@@ -397,12 +397,22 @@
   muenbaDance.preload = 'auto';
   muenbaDance.loop = false;
   muenbaDance.volume = 0.72;
-  const rhythmHitSfx = new Audio('assets/img/muenba/get.mp3');
-  rhythmHitSfx.preload = 'auto';
-  rhythmHitSfx.volume = 0.42;
-  const rhythmMissSfx = new Audio('assets/img/muenba/miss.mp3');
-  rhythmMissSfx.preload = 'auto';
-  rhythmMissSfx.volume = 0.24;
+  // A short pool prevents a fast chart from cutting off the previous get or
+  // miss sound when two notes land close together. The files are small, so a
+  // three-voice pool is cheaper and more reliable than creating audio nodes
+  // during play.
+  function makeRhythmSfxPool(src, volume, size = 3) {
+    return Array.from({ length: size }, () => {
+      const audio = new Audio(src);
+      audio.preload = 'auto';
+      audio.volume = volume;
+      return audio;
+    });
+  }
+  const rhythmHitSfxPool = makeRhythmSfxPool('assets/img/muenba/get.mp3', 0.42);
+  const rhythmMissSfxPool = makeRhythmSfxPool('assets/img/muenba/miss.mp3', 0.24);
+  let rhythmHitSfxIndex = 0;
+  let rhythmMissSfxIndex = 0;
 
   const danceArmsUpImg = new Image();
   danceArmsUpImg.src = 'assets/img/booha_ghost_dance_arms_up.png';
@@ -449,10 +459,27 @@
   }
 
   function startMusic() {
-    if (state.musicStarted) return;
+    if (state.musicStarted && !music.paused && !music.ended) return;
     state.musicStarted = true;
-    music.play().catch(() => { state.musicStarted = false; });
+    if (music.ended) music.currentTime = 0;
+    try {
+      const playResult = music.play();
+      if (playResult && typeof playResult.catch === 'function') {
+        playResult.catch(() => { state.musicStarted = false; });
+      }
+    } catch (_) {
+      state.musicStarted = false;
+    }
   }
+
+  music.addEventListener('error', () => { state.musicStarted = false; });
+  music.addEventListener('ended', () => {
+    // `loop` is the normal path. This second guard keeps the cemetery BGM
+    // continuous on browsers that briefly report ended before honoring loop.
+    if (!music.loop || !state.musicStarted || state.transitioning || state.returnExiting) return;
+    music.currentTime = 0;
+    music.play().catch(() => { state.musicStarted = false; });
+  });
 
   // Pass 11: dangerScream is one shared <audio> element reused by every
   // ghost's scream. play() is async — if a pause()/currentTime reset/new
@@ -2042,7 +2069,7 @@
 
   function resumeWorldMusicAfterCapture() {
     if (!state.musicStarted) return;
-    music.play().catch(() => {});
+    startMusic();
   }
 
   function rhythmExpectedAt(rhythm, index) {
@@ -2311,8 +2338,13 @@
   }
 
   function playRhythmSfx(result) {
-    const sound = result === 'miss' ? rhythmMissSfx : rhythmHitSfx;
+    const pool = result === 'miss' ? rhythmMissSfxPool : rhythmHitSfxPool;
+    const index = result === 'miss'
+      ? rhythmMissSfxIndex++ % pool.length
+      : rhythmHitSfxIndex++ % pool.length;
+    const sound = pool[index];
     try {
+      sound.pause();
       sound.currentTime = 0;
       sound.play().catch(() => {});
     } catch (_) {}
@@ -2932,7 +2964,7 @@
       muenbaDanceSparkles = [];
       if (celebrationStatus) celebrationStatus.classList.remove('open');
       stopMuenbaDance();
-      try { music.play().catch(() => {}); } catch (_) {}
+      try { startMusic(); } catch (_) {}
       state.inputLocked = false;
       spawnRoomGhost(state.roomId);
       openNuppiAfterHandoff(state.celebrationDeposit);
