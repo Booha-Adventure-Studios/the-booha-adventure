@@ -7,7 +7,7 @@
 const CURRENT_CACHES = {
   // Rhythm Pass 2: invalidate the previous bundle so permanent capture-based
   // difficulty reaches returning players.
-  pages:  'booha-pages-2026-311',
+  pages:  'booha-pages-2026-312',
   // js/ is served cache-first (see ASSET_PREFIXES below), so once a device
   // caches a script it never re-fetches it until this string changes.
   // Connected-doors pass: bumped for js/karasuki.js's UTSUROBA_LOCKED_COPY
