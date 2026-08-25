@@ -214,17 +214,17 @@
         clues: [
           { title: 'The stone', text: 'Fuzzle hid behind a stone.', keywords: ['hid', 'stone'] },
           { title: 'Three scares', text: 'Fuzzle tried three silly scares.', keywords: ['tried', 'scares'] },
-          { title: 'No choice', text: 'Fuzzle could not choose one.', keywords: ['choose'] }
+          { title: 'No choice', text: 'Fuzzle did not choose one.', keywords: ['choose'] }
         ],
-        prompt: 'Why did Fuzzle’s energy get mixed up?',
-        promptJP: 'ファズルのエネルギーは<ruby>何<rt>なに</rt></ruby>で<ruby>混<rt>ま</rt></ruby>ざりましたか？',
+        prompt: 'Why was Fuzzle’s energy confused?',
+        promptJP: 'ファズルのエネルギーは、なぜ<ruby>混乱<rt>こんらん</rt></ruby>しましたか？',
         choices: [
           'Fuzzle tried too many scares.',
           'The stone ate the energy.',
           'Nuppi came after lunch.'
         ],
         correct: 0,
-        resolution: 'Fuzzle’s energy settles when Fuzzle chooses one scare.'
+        resolution: 'Fuzzle’s energy is calm when Fuzzle chooses one scare.'
       },
       fresh: {
         clues: [
@@ -271,15 +271,15 @@
           { title: 'Lights on things', text: 'The spark shone on leaves and stones.', keywords: ['shone', 'leaves'] },
           { title: 'Too many lights', text: 'Glimmer chased every light it saw.', keywords: ['chased'] }
         ],
-        prompt: 'Why did Glimmer’s energy split?',
-        promptJP: 'グリマーのエネルギーは<ruby>何<rt>なに</rt></ruby>で<ruby>散<rt>ち</rt></ruby>らばりましたか？',
+        prompt: 'Why was Glimmer’s energy confused?',
+        promptJP: 'グリマーのエネルギーは、なぜ<ruby>混乱<rt>こんらん</rt></ruby>しましたか？',
         choices: [
           'Glimmer chased every light.',
           'Nuppi turned off the lights.',
           'A leaf hid the spark.'
         ],
         correct: 0,
-        resolution: 'Glimmer’s energy settles when Glimmer follows one light.'
+        resolution: 'Glimmer’s energy is calm when Glimmer follows one light.'
       },
       fresh: {
         clues: [
@@ -326,15 +326,15 @@
           { title: 'Labels gone', text: 'Each sound lost its label.', keywords: ['lost', 'label'] },
           { title: 'Wrong places', text: 'Nibsy put the sounds in the wrong places.', keywords: ['wrong', 'places'] }
         ],
-        prompt: 'Why did Nibsy’s energy get mixed up?',
-        promptJP: 'ニブシーのエネルギーは<ruby>何<rt>なに</rt></ruby>で<ruby>混<rt>ま</rt></ruby>ざりましたか？',
+        prompt: 'Why was Nibsy’s energy confused?',
+        promptJP: 'ニブシーのエネルギーは、なぜ<ruby>混乱<rt>こんらん</rt></ruby>しましたか？',
         choices: [
           'Nibsy mixed up the small sounds.',
           'The pebble made no sound.',
           'Nuppi hid the pocket.'
         ],
         correct: 0,
-        resolution: 'Nibsy’s energy settles when each sound has its place.'
+        resolution: 'Nibsy’s energy is calm when each sound has its place.'
       },
       fresh: {
         clues: [
@@ -381,15 +381,15 @@
           { title: 'Too soon', text: 'The bell rang before Nuppi came.', keywords: ['rang', 'before'] },
           { title: 'Three rings', text: 'The bell rang three times too soon.', keywords: ['times', 'soon'] }
         ],
-        prompt: 'Why did Tinkley’s energy get mixed up?',
-        promptJP: 'ティンクリーのエネルギーは<ruby>何<rt>なに</rt></ruby>で<ruby>混<rt>ま</rt></ruby>ざりましたか？',
+        prompt: 'Why was Tinkley’s energy confused?',
+        promptJP: 'ティンクリーのエネルギーは、なぜ<ruby>混乱<rt>こんらん</rt></ruby>しましたか？',
         choices: [
           'Tinkley rang the bell too early.',
           'Nuppi hid the bell.',
           'The bell was too quiet.'
         ],
         correct: 0,
-        resolution: 'Tinkley’s energy settles when the bell waits.'
+        resolution: 'Tinkley’s energy is calm when the bell waits.'
       },
       fresh: {
         clues: [
@@ -436,15 +436,15 @@
           { title: 'One choice', text: 'Twiddle picked the crooked path.', keywords: ['picked'] },
           { title: 'Turn back', text: 'Twiddle changed its mind and walked back.', keywords: ['changed', 'walked'] }
         ],
-        prompt: 'Why did Twiddle’s energy get mixed up?',
-        promptJP: 'トゥイドルのエネルギーは<ruby>何<rt>なに</rt></ruby>で<ruby>混<rt>ま</rt></ruby>ざりましたか？',
+        prompt: 'Why was Twiddle’s energy confused?',
+        promptJP: 'トゥイドルのエネルギーは、なぜ<ruby>混乱<rt>こんらん</rt></ruby>しましたか？',
         choices: [
           'Twiddle changed its mind again and again.',
           'The paths disappeared.',
           'Nuppi moved the mossy path.'
         ],
         correct: 0,
-        resolution: 'Twiddle’s energy settles when Twiddle takes one path.'
+        resolution: 'Twiddle’s energy is calm when Twiddle takes one path.'
       },
       fresh: {
         clues: [
