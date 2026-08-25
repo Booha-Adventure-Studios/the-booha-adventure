@@ -1639,7 +1639,7 @@
     if (!captureSession || !captureSession.caseData || !captureOverlay) return;
     const caseData = captureSession.caseData;
     const box = captureBox();
-    box.classList.add('muenba-case-box');
+    box.classList.add('muenba-case-box', 'muenba-case-intro');
     captureImage(box, captureSession.ghost);
 
     // caseData.eyebrow/title/intro (and every clue title/text/resolution
@@ -1669,7 +1669,8 @@
     renderCaseDirection(
       box,
       `Your profile is set to ${selectedModeLabel}. This case will use that mode.`,
-      `プロフィールの<ruby>設定<rt>せってい</rt></ruby>は${selectedModeJP}です。この<ruby>事件<rt>じけん</rt></ruby>ではその<ruby>読<rt>よ</rt></ruby>み<ruby>方<rt>かた</rt></ruby>を<ruby>使<rt>つか</rt></ruby>います。`
+      `プロフィールの<ruby>設定<rt>せってい</rt></ruby>は${selectedModeJP}です。この<ruby>事件<rt>じけん</rt></ruby>ではその<ruby>読<rt>よ</rt></ruby>み<ruby>方<rt>かた</rt></ruby>を<ruby>使<rt>つか</rt></ruby>います。`,
+      'muenba-case-mode-card'
     );
 
     const actions = document.createElement('div');
@@ -1702,7 +1703,7 @@
     const clue = mode.clues[captureSession.caseIndex];
     const lastClue = captureSession.caseIndex >= mode.clues.length - 1;
     const box = captureBox();
-    box.classList.add('muenba-case-box');
+    box.classList.add('muenba-case-box', 'muenba-case-clue');
     captureImage(box, captureSession.ghost);
 
     const modeLabel = document.createElement('div');
@@ -1768,7 +1769,7 @@
     if (!captureSession || !captureSession.caseData || !captureOverlay) return;
     const mode = captureSession.caseData[captureSession.caseDifficulty];
     const box = captureBox();
-    box.classList.add('muenba-case-box');
+    box.classList.add('muenba-case-box', 'muenba-case-resolved');
     captureImage(box, captureSession.ghost);
 
     const modeLabel = document.createElement('div');
@@ -1872,7 +1873,8 @@
     renderCaseDirection(
       box,
       'The case is settled. Now begin the energy capture.',
-      '<ruby>事件<rt>じけん</rt></ruby>は<ruby>解決<rt>かいけつ</rt></ruby>しました。<ruby>次<rt>つぎ</rt></ruby>にエネルギーを<ruby>集<rt>あつ</rt></ruby>めましょう。'
+      '<ruby>事件<rt>じけん</rt></ruby>は<ruby>解決<rt>かいけつ</rt></ruby>しました。<ruby>次<rt>つぎ</rt></ruby>にエネルギーを<ruby>集<rt>あつ</rt></ruby>めましょう。',
+      'muenba-case-resolution-direction'
     );
 
     const actions = document.createElement('div');
@@ -1895,8 +1897,13 @@
     if (!captureSession || !captureOverlay) return;
     const ghost = captureSession.ghost;
     const box = captureBox();
+    box.classList.add('muenba-capture-ready');
     captureImage(box, ghost);
 
+    const phase = document.createElement('div');
+    phase.className = 'muenba-capture-phase-label';
+    phase.textContent = 'CAPTURE PHASE';
+    box.appendChild(phase);
     const h2 = document.createElement('h2');
     h2.textContent = 'Capture ready';
     box.appendChild(h2);
@@ -1921,7 +1928,8 @@
     renderCaseDirection(
       box,
       `You found ${ghost.name}. When you are ready, begin the capture sequence.`,
-      `${ghost.name}を<ruby>見<rt>み</rt></ruby>つけました。<ruby>準備<rt>じゅんび</rt></ruby>ができたら、<ruby>捕<rt>つか</rt></ruby>まえましょう。`
+      `${ghost.name}を<ruby>見<rt>み</rt></ruby>つけました。<ruby>準備<rt>じゅんび</rt></ruby>ができたら、<ruby>捕<rt>つか</rt></ruby>まえましょう。`,
+      'muenba-capture-direction'
     );
 
     const actions = document.createElement('div');
@@ -2116,7 +2124,7 @@
     if (!captureSession || !captureOverlay) return;
     setDangerOverlay(false);
     const box = captureBox();
-    box.classList.add('muenba-rhythm-halloween-box');
+    box.classList.add('muenba-rhythm-halloween-box', 'muenba-capture-result');
     box.classList.add('muenba-rhythm-help-box');
 
     const eyebrow = document.createElement('div');
@@ -2710,6 +2718,7 @@
     const box = captureBox();
     box.classList.add('muenba-rhythm-halloween-box');
     box.classList.add(success ? 'muenba-rhythm-result-success' : 'muenba-rhythm-result-failure');
+    box.classList.add('muenba-capture-result');
     if (danger) box.classList.add('muenba-danger-box');
     captureImage(box, ghost, danger ? ANGRY_CHANGE_IMG : ghost.img);
 
@@ -2809,8 +2818,13 @@
     const ghost = captureSession.ghost;
     const reward = captureSession.reward;
     const box = captureBox();
+    box.classList.add('muenba-capture-reward');
     captureImage(box, ghost);
 
+    const phase = document.createElement('div');
+    phase.className = 'muenba-capture-phase-label';
+    phase.textContent = 'ENERGY RELEASE';
+    box.appendChild(phase);
     const h2 = document.createElement('h2');
     h2.textContent = 'Captured!';
     box.appendChild(h2);
@@ -2828,7 +2842,8 @@
     renderCaseDirection(
       box,
       'Watch the energy release, then return the orbs to Nuppi.',
-      'エネルギーが<ruby>出<rt>で</rt></ruby>てきます。<ruby>見<rt>み</rt></ruby>てから、オーブをヌーピーに<ruby>届<rt>とど</rt></ruby>けましょう。'
+      'エネルギーが<ruby>出<rt>で</rt></ruby>てきます。<ruby>見<rt>み</rt></ruby>てから、オーブをヌーピーに<ruby>届<rt>とど</rt></ruby>けましょう。',
+      'muenba-capture-direction'
     );
 
     const orbList = document.createElement('div');
@@ -3667,6 +3682,64 @@
       .muenba-nuppi-next-card { border:1px solid rgba(170,150,255,.34); background:linear-gradient(145deg,rgba(83,61,155,.14),rgba(38,29,81,.2)); }
       .muenba-nuppi-next-card .muenba-nuppi-card-label { color:#c9baff; }
       .muenba-nuppi-handoff .muenba-nuppi-nameplate { margin-bottom:14px; }
+      /* Pass 4: case and capture phases. Each screen keeps the shared shell,
+         but its accent tells the player what kind of moment this is. */
+      .muenba-case-intro,
+      .muenba-case-clue,
+      .muenba-case-resolved,
+      .muenba-capture-ready,
+      .muenba-capture-result,
+      .muenba-capture-reward { width:min(600px,100%); }
+      .muenba-case-intro { border-color:rgba(216,201,139,.68); box-shadow:0 24px 80px rgba(0,0,0,.82),0 0 70px rgba(126,111,48,.24),inset 0 0 70px rgba(0,0,0,.58); }
+      .muenba-case-intro .muenba-lobby-portrait,
+      .muenba-case-resolved .muenba-lobby-portrait { width:108px; height:108px; filter:drop-shadow(0 0 22px rgba(216,201,139,.38)); }
+      .muenba-case-intro h2,
+      .muenba-case-resolved h2 { font-size:clamp(1.32rem,4vw,1.72rem); }
+      .muenba-case-intro .muenba-case-record { margin-top:20px !important; padding:18px 18px 17px; border-left-width:4px; border-color:#ead68c; background:linear-gradient(110deg,rgba(126,111,48,.2),rgba(216,201,139,.05)); color:#fff7dc !important; font-size:1.05rem !important; line-height:1.62 !important; box-shadow:inset 0 0 22px rgba(216,201,139,.035); }
+      .muenba-case-mode-card { margin:16px 0 20px; border-color:rgba(170,150,255,.42); background:linear-gradient(135deg,rgba(83,61,155,.14),rgba(38,29,81,.18)); box-shadow:0 0 20px rgba(100,77,184,.12); }
+      .muenba-case-mode-card .muenba-case-direction-en { color:#eeeaff; font-size:.92rem; font-weight:700; }
+      .muenba-case-mode-card .muenba-case-direction-jp { color:#c9baff; }
+      .muenba-case-intro .muenba-case-action,
+      .muenba-case-resolved .muenba-case-action { min-width:210px; padding:13px 28px; }
+      .muenba-case-clue { border-color:rgba(156,224,193,.62); }
+      .muenba-case-clue .muenba-case-mode-label { margin:2px 0 16px; padding:8px 11px; border:1px solid rgba(216,201,139,.34); border-radius:9px; background:rgba(216,201,139,.07); color:#ffe9a9; box-shadow:inset 0 0 14px rgba(216,201,139,.035); }
+      .muenba-case-clue .muenba-case-mode-label small { color:#c9c49d; }
+      .muenba-case-clue .muenba-case-record-instruction { margin-bottom:13px; }
+      .muenba-case-clue .muenba-case-progress { margin-top:3px; color:#e7dca9; }
+      .muenba-case-clue .muenba-case-progress-jp { color:#9fc3af; }
+      .muenba-case-clue h2 { margin:15px 0 4px; color:#f4f1d9; font-size:clamp(1.22rem,3.5vw,1.48rem); text-align:left; }
+      .muenba-case-clue .muenba-case-record { margin-top:8px !important; padding:17px 17px 16px; border-left-width:4px; border-color:#b9e2a0; background:linear-gradient(110deg,rgba(104,139,83,.19),rgba(156,224,193,.045)); font-size:1.04rem !important; line-height:1.68 !important; }
+      .muenba-case-clue .muenba-case-glossary { margin-top:-6px; }
+      .muenba-case-resolved { border-color:rgba(241,215,141,.78); box-shadow:0 24px 80px rgba(0,0,0,.82),0 0 76px rgba(216,201,139,.28),inset 0 0 70px rgba(0,0,0,.58); }
+      .muenba-case-resolved .muenba-case-eyebrow { color:#fff0a9; text-shadow:0 0 18px rgba(255,224,102,.28); font-size:.72rem; }
+      .muenba-case-resolved .muenba-case-eyebrow-jp { color:#d8c98b; }
+      .muenba-case-resolved .muenba-case-record { margin-top:20px !important; padding:18px; border-left-width:4px; border-color:#e6d278; background:linear-gradient(110deg,rgba(126,111,48,.22),rgba(216,201,139,.05)); color:#fff5d5 !important; font-size:1.05rem !important; line-height:1.64 !important; }
+      .muenba-case-resolution-direction { margin-top:16px; border-color:rgba(156,224,193,.38); background:linear-gradient(145deg,rgba(52,104,78,.15),rgba(8,35,27,.28)); }
+      .muenba-case-resolution-direction .muenba-case-direction-en { color:#e6f7ec; font-weight:700; }
+      .muenba-capture-ready { border-color:rgba(170,150,255,.7); background:radial-gradient(circle at 50% 8%,rgba(116,46,168,.2),transparent 42%),linear-gradient(145deg,rgba(19,11,43,.97),rgba(6,13,25,.98)); box-shadow:0 24px 80px rgba(0,0,0,.86),0 0 65px rgba(111,66,210,.28),inset 0 0 55px rgba(49,205,154,.07); }
+      .muenba-capture-ready .muenba-lobby-portrait { width:136px; height:136px; filter:drop-shadow(0 0 24px rgba(190,119,255,.42)) drop-shadow(0 0 36px rgba(39,255,145,.12)); }
+      .muenba-capture-phase-label { margin:0 0 8px; color:#d8c98b; font:900 .65rem/1.4 ui-monospace,monospace; letter-spacing:.18em; text-align:center; text-transform:uppercase; text-shadow:0 0 14px rgba(216,201,139,.22); }
+      .muenba-capture-ready .muenba-capture-phase-label { color:#c9baff; text-shadow:0 0 16px rgba(190,119,255,.3); }
+      .muenba-capture-ready h2 { color:#f4e8ff; font-size:clamp(1.42rem,4vw,1.82rem); text-shadow:0 0 18px rgba(190,119,255,.3); }
+      .muenba-capture-ready .muenba-ghost-flavor { margin-top:16px !important; border-left-color:rgba(190,119,255,.75); background:rgba(116,46,168,.13); color:#f0e7ff !important; box-shadow:inset 0 0 18px rgba(190,119,255,.05); }
+      .muenba-capture-ready .muenba-ghost-flavor-jp { color:#c9baff !important; }
+      .muenba-capture-direction { border-color:rgba(170,150,255,.36); background:rgba(83,61,155,.12); }
+      .muenba-capture-ready .muenba-capture-direction .muenba-case-direction-en { color:#f2edff; font-weight:700; }
+      .muenba-capture-ready .muenba-capture-action { min-width:190px; padding:13px 30px; border-color:rgba(190,119,255,.78); background:rgba(116,46,168,.24); box-shadow:0 0 26px rgba(111,66,210,.32),inset 0 0 14px rgba(190,119,255,.08); }
+      .muenba-capture-ready .muenba-capture-action:hover,
+      .muenba-capture-ready .muenba-capture-action:focus-visible { border-color:#e2d4ff; background:rgba(116,46,168,.42); box-shadow:0 0 38px rgba(190,119,255,.5),inset 0 0 18px rgba(190,119,255,.14); }
+      .muenba-capture-result { min-height:300px; }
+      .muenba-capture-result .muenba-lobby-portrait { width:116px; height:116px; }
+      .muenba-capture-result h2 { font-size:clamp(1.3rem,4vw,1.72rem); }
+      .muenba-capture-result > p:not(.jp):not(.muenba-rhythm-combo) { color:#e4eee7; font-size:.96rem; line-height:1.58; }
+      .muenba-capture-result .muenba-case-direction { margin-top:17px; }
+      .muenba-capture-reward { border-color:rgba(183,255,83,.72); background:radial-gradient(circle at 50% 8%,rgba(132,255,77,.13),transparent 38%),linear-gradient(145deg,rgba(7,33,24,.98),rgba(4,13,18,.99)); box-shadow:0 24px 80px rgba(0,0,0,.86),0 0 70px rgba(79,255,151,.25),inset 0 0 58px rgba(132,255,77,.06); }
+      .muenba-capture-reward .muenba-lobby-portrait { width:132px; height:132px; filter:drop-shadow(0 0 26px rgba(132,255,77,.38)) drop-shadow(0 0 34px rgba(216,201,139,.18)); }
+      .muenba-capture-reward .muenba-capture-phase-label { color:#c9ff54; text-shadow:0 0 16px rgba(132,255,77,.3); }
+      .muenba-capture-reward h2 { color:#efffd6; font-size:clamp(1.42rem,4vw,1.85rem); text-shadow:0 0 18px rgba(132,255,77,.28); }
+      .muenba-capture-reward > p:not(.jp):not(.muenba-orb-release-status) { color:#e4f7df; font-size:.98rem; line-height:1.58; }
+      .muenba-capture-reward .muenba-capture-direction { border-color:rgba(183,255,83,.3); background:rgba(132,255,77,.06); }
+      .muenba-capture-reward .muenba-orb-release-list { margin-top:16px; padding:10px 8px; border:1px solid rgba(183,255,83,.2); border-radius:12px; background:rgba(132,255,77,.035); }
       @media (max-width:640px) {
         .muenba-lobby-box { width:min(100%,calc(100vw - 24px)); max-height:calc(100dvh - 24px); padding:24px 18px 20px; border-radius:16px; }
         .muenba-lobby-box::after { top:11px; width:72px; }
