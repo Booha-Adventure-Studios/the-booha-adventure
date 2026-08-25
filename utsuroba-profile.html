@@ -325,6 +325,11 @@
         deep:  { en: 'Deep Memory', jp: `${rb('深', 'ふか')}い${rb('記憶', 'きおく')}`, pip: 'D', note: 'The full stories, the way they were first written.', noteJP: '最初に書かれたままの、完全な物語です。' },
       };
 
+      function memoryModeLabel(value) {
+        const mode = TIERS.includes(value) ? value : 'start';
+        return TIER_META[mode].en;
+      }
+
       function getDifficulty() {
         const value = window.UTSUROBA_READING_DIFFICULTY ? window.UTSUROBA_READING_DIFFICULTY() : 'start';
         return TIERS.includes(value) ? value : 'start';
@@ -482,7 +487,7 @@
               return `<article class="journal-entry">
                 <h3>${esc(episode?.title || entry.episodeId || 'Untitled memory')}<small>${esc(episode?.titleJP || drifter?.nameKanji || '')}</small></h3>
                 ${drifter ? tierPipsMarkup(restoredTiers, currentTier) : ''}
-                <p class="journal-meta">${esc(drifter?.name || 'Utsuroba')} · ${reviews} reading${reviews === 1 ? '' : 's'} total (every replay counted)</p>
+                <p class="journal-meta">${esc(drifter?.name || 'Utsuroba')} · ${memoryModeLabel(entry.difficulty || 'start')} · ${reviews} reading${reviews === 1 ? '' : 's'} total (every replay counted)</p>
                 <p class="journal-next${missingTier ? '' : ' is-done'}">${nextHint}</p>
               </article>`;
             }).join('')}</div>`
