@@ -25,6 +25,7 @@ assert(source.includes('restartHuntAfterCarriedEnergyLoss'), 'failed carried-ene
 assert(source.includes('if (carryingStolenEnergy) return \'sight\';'), 'carrying energy must make every ghost sight-angry');
 assert(source.includes("if (Number(readMuenba().orbsPending) > 0) return null;"), 'carrying energy must clear capture eligibility until handoff');
 assert(source.includes("if (!carryingStolenEnergy && ghostId === target) return 'friendly';"), 'the assigned hunt ghost must stay quiet during an ordinary hunt');
+assert(!source.includes('muenbaGhostHostility'), 'ordinary non-target ghosts must not use a seeded random hostility split');
 assert(source.includes('chaseSpeed: carryingEnergy ? GHOST_CARRY_CHASE_SPEED : GHOST_CHASE_SPEED,'), 'ghosts must remember the carried-energy chase speed');
 assert(source.includes('moveGhostToward(g, state.x, state.y, g.chaseSpeed || GHOST_CHASE_SPEED);'), 'chasing must use the carried-energy speed when active');
 assert(source.includes("if (g.hostility === 'sight' && !g.screaming)"), 'sight-angry ghosts must use the delayed notice path');
