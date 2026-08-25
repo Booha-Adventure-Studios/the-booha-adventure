@@ -14,5 +14,11 @@ assert(source.includes("if (!carryingStolenEnergy && ghostId === target) return 
 assert(source.includes('chaseSpeed: carryingEnergy ? GHOST_CARRY_CHASE_SPEED : GHOST_CHASE_SPEED,'), 'ghosts must remember the carried-energy chase speed');
 assert(source.includes('moveGhostToward(g, state.x, state.y, g.chaseSpeed || GHOST_CHASE_SPEED);'), 'chasing must use the carried-energy speed when active');
 assert(source.includes("if (g.hostility === 'sight' && !g.screaming)"), 'sight-angry ghosts must use the delayed notice path');
+assert(source.includes("beginDangerEncounter(g.ghost, { allowHide: g.screamReason === 'wrong-ghost' });"), 'danger encounters must remember whether a quiet wrong-click ghost allows hiding');
+assert(source.includes('dangerCanHide: allowHide === true,'), 'danger sessions must store the popup hide decision');
+assert(source.includes("if (canHide) {\n      actions.appendChild(captureButton('Hide now'"), 'angry touch popups must omit Hide while quiet wrong-click popups keep it');
+assert(source.includes('if (captureSession.dangerCanHide === true) {\n        actions.appendChild(captureButton(\'Hide and escape\''), 'danger rhythm popups must conditionally show Hide');
+assert(source.includes("if (!captureSession || !captureSession.danger || captureSession.dangerCanHide !== true) return;"), 'the Hide escape handler must reject angry touch encounters');
+assert(source.includes("if (state.transitioning || lobbyOpen || returnPortalOpen || captureOpen) return;"), 'the gameplay Hide button must remain available outside encounter popups');
 
-console.log('Muenba ghost audit passed: two-second tension, quiet hunt target, and faster carried-energy chases.');
+console.log('Muenba ghost audit passed: two-second tension, carried-energy chases, and encounter-specific Hide rules.');
