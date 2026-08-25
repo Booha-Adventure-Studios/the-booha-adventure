@@ -8,7 +8,9 @@ const path = require('path');
 const source = fs.readFileSync(path.join(__dirname, '..', 'js', 'muenba.js'), 'utf8');
 
 assert(source.includes('const GHOST_NOTICE_DELAY_MS = 2000;'), 'sight-angry ghosts must wait exactly two seconds before screaming');
-assert(source.includes('const GHOST_CARRY_CHASE_SPEED = 1.35;'), 'carrying-energy chases must be only slightly faster');
+assert(source.includes('const JERK_NOTICE_DELAY_MS = 700;'), 'Jerk ghosts must react faster than ordinary sight-angry ghosts');
+assert(source.includes('const JERK_CHASE_SPEED = 1.55;'), 'Jerk ghosts must chase faster once angry');
+assert(source.includes('const GHOST_CARRY_CHASE_SPEED = 1.6;'), 'carrying-energy chases must use the urgent shared speed');
 assert(source.includes("if (roleRules.alwaysAngry) return 'sight';"), 'jerk ghosts must use sight-triggered aggression');
 assert(source.includes('if (state.cemeteryAlert) return \'sight\';'), 'declining the next hint must leave every ghost sight-angry');
 assert(source.includes('state.cemeteryAlert = false;'), 'accepting the next hint must clear the cemetery alert');
@@ -26,7 +28,10 @@ assert(source.includes('if (carryingStolenEnergy) return \'sight\';'), 'carrying
 assert(source.includes("if (Number(readMuenba().orbsPending) > 0) return null;"), 'carrying energy must clear capture eligibility until handoff');
 assert(source.includes("if (!carryingStolenEnergy && ghostId === target) return 'friendly';"), 'the assigned hunt ghost must stay quiet during an ordinary hunt');
 assert(!source.includes('muenbaGhostHostility'), 'ordinary non-target ghosts must not use a seeded random hostility split');
-assert(source.includes('chaseSpeed: carryingEnergy ? GHOST_CARRY_CHASE_SPEED : GHOST_CHASE_SPEED,'), 'ghosts must remember the carried-energy chase speed');
+assert(source.includes('chaseSpeed: carryingEnergy'), 'ghosts must remember the carried-energy chase speed');
+assert(source.includes("startGhostScream(activeGhost, performance.now(), 'carried-energy');"), 'carried-energy rooms must begin screaming immediately');
+assert(source.includes("if (g.carryingEnergy && g.hostility === 'sight' && !g.screaming)"), 'coming out of hiding with energy must re-arm the chase immediately');
+assert(source.includes('&& !g.carryingEnergy'), 'ordinary chases may lose interest at range, but carried-energy chases must persist');
 assert(source.includes('moveGhostToward(g, state.x, state.y, g.chaseSpeed || GHOST_CHASE_SPEED);'), 'chasing must use the carried-energy speed when active');
 assert(source.includes("if (g.hostility === 'sight' && !g.screaming)"), 'sight-angry ghosts must use the delayed notice path');
 assert(source.includes("beginDangerEncounter(g.ghost, { allowHide: g.dangerCanHide === true });"), 'danger encounters must use the ghost role to decide whether hiding is allowed');
