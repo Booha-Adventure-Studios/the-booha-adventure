@@ -65,9 +65,13 @@
   const GHOST_DETECT_R = 230;
   const GHOST_CATCH_R = 60;
   const GHOST_CLICK_R = 64;
-  // Hostile ghosts should give Booha a short readable beat, not several
-  // seconds of silence while they stare at him.
-  const GHOST_NOTICE_DELAY_MS = 900;
+  // Sight-angry ghosts build tension for two seconds before they reveal the
+  // scream. The delay is intentional: Booha should feel watched before the
+  // chase begins, but the reaction must still be predictable.
+  const GHOST_NOTICE_DELAY_MS = 2000;
+  // Carrying energy puts the whole cemetery on alert. The chase remains fair,
+  // but is a little faster than the ordinary angry-ghost pace.
+  const GHOST_CARRY_CHASE_SPEED = 1.35;
   // Hiding calms the encounter, but does not instantly clear the room. Let a
   // hostile ghost search nearby for a longer beat before it slips away.
   const GHOST_GIVEUP_HIDE_MS = 6000;
@@ -936,6 +940,10 @@
     if (!isJerk) {
       if (!carryingStolenEnergy && ghostId === target) return 'friendly';
     }
+    // The hunt target stays quiet during an ordinary hunt, while the other
+    // ghosts keep the seeded mix of sight-angry and click-reactive behavior.
+    // Once Booha is carrying energy, every ghost becomes sight-angry. This is
+    // the return journey escalation and also covers the target ghost.
     if (carryingStolenEnergy) return 'sight';
     // No active hunt target (every case finished at this difficulty, or no
     // ghost left for the week) used to fall through to the same 50/50 roll
@@ -1042,12 +1050,15 @@
     if (!ghost) return;
     const pos = pickGhostSpawnPosition();
     const hostility = ghostHostilityFor(ghost.id);
+    const carryingEnergy = Number(readMuenba().orbsPending) > 0;
     activeGhost = {
       ghost,
       x: pos.x,
       y: pos.y,
       behavior: hostility,
       hostility,
+      carryingEnergy,
+      chaseSpeed: carryingEnergy ? GHOST_CARRY_CHASE_SPEED : GHOST_CHASE_SPEED,
       chasing: false,
       wanderTarget: pos,
       nextWanderAt: performance.now() + 1800 + Math.random() * 1600,
@@ -1174,7 +1185,7 @@
         g.chasing = false;
         g.noticeStartedAt = 0;
       } else {
-        moveGhostToward(g, state.x, state.y, GHOST_CHASE_SPEED);
+        moveGhostToward(g, state.x, state.y, g.chaseSpeed || GHOST_CHASE_SPEED);
         if (dist <= GHOST_CATCH_R && now >= g.startleUntil) {
           g.startleUntil = now + GHOST_STARTLE_COOLDOWN_MS;
           g.angryUntil = now + 1200;
