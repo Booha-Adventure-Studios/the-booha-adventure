@@ -10,10 +10,10 @@ const CURRENT_CACHES = {
   pages:  'booha-pages-2026-309',
   // js/ is served cache-first (see ASSET_PREFIXES below), so once a device
   // caches a script it never re-fetches it until this string changes.
-  // Utsuroba profile pass: bumped for js/utsuroba.js's tier-tracking/
-  // running-total save-schema changes. Bump this string on every future
-  // /js/-touching fix, not just this one.
-  assets: 'booha-assets-2026-314',
+  // Connected-doors pass: bumped for js/karasuki.js's UTSUROBA_LOCKED_COPY
+  // wording fix. Bump this string on every future /js/-touching fix, not
+  // just this one.
+  assets: 'booha-assets-2026-315',
   decks:  'booha-decks-2026-309',
 };
 
