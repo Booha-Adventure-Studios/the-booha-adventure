@@ -281,6 +281,7 @@ const HAPPY_HOUSE_PORTAL = {
     lantern:    { glowRGBA: '255,240,180', coreHi: '#fffde0', coreMid: '#ffd966', coreLo: '#c8860a', shadow: '#ffd966' },
     candy:      { glowRGBA: '255,190,205', coreHi: '#fff0f4', coreMid: '#ff85a1', coreLo: '#c23a5e', shadow: '#ff85a1' },
     reflection: { glowRGBA: '190,235,255', coreHi: '#eafcff', coreMid: '#a8edff', coreLo: '#3b8fbf', shadow: '#a8edff' },
+    window:     { glowRGBA: '180,255,230', coreHi: '#effff9', coreMid: '#8ff0d0', coreLo: '#2d9d82', shadow: '#8ff0d0' },
     /* Pass 9 (Blakesly + Patricia): kept deliberately apart from the hues
        above so neither reads as a recolor of an existing memory — thorn is
        a hot brick-red (sharp/guarded), ribbon a soft lavender-pink (warm,
@@ -469,7 +470,7 @@ const HAPPY_HOUSE_PORTAL = {
      ECHO_STYLE_FOR gradient table since .utsu-hud-chip-dot.motif-*.is-lit
      already provides the same per-motif glow, one definition instead
      of two. */
-  const ECHO_ICON_FOR = { lantern: '✦', candy: '●', reflection: '◈' };
+  const ECHO_ICON_FOR = { lantern: '✦', candy: '●', reflection: '◈', window: '▱' };
   let echoesTrackerEl = null;
   // Round 2 Pass 16: see the matching comment in utsuroba.js's own
   // renderEchoesTracker() — null until the first render, so the tracker

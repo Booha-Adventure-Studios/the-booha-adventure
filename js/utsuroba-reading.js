@@ -18,6 +18,7 @@
     lantern:    { ring: '#ffd966', glow: 'rgba(255,217,102,.5)' },
     candy:      { ring: '#ff85a1', glow: 'rgba(255,133,161,.5)' },
     reflection: { ring: '#a8edff', glow: 'rgba(168,237,255,.5)' },
+    window:     { ring: '#8ff0d0', glow: 'rgba(143,240,208,.5)' },
     thorn:      { ring: '#d9503a', glow: 'rgba(217,80,58,.5)' },
     ribbon:     { ring: '#d9a8ff', glow: 'rgba(217,168,255,.5)' },
   };

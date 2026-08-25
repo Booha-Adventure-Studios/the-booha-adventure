@@ -29,7 +29,7 @@
        key, then `UtsuCard.ringFor(motif)` / `UtsuCard.glowFor(motif)` and
        set them as the `--card-ring` / `--card-glow` custom properties on
        the popup element for a per-drifter accent color (portrait border,
-       card border/glow) — the same lantern/candy/reflection/thorn/ribbon
+       card border/glow) — the same lantern/candy/reflection/window/thorn/ribbon
        language already used by orbs (karasuki.js ORB_MOTIF_COLORS) and
        the reading-modal portrait ring (utsuroba-reading.js MOTIF_COLORS).
 */
@@ -40,6 +40,7 @@
     lantern:    '#ffd966',
     candy:      '#ff85a1',
     reflection: '#a8edff',
+    window:     '#8ff0d0',
     thorn:      '#d9503a',
     ribbon:     '#d9a8ff',
   };
@@ -47,6 +48,7 @@
     lantern:    'rgba(255,217,102,.45)',
     candy:      'rgba(255,133,161,.45)',
     reflection: 'rgba(168,237,255,.45)',
+    window:     'rgba(143,240,208,.45)',
     thorn:      'rgba(217,80,58,.45)',
     ribbon:     'rgba(217,168,255,.45)',
   };
@@ -55,11 +57,11 @@
      UTSUROBA_EPISODES has resolved (or for a drifter with no episode
      yet). Matches each drifter's live worldEcho.motif exactly — checked
      against content/utsuroba/episodes/*.json at the time this was
-     written: ks→lantern, nto→candy, cg→reflection, bh→reflection,
+     written: ks→lantern, nto→candy, cg→reflection, bh→window,
      bk→thorn, ph→ribbon. If a drifter's motif ever changes in the
      episode JSON, the live lookup below picks it up automatically —
      this table only matters for that first-paint race. */
-  var DRIFTER_MOTIF_FALLBACK = { ks: 'lantern', nto: 'candy', cg: 'reflection', bh: 'reflection', bk: 'thorn', ph: 'ribbon' };
+  var DRIFTER_MOTIF_FALLBACK = { ks: 'lantern', nto: 'candy', cg: 'reflection', bh: 'window', bk: 'thorn', ph: 'ribbon' };
 
   function motifForDrifter(drifter) {
     if (!drifter) return null;
@@ -255,6 +257,7 @@
       .utsu-hud-chip-dot.motif-lantern.is-lit{background:radial-gradient(circle at 35% 30%,#fffde0,#ffd966 55%,#c8860a);box-shadow:0 0 10px rgba(255,217,102,.55);}
       .utsu-hud-chip-dot.motif-candy.is-lit{background:radial-gradient(circle at 35% 30%,#fff0f4,#ff85a1 55%,#c23a5e);box-shadow:0 0 10px rgba(255,133,161,.55);}
       .utsu-hud-chip-dot.motif-reflection.is-lit{background:radial-gradient(circle at 35% 30%,#eafcff,#a8edff 55%,#3b8fbf);box-shadow:0 0 10px rgba(168,237,255,.55);}
+      .utsu-hud-chip-dot.motif-window.is-lit{background:radial-gradient(circle at 35% 30%,#effff9,#8ff0d0 55%,#2d9d82);box-shadow:0 0 10px rgba(143,240,208,.55);}
       /* Round 2 Pass 16: caller adds .is-just-lit for one render only —
          the render that actually transitions a dot from unlit to lit
          (see renderEchoesTracker() in karasuki.js/utsuroba.js, which
