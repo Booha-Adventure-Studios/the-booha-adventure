@@ -376,6 +376,37 @@
   function isJerkGhostId(ghostId) {
     return typeof ghostId === 'string' && ghostId.indexOf('jerk_') === 0;
   }
+  // Pass 1: one source of truth for the Muenba encounter roles. Later
+  // behavior passes use these rules to choose neutral hunt behavior,
+  // dangerous wrong-ghost behavior, or carried-energy escalation.
+  const GHOST_ROLE_RULES = Object.freeze({
+    'hunt-target': Object.freeze({
+      huntable: true,
+      neutralDuringHunt: true,
+      alwaysAngry: false,
+      dangerCanHide: true
+    }),
+    jerk: Object.freeze({
+      huntable: false,
+      neutralDuringHunt: false,
+      alwaysAngry: true,
+      dangerCanHide: false
+    })
+  });
+  function ghostRoleFor(ghostOrId) {
+    const ghostId = typeof ghostOrId === 'string' ? ghostOrId : ghostOrId && ghostOrId.id;
+    if (isJerkGhostId(ghostId)) return 'jerk';
+    const ghost = typeof ghostOrId === 'object'
+      ? ghostOrId
+      : GHOSTS.find(candidate => candidate.id === ghostId);
+    return ghost && GHOST_ROLE_RULES[ghost.role] ? ghost.role : 'hunt-target';
+  }
+  function ghostRulesFor(ghostOrId) {
+    return GHOST_ROLE_RULES[ghostRoleFor(ghostOrId)];
+  }
+  function isMainHuntGhostId(ghostId) {
+    return ghostRoleFor(ghostId) === 'hunt-target';
+  }
 
   const ghostImg = new Image();
   ghostImg.src = 'assets/img/booha_ghost.png';
@@ -570,12 +601,14 @@
       if (!ghost || !ghost.id || ghostIds.has(ghost.id)) errors.push('ghost roster contains a missing or duplicate id');
       if (ghost) {
         ghostIds.add(ghost.id);
+        if (ghost.role !== 'hunt-target') errors.push(`${ghost.id} must use the hunt-target role`);
         if (typeof ghost.kana !== 'string' || !ghost.kana.trim()) errors.push(`${ghost.id} has no katakana name`);
         else if (!/^[\u30a0-\u30ffー・\s]+$/.test(ghost.kana)) errors.push(`${ghost.id} katakana name contains non-katakana text`);
         if (typeof ghost.personality !== 'string' || !ghost.personality.trim()) errors.push(`${ghost.id} has no personality note`);
         else if (/[\u3040-\u30ff\u3400-\u9fff]/.test(ghost.personality)) errors.push(`${ghost.id} personality note contains Japanese story text`);
       }
     }
+    if (!JERK_GHOST || JERK_GHOST.role !== 'jerk') errors.push('jerk ghost must use the jerk role');
     if (errors.length) console.error('[Muenba] Data validation failed:', errors);
     else console.info('[Muenba] 15-room data validation passed.');
   }
@@ -934,10 +967,12 @@
     // taken but not yet delivered," so it's the right flag to key off of.
     const carryingStolenEnergy = Number(readMuenba().orbsPending) > 0;
     const target = currentHuntGhostId();
-    const isJerk = isJerkGhostId(ghostId);
+    const role = ghostRoleFor(ghostId);
+    const roleRules = ghostRulesFor(ghostId);
+    const isJerk = role === 'jerk';
     // Pass 15: a Jerk is purely hostile — never Nuppi's target, never the
     // "quiet cemetery" exception below, whatever the hunt state is.
-    if (!isJerk) {
+    if (roleRules.neutralDuringHunt) {
       if (!carryingStolenEnergy && ghostId === target) return 'friendly';
     }
     // The hunt target stays quiet during an ordinary hunt, while the other
@@ -1049,10 +1084,17 @@
     const ghost = getGhostRoomMap()[roomId];
     if (!ghost) return;
     const pos = pickGhostSpawnPosition();
+    const role = ghostRoleFor(ghost);
+    const roleRules = ghostRulesFor(ghost);
     const hostility = ghostHostilityFor(ghost.id);
     const carryingEnergy = Number(readMuenba().orbsPending) > 0;
     activeGhost = {
       ghost,
+      role,
+      roleRules,
+      isHuntTarget: roleRules.huntable === true,
+      alwaysAngry: roleRules.alwaysAngry === true,
+      dangerCanHide: roleRules.dangerCanHide === true,
       x: pos.x,
       y: pos.y,
       behavior: hostility,
@@ -1274,6 +1316,7 @@
     activeGhost = null;
     captureSession = {
       ghost,
+      encounterRole: ghostRoleFor(ghost),
       caseData: null,
       caseDifficulty: null,
       caseIndex: 0,
@@ -1512,6 +1555,7 @@
     const caseData = caseForGhost(ghost && ghost.id);
     captureSession = {
       ghost,
+      encounterRole: ghostRoleFor(ghost),
       caseData,
       caseDifficulty: caseData ? getMuenbaReadingDifficulty() : null,
       caseIndex: 0,
