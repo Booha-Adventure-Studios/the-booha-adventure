@@ -14,7 +14,7 @@ const CURRENT_CACHES = {
   // wording fix. Bump this string on every future /js/-touching fix, not
   // just this one.
   assets: 'booha-assets-2026-346',
-  decks:  'booha-decks-2026-309',
+  decks:  'booha-decks-2026-310',
 };
 
 const PAGE_CACHE  = CURRENT_CACHES.pages;
