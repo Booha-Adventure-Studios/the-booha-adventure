@@ -125,23 +125,43 @@ const BoohaAdventureLog = (() => {
     return e;
   }
 
-  const CURR_LABELS = { pb: 'Pre-Boo', br: 'Boo-riculum', bc: 'Boo-continuum' };
+  const CURR_LABELS = {
+    pb: { en: 'Pre-Boo', jp: 'プレブー' },
+    br: { en: 'Boo-riculum', jp: 'ブーカリキュラム' },
+    bc: { en: 'Boo-continuum', jp: 'ブーコンティニューム' },
+  };
 
   function renderWeek(mount, status, curr, playerName, onPick, reference) {
     mount.textContent = '';
 
-    // Curriculum selector — always visible so students can switch tracks
+    // Curriculum selector, kept directly above the weekly snapshot so the
+    // three-letter codes are explained before the student uses them.
+    const switcher = el('div', 'alog-curr-switcher');
+    const switcherLabel = el('div', 'alog-curr-switcher-label');
+    switcherLabel.appendChild(el('span', 'alog-curr-switcher-en', 'WEEKLY CURRICULUM'));
+    switcherLabel.appendChild(el('span', 'alog-curr-switcher-jp', 'こんしゅうのカリキュラム'));
+    switcher.appendChild(switcherLabel);
+
     const tabs = el('div', 'alog-curr-tabs');
+    tabs.setAttribute('role', 'group');
+    tabs.setAttribute('aria-label', 'Choose the curriculum for this week');
     ['pb', 'br', 'bc'].forEach(c => {
-      const b = el('button', 'alog-curr-tab' + (c === curr ? ' active' : ''),
-                   c.toUpperCase());
+      const label = CURR_LABELS[c];
+      const b = el('button', 'alog-curr-tab' + (c === curr ? ' active' : ''));
       b.type = 'button';
-      b.title = CURR_LABELS[c];
+      b.title = `${label.en} / ${label.jp}`;
+      b.setAttribute('aria-label', `${label.en}, ${label.jp}`);
       b.setAttribute('aria-pressed', c === curr ? 'true' : 'false');
+      b.appendChild(el('span', 'alog-curr-tab-code', c.toUpperCase()));
+      const copy = el('span', 'alog-curr-tab-copy');
+      copy.appendChild(el('span', 'alog-curr-tab-en', label.en));
+      copy.appendChild(el('span', 'alog-curr-tab-jp', label.jp));
+      b.appendChild(copy);
       b.addEventListener('click', () => { if (c !== curr && onPick) onPick(c); });
       tabs.appendChild(b);
     });
-    mount.appendChild(tabs);
+    switcher.appendChild(tabs);
+    mount.appendChild(switcher);
 
     const untouched = status.advDone === 0 && status.blitzDone === 0;
     if (untouched) {
