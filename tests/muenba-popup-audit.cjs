@@ -37,5 +37,13 @@ assert(source.includes('Pause timed reading or transition callbacks for screensh
   'the DEV screenshot control must explain what it pauses');
 assert(source.includes('function setDevCaptureHold(held)'),
   'DEV screenshot hold must be session-scoped and reversible');
+assert(source.includes('min-height:120px; box-sizing:border-box; padding:20px 20px 19px;'),
+  'case reading records must reserve a stable, spacious English surface');
+assert(source.includes('font-size:clamp(1.16rem,2.35vw,1.38rem) !important; line-height:1.82 !important;'),
+  'case reading records must use ESL-friendly type and line spacing');
+assert(source.includes('.muenba-case-check-panel .muenba-case-choice { min-height:62px;'),
+  'case answer choices must remain comfortable touch targets');
+assert(source.includes('.muenba-case-check-panel.is-locked'),
+  'locked and unlocked check panels must have distinct visual states');
 
-console.log('Muenba popup audit passed: top anchoring, safe-area spacing, scrollability, and scene reset contracts.');
+console.log('Muenba popup audit passed: top anchoring, safe-area spacing, scrollability, scene reset, DEV hold, and ESL layout contracts.');
