@@ -56,19 +56,24 @@ assert.strictEqual(clueCount, data.caseOrder.length * 3 * 3, 'every mode must co
 // 2. A clue cannot expose a generic NEXT shortcut. Reading unlocks its check;
 // only the correct check answer can increment the record index.
 assert(clueSource.includes("captureSession.phase = 'case-read'"), 'clue screen must enter the read phase');
-assert(clueSource.includes('startCaseWordSweep(box, record, clue.text, clue.keywords, renderCaseCheck)'), 'clue screen must use the word sweep before the comprehension check');
+assert(clueSource.includes('appendCaseLockedCheck(box, clue, mode, captureSession)'), 'clue screen must reserve a locked comprehension panel');
+assert(clueSource.includes('startCaseWordSweep('), 'clue screen must use the word sweep before the comprehension check');
 assert(runtimeSource.includes('function startCaseWordSweep(box, record, englishText, keywords, onReady, button = null)'), 'Muenba must expose a session-owned word sweep engine');
 assert(runtimeSource.includes('CASE_WORD_SWEEP_BASE_MS = 620'), 'word sweep must use an ESL-friendly base dwell');
 assert(runtimeSource.includes('CASE_WORD_SWEEP_KEYWORD_EXTRA_MS = 180'), 'word sweep must give target vocabulary extra dwell');
 assert(runtimeSource.includes('CASE_WORD_SWEEP_FINAL_HOLD_MS = 1200'), 'word sweep must hold the completed record before CHECK');
 assert(runtimeSource.includes("record.classList.add('muenba-case-sweep')"), 'word sweep must render an explicit reading surface');
 assert(runtimeSource.includes("record.dataset.sweepState = 'complete'"), 'word sweep must expose a completed state before CHECK');
+assert(runtimeSource.includes('function appendCaseLockedCheck(box, clue, mode, session)'), 'Muenba must expose an anti-button-smash check panel');
+assert(runtimeSource.includes("button.setAttribute('aria-disabled', 'true')"), 'locked answer choices must advertise their disabled state');
+assert(runtimeSource.includes('function unlockCaseCheck(session, checkPanel, readStatus)'), 'the completed sweep must unlock the existing check panel');
+assert(runtimeSource.includes('handleCaseClueAnswer(index, answerSet, mode)'), 'unlocked clue choices must use the shared answer handler');
 assert(!clueSource.includes('muenba-case-next'), 'clue screen must not expose a generic NEXT button');
 assert(!clueSource.includes('caseIndex += 1'), 'clue screen must not advance before comprehension');
 assert(checkSource.includes("captureSession.phase = 'case-check'"), 'check screen must have its own phase');
-assert(checkSource.includes("captureSession.phase !== 'case-check'"), 'clue answers must be phase-guarded');
-assert(checkSource.includes('captureSession.caseIndex += 1'), 'only a correct clue answer may advance the record');
-assert(checkSource.includes("renderCaseCheck('Not quite."), 'wrong clue answers must reread without advancing');
+assert(runtimeSource.includes("captureSession.phase !== 'case-check'"), 'clue answers must be phase-guarded');
+assert(runtimeSource.includes('captureSession.caseIndex += 1'), 'only a correct clue answer may advance the record');
+assert(runtimeSource.includes("renderCaseCheck('Not quite."), 'wrong clue answers must reread without advancing');
 
 // 3. The final solve prompt is an inference lock, with review available one
 // record at a time and no accidental display of the whole answer key.

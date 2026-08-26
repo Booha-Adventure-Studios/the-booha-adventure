@@ -1919,6 +1919,102 @@
     box.appendChild(glossary);
   }
 
+  function handleCaseClueAnswer(index, answerSet, mode) {
+    if (!captureSession || captureSession.phase !== 'case-check') return;
+    if (index === answerSet.correct) {
+      if (captureSession.caseIndex >= mode.clues.length - 1) {
+        captureSession.phase = 'case-question';
+        renderCaseQuestion();
+      } else {
+        captureSession.caseIndex += 1;
+        renderCaseClue();
+      }
+    } else {
+      renderCaseCheck('Not quite. Read the record again, then try once more.');
+    }
+  }
+
+  function appendCaseLockedCheck(box, clue, mode, session) {
+    const check = clue.check;
+    const panel = document.createElement('section');
+    panel.className = 'muenba-case-check-panel is-locked';
+    panel.setAttribute('aria-label', 'Comprehension check locked until the record is read');
+
+    const label = document.createElement('div');
+    label.className = 'muenba-case-check-lock-label';
+    label.textContent = 'CHECK LOCKED';
+    panel.appendChild(label);
+
+    const question = renderCaseDirection(
+      panel,
+      check.prompt,
+      check.promptJP,
+      'muenba-case-question muenba-case-question-locked'
+    );
+    question.setAttribute('aria-hidden', 'true');
+
+    const lockHint = document.createElement('p');
+    lockHint.className = 'muenba-case-check-lock-hint';
+    lockHint.textContent = 'Read the complete record first.';
+    lockHint.setAttribute('aria-live', 'polite');
+    panel.appendChild(lockHint);
+
+    const choices = document.createElement('div');
+    choices.className = 'muenba-case-choices muenba-case-choices-locked';
+    choices.setAttribute('role', 'group');
+    choices.setAttribute('aria-label', 'Locked record question choices');
+    const answerSet = shuffledCaseChoices(check, `clue-${session.caseIndex}`);
+    answerSet.choices.forEach((choice, index) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'muenba-case-choice muenba-case-choice-locked';
+      button.setAttribute('aria-disabled', 'true');
+      button.setAttribute('tabindex', '-1');
+      button.setAttribute('aria-label', `Answer ${index + 1}: ${choice}`);
+      const number = document.createElement('span');
+      number.className = 'muenba-case-choice-number';
+      number.textContent = String(index + 1).padStart(2, '0');
+      const text = document.createElement('span');
+      text.className = 'muenba-case-choice-text';
+      text.textContent = choice;
+      button.append(number, text);
+      button.addEventListener('click', event => {
+        event.preventDefault();
+        if (panel.classList.contains('is-locked')) {
+          panel.classList.remove('muenba-case-locked-pulse');
+          void panel.offsetWidth;
+          panel.classList.add('muenba-case-locked-pulse');
+          lockHint.textContent = 'Keep reading. The answers unlock when the record is complete.';
+          return;
+        }
+        handleCaseClueAnswer(index, answerSet, mode);
+      });
+      choices.appendChild(button);
+    });
+    panel.appendChild(choices);
+    box.appendChild(panel);
+    return { panel, answerSet, lockHint };
+  }
+
+  function unlockCaseCheck(session, checkPanel, readStatus) {
+    if (!session || captureSession !== session || session.phase !== 'case-read') return;
+    session.phase = 'case-check';
+    checkPanel.panel.classList.remove('is-locked', 'muenba-case-locked-pulse');
+    checkPanel.panel.classList.add('is-unlocked');
+    checkPanel.panel.setAttribute('aria-label', 'Record question choices');
+    checkPanel.panel.querySelector('.muenba-case-check-lock-label').textContent = 'CHECK';
+    checkPanel.panel.querySelector('.muenba-case-question-locked')?.removeAttribute('aria-hidden');
+    checkPanel.lockHint.textContent = 'The record is complete. Choose the best answer.';
+    checkPanel.panel.querySelectorAll('.muenba-case-choice').forEach(button => {
+      button.classList.remove('muenba-case-choice-locked');
+      button.setAttribute('aria-disabled', 'false');
+      button.setAttribute('tabindex', '0');
+    });
+    const status = readStatus && readStatus.querySelector('.muenba-case-direction-en');
+    if (status) status.textContent = 'CHECK UNLOCKED. Choose an answer.';
+    focusCaptureControl('.muenba-case-choice[aria-disabled="false"]');
+  }
+
   function focusCaptureControl(selector) {
     window.setTimeout(() => {
       const control = captureOverlay && captureOverlay.querySelector(selector);
@@ -2160,6 +2256,7 @@
     jp.innerHTML = japaneseHtml;
     direction.append(en, jp);
     box.appendChild(direction);
+    return direction;
   }
 
   function caseActionButton(label, japaneseHtml, id, handler) {
@@ -2293,14 +2390,21 @@
     box.appendChild(record);
     appendCaseGlossary(box, clue.keywords);
 
-    renderCaseDirection(
+    const readStatus = renderCaseDirection(
       box,
       'Read this record carefully. A question will appear soon.',
       'この<ruby>記録<rt>きろく</rt></ruby>をよく<ruby>読<rt>よ</rt></ruby>んでね。すぐに<ruby>質問<rt>しつもん</rt></ruby>が<ruby>出<rt>で</rt></ruby>てくるよ。',
       'muenba-case-read-status muenba-case-reading-status'
     );
+    const checkPanel = appendCaseLockedCheck(box, clue, mode, captureSession);
     captureOverlay.classList.add('open');
-    startCaseWordSweep(box, record, clue.text, clue.keywords, renderCaseCheck);
+    startCaseWordSweep(
+      box,
+      record,
+      clue.text,
+      clue.keywords,
+      () => unlockCaseCheck(captureSession, checkPanel, readStatus)
+    );
   }
 
   function renderCaseCheck(feedback = '') {
@@ -2375,20 +2479,7 @@
       text.className = 'muenba-case-choice-text';
       text.textContent = choice;
       button.append(number, text);
-      button.addEventListener('click', () => {
-        if (!captureSession || captureSession.phase !== 'case-check') return;
-        if (index === answerSet.correct) {
-          if (captureSession.caseIndex >= mode.clues.length - 1) {
-            captureSession.phase = 'case-question';
-            renderCaseQuestion();
-          } else {
-            captureSession.caseIndex += 1;
-            renderCaseClue();
-          }
-        } else {
-          renderCaseCheck('Not quite. Read the record again, then try once more.');
-        }
-      });
+      button.addEventListener('click', () => handleCaseClueAnswer(index, answerSet, mode));
       choices.appendChild(button);
     });
     box.appendChild(choices);
@@ -4217,6 +4308,23 @@
       .muenba-case-reading-status::after { width:7px; height:7px; flex:0 0 auto; border-radius:50%; background:#9ce0c1; box-shadow:0 0 12px rgba(156,224,193,.85); content:""; animation:muenbaReadingDot 1.2s ease-in-out infinite; }
       .muenba-case-clue.muenba-reading-complete .muenba-case-reading-status::after { background:#ffe066; box-shadow:0 0 12px rgba(255,224,102,.85); animation:none; }
       @keyframes muenbaReadingDot { 0%,100% { opacity:.35; transform:scale(.8); } 50% { opacity:1; transform:scale(1.15); } }
+      .muenba-case-check-panel { margin-top:18px; padding:15px 14px 13px; border:1px solid rgba(170,150,255,.64); border-radius:13px; background:linear-gradient(135deg,rgba(83,61,155,.14),rgba(38,29,81,.2)); box-shadow:0 0 24px rgba(100,77,184,.14); transition:border-color .22s ease, background .22s ease, box-shadow .22s ease, opacity .22s ease; }
+      .muenba-case-check-panel.is-locked { border-color:rgba(170,150,255,.28); background:rgba(25,22,51,.34); box-shadow:none; }
+      .muenba-case-check-panel.is-unlocked { border-color:rgba(206,190,255,.72); background:linear-gradient(135deg,rgba(83,61,155,.22),rgba(38,29,81,.28)); box-shadow:0 0 28px rgba(100,77,184,.24); }
+      .muenba-case-check-lock-label { margin:0 0 8px; color:#c9baff; font:900 .7rem/1.35 ui-monospace,monospace; letter-spacing:.14em; text-align:left; }
+      .muenba-case-check-panel.is-locked .muenba-case-check-lock-label { color:rgba(201,186,255,.52); }
+      .muenba-case-check-panel .muenba-case-question { margin:0 0 11px; }
+      .muenba-case-question-locked { border-color:rgba(170,150,255,.22) !important; background:rgba(30,25,64,.22) !important; box-shadow:none !important; animation:none !important; }
+      .muenba-case-question-locked .muenba-case-direction-en { color:rgba(238,234,255,.34) !important; text-shadow:none !important; }
+      .muenba-case-question-locked .muenba-case-direction-jp { color:rgba(201,186,255,.3) !important; }
+      .muenba-case-check-lock-hint { margin:0 0 10px; color:#9b91c1; font:600 .76rem/1.45 system-ui,-apple-system,sans-serif; text-align:left; }
+      .muenba-case-check-panel.is-unlocked .muenba-case-check-lock-hint { color:#d8d0ff; }
+      .muenba-case-choices-locked { margin-top:10px; }
+      .muenba-case-choice-locked { border-color:rgba(174,145,255,.2) !important; background:rgba(89,65,151,.07) !important; color:rgba(242,237,255,.34) !important; cursor:not-allowed; filter:saturate(.45); }
+      .muenba-case-choice-locked .muenba-case-choice-number { border-color:rgba(174,145,255,.2); color:rgba(231,221,255,.34); background:rgba(89,65,151,.08); }
+      .muenba-case-choice-locked:hover, .muenba-case-choice-locked:focus-visible { transform:none !important; border-color:rgba(174,145,255,.38) !important; background:rgba(89,65,151,.15) !important; box-shadow:none !important; outline:none; }
+      .muenba-case-locked-pulse { animation:muenbaCaseLockedPulse .36s ease-out; }
+      @keyframes muenbaCaseLockedPulse { 0%,100% { transform:translateX(0); } 25% { transform:translateX(-4px); } 50% { transform:translateX(4px); } 75% { transform:translateX(-2px); } }
       .muenba-case-glossary { display:flex; flex-wrap:wrap; gap:7px; margin:0 0 16px; }
       .muenba-case-glossary-chip { padding:4px 12px; border:1px solid rgba(255,224,102,.5); border-radius:999px; background:rgba(255,224,102,.1); color:#ffe066; font:700 .72rem ui-monospace,monospace; letter-spacing:.03em; }
       /* Case-specific heading treatment, scoped to .muenba-case-box so it
