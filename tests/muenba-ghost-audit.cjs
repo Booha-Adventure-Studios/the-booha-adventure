@@ -44,6 +44,6 @@ assert(source.includes('dangerCanHide: !carryingEnergy && allowHide === true && 
 assert(source.includes("if (canHide) {\n      actions.appendChild(captureButton('Hide now'"), 'main-ghost danger popups must offer Hide while jerk popups omit it');
 assert(source.includes('if (captureSession.dangerCanHide === true) {\n        actions.appendChild(captureButton(\'Hide and escape\''), 'danger rhythm popups must conditionally show Hide');
 assert(source.includes("if (!captureSession || !captureSession.danger || captureSession.dangerCanHide !== true) return;"), 'the Hide escape handler must reject angry touch encounters');
-assert(source.includes("if (state.transitioning || lobbyOpen || returnPortalOpen || captureOpen) return;"), 'the gameplay Hide button must remain available outside encounter popups');
+assert(source.includes("if (state.transitioning || state.celebrating || lobbyOpen || returnPortalOpen || captureOpen) return;"), 'the gameplay Hide button must remain available outside encounter popups and celebration');
 
 console.log('Muenba ghost audit passed: two-second tension, carried-energy chases, and encounter-specific Hide rules.');
