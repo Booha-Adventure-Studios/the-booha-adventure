@@ -34,6 +34,10 @@ assert.match(page, /border-color:#70e0d0/, 'the active collection filter should 
 assert.match(page, /border:1px solid #7fffd433/, 'collection stat cards should share an eerie neon border');
 assert.match(page, /\.games-acc-card \{ padding:1\.15rem; \}/, 'bonus games should share the collection card spacing');
 assert.match(page, /grid-template-columns:repeat\(auto-fill,minmax\(185px,1fr\)\)/, 'bonus games and wanderers should use a unified card width');
+assert.match(page, /@keyframes wandererAura/, 'found wanderers should have a spectral completion aura');
+assert.match(page, /\.wanderer-tile\.locked:hover/, 'locked wanderers should reveal a mystery state on hover');
+assert.match(page, /border-color:#8b0000aa/, 'reset should use a deep crimson danger treatment');
+assert.match(page, /\.spell-btn:focus-visible/, 'save actions should expose a visible keyboard focus state');
 assert.match(renderer, /activeFilter/, 'the collection renderer should retain the selected gallery filter');
 assert.match(renderer, /wanderer-index/, 'found and unfound tiles should show stable gallery numbers');
 assert.match(renderer, /decoding="async"/, 'wanderer portraits should decode without blocking the page');
