@@ -21,6 +21,7 @@
     clipboard: '<rect x="6" y="5" width="12" height="16" rx="2"/><path d="M9 5.5V4h6v1.5M9 10h6m-6 4h6m-6 4h3"/>',
     save: '<path d="M5 4h11l3 3v13H5V4Z"/><path d="M8 4v6h7V4M8 20v-6h8v6"/>',
     trash: '<path d="M5 7h14m-9-3h4l1 3H9l1-3Zm-3 3 1 12h8l1-12m-6 3v6m3-6v6"/>',
+    arrowLeft: '<path d="M19 12H5m7-7-7 7 7 7"/>',
   };
 
   function svg(name, className = '') {
