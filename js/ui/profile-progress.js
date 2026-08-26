@@ -3,8 +3,8 @@
  * The canonical detailed progress renderer for profile.html.
  *
  * Adventure-profile.html is reserved for collections and identity. This
- * module keeps the curriculum, bonus-game, achievement, and totals views in
- * one place so the student and parent have one reliable progress record.
+ * module keeps the curriculum, achievement, and totals views in one place so
+ * the student and parent have one reliable progress record.
  */
 (() => {
   'use strict';
