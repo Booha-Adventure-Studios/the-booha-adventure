@@ -13,10 +13,11 @@ const CURRENT_CACHES = {
   // Connected-doors pass: bumped for js/karasuki.js's UTSUROBA_LOCKED_COPY
   // wording fix. Bump this string on every future /js/-touching fix, not
   // just this one.
-  // Wanderer furigana pass (Pass 1+2, js/karasuki.js): -351 was already
-  // pushed to origin/main before this pass landed, so it doesn't cover it —
-  // bumped again so returning players actually refetch the new file.
-  assets: 'booha-assets-2026-352',
+  // Wanderer furigana pass (js/karasuki.js), bumped per batch since each
+  // lands as its own commit and prior bumps keep shipping to origin/main
+  // before the next batch is ready: -351 (Pass 1+2), -352 (committed before
+  // Pass 3 landed) — this bump is for Pass 3.
+  assets: 'booha-assets-2026-353',
   decks:  'booha-decks-2026-310',
 };
 
