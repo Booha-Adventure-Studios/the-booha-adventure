@@ -508,6 +508,85 @@
       50% { box-shadow: 0 4px 0 rgba(65,42,14,.18), 0 0 25px rgba(184,137,47,.48), inset 0 1px rgba(255,255,255,.7); }
     }
     @media (prefers-reduced-motion: reduce) { .profile-network a[aria-current="page"] { animation: none; } }
+    /* ── CANONICAL PROGRESS DASHBOARD ───────────────────────────── */
+    .profile-totals {
+      display:grid; grid-template-columns:repeat(3,1fr); gap:8px;
+      margin:0 0 18px; padding:2px;
+    }
+    .profile-total-card {
+      position:relative; overflow:hidden; text-align:center; padding:13px 6px 11px;
+      border:1px solid rgba(58,44,26,.34); border-radius:12px;
+      background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,.08));
+      box-shadow:inset 0 1px rgba(255,255,255,.28),0 3px 0 rgba(65,42,14,.12);
+    }
+    .profile-total-card::after { content:''; position:absolute; left:13%; right:13%; bottom:0; height:2px; border-radius:99px; }
+    .profile-total-card.stars::after { background:#b8892f; box-shadow:0 0 9px #ffd700; }
+    .profile-total-card.recorded::after { background:#2e9b67; box-shadow:0 0 9px #5cffd0; }
+    .profile-total-card.alltime::after { background:#7950b5; box-shadow:0 0 9px #c8b8ff; }
+    .profile-total-value { font-family:'Cinzel Decorative',serif; font-size:clamp(1.15rem,5vw,1.8rem); line-height:1.1; margin:3px 0; }
+    .profile-total-card.stars .profile-total-value { color:#8b5c08; text-shadow:0 0 13px #ffd96699; }
+    .profile-total-card.recorded .profile-total-value { color:#176d47; text-shadow:0 0 13px #5cffd099; }
+    .profile-total-card.alltime .profile-total-value { color:#5b3b91; text-shadow:0 0 13px #c8b8ff99; }
+    .profile-total-icon { font-size:1rem; }
+    .profile-total-en { font-family:'Cinzel Decorative',serif; font-size:.52rem; letter-spacing:.09em; color:#5d4929; }
+    .profile-total-jp { font-size:.68rem; color:#765d36; font-weight:900; }
+
+    .profile-progress { margin-top:18px; }
+    .profile-progress-eyebrow { margin:20px 0 9px; }
+    .profile-progress-card {
+      position:relative; overflow:hidden; border:1px solid rgba(58,44,26,.28);
+      border-radius:14px; background:rgba(255,255,255,.10); margin-bottom:12px;
+      box-shadow:inset 0 1px rgba(255,255,255,.18);
+    }
+    .profile-progress .accordion-trigger { width:100%; text-align:left; border:0; background:transparent; cursor:pointer; padding:0; color:inherit; }
+    .profile-progress .accordion-header { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:12px 13px; }
+    .profile-progress .accordion-trigger:hover .accordion-header,
+    .profile-progress .accordion-trigger:focus-visible .accordion-header { background:rgba(184,137,47,.10); outline:none; }
+    .profile-progress .curr-badge { display:flex; align-items:center; gap:9px; min-width:0; }
+    .profile-progress .orb { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:.55rem; font-weight:900; }
+    .profile-progress .orb-bc { background:#75d99a; color:#143b25; box-shadow:0 0 13px #5cffd088; }
+    .profile-progress .orb-br { background:#70a9f4; color:#10294d; box-shadow:0 0 13px #66bbff88; }
+    .profile-progress .orb-pb { background:#c78cf2; color:#35134f; box-shadow:0 0 13px #cc66ff88; }
+    .profile-progress .curr-name-en { font-family:'Cinzel Decorative',serif; font-size:.62rem; letter-spacing:.05em; white-space:nowrap; }
+    .profile-progress .c-bc { color:#176d47; } .profile-progress .c-br { color:#17508f; } .profile-progress .c-pb { color:#63358e; }
+    .profile-progress .curr-name-jp { font-size:.67rem; color:#765d36; font-weight:900; }
+    .profile-progress .curr-name-k { font-size:.58rem; color:#92784d; }
+    .profile-progress .curr-summary { display:flex; align-items:center; gap:7px; flex-shrink:0; }
+    .profile-progress .curr-stars { font-size:.68rem; color:#8b5c08; font-weight:900; white-space:nowrap; }
+    .profile-progress .acc-chevron { color:#765d36; font-size:.7rem; transition:transform .25s ease; }
+    .profile-progress .accordion-trigger[aria-expanded="true"] .acc-chevron { transform:rotate(180deg); }
+    .profile-progress .accordion-body { display:grid; grid-template-rows:0fr; transition:grid-template-rows .3s ease; overflow:hidden; }
+    .profile-progress .accordion-body.open { grid-template-rows:1fr; }
+    .profile-progress .accordion-inner { min-height:0; overflow:hidden; padding:0 13px 13px; }
+    .profile-progress .accordion-shimmer { display:none; }
+    .profile-progress .prog-track { height:7px; border-radius:99px; background:rgba(58,44,26,.14); overflow:hidden; margin:2px 0 10px; }
+    .profile-progress .prog-fill { height:100%; width:0; border-radius:99px; transition:width .7s ease; }
+    .profile-progress .pf-bc { background:#2e9b67; } .profile-progress .pf-br { background:#397fcb; } .profile-progress .pf-pb { background:#9a55c9; }
+    .profile-progress .game-rows { display:flex; flex-direction:column; gap:4px; }
+    .profile-progress .game-row { display:grid; grid-template-columns:1.1rem 1fr auto auto; align-items:center; gap:6px; padding:7px; border-radius:7px; background:rgba(255,255,255,.13); }
+    .profile-progress .game-row.done { background:rgba(64,150,98,.15); }
+    .profile-progress .row-chk { font-size:.72rem; text-align:center; }
+    .profile-progress .row-names { min-width:0; }
+    .profile-progress .rn-en { font-size:.64rem; color:#3a2c1a; font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .profile-progress .game-row.done .rn-en { color:#176d47; }
+    .profile-progress .rn-jp { font-size:.62rem; color:#765d36; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .profile-progress .row-stars { display:flex; gap:1px; } .profile-progress .sp { font-size:.6rem; opacity:.2; } .profile-progress .sp.lit { opacity:1; color:#b8892f; text-shadow:0 0 3px #ffd700; }
+    .profile-progress .row-sc { min-width:2rem; text-align:right; font-size:.62rem; color:#765d36; font-weight:900; }
+    .profile-progress .accordion-wrap { margin-bottom:9px; }
+    .profile-progress .profile-accordion-trigger { display:flex; align-items:center; gap:10px; width:100%; border:0; background:transparent; cursor:pointer; text-align:left; color:#3a2c1a; }
+    .profile-progress .profile-accordion-trigger .accordion-header { flex:1; }
+    .profile-progress .games-grid, .profile-progress .unlocks-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(175px,1fr)); gap:7px; padding:0 10px 10px; }
+    .profile-progress .g-chip, .profile-progress .u-chip { display:flex; align-items:center; gap:8px; min-width:0; padding:9px; border:1px solid rgba(58,44,26,.18); border-radius:9px; background:rgba(255,255,255,.10); text-decoration:none; color:#3a2c1a; filter:grayscale(.8); opacity:.48; }
+    .profile-progress .g-chip.unlocked, .profile-progress .u-chip.earned { filter:none; opacity:1; border-color:rgba(184,137,47,.48); box-shadow:0 0 12px rgba(184,137,47,.12); }
+    .profile-progress .g-icon { width:30px; height:30px; object-fit:contain; flex-shrink:0; }
+    .profile-progress .g-text, .profile-progress .u-text { min-width:0; overflow:hidden; }
+    .profile-progress .g-en, .profile-progress .u-en { font-size:.61rem; font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .profile-progress .g-jp, .profile-progress .u-jp { font-size:.61rem; color:#765d36; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .profile-progress .g-score, .profile-progress .u-desc { font-size:.59rem; color:#92784d; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .profile-progress .g-k, .profile-progress .u-k { font-size:.52rem; }
+    .profile-progress .u-icon { font-size:1.1rem; flex-shrink:0; }
+    @media (max-width:500px) { .profile-totals { gap:4px; } .profile-total-card { padding:10px 3px 9px; } .profile-total-en { font-size:.44rem; } .profile-total-jp { font-size:.6rem; } .profile-progress .games-grid, .profile-progress .unlocks-grid { grid-template-columns:1fr; } }
+    @media (prefers-reduced-motion: reduce) { .profile-progress .accordion-body { transition:none; } .profile-progress .prog-fill { transition:none; } }
   </style>
 </head>
 <body>
@@ -529,6 +608,27 @@
   </nav>
 
  <div class="paper">
+    <div class="profile-totals" id="profile-totals" aria-label="Progress totals">
+      <div class="profile-total-card stars">
+        <div class="profile-total-icon">⭐</div>
+        <div class="profile-total-value" id="total-stars">--</div>
+        <div class="profile-total-en">THIS WEEK</div>
+        <div class="profile-total-jp">こんしゅうのスター</div>
+      </div>
+      <div class="profile-total-card recorded">
+        <div class="profile-total-icon">✅</div>
+        <div class="profile-total-value" id="total-completed">--</div>
+        <div class="profile-total-en">RECORDED</div>
+        <div class="profile-total-jp">きろく</div>
+      </div>
+      <div class="profile-total-card alltime">
+        <div class="profile-total-icon">🏆</div>
+        <div class="profile-total-value" id="total-alltime">--</div>
+        <div class="profile-total-en">ALL-TIME STARS</div>
+        <div class="profile-total-jp">ぜんぶのスター</div>
+      </div>
+    </div>
+
     <div class="ink-head">
       <span class="jp">まいにちチェック</span><span class="en">DAILY CHECK</span>
     </div>
@@ -538,6 +638,55 @@
       <span class="jp">こんしゅう</span><span class="en">THIS WEEK</span>
     </div>
     <div id="alog-week"></div>
+
+    <section class="profile-progress" aria-label="Detailed weekly progress">
+      <div class="ink-head profile-progress-eyebrow">
+        <span class="jp">こんしゅうのきろく</span><span class="en">THIS WEEK'S RECORD</span>
+      </div>
+      <div id="curr-cards"></div>
+
+      <div class="ink-head profile-progress-eyebrow">
+        <span class="jp">ボーナスゲーム</span><span class="en">BONUS GAMES</span>
+      </div>
+      <div class="profile-progress-card glass">
+        <button class="accordion-trigger" aria-expanded="false" id="acc-games-trigger">
+          <div class="accordion-header">
+            <div class="curr-badge">
+              <div class="orb orb-br">🎮</div>
+              <div>
+                <div class="curr-name-en c-br">BONUS GAMES</div>
+                <div class="curr-name-jp">ボーナスゲーム <span class="curr-name-k"><ruby>遊技<rt>ゆうぎ</rt></ruby></span></div>
+              </div>
+            </div>
+            <span class="acc-chevron">▼</span>
+          </div>
+        </button>
+        <div class="accordion-body" id="acc-games-body">
+          <div class="accordion-inner"><div class="games-grid" id="games-grid"></div></div>
+        </div>
+      </div>
+
+      <div class="ink-head profile-progress-eyebrow">
+        <span class="jp">じっせき</span><span class="en">ACHIEVEMENTS</span>
+      </div>
+      <div class="profile-progress-card glass">
+        <button class="accordion-trigger" aria-expanded="false" id="acc-achievements-trigger">
+          <div class="accordion-header">
+            <div class="curr-badge">
+              <div class="orb orb-pb">🏆</div>
+              <div>
+                <div class="curr-name-en c-pb">ACHIEVEMENTS</div>
+                <div class="curr-name-jp">じっせき <span class="curr-name-k"><ruby>実績<rt>じっせき</rt></ruby></span></div>
+              </div>
+            </div>
+            <span class="acc-chevron">▼</span>
+          </div>
+        </button>
+        <div class="accordion-body" id="acc-achievements-body">
+          <div class="accordion-inner"><div class="unlocks-grid" id="unlocks-grid"></div></div>
+        </div>
+      </div>
+    </section>
 
     <div id="juku-report-section">
       <div class="ink-head">
@@ -596,6 +745,7 @@
 <script src="./js/core/day-record.js"></script>
   
 <script src="./js/ui/adventure-log.js"></script>
+<script src="./js/ui/profile-progress.js"></script>
 <script src="./js/ui/juku-report-log.js"></script>
 <script src="./js/daily-check.js"></script>
 <script>
