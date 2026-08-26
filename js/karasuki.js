@@ -2611,6 +2611,7 @@ const HAPPY_HOUSE_PORTAL = {
       const previous = data.collection.wanderers[id] && typeof data.collection.wanderers[id] === 'object'
         ? data.collection.wanderers[id]
         : {};
+      const firstVisit = !previous.firstFoundAt && !(Number(previous.visits) > 0);
       const now = Date.now();
       const record = {
         ...previous,
@@ -2625,11 +2626,50 @@ const HAPPY_HOUSE_PORTAL = {
         console.warn('[Karasuki] Wanderer collection write blocked.');
         return null;
       }
-      return record;
+      return { ...record, firstVisit };
     } catch (e) {
       console.error('[Karasuki] Wanderer collection write failed:', e);
       return null;
     }
+  }
+
+  function rewardHTMLText(value) {
+    return String(value == null ? '' : value)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  function showWandererDiscovery(w) {
+    if (!window.UtsuCard || !w || !w.name) return;
+    const jp = window.UtsuFurigana && window.UtsuFurigana.sentence
+      ? window.UtsuFurigana.sentence('新しい旅人を見つけた！', { '新しい': 'あたらしい', '旅人': 'たびびと', '見つけた': 'みつけた' })
+      : '新しい旅人を見つけた！';
+    window.UtsuCard.showRewardPop({
+      motif: 'lantern',
+      icon: '✦',
+      title: 'NEW WANDERER FOUND!',
+      subHTML: `${rewardHTMLText(w.name)}<br>${jp}`,
+      duration: 2800,
+    });
+    const reward = document.querySelector('.utsu-reward-pop');
+    if (reward) reward.style.zIndex = '9300';
+  }
+
+  function showKarasukiArrival() {
+    if (!isProfileEntry() || !window.UtsuCard) return;
+    const name = rewardHTMLText(getBoohaFirstName() || 'Booha');
+    const jp = window.UtsuFurigana && window.UtsuFurigana.sentence
+      ? window.UtsuFurigana.sentence('カラスキへおかえりなさい。', {})
+      : 'カラスキへおかえりなさい。';
+    setTimeout(() => {
+      window.UtsuCard.showRewardPop({
+        motif: 'lantern',
+        icon: '✧',
+        title: "I'M BACK IN KARASUKI",
+        subHTML: `${name}, the wandering paths are open again.<br>${jp}`,
+        duration: 2800,
+      });
+    }, 700);
   }
 
   
@@ -2779,7 +2819,7 @@ const HAPPY_HOUSE_PORTAL = {
 
   function openWandererPop(w) {
     if (!w.name) return;
-    recordWandererVisit(w);
+    const visit = recordWandererVisit(w);
     currentPopWanderer = w; w.pose = 1;
     if (w.type === 'drift') w.frozen = true;
     const box        = document.getElementById('wanderer-pop-box');
@@ -2813,6 +2853,7 @@ const HAPPY_HOUSE_PORTAL = {
     wandererPopOverlay.style.display    = 'flex';
     wandererPopOverlay.style.background = 'rgba(0,0,0,0.82)';
     state.clickTarget = null;
+    if (visit && visit.firstVisit) showWandererDiscovery(w);
   }
 
   function closeWandererPop() {
@@ -5259,7 +5300,7 @@ function drawObserver(now) {
     injectStyles(); buildApp(); injectTrailHud(); injectEchoesTracker(); KarasukiAtmos.init(stage);
     restoreProfileRoom();
     fitStage(); resizeCanvas();
-    initOrbs(); updateTrailHud(); renderInitialRoom(); initWanderers(); initNuppi(); bindInput();
+    initOrbs(); updateTrailHud(); renderInitialRoom(); initWanderers(); initNuppi(); bindInput(); showKarasukiArrival();
     
     window.addEventListener("resize",()=>{ fitStage(); resizeCanvas(); });
     requestAnimationFrame(tick);
