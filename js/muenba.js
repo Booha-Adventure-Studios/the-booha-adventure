@@ -1743,6 +1743,10 @@
     const box = document.createElement('div');
     box.className = 'muenba-lobby-box';
     captureOverlay.appendChild(box);
+    // Every capture scene is a fresh reading/game card. Keep the scroll
+    // position deterministic when a long scene replaces the previous one.
+    box.scrollTop = 0;
+    box.scrollLeft = 0;
     return box;
   }
 
@@ -3847,9 +3851,9 @@
          return prompt, just roomier: it holds a portrait plus a few lines
          of text instead of a one-line question. Shows every time the
          player enters Muenba (Pass 3b). */
-      #muenba-lobby-overlay { position:fixed; inset:0; z-index:210; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,0); transition:background .4s ease; padding:20px; box-sizing:border-box; }
+      #muenba-lobby-overlay { position:fixed; inset:0; z-index:210; display:none; align-items:flex-start; justify-content:center; overflow-y:auto; background:rgba(0,0,0,0); transition:background .4s ease; padding:max(20px,env(safe-area-inset-top,0px)) max(20px,env(safe-area-inset-right,0px)) max(20px,env(safe-area-inset-bottom,0px)) max(20px,env(safe-area-inset-left,0px)); box-sizing:border-box; }
       #muenba-lobby-overlay.open { display:flex; background:rgba(0,0,0,.86); }
-      .muenba-lobby-box { position:relative; box-sizing:border-box; width:min(480px,100%); max-height:calc(100vh - 40px); overflow-y:auto; padding:28px 26px 26px; border:1px solid rgba(111,166,145,.45); border-radius:18px; background:linear-gradient(155deg,rgba(8,27,20,.97),rgba(1,4,4,.98)); box-shadow:0 24px 70px rgba(0,0,0,.75),0 0 55px rgba(16,65,45,.28),inset 0 0 70px rgba(0,0,0,.58); text-align:center; font-family:Georgia,'Times New Roman',serif; color:#e0eee8; transform:scale(.94); opacity:0; transition:transform .32s cubic-bezier(.34,1.56,.64,1),opacity .26s ease; }
+      .muenba-lobby-box { position:relative; box-sizing:border-box; width:min(480px,100%); max-height:calc(100vh - 40px); max-height:calc(100dvh - 40px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px)); margin:0 auto; overflow-y:auto; padding:28px 26px 26px; border:1px solid rgba(111,166,145,.45); border-radius:18px; background:linear-gradient(155deg,rgba(8,27,20,.97),rgba(1,4,4,.98)); box-shadow:0 24px 70px rgba(0,0,0,.75),0 0 55px rgba(16,65,45,.28),inset 0 0 70px rgba(0,0,0,.58); text-align:center; font-family:Georgia,'Times New Roman',serif; color:#e0eee8; transform:scale(.94); opacity:0; transition:transform .32s cubic-bezier(.34,1.56,.64,1),opacity .26s ease; }
       #muenba-lobby-overlay.open .muenba-lobby-box { transform:scale(1); opacity:1; }
       .muenba-lobby-portrait { display:block; width:96px; height:96px; object-fit:contain; margin:0 auto 12px; filter:drop-shadow(0 0 16px rgba(122,180,151,.3)); animation:muenbaNuppiTalk 2.8s ease-in-out infinite; transform-origin:50% 86%; }
       @keyframes muenbaNuppiTalk { 0%,100% { transform:translateY(0) rotate(-1deg); } 25% { transform:translateY(-3px) rotate(1deg); } 52% { transform:translateY(1px) rotate(0deg); } 76% { transform:translateY(-2px) rotate(-1deg); } }
@@ -3973,7 +3977,7 @@
       /* Capture session overlay — reuses .muenba-lobby-box for
          the card shell and adds the two-lane
          rhythm board inside that modal. */
-      #muenba-capture-overlay { position:fixed; inset:0; z-index:215; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,0); transition:background .4s ease; padding:20px; box-sizing:border-box; }
+      #muenba-capture-overlay { position:fixed; inset:0; z-index:215; display:none; align-items:flex-start; justify-content:center; overflow-y:auto; background:rgba(0,0,0,0); transition:background .4s ease; padding:max(20px,env(safe-area-inset-top,0px)) max(20px,env(safe-area-inset-right,0px)) max(20px,env(safe-area-inset-bottom,0px)) max(20px,env(safe-area-inset-left,0px)); box-sizing:border-box; }
       #muenba-capture-overlay.open { display:flex; background:rgba(0,0,0,.86); }
       #muenba-capture-overlay.danger.open { background:rgba(90,0,12,.9); animation:muenbaDangerFlash .38s steps(2,end) infinite; }
       #muenba-capture-overlay.open .muenba-lobby-box { transform:scale(1); opacity:1; }
@@ -4380,7 +4384,7 @@
         .muenba-case-resolved .muenba-case-record { font-size:.92rem !important; }
       }
       @media (max-width:640px) {
-        .muenba-lobby-box { width:min(100%,calc(100vw - 24px)); max-height:calc(100dvh - 24px); padding:24px 18px 20px; border-radius:16px; }
+        .muenba-lobby-box { width:min(100%,calc(100vw - 24px)); max-height:calc(100dvh - 24px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px)); padding:24px 18px 20px; border-radius:16px; }
         .muenba-lobby-box::after { top:11px; width:72px; }
         .muenba-lobby-portrait { width:82px; height:82px; margin-bottom:10px; }
         .muenba-case-question { padding:15px 14px 14px; }
@@ -5181,6 +5185,14 @@
   }
 
   function focusLobbyControl(selector) {
+    const box = lobbyOverlay && lobbyOverlay.querySelector('.muenba-lobby-box');
+    if (box) {
+      // Scene renderers replace the card with innerHTML. Always reopen the
+      // replacement at its first line instead of inheriting a stale scroll
+      // position from a previous long popup.
+      box.scrollTop = 0;
+      box.scrollLeft = 0;
+    }
     window.setTimeout(() => {
       const control = lobbyOverlay && lobbyOverlay.querySelector(selector);
       if (control && typeof control.focus === 'function') control.focus();
