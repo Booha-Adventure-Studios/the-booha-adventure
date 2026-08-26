@@ -342,8 +342,8 @@
 
     /* ── BACK BUTTON — GLOWING ───────────────────── */
     .back-btn {
-      display: inline-flex; flex-direction: column; align-items: center; gap: .08rem;
-      margin-top: 1.1rem; padding: .55rem 1.4rem; border-radius: 99px;
+      display: inline-flex; align-items: center; gap: .65rem;
+      margin-top: 1.1rem; padding: .58rem 1.25rem .58rem 1rem; border-radius: 99px;
       border: 1.5px solid #c8b8ffaa;
       background: linear-gradient(135deg, #c8b8ff22, #9d80ff14);
       color: #ffffff;
@@ -357,8 +357,11 @@
         inset 0 1px 0 #c8b8ff33;
       animation: backBtnPulse 3s ease-in-out infinite;
     }
-    .back-btn .back-en { line-height: 1.1; }
-    .back-btn small { color: #dcd3ff; font-size: .82em; line-height: 1.1; letter-spacing: .08em; }
+    .back-btn .back-icon { display:flex; align-items:center; justify-content:center; width:1.2rem; height:1.2rem; color:#e8ddff; }
+    .back-btn .back-icon .profile-icon { width:1.15rem; height:1.15rem; }
+    .back-btn .back-copy { display:flex; flex-direction:column; align-items:flex-start; gap:.08rem; }
+    .back-btn .back-en { line-height:1.1; letter-spacing:.03em; }
+    .back-btn small { color:#dcd3ff; font-size:.82em; line-height:1.1; letter-spacing:.08em; }
     @keyframes backBtnPulse {
       0%,100% { box-shadow: 0 0 18px #c8b8ff55, 0 0 40px #c8b8ff22, 0 0 70px #c8b8ff11, inset 0 1px 0 #c8b8ff33; }
       50%      { box-shadow: 0 0 28px #c8b8ffaa, 0 0 60px #c8b8ff44, 0 0 100px #c8b8ff22, inset 0 1px 0 #c8b8ff55; }
@@ -695,6 +698,8 @@
       color:#c4bce0; font-size:.78rem; line-height:1.65; font-weight:800;
       margin:.75rem 0 1rem; max-width:58ch;
     }
+    .wanderer-intro-en, .wanderer-intro-jp { display:block; }
+    .wanderer-intro-jp { margin-top:.35rem; color:#e1dbf6; font-size:.72rem; line-height:1.8; }
     .wanderer-intro ruby rt { color:#ffd966; }
     .wanderer-grid {
       display:grid; grid-template-columns:repeat(auto-fill,minmax(185px,1fr)); gap:.6rem;
@@ -870,7 +875,10 @@
     <div class="h-en">My Adventure</div>
     <div class="h-jp">ぼくのぼうけん</div>
     <div class="h-kanji"><ruby>冒険<rt>ぼうけん</rt></ruby>の<ruby>記録<rt>きろく</rt></ruby></div>
-    <a href="karasuki.html?from=profile" class="back-btn" aria-label="Back to Karasuki"><span class="back-en">← Back</span><small><ruby>戻<rt>もど</rt></ruby>る</small></a>
+    <a href="karasuki.html?from=profile" class="back-btn" aria-label="Back to Karasuki">
+      <span class="back-icon" data-profile-icon="arrowLeft"></span>
+      <span class="back-copy"><span class="back-en">Back to Karasuki</span><small><ruby>戻<rt>もど</rt></ruby>る</small></span>
+    </a>
     <nav class="profile-network" aria-label="Output profiles">
       <a href="profile.html">LOG <small>ぼうけんログ</small></a>
       <a href="adventure-profile.html" aria-current="page">ADVENTURE <small>ぼうけん</small></a>
@@ -892,7 +900,10 @@
       </div>
       <span class="wanderer-count" id="wanderer-count">0 / 36</span>
     </div>
-    <p class="wanderer-intro">Each wanderer keeps a small memory of your visits. Find them again to learn more about Karasuki.</p>
+    <p class="wanderer-intro">
+      <span class="wanderer-intro-en">Each wanderer keeps a small memory of your visits. Find them again to learn more about Karasuki.</span>
+      <span class="wanderer-intro-jp">それぞれの<ruby>旅人<rt>たびびと</rt></ruby>は、あなたが<ruby>会<rt>あ</rt></ruby>いに<ruby>来<rt>き</rt></ruby>た<ruby>思<rt>おも</rt></ruby>い<ruby>出<rt>で</rt></ruby>を<ruby>少<rt>すこ</rt></ruby>しずつ<ruby>残<rt>のこ</rt></ruby>します。もう<ruby>一度<rt>いちど</rt></ruby><ruby>見<rt>み</rt></ruby>つけると、カラスキをもっと<ruby>知<rt>し</rt></ruby>ることができます。</span>
+    </p>
     <div class="wanderer-grid" id="wanderer-grid" aria-live="polite"></div>
   </section>
 
