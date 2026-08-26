@@ -50,13 +50,26 @@
     } catch (_) {}
   }
 
+  /* Small, intentionally restrained offsets. The motif should feel like a
+     color in the ear, not a different instrument or a difficulty signal. */
+  var MOTIF_PITCH = {
+    lantern: 1,
+    candy: 1.0595,
+    reflection: 1.1225,
+    window: 0.9439,
+    thorn: 0.8909,
+    ribbon: 1.0595,
+  };
+  function motifPitch(motif) { return MOTIF_PITCH[motif] || 1; }
+
   var SFX = {
     /* Correct answer in the reading challenge — a short bright upward
        tick, deliberately smaller/lighter than the give-memory sound
        below so the two "success" moments don't compete. */
-    correct: function () {
-      tone(660, { type: 'sine', gain: 0.05, dur: 0.075 });
-      tone(880, { type: 'sine', gain: 0.045, dur: 0.09, delay: 0.05 });
+    correct: function (motif) {
+      var pitch = motifPitch(motif);
+      tone(660 * pitch, { type: 'sine', gain: 0.05, dur: 0.075 });
+      tone(880 * pitch, { type: 'sine', gain: 0.045, dur: 0.09, delay: 0.05 });
     },
     /* Wrong answer in the reading challenge — soft two-note descending
        dip. A "try again" nudge, not a buzzer, for ESL readers working
@@ -88,10 +101,11 @@
        ding.mp3-based celebration chime (a single sample pitched twice)
        so "you answered right" and "you completed the whole memory"
        don't sound like the same event at two volumes. */
-    giveMemory: function () {
-      tone(523.25, { type: 'sine', gain: 0.06, dur: 0.14 });
-      tone(659.25, { type: 'sine', gain: 0.055, dur: 0.16, delay: 0.1 });
-      tone(783.99, { type: 'sine', gain: 0.05, dur: 0.26, delay: 0.2 });
+    giveMemory: function (motif) {
+      var pitch = motifPitch(motif);
+      tone(523.25 * pitch, { type: 'sine', gain: 0.06, dur: 0.14 });
+      tone(659.25 * pitch, { type: 'sine', gain: 0.055, dur: 0.16, delay: 0.1 });
+      tone(783.99 * pitch, { type: 'sine', gain: 0.05, dur: 0.26, delay: 0.2 });
     },
   };
 
