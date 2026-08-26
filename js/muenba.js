@@ -1419,8 +1419,16 @@
       : '<span>Hide</span><small><ruby>隠<rt>かく</rt></ruby>れる</small>';
   }
 
+  function setHideButtonDisabled(disabled) {
+    if (!hideBtn) return;
+    const locked = !!disabled;
+    hideBtn.disabled = locked;
+    hideBtn.setAttribute('aria-disabled', locked ? 'true' : 'false');
+    hideBtn.classList.toggle('is-disabled', locked);
+  }
+
   function toggleHide() {
-    if (state.transitioning || lobbyOpen || returnPortalOpen || captureOpen) return;
+    if (state.transitioning || state.celebrating || lobbyOpen || returnPortalOpen || captureOpen) return;
     state.hiding = !state.hiding;
     if (hideBtn) {
       hideBtn.classList.toggle('active', state.hiding);
@@ -3562,8 +3570,16 @@
     state.celebrationDeposit = deposited;
     state.celebrationFinishing = false;
     state.inputLocked = true;
+    // The handoff dance is a readable reward moment. Re-anchor Booha to the
+    // world center before the local dance motion begins, regardless of where
+    // he stood when he reached Nuppi.
+    state.x = CENTER_X;
+    state.y = CENTER_Y;
     state.clickTarget = null;
     state.moving = false;
+    state.hiding = false;
+    setHideButtonDisabled(true);
+    if (hideBtn) hideBtn.classList.remove('active');
     activeGhost = null;
     muenbaDanceSparkles = [];
     if (celebrationStatus) {
@@ -3601,6 +3617,7 @@
       stopMuenbaDance();
       try { startMusic(); } catch (_) {}
       state.inputLocked = false;
+      setHideButtonDisabled(false);
       spawnRoomGhost(state.roomId);
       openNuppiAfterHandoff(state.celebrationDeposit);
     }, MUENBA_DANCE_SETTLE_MS);
@@ -3966,6 +3983,7 @@
       #muenba-profile-link:hover, #muenba-profile-link:focus-visible { transform:translateY(-2px); border-color:#fff0ad; box-shadow:0 0 28px rgba(216,201,139,.44), inset 0 0 16px rgba(216,201,139,.14); outline:none; }
       @keyframes muenbaHideGlow { 0%,100% { box-shadow:0 0 10px rgba(93,208,140,.22), inset 0 0 8px rgba(93,208,140,.06); } 50% { box-shadow:0 0 25px rgba(93,208,140,.58), 0 0 48px rgba(93,208,140,.18), inset 0 0 14px rgba(93,208,140,.16); } }
       #muenba-hide:hover, #muenba-hide:focus-visible { background:rgba(30,70,60,.8); outline:none; }
+      #muenba-hide.is-disabled, #muenba-hide:disabled { cursor:not-allowed; opacity:.38; animation:none; background:rgba(0,8,12,.62); border-color:rgba(156,203,182,.28); color:rgba(230,255,241,.5); box-shadow:none; }
       #muenba-return-nuppi-hint { position:fixed; left:50%; top:12px; z-index:90; display:none; transform:translateX(-50%); padding:8px 14px; border:1px solid rgba(216,201,139,.72); border-radius:999px; background:rgba(20,24,14,.86); color:#fff5d5; box-shadow:0 0 18px rgba(216,201,139,.28); font:700 10px/1.25 ui-monospace,monospace; letter-spacing:.08em; text-align:center; pointer-events:none; }
       #muenba-return-nuppi-hint.open { display:block; }
       #muenba-return-nuppi-hint small { display:block; margin-top:3px; color:#c7d9c5; font:400 .82em Georgia,'Times New Roman',serif; letter-spacing:.04em; }
@@ -4424,6 +4442,7 @@
     hideBtn.id = 'muenba-hide';
     hideBtn.type = 'button';
     setHideButtonLabel(false);
+    setHideButtonDisabled(false);
     hideBtn.addEventListener('click', toggleHide);
     document.body.appendChild(hideBtn);
 
@@ -4840,7 +4859,7 @@
     updateMuenbaProfileLink();
     stopDangerScream();
     setReturnToNuppiPending(Number(readMuenba().orbsPending) > 0 || state.returnToNuppiPending);
-    if (hideBtn) { hideBtn.classList.remove('active'); setHideButtonLabel(false); }
+    if (hideBtn) { hideBtn.classList.remove('active'); setHideButtonLabel(false); setHideButtonDisabled(false); }
     markMuenbaRoomVisited(roomId);
     spawnRoomGhost(roomId);
     showRoom(roomId);
