@@ -22,7 +22,7 @@ const CURRENT_CACHES = {
   // batch (all 36 wanderers now covered).
   // Wanderer collection profile renderer (Pass 4).
   // Profile Pass 1: remove floating world doors and ship the shared SVG icon set.
-  assets: 'booha-assets-2026-373',
+  assets: 'booha-assets-2026-374',
   decks:  'booha-decks-2026-310',
 };
 
