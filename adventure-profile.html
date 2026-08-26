@@ -848,6 +848,12 @@
       .save-grid  { grid-template-columns:repeat(2,1fr); }
       .tv { font-size:1.1rem; }
       .moon-orb, .moon-orb img { width:130px; height:130px; }
+      .collection-strip { gap:.3rem; }
+      .collection-stat { padding:.55rem .25rem; }
+      .collection-stat-label { font-size:.49rem; letter-spacing:.04em; }
+      .collection-stat-jp { font-size:.55rem; }
+      .collection-filters { gap:.3rem; }
+      .collection-filter { flex:1 1 5.5rem; padding-left:.45rem; padding-right:.45rem; }
     }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; scroll-behavior:auto !important; }
@@ -951,7 +957,7 @@
       <span class="wanderer-intro-en">Each wanderer keeps a small memory of your visits. Find them again to learn more about Karasuki.</span>
       <span class="wanderer-intro-jp">それぞれの<ruby>旅人<rt>たびびと</rt></ruby>は、あなたが<ruby>会<rt>あ</rt></ruby>いに<ruby>来<rt>き</rt></ruby>た<ruby>思<rt>おも</rt></ruby>い<ruby>出<rt>で</rt></ruby>を<ruby>少<rt>すこ</rt></ruby>しずつ<ruby>残<rt>のこ</rt></ruby>します。もう<ruby>一度<rt>いちど</rt></ruby><ruby>見<rt>み</rt></ruby>つけると、カラスキをもっと<ruby>知<rt>し</rt></ruby>ることができます。</span>
     </p>
-    <div class="collection-strip" aria-label="Wanderer collection summary">
+    <div class="collection-strip" aria-label="Wanderer collection summary" aria-live="polite">
       <div class="collection-stat">
         <span class="collection-stat-value" id="collection-found-count">0</span>
         <span class="collection-stat-label">Found</span>
