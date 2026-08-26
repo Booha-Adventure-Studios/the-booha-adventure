@@ -78,6 +78,10 @@ assert.match(karasukiPage, /src="js\/karasuki-wanderer-data\.js"/,
   'Karasuki should load the shared wanderer collection comments');
 assert.match(karasukiWorld, /recordWandererVisit\(w\)/,
   'Karasuki should record a permanent wanderer visit when a wanderer is opened');
+assert.match(karasukiWorld, /NEW WANDERER FOUND!/,
+  'Karasuki should celebrate a first wanderer discovery');
+assert.match(karasukiWorld, /I'M BACK IN KARASUKI/,
+  'Karasuki should show an arrival moment from the profile');
 assert.match(karasukiWorld, /KARASUKI_WANDERER_DATA/,
   'Karasuki should consume the shared wanderer collection data');
 assert.match(karasukiWorld, /subHTML:/,
