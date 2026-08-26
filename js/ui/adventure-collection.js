@@ -9,7 +9,7 @@
 
   var IMAGE_SLUGS = {
     'gorogui': 'gorogane',
-    'mr-happy': 'mr_happy',
+    'mister-happy': 'mr_happy',
     'tom-katsu': 'tom_katsu',
     'sumiyo-horaguchi': 'sumiyo_horaguchi',
     'takachika-green': 'takachika_green',

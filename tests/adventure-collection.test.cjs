@@ -15,6 +15,9 @@ assert.match(renderer, /collection\.wanderers/, 'the renderer should read the pe
 assert.match(renderer, /VISITS/, 'found tiles should display visit counts');
 assert.match(renderer, /UtsuFurigana\.sentence/, 'found comments should render with furigana');
 assert.match(renderer, /NOT YET FOUND/, 'unfound tiles should have a clear locked state');
+assert.match(renderer, /'mister-happy': 'mr_happy'/, 'Mister Happy should resolve to its existing portrait asset');
+assert.match(page, /wanderer-intro-jp/, 'the collection introduction should include a Japanese reading aid');
+assert.match(page, /data-profile-icon="arrowLeft"/, 'the Back control should use the shared icon system');
 assert.match(dataSource, /"Shoganai"/, 'the collection renderer should use the shared 36-wanderer data');
 
 console.log('Adventure collection tests passed.');
