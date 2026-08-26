@@ -92,8 +92,8 @@
   const MUENBA_DANCE_FALLBACK_MS = 11000;
   const MUENBA_DANCE_SETTLE_MS = 750;
   // Pass 1 reading attention gate. This is a brief, non-punitive pause rather
-  // than a comprehension test: the button stays visible, but becomes active
-  // only after enough time has passed for the English record to be read.
+  // than a comprehension test: intro actions wake after the pause, while
+  // clue screens use the same pause to reveal their comprehension check.
   const CASE_READ_GATE_MIN_MS = 2000;
   const CASE_READ_GATE_PER_WORD_MS = 240;
   const CASE_READ_GATE_MAX_MS = 6500;
@@ -1765,8 +1765,8 @@
     }, 0);
   }
 
-  function armCaseReadGate(box, button, englishText) {
-    if (!captureSession || !button) return;
+  function armCaseReadGate(box, button, englishText, onReady) {
+    if (!captureSession) return;
     const session = captureSession;
     const gateId = (session.readGateId || 0) + 1;
     session.readGateId = gateId;
@@ -1776,19 +1776,25 @@
       Math.max(CASE_READ_GATE_MIN_MS, wordCount * CASE_READ_GATE_PER_WORD_MS)
     );
 
-    button.disabled = true;
-    button.setAttribute('aria-disabled', 'true');
-    button.classList.add('muenba-read-locked');
-    button.classList.remove('muenba-read-ready');
+    if (button) {
+      button.disabled = true;
+      button.setAttribute('aria-disabled', 'true');
+      button.classList.add('muenba-read-locked');
+      button.classList.remove('muenba-read-ready');
+    }
     if (box) box.classList.add('muenba-reading');
 
     window.setTimeout(() => {
-      if (captureSession !== session || session.readGateId !== gateId || !button.isConnected) return;
-      button.disabled = false;
-      button.setAttribute('aria-disabled', 'false');
-      button.classList.remove('muenba-read-locked');
-      button.classList.add('muenba-read-ready');
+      if (captureSession !== session || session.readGateId !== gateId) return;
+      if (button && !button.isConnected) return;
+      if (button) {
+        button.disabled = false;
+        button.setAttribute('aria-disabled', 'false');
+        button.classList.remove('muenba-read-locked');
+        button.classList.add('muenba-read-ready');
+      }
       if (box) box.classList.remove('muenba-reading');
+      if (typeof onReady === 'function') onReady();
     }, delay);
   }
 
@@ -1884,7 +1890,7 @@
     if (!['start', 'fresh', 'deep'].includes(difficulty)) return;
     captureSession.caseDifficulty = difficulty;
     captureSession.caseIndex = 0;
-    captureSession.phase = 'case-clues';
+    captureSession.phase = 'case-read';
     renderCaseClue();
   }
 
@@ -1893,7 +1899,8 @@
     const caseData = captureSession.caseData;
     const mode = caseData[captureSession.caseDifficulty];
     const clue = mode.clues[captureSession.caseIndex];
-    const lastClue = captureSession.caseIndex >= mode.clues.length - 1;
+    if (!clue) return;
+    captureSession.phase = 'case-read';
     const box = captureBox();
     box.classList.add('muenba-case-box', 'muenba-case-clue');
     captureImage(box, captureSession.ghost);
@@ -1936,26 +1943,106 @@
     box.appendChild(record);
     appendCaseGlossary(box, clue.keywords);
 
-    const actions = document.createElement('div');
-    actions.className = 'muenba-case-actions';
-    const nextAction = caseActionButton(
-      lastClue ? 'Solve the case' : 'Open next clue',
-      lastClue
-        ? '<ruby>事件<rt>じけん</rt></ruby>を<ruby>解<rt>と</rt></ruby>く'
-        : '<ruby>次<rt>つぎ</rt></ruby>の<ruby>手<rt>て</rt></ruby>がかりを<ruby>開<rt>ひら</rt></ruby>く',
-      'muenba-case-next',
-      () => {
-        if (lastClue) renderCaseQuestion();
-        else {
-          captureSession.caseIndex += 1;
-          renderCaseClue();
-        }
-      }
+    renderCaseDirection(
+      box,
+      'Read this record carefully. A question will appear soon.',
+      'この<ruby>記録<rt>きろく</rt></ruby>をよく<ruby>読<rt>よ</rt></ruby>んでね。すぐに<ruby>質問<rt>しつもん</rt></ruby>が<ruby>出<rt>で</rt></ruby>てくるよ。',
+      'muenba-case-read-status'
     );
-    actions.appendChild(nextAction);
-    box.appendChild(actions);
-    armCaseReadGate(box, nextAction, clue.text);
     captureOverlay.classList.add('open');
+    armCaseReadGate(box, null, clue.text, renderCaseCheck);
+  }
+
+  function renderCaseCheck(feedback = '') {
+    if (!captureSession || !captureSession.caseData || !captureOverlay) return;
+    const caseData = captureSession.caseData;
+    const mode = caseData[captureSession.caseDifficulty];
+    const clue = mode && mode.clues[captureSession.caseIndex];
+    const check = clue && clue.check;
+    if (!clue || !check) return;
+    captureSession.phase = 'case-check';
+
+    const box = captureBox();
+    box.classList.add('muenba-case-box', 'muenba-case-clue', 'muenba-case-check');
+    captureImage(box, captureSession.ghost);
+
+    const modeLabel = document.createElement('div');
+    modeLabel.className = 'muenba-case-mode-label';
+    modeLabel.textContent = MUENBA_MEMORY_MODE_LABELS[captureSession.caseDifficulty] || MUENBA_MEMORY_MODE_LABELS.start;
+    const modeJP = document.createElement('small');
+    modeJP.innerHTML = MUENBA_MEMORY_MODE_JP[captureSession.caseDifficulty] || MUENBA_MEMORY_MODE_JP.start;
+    modeLabel.appendChild(modeJP);
+    box.appendChild(modeLabel);
+
+    renderCaseDirection(
+      box,
+      'CHECK',
+      '<ruby>確認<rt>かくにん</rt></ruby>しよう',
+      'muenba-case-question-instruction'
+    );
+
+    const progress = document.createElement('div');
+    progress.className = 'muenba-case-progress';
+    progress.textContent = `RECORD ${captureSession.caseIndex + 1} OF ${mode.clues.length} · CHECK`;
+    box.appendChild(progress);
+    const progressJp = document.createElement('p');
+    progressJp.className = 'muenba-case-progress-jp';
+    progressJp.innerHTML = `<ruby>記録<rt>きろく</rt></ruby> ${captureSession.caseIndex + 1} / ${mode.clues.length}・<ruby>確認<rt>かくにん</rt></ruby>`;
+    box.appendChild(progressJp);
+
+    const h2 = document.createElement('h2');
+    h2.textContent = clue.title;
+    box.appendChild(h2);
+
+    const record = document.createElement('p');
+    record.className = 'muenba-case-record';
+    record.innerHTML = highlightKeywords(clue.text, clue.keywords);
+    box.appendChild(record);
+    appendCaseGlossary(box, clue.keywords);
+
+    renderCaseDirection(box, check.prompt, check.promptJP, 'muenba-case-question');
+    if (feedback) renderCaseDirection(
+      box,
+      feedback,
+      '<ruby>記録<rt>きろく</rt></ruby>をもう<ruby>一度<rt>いちど</rt></ruby><ruby>読<rt>よ</rt></ruby>んで、もう<ruby>一度<rt>いちど</rt></ruby><ruby>選<rt>えら</rt></ruby>びましょう。',
+      'muenba-case-feedback muenba-case-feedback-shake'
+    );
+
+    const choices = document.createElement('div');
+    choices.className = 'muenba-case-choices';
+    choices.setAttribute('role', 'group');
+    choices.setAttribute('aria-label', 'Record question choices');
+    check.choices.forEach((choice, index) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'muenba-case-choice';
+      button.setAttribute('aria-label', `Answer ${index + 1}: ${choice}`);
+      const number = document.createElement('span');
+      number.className = 'muenba-case-choice-number';
+      number.textContent = String(index + 1).padStart(2, '0');
+      const text = document.createElement('span');
+      text.className = 'muenba-case-choice-text';
+      text.textContent = choice;
+      button.append(number, text);
+      button.addEventListener('click', () => {
+        if (!captureSession || captureSession.phase !== 'case-check') return;
+        if (index === check.correct) {
+          if (captureSession.caseIndex >= mode.clues.length - 1) {
+            captureSession.phase = 'case-question';
+            renderCaseQuestion();
+          } else {
+            captureSession.caseIndex += 1;
+            renderCaseClue();
+          }
+        } else {
+          renderCaseCheck('Not quite. Read the record again, then try once more.');
+        }
+      });
+      choices.appendChild(button);
+    });
+    box.appendChild(choices);
+    captureOverlay.classList.add('open');
+    focusCaptureControl('.muenba-case-choice');
   }
 
   function renderCaseQuestion(feedback = '') {
@@ -3645,6 +3732,13 @@
       .muenba-case-question .muenba-case-direction-en { color:#fff; font-size:1.12rem; font-weight:700; line-height:1.45; }
       .muenba-case-question .muenba-case-direction-jp { color:#d8d0ff; }
       .muenba-case-feedback { border-color:rgba(219,130,130,.42); background:rgba(125,24,34,.12); }
+      .muenba-case-feedback-shake { animation:muenbaCaseFeedbackShake .34s ease-out; }
+      @keyframes muenbaCaseFeedbackShake { 0%,100% { transform:translateX(0); } 20% { transform:translateX(-5px); } 40% { transform:translateX(4px); } 60% { transform:translateX(-3px); } 80% { transform:translateX(2px); } }
+      .muenba-case-read-status { margin-top:16px; border-color:rgba(216,201,139,.28); background:rgba(216,201,139,.04); box-shadow:none; }
+      .muenba-case-read-status .muenba-case-direction-en { color:#d8c98b; font-size:.78rem; font-weight:700; }
+      .muenba-case-read-status .muenba-case-direction-jp { color:#a8bda9; }
+      .muenba-case-clue.muenba-reading .muenba-case-read-status { animation:muenbaReadStatusPulse 1.8s ease-in-out infinite; }
+      @keyframes muenbaReadStatusPulse { 0%,100% { opacity:.7; } 50% { opacity:1; } }
       .muenba-case-direction ruby, .muenba-case-action ruby { ruby-position:over; line-height:1.45; }
       .muenba-case-direction rt, .muenba-case-action rt { font-size:.78em; opacity:.95; }
       .muenba-case-actions { display:flex; justify-content:center; gap:9px; flex-wrap:wrap; margin-top:6px; }
@@ -4088,7 +4182,7 @@
         .muenba-nuppi-speech, .muenba-nuppi-mission, .muenba-nuppi-status-card, .muenba-nuppi-success-card, .muenba-nuppi-next-card { padding-left:13px; padding-right:13px; }
       }
       @media (prefers-reduced-motion: reduce) { .muenba-orb-release, .muenba-hunt-ghost-portrait, .muenba-gold-action, .muenba-read-ready { animation:none !important; } }
-      @media (prefers-reduced-motion: reduce) { #muenba-fade, .muenba-return-box, #muenba-return-overlay, .muenba-lobby-box, #muenba-lobby-overlay, #muenba-capture-overlay { transition:none !important; } .muenba-lobby-portrait, #muenba-hide, #muenba-celebration-status, .muenba-rhythm-board, .muenba-rhythm-combo, .muenba-rhythm-result-failure, .muenba-case-question, .muenba-case-question::before, .muenba-energy-warning { animation:none !important; } .muenba-case-choice, .muenba-case-action, .muenba-capture-action { transition:none !important; } .muenba-rhythm-energy-fill { transition:none !important; } #muenba-profile-link { transition:none !important; } }
+      @media (prefers-reduced-motion: reduce) { #muenba-fade, .muenba-return-box, #muenba-return-overlay, .muenba-lobby-box, #muenba-lobby-overlay, #muenba-capture-overlay { transition:none !important; } .muenba-lobby-portrait, #muenba-hide, #muenba-celebration-status, .muenba-rhythm-board, .muenba-rhythm-combo, .muenba-rhythm-result-failure, .muenba-case-question, .muenba-case-question::before, .muenba-case-feedback-shake, .muenba-case-read-status, .muenba-energy-warning { animation:none !important; } .muenba-case-choice, .muenba-case-action, .muenba-capture-action { transition:none !important; } .muenba-rhythm-energy-fill { transition:none !important; } #muenba-profile-link { transition:none !important; } }
     `;
     document.head.appendChild(style);
   }
