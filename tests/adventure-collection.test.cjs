@@ -18,6 +18,9 @@ assert.match(renderer, /NOT YET FOUND/, 'unfound tiles should have a clear locke
 assert.match(renderer, /'mister-happy': 'mr_happy'/, 'Mister Happy should resolve to its existing portrait asset');
 assert.match(page, /wanderer-intro-jp/, 'the collection introduction should include a Japanese reading aid');
 assert.match(page, /data-profile-icon="arrowLeft"/, 'the Back control should use the shared icon system');
+assert.match(page, /<section class="games-section"/, 'the adventure profile should place Bonus Games near the top');
+assert.match(page, /id="games-grid"/, 'the adventure profile should mount the Bonus Games shelf');
+assert.match(page, /js\/ui\/bonus-games\.js/, 'the adventure profile should load the shared Bonus Games renderer');
 assert.match(dataSource, /"Shoganai"/, 'the collection renderer should use the shared 36-wanderer data');
 
 console.log('Adventure collection tests passed.');
