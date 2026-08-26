@@ -2003,7 +2003,11 @@
     checkPanel.panel.classList.add('is-unlocked');
     checkPanel.panel.setAttribute('aria-label', 'Record question choices');
     checkPanel.panel.querySelector('.muenba-case-check-lock-label').textContent = 'CHECK';
-    checkPanel.panel.querySelector('.muenba-case-question-locked')?.removeAttribute('aria-hidden');
+    const unlockedQuestion = checkPanel.panel.querySelector('.muenba-case-question-locked');
+    if (unlockedQuestion) {
+      unlockedQuestion.classList.remove('muenba-case-question-locked');
+      unlockedQuestion.removeAttribute('aria-hidden');
+    }
     checkPanel.lockHint.textContent = 'The record is complete. Choose the best answer.';
     checkPanel.panel.querySelectorAll('.muenba-case-choice').forEach(button => {
       button.classList.remove('muenba-case-choice-locked');
@@ -2392,8 +2396,8 @@
 
     const readStatus = renderCaseDirection(
       box,
-      'Read this record carefully. A question will appear soon.',
-      'この<ruby>記録<rt>きろく</rt></ruby>をよく<ruby>読<rt>よ</rt></ruby>んでね。すぐに<ruby>質問<rt>しつもん</rt></ruby>が<ruby>出<rt>で</rt></ruby>てくるよ。',
+      'Read the complete record. The check is locked until you finish.',
+      'この<ruby>記録<rt>きろく</rt></ruby>を<ruby>読<rt>よ</rt></ruby>み<ruby>終<rt>お</rt></ruby>えよう。<ruby>終<rt>お</rt></ruby>わるまで<ruby>確認<rt>かくにん</rt></ruby>はロックされています。',
       'muenba-case-read-status muenba-case-reading-status'
     );
     const checkPanel = appendCaseLockedCheck(box, clue, mode, captureSession);
@@ -4819,6 +4823,28 @@
         .muenba-case-question { padding:15px 14px 14px; }
         .muenba-case-choice { min-height:58px; padding:12px 12px 12px 10px; }
         .muenba-nuppi-speech, .muenba-nuppi-mission, .muenba-nuppi-status-card, .muenba-nuppi-success-card, .muenba-nuppi-next-card { padding-left:13px; padding-right:13px; }
+      }
+      /* Pass 18D: the English record is the lesson surface. Keep it tall
+         enough for a calm word sweep, give beginner readers generous line
+         spacing, and preserve a reliable touch target even on narrow phones. */
+      .muenba-case-clue { padding:30px 26px 28px; }
+      .muenba-case-clue .muenba-case-mode-label { margin-bottom:18px; font-size:.74rem; letter-spacing:.1em; }
+      .muenba-case-clue .muenba-case-progress { margin-bottom:4px; font-size:.74rem; letter-spacing:.11em; }
+      .muenba-case-clue .muenba-case-progress-jp { margin-bottom:13px; font-size:.8rem; }
+      .muenba-case-clue h2 { margin:17px 0 7px; font-size:clamp(1.28rem,3.5vw,1.52rem); line-height:1.25; }
+      .muenba-case-clue .muenba-case-record { min-height:120px; box-sizing:border-box; padding:20px 20px 19px; font-size:clamp(1.16rem,2.35vw,1.38rem) !important; line-height:1.82 !important; letter-spacing:.015em; }
+      .muenba-case-clue .muenba-case-glossary { gap:8px; margin:0 0 17px; }
+      .muenba-case-clue .muenba-case-glossary-chip { padding:5px 11px; font-size:.78rem; }
+      .muenba-case-clue .muenba-case-reading-status { margin-top:17px; padding:12px 14px; }
+      .muenba-case-check-panel { padding:18px 16px 16px; }
+      .muenba-case-check-panel .muenba-case-question { padding:18px 17px 17px; }
+      .muenba-case-check-panel .muenba-case-question .muenba-case-direction-en { font-size:clamp(1.08rem,2.8vw,1.24rem); line-height:1.5; }
+      .muenba-case-check-panel .muenba-case-choice { min-height:62px; padding:13px 15px 13px 12px; font-size:1rem; line-height:1.5; }
+      @media (max-width:640px) {
+        .muenba-case-clue { padding:24px 16px 22px; }
+        .muenba-case-clue .muenba-case-record { min-height:120px; padding:18px 16px 17px; font-size:1.16rem !important; line-height:1.82 !important; }
+        .muenba-case-check-panel { padding:15px 12px 13px; }
+        .muenba-case-check-panel .muenba-case-choice { min-height:60px; padding:12px 12px 12px 10px; font-size:.98rem; }
       }
       @media (prefers-reduced-motion: reduce) { .muenba-orb-release, .muenba-hunt-ghost-portrait, .muenba-gold-action, .muenba-read-ready { animation:none !important; } }
       @media (prefers-reduced-motion: reduce) { #muenba-fade, .muenba-return-box, #muenba-return-overlay, .muenba-lobby-box, #muenba-lobby-overlay, #muenba-capture-overlay { transition:none !important; } .muenba-lobby-portrait, #muenba-hide, #muenba-celebration-status, .muenba-rhythm-board, .muenba-rhythm-combo, .muenba-rhythm-result-failure, .muenba-case-question, .muenba-case-question::before, .muenba-case-feedback-shake, .muenba-case-read-status, .muenba-case-rhythm-transition .muenba-lobby-portrait, .muenba-energy-warning { animation:none !important; } .muenba-case-choice, .muenba-case-action, .muenba-capture-action { transition:none !important; } .muenba-rhythm-energy-fill { transition:none !important; } #muenba-profile-link { transition:none !important; } }
