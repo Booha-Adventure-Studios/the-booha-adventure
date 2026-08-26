@@ -870,13 +870,14 @@
       a.play().catch(() => {});
     } catch (_) {}
   }
-  function playCelebrationChime() {
+  function playCelebrationChime(drifter) {
     /* Round 2 Pass 3: a memory handed back to its drifter now gets its
        own distinct three-note rise (UtsuSfx.giveMemory) instead of the
        same ding.mp3 the reading challenge's correct-answer feel and
        the orb pickup also use. Falls back to the old two-ding chime if
        utsu-sfx.js somehow isn't loaded. */
-    if (window.UtsuSfx) { window.UtsuSfx.giveMemory(); return; }
+    const motif = window.UtsuCard && drifter ? window.UtsuCard.motifForDrifter(drifter) : null;
+    if (window.UtsuSfx) { window.UtsuSfx.giveMemory(motif); return; }
     playChime(1);
     setTimeout(() => playChime(1.28), 150);
   }
@@ -2550,7 +2551,7 @@
     danceSparkles            = [];
     try { music.pause(); } catch(_) {}
     try { booDance.currentTime = 0; booDance.play().catch(() => {}); } catch(_) {}
-    playCelebrationChime();
+    playCelebrationChime(drifter);
 
     const pos = drifterWorldPos(drifter, weeklyRooms[DATA.drifters.indexOf(drifter)]);
     state.celebrateOrbitX = pos.x;
@@ -2990,6 +2991,44 @@
     });
   }
 
+  /* Pass 6: a restored memory leaves a quiet, motif-colored warmth in its
+     room. This is one radial gradient per restored echo, drawn before the
+     characters and arrows, so it stays cheap and never obscures gameplay. */
+  function drawRestoredRoomShimmer(now) {
+    const restored = readUtsuroba().readingEchoes || {};
+    const episodes = window.UTSUROBA_EPISODES || {};
+    const echoes = DATA.drifters.map(drifter => {
+      const episode = drifter.episodeId ? episodes[drifter.episodeId] : null;
+      const echo = episode && episode.worldEcho;
+      return echo && echo.roomId === state.roomId && restored[drifter.episodeId]
+        ? { echo, motif: echo.motif }
+        : null;
+    }).filter(Boolean);
+    if (!echoes.length) return;
+
+    const sec = now / 1000;
+    echoes.forEach(({ echo, motif }, index) => {
+      const x = Math.max(0, Math.min(1, Number(echo.x) || 0.5)) * WORLD_W;
+      const y = Math.max(0, Math.min(1, Number(echo.y) || 0.5)) * WORLD_H;
+      const pulse = 0.5 + 0.5 * Math.sin(sec * 0.75 + index * 1.7);
+      const radius = 150 + pulse * 24;
+      const color = window.UtsuCard ? window.UtsuCard.ringFor(motif) : '#d8a8ff';
+      ctx.save();
+      ctx.globalAlpha = 0.055 + pulse * 0.025;
+      const glow = ctx.createRadialGradient(x, y, 0, x, y, radius);
+      glow.addColorStop(0, color);
+      glow.addColorStop(0.34, color);
+      glow.addColorStop(1, 'transparent');
+      ctx.fillStyle = glow;
+      ctx.beginPath(); ctx.arc(x, y, radius, 0, Math.PI * 2); ctx.fill();
+      ctx.globalAlpha = 0.10 + pulse * 0.04;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 1.2;
+      ctx.beginPath(); ctx.arc(x, y, 34 + pulse * 7, 0, Math.PI * 2); ctx.stroke();
+      ctx.restore();
+    });
+  }
+
   /* ═══════════════════════════════════════════
      MAIN DRAW FRAME
   ═══════════════════════════════════════════ */
@@ -3012,6 +3051,7 @@
     }
     trail = trail.filter(p => p.life > 0);
 
+    drawRestoredRoomShimmer(now);
     drawDrifters(now);
     drawExitArrows(now);
     drawKarasukiExitArrow(now);

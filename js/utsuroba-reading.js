@@ -579,7 +579,7 @@
     }
 
     function advanceQuestion(question) {
-      if (window.UtsuSfx) window.UtsuSfx.correct();
+      if (window.UtsuSfx) window.UtsuSfx.correct(episode.worldEcho && episode.worldEcho.motif);
       questionIndex += 1;
       showEvidence = false;
       resetQuestionInteraction();
