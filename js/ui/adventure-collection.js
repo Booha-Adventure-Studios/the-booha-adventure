@@ -99,7 +99,7 @@
       var state = found ? 'FOUND' : 'NOT YET FOUND';
       var comment = found ? '<p class="wanderer-comment">' + esc(item.en) + '</p><p class="wanderer-comment-jp">' + furigana(item) + '</p><p class="wanderer-visits">VISITS · ' + visits + '</p>' : '';
       return '<article class="wanderer-tile ' + (found ? 'found' : 'locked') + '" style="--tile-color:' + color + '" aria-label="' + esc(title) + ', ' + state + '">' +
-        '<div class="wanderer-index">#' + number + '</div><div class="wanderer-top"><img class="wanderer-portrait" src="assets/img/wanderers/' + imageSlug(item) + '-1.png" alt="" loading="lazy"><div class="wanderer-name"><div class="wanderer-name-en">' + esc(title) + '</div><div class="wanderer-state">' + state + '</div></div></div>' + comment +
+        '<div class="wanderer-index">#' + number + '</div><div class="wanderer-top"><img class="wanderer-portrait" src="assets/img/wanderers/' + imageSlug(item) + '-1.png" alt="" width="58" height="58" loading="lazy" decoding="async"><div class="wanderer-name"><div class="wanderer-name-en">' + esc(title) + '</div><div class="wanderer-state">' + state + '</div></div></div>' + comment +
         '</article>';
     }).join('');
   }

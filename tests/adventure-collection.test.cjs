@@ -26,6 +26,8 @@ assert.match(page, /id="collection-total-visits"/, 'the collection should show p
 assert.match(page, /data-collection-filter="found"/, 'the collection should offer a found filter');
 assert.match(renderer, /activeFilter/, 'the collection renderer should retain the selected gallery filter');
 assert.match(renderer, /wanderer-index/, 'found and unfound tiles should show stable gallery numbers');
+assert.match(renderer, /decoding="async"/, 'wanderer portraits should decode without blocking the page');
+assert.match(page, /aria-live="polite"/, 'collection totals should announce saved discovery changes');
 assert.match(dataSource, /"Shoganai"/, 'the collection renderer should use the shared 36-wanderer data');
 
 console.log('Adventure collection tests passed.');
