@@ -281,9 +281,10 @@
             check: {
               type: 'what-happened',
               prompt: 'What happened when Nuppi arrived?',
-              promptJP: 'ヌッピが<ruby>来<rt>き</rt></ruby>たとき、<ruby>何<rt>なに</rt></ruby>が<ruby>起<rt>お</rt></ruby>きましたか？',
+            promptJP: 'ヌッピが<ruby>来<rt>き</rt></ruby>たとき、<ruby>何<rt>なに</rt></ruby>が<ruby>起<rt>お</rt></ruby>きましたか？',
               choices: ['Fuzzle started all three scares but finished none.', 'Fuzzle chose one scare and finished it.', 'Fuzzle went home before Nuppi arrived.'],
-              correct: 0
+              correct: 0,
+              requiresPrevious: true
             }
           }
         ],
@@ -412,7 +413,8 @@
               prompt: 'What did Glimmer polish the spark against?',
               promptJP: 'グリマーは、<ruby>何<rt>なに</rt></ruby>に<ruby>光<rt>ひかり</rt></ruby>をこすって<ruby>磨<rt>みが</rt></ruby>きましたか？',
               choices: ['Leaves, bells, and shiny pebbles', 'Only one gravestone', 'Wet paths and tree roots'],
-              correct: 0
+              correct: 0,
+              requiresPrevious: true
             }
           },
           {
@@ -561,7 +563,8 @@
               prompt: 'What happened when Nuppi asked for one sound?',
               promptJP: 'ヌッピがひとつの<ruby>音<rt>おと</rt></ruby>を<ruby>聞<rt>き</rt></ruby>いたとき、<ruby>何<rt>なに</rt></ruby>が<ruby>起<rt>お</rt></ruby>きましたか？',
               choices: ['All three noises answered together.', 'Only the pebble answered.', 'The pocket became silent.'],
-              correct: 0
+              correct: 0,
+              requiresPrevious: true
             }
           }
         ],
@@ -700,7 +703,8 @@
               prompt: 'What had already happened when Nuppi arrived?',
               promptJP: 'ヌッピが<ruby>来<rt>き</rt></ruby>たとき、すでに<ruby>何<rt>なに</rt></ruby>が<ruby>起<rt>お</rt></ruby>きていましたか？',
               choices: ['The bell had announced him three times.', 'The bell had vanished.', 'Tinkley had gone to sleep.'],
-              correct: 0
+              correct: 0,
+              requiresPrevious: true
             }
           }
         ],
@@ -839,7 +843,8 @@
               prompt: 'Which choices was Twiddle’s energy circling?',
               promptJP: 'トゥイドルのエネルギーは、どの<ruby>選択<rt>せんたく</rt></ruby>を<ruby>回<rt>まわ</rt></ruby>っていましたか？',
               choices: ['The same crooked and mossy paths', 'Three new paths', 'The cemetery gate and a lantern'],
-              correct: 0
+              correct: 0,
+              requiresPrevious: true
             }
           }
         ],

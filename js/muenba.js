@@ -666,6 +666,11 @@
     const order = Array.isArray(DATA.caseOrder) ? DATA.caseOrder : [];
     const ghostIds = new Set((DATA.ghosts || []).map(ghost => ghost.id));
     const checkTypes = new Set(['who', 'what', 'which', 'where', 'when', 'how-many', 'what-happened', 'why', 'meaning']);
+    const modeCheckTypeRules = {
+      start: new Set(['who', 'what', 'which', 'where', 'how-many', 'what-happened']),
+      fresh: new Set(['who', 'what', 'which', 'where', 'when', 'what-happened', 'why']),
+      deep: new Set(['who', 'what', 'which', 'when', 'what-happened', 'why', 'meaning'])
+    };
     const japanese = /[\u3040-\u30ff\u3400-\u9fff]/;
     const englishOnly = (value, label) => {
       if (typeof value !== 'string' || !value.trim()) errors.push(`${label} must be non-empty text`);
@@ -694,6 +699,8 @@
           continue;
         }
         if (mode.clues.length !== 3) errors.push(`${caseId}.${modeName} needs exactly three clues`);
+        const modeTypes = new Set();
+        let connectsRecords = false;
         mode.clues.forEach((clue, index) => {
           const clueLabel = `${caseId}.${modeName}.clues[${index}]`;
           englishOnly(clue && clue.title, `${clueLabel}.title`);
@@ -711,12 +718,20 @@
             return;
           }
           if (!checkTypes.has(check.type)) errors.push(`${clueLabel}.check.type is not supported`);
+          else if (!modeCheckTypeRules[modeName].has(check.type)) errors.push(`${clueLabel}.check.type does not fit ${modeName} mode`);
+          else modeTypes.add(check.type);
+          if (check.requiresPrevious !== undefined && typeof check.requiresPrevious !== 'boolean') {
+            errors.push(`${clueLabel}.check.requiresPrevious must be boolean when provided`);
+          }
+          if (check.requiresPrevious === true) connectsRecords = true;
           englishOnly(check.prompt, `${clueLabel}.check.prompt`);
           if (typeof check.promptJP !== 'string' || !check.promptJP.trim()) {
             errors.push(`${clueLabel}.check.promptJP must be non-empty text`);
           }
           if (!Array.isArray(check.choices) || check.choices.length < 2) {
             errors.push(`${clueLabel}.check.choices must contain at least two choices`);
+          } else if (check.choices.length !== 3) {
+            errors.push(`${clueLabel}.check.choices must contain exactly three choices`);
           } else {
             const choiceKeys = new Set();
             check.choices.forEach((choice, choiceIndex) => {
@@ -730,6 +745,12 @@
             errors.push(`${clueLabel}.check.correct is out of range`);
           }
         });
+        if (modeTypes.size < 2) errors.push(`${caseId}.${modeName} needs at least two comprehension question types`);
+        if (modeName === 'start' && connectsRecords) errors.push(`${caseId}.start must use direct record checks only`);
+        if (modeName === 'fresh' && !connectsRecords) errors.push(`${caseId}.fresh needs at least one cross-record check`);
+        if (modeName === 'deep' && ![...modeTypes].some(type => type === 'why' || type === 'meaning')) {
+          errors.push(`${caseId}.deep needs a why or meaning check`);
+        }
         if (!Array.isArray(mode.reviewClues) || !mode.reviewClues.length) {
           errors.push(`${caseId}.${modeName}.reviewClues must contain at least one clue index`);
         } else {
@@ -742,7 +763,16 @@
         englishOnly(mode.prompt, `${caseId}.${modeName}.prompt`);
         if (typeof mode.promptJP !== 'string' || !mode.promptJP.trim()) errors.push(`${caseId}.${modeName}.promptJP must be non-empty text`);
         if (!Array.isArray(mode.choices) || !mode.choices.length) errors.push(`${caseId}.${modeName}.choices must be non-empty`);
-        else mode.choices.forEach((choice, index) => englishOnly(choice, `${caseId}.${modeName}.choices[${index}]`));
+        else {
+          if (mode.choices.length !== 3) errors.push(`${caseId}.${modeName}.choices must contain exactly three choices`);
+          const choiceKeys = new Set();
+          mode.choices.forEach((choice, index) => {
+            englishOnly(choice, `${caseId}.${modeName}.choices[${index}]`);
+            const key = typeof choice === 'string' ? choice.trim().toLowerCase() : '';
+            if (key && choiceKeys.has(key)) errors.push(`${caseId}.${modeName}.choices repeats a choice`);
+            if (key) choiceKeys.add(key);
+          });
+        }
         if (!Number.isInteger(mode.correct) || mode.correct < 0 || mode.correct >= (mode.choices || []).length) {
           errors.push(`${caseId}.${modeName}.correct is out of range`);
         }
@@ -785,6 +815,25 @@
     }
     return a;
   }
+
+  // Pass 16D: keep each question's answer order stable while the player is
+  // retrying it, but do not let the authored correct index become a visible
+  // answer pattern. The session seed makes one encounter reproducible for
+  // debugging while the case/mode/day inputs prevent a permanent A-A-A-A
+  // sequence across encounters.
+  function shuffledCaseChoices(question, scope) {
+    const choices = Array.isArray(question && question.choices) ? question.choices : [];
+    const entries = choices.map((choice, originalIndex) => ({ choice, originalIndex }));
+    const sessionSeed = captureSession && captureSession.choiceSeed
+      ? captureSession.choiceSeed
+      : `${question && question.prompt ? question.prompt : 'case-question'}:${_muenbaTodayKey() || 'session'}`;
+    const shuffled = _muenbaShuffle(entries, `${sessionSeed}:${scope}`);
+    return {
+      choices: shuffled.map(entry => entry.choice),
+      correct: shuffled.findIndex(entry => entry.originalIndex === question.correct)
+    };
+  }
+
   function _muenbaTodayKey() {
     try {
       return window.CALENDAR && CALENDAR.getTodayKey ? CALENDAR.getTodayKey() : null;
@@ -1666,11 +1715,13 @@
     }
     captureOpen = true;
     const caseData = caseForGhost(ghost && ghost.id);
+    const caseDifficulty = caseData ? getMuenbaReadingDifficulty() : null;
     captureSession = {
       ghost,
       encounterRole: ghostRoleFor(ghost),
       caseData,
-      caseDifficulty: caseData ? getMuenbaReadingDifficulty() : null,
+      caseDifficulty,
+      choiceSeed: `${ghost.id}:${caseDifficulty || 'none'}:${_muenbaTodayKey() || 'session'}:${Math.floor(performance.now())}`,
       caseIndex: 0,
       caseResolved: false,
       phase: caseData && !caseRecordComplete(caseData) ? 'case-intro' : 'ready',
@@ -2012,7 +2063,8 @@
     choices.className = 'muenba-case-choices';
     choices.setAttribute('role', 'group');
     choices.setAttribute('aria-label', 'Record question choices');
-    check.choices.forEach((choice, index) => {
+    const answerSet = shuffledCaseChoices(check, `clue-${captureSession.caseIndex}`);
+    answerSet.choices.forEach((choice, index) => {
       const button = document.createElement('button');
       button.type = 'button';
       button.className = 'muenba-case-choice';
@@ -2026,7 +2078,7 @@
       button.append(number, text);
       button.addEventListener('click', () => {
         if (!captureSession || captureSession.phase !== 'case-check') return;
-        if (index === check.correct) {
+        if (index === answerSet.correct) {
           if (captureSession.caseIndex >= mode.clues.length - 1) {
             captureSession.phase = 'case-question';
             renderCaseQuestion();
@@ -2191,7 +2243,8 @@
     choices.className = 'muenba-case-choices';
     choices.setAttribute('role', 'group');
     choices.setAttribute('aria-label', 'Answer choices');
-    mode.choices.forEach((choice, index) => {
+    const answerSet = shuffledCaseChoices(mode, 'final');
+    answerSet.choices.forEach((choice, index) => {
       const button = document.createElement('button');
       button.type = 'button';
       button.className = 'muenba-case-choice';
@@ -2205,7 +2258,7 @@
       button.append(number, text);
       button.addEventListener('click', () => {
         if (!captureSession || captureSession.phase !== 'case-question') return;
-        if (index === mode.correct) renderCaseResolved();
+        if (index === answerSet.correct) renderCaseResolved();
         else renderCaseQuestion('That explanation does not fit all three records yet.');
       });
       choices.appendChild(button);
