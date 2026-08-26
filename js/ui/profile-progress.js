@@ -125,6 +125,19 @@
     return values.length ? Math.round(values.reduce((sum, value) => sum + value, 0) / values.length) : null;
   }
 
+  function changedValue(node, value) {
+    if (!node) return;
+    const next = String(value);
+    const previous = node.dataset.profileValue;
+    node.textContent = next;
+    if (previous !== undefined && previous !== next) {
+      node.classList.remove('profile-value-pop');
+      node.offsetWidth;
+      node.classList.add('profile-value-pop');
+    }
+    node.dataset.profileValue = next;
+  }
+
   function renderHighlights() {
     const host = document.getElementById('profile-highlights');
     if (!host || !window.BoohaDayRecord) return;
@@ -143,6 +156,16 @@
     const found = collection && typeof collection === 'object' && !Array.isArray(collection)
       ? Object.keys(collection).length : 0;
     const total = Object.keys(window.KARASUKI_WANDERER_DATA || {}).length || 36;
+    const snapshot = {
+      current,
+      longest,
+      best: bestWeek ? bestWeek.score : '--',
+      found,
+    };
+    let previous = {};
+    try { previous = JSON.parse(host.dataset.highlightSnapshot || '{}'); } catch (_) {}
+    const valueChanged = key => previous[key] !== undefined && String(previous[key]) !== String(snapshot[key]);
+    host.dataset.highlightSnapshot = JSON.stringify(snapshot);
     const trend = weekEntries.slice().sort((a, b) => a.key.localeCompare(b.key)).slice(-8);
     const trendMarkup = trend.map(entry => {
       const height = Math.max(10, Math.min(100, entry.score));
@@ -151,10 +174,10 @@
 
     host.innerHTML = `
       <div class="highlight-grid">
-        <div class="highlight-card streak"><div class="highlight-icon">${profileIcon('flame')}</div><div class="highlight-value">${current}</div><div class="highlight-en">CURRENT STREAK</div><div class="highlight-jp">いまのれんぞく</div></div>
-        <div class="highlight-card longest"><div class="highlight-icon">${profileIcon('bolt')}</div><div class="highlight-value">${longest}</div><div class="highlight-en">LONGEST STREAK</div><div class="highlight-jp">さいこうれんぞく</div></div>
-        <div class="highlight-card best"><div class="highlight-icon">${profileIcon('medal')}</div><div class="highlight-value">${bestWeek ? bestWeek.score + '%' : '--'}</div><div class="highlight-en">BEST WEEK AVERAGE</div><div class="highlight-jp">ベストしゅうスコア</div></div>
-        <a class="highlight-card wanderers" href="adventure-profile.html" aria-label="View wanderers found"><div class="highlight-icon">${profileIcon('ghost')}</div><div class="highlight-value">${found}/${total}</div><div class="highlight-en">WANDERERS FOUND</div><div class="highlight-jp">見つけた<ruby>旅人<rt>たびびと</rt></ruby></div></a>
+        <div class="highlight-card streak${valueChanged('current') ? ' profile-value-pop' : ''}"><div class="highlight-icon">${profileIcon('flame')}</div><div class="highlight-value">${current}</div><div class="highlight-en">CURRENT STREAK</div><div class="highlight-jp">いまのれんぞく</div></div>
+        <div class="highlight-card longest${valueChanged('longest') ? ' profile-value-pop' : ''}"><div class="highlight-icon">${profileIcon('bolt')}</div><div class="highlight-value">${longest}</div><div class="highlight-en">LONGEST STREAK</div><div class="highlight-jp">さいこうれんぞく</div></div>
+        <div class="highlight-card best${valueChanged('best') ? ' profile-value-pop' : ''}"><div class="highlight-icon">${profileIcon('medal')}</div><div class="highlight-value">${bestWeek ? bestWeek.score + '%' : '--'}</div><div class="highlight-en">BEST WEEK AVERAGE</div><div class="highlight-jp">ベストしゅうスコア</div></div>
+        <a class="highlight-card wanderers${valueChanged('found') ? ' profile-value-pop' : ''}" href="adventure-profile.html" aria-label="View wanderers found"><div class="highlight-icon">${profileIcon('ghost')}</div><div class="highlight-value">${found}/${total}</div><div class="highlight-en">WANDERERS FOUND</div><div class="highlight-jp">見つけた<ruby>旅人<rt>たびびと</rt></ruby></div></a>
       </div>
       <div class="trend-panel"><div class="trend-head"><div class="trend-title">RECENT WEEKS <small>さいきんのしゅう</small></div><div class="trend-title">${trend.length}/8</div></div><div class="trend-strip">${trendMarkup}</div></div>`;
   }
@@ -227,9 +250,9 @@
 
     renderHighlights();
 
-    document.getElementById('total-stars').textContent = `${S.weeklyStars()}/${27 * 3}`;
-    document.getElementById('total-completed').textContent = `${S.weeklyCompleted()}/27`;
-    document.getElementById('total-alltime').textContent = S.allTimeStars();
+    changedValue(document.getElementById('total-stars'), `${S.weeklyStars()}/${27 * 3}`);
+    changedValue(document.getElementById('total-completed'), `${S.weeklyCompleted()}/27`);
+    changedValue(document.getElementById('total-alltime'), S.allTimeStars());
 
     cont.textContent = '';
     R.CURRICULUMS.forEach(curriculum => {

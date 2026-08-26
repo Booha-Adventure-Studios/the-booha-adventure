@@ -615,7 +615,8 @@
       background:#c8b8ff0c; box-shadow:0 0 20px #c8b8ff14,inset 0 0 20px #c8b8ff05;
       cursor:pointer;
     }
-    .g-chip.unlocked:hover { border-color:var(--glow-moon); box-shadow:0 0 28px #c8b8ff2a; transform:translateY(-2px); }
+    .g-chip.unlocked { background:radial-gradient(circle at 0 0,#66bbff26,transparent 62%),#c8b8ff0c; box-shadow:0 0 24px #66bbff1f,inset 0 1px #ffffff18; }
+    .g-chip.unlocked:hover { border-color:var(--glow-moon); box-shadow:0 0 30px #66bbff35,0 0 28px #c8b8ff2a; transform:translateY(-2px); }
     .g-chip.unlocked::before {
       content:''; position:absolute; top:0; left:-100%; width:55%; height:100%;
       background:linear-gradient(90deg,transparent,#c8b8ff08,transparent);
@@ -653,7 +654,8 @@
       filter:none; opacity:1; border-color:#c8b8ff55;
       background:#c8b8ff0c; box-shadow:0 0 20px #c8b8ff14,inset 0 0 20px #c8b8ff05;
     }
-    .u-chip.earned:hover { border-color:var(--glow-moon); box-shadow:0 0 28px #c8b8ff2a; transform:translateY(-2px); }
+    .u-chip.earned { background:radial-gradient(circle at 0 0,#cc66ff26,transparent 62%),#c8b8ff0c; box-shadow:0 0 24px #cc66ff1f,inset 0 1px #ffffff18; }
+    .u-chip.earned:hover { border-color:var(--glow-moon); box-shadow:0 0 30px #cc66ff35,0 0 28px #c8b8ff2a; transform:translateY(-2px); }
     .u-chip.earned::before {
       content:''; position:absolute; top:0; left:-100%; width:55%; height:100%;
       background:linear-gradient(90deg,transparent,#c8b8ff08,transparent);
@@ -750,6 +752,7 @@
       border:1px solid; background:transparent;
       cursor:pointer; font-family:var(--font-jp);
       transition:all .2s; position:relative; overflow:hidden; text-align:center;
+      box-shadow:0 0 16px #c8b8ff12,inset 0 1px #ffffff12;
     }
     .spell-btn::before {
       content:''; position:absolute; inset:0; opacity:0; transition:opacity .2s;
@@ -757,25 +760,25 @@
     .spell-btn:hover::before { opacity:1; }
     .spell-btn:active { transform:scale(.97); }
 
-    .sb-icon  { display:flex; align-items:center; justify-content:center; height:1.35rem; color:currentColor; }
+    .sb-icon  { display:flex; align-items:center; justify-content:center; height:1.35rem; color:currentColor; filter:drop-shadow(0 0 6px currentColor); }
     .sb-icon .profile-icon { width:1.25rem; height:1.25rem; }
     .sb-en    { font-family:var(--font-title); font-size:.58rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color: #ffffff; }
     .sb-jp    { font-size:.74rem; font-weight:800; color: #e8e4ff; }
     .sb-kanji { font-size:.62rem; font-weight:800; color: #c4bce0; }
 
-    .sb-moon   { border-color:#c8b8ff66; color: #ffffff; }
+    .sb-moon   { border-color:#c8b8ff88; color: #ffffff; box-shadow:0 0 18px #c8b8ff1f,inset 0 1px #ffffff18; }
     .sb-moon::before   { background:radial-gradient(ellipse at 50% 0%,#c8b8ff18,transparent 70%); }
     .sb-moon:hover     { border-color:var(--glow-moon); box-shadow:0 0 24px #c8b8ff44,0 0 50px #c8b8ff18; }
 
-    .sb-teal   { border-color:#7fffd466; color: #5cffd0; }
+    .sb-teal   { border-color:#7fffd488; color: #5cffd0; box-shadow:0 0 18px #7fffd41f,inset 0 1px #ffffff18; }
     .sb-teal::before   { background:radial-gradient(ellipse at 50% 0%,#7fffd418,transparent 70%); }
     .sb-teal:hover     { border-color:var(--glow-teal); box-shadow:0 0 24px #7fffd444; }
 
-    .sb-amber  { border-color:#ffcc6666; color: #ffd966; }
+    .sb-amber  { border-color:#ffcc6688; color: #ffd966; box-shadow:0 0 18px #ffcc661f,inset 0 1px #ffffff18; }
     .sb-amber::before  { background:radial-gradient(ellipse at 50% 0%,#ffcc6618,transparent 70%); }
     .sb-amber:hover    { border-color:var(--glow-amber); box-shadow:0 0 24px #ffcc6644; }
 
-    .sb-danger { border-color:#ff6b6b55; color:#ff9eb5; }
+    .sb-danger { border-color:#ff6b6b77; color:#ff9eb5; box-shadow:0 0 18px #ff6b6b1f,inset 0 1px #ffffff18; }
     .sb-danger::before { background:radial-gradient(ellipse at 50% 0%,#ff6b6b18,transparent 70%); }
     .sb-danger:hover   { border-color:#ff9eb5; box-shadow:0 0 24px #ff6b6b44; }
 
