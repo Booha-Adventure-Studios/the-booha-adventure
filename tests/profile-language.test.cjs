@@ -20,6 +20,8 @@ assert.match(profile, /THIS WEEK'S RECORD/, 'the canonical profile should contai
 assert.match(profile, /js\/ui\/profile-progress\.js/, 'the canonical profile should load its detailed progress renderer');
 assert.match(profile, /id="profile-highlights"/, 'the canonical profile should mount its progress highlights');
 assert.match(profile, /js\/karasuki-wanderer-data\.js/, 'the canonical profile should load wanderer collection data');
+assert.match(profile, /aria-controls="acc-games-body"/, 'the bonus-games accordion should expose its controlled region');
+assert.match(profile, /aria-controls="acc-achievements-body"/, 'the achievements accordion should expose its controlled region');
 assert.doesNotMatch(adventure, /class="totals-bar"/, 'the adventure profile should not duplicate the progress totals');
 assert.doesNotMatch(adventure, /This Week's Record/, 'the adventure profile should not duplicate the detailed weekly record');
 assert.doesNotMatch(adventure, /js\/ui\/adventure-log\.js/, 'the adventure profile should not load the canonical weekly log');
