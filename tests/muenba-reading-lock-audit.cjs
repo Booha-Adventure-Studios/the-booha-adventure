@@ -56,7 +56,13 @@ assert.strictEqual(clueCount, data.caseOrder.length * 3 * 3, 'every mode must co
 // 2. A clue cannot expose a generic NEXT shortcut. Reading unlocks its check;
 // only the correct check answer can increment the record index.
 assert(clueSource.includes("captureSession.phase = 'case-read'"), 'clue screen must enter the read phase');
-assert(clueSource.includes('armCaseReadGate(box, null, clue.text, renderCaseCheck)'), 'clue screen must gate the comprehension check');
+assert(clueSource.includes('startCaseWordSweep(box, record, clue.text, clue.keywords, renderCaseCheck)'), 'clue screen must use the word sweep before the comprehension check');
+assert(runtimeSource.includes('function startCaseWordSweep(box, record, englishText, keywords, onReady, button = null)'), 'Muenba must expose a session-owned word sweep engine');
+assert(runtimeSource.includes('CASE_WORD_SWEEP_BASE_MS = 620'), 'word sweep must use an ESL-friendly base dwell');
+assert(runtimeSource.includes('CASE_WORD_SWEEP_KEYWORD_EXTRA_MS = 180'), 'word sweep must give target vocabulary extra dwell');
+assert(runtimeSource.includes('CASE_WORD_SWEEP_FINAL_HOLD_MS = 1200'), 'word sweep must hold the completed record before CHECK');
+assert(runtimeSource.includes("record.classList.add('muenba-case-sweep')"), 'word sweep must render an explicit reading surface');
+assert(runtimeSource.includes("record.dataset.sweepState = 'complete'"), 'word sweep must expose a completed state before CHECK');
 assert(!clueSource.includes('muenba-case-next'), 'clue screen must not expose a generic NEXT button');
 assert(!clueSource.includes('caseIndex += 1'), 'clue screen must not advance before comprehension');
 assert(checkSource.includes("captureSession.phase = 'case-check'"), 'check screen must have its own phase');
@@ -71,7 +77,7 @@ assert(finalSource.includes('muenba-case-review'), 'final solve must offer recor
 assert(!finalSource.includes('muenba-case-record-list'), 'final solve must not display all records at once');
 assert(reviewSource.includes("captureSession.phase = penaltyReview ? 'case-reread' : 'case-review'"), 'review and penalty reread must be separate phases');
 assert(reviewSource.includes('Reviewing is safe. It does not cost a turn or a reward.'), 'normal review must be penalty-free');
-assert(reviewSource.includes('armCaseReadGate(box, returnAction, clue.text)'), 'penalty reread must wait for the record to be read');
+assert(reviewSource.includes('startCaseWordSweep(box, record, clue.text, clue.keywords, null, returnAction)'), 'penalty reread must wait for the record word sweep');
 assert(reviewSource.includes("captureSession.phase === 'case-reread'"), 'reread return must be phase-guarded');
 
 // 4. Final mistakes are bounded and point back to a relevant record rather

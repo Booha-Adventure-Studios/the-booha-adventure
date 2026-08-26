@@ -31,7 +31,7 @@ function sourceSection(startName, endName) {
   return runtimeSource.slice(start, end);
 }
 assert(runtimeSource.includes('armCaseReadGate(box, openAction, caseData.intro)'), 'case intro must use the read gate');
-assert(runtimeSource.includes('armCaseReadGate(box, null, clue.text, renderCaseCheck)'), 'case clues must reveal a check after the read gate');
+assert(runtimeSource.includes('startCaseWordSweep(box, record, clue.text, clue.keywords, renderCaseCheck)'), 'case clues must reveal a check after the word sweep');
 assert(runtimeSource.includes('function renderCaseCheck(feedback = \'\')'), 'case clues must have a comprehension-check renderer');
 assert(runtimeSource.includes('function renderCaseReview(index = 0, options = {})'), 'case solve must have a safe record-review renderer');
 assert(runtimeSource.includes('function beginCaseRhythm()'), 'a correct case solve must enter rhythm through the direct handoff');

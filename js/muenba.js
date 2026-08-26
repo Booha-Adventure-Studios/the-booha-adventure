@@ -98,12 +98,15 @@
   const MUENBA_DANGER_RHYTHM_VOLUME = 0.62;
   const MUENBA_DANCE_FALLBACK_MS = 11000;
   const MUENBA_DANCE_SETTLE_MS = 750;
-  // Pass 1 reading attention gate. This is a brief, non-punitive pause rather
-  // than a comprehension test: intro actions wake after the pause, while
-  // clue screens use the same pause to reveal their comprehension check.
+  // Pass 1 reading attention gate. The intro still uses this as a brief,
+  // non-punitive pause. Pass 18B uses the word-sweep timings below for clue
+  // records so the English itself becomes the quiet lock before CHECK.
   const CASE_READ_GATE_MIN_MS = 2000;
   const CASE_READ_GATE_PER_WORD_MS = 240;
   const CASE_READ_GATE_MAX_MS = 6500;
+  const CASE_WORD_SWEEP_BASE_MS = 620;
+  const CASE_WORD_SWEEP_KEYWORD_EXTRA_MS = 180;
+  const CASE_WORD_SWEEP_FINAL_HOLD_MS = 1200;
   const CASE_FINAL_PENALTY_MAX = 2;
   const CASE_FINAL_PENALTY_ACCURACY_STEP = 5;
   const CASE_RHYTHM_TRANSITION_MS = 650;
@@ -1967,6 +1970,108 @@
     }, Math.max(0, session.readGateRemainingMs));
   }
 
+  function caseSweepWordIsKeyword(word, keywords) {
+    const normalizedWord = String(word || '')
+      .toLowerCase()
+      .replace(/^[^a-z0-9]+|[^a-z0-9'’]+$/g, '');
+    if (!normalizedWord || !Array.isArray(keywords)) return false;
+    return keywords.some(keyword => {
+      const normalizedKeyword = String(keyword || '').toLowerCase().trim();
+      return normalizedKeyword && normalizedWord === normalizedKeyword;
+    });
+  }
+
+  function startCaseWordSweep(box, record, englishText, keywords, onReady, button = null) {
+    if (!captureSession || !box || !record) return;
+    const session = captureSession;
+    clearCaseReadGate(session);
+    const sweepId = (session.readSweepId || 0) + 1;
+    session.readSweepId = sweepId;
+    const parts = String(englishText || '').match(/\s+|[^\s]+/g) || [];
+    const wordSpans = [];
+    record.textContent = '';
+    record.classList.add('muenba-case-sweep');
+    record.setAttribute('aria-label', String(englishText || ''));
+    record.dataset.sweepState = 'reading';
+
+    parts.forEach(part => {
+      if (/^\s+$/.test(part)) {
+        record.appendChild(document.createTextNode(part));
+        return;
+      }
+      const word = document.createElement('span');
+      word.className = 'muenba-case-sweep-word';
+      if (caseSweepWordIsKeyword(part, keywords)) word.classList.add('is-keyword');
+      word.textContent = part;
+      record.appendChild(word);
+      wordSpans.push(word);
+    });
+
+    session.readSweep = { box, record, wordSpans, index: 0, onReady, button, sweepId };
+    if (button) {
+      button.disabled = true;
+      button.setAttribute('aria-disabled', 'true');
+      button.classList.add('muenba-read-locked');
+      button.classList.remove('muenba-read-ready');
+    }
+    box.classList.add('muenba-reading');
+
+    const advance = () => {
+      if (captureSession !== session || session.readSweepId !== sweepId) return;
+      const sweep = session.readSweep;
+      if (!sweep || sweep.sweepId !== sweepId) return;
+      const previous = sweep.wordSpans[sweep.index - 1];
+      if (previous) {
+        previous.classList.remove('is-current');
+        previous.classList.add('is-revealed');
+      }
+
+      const current = sweep.wordSpans[sweep.index];
+      if (!current) {
+        if (!sweep.finalHoldStarted) {
+          sweep.finalHoldStarted = true;
+          session.readGateOnReady = advance;
+          session.readGateRemainingMs = CASE_WORD_SWEEP_FINAL_HOLD_MS;
+          session.readGatePaused = false;
+          scheduleCaseReadGate(session, sweepId);
+          return;
+        }
+        record.dataset.sweepState = 'complete';
+        box.classList.remove('muenba-reading');
+        box.classList.add('muenba-reading-complete');
+        if (button && button.isConnected) {
+          button.disabled = false;
+          button.setAttribute('aria-disabled', 'false');
+          button.classList.remove('muenba-read-locked');
+          button.classList.add('muenba-read-ready');
+        }
+        if (typeof onReady === 'function') onReady();
+        return;
+      }
+
+      current.classList.add('is-current', 'is-revealed');
+      sweep.index += 1;
+      session.readGateOnReady = advance;
+      session.readGateRemainingMs = caseSweepWordIsKeyword(current.textContent, keywords)
+        ? CASE_WORD_SWEEP_BASE_MS + CASE_WORD_SWEEP_KEYWORD_EXTRA_MS
+        : CASE_WORD_SWEEP_BASE_MS;
+      session.readGatePaused = false;
+      scheduleCaseReadGate(session, sweepId);
+    };
+
+    session.readGateId = sweepId;
+    session.readGateOnReady = advance;
+    session.readGateRemainingMs = wordSpans.length ? CASE_WORD_SWEEP_BASE_MS : CASE_WORD_SWEEP_FINAL_HOLD_MS;
+    session.readGatePaused = false;
+    if (wordSpans.length) {
+      // The first word is shown immediately; subsequent words are paced by
+      // the same session-owned timer that DEV screenshot hold can pause.
+      advance();
+    } else {
+      scheduleCaseReadGate(session, sweepId);
+    }
+  }
+
   function clearCaseTransition(session) {
     if (!session) return;
     if (session.caseTransitionTimer) window.clearTimeout(session.caseTransitionTimer);
@@ -2185,7 +2290,6 @@
     // plain white for contrast — the "Highlighted Vocabulary" treatment.
     const record = document.createElement('p');
     record.className = 'muenba-case-record';
-    record.innerHTML = highlightKeywords(clue.text, clue.keywords);
     box.appendChild(record);
     appendCaseGlossary(box, clue.keywords);
 
@@ -2193,10 +2297,10 @@
       box,
       'Read this record carefully. A question will appear soon.',
       'この<ruby>記録<rt>きろく</rt></ruby>をよく<ruby>読<rt>よ</rt></ruby>んでね。すぐに<ruby>質問<rt>しつもん</rt></ruby>が<ruby>出<rt>で</rt></ruby>てくるよ。',
-      'muenba-case-read-status'
+      'muenba-case-read-status muenba-case-reading-status'
     );
     captureOverlay.classList.add('open');
-    armCaseReadGate(box, null, clue.text, renderCaseCheck);
+    startCaseWordSweep(box, record, clue.text, clue.keywords, renderCaseCheck);
   }
 
   function renderCaseCheck(feedback = '') {
@@ -2369,7 +2473,7 @@
       actions.appendChild(returnAction);
       box.appendChild(actions);
       captureOverlay.classList.add('open');
-      armCaseReadGate(box, returnAction, clue.text);
+      startCaseWordSweep(box, record, clue.text, clue.keywords, null, returnAction);
       return;
     }
 
@@ -4101,6 +4205,18 @@
          against the now-white body text; the glossary chip row echoes them
          below the clue so learners see the target words twice. */
       .muenba-case-record .kw, .muenba-case-record-item p .kw { color:#ffe066; font-weight:700; text-shadow:0 0 10px rgba(255,224,102,.65), 0 0 22px rgba(255,196,40,.3); }
+      .muenba-case-record.muenba-case-sweep { color:#fff !important; }
+      .muenba-case-sweep-word { color:rgba(223,240,231,.2); text-shadow:none; transition:color .22s ease, text-shadow .22s ease, opacity .22s ease; }
+      .muenba-case-sweep-word.is-revealed { color:#f3f1df; }
+      .muenba-case-sweep-word.is-keyword { color:rgba(255,224,102,.38); }
+      .muenba-case-sweep-word.is-keyword.is-revealed { color:#ffe066; font-weight:700; text-shadow:0 0 10px rgba(255,224,102,.65), 0 0 22px rgba(255,196,40,.3); }
+      .muenba-case-sweep-word.is-current { color:#fff; text-shadow:0 0 12px rgba(223,255,237,.7); }
+      .muenba-case-sweep-word.is-current.is-keyword { color:#ffe066; text-shadow:0 0 12px rgba(255,224,102,.8), 0 0 26px rgba(255,196,40,.35); }
+      .muenba-case-reading-status { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+      .muenba-case-reading-status .muenba-case-direction-en { letter-spacing:.03em; }
+      .muenba-case-reading-status::after { width:7px; height:7px; flex:0 0 auto; border-radius:50%; background:#9ce0c1; box-shadow:0 0 12px rgba(156,224,193,.85); content:""; animation:muenbaReadingDot 1.2s ease-in-out infinite; }
+      .muenba-case-clue.muenba-reading-complete .muenba-case-reading-status::after { background:#ffe066; box-shadow:0 0 12px rgba(255,224,102,.85); animation:none; }
+      @keyframes muenbaReadingDot { 0%,100% { opacity:.35; transform:scale(.8); } 50% { opacity:1; transform:scale(1.15); } }
       .muenba-case-glossary { display:flex; flex-wrap:wrap; gap:7px; margin:0 0 16px; }
       .muenba-case-glossary-chip { padding:4px 12px; border:1px solid rgba(255,224,102,.5); border-radius:999px; background:rgba(255,224,102,.1); color:#ffe066; font:700 .72rem ui-monospace,monospace; letter-spacing:.03em; }
       /* Case-specific heading treatment, scoped to .muenba-case-box so it
