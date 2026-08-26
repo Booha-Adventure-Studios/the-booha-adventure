@@ -607,12 +607,13 @@
     .games-section { margin-bottom:2rem; animation:riseIn .9s .28s cubic-bezier(.16,1,.3,1) both; }
 
     .games-acc-card { border-radius: var(--radius-lg); overflow: hidden; position: relative; }
+    .games-acc-card { padding:1.15rem; }
     .games-acc-card .accordion-body .accordion-inner { padding: 0 1rem 1rem; }
-    .games-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(205px,1fr)); gap:.55rem; }
+    .games-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(185px,1fr)); gap:.6rem; }
 
     .g-chip {
       display:flex; align-items:center; gap:.65rem;
-      padding:.65rem .8rem; border-radius:var(--radius);
+      min-width:0; padding:.72rem; border-radius:var(--radius);
       border:1px solid #c8b8ff14; background:#c8b8ff05;
       filter:grayscale(.85); opacity:.45; transition:all .2s;
       position:relative; overflow:hidden;
@@ -705,8 +706,9 @@
       display:grid; grid-template-columns:repeat(3,1fr); gap:.5rem; margin:.9rem 0 .7rem;
     }
     .collection-stat {
-      min-width:0; padding:.62rem .7rem; border:1px solid #c8b8ff18; border-radius:var(--radius);
-      background:linear-gradient(145deg,#c8b8ff0d,#08081066); text-align:center;
+      min-width:0; padding:.62rem .7rem; border:1px solid #7fffd433; border-radius:var(--radius);
+      background:linear-gradient(145deg,#7fffd412,#08081066); text-align:center;
+      box-shadow:inset 0 1px #ffffff10, 0 0 14px #7fffd40d;
     }
     .collection-stat-value {
       display:block; color:#ffffff; font-family:var(--font-title); font-size:.86rem; font-weight:700;
@@ -717,19 +719,25 @@
       letter-spacing:.08em; text-transform:uppercase; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     }
     .collection-stat-jp { display:block; margin-top:.12rem; color:#8a80b0; font-size:.58rem; font-weight:800; }
-    .collection-filters { display:flex; flex-wrap:wrap; gap:.4rem; margin:0 0 .85rem; }
+    .collection-filters {
+      display:flex; flex-wrap:nowrap; gap:.2rem; margin:0 0 .95rem; padding:.3rem;
+      border:1px solid rgba(120,100,160,.3); border-radius:999px;
+      background:rgba(20,20,35,.6); box-shadow:inset 0 1px #ffffff0a, 0 0 18px #8b5cf60d;
+    }
     .collection-filter {
-      border:1px solid #c8b8ff2b; border-radius:999px; padding:.38rem .7rem;
-      background:#c8b8ff08; color:#c4bce0; font-family:var(--font-jp); font-size:.62rem; font-weight:900;
-      cursor:pointer; transition:color .2s,border-color .2s,background .2s,box-shadow .2s;
+      flex:1 1 0; min-width:0; border:1px solid transparent; border-radius:999px; padding:.46rem .55rem;
+      background:transparent; color:#c4bce0; font-family:var(--font-jp); font-size:.62rem; font-weight:900;
+      cursor:pointer; transition:color .2s,border-color .2s,background .2s,box-shadow .2s,transform .2s;
     }
     .collection-filter:hover, .collection-filter:focus-visible {
-      color:#ffffff; border-color:#c8b8ffaa; background:#c8b8ff18; outline:none;
+      color:#ffffff; border-color:#8b5cf688; background:#8b5cf61a; outline:none; transform:translateY(-1px);
     }
     .collection-filter[aria-pressed="true"] {
-      color:#0a0a12; border-color:#ffd966; background:#ffd966; box-shadow:0 0 16px #ffcc6666;
+      color:#07151a; border-color:#70e0d0; background:#70e0d0; box-shadow:0 0 16px #70e0d066, inset 0 1px #ffffff88;
     }
-    .collection-filter small { display:block; margin-top:.04rem; font-size:.9em; font-weight:800; }
+    .collection-filter small { display:block; margin-top:.04rem; font-size:.9em; font-weight:800; opacity:.84; }
+    .collection-filter[aria-pressed="true"] small { color:#123d42; opacity:1; }
+    .collection-filter:focus-visible { outline:2px solid #a2f0ed; outline-offset:2px; }
     .wanderer-grid {
       display:grid; grid-template-columns:repeat(auto-fill,minmax(185px,1fr)); gap:.6rem;
     }
@@ -853,7 +861,8 @@
       .collection-stat-label { font-size:.49rem; letter-spacing:.04em; }
       .collection-stat-jp { font-size:.55rem; }
       .collection-filters { gap:.3rem; }
-      .collection-filter { flex:1 1 5.5rem; padding-left:.45rem; padding-right:.45rem; }
+      .games-acc-card { padding:.65rem; }
+      .collection-filter { flex:1 1 0; padding-left:.35rem; padding-right:.35rem; font-size:.58rem; }
     }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; scroll-behavior:auto !important; }
