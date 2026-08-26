@@ -40,5 +40,7 @@ assert.match(adventureLog, /Choose the curriculum for this week/, 'the weekly cu
 assert.match(adventureLog, /alog-curr-tab-jp/, 'curriculum tabs should show Japanese helper text');
 assert.match(profile, /family=Cinzel:wght@600;700/, 'the profile should load a clearer supporting display font');
 assert.match(profile, /font-variant-numeric:tabular-nums/, 'profile scores should use stable number widths');
+assert.match(profile, /@keyframes stampAura/, 'completed weekly records should have a visual completion state');
+assert.match(profile, /@keyframes progressSheen/, 'progress bars should have a restrained visual shine');
 
 console.log('Profile language tests passed.');
