@@ -18,6 +18,8 @@ assert.match(profile, /THIS WEEK'S RECORD/, 'the canonical profile should contai
 ['profile-totals', 'dc-week', 'alog-week', 'curr-cards', 'games-grid', 'unlocks-grid', 'juku-report-log', 'alog-calendar', 'alog-past']
   .forEach(id => assert.match(profile, new RegExp(`id=\\"${id}\\"`), `the canonical profile should mount ${id}`));
 assert.match(profile, /js\/ui\/profile-progress\.js/, 'the canonical profile should load its detailed progress renderer');
+assert.match(profile, /id="profile-highlights"/, 'the canonical profile should mount its progress highlights');
+assert.match(profile, /js\/karasuki-wanderer-data\.js/, 'the canonical profile should load wanderer collection data');
 assert.doesNotMatch(adventure, /class="totals-bar"/, 'the adventure profile should not duplicate the progress totals');
 assert.doesNotMatch(adventure, /This Week's Record/, 'the adventure profile should not duplicate the detailed weekly record');
 assert.doesNotMatch(adventure, /js\/ui\/adventure-log\.js/, 'the adventure profile should not load the canonical weekly log');

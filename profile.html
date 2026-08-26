@@ -531,6 +531,42 @@
     .profile-total-en { font-family:'Cinzel Decorative',serif; font-size:.52rem; letter-spacing:.09em; color:#5d4929; }
     .profile-total-jp { font-size:.68rem; color:#765d36; font-weight:900; }
 
+    /* ── PROFILE HIGHLIGHTS ──────────────────────── */
+    .profile-highlights { margin:0 0 18px; }
+    .highlight-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:7px; }
+    .highlight-card {
+      position:relative; overflow:hidden; min-width:0; padding:11px 7px 10px; text-align:center;
+      border:1px solid rgba(58,44,26,.32); border-radius:11px;
+      background:linear-gradient(155deg,rgba(255,255,255,.25),rgba(255,255,255,.08));
+      box-shadow:inset 0 1px rgba(255,255,255,.28),0 3px 0 rgba(65,42,14,.1);
+    }
+    .highlight-card::after { content:''; position:absolute; left:18%; right:18%; bottom:0; height:2px; border-radius:99px; }
+    .highlight-card.streak::after { background:#e47c26; box-shadow:0 0 9px #ffad55; }
+    .highlight-card.longest::after { background:#397fcb; box-shadow:0 0 9px #66bbff; }
+    .highlight-card.best::after { background:#b8892f; box-shadow:0 0 9px #ffd700; }
+    .highlight-card.wanderers::after { background:#9a55c9; box-shadow:0 0 9px #cc66ff; }
+    .highlight-icon { font-size:1rem; line-height:1; }
+    .highlight-value { margin:4px 0 3px; font-family:'Cinzel Decorative',serif; font-size:clamp(1rem,4vw,1.55rem); line-height:1.05; }
+    .highlight-card.streak .highlight-value { color:#b95817; text-shadow:0 0 13px #ffad5599; }
+    .highlight-card.longest .highlight-value { color:#2165a0; text-shadow:0 0 13px #66bbff99; }
+    .highlight-card.best .highlight-value { color:#8b5c08; text-shadow:0 0 13px #ffd96699; }
+    .highlight-card.wanderers .highlight-value { color:#63358e; text-shadow:0 0 13px #c8b8ff99; }
+    .highlight-en { font-family:'Cinzel Decorative',serif; font-size:.46rem; letter-spacing:.08em; color:#5d4929; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .highlight-jp { margin-top:2px; font-size:.62rem; color:#765d36; font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .highlight-card.wanderers { cursor:pointer; text-decoration:none; color:inherit; }
+    .highlight-card.wanderers:hover, .highlight-card.wanderers:focus-visible { outline:none; transform:translateY(-2px); box-shadow:0 0 17px #c8b8ff55,inset 0 1px rgba(255,255,255,.4); }
+    .trend-panel { margin-top:10px; padding:11px 12px 10px; border:1px solid rgba(58,44,26,.28); border-radius:11px; background:rgba(255,255,255,.10); }
+    .trend-head { display:flex; align-items:baseline; justify-content:space-between; gap:8px; margin-bottom:8px; }
+    .trend-title { color:#3a2c1a; font-size:.73rem; font-weight:900; }
+    .trend-title small { color:#92784d; font-size:.62rem; margin-left:4px; }
+    .trend-strip { display:grid; grid-template-columns:repeat(8,1fr); gap:6px; align-items:end; min-height:74px; }
+    .trend-week { display:flex; flex-direction:column; align-items:center; justify-content:end; min-width:0; height:74px; }
+    .trend-score { color:#765d36; font-size:.6rem; font-weight:900; line-height:1; margin-bottom:4px; }
+    .trend-bar-wrap { width:100%; height:45px; display:flex; align-items:end; justify-content:center; }
+    .trend-bar { width:min(25px,70%); min-height:5px; border-radius:5px 5px 2px 2px; background:linear-gradient(to top,#9a55c9,#ffd966); box-shadow:0 0 8px #c8b8ff66; }
+    .trend-label { max-width:100%; margin-top:5px; color:#92784d; font-family:'Cinzel Decorative',serif; font-size:.45rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .trend-empty { grid-column:1/-1; color:#92784d; text-align:center; font-size:.72rem; padding:17px 4px; }
+
     .profile-progress { margin-top:18px; }
     .profile-progress-eyebrow { margin:20px 0 9px; }
     .profile-progress-card {
@@ -586,6 +622,7 @@
     .profile-progress .g-k, .profile-progress .u-k { font-size:.52rem; }
     .profile-progress .u-icon { font-size:1.1rem; flex-shrink:0; }
     @media (max-width:500px) { .profile-totals { gap:4px; } .profile-total-card { padding:10px 3px 9px; } .profile-total-en { font-size:.44rem; } .profile-total-jp { font-size:.6rem; } .profile-progress .games-grid, .profile-progress .unlocks-grid { grid-template-columns:1fr; } }
+    @media (max-width:640px) { .highlight-grid { grid-template-columns:repeat(2,1fr); } .trend-strip { gap:3px; } }
     @media (prefers-reduced-motion: reduce) { .profile-progress .accordion-body { transition:none; } .profile-progress .prog-fill { transition:none; } }
   </style>
 </head>
@@ -628,6 +665,8 @@
         <div class="profile-total-jp">ぜんぶのスター</div>
       </div>
     </div>
+
+    <section class="profile-highlights" id="profile-highlights" aria-label="Progress highlights"></section>
 
     <div class="ink-head">
       <span class="jp">まいにちチェック</span><span class="en">DAILY CHECK</span>
@@ -734,6 +773,7 @@
 </script>
 <script src="./js/calendar.js"></script>
 <script src="./js/utsu-furigana.js"></script>
+<script src="./js/karasuki-wanderer-data.js"></script>
 <script src="./js/core/adventure-core.js"></script>
 <script src="./js/core/save-file.js"></script>
 <script src="./js/juku-config.js"></script>
