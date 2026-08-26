@@ -1766,6 +1766,15 @@
       caseIndex: 0,
       casePenaltyCount: 0,
       caseResolved: false,
+      devCaptureHold: false,
+      readGateTimer: 0,
+      readGateRemainingMs: 0,
+      readGateStartedAt: 0,
+      readGatePaused: false,
+      caseTransitionTimer: 0,
+      caseTransitionRemainingMs: 0,
+      caseTransitionStartedAt: 0,
+      caseTransitionPaused: false,
       phase: caseData && !caseRecordComplete(caseData) ? 'case-intro' : 'ready',
       openedAt: performance.now()
     };
@@ -1777,7 +1786,11 @@
   }
 
   function captureBox() {
+    if (captureSession) clearCaseReadGate(captureSession);
     captureOverlay.textContent = '';
+    captureOverlay.scrollTop = 0;
+    captureOverlay.scrollLeft = 0;
+    if (captureSession) captureOverlay.dataset.phase = captureSession.phase || '';
     const box = document.createElement('div');
     box.className = 'muenba-lobby-box';
     captureOverlay.appendChild(box);
@@ -1785,7 +1798,55 @@
     // position deterministic when a long scene replaces the previous one.
     box.scrollTop = 0;
     box.scrollLeft = 0;
+    appendDevCaptureTools(box);
     return box;
+  }
+
+  function devCaptureToolsEnabled() {
+    return DEV_MODE || window.__devMuenba === true;
+  }
+
+  function appendDevCaptureTools(box) {
+    if (!box || !devCaptureToolsEnabled()) return;
+    const tools = document.createElement('div');
+    tools.className = 'muenba-dev-capture-tools';
+    tools.setAttribute('role', 'toolbar');
+    tools.setAttribute('aria-label', 'Muenba developer capture tools');
+    const hold = document.createElement('button');
+    hold.type = 'button';
+    hold.id = 'muenba-dev-capture-hold';
+    hold.className = 'muenba-dev-capture-hold';
+    hold.addEventListener('click', () => {
+      if (!captureSession) return;
+      setDevCaptureHold(!captureSession.devCaptureHold);
+    });
+    tools.appendChild(hold);
+    box.appendChild(tools);
+    updateDevCaptureTools();
+  }
+
+  function updateDevCaptureTools() {
+    const hold = captureOverlay && captureOverlay.querySelector('#muenba-dev-capture-hold');
+    if (!hold) return;
+    const paused = !!(captureSession && captureSession.devCaptureHold);
+    hold.textContent = paused ? 'Resume screen' : 'Hold screen';
+    hold.setAttribute('aria-pressed', paused ? 'true' : 'false');
+    hold.title = paused
+      ? 'Resume the paused developer timer'
+      : 'Pause timed reading or transition callbacks for screenshots';
+  }
+
+  function setDevCaptureHold(held) {
+    if (!captureSession || !devCaptureToolsEnabled()) return;
+    captureSession.devCaptureHold = !!held;
+    if (captureSession.devCaptureHold) {
+      pauseCaseReadGate(captureSession);
+      pauseCaseTransition(captureSession);
+    } else {
+      resumeCaseReadGate(captureSession);
+      resumeCaseTransition(captureSession);
+    }
+    updateDevCaptureTools();
   }
 
   function setDangerOverlay(active) {
@@ -1858,20 +1919,109 @@
   function focusCaptureControl(selector) {
     window.setTimeout(() => {
       const control = captureOverlay && captureOverlay.querySelector(selector);
-      if (control && typeof control.focus === 'function') control.focus();
+      if (control && typeof control.focus === 'function') control.focus({ preventScroll: true });
     }, 0);
+  }
+
+  function clearCaseReadGate(session) {
+    if (!session) return;
+    if (session.readGateTimer) window.clearTimeout(session.readGateTimer);
+    session.readGateTimer = 0;
+    session.readGateStartedAt = 0;
+  }
+
+  function pauseCaseReadGate(session) {
+    if (!session || !session.readGateTimer || session.readGatePaused) return;
+    const elapsed = Math.max(0, performance.now() - session.readGateStartedAt);
+    session.readGateRemainingMs = Math.max(0, session.readGateRemainingMs - elapsed);
+    clearCaseReadGate(session);
+    session.readGatePaused = true;
+  }
+
+  function resumeCaseReadGate(session) {
+    if (!session || !session.readGatePaused) return;
+    session.readGatePaused = false;
+    scheduleCaseReadGate(session, session.readGateId);
+  }
+
+  function scheduleCaseReadGate(session, gateId) {
+    if (!session || captureSession !== session || session.readGateId !== gateId) return;
+    if (session.devCaptureHold) {
+      session.readGatePaused = true;
+      return;
+    }
+    session.readGateStartedAt = performance.now();
+    session.readGateTimer = window.setTimeout(() => {
+      if (captureSession !== session || session.readGateId !== gateId) return;
+      if (session.devCaptureHold) {
+        session.readGatePaused = true;
+        session.readGateRemainingMs = 0;
+        session.readGateTimer = 0;
+        return;
+      }
+      session.readGateTimer = 0;
+      session.readGateRemainingMs = 0;
+      session.readGateStartedAt = 0;
+      session.readGatePaused = false;
+      if (typeof session.readGateOnReady === 'function') session.readGateOnReady();
+    }, Math.max(0, session.readGateRemainingMs));
+  }
+
+  function clearCaseTransition(session) {
+    if (!session) return;
+    if (session.caseTransitionTimer) window.clearTimeout(session.caseTransitionTimer);
+    session.caseTransitionTimer = 0;
+    session.caseTransitionStartedAt = 0;
+  }
+
+  function pauseCaseTransition(session) {
+    if (!session || !session.caseTransitionTimer || session.caseTransitionPaused) return;
+    const elapsed = Math.max(0, performance.now() - session.caseTransitionStartedAt);
+    session.caseTransitionRemainingMs = Math.max(0, session.caseTransitionRemainingMs - elapsed);
+    clearCaseTransition(session);
+    session.caseTransitionPaused = true;
+  }
+
+  function resumeCaseTransition(session) {
+    if (!session || !session.caseTransitionPaused) return;
+    session.caseTransitionPaused = false;
+    scheduleCaseTransition(session);
+  }
+
+  function scheduleCaseTransition(session) {
+    if (!session || captureSession !== session || session.phase !== 'case-transition') return;
+    if (session.devCaptureHold) {
+      session.caseTransitionPaused = true;
+      return;
+    }
+    session.caseTransitionStartedAt = performance.now();
+    session.caseTransitionTimer = window.setTimeout(() => {
+      if (captureSession !== session || session.phase !== 'case-transition') return;
+      if (session.devCaptureHold) {
+        session.caseTransitionPaused = true;
+        session.caseTransitionRemainingMs = 0;
+        session.caseTransitionTimer = 0;
+        return;
+      }
+      session.caseTransitionTimer = 0;
+      session.caseTransitionRemainingMs = 0;
+      session.caseTransitionStartedAt = 0;
+      session.caseTransitionPaused = false;
+      startRhythmCapture(false);
+    }, Math.max(0, session.caseTransitionRemainingMs));
   }
 
   function armCaseReadGate(box, button, englishText, onReady) {
     if (!captureSession) return;
     const session = captureSession;
+    clearCaseReadGate(session);
     const gateId = (session.readGateId || 0) + 1;
     session.readGateId = gateId;
+    session.readGateOnReady = onReady;
     const wordCount = String(englishText || '').trim().split(/\s+/).filter(Boolean).length;
-    const delay = Math.min(
-      CASE_READ_GATE_MAX_MS,
-      Math.max(CASE_READ_GATE_MIN_MS, wordCount * CASE_READ_GATE_PER_WORD_MS)
-    );
+    const delay = Math.min(CASE_READ_GATE_MAX_MS, Math.max(CASE_READ_GATE_MIN_MS, wordCount * CASE_READ_GATE_PER_WORD_MS));
+    session.readGateRemainingMs = delay;
+    session.readGatePaused = false;
 
     if (button) {
       button.disabled = true;
@@ -1880,9 +2030,7 @@
       button.classList.remove('muenba-read-ready');
     }
     if (box) box.classList.add('muenba-reading');
-
-    window.setTimeout(() => {
-      if (captureSession !== session || session.readGateId !== gateId) return;
+    session.readGateOnReady = () => {
       if (button && !button.isConnected) return;
       if (button) {
         button.disabled = false;
@@ -1892,7 +2040,8 @@
       }
       if (box) box.classList.remove('muenba-reading');
       if (typeof onReady === 'function') onReady();
-    }, delay);
+    };
+    scheduleCaseReadGate(session, gateId);
   }
 
   function renderCaseDirection(box, english, japaneseHtml, variant = '') {
@@ -2386,10 +2535,9 @@
     );
 
     captureOverlay.classList.add('open');
-    window.setTimeout(() => {
-      if (captureSession !== session || session.phase !== 'case-transition') return;
-      startRhythmCapture(false);
-    }, CASE_RHYTHM_TRANSITION_MS);
+    session.caseTransitionRemainingMs = CASE_RHYTHM_TRANSITION_MS;
+    session.caseTransitionPaused = false;
+    scheduleCaseTransition(session);
   }
 
   function renderCaptureReady() {
@@ -3789,6 +3937,8 @@
   }
 
   function stopRhythmCapture() {
+    clearCaseReadGate(captureSession);
+    clearCaseTransition(captureSession);
     const rhythm = captureSession && captureSession.rhythm;
     if (rhythm && rhythm.rafId) window.cancelAnimationFrame(rhythm.rafId);
     if (rhythm) rhythm.rafId = 0;
@@ -4032,6 +4182,10 @@
       #muenba-capture-overlay.open { display:flex; background:rgba(0,0,0,.86); }
       #muenba-capture-overlay.danger.open { background:rgba(90,0,12,.9); animation:muenbaDangerFlash .38s steps(2,end) infinite; }
       #muenba-capture-overlay.open .muenba-lobby-box { transform:scale(1); opacity:1; }
+      .muenba-dev-capture-tools { display:flex; justify-content:flex-end; min-height:24px; margin:-12px -10px 8px; pointer-events:auto; }
+      .muenba-dev-capture-hold { border:1px solid rgba(216,201,139,.42); border-radius:999px; padding:4px 9px; color:rgba(255,245,213,.78); background:rgba(0,0,0,.28); font:700 9px ui-monospace,monospace; letter-spacing:.05em; cursor:pointer; }
+      .muenba-dev-capture-hold:hover, .muenba-dev-capture-hold:focus-visible { border-color:rgba(216,201,139,.85); color:#fff5d5; background:rgba(126,111,48,.22); outline:none; }
+      .muenba-dev-capture-hold[aria-pressed="true"] { border-color:rgba(156,224,193,.86); color:#dff5e8; background:rgba(52,104,78,.26); box-shadow:0 0 12px rgba(93,208,140,.18); }
       @keyframes muenbaDangerFlash { 0%,100% { box-shadow:inset 0 0 0 rgba(238,36,63,0); } 50% { box-shadow:inset 0 0 120px rgba(238,36,63,.32); } }
       .muenba-danger-box { border-color:rgba(255,82,96,.82) !important; box-shadow:0 24px 80px rgba(0,0,0,.82),0 0 70px rgba(235,28,57,.35),inset 0 0 70px rgba(98,0,12,.46) !important; }
       .muenba-danger-box .muenba-danger-eyebrow { color:#ff8290; }
