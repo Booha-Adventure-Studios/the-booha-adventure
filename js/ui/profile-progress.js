@@ -166,20 +166,13 @@
     try { previous = JSON.parse(host.dataset.highlightSnapshot || '{}'); } catch (_) {}
     const valueChanged = key => previous[key] !== undefined && String(previous[key]) !== String(snapshot[key]);
     host.dataset.highlightSnapshot = JSON.stringify(snapshot);
-    const trend = weekEntries.slice().sort((a, b) => a.key.localeCompare(b.key)).slice(-8);
-    const trendMarkup = trend.map(entry => {
-      const height = Math.max(10, Math.min(100, entry.score));
-      return `<div class="trend-week" title="${escapeHTML(entry.key)}: ${entry.score}%"><div class="trend-score">${entry.score}%</div><div class="trend-bar-wrap"><div class="trend-bar" style="height:${height}%"></div></div><div class="trend-label">${escapeHTML(entry.key.slice(5))}</div></div>`;
-    }).join('') || '<div class="trend-empty">Your weekly scores will appear here as you play.</div>';
-
     host.innerHTML = `
       <div class="highlight-grid">
         <div class="highlight-card streak${valueChanged('current') ? ' profile-value-pop' : ''}"><div class="highlight-icon">${profileIcon('flame')}</div><div class="highlight-value">${current}</div><div class="highlight-en">CURRENT STREAK</div><div class="highlight-jp">いまのれんぞく</div></div>
         <div class="highlight-card longest${valueChanged('longest') ? ' profile-value-pop' : ''}"><div class="highlight-icon">${profileIcon('bolt')}</div><div class="highlight-value">${longest}</div><div class="highlight-en">LONGEST STREAK</div><div class="highlight-jp">さいこうれんぞく</div></div>
         <div class="highlight-card best${valueChanged('best') ? ' profile-value-pop' : ''}"><div class="highlight-icon">${profileIcon('medal')}</div><div class="highlight-value">${bestWeek ? bestWeek.score + '%' : '--'}</div><div class="highlight-en">BEST WEEK AVERAGE</div><div class="highlight-jp">ベストしゅうスコア</div></div>
         <a class="highlight-card wanderers${valueChanged('found') ? ' profile-value-pop' : ''}" href="adventure-profile.html" aria-label="View wanderers found"><div class="highlight-icon">${profileIcon('ghost')}</div><div class="highlight-value">${found}/${total}</div><div class="highlight-en">WANDERERS FOUND</div><div class="highlight-jp">見つけた<ruby>旅人<rt>たびびと</rt></ruby></div></a>
-      </div>
-      <div class="trend-panel"><div class="trend-head"><div class="trend-title">RECENT WEEKS <small>さいきんのしゅう</small></div><div class="trend-title">${trend.length}/8</div></div><div class="trend-strip">${trendMarkup}</div></div>`;
+      </div>`;
   }
 
   function initAccordion(triggerId, bodyId) {

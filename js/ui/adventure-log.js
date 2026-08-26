@@ -104,6 +104,18 @@ const BoohaAdventureLog = (() => {
       : `${s.toFixed(1)}s`;
   }
 
+  /** Average only fully recorded past weeks for the selected curriculum. */
+  function recentFullWeekAverage(weekLog, currentWeekKey, curr, games) {
+    const scores = Object.keys(weekLog || {})
+      .filter(key => key !== currentWeekKey)
+      .map(key => weekStatus(weekLog[key], curr, games))
+      .filter(status => status.complete && status.pct != null)
+      .map(status => status.pct);
+    return scores.length
+      ? Math.round(scores.reduce((sum, score) => sum + score, 0) / scores.length)
+      : null;
+  }
+
   /* ── DOM builders (createElement + textContent only) ─────────── */
 
   function el(tag, cls, text) {
@@ -115,7 +127,7 @@ const BoohaAdventureLog = (() => {
 
   const CURR_LABELS = { pb: 'Pre-Boo', br: 'Boo-riculum', bc: 'Boo-continuum' };
 
-  function renderWeek(mount, status, curr, playerName, onPick) {
+  function renderWeek(mount, status, curr, playerName, onPick, reference) {
     mount.textContent = '';
 
     // Curriculum selector — always visible so students can switch tracks
@@ -187,6 +199,48 @@ const BoohaAdventureLog = (() => {
       score.appendChild(el('div', 'alog-score-en', `${playerName}'S WEEKLY SCORE`));
       mount.appendChild(score);
     }
+
+    const referenceBox = el('div', 'alog-reference');
+    referenceBox.appendChild(el('div', 'alog-reference-kicker', 'YOUR WEEKLY REFERENCE'));
+    if (reference && reference.average != null) {
+      const refGrid = el('div', 'alog-reference-grid');
+      const recent = el('div', 'alog-reference-stat');
+      recent.appendChild(el('div', 'alog-reference-value', reference.average + '%'));
+      recent.appendChild(el('div', 'alog-reference-label', 'PERSONAL RECENT AVERAGE'));
+      recent.appendChild(el('div', 'alog-reference-jp', 'さいきんのじぶんのへいきん'));
+      refGrid.appendChild(recent);
+
+      const result = el('div', 'alog-reference-result');
+      if (status.complete) {
+        const delta = status.pct - reference.average;
+        const sign = delta > 0 ? '+' : '';
+        result.appendChild(el('div', 'alog-reference-value', sign + delta));
+        result.appendChild(el('div', 'alog-reference-label', 'POINTS VS AVERAGE'));
+        result.appendChild(el('div', 'alog-reference-jp', delta >= 0 ? 'へいきんより たかい' : 'へいきんより ひくい'));
+        result.classList.add(delta >= 0 ? 'above' : 'below');
+      } else {
+        result.appendChild(el('div', 'alog-reference-value muted', '—'));
+        result.appendChild(el('div', 'alog-reference-label', 'FINISH THIS WEEK TO COMPARE'));
+        result.appendChild(el('div', 'alog-reference-jp', 'しゅうを おえて くらべよう'));
+      }
+      refGrid.appendChild(result);
+      referenceBox.appendChild(refGrid);
+      if (status.complete) {
+        const range = el('div', 'alog-reference-track');
+        const currentFill = el('span', 'alog-reference-current');
+        currentFill.style.width = Math.max(0, Math.min(100, status.pct)) + '%';
+        range.appendChild(currentFill);
+        const averageMark = el('span', 'alog-reference-marker');
+        averageMark.style.left = Math.max(0, Math.min(100, reference.average)) + '%';
+        range.appendChild(averageMark);
+        referenceBox.appendChild(range);
+        referenceBox.appendChild(el('div', 'alog-reference-note', 'Gold marker = your personal recent average'));
+      }
+    } else {
+      referenceBox.appendChild(el('div', 'alog-reference-empty', 'Complete one full week to create your personal reference.'));
+      referenceBox.appendChild(el('div', 'alog-reference-jp', 'まず 1しゅう ぜんぶ きろくすると へいきんが できます'));
+    }
+    mount.appendChild(referenceBox);
 
     // Duels bonus row
     const duelIds = Object.keys(status.duel || {});
@@ -331,7 +385,10 @@ const BoohaAdventureLog = (() => {
     const paint = (c) => {
       try { localStorage.setItem('booha_profile_curr', c); } catch (_) {}
       const g = gamesFor(c);
-      renderWeek(wMount, weekStatus(weekLog[keys.week], c, g), c, playerName, paint);
+      const reference = {
+        average: recentFullWeekAverage(weekLog, keys.week, c, g),
+      };
+      renderWeek(wMount, weekStatus(weekLog[keys.week], c, g), c, playerName, paint, reference);
       if (pMount) renderPast(pMount, weekLog, keys.week, c, g);
     };
     paint(curr);
@@ -346,7 +403,7 @@ const BoohaAdventureLog = (() => {
     document.addEventListener('booha:ready', init, { once: true });
   }
 
-  return { init, _test: { inferCurriculum, weekStatus, streak, fmtMs } };
+  return { init, _test: { inferCurriculum, weekStatus, streak, fmtMs, recentFullWeekAverage } };
 })();
 
 window.BoohaAdventureLog = BoohaAdventureLog;
