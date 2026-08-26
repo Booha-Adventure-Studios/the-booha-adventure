@@ -24,6 +24,11 @@ assert.match(page, /js\/ui\/bonus-games\.js/, 'the adventure profile should load
 assert.match(page, /id="collection-found-count"/, 'the collection should show a found summary');
 assert.match(page, /id="collection-total-visits"/, 'the collection should show permanent visit totals');
 assert.match(page, /data-collection-filter="found"/, 'the collection should offer a found filter');
+assert.match(page, /family=Cinzel:wght@600;700/, 'the adventure profile should load a sturdy secondary display font');
+assert.match(page, /family=Zen\+Maru\+Gothic:wght@500;700;900/, 'the adventure profile should load a rounded Japanese display font');
+assert.match(page, /--font-ui:\s*'Cinzel'/, 'secondary English labels should use the UI display font');
+assert.match(page, /color:var\(--spectral-cyan\); text-shadow:0 0 6px rgba\(162,240,237/, 'furigana should use a readable spectral glow');
+assert.match(page, /\.ey-en \{[\s\S]*font-family: var\(--font-ui\)/, 'section headings should use the sturdier UI font');
 assert.match(page, /background:rgba\(20,20,35,\.6\)/, 'the collection filters should use a unified dark control');
 assert.match(page, /border-color:#70e0d0/, 'the active collection filter should use a spectral highlight');
 assert.match(page, /border:1px solid #7fffd433/, 'collection stat cards should share an eerie neon border');
