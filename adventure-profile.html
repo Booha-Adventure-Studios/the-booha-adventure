@@ -17,7 +17,7 @@
   <!-- ═══════════════════════════════════════════════════════ -->
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=M+PLUS+Rounded+1c:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Cinzel+Decorative:wght@400;700&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="theme/save-ui.css">
 
     <!-- ═══ TOKEN GATE ════════════════════════════════════════ -->
@@ -51,7 +51,11 @@
       --radius:      12px;
       --radius-lg:   20px;
       --font-title:  'Cinzel Decorative', serif;
-      --font-jp:     'M PLUS Rounded 1c', 'Hiragino Maru Gothic ProN', sans-serif;
+      --font-ui:     'Cinzel', serif;
+      --font-jp:     'Zen Maru Gothic', 'Hiragino Maru Gothic ProN', sans-serif;
+      --spectral-cyan: #a2f0ed;
+      --spectral-turquoise: #70e0d0;
+      --mystic-violet: #d8b4fe;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -66,8 +70,9 @@
     }
     ruby { ruby-align:center; }
     rt {
-      font-family: 'M PLUS Rounded 1c', 'Hiragino Maru Gothic ProN', sans-serif;
-      font-size:.58em; font-weight:800; letter-spacing:0;
+      font-family: var(--font-jp);
+      font-size:.58em; font-weight:700; letter-spacing:0;
+      color:var(--spectral-cyan); text-shadow:0 0 6px rgba(162,240,237,.4);
     }
 
     /* ── ATMOSPHERE ─────────────────────────────── */
@@ -360,8 +365,8 @@
     .back-btn .back-icon { display:flex; align-items:center; justify-content:center; width:1.2rem; height:1.2rem; color:#e8ddff; }
     .back-btn .back-icon .profile-icon { width:1.15rem; height:1.15rem; }
     .back-btn .back-copy { display:flex; flex-direction:column; align-items:flex-start; gap:.08rem; }
-    .back-btn .back-en { line-height:1.1; letter-spacing:.03em; }
-    .back-btn small { color:#dcd3ff; font-size:.82em; line-height:1.1; letter-spacing:.08em; }
+    .back-btn .back-en { font-family:var(--font-ui); font-weight:700; line-height:1.1; letter-spacing:.03em; }
+    .back-btn small { font-family:var(--font-jp); color:var(--spectral-cyan); font-size:.82em; line-height:1.1; letter-spacing:.08em; text-shadow:0 0 6px rgba(162,240,237,.35); }
     @keyframes backBtnPulse {
       0%,100% { box-shadow: 0 0 18px #c8b8ff55, 0 0 40px #c8b8ff22, 0 0 70px #c8b8ff11, inset 0 1px 0 #c8b8ff33; }
       50%      { box-shadow: 0 0 28px #c8b8ffaa, 0 0 60px #c8b8ff44, 0 0 100px #c8b8ff22, inset 0 1px 0 #c8b8ff55; }
@@ -386,13 +391,13 @@
     .profile-network a {
       display: inline-flex; align-items: center; gap: .38rem; min-height: 38px;
       padding: .48rem .9rem; border: 1px solid rgba(200,184,255,.28); border-radius: 10px;
-      color: #eeeaff; text-decoration: none; font-size: .7rem; font-weight: 900; letter-spacing: .04em;
+      color: #eeeaff; text-decoration: none; font-family:var(--font-ui); font-size: .7rem; font-weight: 700; letter-spacing: .04em;
       text-shadow: 0 1px 2px rgba(0,0,0,.72);
       background: linear-gradient(180deg, rgba(200,184,255,.16), rgba(14,11,26,.4));
       box-shadow: 0 2px 0 rgba(0,0,0,.34), inset 0 1px rgba(255,255,255,.12);
       transition: color .2s, border-color .2s, background .2s, transform .2s, box-shadow .2s;
     }
-    .profile-network a small { color: #c9c1e4; font-size: .9em; font-weight: 800; }
+    .profile-network a small { color: var(--spectral-cyan); font-family:var(--font-jp); font-size: .9em; font-weight: 700; text-shadow:0 0 6px rgba(162,240,237,.3); }
     .profile-network a:hover, .profile-network a:focus-visible {
       color: #fff; border-color: #c8b8ffaa; background: #c8b8ff18;
       outline: none; transform: translateY(-1px); box-shadow: 0 4px 0 rgba(0,0,0,.28), 0 0 18px rgba(200,184,255,.22), inset 0 1px rgba(255,255,255,.2);
@@ -413,13 +418,13 @@
       display: flex; align-items: baseline; gap: .55rem; margin-bottom: 1rem;
     }
     .ey-en {
-      font-family: var(--font-title); font-size: .65rem;
+      font-family: var(--font-ui); font-size: .65rem;
       letter-spacing: .18em; text-transform: uppercase;
       color: #ffffff; font-weight: 700;
       text-shadow: 0 0 14px #c8b8ffcc;
     }
-    .ey-jp    { font-family: var(--font-jp); font-size: .78rem; font-weight: 800; color: #e8e4ff; }
-    .ey-kanji { font-family: var(--font-jp); font-size: .68rem; font-weight: 800; color: #c4bce0; }
+    .ey-jp    { font-family: var(--font-jp); font-size: .78rem; font-weight: 800; color: var(--mystic-violet); text-shadow:0 0 6px rgba(216,180,254,.3); }
+    .ey-kanji { font-family: var(--font-jp); font-size: .68rem; font-weight: 800; color: var(--spectral-cyan); text-shadow:0 0 6px rgba(162,240,237,.28); }
     .ey-line  { flex:1; height:1px; background: linear-gradient(90deg,#c8b8ff55,transparent); }
 
     /* ── TOTALS ──────────────────────────────────── */
@@ -452,9 +457,9 @@
 
     .t-icon { font-size:1.05rem; margin-bottom:.25rem; }
     .t-tri  { display:flex; flex-direction:column; gap:.05rem; align-items:center; }
-    .t-en   { font-family:var(--font-title); font-size:.62rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; }
-    .t-jp   { font-size:.78rem; font-weight:800; color: #e0d8ff; }
-    .t-k    { font-size:.66rem; color:#c4bce0; font-weight:800; }
+    .t-en   { font-family:var(--font-ui); font-size:.62rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; }
+    .t-jp   { font-family:var(--font-jp); font-size:.78rem; font-weight:800; color:var(--spectral-cyan); text-shadow:0 0 6px rgba(162,240,237,.24); }
+    .t-k    { font-family:var(--font-jp); font-size:.66rem; color:var(--mystic-violet); font-weight:800; text-shadow:0 0 6px rgba(216,180,254,.24); }
     .tc-stars  .t-en { color:#ffd966; }
     .tc-done   .t-en { color:#5cffd0; }
     .tc-unlock .t-en { color:#ddd0ff; }
@@ -555,9 +560,9 @@
     }
 
     /* BOLD curriculum name colors */
-    .curr-name-en { font-family:var(--font-title); font-size:.74rem; font-weight:700; letter-spacing:.08em; }
-    .curr-name-jp { font-size:.77rem; font-weight:800; color: #e0d8ff; }
-    .curr-name-k  { font-size:.65rem; color: #c4bce0; font-weight:800; }
+    .curr-name-en { font-family:var(--font-ui); font-size:.74rem; font-weight:700; letter-spacing:.08em; }
+    .curr-name-jp { font-family:var(--font-jp); font-size:.77rem; font-weight:800; color:var(--spectral-cyan); text-shadow:0 0 6px rgba(162,240,237,.22); }
+    .curr-name-k  { font-family:var(--font-jp); font-size:.65rem; color:var(--mystic-violet); font-weight:800; text-shadow:0 0 6px rgba(216,180,254,.22); }
 
     .c-bc { color: #22ff88; text-shadow: 0 0 18px #22ff8899; }
     .c-br { color: #44aaff; text-shadow: 0 0 18px #44aaff99; }
@@ -586,12 +591,12 @@
     .row-chk .profile-icon { width:.86rem; height:.86rem; }
     .row-names { overflow:hidden; }
     .rn-en {
-      font-family:var(--font-title); font-size:.66rem; font-weight:700; letter-spacing:.04em;
+      font-family:var(--font-ui); font-size:.66rem; font-weight:700; letter-spacing:.04em;
       color: #ffffff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     }
     .game-row.done .rn-en { color:var(--glow-teal); }
     .rn-jp {
-      font-size:.66rem; font-weight:800; color: #c4bce0;
+      font-family:var(--font-jp); font-size:.66rem; font-weight:800; color: var(--spectral-cyan); text-shadow:0 0 6px rgba(162,240,237,.22);
       white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     }
     .row-stars { display:flex; gap:1px; }
@@ -633,10 +638,10 @@
     }
     .g-icon { width:34px; height:34px; object-fit:contain; flex-shrink:0; filter:drop-shadow(0 0 6px #00000088); }
     .g-text { overflow:hidden; min-width:0; }
-    .g-en    { font-family:var(--font-title); font-size:.64rem; font-weight:700; letter-spacing:.05em; color: #ffffff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .g-en    { font-family:var(--font-ui); font-size:.64rem; font-weight:700; letter-spacing:.05em; color: #ffffff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .g-chip:not(.unlocked) .g-en { color: #8a80b0; }
-    .g-jp    { font-size:.67rem; font-weight:800; color: #c4bce0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .g-score { font-size:.64rem; font-weight:700; color: #c4bce0; margin-top:.08rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .g-jp    { font-family:var(--font-jp); font-size:.67rem; font-weight:800; color: var(--spectral-cyan); text-shadow:0 0 6px rgba(162,240,237,.22); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .g-score { font-family:var(--font-jp); font-size:.64rem; font-weight:700; color: var(--mystic-violet); margin-top:.08rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .g-chip.unlocked .g-score { color: var(--glow-amber); }
 
     /* ── ACHIEVEMENTS ACCORDION ──────────────────── */
@@ -675,10 +680,10 @@
     .u-icon  { display:flex; align-items:center; justify-content:center; width:1.4rem; color:var(--glow-amber); flex-shrink:0; }
     .u-icon .profile-icon { width:1.15rem; height:1.15rem; }
     .u-text  { overflow:hidden; min-width:0; }
-    .u-en    { font-family:var(--font-title); font-size:.64rem; font-weight:700; letter-spacing:.05em; color: #ffffff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .u-en    { font-family:var(--font-ui); font-size:.64rem; font-weight:700; letter-spacing:.05em; color: #ffffff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .u-chip:not(.earned) .u-en { color: #8a80b0; }
-    .u-jp    { font-size:.67rem; font-weight:800; color: #c4bce0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .u-desc  { font-size:.64rem; font-weight:700; color: #c4bce0; margin-top:.08rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .u-jp    { font-family:var(--font-jp); font-size:.67rem; font-weight:800; color: var(--spectral-cyan); text-shadow:0 0 6px rgba(162,240,237,.22); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .u-desc  { font-family:var(--font-jp); font-size:.64rem; font-weight:700; color: var(--mystic-violet); margin-top:.08rem; text-shadow:0 0 6px rgba(216,180,254,.18); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
     /* ── WANDERER COLLECTION ────────────────────── */
     .wanderer-section {
@@ -692,16 +697,16 @@
     }
     .wanderer-heading .eyebrow { margin-bottom:0; flex:1; }
     .wanderer-count {
-      color:#ffd966; font-family:var(--font-title); font-size:.72rem; font-weight:700;
-      letter-spacing:.08em; white-space:nowrap; text-shadow:0 0 12px #ffcc6688;
+      color:var(--spectral-cyan); font-family:var(--font-ui); font-size:.72rem; font-weight:700;
+      letter-spacing:.08em; white-space:nowrap; text-shadow:0 0 12px rgba(162,240,237,.5);
     }
     .wanderer-intro {
       color:#c4bce0; font-size:.78rem; line-height:1.65; font-weight:800;
       margin:.75rem 0 1rem; max-width:58ch;
     }
     .wanderer-intro-en, .wanderer-intro-jp { display:block; }
-    .wanderer-intro-jp { margin-top:.35rem; color:#e1dbf6; font-size:.72rem; line-height:1.8; }
-    .wanderer-intro ruby rt { color:#ffd966; }
+    .wanderer-intro-jp { margin-top:.35rem; color:var(--mystic-violet); font-size:.72rem; line-height:1.8; text-shadow:0 0 6px rgba(216,180,254,.2); }
+    .wanderer-intro ruby rt { color:var(--spectral-cyan); }
     .collection-strip {
       display:grid; grid-template-columns:repeat(3,1fr); gap:.5rem; margin:.9rem 0 .7rem;
     }
@@ -715,10 +720,10 @@
       line-height:1.2; text-shadow:0 0 12px var(--glow-moon);
     }
     .collection-stat-label {
-      display:block; margin-top:.2rem; color:#c4bce0; font-size:.57rem; font-weight:900;
+      display:block; margin-top:.2rem; color:var(--spectral-cyan); font-family:var(--font-ui); font-size:.57rem; font-weight:700;
       letter-spacing:.08em; text-transform:uppercase; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     }
-    .collection-stat-jp { display:block; margin-top:.12rem; color:#8a80b0; font-size:.58rem; font-weight:800; }
+    .collection-stat-jp { display:block; margin-top:.12rem; color:var(--mystic-violet); font-size:.58rem; font-weight:800; text-shadow:0 0 6px rgba(216,180,254,.2); }
     .collection-filters {
       display:flex; flex-wrap:nowrap; gap:.2rem; margin:0 0 .95rem; padding:.3rem;
       border:1px solid rgba(120,100,160,.3); border-radius:999px;
@@ -726,7 +731,7 @@
     }
     .collection-filter {
       flex:1 1 0; min-width:0; border:1px solid transparent; border-radius:999px; padding:.46rem .55rem;
-      background:transparent; color:#c4bce0; font-family:var(--font-jp); font-size:.62rem; font-weight:900;
+      background:transparent; color:#c4bce0; font-family:var(--font-ui); font-size:.62rem; font-weight:700;
       cursor:pointer; transition:color .2s,border-color .2s,background .2s,box-shadow .2s,transform .2s;
     }
     .collection-filter:hover, .collection-filter:focus-visible {
@@ -735,7 +740,7 @@
     .collection-filter[aria-pressed="true"] {
       color:#07151a; border-color:#70e0d0; background:#70e0d0; box-shadow:0 0 16px #70e0d066, inset 0 1px #ffffff88;
     }
-    .collection-filter small { display:block; margin-top:.04rem; font-size:.9em; font-weight:800; opacity:.84; }
+    .collection-filter small { display:block; margin-top:.04rem; font-family:var(--font-jp); font-size:.9em; font-weight:800; opacity:.84; }
     .collection-filter[aria-pressed="true"] small { color:#123d42; opacity:1; }
     .collection-filter:focus-visible { outline:2px solid #a2f0ed; outline-offset:2px; }
     .wanderer-grid {
@@ -758,7 +763,7 @@
     }
     .wanderer-tile.found::after { opacity:.9; }
     .wanderer-index {
-      position:absolute; top:.55rem; right:.65rem; color:#8a80b0; font-family:var(--font-title);
+      position:absolute; top:.55rem; right:.65rem; color:#8a80b0; font-family:var(--font-ui);
       font-size:.54rem; font-weight:700; letter-spacing:.08em;
     }
     .wanderer-tile.found .wanderer-index { color:var(--tile-color,#ffd966); text-shadow:0 0 8px var(--tile-color,#ffd966); }
@@ -770,22 +775,22 @@
     .wanderer-tile:not(.found) .wanderer-portrait { filter:grayscale(1) brightness(.18); opacity:.72; }
     .wanderer-name { min-width:0; }
     .wanderer-name-en {
-      color:#ffffff; font-family:var(--font-title); font-size:.64rem; font-weight:700;
+      color:#ffffff; font-family:var(--font-ui); font-size:.64rem; font-weight:700;
       letter-spacing:.04em; line-height:1.25; overflow-wrap:anywhere;
     }
     .wanderer-tile:not(.found) .wanderer-name-en { color:#8a80b0; }
     .wanderer-state {
-      margin-top:.25rem; color:#8a80b0; font-size:.64rem; font-weight:900; letter-spacing:.08em;
+      margin-top:.25rem; color:#8a80b0; font-family:var(--font-ui); font-size:.64rem; font-weight:700; letter-spacing:.08em;
       text-transform:uppercase;
     }
     .wanderer-tile.found .wanderer-state { color:var(--tile-color,#ffd966); text-shadow:0 0 8px color-mix(in srgb,var(--tile-color,#ffd966) 65%,transparent); }
     .wanderer-comment {
       margin:.72rem 0 0; color:#f0eaff; font-size:.72rem; line-height:1.45; font-weight:800;
     }
-    .wanderer-comment-jp { margin:.3rem 0 0; color:#c4bce0; font-size:.7rem; line-height:1.7; font-weight:800; }
-    .wanderer-comment-jp ruby rt { color:#ffd966; }
+    .wanderer-comment-jp { margin:.3rem 0 0; color:var(--spectral-cyan); font-size:.7rem; line-height:1.7; font-weight:800; text-shadow:0 0 6px rgba(162,240,237,.2); }
+    .wanderer-comment-jp ruby rt { color:var(--spectral-cyan); }
     .wanderer-visits {
-      margin-top:.5rem; color:#c4bce0; font-size:.62rem; font-weight:900; letter-spacing:.04em;
+      margin-top:.5rem; color:var(--mystic-violet); font-family:var(--font-ui); font-size:.62rem; font-weight:700; letter-spacing:.04em;
     }
     .wanderer-tile:not(.found) .wanderer-comment,
     .wanderer-tile:not(.found) .wanderer-comment-jp,
@@ -815,7 +820,7 @@
 
     .sb-icon  { display:flex; align-items:center; justify-content:center; height:1.35rem; color:currentColor; filter:drop-shadow(0 0 6px currentColor); }
     .sb-icon .profile-icon { width:1.25rem; height:1.25rem; }
-    .sb-en    { font-family:var(--font-title); font-size:.58rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color: #ffffff; }
+    .sb-en    { font-family:var(--font-ui); font-size:.58rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color: #ffffff; }
     .sb-jp    { font-size:.74rem; font-weight:800; color: #e8e4ff; }
     .sb-kanji { font-size:.62rem; font-weight:800; color: #c4bce0; }
 
