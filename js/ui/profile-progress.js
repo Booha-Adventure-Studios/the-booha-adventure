@@ -35,9 +35,9 @@
   };
 
   const UNLOCK_META = {
-    first_game:              { icon:'🌟', jp:'さいしょのゲーム', k:'初ゲーム' },
-    any_curriculum_complete: { icon:'🎓', jp:'カリキュラムかんりょう', k:'課程完了' },
-    all_complete:            { icon:'👑', jp:'ぜんぶかんりょう', k:'全完了' },
+    first_game:              { icon:'star', jp:'さいしょのゲーム', k:'初ゲーム' },
+    any_curriculum_complete: { icon:'medal', jp:'カリキュラムかんりょう', k:'課程完了' },
+    all_complete:            { icon:'trophy', jp:'ぜんぶかんりょう', k:'全完了' },
   };
 
   const PROFILE_KANJI_READINGS = {
@@ -74,6 +74,10 @@
     return String(value ?? '').replace(/[&<>"']/g, ch => ({
       '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'
     }[ch]));
+  }
+
+  function profileIcon(name, className = '') {
+    return window.BoohaProfileIcons ? BoohaProfileIcons.svg(name, className) : '';
   }
 
   function starsHTML(n, max = 3) {
@@ -147,10 +151,10 @@
 
     host.innerHTML = `
       <div class="highlight-grid">
-        <div class="highlight-card streak"><div class="highlight-icon">🔥</div><div class="highlight-value">${current}</div><div class="highlight-en">CURRENT STREAK</div><div class="highlight-jp">いまのれんぞく</div></div>
-        <div class="highlight-card longest"><div class="highlight-icon">⚡</div><div class="highlight-value">${longest}</div><div class="highlight-en">LONGEST STREAK</div><div class="highlight-jp">さいこうれんぞく</div></div>
-        <div class="highlight-card best"><div class="highlight-icon">🏅</div><div class="highlight-value">${bestWeek ? bestWeek.score + '%' : '--'}</div><div class="highlight-en">BEST WEEK AVERAGE</div><div class="highlight-jp">ベストしゅうスコア</div></div>
-        <a class="highlight-card wanderers" href="adventure-profile.html" aria-label="View wanderers found"><div class="highlight-icon">👻</div><div class="highlight-value">${found}/${total}</div><div class="highlight-en">WANDERERS FOUND</div><div class="highlight-jp">見つけた<ruby>旅人<rt>たびびと</rt></ruby></div></a>
+        <div class="highlight-card streak"><div class="highlight-icon">${profileIcon('flame')}</div><div class="highlight-value">${current}</div><div class="highlight-en">CURRENT STREAK</div><div class="highlight-jp">いまのれんぞく</div></div>
+        <div class="highlight-card longest"><div class="highlight-icon">${profileIcon('bolt')}</div><div class="highlight-value">${longest}</div><div class="highlight-en">LONGEST STREAK</div><div class="highlight-jp">さいこうれんぞく</div></div>
+        <div class="highlight-card best"><div class="highlight-icon">${profileIcon('medal')}</div><div class="highlight-value">${bestWeek ? bestWeek.score + '%' : '--'}</div><div class="highlight-en">BEST WEEK AVERAGE</div><div class="highlight-jp">ベストしゅうスコア</div></div>
+        <a class="highlight-card wanderers" href="adventure-profile.html" aria-label="View wanderers found"><div class="highlight-icon">${profileIcon('ghost')}</div><div class="highlight-value">${found}/${total}</div><div class="highlight-en">WANDERERS FOUND</div><div class="highlight-jp">見つけた<ruby>旅人<rt>たびびと</rt></ruby></div></a>
       </div>
       <div class="trend-panel"><div class="trend-head"><div class="trend-title">RECENT WEEKS <small>さいきんのしゅう</small></div><div class="trend-title">${trend.length}/8</div></div><div class="trend-strip">${trendMarkup}</div></div>`;
   }
@@ -178,8 +182,8 @@
 
   function uMeta(id) {
     if (UNLOCK_META[id]) return UNLOCK_META[id];
-    if (id.includes('all_complete')) return { icon:'🏆', jp:'チャンピオン', k:'王者' };
-    return { icon:'✅', jp:'クリア', k:'完了' };
+    if (id.includes('all_complete')) return { icon:'trophy', jp:'チャンピオン', k:'王者' };
+    return { icon:'check', jp:'クリア', k:'完了' };
   }
 
   function renderGames() {
@@ -248,7 +252,7 @@
                   <div class="curr-name-jp">${info.jp} <span class="curr-name-k">${furiKanji(info.k)}</span></div>
                 </div>
               </div>
-              <div class="curr-summary"><span class="curr-stars">⭐ ${summary.stars}/${summary.totalStars}</span><span class="acc-chevron">▼</span></div>
+              <div class="curr-summary"><span class="curr-stars">${profileIcon('star')} ${summary.stars}/${summary.totalStars}</span><span class="acc-chevron">▼</span></div>
             </div>
           </button>
           <div class="accordion-body" id="${bodyId}">
@@ -258,7 +262,7 @@
                 ${summary.entries.map(entry => {
                   const gameJP = GAME_JP[entry.id] || { jp: entry.name, k: '' };
                   return `<div class="game-row ${entry.completed ? 'done' : ''}">
-                    <span class="row-chk">${entry.completed ? '✅' : '☐'}</span>
+                    <span class="row-chk">${profileIcon(entry.completed ? 'check' : 'square')}</span>
                     <div class="row-names"><div class="rn-en">${escapeHTML(entry.name)}</div><div class="rn-jp">${escapeHTML(gameJP.jp)}　${furiKanji(gameJP.k)}</div></div>
                     <div class="row-stars">${starsHTML(entry.stars)}</div>
                     <div class="row-sc">${entry.highScore > 0 ? escapeHTML(entry.highScore) : '—'}</div>
@@ -284,7 +288,7 @@
       const chip = document.createElement('div');
       chip.className = `u-chip ${unlock.unlocked ? 'earned' : ''}`;
       chip.innerHTML = `
-        <span class="u-icon">${unlock.unlocked ? meta.icon : '🔒'}</span>
+        <span class="u-icon">${profileIcon(unlock.unlocked ? meta.icon : 'lock')}</span>
         <div class="u-text">
           <div class="u-en">${escapeHTML(unlock.name)}</div>
           <div class="u-jp">${escapeHTML(meta.jp)}　<span class="u-k">${furiKanji(meta.k)}</span></div>

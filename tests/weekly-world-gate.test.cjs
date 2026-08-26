@@ -85,14 +85,14 @@ assert.match(karasukiSource, /params\.get\('from'\) === 'maze'/,
   'Karasuki must preserve the Maze entry route');
 assert.doesNotMatch(karasukiSource, /weeklyCompletedFor\(c\)\s*>=\s*9/,
   'Karasuki must not keep its own copied nine-game rule');
-assert.match(profileSource, /id="world-doors" hidden/,
-  'Output profile doors must be hidden by default');
-assert.match(profileSource, /BoohaUnlockSystem\.isWeeklyWorldGateOpen/,
-  'Output profile doors must consume the shared weekly gate');
-assert.match(profileSource, /href="karasuki\.html\?from=profile"/,
-  'Output profile must provide a Karasuki door when open');
-assert.match(profileSource, /href="utsuroba\.html\?from=profile"/,
-  'Output profile must provide an Utsuroba door when open');
+assert.doesNotMatch(profileSource, /id="world-doors"/,
+  'Output profile should not render a second floating world-door menu');
+assert.doesNotMatch(profileSource, /id="world-door-(karasuki|utsuroba|muenba)"/,
+  'Output profile should keep world navigation in the top profile network');
+assert.match(profileSource, /class="profile-network"/, 
+  'Output profile must keep its compact profile navigation');
+assert.match(profileSource, /id="pnet-muenba" hidden/,
+  'Output profile must keep Muenba gated in the top profile network');
 assert.doesNotMatch(profileSource, /href="juku\.html"/, 
   'Output world doors must not add a Juku route');
 assert.match(profileSource, /booha:weeklyReset/,

@@ -574,7 +574,8 @@
     .game-row:hover { background:#c8b8ff0d; border-color:#c8b8ff16; }
     .game-row.done  { background:#7fffd406; border-color:#7fffd416; }
 
-    .row-chk { font-size:.82rem; text-align:center; line-height:1; }
+    .row-chk { display:flex; align-items:center; justify-content:center; line-height:1; color:var(--glow-teal); }
+    .row-chk .profile-icon { width:.86rem; height:.86rem; }
     .row-names { overflow:hidden; }
     .rn-en {
       font-family:var(--font-title); font-size:.66rem; font-weight:700; letter-spacing:.04em;
@@ -660,7 +661,8 @@
     }
     @keyframes shimmer { 0%{left:-100%} 50%,100%{left:160%} }
 
-    .u-icon  { font-size:1.2rem; flex-shrink:0; }
+    .u-icon  { display:flex; align-items:center; justify-content:center; width:1.4rem; color:var(--glow-amber); flex-shrink:0; }
+    .u-icon .profile-icon { width:1.15rem; height:1.15rem; }
     .u-text  { overflow:hidden; min-width:0; }
     .u-en    { font-family:var(--font-title); font-size:.64rem; font-weight:700; letter-spacing:.05em; color: #ffffff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .u-chip:not(.earned) .u-en { color: #8a80b0; }
@@ -755,7 +757,8 @@
     .spell-btn:hover::before { opacity:1; }
     .spell-btn:active { transform:scale(.97); }
 
-    .sb-icon  { font-size:1.25rem; }
+    .sb-icon  { display:flex; align-items:center; justify-content:center; height:1.35rem; color:currentColor; }
+    .sb-icon .profile-icon { width:1.25rem; height:1.25rem; }
     .sb-en    { font-family:var(--font-title); font-size:.58rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color: #ffffff; }
     .sb-jp    { font-size:.74rem; font-weight:800; color: #e8e4ff; }
     .sb-kanji { font-size:.62rem; font-weight:800; color: #c4bce0; }
@@ -891,31 +894,31 @@
     </div>
     <div class="save-grid">
       <button class="spell-btn sb-moon" id="btn-show-code">
-        <span class="sb-icon">🔑</span>
+        <span class="sb-icon" data-profile-icon="key"></span>
         <span class="sb-en">Memory Code</span>
         <span class="sb-jp">メモリーコード</span>
         <span class="sb-kanji"><ruby>記憶<rt>きおく</rt></ruby><ruby>呪文<rt>じゅもん</rt></ruby></span>
       </button>
       <button class="spell-btn sb-moon" id="btn-enter-code" hidden>
-        <span class="sb-icon">📋</span>
+        <span class="sb-icon" data-profile-icon="clipboard"></span>
         <span class="sb-en">Enter Code</span>
         <span class="sb-jp">コードをいれる</span>
         <span class="sb-kanji"><ruby>呪文<rt>じゅもん</rt></ruby><ruby>入力<rt>にゅうりょく</rt></ruby></span>
       </button>
       <button class="spell-btn sb-teal" id="btn-export">
-        <span class="sb-icon">💾</span>
+        <span class="sb-icon" data-profile-icon="save"></span>
         <span class="sb-en">Export Save</span>
         <span class="sb-jp">セーブをほぞん</span>
         <span class="sb-kanji"><ruby>保存<rt>ほぞん</rt></ruby><ruby>出力<rt>しゅつりょく</rt></ruby></span>
       </button>
       <button class="spell-btn sb-amber" id="btn-import" hidden>
-        <span class="sb-icon">💾</span>
+        <span class="sb-icon" data-profile-icon="save"></span>
         <span class="sb-en">Import Save</span>
         <span class="sb-jp">セーブをよみこむ</span>
         <span class="sb-kanji"><ruby>保存<rt>ほぞん</rt></ruby><ruby>読込<rt>よみこみ</rt></ruby></span>
       </button>
       <button class="spell-btn sb-danger" id="btn-reset" hidden>
-        <span class="sb-icon">🗑</span>
+        <span class="sb-icon" data-profile-icon="trash"></span>
         <span class="sb-en">Reset All</span>
         <span class="sb-jp">ぜんぶリセット</span>
         <span class="sb-kanji"><ruby>全消去<rt>ぜんしょうきょ</rt></ruby></span>
@@ -928,6 +931,7 @@
 
 <!-- Core systems -->
 <script src="./js/utsu-furigana.js"></script>
+<script src="js/ui/profile-icons.js"></script>
 <script src="js/karasuki-wanderer-data.js"></script>
 <script src="js/calendar.js"></script>
 <script src="js/core/adventure-core.js"></script>
