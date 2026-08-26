@@ -17,7 +17,7 @@
   <!-- ═══════════════════════════════════════════════════════ -->
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Cinzel+Decorative:wght@400;700&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
 
   <!-- ═══ TOKEN GATE ════════════════════════════════════════ -->
   <style>
@@ -53,6 +53,10 @@
       color: #3a2c1a;
       padding: 14px 10px 40px;
       -webkit-font-smoothing: antialiased;
+    }
+    rt {
+      font-family:'Zen Maru Gothic','Hiragino Maru Gothic ProN',sans-serif;
+      font-size:.64em; font-weight:700; letter-spacing:0;
     }
 
 
@@ -214,15 +218,16 @@
     .ink-head:first-of-type { margin-top: 4px; }
     .ink-head .jp { font-size: 20px; font-weight: 700; }
     .ink-head .en {
-      font-family: 'Cinzel Decorative', serif;
-      font-size: 10px; letter-spacing: 3px; color: #7a603a;
+      font-family: 'Cinzel', serif;
+      font-size: 11px; font-weight:700; letter-spacing: .16em; color: #5c4728;
+      text-shadow: 0 1px 0 rgba(255,253,242,.8);
     }
 
     /* ═══ Adventure-log module reskin (ink & wax) ═══════════ */
 
     .alog-curr-switcher { margin-bottom: 14px; }
     .alog-curr-switcher-label { display:flex; align-items:baseline; gap:8px; margin:0 2px 7px; }
-    .alog-curr-switcher-en { font-family:'Cinzel Decorative',serif; font-size:9px; letter-spacing:2px; color:#7a603a; }
+    .alog-curr-switcher-en { font-family:'Cinzel',serif; font-size:10px; font-weight:700; letter-spacing:.14em; color:#5c4728; }
     .alog-curr-switcher-jp { font-size:11px; color:#765d36; font-weight:900; }
     .alog-curr-tabs { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
     .alog-curr-tab {
@@ -240,7 +245,7 @@
     }
     .alog-curr-tab-code {
       display:flex; align-items:center; justify-content:center; width:31px; height:31px; flex:0 0 31px;
-      border:1px solid currentColor; border-radius:50%; font-family:'Cinzel Decorative',serif; font-size:9px; font-weight:900;
+      border:1px solid currentColor; border-radius:50%; font-family:'Cinzel',serif; font-size:9px; font-weight:700;
     }
     .alog-curr-tab-copy { display:flex; flex-direction:column; min-width:0; gap:2px; }
     .alog-curr-tab-en { font-size:11px; font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -283,7 +288,7 @@
     }
     .alog-stamp-glyph { font-size: 18px; min-height: 22px; }
     .alog-stamp-label { font-size: 8.5px; letter-spacing: .4px; line-height: 1.15; }
-    .alog-stamp-pct   { font-size: 13px; font-weight: 700; }
+    .alog-stamp-pct   { font-size: 13px; font-weight: 700; font-variant-numeric:tabular-nums; }
 
     .alog-count {
       text-align: center; margin: 14px 0 4px;
@@ -292,7 +297,7 @@
 
     /* ── Weekly progress & score ── */
     .alog-progress { margin: 16px auto 4px; max-width: 440px; text-align: center; }
-    .alog-progress-label { font-size: 19px; font-weight: 900; color: #3a2c1a; }
+    .alog-progress-label { font-size: 19px; font-weight: 900; color: #2f2111; font-variant-numeric:tabular-nums; }
     .alog-bar {
       margin: 8px 0 6px; height: 18px; border-radius: 999px;
       border: 2px solid #8a7048; background: rgba(58,44,26,.08);
@@ -305,8 +310,9 @@
     }
     .alog-bar-fill.full { background: linear-gradient(90deg, #e8b93c, #b8892f); }
     .alog-progress-en {
-      font-family: 'Cinzel Decorative', serif;
-      font-size: 10px; letter-spacing: 2px; color: #7a603a;
+      font-family: 'Cinzel', serif;
+      font-size: 11px; font-weight:700; letter-spacing: .13em; color: #5c4728;
+      text-shadow: 0 1px 0 rgba(255,253,242,.8); font-variant-numeric:tabular-nums;
     }
     .alog-score {
       margin: 14px auto 4px; max-width: 440px; text-align: center;
@@ -314,11 +320,11 @@
       padding: 12px 14px;
       background: radial-gradient(circle at 50% 20%, rgba(232,185,60,.28), rgba(232,185,60,.06) 75%);
     }
-    .alog-score-pct { font-size: 46px; font-weight: 900; color: #8a5a1e;
+    .alog-score-pct { font-size: 46px; font-weight: 900; color: #8a5a1e; font-variant-numeric:tabular-nums;
                       text-shadow: 0 1px 0 rgba(255,245,200,.8); }
     .alog-score-jp  { font-size: 14px; font-weight: 900; color: #5c4626; }
-    .alog-score-en  { font-family: 'Cinzel Decorative', serif;
-                      font-size: 9px; letter-spacing: 2px; color: #7a603a; margin-top: 2px; }
+    .alog-score-en  { font-family: 'Cinzel', serif;
+                      font-size: 10px; font-weight:700; letter-spacing: .13em; color: #5c4728; margin-top: 3px; }
 
     .alog-reference {
       margin: 12px auto 4px; max-width: 440px; padding: 12px 14px;
@@ -328,8 +334,8 @@
       text-align: center;
     }
     .alog-reference-kicker {
-      color: #17508f; font-family: 'Cinzel Decorative', serif;
-      font-size: 9px; letter-spacing: 1.7px; font-weight: 900;
+      color: #17508f; font-family: 'Cinzel', serif;
+      font-size: 10px; letter-spacing: .12em; font-weight: 700;
     }
     .alog-reference-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-top:9px; }
     .alog-reference-stat, .alog-reference-result {
@@ -337,11 +343,11 @@
     }
     .alog-reference-result.above { color:#176d47; background:rgba(92,255,208,.14); }
     .alog-reference-result.below { color:#9a3f32; background:rgba(255,158,181,.15); }
-    .alog-reference-value { color:#17508f; font-size:24px; font-weight:900; line-height:1.05; }
+    .alog-reference-value { color:#17508f; font-size:24px; font-weight:900; line-height:1.05; font-variant-numeric:tabular-nums; }
     .alog-reference-result.above .alog-reference-value { color:#176d47; }
     .alog-reference-result.below .alog-reference-value { color:#9a3f32; }
     .alog-reference-value.muted { color:#765d36; }
-    .alog-reference-label { margin-top:4px; color:#3a2c1a; font-family:'Cinzel Decorative',serif; font-size:8px; line-height:1.35; letter-spacing:.7px; }
+    .alog-reference-label { margin-top:4px; color:#3a2c1a; font-family:'Cinzel',serif; font-size:9px; font-weight:700; line-height:1.35; letter-spacing:.08em; }
     .alog-reference-jp { margin-top:2px; color:#765d36; font-size:11px; font-weight:900; line-height:1.35; }
     .alog-reference-track { position:relative; height:9px; margin:11px 2px 4px; border-radius:99px; background:rgba(58,44,26,.16); overflow:visible; }
     .alog-reference-current { display:block; height:100%; border-radius:99px; background:linear-gradient(90deg,#397fcb,#5cffd0); box-shadow:0 0 8px rgba(92,255,208,.48); }
@@ -360,8 +366,8 @@
       background: rgba(176,52,52,.05);
     }
     .alog-untouched-jp { font-size: 28px; font-weight: 700; }
-    .alog-untouched-en { font-family: 'Cinzel Decorative', serif;
-                         font-size: 10px; letter-spacing: 2px; margin-top: 4px; }
+    .alog-untouched-en { font-family: 'Cinzel', serif;
+                         font-size: 11px; font-weight:700; letter-spacing: .12em; margin-top: 4px; }
 
     /* ── Calendar: hand-ruled grid ── */
     .alog-cal-month { text-align: center; font-size: 18px; color: #5c4626; margin-bottom: 8px; }
@@ -384,7 +390,7 @@
     .alog-cal-cell.empty  { border: none; }
     .alog-cal-num   { line-height: 1.1; }
     .alog-cal-star {
-      font-size: 15px; line-height: 1; color: #d4a017;
+      font-size: 15px; line-height: 1; color: #d4a017; font-variant-numeric:tabular-nums;
       text-shadow: 0 1px 0 rgba(120,80,10,.4);
     }
     .alog-cal-cell.played {
@@ -411,8 +417,8 @@
     }
     .alog-term-jp { color: #3a2c1a; font-size: 21px; font-weight: 900; line-height: 1.35; }
     .alog-term-en {
-      margin-top: 4px; color: #7a603a; font-family: 'Cinzel Decorative', serif;
-      font-size: 9px; letter-spacing: 1.3px; line-height: 1.5;
+      margin-top: 4px; color: #5c4728; font-family: 'Cinzel', serif;
+      font-size: 10px; font-weight:700; letter-spacing: .1em; line-height: 1.5;
     }
     .alog-past-strip { display: flex; gap: 10px; overflow-x: auto; padding: 4px 2px 8px; }
     .alog-past-seal {
@@ -435,7 +441,7 @@
     }
     .alog-past-pct  { font-weight: 700; font-size: 15px; }
     .alog-past-week { font-size: 8px; letter-spacing: 1px; opacity: .85;
-                      font-family: 'Cinzel Decorative', serif; }
+                      font-family: 'Cinzel', serif; font-variant-numeric:tabular-nums; }
     .alog-past-empty { text-align: center; color: #8a7048; padding: 8px; font-size: 15px; }
 
     /* ── Output profile switcher ─────────────────────── */
@@ -510,7 +516,7 @@
     .profile-total-card.stars::after { background:#b8892f; box-shadow:0 0 9px #ffd700; }
     .profile-total-card.recorded::after { background:#2e9b67; box-shadow:0 0 9px #5cffd0; }
     .profile-total-card.alltime::after { background:#7950b5; box-shadow:0 0 9px #c8b8ff; }
-    .profile-total-value { font-family:'Cinzel Decorative',serif; font-size:clamp(1.15rem,5vw,1.8rem); line-height:1.1; margin:3px 0; }
+    .profile-total-value { font-family:'Cinzel Decorative',serif; font-size:clamp(1.15rem,5vw,1.8rem); line-height:1.1; margin:3px 0; font-variant-numeric:tabular-nums; letter-spacing:.02em; }
     .profile-total-card.stars .profile-total-value { color:#8b5c08; text-shadow:0 0 13px #ffd96699; }
     .profile-total-card.recorded .profile-total-value { color:#176d47; text-shadow:0 0 13px #5cffd099; }
     .profile-total-card.alltime .profile-total-value { color:#5b3b91; text-shadow:0 0 13px #c8b8ff99; }
@@ -520,8 +526,8 @@
     .profile-total-card.stars .profile-total-icon { color:#b8892f; filter:drop-shadow(0 0 6px #ffd966); }
     .profile-total-card.recorded .profile-total-icon { color:#2e9b67; filter:drop-shadow(0 0 6px #5cffd0); }
     .profile-total-card.alltime .profile-total-icon { color:#7950b5; filter:drop-shadow(0 0 6px #c8b8ff); }
-    .profile-total-en { font-family:'Cinzel Decorative',serif; font-size:.52rem; letter-spacing:.09em; color:#5d4929; }
-    .profile-total-jp { font-size:.68rem; color:#765d36; font-weight:900; }
+    .profile-total-en { font-family:'Cinzel',serif; font-size:.58rem; font-weight:700; letter-spacing:.12em; color:#4a3821; text-shadow:0 1px 0 rgba(255,253,242,.8); }
+    .profile-total-jp { font-size:.72rem; color:#5c4728; font-weight:900; }
 
     /* ── PROFILE HIGHLIGHTS ──────────────────────── */
     .profile-highlights { margin:0 0 18px; }
@@ -545,13 +551,13 @@
     .highlight-card.wanderers::after { background:#9a55c9; box-shadow:0 0 12px #cc66ff; }
     .highlight-icon { display:flex; justify-content:center; height:1.2rem; line-height:1; }
     .highlight-icon .profile-icon { width:1.1rem; height:1.1rem; }
-    .highlight-value { margin:4px 0 3px; font-family:'Cinzel Decorative',serif; font-size:clamp(1rem,4vw,1.55rem); line-height:1.05; }
+    .highlight-value { margin:4px 0 3px; font-family:'Cinzel Decorative',serif; font-size:clamp(1rem,4vw,1.55rem); line-height:1.05; font-variant-numeric:tabular-nums; }
     .highlight-card.streak .highlight-value { color:#b95817; text-shadow:0 0 13px #ffad5599; }
     .highlight-card.longest .highlight-value { color:#2165a0; text-shadow:0 0 13px #66bbff99; }
     .highlight-card.best .highlight-value { color:#8b5c08; text-shadow:0 0 13px #ffd96699; }
     .highlight-card.wanderers .highlight-value { color:#63358e; text-shadow:0 0 13px #c8b8ff99; }
-    .highlight-en { font-family:'Cinzel Decorative',serif; font-size:.46rem; letter-spacing:.08em; color:#5d4929; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .highlight-jp { margin-top:2px; font-size:.62rem; color:#765d36; font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .highlight-en { font-family:'Cinzel',serif; font-size:.52rem; font-weight:700; letter-spacing:.1em; color:#4a3821; text-shadow:0 1px 0 rgba(255,253,242,.8); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .highlight-jp { margin-top:2px; font-size:.68rem; color:#5c4728; font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .highlight-card.wanderers { cursor:pointer; text-decoration:none; color:inherit; }
     .highlight-card.wanderers:hover { transform:translateY(-2px); box-shadow:0 0 17px #c8b8ff55,inset 0 1px rgba(255,255,255,.4); }
     .highlight-card.wanderers:focus-visible { outline:2px solid #9a55c9; outline-offset:3px; box-shadow:0 0 20px #c8b8ff88,inset 0 1px rgba(255,255,255,.4); }
@@ -572,10 +578,10 @@
     .profile-progress .orb-bc { background:#75d99a; color:#143b25; box-shadow:0 0 13px #5cffd088; }
     .profile-progress .orb-br { background:#70a9f4; color:#10294d; box-shadow:0 0 13px #66bbff88; }
     .profile-progress .orb-pb { background:#c78cf2; color:#35134f; box-shadow:0 0 13px #cc66ff88; }
-    .profile-progress .curr-name-en { font-family:'Cinzel Decorative',serif; font-size:.62rem; letter-spacing:.05em; white-space:nowrap; }
+    .profile-progress .curr-name-en { font-family:'Cinzel',serif; font-size:.68rem; font-weight:700; letter-spacing:.08em; white-space:nowrap; }
     .profile-progress .c-bc { color:#176d47; } .profile-progress .c-br { color:#17508f; } .profile-progress .c-pb { color:#63358e; }
     .profile-progress .curr-name-jp { font-size:.67rem; color:#765d36; font-weight:900; }
-    .profile-progress .curr-name-k { font-size:.58rem; color:#92784d; }
+    .profile-progress .curr-name-k { font-size:.64rem; color:#765d36; font-weight:700; }
     .profile-progress .curr-summary { display:flex; align-items:center; gap:7px; flex-shrink:0; }
     .profile-progress .curr-stars { font-size:.68rem; color:#8b5c08; font-weight:900; white-space:nowrap; }
     .profile-progress .acc-chevron { color:#765d36; font-size:.7rem; transition:transform .25s ease; }
