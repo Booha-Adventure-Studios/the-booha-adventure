@@ -17,7 +17,7 @@
   <!-- ═══════════════════════════════════════════════════════ -->
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Yomogi&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=M+PLUS+Rounded+1c:wght@400;500;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="theme/save-ui.css">
 
     <!-- ═══ TOKEN GATE ════════════════════════════════════════ -->
@@ -35,9 +35,9 @@
   <style>
     :root {
       --ink:         #0a0a12;
-      --void:        #070710;
-      --fog:         #1a1530;
-      --mist:        #241d3f;
+      --void:        #020207;
+      --fog:         #080811;
+      --mist:        #11111d;
       --glow-moon:   #ddd0ff;
       --glow-teal:   #7fffd4;
       --glow-amber:  #ffcc66;
@@ -51,7 +51,7 @@
       --radius:      12px;
       --radius-lg:   20px;
       --font-title:  'Cinzel Decorative', serif;
-      --font-jp:     'Yomogi', cursive;
+      --font-jp:     'M PLUS Rounded 1c', 'Hiragino Maru Gothic ProN', sans-serif;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -64,14 +64,19 @@
       min-height: 100dvh;
       overflow-x: hidden;
     }
+    ruby { ruby-align:center; }
+    rt {
+      font-family: 'M PLUS Rounded 1c', 'Hiragino Maru Gothic ProN', sans-serif;
+      font-size:.58em; font-weight:800; letter-spacing:0;
+    }
 
     /* ── ATMOSPHERE ─────────────────────────────── */
     .bg-cosmos {
       position: fixed; inset: 0; z-index: 0;
       background:
-        radial-gradient(ellipse 60% 40% at 50% 0%,   #1a1060 0%, transparent 70%),
-        radial-gradient(ellipse 80% 60% at 20% 100%,  #0d1a1a 0%, transparent 60%),
-        radial-gradient(ellipse 50% 50% at 80% 80%,   #1a0d20 0%, transparent 60%),
+        radial-gradient(ellipse 48% 32% at 50% 0%,   #111126 0%, transparent 72%),
+        radial-gradient(ellipse 70% 52% at 12% 100%, #071313 0%, transparent 64%),
+        radial-gradient(ellipse 48% 48% at 88% 80%,  #130b1a 0%, transparent 64%),
         var(--void);
     }
 
@@ -254,8 +259,8 @@
 
     /* ── GLASS CARD ──────────────────────────────── */
     .glass {
-      background: linear-gradient(135deg, #1a153088 0%, #0e0b1a99 100%);
-      border: 1px solid #c8b8ff22;
+      background: linear-gradient(135deg, #0d0d1690 0%, #020207c9 100%);
+      border: 1px solid #c8b8ff28;
       border-radius: var(--radius-lg);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
@@ -264,7 +269,7 @@
     .glass::before {
       content: '';
       position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
-      background: linear-gradient(135deg, #c8b8ff08 0%, transparent 55%);
+      background: linear-gradient(135deg, #ffffff09 0%, transparent 55%);
     }
 
     /* ── HEADER ──────────────────────────────────── */
