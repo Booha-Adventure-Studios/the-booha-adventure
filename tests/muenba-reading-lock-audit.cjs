@@ -90,7 +90,8 @@ assert(rhythmSource.includes('CASE_FINAL_PENALTY_ACCURACY_STEP'), 'reading penal
 assert(finalSource.includes('if (index === answerSet.correct) beginCaseRhythm();'), 'correct solve must start the rhythm handoff');
 assert(transitionSource.includes("session.phase = 'case-transition'"), 'rhythm handoff must use a transition phase');
 assert(transitionSource.includes('CASE_RHYTHM_TRANSITION_MS'), 'rhythm handoff must use the short transition timing');
-assert(transitionSource.includes('startRhythmCapture(false)'), 'rhythm must start automatically after the transition');
+assert(transitionSource.includes('scheduleCaseTransition(session)'), 'rhythm handoff must use the owned transition scheduler');
+assert(runtimeSource.includes('startRhythmCapture(false)'), 'rhythm must start automatically after the transition');
 assert(!runtimeSource.includes('renderCaseResolved'), 'old extra resolved/capture screen must stay removed');
 assert(!runtimeSource.includes('muenba-case-capture'), 'the reading lock must not add a second capture button');
 

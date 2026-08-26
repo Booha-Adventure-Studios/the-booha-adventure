@@ -21,7 +21,21 @@ assert(source.includes('box.scrollTop = 0;\n      box.scrollLeft = 0;'),
   'lobby scene replacements must reset to their first line');
 assert(source.includes('captureOverlay.appendChild(box);\n    // Every capture scene is a fresh reading/game card.'),
   'capture scene replacements must reset their scroll container');
-assert(source.includes('box.scrollTop = 0;\n    box.scrollLeft = 0;\n    return box;'),
+assert(source.includes('box.scrollTop = 0;\n    box.scrollLeft = 0;') && source.includes('return box;'),
   'capture cards must start at scroll position zero');
+assert(source.includes('captureOverlay.scrollTop = 0;\n    captureOverlay.scrollLeft = 0;'),
+  'capture scene replacements must also reset the overlay scroll container');
+assert(source.includes("control.focus({ preventScroll: true })"),
+  'capture control focus must not scroll a long popup away from its opening position');
+assert(source.includes('function clearCaseReadGate(session)'),
+  'capture reading timers must have an explicit cancellation boundary');
+assert(source.includes('function scheduleCaseTransition(session)'),
+  'capture transitions must have an owned scheduling boundary');
+assert(source.includes('id = \'muenba-dev-capture-hold\''),
+  'DEV capture popups must expose a screenshot hold control');
+assert(source.includes('Pause timed reading or transition callbacks for screenshots'),
+  'the DEV screenshot control must explain what it pauses');
+assert(source.includes('function setDevCaptureHold(held)'),
+  'DEV screenshot hold must be session-scoped and reversible');
 
 console.log('Muenba popup audit passed: top anchoring, safe-area spacing, scrollability, and scene reset contracts.');
