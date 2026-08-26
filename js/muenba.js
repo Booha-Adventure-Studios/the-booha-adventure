@@ -97,6 +97,9 @@
   const CASE_READ_GATE_MIN_MS = 2000;
   const CASE_READ_GATE_PER_WORD_MS = 240;
   const CASE_READ_GATE_MAX_MS = 6500;
+  const CASE_FINAL_PENALTY_MAX = 2;
+  const CASE_FINAL_PENALTY_ACCURACY_STEP = 5;
+  const CASE_RHYTHM_TRANSITION_MS = 650;
 
   // Pass 8B — first rhythm chart. It is intentionally short and forgiving:
   // no simultaneous notes, holds, combos, or punishment yet. The chart is
@@ -1723,6 +1726,7 @@
       caseDifficulty,
       choiceSeed: `${ghost.id}:${caseDifficulty || 'none'}:${_muenbaTodayKey() || 'session'}:${Math.floor(performance.now())}`,
       caseIndex: 0,
+      casePenaltyCount: 0,
       caseResolved: false,
       phase: caseData && !caseRecordComplete(caseData) ? 'case-intro' : 'ready',
       openedAt: performance.now()
@@ -2097,15 +2101,16 @@
     focusCaptureControl('.muenba-case-choice');
   }
 
-  function renderCaseReview(index = 0) {
+  function renderCaseReview(index = 0, options = {}) {
     if (!captureSession || !captureSession.caseData || !captureOverlay) return;
     const mode = captureSession.caseData[captureSession.caseDifficulty];
     if (!mode || !Array.isArray(mode.clues) || !mode.clues.length) return;
     const lastIndex = mode.clues.length - 1;
     const reviewIndex = Math.max(0, Math.min(lastIndex, Number.isInteger(index) ? index : 0));
     const clue = mode.clues[reviewIndex];
+    const penaltyReview = options.penalty === true;
     captureSession.caseReviewIndex = reviewIndex;
-    captureSession.phase = 'case-review';
+    captureSession.phase = penaltyReview ? 'case-reread' : 'case-review';
 
     const box = captureBox();
     box.classList.add('muenba-case-box', 'muenba-case-review');
@@ -2121,8 +2126,10 @@
 
     renderCaseDirection(
       box,
-      'REVIEW RECORDS',
-      '<ruby>記録<rt>きろく</rt></ruby>を<ruby>見直<rt>みなお</rt></ruby>そう',
+      penaltyReview ? 'READ THIS RECORD AGAIN' : 'REVIEW RECORDS',
+      penaltyReview
+        ? '<ruby>記録<rt>きろく</rt></ruby>をもう<ruby>一度<rt>いちど</rt></ruby><ruby>読<rt>よ</rt></ruby>もう'
+        : '<ruby>記録<rt>きろく</rt></ruby>を<ruby>見直<rt>みなお</rt></ruby>そう',
       'muenba-case-question-instruction'
     );
 
@@ -2145,6 +2152,36 @@
     box.appendChild(record);
     appendCaseGlossary(box, clue.keywords);
 
+    const actions = document.createElement('div');
+    actions.className = 'muenba-case-actions muenba-case-review-actions';
+    if (penaltyReview) {
+      const penaltyCount = Math.max(1, Math.min(CASE_FINAL_PENALTY_MAX, Number(options.penaltyCount) || 1));
+      const penaltyText = options.penaltyApplied === false
+        ? 'The ghost will not grow stronger again. Read this record, then try the case once more.'
+        : `The ghost grew stronger (${penaltyCount} of ${CASE_FINAL_PENALTY_MAX} reading penalties). Read this record, then try the case once more.`;
+      renderCaseDirection(
+        box,
+        penaltyText,
+        options.penaltyApplied === false
+          ? 'これ<ruby>以上<rt>いじょう</rt></ruby>ゴーストは<ruby>強<rt>つよ</rt></ruby>くなりません。この<ruby>記録<rt>きろく</rt></ruby>を<ruby>読<rt>よ</rt></ruby>んでもう<ruby>一度<rt>いちど</rt></ruby><ruby>挑戦<rt>ちょうせん</rt></ruby>しましょう。'
+          : `ゴーストが<ruby>少<rt>すこ</rt></ruby>し<ruby>強<rt>つよ</rt></ruby>くなりました（${penaltyCount} / ${CASE_FINAL_PENALTY_MAX}）。この<ruby>記録<rt>きろく</rt></ruby>を<ruby>読<rt>よ</rt></ruby>んでもう<ruby>一度<rt>いちど</rt></ruby><ruby>挑戦<rt>ちょうせん</rt></ruby>しましょう。`,
+        'muenba-case-review-note muenba-case-penalty-note'
+      );
+      const returnAction = caseActionButton(
+        'Return to final question',
+        '<ruby>質問<rt>しつもん</rt></ruby>に<ruby>戻<rt>もど</rt></ruby>る',
+        'muenba-case-reread-return',
+        () => {
+          if (captureSession && captureSession.phase === 'case-reread') renderCaseQuestion();
+        }
+      );
+      actions.appendChild(returnAction);
+      box.appendChild(actions);
+      captureOverlay.classList.add('open');
+      armCaseReadGate(box, returnAction, clue.text);
+      return;
+    }
+
     renderCaseDirection(
       box,
       'Reviewing is safe. It does not cost a turn or a reward.',
@@ -2152,8 +2189,6 @@
       'muenba-case-review-note'
     );
 
-    const actions = document.createElement('div');
-    actions.className = 'muenba-case-actions muenba-case-review-actions';
     if (reviewIndex > 0) {
       actions.appendChild(caseActionButton(
         'Previous record',
@@ -2258,8 +2293,19 @@
       button.append(number, text);
       button.addEventListener('click', () => {
         if (!captureSession || captureSession.phase !== 'case-question') return;
-        if (index === answerSet.correct) renderCaseResolved();
-        else renderCaseQuestion('That explanation does not fit all three records yet.');
+        if (index === answerSet.correct) beginCaseRhythm();
+        else {
+          const previousPenaltyCount = Math.max(0, Number(captureSession.casePenaltyCount) || 0);
+          const penaltyApplied = previousPenaltyCount < CASE_FINAL_PENALTY_MAX;
+          const penaltyCount = penaltyApplied ? previousPenaltyCount + 1 : CASE_FINAL_PENALTY_MAX;
+          captureSession.casePenaltyCount = penaltyCount;
+          const reviewTargets = Array.isArray(mode.reviewClues) && mode.reviewClues.length
+            ? mode.reviewClues
+            : [mode.clues.length - 1];
+          const targetOffset = Math.min(penaltyCount - 1, reviewTargets.length - 1);
+          const reviewIndex = reviewTargets[targetOffset];
+          renderCaseReview(reviewIndex, { penalty: true, penaltyCount, penaltyApplied });
+        }
       });
       choices.appendChild(button);
     });
@@ -2268,63 +2314,40 @@
     focusCaptureControl('.muenba-case-choice');
   }
 
-  function renderCaseResolved() {
-    if (!captureSession || !captureSession.caseData || !captureOverlay) return;
-    const mode = captureSession.caseData[captureSession.caseDifficulty];
-    captureSession.caseResolved = true;
-    captureSession.phase = 'case-resolved';
+  // Pass 16E: solving the quiet reading section is the reward trigger. Keep a
+  // short visual handoff, then start the existing rhythm session directly so
+  // there is no extra confirmation button between comprehension and play.
+  function beginCaseRhythm() {
+    if (!captureSession || captureSession.phase !== 'case-question') return;
+    const session = captureSession;
+    session.caseResolved = true;
+    session.phase = 'case-transition';
+
     const box = captureBox();
-    box.classList.add('muenba-case-box');
-    captureImage(box, captureSession.ghost);
+    box.classList.add('muenba-case-box', 'muenba-case-rhythm-transition');
+    captureImage(box, session.ghost);
 
     const eyebrow = document.createElement('div');
     eyebrow.className = 'muenba-case-eyebrow';
-    eyebrow.textContent = 'CASE FILE';
+    eyebrow.textContent = 'CASE SOLVED';
     box.appendChild(eyebrow);
-    const eyebrowJp = document.createElement('p');
-    eyebrowJp.className = 'muenba-case-eyebrow-jp';
-    eyebrowJp.innerHTML = '<ruby>事件<rt>じけん</rt></ruby>ファイル';
-    box.appendChild(eyebrowJp);
 
     const h2 = document.createElement('h2');
-    h2.textContent = captureSession.caseData.title;
+    h2.textContent = 'The rhythm begins';
     box.appendChild(h2);
 
     renderCaseDirection(
       box,
-      'READ',
-      '<ruby>読<rt>よ</rt></ruby>んでね',
-      'muenba-case-read-instruction'
+      'You understood the ghost. Now catch its energy.',
+      'ゴーストの<ruby>意味<rt>いみ</rt></ruby>が<ruby>分<rt>わ</rt></ruby>かりました。エネルギーを<ruby>捕<rt>つか</rt></ruby>まえよう。',
+      'muenba-case-rhythm-transition-copy'
     );
 
-    const resolution = document.createElement('p');
-    resolution.className = 'muenba-case-record';
-    resolution.textContent = mode.resolution;
-    box.appendChild(resolution);
-
-    renderCaseDirection(
-      box,
-      'The case is settled. Now begin the energy capture.',
-      '<ruby>事件<rt>じけん</rt></ruby>は<ruby>解決<rt>かいけつ</rt></ruby>しました。<ruby>次<rt>つぎ</rt></ruby>にエネルギーを<ruby>集<rt>あつ</rt></ruby>めましょう。',
-      'muenba-case-resolution-direction'
-    );
-
-    const actions = document.createElement('div');
-    actions.className = 'muenba-case-actions';
-    const captureAction = caseActionButton(
-      'Begin energy capture',
-      'エネルギーを<ruby>集<rt>あつ</rt></ruby>める',
-      'muenba-case-capture',
-      () => {
-        captureSession.phase = 'ready';
-        renderCaptureReady();
-      }
-    );
-    captureAction.classList.add('muenba-gold-action');
-    actions.appendChild(captureAction);
-    box.appendChild(actions);
-    armCaseReadGate(box, captureAction, mode.resolution);
     captureOverlay.classList.add('open');
+    window.setTimeout(() => {
+      if (captureSession !== session || session.phase !== 'case-transition') return;
+      startRhythmCapture(false);
+    }, CASE_RHYTHM_TRANSITION_MS);
   }
 
   function renderCaptureReady() {
@@ -2470,10 +2493,19 @@
           difficultyTier: difficulty.tierIndex,
           difficultyLabel: difficulty.label
         };
+    const readingPenaltyCount = !danger && !practice
+      ? Math.min(CASE_FINAL_PENALTY_MAX, Math.max(0, Number(captureSession.casePenaltyCount) || 0))
+      : 0;
+    const passAccuracy = Math.min(
+      100,
+      config.passAccuracy + readingPenaltyCount * CASE_FINAL_PENALTY_ACCURACY_STEP
+    );
     const startAt = performance.now() + config.countdownMs;
     captureSession.phase = 'countdown';
     captureSession.rhythm = {
       ...config,
+      passAccuracy,
+      readingPenaltyCount,
       chart: normalizeRhythmChart(config.chart),
       lanes: config.lanes.slice(),
       startAt,
@@ -2654,6 +2686,15 @@
       tier.className = 'muenba-rhythm-tier';
       tier.textContent = `Haunting level ${rhythm.difficultyTier + 1} · ${rhythm.difficultyLabel}`;
       box.appendChild(tier);
+    }
+
+    if (!practice && !danger && rhythm.readingPenaltyCount > 0) {
+      renderCaseDirection(
+        box,
+        `The ghost is stronger. Capture target: ${rhythm.passAccuracy}% accuracy.`,
+        `ゴーストが<ruby>強<rt>つよ</rt></ruby>くなりました。<ruby>捕獲<rt>ほかく</rt></ruby>には${rhythm.passAccuracy}%の<ruby>正確<rt>せいかく</rt></ruby>さが<ruby>必要<rt>ひつよう</rt></ruby>です。`,
+        'muenba-rhythm-penalty'
+      );
     }
 
     const status = document.createElement('p');
@@ -3889,6 +3930,19 @@
       .muenba-case-review-note .muenba-case-direction-jp { color:#a8cbbb; }
       .muenba-case-review-actions { margin-top:18px; }
       .muenba-case-review-actions .muenba-case-action { min-width:155px; }
+      .muenba-case-penalty-note { border-color:rgba(219,130,130,.48); background:rgba(125,24,34,.16); box-shadow:0 0 22px rgba(125,24,34,.16); }
+      .muenba-case-penalty-note .muenba-case-direction-en { color:#ffe2df; }
+      .muenba-case-penalty-note .muenba-case-direction-jp { color:#d6b6b1; }
+      .muenba-case-rhythm-transition { border-color:rgba(216,201,139,.82); background:radial-gradient(circle at 50% 12%,rgba(216,201,139,.18),transparent 42%),linear-gradient(145deg,rgba(22,24,13,.98),rgba(5,12,12,.99)); box-shadow:0 24px 80px rgba(0,0,0,.86),0 0 80px rgba(216,201,139,.28),inset 0 0 62px rgba(216,201,139,.08); }
+      .muenba-case-rhythm-transition .muenba-lobby-portrait { width:124px; height:124px; filter:drop-shadow(0 0 28px rgba(216,201,139,.5)); animation:muenbaRhythmRewardPulse 1.1s ease-in-out infinite; }
+      .muenba-case-rhythm-transition h2 { color:#fff5d5; font-size:clamp(1.45rem,4vw,1.9rem); text-shadow:0 0 20px rgba(255,224,102,.28); }
+      .muenba-case-rhythm-transition-copy { border-color:rgba(216,201,139,.5); background:rgba(216,201,139,.08); }
+      .muenba-case-rhythm-transition-copy .muenba-case-direction-en { color:#fff5d5; font-size:1rem; font-weight:700; }
+      .muenba-case-rhythm-transition-copy .muenba-case-direction-jp { color:#d8c98b; }
+      @keyframes muenbaRhythmRewardPulse { 0%,100% { transform:translateY(0) scale(1); } 50% { transform:translateY(-4px) scale(1.035); } }
+      .muenba-rhythm-penalty { margin:12px 0 14px; border-color:rgba(219,130,130,.46); background:rgba(125,24,34,.13); box-shadow:0 0 20px rgba(125,24,34,.16); }
+      .muenba-rhythm-penalty .muenba-case-direction-en { color:#ffe2df; font-size:.82rem; font-weight:700; }
+      .muenba-rhythm-penalty .muenba-case-direction-jp { color:#d6b6b1; }
       .muenba-case-direction ruby, .muenba-case-action ruby { ruby-position:over; line-height:1.45; }
       .muenba-case-direction rt, .muenba-case-action rt { font-size:.78em; opacity:.95; }
       .muenba-case-actions { display:flex; justify-content:center; gap:9px; flex-wrap:wrap; margin-top:6px; }
@@ -4198,6 +4252,7 @@
       .muenba-case-intro,
       .muenba-case-clue,
       .muenba-case-review,
+      .muenba-case-rhythm-transition,
       .muenba-case-resolved,
       .muenba-capture-ready,
       .muenba-capture-result,
@@ -4333,7 +4388,7 @@
         .muenba-nuppi-speech, .muenba-nuppi-mission, .muenba-nuppi-status-card, .muenba-nuppi-success-card, .muenba-nuppi-next-card { padding-left:13px; padding-right:13px; }
       }
       @media (prefers-reduced-motion: reduce) { .muenba-orb-release, .muenba-hunt-ghost-portrait, .muenba-gold-action, .muenba-read-ready { animation:none !important; } }
-      @media (prefers-reduced-motion: reduce) { #muenba-fade, .muenba-return-box, #muenba-return-overlay, .muenba-lobby-box, #muenba-lobby-overlay, #muenba-capture-overlay { transition:none !important; } .muenba-lobby-portrait, #muenba-hide, #muenba-celebration-status, .muenba-rhythm-board, .muenba-rhythm-combo, .muenba-rhythm-result-failure, .muenba-case-question, .muenba-case-question::before, .muenba-case-feedback-shake, .muenba-case-read-status, .muenba-energy-warning { animation:none !important; } .muenba-case-choice, .muenba-case-action, .muenba-capture-action { transition:none !important; } .muenba-rhythm-energy-fill { transition:none !important; } #muenba-profile-link { transition:none !important; } }
+      @media (prefers-reduced-motion: reduce) { #muenba-fade, .muenba-return-box, #muenba-return-overlay, .muenba-lobby-box, #muenba-lobby-overlay, #muenba-capture-overlay { transition:none !important; } .muenba-lobby-portrait, #muenba-hide, #muenba-celebration-status, .muenba-rhythm-board, .muenba-rhythm-combo, .muenba-rhythm-result-failure, .muenba-case-question, .muenba-case-question::before, .muenba-case-feedback-shake, .muenba-case-read-status, .muenba-case-rhythm-transition .muenba-lobby-portrait, .muenba-energy-warning { animation:none !important; } .muenba-case-choice, .muenba-case-action, .muenba-capture-action { transition:none !important; } .muenba-rhythm-energy-fill { transition:none !important; } #muenba-profile-link { transition:none !important; } }
     `;
     document.head.appendChild(style);
   }
