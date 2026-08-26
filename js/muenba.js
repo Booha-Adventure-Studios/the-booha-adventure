@@ -665,6 +665,7 @@
     const cases = DATA.cases && typeof DATA.cases === 'object' ? DATA.cases : {};
     const order = Array.isArray(DATA.caseOrder) ? DATA.caseOrder : [];
     const ghostIds = new Set((DATA.ghosts || []).map(ghost => ghost.id));
+    const checkTypes = new Set(['who', 'what', 'which', 'where', 'when', 'how-many', 'what-happened', 'why', 'meaning']);
     const japanese = /[\u3040-\u30ff\u3400-\u9fff]/;
     const englishOnly = (value, label) => {
       if (typeof value !== 'string' || !value.trim()) errors.push(`${label} must be non-empty text`);
@@ -689,13 +690,55 @@
       for (const modeName of ['start', 'fresh', 'deep']) {
         const mode = caseData[modeName];
         if (!mode || !Array.isArray(mode.clues) || !mode.clues.length) {
-          errors.push(`${caseId}.${modeName} needs at least one clue`);
+          errors.push(`${caseId}.${modeName} needs exactly three clues`);
           continue;
         }
+        if (mode.clues.length !== 3) errors.push(`${caseId}.${modeName} needs exactly three clues`);
         mode.clues.forEach((clue, index) => {
-          englishOnly(clue && clue.title, `${caseId}.${modeName}.clues[${index}].title`);
-          englishOnly(clue && clue.text, `${caseId}.${modeName}.clues[${index}].text`);
+          const clueLabel = `${caseId}.${modeName}.clues[${index}]`;
+          englishOnly(clue && clue.title, `${clueLabel}.title`);
+          englishOnly(clue && clue.text, `${clueLabel}.text`);
+          if (!clue || !Array.isArray(clue.keywords) || !clue.keywords.length) {
+            errors.push(`${clueLabel}.keywords must be a non-empty array`);
+          } else {
+            clue.keywords.forEach((keyword, keywordIndex) => {
+              englishOnly(keyword, `${clueLabel}.keywords[${keywordIndex}]`);
+            });
+          }
+          const check = clue && clue.check;
+          if (!check || typeof check !== 'object') {
+            errors.push(`${clueLabel}.check must be an object`);
+            return;
+          }
+          if (!checkTypes.has(check.type)) errors.push(`${clueLabel}.check.type is not supported`);
+          englishOnly(check.prompt, `${clueLabel}.check.prompt`);
+          if (typeof check.promptJP !== 'string' || !check.promptJP.trim()) {
+            errors.push(`${clueLabel}.check.promptJP must be non-empty text`);
+          }
+          if (!Array.isArray(check.choices) || check.choices.length < 2) {
+            errors.push(`${clueLabel}.check.choices must contain at least two choices`);
+          } else {
+            const choiceKeys = new Set();
+            check.choices.forEach((choice, choiceIndex) => {
+              englishOnly(choice, `${clueLabel}.check.choices[${choiceIndex}]`);
+              const key = typeof choice === 'string' ? choice.trim().toLowerCase() : '';
+              if (key && choiceKeys.has(key)) errors.push(`${clueLabel}.check.choices repeats a choice`);
+              if (key) choiceKeys.add(key);
+            });
+          }
+          if (!Number.isInteger(check.correct) || check.correct < 0 || check.correct >= (check.choices || []).length) {
+            errors.push(`${clueLabel}.check.correct is out of range`);
+          }
         });
+        if (!Array.isArray(mode.reviewClues) || !mode.reviewClues.length) {
+          errors.push(`${caseId}.${modeName}.reviewClues must contain at least one clue index`);
+        } else {
+          mode.reviewClues.forEach((clueIndex, reviewIndex) => {
+            if (!Number.isInteger(clueIndex) || clueIndex < 0 || clueIndex >= mode.clues.length) {
+              errors.push(`${caseId}.${modeName}.reviewClues[${reviewIndex}] is out of range`);
+            }
+          });
+        }
         englishOnly(mode.prompt, `${caseId}.${modeName}.prompt`);
         if (typeof mode.promptJP !== 'string' || !mode.promptJP.trim()) errors.push(`${caseId}.${modeName}.promptJP must be non-empty text`);
         if (!Array.isArray(mode.choices) || !mode.choices.length) errors.push(`${caseId}.${modeName}.choices must be non-empty`);

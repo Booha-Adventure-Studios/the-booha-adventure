@@ -212,10 +212,38 @@
       intro: 'Fuzzle had one job: scare the next visitor. Now Fuzzle cannot remember what the scare was supposed to be.',
       start: {
         clues: [
-          { title: 'The stone', text: 'Fuzzle hid behind a stone.', keywords: ['hid', 'stone'] },
-          { title: 'Three scares', text: 'Fuzzle tried three silly scares.', keywords: ['tried', 'scares'] },
-          { title: 'No choice', text: 'Fuzzle did not choose one.', keywords: ['choose'] }
+          {
+            title: 'The stone', text: 'Fuzzle hid behind a stone.', keywords: ['hid', 'stone'],
+            check: {
+              type: 'who',
+              prompt: 'Who hid behind a stone?',
+              promptJP: '<ruby>石<rt>いし</rt></ruby>の<ruby>後<rt>うし</rt></ruby>ろに<ruby>隠<rt>かく</rt></ruby>れたのは、だれですか？',
+              choices: ['Fuzzle', 'Nuppi', 'Glimmer'],
+              correct: 0
+            }
+          },
+          {
+            title: 'Three scares', text: 'Fuzzle tried three silly scares.', keywords: ['tried', 'scares'],
+            check: {
+              type: 'what',
+              prompt: 'What did Fuzzle try?',
+              promptJP: 'ファズルは、<ruby>何<rt>なに</rt></ruby>を<ruby>試<rt>ため</rt></ruby>しましたか？',
+              choices: ['One quiet song', 'Three silly scares', 'A bright lantern'],
+              correct: 1
+            }
+          },
+          {
+            title: 'No choice', text: 'Fuzzle did not choose one.', keywords: ['choose'],
+            check: {
+              type: 'which',
+              prompt: 'Which scare did Fuzzle choose?',
+              promptJP: 'ファズルは、どの<ruby>驚<rt>おどろ</rt></ruby>かし<ruby>方<rt>かた</rt></ruby>を<ruby>選<rt>えら</rt></ruby>びましたか？',
+              choices: ['The first scare', 'The silly trumpet', 'None of them'],
+              correct: 2
+            }
+          }
         ],
+        reviewClues: [1, 2],
         prompt: 'Why was Fuzzle’s energy confused?',
         promptJP: 'ファズルのエネルギーは、なぜ<ruby>混乱<rt>こんらん</rt></ruby>しましたか？',
         choices: [
@@ -228,10 +256,38 @@
       },
       fresh: {
         clues: [
-          { title: 'One plan', text: 'Fuzzle planned one scare for Nuppi behind a crooked gravestone.', keywords: ['planned', 'gravestone'] },
-          { title: 'Too many scares', text: 'Then Fuzzle practiced a pop, a hiss, and a silly trumpet sound.', keywords: ['practiced', 'hiss'] },
-          { title: 'No ending', text: 'When Nuppi arrived, Fuzzle started all three scares and finished none.', keywords: ['arrived', 'finished'] }
+          {
+            title: 'One plan', text: 'Fuzzle planned one scare for Nuppi behind a crooked gravestone.', keywords: ['planned', 'gravestone'],
+            check: {
+              type: 'where',
+              prompt: 'Where did Fuzzle plan the scare?',
+              promptJP: 'ファズルは、どこで<ruby>驚<rt>おどろ</rt></ruby>かす<ruby>計画<rt>けいかく</rt></ruby>を<ruby>立<rt>た</rt></ruby>てましたか？',
+              choices: ['Behind a crooked gravestone', 'Beside a bright river', 'Inside Nuppi’s house'],
+              correct: 0
+            }
+          },
+          {
+            title: 'Too many scares', text: 'Then Fuzzle practiced a pop, a hiss, and a silly trumpet sound.', keywords: ['practiced', 'hiss'],
+            check: {
+              type: 'what',
+              prompt: 'What sounds did Fuzzle practice?',
+              promptJP: 'ファズルは、どんな<ruby>音<rt>おと</rt></ruby>を<ruby>練習<rt>れんしゅう</rt></ruby>しましたか？',
+              choices: ['A pop, a hiss, and a silly trumpet', 'A bell, a drum, and a whistle', 'One long quiet breath'],
+              correct: 0
+            }
+          },
+          {
+            title: 'No ending', text: 'When Nuppi arrived, Fuzzle started all three scares and finished none.', keywords: ['arrived', 'finished'],
+            check: {
+              type: 'what-happened',
+              prompt: 'What happened when Nuppi arrived?',
+              promptJP: 'ヌッピが<ruby>来<rt>き</rt></ruby>たとき、<ruby>何<rt>なに</rt></ruby>が<ruby>起<rt>お</rt></ruby>きましたか？',
+              choices: ['Fuzzle started all three scares but finished none.', 'Fuzzle chose one scare and finished it.', 'Fuzzle went home before Nuppi arrived.'],
+              correct: 0
+            }
+          }
         ],
+        reviewClues: [1, 2],
         prompt: 'What caused Fuzzle’s energy to tangle?',
         promptJP: '<ruby>何<rt>なに</rt></ruby>がファズルのエネルギーを<ruby>絡<rt>から</rt></ruby>ませましたか？',
         choices: [
@@ -244,10 +300,38 @@
       },
       deep: {
         clues: [
-          { title: 'A careful plan', text: 'Fuzzle stood behind a crooked gravestone and prepared one fright for Nuppi.', keywords: ['prepared', 'fright'] },
-          { title: 'Three beginnings', text: 'The plan grew into three different scares, but each one stopped before the ending.', keywords: ['grew', 'stopped'] },
-          { title: 'A divided energy', text: 'When Nuppi arrived, Fuzzle’s energy pulled in three directions and no scare could finish.', keywords: ['pulled', 'directions'] }
+          {
+            title: 'A careful plan', text: 'Fuzzle stood behind a crooked gravestone and prepared one fright for Nuppi.', keywords: ['prepared', 'fright'],
+            check: {
+              type: 'who',
+              prompt: 'Who was Fuzzle’s planned fright for?',
+              promptJP: 'ファズルが<ruby>計画<rt>けいかく</rt></ruby>した<ruby>驚<rt>おどろ</rt></ruby>かしは、だれのためでしたか？',
+              choices: ['Nuppi', 'Glimmer', 'The cemetery keeper'],
+              correct: 0
+            }
+          },
+          {
+            title: 'Three beginnings', text: 'The plan grew into three different scares, but each one stopped before the ending.', keywords: ['grew', 'stopped'],
+            check: {
+              type: 'what-happened',
+              prompt: 'What happened to Fuzzle’s one plan?',
+              promptJP: 'ファズルのひとつの<ruby>計画<rt>けいかく</rt></ruby>は、どうなりましたか？',
+              choices: ['It grew into three scares that stopped before the ending.', 'It became one perfect scare.', 'It disappeared behind the gravestone.'],
+              correct: 0
+            }
+          },
+          {
+            title: 'A divided energy', text: 'When Nuppi arrived, Fuzzle’s energy pulled in three directions and no scare could finish.', keywords: ['pulled', 'directions'],
+            check: {
+              type: 'why',
+              prompt: 'Why could none of the scares finish?',
+              promptJP: 'なぜ、どの<ruby>驚<rt>おどろ</rt></ruby>かしも<ruby>終<rt>お</rt></ruby>わりませんでしたか？',
+              choices: ['Fuzzle’s energy pulled in three directions.', 'The gravestone blocked every sound.', 'Nuppi arrived too quietly.'],
+              correct: 0
+            }
+          }
         ],
+        reviewClues: [1, 2],
         prompt: 'What does the evidence tell us about Fuzzle’s energy?',
         promptJP: 'この<ruby>証拠<rt>しょうこ</rt></ruby>に<ruby>一番<rt>いちばん</rt></ruby>よく<ruby>合<rt>あ</rt></ruby>う<ruby>説明<rt>せつめい</rt></ruby>はどれですか？',
         choices: [
@@ -267,10 +351,38 @@
       intro: 'Glimmer wanted one perfect sparkle. After polishing it all night, Glimmer could not stop chasing every reflection it made.',
       start: {
         clues: [
-          { title: 'One small spark', text: 'Glimmer held one small spark.', keywords: ['held', 'spark'] },
-          { title: 'Lights on things', text: 'The spark shone on leaves and stones.', keywords: ['shone', 'leaves'] },
-          { title: 'Too many lights', text: 'Glimmer chased every light it saw.', keywords: ['chased'] }
+          {
+            title: 'One small spark', text: 'Glimmer held one small spark.', keywords: ['held', 'spark'],
+            check: {
+              type: 'who',
+              prompt: 'Who held the small spark?',
+              promptJP: '小さな<ruby>光<rt>ひかり</rt></ruby>を<ruby>持<rt>も</rt></ruby>っていたのは、だれですか？',
+              choices: ['Glimmer', 'Fuzzle', 'Nuppi'],
+              correct: 0
+            }
+          },
+          {
+            title: 'Lights on things', text: 'The spark shone on leaves and stones.', keywords: ['shone', 'leaves'],
+            check: {
+              type: 'where',
+              prompt: 'Where did the spark shine?',
+              promptJP: 'その<ruby>光<rt>ひかり</rt></ruby>は、どこで<ruby>輝<rt>かがや</rt></ruby>きましたか？',
+              choices: ['On leaves and stones', 'Under the river', 'Inside a pocket'],
+              correct: 0
+            }
+          },
+          {
+            title: 'Too many lights', text: 'Glimmer chased every light it saw.', keywords: ['chased'],
+            check: {
+              type: 'what',
+              prompt: 'What did Glimmer chase?',
+              promptJP: 'グリマーは、<ruby>何<rt>なに</rt></ruby>を<ruby>追<rt>お</rt></ruby>いかけましたか？',
+              choices: ['Every light it saw', 'Only the first spark', 'A dark stone'],
+              correct: 0
+            }
+          }
         ],
+        reviewClues: [1, 2],
         prompt: 'Why was Glimmer’s energy confused?',
         promptJP: 'グリマーのエネルギーは、なぜ<ruby>混乱<rt>こんらん</rt></ruby>しましたか？',
         choices: [
@@ -283,10 +395,38 @@
       },
       fresh: {
         clues: [
-          { title: 'The first spark', text: 'Glimmer balanced one pale spark on a gravestone and wanted it to shine.', keywords: ['balanced', 'shine'] },
-          { title: 'The shiny trail', text: 'Glimmer polished the spark against leaves, bells, and every shiny pebble nearby.', keywords: ['polished', 'pebble'] },
-          { title: 'The long chase', text: 'Each reflection looked like a new spark, so Glimmer chased one after another.', keywords: ['reflection', 'chased'] }
+          {
+            title: 'The first spark', text: 'Glimmer balanced one pale spark on a gravestone and wanted it to shine.', keywords: ['balanced', 'shine'],
+            check: {
+              type: 'which',
+              prompt: 'Which spark did Glimmer want to shine?',
+              promptJP: 'グリマーが<ruby>輝<rt>かがや</rt></ruby>かせたかったのは、どの<ruby>光<rt>ひかり</rt></ruby>ですか？',
+              choices: ['One pale spark', 'Every reflection', 'A firefly’s light'],
+              correct: 0
+            }
+          },
+          {
+            title: 'The shiny trail', text: 'Glimmer polished the spark against leaves, bells, and every shiny pebble nearby.', keywords: ['polished', 'pebble'],
+            check: {
+              type: 'what',
+              prompt: 'What did Glimmer polish the spark against?',
+              promptJP: 'グリマーは、<ruby>何<rt>なに</rt></ruby>に<ruby>光<rt>ひかり</rt></ruby>をこすって<ruby>磨<rt>みが</rt></ruby>きましたか？',
+              choices: ['Leaves, bells, and shiny pebbles', 'Only one gravestone', 'Wet paths and tree roots'],
+              correct: 0
+            }
+          },
+          {
+            title: 'The long chase', text: 'Each reflection looked like a new spark, so Glimmer chased one after another.', keywords: ['reflection', 'chased'],
+            check: {
+              type: 'why',
+              prompt: 'Why did Glimmer chase one light after another?',
+              promptJP: 'なぜグリマーは、<ruby>次々<rt>つぎつぎ</rt></ruby>に<ruby>光<rt>ひかり</rt></ruby>を<ruby>追<rt>お</rt></ruby>いかけましたか？',
+              choices: ['Each reflection looked like a new spark.', 'The first spark went out at once.', 'Nuppi told Glimmer to run.'],
+              correct: 0
+            }
+          }
         ],
+        reviewClues: [1, 2],
         prompt: 'Why did Glimmer keep chasing?',
         promptJP: 'グリマーのエネルギーは<ruby>何<rt>なに</rt></ruby>で<ruby>散<rt>ち</rt></ruby>らばりましたか？',
         choices: [
@@ -299,10 +439,38 @@
       },
       deep: {
         clues: [
-          { title: 'A careful display', text: 'Glimmer prepared one pale spark and promised to make it the finest light in Muenba.', keywords: ['prepared', 'promised'] },
-          { title: 'More shine, more trouble', text: 'Every polished surface made another reflection, and Glimmer treated each one like a new prize.', keywords: ['surface', 'prize'] },
-          { title: 'An everywhere ghost', text: 'By the time Nuppi arrived, Glimmer’s energy had spread across the cemetery, following a shine that could never end.', keywords: ['spread', 'following'] }
+          {
+            title: 'A careful display', text: 'Glimmer prepared one pale spark and promised to make it the finest light in Muenba.', keywords: ['prepared', 'promised'],
+            check: {
+              type: 'what',
+              prompt: 'What did Glimmer promise to make the finest light in Muenba?',
+              promptJP: 'グリマーは、<ruby>何<rt>なに</rt></ruby>をムエンバで<ruby>一番<rt>いちばん</rt></ruby>きれいな<ruby>光<rt>ひかり</rt></ruby>にすると<ruby>約束<rt>やくそく</rt></ruby>しましたか？',
+              choices: ['One pale spark', 'Every gravestone', 'A new lantern'],
+              correct: 0
+            }
+          },
+          {
+            title: 'More shine, more trouble', text: 'Every polished surface made another reflection, and Glimmer treated each one like a new prize.', keywords: ['surface', 'prize'],
+            check: {
+              type: 'what-happened',
+              prompt: 'What did every polished surface make?',
+              promptJP: 'すべての<ruby>磨<rt>みが</rt></ruby>かれた<ruby>表面<rt>ひょうめん</rt></ruby>は、<ruby>何<rt>なに</rt></ruby>を<ruby>作<rt>つく</rt></ruby>りましたか？',
+              choices: ['Another reflection', 'A darker forest', 'A second cemetery'],
+              correct: 0
+            }
+          },
+          {
+            title: 'An everywhere ghost', text: 'By the time Nuppi arrived, Glimmer’s energy had spread across the cemetery, following a shine that could never end.', keywords: ['spread', 'following'],
+            check: {
+              type: 'meaning',
+              prompt: 'What does “a shine that could never end” mean here?',
+              promptJP: 'ここで「<ruby>終<rt>お</rt></ruby>わらない<ruby>輝<rt>かがや</rt></ruby>き」は、どんな<ruby>意味<rt>いみ</rt></ruby>ですか？',
+              choices: ['Glimmer kept following new reflections.', 'The original spark became dark.', 'The cemetery lights turned off.'],
+              correct: 0
+            }
+          }
         ],
+        reviewClues: [1, 2],
         prompt: 'What can we infer from Glimmer’s endless chase?',
         promptJP: 'グリマーの<ruby>終<rt>お</rt></ruby>わらない<ruby>追<rt>お</rt></ruby>いかけから、<ruby>何<rt>なに</rt></ruby>が<ruby>分<rt>わ</rt></ruby>かりますか？',
         choices: [
@@ -322,10 +490,38 @@
       intro: 'Nibsy collected tiny noises from every corner of Muenba. Now the sounds have mixed together, and Nibsy cannot remember which one belongs to which place.',
       start: {
         clues: [
-          { title: 'Three sounds', text: 'Nibsy had a pebble sound, a leaf sound, and a faraway sound.', keywords: ['pebble', 'faraway'] },
-          { title: 'Labels gone', text: 'Each sound lost its label.', keywords: ['lost', 'label'] },
-          { title: 'Wrong places', text: 'Nibsy put the sounds in the wrong places.', keywords: ['wrong', 'places'] }
+          {
+            title: 'Three sounds', text: 'Nibsy had a pebble sound, a leaf sound, and a faraway sound.', keywords: ['pebble', 'faraway'],
+            check: {
+              type: 'which',
+              prompt: 'Which sounds did Nibsy have?',
+              promptJP: 'ニブシーが<ruby>持<rt>も</rt></ruby>っていたのは、どんな<ruby>音<rt>おと</rt></ruby>ですか？',
+              choices: ['A pebble sound, a leaf sound, and a faraway sound', 'A bell sound and two drum sounds', 'Only one quiet sound'],
+              correct: 0
+            }
+          },
+          {
+            title: 'Labels gone', text: 'Each sound lost its label.', keywords: ['lost', 'label'],
+            check: {
+              type: 'what-happened',
+              prompt: 'What happened to each sound’s label?',
+              promptJP: 'それぞれの<ruby>音<rt>おと</rt></ruby>のラベルは、どうなりましたか？',
+              choices: ['It was lost.', 'It became louder.', 'It moved to a stone.'],
+              correct: 0
+            }
+          },
+          {
+            title: 'Wrong places', text: 'Nibsy put the sounds in the wrong places.', keywords: ['wrong', 'places'],
+            check: {
+              type: 'what',
+              prompt: 'Where did Nibsy put the sounds?',
+              promptJP: 'ニブシーは、<ruby>音<rt>おと</rt></ruby>をどこに<ruby>置<rt>お</rt></ruby>きましたか？',
+              choices: ['In the wrong places', 'Back where they belonged', 'Inside the lanterns'],
+              correct: 0
+            }
+          }
         ],
+        reviewClues: [1, 2],
         prompt: 'Why was Nibsy’s energy confused?',
         promptJP: 'ニブシーのエネルギーは、なぜ<ruby>混乱<rt>こんらん</rt></ruby>しましたか？',
         choices: [
@@ -338,10 +534,38 @@
       },
       fresh: {
         clues: [
-          { title: 'Three pocket sounds', text: 'Nibsy carried a pebble plink, a leaf scritch, and a distant puff in one pocket.', keywords: ['carried', 'pocket'] },
-          { title: 'A missing label', text: 'The labels fell off, so Nibsy guessed where each sound had come from.', keywords: ['labels', 'guessed'] },
-          { title: 'One loud answer', text: 'When Nuppi asked for one sound, all three noises answered together.', keywords: ['asked', 'together'] }
+          {
+            title: 'Three pocket sounds', text: 'Nibsy carried a pebble plink, a leaf scritch, and a distant puff in one pocket.', keywords: ['carried', 'pocket'],
+            check: {
+              type: 'what',
+              prompt: 'What did Nibsy carry in one pocket?',
+              promptJP: 'ニブシーは、ひとつのポケットに<ruby>何<rt>なに</rt></ruby>を<ruby>入<rt>い</rt></ruby>れていましたか？',
+              choices: ['A pebble plink, a leaf scritch, and a distant puff', 'Three bright sparks', 'One bell and two lanterns'],
+              correct: 0
+            }
+          },
+          {
+            title: 'A missing label', text: 'The labels fell off, so Nibsy guessed where each sound had come from.', keywords: ['labels', 'guessed'],
+            check: {
+              type: 'why',
+              prompt: 'Why did Nibsy guess where the sounds came from?',
+              promptJP: 'なぜニブシーは、<ruby>音<rt>おと</rt></ruby>がどこから<ruby>来<rt>き</rt></ruby>たか<ruby>推測<rt>すいそく</rt></ruby>しましたか？',
+              choices: ['The labels had fallen off.', 'The sounds were too quiet to hear.', 'Nuppi moved the sounds.'],
+              correct: 0
+            }
+          },
+          {
+            title: 'One loud answer', text: 'When Nuppi asked for one sound, all three noises answered together.', keywords: ['asked', 'together'],
+            check: {
+              type: 'what-happened',
+              prompt: 'What happened when Nuppi asked for one sound?',
+              promptJP: 'ヌッピがひとつの<ruby>音<rt>おと</rt></ruby>を<ruby>聞<rt>き</rt></ruby>いたとき、<ruby>何<rt>なに</rt></ruby>が<ruby>起<rt>お</rt></ruby>きましたか？',
+              choices: ['All three noises answered together.', 'Only the pebble answered.', 'The pocket became silent.'],
+              correct: 0
+            }
+          }
         ],
+        reviewClues: [1, 2],
         prompt: 'Why did the sounds tangle Nibsy’s energy?',
         promptJP: 'ニブシーのエネルギーは<ruby>何<rt>なに</rt></ruby>で<ruby>絡<rt>から</rt></ruby>まりましたか？',
         choices: [
@@ -354,10 +578,38 @@
       },
       deep: {
         clues: [
-          { title: 'Three treasures', text: 'Nibsy recorded a pebble’s plink, a leaf’s scritch, and a faraway puff as three separate treasures.', keywords: ['recorded', 'treasures'] },
-          { title: 'A quick guess', text: 'When the labels disappeared, Nibsy assigned each sound by memory and quietly swapped all three.', keywords: ['assigned', 'swapped'] },
-          { title: 'The problem', text: 'The pocket could not agree with itself: every sound insisted it belonged somewhere else.', keywords: ['insisted', 'belonged'] }
+          {
+            title: 'Three treasures', text: 'Nibsy recorded a pebble’s plink, a leaf’s scritch, and a faraway puff as three separate treasures.', keywords: ['recorded', 'treasures'],
+            check: {
+              type: 'which',
+              prompt: 'Which three sounds did Nibsy record?',
+              promptJP: 'ニブシーが<ruby>記録<rt>きろく</rt></ruby>したのは、どの3つの<ruby>音<rt>おと</rt></ruby>ですか？',
+              choices: ['A pebble’s plink, a leaf’s scritch, and a faraway puff', 'Three bell rings from one tower', 'A footstep, a shout, and a door slam'],
+              correct: 0
+            }
+          },
+          {
+            title: 'A quick guess', text: 'When the labels disappeared, Nibsy assigned each sound by memory and quietly swapped all three.', keywords: ['assigned', 'swapped'],
+            check: {
+              type: 'what-happened',
+              prompt: 'What did Nibsy do after the labels disappeared?',
+              promptJP: 'ラベルが<ruby>消<rt>き</rt></ruby>えたあと、ニブシーは<ruby>何<rt>なに</rt></ruby>をしましたか？',
+              choices: ['Nibsy assigned the sounds by memory and swapped all three.', 'Nibsy threw all the sounds away.', 'Nibsy made three new labels.'],
+              correct: 0
+            }
+          },
+          {
+            title: 'The problem', text: 'The pocket could not agree with itself: every sound insisted it belonged somewhere else.', keywords: ['insisted', 'belonged'],
+            check: {
+              type: 'meaning',
+              prompt: 'What does it mean that every sound “belonged somewhere else”?',
+              promptJP: 'すべての<ruby>音<rt>おと</rt></ruby>が「ほかの<ruby>場所<rt>ばしょ</rt></ruby>にある」とは、どんな<ruby>意味<rt>いみ</rt></ruby>ですか？',
+              choices: ['The sounds were mixed up with the wrong places.', 'The sounds wanted to leave Muenba.', 'The pocket had no room left.'],
+              correct: 0
+            }
+          }
         ],
+        reviewClues: [1, 2],
         prompt: 'What does the mixed-up pocket tell us?',
         promptJP: '混ざったポケットから、<ruby>何<rt>なに</rt></ruby>が<ruby>分<rt>わ</rt></ruby>かりますか？',
         choices: [
@@ -377,10 +629,38 @@
       intro: 'Tinkley prepared an invisible bell for a grand entrance. The bell kept ringing before the entrance happened, and the moment never felt right.',
       start: {
         clues: [
-          { title: 'A hidden bell', text: 'Tinkley had a bell that nobody could see.', keywords: ['nobody', 'bell'] },
-          { title: 'Too soon', text: 'The bell rang before Nuppi came.', keywords: ['rang', 'before'] },
-          { title: 'Three rings', text: 'The bell rang three times too soon.', keywords: ['times', 'soon'] }
+          {
+            title: 'A hidden bell', text: 'Tinkley had a bell that nobody could see.', keywords: ['nobody', 'bell'],
+            check: {
+              type: 'what',
+              prompt: 'What did Tinkley have?',
+              promptJP: 'ティンクリーは、<ruby>何<rt>なに</rt></ruby>を<ruby>持<rt>も</rt></ruby>っていましたか？',
+              choices: ['A bell nobody could see', 'A lantern everyone could see', 'A pocket full of stones'],
+              correct: 0
+            }
+          },
+          {
+            title: 'Too soon', text: 'The bell rang before Nuppi came.', keywords: ['rang', 'before'],
+            check: {
+              type: 'what-happened',
+              prompt: 'What happened before Nuppi came?',
+              promptJP: 'ヌッピが<ruby>来<rt>き</rt></ruby>る<ruby>前<rt>まえ</rt></ruby>に、<ruby>何<rt>なに</rt></ruby>が<ruby>起<rt>お</rt></ruby>きましたか？',
+              choices: ['The bell rang.', 'The bell disappeared.', 'Tinkley left the cemetery.'],
+              correct: 0
+            }
+          },
+          {
+            title: 'Three rings', text: 'The bell rang three times too soon.', keywords: ['times', 'soon'],
+            check: {
+              type: 'how-many',
+              prompt: 'How many times did the bell ring too soon?',
+              promptJP: 'ベルは、<ruby>何回<rt>なんかい</rt></ruby>早く<ruby>鳴<rt>な</rt></ruby>りましたか？',
+              choices: ['Once', 'Three times', 'Five times'],
+              correct: 1
+            }
+          }
         ],
+        reviewClues: [1, 2],
         prompt: 'Why was Tinkley’s energy confused?',
         promptJP: 'ティンクリーのエネルギーは、なぜ<ruby>混乱<rt>こんらん</rt></ruby>しましたか？',
         choices: [
@@ -393,10 +673,38 @@
       },
       fresh: {
         clues: [
-          { title: 'The hidden bell', text: 'Tinkley held both hands around a bell that nobody else could see.', keywords: ['held', 'hands'] },
-          { title: 'Practice rings', text: 'The bell rang while Tinkley practiced, waited, and even yawned.', keywords: ['practiced', 'yawned'] },
-          { title: 'The missed moment', text: 'When Nuppi finally arrived, the bell had already announced him three times.', keywords: ['finally', 'announced'] }
+          {
+            title: 'The hidden bell', text: 'Tinkley held both hands around a bell that nobody else could see.', keywords: ['held', 'hands'],
+            check: {
+              type: 'who',
+              prompt: 'Who could not see Tinkley’s bell?',
+              promptJP: 'ティンクリーのベルを<ruby>見<rt>み</rt></ruby>られなかったのは、だれですか？',
+              choices: ['Everyone else', 'Only Tinkley', 'The cemetery trees'],
+              correct: 0
+            }
+          },
+          {
+            title: 'Practice rings', text: 'The bell rang while Tinkley practiced, waited, and even yawned.', keywords: ['practiced', 'yawned'],
+            check: {
+              type: 'when',
+              prompt: 'When did the bell ring?',
+              promptJP: 'ベルは、いつ<ruby>鳴<rt>な</rt></ruby>りましたか？',
+              choices: ['While Tinkley practiced, waited, and yawned', 'Only after Nuppi arrived', 'While the cemetery was silent'],
+              correct: 0
+            }
+          },
+          {
+            title: 'The missed moment', text: 'When Nuppi finally arrived, the bell had already announced him three times.', keywords: ['finally', 'announced'],
+            check: {
+              type: 'what-happened',
+              prompt: 'What had already happened when Nuppi arrived?',
+              promptJP: 'ヌッピが<ruby>来<rt>き</rt></ruby>たとき、すでに<ruby>何<rt>なに</rt></ruby>が<ruby>起<rt>お</rt></ruby>きていましたか？',
+              choices: ['The bell had announced him three times.', 'The bell had vanished.', 'Tinkley had gone to sleep.'],
+              correct: 0
+            }
+          }
         ],
+        reviewClues: [1, 2],
         prompt: 'Why did Tinkley’s energy stay tangled?',
         promptJP: 'ティンクリーのエネルギーは<ruby>何<rt>なに</rt></ruby>で<ruby>絡<rt>から</rt></ruby>まりましたか？',
         choices: [
@@ -409,10 +717,38 @@
       },
       deep: {
         clues: [
-          { title: 'A perfect announcement', text: 'Tinkley planned one bright chime to mark Nuppi’s arrival in the cemetery.', keywords: ['planned', 'chime'] },
-          { title: 'Practice without an ending', text: 'Tinkley rehearsed the chime before the footsteps, during the footsteps, and after the footsteps.', keywords: ['rehearsed', 'footsteps'] },
-          { title: 'A ceremony with no center', text: 'By the time Nuppi arrived, the bell had made every moment feel like the important one.', keywords: ['arrived', 'important'] }
+          {
+            title: 'A perfect announcement', text: 'Tinkley planned one bright chime to mark Nuppi’s arrival in the cemetery.', keywords: ['planned', 'chime'],
+            check: {
+              type: 'why',
+              prompt: 'Why did Tinkley plan one bright chime?',
+              promptJP: 'なぜティンクリーは、ひとつの<ruby>明<rt>あか</rt></ruby>るい<ruby>音<rt>おと</rt></ruby>を<ruby>計画<rt>けいかく</rt></ruby>しましたか？',
+              choices: ['To mark Nuppi’s arrival', 'To wake the cemetery trees', 'To hide the footsteps'],
+              correct: 0
+            }
+          },
+          {
+            title: 'Practice without an ending', text: 'Tinkley rehearsed the chime before the footsteps, during the footsteps, and after the footsteps.', keywords: ['rehearsed', 'footsteps'],
+            check: {
+              type: 'when',
+              prompt: 'When did Tinkley rehearse the chime?',
+              promptJP: 'ティンクリーは、いつその<ruby>音<rt>おと</rt></ruby>を<ruby>練習<rt>れんしゅう</rt></ruby>しましたか？',
+              choices: ['Before, during, and after the footsteps', 'Only before the footsteps', 'Only after Nuppi arrived'],
+              correct: 0
+            }
+          },
+          {
+            title: 'A ceremony with no center', text: 'By the time Nuppi arrived, the bell had made every moment feel like the important one.', keywords: ['arrived', 'important'],
+            check: {
+              type: 'meaning',
+              prompt: 'What does “every moment” show about the bell?',
+              promptJP: '「すべての<ruby>瞬間<rt>しゅんかん</rt></ruby>」は、ベルについて<ruby>何<rt>なに</rt></ruby>を<ruby>示<rt>しめ</rt></ruby>していますか？',
+              choices: ['It rang so often that no true moment stood out.', 'It rang exactly once at the right time.', 'It never rang near Nuppi.'],
+              correct: 0
+            }
+          }
         ],
+        reviewClues: [1, 2],
         prompt: 'What does the repeated ringing show?',
         promptJP: '<ruby>何度<rt>なんど</rt></ruby>も<ruby>鳴<rt>な</rt></ruby>るベルは、<ruby>何<rt>なに</rt></ruby>を<ruby>示<rt>しめ</rt></ruby>していますか？',
         choices: [
@@ -432,10 +768,38 @@
       intro: 'Twiddle found two possible paths through the cemetery. Every time a choice felt serious, Twiddle turned around and started the decision again.',
       start: {
         clues: [
-          { title: 'Two paths', text: 'Twiddle saw a crooked path and a mossy path.', keywords: ['crooked', 'mossy'] },
-          { title: 'One choice', text: 'Twiddle picked the crooked path.', keywords: ['picked'] },
-          { title: 'Turn back', text: 'Twiddle changed its mind and walked back.', keywords: ['changed', 'walked'] }
+          {
+            title: 'Two paths', text: 'Twiddle saw a crooked path and a mossy path.', keywords: ['crooked', 'mossy'],
+            check: {
+              type: 'which',
+              prompt: 'Which paths did Twiddle see?',
+              promptJP: 'トゥイドルが<ruby>見<rt>み</rt></ruby>たのは、どの<ruby>道<rt>みち</rt></ruby>ですか？',
+              choices: ['A crooked path and a mossy path', 'A sunny road and a dark tunnel', 'A stone bridge and a river path'],
+              correct: 0
+            }
+          },
+          {
+            title: 'One choice', text: 'Twiddle picked the crooked path.', keywords: ['picked'],
+            check: {
+              type: 'which',
+              prompt: 'Which path did Twiddle pick first?',
+              promptJP: 'トゥイドルが<ruby>最初<rt>さいしょ</rt></ruby>に<ruby>選<rt>えら</rt></ruby>んだのは、どの<ruby>道<rt>みち</rt></ruby>ですか？',
+              choices: ['The mossy path', 'The crooked path', 'Neither path'],
+              correct: 1
+            }
+          },
+          {
+            title: 'Turn back', text: 'Twiddle changed its mind and walked back.', keywords: ['changed', 'walked'],
+            check: {
+              type: 'what-happened',
+              prompt: 'What did Twiddle do after changing its mind?',
+              promptJP: 'トゥイドルは、<ruby>考<rt>かんが</rt></ruby>えを<ruby>変<rt>か</rt></ruby>えたあと、<ruby>何<rt>なに</rt></ruby>をしましたか？',
+              choices: ['Walked back', 'Ran down the mossy path', 'Sat beside the stone'],
+              correct: 0
+            }
+          }
         ],
+        reviewClues: [1, 2],
         prompt: 'Why was Twiddle’s energy confused?',
         promptJP: 'トゥイドルのエネルギーは、なぜ<ruby>混乱<rt>こんらん</rt></ruby>しましたか？',
         choices: [
@@ -448,10 +812,38 @@
       },
       fresh: {
         clues: [
-          { title: 'Two paths', text: 'Twiddle stood between a crooked path and a mossy path, holding one pebble in each hand.', keywords: ['stood', 'holding'] },
-          { title: 'The first turn', text: 'Twiddle chose the crooked path, changed its mind, and walked back before reaching the first stone.', keywords: ['chose', 'reaching'] },
-          { title: 'The endless loop', text: 'When Nuppi arrived, Twiddle’s energy was circling the same two choices.', keywords: ['circling', 'choices'] }
+          {
+            title: 'Two paths', text: 'Twiddle stood between a crooked path and a mossy path, holding one pebble in each hand.', keywords: ['stood', 'holding'],
+            check: {
+              type: 'what',
+              prompt: 'What was Twiddle holding?',
+              promptJP: 'トゥイドルは、<ruby>何<rt>なに</rt></ruby>を<ruby>持<rt>も</rt></ruby>っていましたか？',
+              choices: ['One pebble in each hand', 'Two lanterns in one hand', 'A bell and a leaf'],
+              correct: 0
+            }
+          },
+          {
+            title: 'The first turn', text: 'Twiddle chose the crooked path, changed its mind, and walked back before reaching the first stone.', keywords: ['chose', 'reaching'],
+            check: {
+              type: 'what-happened',
+              prompt: 'What happened before Twiddle reached the first stone?',
+              promptJP: 'トゥイドルが<ruby>最初<rt>さいしょ</rt></ruby>の<ruby>石<rt>いし</rt></ruby>に<ruby>着<rt>つ</rt></ruby>く<ruby>前<rt>まえ</rt></ruby>に、<ruby>何<rt>なに</rt></ruby>が<ruby>起<rt>お</rt></ruby>きましたか？',
+              choices: ['Twiddle changed its mind and walked back.', 'Twiddle reached the stone and rested.', 'Nuppi closed the crooked path.'],
+              correct: 0
+            }
+          },
+          {
+            title: 'The endless loop', text: 'When Nuppi arrived, Twiddle’s energy was circling the same two choices.', keywords: ['circling', 'choices'],
+            check: {
+              type: 'which',
+              prompt: 'Which choices was Twiddle’s energy circling?',
+              promptJP: 'トゥイドルのエネルギーは、どの<ruby>選択<rt>せんたく</rt></ruby>を<ruby>回<rt>まわ</rt></ruby>っていましたか？',
+              choices: ['The same crooked and mossy paths', 'Three new paths', 'The cemetery gate and a lantern'],
+              correct: 0
+            }
+          }
         ],
+        reviewClues: [1, 2],
         prompt: 'Why did Twiddle keep circling?',
         promptJP: 'トゥイドルのエネルギーは<ruby>何<rt>なに</rt></ruby>で<ruby>絡<rt>から</rt></ruby>まりましたか？',
         choices: [
@@ -464,10 +856,38 @@
       },
       deep: {
         clues: [
-          { title: 'A harmless choice', text: 'Twiddle first chose between a crooked path and a mossy path, certain that either one would be fine.', keywords: ['certain', 'either'] },
-          { title: 'A serious question', text: 'Then Twiddle wondered which path was more correct, and the easy choice became impossible.', keywords: ['wondered', 'impossible'] },
-          { title: 'A perfect circle', text: 'Twiddle’s energy repeated the same decision until every turn looked like both a beginning and an ending.', keywords: ['repeated', 'decision'] }
+          {
+            title: 'A harmless choice', text: 'Twiddle first chose between a crooked path and a mossy path, certain that either one would be fine.', keywords: ['certain', 'either'],
+            check: {
+              type: 'which',
+              prompt: 'Which paths did Twiddle think would be fine?',
+              promptJP: 'トゥイドルは、どの<ruby>道<rt>みち</rt></ruby>でも<ruby>大丈夫<rt>だいじょうぶ</rt></ruby>だと<ruby>思<rt>おも</rt></ruby>いましたか？',
+              choices: ['The crooked path or the mossy path', 'Only the longest path', 'The road outside Muenba'],
+              correct: 0
+            }
+          },
+          {
+            title: 'A serious question', text: 'Then Twiddle wondered which path was more correct, and the easy choice became impossible.', keywords: ['wondered', 'impossible'],
+            check: {
+              type: 'what-happened',
+              prompt: 'What happened when Twiddle wondered which path was more correct?',
+              promptJP: 'どちらの<ruby>道<rt>みち</rt></ruby>がより<ruby>正<rt>ただ</rt></ruby>しいか<ruby>考<rt>かんが</rt></ruby>えたとき、<ruby>何<rt>なに</rt></ruby>が<ruby>起<rt>お</rt></ruby>きましたか？',
+              choices: ['The easy choice became impossible.', 'The two paths joined together.', 'Twiddle chose the mossy path.'],
+              correct: 0
+            }
+          },
+          {
+            title: 'A perfect circle', text: 'Twiddle’s energy repeated the same decision until every turn looked like both a beginning and an ending.', keywords: ['repeated', 'decision'],
+            check: {
+              type: 'meaning',
+              prompt: 'What does “every turn” mean in this record?',
+              promptJP: 'この<ruby>記録<rt>きろく</rt></ruby>の「すべての<ruby>曲<rt>ま</rt></ruby>がり」は、どんな<ruby>意味<rt>いみ</rt></ruby>ですか？',
+              choices: ['Twiddle kept repeating the same decision.', 'Twiddle found many new paths.', 'Twiddle walked straight to Nuppi.'],
+              correct: 0
+            }
+          }
         ],
+        reviewClues: [1, 2],
         prompt: 'What made a simple choice become a loop?',
         promptJP: 'やさしい<ruby>選<rt>えら</rt></ruby>びがループになったのは、<ruby>何<rt>なに</rt></ruby>のためですか？',
         choices: [
