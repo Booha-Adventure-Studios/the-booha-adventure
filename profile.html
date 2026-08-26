@@ -42,6 +42,16 @@
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
+    .skip-link {
+      position: fixed; left: 10px; top: 8px; z-index: 100;
+      transform: translateY(-160%); padding: 9px 13px;
+      border: 2px solid #b8892f; border-radius: 9px;
+      background: #efe1c2; color: #3a2c1a; font-size: 12px; font-weight: 900;
+      text-decoration: none; box-shadow: 0 4px 12px rgba(0,0,0,.45);
+      transition: transform .15s ease;
+    }
+    .skip-link:focus-visible { transform: translateY(0); outline: 3px solid #ffd966; outline-offset: 2px; }
+
     body {
       min-height: 100vh;
       background:
@@ -95,6 +105,8 @@
     }
     .dc-today-action:active{transform:translateY(2px);box-shadow:0 1px 0 #1f160d;}
     .dc-today-action:disabled{opacity:.55;cursor:wait;}
+    .dc-today-action:focus-visible,
+    .juku-log-head:focus-visible { outline: 3px solid #b8892f; outline-offset: 2px; }
 
     /* ── Juku weekly reports ── */
     .juku-log-empty {
@@ -158,6 +170,7 @@
       transition: transform .12s ease;
     }
     #alog-close:active { transform: scale(.9); }
+    #alog-close:focus-visible { outline: 3px solid #ffd966; outline-offset: 3px; }
 
     /* ── Leather header plate ── */
     .journal-plate {
@@ -473,6 +486,7 @@
       background: rgba(255,255,255,.34); outline: none; transform: translateY(-1px);
       box-shadow: 0 4px 0 rgba(65,42,14,.2), 0 0 14px rgba(184,137,47,.18), inset 0 1px rgba(255,255,255,.45);
     }
+    .profile-network a:focus-visible { outline: 3px solid #ffd966; outline-offset: 2px; }
     .profile-network a[aria-current="page"] {
       color: #2b1d0e; border-color: rgba(184,137,47,.9);
       background: linear-gradient(180deg, rgba(255,255,255,.48), rgba(215,178,105,.26));
@@ -636,7 +650,36 @@
     @keyframes progressSheen { 0%,35% { transform:translateX(0); opacity:0; } 48% { opacity:1; } 72%,100% { transform:translateX(350%); opacity:0; } }
     @media (max-width:500px) { .profile-totals { gap:4px; } .profile-total-card { padding:10px 3px 9px; } .profile-total-en { font-size:.44rem; } .profile-total-jp { font-size:.6rem; } .profile-progress .unlocks-grid { grid-template-columns:1fr; } }
     @media (max-width:640px) { .highlight-grid { grid-template-columns:repeat(2,1fr); } }
-    @media (max-width:360px) { .alog-reference-grid { grid-template-columns:1fr; } .profile-network a { padding-left:9px; padding-right:9px; font-size:10px; } }
+    @media (max-width:430px) {
+      body { padding: 10px 6px 28px; }
+      .paper { padding: 18px 10px 22px; }
+      .ink-head { gap:7px; margin-left:1px; margin-right:1px; }
+      .ink-head .jp { font-size:18px; }
+      .ink-head .en { font-size:9px; letter-spacing:.10em; }
+      .alog-curr-switcher-label { flex-wrap:wrap; row-gap:2px; }
+      .alog-curr-switcher-en { font-size:9px; letter-spacing:.10em; }
+      .alog-stamps { grid-template-columns:repeat(auto-fill,minmax(76px,1fr)); gap:7px; }
+      .alog-stamp { padding:4px; }
+      .alog-stamp-label { font-size:7.5px; }
+      .alog-stamp-pct { font-size:11px; }
+      .alog-count { font-size:14px; }
+      .alog-progress-label { font-size:16px; }
+      .alog-score-pct { font-size:38px; }
+      .profile-progress .game-row { grid-template-columns:.95rem minmax(0,1fr) auto auto; gap:4px; padding:6px 4px; }
+      .profile-progress .row-stars { gap:0; }
+      .profile-progress .sp { font-size:.52rem; }
+      .profile-progress .row-sc { min-width:1.8rem; font-size:.56rem; }
+    }
+    @media (max-width:360px) {
+      .alog-reference-grid { grid-template-columns:1fr; }
+      .profile-network { gap:4px; padding:5px; }
+      .profile-network a { padding-left:7px; padding-right:7px; font-size:9px; }
+      .profile-network a small { font-size:8px; }
+      .paper { padding-left:8px; padding-right:8px; }
+      .profile-total-value { font-size:1rem; }
+      .profile-total-en { font-size:.40rem; letter-spacing:.07em; }
+      .profile-total-jp { font-size:.56rem; }
+    }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; scroll-behavior:auto !important; }
       .profile-progress .accordion-body { transition:none; }
@@ -649,6 +692,8 @@
   </style>
 </head>
 <body>
+
+  <a class="skip-link" href="#profile-content">Skip to profile content</a>
 
   <button id="alog-close" type="button" aria-label="もどる / Back to games">×</button>
 
@@ -665,7 +710,7 @@
     <a href="muenba-profile.html" id="pnet-muenba" hidden>MUENBA <small>むえんば</small></a>
   </nav>
 
- <div class="paper">
+ <main class="paper" id="profile-content">
     <div class="profile-totals" id="profile-totals" aria-label="Progress totals">
       <div class="profile-total-card stars">
         <div class="profile-total-icon" data-profile-icon="star"></div>
@@ -687,28 +732,28 @@
       </div>
     </div>
 
-    <section class="profile-highlights" id="profile-highlights" aria-label="Progress highlights"></section>
+    <section class="profile-highlights" id="profile-highlights" aria-label="Progress highlights" aria-live="polite"></section>
 
     <div class="ink-head">
       <span class="jp">まいにちチェック</span><span class="en">DAILY CHECK</span>
     </div>
-    <div id="dc-week"></div>
+    <div id="dc-week" role="region" aria-label="Daily check progress" aria-live="polite"></div>
 
     <div class="ink-head">
       <span class="jp">こんしゅう</span><span class="en">THIS WEEK</span>
     </div>
-    <div id="alog-week"></div>
+    <div id="alog-week" role="region" aria-label="This week's curriculum progress" aria-live="polite"></div>
 
     <div class="ink-head">
       <span class="jp">ぼうけんカレンダー</span><span class="en">CALENDAR</span>
     </div>
-    <div id="alog-calendar"></div>
+    <div id="alog-calendar" role="region" aria-label="Adventure calendar"></div>
 
     <section class="profile-progress" aria-label="Detailed weekly progress">
       <div class="ink-head profile-progress-eyebrow">
         <span class="jp">カリキュラムの<ruby>詳細<rt>しょうさい</rt></ruby></span><span class="en">CURRICULUM DETAILS</span>
       </div>
-      <div id="curr-cards"></div>
+      <div id="curr-cards" role="region" aria-label="Detailed curriculum progress"></div>
 
       <div class="ink-head profile-progress-eyebrow">
         <span class="jp">じっせき</span><span class="en">ACHIEVEMENTS</span>
@@ -736,14 +781,14 @@
       <div class="ink-head">
         <span class="jp">じゅくレポート</span><span class="en">JUKU REPORTS</span>
       </div>
-      <div id="juku-report-log"></div>
+      <div id="juku-report-log" role="region" aria-label="Juku reports"></div>
     </div>
 
     <div class="ink-head">
       <span class="jp">これまでのきろく</span><span class="en">PAST WEEKS</span>
     </div>
-    <div id="alog-past"></div>
-  </div>
+    <div id="alog-past" role="region" aria-label="Past weeks" aria-live="polite"></div>
+  </main>
 
 <script>
   document.getElementById('alog-close').addEventListener('click', () => {

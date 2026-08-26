@@ -19,6 +19,11 @@ assert.match(profile, /CURRICULUM DETAILS/, 'the canonical profile should contai
   .forEach(id => assert.match(profile, new RegExp(`id=\\"${id}\\"`), `the canonical profile should mount ${id}`));
 assert.match(profile, /js\/ui\/profile-progress\.js/, 'the canonical profile should load its detailed progress renderer');
 assert.match(profile, /id="profile-highlights"/, 'the canonical profile should mount its progress highlights');
+assert.match(profile, /class="skip-link" href="#profile-content"/, 'the canonical profile should provide a keyboard skip link');
+assert.match(profile, /id="alog-week" role="region" aria-label="This week's curriculum progress" aria-live="polite"/, 'the weekly log should announce refreshed progress');
+assert.match(profile, /id="alog-past" role="region" aria-label="Past weeks" aria-live="polite"/, 'past weeks should be an announced region');
+assert.match(profile, /\.dc-today-action:focus-visible/, 'daily check actions should have a visible focus state');
+assert.match(profile, /@media \(max-width:430px\)/, 'the profile should include a compact mobile layout');
 assert.match(profile, /js\/karasuki-wanderer-data\.js/, 'the canonical profile should load wanderer collection data');
 assert.match(profile, /aria-controls="acc-achievements-body"/, 'the achievements accordion should expose its controlled region');
 assert.doesNotMatch(profile, /BONUS GAMES/, 'the canonical profile should not duplicate the Bonus Games shelf');
