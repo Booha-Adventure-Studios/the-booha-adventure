@@ -32,18 +32,22 @@ function sourceSection(startName, endName) {
 }
 assert(runtimeSource.includes('armCaseReadGate(box, openAction, caseData.intro)'), 'case intro must use the read gate');
 assert(runtimeSource.includes('armCaseReadGate(box, null, clue.text, renderCaseCheck)'), 'case clues must reveal a check after the read gate');
-assert(runtimeSource.includes('armCaseReadGate(box, captureAction, mode.resolution)'), 'case resolution must use the read gate');
 assert(runtimeSource.includes('function renderCaseCheck(feedback = \'\')'), 'case clues must have a comprehension-check renderer');
-assert(runtimeSource.includes('function renderCaseReview(index = 0)'), 'case solve must have a safe record-review renderer');
+assert(runtimeSource.includes('function renderCaseReview(index = 0, options = {})'), 'case solve must have a safe record-review renderer');
+assert(runtimeSource.includes('function beginCaseRhythm()'), 'a correct case solve must enter rhythm through the direct handoff');
+assert(runtimeSource.includes("if (index === answerSet.correct) beginCaseRhythm();"), 'the final correct answer must start the rhythm handoff');
 assert(runtimeSource.includes('shuffledCaseChoices(check, `clue-${captureSession.caseIndex}`)'), 'clue choices must use the answer shuffler');
 assert(runtimeSource.includes("shuffledCaseChoices(mode, 'final')"), 'final choices must use the answer shuffler');
 assert(!sourceSection('renderCaseIntro', 'selectCaseDifficulty').includes('focusCaptureControl('), 'case intro must not auto-focus its action');
 assert(!sourceSection('renderCaseClue', 'renderCaseCheck').includes('focusCaptureControl('), 'case clue read screen must not auto-focus an action');
-assert(!sourceSection('renderCaseResolved', 'renderCaptureReady').includes('focusCaptureControl('), 'case resolution must not auto-focus its action');
-const finalQuestionSource = sourceSection('renderCaseQuestion', 'renderCaseResolved');
+assert(!runtimeSource.includes('muenba-case-capture'), 'the resolved case must not expose an extra capture button');
+const finalQuestionSource = sourceSection('renderCaseQuestion', 'beginCaseRhythm');
 assert(!finalQuestionSource.includes('muenba-case-record-list'), 'final solve must not display all records');
 assert(finalQuestionSource.includes('muenba-case-review'), 'final solve must offer record review');
 assert(finalQuestionSource.includes("captureSession.phase !== 'case-question'"), 'final choices must be phase-guarded');
+assert(runtimeSource.includes('CASE_FINAL_PENALTY_MAX = 2'), 'final reading penalties must be capped at two');
+assert(runtimeSource.includes("captureSession.phase = penaltyReview ? 'case-reread' : 'case-review'"), 'final mistakes must return through a reread phase');
+assert(runtimeSource.includes('CASE_FINAL_PENALTY_ACCURACY_STEP'), 'final reading penalties must affect rhythm difficulty');
 
 for (const ghost of data.ghosts || []) {
   assert.strictEqual(typeof ghost.kana, 'string', `${ghost.id}.kana must be text`);
