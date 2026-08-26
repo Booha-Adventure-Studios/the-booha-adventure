@@ -38,5 +38,7 @@ assert.match(adventureLog, /FULLY LOGGED/, 'past weeks should describe full reco
 assert.match(adventureLog, /alog-curr-switcher/, 'the weekly curriculum selector should have a clear container');
 assert.match(adventureLog, /Choose the curriculum for this week/, 'the weekly curriculum selector should be labeled for assistive technology');
 assert.match(adventureLog, /alog-curr-tab-jp/, 'curriculum tabs should show Japanese helper text');
+assert.match(profile, /family=Cinzel:wght@600;700/, 'the profile should load a clearer supporting display font');
+assert.match(profile, /font-variant-numeric:tabular-nums/, 'profile scores should use stable number widths');
 
 console.log('Profile language tests passed.');
