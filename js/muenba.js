@@ -415,6 +415,10 @@
   // feeling populated as the week's real ghosts get caught.
   const JERK_GHOST = DATA.jerk || null;
   const JERK_COUNT = 5;
+  // Return trips are meant to feel meaningfully more crowded, but not so
+  // saturated that every room becomes an unavoidable fight. The map has
+  // enough empty rooms for eight in the normal five-target case.
+  const JERK_RETURN_COUNT = 8;
   function isJerkGhostId(ghostId) {
     return typeof ghostId === 'string' && ghostId.indexOf('jerk_') === 0;
   }
@@ -1068,14 +1072,22 @@
   // non-target ghosts react on sight. The active case always overrides this
   // as friendly. Permanent ghostsFound
   // history is not used here; weeklyGhostsFound controls availability.
+  function invalidateGhostRoomMap() {
+    ghostRoomMap = null;
+    ghostRoomMapDay = null;
+    ghostRoomMapWeek = null;
+    ghostRoomMapAvailabilityKey = '';
+  }
+
   function getGhostRoomMap() {
     const today = _muenbaTodayKey() || 'nodate';
     const weekKey = _muenbaWeekKey() || 'no-week';
+    const returnTripActive = Number(readMuenba().orbsPending) > 0;
     const weeklyFound = readMuenba().weeklyGhostsFound;
     const activeCaseGhost = activeMuenbaCaseGhost();
     const activeCaseGhostId = activeCaseGhost && activeCaseGhost.id;
     const availableGhosts = GHOSTS.filter(ghost => ghost.id === activeCaseGhostId || !weeklyFound || !weeklyFound[ghost.id]);
-    const availabilityKey = availableGhosts.map(ghost => ghost.id).join('|');
+    const availabilityKey = `${availableGhosts.map(ghost => ghost.id).join('|')}|return-trip:${returnTripActive ? 'on' : 'off'}`;
     if (ghostRoomMap && ghostRoomMapDay === today && ghostRoomMapWeek === weekKey && ghostRoomMapAvailabilityKey === availabilityKey) return ghostRoomMap;
     // Pass 11: room_01 is Nuppi's room — no ghost is ever placed there, so
     // there's always one guaranteed-safe room to reach regardless of how
@@ -1096,9 +1108,14 @@
     // freed rooms.
     if (JERK_GHOST) {
       const emptyRoomIds = roomIds.filter(roomId => !map[roomId]);
-      const jerkRoomIds = _muenbaShuffle(emptyRoomIds, today + '|muenbaJerkRooms').slice(0, JERK_COUNT);
+      const jerkCount = returnTripActive ? JERK_RETURN_COUNT : JERK_COUNT;
+      const jerkSeed = today + '|muenbaJerkRooms|' + (returnTripActive ? 'return' : 'hunt');
+      const jerkRoomIds = _muenbaShuffle(emptyRoomIds, jerkSeed).slice(0, jerkCount);
       jerkRoomIds.forEach((roomId, i) => {
-        map[roomId] = Object.assign({}, JERK_GHOST, { id: 'jerk_' + (i + 1) });
+        map[roomId] = Object.assign({}, JERK_GHOST, {
+          id: (returnTripActive ? 'return_jerk_' : 'jerk_') + (i + 1),
+          returnTripJerk: returnTripActive
+        });
       });
     }
     ghostRoomMap = map;
@@ -3437,8 +3454,11 @@
   }
 
   function setReturnToNuppiPending(pending) {
-    state.returnToNuppiPending = !!pending;
+    const next = !!pending;
+    const changed = state.returnToNuppiPending !== next;
+    state.returnToNuppiPending = next;
     if (returnNuppiHint) returnNuppiHint.classList.toggle('open', state.returnToNuppiPending);
+    if (changed) invalidateGhostRoomMap();
   }
 
   function leaveCaptureForNuppi() {
