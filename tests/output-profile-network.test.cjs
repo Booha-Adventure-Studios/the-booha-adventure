@@ -74,6 +74,12 @@ assert.match(utsurobaWorld, /questTrackHTML\(drifter, quest, hasRestoredMemory\)
   'drifter quest progress should reflect the current save state');
 assert.match(karasukiPage, /src="js\/utsuroba-data\.js"/,
   'Karasuki should load the shared drifter identity data');
+assert.match(karasukiPage, /src="js\/karasuki-wanderer-data\.js"/,
+  'Karasuki should load the shared wanderer collection comments');
+assert.match(karasukiWorld, /recordWandererVisit\(w\)/,
+  'Karasuki should record a permanent wanderer visit when a wanderer is opened');
+assert.match(karasukiWorld, /KARASUKI_WANDERER_DATA/,
+  'Karasuki should consume the shared wanderer collection data');
 assert.match(karasukiWorld, /subHTML:/,
   'Karasuki reward popups should support furigana markup');
 assert.match(karasukiWorld, /drifterReturnLabel\(quest\.active\)/,

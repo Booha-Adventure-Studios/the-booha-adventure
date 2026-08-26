@@ -87,7 +87,7 @@ const BoohaSaveFile = (() => {
 
       // ── Collection — permanent discoveries ──────────────────────────────
       collection: {
-        wanderers: [],           // permanent pool — stays across resets
+        wanderers: {},           // { [wandererId]: { visits, firstFoundAt, lastFoundAt } }
       },
     };
   }
@@ -121,7 +121,25 @@ const BoohaSaveFile = (() => {
         wanderers:          [],
       };
     }
-    if (!save.collection) save.collection = { wanderers: [] };
+    if (!save.collection || typeof save.collection !== 'object' || Array.isArray(save.collection)) {
+      save.collection = {};
+    }
+    // Early scaffolding used an array here but never wrote entries. Convert
+    // any imported legacy array into the permanent keyed collection shape.
+    if (Array.isArray(save.collection.wanderers)) {
+      const migrated = {};
+      save.collection.wanderers.forEach((item, index) => {
+        const source = item && typeof item === 'object' ? item : {};
+        const id = String(source.id || source.name || item || index);
+        migrated[id] = {
+          ...source,
+          visits: Math.max(1, Number(source.visits) || 1),
+        };
+      });
+      save.collection.wanderers = migrated;
+    } else if (!save.collection.wanderers || typeof save.collection.wanderers !== 'object') {
+      save.collection.wanderers = {};
+    }
 
     if (save.version < 2) save.version = 2;
     return save;
