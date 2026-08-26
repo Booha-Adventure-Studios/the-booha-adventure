@@ -91,6 +91,70 @@
     });
   }
 
+  function currentStreak(dayLog, todayKey) {
+    if (window.BoohaAdventureLog && BoohaAdventureLog._test && BoohaAdventureLog._test.streak) {
+      return BoohaAdventureLog._test.streak(dayLog, todayKey);
+    }
+    return 0;
+  }
+
+  function longestStreak(dayLog) {
+    const keys = Object.keys(dayLog || {}).filter(key => dayLog[key] && dayLog[key].g > 0).sort();
+    let best = 0;
+    let run = 0;
+    let previous = null;
+    const dayBefore = key => {
+      const date = new Date(`${key}T00:00:00Z`);
+      date.setUTCDate(date.getUTCDate() - 1);
+      return date.toISOString().slice(0, 10);
+    };
+    keys.forEach(key => {
+      run = previous && dayBefore(key) === previous ? run + 1 : 1;
+      best = Math.max(best, run);
+      previous = key;
+    });
+    return best;
+  }
+
+  function weekAverage(week) {
+    const values = Object.values((week && week.adv) || {}).filter(value => Number.isFinite(value));
+    return values.length ? Math.round(values.reduce((sum, value) => sum + value, 0) / values.length) : null;
+  }
+
+  function renderHighlights() {
+    const host = document.getElementById('profile-highlights');
+    if (!host || !window.BoohaDayRecord) return;
+    const keys = BoohaDayRecord.getCurrentKeys();
+    if (!keys) return;
+    const dayLog = BoohaDayRecord.getDayLog();
+    const weekLog = BoohaDayRecord.getWeekLog();
+    const current = currentStreak(dayLog, keys.day);
+    const longest = longestStreak(dayLog);
+    const weekEntries = Object.entries(weekLog)
+      .map(([key, value]) => ({ key, value, score: weekAverage(value) }))
+      .filter(entry => entry.score != null);
+    const bestWeek = weekEntries.reduce((best, entry) => !best || entry.score > best.score ? entry : best, null);
+    const data = BoohaAdventure.save.load();
+    const collection = data.collection && data.collection.wanderers;
+    const found = collection && typeof collection === 'object' && !Array.isArray(collection)
+      ? Object.keys(collection).length : 0;
+    const total = Object.keys(window.KARASUKI_WANDERER_DATA || {}).length || 36;
+    const trend = weekEntries.slice().sort((a, b) => a.key.localeCompare(b.key)).slice(-8);
+    const trendMarkup = trend.map(entry => {
+      const height = Math.max(10, Math.min(100, entry.score));
+      return `<div class="trend-week" title="${escapeHTML(entry.key)}: ${entry.score}%"><div class="trend-score">${entry.score}%</div><div class="trend-bar-wrap"><div class="trend-bar" style="height:${height}%"></div></div><div class="trend-label">${escapeHTML(entry.key.slice(5))}</div></div>`;
+    }).join('') || '<div class="trend-empty">Your weekly scores will appear here as you play.</div>';
+
+    host.innerHTML = `
+      <div class="highlight-grid">
+        <div class="highlight-card streak"><div class="highlight-icon">🔥</div><div class="highlight-value">${current}</div><div class="highlight-en">CURRENT STREAK</div><div class="highlight-jp">いまのれんぞく</div></div>
+        <div class="highlight-card longest"><div class="highlight-icon">⚡</div><div class="highlight-value">${longest}</div><div class="highlight-en">LONGEST STREAK</div><div class="highlight-jp">さいこうれんぞく</div></div>
+        <div class="highlight-card best"><div class="highlight-icon">🏅</div><div class="highlight-value">${bestWeek ? bestWeek.score + '%' : '--'}</div><div class="highlight-en">BEST WEEK AVERAGE</div><div class="highlight-jp">ベストしゅうスコア</div></div>
+        <a class="highlight-card wanderers" href="adventure-profile.html" aria-label="View wanderers found"><div class="highlight-icon">👻</div><div class="highlight-value">${found}/${total}</div><div class="highlight-en">WANDERERS FOUND</div><div class="highlight-jp">見つけた<ruby>旅人<rt>たびびと</rt></ruby></div></a>
+      </div>
+      <div class="trend-panel"><div class="trend-head"><div class="trend-title">RECENT WEEKS <small>さいきんのしゅう</small></div><div class="trend-title">${trend.length}/8</div></div><div class="trend-strip">${trendMarkup}</div></div>`;
+  }
+
   function initAccordion(triggerId, bodyId) {
     const trigger = document.getElementById(triggerId);
     const body = document.getElementById(bodyId);
@@ -156,6 +220,8 @@
     const U = BoohaAdventure.unlocks;
     const R = BoohaAdventure.registry;
     if (!S || !U || !R) return;
+
+    renderHighlights();
 
     document.getElementById('total-stars').textContent = `${S.weeklyStars()}/${27 * 3}`;
     document.getElementById('total-completed').textContent = `${S.weeklyCompleted()}/27`;
