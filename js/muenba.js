@@ -2045,9 +2045,100 @@
     focusCaptureControl('.muenba-case-choice');
   }
 
+  function renderCaseReview(index = 0) {
+    if (!captureSession || !captureSession.caseData || !captureOverlay) return;
+    const mode = captureSession.caseData[captureSession.caseDifficulty];
+    if (!mode || !Array.isArray(mode.clues) || !mode.clues.length) return;
+    const lastIndex = mode.clues.length - 1;
+    const reviewIndex = Math.max(0, Math.min(lastIndex, Number.isInteger(index) ? index : 0));
+    const clue = mode.clues[reviewIndex];
+    captureSession.caseReviewIndex = reviewIndex;
+    captureSession.phase = 'case-review';
+
+    const box = captureBox();
+    box.classList.add('muenba-case-box', 'muenba-case-review');
+    captureImage(box, captureSession.ghost);
+
+    const modeLabel = document.createElement('div');
+    modeLabel.className = 'muenba-case-mode-label';
+    modeLabel.textContent = MUENBA_MEMORY_MODE_LABELS[captureSession.caseDifficulty] || MUENBA_MEMORY_MODE_LABELS.start;
+    const modeJP = document.createElement('small');
+    modeJP.innerHTML = MUENBA_MEMORY_MODE_JP[captureSession.caseDifficulty] || MUENBA_MEMORY_MODE_JP.start;
+    modeLabel.appendChild(modeJP);
+    box.appendChild(modeLabel);
+
+    renderCaseDirection(
+      box,
+      'REVIEW RECORDS',
+      '<ruby>記録<rt>きろく</rt></ruby>を<ruby>見直<rt>みなお</rt></ruby>そう',
+      'muenba-case-question-instruction'
+    );
+
+    const progress = document.createElement('div');
+    progress.className = 'muenba-case-progress';
+    progress.textContent = `RECORD ${reviewIndex + 1} OF ${mode.clues.length}`;
+    box.appendChild(progress);
+    const progressJp = document.createElement('p');
+    progressJp.className = 'muenba-case-progress-jp';
+    progressJp.innerHTML = `<ruby>記録<rt>きろく</rt></ruby> ${reviewIndex + 1} / ${mode.clues.length}`;
+    box.appendChild(progressJp);
+
+    const h2 = document.createElement('h2');
+    h2.textContent = clue.title;
+    box.appendChild(h2);
+
+    const record = document.createElement('p');
+    record.className = 'muenba-case-record';
+    record.innerHTML = highlightKeywords(clue.text, clue.keywords);
+    box.appendChild(record);
+    appendCaseGlossary(box, clue.keywords);
+
+    renderCaseDirection(
+      box,
+      'Reviewing is safe. It does not cost a turn or a reward.',
+      '<ruby>見直<rt>みなお</rt></ruby>しても、ペナルティやごほうびの<ruby>減点<rt>げんてん</rt></ruby>はありません。',
+      'muenba-case-review-note'
+    );
+
+    const actions = document.createElement('div');
+    actions.className = 'muenba-case-actions muenba-case-review-actions';
+    if (reviewIndex > 0) {
+      actions.appendChild(caseActionButton(
+        'Previous record',
+        '<ruby>前<rt>まえ</rt></ruby>の<ruby>記録<rt>きろく</rt></ruby>',
+        'muenba-case-review-previous',
+        () => {
+          if (captureSession && captureSession.phase === 'case-review') renderCaseReview(reviewIndex - 1);
+        }
+      ));
+    }
+    if (reviewIndex < lastIndex) {
+      actions.appendChild(caseActionButton(
+        'Next record',
+        '<ruby>次<rt>つぎ</rt></ruby>の<ruby>記録<rt>きろく</rt></ruby>',
+        'muenba-case-review-next',
+        () => {
+          if (captureSession && captureSession.phase === 'case-review') renderCaseReview(reviewIndex + 1);
+        }
+      ));
+    }
+    actions.appendChild(caseActionButton(
+      'Back to final question',
+      '<ruby>質問<rt>しつもん</rt></ruby>に<ruby>戻<rt>もど</rt></ruby>る',
+      'muenba-case-review-return',
+      () => {
+        if (captureSession && captureSession.phase === 'case-review') renderCaseQuestion();
+      }
+    ));
+    box.appendChild(actions);
+    captureOverlay.classList.add('open');
+    focusCaptureControl('.muenba-case-action');
+  }
+
   function renderCaseQuestion(feedback = '') {
     if (!captureSession || !captureSession.caseData || !captureOverlay) return;
     const mode = captureSession.caseData[captureSession.caseDifficulty];
+    captureSession.phase = 'case-question';
     const box = captureBox();
     box.classList.add('muenba-case-box', 'muenba-case-resolved');
     captureImage(box, captureSession.ghost);
@@ -2076,19 +2167,17 @@
     progressJp.innerHTML = '<ruby>記録<rt>きろく</rt></ruby>を<ruby>読<rt>よ</rt></ruby>み<ruby>終<rt>お</rt></ruby>えた・<ruby>質問<rt>しつもん</rt></ruby>';
     box.appendChild(progressJp);
 
-    const records = document.createElement('div');
-    records.className = 'muenba-case-record-list';
-    mode.clues.forEach((clue, index) => {
-      const record = document.createElement('article');
-      record.className = 'muenba-case-record-item';
-      const label = document.createElement('h3');
-      label.textContent = `${index + 1}. ${clue.title}`;
-      const text = document.createElement('p');
-      text.innerHTML = highlightKeywords(clue.text, clue.keywords);
-      record.append(label, text);
-      records.appendChild(record);
-    });
-    box.appendChild(records);
+    const reviewActions = document.createElement('div');
+    reviewActions.className = 'muenba-case-actions muenba-case-review-actions';
+    reviewActions.appendChild(caseActionButton(
+      'Review records',
+      '<ruby>記録<rt>きろく</rt></ruby>を<ruby>見直<rt>みなお</rt></ruby>す',
+      'muenba-case-review',
+      () => {
+        if (captureSession && captureSession.phase === 'case-question') renderCaseReview(0);
+      }
+    ));
+    box.appendChild(reviewActions);
 
     renderCaseDirection(box, mode.prompt, mode.promptJP, 'muenba-case-question');
     if (feedback) renderCaseDirection(
@@ -2115,6 +2204,7 @@
       text.textContent = choice;
       button.append(number, text);
       button.addEventListener('click', () => {
+        if (!captureSession || captureSession.phase !== 'case-question') return;
         if (index === mode.correct) renderCaseResolved();
         else renderCaseQuestion('That explanation does not fit all three records yet.');
       });
@@ -3739,6 +3829,13 @@
       .muenba-case-read-status .muenba-case-direction-jp { color:#a8bda9; }
       .muenba-case-clue.muenba-reading .muenba-case-read-status { animation:muenbaReadStatusPulse 1.8s ease-in-out infinite; }
       @keyframes muenbaReadStatusPulse { 0%,100% { opacity:.7; } 50% { opacity:1; } }
+      .muenba-case-review { border-color:rgba(170,150,255,.62); background:linear-gradient(145deg,rgba(19,11,43,.97),rgba(6,13,25,.98)); box-shadow:0 24px 80px rgba(0,0,0,.82),0 0 55px rgba(111,66,210,.2),inset 0 0 55px rgba(49,205,154,.045); }
+      .muenba-case-review .muenba-case-record { border-color:#c6adff; background:linear-gradient(110deg,rgba(111,83,184,.18),rgba(156,224,193,.04)); }
+      .muenba-case-review-note { margin-top:16px; border-color:rgba(156,224,193,.3); background:rgba(52,104,78,.08); box-shadow:none; }
+      .muenba-case-review-note .muenba-case-direction-en { color:#dff5e8; font-size:.82rem; font-weight:700; }
+      .muenba-case-review-note .muenba-case-direction-jp { color:#a8cbbb; }
+      .muenba-case-review-actions { margin-top:18px; }
+      .muenba-case-review-actions .muenba-case-action { min-width:155px; }
       .muenba-case-direction ruby, .muenba-case-action ruby { ruby-position:over; line-height:1.45; }
       .muenba-case-direction rt, .muenba-case-action rt { font-size:.78em; opacity:.95; }
       .muenba-case-actions { display:flex; justify-content:center; gap:9px; flex-wrap:wrap; margin-top:6px; }
@@ -4047,6 +4144,7 @@
          but its accent tells the player what kind of moment this is. */
       .muenba-case-intro,
       .muenba-case-clue,
+      .muenba-case-review,
       .muenba-case-resolved,
       .muenba-capture-ready,
       .muenba-capture-result,
