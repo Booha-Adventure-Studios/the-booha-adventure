@@ -2576,6 +2576,62 @@ const HAPPY_HOUSE_PORTAL = {
     }
   };
 
+  // Permanent collection copy and visit records live outside the weekly
+  // wanderer rotation. This lets a found wanderer stay found while the room
+  // roster still resets each week.
+  function wandererComment(w) {
+    return (window.KARASUKI_WANDERER_DATA && w && w.name)
+      ? window.KARASUKI_WANDERER_DATA[w.name] || null
+      : null;
+  }
+
+  function wandererSaveId(w) {
+    const comment = wandererComment(w);
+    if (comment && comment.id) return comment.id;
+    const fallback = String((w && (w.name || w.index)) || 'wanderer');
+    return fallback.normalize('NFKD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '') || 'wanderer';
+  }
+
+  function recordWandererVisit(w) {
+    if (!w || !w.name || window.__devAllWanderers) return null;
+    try {
+      if (!window.BoohaAdventure || !BoohaAdventure.save) return null;
+      const data = BoohaAdventure.save.load();
+      if (!data.collection || typeof data.collection !== 'object' || Array.isArray(data.collection)) {
+        data.collection = {};
+      }
+      if (!data.collection.wanderers || typeof data.collection.wanderers !== 'object' || Array.isArray(data.collection.wanderers)) {
+        data.collection.wanderers = {};
+      }
+      const id = wandererSaveId(w);
+      const previous = data.collection.wanderers[id] && typeof data.collection.wanderers[id] === 'object'
+        ? data.collection.wanderers[id]
+        : {};
+      const now = Date.now();
+      const record = {
+        ...previous,
+        id,
+        name: w.name,
+        visits: Math.max(0, Number(previous.visits) || 0) + 1,
+        firstFoundAt: Number(previous.firstFoundAt) || now,
+        lastFoundAt: now,
+      };
+      data.collection.wanderers[id] = record;
+      if (!BoohaAdventure.save.save(data)) {
+        console.warn('[Karasuki] Wanderer collection write blocked.');
+        return null;
+      }
+      return record;
+    } catch (e) {
+      console.error('[Karasuki] Wanderer collection write failed:', e);
+      return null;
+    }
+  }
+
   
   const WANDERER_IMG_BASE = 'https://booha-adventure-studios.github.io/the-booha-adventure/assets/img/wanderers/';
   const DRIFT_SPEED      = 0.28;
@@ -2723,6 +2779,7 @@ const HAPPY_HOUSE_PORTAL = {
 
   function openWandererPop(w) {
     if (!w.name) return;
+    recordWandererVisit(w);
     currentPopWanderer = w; w.pose = 1;
     if (w.type === 'drift') w.frozen = true;
     const box        = document.getElementById('wanderer-pop-box');
@@ -2746,7 +2803,8 @@ const HAPPY_HOUSE_PORTAL = {
     closeEl.style.color  = c;
     nameEl.style.color   = c;
     nameEl.style.textShadow = `0 0 18px ${c}88`;
-    const furiMap = WANDERER_FURIGANA[w.name] || {};
+    const comment = wandererComment(w);
+    const furiMap = { ...(WANDERER_FURIGANA[w.name] || {}), ...((comment && comment.furigana) || {}) };
     nameEl.textContent   = w.name || '';
     jpEl.innerHTML       = w.nameJP ? `「${UtsuFurigana.sentence(w.nameJP, furiMap)}」` : '';
     descEl.textContent   = w.desc || '';
