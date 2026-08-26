@@ -53,6 +53,13 @@
   // Keep Nuppi on the upper path, but clear of room_01's up arrow at x:767,
   // y:284 so the guide and the exit remain separate targets.
   const MUENBA_NUPPI = { roomId: 'room_01', x: 940, y: 215, hitR: 76, drawR: 54 };
+  // Real hunt targets should not appear in Nuppi's two direct approach rooms.
+  // Derive this from the room graph so the safe approach remains correct if
+  // the maze connections change later. Generic Jerk threats may still use
+  // these rooms during the return trip.
+  const MUENBA_NUPPI_APPROACH_ROOMS = new Set(
+    (DATA.rooms[MUENBA_NUPPI.roomId]?.exits || []).map(exit => exit.to)
+  );
   const POPUP_COOLDOWN_MS = 900;
 
   // ── Ghost hunting core loop (Pass 7) ────────────────────────────────────
@@ -1074,7 +1081,8 @@
     // there's always one guaranteed-safe room to reach regardless of how
     // hostile the rest of the cemetery has gotten.
     const roomIds = Object.keys(DATA.rooms).filter(roomId => roomId !== MUENBA_NUPPI.roomId);
-    const pickedRooms = _muenbaShuffle(roomIds, today + '|muenbaGhostRooms').slice(0, availableGhosts.length);
+    const huntRoomIds = roomIds.filter(roomId => !MUENBA_NUPPI_APPROACH_ROOMS.has(roomId));
+    const pickedRooms = _muenbaShuffle(huntRoomIds, today + '|muenbaGhostRooms').slice(0, availableGhosts.length);
     const shuffledGhosts = _muenbaShuffle(availableGhosts, today + '|muenbaGhostAssign');
     const map = {};
     shuffledGhosts.forEach((ghost, i) => {
@@ -1171,25 +1179,30 @@
     g.teleporting = false;
   }
 
-  function pickGhostTravelExit(fromRoomId) {
+  function pickGhostTravelExit(fromRoomId, ghostOrId = null) {
     const map = getGhostRoomMap();
     const exits = DATA.rooms[fromRoomId]?.exits || [];
+    const realGhost = ghostOrId && (ghostOrId.ghost || ghostOrId);
+    const keepTargetAwayFromNuppi = isMainHuntGhostId(realGhost);
     // Pass 11: a wandering/teleporting ghost can never travel into room_01
     // either — the safe-room guarantee has to hold even as ghosts roam
     // between rooms on their own, not just at the day's initial placement.
-    const candidates = exits.filter(exit => exit.to !== state.roomId && exit.to !== MUENBA_NUPPI.roomId && !map[exit.to]);
+    const candidates = exits.filter(exit => exit.to !== state.roomId
+      && exit.to !== MUENBA_NUPPI.roomId
+      && !(keepTargetAwayFromNuppi && MUENBA_NUPPI_APPROACH_ROOMS.has(exit.to))
+      && !map[exit.to]);
     if (!candidates.length) return null;
     return candidates[Math.floor(Math.random() * candidates.length)];
   }
 
-  function pickGhostTeleportRoom(fromRoomId) {
-    const exit = pickGhostTravelExit(fromRoomId);
+  function pickGhostTeleportRoom(fromRoomId, ghostOrId = null) {
+    const exit = pickGhostTravelExit(fromRoomId, ghostOrId);
     return exit ? exit.to : null;
   }
 
   function beginGhostRoomTravel(g, now) {
     const fromRoomId = g.roomId || state.roomId;
-    const exit = pickGhostTravelExit(fromRoomId);
+    const exit = pickGhostTravelExit(fromRoomId, g.ghost);
     if (!exit) {
       scheduleGhostTeleport(g, now);
       return false;
@@ -1206,7 +1219,7 @@
 
   function teleportGhostToAnotherRoom(g, now) {
     const fromRoomId = g.roomId || state.roomId;
-    const destinationRoomId = g.travelExit?.to || pickGhostTeleportRoom(fromRoomId);
+    const destinationRoomId = g.travelExit?.to || pickGhostTeleportRoom(fromRoomId, g.ghost);
     if (!destinationRoomId) {
       scheduleGhostTeleport(g, now);
       return false;
@@ -1583,7 +1596,7 @@
     const map = getGhostRoomMap();
     if (map[roomId] && map[roomId].id === captureSession.ghost.id) {
       delete map[roomId];
-      const destinationRoomId = pickGhostTeleportRoom(roomId);
+      const destinationRoomId = pickGhostTeleportRoom(roomId, captureSession.ghost);
       if (destinationRoomId) map[destinationRoomId] = captureSession.ghost;
     }
     activeGhost = null;
