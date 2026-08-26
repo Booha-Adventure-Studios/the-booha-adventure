@@ -3,12 +3,13 @@
  * adventure-log.js
  * The Booha Adventure — Adventure Log (student profile sections)
  *
- * Renders into three mounts on adventure-profile.html:
+ * Renders into three mounts on profile.html:
  *   #alog-week      — This Week: 12 stamps + sealed score + blitz times + duels
  *   #alog-calendar  — attendance calendar for the current Tokyo month
  *   #alog-past      — past week seals
  *
- * Data comes ONLY from BoohaDayRecord (meta.dayLog / meta.weekLog).
+ * This is the canonical weekly log for the main profile. Data comes ONLY
+ * from BoohaDayRecord (meta.dayLog / meta.weekLog).
  * All user-derived text is set via textContent — never innerHTML.
  */
 

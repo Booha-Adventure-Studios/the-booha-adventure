@@ -15,8 +15,13 @@ assert.match(profile, /NOT RECORDED/, 'the daily profile empty state should desc
 assert.doesNotMatch(profile, /NOT COMPLETED/, 'the daily profile should not frame participation as a permanent completion');
 assert.match(profile, /RECORDED/, 'the canonical profile should show the recorded total');
 assert.match(profile, /THIS WEEK'S RECORD/, 'the canonical profile should contain the detailed weekly record');
+['profile-totals', 'dc-week', 'alog-week', 'curr-cards', 'games-grid', 'unlocks-grid', 'juku-report-log', 'alog-calendar', 'alog-past']
+  .forEach(id => assert.match(profile, new RegExp(`id=\\"${id}\\"`), `the canonical profile should mount ${id}`));
+assert.match(profile, /js\/ui\/profile-progress\.js/, 'the canonical profile should load its detailed progress renderer');
 assert.doesNotMatch(adventure, /class="totals-bar"/, 'the adventure profile should not duplicate the progress totals');
 assert.doesNotMatch(adventure, /This Week's Record/, 'the adventure profile should not duplicate the detailed weekly record');
+assert.doesNotMatch(adventure, /js\/ui\/adventure-log\.js/, 'the adventure profile should not load the canonical weekly log');
+assert.match(adventure, /Save &amp; Memory/, 'the adventure profile should retain save and memory controls');
 assert.match(adventureLog, /RECORDED`/, 'the weekly log should call activity recorded');
 assert.match(adventureLog, /FULLY LOGGED/, 'past weeks should describe full records, not a yearly completion path');
 
