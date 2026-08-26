@@ -304,6 +304,35 @@
     .alog-score-en  { font-family: 'Cinzel Decorative', serif;
                       font-size: 9px; letter-spacing: 2px; color: #7a603a; margin-top: 2px; }
 
+    .alog-reference {
+      margin: 12px auto 4px; max-width: 440px; padding: 12px 14px;
+      border: 2px solid rgba(57,127,203,.48); border-radius: 14px;
+      background: radial-gradient(circle at 50% 0%, rgba(102,187,255,.18), rgba(102,187,255,.04) 76%);
+      box-shadow: 0 0 16px rgba(102,187,255,.12), inset 0 1px rgba(255,255,255,.28);
+      text-align: center;
+    }
+    .alog-reference-kicker {
+      color: #17508f; font-family: 'Cinzel Decorative', serif;
+      font-size: 9px; letter-spacing: 1.7px; font-weight: 900;
+    }
+    .alog-reference-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-top:9px; }
+    .alog-reference-stat, .alog-reference-result {
+      padding:8px 5px; border-radius:9px; background:rgba(255,255,255,.22);
+    }
+    .alog-reference-result.above { color:#176d47; background:rgba(92,255,208,.14); }
+    .alog-reference-result.below { color:#9a3f32; background:rgba(255,158,181,.15); }
+    .alog-reference-value { color:#17508f; font-size:24px; font-weight:900; line-height:1.05; }
+    .alog-reference-result.above .alog-reference-value { color:#176d47; }
+    .alog-reference-result.below .alog-reference-value { color:#9a3f32; }
+    .alog-reference-value.muted { color:#765d36; }
+    .alog-reference-label { margin-top:4px; color:#3a2c1a; font-family:'Cinzel Decorative',serif; font-size:8px; line-height:1.35; letter-spacing:.7px; }
+    .alog-reference-jp { margin-top:2px; color:#765d36; font-size:11px; font-weight:900; line-height:1.35; }
+    .alog-reference-track { position:relative; height:9px; margin:11px 2px 4px; border-radius:99px; background:rgba(58,44,26,.16); overflow:visible; }
+    .alog-reference-current { display:block; height:100%; border-radius:99px; background:linear-gradient(90deg,#397fcb,#5cffd0); box-shadow:0 0 8px rgba(92,255,208,.48); }
+    .alog-reference-marker { position:absolute; top:-4px; width:3px; height:17px; border-radius:3px; background:#b8892f; box-shadow:0 0 8px #ffd966; transform:translateX(-50%); }
+    .alog-reference-note { color:#92784d; font-size:9px; line-height:1.35; }
+    .alog-reference-empty { margin-top:9px; color:#3a2c1a; font-size:13px; line-height:1.4; }
+
     .alog-duels { margin-top: 14px; text-align: center; font-size: 14px; color: #5c4626; }
     .alog-duel-label { color: #a34d12; font-weight: 700; margin-right: 8px; }
     .alog-duel-item  { margin: 0 7px; }
@@ -509,18 +538,6 @@
     .highlight-jp { margin-top:2px; font-size:.62rem; color:#765d36; font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .highlight-card.wanderers { cursor:pointer; text-decoration:none; color:inherit; }
     .highlight-card.wanderers:hover, .highlight-card.wanderers:focus-visible { outline:none; transform:translateY(-2px); box-shadow:0 0 17px #c8b8ff55,inset 0 1px rgba(255,255,255,.4); }
-    .trend-panel { margin-top:10px; padding:11px 12px 10px; border:1px solid rgba(58,44,26,.28); border-radius:11px; background:rgba(255,255,255,.10); }
-    .trend-head { display:flex; align-items:baseline; justify-content:space-between; gap:8px; margin-bottom:8px; }
-    .trend-title { color:#3a2c1a; font-size:.73rem; font-weight:900; }
-    .trend-title small { color:#92784d; font-size:.62rem; margin-left:4px; }
-    .trend-strip { display:grid; grid-template-columns:repeat(8,1fr); gap:6px; align-items:end; min-height:74px; }
-    .trend-week { display:flex; flex-direction:column; align-items:center; justify-content:end; min-width:0; height:74px; }
-    .trend-score { color:#765d36; font-size:.6rem; font-weight:900; line-height:1; margin-bottom:4px; }
-    .trend-bar-wrap { width:100%; height:45px; display:flex; align-items:end; justify-content:center; }
-    .trend-bar { width:min(25px,70%); min-height:5px; border-radius:5px 5px 2px 2px; background:linear-gradient(to top,#9a55c9,#ffd966); box-shadow:0 0 8px #c8b8ff66; }
-    .trend-label { max-width:100%; margin-top:5px; color:#92784d; font-family:'Cinzel Decorative',serif; font-size:.45rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .trend-empty { grid-column:1/-1; color:#92784d; text-align:center; font-size:.72rem; padding:17px 4px; }
-
     .profile-progress { margin-top:18px; }
     .profile-progress-eyebrow { margin:20px 0 9px; }
     .profile-progress-card {
@@ -585,7 +602,7 @@
     @keyframes profileCardSheen { 0%,58%,100% { transform:translateX(-135%); } 72% { transform:translateX(135%); } }
     @keyframes profileValuePop { 0% { transform:scale(1); } 45% { transform:scale(1.12); filter:brightness(1.3); } 100% { transform:scale(1); } }
     @media (max-width:500px) { .profile-totals { gap:4px; } .profile-total-card { padding:10px 3px 9px; } .profile-total-en { font-size:.44rem; } .profile-total-jp { font-size:.6rem; } .profile-progress .games-grid, .profile-progress .unlocks-grid { grid-template-columns:1fr; } }
-    @media (max-width:640px) { .highlight-grid { grid-template-columns:repeat(2,1fr); } .trend-strip { gap:3px; } }
+    @media (max-width:640px) { .highlight-grid { grid-template-columns:repeat(2,1fr); } }
     @media (prefers-reduced-motion: reduce) {
       .profile-progress .accordion-body { transition:none; }
       .profile-progress .prog-fill { transition:none; }
