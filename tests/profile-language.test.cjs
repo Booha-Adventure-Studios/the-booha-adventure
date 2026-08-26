@@ -35,5 +35,8 @@ assert.match(adventure, /id="games-grid"/, 'the adventure profile should mount t
 assert.match(adventure, /js\/ui\/bonus-games\.js/, 'the adventure profile should load the shared Bonus Games renderer');
 assert.match(adventureLog, /RECORDED`/, 'the weekly log should call activity recorded');
 assert.match(adventureLog, /FULLY LOGGED/, 'past weeks should describe full records, not a yearly completion path');
+assert.match(adventureLog, /alog-curr-switcher/, 'the weekly curriculum selector should have a clear container');
+assert.match(adventureLog, /Choose the curriculum for this week/, 'the weekly curriculum selector should be labeled for assistive technology');
+assert.match(adventureLog, /alog-curr-tab-jp/, 'curriculum tabs should show Japanese helper text');
 
 console.log('Profile language tests passed.');

@@ -220,21 +220,37 @@
 
     /* ═══ Adventure-log module reskin (ink & wax) ═══════════ */
 
-    .alog-curr-tabs {
-      display: flex; gap: 8px; margin-bottom: 14px; justify-content: center;
-    }
+    .alog-curr-switcher { margin-bottom: 14px; }
+    .alog-curr-switcher-label { display:flex; align-items:baseline; gap:8px; margin:0 2px 7px; }
+    .alog-curr-switcher-en { font-family:'Cinzel Decorative',serif; font-size:9px; letter-spacing:2px; color:#7a603a; }
+    .alog-curr-switcher-jp { font-size:11px; color:#765d36; font-weight:900; }
+    .alog-curr-tabs { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
     .alog-curr-tab {
-      appearance: none; cursor: pointer;
-      font-family: inherit; font-weight: 900; letter-spacing: 2px;
-      font-size: 13px; padding: 6px 18px; border-radius: 999px;
-      border: 2px dashed rgba(58,44,26,.45);
-      background: transparent; color: #8a7048;
+      appearance:none; cursor:pointer; display:flex; align-items:center; gap:8px; min-width:0;
+      font-family:inherit; padding:8px 10px; border-radius:12px;
+      border:1px solid rgba(58,44,26,.30); background:rgba(255,255,255,.14); color:#8a7048;
+      text-align:left; transition:background .18s,border-color .18s,box-shadow .18s,transform .18s;
       -webkit-tap-highlight-color: transparent;
     }
+    .alog-curr-tab:hover { border-color:rgba(58,44,26,.66); background:rgba(255,255,255,.28); transform:translateY(-1px); }
+    .alog-curr-tab:focus-visible { outline:3px solid rgba(184,137,47,.62); outline-offset:2px; }
     .alog-curr-tab.active {
-      border: 2px solid #3a2c1a;
-      background: #3a2c1a; color: #efe1c2;
-      transform: rotate(-1.2deg);
+      border-color:#3a2c1a; background:#3a2c1a; color:#efe1c2;
+      box-shadow:0 4px 0 rgba(31,22,13,.18),0 0 16px rgba(184,137,47,.20);
+    }
+    .alog-curr-tab-code {
+      display:flex; align-items:center; justify-content:center; width:31px; height:31px; flex:0 0 31px;
+      border:1px solid currentColor; border-radius:50%; font-family:'Cinzel Decorative',serif; font-size:9px; font-weight:900;
+    }
+    .alog-curr-tab-copy { display:flex; flex-direction:column; min-width:0; gap:2px; }
+    .alog-curr-tab-en { font-size:11px; font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .alog-curr-tab-jp { font-size:10px; font-weight:800; opacity:.82; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    @media (max-width:500px) {
+      .alog-curr-tabs { gap:5px; }
+      .alog-curr-tab { gap:5px; padding:7px 5px; }
+      .alog-curr-tab-code { width:26px; height:26px; flex-basis:26px; font-size:8px; }
+      .alog-curr-tab-en { font-size:9px; }
+      .alog-curr-tab-jp { font-size:8px; }
     }
 
     .alog-stamps {
