@@ -107,6 +107,7 @@
   const CASE_WORD_SWEEP_BASE_MS = 620;
   const CASE_WORD_SWEEP_KEYWORD_EXTRA_MS = 180;
   const CASE_WORD_SWEEP_FINAL_HOLD_MS = 1200;
+  const CASE_WRONG_CLUE_COOLDOWN_MS = 1500;
   const CASE_FINAL_PENALTY_MAX = 2;
   const CASE_FINAL_PENALTY_ACCURACY_STEP = 5;
   const CASE_RHYTHM_TRANSITION_MS = 650;
@@ -1768,6 +1769,9 @@
       choiceSeed: `${ghost.id}:${caseDifficulty || 'none'}:${_muenbaTodayKey() || 'session'}:${Math.floor(performance.now())}`,
       caseIndex: 0,
       casePenaltyCount: 0,
+      caseChoiceAttempt: 0,
+      caseWrongAnswerPending: false,
+      caseWrongTimer: 0,
       caseResolved: false,
       devCaptureHold: false,
       readGateTimer: 0,
@@ -1919,8 +1923,59 @@
     box.appendChild(glossary);
   }
 
-  function handleCaseClueAnswer(index, answerSet, mode) {
+  function clearCaseWrongAnswer(session) {
+    if (!session) return;
+    if (session.caseWrongTimer) window.clearTimeout(session.caseWrongTimer);
+    session.caseWrongTimer = 0;
+    session.caseWrongAnswerPending = false;
+  }
+
+  function beginCaseClueReread(index, answerSet, mode, clickedButton = null, panel = null) {
+    if (!captureSession || captureSession.phase !== 'case-check' || captureSession.caseWrongAnswerPending) return;
+    const session = captureSession;
+    session.caseWrongAnswerPending = true;
+    session.caseChoiceAttempt = Math.max(0, Number(session.caseChoiceAttempt) || 0) + 1;
+    const checkPanel = panel || captureOverlay?.querySelector('.muenba-case-check-panel');
+    const box = checkPanel?.closest('.muenba-lobby-box') || captureOverlay?.querySelector('.muenba-case-check');
+    const choices = checkPanel?.querySelectorAll('.muenba-case-choice') || box?.querySelectorAll('.muenba-case-choice') || [];
+    choices.forEach(button => {
+      button.disabled = true;
+      button.setAttribute('aria-disabled', 'true');
+      if (button !== clickedButton) button.classList.add('is-cooldown');
+    });
+    if (clickedButton) clickedButton.classList.add('is-wrong');
+
+    if (checkPanel) {
+      checkPanel.classList.remove('muenba-case-wrong-state');
+      void checkPanel.offsetWidth;
+      checkPanel.classList.add('muenba-case-wrong-state');
+      const hint = checkPanel.querySelector('.muenba-case-check-lock-hint');
+      if (hint) hint.textContent = 'Not quite. Read the record again, then try once more.';
+    } else if (box) {
+      const feedback = document.createElement('div');
+      feedback.className = 'muenba-case-direction muenba-case-feedback muenba-case-feedback-shake';
+      const en = document.createElement('p');
+      en.className = 'muenba-case-direction-en';
+      en.textContent = 'Not quite. Read the record again, then try once more.';
+      const jp = document.createElement('p');
+      jp.className = 'muenba-case-direction-jp';
+      jp.innerHTML = '<ruby>記録<rt>きろく</rt></ruby>をもう<ruby>一度<rt>いちど</rt></ruby><ruby>読<rt>よ</rt></ruby>んで、もう<ruby>一度<rt>いちど</rt></ruby><ruby>選<rt>えら</rt></ruby>びましょう。';
+      feedback.append(en, jp);
+      const choiceGroup = box.querySelector('.muenba-case-choices');
+      if (choiceGroup) box.insertBefore(feedback, choiceGroup);
+      else box.appendChild(feedback);
+    }
+
+    session.caseWrongTimer = window.setTimeout(() => {
+      if (captureSession !== session || session.phase !== 'case-check') return;
+      clearCaseWrongAnswer(session);
+      renderCaseClue();
+    }, CASE_WRONG_CLUE_COOLDOWN_MS);
+  }
+
+  function handleCaseClueAnswer(index, answerSet, mode, clickedButton = null, panel = null) {
     if (!captureSession || captureSession.phase !== 'case-check') return;
+    if (captureSession.caseWrongAnswerPending) return;
     if (index === answerSet.correct) {
       if (captureSession.caseIndex >= mode.clues.length - 1) {
         captureSession.phase = 'case-question';
@@ -1930,7 +1985,7 @@
         renderCaseClue();
       }
     } else {
-      renderCaseCheck('Not quite. Read the record again, then try once more.');
+      beginCaseClueReread(index, answerSet, mode, clickedButton, panel);
     }
   }
 
@@ -1963,7 +2018,7 @@
     choices.className = 'muenba-case-choices muenba-case-choices-locked';
     choices.setAttribute('role', 'group');
     choices.setAttribute('aria-label', 'Locked record question choices');
-    const answerSet = shuffledCaseChoices(check, `clue-${session.caseIndex}`);
+    const answerSet = shuffledCaseChoices(check, `clue-${session.caseIndex}-attempt-${session.caseChoiceAttempt || 0}`);
     answerSet.choices.forEach((choice, index) => {
       const button = document.createElement('button');
       button.type = 'button';
@@ -1987,7 +2042,7 @@
           lockHint.textContent = 'Keep reading. The answers unlock when the record is complete.';
           return;
         }
-        handleCaseClueAnswer(index, answerSet, mode);
+        handleCaseClueAnswer(index, answerSet, mode, button, panel);
       });
       choices.appendChild(button);
     });
@@ -2470,7 +2525,7 @@
     choices.className = 'muenba-case-choices';
     choices.setAttribute('role', 'group');
     choices.setAttribute('aria-label', 'Record question choices');
-    const answerSet = shuffledCaseChoices(check, `clue-${captureSession.caseIndex}`);
+    const answerSet = shuffledCaseChoices(check, `clue-${captureSession.caseIndex}-attempt-${captureSession.caseChoiceAttempt || 0}`);
     answerSet.choices.forEach((choice, index) => {
       const button = document.createElement('button');
       button.type = 'button';
@@ -2483,7 +2538,7 @@
       text.className = 'muenba-case-choice-text';
       text.textContent = choice;
       button.append(number, text);
-      button.addEventListener('click', () => handleCaseClueAnswer(index, answerSet, mode));
+      button.addEventListener('click', event => handleCaseClueAnswer(index, answerSet, mode, event.currentTarget, null));
       choices.appendChild(button);
     });
     box.appendChild(choices);
@@ -4138,6 +4193,7 @@
   function stopRhythmCapture() {
     clearCaseReadGate(captureSession);
     clearCaseTransition(captureSession);
+    clearCaseWrongAnswer(captureSession);
     const rhythm = captureSession && captureSession.rhythm;
     if (rhythm && rhythm.rafId) window.cancelAnimationFrame(rhythm.rafId);
     if (rhythm) rhythm.rafId = 0;
@@ -4846,6 +4902,15 @@
         .muenba-case-check-panel { padding:15px 12px 13px; }
         .muenba-case-check-panel .muenba-case-choice { min-height:60px; padding:12px 12px 12px 10px; font-size:.98rem; }
       }
+      /* Pass 18E: a wrong clue answer is a soft reset, not a punishment loop.
+         Keep the evidence visible during the short cooldown, then reread the
+         same record before presenting a fresh answer order. */
+      .muenba-case-choice.is-wrong { border-color:rgba(255,130,145,.88) !important; background:rgba(125,24,34,.32) !important; color:#ffe2df !important; box-shadow:0 0 22px rgba(235,28,57,.22) !important; animation:muenbaCaseWrongChoice .36s ease-out; }
+      .muenba-case-choice.is-cooldown { opacity:.48; cursor:wait; }
+      .muenba-case-choice:disabled { pointer-events:none; }
+      .muenba-case-wrong-state { animation:muenbaCaseWrongPanel .42s ease-out; }
+      @keyframes muenbaCaseWrongChoice { 0%,100% { transform:translateX(0); } 25% { transform:translateX(-5px); } 50% { transform:translateX(5px); } 75% { transform:translateX(-3px); } }
+      @keyframes muenbaCaseWrongPanel { 0%,100% { transform:translateX(0); } 22% { transform:translateX(-3px); } 44% { transform:translateX(3px); } 66% { transform:translateX(-2px); } }
       @media (prefers-reduced-motion: reduce) { .muenba-orb-release, .muenba-hunt-ghost-portrait, .muenba-gold-action, .muenba-read-ready { animation:none !important; } }
       @media (prefers-reduced-motion: reduce) { #muenba-fade, .muenba-return-box, #muenba-return-overlay, .muenba-lobby-box, #muenba-lobby-overlay, #muenba-capture-overlay { transition:none !important; } .muenba-lobby-portrait, #muenba-hide, #muenba-celebration-status, .muenba-rhythm-board, .muenba-rhythm-combo, .muenba-rhythm-result-failure, .muenba-case-question, .muenba-case-question::before, .muenba-case-feedback-shake, .muenba-case-read-status, .muenba-case-rhythm-transition .muenba-lobby-portrait, .muenba-energy-warning { animation:none !important; } .muenba-case-choice, .muenba-case-action, .muenba-capture-action { transition:none !important; } .muenba-rhythm-energy-fill { transition:none !important; } #muenba-profile-link { transition:none !important; } }
     `;

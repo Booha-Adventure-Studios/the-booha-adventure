@@ -67,13 +67,16 @@ assert(runtimeSource.includes("record.dataset.sweepState = 'complete'"), 'word s
 assert(runtimeSource.includes('function appendCaseLockedCheck(box, clue, mode, session)'), 'Muenba must expose an anti-button-smash check panel');
 assert(runtimeSource.includes("button.setAttribute('aria-disabled', 'true')"), 'locked answer choices must advertise their disabled state');
 assert(runtimeSource.includes('function unlockCaseCheck(session, checkPanel, readStatus)'), 'the completed sweep must unlock the existing check panel');
-assert(runtimeSource.includes('handleCaseClueAnswer(index, answerSet, mode)'), 'unlocked clue choices must use the shared answer handler');
+assert(runtimeSource.includes('handleCaseClueAnswer(index, answerSet, mode,'), 'unlocked clue choices must use the shared answer handler');
 assert(!clueSource.includes('muenba-case-next'), 'clue screen must not expose a generic NEXT button');
 assert(!clueSource.includes('caseIndex += 1'), 'clue screen must not advance before comprehension');
 assert(checkSource.includes("captureSession.phase = 'case-check'"), 'check screen must have its own phase');
 assert(runtimeSource.includes("captureSession.phase !== 'case-check'"), 'clue answers must be phase-guarded');
 assert(runtimeSource.includes('captureSession.caseIndex += 1'), 'only a correct clue answer may advance the record');
-assert(runtimeSource.includes("renderCaseCheck('Not quite."), 'wrong clue answers must reread without advancing');
+assert(runtimeSource.includes('function beginCaseClueReread(index, answerSet, mode, clickedButton = null, panel = null)'), 'wrong clue answers must enter a bounded reread cooldown');
+assert(runtimeSource.includes('CASE_WRONG_CLUE_COOLDOWN_MS = 1500'), 'wrong clue answers must use the short non-punitive cooldown');
+assert(runtimeSource.includes('session.caseChoiceAttempt = Math.max(0, Number(session.caseChoiceAttempt) || 0) + 1'), 'wrong clue answers must change the next answer order');
+assert(runtimeSource.includes('renderCaseClue();'), 'wrong clue answers must return to the same clue for rereading');
 
 // 3. The final solve prompt is an inference lock, with review available one
 // record at a time and no accidental display of the whole answer key.
@@ -111,7 +114,7 @@ assert(!runtimeSource.includes('muenba-case-capture'), 'the reading lock must no
 assert(runtimeSource.includes('function shuffledCaseChoices(question, scope)'), 'case choices need a dedicated shuffle helper');
 assert(runtimeSource.includes('_muenbaShuffle(entries, `${sessionSeed}:${scope}`)'), 'choice shuffle must use the seeded Muenba shuffle');
 assert(runtimeSource.includes('choiceSeed'), 'the encounter must own a reproducible choice seed');
-assert(checkSource.includes('shuffledCaseChoices(check, `clue-${captureSession.caseIndex}`)'), 'clue checks must use scoped shuffling');
+assert(runtimeSource.includes('shuffledCaseChoices(check, `clue-${captureSession.caseIndex}-attempt-${captureSession.caseChoiceAttempt || 0}`)'), 'clue checks must use scoped shuffling');
 assert(finalSource.includes("shuffledCaseChoices(mode, 'final')"), 'final solve must use scoped shuffling');
 
 console.log(`Muenba reading-lock audit passed: ${data.caseOrder.length} cases, ${clueCount} clue checks, and direct rhythm handoff contracts.`);
