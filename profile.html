@@ -537,7 +537,8 @@
     .highlight-en { font-family:'Cinzel Decorative',serif; font-size:.46rem; letter-spacing:.08em; color:#5d4929; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .highlight-jp { margin-top:2px; font-size:.62rem; color:#765d36; font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .highlight-card.wanderers { cursor:pointer; text-decoration:none; color:inherit; }
-    .highlight-card.wanderers:hover, .highlight-card.wanderers:focus-visible { outline:none; transform:translateY(-2px); box-shadow:0 0 17px #c8b8ff55,inset 0 1px rgba(255,255,255,.4); }
+    .highlight-card.wanderers:hover { transform:translateY(-2px); box-shadow:0 0 17px #c8b8ff55,inset 0 1px rgba(255,255,255,.4); }
+    .highlight-card.wanderers:focus-visible { outline:2px solid #9a55c9; outline-offset:3px; box-shadow:0 0 20px #c8b8ff88,inset 0 1px rgba(255,255,255,.4); }
     .profile-progress { margin-top:18px; }
     .profile-progress-eyebrow { margin:20px 0 9px; }
     .profile-progress-card {
@@ -547,8 +548,8 @@
     }
     .profile-progress .accordion-trigger { width:100%; text-align:left; border:0; background:transparent; cursor:pointer; padding:0; color:inherit; }
     .profile-progress .accordion-header { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:12px 13px; }
-    .profile-progress .accordion-trigger:hover .accordion-header,
-    .profile-progress .accordion-trigger:focus-visible .accordion-header { background:rgba(184,137,47,.10); outline:none; }
+    .profile-progress .accordion-trigger:hover .accordion-header { background:rgba(184,137,47,.10); }
+    .profile-progress .accordion-trigger:focus-visible .accordion-header { background:rgba(184,137,47,.10); outline:none; box-shadow:inset 0 0 0 2px rgba(184,137,47,.8); }
     .profile-progress .curr-badge { display:flex; align-items:center; gap:9px; min-width:0; }
     .profile-progress .orb { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:.55rem; font-weight:900; }
     .profile-progress .orb .profile-icon { width:1.15rem; height:1.15rem; }
@@ -603,7 +604,9 @@
     @keyframes profileValuePop { 0% { transform:scale(1); } 45% { transform:scale(1.12); filter:brightness(1.3); } 100% { transform:scale(1); } }
     @media (max-width:500px) { .profile-totals { gap:4px; } .profile-total-card { padding:10px 3px 9px; } .profile-total-en { font-size:.44rem; } .profile-total-jp { font-size:.6rem; } .profile-progress .games-grid, .profile-progress .unlocks-grid { grid-template-columns:1fr; } }
     @media (max-width:640px) { .highlight-grid { grid-template-columns:repeat(2,1fr); } }
+    @media (max-width:360px) { .alog-reference-grid { grid-template-columns:1fr; } .profile-network a { padding-left:9px; padding-right:9px; font-size:10px; } }
     @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; scroll-behavior:auto !important; }
       .profile-progress .accordion-body { transition:none; }
       .profile-progress .prog-fill { transition:none; }
       .profile-total-card::before, .highlight-card::before { animation:none; }
@@ -673,7 +676,7 @@
         <span class="jp">ボーナスゲーム</span><span class="en">BONUS GAMES</span>
       </div>
       <div class="profile-progress-card glass">
-        <button class="accordion-trigger" aria-expanded="false" id="acc-games-trigger">
+        <button class="accordion-trigger" aria-expanded="false" aria-controls="acc-games-body" id="acc-games-trigger">
           <div class="accordion-header">
             <div class="curr-badge">
               <div class="orb orb-br" data-profile-icon="gamepad"></div>
@@ -685,7 +688,7 @@
             <span class="acc-chevron">▼</span>
           </div>
         </button>
-        <div class="accordion-body" id="acc-games-body">
+        <div class="accordion-body" id="acc-games-body" aria-hidden="true">
           <div class="accordion-inner"><div class="games-grid" id="games-grid"></div></div>
         </div>
       </div>
@@ -694,7 +697,7 @@
         <span class="jp">じっせき</span><span class="en">ACHIEVEMENTS</span>
       </div>
       <div class="profile-progress-card glass">
-        <button class="accordion-trigger" aria-expanded="false" id="acc-achievements-trigger">
+        <button class="accordion-trigger" aria-expanded="false" aria-controls="acc-achievements-body" id="acc-achievements-trigger">
           <div class="accordion-header">
             <div class="curr-badge">
               <div class="orb orb-pb" data-profile-icon="trophy"></div>
@@ -706,7 +709,7 @@
             <span class="acc-chevron">▼</span>
           </div>
         </button>
-        <div class="accordion-body" id="acc-achievements-body">
+        <div class="accordion-body" id="acc-achievements-body" aria-hidden="true">
           <div class="accordion-inner"><div class="unlocks-grid" id="unlocks-grid"></div></div>
         </div>
       </div>

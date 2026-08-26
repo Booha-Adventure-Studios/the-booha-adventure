@@ -182,11 +182,13 @@
     trigger.dataset.bound = '1';
     const card = trigger.closest('.profile-progress-card');
     const shimmer = card && card.querySelector('.accordion-shimmer');
+    body.setAttribute('aria-hidden', 'true');
 
     trigger.addEventListener('click', () => {
       const expanded = trigger.getAttribute('aria-expanded') === 'true';
       trigger.setAttribute('aria-expanded', String(!expanded));
       body.classList.toggle('open', !expanded);
+      body.setAttribute('aria-hidden', expanded ? 'true' : 'false');
       if (!expanded && shimmer) {
         shimmer.style.animation = 'none';
         shimmer.offsetHeight;
@@ -259,7 +261,7 @@
       wrap.innerHTML = `
         <div class="profile-progress-card glass curr-card-acc">
           <div class="accordion-shimmer"></div>
-          <button class="accordion-trigger" aria-expanded="false" id="${triggerId}">
+          <button class="accordion-trigger" aria-expanded="false" aria-controls="${bodyId}" id="${triggerId}">
             <div class="accordion-header">
               <div class="curr-badge">
                 <div class="orb ${info.oc}">${curriculum.toUpperCase()}</div>
@@ -271,7 +273,7 @@
               <div class="curr-summary"><span class="curr-stars">${profileIcon('star')} ${summary.stars}/${summary.totalStars}</span><span class="acc-chevron">▼</span></div>
             </div>
           </button>
-          <div class="accordion-body" id="${bodyId}">
+          <div class="accordion-body" id="${bodyId}" aria-hidden="true">
             <div class="accordion-inner">
               <div class="prog-track"><div class="prog-fill ${info.fc}" data-target="${pct}"></div></div>
               <div class="game-rows">
