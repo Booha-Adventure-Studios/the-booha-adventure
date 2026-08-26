@@ -667,6 +667,77 @@
     .u-jp    { font-size:.67rem; font-weight:800; color: #c4bce0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .u-desc  { font-size:.64rem; font-weight:700; color: #c4bce0; margin-top:.08rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
+    /* ── WANDERER COLLECTION ────────────────────── */
+    .wanderer-section {
+      margin-bottom: 2rem;
+      padding: 1.15rem;
+      animation: riseIn .9s .34s cubic-bezier(.16,1,.3,1) both;
+    }
+    .wanderer-heading {
+      display:flex; align-items:end; justify-content:space-between; gap:1rem;
+      margin-bottom:.35rem;
+    }
+    .wanderer-heading .eyebrow { margin-bottom:0; flex:1; }
+    .wanderer-count {
+      color:#ffd966; font-family:var(--font-title); font-size:.72rem; font-weight:700;
+      letter-spacing:.08em; white-space:nowrap; text-shadow:0 0 12px #ffcc6688;
+    }
+    .wanderer-intro {
+      color:#c4bce0; font-size:.78rem; line-height:1.65; font-weight:800;
+      margin:.75rem 0 1rem; max-width:58ch;
+    }
+    .wanderer-intro ruby rt { color:#ffd966; }
+    .wanderer-grid {
+      display:grid; grid-template-columns:repeat(auto-fill,minmax(185px,1fr)); gap:.6rem;
+    }
+    .wanderer-tile {
+      min-width:0; min-height:170px; padding:.72rem; border-radius:var(--radius);
+      border:1px solid #c8b8ff18; background:linear-gradient(145deg,#c8b8ff0c,#08081055);
+      position:relative; overflow:hidden; transition:transform .2s,border-color .2s,box-shadow .2s;
+    }
+    .wanderer-tile.found {
+      border-color:var(--tile-color,#c8b8ff)66;
+      background:linear-gradient(145deg,color-mix(in srgb,var(--tile-color,#c8b8ff) 15%,transparent),#08081099 70%);
+      box-shadow:0 0 18px color-mix(in srgb,var(--tile-color,#c8b8ff) 18%,transparent), inset 0 0 18px #ffffff04;
+    }
+    .wanderer-tile.found:hover { transform:translateY(-3px); border-color:var(--tile-color,#fff); box-shadow:0 0 26px color-mix(in srgb,var(--tile-color,#c8b8ff) 34%,transparent); }
+    .wanderer-tile::after {
+      content:''; position:absolute; left:10%; right:10%; bottom:0; height:1px;
+      background:var(--tile-color,#c8b8ff); box-shadow:0 0 8px var(--tile-color,#c8b8ff); opacity:.22;
+    }
+    .wanderer-tile.found::after { opacity:.9; }
+    .wanderer-top { display:flex; align-items:center; gap:.65rem; min-width:0; }
+    .wanderer-portrait {
+      width:58px; height:58px; flex:0 0 58px; object-fit:contain; object-position:center bottom;
+      filter:drop-shadow(0 0 7px var(--tile-color,#c8b8ff88));
+    }
+    .wanderer-tile:not(.found) .wanderer-portrait { filter:grayscale(1) brightness(.18); opacity:.72; }
+    .wanderer-name { min-width:0; }
+    .wanderer-name-en {
+      color:#ffffff; font-family:var(--font-title); font-size:.64rem; font-weight:700;
+      letter-spacing:.04em; line-height:1.25; overflow-wrap:anywhere;
+    }
+    .wanderer-tile:not(.found) .wanderer-name-en { color:#8a80b0; }
+    .wanderer-state {
+      margin-top:.25rem; color:#8a80b0; font-size:.64rem; font-weight:900; letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+    .wanderer-tile.found .wanderer-state { color:var(--tile-color,#ffd966); text-shadow:0 0 8px color-mix(in srgb,var(--tile-color,#ffd966) 65%,transparent); }
+    .wanderer-comment {
+      margin:.72rem 0 0; color:#f0eaff; font-size:.72rem; line-height:1.45; font-weight:800;
+    }
+    .wanderer-comment-jp { margin:.3rem 0 0; color:#c4bce0; font-size:.7rem; line-height:1.7; font-weight:800; }
+    .wanderer-comment-jp ruby rt { color:#ffd966; }
+    .wanderer-visits {
+      margin-top:.5rem; color:#c4bce0; font-size:.62rem; font-weight:900; letter-spacing:.04em;
+    }
+    .wanderer-tile:not(.found) .wanderer-comment,
+    .wanderer-tile:not(.found) .wanderer-comment-jp,
+    .wanderer-tile:not(.found) .wanderer-visits { display:none; }
+    @supports not (background: color-mix(in srgb, red 10%, transparent)) {
+      .wanderer-tile.found { background:#c8b8ff12; box-shadow:0 0 18px #c8b8ff18; }
+    }
+
     /* ── SAVE CONTROLS ───────────────────────────── */
     .save-section { padding:1.4rem; animation:riseIn .9s .4s cubic-bezier(.16,1,.3,1) both; }
     .save-grid    { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:.55rem; margin-top:.85rem; }
@@ -797,6 +868,20 @@
   </header>
 
   <!-- Detailed progress now lives on profile.html. This page is reserved for collections, identity, and save controls. -->
+  <section class="wanderer-section glass" aria-labelledby="wanderer-title">
+    <div class="wanderer-heading">
+      <div class="eyebrow">
+        <span class="ey-en" id="wanderer-title">Wanderers Found</span>
+        <span class="ey-jp">見つけた旅人</span>
+        <span class="ey-kanji"><ruby>発見<rt>はっけん</rt></ruby>した<ruby>旅人<rt>たびびと</rt></ruby></span>
+        <div class="ey-line"></div>
+      </div>
+      <span class="wanderer-count" id="wanderer-count">0 / 36</span>
+    </div>
+    <p class="wanderer-intro">Each wanderer keeps a small memory of your visits. Find them again to learn more about Karasuki.</p>
+    <div class="wanderer-grid" id="wanderer-grid" aria-live="polite"></div>
+  </section>
+
   <section class="save-section glass">
     <div class="eyebrow">
       <span class="ey-en">Save &amp; Memory</span>
@@ -843,6 +928,7 @@
 
 <!-- Core systems -->
 <script src="./js/utsu-furigana.js"></script>
+<script src="js/karasuki-wanderer-data.js"></script>
 <script src="js/calendar.js"></script>
 <script src="js/core/adventure-core.js"></script>
 <script src="js/core/save-file.js"></script>
@@ -859,6 +945,7 @@
 <script src="js/core/week-system.js"></script>
 <script src="js/ui/memory-code-ui.js"></script>
 <script src="js/ui/save-menu.js"></script>
+<script src="js/ui/adventure-collection.js"></script>
 
 
 

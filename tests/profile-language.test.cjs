@@ -22,6 +22,9 @@ assert.doesNotMatch(adventure, /class="totals-bar"/, 'the adventure profile shou
 assert.doesNotMatch(adventure, /This Week's Record/, 'the adventure profile should not duplicate the detailed weekly record');
 assert.doesNotMatch(adventure, /js\/ui\/adventure-log\.js/, 'the adventure profile should not load the canonical weekly log');
 assert.match(adventure, /Save &amp; Memory/, 'the adventure profile should retain save and memory controls');
+assert.match(adventure, /id="wanderer-grid"/, 'the adventure profile should mount the wanderer collection');
+assert.match(adventure, /id="wanderer-count"/, 'the adventure profile should show the permanent wanderer count');
+assert.match(adventure, /js\/ui\/adventure-collection\.js/, 'the adventure profile should load the collection renderer');
 assert.match(adventureLog, /RECORDED`/, 'the weekly log should call activity recorded');
 assert.match(adventureLog, /FULLY LOGGED/, 'past weeks should describe full records, not a yearly completion path');
 
