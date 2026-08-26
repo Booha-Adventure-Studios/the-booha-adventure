@@ -15,9 +15,10 @@ const CURRENT_CACHES = {
   // just this one.
   // Wanderer furigana pass (js/karasuki.js), bumped per batch since each
   // lands as its own commit and prior bumps keep shipping to origin/main
-  // before the next batch is ready: -351 (Pass 1+2), -352 (committed before
-  // Pass 3 landed) — this bump is for Pass 3.
-  assets: 'booha-assets-2026-353',
+  // before the next batch is ready: -351 (Pass 1+2), -352 (Pass 3), -353
+  // (committed before Pass 4 landed) — this bump is for Pass 4, the final
+  // batch (all 36 wanderers now covered).
+  assets: 'booha-assets-2026-354',
   decks:  'booha-decks-2026-310',
 };
 
