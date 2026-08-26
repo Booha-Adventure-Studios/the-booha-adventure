@@ -13,8 +13,10 @@ const adventureLog = fs.readFileSync(path.join(ROOT, 'js/ui/adventure-log.js'), 
 assert.match(profile, /✓ RECORDED/, 'the daily profile result should describe a recorded check');
 assert.match(profile, /NOT RECORDED/, 'the daily profile empty state should describe an unrecorded check');
 assert.doesNotMatch(profile, /NOT COMPLETED/, 'the daily profile should not frame participation as a permanent completion');
-assert.match(adventure, />Recorded</, 'the adventure profile total should be a record count');
-assert.match(adventure, /This Week's Record/, 'the adventure profile should frame curriculum data as weekly');
+assert.match(profile, /RECORDED/, 'the canonical profile should show the recorded total');
+assert.match(profile, /THIS WEEK'S RECORD/, 'the canonical profile should contain the detailed weekly record');
+assert.doesNotMatch(adventure, /class="totals-bar"/, 'the adventure profile should not duplicate the progress totals');
+assert.doesNotMatch(adventure, /This Week's Record/, 'the adventure profile should not duplicate the detailed weekly record');
 assert.match(adventureLog, /RECORDED`/, 'the weekly log should call activity recorded');
 assert.match(adventureLog, /FULLY LOGGED/, 'past weeks should describe full records, not a yearly completion path');
 
