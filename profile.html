@@ -68,6 +68,8 @@
     .dc-dot.today{box-shadow:0 0 0 2px #b8892f;}
     .dc-stats{display:flex;gap:10px;justify-content:center;}
     .dc-stat{flex:1;max-width:120px;text-align:center;padding:8px 6px;border:1px solid #4a3820;border-radius:8px;}
+    .dc-stat-icon{display:block;height:18px;color:#b95817;filter:drop-shadow(0 0 5px #ffad55);}
+    .dc-stat-icon .profile-icon{width:16px;height:16px;}
     .dc-stat b{display:block;font-size:22px;color:#3a2c1a;line-height:1;}
     .dc-stat.accuracy b{font-size:clamp(14px,3.5vw,19px);white-space:nowrap;}
     .dc-stat .lab{font-size:10px;color:#7a603a;letter-spacing:1px;margin-top:4px;font-weight:700;}
@@ -152,90 +154,6 @@
       transition: transform .12s ease;
     }
     #alog-close:active { transform: scale(.9); }
-
-    /* ── Weekly world doors ──────────────────────────────────────────────── */
-    #world-doors[hidden] { display: none; }
-    /* Selector is class-only (not scoped to "#world-doors .world-door") so
-       it also reaches #world-door-muenba below, which is deliberately a
-       sibling of #world-doors rather than nested inside it — see the
-       markup comment for why. */
-    .world-door {
-      position: fixed; bottom: calc(14px + env(safe-area-inset-bottom, 0px));
-      z-index: 70; width: 86px; min-height: 102px; padding: 5px 4px 3px;
-      display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
-      border: 1px solid rgba(255,255,255,.16); border-radius: 15px;
-      background: rgba(20,16,10,.84); color: #efe1c2; text-decoration: none;
-      box-shadow: 0 5px 18px rgba(0,0,0,.55), inset 0 1px rgba(255,255,255,.14);
-      transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .world-door:hover,
-    .world-door:focus-visible {
-      transform: translateY(-4px) scale(1.03); outline: none;
-    }
-    #world-door-karasuki { left: 14px; border-color: rgba(184,137,47,.55); }
-    #world-door-karasuki:hover, #world-door-karasuki:focus-visible {
-      border-color: #d7aa4c; box-shadow: 0 0 22px rgba(184,137,47,.38), 0 6px 18px rgba(0,0,0,.55);
-    }
-    /* Centered rather than transform-positioned, so the shared hover
-       transform above (translateY + scale) doesn't have to fight a
-       translateX(-50%) needed just for centering. */
-    #world-door-muenba[hidden] { display: none; }
-    #world-door-muenba { left: 50%; margin-left: -43px; border-color: rgba(111,166,145,.55); }
-    #world-door-muenba:hover, #world-door-muenba:focus-visible {
-      border-color: #9ccbb6; box-shadow: 0 0 22px rgba(111,166,145,.38), 0 6px 18px rgba(0,0,0,.55);
-    }
-    .world-door img {
-      width: 69px; height: 69px; object-fit: contain; object-position: center bottom;
-      filter: drop-shadow(0 3px 6px rgba(0,0,0,.72));
-    }
-    #world-door-karasuki img { transform: scale(1.18); }
-    .world-door-label {
-      position: relative; z-index: 1; width: 100%; margin-top: -1px;
-      font-family: 'Cinzel Decorative', serif; font-size: 8px; letter-spacing: 1px;
-      line-height: 1.2; text-align: center; white-space: nowrap;
-    }
-    .world-door-label small { display: block; margin-top: 2px; color: #bca989; font-family: inherit; font-size: 8px; letter-spacing: .5px; }
-    @media (max-width: 430px) {
-      .world-door { width: 72px; min-height: 86px; border-radius: 12px; }
-      .world-door img { width: 57px; height: 57px; }
-      .world-door-label { font-size: 7px; }
-      .world-door-label small { font-size: 7px; }
-      #world-door-karasuki { left: 8px; }
-      #world-door-muenba { margin-left: -36px; }
-    }
-
-    /* ── Utsuroba door: bare corner-icon language ──────────────────────────
-       Pass 3 (finalized spec) asks specifically for the Utsuroba door to
-       match index.html's #alog-icon-btn/#juku-icon-btn language — a bare
-       glowing object, not another card — rather than the bordered/labeled
-       .world-door treatment Karasuki and Muenba use. It stays a .world-door
-       for the shared hidden/positioning/hover-lift plumbing, but every card
-       trapping (border, fill, label, padded box) is stripped back off here. */
-    #world-door-utsuroba {
-      right: 14px; width: 76px; min-height: 0; height: 76px; padding: 0;
-      border: none; border-radius: 0; background: transparent; box-shadow: none;
-      align-items: center; justify-content: center;
-      animation: utsurobaDoorGlow 3s ease-in-out infinite;
-    }
-    #world-door-utsuroba:hover, #world-door-utsuroba:focus-visible {
-      border-color: transparent; box-shadow: none;
-    }
-    #world-door-utsuroba img {
-      width: 100%; height: 100%; object-fit: contain; object-position: center; transform: none;
-      filter: drop-shadow(0 4px 14px rgba(0,0,0,.6));
-    }
-    #world-door-utsuroba .world-door-label { display: none; }
-    @keyframes utsurobaDoorGlow {
-      0%, 100% { filter: drop-shadow(0 4px 14px rgba(0,0,0,.6)); }
-      50%      { filter: drop-shadow(0 0 18px rgba(91,194,231,.75)); }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      #world-door-utsuroba { animation: none; }
-    }
-    @media (max-width: 430px) {
-      #world-door-utsuroba { right: 8px; width: 62px; height: 62px; }
-    }
 
     /* ── Leather header plate ── */
     .journal-plate {
@@ -527,7 +445,12 @@
     .profile-total-card.stars .profile-total-value { color:#8b5c08; text-shadow:0 0 13px #ffd96699; }
     .profile-total-card.recorded .profile-total-value { color:#176d47; text-shadow:0 0 13px #5cffd099; }
     .profile-total-card.alltime .profile-total-value { color:#5b3b91; text-shadow:0 0 13px #c8b8ff99; }
-    .profile-total-icon { font-size:1rem; }
+    .profile-icon { display:inline-block; width:1.15em; height:1.15em; vertical-align:-.18em; }
+    .profile-total-icon { display:flex; align-items:center; justify-content:center; height:1.35rem; }
+    .profile-total-icon .profile-icon { width:1.25rem; height:1.25rem; }
+    .profile-total-card.stars .profile-total-icon { color:#b8892f; filter:drop-shadow(0 0 6px #ffd966); }
+    .profile-total-card.recorded .profile-total-icon { color:#2e9b67; filter:drop-shadow(0 0 6px #5cffd0); }
+    .profile-total-card.alltime .profile-total-icon { color:#7950b5; filter:drop-shadow(0 0 6px #c8b8ff); }
     .profile-total-en { font-family:'Cinzel Decorative',serif; font-size:.52rem; letter-spacing:.09em; color:#5d4929; }
     .profile-total-jp { font-size:.68rem; color:#765d36; font-weight:900; }
 
@@ -545,7 +468,8 @@
     .highlight-card.longest::after { background:#397fcb; box-shadow:0 0 9px #66bbff; }
     .highlight-card.best::after { background:#b8892f; box-shadow:0 0 9px #ffd700; }
     .highlight-card.wanderers::after { background:#9a55c9; box-shadow:0 0 9px #cc66ff; }
-    .highlight-icon { font-size:1rem; line-height:1; }
+    .highlight-icon { display:flex; justify-content:center; height:1.2rem; line-height:1; }
+    .highlight-icon .profile-icon { width:1.1rem; height:1.1rem; }
     .highlight-value { margin:4px 0 3px; font-family:'Cinzel Decorative',serif; font-size:clamp(1rem,4vw,1.55rem); line-height:1.05; }
     .highlight-card.streak .highlight-value { color:#b95817; text-shadow:0 0 13px #ffad5599; }
     .highlight-card.longest .highlight-value { color:#2165a0; text-shadow:0 0 13px #66bbff99; }
@@ -580,6 +504,7 @@
     .profile-progress .accordion-trigger:focus-visible .accordion-header { background:rgba(184,137,47,.10); outline:none; }
     .profile-progress .curr-badge { display:flex; align-items:center; gap:9px; min-width:0; }
     .profile-progress .orb { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:.55rem; font-weight:900; }
+    .profile-progress .orb .profile-icon { width:1.15rem; height:1.15rem; }
     .profile-progress .orb-bc { background:#75d99a; color:#143b25; box-shadow:0 0 13px #5cffd088; }
     .profile-progress .orb-br { background:#70a9f4; color:#10294d; box-shadow:0 0 13px #66bbff88; }
     .profile-progress .orb-pb { background:#c78cf2; color:#35134f; box-shadow:0 0 13px #cc66ff88; }
@@ -601,7 +526,8 @@
     .profile-progress .game-rows { display:flex; flex-direction:column; gap:4px; }
     .profile-progress .game-row { display:grid; grid-template-columns:1.1rem 1fr auto auto; align-items:center; gap:6px; padding:7px; border-radius:7px; background:rgba(255,255,255,.13); }
     .profile-progress .game-row.done { background:rgba(64,150,98,.15); }
-    .profile-progress .row-chk { font-size:.72rem; text-align:center; }
+    .profile-progress .row-chk { display:flex; align-items:center; justify-content:center; color:#2e9b67; }
+    .profile-progress .row-chk .profile-icon { width:.82rem; height:.82rem; }
     .profile-progress .row-names { min-width:0; }
     .profile-progress .rn-en { font-size:.64rem; color:#3a2c1a; font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .profile-progress .game-row.done .rn-en { color:#176d47; }
@@ -620,7 +546,9 @@
     .profile-progress .g-jp, .profile-progress .u-jp { font-size:.61rem; color:#765d36; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .profile-progress .g-score, .profile-progress .u-desc { font-size:.59rem; color:#92784d; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .profile-progress .g-k, .profile-progress .u-k { font-size:.52rem; }
-    .profile-progress .u-icon { font-size:1.1rem; flex-shrink:0; }
+    .profile-progress .u-icon { display:flex; align-items:center; justify-content:center; width:1.35rem; color:#b8892f; flex-shrink:0; }
+    .profile-progress .u-icon .profile-icon { width:1.1rem; height:1.1rem; }
+    .profile-progress .u-chip:not(.earned) .u-icon { color:#92784d; }
     @media (max-width:500px) { .profile-totals { gap:4px; } .profile-total-card { padding:10px 3px 9px; } .profile-total-en { font-size:.44rem; } .profile-total-jp { font-size:.6rem; } .profile-progress .games-grid, .profile-progress .unlocks-grid { grid-template-columns:1fr; } }
     @media (max-width:640px) { .highlight-grid { grid-template-columns:repeat(2,1fr); } .trend-strip { gap:3px; } }
     @media (prefers-reduced-motion: reduce) { .profile-progress .accordion-body { transition:none; } .profile-progress .prog-fill { transition:none; } }
@@ -639,27 +567,26 @@
     <a href="profile.html" aria-current="page">LOG <small>ぼうけんログ</small></a>
     <a href="adventure-profile.html">ADVENTURE <small>ぼうけん</small></a>
     <a href="utsuroba-profile.html">UTSUROBA <small>うつろば</small></a>
-    <!-- Hidden until BoohaUnlockSystem.isMuenbaUnlocked() — see the
-         world-door-muenba script below, which toggles both together. -->
+    <!-- Hidden until BoohaUnlockSystem.isMuenbaUnlocked(). -->
     <a href="muenba-profile.html" id="pnet-muenba" hidden>MUENBA <small>むえんば</small></a>
   </nav>
 
  <div class="paper">
     <div class="profile-totals" id="profile-totals" aria-label="Progress totals">
       <div class="profile-total-card stars">
-        <div class="profile-total-icon">⭐</div>
+        <div class="profile-total-icon" data-profile-icon="star"></div>
         <div class="profile-total-value" id="total-stars">--</div>
         <div class="profile-total-en">THIS WEEK</div>
         <div class="profile-total-jp">こんしゅうのスター</div>
       </div>
       <div class="profile-total-card recorded">
-        <div class="profile-total-icon">✅</div>
+        <div class="profile-total-icon" data-profile-icon="check"></div>
         <div class="profile-total-value" id="total-completed">--</div>
         <div class="profile-total-en">RECORDED</div>
         <div class="profile-total-jp">きろく</div>
       </div>
       <div class="profile-total-card alltime">
-        <div class="profile-total-icon">🏆</div>
+        <div class="profile-total-icon" data-profile-icon="trophy"></div>
         <div class="profile-total-value" id="total-alltime">--</div>
         <div class="profile-total-en">ALL-TIME STARS</div>
         <div class="profile-total-jp">ぜんぶのスター</div>
@@ -691,7 +618,7 @@
         <button class="accordion-trigger" aria-expanded="false" id="acc-games-trigger">
           <div class="accordion-header">
             <div class="curr-badge">
-              <div class="orb orb-br">🎮</div>
+              <div class="orb orb-br" data-profile-icon="gamepad"></div>
               <div>
                 <div class="curr-name-en c-br">BONUS GAMES</div>
                 <div class="curr-name-jp">ボーナスゲーム <span class="curr-name-k"><ruby>遊技<rt>ゆうぎ</rt></ruby></span></div>
@@ -712,7 +639,7 @@
         <button class="accordion-trigger" aria-expanded="false" id="acc-achievements-trigger">
           <div class="accordion-header">
             <div class="curr-badge">
-              <div class="orb orb-pb">🏆</div>
+              <div class="orb orb-pb" data-profile-icon="trophy"></div>
               <div>
                 <div class="curr-name-en c-pb">ACHIEVEMENTS</div>
                 <div class="curr-name-jp">じっせき <span class="curr-name-k"><ruby>実績<rt>じっせき</rt></ruby></span></div>
@@ -745,26 +672,6 @@
     <div id="alog-past"></div>
   </div>
 
-  <!-- These doors are intentionally absent until the shared weekly gate opens. -->
-  <nav id="world-doors" hidden aria-label="Output world doors" aria-hidden="true">
-    <a id="world-door-karasuki" class="world-door" href="karasuki.html?from=profile" aria-label="Enter Karasuki / カラスキへ">
-      <img src="assets/img/karasuki1-tree.png" alt="">
-      <span class="world-door-label">KARASUKI<small>カラスキ</small></span>
-    </a>
-    <a id="world-door-utsuroba" class="world-door" href="utsuroba.html?from=profile" aria-label="Enter Utsuroba / うつろばへ">
-      <img src="assets/img/utsuroba_icon.png" alt="">
-      <span class="world-door-label">UTSUROBA<small>うつろば</small></span>
-    </a>
-  </nav>
-
-  <!-- Muenba's door is deliberately its own element, NOT nested inside
-       #world-doors above: it shares the same weekly gate, but keeps its own
-       visual treatment and profile-network tab. -->
-  <a id="world-door-muenba" class="world-door" href="muenba.html?from=profile" hidden aria-hidden="true" aria-label="Enter Muenba / むえんばへ">
-    <img src="assets/img/muenba/muenba_logo.png" alt="">
-    <span class="world-door-label">MUENBA<small>むえんば</small></span>
-  </a>
-
 <script>
   document.getElementById('alog-close').addEventListener('click', () => {
     sessionStorage.setItem('booha_return_to_hub', '1');
@@ -783,42 +690,15 @@
 <script src="./js/core/score-system.js"></script>
 <script src="./js/core/unlock-system.js"></script>
 <script src="./js/core/day-record.js"></script>
-  
+<script src="./js/ui/profile-icons.js"></script>
 <script src="./js/ui/adventure-log.js"></script>
 <script src="./js/ui/profile-progress.js"></script>
 <script src="./js/ui/juku-report-log.js"></script>
 <script src="./js/daily-check.js"></script>
 <script>
   (function () {
-    var doors = document.getElementById('world-doors');
-    if (!doors) return;
-
-    function renderWorldDoors() {
-      var open = false;
-      try {
-        open = !!(window.BoohaUnlockSystem &&
-          typeof BoohaUnlockSystem.isWeeklyWorldGateOpen === 'function' &&
-          BoohaUnlockSystem.isWeeklyWorldGateOpen());
-      } catch (_) {}
-      doors.hidden = !open;
-      doors.setAttribute('aria-hidden', open ? 'false' : 'true');
-    }
-
-    if (window.BOOHA_READY) renderWorldDoors();
-    else document.addEventListener('booha:ready', renderWorldDoors, { once: true });
-    document.addEventListener('booha:saved', renderWorldDoors);
-    document.addEventListener('booha:weeklyReset', renderWorldDoors);
-    document.addEventListener('booha:newWeek', renderWorldDoors);
-  })();
-</script>
-<script>
-  (function () {
-    // Independent of renderWorldDoors() above on purpose — Muenba keeps its
-    // own visual treatment while using the same live weekly gate. Toggle both
-    // the in-world door and profile-network tab together.
-    var muenbaDoor = document.getElementById('world-door-muenba');
     var muenbaTab = document.getElementById('pnet-muenba');
-    if (!muenbaDoor && !muenbaTab) return;
+    if (!muenbaTab) return;
 
     function renderMuenbaDoor() {
       var open = false;
@@ -827,11 +707,7 @@
           typeof BoohaUnlockSystem.isMuenbaUnlocked === 'function' &&
           BoohaUnlockSystem.isMuenbaUnlocked());
       } catch (_) {}
-      if (muenbaDoor) {
-        muenbaDoor.hidden = !open;
-        muenbaDoor.setAttribute('aria-hidden', open ? 'false' : 'true');
-      }
-      if (muenbaTab) muenbaTab.hidden = !open;
+      muenbaTab.hidden = !open;
     }
 
     if (window.BOOHA_READY) renderMuenbaDoor();
@@ -865,9 +741,15 @@
       });
 
       var stats = document.createElement('div'); stats.className = 'dc-stats';
-      function stat(value, label, extraClass) {
+      function stat(value, label, extraClass, iconName) {
         var box = document.createElement('div');
         box.className = 'dc-stat' + (extraClass ? ' ' + extraClass : '');
+        if (iconName && window.BoohaProfileIcons) {
+          var icon = document.createElement('span');
+          icon.className = 'dc-stat-icon';
+          icon.innerHTML = BoohaProfileIcons.svg(iconName);
+          box.appendChild(icon);
+        }
         var b = document.createElement('b'); b.textContent = value;
         var l = document.createElement('div'); l.className = 'lab'; l.textContent = label;
         box.appendChild(b); box.appendChild(l); return box;
@@ -879,7 +761,7 @@
         accuracyLabel = 'さいしょ → ベスト';
       }
       stats.appendChild(stat(s.doneCount + '/' + s.total, 'こんしゅう'));
-      stats.appendChild(stat('🔥 ' + s.streak, 'チェックれんぞく'));
+      stats.appendChild(stat(s.streak, 'チェックれんぞく', 'streak', 'flame'));
       stats.appendChild(stat(accuracy, accuracyLabel, 'accuracy'));
 
       host.appendChild(row);
