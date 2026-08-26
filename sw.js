@@ -20,7 +20,7 @@ const CURRENT_CACHES = {
   // before the next batch is ready: -351 (Pass 1+2), -352 (Pass 3), -353
   // (committed before Pass 4 landed) — this bump is for Pass 4, the final
   // batch (all 36 wanderers now covered).
-  assets: 'booha-assets-2026-355',
+  assets: 'booha-assets-2026-356',
   decks:  'booha-decks-2026-310',
 };
 
