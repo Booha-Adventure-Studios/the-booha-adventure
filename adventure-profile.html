@@ -701,6 +701,35 @@
     .wanderer-intro-en, .wanderer-intro-jp { display:block; }
     .wanderer-intro-jp { margin-top:.35rem; color:#e1dbf6; font-size:.72rem; line-height:1.8; }
     .wanderer-intro ruby rt { color:#ffd966; }
+    .collection-strip {
+      display:grid; grid-template-columns:repeat(3,1fr); gap:.5rem; margin:.9rem 0 .7rem;
+    }
+    .collection-stat {
+      min-width:0; padding:.62rem .7rem; border:1px solid #c8b8ff18; border-radius:var(--radius);
+      background:linear-gradient(145deg,#c8b8ff0d,#08081066); text-align:center;
+    }
+    .collection-stat-value {
+      display:block; color:#ffffff; font-family:var(--font-title); font-size:.86rem; font-weight:700;
+      line-height:1.2; text-shadow:0 0 12px var(--glow-moon);
+    }
+    .collection-stat-label {
+      display:block; margin-top:.2rem; color:#c4bce0; font-size:.57rem; font-weight:900;
+      letter-spacing:.08em; text-transform:uppercase; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .collection-stat-jp { display:block; margin-top:.12rem; color:#8a80b0; font-size:.58rem; font-weight:800; }
+    .collection-filters { display:flex; flex-wrap:wrap; gap:.4rem; margin:0 0 .85rem; }
+    .collection-filter {
+      border:1px solid #c8b8ff2b; border-radius:999px; padding:.38rem .7rem;
+      background:#c8b8ff08; color:#c4bce0; font-family:var(--font-jp); font-size:.62rem; font-weight:900;
+      cursor:pointer; transition:color .2s,border-color .2s,background .2s,box-shadow .2s;
+    }
+    .collection-filter:hover, .collection-filter:focus-visible {
+      color:#ffffff; border-color:#c8b8ffaa; background:#c8b8ff18; outline:none;
+    }
+    .collection-filter[aria-pressed="true"] {
+      color:#0a0a12; border-color:#ffd966; background:#ffd966; box-shadow:0 0 16px #ffcc6666;
+    }
+    .collection-filter small { display:block; margin-top:.04rem; font-size:.9em; font-weight:800; }
     .wanderer-grid {
       display:grid; grid-template-columns:repeat(auto-fill,minmax(185px,1fr)); gap:.6rem;
     }
@@ -720,7 +749,12 @@
       background:var(--tile-color,#c8b8ff); box-shadow:0 0 8px var(--tile-color,#c8b8ff); opacity:.22;
     }
     .wanderer-tile.found::after { opacity:.9; }
-    .wanderer-top { display:flex; align-items:center; gap:.65rem; min-width:0; }
+    .wanderer-index {
+      position:absolute; top:.55rem; right:.65rem; color:#8a80b0; font-family:var(--font-title);
+      font-size:.54rem; font-weight:700; letter-spacing:.08em;
+    }
+    .wanderer-tile.found .wanderer-index { color:var(--tile-color,#ffd966); text-shadow:0 0 8px var(--tile-color,#ffd966); }
+    .wanderer-top { display:flex; align-items:center; gap:.65rem; min-width:0; padding-right:1.9rem; }
     .wanderer-portrait {
       width:58px; height:58px; flex:0 0 58px; object-fit:contain; object-position:center bottom;
       filter:drop-shadow(0 0 7px var(--tile-color,#c8b8ff88));
@@ -748,6 +782,7 @@
     .wanderer-tile:not(.found) .wanderer-comment,
     .wanderer-tile:not(.found) .wanderer-comment-jp,
     .wanderer-tile:not(.found) .wanderer-visits { display:none; }
+    .wanderer-tile.locked { background:linear-gradient(145deg,#c8b8ff07,#05050b88); }
     @supports not (background: color-mix(in srgb, red 10%, transparent)) {
       .wanderer-tile.found { background:#c8b8ff12; box-shadow:0 0 18px #c8b8ff18; }
     }
@@ -916,6 +951,28 @@
       <span class="wanderer-intro-en">Each wanderer keeps a small memory of your visits. Find them again to learn more about Karasuki.</span>
       <span class="wanderer-intro-jp">それぞれの<ruby>旅人<rt>たびびと</rt></ruby>は、あなたが<ruby>会<rt>あ</rt></ruby>いに<ruby>来<rt>き</rt></ruby>た<ruby>思<rt>おも</rt></ruby>い<ruby>出<rt>で</rt></ruby>を<ruby>少<rt>すこ</rt></ruby>しずつ<ruby>残<rt>のこ</rt></ruby>します。もう<ruby>一度<rt>いちど</rt></ruby><ruby>見<rt>み</rt></ruby>つけると、カラスキをもっと<ruby>知<rt>し</rt></ruby>ることができます。</span>
     </p>
+    <div class="collection-strip" aria-label="Wanderer collection summary">
+      <div class="collection-stat">
+        <span class="collection-stat-value" id="collection-found-count">0</span>
+        <span class="collection-stat-label">Found</span>
+        <span class="collection-stat-jp"><ruby>発見<rt>はっけん</rt></ruby></span>
+      </div>
+      <div class="collection-stat">
+        <span class="collection-stat-value" id="collection-total-visits">0</span>
+        <span class="collection-stat-label">Total visits</span>
+        <span class="collection-stat-jp"><ruby>訪問<rt>ほうもん</rt></ruby></span>
+      </div>
+      <div class="collection-stat">
+        <span class="collection-stat-value" id="collection-total-count">0</span>
+        <span class="collection-stat-label">Wanderers</span>
+        <span class="collection-stat-jp"><ruby>旅人<rt>たびびと</rt></ruby></span>
+      </div>
+    </div>
+    <div class="collection-filters" role="group" aria-label="Filter wanderers">
+      <button class="collection-filter" type="button" data-collection-filter="all" aria-pressed="true">All<small>すべて</small></button>
+      <button class="collection-filter" type="button" data-collection-filter="found" aria-pressed="false">Found<small><ruby>発見済み<rt>はっけんずみ</rt></ruby></small></button>
+      <button class="collection-filter" type="button" data-collection-filter="unfound" aria-pressed="false">Not found<small><ruby>未発見<rt>みはっけん</rt></ruby></small></button>
+    </div>
     <div class="wanderer-grid" id="wanderer-grid" aria-live="polite"></div>
   </section>
 

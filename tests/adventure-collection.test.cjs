@@ -21,6 +21,11 @@ assert.match(page, /data-profile-icon="arrowLeft"/, 'the Back control should use
 assert.match(page, /<section class="games-section"/, 'the adventure profile should place Bonus Games near the top');
 assert.match(page, /id="games-grid"/, 'the adventure profile should mount the Bonus Games shelf');
 assert.match(page, /js\/ui\/bonus-games\.js/, 'the adventure profile should load the shared Bonus Games renderer');
+assert.match(page, /id="collection-found-count"/, 'the collection should show a found summary');
+assert.match(page, /id="collection-total-visits"/, 'the collection should show permanent visit totals');
+assert.match(page, /data-collection-filter="found"/, 'the collection should offer a found filter');
+assert.match(renderer, /activeFilter/, 'the collection renderer should retain the selected gallery filter');
+assert.match(renderer, /wanderer-index/, 'found and unfound tiles should show stable gallery numbers');
 assert.match(dataSource, /"Shoganai"/, 'the collection renderer should use the shared 36-wanderer data');
 
 console.log('Adventure collection tests passed.');
