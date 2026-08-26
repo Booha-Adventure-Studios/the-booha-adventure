@@ -7,7 +7,7 @@
 const CURRENT_CACHES = {
   // Profile consolidation Pass 1: ship the canonical progress page and its
   // moved progress renderer to returning players.
-  pages:  'booha-pages-2026-321',
+  pages:  'booha-pages-2026-322',
   // js/ is served cache-first (see ASSET_PREFIXES below), so once a device
   // caches a script it never re-fetches it until this string changes.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
@@ -22,7 +22,7 @@ const CURRENT_CACHES = {
   // batch (all 36 wanderers now covered).
   // Wanderer collection profile renderer (Pass 4).
   // Profile Pass 1: remove floating world doors and ship the shared SVG icon set.
-  assets: 'booha-assets-2026-365',
+  assets: 'booha-assets-2026-366',
   decks:  'booha-decks-2026-310',
 };
 

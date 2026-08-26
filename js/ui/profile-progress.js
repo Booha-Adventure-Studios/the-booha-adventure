@@ -27,13 +27,6 @@
     pb:{ en:'PB Curriculum', jp:'PBカリキュラム', k:'PB課程', cc:'c-pb', oc:'orb-pb', fc:'pf-pb' },
   };
 
-  const BONUS_GAME_META = {
-    booha_invaders:    { icon:'assets/invaders/bug-1.png',                         jp:'ブーハー・インベーダーズ',       k:'侵略者' },
-    booha_blocks:      { icon:'assets/blocks/red_block.png',                       jp:'ブーハー・ブロック',             k:'積木' },
-    feed_booha:        { icon:'assets/feed/boo-eat.png',                           jp:'ブーハーにキャンディをあげよう', k:'給食' },
-    booha_destruction: { icon:'assets/destruction/optimized/booha_helmet_256.png', jp:'ブーハー・デストラクション',     k:'破壊' },
-  };
-
   const UNLOCK_META = {
     first_game:              { icon:'star', jp:'さいしょのゲーム', k:'初ゲーム' },
     any_curriculum_complete: { icon:'medal', jp:'カリキュラムかんりょう', k:'課程完了' },
@@ -204,34 +197,6 @@
     return { icon:'check', jp:'クリア', k:'完了' };
   }
 
-  function renderGames() {
-    const R = BoohaAdventure.registry;
-    const S = BoohaAdventure.scores;
-    const U = BoohaAdventure.unlocks;
-    const grid = document.getElementById('games-grid');
-    if (!grid || !R || !S || !U) return;
-
-    grid.textContent = '';
-    R.getBonusGames().forEach(game => {
-      const meta = BONUS_GAME_META[game.id] || {};
-      const unlocked = U.isBonusGameUnlocked(game.id);
-      const entry = S.getEntry(game.saveId);
-      const played = entry.attempts > 0;
-      const scoreText = !unlocked ? 'Locked this week' : played ? entry.highScore.toLocaleString() : 'Not played';
-      const chip = document.createElement(unlocked ? 'a' : 'div');
-      chip.className = `g-chip ${unlocked ? 'unlocked' : ''}`;
-      if (unlocked) chip.href = game.file;
-      chip.innerHTML = `
-        <img class="g-icon" src="${escapeHTML(meta.icon || '')}" alt="${escapeHTML(game.name)}" loading="lazy">
-        <div class="g-text">
-          <div class="g-en">${escapeHTML(game.name)}</div>
-          <div class="g-jp">${escapeHTML(meta.jp || '')}　<span class="g-k">${furiKanji(meta.k || '')}</span></div>
-          <div class="g-score">${escapeHTML(scoreText)}</div>
-        </div>`;
-      grid.appendChild(chip);
-    });
-  }
-
   function render() {
     const totalBar = document.getElementById('profile-totals');
     const cont = document.getElementById('curr-cards');
@@ -298,8 +263,6 @@
       node.style.width = `${node.dataset.target}%`;
     }));
 
-    renderGames();
-
     grid.textContent = '';
     [...U.getAll()].sort((a, b) => b.unlocked - a.unlocked).forEach(unlock => {
       const meta = uMeta(unlock.id);
@@ -318,7 +281,6 @@
 
   function boot() {
     render();
-    initAccordion('acc-games-trigger', 'acc-games-body');
     initAccordion('acc-achievements-trigger', 'acc-achievements-body');
     document.addEventListener('booha:saved', render);
     document.addEventListener('booha:reset', render);

@@ -585,24 +585,22 @@
     .profile-progress .accordion-wrap { margin-bottom:9px; }
     .profile-progress .profile-accordion-trigger { display:flex; align-items:center; gap:10px; width:100%; border:0; background:transparent; cursor:pointer; text-align:left; color:#3a2c1a; }
     .profile-progress .profile-accordion-trigger .accordion-header { flex:1; }
-    .profile-progress .games-grid, .profile-progress .unlocks-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(175px,1fr)); gap:7px; padding:0 10px 10px; }
-    .profile-progress .g-chip, .profile-progress .u-chip { display:flex; align-items:center; gap:8px; min-width:0; padding:9px; border:1px solid rgba(58,44,26,.18); border-radius:9px; background:rgba(255,255,255,.10); text-decoration:none; color:#3a2c1a; filter:grayscale(.8); opacity:.48; }
-    .profile-progress .g-chip.unlocked, .profile-progress .u-chip.earned { filter:none; opacity:1; border-color:rgba(184,137,47,.48); box-shadow:0 0 12px rgba(184,137,47,.12); }
-    .profile-progress .g-chip.unlocked { background:radial-gradient(circle at 0 0,rgba(102,187,255,.18),transparent 62%),rgba(255,255,255,.12); box-shadow:0 0 16px rgba(102,187,255,.16),inset 0 1px rgba(255,255,255,.2); }
+    .profile-progress .unlocks-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(175px,1fr)); gap:7px; padding:0 10px 10px; }
+    .profile-progress .u-chip { display:flex; align-items:center; gap:8px; min-width:0; padding:9px; border:1px solid rgba(58,44,26,.18); border-radius:9px; background:rgba(255,255,255,.10); text-decoration:none; color:#3a2c1a; filter:grayscale(.8); opacity:.48; }
+    .profile-progress .u-chip.earned { filter:none; opacity:1; border-color:rgba(184,137,47,.48); box-shadow:0 0 12px rgba(184,137,47,.12); }
     .profile-progress .u-chip.earned { background:radial-gradient(circle at 0 0,rgba(204,102,255,.18),transparent 62%),rgba(255,255,255,.12); box-shadow:0 0 16px rgba(204,102,255,.16),inset 0 1px rgba(255,255,255,.2); }
-    .profile-progress .g-icon { width:30px; height:30px; object-fit:contain; flex-shrink:0; }
-    .profile-progress .g-text, .profile-progress .u-text { min-width:0; overflow:hidden; }
-    .profile-progress .g-en, .profile-progress .u-en { font-size:.61rem; font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .profile-progress .g-jp, .profile-progress .u-jp { font-size:.61rem; color:#765d36; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .profile-progress .g-score, .profile-progress .u-desc { font-size:.59rem; color:#92784d; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .profile-progress .g-k, .profile-progress .u-k { font-size:.52rem; }
+    .profile-progress .u-text { min-width:0; overflow:hidden; }
+    .profile-progress .u-en { font-size:.61rem; font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .profile-progress .u-jp { font-size:.61rem; color:#765d36; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .profile-progress .u-desc { font-size:.59rem; color:#92784d; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .profile-progress .u-k { font-size:.52rem; }
     .profile-progress .u-icon { display:flex; align-items:center; justify-content:center; width:1.35rem; color:#b8892f; flex-shrink:0; }
     .profile-progress .u-icon .profile-icon { width:1.1rem; height:1.1rem; }
     .profile-progress .u-chip:not(.earned) .u-icon { color:#92784d; }
     .profile-value-pop { animation:profileValuePop .55s cubic-bezier(.2,1.5,.4,1); }
     @keyframes profileCardSheen { 0%,58%,100% { transform:translateX(-135%); } 72% { transform:translateX(135%); } }
     @keyframes profileValuePop { 0% { transform:scale(1); } 45% { transform:scale(1.12); filter:brightness(1.3); } 100% { transform:scale(1); } }
-    @media (max-width:500px) { .profile-totals { gap:4px; } .profile-total-card { padding:10px 3px 9px; } .profile-total-en { font-size:.44rem; } .profile-total-jp { font-size:.6rem; } .profile-progress .games-grid, .profile-progress .unlocks-grid { grid-template-columns:1fr; } }
+    @media (max-width:500px) { .profile-totals { gap:4px; } .profile-total-card { padding:10px 3px 9px; } .profile-total-en { font-size:.44rem; } .profile-total-jp { font-size:.6rem; } .profile-progress .unlocks-grid { grid-template-columns:1fr; } }
     @media (max-width:640px) { .highlight-grid { grid-template-columns:repeat(2,1fr); } }
     @media (max-width:360px) { .alog-reference-grid { grid-template-columns:1fr; } .profile-network a { padding-left:9px; padding-right:9px; font-size:10px; } }
     @media (prefers-reduced-motion: reduce) {
@@ -673,27 +671,6 @@
       <div id="curr-cards"></div>
 
       <div class="ink-head profile-progress-eyebrow">
-        <span class="jp">ボーナスゲーム</span><span class="en">BONUS GAMES</span>
-      </div>
-      <div class="profile-progress-card glass">
-        <button class="accordion-trigger" aria-expanded="false" aria-controls="acc-games-body" id="acc-games-trigger">
-          <div class="accordion-header">
-            <div class="curr-badge">
-              <div class="orb orb-br" data-profile-icon="gamepad"></div>
-              <div>
-                <div class="curr-name-en c-br">BONUS GAMES</div>
-                <div class="curr-name-jp">ボーナスゲーム <span class="curr-name-k"><ruby>遊技<rt>ゆうぎ</rt></ruby></span></div>
-              </div>
-            </div>
-            <span class="acc-chevron">▼</span>
-          </div>
-        </button>
-        <div class="accordion-body" id="acc-games-body" aria-hidden="true">
-          <div class="accordion-inner"><div class="games-grid" id="games-grid"></div></div>
-        </div>
-      </div>
-
-      <div class="ink-head profile-progress-eyebrow">
         <span class="jp">じっせき</span><span class="en">ACHIEVEMENTS</span>
       </div>
       <div class="profile-progress-card glass">
@@ -752,6 +729,7 @@
 <script src="./js/core/unlock-system.js"></script>
 <script src="./js/core/day-record.js"></script>
 <script src="./js/ui/profile-icons.js"></script>
+<script src="./js/ui/bonus-games.js"></script>
 <script src="./js/ui/adventure-log.js"></script>
 <script src="./js/ui/profile-progress.js"></script>
 <script src="./js/ui/juku-report-log.js"></script>
