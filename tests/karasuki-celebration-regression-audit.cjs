@@ -43,8 +43,8 @@ assert(discovery.includes("title: 'NEW WANDERER FOUND!'"), 'first discovery must
 assert(discovery.includes("sfx: 'wandererFound'"), 'first discovery must use its procedural motif');
 assert(reunion.includes("title: 'HELLO AGAIN!'"), 'return visit must keep its welcome-back title');
 assert(reunion.includes("sfx: 'wandererReturn'"), 'return visit must use its procedural motif');
-assert(opener.includes('if (visit && visit.firstVisit) showWandererDiscovery(w);'), 'first-visit branch must open the discovery card');
-assert(opener.includes('else if (visit && Number(visit.visits) > 1) showWandererReturn(w);'), 'repeat-visit branch must open the welcome-back card');
+assert(opener.includes("if (visit && visit.popupKind === 'discovery') showWandererDiscovery(w);"), 'first-visit branch must open the discovery card');
+assert(opener.includes("else if (visit && visit.popupKind === 'return') showWandererReturn(w);"), 'new-week branch must open the welcome-back card');
 
 assert(nuppi.includes("innerHTML = furi(jp, NUPPI_FURIGANA)"), 'Nuppi dialogue must preserve furigana markup');
 assert(observer.includes('getGamesThisWeek()'), 'Observer must read the weekly activity count');
