@@ -51,7 +51,13 @@ assert(source.includes('id="muenba-case-board-eyebrow"') && source.includes('CAS
   'the case board must use one numbered eyebrow above the case title');
 assert(!source.includes("'muenba-case-record-instruction muenba-case-read-instruction'") && !source.includes("'muenba-case-read-instruction'"),
   'case intro and clue scenes must not render an empty READ instruction card');
+assert(source.includes('.muenba-lobby-box { overflow-x:hidden; }') && source.includes('overflow-wrap:anywhere;'),
+  'responsive popup content must wrap instead of clipping at narrow widths');
+assert(source.includes('.muenba-lobby-box.is-case-board { width:min(100%,calc(100vw - 24px)); padding:24px 16px 22px; }'),
+  'the de-cluttered case board must keep safe mobile insets');
+assert(source.includes('.muenba-mission-hint-toggle { min-height:42px; }'),
+  'the mission hint must remain a comfortable mobile touch target');
 assert(source.includes('.muenba-case-check-panel.is-locked'),
   'locked and unlocked check panels must have distinct visual states');
 
-console.log('Muenba popup audit passed: top anchoring, safe-area spacing, scrollability, scene reset, DEV hold, ESL layout, 19C typography, and 19D decluttering contracts.');
+console.log('Muenba popup audit passed: top anchoring, safe-area spacing, scrollability, scene reset, DEV hold, ESL layout, 19C typography, 19D decluttering, and 19E responsive contracts.');
