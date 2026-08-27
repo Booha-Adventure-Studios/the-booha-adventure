@@ -411,6 +411,13 @@ else
   bad "celebration modal accessibility audit failed"
 fi
 
+echo "[41/41] UtsuCard 21D celebration containment audit"
+if node tests/utsu-card-celebration-containment-audit.cjs >/dev/null 2>&1; then
+  ok "celebration modal containment contracts pass"
+else
+  bad "celebration modal containment audit failed"
+fi
+
 # ── Summary ──────────────────────────────────────────────────
 echo "───────────────────────────────────"
 echo "✅ $PASS passed   ⚠️  $WARN warnings   ❌ $FAIL failed"
