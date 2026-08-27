@@ -104,9 +104,9 @@
   const CASE_READ_GATE_MIN_MS = 2000;
   const CASE_READ_GATE_PER_WORD_MS = 240;
   const CASE_READ_GATE_MAX_MS = 6500;
-  const CASE_WORD_SWEEP_BASE_MS = 620;
-  const CASE_WORD_SWEEP_KEYWORD_EXTRA_MS = 180;
-  const CASE_WORD_SWEEP_FINAL_HOLD_MS = 1200;
+  const CASE_WORD_SWEEP_BASE_MS = 720;
+  const CASE_WORD_SWEEP_KEYWORD_EXTRA_MS = 250;
+  const CASE_WORD_SWEEP_FINAL_HOLD_MS = 1500;
   const CASE_WRONG_CLUE_COOLDOWN_MS = 1500;
   const CASE_FINAL_PENALTY_MAX = 2;
   const CASE_FINAL_PENALTY_ACCURACY_STEP = 5;
@@ -116,7 +116,6 @@
   const CASE_AUDIO_WORD_TICK_VOLUME = 0.018;
   const CASE_AUDIO_KEYWORD_VOLUME = 0.055;
   const CASE_AUDIO_UNLOCK_VOLUME = 0.08;
-  const CASE_AUDIO_LOCKED_VOLUME = 0.06;
 
   // Pass 8B — first rhythm chart. It is intentionally short and forgiving:
   // no simultaneous notes, holds, combos, or punishment yet. The chart is
@@ -579,12 +578,6 @@
     // Low and brief: the learner hears that CHECK is available, while the
     // transition into the rhythm reward remains reserved for the later pass.
     playCaseTone(130.81, 65.41, 0.6, CASE_AUDIO_UNLOCK_VOLUME, 'sine');
-  }
-
-  function playCaseLockedThud() {
-    // A short, low response explains an early tap without rewarding guessing
-    // or competing with the sentence and its keyword cues.
-    playCaseTone(70, 40, 0.12, CASE_AUDIO_LOCKED_VOLUME, 'square');
   }
 
   function playCaseSolvedCue() {
@@ -2120,11 +2113,6 @@
       button.addEventListener('click', event => {
         event.preventDefault();
         if (panel.classList.contains('is-locked')) {
-          playCaseLockedThud();
-          pulseCaseReadingWord(panel);
-          panel.classList.remove('muenba-case-locked-pulse');
-          void panel.offsetWidth;
-          panel.classList.add('muenba-case-locked-pulse');
           lockHint.textContent = 'Keep reading. The answers unlock when the record is complete.';
           return;
         }
@@ -2137,19 +2125,10 @@
     return { panel, answerSet, lockHint };
   }
 
-  function pulseCaseReadingWord(panel) {
-    const box = panel && panel.closest('.muenba-case-box');
-    const activeWord = box && box.querySelector('.muenba-case-sweep-word.is-current');
-    if (!activeWord) return;
-    activeWord.classList.remove('muenba-case-sweep-word-locked-pulse');
-    void activeWord.offsetWidth;
-    activeWord.classList.add('muenba-case-sweep-word-locked-pulse');
-  }
-
   function unlockCaseCheck(session, checkPanel, readStatus) {
     if (!session || captureSession !== session || session.phase !== 'case-read') return;
     session.phase = 'case-check';
-    checkPanel.panel.classList.remove('is-locked', 'muenba-case-locked-pulse');
+    checkPanel.panel.classList.remove('is-locked');
     checkPanel.panel.classList.add('is-unlocked');
     checkPanel.panel.setAttribute('aria-label', 'Record question choices');
     checkPanel.panel.querySelector('.muenba-case-check-lock-label').textContent = 'CHECK';
@@ -4451,8 +4430,6 @@
       .muenba-case-choice-locked { border-color:rgba(174,145,255,.2) !important; background:rgba(89,65,151,.07) !important; color:rgba(242,237,255,.34) !important; cursor:not-allowed; filter:saturate(.45); }
       .muenba-case-choice-locked .muenba-case-choice-number { border-color:rgba(174,145,255,.2); color:rgba(231,221,255,.34); background:rgba(89,65,151,.08); }
       .muenba-case-choice-locked:hover, .muenba-case-choice-locked:focus-visible { transform:none !important; border-color:rgba(174,145,255,.38) !important; background:rgba(89,65,151,.15) !important; box-shadow:none !important; outline:none; }
-      .muenba-case-locked-pulse { animation:muenbaCaseLockedPulse .36s ease-out; }
-      @keyframes muenbaCaseLockedPulse { 0%,100% { transform:translateX(0); } 25% { transform:translateX(-4px); } 50% { transform:translateX(4px); } 75% { transform:translateX(-2px); } }
       .muenba-case-glossary { display:flex; flex-wrap:wrap; gap:7px; margin:0 0 16px; }
       .muenba-case-glossary-chip { padding:4px 12px; border:1px solid rgba(255,224,102,.5); border-radius:999px; background:rgba(255,224,102,.1); color:#ffe066; font:700 .72rem ui-monospace,monospace; letter-spacing:.03em; }
       /* Case-specific heading treatment, scoped to .muenba-case-box so it
@@ -4982,8 +4959,29 @@
       .muenba-case-wrong-state { animation:muenbaCaseWrongPanel .42s ease-out; }
       @keyframes muenbaCaseWrongChoice { 0%,100% { transform:translateX(0); } 25% { transform:translateX(-5px); } 50% { transform:translateX(5px); } 75% { transform:translateX(-3px); } }
       @keyframes muenbaCaseWrongPanel { 0%,100% { transform:translateX(0); } 22% { transform:translateX(-3px); } 44% { transform:translateX(3px); } 66% { transform:translateX(-2px); } }
+      /* Pass 19B: the clue has two visual states. During the word sweep,
+         English is the only learner-facing surface. Once the sweep and its
+         final hold finish, the supporting UI fades back in together. */
+      .muenba-case-clue.muenba-reading { display:flex; flex-direction:column; justify-content:center; min-height:clamp(320px,65vh,620px); }
+      .muenba-case-clue.muenba-reading > .muenba-case-mode-label,
+      .muenba-case-clue.muenba-reading > .muenba-case-record-instruction,
+      .muenba-case-clue.muenba-reading > .muenba-case-progress,
+      .muenba-case-clue.muenba-reading > .muenba-case-progress-jp,
+      .muenba-case-clue.muenba-reading > h2,
+      .muenba-case-clue.muenba-reading > .muenba-case-glossary,
+      .muenba-case-clue.muenba-reading > .muenba-case-reading-status,
+      .muenba-case-clue.muenba-reading > .muenba-case-check-panel { display:none !important; }
+      .muenba-case-clue.muenba-reading > .muenba-case-record { box-sizing:border-box; width:100%; margin:0 auto !important; padding:26px 22px 25px; border-top:1px solid rgba(185,226,160,.32); border-right:0; border-bottom:1px solid rgba(185,226,160,.32); border-left:0; background:linear-gradient(110deg,rgba(104,139,83,.13),rgba(156,224,193,.035)); color:#fff7e6 !important; font-size:clamp(1.2rem,2.35vw,1.625rem) !important; line-height:1.85 !important; text-align:center !important; }
+      .muenba-case-clue.muenba-reading-complete > .muenba-case-reading-status,
+      .muenba-case-clue.muenba-reading-complete > .muenba-case-check-panel,
+      .muenba-case-clue.muenba-reading-complete > .muenba-case-glossary { animation:muenbaCaseStageReveal .4s ease both; }
+      @keyframes muenbaCaseStageReveal { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+      @media (max-width:640px) {
+        .muenba-case-clue.muenba-reading { min-height:300px; }
+        .muenba-case-clue.muenba-reading > .muenba-case-record { padding:22px 12px; font-size:clamp(1.18rem,5.2vw,1.42rem) !important; line-height:1.82 !important; }
+      }
       @media (prefers-reduced-motion: reduce) { .muenba-orb-release, .muenba-hunt-ghost-portrait, .muenba-gold-action, .muenba-read-ready { animation:none !important; } }
-      @media (prefers-reduced-motion: reduce) { #muenba-fade, .muenba-return-box, #muenba-return-overlay, .muenba-lobby-box, #muenba-lobby-overlay, #muenba-capture-overlay { transition:none !important; } .muenba-lobby-portrait, #muenba-hide, #muenba-celebration-status, .muenba-rhythm-board, .muenba-rhythm-combo, .muenba-rhythm-result-failure, .muenba-case-question, .muenba-case-question::before, .muenba-case-feedback-shake, .muenba-case-read-status, .muenba-energy-warning, .muenba-case-sweep-word-locked-pulse { animation:none !important; } .muenba-case-choice, .muenba-case-action, .muenba-capture-action { transition:none !important; } .muenba-rhythm-energy-fill { transition:none !important; } #muenba-profile-link { transition:none !important; } }
+      @media (prefers-reduced-motion: reduce) { #muenba-fade, .muenba-return-box, #muenba-return-overlay, .muenba-lobby-box, #muenba-lobby-overlay, #muenba-capture-overlay { transition:none !important; } .muenba-lobby-portrait, #muenba-hide, #muenba-celebration-status, .muenba-rhythm-board, .muenba-rhythm-combo, .muenba-rhythm-result-failure, .muenba-case-question, .muenba-case-question::before, .muenba-case-feedback-shake, .muenba-case-read-status, .muenba-energy-warning, .muenba-case-clue.muenba-reading-complete > .muenba-case-reading-status, .muenba-case-clue.muenba-reading-complete > .muenba-case-check-panel, .muenba-case-clue.muenba-reading-complete > .muenba-case-glossary { animation:none !important; } .muenba-case-choice, .muenba-case-action, .muenba-capture-action { transition:none !important; } .muenba-rhythm-energy-fill { transition:none !important; } #muenba-profile-link { transition:none !important; } }
     `;
     document.head.appendChild(style);
   }
