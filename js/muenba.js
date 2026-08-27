@@ -117,6 +117,7 @@
   const CASE_AUDIO_WORD_TICK_VOLUME = 0.018;
   const CASE_AUDIO_KEYWORD_VOLUME = 0.055;
   const CASE_AUDIO_UNLOCK_VOLUME = 0.08;
+  const CASE_AUDIO_LOCKED_VOLUME = 0.06;
 
   // Pass 8B — first rhythm chart. It is intentionally short and forgiving:
   // no simultaneous notes, holds, combos, or punishment yet. The chart is
@@ -579,6 +580,12 @@
     // Low and brief: the learner hears that CHECK is available, while the
     // transition into the rhythm reward remains reserved for the later pass.
     playCaseTone(130.81, 65.41, 0.6, CASE_AUDIO_UNLOCK_VOLUME, 'sine');
+  }
+
+  function playCaseLockedThud() {
+    // A short, low response explains an early tap without rewarding guessing
+    // or competing with the sentence and its keyword cues.
+    playCaseTone(70, 40, 0.12, CASE_AUDIO_LOCKED_VOLUME, 'square');
   }
 
   const danceArmsUpImg = new Image();
@@ -2113,6 +2120,8 @@
       button.addEventListener('click', event => {
         event.preventDefault();
         if (panel.classList.contains('is-locked')) {
+          playCaseLockedThud();
+          pulseCaseReadingWord(panel);
           panel.classList.remove('muenba-case-locked-pulse');
           void panel.offsetWidth;
           panel.classList.add('muenba-case-locked-pulse');
@@ -2126,6 +2135,15 @@
     panel.appendChild(choices);
     box.appendChild(panel);
     return { panel, answerSet, lockHint };
+  }
+
+  function pulseCaseReadingWord(panel) {
+    const box = panel && panel.closest('.muenba-case-box');
+    const activeWord = box && box.querySelector('.muenba-case-sweep-word.is-current');
+    if (!activeWord) return;
+    activeWord.classList.remove('muenba-case-sweep-word-locked-pulse');
+    void activeWord.offsetWidth;
+    activeWord.classList.add('muenba-case-sweep-word-locked-pulse');
   }
 
   function unlockCaseCheck(session, checkPanel, readStatus) {
@@ -4442,6 +4460,8 @@
       .muenba-case-sweep-word.is-keyword.is-revealed { color:#ffe066; font-weight:700; text-shadow:0 0 10px rgba(255,224,102,.65), 0 0 22px rgba(255,196,40,.3); }
       .muenba-case-sweep-word.is-current { color:#fff; text-shadow:0 0 12px rgba(223,255,237,.7); }
       .muenba-case-sweep-word.is-current.is-keyword { color:#ffe066; text-shadow:0 0 12px rgba(255,224,102,.8), 0 0 26px rgba(255,196,40,.35); }
+      .muenba-case-sweep-word-locked-pulse { animation:muenbaCaseLockedWordPulse .36s ease-out; }
+      @keyframes muenbaCaseLockedWordPulse { 0%,100% { filter:brightness(1); } 40% { filter:brightness(1.7); text-shadow:0 0 18px rgba(255,255,235,.95),0 0 30px rgba(156,224,193,.42); } }
       .muenba-case-reading-status { display:flex; align-items:center; justify-content:space-between; gap:10px; }
       .muenba-case-reading-status .muenba-case-direction-en { letter-spacing:.03em; }
       .muenba-case-reading-status::after { width:7px; height:7px; flex:0 0 auto; border-radius:50%; background:#9ce0c1; box-shadow:0 0 12px rgba(156,224,193,.85); content:""; animation:muenbaReadingDot 1.2s ease-in-out infinite; }
@@ -4991,7 +5011,7 @@
       @keyframes muenbaCaseWrongChoice { 0%,100% { transform:translateX(0); } 25% { transform:translateX(-5px); } 50% { transform:translateX(5px); } 75% { transform:translateX(-3px); } }
       @keyframes muenbaCaseWrongPanel { 0%,100% { transform:translateX(0); } 22% { transform:translateX(-3px); } 44% { transform:translateX(3px); } 66% { transform:translateX(-2px); } }
       @media (prefers-reduced-motion: reduce) { .muenba-orb-release, .muenba-hunt-ghost-portrait, .muenba-gold-action, .muenba-read-ready { animation:none !important; } }
-      @media (prefers-reduced-motion: reduce) { #muenba-fade, .muenba-return-box, #muenba-return-overlay, .muenba-lobby-box, #muenba-lobby-overlay, #muenba-capture-overlay { transition:none !important; } .muenba-lobby-portrait, #muenba-hide, #muenba-celebration-status, .muenba-rhythm-board, .muenba-rhythm-combo, .muenba-rhythm-result-failure, .muenba-case-question, .muenba-case-question::before, .muenba-case-feedback-shake, .muenba-case-read-status, .muenba-case-rhythm-transition .muenba-lobby-portrait, .muenba-energy-warning { animation:none !important; } .muenba-case-choice, .muenba-case-action, .muenba-capture-action { transition:none !important; } .muenba-rhythm-energy-fill { transition:none !important; } #muenba-profile-link { transition:none !important; } }
+      @media (prefers-reduced-motion: reduce) { #muenba-fade, .muenba-return-box, #muenba-return-overlay, .muenba-lobby-box, #muenba-lobby-overlay, #muenba-capture-overlay { transition:none !important; } .muenba-lobby-portrait, #muenba-hide, #muenba-celebration-status, .muenba-rhythm-board, .muenba-rhythm-combo, .muenba-rhythm-result-failure, .muenba-case-question, .muenba-case-question::before, .muenba-case-feedback-shake, .muenba-case-read-status, .muenba-case-rhythm-transition .muenba-lobby-portrait, .muenba-energy-warning, .muenba-case-sweep-word-locked-pulse { animation:none !important; } .muenba-case-choice, .muenba-case-action, .muenba-capture-action { transition:none !important; } .muenba-rhythm-energy-fill { transition:none !important; } #muenba-profile-link { transition:none !important; } }
     `;
     document.head.appendChild(style);
   }
