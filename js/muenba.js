@@ -1987,19 +1987,6 @@
     return escaped.replace(new RegExp(`\\b(${pattern})\\b`, 'gi'), '<span class="kw">$1</span>');
   }
 
-  function appendCaseGlossary(box, keywords) {
-    if (!Array.isArray(keywords) || !keywords.length) return;
-    const glossary = document.createElement('div');
-    glossary.className = 'muenba-case-glossary';
-    keywords.forEach(kw => {
-      const chip = document.createElement('span');
-      chip.className = 'muenba-case-glossary-chip';
-      chip.textContent = kw;
-      glossary.appendChild(chip);
-    });
-    box.appendChild(glossary);
-  }
-
   function clearCaseWrongAnswer(session) {
     if (!session) return;
     if (session.caseWrongTimer) window.clearTimeout(session.caseWrongTimer);
@@ -2479,7 +2466,6 @@
     const record = document.createElement('p');
     record.className = 'muenba-case-record';
     box.appendChild(record);
-    appendCaseGlossary(box, clue.keywords);
 
     const readStatus = renderCaseDirection(
       box,
@@ -2543,7 +2529,6 @@
     record.className = 'muenba-case-record';
     record.innerHTML = highlightKeywords(clue.text, clue.keywords);
     box.appendChild(record);
-    appendCaseGlossary(box, clue.keywords);
 
     renderCaseDirection(box, check.prompt, check.promptJP, 'muenba-case-question');
     if (feedback) renderCaseDirection(
@@ -2627,7 +2612,6 @@
     record.className = 'muenba-case-record';
     record.innerHTML = highlightKeywords(clue.text, clue.keywords);
     box.appendChild(record);
-    appendCaseGlossary(box, clue.keywords);
 
     const actions = document.createElement('div');
     actions.className = 'muenba-case-actions muenba-case-review-actions';
@@ -4398,8 +4382,8 @@
       .muenba-case-record-item h3 { margin:0 0 4px; color:#e7dca9; font:700 .72rem/1.35 ui-monospace,monospace; letter-spacing:.04em; }
       .muenba-case-record-item p { margin:0; color:#fff; font-size:.82rem; line-height:1.45; }
       /* Pass 12: highlighted-vocabulary clue cards — keywords glow gold
-         against the now-white body text; the glossary chip row echoes them
-         below the clue so learners see the target words twice. */
+         against the now-white body text without adding another competing
+         reading surface. */
       .muenba-case-record .kw, .muenba-case-record-item p .kw { color:#ffe066; font-weight:700; text-shadow:0 0 10px rgba(255,224,102,.65), 0 0 22px rgba(255,196,40,.3); }
       .muenba-case-record.muenba-case-sweep { color:#fff !important; }
       .muenba-case-sweep-word { color:rgba(223,240,231,.2); text-shadow:none; transition:color .22s ease, text-shadow .22s ease, opacity .22s ease; }
@@ -4430,8 +4414,6 @@
       .muenba-case-choice-locked { border-color:rgba(174,145,255,.2) !important; background:rgba(89,65,151,.07) !important; color:rgba(242,237,255,.34) !important; cursor:not-allowed; filter:saturate(.45); }
       .muenba-case-choice-locked .muenba-case-choice-number { border-color:rgba(174,145,255,.2); color:rgba(231,221,255,.34); background:rgba(89,65,151,.08); }
       .muenba-case-choice-locked:hover, .muenba-case-choice-locked:focus-visible { transform:none !important; border-color:rgba(174,145,255,.38) !important; background:rgba(89,65,151,.15) !important; box-shadow:none !important; outline:none; }
-      .muenba-case-glossary { display:flex; flex-wrap:wrap; gap:7px; margin:0 0 16px; }
-      .muenba-case-glossary-chip { padding:4px 12px; border:1px solid rgba(255,224,102,.5); border-radius:999px; background:rgba(255,224,102,.1); color:#ffe066; font:700 .72rem ui-monospace,monospace; letter-spacing:.03em; }
       /* Case-specific heading treatment, scoped to .muenba-case-box so it
          never touches the many unrelated screens sharing .muenba-lobby-box. */
       .muenba-case-box h2 { color:#fff5d5; font-size:1.3rem; font-weight:400; letter-spacing:.01em; text-transform:none; }
@@ -4807,7 +4789,6 @@
       .muenba-case-clue .muenba-case-progress-jp { color:#9fc3af; }
       .muenba-case-clue h2 { margin:15px 0 4px; color:#f4f1d9; font-size:clamp(1.22rem,3.5vw,1.48rem); text-align:left; }
       .muenba-case-clue .muenba-case-record { margin-top:8px !important; padding:17px 17px 16px; border-left-width:4px; border-color:#b9e2a0; background:linear-gradient(110deg,rgba(104,139,83,.19),rgba(156,224,193,.045)); font-size:1.04rem !important; line-height:1.68 !important; }
-      .muenba-case-clue .muenba-case-glossary { margin-top:-6px; }
       .muenba-case-resolved { border-color:rgba(241,215,141,.78); box-shadow:0 24px 80px rgba(0,0,0,.82),0 0 76px rgba(216,201,139,.28),inset 0 0 70px rgba(0,0,0,.58); }
       .muenba-case-resolved .muenba-case-eyebrow { color:#fff0a9; text-shadow:0 0 18px rgba(255,224,102,.28); font-size:.72rem; }
       .muenba-case-resolved .muenba-case-eyebrow-jp { color:#d8c98b; }
@@ -4937,8 +4918,6 @@
       .muenba-case-clue .muenba-case-progress-jp { margin-bottom:13px; font-size:.8rem; }
       .muenba-case-clue h2 { margin:17px 0 7px; font-size:clamp(1.28rem,3.5vw,1.52rem); line-height:1.25; }
       .muenba-case-clue .muenba-case-record { min-height:120px; box-sizing:border-box; padding:20px 20px 19px; font-size:clamp(1.16rem,2.35vw,1.38rem) !important; line-height:1.82 !important; letter-spacing:.015em; }
-      .muenba-case-clue .muenba-case-glossary { gap:8px; margin:0 0 17px; }
-      .muenba-case-clue .muenba-case-glossary-chip { padding:5px 11px; font-size:.78rem; }
       .muenba-case-clue .muenba-case-reading-status { margin-top:17px; padding:12px 14px; }
       .muenba-case-check-panel { padding:18px 16px 16px; }
       .muenba-case-check-panel .muenba-case-question { padding:18px 17px 17px; }
@@ -4968,20 +4947,36 @@
       .muenba-case-clue.muenba-reading > .muenba-case-progress,
       .muenba-case-clue.muenba-reading > .muenba-case-progress-jp,
       .muenba-case-clue.muenba-reading > h2,
-      .muenba-case-clue.muenba-reading > .muenba-case-glossary,
       .muenba-case-clue.muenba-reading > .muenba-case-reading-status,
       .muenba-case-clue.muenba-reading > .muenba-case-check-panel { display:none !important; }
       .muenba-case-clue.muenba-reading > .muenba-case-record { box-sizing:border-box; width:100%; margin:0 auto !important; padding:26px 22px 25px; border-top:1px solid rgba(185,226,160,.32); border-right:0; border-bottom:1px solid rgba(185,226,160,.32); border-left:0; background:linear-gradient(110deg,rgba(104,139,83,.13),rgba(156,224,193,.035)); color:#fff7e6 !important; font-size:clamp(1.2rem,2.35vw,1.625rem) !important; line-height:1.85 !important; text-align:center !important; }
       .muenba-case-clue.muenba-reading-complete > .muenba-case-reading-status,
-      .muenba-case-clue.muenba-reading-complete > .muenba-case-check-panel,
-      .muenba-case-clue.muenba-reading-complete > .muenba-case-glossary { animation:muenbaCaseStageReveal .4s ease both; }
+      .muenba-case-clue.muenba-reading-complete > .muenba-case-check-panel { animation:muenbaCaseStageReveal .4s ease both; }
       @keyframes muenbaCaseStageReveal { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
       @media (max-width:640px) {
         .muenba-case-clue.muenba-reading { min-height:300px; }
         .muenba-case-clue.muenba-reading > .muenba-case-record { padding:22px 12px; font-size:clamp(1.18rem,5.2vw,1.42rem) !important; line-height:1.82 !important; }
       }
+      /* Pass 19C: make the English record the visual hero. The old keyword
+         pills repeated words already highlighted in the sentence, so the
+         sentence now carries the vocabulary emphasis by itself. Questions
+         and choices stay large enough for young readers to tap comfortably. */
+      .muenba-case-clue .muenba-case-record,
+      .muenba-case-review .muenba-case-record { font-size:clamp(1.18rem,2.1vw,1.625rem) !important; line-height:1.85 !important; letter-spacing:.015em; }
+      .muenba-case-clue .muenba-case-record:not(.muenba-case-sweep) .kw,
+      .muenba-case-review .muenba-case-record .kw { font-size:clamp(1.05em,2.2vw,1.077em); line-height:inherit; }
+      .muenba-case-clue .muenba-case-direction-jp,
+      .muenba-case-review .muenba-case-direction-jp { color:#8093a7 !important; font-size:13px !important; line-height:1.6 !important; opacity:.5; }
+      .muenba-case-question .muenba-case-direction-en { color:#e2e8f0 !important; font-size:clamp(1.18rem,2.2vw,1.375rem) !important; line-height:1.45 !important; }
+      .muenba-case-check-panel .muenba-case-question { background:#131c27; border-color:rgba(226,232,240,.34); }
+      .muenba-case-choice { min-height:62px !important; padding:16px 20px !important; font-size:clamp(1rem,2.1vw,1.125rem) !important; line-height:1.45 !important; }
+      @media (max-width:640px) {
+        .muenba-case-clue .muenba-case-record,
+        .muenba-case-review .muenba-case-record { font-size:clamp(1.18rem,5.2vw,1.625rem) !important; line-height:1.82 !important; }
+        .muenba-case-choice { padding:14px 14px !important; }
+      }
       @media (prefers-reduced-motion: reduce) { .muenba-orb-release, .muenba-hunt-ghost-portrait, .muenba-gold-action, .muenba-read-ready { animation:none !important; } }
-      @media (prefers-reduced-motion: reduce) { #muenba-fade, .muenba-return-box, #muenba-return-overlay, .muenba-lobby-box, #muenba-lobby-overlay, #muenba-capture-overlay { transition:none !important; } .muenba-lobby-portrait, #muenba-hide, #muenba-celebration-status, .muenba-rhythm-board, .muenba-rhythm-combo, .muenba-rhythm-result-failure, .muenba-case-question, .muenba-case-question::before, .muenba-case-feedback-shake, .muenba-case-read-status, .muenba-energy-warning, .muenba-case-clue.muenba-reading-complete > .muenba-case-reading-status, .muenba-case-clue.muenba-reading-complete > .muenba-case-check-panel, .muenba-case-clue.muenba-reading-complete > .muenba-case-glossary { animation:none !important; } .muenba-case-choice, .muenba-case-action, .muenba-capture-action { transition:none !important; } .muenba-rhythm-energy-fill { transition:none !important; } #muenba-profile-link { transition:none !important; } }
+      @media (prefers-reduced-motion: reduce) { #muenba-fade, .muenba-return-box, #muenba-return-overlay, .muenba-lobby-box, #muenba-lobby-overlay, #muenba-capture-overlay { transition:none !important; } .muenba-lobby-portrait, #muenba-hide, #muenba-celebration-status, .muenba-rhythm-board, .muenba-rhythm-combo, .muenba-rhythm-result-failure, .muenba-case-question, .muenba-case-question::before, .muenba-case-feedback-shake, .muenba-case-read-status, .muenba-energy-warning, .muenba-case-clue.muenba-reading-complete > .muenba-case-reading-status, .muenba-case-clue.muenba-reading-complete > .muenba-case-check-panel { animation:none !important; } .muenba-case-choice, .muenba-case-action, .muenba-capture-action { transition:none !important; } .muenba-rhythm-energy-fill { transition:none !important; } #muenba-profile-link { transition:none !important; } }
     `;
     document.head.appendChild(style);
   }
