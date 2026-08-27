@@ -2917,10 +2917,12 @@ const HAPPY_HOUSE_PORTAL = {
     state.clickTarget = null;
     if (visit && visit.firstVisit) showWandererDiscovery(w);
     else if (visit && Number(visit.visits) > 1) showWandererReturn(w);
+    else if (window.UtsuSfx && typeof window.UtsuSfx.popupOpen === 'function') window.UtsuSfx.popupOpen();
   }
 
   function closeWandererPop() {
     if (currentPopWanderer) { currentPopWanderer.pose = 0; if (currentPopWanderer.type === 'drift') currentPopWanderer.frozen = false; currentPopWanderer = null; }
+    if (window.UtsuSfx && typeof window.UtsuSfx.popupClose === 'function') window.UtsuSfx.popupClose();
     wandererPopCooldownUntil = performance.now() + POPUP_COOLDOWN_MS;
     wandererPopOverlay.style.background = 'rgba(0,0,0,0)';
     setTimeout(() => { wandererPopOverlay.style.display = 'none'; }, 300);
@@ -3045,7 +3047,10 @@ const HAPPY_HOUSE_PORTAL = {
     b.type = 'button';
     b.className = 'wpop-btn';
     b.innerHTML = `<span>${en}</span><span class="wbtn-jp">${jp}</span>`;
-    b.addEventListener('click', onClick);
+    b.addEventListener('click', event => {
+      if (window.UtsuSfx && typeof window.UtsuSfx.buttonPress === 'function') window.UtsuSfx.buttonPress();
+      if (typeof onClick === 'function') onClick(event);
+    });
     return b;
   }
 
@@ -3084,10 +3089,12 @@ const HAPPY_HOUSE_PORTAL = {
     overlay.style.display    = 'flex';
     overlay.style.background = bg || 'rgba(0,0,0,0.86)';
     state.clickTarget = null;
+    if (window.UtsuSfx && typeof window.UtsuSfx.popupOpen === 'function') window.UtsuSfx.popupOpen();
   }
 
   function closeWpopOverlay(overlay, delay) {
     overlay.style.background = 'rgba(0,0,0,0)';
+    if (window.UtsuSfx && typeof window.UtsuSfx.popupClose === 'function') window.UtsuSfx.popupClose();
     setTimeout(() => { overlay.style.display = 'none'; }, delay || 300);
   }
 
@@ -3134,6 +3141,7 @@ const HAPPY_HOUSE_PORTAL = {
   function openBonusPop(tree) {
     bonusPopCurrentTree = tree;
     const unlocked = _bonusUnlocked(tree.id);
+    if (!unlocked && window.UtsuSfx && typeof window.UtsuSfx.lockedRattle === 'function') window.UtsuSfx.lockedRattle();
     const t = BONUS_THEMES[tree.theme] || BONUS_THEMES.mystery;
     wpopThemeBox('bonus-pop', t);
 
@@ -3592,6 +3600,7 @@ const HAPPY_HOUSE_PORTAL = {
 
   function openUtsuobaPopup() {
     const unlocked = _utsurobaCurriculumUnlocked();
+    if (!unlocked && window.UtsuSfx && typeof window.UtsuSfx.lockedRattle === 'function') window.UtsuSfx.lockedRattle();
     wpopThemeBox('utsuroba-pop', UTSUROBA_THEME);
     wpopSetIconImage('utsuroba-pop', 'assets/img/utsuroba_icon.png', 'Utsuroba', 'image-utsuroba');
     wpopSetLock('utsuroba-pop', false);
@@ -3853,6 +3862,8 @@ const HAPPY_HOUSE_PORTAL = {
 
   function openMuenbaPopup() {
     if (!muenbaPopOverlay) injectMuenbaPopOverlay();
+    const unlocked = muenbaUnlocked();
+    if (!unlocked && window.UtsuSfx && typeof window.UtsuSfx.lockedRattle === 'function') window.UtsuSfx.lockedRattle();
     wpopThemeBox('muenba-pop', MUENBA_THEME);
     wpopSetIconImage('muenba-pop', 'assets/img/muenba/muenba_logo.png', 'Muenba', 'image-muenba');
     wpopSetText(document.getElementById('muenba-pop-title-en'), '');
@@ -3866,7 +3877,7 @@ const HAPPY_HOUSE_PORTAL = {
     bodyEn.style.color = '#dceee3';
     bodyJp.style.color = '#aec8bb';
 
-    if (muenbaUnlocked()) {
+    if (unlocked) {
       wpopSetLock('muenba-pop', false);
       wpopSetText(eyebrowEn, 'A NEW WORLD');
       wpopSetText(eyebrowJp, '新しい世界');
@@ -4865,10 +4876,12 @@ function openObserverPop() {
   observerPopEl.style.display    = 'flex';
   observerPopEl.style.background = 'rgba(1,8,1,0.90)';
   state.clickTarget = null;
+  if (window.UtsuSfx && typeof window.UtsuSfx.slimeClick === 'function') window.UtsuSfx.slimeClick();
 }
 
 function closeObserverPop() {
   observerPopOpen = false;
+  if (window.UtsuSfx && typeof window.UtsuSfx.skeletonClose === 'function') window.UtsuSfx.skeletonClose();
   observerPopEl.style.background = 'rgba(0,0,0,0)';
   setTimeout(() => { if (!observerPopOpen) observerPopEl.style.display = 'none'; }, 300);
   observerPopCooldownUntil = performance.now() + POPUP_COOLDOWN_MS;
@@ -5345,11 +5358,13 @@ const NUPPI_LINES = [
     nuppiPopEl.style.display    = 'flex';
     nuppiPopEl.style.background = 'rgba(10,0,8,0.92)';
     state.clickTarget = null;
+    if (window.UtsuSfx && typeof window.UtsuSfx.mischiefReward === 'function') window.UtsuSfx.mischiefReward();
   }
  
   function closeNuppiPop() {
     nuppiPopOpen  = false;
     nuppi.frozen  = false;
+    if (window.UtsuSfx && typeof window.UtsuSfx.popupClose === 'function') window.UtsuSfx.popupClose();
     nuppiPopEl.style.background = 'rgba(0,0,0,0)';
     setTimeout(() => { if (!nuppiPopOpen) nuppiPopEl.style.display = 'none'; }, 300);
     nuppiPopCooldownUntil = performance.now() + POPUP_COOLDOWN_MS;
