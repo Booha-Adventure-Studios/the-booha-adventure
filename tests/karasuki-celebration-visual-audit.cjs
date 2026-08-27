@@ -17,7 +17,7 @@ assert(card.includes('.utsu-celebration-card.is-copy-overlay .utsu-celebration-c
 assert(card.includes('background:linear-gradient(180deg,rgba(4,14,11,.92),rgba(4,10,8,.80))'), 'foreground copy needs a readable dark glow surface');
 assert(card.includes('width:100%;height:100%;object-fit:contain'), 'all Wanderer portraits must share a constrained contain frame');
 assert(card.includes('width:min(340px,74vw);height:min(360px,42vh)'), 'desktop portrait frame must preserve the large shared scale');
-assert(card.includes('width:min(270px,72vw);height:min(280px,38vh)'), 'mobile portrait frame must remain large but screen-safe');
+assert(card.includes('width:min(270px,72vw,100%);height:min(280px,38vh,38dvh)'), 'mobile portrait frame must remain large but screen-safe');
 
 assert((karasuki.match(/copyOverlay: true/g) || []).length >= 2, 'discovery and return cards must both use the foreground copy treatment');
 assert(karasuki.includes('alt="The Observers"'), 'Observer artwork alt text must reflect the four-figure group');

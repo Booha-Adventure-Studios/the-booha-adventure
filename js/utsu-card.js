@@ -334,7 +334,7 @@
         padding:clamp(12px,3vw,28px);box-sizing:border-box;background:rgba(0,0,0,0);
         opacity:0;visibility:hidden;pointer-events:none;transition:opacity .28s ease,background .28s ease,visibility 0s linear .28s;}
       .utsu-celebration-pop.is-shown{opacity:1;visibility:visible;pointer-events:auto;background:rgba(0,0,0,.78);transition-delay:0s;}
-      .utsu-celebration-card{position:relative;width:min(620px,100%);max-height:min(86vh,720px);overflow:auto;
+      .utsu-celebration-card{position:relative;width:min(620px,calc(100% - 2px));max-height:min(86vh,720px);max-height:min(86dvh,720px);overflow:auto;
         box-sizing:border-box;padding:clamp(28px,5vw,48px) clamp(20px,6vw,56px) clamp(24px,4vw,38px);
         border:2px solid var(--celebration-ring,#ffd966);border-radius:24px;text-align:center;
         color:#fff7e6;background:radial-gradient(circle at 50% 0%,rgba(255,255,255,.10),transparent 38%),
@@ -369,11 +369,21 @@
       .utsu-celebration-action:hover,.utsu-celebration-action:focus-visible{background:rgba(255,217,102,.24);outline:2px solid var(--celebration-ring,#ffd966);outline-offset:3px;}
       .utsu-celebration-action small{color:var(--celebration-ring,#ffd966);font:400 .78em/1.2 Georgia,'Times New Roman',serif;}
       @media(max-width:520px){
-        .utsu-celebration-card{border-radius:18px;padding:28px 16px 24px;}
-        .utsu-celebration-portrait-wrap{width:min(270px,72vw);height:min(280px,38vh);}
+        .utsu-celebration-pop{padding:max(10px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left));}
+        .utsu-celebration-card{width:100%;border-radius:18px;padding:28px 16px 24px;max-height:min(88vh,640px);max-height:min(88dvh,640px);}
+        .utsu-celebration-portrait-wrap{width:min(270px,72vw,100%);height:min(280px,38vh,38dvh);}
+        .utsu-celebration-copy{max-width:100%;}
         .utsu-celebration-title{font-size:clamp(1.35rem,7vw,1.85rem);}
         .utsu-celebration-card.is-copy-overlay .utsu-celebration-copy{margin-top:-68px;padding:14px 12px 10px;}
         .utsu-celebration-card.is-compact-copy .utsu-celebration-copy{margin-top:-44px;padding:10px 10px 8px;}
+      }
+      @media(max-height:620px) and (orientation:landscape){
+        .utsu-celebration-pop{padding:8px 12px;}
+        .utsu-celebration-card{max-height:calc(100dvh - 16px);padding:16px 18px 14px;}
+        .utsu-celebration-portrait-wrap{width:min(220px,34vw);height:min(170px,30dvh);margin-bottom:8px;}
+        .utsu-celebration-eyebrow{margin-bottom:6px;}
+        .utsu-celebration-card.is-compact-copy .utsu-celebration-copy{margin-top:-36px;}
+        .utsu-celebration-card.is-compact-copy .utsu-celebration-action{margin-top:8px;}
       }
       @media(prefers-reduced-motion:reduce){
         .utsu-celebration-card,.utsu-celebration-pop{transition:opacity .2s ease,background .2s ease;}
