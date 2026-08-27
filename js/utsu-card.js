@@ -426,6 +426,7 @@
   var rewardPopHideTimer = null;
   var celebrationPopEl = null;
   var celebrationCloseHandler = null;
+  var celebrationPreviousFocus = null;
   var SPARK_GLYPHS = ['✦', '✧'];
 
   /* Fills the burst container with a fresh ring of sparks each call —
@@ -478,10 +479,16 @@
 
   function closeCelebrationPop() {
     if (!celebrationPopEl) return;
+    var previousFocus = celebrationPreviousFocus;
+    celebrationPreviousFocus = null;
     celebrationPopEl.classList.remove('is-shown');
+    celebrationPopEl.setAttribute('aria-hidden', 'true');
     if (celebrationCloseHandler) {
       document.removeEventListener('keydown', celebrationCloseHandler);
       celebrationCloseHandler = null;
+    }
+    if (previousFocus && document.contains(previousFocus) && typeof previousFocus.focus === 'function') {
+      try { previousFocus.focus({ preventScroll: true }); } catch (_) { previousFocus.focus(); }
     }
   }
 
@@ -494,6 +501,7 @@
     if (!celebrationPopEl) {
       celebrationPopEl = document.createElement('div');
       celebrationPopEl.className = 'utsu-celebration-pop';
+      celebrationPopEl.setAttribute('aria-hidden', 'true');
       celebrationPopEl.innerHTML =
         '<section class="utsu-celebration-card" role="dialog" aria-modal="true" aria-labelledby="utsu-celebration-title">' +
           '<p class="utsu-celebration-eyebrow"></p>' +
@@ -516,6 +524,10 @@
     var action = celebrationPopEl.querySelector('.utsu-celebration-action');
     var actionLabel = action.querySelector('span');
     var actionSub = action.querySelector('small');
+    if (!celebrationPopEl.classList.contains('is-shown')) {
+      var activeElement = document.activeElement;
+      celebrationPreviousFocus = activeElement && activeElement !== document.body ? activeElement : null;
+    }
     var accent = opts.accent || ringFor(opts.motif);
     var glow = opts.glow || glowFor(opts.motif);
     card.style.setProperty('--celebration-ring', accent);
@@ -555,6 +567,9 @@
     celebrationCloseHandler = function (event) {
       if (event.key === 'Escape') {
         dismiss();
+      } else if (event.key === 'Tab') {
+        event.preventDefault();
+        try { action.focus({ preventScroll: true }); } catch (_) { action.focus(); }
       }
     };
     document.addEventListener('keydown', celebrationCloseHandler);
@@ -565,9 +580,10 @@
       try { window.UtsuSfx[opts.sfx](); } catch (_) {}
     }
     celebrationPopEl.classList.remove('is-shown');
+    celebrationPopEl.setAttribute('aria-hidden', 'false');
     void card.offsetWidth;
     requestAnimationFrame(function () { celebrationPopEl.classList.add('is-shown'); });
-    action.focus();
+    try { action.focus({ preventScroll: true }); } catch (_) { action.focus(); }
   }
 
   injectStyles();

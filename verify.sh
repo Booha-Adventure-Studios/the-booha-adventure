@@ -404,6 +404,13 @@ else
   bad "Wanderer mobile popup audit failed"
 fi
 
+echo "[40/40] UtsuCard 21C celebration accessibility audit"
+if node tests/utsu-card-celebration-a11y-audit.cjs >/dev/null 2>&1; then
+  ok "celebration modal accessibility contracts pass"
+else
+  bad "celebration modal accessibility audit failed"
+fi
+
 # ── Summary ──────────────────────────────────────────────────
 echo "───────────────────────────────────"
 echo "✅ $PASS passed   ⚠️  $WARN warnings   ❌ $FAIL failed"
