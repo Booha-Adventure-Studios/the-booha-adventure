@@ -34,6 +34,6 @@ assert(muenba.includes('music.loop = true'), 'Muenba BGM loop must remain intact
 assert(muenba.includes('dangerRhythmMusic.loop = true'), 'Muenba rhythm loop must remain intact');
 
 assert(serviceWorker.includes('${BASE}/js/utsu-sfx.js'), 'shared SFX helper must be precached by the service worker');
-assert(serviceWorker.includes('booha-pages-2026-358'), 'service-worker page cache must be bumped for the new helper');
+assert(serviceWorker.includes('booha-pages-2026-359'), 'service-worker page cache must include the current popup pass bump');
 
 console.log('Popup procedural audio audit passed: shared WebAudio hooks are wired and BGM/looped tracks remain untouched.');
