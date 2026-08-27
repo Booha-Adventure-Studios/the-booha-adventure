@@ -418,6 +418,13 @@ else
   bad "celebration modal containment audit failed"
 fi
 
+echo "[42/42] UtsuCard 21E celebration mobile audit"
+if node tests/utsu-card-celebration-mobile-audit.cjs >/dev/null 2>&1; then
+  ok "celebration modal mobile contracts pass"
+else
+  bad "celebration modal mobile audit failed"
+fi
+
 # ── Summary ──────────────────────────────────────────────────
 echo "───────────────────────────────────"
 echo "✅ $PASS passed   ⚠️  $WARN warnings   ❌ $FAIL failed"
