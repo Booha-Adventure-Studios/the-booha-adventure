@@ -32,8 +32,8 @@ assert(returning.includes('glow: WANDERER_RETURN_GLOW'), 'return celebration nee
 assert(returning.includes("actionLabel: 'Say hello'"), 'return celebration needs an explicit readable action');
 assert(returning.includes('UtsuFurigana.sentence'), 'return celebration must use the shared furigana renderer');
 
-assert(visitFlow.includes('if (visit && visit.firstVisit) showWandererDiscovery(w);'), 'first visits must retain discovery behavior');
-assert(visitFlow.includes('else if (visit && Number(visit.visits) > 1) showWandererReturn(w);'), 'later visits must trigger the welcome-back celebration');
+assert(visitFlow.includes("if (visit && visit.popupKind === 'discovery') showWandererDiscovery(w);"), 'first visits must retain discovery behavior');
+assert(visitFlow.includes("else if (visit && visit.popupKind === 'return') showWandererReturn(w);"), 'first visit in a new week must trigger the welcome-back celebration');
 assert(source.includes("const WANDERER_RETURN_ACCENT = '#7dd3fc';"), 'return palette must be authored and stable');
 assert(source.includes("const WANDERER_RETURN_GLOW   = 'rgba(125,211,252,.46)';"), 'return glow must be authored and stable');
 assert(card.includes('function showCelebrationPop(opts)'), 'return celebration must rely on the shared stable card foundation');

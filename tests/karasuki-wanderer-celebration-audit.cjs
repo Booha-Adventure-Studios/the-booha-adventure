@@ -30,7 +30,7 @@ assert(discovery.includes('actionLabel: \'Meet this wanderer\''), 'discovery mus
 assert(discovery.includes('WANDERER_FURIGANA[w.name]'), 'discovery must reuse the authored Wanderer furigana map');
 assert(source.includes('function wandererCelebrationGlow(color)'), 'Wanderer celebration needs a safe color-to-glow helper');
 assert(source.includes('function wandererCelebrationPortrait(w)'), 'Wanderer celebration needs a portrait resolver');
-assert(source.includes('if (visit && visit.firstVisit) showWandererDiscovery(w);'), 'celebration must remain limited to first visits');
+assert(source.includes("if (visit && visit.popupKind === 'discovery') showWandererDiscovery(w);"), 'discovery celebration must remain limited to first visits');
 
 assert(card.includes('function showCelebrationPop(opts)'), 'shared celebration API must exist before the Wanderer integration');
 assert(card.includes('portraitSrc'), 'shared celebration API must accept the Wanderer portrait');

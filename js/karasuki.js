@@ -2596,6 +2596,22 @@ const HAPPY_HOUSE_PORTAL = {
       .replace(/^-|-$/g, '') || 'wanderer';
   }
 
+  // Wanderer celebration cadence uses the same Tokyo curriculum week as the
+  // rest of the adventure. Keep the year in the key so an old collection
+  // record cannot accidentally replay a welcome-back card twelve months
+  // later just because the month/week label matches.
+  function wandererWeekKey() {
+    try {
+      if (!window.CALENDAR || typeof CALENDAR.getCurrentCurriculumWeek !== 'function') return null;
+      const cw = CALENDAR.getCurrentCurriculumWeek();
+      if (!cw || !cw.year || !cw.monthSlug || !cw.weekNumber) return null;
+      return `${cw.year}-${cw.monthSlug}-w${cw.weekNumber}`;
+    } catch (e) {
+      console.warn('[Karasuki] Wanderer week resolution failed:', e);
+      return null;
+    }
+  }
+
   function recordWandererVisit(w) {
     if (!w || !w.name || window.__devAllWanderers) return null;
     try {
@@ -2612,6 +2628,9 @@ const HAPPY_HOUSE_PORTAL = {
         ? data.collection.wanderers[id]
         : {};
       const firstVisit = !previous.firstFoundAt && !(Number(previous.visits) > 0);
+      const weekKey = wandererWeekKey();
+      const weeklyReturn = !firstVisit && !!weekKey && previous.lastPopupWeek !== weekKey;
+      const popupKind = firstVisit ? 'discovery' : weeklyReturn ? 'return' : 'story';
       const now = Date.now();
       const record = {
         ...previous,
@@ -2620,13 +2639,14 @@ const HAPPY_HOUSE_PORTAL = {
         visits: Math.max(0, Number(previous.visits) || 0) + 1,
         firstFoundAt: Number(previous.firstFoundAt) || now,
         lastFoundAt: now,
+        lastPopupWeek: (firstVisit || weeklyReturn) && weekKey ? weekKey : previous.lastPopupWeek,
       };
       data.collection.wanderers[id] = record;
       if (!BoohaAdventure.save.save(data)) {
         console.warn('[Karasuki] Wanderer collection write blocked.');
         return null;
       }
-      return { ...record, firstVisit };
+      return { ...record, firstVisit, popupKind, weekKey };
     } catch (e) {
       console.error('[Karasuki] Wanderer collection write failed:', e);
       return null;
@@ -2915,8 +2935,8 @@ const HAPPY_HOUSE_PORTAL = {
     wandererPopOverlay.style.display    = 'flex';
     wandererPopOverlay.style.background = 'rgba(0,0,0,0.82)';
     state.clickTarget = null;
-    if (visit && visit.firstVisit) showWandererDiscovery(w);
-    else if (visit && Number(visit.visits) > 1) showWandererReturn(w);
+    if (visit && visit.popupKind === 'discovery') showWandererDiscovery(w);
+    else if (visit && visit.popupKind === 'return') showWandererReturn(w);
     else if (window.UtsuSfx && typeof window.UtsuSfx.popupOpen === 'function') window.UtsuSfx.popupOpen();
   }
 
