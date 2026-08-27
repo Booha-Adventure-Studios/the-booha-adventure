@@ -18,9 +18,9 @@
    ding.mp3 reused everywhere. Loaded by both utsuroba.html and
    karasuki.html, right after js/utsu-card.js.
 
-   Pass 20F adds two tiny procedural celebration motifs. They use the same
-   WebAudio oscillator path as the existing palette, so the Wanderer cards do
-   not need new binary audio assets.
+   Pass 20F adds two tiny procedural celebration motifs. Later popup polish
+   keeps the same shared path for short UI sounds; BGM and looped tracks stay
+   outside this file.
 */
 (function () {
   'use strict';
@@ -94,10 +94,50 @@
       tone(560, { type: 'triangle', gain: 0.036, dur: 0.08 });
       tone(420, { type: 'triangle', gain: 0.034, dur: 0.1, delay: 0.04 });
     },
+    /* Short popup open/close cues. These are deliberately distinct from the
+       reading correct/wrong cues so opening a card never sounds like an
+       answer judgment. */
+    popupOpen: function () {
+      tone(330, { type: 'triangle', gain: 0.075, dur: 0.08 });
+      tone(495, { type: 'sine', gain: 0.06, dur: 0.12, delay: 0.045 });
+    },
+    popupClose: function () {
+      tone(620, { type: 'triangle', gain: 0.06, dur: 0.055 });
+      tone(390, { type: 'sine', gain: 0.05, dur: 0.09, delay: 0.035 });
+    },
     /* Any .dp-btn press — a very light click, quieter than every other
        sound here on purpose since it fires often. */
     buttonPress: function () {
       tone(720, { type: 'square', gain: 0.03, dur: 0.03 });
+    },
+    /* A tiny two-click bone rattle for the Observer close/exit moment. */
+    skeletonClose: function () {
+      tone(1200, { type: 'triangle', gain: 0.07, dur: 0.04 });
+      tone(1800, { type: 'triangle', gain: 0.06, dur: 0.04, delay: 0.035 });
+    },
+    /* Friendly mischief: useful for Nuppi and other cute character cards. */
+    mischiefReward: function () {
+      var notes = [311.13, 369.99, 440.00, 622.25];
+      notes.forEach(function (freq, index) {
+        tone(freq, { type: 'sine', gain: 0.07, dur: 0.1, delay: index * 0.05 });
+      });
+    },
+    /* Green, sticky, descending click for slime/Observer interactions. */
+    slimeClick: function () {
+      tone(500, { type: 'sawtooth', gain: 0.075, dur: 0.07, slideTo: 90 });
+    },
+    /* A short shudder for an actual ghost mistake, kept below a jumpscare. */
+    ghostError: function () {
+      tone(240, { type: 'sawtooth', gain: 0.075, dur: 0.22, slideTo: 110 });
+    },
+    /* Locked-world feedback: a low, brief double knock. */
+    lockedRattle: function () {
+      tone(140, { type: 'square', gain: 0.08, dur: 0.04, slideTo: 70 });
+      tone(140, { type: 'square', gain: 0.065, dur: 0.04, delay: 0.05, slideTo: 70 });
+    },
+    /* Soft cancellation/fade-out cue for a dismissed scary prompt. */
+    phantomCancel: function () {
+      tone(320, { type: 'triangle', gain: 0.07, dur: 0.16, slideTo: 50 });
     },
     /* A memory successfully handed to its drifter — the moment
        startCelebration() fires. Three-note warm rise, deliberately
