@@ -110,7 +110,6 @@
   const CASE_WRONG_CLUE_COOLDOWN_MS = 1500;
   const CASE_FINAL_PENALTY_MAX = 2;
   const CASE_FINAL_PENALTY_ACCURACY_STEP = 5;
-  const CASE_RHYTHM_TRANSITION_MS = 650;
   // Pass 18F — procedural reading cues. These stay deliberately quieter than
   // the world music so the English remains the focus, and require no extra
   // audio assets or network requests.
@@ -586,6 +585,13 @@
     // A short, low response explains an early tap without rewarding guessing
     // or competing with the sentence and its keyword cues.
     playCaseTone(70, 40, 0.12, CASE_AUDIO_LOCKED_VOLUME, 'square');
+  }
+
+  function playCaseSolvedCue() {
+    // Two soft overtones make the comprehension success feel like a release,
+    // while staying below the later rhythm music's volume and intensity.
+    playCaseTone(392, 783.99, 0.45, 0.06, 'triangle');
+    playCaseTone(523.25, 1046.5, 0.65, 0.04, 'sine');
   }
 
   const danceArmsUpImg = new Image();
@@ -1862,10 +1868,6 @@
       readGateRemainingMs: 0,
       readGateStartedAt: 0,
       readGatePaused: false,
-      caseTransitionTimer: 0,
-      caseTransitionRemainingMs: 0,
-      caseTransitionStartedAt: 0,
-      caseTransitionPaused: false,
       phase: caseData && !caseRecordComplete(caseData) ? 'case-intro' : 'ready',
       openedAt: performance.now()
     };
@@ -1932,10 +1934,8 @@
     captureSession.devCaptureHold = !!held;
     if (captureSession.devCaptureHold) {
       pauseCaseReadGate(captureSession);
-      pauseCaseTransition(captureSession);
     } else {
       resumeCaseReadGate(captureSession);
-      resumeCaseTransition(captureSession);
     }
     updateDevCaptureTools();
   }
@@ -2322,50 +2322,6 @@
     } else {
       scheduleCaseReadGate(session, sweepId);
     }
-  }
-
-  function clearCaseTransition(session) {
-    if (!session) return;
-    if (session.caseTransitionTimer) window.clearTimeout(session.caseTransitionTimer);
-    session.caseTransitionTimer = 0;
-    session.caseTransitionStartedAt = 0;
-  }
-
-  function pauseCaseTransition(session) {
-    if (!session || !session.caseTransitionTimer || session.caseTransitionPaused) return;
-    const elapsed = Math.max(0, performance.now() - session.caseTransitionStartedAt);
-    session.caseTransitionRemainingMs = Math.max(0, session.caseTransitionRemainingMs - elapsed);
-    clearCaseTransition(session);
-    session.caseTransitionPaused = true;
-  }
-
-  function resumeCaseTransition(session) {
-    if (!session || !session.caseTransitionPaused) return;
-    session.caseTransitionPaused = false;
-    scheduleCaseTransition(session);
-  }
-
-  function scheduleCaseTransition(session) {
-    if (!session || captureSession !== session || session.phase !== 'case-transition') return;
-    if (session.devCaptureHold) {
-      session.caseTransitionPaused = true;
-      return;
-    }
-    session.caseTransitionStartedAt = performance.now();
-    session.caseTransitionTimer = window.setTimeout(() => {
-      if (captureSession !== session || session.phase !== 'case-transition') return;
-      if (session.devCaptureHold) {
-        session.caseTransitionPaused = true;
-        session.caseTransitionRemainingMs = 0;
-        session.caseTransitionTimer = 0;
-        return;
-      }
-      session.caseTransitionTimer = 0;
-      session.caseTransitionRemainingMs = 0;
-      session.caseTransitionStartedAt = 0;
-      session.caseTransitionPaused = false;
-      startRhythmCapture(false);
-    }, Math.max(0, session.caseTransitionRemainingMs));
   }
 
   function armCaseReadGate(box, button, englishText, onReady) {
@@ -2856,17 +2812,17 @@
     focusCaptureControl('.muenba-case-choice');
   }
 
-  // Pass 16E: solving the quiet reading section is the reward trigger. Keep a
-  // short visual handoff, then start the existing rhythm session directly so
-  // there is no extra confirmation button between comprehension and play.
+  // Pass 19A: solving the quiet reading section earns a stable victory card.
+  // The learner explicitly starts energy collection; no transition timer may
+  // launch the rhythm session underneath a still-readable success moment.
   function beginCaseRhythm() {
     if (!captureSession || captureSession.phase !== 'case-question') return;
     const session = captureSession;
     session.caseResolved = true;
-    session.phase = 'case-transition';
+    session.phase = 'case-solved';
 
     const box = captureBox();
-    box.classList.add('muenba-case-box', 'muenba-case-rhythm-transition');
+    box.classList.add('muenba-case-box', 'muenba-case-solved');
     captureImage(box, session.ghost);
 
     const eyebrow = document.createElement('div');
@@ -2875,20 +2831,34 @@
     box.appendChild(eyebrow);
 
     const h2 = document.createElement('h2');
-    h2.textContent = 'The rhythm begins';
+    h2.textContent = `${session.ghost.name}'s energy untangled!`;
     box.appendChild(h2);
 
     renderCaseDirection(
       box,
-      'You understood the ghost. Now catch its energy.',
-      'ゴーストの<ruby>意味<rt>いみ</rt></ruby>が<ruby>分<rt>わ</rt></ruby>かりました。エネルギーを<ruby>捕<rt>つか</rt></ruby>まえよう。',
-      'muenba-case-rhythm-transition-copy'
+      'You understood the ghost. Start the energy collection when you are ready.',
+      'ゴーストの<ruby>意味<rt>いみ</rt></ruby>が<ruby>分<rt>わ</rt></ruby>かりました。<ruby>準備<rt>じゅんび</rt></ruby>ができたらエネルギーを<ruby>集<rt>あつ</rt></ruby>めよう。',
+      'muenba-case-resolution-direction'
     );
 
+    const actions = document.createElement('div');
+    actions.className = 'muenba-lobby-actions';
+    const energyAction = caseActionButton(
+      'Start energy collection',
+      'エネルギーを<ruby>集<rt>あつ</rt></ruby>めよう',
+      'muenba-case-energy-start',
+      () => {
+        if (captureSession !== session || session.phase !== 'case-solved') return;
+        startRhythmCapture(false);
+      }
+    );
+    energyAction.classList.add('muenba-energy-collection-action');
+    actions.appendChild(energyAction);
+    box.appendChild(actions);
+
     captureOverlay.classList.add('open');
-    session.caseTransitionRemainingMs = CASE_RHYTHM_TRANSITION_MS;
-    session.caseTransitionPaused = false;
-    scheduleCaseTransition(session);
+    playCaseSolvedCue();
+    focusCaptureControl('#muenba-case-energy-start');
   }
 
   function renderCaptureReady() {
@@ -4289,7 +4259,6 @@
 
   function stopRhythmCapture() {
     clearCaseReadGate(captureSession);
-    clearCaseTransition(captureSession);
     clearCaseWrongAnswer(captureSession);
     const rhythm = captureSession && captureSession.rhythm;
     if (rhythm && rhythm.rafId) window.cancelAnimationFrame(rhythm.rafId);
@@ -4520,13 +4489,6 @@
       .muenba-case-penalty-note { border-color:rgba(219,130,130,.48); background:rgba(125,24,34,.16); box-shadow:0 0 22px rgba(125,24,34,.16); }
       .muenba-case-penalty-note .muenba-case-direction-en { color:#ffe2df; }
       .muenba-case-penalty-note .muenba-case-direction-jp { color:#d6b6b1; }
-      .muenba-case-rhythm-transition { border-color:rgba(216,201,139,.82); background:radial-gradient(circle at 50% 12%,rgba(216,201,139,.18),transparent 42%),linear-gradient(145deg,rgba(22,24,13,.98),rgba(5,12,12,.99)); box-shadow:0 24px 80px rgba(0,0,0,.86),0 0 80px rgba(216,201,139,.28),inset 0 0 62px rgba(216,201,139,.08); }
-      .muenba-case-rhythm-transition .muenba-lobby-portrait { width:124px; height:124px; filter:drop-shadow(0 0 28px rgba(216,201,139,.5)); animation:muenbaRhythmRewardPulse 1.1s ease-in-out infinite; }
-      .muenba-case-rhythm-transition h2 { color:#fff5d5; font-size:clamp(1.45rem,4vw,1.9rem); text-shadow:0 0 20px rgba(255,224,102,.28); }
-      .muenba-case-rhythm-transition-copy { border-color:rgba(216,201,139,.5); background:rgba(216,201,139,.08); }
-      .muenba-case-rhythm-transition-copy .muenba-case-direction-en { color:#fff5d5; font-size:1rem; font-weight:700; }
-      .muenba-case-rhythm-transition-copy .muenba-case-direction-jp { color:#d8c98b; }
-      @keyframes muenbaRhythmRewardPulse { 0%,100% { transform:translateY(0) scale(1); } 50% { transform:translateY(-4px) scale(1.035); } }
       .muenba-rhythm-penalty { margin:12px 0 14px; border-color:rgba(219,130,130,.46); background:rgba(125,24,34,.13); box-shadow:0 0 20px rgba(125,24,34,.16); }
       .muenba-rhythm-penalty .muenba-case-direction-en { color:#ffe2df; font-size:.82rem; font-weight:700; }
       .muenba-rhythm-penalty .muenba-case-direction-jp { color:#d6b6b1; }
@@ -4844,8 +4806,8 @@
       .muenba-case-intro,
       .muenba-case-clue,
       .muenba-case-review,
-      .muenba-case-rhythm-transition,
       .muenba-case-resolved,
+      .muenba-case-solved,
       .muenba-capture-ready,
       .muenba-capture-result,
       .muenba-capture-reward { width:min(600px,100%); }
@@ -4878,6 +4840,16 @@
       .muenba-case-resolved .muenba-case-resolution-direction { border-color:rgba(241,215,141,.58); background:linear-gradient(145deg,rgba(126,111,48,.22),rgba(83,60,20,.16)); box-shadow:0 0 22px rgba(216,201,139,.14),inset 0 0 18px rgba(216,201,139,.04); }
       .muenba-case-resolved .muenba-case-resolution-direction .muenba-case-direction-en { color:#fff2c7; text-shadow:0 0 12px rgba(255,224,102,.14); }
       .muenba-case-resolved .muenba-case-resolution-direction .muenba-case-direction-jp { color:#d7c68f; }
+      .muenba-case-solved { border-color:rgba(74,222,128,.82); background:radial-gradient(circle at 50% 8%,rgba(74,222,128,.14),transparent 42%),linear-gradient(145deg,rgba(7,33,24,.98),rgba(4,13,18,.99)); box-shadow:0 24px 80px rgba(0,0,0,.86),0 0 70px rgba(74,222,128,.24),inset 0 0 58px rgba(74,222,128,.06); }
+      .muenba-case-solved .muenba-lobby-portrait { width:132px; height:132px; filter:drop-shadow(0 0 26px rgba(74,222,128,.38)) drop-shadow(0 0 34px rgba(216,201,139,.18)); }
+      .muenba-case-solved h2 { color:#efffd6; font-size:clamp(1.42rem,4vw,1.85rem); text-shadow:0 0 18px rgba(74,222,128,.28); }
+      .muenba-case-solved .muenba-case-resolution-direction { border-color:rgba(74,222,128,.42); background:rgba(74,222,128,.07); }
+      .muenba-case-solved .muenba-case-resolution-direction .muenba-case-direction-en { color:#efffd6; font-weight:700; }
+      .muenba-case-solved .muenba-case-resolution-direction .muenba-case-direction-jp { color:#b9dfc7; }
+      .muenba-energy-collection-action { box-sizing:border-box; min-height:64px; min-width:260px; padding:14px 28px !important; border:1.5px solid #4ade80 !important; border-radius:999px !important; background:linear-gradient(180deg,#1f3a2b 0%,#12241a 100%) !important; color:#fff7e6 !important; box-shadow:0 0 26px rgba(74,222,128,.3),inset 0 0 16px rgba(74,222,128,.08) !important; }
+      .muenba-energy-collection-action span { color:#fff7e6; font:700 20px/1.2 Georgia,'Times New Roman',serif; }
+      .muenba-energy-collection-action small { margin-top:4px; color:#facc15 !important; font:400 13px/1.2 Georgia,'Times New Roman',serif; }
+      .muenba-energy-collection-action:hover, .muenba-energy-collection-action:focus-visible { border-color:#86efac !important; background:linear-gradient(180deg,#28543a 0%,#163522 100%) !important; box-shadow:0 0 34px rgba(74,222,128,.48),inset 0 0 18px rgba(74,222,128,.12) !important; outline:none; }
       .muenba-capture-ready { border-color:rgba(170,150,255,.7); background:radial-gradient(circle at 50% 8%,rgba(116,46,168,.2),transparent 42%),linear-gradient(145deg,rgba(19,11,43,.97),rgba(6,13,25,.98)); box-shadow:0 24px 80px rgba(0,0,0,.86),0 0 65px rgba(111,66,210,.28),inset 0 0 55px rgba(49,205,154,.07); }
       .muenba-capture-ready .muenba-lobby-portrait { width:136px; height:136px; filter:drop-shadow(0 0 24px rgba(190,119,255,.42)) drop-shadow(0 0 36px rgba(39,255,145,.12)); }
       .muenba-capture-phase-label { margin:0 0 8px; color:#d8c98b; font:900 .65rem/1.4 ui-monospace,monospace; letter-spacing:.18em; text-align:center; text-transform:uppercase; text-shadow:0 0 14px rgba(216,201,139,.22); }
@@ -5011,7 +4983,7 @@
       @keyframes muenbaCaseWrongChoice { 0%,100% { transform:translateX(0); } 25% { transform:translateX(-5px); } 50% { transform:translateX(5px); } 75% { transform:translateX(-3px); } }
       @keyframes muenbaCaseWrongPanel { 0%,100% { transform:translateX(0); } 22% { transform:translateX(-3px); } 44% { transform:translateX(3px); } 66% { transform:translateX(-2px); } }
       @media (prefers-reduced-motion: reduce) { .muenba-orb-release, .muenba-hunt-ghost-portrait, .muenba-gold-action, .muenba-read-ready { animation:none !important; } }
-      @media (prefers-reduced-motion: reduce) { #muenba-fade, .muenba-return-box, #muenba-return-overlay, .muenba-lobby-box, #muenba-lobby-overlay, #muenba-capture-overlay { transition:none !important; } .muenba-lobby-portrait, #muenba-hide, #muenba-celebration-status, .muenba-rhythm-board, .muenba-rhythm-combo, .muenba-rhythm-result-failure, .muenba-case-question, .muenba-case-question::before, .muenba-case-feedback-shake, .muenba-case-read-status, .muenba-case-rhythm-transition .muenba-lobby-portrait, .muenba-energy-warning, .muenba-case-sweep-word-locked-pulse { animation:none !important; } .muenba-case-choice, .muenba-case-action, .muenba-capture-action { transition:none !important; } .muenba-rhythm-energy-fill { transition:none !important; } #muenba-profile-link { transition:none !important; } }
+      @media (prefers-reduced-motion: reduce) { #muenba-fade, .muenba-return-box, #muenba-return-overlay, .muenba-lobby-box, #muenba-lobby-overlay, #muenba-capture-overlay { transition:none !important; } .muenba-lobby-portrait, #muenba-hide, #muenba-celebration-status, .muenba-rhythm-board, .muenba-rhythm-combo, .muenba-rhythm-result-failure, .muenba-case-question, .muenba-case-question::before, .muenba-case-feedback-shake, .muenba-case-read-status, .muenba-energy-warning, .muenba-case-sweep-word-locked-pulse { animation:none !important; } .muenba-case-choice, .muenba-case-action, .muenba-capture-action { transition:none !important; } .muenba-rhythm-energy-fill { transition:none !important; } #muenba-profile-link { transition:none !important; } }
     `;
     document.head.appendChild(style);
   }
