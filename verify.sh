@@ -397,6 +397,13 @@ else
   bad "weekly Wanderer popup audit failed"
 fi
 
+echo "[39/39] Karasuki 21B Wanderer mobile audit"
+if node tests/karasuki-wanderer-mobile-audit.cjs >/dev/null 2>&1; then
+  ok "Wanderer mobile popup contracts pass"
+else
+  bad "Wanderer mobile popup audit failed"
+fi
+
 # ── Summary ──────────────────────────────────────────────────
 echo "───────────────────────────────────"
 echo "✅ $PASS passed   ⚠️  $WARN warnings   ❌ $FAIL failed"
