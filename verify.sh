@@ -17,7 +17,7 @@ echo "🔍 Booha Adventure pre-deploy check"
 echo "───────────────────────────────────"
 
 # ── 1. JSON validity (non-empty files must parse) ────────────
-echo "[1/27] Content JSON validity"
+echo "[1/28] Content JSON validity"
 json_bad=0; json_empty=0; json_ok=0
 while IFS= read -r f; do
   if [ "$(wc -c < "$f")" -le 2 ]; then
@@ -32,7 +32,7 @@ done < <(find content data -name "*.json" 2>/dev/null)
 [ $json_bad -eq 0 ] && ok "$json_ok JSON files valid ($json_empty empty placeholders skipped)"
 
 # ── 2. Service worker manifest: every CORE_FILES path exists ─
-echo "[2/27] sw.js CORE_FILES exist on disk (addAll is all-or-nothing)"
+echo "[2/28] sw.js CORE_FILES exist on disk (addAll is all-or-nothing)"
 sw_bad=0; sw_ok=0
 while IFS= read -r rel; do
   [ -z "$rel" ] && continue
@@ -49,7 +49,7 @@ done < <(sed -n '/const CORE_FILES = \[/,/\];/p' sw.js \
 [ $sw_bad -eq 0 ] && ok "$sw_ok precached files all present"
 
 # ── 3. Independent cache version constants ──────────────────
-echo "[3/27] Independent cache version validation"
+echo "[3/28] Independent cache version validation"
 cache_bad=0
 cache_summary=""
 for cache_kind in pages assets decks; do
@@ -70,7 +70,7 @@ else
 fi
 
 # ── 4. Cache bump reminder (needs git) ───────────────────────
-echo "[4/27] Cache bump vs. changed files"
+echo "[4/28] Cache bump vs. changed files"
 if git rev-parse --git-dir >/dev/null 2>&1; then
   changed=$(git diff HEAD --name-only 2>/dev/null; git diff --cached --name-only 2>/dev/null)
   cached_changed=$(echo "$changed" | grep -cE '\.(html|js|css|json)$' || true)
@@ -85,7 +85,7 @@ else
 fi
 
 # ── 5. No leading-slash asset paths (GitHub Pages trap) ──────
-echo "[5/27] Leading-slash paths"
+echo "[5/28] Leading-slash paths"
 ls_hits=$(grep -rnE 'src="/[^/t]|href="/[^/t]' --include="*.html" . 2>/dev/null \
           | grep -v '/the-booha-adventure/' | head -5)
 if [ -z "$ls_hits" ]; then
@@ -95,7 +95,7 @@ else
 fi
 
 # ── 6. Script order: calendar.js before core stack ───────────
-echo "[6/27] calendar.js loads before core stack"
+echo "[6/28] calendar.js loads before core stack"
 order_bad=0
 while IFS= read -r page; do
   cal=$(grep -n 'calendar\.js' "$page" | head -1 | cut -d: -f1)
@@ -109,7 +109,7 @@ done < <(grep -rlE 'adventure-core\.js' --include="*.html" . 2>/dev/null)
 
 
 # ── 7. Juku content validation ───────────────────────────────
-echo "[7/27] juku.json content checks"
+echo "[7/28] juku.json content checks"
 juku_files=$(find content -name "juku.json" 2>/dev/null)
 if [ -z "$juku_files" ]; then
   warn "no juku.json files found"
@@ -179,126 +179,126 @@ PYEOF
 fi
 
 # ── 8. Utsuroba reading contracts ───────────────────────────
-echo "[8/27] Utsuroba episode audit"
+echo "[8/28] Utsuroba episode audit"
 if node tests/utsuroba-episode-audit.cjs >/dev/null 2>&1; then
   ok "Utsuroba episode data and answer contracts pass"
 else
   bad "Utsuroba episode audit failed"
 fi
 
-echo "[9/27] Utsuroba resolver audit"
+echo "[9/28] Utsuroba resolver audit"
 if node tests/utsuroba-resolver-audit.cjs >/dev/null 2>&1; then
   ok "Utsuroba Starter/Case/Deep runtime resolution contracts pass"
 else
   bad "Utsuroba resolver audit failed"
 fi
 
-echo "[10/27] Utsuroba memory progress audit"
+echo "[10/28] Utsuroba memory progress audit"
 if node tests/utsuroba-memory-progress-audit.cjs >/dev/null 2>&1; then
   ok "Utsuroba Start/Fresh/Deep progress contracts pass"
 else
   bad "Utsuroba memory progress audit failed"
 fi
 
-echo "[11/27] Utsuroba journal audit"
+echo "[11/28] Utsuroba journal audit"
 if node tests/utsuroba-journal-audit.cjs >/dev/null 2>&1; then
   ok "Utsuroba reading journal contracts pass"
 else
   bad "Utsuroba journal audit failed"
 fi
 
-echo "[12/27] Muenba case audit"
+echo "[12/28] Muenba case audit"
 if node tests/muenba-case-audit.cjs >/dev/null 2>&1; then
   ok "Muenba case order and English-only record contracts pass"
 else
   bad "Muenba case audit failed"
 fi
 
-echo "[13/27] Muenba reading-lock audit"
+echo "[13/28] Muenba reading-lock audit"
 if node tests/muenba-reading-lock-audit.cjs >/dev/null 2>&1; then
   ok "Muenba reading lock, review, penalty, and rhythm handoff contracts pass"
 else
   bad "Muenba reading-lock audit failed"
 fi
 
-echo "[14/27] Muenba popup audit"
+echo "[14/28] Muenba popup audit"
 if node tests/muenba-popup-audit.cjs >/dev/null 2>&1; then
   ok "Muenba popup top anchoring and scroll-reset contracts pass"
 else
   bad "Muenba popup audit failed"
 fi
 
-echo "[15/27] Muenba celebration audit"
+echo "[15/28] Muenba celebration audit"
 if node tests/muenba-celebration-audit.cjs >/dev/null 2>&1; then
   ok "Muenba center dance and Hide lock contracts pass"
 else
   bad "Muenba celebration audit failed"
 fi
 
-echo "[16/27] Muenba spawn audit"
+echo "[16/28] Muenba spawn audit"
 if node tests/muenba-spawn-audit.cjs >/dev/null 2>&1; then
   ok "Muenba hunt-target spawn safety contracts pass"
 else
   bad "Muenba spawn audit failed"
 fi
 
-echo "[17/27] Muenba return-threat audit"
+echo "[17/28] Muenba return-threat audit"
 if node tests/muenba-return-threat-audit.cjs >/dev/null 2>&1; then
   ok "Muenba return-trip Jerk escalation and cleanup contracts pass"
 else
   bad "Muenba return-threat audit failed"
 fi
 
-echo "[18/27] Muenba Pass 17 regression audit"
+echo "[18/28] Muenba Pass 17 regression audit"
 if node tests/muenba-pass17-regression-audit.cjs >/dev/null 2>&1; then
   ok "Muenba Pass 17 integration contracts pass"
 else
   bad "Muenba Pass 17 regression audit failed"
 fi
 
-echo "[19/27] Muenba 19H journey audit"
+echo "[19/28] Muenba 19H journey audit"
 if node tests/muenba-journey-audit.cjs >/dev/null 2>&1; then
   ok "Muenba full hunt-to-reward journey contracts pass"
 else
   bad "Muenba journey audit failed"
 fi
 
-echo "[20/27] Muenba 19I entry audit"
+echo "[20/28] Muenba 19I entry audit"
 if node tests/muenba-entry-audit.cjs >/dev/null 2>&1; then
   ok "Muenba live page boot, portal, and cache wiring contracts pass"
 else
   bad "Muenba entry audit failed"
 fi
 
-echo "[21/27] Muenba memory progress audit"
+echo "[21/28] Muenba memory progress audit"
 if node tests/muenba-memory-progress-audit.cjs >/dev/null 2>&1; then
   ok "Muenba memory migration and per-mode progress contracts pass"
 else
   bad "Muenba memory progress audit failed"
 fi
 
-echo "[22/27] Muenba navigation audit"
+echo "[22/28] Muenba navigation audit"
 if node tests/muenba-navigation-audit.cjs >/dev/null 2>&1; then
   ok "Muenba room entry and arrow reveal contracts pass"
 else
   bad "Muenba navigation audit failed"
 fi
 
-echo "[23/27] Muenba ghost audit"
+echo "[23/28] Muenba ghost audit"
 if node tests/muenba-ghost-audit.cjs >/dev/null 2>&1; then
   ok "Muenba ghost tension and carried-energy behavior pass"
 else
   bad "Muenba ghost audit failed"
 fi
 
-echo "[24/27] Muenba audio audit"
+echo "[24/28] Muenba audio audit"
 if node tests/muenba-audio-audit.cjs >/dev/null 2>&1; then
   ok "Muenba audio assets and playback contracts pass"
 else
   bad "Muenba audio audit failed"
 fi
 
-echo "[25/27] Feed Booha level audit"
+echo "[25/28] Feed Booha level audit"
 if node tests/feed-level-audit.cjs >/dev/null 2>&1; then
   ok "Feed Booha geometry and timing guardrails pass"
 else
@@ -306,18 +306,25 @@ else
 fi
 
 # ── 10. Feed Booha playability simulation ───────────────────
-echo "[26/27] Feed Booha playability simulation"
+echo "[26/28] Feed Booha playability simulation"
 if node tests/feed-playability-audit.cjs >/dev/null 2>&1; then
   ok "Feed Booha has a simulated successful feed path for all 50 levels"
 else
   bad "Feed Booha playability simulation failed"
 fi
 
-echo "[27/27] UtsuCard 20A celebration audit"
+echo "[27/28] UtsuCard 20A celebration audit"
 if node tests/utsu-card-celebration-audit.cjs >/dev/null 2>&1; then
   ok "UtsuCard stable celebration foundation contracts pass"
 else
   bad "UtsuCard celebration audit failed"
+fi
+
+echo "[28/28] Karasuki 20B Wanderer celebration audit"
+if node tests/karasuki-wanderer-celebration-audit.cjs >/dev/null 2>&1; then
+  ok "Karasuki Wanderer discovery celebration contracts pass"
+else
+  bad "Karasuki Wanderer celebration audit failed"
 fi
 
 # ── Summary ──────────────────────────────────────────────────
