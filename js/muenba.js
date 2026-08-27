@@ -62,6 +62,17 @@
   );
   const POPUP_COOLDOWN_MS = 900;
 
+  // Short event sounds share the Karasuki/Utsuroba palette. Muenba keeps its
+  // local reading-cue context for word timing, while popup and button sounds
+  // use this central, lazy WebAudio helper. BGM and looped tracks never pass
+  // through this function.
+  function playUiSfx(name) {
+    try {
+      const sound = window.UtsuSfx && window.UtsuSfx[name];
+      if (typeof sound === 'function') sound();
+    } catch (_) {}
+  }
+
   // ── Ghost hunting core loop (Pass 7) ────────────────────────────────────
   // Chase speed stays well under BASE_SPEED (5.5-8) on purpose — a chasing
   // ghost can close in if the player stands still or walks toward it, but
@@ -1595,6 +1606,7 @@
     state.clickTarget = null;
     state.moving = false;
     activeGhost = null;
+    playUiSfx('ghostError');
     const encounterRole = ghostRoleFor(ghost);
     const encounterRules = ghostRulesFor(ghost);
     const carryingEnergy = Number(readMuenba().orbsPending) > 0;
@@ -1664,6 +1676,7 @@
 
   function escapeDangerToHide() {
     if (!captureSession || !captureSession.danger || captureSession.dangerCanHide !== true) return;
+    playUiSfx('phantomCancel');
     stopRhythmCapture();
     stopDangerScream();
     stopDangerRhythmMusic();
@@ -1976,7 +1989,10 @@
       jp.innerHTML = japaneseText;
       button.appendChild(jp);
     }
-    button.addEventListener('click', handler);
+    button.addEventListener('click', event => {
+      playUiSfx('buttonPress');
+      if (typeof handler === 'function') handler(event);
+    });
     return button;
   }
 
@@ -2112,6 +2128,7 @@
       text.textContent = choice;
       button.append(number, text);
       button.addEventListener('click', event => {
+        playUiSfx('buttonPress');
         event.preventDefault();
         if (panel.classList.contains('is-locked')) {
           lockHint.textContent = 'Keep reading. The answers unlock when the record is complete.';
@@ -2370,7 +2387,10 @@
     const jp = document.createElement('small');
     jp.innerHTML = japaneseHtml;
     button.append(en, jp);
-    button.addEventListener('click', handler);
+    button.addEventListener('click', event => {
+      playUiSfx('buttonPress');
+      if (typeof handler === 'function') handler(event);
+    });
     return button;
   }
 
@@ -2564,7 +2584,10 @@
       text.className = 'muenba-case-choice-text';
       text.textContent = choice;
       button.append(number, text);
-      button.addEventListener('click', event => handleCaseClueAnswer(index, answerSet, mode, event.currentTarget, null));
+      button.addEventListener('click', event => {
+        playUiSfx('buttonPress');
+        handleCaseClueAnswer(index, answerSet, mode, event.currentTarget, null);
+      });
       choices.appendChild(button);
     });
     box.appendChild(choices);
@@ -2762,6 +2785,7 @@
       text.textContent = choice;
       button.append(number, text);
       button.addEventListener('click', () => {
+        playUiSfx('buttonPress');
         if (!captureSession || captureSession.phase !== 'case-question') return;
         if (index === answerSet.correct) beginCaseRhythm();
         else {
@@ -3023,6 +3047,7 @@
     rhythm.helpOpenedAt = performance.now();
     captureSession.rhythmHelpPhase = captureSession.phase;
     captureSession.phase = 'rhythm-help';
+    playUiSfx('popupOpen');
     if (captureSession.danger) stopDangerRhythmMusic();
     renderRhythmHelp();
   }
@@ -3034,6 +3059,7 @@
     rhythm.startAt += pausedFor;
     captureSession.phase = captureSession.rhythmHelpPhase || 'playing';
     captureSession.rhythmHelpPhase = null;
+    playUiSfx('popupClose');
     rhythm.helpOpenedAt = 0;
     renderRhythmCapture();
     if (captureSession.danger && !captureSession.practice) startDangerRhythmMusic();
@@ -4228,6 +4254,7 @@
     stopRhythmCapture();
     captureOpen = false;
     state.captureResolving = false;
+    playUiSfx('popupClose');
     setDangerOverlay(false);
     if (captureOverlay) {
       captureOverlay.classList.remove('open');
@@ -5639,11 +5666,13 @@
     returnPortalOpen = true;
     state.clickTarget = null;
     state.moving = false;
+    playUiSfx('popupOpen');
     returnPortalOverlay.classList.add('open');
   }
 
   function closeReturnPortalPopup() {
     returnPortalOpen = false;
+    playUiSfx('popupClose');
     returnPortalOverlay.classList.remove('open');
     returnPortalCooldownUntil = performance.now() + POPUP_COOLDOWN_MS;
   }
@@ -5873,6 +5902,7 @@
     lobbyOpen = true;
     state.clickTarget = null;
     state.moving = false;
+    playUiSfx('mischiefReward');
     renderNuppiWelcome();
     refreshNuppiCaseBoard();
     lobbyOverlay.setAttribute('aria-hidden', 'false');
@@ -5896,6 +5926,7 @@
 
   function closeNuppiLobby() {
     lobbyOpen = false;
+    playUiSfx('popupClose');
     if (lobbyOverlay) {
       lobbyOverlay.classList.remove('open');
       lobbyOverlay.setAttribute('aria-hidden', 'true');
@@ -5967,6 +5998,7 @@
     lobbyOpen = true;
     state.clickTarget = null;
     state.moving = false;
+    playUiSfx('mischiefReward');
     renderRoomNuppiPopup();
     lobbyOverlay.setAttribute('aria-hidden', 'false');
     lobbyOverlay.classList.add('open');
