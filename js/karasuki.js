@@ -2639,20 +2639,49 @@ const HAPPY_HOUSE_PORTAL = {
       .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   }
 
+  function wandererCelebrationGlow(color) {
+    const value = String(color || '').trim();
+    const match = value.match(/^#([0-9a-f]{6})$/i);
+    if (!match) return 'rgba(255,217,102,.42)';
+    const hex = match[1];
+    const r = parseInt(hex.slice(0, 2), 16);
+    const g = parseInt(hex.slice(2, 4), 16);
+    const b = parseInt(hex.slice(4, 6), 16);
+    return `rgba(${r},${g},${b},.44)`;
+  }
+
+  function wandererCelebrationPortrait(w) {
+    const pose = w && w.images && w.images.length > 1 ? w.images[1] : w && w.images && w.images[0];
+    if (pose && pose.src) return pose.src;
+    const filename = w && w.frames && (w.frames[1] || w.frames[0]);
+    return filename ? `${WANDERER_IMG_BASE}${filename}` : '';
+  }
+
   function showWandererDiscovery(w) {
-    if (!window.UtsuCard || !w || !w.name) return;
+    if (!window.UtsuCard || typeof window.UtsuCard.showCelebrationPop !== 'function' || !w || !w.name) return;
+    const comment = wandererComment(w);
+    const furiMap = { ...(WANDERER_FURIGANA[w.name] || {}), ...((comment && comment.furigana) || {}) };
     const jp = window.UtsuFurigana && window.UtsuFurigana.sentence
       ? window.UtsuFurigana.sentence('新しい旅人を見つけた！', { '新しい': 'あたらしい', '旅人': 'たびびと', '見つけた': 'みつけた' })
       : '新しい旅人を見つけた！';
-    window.UtsuCard.showRewardPop({
-      motif: 'lantern',
-      icon: '✦',
+    const nameJP = w.nameJP && window.UtsuFurigana && window.UtsuFurigana.sentence
+      ? window.UtsuFurigana.sentence(w.nameJP, furiMap)
+      : rewardHTMLText(w.nameJP || '');
+    const translation = nameJP
+      ? `${jp}<br><span aria-label="Wanderer name in Japanese">${nameJP}</span>`
+      : jp;
+    window.UtsuCard.showCelebrationPop({
+      eyebrow: 'KARASUKI DISCOVERY',
       title: 'NEW WANDERER FOUND!',
-      subHTML: `${rewardHTMLText(w.name)}<br>${jp}`,
-      duration: 2800,
+      sub: w.name,
+      translationHTML: translation,
+      portraitSrc: wandererCelebrationPortrait(w),
+      portraitAlt: `${w.name} wanderer`,
+      accent: w.color,
+      glow: wandererCelebrationGlow(w.color),
+      actionLabel: 'Meet this wanderer',
+      actionSubHTML: '<ruby>旅人<rt>たびびと</rt></ruby>に<ruby>会<rt>あ</rt></ruby>おう',
     });
-    const reward = document.querySelector('.utsu-reward-pop');
-    if (reward) reward.style.zIndex = '9300';
   }
 
   function showKarasukiArrival() {
