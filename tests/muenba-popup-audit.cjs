@@ -39,11 +39,13 @@ assert(source.includes('function setDevCaptureHold(held)'),
   'DEV screenshot hold must be session-scoped and reversible');
 assert(source.includes('min-height:120px; box-sizing:border-box; padding:20px 20px 19px;'),
   'case reading records must reserve a stable, spacious English surface');
-assert(source.includes('font-size:clamp(1.16rem,2.35vw,1.38rem) !important; line-height:1.82 !important;'),
-  'case reading records must use ESL-friendly type and line spacing');
-assert(source.includes('.muenba-case-check-panel .muenba-case-choice { min-height:62px;'),
+assert(source.includes('font-size:clamp(1.18rem,2.1vw,1.625rem) !important; line-height:1.85 !important;'),
+  'case reading records must use the 19C hero typography and line spacing');
+assert(source.includes('.muenba-case-choice { min-height:62px !important; padding:16px 20px !important;'),
   'case answer choices must remain comfortable touch targets');
+assert(!source.includes('appendCaseGlossary') && !source.includes('muenba-case-glossary'),
+  'case popups must not repeat highlighted vocabulary in a competing chip row');
 assert(source.includes('.muenba-case-check-panel.is-locked'),
   'locked and unlocked check panels must have distinct visual states');
 
-console.log('Muenba popup audit passed: top anchoring, safe-area spacing, scrollability, scene reset, DEV hold, and ESL layout contracts.');
+console.log('Muenba popup audit passed: top anchoring, safe-area spacing, scrollability, scene reset, DEV hold, ESL layout, and 19C typography contracts.');
