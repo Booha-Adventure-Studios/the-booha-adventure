@@ -2657,6 +2657,11 @@ const HAPPY_HOUSE_PORTAL = {
     return filename ? `${WANDERER_IMG_BASE}${filename}` : '';
   }
 
+  // Pass 20C: returning wanderers use a shared welcome-back palette so the
+  // return moment is visually distinct from a first-discovery celebration.
+  const WANDERER_RETURN_ACCENT = '#7dd3fc';
+  const WANDERER_RETURN_GLOW   = 'rgba(125,211,252,.46)';
+
   function showWandererDiscovery(w) {
     if (!window.UtsuCard || typeof window.UtsuCard.showCelebrationPop !== 'function' || !w || !w.name) return;
     const comment = wandererComment(w);
@@ -2681,6 +2686,28 @@ const HAPPY_HOUSE_PORTAL = {
       glow: wandererCelebrationGlow(w.color),
       actionLabel: 'Meet this wanderer',
       actionSubHTML: '<ruby>旅人<rt>たびびと</rt></ruby>に<ruby>会<rt>あ</rt></ruby>おう',
+    });
+  }
+
+  function showWandererReturn(w) {
+    if (!window.UtsuCard || typeof window.UtsuCard.showCelebrationPop !== 'function' || !w || !w.name) return;
+    const jp = window.UtsuFurigana && window.UtsuFurigana.sentence
+      ? window.UtsuFurigana.sentence('また会えたね！戻ってきたよ。', {
+        '会': 'あ',
+        '戻': 'もど',
+      })
+      : 'また会えたね！戻ってきたよ。';
+    window.UtsuCard.showCelebrationPop({
+      eyebrow: 'KARASUKI RETURN',
+      title: 'HELLO AGAIN!',
+      sub: "I'm back.",
+      translationHTML: jp,
+      portraitSrc: wandererCelebrationPortrait(w),
+      portraitAlt: `${w.name} wanderer returning`,
+      accent: WANDERER_RETURN_ACCENT,
+      glow: WANDERER_RETURN_GLOW,
+      actionLabel: 'Say hello',
+      actionSubHTML: '<ruby>あいさつ<rt>あいさつ</rt></ruby>しよう',
     });
   }
 
@@ -2883,6 +2910,7 @@ const HAPPY_HOUSE_PORTAL = {
     wandererPopOverlay.style.background = 'rgba(0,0,0,0.82)';
     state.clickTarget = null;
     if (visit && visit.firstVisit) showWandererDiscovery(w);
+    else if (visit && Number(visit.visits) > 1) showWandererReturn(w);
   }
 
   function closeWandererPop() {
