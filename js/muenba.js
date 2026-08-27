@@ -1590,6 +1590,7 @@
   function beginDangerEncounter(ghost, { allowHide = false } = {}) {
     if (!ghost || captureOpen || state.captureResolving) return;
     captureOpen = true;
+    if (captureOverlay) captureOverlay.setAttribute('aria-hidden', 'false');
     state.captureResolving = true;
     state.clickTarget = null;
     state.moving = false;
@@ -1672,7 +1673,10 @@
     state.clickTarget = null;
     state.moving = false;
     setDangerOverlay(false);
-    if (captureOverlay) captureOverlay.classList.remove('open');
+    if (captureOverlay) {
+      captureOverlay.classList.remove('open');
+      captureOverlay.setAttribute('aria-hidden', 'true');
+    }
     captureSession = null;
     spawnRoomGhost(state.roomId);
     if (activeGhost) {
@@ -1717,7 +1721,10 @@
     captureOpen = false;
     state.captureResolving = false;
     setDangerOverlay(false);
-    if (captureOverlay) captureOverlay.classList.remove('open');
+    if (captureOverlay) {
+      captureOverlay.classList.remove('open');
+      captureOverlay.setAttribute('aria-hidden', 'true');
+    }
     captureSession = null;
     resumeWorldMusicAfterCapture();
   }
@@ -1735,7 +1742,10 @@
     captureOpen = false;
     state.captureResolving = false;
     setDangerOverlay(false);
-    if (captureOverlay) captureOverlay.classList.remove('open');
+    if (captureOverlay) {
+      captureOverlay.classList.remove('open');
+      captureOverlay.setAttribute('aria-hidden', 'true');
+    }
     captureSession = null;
     resumeWorldMusicAfterCapture();
     setRoom(MUENBA_NUPPI.roomId, 'fromKarasuki');
@@ -1809,6 +1819,7 @@
     captureOverlay.setAttribute('role', 'dialog');
     captureOverlay.setAttribute('aria-modal', 'true');
     captureOverlay.setAttribute('aria-label', 'Muenba ghost capture');
+    captureOverlay.setAttribute('aria-hidden', 'true');
     document.body.appendChild(captureOverlay);
     document.addEventListener('keydown', event => {
       if (event.key === 'Escape' && captureOpen) {
@@ -1842,6 +1853,7 @@
       return;
     }
     captureOpen = true;
+    if (captureOverlay) captureOverlay.setAttribute('aria-hidden', 'false');
     const caseData = caseForGhost(ghost && ghost.id);
     const caseDifficulty = caseData ? getMuenbaReadingDifficulty() : null;
     captureSession = {
@@ -1874,6 +1886,7 @@
   function captureBox() {
     if (captureSession) clearCaseReadGate(captureSession);
     captureOverlay.textContent = '';
+    captureOverlay.setAttribute('aria-hidden', 'false');
     captureOverlay.scrollTop = 0;
     captureOverlay.scrollLeft = 0;
     if (captureSession) captureOverlay.dataset.phase = captureSession.phase || '';
@@ -2087,6 +2100,7 @@
       const button = document.createElement('button');
       button.type = 'button';
       button.className = 'muenba-case-choice muenba-case-choice-locked';
+      button.disabled = true;
       button.setAttribute('aria-disabled', 'true');
       button.setAttribute('tabindex', '-1');
       button.setAttribute('aria-label', `Answer ${index + 1}: ${choice}`);
@@ -2127,6 +2141,7 @@
     checkPanel.lockHint.textContent = 'The record is complete. Choose the best answer.';
     checkPanel.panel.querySelectorAll('.muenba-case-choice').forEach(button => {
       button.classList.remove('muenba-case-choice-locked');
+      button.disabled = false;
       button.setAttribute('aria-disabled', 'false');
       button.setAttribute('tabindex', '0');
     });
@@ -2209,6 +2224,7 @@
     record.textContent = '';
     record.classList.add('muenba-case-sweep');
     record.setAttribute('aria-label', String(englishText || ''));
+    record.setAttribute('aria-busy', 'true');
     record.dataset.sweepState = 'reading';
 
     parts.forEach(part => {
@@ -2254,6 +2270,7 @@
           return;
         }
         record.dataset.sweepState = 'complete';
+        record.setAttribute('aria-busy', 'false');
         box.classList.remove('muenba-reading');
         box.classList.add('muenba-reading-complete');
         if (button && button.isConnected) {
@@ -3934,7 +3951,10 @@
 
     setReturnToNuppiPending(false);
     lobbyOpen = false;
-    if (lobbyOverlay) lobbyOverlay.classList.remove('open');
+    if (lobbyOverlay) {
+      lobbyOverlay.classList.remove('open');
+      lobbyOverlay.setAttribute('aria-hidden', 'true');
+    }
     startMuenbaCelebration(pending);
     return true;
   }
@@ -4189,7 +4209,10 @@
     captureOpen = false;
     state.captureResolving = false;
     setDangerOverlay(false);
-    if (captureOverlay) captureOverlay.classList.remove('open');
+    if (captureOverlay) {
+      captureOverlay.classList.remove('open');
+      captureOverlay.setAttribute('aria-hidden', 'true');
+    }
 
     // Re-seed the room ghost after a cancel. This does not write ghostsFound,
     // huntJournal, or orbs.
@@ -4206,7 +4229,10 @@
     captureOpen = false;
     state.captureResolving = false;
     setDangerOverlay(false);
-    if (captureOverlay) captureOverlay.classList.remove('open');
+    if (captureOverlay) {
+      captureOverlay.classList.remove('open');
+      captureOverlay.setAttribute('aria-hidden', 'true');
+    }
     captureSession = null;
     if (resumeHunt) spawnRoomGhost(state.roomId);
     resumeWorldMusicAfterCapture();
@@ -5679,6 +5705,10 @@
     if (lobbyOverlay) return;
     lobbyOverlay = document.createElement('div');
     lobbyOverlay.id = 'muenba-lobby-overlay';
+    lobbyOverlay.setAttribute('role', 'dialog');
+    lobbyOverlay.setAttribute('aria-modal', 'true');
+    lobbyOverlay.setAttribute('aria-label', 'Muenba Nuppi dialogue');
+    lobbyOverlay.setAttribute('aria-hidden', 'true');
     document.body.appendChild(lobbyOverlay);
     renderNuppiWelcome();
     document.addEventListener('keydown', event => {
@@ -5845,6 +5875,7 @@
     state.moving = false;
     renderNuppiWelcome();
     refreshNuppiCaseBoard();
+    lobbyOverlay.setAttribute('aria-hidden', 'false');
     lobbyOverlay.classList.add('open');
   }
 
@@ -5865,7 +5896,10 @@
 
   function closeNuppiLobby() {
     lobbyOpen = false;
-    if (lobbyOverlay) lobbyOverlay.classList.remove('open');
+    if (lobbyOverlay) {
+      lobbyOverlay.classList.remove('open');
+      lobbyOverlay.setAttribute('aria-hidden', 'true');
+    }
   }
 
   function renderRoomNuppiPopup() {
@@ -5934,6 +5968,7 @@
     state.clickTarget = null;
     state.moving = false;
     renderRoomNuppiPopup();
+    lobbyOverlay.setAttribute('aria-hidden', 'false');
     lobbyOverlay.classList.add('open');
   }
 
@@ -5976,6 +6011,7 @@
       state.cemeteryAlert = true;
       closeNuppiLobby();
     });
+    lobbyOverlay.setAttribute('aria-hidden', 'false');
     lobbyOverlay.classList.add('open');
     focusLobbyControl(canContinue ? '#muenba-handoff-find' : '#muenba-handoff-later');
   }

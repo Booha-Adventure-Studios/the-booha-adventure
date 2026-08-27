@@ -64,8 +64,10 @@ assert(runtimeSource.includes('CASE_WORD_SWEEP_KEYWORD_EXTRA_MS = 250'), 'word s
 assert(runtimeSource.includes('CASE_WORD_SWEEP_FINAL_HOLD_MS = 1500'), 'word sweep must hold the completed record before CHECK');
 assert(runtimeSource.includes("record.classList.add('muenba-case-sweep')"), 'word sweep must render an explicit reading surface');
 assert(runtimeSource.includes("record.dataset.sweepState = 'complete'"), 'word sweep must expose a completed state before CHECK');
+assert(runtimeSource.includes("record.setAttribute('aria-busy', 'true')") && runtimeSource.includes("record.setAttribute('aria-busy', 'false')"), 'word sweep must expose its reading state to assistive technology');
 assert(runtimeSource.includes('function appendCaseLockedCheck(box, clue, mode, session)'), 'Muenba must expose an anti-button-smash check panel');
 assert(runtimeSource.includes("button.setAttribute('aria-disabled', 'true')"), 'locked answer choices must advertise their disabled state');
+assert(runtimeSource.includes('button.disabled = true;') && runtimeSource.includes('button.disabled = false;'), 'locked answer choices must be natively disabled until the record is complete');
 assert(runtimeSource.includes('function unlockCaseCheck(session, checkPanel, readStatus)'), 'the completed sweep must unlock the existing check panel');
 assert(runtimeSource.includes('.muenba-case-clue.muenba-reading > .muenba-case-check-panel'), 'reading stage must hide the question panel');
 assert(runtimeSource.includes('.muenba-case-clue.muenba-reading > .muenba-case-reading-status'), 'reading stage must hide the supporting status');
