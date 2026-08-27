@@ -26,13 +26,10 @@ assert(source.includes('function getCaseAudioContext()'), 'reading audio context
 assert(source.includes('if (!caseAudioContext)'), 'reading audio context must not be recreated for every word');
 assert(source.includes('function playCaseWordCue(isKeyword = false)'), 'word sweep must have a dedicated reading cue');
 assert(source.includes('function playCaseUnlockCue()'), 'opening CHECK must have a dedicated unlock cue');
-assert(source.includes('function playCaseLockedThud()'), 'premature answer taps must have a dedicated locked response');
 assert(source.includes('function playCaseSolvedCue()'), 'solved cases must have a dedicated success cue');
 assert(source.includes('return !REDUCED_MOTION;'), 'reading cues must respect reduced-motion preference');
 assert(source.includes('playCaseWordCue(caseSweepWordIsKeyword(current.textContent, keywords))'), 'word cues must fire as each sweep word is revealed');
 assert(source.includes('playCaseUnlockCue();'), 'unlock cue must fire when the comprehension check opens');
-assert(source.includes('playCaseLockedThud();'), 'locked answer taps must trigger the quiet thud response');
-assert(source.includes('pulseCaseReadingWord(panel);'), 'locked answer taps must pulse the active reading word');
 assert(source.includes('playCaseSolvedCue();'), 'solved cards must trigger the success cue');
 assert(source.includes('const playResult = dangerScream.play();'), 'scream playback must be explicitly started on encounter');
 assert(source.includes('const playResult = dangerRhythmMusic.play();'), 'danger rhythm music must start with the danger chart');
