@@ -326,6 +326,54 @@
         100%{opacity:0;transform:translate(-50%,-50%) translate(var(--dx),var(--dy)) scale(.25);}
       }
 
+      /* ── stable celebration card (Round 3, Pass 20A) ──
+         This is intentionally separate from .utsu-reward-pop. Pickups can
+         remain small and transient; discoveries and returns are meaningful
+         world moments that need a centered, readable, dismissible surface. */
+      .utsu-celebration-pop{position:fixed;inset:0;z-index:9350;display:grid;place-items:center;
+        padding:clamp(12px,3vw,28px);box-sizing:border-box;background:rgba(0,0,0,0);
+        opacity:0;visibility:hidden;pointer-events:none;transition:opacity .28s ease,background .28s ease,visibility 0s linear .28s;}
+      .utsu-celebration-pop.is-shown{opacity:1;visibility:visible;pointer-events:auto;background:rgba(0,0,0,.78);transition-delay:0s;}
+      .utsu-celebration-card{position:relative;width:min(620px,100%);max-height:min(86vh,720px);overflow:auto;
+        box-sizing:border-box;padding:clamp(28px,5vw,48px) clamp(20px,6vw,56px) clamp(24px,4vw,38px);
+        border:2px solid var(--celebration-ring,#ffd966);border-radius:24px;text-align:center;
+        color:#fff7e6;background:radial-gradient(circle at 50% 0%,rgba(255,255,255,.10),transparent 38%),
+        linear-gradient(160deg,#15271f 0%,#09140f 60%,#040807 100%);
+        box-shadow:0 22px 90px rgba(0,0,0,.78),0 0 0 1px rgba(255,255,255,.08) inset,
+        0 0 58px var(--celebration-glow,rgba(255,217,102,.38));
+        transform:translateY(18px) scale(.94);opacity:0;transition:transform .46s cubic-bezier(.22,1.3,.36,1),opacity .28s ease;}
+      .utsu-celebration-pop.is-shown .utsu-celebration-card{transform:translateY(0) scale(1);opacity:1;}
+      .utsu-celebration-card::before{content:'';position:absolute;top:0;left:14%;right:14%;height:3px;
+        background:linear-gradient(90deg,transparent,var(--celebration-ring,#ffd966),transparent);
+        box-shadow:0 0 18px var(--celebration-glow,rgba(255,217,102,.55));}
+      .utsu-celebration-close{position:absolute;top:10px;right:12px;width:42px;height:42px;
+        border:0;background:transparent;color:rgba(255,247,230,.62);font-size:1.25rem;line-height:1;
+        cursor:pointer;border-radius:50%;}
+      .utsu-celebration-close:hover,.utsu-celebration-close:focus-visible{color:#fff7e6;background:rgba(255,255,255,.10);outline:2px solid var(--celebration-ring,#ffd966);outline-offset:2px;}
+      .utsu-celebration-eyebrow{margin:0 0 10px;color:var(--celebration-ring,#ffd966);font:800 clamp(.72rem,2vw,.9rem)/1.2 ui-monospace,monospace;letter-spacing:.2em;text-transform:uppercase;text-shadow:0 0 14px var(--celebration-glow,rgba(255,217,102,.5));}
+      .utsu-celebration-portrait-wrap{position:relative;width:min(280px,68vw);height:min(250px,42vh);margin:0 auto 12px;display:grid;place-items:center;}
+      .utsu-celebration-portrait-wrap::before{content:'';position:absolute;inset:4%;border-radius:50%;background:radial-gradient(circle,var(--celebration-glow,rgba(255,217,102,.32)),transparent 68%);filter:blur(12px);animation:utsuCelebrationGlow 2.4s ease-in-out infinite;}
+      .utsu-celebration-portrait{position:relative;z-index:1;max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;filter:drop-shadow(0 0 10px var(--celebration-ring,#ffd966)) drop-shadow(0 0 24px var(--celebration-glow,rgba(255,217,102,.5)));}
+      .utsu-celebration-icon{position:relative;z-index:1;width:112px;height:112px;border-radius:50%;display:grid;place-items:center;font-size:52px;color:#fff7e6;background:radial-gradient(circle at 34% 28%,#fff9dc,var(--celebration-ring,#ffd966) 58%,#261a06 125%);box-shadow:0 0 22px var(--celebration-glow,rgba(255,217,102,.5));}
+      @keyframes utsuCelebrationGlow{0%,100%{transform:scale(.9);opacity:.42;}50%{transform:scale(1.08);opacity:.78;}}
+      .utsu-celebration-title{margin:0;color:#fff7e6;font:700 clamp(1.55rem,5vw,2.45rem)/1.15 Georgia,'Times New Roman',serif;text-shadow:0 0 20px var(--celebration-glow,rgba(255,217,102,.38));}
+      .utsu-celebration-sub{margin:10px auto 0;max-width:34em;color:#fff7e6;font:700 clamp(1rem,2.8vw,1.3rem)/1.5 Georgia,'Times New Roman',serif;}
+      .utsu-celebration-translation{margin:7px auto 0;max-width:38em;color:rgba(255,247,230,.78);font:400 clamp(.86rem,2.4vw,1rem)/1.7 Georgia,'Times New Roman',serif;}
+      .utsu-celebration-translation ruby{ruby-position:over;line-height:1.55;}
+      .utsu-celebration-translation rt{font-size:clamp(10px,.78em,15px);color:var(--celebration-ring,#ffd966);opacity:.95;}
+      .utsu-celebration-action{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:52px;margin-top:24px;padding:11px 28px;border:1.5px solid var(--celebration-ring,#ffd966);border-radius:999px;color:#fff7e6;background:rgba(255,217,102,.12);font:700 clamp(.9rem,2.5vw,1.05rem)/1.2 Georgia,'Times New Roman',serif;cursor:pointer;box-shadow:0 0 22px var(--celebration-glow,rgba(255,217,102,.28));}
+      .utsu-celebration-action:hover,.utsu-celebration-action:focus-visible{background:rgba(255,217,102,.24);outline:2px solid var(--celebration-ring,#ffd966);outline-offset:3px;}
+      .utsu-celebration-action small{color:var(--celebration-ring,#ffd966);font:400 .78em/1.2 Georgia,'Times New Roman',serif;}
+      @media(max-width:520px){
+        .utsu-celebration-card{border-radius:18px;padding:28px 16px 24px;}
+        .utsu-celebration-portrait-wrap{width:min(220px,65vw);height:min(190px,32vh);}
+        .utsu-celebration-title{font-size:clamp(1.35rem,7vw,1.85rem);}
+      }
+      @media(prefers-reduced-motion:reduce){
+        .utsu-celebration-card,.utsu-celebration-pop{transition:opacity .2s ease,background .2s ease;}
+        .utsu-celebration-portrait-wrap::before{animation:none;}
+      }
+
       @media(max-width:700px){
         .utsu-hud-chip{top:9px;padding:7px 13px 7px 13px;max-width:calc(100vw - 20px);}
         .utsu-hud-chip.is-left{left:9px;}
@@ -360,6 +408,8 @@
      doesn't need to track a handle or clean anything up. */
   var rewardPopEl = null;
   var rewardPopHideTimer = null;
+  var celebrationPopEl = null;
+  var celebrationCloseHandler = null;
   var SPARK_GLYPHS = ['✦', '✧'];
 
   /* Fills the burst container with a fresh ring of sparks each call —
@@ -410,6 +460,95 @@
     rewardPopHideTimer = setTimeout(() => { rewardPopEl.classList.remove('is-shown'); }, opts.duration || 1900);
   }
 
+  function closeCelebrationPop() {
+    if (!celebrationPopEl) return;
+    celebrationPopEl.classList.remove('is-shown');
+    if (celebrationCloseHandler) {
+      document.removeEventListener('keydown', celebrationCloseHandler);
+      celebrationCloseHandler = null;
+    }
+  }
+
+  // Pass 20A: a stable, centered celebration surface for high-value moments.
+  // `translationHTML` is caller-authored furigana-safe HTML; all other text
+  // values are assigned with textContent. The card stays open until the
+  // learner explicitly dismisses it unless closeOnBackdrop is requested.
+  function showCelebrationPop(opts) {
+    opts = opts || {};
+    if (!celebrationPopEl) {
+      celebrationPopEl = document.createElement('div');
+      celebrationPopEl.className = 'utsu-celebration-pop';
+      celebrationPopEl.innerHTML =
+        '<section class="utsu-celebration-card" role="dialog" aria-modal="true" aria-labelledby="utsu-celebration-title">' +
+          '<button class="utsu-celebration-close" type="button" aria-label="Close celebration / 閉じる">✕</button>' +
+          '<p class="utsu-celebration-eyebrow"></p>' +
+          '<div class="utsu-celebration-portrait-wrap"><div class="utsu-celebration-icon" aria-hidden="true">✦</div><img class="utsu-celebration-portrait" alt="" hidden></div>' +
+          '<h2 class="utsu-celebration-title" id="utsu-celebration-title"></h2>' +
+          '<p class="utsu-celebration-sub"></p>' +
+          '<p class="utsu-celebration-translation"></p>' +
+          '<button class="utsu-celebration-action" type="button"><span></span><small></small></button>' +
+        '</section>';
+      document.body.appendChild(celebrationPopEl);
+    }
+
+    var card = celebrationPopEl.querySelector('.utsu-celebration-card');
+    var closeButton = celebrationPopEl.querySelector('.utsu-celebration-close');
+    var eyebrow = celebrationPopEl.querySelector('.utsu-celebration-eyebrow');
+    var portrait = celebrationPopEl.querySelector('.utsu-celebration-portrait');
+    var icon = celebrationPopEl.querySelector('.utsu-celebration-icon');
+    var title = celebrationPopEl.querySelector('.utsu-celebration-title');
+    var sub = celebrationPopEl.querySelector('.utsu-celebration-sub');
+    var translation = celebrationPopEl.querySelector('.utsu-celebration-translation');
+    var action = celebrationPopEl.querySelector('.utsu-celebration-action');
+    var actionLabel = action.querySelector('span');
+    var actionSub = action.querySelector('small');
+    var accent = opts.accent || ringFor(opts.motif);
+    var glow = opts.glow || glowFor(opts.motif);
+    card.style.setProperty('--celebration-ring', accent);
+    card.style.setProperty('--celebration-glow', glow);
+    eyebrow.textContent = opts.eyebrow || '';
+    eyebrow.style.display = opts.eyebrow ? '' : 'none';
+    title.textContent = opts.title || '';
+    sub.textContent = opts.sub || '';
+    sub.style.display = opts.sub ? '' : 'none';
+    translation.innerHTML = opts.translationHTML || '';
+    translation.style.display = opts.translationHTML ? '' : 'none';
+    if (opts.portraitSrc) {
+      portrait.src = opts.portraitSrc;
+      portrait.alt = opts.portraitAlt || '';
+      portrait.hidden = false;
+      icon.style.display = 'none';
+    } else {
+      portrait.hidden = true;
+      icon.style.display = 'grid';
+      icon.textContent = opts.icon || '✦';
+    }
+    actionLabel.textContent = opts.actionLabel || 'Continue';
+    actionSub.innerHTML = opts.actionSubHTML || '';
+    actionSub.style.display = opts.actionSubHTML ? '' : 'none';
+    var dismiss = function () {
+      var onClose = opts.onClose;
+      closeCelebrationPop();
+      if (typeof onClose === 'function') onClose();
+    };
+    closeButton.onclick = dismiss;
+    action.onclick = dismiss;
+    celebrationPopEl.onclick = function (event) {
+      if (event.target === celebrationPopEl && opts.closeOnBackdrop === true) dismiss();
+    };
+    if (celebrationCloseHandler) document.removeEventListener('keydown', celebrationCloseHandler);
+    celebrationCloseHandler = function (event) {
+      if (event.key === 'Escape') {
+        dismiss();
+      }
+    };
+    document.addEventListener('keydown', celebrationCloseHandler);
+    celebrationPopEl.classList.remove('is-shown');
+    void card.offsetWidth;
+    requestAnimationFrame(function () { celebrationPopEl.classList.add('is-shown'); });
+    action.focus();
+  }
+
   injectStyles();
 
   window.UtsuCard = {
@@ -418,5 +557,7 @@
     ringFor: ringFor,
     glowFor: glowFor,
     showRewardPop: showRewardPop,
+    showCelebrationPop: showCelebrationPop,
+    closeCelebrationPop: closeCelebrationPop,
   };
 })();
