@@ -35,8 +35,11 @@ assert(runtimeSource.includes('appendCaseLockedCheck(box, clue, mode, captureSes
 assert(runtimeSource.includes('startCaseWordSweep('), 'case clues must reveal a check after the word sweep');
 assert(runtimeSource.includes('function renderCaseCheck(feedback = \'\')'), 'case clues must have a comprehension-check renderer');
 assert(runtimeSource.includes('function renderCaseReview(index = 0, options = {})'), 'case solve must have a safe record-review renderer');
-assert(runtimeSource.includes('function beginCaseRhythm()'), 'a correct case solve must enter rhythm through the direct handoff');
+assert(runtimeSource.includes('function beginCaseRhythm()'), 'a correct case solve must enter the solved handoff');
 assert(runtimeSource.includes("if (index === answerSet.correct) beginCaseRhythm();"), 'the final correct answer must start the rhythm handoff');
+assert(runtimeSource.includes("session.phase = 'case-solved'"), 'a solved case must pause before rhythm');
+assert(runtimeSource.includes('muenba-case-energy-start'), 'a solved case must expose the energy collection action');
+assert(runtimeSource.includes('Start energy collection'), 'the solved action must name the energy collection step');
 assert(runtimeSource.includes('shuffledCaseChoices(check, `clue-${session.caseIndex}-attempt-${session.caseChoiceAttempt || 0}`)'), 'clue choices must use the answer shuffler');
 assert(runtimeSource.includes("shuffledCaseChoices(mode, 'final')"), 'final choices must use the answer shuffler');
 assert(!sourceSection('renderCaseIntro', 'selectCaseDifficulty').includes('focusCaptureControl('), 'case intro must not auto-focus its action');

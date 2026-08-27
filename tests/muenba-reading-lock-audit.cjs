@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 
-// Pass 16F: a journey-level regression audit for the English reading lock.
+// Pass 19A: a journey-level regression audit for the English reading lock.
 // This deliberately stays DOM-free so it can run in verify.sh before deploy.
 // The data audit owns authored content; this audit owns the player-flow seams
 // that are easiest to regress when the case UI is edited.
@@ -31,7 +31,7 @@ const clueSource = sourceSection('renderCaseClue', 'renderCaseCheck');
 const checkSource = sourceSection('renderCaseCheck', 'renderCaseReview');
 const reviewSource = sourceSection('renderCaseReview', 'renderCaseQuestion');
 const finalSource = sourceSection('renderCaseQuestion', 'beginCaseRhythm');
-const transitionSource = sourceSection('beginCaseRhythm', 'renderCaptureReady');
+const solvedSource = sourceSection('beginCaseRhythm', 'renderCaptureReady');
 const rhythmSource = sourceSection('startRhythmCapture', 'openRhythmHelp');
 
 // 1. The authored content must provide three small reading locks per mode.
@@ -99,13 +99,18 @@ assert(finalSource.includes("renderCaseReview(reviewIndex, { penalty: true"), 'f
 assert(rhythmSource.includes('readingPenaltyCount'), 'rhythm must receive the reading penalty count');
 assert(rhythmSource.includes('CASE_FINAL_PENALTY_ACCURACY_STEP'), 'reading penalties must create only the planned rhythm disadvantage');
 
-// 5. Correct comprehension hands the player directly to rhythm after the
-// visual transition; there must be no second confirmation button.
+// 5. Correct comprehension earns a stable solved card. Rhythm must not start
+// until the learner explicitly taps the energy-collection action.
 assert(finalSource.includes('if (index === answerSet.correct) beginCaseRhythm();'), 'correct solve must start the rhythm handoff');
-assert(transitionSource.includes("session.phase = 'case-transition'"), 'rhythm handoff must use a transition phase');
-assert(transitionSource.includes('CASE_RHYTHM_TRANSITION_MS'), 'rhythm handoff must use the short transition timing');
-assert(transitionSource.includes('scheduleCaseTransition(session)'), 'rhythm handoff must use the owned transition scheduler');
-assert(runtimeSource.includes('startRhythmCapture(false)'), 'rhythm must start automatically after the transition');
+assert(solvedSource.includes("session.phase = 'case-solved'"), 'rhythm handoff must pause on a stable solved phase');
+assert(solvedSource.includes('Start energy collection'), 'solved card must use the explicit energy-collection label');
+assert(solvedSource.includes('muenba-case-energy-start'), 'solved card must expose a dedicated energy-collection action');
+assert(solvedSource.includes('session.phase !== \'case-solved\''), 'energy action must be phase-guarded');
+assert(solvedSource.includes('startRhythmCapture(false)'), 'rhythm must start from the explicit energy action');
+assert(runtimeSource.includes('function playCaseSolvedCue()'), 'solving a case must have a success cue');
+assert(solvedSource.includes('playCaseSolvedCue()'), 'success cue must play when the solved card opens');
+assert(!runtimeSource.includes("phase = 'case-transition'"), 'old automatic transition phase must stay removed');
+assert(!runtimeSource.includes('scheduleCaseTransition'), 'old automatic transition scheduler must stay removed');
 assert(!runtimeSource.includes('renderCaseResolved'), 'old extra resolved/capture screen must stay removed');
 assert(!runtimeSource.includes('muenba-case-capture'), 'the reading lock must not add a second capture button');
 
@@ -117,4 +122,4 @@ assert(runtimeSource.includes('choiceSeed'), 'the encounter must own a reproduci
 assert(runtimeSource.includes('shuffledCaseChoices(check, `clue-${captureSession.caseIndex}-attempt-${captureSession.caseChoiceAttempt || 0}`)'), 'clue checks must use scoped shuffling');
 assert(finalSource.includes("shuffledCaseChoices(mode, 'final')"), 'final solve must use scoped shuffling');
 
-console.log(`Muenba reading-lock audit passed: ${data.caseOrder.length} cases, ${clueCount} clue checks, and direct rhythm handoff contracts.`);
+console.log(`Muenba reading-lock audit passed: ${data.caseOrder.length} cases, ${clueCount} clue checks, and explicit solved-card handoff contracts.`);
