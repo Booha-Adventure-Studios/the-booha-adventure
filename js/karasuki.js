@@ -5293,28 +5293,35 @@ const NUPPI_LINES = [
       background:rgba(0,0,0,0);transition:background 0.3s ease;`;
     nuppiPopEl.innerHTML = `
       <div style="
-        background:#06040a;border:1px solid rgba(220,180,220,0.18);
-        border-radius:8px;padding:0 0 28px;
-        width:min(340px,90vw);max-height:90vh;overflow-y:auto;
+        background:radial-gradient(circle at 50% 0%,rgba(255,119,200,.22),transparent 34%),linear-gradient(165deg,#160812 0%,#08040b 58%,#030205 100%);
+        border:2px solid rgba(255,105,180,0.62);
+        border-radius:24px;padding:0 0 30px;
+        width:min(390px,90vw);max-height:90vh;overflow-y:auto;
         text-align:center;font-family:'Georgia',serif;position:relative;
-        box-shadow:0 0 50px rgba(30,10,40,0.95),0 0 20px rgba(180,100,200,0.12);">
-        <div style="padding:28px 0 18px;display:flex;align-items:center;justify-content:center;">
+        box-shadow:0 0 0 1px rgba(255,209,236,.12),0 0 28px rgba(255,79,163,.52),0 0 74px rgba(255,20,147,.25),inset 0 0 34px rgba(255,105,180,.08);">
+        <div style="height:4px;margin:0 22% 5px;border-radius:99px;background:linear-gradient(90deg,transparent,#ff4fa3,#ffd1ec,#ff4fa3,transparent);box-shadow:0 0 16px rgba(255,105,180,.9);"></div>
+        <div style="padding:22px 0 8px;display:flex;align-items:center;justify-content:center;">
           <img src="assets/img/wanderers/nuppi-2.png"
-            style="max-width:88%;max-height:min(170px,36vw);object-fit:contain;
-                   filter:drop-shadow(0 0 16px rgba(200,150,220,0.30));"/>
+            alt="Nuppi"
+            style="max-width:76%;max-height:min(210px,42vw);object-fit:contain;
+                   filter:drop-shadow(0 0 10px rgba(255,119,200,.9)) drop-shadow(0 0 28px rgba(255,20,147,.45));"/>
         </div>
         <button id="nuppi-pop-close" style="
           position:absolute;top:12px;right:14px;background:transparent;
           border:none;cursor:pointer;font-size:1rem;
-          color:rgba(200,180,220,0.28);padding:4px 8px;">✕</button>
+          color:rgba(255,209,236,0.72);padding:6px 9px;border-radius:50%;">✕</button>
+        <p style="font-family:monospace;font-size:clamp(.66rem,2.4vw,.8rem);font-weight:800;letter-spacing:.2em;color:#ff77c8;margin:0 22px 6px;text-shadow:0 0 12px rgba(255,105,180,.8);">NUPPI SAYS ♡</p>
+        <p style="font-family:'Noto Sans JP',serif;font-size:clamp(.72rem,2.8vw,.9rem);color:#ffd1ec;margin:0 24px 16px;">ヌーピーからのひとこと</p>
+        <div style="position:relative;margin:0 20px;padding:20px 18px 18px;border:1px solid rgba(255,119,200,.54);border-radius:20px;background:linear-gradient(180deg,rgba(31,7,23,.92),rgba(7,3,10,.9));box-shadow:0 0 22px rgba(255,20,147,.24),inset 0 0 22px rgba(255,105,180,.06);">
         <p id="nuppi-pop-en" style="
           font-size:clamp(.88rem,3.6vw,1.06rem);line-height:1.65;
-          color:rgba(225,215,235,0.88);margin:0 24px 8px;
-          letter-spacing:.04em;font-style:italic;"></p>
+          color:#fff0f8;margin:0 0 10px;
+          letter-spacing:.04em;font-style:italic;text-shadow:0 0 10px rgba(255,119,200,.2);"></p>
         <p id="nuppi-pop-jp" style="
           font-size:clamp(.8rem,3.2vw,.95rem);line-height:1.6;
-          color:rgba(190,175,210,0.60);margin:0 24px 0;
+          color:rgba(255,209,236,0.78);margin:0;
           font-family:'Noto Sans JP',serif;letter-spacing:.06em;"></p>
+        </div>
       </div>`;
     document.body.appendChild(nuppiPopEl);
     document.getElementById('nuppi-pop-close').addEventListener('click', closeNuppiPop);
@@ -5334,7 +5341,7 @@ const NUPPI_LINES = [
     nuppiPopOpen              = true;
     nuppi.frozen              = true;
     nuppiPopEl.style.display    = 'flex';
-    nuppiPopEl.style.background = 'rgba(0,0,0,0.88)';
+    nuppiPopEl.style.background = 'rgba(10,0,8,0.92)';
     state.clickTarget = null;
   }
  
