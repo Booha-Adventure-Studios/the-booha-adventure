@@ -21,9 +21,17 @@ assert(source.includes('music.addEventListener(\'error\''), 'Muenba BGM errors m
 assert(source.includes('const rhythmHitSfxPool = makeRhythmSfxPool'), 'rhythm hit sounds must use a playback pool');
 assert(source.includes('const rhythmMissSfxPool = makeRhythmSfxPool'), 'rhythm miss sounds must use a playback pool');
 assert(source.includes('sound.pause();\n      sound.currentTime = 0;'), 'rhythm SFX must reset each voice before playback');
+assert(source.includes('window.AudioContext || window.webkitAudioContext'), 'reading cues must support Web Audio where available');
+assert(source.includes('function getCaseAudioContext()'), 'reading audio context must be initialized lazily');
+assert(source.includes('if (!caseAudioContext)'), 'reading audio context must not be recreated for every word');
+assert(source.includes('function playCaseWordCue(isKeyword = false)'), 'word sweep must have a dedicated reading cue');
+assert(source.includes('function playCaseUnlockCue()'), 'opening CHECK must have a dedicated unlock cue');
+assert(source.includes('return !REDUCED_MOTION;'), 'reading cues must respect reduced-motion preference');
+assert(source.includes('playCaseWordCue(caseSweepWordIsKeyword(current.textContent, keywords))'), 'word cues must fire as each sweep word is revealed');
+assert(source.includes('playCaseUnlockCue();'), 'unlock cue must fire when the comprehension check opens');
 assert(source.includes('const playResult = dangerScream.play();'), 'scream playback must be explicitly started on encounter');
 assert(source.includes('const playResult = dangerRhythmMusic.play();'), 'danger rhythm music must start with the danger chart');
 assert(source.includes('let dangerRhythmPlayToken = 0;'), 'danger rhythm music must guard against stale asynchronous playback');
 assert(source.includes('stopDangerScream();\n    stopDangerRhythmMusic();'), 'leaving Muenba must stop danger audio before navigation');
 
-console.log('Muenba audio audit passed: restored assets, looping BGM, danger audio, and pooled rhythm SFX.');
+console.log('Muenba audio audit passed: restored assets, looping BGM, danger audio, pooled rhythm SFX, and 18F reading cues.');

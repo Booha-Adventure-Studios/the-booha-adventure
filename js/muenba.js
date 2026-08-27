@@ -111,6 +111,12 @@
   const CASE_FINAL_PENALTY_MAX = 2;
   const CASE_FINAL_PENALTY_ACCURACY_STEP = 5;
   const CASE_RHYTHM_TRANSITION_MS = 650;
+  // Pass 18F — procedural reading cues. These stay deliberately quieter than
+  // the world music so the English remains the focus, and require no extra
+  // audio assets or network requests.
+  const CASE_AUDIO_WORD_TICK_VOLUME = 0.018;
+  const CASE_AUDIO_KEYWORD_VOLUME = 0.055;
+  const CASE_AUDIO_UNLOCK_VOLUME = 0.08;
 
   // Pass 8B — first rhythm chart. It is intentionally short and forgiving:
   // no simultaneous notes, holds, combos, or punishment yet. The chart is
@@ -503,6 +509,77 @@
   const rhythmMissSfxPool = makeRhythmSfxPool('assets/img/muenba/miss.mp3', 0.24);
   let rhythmHitSfxIndex = 0;
   let rhythmMissSfxIndex = 0;
+
+  // Reading cues use a lazy Web Audio context. It is created only when the
+  // learner opens a record (a user gesture), so browser autoplay policy never
+  // blocks the case and unsupported browsers simply get silent reading.
+  let caseAudioContext = null;
+  let caseAudioMaster = null;
+
+  function caseAudioEnabled() {
+    return !REDUCED_MOTION;
+  }
+
+  function getCaseAudioContext() {
+    if (!caseAudioEnabled()) return null;
+    const AudioContextCtor = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextCtor) return null;
+    try {
+      if (!caseAudioContext) {
+        caseAudioContext = new AudioContextCtor();
+        caseAudioMaster = caseAudioContext.createGain();
+        caseAudioMaster.gain.value = 0.7;
+        caseAudioMaster.connect(caseAudioContext.destination);
+      }
+      if (caseAudioContext.state === 'suspended' && typeof caseAudioContext.resume === 'function') {
+        caseAudioContext.resume().catch(() => {});
+      }
+      return caseAudioContext;
+    } catch (_) {
+      caseAudioContext = null;
+      caseAudioMaster = null;
+      return null;
+    }
+  }
+
+  function playCaseTone(startFrequency, endFrequency, duration, volume, waveform = 'sine') {
+    const context = getCaseAudioContext();
+    if (!context || !caseAudioMaster) return;
+    try {
+      const now = context.currentTime;
+      const oscillator = context.createOscillator();
+      const gain = context.createGain();
+      oscillator.type = waveform;
+      oscillator.frequency.setValueAtTime(startFrequency, now);
+      oscillator.frequency.exponentialRampToValueAtTime(endFrequency, now + duration);
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(volume, now + 0.008);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+      oscillator.connect(gain);
+      gain.connect(caseAudioMaster);
+      oscillator.start(now);
+      oscillator.stop(now + duration + 0.02);
+    } catch (_) {
+      // A reading cue is decorative; never let an audio implementation error
+      // interrupt the word sweep or comprehension flow.
+    }
+  }
+
+  function playCaseWordCue(isKeyword = false) {
+    if (isKeyword) {
+      // A soft rising cue marks a useful word without turning highlighting
+      // into a required interaction.
+      playCaseTone(587.33, 880, 0.3, CASE_AUDIO_KEYWORD_VOLUME, 'triangle');
+      return;
+    }
+    playCaseTone(240, 100, 0.04, CASE_AUDIO_WORD_TICK_VOLUME, 'sine');
+  }
+
+  function playCaseUnlockCue() {
+    // Low and brief: the learner hears that CHECK is available, while the
+    // transition into the rhythm reward remains reserved for the later pass.
+    playCaseTone(130.81, 65.41, 0.6, CASE_AUDIO_UNLOCK_VOLUME, 'sine');
+  }
 
   const danceArmsUpImg = new Image();
   danceArmsUpImg.src = 'assets/img/booha_ghost_dance_arms_up.png';
@@ -2071,6 +2148,7 @@
     });
     const status = readStatus && readStatus.querySelector('.muenba-case-direction-en');
     if (status) status.textContent = 'CHECK UNLOCKED. Choose an answer.';
+    playCaseUnlockCue();
     focusCaptureControl('.muenba-case-choice[aria-disabled="false"]');
   }
 
@@ -2205,6 +2283,7 @@
       }
 
       current.classList.add('is-current', 'is-revealed');
+      playCaseWordCue(caseSweepWordIsKeyword(current.textContent, keywords));
       sweep.index += 1;
       session.readGateOnReady = advance;
       session.readGateRemainingMs = caseSweepWordIsKeyword(current.textContent, keywords)
