@@ -247,47 +247,58 @@ OBSERVER_COORDS: {
  OBSERVER_LINES: [
   {
     en: "{name}, you have not played yet this week.",
-    jp: "{name}、今週はまだ何もしていない。"
+    jp: "{name}、今週はまだ何もしていない。",
+    furigana: { "今週": "こんしゅう", "何も": "なにも" }
   },
   {
     en: "{name}, one game. You have begun.",
-    jp: "{name}、一回。始まった。"
+    jp: "{name}、一回。始まった。",
+    furigana: { "一回": "いっかい", "始まった": "はじまった" }
   },
   {
     en: "{name}, two games. You came back.",
-    jp: "{name}、二回。戻ってきた。"
+    jp: "{name}、二回。戻ってきた。",
+    furigana: { "二回": "にかい", "戻ってきた": "もどってきた" }
   },
   {
     en: "{name}, three games. Something noticed you.",
-    jp: "{name}、三回。何かが気づいた。"
+    jp: "{name}、三回。何かが気づいた。",
+    furigana: { "三回": "さんかい", "何か": "なにか", "気づいた": "きづいた" }
   },
   {
     en: "{name}, four games. You return without being called.",
-    jp: "{name}、四回。呼ばれていないのに戻ってくる。"
+    jp: "{name}、四回。呼ばれていないのに戻ってくる。",
+    furigana: { "四回": "よんかい", "呼ばれていない": "よばれていない", "戻ってくる": "もどってくる" }
   },
   {
     en: "{name}, five games. Your footsteps are easier to hear now.",
-    jp: "{name}、五回。足音が聞こえやすくなった。"
+    jp: "{name}、五回。足音が聞こえやすくなった。",
+    furigana: { "五回": "ごかい", "足音": "あしおと", "聞こえやすくなった": "きこえやすくなった" }
   },
   {
     en: "{name}, six games. We are starting to remember your face.",
-    jp: "{name}、六回。顔を覚え始めている。"
+    jp: "{name}、六回。顔を覚え始めている。",
+    furigana: { "六回": "ろっかい", "顔": "かお", "覚え始めている": "おぼえはじめている" }
   },
   {
     en: "{name}, seven games. You almost never stop.",
-    jp: "{name}、七回。ほとんど止まらない。"
+    jp: "{name}、七回。ほとんど止まらない。",
+    furigana: { "七回": "ななかい", "止まらない": "とまらない" }
   },
   {
     en: "{name}, eight games. What are you looking for?",
-    jp: "{name}、八回。何を探している？"
+    jp: "{name}、八回。何を探している？",
+    furigana: { "八回": "はちかい", "何を": "なにを", "探している": "さがしている" }
   },
   {
     en: "{name}, nine games. Now we understand why you came.",
-    jp: "{name}、九回。なぜ来たのか、もう分かった。"
+    jp: "{name}、九回。なぜ来たのか、もう分かった。",
+    furigana: { "九回": "きゅうかい", "来た": "きた", "分かった": "わかった" }
   },
   { 
     en: "{name}, more than nine. You are still here.", 
-    jp: "{name}、九回を超えた。まだここにいる。" 
+    jp: "{name}、九回を超えた。まだここにいる。",
+    furigana: { "九回を超えた": "きゅうかいをこえた" }
   },
 ],
   
