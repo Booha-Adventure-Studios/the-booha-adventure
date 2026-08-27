@@ -2371,13 +2371,6 @@
     h2.textContent = caseData.title;
     box.appendChild(h2);
 
-    renderCaseDirection(
-      box,
-      'READ',
-      '<ruby>読<rt>よ</rt></ruby>んでね',
-      'muenba-case-read-instruction'
-    );
-
     const intro = document.createElement('p');
     intro.className = 'muenba-case-record';
     intro.textContent = caseData.intro;
@@ -2438,13 +2431,6 @@
     modeJP.innerHTML = MUENBA_MEMORY_MODE_JP[captureSession.caseDifficulty] || MUENBA_MEMORY_MODE_JP.start;
     modeLabel.appendChild(modeJP);
     box.appendChild(modeLabel);
-
-    renderCaseDirection(
-      box,
-      'READ',
-      '<ruby>読<rt>よ</rt></ruby>んでね',
-      'muenba-case-record-instruction muenba-case-read-instruction'
-    );
 
     const progress = document.createElement('div');
     progress.className = 'muenba-case-progress';
@@ -4420,9 +4406,8 @@
       .muenba-case-direction { margin:16px 0; padding:10px 12px; border:1px solid rgba(156,203,182,.24); border-radius:10px; background:rgba(255,255,255,.035); text-align:left; }
       .muenba-case-direction-en { margin:0; color:#dff5e8; font-size:.86rem; line-height:1.45; }
       .muenba-case-direction-jp { margin:5px 0 0; color:#9fc3af; font-size:.82rem; line-height:1.55; }
-      .muenba-case-record-instruction { margin:0 0 10px; border-color:rgba(156,203,182,.28); background:rgba(255,255,255,.03); box-shadow:none; }
-      .muenba-case-record-instruction .muenba-case-direction-en, .muenba-case-question-instruction .muenba-case-direction-en { color:#cfe3d6; font:600 .72rem/1.4 system-ui,-apple-system,sans-serif; letter-spacing:.08em; text-transform:uppercase; }
-      .muenba-case-record-instruction .muenba-case-direction-jp, .muenba-case-question-instruction .muenba-case-direction-jp { color:#9fc3af; }
+      .muenba-case-question-instruction .muenba-case-direction-en { color:#cfe3d6; font:600 .72rem/1.4 system-ui,-apple-system,sans-serif; letter-spacing:.08em; text-transform:uppercase; }
+      .muenba-case-question-instruction .muenba-case-direction-jp { color:#9fc3af; }
       .muenba-case-question-instruction { margin:0 0 10px; border-color:rgba(151,126,255,.24); background:rgba(94,67,157,.06); box-shadow:none; }
       .muenba-case-progress-jp { margin:-6px 0 10px; color:#9fc3af; font-size:.76rem; letter-spacing:.04em; text-align:left; }
       .muenba-case-eyebrow-jp, .muenba-case-board-eyebrow-jp, .muenba-hunt-target-eyebrow-jp { margin:-6px 0 8px; color:#9fc3af; font-size:.76rem; letter-spacing:.04em; }
@@ -4615,8 +4600,7 @@
       .muenba-case-box .muenba-case-eyebrow,
       .muenba-case-box .muenba-case-board-eyebrow { color:var(--muenba-gold); text-shadow:0 0 12px rgba(241,215,141,.18); }
       .muenba-case-record,
-      .muenba-case-record-item,
-      .muenba-case-direction.muenba-case-record-instruction {
+      .muenba-case-record-item {
         border-color:rgba(156,224,193,.34);
         background:linear-gradient(110deg,rgba(104,139,83,.13),rgba(156,224,193,.035));
       }
@@ -4784,7 +4768,6 @@
       .muenba-case-clue { border-color:rgba(156,224,193,.62); }
       .muenba-case-clue .muenba-case-mode-label { margin:2px 0 16px; padding:8px 11px; border:1px solid rgba(216,201,139,.34); border-radius:9px; background:rgba(216,201,139,.07); color:#ffe9a9; box-shadow:inset 0 0 14px rgba(216,201,139,.035); }
       .muenba-case-clue .muenba-case-mode-label small { color:#c9c49d; }
-      .muenba-case-clue .muenba-case-record-instruction { margin-bottom:13px; }
       .muenba-case-clue .muenba-case-progress { margin-top:3px; color:#e7dca9; }
       .muenba-case-clue .muenba-case-progress-jp { color:#9fc3af; }
       .muenba-case-clue h2 { margin:15px 0 4px; color:#f4f1d9; font-size:clamp(1.22rem,3.5vw,1.48rem); text-align:left; }
@@ -4831,12 +4814,8 @@
       .muenba-gold-action:hover,
       .muenba-gold-action:focus-visible { border-color:#fff1a5 !important; background:linear-gradient(180deg,rgba(188,139,27,.72),rgba(103,59,9,.82)) !important; box-shadow:0 0 38px rgba(255,198,64,.68),inset 0 0 18px rgba(255,228,132,.2) !important; }
       @keyframes muenbaGoldActionGlow { 0%,100% { box-shadow:0 0 20px rgba(255,198,64,.38),inset 0 0 14px rgba(255,228,132,.1); } 50% { box-shadow:0 0 34px rgba(255,211,87,.68),inset 0 0 18px rgba(255,228,132,.18); } }
-      /* Pass 1: reading attention gate. The card remains open and the action
-         remains visible, but it wakes only after the English record has had
-         a short, content-sized reading pause. */
-      .muenba-case-read-instruction { margin:14px 0 10px; border-color:rgba(216,201,139,.42); background:linear-gradient(110deg,rgba(126,111,48,.13),rgba(216,201,139,.035)); box-shadow:0 0 18px rgba(216,201,139,.08),inset 0 0 14px rgba(216,201,139,.03); }
-      .muenba-case-read-instruction .muenba-case-direction-en { color:#ffe9a9; font:900 .72rem/1.4 ui-monospace,monospace; letter-spacing:.18em; text-transform:uppercase; text-shadow:0 0 12px rgba(255,224,102,.2); }
-      .muenba-case-read-instruction .muenba-case-direction-jp { color:#d8c98b; font-size:.82rem; }
+      /* Pass 1: reading attention gate. The case action wakes only after
+         the authored English record has had a short reading pause. */
       .muenba-case-action.muenba-read-locked { cursor:wait; opacity:.52; filter:grayscale(.38) saturate(.55); color:#a9b9b0 !important; border-color:rgba(132,157,145,.42) !important; background:rgba(32,53,44,.24) !important; box-shadow:0 0 8px rgba(93,162,124,.08),inset 0 0 10px rgba(156,224,193,.03) !important; animation:none !important; transform:none !important; }
       .muenba-case-action.muenba-read-locked small { color:#8ea99a; }
       .muenba-case-action.muenba-read-ready { color:#fff8d5 !important; border-color:#f7d86e !important; background:linear-gradient(180deg,rgba(160,111,20,.58),rgba(80,45,8,.72)) !important; box-shadow:0 0 24px rgba(255,198,64,.5),inset 0 0 14px rgba(255,228,132,.14) !important; text-shadow:0 0 10px rgba(255,232,154,.25); animation:muenbaGoldActionGlow 2.2s ease-in-out infinite; }
@@ -4943,7 +4922,6 @@
          final hold finish, the supporting UI fades back in together. */
       .muenba-case-clue.muenba-reading { display:flex; flex-direction:column; justify-content:center; min-height:clamp(320px,65vh,620px); }
       .muenba-case-clue.muenba-reading > .muenba-case-mode-label,
-      .muenba-case-clue.muenba-reading > .muenba-case-record-instruction,
       .muenba-case-clue.muenba-reading > .muenba-case-progress,
       .muenba-case-clue.muenba-reading > .muenba-case-progress-jp,
       .muenba-case-clue.muenba-reading > h2,
@@ -4975,6 +4953,17 @@
         .muenba-case-review .muenba-case-record { font-size:clamp(1.18rem,5.2vw,1.625rem) !important; line-height:1.82 !important; }
         .muenba-case-choice { padding:14px 14px !important; }
       }
+      /* Pass 19D: let the English mission lead, with Japanese available as
+         an intentional hint, and reduce the case-board scene to one eyebrow
+         directly above the case title. */
+      .muenba-mission-hint-toggle { display:inline-flex; flex-direction:column; align-items:center; gap:2px; margin:4px 0 0; padding:7px 14px; border:1px solid rgba(216,201,139,.5); border-radius:999px; background:rgba(126,111,48,.12); color:#f1d78d; font:700 .72rem/1.25 ui-monospace,monospace; letter-spacing:.04em; cursor:pointer; }
+      .muenba-mission-hint-toggle small { color:#a8cbbb; font:400 .76rem/1.3 Georgia,'Times New Roman',serif; letter-spacing:0; }
+      .muenba-mission-hint-toggle:hover,
+      .muenba-mission-hint-toggle:focus-visible { border-color:#fff0ad; background:rgba(126,111,48,.28); box-shadow:0 0 18px rgba(216,201,139,.2); outline:none; }
+      .muenba-nuppi-mission .muenba-mission-hint { margin-top:12px !important; padding-top:12px; border-top:1px solid rgba(216,201,139,.2); }
+      .muenba-nuppi-case-board .muenba-lobby-case-board { margin-top:12px; }
+      .muenba-nuppi-case-board .muenba-case-board-eyebrow { margin:0 0 10px; text-align:left; }
+      .muenba-nuppi-case-board .muenba-lobby-case-board h3 { margin-top:0; font-size:clamp(1.2rem,4vw,1.55rem); }
       @media (prefers-reduced-motion: reduce) { .muenba-orb-release, .muenba-hunt-ghost-portrait, .muenba-gold-action, .muenba-read-ready { animation:none !important; } }
       @media (prefers-reduced-motion: reduce) { #muenba-fade, .muenba-return-box, #muenba-return-overlay, .muenba-lobby-box, #muenba-lobby-overlay, #muenba-capture-overlay { transition:none !important; } .muenba-lobby-portrait, #muenba-hide, #muenba-celebration-status, .muenba-rhythm-board, .muenba-rhythm-combo, .muenba-rhythm-result-failure, .muenba-case-question, .muenba-case-question::before, .muenba-case-feedback-shake, .muenba-case-read-status, .muenba-energy-warning, .muenba-case-clue.muenba-reading-complete > .muenba-case-reading-status, .muenba-case-clue.muenba-reading-complete > .muenba-case-check-panel { animation:none !important; } .muenba-case-choice, .muenba-case-action, .muenba-capture-action { transition:none !important; } .muenba-rhythm-energy-fill { transition:none !important; } #muenba-profile-link { transition:none !important; } }
     `;
@@ -5691,12 +5680,21 @@
         <section class="muenba-nuppi-mission" aria-labelledby="muenba-welcome-mission-title">
           <div id="muenba-welcome-mission-title" class="muenba-nuppi-card-label">YOUR MISSION</div>
           <p>Somewhere among these fifteen rooms, a ghost is hiding. Some won't notice you at all, while others will come looking. If one gets close, you can hide until it loses interest. When you see one, walk up and give it a tap.</p>
-          <p class="jp-line">この15の<ruby>部屋<rt>へや</rt></ruby>のどこかに、<ruby>幽霊<rt>ゆうれい</rt></ruby>が<ruby>隠<rt>かく</rt></ruby>れているよ。<ruby>気<rt>き</rt></ruby>づかない<ruby>幽霊<rt>ゆうれい</rt></ruby>もいれば、<ruby>探<rt>さが</rt></ruby>しに<ruby>来<rt>く</rt></ruby>る<ruby>幽霊<rt>ゆうれい</rt></ruby>もいる。<ruby>近<rt>ちか</rt></ruby>づかれたら、<ruby>隠<rt>かく</rt></ruby>れて<ruby>興味<rt>きょうみ</rt></ruby>をなくすのを<ruby>待<rt>ま</rt></ruby>とう。<ruby>見<rt>み</rt></ruby>つけたら、<ruby>近<rt>ちか</rt></ruby>づいてそっとタップしてみて。</p>
+          <button id="muenba-mission-hint-toggle" class="muenba-mission-hint-toggle" type="button" aria-expanded="false" aria-controls="muenba-mission-hint"><span>Show hint</span><small>ヒント</small></button>
+          <p id="muenba-mission-hint" class="jp-line muenba-mission-hint" hidden>この15の<ruby>部屋<rt>へや</rt></ruby>のどこかに、<ruby>幽霊<rt>ゆうれい</rt></ruby>が<ruby>隠<rt>かく</rt></ruby>れているよ。<ruby>気<rt>き</rt></ruby>づかない<ruby>幽霊<rt>ゆうれい</rt></ruby>もいれば、<ruby>探<rt>さが</rt></ruby>しに<ruby>来<rt>く</rt></ruby>る<ruby>幽霊<rt>ゆうれい</rt></ruby>もいる。<ruby>近<rt>ちか</rt></ruby>づかれたら、<ruby>隠<rt>かく</rt></ruby>れて<ruby>興味<rt>きょうみ</rt></ruby>をなくすのを<ruby>待<rt>ま</rt></ruby>とう。<ruby>見<rt>み</rt></ruby>つけたら、<ruby>近<rt>ちか</rt></ruby>づいてそっとタップしてみて。</p>
         </section>
         <div class="muenba-lobby-actions">
           <button id="muenba-lobby-begin" type="button"><span>Let's begin</span><small><ruby>始<rt>はじ</rt></ruby>めよう</small></button>
         </div>
       </div>`;
+    const missionHintToggle = lobbyOverlay.querySelector('#muenba-mission-hint-toggle');
+    const missionHint = lobbyOverlay.querySelector('#muenba-mission-hint');
+    missionHintToggle.addEventListener('click', () => {
+      const showing = missionHint.hidden;
+      missionHint.hidden = !showing;
+      missionHintToggle.setAttribute('aria-expanded', String(showing));
+      missionHintToggle.querySelector('span').textContent = showing ? 'Hide hint' : 'Show hint';
+    });
     lobbyOverlay.querySelector('#muenba-lobby-begin').addEventListener('click', renderNuppiCaseBoard);
     focusLobbyControl('#muenba-lobby-begin');
   }
@@ -5709,13 +5707,8 @@
     lobbyOverlay.innerHTML = `
       <div class="muenba-lobby-box is-case-board muenba-nuppi-scene muenba-nuppi-case-board">
         <img class="muenba-lobby-portrait" src="assets/img/wanderers/nuppi-2.png" alt="Nuppi">
-        <div class="muenba-nuppi-kicker">NUPPI TALK</div>
-        <p class="jp muenba-nuppi-kicker-jp">ヌーピーと<ruby>話<rt>はな</rt></ruby>す</p>
-        <div class="muenba-case-board-eyebrow">CASE FILE</div>
-        <p class="jp muenba-case-board-eyebrow-jp"><ruby>事件<rt>じけん</rt></ruby>ファイル</p>
-        <div class="muenba-nuppi-nameplate"><h2>Nuppi's case board</h2><span>ヌーピーの<ruby>事件<rt>じけん</rt></ruby>ボード</span></div>
         <section class="muenba-lobby-case-board" aria-labelledby="muenba-case-board-title">
-          <div class="muenba-nuppi-card-label">NEXT CASE</div>
+          <div id="muenba-case-board-eyebrow" class="muenba-case-board-eyebrow">CASE FILE</div>
           <h3 id="muenba-case-board-title"></h3>
           <p id="muenba-case-board-title-jp" class="muenba-case-direction-jp"></p>
           <p id="muenba-case-board-mode" class="muenba-case-board-mode"></p>
@@ -5786,20 +5779,23 @@
 
   function refreshNuppiCaseBoard() {
     if (!lobbyOverlay) return;
+    const eyebrow = lobbyOverlay.querySelector('#muenba-case-board-eyebrow');
     const title = lobbyOverlay.querySelector('#muenba-case-board-title');
     const titleJp = lobbyOverlay.querySelector('#muenba-case-board-title-jp');
     const mode = lobbyOverlay.querySelector('#muenba-case-board-mode');
     const modeJp = lobbyOverlay.querySelector('#muenba-case-board-mode-jp');
     const copy = lobbyOverlay.querySelector('#muenba-case-board-copy');
     const jp = lobbyOverlay.querySelector('#muenba-case-board-jp');
-    if (!title || !titleJp || !mode || !modeJp || !copy || !jp) return;
+    if (!eyebrow || !title || !titleJp || !mode || !modeJp || !copy || !jp) return;
     const next = nextMuenbaCase();
     if (next) {
       const ghost = (DATA.ghosts || []).find(candidate => candidate.id === next.ghostId);
       const ghostName = ghost ? ghost.name : next.ghostId;
       const selectedMode = getMuenbaReadingDifficulty();
+      const caseNumber = orderedMuenbaCases().findIndex(caseData => caseData.id === next.id) + 1;
       // next.title is authored case content (English-only by design, see
       // muenba-data.js), so its JP line stays empty on purpose.
+      eyebrow.textContent = `CASE FILE ${String(caseNumber).padStart(2, '0')}`;
       title.textContent = next.title;
       titleJp.textContent = '';
       mode.textContent = MUENBA_MEMORY_MODE_LABELS[selectedMode] || MUENBA_MEMORY_MODE_LABELS.start;
@@ -5807,6 +5803,7 @@
       copy.textContent = `Case ready. Find ${ghostName} and untangle its energy.`;
       jp.innerHTML = '<ruby>事件<rt>じけん</rt></ruby>の<ruby>準備<rt>じゅんび</rt></ruby>ができたよ。<ruby>幽霊<rt>ゆうれい</rt></ruby>を<ruby>探<rt>さが</rt></ruby>して、エネルギーを<ruby>解<rt>と</rt></ruby>こう。';
     } else {
+      eyebrow.textContent = 'CASE FILE';
       title.textContent = 'The case board is quiet.';
       titleJp.innerHTML = '<ruby>事件<rt>じけん</rt></ruby>ボードは<ruby>静<rt>しず</rt></ruby>か。';
       mode.textContent = 'No reading level selected';
