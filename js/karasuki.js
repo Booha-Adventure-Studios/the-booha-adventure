@@ -2686,6 +2686,7 @@ const HAPPY_HOUSE_PORTAL = {
       glow: wandererCelebrationGlow(w.color),
       actionLabel: 'Meet this wanderer',
       actionSubHTML: '<ruby>旅人<rt>たびびと</rt></ruby>に<ruby>会<rt>あ</rt></ruby>おう',
+      sfx: 'wandererFound',
     });
   }
 
@@ -2708,6 +2709,7 @@ const HAPPY_HOUSE_PORTAL = {
       glow: WANDERER_RETURN_GLOW,
       actionLabel: 'Say hello',
       actionSubHTML: '<ruby>あいさつ<rt>あいさつ</rt></ruby>しよう',
+      sfx: 'wandererReturn',
     });
   }
 

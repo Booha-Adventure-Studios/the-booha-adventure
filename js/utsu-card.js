@@ -543,6 +543,12 @@
       }
     };
     document.addEventListener('keydown', celebrationCloseHandler);
+    // Pass 20F: celebration callers may request a named procedural motif.
+    // The lookup keeps UtsuCard independent from the optional audio helper;
+    // browsers without WebAudio simply fail silently inside the SFX layer.
+    if (opts.sfx && window.UtsuSfx && typeof window.UtsuSfx[opts.sfx] === 'function') {
+      try { window.UtsuSfx[opts.sfx](); } catch (_) {}
+    }
     celebrationPopEl.classList.remove('is-shown');
     void card.offsetWidth;
     requestAnimationFrame(function () { celebrationPopEl.classList.add('is-shown'); });
