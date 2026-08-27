@@ -36,8 +36,8 @@ assert(source.includes('function showCelebrationPop(opts)'), 'UtsuCard must expo
 assert(source.includes('showCelebrationPop: showCelebrationPop'), 'stable celebration API must be public');
 assert(source.includes('closeCelebrationPop: closeCelebrationPop'), 'stable celebration API must support explicit closing');
 assert(celebration.includes('role="dialog" aria-modal="true"'), 'celebration must be announced as a modal dialog');
-assert(celebration.includes('utsu-celebration-close'), 'celebration must provide a visible close control');
 assert(celebration.includes('action.onclick'), 'celebration must provide an explicit action');
+assert(!celebration.includes('utsu-celebration-close'), 'Wanderer celebration must use its primary action instead of a competing X control');
 assert(celebration.includes("actionLabel || 'Continue'"), 'celebration action must have a readable default');
 assert(celebration.includes('translation.innerHTML = opts.translationHTML ||'), 'celebration must support furigana-safe authored translation HTML');
 assert(celebration.includes('title.textContent = opts.title ||'), 'celebration title must be assigned as text');

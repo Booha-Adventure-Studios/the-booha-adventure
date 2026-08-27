@@ -346,10 +346,6 @@
       .utsu-celebration-card::before{content:'';position:absolute;top:0;left:14%;right:14%;height:3px;
         background:linear-gradient(90deg,transparent,var(--celebration-ring,#ffd966),transparent);
         box-shadow:0 0 18px var(--celebration-glow,rgba(255,217,102,.55));}
-      .utsu-celebration-close{position:absolute;top:10px;right:12px;width:42px;height:42px;
-        border:0;background:transparent;color:rgba(255,247,230,.62);font-size:1.25rem;line-height:1;
-        cursor:pointer;border-radius:50%;}
-      .utsu-celebration-close:hover,.utsu-celebration-close:focus-visible{color:#fff7e6;background:rgba(255,255,255,.10);outline:2px solid var(--celebration-ring,#ffd966);outline-offset:2px;}
       .utsu-celebration-eyebrow{margin:0 0 10px;color:var(--celebration-ring,#ffd966);font:800 clamp(.72rem,2vw,.9rem)/1.2 ui-monospace,monospace;letter-spacing:.2em;text-transform:uppercase;text-shadow:0 0 14px var(--celebration-glow,rgba(255,217,102,.5));}
       .utsu-celebration-portrait-wrap{position:relative;z-index:1;width:min(330px,72vw);height:min(310px,40vh);margin:0 auto 12px;display:grid;place-items:center;}
       .utsu-celebration-portrait-wrap::before{content:'';position:absolute;inset:4%;border-radius:50%;background:radial-gradient(circle,var(--celebration-glow,rgba(255,217,102,.32)),transparent 68%);filter:blur(12px);animation:utsuCelebrationGlow 2.4s ease-in-out infinite;}
@@ -483,19 +479,17 @@
       celebrationPopEl.className = 'utsu-celebration-pop';
       celebrationPopEl.innerHTML =
         '<section class="utsu-celebration-card" role="dialog" aria-modal="true" aria-labelledby="utsu-celebration-title">' +
-          '<button class="utsu-celebration-close" type="button" aria-label="Close celebration / 閉じる">✕</button>' +
           '<p class="utsu-celebration-eyebrow"></p>' +
           '<div class="utsu-celebration-portrait-wrap"><div class="utsu-celebration-icon" aria-hidden="true">✦</div><img class="utsu-celebration-portrait" alt="" hidden></div>' +
           '<div class="utsu-celebration-copy"><h2 class="utsu-celebration-title" id="utsu-celebration-title"></h2>' +
           '<p class="utsu-celebration-sub"></p>' +
-          '<p class="utsu-celebration-translation"></p></div>' +
-          '<button class="utsu-celebration-action" type="button"><span></span><small></small></button>' +
+          '<p class="utsu-celebration-translation"></p>' +
+          '<button class="utsu-celebration-action" type="button"><span></span><small></small></button></div>' +
         '</section>';
       document.body.appendChild(celebrationPopEl);
     }
 
     var card = celebrationPopEl.querySelector('.utsu-celebration-card');
-    var closeButton = celebrationPopEl.querySelector('.utsu-celebration-close');
     var eyebrow = celebrationPopEl.querySelector('.utsu-celebration-eyebrow');
     var portrait = celebrationPopEl.querySelector('.utsu-celebration-portrait');
     var icon = celebrationPopEl.querySelector('.utsu-celebration-icon');
@@ -535,7 +529,6 @@
       closeCelebrationPop();
       if (typeof onClose === 'function') onClose();
     };
-    closeButton.onclick = dismiss;
     action.onclick = dismiss;
     celebrationPopEl.onclick = function (event) {
       if (event.target === celebrationPopEl && opts.closeOnBackdrop === true) dismiss();
