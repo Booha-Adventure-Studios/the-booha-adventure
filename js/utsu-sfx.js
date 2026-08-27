@@ -17,6 +17,10 @@
    every distinct moment gets its own distinct sound instead of the same
    ding.mp3 reused everywhere. Loaded by both utsuroba.html and
    karasuki.html, right after js/utsu-card.js.
+
+   Pass 20F adds two tiny procedural celebration motifs. They use the same
+   WebAudio oscillator path as the existing palette, so the Wanderer cards do
+   not need new binary audio assets.
 */
 (function () {
   'use strict';
@@ -106,6 +110,21 @@
       tone(523.25 * pitch, { type: 'sine', gain: 0.06, dur: 0.14 });
       tone(659.25 * pitch, { type: 'sine', gain: 0.055, dur: 0.16, delay: 0.1 });
       tone(783.99 * pitch, { type: 'sine', gain: 0.05, dur: 0.26, delay: 0.2 });
+    },
+    /* Pass 20F — first Wanderer discovery: a small, bright four-note
+       rise. It is celebratory without competing with Karasuki's music. */
+    wandererFound: function () {
+      tone(523.25, { type: 'triangle', gain: 0.052, dur: 0.12 });
+      tone(659.25, { type: 'triangle', gain: 0.048, dur: 0.14, delay: 0.08 });
+      tone(783.99, { type: 'sine', gain: 0.045, dur: 0.18, delay: 0.17 });
+      tone(1046.5, { type: 'sine', gain: 0.038, dur: 0.28, delay: 0.28 });
+    },
+    /* Pass 20F — returning Wanderer: warmer and shorter than a discovery,
+       like a friendly wave rather than a new-unlock fanfare. */
+    wandererReturn: function () {
+      tone(392.00, { type: 'sine', gain: 0.045, dur: 0.12 });
+      tone(493.88, { type: 'triangle', gain: 0.042, dur: 0.14, delay: 0.09 });
+      tone(587.33, { type: 'sine', gain: 0.04, dur: 0.22, delay: 0.19 });
     },
   };
 
