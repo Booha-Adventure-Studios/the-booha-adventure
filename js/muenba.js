@@ -826,8 +826,8 @@
           }
           if (check.requiresPrevious === true) connectsRecords = true;
           englishOnly(check.prompt, `${clueLabel}.check.prompt`);
-          if (typeof check.promptJP !== 'string' || !check.promptJP.trim()) {
-            errors.push(`${clueLabel}.check.promptJP must be non-empty text`);
+          if (check.promptJP !== undefined && typeof check.promptJP !== 'string') {
+            errors.push(`${clueLabel}.check.promptJP must be text when provided`);
           }
           if (!Array.isArray(check.choices) || check.choices.length < 2) {
             errors.push(`${clueLabel}.check.choices must contain at least two choices`);
@@ -862,7 +862,7 @@
           });
         }
         englishOnly(mode.prompt, `${caseId}.${modeName}.prompt`);
-        if (typeof mode.promptJP !== 'string' || !mode.promptJP.trim()) errors.push(`${caseId}.${modeName}.promptJP must be non-empty text`);
+        if (mode.promptJP !== undefined && typeof mode.promptJP !== 'string') errors.push(`${caseId}.${modeName}.promptJP must be text when provided`);
         if (!Array.isArray(mode.choices) || !mode.choices.length) errors.push(`${caseId}.${modeName}.choices must be non-empty`);
         else {
           if (mode.choices.length !== 3) errors.push(`${caseId}.${modeName}.choices must contain exactly three choices`);
@@ -2323,16 +2323,22 @@
     scheduleCaseReadGate(session, gateId);
   }
 
+  // Japanese scaffolding is optional. The authored lesson stays English-only;
+  // existing translations can still support a learner when present, but a
+  // future English-only record must not render an empty or "undefined" row.
   function renderCaseDirection(box, english, japaneseHtml, variant = '') {
     const direction = document.createElement('div');
     direction.className = `muenba-case-direction${variant ? ` ${variant}` : ''}`;
     const en = document.createElement('p');
     en.className = 'muenba-case-direction-en';
     en.textContent = english;
-    const jp = document.createElement('p');
-    jp.className = 'muenba-case-direction-jp';
-    jp.innerHTML = japaneseHtml;
-    direction.append(en, jp);
+    direction.appendChild(en);
+    if (typeof japaneseHtml === 'string' && japaneseHtml.trim()) {
+      const jp = document.createElement('p');
+      jp.className = 'muenba-case-direction-jp';
+      jp.innerHTML = japaneseHtml;
+      direction.appendChild(jp);
+    }
     box.appendChild(direction);
     return direction;
   }

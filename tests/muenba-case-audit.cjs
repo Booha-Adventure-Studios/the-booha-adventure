@@ -52,6 +52,9 @@ assert(finalQuestionSource.includes("captureSession.phase !== 'case-question'"),
 assert(runtimeSource.includes('CASE_FINAL_PENALTY_MAX = 2'), 'final reading penalties must be capped at two');
 assert(runtimeSource.includes("captureSession.phase = penaltyReview ? 'case-reread' : 'case-review'"), 'final mistakes must return through a reread phase');
 assert(runtimeSource.includes('CASE_FINAL_PENALTY_ACCURACY_STEP'), 'final reading penalties must affect rhythm difficulty');
+assert(runtimeSource.includes("if (typeof japaneseHtml === 'string' && japaneseHtml.trim())"), 'Japanese direction scaffolding must be optional');
+assert(runtimeSource.includes("check.promptJP !== undefined && typeof check.promptJP !== 'string'"), 'clue prompt translations must not be a required content field');
+assert(runtimeSource.includes("mode.promptJP !== undefined && typeof mode.promptJP !== 'string'"), 'final prompt translations must not be a required content field');
 
 for (const ghost of data.ghosts || []) {
   assert.strictEqual(typeof ghost.kana, 'string', `${ghost.id}.kana must be text`);
@@ -96,8 +99,10 @@ for (const caseId of data.caseOrder) {
       if (check.requiresPrevious === true) connectsRecords = true;
       assert(['who', 'what', 'which', 'where', 'when', 'how-many', 'what-happened', 'why', 'meaning'].includes(check.type), `${caseId}.${modeName}.clues[${index}] uses an unsupported check type`);
       englishOnly(check.prompt, `${caseId}.${modeName}.clues[${index}].check.prompt`);
-      assert.strictEqual(typeof check.promptJP, 'string', `${caseId}.${modeName}.clues[${index}].check.promptJP must be text`);
-      assert(check.promptJP.includes('<ruby>'), `${caseId}.${modeName}.clues[${index}].check.promptJP needs furigana markup`);
+      if (check.promptJP !== undefined) {
+        assert.strictEqual(typeof check.promptJP, 'string', `${caseId}.${modeName}.clues[${index}].check.promptJP must be text when provided`);
+        assert(check.promptJP.includes('<ruby>'), `${caseId}.${modeName}.clues[${index}].check.promptJP needs furigana markup when provided`);
+      }
       assert(Array.isArray(check.choices) && check.choices.length === 3, `${caseId}.${modeName}.clues[${index}].check.choices must contain exactly three options`);
       assert.strictEqual(new Set(check.choices).size, check.choices.length, `${caseId}.${modeName}.clues[${index}].check choices must be unique`);
       check.choices.forEach((choice, choiceIndex) => englishOnly(choice, `${caseId}.${modeName}.clues[${index}].check.choices[${choiceIndex}]`));
@@ -108,9 +113,11 @@ for (const caseId of data.caseOrder) {
     if (modeName === 'fresh') assert.strictEqual(connectsRecords, true, `${caseId}.fresh needs at least one cross-record check`);
     if (modeName === 'deep') assert([...checkTypes].some(type => type === 'why' || type === 'meaning'), `${caseId}.deep needs a why or meaning check`);
     englishOnly(mode.prompt, `${caseId}.${modeName}.prompt`);
-    assert.strictEqual(typeof mode.promptJP, 'string', `${caseId}.${modeName}.promptJP must be text`);
-    assert(mode.promptJP.trim(), `${caseId}.${modeName}.promptJP must not be empty`);
-    assert(mode.promptJP.includes('<ruby>'), `${caseId}.${modeName}.promptJP needs furigana markup`);
+    if (mode.promptJP !== undefined) {
+      assert.strictEqual(typeof mode.promptJP, 'string', `${caseId}.${modeName}.promptJP must be text when provided`);
+      assert(mode.promptJP.trim(), `${caseId}.${modeName}.promptJP must not be empty when provided`);
+      assert(mode.promptJP.includes('<ruby>'), `${caseId}.${modeName}.promptJP needs furigana markup when provided`);
+    }
     assert(Array.isArray(mode.choices) && mode.choices.length === 3, `${caseId}.${modeName}.choices must contain exactly three options`);
     assert.strictEqual(new Set(mode.choices).size, mode.choices.length, `${caseId}.${modeName}.choices must be unique`);
     mode.choices.forEach((choice, index) => englishOnly(choice, `${caseId}.${modeName}.choices[${index}]`));
