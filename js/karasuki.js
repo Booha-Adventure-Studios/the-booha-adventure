@@ -2687,6 +2687,7 @@ const HAPPY_HOUSE_PORTAL = {
       actionLabel: 'Meet this wanderer',
       actionSubHTML: '<ruby>旅人<rt>たびびと</rt></ruby>に<ruby>会<rt>あ</rt></ruby>おう',
       copyOverlay: true,
+      copyCompact: true,
       sfx: 'wandererFound',
     });
   }
@@ -2711,6 +2712,7 @@ const HAPPY_HOUSE_PORTAL = {
       actionLabel: 'Say hello',
       actionSubHTML: '<ruby>あいさつ<rt>あいさつ</rt></ruby>しよう',
       copyOverlay: true,
+      copyCompact: true,
       sfx: 'wandererReturn',
     });
   }

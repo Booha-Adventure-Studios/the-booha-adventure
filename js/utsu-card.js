@@ -347,13 +347,19 @@
         background:linear-gradient(90deg,transparent,var(--celebration-ring,#ffd966),transparent);
         box-shadow:0 0 18px var(--celebration-glow,rgba(255,217,102,.55));}
       .utsu-celebration-eyebrow{margin:0 0 10px;color:var(--celebration-ring,#ffd966);font:800 clamp(.72rem,2vw,.9rem)/1.2 ui-monospace,monospace;letter-spacing:.2em;text-transform:uppercase;text-shadow:0 0 14px var(--celebration-glow,rgba(255,217,102,.5));}
-      .utsu-celebration-portrait-wrap{position:relative;z-index:1;width:min(330px,72vw);height:min(310px,40vh);margin:0 auto 12px;display:grid;place-items:center;}
+      .utsu-celebration-portrait-wrap{position:relative;z-index:1;width:min(340px,74vw);height:min(360px,42vh);margin:0 auto 12px;display:grid;place-items:center;}
       .utsu-celebration-portrait-wrap::before{content:'';position:absolute;inset:4%;border-radius:50%;background:radial-gradient(circle,var(--celebration-glow,rgba(255,217,102,.32)),transparent 68%);filter:blur(12px);animation:utsuCelebrationGlow 2.4s ease-in-out infinite;}
       .utsu-celebration-portrait{position:relative;z-index:1;display:block;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 0 10px var(--celebration-ring,#ffd966)) drop-shadow(0 0 24px var(--celebration-glow,rgba(255,217,102,.5)));}
       .utsu-celebration-icon{position:relative;z-index:1;width:112px;height:112px;border-radius:50%;display:grid;place-items:center;font-size:52px;color:#fff7e6;background:radial-gradient(circle at 34% 28%,#fff9dc,var(--celebration-ring,#ffd966) 58%,#261a06 125%);box-shadow:0 0 22px var(--celebration-glow,rgba(255,217,102,.5));}
       @keyframes utsuCelebrationGlow{0%,100%{transform:scale(.9);opacity:.42;}50%{transform:scale(1.08);opacity:.78;}}
       .utsu-celebration-copy{position:relative;z-index:4;margin:0 auto;max-width:38em;}
       .utsu-celebration-card.is-copy-overlay .utsu-celebration-copy{margin-top:-86px;padding:16px 18px 12px;border:1px solid color-mix(in srgb,var(--celebration-ring,#ffd966) 72%,transparent);border-radius:18px;background:linear-gradient(180deg,rgba(4,14,11,.92),rgba(4,10,8,.80));box-shadow:0 0 18px var(--celebration-glow,rgba(255,217,102,.34)),0 0 42px rgba(0,0,0,.48),inset 0 0 24px rgba(255,255,255,.04);backdrop-filter:blur(5px);}
+      .utsu-celebration-card.is-copy-overlay .utsu-celebration-action{position:relative;z-index:5;}
+      .utsu-celebration-card.is-compact-copy .utsu-celebration-copy{margin-top:-54px;padding:11px 14px 9px;border-radius:16px;}
+      .utsu-celebration-card.is-compact-copy .utsu-celebration-action{position:relative;z-index:5;margin-top:12px;min-height:48px;padding:9px 24px;}
+      .utsu-celebration-card.is-compact-copy .utsu-celebration-title{font-size:clamp(1.28rem,4.5vw,2rem);}
+      .utsu-celebration-card.is-compact-copy .utsu-celebration-sub{margin-top:4px;font-size:clamp(.9rem,2.4vw,1.12rem);}
+      .utsu-celebration-card.is-compact-copy .utsu-celebration-translation{margin-top:3px;font-size:clamp(.78rem,2.1vw,.92rem);line-height:1.45;}
       .utsu-celebration-title{margin:0;color:#fff7e6;font:700 clamp(1.55rem,5vw,2.45rem)/1.15 Georgia,'Times New Roman',serif;text-shadow:0 0 20px var(--celebration-glow,rgba(255,217,102,.38));}
       .utsu-celebration-sub{margin:10px auto 0;max-width:34em;color:#fff7e6;font:700 clamp(1rem,2.8vw,1.3rem)/1.5 Georgia,'Times New Roman',serif;}
       .utsu-celebration-translation{margin:7px auto 0;max-width:38em;color:rgba(255,247,230,.78);font:400 clamp(.86rem,2.4vw,1rem)/1.7 Georgia,'Times New Roman',serif;}
@@ -364,9 +370,10 @@
       .utsu-celebration-action small{color:var(--celebration-ring,#ffd966);font:400 .78em/1.2 Georgia,'Times New Roman',serif;}
       @media(max-width:520px){
         .utsu-celebration-card{border-radius:18px;padding:28px 16px 24px;}
-        .utsu-celebration-portrait-wrap{width:min(270px,72vw);height:min(250px,36vh);}
+        .utsu-celebration-portrait-wrap{width:min(270px,72vw);height:min(280px,38vh);}
         .utsu-celebration-title{font-size:clamp(1.35rem,7vw,1.85rem);}
         .utsu-celebration-card.is-copy-overlay .utsu-celebration-copy{margin-top:-68px;padding:14px 12px 10px;}
+        .utsu-celebration-card.is-compact-copy .utsu-celebration-copy{margin-top:-44px;padding:10px 10px 8px;}
       }
       @media(prefers-reduced-motion:reduce){
         .utsu-celebration-card,.utsu-celebration-pop{transition:opacity .2s ease,background .2s ease;}
@@ -504,6 +511,7 @@
     card.style.setProperty('--celebration-ring', accent);
     card.style.setProperty('--celebration-glow', glow);
     card.classList.toggle('is-copy-overlay', opts.copyOverlay === true);
+    card.classList.toggle('is-compact-copy', opts.copyCompact === true);
     eyebrow.textContent = opts.eyebrow || '';
     eyebrow.style.display = opts.eyebrow ? '' : 'none';
     title.textContent = opts.title || '';
