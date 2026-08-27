@@ -4789,35 +4789,47 @@ function injectObserverPop() {
     align-items:center;justify-content:center;
     background:rgba(0,0,0,0);transition:background 0.3s ease;`;
   observerPopEl.innerHTML = `
-  
-   <div style="
-      background:#05050d;border:1px solid rgba(200,200,220,0.18);
-      border-radius:8px;padding:0 0 28px;
-      width:min(340px,90vw);max-height:90vh;overflow-y:auto;text-align:center;
+   <section role="dialog" aria-modal="true" aria-labelledby="obs-pop-title" aria-describedby="obs-pop-line-en" style="
+      background:linear-gradient(160deg,#080b18 0%,#10132b 58%,#070812 100%);
+      border:1px solid rgba(184,174,255,0.58);border-radius:18px;padding:0 0 30px;
+      width:min(520px,92vw);max-height:92vh;overflow-y:auto;text-align:center;
       font-family:'Georgia',serif;position:relative;
-      box-shadow:0 0 40px rgba(20,20,40,0.9);">
-      
-      <div style="padding:28px 0 18px;display:flex;align-items:center;justify-content:center;">
+      box-shadow:0 0 0 1px rgba(125,211,252,0.12),0 0 42px rgba(80,70,180,0.42),0 0 90px rgba(125,211,252,0.12);">
+      <div style="height:4px;margin:0 22% 8px;border-radius:99px;background:linear-gradient(90deg,transparent,#7dd3fc,#c4b5fd,transparent);box-shadow:0 0 15px rgba(125,211,252,0.7);"></div>
+      <div style="padding:20px 0 12px;display:flex;align-items:center;justify-content:center;">
         <img src="assets/img/karasuki/observer-2.png"
-          style="max-width:88%;max-height:min(160px,35vw);object-fit:contain;
-                 filter:drop-shadow(0 0 18px rgba(220,220,255,0.25));"/>
+          alt="The Observer"
+          style="max-width:88%;max-height:min(210px,38vw);object-fit:contain;
+                 filter:drop-shadow(0 0 18px rgba(196,181,253,0.48)) drop-shadow(0 0 34px rgba(125,211,252,0.18));"/>
       </div>
       <button id="obs-pop-close" style="
         position:absolute;top:12px;right:14px;background:transparent;
         border:none;cursor:pointer;font-size:1rem;
-        color:rgba(200,200,220,0.30);padding:4px 8px;">✕</button>
+        color:rgba(196,181,253,0.72);padding:7px 10px;">✕</button>
+      <p style="font-family:monospace;font-size:clamp(.62rem,2.2vw,.76rem);font-weight:700;letter-spacing:.2em;color:#facc15;margin:0 24px 5px;">OBSERVER LOG</p>
+      <p style="font-family:'Noto Sans JP',serif;font-size:clamp(.72rem,2.8vw,.9rem);color:#b7c8dd;margin:0 24px 4px;">観察記録</p>
+      <h2 id="obs-pop-title" style="font-size:clamp(1.65rem,6vw,2.2rem);letter-spacing:.08em;color:#fff7e6;margin:0 22px 3px;text-shadow:0 0 18px rgba(196,181,253,0.45);">THE OBSERVER</h2>
+      <p style="font-family:'Noto Sans JP',serif;font-size:clamp(.9rem,3.4vw,1.1rem);color:#c4b5fd;margin:0 24px 18px;">観察者</p>
+      <section style="margin:0 22px 18px;padding:15px 18px 14px;border:1px solid rgba(125,211,252,0.4);border-radius:13px;background:rgba(8,16,36,0.72);text-align:left;">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;">
+          <span style="font-family:monospace;font-size:clamp(.68rem,2.5vw,.82rem);font-weight:700;letter-spacing:.12em;color:#7dd3fc;">WEEKLY ACTIVITY</span>
+          <span id="obs-pop-count" style="font-family:monospace;font-size:clamp(.82rem,3vw,1rem);font-weight:700;color:#fff7e6;letter-spacing:.04em;"></span>
+        </div>
+        <div aria-hidden="true" style="height:10px;margin:11px 0 8px;border-radius:99px;background:rgba(196,181,253,0.16);overflow:hidden;box-shadow:inset 0 0 0 1px rgba(196,181,253,0.18);">
+          <span id="obs-pop-meter" style="display:block;height:100%;width:0%;border-radius:99px;background:linear-gradient(90deg,#7dd3fc,#c4b5fd,#facc15);box-shadow:0 0 14px rgba(125,211,252,0.72);transition:width .35s ease;"></span>
+        </div>
+        <p id="obs-pop-count-jp" style="font-family:'Noto Sans JP',serif;font-size:clamp(.75rem,2.8vw,.92rem);line-height:1.55;color:rgba(191,219,254,0.72);margin:0;"></p>
+      </section>
+      <div style="margin:0 22px;padding:18px 20px 19px;border-left:3px solid #c4b5fd;border-radius:0 12px 12px 0;background:rgba(31,30,72,0.68);text-align:left;box-shadow:inset 0 0 25px rgba(125,211,252,0.05);">
       <p id="obs-pop-line-en" style="
-        font-size:clamp(.85rem,3.5vw,1.05rem);line-height:1.65;
-        color:rgba(220,218,240,0.88);margin:0 24px 6px;
-        letter-spacing:.04em;"></p>
+        font-size:clamp(1rem,3.8vw,1.25rem);line-height:1.6;
+        color:#fff7e6;margin:0 0 8px;letter-spacing:.02em;"></p>
       <p id="obs-pop-line-jp" style="
-        font-size:clamp(.8rem,3.2vw,.95rem);line-height:1.6;
-        color:rgba(190,188,220,0.65);margin:0 24px 14px;
-        font-family:'Noto Sans JP',serif;letter-spacing:.06em;"></p>
-      <p id="obs-pop-count" style="
-        font-size:clamp(.7rem,2.5vw,.82rem);color:rgba(180,178,210,0.45);
-        margin:0 24px;letter-spacing:.08em;"></p>
-    </div>`;
+        font-size:clamp(.88rem,3.4vw,1.05rem);line-height:1.75;
+        color:rgba(191,219,254,0.78);margin:0;
+        font-family:'Noto Sans JP',serif;letter-spacing:.04em;"></p>
+      </div>
+    </section>`;
   document.body.appendChild(observerPopEl);
   document.getElementById('obs-pop-close')
     .addEventListener('click', closeObserverPop);
@@ -4832,17 +4844,17 @@ function injectObserverPop() {
 function openObserverPop() {
   const games   = getGamesThisWeek();
   const lines   = window.KARASUKI_DATA.OBSERVER_LINES;
-  
-  const line = lines[Math.min(games, lines.length - 1)];
-  document.getElementById('obs-pop-line-en').textContent = line.en;
-  document.getElementById('obs-pop-line-jp').textContent = line.jp;
-  
-  const name = getBoohaFirstName();
-const en = name ? line.en.replace('{name}', name) : line.en.replace('{name}, ', '').replace('{name}、', '');
-const jp = name ? line.jp.replace('{name}', name) : line.jp.replace('{name}、', '').replace('{name}, ', '');
-document.getElementById('obs-pop-line-en').textContent = en;
-document.getElementById('obs-pop-line-jp').textContent = jp;
-document.getElementById('obs-pop-count').textContent   = name ? `${name} — ${games} / 9` : `${games} / 9`;
+  const line    = lines[Math.min(games, lines.length - 1)];
+  const name    = getBoohaFirstName();
+  const en      = name ? line.en.replace('{name}', name) : line.en.replace('{name}, ', '').replace('{name}、', '');
+  const jp      = name ? line.jp.replace('{name}', name) : line.jp.replace('{name}、', '').replace('{name}, ', '');
+  const target  = 9;
+  const percent = Math.min(100, Math.round((games / target) * 100));
+  document.getElementById('obs-pop-line-en').textContent = en;
+  document.getElementById('obs-pop-line-jp').innerHTML = furi(jp, line.furigana || {});
+  document.getElementById('obs-pop-count').textContent = `${games} / ${target} GAMES PLAYED`;
+  document.getElementById('obs-pop-count-jp').innerHTML = furi(`${games}回プレイした。`, { '回': 'かい' });
+  document.getElementById('obs-pop-meter').style.width = `${percent}%`;
   observerPopOpen = true;
   observerPopEl.style.display    = 'flex';
   observerPopEl.style.background = 'rgba(0,0,0,0.88)';
