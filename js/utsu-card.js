@@ -427,6 +427,7 @@
   var celebrationPopEl = null;
   var celebrationCloseHandler = null;
   var celebrationPreviousFocus = null;
+  var celebrationPageLock = null;
   var SPARK_GLYPHS = ['✦', '✧'];
 
   /* Fills the burst container with a fresh ring of sparks each call —
@@ -477,6 +478,27 @@
     rewardPopHideTimer = setTimeout(() => { rewardPopEl.classList.remove('is-shown'); }, opts.duration || 1900);
   }
 
+  // Pass 21D: a celebration is a true modal surface. Preserve the page's
+  // existing overflow values because another app surface may already have
+  // chosen them, then lock both scroll roots while the card is open.
+  function setCelebrationPageLock(locked) {
+    if (!document.documentElement || !document.body) return;
+    if (locked) {
+      if (celebrationPageLock) return;
+      celebrationPageLock = {
+        documentOverflow: document.documentElement.style.overflow,
+        bodyOverflow: document.body.style.overflow,
+      };
+      document.documentElement.style.overflow = 'hidden';
+      document.body.style.overflow = 'hidden';
+      return;
+    }
+    if (!celebrationPageLock) return;
+    document.documentElement.style.overflow = celebrationPageLock.documentOverflow;
+    document.body.style.overflow = celebrationPageLock.bodyOverflow;
+    celebrationPageLock = null;
+  }
+
   function closeCelebrationPop() {
     if (!celebrationPopEl) return;
     var previousFocus = celebrationPreviousFocus;
@@ -487,6 +509,7 @@
       document.removeEventListener('keydown', celebrationCloseHandler);
       celebrationCloseHandler = null;
     }
+    setCelebrationPageLock(false);
     if (previousFocus && document.contains(previousFocus) && typeof previousFocus.focus === 'function') {
       try { previousFocus.focus({ preventScroll: true }); } catch (_) { previousFocus.focus(); }
     }
@@ -581,6 +604,7 @@
     }
     celebrationPopEl.classList.remove('is-shown');
     celebrationPopEl.setAttribute('aria-hidden', 'false');
+    setCelebrationPageLock(true);
     void card.offsetWidth;
     requestAnimationFrame(function () { celebrationPopEl.classList.add('is-shown'); });
     try { action.focus({ preventScroll: true }); } catch (_) { action.focus(); }
