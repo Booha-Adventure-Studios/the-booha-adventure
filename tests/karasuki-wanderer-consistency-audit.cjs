@@ -20,7 +20,7 @@ assert(card.includes('.utsu-celebration-card.is-compact-copy .utsu-celebration-a
 assert((karasuki.match(/copyCompact: true/g) || []).length >= 2, 'New and returning Wanderer cards must both use compact copy');
 assert(karasuki.includes("title: 'HELLO AGAIN!'"), 'return celebration must remain present');
 assert(karasuki.includes("title: 'NEW WANDERER FOUND!'"), 'discovery celebration must remain present');
-assert(sw.includes("pages:  'booha-pages-2026-362'"), 'page cache must include the current consistency-pass bump');
+assert(sw.includes("pages:  'booha-pages-2026-363'"), 'page cache must include the current consistency-pass bump');
 assert(verify.includes('tests/karasuki-wanderer-consistency-audit.cjs'), 'verify.sh must run the consistency audit');
 
 console.log('Karasuki 20J consistency audit passed: New and returning Wanderers share a large safe frame with compact foreground copy for tall portraits.');

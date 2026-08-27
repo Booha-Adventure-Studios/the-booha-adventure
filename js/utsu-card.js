@@ -332,11 +332,12 @@
          world moments that need a centered, readable, dismissible surface. */
       .utsu-celebration-pop{position:fixed;inset:0;z-index:9350;display:grid;place-items:center;
         padding:clamp(12px,3vw,28px);box-sizing:border-box;background:rgba(0,0,0,0);
-        opacity:0;visibility:hidden;pointer-events:none;transition:opacity .28s ease,background .28s ease,visibility 0s linear .28s;}
+        opacity:0;visibility:hidden;pointer-events:none;overscroll-behavior:none;transition:opacity .28s ease,background .28s ease,visibility 0s linear .28s;}
       .utsu-celebration-pop.is-shown{opacity:1;visibility:visible;pointer-events:auto;background:rgba(0,0,0,.78);transition-delay:0s;}
       .utsu-celebration-card{position:relative;width:min(620px,calc(100% - 2px));max-height:min(86vh,720px);max-height:min(86dvh,720px);overflow:auto;
         box-sizing:border-box;padding:clamp(28px,5vw,48px) clamp(20px,6vw,56px) clamp(24px,4vw,38px);
         border:2px solid var(--celebration-ring,#ffd966);border-radius:24px;text-align:center;
+        overscroll-behavior:contain;touch-action:pan-y;-webkit-overflow-scrolling:touch;
         color:#fff7e6;background:radial-gradient(circle at 50% 0%,rgba(255,255,255,.10),transparent 38%),
         linear-gradient(160deg,#15271f 0%,#09140f 60%,#040807 100%);
         box-shadow:0 22px 90px rgba(0,0,0,.78),0 0 0 1px rgba(255,255,255,.08) inset,
