@@ -45,7 +45,13 @@ assert(source.includes('.muenba-case-choice { min-height:62px !important; paddin
   'case answer choices must remain comfortable touch targets');
 assert(!source.includes('appendCaseGlossary') && !source.includes('muenba-case-glossary'),
   'case popups must not repeat highlighted vocabulary in a competing chip row');
+assert(source.includes('id="muenba-mission-hint-toggle"') && source.includes('missionHint.hidden = !showing'),
+  'the welcome mission must keep Japanese scaffolding behind an explicit hint');
+assert(source.includes('id="muenba-case-board-eyebrow"') && source.includes('CASE FILE ${String(caseNumber).padStart(2, \'0\')}'),
+  'the case board must use one numbered eyebrow above the case title');
+assert(!source.includes("'muenba-case-record-instruction muenba-case-read-instruction'") && !source.includes("'muenba-case-read-instruction'"),
+  'case intro and clue scenes must not render an empty READ instruction card');
 assert(source.includes('.muenba-case-check-panel.is-locked'),
   'locked and unlocked check panels must have distinct visual states');
 
-console.log('Muenba popup audit passed: top anchoring, safe-area spacing, scrollability, scene reset, DEV hold, ESL layout, and 19C typography contracts.');
+console.log('Muenba popup audit passed: top anchoring, safe-area spacing, scrollability, scene reset, DEV hold, ESL layout, 19C typography, and 19D decluttering contracts.');
