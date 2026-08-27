@@ -5031,6 +5031,67 @@ const NUPPI_LINES = [
     jp: "{name}、だいじょうぶ。秘密は少ししか知らないよ。"
   }
 ];
+
+  // Pass 20D: Nuppi's short Japanese dialogue uses the shared renderer so
+  // the reading aid stays visible without duplicating every line as HTML.
+  // Terms are intentionally phrase-sized where possible; UtsuFurigana sorts
+  // them longest-first before applying the ruby markup.
+  const NUPPI_FURIGANA = {
+    '何か': 'なにか',
+    '名前': 'なまえ',
+    '一回': 'いっかい',
+    '聞いた': 'きいた',
+    '取っておいた': 'とっておいた',
+    '悲しそう': 'かなしそう',
+    '影': 'かげ',
+    '先': 'さき',
+    '来た': 'きた',
+    '考え中': 'かんがえちゅう',
+    '考え': 'かんがえ',
+    '見つけた': 'みつけた',
+    '静かな': 'しずかな',
+    '静か': 'しずか',
+    '聞いて': 'きいて',
+    '信じて': 'しんじて',
+    '時': 'とき',
+    '音': 'おと',
+    '忘れた': 'わすれた',
+    '二回': 'にかい',
+    '返事': 'へんじ',
+    '壁': 'かべ',
+    '地図': 'ちず',
+    '意見': 'いけん',
+    '合わない': 'あわない',
+    '見てない': 'みてない',
+    '光': 'ひかり',
+    '一つ': 'ひとつ',
+    '押す': 'おす',
+    '好き': 'すき',
+    '木': 'き',
+    '後ろ': 'うしろ',
+    '夢': 'ゆめ',
+    '今日': 'きょう',
+    '足音': 'あしおと',
+    '心配': 'しんぱい',
+    '石': 'いし',
+    '下': 'した',
+    '持ち上げ': 'もちあげ',
+    '森': 'もり',
+    '私': 'わたし',
+    '笑って': 'わらって',
+    '言った': 'いった',
+    '大事': 'だいじ',
+    '集める': 'あつめる',
+    '走った': 'はしった',
+    '持ち主': 'もちぬし',
+    '思い出': 'おもいで',
+    '暗い': 'くらい',
+    '空っぽ': 'からっぽ',
+    '来る': 'くる',
+    '秘密': 'ひみつ',
+    '少し': 'すこし',
+    '覚えて': 'おぼえて'
+  };
  
   /* ── Nuppi state ── */
   const nuppi = {
@@ -5252,7 +5313,7 @@ const NUPPI_LINES = [
     const en = name ? line.en.replace('{name}', name) : line.en.replace('{name}, ', '').replace('{name}、', '');
     const jp = name ? line.jp.replace('{name}', name) : line.jp.replace('{name}、', '').replace('{name}, ', '');
     document.getElementById('nuppi-pop-en').textContent = en;
-   document.getElementById('nuppi-pop-jp').textContent = jp;
+    document.getElementById('nuppi-pop-jp').innerHTML = furi(jp, NUPPI_FURIGANA);
     
     nuppiPopOpen              = true;
     nuppi.frozen              = true;
