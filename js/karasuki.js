@@ -2686,6 +2686,7 @@ const HAPPY_HOUSE_PORTAL = {
       glow: wandererCelebrationGlow(w.color),
       actionLabel: 'Meet this wanderer',
       actionSubHTML: '<ruby>旅人<rt>たびびと</rt></ruby>に<ruby>会<rt>あ</rt></ruby>おう',
+      copyOverlay: true,
       sfx: 'wandererFound',
     });
   }
@@ -2709,6 +2710,7 @@ const HAPPY_HOUSE_PORTAL = {
       glow: WANDERER_RETURN_GLOW,
       actionLabel: 'Say hello',
       actionSubHTML: '<ruby>あいさつ<rt>あいさつ</rt></ruby>しよう',
+      copyOverlay: true,
       sfx: 'wandererReturn',
     });
   }
@@ -4792,43 +4794,43 @@ function injectObserverPop() {
     background:rgba(0,0,0,0);transition:background 0.3s ease;`;
   observerPopEl.innerHTML = `
    <section role="dialog" aria-modal="true" aria-labelledby="obs-pop-title" aria-describedby="obs-pop-line-en" style="
-      background:linear-gradient(160deg,#080b18 0%,#10132b 58%,#070812 100%);
-      border:1px solid rgba(184,174,255,0.58);border-radius:18px;padding:0 0 30px;
+      background:radial-gradient(circle at 50% 18%,rgba(132,204,22,.14),transparent 36%),linear-gradient(160deg,#071108 0%,#0c1a12 58%,#030804 100%);
+      border:1px solid rgba(163,230,53,0.72);border-radius:18px;padding:0 0 30px;
       width:min(520px,92vw);max-height:92vh;overflow-y:auto;text-align:center;
       font-family:'Georgia',serif;position:relative;
-      box-shadow:0 0 0 1px rgba(125,211,252,0.12),0 0 42px rgba(80,70,180,0.42),0 0 90px rgba(125,211,252,0.12);">
-      <div style="height:4px;margin:0 22% 8px;border-radius:99px;background:linear-gradient(90deg,transparent,#7dd3fc,#c4b5fd,transparent);box-shadow:0 0 15px rgba(125,211,252,0.7);"></div>
+      box-shadow:0 0 0 1px rgba(190,242,100,0.16),0 0 42px rgba(101,163,13,0.5),0 0 96px rgba(132,204,22,0.28),inset 0 0 34px rgba(132,204,22,0.06);">
+      <div style="height:4px;margin:0 22% 8px;border-radius:99px;background:linear-gradient(90deg,transparent,#84cc16,#d9f99d,transparent);box-shadow:0 0 15px rgba(163,230,53,0.82);"></div>
       <div style="padding:20px 0 12px;display:flex;align-items:center;justify-content:center;">
         <img src="assets/img/karasuki/observer-2.png"
-          alt="The Observer"
+          alt="The Observers"
           style="max-width:88%;max-height:min(210px,38vw);object-fit:contain;
-                 filter:drop-shadow(0 0 18px rgba(196,181,253,0.48)) drop-shadow(0 0 34px rgba(125,211,252,0.18));"/>
+                 filter:drop-shadow(0 0 18px rgba(163,230,53,0.72)) drop-shadow(0 0 34px rgba(132,204,22,0.32));"/>
       </div>
       <button id="obs-pop-close" style="
         position:absolute;top:12px;right:14px;background:transparent;
         border:none;cursor:pointer;font-size:1rem;
-        color:rgba(196,181,253,0.72);padding:7px 10px;">✕</button>
-      <p style="font-family:monospace;font-size:clamp(.62rem,2.2vw,.76rem);font-weight:700;letter-spacing:.2em;color:#facc15;margin:0 24px 5px;">OBSERVER LOG</p>
-      <p style="font-family:'Noto Sans JP',serif;font-size:clamp(.72rem,2.8vw,.9rem);color:#b7c8dd;margin:0 24px 4px;">観察記録</p>
-      <h2 id="obs-pop-title" style="font-size:clamp(1.65rem,6vw,2.2rem);letter-spacing:.08em;color:#fff7e6;margin:0 22px 3px;text-shadow:0 0 18px rgba(196,181,253,0.45);">THE OBSERVER</h2>
-      <p style="font-family:'Noto Sans JP',serif;font-size:clamp(.9rem,3.4vw,1.1rem);color:#c4b5fd;margin:0 24px 18px;">観察者</p>
-      <section style="margin:0 22px 18px;padding:15px 18px 14px;border:1px solid rgba(125,211,252,0.4);border-radius:13px;background:rgba(8,16,36,0.72);text-align:left;">
+        color:rgba(217,249,157,0.78);padding:7px 10px;">✕</button>
+      <p style="font-family:monospace;font-size:clamp(.62rem,2.2vw,.76rem);font-weight:700;letter-spacing:.2em;color:#a3e635;margin:0 24px 5px;text-shadow:0 0 12px rgba(163,230,53,.7);">OBSERVER LOG</p>
+      <p style="font-family:'Noto Sans JP',serif;font-size:clamp(.72rem,2.8vw,.9rem);color:#c7e89a;margin:0 24px 4px;">観察記録</p>
+      <h2 id="obs-pop-title" style="font-size:clamp(1.65rem,6vw,2.2rem);letter-spacing:.08em;color:#f7fee7;margin:0 22px 3px;text-shadow:0 0 18px rgba(163,230,53,0.62),0 0 34px rgba(132,204,22,0.3);">THE OBSERVERS</h2>
+      <p style="font-family:'Noto Sans JP',serif;font-size:clamp(.9rem,3.4vw,1.1rem);color:#bef264;margin:0 24px 18px;">観察者たち</p>
+      <section style="margin:0 22px 18px;padding:15px 18px 14px;border:1px solid rgba(163,230,53,0.58);border-radius:13px;background:rgba(9,28,12,0.78);text-align:left;box-shadow:0 0 22px rgba(101,163,13,0.22),inset 0 0 18px rgba(132,204,22,0.08);">
         <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;">
-          <span style="font-family:monospace;font-size:clamp(.68rem,2.5vw,.82rem);font-weight:700;letter-spacing:.12em;color:#7dd3fc;">WEEKLY ACTIVITY</span>
-          <span id="obs-pop-count" style="font-family:monospace;font-size:clamp(.82rem,3vw,1rem);font-weight:700;color:#fff7e6;letter-spacing:.04em;"></span>
+          <span style="font-family:monospace;font-size:clamp(.68rem,2.5vw,.82rem);font-weight:700;letter-spacing:.12em;color:#bef264;text-shadow:0 0 10px rgba(163,230,53,.55);">WEEKLY ACTIVITY</span>
+          <span id="obs-pop-count" style="font-family:monospace;font-size:clamp(.82rem,3vw,1rem);font-weight:700;color:#f7fee7;letter-spacing:.04em;"></span>
         </div>
-        <div aria-hidden="true" style="height:10px;margin:11px 0 8px;border-radius:99px;background:rgba(196,181,253,0.16);overflow:hidden;box-shadow:inset 0 0 0 1px rgba(196,181,253,0.18);">
-          <span id="obs-pop-meter" style="display:block;height:100%;width:0%;border-radius:99px;background:linear-gradient(90deg,#7dd3fc,#c4b5fd,#facc15);box-shadow:0 0 14px rgba(125,211,252,0.72);transition:width .35s ease;"></span>
+        <div aria-hidden="true" style="height:10px;margin:11px 0 8px;border-radius:99px;background:rgba(54,83,20,0.56);overflow:hidden;box-shadow:inset 0 0 0 1px rgba(190,242,100,0.26),0 0 10px rgba(132,204,22,0.18);">
+          <span id="obs-pop-meter" style="display:block;height:100%;width:0%;border-radius:99px;background:linear-gradient(90deg,#365314,#65a30d,#a3e635,#d9f99d);box-shadow:0 0 14px rgba(163,230,53,0.86);transition:width .35s ease;"></span>
         </div>
-        <p id="obs-pop-count-jp" style="font-family:'Noto Sans JP',serif;font-size:clamp(.75rem,2.8vw,.92rem);line-height:1.55;color:rgba(191,219,254,0.72);margin:0;"></p>
+        <p id="obs-pop-count-jp" style="font-family:'Noto Sans JP',serif;font-size:clamp(.75rem,2.8vw,.92rem);line-height:1.55;color:rgba(190,242,100,0.78);margin:0;"></p>
       </section>
-      <div style="margin:0 22px;padding:18px 20px 19px;border-left:3px solid #c4b5fd;border-radius:0 12px 12px 0;background:rgba(31,30,72,0.68);text-align:left;box-shadow:inset 0 0 25px rgba(125,211,252,0.05);">
+      <div style="margin:0 22px;padding:18px 20px 19px;border-left:3px solid #a3e635;border-radius:0 12px 12px 0;background:rgba(27,46,13,0.72);text-align:left;box-shadow:inset 0 0 25px rgba(132,204,22,0.1),0 0 18px rgba(101,163,13,0.16);">
       <p id="obs-pop-line-en" style="
         font-size:clamp(1rem,3.8vw,1.25rem);line-height:1.6;
-        color:#fff7e6;margin:0 0 8px;letter-spacing:.02em;"></p>
+        color:#f7fee7;margin:0 0 8px;letter-spacing:.02em;text-shadow:0 0 12px rgba(163,230,53,.18);"></p>
       <p id="obs-pop-line-jp" style="
         font-size:clamp(.88rem,3.4vw,1.05rem);line-height:1.75;
-        color:rgba(191,219,254,0.78);margin:0;
+        color:rgba(217,249,157,0.82);margin:0;
         font-family:'Noto Sans JP',serif;letter-spacing:.04em;"></p>
       </div>
     </section>`;
@@ -4859,7 +4861,7 @@ function openObserverPop() {
   document.getElementById('obs-pop-meter').style.width = `${percent}%`;
   observerPopOpen = true;
   observerPopEl.style.display    = 'flex';
-  observerPopEl.style.background = 'rgba(0,0,0,0.88)';
+  observerPopEl.style.background = 'rgba(1,8,1,0.90)';
   state.clickTarget = null;
 }
 
