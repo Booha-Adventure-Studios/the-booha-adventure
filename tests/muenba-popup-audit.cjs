@@ -17,6 +17,10 @@ assert(source.includes('overflow-y:auto; background:rgba(0,0,0,0); transition:ba
 assert(source.includes('max-height:calc(100dvh - 40px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px))'),
   'popup cards must fit between mobile safe-area insets');
 assert(source.includes('function focusLobbyControl(selector)'), 'lobby scenes need a shared focus/reset helper');
+assert(source.includes("lobbyOverlay.setAttribute('role', 'dialog')") && source.includes("lobbyOverlay.setAttribute('aria-hidden', 'true')"),
+  'lobby popup must expose dialog semantics and start hidden to assistive technology');
+assert(source.includes("captureOverlay.setAttribute('aria-hidden', 'true')") && source.includes("captureOverlay.setAttribute('aria-hidden', 'false')"),
+  'capture popup must announce its open and closed state');
 assert(source.includes('box.scrollTop = 0;\n      box.scrollLeft = 0;'),
   'lobby scene replacements must reset to their first line');
 assert(source.includes('captureOverlay.appendChild(box);\n    // Every capture scene is a fresh reading/game card.'),
