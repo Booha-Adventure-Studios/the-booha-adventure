@@ -29,8 +29,8 @@ assert(source.includes("control.focus({ preventScroll: true })"),
   'capture control focus must not scroll a long popup away from its opening position');
 assert(source.includes('function clearCaseReadGate(session)'),
   'capture reading timers must have an explicit cancellation boundary');
-assert(source.includes('function scheduleCaseTransition(session)'),
-  'capture transitions must have an owned scheduling boundary');
+assert(source.includes('muenba-case-energy-start'),
+  'solved capture cards must expose an explicit energy-collection action');
 assert(source.includes('id = \'muenba-dev-capture-hold\''),
   'DEV capture popups must expose a screenshot hold control');
 assert(source.includes('Pause timed reading or transition callbacks for screenshots'),
