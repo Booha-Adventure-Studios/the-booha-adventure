@@ -4964,6 +4964,25 @@
       .muenba-nuppi-case-board .muenba-lobby-case-board { margin-top:12px; }
       .muenba-nuppi-case-board .muenba-case-board-eyebrow { margin:0 0 10px; text-align:left; }
       .muenba-nuppi-case-board .muenba-lobby-case-board h3 { margin-top:0; font-size:clamp(1.2rem,4vw,1.55rem); }
+      /* Pass 19E: responsive safety rails. Long English strings and Japanese
+         hint text must wrap inside the card, while the popup keeps a single
+         vertical scroll surface and visible safe-area breathing room. */
+      .muenba-lobby-box,
+      .muenba-lobby-box h2,
+      .muenba-lobby-box h3,
+      .muenba-lobby-box p,
+      .muenba-lobby-box button { min-width:0; overflow-wrap:anywhere; }
+      .muenba-lobby-box { overflow-x:hidden; }
+      .muenba-lobby-box button { box-sizing:border-box; }
+      .muenba-case-record { text-wrap:pretty; }
+      .muenba-case-choice-text { overflow-wrap:anywhere; text-wrap:pretty; }
+      @media (max-width:640px) {
+        .muenba-lobby-box.is-case-board { width:min(100%,calc(100vw - 24px)); padding:24px 16px 22px; }
+        .muenba-lobby-case-board { padding:17px 15px 16px; }
+        .muenba-lobby-case-board h3 { font-size:clamp(1.15rem,6vw,1.45rem); line-height:1.25; }
+        .muenba-nuppi-mission p { font-size:.9rem; line-height:1.6; }
+        .muenba-mission-hint-toggle { min-height:42px; }
+      }
       @media (prefers-reduced-motion: reduce) { .muenba-orb-release, .muenba-hunt-ghost-portrait, .muenba-gold-action, .muenba-read-ready { animation:none !important; } }
       @media (prefers-reduced-motion: reduce) { #muenba-fade, .muenba-return-box, #muenba-return-overlay, .muenba-lobby-box, #muenba-lobby-overlay, #muenba-capture-overlay { transition:none !important; } .muenba-lobby-portrait, #muenba-hide, #muenba-celebration-status, .muenba-rhythm-board, .muenba-rhythm-combo, .muenba-rhythm-result-failure, .muenba-case-question, .muenba-case-question::before, .muenba-case-feedback-shake, .muenba-case-read-status, .muenba-energy-warning, .muenba-case-clue.muenba-reading-complete > .muenba-case-reading-status, .muenba-case-clue.muenba-reading-complete > .muenba-case-check-panel { animation:none !important; } .muenba-case-choice, .muenba-case-action, .muenba-capture-action { transition:none !important; } .muenba-rhythm-energy-fill { transition:none !important; } #muenba-profile-link { transition:none !important; } }
     `;
