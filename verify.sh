@@ -516,6 +516,13 @@ else
   bad "Karasuki Observer WebP audit failed"
 fi
 
+echo "[56/56] Karasuki 24D Observer dedupe audit"
+if node tests/karasuki-observer-dedupe-audit.cjs >/dev/null 2>&1; then
+  ok "Karasuki Observer dedupe contracts pass"
+else
+  bad "Karasuki Observer dedupe audit failed"
+fi
+
 # ── Summary ──────────────────────────────────────────────────
 echo "───────────────────────────────────"
 echo "✅ $PASS passed   ⚠️  $WARN warnings   ❌ $FAIL failed"

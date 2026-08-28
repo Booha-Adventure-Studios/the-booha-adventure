@@ -14,7 +14,7 @@ const karasuki = fs.readFileSync(path.join(root, 'js', 'karasuki.js'), 'utf8');
 const muenba = fs.readFileSync(path.join(root, 'js', 'muenba.js'), 'utf8');
 const collection = fs.readFileSync(path.join(root, 'js', 'ui', 'adventure-collection.js'), 'utf8');
 
-const expected = new Set(['nuppi-1.webp', 'nuppi-2.webp', 'observer-1.webp', 'observer-2.webp']);
+const expected = new Set(['nuppi-1.webp', 'nuppi-2.webp']);
 const framePattern = /frames:\['([^']+)',\s*'([^']+)'\]/g;
 let match;
 let definitionCount = 0;
@@ -25,7 +25,7 @@ while ((match = framePattern.exec(karasuki))) {
 }
 
 assert.strictEqual(definitionCount, 36, 'Karasuki should define all 36 wanderers');
-assert.strictEqual(expected.size, 76, 'Karasuki frames plus Nuppi and the two shared Observer sprites should total 76 files');
+assert.strictEqual(expected.size, 74, 'Karasuki frames plus Nuppi should total 74 shared wanderer files');
 
 const webps = fs.readdirSync(wandererDir).filter((name) => /\.webp$/i.test(name)).sort();
 assert.deepStrictEqual(webps, [...expected].sort(), 'shared wanderer WebP set must match live definitions');
