@@ -19,7 +19,7 @@ assert(source.includes('let orientationMode = \'landscape\';'),
   'Muenba must default to landscape for world exploration');
 assert(source.includes('function isMuenbaPhoneViewport()'),
   'orientation switching must be limited to phone-sized touch viewports');
-assert(source.includes('Math.min(window.innerWidth, window.innerHeight) <= 540'),
+assert(source.includes('Math.min(width, height) <= 540') && source.includes('const { width, height } = currentMuenbaViewport();'),
   'small tablets must remain outside the phone-only orientation handoff');
 assert(source.includes('function isMuenbaOrientationReady()'),
   'Muenba must expose a single orientation readiness guard');
@@ -35,7 +35,7 @@ assert(source.includes('#muenba-rotate-overlay.is-visible'),
   'orientation fallback must be controlled by runtime state');
 assert(!source.includes('@media screen and (orientation:portrait) and (max-width:1023px) { #muenba-rotate-overlay'),
   'the old universal landscape gate must not override popup portrait mode');
-assert(source.includes('window.addEventListener(\'orientationchange\', scheduleMuenbaOrientationCheck'),
+assert(source.includes("window.addEventListener('orientationchange', refreshMuenbaViewport"),
   'orientation changes must refresh the fallback gate');
 assert(source.includes('if (orientationReady && !state.transitioning && !returnPortalOpen && !lobbyOpen && !captureOpen)'),
   'world movement must remain paused until the requested orientation is ready');
