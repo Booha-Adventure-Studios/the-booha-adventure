@@ -42,7 +42,10 @@ const CURRENT_CACHES = {
   // Karasuki popup pass: js/karasuki.js drops "I'm back in Karasuki", fixes the
   // mobile celebration-card overlap in js/utsu-card.js, and wires bespoke
   // nuppiOpen()/observerOpen() cues (js/utsu-sfx.js) into the Nuppi/Observer popups.
-  assets: 'booha-assets-2026-400',
+  // Destruction goofy-SFX v2: louder across the board, more differentiated
+  // per-material character, and the pull sound rebuilt from a stuck-prone
+  // held drone into short self-terminating creak pulses.
+  assets: 'booha-assets-2026-401',
   decks:  'booha-decks-2026-310',
 };
 

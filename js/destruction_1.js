@@ -284,15 +284,19 @@
     } catch(e) {}
   }
 
-  // ── Procedural material SFX — "goofy" pass ─────────────────────
-  // Every hit and break sound in this section is synthesized (no mp3s).
-  // Hit sounds (playWoodSFX / playStoneSFX / playSoftSFX / playGlassSFX,
-  // called from sndHit) are light "taps" gated by sndHit's own HIT_COOL
-  // check. Break sounds (the *BreakSFX / playGlassShatterSFX functions,
-  // called from sndBreak) are bigger cartoon "crashes" with their own
-  // per-material cooldown, so a hit and the break it causes can still
-  // land back-to-back as one "whack-CRACK" without a fast chain of
-  // simultaneous breaks stacking dozens of crash nodes at once.
+  // ── Procedural material SFX — "goofy" pass v2 ──────────────────
+  // v2, after playtest feedback: everything read as similar, soft
+  // "soundboard on 20%" blips, and the pull sound was a continuous drone
+  // that could get stuck playing (a "siren") if a browser ever skipped
+  // the pointer-up event (touchcancel, a lost pointer capture, etc.).
+  // Fixes: SYNTH_BOOST raises every procedural sound in this section;
+  // per-material character is pushed further apart (waveshaped grit on
+  // stone/rubble, a two-stage bounce on wood, a double squish on soft);
+  // and the pull sound is rebuilt from a held oscillator into short,
+  // self-terminating "creak" pulses — nothing below holds a node open
+  // past its own short envelope, so nothing here can end up stuck on.
+  const SYNTH_BOOST = 1.55;
+  function g1(x) { return Math.min(1, x); }
   let noiseBuffer = null;
   function getNoiseBuffer(ac) {
     if (noiseBuffer) return noiseBuffer;
@@ -309,101 +313,122 @@
     AUDIO_STATE.lastPlayed.set(channel, now);
     return true;
   }
+  // A cheap tanh waveshaper curve gives an oscillator a bit of cartoon
+  // "crunch" instead of a clean, generic-sounding tone — used on stone's
+  // impact and rubble's debris so they read as distinct from wood/soft
+  // instead of the same blip at a different pitch.
+  let crunchCurve = null;
+  function getCrunchCurve() {
+    if (crunchCurve) return crunchCurve;
+    const n = 256;
+    crunchCurve = new Float32Array(n);
+    for (let i = 0; i < n; i++) {
+      const x = (i / (n - 1)) * 2 - 1;
+      crunchCurve[i] = Math.tanh(x * 3.2) * 0.9;
+    }
+    return crunchCurve;
+  }
 
-  // Wood — a springy pitch-bent "boink". vol scales with impact speed.
+  // Wood — a springy, two-stage pitch-bent "boi-YOINK". The volume floor
+  // is kept high enough that even a glancing tap stays clearly audible.
   function playWoodSFX(vol=1) {
     if (AUDIO_STATE.muted) return;
     try {
       const ac = getAC(); if (!ac) return;
-      const now = ac.currentTime, m = AUDIO_STATE.master * Math.max(0.15, Math.min(1, vol));
+      const now = ac.currentTime, m = AUDIO_STATE.master * SYNTH_BOOST * Math.max(0.45, Math.min(1, vol));
       const osc = ac.createOscillator(), g = ac.createGain();
       osc.type = 'triangle';
-      osc.frequency.setValueAtTime(340 + rnd()*60, now);
-      osc.frequency.exponentialRampToValueAtTime(150, now + 0.10);
-      osc.frequency.exponentialRampToValueAtTime(210, now + 0.16);
+      osc.frequency.setValueAtTime(360 + rnd()*70, now);
+      osc.frequency.exponentialRampToValueAtTime(140, now + 0.075);
+      osc.frequency.exponentialRampToValueAtTime(260, now + 0.13);
+      osc.frequency.exponentialRampToValueAtTime(190, now + 0.21);
       g.gain.setValueAtTime(0.001, now);
-      g.gain.exponentialRampToValueAtTime(0.8*m, now + 0.012);
-      g.gain.exponentialRampToValueAtTime(0.0001, now + 0.22);
+      g.gain.exponentialRampToValueAtTime(g1(1.05*m), now + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + 0.24);
       osc.connect(g).connect(ac.destination);
-      osc.start(now); osc.stop(now + 0.24);
+      osc.start(now); osc.stop(now + 0.26);
 
       const noise = ac.createBufferSource();
       noise.buffer = getNoiseBuffer(ac);
       const filter = ac.createBiquadFilter();
       filter.type = 'bandpass';
-      filter.frequency.setValueAtTime(700 + rnd()*200, now);
-      filter.Q.setValueAtTime(2.2, now);
+      filter.frequency.setValueAtTime(750 + rnd()*250, now);
+      filter.Q.setValueAtTime(2.4, now);
       const ng = ac.createGain();
-      ng.gain.setValueAtTime(0.35*m, now);
+      ng.gain.setValueAtTime(g1(0.5*m), now);
       ng.gain.exponentialRampToValueAtTime(0.0001, now + 0.09);
       noise.connect(filter).connect(ng).connect(ac.destination);
       noise.start(now, rnd(0, 2)); noise.stop(now + 0.09);
     } catch (e) { audioWarn('wood', e); }
   }
-  // Wood break — the boink at full strength plus a handful of high
-  // "splinter" ticks scattered across the next ~0.25s.
+  // Wood break — the boink at full strength plus a bigger scatter of high
+  // "splinter" ticks.
   function playWoodBreakSFX() {
     if (AUDIO_STATE.muted) return;
     if (!synthCooldownOk('break-wood', 120)) return;
     try {
       const ac = getAC(); if (!ac) return;
-      const now = ac.currentTime, m = AUDIO_STATE.master;
+      const now = ac.currentTime, m = AUDIO_STATE.master * SYNTH_BOOST;
       playWoodSFX(1);
-      const snaps = 4 + Math.floor(rnd()*3);
+      const snaps = 5 + Math.floor(rnd()*4);
       for (let i = 0; i < snaps; i++) {
-        const t = now + 0.02 + rnd()*0.22;
+        const t = now + 0.02 + rnd()*0.24;
         const o = ac.createOscillator(), g = ac.createGain();
         o.type = 'square';
-        o.frequency.setValueAtTime(900 + rnd()*700, t);
+        o.frequency.setValueAtTime(950 + rnd()*750, t);
         g.gain.setValueAtTime(0.001, t);
-        g.gain.exponentialRampToValueAtTime(0.22*m, t + 0.006);
+        g.gain.exponentialRampToValueAtTime(g1(0.32*m), t + 0.006);
         g.gain.exponentialRampToValueAtTime(0.0001, t + 0.05);
         o.connect(g).connect(ac.destination);
         o.start(t); o.stop(t + 0.06);
       }
     } catch (e) { audioWarn('wood-break', e); }
   }
-  // Stone — a heavier double "clonk", lower and grittier than wood.
+  // Stone — a heavy, gritty double "CLONK". The impact oscillators run
+  // through a tanh waveshaper for a rougher, more "produced" texture
+  // instead of a plain tone.
   function playStoneSFX(vol=1) {
     if (AUDIO_STATE.muted) return;
     try {
       const ac = getAC(); if (!ac) return;
-      const now = ac.currentTime, m = AUDIO_STATE.master * Math.max(0.15, Math.min(1, vol));
-      [0, 0.07].forEach((d, i) => {
+      const now = ac.currentTime, m = AUDIO_STATE.master * SYNTH_BOOST * Math.max(0.45, Math.min(1, vol));
+      const shaper = ac.createWaveShaper();
+      shaper.curve = getCrunchCurve();
+      [0, 0.065].forEach((d, i) => {
         const t = now + d;
         const osc = ac.createOscillator(), g = ac.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime((i===0?150:110) + rnd()*20, t);
-        osc.frequency.exponentialRampToValueAtTime(45, t + 0.14);
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime((i===0?140:100) + rnd()*18, t);
+        osc.frequency.exponentialRampToValueAtTime(42, t + 0.15);
         g.gain.setValueAtTime(0.001, t);
-        g.gain.exponentialRampToValueAtTime((i===0?0.95:0.55)*m, t + 0.01);
-        g.gain.exponentialRampToValueAtTime(0.0001, t + 0.18);
-        osc.connect(g).connect(ac.destination);
-        osc.start(t); osc.stop(t + 0.2);
+        g.gain.exponentialRampToValueAtTime(g1((i===0?1.1:0.6)*m), t + 0.008);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + 0.19);
+        osc.connect(shaper).connect(g).connect(ac.destination);
+        osc.start(t); osc.stop(t + 0.21);
       });
       const noise = ac.createBufferSource();
       noise.buffer = getNoiseBuffer(ac);
       const filter = ac.createBiquadFilter();
       filter.type = 'bandpass';
-      filter.frequency.setValueAtTime(300 + rnd()*120, now);
-      filter.Q.setValueAtTime(1.1, now);
+      filter.frequency.setValueAtTime(280 + rnd()*130, now);
+      filter.Q.setValueAtTime(1.2, now);
       const ng = ac.createGain();
-      ng.gain.setValueAtTime(0.55*m, now);
-      ng.gain.exponentialRampToValueAtTime(0.0001, now + 0.16);
+      ng.gain.setValueAtTime(g1(0.7*m), now);
+      ng.gain.exponentialRampToValueAtTime(0.0001, now + 0.17);
       noise.connect(filter).connect(ng).connect(ac.destination);
-      noise.start(now, rnd(0, 2)); noise.stop(now + 0.16);
+      noise.start(now, rnd(0, 2)); noise.stop(now + 0.17);
     } catch (e) { audioWarn('stone', e); }
   }
-  // Stone break — the double clonk at full strength plus a scatter of
-  // lowpassed gravel bits.
+  // Stone break — the double clonk at full strength plus a bigger scatter
+  // of lowpassed gravel bits.
   function playStoneBreakSFX() {
     if (AUDIO_STATE.muted) return;
     if (!synthCooldownOk('break-stone', 130)) return;
     try {
       const ac = getAC(); if (!ac) return;
-      const now = ac.currentTime, m = AUDIO_STATE.master;
+      const now = ac.currentTime, m = AUDIO_STATE.master * SYNTH_BOOST;
       playStoneSFX(1);
-      const bits = 6 + Math.floor(rnd()*4);
+      const bits = 7 + Math.floor(rnd()*5);
       const buf = getNoiseBuffer(ac);
       for (let i = 0; i < bits; i++) {
         const t = now + 0.05 + rnd()*0.35;
@@ -413,75 +438,77 @@
         filter.type = 'lowpass';
         filter.frequency.setValueAtTime(250 + rnd()*500, t);
         const g = ac.createGain();
-        g.gain.setValueAtTime(0.28*m, t);
+        g.gain.setValueAtTime(g1(0.36*m), t);
         g.gain.exponentialRampToValueAtTime(0.0001, t + 0.06);
         noise.connect(filter).connect(g).connect(ac.destination);
         noise.start(t, rnd(0, 2)); noise.stop(t + 0.06);
       }
     } catch (e) { audioWarn('stone-break', e); }
   }
-  // Soft — a squishy cartoon "boop", pitch bends up then settles.
+  // Soft — an exaggerated squishy "boi-OOP!" with two quick upward pitch
+  // bounces instead of one, so it reads as bouncier and cuter.
   function playSoftSFX(vol=1) {
     if (AUDIO_STATE.muted) return;
     try {
       const ac = getAC(); if (!ac) return;
-      const now = ac.currentTime, m = AUDIO_STATE.master * Math.max(0.15, Math.min(1, vol));
+      const now = ac.currentTime, m = AUDIO_STATE.master * SYNTH_BOOST * Math.max(0.45, Math.min(1, vol));
       const osc = ac.createOscillator(), g = ac.createGain();
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(220, now);
-      osc.frequency.exponentialRampToValueAtTime(420, now + 0.05);
-      osc.frequency.exponentialRampToValueAtTime(260, now + 0.16);
+      osc.frequency.setValueAtTime(210, now);
+      osc.frequency.exponentialRampToValueAtTime(480, now + 0.045);
+      osc.frequency.exponentialRampToValueAtTime(300, now + 0.1);
+      osc.frequency.exponentialRampToValueAtTime(400, now + 0.15);
+      osc.frequency.exponentialRampToValueAtTime(260, now + 0.22);
       g.gain.setValueAtTime(0.001, now);
-      g.gain.exponentialRampToValueAtTime(0.6*m, now + 0.02);
-      g.gain.exponentialRampToValueAtTime(0.0001, now + 0.22);
+      g.gain.exponentialRampToValueAtTime(g1(0.85*m), now + 0.018);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + 0.26);
       osc.connect(g).connect(ac.destination);
-      osc.start(now); osc.stop(now + 0.24);
+      osc.start(now); osc.stop(now + 0.28);
 
       const noise = ac.createBufferSource();
       noise.buffer = getNoiseBuffer(ac);
       const filter = ac.createBiquadFilter();
       filter.type = 'lowpass';
-      filter.frequency.setValueAtTime(500, now);
+      filter.frequency.setValueAtTime(550, now);
       const ng = ac.createGain();
-      ng.gain.setValueAtTime(0.25*m, now);
+      ng.gain.setValueAtTime(g1(0.35*m), now);
       ng.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
       noise.connect(filter).connect(ng).connect(ac.destination);
       noise.start(now, rnd(0, 2)); noise.stop(now + 0.12);
     } catch (e) { audioWarn('soft', e); }
   }
-  // Soft break — the boop at full strength plus a little three-note
+  // Soft break — the boop at full strength plus a bouncier four-note
   // descending "poof" of stuffing.
   function playSoftBreakSFX() {
     if (AUDIO_STATE.muted) return;
     if (!synthCooldownOk('break-soft', 120)) return;
     try {
       const ac = getAC(); if (!ac) return;
-      const now = ac.currentTime, m = AUDIO_STATE.master;
+      const now = ac.currentTime, m = AUDIO_STATE.master * SYNTH_BOOST;
       playSoftSFX(1);
-      const puffs = 3;
+      const puffs = 4;
       for (let i = 0; i < puffs; i++) {
-        const t = now + 0.05 + i*0.05;
+        const t = now + 0.06 + i*0.05;
         const osc = ac.createOscillator(), g = ac.createGain();
         osc.type = 'sine';
-        osc.frequency.setValueAtTime(500 - i*80, t);
+        osc.frequency.setValueAtTime(560 - i*90, t);
         g.gain.setValueAtTime(0.001, t);
-        g.gain.exponentialRampToValueAtTime(0.18*m, t + 0.02);
+        g.gain.exponentialRampToValueAtTime(g1(0.26*m), t + 0.02);
         g.gain.exponentialRampToValueAtTime(0.0001, t + 0.12);
         osc.connect(g).connect(ac.destination);
         osc.start(t); osc.stop(t + 0.14);
       }
     } catch (e) { audioWarn('soft-break', e); }
   }
-  // Rubble — cascading debris after a block gives way. Bigger and goofier
-  // than the old 9-hit/0.6s version: ~18 pebble impacts over ~1.1s with a
-  // few descending cartoon "boink" bounces mixed into the tail.
+  // Rubble — cascading debris after a block gives way, boosted and now
+  // run through the same crunch character as stone for a grittier scatter.
   function playRubbleSFX() {
     if (AUDIO_STATE.muted) return;
     if (!synthCooldownOk('rubble', 260)) return;
     try {
       const ac = getAC(); if (!ac) return;
       const buf = getNoiseBuffer(ac);
-      const now = ac.currentTime, m = AUDIO_STATE.master;
+      const now = ac.currentTime, m = AUDIO_STATE.master * SYNTH_BOOST;
       const totalDuration = 1.1, debrisCount = 18;
       for (let i = 0; i < debrisCount; i++) {
         const delay = rnd() * totalDuration * 0.85;
@@ -493,7 +520,7 @@
         filter.type = 'lowpass';
         filter.frequency.setValueAtTime(180 + rnd()*550, time);
         const gain = ac.createGain();
-        const volume = Math.max(0.0001, (1 - delay/totalDuration) * (0.28 + rnd()*0.35) * m);
+        const volume = g1(Math.max(0.0001, (1 - delay/totalDuration) * (0.34 + rnd()*0.4) * m));
         gain.gain.setValueAtTime(volume, time);
         gain.gain.exponentialRampToValueAtTime(0.0001, time + dur);
         noise.connect(filter).connect(gain).connect(ac.destination);
@@ -507,7 +534,7 @@
         o.frequency.setValueAtTime(500 - i*90, t);
         o.frequency.exponentialRampToValueAtTime(260 - i*40, t + 0.05);
         g.gain.setValueAtTime(0.001, t);
-        g.gain.exponentialRampToValueAtTime((0.22 - i*0.05)*m, t + 0.008);
+        g.gain.exponentialRampToValueAtTime(g1((0.26 - i*0.05)*m), t + 0.008);
         g.gain.exponentialRampToValueAtTime(0.0001, t + 0.09);
         o.connect(g).connect(ac.destination);
         o.start(t); o.stop(t + 0.1);
@@ -522,7 +549,7 @@
     try {
       const ac = getAC(); if (!ac) return;
       const buf = getNoiseBuffer(ac);
-      const now = ac.currentTime, m = AUDIO_STATE.master * Math.max(0, Math.min(1, vol));
+      const now = ac.currentTime, m = AUDIO_STATE.master * SYNTH_BOOST * Math.max(0.35, Math.min(1, vol));
 
       const noise = ac.createBufferSource();
       noise.buffer = buf;
@@ -530,7 +557,7 @@
       filter.type = 'highpass';
       filter.frequency.setValueAtTime(4000, now);
       const noiseGain = ac.createGain();
-      noiseGain.gain.setValueAtTime(0.6 * m, now);
+      noiseGain.gain.setValueAtTime(g1(0.7 * m), now);
       noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.1);
       noise.connect(filter).connect(noiseGain).connect(ac.destination);
       noise.start(now, rnd(0, 2)); noise.stop(now + 0.1);
@@ -539,24 +566,21 @@
         const osc = ac.createOscillator(), gain = ac.createGain();
         const offset = rnd(0, 0.03);
         osc.frequency.setValueAtTime(freq + rnd(-200, 200), now + offset);
-        gain.gain.setValueAtTime(0.18 * m, now + offset);
+        gain.gain.setValueAtTime(g1(0.24 * m), now + offset);
         gain.gain.exponentialRampToValueAtTime(0.0001, now + offset + 0.12 + rnd(0, 0.06));
         osc.connect(gain).connect(ac.destination);
         osc.start(now + offset); osc.stop(now + offset + 0.2);
       });
     } catch (e) { audioWarn('glass', e); }
   }
-  // Glass shatter — the big destroy-moment crash. A sharper snap transient
-  // plus a scattering cascade of ~16 detuned sine "shards" over ~1.1s,
-  // pitched off a loose chime scale so the cascade reads musically instead
-  // of as pure noise.
+  // Glass shatter — the big destroy-moment crash.
   function playGlassShatterSFX() {
     if (AUDIO_STATE.muted) return;
     if (!synthCooldownOk('glass-shatter', 140)) return;
     try {
       const ac = getAC(); if (!ac) return;
       const buf = getNoiseBuffer(ac);
-      const now = ac.currentTime, m = AUDIO_STATE.master;
+      const now = ac.currentTime, m = AUDIO_STATE.master * SYNTH_BOOST;
 
       const noise = ac.createBufferSource();
       noise.buffer = buf;
@@ -564,7 +588,7 @@
       filter.type = 'highpass';
       filter.frequency.setValueAtTime(3200, now);
       const noiseGain = ac.createGain();
-      noiseGain.gain.setValueAtTime(0.85 * m, now);
+      noiseGain.gain.setValueAtTime(g1(0.95 * m), now);
       noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.14);
       noise.connect(filter).connect(noiseGain).connect(ac.destination);
       noise.start(now, rnd(0, 2)); noise.stop(now + 0.14);
@@ -578,51 +602,52 @@
         osc.type = 'sine';
         osc.frequency.setValueAtTime(freq, t);
         gain.gain.setValueAtTime(0.001, t);
-        gain.gain.exponentialRampToValueAtTime(0.16 * m, t + 0.008);
+        gain.gain.exponentialRampToValueAtTime(g1(0.22 * m), t + 0.008);
         gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.18 + rnd(0, 0.12));
         osc.connect(gain).connect(ac.destination);
         osc.start(t); osc.stop(t + 0.32);
       }
     } catch (e) { audioWarn('glass-shatter', e); }
   }
-  // Bounce/ground contact — a single cartoon "boing" whose pitch and punch
-  // scale with impact speed, replacing the old flat ground.mp3.
+  // Bounce/ground contact — a bigger, boingier "SPROING" than before,
+  // with a little wobble on the tail for comedic spring character. Pitch
+  // and punch still scale continuously with impact speed.
   function playBounceSFX(speed) {
     if (AUDIO_STATE.muted) return;
     if (!synthCooldownOk('bounce', 70)) return;
     try {
       const ac = getAC(); if (!ac) return;
-      const now = ac.currentTime, m = AUDIO_STATE.master;
+      const now = ac.currentTime, m = AUDIO_STATE.master * SYNTH_BOOST;
       const energy = Math.max(0, Math.min(1, speed / 40));
-      const pitch = 600 - energy * 420;
-      const dur = 0.05 + energy * 0.20;
-      const vol = (0.25 + energy * 0.35) * m;
+      const pitch = 640 - energy * 440;
+      const dur = 0.07 + energy * 0.26;
+      const vol = g1((0.4 + energy * 0.5) * m);
       const osc = ac.createOscillator(), g = ac.createGain();
       osc.type = 'triangle';
-      osc.frequency.setValueAtTime(pitch * 0.6, now);
-      osc.frequency.exponentialRampToValueAtTime(pitch, now + dur * 0.3);
-      osc.frequency.exponentialRampToValueAtTime(pitch * 0.5, now + dur);
+      osc.frequency.setValueAtTime(pitch * 0.55, now);
+      osc.frequency.exponentialRampToValueAtTime(pitch * 1.15, now + dur * 0.28);
+      osc.frequency.exponentialRampToValueAtTime(pitch * 0.45, now + dur * 0.75);
+      osc.frequency.exponentialRampToValueAtTime(pitch * 0.65, now + dur);
       g.gain.setValueAtTime(0.001, now);
-      g.gain.exponentialRampToValueAtTime(vol, now + dur * 0.15);
+      g.gain.exponentialRampToValueAtTime(vol, now + dur * 0.12);
       g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
       osc.connect(g).connect(ac.destination);
       osc.start(now); osc.stop(now + dur + 0.02);
     } catch (e) { audioWarn('bounce', e); }
   }
-  // Launch — a quick rising "stretch" sweep into a puff of release air,
-  // replacing the old fixed launch.mp3.
+  // Launch — a quick rising "stretch" sweep into a puff of release air.
   function playLaunchSFX() {
     if (AUDIO_STATE.muted) return;
     if (!synthCooldownOk('launch', 120)) return;
     try {
       const ac = getAC(); if (!ac) return;
-      const now = ac.currentTime, m = AUDIO_STATE.master;
+      const now = ac.currentTime, m = AUDIO_STATE.master * SYNTH_BOOST;
       const osc = ac.createOscillator(), g = ac.createGain();
       osc.type = 'sawtooth';
       osc.frequency.setValueAtTime(220, now);
       osc.frequency.exponentialRampToValueAtTime(880, now + 0.09);
       g.gain.setValueAtTime(0.001, now);
-      g.gain.exponentialRampToValueAtTime(0.45 * m, now + 0.02);
+      g.gain.exponentialRampToValueAtTime(g1(0.6 * m), now + 0.02);
       g.gain.exponentialRampToValueAtTime(0.0001, now + 0.11);
       const lp = ac.createBiquadFilter();
       lp.type = 'lowpass';
@@ -637,73 +662,102 @@
       filter.frequency.setValueAtTime(1200, now + 0.02);
       const ng = ac.createGain();
       ng.gain.setValueAtTime(0.001, now);
-      ng.gain.exponentialRampToValueAtTime(0.3 * m, now + 0.04);
+      ng.gain.exponentialRampToValueAtTime(g1(0.4 * m), now + 0.04);
       ng.gain.exponentialRampToValueAtTime(0.0001, now + 0.16);
       noise.connect(filter).connect(ng).connect(ac.destination);
       noise.start(now, rnd(0, 2)); noise.stop(now + 0.16);
     } catch (e) { audioWarn('launch', e); }
   }
-  // Rubber-band drone — a live pull-tension hum tracked to the actual drag
-  // gesture (startRubberBandSFX / updateRubberBandSFX / stopRubberBandSFX)
-  // rather than a fixed pre-scripted tension-then-snap, since a real pull
-  // can be any length or duration. snap=true on release plays a quick
-  // upward "twang" before the drone dies; snap=false (paused, cancelled,
-  // muted, snapped back to center) just fades it out.
-  let rubberBandState = null;
-  function startRubberBandSFX() {
+  // Slingshot pull — rebuilt from a continuous held drone into short,
+  // self-terminating "creak" pulses (playPullCreakSFX, fired from onMove
+  // with the live pull distance) plus one-shot release cues
+  // (playSlingshotSnapSFX on an actual launch, playPullReleaseSFX on a
+  // cancelled pull). Nothing here holds an oscillator open past its own
+  // short envelope, so this can never get stuck "on" the way the old
+  // held drone could if a browser ever skipped the pointer-up event
+  // (touchcancel, a lost pointer capture, tab losing focus mid-drag,
+  // etc.) — every sound below ends on its own within ~100ms regardless
+  // of what the input system does afterward.
+  function playPullCreakSFX(pullFrac) {
     if (AUDIO_STATE.muted) return;
-    if (rubberBandState) return;
+    const f = Math.max(0, Math.min(1, pullFrac));
+    if (!synthCooldownOk('pull-creak', 210 - f * 140)) return;
     try {
       const ac = getAC(); if (!ac) return;
-      const now = ac.currentTime;
+      const now = ac.currentTime, m = AUDIO_STATE.master * SYNTH_BOOST;
+      const pitch = 240 + f * 460 + rnd(-15, 15);
+      const osc = ac.createOscillator(), g = ac.createGain();
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(pitch, now);
+      osc.frequency.exponentialRampToValueAtTime(pitch * 1.4, now + 0.05);
+      g.gain.setValueAtTime(0.001, now);
+      g.gain.exponentialRampToValueAtTime(g1((0.22 + f * 0.28) * m), now + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + 0.075);
+      osc.connect(g).connect(ac.destination);
+      osc.start(now); osc.stop(now + 0.09);
+
+      const noise = ac.createBufferSource();
+      noise.buffer = getNoiseBuffer(ac);
+      const filter = ac.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(900 + f * 1900, now);
+      filter.Q.setValueAtTime(5, now);
+      const ng = ac.createGain();
+      ng.gain.setValueAtTime(g1((0.12 + f * 0.18) * m), now);
+      ng.gain.exponentialRampToValueAtTime(0.0001, now + 0.05);
+      noise.connect(filter).connect(ng).connect(ac.destination);
+      noise.start(now, rnd(0, 2)); noise.stop(now + 0.05);
+    } catch (e) { audioWarn('pull-creak', e); }
+  }
+  // Release without firing (snapped back to center, cancelled, paused) —
+  // a soft descending "un-stretch" tick, quieter than the real snap.
+  function playPullReleaseSFX() {
+    if (AUDIO_STATE.muted) return;
+    if (!synthCooldownOk('pull-release', 90)) return;
+    try {
+      const ac = getAC(); if (!ac) return;
+      const now = ac.currentTime, m = AUDIO_STATE.master * SYNTH_BOOST;
+      const osc = ac.createOscillator(), g = ac.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(440, now);
+      osc.frequency.exponentialRampToValueAtTime(180, now + 0.11);
+      g.gain.setValueAtTime(0.001, now);
+      g.gain.exponentialRampToValueAtTime(g1(0.3 * m), now + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + 0.13);
+      osc.connect(g).connect(ac.destination);
+      osc.start(now); osc.stop(now + 0.15);
+    } catch (e) { audioWarn('pull-release', e); }
+  }
+  // The real release — a sharp downward "TWANG": a fast sawtooth pitch
+  // drop plus a highpassed noise snap. Loud on purpose — this is the
+  // payoff moment for the whole pull gesture.
+  function playSlingshotSnapSFX() {
+    if (AUDIO_STATE.muted) return;
+    if (!synthCooldownOk('snap', 100)) return;
+    try {
+      const ac = getAC(); if (!ac) return;
+      const now = ac.currentTime, m = AUDIO_STATE.master * SYNTH_BOOST;
       const osc = ac.createOscillator(), g = ac.createGain();
       osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(140, now);
-      g.gain.setValueAtTime(0.0001, now);
-      g.gain.exponentialRampToValueAtTime(0.14 * AUDIO_STATE.master, now + 0.05);
-      const lp = ac.createBiquadFilter();
-      lp.type = 'lowpass';
-      lp.frequency.setValueAtTime(500, now);
-      osc.connect(lp).connect(g).connect(ac.destination);
-      osc.start(now);
-      rubberBandState = { ac, osc, gain: g, filter: lp };
-    } catch (e) { audioWarn('rubberband-start', e); }
-  }
-  function updateRubberBandSFX(pullFrac) {
-    if (!rubberBandState) return;
-    try {
-      const { ac, osc, gain, filter } = rubberBandState;
-      const f = Math.max(0, Math.min(1, pullFrac));
-      const now = ac.currentTime;
-      osc.frequency.linearRampToValueAtTime(140 + f * 260, now + 0.03);
-      filter.frequency.linearRampToValueAtTime(500 + f * 2200, now + 0.03);
-      gain.gain.linearRampToValueAtTime((0.14 + f * 0.16) * AUDIO_STATE.master, now + 0.03);
-    } catch (e) {}
-  }
-  function stopRubberBandSFX(snap) {
-    if (!rubberBandState) return;
-    const { ac, osc, gain } = rubberBandState;
-    rubberBandState = null;
-    try {
-      const now = ac.currentTime;
-      if (snap && !AUDIO_STATE.muted) {
-        const curFreq = osc.frequency.value, curGain = gain.gain.value;
-        osc.frequency.cancelScheduledValues(now);
-        osc.frequency.setValueAtTime(curFreq, now);
-        osc.frequency.exponentialRampToValueAtTime(Math.max(60, curFreq * 2.2), now + 0.05);
-        gain.gain.cancelScheduledValues(now);
-        gain.gain.setValueAtTime(curGain, now);
-        gain.gain.exponentialRampToValueAtTime(0.35 * AUDIO_STATE.master, now + 0.04);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.22);
-        osc.stop(now + 0.24);
-      } else {
-        const curGain = gain.gain.value;
-        gain.gain.cancelScheduledValues(now);
-        gain.gain.setValueAtTime(curGain, now);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.08);
-        osc.stop(now + 0.1);
-      }
-    } catch (e) { audioWarn('rubberband-stop', e); }
+      osc.frequency.setValueAtTime(950, now);
+      osc.frequency.exponentialRampToValueAtTime(110, now + 0.16);
+      g.gain.setValueAtTime(0.001, now);
+      g.gain.exponentialRampToValueAtTime(g1(0.95 * m), now + 0.008);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
+      osc.connect(g).connect(ac.destination);
+      osc.start(now); osc.stop(now + 0.2);
+
+      const noise = ac.createBufferSource();
+      noise.buffer = getNoiseBuffer(ac);
+      const filter = ac.createBiquadFilter();
+      filter.type = 'highpass';
+      filter.frequency.setValueAtTime(1800, now);
+      const ng = ac.createGain();
+      ng.gain.setValueAtTime(g1(0.65 * m), now);
+      ng.gain.exponentialRampToValueAtTime(0.0001, now + 0.05);
+      noise.connect(filter).connect(ng).connect(ac.destination);
+      noise.start(now, rnd(0, 2)); noise.stop(now + 0.05);
+    } catch (e) { audioWarn('snap', e); }
   }
 
   function preloadAudio() {
@@ -726,7 +780,6 @@
       AUDIO_STATE.activeBufferSFX.forEach(v => { try { v.node.stop(); } catch(e) {} });
       AUDIO_STATE.activeBufferSFX=[];
       AUDIO_STATE.lastPlayed.clear();
-      stopRubberBandSFX(false);
     }
     try { window.localStorage?.setItem(AUDIO_PREF_KEY, AUDIO_STATE.muted ? '1' : '0'); }
     catch (e) {}
@@ -1452,7 +1505,7 @@
   }
 
   // ── Audio helpers ────────────────────────────────────
-  function sndPull()   { if (gs.pullPlayed) return; gs.pullPlayed = true; startRubberBandSFX(); }
+  function sndPull()   { if (gs.pullPlayed) return; gs.pullPlayed = true; playPullCreakSFX(0); }
   function sndLaunch() {
     playLaunchSFX();
     const r = ROSTER[bst.sel];
@@ -2218,7 +2271,7 @@ function traitGlowColor(block) {
     sparks.length=0; waves.length=0; impactBursts.length=0; dusts.length=0; confetti.length=0;
     powers.length=0; scorchMarks.length=0;
     CRACKS.clear(); shake.v=0;
-    gs.dragging=false; gs.pullPlayed=false; stopRubberBandSFX(false); gs.bestShot=0; gs.pct=0; gs.brokenBlocks=0; gs.goalReached=false;
+    gs.dragging=false; gs.pullPlayed=false; gs.bestShot=0; gs.pct=0; gs.brokenBlocks=0; gs.goalReached=false;
     gs.roundScore=0;
     gs.roundMultiplier=1; gs.roundShotBonus=0; gs.roundDestructionScore=0;
     gs.shotsUsed=0; gs.collapseCount=0; gs.powerUsed=new Set();
@@ -3037,7 +3090,6 @@ function traitGlowColor(block) {
     if (gs.phase !== P.PLAY) return;
     pauseOpen = true;
     gs.dragging = false; gs.pullPlayed = false;
-    stopRubberBandSFX(false);
     needsRender = true;
   }
   function closePause() {
@@ -3128,16 +3180,16 @@ function traitGlowColor(block) {
     const dx=p.x-SLING_X,dy=p.y-SLING_Y,d=Math.min(MAX_PULL,Math.hypot(dx,dy)),a=Math.atan2(dy,dx);
     gs.booha.x=SLING_X+Math.cos(a)*d;
     gs.booha.y=Math.min(SLING_Y+Math.sin(a)*d,FLOOR_Y-gs.booha.radius-4);
-    updateRubberBandSFX(d/MAX_PULL);
+    playPullCreakSFX(d/MAX_PULL);
     evt.preventDefault();
   }
   function onUp(evt){
     if(!gs.dragging)return;
     gs.dragging=false;gs.pullPlayed=false;
-    if(!gs.booha||gs.booha.launched||gs.shotLock){stopRubberBandSFX(false);return;}
+    if(!gs.booha||gs.booha.launched||gs.shotLock)return;
     const dx=SLING_X-gs.booha.x,dy=SLING_Y-gs.booha.y,mag=Math.hypot(dx,dy);
-    if(mag<12){gs.booha.x=SLING_X;gs.booha.y=SLING_Y;stopRubberBandSFX(false);return;}
-    stopRubberBandSFX(true);
+    if(mag<12){gs.booha.x=SLING_X;gs.booha.y=SLING_Y;playPullReleaseSFX();return;}
+    playSlingshotSnapSFX();
     bst.stocks[bst.sel]=Math.max(0,bst.stocks[bst.sel]-1);
     gs.shotsUsed++;
     gs.powerUsed.add(gs.booha.power);
@@ -4278,6 +4330,8 @@ function traitGlowColor(block) {
     canvas.addEventListener('touchstart', onDown, {passive:false});
     window.addEventListener('touchmove',  onMove, {passive:false});
     window.addEventListener('touchend',   onUp,   {passive:false});
+    canvas.addEventListener('touchcancel', onUp,  {passive:false});
+    window.addEventListener('blur', () => { if (gs.dragging) onUp({preventDefault(){}}); });
     await preload();
     loadRound(0);
     gs.phase=P.TITLE;
