@@ -24,7 +24,9 @@ const CURRENT_CACHES = {
   // Profile Pass 1: remove floating world doors and ship the shared SVG icon set.
   // Shared index assets are now used by all migrated pages; invalidate the
   // prior PNG-serving asset cache after the 22F WebP migration.
-  assets: 'booha-assets-2026-383',
+  // Karasuki 24A: room backgrounds are now genuine WebP files, replacing
+  // PNG/JPEG bytes that had been stored under .webp filenames.
+  assets: 'booha-assets-2026-384',
   decks:  'booha-decks-2026-310',
 };
 
