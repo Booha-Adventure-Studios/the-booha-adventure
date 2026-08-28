@@ -31,7 +31,8 @@ const CURRENT_CACHES = {
   // Utsuroba 25A converts its 15 room backgrounds to genuine WebP.
   // Utsuroba 25B converts its 12 transparent drifter sprites to lossless WebP.
   // Utsuroba 25C defers drifter and dance artwork requests until needed.
-  assets: 'booha-assets-2026-392',
+  // Utsuroba 25D converts its three transparent dance poses to lossless WebP.
+  assets: 'booha-assets-2026-393',
   decks:  'booha-decks-2026-310',
 };
 

@@ -558,6 +558,13 @@ else
   bad "Utsuroba image-loading audit failed"
 fi
 
+echo "[62/62] Utsuroba 25D dance WebP audit"
+if node tests/utsuroba-dance-webp-audit.cjs >/dev/null 2>&1; then
+  ok "Utsuroba dance WebP contracts pass"
+else
+  bad "Utsuroba dance WebP audit failed"
+fi
+
 # ── Summary ──────────────────────────────────────────────────
 echo "───────────────────────────────────"
 echo "✅ $PASS passed   ⚠️  $WARN warnings   ❌ $FAIL failed"
