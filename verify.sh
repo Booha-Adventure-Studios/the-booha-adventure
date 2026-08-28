@@ -600,6 +600,13 @@ else
   bad "Muenba danger-audio audit failed"
 fi
 
+echo "[68/68] Muenba 27A orientation audit"
+if node tests/muenba-orientation-audit.cjs >/dev/null 2>&1; then
+  ok "Muenba orientation contracts pass"
+else
+  bad "Muenba orientation audit failed"
+fi
+
 # ── Summary ──────────────────────────────────────────────────
 echo "───────────────────────────────────"
 echo "✅ $PASS passed   ⚠️  $WARN warnings   ❌ $FAIL failed"

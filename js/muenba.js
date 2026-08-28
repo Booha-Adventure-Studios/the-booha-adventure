@@ -385,6 +385,12 @@
   let hideBtn = null;
   let captureOverlay = null;
   let captureOpen = false;
+  // Pass 27A: phones use landscape for the explorable world and portrait for
+  // reading/rhythm states. The browser request is best-effort; the overlay is
+  // the reliable fallback when a browser declines orientation locking.
+  let orientationOverlay = null;
+  let orientationMode = 'landscape';
+  let orientationCheckTimer = 0;
   // Pass 8A: one explicit capture session owns the hand-off from the
   // wandering ghost to the future rhythm game. Keeping the phase here means
   // Pass 8B can attach timing/input without also changing movement, ghost AI,
@@ -4332,7 +4338,7 @@
       #muenba-canvas { z-index:10; pointer-events:none; }
       #muenba-fade { z-index:30; background:#000; opacity:0; pointer-events:none; }
       #muenba-rotate-overlay { display:none; position:fixed; inset:0; z-index:9999; background:#000; flex-direction:column; align-items:center; justify-content:center; gap:18px; text-align:center; padding:32px; box-sizing:border-box; }
-      @media screen and (orientation:portrait) and (max-width:1023px) { #muenba-rotate-overlay { display:flex !important; } }
+      #muenba-rotate-overlay.is-visible { display:flex !important; }
       .muenba-rotate-phone { display:inline-flex; align-items:center; justify-content:center; color:#d8f4e6; transform-origin:center; animation:muenbaRotateHint 2.4s ease-in-out infinite; }
       @keyframes muenbaRotateHint { 0%,100% { transform:rotate(0deg); } 40%,60% { transform:rotate(-90deg); } }
       .muenba-rotate-bar { width:120px; height:3px; border-radius:999px; background:linear-gradient(90deg,#477f6a,#a7e1c5,#477f6a); background-size:200%; animation:muenbaBarShimmer 2s linear infinite; box-shadow:0 0 14px rgba(122,210,170,.46); }
@@ -5088,17 +5094,20 @@
     celebrationStatus.setAttribute('aria-atomic', 'true');
     document.body.appendChild(celebrationStatus);
 
-    // Muenba is a landscape world like Karasuki and Utsuroba. In portrait,
-    // cover-scaling would hide the side exits, so give the player a clear
-    // orientation prompt instead of leaving a partially playable room.
-    const rotateOverlay = document.createElement('div');
-    rotateOverlay.id = 'muenba-rotate-overlay';
-    rotateOverlay.innerHTML = '<span class="muenba-rotate-phone" aria-hidden="true"><svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2.4"></rect><line x1="11" y1="18.4" x2="13" y2="18.4"></line></svg></span><div class="muenba-rotate-bar"></div><p class="muenba-rotate-title">Turn your device sideways!</p><p class="muenba-rotate-sub">ムエンバは<strong style="color:#a7e1c5">横画面</strong>で遊べるよ。<br>スマホを横にしてね。</p>';
-    document.body.appendChild(rotateOverlay);
+    // Pass 27A: this gate is state-aware. The world and hunting remain
+    // landscape, while popup/rhythm states can request portrait on phones.
+    orientationOverlay = document.createElement('div');
+    orientationOverlay.id = 'muenba-rotate-overlay';
+    orientationOverlay.setAttribute('role', 'alert');
+    orientationOverlay.setAttribute('aria-live', 'polite');
+    orientationOverlay.setAttribute('aria-hidden', 'true');
+    orientationOverlay.innerHTML = '<span class="muenba-rotate-phone" aria-hidden="true"><svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2.4"></rect><line x1="11" y1="18.4" x2="13" y2="18.4"></line></svg></span><div class="muenba-rotate-bar"></div><p class="muenba-rotate-title"></p><p class="muenba-rotate-sub"></p>';
+    document.body.appendChild(orientationOverlay);
 
     roomTintCtx = roomTintCanvas.getContext('2d');
     atmosphereCtx = atmosphereCanvas.getContext('2d');
     actorCtx = actorCanvas.getContext('2d');
+    updateMuenbaOrientationGate();
   }
 
   function resizeCanvas() {
@@ -5123,6 +5132,82 @@
   function fitStage() {
     const scale = Math.max(window.innerWidth / WORLD_W, window.innerHeight / WORLD_H);
     stage.style.transform = `translate(-50%, -50%) scale(${scale})`;
+  }
+
+  function isMuenbaPhoneViewport() {
+    // A 700px short edge can include small tablets. Keep the handoff limited
+    // to phone-sized touch viewports so tablet landscape remains untouched.
+    return TOUCH_DEVICE && Math.min(window.innerWidth, window.innerHeight) <= 540;
+  }
+
+  function currentMuenbaOrientation() {
+    return window.innerWidth >= window.innerHeight ? 'landscape' : 'portrait';
+  }
+
+  function isMuenbaOrientationReady() {
+    return !isMuenbaPhoneViewport() || currentMuenbaOrientation() === orientationMode;
+  }
+
+  function updateMuenbaOrientationGate() {
+    if (!orientationOverlay) return;
+    const phone = isMuenbaPhoneViewport();
+    const ready = isMuenbaOrientationReady();
+    const needsPrompt = phone && !ready;
+    const title = orientationOverlay.querySelector('.muenba-rotate-title');
+    const sub = orientationOverlay.querySelector('.muenba-rotate-sub');
+    if (title) title.textContent = orientationMode === 'portrait'
+      ? 'Turn your phone upright'
+      : 'Turn your phone sideways!';
+    if (sub) sub.innerHTML = orientationMode === 'portrait'
+      ? 'Read and play this part in <strong style="color:#a7e1c5">portrait</strong> mode.<br>スマホを<ruby>縦向<rt>たてむ</rt></ruby>きにしてね。'
+      : 'Explore Muenba in <strong style="color:#a7e1c5">landscape</strong> mode.<br>スマホを<ruby>横向<rt>よこむ</rt></ruby>きにしてね。';
+    orientationOverlay.classList.toggle('is-visible', needsPrompt);
+    orientationOverlay.setAttribute('aria-hidden', String(!needsPrompt));
+  }
+
+  function setMuenbaOrientationMode(mode) {
+    const nextMode = mode === 'portrait' ? 'portrait' : 'landscape';
+    const changed = orientationMode !== nextMode;
+    if (!changed) return;
+    orientationMode = nextMode;
+    updateMuenbaOrientationGate();
+    if (!isMuenbaPhoneViewport() || isMuenbaOrientationReady()) return;
+
+    // Browsers commonly require this to follow a user gesture or an installed
+    // fullscreen app. Failure is expected, so the visible rotate gate remains
+    // the dependable fallback instead of blocking the Muenba state machine.
+    const orientation = window.screen && window.screen.orientation;
+    if (!orientation || typeof orientation.lock !== 'function') return;
+    try {
+      const request = orientation.lock(`${nextMode}-primary`);
+      if (request && typeof request.catch === 'function') {
+        request.catch(() => {
+          if (orientationMode === nextMode) updateMuenbaOrientationGate();
+        });
+      }
+    } catch (_) { updateMuenbaOrientationGate(); }
+  }
+
+  function syncMuenbaOrientationMode() {
+    const popupState = lobbyOpen || captureOpen || returnPortalOpen;
+    setMuenbaOrientationMode(popupState ? 'portrait' : 'landscape');
+  }
+
+  function scheduleMuenbaOrientationCheck() {
+    if (orientationCheckTimer) window.clearTimeout(orientationCheckTimer);
+    orientationCheckTimer = window.setTimeout(() => {
+      orientationCheckTimer = 0;
+      updateMuenbaOrientationGate();
+    }, 150);
+  }
+
+  function bindMuenbaOrientationController() {
+    window.addEventListener('resize', scheduleMuenbaOrientationCheck, { passive: true });
+    window.addEventListener('orientationchange', scheduleMuenbaOrientationCheck, { passive: true });
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', scheduleMuenbaOrientationCheck, { passive: true });
+    }
+    updateMuenbaOrientationGate();
   }
 
   function buildAtmosphereCache() {
@@ -6438,6 +6523,7 @@
 
   function handleInput(clientX, clientY) {
     startMusic();
+    if (!isMuenbaOrientationReady()) return;
     if (state.transitioning || returnPortalOpen || lobbyOpen || captureOpen || state.hiding) return;
     const point = stagePoint(clientX, clientY);
     // Pass 10: a tap during the entry-drift walk-to-center used to be
@@ -6486,11 +6572,13 @@
     const dt = Math.min(32, Math.max(8, now - (state.lastTickTime || now)));
     state.lastTickTime = now;
     state.speed = BASE_SPEED * Math.min(1.6, dt / TARGET_DT);
+    syncMuenbaOrientationMode();
+    const orientationReady = isMuenbaOrientationReady();
     // Entry drift must continue independently of overlays. The lobby now
     // waits for it on initial arrival, but this guard also protects any future
     // handoff that opens a modal during the same arrival window.
-    const drifting = !state.transitioning && tickEntryDrift(now);
-    if (!state.transitioning && !returnPortalOpen && !lobbyOpen && !captureOpen) {
+    const drifting = orientationReady && !state.transitioning && tickEntryDrift(now);
+    if (orientationReady && !state.transitioning && !returnPortalOpen && !lobbyOpen && !captureOpen) {
       if (!drifting && !state.inputLocked) {
         if (!state.hiding) {
           handleMovement(now);
@@ -6514,6 +6602,7 @@
     validateCaseData();
     injectStyles();
     buildApp();
+    bindMuenbaOrientationController();
     fitStage();
     resizeCanvas();
     setRoom(state.roomId, state.spawnId, null);
