@@ -12,21 +12,20 @@
 const ASSET_BASE = "assets/invaders/";
 
 const ASSET_PATHS = {
-  background:  ASSET_BASE + "background.png",
-  booIdle:     ASSET_BASE + "booha-invad-1.png",
-  booShoot:    ASSET_BASE + "booha-invad-2.png",
-  bugNormal:   ASSET_BASE + "bug-1.png",   // default Dotty
-  bugHurt:     ASSET_BASE + "bug-2.png",   // hit-flash sprite (shown briefly on damage)
-  bugBoss:     ASSET_BASE + "bug-3.png",   // angry boss sprite (phase 2 + 3)
-  candy:       ASSET_BASE + "candy.png",
+  background:  ASSET_BASE + "background.webp",
+  booIdle:     ASSET_BASE + "booha-invad-1.webp",
+  booShoot:    ASSET_BASE + "booha-invad-2.webp",
+  bugNormal:   ASSET_BASE + "bug-1.webp",   // default Dotty
+  bugHurt:     ASSET_BASE + "bug-2.webp",   // hit-flash sprite (shown briefly on damage)
+  bugBoss:     ASSET_BASE + "bug-3.webp",   // angry boss sprite (phase 2 + 3)
+  candy:       ASSET_BASE + "candy.webp",
   rocks:       [
-    ASSET_BASE + "rock1.png",
-    ASSET_BASE + "rock2.png",
-    ASSET_BASE + "rock3.png",
-    ASSET_BASE + "rock4.png",
+    ASSET_BASE + "rock1.webp",
+    ASSET_BASE + "rock2.webp",
+    ASSET_BASE + "rock3.webp",
+    ASSET_BASE + "rock4.webp",
   ],
   bgm:         ASSET_BASE + "invaders-bgm.mp3",
-  candySfx:    ASSET_BASE + "candy-get.mp3",
   bossMusic:   [
     ASSET_BASE + "dotty-boss-1.mp3",
     ASSET_BASE + "dotty-boss-2.mp3",
