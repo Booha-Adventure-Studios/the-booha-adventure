@@ -4027,7 +4027,7 @@ const HAPPY_HOUSE_PORTAL = {
   const ghostImg = new Image(); ghostImg.src = "assets/img/booha_ghost.webp";
   const memoryBoxImg = new Image(); memoryBoxImg.src = 'assets/img/memory_box.png';
   const observerImg = new Image();
-  observerImg.src = 'assets/img/karasuki/observer-1.png';
+  observerImg.src = 'assets/img/karasuki/observer-1.webp';
   const music    = new Audio('assets/audio/karasuki-music.mp3');
   music.loop     = true;
   music.volume   = 0.65;
@@ -4843,7 +4843,7 @@ function injectObserverPop() {
       box-shadow:0 0 0 1px rgba(190,242,100,0.16),0 0 42px rgba(101,163,13,0.5),0 0 96px rgba(132,204,22,0.28),inset 0 0 34px rgba(132,204,22,0.06);">
       <div style="height:4px;margin:0 22% 8px;border-radius:99px;background:linear-gradient(90deg,transparent,#84cc16,#d9f99d,transparent);box-shadow:0 0 15px rgba(163,230,53,0.82);"></div>
       <div style="padding:20px 0 12px;display:flex;align-items:center;justify-content:center;">
-        <img src="assets/img/karasuki/observer-2.png"
+        <img src="assets/img/karasuki/observer-2.webp"
           alt="The Observers"
           style="max-width:88%;max-height:min(210px,38vw);object-fit:contain;
                  filter:drop-shadow(0 0 18px rgba(163,230,53,0.72)) drop-shadow(0 0 34px rgba(132,204,22,0.32));"/>
