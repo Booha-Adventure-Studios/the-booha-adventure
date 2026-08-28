@@ -1505,7 +1505,7 @@
     }
     // Carrying energy is an emergency state. Hiding clears the scream for a
     // moment, but stepping back out immediately re-arms the chase.
-    if (g.carryingEnergy && g.hostility === 'sight' && !g.screaming) {
+    if (g.carryingEnergy && !g.screaming) {
       startGhostScream(g, now, 'carried-energy');
       g.chasing = true;
     }
