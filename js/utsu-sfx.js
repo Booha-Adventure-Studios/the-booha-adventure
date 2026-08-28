@@ -62,6 +62,163 @@
     } catch (_) {}
   }
 
+  // Pass 26E: Muenba danger is a living threat, not a single looping sample.
+  // Keep the scheduler here with the shared WebAudio context so it uses the
+  // same user-gesture unlock as every other short SFX and can be stopped as
+  // one group when the danger state ends.
+  var dangerScreamTimer = 0;
+  var dangerScreamActive = false;
+  var dangerScreamVoices = [];
+  var lastDangerScreamPreset = -1;
+  var DANGER_SCREAM_PRESETS = ['banshee', 'spectral', 'poltergeist', 'whisper'];
+
+  function trackDangerVoice(nodes, duration) {
+    var voice = { nodes: nodes };
+    dangerScreamVoices.push(voice);
+    window.setTimeout(function () {
+      var index = dangerScreamVoices.indexOf(voice);
+      if (index >= 0) dangerScreamVoices.splice(index, 1);
+    }, (duration + 0.3) * 1000);
+  }
+
+  function playDangerScreamPulse() {
+    var c = ensureCtx();
+    if (!c || !dangerScreamActive) return;
+    var presetIndex = Math.floor(Math.random() * DANGER_SCREAM_PRESETS.length);
+    if (presetIndex === lastDangerScreamPreset) {
+      presetIndex = (presetIndex + 1) % DANGER_SCREAM_PRESETS.length;
+    }
+    lastDangerScreamPreset = presetIndex;
+    var preset = DANGER_SCREAM_PRESETS[presetIndex];
+    var now = c.currentTime;
+
+    try {
+      if (preset === 'banshee') {
+        var banshee = c.createOscillator();
+        var bansheeLfo = c.createOscillator();
+        var bansheeLfoGain = c.createGain();
+        var bansheeGain = c.createGain();
+        banshee.type = 'sine';
+        banshee.frequency.setValueAtTime(1250, now);
+        banshee.frequency.exponentialRampToValueAtTime(300, now + 1.05);
+        bansheeLfo.frequency.value = 7;
+        bansheeLfoGain.gain.value = 55;
+        bansheeLfo.connect(bansheeLfoGain);
+        bansheeLfoGain.connect(banshee.frequency);
+        bansheeGain.gain.setValueAtTime(0.0001, now);
+        bansheeGain.gain.linearRampToValueAtTime(0.15, now + 0.12);
+        bansheeGain.gain.exponentialRampToValueAtTime(0.0001, now + 1.05);
+        banshee.connect(bansheeGain);
+        bansheeGain.connect(c.destination);
+        banshee.start(now);
+        bansheeLfo.start(now);
+        banshee.stop(now + 1.08);
+        bansheeLfo.stop(now + 1.08);
+        trackDangerVoice([banshee, bansheeLfo], 1.08);
+        return;
+      }
+
+      if (preset === 'spectral') {
+        var spectral = c.createOscillator();
+        var spectralFilter = c.createBiquadFilter();
+        var spectralGain = c.createGain();
+        spectral.type = 'triangle';
+        spectral.frequency.setValueAtTime(170, now);
+        spectral.frequency.linearRampToValueAtTime(320, now + 0.45);
+        spectral.frequency.exponentialRampToValueAtTime(115, now + 1.25);
+        spectralFilter.type = 'bandpass';
+        spectralFilter.Q.value = 9;
+        spectralFilter.frequency.setValueAtTime(260, now);
+        spectralFilter.frequency.exponentialRampToValueAtTime(900, now + 0.5);
+        spectralFilter.frequency.exponentialRampToValueAtTime(160, now + 1.25);
+        spectralGain.gain.setValueAtTime(0.0001, now);
+        spectralGain.gain.linearRampToValueAtTime(0.17, now + 0.18);
+        spectralGain.gain.exponentialRampToValueAtTime(0.0001, now + 1.25);
+        spectral.connect(spectralFilter);
+        spectralFilter.connect(spectralGain);
+        spectralGain.connect(c.destination);
+        spectral.start(now);
+        spectral.stop(now + 1.28);
+        trackDangerVoice([spectral], 1.28);
+        return;
+      }
+
+      if (preset === 'poltergeist') {
+        var shriekGain = c.createGain();
+        var shriekOne = c.createOscillator();
+        var shriekTwo = c.createOscillator();
+        shriekOne.type = 'sawtooth';
+        shriekTwo.type = 'sawtooth';
+        shriekOne.frequency.setValueAtTime(2200, now);
+        shriekOne.frequency.exponentialRampToValueAtTime(420, now + 0.66);
+        shriekTwo.frequency.setValueAtTime(2240, now);
+        shriekTwo.frequency.exponentialRampToValueAtTime(440, now + 0.66);
+        shriekGain.gain.setValueAtTime(0.0001, now);
+        shriekGain.gain.linearRampToValueAtTime(0.08, now + 0.025);
+        shriekGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.66);
+        shriekOne.connect(shriekGain);
+        shriekTwo.connect(shriekGain);
+        shriekGain.connect(c.destination);
+        shriekOne.start(now);
+        shriekTwo.start(now);
+        shriekOne.stop(now + 0.7);
+        shriekTwo.stop(now + 0.7);
+        trackDangerVoice([shriekOne, shriekTwo], 0.7);
+        return;
+      }
+
+      // Whisper: filtered noise gives the scheduler a texture that is not
+      // another pitched oscillator, while staying short enough for mobile.
+      var duration = 1.1;
+      var buffer = c.createBuffer(1, Math.ceil(c.sampleRate * duration), c.sampleRate);
+      var noiseData = buffer.getChannelData(0);
+      for (var i = 0; i < noiseData.length; i += 1) noiseData[i] = Math.random() * 2 - 1;
+      var whisper = c.createBufferSource();
+      var whisperFilter = c.createBiquadFilter();
+      var whisperGain = c.createGain();
+      whisper.buffer = buffer;
+      whisperFilter.type = 'bandpass';
+      whisperFilter.Q.value = 13;
+      whisperFilter.frequency.setValueAtTime(220, now);
+      whisperFilter.frequency.exponentialRampToValueAtTime(1700, now + 0.5);
+      whisperFilter.frequency.exponentialRampToValueAtTime(150, now + duration);
+      whisperGain.gain.setValueAtTime(0.0001, now);
+      whisperGain.gain.linearRampToValueAtTime(0.16, now + 0.2);
+      whisperGain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+      whisper.connect(whisperFilter);
+      whisperFilter.connect(whisperGain);
+      whisperGain.connect(c.destination);
+      whisper.start(now);
+      whisper.stop(now + duration + 0.03);
+      trackDangerVoice([whisper], duration + 0.03);
+    } catch (_) {}
+  }
+
+  function scheduleDangerScreamPulse() {
+    if (!dangerScreamActive) return;
+    playDangerScreamPulse();
+    dangerScreamTimer = window.setTimeout(scheduleDangerScreamPulse, 1050 + Math.random() * 750);
+  }
+
+  function startDangerScream() {
+    if (dangerScreamActive) return;
+    if (!ensureCtx()) return;
+    dangerScreamActive = true;
+    scheduleDangerScreamPulse();
+  }
+
+  function stopDangerScream() {
+    dangerScreamActive = false;
+    if (dangerScreamTimer) window.clearTimeout(dangerScreamTimer);
+    dangerScreamTimer = 0;
+    dangerScreamVoices.forEach(function (voice) {
+      voice.nodes.forEach(function (node) {
+        try { node.stop(); } catch (_) {}
+      });
+    });
+    dangerScreamVoices = [];
+  }
+
   /* Small, intentionally restrained offsets. The motif should feel like a
      color in the ear, not a different instrument or a difficulty signal. */
   var MOTIF_PITCH = {
@@ -158,6 +315,11 @@
     phantomCancel: function () {
       tone(320, { type: 'triangle', gain: 0.07, dur: 0.16, slideTo: 50 });
     },
+    /* Pass 26E — staggered Muenba danger voices. Several hostile ghosts can
+       request this safely: one scheduler varies the short screams instead
+       of restarting a shared one-shot sample on every trigger. */
+    startDangerScream: startDangerScream,
+    stopDangerScream: stopDangerScream,
     /* A memory successfully handed to its drifter — the moment
        startCelebration() fires. Three-note warm rise, deliberately
        distinct from correct() (brighter/thinner) and from the old

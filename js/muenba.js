@@ -105,7 +105,6 @@
   const ORB_REWARD_PER_CAPTURE = 3;
   const MUENBA_MUSIC_VOLUME = 0.55;
   const MUENBA_SCREAM_DUCK_VOLUME = 0.16;
-  const MUENBA_SCREAM_VOLUME = 0.78;
   const MUENBA_DANGER_RHYTHM_VOLUME = 0.62;
   const MUENBA_DANCE_FALLBACK_MS = 11000;
   const MUENBA_DANCE_SETTLE_MS = 750;
@@ -505,10 +504,6 @@
   music.preload = 'auto';
   music.loop = true;
   music.volume = MUENBA_MUSIC_VOLUME;
-  const dangerScream = new Audio('assets/img/muenba/scream.mp3');
-  dangerScream.preload = 'auto';
-  dangerScream.loop = true;
-  dangerScream.volume = MUENBA_SCREAM_VOLUME;
   const dangerRhythmMusic = new Audio('assets/img/muenba/rhythm.mp3');
   dangerRhythmMusic.preload = 'auto';
   dangerRhythmMusic.loop = true;
@@ -674,36 +669,19 @@
     music.play().catch(() => { state.musicStarted = false; });
   });
 
-  // Pass 11: dangerScream is one shared <audio> element reused by every
-  // ghost's scream. play() is async — if a pause()/currentTime reset/new
-  // play() lands on the element before a previous play() has resolved, the
-  // browser silently rejects that promise and the scream just doesn't play.
-  // This token guards against that: only the most recent start/stop call
-  // gets to act once its play() promise actually settles.
-  let screamPlayToken = 0;
   function startDangerScream() {
     stopDangerRhythmMusic();
     music.volume = MUENBA_SCREAM_DUCK_VOLUME;
-    const token = ++screamPlayToken;
     try {
-      dangerScream.currentTime = 0;
-      const playResult = dangerScream.play();
-      if (playResult && typeof playResult.then === 'function') {
-        playResult.catch(() => {}).then(() => {
-          // If stopDangerScream() (or a newer scream) already moved on by
-          // the time this late-resolving play() settles, don't leave the
-          // old scream running underneath the newer state.
-          if (token !== screamPlayToken) { try { dangerScream.pause(); } catch (_) {} }
-        });
-      }
+      const sound = window.UtsuSfx && window.UtsuSfx.startDangerScream;
+      if (typeof sound === 'function') sound();
     } catch (_) {}
   }
 
   function stopDangerScream() {
-    screamPlayToken++;
     try {
-      dangerScream.pause();
-      dangerScream.currentTime = 0;
+      const sound = window.UtsuSfx && window.UtsuSfx.stopDangerScream;
+      if (typeof sound === 'function') sound();
     } catch (_) {}
     music.volume = MUENBA_MUSIC_VOLUME;
   }
