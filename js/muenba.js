@@ -479,6 +479,20 @@
       && activeGhostState.ghost.id === currentHuntGhostId();
   }
 
+  function makeMuenbaDeferredImage(src) {
+    return { img: new Image(), src, requested: false };
+  }
+
+  function ensureMuenbaImage(image) {
+    if (!image) return null;
+    if (!image.requested) {
+      image.requested = true;
+      image.img.decoding = 'async';
+      image.img.src = image.src;
+    }
+    return image.img;
+  }
+
   const ghostImg = new Image();
   ghostImg.src = 'assets/img/booha_ghost.webp';
   const hidingImg = new Image();
@@ -598,12 +612,9 @@
     playCaseTone(523.25, 1046.5, 0.65, 0.04, 'sine');
   }
 
-  const danceArmsUpImg = new Image();
-  danceArmsUpImg.src = 'assets/img/booha_ghost_dance_arms_up.png';
-  const danceSwayImg = new Image();
-  danceSwayImg.src = 'assets/img/booha_ghost_dance_sway.png';
-  const danceWaveImg = new Image();
-  danceWaveImg.src = 'assets/img/booha_ghost_dance_wave.png';
+  const danceArmsUpImg = makeMuenbaDeferredImage('assets/img/booha_ghost_dance_arms_up.webp');
+  const danceSwayImg = makeMuenbaDeferredImage('assets/img/booha_ghost_dance_sway.webp');
+  const danceWaveImg = makeMuenbaDeferredImage('assets/img/booha_ghost_dance_wave.webp');
   const MUENBA_DANCE_FRAMES = [
     { img: danceArmsUpImg, contentScale: 0.817, offsetX: -0.007, offsetY: -0.026 },
     { img: danceSwayImg, contentScale: 0.801, offsetX: 0.009, offsetY: -0.015 },
@@ -4085,6 +4096,7 @@
     if (hideBtn) hideBtn.classList.remove('active');
     activeGhost = null;
     muenbaDanceSparkles = [];
+    MUENBA_DANCE_FRAMES.forEach(frame => ensureMuenbaImage(frame.img));
     if (celebrationStatus) {
       celebrationStatus.innerHTML = 'ENERGY RETURNED<small>エネルギーが戻った</small>';
       celebrationStatus.classList.add('open');
@@ -6276,7 +6288,7 @@
     actorCtx.globalAlpha = (dancing ? .98 : .96) * hidingFade;
     if (state.hiding) actorCtx.scale(.82, .82);
     if (dancing) actorCtx.scale((1 + beat * .16) * settleEase + (1 - settleEase), (1 - beat * .2) * settleEase + (1 - settleEase));
-    const boohaSprite = dancing ? danceFrame.img : (state.hiding ? hidingImg : ghostImg);
+    const boohaSprite = dancing ? ensureMuenbaImage(danceFrame.img) : (state.hiding ? hidingImg : ghostImg);
     if (boohaSprite.complete && boohaSprite.naturalWidth > 0) {
       const boxSize = BOOHA_R * 2 * (dancing ? danceFrame.contentScale : 1);
       const offsetX = dancing ? danceFrame.offsetX * boxSize : 0;
