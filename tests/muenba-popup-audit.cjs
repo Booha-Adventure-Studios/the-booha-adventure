@@ -21,7 +21,7 @@ assert(source.includes("lobbyOverlay.setAttribute('role', 'dialog')") && source.
   'lobby popup must expose dialog semantics and start hidden to assistive technology');
 assert(source.includes("captureOverlay.setAttribute('aria-hidden', 'true')") && source.includes("captureOverlay.setAttribute('aria-hidden', 'false')"),
   'capture popup must announce its open and closed state');
-assert(source.includes('box.scrollTop = 0;\n      box.scrollLeft = 0;'),
+assert(source.includes('resetMuenbaPopupScrollAfterLayout(lobbyOverlay);'),
   'lobby scene replacements must reset to their first line');
 assert(source.includes('captureOverlay.appendChild(box);\n    // Every capture scene is a fresh reading/game card.'),
   'capture scene replacements must reset their scroll container');

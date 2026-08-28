@@ -1909,6 +1909,28 @@
     return box;
   }
 
+  // Pass 27B: browsers may scroll a focused control into view after a popup
+  // has been rendered. Keep the overlay and its independently-scrollable card
+  // anchored at their first line, even after that focus/layout cycle finishes.
+  function resetMuenbaPopupScroll(overlay, cardSelector = '.muenba-lobby-box') {
+    if (!overlay) return;
+    overlay.scrollTop = 0;
+    overlay.scrollLeft = 0;
+    const card = overlay.querySelector(cardSelector);
+    if (card) {
+      card.scrollTop = 0;
+      card.scrollLeft = 0;
+    }
+  }
+
+  function resetMuenbaPopupScrollAfterLayout(overlay, cardSelector = '.muenba-lobby-box') {
+    resetMuenbaPopupScroll(overlay, cardSelector);
+    window.requestAnimationFrame(() => {
+      resetMuenbaPopupScroll(overlay, cardSelector);
+      window.requestAnimationFrame(() => resetMuenbaPopupScroll(overlay, cardSelector));
+    });
+  }
+
   function devCaptureToolsEnabled() {
     return DEV_MODE || window.__devMuenba === true;
   }
@@ -2164,9 +2186,11 @@
   }
 
   function focusCaptureControl(selector) {
+    resetMuenbaPopupScrollAfterLayout(captureOverlay);
     window.setTimeout(() => {
       const control = captureOverlay && captureOverlay.querySelector(selector);
       if (control && typeof control.focus === 'function') control.focus({ preventScroll: true });
+      resetMuenbaPopupScrollAfterLayout(captureOverlay);
     }, 0);
   }
 
@@ -5743,6 +5767,7 @@
     state.moving = false;
     playUiSfx('popupOpen');
     returnPortalOverlay.classList.add('open');
+    resetMuenbaPopupScrollAfterLayout(returnPortalOverlay, '.muenba-return-box');
   }
 
   function closeReturnPortalPopup() {
@@ -5922,17 +5947,11 @@
   }
 
   function focusLobbyControl(selector) {
-    const box = lobbyOverlay && lobbyOverlay.querySelector('.muenba-lobby-box');
-    if (box) {
-      // Scene renderers replace the card with innerHTML. Always reopen the
-      // replacement at its first line instead of inheriting a stale scroll
-      // position from a previous long popup.
-      box.scrollTop = 0;
-      box.scrollLeft = 0;
-    }
+    resetMuenbaPopupScrollAfterLayout(lobbyOverlay);
     window.setTimeout(() => {
       const control = lobbyOverlay && lobbyOverlay.querySelector(selector);
-      if (control && typeof control.focus === 'function') control.focus();
+      if (control && typeof control.focus === 'function') control.focus({ preventScroll: true });
+      resetMuenbaPopupScrollAfterLayout(lobbyOverlay);
     }, 0);
   }
 

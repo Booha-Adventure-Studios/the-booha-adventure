@@ -46,11 +46,12 @@ const CURRENT_CACHES = {
   // per-material character, and the pull sound rebuilt from a stuck-prone
   // held drone into short self-terminating creak pulses.
   // Muenba 27A adds state-aware phone orientation handling to js/muenba.js.
+  // Muenba 27B keeps popup focus and layout cycles anchored at the first line.
   // Destruction goofy-SFX v3: modal-synthesis rewrite of the pull/creak,
   // block hit/break, and bounce sounds (static-partial materials vs.
   // pitch-bending gesture sounds), based on a reference implementation
   // the user supplied.
-  assets: 'booha-assets-2026-403',
+  assets: 'booha-assets-2026-404',
   decks:  'booha-decks-2026-310',
 };
 
