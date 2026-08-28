@@ -36,7 +36,8 @@ const CURRENT_CACHES = {
   // Muenba 26B converts its seven transparent ghost sprites to lossless WebP.
   // Muenba 26C converts its remaining transparent support art to lossless WebP.
   // Muenba 26D fixes and defers the shared WebP dance art until celebration.
-  assets: 'booha-assets-2026-397',
+  // Muenba 26E replaces the shared looped scream sample with staggered WebAudio voices.
+  assets: 'booha-assets-2026-398',
   decks:  'booha-decks-2026-310',
 };
 
