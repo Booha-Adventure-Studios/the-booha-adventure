@@ -284,17 +284,19 @@
     } catch(e) {}
   }
 
-  // ── Procedural material SFX ─────────────────────────────
-  // break / rubble / glass used to be mp3s played through playBufferSFX.
-  // They're the three biggest audio files in the game for what are short
-  // impact stings, and none of them need to be recordings — noise bursts
-  // and detuned oscillators sell "stone crunch" / "debris scatter" /
-  // "glass shard" better than a single static clip looping anyway, and it
-  // means every hit sounds a little different instead of identical.
+  // ── Procedural material SFX — "goofy" pass ─────────────────────
+  // Every hit and break sound in this section is synthesized (no mp3s).
+  // Hit sounds (playWoodSFX / playStoneSFX / playSoftSFX / playGlassSFX,
+  // called from sndHit) are light "taps" gated by sndHit's own HIT_COOL
+  // check. Break sounds (the *BreakSFX / playGlassShatterSFX functions,
+  // called from sndBreak) are bigger cartoon "crashes" with their own
+  // per-material cooldown, so a hit and the break it causes can still
+  // land back-to-back as one "whack-CRACK" without a fast chain of
+  // simultaneous breaks stacking dozens of crash nodes at once.
   let noiseBuffer = null;
   function getNoiseBuffer(ac) {
     if (noiseBuffer) return noiseBuffer;
-    const len = Math.floor(ac.sampleRate * 1);
+    const len = Math.floor(ac.sampleRate * 3);
     noiseBuffer = ac.createBuffer(1, len, ac.sampleRate);
     const data = noiseBuffer.getChannelData(0);
     for (let i = 0; i < len; i++) data[i] = Math.random() * 2 - 1;
@@ -307,42 +309,172 @@
     AUDIO_STATE.lastPlayed.set(channel, now);
     return true;
   }
-  // Generic "structure destroyed" sting — low-frequency thud plus a
-  // bandpass-filtered noise crunch. Used for every material, same as the
-  // old break.mp3 was.
-  function playBreakSFX() {
+
+  // Wood — a springy pitch-bent "boink". vol scales with impact speed.
+  function playWoodSFX(vol=1) {
     if (AUDIO_STATE.muted) return;
-    if (!synthCooldownOk('break', 110)) return;
     try {
       const ac = getAC(); if (!ac) return;
-      const now = ac.currentTime, m = AUDIO_STATE.master;
-
-      const osc = ac.createOscillator(), oscGain = ac.createGain();
-      osc.frequency.setValueAtTime(128 + rnd()*24, now);
-      osc.frequency.exponentialRampToValueAtTime(30, now + 0.15);
-      oscGain.gain.setValueAtTime(0.95 * m, now);
-      oscGain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
-      osc.connect(oscGain).connect(ac.destination);
-      osc.start(now); osc.stop(now + 0.16);
+      const now = ac.currentTime, m = AUDIO_STATE.master * Math.max(0.15, Math.min(1, vol));
+      const osc = ac.createOscillator(), g = ac.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(340 + rnd()*60, now);
+      osc.frequency.exponentialRampToValueAtTime(150, now + 0.10);
+      osc.frequency.exponentialRampToValueAtTime(210, now + 0.16);
+      g.gain.setValueAtTime(0.001, now);
+      g.gain.exponentialRampToValueAtTime(0.8*m, now + 0.012);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + 0.22);
+      osc.connect(g).connect(ac.destination);
+      osc.start(now); osc.stop(now + 0.24);
 
       const noise = ac.createBufferSource();
       noise.buffer = getNoiseBuffer(ac);
       const filter = ac.createBiquadFilter();
       filter.type = 'bandpass';
-      filter.frequency.setValueAtTime(560 + rnd()*140, now);
-      filter.Q.setValueAtTime(1.5, now);
-      const noiseGain = ac.createGain();
-      noiseGain.gain.setValueAtTime(0.75 * m, now);
-      noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
-      noise.connect(filter).connect(noiseGain).connect(ac.destination);
-      noise.start(now, rnd(0, 0.5)); noise.stop(now + 0.25);
-    } catch (e) { audioWarn('break', e); }
+      filter.frequency.setValueAtTime(700 + rnd()*200, now);
+      filter.Q.setValueAtTime(2.2, now);
+      const ng = ac.createGain();
+      ng.gain.setValueAtTime(0.35*m, now);
+      ng.gain.exponentialRampToValueAtTime(0.0001, now + 0.09);
+      noise.connect(filter).connect(ng).connect(ac.destination);
+      noise.start(now, rnd(0, 2)); noise.stop(now + 0.09);
+    } catch (e) { audioWarn('wood', e); }
   }
-  // Cascading debris — a cluster of randomized, low-pass filtered micro
-  // impacts. Trimmed from the original 12-hit/0.8s pitch to 9 hits/0.6s so
-  // a fast run of collapses (this fires every time gs.debTimer settles)
-  // can't stack more overlapping nodes than the old single-clip version
-  // ever could.
+  // Wood break — the boink at full strength plus a handful of high
+  // "splinter" ticks scattered across the next ~0.25s.
+  function playWoodBreakSFX() {
+    if (AUDIO_STATE.muted) return;
+    if (!synthCooldownOk('break-wood', 120)) return;
+    try {
+      const ac = getAC(); if (!ac) return;
+      const now = ac.currentTime, m = AUDIO_STATE.master;
+      playWoodSFX(1);
+      const snaps = 4 + Math.floor(rnd()*3);
+      for (let i = 0; i < snaps; i++) {
+        const t = now + 0.02 + rnd()*0.22;
+        const o = ac.createOscillator(), g = ac.createGain();
+        o.type = 'square';
+        o.frequency.setValueAtTime(900 + rnd()*700, t);
+        g.gain.setValueAtTime(0.001, t);
+        g.gain.exponentialRampToValueAtTime(0.22*m, t + 0.006);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + 0.05);
+        o.connect(g).connect(ac.destination);
+        o.start(t); o.stop(t + 0.06);
+      }
+    } catch (e) { audioWarn('wood-break', e); }
+  }
+  // Stone — a heavier double "clonk", lower and grittier than wood.
+  function playStoneSFX(vol=1) {
+    if (AUDIO_STATE.muted) return;
+    try {
+      const ac = getAC(); if (!ac) return;
+      const now = ac.currentTime, m = AUDIO_STATE.master * Math.max(0.15, Math.min(1, vol));
+      [0, 0.07].forEach((d, i) => {
+        const t = now + d;
+        const osc = ac.createOscillator(), g = ac.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime((i===0?150:110) + rnd()*20, t);
+        osc.frequency.exponentialRampToValueAtTime(45, t + 0.14);
+        g.gain.setValueAtTime(0.001, t);
+        g.gain.exponentialRampToValueAtTime((i===0?0.95:0.55)*m, t + 0.01);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + 0.18);
+        osc.connect(g).connect(ac.destination);
+        osc.start(t); osc.stop(t + 0.2);
+      });
+      const noise = ac.createBufferSource();
+      noise.buffer = getNoiseBuffer(ac);
+      const filter = ac.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(300 + rnd()*120, now);
+      filter.Q.setValueAtTime(1.1, now);
+      const ng = ac.createGain();
+      ng.gain.setValueAtTime(0.55*m, now);
+      ng.gain.exponentialRampToValueAtTime(0.0001, now + 0.16);
+      noise.connect(filter).connect(ng).connect(ac.destination);
+      noise.start(now, rnd(0, 2)); noise.stop(now + 0.16);
+    } catch (e) { audioWarn('stone', e); }
+  }
+  // Stone break — the double clonk at full strength plus a scatter of
+  // lowpassed gravel bits.
+  function playStoneBreakSFX() {
+    if (AUDIO_STATE.muted) return;
+    if (!synthCooldownOk('break-stone', 130)) return;
+    try {
+      const ac = getAC(); if (!ac) return;
+      const now = ac.currentTime, m = AUDIO_STATE.master;
+      playStoneSFX(1);
+      const bits = 6 + Math.floor(rnd()*4);
+      const buf = getNoiseBuffer(ac);
+      for (let i = 0; i < bits; i++) {
+        const t = now + 0.05 + rnd()*0.35;
+        const noise = ac.createBufferSource();
+        noise.buffer = buf;
+        const filter = ac.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(250 + rnd()*500, t);
+        const g = ac.createGain();
+        g.gain.setValueAtTime(0.28*m, t);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + 0.06);
+        noise.connect(filter).connect(g).connect(ac.destination);
+        noise.start(t, rnd(0, 2)); noise.stop(t + 0.06);
+      }
+    } catch (e) { audioWarn('stone-break', e); }
+  }
+  // Soft — a squishy cartoon "boop", pitch bends up then settles.
+  function playSoftSFX(vol=1) {
+    if (AUDIO_STATE.muted) return;
+    try {
+      const ac = getAC(); if (!ac) return;
+      const now = ac.currentTime, m = AUDIO_STATE.master * Math.max(0.15, Math.min(1, vol));
+      const osc = ac.createOscillator(), g = ac.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(220, now);
+      osc.frequency.exponentialRampToValueAtTime(420, now + 0.05);
+      osc.frequency.exponentialRampToValueAtTime(260, now + 0.16);
+      g.gain.setValueAtTime(0.001, now);
+      g.gain.exponentialRampToValueAtTime(0.6*m, now + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + 0.22);
+      osc.connect(g).connect(ac.destination);
+      osc.start(now); osc.stop(now + 0.24);
+
+      const noise = ac.createBufferSource();
+      noise.buffer = getNoiseBuffer(ac);
+      const filter = ac.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(500, now);
+      const ng = ac.createGain();
+      ng.gain.setValueAtTime(0.25*m, now);
+      ng.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
+      noise.connect(filter).connect(ng).connect(ac.destination);
+      noise.start(now, rnd(0, 2)); noise.stop(now + 0.12);
+    } catch (e) { audioWarn('soft', e); }
+  }
+  // Soft break — the boop at full strength plus a little three-note
+  // descending "poof" of stuffing.
+  function playSoftBreakSFX() {
+    if (AUDIO_STATE.muted) return;
+    if (!synthCooldownOk('break-soft', 120)) return;
+    try {
+      const ac = getAC(); if (!ac) return;
+      const now = ac.currentTime, m = AUDIO_STATE.master;
+      playSoftSFX(1);
+      const puffs = 3;
+      for (let i = 0; i < puffs; i++) {
+        const t = now + 0.05 + i*0.05;
+        const osc = ac.createOscillator(), g = ac.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(500 - i*80, t);
+        g.gain.setValueAtTime(0.001, t);
+        g.gain.exponentialRampToValueAtTime(0.18*m, t + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + 0.12);
+        osc.connect(g).connect(ac.destination);
+        osc.start(t); osc.stop(t + 0.14);
+      }
+    } catch (e) { audioWarn('soft-break', e); }
+  }
+  // Rubble — cascading debris after a block gives way. Bigger and goofier
+  // than the old 9-hit/0.6s version: ~18 pebble impacts over ~1.1s with a
+  // few descending cartoon "boink" bounces mixed into the tail.
   function playRubbleSFX() {
     if (AUDIO_STATE.muted) return;
     if (!synthCooldownOk('rubble', 260)) return;
@@ -350,29 +482,41 @@
       const ac = getAC(); if (!ac) return;
       const buf = getNoiseBuffer(ac);
       const now = ac.currentTime, m = AUDIO_STATE.master;
-      const totalDuration = 0.6, debrisCount = 9;
+      const totalDuration = 1.1, debrisCount = 18;
       for (let i = 0; i < debrisCount; i++) {
-        const delay = rnd() * totalDuration * 0.8;
+        const delay = rnd() * totalDuration * 0.85;
         const time = now + delay;
-        const dur = 0.03 + rnd() * 0.05;
+        const dur = 0.03 + rnd() * 0.06;
         const noise = ac.createBufferSource();
         noise.buffer = buf;
         const filter = ac.createBiquadFilter();
         filter.type = 'lowpass';
-        filter.frequency.setValueAtTime(200 + rnd() * 600, time);
+        filter.frequency.setValueAtTime(180 + rnd()*550, time);
         const gain = ac.createGain();
-        const volume = Math.max(0.0001, (1 - delay/totalDuration) * (0.3 + rnd()*0.4) * 0.5 * m);
+        const volume = Math.max(0.0001, (1 - delay/totalDuration) * (0.28 + rnd()*0.35) * m);
         gain.gain.setValueAtTime(volume, time);
         gain.gain.exponentialRampToValueAtTime(0.0001, time + dur);
         noise.connect(filter).connect(gain).connect(ac.destination);
-        noise.start(time, rnd(0, 0.5)); noise.stop(time + dur);
+        noise.start(time, rnd(0, 2)); noise.stop(time + dur);
+      }
+      const bounces = 3;
+      for (let i = 0; i < bounces; i++) {
+        const t = now + 0.5 + i*0.16 + rnd()*0.08;
+        const o = ac.createOscillator(), g = ac.createGain();
+        o.type = 'triangle';
+        o.frequency.setValueAtTime(500 - i*90, t);
+        o.frequency.exponentialRampToValueAtTime(260 - i*40, t + 0.05);
+        g.gain.setValueAtTime(0.001, t);
+        g.gain.exponentialRampToValueAtTime((0.22 - i*0.05)*m, t + 0.008);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + 0.09);
+        o.connect(g).connect(ac.destination);
+        o.start(t); o.stop(t + 0.1);
       }
     } catch (e) { audioWarn('rubble', e); }
   }
-  // Glass shatter — a high-passed noise transient (the snap) plus a
-  // handful of detuned high sine "tinkles" (the shards). vol scales with
-  // impact speed the same way the old glass.mp3 playback did. No cooldown
-  // of its own — sndHit() already gates all material hits to HIT_COOL.
+  // Glass crack — used per-hit (sndHit). Small highpass transient plus a
+  // few detuned tinkles; vol scales with impact speed. No cooldown of its
+  // own — sndHit() already gates all material hits to HIT_COOL.
   function playGlassSFX(vol=1) {
     if (AUDIO_STATE.muted) return;
     try {
@@ -389,18 +533,177 @@
       noiseGain.gain.setValueAtTime(0.6 * m, now);
       noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.1);
       noise.connect(filter).connect(noiseGain).connect(ac.destination);
-      noise.start(now, rnd(0, 0.5)); noise.stop(now + 0.1);
+      noise.start(now, rnd(0, 2)); noise.stop(now + 0.1);
 
-      [2800, 4200, 5100, 6700, 8300].forEach(freq => {
+      [2800, 4200, 5100].forEach(freq => {
         const osc = ac.createOscillator(), gain = ac.createGain();
-        const offset = rnd(0, 0.04);
+        const offset = rnd(0, 0.03);
         osc.frequency.setValueAtTime(freq + rnd(-200, 200), now + offset);
-        gain.gain.setValueAtTime(0.2 * m, now + offset);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + offset + 0.15 + rnd(0, 0.1));
+        gain.gain.setValueAtTime(0.18 * m, now + offset);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + offset + 0.12 + rnd(0, 0.06));
         osc.connect(gain).connect(ac.destination);
-        osc.start(now + offset); osc.stop(now + offset + 0.26);
+        osc.start(now + offset); osc.stop(now + offset + 0.2);
       });
     } catch (e) { audioWarn('glass', e); }
+  }
+  // Glass shatter — the big destroy-moment crash. A sharper snap transient
+  // plus a scattering cascade of ~16 detuned sine "shards" over ~1.1s,
+  // pitched off a loose chime scale so the cascade reads musically instead
+  // of as pure noise.
+  function playGlassShatterSFX() {
+    if (AUDIO_STATE.muted) return;
+    if (!synthCooldownOk('glass-shatter', 140)) return;
+    try {
+      const ac = getAC(); if (!ac) return;
+      const buf = getNoiseBuffer(ac);
+      const now = ac.currentTime, m = AUDIO_STATE.master;
+
+      const noise = ac.createBufferSource();
+      noise.buffer = buf;
+      const filter = ac.createBiquadFilter();
+      filter.type = 'highpass';
+      filter.frequency.setValueAtTime(3200, now);
+      const noiseGain = ac.createGain();
+      noiseGain.gain.setValueAtTime(0.85 * m, now);
+      noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.14);
+      noise.connect(filter).connect(noiseGain).connect(ac.destination);
+      noise.start(now, rnd(0, 2)); noise.stop(now + 0.14);
+
+      const scale = [2600, 2920, 3280, 3900, 4370, 4900, 5830, 6540, 7790];
+      const shards = 16;
+      for (let i = 0; i < shards; i++) {
+        const t = now + rnd() * 1.1;
+        const freq = scale[Math.floor(rnd() * scale.length)] + rnd(-80, 80);
+        const osc = ac.createOscillator(), gain = ac.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, t);
+        gain.gain.setValueAtTime(0.001, t);
+        gain.gain.exponentialRampToValueAtTime(0.16 * m, t + 0.008);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.18 + rnd(0, 0.12));
+        osc.connect(gain).connect(ac.destination);
+        osc.start(t); osc.stop(t + 0.32);
+      }
+    } catch (e) { audioWarn('glass-shatter', e); }
+  }
+  // Bounce/ground contact — a single cartoon "boing" whose pitch and punch
+  // scale with impact speed, replacing the old flat ground.mp3.
+  function playBounceSFX(speed) {
+    if (AUDIO_STATE.muted) return;
+    if (!synthCooldownOk('bounce', 70)) return;
+    try {
+      const ac = getAC(); if (!ac) return;
+      const now = ac.currentTime, m = AUDIO_STATE.master;
+      const energy = Math.max(0, Math.min(1, speed / 40));
+      const pitch = 600 - energy * 420;
+      const dur = 0.05 + energy * 0.20;
+      const vol = (0.25 + energy * 0.35) * m;
+      const osc = ac.createOscillator(), g = ac.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(pitch * 0.6, now);
+      osc.frequency.exponentialRampToValueAtTime(pitch, now + dur * 0.3);
+      osc.frequency.exponentialRampToValueAtTime(pitch * 0.5, now + dur);
+      g.gain.setValueAtTime(0.001, now);
+      g.gain.exponentialRampToValueAtTime(vol, now + dur * 0.15);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+      osc.connect(g).connect(ac.destination);
+      osc.start(now); osc.stop(now + dur + 0.02);
+    } catch (e) { audioWarn('bounce', e); }
+  }
+  // Launch — a quick rising "stretch" sweep into a puff of release air,
+  // replacing the old fixed launch.mp3.
+  function playLaunchSFX() {
+    if (AUDIO_STATE.muted) return;
+    if (!synthCooldownOk('launch', 120)) return;
+    try {
+      const ac = getAC(); if (!ac) return;
+      const now = ac.currentTime, m = AUDIO_STATE.master;
+      const osc = ac.createOscillator(), g = ac.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(220, now);
+      osc.frequency.exponentialRampToValueAtTime(880, now + 0.09);
+      g.gain.setValueAtTime(0.001, now);
+      g.gain.exponentialRampToValueAtTime(0.45 * m, now + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + 0.11);
+      const lp = ac.createBiquadFilter();
+      lp.type = 'lowpass';
+      lp.frequency.setValueAtTime(2200, now);
+      osc.connect(lp).connect(g).connect(ac.destination);
+      osc.start(now); osc.stop(now + 0.12);
+
+      const noise = ac.createBufferSource();
+      noise.buffer = getNoiseBuffer(ac);
+      const filter = ac.createBiquadFilter();
+      filter.type = 'highpass';
+      filter.frequency.setValueAtTime(1200, now + 0.02);
+      const ng = ac.createGain();
+      ng.gain.setValueAtTime(0.001, now);
+      ng.gain.exponentialRampToValueAtTime(0.3 * m, now + 0.04);
+      ng.gain.exponentialRampToValueAtTime(0.0001, now + 0.16);
+      noise.connect(filter).connect(ng).connect(ac.destination);
+      noise.start(now, rnd(0, 2)); noise.stop(now + 0.16);
+    } catch (e) { audioWarn('launch', e); }
+  }
+  // Rubber-band drone — a live pull-tension hum tracked to the actual drag
+  // gesture (startRubberBandSFX / updateRubberBandSFX / stopRubberBandSFX)
+  // rather than a fixed pre-scripted tension-then-snap, since a real pull
+  // can be any length or duration. snap=true on release plays a quick
+  // upward "twang" before the drone dies; snap=false (paused, cancelled,
+  // muted, snapped back to center) just fades it out.
+  let rubberBandState = null;
+  function startRubberBandSFX() {
+    if (AUDIO_STATE.muted) return;
+    if (rubberBandState) return;
+    try {
+      const ac = getAC(); if (!ac) return;
+      const now = ac.currentTime;
+      const osc = ac.createOscillator(), g = ac.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(140, now);
+      g.gain.setValueAtTime(0.0001, now);
+      g.gain.exponentialRampToValueAtTime(0.14 * AUDIO_STATE.master, now + 0.05);
+      const lp = ac.createBiquadFilter();
+      lp.type = 'lowpass';
+      lp.frequency.setValueAtTime(500, now);
+      osc.connect(lp).connect(g).connect(ac.destination);
+      osc.start(now);
+      rubberBandState = { ac, osc, gain: g, filter: lp };
+    } catch (e) { audioWarn('rubberband-start', e); }
+  }
+  function updateRubberBandSFX(pullFrac) {
+    if (!rubberBandState) return;
+    try {
+      const { ac, osc, gain, filter } = rubberBandState;
+      const f = Math.max(0, Math.min(1, pullFrac));
+      const now = ac.currentTime;
+      osc.frequency.linearRampToValueAtTime(140 + f * 260, now + 0.03);
+      filter.frequency.linearRampToValueAtTime(500 + f * 2200, now + 0.03);
+      gain.gain.linearRampToValueAtTime((0.14 + f * 0.16) * AUDIO_STATE.master, now + 0.03);
+    } catch (e) {}
+  }
+  function stopRubberBandSFX(snap) {
+    if (!rubberBandState) return;
+    const { ac, osc, gain } = rubberBandState;
+    rubberBandState = null;
+    try {
+      const now = ac.currentTime;
+      if (snap && !AUDIO_STATE.muted) {
+        const curFreq = osc.frequency.value, curGain = gain.gain.value;
+        osc.frequency.cancelScheduledValues(now);
+        osc.frequency.setValueAtTime(curFreq, now);
+        osc.frequency.exponentialRampToValueAtTime(Math.max(60, curFreq * 2.2), now + 0.05);
+        gain.gain.cancelScheduledValues(now);
+        gain.gain.setValueAtTime(curGain, now);
+        gain.gain.exponentialRampToValueAtTime(0.35 * AUDIO_STATE.master, now + 0.04);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.22);
+        osc.stop(now + 0.24);
+      } else {
+        const curGain = gain.gain.value;
+        gain.gain.cancelScheduledValues(now);
+        gain.gain.setValueAtTime(curGain, now);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.08);
+        osc.stop(now + 0.1);
+      }
+    } catch (e) { audioWarn('rubberband-stop', e); }
   }
 
   function preloadAudio() {
@@ -423,6 +726,7 @@
       AUDIO_STATE.activeBufferSFX.forEach(v => { try { v.node.stop(); } catch(e) {} });
       AUDIO_STATE.activeBufferSFX=[];
       AUDIO_STATE.lastPlayed.clear();
+      stopRubberBandSFX(false);
     }
     try { window.localStorage?.setItem(AUDIO_PREF_KEY, AUDIO_STATE.muted ? '1' : '0'); }
     catch (e) {}
@@ -1148,9 +1452,9 @@
   }
 
   // ── Audio helpers ────────────────────────────────────
-  function sndPull()   { if (gs.pullPlayed) return; gs.pullPlayed = true; playBufferSFX('pull', 0.5, 0.98+rnd()*0.06, 'pull', 90, 1); }
+  function sndPull()   { if (gs.pullPlayed) return; gs.pullPlayed = true; startRubberBandSFX(); }
   function sndLaunch() {
-    playBufferSFX('launch', 0.88, 0.98+rnd()*0.06, 'launch', 120, 2);
+    playLaunchSFX();
     const r = ROSTER[bst.sel];
     if (!r) return;
     const playVoice = () => playBuffer(r.id, 0.85);
@@ -1162,17 +1466,20 @@
     gs.lastHit = now;
     const volMult = gs.booha?.power === 'monster' ? Math.min(2, 1 + gs.bounces * 0.15) : 1;
     const vol = Math.max(0.2, Math.min(1, spd/14)) * volMult;
-    if (mat === 'glass') {
-      playGlassSFX(vol);
-    } else {
-      const key = mat==='stone'?'stone' : mat==='soft'?'soft' : 'wood';
-      playBufferSFX(key, vol, 0.92+rnd()*0.18, 'hit', HIT_COOL, 1);
-    }
+    if (mat === 'glass') playGlassSFX(vol);
+    else if (mat === 'stone') playStoneSFX(vol);
+    else if (mat === 'soft') playSoftSFX(vol);
+    else playWoodSFX(vol);
     gs.flash = Math.max(gs.flash, spd > 12 ? 0.72 : 0.42);
   }
-  function sndBreak() { playBreakSFX(); }
+  function sndBreak(mat) {
+    if (mat === 'glass') playGlassShatterSFX();
+    else if (mat === 'stone') playStoneBreakSFX();
+    else if (mat === 'soft') playSoftBreakSFX();
+    else playWoodBreakSFX();
+  }
   function sndRub()   { playRubbleSFX(); }
-  function sndGnd(s)  { if (s < 12) return; playBufferSFX('ground', Math.min(0.72, s/28), 0.96+rnd()*0.08, 'ground', 170, 1); }
+  function sndGnd(s)  { if (s < 12) return; playBounceSFX(s); }
   function sndWin()   { playBufferSFX('win',  1, 1, 'win', 300, 3); }
   function sndFail()  { playBufferSFX('fail', 0.85, 1, 'fail', 300, 3); }
   function sndUnlock() {
@@ -1911,7 +2218,7 @@ function traitGlowColor(block) {
     sparks.length=0; waves.length=0; impactBursts.length=0; dusts.length=0; confetti.length=0;
     powers.length=0; scorchMarks.length=0;
     CRACKS.clear(); shake.v=0;
-    gs.dragging=false; gs.pullPlayed=false; gs.bestShot=0; gs.pct=0; gs.brokenBlocks=0; gs.goalReached=false;
+    gs.dragging=false; gs.pullPlayed=false; stopRubberBandSFX(false); gs.bestShot=0; gs.pct=0; gs.brokenBlocks=0; gs.goalReached=false;
     gs.roundScore=0;
     gs.roundMultiplier=1; gs.roundShotBonus=0; gs.roundDestructionScore=0;
     gs.shotsUsed=0; gs.collapseCount=0; gs.powerUsed=new Set();
@@ -2151,7 +2458,7 @@ function traitGlowColor(block) {
       }
       gs.hitStop=Math.max(gs.hitStop, spd>12 ? 5 : 3);
       addShake(Math.min(10, spd*0.6+4));
-      if (doSFX) sndBreak();
+      if (doSFX) sndBreak(mat);
       gs.debTimer=18;
       markIndexDirty();
       checkSupport();
@@ -2730,6 +3037,7 @@ function traitGlowColor(block) {
     if (gs.phase !== P.PLAY) return;
     pauseOpen = true;
     gs.dragging = false; gs.pullPlayed = false;
+    stopRubberBandSFX(false);
     needsRender = true;
   }
   function closePause() {
@@ -2820,14 +3128,16 @@ function traitGlowColor(block) {
     const dx=p.x-SLING_X,dy=p.y-SLING_Y,d=Math.min(MAX_PULL,Math.hypot(dx,dy)),a=Math.atan2(dy,dx);
     gs.booha.x=SLING_X+Math.cos(a)*d;
     gs.booha.y=Math.min(SLING_Y+Math.sin(a)*d,FLOOR_Y-gs.booha.radius-4);
+    updateRubberBandSFX(d/MAX_PULL);
     evt.preventDefault();
   }
   function onUp(evt){
     if(!gs.dragging)return;
     gs.dragging=false;gs.pullPlayed=false;
-    if(!gs.booha||gs.booha.launched||gs.shotLock)return;
+    if(!gs.booha||gs.booha.launched||gs.shotLock){stopRubberBandSFX(false);return;}
     const dx=SLING_X-gs.booha.x,dy=SLING_Y-gs.booha.y,mag=Math.hypot(dx,dy);
-    if(mag<12){gs.booha.x=SLING_X;gs.booha.y=SLING_Y;return;}
+    if(mag<12){gs.booha.x=SLING_X;gs.booha.y=SLING_Y;stopRubberBandSFX(false);return;}
+    stopRubberBandSFX(true);
     bst.stocks[bst.sel]=Math.max(0,bst.stocks[bst.sel]-1);
     gs.shotsUsed++;
     gs.powerUsed.add(gs.booha.power);

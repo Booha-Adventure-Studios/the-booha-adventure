@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 
-// Pass 26E: Muenba danger audio is a staggered procedural WebAudio layer,
+// Pass 26F: Muenba danger audio is a staggered procedural WebAudio layer,
 // not a shared looping scream sample restarted by each hostile ghost.
 const assert = require('assert');
 const fs = require('fs');
@@ -17,7 +17,12 @@ assert(sfx.includes('function stopDangerScream()'), 'shared SFX must expose a da
 assert(sfx.includes('function scheduleDangerScreamPulse()'), 'danger screams must be scheduled in staggered pulses');
 assert(sfx.includes('dangerScreamActive'), 'danger audio must have an explicit active state');
 assert(sfx.includes('dangerScreamVoices'), 'danger audio must track active voices for cleanup');
-assert(sfx.includes('DANGER_SCREAM_PRESETS'), 'danger audio must rotate through multiple procedural presets');
+assert(sfx.includes('function addDangerNoise('), 'danger audio must add generated texture to abrasive voices');
+assert(sfx.includes('getDangerNoiseBuffer'), 'danger audio must reuse generated noise efficiently');
+assert(!sfx.includes("preset === 'spectral'"), 'danger audio must not retain an unreachable legacy profile');
+assert(!sfx.includes("preset === 'poltergeist'"), 'danger audio must not retain an unreachable legacy profile');
+assert(sfx.includes("'banshee', 'psycho', 'beast', 'burst'"), 'danger audio must include the high-register scream presets');
+assert(sfx.includes("'demonic', 'parasite', 'wail', 'rasp'"), 'danger audio must include the low, spectral, and rasp scream presets');
 assert(sfx.includes('window.setTimeout(scheduleDangerScreamPulse'), 'danger audio must schedule the next scream after each pulse');
 assert(sfx.includes('dangerScreamVoices.forEach'), 'danger audio must stop every active voice when danger ends');
 assert(sfx.includes('startDangerScream: startDangerScream'), 'shared SFX must publish the danger-scream start function');
@@ -27,4 +32,4 @@ assert(muenba.includes('window.UtsuSfx && window.UtsuSfx.stopDangerScream'), 'Mu
 assert(!muenba.includes('scream.mp3'), 'Muenba must not load the retired scream sample');
 assert(!fs.existsSync(path.join(audioDir, 'scream.mp3')), 'retired scream sample must be absent');
 
-console.log('Muenba 26E danger-audio audit passed: staggered procedural scream presets start once, rotate, and clean up safely.');
+console.log('Muenba 26F danger-audio audit passed: textured scream presets start once, rotate, and clean up safely.');
