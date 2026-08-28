@@ -285,7 +285,7 @@ window.BoohaDailyCheck = (function () {
     .dc-root{position:fixed;inset:0;z-index:10000;display:flex;flex-direction:column;
       align-items:center;justify-content:flex-start;padding:calc(18px + var(--safe-top,0px)) 18px
       calc(18px + var(--safe-bottom,0px));background:var(--bg,#000)
-      url('assets/img/background-1.png') center/cover no-repeat;color:var(--text,#fff);
+      url('assets/img/background-1.webp') center/cover no-repeat;color:var(--text,#fff);
       font-family:inherit;text-align:center;overflow-x:hidden;overflow-y:auto;
       -webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;
       -webkit-tap-highlight-color:transparent;}
@@ -457,7 +457,7 @@ window.BoohaDailyCheck = (function () {
     }
     function ghost() {
       const g = document.createElement('img');
-      g.className = 'dc-ghost'; g.src = 'assets/img/booha_ghost.png'; g.alt = 'Booha';
+      g.className = 'dc-ghost'; g.src = 'assets/img/booha_ghost.webp'; g.alt = 'Booha';
       return g;
     }
 

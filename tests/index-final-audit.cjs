@@ -24,14 +24,12 @@ const imageNames = [
 
 imageNames.forEach((name) => {
   const webpPath = path.join(root, 'assets', 'img', `${name}.webp`);
-  const pngPath = path.join(root, 'assets', 'img', `${name}.png`);
   const webp = fs.readFileSync(webpPath);
-  const png = fs.readFileSync(pngPath);
 
   assert(webp.length > 12, `${name}.webp must not be empty`);
   assert(webp.subarray(0, 4).toString('ascii') === 'RIFF', `${name}.webp must have a RIFF header`);
   assert(webp.subarray(8, 12).toString('ascii') === 'WEBP', `${name}.webp must have a WEBP signature`);
-  assert(webp.length < png.length, `${name}.webp should be smaller than its PNG source`);
+  assert(!fs.existsSync(path.join(root, 'assets', 'img', `${name}.png`)), `${name}.png should be absent after the shared migration`);
 });
 
 // Critical Booha art is available immediately; curriculum picker art is

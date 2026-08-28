@@ -2,8 +2,8 @@
 'use strict';
 
 // Pass 22A + 22B: index image references use the generated WebP siblings,
-// originals remain available to shared pages, and the service worker places
-// the new assets in the cache that actually serves static assets.
+// shared pages also use the WebP siblings, and the service worker places the
+// new assets in the cache that actually serves static assets.
 const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
@@ -23,7 +23,7 @@ const expected = [
 expected.forEach((name) => {
   assert(index.includes(`assets/img/${name}.webp`), `index must reference ${name}.webp`);
   assert(fs.existsSync(path.join(root, 'assets', 'img', `${name}.webp`)), `${name}.webp must exist`);
-  assert(fs.existsSync(path.join(root, 'assets', 'img', `${name}.png`)), `${name}.png must remain for shared-page compatibility`);
+  assert(!fs.existsSync(path.join(root, 'assets', 'img', `${name}.png`)), `${name}.png should be removed after the shared migration`);
   assert(sw.includes(`assets/img/${name}.webp`), `service worker must precache ${name}.webp`);
 });
 
@@ -37,4 +37,4 @@ assert(!index.includes('assets/img/cont-tree.png'), 'index Boo-continuum referen
 assert(sw.includes('const CORE_ASSETS = ['), 'service worker needs a static asset precache list');
 assert(sw.includes('cache.addAll(CORE_ASSETS)'), 'static asset precache must target the asset cache');
 
-console.log('Index 22A+22B performance audit passed: six WebP references, preserved PNG siblings, and correct asset precaching.');
+console.log('Index 22A+22B performance audit passed: six WebP references, removed PNG sources, and correct asset precaching.');

@@ -4015,7 +4015,7 @@ const HAPPY_HOUSE_PORTAL = {
   
 
   let pins = [], trail = [], ripples = [];
-  const ghostImg = new Image(); ghostImg.src = "assets/img/booha_ghost.png";
+  const ghostImg = new Image(); ghostImg.src = "assets/img/booha_ghost.webp";
   const memoryBoxImg = new Image(); memoryBoxImg.src = 'assets/img/memory_box.png';
   const observerImg = new Image();
   observerImg.src = 'assets/img/karasuki/observer-1.png';
