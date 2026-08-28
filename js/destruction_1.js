@@ -177,7 +177,7 @@
   const AUDIO_STATE = {
     muted:false, warned:new Set(), ready:false,
     master:0.82, maxVoices:4, activeVoices:0,
-    lastPlayed:new Map(), activeSFX:[]
+    lastPlayed:new Map(), activeBufferSFX:[]
   };
 
   function audioWarn(key, error) {
@@ -235,42 +235,37 @@
       src.onended = () => { AUDIO_STATE.activeVoices=Math.max(0,AUDIO_STATE.activeVoices-1); };
     } catch(e) {}
   }
-  const SFX_POOL_SIZE = 5;
-  const sfxPool = {};
-  function getSFXNode(src) {
-    if (!sfxPool[src]) sfxPool[src] = Array.from({length: SFX_POOL_SIZE}, () => {
-      const audio = new Audio(src);
-      audio.preload = 'auto';
-      audio.onerror = () => audioWarn(src, audio.error || 'file load failed');
-      return audio;
-    });
-    const pool = sfxPool[src];
-    const free = pool.find(a => a.ended || (a.paused && a.currentTime === 0));
-    if (free) return free;
-    pool.sort((a, b) => b.currentTime - a.currentTime);
-    const oldest = pool[0]; oldest.pause(); oldest.currentTime = 0; return oldest;
-  }
-  function playSFX(src, vol=1, rate=1, channel=src, cooldownMs=0, priority=0) {
-    if (!src || AUDIO_STATE.muted) return;
-    const now=performance.now();
-    const last=AUDIO_STATE.lastPlayed.get(channel)||0;
-    if (cooldownMs && now-last<cooldownMs) return;
-    AUDIO_STATE.lastPlayed.set(channel,now);
-    AUDIO_STATE.activeSFX=AUDIO_STATE.activeSFX.filter(a=>!a.paused&&!a.ended);
-    if (AUDIO_STATE.activeSFX.length>=AUDIO_STATE.maxVoices) {
-      if (priority<2) return;
-      const oldest=AUDIO_STATE.activeSFX.shift();
-      try { oldest.pause(); oldest.currentTime=0; } catch(e) {}
+  // Material/UI sound effects — decoded AudioBuffers played through the
+  // same WebAudio graph as the character voice lines below, instead of a
+  // pool of <audio> elements. Keeps the cooldown/priority/voice-stealing
+  // behavior the old Audio-pool version had, on its own voice budget
+  // (separate from playBuffer's, so a flurry of hit sounds can't crowd
+  // out a character's launch line or a celebration pop).
+  function playBufferSFX(key, vol=1, rate=1, channel=key, cooldownMs=0, priority=0) {
+    if (!key || AUDIO_STATE.muted) return;
+    const buf = audioBuffers[key]; if (!buf) return;
+    const now = performance.now();
+    const last = AUDIO_STATE.lastPlayed.get(channel) || 0;
+    if (cooldownMs && now - last < cooldownMs) return;
+    AUDIO_STATE.lastPlayed.set(channel, now);
+    AUDIO_STATE.activeBufferSFX = AUDIO_STATE.activeBufferSFX.filter(v => !v.ended);
+    if (AUDIO_STATE.activeBufferSFX.length >= AUDIO_STATE.maxVoices) {
+      if (priority < 2) return;
+      const oldest = AUDIO_STATE.activeBufferSFX.shift();
+      try { oldest.node.stop(); } catch(e) {}
     }
     try {
-      const a = getSFXNode(src);
-      a.preload = 'auto';
-      a.volume = Math.max(0, Math.min(1, vol * AUDIO_STATE.master));
-      a.playbackRate = rate; a.currentTime = 0;
-      const play = a.play();
-      AUDIO_STATE.activeSFX.push(a);
-      if (play?.catch) play.catch(e => audioWarn(src, e));
-    } catch(e) { audioWarn(src, e); }
+      const ac = getAC(); if (!ac) return;
+      const src = ac.createBufferSource(), gain = ac.createGain();
+      src.buffer = buf;
+      src.playbackRate.value = rate;
+      gain.gain.value = Math.max(0, Math.min(1, vol * AUDIO_STATE.master));
+      src.connect(gain); gain.connect(ac.destination);
+      const voice = { node: src, ended: false };
+      src.onended = () => { voice.ended = true; };
+      src.start();
+      AUDIO_STATE.activeBufferSFX.push(voice);
+    } catch(e) { audioWarn(key, e); }
   }
   function synthPop(freq=500, vol=0.3, dur=0.08) {
     try {
@@ -290,13 +285,11 @@
   }
 
   function preloadAudio() {
-    const sources = Object.values(AUDIO).filter(Boolean);
-    sources.forEach(src => {
-      try {
-        const audio = new Audio(src);
-        audio.preload = 'auto';
-        audio.load?.();
-      } catch (e) { audioWarn(src, e); }
+    // Decode every material/UI sound into an AudioBuffer up front (same
+    // loadBuffer() the character voices use) so the very first hit of a
+    // round doesn't have to wait on a fetch+decode mid-collision.
+    Object.entries(AUDIO).forEach(([key, src]) => {
+      if (src) loadBuffer(key, src);
     });
   }
 
@@ -308,8 +301,8 @@
   function toggleMute() {
     AUDIO_STATE.muted = !AUDIO_STATE.muted;
     if (AUDIO_STATE.muted) {
-      AUDIO_STATE.activeSFX.forEach(a => { try { a.pause(); a.currentTime=0; } catch(e) {} });
-      AUDIO_STATE.activeSFX=[];
+      AUDIO_STATE.activeBufferSFX.forEach(v => { try { v.node.stop(); } catch(e) {} });
+      AUDIO_STATE.activeBufferSFX=[];
       AUDIO_STATE.lastPlayed.clear();
     }
     try { window.localStorage?.setItem(AUDIO_PREF_KEY, AUDIO_STATE.muted ? '1' : '0'); }
@@ -323,80 +316,80 @@
   // ── Booha roster ────────────────────────────────────
   const ROSTER = [
     { id:'booha', name:'Yellow Booha', jpName:'イエローブーハー',
-      img:'./assets/destruction/optimized/booha_helmet_512.png',
-      thumb:'./assets/destruction/optimized/booha_helmet_256.png',
+      img:'./assets/destruction/optimized/booha_helmet_512.webp',
+      thumb:'./assets/destruction/optimized/booha_helmet_256.webp',
       sfx:'./assets/destruction/boo-boo.mp3', stock:5, power:'normal',
       desc:'Classic. Reliable. Friendly.',
       jp:'ベーシックであんていしたブーハーです。',
       tip:'Aim for the middle of tall stacks — the ricochet does the work.',
       conf:{cols:['#fff','#ffe','#ddf','#fdd','#dfd','#ffd'],sh:['circle','star','sparkle'],sz:[4,10],burst:65,spin:true}},
     { id:'heavy', name:'Heavy Booha', jpName:'ヘビーブーハー',
-      img:'./assets/destruction/optimized/heavy_booha_512.png',
-      thumb:'./assets/destruction/optimized/heavy_booha_256.png',
+      img:'./assets/destruction/optimized/heavy_booha_512.webp',
+      thumb:'./assets/destruction/optimized/heavy_booha_256.webp',
       sfx:'./assets/destruction/boo-heavy.mp3', stock:3, power:'heavy',
       desc:'2× damage. Craters on landing.',
       jp:'とても強く、かたいブロックをこわします。',
       tip:'Drop it from high up — vertical hits compress blocks hardest.',
       conf:{cols:['#f60','#f90','#fc0','#f40','#fa0','#c30'],sh:['chunk','rect','circle'],sz:[7,18],burst:90,spin:false}},
     { id:'rock', name:'Rock Booha', jpName:'ロックブーハー',
-      img:'./assets/destruction/optimized/rock_booha_512.png',
-      thumb:'./assets/destruction/optimized/rock_booha_256.png',
+      img:'./assets/destruction/optimized/rock_booha_512.webp',
+      thumb:'./assets/destruction/optimized/rock_booha_256.webp',
       sfx:'./assets/destruction/boo-rock.mp3', stock:2, power:'rock',
       desc:'Pierces one block. Keeps going.',
       jp:'ブロックをつきぬけて、さらに進みます。',
       tip:'Angle through multiple blocks in a line for chain damage.',
       conf:{cols:['#9ab','#cde','#678','#e0e','#456','#abc'],sh:['shard','rect','crystal'],sz:[5,13],burst:58,spin:true}},
     { id:'ice', name:'Ice Booha', jpName:'アイスブーハー',
-      img:'./assets/destruction/optimized/ice_booha_512.png',
-      thumb:'./assets/destruction/optimized/ice_booha_256.png',
+      img:'./assets/destruction/optimized/ice_booha_512.webp',
+      thumb:'./assets/destruction/optimized/ice_booha_256.webp',
       sfx:'./assets/destruction/boo-ice.mp3', stock:2, power:'ice',
       desc:'Freezes blocks. They shatter.',
       jp:'ブロックをこおらせます。こおったブロックはこわれやすいです。',
       tip:'Freeze a structural base block — when it shatters, everything above falls.',
       conf:{cols:['#aef','#dff','#8df','#fff','#bcf','#6df'],sh:['crystal','sparkle','star'],sz:[4,12],burst:80,spin:true}},
     { id:'fire', name:'Fire Booha', jpName:'ファイアブーハー',
-      img:'./assets/destruction/optimized/fire_booha_512.png',
-      thumb:'./assets/destruction/optimized/fire_booha_256.png',
+      img:'./assets/destruction/optimized/fire_booha_512.webp',
+      thumb:'./assets/destruction/optimized/fire_booha_256.webp',
       sfx:'./assets/destruction/boo-fire.mp3', stock:2, power:'fire',
       desc:'Burns nearby blocks over time.',
       jp:'まわりのブロックをだんだんもやします。',
       tip:'Hit a central block — the burn spreads to everything within range.',
       conf:{cols:['#f22','#f70','#fa0','#fe0','#f50','#f33'],sh:['flame','circle','sparkle'],sz:[5,14],burst:105,spin:false}},
     { id:'princess', name:'Princess Booha', jpName:'プリンセスブーハー',
-      img:'./assets/destruction/optimized/princess_booha_512.png',
-      thumb:'./assets/destruction/optimized/princess_booha_256.png',
+      img:'./assets/destruction/optimized/princess_booha_512.webp',
+      thumb:'./assets/destruction/optimized/princess_booha_256.webp',
       sfx:'./assets/destruction/boo-princess.mp3', stock:1, power:'princess',
       desc:'Light & bouncy. Spawns 3 minis on first hit!',
       jp:'あたると、ちいさいブーハーに３つに分かれます。',
       tip:'The minis scatter unpredictably — hit a dense cluster for max chaos.',
       conf:{cols:['#f8c','#fae','#c4a','#fde','#fff','#fbd'],sh:['heart','star','sparkle','circle'],sz:[4,11],burst:125,spin:true}},
     { id:'rainbow', name:'Rainbow Booha', jpName:'レインボーブーハー',
-      img:'./assets/destruction/optimized/rainbow_booha_512.png',
-      thumb:'./assets/destruction/optimized/rainbow_booha_256.png',
+      img:'./assets/destruction/optimized/rainbow_booha_512.webp',
+      thumb:'./assets/destruction/optimized/rainbow_booha_256.webp',
       sfx:'./assets/destruction/boo-rainbow.mp3', stock:1, power:'rainbow',
       desc:'Turns blocks to glass. Shimmer trail.',
       jp:'ブロックをガラスに変えます。',
       tip:'Glass breaks with one hit — convert a whole wall, then finish it off.',
       conf:{cols:['#f06','#f80','#ff0','#0f6','#08f','#80f','#f0f'],sh:['sparkle','star','crystal'],sz:[5,13],burst:130,spin:true}},
     { id:'nightmare', name:'Nightmare Booha', jpName:'ナイトメアブーハー',
-      img:'./assets/destruction/optimized/nightmare_booha_512.png',
-      thumb:'./assets/destruction/optimized/nightmare_booha_256.png',
+      img:'./assets/destruction/optimized/nightmare_booha_512.webp',
+      thumb:'./assets/destruction/optimized/nightmare_booha_256.webp',
       sfx:'./assets/destruction/boo-nightmare.mp3', stock:1, power:'nightmare',
       desc:'Teleports behind the target!',
       jp:'ブロックのうしろにテレポートします。',
       tip:'Works best when blocks are clustered — it warps to the nearest surviving block.',
       conf:{cols:['#508','#80c','#b0f','#d4f','#304','#f0f'],sh:['shard','star','sparkle'],sz:[4,13],burst:88,spin:true}},
     { id:'monster', name:'Monster Booha', jpName:'モンスターブーハー',
-      img:'./assets/destruction/optimized/monster_booha_512.png',
-      thumb:'./assets/destruction/optimized/monster_booha_256.png',
+      img:'./assets/destruction/optimized/monster_booha_512.webp',
+      thumb:'./assets/destruction/optimized/monster_booha_256.webp',
       sfx:'./assets/destruction/boo-monster.mp3', stock:1, power:'monster',
       desc:'Grows with every bounce. HUGE settle.',
       jp:'はねるたびに大きくなります。',
       tip:'Let it bounce off the floor a few times before it hits the blocks.',
       conf:{cols:['#0c4','#4f8','#cf0','#0f6','#3a0','#8f0'],sh:['chunk','circle','sparkle'],sz:[6,16],burst:95,spin:false}},
     { id:'ultimate', name:'Ultimate Booha', jpName:'アルティメットブーハー',
-      img:'./assets/destruction/optimized/ultimate_booha_512.png',
-      thumb:'./assets/destruction/optimized/ultimate_booha_256.png',
+      img:'./assets/destruction/optimized/ultimate_booha_512.webp',
+      thumb:'./assets/destruction/optimized/ultimate_booha_256.webp',
       sfx:'./assets/destruction/boo-ultimate.mp3', stock:1, power:'ultimate',
       desc:'On settle — EVERYTHING in range explodes!',
       jp:'ばくはつして、まわりをすべてこわします。',
@@ -973,9 +966,9 @@
   }
 
   // ── Audio helpers ────────────────────────────────────
-  function sndPull()   { if (gs.pullPlayed) return; gs.pullPlayed = true; playSFX(AUDIO.pull, 0.5, 0.98+rnd()*0.06, 'pull', 90, 1); }
+  function sndPull()   { if (gs.pullPlayed) return; gs.pullPlayed = true; playBufferSFX('pull', 0.5, 0.98+rnd()*0.06, 'pull', 90, 1); }
   function sndLaunch() {
-    playSFX(AUDIO.launch, 0.88, 0.98+rnd()*0.06, 'launch', 120, 2);
+    playBufferSFX('launch', 0.88, 0.98+rnd()*0.06, 'launch', 120, 2);
     const r = ROSTER[bst.sel];
     if (!r) return;
     const playVoice = () => playBuffer(r.id, 0.85);
@@ -985,16 +978,16 @@
   function sndHit(mat, spd) {
     const now = performance.now(); if (now - gs.lastHit < HIT_COOL) return;
     gs.lastHit = now;
-    const src = mat==='stone'?AUDIO.stone : mat==='glass'?AUDIO.glass : mat==='soft'?AUDIO.soft : AUDIO.wood;
+    const key = mat==='stone'?'stone' : mat==='glass'?'glass' : mat==='soft'?'soft' : 'wood';
     const volMult = gs.booha?.power === 'monster' ? Math.min(2, 1 + gs.bounces * 0.15) : 1;
-    playSFX(src, Math.max(0.2, Math.min(1, spd/14)) * volMult, 0.92+rnd()*0.18, 'hit', HIT_COOL, 1);
+    playBufferSFX(key, Math.max(0.2, Math.min(1, spd/14)) * volMult, 0.92+rnd()*0.18, 'hit', HIT_COOL, 1);
     gs.flash = Math.max(gs.flash, spd > 12 ? 0.72 : 0.42);
   }
-  function sndBreak() { playSFX(AUDIO.break, 0.95, 0.94+rnd()*0.08, 'break', 110, 2); }
-  function sndRub()   { playSFX(AUDIO.rubble, 0.48, 0.98+rnd()*0.08, 'rubble', 260, 1); }
-  function sndGnd(s)  { if (s < 12) return; playSFX(AUDIO.ground, Math.min(0.72, s/28), 0.96+rnd()*0.08, 'ground', 170, 1); }
-  function sndWin()   { playSFX(AUDIO.win,  1, 1, 'win', 300, 3); }
-  function sndFail()  { playSFX(AUDIO.fail, 0.85, 1, 'fail', 300, 3); }
+  function sndBreak() { playBufferSFX('break', 0.95, 0.94+rnd()*0.08, 'break', 110, 2); }
+  function sndRub()   { playBufferSFX('rubble', 0.48, 0.98+rnd()*0.08, 'rubble', 260, 1); }
+  function sndGnd(s)  { if (s < 12) return; playBufferSFX('ground', Math.min(0.72, s/28), 0.96+rnd()*0.08, 'ground', 170, 1); }
+  function sndWin()   { playBufferSFX('win',  1, 1, 'win', 300, 3); }
+  function sndFail()  { playBufferSFX('fail', 0.85, 1, 'fail', 300, 3); }
   function sndUnlock() {
     [0, 120, 250].forEach((delay, index) => {
       setTimeout(() => synthPop(520 + index * 160, 0.25, 0.1), delay);

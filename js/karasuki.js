@@ -3152,7 +3152,7 @@ const HAPPY_HOUSE_PORTAL = {
   };
 
   const BONUS_POP_IMAGES = {
-    booha_destruction: { src: 'assets/destruction/optimized/booha_helmet_256.png', alt: 'Booha helmet' },
+    booha_destruction: { src: 'assets/destruction/optimized/booha_helmet_256.webp', alt: 'Booha helmet' },
     feed_booha:        { src: 'assets/feed/boo-eat.png',                       alt: 'Booha eating' },
     booha_invaders:    { src: 'assets/invaders/bug-1.webp',                     alt: 'Booha invader' },
     booha_blocks:      { src: 'assets/blocks/red_block.png',                   alt: 'Red block' },
