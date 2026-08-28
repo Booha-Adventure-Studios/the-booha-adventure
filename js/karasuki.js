@@ -2686,8 +2686,10 @@ const HAPPY_HOUSE_PORTAL = {
     return filename ? `${WANDERER_IMG_BASE}${filename}` : '';
   }
 
-  // Pass 20C: returning wanderers use a shared welcome-back palette so the
-  // return moment is visually distinct from a first-discovery celebration.
+  // Pass 24F: discovery celebrations use a shared gold palette so a new
+  // Wanderer reads as a reward, while returning Wanderers retain cool blue.
+  const WANDERER_DISCOVERY_ACCENT = '#facc15';
+  const WANDERER_DISCOVERY_GLOW   = 'rgba(250,204,21,.58)';
   const WANDERER_RETURN_ACCENT = '#7dd3fc';
   const WANDERER_RETURN_GLOW   = 'rgba(125,211,252,.46)';
 
@@ -2711,8 +2713,9 @@ const HAPPY_HOUSE_PORTAL = {
       translationHTML: translation,
       portraitSrc: wandererCelebrationPortrait(w),
       portraitAlt: `${w.name} wanderer`,
-      accent: w.color,
-      glow: wandererCelebrationGlow(w.color),
+      accent: WANDERER_DISCOVERY_ACCENT,
+      glow: WANDERER_DISCOVERY_GLOW,
+      discovery: true,
       actionLabel: 'Meet this wanderer',
       actionSubHTML: '<ruby>旅人<rt>たびびと</rt></ruby>に<ruby>会<rt>あ</rt></ruby>おう',
       copyOverlay: true,
