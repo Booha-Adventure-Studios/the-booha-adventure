@@ -48,6 +48,7 @@ const CURRENT_CACHES = {
   // Muenba 27A adds state-aware phone orientation handling to js/muenba.js.
   // Muenba 27B keeps popup focus and layout cycles anchored at the first line.
   // Muenba 27D gives the active rhythm stage an explicit portrait surface.
+  // Muenba 27E requests landscape again before exploration resumes.
   // Destruction goofy-SFX v3: modal-synthesis rewrite of the pull/creak,
   // block hit/break, and bounce sounds (static-partial materials vs.
   // pitch-bending gesture sounds), based on a reference implementation
@@ -60,7 +61,7 @@ const CURRENT_CACHES = {
   // four materials, opened up soft/rubber's muffled lowpass so it's
   // finally audible, louder break/shatter debris on every material,
   // and roughly doubled every death-explosion sound.
-  assets: 'booha-assets-2026-407',
+  assets: 'booha-assets-2026-408',
   decks:  'booha-decks-2026-310',
 };
 
