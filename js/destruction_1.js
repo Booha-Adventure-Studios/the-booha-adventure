@@ -284,6 +284,125 @@
     } catch(e) {}
   }
 
+  // ── Procedural material SFX ─────────────────────────────
+  // break / rubble / glass used to be mp3s played through playBufferSFX.
+  // They're the three biggest audio files in the game for what are short
+  // impact stings, and none of them need to be recordings — noise bursts
+  // and detuned oscillators sell "stone crunch" / "debris scatter" /
+  // "glass shard" better than a single static clip looping anyway, and it
+  // means every hit sounds a little different instead of identical.
+  let noiseBuffer = null;
+  function getNoiseBuffer(ac) {
+    if (noiseBuffer) return noiseBuffer;
+    const len = Math.floor(ac.sampleRate * 1);
+    noiseBuffer = ac.createBuffer(1, len, ac.sampleRate);
+    const data = noiseBuffer.getChannelData(0);
+    for (let i = 0; i < len; i++) data[i] = Math.random() * 2 - 1;
+    return noiseBuffer;
+  }
+  function synthCooldownOk(channel, cooldownMs) {
+    const now = performance.now();
+    const last = AUDIO_STATE.lastPlayed.get(channel) || 0;
+    if (cooldownMs && now - last < cooldownMs) return false;
+    AUDIO_STATE.lastPlayed.set(channel, now);
+    return true;
+  }
+  // Generic "structure destroyed" sting — low-frequency thud plus a
+  // bandpass-filtered noise crunch. Used for every material, same as the
+  // old break.mp3 was.
+  function playBreakSFX() {
+    if (AUDIO_STATE.muted) return;
+    if (!synthCooldownOk('break', 110)) return;
+    try {
+      const ac = getAC(); if (!ac) return;
+      const now = ac.currentTime, m = AUDIO_STATE.master;
+
+      const osc = ac.createOscillator(), oscGain = ac.createGain();
+      osc.frequency.setValueAtTime(128 + rnd()*24, now);
+      osc.frequency.exponentialRampToValueAtTime(30, now + 0.15);
+      oscGain.gain.setValueAtTime(0.95 * m, now);
+      oscGain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+      osc.connect(oscGain).connect(ac.destination);
+      osc.start(now); osc.stop(now + 0.16);
+
+      const noise = ac.createBufferSource();
+      noise.buffer = getNoiseBuffer(ac);
+      const filter = ac.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(560 + rnd()*140, now);
+      filter.Q.setValueAtTime(1.5, now);
+      const noiseGain = ac.createGain();
+      noiseGain.gain.setValueAtTime(0.75 * m, now);
+      noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+      noise.connect(filter).connect(noiseGain).connect(ac.destination);
+      noise.start(now, rnd(0, 0.5)); noise.stop(now + 0.25);
+    } catch (e) { audioWarn('break', e); }
+  }
+  // Cascading debris — a cluster of randomized, low-pass filtered micro
+  // impacts. Trimmed from the original 12-hit/0.8s pitch to 9 hits/0.6s so
+  // a fast run of collapses (this fires every time gs.debTimer settles)
+  // can't stack more overlapping nodes than the old single-clip version
+  // ever could.
+  function playRubbleSFX() {
+    if (AUDIO_STATE.muted) return;
+    if (!synthCooldownOk('rubble', 260)) return;
+    try {
+      const ac = getAC(); if (!ac) return;
+      const buf = getNoiseBuffer(ac);
+      const now = ac.currentTime, m = AUDIO_STATE.master;
+      const totalDuration = 0.6, debrisCount = 9;
+      for (let i = 0; i < debrisCount; i++) {
+        const delay = rnd() * totalDuration * 0.8;
+        const time = now + delay;
+        const dur = 0.03 + rnd() * 0.05;
+        const noise = ac.createBufferSource();
+        noise.buffer = buf;
+        const filter = ac.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(200 + rnd() * 600, time);
+        const gain = ac.createGain();
+        const volume = Math.max(0.0001, (1 - delay/totalDuration) * (0.3 + rnd()*0.4) * 0.5 * m);
+        gain.gain.setValueAtTime(volume, time);
+        gain.gain.exponentialRampToValueAtTime(0.0001, time + dur);
+        noise.connect(filter).connect(gain).connect(ac.destination);
+        noise.start(time, rnd(0, 0.5)); noise.stop(time + dur);
+      }
+    } catch (e) { audioWarn('rubble', e); }
+  }
+  // Glass shatter — a high-passed noise transient (the snap) plus a
+  // handful of detuned high sine "tinkles" (the shards). vol scales with
+  // impact speed the same way the old glass.mp3 playback did. No cooldown
+  // of its own — sndHit() already gates all material hits to HIT_COOL.
+  function playGlassSFX(vol=1) {
+    if (AUDIO_STATE.muted) return;
+    try {
+      const ac = getAC(); if (!ac) return;
+      const buf = getNoiseBuffer(ac);
+      const now = ac.currentTime, m = AUDIO_STATE.master * Math.max(0, Math.min(1, vol));
+
+      const noise = ac.createBufferSource();
+      noise.buffer = buf;
+      const filter = ac.createBiquadFilter();
+      filter.type = 'highpass';
+      filter.frequency.setValueAtTime(4000, now);
+      const noiseGain = ac.createGain();
+      noiseGain.gain.setValueAtTime(0.6 * m, now);
+      noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.1);
+      noise.connect(filter).connect(noiseGain).connect(ac.destination);
+      noise.start(now, rnd(0, 0.5)); noise.stop(now + 0.1);
+
+      [2800, 4200, 5100, 6700, 8300].forEach(freq => {
+        const osc = ac.createOscillator(), gain = ac.createGain();
+        const offset = rnd(0, 0.04);
+        osc.frequency.setValueAtTime(freq + rnd(-200, 200), now + offset);
+        gain.gain.setValueAtTime(0.2 * m, now + offset);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + offset + 0.15 + rnd(0, 0.1));
+        osc.connect(gain).connect(ac.destination);
+        osc.start(now + offset); osc.stop(now + offset + 0.26);
+      });
+    } catch (e) { audioWarn('glass', e); }
+  }
+
   function preloadAudio() {
     // Decode every material/UI sound into an AudioBuffer up front (same
     // loadBuffer() the character voices use) so the very first hit of a
@@ -1041,13 +1160,18 @@
   function sndHit(mat, spd) {
     const now = performance.now(); if (now - gs.lastHit < HIT_COOL) return;
     gs.lastHit = now;
-    const key = mat==='stone'?'stone' : mat==='glass'?'glass' : mat==='soft'?'soft' : 'wood';
     const volMult = gs.booha?.power === 'monster' ? Math.min(2, 1 + gs.bounces * 0.15) : 1;
-    playBufferSFX(key, Math.max(0.2, Math.min(1, spd/14)) * volMult, 0.92+rnd()*0.18, 'hit', HIT_COOL, 1);
+    const vol = Math.max(0.2, Math.min(1, spd/14)) * volMult;
+    if (mat === 'glass') {
+      playGlassSFX(vol);
+    } else {
+      const key = mat==='stone'?'stone' : mat==='soft'?'soft' : 'wood';
+      playBufferSFX(key, vol, 0.92+rnd()*0.18, 'hit', HIT_COOL, 1);
+    }
     gs.flash = Math.max(gs.flash, spd > 12 ? 0.72 : 0.42);
   }
-  function sndBreak() { playBufferSFX('break', 0.95, 0.94+rnd()*0.08, 'break', 110, 2); }
-  function sndRub()   { playBufferSFX('rubble', 0.48, 0.98+rnd()*0.08, 'rubble', 260, 1); }
+  function sndBreak() { playBreakSFX(); }
+  function sndRub()   { playRubbleSFX(); }
   function sndGnd(s)  { if (s < 12) return; playBufferSFX('ground', Math.min(0.72, s/28), 0.96+rnd()*0.08, 'ground', 170, 1); }
   function sndWin()   { playBufferSFX('win',  1, 1, 'win', 300, 3); }
   function sndFail()  { playBufferSFX('fail', 0.85, 1, 'fail', 300, 3); }
@@ -2102,9 +2226,21 @@ function traitGlowColor(block) {
       block.frozen=true; gs.frozen.set(idx,90);
       spawnWave(cx,cy,'#aaeeff',50); spawnSparks(cx,cy,'ice',spd,10); addShake(4);
     }
-    if (power==='rainbow' && block.material!=='glass') {
-      block.material='glass'; block.hp=1; block.maxHp=1;
+    if (power==='rainbow') {
+      if (block.material!=='glass') { block.material='glass'; block.hp=1; block.maxHp=1; }
       spawnWave(cx,cy,'#ff88ff',55);
+      // "Convert a whole wall" — everything nearby that isn't already
+      // glass and isn't marked convertimmune turns fragile too, so one
+      // shot primes a cluster instead of softening a single block.
+      const RAINBOW_RADIUS = 130;
+      const RAINBOW_COLORS = ['#f06','#f80','#ff0','#0f6','#08f','#80f','#f0f'];
+      gs.blocks.forEach((blk,j)=>{
+        if (j===idx || blk.broken || blk.material==='glass') return;
+        if (dist(blk.x,blk.y,cx,cy) > RAINBOW_RADIUS) return;
+        if (powerBlocked(blk,'rainbow','convert')) return;
+        blk.material='glass'; blk.hp=1; blk.maxHp=1;
+        spawnWave(blk.x,blk.y,RAINBOW_COLORS[j % RAINBOW_COLORS.length],40);
+      });
     }
     if (power==='princess' && !b.spawnedMinis) {
       b.spawnedMinis=true;
@@ -2116,8 +2252,8 @@ function traitGlowColor(block) {
 
     // Damage
     let dmg=0;
-    if      (power==='heavy')                   dmg=2;
-    else if (power==='ice'||power==='rainbow')  dmg=0;
+    if      (power==='heavy')  dmg=2;
+    else if (power==='ice')    dmg=0;
     else dmg = block.material==='stone'?(spd>11?1:0) : block.material==='glass'?1 : block.material==='soft'?(spd>5?1:0) : (spd>7?1:0);
     if (dmg>0) damageBlock(block,dmg,cx,cy,spd,idx,true,power);
 
