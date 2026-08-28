@@ -425,6 +425,13 @@ else
   bad "celebration modal mobile audit failed"
 fi
 
+echo "[43/43] Index 22A+22B image performance audit"
+if node tests/index-performance-audit.cjs >/dev/null 2>&1; then
+  ok "index WebP and asset precache contracts pass"
+else
+  bad "index image performance audit failed"
+fi
+
 # ── Summary ──────────────────────────────────────────────────
 echo "───────────────────────────────────"
 echo "✅ $PASS passed   ⚠️  $WARN warnings   ❌ $FAIL failed"

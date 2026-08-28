@@ -7,7 +7,7 @@
 const CURRENT_CACHES = {
   // Profile consolidation Pass 1: ship the canonical progress page and its
   // moved progress renderer to returning players.
-  pages:  'booha-pages-2026-363',
+  pages:  'booha-pages-2026-364',
   // js/ is served cache-first (see ASSET_PREFIXES below), so once a device
   // caches a script it never re-fetches it until this string changes.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
@@ -22,7 +22,7 @@ const CURRENT_CACHES = {
   // batch (all 36 wanderers now covered).
   // Wanderer collection profile renderer (Pass 4).
   // Profile Pass 1: remove floating world doors and ship the shared SVG icon set.
-  assets: 'booha-assets-2026-374',
+  assets: 'booha-assets-2026-375',
   decks:  'booha-decks-2026-310',
 };
 
@@ -68,6 +68,17 @@ const CORE_FILES = [
   `${BASE}/assets/img/juku-logo.png`,
 ];
 
+// Static images are fetched from ASSET_CACHE, so these must be pre-cached
+// there rather than added to CORE_FILES (which belongs to PAGE_CACHE).
+const CORE_ASSETS = [
+  `${BASE}/assets/img/background-1.webp`,
+  `${BASE}/assets/img/booha_ghost.webp`,
+  `${BASE}/assets/img/profile.webp`,
+  `${BASE}/assets/img/pre-boo.webp`,
+  `${BASE}/assets/img/boo-tree.webp`,
+  `${BASE}/assets/img/cont-tree.webp`,
+];
+
 // ── Asset folder prefixes (matched at runtime) ───────────────
 const ASSET_PREFIXES = [
   `${BASE}/js/`,
@@ -87,17 +98,23 @@ const DECK_PATTERNS = [
 //  INSTALL — pre-cache core files - Keep chacking this
 // ============================================================
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(PAGE_CACHE)
-      .then((cache) => {
-        console.log('[SW] Pre-caching core files');
-        return cache.addAll(CORE_FILES);
-      })
-      .catch((err) => {
-        console.warn('[SW] Some core files could not be cached:', err);
-      })
-      .then(() => self.skipWaiting())
-  );
+  const precachePages = caches.open(PAGE_CACHE)
+    .then((cache) => {
+      console.log('[SW] Pre-caching core files');
+      return cache.addAll(CORE_FILES);
+    })
+    .catch((err) => {
+      console.warn('[SW] Some core files could not be cached:', err);
+    });
+  const precacheAssets = caches.open(ASSET_CACHE)
+    .then((cache) => {
+      console.log('[SW] Pre-caching index image assets');
+      return cache.addAll(CORE_ASSETS);
+    })
+    .catch((err) => {
+      console.warn('[SW] Some index image assets could not be cached:', err);
+    });
+  event.waitUntil(Promise.all([precachePages, precacheAssets]).then(() => self.skipWaiting()));
 });
 
 // ============================================================
