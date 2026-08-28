@@ -460,6 +460,13 @@ else
   bad "Maze WebP asset audit failed"
 fi
 
+echo "[48/48] Maze 23B deferred image-loading audit"
+if node tests/maze-image-loading-audit.cjs >/dev/null 2>&1; then
+  ok "Maze deferred image-loading contracts pass"
+else
+  bad "Maze deferred image-loading audit failed"
+fi
+
 # ── Summary ──────────────────────────────────────────────────
 echo "───────────────────────────────────"
 echo "✅ $PASS passed   ⚠️  $WARN warnings   ❌ $FAIL failed"

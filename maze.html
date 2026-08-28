@@ -1184,7 +1184,7 @@
       </svg>
     </div>
     <div id="hwPromptBar"></div>
-    <img id="hwTreeEmoji" src="assets/img/homework-tree.webp" alt="しゅくだいの木" decoding="async" />
+    <img id="hwTreeEmoji" data-src="assets/img/homework-tree.webp" alt="しゅくだいの木" loading="lazy" decoding="async" />
     <p class="hw-eyebrow">しゅくだい</p>
     <h2 id="hwPromptTitle">しゅくだいの木に<br>はいりますか？</h2>
     <p id="hwPromptSub">Homework Tree へ いきますか？</p>
@@ -1235,7 +1235,7 @@
       </svg>
     </div>
     <div id="krPromptBar"></div>
-    <img id="krTreeLogo" src="assets/img/karasuki1-tree.webp" alt="カラスキー" decoding="async" />
+    <img id="krTreeLogo" data-src="assets/img/karasuki1-tree.webp" alt="カラスキー" loading="lazy" decoding="async" />
     <p class="kr-eyebrow">カラスキー</p>
     <h2 id="krPromptTitle">カラスキーの木に<br>はいりますか？</h2>
     <p id="krPromptSub">ほんとうに はいりますか？</p>
@@ -1267,7 +1267,7 @@
   <div id="jkPromptScrim"></div>
   <div id="jkPrompt" role="dialog" aria-modal="true" aria-labelledby="jkPromptTitle">
     <div id="jkPromptBar"></div>
-    <img id="jkTreeLogo" src="assets/img/juku-tree.webp" alt="英語塾" decoding="async" />
+    <img id="jkTreeLogo" data-src="assets/img/juku-tree.webp" alt="英語塾" loading="lazy" decoding="async" />
     <p class="jk-eyebrow">えいごじゅく</p>
     <h2 id="jkPromptTitle"></h2>
     <p id="jkPromptSub"></p>
@@ -1451,12 +1451,14 @@ const app=document.getElementById('app'),rotateOverlay=document.getElementById('
   iconContTree=document.getElementById('iconContTree'),
   hwPromptScrim=document.getElementById('hwPromptScrim'),
   hwPrompt=document.getElementById('hwPrompt'),
+  hwTreeEmoji=document.getElementById('hwTreeEmoji'),
   hwNoBtn=document.getElementById('hwNoBtn'),
   hwYesBtn=document.getElementById('hwYesBtn'),
   hwVideoWrap=document.getElementById('hwVideoWrap'),
   hwTreeVideo=document.getElementById('hwTreeVideo'),
   krPromptScrim=document.getElementById('krPromptScrim'),
   krPrompt=document.getElementById('krPrompt'),
+  krTreeLogo=document.getElementById('krTreeLogo'),
   krNoBtn=document.getElementById('krNoBtn'),
   krYesBtn=document.getElementById('krYesBtn'),
   krVideoWrap=document.getElementById('krVideoWrap'),
@@ -1604,18 +1606,32 @@ function drawGlow(x,y,radius,color,alpha){
 }
 
 // Ghost images
+// Keep image objects cheap at boot. The network request starts only when a
+// ghost is actually rendered, so the intro overlay does not compete with the
+// first interactive frame.
+function makeDeferredImage(src){
+  const image=new Image();
+  image.decoding='async';
+  image._boohaSrc=src;
+  image._boohaRequested=false;
+  return image;
+}
+function ensureDeferredImage(image){
+  if(image&&!image._boohaRequested){
+    image._boohaRequested=true;
+    image.src=image._boohaSrc;
+  }
+  return image;
+}
+
 // Playable ghost images — the sacred main five.
 const ghostImgs = GHOSTS.map(src => {
-  const i = new Image();
-  i.src = src;
-  return i;
+  return makeDeferredImage(src);
 });
 
 // Extra visitor ghost images — not playable.
 const extraGhostImgs = EXTRA_BOOHA_GHOSTS.map(src => {
-  const i = new Image();
-  i.src = src;
-  return i;
+  return makeDeferredImage(src);
 });
 
 let activeGhostIdx = 0;
@@ -1630,16 +1646,22 @@ assignRandomGhost();
 
 function getWandererImage(w) {
   if (w.kind === 'extra') {
-    return extraGhostImgs[w.extraIdx];
+    return ensureDeferredImage(extraGhostImgs[w.extraIdx]);
   }
-  return ghostImgs[w.ghostIdx];
+  return ensureDeferredImage(ghostImgs[w.ghostIdx]);
 }
 
 // Tree images
-const homeworkImg=new Image(); homeworkImg.src='assets/img/homework-tree.webp';
-const karasuki1Img=new Image(); karasuki1Img.src='assets/img/karasuki1-tree.webp';
-const karasuki2Img=new Image(); karasuki2Img.src='assets/img/karasuki2-tree.webp';
-const jukuImg=new Image(); jukuImg.src='assets/img/juku-tree.webp';
+const homeworkImg=makeDeferredImage('assets/img/homework-tree.webp');
+const karasuki1Img=makeDeferredImage('assets/img/karasuki1-tree.webp');
+const karasuki2Img=makeDeferredImage('assets/img/karasuki2-tree.webp');
+const jukuImg=makeDeferredImage('assets/img/juku-tree.webp');
+let mazeVisualsRequested=false;
+function requestMazeVisuals(){
+  if(mazeVisualsRequested)return;
+  mazeVisualsRequested=true;
+  [homeworkImg,karasuki1Img,karasuki2Img,jukuImg].forEach(ensureDeferredImage);
+}
 
 // Karasuki state machine
 let karasukiPhase=0,karasukiBlend=0,karasukiOpacity=1,karasukiLastSwap=0;
@@ -1726,6 +1748,7 @@ function restoreMazeFromCheckpoint(){
   
   app.classList.remove('inTransition');
   karasukiLastSwap=performance.now();
+  requestMazeVisuals();
   resizeCanvas();buildWanderers();startLoop();
   bgMusic.loop=true;bgMusic.volume=.65;
   const _musicResume=()=>{
@@ -2140,7 +2163,7 @@ function drawFrame(now){
     ctx.globalAlpha=.20+pulseG*.10;const ga=ctx.createRadialGradient(gx,gy+3,0,gx,gy+3,gR*2.0);ga.addColorStop(0,gcol1);ga.addColorStop(.5,gcol2);ga.addColorStop(1,'transparent');ctx.fillStyle=ga;ctx.beginPath();ctx.arc(gx,gy+3,gR*2.0,0,Math.PI*2);ctx.fill();
     ctx.globalAlpha=.14+pulseG*.06;const gs=ctx.createRadialGradient(gx,gy+gR*.7,0,gx,gy+gR*.7,gR*.85);gs.addColorStop(0,'rgba(0,0,0,.5)');gs.addColorStop(1,'transparent');ctx.fillStyle=gs;ctx.beginPath();ctx.arc(gx,gy+gR*.7,gR*.85,0,Math.PI*2);ctx.fill();
     ctx.restore();ctx.save();
-    const activeImg=ghostImgs[activeGhostIdx];
+    const activeImg=ensureDeferredImage(ghostImgs[activeGhostIdx]);
     if(activeImg&&activeImg.complete&&activeImg.naturalWidth>0)ctx.drawImage(activeImg,gx-gR,gy-gR+bob,gR*2,gR*2);
     else{ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(gx,gy+bob,gR*.7,0,Math.PI*2);ctx.fill();}
     ctx.restore();
@@ -2294,6 +2317,7 @@ cpCloseBtn.addEventListener('click',closePopup);cpScrim.addEventListener('click'
 
 // ── Homework prompt ──────────────────────────────────────────────────────────
 function openHomeworkPrompt(){
+  loadPopupImage(hwTreeEmoji);
   hwPromptScrim.classList.add('show');
   hwPrompt.classList.add('show');
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
@@ -2345,6 +2369,7 @@ hwYesBtn.addEventListener('click',playHomeworkVideoAndGo);
 
 // ── Karasuki prompt ──────────────────────────────────────────────────────────
 function openKarasukiPrompt(){
+  loadPopupImage(krTreeLogo);
   krPromptScrim.classList.add('show');
   krPrompt.classList.add('show');
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
@@ -2397,12 +2422,22 @@ krYesBtn.addEventListener('click',playKarasukiVideoAndGo);
 // ── Juku prompt ──────────────────────────────────────────────────────────────
 const jkPromptScrim=document.getElementById('jkPromptScrim'),
   jkPrompt=document.getElementById('jkPrompt'),
+  jkTreeLogo=document.getElementById('jkTreeLogo'),
   jkPromptTitle=document.getElementById('jkPromptTitle'),
   jkPromptSub=document.getElementById('jkPromptSub'),
   jkNoBtn=document.getElementById('jkNoBtn'),
   jkYesBtn=document.getElementById('jkYesBtn');
 
+function loadPopupImage(image){
+  if(!image||image.dataset.loaded==='1')return;
+  const src=image.dataset.src;
+  if(!src)return;
+  image.dataset.loaded='1';
+  image.src=src;
+}
+
 function openJukuPrompt(){
+  loadPopupImage(jkTreeLogo);
   // Branch on membership. Authored constant strings only — no user data.
   // juku.html fail-closes on its own gate; this branch is UX, not security.
   const isJuku=localStorage.getItem('booha_is_juku')==='1';
@@ -2548,6 +2583,7 @@ mazeStartBtn.addEventListener('click',async()=>{
   ghostIX=INTRO_TOP_CENTER_START.ix;ghostIY=INTRO_TOP_CENTER_START.iy;
   karasukiLastSwap=performance.now();
   introPhase='allGlow';introGlowStart=performance.now();
+  requestMazeVisuals();
   resizeCanvas();buildWanderers();startLoop();
   try{bgMusic.volume=.65;await bgMusic.play();}catch(e){console.warn('Music blocked',e);}
 });
