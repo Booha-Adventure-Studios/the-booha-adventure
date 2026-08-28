@@ -486,7 +486,7 @@
   // Reusing Nuppi's existing wandering-NPC art from Karasuki (same asset
   // path, no new files) rather than a new character for the lobby host.
   const nuppiLobbyImg = new Image();
-  nuppiLobbyImg.src = 'assets/img/wanderers/nuppi-2.png';
+  nuppiLobbyImg.src = 'assets/img/wanderers/nuppi-2.webp';
   const music = new Audio('assets/img/muenba/Muenba_BGM.mp3');
   music.preload = 'auto';
   music.loop = true;
@@ -4133,7 +4133,7 @@
     const box = captureBox();
     const img = document.createElement('img');
     img.className = 'muenba-lobby-portrait';
-    img.src = 'assets/img/wanderers/nuppi-2.png';
+    img.src = 'assets/img/wanderers/nuppi-2.webp';
     img.alt = 'Nuppi';
     box.appendChild(img);
 
@@ -4192,7 +4192,7 @@
     const box = captureBox();
     const img = document.createElement('img');
     img.className = 'muenba-lobby-portrait';
-    img.src = 'assets/img/wanderers/nuppi-2.png';
+    img.src = 'assets/img/wanderers/nuppi-2.webp';
     img.alt = 'Nuppi';
     box.appendChild(img);
 
@@ -5752,7 +5752,7 @@
     const greetJp = name ? `${name}……ようこそ。` : 'ようこそ。';
     lobbyOverlay.innerHTML = `
       <div class="muenba-lobby-box muenba-nuppi-scene muenba-nuppi-welcome">
-        <img class="muenba-lobby-portrait" src="assets/img/wanderers/nuppi-2.png" alt="Nuppi">
+        <img class="muenba-lobby-portrait" src="assets/img/wanderers/nuppi-2.webp" alt="Nuppi">
         <div class="muenba-nuppi-kicker">NUPPI TALK</div>
         <p class="jp muenba-nuppi-kicker-jp">ヌーピーと<ruby>話<rt>はな</rt></ruby>す</p>
         <div class="muenba-nuppi-nameplate"><h2>Nuppi</h2><span>ヌーピー</span></div>
@@ -5790,7 +5790,7 @@
     state.cemeteryAlert = false;
     lobbyOverlay.innerHTML = `
       <div class="muenba-lobby-box is-case-board muenba-nuppi-scene muenba-nuppi-case-board">
-        <img class="muenba-lobby-portrait" src="assets/img/wanderers/nuppi-2.png" alt="Nuppi">
+        <img class="muenba-lobby-portrait" src="assets/img/wanderers/nuppi-2.webp" alt="Nuppi">
         <section class="muenba-lobby-case-board" aria-labelledby="muenba-case-board-title">
           <div id="muenba-case-board-eyebrow" class="muenba-case-board-eyebrow">CASE FILE</div>
           <h3 id="muenba-case-board-title"></h3>
@@ -5968,7 +5968,7 @@
         : 'ヌーピーはここで<ruby>待<rt>ま</rt></ruby>っているよ。';
     lobbyOverlay.innerHTML = `
       <div class="muenba-lobby-box muenba-room-nuppi-box muenba-nuppi-scene muenba-nuppi-waiting">
-        <img class="muenba-lobby-portrait" src="assets/img/wanderers/nuppi-2.png" alt="Nuppi">
+        <img class="muenba-lobby-portrait" src="assets/img/wanderers/nuppi-2.webp" alt="Nuppi">
         <div class="muenba-nuppi-kicker">NUPPI TALK</div>
         <p class="jp muenba-nuppi-kicker-jp">ヌーピーと<ruby>話<rt>はな</rt></ruby>す</p>
         <div class="muenba-nuppi-nameplate"><h2>Nuppi</h2><span>ヌーピー</span></div>
@@ -6014,7 +6014,7 @@
     state.moving = false;
     lobbyOverlay.innerHTML = `
       <div class="muenba-lobby-box muenba-handoff-box muenba-nuppi-scene muenba-nuppi-handoff">
-        <img class="muenba-lobby-portrait" src="assets/img/wanderers/nuppi-2.png" alt="Nuppi">
+        <img class="muenba-lobby-portrait" src="assets/img/wanderers/nuppi-2.webp" alt="Nuppi">
         <div class="muenba-nuppi-kicker">NUPPI TALK</div>
         <p class="jp muenba-nuppi-kicker-jp">ヌーピーと<ruby>話<rt>はな</rt></ruby>す</p>
         <div class="muenba-case-board-eyebrow">HANDOFF COMPLETE</div>

@@ -309,7 +309,7 @@ const HAPPY_HOUSE_PORTAL = {
   }
 
   function getWandererCoordsForRoom(roomId) {
-    return WANDERER_DEFS.filter(w => w.roomId === roomId).map(w => ({ x: w.x, y: w.y }));
+    return WANDERER_DEFS_WEBP.filter(w => w.roomId === roomId).map(w => ({ x: w.x, y: w.y }));
   }
   function getBonusTreeCoordsForRoom(roomId) {
     return BONUS_TREES.filter(t => t.roomId === roomId).map(t => ({ x: t.x, y: t.y }));
@@ -1140,6 +1140,15 @@ const HAPPY_HOUSE_PORTAL = {
     { index:34, roomId:'room_12', x:541,  y:320, type:'stay',  frames:['chillicothe-1.png','chillicothe-2.png'],                   color:'#f29a4a', size:110, name:'Chillicothe',         nameJP:'チリコシー',         desc:'Chillicothe is a large capybara with long orange fur who walks upright. When October was young, he went wherever she went. They played, they argued, and they spent so much time together that he no longer knows which of those days were imaginary.\n\nImaginary friends do not disappear when children stop believing in them. They disappear the same way real friends do: when no one speaks to them anymore. A friend from elementary school and a creature no one else could see can be lost in exactly the same way.\n\nThings that were only imagined do not remember you. Chillicothe does.\n\nOctober remembers that she once had an imaginary friend. Chillicothe remembers being him.', descJP:'チリコシーは、長いオレンジ色の毛に覆われた大きなカピバラで、二本足で歩く。オクトーバーが幼かったころは、どこへ行くにも一緒だった。二人は遊び、けんかをし、あまりにも長い時間を共に過ごしたため、そのうちのどの日が想像の中の出来事だったのか、チリコシーにはもう分からない。\n\n空想の友達は、子どもが信じなくなったから消えるのではない。本当の友達と同じように、誰からも話しかけられなくなったとき、いなくなる。小学校で毎日一緒だった子も、ほかの誰にも見えなかった生き物も、まったく同じように失われる。\n\nただ想像されただけのものは、あなたを覚えていない。チリコシーは覚えている。\n\nオクトーバーは、昔、空想の友達がいたことを覚えている。チリコシーは、その友達だったことを覚えている。' },
     { index:35, roomId:'room_14', x:671,  y:321, type:'stay',  frames:['shoganai-1.png','shoganai-2.png'],                       color:'#aeb6bd', size:110, name:'Shoganai',            nameJP:'ショウガナイ',    desc:'A Shoganai is a tall, flightless bird made of smoke and cooled ash. Its edges blur like the air above a dying fire, and it slides rather than walks. It leaves no print in snow, no sound in dry leaves, and no scent anywhere it has been.\n\nIt has a beak and no eyes. Where its eyes should be, a soft gray cowl opens into nothing.\n\nSome things truly cannot be helped. Sometimes those words are mercy: permission to put down a burden that no action can change. Nothing comes then.\n\nA Shoganai comes when the same words are used to make another person\'s pain stop inconveniencing the room. It appears in the silence afterward, when anger is reduced to complaining, grief becomes an embarrassment, and protest is treated as bad manners.\n\nIt takes whatever the room has decided should no longer be spoken. The guilt of someone who was never at fault and the anger of someone who was wronged weigh exactly the same to it.\n\nMemory is not taken. The person still knows what happened. Nothing has been forgotten. There is simply nowhere left to put it.\n\nAfterward, the room becomes peaceful.\n\nIt is the peace of a closed mouth.', descJP:'ショウガナイは、煙と冷えた灰でできた、飛べない大きな鳥だ。輪郭は、消えかけた火の上の空気のようにゆがみ、歩くというより滑るように動く。雪の上に足あとを残さず、枯れ葉の上でも音を立てず、通ったあとに匂いも残らない。\n\nくちばしはあるが、目はない。目のあるはずの場所には、やわらかい灰色の布のようなものがあり、その奥には何もない。\n\n本当に、どうしようもないことはある。その言葉が、もう変えられない重荷を下ろしてもいいという許しになることもある。そんなとき、何も来ない。\n\nショウガナイが来るのは、同じ言葉が、誰かの痛みを受け止めるためではなく、その痛みがその場の邪魔をしないようにするために使われたときだ。怒りがただの不満にされ、悲しみが気まずいものになり、訴えることが礼儀の悪さとして片づけられたあとの沈黙に現れる。\n\nその場にいる人たちが、もう聞きたくないと決めたものを、ショウガナイはすべて受け取る。自分のせいではない人が抱えた罪悪感も、ひどいことをされた人の怒りも、同じ重さでしかない。\n\n記憶は持っていかない。何があったのかは、本人がそのまま覚えている。忘れられたものは何もない。ただ、その気持ちを置く場所だけが、どこにもなくなる。\n\nそのあと、部屋は静かになる。\n\nそれは、口を閉じさせられたあとの静けさだ。' },
  ];
+
+ // Pass 24B: the shared wanderer artwork is served as transparent WebP.
+ // Keep the definitions readable while normalizing the runtime frame names.
+ const WANDERER_DEFS_WEBP = WANDERER_DEFS.map(def => ({
+   ...def,
+   frames: Array.isArray(def.frames)
+     ? def.frames.map(filename => filename.replace(/\.png$/i, '.webp'))
+     : def.frames,
+ }));
 
   // Furigana readings for wanderer JP text (nameJP + descJP), keyed by w.name.
   // Built incrementally, batch by batch (Pass 1: indices 0-8, Pass 2: indices 9-17,
@@ -2827,7 +2836,7 @@ const HAPPY_HOUSE_PORTAL = {
  function refreshWanderersForRoom() {
   let unlockedIndices = [];
   if (window.__devAllWanderers) {
-    unlockedIndices = WANDERER_DEFS.map(d => d.index);
+    unlockedIndices = WANDERER_DEFS_WEBP.map(d => d.index);
   } else {
     
     try {
@@ -2840,7 +2849,7 @@ const HAPPY_HOUSE_PORTAL = {
     } catch (e) { console.error('[Karasuki] Wanderer read failed:', e); }
     
   }
-  const roomDefs = WANDERER_DEFS
+  const roomDefs = WANDERER_DEFS_WEBP
     .filter(def => def.roomId === state.roomId && unlockedIndices.includes(def.index));
   // Several portraits are intentionally large. Loading only the unlocked
   // wanderers in this room keeps Karasuki responsive on classroom devices.
@@ -4923,9 +4932,9 @@ function clickCheckObserver(worldX, worldY) {
 
  /* ── Nuppi images ── */
   const nuppiImg1 = new Image();
-  nuppiImg1.src = 'assets/img/wanderers/nuppi-1.png';
+  nuppiImg1.src = 'assets/img/wanderers/nuppi-1.webp';
   const nuppiImg2 = new Image();
-  nuppiImg2.src = 'assets/img/wanderers/nuppi-2.png';
+  nuppiImg2.src = 'assets/img/wanderers/nuppi-2.webp';
  
   /* ── Nuppi constants ── */
   const NUPPI_SIZE        = 52;
@@ -5336,7 +5345,7 @@ const NUPPI_LINES = [
         box-shadow:0 0 0 1px rgba(255,209,236,.12),0 0 28px rgba(255,79,163,.52),0 0 74px rgba(255,20,147,.25),inset 0 0 34px rgba(255,105,180,.08);">
         <div style="height:4px;margin:0 22% 5px;border-radius:99px;background:linear-gradient(90deg,transparent,#ff4fa3,#ffd1ec,#ff4fa3,transparent);box-shadow:0 0 16px rgba(255,105,180,.9);"></div>
         <div style="padding:22px 0 8px;display:flex;align-items:center;justify-content:center;">
-          <img src="assets/img/wanderers/nuppi-2.png"
+          <img src="assets/img/wanderers/nuppi-2.webp"
             alt="Nuppi"
             style="max-width:76%;max-height:min(210px,42vw);object-fit:contain;
                    filter:drop-shadow(0 0 10px rgba(255,119,200,.9)) drop-shadow(0 0 28px rgba(255,20,147,.45));"/>
