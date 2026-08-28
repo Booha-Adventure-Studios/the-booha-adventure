@@ -23,8 +23,8 @@ assert(discovery.includes('showCelebrationPop'), 'first Wanderer discovery must 
 assert(!discovery.includes('showRewardPop'), 'first Wanderer discovery must not use the transient pickup toast');
 assert(discovery.includes('wandererCelebrationPortrait(w)'), 'discovery must show the actual Wanderer portrait');
 assert(discovery.includes('portraitAlt: `${w.name} wanderer`'), 'discovery portrait must have an accessible label');
-assert(discovery.includes('accent: w.color'), 'discovery must match the Wanderer authored color');
-assert(discovery.includes('glow: wandererCelebrationGlow(w.color)'), 'discovery must derive its glow from the Wanderer color');
+assert(discovery.includes('accent: WANDERER_DISCOVERY_ACCENT'), 'discovery must use the shared gold celebration accent');
+assert(discovery.includes('glow: WANDERER_DISCOVERY_GLOW'), 'discovery must use the shared gold celebration glow');
 assert(discovery.includes('translationHTML: translation'), 'discovery must place furigana-ready translation under English');
 assert(discovery.includes('actionLabel: \'Meet this wanderer\''), 'discovery must have an explicit readable action');
 assert(discovery.includes('WANDERER_FURIGANA[w.name]'), 'discovery must reuse the authored Wanderer furigana map');

@@ -530,6 +530,13 @@ else
   bad "Karasuki supporting-art WebP audit failed"
 fi
 
+echo "[58/58] Karasuki 24F discovery-gold audit"
+if node tests/karasuki-wanderer-discovery-gold-audit.cjs >/dev/null 2>&1; then
+  ok "Karasuki discovery-gold contracts pass"
+else
+  bad "Karasuki discovery-gold audit failed"
+fi
+
 # ── Summary ──────────────────────────────────────────────────
 echo "───────────────────────────────────"
 echo "✅ $PASS passed   ⚠️  $WARN warnings   ❌ $FAIL failed"
