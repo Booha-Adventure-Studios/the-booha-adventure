@@ -4890,7 +4890,7 @@ function openObserverPop() {
   observerPopEl.style.display    = 'flex';
   observerPopEl.style.background = 'rgba(1,8,1,0.90)';
   state.clickTarget = null;
-  if (window.UtsuSfx && typeof window.UtsuSfx.slimeClick === 'function') window.UtsuSfx.slimeClick();
+  if (window.UtsuSfx && typeof window.UtsuSfx.observerOpen === 'function') window.UtsuSfx.observerOpen();
 }
 
 function closeObserverPop() {
@@ -5372,7 +5372,7 @@ const NUPPI_LINES = [
     nuppiPopEl.style.display    = 'flex';
     nuppiPopEl.style.background = 'rgba(10,0,8,0.92)';
     state.clickTarget = null;
-    if (window.UtsuSfx && typeof window.UtsuSfx.mischiefReward === 'function') window.UtsuSfx.mischiefReward();
+    if (window.UtsuSfx && typeof window.UtsuSfx.nuppiOpen === 'function') window.UtsuSfx.nuppiOpen();
   }
  
   function closeNuppiPop() {

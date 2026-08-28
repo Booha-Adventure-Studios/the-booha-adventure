@@ -24,7 +24,7 @@ function section(startName, endName) {
 }
 
 const discovery = section('function showWandererDiscovery(w)', 'function showWandererReturn(w)');
-const reunion = section('function showWandererReturn(w)', 'function showKarasukiArrival()');
+const reunion = section('function showWandererReturn(w)', 'function spawnGlitter(w, now)');
 const opener = section('function openWandererPop(w)', 'function closeWandererPop()');
 const observer = section('function openObserverPop()', 'function closeObserverPop()');
 const nuppi = section('function openNuppiPop()', 'function closeNuppiPop()');
