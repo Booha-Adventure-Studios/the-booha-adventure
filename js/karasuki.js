@@ -3445,7 +3445,7 @@ const HAPPY_HOUSE_PORTAL = {
 
   function openHappyHousePop() {
     wpopThemeBox('happy-house-pop', HAPPY_HOUSE_THEME);
-    wpopSetIconImage('happy-house-pop', 'assets/happy_house/mister_happy-2.png', 'Mister Happy', 'image-happy');
+    wpopSetIconImage('happy-house-pop', 'assets/happy_house/mister_happy-2.webp', 'Mister Happy', 'image-happy');
     wpopSetLock('happy-house-pop', false);
 
     wpopSetText(document.getElementById('happy-house-pop-eyebrow-en'), 'AN INVITATION');
@@ -3631,7 +3631,7 @@ const HAPPY_HOUSE_PORTAL = {
     const unlocked = _utsurobaCurriculumUnlocked();
     if (!unlocked && window.UtsuSfx && typeof window.UtsuSfx.lockedRattle === 'function') window.UtsuSfx.lockedRattle();
     wpopThemeBox('utsuroba-pop', UTSUROBA_THEME);
-    wpopSetIconImage('utsuroba-pop', 'assets/img/utsuroba_icon.png', 'Utsuroba', 'image-utsuroba');
+    wpopSetIconImage('utsuroba-pop', 'assets/img/utsuroba_icon.webp', 'Utsuroba', 'image-utsuroba');
     wpopSetLock('utsuroba-pop', false);
     wpopSetText(document.getElementById('utsuroba-pop-title-en'), '');
     wpopSetText(document.getElementById('utsuroba-pop-title-jp'), '');
@@ -4025,7 +4025,7 @@ const HAPPY_HOUSE_PORTAL = {
 
   let pins = [], trail = [], ripples = [];
   const ghostImg = new Image(); ghostImg.src = "assets/img/booha_ghost.webp";
-  const memoryBoxImg = new Image(); memoryBoxImg.src = 'assets/img/memory_box.png';
+  const memoryBoxImg = new Image(); memoryBoxImg.src = 'assets/img/memory_box.webp';
   const observerImg = new Image();
   observerImg.src = 'assets/img/karasuki/observer-1.webp';
   const music    = new Audio('assets/audio/karasuki-music.mp3');
@@ -4308,7 +4308,7 @@ const HAPPY_HOUSE_PORTAL = {
       btnBorder: 'rgba(45,212,191,.9)', btnColor: '#d6fff6',
     };
     wpopThemeBox('portal', PROFILE_THEME);
-    wpopSetIconImage('portal', 'assets/img/boo-moon.png', 'Your profile', 'image-profile');
+    wpopSetIconImage('portal', 'assets/img/boo-moon.webp', 'Your profile', 'image-profile');
     wpopSetLock('portal', false);
     wpopSetText(document.getElementById('portal-title-en'), '');
     wpopSetText(document.getElementById('portal-title-jp'), '');
