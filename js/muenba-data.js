@@ -171,16 +171,16 @@
   // wired here with "Tinkley" kept only as the display name — flag if either
   // should change to match the other.
   const GHOSTS = [
-    { id: 'fuzzle',  role: 'hunt-target', name: 'Fuzzle',  kana: 'ファズル',       img: 'assets/img/muenba/ghosts/fuzzle.png',  personality: 'Practices a different scare every time.', personalityJp: 'いつも<ruby>違<rt>ちが</rt></ruby>う<ruby>驚<rt>おどろ</rt></ruby>かし<ruby>方<rt>かた</rt></ruby>を<ruby>練習<rt>れんしゅう</rt></ruby>する。' },
-    { id: 'glimmer', role: 'hunt-target', name: 'Glimmer', kana: 'グリマー',     img: 'assets/img/muenba/ghosts/glimmer.png', personality: 'Polishes every sparkle until it runs away.', personalityJp: 'きらめきがなくなるまで<ruby>磨<rt>みが</rt></ruby>き<ruby>続<rt>つづ</rt></ruby>ける。' },
-    { id: 'nibsy',   role: 'hunt-target', name: 'Nibsy',   kana: 'ニブシー',     img: 'assets/img/muenba/ghosts/nibsy.png',   personality: 'Collects tiny noises and forgets where they came from.', personalityJp: '<ruby>小<rt>ちい</rt></ruby>さな<ruby>音<rt>おと</rt></ruby>を<ruby>集<rt>あつ</rt></ruby>めて、どこから<ruby>来<rt>き</rt></ruby>たか<ruby>忘<rt>わす</rt></ruby>れてしまう。' },
-    { id: 'tinklet', role: 'hunt-target', name: 'Tinkley', kana: 'ティンクリー', img: 'assets/img/muenba/ghosts/tinklet.png', personality: 'Rings invisible bells at the worst possible moment.', personalityJp: '<ruby>一番<rt>いちばん</rt></ruby><ruby>悪<rt>わる</rt></ruby>いタイミングで<ruby>見<rt>み</rt></ruby>えないベルを<ruby>鳴<rt>な</rt></ruby>らす。' },
-    { id: 'twiddle', role: 'hunt-target', name: 'Twiddle', kana: 'トゥイドル',  img: 'assets/img/muenba/ghosts/twiddle.png', personality: 'Turns in circles whenever a decision gets too serious.', personalityJp: '<ruby>決断<rt>けつだん</rt></ruby>が<ruby>重<rt>おも</rt></ruby>くなると、くるくる<ruby>回<rt>まわ</rt></ruby>ってしまう。' }
+    { id: 'fuzzle',  role: 'hunt-target', name: 'Fuzzle',  kana: 'ファズル',       img: 'assets/img/muenba/ghosts/fuzzle.webp',  personality: 'Practices a different scare every time.', personalityJp: 'いつも<ruby>違<rt>ちが</rt></ruby>う<ruby>驚<rt>おどろ</rt></ruby>かし<ruby>方<rt>かた</rt></ruby>を<ruby>練習<rt>れんしゅう</rt></ruby>する。' },
+    { id: 'glimmer', role: 'hunt-target', name: 'Glimmer', kana: 'グリマー',     img: 'assets/img/muenba/ghosts/glimmer.webp', personality: 'Polishes every sparkle until it runs away.', personalityJp: 'きらめきがなくなるまで<ruby>磨<rt>みが</rt></ruby>き<ruby>続<rt>つづ</rt></ruby>ける。' },
+    { id: 'nibsy',   role: 'hunt-target', name: 'Nibsy',   kana: 'ニブシー',     img: 'assets/img/muenba/ghosts/nibsy.webp',   personality: 'Collects tiny noises and forgets where they came from.', personalityJp: '<ruby>小<rt>ちい</rt></ruby>さな<ruby>音<rt>おと</rt></ruby>を<ruby>集<rt>あつ</rt></ruby>めて、どこから<ruby>来<rt>き</rt></ruby>たか<ruby>忘<rt>わす</rt></ruby>れてしまう。' },
+    { id: 'tinklet', role: 'hunt-target', name: 'Tinkley', kana: 'ティンクリー', img: 'assets/img/muenba/ghosts/tinklet.webp', personality: 'Rings invisible bells at the worst possible moment.', personalityJp: '<ruby>一番<rt>いちばん</rt></ruby><ruby>悪<rt>わる</rt></ruby>いタイミングで<ruby>見<rt>み</rt></ruby>えないベルを<ruby>鳴<rt>な</rt></ruby>らす。' },
+    { id: 'twiddle', role: 'hunt-target', name: 'Twiddle', kana: 'トゥイドル',  img: 'assets/img/muenba/ghosts/twiddle.webp', personality: 'Turns in circles whenever a decision gets too serious.', personalityJp: '<ruby>決断<rt>けつだん</rt></ruby>が<ruby>重<rt>おも</rt></ruby>くなると、くるくる<ruby>回<rt>まわ</rt></ruby>ってしまう。' }
   ];
   // Shared sprite every ghost swaps to when clicked or when it turns to
   // chase (Pass 7) — not a huntable ghost of its own, so it's kept separate
   // from the GHOSTS roster above.
-  const GHOST_ANGRY_CHANGE_IMG = 'assets/img/muenba/ghosts/angry_change.png';
+  const GHOST_ANGRY_CHANGE_IMG = 'assets/img/muenba/ghosts/angry_change.webp';
 
   // Pass 15: a single generic "Jerk" archetype, spawned as several instances
   // by muenba.js to keep rooms feeling populated as the week's real ghosts
@@ -195,7 +195,7 @@
     dangerCanHide: false,
     name: 'Jerk',
     kana: 'イジワル',
-    img: 'assets/img/muenba/ghosts/jerk.png',
+    img: 'assets/img/muenba/ghosts/jerk.webp',
     personality: 'Doesn’t want to be found. Just wants to scare somebody.',
     personalityJp: '<ruby>見<rt>み</rt></ruby>つかりたくない。ただ<ruby>誰<rt>だれ</rt></ruby>かを<ruby>驚<rt>おどろ</rt></ruby>かしたいだけ。'
   };

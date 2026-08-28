@@ -25,7 +25,7 @@
   // Pass 1 scale pass: enlarge only the visible art. GHOST_R and the click
   // radius stay unchanged so encounters keep the same gameplay footprint.
   const GHOST_DRAW_R = 72;
-  // The ghost PNGs are 2048px square with wide transparent margins. Draw
+  // The ghost sprites are 2048px square with wide transparent margins. Draw
   // the useful center crop so the visible ghost, rather than the empty
   // canvas around it, determines its gameplay scale.
   const GHOST_ART_CROP = { x: 256, y: 256, size: 1536 };
