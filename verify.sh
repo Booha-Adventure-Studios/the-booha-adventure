@@ -446,6 +446,13 @@ else
   bad "index WebAudio SFX audit failed"
 fi
 
+echo "[46/46] Index 22E final performance/runtime audit"
+if node tests/index-final-audit.cjs >/dev/null 2>&1; then
+  ok "index final performance and runtime guardrails pass"
+else
+  bad "index final performance/runtime audit failed"
+fi
+
 # ── Summary ──────────────────────────────────────────────────
 echo "───────────────────────────────────"
 echo "✅ $PASS passed   ⚠️  $WARN warnings   ❌ $FAIL failed"
