@@ -509,6 +509,13 @@ else
   bad "Karasuki wanderer WebP audit failed"
 fi
 
+echo "[55/55] Karasuki 24C Observer WebP audit"
+if node tests/karasuki-observer-webp-audit.cjs >/dev/null 2>&1; then
+  ok "Karasuki Observer WebP contracts pass"
+else
+  bad "Karasuki Observer WebP audit failed"
+fi
+
 # ── Summary ──────────────────────────────────────────────────
 echo "───────────────────────────────────"
 echo "✅ $PASS passed   ⚠️  $WARN warnings   ❌ $FAIL failed"
