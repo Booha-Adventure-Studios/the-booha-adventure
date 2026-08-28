@@ -112,15 +112,18 @@
   const comboTexts   = [];
   const images       = {};
 
+  // 'bg' was fetched here too before this pass, but nothing in this file
+  // ever draws images.bg — the background is rendered entirely through
+  // CSS (.game-wrap's background-image), so loading it a second time via
+  // JS was a pure wasted download of the largest image in the set.
   const imageSources = {
-    bg:           './assets/feed/feed_booha-1.png',
-    booEat:       './assets/feed/boo-eat.png',
-    booMouthOpen: './assets/feed/boo-mouth-open.png',
-    booSad:       './assets/feed/boo-sad.png',
-    booSurprised: './assets/feed/boo-surprised.png',
-    booWait:      './assets/feed/boo-wait.png',
-    booWin:       './assets/feed/boo-win.png',
-    candy:        './assets/feed/candy.png'
+    booEat:       './assets/feed/boo-eat.webp',
+    booMouthOpen: './assets/feed/boo-mouth-open.webp',
+    booSad:       './assets/feed/boo-sad.webp',
+    booSurprised: './assets/feed/boo-surprised.webp',
+    booWait:      './assets/feed/boo-wait.webp',
+    booWin:       './assets/feed/boo-win.webp',
+    candy:        './assets/feed/candy.webp'
   };
 
 
@@ -225,6 +228,21 @@
                  gain: 0.28, duration: 0.22, attack: 0.01, decay: 0.06, sustain: 0.45,
                  release: 0.10, delay: d });
     });
+  }
+  // v8: every UI button was completely silent before this pass — only
+  // in-game events (cut/bounce/fall/win/etc.) had sound. Two small, cute
+  // taps for menu/overlay buttons, built on the same playTone() helper.
+  function playSfxClick() {
+    // Neutral tap — help/close/dismiss/menu buttons.
+    playTone({ freq: 720, freq2: 560, type: 'sine', gain: 0.14, duration: 0.06,
+               attack: 0.002, decay: 0.02, sustain: 0.2, release: 0.03 });
+  }
+  function playSfxConfirm() {
+    // Cheerful little up-blip — start/next/retry/helper/keep-playing.
+    playTone({ freq: 660, freq2: 880, type: 'triangle', gain: 0.16, duration: 0.10,
+               attack: 0.004, decay: 0.03, sustain: 0.3, release: 0.05 });
+    playTone({ freq: 990, type: 'sine', gain: 0.10, duration: 0.08,
+               attack: 0.003, decay: 0.02, sustain: 0.2, release: 0.04, delay: 0.05 });
   }
 
   // ─────────────────────────────────────────────────
@@ -737,11 +755,10 @@
   }
 
   async function preloadAssets() {
-    for (const [k, src] of Object.entries(imageSources)) {
+    await Promise.all(Object.entries(imageSources).map(async ([k, src]) => {
       try { images[k] = await loadImage(src); } catch(e) { console.warn('img fail:', src); }
-    }
+    }));
     buildBouncePattern();
- 
   }
 
   function buildBouncePattern() {
@@ -1957,20 +1974,22 @@
   }
 
   function bindEvents() {
-    startBtn.addEventListener('click', startGame);
-    restartBtn.addEventListener('click', resetLevel);
-    retryBtn.addEventListener('click', () => { hideMessage(); resetLevel(); });
-    continueBtn?.addEventListener('click', useContinue);
-    nextBtn.addEventListener('click', nextLevel);
-    helpBtn.addEventListener('click', () => toggleHelp(true));
-    closeHelpBtn.addEventListener('click', () => toggleHelp(false));
-    document.getElementById('startExitBtn')?.addEventListener('click', requestExit);
-    bottomExitBtn?.addEventListener('click', requestExit);
-    bottomRestartBtn?.addEventListener('click', requestRestartGame);
-    confirmExitBtn?.addEventListener('click', confirmExit);
-    cancelExitBtn?.addEventListener('click', () => toggleExitConfirm(false));
-    confirmRestartBtn?.addEventListener('click', confirmRestartGame);
-    cancelRestartBtn?.addEventListener('click', () => toggleRestartConfirm(false));
+    // v8: positive/advancing taps get the cheerful confirm blip; neutral
+    // menu/dismiss/confirm-exit taps get the plain click.
+    startBtn.addEventListener('click', () => { playSfxConfirm(); startGame(); });
+    restartBtn.addEventListener('click', () => { playSfxClick(); resetLevel(); });
+    retryBtn.addEventListener('click', () => { playSfxConfirm(); hideMessage(); resetLevel(); });
+    continueBtn?.addEventListener('click', () => { playSfxConfirm(); useContinue(); });
+    nextBtn.addEventListener('click', () => { playSfxConfirm(); nextLevel(); });
+    helpBtn.addEventListener('click', () => { playSfxClick(); toggleHelp(true); });
+    closeHelpBtn.addEventListener('click', () => { playSfxClick(); toggleHelp(false); });
+    document.getElementById('startExitBtn')?.addEventListener('click', () => { playSfxClick(); requestExit(); });
+    bottomExitBtn?.addEventListener('click', () => { playSfxClick(); requestExit(); });
+    bottomRestartBtn?.addEventListener('click', () => { playSfxClick(); requestRestartGame(); });
+    confirmExitBtn?.addEventListener('click', () => { playSfxClick(); confirmExit(); });
+    cancelExitBtn?.addEventListener('click', () => { playSfxConfirm(); toggleExitConfirm(false); });
+    confirmRestartBtn?.addEventListener('click', () => { playSfxClick(); confirmRestartGame(); });
+    cancelRestartBtn?.addEventListener('click', () => { playSfxConfirm(); toggleRestartConfirm(false); });
     // Pointer events unify touch, stylus, and mouse. A short press is a tap;
     // any longer stroke is treated as a slash across the rope path.
     canvas.addEventListener('pointerdown', evt => {

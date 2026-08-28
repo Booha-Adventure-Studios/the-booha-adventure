@@ -519,6 +519,7 @@
   muenbaDance.preload = 'auto';
   muenbaDance.loop = false;
   muenbaDance.volume = 0.72;
+  let dangerScreamPreloadStarted = false;
   // A short pool prevents a fast chart from cutting off the previous get or
   // miss sound when two notes land close together. The files are small, so a
   // three-voice pool is cheaper and more reliable than creating audio nodes
@@ -653,7 +654,19 @@
     document.body.innerHTML = `<main class="muenba-lock" aria-labelledby="muenba-lock-title"><img src="assets/img/muenba/muenba_logo.webp" alt="Muenba"><h1 id="muenba-lock-title">This world is locked</h1><p class="jp">この世界は封印されています</p><p>Something waits beyond the cemetery path.<small>Complete nine lessons in one path this week before it will open to you.</small></p><p class="jp-line"><ruby>墓地<rt>ぼち</rt></ruby>の<ruby>道<rt>みち</rt></ruby>の<ruby>先<rt>さき</rt></ruby>で<ruby>何<rt>なに</rt></ruby>かが<ruby>待<rt>ま</rt></ruby>っている。<br><small>今週、ひとつの道で九つの学びを終えよ。それまで、ここは開かない。</small></p><a href="karasuki.html">Return to Karasuki<small>カラスキに<ruby>戻<rt>もど</rt></ruby>る</small></a></main>`;
   }
 
+  function primeDangerScreamSamples() {
+    if (dangerScreamPreloadStarted) return;
+    try {
+      const preload = window.UtsuSfx && window.UtsuSfx.preloadDangerScreamSamples;
+      if (typeof preload !== 'function') return;
+      dangerScreamPreloadStarted = true;
+      const result = preload();
+      if (result && typeof result.catch === 'function') result.catch(() => {});
+    } catch (_) {}
+  }
+
   function startMusic() {
+    primeDangerScreamSamples();
     if (state.musicStarted && !music.paused && !music.ended) return;
     state.musicStarted = true;
     if (music.ended) music.currentTime = 0;
