@@ -5044,6 +5044,16 @@
       html.muenba-phone-portrait #muenba-capture-overlay.muenba-rhythm-mode .muenba-rhythm-lane-label { font-size:.52rem; letter-spacing:.01em; }
       html.muenba-phone-portrait #muenba-capture-overlay.muenba-rhythm-mode .muenba-rhythm-note { width:34px; height:34px; min-width:30px; min-height:30px; font-size:.9rem; }
       html.muenba-phone-portrait #muenba-capture-overlay.muenba-rhythm-mode .muenba-rhythm-help-button { top:8px; left:8px; }
+      /* Pass 27F: popup surfaces own the gesture. The overlay can scroll
+         vertically, but its edge must not hand the gesture to the page or
+         trigger mobile pull-to-refresh. */
+      html.muenba-popup-open,
+      html.muenba-popup-open body { overscroll-behavior:none; }
+      #muenba-lobby-overlay,
+      #muenba-capture-overlay,
+      #muenba-return-overlay { overscroll-behavior-y:contain; touch-action:pan-y; -webkit-overflow-scrolling:touch; }
+      .muenba-lobby-box,
+      .muenba-return-box { overscroll-behavior:contain; }
       /* Pass 18D: the English record is the lesson surface. Keep it tall
          enough for a calm word sweep, give beginner readers generous line
          spacing, and preserve a reliable touch target even on narrow phones. */
@@ -5254,10 +5264,15 @@
     const phone = isMuenbaPhoneViewport();
     const ready = isMuenbaOrientationReady();
     const needsPrompt = phone && !ready;
+    // Pass 27F: an open popup owns the touch surface. Keep the document from
+    // chaining a downward swipe into browser bounce/pull-to-refresh while the
+    // card itself remains an intentional vertical scroll area.
+    const popupOpen = lobbyOpen || captureOpen || returnPortalOpen;
     // Pass 27C: scope portrait popup CSS to actual phone mode. A narrow
     // desktop window or tablet must not inherit the phone presentation.
     document.documentElement.classList.toggle('muenba-phone-portrait', phone && orientationMode === 'portrait');
     document.documentElement.classList.toggle('muenba-phone-landscape', phone && orientationMode === 'landscape');
+    document.documentElement.classList.toggle('muenba-popup-open', popupOpen);
     const title = orientationOverlay.querySelector('.muenba-rotate-title');
     const sub = orientationOverlay.querySelector('.muenba-rotate-sub');
     if (title) title.textContent = orientationMode === 'portrait'
