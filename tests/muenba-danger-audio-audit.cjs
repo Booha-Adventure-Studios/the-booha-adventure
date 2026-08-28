@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 'use strict';
 
-// Pass 26F: Muenba danger audio is a staggered procedural WebAudio layer,
-// not a shared looping scream sample restarted by each hostile ghost.
+// Pass 26F compatibility audit: the shared procedural layer remains available
+// to older callers while Muenba's active danger path uses authored samples.
 const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
@@ -27,9 +27,9 @@ assert(sfx.includes('window.setTimeout(scheduleDangerScreamPulse'), 'danger audi
 assert(sfx.includes('dangerScreamVoices.forEach'), 'danger audio must stop every active voice when danger ends');
 assert(sfx.includes('startDangerScream: startDangerScream'), 'shared SFX must publish the danger-scream start function');
 assert(sfx.includes('stopDangerScream: stopDangerScream'), 'shared SFX must publish the danger-scream stop function');
-assert(muenba.includes('window.UtsuSfx && window.UtsuSfx.startDangerScream'), 'Muenba must start danger audio through shared SFX');
-assert(muenba.includes('window.UtsuSfx && window.UtsuSfx.stopDangerScream'), 'Muenba must stop danger audio through shared SFX');
+assert(muenba.includes('window.UtsuSfx && window.UtsuSfx.startDangerScreamSamples'), 'Muenba must start authored danger audio through shared SFX');
+assert(muenba.includes('window.UtsuSfx && window.UtsuSfx.stopDangerScreamSamples'), 'Muenba must stop authored danger audio through shared SFX');
 assert(!muenba.includes('scream.mp3'), 'Muenba must not load the retired scream sample');
 assert(!fs.existsSync(path.join(audioDir, 'scream.mp3')), 'retired scream sample must be absent');
 
-console.log('Muenba 26F danger-audio audit passed: textured scream presets start once, rotate, and clean up safely.');
+console.log('Muenba danger-audio compatibility audit passed: shared procedural fallback remains safe and Muenba uses authored danger playback.');
