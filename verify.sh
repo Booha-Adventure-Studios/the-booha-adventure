@@ -474,6 +474,13 @@ else
   bad "Maze deferred media-loading audit failed"
 fi
 
+echo "[50/50] Maze 23D travel audit"
+if node tests/maze-travel-audit.cjs >/dev/null 2>&1; then
+  ok "Maze automatic travel contracts pass"
+else
+  bad "Maze travel audit failed"
+fi
+
 # ── Summary ──────────────────────────────────────────────────
 echo "───────────────────────────────────"
 echo "✅ $PASS passed   ⚠️  $WARN warnings   ❌ $FAIL failed"
