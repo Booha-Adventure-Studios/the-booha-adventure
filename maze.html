@@ -1328,6 +1328,7 @@ const GHOST_TRAVEL_MIN_MS = 1100;
 const GHOST_TRAVEL_MAX_MS = 2000;
 const GHOST_TRAVEL_BASE_MS = 700;
 const GHOST_TRAVEL_MS_PER_PX = 1.18;
+const ARRIVAL_POPUP_DELAY_MS = 650;
 
 const INTRO_GLOW_MS   = 2600;
 const INTRO_DROP_MS   = 3800;
@@ -2034,6 +2035,17 @@ function beginGhostTravel(dstIX,dstIY){
   setTravelLock(true);
 }
 
+function queueArrivalPopup(openPopup){
+  // Let the landing burst read before any modal can cover the Booha.
+  // Keep input locked during the hold so another action cannot race the
+  // pending popup or interrupt the arrival state.
+  setTravelLock(true);
+  window.setTimeout(()=>{
+    setTravelLock(false);
+    openPopup();
+  },ARRIVAL_POPUP_DELAY_MS);
+}
+
 function drawTrees(now){
   if(!mazeStarted)return;
   const sec=now/1000;
@@ -2117,7 +2129,11 @@ function drawFrame(now){
     const prog=Math.min((now-introSettleStart)/INTRO_SETTLE_MS,1);const et=easeInOutCubic(prog);
     ghostIX=introHoverIX+(startCP.ix-introHoverIX)*et;ghostIY=introHoverIY+(startCP.iy-introHoverIY)*et;
     if(Math.random()<.22)addTrail(ghostIX,ghostIY);
-    if(prog>=1){introPhase='done';ghostIX=startCP.ix;ghostIY=startCP.iy;ghostSrcIX=ghostIX;ghostSrcIY=ghostIY;ghostDstIX=ghostIX;ghostDstIY=ghostIY;ghostT=1;setTravelLock(false);showPopupAtCP(startCP);}
+    if(prog>=1){
+      introPhase='done';ghostIX=startCP.ix;ghostIY=startCP.iy;ghostSrcIX=ghostIX;ghostSrcIY=ghostIY;ghostDstIX=ghostIX;ghostDstIY=ghostIY;ghostT=1;
+      addGhostFlightBurst(ghostIX,ghostIY,20);
+      queueArrivalPopup(()=>showPopupAtCP(startCP));
+    }
   } else if(introPhase==='done'){
     OPEN_WEEKS.forEach(w=>{cpState[w]={alpha:1,extra:0};});
     if(bryanOn)CHECKPOINTS.forEach(cp=>{if(!cpState[cp.w])cpState[cp.w]={alpha:.65,extra:.15};});
@@ -2128,21 +2144,20 @@ function drawFrame(now){
       if(ghostT>=1){
         ghostIX=ghostDstIX;ghostIY=ghostDstIY;
         addGhostFlightBurst(ghostIX,ghostIY,20);
-        setTravelLock(false);
-        
-       if(pendingHomework){
-          pendingHomework=false;
-          openHomeworkPrompt();
-        } else if(pendingKarasuki){
-          pendingKarasuki=false;
-          openKarasukiPrompt();
-        } else if(pendingJuku){
-          pendingJuku=false;
-          openJukuPrompt();
-        } else if(pendingPopupCP){
-          
-          showPopupAtCP(pendingPopupCP);pendingPopupCP=null;
-        }
+        queueArrivalPopup(()=>{
+          if(pendingHomework){
+            pendingHomework=false;
+            openHomeworkPrompt();
+          } else if(pendingKarasuki){
+            pendingKarasuki=false;
+            openKarasukiPrompt();
+          } else if(pendingJuku){
+            pendingJuku=false;
+            openJukuPrompt();
+          } else if(pendingPopupCP){
+            showPopupAtCP(pendingPopupCP);pendingPopupCP=null;
+          }
+        });
       }
     }
   }

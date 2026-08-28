@@ -35,7 +35,7 @@ assets.forEach((name) => {
 });
 
 assert(!sw.includes('${BASE}/assets/img/juku-tree.png'), 'service worker must not precache the retired Maze tree path');
-assert(sw.includes('booha-pages-2026-370'), 'Maze HTML migration must bump the page cache');
-assert(sw.includes('booha-assets-2026-381'), 'Maze WebP migration must bump the asset cache');
+assert(sw.includes('booha-pages-2026-371'), 'Maze HTML migration must bump the page cache');
+assert(sw.includes('booha-assets-2026-382'), 'Maze WebP migration must bump the asset cache');
 
 console.log('Maze 23A performance audit passed: 19 visual assets use smaller WebP files and Maze has no stale PNG references.');

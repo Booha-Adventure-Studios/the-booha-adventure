@@ -481,6 +481,13 @@ else
   bad "Maze travel audit failed"
 fi
 
+echo "[51/51] Maze 23E arrival celebration audit"
+if node tests/maze-arrival-audit.cjs >/dev/null 2>&1; then
+  ok "Maze arrival celebration contracts pass"
+else
+  bad "Maze arrival celebration audit failed"
+fi
+
 # ── Summary ──────────────────────────────────────────────────
 echo "───────────────────────────────────"
 echo "✅ $PASS passed   ⚠️  $WARN warnings   ❌ $FAIL failed"
