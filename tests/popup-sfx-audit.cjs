@@ -22,7 +22,7 @@ assert(sfx.includes('window.AudioContext || window.webkitAudioContext'), 'popup 
 });
 assert(!sfx.includes('new Audio('), 'popup palette must not introduce audio-file playback');
 
-['popupOpen', 'popupClose', 'buttonPress', 'skeletonClose', 'slimeClick', 'mischiefReward', 'lockedRattle'].forEach(name => {
+['popupOpen', 'popupClose', 'buttonPress', 'skeletonClose', 'observerOpen', 'nuppiOpen', 'lockedRattle'].forEach(name => {
   assert(karasuki.includes(`UtsuSfx.${name}`), `Karasuki must wire ${name} to a popup or click event`);
 });
 

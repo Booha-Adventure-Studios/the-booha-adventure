@@ -17,7 +17,7 @@ function sourceSection(startName, endName) {
   return source.slice(start, end);
 }
 
-const returning = sourceSection('showWandererReturn', 'showKarasukiArrival');
+const returning = sourceSection('showWandererReturn', 'spawnGlitter');
 const visitFlow = sourceSection('openWandererPop', 'closeWandererPop');
 
 assert(returning.includes('showCelebrationPop'), 'returning Wanderers must use the stable celebration card');
