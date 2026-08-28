@@ -57,6 +57,7 @@ const CURRENT_CACHES = {
   // Muenba 28C primes all authored clips after the first gesture and avoids immediate repeats.
   // Muenba 28D re-arms every carrying-energy hostile chase after Hide.
   // Muenba 28E removes the retired procedural scream generator from the shared bundle.
+  // Muenba 28F pauses authored danger screams while the page is backgrounded.
   // Destruction goofy-SFX v3: modal-synthesis rewrite of the pull/creak,
   // block hit/break, and bounce sounds (static-partial materials vs.
   // pitch-bending gesture sounds), based on a reference implementation
@@ -76,7 +77,7 @@ const CURRENT_CACHES = {
   // resized and converted to webp, background recompressed only, the
   // dead double-fetch of the (CSS-only) background image removed from
   // preloadAssets, and the 5 catch/bounce mp3s right-sized.
-  assets: 'booha-assets-2026-418',
+  assets: 'booha-assets-2026-419',
   decks:  'booha-decks-2026-310',
 };
 
