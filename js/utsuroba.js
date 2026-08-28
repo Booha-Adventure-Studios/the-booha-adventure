@@ -824,7 +824,7 @@
   };
 
   let pins = [], trail = [], ripples = [];
-  const ghostImg = new Image(); ghostImg.src = './assets/img/booha_ghost.png';
+  const ghostImg = new Image(); ghostImg.src = './assets/img/booha_ghost.webp';
 
   /* Round 2 Pass 13 (celebration dance): three dedicated dance-pose
      frames, swapped on a beat during startCelebration() instead of

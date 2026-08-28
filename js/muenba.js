@@ -480,7 +480,7 @@
   }
 
   const ghostImg = new Image();
-  ghostImg.src = 'assets/img/booha_ghost.png';
+  ghostImg.src = 'assets/img/booha_ghost.webp';
   const hidingImg = new Image();
   hidingImg.src = 'assets/img/muenba/hiding.png';
   // Reusing Nuppi's existing wandering-NPC art from Karasuki (same asset
