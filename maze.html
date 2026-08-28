@@ -1098,9 +1098,7 @@
     </div>
   </div>
   <div id="videoWrap" aria-hidden="true">
-    <video id="toMazeVideo" preload="auto" playsinline webkit-playsinline>
-      <source src="assets/video/ttmaze.mp4" type="video/mp4" />
-    </video>
+    <video id="toMazeVideo" data-src="assets/video/ttmaze.mp4" preload="none" playsinline webkit-playsinline></video>
   </div>
   <div id="overlay2" class="overlay" aria-label="Welcome to the maze / めいろへようこそ">
     <p class="arrivalKicker">A NEW WORLD OPENS</p>
@@ -1203,9 +1201,7 @@
 
   <!-- HOMEWORK VIDEO — simple fade -->
   <div id="hwVideoWrap" aria-hidden="true">
-    <video id="hwTreeVideo" preload="auto" playsinline webkit-playsinline>
-      <source src="assets/video/homework.mp4" type="video/mp4" />
-    </video>
+    <video id="hwTreeVideo" data-src="assets/video/homework.mp4" preload="none" playsinline webkit-playsinline></video>
   </div>
 
   <!-- KARASUKI PROMPT -->
@@ -1258,9 +1254,7 @@
 
 <!-- KARASUKI VIDEO — simple fade -->
   <div id="krVideoWrap" aria-hidden="true">
-    <video id="krVideo" preload="auto" playsinline webkit-playsinline>
-      <source src="assets/video/karasuki.mp4" type="video/mp4" />
-    </video>
+    <video id="krVideo" data-src="assets/video/karasuki.mp4" preload="none" playsinline webkit-playsinline></video>
   </div>
 
   <!-- JUKU PROMPT -->
@@ -1279,7 +1273,7 @@
 
 </div>
   
-<audio id="bgMusic" src="assets/audio/sneaky.mp3" loop preload="auto"></audio>
+<audio id="bgMusic" data-src="assets/audio/sneaky.mp3" loop preload="none"></audio>
 
 <script src="./js/calendar.js"></script>
 <script src="./js/core/adventure-core.js"></script>
@@ -1463,6 +1457,20 @@ const app=document.getElementById('app'),rotateOverlay=document.getElementById('
   krYesBtn=document.getElementById('krYesBtn'),
   krVideoWrap=document.getElementById('krVideoWrap'),
   krVideo=document.getElementById('krVideo');
+
+function loadMediaSource(media){
+  if(!media||media.dataset.loaded==='1')return;
+  const src=media.dataset.src;
+  if(!src)return;
+  media.dataset.loaded='1';
+  media.src=src;
+  media.load();
+}
+
+function playBgMusic(){
+  loadMediaSource(bgMusic);
+  return bgMusic.play();
+}
 
  function personalizeMazeIntro() {
   const overlay = document.getElementById('overlay1');
@@ -1752,12 +1760,12 @@ function restoreMazeFromCheckpoint(){
   resizeCanvas();buildWanderers();startLoop();
   bgMusic.loop=true;bgMusic.volume=.65;
   const _musicResume=()=>{
-    if(bgMusic.paused)bgMusic.play().catch(()=>{});
+    if(bgMusic.paused)playBgMusic().catch(()=>{});
   };
-  bgMusic.play().catch(()=>{});
+  playBgMusic().catch(()=>{});
   ['click','touchstart','keydown','pointerdown'].forEach(ev=>{
     document.addEventListener(ev,function _once(){
-      if(bgMusic.paused)bgMusic.play().catch(()=>{});
+      if(bgMusic.paused)playBgMusic().catch(()=>{});
       document.removeEventListener(ev,_once);
     },{once:true,passive:true});
   });
@@ -2338,6 +2346,7 @@ function closeHomeworkPrompt(){
 function playHomeworkVideoAndGo(){
   closeHomeworkPrompt();
   try{bgMusic.pause();bgMusic.currentTime=0;}catch(e){}
+  loadMediaSource(hwTreeVideo);
   try{hwTreeVideo.pause();hwTreeVideo.currentTime=0;}catch(e){}
   void hwVideoWrap.offsetWidth;
   hwVideoWrap.classList.add('show');
@@ -2390,6 +2399,7 @@ function closeKarasukiPrompt(){
 function playKarasukiVideoAndGo(){
   closeKarasukiPrompt();
   try{bgMusic.pause();bgMusic.currentTime=0;}catch(e){}
+  loadMediaSource(krVideo);
   try{krVideo.pause();krVideo.currentTime=0;}catch(e){}
   void krVideoWrap.offsetWidth;
   krVideoWrap.classList.add('show');
@@ -2559,6 +2569,7 @@ returnBtn.addEventListener('click',()=>{fadeOut();setTimeout(()=>goToHub(),FADE_
 let videoPlayed=false;
 continueBtn.addEventListener('click',async()=>{
   if(videoPlayed)return;videoPlayed=true;
+  loadMediaSource(toMazeVideo);
   overlay1.classList.add('hidden');overlay1.addEventListener('transitionend',()=>overlay1.classList.add('gone'),{once:true});
   app.classList.add('inTransition');videoWrap.classList.add('show');
   try{toMazeVideo.currentTime=0;}catch(e){}
@@ -2585,7 +2596,7 @@ mazeStartBtn.addEventListener('click',async()=>{
   introPhase='allGlow';introGlowStart=performance.now();
   requestMazeVisuals();
   resizeCanvas();buildWanderers();startLoop();
-  try{bgMusic.volume=.65;await bgMusic.play();}catch(e){console.warn('Music blocked',e);}
+  try{bgMusic.volume=.65;await playBgMusic();}catch(e){console.warn('Music blocked',e);}
 });
 
 
@@ -2608,8 +2619,8 @@ document.addEventListener('visibilitychange',()=>{
     try{toMazeVideo.pause();}catch(e){}
     if(!mazeLaunched)try{bgMusic.pause();}catch(e){}
   } else {
-    if(videoPlayed&&!o2shown)try{toMazeVideo.play();}catch(e){}
-    if(mazeLaunched)try{bgMusic.loop=true;bgMusic.volume=.65;bgMusic.play().catch(()=>{});}catch(e){}
+    if(videoPlayed&&!o2shown)try{loadMediaSource(toMazeVideo);toMazeVideo.play();}catch(e){}
+    if(mazeLaunched)try{bgMusic.loop=true;bgMusic.volume=.65;playBgMusic().catch(()=>{});}catch(e){}
   }
 });
 
@@ -2632,10 +2643,10 @@ window.addEventListener('pageshow',(e)=>{
   if(rafHandle){cancelAnimationFrame(rafHandle);rafHandle=null;}
   if(mazeStarted)startLoop();
   bgMusic.loop=true;bgMusic.volume=.65;
-  bgMusic.play().catch(()=>{});
+  playBgMusic().catch(()=>{});
   ['click','touchstart','keydown','pointerdown'].forEach(ev=>{
     document.addEventListener(ev,function _once(){
-      if(bgMusic.paused)bgMusic.play().catch(()=>{});
+      if(bgMusic.paused)playBgMusic().catch(()=>{});
       document.removeEventListener(ev,_once);
     },{once:true,passive:true});
   });
