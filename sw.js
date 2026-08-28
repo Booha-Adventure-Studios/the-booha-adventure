@@ -45,7 +45,12 @@ const CURRENT_CACHES = {
   // Destruction goofy-SFX v2: louder across the board, more differentiated
   // per-material character, and the pull sound rebuilt from a stuck-prone
   // held drone into short self-terminating creak pulses.
-  assets: 'booha-assets-2026-401',
+  // Muenba 27A adds state-aware phone orientation handling to js/muenba.js.
+  // Destruction goofy-SFX v3: modal-synthesis rewrite of the pull/creak,
+  // block hit/break, and bounce sounds (static-partial materials vs.
+  // pitch-bending gesture sounds), based on a reference implementation
+  // the user supplied.
+  assets: 'booha-assets-2026-403',
   decks:  'booha-decks-2026-310',
 };
 
