@@ -1379,12 +1379,13 @@
   btn.addEventListener('click', function (e) {
     if (localStorage.getItem('booha_is_juku') === '1') return; // navigate normally
     e.preventDefault();
+    playIndexSfx('popupOpen');
     pop.classList.add('open');
   });
 
-  close.addEventListener('click', function () { pop.classList.remove('open'); });
+  close.addEventListener('click', function () { playIndexSfx('popupClose'); pop.classList.remove('open'); });
   pop.addEventListener('click', function (e) {
-    if (e.target === pop) pop.classList.remove('open');
+    if (e.target === pop) { playIndexSfx('popupClose'); pop.classList.remove('open'); }
   });
 })();
 </script>
@@ -1394,6 +1395,12 @@
 
 <script src="./js/calendar.js"></script>
 <script>
+
+function playIndexSfx(name) {
+  try {
+    if (window.UtsuSfx && typeof window.UtsuSfx[name] === 'function') window.UtsuSfx[name]();
+  } catch (e) {}
+}
   
 const { getCurrentCurriculumWeek } = window.CALENDAR;
 
@@ -1686,6 +1693,7 @@ const PILLS = [
     if (done) btn.classList.add('done');
 
     btn.addEventListener('click', () => {
+      playIndexSfx('buttonPress');
       const live = getCurrentCurriculumWeek();
       ENGINES[type].launch({
         curr: activeTab,
@@ -1709,6 +1717,7 @@ const PILLS = [
     btn.className = tab.ready ? (tab.id === activeTab ? 'active' : '') : 'soon';
     btn.addEventListener('click', () => {
       if (!tab.ready) return;
+      playIndexSfx('buttonPress');
       activeTab = tab.id;
       tabsEl.querySelectorAll('button').forEach(b => {
         const bTab = TABS.find(t => t.id === b.dataset.tabId);
@@ -1720,6 +1729,7 @@ const PILLS = [
   });
 
  arcade.querySelector('.blitzRankBtn').addEventListener('click', () => {
+    playIndexSfx('panelOpen');
     const cw = getCurrentCurriculumWeek();
    
    VocabBlitz.openFastestPanel('vocab', {
@@ -1784,11 +1794,14 @@ function openPicker(tagEn, tagJp, dates, weekId) {
   const pickerSub2 = document.getElementById('pickerSub2');
   if (pickerSub2) pickerSub2.textContent = `${getBoohaFirstName()}, choose your curriculum`;
   picker.scrollTop = 0;
+  playIndexSfx('panelOpen');
   picker.classList.add('show');
   picker.setAttribute('aria-hidden', 'false');
 }
 
 function closePicker() {
+  if (!picker.classList.contains('show')) return;
+  playIndexSfx('panelClose');
   picker.classList.remove('show');
   picker.setAttribute('aria-hidden', 'true');
 }
@@ -1799,6 +1812,7 @@ picker.addEventListener('click', e => { if (e.target === picker) closePicker(); 
 document.querySelectorAll('.pickTile').forEach(btn => {
   btn.addEventListener('click', e => {
     e.stopPropagation();
+    playIndexSfx('hubSelect');
     const weekId = currentWeekId;
     
    const curr   = btn.dataset.curr;
@@ -1817,6 +1831,7 @@ document.querySelectorAll('.pickTile').forEach(btn => {
 ════════════════════════════════════════════════════════════ */
 const mazeBtn = document.getElementById('mazeBtn');
 mazeBtn.addEventListener('click', () => {
+  playIndexSfx('hubPrimary');
   sessionStorage.setItem('booha_return_to_hub', '1');
   fadeToBlack(true);
   setTimeout(() => { window.location.href = 'maze.html'; }, 520);
@@ -1836,6 +1851,7 @@ const dailyCheckBtn = document.getElementById('dailyCheckBtn');
    by which point they're ready. */
 if (dailyCheckBtn) dailyCheckBtn.addEventListener('click', () => {
   if (started) return;
+  playIndexSfx('mischiefReward');
   if (!window.BoohaDailyCheck) return;
   const today = BoohaDailyCheck.todaySummary();
   BoohaDailyCheck.run({
@@ -1888,6 +1904,7 @@ async function startIntro() {
 }
 
 startBtn.addEventListener('click', () => {
+  playIndexSfx('hubPrimary');
   try { if (window.BoohaDailyCheck) BoohaDailyCheck.markSkip(BoohaDailyCheck.knownCurr()); } catch (e) {}
   startIntro();
 });
@@ -1979,6 +1996,7 @@ window.addEventListener('pageshow', ev => {
 </script>
 
 
+<script src="js/utsu-sfx.js"></script>
 <script src="pwa-init.js"></script>
 <script src="js/core/adventure-core.js"></script>
 <script src="js/core/save-file.js"></script>

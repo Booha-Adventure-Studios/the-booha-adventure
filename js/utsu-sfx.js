@@ -34,6 +34,12 @@
     return ctx;
   }
 
+  // Pass 22D: UI feedback must be heard over the world's music. Keep the
+  // authored palette values restrained, then apply one shared capped boost so
+  // every existing popup/click becomes more present without clipping.
+  var SFX_GAIN_BOOST = 1.9;
+  var SFX_MAX_GAIN = 0.16;
+
   /* One short tone. freq in Hz, opts: {type, gain, dur, delay}. */
   function tone(freq, opts) {
     opts = opts || {};
@@ -47,7 +53,9 @@
       osc.type = opts.type || 'sine';
       osc.frequency.setValueAtTime(freq, start);
       if (opts.slideTo) osc.frequency.exponentialRampToValueAtTime(opts.slideTo, start + dur);
-      gain.gain.setValueAtTime(opts.gain != null ? opts.gain : 0.055, start);
+      var requestedGain = opts.gain != null ? opts.gain : 0.055;
+      var audibleGain = Math.min(SFX_MAX_GAIN, requestedGain * SFX_GAIN_BOOST);
+      gain.gain.setValueAtTime(audibleGain, start);
       gain.gain.exponentialRampToValueAtTime(0.0001, start + dur);
       osc.connect(gain); gain.connect(c.destination);
       osc.start(start); osc.stop(start + dur + 0.02);
@@ -108,7 +116,18 @@
     /* Any .dp-btn press — a very light click, quieter than every other
        sound here on purpose since it fires often. */
     buttonPress: function () {
-      tone(720, { type: 'square', gain: 0.03, dur: 0.03 });
+      tone(720, { type: 'square', gain: 0.05, dur: 0.035 });
+    },
+    /* Index hub: a friendly three-note acknowledgement for primary actions. */
+    hubPrimary: function () {
+      tone(392, { type: 'triangle', gain: 0.075, dur: 0.075 });
+      tone(523.25, { type: 'sine', gain: 0.065, dur: 0.1, delay: 0.05 });
+      tone(659.25, { type: 'sine', gain: 0.055, dur: 0.15, delay: 0.11 });
+    },
+    /* Index hub: a quick two-note confirmation for choosing a curriculum. */
+    hubSelect: function () {
+      tone(560, { type: 'triangle', gain: 0.065, dur: 0.055 });
+      tone(840, { type: 'sine', gain: 0.055, dur: 0.085, delay: 0.04 });
     },
     /* A tiny two-click bone rattle for the Observer close/exit moment. */
     skeletonClose: function () {
