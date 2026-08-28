@@ -47,6 +47,7 @@ const CURRENT_CACHES = {
   // held drone into short self-terminating creak pulses.
   // Muenba 27A adds state-aware phone orientation handling to js/muenba.js.
   // Muenba 27B keeps popup focus and layout cycles anchored at the first line.
+  // Muenba 27D gives the active rhythm stage an explicit portrait surface.
   // Destruction goofy-SFX v3: modal-synthesis rewrite of the pull/creak,
   // block hit/break, and bounce sounds (static-partial materials vs.
   // pitch-bending gesture sounds), based on a reference implementation
@@ -55,7 +56,11 @@ const CURRENT_CACHES = {
   // stone, a slightly slower block-impact cadence, a live rolling/
   // sliding friction loop, staggered tower-collapse landing impacts,
   // and nine distinct per-power death-explosion sounds.
-  assets: 'booha-assets-2026-405',
+  // Destruction goofy-SFX v5: normalized hit-sound loudness across all
+  // four materials, opened up soft/rubber's muffled lowpass so it's
+  // finally audible, louder break/shatter debris on every material,
+  // and roughly doubled every death-explosion sound.
+  assets: 'booha-assets-2026-407',
   decks:  'booha-decks-2026-310',
 };
 
