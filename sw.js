@@ -24,9 +24,9 @@ const CURRENT_CACHES = {
   // Profile Pass 1: remove floating world doors and ship the shared SVG icon set.
   // Shared index assets are now used by all migrated pages; invalidate the
   // prior PNG-serving asset cache after the 22F WebP migration.
-  // Karasuki 24A/24B/24C: room, wanderer, and Observer artwork now use
-  // genuine transparent WebP assets.
-  assets: 'booha-assets-2026-386',
+  // Karasuki 24A/24B/24C/24D: room, wanderer, and Observer artwork now use
+  // genuine transparent WebP assets without duplicate Observer copies.
+  assets: 'booha-assets-2026-387',
   decks:  'booha-decks-2026-310',
 };
 
