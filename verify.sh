@@ -544,6 +544,13 @@ else
   bad "Utsuroba room WebP audit failed"
 fi
 
+echo "[60/60] Utsuroba 25B drifter WebP audit"
+if node tests/utsuroba-drifter-webp-audit.cjs >/dev/null 2>&1; then
+  ok "Utsuroba drifter WebP contracts pass"
+else
+  bad "Utsuroba drifter WebP audit failed"
+fi
+
 # ── Summary ──────────────────────────────────────────────────
 echo "───────────────────────────────────"
 echo "✅ $PASS passed   ⚠️  $WARN warnings   ❌ $FAIL failed"
