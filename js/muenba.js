@@ -397,6 +397,7 @@
   // Pass 8B can attach timing/input without also changing movement, ghost AI,
   // or save writes.
   let captureSession = null;
+  let dangerScreamVisibilityPaused = false;
   let motes = [];
   const moteSpriteCache = new Map();
   const spiritGlowCache = new Map();
@@ -704,6 +705,27 @@
       if (typeof sound === 'function') sound();
     } catch (_) {}
     music.volume = MUENBA_MUSIC_VOLUME;
+  }
+
+  function dangerScreamStateIsActive() {
+    const dangerPopupWaiting = captureSession?.danger === true
+      && captureSession.phase === 'danger-ready';
+    return activeGhost?.screaming === true || dangerPopupWaiting;
+  }
+
+  function handleMuenbaVisibilityChange() {
+    if (document.hidden) {
+      if (dangerScreamStateIsActive()) {
+        dangerScreamVisibilityPaused = true;
+        stopDangerScream();
+      }
+      return;
+    }
+    if (!dangerScreamVisibilityPaused) return;
+    dangerScreamVisibilityPaused = false;
+    if (!state.hiding && !state.celebrating && !captureSession?.rhythm && dangerScreamStateIsActive()) {
+      startDangerScream();
+    }
   }
 
   let dangerRhythmPlayToken = 0;
@@ -6800,6 +6822,7 @@
     validateCaseData();
     injectStyles();
     buildApp();
+    document.addEventListener('visibilitychange', handleMuenbaVisibilityChange);
     bindMuenbaOrientationController();
     fitStage();
     resizeCanvas();
