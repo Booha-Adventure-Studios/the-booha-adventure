@@ -1683,6 +1683,8 @@
     setDangerOverlay(false);
     if (captureOverlay) {
       captureOverlay.classList.remove('open');
+      captureOverlay.classList.remove('muenba-rhythm-mode');
+      delete captureOverlay.dataset.surface;
       captureOverlay.setAttribute('aria-hidden', 'true');
     }
     captureSession = null;
@@ -1731,6 +1733,8 @@
     setDangerOverlay(false);
     if (captureOverlay) {
       captureOverlay.classList.remove('open');
+      captureOverlay.classList.remove('muenba-rhythm-mode');
+      delete captureOverlay.dataset.surface;
       captureOverlay.setAttribute('aria-hidden', 'true');
     }
     captureSession = null;
@@ -1752,6 +1756,8 @@
     setDangerOverlay(false);
     if (captureOverlay) {
       captureOverlay.classList.remove('open');
+      captureOverlay.classList.remove('muenba-rhythm-mode');
+      delete captureOverlay.dataset.surface;
       captureOverlay.setAttribute('aria-hidden', 'true');
     }
     captureSession = null;
@@ -1897,7 +1903,11 @@
     captureOverlay.setAttribute('aria-hidden', 'false');
     captureOverlay.scrollTop = 0;
     captureOverlay.scrollLeft = 0;
-    if (captureSession) captureOverlay.dataset.phase = captureSession.phase || '';
+    if (captureSession) {
+      captureOverlay.dataset.phase = captureSession.phase || '';
+      captureOverlay.dataset.surface = captureSession.rhythm ? 'rhythm' : 'capture';
+      captureOverlay.classList.toggle('muenba-rhythm-mode', !!captureSession.rhythm);
+    }
     const box = document.createElement('div');
     box.className = 'muenba-lobby-box';
     captureOverlay.appendChild(box);
@@ -3053,6 +3063,10 @@
 
     pauseWorldMusicForCapture();
     if (danger) startDangerRhythmMusic();
+    // Pass 27D: keep the rhythm surface explicit for portrait-specific lane
+    // sizing and accessibility/QA, across countdown, play, help, and result.
+    captureOverlay.dataset.surface = 'rhythm';
+    captureOverlay.classList.add('muenba-rhythm-mode');
     renderRhythmCapture();
     captureSession.rhythm.rafId = window.requestAnimationFrame(tickRhythmCapture);
   }
@@ -3128,6 +3142,8 @@
 
   function renderRhythmHelp() {
     if (!captureSession || !captureOverlay) return;
+    captureOverlay.dataset.surface = 'rhythm';
+    captureOverlay.classList.add('muenba-rhythm-mode');
     setDangerOverlay(false);
     const box = captureBox();
     box.classList.add('muenba-rhythm-halloween-box', 'muenba-capture-result');
@@ -3182,6 +3198,8 @@
 
   function renderRhythmCapture() {
     if (!captureSession || !captureSession.rhythm || !captureOverlay) return;
+    captureOverlay.dataset.surface = 'rhythm';
+    captureOverlay.classList.add('muenba-rhythm-mode');
     const rhythm = captureSession.rhythm;
     const ghost = captureSession.ghost;
     const practice = !!captureSession.practice;
@@ -3764,6 +3782,10 @@
   }
 
   function renderRhythmResult(accuracy, success, message) {
+    if (captureOverlay) {
+      captureOverlay.dataset.surface = 'rhythm';
+      captureOverlay.classList.add('muenba-rhythm-mode');
+    }
     const ghost = captureSession.ghost;
     const p = document.createElement('p');
     const danger = !!captureSession.danger;
@@ -4257,6 +4279,8 @@
     setDangerOverlay(false);
     if (captureOverlay) {
       captureOverlay.classList.remove('open');
+      captureOverlay.classList.remove('muenba-rhythm-mode');
+      delete captureOverlay.dataset.surface;
       captureOverlay.setAttribute('aria-hidden', 'true');
     }
 
@@ -4278,6 +4302,8 @@
     setDangerOverlay(false);
     if (captureOverlay) {
       captureOverlay.classList.remove('open');
+      captureOverlay.classList.remove('muenba-rhythm-mode');
+      delete captureOverlay.dataset.surface;
       captureOverlay.setAttribute('aria-hidden', 'true');
     }
     captureSession = null;
@@ -4999,6 +5025,18 @@
       html.muenba-phone-portrait .muenba-lobby-actions button,
       html.muenba-phone-portrait .muenba-case-actions button,
       html.muenba-phone-portrait .muenba-capture-action { min-height:48px; }
+      /* Pass 27D: rhythm is its own portrait surface. Keep the active chart
+         and its lane controls together, while leaving the normal reading
+         popup proportions untouched. The class remains through countdown,
+         help, result, and reward until the capture session closes. */
+      html.muenba-phone-portrait #muenba-capture-overlay.muenba-rhythm-mode { overscroll-behavior:contain; }
+      html.muenba-phone-portrait #muenba-capture-overlay.muenba-rhythm-mode .muenba-lobby-box { padding:16px 10px 14px; }
+      html.muenba-phone-portrait #muenba-capture-overlay.muenba-rhythm-mode .muenba-rhythm-halloween-box h2 { margin-bottom:2px; font-size:clamp(1.15rem,6vw,1.5rem); }
+      html.muenba-phone-portrait #muenba-capture-overlay.muenba-rhythm-mode .muenba-rhythm-board { height:min(42dvh,250px); min-height:190px; margin:7px 0 5px; gap:6px; padding:4px; }
+      html.muenba-phone-portrait #muenba-capture-overlay.muenba-rhythm-mode .muenba-rhythm-lane { height:100%; min-height:190px; }
+      html.muenba-phone-portrait #muenba-capture-overlay.muenba-rhythm-mode .muenba-rhythm-lane-label { font-size:.52rem; letter-spacing:.01em; }
+      html.muenba-phone-portrait #muenba-capture-overlay.muenba-rhythm-mode .muenba-rhythm-note { width:34px; height:34px; min-width:30px; min-height:30px; font-size:.9rem; }
+      html.muenba-phone-portrait #muenba-capture-overlay.muenba-rhythm-mode .muenba-rhythm-help-button { top:8px; left:8px; }
       /* Pass 18D: the English record is the lesson surface. Keep it tall
          enough for a calm word sweep, give beginner readers generous line
          spacing, and preserve a reliable touch target even on narrow phones. */

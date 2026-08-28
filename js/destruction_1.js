@@ -312,6 +312,8 @@
   // purpose; the difference is *which* sounds get the toon swoop.
   const SYNTH_BOOST = 1.6;
   function g1(x) { return Math.min(1, x); }
+  function g1b(x) { return Math.min(1.25, x); }
+  function g2(x) { return Math.min(1.9, x); }
   let noiseBuffer = null;
   function getNoiseBuffer(ac) {
     if (noiseBuffer) return noiseBuffer;
@@ -371,12 +373,12 @@
         const osc = ac.createOscillator(), g = ac.createGain();
         osc.type = 'triangle';
         osc.frequency.setValueAtTime(freq + rnd(-12, 12), now);
-        g.gain.setValueAtTime(g1((i===0?0.85:0.5)*m), now);
-        g.gain.exponentialRampToValueAtTime(0.0001, now + 0.13 - i*0.02);
+        g.gain.setValueAtTime(g1((i===0?1.3:0.8)*m), now);
+        g.gain.exponentialRampToValueAtTime(0.0001, now + 0.16 - i*0.02);
         osc.connect(g).connect(ac.destination);
-        osc.start(now); osc.stop(now + 0.15);
+        osc.start(now); osc.stop(now + 0.18);
       });
-      playNoiseImpact(ac, now, 480, 1.6, 0.06, 0.55*m, 'bandpass');
+      playNoiseImpact(ac, now, 480, 1.6, 0.08, 0.85*m, 'bandpass');
     } catch (e) { audioWarn('wood', e); }
   }
   // Wood break — the modal knock at full strength plus a bigger scatter
@@ -395,7 +397,7 @@
         o.type = 'square';
         o.frequency.setValueAtTime(950 + rnd()*750, t);
         g.gain.setValueAtTime(0.001, t);
-        g.gain.exponentialRampToValueAtTime(g1(0.32*m), t + 0.006);
+        g.gain.exponentialRampToValueAtTime(g1b(0.55*m), t + 0.006);
         g.gain.exponentialRampToValueAtTime(0.0001, t + 0.05);
         o.connect(g).connect(ac.destination);
         o.start(t); o.stop(t + 0.06);
@@ -419,12 +421,12 @@
       const osc = ac.createOscillator(), g = ac.createGain();
       osc.type = 'sawtooth';
       osc.frequency.setValueAtTime(88 + rnd(-6,6), now);
-      osc.frequency.exponentialRampToValueAtTime(26, now + 0.09);
-      g.gain.setValueAtTime(g1(1.2*m), now);
-      g.gain.exponentialRampToValueAtTime(0.0001, now + 0.105);
+      osc.frequency.exponentialRampToValueAtTime(24, now + 0.115);
+      g.gain.setValueAtTime(g1(1.3*m), now);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + 0.13);
       osc.connect(shaper).connect(g).connect(ac.destination);
-      osc.start(now); osc.stop(now + 0.11);
-      playNoiseImpact(ac, now, 160, 0.9, 0.075, 0.9*m, 'lowpass');
+      osc.start(now); osc.stop(now + 0.14);
+      playNoiseImpact(ac, now, 160, 0.9, 0.095, 1.05*m, 'lowpass');
     } catch (e) { audioWarn('stone', e); }
   }
   // Stone break — the sub-bass thump at full strength plus a bigger
@@ -446,7 +448,7 @@
         filter.type = 'lowpass';
         filter.frequency.setValueAtTime(250 + rnd()*500, t);
         const g = ac.createGain();
-        g.gain.setValueAtTime(g1(0.38*m), t);
+        g.gain.setValueAtTime(g1b(0.6*m), t);
         g.gain.exponentialRampToValueAtTime(0.0001, t + 0.06);
         noise.connect(filter).connect(g).connect(ac.destination);
         noise.start(t, rnd(0, 2)); noise.stop(t + 0.06);
@@ -462,17 +464,17 @@
     if (AUDIO_STATE.muted) return;
     try {
       const ac = getAC(); if (!ac) return;
-      const now = ac.currentTime, m = AUDIO_STATE.master * SYNTH_BOOST * Math.max(0.45, Math.min(1, vol));
-      playNoiseImpact(ac, now, 260, 0.8, 0.15, 0.8*m, 'lowpass');
+      const now = ac.currentTime, m = AUDIO_STATE.master * SYNTH_BOOST * Math.max(0.55, Math.min(1, vol));
+      playNoiseImpact(ac, now, 480, 0.9, 0.2, 1.05*m, 'lowpass');
       const osc = ac.createOscillator(), g = ac.createGain();
       osc.type = 'sine';
       osc.frequency.setValueAtTime(320, now);
-      osc.frequency.exponentialRampToValueAtTime(560, now + 0.05);
+      osc.frequency.exponentialRampToValueAtTime(560, now + 0.06);
       g.gain.setValueAtTime(0.001, now);
-      g.gain.exponentialRampToValueAtTime(g1(0.4*m), now + 0.015);
-      g.gain.exponentialRampToValueAtTime(0.0001, now + 0.13);
+      g.gain.exponentialRampToValueAtTime(g1b(0.9*m), now + 0.015);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + 0.17);
       osc.connect(g).connect(ac.destination);
-      osc.start(now); osc.stop(now + 0.15);
+      osc.start(now); osc.stop(now + 0.19);
     } catch (e) { audioWarn('soft', e); }
   }
   // Soft break — the squish at full strength plus a bouncier four-note
@@ -491,7 +493,7 @@
         osc.type = 'sine';
         osc.frequency.setValueAtTime(560 - i*90, t);
         g.gain.setValueAtTime(0.001, t);
-        g.gain.exponentialRampToValueAtTime(g1(0.26*m), t + 0.02);
+        g.gain.exponentialRampToValueAtTime(g1b(0.5*m), t + 0.02);
         g.gain.exponentialRampToValueAtTime(0.0001, t + 0.12);
         osc.connect(g).connect(ac.destination);
         osc.start(t); osc.stop(t + 0.14);
@@ -548,16 +550,16 @@
     if (AUDIO_STATE.muted) return;
     try {
       const ac = getAC(); if (!ac) return;
-      const now = ac.currentTime, m = AUDIO_STATE.master * SYNTH_BOOST * Math.max(0.35, Math.min(1, vol));
-      playNoiseImpact(ac, now, 4200, null, 0.09, 0.65*m, 'highpass');
+      const now = ac.currentTime, m = AUDIO_STATE.master * SYNTH_BOOST * Math.max(0.45, Math.min(1, vol));
+      playNoiseImpact(ac, now, 4200, null, 0.11, 0.9*m, 'highpass');
       [2800, 4200, 5600].forEach(freq => {
         const osc = ac.createOscillator(), gain = ac.createGain();
         osc.type = 'sine';
         osc.frequency.setValueAtTime(freq + rnd(-100, 100), now);
-        gain.gain.setValueAtTime(g1(0.26 * m), now);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.14 + rnd(0, 0.1));
+        gain.gain.setValueAtTime(g1(0.42 * m), now);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.18 + rnd(0, 0.12));
         osc.connect(gain).connect(ac.destination);
-        osc.start(now); osc.stop(now + 0.28);
+        osc.start(now); osc.stop(now + 0.34);
       });
     } catch (e) { audioWarn('glass', e); }
   }
@@ -580,7 +582,7 @@
         osc.type = 'sine';
         osc.frequency.setValueAtTime(freq, t);
         gain.gain.setValueAtTime(0.001, t);
-        gain.gain.exponentialRampToValueAtTime(g1(0.24 * m), t + 0.008);
+        gain.gain.exponentialRampToValueAtTime(g1b(0.42 * m), t + 0.008);
         gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.2 + rnd(0, 0.16));
         osc.connect(gain).connect(ac.destination);
         osc.start(t); osc.stop(t + 0.4);
@@ -1803,12 +1805,12 @@ function traitGlowColor(block) {
         osc.type = 'triangle';
         osc.frequency.setValueAtTime(freq, t);
         g.gain.setValueAtTime(0.001, t);
-        g.gain.exponentialRampToValueAtTime(g1(0.4 * m), t + 0.008);
+        g.gain.exponentialRampToValueAtTime(g2(0.85 * m), t + 0.008);
         g.gain.exponentialRampToValueAtTime(0.0001, t + 0.09);
         osc.connect(g).connect(ac.destination);
         osc.start(t); osc.stop(t + 0.11);
       });
-      playNoiseImpact(ac, now, 900, null, 0.08, 0.3*m, 'highpass');
+      playNoiseImpact(ac, now, 900, null, 0.08, 0.6*m, 'highpass');
     } catch (e) { audioWarn('death-normal', e); }
   }
   // Heavy — a dull, heavy WHUMP through the crunch waveshaper plus a
@@ -1824,14 +1826,14 @@ function traitGlowColor(block) {
       osc.type = 'sawtooth';
       osc.frequency.setValueAtTime(110, now);
       osc.frequency.exponentialRampToValueAtTime(28, now + 0.22);
-      g.gain.setValueAtTime(g1(1.05*m), now);
+      g.gain.setValueAtTime(g2(2.0*m), now);
       g.gain.exponentialRampToValueAtTime(0.0001, now + 0.26);
       osc.connect(shaper).connect(g).connect(ac.destination);
       osc.start(now); osc.stop(now + 0.28);
-      playNoiseImpact(ac, now, 200, 0.8, 0.22, 0.75*m, 'lowpass');
+      playNoiseImpact(ac, now, 200, 0.8, 0.22, 1.4*m, 'lowpass');
       for (let i = 0; i < 6; i++) {
         const t = now + 0.02 + i * rnd(0.02, 0.05);
-        playNoiseImpact(ac, t, rnd(300,700), 3, 0.05, 0.22*m, 'bandpass');
+        playNoiseImpact(ac, t, rnd(300,700), 3, 0.05, 0.42*m, 'bandpass');
       }
     } catch (e) { audioWarn('death-heavy', e); }
   }
@@ -1843,14 +1845,14 @@ function traitGlowColor(block) {
     try {
       const ac = getAC(); if (!ac) return;
       const now = ac.currentTime, m = AUDIO_STATE.master * SYNTH_BOOST;
-      playNoiseImpact(ac, now, 5200, null, 0.1, 0.55*m, 'highpass');
+      playNoiseImpact(ac, now, 5200, null, 0.1, 1.0*m, 'highpass');
       [3200, 4400, 5800, 7000].forEach((freq, i) => {
         const f2 = freq + rnd(-60,60);
         const osc = ac.createOscillator(), g = ac.createGain();
         osc.type = 'sine';
         osc.frequency.setValueAtTime(f2, now);
         osc.frequency.exponentialRampToValueAtTime(f2 * 1.05, now + 0.3);
-        g.gain.setValueAtTime(g1(0.24*m), now + i*0.015);
+        g.gain.setValueAtTime(g2(0.48*m), now + i*0.015);
         g.gain.exponentialRampToValueAtTime(0.0001, now + 0.32 + i*0.03);
         osc.connect(g).connect(ac.destination);
         osc.start(now); osc.stop(now + 0.4);
@@ -1871,18 +1873,18 @@ function traitGlowColor(block) {
       filter.frequency.setValueAtTime(2200, now);
       filter.frequency.exponentialRampToValueAtTime(300, now + 0.35);
       const wg = ac.createGain();
-      wg.gain.setValueAtTime(g1(0.6*m), now);
+      wg.gain.setValueAtTime(g2(1.15*m), now);
       wg.gain.exponentialRampToValueAtTime(0.0001, now + 0.38);
       noise.connect(filter).connect(wg).connect(ac.destination);
       noise.start(now, rnd(0,2)); noise.stop(now + 0.4);
       for (let i = 0; i < 8; i++) {
         const t = now + rnd(0.02, 0.32);
-        playNoiseImpact(ac, t, rnd(1500,3200), 4, 0.03, 0.18*m, 'bandpass');
+        playNoiseImpact(ac, t, rnd(1500,3200), 4, 0.03, 0.34*m, 'bandpass');
       }
       const osc = ac.createOscillator(), og = ac.createGain();
       osc.type = 'sawtooth'; osc.frequency.setValueAtTime(70, now);
       osc.frequency.exponentialRampToValueAtTime(35, now + 0.3);
-      og.gain.setValueAtTime(g1(0.35*m), now);
+      og.gain.setValueAtTime(g2(0.68*m), now);
       og.gain.exponentialRampToValueAtTime(0.0001, now + 0.32);
       osc.connect(og).connect(ac.destination);
       osc.start(now); osc.stop(now + 0.34);
@@ -1902,12 +1904,12 @@ function traitGlowColor(block) {
         osc.type = 'triangle';
         osc.frequency.setValueAtTime(freq, t);
         g.gain.setValueAtTime(0.001, t);
-        g.gain.exponentialRampToValueAtTime(g1(0.32*m), t + 0.006);
+        g.gain.exponentialRampToValueAtTime(g2(0.62*m), t + 0.006);
         g.gain.exponentialRampToValueAtTime(0.0001, t + 0.22);
         osc.connect(g).connect(ac.destination);
         osc.start(t); osc.stop(t + 0.24);
       });
-      playNoiseImpact(ac, now, 3800, null, 0.18, 0.22*m, 'highpass');
+      playNoiseImpact(ac, now, 3800, null, 0.18, 0.42*m, 'highpass');
     } catch (e) { audioWarn('death-princess', e); }
   }
   // Rainbow — a quick six-note magical cascade across a bright scale,
@@ -1926,12 +1928,12 @@ function traitGlowColor(block) {
         osc.type = i % 2 === 0 ? 'sine' : 'triangle';
         osc.frequency.setValueAtTime(freq, t);
         g.gain.setValueAtTime(0.001, t);
-        g.gain.exponentialRampToValueAtTime(g1(0.26*m), t + 0.006);
+        g.gain.exponentialRampToValueAtTime(g2(0.5*m), t + 0.006);
         g.gain.exponentialRampToValueAtTime(0.0001, t + 0.26);
         osc.connect(g).connect(ac.destination);
         osc.start(t); osc.stop(t + 0.28);
       }
-      playNoiseImpact(ac, now, 4600, null, 0.22, 0.28*m, 'highpass');
+      playNoiseImpact(ac, now, 4600, null, 0.22, 0.52*m, 'highpass');
     } catch (e) { audioWarn('death-rainbow', e); }
   }
   // Nightmare — two closely-detuned sawtooths sliding down into a
@@ -1947,7 +1949,7 @@ function traitGlowColor(block) {
         osc.type = 'sawtooth';
         osc.frequency.setValueAtTime(freq, now);
         osc.frequency.exponentialRampToValueAtTime(freq * 0.35, now + 0.45);
-        g.gain.setValueAtTime(g1(0.4*m), now);
+        g.gain.setValueAtTime(g2(0.78*m), now);
         g.gain.exponentialRampToValueAtTime(0.0001, now + 0.48);
         osc.connect(g).connect(ac.destination);
         osc.start(now); osc.stop(now + 0.5);
@@ -1959,7 +1961,7 @@ function traitGlowColor(block) {
       filter.frequency.exponentialRampToValueAtTime(150, now + 0.4);
       const ng = ac.createGain();
       ng.gain.setValueAtTime(0.001, now);
-      ng.gain.exponentialRampToValueAtTime(g1(0.32*m), now + 0.03);
+      ng.gain.exponentialRampToValueAtTime(g2(0.6*m), now + 0.03);
       ng.gain.exponentialRampToValueAtTime(0.0001, now + 0.42);
       noise.connect(filter).connect(ng).connect(ac.destination);
       noise.start(now, rnd(0,2)); noise.stop(now + 0.44);
@@ -1979,11 +1981,11 @@ function traitGlowColor(block) {
       osc.frequency.setValueAtTime(90, now);
       osc.frequency.exponentialRampToValueAtTime(140, now + 0.12);
       osc.frequency.exponentialRampToValueAtTime(50, now + 0.4);
-      g.gain.setValueAtTime(g1(1.1*m), now);
+      g.gain.setValueAtTime(g2(2.1*m), now);
       g.gain.exponentialRampToValueAtTime(0.0001, now + 0.45);
       osc.connect(shaper).connect(g).connect(ac.destination);
       osc.start(now); osc.stop(now + 0.48);
-      playNoiseImpact(ac, now, 220, 0.7, 0.4, 0.7*m, 'lowpass');
+      playNoiseImpact(ac, now, 220, 0.7, 0.4, 1.3*m, 'lowpass');
     } catch (e) { audioWarn('death-monster', e); }
   }
   // Ultimate — the biggest boom in the set: a sub-bass sweep through the
@@ -2001,18 +2003,18 @@ function traitGlowColor(block) {
       osc.type = 'sawtooth';
       osc.frequency.setValueAtTime(65, now);
       osc.frequency.exponentialRampToValueAtTime(22, now + 0.5);
-      g.gain.setValueAtTime(g1(1.3*m), now);
+      g.gain.setValueAtTime(g2(1.9*m), now);
       g.gain.exponentialRampToValueAtTime(0.0001, now + 0.55);
       osc.connect(shaper).connect(g).connect(ac.destination);
       osc.start(now); osc.stop(now + 0.58);
-      playNoiseImpact(ac, now, 260, 0.6, 0.5, 0.9*m, 'lowpass');
+      playNoiseImpact(ac, now, 260, 0.6, 0.5, 1.7*m, 'lowpass');
       [1800, 2600, 3600].forEach((freq, i) => {
         const t = now + 0.06 + i * 0.02;
         const so = ac.createOscillator(), sg = ac.createGain();
         so.type = 'sine';
         so.frequency.setValueAtTime(freq, t);
         sg.gain.setValueAtTime(0.001, t);
-        sg.gain.exponentialRampToValueAtTime(g1(0.22*m), t + 0.01);
+        sg.gain.exponentialRampToValueAtTime(g2(0.44*m), t + 0.01);
         sg.gain.exponentialRampToValueAtTime(0.0001, t + 0.3);
         so.connect(sg).connect(ac.destination);
         so.start(t); so.stop(t + 0.32);
