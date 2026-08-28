@@ -593,7 +593,7 @@ else
   bad "Muenba media-loading audit failed"
 fi
 
-echo "[67/67] Muenba 26E danger-audio audit"
+echo "[67/67] Muenba 26F danger-audio audit"
 if node tests/muenba-danger-audio-audit.cjs >/dev/null 2>&1; then
   ok "Muenba danger-audio contracts pass"
 else

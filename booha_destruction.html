@@ -134,15 +134,9 @@
         bg: './assets/destruction/destruction-1.webp'
       },
       audio: {
-        // break / rubble / glass are now fully procedural (playBreakSFX,
-        // playRubbleSFX, playGlassSFX in destruction_1.js) — no mp3s to
-        // preload for them anymore.
-        pull:   './assets/destruction/pull.mp3',
-        launch: './assets/destruction/launch.mp3',
-        wood:   './assets/destruction/wood.mp3',
-        stone:  './assets/destruction/stone.mp3',
-        soft:   './assets/destruction/soft.mp3',
-        ground: './assets/destruction/ground.mp3',
+        // Every material/hit/break/launch/pull/bounce sound is now fully
+        // procedural (see the "goofy" SFX pass in destruction_1.js) — only
+        // win/fail stay as recorded clips.
         win:    './assets/destruction/100.mp3',
         fail:   './assets/destruction/fail.mp3'
       },
