@@ -31,10 +31,10 @@ assert(source.includes('return !REDUCED_MOTION;'), 'reading cues must respect re
 assert(source.includes('playCaseWordCue(caseSweepWordIsKeyword(current.textContent, keywords))'), 'word cues must fire as each sweep word is revealed');
 assert(source.includes('playCaseUnlockCue();'), 'unlock cue must fire when the comprehension check opens');
 assert(source.includes('playCaseSolvedCue();'), 'solved cards must trigger the success cue');
-assert(source.includes('window.UtsuSfx && window.UtsuSfx.startDangerScream'), 'danger screams must use the shared procedural WebAudio scheduler');
-assert(source.includes('window.UtsuSfx && window.UtsuSfx.stopDangerScream'), 'danger screams must stop through the shared procedural WebAudio scheduler');
+assert(source.includes('window.UtsuSfx && window.UtsuSfx.startDangerScreamSamples'), 'danger screams must use the shared authored sample scheduler');
+assert(source.includes('window.UtsuSfx && window.UtsuSfx.stopDangerScreamSamples'), 'danger screams must stop through the shared authored sample scheduler');
 assert(source.includes('const playResult = dangerRhythmMusic.play();'), 'danger rhythm music must start with the danger chart');
 assert(source.includes('let dangerRhythmPlayToken = 0;'), 'danger rhythm music must guard against stale asynchronous playback');
 assert(source.includes('stopDangerScream();\n    stopDangerRhythmMusic();'), 'leaving Muenba must stop danger audio before navigation');
 
-console.log('Muenba audio audit passed: looping BGM, staggered procedural danger audio, pooled rhythm SFX, and 18F reading cues.');
+console.log('Muenba audio audit passed: looping BGM, staggered authored danger audio, pooled rhythm SFX, and 18F reading cues.');

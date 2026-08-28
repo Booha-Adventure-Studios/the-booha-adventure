@@ -24,6 +24,6 @@ assert(utsuroba.includes('DANCE_FRAMES.forEach(frame => ensureUtsurobaImage(fram
 assert(utsuroba.includes('drawImg   = ensureUtsurobaImage(frame.img);'), 'dance rendering must use the deferred image result');
 assert(!/const load = src => \{ const img = new Image\(\); img\.src = src; return img; \};/.test(utsuroba), 'Utsuroba must not preload every drifter at declaration time');
 assert(!/const dance(?:ArmsUp|Sway|Wave)Img\s*= new Image\(\);[^\n]*\.src\s*=/.test(utsuroba), 'dance frames must not assign src at declaration time');
-assert(sw.includes('booha-assets-2026-417'), 'service-worker asset cache must include the current Utsuroba loading bump');
+assert(sw.includes('booha-assets-2026-418'), 'service-worker asset cache must include the current Utsuroba loading bump');
 
 console.log('Utsuroba 25C image-loading audit passed: drifter and dance artwork requests are deferred until needed.');
