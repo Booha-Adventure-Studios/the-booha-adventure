@@ -87,6 +87,6 @@ assert.match(furigana, /sentence\(value, readings\)/, 'Furigana helper should re
 assert.match(dialogue, /window\.UTSUROBA_DIALOGUE/, 'Utsuroba should define rotating ambient dialogue');
 assert.match(dialogue, /readings:/, 'Rotating drifter dialogue should carry furigana metadata');
 assert.doesNotMatch(utsuroba, /utsu-profile-portal-label|Profile<small>/, 'The Utsuroba icon should not carry a redundant profile pill');
-assert.match(utsuroba, /utsuProfilePortal\.innerHTML\s*=\s*'<img src="\.\/assets\/img\/utsuroba_icon\.png" alt="">'/, 'The profile doorway should remain as an icon-only control');
+assert.match(utsuroba, /utsuProfilePortal\.innerHTML\s*=\s*'<img src="\.\/assets\/img\/utsuroba_icon\.webp" alt="">'/, 'The profile doorway should remain as an icon-only control');
 
 console.log('Utsuroba reading journal audit passed');

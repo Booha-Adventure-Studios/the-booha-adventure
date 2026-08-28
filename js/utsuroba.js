@@ -1497,7 +1497,7 @@
     utsuProfileOverlay.innerHTML = `
       <div class="utsu-profile-pop-box" role="dialog" aria-modal="true" aria-labelledby="utsu-profile-pop-title">
         <button class="utsu-profile-pop-close" type="button" aria-label="Close / 閉じる">✕</button>
-        <div class="utsu-profile-pop-icon"><img src="./assets/img/utsuroba_icon.png" alt="Utsuroba profile"></div>
+        <div class="utsu-profile-pop-icon"><img src="./assets/img/utsuroba_icon.webp" alt="Utsuroba profile"></div>
         <p class="utsu-profile-pop-eyebrow">MEMORY ARCHIVE / 記憶の記録</p>
         <h2 id="utsu-profile-pop-title">Utsuroba profile</h2>
         <p class="utsu-profile-pop-title-jp">うつろばプロフィール</p>
@@ -1531,7 +1531,7 @@
     utsuProfilePortal.style.left = '84%';
     utsuProfilePortal.style.top = '78%';
     utsuProfilePortal.setAttribute('aria-label', 'Open Utsuroba profile / うつろばプロフィールをひらく');
-    utsuProfilePortal.innerHTML = '<img src="./assets/img/utsuroba_icon.png" alt="">';
+    utsuProfilePortal.innerHTML = '<img src="./assets/img/utsuroba_icon.webp" alt="">';
     utsuProfilePortal.addEventListener('click', event => { event.stopPropagation(); openUtsurobaProfilePopup(); });
     echoLayer.appendChild(utsuProfilePortal);
   }
