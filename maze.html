@@ -1322,7 +1322,12 @@ const _nextW = getAcademicWeekNumber(_nextData);
 const OPEN_WEEKS = [Math.max(1, _lastW), CURRENT_WEEK];
 if (_nextData.weekId !== CURRENT_WEEK_DATA.weekId) OPEN_WEEKS.push(Math.min(48, _nextW));
 
-const GHOST_TRAVEL_MS = 3800;
+// Normal travel is deliberately automatic: tapping never accelerates it.
+// Nearby targets feel responsive while distant targets still read as a flight.
+const GHOST_TRAVEL_MIN_MS = 1100;
+const GHOST_TRAVEL_MAX_MS = 2000;
+const GHOST_TRAVEL_BASE_MS = 700;
+const GHOST_TRAVEL_MS_PER_PX = 1.18;
 
 const INTRO_GLOW_MS   = 2600;
 const INTRO_DROP_MS   = 3800;
@@ -1704,7 +1709,7 @@ let introHoverIX=0,introHoverIY=0;
 const startCP=CHECKPOINTS.find(c=>c.w===CURRENT_WEEK);
 let ghostIX=INTRO_TOP_CENTER_START.ix,ghostIY=INTRO_TOP_CENTER_START.iy;
 let ghostSrcIX=ghostIX,ghostSrcIY=ghostIY,ghostDstIX=ghostIX,ghostDstIY=ghostIY;
-let ghostT=1,ghostAnimStart=0,pendingPopupCP=null,ghostVisible=false;
+let ghostT=1,ghostAnimStart=0,ghostTravelMs=GHOST_TRAVEL_MAX_MS,pendingPopupCP=null,ghostVisible=false;
 
 // pendingHomework: ghost travelling to HW tree
 let pendingHomework=false;
@@ -1999,6 +2004,36 @@ function addTrail(ix,iy){
   if(trail.length>100)trail.shift();
 }
 
+function getGhostTravelDuration(srcIX,srcIY,dstIX,dstIY){
+  const distance=Math.hypot(dstIX-srcIX,dstIY-srcIY);
+  return Math.round(Math.max(
+    GHOST_TRAVEL_MIN_MS,
+    Math.min(GHOST_TRAVEL_MAX_MS,GHOST_TRAVEL_BASE_MS+distance*GHOST_TRAVEL_MS_PER_PX)
+  ));
+}
+
+function addGhostFlightBurst(ix,iy,count=14){
+  const col1=monthPrimary(activeWeek),col2=monthSecondary(activeWeek);
+  for(let i=0;i<count;i++){
+    const angle=Math.random()*Math.PI*2;
+    const speed=.35+Math.random()*1.15;
+    trail.push({
+      ix,iy,life:.9+Math.random()*.35,size:1.8+Math.random()*3.6,
+      color:i%2?col1:col2,dx:Math.cos(angle)*speed,dy:Math.sin(angle)*speed
+    });
+  }
+  if(trail.length>100)trail.splice(0,trail.length-100);
+}
+
+function beginGhostTravel(dstIX,dstIY){
+  ghostSrcIX=ghostIX;ghostSrcIY=ghostIY;
+  ghostDstIX=dstIX;ghostDstIY=dstIY;
+  ghostTravelMs=getGhostTravelDuration(ghostSrcIX,ghostSrcIY,ghostDstIX,ghostDstIY);
+  ghostT=0;ghostAnimStart=performance.now();
+  addGhostFlightBurst(ghostSrcIX,ghostSrcIY,16);
+  setTravelLock(true);
+}
+
 function drawTrees(now){
   if(!mazeStarted)return;
   const sec=now/1000;
@@ -2087,11 +2122,12 @@ function drawFrame(now){
     OPEN_WEEKS.forEach(w=>{cpState[w]={alpha:1,extra:0};});
     if(bryanOn)CHECKPOINTS.forEach(cp=>{if(!cpState[cp.w])cpState[cp.w]={alpha:.65,extra:.15};});
     if(ghostT<1){
-      const el=now-ghostAnimStart;ghostT=Math.min(el/GHOST_TRAVEL_MS,1);const et=ease(ghostT);
+      const el=now-ghostAnimStart;ghostT=Math.min(el/ghostTravelMs,1);const et=ease(ghostT);
       ghostIX=ghostSrcIX+(ghostDstIX-ghostSrcIX)*et;ghostIY=ghostSrcIY+(ghostDstIY-ghostSrcIY)*et;
       if(Math.random()<.28)addTrail(ghostIX,ghostIY);
       if(ghostT>=1){
         ghostIX=ghostDstIX;ghostIY=ghostDstIY;
+        addGhostFlightBurst(ghostIX,ghostIY,20);
         setTravelLock(false);
         
        if(pendingHomework){
@@ -2172,8 +2208,14 @@ function drawFrame(now){
     ctx.globalAlpha=.14+pulseG*.06;const gs=ctx.createRadialGradient(gx,gy+gR*.7,0,gx,gy+gR*.7,gR*.85);gs.addColorStop(0,'rgba(0,0,0,.5)');gs.addColorStop(1,'transparent');ctx.fillStyle=gs;ctx.beginPath();ctx.arc(gx,gy+gR*.7,gR*.85,0,Math.PI*2);ctx.fill();
     ctx.restore();ctx.save();
     const activeImg=ensureDeferredImage(ghostImgs[activeGhostIdx]);
-    if(activeImg&&activeImg.complete&&activeImg.naturalWidth>0)ctx.drawImage(activeImg,gx-gR,gy-gR+bob,gR*2,gR*2);
-    else{ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(gx,gy+bob,gR*.7,0,Math.PI*2);ctx.fill();}
+    if(activeImg&&activeImg.complete&&activeImg.naturalWidth>0){
+      const flightT=ghostT<1?ghostT:0;
+      const flightBeat=Math.sin(flightT*Math.PI);
+      const squashX=1+flightBeat*.08,squashY=1-flightBeat*.06;
+      const tilt=flightT?Math.sin(flightT*Math.PI*2)*.10:0;
+      ctx.translate(gx,gy+bob);ctx.rotate(tilt);ctx.scale(squashX,squashY);
+      ctx.drawImage(activeImg,-gR,-gR,gR*2,gR*2);
+    } else {ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(gx,gy+bob,gR*.7,0,Math.PI*2);ctx.fill();}
     ctx.restore();
   }
 
@@ -2209,40 +2251,31 @@ function hitJukuTree(clientX,clientY){
 function startGhostTravelToHWTree(){
   if(ghostLocked)return;
   closePopup();
-  ghostSrcIX=ghostIX;ghostSrcIY=ghostIY;
-  ghostDstIX=HW_TREE_IX;ghostDstIY=HW_TREE_IY;
-  ghostT=0;ghostAnimStart=performance.now();
   pendingPopupCP=null;
   pendingHomework=true;
   pendingKarasuki=false;
   pendingJuku=false;
-  setTravelLock(true);
+  beginGhostTravel(HW_TREE_IX,HW_TREE_IY);
 }
 
 function startGhostTravelToKRTree(){
   if(ghostLocked)return;
   closePopup();
-  ghostSrcIX=ghostIX;ghostSrcIY=ghostIY;
-  ghostDstIX=KR_TREE_IX;ghostDstIY=KR_TREE_IY;
-  ghostT=0;ghostAnimStart=performance.now();
   pendingPopupCP=null;
   pendingHomework=false;
   pendingKarasuki=true;
   pendingJuku=false;
-  setTravelLock(true);
+  beginGhostTravel(KR_TREE_IX,KR_TREE_IY);
 }
 
 function startGhostTravelToJukuTree(){
   if(ghostLocked)return;
   closePopup();
-  ghostSrcIX=ghostIX;ghostSrcIY=ghostIY;
-  ghostDstIX=JUKU_TREE_IX;ghostDstIY=JUKU_TREE_IY;
-  ghostT=0;ghostAnimStart=performance.now();
   pendingPopupCP=null;
   pendingHomework=false;
   pendingKarasuki=false;
   pendingJuku=true;
-  setTravelLock(true);
+  beginGhostTravel(JUKU_TREE_IX,JUKU_TREE_IY);
 }
 
 canvas.addEventListener('click',e=>{
@@ -2283,9 +2316,7 @@ canvas.addEventListener('mouseleave',()=>{bMouseX=-1;bMouseY=-1;});
 function startGhostTravel(cp){
   if(ghostLocked)return;closePopup();
   pendingHomework=false;pendingKarasuki=false;pendingJuku=false;
-  
-  ghostSrcIX=ghostIX;ghostSrcIY=ghostIY;ghostDstIX=cp.ix;ghostDstIY=cp.iy;
-  ghostT=0;ghostAnimStart=performance.now();activeWeek=cp.w;pendingPopupCP=cp;setTravelLock(true);
+  activeWeek=cp.w;pendingPopupCP=cp;beginGhostTravel(cp.ix,cp.iy);
 }
 
 
