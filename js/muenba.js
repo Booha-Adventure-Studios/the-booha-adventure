@@ -1698,6 +1698,7 @@
       hideBtn.classList.add('active');
       setHideButtonLabel(true);
     }
+    requestMuenbaLandscapeAfterPopup();
     resumeWorldMusicAfterCapture();
   }
 
@@ -1738,6 +1739,7 @@
       captureOverlay.setAttribute('aria-hidden', 'true');
     }
     captureSession = null;
+    requestMuenbaLandscapeAfterPopup();
     resumeWorldMusicAfterCapture();
   }
 
@@ -1761,6 +1763,7 @@
       captureOverlay.setAttribute('aria-hidden', 'true');
     }
     captureSession = null;
+    requestMuenbaLandscapeAfterPopup();
     resumeWorldMusicAfterCapture();
     setRoom(MUENBA_NUPPI.roomId, 'fromKarasuki');
   }
@@ -3571,6 +3574,7 @@
       hideBtn.classList.remove('active');
       setHideButtonLabel(false);
     }
+    requestMuenbaLandscapeAfterPopup();
     spawnRoomGhost(state.roomId);
     resumeWorldMusicAfterCapture();
   }
@@ -4022,6 +4026,7 @@
       lobbyOverlay.classList.remove('open');
       lobbyOverlay.setAttribute('aria-hidden', 'true');
     }
+    requestMuenbaLandscapeAfterPopup();
     startMuenbaCelebration(pending);
     return true;
   }
@@ -4287,6 +4292,7 @@
     // Re-seed the room ghost after a cancel. This does not write ghostsFound,
     // huntJournal, or orbs.
     captureSession = null;
+    requestMuenbaLandscapeAfterPopup();
     spawnRoomGhost(state.roomId);
     resumeWorldMusicAfterCapture();
   }
@@ -4307,6 +4313,7 @@
       captureOverlay.setAttribute('aria-hidden', 'true');
     }
     captureSession = null;
+    requestMuenbaLandscapeAfterPopup();
     if (resumeHunt) spawnRoomGhost(state.roomId);
     resumeWorldMusicAfterCapture();
   }
@@ -5291,6 +5298,16 @@
     setMuenbaOrientationMode(popupState ? 'portrait' : 'landscape');
   }
 
+  // Pass 27E: closing the last popup is an explicit handoff back to the
+  // explorable world. Request landscape immediately from the user's close
+  // gesture, then let the normal readiness gate keep movement/input paused
+  // until the phone has actually rotated.
+  function requestMuenbaLandscapeAfterPopup() {
+    if (lobbyOpen || captureOpen || returnPortalOpen) return;
+    setMuenbaOrientationMode('landscape');
+    scheduleMuenbaOrientationCheck();
+  }
+
   function scheduleMuenbaOrientationCheck() {
     if (orientationCheckTimer) window.clearTimeout(orientationCheckTimer);
     orientationCheckTimer = window.setTimeout(() => {
@@ -5848,6 +5865,7 @@
     returnPortalOpen = false;
     playUiSfx('popupClose');
     returnPortalOverlay.classList.remove('open');
+    requestMuenbaLandscapeAfterPopup();
     returnPortalCooldownUntil = performance.now() + POPUP_COOLDOWN_MS;
   }
 
@@ -6099,6 +6117,7 @@
       lobbyOverlay.classList.remove('open');
       lobbyOverlay.setAttribute('aria-hidden', 'true');
     }
+    requestMuenbaLandscapeAfterPopup();
   }
 
   function renderRoomNuppiPopup() {
