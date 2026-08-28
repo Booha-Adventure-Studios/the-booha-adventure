@@ -34,7 +34,8 @@ const CURRENT_CACHES = {
   // Utsuroba 25D converts its three transparent dance poses to lossless WebP.
   // Muenba 26A converts its 15 room backgrounds to genuine WebP.
   // Muenba 26B converts its seven transparent ghost sprites to lossless WebP.
-  assets: 'booha-assets-2026-395',
+  // Muenba 26C converts its remaining transparent support art to lossless WebP.
+  assets: 'booha-assets-2026-396',
   decks:  'booha-decks-2026-310',
 };
 

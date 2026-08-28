@@ -33,7 +33,7 @@ assert(card.includes('z-index:0;overflow:hidden;pointer-events:none;opacity:0'),
 assert(card.includes('.utsu-celebration-spark-field::before'), 'discovery card must have visible sparkle decoration');
 assert(card.includes('.utsu-celebration-spark-field::after'), 'discovery card must have a second sparkle layer');
 assert(card.includes('.utsu-celebration-spark-field::before,.utsu-celebration-spark-field::after{animation:none;}'), 'sparkles must respect reduced-motion settings');
-assert(sw.includes('booha-assets-2026-395'), 'service worker must ship the new shared celebration script');
+assert(sw.includes('booha-assets-2026-396'), 'service worker must ship the new shared celebration script');
 assert(verify.includes('tests/karasuki-wanderer-discovery-gold-audit.cjs'), 'verify.sh must run the gold discovery audit');
 
 console.log('Karasuki 24F discovery audit passed: new Wanderers use a gold-only reward treatment with contained non-interactive sparkles, while returns stay blue.');
