@@ -40,7 +40,7 @@
   ];
   const IMG_DIR = 'assets/img/';
   const TREE_IMG = IMG_DIR + 'tree-arch.png';
-  const SNACK_IMG = 'assets/feed/candy.png';
+  const SNACK_IMG = 'assets/feed/candy.webp';
   const GOLDS = ['#e8c46a', '#fff3c0'];
 
   const REDUCED = window.matchMedia &&
