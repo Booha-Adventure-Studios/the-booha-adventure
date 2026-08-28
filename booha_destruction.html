@@ -134,11 +134,24 @@
         bg: './assets/destruction/destruction-1.webp'
       },
       audio: {
-        // Every material/hit/break/launch/pull/bounce sound is now fully
-        // procedural (see the "goofy" SFX pass in destruction_1.js) — only
-        // win/fail stay as recorded clips.
-        win:    './assets/destruction/100.mp3',
-        fail:   './assets/destruction/fail.mp3'
+        // Material hit/break/pull/snap/rubble/death sounds are recorded
+        // clips (right-sized mono MP3) as of the "real audio files" pass;
+        // only the floor-bounce/landing sound stays procedural (see
+        // playBounceSFX in destruction_1.js).
+        win:        './assets/destruction/100.mp3',
+        fail:       './assets/destruction/fail.mp3',
+        woodHit:    './assets/destruction/sounds/wood.mp3',
+        woodBreak:  './assets/destruction/sounds/wood_break.mp3',
+        stoneHit:   './assets/destruction/sounds/stone.mp3',
+        stoneBreak: './assets/destruction/sounds/rock_break.mp3',
+        glassHit:   './assets/destruction/sounds/glass.mp3',
+        glassBreak: './assets/destruction/sounds/glass_break.mp3',
+        softHit:    './assets/destruction/sounds/rubber.mp3',
+        softBreak:  './assets/destruction/sounds/rubberb_break.mp3',
+        pull:       './assets/destruction/sounds/rubberband.mp3',
+        snap:       './assets/destruction/sounds/twang.mp3',
+        rubble:     './assets/destruction/sounds/many_break.mp3',
+        explosion:  './assets/destruction/sounds/booha_explosion.mp3'
       },
       gameplay: {
         ghostsPerRound: 3,

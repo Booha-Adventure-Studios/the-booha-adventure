@@ -76,6 +76,99 @@
     'demonic', 'parasite', 'wail', 'rasp'
   ];
 
+  // Pass 28A: authored scream samples share this same AudioContext. Keep
+  // loading lazy so pages that never enter Muenba do not pay the download or
+  // decode cost, then retain one decoded buffer per clip for cheap replay.
+  var DANGER_SCREAM_SAMPLE_URLS = [1, 2, 3, 4, 5, 6].map(function (index) {
+    return 'assets/img/muenba/screams/scream_' + index + '.mp3';
+  });
+  var dangerScreamSampleBuffers = new Map();
+  var dangerScreamSampleLoads = new Map();
+  var dangerScreamSampleVoices = [];
+
+  function loadDangerScreamSample(url) {
+    if (dangerScreamSampleBuffers.has(url)) {
+      return Promise.resolve(dangerScreamSampleBuffers.get(url));
+    }
+    if (dangerScreamSampleLoads.has(url)) return dangerScreamSampleLoads.get(url);
+    var c = ensureCtx();
+    if (!c || typeof window.fetch !== 'function') return Promise.resolve(null);
+    var load = window.fetch(url)
+      .then(function (response) {
+        if (!response.ok) throw new Error('Unable to load scream sample');
+        return response.arrayBuffer();
+      })
+      .then(function (encoded) {
+        return new Promise(function (resolve, reject) {
+          var decoded = c.decodeAudioData(encoded, resolve, reject);
+          // Older WebKit returns a promise; newer browsers resolve through the
+          // callback above. Supporting both keeps the loader one-shot-safe.
+          if (decoded && typeof decoded.then === 'function') decoded.then(resolve, reject);
+        });
+      })
+      .then(function (buffer) {
+        dangerScreamSampleBuffers.set(url, buffer);
+        dangerScreamSampleLoads.delete(url);
+        return buffer;
+      })
+      .catch(function () {
+        dangerScreamSampleLoads.delete(url);
+        return null;
+      });
+    dangerScreamSampleLoads.set(url, load);
+    return load;
+  }
+
+  function preloadDangerScreamSamples() {
+    return Promise.all(DANGER_SCREAM_SAMPLE_URLS.map(loadDangerScreamSample));
+  }
+
+  function randomDangerScreamSampleUrl() {
+    return DANGER_SCREAM_SAMPLE_URLS[Math.floor(Math.random() * DANGER_SCREAM_SAMPLE_URLS.length)];
+  }
+
+  // Play one decoded sample with a small pitch window. `gain` is deliberately
+  // an explicit input so the upcoming chase scheduler can make later screams
+  // quieter without rebuilding the audio graph.
+  function playDangerScreamSample(options) {
+    options = options || {};
+    var c = ensureCtx();
+    if (!c) return null;
+    var url = options.url || randomDangerScreamSampleUrl();
+    var buffer = dangerScreamSampleBuffers.get(url);
+    if (!buffer) {
+      loadDangerScreamSample(url);
+      return null;
+    }
+    var source = c.createBufferSource();
+    var gain = c.createGain();
+    var now = c.currentTime;
+    var minPitch = Number.isFinite(options.minPitch) ? options.minPitch : 0.92;
+    var maxPitch = Number.isFinite(options.maxPitch) ? options.maxPitch : 1.08;
+    var pitch = minPitch + Math.random() * Math.max(0, maxPitch - minPitch);
+    var volume = Math.max(0, Math.min(SFX_MAX_GAIN, Number(options.gain) || 0.13));
+    source.buffer = buffer;
+    source.playbackRate.setValueAtTime(pitch, now);
+    gain.gain.setValueAtTime(volume, now);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + buffer.duration / pitch);
+    source.connect(gain);
+    gain.connect(c.destination);
+    source.onended = function () {
+      var index = dangerScreamSampleVoices.indexOf(source);
+      if (index >= 0) dangerScreamSampleVoices.splice(index, 1);
+    };
+    dangerScreamSampleVoices.push(source);
+    source.start(now);
+    return source;
+  }
+
+  function stopDangerScreamSamples() {
+    dangerScreamSampleVoices.forEach(function (source) {
+      try { source.stop(); } catch (_) {}
+    });
+    dangerScreamSampleVoices = [];
+  }
+
   function trackDangerVoice(nodes, duration) {
     var voice = { nodes: nodes };
     dangerScreamVoices.push(voice);
@@ -526,6 +619,10 @@
        of restarting a shared one-shot sample on every trigger. */
     startDangerScream: startDangerScream,
     stopDangerScream: stopDangerScream,
+    /* Pass 28A — authored Muenba scream sample foundation. */
+    preloadDangerScreamSamples: preloadDangerScreamSamples,
+    playDangerScreamSample: playDangerScreamSample,
+    stopDangerScreamSamples: stopDangerScreamSamples,
     /* A memory successfully handed to its drifter — the moment
        startCelebration() fires. Three-note warm rise, deliberately
        distinct from correct() (brighter/thinner) and from the old

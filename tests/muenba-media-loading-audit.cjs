@@ -26,6 +26,6 @@ assert(muenba.includes('MUENBA_DANCE_FRAMES.forEach(frame => ensureMuenbaImage(f
 assert(muenba.includes('const boohaSprite = dancing ? ensureMuenbaImage(danceFrame.img)'), 'dance rendering must resolve deferred art');
 assert(!/dance(?:ArmsUp|Sway|Wave)Img\.src\s*=\s*['"][^'"]+\.png/.test(muenba), 'Muenba must not assign retired dance PNG paths');
 assert(!/dance(?:ArmsUp|Sway|Wave)Img\s*=\s*new Image\(\);[^\n]*\.src\s*=/.test(muenba), 'dance frames must not request art at declaration time');
-assert(sw.includes('booha-assets-2026-410'), 'service-worker asset cache must include the current Muenba media bump');
+assert(sw.includes('booha-assets-2026-413'), 'service-worker asset cache must include the current Muenba media bump');
 
 console.log('Muenba 26D media audit passed: shared dance WebP assets are deferred until celebration and remain compatible with the existing dance flow.');

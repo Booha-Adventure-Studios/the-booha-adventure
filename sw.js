@@ -50,6 +50,9 @@ const CURRENT_CACHES = {
   // Muenba 27D gives the active rhythm stage an explicit portrait surface.
   // Muenba 27E requests landscape again before exploration resumes.
   // Muenba 27G aligns phone orientation and popup height with visualViewport.
+  // Muenba scream asset pass right-sizes six mono MP3 one-shots for the
+  // upcoming shared sample-loader pass.
+  // Muenba 28A adds the shared decoded sample-loader and pitch variation API.
   // Destruction goofy-SFX v3: modal-synthesis rewrite of the pull/creak,
   // block hit/break, and bounce sounds (static-partial materials vs.
   // pitch-bending gesture sounds), based on a reference implementation
@@ -62,7 +65,10 @@ const CURRENT_CACHES = {
   // four materials, opened up soft/rubber's muffled lowpass so it's
   // finally audible, louder break/shatter debris on every material,
   // and roughly doubled every death-explosion sound.
-  assets: 'booha-assets-2026-410',
+  // Destruction real-audio pass: material hit/break/pull/snap/rubble/
+  // death sounds are now right-sized recorded MP3 clips instead of
+  // WebAudio synthesis; the floor-bounce sound stays procedural.
+  assets: 'booha-assets-2026-413',
   decks:  'booha-decks-2026-310',
 };
 
