@@ -26,7 +26,7 @@ const CURRENT_CACHES = {
   // prior PNG-serving asset cache after the 22F WebP migration.
   // Karasuki 24A: room backgrounds are now genuine WebP files, replacing
   // PNG/JPEG bytes that had been stored under .webp filenames.
-  assets: 'booha-assets-2026-384',
+  assets: 'booha-assets-2026-385',
   decks:  'booha-decks-2026-310',
 };
 
