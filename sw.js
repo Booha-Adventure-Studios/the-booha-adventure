@@ -54,6 +54,7 @@ const CURRENT_CACHES = {
   // upcoming shared sample-loader pass.
   // Muenba 28A adds the shared decoded sample-loader and pitch variation API.
   // Muenba 28B adds staggered authored scream playback, decay, and danger-state cleanup.
+  // Muenba 28C primes all authored clips after the first gesture and avoids immediate repeats.
   // Destruction goofy-SFX v3: modal-synthesis rewrite of the pull/creak,
   // block hit/break, and bounce sounds (static-partial materials vs.
   // pitch-bending gesture sounds), based on a reference implementation
@@ -69,7 +70,11 @@ const CURRENT_CACHES = {
   // Destruction real-audio pass: material hit/break/pull/snap/rubble/
   // death sounds are now right-sized recorded MP3 clips instead of
   // WebAudio synthesis; the floor-bounce sound stays procedural.
-  assets: 'booha-assets-2026-414',
+  // Feed Booha webp + audio right-size pass: 6 booha sprites + candy
+  // resized and converted to webp, background recompressed only, the
+  // dead double-fetch of the (CSS-only) background image removed from
+  // preloadAssets, and the 5 catch/bounce mp3s right-sized.
+  assets: 'booha-assets-2026-416',
   decks:  'booha-decks-2026-310',
 };
 

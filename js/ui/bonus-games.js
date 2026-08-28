@@ -11,7 +11,7 @@
   const BONUS_GAME_META = {
     booha_invaders:    { icon:'assets/invaders/bug-1.webp',                         jp:'ブーハー・インベーダーズ',       k:'侵略者' },
     booha_blocks:      { icon:'assets/blocks/red_block.png',                       jp:'ブーハー・ブロック',             k:'積木' },
-    feed_booha:        { icon:'assets/feed/boo-eat.png',                           jp:'ブーハーにキャンディをあげよう', k:'給食' },
+    feed_booha:        { icon:'assets/feed/boo-eat.webp',                          jp:'ブーハーにキャンディをあげよう', k:'給食' },
     booha_destruction: { icon:'assets/destruction/optimized/booha_helmet_256.webp', jp:'ブーハー・デストラクション',     k:'破壊' },
   };
 

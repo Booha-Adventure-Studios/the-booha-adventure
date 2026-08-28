@@ -84,7 +84,7 @@ html, body {
   aspect-ratio: 9 / 16;
   flex-shrink: 0;
   overflow: hidden;
-  background-image: url('../assets/feed/feed_booha-1.png');  /* ← add */
+  background-image: url('../assets/feed/feed_booha-1.webp');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

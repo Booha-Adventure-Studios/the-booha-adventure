@@ -85,6 +85,7 @@
   var dangerScreamSampleBuffers = new Map();
   var dangerScreamSampleLoads = new Map();
   var dangerScreamSampleVoices = [];
+  var dangerScreamSampleLastUrl = '';
   var dangerSampleScreamTimer = 0;
   var dangerSampleScreamActive = false;
   var dangerSampleScreamCount = 0;
@@ -127,7 +128,12 @@
   }
 
   function randomDangerScreamSampleUrl() {
-    return DANGER_SCREAM_SAMPLE_URLS[Math.floor(Math.random() * DANGER_SCREAM_SAMPLE_URLS.length)];
+    var candidates = DANGER_SCREAM_SAMPLE_URLS.filter(function (url) {
+      return url !== dangerScreamSampleLastUrl;
+    });
+    var url = candidates[Math.floor(Math.random() * candidates.length)] || DANGER_SCREAM_SAMPLE_URLS[0];
+    dangerScreamSampleLastUrl = url;
+    return url;
   }
 
   // Play one decoded sample with a small pitch window. `gain` is deliberately
