@@ -845,7 +845,7 @@
 
   /* Round 2 Pass 13 (celebration dance): three dedicated dance-pose
      frames, swapped on a beat during startCelebration() instead of
-     just spinning the base sprite. Measured each PNG's own opaque
+     just spinning the base sprite. Measured each pose asset's own opaque
      content as a fraction of its canvas (booha_ghost.png: ~65% of a
      1024×1024 square; the three dance frames: ~80-84% of their own,
      slightly taller-than-wide canvases, since the raised/spread poses
@@ -854,12 +854,12 @@
      every pose instead of visibly growing when a dance frame swaps in
      (the "these files' ghosts are a tad bigger" the user flagged).
      offsetX/offsetY (a few percent of the frame, also measured from
-     each PNG's content bounding box) re-centers each pose on the same
-     point booha_ghost.png centers on, so the swap doesn't nudge the
+     each pose's content bounding box) re-centers each pose on the same
+     point the base Booha frame centers on, so the swap doesn't nudge the
      ghost sideways either. */
-  const danceArmsUpImg = makeUtsurobaDeferredImage('./assets/img/booha_ghost_dance_arms_up.png');
-  const danceSwayImg   = makeUtsurobaDeferredImage('./assets/img/booha_ghost_dance_sway.png');
-  const danceWaveImg   = makeUtsurobaDeferredImage('./assets/img/booha_ghost_dance_wave.png');
+  const danceArmsUpImg = makeUtsurobaDeferredImage('./assets/img/booha_ghost_dance_arms_up.webp');
+  const danceSwayImg   = makeUtsurobaDeferredImage('./assets/img/booha_ghost_dance_sway.webp');
+  const danceWaveImg   = makeUtsurobaDeferredImage('./assets/img/booha_ghost_dance_wave.webp');
   const DANCE_FRAMES = [
     { img: danceArmsUpImg, contentScale: 0.817, offsetX: -0.007, offsetY: -0.026 },
     { img: danceSwayImg,   contentScale: 0.801, offsetX:  0.009, offsetY: -0.015 },
