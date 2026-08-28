@@ -378,19 +378,27 @@
       .utsu-celebration-action small{color:var(--celebration-ring,#ffd966);font:400 .78em/1.2 Georgia,'Times New Roman',serif;}
       @media(max-width:520px){
         .utsu-celebration-pop{padding:max(10px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left));}
-        .utsu-celebration-card{width:100%;border-radius:18px;padding:28px 16px 24px;max-height:min(88vh,640px);max-height:min(88dvh,640px);}
-        .utsu-celebration-portrait-wrap{width:min(270px,72vw,100%);height:min(280px,38vh,38dvh);}
+        .utsu-celebration-card{width:100%;border-radius:18px;padding:22px 16px 20px;max-height:min(80vh,560px);max-height:min(80dvh,560px);}
+        .utsu-celebration-portrait-wrap{width:min(230px,60vw,100%);height:min(220px,30vh,30dvh);margin-bottom:8px;}
         .utsu-celebration-copy{max-width:100%;}
         .utsu-celebration-title{font-size:clamp(1.35rem,7vw,1.85rem);}
-        .utsu-celebration-card.is-copy-overlay .utsu-celebration-copy{margin-top:-68px;padding:14px 12px 10px;}
-        .utsu-celebration-card.is-compact-copy .utsu-celebration-copy{margin-top:-44px;padding:10px 10px 8px;}
+        /* Fix: the desktop "caption pulled up over the poster" trick used a
+           fixed negative margin-top, which stayed fixed even as the portrait
+           above it shrunk to fit the screen — on a short phone the text card
+           ate most of the art instead of just its bottom margin. Below this
+           width the copy card stacks under the portrait with a normal gap
+           instead of overlapping it. */
+        .utsu-celebration-card.is-copy-overlay .utsu-celebration-copy{margin-top:10px;padding:14px 12px 10px;}
+        .utsu-celebration-card.is-compact-copy .utsu-celebration-copy{margin-top:10px;padding:10px 10px 8px;}
       }
       @media(max-height:620px) and (orientation:landscape){
         .utsu-celebration-pop{padding:8px 12px;}
         .utsu-celebration-card{max-height:calc(100dvh - 16px);padding:16px 18px 14px;}
-        .utsu-celebration-portrait-wrap{width:min(220px,34vw);height:min(170px,30dvh);margin-bottom:8px;}
+        .utsu-celebration-portrait-wrap{width:min(200px,32vw);height:min(140px,24dvh);margin-bottom:6px;}
         .utsu-celebration-eyebrow{margin-bottom:6px;}
-        .utsu-celebration-card.is-compact-copy .utsu-celebration-copy{margin-top:-36px;}
+        /* Same fix as the portrait breakpoint above, applied to the even
+           tighter landscape case. */
+        .utsu-celebration-card.is-compact-copy .utsu-celebration-copy{margin-top:6px;}
         .utsu-celebration-card.is-compact-copy .utsu-celebration-action{margin-top:8px;}
       }
       @media(prefers-reduced-motion:reduce){

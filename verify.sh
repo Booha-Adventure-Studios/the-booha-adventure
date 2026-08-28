@@ -565,32 +565,39 @@ else
   bad "Utsuroba dance WebP audit failed"
 fi
 
-echo "[63/66] Muenba 26A room WebP audit"
+echo "[63/67] Muenba 26A room WebP audit"
 if node tests/muenba-room-webp-audit.cjs >/dev/null 2>&1; then
   ok "Muenba room WebP contracts pass"
 else
   bad "Muenba room WebP audit failed"
 fi
 
-echo "[64/66] Muenba 26B ghost WebP audit"
+echo "[64/67] Muenba 26B ghost WebP audit"
 if node tests/muenba-ghost-webp-audit.cjs >/dev/null 2>&1; then
   ok "Muenba ghost WebP contracts pass"
 else
   bad "Muenba ghost WebP audit failed"
 fi
 
-echo "[65/66] Muenba 26C supporting-art WebP audit"
+echo "[65/67] Muenba 26C supporting-art WebP audit"
 if node tests/muenba-supporting-webp-audit.cjs >/dev/null 2>&1; then
   ok "Muenba supporting-art WebP contracts pass"
 else
   bad "Muenba supporting-art WebP audit failed"
 fi
 
-echo "[66/66] Muenba 26D media-loading audit"
+echo "[66/67] Muenba 26D media-loading audit"
 if node tests/muenba-media-loading-audit.cjs >/dev/null 2>&1; then
   ok "Muenba media-loading contracts pass"
 else
   bad "Muenba media-loading audit failed"
+fi
+
+echo "[67/67] Muenba 26E danger-audio audit"
+if node tests/muenba-danger-audio-audit.cjs >/dev/null 2>&1; then
+  ok "Muenba danger-audio contracts pass"
+else
+  bad "Muenba danger-audio audit failed"
 fi
 
 # ── Summary ──────────────────────────────────────────────────

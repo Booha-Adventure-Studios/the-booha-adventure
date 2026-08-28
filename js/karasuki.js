@@ -2749,24 +2749,6 @@ const HAPPY_HOUSE_PORTAL = {
     });
   }
 
-  function showKarasukiArrival() {
-    if (!isProfileEntry() || !window.UtsuCard) return;
-    const name = rewardHTMLText(getBoohaFirstName() || 'Booha');
-    const jp = window.UtsuFurigana && window.UtsuFurigana.sentence
-      ? window.UtsuFurigana.sentence('カラスキへおかえりなさい。', {})
-      : 'カラスキへおかえりなさい。';
-    setTimeout(() => {
-      window.UtsuCard.showRewardPop({
-        motif: 'lantern',
-        icon: '✧',
-        title: "I'M BACK IN KARASUKI",
-        subHTML: `${name}, the wandering paths are open again.<br>${jp}`,
-        duration: 2800,
-      });
-    }, 700);
-  }
-
-  
   const WANDERER_IMG_BASE = 'https://booha-adventure-studios.github.io/the-booha-adventure/assets/img/wanderers/';
   const DRIFT_SPEED      = 0.28;
   const DRIFT_STOP_DIST  = 90;
@@ -5490,7 +5472,7 @@ function drawObserver(now) {
     injectStyles(); buildApp(); injectTrailHud(); injectEchoesTracker(); KarasukiAtmos.init(stage);
     restoreProfileRoom();
     fitStage(); resizeCanvas();
-    initOrbs(); updateTrailHud(); renderInitialRoom(); initWanderers(); initNuppi(); bindInput(); showKarasukiArrival();
+    initOrbs(); updateTrailHud(); renderInitialRoom(); initWanderers(); initNuppi(); bindInput();
     
     window.addEventListener("resize",()=>{ fitStage(); resizeCanvas(); });
     requestAnimationFrame(tick);
