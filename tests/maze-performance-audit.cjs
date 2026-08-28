@@ -1,9 +1,8 @@
 #!/usr/bin/env node
 'use strict';
 
-// Pass 23A: Maze visual assets use quality-checked WebP siblings. PNG sources
-// remain during this staged pass so visual rollback is still easy; removal is
-// a later cleanup pass after Maze has been exercised in production.
+// Maze visual assets use quality-checked WebP files. Their old PNG sources
+// are retired after the cross-page reference migration.
 const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
@@ -24,18 +23,17 @@ const assets = [
 assets.forEach((name) => {
   const pngPath = path.join(root, 'assets', 'img', `${name}.png`);
   const webpPath = path.join(root, 'assets', 'img', `${name}.webp`);
-  const png = fs.readFileSync(pngPath);
   const webp = fs.readFileSync(webpPath);
+  assert(!fs.existsSync(pngPath), `${name}.png must be retired after WebP migration`);
   assert(webp.length > 12, `${name}.webp must not be empty`);
   assert(webp.subarray(0, 4).toString('ascii') === 'RIFF', `${name}.webp must have a RIFF header`);
   assert(webp.subarray(8, 12).toString('ascii') === 'WEBP', `${name}.webp must have a WEBP signature`);
-  assert(webp.length < png.length, `${name}.webp must be smaller than its PNG source`);
   assert(maze.includes(`assets/img/${name}.webp`), `maze must reference ${name}.webp`);
   assert(!maze.includes(`assets/img/${name}.png`), `maze must not reference ${name}.png`);
 });
 
 assert(!sw.includes('${BASE}/assets/img/juku-tree.png'), 'service worker must not precache the retired Maze tree path');
-assert(sw.includes('booha-pages-2026-371'), 'Maze HTML migration must bump the page cache');
-assert(sw.includes('booha-assets-2026-382'), 'Maze WebP migration must bump the asset cache');
+assert(sw.includes('booha-pages-2026-372'), 'Maze HTML migration must bump the page cache');
+assert(sw.includes('booha-assets-2026-383'), 'Maze WebP migration must bump the asset cache');
 
-console.log('Maze 23A performance audit passed: 19 visual assets use smaller WebP files and Maze has no stale PNG references.');
+console.log('Maze visual asset audit passed: 19 WebP files are present and all retired PNG sources are absent.');
