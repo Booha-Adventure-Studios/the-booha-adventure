@@ -5051,7 +5051,7 @@
       html.muenba-popup-open body { overscroll-behavior:none; }
       #muenba-lobby-overlay,
       #muenba-capture-overlay,
-      #muenba-return-overlay { overscroll-behavior-y:contain; touch-action:pan-y; -webkit-overflow-scrolling:touch; }
+      #muenba-return-overlay { overscroll-behavior-y:contain; touch-action:pan-y; -webkit-overflow-scrolling:touch; height:var(--muenba-viewport-height,100dvh); min-height:var(--muenba-viewport-height,100dvh); }
       .muenba-lobby-box,
       .muenba-return-box { overscroll-behavior:contain; }
       /* Pass 18D: the English record is the lesson surface. Keep it tall
@@ -5245,14 +5245,32 @@
     stage.style.transform = `translate(-50%, -50%) scale(${scale})`;
   }
 
+  // Pass 27G: mobile browser chrome can leave innerWidth/innerHeight one
+  // resize behind the pixels the player can actually see. Prefer the visual
+  // viewport for orientation and popup sizing, with the window dimensions as
+  // the stable fallback for browsers that do not expose it.
+  function currentMuenbaViewport() {
+    const viewport = window.visualViewport;
+    const width = Number(viewport?.width) || window.innerWidth;
+    const height = Number(viewport?.height) || window.innerHeight;
+    return { width, height };
+  }
+
+  function updateMuenbaViewportMetrics() {
+    const { height } = currentMuenbaViewport();
+    document.documentElement.style.setProperty('--muenba-viewport-height', `${Math.max(1, Math.round(height))}px`);
+  }
+
   function isMuenbaPhoneViewport() {
     // A 700px short edge can include small tablets. Keep the handoff limited
     // to phone-sized touch viewports so tablet landscape remains untouched.
-    return TOUCH_DEVICE && Math.min(window.innerWidth, window.innerHeight) <= 540;
+    const { width, height } = currentMuenbaViewport();
+    return TOUCH_DEVICE && Math.min(width, height) <= 540;
   }
 
   function currentMuenbaOrientation() {
-    return window.innerWidth >= window.innerHeight ? 'landscape' : 'portrait';
+    const { width, height } = currentMuenbaViewport();
+    return width >= height ? 'landscape' : 'portrait';
   }
 
   function isMuenbaOrientationReady() {
@@ -5332,10 +5350,15 @@
   }
 
   function bindMuenbaOrientationController() {
-    window.addEventListener('resize', scheduleMuenbaOrientationCheck, { passive: true });
-    window.addEventListener('orientationchange', scheduleMuenbaOrientationCheck, { passive: true });
+    const refreshMuenbaViewport = () => {
+      updateMuenbaViewportMetrics();
+      scheduleMuenbaOrientationCheck();
+    };
+    updateMuenbaViewportMetrics();
+    window.addEventListener('resize', refreshMuenbaViewport, { passive: true });
+    window.addEventListener('orientationchange', refreshMuenbaViewport, { passive: true });
     if (window.visualViewport) {
-      window.visualViewport.addEventListener('resize', scheduleMuenbaOrientationCheck, { passive: true });
+      window.visualViewport.addEventListener('resize', refreshMuenbaViewport, { passive: true });
     }
     updateMuenbaOrientationGate();
   }
