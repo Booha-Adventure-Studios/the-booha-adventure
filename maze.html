@@ -1119,7 +1119,7 @@
   </div>
   <section id="mazeScene" aria-label="めいろ">
     <div id="stage">
-      <img id="mazeImg" src="assets/img/maze.png" alt="めいろ" />
+      <img id="mazeImg" src="assets/img/maze.webp" alt="めいろ" decoding="async" />
       <canvas id="mazeCanvas"></canvas>
       <div id="travelLock"></div>
       <div id="grid"></div>
@@ -1184,7 +1184,7 @@
       </svg>
     </div>
     <div id="hwPromptBar"></div>
-    <img id="hwTreeEmoji" src="assets/img/homework-tree.png" alt="しゅくだいの木" />
+    <img id="hwTreeEmoji" src="assets/img/homework-tree.webp" alt="しゅくだいの木" decoding="async" />
     <p class="hw-eyebrow">しゅくだい</p>
     <h2 id="hwPromptTitle">しゅくだいの木に<br>はいりますか？</h2>
     <p id="hwPromptSub">Homework Tree へ いきますか？</p>
@@ -1235,7 +1235,7 @@
       </svg>
     </div>
     <div id="krPromptBar"></div>
-    <img id="krTreeLogo" src="assets/img/karasuki1-tree.png" alt="カラスキー" />
+    <img id="krTreeLogo" src="assets/img/karasuki1-tree.webp" alt="カラスキー" decoding="async" />
     <p class="kr-eyebrow">カラスキー</p>
     <h2 id="krPromptTitle">カラスキーの木に<br>はいりますか？</h2>
     <p id="krPromptSub">ほんとうに はいりますか？</p>
@@ -1267,7 +1267,7 @@
   <div id="jkPromptScrim"></div>
   <div id="jkPrompt" role="dialog" aria-modal="true" aria-labelledby="jkPromptTitle">
     <div id="jkPromptBar"></div>
-    <img id="jkTreeLogo" src="assets/img/juku-tree.png" alt="英語塾" />
+    <img id="jkTreeLogo" src="assets/img/juku-tree.webp" alt="英語塾" decoding="async" />
     <p class="jk-eyebrow">えいごじゅく</p>
     <h2 id="jkPromptTitle"></h2>
     <p id="jkPromptSub"></p>
@@ -1354,26 +1354,26 @@ const JUKU_TREE_HIT_R = 45;
 
 const GHOSTS = [
   'assets/img/booha_ghost.webp',
-  'assets/img/blue-boo.png',
-  'assets/img/green-boo.png',
-  'assets/img/pink-boo.png',
-  'assets/img/purple-boo.png'
+  'assets/img/blue-boo.webp',
+  'assets/img/green-boo.webp',
+  'assets/img/pink-boo.webp',
+  'assets/img/purple-boo.webp'
 ];
 
   // Extra Booha visitors.
 // These are NOT playable colors.
 // They only appear in the maze after students play games.
 const EXTRA_BOOHA_GHOSTS = [
-  'assets/img/extra-boo-gold.png',
-  'assets/img/extra-boo-orange.png',
-  'assets/img/extra-boo-aqua.png',
-  'assets/img/extra-boo-rose.png',
-  'assets/img/extra-boo-lime.png',
-  'assets/img/extra-boo-candy.png',
-  'assets/img/extra-boo-mint.png',
-  'assets/img/extra-boo-sky.png',
-  'assets/img/extra-boo-peach.png',
-  'assets/img/extra-boo-violet.png'
+  'assets/img/extra-boo-gold.webp',
+  'assets/img/extra-boo-orange.webp',
+  'assets/img/extra-boo-aqua.webp',
+  'assets/img/extra-boo-rose.webp',
+  'assets/img/extra-boo-lime.webp',
+  'assets/img/extra-boo-candy.webp',
+  'assets/img/extra-boo-mint.webp',
+  'assets/img/extra-boo-sky.webp',
+  'assets/img/extra-boo-peach.webp',
+  'assets/img/extra-boo-violet.webp'
 ];
 
 // DEV switches.
@@ -1636,10 +1636,10 @@ function getWandererImage(w) {
 }
 
 // Tree images
-const homeworkImg=new Image(); homeworkImg.src='assets/img/homework-tree.png';
-const karasuki1Img=new Image(); karasuki1Img.src='assets/img/karasuki1-tree.png';
-const karasuki2Img=new Image(); karasuki2Img.src='assets/img/karasuki2-tree.png';
-const jukuImg=new Image(); jukuImg.src='assets/img/juku-tree.png';
+const homeworkImg=new Image(); homeworkImg.src='assets/img/homework-tree.webp';
+const karasuki1Img=new Image(); karasuki1Img.src='assets/img/karasuki1-tree.webp';
+const karasuki2Img=new Image(); karasuki2Img.src='assets/img/karasuki2-tree.webp';
+const jukuImg=new Image(); jukuImg.src='assets/img/juku-tree.webp';
 
 // Karasuki state machine
 let karasukiPhase=0,karasukiBlend=0,karasukiOpacity=1,karasukiLastSwap=0;

@@ -453,6 +453,13 @@ else
   bad "index final performance/runtime audit failed"
 fi
 
+echo "[47/47] Maze 23A WebP asset audit"
+if node tests/maze-performance-audit.cjs >/dev/null 2>&1; then
+  ok "Maze WebP asset contracts pass"
+else
+  bad "Maze WebP asset audit failed"
+fi
+
 # ── Summary ──────────────────────────────────────────────────
 echo "───────────────────────────────────"
 echo "✅ $PASS passed   ⚠️  $WARN warnings   ❌ $FAIL failed"
