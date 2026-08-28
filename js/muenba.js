@@ -88,6 +88,7 @@
   // skips the warning entirely.
   const GHOST_NOTICE_DELAY_MS = 2000;
   const JERK_NOTICE_DELAY_MS = 700;
+  const ANGRY_TRANSITION_MS = 260;
   const JERK_CHASE_SPEED = 1.55;
   // Carrying energy puts the whole cemetery on immediate alert. This is fast
   // enough to make the return trip dangerous, but still below Booha's speed.
@@ -679,14 +680,14 @@
     stopDangerRhythmMusic();
     music.volume = MUENBA_SCREAM_DUCK_VOLUME;
     try {
-      const sound = window.UtsuSfx && window.UtsuSfx.startDangerScream;
+      const sound = window.UtsuSfx && window.UtsuSfx.startDangerScreamSamples;
       if (typeof sound === 'function') sound();
     } catch (_) {}
   }
 
   function stopDangerScream() {
     try {
-      const sound = window.UtsuSfx && window.UtsuSfx.stopDangerScream;
+      const sound = window.UtsuSfx && window.UtsuSfx.stopDangerScreamSamples;
       if (typeof sound === 'function') sound();
     } catch (_) {}
     music.volume = MUENBA_MUSIC_VOLUME;
@@ -1376,6 +1377,9 @@
       screaming: false,
       screamReason: null,
       angryUntil: 0,
+      angerBlend: 0,
+      angerBlendTarget: 0,
+      angerBlendStartedAt: performance.now(),
       startleUntil: 0,
       hideGiveupAt: 0,
       hideSearchTarget: null,
@@ -1419,6 +1423,8 @@
     g.screaming = true;
     g.screamReason = reason;
     g.angryUntil = now + 1200;
+    g.angerBlendTarget = 1;
+    g.angerBlendStartedAt = now;
     startDangerScream();
   }
 
@@ -1426,6 +1432,9 @@
     if (!g || !g.screaming) return;
     g.screaming = false;
     g.screamReason = null;
+    const now = performance.now();
+    g.angerBlendTarget = 0;
+    g.angerBlendStartedAt = now;
     stopDangerScream();
   }
 
@@ -1548,6 +1557,15 @@
     hideBtn.disabled = locked;
     hideBtn.setAttribute('aria-disabled', locked ? 'true' : 'false');
     hideBtn.classList.toggle('is-disabled', locked);
+  }
+
+  function setMuenbaProfileDisabled(disabled) {
+    if (!muenbaProfileLink) return;
+    const locked = !!disabled;
+    muenbaProfileLink.classList.toggle('is-disabled', locked);
+    muenbaProfileLink.setAttribute('aria-disabled', locked ? 'true' : 'false');
+    if (locked) muenbaProfileLink.setAttribute('tabindex', '-1');
+    else muenbaProfileLink.removeAttribute('tabindex');
   }
 
   function toggleHide() {
@@ -4128,6 +4146,7 @@
     state.moving = false;
     state.hiding = false;
     setHideButtonDisabled(true);
+    setMuenbaProfileDisabled(true);
     if (hideBtn) hideBtn.classList.remove('active');
     activeGhost = null;
     muenbaDanceSparkles = [];
@@ -4168,6 +4187,7 @@
       try { startMusic(); } catch (_) {}
       state.inputLocked = false;
       setHideButtonDisabled(false);
+      setMuenbaProfileDisabled(false);
       spawnRoomGhost(state.roomId);
       openNuppiAfterHandoff(state.celebrationDeposit);
     }, MUENBA_DANCE_SETTLE_MS);
@@ -4335,8 +4355,14 @@
     const seconds = now / 1000;
     const bob = Math.sin(seconds * 3.4 + 1) * 6;
     const isAngry = activeGhost.screaming || now < activeGhost.angryUntil;
-    const src = isAngry ? ANGRY_CHANGE_IMG : activeGhost.ghost.img;
-    const img = src ? getGhostSprite(src) : null;
+    const normalImg = activeGhost.ghost.img ? getGhostSprite(activeGhost.ghost.img) : null;
+    const angryImg = ANGRY_CHANGE_IMG ? getGhostSprite(ANGRY_CHANGE_IMG) : null;
+    const blendTarget = isAngry ? 1 : 0;
+    const blendStartedAt = Number.isFinite(activeGhost.angerBlendStartedAt)
+      ? activeGhost.angerBlendStartedAt
+      : now;
+    const blendProgress = Math.max(0, Math.min(1, (now - blendStartedAt) / ANGRY_TRANSITION_MS));
+    const angerBlend = blendTarget ? blendProgress : 1 - blendProgress;
     const x = activeGhost.x;
     const y = activeGhost.y + bob;
     const teleporting = activeGhost.teleporting;
@@ -4359,7 +4385,9 @@
       actorCtx.arc(x, y, GHOST_DRAW_R * (.78 + pulse * .12), 0, Math.PI * 2);
       actorCtx.stroke();
     }
-    if (img && img.complete && img.naturalWidth > 0) {
+    const drawSprite = (img, alpha) => {
+      if (!img || !img.complete || img.naturalWidth <= 0 || alpha <= 0) return false;
+      actorCtx.globalAlpha = .95 * (teleporting ? .18 + teleportProgress * .82 : 1) * alpha;
       actorCtx.drawImage(
         img,
         GHOST_ART_CROP.x,
@@ -4371,8 +4399,13 @@
         GHOST_DRAW_R * 2,
         GHOST_DRAW_R * 2
       );
-    } else {
-      actorCtx.fillStyle = isAngry ? '#e0687e' : '#cfe8df';
+      return true;
+    };
+    const drewNormal = drawSprite(normalImg, 1 - angerBlend);
+    const drewAngry = drawSprite(angryImg, angerBlend);
+    if (!drewNormal && !drewAngry) {
+      actorCtx.globalAlpha = .95 * (teleporting ? .18 + teleportProgress * .82 : 1);
+      actorCtx.fillStyle = angerBlend > .5 ? '#e0687e' : '#cfe8df';
       actorCtx.beginPath();
       actorCtx.arc(x, y, GHOST_R * .7, 0, Math.PI * 2);
       actorCtx.fill();
@@ -4564,6 +4597,7 @@
       #muenba-profile-link { position:fixed; right:max(18px, env(safe-area-inset-right, 0px)); bottom:max(30px, calc(env(safe-area-inset-bottom, 0px) + 22px)); z-index:100; display:none; place-items:center; box-sizing:border-box; width:clamp(44px, 6vw, 62px); height:clamp(44px, 6vw, 62px); padding:clamp(4px, .7vw, 7px); border:1px solid rgba(216,201,139,.66); border-radius:clamp(10px, 1.2vw, 14px); background:rgba(6,15,12,.86); box-shadow:0 0 18px rgba(216,201,139,.2), inset 0 0 14px rgba(216,201,139,.08); transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease; }
       #muenba-profile-link.is-visible { display:grid; }
       #muenba-profile-link img { display:block; width:100%; height:100%; object-fit:contain; filter:drop-shadow(0 0 8px rgba(216,201,139,.42)); }
+      #muenba-profile-link.is-disabled { pointer-events:none; opacity:.28; filter:grayscale(1); cursor:not-allowed; }
       #muenba-profile-link:hover, #muenba-profile-link:focus-visible { transform:translateY(-2px); border-color:#fff0ad; box-shadow:0 0 28px rgba(216,201,139,.44), inset 0 0 16px rgba(216,201,139,.14); outline:none; }
       @keyframes muenbaHideGlow { 0%,100% { box-shadow:0 0 10px rgba(93,208,140,.22), inset 0 0 8px rgba(93,208,140,.06); } 50% { box-shadow:0 0 25px rgba(93,208,140,.58), 0 0 48px rgba(93,208,140,.18), inset 0 0 14px rgba(93,208,140,.16); } }
       #muenba-hide:hover, #muenba-hide:focus-visible { background:rgba(30,70,60,.8); outline:none; }
@@ -5193,6 +5227,7 @@
     muenbaProfileLink.title = 'Open Muenba profile';
     muenbaProfileLink.innerHTML = '<img src="assets/img/muenba/muenba_logo.webp" alt="Muenba profile">';
     document.body.appendChild(muenbaProfileLink);
+    setMuenbaProfileDisabled(false);
 
     returnNuppiHint = document.createElement('div');
     returnNuppiHint.id = 'muenba-return-nuppi-hint';

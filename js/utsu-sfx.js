@@ -85,6 +85,9 @@
   var dangerScreamSampleBuffers = new Map();
   var dangerScreamSampleLoads = new Map();
   var dangerScreamSampleVoices = [];
+  var dangerSampleScreamTimer = 0;
+  var dangerSampleScreamActive = false;
+  var dangerSampleScreamCount = 0;
 
   function loadDangerScreamSample(url) {
     if (dangerScreamSampleBuffers.has(url)) {
@@ -163,10 +166,56 @@
   }
 
   function stopDangerScreamSamples() {
+    dangerSampleScreamActive = false;
+    if (dangerSampleScreamTimer) window.clearTimeout(dangerSampleScreamTimer);
+    dangerSampleScreamTimer = 0;
     dangerScreamSampleVoices.forEach(function (source) {
       try { source.stop(); } catch (_) {}
     });
     dangerScreamSampleVoices = [];
+  }
+
+  // Pass 28B: authored screams are a measured warning layer. The first
+  // response is strongest; later responses remain audible but recede so the
+  // chase creates tension without becoming a wall of repeated sound.
+  function scheduleDangerSampleScreamPulse() {
+    if (!dangerSampleScreamActive) return;
+    var url = randomDangerScreamSampleUrl();
+    var play = function (buffer) {
+      if (!dangerSampleScreamActive || !buffer) return;
+      playDangerScreamSample({
+        url: url,
+        gain: Math.max(0.035, 0.14 * Math.pow(0.62, dangerSampleScreamCount)),
+        minPitch: 0.94,
+        maxPitch: 1.06
+      });
+      dangerSampleScreamCount += 1;
+      dangerSampleScreamTimer = window.setTimeout(
+        scheduleDangerSampleScreamPulse,
+        1800 + Math.random() * 1100
+      );
+    };
+    if (dangerScreamSampleBuffers.has(url)) {
+      play(dangerScreamSampleBuffers.get(url));
+      return;
+    }
+    loadDangerScreamSample(url).then(function (buffer) {
+      if (buffer) play(buffer);
+      else if (dangerSampleScreamActive) {
+        dangerSampleScreamTimer = window.setTimeout(scheduleDangerSampleScreamPulse, 900);
+      }
+    });
+  }
+
+  function startDangerScreamSamples() {
+    if (dangerSampleScreamActive) return;
+    // Keep the retired procedural scheduler from ever overlapping the
+    // authored sample layer if an older caller still uses its API.
+    stopDangerScream();
+    if (!ensureCtx()) return;
+    dangerSampleScreamActive = true;
+    dangerSampleScreamCount = 0;
+    scheduleDangerSampleScreamPulse();
   }
 
   function trackDangerVoice(nodes, duration) {
@@ -500,6 +549,7 @@
   }
 
   function startDangerScream() {
+    stopDangerScreamSamples();
     if (dangerScreamActive) return;
     if (!ensureCtx()) return;
     dangerScreamActive = true;
@@ -507,6 +557,7 @@
   }
 
   function stopDangerScream() {
+    stopDangerScreamSamples();
     dangerScreamActive = false;
     if (dangerScreamTimer) window.clearTimeout(dangerScreamTimer);
     dangerScreamTimer = 0;
@@ -622,6 +673,7 @@
     /* Pass 28A — authored Muenba scream sample foundation. */
     preloadDangerScreamSamples: preloadDangerScreamSamples,
     playDangerScreamSample: playDangerScreamSample,
+    startDangerScreamSamples: startDangerScreamSamples,
     stopDangerScreamSamples: stopDangerScreamSamples,
     /* A memory successfully handed to its drifter — the moment
        startCelebration() fires. Three-note warm rise, deliberately
