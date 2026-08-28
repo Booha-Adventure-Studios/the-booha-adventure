@@ -61,7 +61,7 @@ const CURRENT_CACHES = {
   // four materials, opened up soft/rubber's muffled lowpass so it's
   // finally audible, louder break/shatter debris on every material,
   // and roughly doubled every death-explosion sound.
-  assets: 'booha-assets-2026-408',
+  assets: 'booha-assets-2026-409',
   decks:  'booha-decks-2026-310',
 };
 
