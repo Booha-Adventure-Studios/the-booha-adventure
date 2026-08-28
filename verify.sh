@@ -663,6 +663,13 @@ else
   bad "Muenba scream loader audit failed"
 fi
 
+echo "[77/77] Muenba authored-scream behavior audit"
+if node tests/muenba-authored-scream-behavior-audit.cjs >/dev/null 2>&1; then
+  ok "Muenba authored-scream behavior contracts pass"
+else
+  bad "Muenba authored-scream behavior audit failed"
+fi
+
 # ── Summary ──────────────────────────────────────────────────
 echo "───────────────────────────────────"
 echo "✅ $PASS passed   ⚠️  $WARN warnings   ❌ $FAIL failed"
