@@ -30,13 +30,13 @@
   // filename → burst hue (paired with gold/cream so every pop still
   // reads as Juku's palette)
   const GHOSTS = [
-    ['blue-boo.png', '#7db8e8'], ['pink-boo.png', '#f090c0'],
-    ['green-boo.png', '#9ed879'], ['purple-boo.png', '#b48ae0'],
-    ['extra-boo-aqua.png', '#7de0d8'], ['extra-boo-candy.png', '#f0a0d0'],
-    ['extra-boo-gold.png', '#e8c46a'], ['extra-boo-lime.png', '#c0e070'],
-    ['extra-boo-mint.png', '#90dcb0'], ['extra-boo-orange.png', '#f0b070'],
-    ['extra-boo-peach.png', '#f0c0a0'], ['extra-boo-rose.png', '#e890a0'],
-    ['extra-boo-sky.png', '#90c8f0'], ['extra-boo-violet.png', '#a898e8']
+    ['blue-boo.webp', '#7db8e8'], ['pink-boo.webp', '#f090c0'],
+    ['green-boo.webp', '#9ed879'], ['purple-boo.webp', '#b48ae0'],
+    ['extra-boo-aqua.webp', '#7de0d8'], ['extra-boo-candy.webp', '#f0a0d0'],
+    ['extra-boo-gold.webp', '#e8c46a'], ['extra-boo-lime.webp', '#c0e070'],
+    ['extra-boo-mint.webp', '#90dcb0'], ['extra-boo-orange.webp', '#f0b070'],
+    ['extra-boo-peach.webp', '#f0c0a0'], ['extra-boo-rose.webp', '#e890a0'],
+    ['extra-boo-sky.webp', '#90c8f0'], ['extra-boo-violet.webp', '#a898e8']
   ];
   const IMG_DIR = 'assets/img/';
   const TREE_IMG = IMG_DIR + 'tree-arch.png';

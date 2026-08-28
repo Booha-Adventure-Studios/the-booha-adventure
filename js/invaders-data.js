@@ -160,10 +160,10 @@ const COMBO_CONFIG = {
 // Friends join the fight when the player reaches the given wave.
 // img is loaded at runtime; src points to the asset.
 const FRIENDS_UNLOCK = [
-  { wave:  5, id: "blue",   src: ASSET_BASE + "blue-boo.png",   color: "rgba(100,200,255,1)", shotColor: "#a8e8ff" },
-  { wave: 10, id: "green",  src: ASSET_BASE + "green-boo.png",  color: "rgba(100,255,160,1)", shotColor: "#afffcc" },
-  { wave: 15, id: "pink",   src: ASSET_BASE + "pink-boo.png",   color: "rgba(255,140,220,1)", shotColor: "#ffcfee" },
-  { wave: 20, id: "purple", src: ASSET_BASE + "purple-boo.png", color: "rgba(180,100,255,1)", shotColor: "#d4aaff" },
+  { wave:  5, id: "blue",   src: ASSET_BASE + "blue-boo.webp",   color: "rgba(100,200,255,1)", shotColor: "#a8e8ff" },
+  { wave: 10, id: "green",  src: ASSET_BASE + "green-boo.webp",  color: "rgba(100,255,160,1)", shotColor: "#afffcc" },
+  { wave: 15, id: "pink",   src: ASSET_BASE + "pink-boo.webp",   color: "rgba(255,140,220,1)", shotColor: "#ffcfee" },
+  { wave: 20, id: "purple", src: ASSET_BASE + "purple-boo.webp", color: "rgba(180,100,255,1)", shotColor: "#d4aaff" },
 ];
 
 // ── MILESTONE WAVES ──────────────────────────────────────────
