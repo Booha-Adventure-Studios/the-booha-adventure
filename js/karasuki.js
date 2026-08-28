@@ -3897,7 +3897,7 @@ const HAPPY_HOUSE_PORTAL = {
     const unlocked = muenbaUnlocked();
     if (!unlocked && window.UtsuSfx && typeof window.UtsuSfx.lockedRattle === 'function') window.UtsuSfx.lockedRattle();
     wpopThemeBox('muenba-pop', MUENBA_THEME);
-    wpopSetIconImage('muenba-pop', 'assets/img/muenba/muenba_logo.png', 'Muenba', 'image-muenba');
+    wpopSetIconImage('muenba-pop', 'assets/img/muenba/muenba_logo.webp', 'Muenba', 'image-muenba');
     wpopSetText(document.getElementById('muenba-pop-title-en'), '');
     wpopSetText(document.getElementById('muenba-pop-title-jp'), '');
 
