@@ -34,7 +34,8 @@
   const REST_THR   = 0.35;
   const SETTLE_NEED = 38;
   const NEXT_MS    = 950;
-  const HIT_COOL   = 90;
+  const HIT_COOL   = 130;
+  const ROLL_MIN_SPEED = 0.55, ROLL_MAX_SPEED = 11;
   const FIXED_STEP = 1000 / 60;
   const MAX_RUN_LIVES = 3;
   const GAME_ID = 'bonus:booha_destruction';
@@ -177,7 +178,8 @@
   const AUDIO_STATE = {
     muted:false, warned:new Set(), ready:false,
     master:0.82, maxVoices:4, activeVoices:0,
-    lastPlayed:new Map(), activeBufferSFX:[]
+    lastPlayed:new Map(), activeBufferSFX:[],
+    landingBurst:{count:0, last:0}
   };
 
   function audioWarn(key, error) {
@@ -381,7 +383,7 @@
   // of high "splinter" ticks.
   function playWoodBreakSFX() {
     if (AUDIO_STATE.muted) return;
-    if (!synthCooldownOk('break-wood', 120)) return;
+    if (!synthCooldownOk('break-wood', 150)) return;
     try {
       const ac = getAC(); if (!ac) return;
       const now = ac.currentTime, m = AUDIO_STATE.master * SYNTH_BOOST;
@@ -400,11 +402,13 @@
       }
     } catch (e) { audioWarn('wood-break', e); }
   }
-  // Stone — modal synthesis: a single dense sub-bass thump (90Hz down to
-  // 30Hz) with almost no ring — heavy mass, dead decay, over fast — run
-  // through the crunch waveshaper for grit, plus a deep muffled noise
-  // impact. Deliberately the SHORTEST decay of the three materials so it
-  // reads as "heavy and dead" next to wood's warmth and glass's ring.
+  // Stone — modal synthesis: a single dense sub-bass thump (88Hz down to
+  // 26Hz) with almost no ring — heavy mass, dead decay — run through the
+  // crunch waveshaper for grit, plus a deep muffled noise impact. Given a
+  // touch more body/decay than the first pass per feedback that it read
+  // as too dead/short, but still deliberately the SHORTEST decay of the
+  // four materials so it reads as "heavy and dead" next to wood's warmth
+  // and glass's ring.
   function playStoneSFX(vol=1) {
     if (AUDIO_STATE.muted) return;
     try {
@@ -414,20 +418,20 @@
       shaper.curve = getCrunchCurve();
       const osc = ac.createOscillator(), g = ac.createGain();
       osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(90 + rnd(-6,6), now);
-      osc.frequency.exponentialRampToValueAtTime(30, now + 0.06);
-      g.gain.setValueAtTime(g1(1.15*m), now);
-      g.gain.exponentialRampToValueAtTime(0.0001, now + 0.065);
+      osc.frequency.setValueAtTime(88 + rnd(-6,6), now);
+      osc.frequency.exponentialRampToValueAtTime(26, now + 0.09);
+      g.gain.setValueAtTime(g1(1.2*m), now);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + 0.105);
       osc.connect(shaper).connect(g).connect(ac.destination);
-      osc.start(now); osc.stop(now + 0.07);
-      playNoiseImpact(ac, now, 170, 0.9, 0.045, 0.85*m, 'lowpass');
+      osc.start(now); osc.stop(now + 0.11);
+      playNoiseImpact(ac, now, 160, 0.9, 0.075, 0.9*m, 'lowpass');
     } catch (e) { audioWarn('stone', e); }
   }
   // Stone break — the sub-bass thump at full strength plus a bigger
   // scatter of lowpassed gravel bits.
   function playStoneBreakSFX() {
     if (AUDIO_STATE.muted) return;
-    if (!synthCooldownOk('break-stone', 130)) return;
+    if (!synthCooldownOk('break-stone', 160)) return;
     try {
       const ac = getAC(); if (!ac) return;
       const now = ac.currentTime, m = AUDIO_STATE.master * SYNTH_BOOST;
@@ -475,7 +479,7 @@
   // descending "poof" of stuffing.
   function playSoftBreakSFX() {
     if (AUDIO_STATE.muted) return;
-    if (!synthCooldownOk('break-soft', 120)) return;
+    if (!synthCooldownOk('break-soft', 150)) return;
     try {
       const ac = getAC(); if (!ac) return;
       const now = ac.currentTime, m = AUDIO_STATE.master * SYNTH_BOOST;
@@ -562,7 +566,7 @@
   // ring is the longest of any material sound in the game.
   function playGlassShatterSFX() {
     if (AUDIO_STATE.muted) return;
-    if (!synthCooldownOk('glass-shatter', 140)) return;
+    if (!synthCooldownOk('glass-shatter', 170)) return;
     try {
       const ac = getAC(); if (!ac) return;
       const now = ac.currentTime, m = AUDIO_STATE.master * SYNTH_BOOST;
@@ -588,12 +592,12 @@
   // resonance) over a low noise thump for real floor-contact weight, so
   // it doesn't read as a thin pure tone. Pitch, punch, and thump all
   // scale continuously with impact speed.
-  function playBounceSFX(speed) {
+  function playBounceSFX(speed, delaySec=0) {
     if (AUDIO_STATE.muted) return;
-    if (!synthCooldownOk('bounce', 70)) return;
+    if (delaySec <= 0 && !synthCooldownOk('bounce', 70)) return;
     try {
       const ac = getAC(); if (!ac) return;
-      const now = ac.currentTime, m = AUDIO_STATE.master * SYNTH_BOOST;
+      const now = ac.currentTime + Math.max(0, delaySec), m = AUDIO_STATE.master * SYNTH_BOOST;
       const energy = Math.max(0, Math.min(1, speed / 40));
       const peak = 130 + energy * 260;
       const dur = 0.08 + energy * 0.24;
@@ -608,6 +612,49 @@
       osc.start(now); osc.stop(now + dur + 0.02);
       playNoiseImpact(ac, now, 140, 0.9, 0.05 + energy*0.05, (0.3 + energy*0.35)*m, 'lowpass');
     } catch (e) { audioWarn('bounce', e); }
+  }
+  // Rolling/sliding friction — a soft, continuously-updated noise loop
+  // tied to the Booha's live ground speed while it rolls to a stop
+  // (above dead-stop, below the bounce threshold). Lazily created the
+  // first time it's needed; its gain/filter are nudged toward a new
+  // target every frame from updateBooha() via updateRollingFrictionSFX
+  // (setTargetAtTime, never a hard jump) — this is never a fire-and-
+  // forget "start once" node. Every place the Booha can stop being
+  // relevant — settle, reset, pause, mute, a fresh shot — calls
+  // stopRollingFrictionSFX() directly and unconditionally, the same
+  // "wire it into every exit path" lesson the old pull drone taught.
+  let rollFriction = null; // { noise, filter, gain }
+  function updateRollingFrictionSFX(spd, active) {
+    if (AUDIO_STATE.muted || !active || spd < ROLL_MIN_SPEED) { stopRollingFrictionSFX(); return; }
+    try {
+      const ac = getAC(); if (!ac) { stopRollingFrictionSFX(); return; }
+      const now = ac.currentTime;
+      const energy = Math.max(0, Math.min(1, (spd - ROLL_MIN_SPEED) / (ROLL_MAX_SPEED - ROLL_MIN_SPEED)));
+      if (!rollFriction) {
+        const noise = ac.createBufferSource();
+        noise.buffer = getNoiseBuffer(ac); noise.loop = true;
+        const filter = ac.createBiquadFilter();
+        filter.type = 'bandpass'; filter.Q.value = 0.8; filter.frequency.value = 400;
+        const gain = ac.createGain(); gain.gain.value = 0.0001;
+        noise.connect(filter).connect(gain).connect(ac.destination);
+        noise.start(now, rnd(0, 2));
+        rollFriction = { noise, filter, gain };
+      }
+      const m = AUDIO_STATE.master * SYNTH_BOOST;
+      rollFriction.gain.gain.setTargetAtTime(g1((0.045 + energy * 0.2) * m), now, 0.05);
+      rollFriction.filter.frequency.setTargetAtTime(260 + energy * 780, now, 0.08);
+    } catch (e) { audioWarn('roll-friction', e); stopRollingFrictionSFX(); }
+  }
+  function stopRollingFrictionSFX() {
+    if (!rollFriction) return;
+    const node = rollFriction; rollFriction = null;
+    try {
+      const ac = getAC();
+      const now = ac ? ac.currentTime : 0;
+      node.gain.gain.cancelScheduledValues(now);
+      node.gain.gain.setTargetAtTime(0.0001, now, 0.03);
+      setTimeout(() => { try { node.noise.stop(); } catch (e) {} }, 150);
+    } catch (e) {}
   }
   // Launch — a quick rising "stretch" sweep into a puff of release air.
   function playLaunchSFX() {
@@ -681,25 +728,27 @@
       osc.start(now); osc.stop(now + 0.15);
     } catch (e) { audioWarn('pull-release', e); }
   }
-  // The real release — a sharp downward "TWANG": a fast sawtooth pitch
-  // drop plus a highpassed noise snap. Loud on purpose — this is the
-  // payoff moment for the whole pull gesture.
+  // The real release — a sharp downward "TWANG". Per feedback that this
+  // read as landing a beat late, the noise crack now fires first and at
+  // full gain instantly (no ramp-in), with the tonal sawtooth's own
+  // attack tightened to match, so the snap reads as happening exactly on
+  // release rather than trailing it.
   function playSlingshotSnapSFX() {
     if (AUDIO_STATE.muted) return;
-    if (!synthCooldownOk('snap', 100)) return;
+    if (!synthCooldownOk('snap', 60)) return;
     try {
       const ac = getAC(); if (!ac) return;
       const now = ac.currentTime, m = AUDIO_STATE.master * SYNTH_BOOST;
+      playNoiseImpact(ac, now, 1500, null, 0.055, 0.85*m, 'highpass');
       const osc = ac.createOscillator(), g = ac.createGain();
       osc.type = 'sawtooth';
       osc.frequency.setValueAtTime(950, now);
       osc.frequency.exponentialRampToValueAtTime(110, now + 0.16);
       g.gain.setValueAtTime(0.001, now);
-      g.gain.exponentialRampToValueAtTime(g1(0.95 * m), now + 0.008);
+      g.gain.exponentialRampToValueAtTime(g1(0.95 * m), now + 0.003);
       g.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
       osc.connect(g).connect(ac.destination);
       osc.start(now); osc.stop(now + 0.2);
-      playNoiseImpact(ac, now, 1800, null, 0.05, 0.65*m, 'highpass');
     } catch (e) { audioWarn('snap', e); }
   }
 
@@ -723,6 +772,7 @@
       AUDIO_STATE.activeBufferSFX.forEach(v => { try { v.node.stop(); } catch(e) {} });
       AUDIO_STATE.activeBufferSFX=[];
       AUDIO_STATE.lastPlayed.clear();
+      stopRollingFrictionSFX();
     }
     try { window.localStorage?.setItem(AUDIO_PREF_KEY, AUDIO_STATE.muted ? '1' : '0'); }
     catch (e) {}
@@ -1475,7 +1525,16 @@
     else playWoodBreakSFX();
   }
   function sndRub()   { playRubbleSFX(); }
-  function sndGnd(s)  { if (s < 12) return; playBounceSFX(s); }
+  function sndGnd(s) {
+    if (s < 12) return;
+    const nowMs = performance.now();
+    if (nowMs - AUDIO_STATE.landingBurst.last < 220) AUDIO_STATE.landingBurst.count++;
+    else AUDIO_STATE.landingBurst.count = 0;
+    AUDIO_STATE.landingBurst.last = nowMs;
+    const n = AUDIO_STATE.landingBurst.count;
+    const delaySec = n === 0 ? 0 : Math.min(0.32, n * (0.02 + Math.random() * 0.045));
+    playBounceSFX(s, delaySec);
+  }
   function sndWin()   { playBufferSFX('win',  1, 1, 'win', 300, 3); }
   function sndFail()  { playBufferSFX('fail', 0.85, 1, 'fail', 300, 3); }
   function sndUnlock() {
@@ -1712,11 +1771,260 @@ function traitGlowColor(block) {
     return '';
   }
   // ── Death explosions ─────────────────────────────────
+  // ── Death-explosion SFX ──────────────────────────────
+  // One distinct procedural voice per power, dispatched once per shot
+  // from triggerDeathExplosion() (guarded there by confettiFired, so
+  // this can't double-fire in normal play). Each still carries its own
+  // cooldown as a cheap safety net. Character follows each power's own
+  // theme/visual identity below.
+  function playDeathSFX(power) {
+    switch (power) {
+      case 'heavy':     playDeathHeavySFX();     break;
+      case 'ice':       playDeathIceSFX();       break;
+      case 'fire':      playDeathFireSFX();      break;
+      case 'princess':  playDeathPrincessSFX();  break;
+      case 'rainbow':   playDeathRainbowSFX();   break;
+      case 'nightmare': playDeathNightmareSFX(); break;
+      case 'monster':   playDeathMonsterSFX();   break;
+      case 'ultimate':  playDeathUltimateSFX();  break;
+      default:          playDeathNormalSFX();    break;
+    }
+  }
+  // Normal/Rock — a cheerful little three-note "pop-pop-poof" arpeggio.
+  function playDeathNormalSFX() {
+    if (AUDIO_STATE.muted) return;
+    if (!synthCooldownOk('death', 150)) return;
+    try {
+      const ac = getAC(); if (!ac) return;
+      const now = ac.currentTime, m = AUDIO_STATE.master * SYNTH_BOOST;
+      [420, 560, 700].forEach((freq, i) => {
+        const t = now + i * 0.045;
+        const osc = ac.createOscillator(), g = ac.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, t);
+        g.gain.setValueAtTime(0.001, t);
+        g.gain.exponentialRampToValueAtTime(g1(0.4 * m), t + 0.008);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + 0.09);
+        osc.connect(g).connect(ac.destination);
+        osc.start(t); osc.stop(t + 0.11);
+      });
+      playNoiseImpact(ac, now, 900, null, 0.08, 0.3*m, 'highpass');
+    } catch (e) { audioWarn('death-normal', e); }
+  }
+  // Heavy — a dull, heavy WHUMP through the crunch waveshaper plus a
+  // scatter of gravel bits, matching its craters-on-landing theme.
+  function playDeathHeavySFX() {
+    if (AUDIO_STATE.muted) return;
+    if (!synthCooldownOk('death', 150)) return;
+    try {
+      const ac = getAC(); if (!ac) return;
+      const now = ac.currentTime, m = AUDIO_STATE.master * SYNTH_BOOST;
+      const shaper = ac.createWaveShaper(); shaper.curve = getCrunchCurve();
+      const osc = ac.createOscillator(), g = ac.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(110, now);
+      osc.frequency.exponentialRampToValueAtTime(28, now + 0.22);
+      g.gain.setValueAtTime(g1(1.05*m), now);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + 0.26);
+      osc.connect(shaper).connect(g).connect(ac.destination);
+      osc.start(now); osc.stop(now + 0.28);
+      playNoiseImpact(ac, now, 200, 0.8, 0.22, 0.75*m, 'lowpass');
+      for (let i = 0; i < 6; i++) {
+        const t = now + 0.02 + i * rnd(0.02, 0.05);
+        playNoiseImpact(ac, t, rnd(300,700), 3, 0.05, 0.22*m, 'bandpass');
+      }
+    } catch (e) { audioWarn('death-heavy', e); }
+  }
+  // Ice — a bright crystalline shimmer: a highpassed crack plus four
+  // static, slightly rising inharmonic sine partials.
+  function playDeathIceSFX() {
+    if (AUDIO_STATE.muted) return;
+    if (!synthCooldownOk('death', 150)) return;
+    try {
+      const ac = getAC(); if (!ac) return;
+      const now = ac.currentTime, m = AUDIO_STATE.master * SYNTH_BOOST;
+      playNoiseImpact(ac, now, 5200, null, 0.1, 0.55*m, 'highpass');
+      [3200, 4400, 5800, 7000].forEach((freq, i) => {
+        const f2 = freq + rnd(-60,60);
+        const osc = ac.createOscillator(), g = ac.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(f2, now);
+        osc.frequency.exponentialRampToValueAtTime(f2 * 1.05, now + 0.3);
+        g.gain.setValueAtTime(g1(0.24*m), now + i*0.015);
+        g.gain.exponentialRampToValueAtTime(0.0001, now + 0.32 + i*0.03);
+        osc.connect(g).connect(ac.destination);
+        osc.start(now); osc.stop(now + 0.4);
+      });
+    } catch (e) { audioWarn('death-ice', e); }
+  }
+  // Fire — a bandpassed noise whoosh sweeping down, scattered high
+  // "crackle" ticks, and a low rumble undertone.
+  function playDeathFireSFX() {
+    if (AUDIO_STATE.muted) return;
+    if (!synthCooldownOk('death', 150)) return;
+    try {
+      const ac = getAC(); if (!ac) return;
+      const now = ac.currentTime, m = AUDIO_STATE.master * SYNTH_BOOST;
+      const noise = ac.createBufferSource(); noise.buffer = getNoiseBuffer(ac);
+      const filter = ac.createBiquadFilter();
+      filter.type = 'bandpass'; filter.Q.setValueAtTime(1.1, now);
+      filter.frequency.setValueAtTime(2200, now);
+      filter.frequency.exponentialRampToValueAtTime(300, now + 0.35);
+      const wg = ac.createGain();
+      wg.gain.setValueAtTime(g1(0.6*m), now);
+      wg.gain.exponentialRampToValueAtTime(0.0001, now + 0.38);
+      noise.connect(filter).connect(wg).connect(ac.destination);
+      noise.start(now, rnd(0,2)); noise.stop(now + 0.4);
+      for (let i = 0; i < 8; i++) {
+        const t = now + rnd(0.02, 0.32);
+        playNoiseImpact(ac, t, rnd(1500,3200), 4, 0.03, 0.18*m, 'bandpass');
+      }
+      const osc = ac.createOscillator(), og = ac.createGain();
+      osc.type = 'sawtooth'; osc.frequency.setValueAtTime(70, now);
+      osc.frequency.exponentialRampToValueAtTime(35, now + 0.3);
+      og.gain.setValueAtTime(g1(0.35*m), now);
+      og.gain.exponentialRampToValueAtTime(0.0001, now + 0.32);
+      osc.connect(og).connect(ac.destination);
+      osc.start(now); osc.stop(now + 0.34);
+    } catch (e) { audioWarn('death-fire', e); }
+  }
+  // Princess — a cute ascending four-note "twinkle" plus a soft airy
+  // shimmer, matching the heart/sparkle float-up confetti.
+  function playDeathPrincessSFX() {
+    if (AUDIO_STATE.muted) return;
+    if (!synthCooldownOk('death', 150)) return;
+    try {
+      const ac = getAC(); if (!ac) return;
+      const now = ac.currentTime, m = AUDIO_STATE.master * SYNTH_BOOST;
+      [660, 830, 990, 1320].forEach((freq, i) => {
+        const t = now + i * 0.055;
+        const osc = ac.createOscillator(), g = ac.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, t);
+        g.gain.setValueAtTime(0.001, t);
+        g.gain.exponentialRampToValueAtTime(g1(0.32*m), t + 0.006);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + 0.22);
+        osc.connect(g).connect(ac.destination);
+        osc.start(t); osc.stop(t + 0.24);
+      });
+      playNoiseImpact(ac, now, 3800, null, 0.18, 0.22*m, 'highpass');
+    } catch (e) { audioWarn('death-princess', e); }
+  }
+  // Rainbow — a quick six-note magical cascade across a bright scale,
+  // matching the hue-staggered sparkle wave.
+  function playDeathRainbowSFX() {
+    if (AUDIO_STATE.muted) return;
+    if (!synthCooldownOk('death', 150)) return;
+    try {
+      const ac = getAC(); if (!ac) return;
+      const now = ac.currentTime, m = AUDIO_STATE.master * SYNTH_BOOST;
+      const scale = [523, 587, 659, 784, 880, 1046];
+      for (let i = 0; i < scale.length; i++) {
+        const t = now + i * 0.032 + rnd(0, 0.01);
+        const freq = scale[i] * (1 + rnd(-0.01,0.01));
+        const osc = ac.createOscillator(), g = ac.createGain();
+        osc.type = i % 2 === 0 ? 'sine' : 'triangle';
+        osc.frequency.setValueAtTime(freq, t);
+        g.gain.setValueAtTime(0.001, t);
+        g.gain.exponentialRampToValueAtTime(g1(0.26*m), t + 0.006);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + 0.26);
+        osc.connect(g).connect(ac.destination);
+        osc.start(t); osc.stop(t + 0.28);
+      }
+      playNoiseImpact(ac, now, 4600, null, 0.22, 0.28*m, 'highpass');
+    } catch (e) { audioWarn('death-rainbow', e); }
+  }
+  // Nightmare — two closely-detuned sawtooths sliding down into a
+  // bandpassed noise swell, a spooky "whoosh out" for the teleporter.
+  function playDeathNightmareSFX() {
+    if (AUDIO_STATE.muted) return;
+    if (!synthCooldownOk('death', 150)) return;
+    try {
+      const ac = getAC(); if (!ac) return;
+      const now = ac.currentTime, m = AUDIO_STATE.master * SYNTH_BOOST;
+      [220, 233].forEach(freq => {
+        const osc = ac.createOscillator(), g = ac.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(freq, now);
+        osc.frequency.exponentialRampToValueAtTime(freq * 0.35, now + 0.45);
+        g.gain.setValueAtTime(g1(0.4*m), now);
+        g.gain.exponentialRampToValueAtTime(0.0001, now + 0.48);
+        osc.connect(g).connect(ac.destination);
+        osc.start(now); osc.stop(now + 0.5);
+      });
+      const noise = ac.createBufferSource(); noise.buffer = getNoiseBuffer(ac);
+      const filter = ac.createBiquadFilter();
+      filter.type = 'bandpass'; filter.Q.setValueAtTime(2, now);
+      filter.frequency.setValueAtTime(600, now);
+      filter.frequency.exponentialRampToValueAtTime(150, now + 0.4);
+      const ng = ac.createGain();
+      ng.gain.setValueAtTime(0.001, now);
+      ng.gain.exponentialRampToValueAtTime(g1(0.32*m), now + 0.03);
+      ng.gain.exponentialRampToValueAtTime(0.0001, now + 0.42);
+      noise.connect(filter).connect(ng).connect(ac.destination);
+      noise.start(now, rnd(0,2)); noise.stop(now + 0.44);
+    } catch (e) { audioWarn('death-nightmare', e); }
+  }
+  // Monster — a big low roar: a growling sawtooth that flares up then
+  // sags, through the crunch waveshaper, over a heavy noise boom.
+  function playDeathMonsterSFX() {
+    if (AUDIO_STATE.muted) return;
+    if (!synthCooldownOk('death', 150)) return;
+    try {
+      const ac = getAC(); if (!ac) return;
+      const now = ac.currentTime, m = AUDIO_STATE.master * SYNTH_BOOST;
+      const shaper = ac.createWaveShaper(); shaper.curve = getCrunchCurve();
+      const osc = ac.createOscillator(), g = ac.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(90, now);
+      osc.frequency.exponentialRampToValueAtTime(140, now + 0.12);
+      osc.frequency.exponentialRampToValueAtTime(50, now + 0.4);
+      g.gain.setValueAtTime(g1(1.1*m), now);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + 0.45);
+      osc.connect(shaper).connect(g).connect(ac.destination);
+      osc.start(now); osc.stop(now + 0.48);
+      playNoiseImpact(ac, now, 220, 0.7, 0.4, 0.7*m, 'lowpass');
+    } catch (e) { audioWarn('death-monster', e); }
+  }
+  // Ultimate — the biggest boom in the set: a sub-bass sweep through the
+  // crunch waveshaper and a heavy noise blast, plus a bright three-note
+  // shimmer tail so it still reads as "everything explodes" and not just
+  // a bigger thud.
+  function playDeathUltimateSFX() {
+    if (AUDIO_STATE.muted) return;
+    if (!synthCooldownOk('death', 150)) return;
+    try {
+      const ac = getAC(); if (!ac) return;
+      const now = ac.currentTime, m = AUDIO_STATE.master * SYNTH_BOOST;
+      const shaper = ac.createWaveShaper(); shaper.curve = getCrunchCurve();
+      const osc = ac.createOscillator(), g = ac.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(65, now);
+      osc.frequency.exponentialRampToValueAtTime(22, now + 0.5);
+      g.gain.setValueAtTime(g1(1.3*m), now);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + 0.55);
+      osc.connect(shaper).connect(g).connect(ac.destination);
+      osc.start(now); osc.stop(now + 0.58);
+      playNoiseImpact(ac, now, 260, 0.6, 0.5, 0.9*m, 'lowpass');
+      [1800, 2600, 3600].forEach((freq, i) => {
+        const t = now + 0.06 + i * 0.02;
+        const so = ac.createOscillator(), sg = ac.createGain();
+        so.type = 'sine';
+        so.frequency.setValueAtTime(freq, t);
+        sg.gain.setValueAtTime(0.001, t);
+        sg.gain.exponentialRampToValueAtTime(g1(0.22*m), t + 0.01);
+        sg.gain.exponentialRampToValueAtTime(0.0001, t + 0.3);
+        so.connect(sg).connect(ac.destination);
+        so.start(t); so.stop(t + 0.32);
+      });
+    } catch (e) { audioWarn('death-ultimate', e); }
+  }
   function triggerDeathExplosion(b) {
     const x = b.x, y = b.y, power = b.power, ri = b.ri;
     const isLast  = gs.isLastBooha;
     const scale   = (isLast ? 1.6 : 1) * BURST_SCALE;
     const token   = gs.roundToken;
+    playDeathSFX(power);
 
     switch (power) {
       case 'heavy': {
@@ -2211,6 +2519,7 @@ function traitGlowColor(block) {
 
   // ── Atomic round management ──────────────────────────
   function resetRound() {
+    stopRollingFrictionSFX();
     sparks.length=0; waves.length=0; impactBursts.length=0; dusts.length=0; confetti.length=0;
     powers.length=0; scorchMarks.length=0;
     CRACKS.clear(); shake.v=0;
@@ -2712,8 +3021,9 @@ function traitGlowColor(block) {
 
   // ── Update: booha ────────────────────────────────────
   function updateBooha() {
-    const b=gs.booha; if(!b||!b.launched)return;
+    const b=gs.booha; if(!b||!b.launched){ stopRollingFrictionSFX(); return; }
     if(b.tell){
+      stopRollingFrictionSFX();
       const fire=updateTell(b);
       if(fire){ b.confettiFired=true; triggerDeathExplosion(b); queueNextRound(()=>finishShot(), NEXT_MS); }
       return;
@@ -2766,6 +3076,7 @@ function traitGlowColor(block) {
     }
     for(let i=0;i<gs.blocks.length;i++)blockCollide(gs.blocks[i],i);
     const spd=Math.hypot(b.vx,b.vy), onFloor=Math.abs(b.y-(FLOOR_Y-b.radius))<3;
+    updateRollingFrictionSFX(spd, onFloor && !b.confettiFired);
     if(spd<REST_THR&&onFloor){
       b.vx*=0.985; b.vy*=0.985; b.settledF++;
       if(!b.confettiFired&&b.settledF>=SETTLE_NEED){
@@ -2797,6 +3108,7 @@ function traitGlowColor(block) {
   function finishShot() {
     if (gs.shotLock) return;
     gs.shotLock=true;
+    stopRollingFrictionSFX();
     gs.timeScale=1;
     const shotsLeft=bst.stocks.reduce((a,v)=>a+v,0);
     gs.ghostsLeft=shotsLeft;
@@ -3033,6 +3345,7 @@ function traitGlowColor(block) {
     if (gs.phase !== P.PLAY) return;
     pauseOpen = true;
     gs.dragging = false; gs.pullPlayed = false;
+    stopRollingFrictionSFX();
     needsRender = true;
   }
   function closePause() {

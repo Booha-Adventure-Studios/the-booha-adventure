@@ -4967,6 +4967,38 @@
         .muenba-case-choice { min-height:58px; padding:12px 12px 12px 10px; }
         .muenba-nuppi-speech, .muenba-nuppi-mission, .muenba-nuppi-status-card, .muenba-nuppi-success-card, .muenba-nuppi-next-card { padding-left:13px; padding-right:13px; }
       }
+      /* Pass 27C: portrait popups are a phone-only presentation. The world
+         stays landscape; once a popup opens, give the reading card the full
+         narrow viewport, preserve both safe areas, and keep one deliberate
+         vertical scroll surface. */
+      html.muenba-phone-portrait #muenba-return-overlay,
+      html.muenba-phone-portrait #muenba-lobby-overlay,
+      html.muenba-phone-portrait #muenba-capture-overlay { align-items:flex-start; justify-content:center; padding:max(10px,env(safe-area-inset-top,0px)) max(10px,env(safe-area-inset-right,0px)) max(10px,env(safe-area-inset-bottom,0px)) max(10px,env(safe-area-inset-left,0px)); overscroll-behavior:contain; touch-action:pan-y; }
+      html.muenba-phone-portrait #muenba-lobby-overlay,
+      html.muenba-phone-portrait #muenba-capture-overlay { -webkit-overflow-scrolling:touch; }
+      html.muenba-phone-portrait .muenba-return-box,
+      html.muenba-phone-portrait .muenba-lobby-box { width:min(100%,calc(100vw - 20px)); max-height:calc(100dvh - 20px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px)); margin:0 auto; border-radius:14px; }
+      html.muenba-phone-portrait .muenba-return-box { overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; padding:22px 17px 18px; }
+      html.muenba-phone-portrait .muenba-lobby-box { padding:20px 14px 18px; }
+      html.muenba-phone-portrait .muenba-lobby-portrait { width:76px; height:76px; margin-bottom:8px; }
+      html.muenba-phone-portrait .muenba-case-intro .muenba-lobby-portrait,
+      html.muenba-phone-portrait .muenba-case-resolved .muenba-lobby-portrait { width:86px; height:86px; }
+      html.muenba-phone-portrait .muenba-capture-ready .muenba-lobby-portrait,
+      html.muenba-phone-portrait .muenba-capture-reward .muenba-lobby-portrait { width:104px; height:104px; }
+      html.muenba-phone-portrait .muenba-case-clue { padding:21px 13px 19px; }
+      html.muenba-phone-portrait .muenba-case-clue.muenba-reading { min-height:270px; }
+      html.muenba-phone-portrait .muenba-case-clue.muenba-reading > .muenba-case-record { padding:20px 10px 19px; font-size:clamp(1.15rem,5.7vw,1.48rem) !important; line-height:1.78 !important; }
+      html.muenba-phone-portrait .muenba-case-check-panel { padding:15px 12px 14px; }
+      html.muenba-phone-portrait .muenba-case-check-panel .muenba-case-question { padding:16px 13px 15px; }
+      html.muenba-phone-portrait .muenba-case-choice { min-height:58px; padding:13px 11px 13px 9px; font-size:clamp(.94rem,4.4vw,1.05rem) !important; }
+      html.muenba-phone-portrait .muenba-rhythm-board { height:min(42dvh,250px); min-height:190px; margin:7px 0 5px; gap:6px; padding:4px; }
+      html.muenba-phone-portrait .muenba-rhythm-lane { height:100%; }
+      html.muenba-phone-portrait .muenba-rhythm-note { min-width:30px; min-height:30px; }
+      html.muenba-phone-portrait .muenba-lobby-actions,
+      html.muenba-phone-portrait .muenba-case-actions { gap:8px; }
+      html.muenba-phone-portrait .muenba-lobby-actions button,
+      html.muenba-phone-portrait .muenba-case-actions button,
+      html.muenba-phone-portrait .muenba-capture-action { min-height:48px; }
       /* Pass 18D: the English record is the lesson surface. Keep it tall
          enough for a calm word sweep, give beginner readers generous line
          spacing, and preserve a reliable touch target even on narrow phones. */
@@ -5177,6 +5209,10 @@
     const phone = isMuenbaPhoneViewport();
     const ready = isMuenbaOrientationReady();
     const needsPrompt = phone && !ready;
+    // Pass 27C: scope portrait popup CSS to actual phone mode. A narrow
+    // desktop window or tablet must not inherit the phone presentation.
+    document.documentElement.classList.toggle('muenba-phone-portrait', phone && orientationMode === 'portrait');
+    document.documentElement.classList.toggle('muenba-phone-landscape', phone && orientationMode === 'landscape');
     const title = orientationOverlay.querySelector('.muenba-rotate-title');
     const sub = orientationOverlay.querySelector('.muenba-rotate-sub');
     if (title) title.textContent = orientationMode === 'portrait'

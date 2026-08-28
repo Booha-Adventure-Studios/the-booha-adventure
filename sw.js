@@ -51,7 +51,11 @@ const CURRENT_CACHES = {
   // block hit/break, and bounce sounds (static-partial materials vs.
   // pitch-bending gesture sounds), based on a reference implementation
   // the user supplied.
-  assets: 'booha-assets-2026-404',
+  // Destruction goofy-SFX v4: snappier slingshot release, more-bodied
+  // stone, a slightly slower block-impact cadence, a live rolling/
+  // sliding friction loop, staggered tower-collapse landing impacts,
+  // and nine distinct per-power death-explosion sounds.
+  assets: 'booha-assets-2026-405',
   decks:  'booha-decks-2026-310',
 };
 
