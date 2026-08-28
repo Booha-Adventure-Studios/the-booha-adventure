@@ -614,6 +614,13 @@ else
   bad "Muenba popup-top audit failed"
 fi
 
+echo "[70/70] Muenba 27C portrait-popup audit"
+if node tests/muenba-portrait-popup-audit.cjs >/dev/null 2>&1; then
+  ok "Muenba portrait-popup contracts pass"
+else
+  bad "Muenba portrait-popup audit failed"
+fi
+
 # ── Summary ──────────────────────────────────────────────────
 echo "───────────────────────────────────"
 echo "✅ $PASS passed   ⚠️  $WARN warnings   ❌ $FAIL failed"
