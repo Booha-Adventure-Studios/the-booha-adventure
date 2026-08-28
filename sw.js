@@ -29,7 +29,8 @@ const CURRENT_CACHES = {
   // Karasuki 24E also migrates its shared popup/profile artwork.
   // Karasuki 24F gives first-time Wanderer discoveries a gold sparkle state.
   // Utsuroba 25A converts its 15 room backgrounds to genuine WebP.
-  assets: 'booha-assets-2026-390',
+  // Utsuroba 25B converts its 12 transparent drifter sprites to lossless WebP.
+  assets: 'booha-assets-2026-391',
   decks:  'booha-decks-2026-310',
 };
 
