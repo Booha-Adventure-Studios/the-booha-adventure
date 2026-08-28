@@ -1129,12 +1129,6 @@
   border: 0;
 }
 
-@keyframes goldShift {
-  0%   { background-position: 0% 50%; }
-  50%  { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
 .btnGold::after {
   content: '';
   position: absolute;
@@ -1148,13 +1142,6 @@
   );
   transform: skewX(-15deg);
   animation: goldGlimmer 3.5s ease-in-out infinite;
-}
-
-@keyframes goldGlimmer {
-  0%   { left: -80%; opacity: 0; }
-  20%  { opacity: 1; }
-  55%  { left: 130%; opacity: 0; }
-  100% { left: 130%; opacity: 0; }
 }
 
 .btnGold:hover {
@@ -1187,7 +1174,7 @@
     <div class="ghostOuter">
       <div class="sparkleField" aria-hidden="true"></div>
       <div class="ghostWrap" aria-hidden="true">
-        <img id="boohaGhost" src="assets/img/booha_ghost.webp" alt="Booha" />
+        <img id="boohaGhost" src="assets/img/booha_ghost.webp" alt="Booha" decoding="async" />
       </div>
     </div>
     
@@ -1255,7 +1242,7 @@
       <div class="pickerGrid">
         <button class="pickTile" type="button" data-curr="preboo">
           <div class="tileTop">
-            <div class="tileIcon"><img src="assets/img/pre-boo.webp" alt="Pre-Boo" /></div>
+            <div class="tileIcon"><img src="assets/img/pre-boo.webp" alt="Pre-Boo" loading="lazy" decoding="async" /></div>
             <div>
               <div class="tileName">Pre-Boo</div>
               <span class="tileJp">プレブー</span>
@@ -1264,7 +1251,7 @@
         </button>
         <button class="pickTile" type="button" data-curr="booriculum">
           <div class="tileTop">
-            <div class="tileIcon"><img src="assets/img/boo-tree.webp" alt="Boo-riculum" /></div>
+            <div class="tileIcon"><img src="assets/img/boo-tree.webp" alt="Boo-riculum" loading="lazy" decoding="async" /></div>
             <div>
               <div class="tileName">Boo-riculum</div>
               <span class="tileJp">ブーリキュラム</span>
@@ -1273,7 +1260,7 @@
         </button>
         <button class="pickTile" type="button" data-curr="boocontinuum">
           <div class="tileTop">
-            <div class="tileIcon"><img src="assets/img/cont-tree.webp" alt="Boo-continuum" /></div>
+            <div class="tileIcon"><img src="assets/img/cont-tree.webp" alt="Boo-continuum" loading="lazy" decoding="async" /></div>
             <div>
               <div class="tileName">Boo-continuum</div>
               <span class="tileJp">ブーコンティニューム</span>
@@ -1288,11 +1275,11 @@
 
 <!-- Adventure Log Icon -->
  <a href="profile.html" id="alog-icon-btn" aria-label="ぼうけんログ / Adventure Log">
-  <img src="assets/img/profile.webp" alt="">
+  <img src="assets/img/profile.webp" alt="" decoding="async">
 </a>
 <!-- English Juku Icon -->
 <a href="juku.html" id="juku-icon-btn" aria-label="英語塾 / English Juku">
-  <img src="assets/img/juku-logo.png" alt="">
+  <img src="assets/img/juku-logo.png" alt="" decoding="async">
 </a>
 <style>
 
