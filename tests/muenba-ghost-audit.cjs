@@ -30,7 +30,8 @@ assert(source.includes("if (!carryingStolenEnergy && ghostId === target) return 
 assert(!source.includes('muenbaGhostHostility'), 'ordinary non-target ghosts must not use a seeded random hostility split');
 assert(source.includes('chaseSpeed: carryingEnergy'), 'ghosts must remember the carried-energy chase speed');
 assert(source.includes("startGhostScream(activeGhost, performance.now(), 'carried-energy');"), 'carried-energy rooms must begin screaming immediately');
-assert(source.includes("if (g.carryingEnergy && g.hostility === 'sight' && !g.screaming)"), 'coming out of hiding with energy must re-arm the chase immediately');
+assert(source.includes('if (g.carryingEnergy && !g.screaming)'), 'coming out of hiding with energy must re-arm every hostile chase immediately');
+assert(!source.includes("if (g.carryingEnergy && g.hostility === 'sight' && !g.screaming)"), 'energy re-entry must not depend on one hostility label');
 assert(source.includes('&& !g.carryingEnergy'), 'ordinary chases may lose interest at range, but carried-energy chases must persist');
 assert(source.includes('let carriedEnergyVignetteCanvas;'), 'carried-energy atmosphere must use its own cached layer');
 assert(source.includes('carriedEnergyVignetteCanvas = document.createElement(\'canvas\');'), 'carried-energy vignette must be cached once');
