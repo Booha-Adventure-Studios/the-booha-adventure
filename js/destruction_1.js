@@ -424,6 +424,7 @@
   // ── Main game state ─────────────────────────────────
   const gs = {
     phase: P.TITLE,
+    titleCheckpoint: null,
     round: 0, roundN: 1,
     running: false,
     dragging: false, pullPlayed: false,
@@ -836,6 +837,67 @@
     gs.campaignComplete = false;
   }
 
+  // ── Continue system ─────────────────────────────────
+  // Mirrors Invaders' checkpoint pattern exactly: a checkpoint is written at
+  // every safe round-boundary (loadRound) and cleared only when a run is
+  // actually finalized (submitRunScore, on lives-out or campaign clear).
+  // Deliberately exiting mid-campaign does neither — see performExit().
+  const DESTRUCTION_PAGE_ID = "booha_destruction";
+
+  function destructionSaveApi() {
+    try {
+      const api = window.BoohaAdventure && window.BoohaAdventure.save;
+      return api && typeof api.load === "function" && typeof api.patch === "function" &&
+        typeof api.key === "function" && api.key() ? api : null;
+    } catch (_) { return null; }
+  }
+  function loadDestructionCheckpoint() {
+    const api = destructionSaveApi();
+    if (!api) return null;
+    try {
+      const data = api.load();
+      const cp = data.pageState && data.pageState[DESTRUCTION_PAGE_ID] && data.pageState[DESTRUCTION_PAGE_ID].checkpoint;
+      if (!cp || typeof cp !== "object") return null;
+      const round = Math.floor(Number(cp.round));
+      if (!Number.isFinite(round) || round < 0 || round >= LEVELS.length) return null;
+      return {
+        round,
+        runScore: Math.max(0, Math.floor(Number(cp.runScore) || 0)),
+        lives: Math.floor(clamp(Number(cp.lives) || 1, 1, MAX_RUN_LIVES)),
+        combo: Math.max(0, Math.floor(Number(cp.combo) || 0)),
+        savedAt: Number(cp.savedAt) || 0,
+      };
+    } catch (_) { return null; }
+  }
+  function saveDestructionCheckpoint() {
+    const api = destructionSaveApi();
+    if (!api) return false;
+    try {
+      return api.patch("pageState", { [DESTRUCTION_PAGE_ID]: { checkpoint: {
+        round: gs.round, runScore: gs.runScore, lives: gs.lives, combo: gs.combo,
+        savedAt: Date.now(),
+      } } });
+    } catch (_) { return false; }
+  }
+  function clearDestructionCheckpoint() {
+    const api = destructionSaveApi();
+    if (!api) return false;
+    try {
+      return api.patch("pageState", { [DESTRUCTION_PAGE_ID]: { checkpoint: null } });
+    } catch (_) { return false; }
+  }
+  function restoreDestructionCheckpoint() {
+    const cp = loadDestructionCheckpoint();
+    if (!cp) return false;
+    beginCampaign();
+    gs.runScore = cp.runScore;
+    gs.lives = cp.lives;
+    gs.combo = cp.combo;
+    loadRound(cp.round);
+    showBriefing();
+    return true;
+  }
+
   function submitRunScore(completed) {
     if (!gs.campaignActive) return null;
     const score = Math.max(0, Math.round(gs.runScore));
@@ -854,6 +916,7 @@
     }
     gs.campaignActive = false;
     gs.campaignComplete = !!completed;
+    clearDestructionCheckpoint();
     return result;
   }
 
@@ -1774,6 +1837,7 @@ function traitGlowColor(block) {
     buildBlockIndex();
     gs.booha   = makeBooha();
     gs.running = false;
+    if (gs.campaignActive) saveDestructionCheckpoint();
   }
 
   function showBriefing() {
@@ -2475,8 +2539,9 @@ function traitGlowColor(block) {
     }
     return -1;
   }
-  function htStart(px,py){const bx=W/2-140,by=H/2+10;return px>=bx&&px<=bx+280&&py>=by&&py<=by+70;}
-  function htSave(px,py){const bx=W/2-95,by=H/2+128;return px>=bx&&px<=bx+190&&py>=by&&py<=by+44;}
+  function htContinue(px,py){const cp=gs.titleCheckpoint;if(!cp)return false;const bx=W/2-140,by=H/2+6,bw=280,bh=54;return px>=bx&&px<=bx+bw&&py>=by&&py<=by+bh;}
+  function htStart(px,py){const off=gs.titleCheckpoint?70:0;const bx=W/2-140,by=H/2+10+off;return px>=bx&&px<=bx+280&&py>=by&&py<=by+70;}
+  function htSave(px,py){const off=gs.titleCheckpoint?70:0;const bx=W/2-95,by=H/2+128+off;return px>=bx&&px<=bx+190&&py>=by&&py<=by+44;}
   function htAction(px,py){return px>=ACTION_RECT.x&&px<=ACTION_RECT.x+ACTION_RECT.w&&py>=ACTION_RECT.y&&py<=ACTION_RECT.y+ACTION_RECT.h;}
   function showHall(){
     hallReturnState = {
@@ -2492,7 +2557,7 @@ function traitGlowColor(block) {
   }
   function returnFromHall() {
     if (hallReturnState) Object.assign(gs, hallReturnState);
-    else gs.phase=P.TITLE;
+    else { gs.phase=P.TITLE; gs.titleCheckpoint = loadDestructionCheckpoint(); }
     hallReturnState=null;
     needsRender=true;
   }
@@ -2503,7 +2568,10 @@ function traitGlowColor(block) {
       Object.assign(gs, hallReturnState);
       hallReturnState=null;
     }
-    if (gs.campaignActive && gs.runScore > 0) submitRunScore(false);
+    // Exiting mid-campaign no longer finalizes the run: the checkpoint
+    // saveDestructionCheckpoint() last wrote (at the most recent round
+    // boundary) stays in place, so Continue can pick it back up. Only
+    // running out of lives or clearing the campaign calls submitRunScore.
     window.location.href='karasuki.html?room=room_12';
   }
   function leaveGame() {
@@ -2572,7 +2640,8 @@ function traitGlowColor(block) {
     getAC();
 
     if(gs.phase===P.TITLE){
-      if(htStart(p.x,p.y)){beginCampaign();loadRound(0);showBriefing();}
+      if(htContinue(p.x,p.y)){ restoreDestructionCheckpoint(); }
+      else if(htStart(p.x,p.y)){beginCampaign();loadRound(0);showBriefing();}
       else if(htSave(p.x,p.y)){ if(window.BoohaSaveMenu) BoohaSaveMenu.open(); }
       evt.preventDefault();return;
     }
@@ -3233,16 +3302,27 @@ function traitGlowColor(block) {
 
     ctx.font='15px system-ui,sans-serif';ctx.fillStyle='rgba(255,255,255,0.6)';
     ctx.fillText('Pull back and let fly! / ひっぱって、はなそう！',W/2,H/2-16);
-    const bx=W/2-140,by=H/2+10,bw=280,bh=70;
+    const cp=gs.titleCheckpoint;
+    const contOffset=cp?70:0;
+    if(cp){
+      const cbx=W/2-140,cby=H/2+6,cbw=280,cbh=54;
+      ctx.fillStyle='rgba(124,255,248,0.12)';ctx.strokeStyle='rgba(124,255,248,0.6)';ctx.lineWidth=2;
+      rr(ctx,cbx,cby,cbw,cbh,16,true,true);
+      ctx.fillStyle='#7cfff8';ctx.font='bold 17px system-ui,sans-serif';
+      ctx.fillText(`CONTINUE — LEVEL ${cp.round+1}`,W/2,cby+21);
+      ctx.font='12px system-ui,sans-serif';ctx.fillStyle='rgba(124,255,248,0.8)';
+      ctx.fillText(`つづきから — レベル${cp.round+1}`,W/2,cby+40);
+    }
+    const bx=W/2-140,by=H/2+10+contOffset,bw=280,bh=70;
     const bg=ctx.createLinearGradient(bx,by,bx,by+bh);bg.addColorStop(0,'#ffe566');bg.addColorStop(1,'#ff9900');
     ctx.shadowColor='#ffdd44';ctx.shadowBlur=16+glowPulse*10;
     ctx.fillStyle=bg;rr(ctx,bx,by,bw,bh,18,true,false);ctx.shadowBlur=0;
     ctx.strokeStyle='rgba(255,255,255,0.35)';ctx.lineWidth=2;rr(ctx,bx,by,bw,bh,18,false,true);
     ctx.fillStyle='#1a0e00';ctx.font='bold 25px system-ui,sans-serif';ctx.fillText('START / はじめる',W/2,by+bh/2);
     ctx.font='13px system-ui,sans-serif';ctx.fillStyle='rgba(255,255,255,0.62)';
-    ctx.fillText(`${CHAPTERS.length || 5} chapters · ${LEVELS.length} rounds · Best ${scoreText(gs.highScore)}`,W/2,H/2+100);
+    ctx.fillText(`${CHAPTERS.length || 5} chapters · ${LEVELS.length} rounds · Best ${scoreText(gs.highScore)}`,W/2,H/2+100+contOffset);
 
-    const sbx=W/2-95,sby=H/2+128,sbw=190,sbh=44;
+    const sbx=W/2-95,sby=H/2+128+contOffset,sbw=190,sbh=44;
     ctx.fillStyle='rgba(124,255,248,0.1)';ctx.strokeStyle='rgba(124,255,248,0.5)';ctx.lineWidth=1.5;
     rr(ctx,sbx,sby,sbw,sbh,14,true,true);
     ctx.fillStyle='#7cfff8';ctx.font='bold 15px system-ui,sans-serif';
@@ -3755,6 +3835,7 @@ function traitGlowColor(block) {
     await preload();
     loadRound(0);
     gs.phase=P.TITLE;
+    gs.titleCheckpoint = loadDestructionCheckpoint();
     requestAnimationFrame(tick);
   }
 
