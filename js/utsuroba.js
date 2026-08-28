@@ -524,10 +524,27 @@
     return { x: coords.x, y: coords.y };
   }
 
+  function makeUtsurobaDeferredImage(src) {
+    return { img: new Image(), src, requested: false };
+  }
+
+  function ensureUtsurobaImage(image) {
+    if (!image.requested) {
+      image.img.src = image.src;
+      image.requested = true;
+    }
+    return image.img;
+  }
+
+  /* Pass 25C: keep all twelve drifter requests off the initial page load.
+     The renderer activates only the drifter currently visible in the room;
+     the popup still uses the same source when the player opens it. */
   const drifterImgs = {};
   DATA.drifters.forEach(d => {
-    const load = src => { const img = new Image(); img.src = src; return img; };
-    drifterImgs[d.id] = { img1: load(d.sprite1), img2: load(d.sprite2) };
+    drifterImgs[d.id] = {
+      img1: makeUtsurobaDeferredImage(d.sprite1),
+      img2: makeUtsurobaDeferredImage(d.sprite2),
+    };
   });
 
   function drifterRecord(id, utsu = null) {
@@ -840,9 +857,9 @@
      each PNG's content bounding box) re-centers each pose on the same
      point booha_ghost.png centers on, so the swap doesn't nudge the
      ghost sideways either. */
-  const danceArmsUpImg = new Image(); danceArmsUpImg.src = './assets/img/booha_ghost_dance_arms_up.png';
-  const danceSwayImg   = new Image(); danceSwayImg.src   = './assets/img/booha_ghost_dance_sway.png';
-  const danceWaveImg   = new Image(); danceWaveImg.src   = './assets/img/booha_ghost_dance_wave.png';
+  const danceArmsUpImg = makeUtsurobaDeferredImage('./assets/img/booha_ghost_dance_arms_up.png');
+  const danceSwayImg   = makeUtsurobaDeferredImage('./assets/img/booha_ghost_dance_sway.png');
+  const danceWaveImg   = makeUtsurobaDeferredImage('./assets/img/booha_ghost_dance_wave.png');
   const DANCE_FRAMES = [
     { img: danceArmsUpImg, contentScale: 0.817, offsetX: -0.007, offsetY: -0.026 },
     { img: danceSwayImg,   contentScale: 0.801, offsetX:  0.009, offsetY: -0.015 },
@@ -2549,6 +2566,7 @@
     state.celebrateDrifter   = drifter;
     state.celebrateConvergence = options.convergenceBeat === true;
     danceSparkles            = [];
+    DANCE_FRAMES.forEach(frame => ensureUtsurobaImage(frame.img));
     try { music.pause(); } catch(_) {}
     try { booDance.currentTime = 0; booDance.play().catch(() => {}); } catch(_) {}
     playCelebrationChime(drifter);
@@ -2889,7 +2907,7 @@
       const questActive = isWaiting || isCollected;
       const useImg2     = !!(quest && quest.active === drifter.id);
       const imgs        = drifterImgs[drifter.id];
-      const img         = useImg2 ? imgs.img2 : imgs.img1;
+      const img         = ensureUtsurobaImage(useImg2 ? imgs.img2 : imgs.img1);
       const pos         = drifterWorldPos(drifter, state.roomId);
 
       const dw = img.naturalWidth  * drifter.scale;
@@ -3100,7 +3118,7 @@
       const frame = state.celebrateSettling
         ? DANCE_FRAMES[0]
         : DANCE_FRAMES[Math.floor(elapsed / 0.5) % DANCE_FRAMES.length];
-      drawImg   = frame.img;
+      drawImg   = ensureUtsurobaImage(frame.img);
       drawScale = frame.contentScale;
       drawOffX  = frame.offsetX;
       drawOffY  = frame.offsetY;
@@ -3208,7 +3226,7 @@
     for (const drifter of drifters) {
       const pos         = drifterWorldPos(drifter, state.roomId);
       const imgs = drifterImgs[drifter.id];
-      const img  = imgs.img1;
+      const img  = ensureUtsurobaImage(imgs.img1);
       const dw   = img.naturalWidth  * drifter.scale;
       const dh   = img.naturalHeight * drifter.scale;
       if (wx >= pos.x-dw/2 && wx <= pos.x+dw/2 && wy >= pos.y-dh && wy <= pos.y) {
