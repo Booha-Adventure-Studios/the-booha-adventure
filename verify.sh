@@ -649,6 +649,20 @@ else
   bad "Muenba visual-viewport audit failed"
 fi
 
+echo "[75/75] Muenba scream asset audit"
+if node tests/muenba-scream-assets-audit.cjs >/dev/null 2>&1; then
+  ok "Muenba scream assets pass"
+else
+  bad "Muenba scream asset audit failed"
+fi
+
+echo "[76/76] Muenba scream loader audit"
+if node tests/muenba-scream-loader-audit.cjs >/dev/null 2>&1; then
+  ok "Muenba scream loader contracts pass"
+else
+  bad "Muenba scream loader audit failed"
+fi
+
 # ── Summary ──────────────────────────────────────────────────
 echo "───────────────────────────────────"
 echo "✅ $PASS passed   ⚠️  $WARN warnings   ❌ $FAIL failed"
