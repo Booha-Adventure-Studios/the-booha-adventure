@@ -15,7 +15,7 @@ const verify = fs.readFileSync(path.join(root, 'verify.sh'), 'utf8');
 assert(card.includes('width:min(620px,calc(100% - 2px))'), 'celebration card needs a mobile-safe width guard');
 assert(card.includes('max-height:min(86dvh,720px)'), 'celebration card needs dynamic viewport-height support');
 assert(card.includes('env(safe-area-inset-top)'), 'mobile celebration padding must respect the safe area');
-assert(card.includes('width:min(270px,72vw,100%)'), 'mobile portraits must retain a large responsive frame');
+assert(card.includes('width:min(230px,60vw,100%)'), 'mobile portraits must retain a large responsive frame');
 assert(card.includes('@media(max-height:620px) and (orientation:landscape)'), 'short landscape screens need a dedicated compact rule');
 assert(card.includes('max-height:calc(100dvh - 16px)'), 'short landscape cards must fit inside the dynamic viewport');
 assert(card.includes('min-height:48px'), 'celebration actions must remain comfortable tap targets');

@@ -17,7 +17,7 @@ function sourceSection(startName, endName) {
   return source.slice(start, end);
 }
 
-const discovery = sourceSection('showWandererDiscovery', 'showKarasukiArrival');
+const discovery = sourceSection('showWandererDiscovery', 'spawnGlitter');
 
 assert(discovery.includes('showCelebrationPop'), 'first Wanderer discovery must use the stable celebration card');
 assert(!discovery.includes('showRewardPop'), 'first Wanderer discovery must not use the transient pickup toast');

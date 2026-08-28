@@ -553,6 +553,25 @@
       tone(493.88, { type: 'triangle', gain: 0.042, dur: 0.14, delay: 0.09 });
       tone(587.33, { type: 'sine', gain: 0.04, dur: 0.22, delay: 0.19 });
     },
+    /* Bespoke "cute" open cue for the Nuppi popup, replacing the borrowed
+       mischiefReward() (which stays in the palette for its other callers
+       in muenba.js). A light, bouncy bell run that closes on an upward
+       "boop" wobble — its own voice instead of a reused generic one. */
+    nuppiOpen: function () {
+      tone(587.33, { type: 'triangle', gain: 0.06, dur: 0.09 });
+      tone(698.46, { type: 'triangle', gain: 0.055, dur: 0.09, delay: 0.06 });
+      tone(880.00, { type: 'sine', gain: 0.05, dur: 0.11, delay: 0.12 });
+      tone(1046.50, { type: 'sine', gain: 0.045, dur: 0.18, delay: 0.2, slideTo: 1244.51 });
+    },
+    /* Bespoke "eerie" open cue for the Observer popup, replacing the
+       borrowed slimeClick(). Two closely-detuned descending saws beat
+       against each other for an uneasy hum, closed out by a small
+       mechanical "shutter" click — the Observer noticing you. */
+    observerOpen: function () {
+      tone(196.00, { type: 'sawtooth', gain: 0.045, dur: 0.32, slideTo: 130.81 });
+      tone(207.65, { type: 'sawtooth', gain: 0.032, dur: 0.32, delay: 0.015, slideTo: 138.59 });
+      tone(1500, { type: 'square', gain: 0.05, dur: 0.025, delay: 0.27 });
+    },
   };
 
   window.UtsuSfx = SFX;

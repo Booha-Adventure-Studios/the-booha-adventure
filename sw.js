@@ -37,7 +37,12 @@ const CURRENT_CACHES = {
   // Muenba 26C converts its remaining transparent support art to lossless WebP.
   // Muenba 26D fixes and defers the shared WebP dance art until celebration.
   // Muenba 26F adds longer textured procedural danger voices to the shared SFX script.
-  assets: 'booha-assets-2026-399',
+  // Destruction goofy-SFX pass rebuilds js/destruction_1.js's procedural material
+  // sounds and drops the pull/launch/wood/stone/soft mp3s from preload.
+  // Karasuki popup pass: js/karasuki.js drops "I'm back in Karasuki", fixes the
+  // mobile celebration-card overlap in js/utsu-card.js, and wires bespoke
+  // nuppiOpen()/observerOpen() cues (js/utsu-sfx.js) into the Nuppi/Observer popups.
+  assets: 'booha-assets-2026-400',
   decks:  'booha-decks-2026-310',
 };
 
