@@ -432,6 +432,13 @@ else
   bad "index image performance audit failed"
 fi
 
+echo "[44/44] Index 22C CSS and image hint audit"
+if node tests/index-css-hints-audit.cjs >/dev/null 2>&1; then
+  ok "index CSS and decoding hint contracts pass"
+else
+  bad "index CSS and image hint audit failed"
+fi
+
 # ── Summary ──────────────────────────────────────────────────
 echo "───────────────────────────────────"
 echo "✅ $PASS passed   ⚠️  $WARN warnings   ❌ $FAIL failed"
