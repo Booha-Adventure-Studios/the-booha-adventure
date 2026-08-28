@@ -635,6 +635,13 @@ else
   bad "Muenba landscape-return audit failed"
 fi
 
+echo "[73/73] Muenba 27F mobile-surface audit"
+if node tests/muenba-mobile-surface-audit.cjs >/dev/null 2>&1; then
+  ok "Muenba mobile-surface contracts pass"
+else
+  bad "Muenba mobile-surface audit failed"
+fi
+
 # ── Summary ──────────────────────────────────────────────────
 echo "───────────────────────────────────"
 echo "✅ $PASS passed   ⚠️  $WARN warnings   ❌ $FAIL failed"
