@@ -27,7 +27,8 @@ const CURRENT_CACHES = {
   // Karasuki 24A/24B/24C/24D: room, wanderer, and Observer artwork now use
   // genuine transparent WebP assets without duplicate Observer copies.
   // Karasuki 24E also migrates its shared popup/profile artwork.
-  assets: 'booha-assets-2026-388',
+  // Karasuki 24F gives first-time Wanderer discoveries a gold sparkle state.
+  assets: 'booha-assets-2026-389',
   decks:  'booha-decks-2026-310',
 };
 

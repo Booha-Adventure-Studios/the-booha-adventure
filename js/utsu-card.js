@@ -347,12 +347,19 @@
       .utsu-celebration-card::before{content:'';position:absolute;top:0;left:14%;right:14%;height:3px;
         background:linear-gradient(90deg,transparent,var(--celebration-ring,#ffd966),transparent);
         box-shadow:0 0 18px var(--celebration-glow,rgba(255,217,102,.55));}
-      .utsu-celebration-eyebrow{margin:0 0 10px;color:var(--celebration-ring,#ffd966);font:800 clamp(.72rem,2vw,.9rem)/1.2 ui-monospace,monospace;letter-spacing:.2em;text-transform:uppercase;text-shadow:0 0 14px var(--celebration-glow,rgba(255,217,102,.5));}
+      .utsu-celebration-card.is-discovery{background:radial-gradient(circle at 50% 10%,rgba(250,204,21,.18),transparent 35%),radial-gradient(circle at 50% 100%,rgba(161,98,7,.16),transparent 42%),linear-gradient(160deg,#211b0b 0%,#111308 58%,#070a06 100%);box-shadow:0 22px 90px rgba(0,0,0,.78),0 0 0 1px rgba(255,247,190,.14) inset,0 0 74px var(--celebration-glow,rgba(250,204,21,.58));}
+      .utsu-celebration-spark-field{position:absolute;inset:7% 5% 9%;z-index:0;overflow:hidden;pointer-events:none;opacity:0;}
+      .utsu-celebration-card.is-discovery .utsu-celebration-spark-field{opacity:1;}
+      .utsu-celebration-spark-field::before,.utsu-celebration-spark-field::after{content:'';position:absolute;inset:0;pointer-events:none;}
+      .utsu-celebration-spark-field::before{background:radial-gradient(circle at 12% 18%,rgba(255,250,205,.95) 0 1px,transparent 2px),radial-gradient(circle at 87% 16%,rgba(255,247,190,.9) 0 1.5px,transparent 3px),radial-gradient(circle at 18% 56%,rgba(250,204,21,.8) 0 1px,transparent 2px),radial-gradient(circle at 82% 58%,rgba(255,247,190,.9) 0 1px,transparent 2px),radial-gradient(circle at 26% 86%,rgba(250,204,21,.75) 0 1.5px,transparent 3px),radial-gradient(circle at 75% 84%,rgba(255,250,205,.95) 0 1px,transparent 2px);animation:utsuCelebrationSparkle 3.8s ease-in-out infinite;}
+      .utsu-celebration-spark-field::after{background:radial-gradient(ellipse at 9% 38%,rgba(255,247,190,.9) 0 1px,transparent 2px),radial-gradient(ellipse at 91% 39%,rgba(250,204,21,.85) 0 1px,transparent 2px),radial-gradient(ellipse at 37% 8%,rgba(255,250,205,.85) 0 1px,transparent 2px),radial-gradient(ellipse at 64% 92%,rgba(255,247,190,.85) 0 1px,transparent 2px);filter:drop-shadow(0 0 5px rgba(250,204,21,.8));animation:utsuCelebrationSparkle 3.8s ease-in-out -1.9s infinite reverse;}
+      .utsu-celebration-eyebrow{position:relative;z-index:1;margin:0 0 10px;color:var(--celebration-ring,#ffd966);font:800 clamp(.72rem,2vw,.9rem)/1.2 ui-monospace,monospace;letter-spacing:.2em;text-transform:uppercase;text-shadow:0 0 14px var(--celebration-glow,rgba(255,217,102,.5));}
       .utsu-celebration-portrait-wrap{position:relative;z-index:1;width:min(340px,74vw);height:min(360px,42vh);margin:0 auto 12px;display:grid;place-items:center;}
       .utsu-celebration-portrait-wrap::before{content:'';position:absolute;inset:4%;border-radius:50%;background:radial-gradient(circle,var(--celebration-glow,rgba(255,217,102,.32)),transparent 68%);filter:blur(12px);animation:utsuCelebrationGlow 2.4s ease-in-out infinite;}
       .utsu-celebration-portrait{position:relative;z-index:1;display:block;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 0 10px var(--celebration-ring,#ffd966)) drop-shadow(0 0 24px var(--celebration-glow,rgba(255,217,102,.5)));}
       .utsu-celebration-icon{position:relative;z-index:1;width:112px;height:112px;border-radius:50%;display:grid;place-items:center;font-size:52px;color:#fff7e6;background:radial-gradient(circle at 34% 28%,#fff9dc,var(--celebration-ring,#ffd966) 58%,#261a06 125%);box-shadow:0 0 22px var(--celebration-glow,rgba(255,217,102,.5));}
       @keyframes utsuCelebrationGlow{0%,100%{transform:scale(.9);opacity:.42;}50%{transform:scale(1.08);opacity:.78;}}
+      @keyframes utsuCelebrationSparkle{0%,100%{opacity:.38;transform:scale(.94) rotate(0deg);}50%{opacity:1;transform:scale(1.04) rotate(2deg);}}
       .utsu-celebration-copy{position:relative;z-index:4;margin:0 auto;max-width:38em;}
       .utsu-celebration-card.is-copy-overlay .utsu-celebration-copy{margin-top:-86px;padding:16px 18px 12px;border:1px solid color-mix(in srgb,var(--celebration-ring,#ffd966) 72%,transparent);border-radius:18px;background:linear-gradient(180deg,rgba(4,14,11,.92),rgba(4,10,8,.80));box-shadow:0 0 18px var(--celebration-glow,rgba(255,217,102,.34)),0 0 42px rgba(0,0,0,.48),inset 0 0 24px rgba(255,255,255,.04);backdrop-filter:blur(5px);}
       .utsu-celebration-card.is-copy-overlay .utsu-celebration-action{position:relative;z-index:5;}
@@ -388,7 +395,7 @@
       }
       @media(prefers-reduced-motion:reduce){
         .utsu-celebration-card,.utsu-celebration-pop{transition:opacity .2s ease,background .2s ease;}
-        .utsu-celebration-portrait-wrap::before{animation:none;}
+        .utsu-celebration-portrait-wrap::before,.utsu-celebration-spark-field::before,.utsu-celebration-spark-field::after{animation:none;}
       }
 
       @media(max-width:700px){
@@ -528,6 +535,7 @@
       celebrationPopEl.setAttribute('aria-hidden', 'true');
       celebrationPopEl.innerHTML =
         '<section class="utsu-celebration-card" role="dialog" aria-modal="true" aria-labelledby="utsu-celebration-title">' +
+          '<div class="utsu-celebration-spark-field" aria-hidden="true"></div>' +
           '<p class="utsu-celebration-eyebrow"></p>' +
           '<div class="utsu-celebration-portrait-wrap"><div class="utsu-celebration-icon" aria-hidden="true">✦</div><img class="utsu-celebration-portrait" alt="" hidden></div>' +
           '<div class="utsu-celebration-copy"><h2 class="utsu-celebration-title" id="utsu-celebration-title"></h2>' +
@@ -556,6 +564,7 @@
     var glow = opts.glow || glowFor(opts.motif);
     card.style.setProperty('--celebration-ring', accent);
     card.style.setProperty('--celebration-glow', glow);
+    card.classList.toggle('is-discovery', opts.discovery === true);
     card.classList.toggle('is-copy-overlay', opts.copyOverlay === true);
     card.classList.toggle('is-compact-copy', opts.copyCompact === true);
     eyebrow.textContent = opts.eyebrow || '';
