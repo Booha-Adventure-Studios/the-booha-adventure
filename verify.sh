@@ -439,6 +439,13 @@ else
   bad "index CSS and image hint audit failed"
 fi
 
+echo "[45/45] Index 22D WebAudio SFX audit"
+if node tests/index-sfx-audit.cjs >/dev/null 2>&1; then
+  ok "index WebAudio button contracts pass"
+else
+  bad "index WebAudio SFX audit failed"
+fi
+
 # ── Summary ──────────────────────────────────────────────────
 echo "───────────────────────────────────"
 echo "✅ $PASS passed   ⚠️  $WARN warnings   ❌ $FAIL failed"
