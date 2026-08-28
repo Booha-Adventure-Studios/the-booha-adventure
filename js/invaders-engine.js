@@ -38,7 +38,7 @@ let TILT_ENABLED = false;
 let tiltGamma = 0, tiltSmooth = 0, tiltBaseline = 0, tiltVx = 0;
 
 // Audio
-let bgm = null, bossBgm = null, candySfx = null;
+let bgm = null, bossBgm = null;
 let audioCtx = null, audioMaster = null, audioReady = false;
 let audioRetryTimer = 0, lastFireSfxAt = 0;
 let bossMusicIdx = 0;
@@ -57,21 +57,10 @@ function toggleMute() {
   try { window.localStorage?.setItem(INVADERS_MUTE_KEY, muted ? "1" : "0"); } catch (_) {}
   if (muted) {
     pauseAllMusic();
-    for (const el of candySfxPool) { try { el.pause(); el.currentTime = 0; } catch (_) {} }
   } else if (started && !paused) {
     resumeAllMusic();
   }
 }
-
-// A small rotating pool of persistently-referenced candy-pickup clones.
-// Cloning-and-discarding a single Audio() per pickup left the clone with no
-// live reference anywhere, so it could be garbage-collected mid-playback
-// (or never actually start) with no error raised — that silent drop was
-// why the sound sometimes didn't fire. Reusing a pool of long-lived clones
-// keeps each one referenced for the life of the run.
-const CANDY_SFX_POOL_SIZE = 4;
-let candySfxPool = [];
-let candySfxPoolIdx = 0;
 
 // Boss
 let bossAlive = false;
@@ -90,6 +79,7 @@ let score = 0, totalKills = 0, highScore = 0;
 try { highScore = parseInt(localStorage.getItem("booha_hiscore") || "0") || 0; } catch (_) {}
 
 let combo = 0, maxCombo = 0, comboTimer = 0, comboDisplay = 0, comboPop = 0;
+let prevWeaponLevel = 1;
 
 // Friends
 const activeFriends = [];
@@ -372,36 +362,90 @@ function ensureAudio() {
   }
 }
 
-function playTone(kind) {
+function playTone(kind, mult = 1) {
   if (!audioReady || !audioCtx || !audioMaster) return;
   const now = audioNow();
   const settings = {
-    fire:     { freq: 420, end: 180, dur: 0.055, type: "square", gain: 0.045 },
-    weakFire: { freq: 270, end: 120, dur: 0.045, type: "triangle", gain: 0.030 },
-    hit:      { freq: 180, end: 95,  dur: 0.075, type: "square", gain: 0.060 },
-    kill:     { freq: 520, end: 760, dur: 0.11,  type: "triangle", gain: 0.070 },
-    rock:     { freq: 110, end: 65,  dur: 0.12,  type: "sawtooth", gain: 0.075 },
-    player:   { freq: 150, end: 55,  dur: 0.20,  type: "sawtooth", gain: 0.11  },
-    boss:     { freq: 90,  end: 42,  dur: 0.32,  type: "sawtooth", gain: 0.13  },
-    pickup:   { freq: 620, end: 980, dur: 0.16,  type: "triangle", gain: 0.085 },
-    streak:   { freq: 740, end: 1180,dur: 0.22,  type: "square", gain: 0.075 },
+    fire:         { freq: 420, end: 180, dur: 0.055, type: "square",   gain: 0.045 },
+    weakFire:     { freq: 270, end: 120, dur: 0.045, type: "triangle", gain: 0.030 },
+    hit:          { freq: 180, end: 95,  dur: 0.075, type: "square",   gain: 0.060 },
+    kill:         { freq: 520, end: 760, dur: 0.11,  type: "triangle", gain: 0.070 },
+    rock:         { freq: 110, end: 65,  dur: 0.12,  type: "sawtooth", gain: 0.075 },
+    player:       { freq: 150, end: 55,  dur: 0.20,  type: "sawtooth", gain: 0.11  },
+    boss:         { freq: 90,  end: 42,  dur: 0.32,  type: "sawtooth", gain: 0.13  },
+    pickup:       { freq: 620, end: 980, dur: 0.16,  type: "triangle", gain: 0.085 },
+    streak:       { freq: 740, end: 1180,dur: 0.22,  type: "square",   gain: 0.075 },
+    waveClear:    { freq: 500, end: 1000,dur: 0.30,  type: "triangle", gain: 0.095 },
+    friendJoin:   { freq: 500, end: 900, dur: 0.20,  type: "triangle", gain: 0.090 },
+    goldClear:    { freq: 340, end: 900, dur: 0.42,  type: "triangle", gain: 0.130 },
+    bossAppear:   { freq: 80,  end: 36,  dur: 0.55,  type: "sawtooth", gain: 0.130 },
+    bossPhase2:   { freq: 200, end: 70,  dur: 0.28,  type: "square",   gain: 0.100 },
+    bossPhase3:   { freq: 260, end: 60,  dur: 0.34,  type: "square",   gain: 0.130 },
+    bossDeathPop: { freq: 300, end: 80,  dur: 0.09,  type: "square",   gain: 0.060 },
+    bossDeathBig: { freq: 130, end: 28,  dur: 0.65,  type: "sawtooth", gain: 0.170 },
   }[kind];
   if (!settings) return;
+  const freq = settings.freq * mult;
+  const end  = Math.max(30, settings.end * mult);
+  const gain = clamp(settings.gain * mult, 0.01, 0.35);
   try {
     const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
+    const gainNode = audioCtx.createGain();
     osc.type = settings.type;
-    osc.frequency.setValueAtTime(settings.freq, now);
-    osc.frequency.exponentialRampToValueAtTime(Math.max(30, settings.end), now + settings.dur);
-    gain.gain.setValueAtTime(0.0001, now);
-    gain.gain.exponentialRampToValueAtTime(settings.gain, now + 0.008);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + settings.dur);
-    osc.connect(gain); gain.connect(audioMaster);
+    osc.frequency.setValueAtTime(freq, now);
+    osc.frequency.exponentialRampToValueAtTime(end, now + settings.dur);
+    gainNode.gain.setValueAtTime(0.0001, now);
+    gainNode.gain.exponentialRampToValueAtTime(gain, now + 0.008);
+    gainNode.gain.exponentialRampToValueAtTime(0.0001, now + settings.dur);
+    osc.connect(gainNode); gainNode.connect(audioMaster);
     osc.start(now); osc.stop(now + settings.dur + 0.02);
   } catch (_) {}
 }
 
-function playSfx(kind) {
+// Short ascending note sequence for celebratory events (weapon level-ups,
+// wave milestones) — the single-oscillator sweep above reads as an
+// "impact," this reads as a "reward."
+function playArpeggio(freqs, opts = {}) {
+  if (!audioReady || !audioCtx || !audioMaster) return;
+  const { noteDur = 0.09, gap = 0.055, type = "triangle", gain = 0.08 } = opts;
+  let t = audioNow();
+  for (const f of freqs) {
+    try {
+      const osc = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(f, t);
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(gain, t + 0.006);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + noteDur);
+      osc.connect(g); g.connect(audioMaster);
+      osc.start(t); osc.stop(t + noteDur + 0.02);
+    } catch (_) {}
+    t += gap;
+  }
+}
+
+function playWeaponUpgrade(level) {
+  if (muted) return;
+  ensureAudio();
+  // Each weapon level gets its own short arpeggio, transposed up and with
+  // one more note than the last, so a level-4 upgrade is audibly bigger
+  // than a level-2 one rather than just louder.
+  const runs = {
+    2: [520, 660, 820],
+    3: [560, 700, 880, 1040],
+    4: [620, 780, 980, 1180, 1400],
+  };
+  playArpeggio(runs[level] || runs[2], { gain: 0.09 });
+}
+
+function playMilestoneFanfare() {
+  if (muted) return;
+  ensureAudio();
+  playArpeggio([440, 554, 659, 880], { noteDur: 0.11, gap: 0.07, gain: 0.10, type: "triangle" });
+}
+
+function playSfx(kind, mult = 1) {
   if (muted) return;
   ensureAudio();
   if (kind === "fire" || kind === "weakFire") {
@@ -409,7 +453,7 @@ function playSfx(kind) {
     if (now - lastFireSfxAt < 85) return;
     lastFireSfxAt = now;
   }
-  playTone(kind);
+  playTone(kind, mult);
 }
 
 function retryAudioElement(el) {
@@ -442,19 +486,8 @@ function setPaused(on) {
   if (paused) pauseAllMusic(); else resumeAllMusic();
 }
 function playCandySfx() {
-  if (muted) return;
-  try {
-    ensureAudio();
-    if (!candySfxPool.length) { playSfx("pickup"); return; }
-    // Round-robin the pool instead of creating a fresh clone per pickup —
-    // see the CANDY_SFX_POOL_SIZE comment above for why that was flaky.
-    const s = candySfxPool[candySfxPoolIdx % candySfxPool.length];
-    candySfxPoolIdx++;
-    s.currentTime = 0;
-    s.volume = 1;
-    const promise = s.play();
-    if (promise?.catch) promise.catch(() => playSfx("pickup"));
-  } catch (_) {}
+  // WebAudio only now — candy-get.mp3 and its clone pool are gone.
+  playSfx("pickup");
 }
 function playLifeloss() {
   playSfx("player");
@@ -727,6 +760,7 @@ function triggerBossCinematic() {
   screenFlash.alpha = 1;
   screenFlash.color = `hsl(${(bgHue + 120) % 360},100%,70%)`;
   doShake(SHAKE_CONFIG.bossCinematic.mag, SHAKE_CONFIG.bossCinematic.dur);
+  playSfx("bossAppear");
   pauseAllMusic();
 }
 function updateBossCinematic(dt) {
@@ -749,6 +783,7 @@ function updateBossCinematic(dt) {
 // MILESTONE
 // ════════════════════════════════════════
 function triggerMilestone(wave) {
+  playMilestoneFanfare();
   const entry = MILESTONE_TEXT[wave] || { en: `WAVE ${wave}!`, jp: "すごい！ / Amazing!" };
   milestoneAnim.active  = true;
   milestoneAnim.t       = 0;
@@ -791,6 +826,7 @@ function updateFriendUnlocks(wave) {
         const namesJP = { blue:"ブルー・ブーが なかまになった！", green:"グリーン・ブーが なかまになった！", pink:"ピンク・ブーが なかまになった！", purple:"パープル・ブーが なかまになった！" };
         window._friendToast = { en: names[fd.id]||fd.id, jp: namesJP[fd.id]||"", color: fd.color, t: 4.0 };
         screenFlash.alpha = 0.25; screenFlash.color = fd.color;
+        playSfx("friendJoin");
       }
     }
   }
@@ -1151,17 +1187,25 @@ function registerKill(points, px, py) {
   px = px ?? player.x+player.w/2;
   py = py ?? player.y-10;
   window._scorePopups.push({ x:px, y:py, val:`+${earned}`, t:1.2, life:0 });
+
+  const newWeaponLevel = weaponLevelFromCombo(combo);
+  if (newWeaponLevel > prevWeaponLevel) {
+    prevWeaponLevel = newWeaponLevel;
+    playWeaponUpgrade(newWeaponLevel);
+  }
+
   const streaks = [5, 10, 15, 25, 30];
   if (streaks.includes(combo)) {
+    const tier  = streaks.indexOf(combo); // 0..4 — higher streak, bigger sound
     const bonus = combo * 10;
     score += bonus;
     window._scorePopups.push({ x:px, y:py-24, val:`+${bonus} BONUS`, t:1.35, life:0 });
     window._rewardToast = { en:`${combo} HIT STREAK!`, jp:`${combo}れんぞく！`, detail:`+${bonus}`, color:"#ffdd55", t:2.0 };
-    playSfx("streak");
+    playSfx("streak", 1 + tier * 0.16);
   }
 }
 function breakCombo() {
-  if (combo > 0) { combo = 0; comboTimer = 0; comboDisplay = 0; }
+  if (combo > 0) { combo = 0; comboTimer = 0; comboDisplay = 0; prevWeaponLevel = 1; }
 }
 
 function awardWaveClear() {
@@ -1173,7 +1217,7 @@ function awardWaveClear() {
   };
   window._scorePopups = window._scorePopups || [];
   window._scorePopups.push({ x:W()/2, y:H()*0.30, val:`+${bonus}`, t:1.5, life:0 });
-  playSfx("streak");
+  playSfx("waveClear");
 }
 
 // ════════════════════════════════════════
@@ -1323,8 +1367,8 @@ function update(dt) {
 
     if (b.isBoss) {
       const pct = b.hp / b.maxHp;
-      if (b.phase === 1 && pct <= 0.60) { b.phase=2; doShake(SHAKE_CONFIG.bossPhase.mag,SHAKE_CONFIG.bossPhase.dur); b.glow=0.4; screenFlash.alpha=0.3; screenFlash.color="#ff6644"; }
-      if (b.phase === 2 && pct <= 0.25) { b.phase=3; doShake(SHAKE_CONFIG.bossPhase3.mag,SHAKE_CONFIG.bossPhase3.dur); b.glow=0.6; screenFlash.alpha=0.5; screenFlash.color="#ff2244"; }
+      if (b.phase === 1 && pct <= 0.60) { b.phase=2; doShake(SHAKE_CONFIG.bossPhase.mag,SHAKE_CONFIG.bossPhase.dur); b.glow=0.4; screenFlash.alpha=0.3; screenFlash.color="#ff6644"; playSfx("bossPhase2"); }
+      if (b.phase === 2 && pct <= 0.25) { b.phase=3; doShake(SHAKE_CONFIG.bossPhase3.mag,SHAKE_CONFIG.bossPhase3.dur); b.glow=0.6; screenFlash.alpha=0.5; screenFlash.color="#ff2244"; playSfx("bossPhase3"); }
     }
     if (!b.isBoss && b.panicking) {
       b.panicT = Math.max(0, b.panicT - dt);
@@ -1525,12 +1569,14 @@ function updateProjectiles(dt) {
               const oy = rand(-b.h*BOSS_DEATH.popSpread, b.h*BOSS_DEATH.popSpread);
               addBigExplosion(bcx+ox, bcy+oy, "boss");
               doShake(6, 0.08);
+              playSfx("bossDeathPop", 1 + pi * 0.10);
             }, pi * BOSS_DEATH.popInterval * 1000);
           }
           setTimeout(() => {
             addBigExplosion(bcx, bcy, "boss");
             screenFlash.alpha = 0.9; screenFlash.color = "#fff";
             doShake(SHAKE_CONFIG.bossDeath.mag, SHAKE_CONFIG.bossDeath.dur);
+            playSfx("bossDeathBig");
           }, BOSS_DEATH.bigDelay * 1000);
           score += WS.wave * 100;
         } else {
@@ -1629,6 +1675,7 @@ function updateCandy(dt) {
       } else if (c.type==="gold") {
         score += 500;
         screenFlash.alpha = 0.7; screenFlash.color = "#ffdd44";
+        playSfx("goldClear");
         for (const b of bugs) { if (!b.alive || b.isBoss) continue; addBigExplosion(b.x+b.w/2, b.y+b.h/2,"gold"); b.alive=false; WS.killed++; registerKill(20 + WS.wave * 4, b.x+b.w/2, b.y+b.h/2); }
       } else if (c.type==="green") {
         playerShield = CANDY_CONFIG.shieldDuration;
@@ -2609,7 +2656,7 @@ function resetGame() {
   bugs.length=0; booShots.length=0; bugShots.length=0; sparkles.length=0; candies.length=0;
   droppers.length=0; dropperTimer=0;
   activeFriends.length=0; _seenFriends.clear();
-  combo=0; maxCombo=0; comboTimer=0; comboDisplay=0; comboPop=0;
+  combo=0; maxCombo=0; comboTimer=0; comboDisplay=0; comboPop=0; prevWeaponLevel=1;
   score=0; totalKills=0; lives=PLAYER_CONFIG.maxLives;
   playerShield=0; timedWeapon.level=0; timedWeapon.mode=null; timedWeapon.remaining=0;
   stageTime=0; candyTimer=4.5; bossAlive=false; bossMusicIdx=0;
@@ -2700,15 +2747,6 @@ function startInvadersRun(continueRun) {
     endVideoEl.play().catch(()=>{});
     setTimeout(()=>{ try { endVideoEl.pause(); endVideoEl.currentTime=0; endVideoEl.muted=false; } catch(_){} }, 60);
   }
-  try {
-    // Warm up every pooled clone during this user-gesture handler, not just
-    // the primary element — a clone created and played for the first time
-    // later, outside a gesture, is the case mobile autoplay rules tend to
-    // block.
-    const warmSfx = candySfxPool.length ? candySfxPool : (candySfx ? [candySfx] : []);
-    for (const el of warmSfx) { el.muted=true; el.play().catch(()=>{}); }
-    setTimeout(()=>{ for (const el of warmSfx) { try { el.pause(); el.currentTime=0; el.muted=false; } catch(_){} } }, 50);
-  } catch(_){}
   if (continueRun && restoreInvadersCheckpoint()) {
     window._rewardToast = { en:"RUN RESTORED", jp:"つづきから スタート！", detail:"", color:"#a8f5c4", t:2.0 };
   } else {
@@ -2740,19 +2778,6 @@ function startInvadersRun(continueRun) {
       }
     });
   } catch(_){}
-  try {
-    candySfx = new Audio(ASSET_PATHS.candySfx);
-    candySfx.preload = "auto";
-    candySfx.volume = 1;
-    candySfxPool = [candySfx];
-    for (let i = 1; i < CANDY_SFX_POOL_SIZE; i++) {
-      const clone = candySfx.cloneNode();
-      clone.preload = "auto";
-      clone.volume = 1;
-      candySfxPool.push(clone);
-    }
-  } catch(_){}
-
   try {
     const [bg,b1,b2,bugN,bugH,bugB,candy,r1,r2,r3,r4] = await Promise.all([
       loadImg(ASSET_PATHS.background),
