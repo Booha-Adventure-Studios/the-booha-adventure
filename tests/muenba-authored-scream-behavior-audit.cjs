@@ -18,9 +18,10 @@ assert(sfx.includes('dangerScreamSampleLastUrl'), 'authored scream selection mus
 assert(sfx.includes('url !== dangerScreamSampleLastUrl'), 'authored scream selection must avoid immediate repeats');
 assert(sfx.includes('Math.pow(0.82, dangerSampleScreamCount)'), 'later authored screams must taper gently instead of dropping abruptly');
 assert(sfx.includes('dangerSampleScreamDecayEnabled'), 'authored scream scheduler must support a loud-only return-trip mode');
-assert(sfx.includes('var DANGER_SCREAM_BASE_GAIN = 0.78;'), 'danger samples must have an audible gain separate from UI tones');
-assert(sfx.includes('var DANGER_SCREAM_MAX_GAIN = 0.88;'), 'danger samples must have a dedicated gain ceiling');
+assert(sfx.includes('var DANGER_SCREAM_BASE_GAIN = 1.15;'), 'danger samples must have an audible gain separate from UI tones');
+assert(sfx.includes('var DANGER_SCREAM_MAX_GAIN = 1.25;'), 'danger samples must have a dedicated gain ceiling');
 assert(sfx.includes('DANGER_SCREAM_BASE_GAIN * Math.pow(0.82, dangerSampleScreamCount)'), 'danger taper must use the dedicated audible baseline');
+assert(sfx.includes('function ensureDangerScreamLimiter(c)'), 'danger gain boost must retain a clean output limiter');
 assert(sfx.includes('options.reset === true'), 'authored scream scheduler must support an explicit per-ghost reset');
 assert(sfx.includes('generation !== dangerSampleScreamGeneration'), 'stale scream loads must be ignored after a ghost reset');
 assert(sfx.includes('1800 + Math.random() * 1100'), 'authored screams must have a readable stagger interval');
