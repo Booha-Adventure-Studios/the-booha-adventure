@@ -1,6 +1,6 @@
 # The Booha Adventure
 
-*[English version here](README.md)*
+*[English version here](README.md)* · [Booha Worldを見る ↗](https://booha-adventure-studios.github.io/booha-world/)
 
 The Booha Adventureは、英語学習・物語の探索・ミニゲーム・進捗の保存を、ひとつの不思議な世界の中でまとめて体験できる、ブラウザベースの学習アドベンチャーです。
 
