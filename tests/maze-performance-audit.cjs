@@ -34,6 +34,6 @@ assets.forEach((name) => {
 
 assert(!sw.includes('${BASE}/assets/img/juku-tree.png'), 'service worker must not precache the retired Maze tree path');
 assert(sw.includes('booha-pages-2026-372'), 'Maze HTML migration must bump the page cache');
-assert(sw.includes('booha-assets-2026-426'), 'Maze WebP migration must bump the asset cache');
+assert(sw.includes('booha-assets-2026-427'), 'Maze WebP migration must bump the asset cache');
 
 console.log('Maze visual asset audit passed: 19 WebP files are present and all retired PNG sources are absent.');
