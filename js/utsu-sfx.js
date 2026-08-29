@@ -42,8 +42,22 @@
   // Danger samples are authored full-volume one-shots, not tiny UI tones.
   // Give them their own headroom so an angry ghost cannot look active while
   // its scream is buried under the cemetery BGM.
-  var DANGER_SCREAM_BASE_GAIN = 0.78;
-  var DANGER_SCREAM_MAX_GAIN = 0.88;
+  var DANGER_SCREAM_BASE_GAIN = 1.15;
+  var DANGER_SCREAM_MAX_GAIN = 1.25;
+  var dangerScreamLimiter = null;
+
+  function ensureDangerScreamLimiter(c) {
+    if (dangerScreamLimiter) return dangerScreamLimiter;
+    var limiter = c.createDynamicsCompressor();
+    limiter.threshold.setValueAtTime(-3, c.currentTime);
+    limiter.knee.setValueAtTime(0, c.currentTime);
+    limiter.ratio.setValueAtTime(20, c.currentTime);
+    limiter.attack.setValueAtTime(0.003, c.currentTime);
+    limiter.release.setValueAtTime(0.12, c.currentTime);
+    limiter.connect(c.destination);
+    dangerScreamLimiter = limiter;
+    return limiter;
+  }
 
   /* One short tone. freq in Hz, opts: {type, gain, dur, delay}. */
   function tone(freq, opts) {
@@ -155,7 +169,7 @@
     gain.gain.setValueAtTime(volume, now);
     gain.gain.exponentialRampToValueAtTime(0.0001, now + buffer.duration / pitch);
     source.connect(gain);
-    gain.connect(c.destination);
+    gain.connect(ensureDangerScreamLimiter(c));
     source.onended = function () {
       var index = dangerScreamSampleVoices.indexOf(source);
       if (index >= 0) dangerScreamSampleVoices.splice(index, 1);
@@ -189,7 +203,7 @@
     var play = function (buffer) {
       if (!dangerSampleScreamActive || generation !== dangerSampleScreamGeneration || !buffer) return;
       var gain = dangerSampleScreamDecayEnabled
-        ? Math.max(0.36, DANGER_SCREAM_BASE_GAIN * Math.pow(0.82, dangerSampleScreamCount))
+        ? Math.max(0.55, DANGER_SCREAM_BASE_GAIN * Math.pow(0.82, dangerSampleScreamCount))
         : DANGER_SCREAM_BASE_GAIN;
       playDangerScreamSample({
         url: url,
