@@ -82,7 +82,7 @@ Before deployment, run:
 
 The verification suite checks content data, navigation contracts, game behavior, service-worker paths, media assets, responsive behavior, and performance-related safeguards.
 
-Full verification requires Node.js, Python 3, and ffmpeg/ffprobe and ImageMagick for the media-inspection checks.
+Full verification requires Node.js, Python 3, and ffmpeg (ffprobe is included) for the media-inspection checks.
 
 ## Project status
 
