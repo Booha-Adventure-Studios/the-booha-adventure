@@ -85,7 +85,14 @@ const CURRENT_CACHES = {
   // bgm/danger/gameover audio preload=none, a new WebAudio click system
   // wired into its ~15 previously-silent menu buttons, and its shelf/
   // popup icon (red_block.png) converted to webp.
-  assets: 'booha-assets-2026-422',
+  // Happy House webp pass (2026-08-29): 6 scene backgrounds + trophy/liar-
+  // machine/snap-test/mister-happy PNGs converted to right-sized webp;
+  // mister_happy-2.webp re-resized (was never actually downsized before).
+  // Battle-games CPU-opponent pass (2026-08-29): The Liar Machine and
+  // Mister Happy's Snap Test both gained a solo 1-player mode against a
+  // simulated CPU opponent (THE MACHINE / MISTER HAPPY), so a kid without
+  // a second player no longer has to pass the device back and forth.
+  assets: 'booha-assets-2026-424',
   decks:  'booha-decks-2026-310',
 };
 
