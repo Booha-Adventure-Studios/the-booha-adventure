@@ -960,15 +960,20 @@
   <div class="title-badge">▸ BOOHA ARCADE ◂</div>
   <div class="title-main">THE LIAR<br>MACHINE</div>
   <div class="title-sub">
-    THIS IS A 2 PERSON BATTLE GAME<br>
-    <span class="jp-small">これは2人対戦ゲームです</span>
+    PLAY SOLO VS THE MACHINE, OR 2 PLAYER<br>
+    <span class="jp-small">1人でマシンと対戦、または2人対戦</span>
   </div>
   <div class="sep-line"></div>
   <div class="title-warning">⚠ ACCURACY BELOW 70% = INSTANT FAIL ⚠</div>
   <div class="btn-row">
-    
-    <button class="big-btn primary-start" onclick="showScreen('setup')">
-  START 2 PLAYER GAME<br>
+
+    <button class="big-btn primary-start" onclick="goToSetup(true)">
+  1 PLAYER — vs THE MACHINE<br>
+  <span class="jp-line">1人でマシンと対戦</span>
+</button>
+
+<button class="big-btn" onclick="goToSetup(false)">
+  2 PLAYER BATTLE<br>
   <span class="jp-line">2人対戦をはじめる</span>
 </button>
 
@@ -976,7 +981,7 @@
   RECORDS<br>
   <span class="jp-line">記録</span>
 </button>
-    
+
   </div>
 </div>
 
@@ -1003,11 +1008,20 @@
     </div>
   </div>
 
+  <div id="difficulty-setup-block" style="display:none;">
+    <div class="setup-section-label">Machine Difficulty</div>
+    <div class="btn-group" id="difficulty-group">
+      <button class="sel-btn" data-val="sleepy" onclick="selectOpt('difficulty','sleepy',this)">SLEEPY</button>
+      <button class="sel-btn active" data-val="alert" onclick="selectOpt('difficulty','alert',this)">ALERT</button>
+      <button class="sel-btn" data-val="genius" onclick="selectOpt('difficulty','genius',this)">GENIUS</button>
+    </div>
+  </div>
+
   <div class="sep-line"></div>
   
   <div class="simple-rules big-rules">
-  <strong>PLAYER 2 GOES FIRST</strong><br>
-  <span>P2が先にプレイします</span><br><br>
+  <strong id="rule-turn-order">PLAYER 2 GOES FIRST</strong><br>
+  <span id="rule-turn-order-jp">P2が先にプレイします</span><br><br>
 
   <strong>LOOK: DO THE WORDS MATCH?</strong><br>
   <span>英語と日本語は同じ意味？</span><br><br>
@@ -1330,6 +1344,9 @@ const STATE = {
   p1Name:   getP1Name(),
   p2Name:   getP2Name(),
 
+  vsCpu:      false,
+  difficulty: 'alert',
+
   // per-player run
   currentPlayer: 2,  // 2 goes first
   
@@ -1456,8 +1473,85 @@ function buildPairs(items, rng) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+//  CPU OPPONENT (solo mode)
+//  Simulates a full 15-round run instantly, in the exact same run-object
+//  shape a human's buildRunObject() produces (name/correct/wrong/accuracy/
+//  timeMs/survived/penaltyMs/date/weekKey/dupeScore) — so determineWinner(),
+//  showResult(), and recordDuel() need zero changes to accept it as p2.
+// ─────────────────────────────────────────────────────────────────────────────
+const CPU_NAME = 'THE MACHINE';
+const CPU_DIFFICULTIES = {
+  sleepy: { label: 'SLEEPY',  jp: 'ねむい', avgMs: 2600, jitterMs: 900, errorRate: 0.28 },
+  alert:  { label: 'ALERT',   jp: 'げんき', avgMs: 1900, jitterMs: 650, errorRate: 0.16 },
+  genius: { label: 'GENIUS',  jp: '天才',   avgMs: 1300, jitterMs: 400, errorRate: 0.07 },
+};
+
+function simulateCpuRun(pairs, difficultyKey, name, weekKey) {
+  const profile = CPU_DIFFICULTIES[difficultyKey] || CPU_DIFFICULTIES.alert;
+  let correct = 0, wrong = 0, timeMs = 0, penaltyMs = 0, survived = true;
+
+  for (let i = 0; i < pairs.length; i++) {
+    // Cheap triangular-ish jitter around the average decision time — no need
+    // for a true Gaussian, just something with central tendency and no hard
+    // ceiling/floor cliff.
+    const jitter     = (Math.random() + Math.random() - 1) * profile.jitterMs;
+    const decisionMs = Math.max(500, profile.avgMs + jitter);
+    timeMs += decisionMs;
+
+    if (Math.random() >= profile.errorRate) {
+      correct++;
+    } else {
+      wrong++;
+      penaltyMs += 3000; // same hidden penalty a human wrong answer costs
+    }
+
+    const answered = correct + wrong;
+    if (answered >= 5 && (correct / answered) < 0.70) {
+      survived = false;
+      break; // same 70%-after-5 fail rule triggerFail() uses
+    }
+  }
+
+  const answered = correct + wrong;
+  const accuracy = answered === 0 ? 0 : Math.round(correct / answered * 100);
+  const today    = new Date().toISOString().slice(0, 10);
+
+  const run = {
+    name, correct, wrong, accuracy,
+    timeMs: timeMs + penaltyMs,
+    survived, penaltyMs,
+    date: today, weekKey
+  };
+  run.dupeScore = calcDupeScore(run);
+  return run;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 //  START DUEL
 // ─────────────────────────────────────────────────────────────────────────────
+function goToSetup(vsCpu) {
+  STATE.vsCpu = vsCpu;
+  enterSetup();
+  showScreen('setup');
+}
+
+function enterSetup() {
+  const diffBlock = document.getElementById('difficulty-setup-block');
+  if (diffBlock) diffBlock.style.display = STATE.vsCpu ? '' : 'none';
+
+  const turnLine   = document.getElementById('rule-turn-order');
+  const turnLineJp = document.getElementById('rule-turn-order-jp');
+  if (turnLine && turnLineJp) {
+    if (STATE.vsCpu) {
+      turnLine.textContent   = 'YOU PLAY — THE MACHINE ALREADY DID';
+      turnLineJp.textContent = 'あなたがプレイ。マシンはもう終わっています。';
+    } else {
+      turnLine.textContent   = 'PLAYER 2 GOES FIRST';
+      turnLineJp.textContent = 'P2が先にプレイします';
+    }
+  }
+}
+
 async function startDuel() {
   // Load content
   const cards = await loadContent();
@@ -1480,8 +1574,20 @@ async function startDuel() {
   STATE.pairs    = buildPairs(STATE.items, rng);
   STATE.runs     = { p1: null, p2: null };
   STATE.p1Name = getP1Name();
-  STATE.p2Name = getP2Name();
 
+  if (STATE.vsCpu) {
+    // No handoff needed — the Machine's "turn" is simulated instantly and
+    // stored straight into STATE.runs.p2, then the human plays their one
+    // real run as P1. Everything downstream (fail check, results, records)
+    // already reads p1/p2 generically and doesn't know the difference.
+    STATE.p2Name = CPU_NAME;
+    STATE.runs.p2 = simulateCpuRun(STATE.pairs, STATE.difficulty, CPU_NAME, STATE.weekKey);
+    STATE.currentPlayer = 1;
+    showTurnSplashThenStart();
+    return;
+  }
+
+  STATE.p2Name = getP2Name();
   // Show handoff for P2 first
   setupHandoff(2);
   showScreen('handoff');
@@ -1531,17 +1637,23 @@ function showTurnSplashThenStart() {
   const isP2 = STATE.currentPlayer === 2;
   const splash = document.getElementById('turn-splash');
 
-  document.getElementById('turn-mini').textContent = isP2
-    ? 'PLAYER 2 GOES FIRST'
-    : 'PLAYER 1 TURN';
+  if (STATE.vsCpu) {
+    document.getElementById('turn-mini').textContent = 'THE MACHINE ALREADY PLAYED';
+    document.getElementById('turn-main').textContent = `${STATE.p1Name}'S TURN`;
+    document.getElementById('turn-jp').textContent   = 'マシンは終わりました。あなたの番です。';
+  } else {
+    document.getElementById('turn-mini').textContent = isP2
+      ? 'PLAYER 2 GOES FIRST'
+      : 'PLAYER 1 TURN';
 
-  document.getElementById('turn-main').textContent = isP2
-    ? "YOUR OPPONENT'S TURN"
-    : `${STATE.p1Name}'S TURN`;
+    document.getElementById('turn-main').textContent = isP2
+      ? "YOUR OPPONENT'S TURN"
+      : `${STATE.p1Name}'S TURN`;
 
-  document.getElementById('turn-jp').textContent = isP2
-    ? '相手の番です'
-    : 'P1の番です';
+    document.getElementById('turn-jp').textContent = isP2
+      ? '相手の番です'
+      : 'P1の番です';
+  }
 
   splash.classList.remove('show');
   void splash.offsetWidth;
@@ -2072,6 +2184,7 @@ function playWrongSound() {
 //  PLAY AGAIN
 // ─────────────────────────────────────────────────────────────────────────────
 function playAgain() {
+  enterSetup();
   showScreen('setup');
 }
 

@@ -577,8 +577,8 @@
   <div class="badge">▸ MISTER HAPPY'S HOUSE ◂</div>
   <div class="title-main">SNAP<br>TEST</div>
   <div class="title-sub">
-    2 PLAYER REFLEX BATTLE<br>
-    <span class="jp">2人 はんしゃ 対戦</span><br><br>
+    PLAY SOLO VS MISTER HAPPY, OR 2 PLAYER<br>
+    <span class="jp">1人でミスターハッピーと対戦、または2人対戦</span><br><br>
     WAIT FOR <strong style="color:var(--green)">SNAP!</strong> — THEN TAP FAST.<br>
     <span class="jp">「SNAP!」が出たら、はやく押す！</span><br><br>
     FASTEST TAP ANSWERS THE QUESTION.<br>
@@ -586,7 +586,8 @@
   </div>
   <div class="warn">TOO FAST OR TOO SLOW = POINT TO OPPONENT<br>早すぎ・おそすぎ → 相手に1点</div>
   <div class="btn-row">
-    <button class="big-btn" onclick="showScreen('setup')">START DUEL<br><span class="jp">対戦スタート</span></button>
+    <button class="big-btn" onclick="enterSetup(true)">1 PLAYER — vs MISTER HAPPY<br><span class="jp">1人でハッピーと対戦</span></button>
+    <button class="big-btn ghost" onclick="enterSetup(false)">2 PLAYER BATTLE<br><span class="jp">2人対戦</span></button>
     <button class="big-btn ghost" onclick="showScreen('records'); renderRecords();">RECORDS<br><span class="jp">記録</span></button>
   </div>
 </div>
@@ -611,6 +612,15 @@
       <button class="sel-btn active" onclick="selectOpt('mode','vocab',this)">VOCAB</button>
       <button class="sel-btn" onclick="selectOpt('mode','sentences',this)">SENTENCES</button>
       <button class="sel-btn" onclick="selectOpt('mode','questions',this)">QUESTIONS</button>
+    </div>
+  </div>
+
+  <div id="difficulty-setup-block" style="display:none;">
+    <div class="label">Mister Happy's Reflexes</div>
+    <div class="btn-group" id="difficulty-group">
+      <button class="sel-btn" onclick="selectOpt('difficulty','sleepy',this)">SLEEPY</button>
+      <button class="sel-btn active" onclick="selectOpt('difficulty','alert',this)">ALERT</button>
+      <button class="sel-btn" onclick="selectOpt('difficulty','genius',this)">GENIUS</button>
     </div>
   </div>
 
@@ -693,7 +703,7 @@
   <div class="cmp" id="cmp"></div>
   <div class="btn-row">
     <button class="big-btn" onclick="startMatch()">PLAY AGAIN<br><span class="jp">もう一回</span></button>
-    <button class="big-btn ghost" onclick="showScreen('setup')">SETUP<br><span class="jp">設定</span></button>
+    <button class="big-btn ghost" onclick="enterSetup(STATE.vsCpu)">SETUP<br><span class="jp">設定</span></button>
     <button class="big-btn ghost" onclick="showScreen('title')">MENU<br><span class="jp">メニュー</span></button>
   </div>
 </div>
@@ -754,6 +764,9 @@ const STATE = {
   p2Name: getP2Name(),
   weekKey: '',
 
+  vsCpu: false,
+  difficulty: 'alert',
+
   seed: 0,
   cards: [],
   items: [],
@@ -791,6 +804,13 @@ function selectOpt(group, val, el) {
   const groupEl = document.getElementById(group + '-group');
   if (groupEl) groupEl.querySelectorAll('.sel-btn').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
+}
+
+function enterSetup(vsCpu) {
+  if (typeof vsCpu === 'boolean') STATE.vsCpu = vsCpu;
+  const diffBlock = document.getElementById('difficulty-setup-block');
+  if (diffBlock) diffBlock.style.display = STATE.vsCpu ? '' : 'none';
+  showScreen('setup');
 }
 
 function clearTimers() {
@@ -881,6 +901,64 @@ function buildPairs(items, rng) {
   });
 }
 
+// ─── CPU OPPONENT (solo mode) ───
+// P2 is always the CPU slot ("MISTER HAPPY") -- P1 is always framed as the
+// student (getP1Name()). The CPU plays through the exact same real
+// functions a human tap would (playerHit / beginAnswer / answer), just
+// triggered by a timer instead of a touch, so every existing scoring,
+// animation, and feedback path already works unchanged.
+const CPU_SLOT = 2;
+const CPU_NAME = 'MISTER HAPPY';
+const CPU_DIFFICULTIES = {
+  sleepy: { label:'SLEEPY', jp:'ねむい', earlyRate:0.03, reactAvg:1100, reactJitter:500, minReact:350,
+            answerAcc:0.55, answerFrac:0.55, answerJitter:0.20 },
+  alert:  { label:'ALERT',  jp:'げんき', earlyRate:0.06, reactAvg:650,  reactJitter:300, minReact:220,
+            answerAcc:0.75, answerFrac:0.40, answerJitter:0.15 },
+  genius: { label:'GENIUS', jp:'天才',   earlyRate:0.10, reactAvg:380,  reactJitter:180, minReact:150,
+            answerAcc:0.90, answerFrac:0.28, answerJitter:0.12 },
+};
+function cpuProfile() { return CPU_DIFFICULTIES[STATE.difficulty] || CPU_DIFFICULTIES.alert; }
+
+// Called once per round (from nextRound(), alongside the real later(goLive, armDelay)
+// call) to decide what Mister Happy does this round: either jump the gun during the
+// arming window (a real "too fast" mistake, scaled by difficulty), or react to the
+// live "TAP!" cue after a randomized delay. Both paths call playerHit(CPU_SLOT) --
+// the exact function a real tap on his half would call -- which already no-ops
+// safely if the round has moved on by the time this timer fires (a human beat him
+// to it, or the round reset).
+function scheduleCpuSnap(armDelay) {
+  const p = cpuProfile();
+
+  if (Math.random() < p.earlyRate) {
+    const jumpAt = 40 + Math.random() * Math.max(40, armDelay - 80);
+    later(() => playerHit(CPU_SLOT), jumpAt);
+    return;
+  }
+
+  const jitter  = (Math.random() + Math.random() - 1) * p.reactJitter;
+  const reactMs = Math.max(p.minReact, p.reactAvg + jitter);
+  later(() => playerHit(CPU_SLOT), armDelay + reactMs);
+}
+
+// Called from startAnswerTimer() whenever the CPU is the active answerer -- either
+// because it won the snap itself, or because a human timed out and it got the
+// "pass" chance. Answers correctly with probability p.answerAcc, after a delay
+// that's a randomized fraction of the real answer window (never instant, never
+// so slow it risks its own timeout).
+function scheduleCpuAnswer(windowMs) {
+  const p = cpuProfile();
+  const jitter  = (Math.random() + Math.random() - 1) * p.answerJitter;
+  const frac    = Math.min(0.85, Math.max(0.15, p.answerFrac + jitter));
+  const delayMs = Math.max(300, windowMs * frac);
+
+  later(() => {
+    if (STATE.phase !== 'answering' || STATE.activePlayer !== CPU_SLOT) return;
+    const correctIsYes = !STATE.pair.isDifferent;
+    const saysYes = Math.random() < p.answerAcc ? correctIsYes : !correctIsYes;
+    answer(CPU_SLOT, saysYes, null);
+  }, delayMs);
+}
+
 async function startMatch() {
   clearTimers();
   const rawCards = await loadContent();
@@ -905,7 +983,7 @@ async function startMatch() {
   STATE.passed = false;
   STATE.stats = { snaps:{1:0,2:0}, attempts:{1:0,2:0}, correct:{1:0,2:0}, tooFast:{1:0,2:0} };
   STATE.p1Name = getP1Name();
-  STATE.p2Name = getP2Name();
+  STATE.p2Name = STATE.vsCpu ? CPU_NAME : getP2Name();
 
   document.getElementById('p1-name').textContent = STATE.p1Name;
   document.getElementById('p2-name').textContent = STATE.p2Name;
@@ -960,6 +1038,8 @@ function nextRound() {
   const rng = mulberry32(STATE.seed + STATE.round * 77 + 1234);
   const armDelay = ARM_MIN + Math.floor(rng() * ARM_RANGE);
   later(goLive, armDelay);
+
+  if (STATE.vsCpu) scheduleCpuSnap(armDelay);
 }
 
 function goLive() {
@@ -1029,6 +1109,8 @@ function startAnswerTimer(player) {
   fill.style.transition = `transform ${ms}ms linear`;
   fill.style.transform = 'scaleX(0)';
   later(() => onTimeout(player), ms);
+
+  if (STATE.vsCpu && player === CPU_SLOT) scheduleCpuAnswer(ms);
 }
 
 function onTimeout(player) {
