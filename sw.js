@@ -92,7 +92,7 @@ const CURRENT_CACHES = {
   // Mister Happy's Snap Test both gained a solo 1-player mode against a
   // simulated CPU opponent (THE MACHINE / MISTER HAPPY), so a kid without
   // a second player no longer has to pass the device back and forth.
-  assets: 'booha-assets-2026-424',
+  assets: 'booha-assets-2026-425',
   decks:  'booha-decks-2026-310',
 };
 

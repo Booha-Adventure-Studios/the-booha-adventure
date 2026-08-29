@@ -586,9 +586,9 @@
   </div>
   <div class="warn">TOO FAST OR TOO SLOW = POINT TO OPPONENT<br>早すぎ・おそすぎ → 相手に1点</div>
   <div class="btn-row">
-    <button class="big-btn" onclick="enterSetup(true)">1 PLAYER — vs MISTER HAPPY<br><span class="jp">1人でハッピーと対戦</span></button>
-    <button class="big-btn ghost" onclick="enterSetup(false)">2 PLAYER BATTLE<br><span class="jp">2人対戦</span></button>
-    <button class="big-btn ghost" onclick="showScreen('records'); renderRecords();">RECORDS<br><span class="jp">記録</span></button>
+    <button class="big-btn" onclick="enterSetup(true)">1 PLAYER — vs MISTER HAPPY<br><span class="jp"><ruby>一人<rt>ひとり</rt></ruby>でハッピーと<ruby>対戦<rt>たいせん</rt></ruby></span></button>
+    <button class="big-btn ghost" onclick="enterSetup(false)">2 PLAYER BATTLE<br><span class="jp"><ruby>二人<rt>ふたり</rt></ruby><ruby>対戦<rt>たいせん</rt></ruby></span></button>
+    <button class="big-btn ghost" onclick="showScreen('records'); renderRecords();">RECORDS<br><span class="jp"><ruby>記録<rt>きろく</rt></ruby></span></button>
   </div>
 </div>
 
@@ -609,18 +609,18 @@
   <div>
     <div class="label">Mode</div>
     <div class="btn-group" id="mode-group">
-      <button class="sel-btn active" onclick="selectOpt('mode','vocab',this)">VOCAB</button>
-      <button class="sel-btn" onclick="selectOpt('mode','sentences',this)">SENTENCES</button>
-      <button class="sel-btn" onclick="selectOpt('mode','questions',this)">QUESTIONS</button>
+      <button class="sel-btn active" onclick="selectOpt('mode','vocab',this)">VOCAB<br><span class="jp"><ruby>単語<rt>たんご</rt></ruby></span></button>
+      <button class="sel-btn" onclick="selectOpt('mode','sentences',this)">SENTENCES<br><span class="jp"><ruby>文<rt>ぶん</rt></ruby></span></button>
+      <button class="sel-btn" onclick="selectOpt('mode','questions',this)">QUESTIONS<br><span class="jp"><ruby>質問<rt>しつもん</rt></ruby></span></button>
     </div>
   </div>
 
   <div id="difficulty-setup-block" style="display:none;">
     <div class="label">Mister Happy's Reflexes</div>
     <div class="btn-group" id="difficulty-group">
-      <button class="sel-btn" onclick="selectOpt('difficulty','sleepy',this)">SLEEPY</button>
-      <button class="sel-btn active" onclick="selectOpt('difficulty','alert',this)">ALERT</button>
-      <button class="sel-btn" onclick="selectOpt('difficulty','genius',this)">GENIUS</button>
+      <button class="sel-btn" onclick="selectOpt('difficulty','sleepy',this)">SLEEPY<br><span class="jp">ねむい</span></button>
+      <button class="sel-btn active" onclick="selectOpt('difficulty','alert',this)">ALERT<br><span class="jp">げんき</span></button>
+      <button class="sel-btn" onclick="selectOpt('difficulty','genius',this)">GENIUS<br><span class="jp"><ruby>天才<rt>てんさい</rt></ruby></span></button>
     </div>
   </div>
 
@@ -637,7 +637,7 @@
   </div>
 
   <div class="btn-row">
-    <button class="big-btn" onclick="startMatch()">LOAD WEEKLY CONTENT<br><span class="jp">今週の内容で始める</span></button>
+    <button class="big-btn" onclick="startMatch()">LOAD WEEKLY CONTENT<br><span class="jp"><ruby>今週<rt>こんしゅう</rt></ruby>の<ruby>内容<rt>ないよう</rt></ruby>で<ruby>始<rt>はじ</rt></ruby>める</span></button>
     <button class="big-btn ghost" onclick="showScreen('title')">BACK<br><span class="jp">もどる</span></button>
   </div>
 </div>
@@ -659,7 +659,7 @@
         <div class="word-hira" id="p1-hira"></div>
       </div>
       <div class="answers">
-        <button class="answer-btn yes" onclick="answer(1,true,event)">YES<span>同じ</span></button>
+        <button class="answer-btn yes" onclick="answer(1,true,event)">YES<span><ruby>同<rt>おな</rt></ruby>じ</span></button>
         <button class="answer-btn no"  onclick="answer(1,false,event)">NO<span>ちがう</span></button>
       </div>
       <div class="timer-track"><div class="timer-fill" id="p1-fill"></div></div>
@@ -685,7 +685,7 @@
         <div class="word-hira" id="p2-hira"></div>
       </div>
       <div class="answers">
-        <button class="answer-btn yes" onclick="answer(2,true,event)">YES<span>同じ</span></button>
+        <button class="answer-btn yes" onclick="answer(2,true,event)">YES<span><ruby>同<rt>おな</rt></ruby>じ</span></button>
         <button class="answer-btn no"  onclick="answer(2,false,event)">NO<span>ちがう</span></button>
       </div>
       <div class="timer-track"><div class="timer-fill" id="p2-fill"></div></div>
@@ -702,8 +702,8 @@
   <div class="bigscore" id="bigscore"></div>
   <div class="cmp" id="cmp"></div>
   <div class="btn-row">
-    <button class="big-btn" onclick="startMatch()">PLAY AGAIN<br><span class="jp">もう一回</span></button>
-    <button class="big-btn ghost" onclick="enterSetup(STATE.vsCpu)">SETUP<br><span class="jp">設定</span></button>
+    <button class="big-btn" onclick="startMatch()">PLAY AGAIN<br><span class="jp">もう<ruby>一回<rt>いっかい</rt></ruby></span></button>
+    <button class="big-btn ghost" onclick="enterSetup(STATE.vsCpu)">SETUP<br><span class="jp"><ruby>設定<rt>せってい</rt></ruby></span></button>
     <button class="big-btn ghost" onclick="showScreen('title')">MENU<br><span class="jp">メニュー</span></button>
   </div>
 </div>
