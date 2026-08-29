@@ -15,6 +15,9 @@ jobs:
         with:
           fetch-depth: 2   # so we can compare against the previous commit
 
+      - name: Install media inspection tools
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends ffmpeg
+
       - name: Run verify.sh
         run: |
           chmod +x verify.sh
