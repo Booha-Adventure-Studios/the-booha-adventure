@@ -42,8 +42,8 @@
   // Danger samples are authored full-volume one-shots, not tiny UI tones.
   // Give them their own headroom so an angry ghost cannot look active while
   // its scream is buried under the cemetery BGM.
-  var DANGER_SCREAM_BASE_GAIN = 1.15;
-  var DANGER_SCREAM_MAX_GAIN = 1.25;
+  var DANGER_SCREAM_BASE_GAIN = 2.05;
+  var DANGER_SCREAM_MAX_GAIN = 2.3;
   var dangerScreamLimiter = null;
 
   function ensureDangerScreamLimiter(c) {
@@ -166,8 +166,11 @@
     var volume = Math.max(0, Math.min(DANGER_SCREAM_MAX_GAIN, Number(options.gain) || DANGER_SCREAM_BASE_GAIN));
     source.buffer = buffer;
     source.playbackRate.setValueAtTime(pitch, now);
+    var playedDur = buffer.duration / pitch;
+    var fadeTailSec = Math.min(0.11, playedDur * 0.15);
     gain.gain.setValueAtTime(volume, now);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + buffer.duration / pitch);
+    gain.gain.setValueAtTime(volume, now + Math.max(0, playedDur - fadeTailSec));
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + playedDur);
     source.connect(gain);
     gain.connect(ensureDangerScreamLimiter(c));
     source.onended = function () {
@@ -203,7 +206,7 @@
     var play = function (buffer) {
       if (!dangerSampleScreamActive || generation !== dangerSampleScreamGeneration || !buffer) return;
       var gain = dangerSampleScreamDecayEnabled
-        ? Math.max(0.55, DANGER_SCREAM_BASE_GAIN * Math.pow(0.82, dangerSampleScreamCount))
+        ? Math.max(1.1, DANGER_SCREAM_BASE_GAIN * Math.pow(0.9, dangerSampleScreamCount))
         : DANGER_SCREAM_BASE_GAIN;
       playDangerScreamSample({
         url: url,
