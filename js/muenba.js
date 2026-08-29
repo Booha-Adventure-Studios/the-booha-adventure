@@ -1605,6 +1605,7 @@
 
   function toggleHide() {
     if (state.transitioning || state.celebrating || lobbyOpen || returnPortalOpen || captureOpen) return;
+    playUiSfx('buttonPress');
     state.hiding = !state.hiding;
     if (hideBtn) {
       hideBtn.classList.toggle('active', state.hiding);
@@ -2076,6 +2077,15 @@
       playUiSfx('buttonPress');
       if (typeof handler === 'function') handler(event);
     });
+    return button;
+  }
+
+  // Pass 28G: popup controls assembled directly from HTML need the same
+  // audible acknowledgement as captureButton(). Keep this opt-in so
+  // decorative/background clicks remain silent and UtsuSfx stays central.
+  function addMuenbaButtonSfx(button, sound = 'buttonPress') {
+    if (!button) return button;
+    button.addEventListener('click', () => playUiSfx(sound));
     return button;
   }
 
@@ -5946,6 +5956,8 @@
         </div>
       </div>`;
     document.body.appendChild(returnPortalOverlay);
+    addMuenbaButtonSfx(document.getElementById('muenba-return-yes'));
+    addMuenbaButtonSfx(document.getElementById('muenba-return-no'));
     document.getElementById('muenba-return-yes').addEventListener('click', () => {
       closeReturnPortalPopup();
       returnToKarasuki();
@@ -6073,13 +6085,15 @@
       </div>`;
     const missionHintToggle = lobbyOverlay.querySelector('#muenba-mission-hint-toggle');
     const missionHint = lobbyOverlay.querySelector('#muenba-mission-hint');
+    addMuenbaButtonSfx(missionHintToggle);
     missionHintToggle.addEventListener('click', () => {
       const showing = missionHint.hidden;
       missionHint.hidden = !showing;
       missionHintToggle.setAttribute('aria-expanded', String(showing));
       missionHintToggle.querySelector('span').textContent = showing ? 'Hide hint' : 'Show hint';
     });
-    lobbyOverlay.querySelector('#muenba-lobby-begin').addEventListener('click', renderNuppiCaseBoard);
+    addMuenbaButtonSfx(lobbyOverlay.querySelector('#muenba-lobby-begin'))
+      .addEventListener('click', renderNuppiCaseBoard);
     focusLobbyControl('#muenba-lobby-begin');
   }
 
@@ -6105,7 +6119,8 @@
         </div>
       </div>`;
     refreshNuppiCaseBoard();
-    lobbyOverlay.querySelector('#muenba-case-board-next').addEventListener('click', renderNuppiHuntCard);
+    addMuenbaButtonSfx(lobbyOverlay.querySelector('#muenba-case-board-next'))
+      .addEventListener('click', renderNuppiHuntCard);
     focusLobbyControl('#muenba-case-board-next');
   }
 
@@ -6139,10 +6154,11 @@
           <button id="muenba-hunt-card-begin" type="button"><span>Begin hunt</span><small><ruby>探索<rt>たんさく</rt></ruby>を<ruby>始<rt>はじ</rt></ruby>める</small></button>
         </div>
       </div>`;
-    lobbyOverlay.querySelector('#muenba-hunt-card-begin').addEventListener('click', () => {
+    addMuenbaButtonSfx(lobbyOverlay.querySelector('#muenba-hunt-card-begin'))
+      .addEventListener('click', () => {
       closeNuppiLobby();
       if (readMuenba().orbsPending > 0) openPendingOrbRecovery();
-    });
+      });
     focusLobbyControl('#muenba-hunt-card-begin');
   }
 
@@ -6196,7 +6212,7 @@
     lobbyOpen = true;
     state.clickTarget = null;
     state.moving = false;
-    playUiSfx('mischiefReward');
+    playUiSfx('nuppiOpen');
     renderNuppiWelcome();
     refreshNuppiCaseBoard();
     lobbyOverlay.setAttribute('aria-hidden', 'false');
@@ -6283,8 +6299,9 @@
         </div>
       </div>`;
     const handoff = lobbyOverlay.querySelector('#muenba-room-nuppi-handoff');
-    if (handoff) handoff.addEventListener('click', () => depositOrbsAtNuppi());
-    lobbyOverlay.querySelector('#muenba-room-nuppi-close').addEventListener('click', closeNuppiLobby);
+    if (handoff) addMuenbaButtonSfx(handoff).addEventListener('click', () => depositOrbsAtNuppi());
+    addMuenbaButtonSfx(lobbyOverlay.querySelector('#muenba-room-nuppi-close'))
+      .addEventListener('click', closeNuppiLobby);
     focusLobbyControl(pending ? '#muenba-room-nuppi-handoff' : '#muenba-room-nuppi-close');
   }
 
@@ -6293,7 +6310,7 @@
     lobbyOpen = true;
     state.clickTarget = null;
     state.moving = false;
-    playUiSfx('mischiefReward');
+    playUiSfx('nuppiOpen');
     renderRoomNuppiPopup();
     lobbyOverlay.setAttribute('aria-hidden', 'false');
     lobbyOverlay.classList.add('open');
@@ -6307,6 +6324,7 @@
     lobbyOpen = true;
     state.clickTarget = null;
     state.moving = false;
+    playUiSfx('nuppiOpen');
     lobbyOverlay.innerHTML = `
       <div class="muenba-lobby-box muenba-handoff-box muenba-nuppi-scene muenba-nuppi-handoff">
         <img class="muenba-lobby-portrait" src="assets/img/wanderers/nuppi-2.webp" alt="Nuppi">
@@ -6331,8 +6349,8 @@
         </div>
       </div>`;
     const find = lobbyOverlay.querySelector('#muenba-handoff-find');
-    if (find) find.addEventListener('click', () => renderNuppiCaseBoard());
-    lobbyOverlay.querySelector('#muenba-handoff-later').addEventListener('click', () => {
+    if (find) addMuenbaButtonSfx(find).addEventListener('click', () => renderNuppiCaseBoard());
+    addMuenbaButtonSfx(lobbyOverlay.querySelector('#muenba-handoff-later')).addEventListener('click', () => {
       // The player declined Nuppi's next hint. The energy is already safe,
       // but the ghosts do not calm until the next hint is accepted.
       state.cemeteryAlert = true;
