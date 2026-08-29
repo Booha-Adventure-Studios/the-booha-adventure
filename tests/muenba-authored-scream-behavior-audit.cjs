@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 
-// Pass 28B/28C/28H: authored scream playback, danger-state behavior, and priming.
+// Pass 28B/28C/28H/28I: authored scream playback, danger-state behavior, and priming.
 const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
@@ -18,8 +18,8 @@ assert(sfx.includes('dangerScreamSampleLastUrl'), 'authored scream selection mus
 assert(sfx.includes('url !== dangerScreamSampleLastUrl'), 'authored scream selection must avoid immediate repeats');
 assert(sfx.includes('Math.pow(0.82, dangerSampleScreamCount)'), 'later authored screams must taper gently instead of dropping abruptly');
 assert(sfx.includes('dangerSampleScreamDecayEnabled'), 'authored scream scheduler must support a loud-only return-trip mode');
-assert(sfx.includes('var DANGER_SCREAM_BASE_GAIN = 0.42;'), 'danger samples must have an audible gain separate from UI tones');
-assert(sfx.includes('var DANGER_SCREAM_MAX_GAIN = 0.50;'), 'danger samples must have a dedicated gain ceiling');
+assert(sfx.includes('var DANGER_SCREAM_BASE_GAIN = 0.78;'), 'danger samples must have an audible gain separate from UI tones');
+assert(sfx.includes('var DANGER_SCREAM_MAX_GAIN = 0.88;'), 'danger samples must have a dedicated gain ceiling');
 assert(sfx.includes('DANGER_SCREAM_BASE_GAIN * Math.pow(0.82, dangerSampleScreamCount)'), 'danger taper must use the dedicated audible baseline');
 assert(sfx.includes('options.reset === true'), 'authored scream scheduler must support an explicit per-ghost reset');
 assert(sfx.includes('generation !== dangerSampleScreamGeneration'), 'stale scream loads must be ignored after a ghost reset');
@@ -42,4 +42,4 @@ assert(muenba.includes('setMuenbaProfileDisabled(false);'), 'Muenba profile navi
 assert(muenba.includes('#muenba-profile-link.is-disabled'), 'profile lock must have a visible disabled style');
 assert(muenba.includes('startDangerRhythmMusic()') && muenba.includes('stopDangerScream();'), 'rhythm entry must stop danger screams');
 
-console.log('Muenba 28H authored-scream audit passed: per-ghost reset, gentle taper, loud return-trip mode, priming, crossfade, rhythm silence, and dance profile lock are wired.');
+console.log('Muenba 28I authored-scream audit passed: per-ghost reset, louder danger gain, gentle taper, loud return-trip mode, priming, crossfade, rhythm silence, and dance profile lock are wired.');
