@@ -42,8 +42,8 @@
   // Danger samples are authored full-volume one-shots, not tiny UI tones.
   // Give them their own headroom so an angry ghost cannot look active while
   // its scream is buried under the cemetery BGM.
-  var DANGER_SCREAM_BASE_GAIN = 0.42;
-  var DANGER_SCREAM_MAX_GAIN = 0.50;
+  var DANGER_SCREAM_BASE_GAIN = 0.78;
+  var DANGER_SCREAM_MAX_GAIN = 0.88;
 
   /* One short tone. freq in Hz, opts: {type, gain, dur, delay}. */
   function tone(freq, opts) {
@@ -179,7 +179,7 @@
     dangerScreamSampleVoices = [];
   }
 
-  // Pass 28H: each ghost owns a fresh scream run. The first response is loud;
+  // Pass 28I: each ghost owns a fresh scream run. The first response is loud;
   // later responses taper gently instead of inheriting another ghost's decay.
   // Return trips use decay:false so every warning stays loud while Booha is
   // carrying energy back to Nuppi.
@@ -189,7 +189,7 @@
     var play = function (buffer) {
       if (!dangerSampleScreamActive || generation !== dangerSampleScreamGeneration || !buffer) return;
       var gain = dangerSampleScreamDecayEnabled
-        ? Math.max(0.20, DANGER_SCREAM_BASE_GAIN * Math.pow(0.82, dangerSampleScreamCount))
+        ? Math.max(0.36, DANGER_SCREAM_BASE_GAIN * Math.pow(0.82, dangerSampleScreamCount))
         : DANGER_SCREAM_BASE_GAIN;
       playDangerScreamSample({
         url: url,
