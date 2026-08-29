@@ -383,6 +383,8 @@ function playTone(kind, mult = 1) {
     bossPhase3:   { freq: 260, end: 60,  dur: 0.34,  type: "square",   gain: 0.130 },
     bossDeathPop: { freq: 300, end: 80,  dur: 0.09,  type: "square",   gain: 0.060 },
     bossDeathBig: { freq: 130, end: 28,  dur: 0.65,  type: "sawtooth", gain: 0.170 },
+    uiClick:      { freq: 500, end: 650, dur: 0.045, type: "square",   gain: 0.035 },
+    uiConfirm:    { freq: 480, end: 720, dur: 0.09,  type: "triangle", gain: 0.055 },
   }[kind];
   if (!settings) return;
   const freq = settings.freq * mult;
@@ -2802,12 +2804,12 @@ function startInvadersRun(continueRun) {
 
   const startBtn = document.getElementById("startBtn");
   if (startBtn) {
-    startBtn.addEventListener("click", () => startInvadersRun(false));
+    startBtn.addEventListener("click", () => { playSfx("uiConfirm"); startInvadersRun(false); });
   }
   const continueBtn = document.getElementById("invadersContinueBtn");
-  if (continueBtn) continueBtn.addEventListener("click", () => startInvadersRun(true));
+  if (continueBtn) continueBtn.addEventListener("click", () => { playSfx("uiConfirm"); startInvadersRun(true); });
   const saveMenuBtn = document.getElementById("invadersSaveMenuBtn");
-  if (saveMenuBtn) saveMenuBtn.addEventListener("click", () => { if (window.BoohaSaveMenu) BoohaSaveMenu.open(); });
+  if (saveMenuBtn) saveMenuBtn.addEventListener("click", () => { playSfx("uiClick"); if (window.BoohaSaveMenu) BoohaSaveMenu.open(); });
 
   // If a browser rejected music during a background/visibility transition,
   // the next real user gesture gives us a safe opportunity to resume it.
@@ -2824,6 +2826,7 @@ function startInvadersRun(continueRun) {
 
  document.getElementById("startExitBtn")?.addEventListener("pointerdown", e => {
     e.preventDefault(); e.stopPropagation();
+    playSfx("uiClick");
     window.location.href = "karasuki.html?room=room_07";
   }, { passive: false });
   requestAnimationFrame(tick);

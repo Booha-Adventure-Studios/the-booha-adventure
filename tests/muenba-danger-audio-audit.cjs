@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 'use strict';
 
-// Pass 28E: the retired procedural scream generator must stay out of the
-// shared bundle now that Muenba uses authored samples.
+// Pass 28E/28H: the retired procedural scream generator must stay out of the
+// shared bundle while authored samples provide configurable danger playback.
 const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
@@ -17,7 +17,7 @@ assert(!sfx.includes('function scheduleDangerScreamPulse()'), 'retired procedura
 assert(!sfx.includes('DANGER_SCREAM_PRESETS'), 'retired procedural scream presets must be removed');
 assert(!sfx.includes('getDangerNoiseBuffer'), 'retired procedural scream noise must be removed');
 assert(!sfx.includes('dangerScreamVoices'), 'retired procedural scream voice tracking must be removed');
-assert(sfx.includes('function startDangerScreamSamples()'), 'shared SFX must expose the authored danger-scream start function');
+assert(sfx.includes('function startDangerScreamSamples(options)'), 'shared SFX must expose configurable authored danger-scream playback');
 assert(sfx.includes('function stopDangerScreamSamples()'), 'shared SFX must expose the authored danger-scream stop function');
 assert(sfx.includes('startDangerScreamSamples: startDangerScreamSamples'), 'shared SFX must publish authored danger playback');
 assert(sfx.includes('stopDangerScreamSamples: stopDangerScreamSamples'), 'shared SFX must publish authored danger cleanup');
@@ -26,4 +26,4 @@ assert(muenba.includes('window.UtsuSfx && window.UtsuSfx.stopDangerScreamSamples
 assert(!muenba.includes('scream.mp3'), 'Muenba must not load the retired scream sample');
 assert(!fs.existsSync(path.join(audioDir, 'scream.mp3')), 'retired scream sample must be absent');
 
-console.log('Muenba 28E danger-audio audit passed: retired procedural screams are removed and authored playback is the only shared danger path.');
+console.log('Muenba 28H danger-audio audit passed: retired procedural screams are removed and authored playback is the only shared danger path.');

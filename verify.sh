@@ -684,6 +684,13 @@ else
   bad "Muenba popup-SFX audit failed"
 fi
 
+echo "[80/80] Muenba scream loudness audit"
+if node tests/muenba-scream-volume-audit.cjs >/dev/null 2>&1; then
+  ok "Muenba scream loudness pass"
+else
+  bad "Muenba scream loudness audit failed"
+fi
+
 # ── Summary ──────────────────────────────────────────────────
 echo "───────────────────────────────────"
 echo "✅ $PASS passed   ⚠️  $WARN warnings   ❌ $FAIL failed"
