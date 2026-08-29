@@ -11,6 +11,10 @@ const karasukiSource = fs.readFileSync(path.join(__dirname, '..', 'js', 'karasuk
 
 assert(source.includes('state.inputLocked = false;'), 'room entry must release the movement lock');
 assert(source.includes("if (state.spawnId === 'fromKarasuki' || state.arrivalDir) beginEntryDrift();"), 'room transitions must drift Booha toward the center');
+assert(source.includes('const dt = Math.min(50, Math.max(8, now - (state.lastTickTime || now)));'), 'Muenba movement must use the shared elapsed-time frame window');
+assert(source.includes('state.speed = BASE_SPEED * (dt / TARGET_DT);'), 'Muenba movement must remain frame-rate independent like Karasuki and Utsuroba');
+assert(!source.includes('state.speed = BASE_SPEED * Math.min(1.6, dt / TARGET_DT);'), 'Muenba must not cap low-frame-rate travel below real elapsed-time speed');
+assert(source.includes('if (distance <= 24) {'), 'center arrival must finish at the center without a timeout snap');
 assert(source.includes('state.distMovedSinceSpawn = Math.max(state.distMovedSinceSpawn, ARROW_MOVE_THRESHOLD);'), 'the first valid movement tap must reveal room arrows');
 assert(source.includes("const MUENBA_NUPPI = { roomId: 'room_01', x: 940, y: 215"), 'Nuppi must stay clear of the room 01 up arrow');
 assert(dataSource.includes("up:    { x: 767, y: 284 }"), 'room 01 up-arrow coordinates must remain stable');

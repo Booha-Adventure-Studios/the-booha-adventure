@@ -39,7 +39,7 @@
   const ARRIVAL_ARROW_BACK_DELAY_MS = 3800;
   const ARROW_MOVE_THRESHOLD = 30;
   const CLICK_STOP_DIST = 6;
-  const ENTRY_DRIFT_MAX_MS = 2200;
+  const ENTRY_DRIFT_MAX_MS = 3200;
   const NPP_RADIUS = 42;
   const DIR_ANGLE = { right: 0, down: Math.PI / 2, left: Math.PI, up: -Math.PI / 2 };
   const OPPOSITE = { left: 'right', right: 'left', up: 'down', down: 'up' };
@@ -5843,13 +5843,18 @@
     const dx = entryDrift.targetX - state.x;
     const dy = entryDrift.targetY - state.y;
     const distance = Math.hypot(dx, dy);
-    if (distance <= 24 || now >= entryDrift.maxUntil) {
+    // Do not snap Booha to the center when a frame or orientation pause
+    // consumes the original window. Keep the same smooth direct flight until
+    // the center is actually reached; the longer guard only prevents a stale
+    // entry state from lasting forever.
+    if (distance <= 24) {
       state.x = entryDrift.targetX;
       state.y = entryDrift.targetY;
       entryDrift = null;
       state.inputLocked = false;
       return false;
     }
+    if (now >= entryDrift.maxUntil) entryDrift.maxUntil = now + ENTRY_DRIFT_MAX_MS;
     const step = Math.min(distance, state.speed * 1.1);
     state.x += (dx / distance) * step;
     state.y += (dy / distance) * step;
@@ -6824,9 +6829,11 @@
   }
 
   function tick(now) {
-    const dt = Math.min(32, Math.max(8, now - (state.lastTickTime || now)));
+    // Match Karasuki/Utsuroba: use elapsed time directly so a 30fps phone
+    // still covers the same distance per second as a 60fps tablet.
+    const dt = Math.min(50, Math.max(8, now - (state.lastTickTime || now)));
     state.lastTickTime = now;
-    state.speed = BASE_SPEED * Math.min(1.6, dt / TARGET_DT);
+    state.speed = BASE_SPEED * (dt / TARGET_DT);
     syncMuenbaOrientationMode();
     const orientationReady = isMuenbaOrientationReady();
     // Entry drift must continue independently of overlays. The lobby now
