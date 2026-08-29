@@ -782,6 +782,14 @@
   padding: 13px 20px;
 }
 
+.sel-btn .jp-line {
+  display: block;
+  margin-top: 3px;
+  font-size: clamp(10px, 2.4vw, 13px);
+  color: var(--jp-col);
+  letter-spacing: 0;
+}
+
 /* Bigger handoff/pass screen */
 .handoff-instruction {
   font-size: clamp(16px, 4vw, 24px);
@@ -969,17 +977,17 @@
 
     <button class="big-btn primary-start" onclick="goToSetup(true)">
   1 PLAYER — vs THE MACHINE<br>
-  <span class="jp-line">1人でマシンと対戦</span>
+  <span class="jp-line"><ruby>一人<rt>ひとり</rt></ruby>でマシンと<ruby>対戦<rt>たいせん</rt></ruby></span>
 </button>
 
 <button class="big-btn" onclick="goToSetup(false)">
   2 PLAYER BATTLE<br>
-  <span class="jp-line">2人対戦をはじめる</span>
+  <span class="jp-line"><ruby>二人<rt>ふたり</rt></ruby><ruby>対戦<rt>たいせん</rt></ruby>をはじめる</span>
 </button>
 
 <button class="big-btn ghost" onclick="openRecords()">
   RECORDS<br>
-  <span class="jp-line">記録</span>
+  <span class="jp-line"><ruby>記録<rt>きろく</rt></ruby></span>
 </button>
 
   </div>
@@ -1002,18 +1010,18 @@
   <div>
     <div class="setup-section-label">Mode</div>
     <div class="btn-group" id="mode-group">
-      <button class="sel-btn active" data-val="vocab" onclick="selectOpt('mode','vocab',this)">VOCAB</button>
-      <button class="sel-btn" data-val="sentences" onclick="selectOpt('mode','sentences',this)">SENTENCES</button>
-      <button class="sel-btn" data-val="questions" onclick="selectOpt('mode','questions',this)">QUESTIONS</button>
+      <button class="sel-btn active" data-val="vocab" onclick="selectOpt('mode','vocab',this)">VOCAB<br><span class="jp-line"><ruby>単語<rt>たんご</rt></ruby></span></button>
+      <button class="sel-btn" data-val="sentences" onclick="selectOpt('mode','sentences',this)">SENTENCES<br><span class="jp-line"><ruby>文<rt>ぶん</rt></ruby></span></button>
+      <button class="sel-btn" data-val="questions" onclick="selectOpt('mode','questions',this)">QUESTIONS<br><span class="jp-line"><ruby>質問<rt>しつもん</rt></ruby></span></button>
     </div>
   </div>
 
   <div id="difficulty-setup-block" style="display:none;">
     <div class="setup-section-label">Machine Difficulty</div>
     <div class="btn-group" id="difficulty-group">
-      <button class="sel-btn" data-val="sleepy" onclick="selectOpt('difficulty','sleepy',this)">SLEEPY</button>
-      <button class="sel-btn active" data-val="alert" onclick="selectOpt('difficulty','alert',this)">ALERT</button>
-      <button class="sel-btn" data-val="genius" onclick="selectOpt('difficulty','genius',this)">GENIUS</button>
+      <button class="sel-btn" data-val="sleepy" onclick="selectOpt('difficulty','sleepy',this)">SLEEPY<br><span class="jp-line">ねむい</span></button>
+      <button class="sel-btn active" data-val="alert" onclick="selectOpt('difficulty','alert',this)">ALERT<br><span class="jp-line">げんき</span></button>
+      <button class="sel-btn" data-val="genius" onclick="selectOpt('difficulty','genius',this)">GENIUS<br><span class="jp-line"><ruby>天才<rt>てんさい</rt></ruby></span></button>
     </div>
   </div>
 
@@ -1034,8 +1042,8 @@
 </div>
 
   <div class="btn-row">
-    <button class="big-btn" onclick="startDuel()">LOAD MACHINE</button>
-    <button class="big-btn ghost" onclick="showScreen('title')">BACK</button>
+    <button class="big-btn" onclick="startDuel()">LOAD MACHINE<br><span class="jp-line">マシンを<ruby>起動<rt>きどう</rt></ruby></span></button>
+    <button class="big-btn ghost" onclick="showScreen('title')">BACK<br><span class="jp-line">もどる</span></button>
   </div>
 </div>
 
@@ -1054,7 +1062,7 @@
     ⚠ DO NOT SHOW THIS SCREEN TO YOUR OPPONENT
   </div>
   <div class="btn-row">
-    <button class="big-btn" id="handoff-start-btn" onclick="startPlayerRun()">READY → START</button>
+    <button class="big-btn" id="handoff-start-btn" onclick="startPlayerRun()">READY → START<br><span class="jp-line"><ruby>準備<rt>じゅんび</rt></ruby>してスタート</span></button>
   </div>
 </div>
 
@@ -1087,7 +1095,7 @@
       
       <button class="answer-btn btn-yes" id="btn-yes" onclick="answer(true)">
   YES ✓<br>
-  <span>同じ</span>
+  <span><ruby>同<rt>おな</rt></ruby>じ</span>
 </button>
 
 <button class="answer-btn btn-no" id="btn-no" onclick="answer(false)">
@@ -1112,7 +1120,7 @@
   <div class="sep-line"></div>
   <div class="fail-stats" id="fail-stats"></div>
   <div class="btn-row">
-    <button class="big-btn danger" id="fail-continue-btn">CONTINUE</button>
+    <button class="big-btn danger" id="fail-continue-btn">CONTINUE<br><span class="jp-line"><ruby>続<rt>つづ</rt></ruby>ける</span></button>
   </div>
 </div>
 
@@ -1131,7 +1139,7 @@
   </div>
   <button class="big-btn" onclick="showCalc()">
     CALCULATE RESULTS<br>
-    <span class="jp-line">結果を見る</span>
+    <span class="jp-line"><ruby>結果<rt>けっか</rt></ruby>を<ruby>見<rt>み</rt></ruby>る</span>
   </button>
 </div>
 
@@ -1157,9 +1165,9 @@
   </div>
 
   <div class="btn-row">
-    <button class="big-btn" onclick="playAgain()">PLAY AGAIN</button>
-    <button class="big-btn ghost" onclick="showScreen('title')">MAIN MENU</button>
-    <button class="big-btn ghost" onclick="openRecords()">RECORDS</button>
+    <button class="big-btn" onclick="playAgain()">PLAY AGAIN<br><span class="jp-line">もう<ruby>一度<rt>いちど</rt></ruby>あそぶ</span></button>
+    <button class="big-btn ghost" onclick="showScreen('title')">MAIN MENU<br><span class="jp-line">メニューに<ruby>戻<rt>もど</rt></ruby>る</span></button>
+    <button class="big-btn ghost" onclick="openRecords()">RECORDS<br><span class="jp-line"><ruby>記録<rt>きろく</rt></ruby></span></button>
   </div>
 </div>
 
@@ -1169,7 +1177,7 @@
     <div class="records-title">THE LIAR MACHINE</div>
     <div class="records-sub" id="records-sub">RECORDS</div>
     <div id="records-content"></div>
-    <button id="records-close-btn" onclick="closeRecords()">CLOSE</button>
+    <button id="records-close-btn" onclick="closeRecords()">CLOSE<br><span class="jp-line"><ruby>閉<rt>と</rt></ruby>じる</span></button>
   </div>
 </div>
 

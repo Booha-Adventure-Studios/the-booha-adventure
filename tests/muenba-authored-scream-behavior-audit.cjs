@@ -18,6 +18,9 @@ assert(sfx.includes('dangerScreamSampleLastUrl'), 'authored scream selection mus
 assert(sfx.includes('url !== dangerScreamSampleLastUrl'), 'authored scream selection must avoid immediate repeats');
 assert(sfx.includes('Math.pow(0.82, dangerSampleScreamCount)'), 'later authored screams must taper gently instead of dropping abruptly');
 assert(sfx.includes('dangerSampleScreamDecayEnabled'), 'authored scream scheduler must support a loud-only return-trip mode');
+assert(sfx.includes('var DANGER_SCREAM_BASE_GAIN = 0.42;'), 'danger samples must have an audible gain separate from UI tones');
+assert(sfx.includes('var DANGER_SCREAM_MAX_GAIN = 0.50;'), 'danger samples must have a dedicated gain ceiling');
+assert(sfx.includes('DANGER_SCREAM_BASE_GAIN * Math.pow(0.82, dangerSampleScreamCount)'), 'danger taper must use the dedicated audible baseline');
 assert(sfx.includes('options.reset === true'), 'authored scream scheduler must support an explicit per-ghost reset');
 assert(sfx.includes('generation !== dangerSampleScreamGeneration'), 'stale scream loads must be ignored after a ghost reset');
 assert(sfx.includes('1800 + Math.random() * 1100'), 'authored screams must have a readable stagger interval');
@@ -26,6 +29,8 @@ assert(muenba.includes('window.UtsuSfx && window.UtsuSfx.startDangerScreamSample
 assert(muenba.includes('reset: true'), 'Muenba must reset scream volume for each new ghost encounter');
 assert(muenba.includes('loudOnly: Number(readMuenba().orbsPending) > 0'), 'Muenba return-trip ghost encounters must use loud-only screams');
 assert(muenba.includes('loudOnly: captureSession.carryingEnergy === true'), 'Muenba danger retries and returns must preserve loud return-trip screams');
+assert(muenba.includes("startGhostScream(activeGhost, now, 'wrong-ghost')"), 'clicking a hostile ghost must enter the authored scream path');
+assert(muenba.includes("startGhostScream(g, now, 'sight')"), 'proximity anger must enter the authored scream path');
 assert(muenba.includes('window.UtsuSfx && window.UtsuSfx.stopDangerScreamSamples'), 'Muenba must stop authored samples through shared SFX');
 assert(muenba.includes('function primeDangerScreamSamples()'), 'Muenba must prime authored clips after the first player interaction');
 assert(muenba.includes('preloadDangerScreamSamples'), 'Muenba must request all authored clips before danger playback');

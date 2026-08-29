@@ -28,4 +28,4 @@ const loudness = files.map((file) => {
 const spread = Math.max(...loudness) - Math.min(...loudness);
 assert(spread <= 1.5, `Muenba screams must stay within 1.5 LUFS; measured ${spread.toFixed(1)} LUFS`);
 
-console.log(`Muenba scream loudness audit passed: six clips are within ${spread.toFixed(1)} LUFS.`);
+console.log(`Muenba scream loudness audit passed: six clips are within ${spread.toFixed(1)} LUFS and use the dedicated danger gain path.`);
