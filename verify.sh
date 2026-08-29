@@ -677,6 +677,13 @@ else
   bad "Muenba visibility-audio audit failed"
 fi
 
+echo "[79/79] Muenba popup-SFX audit"
+if node tests/muenba-popup-sfx-audit.cjs >/dev/null 2>&1; then
+  ok "Muenba popup-SFX contracts pass"
+else
+  bad "Muenba popup-SFX audit failed"
+fi
+
 # ── Summary ──────────────────────────────────────────────────
 echo "───────────────────────────────────"
 echo "✅ $PASS passed   ⚠️  $WARN warnings   ❌ $FAIL failed"
