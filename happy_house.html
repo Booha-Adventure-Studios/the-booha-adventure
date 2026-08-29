@@ -140,7 +140,16 @@
   }
   #hh-back-btn { left: 3%; opacity: 0; pointer-events: none; }
   #hh-back-btn.visible { opacity: 1; pointer-events: auto; }
-  #hh-exit-btn { right: 3%; }
+  #hh-exit-btn {
+    top: auto;
+    bottom: 5%;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    opacity: 0;
+    pointer-events: none;
+  }
+  #hh-exit-btn.visible { opacity: 1; pointer-events: auto; }
   #hh-back-btn:hover, #hh-exit-btn:hover {
     background: rgba(0, 0, 0, 0.65);
     color: rgba(255, 220, 140, 0.90);
@@ -692,6 +701,14 @@
     }
   }
 
+  function updateExitBtn(sceneId) {
+    if (sceneId === 'entry') {
+      exitBtn.classList.add('visible');
+    } else {
+      exitBtn.classList.remove('visible');
+    }
+  }
+
   backBtn.addEventListener('click', () => {
     if (performance.now() < lockUntil) return;
     startBGM();
@@ -762,6 +779,7 @@
 
       buildHotspotsForScene(currentScene);
       updateBackBtn(SCENES[currentScene]);
+      updateExitBtn(currentScene);
 
       // DEV: update scene label
       if (devPanelEl.style.display === 'block') {
@@ -884,6 +902,7 @@ function init() {
 
     buildHotspotsForScene(startScene);
     updateBackBtn(SCENES[startScene]);
+    updateExitBtn(startScene);
 
     
 

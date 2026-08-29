@@ -39,6 +39,11 @@
   // every existing popup/click becomes more present without clipping.
   var SFX_GAIN_BOOST = 1.9;
   var SFX_MAX_GAIN = 0.16;
+  // Danger samples are authored full-volume one-shots, not tiny UI tones.
+  // Give them their own headroom so an angry ghost cannot look active while
+  // its scream is buried under the cemetery BGM.
+  var DANGER_SCREAM_BASE_GAIN = 0.42;
+  var DANGER_SCREAM_MAX_GAIN = 0.50;
 
   /* One short tone. freq in Hz, opts: {type, gain, dur, delay}. */
   function tone(freq, opts) {
@@ -125,8 +130,9 @@
   }
 
   // Play one decoded sample with a small pitch window. `gain` is deliberately
-  // an explicit input so the upcoming chase scheduler can make later screams
-  // quieter without rebuilding the audio graph.
+  // an explicit input so the chase scheduler can taper later screams without
+  // rebuilding the audio graph. Danger samples intentionally use their own
+  // louder ceiling instead of the small UI-tone cap above.
   function playDangerScreamSample(options) {
     options = options || {};
     var c = ensureCtx();
@@ -143,7 +149,7 @@
     var minPitch = Number.isFinite(options.minPitch) ? options.minPitch : 0.92;
     var maxPitch = Number.isFinite(options.maxPitch) ? options.maxPitch : 1.08;
     var pitch = minPitch + Math.random() * Math.max(0, maxPitch - minPitch);
-    var volume = Math.max(0, Math.min(SFX_MAX_GAIN, Number(options.gain) || 0.13));
+    var volume = Math.max(0, Math.min(DANGER_SCREAM_MAX_GAIN, Number(options.gain) || DANGER_SCREAM_BASE_GAIN));
     source.buffer = buffer;
     source.playbackRate.setValueAtTime(pitch, now);
     gain.gain.setValueAtTime(volume, now);
@@ -183,8 +189,8 @@
     var play = function (buffer) {
       if (!dangerSampleScreamActive || generation !== dangerSampleScreamGeneration || !buffer) return;
       var gain = dangerSampleScreamDecayEnabled
-        ? Math.max(0.065, 0.14 * Math.pow(0.82, dangerSampleScreamCount))
-        : 0.14;
+        ? Math.max(0.20, DANGER_SCREAM_BASE_GAIN * Math.pow(0.82, dangerSampleScreamCount))
+        : DANGER_SCREAM_BASE_GAIN;
       playDangerScreamSample({
         url: url,
         gain: gain,
