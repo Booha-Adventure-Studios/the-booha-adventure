@@ -690,12 +690,18 @@
     music.play().catch(() => { state.musicStarted = false; });
   });
 
-  function startDangerScream() {
+  function startDangerScream(options) {
+    options = options || {};
     stopDangerRhythmMusic();
     music.volume = MUENBA_SCREAM_DUCK_VOLUME;
     try {
       const sound = window.UtsuSfx && window.UtsuSfx.startDangerScreamSamples;
-      if (typeof sound === 'function') sound();
+      if (typeof sound === 'function') {
+        sound({
+          reset: options.reset === true,
+          decay: options.loudOnly !== true
+        });
+      }
     } catch (_) {}
   }
 
@@ -1460,7 +1466,12 @@
     g.angryUntil = now + 1200;
     g.angerBlendTarget = 1;
     g.angerBlendStartedAt = now;
-    startDangerScream();
+    // A new ghost gets its own loud first scream. During the return trip,
+    // every staggered warning stays loud because Booha is carrying energy.
+    startDangerScream({
+      reset: true,
+      loudOnly: Number(readMuenba().orbsPending) > 0
+    });
   }
 
   function stopGhostScream(g) {
@@ -3179,7 +3190,10 @@
     captureSession.rhythm = null;
     captureSession.phase = captureSession.danger ? 'danger-ready' : 'ready';
     if (captureSession.danger) {
-      startDangerScream();
+      startDangerScream({
+        reset: true,
+        loudOnly: captureSession.carryingEnergy === true
+      });
       renderDangerReady();
     } else {
       renderCaptureReady();
@@ -3964,7 +3978,10 @@
     stopRhythmCapture();
     captureSession.phase = 'danger-ready';
     captureSession.rhythm = null;
-    startDangerScream();
+    startDangerScream({
+      reset: true,
+      loudOnly: captureSession.carryingEnergy === true
+    });
     renderDangerReady();
   }
 

@@ -2923,9 +2923,9 @@ function traitGlowColor(block) {
     getAC();
 
     if(gs.phase===P.TITLE){
-      if(htContinue(p.x,p.y)){ restoreDestructionCheckpoint(); }
-      else if(htStart(p.x,p.y)){beginCampaign();loadRound(0);showBriefing();}
-      else if(htSave(p.x,p.y)){ if(window.BoohaSaveMenu) BoohaSaveMenu.open(); }
+      if(htContinue(p.x,p.y)){ synthPop(650, 0.22, 0.07); restoreDestructionCheckpoint(); }
+      else if(htStart(p.x,p.y)){ synthPop(700, 0.26, 0.09); beginCampaign();loadRound(0);showBriefing();}
+      else if(htSave(p.x,p.y)){ synthPop(450, 0.18, 0.06); if(window.BoohaSaveMenu) BoohaSaveMenu.open(); }
       evt.preventDefault();return;
     }
     if(gs.phase===P.HALL){

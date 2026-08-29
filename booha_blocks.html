@@ -813,10 +813,30 @@ let bgmIdx=0;
 const bgmAudio=new Audio(BASE+SFX.bgm[0]);
 const dangerAudio=new Audio(BASE+SFX.danger);
 const goAudio=new Audio(BASE+SFX.gameOver);
+bgmAudio.preload='none'; dangerAudio.preload='none'; goAudio.preload='none';
 bgmAudio.volume=0.28; dangerAudio.volume=0.55; dangerAudio.loop=true; goAudio.volume=0.95;
 bgmAudio.addEventListener('ended',()=>{ bgmIdx=(bgmIdx+1)%SFX.bgm.length; bgmAudio.src=BASE+SFX.bgm[bgmIdx]; if(audioUnlocked&&gameStarted&&!isGameOver) bgmAudio.play().catch(()=>{}); });
 async function unlockAudio(){ if(audioUnlocked) return; audioUnlocked=true; const v=bgmAudio.volume; bgmAudio.volume=0; try{await bgmAudio.play();bgmAudio.pause();bgmAudio.currentTime=0;}catch(_){} bgmAudio.volume=v; }
 function playSFX(f,v=1){ if(!audioUnlocked) return; try{const a=new Audio(BASE+f);a.volume=v;a.play().catch(()=>{});}catch(_){} }
+/* ── UI click tones (WebAudio, not the recorded SFX above) ── */
+let _uiAC=null;
+function getUiAC(){ if(_uiAC) return _uiAC; try{ _uiAC=new (window.AudioContext||window.webkitAudioContext)(); }catch(_){ _uiAC=null; } return _uiAC; }
+function playUiTone(freq,end,dur,vol){
+  if(!audioUnlocked) return;
+  try{
+    const ac=getUiAC(); if(!ac) return;
+    const o=ac.createOscillator(), g=ac.createGain();
+    o.type='square';
+    o.frequency.setValueAtTime(freq, ac.currentTime);
+    o.frequency.exponentialRampToValueAtTime(end, ac.currentTime+dur);
+    g.gain.setValueAtTime(vol, ac.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime+dur);
+    o.connect(g).connect(ac.destination);
+    o.start(ac.currentTime); o.stop(ac.currentTime+dur+0.01);
+  }catch(_){}
+}
+function playUiClick(){ playUiTone(500,650,0.045,0.05); }
+function playUiConfirm(){ playUiTone(480,720,0.09,0.07); }
 function pauseBGM(){ try{bgmAudio.pause();}catch(_){} }
 function resumeBGM(){ if(!audioUnlocked||!gameStarted||isGameOver||isPaused||dangerOn) return; bgmAudio.play().catch(()=>{}); }
 let dangerOn=false;
@@ -1419,22 +1439,23 @@ function setPaused(v){
   if(v){pauseBGM();shakeMag=0;shakeFrames=0;}
   else{resumeLoop();resumeBGM();}
 }
-pauseBtn?.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(!gameStarted||isGameOver)return;setPaused(!isPaused);},{passive:false});
-document.getElementById('pauseResumeBtn')?.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();setPaused(false);},{passive:false});
+pauseBtn?.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(!gameStarted||isGameOver)return;playUiClick();setPaused(!isPaused);},{passive:false});
+document.getElementById('pauseResumeBtn')?.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();playUiConfirm();setPaused(false);},{passive:false});
 document.getElementById('pauseExitBtn')?.addEventListener('pointerdown',e=>{
   e.preventDefault(); e.stopPropagation();
+  playUiClick();
   exitToAdventure();
 },{passive:false});
 document.getElementById('headerExitBtn')?.addEventListener('pointerdown',e=>{
-  e.preventDefault(); e.stopPropagation(); exitToAdventure();
+  e.preventDefault(); e.stopPropagation(); playUiClick(); exitToAdventure();
 },{passive:false});
 
 /* ── HELP ── */
 const helpBtn=document.getElementById('helpBtn');
 const helpOverlay=document.getElementById('helpOverlay');
 const helpClose=document.getElementById('helpClose');
-helpBtn?.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(!gameStarted||isGameOver)return;isPaused=true;pauseBGM();pauseOverlay.style.display='none';helpOverlay.style.display='flex';},{passive:false});
-helpClose?.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();helpOverlay.style.display='none';isPaused=false;resumeLoop();},{passive:false});
+helpBtn?.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(!gameStarted||isGameOver)return;playUiClick();isPaused=true;pauseBGM();pauseOverlay.style.display='none';helpOverlay.style.display='flex';},{passive:false});
+helpClose?.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();playUiClick();helpOverlay.style.display='none';isPaused=false;resumeLoop();},{passive:false});
 
 /* ── LEADERBOARD ── */
 const LB_KEY='booha_blocks_lb_v2',NAME_KEY='booha_blocks_name';
@@ -1508,17 +1529,17 @@ function closeMemoryHall(){
   if(memoryFromGame){isPaused=false;resumeLoop();resumeBGM();}
   else if(isGameOver){showStartOverlay();}
 }
-document.getElementById('trophyBtn')?.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();openMemoryHall();},{passive:false});
-document.getElementById('memoryClose')?.addEventListener('pointerdown',e=>{e.preventDefault();closeMemoryHall();},{passive:false});
-document.getElementById('memoryDone')?.addEventListener('pointerdown',e=>{e.preventDefault();closeMemoryHall();},{passive:false});
-document.getElementById('memoryLocalBtn')?.addEventListener('pointerdown',e=>{e.preventDefault();memoryOverlay.style.display='none';openLeaderboard();},{passive:false});
+document.getElementById('trophyBtn')?.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();playUiClick();openMemoryHall();},{passive:false});
+document.getElementById('memoryClose')?.addEventListener('pointerdown',e=>{e.preventDefault();playUiClick();closeMemoryHall();},{passive:false});
+document.getElementById('memoryDone')?.addEventListener('pointerdown',e=>{e.preventDefault();playUiClick();closeMemoryHall();},{passive:false});
+document.getElementById('memoryLocalBtn')?.addEventListener('pointerdown',e=>{e.preventDefault();playUiClick();memoryOverlay.style.display='none';openLeaderboard();},{passive:false});
 memoryOverlay?.addEventListener('pointerdown',e=>{if(e.target===memoryOverlay)closeMemoryHall();},{passive:false});
 
 function openLeaderboard(){lbFromGame=gameStarted&&!isGameOver;if(lbFromGame){isPaused=true;pauseBGM();}renderBoard();lbOverlay.style.display='flex';}
 function closeLeaderboard(){lbOverlay.style.display='none';if(isGameOver){showStartOverlay();return;}if(lbFromGame){isPaused=false;resumeLoop();resumeBGM();}else showStartOverlay();}
-document.getElementById('lbClose')?.addEventListener('pointerdown', e=>{e.preventDefault();closeLeaderboard();},{passive:false});
-document.getElementById('lbDone')?.addEventListener('pointerdown',  e=>{e.preventDefault();closeLeaderboard();},{passive:false});
-document.getElementById('lbClear')?.addEventListener('pointerdown', e=>{e.preventDefault();if(confirm('スコアをリセットしますか？')){setBoard([]);renderBoard();}},{passive:false});
+document.getElementById('lbClose')?.addEventListener('pointerdown', e=>{e.preventDefault();playUiClick();closeLeaderboard();},{passive:false});
+document.getElementById('lbDone')?.addEventListener('pointerdown',  e=>{e.preventDefault();playUiClick();closeLeaderboard();},{passive:false});
+document.getElementById('lbClear')?.addEventListener('pointerdown', e=>{e.preventDefault();playUiClick();if(confirm('スコアをリセットしますか？')){setBoard([]);renderBoard();}},{passive:false});
 lbOverlay?.addEventListener('pointerdown',e=>{if(e.target===lbOverlay)closeLeaderboard();},{passive:false});
 
 /* ── NAME OVERLAY ── */
@@ -1534,8 +1555,8 @@ function openNameOverlay(){
   setTimeout(()=>{try{nameInput.focus();}catch(_){}},80);
 }
 function submitName(){saveScore(nameInput.value);nameOverlay.style.display='none';openLeaderboard();}
-document.getElementById('nameOkBtn')?.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();submitName();},{passive:false});
-document.getElementById('nameSkipBtn')?.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();nameOverlay.style.display='none';showStartOverlay();},{passive:false});
+document.getElementById('nameOkBtn')?.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();playUiConfirm();submitName();},{passive:false});
+document.getElementById('nameSkipBtn')?.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();playUiClick();nameOverlay.style.display='none';showStartOverlay();},{passive:false});
 nameInput?.addEventListener('keydown',e=>{if(e.key==='Enter')submitName();});
 
 /* ── GAME OVER ── */
