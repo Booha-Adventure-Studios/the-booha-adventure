@@ -79,7 +79,13 @@ const CURRENT_CACHES = {
   // resized and converted to webp, background recompressed only, the
   // dead double-fetch of the (CSS-only) background image removed from
   // preloadAssets, and the 5 catch/bounce mp3s right-sized.
-  assets: 'booha-assets-2026-420',
+  // Final passes on the 4 bonus games (2026-08-29): Invaders endscreen
+  // video preload=none + uiClick/uiConfirm tones on start/continue/save/
+  // exit; Destruction title-screen buttons now play synthPop; Blocks'
+  // bgm/danger/gameover audio preload=none, a new WebAudio click system
+  // wired into its ~15 previously-silent menu buttons, and its shelf/
+  // popup icon (red_block.png) converted to webp.
+  assets: 'booha-assets-2026-422',
   decks:  'booha-decks-2026-310',
 };
 

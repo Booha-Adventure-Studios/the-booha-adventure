@@ -44,6 +44,6 @@ assert.strictEqual(
   'retired dance pose PNG files must be absent',
 );
 assert(!/assets\/img\/booha_ghost_dance_(?:arms_up|sway|wave)\.png/i.test(utsuroba), 'Utsuroba must not reference retired dance pose PNG paths');
-assert(sw.includes('booha-assets-2026-420'), 'service-worker asset cache must include the current dance-art bump');
+assert(sw.includes('booha-assets-2026-422'), 'service-worker asset cache must include the current dance-art bump');
 
 console.log('Utsuroba 25D dance audit passed: all three celebration poses are transparent lossless WebP assets with stable references.');

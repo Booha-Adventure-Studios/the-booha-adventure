@@ -75,6 +75,8 @@
   var dangerSampleScreamTimer = 0;
   var dangerSampleScreamActive = false;
   var dangerSampleScreamCount = 0;
+  var dangerSampleScreamDecayEnabled = true;
+  var dangerSampleScreamGeneration = 0;
 
   function loadDangerScreamSample(url) {
     if (dangerScreamSampleBuffers.has(url)) {
@@ -158,6 +160,10 @@
   }
 
   function stopDangerScreamSamples() {
+    // Invalidate any in-flight decode callback before stopping voices. This
+    // matters when a new ghost starts screaming while the previous clip is
+    // still loading: the old callback must not leak into the new encounter.
+    dangerSampleScreamGeneration += 1;
     dangerSampleScreamActive = false;
     if (dangerSampleScreamTimer) window.clearTimeout(dangerSampleScreamTimer);
     dangerSampleScreamTimer = 0;
@@ -167,23 +173,27 @@
     dangerScreamSampleVoices = [];
   }
 
-  // Pass 28B: authored screams are a measured warning layer. The first
-  // response is strongest; later responses remain audible but recede so the
-  // chase creates tension without becoming a wall of repeated sound.
-  function scheduleDangerSampleScreamPulse() {
-    if (!dangerSampleScreamActive) return;
+  // Pass 28H: each ghost owns a fresh scream run. The first response is loud;
+  // later responses taper gently instead of inheriting another ghost's decay.
+  // Return trips use decay:false so every warning stays loud while Booha is
+  // carrying energy back to Nuppi.
+  function scheduleDangerSampleScreamPulse(generation) {
+    if (!dangerSampleScreamActive || generation !== dangerSampleScreamGeneration) return;
     var url = randomDangerScreamSampleUrl();
     var play = function (buffer) {
-      if (!dangerSampleScreamActive || !buffer) return;
+      if (!dangerSampleScreamActive || generation !== dangerSampleScreamGeneration || !buffer) return;
+      var gain = dangerSampleScreamDecayEnabled
+        ? Math.max(0.065, 0.14 * Math.pow(0.82, dangerSampleScreamCount))
+        : 0.14;
       playDangerScreamSample({
         url: url,
-        gain: Math.max(0.035, 0.14 * Math.pow(0.62, dangerSampleScreamCount)),
+        gain: gain,
         minPitch: 0.94,
         maxPitch: 1.06
       });
       dangerSampleScreamCount += 1;
       dangerSampleScreamTimer = window.setTimeout(
-        scheduleDangerSampleScreamPulse,
+        function () { scheduleDangerSampleScreamPulse(generation); },
         1800 + Math.random() * 1100
       );
     };
@@ -193,19 +203,25 @@
     }
     loadDangerScreamSample(url).then(function (buffer) {
       if (buffer) play(buffer);
-      else if (dangerSampleScreamActive) {
-        dangerSampleScreamTimer = window.setTimeout(scheduleDangerSampleScreamPulse, 900);
+      else if (dangerSampleScreamActive && generation === dangerSampleScreamGeneration) {
+        dangerSampleScreamTimer = window.setTimeout(function () {
+          scheduleDangerSampleScreamPulse(generation);
+        }, 900);
       }
     });
   }
 
-  function startDangerScreamSamples() {
-    if (dangerSampleScreamActive) return;
+  function startDangerScreamSamples(options) {
+    options = options || {};
+    var reset = options.reset === true;
+    var decay = options.decay !== false;
+    if (dangerSampleScreamActive && !reset) return;
     stopDangerScreamSamples();
     if (!ensureCtx()) return;
     dangerSampleScreamActive = true;
     dangerSampleScreamCount = 0;
-    scheduleDangerSampleScreamPulse();
+    dangerSampleScreamDecayEnabled = decay;
+    scheduleDangerSampleScreamPulse(dangerSampleScreamGeneration);
   }
 
 

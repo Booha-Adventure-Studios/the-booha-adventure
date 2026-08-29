@@ -3137,7 +3137,7 @@ const HAPPY_HOUSE_PORTAL = {
     booha_destruction: { src: 'assets/destruction/optimized/booha_helmet_256.webp', alt: 'Booha helmet' },
     feed_booha:        { src: 'assets/feed/boo-eat.webp',                      alt: 'Booha eating' },
     booha_invaders:    { src: 'assets/invaders/bug-1.webp',                     alt: 'Booha invader' },
-    booha_blocks:      { src: 'assets/blocks/red_block.png',                   alt: 'Red block' },
+    booha_blocks:      { src: 'assets/blocks/red_block.webp',                   alt: 'Red block' },
   };
 
   function injectBonusPopOverlay() {
