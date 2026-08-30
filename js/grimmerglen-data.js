@@ -206,6 +206,10 @@
         return `assets/img/grimmerglen/marietta/marietta_${pose}.webp`;
       })
     },
+    dance: {
+      marietta: Array.from({ length: 3 }, (_, index) => `assets/img/grimmerglen/dance/marietta_dance_${String(index + 1).padStart(2, '0')}.webp`),
+      booha: Array.from({ length: 3 }, (_, index) => `assets/img/grimmerglen/dance/booha_grimmerglen_dance_${String(index + 1).padStart(2, '0')}.webp`)
+    },
     collectibles: {
       banner: 'assets/img/grimmerglen/collectibles/banner.webp',
       ticket: 'assets/img/grimmerglen/collectibles/ticket.webp',
