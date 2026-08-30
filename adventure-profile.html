@@ -961,6 +961,8 @@
       <!-- Hidden until BoohaUnlockSystem.isMuenbaUnlocked() — see the
            small script near the end of body that toggles this. -->
       <a href="muenba-profile.html" id="pnet-muenba" hidden>MUENBA <small>むえんば</small></a>
+      <!-- Hidden until the Grimmerglen world is opened. -->
+      <a href="grimmerglen-profile.html" id="pnet-grimmerglen" hidden>GRIMMERGLEN <small>グリマーグレン</small></a>
     </nav>
   </header>
 
@@ -1136,5 +1138,26 @@
 </script>
 
 
+  <script>
+    // Grimmerglen is a dormant menu door until its weekly/build gate opens.
+    (function () {
+      var tab = document.getElementById('pnet-grimmerglen');
+      if (!tab) return;
+      function renderGrimmerglenTab() {
+        var open = false;
+        try {
+          open = !!(window.BoohaUnlockSystem &&
+            typeof BoohaUnlockSystem.isGrimmerglenUnlocked === 'function' &&
+            BoohaUnlockSystem.isGrimmerglenUnlocked());
+        } catch (_) {}
+        tab.hidden = !open;
+      }
+      if (window.BOOHA_READY) renderGrimmerglenTab();
+      else document.addEventListener('booha:ready', renderGrimmerglenTab, { once: true });
+      document.addEventListener('booha:saved', renderGrimmerglenTab);
+      document.addEventListener('booha:weeklyReset', renderGrimmerglenTab);
+      document.addEventListener('booha:newWeek', renderGrimmerglenTab);
+    })();
+  </script>
 </body>
 </html>

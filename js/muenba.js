@@ -382,6 +382,8 @@
   let ghostRoomMapDay = null;
   let ghostRoomMapWeek = null;
   let ghostRoomMapAvailabilityKey = '';
+  let huntGhostOrderCache = null;
+  let huntGhostOrderCacheWeek = null;
   const ghostSpriteCache = new Map();
   let hideBtn = null;
   let captureOverlay = null;
@@ -1839,6 +1841,34 @@
     return ids.map(caseId => cases[caseId]).filter(Boolean);
   }
 
+  // The profile keeps the authored case order for reading, but the live hunt
+  // gets a fresh, week-stable order. Persisting the shuffle means a redraw or
+  // a return visit cannot quietly move the player's current target while a
+  // new week still feels different from the last one.
+  function getMuenbaHuntGhostOrder() {
+    const weekKey = _muenbaWeekKey() || 'no-week';
+    if (huntGhostOrderCache && huntGhostOrderCacheWeek === weekKey) return huntGhostOrderCache;
+    const ghostIds = GHOSTS.map(ghost => ghost.id);
+    const stored = readMuenba();
+    const savedOrder = Array.isArray(stored.huntGhostOrder) && stored.huntGhostOrderWeek === weekKey
+      ? stored.huntGhostOrder
+      : null;
+    const isValid = savedOrder && savedOrder.length === ghostIds.length && ghostIds.every(id => savedOrder.includes(id));
+    const order = isValid
+      ? savedOrder.slice()
+      : _muenbaShuffle(ghostIds, `${weekKey}|muenbaHuntGhostOrder|${Date.now()}|${Math.random()}`);
+    huntGhostOrderCache = order;
+    huntGhostOrderCacheWeek = weekKey;
+    if (!isValid) writeMuenba({ huntGhostOrder: order, huntGhostOrderWeek: weekKey });
+    return order;
+  }
+
+  function randomizedMuenbaCases() {
+    const cases = orderedMuenbaCases();
+    const byGhostId = new Map(cases.map(caseData => [caseData.ghostId, caseData]));
+    return getMuenbaHuntGhostOrder().map(ghostId => byGhostId.get(ghostId)).filter(Boolean);
+  }
+
   function completedMuenbaCaseIds() {
     const mu = readMuenba();
     const progressIds = mu.caseProgress && Array.isArray(mu.caseProgress.completedCaseIds)
@@ -1852,13 +1882,16 @@
 
   function nextMuenbaCase() {
     const mode = getMuenbaReadingDifficulty();
-    return orderedMuenbaCases().find(caseData => !caseModeIsComplete(caseData, mode)) || null;
+    return randomizedMuenbaCases().find(caseData => !caseModeIsComplete(caseData, mode)) || null;
   }
 
   function availableMuenbaGhostsThisWeek() {
     const weeklyFound = readMuenba().weeklyGhostsFound;
     const activeCaseGhost = activeMuenbaCaseGhost();
-    return GHOSTS.filter(ghost => ghost.id === (activeCaseGhost && activeCaseGhost.id) || !weeklyFound || !weeklyFound[ghost.id]);
+    const byId = new Map(GHOSTS.map(ghost => [ghost.id, ghost]));
+    return getMuenbaHuntGhostOrder()
+      .map(ghostId => byId.get(ghostId))
+      .filter(ghost => ghost && (ghost.id === (activeCaseGhost && activeCaseGhost.id) || !weeklyFound || !weeklyFound[ghost.id]));
   }
 
   // Energy is collected once per week, but the selected memory mode can leave

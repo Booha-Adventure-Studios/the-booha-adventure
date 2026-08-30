@@ -105,7 +105,7 @@
   let mariettaPanel = null, mariettaPanelOpen = false, mariettaPanelCooldown = 0;
   let carriedObject = null, handoffObject = null;
   let returnPortalOverlay = null, returnPortalOpen = false, returnPortalCooldownUntil = 0;
-  let objectProgressCache = null, objectSlotsCache = null;
+  let objectProgressCache = null, objectSlotsCache = null, activeTargetTypeCache = null;
   let lastTouchEnd = 0;
   const imageCache = new Map();
   const objectImageCache = new Map();
@@ -1170,8 +1170,31 @@
   }
 
   function getActiveGrimmerglenTargetType() {
+    if (activeTargetTypeCache && getGrimmerglenObjectsProgress()[activeTargetTypeCache]?.found < 3) {
+      return activeTargetTypeCache;
+    }
     const progress = getGrimmerglenObjectsProgress();
-    return (DATA.objectTypes || []).find(type => progress[type] && progress[type].found < 3) || null;
+    const unfinished = (DATA.objectTypes || []).filter(type => progress[type] && progress[type].found < 3);
+    if (!unfinished.length) {
+      activeTargetTypeCache = null;
+      if (readGrimmerglen().activeTargetType) writeGrimmerglen({ activeTargetType: null });
+      return null;
+    }
+
+    const savedTarget = readGrimmerglen().activeTargetType;
+    if (unfinished.includes(savedTarget)) {
+      activeTargetTypeCache = savedTarget;
+      return savedTarget;
+    }
+
+    // Each memory lane gets its own stable target until that lane is solved.
+    // The first target is chosen once and persisted, so a redraw never changes
+    // the object Booha is currently looking for; after a return, the next lane
+    // is freshly chosen from the remaining unfinished memories.
+    const nextTarget = unfinished[Math.floor(Math.random() * unfinished.length)];
+    activeTargetTypeCache = nextTarget;
+    writeGrimmerglen({ activeTargetType: nextTarget });
+    return nextTarget;
   }
 
   function writeGrimmerglenCarriedObject(object) {
@@ -1204,6 +1227,7 @@
     if (ok) {
       objectProgressCache = null;
       objectSlotsCache = objectSlots;
+      activeTargetTypeCache = null;
       carriedObject = null;
     }
     return ok;
