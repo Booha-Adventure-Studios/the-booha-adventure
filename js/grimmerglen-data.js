@@ -36,16 +36,17 @@
     return { dir, x: point.x, y: point.y, to, spawn };
   }
 
-  // Original 3x3 grid. room_01 is bottom-left and hosts Marietta / the entry
-  // from Karasuki. Layout (rows bottom-to-top):
+  // 5x3 grid. room_01 is bottom-left and hosts Marietta / the entry from
+  // Karasuki. Layout (rows bottom-to-top):
+  //   13  14  15
+  //   10  11  12
   //   07  08  09
   //   04  05  06
   //   01  02  03
   const NPP = {
     room_01: [
       exit('right', 'room_02', 'fromLeft'),
-      exit('up',    'room_04', 'fromDown'),
-      exit('left',  'room_15', 'fromRight')
+      exit('up',    'room_04', 'fromDown')
     ],
     room_02: [
       exit('left',  'room_01', 'fromRight', { x: 502, y: 521 }),
@@ -70,8 +71,7 @@
     room_06: [
       exit('down', 'room_03', 'fromUp'),
       exit('left', 'room_05', 'fromRight'),
-      exit('up',   'room_09', 'fromDown'),
-      exit('right','room_14', 'fromLeft')
+      exit('up',   'room_09', 'fromDown')
     ],
     room_07: [
       exit('down',  'room_04', 'fromUp'),
@@ -89,26 +89,32 @@
     ],
     room_10: [
       exit('down',  'room_07', 'fromUp'),
-      exit('right', 'room_11', 'fromLeft')
+      exit('right', 'room_11', 'fromLeft'),
+      exit('up',    'room_13', 'fromDown')
     ],
     room_11: [
       exit('left',  'room_10', 'fromRight'),
       exit('right', 'room_12', 'fromLeft'),
-      exit('down',  'room_08', 'fromUp')
+      exit('down',  'room_08', 'fromUp'),
+      exit('up',    'room_14', 'fromDown')
     ],
     room_12: [
       exit('left',  'room_11', 'fromRight'),
-      exit('right', 'room_13', 'fromLeft'),
-      exit('down',  'room_09', 'fromUp')
+      exit('down',  'room_09', 'fromUp'),
+      exit('up',    'room_15', 'fromDown')
     ],
     room_13: [
-      exit('left', 'room_12', 'fromRight')
+      exit('down',  'room_10', 'fromUp'),
+      exit('right', 'room_14', 'fromLeft')
     ],
     room_14: [
-      exit('left', 'room_06', 'fromRight')
+      exit('left',  'room_13', 'fromRight'),
+      exit('right', 'room_15', 'fromLeft'),
+      exit('down',  'room_11', 'fromUp')
     ],
     room_15: [
-      exit('right', 'room_01', 'fromLeft')
+      exit('left', 'room_14', 'fromRight'),
+      exit('down', 'room_12', 'fromUp')
     ]
   };
 
@@ -258,19 +264,19 @@
     // anything that walks one can index the other directly.
     objectTypes: ['banner', 'ticket', 'pillow', 'backpack', 'book', 'teddyBear', 'toGoCoffeeCup', 'ball'],
 
-    // Placement manifest -- 8 types x 3 instance slots. Each type's three
-    // copies live in different rooms, while rooms may hold several different
-    // object types. Coordinates stay in the current generous cross-corridor
-    // walkable shape until the later per-room calibration pass.
+    // Placement manifest -- 8 types x 3 instance slots. room_01 is reserved
+    // for Marietta and the Karasuki return portal, so every memory object is
+    // distributed across rooms 02-15. Runtime positions rotate through the
+    // clearings on each room visit.
     objects: {
-      banner:        [ { room: 'room_10', x: 260,  y: 420 }, { room: 'room_02', x: 260,  y: 420 }, { room: 'room_03', x: 1260, y: 650 } ],
-      ticket:        [ { room: 'room_11', x: 1260, y: 650 }, { room: 'room_05', x: 250,  y: 650 }, { room: 'room_06', x: 1240, y: 400 } ],
-      pillow:        [ { room: 'room_12', x: 600,  y: 690 }, { room: 'room_04', x: 250,  y: 650 }, { room: 'room_06', x: 450,  y: 650 } ],
-      backpack:      [ { room: 'room_02', x: 760,  y: 580 }, { room: 'room_05', x: 760,  y: 390 }, { room: 'room_07', x: 250,  y: 420 } ],
-      book:          [ { room: 'room_02', x: 1240, y: 660 }, { room: 'room_03', x: 420,  y: 600 }, { room: 'room_07', x: 1250, y: 680 } ],
-      teddyBear:     [ { room: 'room_03', x: 900,  y: 700 }, { room: 'room_06', x: 900,  y: 600 }, { room: 'room_08', x: 250,  y: 650 } ],
-      toGoCoffeeCup: [ { room: 'room_04', x: 1080, y: 680 }, { room: 'room_07', x: 760,  y: 600 }, { room: 'room_09', x: 260,  y: 650 } ],
-      ball:          [ { room: 'room_05', x: 1250, y: 650 }, { room: 'room_08', x: 1200, y: 420 }, { room: 'room_09', x: 1240, y: 650 } ]
+      banner:        [ { room: 'room_02', x: 500,  y: 220 }, { room: 'room_10', x: 520,  y: 840 }, { room: 'room_08', x: 1040, y: 220 } ],
+      ticket:        [ { room: 'room_03', x: 1040, y: 840 }, { room: 'room_07', x: 190,  y: 540 }, { room: 'room_11', x: 500,  y: 220 } ],
+      pillow:        [ { room: 'room_04', x: 1040, y: 840 }, { room: 'room_12', x: 520,  y: 840 }, { room: 'room_10', x: 1040, y: 220 } ],
+      backpack:      [ { room: 'room_05', x: 500,  y: 220 }, { room: 'room_13', x: 1040, y: 840 }, { room: 'room_04', x: 520,  y: 220 } ],
+      book:          [ { room: 'room_06', x: 1040, y: 220 }, { room: 'room_14', x: 520,  y: 840 }, { room: 'room_05', x: 1040, y: 840 } ],
+      teddyBear:     [ { room: 'room_07', x: 520,  y: 840 }, { room: 'room_15', x: 1040, y: 840 }, { room: 'room_11', x: 1040, y: 220 } ],
+      toGoCoffeeCup: [ { room: 'room_08', x: 190,  y: 540 }, { room: 'room_02', x: 1040, y: 840 }, { room: 'room_06', x: 190,  y: 540 } ],
+      ball:          [ { room: 'room_09', x: 1340, y: 540 }, { room: 'room_03', x: 500,  y: 840 }, { room: 'room_07', x: 1340, y: 540 } ]
     },
 
     // The 8 objects' typing content -- one GrimmerglenTyping.renderExercise()

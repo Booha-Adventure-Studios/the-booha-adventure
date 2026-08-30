@@ -308,7 +308,7 @@
         size: 1.6 + (i % 4) * 0.6
       });
     }
-    for (let i = 0; i < 16; i++) {
+    for (let i = 0; i < 48; i++) {
       const side = i % 4;
       const lane = (i + 1) / 17;
       const inset = 28 + ((seed * 19 + i * 23) % 105);
@@ -317,7 +317,7 @@
         x: side < 2 ? lane * WORLD_W : (side === 2 ? inset : WORLD_W - inset),
         y: side < 2 ? (side === 0 ? inset : WORLD_H - inset) : lane * WORLD_H,
         phase: seed * .7 + i * 1.83,
-        size: 4 + (i % 3) * 1.1,
+        size: 5.5 + (i % 4) * 1.2,
         speed: .34 + (i % 4) * .07
       });
     }
@@ -348,21 +348,21 @@
     const rgb = getRoomGlowRgb(state.roomId);
     const seconds = now / 1000;
     for (const leaf of edgeLeaves) {
-      const sway = Math.sin(seconds * leaf.speed + leaf.phase) * 22;
-      const bob = Math.cos(seconds * leaf.speed * 1.35 + leaf.phase) * 16;
+      const sway = Math.sin(seconds * leaf.speed + leaf.phase) * 30;
+      const bob = Math.cos(seconds * leaf.speed * 1.35 + leaf.phase) * 22;
       let x = leaf.x;
       let y = leaf.y;
       if (leaf.side < 2) { x += sway; y += bob; }
       else { x += bob; y += sway; }
       const rotation = seconds * (leaf.side % 2 ? -.18 : .18) + leaf.phase;
-      const alpha = .28 + .12 * Math.sin(seconds * 1.4 + leaf.phase);
+      const alpha = .4 + .16 * Math.sin(seconds * 1.4 + leaf.phase);
       atmosphereCtx.save();
       atmosphereCtx.translate(x, y);
       atmosphereCtx.rotate(rotation);
       atmosphereCtx.globalAlpha = alpha;
       atmosphereCtx.fillStyle = `rgb(${rgb.r},${rgb.g},${rgb.b})`;
       atmosphereCtx.shadowColor = `rgba(${rgb.r},${rgb.g},${rgb.b},.75)`;
-      atmosphereCtx.shadowBlur = 7;
+      atmosphereCtx.shadowBlur = 11;
       atmosphereCtx.beginPath();
       atmosphereCtx.moveTo(0, -leaf.size);
       atmosphereCtx.quadraticCurveTo(leaf.size * 1.15, -leaf.size * .15, 0, leaf.size);
@@ -418,9 +418,13 @@
     return image;
   }
 
+  function getRoomExits(roomId) {
+    return (DATA.rooms[roomId]?.exits || []).filter(exit => exit && DATA.rooms[exit.to]);
+  }
+
   function preloadAdjacent(roomId) {
     getImage(roomId);
-    for (const exit of DATA.rooms[roomId].exits || []) getImage(exit.to);
+    for (const exit of getRoomExits(roomId)) getImage(exit.to);
   }
 
   function getSpawn(room, spawnId) {
@@ -534,7 +538,7 @@
     if (now < state.transitionReadyAt || now < state.spawnLockUntil) return null;
     if (state.distMovedSinceSpawn < ARROW_MOVE_THRESHOLD) return null;
     const backDir = state.arrivalDir ? OPPOSITE[state.arrivalDir] : null;
-    for (const exit of getRoom().exits || []) {
+    for (const exit of getRoomExits(state.roomId)) {
       if (Math.hypot(state.x - exit.x, state.y - exit.y) > EXIT_RADIUS) continue;
       if (exit.dir === backDir && now < state.spawnLockUntil + ARRIVAL_ARROW_BACK_DELAY_MS) continue;
       return exit;
@@ -560,7 +564,7 @@
 
   // ── Drawing ──────────────────────────────────────────────────────────────
   function drawExitArrows(now) {
-    const exits = getRoom().exits || [];
+    const exits = getRoomExits(state.roomId);
     const reveal = Math.min(1, state.distMovedSinceSpawn / ARROW_MOVE_THRESHOLD);
     if (reveal <= 0) return;
     const backDir = state.arrivalDir ? OPPOSITE[state.arrivalDir] : null;
