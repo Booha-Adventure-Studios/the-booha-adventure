@@ -137,6 +137,47 @@
     };
   }
 
+  const MEMORY_STORIES = {
+    banner: { en: 'I remember making this with my friend. We hung it up when the room felt too quiet.', jp: '友達とこれを作ったのを覚えている。部屋が静かすぎるとき、これをかざしたの。', readings: { '友達': 'ともだち', '作った': 'つくった', '覚えている': 'おぼえている', '部屋': 'へや', '静か': 'しずか', 'かざした': 'かざした' } },
+    ticket: { en: 'I remember holding this before I rode my bike to meet a friend.', jp: '友達に会うために自転車に乗る前、これを持っていたのを覚えている。', readings: { '友達': 'ともだち', '会う': 'あう', '自転車': 'じてんしゃ', '乗る': 'のる', '前': 'まえ', '持っていた': 'もっていた', '覚えている': 'おぼえている' } },
+    pillow: { en: 'I remember resting here after a long day with my friends.', jp: '友達と長い一日を過ごしたあと、ここで休んだのを覚えている。', readings: { '友達': 'ともだち', '長い': 'ながい', '一日': 'いちにち', '過ごした': 'すごした', '休んだ': 'やすんだ', '覚えている': 'おぼえている' } },
+    backpack: { en: 'I remember carrying my favorite daydreams in this.', jp: 'お気に入りの夢をこれに入れて運んだのを覚えている。', readings: { 'お気に入り': 'おきにいり', '夢': 'ゆめ', '入れて': 'いれて', '運んだ': 'はこんだ', '覚えている': 'おぼえている' } },
+    book: { en: 'I remember writing in this for October. She is my friend, and we always meet around Halloween time.', jp: 'オクトーバーのためにこれに書いたのを覚えている。オクトーバーは友達で、いつもハロウィンのころに会うの。', readings: { '書いた': 'かいた', '覚えている': 'おぼえている', '友達': 'ともだち', '会う': 'あう' } },
+    teddyBear: { en: 'I remember hugging this when the night felt a little spooky.', jp: '夜が少しこわく感じたとき、これを抱きしめたのを覚えている。', readings: { '夜': 'よる', '少し': 'すこし', '感じた': 'かんじた', '抱きしめた': 'だきしめた', '覚えている': 'おぼえている' } },
+    toGoCoffeeCup: { en: 'I remember drinking a warm cup of pamuri while watching the clouds.', jp: '雲を見ながら、あたたかいパムリを飲んだのを覚えている。', readings: { '雲': 'くも', '見ながら': 'みながら', '飲んだ': 'のんだ', '覚えている': 'おぼえている' } },
+    ball: { en: 'I remember playing games every day with my friend.', jp: '友達と毎日ゲームをして遊んだのを覚えている。', readings: { '友達': 'ともだち', '毎日': 'まいにち', '遊んだ': 'あそんだ', '覚えている': 'おぼえている' } }
+  };
+
+  const MEMORY_CONTENT = {
+    banner: { target: 'I made this with my friend.', jp: 'わたしは友達とこれを作った。', readings: { '友達': 'ともだち', '作った': 'つくった' }, full: ['I made this with my friend.', 'I played games with my friend.', 'I wrote this with my friend.'], partial: ['I made …', 'I played …', 'I wrote …'] },
+    ticket: { target: 'I rode my bike to meet a friend.', jp: 'わたしは友達に会うために自転車に乗った。', readings: { '友達': 'ともだち', '会う': 'あう', '自転車': 'じてんしゃ', '乗った': 'のった' }, full: ['I rode my bike to meet a friend.', 'I played games with a friend.', 'I wrote a letter to a friend.'], partial: ['I rode …', 'I played …', 'I wrote …'] },
+    pillow: { target: 'I rested here after a long day.', jp: '長い一日のあと、ここで休んだ。', readings: { '長い': 'ながい', '一日': 'いちにち', '休んだ': 'やすんだ' }, full: ['I rested here after a long day.', 'I played here after a long day.', 'I slept here after a long day.'], partial: ['I rested …', 'I played …', 'I slept …'] },
+    backpack: { target: 'I carry my favorite daydreams in this.', jp: 'お気に入りの夢をこれに入れて運ぶ。', readings: { 'お気に入り': 'おきにいり', '夢': 'ゆめ', '入れて': 'いれて', '運ぶ': 'はこぶ' }, full: ['I carry my favorite daydreams in this.', 'I keep my favorite books in this.', 'I carry my favorite snacks in this.'], partial: ['I carry …', 'I keep …', 'I carry …'] },
+    book: { target: 'I write in my book.', jp: 'わたしは本に書く。', readings: { '本': 'ほん', '書く': 'かく' }, full: ['I ride my bike.', 'I play games every day.', 'I write in my book.'], partial: ['I ride …', 'I play …', 'I write …'] },
+    teddyBear: { target: 'I hug this when the night feels spooky.', jp: '夜がこわいとき、これを抱きしめる。', readings: { '夜': 'よる', '抱きしめる': 'だきしめる' }, full: ['I hug this when the night feels spooky.', 'I hold this when the day feels sunny.', 'I play with this when the night feels quiet.'], partial: ['I hug …', 'I hold …', 'I play …'] },
+    toGoCoffeeCup: { target: 'I drink a warm cup of pamuri.', jp: 'あたたかいパムリを一杯飲む。', readings: { '温かい': 'あたたかい', '一杯': 'いっぱい', '飲む': 'のむ' }, full: ['I drink a warm cup of pamuri.', 'I make a warm cup of tea.', 'I carry a warm cup of cocoa.'], partial: ['I drink …', 'I make …', 'I carry …'] },
+    ball: { target: 'I play games every day with my friend.', jp: '友達と毎日ゲームをして遊ぶ。', readings: { '友達': 'ともだち', '毎日': 'まいにち', '遊ぶ': 'あそぶ' }, full: ['I play games every day with my friend.', 'I ride my bike every day with my friend.', 'I write stories every day with my friend.'], partial: ['I play …', 'I ride …', 'I write …'] }
+  };
+
+  function makeMemoryExercises() {
+    const exercises = {};
+    Object.keys(MEMORY_CONTENT).forEach(type => {
+      const item = MEMORY_CONTENT[type];
+      const base = {
+        promptEn: 'Type the sentence you remember.',
+        promptJp: '思い出した文をタイプしてね。',
+        promptReadings: { '思い出した': 'おもいだした', '文': 'ぶん' },
+        accepted: [item.target.replace(/[.!?]+$/, '')]
+      };
+      exercises[type] = {
+        start: Object.assign({}, base, { options: item.full, optionsVisible: true }),
+        case: Object.assign({}, base, { options: item.partial, optionsVisible: true }),
+        deep: Object.assign({}, base, { options: null, optionsVisible: false, helpText: item.jp, helpReadings: item.readings })
+      };
+    });
+    return exercises;
+  }
+
   window.GRIMMERGLEN_DATA = {
     world: { width: WORLD_W, height: WORLD_H },
     worldWidth: WORLD_W,
@@ -216,7 +257,9 @@
     // shortened to first names only in the graded sentences to keep typing
     // difficulty in line with each tier, not because the names themselves
     // were a problem -- easy to restore in full during real content review.
-    memories: {
+    // Retained as a content reference while the live exercises below use the
+    // clarified same-sentence, fading-helper design.
+    legacyMemories: {
       banner: {
         start: {
           promptEn: 'I made this banner.',
@@ -425,6 +468,9 @@
           optionsVisible: false
         }
       }
-    }
+    },
+
+    stories: MEMORY_STORIES,
+    memories: makeMemoryExercises()
   };
 })();
