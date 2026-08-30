@@ -106,7 +106,7 @@ const CURRENT_CACHES = {
   // normalized to compact 44.1 kHz mono 112 kbps MP3 and trimmed to 3 seconds.
   // Grimmerglen visual polish: room-01 is object-free, room-12 is refreshed,
   // collectibles are smaller, and room-colored vignette leaves are live.
-  assets: 'booha-assets-2026-438',
+  assets: 'booha-assets-2026-439',
   decks:  'booha-decks-2026-310',
 };
 
