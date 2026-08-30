@@ -1,7 +1,7 @@
 /*
  * Grimmerglen world shell — Pass 8 placement and pickup foundation.
  *
- * This is the room-walker engine: 9 rooms, fade transitions, exit arrows,
+ * This is the room-walker engine: 15 rooms, fade transitions, exit arrows,
  * entry drift, movement/collision, Marietta's card, and the 24-object memory
  * hunt. Cloned from Muenba's engine shape (js/muenba.js) with everything
  * Muenba-specific stripped out (no ghosts, rhythm game, or case/briefing
@@ -16,7 +16,7 @@
  * has walked all nine rooms with the DEV overlay.
  *   - Exit coordinates and walkable rectangles are placeholders (see
  *     grimmerglen-data.js) — tune them per room with the DEV overlay below
- *     once someone has actually walked all 9 rooms.
+ *     once someone has actually walked all 15 rooms.
  */
 (() => {
   'use strict';
@@ -524,11 +524,19 @@
     if (!MARIETTA || state.roomId !== MARIETTA.roomId) return;
     if (!mariettaImg.complete || mariettaImg.naturalWidth === 0) return;
     const seconds = now / 1000;
-    const bob = REDUCED_MOTION ? 0 : Math.sin(seconds * 2.6) * 6;
+    const pulse = REDUCED_MOTION ? .82 : .72 + Math.sin(seconds * 2.2) * .1;
     const size = MARIETTA.drawR * 2;
     actorCtx.save();
+    const halo = actorCtx.createRadialGradient(MARIETTA.x, MARIETTA.y, 5, MARIETTA.x, MARIETTA.y, size * 1.45);
+    halo.addColorStop(0, `rgba(255,245,252,${.72 * pulse})`);
+    halo.addColorStop(.45, `rgba(255,159,194,${.28 * pulse})`);
+    halo.addColorStop(1, 'rgba(184,164,255,0)');
+    actorCtx.fillStyle = halo;
+    actorCtx.beginPath();
+    actorCtx.arc(MARIETTA.x, MARIETTA.y, size * 1.45, 0, Math.PI * 2);
+    actorCtx.fill();
     actorCtx.globalAlpha = .98;
-    actorCtx.drawImage(mariettaImg, MARIETTA.x - size / 2, MARIETTA.y - size / 2 + bob, size, size);
+    actorCtx.drawImage(mariettaImg, MARIETTA.x - size / 2, MARIETTA.y - size / 2, size, size);
     actorCtx.restore();
   }
 
@@ -621,10 +629,11 @@
 
   function isGrimmerglenObjectFound(object, progress, slots) {
     if (slots[object.id] === true) return true;
-    // Compatibility with an early save made before exact instance IDs were
-    // written. New saves use objectSlots and can therefore be found in any
-    // order; legacy count-only saves hide their first N manifest slots.
-    return !Object.keys(slots).length && object.index < (progress[object.type]?.found || 0);
+    // Early count-only saves did not record which physical copy was found.
+    // Do not guess that the first manifest slot was found: most first slots
+    // live in room_01, which made its hunted items disappear in test saves.
+    // Exact objectSlots are authoritative for all new pickups.
+    return false;
   }
 
   function drawGrimmerglenObjects(now) {
@@ -1266,11 +1275,6 @@
     Object.keys(progress).forEach(t => { stored[t] = { found: progress[t].found }; });
     stored[type] = { found: Math.min(3, progress[type].found + 1) };
     const objectSlots = Object.assign({}, getGrimmerglenObjectSlots());
-    if (!Object.keys(objectSlots).length && progress[type].found > 0) {
-      for (let index = 0; index < progress[type].found; index++) {
-        objectSlots[`${type}-${index + 1}`] = true;
-      }
-    }
     if (slotId) objectSlots[slotId] = true;
     const ok = writeGrimmerglen({ objects: stored, objectSlots, carriedObjectId: null });
     if (ok) {
