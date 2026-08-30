@@ -81,7 +81,8 @@
     musicStarted: false,
     lastTickTime: 0,
     speed: BASE_SPEED,
-    returnExiting: false
+    returnExiting: false,
+    boohaTransformed: false
   };
 
   let app, stage, roomLayer, atmosphereCanvas, atmosphereCtx, actorCanvas, actorCtx, fadeEl, currentBg;
@@ -97,6 +98,17 @@
   const boohaImg = new Image();
   boohaImg.decoding = 'async';
   boohaImg.src = 'assets/img/booha_ghost.webp';
+
+  // Booha's Grimmerglen sprite -- swapped in once the player is actually
+  // inside (see triggerBoohaTransformIfNeeded()/playBoohaTransform() near
+  // the tutorial section below), with a one-time shake + sparkle burst +
+  // WebAudio cue when the swap happens live rather than silently.
+  const boohaGrimmerglenImg = new Image();
+  boohaGrimmerglenImg.decoding = 'async';
+  boohaGrimmerglenImg.src = 'assets/img/grimmerglen/booha_grimmerglen.webp';
+  let boohaShakeUntil = 0;
+  let boohaShakeSeed = Math.random() * 1000;
+  const boohaTransformParticles = [];
 
   const mariettaImg = new Image();
   if (MARIETTA && MARIETTA.poses && MARIETTA.poses[0]) {
@@ -403,13 +415,21 @@
     const seconds = now / 1000;
     const bob = Math.sin(seconds * 4.18) * 8;
     const wobble = Math.sin(seconds * 8.36) * 2.2;
+    // Cute shake while the transform is fresh -- decays to nothing over
+    // the same ~520ms window boohaShakeUntil was set for.
+    const shakeActive = !REDUCED_MOTION && now < boohaShakeUntil;
+    const shakeT = shakeActive ? (boohaShakeUntil - now) / 520 : 0;
+    const shakeX = shakeActive ? Math.sin(now * 0.12 + boohaShakeSeed) * 7 * shakeT : 0;
+    const shakeY = shakeActive ? Math.cos(now * 0.17 + boohaShakeSeed) * 5 * shakeT : 0;
+    const shakeWobble = shakeActive ? Math.sin(now * 0.2 + boohaShakeSeed) * 10 * shakeT : 0;
     actorCtx.save();
-    actorCtx.translate(state.x, state.y + bob);
-    actorCtx.rotate(wobble * Math.PI / 180);
+    actorCtx.translate(state.x + shakeX, state.y + bob + shakeY);
+    actorCtx.rotate((wobble + shakeWobble) * Math.PI / 180);
     actorCtx.globalAlpha = .96;
-    if (boohaImg.complete && boohaImg.naturalWidth > 0) {
+    const sprite = state.boohaTransformed ? boohaGrimmerglenImg : boohaImg;
+    if (sprite.complete && sprite.naturalWidth > 0) {
       const boxSize = BOOHA_R * 2;
-      actorCtx.drawImage(boohaImg, -boxSize / 2, -boxSize / 2, boxSize, boxSize);
+      actorCtx.drawImage(sprite, -boxSize / 2, -boxSize / 2, boxSize, boxSize);
     } else {
       actorCtx.fillStyle = '#ffe56d';
       actorCtx.beginPath();
@@ -417,6 +437,105 @@
       actorCtx.fill();
     }
     actorCtx.restore();
+  }
+
+  // Sparkle-burst particles for the transform reveal -- canvas-native
+  // (drawn on actorCtx, same as drawBooha itself) rather than the DOM/CSS
+  // particle technique grimmerglen-typing.js uses for its correct-answer
+  // celebration, since Booha lives on a <canvas>, not in the DOM.
+  const BOOHA_TRANSFORM_COLORS = ['#ff9fc2', '#ffe066', '#8fd0ff', '#b8a4ff', '#8fe6c4'];
+  function spawnBoohaTransformSparkles() {
+    if (REDUCED_MOTION) return;
+    boohaTransformParticles.length = 0;
+    const count = 16;
+    for (let i = 0; i < count; i++) {
+      const angle = (Math.PI * 2 * i) / count + Math.random() * 0.3;
+      const dist = 46 + Math.random() * 40;
+      boohaTransformParticles.push({
+        dx: Math.cos(angle) * dist,
+        dy: Math.sin(angle) * dist,
+        size: 3 + Math.random() * 3,
+        color: BOOHA_TRANSFORM_COLORS[i % BOOHA_TRANSFORM_COLORS.length],
+        bornAt: performance.now(),
+        lifeMs: 620 + Math.random() * 180
+      });
+    }
+  }
+
+  function drawBoohaTransformFX(now) {
+    if (!boohaTransformParticles.length) return;
+    for (let i = boohaTransformParticles.length - 1; i >= 0; i--) {
+      const p = boohaTransformParticles[i];
+      const age = now - p.bornAt;
+      if (age >= p.lifeMs) { boohaTransformParticles.splice(i, 1); continue; }
+      const t = age / p.lifeMs;
+      const ease = 1 - Math.pow(1 - t, 2);
+      const x = state.x + p.dx * ease;
+      const y = state.y + p.dy * ease;
+      actorCtx.save();
+      actorCtx.globalAlpha = (1 - t) * .95;
+      actorCtx.shadowBlur = 10;
+      actorCtx.shadowColor = p.color;
+      actorCtx.fillStyle = p.color;
+      actorCtx.beginPath();
+      actorCtx.arc(x, y, (1 - t * .55) * p.size, 0, Math.PI * 2);
+      actorCtx.fill();
+      actorCtx.restore();
+    }
+  }
+
+  // Own cute sparkly WebAudio cue for the transform -- a rising
+  // triangle-wave arpeggio, distinct from both playMariettaTypeTick()
+  // (a typewriter blip) and grimmerglen-typing.js's correct-answer chime.
+  let boohaTransformAudioCtx = null;
+  function playBoohaTransformChime() {
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      if (!boohaTransformAudioCtx) boohaTransformAudioCtx = new AC();
+      if (boohaTransformAudioCtx.state === 'suspended') boohaTransformAudioCtx.resume().catch(() => {});
+      const ctx = boohaTransformAudioCtx;
+      const now = ctx.currentTime;
+      const notes = [587.33, 739.99, 880, 1174.66];
+      notes.forEach((freq, i) => {
+        const start = now + i * 0.06;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, start);
+        osc.frequency.exponentialRampToValueAtTime(freq * 1.08, start + 0.14);
+        gain.gain.setValueAtTime(0.0001, start);
+        gain.gain.exponentialRampToValueAtTime(0.075, start + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.2);
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.start(start); osc.stop(start + 0.22);
+      });
+    } catch (_) {}
+  }
+
+  function playBoohaTransform() {
+    if (state.boohaTransformed) return;
+    state.boohaTransformed = true;
+    boohaShakeUntil = performance.now() + 520;
+    boohaShakeSeed = Math.random() * 1000;
+    spawnBoohaTransformSparkles();
+    playBoohaTransformChime();
+  }
+
+  // Fires once, right as the player actually arrives via the Karasuki
+  // portal (after entry drift finishes -- the same wait-for-arrival gate
+  // openMariettaPanelAfterEntry() uses below), so it reads as "the portal
+  // changed her" rather than replaying on every room change. A direct/DEV
+  // entry (no fromKarasuki spawn) skips the reveal and starts already
+  // transformed -- Booha is just always the Grimmerglen sprite once
+  // you're actually inside, whether or not you saw the moment it happened.
+  function triggerBoohaTransformIfNeeded() {
+    if (state.spawnId !== 'fromKarasuki') { state.boohaTransformed = true; return; }
+    const waitForArrival = () => {
+      if (!entryDrift) playBoohaTransform();
+      else window.requestAnimationFrame(waitForArrival);
+    };
+    window.requestAnimationFrame(waitForArrival);
   }
 
   function drawFrame(now) {
@@ -427,6 +546,7 @@
     drawReturnPortal(now);
     drawMarietta(now);
     drawBooha(now);
+    drawBoohaTransformFX(now);
   }
 
 
@@ -543,23 +663,34 @@
 
   // Marietta's lore intro -- prose-rich per the plan doc (deliberately
   // distinct from the typing content's simple sentences, which stay
-  // Pass 5/6's job). Explains why Grimmerglen exists and who Marietta is:
-  // cute *and* a little spooky, forgetful by nature, matching how fast
-  // daydreams/daymares arrive and how quickly they slip away again --
-  // instability is the point, not a bug to smooth over.
+  // Pass 5/6's job). Updated wholesale per the user's own verbatim script
+  // (two silent typo fixes: "the can't hurt you her" -> "they can't hurt
+  // you here"; the daymare framing dropped in favor of daydreams only,
+  // matching the new text exactly) plus two authored closing lines (not
+  // verbatim -- freely written) that carry the real narrative hook: she
+  // just remembered what she forgot, and needs Booha to find it. Those
+  // closing lines are what the tutorial launches from. No em dashes
+  // anywhere below, per the "going forward" style rule -- everything here
+  // and after uses commas/periods instead.
   const MARIETTA_DIALOGUE = [
-    { en: "Oh! Hello, hello! You found me — I'm Marietta!",
-      jp: 'あっ、こんにちは！わたしを見つけたのね。マリエッタです！' },
-    { en: 'Welcome to Grimmerglen. This is where daydreams and daymares end up.',
-      jp: 'ようこそ、グリマーグレンへ。ここは、たのしい夢と、こわい夢が集まる場所なの。' },
-    { en: 'Nobody knows why. They just arrive, one after another, and pile up all around us.',
+    { en: 'Oh! Hello, hello! You found me.',
+      jp: 'あっ、こんにちは、こんにちは！わたしを見つけたのね。' },
+    { en: 'Welcome to Grimmerglen. This is where daydreams end up.',
+      jp: 'ようこそ、グリマーグレンへ。ここは、夢がたどりつく場所なの。' },
+    { en: 'Nobody knows why, they just arrive, one after another, and pile up all around this place.',
       jp: 'どうしてかは、だれも知らない。夢たちは、つぎつぎとやってきて、ここにたまっていくの。' },
-    { en: "I'm a Marietta too — that's what my whole species is called! Funny, isn't it?",
-      jp: 'わたしも「マリエッタ」っていう種族なのよ。おなじ名前で、ちょっとおもしろいでしょ？' },
-    { en: "Some of the daymares look a little spooky. Don't worry — they can't hurt you here. Probably!",
-      jp: 'こわい夢も、ちょっとだけいるけど……だいじょうぶ、ここでは何もできないから。たぶん！' },
-    { en: 'I try to remember every one that comes through... but they slip away so fast, even for me.',
-      jp: 'やってきた夢を、ぜんぶ覚えていたいんだけど……わたしも、あっというまに忘れちゃうの。' }
+    { en: "I'm a Marietta too! That's my name and what my whole species is called! Funny, right?",
+      jp: 'わたしも「マリエッタ」なの！それが名前で、わたしたちの種族の名前でもあるのよ。おもしろいでしょ？' },
+    { en: "Some of the daydreams look a little strange. Don't worry, they can't hurt you here. Probably!",
+      jp: '夢の中には、ちょっと不思議に見えるものもあるの。だいじょうぶ、ここでは何もできないから。たぶん！' },
+    { en: 'If you have a daydream, that means a Marietta is nearby. We try to remember every one that comes through...but they slip away so fast.',
+      jp: '夢を見たなら、それは近くにマリエッタがいるということなの。やってきた夢を、ぜんぶ覚えていたいんだけど...でも、あっというまに忘れちゃうの。' },
+    { en: 'Oh! Wait a moment...I just remembered something!',
+      jp: 'あっ、ちょっと待って...たった今、思い出したことがあるの！' },
+    { en: 'I forgot something important, and I finally remembered what it was.',
+      jp: '大切なことを忘れていて、それが何だったのか、やっと思い出したの。' },
+    { en: 'Will you help me? I need Booha to find the things from my daydreams.',
+      jp: '手伝ってくれる？わたしの夢の中にあるものを、ブーハに見つけてほしいの。' }
   ];
 
   // Per-kanji-term reading map -- prose gets individual term readings
@@ -573,12 +704,20 @@
     '種族': 'しゅぞく',
     '名前': 'なまえ',
     '覚えて': 'おぼえて',
-    '忘れちゃう': 'わすれちゃう'
+    '忘れちゃう': 'わすれちゃう',
+    '不思議': 'ふしぎ',
+    '近く': 'ちかく',
+    '大切': 'たいせつ',
+    '手伝って': 'てつだって',
+    '見つけて': 'みつけて',
+    '忘れて': 'わすれて',
+    '待って': 'まって',
+    '今': 'いま'
   };
 
-  // PASS 6 HOOK: once the tutorial is built, its "Do you want to try
-  // first?" branch launches from the closing button below instead of
-  // just closing the panel back out to free exploration.
+  // Pass 6: the closing button below now launches the tutorial via
+  // handleMariettaDialogueClose() (defined in the TUTORIAL section further
+  // down, right after this function) instead of just closing the panel.
   function renderMariettaDialogue() {
     if (!mariettaPanel || !MARIETTA) return;
     mariettaPanel.innerHTML = `
@@ -610,7 +749,7 @@
       ).join('');
       actionsEl.style.opacity = '1';
       const closeBtn = mariettaPanel.querySelector('#mg-dialogue-close-btn');
-      if (closeBtn) closeBtn.addEventListener('click', closeMariettaPanel);
+      if (closeBtn) closeBtn.addEventListener('click', handleMariettaDialogueClose);
     }
 
     // Click anywhere on the card to skip straight to the end -- deferred
@@ -655,6 +794,213 @@
     }
 
     typeLine();
+  }
+
+  /* ===============================================
+     SAVE LAYER (pass 6, scoped narrowly)
+  =============================================== */
+  // Just enough of a data.grimmerglen save section to give the tutorial's
+  // tri-state flag somewhere real to live -- window.BoohaSaveFile (from
+  // js/core/save-file.js, already included on this page) exposes load()/
+  // save()/patch() directly, so this mirrors Muenba's own readMuenba()/
+  // writeMuenba() shape without needing a local loadSave()/writeSave()
+  // pair of its own. Room-visit totals and the per-object/tier progress
+  // schema stay Pass 7's job -- this only carries the tutorial slice
+  // forward early because Pass 6 needs it now.
+  function readGrimmerglen() {
+    try {
+      const d = window.BoohaSaveFile ? window.BoohaSaveFile.load() : {};
+      return (d && typeof d.grimmerglen === 'object' && d.grimmerglen) || {};
+    } catch (e) {
+      console.error('[Grimmerglen] Save read failed:', e);
+      return {};
+    }
+  }
+
+  function writeGrimmerglen(patchObj) {
+    try {
+      if (window.BoohaSaveFile && typeof window.BoohaSaveFile.patch === 'function') {
+        return window.BoohaSaveFile.patch('grimmerglen', patchObj);
+      }
+      console.error('[Grimmerglen] Save system unavailable -- progress NOT written.');
+      return false;
+    } catch (e) {
+      console.error('[Grimmerglen] Save write failed:', e);
+      return false;
+    }
+  }
+
+  function getGrimmerglenTutorial() {
+    const t = readGrimmerglen().tutorial;
+    return {
+      completed: !!(t && t.completed === true),
+      skipPrompted: !!(t && t.skipPrompted === true)
+    };
+  }
+
+  function writeGrimmerglenTutorial(patchObj) {
+    const current = getGrimmerglenTutorial();
+    return writeGrimmerglen({ tutorial: Object.assign({}, current, patchObj) });
+  }
+
+  /* ===============================================
+     TUTORIAL (pass 6)
+  =============================================== */
+  // Mandatory the very first time the player finishes Marietta's dialogue
+  // (data.grimmerglen.tutorial.completed === false, .skipPrompted ===
+  // false): launches straight into the 3-step sequence, no choice asked,
+  // and skipPrompted flips true the moment that happens -- that's the
+  // tri-state's whole reason for existing, a "used their one mandatory
+  // pass" marker distinct from "never seen" and from "finished." Every
+  // later entry (completed still false, skipPrompted already true) shows
+  // a small ask-first-or-not screen instead of forcing it. Once completed
+  // is true, "Talk to Marietta" never surfaces the tutorial again -- just
+  // free chat, same as before this pass existed.
+  //
+  // Fading-support arc per the plan doc: options -> options -> none.
+  // Step 3 repeats step 1's question on purpose (pure recall of what was
+  // just practiced, not a new question) rather than adding a fourth topic.
+  const GRIMMERGLEN_TUTORIAL_STEPS = [
+    {
+      promptEn: 'How are you today?',
+      promptJp: '今日の気分はどうですか？',
+      promptReadings: { '今日': 'きょう', '気分': 'きぶん' },
+      accepted: ["i'm happy", "i'm sad", "i'm tired", "i'm stinky"],
+      options: ["I'm happy", "I'm sad", "I'm tired", "I'm stinky"],
+      optionsVisible: true
+    },
+    {
+      promptEn: "How's the weather today?",
+      promptJp: '今日の天気はどうですか？',
+      promptReadings: { '今日': 'きょう', '天気': 'てんき' },
+      accepted: ["it's sunny", "it's hot", "it's a monster", "it's rainy"],
+      options: ["It's sunny", "It's hot", "It's a monster", "It's rainy"],
+      optionsVisible: true
+    },
+    {
+      promptEn: 'How are you today?',
+      promptJp: '今日の気分はどうですか？',
+      promptReadings: { '今日': 'きょう', '気分': 'きぶん' },
+      accepted: ["i'm happy", "i'm sad", "i'm tired", "i'm stinky"],
+      options: null,
+      optionsVisible: false
+    }
+  ];
+
+  const GRIMMERGLEN_TUTORIAL_READINGS = {
+    '練習': 'れんしゅう',
+    '少し': 'すこし',
+    '言葉': 'ことば',
+    '忘れた': 'わすれた',
+    '見つけに': 'みつけに',
+    '行こう': 'いこう',
+    '今': 'いま'
+  };
+
+  function renderTutorialStep(index) {
+    if (!mariettaPanel || !MARIETTA) return;
+    const total = GRIMMERGLEN_TUTORIAL_STEPS.length;
+    const step = GRIMMERGLEN_TUTORIAL_STEPS[index];
+    const introHTML = index === 0
+      ? `<p class="dp-line-en" style="margin-bottom:10px;">Let's practice together. I will show you some words, then you type them in.</p>
+         <p class="dp-line-jp" style="margin:0 0 10px;">${furiJP('いっしょに練習しましょう。まず言葉を見せるから、それをタイプしてね。', GRIMMERGLEN_TUTORIAL_READINGS)}</p>`
+      : '';
+    mariettaPanel.innerHTML = `
+      <span class="dp-handle"></span>
+      <div class="dp-inner">
+        <div class="dp-portrait-wrap"><span class="dp-portrait-halo"></span>
+          <div class="dp-portrait"><img src="${MARIETTA.poses[0]}" alt="Marietta"></div>
+        </div>
+        <div class="dp-body">
+          <p class="dp-name-en">PRACTICE TIME &middot; STEP ${index + 1} OF ${total}</p>
+          <p class="dp-name-kanji">Marietta <span style="font-weight:400;color:#9a7850;">・マリエッタ</span></p>
+          <div class="dp-divider"></div>
+          ${introHTML}
+          <div id="mg-tutorial-exercise-mount"></div>
+        </div>
+      </div>`;
+    const mount = mariettaPanel.querySelector('#mg-tutorial-exercise-mount');
+    if (!mount || !window.GrimmerglenTyping) return;
+    window.GrimmerglenTyping.renderExercise(mount, step, {
+      onCorrect: () => advanceTutorial(index),
+      onWrong: () => {}
+    });
+  }
+
+  function advanceTutorial(index) {
+    const next = index + 1;
+    if (next >= GRIMMERGLEN_TUTORIAL_STEPS.length) { finishGrimmerglenTutorial(); return; }
+    renderTutorialStep(next);
+  }
+
+  function startGrimmerglenTutorial() {
+    renderTutorialStep(0);
+  }
+
+  function finishGrimmerglenTutorial() {
+    writeGrimmerglenTutorial({ completed: true });
+    if (!mariettaPanel || !MARIETTA) return;
+    mariettaPanel.innerHTML = `
+      <span class="dp-handle"></span>
+      <div class="dp-inner">
+        <div class="dp-portrait-wrap"><span class="dp-portrait-halo"></span>
+          <div class="dp-portrait"><img src="${MARIETTA.poses[0]}" alt="Marietta"></div>
+        </div>
+        <div class="dp-body">
+          <p class="dp-name-en">GREAT JOB!</p>
+          <p class="dp-name-kanji">Marietta <span style="font-weight:400;color:#9a7850;">・マリエッタ</span></p>
+          <div class="dp-divider"></div>
+          <p class="dp-line-en">You did it! Now, let's go find what I forgot.</p>
+          <p class="dp-line-jp">${furiJP('できたね！さあ、わたしが忘れたものを見つけに行こう。', GRIMMERGLEN_TUTORIAL_READINGS)}</p>
+          <div class="dp-btns">
+            <button class="dp-btn yes" id="mg-tutorial-done-btn">Let's go! / ${furiJP('行こう！', GRIMMERGLEN_TUTORIAL_READINGS)}</button>
+          </div>
+        </div>
+      </div>`;
+    const doneBtn = mariettaPanel.querySelector('#mg-tutorial-done-btn');
+    if (doneBtn) doneBtn.addEventListener('click', closeMariettaPanel);
+  }
+
+  // Every later entry (tutorial not completed, already offered once
+  // before) -- ask rather than force. "Not right now" just closes the
+  // panel and changes nothing, so the same ask appears again next time.
+  function renderMariettaTutorialAsk() {
+    if (!mariettaPanel || !MARIETTA) return;
+    mariettaPanel.innerHTML = `
+      <span class="dp-handle"></span>
+      <div class="dp-inner">
+        <div class="dp-portrait-wrap"><span class="dp-portrait-halo"></span>
+          <div class="dp-portrait"><img src="${MARIETTA.poses[0]}" alt="Marietta"></div>
+        </div>
+        <div class="dp-body">
+          <p class="dp-name-en">GRIMMERGLEN GUIDE</p>
+          <p class="dp-name-kanji">Marietta <span style="font-weight:400;color:#9a7850;">・マリエッタ</span></p>
+          <div class="dp-divider"></div>
+          <p class="dp-line-en">Want to try a little practice with me?</p>
+          <p class="dp-line-jp">${furiJP('少し、いっしょに練習してみる？', GRIMMERGLEN_TUTORIAL_READINGS)}</p>
+          <div class="dp-btns">
+            <button class="dp-btn yes" id="mg-tutorial-yes-btn">Yes, let's try! / ${furiJP('うん、やってみる！', GRIMMERGLEN_TUTORIAL_READINGS)}</button>
+            <button class="dp-btn no" id="mg-tutorial-no-btn">Not right now / ${furiJP('今はやめておく', GRIMMERGLEN_TUTORIAL_READINGS)}</button>
+          </div>
+        </div>
+      </div>`;
+    const yesBtn = mariettaPanel.querySelector('#mg-tutorial-yes-btn');
+    const noBtn = mariettaPanel.querySelector('#mg-tutorial-no-btn');
+    if (yesBtn) yesBtn.addEventListener('click', startGrimmerglenTutorial);
+    if (noBtn) noBtn.addEventListener('click', closeMariettaPanel);
+  }
+
+  // The dialogue's closing button routes here instead of straight to
+  // closeMariettaPanel() -- the tri-state decision described above.
+  function handleMariettaDialogueClose() {
+    const t = getGrimmerglenTutorial();
+    if (t.completed) { closeMariettaPanel(); return; }
+    if (!t.skipPrompted) {
+      writeGrimmerglenTutorial({ skipPrompted: true });
+      startGrimmerglenTutorial();
+    } else {
+      renderMariettaTutorialAsk();
+    }
   }
 
   function openMariettaPanel() {
@@ -1076,6 +1422,7 @@
     window.addEventListener('resize', () => { fitStage(); resizeCanvas(); });
     window.requestAnimationFrame(tick);
     openMariettaPanelAfterEntry();
+    triggerBoohaTransformIfNeeded();
   }
 
   if (window.BOOHA_READY) init();
