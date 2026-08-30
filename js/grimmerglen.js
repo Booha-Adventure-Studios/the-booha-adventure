@@ -50,6 +50,13 @@
   const OPPOSITE = { left: 'right', right: 'left', up: 'down', down: 'up' };
   const MARIETTA = DATA.marietta || null;
 
+  // Pass 3: the return trip out. Placed at the same spot the player spawns
+  // in from Karasuki (room_01, the fromKarasuki spawn point) so the way
+  // back is exactly where they arrived, mirroring Muenba's own
+  // KARASUKI_RETURN_PORTAL convention.
+  const MARIETTA_RETURN_PORTAL = { roomId: 'room_01', x: 768, y: 820, r: 44, triggerR: 36 };
+  const POPUP_COOLDOWN_MS = 900;
+
   const params = new URLSearchParams(window.location.search);
   const DEV_MODE = params.get('dev') === '1';
   if (DEV_MODE) window.__devGrimmerglen = true;
@@ -73,12 +80,15 @@
     inputLocked: false,
     musicStarted: false,
     lastTickTime: 0,
-    speed: BASE_SPEED
+    speed: BASE_SPEED,
+    returnExiting: false
   };
 
   let app, stage, roomLayer, atmosphereCanvas, atmosphereCtx, actorCanvas, actorCtx, fadeEl, currentBg;
   let devPanel, devReadout;
   let entryDrift = null;
+  let mariettaPanel = null, mariettaPanelOpen = false, mariettaPanelCooldown = 0;
+  let returnPortalOverlay = null, returnPortalOpen = false, returnPortalCooldownUntil = 0;
   let lastTouchEnd = 0;
   const imageCache = new Map();
   const roomGlowCache = new Map();
@@ -414,8 +424,265 @@
     actorCtx.clearRect(0, 0, WORLD_W, WORLD_H);
     drawAtmosphere(now);
     drawExitArrows(now);
+    drawReturnPortal(now);
     drawMarietta(now);
     drawBooha(now);
+  }
+
+
+  /* ═══════════════════════════════════════════
+     MARIETTA'S ENTRY POPUP + THE RETURN TRIP
+  ═══════════════════════════════════════════ */
+  // Foundation pass 3: the "Talk to Marietta / Leave Grimmerglen" choice
+  // card the player sees on arrival, built on the shared utsu-card.js
+  // parchment-card shell (the same .utsu-card/.dp-* system Utsuroba's
+  // drifter panel and Karasuki's orb panel already use) rather than a
+  // sixth hand-copied popup. "Talk to Marietta" is a short placeholder
+  // reaction for now -- her real dialogue system (big-text drawer,
+  // typewriter reveal, the daydream/daymare lore) is pass 4; this pass
+  // only builds the choice card itself and the way back out, matching
+  // the plan doc's pass boundary.
+  function furiJP(text, readings) {
+    const renderer = window.UtsuFurigana && window.UtsuFurigana.sentence;
+    return renderer ? renderer(text, readings || {}) : text;
+  }
+
+  // Whole-phrase-to-whole-reading entries, same convention Utsuroba's own
+  // DRIFTER_UI_READINGS uses for short fixed UI copy (as opposed to the
+  // per-kanji-term maps long authored prose gets) -- these strings are
+  // static button/body text, not variable dialogue.
+  const MARIETTA_UI_READINGS = {
+    'マリエッタと話す': 'マリエッタとはなす',
+    'グリマーグレンを出る': 'グリマーグレンをでる',
+    '閉じる': 'とじる',
+    'マリエッタは、あなたが来てくれてとても嬉しいです！': 'マリエッタは、あなたがきてくれてとてもうれしいです！',
+    'マリエッタは嬉しそうに揺れています…まだ話す準備ができていないみたい！':
+      'マリエッタはうれしそうにゆれています…まだはなすじゅんびができていないみたい！',
+    'カラスキに戻りますか？': 'カラスキにもどりますか？',
+    'ここからカラスキへ戻る道が開いています。': 'ここからカラスキへもどるみちがひらいています。',
+    'はい、戻る': 'はい、もどる',
+  };
+
+  function buildMariettaPanel() {
+    if (mariettaPanel) return;
+    mariettaPanel = document.createElement('div');
+    mariettaPanel.id = 'grimmerglen-marietta-panel';
+    mariettaPanel.className = 'utsu-card is-floating';
+    // A fixed pastel-pink/gold motif rather than the per-drifter lookup
+    // UtsuCard.motifForDrifter() does -- Grimmerglen has one host, not six.
+    mariettaPanel.style.setProperty('--card-ring', '#ff9fc2');
+    mariettaPanel.style.setProperty('--card-glow', 'rgba(255,159,194,.5)');
+    document.body.appendChild(mariettaPanel);
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && mariettaPanelOpen) closeMariettaPanel();
+    });
+    // One delegated listener covers every .dp-btn this panel will ever
+    // render (its innerHTML is rebuilt per screen), matching the drifter
+    // panel's own delegated-click pattern in utsuroba.js.
+    mariettaPanel.addEventListener('click', event => {
+      if (window.UtsuSfx && event.target.closest('.dp-btn')) window.UtsuSfx.buttonPress();
+    });
+  }
+
+  function renderMariettaWelcome() {
+    if (!mariettaPanel || !MARIETTA) return;
+    mariettaPanel.innerHTML = `
+      <span class="dp-handle"></span>
+      <div class="dp-inner">
+        <div class="dp-portrait-wrap"><span class="dp-portrait-halo"></span>
+          <div class="dp-portrait"><img src="${MARIETTA.poses[0]}" alt="Marietta"></div>
+        </div>
+        <div class="dp-body">
+          <p class="dp-name-en">GRIMMERGLEN GUIDE</p>
+          <p class="dp-name-kanji">Marietta <span style="font-weight:400;color:#9a7850;">・マリエッタ</span></p>
+          <div class="dp-divider"></div>
+          <p class="dp-line-en">Marietta is so happy you're here!</p>
+          <p class="dp-line-jp">${furiJP('マリエッタは、あなたが来てくれてとても嬉しいです！', MARIETTA_UI_READINGS)}</p>
+          <div class="dp-btns">
+            <button class="dp-btn yes" id="mg-talk-btn">Talk to Marietta / ${furiJP('マリエッタと話す', MARIETTA_UI_READINGS)}</button>
+            <button class="dp-btn no" id="mg-leave-btn">Leave Grimmerglen / ${furiJP('グリマーグレンを出る', MARIETTA_UI_READINGS)}</button>
+          </div>
+        </div>
+      </div>`;
+    const talkBtn = mariettaPanel.querySelector('#mg-talk-btn');
+    const leaveBtn = mariettaPanel.querySelector('#mg-leave-btn');
+    if (talkBtn) talkBtn.addEventListener('click', renderMariettaTalkStub);
+    if (leaveBtn) leaveBtn.addEventListener('click', () => { closeMariettaPanel(); returnToKarasuki(); });
+  }
+
+  // PASS 4 HOOK: this whole function gets replaced by the real dialogue
+  // system (big-text drawer, per-character typewriter reveal, the
+  // daydream/daymare lore in EN + furigana). For now, tapping "Talk to
+  // Marietta" swaps the same card to a short, honest placeholder instead
+  // of silently doing nothing.
+  function renderMariettaTalkStub() {
+    if (!mariettaPanel || !MARIETTA) return;
+    mariettaPanel.innerHTML = `
+      <span class="dp-handle"></span>
+      <div class="dp-inner">
+        <div class="dp-portrait-wrap"><span class="dp-portrait-halo"></span>
+          <div class="dp-portrait"><img src="${MARIETTA.poses[0]}" alt="Marietta"></div>
+        </div>
+        <div class="dp-body">
+          <p class="dp-name-en">GRIMMERGLEN GUIDE</p>
+          <p class="dp-name-kanji">Marietta <span style="font-weight:400;color:#9a7850;">・マリエッタ</span></p>
+          <div class="dp-divider"></div>
+          <p class="dp-line-en">Marietta wiggles happily... she has so much to tell you, but she's not quite ready yet!</p>
+          <p class="dp-line-jp">${furiJP('マリエッタは嬉しそうに揺れています…まだ話す準備ができていないみたい！', MARIETTA_UI_READINGS)}</p>
+          <div class="dp-btns">
+            <button class="dp-btn no" id="mg-talk-close-btn">Close / ${furiJP('閉じる', MARIETTA_UI_READINGS)}</button>
+          </div>
+        </div>
+      </div>`;
+    const closeBtn = mariettaPanel.querySelector('#mg-talk-close-btn');
+    if (closeBtn) closeBtn.addEventListener('click', closeMariettaPanel);
+  }
+
+  function openMariettaPanel() {
+    if (!mariettaPanel || mariettaPanelOpen || performance.now() < mariettaPanelCooldown) return;
+    if (window.UtsuSfx) window.UtsuSfx.panelOpen();
+    mariettaPanelOpen = true;
+    state.clickTarget = null;
+    state.moving = false;
+    renderMariettaWelcome();
+    mariettaPanel.classList.add('open');
+  }
+
+  function closeMariettaPanel() {
+    if (!mariettaPanel) return;
+    if (window.UtsuSfx) window.UtsuSfx.panelClose();
+    mariettaPanelCooldown = performance.now() + POPUP_COOLDOWN_MS;
+    mariettaPanelOpen = false;
+    mariettaPanel.classList.remove('open');
+  }
+
+  // Opens automatically once per arrival from Karasuki (after any entry
+  // drift finishes), the same "shows every visit, not just the first"
+  // shape Muenba's Nuppi welcome uses -- but Marietta's sprite in room_01
+  // stays clickable too, so the player can reopen the same card any time
+  // they walk back to her mid-visit.
+  function openMariettaPanelAfterEntry() {
+    if (state.spawnId !== 'fromKarasuki') return;
+    const waitForArrival = () => {
+      if (!entryDrift) openMariettaPanel();
+      else window.requestAnimationFrame(waitForArrival);
+    };
+    window.requestAnimationFrame(waitForArrival);
+  }
+
+  function clickCheckMarietta(worldX, worldY) {
+    if (!MARIETTA || state.roomId !== MARIETTA.roomId || mariettaPanelOpen) return false;
+    const bob = REDUCED_MOTION ? 0 : Math.sin(performance.now() / 1000 * 2.6) * 6;
+    if (Math.hypot(worldX - MARIETTA.x, worldY - (MARIETTA.y + bob)) > MARIETTA.hitR) return false;
+    openMariettaPanel();
+    return true;
+  }
+
+  // ── Return portal: a small standalone confirm popup (raw markup, not
+  //    the utsu-card system, matching Muenba's own KARASUKI_RETURN_PORTAL
+  //    treatment exactly) so a player who dismissed Marietta's welcome and
+  //    went exploring still has a clear way back without hunting her down
+  //    again. Grimmerglen's own spec asks for furigana on every button,
+  //    instruction, and direction -- unlike Muenba's plain-kana return
+  //    popup, this one furigana's its Japanese throughout. ──────────────
+  function buildReturnPortalOverlay() {
+    if (returnPortalOverlay) return;
+    returnPortalOverlay = document.createElement('div');
+    returnPortalOverlay.id = 'grimmerglen-return-overlay';
+    returnPortalOverlay.innerHTML = `
+      <div class="grimmerglen-return-box">
+        <h2>Leave Grimmerglen?</h2>
+        <p class="jp">${furiJP('カラスキに戻りますか？', MARIETTA_UI_READINGS)}</p>
+        <p>The path back to Karasuki is open here.</p>
+        <p class="jp-line">${furiJP('ここからカラスキへ戻る道が開いています。', MARIETTA_UI_READINGS)}</p>
+        <div class="grimmerglen-return-actions">
+          <button id="grimmerglen-return-yes" type="button"><span>Yes, return</span><small>${furiJP('はい、戻る', MARIETTA_UI_READINGS)}</small></button>
+          <button id="grimmerglen-return-no" type="button"><span>Stay</span><small>ここにいる</small></button>
+        </div>
+      </div>`;
+    document.body.appendChild(returnPortalOverlay);
+    const yesBtn = document.getElementById('grimmerglen-return-yes');
+    const noBtn  = document.getElementById('grimmerglen-return-no');
+    yesBtn.addEventListener('click', () => {
+      if (window.UtsuSfx) window.UtsuSfx.buttonPress();
+      closeReturnPortalPopup();
+      returnToKarasuki();
+    });
+    noBtn.addEventListener('click', () => {
+      if (window.UtsuSfx) window.UtsuSfx.buttonPress();
+      closeReturnPortalPopup();
+    });
+    returnPortalOverlay.addEventListener('click', event => {
+      if (event.target === returnPortalOverlay) closeReturnPortalPopup();
+    });
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && returnPortalOpen) closeReturnPortalPopup();
+    });
+  }
+
+  function openReturnPortalPopup() {
+    if (returnPortalOpen || state.returnExiting || performance.now() < returnPortalCooldownUntil) return;
+    if (!returnPortalOverlay) buildReturnPortalOverlay();
+    returnPortalOpen = true;
+    state.clickTarget = null;
+    state.moving = false;
+    if (window.UtsuSfx) window.UtsuSfx.popupOpen();
+    returnPortalOverlay.classList.add('open');
+  }
+
+  function closeReturnPortalPopup() {
+    if (!returnPortalOverlay) return;
+    returnPortalOpen = false;
+    if (window.UtsuSfx) window.UtsuSfx.popupClose();
+    returnPortalCooldownUntil = performance.now() + POPUP_COOLDOWN_MS;
+    returnPortalOverlay.classList.remove('open');
+  }
+
+  function inReturnPortalRoom() { return state.roomId === MARIETTA_RETURN_PORTAL.roomId; }
+
+  function checkReturnPortalProximity(now) {
+    if (!inReturnPortalRoom() || returnPortalOpen || mariettaPanelOpen) return;
+    if (now < returnPortalCooldownUntil) return;
+    if (state.distMovedSinceSpawn < ARROW_MOVE_THRESHOLD) return;
+    const d = Math.hypot(state.x - MARIETTA_RETURN_PORTAL.x, state.y - MARIETTA_RETURN_PORTAL.y);
+    if (d <= MARIETTA_RETURN_PORTAL.triggerR) openReturnPortalPopup();
+  }
+
+  function clickCheckReturnPortal(worldX, worldY) {
+    if (!inReturnPortalRoom() || returnPortalOpen || mariettaPanelOpen) return false;
+    if (performance.now() < returnPortalCooldownUntil) return false;
+    const d = Math.hypot(worldX - MARIETTA_RETURN_PORTAL.x, worldY - MARIETTA_RETURN_PORTAL.y);
+    if (d <= MARIETTA_RETURN_PORTAL.r) { openReturnPortalPopup(); return true; }
+    return false;
+  }
+
+  function drawReturnPortal(now) {
+    if (!inReturnPortalRoom()) return;
+    const seconds = now / 1000;
+    const pulse = REDUCED_MOTION ? .78 : .58 + .22 * Math.sin(seconds * 1.7);
+    const cx = MARIETTA_RETURN_PORTAL.x;
+    const cy = MARIETTA_RETURN_PORTAL.y;
+    actorCtx.save();
+    const gradient = actorCtx.createRadialGradient(cx, cy, 0, cx, cy, 46);
+    gradient.addColorStop(0, `rgba(255,214,140,${.55 * pulse})`);
+    gradient.addColorStop(1, 'rgba(255,214,140,0)');
+    actorCtx.fillStyle = gradient;
+    actorCtx.beginPath(); actorCtx.arc(cx, cy, 46, 0, Math.PI * 2); actorCtx.fill();
+    actorCtx.globalAlpha = .8 + pulse * .2;
+    actorCtx.strokeStyle = 'rgba(255,255,255,.85)';
+    actorCtx.lineWidth = 2.4;
+    actorCtx.beginPath(); actorCtx.arc(cx, cy, 22, 0, Math.PI * 2); actorCtx.stroke();
+    actorCtx.restore();
+  }
+
+  function returnToKarasuki() {
+    if (state.returnExiting) return;
+    state.returnExiting = true;
+    state.clickTarget = null;
+    state.moving = false;
+    fadeEl.style.transition = `opacity ${FADE_MS}ms ease-in`;
+    fadeEl.style.opacity = '1';
+    window.setTimeout(() => { window.location.href = 'karasuki.html'; }, FADE_MS + 60);
   }
 
   // ── DEV overlay (foundation tool for calibrating exits/walkables later) ──
@@ -459,6 +726,7 @@
   }
 
   function handleInput(clientX, clientY) {
+    if (mariettaPanelOpen || returnPortalOpen) return;
     const point = stagePoint(clientX, clientY);
     if (entryDrift) {
       if (Math.hypot(point.x - state.x, point.y - state.y) < 30) return;
@@ -469,6 +737,8 @@
       return;
     }
     if (state.inputLocked || state.transitioning) return;
+    if (clickCheckMarietta(point.x, point.y)) return;
+    if (clickCheckReturnPortal(point.x, point.y)) return;
     if (DEV_MODE) updateDevReadout(point.x, point.y);
     if (Math.hypot(point.x - state.x, point.y - state.y) < 30) return;
     state.distMovedSinceSpawn = Math.max(state.distMovedSinceSpawn, ARROW_MOVE_THRESHOLD);
@@ -532,6 +802,8 @@
     atmosphereCtx = atmosphereCanvas.getContext('2d');
     actorCtx = actorCanvas.getContext('2d');
     buildDevPanel();
+    buildMariettaPanel();
+    buildReturnPortalOverlay();
   }
 
   function injectStyles() {
@@ -558,6 +830,20 @@
       @media (prefers-reduced-motion: reduce) { .grimmerglen-rotate-phone, .grimmerglen-rotate-bar { animation:none; } }
       #grimmerglen-dev { position:fixed; left:10px; bottom:10px; z-index:9500; display:flex; flex-direction:column; gap:6px; padding:8px 10px; background:rgba(0,0,0,.72); border-radius:10px; font:11px ui-monospace,monospace; color:#fff; }
       #grimmerglen-dev select { font:11px ui-monospace,monospace; }
+      #grimmerglen-return-overlay { position:fixed; inset:0; z-index:9300; display:none; align-items:center; justify-content:center; background:rgba(120,40,80,0); transition:background .35s ease; }
+      #grimmerglen-return-overlay.open { display:flex; background:rgba(120,40,80,.4); }
+      .grimmerglen-return-box { box-sizing:border-box; width:min(420px,calc(100% - 40px)); padding:26px 24px 24px; border:1px solid rgba(255,150,190,.55); border-radius:16px; background:linear-gradient(155deg,rgba(255,244,249,.98),rgba(255,228,239,.99)); box-shadow:0 24px 70px rgba(224,85,158,.2),0 0 45px rgba(255,150,190,.28),inset 0 0 60px rgba(255,255,255,.6); text-align:center; font-family:Georgia,'Times New Roman',serif; color:#7a1f4b; transform:scale(.94); opacity:0; transition:transform .3s cubic-bezier(.34,1.56,.64,1),opacity .25s ease; }
+      #grimmerglen-return-overlay.open .grimmerglen-return-box { transform:scale(1); opacity:1; }
+      .grimmerglen-return-box h2 { margin:0 0 4px; font-size:1.2rem; font-weight:400; letter-spacing:.06em; text-transform:uppercase; color:#a3306e; }
+      .grimmerglen-return-box .jp { margin:0 0 16px; color:#c07aa3; font-size:.85rem; letter-spacing:.1em; }
+      .grimmerglen-return-box p { margin:0 0 20px; color:#8a3d68; font-size:.92rem; line-height:1.6; }
+      .grimmerglen-return-box p.jp-line { margin-top:-10px; color:#b06a94; font-size:.82rem; line-height:1.55; }
+      .grimmerglen-return-box ruby { ruby-position:over; } .grimmerglen-return-box rt { font-size:.72em; }
+      .grimmerglen-return-actions { display:flex; gap:10px; justify-content:center; }
+      .grimmerglen-return-actions button { flex:1; max-width:150px; padding:9px 14px; border-radius:999px; font:700 12px ui-monospace,monospace; letter-spacing:.04em; cursor:pointer; }
+      #grimmerglen-return-yes { background:linear-gradient(135deg,#ff8fc0,#ffd166); border:1px solid rgba(224,85,158,.7); color:#5a1638; }
+      #grimmerglen-return-no { background:transparent; border:1px solid rgba(224,85,158,.4); color:#a9548a; }
+      .utsu-card#grimmerglen-marietta-panel .dp-btn.no { color:#a9548a; border-color:rgba(224,85,158,.4); }
     `;
     document.head.appendChild(style);
   }
@@ -567,10 +853,11 @@
     state.lastTickTime = now;
     state.speed = BASE_SPEED * (dt / TARGET_DT);
     const drifting = !state.transitioning && tickEntryDrift(now);
-    if (!state.transitioning && !drifting && !state.inputLocked) {
+    if (!state.transitioning && !drifting && !state.inputLocked && !mariettaPanelOpen && !returnPortalOpen) {
       handleMovement();
       const exit = getAvailableExit(now);
       if (exit) transitionTo(exit);
+      checkReturnPortalProximity(now);
       if (DEV_MODE) updateDevReadout();
     }
     drawFrame(now);
@@ -623,6 +910,7 @@
     bindInput();
     window.addEventListener('resize', () => { fitStage(); resizeCanvas(); });
     window.requestAnimationFrame(tick);
+    openMariettaPanelAfterEntry();
   }
 
   if (window.BOOHA_READY) init();
