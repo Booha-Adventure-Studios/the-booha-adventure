@@ -7,7 +7,7 @@
 const CURRENT_CACHES = {
   // Profile consolidation Pass 1: ship the canonical progress page and its
   // moved progress renderer to returning players.
-  pages:  'booha-pages-2026-375',
+  pages:  'booha-pages-2026-376',
   // js/ is served cache-first (see ASSET_PREFIXES below), so once a device
   // caches a script it never re-fetches it until this string changes.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
@@ -99,7 +99,7 @@ const CURRENT_CACHES = {
   // its entire duration; chase-repeat taper slowed and its floor raised.
   // Grimmerglen dance pass (2026-08-30): add the six transparent celebration
   // frames and center-room dance runtime on top of the audio pass.
-  assets: 'booha-assets-2026-432',
+  assets: 'booha-assets-2026-433',
   decks:  'booha-decks-2026-310',
 };
 
@@ -131,6 +131,7 @@ const CORE_FILES = [
   `${BASE}/utsuroba.html`,
   `${BASE}/muenba.html`,
   `${BASE}/grimmerglen.html`,
+  `${BASE}/grimmerglen-profile.html`,
   `${BASE}/curriculum/bc/games-index.html`,
   `${BASE}/curriculum/bc/study-index.html`,
   `${BASE}/curriculum/br/games-index.html`,

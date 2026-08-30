@@ -232,12 +232,13 @@
       <a class="back-link" id="muenba-profile-karasuki" href="karasuki.html?from=profile" hidden aria-label="Enter Karasuki / カラスキへ">Karasuki / カラスキへ →</a>
     </div>
 
-    <nav class="profile-network" aria-label="Output profiles">
-      <a href="profile.html">LOG <small>ぼうけんログ</small></a>
-      <a href="adventure-profile.html">ADVENTURE <small>ぼうけん</small></a>
-      <a href="utsuroba-profile.html">UTSUROBA <small>うつろば</small></a>
-      <a href="muenba-profile.html" aria-current="page">MUENBA <small>むえんば</small></a>
-    </nav>
+      <nav class="profile-network" aria-label="Output profiles">
+        <a href="profile.html">LOG <small>ぼうけんログ</small></a>
+        <a href="adventure-profile.html">ADVENTURE <small>ぼうけん</small></a>
+        <a href="utsuroba-profile.html">UTSUROBA <small>うつろば</small></a>
+        <a href="muenba-profile.html" aria-current="page">MUENBA <small>むえんば</small></a>
+        <a href="grimmerglen-profile.html" id="pnet-grimmerglen" hidden>GRIMMERGLEN <small>グリマーグレン</small></a>
+      </nav>
 
     <section class="hero" aria-labelledby="page-title">
       <p class="eyebrow">A ledger of who's still hiding</p>
@@ -520,6 +521,27 @@
 
       if (window.BOOHA_READY) boot();
       else document.addEventListener('booha:ready', boot, { once: true });
+    })();
+  </script>
+  <script>
+    // Grimmerglen is a dormant menu door until its weekly/build gate opens.
+    (function () {
+      var tab = document.getElementById('pnet-grimmerglen');
+      if (!tab) return;
+      function renderGrimmerglenTab() {
+        var open = false;
+        try {
+          open = !!(window.BoohaUnlockSystem &&
+            typeof BoohaUnlockSystem.isGrimmerglenUnlocked === 'function' &&
+            BoohaUnlockSystem.isGrimmerglenUnlocked());
+        } catch (_) {}
+        tab.hidden = !open;
+      }
+      if (window.BOOHA_READY) renderGrimmerglenTab();
+      else document.addEventListener('booha:ready', renderGrimmerglenTab, { once: true });
+      document.addEventListener('booha:saved', renderGrimmerglenTab);
+      document.addEventListener('booha:weeklyReset', renderGrimmerglenTab);
+      document.addEventListener('booha:newWeek', renderGrimmerglenTab);
     })();
   </script>
 </body>

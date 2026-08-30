@@ -12,7 +12,10 @@ const root = path.join(__dirname, '..');
 const dataSource = fs.readFileSync(path.join(root, 'js', 'grimmerglen-data.js'), 'utf8');
 const runtimeSource = fs.readFileSync(path.join(root, 'js', 'grimmerglen.js'), 'utf8');
 const typingSource = fs.readFileSync(path.join(root, 'js', 'grimmerglen-typing.js'), 'utf8');
+const muenbaSource = fs.readFileSync(path.join(root, 'js', 'muenba.js'), 'utf8');
+const unlockSource = fs.readFileSync(path.join(root, 'js', 'core', 'unlock-system.js'), 'utf8');
 const page = fs.readFileSync(path.join(root, 'grimmerglen.html'), 'utf8');
+const profile = fs.readFileSync(path.join(root, 'grimmerglen-profile.html'), 'utf8');
 const serviceWorker = fs.readFileSync(path.join(root, 'sw.js'), 'utf8');
 const audioFiles = [
   'assets/img/grimmerglen/grimmerglen_bgm.mp3',
@@ -90,6 +93,7 @@ assert(runtimeSource.includes('GrimmerglenTyping.renderExercise'), 'pickup UI mu
 assert(runtimeSource.includes('writeGrimmerglenObjectFound(object.type, object.id)'), 'successful pickup must persist exact object progress');
 assert(runtimeSource.includes('objectSlots'), 'exact object slots must be persisted');
 assert(runtimeSource.includes('getActiveGrimmerglenTargetType'), 'runtime must enforce one active object target at a time');
+assert(runtimeSource.includes('activeTargetType'), 'active Grimmerglen target must persist across redraws');
 assert(runtimeSource.includes('renderMariettaHandoff'), 'Marietta must receive carried objects before the quiz');
 assert(runtimeSource.includes('renderMariettaWrongItem'), 'wrong items must be rejected and returned to the hunt');
 assert(runtimeSource.includes("assets/img/grimmerglen/grimmerglen_bgm.mp3"), 'runtime must reference Grimmerglen BGM');
@@ -101,6 +105,7 @@ assert(runtimeSource.includes('GRIMMERGLEN_DANCE_FRAME_MS'), 'runtime must alter
 assert(!runtimeSource.includes('openGrimmerglenObjectPanel'), 'object pickup must not open the typing quiz immediately');
 assert(typingSource.includes('function renderExercise'), 'typing engine must expose renderExercise');
 assert(serviceWorker.includes('${BASE}/grimmerglen.html'), 'service worker must precache grimmerglen.html');
+assert(serviceWorker.includes('${BASE}/grimmerglen-profile.html'), 'service worker must precache the Grimmerglen profile');
 for (const asset of ['grimmerglen-data.js', 'grimmerglen-typing.js', 'grimmerglen.js']) {
   assert(serviceWorker.includes(`\${BASE}/js/${asset}`), `service worker must precache ${asset}`);
 }
@@ -108,9 +113,20 @@ assert(serviceWorker.includes('`${BASE}/js/`'), 'service worker must cache Grimm
 assert(serviceWorker.includes('`${BASE}/assets/`'), 'service worker must cache Grimmerglen art at runtime');
 assert(serviceWorker.includes('${BASE}/assets/img/grimmerglen/grimmerglen_bgm.mp3'), 'service worker must precache Grimmerglen BGM');
 assert(serviceWorker.includes('${BASE}/assets/img/grimmerglen/grimmerglen_dance.mp3'), 'service worker must precache Grimmerglen dance music');
-assert(/pages:\s+'booha-pages-2026-375'/.test(serviceWorker), 'page cache must be bumped for the audio pass');
+assert(/pages:\s+'booha-pages-2026-376'/.test(serviceWorker), 'page cache must be bumped for the profile pass');
 assert(serviceWorker.includes('grimmerglen/dance/marietta_dance_'), 'service worker must precache Marietta dance art');
 assert(serviceWorker.includes('grimmerglen/dance/booha_grimmerglen_dance_'), 'service worker must precache Booha dance art');
-assert(/assets:\s+'booha-assets-2026-432'/.test(serviceWorker), 'asset cache must be bumped for the dance pass');
+assert(/assets:\s+'booha-assets-2026-433'/.test(serviceWorker), 'asset cache must be bumped for the profile pass');
+
+assert(profile.includes('GRIMMERGLEN / MEMORY CASE FILE'), 'profile must use the Grimmerglen case-file header');
+assert(profile.includes('grimmerglen-data.js'), 'profile must load the Grimmerglen manifest');
+assert(profile.includes('BoohaUnlockSystem.isGrimmerglenUnlocked'), 'profile must keep the world dormant behind its gate');
+assert(profile.includes('clickTone'), 'profile must include the cute WebAudio click cue');
+assert(profile.includes('memory-card'), 'profile must render the eight memory lanes');
+assert(unlockSource.includes("grimmerglen:first_memory"), 'unlock system must define the first Grimmerglen memory achievement');
+assert(unlockSource.includes("grimmerglen:all_memories"), 'unlock system must define the complete Grimmerglen achievement');
+assert(unlockSource.includes("grimmerglen:rooms_explored"), 'unlock system must define the room exploration achievement');
+assert(muenbaSource.includes('getMuenbaHuntGhostOrder'), 'Muenba must persist a randomized hunt order');
+assert(muenbaSource.includes('randomizedMuenbaCases'), 'Muenba cases must follow the randomized hunt order');
 
 console.log(`Grimmerglen Pass 8 audit passed: 9 rooms, ${allInstances.length} placed instances, typing pickup flow, and service-worker coverage.`);
