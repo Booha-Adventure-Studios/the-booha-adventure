@@ -1,23 +1,20 @@
 /*
- * Grimmerglen world shell — foundation pass 1.
+ * Grimmerglen world shell — Pass 8 placement and pickup foundation.
  *
- * This is the room-walker engine only: 9 rooms, fade transitions, exit
- * arrows, entry drift, movement/collision, a lightweight DEV coordinate
- * tool, and a static idle Marietta in room_01. Cloned from Muenba's engine
- * shape (js/muenba.js) with everything Muenba-specific stripped out (no
- * ghosts, no rhythm game, no case/briefing content) — this file is meant to
- * stay small and generic so later passes can build Marietta's popup,
- * dialogue, and the typing engine on top of it without fighting inherited
- * hunt-loop code that doesn't apply here.
+ * This is the room-walker engine: 9 rooms, fade transitions, exit arrows,
+ * entry drift, movement/collision, Marietta's card, and the 24-object memory
+ * hunt. Cloned from Muenba's engine shape (js/muenba.js) with everything
+ * Muenba-specific stripped out (no ghosts, rhythm game, or case/briefing
+ * content).
  *
  * Deliberately NOT in this pass (see claude/grimmerglen-audit-and-pass-plan.md):
  *   - No access lock yet. isGrimmerglenUnlocked()/GRIMMERGLEN_BUILD_READY and
  *     the Karasuki portal are pass 2 — this page is reachable only by direct
  *     URL until that lands, same as any freshly-scaffolded area before its
  *     doorway exists.
- *   - No Marietta popup/dialogue (pass 3/4), no typing engine (pass 5), no
- *     tutorial (pass 6), no save section (pass 7), no service-worker
- *     precache entry (pass 8).
+ *   - No profile/unlock-achievement work, final SFX polish, live device QA,
+ *     or per-room walkable/exit calibration. Those remain separate follow-up
+ *     work after the foundation is playable.
  *   - Exit coordinates and walkable rectangles are placeholders (see
  *     grimmerglen-data.js) — tune them per room with the DEV overlay below
  *     once someone has actually walked all 9 rooms.
@@ -56,6 +53,19 @@
   // KARASUKI_RETURN_PORTAL convention.
   const MARIETTA_RETURN_PORTAL = { roomId: 'room_01', x: 768, y: 820, r: 44, triggerR: 36 };
   const POPUP_COOLDOWN_MS = 900;
+  const OBJECT_HIT_R = 58;
+  const OBJECT_DRAW_SIZE = 94;
+  const OBJECT_PROXIMITY_R = 58;
+  const OBJECT_LABELS = {
+    banner: 'Banner',
+    ticket: 'Ticket',
+    pillow: 'Pillow',
+    backpack: 'Backpack',
+    book: 'Book',
+    teddyBear: 'Teddy bear',
+    toGoCoffeeCup: 'To-go coffee cup',
+    ball: 'Ball'
+  };
 
   const params = new URLSearchParams(window.location.search);
   const DEV_MODE = params.get('dev') === '1';
@@ -89,9 +99,12 @@
   let devPanel, devReadout;
   let entryDrift = null;
   let mariettaPanel = null, mariettaPanelOpen = false, mariettaPanelCooldown = 0;
+  let objectPanel = null, objectPanelOpen = false, objectPanelCooldown = 0, activeObject = null;
   let returnPortalOverlay = null, returnPortalOpen = false, returnPortalCooldownUntil = 0;
+  let objectProgressCache = null, objectSlotsCache = null;
   let lastTouchEnd = 0;
   const imageCache = new Map();
+  const objectImageCache = new Map();
   const roomGlowCache = new Map();
   const sparkles = [];
 
@@ -115,6 +128,13 @@
     mariettaImg.decoding = 'async';
     mariettaImg.src = MARIETTA.poses[0];
   }
+
+  Object.keys(DATA.collectibles || {}).forEach(type => {
+    const image = new Image();
+    image.decoding = 'async';
+    image.src = DATA.collectibles[type];
+    objectImageCache.set(type, image);
+  });
 
   // ── Pastel room glow (cached gradient, built once per room, drawn with
   //    drawImage every frame — same discipline the Maze/Utsuroba/Muenba
@@ -412,6 +432,72 @@
     actorCtx.restore();
   }
 
+  function getRoomObjects(roomId) {
+    const objects = [];
+    Object.keys(DATA.objects || {}).forEach(type => {
+      (DATA.objects[type] || []).forEach((placement, index) => {
+        if (!placement || placement.room !== roomId) return;
+        objects.push(Object.assign({
+          id: `${type}-${index + 1}`,
+          type,
+          index,
+          label: OBJECT_LABELS[type] || type
+        }, placement));
+      });
+    });
+    return objects;
+  }
+
+  function isGrimmerglenObjectFound(object, progress, slots) {
+    if (slots[object.id] === true) return true;
+    // Compatibility with an early save made before exact instance IDs were
+    // written. New saves use objectSlots and can therefore be found in any
+    // order; legacy count-only saves hide their first N manifest slots.
+    return !Object.keys(slots).length && object.index < (progress[object.type]?.found || 0);
+  }
+
+  function drawGrimmerglenObjects(now) {
+    const objects = getRoomObjects(state.roomId);
+    if (!objects.length) return;
+    const progress = getGrimmerglenObjectsProgress();
+    const slots = getGrimmerglenObjectSlots();
+    const seconds = now / 1000;
+    objects.forEach((object, index) => {
+      if (isGrimmerglenObjectFound(object, progress, slots)) return;
+      const image = objectImageCache.get(object.type);
+      if (!image || !image.complete || image.naturalWidth === 0) return;
+      const bob = REDUCED_MOTION ? 0 : Math.sin(seconds * 2.2 + index * 1.7) * 3;
+      const glow = getRoomGlowRgb(state.roomId);
+      actorCtx.save();
+      actorCtx.globalAlpha = .95;
+      actorCtx.shadowColor = `rgba(${glow.r},${glow.g},${glow.b},.9)`;
+      actorCtx.shadowBlur = 15;
+      actorCtx.beginPath();
+      actorCtx.fillStyle = `rgba(255,255,255,${REDUCED_MOTION ? .24 : .16 + .06 * Math.sin(seconds * 2.2 + index)})`;
+      actorCtx.arc(object.x, object.y + bob, 31, 0, Math.PI * 2);
+      actorCtx.fill();
+      actorCtx.shadowBlur = 0;
+      actorCtx.drawImage(image, object.x - OBJECT_DRAW_SIZE / 2, object.y - OBJECT_DRAW_SIZE / 2 + bob, OBJECT_DRAW_SIZE, OBJECT_DRAW_SIZE);
+      actorCtx.restore();
+    });
+  }
+
+  function getNearestUnfoundObject(worldX, worldY, maxDistance) {
+    const progress = getGrimmerglenObjectsProgress();
+    const slots = getGrimmerglenObjectSlots();
+    let nearest = null;
+    let nearestDistance = maxDistance;
+    getRoomObjects(state.roomId).forEach(object => {
+      if (isGrimmerglenObjectFound(object, progress, slots)) return;
+      const distance = Math.hypot(worldX - object.x, worldY - object.y);
+      if (distance <= nearestDistance) {
+        nearest = object;
+        nearestDistance = distance;
+      }
+    });
+    return nearest;
+  }
+
   function drawBooha(now) {
     const seconds = now / 1000;
     const bob = Math.sin(seconds * 4.18) * 8;
@@ -546,6 +632,7 @@
     drawExitArrows(now);
     drawReturnPortal(now);
     drawMarietta(now);
+    drawGrimmerglenObjects(now);
     drawBooha(now);
     drawBoohaTransformFX(now);
   }
@@ -798,16 +885,11 @@
   }
 
   /* ===============================================
-     SAVE LAYER (pass 6, scoped narrowly)
+     SAVE LAYER
   =============================================== */
-  // Just enough of a data.grimmerglen save section to give the tutorial's
-  // tri-state flag somewhere real to live -- window.BoohaSaveFile (from
-  // js/core/save-file.js, already included on this page) exposes load()/
-  // save()/patch() directly, so this mirrors Muenba's own readMuenba()/
-  // writeMuenba() shape without needing a local loadSave()/writeSave()
-  // pair of its own. Room-visit totals and the per-object/tier progress
-  // schema stay Pass 7's job -- this only carries the tutorial slice
-  // forward early because Pass 6 needs it now.
+  // window.BoohaSaveFile (from js/core/save-file.js, already included on this
+  // page) exposes load()/save()/patch() directly, so this mirrors Muenba's
+  // own readMuenba()/writeMuenba() shape without a second local save layer.
   function readGrimmerglen() {
     try {
       const d = window.BoohaSaveFile ? window.BoohaSaveFile.load() : {};
@@ -858,15 +940,13 @@
     } catch (_) {}
   }
 
-  // Placeholder per-object-type/per-tier progress -- the save-side half of
-  // the "3 copies advance the tier" locked decision (found 0 or 1 copies
-  // -> Starter, 2 -> Case, 3 -> Deep). Nothing calls
-  // writeGrimmerglenObjectFound() yet, since no pickup system exists to
-  // find a copy of anything -- this just gives that future pass a save
-  // contract to write into rather than needing to invent one later.
+  // Per-object-type/per-tier progress: found 0 or 1 copies -> Starter,
+  // 2 -> Case, 3 -> Deep. objectSlots records the exact solved instance so
+  // a player can find copies in any order without the clicked item respawning.
   const GRIMMERGLEN_TIER_BY_FOUND = ['start', 'start', 'case', 'deep'];
 
   function getGrimmerglenObjectsProgress() {
+    if (objectProgressCache) return objectProgressCache;
     const d = readGrimmerglen();
     const stored = (d && typeof d.objects === 'object' && d.objects) || {};
     const progress = {};
@@ -877,16 +957,36 @@
         : 0;
       progress[type] = { found, tier: GRIMMERGLEN_TIER_BY_FOUND[found] };
     });
+    objectProgressCache = progress;
     return progress;
   }
 
-  function writeGrimmerglenObjectFound(type) {
+  function getGrimmerglenObjectSlots() {
+    if (objectSlotsCache) return objectSlotsCache;
+    const slots = readGrimmerglen().objectSlots;
+    objectSlotsCache = slots && typeof slots === 'object' ? slots : {};
+    return objectSlotsCache;
+  }
+
+  function writeGrimmerglenObjectFound(type, slotId) {
     if (!DATA.objectTypes || !DATA.objectTypes.includes(type)) return false;
     const progress = getGrimmerglenObjectsProgress();
     const stored = {};
     Object.keys(progress).forEach(t => { stored[t] = { found: progress[t].found }; });
     stored[type] = { found: Math.min(3, progress[type].found + 1) };
-    return writeGrimmerglen({ objects: stored });
+    const objectSlots = Object.assign({}, getGrimmerglenObjectSlots());
+    if (!Object.keys(objectSlots).length && progress[type].found > 0) {
+      for (let index = 0; index < progress[type].found; index++) {
+        objectSlots[`${type}-${index + 1}`] = true;
+      }
+    }
+    if (slotId) objectSlots[slotId] = true;
+    const ok = writeGrimmerglen({ objects: stored, objectSlots });
+    if (ok) {
+      objectProgressCache = null;
+      objectSlotsCache = objectSlots;
+    }
+    return ok;
   }
 
   /* ===============================================
@@ -1065,6 +1165,115 @@
     mariettaPanelCooldown = performance.now() + POPUP_COOLDOWN_MS;
     mariettaPanelOpen = false;
     mariettaPanel.classList.remove('open');
+  }
+
+  function buildGrimmerglenObjectPanel() {
+    if (objectPanel) return;
+    objectPanel = document.createElement('div');
+    objectPanel.id = 'grimmerglen-object-panel';
+    objectPanel.className = 'utsu-card is-floating';
+    objectPanel.style.setProperty('--card-ring', '#b8a4ff');
+    objectPanel.style.setProperty('--card-glow', 'rgba(184,164,255,.52)');
+    document.body.appendChild(objectPanel);
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && objectPanelOpen) closeGrimmerglenObjectPanel();
+    });
+    objectPanel.addEventListener('click', event => {
+      if (window.UtsuSfx && event.target.closest('.dp-btn, .dp-close-x')) window.UtsuSfx.buttonPress();
+    });
+  }
+
+  function renderGrimmerglenObjectExercise(object) {
+    if (!objectPanel || !object) return;
+    const progress = getGrimmerglenObjectsProgress();
+    const tier = progress[object.type]?.tier || 'start';
+    const exercise = DATA.memories?.[object.type]?.[tier];
+    if (!exercise || !window.GrimmerglenTyping) {
+      objectPanel.innerHTML = `<div class="dp-inner"><div class="dp-body"><button class="dp-close-x" type="button" id="mg-object-close">✕</button><p class="dp-name-en">MEMORY LOST</p><p class="dp-line-en">This memory is not ready yet.</p></div></div>`;
+      objectPanel.querySelector('#mg-object-close')?.addEventListener('click', closeGrimmerglenObjectPanel);
+      return;
+    }
+    objectPanel.innerHTML = `
+      <span class="dp-handle"></span>
+      <div class="dp-inner mg-object-inner">
+        <div class="mg-object-art-wrap"><img class="mg-object-art" src="${DATA.collectibles[object.type]}" alt="${escapeHTML(object.label)}"></div>
+        <div class="dp-body">
+          <button class="dp-close-x" type="button" id="mg-object-close">✕</button>
+          <p class="dp-name-en">DAYDREAM MEMORY</p>
+          <p class="dp-name-kanji">${escapeHTML(object.label)} <span style="font-weight:400;color:#9a7850;">・夢のかけら</span></p>
+          <div class="dp-divider"></div>
+          <p class="dp-line-en">A memory is hiding here. Type what you remember.</p>
+          <p class="dp-line-jp">${furiJP('ここに記憶が隠れている。思い出したことをタイプしてね。', { '記憶': 'きおく', '隠れている': 'かくれている', '思い出した': 'おもいだした' })}</p>
+          <div id="mg-object-exercise-mount"></div>
+        </div>
+      </div>`;
+    objectPanel.querySelector('#mg-object-close')?.addEventListener('click', closeGrimmerglenObjectPanel);
+    const mount = objectPanel.querySelector('#mg-object-exercise-mount');
+    window.GrimmerglenTyping.renderExercise(mount, exercise, {
+      onCorrect: () => completeGrimmerglenObject(object),
+      onWrong: () => {}
+    });
+  }
+
+  function completeGrimmerglenObject(object) {
+    if (!objectPanelOpen || !activeObject || activeObject.id !== object.id) return;
+    if (!writeGrimmerglenObjectFound(object.type, object.id)) {
+      const feedback = objectPanel.querySelector('.mgty-feedback');
+      if (feedback) {
+        feedback.textContent = 'The memory could not be saved. Please try again.';
+        feedback.className = 'mgty-feedback is-wrong';
+      }
+      return;
+    }
+    objectPanel.innerHTML = `
+      <span class="dp-handle"></span>
+      <div class="dp-inner mg-object-inner">
+        <div class="mg-object-art-wrap is-found"><img class="mg-object-art" src="${DATA.collectibles[object.type]}" alt="${escapeHTML(object.label)}"></div>
+        <div class="dp-body">
+          <p class="dp-name-en">MEMORY FOUND</p>
+          <p class="dp-name-kanji">${escapeHTML(object.label)} <span style="font-weight:400;color:#9a7850;">・思い出した！</span></p>
+          <div class="dp-divider"></div>
+          <p class="dp-line-en">This daydream is safe with Marietta now.</p>
+          <p class="dp-line-jp">${furiJP('この夢は、もうマリエッタといっしょに覚えていられるよ。', { '夢': 'ゆめ', '覚えて': 'おぼえて' })}</p>
+          <div class="dp-btns"><button class="dp-btn yes" id="mg-object-done" type="button">Keep exploring / ${furiJP('探し続ける', { '探し続ける': 'さがしつづける' })}</button></div>
+        </div>
+      </div>`;
+    objectPanel.querySelector('#mg-object-done')?.addEventListener('click', closeGrimmerglenObjectPanel);
+  }
+
+  function openGrimmerglenObjectPanel(object) {
+    if (!objectPanel || objectPanelOpen || !object || performance.now() < objectPanelCooldown) return;
+    activeObject = object;
+    objectPanelOpen = true;
+    state.clickTarget = null;
+    state.moving = false;
+    if (window.UtsuSfx) window.UtsuSfx.panelOpen();
+    renderGrimmerglenObjectExercise(object);
+    objectPanel.classList.add('open');
+  }
+
+  function closeGrimmerglenObjectPanel() {
+    if (!objectPanel) return;
+    objectPanelOpen = false;
+    activeObject = null;
+    objectPanelCooldown = performance.now() + POPUP_COOLDOWN_MS;
+    if (window.UtsuSfx) window.UtsuSfx.panelClose();
+    objectPanel.classList.remove('open');
+  }
+
+  function clickCheckGrimmerglenObject(worldX, worldY) {
+    if (objectPanelOpen || mariettaPanelOpen || returnPortalOpen) return false;
+    const object = getNearestUnfoundObject(worldX, worldY, OBJECT_HIT_R);
+    if (!object) return false;
+    openGrimmerglenObjectPanel(object);
+    return true;
+  }
+
+  function checkGrimmerglenObjectProximity(now) {
+    if (objectPanelOpen || mariettaPanelOpen || returnPortalOpen || now < objectPanelCooldown) return;
+    if (state.distMovedSinceSpawn < ARROW_MOVE_THRESHOLD) return;
+    const object = getNearestUnfoundObject(state.x, state.y, OBJECT_PROXIMITY_R);
+    if (object) openGrimmerglenObjectPanel(object);
   }
 
   // Opens automatically once per arrival from Karasuki (after any entry
@@ -1282,7 +1491,7 @@
   }
 
   function handleInput(clientX, clientY) {
-    if (mariettaPanelOpen || returnPortalOpen) return;
+    if (mariettaPanelOpen || objectPanelOpen || returnPortalOpen) return;
     const point = stagePoint(clientX, clientY);
     if (entryDrift) {
       if (Math.hypot(point.x - state.x, point.y - state.y) < 30) return;
@@ -1294,6 +1503,7 @@
     }
     if (state.inputLocked || state.transitioning) return;
     if (clickCheckMarietta(point.x, point.y)) return;
+    if (clickCheckGrimmerglenObject(point.x, point.y)) return;
     if (clickCheckReturnPortal(point.x, point.y)) return;
     if (DEV_MODE) updateDevReadout(point.x, point.y);
     if (Math.hypot(point.x - state.x, point.y - state.y) < 30) return;
@@ -1359,6 +1569,7 @@
     actorCtx = actorCanvas.getContext('2d');
     buildDevPanel();
     buildMariettaPanel();
+    buildGrimmerglenObjectPanel();
     buildReturnPortalOverlay();
   }
 
@@ -1401,6 +1612,14 @@
       #grimmerglen-return-yes { background:linear-gradient(135deg,#ff8fc0,#ffd166); border:1px solid rgba(224,85,158,.7); color:#5a1638; }
       #grimmerglen-return-no { background:transparent; border:1px solid rgba(224,85,158,.4); color:#a9548a; }
       .utsu-card#grimmerglen-marietta-panel .dp-btn.no { color:#a9548a; border-color:rgba(224,85,158,.4); }
+      #grimmerglen-object-panel{width:min(680px,calc(100vw - 24px));}
+      #grimmerglen-object-panel .mg-object-inner{align-items:center;}
+      .mg-object-art-wrap{flex:0 0 clamp(74px,11vw,112px);width:clamp(74px,11vw,112px);height:clamp(74px,11vw,112px);display:grid;place-items:center;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.9),rgba(255,201,224,.28));box-shadow:0 0 24px rgba(184,164,255,.42);}
+      .mg-object-art-wrap.is-found{filter:saturate(.75);opacity:.78;}
+      .mg-object-art{display:block;width:92%;height:92%;object-fit:contain;filter:drop-shadow(0 5px 7px rgba(120,58,105,.2));}
+      #grimmerglen-object-panel .dp-body{min-width:0;}
+      #grimmerglen-object-panel .dp-line-jp{margin:0 0 8px;}
+      @media(max-width:700px){#grimmerglen-object-panel{width:calc(100vw - 16px);}#grimmerglen-object-panel .mg-object-inner{gap:8px;}#grimmerglen-object-panel .mg-object-art-wrap{flex-basis:64px;width:64px;height:64px;}#grimmerglen-object-panel .mgty-input-row{flex-wrap:wrap;}#grimmerglen-object-panel .mgty-submit{min-height:42px;flex:0 0 100%;padding:10px 16px;}}
     `;
     document.head.appendChild(style);
   }
@@ -1410,8 +1629,9 @@
     state.lastTickTime = now;
     state.speed = BASE_SPEED * (dt / TARGET_DT);
     const drifting = !state.transitioning && tickEntryDrift(now);
-    if (!state.transitioning && !drifting && !state.inputLocked && !mariettaPanelOpen && !returnPortalOpen) {
+    if (!state.transitioning && !drifting && !state.inputLocked && !mariettaPanelOpen && !objectPanelOpen && !returnPortalOpen) {
       handleMovement();
+      checkGrimmerglenObjectProximity(now);
       const exit = getAvailableExit(now);
       if (exit) transitionTo(exit);
       checkReturnPortalProximity(now);

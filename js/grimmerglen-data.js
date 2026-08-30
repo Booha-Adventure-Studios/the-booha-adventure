@@ -131,7 +131,7 @@
     rooms[roomId] = {
       bg: `assets/img/grimmerglen/${roomId}.webp`,
       spawns: { ...SPAWNS },
-    exits: NPP[roomId] || [],
+      exits: NPP[roomId] || [],
       walkable: makeWalkable(),
       color: ROOM_COLOR[roomId]
     };
@@ -179,20 +179,19 @@
     // anything that walks one can index the other directly.
     objectTypes: ['banner', 'ticket', 'pillow', 'backpack', 'book', 'teddyBear', 'toGoCoffeeCup', 'ball'],
 
-    // Placement manifest -- 8 types x 3 instance slots, matching the
-    // locked "3 copies per type, each copy found advances that type's
-    // tier" decision. room/x/y stay null until an actual placement pass
-    // walks the 9 rooms and decides where each copy sits -- this only
-    // builds the shape, same as the plan doc asked for.
+    // Placement manifest -- 8 types x 3 instance slots. Each type's three
+    // copies live in different rooms, while rooms may hold several different
+    // object types. Coordinates stay in the current generous cross-corridor
+    // walkable shape until the later per-room calibration pass.
     objects: {
-      banner:        [ { room: null, x: null, y: null }, { room: null, x: null, y: null }, { room: null, x: null, y: null } ],
-      ticket:        [ { room: null, x: null, y: null }, { room: null, x: null, y: null }, { room: null, x: null, y: null } ],
-      pillow:        [ { room: null, x: null, y: null }, { room: null, x: null, y: null }, { room: null, x: null, y: null } ],
-      backpack:      [ { room: null, x: null, y: null }, { room: null, x: null, y: null }, { room: null, x: null, y: null } ],
-      book:          [ { room: null, x: null, y: null }, { room: null, x: null, y: null }, { room: null, x: null, y: null } ],
-      teddyBear:     [ { room: null, x: null, y: null }, { room: null, x: null, y: null }, { room: null, x: null, y: null } ],
-      toGoCoffeeCup: [ { room: null, x: null, y: null }, { room: null, x: null, y: null }, { room: null, x: null, y: null } ],
-      ball:          [ { room: null, x: null, y: null }, { room: null, x: null, y: null }, { room: null, x: null, y: null } ]
+      banner:        [ { room: 'room_01', x: 250,  y: 580 }, { room: 'room_02', x: 260,  y: 420 }, { room: 'room_03', x: 1260, y: 650 } ],
+      ticket:        [ { room: 'room_01', x: 1240, y: 650 }, { room: 'room_05', x: 250,  y: 650 }, { room: 'room_06', x: 1240, y: 400 } ],
+      pillow:        [ { room: 'room_01', x: 600,  y: 690 }, { room: 'room_04', x: 250,  y: 650 }, { room: 'room_06', x: 450,  y: 650 } ],
+      backpack:      [ { room: 'room_02', x: 760,  y: 580 }, { room: 'room_05', x: 760,  y: 390 }, { room: 'room_07', x: 250,  y: 420 } ],
+      book:          [ { room: 'room_02', x: 1240, y: 660 }, { room: 'room_03', x: 420,  y: 600 }, { room: 'room_07', x: 1250, y: 680 } ],
+      teddyBear:     [ { room: 'room_03', x: 900,  y: 700 }, { room: 'room_06', x: 900,  y: 600 }, { room: 'room_08', x: 250,  y: 650 } ],
+      toGoCoffeeCup: [ { room: 'room_04', x: 1080, y: 680 }, { room: 'room_07', x: 760,  y: 600 }, { room: 'room_09', x: 260,  y: 650 } ],
+      ball:          [ { room: 'room_05', x: 1250, y: 650 }, { room: 'room_08', x: 1200, y: 420 }, { room: 'room_09', x: 1240, y: 650 } ]
     },
 
     // The 8 objects' typing content -- one GrimmerglenTyping.renderExercise()
