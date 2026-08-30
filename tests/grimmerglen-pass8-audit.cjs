@@ -59,6 +59,7 @@ for (const type of data.objectTypes) {
   assert(fs.existsSync(path.join(root, data.collectibles[type])), `${type} collectible art must exist`);
 }
 assert.strictEqual(new Set(allInstances).size, allInstances.length, 'collectible placements must not overlap exactly');
+assert(!allInstances.some(instance => instance.startsWith('room_01:')), 'room_01 must never contain memory objects');
 
 for (const room of Object.values(data.rooms)) {
   assert(fs.existsSync(path.join(root, room.bg)), `room art must exist: ${room.bg}`);
@@ -104,6 +105,9 @@ for (const script of scripts) {
 }
 
 assert(runtimeSource.includes('drawGrimmerglenObjects'), 'runtime must draw scattered objects');
+assert(runtimeSource.includes('const OBJECT_DRAW_SIZE = 58'), 'collectible art must render near Grimmerglen Booha size');
+assert(runtimeSource.includes('drawPastelVignette'), 'pastel room color must be applied as an edge vignette');
+assert(runtimeSource.includes('drawEdgeLeaves'), 'room-colored leaves must drift around the edges');
 assert(runtimeSource.includes('clickCheckGrimmerglenObject'), 'runtime must support clicked pickups');
 assert(runtimeSource.includes('checkGrimmerglenObjectProximity'), 'runtime must support approached pickups');
 assert(runtimeSource.includes('GrimmerglenTyping.renderExercise'), 'pickup UI must use the shared typing engine');
@@ -140,7 +144,7 @@ assert(serviceWorker.includes('grimmerglen/dance/marietta_dance_'), 'service wor
 assert(serviceWorker.includes('grimmerglen/dance/booha_grimmerglen_dance_'), 'service worker must precache Booha dance art');
 assert(serviceWorker.includes('room_${String(index + 1).padStart(2, \'0\')}.webp'), 'service worker must cover the generated room sequence');
 assert(serviceWorker.includes('${BASE}/assets/img/grimmerglen/booha_change.mp3'), 'service worker must precache the Booha change cue');
-assert(/assets:\s+'booha-assets-2026-436'/.test(serviceWorker), 'asset cache must be bumped for the entry audio pass');
+assert(/assets:\s+'booha-assets-2026-437'/.test(serviceWorker), 'asset cache must be bumped for the Grimmerglen visual pass');
 
 assert(profile.includes('GRIMMERGLEN / MEMORY CASE FILE'), 'profile must use the Grimmerglen case-file header');
 assert(profile.includes('grimmerglen-data.js'), 'profile must load the Grimmerglen manifest');

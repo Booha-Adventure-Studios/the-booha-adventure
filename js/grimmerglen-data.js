@@ -263,9 +263,9 @@
     // object types. Coordinates stay in the current generous cross-corridor
     // walkable shape until the later per-room calibration pass.
     objects: {
-      banner:        [ { room: 'room_01', x: 250,  y: 580 }, { room: 'room_02', x: 260,  y: 420 }, { room: 'room_03', x: 1260, y: 650 } ],
-      ticket:        [ { room: 'room_01', x: 1240, y: 650 }, { room: 'room_05', x: 250,  y: 650 }, { room: 'room_06', x: 1240, y: 400 } ],
-      pillow:        [ { room: 'room_01', x: 600,  y: 690 }, { room: 'room_04', x: 250,  y: 650 }, { room: 'room_06', x: 450,  y: 650 } ],
+      banner:        [ { room: 'room_10', x: 260,  y: 420 }, { room: 'room_02', x: 260,  y: 420 }, { room: 'room_03', x: 1260, y: 650 } ],
+      ticket:        [ { room: 'room_11', x: 1260, y: 650 }, { room: 'room_05', x: 250,  y: 650 }, { room: 'room_06', x: 1240, y: 400 } ],
+      pillow:        [ { room: 'room_12', x: 600,  y: 690 }, { room: 'room_04', x: 250,  y: 650 }, { room: 'room_06', x: 450,  y: 650 } ],
       backpack:      [ { room: 'room_02', x: 760,  y: 580 }, { room: 'room_05', x: 760,  y: 390 }, { room: 'room_07', x: 250,  y: 420 } ],
       book:          [ { room: 'room_02', x: 1240, y: 660 }, { room: 'room_03', x: 420,  y: 600 }, { room: 'room_07', x: 1250, y: 680 } ],
       teddyBear:     [ { room: 'room_03', x: 900,  y: 700 }, { room: 'room_06', x: 900,  y: 600 }, { room: 'room_08', x: 250,  y: 650 } ],

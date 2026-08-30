@@ -53,7 +53,7 @@
   const MARIETTA_RETURN_PORTAL = { roomId: 'room_01', x: 768, y: 820, r: 44, triggerR: 36 };
   const POPUP_COOLDOWN_MS = 900;
   const OBJECT_HIT_R = 58;
-  const OBJECT_DRAW_SIZE = 94;
+  const OBJECT_DRAW_SIZE = 58;
   const OBJECT_PROXIMITY_R = 58;
   const OBJECT_LABELS = {
     banner: 'Banner',
@@ -115,6 +115,7 @@
   const objectImageCache = new Map();
   const roomGlowCache = new Map();
   const sparkles = [];
+  const edgeLeaves = [];
 
   const boohaImg = new Image();
   boohaImg.decoding = 'async';
@@ -268,7 +269,7 @@
     ];
     for (const spot of spots) {
       const gradient = ctx.createRadialGradient(spot.x, spot.y, 0, spot.x, spot.y, spot.r);
-      gradient.addColorStop(0, `rgba(${rgb.r},${rgb.g},${rgb.b},.55)`);
+      gradient.addColorStop(0, `rgba(${rgb.r},${rgb.g},${rgb.b},.34)`);
       gradient.addColorStop(1, `rgba(${rgb.r},${rgb.g},${rgb.b},0)`);
       ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, WORLD_W, WORLD_H);
@@ -283,6 +284,7 @@
 
   function reseedSparkles(roomId) {
     sparkles.length = 0;
+    edgeLeaves.length = 0;
     const seed = Number(roomId.slice(-2)) || 1;
     const count = 10;
     for (let i = 0; i < count; i++) {
@@ -292,6 +294,19 @@
         phase: (seed + i) * 1.7,
         speed: 0.4 + (i % 3) * 0.15,
         size: 1.6 + (i % 4) * 0.6
+      });
+    }
+    for (let i = 0; i < 16; i++) {
+      const side = i % 4;
+      const lane = (i + 1) / 17;
+      const inset = 28 + ((seed * 19 + i * 23) % 105);
+      edgeLeaves.push({
+        side,
+        x: side < 2 ? lane * WORLD_W : (side === 2 ? inset : WORLD_W - inset),
+        y: side < 2 ? (side === 0 ? inset : WORLD_H - inset) : lane * WORLD_H,
+        phase: seed * .7 + i * 1.83,
+        size: 4 + (i % 3) * 1.1,
+        speed: .34 + (i % 4) * .07
       });
     }
   }
@@ -316,15 +331,66 @@
     }
   }
 
+  function drawEdgeLeaves(now) {
+    if (REDUCED_MOTION) return;
+    const rgb = getRoomGlowRgb(state.roomId);
+    const seconds = now / 1000;
+    for (const leaf of edgeLeaves) {
+      const sway = Math.sin(seconds * leaf.speed + leaf.phase) * 22;
+      const bob = Math.cos(seconds * leaf.speed * 1.35 + leaf.phase) * 16;
+      let x = leaf.x;
+      let y = leaf.y;
+      if (leaf.side < 2) { x += sway; y += bob; }
+      else { x += bob; y += sway; }
+      const rotation = seconds * (leaf.side % 2 ? -.18 : .18) + leaf.phase;
+      const alpha = .28 + .12 * Math.sin(seconds * 1.4 + leaf.phase);
+      atmosphereCtx.save();
+      atmosphereCtx.translate(x, y);
+      atmosphereCtx.rotate(rotation);
+      atmosphereCtx.globalAlpha = alpha;
+      atmosphereCtx.fillStyle = `rgb(${rgb.r},${rgb.g},${rgb.b})`;
+      atmosphereCtx.shadowColor = `rgba(${rgb.r},${rgb.g},${rgb.b},.75)`;
+      atmosphereCtx.shadowBlur = 7;
+      atmosphereCtx.beginPath();
+      atmosphereCtx.moveTo(0, -leaf.size);
+      atmosphereCtx.quadraticCurveTo(leaf.size * 1.15, -leaf.size * .15, 0, leaf.size);
+      atmosphereCtx.quadraticCurveTo(-leaf.size * 1.15, -leaf.size * .15, 0, -leaf.size);
+      atmosphereCtx.fill();
+      atmosphereCtx.shadowBlur = 0;
+      atmosphereCtx.strokeStyle = 'rgba(255,255,255,.3)';
+      atmosphereCtx.lineWidth = .8;
+      atmosphereCtx.beginPath();
+      atmosphereCtx.moveTo(0, -leaf.size * .72);
+      atmosphereCtx.lineTo(0, leaf.size * .68);
+      atmosphereCtx.stroke();
+      atmosphereCtx.restore();
+    }
+  }
+
+  function drawPastelVignette() {
+    const rgb = getRoomGlowRgb(state.roomId);
+    const radius = Math.max(WORLD_W, WORLD_H) * .72;
+    const gradient = atmosphereCtx.createRadialGradient(CENTER_X, CENTER_Y, radius * .18, CENTER_X, CENTER_Y, radius);
+    gradient.addColorStop(0, 'rgba(255,255,255,0)');
+    gradient.addColorStop(.62, `rgba(${rgb.r},${rgb.g},${rgb.b},.025)`);
+    gradient.addColorStop(1, `rgba(${rgb.r},${rgb.g},${rgb.b},.3)`);
+    atmosphereCtx.save();
+    atmosphereCtx.fillStyle = gradient;
+    atmosphereCtx.fillRect(0, 0, WORLD_W, WORLD_H);
+    atmosphereCtx.restore();
+  }
+
   function drawAtmosphere(now) {
     atmosphereCtx.clearRect(0, 0, WORLD_W, WORLD_H);
     const seed = Number(state.roomId.slice(-2)) || 1;
     const pulse = REDUCED_MOTION ? .85 : .78 + .22 * Math.sin(now / 2100 + seed);
     atmosphereCtx.save();
-    atmosphereCtx.globalAlpha = pulse;
+    atmosphereCtx.globalAlpha = pulse * .72;
     atmosphereCtx.globalCompositeOperation = 'screen';
     atmosphereCtx.drawImage(getRoomGlow(state.roomId), 0, 0);
     atmosphereCtx.restore();
+    drawPastelVignette();
+    drawEdgeLeaves(now);
     drawSparkles(now);
   }
 
