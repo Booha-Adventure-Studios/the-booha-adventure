@@ -26,7 +26,7 @@ const sandbox = { window: {} };
 vm.runInNewContext(dataSource, sandbox, { filename: 'grimmerglen-data.js' });
 const data = sandbox.window.GRIMMERGLEN_DATA;
 assert(data, 'Grimmerglen data must export its runtime manifest');
-assert.strictEqual(Object.keys(data.rooms).length, 9, 'the world must have 9 rooms');
+assert.strictEqual(Object.keys(data.rooms).length, 15, 'the world must have 15 rooms');
 assert.strictEqual(data.objectTypes.length, 8, 'the world must have 8 collectible types');
 
 const allInstances = [];
@@ -69,6 +69,11 @@ assert.strictEqual(data.dance.booha.length, 3, 'Grimmerglen Booha must have thre
 for (const frame of [...data.dance.marietta, ...data.dance.booha]) {
   assert(fs.existsSync(path.join(root, frame)), `dance art must exist: ${frame}`);
 }
+assert.deepStrictEqual(data.marietta && { x: data.marietta.x, y: data.marietta.y }, { x: 434, y: 504 }, 'Marietta must use the measured fixed position');
+assert(data.rooms.room_10 && data.rooms.room_11 && data.rooms.room_12 && data.rooms.room_13 && data.rooms.room_14 && data.rooms.room_15, 'the six themed room expansion entries must exist');
+assert.strictEqual(data.rooms.room_04.exits.find(exit => exit.dir === 'right').x, 1142, 'room_04 right exit must use the measured x coordinate');
+assert.strictEqual(data.rooms.room_08.exits.find(exit => exit.dir === 'right').y, 456, 'room_08 right exit must use the measured y coordinate');
+assert.strictEqual(data.rooms.room_09.exits.find(exit => exit.dir === 'up').y, 234, 'room_09 up exit must use the measured y coordinate');
 
 const scripts = [
   'js/calendar.js', 'js/core/adventure-core.js', 'js/core/save-file.js',
@@ -119,7 +124,8 @@ assert(serviceWorker.includes('${BASE}/assets/img/grimmerglen/grimmerglen_dance.
 assert(/pages:\s+'booha-pages-2026-377'/.test(serviceWorker), 'page cache must be bumped for the entry pass');
 assert(serviceWorker.includes('grimmerglen/dance/marietta_dance_'), 'service worker must precache Marietta dance art');
 assert(serviceWorker.includes('grimmerglen/dance/booha_grimmerglen_dance_'), 'service worker must precache Booha dance art');
-assert(/assets:\s+'booha-assets-2026-434'/.test(serviceWorker), 'asset cache must be bumped for the entry pass');
+assert(serviceWorker.includes('room_${String(index + 1).padStart(2, \'0\')}.webp'), 'service worker must cover the generated room sequence');
+assert(/assets:\s+'booha-assets-2026-435'/.test(serviceWorker), 'asset cache must be bumped for the room expansion pass');
 
 assert(profile.includes('GRIMMERGLEN / MEMORY CASE FILE'), 'profile must use the Grimmerglen case-file header');
 assert(profile.includes('grimmerglen-data.js'), 'profile must load the Grimmerglen manifest');
@@ -138,4 +144,4 @@ assert(unlockSource.includes("grimmerglen:rooms_explored"), 'unlock system must 
 assert(muenbaSource.includes('getMuenbaHuntGhostOrder'), 'Muenba must persist a randomized hunt order');
 assert(muenbaSource.includes('randomizedMuenbaCases'), 'Muenba cases must follow the randomized hunt order');
 
-console.log(`Grimmerglen Pass 8 audit passed: 9 rooms, ${allInstances.length} placed instances, typing pickup flow, and service-worker coverage.`);
+console.log(`Grimmerglen audit passed: 15 rooms, ${allInstances.length} placed instances, typing pickup flow, and service-worker coverage.`);
