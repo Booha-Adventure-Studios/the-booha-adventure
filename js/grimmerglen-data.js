@@ -159,6 +159,16 @@
         const pose = String(index + 1).padStart(2, '0');
         return `assets/img/grimmerglen/marietta/marietta_${pose}.webp`;
       })
+    },
+    collectibles: {
+      banner: 'assets/img/grimmerglen/collectibles/banner.webp',
+      ticket: 'assets/img/grimmerglen/collectibles/ticket.webp',
+      pillow: 'assets/img/grimmerglen/collectibles/pillow.webp',
+      backpack: 'assets/img/grimmerglen/collectibles/backpack.webp',
+      book: 'assets/img/grimmerglen/collectibles/book.webp',
+      teddyBear: 'assets/img/grimmerglen/collectibles/teddy_bear.webp',
+      toGoCoffeeCup: 'assets/img/grimmerglen/collectibles/to_go_coffee_cup.webp',
+      ball: 'assets/img/grimmerglen/collectibles/ball.webp'
     }
   };
 })();
