@@ -105,7 +105,7 @@
   // WebAudio cue when the swap happens live rather than silently.
   const boohaGrimmerglenImg = new Image();
   boohaGrimmerglenImg.decoding = 'async';
-  boohaGrimmerglenImg.src = 'assets/img/grimmerglen/booha_grimmerglen.webp';
+  boohaGrimmerglenImg.src = (DATA.booha && DATA.booha.sprite) || 'assets/img/grimmerglen/booha_grimmerglen.webp';
   let boohaShakeUntil = 0;
   let boohaShakeSeed = Math.random() * 1000;
   const boohaTransformParticles = [];
@@ -247,6 +247,7 @@
     state.transitionReadyAt = performance.now() + TRANSITION_COOLDOWN_MS;
     state.spawnLockUntil = performance.now() + 700;
     showRoom(roomId);
+    markGrimmerglenRoomVisited(roomId);
     reseedSparkles(roomId);
     updateDevReadout();
     entryDrift = null;
@@ -841,6 +842,51 @@
   function writeGrimmerglenTutorial(patchObj) {
     const current = getGrimmerglenTutorial();
     return writeGrimmerglen({ tutorial: Object.assign({}, current, patchObj) });
+  }
+
+  // Room-visit running totals, mirroring Muenba's own
+  // markMuenbaRoomVisited() -- first-time-per-room timestamps plus an
+  // always-incrementing total, called once per setRoom() (not per tick).
+  function markGrimmerglenRoomVisited(roomId) {
+    try {
+      const d = readGrimmerglen();
+      if (!d.visitedRooms || typeof d.visitedRooms !== 'object') d.visitedRooms = {};
+      if (!Number.isInteger(d.roomVisitsTotal) || d.roomVisitsTotal < 0) d.roomVisitsTotal = 0;
+      if (!d.visitedRooms[roomId]) d.visitedRooms[roomId] = Date.now();
+      d.roomVisitsTotal += 1;
+      writeGrimmerglen(d);
+    } catch (_) {}
+  }
+
+  // Placeholder per-object-type/per-tier progress -- the save-side half of
+  // the "3 copies advance the tier" locked decision (found 0 or 1 copies
+  // -> Starter, 2 -> Case, 3 -> Deep). Nothing calls
+  // writeGrimmerglenObjectFound() yet, since no pickup system exists to
+  // find a copy of anything -- this just gives that future pass a save
+  // contract to write into rather than needing to invent one later.
+  const GRIMMERGLEN_TIER_BY_FOUND = ['start', 'start', 'case', 'deep'];
+
+  function getGrimmerglenObjectsProgress() {
+    const d = readGrimmerglen();
+    const stored = (d && typeof d.objects === 'object' && d.objects) || {};
+    const progress = {};
+    (DATA.objectTypes || []).forEach(type => {
+      const entry = stored[type];
+      const found = Number.isInteger(entry && entry.found)
+        ? Math.max(0, Math.min(3, entry.found))
+        : 0;
+      progress[type] = { found, tier: GRIMMERGLEN_TIER_BY_FOUND[found] };
+    });
+    return progress;
+  }
+
+  function writeGrimmerglenObjectFound(type) {
+    if (!DATA.objectTypes || !DATA.objectTypes.includes(type)) return false;
+    const progress = getGrimmerglenObjectsProgress();
+    const stored = {};
+    Object.keys(progress).forEach(t => { stored[t] = { found: progress[t].found }; });
+    stored[type] = { found: Math.min(3, progress[type].found + 1) };
+    return writeGrimmerglen({ objects: stored });
   }
 
   /* ===============================================
