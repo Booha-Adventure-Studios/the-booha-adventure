@@ -104,7 +104,9 @@ const CURRENT_CACHES = {
   // room navigation/Marietta placement.
   // Grimmerglen entry-audio pass: the recorded Booha transformation cue is
   // normalized to compact 44.1 kHz mono 112 kbps MP3.
-  assets: 'booha-assets-2026-436',
+  // Grimmerglen visual polish: room-01 is object-free, room-12 is refreshed,
+  // collectibles are smaller, and room-colored vignette leaves are live.
+  assets: 'booha-assets-2026-437',
   decks:  'booha-decks-2026-310',
 };
 
