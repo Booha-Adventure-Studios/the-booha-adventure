@@ -36,10 +36,17 @@ for (const type of data.objectTypes) {
     allInstances.push(`${slot.room}:${slot.x},${slot.y}`);
   });
   assert(data.memories[type], `${type} must have typing memories`);
+  assert(data.stories[type] && data.stories[type].en && data.stories[type].jp, `${type} must have a translated Marietta story`);
+  const answers = [];
   for (const tier of ['start', 'case', 'deep']) {
     const exercise = data.memories[type][tier];
     assert(exercise && exercise.promptEn && exercise.accepted?.length, `${type} must have a complete ${tier} exercise`);
+    answers.push(exercise.accepted[0]);
   }
+  assert.strictEqual(new Set(answers).size, 1, `${type} must repeat the same sentence across all three returns`);
+  assert.strictEqual(data.memories[type].start.options.length, 3, `${type} Starter must show three complete helpers`);
+  assert.strictEqual(data.memories[type].case.options.length, 3, `${type} Case must show three partial helpers`);
+  assert(data.memories[type].deep.options === null && data.memories[type].deep.helpText, `${type} Deep must use optional Furigana help`);
   assert(fs.existsSync(path.join(root, data.collectibles[type])), `${type} collectible art must exist`);
 }
 assert.strictEqual(new Set(allInstances).size, allInstances.length, 'collectible placements must not overlap exactly');
@@ -72,6 +79,10 @@ assert(runtimeSource.includes('checkGrimmerglenObjectProximity'), 'runtime must 
 assert(runtimeSource.includes('GrimmerglenTyping.renderExercise'), 'pickup UI must use the shared typing engine');
 assert(runtimeSource.includes('writeGrimmerglenObjectFound(object.type, object.id)'), 'successful pickup must persist exact object progress');
 assert(runtimeSource.includes('objectSlots'), 'exact object slots must be persisted');
+assert(runtimeSource.includes('getActiveGrimmerglenTargetType'), 'runtime must enforce one active object target at a time');
+assert(runtimeSource.includes('renderMariettaHandoff'), 'Marietta must receive carried objects before the quiz');
+assert(runtimeSource.includes('renderMariettaWrongItem'), 'wrong items must be rejected and returned to the hunt');
+assert(!runtimeSource.includes('openGrimmerglenObjectPanel'), 'object pickup must not open the typing quiz immediately');
 assert(typingSource.includes('function renderExercise'), 'typing engine must expose renderExercise');
 assert(serviceWorker.includes('${BASE}/grimmerglen.html'), 'service worker must precache grimmerglen.html');
 for (const asset of ['grimmerglen-data.js', 'grimmerglen-typing.js', 'grimmerglen.js']) {
