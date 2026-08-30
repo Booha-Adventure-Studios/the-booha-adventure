@@ -577,9 +577,44 @@
     window.requestAnimationFrame(tick);
   }
 
+  // Grimmerglen is still under construction -- GRIMMERGLEN_BUILD_READY in
+  // js/core/unlock-system.js keeps the door shut for real students even
+  // once they've earned the weekly gate, the same temporary-scaffold shape
+  // Muenba's own gate carried while it was being built. DEV_MODE / the dev
+  // panel checkbox bypasses it for testing.
+  function worldGateOpen() {
+    if (DEV_MODE || window.__devGrimmerglen) return true;
+    return window.BoohaUnlockSystem &&
+      typeof BoohaUnlockSystem.isGrimmerglenUnlocked === 'function'
+      ? BoohaUnlockSystem.isGrimmerglenUnlocked()
+      : false;
+  }
+
+  function showLockedWorld() {
+    const style = document.createElement('style');
+    style.textContent = `
+      html,body{margin:0;min-height:100%;background:#fff3f8;color:#7a1f4b;}
+      body{display:grid;place-items:center;font-family:Georgia,'Times New Roman',serif;}
+      .grimmerglen-lock{box-sizing:border-box;width:min(460px,calc(100% - 36px));padding:28px 26px 30px;border:1px solid rgba(255,150,190,.55);border-radius:18px;background:linear-gradient(155deg,rgba(255,244,249,.97),rgba(255,228,239,.98));box-shadow:0 24px 70px rgba(224,85,158,.18),0 0 55px rgba(255,150,190,.28),inset 0 0 70px rgba(255,255,255,.65);text-align:center;}
+      .grimmerglen-lock img{display:block;width:min(150px,38vw);height:auto;max-height:180px;object-fit:contain;margin:0 auto 10px;filter:drop-shadow(0 0 18px rgba(255,150,190,.35));}
+      .grimmerglen-lock h1{margin:6px 0 3px;font-size:clamp(1.25rem,5vw,1.8rem);font-weight:400;letter-spacing:.08em;text-transform:uppercase;color:#a9548a;}
+      .grimmerglen-lock .jp{margin:0;color:#c07aa3;font-size:.88rem;letter-spacing:.12em;}
+      .grimmerglen-lock p{margin:20px auto 0;max-width:31em;color:#8a3d68;font-size:.94rem;line-height:1.7;}
+      .grimmerglen-lock p small{display:block;margin-top:8px;color:#b06a94;font-size:.86em;}
+      .grimmerglen-lock p.jp-line{margin-top:6px;color:#b06a94;font-size:.86em;letter-spacing:0;}
+      .grimmerglen-lock a{display:inline-block;margin-top:22px;padding:9px 16px;border:1px solid rgba(224,85,158,.5);border-radius:999px;color:#7a1f4b;text-decoration:none;font-size:.78rem;letter-spacing:.05em;background:rgba(255,150,190,.14);}
+      .grimmerglen-lock a:hover,.grimmerglen-lock a:focus-visible{background:rgba(255,150,190,.26);outline:none;}
+      .grimmerglen-lock a small{display:block;margin-top:2px;color:#b06a94;font-size:.9em;}
+    `;
+    document.head.appendChild(style);
+    document.body.innerHTML = `<main class="grimmerglen-lock" aria-labelledby="grimmerglen-lock-title"><img src="assets/img/grimmerglen/marietta/marietta_01.webp" alt="Marietta"><h1 id="grimmerglen-lock-title">This world is locked</h1><p class="jp">この世界は封印されています</p><p>Something dreamy waits beyond this path.<small>Complete nine lessons in one path this week before it will open to you.</small></p><p class="jp-line">この<ruby>道<rt>みち</rt></ruby>の<ruby>先<rt>さき</rt></ruby>で、<ruby>夢<rt>ゆめ</rt></ruby>のような<ruby>何<rt>なに</rt></ruby>かが<ruby>待<rt>ま</rt></ruby>っている。<br><small>今週、ひとつの道で九つの学びを終えよ。それまで、ここは開かない。</small></p><a href="karasuki.html">Return to Karasuki<small>カラスキに<ruby>戻<rt>もど</rt></ruby>る</small></a></main>`;
+  }
+
   function init() {
-    // Pass 2 hooks the independent access lock in here:
-    //   if (!isGrimmerglenUnlocked()) { showLockedWorld(); return; }
+    if (!worldGateOpen()) {
+      showLockedWorld();
+      return;
+    }
     injectStyles();
     buildApp();
     fitStage();

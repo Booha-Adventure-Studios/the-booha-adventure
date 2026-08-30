@@ -95,6 +95,17 @@ const HAPPY_HOUSE_PORTAL = {
     href    : "muenba.html?from=karasuki",
   };
 
+  // Grimmerglen — foundation pass 2. No intro video yet (none has been
+  // authored); the portal fades to black and navigates directly, the same
+  // stopgap shape Muenba's own portal used before its video existed.
+  const GRIMMERGLEN_PORTAL = {
+    roomId: "room_14",
+    x     : 799,
+    y     : 199,
+    r     : 44,
+    href  : "grimmerglen.html?from=karasuki",
+  };
+
   const ARRIVAL_ARROW_DELAY_MS        = 2000;
   const ARRIVAL_ARROW_BACK_MULTIPLIER = 3;
   const TRANSITION_COOLDOWN_MS        = 1400;
@@ -113,6 +124,8 @@ const HAPPY_HOUSE_PORTAL = {
   let   utsurobaCooldownUntil       = 0;
   let   muenbaCooldownUntil         = 0;
   let   muenbaPopOverlay             = null;
+  let   grimmerglenCooldownUntil    = 0;
+  let   grimmerglenPopOverlay       = null;
   let   observerPopCooldownUntil    = 0;
 
   /* ═══════════════════════════════════════════
@@ -3031,7 +3044,7 @@ const HAPPY_HOUSE_PORTAL = {
     if (wrap) {
       wrap.classList.add('image-mode');
       wrap.classList.remove('orb-mode', 'image-feed', 'image-blocks', 'image-invaders',
-        'image-destruction', 'image-happy', 'image-utsuroba', 'image-profile');
+        'image-destruction', 'image-happy', 'image-utsuroba', 'image-profile', 'image-grimmerglen');
       if (variant) wrap.classList.add(variant);
     }
     if (orb) orb.style.display = 'none';
@@ -3943,6 +3956,198 @@ const HAPPY_HOUSE_PORTAL = {
   }
 
   /* ═══════════════════════════════════════════
+     GRIMMERGLEN PORTAL
+  ═══════════════════════════════════════════ */
+  // Foundation pass 2: the portal itself (dim while locked, a glowing
+  // pastel arrow once open) and the Karasuki-side gate popup. Marietta's
+  // own welcome popup inside Grimmerglen, her dialogue, and the typing
+  // engine are later passes -- this popup only decides whether the door
+  // opens, the same scope Utsuroba/Muenba's own portal popups have here.
+  const GRIMMERGLEN_ARROW_COLORS = ['#ff9fc2', '#ffe066', '#8fd0ff', '#b8a4ff', '#8fe6c4'];
+
+  function grimmerglenUnlocked() {
+    // Same temporary-scaffold shape Muenba used before it shipped for
+    // real: an independent build-ready flag on top of the shared weekly
+    // gate, so real students can't wander in before the area is finished.
+    // See BoohaUnlockSystem.isGrimmerglenUnlocked() / GRIMMERGLEN_BUILD_READY.
+    if (window.__devGrimmerglen) return true;
+    return window.BoohaUnlockSystem &&
+      typeof BoohaUnlockSystem.isGrimmerglenUnlocked === 'function'
+      ? BoohaUnlockSystem.isGrimmerglenUnlocked()
+      : false;
+  }
+
+  function drawGrimmerglenPortal(now) {
+    if (state.roomId !== GRIMMERGLEN_PORTAL.roomId) return;
+    const sec = now / 1000;
+    const moveReveal = Math.max(0.18, Math.min(1, state.distMovedSinceSpawn / ARROW_MOVE_THRESHOLD));
+    const unlocked = grimmerglenUnlocked();
+    const cx = GRIMMERGLEN_PORTAL.x;
+    const cy = GRIMMERGLEN_PORTAL.y;
+
+    if (!unlocked) {
+      // "A dim area sitting there" -- quiet and muted, not eerie-dark like
+      // Muenba's locked haze, since Grimmerglen stays a cute world even
+      // while sealed.
+      const pulse = 0.5 + 0.5 * Math.sin(sec * 1.1);
+      ctx.save();
+      const haze = ctx.createRadialGradient(cx, cy, 2, cx, cy, 58);
+      haze.addColorStop(0, 'rgba(190,178,196,.55)');
+      haze.addColorStop(1, 'transparent');
+      ctx.globalAlpha = moveReveal * (0.18 + pulse * 0.07);
+      ctx.fillStyle = haze;
+      ctx.beginPath(); ctx.arc(cx, cy, 58, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+      return;
+    }
+
+    // Unlocked: the same two-stroke chevron + halo + bright core dot
+    // drawExitArrows() uses for Karasuki's own room-exit arrows, just
+    // glowing through a cycling bright pastel palette rather than one
+    // room's fixed accent pair, since this points out of Karasuki rather
+    // than toward one of its own rooms.
+    const cycleT = (sec * 0.35) % GRIMMERGLEN_ARROW_COLORS.length;
+    const idx0 = Math.floor(cycleT) % GRIMMERGLEN_ARROW_COLORS.length;
+    const idx1 = (idx0 + 1) % GRIMMERGLEN_ARROW_COLORS.length;
+    const t = cycleT - Math.floor(cycleT);
+    const arrowCol1 = lerpHex(GRIMMERGLEN_ARROW_COLORS[idx0], GRIMMERGLEN_ARROW_COLORS[idx1], t);
+    const arrowCol2 = lerpHex(GRIMMERGLEN_ARROW_COLORS[idx1], GRIMMERGLEN_ARROW_COLORS[(idx1 + 1) % GRIMMERGLEN_ARROW_COLORS.length], t);
+    const pulse = 0.5 + 0.5 * Math.sin(sec * 2.2);
+    const bounce = Math.sin(sec * 3.4) * 9;
+    const angle = -Math.PI / 2;
+    const ax = cx + Math.cos(angle) * bounce;
+    const ay = cy + Math.sin(angle) * bounce;
+
+    ctx.save(); ctx.translate(ax, ay); ctx.rotate(angle);
+    const haloR = 56;
+    const ga = ctx.createRadialGradient(0, 0, 0, 0, 0, haloR);
+    ga.addColorStop(0, arrowCol1); ga.addColorStop(1, 'transparent');
+    ctx.globalAlpha = 0.26 + pulse * 0.16; ctx.fillStyle = ga;
+    ctx.beginPath(); ctx.arc(0, 0, haloR, 0, Math.PI * 2); ctx.fill();
+    [{ ox: -11, a: 0.65 }, { ox: 4, a: 1.0 }].forEach(({ ox, a }) => {
+      ctx.globalAlpha = a * (0.5 + pulse * 0.4);
+      ctx.strokeStyle = arrowCol1; ctx.lineWidth = 3.6; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      ctx.shadowBlur = 20; ctx.shadowColor = arrowCol2;
+      ctx.beginPath(); ctx.moveTo(ox - 7, -10); ctx.lineTo(ox + 7, 0); ctx.lineTo(ox - 7, 10); ctx.stroke();
+      ctx.shadowBlur = 0;
+    });
+    ctx.globalAlpha = 0.7 + pulse * 0.3; ctx.fillStyle = '#fff';
+    ctx.shadowBlur = 22; ctx.shadowColor = arrowCol1;
+    ctx.beginPath(); ctx.arc(0, 0, 6.5, 0, Math.PI * 2); ctx.fill();
+    ctx.shadowBlur = 0; ctx.restore();
+  }
+
+  function enterGrimmerglen() {
+    if (state.grimmerglenExiting) return;
+    state.grimmerglenExiting = true;
+    state.clickTarget = null;
+    state.moving = false;
+    try { music.pause(); music.currentTime = 0; } catch (_) {}
+    const fadeEl = document.getElementById('kara-fade');
+    fadeEl.style.transition = `opacity ${FADE_MS}ms ease-in`;
+    fadeEl.style.opacity = '1';
+    setTimeout(() => {
+      const href = window.__devGrimmerglen ? `${GRIMMERGLEN_PORTAL.href}&dev=1` : GRIMMERGLEN_PORTAL.href;
+      window.location.href = href;
+    }, FADE_MS + 60);
+  }
+
+  const GRIMMERGLEN_THEME = {
+    bg: 'linear-gradient(160deg,#fff2f8 0%,#ffe4ef 55%,#fff9fb 100%)',
+    border: 'rgba(255,150,190,.6)',
+    accent1: '#e0559e', accent2: '#f2b705', accent3: '#8a4bbf',
+    glow1: 'rgba(255,150,190,.55)', glow2: 'rgba(255,224,102,.45)',
+    btnBorder: 'rgba(224,85,158,.7)', btnColor: '#7a1f4b',
+    shadow: '0 0 0 1px rgba(255,150,190,.4),0 0 40px rgba(255,150,190,.4),0 0 90px rgba(255,224,102,.3),inset 0 0 40px rgba(255,255,255,.6)',
+  };
+
+  function injectGrimmerglenPopOverlay() {
+    if (grimmerglenPopOverlay) return;
+    grimmerglenPopOverlay = document.createElement('div');
+    grimmerglenPopOverlay.id = 'grimmerglen-pop-overlay';
+    grimmerglenPopOverlay.className = 'wpop-overlay';
+    grimmerglenPopOverlay.innerHTML = wpopMarkup('grimmerglen-pop');
+    document.body.appendChild(grimmerglenPopOverlay);
+    document.getElementById('grimmerglen-pop-close').addEventListener('click', closeGrimmerglenPopup);
+    grimmerglenPopOverlay.addEventListener('click', event => {
+      if (event.target === grimmerglenPopOverlay) closeGrimmerglenPopup();
+    });
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && isGrimmerglenPopupOpen()) closeGrimmerglenPopup();
+    });
+  }
+
+  function openGrimmerglenPopup() {
+    if (!grimmerglenPopOverlay) injectGrimmerglenPopOverlay();
+    const unlocked = grimmerglenUnlocked();
+    if (!unlocked && window.UtsuSfx && typeof window.UtsuSfx.lockedRattle === 'function') window.UtsuSfx.lockedRattle();
+    wpopThemeBox('grimmerglen-pop', GRIMMERGLEN_THEME);
+    // The sprite in this popup is Marietta, not a logo -- same as how the
+    // wanderer popups show a portrait rather than an icon.
+    wpopSetIconImage('grimmerglen-pop', 'assets/img/grimmerglen/marietta/marietta_01.webp', 'Marietta', 'image-grimmerglen');
+    wpopSetText(document.getElementById('grimmerglen-pop-title-en'), '');
+    wpopSetText(document.getElementById('grimmerglen-pop-title-jp'), '');
+
+    const eyebrowEn = document.getElementById('grimmerglen-pop-eyebrow-en');
+    const eyebrowJp = document.getElementById('grimmerglen-pop-eyebrow-jp');
+    const bodyEn = document.getElementById('grimmerglen-pop-body-en');
+    const bodyJp = document.getElementById('grimmerglen-pop-body-jp');
+    eyebrowJp.style.color = GRIMMERGLEN_THEME.accent3;
+    bodyEn.style.color = '#7a1f4b';
+    bodyJp.style.color = '#a9548a';
+
+    if (unlocked) {
+      wpopSetLock('grimmerglen-pop', false);
+      wpopSetText(eyebrowEn, 'A NEW WORLD');
+      wpopSetText(eyebrowJp, '新しい世界');
+      wpopSetText(bodyEn, 'A dreamy path has opened.\nDo you want to enter Grimmerglen?');
+      wpopSetText(bodyJp, '夢のような道が開いた。\nグリマーグレンに入りますか？');
+      wpopSetActions('grimmerglen-pop', [
+        { en: 'Yes', jp: 'はい', border: `1px solid ${GRIMMERGLEN_THEME.btnBorder}`, color: '#fff', background: 'linear-gradient(135deg,#ff8fc0,#ffd166)', boxShadow: '0 0 18px rgba(255,150,190,.5)', onClick: () => { closeGrimmerglenPopup(); enterGrimmerglen(); } },
+        { en: 'No', jp: 'いいえ', border: '1px solid rgba(224,85,158,.4)', color: '#a9548a', onClick: closeGrimmerglenPopup }
+      ]);
+    } else {
+      wpopSetLock('grimmerglen-pop', true);
+      wpopSetText(eyebrowEn, 'THIS WORLD IS LOCKED');
+      wpopSetText(eyebrowJp, 'この世界は封印されています');
+      wpopSetText(bodyEn, 'Something dreamy waits beyond this path.\nComplete nine lessons in one path this week before it will open to you.');
+      wpopSetText(bodyJp, 'この道の先で、夢のような何かが待っている。\n今週、ひとつの道で九つの学びを終えよ。それまで、ここは開かない。');
+      wpopSetActions('grimmerglen-pop', [
+        { en: 'Close', jp: '閉じる', border: '1px solid rgba(224,85,158,.35)', color: '#a9548a', onClick: closeGrimmerglenPopup }
+      ]);
+    }
+    openWpopOverlay(grimmerglenPopOverlay, 'rgba(48,12,34,.72)');
+  }
+
+  function closeGrimmerglenPopup() {
+    grimmerglenCooldownUntil = performance.now() + POPUP_COOLDOWN_MS;
+    closeWpopOverlay(grimmerglenPopOverlay, 400);
+  }
+
+  function isGrimmerglenPopupOpen() {
+    return grimmerglenPopOverlay && grimmerglenPopOverlay.style.display === 'flex';
+  }
+
+  function checkGrimmerglenPortal() {
+    if (state.roomId !== GRIMMERGLEN_PORTAL.roomId) return;
+    if (performance.now() < grimmerglenCooldownUntil) return;
+    if (state.distMovedSinceSpawn < ARROW_MOVE_THRESHOLD) return;
+    if (Math.hypot(state.x - GRIMMERGLEN_PORTAL.x, state.y - GRIMMERGLEN_PORTAL.y) <= GRIMMERGLEN_PORTAL.r) {
+      state.clickTarget = null; state.moving = false; openGrimmerglenPopup();
+    }
+  }
+
+  function clickCheckGrimmerglenPortal(worldX, worldY) {
+    if (state.roomId !== GRIMMERGLEN_PORTAL.roomId) return false;
+    if (performance.now() < grimmerglenCooldownUntil) return false;
+    if (Math.hypot(worldX - GRIMMERGLEN_PORTAL.x, worldY - GRIMMERGLEN_PORTAL.y) <= GRIMMERGLEN_PORTAL.r) {
+      openGrimmerglenPopup();
+      return true;
+    }
+    return false;
+  }
+
+  /* ═══════════════════════════════════════════
      STATE
   ═══════════════════════════════════════════ */
   const state = {
@@ -4108,6 +4313,7 @@ const HAPPY_HOUSE_PORTAL = {
       .wpop-icon-wrap.image-mode.image-happy{width:clamp(104px,22vw,136px);height:clamp(120px,25vw,154px);}
       .wpop-icon-wrap.image-mode.image-utsuroba{width:clamp(96px,20vw,126px);height:clamp(96px,20vw,126px);}
       .wpop-icon-wrap.image-mode.image-profile{width:clamp(96px,20vw,126px);height:clamp(96px,20vw,126px);}
+      .wpop-icon-wrap.image-mode.image-grimmerglen{width:clamp(96px,20vw,126px);height:clamp(96px,20vw,126px);}
       .wpop-icon-wrap img{width:100%;height:100%;object-fit:contain;border-radius:10px;position:relative;z-index:1;}
       .wpop-icon-wrap.orb-mode img{border-radius:50%;}
       .wpop-icon-wrap .wpop-icon-orb{width:100%;height:100%;border-radius:50%;position:relative;z-index:1;}
@@ -4167,16 +4373,18 @@ const HAPPY_HOUSE_PORTAL = {
       <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:4px;"><input type="checkbox" id="dev-all-games"> All games unlocked</label>
       <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:4px;"><input type="checkbox" id="dev-utsuroba"> Utsuroba unlocked</label>
       <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:4px;"><input type="checkbox" id="dev-muenba"> Muenba unlocked</label>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:4px;"><input type="checkbox" id="dev-grimmerglen"> Grimmerglen unlocked</label>
       <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:4px;"><input type="checkbox" id="dev-all-orbs"> Show all memory boxes</label>
       <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:4px;"><input type="checkbox" id="dev-coords-toggle"> Coord mode</label>
       <button id="dev-clear-quest" style="margin-top:4px;font:700 11px monospace;color:#ffd700;background:transparent;border:1px solid rgba(255,200,0,.4);border-radius:4px;padding:3px 8px;cursor:pointer;width:100%;">Clear quest</button>
       <div id="dev-room-info" style="font-size:9px;color:rgba(255,200,0,.45);margin-top:8px;"></div>`;
     document.body.appendChild(panel);
-    window.__devAllGames = false; window.__devAllWanderers = false; window.__devUtsuroba = false; window.__devMuenba = false; window.__devAllOrbs = false;
+    window.__devAllGames = false; window.__devAllWanderers = false; window.__devUtsuroba = false; window.__devMuenba = false; window.__devGrimmerglen = false; window.__devAllOrbs = false;
     document.getElementById('dev-all-games').addEventListener('change',     function() { window.__devAllGames = this.checked; });
     document.getElementById('dev-all-wanderers').addEventListener('change', function() { window.__devAllWanderers = this.checked; refreshWanderersForRoom(); });
     document.getElementById('dev-utsuroba').addEventListener('change',      function() { window.__devUtsuroba = this.checked; });
     document.getElementById('dev-muenba').addEventListener('change',        function() { window.__devMuenba = this.checked; });
+    document.getElementById('dev-grimmerglen').addEventListener('change',   function() { window.__devGrimmerglen = this.checked; });
     document.getElementById('dev-all-orbs').addEventListener('change',      function() { window.__devAllOrbs = this.checked; });
     document.getElementById('dev-coords-toggle').addEventListener('change', function() { if (this.checked !== state.coordMode) toggleCoordMode(); });
     document.getElementById('dev-clear-quest').addEventListener('click', () => {
@@ -4653,7 +4861,7 @@ const HAPPY_HOUSE_PORTAL = {
       ctx.globalAlpha=1; p.life-=0.022; p.x+=p.vx; p.y+=p.vy;
     }
     trail=trail.filter(p=>p.life>0);
-    drawPortalOrb(now); drawMuenbaOrb(now); drawExitArrows(now); drawMazeExitArrow(now); drawHappyHouseOrb(now);
+    drawPortalOrb(now); drawMuenbaOrb(now); drawGrimmerglenPortal(now); drawExitArrows(now); drawMazeExitArrow(now); drawHappyHouseOrb(now);
     drawBonusTrees(now); drawUtsurobPortalMarker(now); drawWanderers(now); drawObserver(now); drawOrbs(now); drawNuppi(now);
     
     const bobFreq=(Math.PI*2)/(HOVER_PERIOD/1000); const bobPhase=sec*bobFreq;
@@ -4753,6 +4961,7 @@ function tick(now) {
 
     if (spawnUnlocked) checkUtsuobaPortal();
     if (spawnUnlocked) checkMuenbaPortal();
+    if (spawnUnlocked) checkGrimmerglenPortal();
     if (spawnUnlocked) checkHappyHousePortal();
 
     if (spawnUnlocked) {
@@ -5424,6 +5633,7 @@ function drawObserver(now) {
     if(isNearPortal(p)){openPortal();ripples.push({x:p.x,y:p.y,life:1});return;}
     if(clickCheckUtsuobaPortal(p.x,p.y)){ripples.push({x:p.x,y:p.y,life:1});return;}
     if(clickCheckMuenbaPortal(p.x,p.y)){ripples.push({x:p.x,y:p.y,life:1});return;}
+    if(clickCheckGrimmerglenPortal(p.x,p.y)){ripples.push({x:p.x,y:p.y,life:1});return;}
     if(clickCheckWanderers(p.x,p.y)){ripples.push({x:p.x,y:p.y,life:1});return;}
     if(clickBonusTree(p.x,p.y)){ripples.push({x:p.x,y:p.y,life:1});return;}
     
