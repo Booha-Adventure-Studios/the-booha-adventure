@@ -7,7 +7,7 @@
 const CURRENT_CACHES = {
   // Profile consolidation Pass 1: ship the canonical progress page and its
   // moved progress renderer to returning players.
-  pages:  'booha-pages-2026-373',
+  pages:  'booha-pages-2026-374',
   // js/ is served cache-first (see ASSET_PREFIXES below), so once a device
   // caches a script it never re-fetches it until this string changes.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
@@ -97,7 +97,10 @@ const CURRENT_CACHES = {
   // volumedetect) and the per-clip fade rewritten to hold full volume for
   // the clip's natural length instead of ramping to near-silence across
   // its entire duration; chase-repeat taper slowed and its floor raised.
-  assets: 'booha-assets-2026-429',
+  // Grimmerglen Pass 8 (2026-08-30): ship the new room page, pickup scripts,
+  // pastel collectible art, Marietta/Booha art, and room backgrounds in the
+  // first offline install. Keep this bump with the page/asset wiring.
+  assets: 'booha-assets-2026-430',
   decks:  'booha-decks-2026-310',
 };
 
@@ -128,6 +131,7 @@ const CORE_FILES = [
   `${BASE}/study-deck.html`,
   `${BASE}/utsuroba.html`,
   `${BASE}/muenba.html`,
+  `${BASE}/grimmerglen.html`,
   `${BASE}/curriculum/bc/games-index.html`,
   `${BASE}/curriculum/bc/study-index.html`,
   `${BASE}/curriculum/br/games-index.html`,
@@ -145,6 +149,17 @@ const CORE_FILES = [
 // there rather than added to CORE_FILES (which belongs to PAGE_CACHE).
 const CORE_ASSETS = [
   `${BASE}/js/utsu-sfx.js`,
+  `${BASE}/js/grimmerglen-data.js`,
+  `${BASE}/js/grimmerglen-typing.js`,
+  `${BASE}/js/grimmerglen.js`,
+  `${BASE}/assets/img/grimmerglen/grimmerglen.css`,
+  `${BASE}/assets/img/grimmerglen/booha_grimmerglen.webp`,
+  `${BASE}/assets/img/grimmerglen/marietta/marietta_01.webp`,
+  ...Array.from({ length: 9 }, (_, index) => `${BASE}/assets/img/grimmerglen/room_${String(index + 1).padStart(2, '0')}.webp`),
+  ...[
+    'banner', 'ticket', 'pillow', 'backpack', 'book', 'teddy_bear',
+    'to_go_coffee_cup', 'ball'
+  ].map(name => `${BASE}/assets/img/grimmerglen/collectibles/${name}.webp`),
   `${BASE}/assets/img/background-1.webp`,
   `${BASE}/assets/img/booha_ghost.webp`,
   `${BASE}/assets/img/profile.webp`,
@@ -155,6 +170,8 @@ const CORE_ASSETS = [
 
 // ── Asset folder prefixes (matched at runtime) ───────────────
 const ASSET_PREFIXES = [
+  // These broad prefixes intentionally cover Grimmerglen's page-local JS
+  // and WebP art as well as the rest of the app's cache-first assets.
   `${BASE}/js/`,
   `${BASE}/theme/`,
   `${BASE}/audio/`,
