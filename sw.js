@@ -7,7 +7,7 @@
 const CURRENT_CACHES = {
   // Profile consolidation Pass 1: ship the canonical progress page and its
   // moved progress renderer to returning players.
-  pages:  'booha-pages-2026-374',
+  pages:  'booha-pages-2026-375',
   // js/ is served cache-first (see ASSET_PREFIXES below), so once a device
   // caches a script it never re-fetches it until this string changes.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
@@ -97,10 +97,10 @@ const CURRENT_CACHES = {
   // volumedetect) and the per-clip fade rewritten to hold full volume for
   // the clip's natural length instead of ramping to near-silence across
   // its entire duration; chase-repeat taper slowed and its floor raised.
-  // Grimmerglen Pass 8 (2026-08-30): ship the new room page, pickup scripts,
-  // pastel collectible art, Marietta/Booha art, and room backgrounds in the
-  // first offline install. Keep this bump with the page/asset wiring.
-  assets: 'booha-assets-2026-430',
+  // Grimmerglen audio pass (2026-08-30): wire the looping room BGM and lazy
+  // celebration track, plus the Marietta size correction. Keep both cache
+  // bumps with the page/asset wiring so returning devices receive the new JS.
+  assets: 'booha-assets-2026-431',
   decks:  'booha-decks-2026-310',
 };
 
@@ -154,6 +154,8 @@ const CORE_ASSETS = [
   `${BASE}/js/grimmerglen.js`,
   `${BASE}/assets/img/grimmerglen/grimmerglen.css`,
   `${BASE}/assets/img/grimmerglen/booha_grimmerglen.webp`,
+  `${BASE}/assets/img/grimmerglen/grimmerglen_bgm.mp3`,
+  `${BASE}/assets/img/grimmerglen/grimmerglen_dance.mp3`,
   `${BASE}/assets/img/grimmerglen/marietta/marietta_01.webp`,
   ...Array.from({ length: 9 }, (_, index) => `${BASE}/assets/img/grimmerglen/room_${String(index + 1).padStart(2, '0')}.webp`),
   ...[

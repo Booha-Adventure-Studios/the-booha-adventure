@@ -198,7 +198,9 @@
       x: 940,
       y: 400,
       hitR: 76,
-      drawR: 60,
+      // Booha currently renders at a 52px diameter; keep Marietta only a
+      // little larger until the final room_01 coordinates are calibrated.
+      drawR: 36,
       poses: Array.from({ length: 5 }, (_, index) => {
         const pose = String(index + 1).padStart(2, '0');
         return `assets/img/grimmerglen/marietta/marietta_${pose}.webp`;
