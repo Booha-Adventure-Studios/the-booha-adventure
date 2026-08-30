@@ -123,6 +123,81 @@
   let boohaShakeSeed = Math.random() * 1000;
   const boohaTransformParticles = [];
 
+  // Grimmerglen music follows the existing world-audio convention: the room
+  // track loops, while the celebration track is loaded only when the future
+  // memory-complete dance is actually triggered. Keeping the dance lazy avoids
+  // making every room entry pay for an audio track it may never use.
+  const GRIMMERGLEN_MUSIC_VOLUME = 0.46;
+  const GRIMMERGLEN_DANCE_VOLUME = 0.72;
+  const GRIMMERGLEN_DANCE_FALLBACK_MS = 15100;
+  const grimmerglenMusic = new Audio('assets/img/grimmerglen/grimmerglen_bgm.mp3');
+  grimmerglenMusic.preload = 'auto';
+  grimmerglenMusic.loop = true;
+  grimmerglenMusic.volume = GRIMMERGLEN_MUSIC_VOLUME;
+  const grimmerglenDance = new Audio('assets/img/grimmerglen/grimmerglen_dance.mp3');
+  grimmerglenDance.preload = 'metadata';
+  grimmerglenDance.loop = false;
+  grimmerglenDance.volume = GRIMMERGLEN_DANCE_VOLUME;
+  let grimmerglenDanceAudioActive = false;
+  let grimmerglenDanceAudioToken = 0;
+
+  function startGrimmerglenMusic() {
+    if (state.returnExiting || grimmerglenDanceAudioActive) return;
+    if (!grimmerglenMusic.paused && !grimmerglenMusic.ended) {
+      state.musicStarted = true;
+      return;
+    }
+    state.musicStarted = true;
+    const playback = grimmerglenMusic.play();
+    if (playback && typeof playback.catch === 'function') {
+      playback.catch(() => { state.musicStarted = false; });
+    }
+  }
+
+  function stopGrimmerglenMusic(reset = true) {
+    state.musicStarted = false;
+    grimmerglenMusic.pause();
+    if (reset) {
+      try { grimmerglenMusic.currentTime = 0; } catch (_) {}
+    }
+  }
+
+  function stopGrimmerglenDanceMusic() {
+    grimmerglenDanceAudioToken += 1;
+    grimmerglenDanceAudioActive = false;
+    grimmerglenDance.pause();
+    try { grimmerglenDance.currentTime = 0; } catch (_) {}
+  }
+
+  // The later center-room dance pass can use the returned duration to keep
+  // both dance sprites and their glitter effect exactly in sync with audio.
+  function playGrimmerglenDanceMusic(onFinished) {
+    const token = ++grimmerglenDanceAudioToken;
+    grimmerglenDanceAudioActive = true;
+    stopGrimmerglenMusic();
+    grimmerglenDance.preload = 'auto';
+    grimmerglenDance.pause();
+    try { grimmerglenDance.currentTime = 0; } catch (_) {}
+    const finish = () => {
+      if (token !== grimmerglenDanceAudioToken) return;
+      grimmerglenDanceAudioActive = false;
+      grimmerglenDance.pause();
+      try { grimmerglenDance.currentTime = 0; } catch (_) {}
+      if (typeof onFinished === 'function') onFinished();
+      startGrimmerglenMusic();
+    };
+    grimmerglenDance.addEventListener('ended', finish, { once: true });
+    const playback = grimmerglenDance.play();
+    if (playback && typeof playback.catch === 'function') playback.catch(() => {});
+    return Number.isFinite(grimmerglenDance.duration) && grimmerglenDance.duration > 0
+      ? Math.round(grimmerglenDance.duration * 1000)
+      : GRIMMERGLEN_DANCE_FALLBACK_MS;
+  }
+
+  grimmerglenMusic.addEventListener('ended', () => {
+    if (!state.returnExiting && !grimmerglenDanceAudioActive) startGrimmerglenMusic();
+  });
+
   const mariettaImg = new Image();
   if (MARIETTA && MARIETTA.poses && MARIETTA.poses[0]) {
     mariettaImg.decoding = 'async';
@@ -1487,6 +1562,8 @@
   function returnToKarasuki() {
     if (state.returnExiting) return;
     state.returnExiting = true;
+    stopGrimmerglenDanceMusic();
+    stopGrimmerglenMusic();
     state.clickTarget = null;
     state.moving = false;
     fadeEl.style.transition = `opacity ${FADE_MS}ms ease-in`;
@@ -1580,6 +1657,7 @@
   }
 
   function handleInput(clientX, clientY) {
+    startGrimmerglenMusic();
     if (mariettaPanelOpen || returnPortalOpen) return;
     const point = stagePoint(clientX, clientY);
     if (entryDrift) {
@@ -1773,6 +1851,8 @@
     setRoom(state.roomId, state.spawnId, null);
     restoreGrimmerglenCarriedObject();
     bindInput();
+    document.addEventListener('click', startGrimmerglenMusic, { once: true });
+    document.addEventListener('touchend', startGrimmerglenMusic, { once: true, passive: true });
     window.addEventListener('resize', () => { fitStage(); resizeCanvas(); });
     window.requestAnimationFrame(tick);
     openMariettaPanelAfterEntry();

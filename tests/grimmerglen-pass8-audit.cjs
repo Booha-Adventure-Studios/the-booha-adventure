@@ -14,6 +14,10 @@ const runtimeSource = fs.readFileSync(path.join(root, 'js', 'grimmerglen.js'), '
 const typingSource = fs.readFileSync(path.join(root, 'js', 'grimmerglen-typing.js'), 'utf8');
 const page = fs.readFileSync(path.join(root, 'grimmerglen.html'), 'utf8');
 const serviceWorker = fs.readFileSync(path.join(root, 'sw.js'), 'utf8');
+const audioFiles = [
+  'assets/img/grimmerglen/grimmerglen_bgm.mp3',
+  'assets/img/grimmerglen/grimmerglen_dance.mp3'
+];
 
 const sandbox = { window: {} };
 vm.runInNewContext(dataSource, sandbox, { filename: 'grimmerglen-data.js' });
@@ -56,6 +60,7 @@ for (const room of Object.values(data.rooms)) {
 }
 for (const pose of data.marietta.poses) assert(fs.existsSync(path.join(root, pose)), `Marietta art must exist: ${pose}`);
 assert(fs.existsSync(path.join(root, data.booha.sprite)), 'Grimmerglen Booha art must exist');
+for (const audio of audioFiles) assert(fs.existsSync(path.join(root, audio)), `audio must exist: ${audio}`);
 
 const scripts = [
   'js/calendar.js', 'js/core/adventure-core.js', 'js/core/save-file.js',
@@ -82,6 +87,10 @@ assert(runtimeSource.includes('objectSlots'), 'exact object slots must be persis
 assert(runtimeSource.includes('getActiveGrimmerglenTargetType'), 'runtime must enforce one active object target at a time');
 assert(runtimeSource.includes('renderMariettaHandoff'), 'Marietta must receive carried objects before the quiz');
 assert(runtimeSource.includes('renderMariettaWrongItem'), 'wrong items must be rejected and returned to the hunt');
+assert(runtimeSource.includes("assets/img/grimmerglen/grimmerglen_bgm.mp3"), 'runtime must reference Grimmerglen BGM');
+assert(runtimeSource.includes("assets/img/grimmerglen/grimmerglen_dance.mp3"), 'runtime must reference Grimmerglen dance music');
+assert(runtimeSource.includes('startGrimmerglenMusic'), 'runtime must start room music from a user gesture');
+assert(runtimeSource.includes('playGrimmerglenDanceMusic'), 'runtime must expose synchronized dance playback');
 assert(!runtimeSource.includes('openGrimmerglenObjectPanel'), 'object pickup must not open the typing quiz immediately');
 assert(typingSource.includes('function renderExercise'), 'typing engine must expose renderExercise');
 assert(serviceWorker.includes('${BASE}/grimmerglen.html'), 'service worker must precache grimmerglen.html');
@@ -90,7 +99,9 @@ for (const asset of ['grimmerglen-data.js', 'grimmerglen-typing.js', 'grimmergle
 }
 assert(serviceWorker.includes('`${BASE}/js/`'), 'service worker must cache Grimmerglen JS at runtime');
 assert(serviceWorker.includes('`${BASE}/assets/`'), 'service worker must cache Grimmerglen art at runtime');
-assert(/pages:\s+'booha-pages-2026-374'/.test(serviceWorker), 'page cache must be bumped for Pass 8');
-assert(/assets:\s+'booha-assets-2026-430'/.test(serviceWorker), 'asset cache must be bumped for Pass 8');
+assert(serviceWorker.includes('${BASE}/assets/img/grimmerglen/grimmerglen_bgm.mp3'), 'service worker must precache Grimmerglen BGM');
+assert(serviceWorker.includes('${BASE}/assets/img/grimmerglen/grimmerglen_dance.mp3'), 'service worker must precache Grimmerglen dance music');
+assert(/pages:\s+'booha-pages-2026-375'/.test(serviceWorker), 'page cache must be bumped for the audio pass');
+assert(/assets:\s+'booha-assets-2026-431'/.test(serviceWorker), 'asset cache must be bumped for the audio pass');
 
 console.log(`Grimmerglen Pass 8 audit passed: 9 rooms, ${allInstances.length} placed instances, typing pickup flow, and service-worker coverage.`);
