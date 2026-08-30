@@ -691,6 +691,13 @@ else
   bad "Muenba scream loudness audit failed"
 fi
 
+echo "[81/81] Grimmerglen Pass 8 audit"
+if node tests/grimmerglen-pass8-audit.cjs >/dev/null 2>&1; then
+  ok "Grimmerglen room placement, pickup, typing, and cache contracts pass"
+else
+  bad "Grimmerglen Pass 8 audit failed"
+fi
+
 # ── Summary ──────────────────────────────────────────────────
 echo "───────────────────────────────────"
 echo "✅ $PASS passed   ⚠️  $WARN warnings   ❌ $FAIL failed"
