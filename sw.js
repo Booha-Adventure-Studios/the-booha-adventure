@@ -102,7 +102,9 @@ const CURRENT_CACHES = {
   // entry transformation sequence.
   // Grimmerglen room expansion: six new themed forest rooms and calibrated
   // room navigation/Marietta placement.
-  assets: 'booha-assets-2026-435',
+  // Grimmerglen entry-audio pass: the recorded Booha transformation cue is
+  // normalized to compact 44.1 kHz mono 112 kbps MP3.
+  assets: 'booha-assets-2026-436',
   decks:  'booha-decks-2026-310',
 };
 
@@ -157,6 +159,7 @@ const CORE_ASSETS = [
   `${BASE}/js/grimmerglen.js`,
   `${BASE}/assets/img/grimmerglen/grimmerglen.css`,
   `${BASE}/assets/img/grimmerglen/booha_grimmerglen_version_1.webp`,
+  `${BASE}/assets/img/grimmerglen/booha_change.mp3`,
   `${BASE}/assets/img/grimmerglen/grimmerglen_bgm.mp3`,
   `${BASE}/assets/img/grimmerglen/grimmerglen_dance.mp3`,
   ...Array.from({ length: 3 }, (_, index) => `${BASE}/assets/img/grimmerglen/dance/marietta_dance_${String(index + 1).padStart(2, '0')}.webp`),

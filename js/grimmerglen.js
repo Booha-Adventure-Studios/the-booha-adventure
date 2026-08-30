@@ -106,6 +106,7 @@
   let devPanel, devReadout;
   let entryDrift = null;
   let mariettaPanel = null, mariettaPanelOpen = false, mariettaPanelCooldown = 0;
+  let boohaChangeOverlay = null;
   let carriedObject = null, handoffObject = null;
   let returnPortalOverlay = null, returnPortalOpen = false, returnPortalCooldownUntil = 0;
   let objectProgressCache = null, objectSlotsCache = null, activeTargetTypeCache = null;
@@ -119,17 +120,17 @@
   boohaImg.decoding = 'async';
   boohaImg.src = 'assets/img/booha_ghost.webp';
 
-  // Booha's Grimmerglen sprite -- swapped in once the player is actually
-  // inside (see triggerBoohaTransformIfNeeded()/playBoohaTransform() near
-  // the tutorial section below), with a one-time shake + sparkle burst +
-  // WebAudio cue when the swap happens live rather than silently.
+  // Booha's Grimmerglen sprite -- swapped in after the player accepts the
+  // entry-change prompt (see triggerBoohaTransformIfNeeded()/playBoohaTransform()
+  // near the tutorial section below), with a full recorded change cue.
   const boohaGrimmerglenImg = new Image();
   boohaGrimmerglenImg.decoding = 'async';
   boohaGrimmerglenImg.src = (DATA.booha && DATA.booha.sprite) || 'assets/img/grimmerglen/booha_grimmerglen.webp';
   let boohaShakeUntil = 0;
   let boohaShakeSeed = Math.random() * 1000;
   const boohaTransformParticles = [];
-  const BOOHA_TRANSFORM_DURATION_MS = 5000;
+  const BOOHA_CHANGE_FALLBACK_MS = 5880;
+  const BOOHA_CHANGE_START_DELAY_MS = 900;
   const BOOHA_TRANSFORM_POOF_MS = 620;
 
   // Grimmerglen music follows the existing world-audio convention: the room
@@ -147,6 +148,12 @@
   grimmerglenDance.preload = 'metadata';
   grimmerglenDance.loop = false;
   grimmerglenDance.volume = GRIMMERGLEN_DANCE_VOLUME;
+  const boohaChangeAudio = new Audio('assets/img/grimmerglen/booha_change.mp3');
+  boohaChangeAudio.preload = 'auto';
+  boohaChangeAudio.loop = false;
+  boohaChangeAudio.volume = 0.88;
+  let boohaChangePromptOpen = false;
+  let boohaChangeStartTimer = 0;
   let grimmerglenDanceAudioActive = false;
   let grimmerglenDanceAudioToken = 0;
   const GRIMMERGLEN_DANCE_FRAME_MS = 480;
@@ -708,7 +715,7 @@
     const seconds = now / 1000;
     const bob = Math.sin(seconds * 4.18) * 8;
     const wobble = Math.sin(seconds * 8.36) * 2.2;
-    // Keep the normal yellow Booha visibly shaking for the full five-second
+    // Keep the normal yellow Booha visibly shaking for the full recorded
     // reveal. The sprite swaps only at the end, so the player sees the
     // transformation instead of arriving to an already-changed character.
     const shakeActive = !REDUCED_MOTION && (state.boohaTransforming || now < boohaShakeUntil);
@@ -803,33 +810,18 @@
     }
   }
 
-  // Own cute sparkly WebAudio cue for the transform -- a rising
-  // triangle-wave arpeggio, distinct from both playMariettaTypeTick()
-  // (a typewriter blip) and grimmerglen-typing.js's correct-answer chime.
-  let boohaTransformAudioCtx = null;
-  function playBoohaTransformChime() {
-    try {
-      const AC = window.AudioContext || window.webkitAudioContext;
-      if (!AC) return;
-      if (!boohaTransformAudioCtx) boohaTransformAudioCtx = new AC();
-      if (boohaTransformAudioCtx.state === 'suspended') boohaTransformAudioCtx.resume().catch(() => {});
-      const ctx = boohaTransformAudioCtx;
-      const now = ctx.currentTime;
-      const notes = [587.33, 739.99, 880, 1174.66];
-      notes.forEach((freq, i) => {
-        const start = now + i * 0.06;
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(freq, start);
-        osc.frequency.exponentialRampToValueAtTime(freq * 1.08, start + 0.14);
-        gain.gain.setValueAtTime(0.0001, start);
-        gain.gain.exponentialRampToValueAtTime(0.075, start + 0.02);
-        gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.2);
-        osc.connect(gain); gain.connect(ctx.destination);
-        osc.start(start); osc.stop(start + 0.22);
-      });
-    } catch (_) {}
+  function getBoohaChangeDurationMs() {
+    const duration = Number(boohaChangeAudio.duration);
+    return Number.isFinite(duration) && duration > 0
+      ? Math.round(duration * 1000)
+      : BOOHA_CHANGE_FALLBACK_MS;
+  }
+
+  function playBoohaChangeAudio() {
+    boohaChangeAudio.pause();
+    try { boohaChangeAudio.currentTime = 0; } catch (_) {}
+    const playback = boohaChangeAudio.play();
+    if (playback && typeof playback.catch === 'function') playback.catch(() => {});
   }
 
   function playBoohaTransform() {
@@ -840,10 +832,10 @@
     state.inputLocked = true;
     state.clickTarget = null;
     state.moving = false;
-    boohaShakeUntil = state.boohaTransformStartedAt + BOOHA_TRANSFORM_DURATION_MS;
+    const durationMs = getBoohaChangeDurationMs();
+    boohaShakeUntil = state.boohaTransformStartedAt + durationMs;
     boohaShakeSeed = Math.random() * 1000;
     spawnBoohaTransformSparkles();
-    playBoohaTransformChime();
     window.setTimeout(() => {
       if (!state.boohaTransforming) return;
       state.boohaTransforming = false;
@@ -853,20 +845,19 @@
       state.boohaTransformPoofUntil = performance.now() + BOOHA_TRANSFORM_POOF_MS;
       boohaShakeUntil = 0;
       spawnBoohaTransformSparkles();
-    }, BOOHA_TRANSFORM_DURATION_MS);
+    }, durationMs);
   }
 
   // Fires once, right as the player actually arrives via the Karasuki
-  // portal (after entry drift finishes -- the same wait-for-arrival gate
-  // transformation uses below), so it reads as "the portal
-  // changed her" rather than replaying on every room change. A direct/DEV
+  // portal (after entry drift finishes), then waits for the player's cute
+  // readiness confirmation. A direct/DEV
   // entry (no fromKarasuki spawn) skips the reveal and starts already
   // transformed -- Booha is just always the Grimmerglen sprite once
   // you're actually inside, whether or not you saw the moment it happened.
   function triggerBoohaTransformIfNeeded() {
     if (state.spawnId !== 'fromKarasuki') { state.boohaTransformed = true; return; }
     const waitForArrival = () => {
-      if (!entryDrift) playBoohaTransform();
+      if (!entryDrift) openBoohaChangePrompt();
       else window.requestAnimationFrame(waitForArrival);
     };
     window.requestAnimationFrame(waitForArrival);
@@ -1882,6 +1873,67 @@
     }, { passive: false });
   }
 
+  function buildBoohaChangeOverlay() {
+    if (boohaChangeOverlay) return;
+    boohaChangeOverlay = document.createElement('div');
+    boohaChangeOverlay.id = 'grimmerglen-change-overlay';
+    boohaChangeOverlay.setAttribute('role', 'dialog');
+    boohaChangeOverlay.setAttribute('aria-modal', 'true');
+    boohaChangeOverlay.setAttribute('aria-labelledby', 'grimmerglen-change-title');
+    boohaChangeOverlay.innerHTML = `
+      <div class="grimmerglen-change-box">
+        <div class="grimmerglen-change-stars" aria-hidden="true">✦　✧　✦</div>
+        <p class="grimmerglen-change-kicker">A pastel surprise is waiting...</p>
+        <h2 id="grimmerglen-change-title">Grimmerglen changes who enters!!</h2>
+        <p class="grimmerglen-change-jp">グリマーグレンは<ruby>入<rt>はい</rt></ruby>る<ruby>人<rt>ひと</rt></ruby>を<ruby>変<rt>か</rt></ruby>える！！</p>
+        <p class="grimmerglen-change-copy">Are you ready for your cute new form?</p>
+        <p class="grimmerglen-change-jp">かわいい<ruby>姿<rt>すがた</rt></ruby>に<ruby>変身<rt>へんしん</rt></ruby>する<ruby>準備<rt>じゅんび</rt></ruby>はできた？</p>
+        <button type="button" id="grimmerglen-change-ready">
+          <span>I'm super ready!!</span>
+          <small>すっごく<ruby>準備<rt>じゅんび</rt></ruby>できたよ！！</small>
+        </button>
+      </div>`;
+    document.body.appendChild(boohaChangeOverlay);
+    boohaChangeOverlay.querySelector('#grimmerglen-change-ready')?.addEventListener('click', beginBoohaChange);
+  }
+
+  function openBoohaChangePrompt() {
+    if (state.boohaTransformed || state.boohaTransforming || boohaChangePromptOpen) return;
+    buildBoohaChangeOverlay();
+    boohaChangePromptOpen = true;
+    state.inputLocked = true;
+    boohaChangeOverlay.classList.add('open');
+    window.setTimeout(() => boohaChangeOverlay.querySelector('#grimmerglen-change-ready')?.focus(), 0);
+  }
+
+  function closeBoohaChangePrompt() {
+    boohaChangePromptOpen = false;
+    boohaChangeOverlay?.classList.remove('open');
+  }
+
+  function beginBoohaChange() {
+    if (!boohaChangePromptOpen || state.boohaTransforming || state.boohaTransformed) return;
+    const button = boohaChangeOverlay.querySelector('#grimmerglen-change-ready');
+    if (button) {
+      button.disabled = true;
+      button.innerHTML = '<span>Get ready... ✦</span><small>わくわく<ruby>待<rt>ま</rt></ruby>ってね！！</small>';
+    }
+    // Start the media element from the user gesture so browser autoplay
+    // rules are satisfied. It stays silent during the tiny anticipation beat,
+    // then resets and becomes audible exactly when the visual change begins.
+    boohaChangeAudio.volume = 0;
+    const primingPlayback = boohaChangeAudio.play();
+    if (primingPlayback && typeof primingPlayback.catch === 'function') primingPlayback.catch(() => {});
+    window.clearTimeout(boohaChangeStartTimer);
+    boohaChangeStartTimer = window.setTimeout(() => {
+      closeBoohaChangePrompt();
+      try { boohaChangeAudio.currentTime = 0; } catch (_) {}
+      boohaChangeAudio.volume = 0.88;
+      playBoohaChangeAudio();
+      playBoohaTransform();
+    }, BOOHA_CHANGE_START_DELAY_MS);
+  }
+
   function resizeCanvas() {
     const maxDpr = TOUCH_DEVICE ? 1.5 : 2;
     const dpr = Math.min(maxDpr, Math.max(1, window.devicePixelRatio || 1));
@@ -1927,6 +1979,7 @@
     buildDevPanel();
     buildMariettaPanel();
     buildReturnPortalOverlay();
+    buildBoohaChangeOverlay();
   }
 
   function injectStyles() {
@@ -1951,6 +2004,21 @@
       .grimmerglen-rotate-title { font-family:system-ui,-apple-system,sans-serif; font-size:clamp(18px,5vw,28px); font-weight:900; letter-spacing:.02em; color:#a3306e; margin:0; }
       .grimmerglen-rotate-sub { font-size:14px; color:#c46b96; margin:0; line-height:1.7; }
       @media (prefers-reduced-motion: reduce) { .grimmerglen-rotate-phone, .grimmerglen-rotate-bar { animation:none; } }
+      #grimmerglen-change-overlay { position:fixed; inset:0; z-index:9400; display:none; align-items:center; justify-content:center; padding:24px; box-sizing:border-box; background:rgba(92,54,112,.38); }
+      #grimmerglen-change-overlay.open { display:flex; }
+      .grimmerglen-change-box { box-sizing:border-box; width:min(510px,calc(100% - 12px)); padding:28px 26px 26px; border:2px solid rgba(255,255,255,.78); border-radius:28px; background:linear-gradient(155deg,rgba(255,248,253,.98),rgba(238,229,255,.98) 52%,rgba(225,247,255,.98)); box-shadow:0 25px 80px rgba(92,54,112,.25),0 0 42px rgba(255,159,194,.52),inset 0 0 45px rgba(255,255,255,.78); text-align:center; color:#703b70; animation:grimmerglenChangePop .42s cubic-bezier(.34,1.56,.64,1) both; }
+      @keyframes grimmerglenChangePop { from { opacity:0; transform:scale(.84) rotate(-2deg); } to { opacity:1; transform:scale(1) rotate(0deg); } }
+      .grimmerglen-change-stars { margin:0 0 9px; color:#d886c2; font-size:19px; letter-spacing:.08em; text-shadow:0 0 12px rgba(255,159,194,.65); }
+      .grimmerglen-change-kicker { margin:0 0 7px; color:#b06a94; font:800 .7rem/1.3 ui-monospace,monospace; letter-spacing:.15em; text-transform:uppercase; }
+      .grimmerglen-change-box h2 { margin:0 0 9px; color:#8b3d76; font:900 clamp(1.35rem,4vw,1.9rem)/1.15 system-ui,-apple-system,sans-serif; letter-spacing:-.02em; }
+      .grimmerglen-change-jp { margin:0 0 10px; color:#a85291; font:700 1rem/1.75 system-ui,-apple-system,sans-serif; }
+      .grimmerglen-change-jp rt, .grimmerglen-change-box button rt { font-size:.58em; }
+      .grimmerglen-change-copy { margin:14px 0 3px; color:#764b83; font:700 1rem/1.5 Georgia,'Times New Roman',serif; }
+      .grimmerglen-change-box button { display:inline-flex; flex-direction:column; align-items:center; gap:3px; min-width:min(310px,100%); margin-top:11px; padding:13px 24px 12px; border:2px solid rgba(224,85,158,.72); border-radius:999px; color:#6c2c58; background:linear-gradient(135deg,#ff9fc9,#d9c2ff 54%,#aee6ff); box-shadow:0 0 22px rgba(255,159,194,.42),inset 0 0 12px rgba(255,255,255,.7); font:900 1rem/1.15 system-ui,-apple-system,sans-serif; cursor:pointer; transition:transform .15s ease,filter .15s ease; }
+      .grimmerglen-change-box button:hover,.grimmerglen-change-box button:focus-visible { transform:translateY(-2px) scale(1.02); filter:saturate(1.12) brightness(1.04); outline:none; }
+      .grimmerglen-change-box button:disabled { cursor:wait; opacity:.86; transform:none; }
+      .grimmerglen-change-box button small { font:700 .73rem/1.3 system-ui,-apple-system,sans-serif; color:#8a4c86; }
+      @media (prefers-reduced-motion: reduce) { .grimmerglen-change-box { animation:none; } .grimmerglen-change-box button { transition:none; } }
       #grimmerglen-dev { position:fixed; left:10px; bottom:10px; z-index:9500; display:flex; flex-direction:column; gap:6px; padding:8px 10px; background:rgba(0,0,0,.72); border-radius:10px; font:11px ui-monospace,monospace; color:#fff; }
       #grimmerglen-dev select { font:11px ui-monospace,monospace; }
       #grimmerglen-dev button { font:11px ui-monospace,monospace; cursor:pointer; margin-top:2px; }
