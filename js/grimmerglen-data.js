@@ -172,6 +172,260 @@
       teddyBear: 'assets/img/grimmerglen/collectibles/teddy_bear.webp',
       toGoCoffeeCup: 'assets/img/grimmerglen/collectibles/to_go_coffee_cup.webp',
       ball: 'assets/img/grimmerglen/collectibles/ball.webp'
+    },
+
+    // Pass 7: the 8 object types' canonical key list, matching the
+    // `collectibles` art-path keys above exactly (same 8 strings) so
+    // anything that walks one can index the other directly.
+    objectTypes: ['banner', 'ticket', 'pillow', 'backpack', 'book', 'teddyBear', 'toGoCoffeeCup', 'ball'],
+
+    // Placement manifest -- 8 types x 3 instance slots, matching the
+    // locked "3 copies per type, each copy found advances that type's
+    // tier" decision. room/x/y stay null until an actual placement pass
+    // walks the 9 rooms and decides where each copy sits -- this only
+    // builds the shape, same as the plan doc asked for.
+    objects: {
+      banner:        [ { room: null, x: null, y: null }, { room: null, x: null, y: null }, { room: null, x: null, y: null } ],
+      ticket:        [ { room: null, x: null, y: null }, { room: null, x: null, y: null }, { room: null, x: null, y: null } ],
+      pillow:        [ { room: null, x: null, y: null }, { room: null, x: null, y: null }, { room: null, x: null, y: null } ],
+      backpack:      [ { room: null, x: null, y: null }, { room: null, x: null, y: null }, { room: null, x: null, y: null } ],
+      book:          [ { room: null, x: null, y: null }, { room: null, x: null, y: null }, { room: null, x: null, y: null } ],
+      teddyBear:     [ { room: null, x: null, y: null }, { room: null, x: null, y: null }, { room: null, x: null, y: null } ],
+      toGoCoffeeCup: [ { room: null, x: null, y: null }, { room: null, x: null, y: null }, { room: null, x: null, y: null } ],
+      ball:          [ { room: null, x: null, y: null }, { room: null, x: null, y: null }, { room: null, x: null, y: null } ]
+    },
+
+    // The 8 objects' typing content -- one GrimmerglenTyping.renderExercise()
+    // -shaped exercise per tier (24 total), rather than separately authoring
+    // a "given" and a "from-memory" phase for each: the fading support arc
+    // instead happens ACROSS the 3 tiers, reusing the engine exactly as
+    // built -- Starter shows its answer chip immediately (optionsVisible:
+    // true), Case hides the same chip behind the engine's own "Need a
+    // hint?" toggle (optionsVisible:false, options still present), and
+    // Deep drops the chip entirely (options:null) for pure recall. That's
+    // the same options-shown -> hint-only -> none progression the Pass 6
+    // tutorial already demonstrates across its 3 steps, just stretched
+    // across one object's 3 tiers instead of one conversation's 3 turns.
+    //
+    // English content here is freely adapted from the lore the user gave
+    // (recorded verbatim in the project plan doc's Content & lore section)
+    // -- not required to match it word for word, confirmed by the user
+    // when this pass started ("you can change any of the English content
+    // you want, I was giving context"). Calibrated toward genuinely simple
+    // Starter sentences per the plan's own ESL-overshoot warning. Two real
+    // names from the user's lore (Bryan Harper, October Moriyama) were
+    // shortened to first names only in the graded sentences to keep typing
+    // difficulty in line with each tier, not because the names themselves
+    // were a problem -- easy to restore in full during real content review.
+    memories: {
+      banner: {
+        start: {
+          promptEn: 'I made this banner.',
+          promptJp: 'わたしはこの旗を作った。',
+          promptReadings: { '旗': 'はた', '作った': 'つくった' },
+          accepted: ['i made this banner'],
+          options: ['I made this banner.'],
+          optionsVisible: true
+        },
+        case: {
+          promptEn: 'I made this banner with my friend.',
+          promptJp: 'わたしは友達とこの旗を作った。',
+          promptReadings: { '旗': 'はた', '作った': 'つくった', '友達': 'ともだち' },
+          accepted: ['i made this banner with my friend'],
+          options: ['I made this banner with my friend.'],
+          optionsVisible: false
+        },
+        deep: {
+          promptEn: 'I made this banner with my friend Jamariko.',
+          promptJp: 'わたしは友達のジャマリコとこの旗を作った。',
+          promptReadings: { '旗': 'はた', '作った': 'つくった', '友達': 'ともだち' },
+          accepted: ['i made this banner with my friend jamariko'],
+          options: null,
+          optionsVisible: false
+        }
+      },
+      ticket: {
+        start: {
+          promptEn: 'This is my ticket.',
+          promptJp: 'これはわたしの切符です。',
+          promptReadings: { '切符': 'きっぷ' },
+          accepted: ['this is my ticket'],
+          options: ['This is my ticket.'],
+          optionsVisible: true
+        },
+        case: {
+          promptEn: 'I rode the train to Utsuroba.',
+          promptJp: 'わたしは電車でウツロバへ行った。',
+          promptReadings: { '電車': 'でんしゃ', '行った': 'いった' },
+          accepted: ['i rode the train to utsuroba'],
+          options: ['I rode the train to Utsuroba.'],
+          optionsVisible: false
+        },
+        deep: {
+          promptEn: 'I rode the train to Utsuroba to meet my friend Bryan.',
+          promptJp: 'わたしは友達のブライアンに会うために電車でウツロバへ行った。',
+          promptReadings: { '友達': 'ともだち', '会う': 'あう', '電車': 'でんしゃ', '行った': 'いった' },
+          accepted: ['i rode the train to utsuroba to meet my friend bryan'],
+          options: null,
+          optionsVisible: false
+        }
+      },
+      pillow: {
+        start: {
+          promptEn: 'This is my pillow.',
+          promptJp: 'これはわたしの枕です。',
+          promptReadings: { '枕': 'まくら' },
+          accepted: ['this is my pillow'],
+          options: ['This is my pillow.'],
+          optionsVisible: true
+        },
+        case: {
+          promptEn: 'I had a sleepover with my friends.',
+          promptJp: 'わたしは友達とお泊まり会をした。',
+          promptReadings: { '友達': 'ともだち', 'お泊まり会': 'おとまりかい' },
+          accepted: ['i had a sleepover with my friends'],
+          options: ['I had a sleepover with my friends.'],
+          optionsVisible: false
+        },
+        deep: {
+          promptEn: 'I had a fun sleepover with all my Marietta friends.',
+          promptJp: 'わたしはマリエッタの友達みんなと楽しいお泊まり会をした。',
+          promptReadings: { '友達': 'ともだち', '楽しい': 'たのしい', 'お泊まり会': 'おとまりかい' },
+          accepted: ['i had a fun sleepover with all my marietta friends'],
+          options: null,
+          optionsVisible: false
+        }
+      },
+      backpack: {
+        start: {
+          promptEn: 'This is my backpack.',
+          promptJp: 'これはわたしのリュックです。',
+          promptReadings: {},
+          accepted: ['this is my backpack'],
+          options: ['This is my backpack.'],
+          optionsVisible: true
+        },
+        case: {
+          promptEn: 'I keep my daydreams in my backpack.',
+          promptJp: 'わたしは夢をリュックに入れる。',
+          promptReadings: { '夢': 'ゆめ', '入れる': 'いれる' },
+          accepted: ['i keep my daydreams in my backpack'],
+          options: ['I keep my daydreams in my backpack.'],
+          optionsVisible: false
+        },
+        deep: {
+          promptEn: 'I secretly keep my favorite daydreams in my backpack.',
+          promptJp: 'わたしはお気に入りの夢をこっそりリュックに入れる。',
+          promptReadings: { 'お気に入り': 'おきにいり', '夢': 'ゆめ', '入れる': 'いれる' },
+          accepted: ['i secretly keep my favorite daydreams in my backpack'],
+          options: null,
+          optionsVisible: false
+        }
+      },
+      book: {
+        start: {
+          promptEn: 'This is my book.',
+          promptJp: 'これはわたしの本です。',
+          promptReadings: { '本': 'ほん' },
+          accepted: ['this is my book'],
+          options: ['This is my book.'],
+          optionsVisible: true
+        },
+        case: {
+          promptEn: 'I write about my trips in this book.',
+          promptJp: 'わたしはこの本に旅のことを書く。',
+          promptReadings: { '本': 'ほん', '旅': 'たび', '書く': 'かく' },
+          accepted: ['i write about my trips in this book'],
+          options: ['I write about my trips in this book.'],
+          optionsVisible: false
+        },
+        deep: {
+          promptEn: 'I write about my trips in this book for my friend October.',
+          promptJp: 'わたしは友達のオクトーバーのために、この本に旅のことを書く。',
+          promptReadings: { '友達': 'ともだち', '本': 'ほん', '旅': 'たび', '書く': 'かく' },
+          accepted: ['i write about my trips in this book for my friend october'],
+          options: null,
+          optionsVisible: false
+        }
+      },
+      teddyBear: {
+        start: {
+          promptEn: 'This is my teddy bear.',
+          promptJp: 'これはわたしのテディベアです。',
+          promptReadings: {},
+          accepted: ['this is my teddy bear'],
+          options: ['This is my teddy bear.'],
+          optionsVisible: true
+        },
+        case: {
+          promptEn: 'My teddy bear was a gift.',
+          promptJp: 'わたしのテディベアはプレゼントだった。',
+          promptReadings: {},
+          accepted: ['my teddy bear was a gift'],
+          options: ['My teddy bear was a gift.'],
+          optionsVisible: false
+        },
+        deep: {
+          promptEn: 'Mister Happy gave me this teddy bear as a gift.',
+          promptJp: 'ミスター・ハッピーがこのテディベアをプレゼントしてくれた。',
+          promptReadings: {},
+          accepted: ['mister happy gave me this teddy bear as a gift'],
+          options: null,
+          optionsVisible: false
+        }
+      },
+      toGoCoffeeCup: {
+        start: {
+          promptEn: 'This is my coffee cup.',
+          promptJp: 'これはわたしのコーヒーカップです。',
+          promptReadings: {},
+          accepted: ['this is my coffee cup'],
+          options: ['This is my coffee cup.'],
+          optionsVisible: true
+        },
+        case: {
+          promptEn: 'I love drinking pamuri from this cup.',
+          promptJp: 'わたしはこのカップでパムリを飲むのが大好き。',
+          promptReadings: { '飲む': 'のむ', '大好き': 'だいすき' },
+          accepted: ['i love drinking pamuri from this cup'],
+          options: ['I love drinking pamuri from this cup.'],
+          optionsVisible: false
+        },
+        deep: {
+          promptEn: 'My favorite drink pamuri is sweet and made here in Grimmerglen.',
+          promptJp: 'わたしの大好きな飲み物パムリは、ここグリマーグレンで作られた甘い飲み物です。',
+          promptReadings: { '大好き': 'だいすき', '飲み物': 'のみもの', '作られた': 'つくられた', '甘い': 'あまい' },
+          accepted: ['my favorite drink pamuri is sweet and made here in grimmerglen'],
+          options: null,
+          optionsVisible: false
+        }
+      },
+      ball: {
+        start: {
+          promptEn: 'This is my ball.',
+          promptJp: 'これはわたしのボールです。',
+          promptReadings: {},
+          accepted: ['this is my ball'],
+          options: ['This is my ball.'],
+          optionsVisible: true
+        },
+        case: {
+          promptEn: 'I play ball with my friend Columbus.',
+          promptJp: 'わたしは友達のコロンブスとボールで遊ぶ。',
+          promptReadings: { '友達': 'ともだち', '遊ぶ': 'あそぶ' },
+          accepted: ['i play ball with my friend columbus'],
+          options: ['I play ball with my friend Columbus.'],
+          optionsVisible: false
+        },
+        deep: {
+          promptEn: 'I play ball with my friend Columbus inside his daydreams.',
+          promptJp: 'わたしは友達のコロンブスの夢の中でボールをして遊ぶ。',
+          promptReadings: { '友達': 'ともだち', '夢': 'ゆめ', '遊ぶ': 'あそぶ' },
+          accepted: ['i play ball with my friend columbus inside his daydreams'],
+          options: null,
+          optionsVisible: false
+        }
+      }
     }
   };
 })();
