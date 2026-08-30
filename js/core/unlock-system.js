@@ -32,6 +32,31 @@ const BoohaUnlockSystem = (() => {
     return found && typeof found === 'object' ? Object.keys(found).length : 0;
   }
 
+  // Grimmerglen stores its memory hunt in a self-contained world bucket, just
+  // like Muenba. Keep these helpers data-file independent so the achievement
+  // system can safely run on the menus and profile pages before the world
+  // manifest is loaded.
+  function _grimmerglen() {
+    const save = BoohaAdventure.save.load();
+    return save.grimmerglen || {};
+  }
+  function _grimmerglenObjectsFoundCount() {
+    const objects = _grimmerglen().objects;
+    if (!objects || typeof objects !== 'object') return 0;
+    return Object.values(objects).reduce((total, entry) => {
+      return total + Math.max(0, Math.min(3, Number(entry && entry.found) || 0));
+    }, 0);
+  }
+  function _grimmerglenMemoriesCompletedCount() {
+    const objects = _grimmerglen().objects;
+    if (!objects || typeof objects !== 'object') return 0;
+    return Object.values(objects).filter(entry => Number(entry && entry.found) >= 3).length;
+  }
+  function _grimmerglenRoomsVisitedCount() {
+    const rooms = _grimmerglen().visitedRooms;
+    return rooms && typeof rooms === 'object' ? Object.keys(rooms).length : 0;
+  }
+
   // ── Permanent UNLOCKS (achievements — never reset) ────────────────────────
   const UNLOCKS = [
     {
@@ -115,6 +140,23 @@ const BoohaUnlockSystem = (() => {
       id:'muenba:cleared', name:'Muenba Cleared',
       description:'Catch every ghost in Muenba.',
       condition() { return _muenbaGhostsFoundCount() >= 5; }, // GHOSTS_TOTAL = 5
+    },
+    // Grimmerglen memory hunt. The world can remain dormant behind its build
+    // gate while these lifetime profile achievements are already defined.
+    {
+      id:'grimmerglen:first_memory', name:'A Memory Found',
+      description:'Bring Marietta the first Grimmerglen memory object.',
+      condition() { return _grimmerglenObjectsFoundCount() >= 1; },
+    },
+    {
+      id:'grimmerglen:all_memories', name:'Memory Garden Complete',
+      description:'Recover all eight Grimmerglen memory threads.',
+      condition() { return _grimmerglenMemoriesCompletedCount() >= 8; },
+    },
+    {
+      id:'grimmerglen:rooms_explored', name:'Every Corner Remembered',
+      description:'Visit all nine Grimmerglen rooms.',
+      condition() { return _grimmerglenRoomsVisitedCount() >= 9; },
     },
   ];
 

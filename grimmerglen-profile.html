@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#ffd7ec">
+  <title>Grimmerglen — The Booha Adventure</title>
+  <style>
+    :root {
+      --ink:#4f355e; --muted:#886e91; --pink:#ff9fc9; --pink-deep:#d85d9a;
+      --lilac:#c8b4ff; --mint:#a9eadb; --cream:#fffaf4; --yellow:#ffe792;
+      --line:rgba(104,70,119,.16); --shadow:0 18px 50px rgba(116,71,124,.16);
+      font-family:ui-rounded,"Avenir Next Rounded","Nunito","Trebuchet MS",sans-serif;
+    }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; color:var(--ink); background:
+      radial-gradient(circle at 12% 8%,rgba(255,255,255,.92) 0 4%,transparent 22%),
+      radial-gradient(circle at 90% 18%,rgba(255,231,146,.45) 0 6%,transparent 26%),
+      linear-gradient(135deg,#ffdce9 0%,#eee3ff 48%,#d9f8ef 100%); }
+    body::before { content:""; position:fixed; inset:0; pointer-events:none; opacity:.24;
+      background-image:radial-gradient(#fff 1px,transparent 1px); background-size:22px 22px; }
+    a { color:inherit; }
+    .page { width:min(1120px,calc(100% - 28px)); margin:0 auto; padding:22px 0 56px; position:relative; }
+    .topbar { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:15px; }
+    .back-link,.enter-link { display:inline-flex; align-items:center; gap:7px; padding:10px 14px; border:2px solid rgba(216,93,154,.28); border-radius:999px; background:rgba(255,255,255,.65); text-decoration:none; font-weight:900; font-size:.77rem; letter-spacing:.04em; box-shadow:0 5px 0 rgba(216,93,154,.12); transition:transform .16s,box-shadow .16s; }
+    .back-link:hover,.enter-link:hover,.network a:hover { transform:translateY(-2px); box-shadow:0 8px 0 rgba(216,93,154,.12); }
+    .back-link[hidden],.enter-link[hidden] { display:none; }
+    .case-label { text-align:right; color:var(--muted); font-size:.68rem; font-weight:900; letter-spacing:.17em; line-height:1.55; }
+    .network { display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin:0 auto 16px; }
+    .network a { padding:8px 13px; border:2px solid var(--line); border-radius:999px; background:rgba(255,255,255,.54); text-decoration:none; font-size:.67rem; font-weight:950; letter-spacing:.08em; transition:transform .16s,box-shadow .16s; }
+    .network a[aria-current="page"] { color:#fff; background:linear-gradient(135deg,var(--pink-deep),#9d73d9); border-color:transparent; box-shadow:0 6px 0 rgba(121,72,145,.2); }
+    .network small { display:block; margin-top:2px; font-size:.62rem; letter-spacing:0; text-align:center; opacity:.76; }
+    .hero { display:grid; grid-template-columns:1fr 280px; align-items:center; gap:26px; padding:35px clamp(20px,5vw,66px) 30px; border:2px solid rgba(255,255,255,.82); border-radius:34px; background:linear-gradient(135deg,rgba(255,255,255,.8),rgba(255,238,249,.72)); box-shadow:var(--shadow); overflow:hidden; position:relative; }
+    .hero::after { content:"✦ ｡ﾟ ✧ ｡ﾟ ✦"; position:absolute; right:28px; top:20px; color:#f09abd; font-size:1.2rem; letter-spacing:.55em; transform:rotate(8deg); }
+    .eyebrow { color:var(--pink-deep); font-size:.72rem; font-weight:950; letter-spacing:.18em; text-transform:uppercase; }
+    h1 { margin:4px 0 4px; font-size:clamp(3.2rem,8vw,6.2rem); line-height:.9; letter-spacing:-.07em; color:#684479; text-shadow:4px 4px 0 rgba(255,255,255,.8); }
+    .hero-jp { margin:0 0 17px; color:#aa75b3; font-size:1.13rem; font-weight:800; }
+    .hero-copy { max-width:650px; margin:0; font-size:1.03rem; line-height:1.65; font-weight:650; }
+    .hero-copy small { display:block; margin-top:8px; color:var(--muted); font-size:.8rem; line-height:1.7; }
+    .mascot { justify-self:center; width:245px; height:245px; padding:12px; border-radius:50%; background:radial-gradient(circle,#fff 0 50%,#ffd8eb 51% 67%,rgba(255,255,255,0) 68%); filter:drop-shadow(0 14px 10px rgba(113,67,130,.18)); }
+    .mascot img { width:100%; height:100%; object-fit:contain; }
+    .status-strip { margin:17px 0 0; display:flex; flex-wrap:wrap; align-items:center; gap:10px; }
+    .status-pill { display:inline-flex; align-items:center; gap:7px; padding:8px 12px; border-radius:999px; background:rgba(255,255,255,.7); font-size:.72rem; font-weight:900; }
+    .status-dot { width:9px; height:9px; border-radius:50%; background:#ed80b0; box-shadow:0 0 0 4px rgba(237,128,176,.14); }
+    .status-dot.open { background:#54cba9; box-shadow:0 0 0 4px rgba(84,203,169,.17); }
+    .section { margin-top:22px; padding:24px; border:2px solid rgba(255,255,255,.78); border-radius:27px; background:rgba(255,255,255,.62); box-shadow:0 10px 30px rgba(116,71,124,.1); }
+    .section-head { display:flex; justify-content:space-between; align-items:end; gap:12px; margin-bottom:17px; }
+    .section-head h2 { margin:0; font-size:1.4rem; letter-spacing:-.04em; }
+    .section-head p { margin:0; color:var(--muted); font-size:.77rem; font-weight:800; }
+    .stats { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+    .stat { padding:15px 12px; text-align:center; border:2px solid rgba(255,255,255,.92); border-radius:20px; background:linear-gradient(160deg,#fff,#fff5fa); }
+    .stat:nth-child(2){background:linear-gradient(160deg,#fff,#f1edff)} .stat:nth-child(3){background:linear-gradient(160deg,#fff,#f0fffa)} .stat:nth-child(4){background:linear-gradient(160deg,#fff,#fff8d9)}
+    .stat-value { font-size:1.8rem; font-weight:950; line-height:1; color:#76518a; }
+    .stat-label { margin-top:6px; font-size:.65rem; font-weight:950; letter-spacing:.06em; text-transform:uppercase; }
+    .stat-jp { display:block; margin-top:3px; color:var(--muted); font-size:.66rem; }
+    .memories { display:grid; grid-template-columns:repeat(4,1fr); gap:13px; }
+    .memory-card { min-height:245px; padding:15px; position:relative; overflow:hidden; border:2px solid rgba(255,255,255,.9); border-radius:22px; background:linear-gradient(155deg,rgba(255,255,255,.94),rgba(255,239,248,.72)); transition:transform .16s,box-shadow .16s; }
+    .memory-card:hover { transform:translateY(-3px) rotate(-.4deg); box-shadow:0 11px 22px rgba(116,71,124,.13); }
+    .memory-card::before { content:""; position:absolute; width:72px; height:72px; right:-23px; top:-23px; border-radius:50%; background:var(--memory-color,#ffb3d4); opacity:.5; }
+    .memory-art { width:75px; height:75px; object-fit:contain; display:block; margin:-2px auto 6px; filter:drop-shadow(0 6px 4px rgba(98,55,115,.16)); }
+    .memory-name { margin:0; text-align:center; font-size:1.03rem; letter-spacing:-.03em; }
+    .memory-kana { margin:2px 0 8px; text-align:center; color:var(--muted); font-size:.68rem; }
+    .memory-story { min-height:48px; margin:0; color:#705878; font-size:.74rem; line-height:1.45; }
+    .memory-status { display:flex; align-items:center; justify-content:space-between; gap:7px; margin-top:11px; font-size:.65rem; font-weight:950; }
+    .dots { display:flex; gap:4px; }
+    .dot { width:10px; height:10px; border-radius:50%; border:2px solid #dbb4cc; background:#fff; }
+    .dot.found { border-color:#e781ae; background:#e781ae; box-shadow:inset 0 0 0 2px #fff; }
+    .memory-tier { margin:8px 0 0; padding-top:8px; border-top:1px dashed rgba(104,70,119,.2); color:var(--pink-deep); font-size:.65rem; font-weight:900; }
+    .memory-card.complete { --memory-color:#9ee8d3; background:linear-gradient(155deg,#fff,rgba(220,255,245,.85)); }
+    .memory-card.active { outline:3px solid rgba(216,93,154,.35); outline-offset:2px; }
+    .memory-card.active::after { content:"ACTIVE MEMORY"; position:absolute; top:10px; left:-26px; transform:rotate(-32deg); padding:3px 27px; color:#fff; background:#db74a8; font-size:.5rem; font-weight:950; letter-spacing:.08em; }
+    .lower-grid { display:grid; grid-template-columns:1.1fr .9fr; gap:16px; }
+    .note { padding:18px; border-radius:19px; background:linear-gradient(135deg,#fff4b9,#fff); border:2px solid rgba(243,203,103,.42); }
+    .note strong { display:block; font-size:.85rem; }
+    .note p { margin:7px 0 0; color:#765e6c; font-size:.78rem; line-height:1.55; }
+    .achievements { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+    .achievement { padding:13px; border-radius:17px; background:rgba(255,255,255,.72); border:2px solid rgba(255,255,255,.9); }
+    .achievement-icon { font-size:1.35rem; }
+    .achievement strong { display:block; margin-top:5px; font-size:.78rem; }
+    .achievement small { display:block; margin-top:4px; color:var(--muted); font-size:.67rem; line-height:1.35; }
+    .achievement.locked { filter:grayscale(.6); opacity:.58; }
+    .empty-state { margin:0; padding:19px; border-radius:17px; color:var(--muted); background:rgba(255,255,255,.6); font-size:.83rem; line-height:1.6; }
+    .footer-note { margin:24px 0 0; text-align:center; color:#8c7196; font-size:.72rem; font-weight:800; }
+    @media (max-width:850px) { .hero{grid-template-columns:1fr 180px}.mascot{width:175px;height:175px}.memories{grid-template-columns:repeat(2,1fr)} }
+    @media (max-width:560px) { .page{width:min(100% - 18px,1120px);padding-top:12px}.topbar{align-items:flex-start}.case-label{font-size:.55rem}.hero{display:block;padding:27px 20px 22px}.mascot{width:170px;height:170px;margin:15px auto -8px}.hero::after{right:9px}.stats{grid-template-columns:repeat(2,1fr)}.section{padding:16px}.memories{gap:9px}.memory-card{min-height:230px;padding:11px}.lower-grid{display:block}.lower-grid>*+*{margin-top:12px}.achievements{grid-template-columns:1fr}.network a{font-size:.6rem;padding:7px 9px} }
+    @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;transition-duration:.001ms!important}}
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="topbar">
+      <a class="back-link" id="profile-back" href="karasuki.html?from=profile">← Karasuki / カラスキ</a>
+      <div class="case-label">GRIMMERGLEN / MEMORY CASE FILE<br><ruby>記憶<rt>きおく</rt></ruby>の<ruby>事件簿<rt>じけんぼ</rt></ruby></div>
+    </div>
+
+    <nav class="network" aria-label="Output profiles">
+      <a href="profile.html">LOG <small>ぼうけんログ</small></a>
+      <a href="adventure-profile.html">ADVENTURE <small>ぼうけん</small></a>
+      <a href="utsuroba-profile.html">UTSUROBA <small>うつろば</small></a>
+      <a href="muenba-profile.html">MUENBA <small>むえんば</small></a>
+      <a href="grimmerglen-profile.html" aria-current="page">GRIMMERGLEN <small>グリマーグレン</small></a>
+    </nav>
+
+    <section class="hero" aria-labelledby="page-title">
+      <div>
+        <div class="eyebrow">A case file for the memories that wobble</div>
+        <h1 id="page-title">Grimmerglen</h1>
+        <p class="hero-jp">グリマーグレン — ふわふわの<ruby>記憶<rt>きおく</rt></ruby></p>
+        <p class="hero-copy">Marietta remembers the feeling, but not always the thing. Bring her the pastel clues Booha finds, then help her hold each little memory long enough to write it down.
+          <small>マリエッタは<ruby>気持<rt>きも</rt></ruby>ちは<ruby>覚<rt>おぼ</rt></ruby>えているけれど、ものを<ruby>忘<rt>わす</rt></ruby>れてしまうことがあります。</small>
+        </p>
+        <div class="status-strip">
+          <span class="status-pill"><i class="status-dot" id="world-dot"></i><span id="world-status">The garden is dreaming…</span></span>
+          <a class="enter-link" id="enter-world" href="grimmerglen.html" hidden>Enter the garden ✦</a>
+        </div>
+      </div>
+      <div class="mascot"><img src="assets/img/grimmerglen/marietta/marietta_04.webp" alt="Pastel horned chipmunk Marietta waving"></div>
+    </section>
+
+    <section class="section" aria-labelledby="stats-title">
+      <div class="section-head"><h2 id="stats-title">Marietta’s memory jar</h2><p>ちいさな<ruby>思<rt>おも</rt></ruby>い<ruby>出<rt>で</rt></ruby>のびん</p></div>
+      <div class="stats" id="stats"></div>
+    </section>
+
+    <section class="section" aria-labelledby="memories-title">
+      <div class="section-head"><h2 id="memories-title">The memory objects</h2><p>one active clue · three returns each</p></div>
+      <div class="memories" id="memories" aria-live="polite"></div>
+    </section>
+
+    <section class="section lower-grid">
+      <div class="note"><strong>Marietta’s rule for remembering</strong><p>She will tell Booha a story that hints at the object. The first return has friendly helpers, the second has fewer, and the final sentence stands on its own. The same memory gets a little hazier each time.</p><p>マリエッタの<ruby>話<rt>はなし</rt></ruby>をよく<ruby>聞<rt>き</rt></ruby>いてね。</p></div>
+      <div><div class="section-head"><h2>Sweet little achievements</h2><p>じっせき</p></div><div class="achievements" id="achievements"></div></div>
+    </section>
+
+    <p class="footer-note">Cute clues, wobbly memories, and one very determined Booha · かわいい<ruby>手<rt>て</rt></ruby>がかりと、がんばるブーハー</p>
+  </main>
+
+  <script src="./js/token.js"></script>
+  <script src="./js/calendar.js"></script>
+  <script src="./js/core/adventure-core.js"></script>
+  <script src="./js/core/save-file.js"></script>
+  <script src="./js/sync-client.js"></script>
+  <script src="./js/core/game-registry.js"></script>
+  <script src="./js/core/score-system.js"></script>
+  <script src="./js/core/unlock-system.js"></script>
+  <script src="./js/grimmerglen-data.js"></script>
+  <script>
+    (() => {
+      'use strict';
+      const DATA = window.GRIMMERGLEN_DATA || {};
+      const labels = {
+        banner:['Banner','かざり'], ticket:['Ticket','チケット'], pillow:['Pillow','まくら'], backpack:['Backpack','リュック'],
+        book:['Book','ほん'], teddyBear:['Teddy bear','ぬいぐるみ'], toGoCoffeeCup:['Coffee cup','コーヒー'], ball:['Ball','ボール']
+      };
+      const colors = ['#ffb4d5','#ffe28b','#a9e8dc','#c7b4ff','#ffbd9c','#b5ddff','#e4acef','#ffc89d'];
+      const esc = value => String(value == null ? '' : value).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+      const saveData = () => {
+        try { return (window.BoohaSaveFile && BoohaSaveFile.load()) || {}; } catch (_) { return {}; }
+      };
+      const bucket = () => saveData().grimmerglen || {};
+      const foundFor = (type) => Math.max(0, Math.min(3, Number(bucket().objects?.[type]?.found) || 0));
+      const visitedCount = () => Object.keys(bucket().visitedRooms || {}).length;
+      const totalFound = () => (DATA.objectTypes || []).reduce((sum, type) => sum + foundFor(type), 0);
+      const completeCount = () => (DATA.objectTypes || []).filter(type => foundFor(type) >= 3).length;
+
+      function clickTone(kind = 'soft') {
+        try {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (!AudioContext) return;
+          const ctx = clickTone.ctx || (clickTone.ctx = new AudioContext());
+          if (ctx.state === 'suspended') ctx.resume();
+          const osc = ctx.createOscillator(); const gain = ctx.createGain();
+          osc.type = kind === 'enter' ? 'triangle' : 'sine';
+          osc.frequency.setValueAtTime(kind === 'enter' ? 620 : 420, ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(kind === 'enter' ? 930 : 250, ctx.currentTime + .075);
+          gain.gain.setValueAtTime(.0001, ctx.currentTime); gain.gain.exponentialRampToValueAtTime(.045, ctx.currentTime + .008);
+          gain.gain.exponentialRampToValueAtTime(.0001, ctx.currentTime + .095);
+          osc.connect(gain).connect(ctx.destination); osc.start(); osc.stop(ctx.currentTime + .11);
+        } catch (_) {}
+      }
+
+      function renderDoor() {
+        let open = false;
+        try { open = !!(window.BoohaUnlockSystem && BoohaUnlockSystem.isGrimmerglenUnlocked()); } catch (_) {}
+        document.getElementById('world-dot').classList.toggle('open', open);
+        document.getElementById('world-status').textContent = open ? 'The garden is awake!' : 'The garden is dreaming…';
+        document.getElementById('enter-world').hidden = !open;
+      }
+
+      function renderStats() {
+        const rooms = Object.keys(DATA.rooms || {}).length || 9;
+        const visits = Number(bucket().roomVisitsTotal) || 0;
+        document.getElementById('stats').innerHTML = [
+          [totalFound(), `${(DATA.objectTypes || []).length * 3}`, 'Clues returned','手がかり'],
+          [completeCount(), `${(DATA.objectTypes || []).length}`, 'Memories held','覚えている'],
+          [visitedCount(), `${rooms}`, 'Rooms explored','部屋'],
+          [visits, '∞', 'Garden visits','訪れた回数']
+        ].map(item => `<div class="stat"><div class="stat-value">${esc(item[0])}<small style="font-size:.75em;color:#b28caf"> / ${esc(item[1])}</small></div><div class="stat-label">${esc(item[2])}</div><span class="stat-jp">${item[3]}</span></div>`).join('');
+      }
+
+      function renderMemories() {
+        const active = bucket().activeTargetType;
+        document.getElementById('memories').innerHTML = (DATA.objectTypes || []).map((type, index) => {
+          const found = foundFor(type); const name = labels[type] || [type,type]; const story = DATA.stories?.[type]?.en || 'A little memory is waiting.';
+          const tier = found >= 3 ? 'Memory safe ✦' : found === 2 ? 'Deep memory next' : found === 1 ? 'Case memory next' : 'Starter memory waiting';
+          return `<article class="memory-card${found >= 3 ? ' complete' : ''}${active === type ? ' active' : ''}" style="--memory-color:${colors[index % colors.length]}">
+            <img class="memory-art" src="${esc(DATA.collectibles?.[type] || '')}" alt="${esc(name[0])}">
+            <h3 class="memory-name">${esc(name[0])}</h3><p class="memory-kana">${esc(name[1])}</p>
+            <p class="memory-story">${esc(story)}</p>
+            <div class="memory-status"><span>${found >= 3 ? 'All three returned' : `${found} of 3 returned`}</span><span class="dots">${[0,1,2].map(i => `<i class="dot${i < found ? ' found' : ''}"></i>`).join('')}</span></div>
+            <p class="memory-tier">${tier}</p>
+          </article>`;
+        }).join('');
+      }
+
+      function renderAchievements() {
+        const ids = ['grimmerglen:first_memory','grimmerglen:all_memories','grimmerglen:rooms_explored'];
+        let all = [];
+        try { all = BoohaUnlockSystem.getAll(); } catch (_) {}
+        const byId = new Map(all.map(item => [item.id,item]));
+        const icons = ['♡','✦','✿'];
+        document.getElementById('achievements').innerHTML = ids.map((id,index) => {
+          const item = byId.get(id) || { name:'A secret achievement', description:'Keep exploring.', unlocked:false };
+          return `<div class="achievement${item.unlocked ? '' : ' locked'}"><div class="achievement-icon">${item.unlocked ? icons[index] : '✧'}</div><strong>${esc(item.name)}</strong><small>${esc(item.unlocked ? item.description : 'Still tucked inside the dream.')}</small></div>`;
+        }).join('');
+      }
+
+      function render() { renderDoor(); renderStats(); renderMemories(); renderAchievements(); }
+      document.addEventListener('pointerdown', event => { if (event.target.closest('a,button')) clickTone(event.target.closest('#enter-world') ? 'enter' : 'soft'); }, { passive:true });
+      ['booha:saved','booha:unlocked','booha:weeklyReset','booha:newWeek'].forEach(name => document.addEventListener(name, render));
+      if (window.BOOHA_READY) render(); else document.addEventListener('booha:ready', render, { once:true });
+      render();
+    })();
+  </script>
+</body>
+</html>
