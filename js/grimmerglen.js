@@ -506,16 +506,80 @@
       </div>`;
     const talkBtn = mariettaPanel.querySelector('#mg-talk-btn');
     const leaveBtn = mariettaPanel.querySelector('#mg-leave-btn');
-    if (talkBtn) talkBtn.addEventListener('click', renderMariettaTalkStub);
+    if (talkBtn) talkBtn.addEventListener('click', renderMariettaDialogue);
     if (leaveBtn) leaveBtn.addEventListener('click', () => { closeMariettaPanel(); returnToKarasuki(); });
   }
 
-  // PASS 4 HOOK: this whole function gets replaced by the real dialogue
-  // system (big-text drawer, per-character typewriter reveal, the
-  // daydream/daymare lore in EN + furigana). For now, tapping "Talk to
-  // Marietta" swaps the same card to a short, honest placeholder instead
-  // of silently doing nothing.
-  function renderMariettaTalkStub() {
+  function escapeHTML(value) {
+    return String(value == null ? '' : value)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  // Marietta's own typewriter blip -- foundation pass 4. Distinct timbre
+  // from Utsuroba's playTypeTick() (a flat square-wave buzz): a sine tone
+  // with a quick upward pitch glide, higher and rounder, matching
+  // Grimmerglen's "cute bubbly pastel" identity.
+  let mariettaTypeAudioCtx = null;
+  function playMariettaTypeTick() {
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      if (!mariettaTypeAudioCtx) mariettaTypeAudioCtx = new AC();
+      if (mariettaTypeAudioCtx.state === 'suspended') mariettaTypeAudioCtx.resume().catch(() => {});
+      const now = mariettaTypeAudioCtx.currentTime;
+      const osc = mariettaTypeAudioCtx.createOscillator();
+      const gain = mariettaTypeAudioCtx.createGain();
+      osc.type = 'sine';
+      const base = 760 + Math.random() * 120;
+      osc.frequency.setValueAtTime(base, now);
+      osc.frequency.exponentialRampToValueAtTime(base * 1.35, now + 0.045);
+      gain.gain.setValueAtTime(0.06, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.06);
+      osc.connect(gain); gain.connect(mariettaTypeAudioCtx.destination);
+      osc.start(now); osc.stop(now + 0.065);
+    } catch (_) {}
+  }
+
+  // Marietta's lore intro -- prose-rich per the plan doc (deliberately
+  // distinct from the typing content's simple sentences, which stay
+  // Pass 5/6's job). Explains why Grimmerglen exists and who Marietta is:
+  // cute *and* a little spooky, forgetful by nature, matching how fast
+  // daydreams/daymares arrive and how quickly they slip away again --
+  // instability is the point, not a bug to smooth over.
+  const MARIETTA_DIALOGUE = [
+    { en: "Oh! Hello, hello! You found me — I'm Marietta!",
+      jp: 'あっ、こんにちは！わたしを見つけたのね。マリエッタです！' },
+    { en: 'Welcome to Grimmerglen. This is where daydreams and daymares end up.',
+      jp: 'ようこそ、グリマーグレンへ。ここは、たのしい夢と、こわい夢が集まる場所なの。' },
+    { en: 'Nobody knows why. They just arrive, one after another, and pile up all around us.',
+      jp: 'どうしてかは、だれも知らない。夢たちは、つぎつぎとやってきて、ここにたまっていくの。' },
+    { en: "I'm a Marietta too — that's what my whole species is called! Funny, isn't it?",
+      jp: 'わたしも「マリエッタ」っていう種族なのよ。おなじ名前で、ちょっとおもしろいでしょ？' },
+    { en: "Some of the daymares look a little spooky. Don't worry — they can't hurt you here. Probably!",
+      jp: 'こわい夢も、ちょっとだけいるけど……だいじょうぶ、ここでは何もできないから。たぶん！' },
+    { en: 'I try to remember every one that comes through... but they slip away so fast, even for me.',
+      jp: 'やってきた夢を、ぜんぶ覚えていたいんだけど……わたしも、あっというまに忘れちゃうの。' }
+  ];
+
+  // Per-kanji-term reading map -- prose gets individual term readings
+  // (the site's real furigana convention for authored dialogue), unlike
+  // MARIETTA_UI_READINGS' whole-phrase style for short fixed button copy.
+  const MARIETTA_DIALOGUE_READINGS = {
+    '見つけた': 'みつけた',
+    '夢': 'ゆめ',
+    '場所': 'ばしょ',
+    '知らない': 'しらない',
+    '種族': 'しゅぞく',
+    '名前': 'なまえ',
+    '覚えて': 'おぼえて',
+    '忘れちゃう': 'わすれちゃう'
+  };
+
+  // PASS 6 HOOK: once the tutorial is built, its "Do you want to try
+  // first?" branch launches from the closing button below instead of
+  // just closing the panel back out to free exploration.
+  function renderMariettaDialogue() {
     if (!mariettaPanel || !MARIETTA) return;
     mariettaPanel.innerHTML = `
       <span class="dp-handle"></span>
@@ -527,15 +591,70 @@
           <p class="dp-name-en">GRIMMERGLEN GUIDE</p>
           <p class="dp-name-kanji">Marietta <span style="font-weight:400;color:#9a7850;">・マリエッタ</span></p>
           <div class="dp-divider"></div>
-          <p class="dp-line-en">Marietta wiggles happily... she has so much to tell you, but she's not quite ready yet!</p>
-          <p class="dp-line-jp">${furiJP('マリエッタは嬉しそうに揺れています…まだ話す準備ができていないみたい！', MARIETTA_UI_READINGS)}</p>
-          <div class="dp-btns">
-            <button class="dp-btn no" id="mg-talk-close-btn">Close / ${furiJP('閉じる', MARIETTA_UI_READINGS)}</button>
+          <div id="mg-dialogue-lines"></div>
+          <div id="mg-dialogue-actions" class="dp-btns" style="opacity:0;transition:opacity .3s;">
+            <button class="dp-btn yes" id="mg-dialogue-close-btn">Got it! / わかった！</button>
           </div>
         </div>
       </div>`;
-    const closeBtn = mariettaPanel.querySelector('#mg-talk-close-btn');
-    if (closeBtn) closeBtn.addEventListener('click', closeMariettaPanel);
+
+    const linesEl = mariettaPanel.querySelector('#mg-dialogue-lines');
+    const actionsEl = mariettaPanel.querySelector('#mg-dialogue-actions');
+    let finished = false;
+
+    function showActions() {
+      if (finished) return;
+      finished = true;
+      linesEl.innerHTML = MARIETTA_DIALOGUE.map(line =>
+        `<p class="dp-line-en" style="margin-bottom:2px;">${escapeHTML(line.en)}</p><p class="dp-line-jp" style="margin:0 0 6px;">${furiJP(line.jp, MARIETTA_DIALOGUE_READINGS)}</p>`
+      ).join('');
+      actionsEl.style.opacity = '1';
+      const closeBtn = mariettaPanel.querySelector('#mg-dialogue-close-btn');
+      if (closeBtn) closeBtn.addEventListener('click', closeMariettaPanel);
+    }
+
+    // Click anywhere on the card to skip straight to the end -- deferred
+    // a tick so the very click that opened this screen (bubbling up from
+    // the "Talk to Marietta" button, a descendant of this same panel)
+    // doesn't immediately trigger its own skip.
+    setTimeout(() => {
+      mariettaPanel.addEventListener('click', showActions, { once: true });
+    }, 0);
+
+    let lineIdx = 0, charIdx = 0, currentEnEl = null;
+    const CHAR_MS = 36, LINE_PAUSE_MS = 360;
+
+    function typeLine() {
+      if (finished) return;
+      if (lineIdx >= MARIETTA_DIALOGUE.length) { setTimeout(showActions, 400); return; }
+      currentEnEl = document.createElement('p');
+      currentEnEl.className = 'dp-line-en';
+      currentEnEl.style.marginBottom = '2px';
+      linesEl.appendChild(currentEnEl);
+      charIdx = 0;
+      typeChar();
+    }
+
+    function typeChar() {
+      if (finished) return;
+      const line = MARIETTA_DIALOGUE[lineIdx];
+      if (charIdx <= line.en.length) {
+        currentEnEl.textContent = line.en.slice(0, charIdx);
+        if (charIdx > 0 && line.en[charIdx - 1] !== ' ') playMariettaTypeTick();
+        charIdx++;
+        setTimeout(typeChar, CHAR_MS);
+      } else {
+        const jpEl = document.createElement('p');
+        jpEl.className = 'dp-line-jp';
+        jpEl.style.margin = '0 0 6px';
+        jpEl.innerHTML = furiJP(line.jp, MARIETTA_DIALOGUE_READINGS);
+        linesEl.appendChild(jpEl);
+        lineIdx++;
+        setTimeout(typeLine, LINE_PAUSE_MS);
+      }
+    }
+
+    typeLine();
   }
 
   function openMariettaPanel() {
