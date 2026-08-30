@@ -19,6 +19,7 @@
  *     accepted: ["i'm happy", "i'm sad", "i'm tired", "i'm stinky"],
  *     options: ["I'm happy", "I'm sad", "I'm tired", "I'm stinky"], // or null
  *     optionsVisible: true,   // false + options given = hidden behind a hint toggle
+ *     helpText: 'Japanese help', helpReadings: { ... }, // optional Deep help
  *   }, {
  *     onCorrect: (answerText) => { ... },
  *     onWrong:   (answerText) => { ... },
@@ -192,6 +193,7 @@
       : '';
     const showChipsUpFront = hasOptions && ex.optionsVisible;
     const showHintToggle = hasOptions && !ex.optionsVisible;
+    const showFuriganaHelp = !hasOptions && ex.helpText;
 
     container.innerHTML = `
       <div class="mgty-exercise">
@@ -199,6 +201,7 @@
         ${ex.promptJp ? `<p class="mgty-prompt-jp">${furiJP(ex.promptJp, ex.promptReadings)}</p>` : ''}
         ${hasOptions ? `<div class="mgty-chips"${showChipsUpFront ? '' : ' hidden'}>${chipsHTML}</div>` : ''}
         ${showHintToggle ? `<button type="button" class="mgty-hint-btn">Need a hint? / ${furiJP('ヒントが必要？', { '必要': 'ひつよう' })}</button>` : ''}
+        ${showFuriganaHelp ? `<button type="button" class="mgty-help-btn">Help me / ${furiJP('助けて', { '助けて': 'たすけて' })}</button><p class="mgty-help" hidden>${furiJP(ex.helpText, ex.helpReadings || {})}</p>` : ''}
         <div class="mgty-input-row">
           <input type="text" class="mgty-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Type your answer / こたえをタイプしてね">
           <button type="button" class="mgty-submit">Check / ${furiJP('たしかめる', {})}</button>
@@ -210,6 +213,8 @@
       root: container.querySelector('.mgty-exercise'),
       chips: container.querySelector('.mgty-chips'),
       hintBtn: container.querySelector('.mgty-hint-btn'),
+      helpBtn: container.querySelector('.mgty-help-btn'),
+      helpEl: container.querySelector('.mgty-help'),
       inputRow: container.querySelector('.mgty-input-row'),
       inputEl: container.querySelector('.mgty-input'),
       submitEl: container.querySelector('.mgty-submit'),
@@ -222,6 +227,13 @@
       refs.hintBtn.addEventListener('click', () => {
         refs.chips.hidden = false;
         refs.hintBtn.hidden = true;
+      });
+    }
+
+    if (refs.helpBtn && refs.helpEl) {
+      refs.helpBtn.addEventListener('click', () => {
+        refs.helpEl.hidden = false;
+        refs.helpBtn.hidden = true;
       });
     }
 
@@ -264,6 +276,11 @@
         font:700 .76rem/1 'Georgia',serif;letter-spacing:.02em;background:transparent;
         border:1px dashed rgba(224,85,158,.5);color:#a9548a;}
       .mgty-hint-btn:hover{background:rgba(255,159,194,.12);}
+      .mgty-help-btn{display:inline-block;margin:0 0 10px;padding:6px 13px;border-radius:999px;cursor:pointer;
+        font:700 .76rem/1 'Georgia',serif;letter-spacing:.02em;background:rgba(184,164,255,.12);
+        border:1px dashed rgba(126,99,196,.55);color:#6851a6;}
+      .mgty-help-btn:hover{background:rgba(184,164,255,.22);}
+      .mgty-help{margin:0 0 10px;padding:8px 11px;border-left:3px solid #b8a4ff;border-radius:0 8px 8px 0;background:rgba(184,164,255,.12);color:#5e4b88;font-size:.86rem;line-height:1.55;}
       .mgty-input-row{position:relative;display:flex;gap:8px;margin:0 0 6px;}
       .mgty-input{flex:1;min-width:0;box-sizing:border-box;padding:11px 14px;border-radius:12px;
         border:2px solid rgba(224,85,158,.35);background:#fffdf9;color:#2a1408;
