@@ -4,6 +4,7 @@
 // Pass 8 foundation audit. Keep this filesystem-only so verify.sh can catch
 // a blank room, an unplaced slot, or a cache omission before deployment.
 const assert = require('assert');
+const { execFileSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
@@ -18,6 +19,7 @@ const page = fs.readFileSync(path.join(root, 'grimmerglen.html'), 'utf8');
 const profile = fs.readFileSync(path.join(root, 'grimmerglen-profile.html'), 'utf8');
 const serviceWorker = fs.readFileSync(path.join(root, 'sw.js'), 'utf8');
 const audioFiles = [
+  'assets/img/grimmerglen/booha_change.mp3',
   'assets/img/grimmerglen/grimmerglen_bgm.mp3',
   'assets/img/grimmerglen/grimmerglen_dance.mp3'
 ];
@@ -64,6 +66,16 @@ for (const room of Object.values(data.rooms)) {
 for (const pose of data.marietta.poses) assert(fs.existsSync(path.join(root, pose)), `Marietta art must exist: ${pose}`);
 assert(fs.existsSync(path.join(root, data.booha.sprite)), 'Grimmerglen Booha art must exist');
 for (const audio of audioFiles) assert(fs.existsSync(path.join(root, audio)), `audio must exist: ${audio}`);
+const changeAudioProbe = JSON.parse(execFileSync('ffprobe', [
+  '-v', 'error', '-select_streams', 'a:0',
+  '-show_entries', 'stream=codec_name,channels,bit_rate,sample_rate',
+  '-of', 'json', path.join(root, 'assets/img/grimmerglen/booha_change.mp3')
+], { encoding: 'utf8' }));
+const changeAudioStream = changeAudioProbe.streams && changeAudioProbe.streams[0];
+assert(changeAudioStream && changeAudioStream.codec_name === 'mp3', 'Booha change cue must remain MP3-compatible');
+assert.strictEqual(Number(changeAudioStream.channels), 1, 'Booha change cue must be mono');
+assert(Number(changeAudioStream.bit_rate) >= 96000 && Number(changeAudioStream.bit_rate) <= 128000, 'Booha change cue must use a compact 96–128 kbps bitrate');
+assert.strictEqual(Number(changeAudioStream.sample_rate), 44100, 'Booha change cue must use 44.1 kHz');
 assert.strictEqual(data.dance.marietta.length, 3, 'Marietta must have three dance frames');
 assert.strictEqual(data.dance.booha.length, 3, 'Grimmerglen Booha must have three dance frames');
 for (const frame of [...data.dance.marietta, ...data.dance.booha]) {
@@ -99,7 +111,9 @@ assert(runtimeSource.includes('writeGrimmerglenObjectFound(object.type, object.i
 assert(runtimeSource.includes('objectSlots'), 'exact object slots must be persisted');
 assert(runtimeSource.includes('getActiveGrimmerglenTargetType'), 'runtime must enforce one active object target at a time');
 assert(runtimeSource.includes('activeTargetType'), 'active Grimmerglen target must persist across redraws');
-assert(runtimeSource.includes('BOOHA_TRANSFORM_DURATION_MS = 5000'), 'entry transformation must last five seconds');
+assert(runtimeSource.includes("new Audio('assets/img/grimmerglen/booha_change.mp3')"), 'entry transformation must use the recorded Booha change cue');
+assert(runtimeSource.includes('BOOHA_CHANGE_FALLBACK_MS'), 'entry transformation must derive its duration from the change audio');
+assert(runtimeSource.includes('openBoohaChangePrompt'), 'entry transformation must wait for the readiness overlay');
 assert(runtimeSource.includes('entryWelcomePending'), 'entry must wait for Marietta before object interaction begins');
 assert(!runtimeSource.includes('openMariettaPanelAfterEntry();'), 'Marietta popup must not auto-open on entry');
 assert(runtimeSource.includes('renderMariettaHandoff'), 'Marietta must receive carried objects before the quiz');
@@ -125,7 +139,8 @@ assert(/pages:\s+'booha-pages-2026-377'/.test(serviceWorker), 'page cache must b
 assert(serviceWorker.includes('grimmerglen/dance/marietta_dance_'), 'service worker must precache Marietta dance art');
 assert(serviceWorker.includes('grimmerglen/dance/booha_grimmerglen_dance_'), 'service worker must precache Booha dance art');
 assert(serviceWorker.includes('room_${String(index + 1).padStart(2, \'0\')}.webp'), 'service worker must cover the generated room sequence');
-assert(/assets:\s+'booha-assets-2026-435'/.test(serviceWorker), 'asset cache must be bumped for the room expansion pass');
+assert(serviceWorker.includes('${BASE}/assets/img/grimmerglen/booha_change.mp3'), 'service worker must precache the Booha change cue');
+assert(/assets:\s+'booha-assets-2026-436'/.test(serviceWorker), 'asset cache must be bumped for the entry audio pass');
 
 assert(profile.includes('GRIMMERGLEN / MEMORY CASE FILE'), 'profile must use the Grimmerglen case-file header');
 assert(profile.includes('grimmerglen-data.js'), 'profile must load the Grimmerglen manifest');
