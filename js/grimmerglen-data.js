@@ -131,7 +131,7 @@
     rooms[roomId] = {
       bg: `assets/img/grimmerglen/${roomId}.webp`,
       spawns: { ...SPAWNS },
-      exits: NPP[roomId] || [],
+    exits: NPP[roomId] || [],
       walkable: makeWalkable(),
       color: ROOM_COLOR[roomId]
     };
@@ -145,6 +145,9 @@
     roomClass: 'grimmerglen-room grimmerglen-pastel-pop',
     spriteClass: 'grimmerglen-sprite',
     rooms,
+    booha: {
+      sprite: 'assets/img/grimmerglen/booha_grimmerglen.webp'
+    },
     marietta: {
       // room_01 is Marietta's room — the entry point from Karasuki and
       // where her "Talk to Marietta / Leave Grimmerglen" popup lives
