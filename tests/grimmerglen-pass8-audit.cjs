@@ -60,6 +60,16 @@ for (const type of data.objectTypes) {
 }
 assert.strictEqual(new Set(allInstances).size, allInstances.length, 'collectible placements must not overlap exactly');
 assert(!allInstances.some(instance => instance.startsWith('room_01:')), 'room_01 must never contain memory objects');
+for (const [roomId, room] of Object.entries(data.rooms)) {
+  for (const exit of room.exits || []) {
+    assert(data.rooms[exit.to], `${roomId} must not point to a missing room`);
+  }
+}
+const occupiedRooms = new Set(Object.values(data.objects).flat().map(slot => slot.room));
+for (let roomNumber = 2; roomNumber <= 15; roomNumber++) {
+  const roomId = `room_${String(roomNumber).padStart(2, '0')}`;
+  assert(occupiedRooms.has(roomId), `${roomId} must contain at least one collectible`);
+}
 
 for (const room of Object.values(data.rooms)) {
   assert(fs.existsSync(path.join(root, room.bg)), `room art must exist: ${room.bg}`);
@@ -112,6 +122,7 @@ assert(runtimeSource.includes('reseedObjectLayout'), 'collectible coordinates mu
 assert(runtimeSource.includes('writeGrimmerglenCarriedObject(null)'), 'Booha must be able to drop a carried item for another');
 assert(runtimeSource.includes('drawPastelVignette'), 'pastel room color must be applied as an edge vignette');
 assert(runtimeSource.includes('drawEdgeLeaves'), 'room-colored leaves must drift around the edges');
+assert(runtimeSource.includes('function getRoomExits'), 'room navigation must ignore missing destination rooms');
 assert(runtimeSource.includes('clickCheckGrimmerglenObject'), 'runtime must support clicked pickups');
 assert(runtimeSource.includes('checkGrimmerglenObjectProximity'), 'runtime must support approached pickups');
 assert(runtimeSource.includes('GrimmerglenTyping.renderExercise'), 'pickup UI must use the shared typing engine');
@@ -148,7 +159,7 @@ assert(serviceWorker.includes('grimmerglen/dance/marietta_dance_'), 'service wor
 assert(serviceWorker.includes('grimmerglen/dance/booha_grimmerglen_dance_'), 'service worker must precache Booha dance art');
 assert(serviceWorker.includes('room_${String(index + 1).padStart(2, \'0\')}.webp'), 'service worker must cover the generated room sequence');
 assert(serviceWorker.includes('${BASE}/assets/img/grimmerglen/booha_change.mp3'), 'service worker must precache the Booha change cue');
-assert(/assets:\s+'booha-assets-2026-438'/.test(serviceWorker), 'asset cache must be bumped for the Grimmerglen audio/visual pass');
+assert(/assets:\s+'booha-assets-2026-439'/.test(serviceWorker), 'asset cache must be bumped for the Grimmerglen room-layout pass');
 
 assert(profile.includes('GRIMMERGLEN / MEMORY CASE FILE'), 'profile must use the Grimmerglen case-file header');
 assert(profile.includes('grimmerglen-data.js'), 'profile must load the Grimmerglen manifest');
