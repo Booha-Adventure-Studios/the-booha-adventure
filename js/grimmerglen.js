@@ -92,7 +92,11 @@
     lastTickTime: 0,
     speed: BASE_SPEED,
     returnExiting: false,
-    boohaTransformed: false
+    boohaTransformed: false,
+    celebrating: false,
+    celebrationStart: 0,
+    celebrationTimer: 0,
+    celebrationFinishing: false
   };
 
   let app, stage, roomLayer, atmosphereCanvas, atmosphereCtx, actorCanvas, actorCtx, fadeEl, currentBg;
@@ -140,6 +144,19 @@
   grimmerglenDance.volume = GRIMMERGLEN_DANCE_VOLUME;
   let grimmerglenDanceAudioActive = false;
   let grimmerglenDanceAudioToken = 0;
+  const GRIMMERGLEN_DANCE_FRAME_MS = 480;
+  const GRIMMERGLEN_DANCE_MARIETTA_SIZE = 82;
+  const GRIMMERGLEN_DANCE_BOOHA_SIZE = 66;
+  const GRIMMERGLEN_DANCE_GAP = 54;
+  const grimmerglenDanceImages = {
+    marietta: ((DATA.dance && DATA.dance.marietta) || []).map(src => {
+      const image = new Image(); image.decoding = 'async'; image.src = src; return image;
+    }),
+    booha: ((DATA.dance && DATA.dance.booha) || []).map(src => {
+      const image = new Image(); image.decoding = 'async'; image.src = src; return image;
+    })
+  };
+  const grimmerglenDanceSparkles = [];
 
   function startGrimmerglenMusic() {
     if (state.returnExiting || grimmerglenDanceAudioActive) return;
@@ -507,6 +524,77 @@
     actorCtx.restore();
   }
 
+  function spawnGrimmerglenDanceSparkle(now) {
+    if (REDUCED_MOTION) return;
+    const colors = ['#ff9fc2', '#ffe066', '#b8a4ff', '#8fe6c4', '#ffffff'];
+    const angle = Math.random() * Math.PI * 2;
+    const radius = 18 + Math.random() * 60;
+    grimmerglenDanceSparkles.push({
+      x: CENTER_X + Math.cos(angle) * radius,
+      y: CENTER_Y + Math.sin(angle) * radius * .7,
+      vx: (Math.random() - .5) * .55,
+      vy: -(0.25 + Math.random() * .5),
+      life: 1,
+      size: 1.5 + Math.random() * 2.6,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      phase: Math.random() * Math.PI * 2,
+      bornAt: now
+    });
+  }
+
+  function drawGrimmerglenDanceSparkles(now) {
+    if (!grimmerglenDanceSparkles.length) return;
+    for (let i = grimmerglenDanceSparkles.length - 1; i >= 0; i--) {
+      const sparkle = grimmerglenDanceSparkles[i];
+      sparkle.life -= .022;
+      if (sparkle.life <= 0) { grimmerglenDanceSparkles.splice(i, 1); continue; }
+      sparkle.x += sparkle.vx;
+      sparkle.y += sparkle.vy;
+      const twinkle = .55 + .45 * Math.sin(now / 90 + sparkle.phase);
+      actorCtx.save();
+      actorCtx.globalAlpha = sparkle.life * twinkle;
+      actorCtx.fillStyle = sparkle.color;
+      actorCtx.shadowColor = sparkle.color;
+      actorCtx.shadowBlur = 10;
+      actorCtx.beginPath();
+      actorCtx.arc(sparkle.x, sparkle.y, sparkle.size, 0, Math.PI * 2);
+      actorCtx.fill();
+      actorCtx.restore();
+    }
+  }
+
+  function drawGrimmerglenCelebration(now) {
+    const elapsed = Math.max(0, (now - state.celebrationStart) / 1000);
+    const frameIndex = REDUCED_MOTION ? 0 : Math.floor(elapsed * 1000 / GRIMMERGLEN_DANCE_FRAME_MS) % 3;
+    const mariettaFrame = grimmerglenDanceImages.marietta[frameIndex];
+    const boohaFrame = grimmerglenDanceImages.booha[frameIndex];
+    const beat = REDUCED_MOTION ? 0 : Math.sin(elapsed * 6.3);
+    const mariettaX = CENTER_X - GRIMMERGLEN_DANCE_GAP;
+    const boohaX = CENTER_X + GRIMMERGLEN_DANCE_GAP;
+    const mariettaY = CENTER_Y + (REDUCED_MOTION ? 0 : Math.cos(elapsed * 3.15) * 7 + beat * 3);
+    const boohaY = CENTER_Y + (REDUCED_MOTION ? 0 : Math.sin(elapsed * 3.15 + .8) * 8 - beat * 2);
+
+    if (!REDUCED_MOTION && Math.random() < .42) spawnGrimmerglenDanceSparkle(now);
+    drawGrimmerglenDanceSparkles(now);
+
+    actorCtx.save();
+    actorCtx.globalAlpha = .22;
+    actorCtx.fillStyle = '#fff4fb';
+    actorCtx.shadowColor = '#ff9fc2';
+    actorCtx.shadowBlur = 34;
+    actorCtx.beginPath();
+    actorCtx.ellipse(CENTER_X, CENTER_Y + 30, 150, 86, 0, 0, Math.PI * 2);
+    actorCtx.fill();
+    actorCtx.restore();
+
+    if (mariettaFrame && mariettaFrame.complete && mariettaFrame.naturalWidth > 0) {
+      actorCtx.drawImage(mariettaFrame, mariettaX - GRIMMERGLEN_DANCE_MARIETTA_SIZE / 2, mariettaY - GRIMMERGLEN_DANCE_MARIETTA_SIZE / 2, GRIMMERGLEN_DANCE_MARIETTA_SIZE, GRIMMERGLEN_DANCE_MARIETTA_SIZE);
+    }
+    if (boohaFrame && boohaFrame.complete && boohaFrame.naturalWidth > 0) {
+      actorCtx.drawImage(boohaFrame, boohaX - GRIMMERGLEN_DANCE_BOOHA_SIZE / 2, boohaY - GRIMMERGLEN_DANCE_BOOHA_SIZE / 2, GRIMMERGLEN_DANCE_BOOHA_SIZE, GRIMMERGLEN_DANCE_BOOHA_SIZE);
+    }
+  }
+
   function getRoomObjects(roomId) {
     const objects = [];
     Object.keys(DATA.objects || {}).forEach(type => {
@@ -732,10 +820,14 @@
     drawAtmosphere(now);
     drawExitArrows(now);
     drawReturnPortal(now);
-    drawMarietta(now);
-    drawGrimmerglenObjects(now);
-    drawBooha(now);
-    drawCarriedObject(now);
+    if (state.celebrating) {
+      drawGrimmerglenCelebration(now);
+    } else {
+      drawMarietta(now);
+      drawGrimmerglenObjects(now);
+      drawBooha(now);
+      drawCarriedObject(now);
+    }
     drawBoohaTransformFX(now);
   }
 
@@ -1391,6 +1483,35 @@
     mariettaPanel.querySelector('#mg-memory-done')?.addEventListener('click', closeMariettaPanel);
   }
 
+  function finishGrimmerglenCelebration() {
+    if (!state.celebrating || state.celebrationFinishing) return;
+    state.celebrationFinishing = true;
+    if (state.celebrationTimer) window.clearTimeout(state.celebrationTimer);
+    state.celebrationTimer = 0;
+    state.celebrating = false;
+    state.celebrationFinishing = false;
+    state.inputLocked = false;
+    grimmerglenDanceSparkles.length = 0;
+    stopGrimmerglenDanceMusic();
+    startGrimmerglenMusic();
+  }
+
+  function startGrimmerglenCelebration() {
+    if (state.celebrating || state.returnExiting) return;
+    state.celebrating = true;
+    state.celebrationFinishing = false;
+    state.celebrationStart = performance.now();
+    state.inputLocked = true;
+    state.clickTarget = null;
+    state.moving = false;
+    state.x = CENTER_X;
+    state.y = CENTER_Y;
+    grimmerglenDanceSparkles.length = 0;
+    closeMariettaPanel();
+    const duration = playGrimmerglenDanceMusic(finishGrimmerglenCelebration);
+    state.celebrationTimer = window.setTimeout(finishGrimmerglenCelebration, Math.max(1200, duration + 120));
+  }
+
   function completeGrimmerglenMemory(object) {
     if (!mariettaPanelOpen || !carriedObject || carriedObject.id !== object.id) return;
     if (!writeGrimmerglenObjectFound(object.type, object.id)) {
@@ -1402,7 +1523,9 @@
       return;
     }
     handoffObject = null;
-    renderMariettaMemorySuccess(object);
+    const memoryComplete = getGrimmerglenObjectsProgress()[object.type]?.found >= 3;
+    if (memoryComplete) startGrimmerglenCelebration();
+    else renderMariettaMemorySuccess(object);
   }
 
   function handleMariettaGiveItem() {

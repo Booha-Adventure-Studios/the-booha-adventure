@@ -61,6 +61,11 @@ for (const room of Object.values(data.rooms)) {
 for (const pose of data.marietta.poses) assert(fs.existsSync(path.join(root, pose)), `Marietta art must exist: ${pose}`);
 assert(fs.existsSync(path.join(root, data.booha.sprite)), 'Grimmerglen Booha art must exist');
 for (const audio of audioFiles) assert(fs.existsSync(path.join(root, audio)), `audio must exist: ${audio}`);
+assert.strictEqual(data.dance.marietta.length, 3, 'Marietta must have three dance frames');
+assert.strictEqual(data.dance.booha.length, 3, 'Grimmerglen Booha must have three dance frames');
+for (const frame of [...data.dance.marietta, ...data.dance.booha]) {
+  assert(fs.existsSync(path.join(root, frame)), `dance art must exist: ${frame}`);
+}
 
 const scripts = [
   'js/calendar.js', 'js/core/adventure-core.js', 'js/core/save-file.js',
@@ -91,6 +96,8 @@ assert(runtimeSource.includes("assets/img/grimmerglen/grimmerglen_bgm.mp3"), 'ru
 assert(runtimeSource.includes("assets/img/grimmerglen/grimmerglen_dance.mp3"), 'runtime must reference Grimmerglen dance music');
 assert(runtimeSource.includes('startGrimmerglenMusic'), 'runtime must start room music from a user gesture');
 assert(runtimeSource.includes('playGrimmerglenDanceMusic'), 'runtime must expose synchronized dance playback');
+assert(runtimeSource.includes('drawGrimmerglenCelebration'), 'runtime must draw the center-room celebration');
+assert(runtimeSource.includes('GRIMMERGLEN_DANCE_FRAME_MS'), 'runtime must alternate the three dance frames');
 assert(!runtimeSource.includes('openGrimmerglenObjectPanel'), 'object pickup must not open the typing quiz immediately');
 assert(typingSource.includes('function renderExercise'), 'typing engine must expose renderExercise');
 assert(serviceWorker.includes('${BASE}/grimmerglen.html'), 'service worker must precache grimmerglen.html');
@@ -102,6 +109,8 @@ assert(serviceWorker.includes('`${BASE}/assets/`'), 'service worker must cache G
 assert(serviceWorker.includes('${BASE}/assets/img/grimmerglen/grimmerglen_bgm.mp3'), 'service worker must precache Grimmerglen BGM');
 assert(serviceWorker.includes('${BASE}/assets/img/grimmerglen/grimmerglen_dance.mp3'), 'service worker must precache Grimmerglen dance music');
 assert(/pages:\s+'booha-pages-2026-375'/.test(serviceWorker), 'page cache must be bumped for the audio pass');
-assert(/assets:\s+'booha-assets-2026-431'/.test(serviceWorker), 'asset cache must be bumped for the audio pass');
+assert(serviceWorker.includes('grimmerglen/dance/marietta_dance_'), 'service worker must precache Marietta dance art');
+assert(serviceWorker.includes('grimmerglen/dance/booha_grimmerglen_dance_'), 'service worker must precache Booha dance art');
+assert(/assets:\s+'booha-assets-2026-432'/.test(serviceWorker), 'asset cache must be bumped for the dance pass');
 
 console.log(`Grimmerglen Pass 8 audit passed: 9 rooms, ${allInstances.length} placed instances, typing pickup flow, and service-worker coverage.`);

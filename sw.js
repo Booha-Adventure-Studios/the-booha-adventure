@@ -97,10 +97,9 @@ const CURRENT_CACHES = {
   // volumedetect) and the per-clip fade rewritten to hold full volume for
   // the clip's natural length instead of ramping to near-silence across
   // its entire duration; chase-repeat taper slowed and its floor raised.
-  // Grimmerglen audio pass (2026-08-30): wire the looping room BGM and lazy
-  // celebration track, plus the Marietta size correction. Keep both cache
-  // bumps with the page/asset wiring so returning devices receive the new JS.
-  assets: 'booha-assets-2026-431',
+  // Grimmerglen dance pass (2026-08-30): add the six transparent celebration
+  // frames and center-room dance runtime on top of the audio pass.
+  assets: 'booha-assets-2026-432',
   decks:  'booha-decks-2026-310',
 };
 
@@ -156,6 +155,8 @@ const CORE_ASSETS = [
   `${BASE}/assets/img/grimmerglen/booha_grimmerglen.webp`,
   `${BASE}/assets/img/grimmerglen/grimmerglen_bgm.mp3`,
   `${BASE}/assets/img/grimmerglen/grimmerglen_dance.mp3`,
+  ...Array.from({ length: 3 }, (_, index) => `${BASE}/assets/img/grimmerglen/dance/marietta_dance_${String(index + 1).padStart(2, '0')}.webp`),
+  ...Array.from({ length: 3 }, (_, index) => `${BASE}/assets/img/grimmerglen/dance/booha_grimmerglen_dance_${String(index + 1).padStart(2, '0')}.webp`),
   `${BASE}/assets/img/grimmerglen/marietta/marietta_01.webp`,
   ...Array.from({ length: 9 }, (_, index) => `${BASE}/assets/img/grimmerglen/room_${String(index + 1).padStart(2, '0')}.webp`),
   ...[
