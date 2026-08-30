@@ -159,6 +159,24 @@ const BoohaUnlockSystem = (() => {
     return isWeeklyWorldGateOpen();
   }
 
+  // ── Grimmerglen weekly world gate ───────────────────────────────────────
+  /**
+   * Grimmerglen is still under construction. GRIMMERGLEN_BUILD_READY is a
+   * temporary scaffold flag -- the same shape Muenba's own gate carried
+   * while it was being built -- so real students can't wander into an
+   * unfinished area even once they've earned the weekly gate. Once
+   * Grimmerglen ships, flip this to true and then delete it entirely,
+   * folding isGrimmerglenUnlocked() into a plain isWeeklyWorldGateOpen()
+   * call the way isMuenbaUnlocked() reads today.
+   */
+  const GRIMMERGLEN_BUILD_READY = false;
+
+  function isGrimmerglenUnlocked() {
+    if (window.__devGrimmerglen) return true;
+    if (!GRIMMERGLEN_BUILD_READY) return false;
+    return isWeeklyWorldGateOpen();
+  }
+
   function isUnlocked(id) {
     return !!_getUnlocks()[id];
   }
@@ -254,6 +272,7 @@ const BONUS_GAMES = [
     isUnlocked,
     isWeeklyWorldGateOpen,
     isMuenbaUnlocked,
+    isGrimmerglenUnlocked,
     checkAll,
     checkWeeklyBonusGames,
     isBonusGameUnlocked,
