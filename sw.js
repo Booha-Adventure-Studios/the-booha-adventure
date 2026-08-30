@@ -100,7 +100,9 @@ const CURRENT_CACHES = {
   // Grimmerglen dance/transform pass (2026-08-30): add the six transparent
   // celebration frames, the purple-blue version-1 Booha, and the five-second
   // entry transformation sequence.
-  assets: 'booha-assets-2026-434',
+  // Grimmerglen room expansion: six new themed forest rooms and calibrated
+  // room navigation/Marietta placement.
+  assets: 'booha-assets-2026-435',
   decks:  'booha-decks-2026-310',
 };
 
@@ -160,7 +162,7 @@ const CORE_ASSETS = [
   ...Array.from({ length: 3 }, (_, index) => `${BASE}/assets/img/grimmerglen/dance/marietta_dance_${String(index + 1).padStart(2, '0')}.webp`),
   ...Array.from({ length: 3 }, (_, index) => `${BASE}/assets/img/grimmerglen/dance/booha_grimmerglen_dance_version_1_${String(index + 1).padStart(2, '0')}.webp`),
   `${BASE}/assets/img/grimmerglen/marietta/marietta_01.webp`,
-  ...Array.from({ length: 9 }, (_, index) => `${BASE}/assets/img/grimmerglen/room_${String(index + 1).padStart(2, '0')}.webp`),
+  ...Array.from({ length: 15 }, (_, index) => `${BASE}/assets/img/grimmerglen/room_${String(index + 1).padStart(2, '0')}.webp`),
   ...[
     'banner', 'ticket', 'pillow', 'backpack', 'book', 'teddy_bear',
     'to_go_coffee_cup', 'ball'

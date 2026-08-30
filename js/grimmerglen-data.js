@@ -8,16 +8,12 @@
  * they slip away again once you try to hold onto them.
  *
  * The room graph follows the same shared-world-space convention Karasuki /
- * Utsuroba / Muenba all use (1536x1024), scaled down to a 3x3 grid of 9
- * rooms instead of their larger grids — same adjacency shape (corner rooms
- * get 2 exits, edge rooms get 3, the center room gets 4), just fewer rooms.
+ * Utsuroba / Muenba all use (1536x1024), starting with the original 3x3
+ * garden and extending it with six themed side rooms.
  *
- * Foundation pass 1: exit coordinates and walkable rectangles are the same
- * generous "cross corridor" placeholders Muenba shipped with initially —
- * nobody has walked these 9 rooms with the DEV tool yet, so these are a
- * starting point, not a calibrated pass. Re-measure per room once someone
- * has actually clicked through them (see grimmerglen.js's DEV overlay,
- * ?dev=1, for live x/y readout).
+ * Exit coordinates are calibrated per the current DEV walkthrough for the
+ * rooms that were measured; unmeasured exits retain the generous corridor
+ * defaults until someone walks them with the DEV overlay.
  */
 (() => {
   'use strict';
@@ -35,32 +31,34 @@
     right: { x: 1152, y: 483 }
   };
 
-  function exit(dir, to, spawn) {
-    return { dir, x: EXIT_XY[dir].x, y: EXIT_XY[dir].y, to, spawn };
+  function exit(dir, to, spawn, coords) {
+    const point = coords || EXIT_XY[dir];
+    return { dir, x: point.x, y: point.y, to, spawn };
   }
 
-  // 3x3 grid. room_01 is bottom-left and hosts Marietta / the entry from
-  // Karasuki. Layout (rows bottom-to-top):
+  // Original 3x3 grid. room_01 is bottom-left and hosts Marietta / the entry
+  // from Karasuki. Layout (rows bottom-to-top):
   //   07  08  09
   //   04  05  06
   //   01  02  03
   const NPP = {
     room_01: [
       exit('right', 'room_02', 'fromLeft'),
-      exit('up',    'room_04', 'fromDown')
+      exit('up',    'room_04', 'fromDown'),
+      exit('left',  'room_15', 'fromRight')
     ],
     room_02: [
-      exit('left',  'room_01', 'fromRight'),
-      exit('right', 'room_03', 'fromLeft'),
+      exit('left',  'room_01', 'fromRight', { x: 502, y: 521 }),
+      exit('right', 'room_03', 'fromLeft', { x: 1092, y: 524 }),
       exit('up',    'room_05', 'fromDown')
     ],
     room_03: [
       exit('left',  'room_02', 'fromRight'),
-      exit('up',    'room_06', 'fromDown')
+      exit('up',    'room_06', 'fromDown', { x: 791, y: 422 })
     ],
     room_04: [
       exit('down',  'room_01', 'fromUp'),
-      exit('right', 'room_05', 'fromLeft'),
+      exit('right', 'room_05', 'fromLeft', { x: 1142, y: 611 }),
       exit('up',    'room_07', 'fromDown')
     ],
     room_05: [
@@ -72,7 +70,8 @@
     room_06: [
       exit('down', 'room_03', 'fromUp'),
       exit('left', 'room_05', 'fromRight'),
-      exit('up',   'room_09', 'fromDown')
+      exit('up',   'room_09', 'fromDown'),
+      exit('right','room_14', 'fromLeft')
     ],
     room_07: [
       exit('down',  'room_04', 'fromUp'),
@@ -81,11 +80,35 @@
     room_08: [
       exit('down',  'room_05', 'fromUp'),
       exit('left',  'room_07', 'fromRight'),
-      exit('right', 'room_09', 'fromLeft')
+      exit('right', 'room_09', 'fromLeft', { x: 1107, y: 456 })
     ],
     room_09: [
       exit('down', 'room_06', 'fromUp'),
-      exit('left', 'room_08', 'fromRight')
+      exit('left', 'room_08', 'fromRight', { x: 518, y: 421 }),
+      exit('up',   'room_12', 'fromDown', { x: 772, y: 234 })
+    ],
+    room_10: [
+      exit('down',  'room_07', 'fromUp'),
+      exit('right', 'room_11', 'fromLeft')
+    ],
+    room_11: [
+      exit('left',  'room_10', 'fromRight'),
+      exit('right', 'room_12', 'fromLeft'),
+      exit('down',  'room_08', 'fromUp')
+    ],
+    room_12: [
+      exit('left',  'room_11', 'fromRight'),
+      exit('right', 'room_13', 'fromLeft'),
+      exit('down',  'room_09', 'fromUp')
+    ],
+    room_13: [
+      exit('left', 'room_12', 'fromRight')
+    ],
+    room_14: [
+      exit('left', 'room_06', 'fromRight')
+    ],
+    room_15: [
+      exit('right', 'room_01', 'fromLeft')
     ]
   };
 
@@ -109,7 +132,7 @@
   }
 
   // One fun pastel accent per room — used to tint that room's ambient glow
-  // and its exit arrows, so the 9 rooms read as 9 distinct cheerful places
+  // and its exit arrows, so the 15 rooms read as distinct cheerful places
   // rather than one room repeated. Bright and saturated on purpose (the
   // opposite instinct from Muenba's desaturated "eerie" palette) — this is
   // the daydream side of Grimmerglen's daydream/daymare identity.
@@ -122,11 +145,17 @@
     room_06: { name: 'Seafoam',          glow: '#8fe6c4' },
     room_07: { name: 'Cotton Candy Blue',glow: '#8fd0ff' },
     room_08: { name: 'Lilac Pop',        glow: '#e2a6f0' },
-    room_09: { name: 'Apricot Glow',     glow: '#ffcf9e' }
+    room_09: { name: 'Apricot Glow',       glow: '#ffcf9e' },
+    room_10: { name: 'Clockwork Lavender', glow: '#c8b8ff' },
+    room_11: { name: 'Gazebo Rose',        glow: '#ffb9d7' },
+    room_12: { name: 'Bandstand Blue',     glow: '#9fdcff' },
+    room_13: { name: 'Postbox Peach',      glow: '#ffc39f' },
+    room_14: { name: 'Flower Meadow',       glow: '#b8efc9' },
+    room_15: { name: 'Candy Cloud',         glow: '#f5a9e8' }
   };
 
   const rooms = {};
-  for (let i = 1; i <= 9; i++) {
+  for (let i = 1; i <= 15; i++) {
     const roomId = `room_${String(i).padStart(2, '0')}`;
     rooms[roomId] = {
       bg: `assets/img/grimmerglen/${roomId}.webp`,
@@ -198,11 +227,11 @@
       // (foundation pass 3), the same way Muenba's Nuppi anchors room_01
       // there.
       roomId: 'room_01',
-      x: 940,
-      y: 400,
+      x: 434,
+      y: 504,
       hitR: 76,
       // Booha currently renders at a 52px diameter; keep Marietta only a
-      // little larger until the final room_01 coordinates are calibrated.
+      // little larger, fixed in place, with a soft glow instead of a bob.
       drawR: 36,
       poses: Array.from({ length: 5 }, (_, index) => {
         const pose = String(index + 1).padStart(2, '0');
