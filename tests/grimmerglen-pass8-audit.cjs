@@ -94,6 +94,9 @@ assert(runtimeSource.includes('writeGrimmerglenObjectFound(object.type, object.i
 assert(runtimeSource.includes('objectSlots'), 'exact object slots must be persisted');
 assert(runtimeSource.includes('getActiveGrimmerglenTargetType'), 'runtime must enforce one active object target at a time');
 assert(runtimeSource.includes('activeTargetType'), 'active Grimmerglen target must persist across redraws');
+assert(runtimeSource.includes('BOOHA_TRANSFORM_DURATION_MS = 5000'), 'entry transformation must last five seconds');
+assert(runtimeSource.includes('entryWelcomePending'), 'entry must wait for Marietta before object interaction begins');
+assert(!runtimeSource.includes('openMariettaPanelAfterEntry();'), 'Marietta popup must not auto-open on entry');
 assert(runtimeSource.includes('renderMariettaHandoff'), 'Marietta must receive carried objects before the quiz');
 assert(runtimeSource.includes('renderMariettaWrongItem'), 'wrong items must be rejected and returned to the hunt');
 assert(runtimeSource.includes("assets/img/grimmerglen/grimmerglen_bgm.mp3"), 'runtime must reference Grimmerglen BGM');
@@ -113,14 +116,20 @@ assert(serviceWorker.includes('`${BASE}/js/`'), 'service worker must cache Grimm
 assert(serviceWorker.includes('`${BASE}/assets/`'), 'service worker must cache Grimmerglen art at runtime');
 assert(serviceWorker.includes('${BASE}/assets/img/grimmerglen/grimmerglen_bgm.mp3'), 'service worker must precache Grimmerglen BGM');
 assert(serviceWorker.includes('${BASE}/assets/img/grimmerglen/grimmerglen_dance.mp3'), 'service worker must precache Grimmerglen dance music');
-assert(/pages:\s+'booha-pages-2026-376'/.test(serviceWorker), 'page cache must be bumped for the profile pass');
+assert(/pages:\s+'booha-pages-2026-377'/.test(serviceWorker), 'page cache must be bumped for the entry pass');
 assert(serviceWorker.includes('grimmerglen/dance/marietta_dance_'), 'service worker must precache Marietta dance art');
 assert(serviceWorker.includes('grimmerglen/dance/booha_grimmerglen_dance_'), 'service worker must precache Booha dance art');
-assert(/assets:\s+'booha-assets-2026-433'/.test(serviceWorker), 'asset cache must be bumped for the profile pass');
+assert(/assets:\s+'booha-assets-2026-434'/.test(serviceWorker), 'asset cache must be bumped for the entry pass');
 
 assert(profile.includes('GRIMMERGLEN / MEMORY CASE FILE'), 'profile must use the Grimmerglen case-file header');
 assert(profile.includes('grimmerglen-data.js'), 'profile must load the Grimmerglen manifest');
 assert(profile.includes('BoohaUnlockSystem.isGrimmerglenUnlocked'), 'profile must keep the world dormant behind its gate');
+assert(unlockSource.includes('const GRIMMERGLEN_BUILD_READY = false'), 'Grimmerglen must remain closed outside DEV tools');
+for (const profilePage of ['profile.html', 'adventure-profile.html', 'utsuroba-profile.html', 'muenba-profile.html']) {
+  const source = fs.readFileSync(path.join(root, profilePage), 'utf8');
+  assert(source.includes('id="pnet-grimmerglen"'), `${profilePage} must expose the Grimmerglen profile tab`);
+  assert(!source.includes('id="pnet-grimmerglen" hidden'), `${profilePage} must not hide the safe profile tab`);
+}
 assert(profile.includes('clickTone'), 'profile must include the cute WebAudio click cue');
 assert(profile.includes('memory-card'), 'profile must render the eight memory lanes');
 assert(unlockSource.includes("grimmerglen:first_memory"), 'unlock system must define the first Grimmerglen memory achievement');

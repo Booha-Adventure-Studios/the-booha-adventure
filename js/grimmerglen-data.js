@@ -187,7 +187,10 @@
     spriteClass: 'grimmerglen-sprite',
     rooms,
     booha: {
-      sprite: 'assets/img/grimmerglen/booha_grimmerglen.webp'
+      // Version 1 is the high-contrast purple/blue, cat-eared form. The
+      // original yellow form remains in the folder as version_0 for future
+      // comparison and is no longer used by the live world.
+      sprite: 'assets/img/grimmerglen/booha_grimmerglen_version_1.webp'
     },
     marietta: {
       // room_01 is Marietta's room — the entry point from Karasuki and
@@ -208,7 +211,7 @@
     },
     dance: {
       marietta: Array.from({ length: 3 }, (_, index) => `assets/img/grimmerglen/dance/marietta_dance_${String(index + 1).padStart(2, '0')}.webp`),
-      booha: Array.from({ length: 3 }, (_, index) => `assets/img/grimmerglen/dance/booha_grimmerglen_dance_${String(index + 1).padStart(2, '0')}.webp`)
+      booha: Array.from({ length: 3 }, (_, index) => `assets/img/grimmerglen/dance/booha_grimmerglen_dance_version_1_${String(index + 1).padStart(2, '0')}.webp`)
     },
     collectibles: {
       banner: 'assets/img/grimmerglen/collectibles/banner.webp',

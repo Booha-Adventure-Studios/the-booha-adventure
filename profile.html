@@ -709,7 +709,7 @@
     <!-- Hidden until BoohaUnlockSystem.isMuenbaUnlocked(). -->
     <a href="muenba-profile.html" id="pnet-muenba" hidden>MUENBA <small>むえんば</small></a>
     <!-- Hidden until the Grimmerglen world is opened. -->
-    <a href="grimmerglen-profile.html" id="pnet-grimmerglen" hidden>GRIMMERGLEN <small>グリマーグレン</small></a>
+    <a href="grimmerglen-profile.html" id="pnet-grimmerglen">GRIMMERGLEN <small>グリマーグレン</small></a>
   </nav>
 
  <main class="paper" id="profile-content">
@@ -948,7 +948,9 @@
             typeof BoohaUnlockSystem.isGrimmerglenUnlocked === 'function' &&
             BoohaUnlockSystem.isGrimmerglenUnlocked());
         } catch (_) {}
-        tab.hidden = !open;
+        // The profile is safe to browse before the world ships. Only the
+        // profile's own Enter button is gated; never expose the live world.
+        tab.hidden = false;
       }
       if (window.BOOHA_READY) renderGrimmerglenTab();
       else document.addEventListener('booha:ready', renderGrimmerglenTab, { once: true });

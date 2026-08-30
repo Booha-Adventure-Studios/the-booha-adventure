@@ -237,7 +237,7 @@
         <a href="adventure-profile.html">ADVENTURE <small>ぼうけん</small></a>
         <a href="utsuroba-profile.html">UTSUROBA <small>うつろば</small></a>
         <a href="muenba-profile.html" aria-current="page">MUENBA <small>むえんば</small></a>
-        <a href="grimmerglen-profile.html" id="pnet-grimmerglen" hidden>GRIMMERGLEN <small>グリマーグレン</small></a>
+        <a href="grimmerglen-profile.html" id="pnet-grimmerglen">GRIMMERGLEN <small>グリマーグレン</small></a>
       </nav>
 
     <section class="hero" aria-labelledby="page-title">
@@ -535,7 +535,9 @@
             typeof BoohaUnlockSystem.isGrimmerglenUnlocked === 'function' &&
             BoohaUnlockSystem.isGrimmerglenUnlocked());
         } catch (_) {}
-        tab.hidden = !open;
+        // The profile is safe to browse before the world ships. Only the
+        // profile's own Enter button is gated; never expose the live world.
+        tab.hidden = false;
       }
       if (window.BOOHA_READY) renderGrimmerglenTab();
       else document.addEventListener('booha:ready', renderGrimmerglenTab, { once: true });

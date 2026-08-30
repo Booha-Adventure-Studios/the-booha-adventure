@@ -7,14 +7,13 @@
  * Muenba-specific stripped out (no ghosts, rhythm game, or case/briefing
  * content).
  *
- * Deliberately NOT in this pass (see claude/grimmerglen-audit-and-pass-plan.md):
- *   - No access lock yet. isGrimmerglenUnlocked()/GRIMMERGLEN_BUILD_READY and
- *     the Karasuki portal are pass 2 — this page is reachable only by direct
- *     URL until that lands, same as any freshly-scaffolded area before its
- *     doorway exists.
- *   - No profile/unlock-achievement work, final SFX polish, live device QA,
- *     or per-room walkable/exit calibration. Those remain separate follow-up
- *     work after the foundation is playable.
+ * The world gate is deliberately still closed to real players. The existing
+ * isGrimmerglenUnlocked()/GRIMMERGLEN_BUILD_READY scaffold and Karasuki
+ * portal remain DEV-only until the area is ready to ship; direct production
+ * URLs show the locked-world card instead of booting the room walker.
+ *
+ * Per-room walkable/exit calibration remains a later follow-up after someone
+ * has walked all nine rooms with the DEV overlay.
  *   - Exit coordinates and walkable rectangles are placeholders (see
  *     grimmerglen-data.js) — tune them per room with the DEV overlay below
  *     once someone has actually walked all 9 rooms.
@@ -93,6 +92,10 @@
     speed: BASE_SPEED,
     returnExiting: false,
     boohaTransformed: false,
+    boohaTransforming: false,
+    boohaTransformStartedAt: 0,
+    boohaTransformPoofUntil: 0,
+    entryWelcomePending: false,
     celebrating: false,
     celebrationStart: 0,
     celebrationTimer: 0,
@@ -126,6 +129,8 @@
   let boohaShakeUntil = 0;
   let boohaShakeSeed = Math.random() * 1000;
   const boohaTransformParticles = [];
+  const BOOHA_TRANSFORM_DURATION_MS = 5000;
+  const BOOHA_TRANSFORM_POOF_MS = 620;
 
   // Grimmerglen music follows the existing world-audio convention: the room
   // track loops, while the celebration track is loaded only when the future
@@ -354,6 +359,7 @@
     state.y = spawn.y;
     state.clickTarget = null;
     state.moving = false;
+    state.entryWelcomePending = false;
     state.inputLocked = false;
     state.distMovedSinceSpawn = 0;
     state.transitionReadyAt = performance.now() + TRANSITION_COOLDOWN_MS;
@@ -386,7 +392,9 @@
       state.x = entryDrift.targetX;
       state.y = entryDrift.targetY;
       entryDrift = null;
-      state.inputLocked = false;
+      // Do not leave a clickable frame between arriving at the center and
+      // starting the transformation sequence.
+      state.inputLocked = state.spawnId === 'fromKarasuki';
       return false;
     }
     if (now >= entryDrift.maxUntil) entryDrift.maxUntil = now + ENTRY_DRIFT_MAX_MS;
@@ -691,10 +699,11 @@
     const seconds = now / 1000;
     const bob = Math.sin(seconds * 4.18) * 8;
     const wobble = Math.sin(seconds * 8.36) * 2.2;
-    // Cute shake while the transform is fresh -- decays to nothing over
-    // the same ~520ms window boohaShakeUntil was set for.
-    const shakeActive = !REDUCED_MOTION && now < boohaShakeUntil;
-    const shakeT = shakeActive ? (boohaShakeUntil - now) / 520 : 0;
+    // Keep the normal yellow Booha visibly shaking for the full five-second
+    // reveal. The sprite swaps only at the end, so the player sees the
+    // transformation instead of arriving to an already-changed character.
+    const shakeActive = !REDUCED_MOTION && (state.boohaTransforming || now < boohaShakeUntil);
+    const shakeT = state.boohaTransforming ? 1 : (shakeActive ? (boohaShakeUntil - now) / 520 : 0);
     const shakeX = shakeActive ? Math.sin(now * 0.12 + boohaShakeSeed) * 7 * shakeT : 0;
     const shakeY = shakeActive ? Math.cos(now * 0.17 + boohaShakeSeed) * 5 * shakeT : 0;
     const shakeWobble = shakeActive ? Math.sin(now * 0.2 + boohaShakeSeed) * 10 * shakeT : 0;
@@ -739,6 +748,31 @@
   }
 
   function drawBoohaTransformFX(now) {
+    if (state.boohaTransforming && !REDUCED_MOTION && Math.random() < .42) {
+      const angle = Math.random() * Math.PI * 2;
+      const dist = 32 + Math.random() * 58;
+      boohaTransformParticles.push({
+        dx: Math.cos(angle) * dist,
+        dy: Math.sin(angle) * dist,
+        size: 2 + Math.random() * 4,
+        color: BOOHA_TRANSFORM_COLORS[Math.floor(Math.random() * BOOHA_TRANSFORM_COLORS.length)],
+        bornAt: now,
+        lifeMs: 520 + Math.random() * 380
+      });
+    }
+    if (state.boohaTransformPoofUntil > now) {
+      const poofT = Math.max(0, (state.boohaTransformPoofUntil - now) / BOOHA_TRANSFORM_POOF_MS);
+      actorCtx.save();
+      actorCtx.globalAlpha = poofT * .72;
+      actorCtx.strokeStyle = '#fff4fb';
+      actorCtx.shadowColor = '#b8a4ff';
+      actorCtx.shadowBlur = 26;
+      actorCtx.lineWidth = 4 + poofT * 5;
+      actorCtx.beginPath();
+      actorCtx.arc(state.x, state.y, 28 + (1 - poofT) * 70, 0, Math.PI * 2);
+      actorCtx.stroke();
+      actorCtx.restore();
+    }
     if (!boohaTransformParticles.length) return;
     for (let i = boohaTransformParticles.length - 1; i >= 0; i--) {
       const p = boohaTransformParticles[i];
@@ -790,17 +824,32 @@
   }
 
   function playBoohaTransform() {
-    if (state.boohaTransformed) return;
-    state.boohaTransformed = true;
-    boohaShakeUntil = performance.now() + 520;
+    if (state.boohaTransformed || state.boohaTransforming) return;
+    state.boohaTransforming = true;
+    state.boohaTransformStartedAt = performance.now();
+    state.boohaTransformPoofUntil = 0;
+    state.inputLocked = true;
+    state.clickTarget = null;
+    state.moving = false;
+    boohaShakeUntil = state.boohaTransformStartedAt + BOOHA_TRANSFORM_DURATION_MS;
     boohaShakeSeed = Math.random() * 1000;
     spawnBoohaTransformSparkles();
     playBoohaTransformChime();
+    window.setTimeout(() => {
+      if (!state.boohaTransforming) return;
+      state.boohaTransforming = false;
+      state.boohaTransformed = true;
+      state.inputLocked = false;
+      state.entryWelcomePending = state.spawnId === 'fromKarasuki';
+      state.boohaTransformPoofUntil = performance.now() + BOOHA_TRANSFORM_POOF_MS;
+      boohaShakeUntil = 0;
+      spawnBoohaTransformSparkles();
+    }, BOOHA_TRANSFORM_DURATION_MS);
   }
 
   // Fires once, right as the player actually arrives via the Karasuki
   // portal (after entry drift finishes -- the same wait-for-arrival gate
-  // openMariettaPanelAfterEntry() uses below), so it reads as "the portal
+  // transformation uses below), so it reads as "the portal
   // changed her" rather than replaying on every room change. A direct/DEV
   // entry (no fromKarasuki spawn) skips the reveal and starts already
   // transformed -- Booha is just always the Grimmerglen sprite once
@@ -1565,14 +1614,14 @@
   }
 
   function clickCheckGrimmerglenObject(worldX, worldY) {
-    if (mariettaPanelOpen || returnPortalOpen || carriedObject) return false;
+    if (mariettaPanelOpen || returnPortalOpen || carriedObject || state.entryWelcomePending) return false;
     const object = getNearestUnfoundObject(worldX, worldY, OBJECT_HIT_R);
     if (!object) return false;
     return pickUpGrimmerglenObject(object);
   }
 
   function checkGrimmerglenObjectProximity(now) {
-    if (mariettaPanelOpen || returnPortalOpen || carriedObject) return;
+    if (mariettaPanelOpen || returnPortalOpen || carriedObject || state.entryWelcomePending) return;
     if (state.distMovedSinceSpawn < ARROW_MOVE_THRESHOLD) return;
     const object = getNearestUnfoundObject(state.x, state.y, OBJECT_PROXIMITY_R);
     if (object) pickUpGrimmerglenObject(object);
@@ -1587,24 +1636,14 @@
     return true;
   }
 
-  // Opens automatically once per arrival from Karasuki (after any entry
-  // drift finishes), the same "shows every visit, not just the first"
-  // shape Muenba's Nuppi welcome uses -- but Marietta's sprite in room_01
-  // stays clickable too, so the player can reopen the same card any time
-  // they walk back to her mid-visit.
-  function openMariettaPanelAfterEntry() {
-    if (state.spawnId !== 'fromKarasuki') return;
-    const waitForArrival = () => {
-      if (!entryDrift) openMariettaPanel();
-      else window.requestAnimationFrame(waitForArrival);
-    };
-    window.requestAnimationFrame(waitForArrival);
-  }
-
+  // Marietta's card is deliberately player-opened. Arrival from Karasuki
+  // never opens a popup by itself; after the transformation, Marietta is the
+  // first memory-world interaction and remains clickable later in the visit.
   function clickCheckMarietta(worldX, worldY) {
-    if (!MARIETTA || state.roomId !== MARIETTA.roomId || mariettaPanelOpen) return false;
+    if (!MARIETTA || state.roomId !== MARIETTA.roomId || mariettaPanelOpen || state.boohaTransforming || !state.boohaTransformed) return false;
     const bob = REDUCED_MOTION ? 0 : Math.sin(performance.now() / 1000 * 2.6) * 6;
     if (Math.hypot(worldX - MARIETTA.x, worldY - (MARIETTA.y + bob)) > MARIETTA.hitR) return false;
+    state.entryWelcomePending = false;
     openMariettaPanel();
     return true;
   }
@@ -1804,8 +1843,8 @@
   }
 
   function handleInput(clientX, clientY) {
+    if (mariettaPanelOpen || returnPortalOpen || state.inputLocked || state.boohaTransforming) return;
     startGrimmerglenMusic();
-    if (mariettaPanelOpen || returnPortalOpen) return;
     const point = stagePoint(clientX, clientY);
     if (entryDrift) {
       if (Math.hypot(point.x - state.x, point.y - state.y) < 30) return;
@@ -1998,11 +2037,8 @@
     setRoom(state.roomId, state.spawnId, null);
     restoreGrimmerglenCarriedObject();
     bindInput();
-    document.addEventListener('click', startGrimmerglenMusic, { once: true });
-    document.addEventListener('touchend', startGrimmerglenMusic, { once: true, passive: true });
     window.addEventListener('resize', () => { fitStage(); resizeCanvas(); });
     window.requestAnimationFrame(tick);
-    openMariettaPanelAfterEntry();
     triggerBoohaTransformIfNeeded();
   }
 
