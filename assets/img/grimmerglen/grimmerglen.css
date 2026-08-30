@@ -2,7 +2,7 @@
    Apply .grimmerglen-pastel-pop to the room layer or sprite wrapper. */
 
 :root {
-  --grimmerglen-pastel-pop: saturate(1.22) brightness(1.06) contrast(1.04);
+  --grimmerglen-pastel-pop: saturate(1.1) contrast(1.06);
 }
 
 .grimmerglen-pastel-pop {
