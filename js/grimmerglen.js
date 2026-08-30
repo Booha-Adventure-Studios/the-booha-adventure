@@ -830,9 +830,54 @@
     select.addEventListener('change', () => setRoom(select.value, 'default', null));
     devReadout = document.createElement('div');
     devReadout.id = 'grimmerglen-dev-readout';
-    devPanel.append(select, devReadout);
+    const testTypingBtn = document.createElement('button');
+    testTypingBtn.id = 'grimmerglen-dev-test-typing';
+    testTypingBtn.type = 'button';
+    testTypingBtn.textContent = 'Test typing exercise';
+    testTypingBtn.addEventListener('click', openTypingTestHarness);
+    devPanel.append(select, devReadout, testTypingBtn);
     document.body.appendChild(devPanel);
     updateDevReadout();
+  }
+
+  // DEV-only manual QA harness for pass 5's typing engine -- nothing
+  // else calls GrimmerglenTyping.renderExercise() yet (pass 6's tutorial
+  // is the real caller); this exists purely so the engine can actually
+  // be tried in a browser before that pass wires it in for real.
+  let typingTestPanel = null;
+  function openTypingTestHarness() {
+    if (!window.GrimmerglenTyping) return;
+    if (!typingTestPanel) {
+      typingTestPanel = document.createElement('div');
+      typingTestPanel.id = 'grimmerglen-typing-test-panel';
+      typingTestPanel.className = 'utsu-card is-floating';
+      typingTestPanel.style.setProperty('--card-ring', '#ff9fc2');
+      typingTestPanel.style.setProperty('--card-glow', 'rgba(255,159,194,.5)');
+      typingTestPanel.innerHTML = `
+        <span class="dp-handle"></span>
+        <div class="dp-inner"><div class="dp-body">
+          <button class="dp-close-x" id="grimmerglen-typing-test-close">\u2715</button>
+          <p class="dp-name-en">DEV: TYPING ENGINE TEST</p>
+          <div class="dp-divider"></div>
+          <div id="grimmerglen-typing-test-mount"></div>
+        </div></div>`;
+      document.body.appendChild(typingTestPanel);
+      typingTestPanel.querySelector('#grimmerglen-typing-test-close')
+        .addEventListener('click', () => typingTestPanel.classList.remove('open'));
+    }
+    const mount = typingTestPanel.querySelector('#grimmerglen-typing-test-mount');
+    window.GrimmerglenTyping.renderExercise(mount, {
+      promptEn: 'How are you today?',
+      promptJp: '\u4eca\u65e5\u306e\u6c17\u5206\u306f\u3069\u3046\u3067\u3059\u304b\uff1f',
+      promptReadings: { '\u4eca\u65e5': '\u304d\u3087\u3046', '\u6c17\u5206': '\u304d\u3076\u3093' },
+      accepted: ["i'm happy", "i'm sad", "i'm tired", "i'm stinky"],
+      options: ["I'm happy", "I'm sad", "I'm tired", "I'm stinky"],
+      optionsVisible: true
+    }, {
+      onCorrect: () => console.log('[Grimmerglen dev] typing test: correct'),
+      onWrong: () => console.log('[Grimmerglen dev] typing test: wrong')
+    });
+    typingTestPanel.classList.add('open');
   }
 
   // ── Input / tick / init ─────────────────────────────────────────────────
@@ -949,6 +994,7 @@
       @media (prefers-reduced-motion: reduce) { .grimmerglen-rotate-phone, .grimmerglen-rotate-bar { animation:none; } }
       #grimmerglen-dev { position:fixed; left:10px; bottom:10px; z-index:9500; display:flex; flex-direction:column; gap:6px; padding:8px 10px; background:rgba(0,0,0,.72); border-radius:10px; font:11px ui-monospace,monospace; color:#fff; }
       #grimmerglen-dev select { font:11px ui-monospace,monospace; }
+      #grimmerglen-dev button { font:11px ui-monospace,monospace; cursor:pointer; margin-top:2px; }
       #grimmerglen-return-overlay { position:fixed; inset:0; z-index:9300; display:none; align-items:center; justify-content:center; background:rgba(120,40,80,0); transition:background .35s ease; }
       #grimmerglen-return-overlay.open { display:flex; background:rgba(120,40,80,.4); }
       .grimmerglen-return-box { box-sizing:border-box; width:min(420px,calc(100% - 40px)); padding:26px 24px 24px; border:1px solid rgba(255,150,190,.55); border-radius:16px; background:linear-gradient(155deg,rgba(255,244,249,.98),rgba(255,228,239,.99)); box-shadow:0 24px 70px rgba(224,85,158,.2),0 0 45px rgba(255,150,190,.28),inset 0 0 60px rgba(255,255,255,.6); text-align:center; font-family:Georgia,'Times New Roman',serif; color:#7a1f4b; transform:scale(.94); opacity:0; transition:transform .3s cubic-bezier(.34,1.56,.64,1),opacity .25s ease; }
