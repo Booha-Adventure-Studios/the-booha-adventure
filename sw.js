@@ -103,10 +103,10 @@ const CURRENT_CACHES = {
   // Grimmerglen room expansion: six new themed forest rooms and calibrated
   // room navigation/Marietta placement.
   // Grimmerglen entry-audio pass: the recorded Booha transformation cue is
-  // normalized to compact 44.1 kHz mono 112 kbps MP3.
+  // normalized to compact 44.1 kHz mono 112 kbps MP3 and trimmed to 3 seconds.
   // Grimmerglen visual polish: room-01 is object-free, room-12 is refreshed,
   // collectibles are smaller, and room-colored vignette leaves are live.
-  assets: 'booha-assets-2026-437',
+  assets: 'booha-assets-2026-438',
   decks:  'booha-decks-2026-310',
 };
 

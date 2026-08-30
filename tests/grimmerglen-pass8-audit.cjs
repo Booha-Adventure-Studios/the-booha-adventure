@@ -69,7 +69,7 @@ assert(fs.existsSync(path.join(root, data.booha.sprite)), 'Grimmerglen Booha art
 for (const audio of audioFiles) assert(fs.existsSync(path.join(root, audio)), `audio must exist: ${audio}`);
 const changeAudioProbe = JSON.parse(execFileSync('ffprobe', [
   '-v', 'error', '-select_streams', 'a:0',
-  '-show_entries', 'stream=codec_name,channels,bit_rate,sample_rate',
+  '-show_entries', 'stream=codec_name,channels,bit_rate,sample_rate:format=duration',
   '-of', 'json', path.join(root, 'assets/img/grimmerglen/booha_change.mp3')
 ], { encoding: 'utf8' }));
 const changeAudioStream = changeAudioProbe.streams && changeAudioProbe.streams[0];
@@ -77,6 +77,7 @@ assert(changeAudioStream && changeAudioStream.codec_name === 'mp3', 'Booha chang
 assert.strictEqual(Number(changeAudioStream.channels), 1, 'Booha change cue must be mono');
 assert(Number(changeAudioStream.bit_rate) >= 96000 && Number(changeAudioStream.bit_rate) <= 128000, 'Booha change cue must use a compact 96–128 kbps bitrate');
 assert.strictEqual(Number(changeAudioStream.sample_rate), 44100, 'Booha change cue must use 44.1 kHz');
+assert(Number(changeAudioProbe.format?.duration) >= 2.9 && Number(changeAudioProbe.format?.duration) <= 3.1, 'Booha change cue must be approximately three seconds');
 assert.strictEqual(data.dance.marietta.length, 3, 'Marietta must have three dance frames');
 assert.strictEqual(data.dance.booha.length, 3, 'Grimmerglen Booha must have three dance frames');
 for (const frame of [...data.dance.marietta, ...data.dance.booha]) {
@@ -106,6 +107,9 @@ for (const script of scripts) {
 
 assert(runtimeSource.includes('drawGrimmerglenObjects'), 'runtime must draw scattered objects');
 assert(runtimeSource.includes('const OBJECT_DRAW_SIZE = 58'), 'collectible art must render near Grimmerglen Booha size');
+assert(runtimeSource.includes('OBJECT_CLEARING_ZONES'), 'collectible art must use path-free clearing zones');
+assert(runtimeSource.includes('reseedObjectLayout'), 'collectible coordinates must rotate on room visits');
+assert(runtimeSource.includes('writeGrimmerglenCarriedObject(null)'), 'Booha must be able to drop a carried item for another');
 assert(runtimeSource.includes('drawPastelVignette'), 'pastel room color must be applied as an edge vignette');
 assert(runtimeSource.includes('drawEdgeLeaves'), 'room-colored leaves must drift around the edges');
 assert(runtimeSource.includes('clickCheckGrimmerglenObject'), 'runtime must support clicked pickups');
@@ -144,7 +148,7 @@ assert(serviceWorker.includes('grimmerglen/dance/marietta_dance_'), 'service wor
 assert(serviceWorker.includes('grimmerglen/dance/booha_grimmerglen_dance_'), 'service worker must precache Booha dance art');
 assert(serviceWorker.includes('room_${String(index + 1).padStart(2, \'0\')}.webp'), 'service worker must cover the generated room sequence');
 assert(serviceWorker.includes('${BASE}/assets/img/grimmerglen/booha_change.mp3'), 'service worker must precache the Booha change cue');
-assert(/assets:\s+'booha-assets-2026-437'/.test(serviceWorker), 'asset cache must be bumped for the Grimmerglen visual pass');
+assert(/assets:\s+'booha-assets-2026-438'/.test(serviceWorker), 'asset cache must be bumped for the Grimmerglen audio/visual pass');
 
 assert(profile.includes('GRIMMERGLEN / MEMORY CASE FILE'), 'profile must use the Grimmerglen case-file header');
 assert(profile.includes('grimmerglen-data.js'), 'profile must load the Grimmerglen manifest');

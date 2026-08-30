@@ -55,6 +55,17 @@
   const OBJECT_HIT_R = 58;
   const OBJECT_DRAW_SIZE = 58;
   const OBJECT_PROXIMITY_R = 58;
+  // Keep collectibles in the flower-bed clearings around the four-way path.
+  // The central cross is deliberately never a spawn zone, so the travel
+  // lanes stay readable and unobstructed.
+  const OBJECT_CLEARING_ZONES = [
+    { x: [410, 580], y: [150, 300] },
+    { x: [950, 1120], y: [150, 300] },
+    { x: [410, 580], y: [770, 920] },
+    { x: [950, 1120], y: [770, 920] },
+    { x: [110, 280], y: [440, 650] },
+    { x: [1250, 1425], y: [440, 650] }
+  ];
   const OBJECT_LABELS = {
     banner: 'Banner',
     ticket: 'Ticket',
@@ -116,6 +127,7 @@
   const roomGlowCache = new Map();
   const sparkles = [];
   const edgeLeaves = [];
+  let objectVisitLayout = new Map();
 
   const boohaImg = new Image();
   boohaImg.decoding = 'async';
@@ -130,7 +142,7 @@
   let boohaShakeUntil = 0;
   let boohaShakeSeed = Math.random() * 1000;
   const boohaTransformParticles = [];
-  const BOOHA_CHANGE_FALLBACK_MS = 5880;
+  const BOOHA_CHANGE_FALLBACK_MS = 3000;
   const BOOHA_CHANGE_START_DELAY_MS = 900;
   const BOOHA_TRANSFORM_POOF_MS = 620;
 
@@ -440,6 +452,7 @@
     showRoom(roomId);
     markGrimmerglenRoomVisited(roomId);
     reseedSparkles(roomId);
+    reseedObjectLayout(roomId);
     updateDevReadout();
     entryDrift = null;
     if (state.spawnId === 'fromKarasuki' || state.arrivalDir) beginEntryDrift();
@@ -684,17 +697,49 @@
     }
   }
 
+  function randomInRange(range) {
+    return range[0] + Math.random() * (range[1] - range[0]);
+  }
+
+  function reseedObjectLayout(roomId) {
+    objectVisitLayout = new Map();
+    const entries = [];
+    Object.keys(DATA.objects || {}).forEach(type => {
+      (DATA.objects[type] || []).forEach((placement, index) => {
+        if (placement && placement.room === roomId) {
+          entries.push({ id: `${type}-${index + 1}` });
+        }
+      });
+    });
+    const zones = OBJECT_CLEARING_ZONES.slice().sort(() => Math.random() - .5);
+    const used = [];
+    entries.forEach((entry, entryIndex) => {
+      let point = null;
+      for (let attempt = 0; attempt < 20 && !point; attempt++) {
+        const zone = zones[(entryIndex + attempt) % zones.length];
+        const candidate = { x: randomInRange(zone.x), y: randomInRange(zone.y) };
+        if (used.every(other => Math.hypot(candidate.x - other.x, candidate.y - other.y) >= 120)) {
+          point = candidate;
+        }
+      }
+      if (!point) point = { x: 768 + entryIndex * 130, y: 220 + entryIndex * 210 };
+      used.push(point);
+      objectVisitLayout.set(entry.id, point);
+    });
+  }
+
   function getRoomObjects(roomId) {
     const objects = [];
     Object.keys(DATA.objects || {}).forEach(type => {
       (DATA.objects[type] || []).forEach((placement, index) => {
         if (!placement || placement.room !== roomId) return;
+        const point = objectVisitLayout.get(`${type}-${index + 1}`);
         objects.push(Object.assign({
           id: `${type}-${index + 1}`,
           type,
           index,
           label: OBJECT_LABELS[type] || type
-        }, placement));
+        }, placement, point || {}));
       });
     });
     return objects;
@@ -758,7 +803,7 @@
       const index = (DATA.objects[type] || []).findIndex((placement, slotIndex) => `${type}-${slotIndex + 1}` === id);
       if (index >= 0) {
         const placement = DATA.objects[type][index];
-        return Object.assign({ id, type, index, label: OBJECT_LABELS[type] || type }, placement);
+        return Object.assign({ id, type, index, label: OBJECT_LABELS[type] || type }, placement, objectVisitLayout.get(id) || {});
       }
     }
     return null;
@@ -1675,9 +1720,18 @@
   }
 
   function clickCheckGrimmerglenObject(worldX, worldY) {
-    if (mariettaPanelOpen || returnPortalOpen || carriedObject || state.entryWelcomePending) return false;
+    if (mariettaPanelOpen || returnPortalOpen || state.entryWelcomePending) return false;
     const object = getNearestUnfoundObject(worldX, worldY, OBJECT_HIT_R);
     if (!object) return false;
+    // Booha can change his mind: clicking another collectible drops the
+    // carried item back at its current room coordinate and picks up the new
+    // one. Approaching an item while carrying still does not auto-swap, so
+    // an accidental walk cannot steal the player's intended choice.
+    if (carriedObject) {
+      if (carriedObject.id === object.id) return false;
+      writeGrimmerglenCarriedObject(null);
+      carriedObject = null;
+    }
     return pickUpGrimmerglenObject(object);
   }
 
