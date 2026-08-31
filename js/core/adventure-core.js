@@ -198,6 +198,23 @@ const BoohaAdventure = (() => {
     setTimeout(_bootWhenReady, 0);
   }
 
+  // A page can remain alive across the Sunday boundary, or be restored from
+  // the browser back-forward cache after the boundary. Re-check the durable
+  // occurrence key when the page becomes active so in-memory views cannot
+  // keep showing the previous week's completion state.
+  function _recheckWeeklyBoundary() {
+    if (!_initialized) return;
+    _checkWeeklyReset();
+  }
+  if (typeof window.addEventListener === 'function') {
+    window.addEventListener('pageshow', _recheckWeeklyBoundary);
+  }
+  if (typeof document.addEventListener === 'function') {
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) _recheckWeeklyBoundary();
+    });
+  }
+
   // ── Public API ────────────────────────────────────────────────────────────
   return {
     VERSION,

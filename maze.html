@@ -2680,6 +2680,7 @@ function onSaveReady(){
 }
 if (window.BOOHA_READY) onSaveReady();
 else document.addEventListener('booha:ready', onSaveReady, { once: true });
+document.addEventListener('booha:weeklyReset', onSaveReady);
 
 if(sessionStorage.getItem('booha_return_to_checkpoint')==='1')restoreMazeFromCheckpoint();
 else resizeCanvas();

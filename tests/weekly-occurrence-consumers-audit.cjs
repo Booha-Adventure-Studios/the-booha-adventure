@@ -41,4 +41,14 @@ const log = read('js/ui/adventure-log.js');
 assert.ok(log.includes('function formatPastWeekLabel'), 'profile log must format occurrence keys');
 assert.ok(log.includes('formatPastWeekLabel(k)'), 'profile log must render the occurrence date');
 
+const core = read('js/core/adventure-core.js');
+assert.ok(core.includes("window.addEventListener('pageshow'"),
+  'core must re-check the occurrence after bfcache restore');
+assert.ok(core.includes("document.addEventListener('visibilitychange'"),
+  'core must re-check the occurrence when a hidden page becomes active');
+assert.ok(index.includes("document.addEventListener('booha:weeklyReset'"),
+  'Hub Blitz pills must refresh after an in-session rollover');
+assert.ok(maze.includes("document.addEventListener('booha:weeklyReset', onSaveReady)"),
+  'Maze progress visuals must refresh after an in-session rollover');
+
 console.log('Weekly occurrence consumer audit passed: all weekly readers distinguish the repeated Week 4 occurrence.');
