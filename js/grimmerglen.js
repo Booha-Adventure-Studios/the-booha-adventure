@@ -1049,6 +1049,7 @@
     '今週': 'こんしゅう',
     'もう一度': 'もういちど',
     '見る': 'みる',
+    '踊ろう': 'おどろう',
   };
 
   function buildMariettaPanel() {
@@ -1899,21 +1900,38 @@
   function renderMariettaMemorySuccess(object, { memoryComplete = false } = {}) {
     const nextType = getActiveGrimmerglenTargetType();
     const nextStory = nextType && DATA.stories ? DATA.stories[nextType] : null;
+    const nextHintHTML = !memoryComplete && nextStory
+      ? `<p class="dp-line-en mg-memory-hint-en">${escapeHTML(nextStory.en)}</p><p class="dp-line-jp mg-memory-hint-jp">${furiJP(nextStory.jp, nextStory.readings)}</p>`
+      : '';
     mariettaPanel.innerHTML = `
       <span class="dp-handle"></span>
       <div class="dp-inner">
         <div class="dp-portrait-wrap"><span class="dp-portrait-halo"></span><div class="dp-portrait"><img src="${MARIETTA.poses[0]}" alt="Marietta"></div></div>
         <div class="dp-body">
-          <p class="dp-name-en">MEMORY SAVED</p>
-          <p class="dp-name-kanji">Marietta <span style="font-weight:400;color:#9a7850;">・ありがとう！</span></p>
-          <div class="dp-divider"></div>
-          <p class="dp-line-en">${memoryComplete ? 'I remembered this memory!' : 'Thanks, but I forgot again! There are still more of this memory to find.'}</p>
-          <p class="dp-line-jp">${furiJP(memoryComplete ? 'この記憶を思い出した！' : 'ありがとう。でも、また忘れちゃった！この記憶はまだ残っているよ。', memoryComplete ? { '記憶': 'きおく', '思い出した': 'おもいだした' } : { '忘れちゃった': 'わすれちゃった', '記憶': 'きおく', '残っている': 'のこっている' })}</p>
-          ${nextStory ? `<p class="dp-line-en mg-memory-hint-en">${escapeHTML(nextStory.en)}</p><p class="dp-line-jp mg-memory-hint-jp">${furiJP(nextStory.jp, nextStory.readings)}</p>` : '<p class="dp-line-en mg-memory-lead">All of my memories are safe now!</p>'}
-          <div class="dp-btns">
-            ${memoryComplete ? `<button class="dp-btn yes" id="mg-memory-see-again" type="button">See again / ${furiJP('もう一度見る', MARIETTA_UI_READINGS)}</button>` : ''}
-            <button class="dp-btn ${memoryComplete ? 'no' : 'yes'}" id="mg-memory-done" type="button">${memoryComplete ? 'Keep exploring / 探し続ける' : 'Keep exploring / 探し続ける'}</button>
-          </div>
+          ${memoryComplete ? `
+            <div class="mg-memory-celebration">
+              <div class="mg-memory-celebration-stars" aria-hidden="true">✦ ♡ ✦</div>
+              <p class="dp-name-en mg-memory-celebration-title">MEMORY FOUND!</p>
+              <p class="dp-name-kanji mg-character-name">Marietta <span>・マリエッタ</span></p>
+              <div class="dp-divider"></div>
+              <p class="mg-memory-celebration-copy">You did it! You found my memory! Thank you!</p>
+              <p class="mg-memory-celebration-jp">${furiJP('できた！わたしの記憶を見つけてくれて、ありがとう！', { '記憶': 'きおく', '見つけてくれて': 'みつけてくれて' })}</p>
+              <div class="dp-btns">
+                <button class="dp-btn no" id="mg-memory-see-again" type="button">See again / ${furiJP('もう一度見る', MARIETTA_UI_READINGS)}</button>
+                <button class="dp-btn yes" id="mg-memory-done" type="button">Let's dance! / ${furiJP('踊ろう！', MARIETTA_UI_READINGS)}</button>
+              </div>
+            </div>
+          ` : `
+            <p class="dp-name-en">MEMORY SAVED</p>
+            <p class="dp-name-kanji">Marietta <span style="font-weight:400;color:#9a7850;">・ありがとう！</span></p>
+            <div class="dp-divider"></div>
+            <p class="dp-line-en">Thanks, but I forgot again! There are still more of this memory to find.</p>
+            <p class="dp-line-jp">${furiJP('ありがとう。でも、また忘れちゃった！この記憶はまだ残っているよ。', { '忘れちゃった': 'わすれちゃった', '記憶': 'きおく', '残っている': 'のこっている' })}</p>
+            ${nextHintHTML}
+            <div class="dp-btns">
+              <button class="dp-btn yes" id="mg-memory-done" type="button">Keep exploring / 探し続ける</button>
+            </div>
+          `}
         </div>
       </div>`;
     mariettaPanel.querySelector('#mg-memory-see-again')?.addEventListener('click', () => renderMariettaMemoryReplay(object, memoryComplete));
@@ -2441,6 +2459,13 @@
       #grimmerglen-marietta-panel .mg-memory-lead{margin-top:10px!important;font-size:clamp(.94rem,2.1vw,1.08rem);font-weight:700;color:#a9548a!important;line-height:1.35;}
       #grimmerglen-marietta-panel .mg-memory-hint-en{font-size:clamp(.98rem,2.2vw,1.15rem);font-weight:700;line-height:1.4;margin:7px 0 3px;padding:8px 10px 5px;border-left:3px solid #ff9fc2;background:rgba(255,159,194,.1);}
       #grimmerglen-marietta-panel .mg-memory-hint-jp{font-size:clamp(.8rem,1.9vw,.96rem);line-height:1.55;margin:0;padding:3px 10px 8px;border-left:3px solid #ff9fc2;background:rgba(255,159,194,.1);}
+      #grimmerglen-marietta-panel .mg-memory-celebration{position:relative;text-align:center;padding-top:4px;}
+      #grimmerglen-marietta-panel .mg-memory-celebration-stars{margin:0 0 6px;color:#e0559e;font-size:1.3rem;letter-spacing:.18em;text-shadow:0 0 14px rgba(255,159,194,.85);}
+      #grimmerglen-marietta-panel .mg-memory-celebration-title{font-size:clamp(.84rem,1.9vw,1rem);font-weight:900;letter-spacing:.16em;color:#b04b88;margin:0 0 8px;}
+      #grimmerglen-marietta-panel .mg-memory-celebration-copy{margin:8px 0 4px;color:#291507;font-size:clamp(1.16rem,3vw,1.55rem);font-weight:800;line-height:1.3;}
+      #grimmerglen-marietta-panel .mg-memory-celebration-jp{margin:0 0 14px;color:#8c5c78;font-size:clamp(.9rem,2.2vw,1.08rem);line-height:1.6;}
+      #grimmerglen-marietta-panel .mg-memory-celebration-jp rt{font-size:.62em;color:#aa6a91;}
+      #grimmerglen-marietta-panel .mg-memory-celebration .dp-btns{align-items:stretch;}
       #grimmerglen-marietta-panel .mg-memory-replay{user-select:none;-webkit-user-select:none;}
       #grimmerglen-marietta-panel .mg-memory-replay-label{margin:8px 0 6px;color:#9a7850;font-size:.86rem;font-weight:700;}
       #grimmerglen-marietta-panel .mg-memory-replay-answer{min-height:150px;display:grid;align-content:center;gap:13px;margin:0 0 14px;padding:18px 16px;border:2px solid rgba(255,159,194,.48);border-radius:18px;background:linear-gradient(145deg,rgba(255,244,249,.96),rgba(238,229,255,.78));box-shadow:inset 0 0 25px rgba(255,255,255,.75),0 8px 24px rgba(184,164,255,.16);}
