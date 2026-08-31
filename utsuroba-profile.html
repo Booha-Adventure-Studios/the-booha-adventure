@@ -154,11 +154,11 @@
 
     .drifter-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
     .drifter-card { min-height: 174px; padding: 14px; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); position: relative; overflow: hidden; }
-    .drifter-card.is-restored { border-color: rgba(216,168,255,.55); background: linear-gradient(145deg, rgba(52,28,68,.78), var(--panel)); }
+    .drifter-card.is-weekly-restored { border-color: rgba(216,168,255,.55); background: linear-gradient(145deg, rgba(52,28,68,.78), var(--panel)); }
     .drifter-card::after { content: ""; position: absolute; width: 86px; height: 86px; right: -28px; bottom: -30px; border-radius: 50%; background: radial-gradient(circle, rgba(216,168,255,.13), transparent 70%); pointer-events: none; }
     .drifter-card-top { display: flex; align-items: center; gap: 10px; }
     .drifter-avatar { width: 55px; height: 55px; object-fit: contain; object-position: center bottom; filter: grayscale(.8) saturate(.65); opacity: .55; }
-    .is-restored .drifter-avatar { filter: none; opacity: 1; }
+    .is-weekly-restored .drifter-avatar { filter: none; opacity: 1; }
     .drifter-name { margin: 0; color: #fff6ff; font-size: .95rem; font-weight: 400; line-height: 1.2; }
     .drifter-name small { display: block; margin-top: 4px; color: var(--quiet); font-size: .7rem; }
     .drifter-state { margin: 15px 0 0; color: var(--quiet); font: 700 .61rem/1.4 var(--sans); letter-spacing: .09em; text-transform: uppercase; }
@@ -497,7 +497,7 @@
             ? `Lifetime ${esc(currentTierMeta.en)} complete · ${rb('記憶', 'きおく')}が${rb('戻', 'もど')}った`
             : (restoredAny ? `Lifetime open at ${esc(currentTierMeta.en)} · ${rb('別', 'べつ')}の${rb('記憶', 'きおく')}で${rb('戻', 'もど')}った` : `Lifetime still wandering · まださまよう`);
           const weeklyStateLabel = weeklyRestored ? 'Restored this week' : (weeklyActive ? 'In progress this week' : 'Available this week');
-          return `<article class="drifter-card${restoredHere ? ' is-restored' : ''}${weeklyRestored ? ' is-weekly-restored' : ''}">
+          return `<article class="drifter-card${restoredHere ? ' has-lifetime-memory' : ''}${weeklyRestored ? ' is-weekly-restored' : ''}">
             <div class="drifter-card-top">
               <img class="drifter-avatar" src="${esc(drifter.sprite1 || '')}" alt="">
               <h3 class="drifter-name">${esc(drifter.name)}<small>${esc(drifter.nameKanji || '')}</small></h3>

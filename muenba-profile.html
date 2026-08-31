@@ -163,10 +163,10 @@
 
     .ghost-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
     .ghost-card { min-height: 174px; padding: 14px; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); position: relative; overflow: hidden; text-align: center; }
-    .ghost-card.is-found { border-color: rgba(143,220,178,.55); background: linear-gradient(145deg, rgba(28,68,50,.78), var(--panel)); }
+    .ghost-card.is-weekly-found { border-color: rgba(143,220,178,.55); background: linear-gradient(145deg, rgba(28,68,50,.78), var(--panel)); }
     .ghost-card::after { content: ""; position: absolute; width: 86px; height: 86px; right: -28px; bottom: -30px; border-radius: 50%; background: radial-gradient(circle, rgba(143,220,178,.13), transparent 70%); pointer-events: none; }
     .ghost-avatar { width: 62px; height: 62px; object-fit: contain; margin: 2px auto 8px; display: block; filter: grayscale(.85) brightness(.75); opacity: .5; }
-    .is-found .ghost-avatar { filter: none; opacity: 1; }
+    .is-weekly-found .ghost-avatar { filter: none; opacity: 1; }
     .ghost-name { margin: 0; color: #f2fff7; font-size: .95rem; font-weight: 400; line-height: 1.2; }
     .ghost-name-kana { margin: 4px 0 0; color: var(--quiet); font: .72rem/1.25 var(--muenba-display); letter-spacing: .1em; }
     .ghost-personality { min-height: 34px; margin: 8px 0 0; color: var(--muted); font-size: .72rem; line-height: 1.4; }
@@ -475,7 +475,7 @@
           const modeProgress = ghostCase
             ? memoryModes.map(modeName => `${memoryModeLabel(modeName)}: ${modeComplete(ghostRecord, modeName) ? 'complete' : 'open'}`).join(' · ')
             : 'No case memory assigned yet';
-          return `<article class="ghost-card${isFound ? ' is-found' : ''}${weeklyFound ? ' is-weekly-found' : ''}">
+          return `<article class="ghost-card${isFound ? ' has-lifetime-memory' : ''}${weeklyFound ? ' is-weekly-found' : ''}">
             <img class="ghost-avatar" src="${esc(ghost.img)}" alt="">
             <h3 class="ghost-name">${esc(ghost.name)}</h3>
             <p class="ghost-name-kana">${esc(ghost.kana || '')}</p>

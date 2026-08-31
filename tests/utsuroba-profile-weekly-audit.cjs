@@ -15,6 +15,8 @@ assert.match(profile, /weeklyRestoredCount/, 'Utsuroba profile must show weekly 
 assert.match(profile, /Restored this week/, 'Utsuroba profile must label drifters restored in the current week');
 assert.match(profile, /Available this week/, 'Utsuroba profile must label drifters available in the current week');
 assert.match(profile, /Lifetime .*complete/, 'Utsuroba profile must label lifetime memory status separately');
+assert.match(profile, /drifter-card\$\{restoredHere \? ' has-lifetime-memory' : ''\}\$\{weeklyRestored \? ' is-weekly-restored' : ''\}/, 'Utsuroba drifter brightness must be driven by weekly restoration state');
+assert.doesNotMatch(profile, /drifter-card\$\{restoredHere \? ' is-restored'/, 'Utsuroba lifetime restoration must not re-light a new week');
 assert.match(profile, /Fresh every Sunday/, 'Utsuroba profile must explain the weekly reset cadence');
 assert.match(profile, /booha:weeklyReset/, 'Utsuroba profile must refresh weekly trail status after rollover');
 assert.match(verify, /tests\/utsuroba-profile-weekly-audit\.cjs/, 'verify.sh must run the Utsuroba weekly/lifetime profile audit');

@@ -77,7 +77,9 @@
     .dot.found { border-color:#e781ae; background:#e781ae; box-shadow:inset 0 0 0 2px #fff; }
     .memory-tier { margin:8px 0 0; padding-top:8px; border-top:1px dashed rgba(104,70,119,.2); color:var(--pink-deep); font-size:.65rem; font-weight:900; }
     .memory-weekly { margin:5px 0 0; color:#4ba98f; font-size:.63rem; font-weight:950; }
-    .memory-card.complete { --memory-color:#9ee8d3; background:linear-gradient(155deg,#fff,rgba(220,255,245,.85)); }
+    .memory-card.weekly-complete { --memory-color:#9ee8d3; background:linear-gradient(155deg,#fff,rgba(220,255,245,.85)); }
+    .memory-card:not(.weekly-complete) .memory-art { filter:grayscale(.45) saturate(.55) drop-shadow(0 6px 4px rgba(98,55,115,.12)); opacity:.72; }
+    .memory-lifetime { margin:5px 0 0; color:var(--muted); font-size:.61rem; font-weight:800; }
     .memory-card.active { outline:3px solid rgba(216,93,154,.35); outline-offset:2px; }
     .memory-card.active::after { content:"ACTIVE MEMORY"; position:absolute; top:10px; left:-26px; transform:rotate(-32deg); padding:3px 27px; color:#fff; background:#db74a8; font-size:.5rem; font-weight:950; letter-spacing:.08em; }
     .lower-grid { display:grid; grid-template-columns:1.1fr .9fr; gap:16px; }
@@ -243,13 +245,13 @@
         document.getElementById('memories').innerHTML = (DATA.objectTypes || []).map((type, index) => {
           const found = foundFor(type); const name = labels[type] || [type,type]; const story = DATA.stories?.[type]?.en || 'A little memory is waiting.';
           const weeklyFound = weeklyFoundFor(type);
-          const tier = found >= 3 ? 'Memory safe ✦' : found === 2 ? 'Deep memory next' : found === 1 ? 'Case memory next' : 'Starter memory waiting';
-          return `<article class="memory-card${found >= 3 ? ' complete' : ''}${active === type ? ' active' : ''}" style="--memory-color:${colors[index % colors.length]}">
+          const tier = weeklyFound >= 3 ? 'Memory safe ✦' : weeklyFound === 2 ? 'Deep memory next' : weeklyFound === 1 ? 'Case memory next' : 'Starter memory waiting';
+          return `<article class="memory-card${weeklyFound >= 3 ? ' weekly-complete' : ''}${found >= 3 ? ' has-lifetime-memory' : ''}${active === type ? ' active' : ''}" style="--memory-color:${colors[index % colors.length]}">
             <img class="memory-art" src="${esc(DATA.collectibles?.[type] || '')}" alt="${esc(name[0])}">
             <h3 class="memory-name">${esc(name[0])}</h3><p class="memory-kana">${esc(name[1])}</p>
             <p class="memory-story">${esc(story)}</p>
-            <div class="memory-status"><span>${found >= 3 ? 'All three returned' : `${found} of 3 returned`}</span><span class="dots">${[0,1,2].map(i => `<i class="dot${i < found ? ' found' : ''}"></i>`).join('')}</span></div>
-            <p class="memory-weekly">This week: ${weeklyFound} of 3 returned</p>
+            <div class="memory-status"><span>This week: ${weeklyFound} of 3 returned</span><span class="dots">${[0,1,2].map(i => `<i class="dot${i < weeklyFound ? ' found' : ''}"></i>`).join('')}</span></div>
+            <p class="memory-lifetime">Lifetime: ${found} of 3 returned</p>
             <p class="memory-tier">${tier}</p>
           </article>`;
         }).join('');

@@ -16,6 +16,8 @@ assert.match(profile, /This Week's Garden/, 'Grimmerglen profile must show weekl
 assert.match(profile, /Fresh every Sunday/, 'Grimmerglen profile must explain the weekly reset cadence');
 assert.match(profile, /This week: \$\{weeklyFound\} of 3 returned/, 'Grimmerglen memory cards must show weekly object progress');
 assert.match(profile, /Lifetime clues returned/, 'Grimmerglen profile must label lifetime object progress separately');
+assert.match(profile, /memory-card\$\{weeklyFound >= 3 \? ' weekly-complete' : ''\}\$\{found >= 3 \? ' has-lifetime-memory' : ''\}/, 'Grimmerglen card completion must be driven by weekly object progress');
+assert.doesNotMatch(profile, /memory-card\$\{found >= 3 \? ' complete'/, 'Grimmerglen lifetime completion must not re-light a new week');
 assert.match(profile, /booha:weeklyReset/, 'Grimmerglen profile must refresh weekly garden status after rollover');
 assert.match(verify, /tests\/grimmerglen-profile-weekly-audit\.cjs/, 'verify.sh must run the Grimmerglen weekly/lifetime profile audit');
 
