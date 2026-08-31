@@ -118,7 +118,8 @@ const CURRENT_CACHES = {
   // quest briefing, with the existing help decision following it.
   // Pass 9B adds the later-week skip action and persists weekly seen/skip
   // state separately from the lifetime first-view marker.
-  assets: 'booha-assets-2026-445',
+  // Pass 9C makes the explicit help choice the tutorial/navigation gateway.
+  assets: 'booha-assets-2026-446',
   decks:  'booha-decks-2026-310',
 };
 
