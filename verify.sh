@@ -817,6 +817,55 @@ else
   bad "Weekly boundary refresh audit failed"
 fi
 
+echo "[weekly] Weekly replay schema audit"
+if node tests/weekly-replay-schema-audit.cjs >/dev/null 2>&1; then
+  ok "Occurrence-scoped world schema and lifetime preservation pass"
+else
+  bad "Weekly replay schema audit failed"
+fi
+
+echo "[weekly] Weekly live-refresh audit"
+if node tests/weekly-live-refresh-audit.cjs >/dev/null 2>&1; then
+  ok "Live weekly reset refresh contracts pass"
+else
+  bad "Weekly live-refresh audit failed"
+fi
+
+echo "[weekly] Utsuroba weekly replay audit"
+if node tests/utsuroba-weekly-replay-audit.cjs >/dev/null 2>&1; then
+  ok "Utsuroba weekly replay contracts pass"
+else
+  bad "Utsuroba weekly replay audit failed"
+fi
+
+echo "[weekly] Muenba weekly replay audit"
+if node tests/muenba-weekly-replay-audit.cjs >/dev/null 2>&1; then
+  ok "Muenba weekly replay contracts pass"
+else
+  bad "Muenba weekly replay audit failed"
+fi
+
+echo "[weekly] Muenba profile weekly audit"
+if node tests/muenba-profile-weekly-audit.cjs >/dev/null 2>&1; then
+  ok "Muenba weekly versus lifetime profile labels pass"
+else
+  bad "Muenba profile weekly audit failed"
+fi
+
+echo "[weekly] Grimmerglen weekly replay audit"
+if node tests/grimmerglen-weekly-replay-audit.cjs >/dev/null 2>&1; then
+  ok "Grimmerglen weekly replay contracts pass"
+else
+  bad "Grimmerglen weekly replay audit failed"
+fi
+
+echo "[weekly] Sync weekly-world audit"
+if node tests/sync-weekly-world-emptiness-audit.cjs >/dev/null 2>&1; then
+  ok "Weekly world sync visibility contracts pass"
+else
+  bad "Sync weekly-world audit failed"
+fi
+
 # ── Summary ──────────────────────────────────────────────────
 echo "───────────────────────────────────"
 echo "✅ $PASS passed   ⚠️  $WARN warnings   ❌ $FAIL failed"

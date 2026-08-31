@@ -152,6 +152,8 @@ const BoohaSaveFile = (() => {
     if (!current.grimmerglen.objectSlots || typeof current.grimmerglen.objectSlots !== 'object' || Array.isArray(current.grimmerglen.objectSlots)) current.grimmerglen.objectSlots = {};
     if (current.grimmerglen.activeTargetType === undefined) current.grimmerglen.activeTargetType = null;
     if (current.grimmerglen.carriedObjectId === undefined) current.grimmerglen.carriedObjectId = null;
+    if (current.grimmerglen.mariettaIntroSeen === undefined) current.grimmerglen.mariettaIntroSeen = false;
+    if (current.grimmerglen.mariettaIntroSkipped === undefined) current.grimmerglen.mariettaIntroSkipped = false;
   }
 
   // ── Migrate legacy saves → current schema ────────────────────────────────
