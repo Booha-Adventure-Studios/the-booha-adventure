@@ -45,8 +45,8 @@
   //   01  02  03
   const NPP = {
     room_01: [
-      exit('right', 'room_02', 'fromLeft'),
-      exit('up',    'room_04', 'fromDown')
+      exit('right', 'room_02', 'fromLeft', { x: 1205, y: 512 }),
+      exit('up',    'room_04', 'fromDown', { x: 792, y: 312 })
     ],
     room_02: [
       exit('left',  'room_01', 'fromRight', { x: 502, y: 521 }),
@@ -76,7 +76,7 @@
     room_07: [
       exit('down',  'room_04', 'fromUp'),
       exit('right', 'room_08', 'fromLeft'),
-      exit('up',    'room_10', 'fromDown')
+      exit('up',    'room_10', 'fromDown', { x: 736, y: 286 })
     ],
     room_08: [
       exit('down',  'room_05', 'fromUp'),
@@ -91,14 +91,14 @@
     ],
     room_10: [
       exit('down',  'room_07', 'fromUp'),
-      exit('right', 'room_11', 'fromLeft'),
-      exit('up',    'room_13', 'fromDown')
+      exit('right', 'room_11', 'fromLeft', { x: 1155, y: 524 }),
+      exit('up',    'room_13', 'fromDown', { x: 782, y: 287 })
     ],
     room_11: [
-      exit('left',  'room_10', 'fromRight'),
+      exit('left',  'room_10', 'fromRight', { x: 491, y: 540 }),
       exit('right', 'room_12', 'fromLeft'),
       exit('down',  'room_08', 'fromUp'),
-      exit('up',    'room_14', 'fromDown')
+      exit('up',    'room_14', 'fromDown', { x: 747, y: 344 })
     ],
     room_12: [
       exit('left',  'room_11', 'fromRight'),
@@ -107,7 +107,7 @@
     ],
     room_13: [
       exit('down',  'room_10', 'fromUp'),
-      exit('right', 'room_14', 'fromLeft')
+      exit('right', 'room_14', 'fromLeft', { x: 1186, y: 507 })
     ],
     room_14: [
       exit('left',  'room_13', 'fromRight'),
