@@ -1174,7 +1174,8 @@
   // Pass 9A: the introduction is now the first Marietta screen. The caller
   // supplies the next screen so the same dialogue renderer cannot put the
   // quest briefing ahead of the hello again.
-  function renderMariettaDialogue(onFinished) {
+  function renderMariettaDialogue(onFinished, options = {}) {
+    const allowSkip = options.allowSkip === true;
     if (!mariettaPanel || !MARIETTA) return;
     mariettaPanel.innerHTML = `
       <span class="dp-handle"></span>
@@ -1189,6 +1190,7 @@
           <div id="mg-dialogue-lines"></div>
           <div id="mg-dialogue-actions" class="dp-btns" style="opacity:0;transition:opacity .3s;">
             <button class="dp-btn yes" id="mg-dialogue-close-btn">Got it! / わかった！</button>
+            ${allowSkip ? `<button class="dp-btn no" id="mg-dialogue-skip-btn">Skip this week's hello / ${furiJP('今週はあいさつをスキップ', { '今週': 'こんしゅう' })}</button>` : ''}
           </div>
         </div>
       </div>`;
@@ -1207,6 +1209,11 @@
       const closeBtn = mariettaPanel.querySelector('#mg-dialogue-close-btn');
       if (closeBtn) closeBtn.addEventListener('click', () => {
         if (typeof onFinished === 'function') onFinished();
+      });
+      const skipBtn = mariettaPanel.querySelector('#mg-dialogue-skip-btn');
+      if (skipBtn) skipBtn.addEventListener('click', event => {
+        event.stopPropagation();
+        if (typeof options.onSkip === 'function') options.onSkip();
       });
     }
 
@@ -1340,8 +1347,20 @@
     return readGrimmerglenWeekly().mariettaIntroSeen === true;
   }
 
-  function markMariettaIntroSeenThisWeek() {
-    writeGrimmerglenWeekly({ mariettaIntroSeen: true });
+  function hasMariettaIntroEverBeenSeen() {
+    return readGrimmerglen().mariettaIntroEverSeen === true;
+  }
+
+  function markMariettaIntroSeenThisWeek(skipped) {
+    const data = loadGrimmerglenSave();
+    const weekly = ensureWeeklyGrimmerglen(data);
+    weekly.mariettaIntroSeen = true;
+    weekly.mariettaIntroSkipped = skipped === true;
+    if (!data.grimmerglen || typeof data.grimmerglen !== 'object') data.grimmerglen = {};
+    data.grimmerglen.mariettaIntroEverSeen = true;
+    return window.BoohaSaveFile && typeof window.BoohaSaveFile.save === 'function'
+      ? window.BoohaSaveFile.save(data)
+      : false;
   }
 
   // Room-visit running totals, mirroring Muenba's own
@@ -1618,7 +1637,12 @@
   }
 
   function finishMariettaIntroduction() {
-    markMariettaIntroSeenThisWeek();
+    markMariettaIntroSeenThisWeek(false);
+    renderMariettaQuestBriefing();
+  }
+
+  function skipMariettaIntroduction() {
+    markMariettaIntroSeenThisWeek(true);
     renderMariettaQuestBriefing();
   }
 
@@ -1647,7 +1671,10 @@
     state.moving = false;
     if (carriedObject) renderMariettaHandoff();
     else if (hasMariettaIntroBeenSeenThisWeek()) renderMariettaQuestBriefing();
-    else renderMariettaDialogue(finishMariettaIntroduction);
+    else renderMariettaDialogue(finishMariettaIntroduction, {
+      allowSkip: hasMariettaIntroEverBeenSeen(),
+      onSkip: skipMariettaIntroduction
+    });
     mariettaPanel.classList.add('open');
   }
 
