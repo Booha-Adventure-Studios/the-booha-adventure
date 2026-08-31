@@ -16,7 +16,7 @@ const BoohaSaveFile = (() => {
   //                     Old keys are orphaned, not migrated, not deleted.
   //   SAVE_VERSION    — schema shape. Bump to MIGRATE saves via _migrate().
   const ADVENTURE_EPOCH = 3;
-  const SAVE_VERSION    = 2;
+  const SAVE_VERSION    = 3;
 
   // ── Identity-scoped storage key ───────────────────────────────────────────
   // Saves live under the logged-in student's Wix _id, so two students sharing
@@ -83,6 +83,7 @@ const BoohaSaveFile = (() => {
         gameStars:         {},   // { [saveId]: stars this week }
         unlockedBonusGames:{},   // { booha_invaders: true, booha_blocks: true, ... }
         wanderers:         [],   // [ wandererId, ... ] unlocked this week (index = order)
+        worlds:            _defaultWeeklyWorlds(),
       },
 
       // ── Collection — permanent discoveries ──────────────────────────────
@@ -92,7 +93,66 @@ const BoohaSaveFile = (() => {
     };
   }
 
-  // ── Migrate v1 → v2 ──────────────────────────────────────────────────────
+  // ── Weekly replay contract ────────────────────────────────────────────────
+  // Every output world has lifetime records in its own root save bucket, but
+  // its playable hunt must be a fresh occurrence-scoped copy. Keep those
+  // transient maps together under weekly.worlds so the rollover can clear the
+  // opportunity to play again without erasing the lifetime record.
+  function _defaultWeeklyWorlds() {
+    return {
+      occurrenceKey: '',
+      utsuroba: {
+        drifterQuest: null,
+        drifters: {},
+        readingChallenge: null,
+      },
+      muenba: {
+        ghostsFound: {},
+        huntGhostOrder: [],
+        activeCaseId: null,
+        orbsPending: 0,
+      },
+      grimmerglen: {
+        objects: {},
+        objectSlots: {},
+        activeTargetType: null,
+        carriedObjectId: null,
+      },
+    };
+  }
+
+  function _ensureWeeklyWorlds(save) {
+    if (!save.weekly || typeof save.weekly !== 'object' || Array.isArray(save.weekly)) {
+      save.weekly = {};
+    }
+
+    const current = save.weekly.worlds;
+    if (!current || typeof current !== 'object' || Array.isArray(current)) {
+      save.weekly.worlds = _defaultWeeklyWorlds();
+      return;
+    }
+
+    if (typeof current.occurrenceKey !== 'string') current.occurrenceKey = '';
+
+    if (!current.utsuroba || typeof current.utsuroba !== 'object' || Array.isArray(current.utsuroba)) current.utsuroba = {};
+    if (current.utsuroba.drifterQuest === undefined) current.utsuroba.drifterQuest = null;
+    if (!current.utsuroba.drifters || typeof current.utsuroba.drifters !== 'object' || Array.isArray(current.utsuroba.drifters)) current.utsuroba.drifters = {};
+    if (current.utsuroba.readingChallenge === undefined) current.utsuroba.readingChallenge = null;
+
+    if (!current.muenba || typeof current.muenba !== 'object' || Array.isArray(current.muenba)) current.muenba = {};
+    if (!current.muenba.ghostsFound || typeof current.muenba.ghostsFound !== 'object' || Array.isArray(current.muenba.ghostsFound)) current.muenba.ghostsFound = {};
+    if (!Array.isArray(current.muenba.huntGhostOrder)) current.muenba.huntGhostOrder = [];
+    if (current.muenba.activeCaseId === undefined) current.muenba.activeCaseId = null;
+    if (!Number.isFinite(current.muenba.orbsPending) || current.muenba.orbsPending < 0) current.muenba.orbsPending = 0;
+
+    if (!current.grimmerglen || typeof current.grimmerglen !== 'object' || Array.isArray(current.grimmerglen)) current.grimmerglen = {};
+    if (!current.grimmerglen.objects || typeof current.grimmerglen.objects !== 'object' || Array.isArray(current.grimmerglen.objects)) current.grimmerglen.objects = {};
+    if (!current.grimmerglen.objectSlots || typeof current.grimmerglen.objectSlots !== 'object' || Array.isArray(current.grimmerglen.objectSlots)) current.grimmerglen.objectSlots = {};
+    if (current.grimmerglen.activeTargetType === undefined) current.grimmerglen.activeTargetType = null;
+    if (current.grimmerglen.carriedObjectId === undefined) current.grimmerglen.carriedObjectId = null;
+  }
+
+  // ── Migrate legacy saves → current schema ────────────────────────────────
   function _migrate(save) {
     if (!save.version || save.version < 1) {
       save = Object.assign(_defaultSave(), save);
@@ -119,8 +179,10 @@ const BoohaSaveFile = (() => {
         gameStars:          {},
         unlockedBonusGames: {},
         wanderers:          [],
+        worlds:             _defaultWeeklyWorlds(),
       };
     }
+    _ensureWeeklyWorlds(save);
     if (!save.collection || typeof save.collection !== 'object' || Array.isArray(save.collection)) {
       save.collection = {};
     }
@@ -142,6 +204,7 @@ const BoohaSaveFile = (() => {
     }
 
     if (save.version < 2) save.version = 2;
+    if (save.version < 3) save.version = 3;
     return save;
     
   }
@@ -233,7 +296,9 @@ const BoohaSaveFile = (() => {
       gameStars:          {},
       unlockedBonusGames: {},
       wanderers:          [],
+      worlds:             _defaultWeeklyWorlds(),
     };
+    data.weekly.worlds.occurrenceKey = occurrenceKey || '';
 
     // Blitz keeps its weekly bucket inside meta for historical reasons, so it
     // must be cleared alongside the top-level weekly section.
