@@ -705,6 +705,13 @@ else
   bad "Calendar fifth-week audit failed"
 fi
 
+echo "[83/83] Weekly rollover audit"
+if node tests/weekly-rollover-audit.cjs >/dev/null 2>&1; then
+  ok "Occurrence-based weekly reset and permanent-state preservation pass"
+else
+  bad "Weekly rollover audit failed"
+fi
+
 # ── Summary ──────────────────────────────────────────────────
 echo "───────────────────────────────────"
 echo "✅ $PASS passed   ⚠️  $WARN warnings   ❌ $FAIL failed"

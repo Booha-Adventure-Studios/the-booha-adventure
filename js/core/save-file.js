@@ -69,14 +69,14 @@ const BoohaSaveFile = (() => {
 
       // ── Meta — permanent counters ────────────────────────────────────────
      meta: {
-        lastWeeklyKey:  '',      // e.g. "2026-march-w3" — used to detect Monday reset
+        lastWeeklyKey:  '',      // occurrence key, e.g. "2026-08-30|august-w4"
         allTimeStars:   0,       // running total, only goes up
         dayLog:         {},      // { "2026-07-22": { s, g } }  — accountability
         weekLog:        {},      // { "2026-w27": { adv, blitz, duel } }
         lastActivityTs: 0,
       },
 
-      // ── Weekly — resets every Monday midnight Tokyo ──────────────────────
+      // ── Weekly — resets at each Sunday-started Tokyo occurrence ──────────
       weekly: {
         completedGames:    {},   // { [saveId]: true }
         gameScores:        {},   // { [saveId]: highScore this week }
@@ -222,10 +222,10 @@ const BoohaSaveFile = (() => {
 
   // ── Weekly reset ──────────────────────────────────────────────────────────
   /**
-   * Clears all weekly data. Called by adventure-core on week change.
+   * Clears all weekly data. Called by adventure-core on occurrence change.
    * Does NOT touch scores, unlocks, meta.allTimeStars, or collection.
    */
-  function resetWeekly() {
+  function resetWeekly(occurrenceKey) {
     const data = load();
     data.weekly = {
       completedGames:     {},
@@ -234,6 +234,29 @@ const BoohaSaveFile = (() => {
       unlockedBonusGames: {},
       wanderers:          [],
     };
+
+    // Blitz keeps its weekly bucket inside meta for historical reasons, so it
+    // must be cleared alongside the top-level weekly section.
+    if (data.meta && data.meta.blitz && typeof data.meta.blitz === 'object') {
+      data.meta.blitz.weekly = {};
+      data.meta.blitz.weeklyKey = occurrenceKey || '';
+    }
+
+    // Muenba's weekly hunt state lives in its own permanent world section;
+    // only the weekly availability/order are cleared here. Lifetime ghosts,
+    // case records, room history, and rhythm bests remain untouched.
+    if (data.muenba && typeof data.muenba === 'object') {
+      data.muenba.weeklyGhostsFound = {};
+      data.muenba.weeklyGhostsFoundWeek = occurrenceKey || '';
+      data.muenba.huntGhostOrder = [];
+      data.muenba.huntGhostOrderWeek = occurrenceKey || '';
+    }
+
+    if (occurrenceKey) {
+      if (!data.meta || typeof data.meta !== 'object') data.meta = {};
+      data.meta.lastWeeklyKey = occurrenceKey;
+    }
+
     const ok = save(data);
     if (ok) {
       document.dispatchEvent(new Event('booha:weeklyReset'));
