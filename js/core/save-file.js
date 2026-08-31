@@ -307,14 +307,19 @@ const BoohaSaveFile = (() => {
       data.meta.blitz.weeklyKey = occurrenceKey || '';
     }
 
-    // Muenba's weekly hunt state lives in its own permanent world section;
-    // only the weekly availability/order are cleared here. Lifetime ghosts,
-    // case records, room history, and rhythm bests remain untouched.
+    // Clear legacy Muenba weekly fields too. The live hunt now uses
+    // weekly.worlds.muenba, but older pages/saves may still carry these
+    // compatibility fields. Lifetime ghosts, case records, room history,
+    // and rhythm bests remain untouched.
     if (data.muenba && typeof data.muenba === 'object') {
       data.muenba.weeklyGhostsFound = {};
       data.muenba.weeklyGhostsFoundWeek = occurrenceKey || '';
       data.muenba.huntGhostOrder = [];
       data.muenba.huntGhostOrderWeek = occurrenceKey || '';
+      data.muenba.orbsPending = 0;
+      if (data.muenba.caseProgress && typeof data.muenba.caseProgress === 'object') {
+        data.muenba.caseProgress.activeCaseId = null;
+      }
     }
 
     if (occurrenceKey) {
