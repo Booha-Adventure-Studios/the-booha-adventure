@@ -782,6 +782,13 @@ else
   bad "Grimmerglen Pass 10C return-handoff audit failed"
 fi
 
+echo "[weekly] Grimmerglen Pass 10D content/accessibility audit"
+if node tests/grimmerglen-pass10d-audit.cjs >/dev/null 2>&1; then
+  ok "Grimmerglen typing furigana and Ticket station-content contracts pass"
+else
+  bad "Grimmerglen Pass 10D content/accessibility audit failed"
+fi
+
 echo "[94/98] Grimmerglen navigation audit"
 if node tests/grimmerglen-navigation-audit.cjs >/dev/null 2>&1; then
   ok "Grimmerglen grid links, boundary arrows, and help-gated movement contracts pass"
