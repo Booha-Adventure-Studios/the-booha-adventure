@@ -176,7 +176,7 @@
 
   const MEMORY_STORIES = {
     banner: { en: 'I remember making this with my friend. We hung it up when the room felt too quiet.', jp: '友達とこれを作ったのを覚えている。部屋が静かすぎるとき、これをかざしたの。', readings: { '友達': 'ともだち', '作った': 'つくった', '覚えている': 'おぼえている', '部屋': 'へや', '静か': 'しずか', 'かざした': 'かざした' } },
-    ticket: { en: 'I remember holding this before I rode my bike to meet a friend.', jp: '友達に会うために自転車に乗る前、これを持っていたのを覚えている。', readings: { '友達': 'ともだち', '会う': 'あう', '自転車': 'じてんしゃ', '乗る': 'のる', '前': 'まえ', '持っていた': 'もっていた', '覚えている': 'おぼえている' } },
+    ticket: { en: 'I remember holding this before I went to the station to meet a friend.', jp: '友達に会うために駅へ行く前、これを持っていたのを覚えている。', readings: { '友達': 'ともだち', '会う': 'あう', '駅': 'えき', '行く': 'いく', '前': 'まえ', '持っていた': 'もっていた', '覚えている': 'おぼえている' } },
     pillow: { en: 'I remember resting here after a long day with my friends.', jp: '友達と長い一日を過ごしたあと、ここで休んだのを覚えている。', readings: { '友達': 'ともだち', '長い': 'ながい', '一日': 'いちにち', '過ごした': 'すごした', '休んだ': 'やすんだ', '覚えている': 'おぼえている' } },
     backpack: { en: 'I remember carrying my favorite daydreams in this.', jp: 'お気に入りの夢をこれに入れて運んだのを覚えている。', readings: { 'お気に入り': 'おきにいり', '夢': 'ゆめ', '入れて': 'いれて', '運んだ': 'はこんだ', '覚えている': 'おぼえている' } },
     book: { en: 'I remember writing in this for October. She is my friend, and we always meet around Halloween time.', jp: 'オクトーバーのためにこれに書いたのを覚えている。オクトーバーは友達で、いつもハロウィンのころに会うの。', readings: { '書いた': 'かいた', '覚えている': 'おぼえている', '友達': 'ともだち', '会う': 'あう' } },
@@ -187,7 +187,7 @@
 
   const MEMORY_CONTENT = {
     banner: { target: 'I made this with my friend.', jp: 'わたしは友達とこれを作った。', readings: { '友達': 'ともだち', '作った': 'つくった' }, full: ['I made this with my friend.', 'I played games with my friend.', 'I wrote this with my friend.'], partial: ['I made …', 'I played …', 'I wrote …'] },
-    ticket: { target: 'I rode my bike to meet a friend.', jp: 'わたしは友達に会うために自転車に乗った。', readings: { '友達': 'ともだち', '会う': 'あう', '自転車': 'じてんしゃ', '乗った': 'のった' }, full: ['I rode my bike to meet a friend.', 'I played games with a friend.', 'I wrote a letter to a friend.'], partial: ['I rode …', 'I played …', 'I wrote …'] },
+    ticket: { target: 'I went to the station to meet a friend.', jp: 'わたしは友達に会うために駅へ行った。', readings: { '友達': 'ともだち', '会う': 'あう', '駅': 'えき', '行った': 'いった' }, full: ['I went to the station to meet a friend.', 'I played games with a friend.', 'I wrote a letter to a friend.'], partial: ['I went …', 'I played …', 'I wrote …'] },
     pillow: { target: 'I rested here after a long day.', jp: '長い一日のあと、ここで休んだ。', readings: { '長い': 'ながい', '一日': 'いちにち', '休んだ': 'やすんだ' }, full: ['I rested here after a long day.', 'I played here after a long day.', 'I slept here after a long day.'], partial: ['I rested …', 'I played …', 'I slept …'] },
     backpack: { target: 'I carry my favorite daydreams in this.', jp: 'お気に入りの夢をこれに入れて運ぶ。', readings: { 'お気に入り': 'おきにいり', '夢': 'ゆめ', '入れて': 'いれて', '運ぶ': 'はこぶ' }, full: ['I carry my favorite daydreams in this.', 'I keep my favorite books in this.', 'I carry my favorite snacks in this.'], partial: ['I carry …', 'I keep …', 'I carry …'] },
     book: { target: 'I write in my book.', jp: 'わたしは本に書く。', readings: { '本': 'ほん', '書く': 'かく' }, full: ['I ride my bike.', 'I play games every day.', 'I write in my book.'], partial: ['I ride …', 'I play …', 'I write …'] },
@@ -345,18 +345,18 @@
           optionsVisible: true
         },
         case: {
-          promptEn: 'I rode the train to Utsuroba.',
-          promptJp: 'わたしは電車でウツロバへ行った。',
-          promptReadings: { '電車': 'でんしゃ', '行った': 'いった' },
-          accepted: ['i rode the train to utsuroba'],
-          options: ['I rode the train to Utsuroba.'],
+          promptEn: 'I went to the station.',
+          promptJp: 'わたしは駅へ行った。',
+          promptReadings: { '駅': 'えき', '行った': 'いった' },
+          accepted: ['i went to the station'],
+          options: ['I went to the station.'],
           optionsVisible: false
         },
         deep: {
-          promptEn: 'I rode the train to Utsuroba to meet my friend Bryan.',
-          promptJp: 'わたしは友達のブライアンに会うために電車でウツロバへ行った。',
-          promptReadings: { '友達': 'ともだち', '会う': 'あう', '電車': 'でんしゃ', '行った': 'いった' },
-          accepted: ['i rode the train to utsuroba to meet my friend bryan'],
+          promptEn: 'I went to the station to meet my friend Bryan.',
+          promptJp: 'わたしは友達のブライアンに会うために駅へ行った。',
+          promptReadings: { '友達': 'ともだち', '会う': 'あう', '駅': 'えき', '行った': 'いった' },
+          accepted: ['i went to the station to meet my friend bryan'],
           options: null,
           optionsVisible: false
         }
