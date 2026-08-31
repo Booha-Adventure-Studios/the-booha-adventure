@@ -11,6 +11,9 @@ const start = runtime.indexOf('function buildGrimmerglenProfilePortal(');
 const end = runtime.indexOf('function beginEntryDrift(', start);
 assert(start >= 0 && end > start, 'Grimmerglen profile portal helpers must remain discoverable');
 const profilePortal = runtime.slice(start, end);
+const profileStyleStart = runtime.indexOf('#grimmerglen-profile-portal span{');
+const profileStyleEnd = runtime.indexOf('#grimmerglen-profile-portal:hover', profileStyleStart);
+const profileStyle = runtime.slice(profileStyleStart, profileStyleEnd);
 
 assert(runtime.includes("const GRIMMERGLEN_PROFILE_PORTAL = { roomId: 'room_01', x: 1111, y: 787 }"),
   'profile doorway must use room_01 at the requested coordinate');
@@ -30,10 +33,15 @@ assert(runtime.includes('grimmerglenProfilePortalPulse'),
   'profile doorway halo must pulse');
 assert(runtime.includes("font:900 2rem/1 ui-rounded,'Avenir Next Rounded','Trebuchet MS',sans-serif"),
   'profile doorway G must use a rounder bubbly font treatment');
+assert(profileStyleStart >= 0 && profileStyleEnd > profileStyleStart &&
+  !profileStyle.includes('width:46px') && !profileStyle.includes('background:linear-gradient'),
+  'profile doorway G must not have the inner bubble badge');
 assert(runtime.includes('#grimmerglen-profile-portal span::after'),
   'profile doorway G must include a cute sparkle accent');
-assert(runtime.includes('border-radius:48% 52% 55% 45%'),
-  'profile doorway G must sit in a soft bubbly inner badge');
+assert(runtime.includes("#grimmerglen-profile-portal span::before{content:'✧'"),
+  'profile doorway G must include a lower-left diamond accent');
+assert(runtime.includes("#grimmerglen-profile-portal::after{content:'✦  ✧  ✦'"),
+  'profile doorway must include several white diamond/star accents');
 assert(verify.includes('tests/grimmerglen-pass10b-audit.cjs'),
   'verify.sh must run the Grimmerglen profile-doorway audit');
 
