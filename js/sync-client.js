@@ -196,6 +196,9 @@ window.BoohaSync = (() => {
     if (w.worlds?.utsuroba?.drifterQuest) return false;
     if (w.worlds?.utsuroba?.drifters && Object.keys(w.worlds.utsuroba.drifters).length) return false;
     if (w.worlds?.utsuroba?.readingChallenge) return false;
+    if (w.worlds?.muenba?.ghostsFound && Object.keys(w.worlds.muenba.ghostsFound).length) return false;
+    if (w.worlds?.muenba?.huntGhostOrder && w.worlds.muenba.huntGhostOrder.length) return false;
+    if (Number(w.worlds?.muenba?.orbsPending) > 0) return false;
     if (d.collection && (d.collection.wanderers || []).length) return false;
     if (d.unlocks && Object.keys(d.unlocks).length) return false;
     return true;

@@ -25,7 +25,7 @@ assert(source.includes('chart: carryingEnergy ? SUPER_DANGER_RHYTHM_CHART : diff
 assert(source.includes('function loseCarriedEnergyAndMarkRestart()'), 'failed carried-energy encounters must have a loss path');
 assert(source.includes('restartHuntAfterCarriedEnergyLoss'), 'failed carried-energy encounters must restart the hunt');
 assert(source.includes('if (carryingStolenEnergy) return \'sight\';'), 'carrying energy must make every ghost sight-angry');
-assert(source.includes("if (Number(readMuenba().orbsPending) > 0) return null;"), 'carrying energy must clear capture eligibility until handoff');
+assert(source.includes("if (Number(readMuenbaWeekly().orbsPending) > 0) return null;"), 'carrying energy must clear capture eligibility until handoff');
 assert(source.includes("if (!carryingStolenEnergy && ghostId === target) return 'friendly';"), 'the assigned hunt ghost must stay quiet during an ordinary hunt');
 assert(!source.includes('muenbaGhostHostility'), 'ordinary non-target ghosts must not use a seeded random hostility split');
 assert(source.includes('chaseSpeed: carryingEnergy'), 'ghosts must remember the carried-energy chase speed');
@@ -35,7 +35,7 @@ assert(!source.includes("if (g.carryingEnergy && g.hostility === 'sight' && !g.s
 assert(source.includes('&& !g.carryingEnergy'), 'ordinary chases may lose interest at range, but carried-energy chases must persist');
 assert(source.includes('let carriedEnergyVignetteCanvas;'), 'carried-energy atmosphere must use its own cached layer');
 assert(source.includes('carriedEnergyVignetteCanvas = document.createElement(\'canvas\');'), 'carried-energy vignette must be cached once');
-assert(source.includes('const returnTripActive = Number(readMuenba().orbsPending) > 0'), 'carried-energy atmosphere must follow pending orbs');
+assert(source.includes('const returnTripActive = Number(readMuenbaWeekly().orbsPending) > 0'), 'carried-energy atmosphere must follow pending orbs');
 assert(source.includes('&& state.roomId !== MUENBA_NUPPI.roomId;'), 'room_01 must remain the safe visual reset during the return trip');
 assert(source.includes('atmosphereCtx.drawImage(carriedEnergyVignetteCanvas, 0, 0);'), 'carried-energy atmosphere must composite the cached vignette');
 assert(source.includes('moveGhostToward(g, state.x, state.y, g.chaseSpeed || GHOST_CHASE_SPEED);'), 'chasing must use the carried-energy speed when active');

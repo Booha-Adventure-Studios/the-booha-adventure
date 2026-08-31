@@ -104,9 +104,9 @@ assert(finishSource.includes('commitSuccessfulCapture()'), 'successful rhythm mu
 assert(finishSource.includes("captureSession.phase = 'reward'"), 'successful capture must enter the reward phase');
 assert(finishSource.includes('renderCaptureReward()'), 'successful capture must render the reward card');
 assert(finishSource.includes('releaseNextOrb()'), 'reward card must begin releasing energy orbs');
-assert(commitSource.includes('mu.ghostsFound[ghost.id] = true'), 'capture commit must mark the ghost found');
-assert(commitSource.includes('mu.weeklyGhostsFound[ghost.id] = true'), 'capture commit must mark weekly availability');
-assert(commitSource.includes('mu.orbsPending += rewardCount'), 'capture commit must create pending energy');
+assert(commitSource.includes('mu.ghostsFound[ghost.id] = true'), 'capture commit must mark the lifetime ghost found');
+assert(commitSource.includes('weekly.ghostsFound[ghost.id] = true'), 'capture commit must mark weekly availability');
+assert(commitSource.includes('weekly.orbsPending += rewardCount'), 'capture commit must create pending energy');
 assert(commitSource.includes('mu.caseRecords[caseData.id]'), 'capture commit must persist case completion');
 assert(commitSource.includes('writeSave(d)'), 'capture commit must persist before showing reward');
 
@@ -118,7 +118,7 @@ assert(returnSource.includes("['reward', 'nuppi-recovery'].includes(captureSessi
 assert(returnSource.includes('closeCaptureOverlay({ resumeHunt: true })'), 'leaving reward must close the encounter cleanly');
 assert(returnSource.includes('setReturnToNuppiPending(true)'), 'leaving reward must flag the Nuppi handoff');
 assert(depositSource.includes('mu.orbsCollected = collected + pending'), 'Nuppi must collect pending energy');
-assert(depositSource.includes('mu.orbsPending = 0'), 'Nuppi deposit must clear pending energy');
+assert(depositSource.includes('weekly.orbsPending = 0'), 'Nuppi deposit must clear pending energy');
 assert(depositSource.includes('writeSave(d)'), 'Nuppi deposit must persist the handoff');
 assert(depositSource.includes('startMuenbaCelebration(pending)'), 'deposit must lead to the celebration');
 
