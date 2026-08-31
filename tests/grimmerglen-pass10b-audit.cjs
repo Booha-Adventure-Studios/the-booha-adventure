@@ -28,6 +28,12 @@ assert(runtime.includes('#grimmerglen-profile-portal::before'),
   'profile doorway must have a glowing circular halo');
 assert(runtime.includes('grimmerglenProfilePortalPulse'),
   'profile doorway halo must pulse');
+assert(runtime.includes("font:900 2rem/1 ui-rounded,'Avenir Next Rounded','Trebuchet MS',sans-serif"),
+  'profile doorway G must use a rounder bubbly font treatment');
+assert(runtime.includes('#grimmerglen-profile-portal span::after'),
+  'profile doorway G must include a cute sparkle accent');
+assert(runtime.includes('border-radius:48% 52% 55% 45%'),
+  'profile doorway G must sit in a soft bubbly inner badge');
 assert(verify.includes('tests/grimmerglen-pass10b-audit.cjs'),
   'verify.sh must run the Grimmerglen profile-doorway audit');
 

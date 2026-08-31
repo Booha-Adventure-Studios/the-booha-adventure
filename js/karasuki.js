@@ -4234,6 +4234,15 @@ const HAPPY_HOUSE_PORTAL = {
     } catch (_) {}
   })();
 
+  (function checkReturnFromGrimmerglen() {
+    try {
+      const ret = sessionStorage.getItem('grimmerglen_return_room');
+      if (!ret) return;
+      sessionStorage.removeItem('grimmerglen_return_room');
+      if (DATA.rooms[ret]) { state.roomId = ret; state.spawnId = 'default'; }
+    } catch (_) {}
+  })();
+
   (function checkReturnFromBonusGame() {
     try {
       const ret = sessionStorage.getItem('booha_bonus_return_room');
@@ -4474,6 +4483,7 @@ const HAPPY_HOUSE_PORTAL = {
       return [
         'booha_return_to_checkpoint', 'booha_bonus_return_room',
         'happy_house_return_room', 'utsuroba_return_room',
+        'grimmerglen_return_room',
       ].some(key => sessionStorage.getItem(key));
     } catch (_) { return false; }
   }
