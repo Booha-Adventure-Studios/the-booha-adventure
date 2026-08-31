@@ -22,7 +22,8 @@ const lossSource = sourceSection('loseCarriedEnergyAndMarkRestart', 'restartHunt
 
 assert(source.includes('const JERK_COUNT = 5;'), 'ordinary hunts must retain the baseline Jerk count');
 assert(source.includes('const JERK_RETURN_COUNT = 8;'), 'return trips must use the increased Jerk count');
-assert(mapSource.includes('const returnTripActive = Number(readMuenba().orbsPending) > 0;'), 'Jerk escalation must follow pending energy');
+assert(mapSource.includes('const weekly = readMuenbaWeekly();'), 'Jerk escalation must read the weekly Muenba bucket');
+assert(mapSource.includes('const returnTripActive = Number(weekly.orbsPending) > 0;'), 'Jerk escalation must follow pending energy');
 assert(mapSource.includes("|return-trip:${returnTripActive ? 'on' : 'off'}"), 'the ghost-map cache must distinguish return trips');
 assert(mapSource.includes('const jerkCount = returnTripActive ? JERK_RETURN_COUNT : JERK_COUNT;'), 'Jerk count must switch with return-trip state');
 assert(mapSource.includes("const jerkSeed = today + '|muenbaJerkRooms|' + (returnTripActive ? 'return' : 'hunt');"), 'return-trip placement must have its own deterministic layout');
@@ -31,9 +32,9 @@ assert(mapSource.includes('returnTripJerk: returnTripActive'), 'temporary Jerk i
 
 assert(source.includes('function invalidateGhostRoomMap()'), 'energy-state changes need an explicit ghost-map invalidation');
 assert(pendingSource.includes('if (changed) invalidateGhostRoomMap();'), 'pending-state changes must invalidate the threat map');
-assert(depositSource.includes('mu.orbsPending = 0;'), 'successful handoff must clear pending energy');
+assert(depositSource.includes('weekly.orbsPending = 0;'), 'successful handoff must clear pending energy');
 assert(depositSource.includes('setReturnToNuppiPending(false);'), 'successful handoff must end return-trip threat state');
-assert(lossSource.includes('mu.orbsPending = 0;'), 'lost energy must clear pending energy');
+assert(lossSource.includes('weekly.orbsPending = 0;'), 'lost energy must clear pending energy');
 assert(lossSource.includes('setReturnToNuppiPending(false);'), 'lost energy must end return-trip threat state');
 
 function jerkCount(emptyRooms, carryingEnergy) {

@@ -60,7 +60,8 @@ assert(travelSource.includes('const keepTargetAwayFromNuppi = isMainHuntGhostId(
 // 17D: carrying energy increases temporary pressure and clearing the pending
 // state invalidates that temporary layout.
 assert(source.includes('const JERK_COUNT = 5;') && source.includes('const JERK_RETURN_COUNT = 8;'), 'normal and return-trip threat counts must both exist');
-assert(spawnSource.includes('const returnTripActive = Number(readMuenba().orbsPending) > 0;'), 'return-trip state must follow pending energy');
+assert(spawnSource.includes('const weekly = readMuenbaWeekly();'), 'return-trip state must read the weekly Muenba bucket');
+assert(spawnSource.includes('const returnTripActive = Number(weekly.orbsPending) > 0;'), 'return-trip state must follow pending energy');
 assert(spawnSource.includes('const jerkCount = returnTripActive ? JERK_RETURN_COUNT : JERK_COUNT;'), 'Jerk count must change with carrying state');
 assert(spawnSource.includes('returnTripJerk: returnTripActive'), 'temporary Jerk instances must be tagged');
 assert(source.includes('function invalidateGhostRoomMap()'), 'temporary threat maps need explicit invalidation');

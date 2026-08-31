@@ -1042,21 +1042,67 @@
     }
   }
 
+  function ensureWeeklyMuenba(data) {
+    if (!data.weekly || typeof data.weekly !== 'object' || Array.isArray(data.weekly)) data.weekly = {};
+    if (!data.weekly.worlds || typeof data.weekly.worlds !== 'object' || Array.isArray(data.weekly.worlds)) data.weekly.worlds = {};
+    if (!data.weekly.worlds.muenba || typeof data.weekly.worlds.muenba !== 'object' || Array.isArray(data.weekly.worlds.muenba)) data.weekly.worlds.muenba = {};
+    const world = data.weekly.worlds.muenba;
+    if (!world.ghostsFound || typeof world.ghostsFound !== 'object' || Array.isArray(world.ghostsFound)) world.ghostsFound = {};
+    if (!Array.isArray(world.huntGhostOrder)) world.huntGhostOrder = [];
+    if (world.activeCaseId === undefined) world.activeCaseId = null;
+    if (!Number.isFinite(world.orbsPending) || world.orbsPending < 0) world.orbsPending = 0;
+    return world;
+  }
+
+  function readMuenbaWeekly() {
+    return ensureWeeklyMuenba(loadSave());
+  }
+
+  function writeMuenbaWeekly(patchObj) {
+    const d = loadSave();
+    Object.assign(ensureWeeklyMuenba(d), patchObj);
+    return writeSave(d);
+  }
+
   function migrateMuenbaSave(data) {
     let dirty = false;
     if (!data.muenba || typeof data.muenba !== 'object') { data.muenba = {}; dirty = true; }
     const mu = data.muenba;
     if (!mu.ghostsFound || typeof mu.ghostsFound !== 'object') { mu.ghostsFound = {}; dirty = true; }
-    if (!mu.weeklyGhostsFound || typeof mu.weeklyGhostsFound !== 'object') { mu.weeklyGhostsFound = {}; dirty = true; }
     const weekKey = _muenbaWeekKey();
-    if (weekKey && mu.weeklyGhostsFoundWeek !== weekKey) {
-      mu.weeklyGhostsFound = {};
-      mu.weeklyGhostsFoundWeek = weekKey;
+    if (!Number.isInteger(mu.orbsCollected)) { mu.orbsCollected = 0; dirty = true; }
+    if (!mu.visitedRooms || typeof mu.visitedRooms !== 'object') { mu.visitedRooms = {}; dirty = true; }
+
+    const weekly = ensureWeeklyMuenba(data);
+    const legacyGhosts = mu.weeklyGhostsFound && typeof mu.weeklyGhostsFound === 'object' && !Array.isArray(mu.weeklyGhostsFound)
+      ? mu.weeklyGhostsFound : {};
+    const legacyGhostsWeek = mu.weeklyGhostsFoundWeek || '';
+    const legacyGhostsCurrent = !weekKey || !legacyGhostsWeek || legacyGhostsWeek === weekKey;
+    if (!Object.keys(weekly.ghostsFound).length && legacyGhostsCurrent && Object.keys(legacyGhosts).length) {
+      weekly.ghostsFound = { ...legacyGhosts };
       dirty = true;
     }
-    if (!Number.isInteger(mu.orbsCollected)) { mu.orbsCollected = 0; dirty = true; }
-    if (!Number.isInteger(mu.orbsPending)) { mu.orbsPending = 0; dirty = true; }
-    if (!mu.visitedRooms || typeof mu.visitedRooms !== 'object') { mu.visitedRooms = {}; dirty = true; }
+    const legacyOrder = Array.isArray(mu.huntGhostOrder) ? mu.huntGhostOrder : [];
+    const legacyOrderWeek = mu.huntGhostOrderWeek || '';
+    const legacyOrderCurrent = !weekKey || !legacyOrderWeek || legacyOrderWeek === weekKey;
+    if (!weekly.huntGhostOrder.length && legacyOrderCurrent && legacyOrder.length) {
+      weekly.huntGhostOrder = legacyOrder.slice();
+      dirty = true;
+    }
+    if (weekly.orbsPending === 0 && Number.isInteger(mu.orbsPending) && mu.orbsPending > 0) {
+      weekly.orbsPending = mu.orbsPending;
+      dirty = true;
+    }
+    if (weekly.activeCaseId === null && mu.caseProgress && typeof mu.caseProgress === 'object' && typeof mu.caseProgress.activeCaseId === 'string') {
+      weekly.activeCaseId = mu.caseProgress.activeCaseId;
+      dirty = true;
+    }
+    ['weeklyGhostsFound', 'weeklyGhostsFoundWeek', 'huntGhostOrder', 'huntGhostOrderWeek', 'orbsPending'].forEach(key => {
+      if (mu[key] !== undefined) {
+        delete mu[key];
+        dirty = true;
+      }
+    });
     // Pass 13: the profile page's "Rooms visited"/"Case records" stats are
     // plain running totals of every room entry / every case settled, not
     // distinct-count or all-tiers-complete fractions, so replaying content
@@ -1089,6 +1135,15 @@
       dirty = true;
     }
     if (mu.caseProgress.activeCaseId !== null && typeof mu.caseProgress.activeCaseId !== 'string') {
+      mu.caseProgress.activeCaseId = null;
+      dirty = true;
+    }
+    if (mu.caseProgress.activeCaseId !== null) {
+      const activeCaseId = mu.caseProgress.activeCaseId;
+      if (weekly.activeCaseId === null && typeof activeCaseId === 'string') {
+        weekly.activeCaseId = activeCaseId;
+        dirty = true;
+      }
       mu.caseProgress.activeCaseId = null;
       dirty = true;
     }
@@ -1211,7 +1266,7 @@
   // Which of the 15 rooms gets which of the still-available ghosts, and which
   // non-target ghosts react on sight. The active case always overrides this
   // as friendly. Permanent ghostsFound
-  // history is not used here; weeklyGhostsFound controls availability.
+  // history is not used here; the weekly world bucket controls availability.
   function invalidateGhostRoomMap() {
     ghostRoomMap = null;
     ghostRoomMapDay = null;
@@ -1222,8 +1277,9 @@
   function getGhostRoomMap() {
     const today = _muenbaTodayKey() || 'nodate';
     const weekKey = _muenbaWeekKey() || 'no-week';
-    const returnTripActive = Number(readMuenba().orbsPending) > 0;
-    const weeklyFound = readMuenba().weeklyGhostsFound;
+    const weekly = readMuenbaWeekly();
+    const returnTripActive = Number(weekly.orbsPending) > 0;
+    const weeklyFound = weekly.ghostsFound;
     const activeCaseGhost = activeMuenbaCaseGhost();
     const activeCaseGhostId = activeCaseGhost && activeCaseGhost.id;
     const availableGhosts = GHOSTS.filter(ghost => ghost.id === activeCaseGhostId || !weeklyFound || !weeklyFound[ghost.id]);
@@ -1271,7 +1327,7 @@
     // meets on the way back is fully hostile (sight-triggered, chase and
     // scream), not the usual 50/50 mix. `orbsPending` is exactly "energy
     // taken but not yet delivered," so it's the right flag to key off of.
-    const carryingStolenEnergy = Number(readMuenba().orbsPending) > 0;
+    const carryingStolenEnergy = Number(readMuenbaWeekly().orbsPending) > 0;
     const target = currentHuntGhostId();
     const role = ghostRoleFor(ghostId);
     const roleRules = ghostRulesFor(ghostId);
@@ -1399,7 +1455,7 @@
     const role = ghostRoleFor(ghost);
     const roleRules = ghostRulesFor(ghost);
     const hostility = ghostHostilityFor(ghost.id);
-    const carryingEnergy = Number(readMuenba().orbsPending) > 0;
+    const carryingEnergy = Number(readMuenbaWeekly().orbsPending) > 0;
     activeGhost = {
       ghost,
       role,
@@ -1475,7 +1531,7 @@
     // every staggered warning stays loud because Booha is carrying energy.
     startDangerScream({
       reset: true,
-      loudOnly: Number(readMuenba().orbsPending) > 0
+      loudOnly: Number(readMuenbaWeekly().orbsPending) > 0
     });
   }
 
@@ -1674,7 +1730,7 @@
     playUiSfx('ghostError');
     const encounterRole = ghostRoleFor(ghost);
     const encounterRules = ghostRulesFor(ghost);
-    const carryingEnergy = Number(readMuenba().orbsPending) > 0;
+    const carryingEnergy = Number(readMuenbaWeekly().orbsPending) > 0;
     captureSession = {
       ghost,
       encounterRole,
@@ -1778,7 +1834,7 @@
   // travel — pickGhostTeleportRoom() already excludes room_01 and the
   // player's current room, so this can never relocate a ghost back into the
   // fight or into Nuppi's safe room. Deliberately does not touch
-  // ghostsFound/weeklyGhostsFound/orbs — this was never a real capture.
+  // ghostsFound/weekly hunt state/orbs — this was never a real capture.
   function dismissDangerGhost() {
     if (!captureSession || !captureSession.ghost) return;
     const roomId = state.roomId;
@@ -1852,17 +1908,15 @@
     const weekKey = _muenbaWeekKey() || 'no-week';
     if (huntGhostOrderCache && huntGhostOrderCacheWeek === weekKey) return huntGhostOrderCache;
     const ghostIds = GHOSTS.map(ghost => ghost.id);
-    const stored = readMuenba();
-    const savedOrder = Array.isArray(stored.huntGhostOrder) && stored.huntGhostOrderWeek === weekKey
-      ? stored.huntGhostOrder
-      : null;
+    const stored = readMuenbaWeekly();
+    const savedOrder = Array.isArray(stored.huntGhostOrder) ? stored.huntGhostOrder : null;
     const isValid = savedOrder && savedOrder.length === ghostIds.length && ghostIds.every(id => savedOrder.includes(id));
     const order = isValid
       ? savedOrder.slice()
       : _muenbaShuffle(ghostIds, `${weekKey}|muenbaHuntGhostOrder|${Date.now()}|${Math.random()}`);
     huntGhostOrderCache = order;
     huntGhostOrderCacheWeek = weekKey;
-    if (!isValid) writeMuenba({ huntGhostOrder: order, huntGhostOrderWeek: weekKey });
+    if (!isValid) writeMuenbaWeekly({ huntGhostOrder: order });
     return order;
   }
 
@@ -1889,7 +1943,7 @@
   }
 
   function availableMuenbaGhostsThisWeek() {
-    const weeklyFound = readMuenba().weeklyGhostsFound;
+    const weeklyFound = readMuenbaWeekly().ghostsFound;
     const activeCaseGhost = activeMuenbaCaseGhost();
     const byId = new Map(GHOSTS.map(ghost => [ghost.id, ghost]));
     return getMuenbaHuntGhostOrder()
@@ -1899,7 +1953,7 @@
 
   // Energy is collected once per week, but the selected memory mode can leave
   // the same case unfinished. Its target ghost must return even when
-  // weeklyGhostsFound already contains that ghost id.
+  // The weekly ghost bucket already contains that ghost id.
   function activeMuenbaCaseGhost() {
     const nextCase = nextMuenbaCase();
     return nextCase ? GHOSTS.find(ghost => ghost.id === nextCase.ghostId) || null : null;
@@ -1916,7 +1970,7 @@
     // orbs reach Nuppi. This prevents the next unfinished case from becoming
     // clickable during the return trip and keeps every other ghost on the
     // danger-encounter path.
-    if (Number(readMuenba().orbsPending) > 0) return null;
+    if (Number(readMuenbaWeekly().orbsPending) > 0) return null;
     const ghost = nextMuenbaHuntGhost();
     return ghost ? ghost.id : null;
   }
@@ -3660,8 +3714,9 @@
     const d = loadSave();
     if (!d.muenba || typeof d.muenba !== 'object') d.muenba = {};
     const mu = d.muenba;
-    const lost = Math.max(0, Number(mu.orbsPending) || 0);
-    mu.orbsPending = 0;
+    const weekly = ensureWeeklyMuenba(d);
+    const lost = Math.max(0, Number(weekly.orbsPending) || 0);
+    weekly.orbsPending = 0;
     if (!writeSave(d)) return false;
     captureSession.carriedEnergyLost = true;
     captureSession.lostOrbCount = lost;
@@ -3810,18 +3865,17 @@
     const d = loadSave();
     if (!d.muenba || typeof d.muenba !== 'object') d.muenba = {};
     const mu = d.muenba;
+    const weekly = ensureWeeklyMuenba(d);
     if (!mu.ghostsFound || typeof mu.ghostsFound !== 'object') mu.ghostsFound = {};
-    if (!mu.weeklyGhostsFound || typeof mu.weeklyGhostsFound !== 'object') mu.weeklyGhostsFound = {};
-    if (!Number.isInteger(mu.orbsPending)) mu.orbsPending = 0;
     if (!mu.huntJournal || !Array.isArray(mu.huntJournal.entries)) mu.huntJournal = { entries: [] };
     if (!mu.caseRecords || typeof mu.caseRecords !== 'object') mu.caseRecords = {};
     if (!mu.rhythm || typeof mu.rhythm !== 'object') mu.rhythm = { bestAccuracy: 0, attempts: 0 };
     if (!Number.isInteger(mu.rhythm.capturesCompleted) || mu.rhythm.capturesCompleted < 0) mu.rhythm.capturesCompleted = 0;
     if (!Number.isInteger(mu.caseRecordsSettled) || mu.caseRecordsSettled < 0) mu.caseRecordsSettled = 0;
 
-    const isNewWeeklyCapture = !mu.weeklyGhostsFound[ghost.id];
+    const isNewWeeklyCapture = !weekly.ghostsFound[ghost.id];
     mu.ghostsFound[ghost.id] = true;
-    mu.weeklyGhostsFound[ghost.id] = true;
+    weekly.ghostsFound[ghost.id] = true;
     let journalEntry = mu.huntJournal.entries.find(entry => entry && entry.ghostId === ghost.id);
     if (!journalEntry) {
       journalEntry = { ghostId: ghost.id, capturedAt: Date.now() };
@@ -3865,7 +3919,7 @@
       } else {
         mu.caseProgress.completedCaseIds = mu.caseProgress.completedCaseIds.filter(caseId => caseId !== caseData.id);
       }
-      mu.caseProgress.activeCaseId = null;
+      weekly.activeCaseId = null;
       journalEntry.caseId = caseData.id;
       journalEntry.caseDifficulty = captureSession.caseDifficulty;
       journalEntry.caseCompletedAt = completedAt;
@@ -3887,7 +3941,7 @@
     const rewardCount = caseMode && !caseModeAlreadyComplete
       ? ORB_REWARD_PER_CAPTURE
       : (isNewWeeklyCapture ? ORB_REWARD_PER_CAPTURE : 0);
-    mu.orbsPending += rewardCount;
+    weekly.orbsPending += rewardCount;
     if (!writeSave(d)) return null;
 
     captureSession.rewardCommitted = true;
@@ -4122,7 +4176,8 @@
     const d = loadSave();
     if (!d.muenba || typeof d.muenba !== 'object') d.muenba = {};
     const mu = d.muenba;
-    const pending = Number.isInteger(mu.orbsPending) ? mu.orbsPending : 0;
+    const weekly = ensureWeeklyMuenba(d);
+    const pending = Number.isInteger(weekly.orbsPending) ? weekly.orbsPending : 0;
     if (pending <= 0) {
       renderRoomNuppiPopup();
       return false;
@@ -4130,7 +4185,7 @@
     state.handoffResolving = true;
     const collected = Number.isInteger(mu.orbsCollected) ? mu.orbsCollected : 0;
     mu.orbsCollected = collected + pending;
-    mu.orbsPending = 0;
+    weekly.orbsPending = 0;
     if (!writeSave(d)) {
       state.handoffResolving = false;
       return false;
@@ -4338,7 +4393,7 @@
   }
 
   function openPendingOrbRecovery() {
-    const pending = readMuenba().orbsPending;
+    const pending = readMuenbaWeekly().orbsPending;
     if (!(pending > 0)) {
       return;
     }
@@ -5852,7 +5907,7 @@
     lastBoohaTrailAt = 0;
     updateMuenbaProfileLink();
     stopDangerScream();
-    setReturnToNuppiPending(Number(readMuenba().orbsPending) > 0 || state.returnToNuppiPending);
+    setReturnToNuppiPending(Number(readMuenbaWeekly().orbsPending) > 0 || state.returnToNuppiPending);
     if (hideBtn) { hideBtn.classList.remove('active'); setHideButtonLabel(false); setHideButtonDisabled(false); }
     markMuenbaRoomVisited(roomId);
     spawnRoomGhost(roomId);
@@ -6215,7 +6270,7 @@
     addMuenbaButtonSfx(lobbyOverlay.querySelector('#muenba-hunt-card-begin'))
       .addEventListener('click', () => {
       closeNuppiLobby();
-      if (readMuenba().orbsPending > 0) openPendingOrbRecovery();
+      if (readMuenbaWeekly().orbsPending > 0) openPendingOrbRecovery();
       });
     focusLobbyControl('#muenba-hunt-card-begin');
   }
@@ -6305,7 +6360,7 @@
   function renderRoomNuppiPopup() {
     if (!lobbyOverlay) return;
     const name = getPlayerFirstName();
-    const pending = Number(readMuenba().orbsPending) > 0;
+    const pending = Number(readMuenbaWeekly().orbsPending) > 0;
     const waitingForCase = !pending && !!nextMuenbaCase();
     const waitingGhost = waitingForCase ? nextNuppiHuntGhost() : null;
     const waitingGhostName = waitingGhost ? waitingGhost.name : 'the next ghost';
@@ -6726,7 +6781,7 @@
       atmosphereCtx.drawImage(vignetteCanvas, 0, 0);
       atmosphereCtx.restore();
     }
-    const returnTripActive = Number(readMuenba().orbsPending) > 0
+    const returnTripActive = Number(readMuenbaWeekly().orbsPending) > 0
       && state.roomId !== MUENBA_NUPPI.roomId;
     if (returnTripActive && carriedEnergyVignetteCanvas) {
       const dreadPulse = REDUCED_MOTION

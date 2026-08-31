@@ -92,6 +92,8 @@ assert.deepStrictEqual(plain(migrated.weekly.worlds), {
 });
 
 save.save(migrated);
+stored.muenba.orbsPending = 5;
+stored.muenba.caseProgress = { completedCaseIds: ['case-1'], activeCaseId: 'case-2' };
 save.resetWeekly('2026-08-30|august-w4');
 
 assert.strictEqual(stored.version, 3);
@@ -123,6 +125,9 @@ assert.deepStrictEqual(plain(stored.utsuroba.drifters), { alpha: { completedMode
 assert.deepStrictEqual(plain(stored.utsuroba.readingJournal), { entries: [{ episodeId: 'episode-1' }] });
 assert.deepStrictEqual(plain(stored.muenba.ghostsFound), { fuzzle: true });
 assert.deepStrictEqual(plain(stored.muenba.huntJournal), { entries: [{ ghostId: 'fuzzle' }] });
+assert.strictEqual(stored.muenba.orbsPending, 0);
+assert.strictEqual(stored.muenba.caseProgress.activeCaseId, null);
+assert.deepStrictEqual(stored.muenba.caseProgress.completedCaseIds, ['case-1']);
 assert.deepStrictEqual(plain(stored.grimmerglen.objects), { banner: { found: 2 } });
 assert.deepStrictEqual(plain(stored.grimmerglen.objectSlots), { 'banner-1': true });
 assert.ok(events.includes('booha:weeklyReset'));

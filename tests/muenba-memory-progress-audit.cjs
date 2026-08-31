@@ -80,8 +80,8 @@ assert(profileSource.includes("memoryModeLabel(entry.caseDifficulty || 'fresh')"
 assert(source.includes('const caseModeAlreadyComplete = !!('), 'capture commits must know whether this memory lane is already complete');
 assert(source.includes('const rewardCount = caseMode && !caseModeAlreadyComplete'), 'unfinished memory lanes must receive energy even after the weekly ghost flag is set');
 assert(source.includes('if (rewardCount <= 0)'), 'zero-orb captures must not create a fake Nuppi handoff');
-assert(source.includes('const pending = Number.isInteger(mu.orbsPending) ? mu.orbsPending : 0;'), 'Nuppi handoff must read the durable pending-orb count');
-assert(source.includes('mu.orbsPending = 0;'), 'Nuppi handoff must clear pending orbs during the saved deposit');
+assert(source.includes('const pending = Number.isInteger(weekly.orbsPending) ? weekly.orbsPending : 0;'), 'Nuppi handoff must read the durable pending-orb count');
+assert(source.includes('weekly.orbsPending = 0;'), 'Nuppi handoff must clear pending orbs during the saved deposit');
 
 const legacy = migrateRecord({ completed: true, difficulty: 'fresh' });
 assert.deepStrictEqual(legacy.completedModes, { fresh: true }, 'legacy completed records should migrate to their recorded mode');

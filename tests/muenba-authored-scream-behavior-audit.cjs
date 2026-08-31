@@ -30,7 +30,7 @@ assert(sfx.includes('1800 + Math.random() * 1100'), 'authored screams must have 
 assert(sfx.includes('startDangerScreamSamples: startDangerScreamSamples'), 'shared SFX must publish authored danger playback');
 assert(muenba.includes('window.UtsuSfx && window.UtsuSfx.startDangerScreamSamples'), 'Muenba must use authored samples for danger playback');
 assert(muenba.includes('reset: true'), 'Muenba must reset scream volume for each new ghost encounter');
-assert(muenba.includes('loudOnly: Number(readMuenba().orbsPending) > 0'), 'Muenba return-trip ghost encounters must use loud-only screams');
+assert(muenba.includes('loudOnly: Number(readMuenbaWeekly().orbsPending) > 0'), 'Muenba return-trip ghost encounters must use loud-only screams');
 assert(muenba.includes('loudOnly: captureSession.carryingEnergy === true'), 'Muenba danger retries and returns must preserve loud return-trip screams');
 assert(muenba.includes("startGhostScream(activeGhost, now, 'wrong-ghost')"), 'clicking a hostile ghost must enter the authored scream path');
 assert(muenba.includes("startGhostScream(g, now, 'sight')"), 'proximity anger must enter the authored scream path');
