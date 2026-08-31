@@ -3982,7 +3982,7 @@ const HAPPY_HOUSE_PORTAL = {
     // Same temporary-scaffold shape Muenba used before it shipped for
     // real: an independent build-ready flag on top of the shared weekly
     // gate, so real students can't wander in before the area is finished.
-    // See BoohaUnlockSystem.isGrimmerglenUnlocked() / GRIMMERGLEN_BUILD_READY.
+    // See BoohaUnlockSystem.isGrimmerglenUnlocked() for the shared weekly gate.
     if (window.__devGrimmerglen) return true;
     return window.BoohaUnlockSystem &&
       typeof BoohaUnlockSystem.isGrimmerglenUnlocked === 'function'
