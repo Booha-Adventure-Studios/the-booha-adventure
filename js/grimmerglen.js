@@ -108,6 +108,7 @@
     boohaTransformPoofUntil: 0,
     entryWelcomePending: false,
     navigationUnlocked: false,
+    helpAccepted: false,
     celebrating: false,
     celebrationStart: 0,
     celebrationTimer: 0,
@@ -1075,14 +1076,14 @@
           <p class="dp-line-en mg-memory-lead">${story ? 'I am trying to remember something...' : 'The memories are all safe now.'}</p>
           ${storyMarkup}
           <div class="dp-btns">
-            <button class="dp-btn yes" id="mg-help-btn">Help Marietta / ${furiJP('マリエッタを手伝う', MARIETTA_UI_READINGS)}</button>
+            <button class="dp-btn yes" id="mg-help-btn">I'll help Marietta! / ${furiJP('マリエッタを手伝う', MARIETTA_UI_READINGS)}</button>
             <button class="dp-btn no" id="mg-leave-btn">Leave Grimmerglen / ${furiJP('グリマーグレンを出る', MARIETTA_UI_READINGS)}</button>
           </div>
         </div>
       </div>`;
     const helpBtn = mariettaPanel.querySelector('#mg-help-btn');
     const leaveBtn = mariettaPanel.querySelector('#mg-leave-btn');
-    if (helpBtn) helpBtn.addEventListener('click', handleMariettaHelpChoice);
+    if (helpBtn) helpBtn.addEventListener('click', acceptMariettaHelp);
     if (leaveBtn) leaveBtn.addEventListener('click', () => { closeMariettaPanel(); returnToKarasuki(); });
   }
 
@@ -1646,9 +1647,10 @@
     renderMariettaQuestBriefing();
   }
 
-  // The quest briefing's help button routes into the existing tutorial
-  // decision. The introduction itself is now handled separately above.
-  function handleMariettaHelpChoice() {
+  // Pass 9C: the explicit help choice is the only doorway into the tutorial
+  // and the only state transition that can eventually unlock navigation.
+  function acceptMariettaHelp() {
+    state.helpAccepted = true;
     const t = getGrimmerglenTutorial();
     if (t.completed) {
       unlockGrimmerglenNavigation();
@@ -1688,6 +1690,7 @@
   }
 
   function unlockGrimmerglenNavigation() {
+    if (!state.helpAccepted) return;
     state.navigationUnlocked = true;
     state.entryWelcomePending = false;
     state.inputLocked = false;
