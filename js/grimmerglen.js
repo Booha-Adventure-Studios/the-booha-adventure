@@ -1370,6 +1370,7 @@
     if (!world.objectSlots || typeof world.objectSlots !== 'object' || Array.isArray(world.objectSlots)) world.objectSlots = {};
     if (world.activeTargetType === undefined) world.activeTargetType = null;
     if (world.carriedObjectId === undefined) world.carriedObjectId = null;
+    if (world.memoryQuestAccepted === undefined) world.memoryQuestAccepted = false;
     return world;
   }
 
@@ -1770,6 +1771,7 @@
   // is no longer a movement gate, so Booha can wander room_01 while deciding.
   function acceptMariettaHelp() {
     state.helpAccepted = true;
+    writeGrimmerglenWeekly({ memoryQuestAccepted: true });
     unlockGrimmerglenNavigation();
     const t = getGrimmerglenTutorial();
     const firstHelp = !t.skipPrompted && !t.completed;
@@ -1888,6 +1890,9 @@
     const exercise = DATA.memories?.[object.type]?.[tier];
     if (!exercise || !window.GrimmerglenTyping) return;
     const tierLabel = tier === 'start' ? 'STARTER MEMORY' : tier === 'case' ? 'CASE MEMORY' : 'DEEP MEMORY';
+    const recheckHTML = tier === 'deep'
+      ? `<div class="dp-btns mg-memory-recheck-wrap"><button class="dp-btn no mg-memory-recheck" id="mg-memory-see-again" type="button">Check again / ${furiJP('もう一度確認する', { '確認する': 'かくにんする' })}</button></div>`
+      : '';
     mariettaPanel.innerHTML = `
       <span class="dp-handle"></span>
       <div class="dp-inner mg-memory-inner">
@@ -1896,7 +1901,7 @@
           <p class="dp-name-kanji">Help Marietta remember her ${escapeHTML(object.label)} memory.</p>
           <div class="dp-divider"></div>
           <p class="dp-line-en">You found my ${escapeHTML(object.label)}! Help me remember:</p>
-          <div class="dp-btns"><button class="dp-btn no" id="mg-memory-see-again" type="button">See again / ${furiJP('もう一度見る', MARIETTA_UI_READINGS)}</button></div>
+          ${recheckHTML}
           <div id="mg-memory-exercise-mount"></div>
         </div>
       </div>`;
@@ -1966,6 +1971,13 @@
   function renderMariettaMemorySuccess(object, { memoryComplete = false } = {}) {
     const nextType = getActiveGrimmerglenTargetType();
     const nextStory = nextType && DATA.stories ? DATA.stories[nextType] : null;
+    const foundForMemory = Number(getGrimmerglenObjectsProgress()[object.type]?.found) || 0;
+    const remainingForMemory = Math.max(0, 3 - foundForMemory);
+    const remainingCue = !memoryComplete && remainingForMemory === 2
+      ? `<p class="mg-memory-remaining" role="status">Two more! / ${furiJP('あと二つ！', { '二つ': 'ふたつ' })}</p>`
+      : !memoryComplete && remainingForMemory === 1
+        ? `<p class="mg-memory-remaining" role="status">One more! / ${furiJP('あと一つ！', { '一つ': 'ひとつ' })}</p>`
+        : '';
     const nextHintHTML = !memoryComplete && nextStory
       ? `<p class="dp-line-en mg-memory-hint-en">${escapeHTML(nextStory.en)}</p><p class="dp-line-jp mg-memory-hint-jp">${furiJP(nextStory.jp, nextStory.readings)}</p>`
       : '';
@@ -1992,6 +2004,7 @@
             <div class="dp-divider"></div>
             <p class="dp-line-en">Thanks, but I forgot again! There are still more of this memory to find.</p>
             <p class="dp-line-jp">${furiJP('ありがとう。でも、また忘れちゃった！この記憶はまだ残っているよ。', { '忘れちゃった': 'わすれちゃった', '記憶': 'きおく', '残っている': 'のこっている' })}</p>
+            ${remainingCue}
             ${nextHintHTML}
             <div class="dp-btns">
               <button class="dp-btn yes" id="mg-memory-done" type="button">Keep exploring / 探し続ける</button>
@@ -2526,6 +2539,12 @@
       #grimmerglen-marietta-panel .mg-memory-lead{margin-top:10px!important;font-size:clamp(.94rem,2.1vw,1.08rem);font-weight:700;color:#a9548a!important;line-height:1.35;}
       #grimmerglen-marietta-panel .mg-memory-hint-en{font-size:clamp(.98rem,2.2vw,1.15rem);font-weight:700;line-height:1.4;margin:7px 0 3px;padding:8px 10px 5px;border-left:3px solid #ff9fc2;background:rgba(255,159,194,.1);}
       #grimmerglen-marietta-panel .mg-memory-hint-jp{font-size:clamp(.8rem,1.9vw,.96rem);line-height:1.55;margin:0;padding:3px 10px 8px;border-left:3px solid #ff9fc2;background:rgba(255,159,194,.1);}
+      #grimmerglen-marietta-panel .mg-memory-recheck-wrap{margin:2px 0 10px;justify-content:flex-start;}
+      #grimmerglen-marietta-panel .mg-memory-recheck{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:9px 16px;border:2px solid rgba(216,93,154,.62);border-radius:12px;color:#8a315f;background:linear-gradient(135deg,rgba(255,226,240,.98),rgba(255,246,211,.98));box-shadow:0 4px 0 rgba(216,93,154,.18),0 0 12px rgba(255,159,194,.24);font-weight:800;cursor:pointer;transition:transform .16s,box-shadow .16s,filter .16s;}
+      #grimmerglen-marietta-panel .mg-memory-recheck:hover,#grimmerglen-marietta-panel .mg-memory-recheck:focus-visible{transform:translateY(-2px);filter:saturate(1.08);box-shadow:0 6px 0 rgba(216,93,154,.18),0 0 18px rgba(255,159,194,.38);outline:none;}
+      #grimmerglen-marietta-panel .mg-memory-recheck:active{transform:translateY(1px);box-shadow:0 2px 0 rgba(216,93,154,.18),0 0 10px rgba(255,159,194,.25);}
+      #grimmerglen-marietta-panel .mg-memory-remaining{margin:10px 0 8px;padding:9px 12px;border:2px solid rgba(84,203,169,.4);border-radius:14px;background:linear-gradient(135deg,rgba(230,255,247,.92),rgba(255,255,255,.86));color:#2f8a72;font-size:clamp(1.16rem,3vw,1.48rem);font-weight:900;line-height:1.25;text-align:center;text-shadow:0 1px 0 #fff;box-shadow:0 5px 12px rgba(84,203,169,.12);}
+      #grimmerglen-marietta-panel .mg-memory-remaining ruby{ruby-position:over;} #grimmerglen-marietta-panel .mg-memory-remaining rt{font-size:.62em;color:#4ba98f;}
       #grimmerglen-marietta-panel .mg-memory-celebration{position:relative;text-align:center;padding-top:4px;}
       #grimmerglen-marietta-panel .mg-memory-celebration-stars{margin:0 0 6px;color:#e0559e;font-size:1.3rem;letter-spacing:.18em;text-shadow:0 0 14px rgba(255,159,194,.85);}
       #grimmerglen-marietta-panel .mg-memory-celebration-title{font-size:clamp(.84rem,1.9vw,1rem);font-weight:900;letter-spacing:.16em;color:#b04b88;margin:0 0 8px;}
