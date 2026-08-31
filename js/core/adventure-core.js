@@ -8,6 +8,7 @@ const BoohaAdventure = (() => {
   'use strict';
   const VERSION = '2.0.0';
   let _initialized = false;
+  let _weeklyRefreshScheduled = false;
 
   // ── Subsystem registry ────────────────────────────────────────────────────
   const _systems = {};
@@ -90,7 +91,31 @@ const BoohaAdventure = (() => {
     // for the background debounce if the student closes the page immediately.
     if (window.BoohaSync) BoohaSync.checkpoint('adventure');
 
-    document.dispatchEvent(new CustomEvent('booha:newWeek', { detail: { weekKey } }));
+    document.dispatchEvent(new CustomEvent('booha:newWeek', {
+      detail: { previousWeekKey: storedKey, weekKey }
+    }));
+  }
+
+  /**
+   * A page can be alive across the Sunday boundary. The save reset event lets
+   * individual surfaces repaint their small counters, but world scripts also
+   * hold seeded layouts and in-memory hunt caches. Reload once after the
+   * durable reset so every page starts from the same occurrence-scoped state.
+   * Hidden tabs wait for their normal visibility/pageshow check instead.
+   */
+  function _refreshLivePageAfterWeeklyReset(e) {
+    if (!e || !e.detail || !e.detail.weekKey || _weeklyRefreshScheduled) return;
+    if (typeof document !== 'undefined' && document.hidden) return;
+    if (!window.location || typeof window.location.reload !== 'function') return;
+
+    _weeklyRefreshScheduled = true;
+    setTimeout(() => {
+      _weeklyRefreshScheduled = false;
+      if (typeof document !== 'undefined' && document.hidden) return;
+      try { window.location.reload(); } catch (error) {
+        console.warn('[BoohaAdventure] Could not refresh after weekly reset:', error);
+      }
+    }, 0);
   }
 
   // ── Init ──────────────────────────────────────────────────────────────────
@@ -210,6 +235,7 @@ const BoohaAdventure = (() => {
     window.addEventListener('pageshow', _recheckWeeklyBoundary);
   }
   if (typeof document.addEventListener === 'function') {
+    document.addEventListener('booha:newWeek', _refreshLivePageAfterWeeklyReset);
     document.addEventListener('visibilitychange', () => {
       if (!document.hidden) _recheckWeeklyBoundary();
     });
