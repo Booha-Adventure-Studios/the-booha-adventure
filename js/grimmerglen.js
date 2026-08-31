@@ -1265,6 +1265,46 @@
     }
   }
 
+  function ensureWeeklyGrimmerglen(data) {
+    if (!data.weekly || typeof data.weekly !== 'object' || Array.isArray(data.weekly)) data.weekly = {};
+    if (!data.weekly.worlds || typeof data.weekly.worlds !== 'object' || Array.isArray(data.weekly.worlds)) data.weekly.worlds = {};
+    if (!data.weekly.worlds.grimmerglen || typeof data.weekly.worlds.grimmerglen !== 'object' || Array.isArray(data.weekly.worlds.grimmerglen)) data.weekly.worlds.grimmerglen = {};
+    const world = data.weekly.worlds.grimmerglen;
+    if (!world.objects || typeof world.objects !== 'object' || Array.isArray(world.objects)) world.objects = {};
+    if (!world.objectSlots || typeof world.objectSlots !== 'object' || Array.isArray(world.objectSlots)) world.objectSlots = {};
+    if (world.activeTargetType === undefined) world.activeTargetType = null;
+    if (world.carriedObjectId === undefined) world.carriedObjectId = null;
+    return world;
+  }
+
+  function loadGrimmerglenSave() {
+    try { return window.BoohaSaveFile ? window.BoohaSaveFile.load() : {}; }
+    catch (e) { console.error('[Grimmerglen] Full save read failed:', e); return {}; }
+  }
+
+  function readGrimmerglenWeekly() {
+    const data = loadGrimmerglenSave();
+    const world = ensureWeeklyGrimmerglen(data);
+    const root = data.grimmerglen;
+    // Old root counts are preserved as lifetime history. The first live
+    // occurrence after this migration starts with a fresh item hunt.
+    if (root && root.weeklyReplayInitialized !== true) {
+      root.weeklyReplayInitialized = true;
+      delete root.activeTargetType;
+      delete root.carriedObjectId;
+      try { if (window.BoohaSaveFile) window.BoohaSaveFile.save(data); } catch (_) {}
+    }
+    return world;
+  }
+
+  function writeGrimmerglenWeekly(patchObj) {
+    const data = loadGrimmerglenSave();
+    Object.assign(ensureWeeklyGrimmerglen(data), patchObj);
+    return window.BoohaSaveFile && typeof window.BoohaSaveFile.save === 'function'
+      ? window.BoohaSaveFile.save(data)
+      : false;
+  }
+
   function writeGrimmerglen(patchObj) {
     try {
       if (window.BoohaSaveFile && typeof window.BoohaSaveFile.patch === 'function') {
@@ -1312,8 +1352,7 @@
 
   function getGrimmerglenObjectsProgress() {
     if (objectProgressCache) return objectProgressCache;
-    const d = readGrimmerglen();
-    const stored = (d && typeof d.objects === 'object' && d.objects) || {};
+    const stored = readGrimmerglenWeekly().objects || {};
     const progress = {};
     (DATA.objectTypes || []).forEach(type => {
       const entry = stored[type];
@@ -1328,7 +1367,7 @@
 
   function getGrimmerglenObjectSlots() {
     if (objectSlotsCache) return objectSlotsCache;
-    const slots = readGrimmerglen().objectSlots;
+    const slots = readGrimmerglenWeekly().objectSlots;
     objectSlotsCache = slots && typeof slots === 'object' ? slots : {};
     return objectSlotsCache;
   }
@@ -1341,11 +1380,11 @@
     const unfinished = (DATA.objectTypes || []).filter(type => progress[type] && progress[type].found < 3);
     if (!unfinished.length) {
       activeTargetTypeCache = null;
-      if (readGrimmerglen().activeTargetType) writeGrimmerglen({ activeTargetType: null });
+      if (readGrimmerglenWeekly().activeTargetType) writeGrimmerglenWeekly({ activeTargetType: null });
       return null;
     }
 
-    const savedTarget = readGrimmerglen().activeTargetType;
+    const savedTarget = readGrimmerglenWeekly().activeTargetType;
     if (unfinished.includes(savedTarget)) {
       activeTargetTypeCache = savedTarget;
       return savedTarget;
@@ -1357,16 +1396,16 @@
     // is freshly chosen from the remaining unfinished memories.
     const nextTarget = unfinished[Math.floor(Math.random() * unfinished.length)];
     activeTargetTypeCache = nextTarget;
-    writeGrimmerglen({ activeTargetType: nextTarget });
+    writeGrimmerglenWeekly({ activeTargetType: nextTarget });
     return nextTarget;
   }
 
   function writeGrimmerglenCarriedObject(object) {
-    return writeGrimmerglen({ carriedObjectId: object ? object.id : null });
+    return writeGrimmerglenWeekly({ carriedObjectId: object ? object.id : null });
   }
 
   function restoreGrimmerglenCarriedObject() {
-    const savedId = readGrimmerglen().carriedObjectId;
+    const savedId = readGrimmerglenWeekly().carriedObjectId;
     const object = findGrimmerglenObjectById(savedId);
     if (!object) return;
     const progress = getGrimmerglenObjectsProgress();
@@ -1377,15 +1416,38 @@
   function writeGrimmerglenObjectFound(type, slotId) {
     if (!DATA.objectTypes || !DATA.objectTypes.includes(type)) return false;
     const progress = getGrimmerglenObjectsProgress();
-    const stored = {};
-    Object.keys(progress).forEach(t => { stored[t] = { found: progress[t].found }; });
-    stored[type] = { found: Math.min(3, progress[type].found + 1) };
-    const objectSlots = Object.assign({}, getGrimmerglenObjectSlots());
-    if (slotId) objectSlots[slotId] = true;
-    const ok = writeGrimmerglen({ objects: stored, objectSlots, carriedObjectId: null });
+    const weeklyStored = {};
+    Object.keys(progress).forEach(t => { weeklyStored[t] = { found: progress[t].found }; });
+    weeklyStored[type] = { found: Math.min(3, progress[type].found + 1) };
+    const weeklySlots = Object.assign({}, getGrimmerglenObjectSlots());
+    if (slotId) weeklySlots[slotId] = true;
+
+    const data = loadGrimmerglenSave();
+    if (!data.grimmerglen || typeof data.grimmerglen !== 'object') data.grimmerglen = {};
+    const lifetimeObjects = data.grimmerglen.objects && typeof data.grimmerglen.objects === 'object'
+      ? data.grimmerglen.objects : {};
+    const lifetimeStored = {};
+    (DATA.objectTypes || []).forEach(t => {
+      const found = Number.isInteger(lifetimeObjects[t]?.found) ? lifetimeObjects[t].found : 0;
+      lifetimeStored[t] = { found: Math.max(0, Math.min(3, found)) };
+    });
+    lifetimeStored[type] = { found: Math.min(3, lifetimeStored[type].found + 1) };
+    const lifetimeSlots = Object.assign({}, data.grimmerglen.objectSlots || {});
+    if (slotId) lifetimeSlots[slotId] = true;
+
+    const weekly = ensureWeeklyGrimmerglen(data);
+    weekly.objects = weeklyStored;
+    weekly.objectSlots = weeklySlots;
+    weekly.carriedObjectId = null;
+    data.grimmerglen.objects = lifetimeStored;
+    data.grimmerglen.objectSlots = lifetimeSlots;
+    data.grimmerglen.weeklyReplayInitialized = true;
+    const ok = window.BoohaSaveFile && typeof window.BoohaSaveFile.save === 'function'
+      ? window.BoohaSaveFile.save(data)
+      : false;
     if (ok) {
       objectProgressCache = null;
-      objectSlotsCache = objectSlots;
+      objectSlotsCache = weeklySlots;
       activeTargetTypeCache = null;
       carriedObject = null;
     }
