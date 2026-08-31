@@ -119,7 +119,9 @@ const CURRENT_CACHES = {
   // Pass 9B adds the later-week skip action and persists weekly seen/skip
   // state separately from the lifetime first-view marker.
   // Pass 9C makes the explicit help choice the tutorial/navigation gateway.
-  assets: 'booha-assets-2026-446',
+  // Grimmerglen guide polish: separate the memory hint and use word-level
+  // furigana so Japanese readings do not look like duplicate sentences.
+  assets: 'booha-assets-2026-447',
   decks:  'booha-decks-2026-310',
 };
 
