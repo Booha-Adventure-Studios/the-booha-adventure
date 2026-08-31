@@ -1863,6 +1863,7 @@
             <p id="mg-memory-replay-en"></p>
             <p id="mg-memory-replay-jp"></p>
           </div>
+          <div class="mg-memory-replay-scroll-cue" role="note" aria-label="Scroll down to close">↓ <span>Scroll down to close / ${furiJP('下へスクロール', { '下へ': 'したへ' })}</span> ↓</div>
           <div class="dp-btns">
             <button class="dp-btn no" id="mg-memory-replay-close" type="button">Close / ${furiJP('閉じる', MARIETTA_UI_READINGS)}</button>
           </div>
@@ -1917,7 +1918,6 @@
               <p class="mg-memory-celebration-copy">You did it! You found my memory! Thank you!</p>
               <p class="mg-memory-celebration-jp">${furiJP('できた！わたしの記憶を見つけてくれて、ありがとう！', { '記憶': 'きおく', '見つけてくれて': 'みつけてくれて' })}</p>
               <div class="dp-btns">
-                <button class="dp-btn no" id="mg-memory-see-again" type="button">See again / ${furiJP('もう一度見る', MARIETTA_UI_READINGS)}</button>
                 <button class="dp-btn yes" id="mg-memory-done" type="button">Let's dance! / ${furiJP('踊ろう！', MARIETTA_UI_READINGS)}</button>
               </div>
             </div>
@@ -2465,7 +2465,9 @@
       #grimmerglen-marietta-panel .mg-memory-celebration-copy{margin:8px 0 4px;color:#291507;font-size:clamp(1.16rem,3vw,1.55rem);font-weight:800;line-height:1.3;}
       #grimmerglen-marietta-panel .mg-memory-celebration-jp{margin:0 0 14px;color:#8c5c78;font-size:clamp(.9rem,2.2vw,1.08rem);line-height:1.6;}
       #grimmerglen-marietta-panel .mg-memory-celebration-jp rt{font-size:.62em;color:#aa6a91;}
-      #grimmerglen-marietta-panel .mg-memory-celebration .dp-btns{align-items:stretch;}
+      #grimmerglen-marietta-panel .mg-memory-celebration .dp-btns{align-items:stretch;justify-content:center;}
+      #grimmerglen-marietta-panel .mg-memory-celebration .dp-btn.yes{border:2px solid #8bc9ee;color:#1d5572;background:linear-gradient(135deg,#aee6ff,#d5f1ff 52%,#b9ddff);box-shadow:0 0 14px rgba(174,230,255,.92),0 0 32px rgba(174,230,255,.62),inset 0 0 14px rgba(255,255,255,.84);text-shadow:0 1px 0 rgba(255,255,255,.65);}
+      #grimmerglen-marietta-panel .mg-memory-celebration .dp-btn.yes:hover{filter:saturate(1.12) brightness(1.06);box-shadow:0 0 18px rgba(174,230,255,1),0 0 40px rgba(174,230,255,.72),inset 0 0 14px rgba(255,255,255,.9);}
       #grimmerglen-marietta-panel .mg-memory-replay{user-select:none;-webkit-user-select:none;}
       #grimmerglen-marietta-panel .mg-memory-replay-label{margin:8px 0 6px;color:#9a7850;font-size:.86rem;font-weight:700;}
       #grimmerglen-marietta-panel .mg-memory-replay-answer{min-height:150px;display:grid;align-content:center;gap:13px;margin:0 0 14px;padding:18px 16px;border:2px solid rgba(255,159,194,.48);border-radius:18px;background:linear-gradient(145deg,rgba(255,244,249,.96),rgba(238,229,255,.78));box-shadow:inset 0 0 25px rgba(255,255,255,.75),0 8px 24px rgba(184,164,255,.16);}
@@ -2473,6 +2475,11 @@
       #grimmerglen-marietta-panel .mg-memory-replay-answer p:first-child{font-size:clamp(1.18rem,3vw,1.62rem);font-weight:700;}
       #grimmerglen-marietta-panel .mg-memory-replay-answer p:last-child{color:#765737;font-size:clamp(.92rem,2.3vw,1.13rem);}
       #grimmerglen-marietta-panel .mg-memory-replay-answer rt{font-size:.62em;color:#a07851;}
+      #grimmerglen-marietta-panel .mg-memory-replay-scroll-cue{position:sticky;bottom:0;z-index:2;display:flex;align-items:center;justify-content:center;gap:9px;margin:0 -2px;padding:7px 10px 6px;border:1px solid rgba(255,159,194,.45);border-radius:999px;background:linear-gradient(180deg,rgba(255,248,252,.72),rgba(255,226,241,.97));color:#b04b88;font-size:clamp(.7rem,1.8vw,.82rem);font-weight:800;letter-spacing:.04em;text-align:center;box-shadow:0 -4px 12px rgba(255,255,255,.72),0 0 13px rgba(255,159,194,.25);animation:mgMemoryReplayScrollCue 1.5s ease-in-out infinite;}
+      #grimmerglen-marietta-panel .mg-memory-replay-scroll-cue span{display:inline-flex;flex-direction:column;line-height:1.2;}
+      #grimmerglen-marietta-panel .mg-memory-replay-scroll-cue rt{font-size:.62em;color:#aa6a91;}
+      @keyframes mgMemoryReplayScrollCue{0%,100%{transform:translateY(0);opacity:.86;}50%{transform:translateY(4px);opacity:1;}}
+      @media(prefers-reduced-motion:reduce){#grimmerglen-marietta-panel .mg-memory-replay-scroll-cue{animation:none;}}
       .mg-object-art-wrap{flex:0 0 clamp(68px,10vw,104px);width:clamp(68px,10vw,104px);height:clamp(68px,10vw,104px);display:grid;place-items:center;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.9),rgba(255,201,224,.28));box-shadow:0 0 24px rgba(184,164,255,.42);}
       .mg-object-art{display:block;width:92%;height:92%;object-fit:contain;filter:drop-shadow(0 5px 7px rgba(120,58,105,.2));}
       #grimmerglen-marietta-panel .mg-memory-inner,#grimmerglen-marietta-panel .mg-handoff-inner{align-items:center;}
