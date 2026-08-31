@@ -1007,30 +1007,25 @@
   // card the player sees on arrival, built on the shared utsu-card.js
   // parchment-card shell (the same .utsu-card/.dp-* system Utsuroba's
   // drifter panel and Karasuki's orb panel already use) rather than a
-  // sixth hand-copied popup. "Talk to Marietta" is a short placeholder
-  // reaction for now -- her real dialogue system (big-text drawer,
-  // typewriter reveal, the daydream/daymare lore) is pass 4; this pass
-  // only builds the choice card itself and the way back out, matching
-  // the plan doc's pass boundary.
+  // sixth hand-copied popup. The card owns the welcome, memory hint, and
+  // help handoff, while the return portal remains a separate confirmation.
   function furiJP(text, readings) {
     const renderer = window.UtsuFurigana && window.UtsuFurigana.sentence;
     return renderer ? renderer(text, readings || {}) : text;
   }
 
-  // Whole-phrase-to-whole-reading entries, same convention Utsuroba's own
-  // DRIFTER_UI_READINGS uses for short fixed UI copy (as opposed to the
-  // per-kanji-term maps long authored prose gets) -- these strings are
-  // static button/body text, not variable dialogue.
+  // Short UI readings use the same term-level convention as authored prose.
+  // Keeping each reading on its word prevents the ruby annotation from
+  // looking like a second copy of the whole Japanese sentence.
   const MARIETTA_UI_READINGS = {
-    'マリエッタと話す': 'マリエッタとはなす',
-    'グリマーグレンを出る': 'グリマーグレンをでる',
+    '来てくれて': 'きてくれて',
+    '嬉しい': 'うれしい',
+    '手伝う': 'てつだう',
+    '出る': 'でる',
     '閉じる': 'とじる',
-    'マリエッタは、あなたが来てくれてとても嬉しいです！': 'マリエッタは、あなたがきてくれてとてもうれしいです！',
-    'マリエッタは嬉しそうに揺れています…まだ話す準備ができていないみたい！':
-      'マリエッタはうれしそうにゆれています…まだはなすじゅんびができていないみたい！',
-    'カラスキに戻りますか？': 'カラスキにもどりますか？',
-    'ここからカラスキへ戻る道が開いています。': 'ここからカラスキへもどるみちがひらいています。',
-    'はい、戻る': 'はい、もどる',
+    '戻る': 'もどる',
+    '道': 'みち',
+    '今週': 'こんしゅう',
   };
 
   function buildMariettaPanel() {
@@ -1058,9 +1053,6 @@
     if (!mariettaPanel || !MARIETTA) return;
     const targetType = getActiveGrimmerglenTargetType();
     const story = targetType && DATA.stories ? DATA.stories[targetType] : null;
-    const storyMarkup = story
-      ? `<p class="dp-line-en mg-memory-story">${escapeHTML(story.en)}</p><p class="dp-line-jp mg-memory-story">${furiJP(story.jp, story.readings)}</p>`
-      : '<p class="dp-line-en mg-memory-story">Every daydream memory is safe now. Thank you!</p>';
     mariettaPanel.innerHTML = `
       <span class="dp-handle"></span>
       <div class="dp-inner">
@@ -1068,13 +1060,12 @@
           <div class="dp-portrait"><img src="${MARIETTA.poses[0]}" alt="Marietta"></div>
         </div>
         <div class="dp-body">
-          <p class="dp-name-en">GRIMMERGLEN GUIDE</p>
-          <p class="dp-name-kanji">Marietta <span style="font-weight:400;color:#9a7850;">・マリエッタ</span></p>
+          <p class="dp-name-en mg-guide-title">GRIMMERGLEN GUIDE</p>
+          <p class="dp-name-kanji mg-character-name">Marietta <span>・マリエッタ</span></p>
           <div class="dp-divider"></div>
-          <p class="dp-line-en">Marietta is so happy you're here!</p>
-          <p class="dp-line-jp">${furiJP('マリエッタは、あなたが来てくれてとても嬉しいです！', MARIETTA_UI_READINGS)}</p>
+          <p class="dp-line-en mg-welcome-en">Marietta is so happy you're here!</p>
+          <p class="dp-line-jp mg-welcome-jp">${furiJP('マリエッタは、あなたが来てくれてとても嬉しいです！', MARIETTA_UI_READINGS)}</p>
           <p class="dp-line-en mg-memory-lead">${story ? 'I am trying to remember something...' : 'The memories are all safe now.'}</p>
-          ${storyMarkup}
           <div class="dp-btns">
             <button class="dp-btn yes" id="mg-help-btn">I'll help Marietta! / ${furiJP('マリエッタを手伝う', MARIETTA_UI_READINGS)}</button>
             <button class="dp-btn no" id="mg-leave-btn">Leave Grimmerglen / ${furiJP('グリマーグレンを出る', MARIETTA_UI_READINGS)}</button>
@@ -1647,10 +1638,52 @@
     renderMariettaQuestBriefing();
   }
 
-  // Pass 9C: the explicit help choice is the only doorway into the tutorial
-  // and the only state transition that can eventually unlock navigation.
+  function renderMariettaMemoryHint(onConfirmed) {
+    if (!mariettaPanel || !MARIETTA) return;
+    const targetType = getActiveGrimmerglenTargetType();
+    const story = targetType && DATA.stories ? DATA.stories[targetType] : null;
+    if (!story) {
+      if (typeof onConfirmed === 'function') onConfirmed();
+      return;
+    }
+    mariettaPanel.innerHTML = `
+      <span class="dp-handle"></span>
+      <div class="dp-inner mg-hint-inner">
+        <div class="dp-portrait-wrap"><span class="dp-portrait-halo"></span>
+          <div class="dp-portrait"><img src="${MARIETTA.poses[0]}" alt="Marietta"></div>
+        </div>
+        <div class="dp-body">
+          <p class="dp-name-en mg-guide-title">MEMORY HINT</p>
+          <p class="dp-name-kanji mg-character-name">Marietta <span>・マリエッタ</span></p>
+          <div class="dp-divider"></div>
+          <p class="dp-line-en mg-memory-hint-en">${escapeHTML(story.en)}</p>
+          <p class="dp-line-jp mg-memory-hint-jp">${furiJP(story.jp, story.readings)}</p>
+          <div class="dp-btns">
+            <button class="dp-btn yes" id="mg-hint-ok-btn" type="button">OK! / わかった！</button>
+          </div>
+        </div>
+      </div>`;
+    mariettaPanel.querySelector('#mg-hint-ok-btn')?.addEventListener('click', () => {
+      if (typeof onConfirmed === 'function') onConfirmed();
+    });
+  }
+
+  // Pass 9C: the explicit help choice is the only doorway into the hint,
+  // tutorial, and the state transition that can eventually unlock navigation.
   function acceptMariettaHelp() {
     state.helpAccepted = true;
+    const t = getGrimmerglenTutorial();
+    const firstHelp = !t.skipPrompted && !t.completed;
+    if (firstHelp) {
+      writeGrimmerglenTutorial({ skipPrompted: true });
+    }
+    renderMariettaMemoryHint(() => {
+      if (firstHelp) startGrimmerglenTutorial();
+      else continueAfterMariettaHelp();
+    });
+  }
+
+  function continueAfterMariettaHelp() {
     const t = getGrimmerglenTutorial();
     if (t.completed) {
       unlockGrimmerglenNavigation();
@@ -2290,8 +2323,14 @@
       #grimmerglen-return-yes { background:linear-gradient(135deg,#ff8fc0,#ffd166); border:1px solid rgba(224,85,158,.7); color:#5a1638; }
       #grimmerglen-return-no { background:transparent; border:1px solid rgba(224,85,158,.4); color:#a9548a; }
       .utsu-card#grimmerglen-marietta-panel .dp-btn.no { color:#a9548a; border-color:rgba(224,85,158,.4); }
-      .mg-memory-lead{margin-top:10px!important;font-weight:700;color:#a9548a!important;}
-      .mg-memory-story{padding:7px 10px;border-left:3px solid #ff9fc2;background:rgba(255,159,194,.1);}
+      #grimmerglen-marietta-panel .mg-guide-title{font-size:clamp(.72rem,1.7vw,.86rem);font-weight:800;letter-spacing:.16em;color:#9a7850;margin-bottom:4px;}
+      #grimmerglen-marietta-panel .mg-character-name{font-size:clamp(1.15rem,2.8vw,1.45rem);font-weight:700;margin-bottom:4px;}
+      #grimmerglen-marietta-panel .mg-character-name span{font-weight:400;color:#9a7850;}
+      #grimmerglen-marietta-panel .mg-welcome-en{font-size:clamp(.98rem,2.3vw,1.16rem);font-weight:700;line-height:1.35;margin-bottom:3px;}
+      #grimmerglen-marietta-panel .mg-welcome-jp{font-size:clamp(.78rem,1.9vw,.94rem);color:#7c5a38;line-height:1.55;margin-bottom:8px;}
+      #grimmerglen-marietta-panel .mg-memory-lead{margin-top:10px!important;font-size:clamp(.94rem,2.1vw,1.08rem);font-weight:700;color:#a9548a!important;line-height:1.35;}
+      #grimmerglen-marietta-panel .mg-memory-hint-en{font-size:clamp(.98rem,2.2vw,1.15rem);font-weight:700;line-height:1.4;margin:7px 0 3px;padding:8px 10px 5px;border-left:3px solid #ff9fc2;background:rgba(255,159,194,.1);}
+      #grimmerglen-marietta-panel .mg-memory-hint-jp{font-size:clamp(.8rem,1.9vw,.96rem);line-height:1.55;margin:0;padding:3px 10px 8px;border-left:3px solid #ff9fc2;background:rgba(255,159,194,.1);}
       .mg-object-art-wrap{flex:0 0 clamp(68px,10vw,104px);width:clamp(68px,10vw,104px);height:clamp(68px,10vw,104px);display:grid;place-items:center;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.9),rgba(255,201,224,.28));box-shadow:0 0 24px rgba(184,164,255,.42);}
       .mg-object-art{display:block;width:92%;height:92%;object-fit:contain;filter:drop-shadow(0 5px 7px rgba(120,58,105,.2));}
       #grimmerglen-marietta-panel .mg-memory-inner,#grimmerglen-marietta-panel .mg-handoff-inner{align-items:center;}
