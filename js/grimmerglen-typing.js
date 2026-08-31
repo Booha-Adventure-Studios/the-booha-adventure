@@ -69,6 +69,8 @@
   //    OS-level accessibility tool can still get text in) ─────────────────
   function blockPaste(input) {
     input.addEventListener('paste', event => event.preventDefault());
+    input.addEventListener('copy', event => event.preventDefault());
+    input.addEventListener('cut', event => event.preventDefault());
     input.addEventListener('drop', event => event.preventDefault());
     input.addEventListener('beforeinput', event => {
       if (event.inputType === 'insertFromPaste' || event.inputType === 'insertFromDrop') {
@@ -193,7 +195,7 @@
       : '';
     const showChipsUpFront = hasOptions && ex.optionsVisible;
     const showHintToggle = hasOptions && !ex.optionsVisible;
-    const showFuriganaHelp = !hasOptions && ex.helpText;
+    const showFuriganaHelp = ex.helpText;
 
     container.innerHTML = `
       <div class="mgty-exercise">
