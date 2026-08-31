@@ -93,6 +93,7 @@ assert.deepStrictEqual(plain(migrated.weekly.worlds), {
     objectSlots: {},
     activeTargetType: null,
     carriedObjectId: null,
+    memoryQuestAccepted: false,
     mariettaIntroSeen: false,
     mariettaIntroSkipped: false,
   },
@@ -124,6 +125,7 @@ assert.deepStrictEqual(plain(stored.weekly.worlds.grimmerglen), {
   objectSlots: {},
   activeTargetType: null,
   carriedObjectId: null,
+  memoryQuestAccepted: false,
   mariettaIntroSeen: false,
   mariettaIntroSkipped: false,
 });
