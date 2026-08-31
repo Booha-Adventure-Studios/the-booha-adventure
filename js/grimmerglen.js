@@ -1047,6 +1047,9 @@
     mariettaPanel.addEventListener('click', event => {
       if (window.UtsuSfx && event.target.closest('.dp-btn')) window.UtsuSfx.buttonPress();
     });
+    ['copy', 'cut', 'paste'].forEach(type => {
+      mariettaPanel.addEventListener(type, event => event.preventDefault());
+    });
   }
 
   function renderMariettaQuestBriefing() {
@@ -1809,7 +1812,58 @@
     });
   }
 
-  function renderMariettaMemorySuccess(object) {
+  function renderMariettaMemoryReplay(object, memoryComplete) {
+    const exercise = DATA.memories?.[object.type]?.deep || {};
+    const answerEn = exercise.answerEn || exercise.accepted?.[0] || '';
+    const answerJp = exercise.answerJp || exercise.helpText || '';
+    const answerReadings = exercise.answerReadings || exercise.helpReadings || {};
+    mariettaPanel.innerHTML = `
+      <span class="dp-handle"></span>
+      <div class="dp-inner mg-memory-replay">
+        <div class="dp-portrait-wrap"><span class="dp-portrait-halo"></span><div class="dp-portrait"><img src="${MARIETTA.poses[0]}" alt="Marietta"></div></div>
+        <div class="dp-body">
+          <p class="dp-name-en mg-guide-title">MEMORY REPLAY</p>
+          <p class="dp-name-kanji mg-character-name">Marietta <span>・マリエッタ</span></p>
+          <div class="dp-divider"></div>
+          <p class="mg-memory-replay-label">Here is the sentence again:</p>
+          <div class="mg-memory-replay-answer" aria-live="polite">
+            <p id="mg-memory-replay-en"></p>
+            <p id="mg-memory-replay-jp"></p>
+          </div>
+          <div class="dp-btns">
+            <button class="dp-btn no" id="mg-memory-replay-close" type="button">Close / ${furiJP('閉じる', MARIETTA_UI_READINGS)}</button>
+          </div>
+        </div>
+      </div>`;
+
+    const enEl = mariettaPanel.querySelector('#mg-memory-replay-en');
+    const jpEl = mariettaPanel.querySelector('#mg-memory-replay-jp');
+    let cancelled = false;
+    const typeText = (element, text, render) => {
+      let index = 0;
+      const step = () => {
+        if (cancelled) return;
+        if (index <= text.length) {
+          render(element, text.slice(0, index));
+          if (index > 0 && text[index - 1] !== ' ') playMariettaTypeTick();
+          index += 1;
+          window.setTimeout(step, 38);
+        }
+      };
+      step();
+    };
+    typeText(enEl, answerEn, (element, text) => { element.textContent = text; });
+    window.setTimeout(() => {
+      if (cancelled) return;
+      typeText(jpEl, answerJp, (element, text) => { element.innerHTML = furiJP(text, answerReadings); });
+    }, Math.max(500, answerEn.length * 38 + 220));
+    mariettaPanel.querySelector('#mg-memory-replay-close')?.addEventListener('click', () => {
+      cancelled = true;
+      renderMariettaMemorySuccess(object, { memoryComplete });
+    });
+  }
+
+  function renderMariettaMemorySuccess(object, { memoryComplete = false } = {}) {
     const nextType = getActiveGrimmerglenTargetType();
     const nextStory = nextType && DATA.stories ? DATA.stories[nextType] : null;
     mariettaPanel.innerHTML = `
@@ -1820,13 +1874,20 @@
           <p class="dp-name-en">MEMORY SAVED</p>
           <p class="dp-name-kanji">Marietta <span style="font-weight:400;color:#9a7850;">・ありがとう！</span></p>
           <div class="dp-divider"></div>
-          <p class="dp-line-en">Thanks, but I forgot again! There are still more of this memory to find.</p>
-          <p class="dp-line-jp">${furiJP('ありがとう。でも、また忘れちゃった！この記憶はまだ残っているよ。', { '忘れちゃった': 'わすれちゃった', '記憶': 'きおく', '残っている': 'のこっている' })}</p>
-          ${nextStory ? '<p class="dp-line-en mg-memory-lead">Here is the next memory I am trying to remember.</p>' : '<p class="dp-line-en mg-memory-lead">All of my memories are safe now!</p>'}
-          <div class="dp-btns"><button class="dp-btn yes" id="mg-memory-done" type="button">Keep exploring / 探し続ける</button></div>
+          <p class="dp-line-en">${memoryComplete ? 'I remembered this memory!' : 'Thanks, but I forgot again! There are still more of this memory to find.'}</p>
+          <p class="dp-line-jp">${furiJP(memoryComplete ? 'この記憶を思い出した！' : 'ありがとう。でも、また忘れちゃった！この記憶はまだ残っているよ。', memoryComplete ? { '記憶': 'きおく', '思い出した': 'おもいだした' } : { '忘れちゃった': 'わすれちゃった', '記憶': 'きおく', '残っている': 'のこっている' })}</p>
+          ${nextStory ? `<p class="dp-line-en mg-memory-hint-en">${escapeHTML(nextStory.en)}</p><p class="dp-line-jp mg-memory-hint-jp">${furiJP(nextStory.jp, nextStory.readings)}</p>` : '<p class="dp-line-en mg-memory-lead">All of my memories are safe now!</p>'}
+          <div class="dp-btns">
+            ${memoryComplete ? '<button class="dp-btn yes" id="mg-memory-see-again" type="button">See again / もう一度見る</button>' : ''}
+            <button class="dp-btn ${memoryComplete ? 'no' : 'yes'}" id="mg-memory-done" type="button">${memoryComplete ? 'Keep exploring / 探し続ける' : 'Keep exploring / 探し続ける'}</button>
+          </div>
         </div>
       </div>`;
-    mariettaPanel.querySelector('#mg-memory-done')?.addEventListener('click', closeMariettaPanel);
+    mariettaPanel.querySelector('#mg-memory-see-again')?.addEventListener('click', () => renderMariettaMemoryReplay(object, memoryComplete));
+    mariettaPanel.querySelector('#mg-memory-done')?.addEventListener('click', () => {
+      if (memoryComplete) startGrimmerglenCelebration();
+      else closeMariettaPanel();
+    });
   }
 
   function finishGrimmerglenCelebration() {
@@ -1870,8 +1931,7 @@
     }
     handoffObject = null;
     const memoryComplete = getGrimmerglenObjectsProgress()[object.type]?.found >= 3;
-    if (memoryComplete) startGrimmerglenCelebration();
-    else renderMariettaMemorySuccess(object);
+    renderMariettaMemorySuccess(object, { memoryComplete });
   }
 
   function handleMariettaGiveItem() {
@@ -2348,6 +2408,13 @@
       #grimmerglen-marietta-panel .mg-memory-lead{margin-top:10px!important;font-size:clamp(.94rem,2.1vw,1.08rem);font-weight:700;color:#a9548a!important;line-height:1.35;}
       #grimmerglen-marietta-panel .mg-memory-hint-en{font-size:clamp(.98rem,2.2vw,1.15rem);font-weight:700;line-height:1.4;margin:7px 0 3px;padding:8px 10px 5px;border-left:3px solid #ff9fc2;background:rgba(255,159,194,.1);}
       #grimmerglen-marietta-panel .mg-memory-hint-jp{font-size:clamp(.8rem,1.9vw,.96rem);line-height:1.55;margin:0;padding:3px 10px 8px;border-left:3px solid #ff9fc2;background:rgba(255,159,194,.1);}
+      #grimmerglen-marietta-panel .mg-memory-replay{user-select:none;-webkit-user-select:none;}
+      #grimmerglen-marietta-panel .mg-memory-replay-label{margin:8px 0 6px;color:#9a7850;font-size:.86rem;font-weight:700;}
+      #grimmerglen-marietta-panel .mg-memory-replay-answer{min-height:150px;display:grid;align-content:center;gap:13px;margin:0 0 14px;padding:18px 16px;border:2px solid rgba(255,159,194,.48);border-radius:18px;background:linear-gradient(145deg,rgba(255,244,249,.96),rgba(238,229,255,.78));box-shadow:inset 0 0 25px rgba(255,255,255,.75),0 8px 24px rgba(184,164,255,.16);}
+      #grimmerglen-marietta-panel .mg-memory-replay-answer p{margin:0;color:#281507;line-height:1.45;word-break:normal;}
+      #grimmerglen-marietta-panel .mg-memory-replay-answer p:first-child{font-size:clamp(1.18rem,3vw,1.62rem);font-weight:700;}
+      #grimmerglen-marietta-panel .mg-memory-replay-answer p:last-child{color:#765737;font-size:clamp(.92rem,2.3vw,1.13rem);}
+      #grimmerglen-marietta-panel .mg-memory-replay-answer rt{font-size:.62em;color:#a07851;}
       .mg-object-art-wrap{flex:0 0 clamp(68px,10vw,104px);width:clamp(68px,10vw,104px);height:clamp(68px,10vw,104px);display:grid;place-items:center;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.9),rgba(255,201,224,.28));box-shadow:0 0 24px rgba(184,164,255,.42);}
       .mg-object-art{display:block;width:92%;height:92%;object-fit:contain;filter:drop-shadow(0 5px 7px rgba(120,58,105,.2));}
       #grimmerglen-marietta-panel .mg-memory-inner,#grimmerglen-marietta-panel .mg-handoff-inner{align-items:center;}

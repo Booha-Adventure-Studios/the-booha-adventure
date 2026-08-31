@@ -204,12 +204,15 @@
         promptEn: 'Type the sentence you remember.',
         promptJp: '思い出した文をタイプしてね。',
         promptReadings: { '思い出した': 'おもいだした', '文': 'ぶん' },
-        accepted: [item.target.replace(/[.!?]+$/, '')]
+        accepted: [item.target.replace(/[.!?]+$/, '')],
+        answerEn: item.target,
+        answerJp: item.jp,
+        answerReadings: item.readings
       };
       exercises[type] = {
         start: Object.assign({}, base, { options: item.full, optionsVisible: true }),
         case: Object.assign({}, base, { options: item.partial, optionsVisible: true }),
-        deep: Object.assign({}, base, { options: null, optionsVisible: false, helpText: item.jp, helpReadings: item.readings })
+        deep: Object.assign({}, base, { options: [item.partial[0]], optionsVisible: true, helpText: item.jp, helpReadings: item.readings })
       };
     });
     return exercises;
