@@ -7,7 +7,7 @@
 const CURRENT_CACHES = {
   // Profile consolidation Pass 1: ship the canonical progress page and its
   // moved progress renderer to returning players.
-  pages:  'booha-pages-2026-377',
+  pages:  'booha-pages-2026-378',
   // js/ is served cache-first (see ASSET_PREFIXES below), so once a device
   // caches a script it never re-fetches it until this string changes.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
@@ -104,6 +104,8 @@ const CURRENT_CACHES = {
   // room navigation/Marietta placement.
   // Grimmerglen entry-audio pass: the recorded Booha transformation cue is
   // normalized to compact 44.1 kHz mono 112 kbps MP3 and trimmed to 3 seconds.
+  // Calendar occurrence-key pass (2026-08-31): preserve Week 4 content while
+  // distinguishing a fifth Sunday-started weekly occurrence.
   // Grimmerglen visual polish: room-01 is object-free, room-12 is refreshed,
   // collectibles are smaller, and room-colored vignette leaves are live.
   assets: 'booha-assets-2026-439',
