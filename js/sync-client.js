@@ -193,6 +193,9 @@ window.BoohaSync = (() => {
     const w = d.weekly || {};
     if (w.completedGames && Object.keys(w.completedGames).length) return false;
     if (w.drifterQuest) return false;
+    if (w.worlds?.utsuroba?.drifterQuest) return false;
+    if (w.worlds?.utsuroba?.drifters && Object.keys(w.worlds.utsuroba.drifters).length) return false;
+    if (w.worlds?.utsuroba?.readingChallenge) return false;
     if (d.collection && (d.collection.wanderers || []).length) return false;
     if (d.unlocks && Object.keys(d.unlocks).length) return false;
     return true;
