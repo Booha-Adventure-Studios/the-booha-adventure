@@ -698,6 +698,13 @@ else
   bad "Grimmerglen Pass 8 audit failed"
 fi
 
+echo "[82/82] Calendar fifth-week audit"
+if node tests/calendar-week-audit.cjs >/dev/null 2>&1; then
+  ok "Calendar Sunday boundary and repeat-week occurrence contracts pass"
+else
+  bad "Calendar fifth-week audit failed"
+fi
+
 # ── Summary ──────────────────────────────────────────────────
 echo "───────────────────────────────────"
 echo "✅ $PASS passed   ⚠️  $WARN warnings   ❌ $FAIL failed"
