@@ -95,9 +95,9 @@ const HAPPY_HOUSE_PORTAL = {
     href    : "muenba.html?from=karasuki",
   };
 
-  // Grimmerglen — foundation pass 2. No intro video yet (none has been
-  // authored); the portal fades to black and navigates directly, the same
-  // stopgap shape Muenba's own portal used before its video existed.
+  // Grimmerglen is a live weekly output-world entrance. No intro video is
+  // needed for this doorway; it fades to black and navigates directly like
+  // the other active world entrances.
   const GRIMMERGLEN_PORTAL = {
     roomId: "room_14",
     x     : 799,
@@ -3971,12 +3971,14 @@ const HAPPY_HOUSE_PORTAL = {
   /* ═══════════════════════════════════════════
      GRIMMERGLEN PORTAL
   ═══════════════════════════════════════════ */
-  // Foundation pass 2: the portal itself (dim while locked, a glowing
-  // pastel arrow once open) and the Karasuki-side gate popup. Marietta's
+  // Release pass: the portal itself (a visibly dulled arrow while locked, a
+  // glowing/sparkling pastel arrow once open) and the Karasuki-side gate
+  // popup. Marietta's
   // own welcome popup inside Grimmerglen, her dialogue, and the typing
   // engine are later passes -- this popup only decides whether the door
   // opens, the same scope Utsuroba/Muenba's own portal popups have here.
   const GRIMMERGLEN_ARROW_COLORS = ['#ff9fc2', '#ffe066', '#8fd0ff', '#b8a4ff', '#8fe6c4'];
+  const GRIMMERGLEN_LOCKED_ARROW = '#98929f';
 
   function grimmerglenUnlocked() {
     // Same temporary-scaffold shape Muenba used before it shipped for
@@ -3999,9 +4001,8 @@ const HAPPY_HOUSE_PORTAL = {
     const cy = GRIMMERGLEN_PORTAL.y;
 
     if (!unlocked) {
-      // "A dim area sitting there" -- quiet and muted, not eerie-dark like
-      // Muenba's locked haze, since Grimmerglen stays a cute world even
-      // while sealed.
+      // Keep a recognizable but unmistakably dulled arrow in place so the
+      // player can discover the entrance and open its locked-world popup.
       const pulse = 0.5 + 0.5 * Math.sin(sec * 1.1);
       ctx.save();
       const haze = ctx.createRadialGradient(cx, cy, 2, cx, cy, 58);
@@ -4010,6 +4011,18 @@ const HAPPY_HOUSE_PORTAL = {
       ctx.globalAlpha = moveReveal * (0.18 + pulse * 0.07);
       ctx.fillStyle = haze;
       ctx.beginPath(); ctx.arc(cx, cy, 58, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+
+      ctx.save(); ctx.translate(cx, cy); ctx.rotate(-Math.PI / 2);
+      [{ ox: -11, a: 0.48 }, { ox: 4, a: 0.74 }].forEach(({ ox, a }) => {
+        ctx.globalAlpha = moveReveal * a * (0.5 + pulse * 0.16);
+        ctx.strokeStyle = GRIMMERGLEN_LOCKED_ARROW;
+        ctx.lineWidth = 3.4; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+        ctx.beginPath(); ctx.moveTo(ox - 7, -10); ctx.lineTo(ox + 7, 0); ctx.lineTo(ox - 7, 10); ctx.stroke();
+      });
+      ctx.globalAlpha = moveReveal * (0.32 + pulse * 0.1);
+      ctx.fillStyle = '#d0c8d3';
+      ctx.beginPath(); ctx.arc(0, 0, 5.5, 0, Math.PI * 2); ctx.fill();
       ctx.restore();
       return;
     }
@@ -4047,6 +4060,26 @@ const HAPPY_HOUSE_PORTAL = {
     ctx.globalAlpha = 0.7 + pulse * 0.3; ctx.fillStyle = '#fff';
     ctx.shadowBlur = 22; ctx.shadowColor = arrowCol1;
     ctx.beginPath(); ctx.arc(0, 0, 6.5, 0, Math.PI * 2); ctx.fill();
+    // Tiny rotating glints make the open doorway feel alive without making
+    // the arrow itself larger or harder to read.
+    [
+      { x: -34, y: -24, phase: .1, size: 3.2 },
+      { x: 30, y: -27, phase: 1.5, size: 2.6 },
+      { x: -39, y: 20, phase: 2.7, size: 2.3 },
+      { x: 36, y: 18, phase: 4.1, size: 3.0 },
+      { x: 4, y: -42, phase: 5.2, size: 2.1 }
+    ].forEach(glint => {
+      const shimmer = 0.28 + 0.72 * (0.5 + 0.5 * Math.sin(sec * 2.8 + glint.phase));
+      ctx.globalAlpha = shimmer * (0.42 + pulse * 0.38);
+      ctx.fillStyle = glint.phase % 2 > 1 ? arrowCol2 : '#fff';
+      ctx.shadowBlur = 13; ctx.shadowColor = arrowCol1;
+      ctx.beginPath();
+      ctx.moveTo(glint.x, glint.y - glint.size);
+      ctx.lineTo(glint.x + glint.size * .42, glint.y);
+      ctx.lineTo(glint.x, glint.y + glint.size);
+      ctx.lineTo(glint.x - glint.size * .42, glint.y);
+      ctx.closePath(); ctx.fill();
+    });
     ctx.shadowBlur = 0; ctx.restore();
   }
 
