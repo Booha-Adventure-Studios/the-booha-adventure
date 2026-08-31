@@ -77,6 +77,48 @@
     return Array.isArray(record?.completed) ? record.completed : [];
   }
 
+  function defaultWeeklyDrifterRecord() {
+    return {
+      completedModes: { start: [], fresh: [], deep: [] },
+      statusByMode: {},
+      wrong: false,
+    };
+  }
+
+  function ensureWeeklyUtsuroba(data) {
+    if (!data.weekly || typeof data.weekly !== 'object' || Array.isArray(data.weekly)) data.weekly = {};
+    if (!data.weekly.worlds || typeof data.weekly.worlds !== 'object' || Array.isArray(data.weekly.worlds)) data.weekly.worlds = {};
+    if (!data.weekly.worlds.utsuroba || typeof data.weekly.worlds.utsuroba !== 'object' || Array.isArray(data.weekly.worlds.utsuroba)) data.weekly.worlds.utsuroba = {};
+    const world = data.weekly.worlds.utsuroba;
+    if (world.drifterQuest === undefined) world.drifterQuest = null;
+    if (!world.drifters || typeof world.drifters !== 'object' || Array.isArray(world.drifters)) world.drifters = {};
+    if (world.readingChallenge === undefined) world.readingChallenge = null;
+    return world;
+  }
+
+  function weeklyDrifterRecord(id, data = null, create = false) {
+    const world = ensureWeeklyUtsuroba(data || loadSave());
+    let record = world.drifters[id];
+    if (!record || typeof record !== 'object' || Array.isArray(record)) {
+      if (!create) return defaultWeeklyDrifterRecord();
+      record = defaultWeeklyDrifterRecord();
+      world.drifters[id] = record;
+    }
+    if (!record.completedModes || typeof record.completedModes !== 'object' || Array.isArray(record.completedModes)) record.completedModes = {};
+    UTSUROBA_MEMORY_MODES.forEach(mode => {
+      if (!Array.isArray(record.completedModes[mode])) record.completedModes[mode] = [];
+    });
+    if (!record.statusByMode || typeof record.statusByMode !== 'object' || Array.isArray(record.statusByMode)) record.statusByMode = {};
+    if (typeof record.wrong !== 'boolean') record.wrong = false;
+    return record;
+  }
+
+  function weeklyCompletedForMode(record, mode) {
+    const normalizedMode = readingMode(mode);
+    const byMode = record && record.completedModes && record.completedModes[normalizedMode];
+    return Array.isArray(byMode) ? byMode : [];
+  }
+
   function isProfileEntry() {
     try { return new URLSearchParams(window.location.search).get('from') === 'profile'; }
     catch (_) { return false; }
@@ -369,26 +411,67 @@
     });
 
     /* ── Weekly drifter tracking ─────────────────────────────
-       Completed memories and readingEchoes stay permanent. A week key is
-       used only to make the already-completed memory available for one
-       replay per new curriculum week. An unfinished quest from an older
-       week cannot block the fresh weekly loop. */
+       Completed memories, readingEchoes, the journal, and the word cabinet
+       stay permanent. Quest progress, wrong-answer lockouts, and the
+       per-occurrence drifter completion lane live under weekly.worlds so a
+       rollover can make every drifter playable again. */
     try {
       if (window.CALENDAR?.getCurrentCurriculumWeek) {
         const cw = CALENDAR.getCurrentCurriculumWeek();
         const wk = curriculumWeekKey(cw);
+        const world = ensureWeeklyUtsuroba(data);
         if (data.utsuroba.driftersWeekKey !== wk) {
           data.utsuroba.driftersWeekKey = wk;
           dirty = true;
         }
-        if (data.weekly.drifterQuest && data.weekly.drifterQuest.weekKey &&
-            data.weekly.drifterQuest.weekKey !== wk) {
-          data.weekly.drifterQuest = null;
-          dirty = true;
-        } else if (data.weekly.drifterQuest && !data.weekly.drifterQuest.weekKey) {
-          data.weekly.drifterQuest.weekKey = wk;
+        const legacyQuest = data.weekly.drifterQuest;
+        if (!world.drifterQuest && legacyQuest &&
+            (!legacyQuest.weekKey || legacyQuest.weekKey === wk)) {
+          world.drifterQuest = legacyQuest;
           dirty = true;
         }
+        if (world.drifterQuest && world.drifterQuest.weekKey && world.drifterQuest.weekKey !== wk) {
+          world.drifterQuest = null;
+          dirty = true;
+        } else if (world.drifterQuest && !world.drifterQuest.weekKey) {
+          world.drifterQuest.weekKey = wk;
+          dirty = true;
+        }
+        if (data.weekly.drifterQuest !== undefined) {
+          delete data.weekly.drifterQuest;
+          dirty = true;
+        }
+
+        const legacyChallenge = data.weekly.readingChallenge;
+        if (!world.readingChallenge && legacyChallenge &&
+            (!legacyChallenge.weekKey || legacyChallenge.weekKey === wk)) {
+          world.readingChallenge = legacyChallenge;
+          dirty = true;
+        }
+        if (data.weekly.readingChallenge !== undefined) {
+          delete data.weekly.readingChallenge;
+          dirty = true;
+        }
+
+        Object.entries(data.utsuroba.drifters).forEach(([id, record]) => {
+          if (!record || typeof record !== 'object') return;
+          const weeklyRecord = weeklyDrifterRecord(id, data, true);
+          const mode = readingMode(record.lastQuestMode || 'deep');
+          if (record.lastQuestWeek === wk &&
+              ['active', 'complete', 'resting'].includes(record.weeklyStatus) &&
+              !weeklyRecord.statusByMode[mode]) {
+            weeklyRecord.statusByMode[mode] = record.weeklyStatus;
+            dirty = true;
+          }
+          if (record.wrongWeek === wk && !weeklyRecord.wrong) {
+            weeklyRecord.wrong = true;
+            dirty = true;
+          }
+          if (record.wrongWeek !== undefined) {
+            delete record.wrongWeek;
+            dirty = true;
+          }
+        });
       }
     } catch (_) {}
     
@@ -398,7 +481,7 @@
       delete data.weekly.utsurobaVisited;
       dirty = true;
     }
-    const q = data.weekly.drifterQuest;
+    const q = ensureWeeklyUtsuroba(data).drifterQuest;
     if (q && q.collectedMemKey !== undefined && q.collectedMemoryId === undefined) {
       q.collectedMemoryId = q.collectedMemKey;
       delete q.collectedMemKey;
@@ -435,11 +518,15 @@
      invalidate it immediately whenever this module writes progress. */
   let _drifterStateCache = null;
   let _drifterStateCacheAt = 0;
+  let _weeklyDrifterStateCache = null;
+  let _weeklyDrifterStateCacheAt = 0;
   const DRIFTER_STATE_CACHE_MS = 250;
 
   function invalidateDrifterStateCache() {
     _drifterStateCache = null;
     _drifterStateCacheAt = 0;
+    _weeklyDrifterStateCache = null;
+    _weeklyDrifterStateCacheAt = 0;
   }
 
   function getCachedDrifterState() {
@@ -451,11 +538,20 @@
     return _drifterStateCache;
   }
 
+  function getCachedWeeklyDrifterState() {
+    const now = performance.now();
+    if (!_weeklyDrifterStateCache || now - _weeklyDrifterStateCacheAt > DRIFTER_STATE_CACHE_MS) {
+      _weeklyDrifterStateCache = ensureWeeklyUtsuroba(loadSave());
+      _weeklyDrifterStateCacheAt = now;
+    }
+    return _weeklyDrifterStateCache;
+  }
+
   let _cachedQuest = null, _cachedQuestTime = 0;
   function getCachedQuest() {
     const now = performance.now();
     if (now - _cachedQuestTime > 500) {
-      _cachedQuest      = loadSave().weekly?.drifterQuest || null;
+      _cachedQuest      = ensureWeeklyUtsuroba(loadSave()).drifterQuest || null;
       _cachedQuestTime  = now;
     }
     return _cachedQuest;
@@ -567,8 +663,16 @@
   }
 
   function drifterWeekStatus(id, mode = currentReadingMode()) {
-    const record = drifterRecord(id);
     const normalizedMode = readingMode(mode);
+    const weeklyWorld = getCachedWeeklyDrifterState();
+    const weeklyRecord = weeklyDrifterRecord(id, { weekly: { worlds: { utsuroba: weeklyWorld } } }, false);
+    const weeklyStatus = weeklyRecord.statusByMode?.[normalizedMode];
+    if (['active', 'complete', 'resting'].includes(weeklyStatus)) return weeklyStatus;
+
+    // Compatibility fallback for an old save that could not be migrated
+    // before this page read it. These fields are legacy and are no longer
+    // written; the weekly bucket is authoritative once present.
+    const record = drifterRecord(id);
     if (record.lastQuestWeekByMode?.[normalizedMode] === getWeekSeed()) {
       return record.weeklyStatusByMode?.[normalizedMode] || null;
     }
@@ -589,13 +693,8 @@
     const normalizedMode = readingMode(mode);
     const data = loadSave();
     if (!data.utsuroba.drifters[id]) data.utsuroba.drifters[id] = { completed: [], completedModes: {} };
-    if (!data.utsuroba.drifters[id].weeklyStatusByMode) data.utsuroba.drifters[id].weeklyStatusByMode = {};
-    if (!data.utsuroba.drifters[id].lastQuestWeekByMode) data.utsuroba.drifters[id].lastQuestWeekByMode = {};
-    data.utsuroba.drifters[id].lastQuestWeek = getWeekSeed();
-    data.utsuroba.drifters[id].lastQuestMode = normalizedMode;
-    data.utsuroba.drifters[id].weeklyStatus = status;
-    data.utsuroba.drifters[id].lastQuestWeekByMode[normalizedMode] = getWeekSeed();
-    data.utsuroba.drifters[id].weeklyStatusByMode[normalizedMode] = status;
+    const weeklyRecord = weeklyDrifterRecord(id, data, true);
+    weeklyRecord.statusByMode[normalizedMode] = status;
     const ok = writeSave(data);
     if (ok) invalidateDrifterStateCache();
     if (ok && window.BoohaSync) BoohaSync.checkpoint('adventure');
@@ -609,7 +708,10 @@
     const d    = DATA.drifters.find(x => x.id === id);
     if (!d) return false;
     const mode = currentReadingMode();
-    /* A completed memory is replayable once per new curriculum week. */
+    /* The lifetime memory record decides which authored memory is available;
+       the weekly status bucket decides whether this drifter can be played in
+       the current occurrence. A completed memory is replayable once per new
+       curriculum week. */
     return drifterHasUnfinishedMemory(id, utsu, mode) || !!completedForMode(drifterRecord(id, utsu), mode).length;
   }
   function pickRandomMemory(id, mode = currentReadingMode()) {
@@ -629,8 +731,8 @@
     const memIdx = pickRandomMemory(id, mode); if (memIdx === null) return null;
     const drifter = DATA.drifters.find(d => d.id === id);
     const data   = loadSave();
-    if (!data.weekly) data.weekly = {};
-    data.weekly.drifterQuest = {
+    const world = ensureWeeklyUtsuroba(data);
+    world.drifterQuest = {
       active           : id,
       state            : 'accepted',
       weekKey          : getWeekSeed(),
@@ -647,41 +749,32 @@
       orbIsCorrect     : false,
     };
     if (!data.utsuroba.drifters[id]) data.utsuroba.drifters[id] = { completed: [], completedModes: {} };
-    if (!data.utsuroba.drifters[id].completedModes) data.utsuroba.drifters[id].completedModes = {};
-    if (!Array.isArray(data.utsuroba.drifters[id].completedModes[mode])) data.utsuroba.drifters[id].completedModes[mode] = [];
-    if (!data.utsuroba.drifters[id].weeklyStatusByMode) data.utsuroba.drifters[id].weeklyStatusByMode = {};
-    if (!data.utsuroba.drifters[id].lastQuestWeekByMode) data.utsuroba.drifters[id].lastQuestWeekByMode = {};
-    data.utsuroba.drifters[id].lastQuestWeek = getWeekSeed();
-    data.utsuroba.drifters[id].lastQuestMode = mode;
-    data.utsuroba.drifters[id].weeklyStatus = 'active';
-    data.utsuroba.drifters[id].lastQuestWeekByMode[mode] = getWeekSeed();
-    data.utsuroba.drifters[id].weeklyStatusByMode[mode] = 'active';
+    weeklyDrifterRecord(id, data, true).statusByMode[mode] = 'active';
     const ok = writeSave(data);
     invalidateQuestCache();
     if (ok) invalidateDrifterStateCache();
     if (ok && window.BoohaSync) BoohaSync.checkpoint('adventure');
-    return ok ? data.weekly.drifterQuest : null;
+    return ok ? world.drifterQuest : null;
   }
 
   function completeMemory(id, memIdx) {
     const data = loadSave();
-    const quest = data.weekly?.drifterQuest;
+    const world = ensureWeeklyUtsuroba(data);
+    const quest = world.drifterQuest;
     const mode = readingMode(quest?.readingDifficulty || currentReadingMode());
     if (!data.utsuroba.drifters[id]) data.utsuroba.drifters[id] = { completed: [], completedModes: {} };
     if (!Array.isArray(data.utsuroba.drifters[id].completed)) data.utsuroba.drifters[id].completed = [];
     if (!data.utsuroba.drifters[id].completedModes || typeof data.utsuroba.drifters[id].completedModes !== 'object') data.utsuroba.drifters[id].completedModes = {};
     if (!Array.isArray(data.utsuroba.drifters[id].completedModes[mode])) data.utsuroba.drifters[id].completedModes[mode] = [];
-    if (!data.utsuroba.drifters[id].weeklyStatusByMode) data.utsuroba.drifters[id].weeklyStatusByMode = {};
-    if (!data.utsuroba.drifters[id].lastQuestWeekByMode) data.utsuroba.drifters[id].lastQuestWeekByMode = {};
     if (!data.utsuroba.drifters[id].completedModes[mode].includes(memIdx))
       data.utsuroba.drifters[id].completedModes[mode].push(memIdx);
     if (!data.utsuroba.drifters[id].completed.includes(memIdx))
       data.utsuroba.drifters[id].completed.push(memIdx);
-    data.utsuroba.drifters[id].lastQuestWeek = getWeekSeed();
-    data.utsuroba.drifters[id].lastQuestMode = mode;
-    data.utsuroba.drifters[id].weeklyStatus = 'complete';
-    data.utsuroba.drifters[id].lastQuestWeekByMode[mode] = getWeekSeed();
-    data.utsuroba.drifters[id].weeklyStatusByMode[mode] = 'complete';
+    const weeklyRecord = weeklyDrifterRecord(id, data, true);
+    if (!weeklyCompletedForMode(weeklyRecord, mode).includes(memIdx)) {
+      weeklyRecord.completedModes[mode].push(memIdx);
+    }
+    weeklyRecord.statusByMode[mode] = 'complete';
     if (quest && quest.active === id && quest.memIdx === memIdx && quest.episodeId) {
       // Fresh Memory / Deep Memory: record which tier the student actually
       // read, so the journal/profile can stay accurate even if they switch
@@ -781,7 +874,7 @@
       if (!Number.isInteger(data.utsuroba.memoriesRestoredTotal) || data.utsuroba.memoriesRestoredTotal < 0) data.utsuroba.memoriesRestoredTotal = 0;
       data.utsuroba.memoriesRestoredTotal += 1;
     }
-    if (data.weekly) data.weekly.drifterQuest = null;
+    world.drifterQuest = null;
     const ok = writeSave(data);
     invalidateQuestCache();
     if (ok) invalidateDrifterStateCache();
@@ -791,7 +884,7 @@
 
   function clearQuest() {
     const data = loadSave();
-    if (data.weekly) data.weekly.drifterQuest = null;
+    ensureWeeklyUtsuroba(data).drifterQuest = null;
     const ok = writeSave(data); invalidateQuestCache();
     if (ok) invalidateDrifterStateCache();
   }
@@ -817,13 +910,12 @@
   function markDrifterWrong(id) {
     const data = loadSave();
     if (!data.utsuroba.drifters[id]) data.utsuroba.drifters[id] = { completed: [] };
-    data.utsuroba.drifters[id].wrongWeek = getWeekSeed();
+    weeklyDrifterRecord(id, data, true).wrong = true;
     const ok = writeSave(data);
     if (ok) invalidateDrifterStateCache();
   }
   function drifterIsWrong(id) {
-    const utsu = getCachedDrifterState();
-    return (utsu.drifters?.[id]?.wrongWeek ?? -1) === getWeekSeed();
+    return weeklyDrifterRecord(id, { weekly: { worlds: { utsuroba: getCachedWeeklyDrifterState() } } }, false).wrong === true;
   }
 
   /* ═══════════════════════════════════════════
@@ -1297,7 +1389,7 @@
     document.getElementById('buki-dev-shadows').addEventListener('change', function() { shadowsEnabled = this.checked; });
     document.getElementById('buki-dev-clear-quest').addEventListener('click', () => {
       const data = loadSave();
-      if (data.weekly) data.weekly.drifterQuest = null;
+      ensureWeeklyUtsuroba(data).drifterQuest = null;
       writeSave(data); invalidateQuestCache();
     });
     document.getElementById('buki-dev-clear-all').addEventListener('click', () => {
@@ -1753,11 +1845,11 @@
     const data = loadSave();
     const weekKey = readingWeekKey();
     if (!weekKey) return { data, state: null };
-    if (!data.weekly) data.weekly = {};
-    let state = data.weekly.readingChallenge;
+    const world = ensureWeeklyUtsuroba(data);
+    let state = world.readingChallenge;
     if (!state || state.weekKey !== weekKey) {
       state = { weekKey, evidenceUsed: false, postcardSaved: false, lensReplayed: false, completedAt: null };
-      data.weekly.readingChallenge = state;
+      world.readingChallenge = state;
       writeSave(data);
     }
     return { data, state };
@@ -2469,9 +2561,9 @@
 
   function persistQuestPatch(patch) {
     const data = loadSave();
-    if (!data.weekly) data.weekly = {};
-    if (!data.weekly.drifterQuest) return false;
-    Object.assign(data.weekly.drifterQuest, patch);
+    const world = ensureWeeklyUtsuroba(data);
+    if (!world.drifterQuest) return false;
+    Object.assign(world.drifterQuest, patch);
     const ok = writeSave(data);
     invalidateQuestCache();
     return ok;
