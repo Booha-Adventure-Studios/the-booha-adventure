@@ -156,9 +156,16 @@ window.QuestionBlitz = (() => {
     }
   }
 
-  // Weekly bucket keyed off curriculum week (monthSlug + weekNumber),
-  // resolved upstream by calendar.js. Stays in lockstep with booha_save.
+  // Weekly bucket is keyed off the exact curriculum-week occurrence. A fifth
+  // Sunday occurrence keeps Week 4's content, but must get a fresh bucket.
   function makeWeekId(monthSlug, weekNumber) {
+    try {
+      const cw = window.CALENDAR?.getCurrentCurriculumWeek?.();
+      if (cw && cw.monthSlug === monthSlug && cw.weekNumber === weekNumber) {
+        const key = window.CALENDAR.getCurriculumWeekOccurrenceKey?.(cw) || cw.occurrenceKey;
+        if (key) return key;
+      }
+    } catch (_) {}
     return `${monthSlug}:w${weekNumber}`;
   }
 

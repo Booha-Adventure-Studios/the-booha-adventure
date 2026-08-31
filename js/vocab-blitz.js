@@ -165,10 +165,16 @@ const SCOLDS = [
     }
   }
 
-  // Weekly bucket is keyed off the curriculum week (monthSlug + weekNumber),
-  // which calendar.js already resolved upstream. Keeps the blitz reset in
-  // lockstep with the main booha_save week — no raw date arithmetic.
+  // Weekly bucket is keyed off the exact curriculum-week occurrence. A fifth
+  // Sunday occurrence keeps Week 4's content, but must get a fresh bucket.
   function makeWeekId(monthSlug, weekNumber) {
+    try {
+      const cw = window.CALENDAR?.getCurrentCurriculumWeek?.();
+      if (cw && cw.monthSlug === monthSlug && cw.weekNumber === weekNumber) {
+        const key = window.CALENDAR.getCurriculumWeekOccurrenceKey?.(cw) || cw.occurrenceKey;
+        if (key) return key;
+      }
+    } catch (_) {}
     return `${monthSlug}:w${weekNumber}`;
   }
 

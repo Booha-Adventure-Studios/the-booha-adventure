@@ -712,6 +712,13 @@ else
   bad "Weekly rollover audit failed"
 fi
 
+echo "[84/84] Weekly occurrence consumer audit"
+if node tests/weekly-occurrence-consumers-audit.cjs >/dev/null 2>&1; then
+  ok "All weekly consumers distinguish repeated Week 4 occurrences"
+else
+  bad "Weekly occurrence consumer audit failed"
+fi
+
 # ── Summary ──────────────────────────────────────────────────
 echo "───────────────────────────────────"
 echo "✅ $PASS passed   ⚠️  $WARN warnings   ❌ $FAIL failed"

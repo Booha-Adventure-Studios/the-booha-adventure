@@ -1678,7 +1678,8 @@ const PILLS = [
   const cw     = getCurrentCurriculumWeek();
 
    
-  const weekId = `${cw.monthSlug}:w${cw.weekNumber}`;
+  const weekId = CALENDAR.getCurriculumWeekOccurrenceKey?.(cw) || cw.occurrenceKey ||
+    `${cw.monthSlug}:w${cw.weekNumber}`;
 
   PILLS.forEach(({ type, label }) => {
     const btn = document.createElement('button');
