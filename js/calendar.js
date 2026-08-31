@@ -8,6 +8,7 @@
 //     window.CALENDAR.getCurrentCurriculumWeek()
 //     window.CALENDAR.getAcademicWeekNumber(cw)
 //     window.CALENDAR.getAcademicWeekKey(cw)
+//     window.CALENDAR.getCurriculumWeekOccurrenceKey(cw)
 //
 // Rule:
 // - Weeks start on Sunday
@@ -91,6 +92,7 @@ function resolveCurriculumWeek(year, month, day) {
   return {
     anchorYear,
     anchorMonth,
+    rawWeek,
     weekNumber: Math.max(1, Math.min(rawWeek, 4)),
     weekStart,
     weekEnd
@@ -102,14 +104,20 @@ function getCurrentCurriculumWeek(now) {
   const tokyo  = getTokyoDateParts(now);
   const result = resolveCurriculumWeek(tokyo.year, tokyo.month, tokyo.day);
   const monthIndex = result.anchorMonth - 1;
+  const weekId = MONTHS[monthIndex] + '-w' + result.weekNumber;
+  const weekStart = formatDateUTC(result.weekStart);
   return {
     year:        result.anchorYear,
     month:       result.anchorMonth,
     monthSlug:   MONTHS[monthIndex],
     monthLabel:  MONTH_LABELS[monthIndex],
     weekNumber:  result.weekNumber,
-    weekId:      MONTHS[monthIndex] + '-w' + result.weekNumber,
-    weekStart:   formatDateUTC(result.weekStart),
+    weekId,
+    // A fifth calendar occurrence keeps Week 4's content identity, but its
+    // Sunday start is a distinct weekly state boundary.
+    isRepeatWeek: result.rawWeek > 4,
+    occurrenceKey: `${weekStart}|${weekId}`,
+    weekStart,
     weekEnd:     formatDateUTC(result.weekEnd)
   };
 }
@@ -125,6 +133,12 @@ function getAcademicWeekKey(curriculumWeek) {
   return 'w' + String(n).padStart(2, '0');
 }
 
+function getCurriculumWeekOccurrenceKey(curriculumWeek) {
+  const cw = curriculumWeek || getCurrentCurriculumWeek();
+  if (cw && cw.occurrenceKey) return cw.occurrenceKey;
+  return `${cw.weekStart}|${cw.weekId}`;
+}
+
 /* ── Expose on window.CALENDAR (plain-script safe, no ES module needed) ── */
   
 function getTodayKey(now) {
@@ -136,6 +150,7 @@ window.CALENDAR = {
   getCurrentCurriculumWeek: getCurrentCurriculumWeek,
   getAcademicWeekNumber:    getAcademicWeekNumber,
   getAcademicWeekKey:       getAcademicWeekKey,
+  getCurriculumWeekOccurrenceKey: getCurriculumWeekOccurrenceKey,
   getTodayKey:              getTodayKey
 };
 
