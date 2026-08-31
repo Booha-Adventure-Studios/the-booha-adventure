@@ -37,15 +37,19 @@ const BoohaAdventure = (() => {
 
   // ── Weekly reset key ──────────────────────────────────────────────────────
   /**
-   * Returns a string like "2026-march-w3" using window.CALENDAR.
-   * This key changes every Monday (new week = new key).
+   * Returns the calendar occurrence key, such as
+   * "2026-08-30|august-w4". The content identity remains Week 4 during a
+   * fifth Sunday-started occurrence, but the occurrence itself is new.
    * If CALENDAR isn't loaded yet, returns null — reset is skipped safely.
    */
   function _getWeekKey() {
     try {
       if (!window.CALENDAR) return null;
       const cw = window.CALENDAR.getCurrentCurriculumWeek();
-      return `${cw.year}-${cw.monthSlug}-w${cw.weekNumber}`;
+      if (typeof window.CALENDAR.getCurriculumWeekOccurrenceKey === 'function') {
+        return window.CALENDAR.getCurriculumWeekOccurrenceKey(cw);
+      }
+      return cw.occurrenceKey || `${cw.weekStart}|${cw.year}-${cw.monthSlug}-w${cw.weekNumber}`;
     } catch (e) {
       console.warn('[BoohaAdventure] Could not read week key:', e);
       return null;
@@ -74,18 +78,17 @@ const BoohaAdventure = (() => {
 
     console.log(`[BoohaAdventure] New week detected: ${storedKey} → ${weekKey}. Resetting weekly data.`);
 
-    // Reset weekly section
-    saveFile.resetWeekly();
-
-    // Save the new week key into meta
-    const updated = saveFile.load();
-    if (!updated.meta) updated.meta = {};
-    updated.meta.lastWeeklyKey = weekKey;
-    const saved = saveFile.save(updated);
+    // Reset all weekly state and stamp the new occurrence in one durable save.
+    // If the write fails, leave the old key in place so the next boot retries.
+    const saved = saveFile.resetWeekly(weekKey);
+    if (!saved) {
+      console.error('[BoohaAdventure] Weekly reset could not be saved; will retry.');
+      return;
+    }
 
     // Weekly rollover is a durable boundary: do not leave the reset waiting
     // for the background debounce if the student closes the page immediately.
-    if (saved && window.BoohaSync) BoohaSync.checkpoint('adventure');
+    if (window.BoohaSync) BoohaSync.checkpoint('adventure');
 
     document.dispatchEvent(new CustomEvent('booha:newWeek', { detail: { weekKey } }));
   }
