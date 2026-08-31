@@ -1754,6 +1754,9 @@ const PILLS = [
   } else {
     initPillsWhenEnginesReady();
   }
+  document.addEventListener('booha:weeklyReset', () => {
+    if (window.VocabBlitz && window.SentenceBlitz && window.QuestionBlitz) renderPills();
+  });
 
   const weekCards = document.getElementById('weekCards');
 
