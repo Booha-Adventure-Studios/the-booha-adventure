@@ -419,6 +419,16 @@ const HAPPY_HOUSE_PORTAL = {
 
   function invalidateQuestCache() { _questCacheAt = 0; }
 
+  function weeklyUtsurobaState(data) {
+    if (!data.weekly || typeof data.weekly !== 'object' || Array.isArray(data.weekly)) data.weekly = {};
+    if (!data.weekly.worlds || typeof data.weekly.worlds !== 'object' || Array.isArray(data.weekly.worlds)) data.weekly.worlds = {};
+    if (!data.weekly.worlds.utsuroba || typeof data.weekly.worlds.utsuroba !== 'object' || Array.isArray(data.weekly.worlds.utsuroba)) data.weekly.worlds.utsuroba = {};
+    if ((data.weekly.worlds.utsuroba.drifterQuest === undefined || data.weekly.worlds.utsuroba.drifterQuest === null) && data.weekly.drifterQuest) {
+      data.weekly.worlds.utsuroba.drifterQuest = data.weekly.drifterQuest || null;
+    }
+    return data.weekly.worlds.utsuroba;
+  }
+
   function loadDrifterQuest() {
     const now = performance.now();
     if (_questCacheAt && (now - _questCacheAt) < QUEST_CACHE_MS) return _questCache;
@@ -426,7 +436,7 @@ const HAPPY_HOUSE_PORTAL = {
       const data = (window.BoohaAdventure && BoohaAdventure.save)
         ? BoohaAdventure.save.load()
         : null;
-      _questCache   = (data && data.weekly && data.weekly.drifterQuest) || null;
+      _questCache   = data ? (weeklyUtsurobaState(data).drifterQuest || data.weekly?.drifterQuest || null) : null;
       _questCacheAt = now;
       return _questCache;
     } catch (e) {
@@ -442,9 +452,9 @@ const HAPPY_HOUSE_PORTAL = {
         return false;
       }
       const data = BoohaAdventure.save.load();
-      if (!data.weekly)              data.weekly              = {};
-      if (!data.weekly.drifterQuest) data.weekly.drifterQuest = {};
-      Object.assign(data.weekly.drifterQuest, patch);
+      const world = weeklyUtsurobaState(data);
+      if (!world.drifterQuest) world.drifterQuest = {};
+      Object.assign(world.drifterQuest, patch);
       const ok = BoohaAdventure.save.save(data);
       invalidateQuestCache();
       if (!ok) console.error('[Karasuki] Quest write BLOCKED — no identity.');
@@ -4395,7 +4405,7 @@ const HAPPY_HOUSE_PORTAL = {
       try {
         if (window.BoohaAdventure && BoohaAdventure.save) {
           const data = BoohaAdventure.save.load();
-          if (data.weekly) data.weekly.drifterQuest = null;
+          weeklyUtsurobaState(data).drifterQuest = null;
           BoohaAdventure.save.save(data);
           invalidateQuestCache();
         }
