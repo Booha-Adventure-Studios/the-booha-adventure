@@ -97,7 +97,7 @@ assert.deepStrictEqual(data.marietta && { x: data.marietta.x, y: data.marietta.y
 assert(data.rooms.room_10 && data.rooms.room_11 && data.rooms.room_12 && data.rooms.room_13 && data.rooms.room_14 && data.rooms.room_15, 'the six themed room expansion entries must exist');
 assert.strictEqual(data.rooms.room_04.exits.find(exit => exit.dir === 'right').x, 1142, 'room_04 right exit must use the measured x coordinate');
 assert.strictEqual(data.rooms.room_08.exits.find(exit => exit.dir === 'right').y, 456, 'room_08 right exit must use the measured y coordinate');
-assert.strictEqual(data.rooms.room_09.exits.find(exit => exit.dir === 'up').y, 234, 'room_09 up exit must use the measured y coordinate');
+assert.strictEqual(data.rooms.room_09.exits.find(exit => exit.dir === 'up').y, 292, 'room_09 up exit must use the latest measured y coordinate');
 
 const scripts = [
   'js/calendar.js', 'js/core/adventure-core.js', 'js/core/save-file.js',
@@ -163,7 +163,7 @@ assert(serviceWorker.includes('grimmerglen/dance/marietta_dance_'), 'service wor
 assert(serviceWorker.includes('grimmerglen/dance/booha_grimmerglen_dance_'), 'service worker must precache Booha dance art');
 assert(serviceWorker.includes('room_${String(index + 1).padStart(2, \'0\')}.webp'), 'service worker must cover the generated room sequence');
 assert(serviceWorker.includes('${BASE}/assets/img/grimmerglen/booha_change.mp3'), 'service worker must precache the Booha change cue');
-assert(/assets:\s+'booha-assets-2026-450'/.test(serviceWorker), 'asset cache must be bumped for the Marietta help-gating pass');
+assert(/assets:\s+'booha-assets-2026-451'/.test(serviceWorker), 'asset cache must be bumped for the Marietta help-gating pass');
 
 assert(profile.includes('GRIMMERGLEN / MEMORY CASE FILE'), 'profile must use the Grimmerglen case-file header');
 assert(profile.includes('grimmerglen-data.js'), 'profile must load the Grimmerglen manifest');
