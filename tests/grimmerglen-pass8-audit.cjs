@@ -138,6 +138,10 @@ assert(runtimeSource.includes('navigationUnlocked'), 'room navigation must have 
 assert(runtimeSource.includes('if (!state.navigationUnlocked) return;'), 'exit arrows must stay hidden until Marietta help is accepted');
 assert(runtimeSource.includes('if (state.entryWelcomePending) return;'), 'entry must allow only the Marietta interaction before help');
 assert(runtimeSource.includes('unlockGrimmerglenNavigation'), 'Marietta help decision must unlock room navigation');
+assert(runtimeSource.includes('renderMariettaDialogue(finishMariettaIntroduction)'), 'first Marietta click must open the introduction before the quest briefing');
+assert(runtimeSource.includes('writeGrimmerglenWeekly({ mariettaIntroSeen: true })'), 'Marietta introduction must be recorded in weekly state');
+assert(runtimeSource.includes('id="mg-help-btn"'), 'quest briefing must expose the explicit help action');
+assert(runtimeSource.includes('renderMariettaQuestBriefing'), 'introduction must advance into the quest briefing');
 assert(!runtimeSource.includes('openMariettaPanelAfterEntry();'), 'Marietta popup must not auto-open on entry');
 assert(runtimeSource.includes('renderMariettaHandoff'), 'Marietta must receive carried objects before the quiz');
 assert(runtimeSource.includes('renderMariettaWrongItem'), 'wrong items must be rejected and returned to the hunt');
@@ -163,7 +167,7 @@ assert(serviceWorker.includes('grimmerglen/dance/marietta_dance_'), 'service wor
 assert(serviceWorker.includes('grimmerglen/dance/booha_grimmerglen_dance_'), 'service worker must precache Booha dance art');
 assert(serviceWorker.includes('room_${String(index + 1).padStart(2, \'0\')}.webp'), 'service worker must cover the generated room sequence');
 assert(serviceWorker.includes('${BASE}/assets/img/grimmerglen/booha_change.mp3'), 'service worker must precache the Booha change cue');
-assert(/assets:\s+'booha-assets-2026-443'/.test(serviceWorker), 'asset cache must be bumped for the help-gated navigation pass');
+assert(/assets:\s+'booha-assets-2026-444'/.test(serviceWorker), 'asset cache must be bumped for the Marietta popup-order pass');
 
 assert(profile.includes('GRIMMERGLEN / MEMORY CASE FILE'), 'profile must use the Grimmerglen case-file header');
 assert(profile.includes('grimmerglen-data.js'), 'profile must load the Grimmerglen manifest');
