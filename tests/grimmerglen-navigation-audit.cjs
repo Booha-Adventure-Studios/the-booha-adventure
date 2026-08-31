@@ -45,6 +45,24 @@ for (const [roomId, expectedExits] of Object.entries(expected)) {
   }
 }
 
+const measured = {
+  room_01: { up: [792, 312], right: [1205, 512] },
+  room_07: { up: [736, 286] },
+  room_10: { up: [782, 287], right: [1155, 524] },
+  room_11: { up: [747, 344], left: [491, 540] },
+  room_13: { right: [1186, 507] }
+};
+for (const [roomId, exits] of Object.entries(measured)) {
+  for (const [direction, [x, y]] of Object.entries(exits)) {
+    const actual = data.rooms[roomId].exits.find(exit => exit.dir === direction);
+    assert(actual, `${roomId} must retain its ${direction} exit`);
+    assert.deepStrictEqual([actual.x, actual.y], [x, y], `${roomId} ${direction} exit must use the updated measured coordinates`);
+  }
+}
+
+assert(data.rooms.room_14.bg.endsWith('/room_14.webp'), 'room_14 must use the available WebP background');
+assert(fs.existsSync(path.join(root, data.rooms.room_14.bg)), 'room_14 WebP background must exist on disk');
+
 assert(runtimeSource.includes("const MARIETTA_RETURN_PORTAL = { roomId: 'room_01'"),
   'the Karasuki return exit must be anchored in room_01');
 assert(runtimeSource.includes('function drawExitArrows(now)'), 'runtime must render room arrows from room data');
