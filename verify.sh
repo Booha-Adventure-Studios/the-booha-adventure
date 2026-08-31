@@ -698,28 +698,35 @@ else
   bad "Grimmerglen Pass 8 audit failed"
 fi
 
-echo "[82/82] Calendar fifth-week audit"
+echo "[82/82] Grimmerglen Pass 9B audit"
+if node tests/grimmerglen-pass9b-audit.cjs >/dev/null 2>&1; then
+  ok "Grimmerglen weekly introduction gating contracts pass"
+else
+  bad "Grimmerglen Pass 9B audit failed"
+fi
+
+echo "[83/83] Calendar fifth-week audit"
 if node tests/calendar-week-audit.cjs >/dev/null 2>&1; then
   ok "Calendar Sunday boundary and repeat-week occurrence contracts pass"
 else
   bad "Calendar fifth-week audit failed"
 fi
 
-echo "[83/83] Weekly rollover audit"
+echo "[84/84] Weekly rollover audit"
 if node tests/weekly-rollover-audit.cjs >/dev/null 2>&1; then
   ok "Occurrence-based weekly reset and permanent-state preservation pass"
 else
   bad "Weekly rollover audit failed"
 fi
 
-echo "[85/85] Weekly occurrence consumer audit"
+echo "[86/86] Weekly occurrence consumer audit"
 if node tests/weekly-occurrence-consumers-audit.cjs >/dev/null 2>&1; then
   ok "All weekly consumers distinguish repeated Week 4 occurrences"
 else
   bad "Weekly occurrence consumer audit failed"
 fi
 
-echo "[86/86] Weekly boundary refresh audit"
+echo "[87/87] Weekly boundary refresh audit"
 if node tests/weekly-boundary-refresh-audit.cjs >/dev/null 2>&1; then
   ok "Live page-boundary rollover resets exactly once"
 else

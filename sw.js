@@ -116,7 +116,9 @@ const CURRENT_CACHES = {
   // collectibles are smaller, and room-colored vignette leaves are live.
   // Grimmerglen Pass 9A: Marietta's weekly introduction now precedes the
   // quest briefing, with the existing help decision following it.
-  assets: 'booha-assets-2026-444',
+  // Pass 9B adds the later-week skip action and persists weekly seen/skip
+  // state separately from the lifetime first-view marker.
+  assets: 'booha-assets-2026-445',
   decks:  'booha-decks-2026-310',
 };
 
