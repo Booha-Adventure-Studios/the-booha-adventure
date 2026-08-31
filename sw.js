@@ -121,7 +121,7 @@ const CURRENT_CACHES = {
   // Pass 9C makes the explicit help choice the tutorial/navigation gateway.
   // Grimmerglen guide polish: separate the memory hint and use word-level
   // furigana so Japanese readings do not look like duplicate sentences.
-  assets: 'booha-assets-2026-455',
+  assets: 'booha-assets-2026-456',
   decks:  'booha-decks-2026-310',
 };
 
