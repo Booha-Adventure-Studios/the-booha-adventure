@@ -1489,7 +1489,8 @@ function playBgMusic(){
   const progress = { vocab: false, sentences: false, questions: false };
   try {
     const cw     = getCurrentCurriculumWeek();
-    const weekId = `${cw.monthSlug}:w${cw.weekNumber}`;
+    const weekId = CALENDAR.getCurriculumWeekOccurrenceKey?.(cw) || cw.occurrenceKey ||
+      `${cw.monthSlug}:w${cw.weekNumber}`;
     const save   = (window.BoohaAdventure && BoohaAdventure.save)
       ? BoohaAdventure.save.load()
       : {};

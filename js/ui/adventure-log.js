@@ -125,6 +125,12 @@ const BoohaAdventureLog = (() => {
     return e;
   }
 
+  function formatPastWeekLabel(key) {
+    const match = String(key).match(/^(\d{4})-(\d{2})-(\d{2})\|([a-z]+)-w(\d+)$/);
+    if (!match) return String(key).slice(5);
+    return `${match[4].slice(0, 3).toUpperCase()} ${Number(match[3])} · W${match[5]}`;
+  }
+
   const CURR_LABELS = {
     pb: { en: 'Pre-Boo', jp: 'プレブー' },
     br: { en: 'Boo-riculum', jp: 'ブーカリキュラム' },
@@ -363,7 +369,7 @@ const BoohaAdventureLog = (() => {
         badge = el('div', 'alog-past-seal missed');
         badge.appendChild(el('div', 'alog-past-pct', '未'));
       }
-      badge.appendChild(el('div', 'alog-past-week', k.slice(5)));
+      badge.appendChild(el('div', 'alog-past-week', formatPastWeekLabel(k)));
       strip.appendChild(badge);
     });
     mount.appendChild(strip);
