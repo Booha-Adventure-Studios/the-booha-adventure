@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 
-// Pass 9F: memory returns keep the next clue visible, and the final return
+// Pass 9F: memory returns keep the next clue visible, and memory writing
 // offers a replayable English/furigana sentence without clipboard shortcuts.
 const assert = require('assert');
 const fs = require('fs');
@@ -21,10 +21,6 @@ assert(!success.includes('Here is the next memory I am trying to remember.'),
   'partial memory returns must not use the generic next-memory sentence');
 assert(success.includes('nextStory.en') && success.includes('nextStory.jp'),
   'partial memory returns must repeat the next memory hint in both languages');
-assert(success.includes('id="mg-memory-see-again"'),
-  'the final returned memory must include a See again action');
-assert(success.includes('renderMariettaMemoryReplay(object, memoryComplete)'),
-  'See again must open the memory replay');
 assert(success.includes('if (memoryComplete) startGrimmerglenCelebration();'),
   'the existing final-memory celebration must remain available after the card');
 

@@ -10,6 +10,10 @@ const start = script.indexOf('function renderMariettaMemorySuccess(');
 const end = script.indexOf('function finishGrimmerglenCelebration(', start);
 assert(start >= 0 && end > start, 'final memory success renderer must remain discoverable');
 const success = script.slice(start, end);
+const replayStart = script.indexOf('function renderMariettaMemoryReplay(');
+const replayEnd = script.indexOf('function renderMariettaMemorySuccess(', replayStart);
+assert(replayStart >= 0 && replayEnd > replayStart, 'memory replay renderer must remain discoverable');
+const replay = script.slice(replayStart, replayEnd);
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -22,9 +26,11 @@ assert(success.includes('mg-memory-celebration-stars'), 'final card must include
 assert(success.includes('mg-memory-celebration-copy'), 'final card must style the celebration copy');
 assert(success.includes('mg-memory-celebration-jp'), 'final card must style the Japanese translation');
 assert(success.includes("Let's dance! / ${furiJP('踊ろう！', MARIETTA_UI_READINGS)}"), 'final card must offer a furigana Let’s dance action');
-assert(success.includes('id="mg-memory-see-again"'), 'final card must retain the See again action');
-assert(success.includes('renderMariettaMemoryReplay(object, memoryComplete)'), 'See again must reopen the typewriter replay');
+assert(!success.includes('id="mg-memory-see-again"'), 'final Let’s dance card must not offer See again');
 assert(success.includes('startGrimmerglenCelebration()'), 'Let’s dance must launch the existing dance celebration');
+assert(replay.includes('mg-memory-replay-scroll-cue'), 'memory replay must include a visible scroll cue');
+assert(replay.includes('Scroll down to close'), 'scroll cue must explain how to reach Close');
+assert(replay.includes('id="mg-memory-replay-close"'), 'memory replay must retain its Close action');
 assert(success.includes('const nextHintHTML = !memoryComplete && nextStory'), 'next hint markup must be limited to unfinished memories');
 assert(!success.includes('I remembered this memory!'), 'final card must not fall back to the ordinary memory-saved copy');
 assert(verify.includes('tests/grimmerglen-pass9h-audit.cjs'), 'verify.sh must run the Pass 9H final-card audit');
