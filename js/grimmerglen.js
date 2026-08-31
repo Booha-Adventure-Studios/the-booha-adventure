@@ -1026,6 +1026,8 @@
     '戻る': 'もどる',
     '道': 'みち',
     '今週': 'こんしゅう',
+    'もう一度': 'もういちど',
+    '見る': 'みる',
   };
 
   function buildMariettaPanel() {
@@ -1802,9 +1804,13 @@
           <p class="dp-name-kanji">Help Marietta remember her ${escapeHTML(object.label)} memory.</p>
           <div class="dp-divider"></div>
           <p class="dp-line-en">You found my ${escapeHTML(object.label)}! Help me remember:</p>
+          <div class="dp-btns"><button class="dp-btn no" id="mg-memory-see-again" type="button">See again / ${furiJP('もう一度見る', MARIETTA_UI_READINGS)}</button></div>
           <div id="mg-memory-exercise-mount"></div>
         </div>
       </div>`;
+    mariettaPanel.querySelector('#mg-memory-see-again')?.addEventListener('click', () => {
+      renderMariettaMemoryReplay(object, false, () => renderMariettaMemoryExercise(object));
+    });
     const mount = mariettaPanel.querySelector('#mg-memory-exercise-mount');
     window.GrimmerglenTyping.renderExercise(mount, exercise, {
       onCorrect: () => completeGrimmerglenMemory(object),
@@ -1812,7 +1818,7 @@
     });
   }
 
-  function renderMariettaMemoryReplay(object, memoryComplete) {
+  function renderMariettaMemoryReplay(object, memoryComplete, onClose) {
     const exercise = DATA.memories?.[object.type]?.deep || {};
     const answerEn = exercise.answerEn || exercise.accepted?.[0] || '';
     const answerJp = exercise.answerJp || exercise.helpText || '';
@@ -1859,7 +1865,8 @@
     }, Math.max(500, answerEn.length * 38 + 220));
     mariettaPanel.querySelector('#mg-memory-replay-close')?.addEventListener('click', () => {
       cancelled = true;
-      renderMariettaMemorySuccess(object, { memoryComplete });
+      if (typeof onClose === 'function') onClose();
+      else renderMariettaMemorySuccess(object, { memoryComplete });
     });
   }
 
@@ -1878,7 +1885,7 @@
           <p class="dp-line-jp">${furiJP(memoryComplete ? 'この記憶を思い出した！' : 'ありがとう。でも、また忘れちゃった！この記憶はまだ残っているよ。', memoryComplete ? { '記憶': 'きおく', '思い出した': 'おもいだした' } : { '忘れちゃった': 'わすれちゃった', '記憶': 'きおく', '残っている': 'のこっている' })}</p>
           ${nextStory ? `<p class="dp-line-en mg-memory-hint-en">${escapeHTML(nextStory.en)}</p><p class="dp-line-jp mg-memory-hint-jp">${furiJP(nextStory.jp, nextStory.readings)}</p>` : '<p class="dp-line-en mg-memory-lead">All of my memories are safe now!</p>'}
           <div class="dp-btns">
-            ${memoryComplete ? '<button class="dp-btn yes" id="mg-memory-see-again" type="button">See again / もう一度見る</button>' : ''}
+            ${memoryComplete ? `<button class="dp-btn yes" id="mg-memory-see-again" type="button">See again / ${furiJP('もう一度見る', MARIETTA_UI_READINGS)}</button>` : ''}
             <button class="dp-btn ${memoryComplete ? 'no' : 'yes'}" id="mg-memory-done" type="button">${memoryComplete ? 'Keep exploring / 探し続ける' : 'Keep exploring / 探し続ける'}</button>
           </div>
         </div>

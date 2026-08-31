@@ -28,6 +28,15 @@ assert(success.includes('renderMariettaMemoryReplay(object, memoryComplete)'),
 assert(success.includes('if (memoryComplete) startGrimmerglenCelebration();'),
   'the existing final-memory celebration must remain available after the card');
 
+const exerciseStart = runtime.indexOf('function renderMariettaMemoryExercise(');
+const exerciseEnd = runtime.indexOf('function renderMariettaMemoryReplay(', exerciseStart);
+assert(exerciseStart >= 0 && exerciseEnd > exerciseStart, 'memory writing renderer must be present');
+const exercise = runtime.slice(exerciseStart, exerciseEnd);
+assert(exercise.includes('id="mg-memory-see-again"'),
+  'the memory writing page must include a See again action before typing');
+assert(exercise.includes('renderMariettaMemoryReplay(object, false, () => renderMariettaMemoryExercise(object))'),
+  'closing the pre-typing replay must return to the same writing page');
+
 const replayStart = runtime.indexOf('function renderMariettaMemoryReplay(');
 const replayEnd = runtime.indexOf('function renderMariettaMemorySuccess(', replayStart);
 assert(replayStart >= 0 && replayEnd > replayStart, 'memory replay renderer must be present');
