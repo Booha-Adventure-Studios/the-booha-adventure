@@ -53,6 +53,16 @@
     .stat-value { font-size:1.8rem; font-weight:950; line-height:1; color:#76518a; }
     .stat-label { margin-top:6px; font-size:.65rem; font-weight:950; letter-spacing:.06em; text-transform:uppercase; }
     .stat-jp { display:block; margin-top:3px; color:var(--muted); font-size:.66rem; }
+    .weekly-hunt { margin-top:22px; padding:18px 20px; border:2px solid rgba(84,203,169,.28); border-radius:22px; background:linear-gradient(135deg,rgba(230,255,247,.78),rgba(255,255,255,.68)); }
+    .weekly-hunt-heading { display:flex; align-items:baseline; justify-content:space-between; gap:14px; }
+    .weekly-hunt-heading h2 { margin:0; color:#684479; font-size:1.2rem; letter-spacing:-.03em; }
+    .weekly-hunt-heading span { color:#4ba98f; font-size:.66rem; font-weight:950; letter-spacing:.08em; text-transform:uppercase; }
+    .weekly-hunt-copy { margin:8px 0 14px; color:#765e6c; font-size:.82rem; line-height:1.5; }
+    .weekly-hunt-copy small { display:block; margin-top:4px; color:var(--muted); font-size:.9em; }
+    .weekly-hunt-progress { display:flex; align-items:center; gap:12px; }
+    .weekly-hunt-progress progress { width:100%; height:9px; accent-color:#54cba9; }
+    .weekly-hunt-count { flex:0 0 auto; color:#d27b51; font-size:.78rem; font-weight:950; white-space:nowrap; }
+    .weekly-hunt-legend { margin:10px 0 0; color:var(--muted); font-size:.68rem; font-weight:800; }
     .memories { display:grid; grid-template-columns:repeat(4,1fr); gap:13px; }
     .memory-card { min-height:245px; padding:15px; position:relative; overflow:hidden; border:2px solid rgba(255,255,255,.9); border-radius:22px; background:linear-gradient(155deg,rgba(255,255,255,.94),rgba(255,239,248,.72)); transition:transform .16s,box-shadow .16s; }
     .memory-card:hover { transform:translateY(-3px) rotate(-.4deg); box-shadow:0 11px 22px rgba(116,71,124,.13); }
@@ -66,6 +76,7 @@
     .dot { width:10px; height:10px; border-radius:50%; border:2px solid #dbb4cc; background:#fff; }
     .dot.found { border-color:#e781ae; background:#e781ae; box-shadow:inset 0 0 0 2px #fff; }
     .memory-tier { margin:8px 0 0; padding-top:8px; border-top:1px dashed rgba(104,70,119,.2); color:var(--pink-deep); font-size:.65rem; font-weight:900; }
+    .memory-weekly { margin:5px 0 0; color:#4ba98f; font-size:.63rem; font-weight:950; }
     .memory-card.complete { --memory-color:#9ee8d3; background:linear-gradient(155deg,#fff,rgba(220,255,245,.85)); }
     .memory-card.active { outline:3px solid rgba(216,93,154,.35); outline-offset:2px; }
     .memory-card.active::after { content:"ACTIVE MEMORY"; position:absolute; top:10px; left:-26px; transform:rotate(-32deg); padding:3px 27px; color:#fff; background:#db74a8; font-size:.5rem; font-weight:950; letter-spacing:.08em; }
@@ -118,6 +129,8 @@
       <div class="mascot"><img src="assets/img/grimmerglen/marietta/marietta_04.webp" alt="Pastel horned chipmunk Marietta waving"></div>
     </section>
 
+    <section id="weekly-progress" class="weekly-hunt" aria-labelledby="weekly-hunt-heading" aria-live="polite"></section>
+
     <section class="section" aria-labelledby="stats-title">
       <div class="section-head"><h2 id="stats-title">Marietta’s memory jar</h2><p>ちいさな<ruby>思<rt>おも</rt></ruby>い<ruby>出<rt>で</rt></ruby>のびん</p></div>
       <div class="stats" id="stats"></div>
@@ -158,9 +171,11 @@
       const saveData = () => {
         try { return (window.BoohaSaveFile && BoohaSaveFile.load()) || {}; } catch (_) { return {}; }
       };
-      const bucket = () => saveData().grimmerglen || {};
-      const foundFor = (type) => Math.max(0, Math.min(3, Number(bucket().objects?.[type]?.found) || 0));
-      const visitedCount = () => Object.keys(bucket().visitedRooms || {}).length;
+      const lifetimeBucket = () => saveData().grimmerglen || {};
+      const weeklyBucket = () => saveData().weekly?.worlds?.grimmerglen || {};
+      const foundFor = (type) => Math.max(0, Math.min(3, Number(lifetimeBucket().objects?.[type]?.found) || 0));
+      const weeklyFoundFor = (type) => Math.max(0, Math.min(3, Number(weeklyBucket().objects?.[type]?.found) || 0));
+      const visitedCount = () => Object.keys(lifetimeBucket().visitedRooms || {}).length;
       const totalFound = () => (DATA.objectTypes || []).reduce((sum, type) => sum + foundFor(type), 0);
       const completeCount = () => (DATA.objectTypes || []).filter(type => foundFor(type) >= 3).length;
 
@@ -203,25 +218,38 @@
 
       function renderStats() {
         const rooms = Object.keys(DATA.rooms || {}).length || 9;
-        const visits = Number(bucket().roomVisitsTotal) || 0;
+        const visits = Number(lifetimeBucket().roomVisitsTotal) || 0;
         document.getElementById('stats').innerHTML = [
-          [totalFound(), `${(DATA.objectTypes || []).length * 3}`, 'Clues returned','手がかり'],
-          [completeCount(), `${(DATA.objectTypes || []).length}`, 'Memories held','覚えている'],
-          [visitedCount(), `${rooms}`, 'Rooms explored','部屋'],
-          [visits, '∞', 'Garden visits','訪れた回数']
+          [totalFound(), `${(DATA.objectTypes || []).length * 3}`, 'Lifetime clues returned','手がかり'],
+          [completeCount(), `${(DATA.objectTypes || []).length}`, 'Lifetime memories held','覚えている'],
+          [visitedCount(), `${rooms}`, 'Lifetime rooms explored','部屋'],
+          [visits, '∞', 'Lifetime garden visits','訪れた回数']
         ].map(item => `<div class="stat"><div class="stat-value">${esc(item[0])}<small style="font-size:.75em;color:#b28caf"> / ${esc(item[1])}</small></div><div class="stat-label">${esc(item[2])}</div><span class="stat-jp">${item[3]}</span></div>`).join('');
       }
 
+      function renderWeeklyProgress() {
+        const totalSlots = (DATA.objectTypes || []).length * 3;
+        const found = (DATA.objectTypes || []).reduce((sum, type) => sum + weeklyFoundFor(type), 0);
+        const remaining = Math.max(totalSlots - found, 0);
+        document.getElementById('weekly-progress').innerHTML = `
+          <div class="weekly-hunt-heading"><h2 id="weekly-hunt-heading">This Week's Garden</h2><span>Fresh every Sunday</span></div>
+          <p class="weekly-hunt-copy">The three returns for each memory are fresh this week. Your lifetime memory jar below stays saved.<small>今週は、それぞれの<ruby>記憶<rt>きおく</rt></ruby>を三<ruby>回<rt>かい</rt></ruby>ずつ<ruby>戻<rt>もど</rt></ruby>せます。<ruby>記録<rt>きろく</rt></ruby>は<ruby>残<rt>のこ</rt></ruby>ります。</small></p>
+          <div class="weekly-hunt-progress"><progress max="${Math.max(totalSlots, 1)}" value="${found}" aria-label="${found} of ${totalSlots} clues returned this week"></progress><span class="weekly-hunt-count">${found} / ${totalSlots}</span></div>
+          <p class="weekly-hunt-legend">${remaining ? `${remaining} clue return${remaining === 1 ? '' : 's'} available this week.` : 'Every clue return completed this week.'}</p>`;
+      }
+
       function renderMemories() {
-        const active = bucket().activeTargetType;
+        const active = weeklyBucket().activeTargetType;
         document.getElementById('memories').innerHTML = (DATA.objectTypes || []).map((type, index) => {
           const found = foundFor(type); const name = labels[type] || [type,type]; const story = DATA.stories?.[type]?.en || 'A little memory is waiting.';
+          const weeklyFound = weeklyFoundFor(type);
           const tier = found >= 3 ? 'Memory safe ✦' : found === 2 ? 'Deep memory next' : found === 1 ? 'Case memory next' : 'Starter memory waiting';
           return `<article class="memory-card${found >= 3 ? ' complete' : ''}${active === type ? ' active' : ''}" style="--memory-color:${colors[index % colors.length]}">
             <img class="memory-art" src="${esc(DATA.collectibles?.[type] || '')}" alt="${esc(name[0])}">
             <h3 class="memory-name">${esc(name[0])}</h3><p class="memory-kana">${esc(name[1])}</p>
             <p class="memory-story">${esc(story)}</p>
             <div class="memory-status"><span>${found >= 3 ? 'All three returned' : `${found} of 3 returned`}</span><span class="dots">${[0,1,2].map(i => `<i class="dot${i < found ? ' found' : ''}"></i>`).join('')}</span></div>
+            <p class="memory-weekly">This week: ${weeklyFound} of 3 returned</p>
             <p class="memory-tier">${tier}</p>
           </article>`;
         }).join('');
@@ -239,7 +267,7 @@
         }).join('');
       }
 
-      function render() { renderDoor(); renderWorldBack(); renderStats(); renderMemories(); renderAchievements(); }
+      function render() { renderDoor(); renderWorldBack(); renderWeeklyProgress(); renderStats(); renderMemories(); renderAchievements(); }
       document.addEventListener('pointerdown', event => { if (event.target.closest('a,button')) clickTone(event.target.closest('#enter-world') ? 'enter' : 'soft'); }, { passive:true });
       ['booha:saved','booha:unlocked','booha:weeklyReset','booha:newWeek'].forEach(name => document.addEventListener(name, render));
       if (window.BOOHA_READY) render(); else document.addEventListener('booha:ready', render, { once:true });
