@@ -94,6 +94,8 @@ assert.deepStrictEqual(plain(migrated.weekly.worlds), {
 save.save(migrated);
 stored.muenba.orbsPending = 5;
 stored.muenba.caseProgress = { completedCaseIds: ['case-1'], activeCaseId: 'case-2' };
+stored.grimmerglen.activeTargetType = 'banner';
+stored.grimmerglen.carriedObjectId = 'banner-1';
 save.resetWeekly('2026-08-30|august-w4');
 
 assert.strictEqual(stored.version, 3);
@@ -130,6 +132,8 @@ assert.strictEqual(stored.muenba.caseProgress.activeCaseId, null);
 assert.deepStrictEqual(stored.muenba.caseProgress.completedCaseIds, ['case-1']);
 assert.deepStrictEqual(plain(stored.grimmerglen.objects), { banner: { found: 2 } });
 assert.deepStrictEqual(plain(stored.grimmerglen.objectSlots), { 'banner-1': true });
+assert.strictEqual(stored.grimmerglen.activeTargetType, null);
+assert.strictEqual(stored.grimmerglen.carriedObjectId, null);
 assert.ok(events.includes('booha:weeklyReset'));
 
 console.log('Weekly replay schema audit passed: occurrence-scoped world buckets reset without touching lifetime records.');

@@ -322,6 +322,14 @@ const BoohaSaveFile = (() => {
       }
     }
 
+    // Grimmerglen's root object counts and slots are lifetime history. Clear
+    // only the old transient target/carry fields; the live weekly item state
+    // has already been recreated inside weekly.worlds.grimmerglen above.
+    if (data.grimmerglen && typeof data.grimmerglen === 'object') {
+      data.grimmerglen.activeTargetType = null;
+      data.grimmerglen.carriedObjectId = null;
+    }
+
     if (occurrenceKey) {
       if (!data.meta || typeof data.meta !== 'object') data.meta = {};
       data.meta.lastWeeklyKey = occurrenceKey;
