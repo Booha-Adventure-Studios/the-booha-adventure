@@ -51,10 +51,10 @@
     room_02: [
       exit('left',  'room_01', 'fromRight', { x: 502, y: 521 }),
       exit('right', 'room_03', 'fromLeft', { x: 1092, y: 524 }),
-      exit('up',    'room_05', 'fromDown')
+      exit('up',    'room_05', 'fromDown', { x: 775, y: 312 })
     ],
     room_03: [
-      exit('left',  'room_02', 'fromRight'),
+      exit('left',  'room_02', 'fromRight', { x: 459, y: 589 }),
       exit('up',    'room_06', 'fromDown', { x: 791, y: 422 })
     ],
     room_04: [
@@ -70,8 +70,8 @@
     ],
     room_06: [
       exit('down', 'room_03', 'fromUp'),
-      exit('left', 'room_05', 'fromRight'),
-      exit('up',   'room_09', 'fromDown')
+      exit('left', 'room_05', 'fromRight', { x: 485, y: 468 }),
+      exit('up',   'room_09', 'fromDown', { x: 773, y: 272 })
     ],
     room_07: [
       exit('down',  'room_04', 'fromUp'),
@@ -80,14 +80,14 @@
     ],
     room_08: [
       exit('down',  'room_05', 'fromUp'),
-      exit('left',  'room_07', 'fromRight'),
+      exit('left',  'room_07', 'fromRight', { x: 535, y: 428 }),
       exit('right', 'room_09', 'fromLeft', { x: 1107, y: 456 }),
       exit('up',    'room_11', 'fromDown')
     ],
     room_09: [
       exit('down', 'room_06', 'fromUp'),
       exit('left', 'room_08', 'fromRight', { x: 518, y: 421 }),
-      exit('up',   'room_12', 'fromDown', { x: 772, y: 234 })
+      exit('up',   'room_12', 'fromDown', { x: 751, y: 292 })
     ],
     room_10: [
       exit('down',  'room_07', 'fromUp'),
@@ -96,7 +96,7 @@
     ],
     room_11: [
       exit('left',  'room_10', 'fromRight', { x: 491, y: 540 }),
-      exit('right', 'room_12', 'fromLeft'),
+      exit('right', 'room_12', 'fromLeft', { x: 1146, y: 547 }),
       exit('down',  'room_08', 'fromUp'),
       exit('up',    'room_14', 'fromDown', { x: 747, y: 344 })
     ],
@@ -110,8 +110,8 @@
       exit('right', 'room_14', 'fromLeft', { x: 1186, y: 507 })
     ],
     room_14: [
-      exit('left',  'room_13', 'fromRight'),
-      exit('right', 'room_15', 'fromLeft'),
+      exit('left',  'room_13', 'fromRight', { x: 431, y: 436 }),
+      exit('right', 'room_15', 'fromLeft', { x: 1136, y: 437 }),
       exit('down',  'room_11', 'fromUp')
     ],
     room_15: [

@@ -47,10 +47,16 @@ for (const [roomId, expectedExits] of Object.entries(expected)) {
 
 const measured = {
   room_01: { up: [792, 312], right: [1205, 512] },
+  room_02: { up: [775, 312] },
+  room_03: { left: [459, 589] },
   room_07: { up: [736, 286] },
+  room_06: { left: [485, 468], up: [773, 272] },
+  room_08: { left: [535, 428] },
+  room_09: { up: [751, 292] },
   room_10: { up: [782, 287], right: [1155, 524] },
-  room_11: { up: [747, 344], left: [491, 540] },
-  room_13: { right: [1186, 507] }
+  room_11: { up: [747, 344], left: [491, 540], right: [1146, 547] },
+  room_13: { right: [1186, 507] },
+  room_14: { left: [431, 436], right: [1136, 437] }
 };
 for (const [roomId, exits] of Object.entries(measured)) {
   for (const [direction, [x, y]] of Object.entries(exits)) {
