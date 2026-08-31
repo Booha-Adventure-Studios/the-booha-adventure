@@ -313,9 +313,14 @@
         size: 1.6 + (i % 4) * 0.6
       });
     }
-    for (let i = 0; i < 48; i++) {
+    // Keep the leaves petite, but make the edge vignette feel fuller. Each
+    // edge gets an even lane distribution so the extra leaves add coverage
+    // instead of clustering in a few corners.
+    const EDGE_LEAF_COUNT = 72;
+    const leavesPerSide = EDGE_LEAF_COUNT / 4;
+    for (let i = 0; i < EDGE_LEAF_COUNT; i++) {
       const side = i % 4;
-      const lane = (i + 1) / 17;
+      const lane = (Math.floor(i / 4) + .5) / leavesPerSide;
       const inset = 28 + ((seed * 19 + i * 23) % 105);
       edgeLeaves.push({
         side,
@@ -323,7 +328,8 @@
         y: side < 2 ? (side === 0 ? inset : WORLD_H - inset) : lane * WORLD_H,
         phase: seed * .7 + i * 1.83,
         size: 5.5 + (i % 4) * 1.2,
-        speed: .34 + (i % 4) * .07
+        speed: .34 + (i % 4) * .07,
+        baseAlpha: .3 + ((seed * 17 + i * 29) % 8) * .055
       });
     }
   }
@@ -360,7 +366,7 @@
       if (leaf.side < 2) { x += sway; y += bob; }
       else { x += bob; y += sway; }
       const rotation = seconds * (leaf.side % 2 ? -.18 : .18) + leaf.phase;
-      const alpha = .4 + .16 * Math.sin(seconds * 1.4 + leaf.phase);
+      const alpha = Math.max(.22, Math.min(.78, leaf.baseAlpha + .07 * Math.sin(seconds * 1.4 + leaf.phase)));
       atmosphereCtx.save();
       atmosphereCtx.translate(x, y);
       atmosphereCtx.rotate(rotation);
