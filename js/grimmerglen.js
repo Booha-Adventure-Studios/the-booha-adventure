@@ -1053,7 +1053,7 @@
     });
   }
 
-  function renderMariettaWelcome() {
+  function renderMariettaQuestBriefing() {
     if (!mariettaPanel || !MARIETTA) return;
     const targetType = getActiveGrimmerglenTargetType();
     const story = targetType && DATA.stories ? DATA.stories[targetType] : null;
@@ -1075,14 +1075,14 @@
           <p class="dp-line-en mg-memory-lead">${story ? 'I am trying to remember something...' : 'The memories are all safe now.'}</p>
           ${storyMarkup}
           <div class="dp-btns">
-            <button class="dp-btn yes" id="mg-talk-btn">Talk to Marietta / ${furiJP('マリエッタと話す', MARIETTA_UI_READINGS)}</button>
+            <button class="dp-btn yes" id="mg-help-btn">Help Marietta / ${furiJP('マリエッタを手伝う', MARIETTA_UI_READINGS)}</button>
             <button class="dp-btn no" id="mg-leave-btn">Leave Grimmerglen / ${furiJP('グリマーグレンを出る', MARIETTA_UI_READINGS)}</button>
           </div>
         </div>
       </div>`;
-    const talkBtn = mariettaPanel.querySelector('#mg-talk-btn');
+    const helpBtn = mariettaPanel.querySelector('#mg-help-btn');
     const leaveBtn = mariettaPanel.querySelector('#mg-leave-btn');
-    if (talkBtn) talkBtn.addEventListener('click', renderMariettaDialogue);
+    if (helpBtn) helpBtn.addEventListener('click', handleMariettaHelpChoice);
     if (leaveBtn) leaveBtn.addEventListener('click', () => { closeMariettaPanel(); returnToKarasuki(); });
   }
 
@@ -1171,10 +1171,10 @@
     '今': 'いま'
   };
 
-  // Pass 6: the closing button below now launches the tutorial via
-  // handleMariettaDialogueClose() (defined in the TUTORIAL section further
-  // down, right after this function) instead of just closing the panel.
-  function renderMariettaDialogue() {
+  // Pass 9A: the introduction is now the first Marietta screen. The caller
+  // supplies the next screen so the same dialogue renderer cannot put the
+  // quest briefing ahead of the hello again.
+  function renderMariettaDialogue(onFinished) {
     if (!mariettaPanel || !MARIETTA) return;
     mariettaPanel.innerHTML = `
       <span class="dp-handle"></span>
@@ -1205,7 +1205,9 @@
       ).join('');
       actionsEl.style.opacity = '1';
       const closeBtn = mariettaPanel.querySelector('#mg-dialogue-close-btn');
-      if (closeBtn) closeBtn.addEventListener('click', handleMariettaDialogueClose);
+      if (closeBtn) closeBtn.addEventListener('click', () => {
+        if (typeof onFinished === 'function') onFinished();
+      });
     }
 
     // Click anywhere on the card to skip straight to the end -- deferred
@@ -1332,6 +1334,14 @@
   function writeGrimmerglenTutorial(patchObj) {
     const current = getGrimmerglenTutorial();
     return writeGrimmerglen({ tutorial: Object.assign({}, current, patchObj) });
+  }
+
+  function hasMariettaIntroBeenSeenThisWeek() {
+    return readGrimmerglenWeekly().mariettaIntroSeen === true;
+  }
+
+  function markMariettaIntroSeenThisWeek() {
+    writeGrimmerglenWeekly({ mariettaIntroSeen: true });
   }
 
   // Room-visit running totals, mirroring Muenba's own
@@ -1607,9 +1617,14 @@
     if (noBtn) noBtn.addEventListener('click', closeMariettaPanel);
   }
 
-  // The dialogue's closing button routes here instead of straight to
-  // closeMariettaPanel() -- the tri-state decision described above.
-  function handleMariettaDialogueClose() {
+  function finishMariettaIntroduction() {
+    markMariettaIntroSeenThisWeek();
+    renderMariettaQuestBriefing();
+  }
+
+  // The quest briefing's help button routes into the existing tutorial
+  // decision. The introduction itself is now handled separately above.
+  function handleMariettaHelpChoice() {
     const t = getGrimmerglenTutorial();
     if (t.completed) {
       unlockGrimmerglenNavigation();
@@ -1631,7 +1646,8 @@
     state.clickTarget = null;
     state.moving = false;
     if (carriedObject) renderMariettaHandoff();
-    else renderMariettaWelcome();
+    else if (hasMariettaIntroBeenSeenThisWeek()) renderMariettaQuestBriefing();
+    else renderMariettaDialogue(finishMariettaIntroduction);
     mariettaPanel.classList.add('open');
   }
 
@@ -1701,7 +1717,7 @@
           <div class="dp-btns"><button class="dp-btn yes" id="mg-memory-try-again" type="button">I’ll listen again / もう一度聞く</button></div>
         </div>
       </div>`;
-    mariettaPanel.querySelector('#mg-memory-try-again')?.addEventListener('click', renderMariettaWelcome);
+    mariettaPanel.querySelector('#mg-memory-try-again')?.addEventListener('click', renderMariettaQuestBriefing);
   }
 
   function renderMariettaMemoryExercise(object) {
