@@ -121,7 +121,7 @@ const CURRENT_CACHES = {
   // Pass 9C makes the explicit help choice the tutorial/navigation gateway.
   // Grimmerglen guide polish: separate the memory hint and use word-level
   // furigana so Japanese readings do not look like duplicate sentences.
-  assets: 'booha-assets-2026-453',
+  assets: 'booha-assets-2026-454',
   decks:  'booha-decks-2026-310',
 };
 
@@ -181,7 +181,7 @@ const CORE_ASSETS = [
   `${BASE}/assets/img/grimmerglen/grimmerglen_dance.mp3`,
   ...Array.from({ length: 3 }, (_, index) => `${BASE}/assets/img/grimmerglen/dance/marietta_dance_${String(index + 1).padStart(2, '0')}.webp`),
   ...Array.from({ length: 3 }, (_, index) => `${BASE}/assets/img/grimmerglen/dance/booha_grimmerglen_dance_version_1_${String(index + 1).padStart(2, '0')}.webp`),
-  `${BASE}/assets/img/grimmerglen/marietta/marietta_01.webp`,
+  ...Array.from({ length: 5 }, (_, index) => `${BASE}/assets/img/grimmerglen/marietta/marietta_${String(index + 1).padStart(2, '0')}.webp`),
   ...Array.from({ length: 15 }, (_, index) => `${BASE}/assets/img/grimmerglen/room_${String(index + 1).padStart(2, '0')}.webp`),
   ...[
     'banner', 'ticket', 'pillow', 'backpack', 'book', 'teddy_bear',
