@@ -222,7 +222,7 @@
         ${showHintToggle ? `<button type="button" class="mgty-hint-btn">Need a hint? / ${furiJP('ヒントが必要？', { '必要': 'ひつよう' })}</button>` : ''}
         ${showFuriganaHelp ? `<button type="button" class="mgty-help-btn">Help me / ${furiJP('助けて', { '助けて': 'たすけて' })}</button><p class="mgty-help" hidden>${furiJP(ex.helpText, ex.helpReadings || {})}</p>` : ''}
         <div class="mgty-input-row">
-          <input type="text" class="mgty-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Type your answer / こたえをタイプしてね">
+          <label class="mgty-input-label"><span>Type here / ${furiJP('答えをタイプしてね', { '答え': 'こたえ' })}</span><input type="text" class="mgty-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="Type your answer" placeholder="Type here"></label>
           <button type="button" class="mgty-submit">Check / ${furiJP('たしかめる', {})}</button>
         </div>
         <p class="mgty-feedback" aria-live="polite"></p>
@@ -301,7 +301,9 @@
       .mgty-help-btn:hover{background:rgba(184,164,255,.22);}
       .mgty-help{margin:0 0 10px;padding:8px 11px;border-left:3px solid #b8a4ff;border-radius:0 8px 8px 0;background:rgba(184,164,255,.12);color:#5e4b88;font-size:.86rem;line-height:1.55;}
       .mgty-input-row{position:relative;display:flex;gap:8px;margin:0 0 6px;}
-      .mgty-input{flex:1;min-width:0;box-sizing:border-box;padding:11px 14px;border-radius:12px;
+      .mgty-input-label{display:flex;flex:1;min-width:0;flex-direction:column;gap:4px;color:#6a5030;font-size:.72rem;font-weight:700;line-height:1.35;}
+      .mgty-input-label ruby{ruby-position:over;} .mgty-input-label rt{font-size:.78em;color:#8a6a42;}
+      .mgty-input{width:100%;min-width:0;box-sizing:border-box;padding:11px 14px;border-radius:12px;
         border:2px solid rgba(224,85,158,.35);background:#fffdf9;color:#2a1408;
         font:600 clamp(1rem,3vw,1.14rem)/1.3 'Georgia',serif;letter-spacing:.01em;
         transition:border-color .18s,box-shadow .18s;}
