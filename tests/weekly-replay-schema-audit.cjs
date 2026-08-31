@@ -88,7 +88,14 @@ assert.deepStrictEqual(plain(migrated.weekly.worlds), {
   occurrenceKey: '',
   utsuroba: { drifterQuest: null, drifters: {}, readingChallenge: null },
   muenba: { ghostsFound: {}, huntGhostOrder: [], activeCaseId: null, orbsPending: 0 },
-  grimmerglen: { objects: {}, objectSlots: {}, activeTargetType: null, carriedObjectId: null },
+  grimmerglen: {
+    objects: {},
+    objectSlots: {},
+    activeTargetType: null,
+    carriedObjectId: null,
+    mariettaIntroSeen: false,
+    mariettaIntroSkipped: false,
+  },
 });
 
 save.save(migrated);
@@ -117,6 +124,8 @@ assert.deepStrictEqual(plain(stored.weekly.worlds.grimmerglen), {
   objectSlots: {},
   activeTargetType: null,
   carriedObjectId: null,
+  mariettaIntroSeen: false,
+  mariettaIntroSkipped: false,
 });
 
 assert.deepStrictEqual(plain(stored.scores), { 'bc:ask_question': { completed: true, stars: 3 } });
