@@ -735,6 +735,39 @@
     return range[0] + Math.random() * (range[1] - range[0]);
   }
 
+  function getObjectViewportBounds() {
+    const scale = Math.max(window.innerWidth / WORLD_W, window.innerHeight / WORLD_H);
+    const visibleWorldW = Math.min(WORLD_W, window.innerWidth / scale);
+    const visibleWorldH = Math.min(WORLD_H, window.innerHeight / scale);
+    // Keep both the drawn object and its pickup radius inside the visible
+    // crop. This matters on landscape phones, where fitStage intentionally
+    // fills the viewport and trims a little from the top and bottom.
+    const margin = Math.max(OBJECT_HIT_R, OBJECT_DRAW_SIZE / 2) + 8;
+    return {
+      minX: Math.max(margin, (WORLD_W - visibleWorldW) / 2 + margin),
+      maxX: Math.min(WORLD_W - margin, (WORLD_W + visibleWorldW) / 2 - margin),
+      minY: Math.max(margin, (WORLD_H - visibleWorldH) / 2 + margin),
+      maxY: Math.min(WORLD_H - margin, (WORLD_H + visibleWorldH) / 2 - margin)
+    };
+  }
+
+  function safeObjectRange(range, min, max) {
+    const low = Math.max(range[0], min);
+    const high = Math.min(range[1], max);
+    if (low <= high) return [low, high];
+    const nearest = Math.max(min, Math.min(max, (range[0] + range[1]) / 2));
+    return [nearest, nearest];
+  }
+
+  function constrainObjectLayoutToViewport() {
+    if (!objectVisitLayout.size) return;
+    const viewport = getObjectViewportBounds();
+    objectVisitLayout = new Map(Array.from(objectVisitLayout.entries(), ([id, point]) => [id, {
+      x: Math.max(viewport.minX, Math.min(viewport.maxX, point.x)),
+      y: Math.max(viewport.minY, Math.min(viewport.maxY, point.y))
+    }]));
+  }
+
   function reseedObjectLayout(roomId) {
     objectVisitLayout = new Map();
     const entries = [];
@@ -746,17 +779,23 @@
       });
     });
     const zones = OBJECT_CLEARING_ZONES.slice().sort(() => Math.random() - .5);
+    const viewport = getObjectViewportBounds();
     const used = [];
     entries.forEach((entry, entryIndex) => {
       let point = null;
       for (let attempt = 0; attempt < 20 && !point; attempt++) {
         const zone = zones[(entryIndex + attempt) % zones.length];
-        const candidate = { x: randomInRange(zone.x), y: randomInRange(zone.y) };
+        const xRange = safeObjectRange(zone.x, viewport.minX, viewport.maxX);
+        const yRange = safeObjectRange(zone.y, viewport.minY, viewport.maxY);
+        const candidate = { x: randomInRange(xRange), y: randomInRange(yRange) };
         if (used.every(other => Math.hypot(candidate.x - other.x, candidate.y - other.y) >= 120)) {
           point = candidate;
         }
       }
-      if (!point) point = { x: 768 + entryIndex * 130, y: 220 + entryIndex * 210 };
+      if (!point) point = {
+        x: Math.max(viewport.minX, Math.min(viewport.maxX, 768 + entryIndex * 130)),
+        y: Math.max(viewport.minY, Math.min(viewport.maxY, 220 + entryIndex * 210))
+      };
       used.push(point);
       objectVisitLayout.set(entry.id, point);
     });
@@ -2554,7 +2593,13 @@
     setRoom(state.roomId, state.spawnId, null);
     restoreGrimmerglenCarriedObject();
     bindInput();
-    window.addEventListener('resize', () => { fitStage(); resizeCanvas(); });
+    window.addEventListener('resize', () => {
+      fitStage();
+      resizeCanvas();
+      // Orientation changes can alter the cropped world area without a
+      // reload; preserve item layout while keeping every item reachable.
+      constrainObjectLayoutToViewport();
+    });
     window.requestAnimationFrame(tick);
     triggerBoohaTransformIfNeeded();
   }
