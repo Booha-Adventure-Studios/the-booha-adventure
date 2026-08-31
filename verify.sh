@@ -789,6 +789,13 @@ else
   bad "Grimmerglen Pass 10D content/accessibility audit failed"
 fi
 
+echo "[weekly] Grimmerglen Pass 10E quest-visibility audit"
+if node tests/grimmerglen-pass10e-audit.cjs >/dev/null 2>&1; then
+  ok "Grimmerglen quest-gated memories, final replay, and remaining-item cues pass"
+else
+  bad "Grimmerglen Pass 10E quest-visibility audit failed"
+fi
+
 echo "[94/98] Grimmerglen navigation audit"
 if node tests/grimmerglen-navigation-audit.cjs >/dev/null 2>&1; then
   ok "Grimmerglen grid links, boundary arrows, and help-gated movement contracts pass"
