@@ -719,6 +719,13 @@ else
   bad "Weekly occurrence consumer audit failed"
 fi
 
+echo "[86/86] Weekly boundary refresh audit"
+if node tests/weekly-boundary-refresh-audit.cjs >/dev/null 2>&1; then
+  ok "Live page-boundary rollover resets exactly once"
+else
+  bad "Weekly boundary refresh audit failed"
+fi
+
 # ── Summary ──────────────────────────────────────────────────
 echo "───────────────────────────────────"
 echo "✅ $PASS passed   ⚠️  $WARN warnings   ❌ $FAIL failed"
