@@ -184,6 +184,8 @@ window.BoohaSync = (() => {
   function isEmpty(blob, d) {
     if (!d) return true;
     if (blob === 'juku') return !d.weeks || Object.keys(d.weeks).length === 0;
+    const hasEntries = value => !!value && typeof value === 'object' && Object.keys(value).length > 0;
+    const hasItems = value => Array.isArray(value) && value.length > 0;
     if (d.scores && Object.keys(d.scores).length) return false;
     const m = d.meta || {};
     if (Number(m.allTimeStars) > 0) return false;
@@ -198,11 +200,39 @@ window.BoohaSync = (() => {
     if (w.worlds?.utsuroba?.readingChallenge) return false;
     if (w.worlds?.muenba?.ghostsFound && Object.keys(w.worlds.muenba.ghostsFound).length) return false;
     if (w.worlds?.muenba?.huntGhostOrder && w.worlds.muenba.huntGhostOrder.length) return false;
+    if (w.worlds?.muenba?.activeCaseId) return false;
     if (Number(w.worlds?.muenba?.orbsPending) > 0) return false;
     if (w.worlds?.grimmerglen?.objects && Object.keys(w.worlds.grimmerglen.objects).length) return false;
     if (w.worlds?.grimmerglen?.objectSlots && Object.keys(w.worlds.grimmerglen.objectSlots).length) return false;
     if (w.worlds?.grimmerglen?.activeTargetType || w.worlds?.grimmerglen?.carriedObjectId) return false;
-    if (d.collection && (d.collection.wanderers || []).length) return false;
+    if (d.collection && (hasEntries(d.collection.wanderers) || hasItems(d.collection.wanderers))) return false;
+
+    // A weekly reset can leave the live weekly bucket empty while the player
+    // still has permanent records from an output world. Those records must
+    // keep the adventure blob non-empty so sync never treats the reset copy as
+    // an untouched device and drops it during restore.
+    const utsuroba = d.utsuroba || {};
+    if (hasEntries(utsuroba.drifters) || hasEntries(utsuroba.visitedRooms) ||
+        hasEntries(utsuroba.readingEchoes) || hasItems(utsuroba.readingJournal?.entries) ||
+        hasItems(utsuroba.wordCabinet?.entries) || Number(utsuroba.memoriesRestoredTotal) > 0 ||
+        Number(utsuroba.wordsTouchedTotal) > 0 || Number(utsuroba.roomVisitsTotal) > 0 ||
+        Object.values(utsuroba.flags || {}).some(Boolean) || utsuroba.readingOnboarding?.seen === true) {
+      return false;
+    }
+
+    const muenba = d.muenba || {};
+    if (hasEntries(muenba.ghostsFound) || hasEntries(muenba.visitedRooms) ||
+        hasItems(muenba.huntJournal?.entries) || hasEntries(muenba.caseRecords) ||
+        Number(muenba.orbsCollected) > 0 || Number(muenba.roomVisitsTotal) > 0 ||
+        Number(muenba.caseRecordsSettled) > 0 || Number(muenba.rhythm?.capturesCompleted) > 0) {
+      return false;
+    }
+
+    const grimmerglen = d.grimmerglen || {};
+    if (hasEntries(grimmerglen.objects) || hasEntries(grimmerglen.objectSlots) ||
+        grimmerglen.tutorial?.completed === true || grimmerglen.tutorial?.skipPrompted === true) {
+      return false;
+    }
     if (d.unlocks && Object.keys(d.unlocks).length) return false;
     return true;
   }
