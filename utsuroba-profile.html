@@ -125,6 +125,17 @@
     .stat-label { margin-top: 9px; color: var(--muted); font: 700 .65rem/1.4 var(--sans); letter-spacing: .08em; text-transform: uppercase; }
     .stat-jp { display: block; margin-top: 3px; color: var(--quiet); font: .75rem/1.4 var(--font); }
 
+    .weekly-hunt { margin-top: 16px; padding: 18px 20px; border: 1px solid rgba(216,168,255,.34); border-radius: 18px 6px 18px 6px; background: linear-gradient(120deg, rgba(52,28,68,.72), rgba(17,13,27,.74)); }
+    .weekly-hunt-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; }
+    .weekly-hunt-heading h2 { margin: 0; color: #f8efff; font-size: 1.15rem; font-weight: 400; }
+    .weekly-hunt-heading span { color: var(--mint); font: 700 .66rem/1.4 var(--sans); letter-spacing: .08em; text-transform: uppercase; }
+    .weekly-hunt-copy { margin: 8px 0 14px; color: var(--muted); font-size: .84rem; line-height: 1.5; }
+    .weekly-hunt-copy small { display: block; margin-top: 4px; color: var(--quiet); font-size: .9em; }
+    .weekly-hunt-progress { display: flex; align-items: center; gap: 12px; }
+    .weekly-hunt-progress progress { width: 100%; height: 9px; accent-color: var(--mint); }
+    .weekly-hunt-count { flex: 0 0 auto; color: var(--gold); font: 700 .78rem/1.4 var(--sans); white-space: nowrap; }
+    .weekly-hunt-legend { margin: 10px 0 0; color: var(--quiet); font: .65rem/1.5 var(--sans); letter-spacing: .03em; }
+
     .section { margin-top: 26px; }
     .section-heading { display: flex; align-items: end; justify-content: space-between; gap: 14px; margin: 0 2px 11px; }
     .section-heading h2 { margin: 0; font-size: clamp(1.25rem, 3vw, 1.7rem); font-weight: 400; }
@@ -151,7 +162,8 @@
     .drifter-name { margin: 0; color: #fff6ff; font-size: .95rem; font-weight: 400; line-height: 1.2; }
     .drifter-name small { display: block; margin-top: 4px; color: var(--quiet); font-size: .7rem; }
     .drifter-state { margin: 15px 0 0; color: var(--quiet); font: 700 .61rem/1.4 var(--sans); letter-spacing: .09em; text-transform: uppercase; }
-    .is-restored .drifter-state { color: var(--mint); }
+    .drifter-weekly-state { margin: 5px 0 0; color: var(--gold); font: 700 .61rem/1.4 var(--sans); letter-spacing: .06em; text-transform: uppercase; }
+    .is-weekly-restored .drifter-weekly-state { color: var(--mint); }
     .drifter-story { margin: 7px 0 0; color: var(--muted); font-size: .78rem; line-height: 1.42; }
 
     /* ── Per-tier progress pips (Starter/Case/Deep) ──────── */
@@ -420,10 +432,24 @@
       function render() {
         const data = getSave();
         const utsu = data.utsuroba || {};
+        const weeklyUtsuroba = data.weekly?.worlds?.utsuroba && typeof data.weekly.worlds.utsuroba === 'object'
+          ? data.weekly.worlds.utsuroba : {};
+        const weeklyDrifters = weeklyUtsuroba.drifters && typeof weeklyUtsuroba.drifters === 'object'
+          ? weeklyUtsuroba.drifters : {};
         const currentTier = getDifficulty();
         const currentTierMeta = TIER_META[currentTier];
         const drifters = Array.isArray(window.UTSUROBA_DATA?.drifters)
           ? window.UTSUROBA_DATA.drifters : [];
+        const weeklyRecordFor = drifter => weeklyDrifters[drifter.id] && typeof weeklyDrifters[drifter.id] === 'object'
+          ? weeklyDrifters[drifter.id] : {};
+        const weeklyCompletedFor = drifter => {
+          const record = weeklyRecordFor(drifter);
+          const completed = record.completedModes?.[currentTier];
+          return Array.isArray(completed) ? completed.length > 0 : record.statusByMode?.[currentTier] === 'complete';
+        };
+        const weeklyActiveFor = drifter => weeklyRecordFor(drifter).statusByMode?.[currentTier] === 'active';
+        const weeklyDriftersTotal = drifters.filter(drifter => drifter.episodeId).length;
+        const weeklyRestoredCount = drifters.filter(drifter => weeklyCompletedFor(drifter)).length;
         const journal = Array.isArray(utsu.readingJournal?.entries) ? utsu.readingJournal.entries : [];
         const cabinet = Array.isArray(utsu.wordCabinet?.entries) ? utsu.wordCabinet.entries : [];
         const convergenceIds = Array.isArray(window.UTSUROBA_DATA?.readingConvergence?.requiredDrifterIds)
@@ -456,6 +482,8 @@
           const restoredHere = restoredAtTier(utsu, drifter, currentTier);
           const restoredTiers = tiersRestored(utsu, drifter);
           const restoredAny = restoredEver(utsu, drifter);
+          const weeklyRestored = weeklyCompletedFor(drifter);
+          const weeklyActive = weeklyActiveFor(drifter);
           const episode = drifter.episodeId ? episodeFor(drifter.episodeId, currentTier) : null;
           let storyHTML;
           if (restoredHere) {
@@ -466,15 +494,17 @@
             storyHTML = esc('A memory is still waiting somewhere in Utsuroba.');
           }
           const stateLabel = restoredHere
-            ? `Memory restored · ${rb('記憶', 'きおく')}が${rb('戻', 'もど')}った`
-            : (restoredAny ? `Not yet at ${esc(currentTierMeta.en)} · ${rb('別', 'べつ')}の${rb('記憶', 'きおく')}で${rb('戻', 'もど')}った` : `Still wandering · まださまよう`);
-          return `<article class="drifter-card${restoredHere ? ' is-restored' : ''}">
+            ? `Lifetime ${esc(currentTierMeta.en)} complete · ${rb('記憶', 'きおく')}が${rb('戻', 'もど')}った`
+            : (restoredAny ? `Lifetime open at ${esc(currentTierMeta.en)} · ${rb('別', 'べつ')}の${rb('記憶', 'きおく')}で${rb('戻', 'もど')}った` : `Lifetime still wandering · まださまよう`);
+          const weeklyStateLabel = weeklyRestored ? 'Restored this week' : (weeklyActive ? 'In progress this week' : 'Available this week');
+          return `<article class="drifter-card${restoredHere ? ' is-restored' : ''}${weeklyRestored ? ' is-weekly-restored' : ''}">
             <div class="drifter-card-top">
               <img class="drifter-avatar" src="${esc(drifter.sprite1 || '')}" alt="">
               <h3 class="drifter-name">${esc(drifter.name)}<small>${esc(drifter.nameKanji || '')}</small></h3>
             </div>
             ${drifter.episodeId ? tierPipsMarkup(restoredTiers, currentTier) : ''}
             <p class="drifter-state">${stateLabel}</p>
+            <p class="drifter-weekly-state">${weeklyStateLabel}</p>
             <p class="drifter-story">${storyHTML}</p>
           </article>`;
         }).join('');
@@ -506,11 +536,18 @@
         host.innerHTML = `
           ${difficultyMarkup()}
 
+          <section class="weekly-hunt" aria-labelledby="weekly-hunt-heading">
+            <div class="weekly-hunt-heading"><h2 id="weekly-hunt-heading">This Week's Trail</h2><span>Fresh every Sunday</span></div>
+            <p class="weekly-hunt-copy">Each drifter's current memory can be restored again this week. Your lifetime memory archive below stays saved.<small><ruby>今週<rt>こんしゅう</rt></ruby>は、それぞれのドリフターの<ruby>記憶<rt>きおく</rt></ruby>をもう<ruby>一度<rt>いちど</rt></ruby><ruby>戻<rt>もど</rt></ruby>せます。<ruby>記録<rt>きろく</rt></ruby>は<ruby>残<rt>のこ</rt></ruby>ります。</small></p>
+            <div class="weekly-hunt-progress"><progress max="${Math.max(weeklyDriftersTotal, 1)}" value="${weeklyRestoredCount}" aria-label="${weeklyRestoredCount} of ${weeklyDriftersTotal} memories restored this week"></progress><span class="weekly-hunt-count">${weeklyRestoredCount} / ${weeklyDriftersTotal}</span></div>
+            <p class="weekly-hunt-legend">${weeklyDriftersTotal - weeklyRestoredCount ? `${weeklyDriftersTotal - weeklyRestoredCount} memory trail${weeklyDriftersTotal - weeklyRestoredCount === 1 ? '' : 's'} available this week.` : 'Every memory trail restored this week.'}</p>
+          </section>
+
           <section class="stats" aria-label="Utsuroba totals">
-            <div class="stat"><div class="stat-value">${memoriesRestoredTotal}</div><div class="stat-label">Memories restored</div><span class="stat-jp">${rb('戻', 'もど')}った${rb('記憶', 'きおく')}</span></div>
-            <div class="stat"><div class="stat-value">${journalReadsTotal}</div><div class="stat-label">Journal entries</div><span class="stat-jp"><ruby>読書<rt>どくしょ</rt></ruby>ノート</span></div>
-            <div class="stat"><div class="stat-value">${wordsTouchedTotal}</div><div class="stat-label">Words kept</div><span class="stat-jp">${rb('集', 'あつ')}めた<ruby>言葉<rt>ことば</rt></ruby></span></div>
-            <div class="stat"><div class="stat-value">${roomVisitsTotal}</div><div class="stat-label">Rooms visited</div><span class="stat-jp"><ruby>訪<rt>おとず</rt></ruby>れた<ruby>部屋<rt>へや</rt></ruby></span></div>
+            <div class="stat"><div class="stat-value">${memoriesRestoredTotal}</div><div class="stat-label">Lifetime memories restored</div><span class="stat-jp">${rb('今', 'いま')}までの${rb('記憶', 'きおく')}</span></div>
+            <div class="stat"><div class="stat-value">${journalReadsTotal}</div><div class="stat-label">Lifetime journal reads</div><span class="stat-jp"><ruby>今<rt>いま</rt></ruby>までの<ruby>読書<rt>どくしょ</rt></ruby></span></div>
+            <div class="stat"><div class="stat-value">${wordsTouchedTotal}</div><div class="stat-label">Lifetime words kept</div><span class="stat-jp">${rb('今', 'いま')}までに${rb('集', 'あつ')}めた<ruby>言葉<rt>ことば</rt></ruby></span></div>
+            <div class="stat"><div class="stat-value">${roomVisitsTotal}</div><div class="stat-label">Lifetime rooms visited</div><span class="stat-jp"><ruby>今<rt>いま</rt></ruby>までに<ruby>訪<rt>おとず</rt></ruby>れた<ruby>部屋<rt>へや</rt></ruby></span></div>
           </section>
 
           <section class="section">
@@ -524,7 +561,7 @@
           </section>
 
           <section class="section">
-            <div class="section-heading"><h2>The Drifters</h2><p>さまよう<ruby>人<rt>ひと</rt></ruby>たち</p></div>
+            <div class="section-heading"><h2>The Drifters</h2><p>Weekly trail · lifetime memory</p></div>
             <div class="drifter-grid">${drifterCards || '<p class="journal-empty">The archive is quiet.</p>'}</div>
           </section>
 

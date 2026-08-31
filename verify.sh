@@ -852,11 +852,25 @@ else
   bad "Muenba profile weekly audit failed"
 fi
 
+echo "[weekly] Utsuroba profile weekly audit"
+if node tests/utsuroba-profile-weekly-audit.cjs >/dev/null 2>&1; then
+  ok "Utsuroba weekly versus lifetime profile labels pass"
+else
+  bad "Utsuroba profile weekly audit failed"
+fi
+
 echo "[weekly] Grimmerglen weekly replay audit"
 if node tests/grimmerglen-weekly-replay-audit.cjs >/dev/null 2>&1; then
   ok "Grimmerglen weekly replay contracts pass"
 else
   bad "Grimmerglen weekly replay audit failed"
+fi
+
+echo "[weekly] Grimmerglen profile weekly audit"
+if node tests/grimmerglen-profile-weekly-audit.cjs >/dev/null 2>&1; then
+  ok "Grimmerglen weekly versus lifetime profile labels pass"
+else
+  bad "Grimmerglen profile weekly audit failed"
 fi
 
 echo "[weekly] Sync weekly-world audit"
