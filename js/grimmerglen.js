@@ -49,6 +49,7 @@
   // back is exactly where they arrived, mirroring Muenba's own
   // KARASUKI_RETURN_PORTAL convention.
   const MARIETTA_RETURN_PORTAL = { roomId: 'room_01', x: 768, y: 820, r: 44, triggerR: 36 };
+  const GRIMMERGLEN_PROFILE_PORTAL = { roomId: 'room_01', x: 1111, y: 787 };
   const POPUP_COOLDOWN_MS = 900;
   const OBJECT_HIT_R = 58;
   const OBJECT_DRAW_SIZE = 58;
@@ -117,6 +118,7 @@
   let devPanel, devReadout, devMousePoint = null;
   let entryDrift = null;
   let mariettaPanel = null, mariettaPanelOpen = false, mariettaPanelCooldown = 0;
+  let grimmerglenProfilePortal = null;
   let boohaChangeOverlay = null;
   let carriedObject = null, handoffObject = null;
   let returnPortalOverlay = null, returnPortalOpen = false, returnPortalCooldownUntil = 0;
@@ -450,6 +452,23 @@
     currentBg = image;
   }
 
+  function updateGrimmerglenProfilePortal() {
+    if (!grimmerglenProfilePortal) return;
+    grimmerglenProfilePortal.classList.toggle('is-visible', state.roomId === GRIMMERGLEN_PROFILE_PORTAL.roomId);
+  }
+
+  function buildGrimmerglenProfilePortal() {
+    if (grimmerglenProfilePortal) return;
+    grimmerglenProfilePortal = document.createElement('a');
+    grimmerglenProfilePortal.id = 'grimmerglen-profile-portal';
+    grimmerglenProfilePortal.href = 'grimmerglen-profile.html';
+    grimmerglenProfilePortal.setAttribute('aria-label', 'Open Grimmerglen profile / グリマーグレンプロフィールをひらく');
+    grimmerglenProfilePortal.title = 'Open Grimmerglen profile';
+    grimmerglenProfilePortal.innerHTML = '<span aria-hidden="true">G</span>';
+    stage.appendChild(grimmerglenProfilePortal);
+    updateGrimmerglenProfilePortal();
+  }
+
   function setRoom(roomId, spawnId, arrivalDir) {
     state.roomId = roomId;
     state.spawnId = spawnId || 'default';
@@ -465,6 +484,7 @@
     state.transitionReadyAt = performance.now() + TRANSITION_COOLDOWN_MS;
     state.spawnLockUntil = performance.now() + 700;
     showRoom(roomId);
+    updateGrimmerglenProfilePortal();
     markGrimmerglenRoomVisited(roomId);
     reseedSparkles(roomId);
     reseedObjectLayout(roomId);
@@ -2428,6 +2448,7 @@
     stage.append(roomLayer, atmosphereCanvas, actorCanvas, fadeEl);
     app.appendChild(stage);
     document.body.replaceChildren(app);
+    buildGrimmerglenProfilePortal();
 
     const rotateOverlay = document.createElement('div');
     rotateOverlay.id = 'grimmerglen-rotate-overlay';
@@ -2525,6 +2546,13 @@
       #grimmerglen-marietta-panel .mg-memory-replay-scroll-cue rt{font-size:.62em;color:#aa6a91;}
       @keyframes mgMemoryReplayScrollCue{0%,100%{transform:translateY(0);opacity:.86;}50%{transform:translateY(4px);opacity:1;}}
       @media(prefers-reduced-motion:reduce){#grimmerglen-marietta-panel .mg-memory-replay-scroll-cue{animation:none;}}
+      #grimmerglen-profile-portal{position:absolute;left:${GRIMMERGLEN_PROFILE_PORTAL.x}px;top:${GRIMMERGLEN_PROFILE_PORTAL.y}px;z-index:15;display:none;place-items:center;width:70px;height:70px;transform:translate(-50%,-50%);border:2px solid rgba(255,159,194,.8);border-radius:50%;background:radial-gradient(circle at 38% 30%,#fff8fd 0%,#ffd1e8 42%,#d8c7ff 100%);color:#8f4c9f;text-decoration:none;box-shadow:0 0 12px rgba(255,159,194,.75),0 0 28px rgba(184,164,255,.58),inset 0 0 14px rgba(255,255,255,.92);cursor:pointer;transition:transform .18s ease,filter .18s ease,box-shadow .18s ease;}
+      #grimmerglen-profile-portal.is-visible{display:grid;}
+      #grimmerglen-profile-portal::before{content:'';position:absolute;inset:-9px;border:1px solid rgba(255,224,102,.42);border-radius:50%;box-shadow:0 0 17px rgba(255,224,102,.42);animation:grimmerglenProfilePortalPulse 2.5s ease-in-out infinite;}
+      #grimmerglen-profile-portal span{position:relative;font:900 2rem/1 Georgia,'Times New Roman',serif;letter-spacing:-.08em;text-shadow:0 1px 0 #fff,0 0 9px rgba(255,255,255,.9);}
+      #grimmerglen-profile-portal:hover,#grimmerglen-profile-portal:focus-visible{transform:translate(-50%,-50%) scale(1.08);filter:saturate(1.12) brightness(1.05);box-shadow:0 0 16px rgba(255,159,194,.95),0 0 38px rgba(184,164,255,.8),inset 0 0 16px rgba(255,255,255,1);outline:none;}
+      @keyframes grimmerglenProfilePortalPulse{0%,100%{transform:scale(.88);opacity:.58;}50%{transform:scale(1.08);opacity:1;}}
+      @media(prefers-reduced-motion:reduce){#grimmerglen-profile-portal::before{animation:none;opacity:.8;}#grimmerglen-profile-portal{transition:none;}}
       .mg-object-art-wrap{flex:0 0 clamp(68px,10vw,104px);width:clamp(68px,10vw,104px);height:clamp(68px,10vw,104px);display:grid;place-items:center;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.9),rgba(255,201,224,.28));box-shadow:0 0 24px rgba(184,164,255,.42);}
       .mg-object-art{display:block;width:92%;height:92%;object-fit:contain;filter:drop-shadow(0 5px 7px rgba(120,58,105,.2));}
       #grimmerglen-marietta-panel .mg-memory-inner,#grimmerglen-marietta-panel .mg-handoff-inner{align-items:center;}
