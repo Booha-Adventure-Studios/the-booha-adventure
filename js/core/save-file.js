@@ -117,6 +117,8 @@ const BoohaSaveFile = (() => {
         objectSlots: {},
         activeTargetType: null,
         carriedObjectId: null,
+        mariettaIntroSeen: false,
+        mariettaIntroSkipped: false,
       },
     };
   }
