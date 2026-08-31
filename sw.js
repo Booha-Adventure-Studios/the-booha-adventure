@@ -108,11 +108,13 @@ const CURRENT_CACHES = {
   // normalized to compact 44.1 kHz mono 112 kbps MP3 and trimmed to 3 seconds.
   // Weekly rollover pass (2026-08-31): reset each Sunday-started occurrence
   // while preserving the repeated Week 4 content identity.
+  // Weekly sync persistence pass (2026-08-31): keep reset weekly buckets and
+  // permanent output-world records visible to the cloud-sync emptiness guard.
   // Calendar occurrence-key pass (2026-08-31): preserve Week 4 content while
   // distinguishing a fifth Sunday-started weekly occurrence.
   // Grimmerglen visual polish: room-01 is object-free, room-12 is refreshed,
   // collectibles are smaller, and room-colored vignette leaves are live.
-  assets: 'booha-assets-2026-441',
+  assets: 'booha-assets-2026-442',
   decks:  'booha-decks-2026-310',
 };
 
