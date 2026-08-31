@@ -114,7 +114,9 @@ const CURRENT_CACHES = {
   // distinguishing a fifth Sunday-started weekly occurrence.
   // Grimmerglen visual polish: room-01 is object-free, room-12 is refreshed,
   // collectibles are smaller, and room-colored vignette leaves are live.
-  assets: 'booha-assets-2026-442',
+  // Grimmerglen help-gated navigation pass: entry remains focused on
+  // Marietta until the player accepts her request for help.
+  assets: 'booha-assets-2026-443',
   decks:  'booha-decks-2026-310',
 };
 
