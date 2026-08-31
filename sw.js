@@ -7,7 +7,7 @@
 const CURRENT_CACHES = {
   // Profile consolidation Pass 1: ship the canonical progress page and its
   // moved progress renderer to returning players.
-  pages:  'booha-pages-2026-379',
+  pages:  'booha-pages-2026-380',
   // js/ is served cache-first (see ASSET_PREFIXES below), so once a device
   // caches a script it never re-fetches it until this string changes.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
@@ -97,6 +97,8 @@ const CURRENT_CACHES = {
   // volumedetect) and the per-clip fade rewritten to hold full volume for
   // the clip's natural length instead of ramping to near-silence across
   // its entire duration; chase-repeat taper slowed and its floor raised.
+  // Weekly occurrence pass (2026-08-31): re-key all weekly consumers by the
+  // exact Sunday occurrence so a repeated Week 4 starts locked and empty.
   // Grimmerglen dance/transform pass (2026-08-30): add the six transparent
   // celebration frames, the purple-blue version-1 Booha, and the five-second
   // entry transformation sequence.
@@ -110,7 +112,7 @@ const CURRENT_CACHES = {
   // distinguishing a fifth Sunday-started weekly occurrence.
   // Grimmerglen visual polish: room-01 is object-free, room-12 is refreshed,
   // collectibles are smaller, and room-colored vignette leaves are live.
-  assets: 'booha-assets-2026-439',
+  assets: 'booha-assets-2026-440',
   decks:  'booha-decks-2026-310',
 };
 

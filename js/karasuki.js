@@ -2627,7 +2627,10 @@ const HAPPY_HOUSE_PORTAL = {
       if (!window.CALENDAR || typeof CALENDAR.getCurrentCurriculumWeek !== 'function') return null;
       const cw = CALENDAR.getCurrentCurriculumWeek();
       if (!cw || !cw.year || !cw.monthSlug || !cw.weekNumber) return null;
-      return `${cw.year}-${cw.monthSlug}-w${cw.weekNumber}`;
+      return CALENDAR.getCurriculumWeekOccurrenceKey?.(cw) || cw.occurrenceKey ||
+        (cw.weekStart && cw.weekId
+          ? `${cw.weekStart}|${cw.weekId}`
+          : `${cw.year}-${cw.monthSlug}-w${cw.weekNumber}`);
     } catch (e) {
       console.warn('[Karasuki] Wanderer week resolution failed:', e);
       return null;

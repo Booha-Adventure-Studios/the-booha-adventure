@@ -997,7 +997,10 @@
     try {
       if (!window.CALENDAR || !CALENDAR.getCurrentCurriculumWeek) return null;
       const week = CALENDAR.getCurrentCurriculumWeek();
-      return `${week.year}-${week.monthSlug}-w${week.weekNumber}`;
+      return CALENDAR.getCurriculumWeekOccurrenceKey?.(week) || week.occurrenceKey ||
+        (week.weekStart && week.weekId
+          ? `${week.weekStart}|${week.weekId}`
+          : `${week.year}-${week.monthSlug}-w${week.weekNumber}`);
     } catch (_) {
       return null;
     }

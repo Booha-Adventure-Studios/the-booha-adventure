@@ -10,7 +10,7 @@
  *       s = sessions today (new session after 15+ min of inactivity)
  *       g = games completed today (pct >= 40)
  *
- *   meta.weekLog["2026-W27"] = {
+ *   meta.weekLog["2026-08-30|august-w4"] = {
  *       adv:   { "br:vocab_tap": 92, ... }   // best pct per game this week
  *       blitz: { "vocab": 41.2, ... }        // best clear time (s), 100% only
  *       duel:  { "liar": { w: 2, p: 3 } }    // wins / plays
@@ -30,16 +30,22 @@ const BoohaDayRecord = (() => {
   const SESSION_GAP_MS = 15 * 60 * 1000; // 15 minutes
 
   function _keys() {
-    if (!window.CALENDAR || !CALENDAR.getTodayKey || !CALENDAR.getAcademicWeekKey) {
+    if (!window.CALENDAR || !CALENDAR.getTodayKey || !CALENDAR.getCurrentCurriculumWeek) {
       console.error('[DayRecord] CALENDAR missing — activity NOT recorded.');
       return null;
     }
     const day = CALENDAR.getTodayKey();
+    const cw = CALENDAR.getCurrentCurriculumWeek();
+    const week = CALENDAR.getCurriculumWeekOccurrenceKey?.(cw) || cw?.occurrenceKey ||
+      (cw?.weekStart && cw?.weekId ? `${cw.weekStart}|${cw.weekId}` : null);
+    if (!week) {
+      console.error('[DayRecord] Curriculum occurrence missing — activity NOT recorded.');
+      return null;
+    }
     return {
       day,
-      // Year-prefixed so week keys never collide across years ("2026-w25")
-      week: day.slice(0, 4) + '-' +
-            CALENDAR.getAcademicWeekKey(CALENDAR.getCurrentCurriculumWeek())
+      // Exact Sunday start keeps a repeated Week 4 occurrence separate.
+      week
     };
   }
 

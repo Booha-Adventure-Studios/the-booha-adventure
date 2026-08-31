@@ -218,6 +218,8 @@
 
   function curriculumWeekKey(cw) {
     if (!cw || typeof cw !== 'object') return String(cw == null ? '' : cw);
+    if (cw.occurrenceKey) return cw.occurrenceKey;
+    if (cw.weekStart && cw.weekId) return `${cw.weekStart}|${cw.weekId}`;
     return `${cw.monthSlug || cw.month || 'week'}-w${cw.weekNumber || 0}`;
   }
 
@@ -1743,8 +1745,7 @@
   function readingWeekKey() {
     try {
       const cw = window.CALENDAR?.getCurrentCurriculumWeek?.();
-      return cw && cw.monthSlug && Number.isInteger(cw.weekNumber)
-        ? `${cw.monthSlug}:w${cw.weekNumber}` : null;
+      return cw ? curriculumWeekKey(cw) : null;
     } catch (_) { return null; }
   }
 
