@@ -245,6 +245,11 @@
     mariettaImg.decoding = 'async';
     mariettaImg.src = MARIETTA.poses[0];
   }
+  const mariettaWaitingImg = new Image();
+  if (MARIETTA && MARIETTA.poses && MARIETTA.poses[4]) {
+    mariettaWaitingImg.decoding = 'async';
+    mariettaWaitingImg.src = MARIETTA.poses[4];
+  }
 
   Object.keys(DATA.collectibles || {}).forEach(type => {
     const image = new Image();
@@ -615,21 +620,37 @@
 
   function drawMarietta(now) {
     if (!MARIETTA || state.roomId !== MARIETTA.roomId) return;
-    if (!mariettaImg.complete || mariettaImg.naturalWidth === 0) return;
+    const waitingForMemory = isMariettaWaitingForMemory();
+    const sprite = waitingForMemory && mariettaWaitingImg.complete && mariettaWaitingImg.naturalWidth > 0
+      ? mariettaWaitingImg : mariettaImg;
+    if (!sprite.complete || sprite.naturalWidth === 0) return;
     const seconds = now / 1000;
     const pulse = REDUCED_MOTION ? .82 : .72 + Math.sin(seconds * 2.2) * .1;
     const size = MARIETTA.drawR * 2;
+    const haloRadius = size * (waitingForMemory ? 1.78 : 1.45);
     actorCtx.save();
-    const halo = actorCtx.createRadialGradient(MARIETTA.x, MARIETTA.y, 5, MARIETTA.x, MARIETTA.y, size * 1.45);
+    const halo = actorCtx.createRadialGradient(MARIETTA.x, MARIETTA.y, 5, MARIETTA.x, MARIETTA.y, haloRadius);
     halo.addColorStop(0, `rgba(255,245,252,${.72 * pulse})`);
-    halo.addColorStop(.45, `rgba(255,159,194,${.28 * pulse})`);
+    halo.addColorStop(.45, `rgba(255,159,194,${(waitingForMemory ? .48 : .28) * pulse})`);
     halo.addColorStop(1, 'rgba(184,164,255,0)');
     actorCtx.fillStyle = halo;
     actorCtx.beginPath();
-    actorCtx.arc(MARIETTA.x, MARIETTA.y, size * 1.45, 0, Math.PI * 2);
+    actorCtx.arc(MARIETTA.x, MARIETTA.y, haloRadius, 0, Math.PI * 2);
     actorCtx.fill();
+    if (waitingForMemory) {
+      actorCtx.globalAlpha = .28 + pulse * .1;
+      actorCtx.strokeStyle = '#ff9fc2';
+      actorCtx.shadowColor = 'rgba(255,159,194,.9)';
+      actorCtx.shadowBlur = 22;
+      actorCtx.lineWidth = 3;
+      actorCtx.beginPath();
+      actorCtx.arc(MARIETTA.x, MARIETTA.y, size * 1.2 + Math.sin(seconds * 2) * 3, 0, Math.PI * 2);
+      actorCtx.stroke();
+    }
     actorCtx.globalAlpha = .98;
-    actorCtx.drawImage(mariettaImg, MARIETTA.x - size / 2, MARIETTA.y - size / 2, size, size);
+    actorCtx.shadowColor = waitingForMemory ? 'rgba(255,159,194,.72)' : 'transparent';
+    actorCtx.shadowBlur = waitingForMemory ? 12 : 0;
+    actorCtx.drawImage(sprite, MARIETTA.x - size / 2, MARIETTA.y - size / 2, size, size);
     actorCtx.restore();
   }
 
@@ -1399,6 +1420,11 @@
     const slots = readGrimmerglenWeekly().objectSlots;
     objectSlotsCache = slots && typeof slots === 'object' ? slots : {};
     return objectSlotsCache;
+  }
+
+  function isMariettaWaitingForMemory() {
+    if (!state.helpAccepted || state.celebrating) return false;
+    return Object.values(getGrimmerglenObjectsProgress()).some(entry => entry.found < 3);
   }
 
   function getActiveGrimmerglenTargetType() {

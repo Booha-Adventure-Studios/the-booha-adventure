@@ -181,6 +181,22 @@
   }
 
   // ── Exercise widget ──────────────────────────────────────────────────────
+  // Choices are reshuffled each time an exercise is rendered. Keep the first
+  // authored choice out of the first slot when alternatives exist, since the
+  // memory content uses that slot for the correct answer.
+  function reorderOptions(options) {
+    const reordered = Array.isArray(options) ? options.slice() : [];
+    for (let index = reordered.length - 1; index > 0; index -= 1) {
+      const swapIndex = Math.floor(Math.random() * (index + 1));
+      [reordered[index], reordered[swapIndex]] = [reordered[swapIndex], reordered[index]];
+    }
+    if (reordered.length > 1 && reordered[0] === options[0]) {
+      const swapIndex = 1 + Math.floor(Math.random() * (reordered.length - 1));
+      [reordered[0], reordered[swapIndex]] = [reordered[swapIndex], reordered[0]];
+    }
+    return reordered;
+  }
+
   function renderExercise(container, exercise, callbacks) {
     if (!container || !exercise) return null;
     const ex = Object.assign({
@@ -190,8 +206,9 @@
     const cb = callbacks || {};
 
     const hasOptions = Array.isArray(ex.options) && ex.options.length > 0;
+    const displayOptions = hasOptions ? reorderOptions(ex.options) : [];
     const chipsHTML = hasOptions
-      ? ex.options.map(opt => `<span class="mgty-chip">${escapeHTML(opt)}</span>`).join('')
+      ? displayOptions.map(opt => `<span class="mgty-chip">${escapeHTML(opt)}</span>`).join('')
       : '';
     const showChipsUpFront = hasOptions && ex.optionsVisible;
     const showHintToggle = hasOptions && !ex.optionsVisible;
