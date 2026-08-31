@@ -75,12 +75,14 @@
     ],
     room_07: [
       exit('down',  'room_04', 'fromUp'),
-      exit('right', 'room_08', 'fromLeft')
+      exit('right', 'room_08', 'fromLeft'),
+      exit('up',    'room_10', 'fromDown')
     ],
     room_08: [
       exit('down',  'room_05', 'fromUp'),
       exit('left',  'room_07', 'fromRight'),
-      exit('right', 'room_09', 'fromLeft', { x: 1107, y: 456 })
+      exit('right', 'room_09', 'fromLeft', { x: 1107, y: 456 }),
+      exit('up',    'room_11', 'fromDown')
     ],
     room_09: [
       exit('down', 'room_06', 'fromUp'),

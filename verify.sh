@@ -726,21 +726,28 @@ else
   bad "Grimmerglen Pass 9E audit failed"
 fi
 
-echo "[86/86] Calendar fifth-week audit"
+echo "[86/90] Grimmerglen navigation audit"
+if node tests/grimmerglen-navigation-audit.cjs >/dev/null 2>&1; then
+  ok "Grimmerglen grid links, boundary arrows, and help-gated movement contracts pass"
+else
+  bad "Grimmerglen navigation audit failed"
+fi
+
+echo "[87/90] Calendar fifth-week audit"
 if node tests/calendar-week-audit.cjs >/dev/null 2>&1; then
   ok "Calendar Sunday boundary and repeat-week occurrence contracts pass"
 else
   bad "Calendar fifth-week audit failed"
 fi
 
-echo "[87/87] Weekly rollover audit"
+echo "[88/90] Weekly rollover audit"
 if node tests/weekly-rollover-audit.cjs >/dev/null 2>&1; then
   ok "Occurrence-based weekly reset and permanent-state preservation pass"
 else
   bad "Weekly rollover audit failed"
 fi
 
-echo "[89/89] Weekly occurrence consumer audit"
+echo "[89/90] Weekly occurrence consumer audit"
 if node tests/weekly-occurrence-consumers-audit.cjs >/dev/null 2>&1; then
   ok "All weekly consumers distinguish repeated Week 4 occurrences"
 else

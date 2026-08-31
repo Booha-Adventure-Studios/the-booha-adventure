@@ -568,8 +568,10 @@
   function drawExitArrows(now) {
     if (!state.navigationUnlocked) return;
     const exits = getRoomExits(state.roomId);
-    const reveal = Math.min(1, state.distMovedSinceSpawn / ARROW_MOVE_THRESHOLD);
-    if (reveal <= 0) return;
+    // Help is the visibility gate. Once navigation is unlocked, show every
+    // real room connection as soon as the room is ready, including when the
+    // player has not moved yet in a newly entered room.
+    const reveal = 1;
     const backDir = state.arrivalDir ? OPPOSITE[state.arrivalDir] : null;
     const seconds = now / 1000;
     const glow = getRoomGlowRgb(state.roomId);
@@ -1668,10 +1670,12 @@
     });
   }
 
-  // Pass 9C: the explicit help choice is the only doorway into the hint,
-  // tutorial, and the state transition that can eventually unlock navigation.
+  // The explicit help choice opens the memory hint and reveals the room
+  // arrows immediately. The practice flow continues after the hint, but it
+  // is no longer a movement gate, so Booha can wander room_01 while deciding.
   function acceptMariettaHelp() {
     state.helpAccepted = true;
+    unlockGrimmerglenNavigation();
     const t = getGrimmerglenTutorial();
     const firstHelp = !t.skipPrompted && !t.completed;
     if (firstHelp) {
@@ -2135,9 +2139,8 @@
     }
     if (state.inputLocked || state.transitioning) return;
     if (clickCheckMarietta(point.x, point.y)) return;
-    // On the first transformed arrival, Marietta is the only interaction.
-    // Her help decision is what opens the rest of the world.
-    if (state.entryWelcomePending) return;
+    // Before help, room_01 remains walkable, but collectibles stay dormant
+    // until the player has completed the welcome/help choice.
     if (clickCheckGrimmerglenObject(point.x, point.y)) return;
     if (clickCheckReturnPortal(point.x, point.y)) return;
     if (DEV_MODE) updateDevReadout(point.x, point.y);
