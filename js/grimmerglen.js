@@ -7,10 +7,8 @@
  * Muenba-specific stripped out (no ghosts, rhythm game, or case/briefing
  * content).
  *
- * The world gate is deliberately still closed to real players. The existing
- * isGrimmerglenUnlocked()/GRIMMERGLEN_BUILD_READY scaffold and Karasuki
- * portal remain DEV-only until the area is ready to ship; direct production
- * URLs show the locked-world card instead of booting the room walker.
+ * The world gate follows the shared nine-game weekly readiness gate. DEV mode
+ * still bypasses that gate for room and coordinate calibration.
  *
  * Per-room walkable/exit calibration remains a later follow-up after someone
  * has walked all nine rooms with the DEV overlay.
@@ -116,7 +114,7 @@
   };
 
   let app, stage, roomLayer, atmosphereCanvas, atmosphereCtx, actorCanvas, actorCtx, fadeEl, currentBg;
-  let devPanel, devReadout;
+  let devPanel, devReadout, devMousePoint = null;
   let entryDrift = null;
   let mariettaPanel = null, mariettaPanelOpen = false, mariettaPanelCooldown = 0;
   let boohaChangeOverlay = null;
@@ -2043,11 +2041,20 @@
   // ── DEV overlay (foundation tool for calibrating exits/walkables later) ──
   function updateDevReadout(worldX, worldY) {
     if (!DEV_MODE || !devReadout) return;
+    if (typeof worldX === 'number' && typeof worldY === 'number') {
+      devMousePoint = { x: worldX, y: worldY };
+    }
     const room = DATA.rooms[state.roomId]?.color?.name || state.roomId;
-    const coordText = (typeof worldX === 'number')
-      ? `last click: ${Math.round(worldX)}, ${Math.round(worldY)}`
-      : `booha: ${Math.round(state.x)}, ${Math.round(state.y)}`;
-    devReadout.textContent = `${state.roomId} (${room}) — ${coordText}`;
+    const mouseText = devMousePoint
+      ? `mouse: ${Math.round(devMousePoint.x)}, ${Math.round(devMousePoint.y)}`
+      : 'mouse: —, —';
+    const boohaText = `booha: ${Math.round(state.x)}, ${Math.round(state.y)}`;
+    devReadout.textContent = `${state.roomId} (${room}) — ${mouseText} · ${boohaText}`;
+  }
+
+  function clearDevMouseReadout() {
+    devMousePoint = null;
+    updateDevReadout();
   }
 
   function buildDevPanel() {
@@ -2150,6 +2157,13 @@
   }
 
   function bindInput() {
+    if (DEV_MODE) {
+      stage.addEventListener('mousemove', event => {
+        const point = stagePoint(event.clientX, event.clientY);
+        updateDevReadout(point.x, point.y);
+      });
+      stage.addEventListener('mouseleave', clearDevMouseReadout);
+    }
     stage.addEventListener('click', event => {
       if (performance.now() - lastTouchEnd < 500) return;
       handleInput(event.clientX, event.clientY);
@@ -2360,11 +2374,8 @@
     window.requestAnimationFrame(tick);
   }
 
-  // Grimmerglen is still under construction -- GRIMMERGLEN_BUILD_READY in
-  // js/core/unlock-system.js keeps the door shut for real students even
-  // once they've earned the weekly gate, the same temporary-scaffold shape
-  // Muenba's own gate carried while it was being built. DEV_MODE / the dev
-  // panel checkbox bypasses it for testing.
+  // Grimmerglen opens after the shared nine-game weekly gate. DEV_MODE / the
+  // dev panel checkbox bypasses it for room and coordinate calibration.
   function worldGateOpen() {
     if (DEV_MODE || window.__devGrimmerglen) return true;
     return window.BoohaUnlockSystem &&

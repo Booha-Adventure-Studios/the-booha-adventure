@@ -721,7 +721,7 @@ fi
 
 echo "[85/85] Grimmerglen Pass 9E audit"
 if node tests/grimmerglen-pass9e-audit.cjs >/dev/null 2>&1; then
-  ok "Grimmerglen profile-preview and DEV-only world gate contracts pass"
+  ok "Grimmerglen weekly shortcut, world gate, and DEV coordinate contracts pass"
 else
   bad "Grimmerglen Pass 9E audit failed"
 fi
