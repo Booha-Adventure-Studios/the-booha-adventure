@@ -9,7 +9,7 @@ const CURRENT_CACHES = {
   // invalidate the cache-first profile/runtime files together.
   // Profile consolidation Pass 1: ship the canonical progress page and its
   // moved progress renderer to returning players.
-  pages:  'booha-pages-2026-382',
+  pages:  'booha-pages-2026-383',
   // js/ is served cache-first (see ASSET_PREFIXES below), so once a device
   // caches a script it never re-fetches it until this string changes.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
