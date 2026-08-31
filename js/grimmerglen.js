@@ -107,6 +107,7 @@
     boohaTransformStartedAt: 0,
     boohaTransformPoofUntil: 0,
     entryWelcomePending: false,
+    navigationUnlocked: false,
     celebrating: false,
     celebrationStart: 0,
     celebrationTimer: 0,
@@ -534,7 +535,7 @@
   }
 
   function getAvailableExit(now) {
-    if (state.inputLocked || state.transitioning) return null;
+    if (!state.navigationUnlocked || state.inputLocked || state.transitioning) return null;
     if (now < state.transitionReadyAt || now < state.spawnLockUntil) return null;
     if (state.distMovedSinceSpawn < ARROW_MOVE_THRESHOLD) return null;
     const backDir = state.arrivalDir ? OPPOSITE[state.arrivalDir] : null;
@@ -564,6 +565,7 @@
 
   // ── Drawing ──────────────────────────────────────────────────────────────
   function drawExitArrows(now) {
+    if (!state.navigationUnlocked) return;
     const exits = getRoomExits(state.roomId);
     const reveal = Math.min(1, state.distMovedSinceSpawn / ARROW_MOVE_THRESHOLD);
     if (reveal <= 0) return;
@@ -956,6 +958,7 @@
       state.boohaTransforming = false;
       state.boohaTransformed = true;
       state.inputLocked = false;
+      state.navigationUnlocked = false;
       state.entryWelcomePending = state.spawnId === 'fromKarasuki';
       state.boohaTransformPoofUntil = performance.now() + BOOHA_TRANSFORM_POOF_MS;
       boohaShakeUntil = 0;
@@ -1569,7 +1572,10 @@
         </div>
       </div>`;
     const doneBtn = mariettaPanel.querySelector('#mg-tutorial-done-btn');
-    if (doneBtn) doneBtn.addEventListener('click', closeMariettaPanel);
+    if (doneBtn) doneBtn.addEventListener('click', () => {
+      unlockGrimmerglenNavigation();
+      closeMariettaPanel();
+    });
   }
 
   // Every later entry (tutorial not completed, already offered once
@@ -1605,7 +1611,11 @@
   // closeMariettaPanel() -- the tri-state decision described above.
   function handleMariettaDialogueClose() {
     const t = getGrimmerglenTutorial();
-    if (t.completed) { closeMariettaPanel(); return; }
+    if (t.completed) {
+      unlockGrimmerglenNavigation();
+      closeMariettaPanel();
+      return;
+    }
     if (!t.skipPrompted) {
       writeGrimmerglenTutorial({ skipPrompted: true });
       startGrimmerglenTutorial();
@@ -1632,6 +1642,16 @@
     mariettaPanelOpen = false;
     handoffObject = null;
     mariettaPanel.classList.remove('open');
+  }
+
+  function unlockGrimmerglenNavigation() {
+    state.navigationUnlocked = true;
+    state.entryWelcomePending = false;
+    state.inputLocked = false;
+    state.clickTarget = null;
+    state.moving = false;
+    // Let the player walk a little before exit arrows fade in.
+    state.distMovedSinceSpawn = 0;
   }
 
   function clearCarriedGrimmerglenObject() {
@@ -1824,7 +1844,6 @@
     if (!MARIETTA || state.roomId !== MARIETTA.roomId || mariettaPanelOpen || state.boohaTransforming || !state.boohaTransformed) return false;
     const bob = REDUCED_MOTION ? 0 : Math.sin(performance.now() / 1000 * 2.6) * 6;
     if (Math.hypot(worldX - MARIETTA.x, worldY - (MARIETTA.y + bob)) > MARIETTA.hitR) return false;
-    state.entryWelcomePending = false;
     openMariettaPanel();
     return true;
   }
@@ -2037,6 +2056,9 @@
     }
     if (state.inputLocked || state.transitioning) return;
     if (clickCheckMarietta(point.x, point.y)) return;
+    // On the first transformed arrival, Marietta is the only interaction.
+    // Her help decision is what opens the rest of the world.
+    if (state.entryWelcomePending) return;
     if (clickCheckGrimmerglenObject(point.x, point.y)) return;
     if (clickCheckReturnPortal(point.x, point.y)) return;
     if (DEV_MODE) updateDevReadout(point.x, point.y);
