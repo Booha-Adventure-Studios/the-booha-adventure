@@ -145,6 +145,17 @@
     .stat-label { margin-top: 9px; color: var(--muted); font: 700 .65rem/1.4 var(--sans); letter-spacing: .08em; text-transform: uppercase; }
     .stat-jp { display: block; margin-top: 3px; color: var(--quiet); font: .75rem/1.4 var(--font); }
 
+    .weekly-hunt { margin-top: 16px; padding: 18px 20px; border: 1px solid rgba(143,220,178,.34); border-radius: 6px 18px 6px 18px; background: linear-gradient(120deg, rgba(19,55,39,.72), rgba(9,24,18,.74)); }
+    .weekly-hunt-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; }
+    .weekly-hunt-heading h2 { margin: 0; color: #f4fff8; font-size: 1.15rem; font-weight: 400; }
+    .weekly-hunt-heading span { color: var(--moss); font: 700 .66rem/1.4 var(--sans); letter-spacing: .08em; text-transform: uppercase; }
+    .weekly-hunt-copy { margin: 8px 0 14px; color: var(--muted); font-size: .84rem; line-height: 1.5; }
+    .weekly-hunt-copy small { display: block; margin-top: 4px; color: var(--quiet); font-size: .9em; }
+    .weekly-hunt-progress { display: flex; align-items: center; gap: 12px; }
+    .weekly-hunt-progress progress { width: 100%; height: 9px; accent-color: var(--moss); }
+    .weekly-hunt-count { flex: 0 0 auto; color: var(--gold); font: 700 .78rem/1.4 var(--sans); white-space: nowrap; }
+    .weekly-hunt-legend { margin: 10px 0 0; color: var(--quiet); font: .65rem/1.5 var(--sans); letter-spacing: .03em; }
+
     .section { margin-top: 26px; }
     .section-heading { display: flex; align-items: end; justify-content: space-between; gap: 14px; margin: 0 2px 11px; }
     .section-heading h2 { margin: 0; font-size: clamp(1.25rem, 3vw, 1.7rem); font-weight: 400; }
@@ -163,8 +174,9 @@
     .ghost-state-jp { margin: 3px 0 0; color: var(--quiet); font: .72rem/1.35 var(--font); }
     .ghost-memory-current { margin: 9px 0 0; color: var(--gold); font: 700 .64rem/1.35 var(--sans); letter-spacing: .04em; }
     .ghost-memory-progress { margin: 4px 0 0; color: var(--quiet); font: .61rem/1.4 var(--sans); letter-spacing: .02em; }
-    .is-found .ghost-state { color: var(--moss); }
-    .is-found .ghost-state-jp { color: rgba(143,220,178,.72); }
+    .is-weekly-found .ghost-state { color: var(--moss); }
+    .is-weekly-found .ghost-state-jp { color: rgba(143,220,178,.72); }
+    .ghost-card:not(.is-weekly-found) .ghost-state { color: var(--gold); }
 
     .lower-grid { display: grid; grid-template-columns: 1.25fr .75fr; gap: 16px; }
     .panel { padding: 19px; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); }
@@ -356,6 +368,10 @@
       function render() {
         const data = getSave();
         const mu = data.muenba || {};
+        const weeklyMuenba = data.weekly?.worlds?.muenba && typeof data.weekly.worlds.muenba === 'object'
+          ? data.weekly.worlds.muenba : {};
+        const weeklyGhostsFound = weeklyMuenba.ghostsFound && typeof weeklyMuenba.ghostsFound === 'object'
+          ? weeklyMuenba.ghostsFound : {};
         const ghosts = Array.isArray(window.MUENBA_DATA?.ghosts) ? window.MUENBA_DATA.ghosts : [];
         const cases = window.MUENBA_DATA?.cases && typeof window.MUENBA_DATA.cases === 'object' ? window.MUENBA_DATA.cases : {};
         const memoryModes = ['start', 'fresh', 'deep'];
@@ -395,6 +411,8 @@
         const nextCase = caseOrder.find(caseData => !modeComplete(recordForCase(caseData), currentMemory)) || null;
         const rooms = Number.isInteger(mu.roomVisitsTotal) ? mu.roomVisitsTotal : 0;
         const journal = Array.isArray(mu.huntJournal?.entries) ? mu.huntJournal.entries : [];
+        const weeklyFoundCount = ghosts.filter(ghost => weeklyGhostsFound[ghost.id] === true).length;
+        const weeklyRemainingCount = Math.max(ghosts.length - weeklyFoundCount, 0);
 
         const caseRecordMarkup = caseOrder.length
           ? `<div class="case-record-grid">${caseOrder.map((caseData, index) => {
@@ -448,6 +466,7 @@
           const ghostCase = caseOrder.find(caseData => caseData.ghostId === ghost.id);
           const ghostRecord = ghostCase ? recordForCase(ghostCase) : null;
           const currentModeComplete = ghostCase && modeComplete(ghostRecord, currentMemory);
+          const weeklyFound = weeklyGhostsFound[ghost.id] === true;
           // Pass 13: highlighting now tracks whether *this ghost's case is
           // solved at the currently-selected memory tier*, not lifetime
           // capture — previously every found-at-least-once ghost stayed lit
@@ -456,14 +475,14 @@
           const modeProgress = ghostCase
             ? memoryModes.map(modeName => `${memoryModeLabel(modeName)}: ${modeComplete(ghostRecord, modeName) ? 'complete' : 'open'}`).join(' · ')
             : 'No case memory assigned yet';
-          return `<article class="ghost-card${isFound ? ' is-found' : ''}">
+          return `<article class="ghost-card${isFound ? ' is-found' : ''}${weeklyFound ? ' is-weekly-found' : ''}">
             <img class="ghost-avatar" src="${esc(ghost.img)}" alt="">
             <h3 class="ghost-name">${esc(ghost.name)}</h3>
             <p class="ghost-name-kana">${esc(ghost.kana || '')}</p>
             <p class="ghost-personality">${esc(ghost.personality || '')}</p>
-            <p class="ghost-state">${isFound ? 'Energy collected' : 'Still hiding'}</p>
-            <p class="ghost-state-jp">${isFound ? '<ruby>集<rt>あつ</rt></ruby>めたエネルギー' : 'まだかくれている'}</p>
-            ${ghostCase ? `<p class="ghost-memory-current">${esc(memoryModeLabel(currentMemory))} · ${currentModeComplete ? 'complete' : 'open'}</p><p class="ghost-memory-progress">${esc(modeProgress)}</p>` : '<p class="ghost-memory-progress">No case memory assigned yet</p>'}
+            <p class="ghost-state">${weeklyFound ? 'Found this week' : 'Available this week'}</p>
+            <p class="ghost-state-jp">${weeklyFound ? '<ruby>今週<rt>こんしゅう</rt></ruby>みつけた' : '<ruby>今週<rt>こんしゅう</rt></ruby>はまだ'}</p>
+            ${ghostCase ? `<p class="ghost-memory-current">Lifetime ${esc(memoryModeLabel(currentMemory))} · ${currentModeComplete ? 'complete' : 'open'}</p><p class="ghost-memory-progress">${esc(modeProgress)}</p>` : '<p class="ghost-memory-progress">Lifetime case memory not opened yet</p>'}
           </article>`;
         }).join('');
 
@@ -482,15 +501,22 @@
         host.innerHTML = `
           ${difficultyMarkup()}
 
+          <section class="weekly-hunt" aria-labelledby="weekly-hunt-heading">
+            <div class="weekly-hunt-heading"><h2 id="weekly-hunt-heading">This Week's Hunt</h2><span>Fresh every Sunday</span></div>
+            <p class="weekly-hunt-copy">The hunt resets weekly, while your case memories and lifetime ledger stay saved.<small>今週の<ruby>探索<rt>たんさく</rt></ruby>は<ruby>毎週日曜日<rt>まいしゅうにちようび</rt></ruby>にリセットされ、<ruby>事件<rt>じけん</rt></ruby>の<ruby>記憶<rt>きおく</rt></ruby>は<ruby>残<rt>のこ</rt></ruby>ります。</small></p>
+            <div class="weekly-hunt-progress"><progress max="${Math.max(ghosts.length, 1)}" value="${weeklyFoundCount}" aria-label="${weeklyFoundCount} of ${ghosts.length} ghosts found this week"></progress><span class="weekly-hunt-count">${weeklyFoundCount} / ${ghosts.length}</span></div>
+            <p class="weekly-hunt-legend">${weeklyRemainingCount ? `${weeklyRemainingCount} ghost${weeklyRemainingCount === 1 ? '' : 's'} available to find again this week.` : 'All ghosts found this week.'}</p>
+          </section>
+
           <section class="stats" aria-label="Muenba totals">
-            <div class="stat"><div class="stat-value">${totalCaptures}</div><div class="stat-label">Energy collected</div><span class="stat-jp"><ruby>集<rt>あつ</rt></ruby>めたエネルギー</span></div>
-            <div class="stat"><div class="stat-value">${orbs}</div><div class="stat-label">Orbs collected</div><span class="stat-jp"><ruby>集<rt>あつ</rt></ruby>めたエネルギー</span></div>
-            <div class="stat"><div class="stat-value">${caseSettles}</div><div class="stat-label">Case records</div><span class="stat-jp"><ruby>事件<rt>じけん</rt></ruby>の<ruby>記録<rt>きろく</rt></ruby></span></div>
-            <div class="stat"><div class="stat-value">${rooms}</div><div class="stat-label">Rooms visited</div><span class="stat-jp"><ruby>訪<rt>おとず</rt></ruby>れた<ruby>部屋<rt>へや</rt></ruby></span></div>
+            <div class="stat"><div class="stat-value">${totalCaptures}</div><div class="stat-label">Lifetime captures</div><span class="stat-jp"><ruby>今<rt>いま</rt></ruby>までの<ruby>捕獲<rt>ほかく</rt></ruby></span></div>
+            <div class="stat"><div class="stat-value">${orbs}</div><div class="stat-label">Lifetime orbs</div><span class="stat-jp"><ruby>今<rt>いま</rt></ruby>までのエネルギー</span></div>
+            <div class="stat"><div class="stat-value">${caseSettles}</div><div class="stat-label">Lifetime case records</div><span class="stat-jp"><ruby>事件<rt>じけん</rt></ruby>の<ruby>記録<rt>きろく</rt></ruby></span></div>
+            <div class="stat"><div class="stat-value">${rooms}</div><div class="stat-label">Lifetime rooms visited</div><span class="stat-jp"><ruby>今<rt>いま</rt></ruby>までに<ruby>訪<rt>おとず</rt></ruby>れた<ruby>部屋<rt>へや</rt></ruby></span></div>
           </section>
 
           <section class="section">
-            <div class="section-heading"><h2>The Ghosts</h2><p><ruby>幽霊<rt>ゆうれい</rt></ruby>たち</p></div>
+            <div class="section-heading"><h2>The Ghosts</h2><p>Weekly hunt · lifetime memory</p></div>
             <div class="ghost-grid">${ghostCards || '<p class="journal-empty">The ledger is quiet.</p>'}</div>
           </section>
 
