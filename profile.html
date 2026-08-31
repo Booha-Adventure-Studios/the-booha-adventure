@@ -708,8 +708,8 @@
     <a href="utsuroba-profile.html">UTSUROBA <small>うつろば</small></a>
     <!-- Hidden until BoohaUnlockSystem.isMuenbaUnlocked(). -->
     <a href="muenba-profile.html" id="pnet-muenba" hidden>MUENBA <small>むえんば</small></a>
-    <!-- Hidden until the Grimmerglen world is opened. -->
-    <a href="grimmerglen-profile.html" id="pnet-grimmerglen">GRIMMERGLEN <small>グリマーグレン</small></a>
+    <!-- Hidden until all nine games open the Grimmerglen world gate. -->
+    <a href="grimmerglen-profile.html" id="pnet-grimmerglen" hidden>GRIMMERGLEN <small>グリマーグレン</small></a>
   </nav>
 
  <main class="paper" id="profile-content">
@@ -937,7 +937,7 @@
   })();
 </script>
   <script>
-    // Grimmerglen is a dormant menu door until its weekly/build gate opens.
+    // Grimmerglen follows the same weekly world gate as the other areas.
     (function () {
       var tab = document.getElementById('pnet-grimmerglen');
       if (!tab) return;
@@ -945,12 +945,10 @@
         var open = false;
         try {
           open = !!(window.BoohaUnlockSystem &&
-            typeof BoohaUnlockSystem.isGrimmerglenUnlocked === 'function' &&
-            BoohaUnlockSystem.isGrimmerglenUnlocked());
+            typeof BoohaUnlockSystem.isWeeklyWorldGateOpen === 'function' &&
+            BoohaUnlockSystem.isWeeklyWorldGateOpen());
         } catch (_) {}
-        // The profile is safe to browse before the world ships. Only the
-        // profile's own Enter button is gated; never expose the live world.
-        tab.hidden = false;
+        tab.hidden = !open;
       }
       if (window.BOOHA_READY) renderGrimmerglenTab();
       else document.addEventListener('booha:ready', renderGrimmerglenTab, { once: true });

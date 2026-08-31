@@ -163,16 +163,16 @@ assert(serviceWorker.includes('grimmerglen/dance/marietta_dance_'), 'service wor
 assert(serviceWorker.includes('grimmerglen/dance/booha_grimmerglen_dance_'), 'service worker must precache Booha dance art');
 assert(serviceWorker.includes('room_${String(index + 1).padStart(2, \'0\')}.webp'), 'service worker must cover the generated room sequence');
 assert(serviceWorker.includes('${BASE}/assets/img/grimmerglen/booha_change.mp3'), 'service worker must precache the Booha change cue');
-assert(/assets:\s+'booha-assets-2026-448'/.test(serviceWorker), 'asset cache must be bumped for the Marietta help-gating pass');
+assert(/assets:\s+'booha-assets-2026-449'/.test(serviceWorker), 'asset cache must be bumped for the Marietta help-gating pass');
 
 assert(profile.includes('GRIMMERGLEN / MEMORY CASE FILE'), 'profile must use the Grimmerglen case-file header');
 assert(profile.includes('grimmerglen-data.js'), 'profile must load the Grimmerglen manifest');
 assert(profile.includes('BoohaUnlockSystem.isGrimmerglenUnlocked'), 'profile must keep the world dormant behind its gate');
-assert(unlockSource.includes('const GRIMMERGLEN_BUILD_READY = false'), 'Grimmerglen must remain closed outside DEV tools');
+assert(!unlockSource.includes('GRIMMERGLEN_BUILD_READY'), 'Grimmerglen must use the shared weekly gate now that it is shipped');
 for (const profilePage of ['profile.html', 'adventure-profile.html', 'utsuroba-profile.html', 'muenba-profile.html']) {
   const source = fs.readFileSync(path.join(root, profilePage), 'utf8');
   assert(source.includes('id="pnet-grimmerglen"'), `${profilePage} must expose the Grimmerglen profile tab`);
-  assert(!source.includes('id="pnet-grimmerglen" hidden'), `${profilePage} must not hide the safe profile tab`);
+  assert(source.includes('id="pnet-grimmerglen" hidden'), `${profilePage} must hide the Grimmerglen tab before the weekly gate`);
 }
 assert(profile.includes('clickTone'), 'profile must include the cute WebAudio click cue');
 assert(profile.includes('memory-card'), 'profile must render the eight memory lanes');
