@@ -126,7 +126,7 @@ const CURRENT_CACHES = {
   // furigana so Japanese readings do not look like duplicate sentences.
   // Grimmerglen Pass 1 adds replay-safe lifetime counters to the shared save
   // layer and world runtime; invalidate the cache-first JavaScript bundle.
-  assets: 'booha-assets-2026-473',
+  assets: 'booha-assets-2026-474',
   decks:  'booha-decks-2026-310',
 };
 

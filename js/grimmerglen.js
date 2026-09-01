@@ -629,16 +629,19 @@
       const bob = REDUCED_MOTION ? 0 : Math.sin(seconds * 2.4 + index) * 5;
       const x = exit.x + Math.cos(angle) * bob;
       const y = exit.y + Math.sin(angle) * bob;
-      const twinkle = REDUCED_MOTION ? .85 : .72 + .24 * Math.sin(seconds * 3.1 + index * 1.6);
+      const twinkle = REDUCED_MOTION ? .9 : .78 + .2 * Math.sin(seconds * 3.1 + index * 1.6);
+      const arrowAlpha = fade * Math.min(1, .66 + twinkle * .18 + proximity * .16);
 
       actorCtx.save();
       actorCtx.translate(x, y);
       actorCtx.rotate(angle);
-      actorCtx.globalAlpha = fade * (.5 + twinkle * .3 + proximity * .2);
-      actorCtx.strokeStyle = `rgba(${glowStr},.95)`;
-      actorCtx.shadowColor = `rgba(${glowStr},.75)`;
-      actorCtx.shadowBlur = 16;
-      actorCtx.lineWidth = 4.2;
+      // A broad low-opacity halo makes the direction discoverable without
+      // enlarging the hitbox or changing the room's calibrated exit point.
+      actorCtx.globalAlpha = arrowAlpha;
+      actorCtx.strokeStyle = `rgba(${glowStr},.34)`;
+      actorCtx.shadowColor = `rgba(${glowStr},.95)`;
+      actorCtx.shadowBlur = 30 + twinkle * 12;
+      actorCtx.lineWidth = 11;
       actorCtx.lineCap = 'round';
       actorCtx.lineJoin = 'round';
       actorCtx.beginPath();
@@ -646,8 +649,18 @@
       actorCtx.lineTo(1, 0);
       actorCtx.lineTo(-12, 8);
       actorCtx.stroke();
-      actorCtx.shadowBlur = 0;
-      actorCtx.globalAlpha = fade * (.7 + twinkle * .3);
+      // Keep a crisp white-edged arrow inside the halo so the glow never
+      // replaces the directional shape itself.
+      actorCtx.shadowBlur = 15 + twinkle * 5;
+      actorCtx.globalAlpha = fade * (.82 + twinkle * .18);
+      actorCtx.strokeStyle = `rgba(${glowStr},.98)`;
+      actorCtx.lineWidth = 4.8;
+      actorCtx.beginPath();
+      actorCtx.moveTo(-12, -8);
+      actorCtx.lineTo(1, 0);
+      actorCtx.lineTo(-12, 8);
+      actorCtx.stroke();
+      actorCtx.shadowBlur = 8;
       actorCtx.fillStyle = '#ffffff';
       actorCtx.beginPath();
       actorCtx.arc(1, 0, 2.4 + twinkle, 0, Math.PI * 2);
