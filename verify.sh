@@ -319,6 +319,13 @@ else
   bad "Muenba handoff audit failed"
 fi
 
+echo "[24D/36] Muenba content integrity audit"
+if node tests/muenba-content-integrity-audit.cjs >/dev/null 2>&1; then
+  ok "Muenba room, ghost, case, asset, tier, and shared-data contracts pass"
+else
+  bad "Muenba content integrity audit failed"
+fi
+
 echo "[25/36] Feed Booha level audit"
 if node tests/feed-level-audit.cjs >/dev/null 2>&1; then
   ok "Feed Booha geometry and timing guardrails pass"
