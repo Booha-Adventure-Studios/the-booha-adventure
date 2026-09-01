@@ -65,7 +65,7 @@ function profileRecord(caseId, caseRecords, legacyCompletedIds) {
 assert(source.includes("const MUENBA_CASE_MODES = ['start', 'fresh', 'deep'];"), 'source must define all three memory modes');
 assert(source.includes('completedModes'), 'source must persist per-mode completion');
 assert(source.includes('caseModeIsComplete'), 'source must check completion for the selected mode');
-assert(source.includes('const availableGhosts = GHOSTS.filter(ghost => ghost.id === activeCaseGhostId || !weeklyFound || !weeklyFound[ghost.id])'), 'unfinished active cases must remain available after weekly capture');
+assert(source.includes('const availableGhosts = tierNeedsSelection'), 'a completed selected tier must not expose case-less ghosts while another tier remains');
 assert(source.includes('function activeMuenbaCaseGhost()'), 'selected-mode target ghost should have an explicit helper');
 assert(source.includes('ghost.id === (activeCaseGhost && activeCaseGhost.id) || !weeklyFound || !weeklyFound[ghost.id]'), 'weekly availability must preserve an unfinished case target');
 assert(source.includes('previousRecord.completed === true && MUENBA_CASE_MODES.includes(previousRecord.difficulty)'), 'legacy mode completion must survive a new mode capture');
