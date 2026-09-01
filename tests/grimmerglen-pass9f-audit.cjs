@@ -30,8 +30,8 @@ assert(exerciseStart >= 0 && exerciseEnd > exerciseStart, 'memory writing render
 const exercise = runtime.slice(exerciseStart, exerciseEnd);
 assert(exercise.includes('id="mg-memory-see-again"'),
   'the memory writing page must include a See again action before typing');
-assert(exercise.includes('renderMariettaMemoryReplay(object, false, () => renderMariettaMemoryExercise(object))'),
-  'closing the pre-typing replay must return to the same writing page');
+assert(exercise.includes('renderMariettaMemoryReplay(object, false, () => renderMariettaMemoryExercise(object), tier)'),
+  'closing the pre-typing replay must return to the same tier-specific writing page');
 
 const replayStart = runtime.indexOf('function renderMariettaMemoryReplay(');
 const replayEnd = runtime.indexOf('function renderMariettaMemorySuccess(', replayStart);
@@ -48,8 +48,8 @@ assert(replay.includes('renderMariettaMemorySuccess(object, { memoryComplete })'
 
 assert(data.includes('answerEn: item.target') && data.includes('answerJp: item.jp'),
   'memory exercises must expose the full answer for replay');
-assert(data.includes("options: [item.partial[0]]") && data.includes('helpText: item.jp'),
-  'the last memory exercise must retain a short hint and optional furigana help');
+assert(data.includes("options: tier === 'start' ? item.full : tier === 'case' ? item.partial : item.full") && data.includes('helpText: tier === \'deep\' ? item.jp : null'),
+  'each tier must retain its authored helper choices and the Deep optional furigana help');
 assert(typing.includes("input.addEventListener('copy'"),
   'typing input must block copying');
 assert(typing.includes("input.addEventListener('cut'"),

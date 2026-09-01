@@ -261,8 +261,8 @@
       },
       case: {
         story: { en: 'I remember carrying my favorite daydreams in this. Some of the daydreams are scary!', jp: 'お気に入りの夢をこれに入れて運んだのを覚えている。夢のいくつかはこわい！', readings: { 'お気に入り': 'おきにいり', '夢': 'ゆめ', '入れて': 'いれて', '運んだ': 'はこんだ', '覚えている': 'おぼえている' } },
-        target: 'Some of the daydreams are scary!', jp: '夢のいくつかはこわい！', readings: { '夢': 'ゆめ' },
-        full: ['Some of the daydreams are scary!', 'Some of the daydreams are sunny!', 'Some of the daydreams are funny!'], partial: ['Some of the …', 'Some of the …', 'Some of the …']
+        target: 'I remember carrying my favorite daydreams in this. Some of the daydreams are scary!', jp: 'お気に入りの夢をこれに入れて運んだのを覚えている。夢のいくつかはこわい！', readings: { 'お気に入り': 'おきにいり', '夢': 'ゆめ', '入れて': 'いれて', '運んだ': 'はこんだ', '覚えている': 'おぼえている' },
+        full: ['I remember carrying my favorite daydreams in this. Some of the daydreams are scary!', 'I remember carrying my favorite daydreams in this. Some of the daydreams are sunny!', 'I remember carrying my favorite daydreams in this. Some of the daydreams are funny!'], partial: ['I remember carrying …', 'I remember carrying …', 'I remember carrying …']
       },
       deep: {
         story: { en: 'I remember carrying my favorite daydreams in this backpack, even when the scary ones followed me home.', jp: 'こわい夢が家までついてきたときも、お気に入りの夢をこのリュックに入れて運んだのを覚えている。', readings: { '夢': 'ゆめ', '家': 'いえ', 'お気に入り': 'おきにいり', '入れて': 'いれて', '運んだ': 'はこんだ', '覚えている': 'おぼえている' } },
@@ -278,8 +278,8 @@
       },
       case: {
         story: { en: 'I remember writing in this for October. She is my friend, and we always meet around Halloween time.', jp: 'オクトーバーのためにこれに書いたのを覚えている。彼女は友達で、私たちはいつもハロウィンのころに会う。', readings: { '書いた': 'かいた', '覚えている': 'おぼえている', '友達': 'ともだち', '会う': 'あう' } },
-        target: 'I remember writing in this for October.', jp: 'オクトーバーのためにこれに書いたのを覚えている。', readings: { '書いた': 'かいた', '覚えている': 'おぼえている' },
-        full: ['I remember writing in this for October.', 'I remember drawing in this for October.', 'I remember reading this in October.'], partial: ['I remember writing …', 'I remember drawing …', 'I remember reading …']
+        target: 'I remember writing in this for October. She is my friend, and we always meet around Halloween time.', jp: 'オクトーバーのためにこれに書いたのを覚えている。彼女は友達で、私たちはいつもハロウィンのころに会う。', readings: { '書いた': 'かいた', '覚えている': 'おぼえている', '友達': 'ともだち', '会う': 'あう' },
+        full: ['I remember writing in this for October. She is my friend, and we always meet around Halloween time.', 'I remember drawing in this for October. She is my friend, and we always meet around Halloween time.', 'I remember reading this in October. She is my friend, and we always meet around Halloween time.'], partial: ['I remember writing …', 'I remember drawing …', 'I remember reading …']
       },
       deep: {
         story: { en: 'I remember writing this for my friend and giving it to her in the fall, when October made the nights feel magical.', jp: 'オクトーバーが夜をふしぎに感じさせる秋に、友達のためにこれを書いて彼女へ渡したのを覚えている。', readings: { '秋': 'あき', '夜': 'よる', '友達': 'ともだち', '書いて': 'かいて', '渡した': 'わたした', '感じさせる': 'かんじさせる', '覚えている': 'おぼえている' } },
@@ -342,22 +342,28 @@
 
   function makeMemoryExercises() {
     const exercises = {};
-    Object.keys(MEMORY_CONTENT).forEach(type => {
-      const item = MEMORY_CONTENT[type];
-      const base = {
-        promptEn: 'Type the sentence you remember.',
-        promptJp: '思い出した文をタイプしてね。',
-        promptReadings: { '思い出した': 'おもいだした', '文': 'ぶん' },
-        accepted: [item.target.replace(/[.!?]+$/, '')],
-        answerEn: item.target,
-        answerJp: item.jp,
-        answerReadings: item.readings
-      };
-      exercises[type] = {
-        start: Object.assign({}, base, { options: item.full, optionsVisible: true }),
-        case: Object.assign({}, base, { options: item.partial, optionsVisible: true }),
-        deep: Object.assign({}, base, { options: [item.partial[0]], optionsVisible: true, helpText: item.jp, helpReadings: item.readings })
-      };
+    Object.keys(MEMORY_TIERS).forEach(type => {
+      const tiers = MEMORY_TIERS[type];
+      exercises[type] = {};
+      ['start', 'case', 'deep'].forEach(tier => {
+        const item = tiers[tier];
+        const base = {
+          promptEn: 'Type the sentence you remember.',
+          promptJp: '思い出した文をタイプしてね。',
+          promptReadings: { '思い出した': 'おもいだした', '文': 'ぶん' },
+          accepted: [item.target.replace(/[.!?]+$/, '')],
+          answerEn: item.target,
+          answerJp: item.jp,
+          answerReadings: item.readings,
+          story: item.story
+        };
+        exercises[type][tier] = Object.assign({}, base, {
+          options: tier === 'start' ? item.full : tier === 'case' ? item.partial : item.full,
+          optionsVisible: tier === 'start',
+          helpText: tier === 'deep' ? item.jp : null,
+          helpReadings: tier === 'deep' ? item.readings : null
+        });
+      });
     });
     return exercises;
   }
@@ -407,8 +413,8 @@
       toGoCoffeeCup: 'assets/img/grimmerglen/collectibles/to_go_coffee_cup.webp',
       ball: 'assets/img/grimmerglen/collectibles/ball.webp'
     },
-    // Content Pass 1 staging source. The live renderer still consumes the
-    // legacy-compatible fields above until the tier wiring pass lands.
+    // Content Pass 2 live source. The quest, exercise, replay, and profile
+    // renderers resolve the current weekly tier from this manifest.
     tierMemories: MEMORY_TIERS,
 
     // Pass 7: the 8 object types' canonical key list, matching the
