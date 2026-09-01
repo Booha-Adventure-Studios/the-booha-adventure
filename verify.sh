@@ -845,6 +845,13 @@ else
   bad "Grimmerglen tier-progress Pass 2 audit failed"
 fi
 
+echo "[weekly] Grimmerglen tier-routing Pass 3 audit"
+if node tests/grimmerglen-tier-routing-audit.cjs >/dev/null 2>&1; then
+  ok "Grimmerglen selected tier routes live content and weekly progress"
+else
+  bad "Grimmerglen tier-routing Pass 3 audit failed"
+fi
+
 echo "[94/98] Grimmerglen navigation audit"
 if node tests/grimmerglen-navigation-audit.cjs >/dev/null 2>&1; then
   ok "Grimmerglen grid links, boundary arrows, and help-gated movement contracts pass"
