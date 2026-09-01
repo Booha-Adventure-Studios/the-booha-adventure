@@ -292,10 +292,10 @@ else
 fi
 
 echo "[24/36] Muenba audio audit"
-if node tests/muenba-audio-audit.cjs >/dev/null 2>&1 && node tests/muenba-rhythm-performance-audit.cjs >/dev/null 2>&1; then
-  ok "Muenba audio and rhythm performance contracts pass"
+if node tests/muenba-audio-audit.cjs >/dev/null 2>&1 && node tests/muenba-rhythm-performance-audit.cjs >/dev/null 2>&1 && node tests/muenba-rhythm-clarity-audit.cjs >/dev/null 2>&1; then
+  ok "Muenba audio, rhythm performance, and clarity contracts pass"
 else
-  bad "Muenba audio or rhythm performance audit failed"
+  bad "Muenba audio, rhythm performance, or clarity audit failed"
 fi
 
 echo "[25/36] Feed Booha level audit"
