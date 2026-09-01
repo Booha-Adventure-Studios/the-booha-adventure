@@ -16,6 +16,8 @@ assert(source.includes('state.speed = BASE_SPEED * (dt / TARGET_DT);'), 'Muenba 
 assert(!source.includes('state.speed = BASE_SPEED * Math.min(1.6, dt / TARGET_DT);'), 'Muenba must not cap low-frame-rate travel below real elapsed-time speed');
 assert(source.includes('if (distance <= 24) {'), 'center arrival must finish at the center without a timeout snap');
 assert(source.includes('state.distMovedSinceSpawn = Math.max(state.distMovedSinceSpawn, ARROW_MOVE_THRESHOLD);'), 'the first valid movement tap must reveal room arrows');
+assert(source.includes("if (state.roomId === MUENBA_NUPPI.roomId && !state.navigationUnlocked) return null;"), 'Muenba room 01 exits must stay gated until the hunt is accepted');
+assert(source.includes("if (state.roomId === MUENBA_NUPPI.roomId && !state.navigationUnlocked) return;"), 'Muenba room 01 arrows must stay hidden until the hunt is accepted');
 assert(source.includes("const MUENBA_NUPPI = { roomId: 'room_01', x: 940, y: 215"), 'Nuppi must stay clear of the room 01 up arrow');
 assert(dataSource.includes("up:    { x: 767, y: 284 }"), 'room 01 up-arrow coordinates must remain stable');
 assert(karasukiSource.includes('const masterAlpha = unlocked ? 1 : moveReveal * 0.38;'), 'unlocked Utsuroba must not be dimmed by movement reveal');

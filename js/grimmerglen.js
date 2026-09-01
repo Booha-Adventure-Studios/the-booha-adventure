@@ -455,7 +455,9 @@
 
   function updateGrimmerglenProfilePortal() {
     if (!grimmerglenProfilePortal) return;
-    const visible = state.roomId === GRIMMERGLEN_PROFILE_PORTAL.roomId && !state.celebrating && !state.returnExiting;
+    // Pass 29A: the profile remains usable throughout ordinary navigation.
+    // Booha's dance is the only state that intentionally makes it inert.
+    const visible = state.roomId === GRIMMERGLEN_PROFILE_PORTAL.roomId && !state.celebrating;
     grimmerglenProfilePortal.classList.toggle('is-visible', visible);
     grimmerglenProfilePortal.setAttribute('aria-hidden', visible ? 'false' : 'true');
     grimmerglenProfilePortal.tabIndex = visible ? 0 : -1;
@@ -470,10 +472,21 @@
     grimmerglenProfilePortal.title = 'Open Grimmerglen profile';
     grimmerglenProfilePortal.innerHTML = '<span aria-hidden="true">G</span>';
     grimmerglenProfilePortal.addEventListener('click', event => {
-      if (state.celebrating || state.returnExiting) {
+      if (state.celebrating) {
         event.preventDefault();
         event.stopPropagation();
+        return;
       }
+      // Keep the stage click handler from turning a profile tap into a move.
+      event.stopPropagation();
+    });
+    grimmerglenProfilePortal.addEventListener('pointerdown', event => {
+      if (state.celebrating) {
+        event.preventDefault();
+        event.stopPropagation();
+        return;
+      }
+      event.stopPropagation();
     });
     stage.appendChild(grimmerglenProfilePortal);
     updateGrimmerglenProfilePortal();

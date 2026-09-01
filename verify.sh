@@ -326,6 +326,20 @@ else
   bad "Muenba content integrity audit failed"
 fi
 
+echo "[24E/36] Grimmerglen profile-link audit"
+if node tests/grimmerglen-profile-link-audit.cjs >/dev/null 2>&1; then
+  ok "Grimmerglen profile link and dance-only lock contracts pass"
+else
+  bad "Grimmerglen profile-link audit failed"
+fi
+
+echo "[24F/36] Muenba room_01 gate audit"
+if node tests/muenba-room-gate-audit.cjs >/dev/null 2>&1; then
+  ok "Muenba hunt acceptance, room gate, and dance-only control contracts pass"
+else
+  bad "Muenba room_01 gate audit failed"
+fi
+
 echo "[25/36] Feed Booha level audit"
 if node tests/feed-level-audit.cjs >/dev/null 2>&1; then
   ok "Feed Booha geometry and timing guardrails pass"

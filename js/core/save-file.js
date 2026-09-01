@@ -121,6 +121,7 @@ const BoohaSaveFile = (() => {
         huntGhostOrder: [],
         activeCaseId: null,
         orbsPending: 0,
+        huntAccepted: false,
       },
       grimmerglen: {
         objects: {},
