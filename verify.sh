@@ -887,6 +887,13 @@ else
   bad "Grimmerglen arrow glow audit failed"
 fi
 
+echo "[regression] Grimmerglen Pass 4 audit"
+if node tests/grimmerglen-pass4-regression-audit.cjs >/dev/null 2>&1; then
+  ok "Grimmerglen counters, profile totals, weekly separation, and arrow glow remain intact"
+else
+  bad "Grimmerglen Pass 4 regression audit failed"
+fi
+
 echo "[lifetime] Grimmerglen lifetime counters audit"
 if node tests/grimmerglen-lifetime-counters-audit.cjs >/dev/null 2>&1; then
   ok "Grimmerglen lifetime counters migrate, increment, and survive weekly reset"
