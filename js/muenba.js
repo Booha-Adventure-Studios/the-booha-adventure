@@ -523,10 +523,9 @@
   muenbaDance.loop = false;
   muenbaDance.volume = 0.72;
   let dangerScreamPreloadStarted = false;
-  // A short pool prevents a fast chart from cutting off the previous get or
-  // miss sound when two notes land close together. The files are small, so a
-  // three-voice pool is cheaper and more reliable than creating audio nodes
-  // during play.
+  // HTML Audio remains as a compatibility fallback. The primary rhythm path
+  // below uses decoded Web Audio buffers so a fast chart does not wait on
+  // media-element scheduling when two notes land close together.
   function makeRhythmSfxPool(src, volume, size = 3) {
     return Array.from({ length: size }, () => {
       const audio = new Audio(src);
@@ -539,12 +538,36 @@
   const rhythmMissSfxPool = makeRhythmSfxPool('assets/img/muenba/miss.mp3', 0.24);
   let rhythmHitSfxIndex = 0;
   let rhythmMissSfxIndex = 0;
+  const RHYTHM_HIT_SFX_URL = 'assets/img/muenba/get.mp3';
+  const RHYTHM_MISS_SFX_URL = 'assets/img/muenba/miss.mp3';
+  let rhythmHitAudioBuffer = null;
+  let rhythmMissAudioBuffer = null;
+  let rhythmAudioLoadPromise = null;
+  let rhythmAudioContext = null;
+  let rhythmAudioMaster = null;
+  let rhythmHitAudioBus = null;
+  let rhythmMissAudioBus = null;
 
   // Reading cues use a lazy Web Audio context. It is created only when the
   // learner opens a record (a user gesture), so browser autoplay policy never
   // blocks the case and unsupported browsers simply get silent reading.
   let caseAudioContext = null;
   let caseAudioMaster = null;
+
+  function ensureRhythmAudioBuses(context) {
+    if (!context) return;
+    if (rhythmAudioContext === context && rhythmHitAudioBus && rhythmMissAudioBus) return;
+    rhythmAudioContext = context;
+    rhythmAudioMaster = context.createGain();
+    rhythmAudioMaster.gain.value = 1;
+    rhythmAudioMaster.connect(context.destination);
+    rhythmHitAudioBus = context.createGain();
+    rhythmHitAudioBus.gain.value = 0.42;
+    rhythmHitAudioBus.connect(rhythmAudioMaster);
+    rhythmMissAudioBus = context.createGain();
+    rhythmMissAudioBus.gain.value = 0.24;
+    rhythmMissAudioBus.connect(rhythmAudioMaster);
+  }
 
   function caseAudioEnabled() {
     return !REDUCED_MOTION;
@@ -561,6 +584,7 @@
         caseAudioMaster.gain.value = 0.7;
         caseAudioMaster.connect(caseAudioContext.destination);
       }
+      ensureRhythmAudioBuses(caseAudioContext);
       if (caseAudioContext.state === 'suspended' && typeof caseAudioContext.resume === 'function') {
         caseAudioContext.resume().catch(() => {});
       }
@@ -568,8 +592,47 @@
     } catch (_) {
       caseAudioContext = null;
       caseAudioMaster = null;
+      rhythmAudioContext = null;
+      rhythmAudioMaster = null;
+      rhythmHitAudioBus = null;
+      rhythmMissAudioBus = null;
       return null;
     }
+  }
+
+  function primeRhythmSfx() {
+    const context = getCaseAudioContext();
+    if (!context || typeof fetch !== 'function' || typeof context.decodeAudioData !== 'function') {
+      return Promise.resolve(false);
+    }
+    ensureRhythmAudioBuses(context);
+    if (rhythmHitAudioBuffer && rhythmMissAudioBuffer && rhythmAudioContext === context) {
+      return Promise.resolve(true);
+    }
+    if (rhythmAudioLoadPromise) return rhythmAudioLoadPromise;
+
+    const loadBuffer = url => fetch(url)
+      .then(response => {
+        if (!response.ok) throw new Error(`Rhythm SFX request failed: ${response.status}`);
+        return response.arrayBuffer();
+      })
+      .then(arrayBuffer => context.decodeAudioData(arrayBuffer));
+
+    rhythmAudioLoadPromise = Promise.all([
+      loadBuffer(RHYTHM_HIT_SFX_URL),
+      loadBuffer(RHYTHM_MISS_SFX_URL)
+    ]).then(([hitBuffer, missBuffer]) => {
+      if (rhythmAudioContext !== context) return false;
+      rhythmHitAudioBuffer = hitBuffer;
+      rhythmMissAudioBuffer = missBuffer;
+      return true;
+    }).catch(() => {
+      // Keep the fallback pool available if Web Audio or the network is
+      // unavailable. A later user gesture may retry the warm-up.
+      rhythmAudioLoadPromise = null;
+      return false;
+    });
+    return rhythmAudioLoadPromise;
   }
 
   function playCaseTone(startFrequency, endFrequency, duration, volume, waveform = 'sine') {
@@ -3186,6 +3249,10 @@
   }
 
   function startRhythmCapture(danger, practice = false) {
+    // This function is reached from a user gesture for ordinary, danger, and
+    // practice rhythms. Start the shared context and warm both short SFX
+    // buffers now, while the visible countdown gives decoding time to finish.
+    primeRhythmSfx();
     const difficulty = practice ? null : getRhythmDifficulty();
     const dangerConfig = danger ? dangerRhythmConfigFor(difficulty) : null;
     const config = practice
@@ -3600,7 +3667,23 @@
     });
   }
 
-  function playRhythmSfx(result) {
+  function playRhythmAudioBuffer(result) {
+    const context = getCaseAudioContext();
+    const buffer = result === 'miss' ? rhythmMissAudioBuffer : rhythmHitAudioBuffer;
+    const bus = result === 'miss' ? rhythmMissAudioBus : rhythmHitAudioBus;
+    if (!context || !buffer || !bus || context.state === 'closed') return false;
+    try {
+      const source = context.createBufferSource();
+      source.buffer = buffer;
+      source.connect(bus);
+      source.start(0);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function playRhythmSfxFallback(result) {
     const pool = result === 'miss' ? rhythmMissSfxPool : rhythmHitSfxPool;
     const index = result === 'miss'
       ? rhythmMissSfxIndex++ % pool.length
@@ -3611,6 +3694,10 @@
       sound.currentTime = 0;
       sound.play().catch(() => {});
     } catch (_) {}
+  }
+
+  function playRhythmSfx(result) {
+    if (!playRhythmAudioBuffer(result)) playRhythmSfxFallback(result);
   }
 
   function markRhythmNote(result, index = captureSession.rhythm.nextIndex) {
@@ -6976,6 +7063,14 @@
     state.lastTickTime = now;
     state.speed = BASE_SPEED * (dt / TARGET_DT);
     syncMuenbaOrientationMode();
+    // Rhythm owns the foreground timing loop while a capture session is
+    // active. Keep this lightweight scheduler alive so the world loop resumes
+    // automatically when the modal closes, but do not update ghost AI or
+    // redraw fog, motes, characters, or other canvas layers underneath it.
+    if (captureOpen) {
+      window.requestAnimationFrame(tick);
+      return;
+    }
     const orientationReady = isMuenbaOrientationReady();
     // Entry drift must continue independently of overlays. The lobby now
     // waits for it on initial arrival, but this guard also protects any future

@@ -21,6 +21,11 @@ assert(source.includes('music.addEventListener(\'error\''), 'Muenba BGM errors m
 assert(source.includes('const rhythmHitSfxPool = makeRhythmSfxPool'), 'rhythm hit sounds must use a playback pool');
 assert(source.includes('const rhythmMissSfxPool = makeRhythmSfxPool'), 'rhythm miss sounds must use a playback pool');
 assert(source.includes('sound.pause();\n      sound.currentTime = 0;'), 'rhythm SFX must reset each voice before playback');
+assert(source.includes('function primeRhythmSfx()'), 'rhythm SFX must warm from the rhythm-start gesture');
+assert(source.includes('decodeAudioData'), 'rhythm SFX must use decoded Web Audio buffers');
+assert(source.includes('function playRhythmAudioBuffer(result)'), 'rhythm SFX must prefer the Web Audio buffer path');
+assert(source.includes('source.start(0);'), 'decoded rhythm SFX must start immediately from the audio clock');
+assert(source.includes('function playRhythmSfxFallback(result)'), 'rhythm SFX must retain an HTML Audio fallback');
 assert(source.includes('window.AudioContext || window.webkitAudioContext'), 'reading cues must support Web Audio where available');
 assert(source.includes('function getCaseAudioContext()'), 'reading audio context must be initialized lazily');
 assert(source.includes('if (!caseAudioContext)'), 'reading audio context must not be recreated for every word');
