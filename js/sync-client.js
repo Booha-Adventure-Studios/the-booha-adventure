@@ -205,6 +205,11 @@ window.BoohaSync = (() => {
     if (w.worlds?.grimmerglen?.objects && Object.keys(w.worlds.grimmerglen.objects).length) return false;
     if (w.worlds?.grimmerglen?.objectSlots && Object.keys(w.worlds.grimmerglen.objectSlots).length) return false;
     if (w.worlds?.grimmerglen?.activeTargetType || w.worlds?.grimmerglen?.carriedObjectId) return false;
+    for (const tier of ['start', 'case', 'deep']) {
+      const tierProgress = w.worlds?.grimmerglen?.tierProgress?.[tier];
+      if (tierProgress && (hasEntries(tierProgress.objects) || hasEntries(tierProgress.objectSlots) ||
+          tierProgress.activeTargetType || tierProgress.carriedObjectId)) return false;
+    }
     if (d.collection && (hasEntries(d.collection.wanderers) || hasItems(d.collection.wanderers))) return false;
 
     // A weekly reset can leave the live weekly bucket empty while the player

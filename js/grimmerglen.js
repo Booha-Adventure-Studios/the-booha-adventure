@@ -122,7 +122,8 @@
   let boohaChangeOverlay = null;
   let carriedObject = null, handoffObject = null;
   let returnPortalOverlay = null, returnPortalOpen = false, returnPortalCooldownUntil = 0;
-  let objectProgressCache = null, objectSlotsCache = null, activeTargetTypeCache = null;
+  let objectProgressCache = null, objectProgressCacheTier = null;
+  let objectSlotsCache = null, objectSlotsCacheTier = null, activeTargetTypeCache = null, activeTargetTypeCacheTier = null;
   let lastTouchEnd = 0;
   const imageCache = new Map();
   const objectImageCache = new Map();
@@ -1379,6 +1380,36 @@
     const world = data.weekly.worlds.grimmerglen;
     if (!world.objects || typeof world.objects !== 'object' || Array.isArray(world.objects)) world.objects = {};
     if (!world.objectSlots || typeof world.objectSlots !== 'object' || Array.isArray(world.objectSlots)) world.objectSlots = {};
+    const priorTierProgressSchema = Number(world.tierProgressSchema) || 0;
+    const hadTierProgress = !!(world.tierProgress && typeof world.tierProgress === 'object' && !Array.isArray(world.tierProgress)
+      && ['start', 'case', 'deep'].some(tier => world.tierProgress[tier] && typeof world.tierProgress[tier] === 'object' && !Array.isArray(world.tierProgress[tier])));
+    const legacyObjects = world.objects;
+    const legacyObjectSlots = world.objectSlots;
+    const legacyActiveTarget = world.activeTargetType;
+    const legacyCarriedObject = world.carriedObjectId;
+    if (!world.tierProgress || typeof world.tierProgress !== 'object' || Array.isArray(world.tierProgress)) {
+      world.tierProgress = {};
+    }
+    ['start', 'case', 'deep'].forEach(tier => {
+      if (!world.tierProgress[tier] || typeof world.tierProgress[tier] !== 'object' || Array.isArray(world.tierProgress[tier])) {
+        world.tierProgress[tier] = { objects: {}, objectSlots: {}, activeTargetType: null, carriedObjectId: null };
+      }
+      const progress = world.tierProgress[tier];
+      if (!progress.objects || typeof progress.objects !== 'object' || Array.isArray(progress.objects)) progress.objects = {};
+      if (!progress.objectSlots || typeof progress.objectSlots !== 'object' || Array.isArray(progress.objectSlots)) progress.objectSlots = {};
+      if (progress.activeTargetType === undefined) progress.activeTargetType = tier === 'start' && typeof world.activeTargetType === 'string' ? world.activeTargetType : null;
+      if (progress.carriedObjectId === undefined) progress.carriedObjectId = tier === 'start' && typeof world.carriedObjectId === 'string' ? world.carriedObjectId : null;
+    });
+    const shouldCopyLegacy = !hadTierProgress || (priorTierProgressSchema < 2 &&
+      Object.keys(world.tierProgress.start.objects).length === 0 && Object.keys(world.tierProgress.start.objectSlots).length === 0 &&
+      (Object.keys(legacyObjects).length > 0 || Object.keys(legacyObjectSlots).length > 0));
+    if (shouldCopyLegacy) {
+      world.tierProgress.start.objects = Object.assign({}, legacyObjects);
+      world.tierProgress.start.objectSlots = Object.assign({}, legacyObjectSlots);
+      world.tierProgress.start.activeTargetType = typeof legacyActiveTarget === 'string' ? legacyActiveTarget : null;
+      world.tierProgress.start.carriedObjectId = typeof legacyCarriedObject === 'string' ? legacyCarriedObject : null;
+    }
+    world.tierProgressSchema = 2;
     if (world.activeTargetType === undefined) world.activeTargetType = null;
     if (world.carriedObjectId === undefined) world.carriedObjectId = null;
     if (world.memoryQuestAccepted === undefined) world.memoryQuestAccepted = false;
@@ -1408,6 +1439,39 @@
   function writeGrimmerglenWeekly(patchObj) {
     const data = loadGrimmerglenSave();
     Object.assign(ensureWeeklyGrimmerglen(data), patchObj);
+    return window.BoohaSaveFile && typeof window.BoohaSaveFile.save === 'function'
+      ? window.BoohaSaveFile.save(data)
+      : false;
+  }
+
+  const GRIMMERGLEN_MEMORY_TIERS = ['start', 'case', 'deep'];
+
+  function getSelectedGrimmerglenTier(data = null) {
+    const source = data || loadGrimmerglenSave();
+    const selected = source.grimmerglen?.memoryTier;
+    return GRIMMERGLEN_MEMORY_TIERS.includes(selected) ? selected : 'start';
+  }
+
+  function getSelectedGrimmerglenTierProgress(data = null) {
+    const source = data || loadGrimmerglenSave();
+    const world = ensureWeeklyGrimmerglen(source);
+    return { world, tier: getSelectedGrimmerglenTier(source), progress: world.tierProgress[getSelectedGrimmerglenTier(source)] };
+  }
+
+  function syncLegacyGrimmerglenWeeklyFields(world, progress) {
+    // Keep the pre-tier fields synchronized for older profile/sync readers;
+    // the selected tier bucket remains the authoritative live state.
+    world.objects = progress.objects;
+    world.objectSlots = progress.objectSlots;
+    world.activeTargetType = progress.activeTargetType;
+    world.carriedObjectId = progress.carriedObjectId;
+  }
+
+  function writeGrimmerglenTierProgress(patchObj) {
+    const data = loadGrimmerglenSave();
+    const selected = getSelectedGrimmerglenTierProgress(data);
+    Object.assign(selected.progress, patchObj);
+    syncLegacyGrimmerglenWeeklyFields(selected.world, selected.progress);
     return window.BoohaSaveFile && typeof window.BoohaSaveFile.save === 'function'
       ? window.BoohaSaveFile.save(data)
       : false;
@@ -1473,35 +1537,34 @@
     } catch (_) {}
   }
 
-  // Per-object-type/per-tier progress: found 0 or 1 copies -> Starter,
-  // 2 -> Case, 3 -> Deep. objectSlots records the exact solved instance so
-  // a player can find copies in any order without the clicked item respawning.
-  const GRIMMERGLEN_TIER_BY_FOUND = ['start', 'start', 'case', 'deep'];
-
   function getGrimmerglenObjectsProgress() {
-    if (objectProgressCache) return objectProgressCache;
-    const stored = readGrimmerglenWeekly().objects || {};
+    const selected = getSelectedGrimmerglenTierProgress();
+    if (objectProgressCache && objectProgressCacheTier === selected.tier) return objectProgressCache;
+    const stored = selected.progress.objects || {};
     const progress = {};
     (DATA.objectTypes || []).forEach(type => {
       const entry = stored[type];
       const found = Number.isInteger(entry && entry.found)
         ? Math.max(0, Math.min(3, entry.found))
         : 0;
-      progress[type] = { found, tier: GRIMMERGLEN_TIER_BY_FOUND[found] };
+      progress[type] = { found, tier: selected.tier };
     });
     objectProgressCache = progress;
+    objectProgressCacheTier = selected.tier;
     return progress;
   }
 
   function getGrimmerglenMemoryStory(type) {
-    const tier = getGrimmerglenObjectsProgress()[type]?.tier || 'start';
+    const tier = getSelectedGrimmerglenTier();
     return DATA.tierMemories?.[type]?.[tier]?.story || DATA.stories?.[type] || null;
   }
 
   function getGrimmerglenObjectSlots() {
-    if (objectSlotsCache) return objectSlotsCache;
-    const slots = readGrimmerglenWeekly().objectSlots;
+    const selected = getSelectedGrimmerglenTierProgress();
+    if (objectSlotsCache && objectSlotsCacheTier === selected.tier) return objectSlotsCache;
+    const slots = selected.progress.objectSlots;
     objectSlotsCache = slots && typeof slots === 'object' ? slots : {};
+    objectSlotsCacheTier = selected.tier;
     return objectSlotsCache;
   }
 
@@ -1511,20 +1574,23 @@
   }
 
   function getActiveGrimmerglenTargetType() {
-    if (activeTargetTypeCache && getGrimmerglenObjectsProgress()[activeTargetTypeCache]?.found < 3) {
+    const selected = getSelectedGrimmerglenTierProgress();
+    if (activeTargetTypeCache && activeTargetTypeCacheTier === selected.tier && getGrimmerglenObjectsProgress()[activeTargetTypeCache]?.found < 3) {
       return activeTargetTypeCache;
     }
     const progress = getGrimmerglenObjectsProgress();
     const unfinished = (DATA.objectTypes || []).filter(type => progress[type] && progress[type].found < 3);
     if (!unfinished.length) {
       activeTargetTypeCache = null;
-      if (readGrimmerglenWeekly().activeTargetType) writeGrimmerglenWeekly({ activeTargetType: null });
+      activeTargetTypeCacheTier = selected.tier;
+      if (selected.progress.activeTargetType) writeGrimmerglenTierProgress({ activeTargetType: null });
       return null;
     }
 
-    const savedTarget = readGrimmerglenWeekly().activeTargetType;
+    const savedTarget = selected.progress.activeTargetType;
     if (unfinished.includes(savedTarget)) {
       activeTargetTypeCache = savedTarget;
+      activeTargetTypeCacheTier = selected.tier;
       return savedTarget;
     }
 
@@ -1534,16 +1600,17 @@
     // is freshly chosen from the remaining unfinished memories.
     const nextTarget = unfinished[Math.floor(Math.random() * unfinished.length)];
     activeTargetTypeCache = nextTarget;
-    writeGrimmerglenWeekly({ activeTargetType: nextTarget });
+    activeTargetTypeCacheTier = selected.tier;
+    writeGrimmerglenTierProgress({ activeTargetType: nextTarget });
     return nextTarget;
   }
 
   function writeGrimmerglenCarriedObject(object) {
-    return writeGrimmerglenWeekly({ carriedObjectId: object ? object.id : null });
+    return writeGrimmerglenTierProgress({ carriedObjectId: object ? object.id : null });
   }
 
   function restoreGrimmerglenCarriedObject() {
-    const savedId = readGrimmerglenWeekly().carriedObjectId;
+    const savedId = getSelectedGrimmerglenTierProgress().progress.carriedObjectId;
     const object = findGrimmerglenObjectById(savedId);
     if (!object) return;
     const progress = getGrimmerglenObjectsProgress();
@@ -1574,9 +1641,12 @@
     if (slotId) lifetimeSlots[slotId] = true;
 
     const weekly = ensureWeeklyGrimmerglen(data);
-    weekly.objects = weeklyStored;
-    weekly.objectSlots = weeklySlots;
-    weekly.carriedObjectId = null;
+    const selectedTier = getSelectedGrimmerglenTier(data);
+    const selectedProgress = weekly.tierProgress[selectedTier];
+    selectedProgress.objects = weeklyStored;
+    selectedProgress.objectSlots = weeklySlots;
+    selectedProgress.carriedObjectId = null;
+    syncLegacyGrimmerglenWeeklyFields(weekly, selectedProgress);
     data.grimmerglen.objects = lifetimeStored;
     data.grimmerglen.objectSlots = lifetimeSlots;
     data.grimmerglen.weeklyReplayInitialized = true;
@@ -1585,8 +1655,11 @@
       : false;
     if (ok) {
       objectProgressCache = null;
+      objectProgressCacheTier = null;
       objectSlotsCache = weeklySlots;
+      objectSlotsCacheTier = selectedTier;
       activeTargetTypeCache = null;
+      activeTargetTypeCacheTier = null;
       carriedObject = null;
     }
     return ok;
@@ -1902,8 +1975,8 @@
 
   function renderMariettaMemoryExercise(object) {
     const progress = getGrimmerglenObjectsProgress();
-    const memoryProgress = progress[object.type] || { found: 0, tier: 'start' };
-    const tier = memoryProgress.tier || 'start';
+    const memoryProgress = progress[object.type] || { found: 0 };
+    const tier = getSelectedGrimmerglenTier();
     const returnNumber = Math.min(3, (Number(memoryProgress.found) || 0) + 1);
     const exercise = DATA.memories?.[object.type]?.[tier];
     if (!exercise || !window.GrimmerglenTyping) return;

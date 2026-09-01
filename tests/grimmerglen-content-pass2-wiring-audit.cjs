@@ -27,8 +27,8 @@ assert(runtime.includes('DATA.memories?.[object.type]?.[memoryTier]'), 'replay m
 assert(runtime.includes('const completedTier = getGrimmerglenObjectsProgress()[object.type]?.tier'), 'completion must capture the tier before progress advances');
 assert(runtime.includes('memoryTier: completedTier'), 'completion must pass the captured tier to the success card');
 
-assert(profile.includes('const tierForFound = weeklyFound >= 3 ? \'deep\' : weeklyFound === 2 ? \'case\' : \'start\';'), 'profile must derive the visible story tier from weekly progress');
-assert(profile.includes('DATA.tierMemories?.[type]?.[tierForFound]?.story?.en'), 'profile must display the active tier story');
+assert(profile.includes('const currentTier = selectedWeeklyTier();'), 'profile must resolve the selected memory tier');
+assert(profile.includes('DATA.tierMemories?.[type]?.[currentTier]?.story?.en'), 'profile must display the selected tier story');
 assert(verify.includes('tests/grimmerglen-content-pass2-wiring-audit.cjs'), 'verify.sh must run the Grimmerglen Content Pass 2 wiring audit');
 
 console.log('Grimmerglen Content Pass 2 audit passed: tiered exercises, active stories, tier replay, and profile wiring are live.');

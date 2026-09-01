@@ -80,14 +80,16 @@ const save = context.BoohaAdventure.save;
 const migrated = save.load();
 const plain = value => JSON.parse(JSON.stringify(value));
 
-assert.strictEqual(migrated.weekly.worlds.grimmerglen.tierProgressSchema, 1);
+assert.strictEqual(migrated.weekly.worlds.grimmerglen.tierProgressSchema, 2);
 assert.deepStrictEqual(plain(migrated.weekly.worlds.grimmerglen.tierProgress), {
   start: {
     objects: { banner: { found: 2 }, ticket: { found: 1 } },
     objectSlots: { 'banner-1': true, 'ticket-1': true },
+    activeTargetType: 'banner',
+    carriedObjectId: 'banner-2',
   },
-  case: { objects: {}, objectSlots: {} },
-  deep: { objects: {}, objectSlots: {} },
+  case: { objects: {}, objectSlots: {}, activeTargetType: null, carriedObjectId: null },
+  deep: { objects: {}, objectSlots: {}, activeTargetType: null, carriedObjectId: null },
 });
 assert.deepStrictEqual(plain(migrated.grimmerglen.objects), { banner: { found: 2 } });
 assert.deepStrictEqual(plain(migrated.grimmerglen.objectSlots), { 'banner-1': true });
@@ -101,13 +103,27 @@ assert.strictEqual(alreadyMigrated.weekly.worlds.grimmerglen.tierProgress.start.
 assert.deepStrictEqual(plain(alreadyMigrated.weekly.worlds.grimmerglen.tierProgress.case.objects), {});
 assert.deepStrictEqual(plain(alreadyMigrated.weekly.worlds.grimmerglen.tierProgress.deep.objects), {});
 
+stored.weekly.worlds.grimmerglen.tierProgressSchema = 1;
+stored.weekly.worlds.grimmerglen.tierProgress = {
+  start: { objects: {}, objectSlots: {}, activeTargetType: null, carriedObjectId: null },
+  case: { objects: {}, objectSlots: {}, activeTargetType: null, carriedObjectId: null },
+  deep: { objects: {}, objectSlots: {}, activeTargetType: null, carriedObjectId: null },
+};
+stored.weekly.worlds.grimmerglen.objects = { pillow: { found: 2 } };
+stored.weekly.worlds.grimmerglen.objectSlots = { 'pillow-1': true };
+const passTwoInterim = save.load();
+assert.strictEqual(passTwoInterim.weekly.worlds.grimmerglen.tierProgressSchema, 2);
+assert.deepStrictEqual(plain(passTwoInterim.weekly.worlds.grimmerglen.tierProgress.start.objects), { pillow: { found: 2 } });
+assert.deepStrictEqual(plain(passTwoInterim.weekly.worlds.grimmerglen.tierProgress.case.objects), {});
+assert.deepStrictEqual(plain(passTwoInterim.weekly.worlds.grimmerglen.tierProgress.deep.objects), {});
+
 save.resetWeekly('2026-08-30|august-w4');
 const reset = save.load();
 assert.strictEqual(reset.weekly.worlds.occurrenceKey, '2026-08-30|august-w4');
 assert.deepStrictEqual(plain(reset.weekly.worlds.grimmerglen.tierProgress), {
-  start: { objects: {}, objectSlots: {} },
-  case: { objects: {}, objectSlots: {} },
-  deep: { objects: {}, objectSlots: {} },
+  start: { objects: {}, objectSlots: {}, activeTargetType: null, carriedObjectId: null },
+  case: { objects: {}, objectSlots: {}, activeTargetType: null, carriedObjectId: null },
+  deep: { objects: {}, objectSlots: {}, activeTargetType: null, carriedObjectId: null },
 });
 assert.deepStrictEqual(plain(reset.grimmerglen.objects), { banner: { found: 2 } });
 assert.deepStrictEqual(plain(reset.grimmerglen.objectSlots), { 'banner-1': true });
