@@ -796,6 +796,13 @@ else
   bad "Grimmerglen Pass 10E quest-visibility audit failed"
 fi
 
+echo "[weekly] Grimmerglen Pass 10F dance-lock audit"
+if node tests/grimmerglen-pass10f-dance-lock-audit.cjs >/dev/null 2>&1; then
+  ok "Grimmerglen dance locks exits, return navigation, and profile doorway access"
+else
+  bad "Grimmerglen Pass 10F dance-lock audit failed"
+fi
+
 echo "[94/98] Grimmerglen navigation audit"
 if node tests/grimmerglen-navigation-audit.cjs >/dev/null 2>&1; then
   ok "Grimmerglen grid links, boundary arrows, and help-gated movement contracts pass"

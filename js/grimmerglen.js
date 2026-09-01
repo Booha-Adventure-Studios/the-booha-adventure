@@ -454,7 +454,10 @@
 
   function updateGrimmerglenProfilePortal() {
     if (!grimmerglenProfilePortal) return;
-    grimmerglenProfilePortal.classList.toggle('is-visible', state.roomId === GRIMMERGLEN_PROFILE_PORTAL.roomId);
+    const visible = state.roomId === GRIMMERGLEN_PROFILE_PORTAL.roomId && !state.celebrating && !state.returnExiting;
+    grimmerglenProfilePortal.classList.toggle('is-visible', visible);
+    grimmerglenProfilePortal.setAttribute('aria-hidden', visible ? 'false' : 'true');
+    grimmerglenProfilePortal.tabIndex = visible ? 0 : -1;
   }
 
   function buildGrimmerglenProfilePortal() {
@@ -465,6 +468,12 @@
     grimmerglenProfilePortal.setAttribute('aria-label', 'Open Grimmerglen profile / グリマーグレンプロフィールをひらく');
     grimmerglenProfilePortal.title = 'Open Grimmerglen profile';
     grimmerglenProfilePortal.innerHTML = '<span aria-hidden="true">G</span>';
+    grimmerglenProfilePortal.addEventListener('click', event => {
+      if (state.celebrating || state.returnExiting) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+    });
     stage.appendChild(grimmerglenProfilePortal);
     updateGrimmerglenProfilePortal();
   }
@@ -565,7 +574,8 @@
   }
 
   function getAvailableExit(now) {
-    if (!state.navigationUnlocked || state.inputLocked || state.transitioning) return null;
+    if (!state.navigationUnlocked) return null;
+    if (state.inputLocked || state.transitioning || state.celebrating || state.returnExiting) return null;
     if (now < state.transitionReadyAt || now < state.spawnLockUntil) return null;
     if (state.distMovedSinceSpawn < ARROW_MOVE_THRESHOLD) return null;
     const backDir = state.arrivalDir ? OPPOSITE[state.arrivalDir] : null;
@@ -578,7 +588,7 @@
   }
 
   function transitionTo(exit) {
-    if (!exit || state.transitioning) return;
+    if (!exit || state.transitioning || state.celebrating || state.returnExiting) return;
     state.transitioning = true;
     state.inputLocked = true;
     state.clickTarget = null;
@@ -596,6 +606,7 @@
   // ── Drawing ──────────────────────────────────────────────────────────────
   function drawExitArrows(now) {
     if (!state.navigationUnlocked) return;
+    if (state.celebrating || state.returnExiting) return;
     const exits = getRoomExits(state.roomId);
     // Help is the visibility gate. Once navigation is unlocked, show every
     // real room connection as soon as the room is ready, including when the
@@ -2027,6 +2038,7 @@
     state.celebrating = false;
     state.celebrationFinishing = false;
     state.inputLocked = false;
+    updateGrimmerglenProfilePortal();
     grimmerglenDanceSparkles.length = 0;
     stopGrimmerglenDanceMusic();
     startGrimmerglenMusic();
@@ -2043,6 +2055,7 @@
     state.x = CENTER_X;
     state.y = CENTER_Y;
     grimmerglenDanceSparkles.length = 0;
+    updateGrimmerglenProfilePortal();
     closeMariettaPanel();
     const duration = playGrimmerglenDanceMusic(finishGrimmerglenCelebration);
     state.celebrationTimer = window.setTimeout(finishGrimmerglenCelebration, Math.max(1200, duration + 120));
@@ -2161,7 +2174,7 @@
   }
 
   function openReturnPortalPopup() {
-    if (returnPortalOpen || state.returnExiting || performance.now() < returnPortalCooldownUntil) return;
+    if (returnPortalOpen || state.returnExiting || state.celebrating || performance.now() < returnPortalCooldownUntil) return;
     if (!returnPortalOverlay) buildReturnPortalOverlay();
     returnPortalOpen = true;
     state.clickTarget = null;
@@ -2181,7 +2194,7 @@
   function inReturnPortalRoom() { return state.roomId === MARIETTA_RETURN_PORTAL.roomId; }
 
   function checkReturnPortalProximity(now) {
-    if (!inReturnPortalRoom() || returnPortalOpen || mariettaPanelOpen) return;
+    if (!inReturnPortalRoom() || returnPortalOpen || mariettaPanelOpen || state.celebrating || state.returnExiting) return;
     if (now < returnPortalCooldownUntil) return;
     if (state.distMovedSinceSpawn < ARROW_MOVE_THRESHOLD) return;
     const d = Math.hypot(state.x - MARIETTA_RETURN_PORTAL.x, state.y - MARIETTA_RETURN_PORTAL.y);
@@ -2189,7 +2202,7 @@
   }
 
   function clickCheckReturnPortal(worldX, worldY) {
-    if (!inReturnPortalRoom() || returnPortalOpen || mariettaPanelOpen) return false;
+    if (!inReturnPortalRoom() || returnPortalOpen || mariettaPanelOpen || state.celebrating || state.returnExiting) return false;
     if (performance.now() < returnPortalCooldownUntil) return false;
     const d = Math.hypot(worldX - MARIETTA_RETURN_PORTAL.x, worldY - MARIETTA_RETURN_PORTAL.y);
     if (d <= MARIETTA_RETURN_PORTAL.r) { openReturnPortalPopup(); return true; }
@@ -2216,7 +2229,7 @@
   }
 
   function returnToKarasuki() {
-    if (state.returnExiting) return;
+    if (state.returnExiting || state.celebrating) return;
     state.returnExiting = true;
     stopGrimmerglenDanceMusic();
     stopGrimmerglenMusic();
