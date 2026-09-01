@@ -115,11 +115,11 @@ const BoohaSaveFile = (() => {
       grimmerglen: {
         objects: {},
         objectSlots: {},
-        tierProgressSchema: 1,
+        tierProgressSchema: 2,
         tierProgress: {
-          start: { objects: {}, objectSlots: {} },
-          case: { objects: {}, objectSlots: {} },
-          deep: { objects: {}, objectSlots: {} },
+          start: { objects: {}, objectSlots: {}, activeTargetType: null, carriedObjectId: null },
+          case: { objects: {}, objectSlots: {}, activeTargetType: null, carriedObjectId: null },
+          deep: { objects: {}, objectSlots: {}, activeTargetType: null, carriedObjectId: null },
         },
         activeTargetType: null,
         carriedObjectId: null,
@@ -135,11 +135,12 @@ const BoohaSaveFile = (() => {
       ? world.objects : {};
     const legacySlots = world.objectSlots && typeof world.objectSlots === 'object' && !Array.isArray(world.objectSlots)
       ? world.objectSlots : {};
-    const hasLegacyProgress = Object.keys(legacyObjects).length > 0 || Object.keys(legacySlots).length > 0;
+    const hasLegacyProgress = Object.keys(legacyObjects).length > 0 || Object.keys(legacySlots).length > 0
+      || typeof world.activeTargetType === 'string' || typeof world.carriedObjectId === 'string';
     const tierProgress = {
-      start: { objects: {}, objectSlots: {} },
-      case: { objects: {}, objectSlots: {} },
-      deep: { objects: {}, objectSlots: {} },
+      start: { objects: {}, objectSlots: {}, activeTargetType: null, carriedObjectId: null },
+      case: { objects: {}, objectSlots: {}, activeTargetType: null, carriedObjectId: null },
+      deep: { objects: {}, objectSlots: {}, activeTargetType: null, carriedObjectId: null },
     };
 
     // The old ladder used one shared found count for Starter → Case → Deep,
@@ -153,9 +154,11 @@ const BoohaSaveFile = (() => {
         tierProgress.start.objects[type] = { found };
       });
       tierProgress.start.objectSlots = Object.assign({}, legacySlots);
+      tierProgress.start.activeTargetType = typeof world.activeTargetType === 'string' ? world.activeTargetType : null;
+      tierProgress.start.carriedObjectId = typeof world.carriedObjectId === 'string' ? world.carriedObjectId : null;
     }
     world.tierProgress = tierProgress;
-    world.tierProgressSchema = 1;
+    world.tierProgressSchema = 2;
   }
 
   function _ensureWeeklyWorlds(save) {
@@ -185,18 +188,38 @@ const BoohaSaveFile = (() => {
     if (!current.grimmerglen || typeof current.grimmerglen !== 'object' || Array.isArray(current.grimmerglen)) current.grimmerglen = {};
     if (!current.grimmerglen.objects || typeof current.grimmerglen.objects !== 'object' || Array.isArray(current.grimmerglen.objects)) current.grimmerglen.objects = {};
     if (!current.grimmerglen.objectSlots || typeof current.grimmerglen.objectSlots !== 'object' || Array.isArray(current.grimmerglen.objectSlots)) current.grimmerglen.objectSlots = {};
-    if (!current.grimmerglen.tierProgress || typeof current.grimmerglen.tierProgress !== 'object' || Array.isArray(current.grimmerglen.tierProgress)) {
+    const priorTierProgressSchema = Number(current.grimmerglen.tierProgressSchema) || 0;
+    const hasTierProgressBuckets = current.grimmerglen.tierProgress && typeof current.grimmerglen.tierProgress === 'object' && !Array.isArray(current.grimmerglen.tierProgress)
+      && ['start', 'case', 'deep'].some(tier => current.grimmerglen.tierProgress[tier] && typeof current.grimmerglen.tierProgress[tier] === 'object' && !Array.isArray(current.grimmerglen.tierProgress[tier]));
+    if (!hasTierProgressBuckets) {
       _copyLegacyGrimmerglenTierProgress(current.grimmerglen);
     } else {
       ['start', 'case', 'deep'].forEach(tier => {
         if (!current.grimmerglen.tierProgress[tier] || typeof current.grimmerglen.tierProgress[tier] !== 'object' || Array.isArray(current.grimmerglen.tierProgress[tier])) {
-          current.grimmerglen.tierProgress[tier] = { objects: {}, objectSlots: {} };
+          current.grimmerglen.tierProgress[tier] = { objects: {}, objectSlots: {}, activeTargetType: null, carriedObjectId: null };
         }
         const progress = current.grimmerglen.tierProgress[tier];
         if (!progress.objects || typeof progress.objects !== 'object' || Array.isArray(progress.objects)) progress.objects = {};
         if (!progress.objectSlots || typeof progress.objectSlots !== 'object' || Array.isArray(progress.objectSlots)) progress.objectSlots = {};
+        if (progress.activeTargetType === undefined) progress.activeTargetType = tier === 'start' && typeof current.grimmerglen.activeTargetType === 'string' ? current.grimmerglen.activeTargetType : null;
+        if (progress.carriedObjectId === undefined) progress.carriedObjectId = tier === 'start' && typeof current.grimmerglen.carriedObjectId === 'string' ? current.grimmerglen.carriedObjectId : null;
       });
-      current.grimmerglen.tierProgressSchema = 1;
+      const startProgress = current.grimmerglen.tierProgress.start;
+      const legacyObjects = current.grimmerglen.objects && typeof current.grimmerglen.objects === 'object' && !Array.isArray(current.grimmerglen.objects)
+        ? current.grimmerglen.objects : {};
+      const legacySlots = current.grimmerglen.objectSlots && typeof current.grimmerglen.objectSlots === 'object' && !Array.isArray(current.grimmerglen.objectSlots)
+        ? current.grimmerglen.objectSlots : {};
+      // Pass 2 created empty tier buckets before the old runtime started
+      // writing into them. Carry that interim root progress into Starter once,
+      // but never overwrite a tier that Pass 3 has already begun using.
+      if (priorTierProgressSchema < 2 && Object.keys(startProgress.objects).length === 0 && Object.keys(startProgress.objectSlots).length === 0 &&
+          (Object.keys(legacyObjects).length > 0 || Object.keys(legacySlots).length > 0)) {
+        startProgress.objects = Object.assign({}, legacyObjects);
+        startProgress.objectSlots = Object.assign({}, legacySlots);
+        if (typeof current.grimmerglen.activeTargetType === 'string') startProgress.activeTargetType = current.grimmerglen.activeTargetType;
+        if (typeof current.grimmerglen.carriedObjectId === 'string') startProgress.carriedObjectId = current.grimmerglen.carriedObjectId;
+      }
+      current.grimmerglen.tierProgressSchema = 2;
     }
     if (current.grimmerglen.activeTargetType === undefined) current.grimmerglen.activeTargetType = null;
     if (current.grimmerglen.carriedObjectId === undefined) current.grimmerglen.carriedObjectId = null;

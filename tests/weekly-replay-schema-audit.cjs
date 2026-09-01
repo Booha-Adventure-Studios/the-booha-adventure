@@ -91,11 +91,11 @@ assert.deepStrictEqual(plain(migrated.weekly.worlds), {
   grimmerglen: {
     objects: {},
     objectSlots: {},
-    tierProgressSchema: 1,
+    tierProgressSchema: 2,
     tierProgress: {
-      start: { objects: {}, objectSlots: {} },
-      case: { objects: {}, objectSlots: {} },
-      deep: { objects: {}, objectSlots: {} },
+      start: { objects: {}, objectSlots: {}, activeTargetType: null, carriedObjectId: null },
+      case: { objects: {}, objectSlots: {}, activeTargetType: null, carriedObjectId: null },
+      deep: { objects: {}, objectSlots: {}, activeTargetType: null, carriedObjectId: null },
     },
     activeTargetType: null,
     carriedObjectId: null,
@@ -129,11 +129,11 @@ assert.deepStrictEqual(plain(stored.weekly.worlds.muenba), {
 assert.deepStrictEqual(plain(stored.weekly.worlds.grimmerglen), {
   objects: {},
   objectSlots: {},
-  tierProgressSchema: 1,
+    tierProgressSchema: 2,
   tierProgress: {
-    start: { objects: {}, objectSlots: {} },
-    case: { objects: {}, objectSlots: {} },
-    deep: { objects: {}, objectSlots: {} },
+    start: { objects: {}, objectSlots: {}, activeTargetType: null, carriedObjectId: null },
+    case: { objects: {}, objectSlots: {}, activeTargetType: null, carriedObjectId: null },
+    deep: { objects: {}, objectSlots: {}, activeTargetType: null, carriedObjectId: null },
   },
   activeTargetType: null,
   carriedObjectId: null,

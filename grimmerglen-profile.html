@@ -197,8 +197,17 @@
       };
       const lifetimeBucket = () => saveData().grimmerglen || {};
       const weeklyBucket = () => saveData().weekly?.worlds?.grimmerglen || {};
+      const selectedWeeklyTier = () => {
+        const value = lifetimeBucket().memoryTier;
+        return MEMORY_TIER_CHOICES.includes(value) ? value : 'start';
+      };
+      const weeklyTierBucket = () => {
+        const world = weeklyBucket();
+        const tier = selectedWeeklyTier();
+        return world.tierProgress?.[tier] || (tier === 'start' ? world : { objects: {}, objectSlots: {} });
+      };
       const foundFor = (type) => Math.max(0, Math.min(3, Number(lifetimeBucket().objects?.[type]?.found) || 0));
-      const weeklyFoundFor = (type) => Math.max(0, Math.min(3, Number(weeklyBucket().objects?.[type]?.found) || 0));
+      const weeklyFoundFor = (type) => Math.max(0, Math.min(3, Number(weeklyTierBucket().objects?.[type]?.found) || 0));
       const memoryQuestAccepted = () => weeklyBucket().memoryQuestAccepted === true || Object.values(weeklyBucket().objects || {}).some(entry => Number(entry?.found) > 0);
       const visitedCount = () => Object.keys(lifetimeBucket().visitedRooms || {}).length;
       const totalFound = () => (DATA.objectTypes || []).reduce((sum, type) => sum + foundFor(type), 0);
@@ -278,9 +287,10 @@
         const totalSlots = (DATA.objectTypes || []).length * 3;
         const found = (DATA.objectTypes || []).reduce((sum, type) => sum + weeklyFoundFor(type), 0);
         const remaining = Math.max(totalSlots - found, 0);
+        const tierLabel = MEMORY_TIER_META[selectedWeeklyTier()]?.en || 'Starter Memory';
         document.getElementById('weekly-progress').innerHTML = `
-          <div class="weekly-hunt-heading"><h2 id="weekly-hunt-heading">This Week's Garden</h2><span>Fresh every Sunday</span></div>
-          <p class="weekly-hunt-copy">Find three items for each memory this week. Your lifetime memory jar below stays saved.<small>今週は、それぞれの<ruby>記憶<rt>きおく</rt></ruby>の<ruby>手がかり<rt>てがかり</rt></ruby>を<ruby>三つ<rt>みっつ</rt></ruby>ずつ<ruby>見<rt>み</rt></ruby>つけられます。<ruby>記録<rt>きろく</rt></ruby>は<ruby>残<rt>のこ</rt></ruby>ります。</small></p>
+          <div class="weekly-hunt-heading"><h2 id="weekly-hunt-heading">This Week's Garden · ${esc(tierLabel)}</h2><span>Fresh every Sunday</span></div>
+          <p class="weekly-hunt-copy">Find three items for each memory in the ${esc(tierLabel)} tier this week. Your lifetime memory jar below stays saved.<small>今週は、${esc(tierLabel)}の<ruby>記憶<rt>きおく</rt></ruby>の<ruby>手<rt>て</rt></ruby>がかりを<ruby>三つ<rt>みっつ</rt></ruby>ずつ<ruby>見<rt>み</rt></ruby>つけられます。<ruby>記録<rt>きろく</rt></ruby>は<ruby>残<rt>のこ</rt></ruby>ります。</small></p>
           <div class="weekly-hunt-progress"><progress max="${Math.max(totalSlots, 1)}" value="${found}" aria-label="${found} of ${totalSlots} clues returned this week"></progress><span class="weekly-hunt-count">${found} / ${totalSlots}</span></div>
           <p class="weekly-hunt-legend">${remaining ? `${remaining} clue return${remaining === 1 ? '' : 's'} available this week.` : 'Every clue return completed this week.'}</p>`;
       }
@@ -308,13 +318,13 @@
           document.getElementById('memories').innerHTML = `<div class="memory-locked-state" role="status"><div class="memory-locked-state-mark" aria-hidden="true">✦</div><h3>Memory clues are tucked away</h3><p>Accept Marietta’s memory quest in Grimmerglen to reveal them.</p><p>マリエッタのクエストを受けると、<ruby>記憶<rt>きおく</rt></ruby>の<ruby>手<rt>て</rt></ruby>がかりが<ruby>見<rt>み</rt></ruby>えるよ。</p></div>`;
           return;
         }
-        const active = weeklyBucket().activeTargetType;
+        const currentTier = selectedWeeklyTier();
+        const active = weeklyTierBucket().activeTargetType;
         document.getElementById('memories').innerHTML = (DATA.objectTypes || []).map((type, index) => {
           const found = foundFor(type); const name = labels[type] || [type,type];
           const weeklyFound = weeklyFoundFor(type);
-          const tierForFound = weeklyFound >= 3 ? 'deep' : weeklyFound === 2 ? 'case' : 'start';
-          const story = DATA.tierMemories?.[type]?.[tierForFound]?.story?.en || DATA.stories?.[type]?.en || 'A little memory is waiting.';
-          const tier = weeklyFound >= 3 ? 'Memory safe ✦' : weeklyFound === 2 ? 'Deep memory next' : weeklyFound === 1 ? 'Case memory next' : 'Starter memory waiting';
+          const story = DATA.tierMemories?.[type]?.[currentTier]?.story?.en || DATA.stories?.[type]?.en || 'A little memory is waiting.';
+          const tier = `${MEMORY_TIER_META[currentTier]?.en || 'Starter Memory'} · ${weeklyFound} of 3 returned`;
           return `<article class="memory-card${weeklyFound >= 3 ? ' weekly-complete' : ''}${found >= 3 ? ' has-lifetime-memory' : ''}${active === type ? ' active' : ''}" data-found="${weeklyFound > 0}" style="--memory-color:${colors[index % colors.length]}">
             <img class="memory-art" src="${esc(DATA.collectibles?.[type] || '')}" alt="${esc(name[0])}">
             <h3 class="memory-name">${esc(name[0])}</h3><p class="memory-kana">${esc(name[1])}</p>
