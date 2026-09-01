@@ -789,12 +789,47 @@
     return activeGhost?.screaming === true || dangerPopupWaiting;
   }
 
+  function pauseRhythmForVisibility() {
+    if (!captureSession || !captureSession.rhythm) return false;
+    if (captureSession.phase !== 'countdown' && captureSession.phase !== 'playing') return false;
+    const rhythm = captureSession.rhythm;
+    if (rhythm.rafId) window.cancelAnimationFrame(rhythm.rafId);
+    rhythm.rafId = 0;
+    rhythm.visibilityPausedAt = performance.now();
+    rhythm.visibilityPausedPhase = captureSession.phase;
+    captureSession.phase = 'rhythm-paused';
+    if (captureSession.danger) stopDangerRhythmMusic({ reset: false });
+    return true;
+  }
+
+  function resumeRhythmAfterVisibility() {
+    if (!captureSession || !captureSession.rhythm || captureSession.phase !== 'rhythm-paused') return;
+    const rhythm = captureSession.rhythm;
+    const pausedFor = Math.max(0, performance.now() - (rhythm.visibilityPausedAt || performance.now()));
+    rhythm.startAt += pausedFor;
+    rhythm.visibilityPausedAt = 0;
+    rhythm.lastBeatPulse = -1;
+    captureSession.phase = rhythm.visibilityPausedPhase || 'playing';
+    rhythm.visibilityPausedPhase = null;
+    // This call is reached by the explicit Resume button gesture. It both
+    // retries a suspended iOS context and primes any missing rhythm buffers.
+    unlockRhythmAudioFromGesture();
+    renderRhythmCapture();
+    if (captureSession.danger && !captureSession.practice) startDangerRhythmMusic({ reset: false });
+    rhythm.rafId = window.requestAnimationFrame(tickRhythmCapture);
+  }
+
   function handleMuenbaVisibilityChange() {
     if (document.hidden) {
       if (dangerScreamStateIsActive()) {
         dangerScreamVisibilityPaused = true;
         stopDangerScream();
       }
+      pauseRhythmForVisibility();
+      return;
+    }
+    if (captureSession?.phase === 'rhythm-paused') {
+      renderRhythmResume();
       return;
     }
     if (!dangerScreamVisibilityPaused) return;
@@ -805,12 +840,12 @@
   }
 
   let dangerRhythmPlayToken = 0;
-  function startDangerRhythmMusic() {
+  function startDangerRhythmMusic({ reset = true } = {}) {
     stopDangerScream();
     pauseWorldMusicForCapture();
     const token = ++dangerRhythmPlayToken;
     try {
-      dangerRhythmMusic.currentTime = 0;
+      if (reset) dangerRhythmMusic.currentTime = 0;
       const playResult = dangerRhythmMusic.play();
       if (playResult && typeof playResult.then === 'function') {
         playResult.catch(() => {}).then(() => {
@@ -822,11 +857,11 @@
     } catch (_) {}
   }
 
-  function stopDangerRhythmMusic() {
+  function stopDangerRhythmMusic({ reset = true } = {}) {
     dangerRhythmPlayToken++;
     try {
       dangerRhythmMusic.pause();
-      dangerRhythmMusic.currentTime = 0;
+      if (reset) dangerRhythmMusic.currentTime = 0;
     } catch (_) {}
     music.volume = MUENBA_MUSIC_VOLUME;
   }
@@ -1857,7 +1892,7 @@
 
     const actions = document.createElement('div');
     actions.className = 'muenba-lobby-actions';
-    actions.appendChild(captureButton('Face the danger rhythm', '<ruby>危険<rt>きけん</rt></ruby>なリズムに<ruby>挑<rt>いど</rt></ruby>む', 'muenba-danger-begin', beginDangerRhythm));
+    actions.appendChild(bindRhythmAudioUnlock(captureButton('Face the danger rhythm', '<ruby>危険<rt>きけん</rt></ruby>なリズムに<ruby>挑<rt>いど</rt></ruby>む', 'muenba-danger-begin', beginDangerRhythm)));
     if (canHide) {
       actions.appendChild(captureButton('Hide now', '<ruby>今<rt>いま</rt></ruby>すぐ<ruby>隠<rt>かく</rt></ruby>れる', 'muenba-danger-hide', escapeDangerToHide));
     }
@@ -2265,6 +2300,28 @@
       playUiSfx('buttonPress');
       if (typeof handler === 'function') handler(event);
     });
+    return button;
+  }
+
+  // iOS Safari may create the shared context in a suspended state. Attach the
+  // resume attempt to the physical pointer gesture that starts a rhythm so
+  // the browser sees it as an explicit user activation before the click
+  // handler changes the capture phase.
+  function unlockRhythmAudioFromGesture() {
+    const context = getCaseAudioContext();
+    if (!context) return;
+    try {
+      if (context.state === 'suspended' && typeof context.resume === 'function') {
+        const result = context.resume();
+        if (result && typeof result.catch === 'function') result.catch(() => {});
+      }
+    } catch (_) {}
+    primeRhythmSfx();
+  }
+
+  function bindRhythmAudioUnlock(button) {
+    if (!button) return button;
+    button.addEventListener('pointerdown', unlockRhythmAudioFromGesture);
     return button;
   }
 
@@ -3122,7 +3179,7 @@
 
     const actions = document.createElement('div');
     actions.className = 'muenba-lobby-actions';
-    const energyAction = caseActionButton(
+    const energyAction = bindRhythmAudioUnlock(caseActionButton(
       'Start energy collection',
       'エネルギーを<ruby>集<rt>あつ</rt></ruby>めよう',
       'muenba-case-energy-start',
@@ -3130,7 +3187,7 @@
         if (captureSession !== session || session.phase !== 'case-solved') return;
         startRhythmCapture(false);
       }
-    );
+    ));
     energyAction.classList.add('muenba-energy-collection-action');
     actions.appendChild(energyAction);
     box.appendChild(actions);
@@ -3181,7 +3238,7 @@
 
     const actions = document.createElement('div');
     actions.className = 'muenba-lobby-actions';
-    const rhythmAction = captureButton('Begin rhythm', 'リズムを<ruby>始<rt>はじ</rt></ruby>める', 'muenba-capture-begin', beginRhythmCapture);
+    const rhythmAction = bindRhythmAudioUnlock(captureButton('Begin rhythm', 'リズムを<ruby>始<rt>はじ</rt></ruby>める', 'muenba-capture-begin', beginRhythmCapture));
     rhythmAction.classList.add('muenba-gold-action');
     actions.appendChild(rhythmAction);
     box.appendChild(actions);
@@ -3295,12 +3352,15 @@
       config.passAccuracy + readingPenaltyCount * CASE_FINAL_PENALTY_ACCURACY_STEP
     );
     const startAt = performance.now() + config.countdownMs;
+    const chart = normalizeRhythmChart(config.chart);
+    const targetCount = chart.reduce((count, note) => count + (note.decoy ? 0 : 1), 0) || 1;
     captureSession.phase = 'countdown';
     captureSession.rhythm = {
       ...config,
       passAccuracy,
       readingPenaltyCount,
-      chart: normalizeRhythmChart(config.chart),
+      chart,
+      targetCount,
       lanes: config.lanes.slice(),
       startAt,
       nextIndex: 0,
@@ -3345,7 +3405,7 @@
     captureSession.rhythmHelpPhase = captureSession.phase;
     captureSession.phase = 'rhythm-help';
     playUiSfx('popupOpen');
-    if (captureSession.danger) stopDangerRhythmMusic();
+    if (captureSession.danger) stopDangerRhythmMusic({ reset: false });
     renderRhythmHelp();
   }
 
@@ -3363,7 +3423,7 @@
     playUiSfx('popupClose');
     rhythm.helpOpenedAt = 0;
     renderRhythmCapture();
-    if (captureSession.danger && !captureSession.practice) startDangerRhythmMusic();
+    if (captureSession.danger && !captureSession.practice) startDangerRhythmMusic({ reset: false });
     rhythm.rafId = window.requestAnimationFrame(tickRhythmCapture);
   }
 
@@ -3407,7 +3467,7 @@
   }
 
   function rhythmAccuracy(rhythm) {
-    const total = rhythm.chart.filter(note => !note.decoy).length || 1;
+    const total = rhythm.targetCount || 1;
     return Math.round(((rhythm.perfect + rhythm.good) / total) * 100);
   }
 
@@ -3460,11 +3520,45 @@
 
     const actions = document.createElement('div');
     actions.className = 'muenba-lobby-actions';
-    actions.appendChild(captureButton('Practice rhythm', 'リズムを<ruby>練習<rt>れんしゅう</rt></ruby>する', 'muenba-rhythm-practice', startPracticeRhythm));
+    actions.appendChild(bindRhythmAudioUnlock(captureButton('Practice rhythm', 'リズムを<ruby>練習<rt>れんしゅう</rt></ruby>する', 'muenba-rhythm-practice', startPracticeRhythm)));
     actions.appendChild(captureButton('Back to rhythm', 'リズムに<ruby>戻<rt>もど</rt></ruby>る', 'muenba-rhythm-help-close', closeRhythmHelp));
     box.appendChild(actions);
     captureOverlay.classList.add('open');
     focusCaptureControl('#muenba-rhythm-practice');
+  }
+
+  function renderRhythmResume() {
+    if (!captureSession || !captureSession.rhythm || !captureOverlay) return;
+    captureOverlay.dataset.surface = 'rhythm';
+    captureOverlay.classList.add('muenba-rhythm-mode');
+    setDangerOverlay(false);
+    const box = captureBox();
+    box.classList.add('muenba-rhythm-halloween-box', 'muenba-rhythm-help-box');
+
+    const h2 = document.createElement('h2');
+    h2.textContent = 'Rhythm paused';
+    box.appendChild(h2);
+    const jp = document.createElement('p');
+    jp.className = 'jp';
+    jp.textContent = 'リズムを一時停止しました';
+    box.appendChild(jp);
+    renderCaseDirection(
+      box,
+      'The game paused while you were away. Tap resume when you are ready; the beat will continue where it stopped.',
+      'いない<ruby>間<rt>あいだ</rt></ruby>はゲームを<ruby>止<rt>と</rt></ruby>めました。<ruby>準備<rt>じゅんび</rt></ruby>ができたら<ruby>再開<rt>さいかい</rt></ruby>を<ruby>押<rt>お</rt></ruby>しましょう。'
+    );
+
+    const actions = document.createElement('div');
+    actions.className = 'muenba-lobby-actions';
+    actions.appendChild(bindRhythmAudioUnlock(captureButton(
+      'Tap to resume',
+      'リズムを<ruby>再開<rt>さいかい</rt></ruby>する',
+      'muenba-rhythm-resume',
+      resumeRhythmAfterVisibility
+    )));
+    box.appendChild(actions);
+    captureOverlay.classList.add('open');
+    focusCaptureControl('#muenba-rhythm-resume');
   }
 
   function renderRhythmCapture() {
@@ -3845,7 +3939,7 @@
       rhythm.comboEl.classList.toggle('is-hot', rhythm.combo >= 3);
     }
     if (rhythm.energyFillEl) {
-      const targetTotal = rhythm.chart.filter(noteData => !noteData.decoy).length || 1;
+      const targetTotal = rhythm.targetCount || 1;
       const energyPercent = Math.round(((rhythm.perfect + rhythm.good) / targetTotal) * 100);
       rhythm.energyFillEl.style.width = `${Math.min(100, energyPercent)}%`;
       rhythm.energyEl?.setAttribute('aria-valuenow', String(Math.min(100, energyPercent)));
@@ -4088,7 +4182,7 @@
 
     const actions = document.createElement('div');
     actions.className = 'muenba-lobby-actions';
-    actions.appendChild(captureButton('Practice again', 'もう<ruby>一度<rt>いちど</rt></ruby><ruby>練習<rt>れんしゅう</rt></ruby>する', 'muenba-rhythm-practice-again', startPracticeRhythm));
+    actions.appendChild(bindRhythmAudioUnlock(captureButton('Practice again', 'もう<ruby>一度<rt>いちど</rt></ruby><ruby>練習<rt>れんしゅう</rt></ruby>する', 'muenba-rhythm-practice-again', startPracticeRhythm)));
     actions.appendChild(captureButton('Return to rhythm', 'リズムに<ruby>戻<rt>もど</rt></ruby>る', 'muenba-rhythm-practice-return', returnFromPractice));
     box.appendChild(actions);
     captureOverlay.classList.add('open');

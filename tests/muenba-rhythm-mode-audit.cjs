@@ -30,6 +30,9 @@ assert(board.includes('event.preventDefault();'), 'touch input must prevent brow
 assert(board.includes('className = `muenba-rhythm-touch-pad'), 'each lane must expose a visible touch pad');
 assert(source.includes('touch-action:none'), 'rhythm controls must opt out of browser touch scrolling');
 assert(source.includes('min-height:190px'), 'portrait rhythm lanes must remain large enough to tap');
+assert(source.includes('function bindRhythmAudioUnlock(button)'), 'rhythm entry controls need a shared audio-unlock binder');
+assert(source.includes("button.addEventListener('pointerdown', unlockRhythmAudioFromGesture)"), 'rhythm audio must attempt unlock on direct pointerdown');
+assert(source.includes('primeRhythmSfx();'), 'the direct gesture must also prime decoded rhythm buffers');
 
 const practice = section('function startPracticeRhythm()', '  function pauseWorldMusicForCapture');
 assert(practice.includes("['rhythm-help', 'practice-result'].includes(captureSession.phase)"), 'practice must only start from help or its result');
@@ -55,6 +58,18 @@ assert(source.includes("if (REDUCED_MOTION) return;\n    const beat = Math.floor
 assert(source.includes('.muenba-rhythm-feedback, .muenba-rhythm-receptor'), 'reduced-motion CSS must disable rhythm animations');
 assert(source.includes('rhythm.lastBeatPulse = -1;'), 'closing rhythm help must restart beat-pulse state');
 assert(source.includes('!captureSession?.rhythm && dangerScreamStateIsActive()'), 'visibility resume must not restart danger audio over an active rhythm game');
+assert(source.includes('function pauseRhythmForVisibility()'), 'active rhythm must have an interruption pause path');
+assert(source.includes("captureSession.phase = 'rhythm-paused';"), 'hidden rhythm sessions must enter an explicit paused phase');
+assert(source.includes('function renderRhythmResume()'), 'paused rhythm sessions must explain how to continue');
+assert(source.includes("'muenba-rhythm-resume'"), 'paused rhythm sessions must expose a resume control');
+assert(source.includes('function resumeRhythmAfterVisibility()'), 'paused rhythm sessions must have an explicit resume path');
+assert(source.includes('rhythm.startAt += pausedFor;'), 'visibility pauses must preserve elapsed timing by shifting the start offset');
+assert(source.includes('startDangerRhythmMusic({ reset: false });'), 'danger music must resume from its paused position');
+assert(source.includes('const targetCount = chart.reduce('), 'playable-note count must be precomputed at rhythm startup');
+assert(source.includes('const total = rhythm.targetCount || 1'), 'rhythm accuracy must use the cached playable-note count');
+assert(source.includes('const targetTotal = rhythm.targetCount || 1'), 'rhythm energy updates must use the cached playable-note count');
+assert(!source.includes('rhythm.chart.filter(note => !note.decoy)'), 'active rhythm accuracy must not filter the chart');
+assert(!source.includes('rhythm.chart.filter(noteData => !noteData.decoy)'), 'active rhythm energy updates must not filter the chart');
 
 assert(verify.includes('tests/muenba-rhythm-mode-audit.cjs'), 'verify.sh must run the Pass 4 rhythm mode audit');
 
