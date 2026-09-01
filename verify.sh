@@ -978,6 +978,13 @@ else
   bad "Muenba profile weekly audit failed"
 fi
 
+echo "[weekly] Muenba tier-routing audit"
+if node tests/muenba-tier-routing-audit.cjs >/dev/null 2>&1; then
+  ok "Muenba selected-tier completion and case routing pass"
+else
+  bad "Muenba tier-routing audit failed"
+fi
+
 echo "[weekly] Utsuroba profile weekly audit"
 if node tests/utsuroba-profile-weekly-audit.cjs >/dev/null 2>&1; then
   ok "Utsuroba weekly versus lifetime profile labels pass"

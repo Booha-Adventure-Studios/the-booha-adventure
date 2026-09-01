@@ -302,7 +302,9 @@
 
       function getReadingDifficulty() {
         const value = getSave().muenba?.readingDifficulty;
-        return ['start', 'fresh', 'deep'].includes(value) ? value : 'fresh';
+        // Keep the profile's fallback aligned with muenba.js and the other
+        // reading worlds: a new or pre-tier save starts in Starter Memory.
+        return ['start', 'fresh', 'deep'].includes(value) ? value : 'start';
       }
 
       function setReadingDifficulty(value) {
@@ -333,7 +335,7 @@
             noteJP: '<ruby>深<rt>ふか</rt></ruby>い<ruby>記憶<rt>きおく</rt></ruby>は、<ruby>事件<rt>じけん</rt></ruby>をじっくり<ruby>読<rt>よ</rt></ruby>むための、<ruby>詳<rt>くわ</rt></ruby>しい<ruby>手<rt>て</rt></ruby>がかりです。'
           }
         };
-        const description = descriptions[current] || descriptions.fresh;
+        const description = descriptions[current] || descriptions.start;
         const note = description.note;
         const noteJP = description.noteJP;
         return `<section class="section">
@@ -380,7 +382,7 @@
           fresh: 'Case Memory',
           deep: 'Deep Memory'
         };
-        const memoryModeLabel = mode => memoryModeLabels[mode] || memoryModeLabels.fresh;
+        const memoryModeLabel = mode => memoryModeLabels[mode] || memoryModeLabels.start;
         const currentMemory = getReadingDifficulty();
         const caseOrder = (Array.isArray(window.MUENBA_DATA?.caseOrder) ? window.MUENBA_DATA.caseOrder : Object.keys(cases))
           .map(caseId => cases[caseId]).filter(Boolean);
