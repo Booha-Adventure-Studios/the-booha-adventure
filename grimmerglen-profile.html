@@ -220,9 +220,10 @@
       const foundFor = (type) => Math.max(0, Math.min(3, Number(lifetimeBucket().objects?.[type]?.found) || 0));
       const weeklyFoundFor = (type) => Math.max(0, Math.min(3, Number(weeklyTierBucket().objects?.[type]?.found) || 0));
       const memoryQuestAccepted = () => weeklyBucket().memoryQuestAccepted === true || Object.values(weeklyBucket().objects || {}).some(entry => Number(entry?.found) > 0);
-      const visitedCount = () => Object.keys(lifetimeBucket().visitedRooms || {}).length;
-      const totalFound = () => (DATA.objectTypes || []).reduce((sum, type) => sum + foundFor(type), 0);
-      const completeCount = () => (DATA.objectTypes || []).filter(type => foundFor(type) >= 3).length;
+      const lifetimeTotal = key => {
+        const value = Number(lifetimeBucket()[key]);
+        return Number.isSafeInteger(value) && value >= 0 ? value : 0;
+      };
       const MEMORY_TIER_CHOICES = ['start', 'case', 'deep'];
       const MEMORY_TIER_META = {
         start: { en:'Starter Memory', jp:'<ruby>始<rt>はじ</rt></ruby>めの<ruby>記憶<rt>きおく</rt></ruby>', note:'The simplest words. A good first memory to hold.', noteJP:'いちばんやさしい<ruby>言葉<rt>ことば</rt></ruby>です。<ruby>最初<rt>さいしょ</rt></ruby>の<ruby>記憶<rt>きおく</rt></ruby>にぴったりです。' },
@@ -304,14 +305,12 @@
       }
 
       function renderStats() {
-        const rooms = Object.keys(DATA.rooms || {}).length || 9;
-        const visits = Number(lifetimeBucket().roomVisitsTotal) || 0;
         document.getElementById('stats').innerHTML = [
-          [totalFound(), `${(DATA.objectTypes || []).length * 3}`, 'Lifetime clues returned','手がかり'],
-          [completeCount(), `${(DATA.objectTypes || []).length}`, 'Lifetime memories held','覚えている'],
-          [visitedCount(), `${rooms}`, 'Lifetime rooms explored','部屋'],
-          [visits, '∞', 'Lifetime garden visits','訪れた回数']
-        ].map(item => `<div class="stat"><div class="stat-value">${esc(item[0])}<small style="font-size:.75em;color:#b28caf"> / ${esc(item[1])}</small></div><div class="stat-label">${esc(item[2])}</div><span class="stat-jp">${item[3]}</span></div>`).join('');
+          [lifetimeTotal('cluesReturnedTotal'), 'Lifetime clues returned','手がかり'],
+          [lifetimeTotal('memoriesRestoredTotal'), 'Lifetime memories restored','覚えている'],
+          [lifetimeTotal('roomVisitsTotal'), 'Lifetime rooms explored','部屋'],
+          [lifetimeTotal('gardenVisitsTotal'), 'Lifetime garden visits','訪れた回数']
+        ].map(item => `<div class="stat"><div class="stat-value">${esc(item[0])}</div><div class="stat-label">${esc(item[1])}</div><span class="stat-jp">${item[2]}</span></div>`).join('');
       }
 
       function renderWeeklyProgress() {

@@ -873,6 +873,13 @@ else
   bad "Grimmerglen tier-readiness Pass 6 audit failed"
 fi
 
+echo "[profile] Grimmerglen profile counters audit"
+if node tests/grimmerglen-profile-counters-audit.cjs >/dev/null 2>&1; then
+  ok "Grimmerglen lifetime profile cards use plain running totals"
+else
+  bad "Grimmerglen profile counters audit failed"
+fi
+
 echo "[lifetime] Grimmerglen lifetime counters audit"
 if node tests/grimmerglen-lifetime-counters-audit.cjs >/dev/null 2>&1; then
   ok "Grimmerglen lifetime counters migrate, increment, and survive weekly reset"
