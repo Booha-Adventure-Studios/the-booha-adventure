@@ -3308,6 +3308,11 @@
       bestCombo: 0,
       resolvedIndices: new Set(),
       noteEls: [],
+      receptorEls: [],
+      feedbackEl: null,
+      noteTravelDistance: 0,
+      geometryKey: '',
+      lastBeatPulse: -1,
       statusEl: null,
       accuracyEl: null,
       countdownEl: null,
@@ -3424,8 +3429,8 @@
 
     renderCaseDirection(
       box,
-      'Tap the lane when its note reaches the orange line.',
-      '<ruby>音符<rt>おんぷ</rt></ruby>がオレンジの<ruby>線<rt>せん</rt></ruby>に<ruby>来<rt>き</rt></ruby>たら、レーンを<ruby>押<rt>お</rt></ruby>します。'
+      'Tap the matching pad when the note touches its target circle.',
+      '<ruby>音符<rt>おんぷ</rt></ruby>が<ruby>目印<rt>めじるし</rt></ruby>の<ruby>丸<rt>まる</rt></ruby>に<ruby>重<rt>かさ</rt></ruby>なったら、<ruby>同<rt>おな</rt></ruby>じレーンのパッドを<ruby>押<rt>お</rt></ruby>します。'
     );
     renderCaseDirection(
       box,
@@ -3550,7 +3555,13 @@
     hitLine.className = 'muenba-rhythm-hit-line';
     hitLine.setAttribute('aria-hidden', 'true');
     board.appendChild(hitLine);
+    const feedback = document.createElement('div');
+    feedback.className = 'muenba-rhythm-feedback';
+    feedback.setAttribute('aria-hidden', 'true');
+    board.appendChild(feedback);
     rhythm.boardEl = board;
+    rhythm.feedbackEl = feedback;
+    rhythm.receptorEls = [];
 
     laneDefs.forEach(laneDef => {
       const lane = laneDef.id;
@@ -3563,6 +3574,23 @@
       label.className = 'muenba-rhythm-lane-label';
       label.textContent = `${laneDef.label} · ${laneDef.key}`;
       laneButton.appendChild(label);
+
+      const receptor = document.createElement('span');
+      receptor.className = `muenba-rhythm-receptor muenba-rhythm-receptor-${lane}`;
+      receptor.textContent = rhythmNoteGlyph({ shape: laneDef.shape });
+      receptor.setAttribute('aria-hidden', 'true');
+      laneButton.appendChild(receptor);
+      rhythm.receptorEls.push(receptor);
+
+      const touchPad = document.createElement('span');
+      touchPad.className = `muenba-rhythm-touch-pad muenba-rhythm-touch-pad-${lane}`;
+      touchPad.setAttribute('aria-hidden', 'true');
+      const touchKey = document.createElement('strong');
+      touchKey.textContent = laneDef.key;
+      const touchName = document.createElement('small');
+      touchName.textContent = laneDef.label.split(' / ')[0];
+      touchPad.append(touchKey, touchName);
+      laneButton.appendChild(touchPad);
 
       const rail = document.createElement('span');
       rail.className = 'muenba-rhythm-rail';
@@ -3594,11 +3622,12 @@
     });
 
     box.appendChild(board);
+    refreshRhythmGeometry(rhythm);
 
     renderCaseDirection(
       box,
-      `Tap a lane when its note reaches the orange line. Use ${laneDefs.map(lane => `${lane.label.split(' / ')[0]} ${lane.key}`).join(', ')}.`,
-      `<ruby>音符<rt>おんぷ</rt></ruby>がオレンジの<ruby>線<rt>せん</rt></ruby>に<ruby>来<rt>き</rt></ruby>たら、レーンを<ruby>押<rt>お</rt></ruby>します。${laneDefs.map(lane => `${lane.label.split(' / ')[1] || lane.label}は${lane.key}`).join('、')}です。`
+      `Tap the matching pad when a note touches its target circle. ${laneDefs.map(lane => `${lane.label.split(' / ')[0]} ${lane.key}`).join(', ')}.`,
+      `<ruby>音符<rt>おんぷ</rt></ruby>が<ruby>目印<rt>めじるし</rt></ruby>の<ruby>丸<rt>まる</rt></ruby>に<ruby>重<rt>かさ</rt></ruby>なったら、<ruby>同<rt>おな</rt></ruby>じレーンのパッドを<ruby>押<rt>お</rt></ruby>します。${laneDefs.map(lane => `${lane.label.split(' / ')[1] || lane.label}は${lane.key}`).join('、')}です。`
     );
 
     const actions = document.createElement('div');
@@ -3632,6 +3661,7 @@
     }
 
     if (captureSession.phase === 'playing') {
+      pulseRhythmReceptors(now);
       advanceMissedRhythmNotes(now);
       updateRhythmNotes(now);
       if (rhythm.nextIndex >= rhythm.chart.length &&
@@ -3654,6 +3684,13 @@
 
   function updateRhythmNotes(now) {
     const rhythm = captureSession.rhythm;
+    const firstNote = rhythm.noteEls.find(Boolean);
+    const board = rhythm.boardEl;
+    const geometryKey = board && firstNote
+      ? `${board.clientWidth}x${board.clientHeight}x${firstNote.offsetWidth}x${firstNote.offsetHeight}`
+      : '';
+    if (geometryKey && geometryKey !== rhythm.geometryKey) refreshRhythmGeometry(rhythm);
+    const travelDistance = rhythm.noteTravelDistance || RHYTHM_NOTE_DISTANCE;
     rhythm.chart.forEach((_, index) => {
       const note = rhythm.noteEls[index];
       if (!note) return;
@@ -3662,9 +3699,36 @@
         return;
       }
       const progress = (now - (rhythmExpectedAt(rhythm, index) - rhythm.travelMs)) / rhythm.travelMs;
-      const y = Math.max(-26, Math.min(RHYTHM_NOTE_DISTANCE, progress * RHYTHM_NOTE_DISTANCE));
+      const y = Math.max(-26, Math.min(travelDistance, progress * travelDistance));
       note.style.transform = `translate(-50%, ${y}px)`;
     });
+  }
+
+  function refreshRhythmGeometry(rhythm) {
+    if (!rhythm || !rhythm.boardEl) return;
+    const lane = rhythm.boardEl.querySelector('.muenba-rhythm-lane');
+    const rail = lane && lane.querySelector('.muenba-rhythm-rail');
+    const receptor = rhythm.receptorEls && rhythm.receptorEls[0];
+    const note = rhythm.noteEls && rhythm.noteEls.find(Boolean);
+    if (!lane || !rail || !receptor || !note) return;
+    const railRect = rail.getBoundingClientRect();
+    const receptorRect = receptor.getBoundingClientRect();
+    rhythm.noteTravelDistance = Math.max(
+      0,
+      (receptorRect.top + receptorRect.height / 2) - railRect.top - note.offsetHeight / 2
+    );
+    rhythm.geometryKey = `${rhythm.boardEl.clientWidth}x${rhythm.boardEl.clientHeight}x${note.offsetWidth}x${note.offsetHeight}`;
+  }
+
+  function pulseRhythmReceptors(now) {
+    const rhythm = captureSession && captureSession.rhythm;
+    if (!rhythm || !rhythm.receptorEls || !rhythm.receptorEls.length || now < rhythm.startAt) return;
+    const beat = Math.floor((now - rhythm.startAt) / rhythm.noteMs);
+    if (beat === rhythm.lastBeatPulse) return;
+    rhythm.lastBeatPulse = beat;
+    rhythm.receptorEls.forEach(receptor => receptor.classList.remove('is-pulsing'));
+    void rhythm.boardEl?.offsetWidth;
+    rhythm.receptorEls.forEach(receptor => receptor.classList.add('is-pulsing'));
   }
 
   function playRhythmAudioBuffer(result) {
@@ -3754,6 +3818,20 @@
       : '';
     rhythm.statusEl.textContent = `${text}${comboText}`;
     rhythm.statusEl.className = `muenba-rhythm-status ${kind || ''}`;
+    if (rhythm.feedbackEl) {
+      const feedbackLabel = {
+        go: 'GO!',
+        perfect: 'PERFECT',
+        good: 'GOOD',
+        early: 'EARLY',
+        late: 'LATE',
+        miss: 'MISS'
+      }[kind] || text;
+      rhythm.feedbackEl.textContent = feedbackLabel;
+      rhythm.feedbackEl.className = `muenba-rhythm-feedback ${kind || ''}`;
+      void rhythm.feedbackEl.offsetWidth;
+      rhythm.feedbackEl.classList.add('is-visible');
+    }
   }
 
   function handleRhythmInput(lane) {
@@ -3785,7 +3863,7 @@
     const expected = rhythmExpectedAt(rhythm, candidateIndex);
     const delta = now - expected;
     if (delta < -rhythm.goodMs) {
-      showRhythmFeedback('A little later…', 'early');
+      showRhythmFeedback('EARLY · TAP LATER', 'early');
       return;
     }
     const absoluteDelta = Math.abs(delta);
@@ -3797,7 +3875,7 @@
       showRhythmFeedback('Good!', 'good');
     } else {
       markRhythmNote('miss', candidateIndex);
-      showRhythmFeedback(delta < 0 ? 'Too early' : 'Too late', 'miss');
+      showRhythmFeedback(delta < 0 ? 'EARLY · TAP LATER' : 'LATE · TAP SOONER', delta < 0 ? 'early' : 'late');
     }
   }
 
@@ -4895,7 +4973,7 @@
       .muenba-capture-action { touch-action:manipulation; }
       .muenba-rhythm-status { min-height:1.5em; margin:2px 0 2px !important; color:#d8f2e2 !important; font:700 1.08rem/1.4 ui-monospace,monospace !important; text-align:center !important; letter-spacing:.08em; }
       .muenba-rhythm-status.perfect, .muenba-rhythm-status.good, .muenba-rhythm-status.go { color:#8fe0ad !important; }
-      .muenba-rhythm-status.miss, .muenba-rhythm-status.early { color:#e8b0b8 !important; }
+      .muenba-rhythm-status.miss, .muenba-rhythm-status.early, .muenba-rhythm-status.late { color:#e8b0b8 !important; }
       .muenba-rhythm-tier { margin:0 0 7px !important; color:#d8c98b !important; font:700 .68rem/1.35 ui-monospace,monospace !important; letter-spacing:.08em; text-align:center !important; text-transform:uppercase; }
       .muenba-rhythm-help-button { position:absolute; top:10px; left:10px; z-index:8; display:grid; place-items:center; width:30px; height:30px; padding:0; border:1px solid rgba(216,201,139,.72); border-radius:50%; color:#fff5d5; background:rgba(40,32,12,.72); box-shadow:0 0 14px rgba(216,201,139,.28); font:900 17px/1 Georgia,'Times New Roman',serif; cursor:pointer; }
       .muenba-rhythm-help-button:hover, .muenba-rhythm-help-button:focus-visible { border-color:#fff1ae; background:rgba(126,111,48,.58); box-shadow:0 0 24px rgba(216,201,139,.48); outline:none; }
@@ -4922,7 +5000,14 @@
       .muenba-rhythm-lane:active { filter:brightness(1.45); }
       .muenba-rhythm-lane-label { position:absolute; z-index:4; left:0; right:0; top:9px; color:#edf5ff; font:900 .68rem/1.2 ui-monospace,monospace; letter-spacing:.08em; pointer-events:none; text-shadow:0 0 9px rgba(255,255,255,.26); }
       .muenba-rhythm-rail { position:absolute; inset:29px 0 0; pointer-events:none; }
-      .muenba-rhythm-hit-line { position:absolute; z-index:5; left:8px; right:8px; top:218px; height:3px; border-radius:99px; background:#ffab45; box-shadow:0 0 10px rgba(255,134,35,.72),0 0 24px rgba(255,91,20,.4); pointer-events:none; }
+      .muenba-rhythm-hit-line { position:absolute; z-index:5; left:8px; right:8px; top:calc(100% - 45px); height:3px; border-radius:99px; background:#ffab45; box-shadow:0 0 10px rgba(255,134,35,.72),0 0 24px rgba(255,91,20,.4); pointer-events:none; }
+      .muenba-rhythm-feedback { position:absolute; z-index:10; left:50%; top:calc(100% - 82px); min-width:96px; padding:4px 9px; border:1px solid rgba(255,213,133,.72); border-radius:999px; color:#fff4ce; background:rgba(38,24,8,.9); box-shadow:0 0 20px rgba(255,153,46,.38); font:900 .7rem/1.2 ui-monospace,monospace; letter-spacing:.12em; text-align:center; opacity:0; pointer-events:none; transform:translate(-50%,8px); }
+      .muenba-rhythm-feedback.is-visible { animation:muenbaRhythmFeedback .62s ease-out both; }
+      .muenba-rhythm-feedback.perfect { border-color:#b6ff86; color:#eaffce; box-shadow:0 0 24px rgba(132,255,94,.54); }
+      .muenba-rhythm-feedback.good { border-color:#8fd7ff; color:#dff4ff; box-shadow:0 0 22px rgba(73,177,255,.44); }
+      .muenba-rhythm-feedback.early, .muenba-rhythm-feedback.late, .muenba-rhythm-feedback.miss { border-color:#ff9da8; color:#ffe1e5; box-shadow:0 0 22px rgba(255,63,88,.42); }
+      .muenba-rhythm-feedback.go { border-color:#ffe58a; color:#fff7c6; }
+      @keyframes muenbaRhythmFeedback { 0% { opacity:0; transform:translate(-50%,8px) scale(.86); } 18% { opacity:1; transform:translate(-50%,0) scale(1); } 72% { opacity:1; transform:translate(-50%,-5px) scale(1); } 100% { opacity:0; transform:translate(-50%,-13px) scale(.96); } }
       .muenba-rhythm-note { position:absolute; z-index:3; left:50%; top:0; display:grid; place-items:center; width:42px; height:42px; border:2px solid rgba(220,248,231,.92); border-radius:50%; color:#f0fff5; background:rgba(44,105,76,.92); box-shadow:0 0 16px rgba(112,214,151,.42); font:900 1.1rem/1 ui-monospace,monospace; will-change:transform; }
       .muenba-rhythm-note-don { border-color:#8affae; background:rgba(21,153,102,.94); box-shadow:0 0 18px rgba(57,255,147,.62); }
       .muenba-rhythm-note-kat { border-radius:10px; border-color:#e0a5ff; background:rgba(118,46,167,.94); box-shadow:0 0 18px rgba(205,103,255,.62); }
@@ -4930,6 +5015,16 @@
       .muenba-rhythm-note-bell { border-radius:50%; border-color:#ffd18d; background:rgba(196,91,27,.96); box-shadow:0 0 18px rgba(255,145,44,.7); }
       .muenba-rhythm-note-decoy { border-style:dashed; color:#ffe0a3; background:rgba(76,35,65,.9); box-shadow:0 0 18px rgba(255,173,91,.48); }
       .muenba-rhythm-note-spiral { border-radius:50%; transform-origin:center; }
+      .muenba-rhythm-receptor { position:absolute; z-index:6; left:50%; bottom:40px; display:grid; place-items:center; width:42px; height:42px; border:2px solid rgba(255,224,157,.92); border-radius:50%; color:#fff5d5; background:rgba(62,40,12,.72); box-shadow:0 0 12px rgba(255,171,69,.42),inset 0 0 12px rgba(255,195,88,.12); font:900 1.1rem/1 ui-monospace,monospace; pointer-events:none; transform:translate(-50%,50%); }
+      .muenba-rhythm-receptor-don { border-color:#8affae; color:#d8ffe3; background:rgba(21,111,77,.7); }
+      .muenba-rhythm-receptor-kat { border-radius:10px; border-color:#e0a5ff; color:#f4ddff; background:rgba(91,39,126,.72); }
+      .muenba-rhythm-receptor-rim { border-radius:9px 9px 50% 50%; border-color:#9ad3ff; color:#e2f3ff; background:rgba(31,81,139,.72); }
+      .muenba-rhythm-receptor-bell { border-color:#ffd18d; color:#fff0d2; background:rgba(151,68,23,.74); }
+      .muenba-rhythm-receptor.is-pulsing { animation:muenbaRhythmReceptorPulse .28s ease-out; }
+      @keyframes muenbaRhythmReceptorPulse { 0%,100% { transform:translate(-50%,50%) scale(1); filter:brightness(1); } 45% { transform:translate(-50%,50%) scale(1.18); filter:brightness(1.45); } }
+      .muenba-rhythm-touch-pad { position:absolute; z-index:7; left:6px; right:6px; bottom:5px; display:flex; align-items:center; justify-content:center; gap:6px; min-height:28px; padding:3px 5px; border:1px solid rgba(255,231,173,.64); border-radius:8px; color:#fff5d5; background:rgba(24,20,10,.78); box-shadow:0 0 12px rgba(255,164,53,.24),inset 0 0 8px rgba(255,205,106,.08); font:900 .68rem/1 ui-monospace,monospace; letter-spacing:.08em; pointer-events:none; }
+      .muenba-rhythm-touch-pad strong { color:#fff0a8; font-size:.82rem; }
+      .muenba-rhythm-touch-pad small { color:#d7e6dc; font:900 .58rem/1 ui-monospace,monospace; letter-spacing:.04em; }
       .muenba-rhythm-note.is-avoided { opacity:.1; border-color:#ffd48a; box-shadow:none; }
       .muenba-rhythm-note.is-resolved { opacity:.14; box-shadow:none; }
       .muenba-rhythm-note.is-hit { opacity:.94; border-color:#8fe0ad; }
@@ -4941,7 +5036,7 @@
       @keyframes muenbaRhythmGood { 50% { box-shadow:inset 0 0 34px rgba(74,175,255,.22),0 0 18px rgba(74,175,255,.3); } }
       @keyframes muenbaRhythmMiss { 50% { box-shadow:inset 0 0 42px rgba(255,52,87,.3),0 0 22px rgba(255,52,87,.32); } }
       @keyframes muenbaRhythmComboPop { 50% { transform:scale(1.12); } }
-      @media (max-width:640px) { .muenba-rhythm-board { gap:4px; padding:3px; } .muenba-rhythm-lane-label { font-size:.52rem; letter-spacing:.01em; } .muenba-rhythm-note { width:34px; height:34px; font-size:.9rem; } }
+      @media (max-width:640px) { .muenba-rhythm-board { gap:4px; padding:3px; } .muenba-rhythm-lane-label { font-size:.52rem; letter-spacing:.01em; } .muenba-rhythm-note, .muenba-rhythm-receptor { width:34px; height:34px; font-size:.9rem; } .muenba-rhythm-touch-pad { left:4px; right:4px; min-height:26px; padding:3px 2px; gap:4px; } .muenba-rhythm-touch-pad strong { font-size:.72rem; } .muenba-rhythm-touch-pad small { font-size:.5rem; } }
       .muenba-rhythm-hint { margin:7px 0 13px !important; color:#8fa89b !important; font-size:.73rem !important; line-height:1.45 !important; text-align:center !important; }
       .muenba-orb-release-list { display:flex; justify-content:center; align-items:center; gap:12px; min-height:52px; margin:5px 0 8px; }
       .muenba-orb-release { display:grid; place-items:center; width:38px; height:38px; color:#dfffea; border:1px solid rgba(181,238,202,.75); border-radius:50%; background:radial-gradient(circle,rgba(113,206,153,.72),rgba(30,83,59,.68)); box-shadow:0 0 22px rgba(113,206,153,.58); font-size:1.45rem; animation:muenbaOrbRelease .42s cubic-bezier(.2,1.5,.4,1) both; }
@@ -5443,7 +5538,7 @@
         .muenba-mission-hint-toggle { min-height:42px; }
       }
       @media (prefers-reduced-motion: reduce) { .muenba-orb-release, .muenba-hunt-ghost-portrait, .muenba-gold-action, .muenba-read-ready { animation:none !important; } }
-      @media (prefers-reduced-motion: reduce) { #muenba-fade, .muenba-return-box, #muenba-return-overlay, .muenba-lobby-box, #muenba-lobby-overlay, #muenba-capture-overlay { transition:none !important; } .muenba-lobby-portrait, #muenba-hide, #muenba-celebration-status, .muenba-rhythm-board, .muenba-rhythm-combo, .muenba-rhythm-result-failure, .muenba-case-question, .muenba-case-question::before, .muenba-case-feedback-shake, .muenba-case-read-status, .muenba-energy-warning, .muenba-case-clue.muenba-reading-complete > .muenba-case-reading-status, .muenba-case-clue.muenba-reading-complete > .muenba-case-check-panel { animation:none !important; } .muenba-case-choice, .muenba-case-action, .muenba-capture-action { transition:none !important; } .muenba-rhythm-energy-fill { transition:none !important; } #muenba-profile-link { transition:none !important; } }
+      @media (prefers-reduced-motion: reduce) { #muenba-fade, .muenba-return-box, #muenba-return-overlay, .muenba-lobby-box, #muenba-lobby-overlay, #muenba-capture-overlay { transition:none !important; } .muenba-lobby-portrait, #muenba-hide, #muenba-celebration-status, .muenba-rhythm-board, .muenba-rhythm-combo, .muenba-rhythm-feedback, .muenba-rhythm-receptor, .muenba-rhythm-result-failure, .muenba-case-question, .muenba-case-question::before, .muenba-case-feedback-shake, .muenba-case-read-status, .muenba-energy-warning, .muenba-case-clue.muenba-reading-complete > .muenba-case-reading-status, .muenba-case-clue.muenba-reading-complete > .muenba-case-check-panel { animation:none !important; } .muenba-case-choice, .muenba-case-action, .muenba-capture-action { transition:none !important; } .muenba-rhythm-energy-fill { transition:none !important; } #muenba-profile-link { transition:none !important; } }
     `;
     document.head.appendChild(style);
   }
