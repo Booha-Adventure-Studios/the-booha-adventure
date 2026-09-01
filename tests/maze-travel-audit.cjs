@@ -38,6 +38,6 @@ assert(maze.includes('addGhostFlightBurst(ghostIX,ghostIY,20);'), 'flight must s
 assert(maze.includes('ctx.rotate(tilt);ctx.scale(squashX,squashY);'), 'active Booha must use restrained flight motion');
 assert(maze.includes('if(ghostLocked||popupOpen())return;'), 'canvas input must remain locked during flight');
 assert(sw.includes('booha-pages-2026-385'), 'service-worker page cache must include the current page bump');
-assert(sw.includes('booha-assets-2026-469'), 'service-worker asset cache must include the current Grimmerglen Pass 3 bump');
+assert(sw.includes('booha-assets-2026-470'), 'service-worker asset cache must include the current Grimmerglen Pass 4 bump');
 
 console.log('Maze 23D travel audit passed: flights are distance-aware, automatic, and visually expressive.');

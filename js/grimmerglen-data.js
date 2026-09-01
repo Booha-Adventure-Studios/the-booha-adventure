@@ -231,9 +231,9 @@
         full: ['I went to the station to meet my friend Uhibon.', 'I played games with my friend Uhibon.', 'I wrote a letter to my friend Uhibon.'], partial: ['I went to the station …', 'I played games …', 'I wrote a letter …']
       },
       deep: {
-        story: { en: 'I remember holding this ticket while Uhibon and I went to Utsuroba to meet Bryan at the station.', jp: 'ウヒボンと私は、駅でブライアンに会うためにウツロバへ行くあいだ、この切符を持っていたのを覚えている。', readings: { '駅': 'えき', '会う': 'あう', '切符': 'きっぷ', '持っていた': 'もっていた', '覚えている': 'おぼえている' } },
-        target: 'I remember holding this ticket while Uhibon and I went to Utsuroba to meet Bryan at the station.', jp: 'ウヒボンと私は、駅でブライアンに会うためにウツロバへ行くあいだ、この切符を持っていたのを覚えている。', readings: { '駅': 'えき', '会う': 'あう', '切符': 'きっぷ', '持っていた': 'もっていた', '覚えている': 'おぼえている' },
-        full: ['I remember holding this ticket while Uhibon and I went to Utsuroba to meet Bryan at the station.'], partial: ['I remember holding …']
+        story: { en: 'I remember holding this ticket before I went to the station to meet my friend Uhibon. We were going to Utsuroba to meet Bryan, and I kept the ticket safe for our trip.', jp: '友達のウヒボンに会うために駅へ行く前、この切符を持っていたのを覚えている。ブライアンに会うためにウツロバへ行くので、旅のために切符を大切にしまっていた。', readings: { '友達': 'ともだち', '会う': 'あう', '駅': 'えき', '行く': 'いく', '前': 'まえ', '切符': 'きっぷ', '持っていた': 'もっていた', '覚えている': 'おぼえている', '旅': 'たび', '大切': 'たいせつ' } },
+        target: 'I remember holding this ticket before I went to the station to meet my friend Uhibon. We were going to Utsuroba to meet Bryan, and I kept the ticket safe for our trip.', jp: '友達のウヒボンに会うために駅へ行く前、この切符を持っていたのを覚えている。ブライアンに会うためにウツロバへ行くので、旅のために切符を大切にしまっていた。', readings: { '友達': 'ともだち', '会う': 'あう', '駅': 'えき', '行く': 'いく', '前': 'まえ', '切符': 'きっぷ', '持っていた': 'もっていた', '覚えている': 'おぼえている', '旅': 'たび', '大切': 'たいせつ' },
+        full: ['I remember holding this ticket before I went to the station to meet my friend Uhibon. We were going to Utsuroba to meet Bryan, and I kept the ticket safe for our trip.'], partial: ['I remember holding …']
       }
     },
     pillow: {
@@ -257,12 +257,12 @@
       start: {
         story: { en: 'I remember carrying my favorite daydreams in this.', jp: 'お気に入りの夢をこれに入れて運んだのを覚えている。', readings: { 'お気に入り': 'おきにいり', '夢': 'ゆめ', '入れて': 'いれて', '運んだ': 'はこんだ', '覚えている': 'おぼえている' } },
         target: 'I carry my favorite daydreams in this.', jp: 'お気に入りの夢をこれに入れて運ぶ。', readings: { 'お気に入り': 'おきにいり', '夢': 'ゆめ', '入れて': 'いれて', '運ぶ': 'はこぶ' },
-        full: ['I carry my favorite daydreams in this.', 'I keep my favorite books in this.', 'I carry my favorite snacks in this.'], partial: ['I carry …', 'I keep …', 'I carry …']
+        full: ['I carry my favorite daydreams in this.', 'I keep my favorite books in this.', 'I carry my favorite snacks in this.'], partial: ['I carry daydreams …', 'I keep books …', 'I carry snacks …']
       },
       case: {
         story: { en: 'I remember carrying my favorite daydreams in this. Some of the daydreams are scary!', jp: 'お気に入りの夢をこれに入れて運んだのを覚えている。夢のいくつかはこわい！', readings: { 'お気に入り': 'おきにいり', '夢': 'ゆめ', '入れて': 'いれて', '運んだ': 'はこんだ', '覚えている': 'おぼえている' } },
         target: 'I remember carrying my favorite daydreams in this. Some of the daydreams are scary!', jp: 'お気に入りの夢をこれに入れて運んだのを覚えている。夢のいくつかはこわい！', readings: { 'お気に入り': 'おきにいり', '夢': 'ゆめ', '入れて': 'いれて', '運んだ': 'はこんだ', '覚えている': 'おぼえている' },
-        full: ['I remember carrying my favorite daydreams in this. Some of the daydreams are scary!', 'I remember carrying my favorite daydreams in this. Some of the daydreams are sunny!', 'I remember carrying my favorite daydreams in this. Some of the daydreams are funny!'], partial: ['I remember carrying …', 'I remember carrying …', 'I remember carrying …']
+        full: ['I remember carrying my favorite daydreams in this. Some of the daydreams are scary!', 'I remember carrying my favorite daydreams in this. Some of the daydreams are sunny!', 'I remember carrying my favorite daydreams in this. Some of the daydreams are funny!'], partial: ['I remember carrying … scary!', 'I remember carrying … sunny!', 'I remember carrying … funny!']
       },
       deep: {
         story: { en: 'I remember carrying my favorite daydreams in this backpack, even when the scary ones followed me home.', jp: 'こわい夢が家までついてきたときも、お気に入りの夢をこのリュックに入れて運んだのを覚えている。', readings: { '夢': 'ゆめ', '家': 'いえ', 'お気に入り': 'おきにいり', '入れて': 'いれて', '運んだ': 'はこんだ', '覚えている': 'おぼえている' } },
