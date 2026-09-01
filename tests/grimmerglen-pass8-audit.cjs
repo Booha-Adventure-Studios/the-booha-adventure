@@ -52,7 +52,9 @@ for (const type of data.objectTypes) {
     assert(exercise && exercise.promptEn && exercise.accepted?.length, `${type} must have a complete ${tier} exercise`);
     answers.push(exercise.accepted[0]);
   }
-  assert.strictEqual(new Set(answers).size, 1, `${type} must repeat the same sentence across all three returns`);
+  assert.strictEqual(new Set(answers).size, 3, `${type} must use a distinct sentence for Starter, Case, and Deep returns`);
+  assert(answers[1].length >= answers[0].length, `${type} Case answer should be at least as challenging as Starter`);
+  assert(answers[2].length >= answers[1].length, `${type} Deep answer should be at least as challenging as Case`);
   assert.strictEqual(data.memories[type].start.options.length, 3, `${type} Starter must show three complete helpers`);
   assert.strictEqual(data.memories[type].case.options.length, 3, `${type} Case must show three partial helpers`);
   assert(data.memories[type].deep.options.length === 1 && data.memories[type].deep.helpText, `${type} Deep must use a short hint plus optional Furigana help`);
@@ -158,12 +160,12 @@ assert(serviceWorker.includes('`${BASE}/js/`'), 'service worker must cache Grimm
 assert(serviceWorker.includes('`${BASE}/assets/`'), 'service worker must cache Grimmerglen art at runtime');
 assert(serviceWorker.includes('${BASE}/assets/img/grimmerglen/grimmerglen_bgm.mp3'), 'service worker must precache Grimmerglen BGM');
 assert(serviceWorker.includes('${BASE}/assets/img/grimmerglen/grimmerglen_dance.mp3'), 'service worker must precache Grimmerglen dance music');
-assert(/pages:\s+'booha-pages-2026-384'/.test(serviceWorker), 'page cache must be bumped for the entry pass');
+assert(/pages:\s+'booha-pages-2026-385'/.test(serviceWorker), 'page cache must be bumped for the entry pass');
 assert(serviceWorker.includes('grimmerglen/dance/marietta_dance_'), 'service worker must precache Marietta dance art');
 assert(serviceWorker.includes('grimmerglen/dance/booha_grimmerglen_dance_'), 'service worker must precache Booha dance art');
 assert(serviceWorker.includes('room_${String(index + 1).padStart(2, \'0\')}.webp'), 'service worker must cover the generated room sequence');
 assert(serviceWorker.includes('${BASE}/assets/img/grimmerglen/booha_change.mp3'), 'service worker must precache the Booha change cue');
-assert(/assets:\s+'booha-assets-2026-467'/.test(serviceWorker), 'asset cache must be bumped for the Grimmerglen Content Pass 1 pass');
+assert(/assets:\s+'booha-assets-2026-468'/.test(serviceWorker), 'asset cache must be bumped for the Grimmerglen Content Pass 2 pass');
 
 assert(profile.includes('GRIMMERGLEN / MEMORY CASE FILE'), 'profile must use the Grimmerglen case-file header');
 assert(profile.includes('grimmerglen-data.js'), 'profile must load the Grimmerglen manifest');
