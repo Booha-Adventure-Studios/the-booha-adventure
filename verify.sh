@@ -873,6 +873,13 @@ else
   bad "Grimmerglen tier-readiness Pass 6 audit failed"
 fi
 
+echo "[content] Grimmerglen memory-assistance audit"
+if node tests/grimmerglen-memory-assistance-audit.cjs >/dev/null 2>&1; then
+  ok "Grimmerglen memory returns use full, partial, and hint-only assistance"
+else
+  bad "Grimmerglen memory-assistance audit failed"
+fi
+
 echo "[94/98] Grimmerglen navigation audit"
 if node tests/grimmerglen-navigation-audit.cjs >/dev/null 2>&1; then
   ok "Grimmerglen grid links, boundary arrows, and help-gated movement contracts pass"

@@ -56,7 +56,7 @@ assert(typing.includes("input.addEventListener('cut'"),
   'typing input must block cutting');
 assert(runtime.includes("['copy', 'cut', 'paste'].forEach"),
   'Marietta memory cards must block clipboard actions');
-assert(runtime.includes('mg-memory-replay{user-select:none'),
+assert(runtime.includes('mg-memory-replay{position:relative;user-select:none'),
   'memory replay must disable text selection');
 assert(verify.includes('tests/grimmerglen-pass9f-audit.cjs'),
   'verify.sh must run the Pass 9F memory-return audit');
