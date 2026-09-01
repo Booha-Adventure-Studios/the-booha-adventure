@@ -136,7 +136,10 @@
   const RHYTHM_BPM = 96;
   const RHYTHM_NOTE_MS = 60000 / RHYTHM_BPM;
   const RHYTHM_COUNTDOWN_MS = 1800;
-  const RHYTHM_TRAVEL_MS = 1200;
+  // Pass 3: keep the visual approach time stable. Difficulty should come
+  // from beat spacing, lane count, chart density, and timing windows—not from
+  // notes unexpectedly moving faster toward the same target.
+  const RHYTHM_TRAVEL_MS = 1000;
   const RHYTHM_NOTE_DISTANCE = 168;
   const RHYTHM_PERFECT_MS = 110;
   const RHYTHM_GOOD_MS = 220;
@@ -145,7 +148,7 @@
   const PRACTICE_RHYTHM_BPM = 72;
   const PRACTICE_RHYTHM_NOTE_MS = 60000 / PRACTICE_RHYTHM_BPM;
   const PRACTICE_RHYTHM_COUNTDOWN_MS = 1400;
-  const PRACTICE_RHYTHM_TRAVEL_MS = 1050;
+  const PRACTICE_RHYTHM_TRAVEL_MS = RHYTHM_TRAVEL_MS;
   const PRACTICE_RHYTHM_PERFECT_MS = 150;
   const PRACTICE_RHYTHM_GOOD_MS = 300;
   const PRACTICE_RHYTHM_PASS_ACCURACY = 50;
@@ -168,7 +171,7 @@
   const DANGER_RHYTHM_BPM = 150;
   const DANGER_RHYTHM_NOTE_MS = 60000 / DANGER_RHYTHM_BPM;
   const DANGER_RHYTHM_COUNTDOWN_MS = 1000;
-  const DANGER_RHYTHM_TRAVEL_MS = 700;
+  const DANGER_RHYTHM_TRAVEL_MS = RHYTHM_TRAVEL_MS;
   const DANGER_RHYTHM_PERFECT_MS = 80;
   const DANGER_RHYTHM_GOOD_MS = 170;
   const DANGER_RHYTHM_PASS_ACCURACY = 60;
@@ -178,11 +181,13 @@
     { lane: 'don', beat: 0 },
     { lane: 'kat', beat: 1 },
     { lane: 'rim', beat: 2 },
-    { lane: 'bell', beat: 3, decoy: true, shape: 'spiral' },
+    // Decoys sit on half-beats away from their lane's real target so the
+    // player can identify and avoid them instead of seeing two notes overlap.
+    { lane: 'bell', beat: 2.5, decoy: true, shape: 'spiral' },
     { lane: 'bell', beat: 3 },
     { lane: 'don', beat: 4 },
     { lane: 'rim', beat: 5 },
-    { lane: 'kat', beat: 6, decoy: true, shape: 'skull' },
+    { lane: 'kat', beat: 5.5, decoy: true, shape: 'skull' },
     { lane: 'kat', beat: 6 },
     { lane: 'bell', beat: 7 },
     { lane: 'don', beat: 8 },
@@ -192,7 +197,7 @@
   ];
   const SUPER_DANGER_RHYTHM_BPM = 180;
   const SUPER_DANGER_RHYTHM_COUNTDOWN_MS = 800;
-  const SUPER_DANGER_RHYTHM_TRAVEL_MS = 560;
+  const SUPER_DANGER_RHYTHM_TRAVEL_MS = RHYTHM_TRAVEL_MS;
   const SUPER_DANGER_RHYTHM_PERFECT_MS = 58;
   const SUPER_DANGER_RHYTHM_GOOD_MS = 122;
   const SUPER_DANGER_RHYTHM_PASS_ACCURACY = 65;
@@ -231,12 +236,12 @@
       lanes: ['don', 'kat'],
       chart: ['don', 'kat', 'don', 'kat', 'kat', 'don', 'kat', 'don', 'kat', 'don'],
       bpm: 102,
-      travelMs: 1140,
+      travelMs: RHYTHM_TRAVEL_MS,
       perfectMs: 105,
       goodMs: 205,
       dangerChart: ['don', 'kat', 'kat', 'don', 'kat', 'don', 'don', 'kat'],
       dangerBpm: 156,
-      dangerTravelMs: 680,
+      dangerTravelMs: DANGER_RHYTHM_TRAVEL_MS,
       dangerPerfectMs: 76,
       dangerGoodMs: 160
     },
@@ -259,12 +264,12 @@
         { lane: 'kat', beat: 9 }
       ],
       bpm: 108,
-      travelMs: 1080,
+      travelMs: RHYTHM_TRAVEL_MS,
       perfectMs: 98,
       goodMs: 190,
       dangerChart: ['don', 'kat', 'kat', 'don', 'kat', 'don', 'kat', 'don', 'kat'],
       dangerBpm: 162,
-      dangerTravelMs: 660,
+      dangerTravelMs: DANGER_RHYTHM_TRAVEL_MS,
       dangerPerfectMs: 72,
       dangerGoodMs: 152
     },
@@ -291,12 +296,12 @@
         { lane: 'bell', beat: 12 }
       ],
       bpm: 114,
-      travelMs: 1020,
+      travelMs: RHYTHM_TRAVEL_MS,
       perfectMs: 92,
       goodMs: 178,
       dangerChart: ['don', 'kat', 'kat', 'don', 'kat', 'don', 'kat', 'don', 'don', 'kat'],
       dangerBpm: 168,
-      dangerTravelMs: 640,
+      dangerTravelMs: DANGER_RHYTHM_TRAVEL_MS,
       dangerPerfectMs: 68,
       dangerGoodMs: 144
     }
@@ -3307,6 +3312,7 @@
       combo: 0,
       bestCombo: 0,
       resolvedIndices: new Set(),
+      decoyWarningIndices: new Set(),
       noteEls: [],
       receptorEls: [],
       feedbackEl: null,
@@ -3629,6 +3635,14 @@
       `Tap the matching pad when a note touches its target circle. ${laneDefs.map(lane => `${lane.label.split(' / ')[0]} ${lane.key}`).join(', ')}.`,
       `<ruby>音符<rt>おんぷ</rt></ruby>が<ruby>目印<rt>めじるし</rt></ruby>の<ruby>丸<rt>まる</rt></ruby>に<ruby>重<rt>かさ</rt></ruby>なったら、<ruby>同<rt>おな</rt></ruby>じレーンのパッドを<ruby>押<rt>お</rt></ruby>します。${laneDefs.map(lane => `${lane.label.split(' / ')[1] || lane.label}は${lane.key}`).join('、')}です。`
     );
+    if (rhythm.chart.some(note => note.decoy)) {
+      renderCaseDirection(
+        box,
+        'Dashed skull and spiral notes are fake. Do not tap them; a warning tone marks them.',
+        '<ruby>骸骨<rt>がいこつ</rt></ruby>と<ruby>渦<rt>うず</rt></ruby>の<ruby>音符<rt>おんぷ</rt></ruby>は<ruby>偽物<rt>にせもの</rt></ruby>です。<ruby>押<rt>お</rt></ruby>さずに、<ruby>警告音<rt>けいこくおん</rt></ruby>を<ruby>聞<rt>き</rt></ruby>きましょう。',
+        'muenba-rhythm-decoy-direction'
+      );
+    }
 
     const actions = document.createElement('div');
     actions.className = 'muenba-lobby-actions';
@@ -3662,6 +3676,7 @@
 
     if (captureSession.phase === 'playing') {
       pulseRhythmReceptors(now);
+      warnRhythmDecoys(now);
       advanceMissedRhythmNotes(now);
       updateRhythmNotes(now);
       if (rhythm.nextIndex >= rhythm.chart.length &&
@@ -3764,6 +3779,39 @@
     if (!playRhythmAudioBuffer(result)) playRhythmSfxFallback(result);
   }
 
+  function playRhythmDecoyCue() {
+    const context = getCaseAudioContext();
+    if (!context || !rhythmAudioMaster || context.state === 'closed') return;
+    try {
+      const now = context.currentTime;
+      const oscillator = context.createOscillator();
+      const gain = context.createGain();
+      oscillator.type = 'square';
+      oscillator.frequency.setValueAtTime(440, now);
+      oscillator.frequency.exponentialRampToValueAtTime(220, now + 0.12);
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(0.055, now + 0.008);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
+      oscillator.connect(gain);
+      gain.connect(rhythmAudioMaster);
+      oscillator.start(now);
+      oscillator.stop(now + 0.14);
+    } catch (_) {}
+  }
+
+  function warnRhythmDecoys(now) {
+    const rhythm = captureSession && captureSession.rhythm;
+    if (!rhythm || !rhythm.decoyWarningIndices) return;
+    const warningLead = Math.min(180, Math.max(100, rhythm.noteMs * 0.35));
+    rhythm.chart.forEach((note, index) => {
+      if (!note.decoy || rhythm.decoyWarningIndices.has(index)) return;
+      if (now < rhythmExpectedAt(rhythm, index) - warningLead) return;
+      rhythm.decoyWarningIndices.add(index);
+      playRhythmDecoyCue();
+      showRhythmFeedback('FAKE NOTE · DO NOT TAP', 'decoy');
+    });
+  }
+
   function markRhythmNote(result, index = captureSession.rhythm.nextIndex) {
     const rhythm = captureSession.rhythm;
     if (rhythm.resolvedIndices.has(index)) return;
@@ -3825,7 +3873,8 @@
         good: 'GOOD',
         early: 'EARLY',
         late: 'LATE',
-        miss: 'MISS'
+        miss: 'MISS',
+        decoy: 'FAKE NOTE'
       }[kind] || text;
       rhythm.feedbackEl.textContent = feedbackLabel;
       rhythm.feedbackEl.className = `muenba-rhythm-feedback ${kind || ''}`;
@@ -4974,6 +5023,7 @@
       .muenba-rhythm-status { min-height:1.5em; margin:2px 0 2px !important; color:#d8f2e2 !important; font:700 1.08rem/1.4 ui-monospace,monospace !important; text-align:center !important; letter-spacing:.08em; }
       .muenba-rhythm-status.perfect, .muenba-rhythm-status.good, .muenba-rhythm-status.go { color:#8fe0ad !important; }
       .muenba-rhythm-status.miss, .muenba-rhythm-status.early, .muenba-rhythm-status.late { color:#e8b0b8 !important; }
+      .muenba-rhythm-status.decoy { color:#ffe09b !important; }
       .muenba-rhythm-tier { margin:0 0 7px !important; color:#d8c98b !important; font:700 .68rem/1.35 ui-monospace,monospace !important; letter-spacing:.08em; text-align:center !important; text-transform:uppercase; }
       .muenba-rhythm-help-button { position:absolute; top:10px; left:10px; z-index:8; display:grid; place-items:center; width:30px; height:30px; padding:0; border:1px solid rgba(216,201,139,.72); border-radius:50%; color:#fff5d5; background:rgba(40,32,12,.72); box-shadow:0 0 14px rgba(216,201,139,.28); font:900 17px/1 Georgia,'Times New Roman',serif; cursor:pointer; }
       .muenba-rhythm-help-button:hover, .muenba-rhythm-help-button:focus-visible { border-color:#fff1ae; background:rgba(126,111,48,.58); box-shadow:0 0 24px rgba(216,201,139,.48); outline:none; }
@@ -5013,7 +5063,7 @@
       .muenba-rhythm-note-kat { border-radius:10px; border-color:#e0a5ff; background:rgba(118,46,167,.94); box-shadow:0 0 18px rgba(205,103,255,.62); }
       .muenba-rhythm-note-rim { border-radius:9px 9px 50% 50%; border-color:#9ad3ff; background:rgba(38,108,177,.94); box-shadow:0 0 18px rgba(65,173,255,.66); }
       .muenba-rhythm-note-bell { border-radius:50%; border-color:#ffd18d; background:rgba(196,91,27,.96); box-shadow:0 0 18px rgba(255,145,44,.7); }
-      .muenba-rhythm-note-decoy { border-style:dashed; color:#ffe0a3; background:rgba(76,35,65,.9); box-shadow:0 0 18px rgba(255,173,91,.48); }
+      .muenba-rhythm-note-decoy { opacity:.62; border-style:dashed; color:#ffe0a3; background:rgba(76,35,65,.62); box-shadow:0 0 18px rgba(255,173,91,.48); }
       .muenba-rhythm-note-spiral { border-radius:50%; transform-origin:center; }
       .muenba-rhythm-receptor { position:absolute; z-index:6; left:50%; bottom:40px; display:grid; place-items:center; width:42px; height:42px; border:2px solid rgba(255,224,157,.92); border-radius:50%; color:#fff5d5; background:rgba(62,40,12,.72); box-shadow:0 0 12px rgba(255,171,69,.42),inset 0 0 12px rgba(255,195,88,.12); font:900 1.1rem/1 ui-monospace,monospace; pointer-events:none; transform:translate(-50%,50%); }
       .muenba-rhythm-receptor-don { border-color:#8affae; color:#d8ffe3; background:rgba(21,111,77,.7); }

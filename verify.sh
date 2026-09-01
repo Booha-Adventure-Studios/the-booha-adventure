@@ -298,6 +298,13 @@ else
   bad "Muenba audio, rhythm performance, or clarity audit failed"
 fi
 
+echo "[24A/36] Muenba rhythm balance audit"
+if node tests/muenba-rhythm-balance-audit.cjs >/dev/null 2>&1; then
+  ok "Muenba rhythm approach speed and decoy fairness contracts pass"
+else
+  bad "Muenba rhythm balance audit failed"
+fi
+
 echo "[25/36] Feed Booha level audit"
 if node tests/feed-level-audit.cjs >/dev/null 2>&1; then
   ok "Feed Booha geometry and timing guardrails pass"
