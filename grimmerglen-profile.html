@@ -254,8 +254,10 @@
         }
         const active = weeklyBucket().activeTargetType;
         document.getElementById('memories').innerHTML = (DATA.objectTypes || []).map((type, index) => {
-          const found = foundFor(type); const name = labels[type] || [type,type]; const story = DATA.stories?.[type]?.en || 'A little memory is waiting.';
+          const found = foundFor(type); const name = labels[type] || [type,type];
           const weeklyFound = weeklyFoundFor(type);
+          const tierForFound = weeklyFound >= 3 ? 'deep' : weeklyFound === 2 ? 'case' : 'start';
+          const story = DATA.tierMemories?.[type]?.[tierForFound]?.story?.en || DATA.stories?.[type]?.en || 'A little memory is waiting.';
           const tier = weeklyFound >= 3 ? 'Memory safe ✦' : weeklyFound === 2 ? 'Deep memory next' : weeklyFound === 1 ? 'Case memory next' : 'Starter memory waiting';
           return `<article class="memory-card${weeklyFound >= 3 ? ' weekly-complete' : ''}${found >= 3 ? ' has-lifetime-memory' : ''}${active === type ? ' active' : ''}" data-found="${weeklyFound > 0}" style="--memory-color:${colors[index % colors.length]}">
             <img class="memory-art" src="${esc(DATA.collectibles?.[type] || '')}" alt="${esc(name[0])}">

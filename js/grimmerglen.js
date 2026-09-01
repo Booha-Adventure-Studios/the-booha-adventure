@@ -1155,7 +1155,7 @@
   function renderMariettaQuestBriefing() {
     if (!mariettaPanel || !MARIETTA) return;
     const targetType = getActiveGrimmerglenTargetType();
-    const story = targetType && DATA.stories ? DATA.stories[targetType] : null;
+    const story = targetType ? getGrimmerglenMemoryStory(targetType) : null;
     mariettaPanel.innerHTML = `
       <span class="dp-handle"></span>
       <div class="dp-inner">
@@ -1493,6 +1493,11 @@
     return progress;
   }
 
+  function getGrimmerglenMemoryStory(type) {
+    const tier = getGrimmerglenObjectsProgress()[type]?.tier || 'start';
+    return DATA.tierMemories?.[type]?.[tier]?.story || DATA.stories?.[type] || null;
+  }
+
   function getGrimmerglenObjectSlots() {
     if (objectSlotsCache) return objectSlotsCache;
     const slots = readGrimmerglenWeekly().objectSlots;
@@ -1750,7 +1755,7 @@
   function renderMariettaMemoryHint(onConfirmed) {
     if (!mariettaPanel || !MARIETTA) return;
     const targetType = getActiveGrimmerglenTargetType();
-    const story = targetType && DATA.stories ? DATA.stories[targetType] : null;
+    const story = targetType ? getGrimmerglenMemoryStory(targetType) : null;
     if (!story) {
       if (typeof onConfirmed === 'function') onConfirmed();
       return;
@@ -1877,7 +1882,7 @@
 
   function renderMariettaWrongItem(object) {
     const targetType = getActiveGrimmerglenTargetType();
-    const story = targetType && DATA.stories ? DATA.stories[targetType] : null;
+    const story = targetType ? getGrimmerglenMemoryStory(targetType) : null;
     mariettaPanel.innerHTML = `
       <span class="dp-handle"></span>
       <div class="dp-inner">
@@ -1917,7 +1922,7 @@
         </div>
       </div>`;
     mariettaPanel.querySelector('#mg-memory-see-again')?.addEventListener('click', () => {
-      renderMariettaMemoryReplay(object, false, () => renderMariettaMemoryExercise(object));
+      renderMariettaMemoryReplay(object, false, () => renderMariettaMemoryExercise(object), tier);
     });
     const mount = mariettaPanel.querySelector('#mg-memory-exercise-mount');
     window.GrimmerglenTyping.renderExercise(mount, exercise, {
@@ -1926,8 +1931,8 @@
     });
   }
 
-  function renderMariettaMemoryReplay(object, memoryComplete, onClose) {
-    const exercise = DATA.memories?.[object.type]?.deep || {};
+  function renderMariettaMemoryReplay(object, memoryComplete, onClose, memoryTier = 'deep') {
+    const exercise = DATA.memories?.[object.type]?.[memoryTier] || DATA.memories?.[object.type]?.deep || {};
     const answerEn = exercise.answerEn || exercise.accepted?.[0] || '';
     const answerJp = exercise.answerJp || exercise.helpText || '';
     const answerReadings = exercise.answerReadings || exercise.helpReadings || {};
@@ -1979,9 +1984,9 @@
     });
   }
 
-  function renderMariettaMemorySuccess(object, { memoryComplete = false } = {}) {
+  function renderMariettaMemorySuccess(object, { memoryComplete = false, memoryTier = 'deep' } = {}) {
     const nextType = getActiveGrimmerglenTargetType();
-    const nextStory = nextType && DATA.stories ? DATA.stories[nextType] : null;
+    const nextStory = nextType ? getGrimmerglenMemoryStory(nextType) : null;
     const foundForMemory = Number(getGrimmerglenObjectsProgress()[object.type]?.found) || 0;
     const remainingForMemory = Math.max(0, 3 - foundForMemory);
     const remainingCue = !memoryComplete && remainingForMemory === 2
@@ -2023,7 +2028,7 @@
           `}
         </div>
       </div>`;
-    mariettaPanel.querySelector('#mg-memory-see-again')?.addEventListener('click', () => renderMariettaMemoryReplay(object, memoryComplete));
+    mariettaPanel.querySelector('#mg-memory-see-again')?.addEventListener('click', () => renderMariettaMemoryReplay(object, memoryComplete, undefined, memoryTier));
     mariettaPanel.querySelector('#mg-memory-done')?.addEventListener('click', () => {
       if (memoryComplete) startGrimmerglenCelebration();
       else closeMariettaPanel();
@@ -2063,6 +2068,7 @@
 
   function completeGrimmerglenMemory(object) {
     if (!mariettaPanelOpen || !carriedObject || carriedObject.id !== object.id) return;
+    const completedTier = getGrimmerglenObjectsProgress()[object.type]?.tier || 'start';
     if (!writeGrimmerglenObjectFound(object.type, object.id)) {
       const feedback = mariettaPanel.querySelector('.mgty-feedback');
       if (feedback) {
@@ -2073,7 +2079,7 @@
     }
     handoffObject = null;
     const memoryComplete = getGrimmerglenObjectsProgress()[object.type]?.found >= 3;
-    renderMariettaMemorySuccess(object, { memoryComplete });
+    renderMariettaMemorySuccess(object, { memoryComplete, memoryTier: completedTier });
   }
 
   function handleMariettaGiveItem() {

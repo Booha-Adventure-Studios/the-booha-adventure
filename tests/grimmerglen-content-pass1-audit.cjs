@@ -31,6 +31,7 @@ for (const type of data.objectTypes) {
     assert(Array.isArray(entry.partial) && entry.partial.length >= 1, `${type} ${tier} needs partial helpers`);
   }
   assert(tiers[type].case.story.en.length >= tiers[type].start.story.en.length, `${type} Case story should not be shorter than Starter`);
+assert(tiers[type].case.target.length >= tiers[type].start.target.length, `${type} Case target should not be shorter than Starter`);
   assert(tiers[type].deep.target.length >= tiers[type].case.target.length, `${type} Deep target should not be shorter than Case`);
 }
 
