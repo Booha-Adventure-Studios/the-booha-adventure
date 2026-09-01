@@ -24,7 +24,7 @@ assert(!stats.includes(' / ${esc(item[1])}'), 'lifetime stat cards must not rend
 assert(!stats.includes('∞'), 'lifetime stat cards must not render infinity');
 assert(profile.includes('weekly-hunt-count">${found} / ${totalSlots}'),
   'weekly progress must keep its current-week denominator');
-assert(/pages:\s+'booha-pages-2026-390'/.test(serviceWorker),
+assert(/pages:\s+'booha-pages-2026-391'/.test(serviceWorker),
   'page cache must be bumped for the profile markup update');
 assert(verify.includes('tests/grimmerglen-profile-counters-audit.cjs'),
   'verify.sh must run the Grimmerglen profile-counter audit');
