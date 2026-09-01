@@ -30,7 +30,7 @@ assert(maze.includes('loadMediaSource(toMazeVideo);\n  overlay1.classList.add'),
 assert(maze.includes('loadMediaSource(hwTreeVideo);'), 'Homework video must load from its confirmation action');
 assert(maze.includes('loadMediaSource(krVideo);'), 'Karasuki video must load from its confirmation action');
 assert(maze.includes('loadMediaSource(bgMusic);\n  return bgMusic.play();'), 'BGM must load immediately before playback');
-assert(sw.includes('booha-pages-2026-397'), 'service-worker page cache must include the current page bump');
-assert(sw.includes('booha-assets-2026-481'), 'service-worker asset cache must include the current asset bump');
+assert(sw.includes('booha-pages-2026-398'), 'service-worker page cache must include the current page bump');
+assert(sw.includes('booha-assets-2026-482'), 'service-worker asset cache must include the current asset bump');
 
 console.log('Maze 23C media-loading audit passed: videos and BGM are deferred until needed.');

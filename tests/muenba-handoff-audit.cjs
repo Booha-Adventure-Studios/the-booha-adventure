@@ -29,7 +29,9 @@ assert(dangerSession.includes('startDangerScream();'), 'danger entry must announ
 
 const nuppiBoard = section('function refreshNuppiCaseBoard()', '  function openNuppiLobby');
 assert(nuppiBoard.includes('const pendingOrbs = Math.max(0, Number(readMuenbaWeekly().orbsPending) || 0);'), 'Nuppi must read pending energy before previewing another case');
-assert(nuppiBoard.includes('const next = pendingOrbs > 0 ? null : nextMuenbaCase();'), 'pending energy must suppress the next-case preview');
+assert(nuppiBoard.includes('const next = pendingOrbs > 0 ? null : nextMuenbaHuntCase();'), 'pending energy must suppress the next-case preview while weekly hunts remain available');
+assert(source.includes('function nextMuenbaHuntCase()'), 'Nuppi must fall back to the next unfound weekly hunt after lifetime cases are complete');
+assert(source.includes('Weekly hunt ready. Find ${ghostName} and untangle its energy.'), 'a completed lifetime memory must not hide a fresh weekly hunt');
 assert(nuppiBoard.includes("eyebrow.textContent = 'ENERGY TRAIL WAITING';"), 'Nuppi must label the return-trip handoff clearly');
 
 const huntCard = section('function renderNuppiHuntCard()', '  function focusLobbyControl');

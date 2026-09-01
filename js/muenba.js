@@ -2037,7 +2037,8 @@
   }
 
   function allMuenbaCaseModesComplete() {
-    return MUENBA_CASE_MODES.every(mode => !muenbaModeHasRemainingCases(mode));
+    const cases = orderedMuenbaCases();
+    return cases.length > 0 && MUENBA_CASE_MODES.every(mode => !muenbaModeHasRemainingCases(mode));
   }
 
   function unfinishedMuenbaModeExcept(mode) {
@@ -2100,6 +2101,19 @@
   function caseForGhost(ghostId) {
     const next = nextMuenbaCase();
     return next && next.ghostId === ghostId ? next : null;
+  }
+
+  // Weekly hunt availability is separate from lifetime case memory. Once a
+  // player has finished every authored tier, the next weekly ghost still
+  // needs a case-board preview; its completed memory record will correctly
+  // let the capture go straight to rhythm afterward.
+  function nextMuenbaHuntCase() {
+    const nextCase = nextMuenbaCase();
+    if (nextCase) return nextCase;
+    const weeklyGhost = nextMuenbaHuntGhost();
+    return weeklyGhost
+      ? orderedMuenbaCases().find(caseData => caseData.ghostId === weeklyGhost.id) || null
+      : null;
   }
 
   function caseRecordComplete(caseData) {
@@ -6670,7 +6684,7 @@
     // Nuppi card look like a fresh hunt, even though it correctly redirected
     // to recovery on the final click.
     const pendingOrbs = Math.max(0, Number(readMuenbaWeekly().orbsPending) || 0);
-    const next = pendingOrbs > 0 ? null : nextMuenbaCase();
+    const next = pendingOrbs > 0 ? null : nextMuenbaHuntCase();
     if (pendingOrbs > 0) {
       eyebrow.textContent = 'ENERGY TRAIL WAITING';
       title.textContent = 'Bring the energy home first.';
@@ -6693,7 +6707,10 @@
       titleJp.textContent = '';
       mode.textContent = MUENBA_MEMORY_MODE_LABELS[selectedMode] || MUENBA_MEMORY_MODE_LABELS.start;
       modeJp.innerHTML = MUENBA_MEMORY_MODE_JP[selectedMode] || MUENBA_MEMORY_MODE_JP.start;
-      copy.textContent = `Case ready. Find ${ghostName} and untangle its energy.`;
+      const memoryAlreadySettled = caseModeIsComplete(next, selectedMode);
+      copy.textContent = memoryAlreadySettled
+        ? `Weekly hunt ready. Find ${ghostName} and untangle its energy.`
+        : `Case ready. Find ${ghostName} and untangle its energy.`;
       jp.innerHTML = '<ruby>事件<rt>じけん</rt></ruby>の<ruby>準備<rt>じゅんび</rt></ruby>ができたよ。<ruby>幽霊<rt>ゆうれい</rt></ruby>を<ruby>探<rt>さが</rt></ruby>して、エネルギーを<ruby>解<rt>と</rt></ruby>こう。';
     } else {
       const selectedMode = getMuenbaReadingDifficulty();
