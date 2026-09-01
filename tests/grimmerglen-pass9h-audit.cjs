@@ -31,6 +31,7 @@ assert(success.includes('startGrimmerglenCelebration()'), 'Let’s dance must la
 assert(replay.includes('mg-memory-replay-scroll-cue'), 'memory replay must include a visible scroll cue');
 assert(replay.includes('Scroll down to close'), 'scroll cue must explain how to reach Close');
 assert(replay.includes('id="mg-memory-replay-close"'), 'memory replay must retain its Close action');
+assert(replay.includes('id="mg-memory-replay-x"'), 'memory replay must have an X close action');
 assert(success.includes('const nextHintHTML = !memoryComplete && nextStory'), 'next hint markup must be limited to unfinished memories');
 assert(!success.includes('I remembered this memory!'), 'final card must not fall back to the ordinary memory-saved copy');
 assert(verify.includes('tests/grimmerglen-pass9h-audit.cjs'), 'verify.sh must run the Pass 9H final-card audit');

@@ -22,6 +22,6 @@ const normal = maze.indexOf('addGhostFlightBurst(ghostIX,ghostIY,20);\n        q
 assert(normal >= 0, 'normal arrivals must burst before their popup callback');
 
 assert(sw.includes('booha-pages-2026-389'), 'service-worker page cache must include the current page bump');
-assert(sw.includes('booha-assets-2026-471'), 'service-worker asset cache must include the current Grimmerglen Pass 2 schema bump');
+assert(sw.includes('booha-assets-2026-472'), 'service-worker asset cache must include the current asset bump');
 
 console.log('Maze 23E arrival audit passed: landing bursts are visible before popups open.');

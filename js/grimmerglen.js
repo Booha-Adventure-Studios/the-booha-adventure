@@ -1979,16 +1979,24 @@
     const tier = getSelectedGrimmerglenTier();
     const returnNumber = Math.min(3, (Number(memoryProgress.found) || 0) + 1);
     const exercise = DATA.memories?.[object.type]?.[tier];
+    const authoredMemory = DATA.tierMemories?.[object.type]?.[tier] || {};
     if (!exercise || !window.GrimmerglenTyping) return;
     const tierLabel = tier === 'start' ? 'STARTER MEMORY' : tier === 'case' ? 'CASE MEMORY' : 'DEEP MEMORY';
-    const tierGuide = tier === 'start'
-      ? { en: 'Choose a helpful sentence, then type what you remember.', jp: '助けになる文を選んで、思い出したことをタイプしてね。', readings: { '助け': 'たすけ', '選んで': 'えらんで', '思い出した': 'おもいだした' } }
-      : tier === 'case'
-        ? { en: 'The clues are smaller now. Ask for a hint if you need one, then type the longer memory.', jp: '手がかりが少なくなったよ。必要ならヒントを見て、長い記憶をタイプしてね。', readings: { '手がかり': 'てがかり', '少なく': 'すくなく', '必要': 'ひつよう', '見て': 'みて', '長い': 'ながい', '記憶': 'きおく' } }
-        : { en: 'No English choices this time. Type the whole memory from what Marietta remembers.', jp: '今回は英語の選択肢はないよ。マリエッタの記憶を全部タイプしてね。', readings: { '今回': 'こんかい', '英語': 'えいご', '選択肢': 'せんたくし', '記憶': 'きおく', '全部': 'ぜんぶ' } };
-    const recheckHTML = tier === 'deep'
+    const returnGuide = returnNumber === 1
+      ? { en: 'Choose one of three full sentences, then type what you remember.', jp: '三つの全文から一つ選んで、思い出したことをタイプしてね。', readings: { '三つ': 'みっつ', '全文': 'ぜんぶん', '一つ': 'ひとつ', '選んで': 'えらんで', '思い出した': 'おもいだした' } }
+      : returnNumber === 2
+        ? { en: 'Choose a partial clue, or ask for a hint, then type the memory.', jp: '短い手がかりを選ぶか、ヒントを聞いてから、記憶をタイプしてね。', readings: { '短い': 'みじかい', '手がかり': 'てがかり', '選ぶ': 'えらぶ', '聞いて': 'きいて', '記憶': 'きおく' } }
+        : { en: 'Type the whole memory. Ask for a hint if you need help.', jp: '記憶を全部タイプしてね。助けが必要ならヒントを聞いてね。', readings: { '記憶': 'きおく', '全部': 'ぜんぶ', '助け': 'たすけ', '必要': 'ひつよう', '聞いて': 'きいて' } };
+    const recheckHTML = returnNumber === 3
       ? `<div class="dp-btns mg-memory-recheck-wrap"><button class="dp-btn no mg-memory-recheck" id="mg-memory-see-again" type="button">Check again / ${furiJP('もう一度確認する', { '確認する': 'かくにんする' })}</button></div>`
       : '';
+    const returnExercise = Object.assign({}, exercise, {
+      options: returnNumber === 1 ? authoredMemory.full : returnNumber === 2 ? authoredMemory.partial : null,
+      optionsVisible: returnNumber < 3,
+      showHint: returnNumber >= 2,
+      helpText: null,
+      helpReadings: null
+    });
     mariettaPanel.innerHTML = `
       <span class="dp-handle"></span>
       <div class="dp-inner mg-memory-inner">
@@ -1997,8 +2005,8 @@
           <p class="dp-name-kanji">Help Marietta remember her ${escapeHTML(object.label)} memory.</p>
           <div class="dp-divider"></div>
           <p class="mg-memory-tier-progress">Memory return ${returnNumber} of 3 / ${furiJP('三回の記憶', { '三回': 'さんかい', '記憶': 'きおく' })}</p>
-          <p class="mg-memory-tier-guide">${escapeHTML(tierGuide.en)}</p>
-          <p class="mg-memory-tier-guide-jp">${furiJP(tierGuide.jp, tierGuide.readings)}</p>
+          <p class="mg-memory-tier-guide">${escapeHTML(returnGuide.en)}</p>
+          <p class="mg-memory-tier-guide-jp">${furiJP(returnGuide.jp, returnGuide.readings)}</p>
           <p class="dp-line-en">You found my ${escapeHTML(object.label)}! Help me remember:</p>
           ${recheckHTML}
           <div id="mg-memory-exercise-mount"></div>
@@ -2008,7 +2016,8 @@
       renderMariettaMemoryReplay(object, false, () => renderMariettaMemoryExercise(object), tier);
     });
     const mount = mariettaPanel.querySelector('#mg-memory-exercise-mount');
-    window.GrimmerglenTyping.renderExercise(mount, exercise, {
+    window.GrimmerglenTyping.renderExercise(mount, returnExercise, {
+      onHint: () => renderMariettaMemoryReplay(object, false, () => renderMariettaMemoryExercise(object), tier),
       onCorrect: () => completeGrimmerglenMemory(object),
       onWrong: () => {}
     });
@@ -2027,6 +2036,7 @@
           <p class="dp-name-en mg-guide-title">MEMORY REPLAY</p>
           <p class="dp-name-kanji mg-character-name">Marietta <span>・マリエッタ</span></p>
           <div class="dp-divider"></div>
+          <button class="mg-memory-replay-x" id="mg-memory-replay-x" type="button" aria-label="Close memory help">×</button>
           <p class="mg-memory-replay-label">Here is the sentence again:</p>
           <div class="mg-memory-replay-answer" aria-live="polite">
             <p id="mg-memory-replay-en"></p>
@@ -2060,11 +2070,13 @@
       if (cancelled) return;
       typeText(jpEl, answerJp, (element, text) => { element.innerHTML = furiJP(text, answerReadings); });
     }, Math.max(500, answerEn.length * 38 + 220));
-    mariettaPanel.querySelector('#mg-memory-replay-close')?.addEventListener('click', () => {
+    const closeReplay = () => {
       cancelled = true;
       if (typeof onClose === 'function') onClose();
       else renderMariettaMemorySuccess(object, { memoryComplete });
-    });
+    };
+    mariettaPanel.querySelector('#mg-memory-replay-x')?.addEventListener('click', closeReplay);
+    mariettaPanel.querySelector('#mg-memory-replay-close')?.addEventListener('click', closeReplay);
   }
 
   function renderMariettaMemorySuccess(object, { memoryComplete = false, memoryTier = 'deep' } = {}) {
@@ -2660,7 +2672,9 @@
       #grimmerglen-marietta-panel .mg-memory-celebration .dp-btns{align-items:stretch;justify-content:center;}
       #grimmerglen-marietta-panel .mg-memory-celebration .dp-btn.yes{border:2px solid #8bc9ee;color:#1d5572;background:linear-gradient(135deg,#aee6ff,#d5f1ff 52%,#b9ddff);box-shadow:0 0 14px rgba(174,230,255,.92),0 0 32px rgba(174,230,255,.62),inset 0 0 14px rgba(255,255,255,.84);text-shadow:0 1px 0 rgba(255,255,255,.65);}
       #grimmerglen-marietta-panel .mg-memory-celebration .dp-btn.yes:hover{filter:saturate(1.12) brightness(1.06);box-shadow:0 0 18px rgba(174,230,255,1),0 0 40px rgba(174,230,255,.72),inset 0 0 14px rgba(255,255,255,.9);}
-      #grimmerglen-marietta-panel .mg-memory-replay{user-select:none;-webkit-user-select:none;}
+      #grimmerglen-marietta-panel .mg-memory-replay{position:relative;user-select:none;-webkit-user-select:none;}
+      #grimmerglen-marietta-panel .mg-memory-replay-x{position:absolute;top:10px;right:10px;z-index:2;display:grid;place-items:center;width:36px;height:36px;padding:0;border:2px solid rgba(216,93,154,.48);border-radius:50%;color:#8a315f;background:rgba(255,255,255,.82);font:900 1.35rem/1 ui-rounded,"Avenir Next Rounded","Nunito",sans-serif;cursor:pointer;box-shadow:0 0 10px rgba(255,159,194,.3);}
+      #grimmerglen-marietta-panel .mg-memory-replay-x:hover,#grimmerglen-marietta-panel .mg-memory-replay-x:focus-visible{color:#fff;background:#d85d9a;outline:none;box-shadow:0 0 16px rgba(255,159,194,.62);}
       #grimmerglen-marietta-panel .mg-memory-replay-label{margin:8px 0 6px;color:#9a7850;font-size:.86rem;font-weight:700;}
       #grimmerglen-marietta-panel .mg-memory-replay-answer{min-height:150px;display:grid;align-content:center;gap:13px;margin:0 0 14px;padding:18px 16px;border:2px solid rgba(255,159,194,.48);border-radius:18px;background:linear-gradient(145deg,rgba(255,244,249,.96),rgba(238,229,255,.78));box-shadow:inset 0 0 25px rgba(255,255,255,.75),0 8px 24px rgba(184,164,255,.16);}
       #grimmerglen-marietta-panel .mg-memory-replay-answer p{margin:0;color:#281507;line-height:1.45;word-break:normal;}
