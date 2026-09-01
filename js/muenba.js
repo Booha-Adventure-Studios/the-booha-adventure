@@ -336,6 +336,7 @@
     speed: BASE_SPEED,
     fogX: 0,
     returnExiting: false,
+    navigationUnlocked: false,
     hiding: false,
     captureResolving: false,
     dangerFlashUntil: 0,
@@ -1154,6 +1155,7 @@
     if (!Array.isArray(world.huntGhostOrder)) world.huntGhostOrder = [];
     if (world.activeCaseId === undefined) world.activeCaseId = null;
     if (!Number.isFinite(world.orbsPending) || world.orbsPending < 0) world.orbsPending = 0;
+    world.huntAccepted = world.huntAccepted === true;
     return world;
   }
 
@@ -1165,6 +1167,27 @@
     const d = loadSave();
     Object.assign(ensureWeeklyMuenba(d), patchObj);
     return writeSave(d);
+  }
+
+  // Pass 29B: accepting Nuppi's hunt is the explicit unlock for the rest of
+  // Muenba. Keep it in weekly state so room navigation opens for the current
+  // hunt and automatically closes again at the next weekly rollover.
+  function acceptMuenbaHunt() {
+    if (!writeMuenbaWeekly({ huntAccepted: true })) return false;
+    state.navigationUnlocked = true;
+    state.inputLocked = false;
+    state.clickTarget = null;
+    state.moving = false;
+    state.distMovedSinceSpawn = 0;
+    return true;
+  }
+
+  function resetMuenbaWeeklyNavigation() {
+    state.navigationUnlocked = false;
+    huntGhostOrderCache = null;
+    huntGhostOrderCacheWeek = null;
+    invalidateGhostRoomMap();
+    if (state.roomId === MUENBA_NUPPI.roomId) state.distMovedSinceSpawn = 0;
   }
 
   function migrateMuenbaSave(data) {
@@ -6381,6 +6404,7 @@
   }
 
   function getAvailableExit(now) {
+    if (state.roomId === MUENBA_NUPPI.roomId && !state.navigationUnlocked) return null;
     if (state.inputLocked || state.transitioning) return null;
     if (now < state.transitionReadyAt || now < state.spawnLockUntil) return null;
     if (state.distMovedSinceSpawn < ARROW_MOVE_THRESHOLD) return null;
@@ -6654,6 +6678,7 @@
         window.location.href = 'muenba-profile.html';
         return;
       }
+      if (ghost && !returningEnergy && !acceptMuenbaHunt()) return;
       closeNuppiLobby();
       if (readMuenbaWeekly().orbsPending > 0) openPendingOrbRecovery();
       });
@@ -6983,8 +7008,11 @@
   }
 
   function drawExitArrows(now) {
+    if (state.roomId === MUENBA_NUPPI.roomId && !state.navigationUnlocked) return;
     const exits = getRoom().exits || [];
-    const reveal = Math.min(1, state.distMovedSinceSpawn / ARROW_MOVE_THRESHOLD);
+    const reveal = state.roomId === MUENBA_NUPPI.roomId
+      ? 1
+      : Math.min(1, state.distMovedSinceSpawn / ARROW_MOVE_THRESHOLD);
     if (reveal <= 0) return;
     const backDir = state.arrivalDir ? OPPOSITE[state.arrivalDir] : null;
     const seconds = now / 1000;
@@ -7393,10 +7421,12 @@
     injectStyles();
     buildApp();
     document.addEventListener('visibilitychange', handleMuenbaVisibilityChange);
+    document.addEventListener('booha:weeklyReset', resetMuenbaWeeklyNavigation);
     bindMuenbaOrientationController();
     fitStage();
     resizeCanvas();
     setRoom(state.roomId, state.spawnId, null);
+    state.navigationUnlocked = readMuenbaWeekly().huntAccepted === true;
     bindInput();
     window.addEventListener('resize', () => { fitStage(); resizeCanvas(); });
     window.requestAnimationFrame(tick);

@@ -22,6 +22,8 @@ assert(muenba.includes('weekly.orbsPending = 0'),
   'pending weekly energy must clear from the weekly world bucket');
 assert(muenba.includes('weekly.huntGhostOrder'),
   'Muenba hunt order must be stored in the weekly world bucket');
+assert(muenba.includes('huntAccepted'),
+  'Muenba room navigation acceptance must be stored in the weekly world bucket');
 assert(muenba.includes('mu.ghostsFound[ghost.id] = true'),
   'lifetime ghost history must remain separate and permanent');
 assert(muenba.includes('mu.rhythm.capturesCompleted += 1'),
@@ -30,6 +32,8 @@ assert(saveFile.includes('data.muenba.orbsPending = 0'),
   'weekly reset must clear the legacy pending-energy compatibility field');
 assert(saveFile.includes('data.muenba.caseProgress.activeCaseId = null'),
   'weekly reset must clear the legacy active-case compatibility field');
+assert(saveFile.includes('huntAccepted: false'),
+  'the default weekly Muenba state must start with the hunt unopened');
 assert(syncClient.includes('w.worlds?.muenba?.ghostsFound'),
   'sync emptiness detection must recognize nested Muenba hunt progress');
 

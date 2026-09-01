@@ -10,7 +10,7 @@ const CURRENT_CACHES = {
   // Profile consolidation Pass 1: ship the canonical progress page and its
   // moved progress renderer to returning players.
   // Grimmerglen Pass 2 changes the lifetime-counter profile markup.
-  pages:  'booha-pages-2026-398',
+  pages:  'booha-pages-2026-399',
   // js/ is served cache-first (see ASSET_PREFIXES below), so once a device
   // caches a script it never re-fetches it until this string changes.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
@@ -62,6 +62,8 @@ const CURRENT_CACHES = {
   // Muenba 28E removes the retired procedural scream generator from the shared bundle.
   // Muenba 28F pauses authored danger screams while the page is backgrounded.
   // Muenba 28G completes the popup/hunt UI sound pass: direct controls now
+  // Muenba 29A/B restores profile-link clicks and gates Muenba room_01 until
+  // the weekly hunt is explicitly accepted.
   // use the central button cue and Nuppi opens use the bespoke Nuppi cue.
   // Destruction goofy-SFX v3: modal-synthesis rewrite of the pull/creak,
   // block hit/break, and bounce sounds (static-partial materials vs.
@@ -126,7 +128,7 @@ const CURRENT_CACHES = {
   // furigana so Japanese readings do not look like duplicate sentences.
   // Grimmerglen Pass 1 adds replay-safe lifetime counters to the shared save
   // layer and world runtime; invalidate the cache-first JavaScript bundle.
-  assets: 'booha-assets-2026-482',
+  assets: 'booha-assets-2026-483',
   decks:  'booha-decks-2026-310',
 };
 
