@@ -838,6 +838,13 @@ else
   bad "Grimmerglen selector Pass 1 audit failed"
 fi
 
+echo "[weekly] Grimmerglen tier-progress Pass 2 audit"
+if node tests/grimmerglen-tier-progress-schema-audit.cjs >/dev/null 2>&1; then
+  ok "Grimmerglen Starter/Case/Deep weekly buckets migrate and reset safely"
+else
+  bad "Grimmerglen tier-progress Pass 2 audit failed"
+fi
+
 echo "[94/98] Grimmerglen navigation audit"
 if node tests/grimmerglen-navigation-audit.cjs >/dev/null 2>&1; then
   ok "Grimmerglen grid links, boundary arrows, and help-gated movement contracts pass"
