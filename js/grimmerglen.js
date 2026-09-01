@@ -1902,10 +1902,17 @@
 
   function renderMariettaMemoryExercise(object) {
     const progress = getGrimmerglenObjectsProgress();
-    const tier = progress[object.type]?.tier || 'start';
+    const memoryProgress = progress[object.type] || { found: 0, tier: 'start' };
+    const tier = memoryProgress.tier || 'start';
+    const returnNumber = Math.min(3, (Number(memoryProgress.found) || 0) + 1);
     const exercise = DATA.memories?.[object.type]?.[tier];
     if (!exercise || !window.GrimmerglenTyping) return;
     const tierLabel = tier === 'start' ? 'STARTER MEMORY' : tier === 'case' ? 'CASE MEMORY' : 'DEEP MEMORY';
+    const tierGuide = tier === 'start'
+      ? { en: 'Choose a helpful sentence, then type what you remember.', jp: '助けになる文を選んで、思い出したことをタイプしてね。', readings: { '助け': 'たすけ', '選んで': 'えらんで', '思い出した': 'おもいだした' } }
+      : tier === 'case'
+        ? { en: 'The clues are smaller now. Ask for a hint if you need one, then type the longer memory.', jp: '手がかりが少なくなったよ。必要ならヒントを見て、長い記憶をタイプしてね。', readings: { '手がかり': 'てがかり', '少なく': 'すくなく', '必要': 'ひつよう', '見て': 'みて', '長い': 'ながい', '記憶': 'きおく' } }
+        : { en: 'No English choices this time. Type the whole memory from what Marietta remembers.', jp: '今回は英語の選択肢はないよ。マリエッタの記憶を全部タイプしてね。', readings: { '今回': 'こんかい', '英語': 'えいご', '選択肢': 'せんたくし', '記憶': 'きおく', '全部': 'ぜんぶ' } };
     const recheckHTML = tier === 'deep'
       ? `<div class="dp-btns mg-memory-recheck-wrap"><button class="dp-btn no mg-memory-recheck" id="mg-memory-see-again" type="button">Check again / ${furiJP('もう一度確認する', { '確認する': 'かくにんする' })}</button></div>`
       : '';
@@ -1916,6 +1923,9 @@
           <p class="dp-name-en">${tierLabel}</p>
           <p class="dp-name-kanji">Help Marietta remember her ${escapeHTML(object.label)} memory.</p>
           <div class="dp-divider"></div>
+          <p class="mg-memory-tier-progress">Memory return ${returnNumber} of 3 / ${furiJP('三回の記憶', { '三回': 'さんかい', '記憶': 'きおく' })}</p>
+          <p class="mg-memory-tier-guide">${escapeHTML(tierGuide.en)}</p>
+          <p class="mg-memory-tier-guide-jp">${furiJP(tierGuide.jp, tierGuide.readings)}</p>
           <p class="dp-line-en">You found my ${escapeHTML(object.label)}! Help me remember:</p>
           ${recheckHTML}
           <div id="mg-memory-exercise-mount"></div>
@@ -2556,6 +2566,10 @@
       #grimmerglen-marietta-panel .mg-welcome-en{font-size:clamp(.98rem,2.3vw,1.16rem);font-weight:700;line-height:1.35;margin-bottom:3px;}
       #grimmerglen-marietta-panel .mg-welcome-jp{font-size:clamp(.78rem,1.9vw,.94rem);color:#7c5a38;line-height:1.55;margin-bottom:8px;}
       #grimmerglen-marietta-panel .mg-memory-lead{margin-top:10px!important;font-size:clamp(.94rem,2.1vw,1.08rem);font-weight:700;color:#a9548a!important;line-height:1.35;}
+      #grimmerglen-marietta-panel .mg-memory-tier-progress{margin:7px 0 4px;color:#b04b88;font-size:.7rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase;}
+      #grimmerglen-marietta-panel .mg-memory-tier-guide{margin:0;color:#3e2517;font-size:clamp(.88rem,2vw,1rem);font-weight:700;line-height:1.4;}
+      #grimmerglen-marietta-panel .mg-memory-tier-guide-jp{margin:2px 0 8px;color:#7c5a38;font-size:clamp(.74rem,1.8vw,.88rem);line-height:1.5;}
+      #grimmerglen-marietta-panel .mg-memory-tier-guide-jp ruby{ruby-position:over;} #grimmerglen-marietta-panel .mg-memory-tier-guide-jp rt{font-size:.76em;color:#8a6a42;}
       #grimmerglen-marietta-panel .mg-memory-hint-en{font-size:clamp(.98rem,2.2vw,1.15rem);font-weight:700;line-height:1.4;margin:7px 0 3px;padding:8px 10px 5px;border-left:3px solid #ff9fc2;background:rgba(255,159,194,.1);}
       #grimmerglen-marietta-panel .mg-memory-hint-jp{font-size:clamp(.8rem,1.9vw,.96rem);line-height:1.55;margin:0;padding:3px 10px 8px;border-left:3px solid #ff9fc2;background:rgba(255,159,194,.1);}
       #grimmerglen-marietta-panel .mg-memory-recheck-wrap{margin:2px 0 10px;justify-content:flex-start;}

@@ -57,7 +57,8 @@ for (const type of data.objectTypes) {
   assert(answers[2].length >= answers[1].length, `${type} Deep answer should be at least as challenging as Case`);
   assert.strictEqual(data.memories[type].start.options.length, 3, `${type} Starter must show three complete helpers`);
   assert.strictEqual(data.memories[type].case.options.length, 3, `${type} Case must show three partial helpers`);
-  assert(data.memories[type].deep.options.length === 1 && data.memories[type].deep.helpText, `${type} Deep must use a short hint plus optional Furigana help`);
+  assert(data.memories[type].case.optionsVisible === false, `${type} Case helpers must be hidden behind the hint control`);
+  assert(data.memories[type].deep.options === null && data.memories[type].deep.helpText, `${type} Deep must remove English choices while retaining optional Furigana help`);
   assert(fs.existsSync(path.join(root, data.collectibles[type])), `${type} collectible art must exist`);
 }
 assert.strictEqual(new Set(allInstances).size, allInstances.length, 'collectible placements must not overlap exactly');
@@ -165,7 +166,7 @@ assert(serviceWorker.includes('grimmerglen/dance/marietta_dance_'), 'service wor
 assert(serviceWorker.includes('grimmerglen/dance/booha_grimmerglen_dance_'), 'service worker must precache Booha dance art');
 assert(serviceWorker.includes('room_${String(index + 1).padStart(2, \'0\')}.webp'), 'service worker must cover the generated room sequence');
 assert(serviceWorker.includes('${BASE}/assets/img/grimmerglen/booha_change.mp3'), 'service worker must precache the Booha change cue');
-assert(/assets:\s+'booha-assets-2026-468'/.test(serviceWorker), 'asset cache must be bumped for the Grimmerglen Content Pass 2 pass');
+assert(/assets:\s+'booha-assets-2026-469'/.test(serviceWorker), 'asset cache must be bumped for the Grimmerglen Pass 3 pass');
 
 assert(profile.includes('GRIMMERGLEN / MEMORY CASE FILE'), 'profile must use the Grimmerglen case-file header');
 assert(profile.includes('grimmerglen-data.js'), 'profile must load the Grimmerglen manifest');
