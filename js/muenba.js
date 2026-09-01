@@ -3354,6 +3354,10 @@
     const rhythm = captureSession.rhythm;
     const pausedFor = Math.max(0, performance.now() - (rhythm.helpOpenedAt || performance.now()));
     rhythm.startAt += pausedFor;
+    // Restart the visible beat pulse after an instruction pause. Without
+    // resetting this marker, closing help on the same beat can leave the
+    // receptors visually stale until the next beat boundary.
+    rhythm.lastBeatPulse = -1;
     captureSession.phase = captureSession.rhythmHelpPhase || 'playing';
     captureSession.rhythmHelpPhase = null;
     playUiSfx('popupClose');
@@ -3738,6 +3742,7 @@
   function pulseRhythmReceptors(now) {
     const rhythm = captureSession && captureSession.rhythm;
     if (!rhythm || !rhythm.receptorEls || !rhythm.receptorEls.length || now < rhythm.startAt) return;
+    if (REDUCED_MOTION) return;
     const beat = Math.floor((now - rhythm.startAt) / rhythm.noteMs);
     if (beat === rhythm.lastBeatPulse) return;
     rhythm.lastBeatPulse = beat;
