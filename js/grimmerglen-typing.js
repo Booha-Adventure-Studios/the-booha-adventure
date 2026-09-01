@@ -18,7 +18,8 @@
  *     promptReadings: { '今日': 'きょう', '気分': 'きぶん' },
  *     accepted: ["i'm happy", "i'm sad", "i'm tired", "i'm stinky"],
  *     options: ["I'm happy", "I'm sad", "I'm tired", "I'm stinky"], // or null
- *     optionsVisible: true,   // false + options given = hidden behind a hint toggle
+ *     optionsVisible: true,   // whether authored choices are visible immediately
+ *     showHint: true,          // show the caller-owned Need a hint action
  *     helpText: 'Japanese help', helpReadings: { ... }, // optional Deep help
  *   }, {
  *     onCorrect: (answerText) => { ... },
@@ -211,7 +212,7 @@
       ? displayOptions.map(opt => `<span class="mgty-chip">${escapeHTML(opt)}</span>`).join('')
       : '';
     const showChipsUpFront = hasOptions && ex.optionsVisible;
-    const showHintToggle = hasOptions && !ex.optionsVisible;
+    const showHintToggle = ex.showHint === true || (hasOptions && !ex.optionsVisible);
     const showFuriganaHelp = ex.helpText;
 
     container.innerHTML = `
@@ -244,7 +245,11 @@
 
     if (refs.hintBtn) {
       refs.hintBtn.addEventListener('click', () => {
-        refs.chips.hidden = false;
+        if (typeof cb.onHint === 'function') {
+          cb.onHint();
+          return;
+        }
+        if (refs.chips) refs.chips.hidden = false;
         refs.hintBtn.hidden = true;
       });
     }
@@ -291,10 +296,11 @@
       .mgty-chips{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 10px;}
       .mgty-chip{display:inline-block;padding:6px 12px;border-radius:999px;font:700 .8rem/1 'Georgia',serif;
         background:rgba(255,159,194,.16);border:1px solid rgba(224,85,158,.4);color:#7a1f4b;user-select:none;}
-      .mgty-hint-btn{display:inline-block;margin:0 0 10px;padding:6px 13px;border-radius:999px;cursor:pointer;
-        font:700 .76rem/1 'Georgia',serif;letter-spacing:.02em;background:transparent;
-        border:1px dashed rgba(224,85,158,.5);color:#a9548a;}
-      .mgty-hint-btn:hover{background:rgba(255,159,194,.12);}
+      .mgty-hint-btn{display:inline-block;margin:0 0 10px;padding:8px 14px;border-radius:999px;cursor:pointer;
+        font:700 .76rem/1 'Georgia',serif;letter-spacing:.02em;background:linear-gradient(135deg,rgba(255,231,242,.98),rgba(255,247,210,.98));
+        border:1px solid rgba(224,85,158,.58);color:#a9548a;box-shadow:0 0 9px rgba(255,159,194,.48),0 0 17px rgba(255,209,102,.18);
+        animation:mgtyHintGlow 2.2s ease-in-out infinite;}
+      .mgty-hint-btn:hover{background:linear-gradient(135deg,rgba(255,215,234,1),rgba(255,241,184,1));box-shadow:0 0 13px rgba(255,159,194,.7),0 0 22px rgba(255,209,102,.3);}
       .mgty-help-btn{display:inline-block;margin:0 0 10px;padding:6px 13px;border-radius:999px;cursor:pointer;
         font:700 .76rem/1 'Georgia',serif;letter-spacing:.02em;background:rgba(184,164,255,.12);
         border:1px dashed rgba(126,99,196,.55);color:#6851a6;}
@@ -326,7 +332,8 @@
         0%{opacity:0;transform:translate(0,0) scale(.4);}
         18%{opacity:1;transform:translate(calc(var(--mgty-dx) * .3),calc(var(--mgty-dy) * .3)) scale(1);}
         100%{opacity:0;transform:translate(var(--mgty-dx),var(--mgty-dy)) scale(.5);}}
-      @media (prefers-reduced-motion: reduce){.mgty-spark{animation:none;display:none;}.mgty-input.is-wrong{animation:none;}}
+      @keyframes mgtyHintGlow{0%,100%{box-shadow:0 0 8px rgba(255,159,194,.42),0 0 15px rgba(255,209,102,.16);}50%{box-shadow:0 0 13px rgba(255,159,194,.68),0 0 23px rgba(255,209,102,.28);}}
+      @media (prefers-reduced-motion: reduce){.mgty-spark{animation:none;display:none;}.mgty-input.is-wrong{animation:none;}.mgty-hint-btn{animation:none;}}
     `;
     document.head.appendChild(style);
   }
