@@ -880,6 +880,13 @@ else
   bad "Grimmerglen profile counters audit failed"
 fi
 
+echo "[visual] Grimmerglen arrow glow audit"
+if node tests/grimmerglen-arrow-glow-audit.cjs >/dev/null 2>&1; then
+  ok "Grimmerglen exit arrows use a stronger halo and crisp directional core"
+else
+  bad "Grimmerglen arrow glow audit failed"
+fi
+
 echo "[lifetime] Grimmerglen lifetime counters audit"
 if node tests/grimmerglen-lifetime-counters-audit.cjs >/dev/null 2>&1; then
   ok "Grimmerglen lifetime counters migrate, increment, and survive weekly reset"
