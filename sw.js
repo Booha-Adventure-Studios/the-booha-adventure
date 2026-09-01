@@ -123,7 +123,9 @@ const CURRENT_CACHES = {
   // Pass 9C makes the explicit help choice the tutorial/navigation gateway.
   // Grimmerglen guide polish: separate the memory hint and use word-level
   // furigana so Japanese readings do not look like duplicate sentences.
-  assets: 'booha-assets-2026-472',
+  // Grimmerglen Pass 1 adds replay-safe lifetime counters to the shared save
+  // layer and world runtime; invalidate the cache-first JavaScript bundle.
+  assets: 'booha-assets-2026-473',
   decks:  'booha-decks-2026-310',
 };
 
