@@ -312,6 +312,13 @@ else
   bad "Muenba rhythm mode audit failed"
 fi
 
+echo "[24C/36] Muenba handoff audit"
+if node tests/muenba-handoff-audit.cjs >/dev/null 2>&1; then
+  ok "Muenba case, danger, return-trip, cleanup, and reward handoff contracts pass"
+else
+  bad "Muenba handoff audit failed"
+fi
+
 echo "[25/36] Feed Booha level audit"
 if node tests/feed-level-audit.cjs >/dev/null 2>&1; then
   ok "Feed Booha geometry and timing guardrails pass"

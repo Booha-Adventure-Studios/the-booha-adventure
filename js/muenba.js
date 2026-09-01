@@ -6500,13 +6500,29 @@
   function renderNuppiHuntCard() {
     if (!lobbyOverlay) return;
     const name = getPlayerFirstName();
-    const ghost = nextNuppiHuntGhost();
-    const needsTierSelection = !ghost && !allMuenbaCaseModesComplete();
+    const pendingOrbs = Math.max(0, Number(readMuenbaWeekly().orbsPending) || 0);
+    const returningEnergy = pendingOrbs > 0;
+    const ghost = returningEnergy ? null : nextNuppiHuntGhost();
+    const needsTierSelection = !returningEnergy && !ghost && !allMuenbaCaseModesComplete();
     const ghostName = ghost ? ghost.name : 'the next ghost';
     const ghostFindJp = ghost
       ? `${ghost.kana}を<ruby>見<rt>み</rt></ruby>つけよう。`
       : '<ruby>次<rt>つぎ</rt></ruby>の<ruby>幽霊<rt>ゆうれい</rt></ruby>を<ruby>探<rt>さが</rt></ruby>そう。';
     const helperName = name ? ` Be careful, ${name}.` : ' Be careful.';
+    const huntTitle = returningEnergy
+      ? 'Return your energy to Nuppi'
+      : ghost ? `Find ${ghostName}` : needsTierSelection ? 'Choose another reading level' : 'No more ghosts this week';
+    const huntJp = returningEnergy
+      ? 'エネルギーをヌーピーに<ruby>届<rt>とど</rt></ruby>けよう'
+      : ghost ? ghostFindJp : needsTierSelection ? '<ruby>別<rt>べつ</rt></ruby>の<ruby>読<rt>よ</rt></ruby>み<ruby>方<rt>かた</rt></ruby>を<ruby>選<rt>えら</rt></ruby>ぼう' : '<ruby>今週<rt>こんしゅう</rt></ruby>はもう<ruby>幽霊<rt>ゆうれい</rt></ruby>がいません';
+    const huntHelper = returningEnergy
+      ? `Nuppi is ready to receive your ${pendingOrbs} pending energy orb${pendingOrbs === 1 ? '' : 's'}.`
+      : ghost ? `Not all ghosts are friendly. Run away or hide from the angry ones.${helperName}` : needsTierSelection ? 'This reading level is complete. Choose another level on your Muenba profile to continue the English cases.' : 'You found every ghost available this week. They will return next week.';
+    const huntHelperJp = returningEnergy
+      ? 'ヌーピーが<ruby>待<rt>ま</rt></ruby>っているよ。<ruby>安全<rt>あんぜん</rt></ruby>な<ruby>場所<rt>ばしょ</rt></ruby>へエネルギーを<ruby>戻<rt>もど</rt></ruby>そう。'
+      : ghost ? `すべての<ruby>幽霊<rt>ゆうれい</rt></ruby>が<ruby>友好的<rt>ゆうこうてき</rt></ruby>とは<ruby>限<rt>かぎ</rt></ruby>らない。<ruby>怒<rt>おこ</rt></ruby>った<ruby>幽霊<rt>ゆうれい</rt></ruby>からは<ruby>逃<rt>に</rt></ruby>げるか、<ruby>隠<rt>かく</rt></ruby>れよう。${name ? `${name}さん、` : ''}<ruby>気<rt>き</rt></ruby>をつけて。` : needsTierSelection ? '<ruby>今<rt>いま</rt></ruby>の<ruby>読<rt>よ</rt></ruby>み<ruby>方<rt>かた</rt></ruby>は<ruby>完了<rt>かんりょう</rt></ruby>です。プロフィールで<ruby>別<rt>べつ</rt></ruby>の<ruby>読<rt>よ</rt></ruby>み<ruby>方<rt>かた</rt></ruby>を<ruby>選<rt>えら</rt></ruby>ぶと、<ruby>英語<rt>えいご</rt></ruby>の<ruby>事件<rt>じけん</rt></ruby>を<ruby>続<rt>つづ</rt></ruby>けられます。' : 'この<ruby>週<rt>しゅう</rt></ruby>に<ruby>見<rt>み</rt></ruby>つけられる<ruby>幽霊<rt>ゆうれい</rt></ruby>は<ruby>全部<rt>ぜんぶ</rt></ruby>です。<ruby>来週<rt>らいしゅう</rt></ruby>にまた<ruby>戻<rt>もど</rt></ruby>ってきます。';
+    const huntButton = returningEnergy ? 'Return to Nuppi' : needsTierSelection ? 'Choose reading level' : 'Begin hunt';
+    const huntButtonJp = returningEnergy ? 'ヌーピーに<ruby>届<rt>とど</rt></ruby>ける' : needsTierSelection ? '<ruby>読<rt>よ</rt></ruby>み<ruby>方<rt>かた</rt></ruby>を<ruby>選<rt>えら</rt></ruby>ぶ' : '<ruby>探索<rt>たんさく</rt></ruby>を<ruby>始<rt>はじ</rt></ruby>める';
     lobbyOverlay.innerHTML = `
       <div class="muenba-lobby-box muenba-hunt-card">
         <div class="muenba-nuppi-kicker">HUNT</div>
@@ -6516,12 +6532,12 @@
         ${ghost
           ? `<img class="muenba-hunt-ghost-portrait" src="${ghost.img}" alt="${ghostName}">`
           : '<div class="muenba-hunt-ghost-portrait" aria-hidden="true"></div>'}
-        <h2>${ghost ? `Find ${ghostName}` : needsTierSelection ? 'Choose another reading level' : 'No more ghosts this week'}</h2>
-        <p class="jp">${ghost ? ghostFindJp : needsTierSelection ? '<ruby>別<rt>べつ</rt></ruby>の<ruby>読<rt>よ</rt></ruby>み<ruby>方<rt>かた</rt></ruby>を<ruby>選<rt>えら</rt></ruby>ぼう' : '<ruby>今週<rt>こんしゅう</rt></ruby>はもう<ruby>幽霊<rt>ゆうれい</rt></ruby>がいません'}</p>
-        <p class="muenba-hunt-helper">${ghost ? `Not all ghosts are friendly. Run away or hide from the angry ones.${helperName}` : needsTierSelection ? 'This reading level is complete. Choose another level on your Muenba profile to continue the English cases.' : 'You found every ghost available this week. They will return next week.'}</p>
-        <p class="muenba-hunt-helper-jp">${ghost ? `すべての<ruby>幽霊<rt>ゆうれい</rt></ruby>が<ruby>友好的<rt>ゆうこうてき</rt></ruby>とは<ruby>限<rt>かぎ</rt></ruby>らない。<ruby>怒<rt>おこ</rt></ruby>った<ruby>幽霊<rt>ゆうれい</rt></ruby>からは<ruby>逃<rt>に</rt></ruby>げるか、<ruby>隠<rt>かく</rt></ruby>れよう。${name ? `${name}さん、` : ''}<ruby>気<rt>き</rt></ruby>をつけて。` : needsTierSelection ? '<ruby>今<rt>いま</rt></ruby>の<ruby>読<rt>よ</rt></ruby>み<ruby>方<rt>かた</rt></ruby>は<ruby>完了<rt>かんりょう</rt></ruby>です。プロフィールで<ruby>別<rt>べつ</rt></ruby>の<ruby>読<rt>よ</rt></ruby>み<ruby>方<rt>かた</rt></ruby>を<ruby>選<rt>えら</rt></ruby>ぶと、<ruby>英語<rt>えいご</rt></ruby>の<ruby>事件<rt>じけん</rt></ruby>を<ruby>続<rt>つづ</rt></ruby>けられます。' : 'この<ruby>週<rt>しゅう</rt></ruby>に<ruby>見<rt>み</rt></ruby>つけられる<ruby>幽霊<rt>ゆうれい</rt></ruby>は<ruby>全部<rt>ぜんぶ</rt></ruby>です。<ruby>来週<rt>らいしゅう</rt></ruby>にまた<ruby>戻<rt>もど</rt></ruby>ってきます。'}</p>
+        <h2>${huntTitle}</h2>
+        <p class="jp">${huntJp}</p>
+        <p class="muenba-hunt-helper">${huntHelper}</p>
+        <p class="muenba-hunt-helper-jp">${huntHelperJp}</p>
         <div class="muenba-lobby-actions">
-          <button id="muenba-hunt-card-begin" type="button"><span>${needsTierSelection ? 'Choose reading level' : 'Begin hunt'}</span><small>${needsTierSelection ? '<ruby>読<rt>よ</rt></ruby>み<ruby>方<rt>かた</rt></ruby>を<ruby>選<rt>えら</rt></ruby>ぶ' : '<ruby>探索<rt>たんさく</rt></ruby>を<ruby>始<rt>はじ</rt></ruby>める'}</small></button>
+          <button id="muenba-hunt-card-begin" type="button"><span>${huntButton}</span><small>${huntButtonJp}</small></button>
         </div>
       </div>`;
     addMuenbaButtonSfx(lobbyOverlay.querySelector('#muenba-hunt-card-begin'))
@@ -6555,7 +6571,22 @@
     const copy = lobbyOverlay.querySelector('#muenba-case-board-copy');
     const jp = lobbyOverlay.querySelector('#muenba-case-board-jp');
     if (!eyebrow || !title || !titleJp || !mode || !modeJp || !copy || !jp) return;
-    const next = nextMuenbaCase();
+    // Returning energy is a higher-priority handoff than previewing another
+    // case. Showing the next case while orbs are still pending made the next
+    // Nuppi card look like a fresh hunt, even though it correctly redirected
+    // to recovery on the final click.
+    const pendingOrbs = Math.max(0, Number(readMuenbaWeekly().orbsPending) || 0);
+    const next = pendingOrbs > 0 ? null : nextMuenbaCase();
+    if (pendingOrbs > 0) {
+      eyebrow.textContent = 'ENERGY TRAIL WAITING';
+      title.textContent = 'Bring the energy home first.';
+      titleJp.innerHTML = '<ruby>先<rt>さき</rt></ruby>にエネルギーを<ruby>届<rt>とど</rt></ruby>けよう。';
+      mode.textContent = `${pendingOrbs} orb${pendingOrbs === 1 ? '' : 's'} waiting for Nuppi`;
+      modeJp.innerHTML = 'オーブがヌーピーを<ruby>待<rt>ま</rt></ruby>っているよ';
+      copy.textContent = 'Your last capture is safe, but the energy trail must return to Nuppi before another case begins.';
+      jp.innerHTML = '<ruby>前<rt>まえ</rt></ruby>の<ruby>捕獲<rt>ほかく</rt></ruby>のエネルギーをヌーピーに<ruby>届<rt>とど</rt></ruby>けてから、<ruby>次<rt>つぎ</rt></ruby>の<ruby>事件<rt>じけん</rt></ruby>を<ruby>始<rt>はじ</rt></ruby>めよう。';
+      return;
+    }
     if (next) {
       const ghost = (DATA.ghosts || []).find(candidate => candidate.id === next.ghostId);
       const ghostName = ghost ? ghost.name : next.ghostId;
