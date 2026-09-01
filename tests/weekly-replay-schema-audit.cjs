@@ -91,6 +91,12 @@ assert.deepStrictEqual(plain(migrated.weekly.worlds), {
   grimmerglen: {
     objects: {},
     objectSlots: {},
+    tierProgressSchema: 1,
+    tierProgress: {
+      start: { objects: {}, objectSlots: {} },
+      case: { objects: {}, objectSlots: {} },
+      deep: { objects: {}, objectSlots: {} },
+    },
     activeTargetType: null,
     carriedObjectId: null,
     memoryQuestAccepted: false,
@@ -123,6 +129,12 @@ assert.deepStrictEqual(plain(stored.weekly.worlds.muenba), {
 assert.deepStrictEqual(plain(stored.weekly.worlds.grimmerglen), {
   objects: {},
   objectSlots: {},
+  tierProgressSchema: 1,
+  tierProgress: {
+    start: { objects: {}, objectSlots: {} },
+    case: { objects: {}, objectSlots: {} },
+    deep: { objects: {}, objectSlots: {} },
+  },
   activeTargetType: null,
   carriedObjectId: null,
   memoryQuestAccepted: false,

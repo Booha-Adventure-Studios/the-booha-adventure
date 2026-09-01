@@ -115,6 +115,12 @@ const BoohaSaveFile = (() => {
       grimmerglen: {
         objects: {},
         objectSlots: {},
+        tierProgressSchema: 1,
+        tierProgress: {
+          start: { objects: {}, objectSlots: {} },
+          case: { objects: {}, objectSlots: {} },
+          deep: { objects: {}, objectSlots: {} },
+        },
         activeTargetType: null,
         carriedObjectId: null,
         memoryQuestAccepted: false,
@@ -122,6 +128,34 @@ const BoohaSaveFile = (() => {
         mariettaIntroSkipped: false,
       },
     };
+  }
+
+  function _copyLegacyGrimmerglenTierProgress(world) {
+    const legacyObjects = world.objects && typeof world.objects === 'object' && !Array.isArray(world.objects)
+      ? world.objects : {};
+    const legacySlots = world.objectSlots && typeof world.objectSlots === 'object' && !Array.isArray(world.objectSlots)
+      ? world.objectSlots : {};
+    const hasLegacyProgress = Object.keys(legacyObjects).length > 0 || Object.keys(legacySlots).length > 0;
+    const tierProgress = {
+      start: { objects: {}, objectSlots: {} },
+      case: { objects: {}, objectSlots: {} },
+      deep: { objects: {}, objectSlots: {} },
+    };
+
+    // The old ladder used one shared found count for Starter → Case → Deep,
+    // so it cannot prove that a player completed any new tier in full. Keep
+    // the discovered weekly items visible in Starter only; Case and Deep
+    // begin clean, while lifetime records remain untouched.
+    if (hasLegacyProgress) {
+      Object.keys(legacyObjects).forEach(type => {
+        const found = Number.isInteger(legacyObjects[type]?.found)
+          ? Math.max(0, Math.min(3, legacyObjects[type].found)) : 0;
+        tierProgress.start.objects[type] = { found };
+      });
+      tierProgress.start.objectSlots = Object.assign({}, legacySlots);
+    }
+    world.tierProgress = tierProgress;
+    world.tierProgressSchema = 1;
   }
 
   function _ensureWeeklyWorlds(save) {
@@ -151,6 +185,19 @@ const BoohaSaveFile = (() => {
     if (!current.grimmerglen || typeof current.grimmerglen !== 'object' || Array.isArray(current.grimmerglen)) current.grimmerglen = {};
     if (!current.grimmerglen.objects || typeof current.grimmerglen.objects !== 'object' || Array.isArray(current.grimmerglen.objects)) current.grimmerglen.objects = {};
     if (!current.grimmerglen.objectSlots || typeof current.grimmerglen.objectSlots !== 'object' || Array.isArray(current.grimmerglen.objectSlots)) current.grimmerglen.objectSlots = {};
+    if (!current.grimmerglen.tierProgress || typeof current.grimmerglen.tierProgress !== 'object' || Array.isArray(current.grimmerglen.tierProgress)) {
+      _copyLegacyGrimmerglenTierProgress(current.grimmerglen);
+    } else {
+      ['start', 'case', 'deep'].forEach(tier => {
+        if (!current.grimmerglen.tierProgress[tier] || typeof current.grimmerglen.tierProgress[tier] !== 'object' || Array.isArray(current.grimmerglen.tierProgress[tier])) {
+          current.grimmerglen.tierProgress[tier] = { objects: {}, objectSlots: {} };
+        }
+        const progress = current.grimmerglen.tierProgress[tier];
+        if (!progress.objects || typeof progress.objects !== 'object' || Array.isArray(progress.objects)) progress.objects = {};
+        if (!progress.objectSlots || typeof progress.objectSlots !== 'object' || Array.isArray(progress.objectSlots)) progress.objectSlots = {};
+      });
+      current.grimmerglen.tierProgressSchema = 1;
+    }
     if (current.grimmerglen.activeTargetType === undefined) current.grimmerglen.activeTargetType = null;
     if (current.grimmerglen.carriedObjectId === undefined) current.grimmerglen.carriedObjectId = null;
     if (current.grimmerglen.memoryQuestAccepted === undefined) current.grimmerglen.memoryQuestAccepted = false;
