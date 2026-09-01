@@ -866,6 +866,13 @@ else
   bad "Grimmerglen tier-lifecycle Pass 5 audit failed"
 fi
 
+echo "[weekly] Grimmerglen tier-readiness Pass 6 audit"
+if node tests/grimmerglen-tier-readiness-audit.cjs >/dev/null 2>&1; then
+  ok "Grimmerglen completed tiers recommend the next challenge without locking choice"
+else
+  bad "Grimmerglen tier-readiness Pass 6 audit failed"
+fi
+
 echo "[94/98] Grimmerglen navigation audit"
 if node tests/grimmerglen-navigation-audit.cjs >/dev/null 2>&1; then
   ok "Grimmerglen grid links, boundary arrows, and help-gated movement contracts pass"

@@ -75,12 +75,16 @@
     .difficulty-progress { margin-top:5px; color:#d27b51; font-size:.68rem; font-weight:950; letter-spacing:.03em; }
     .difficulty-progress-status { color:#4ba98f; font-size:.62rem; font-weight:900; letter-spacing:.05em; text-transform:uppercase; }
     .difficulty-option[data-tier-state="not-started"] .difficulty-progress-status { color:var(--muted); }
+    .difficulty-option.is-next { box-shadow:0 0 0 2px rgba(243,203,103,.35),0 5px 0 rgba(216,93,154,.08); }
+    .difficulty-option.is-next::after { content:'NEXT RECOMMENDED'; align-self:flex-end; margin-top:-2px; color:#c17b36; font-size:.52rem; font-weight:950; letter-spacing:.08em; }
     .difficulty-option:hover,.difficulty-option:focus-visible { border-color:var(--pink-deep); background:rgba(255,255,255,.9); outline:none; transform:translateY(-1px); box-shadow:0 5px 0 rgba(216,93,154,.1); }
     .difficulty-option.is-active { color:#fff; border-color:transparent; background:linear-gradient(135deg,var(--pink-deep),#9d73d9); box-shadow:0 6px 0 rgba(121,72,145,.18),0 0 16px rgba(216,93,154,.2); }
     .difficulty-option.is-active small { color:#ffeaf5; }
     .difficulty-option.is-active .difficulty-progress,.difficulty-option.is-active .difficulty-progress-status { color:#fff4fa; }
     .difficulty-note { margin:12px 2px 0; color:#765e6c; font-size:.76rem; line-height:1.5; }
     .difficulty-note small { display:block; margin-top:4px; color:var(--muted); font-size:.9em; }
+    .tier-next-step { margin:12px 2px 0; padding:10px 12px; border-left:3px solid #e5b85b; border-radius:0 12px 12px 0; color:#785735; background:rgba(255,246,209,.68); font-size:.75rem; font-weight:850; line-height:1.5; }
+    .tier-next-step small { display:block; margin-top:3px; color:#9a7850; font-size:.88em; font-weight:700; }
     .memories { display:grid; grid-template-columns:repeat(4,1fr); gap:13px; }
     .memory-card { min-height:245px; padding:15px; position:relative; overflow:hidden; border:2px solid rgba(255,255,255,.9); border-radius:22px; background:linear-gradient(155deg,rgba(255,255,255,.94),rgba(255,239,248,.72)); transition:transform .16s,box-shadow .16s; }
     .memory-card:hover { transform:translateY(-3px) rotate(-.4deg); box-shadow:0 11px 22px rgba(116,71,124,.13); }
@@ -256,6 +260,12 @@
             : { key: 'not-started', en: 'Not started', jp: '未開始' };
       }
 
+      function nextTierFor(current, statsByTier) {
+        const index = MEMORY_TIER_CHOICES.indexOf(current);
+        if (index < 0 || !statsByTier[current]?.complete || index >= MEMORY_TIER_CHOICES.length - 1) return null;
+        return MEMORY_TIER_CHOICES.slice(index + 1).find(tier => !statsByTier[tier]?.complete) || null;
+      }
+
       function clickTone(kind = 'soft') {
         try {
           const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -321,6 +331,21 @@
         if (!mount) return;
         const current = getMemoryTierPreference();
         const meta = MEMORY_TIER_META[current];
+        const statsByTier = Object.fromEntries(MEMORY_TIER_CHOICES.map(tier => [tier, weeklyTierStats(tier)]));
+        const suggestedNext = nextTierFor(current, statsByTier);
+        const currentStats = statsByTier[current];
+        const allTiersComplete = MEMORY_TIER_CHOICES.every(tier => statsByTier[tier].complete);
+        const readiness = suggestedNext
+          ? { en: `${meta.en} complete! ${MEMORY_TIER_META[suggestedNext].en} is the next recommended challenge.`, jp: `${meta.en}が<ruby>完了<rt>かんりょう</rt></ruby>しました。<ruby>次<rt>つぎ</rt></ruby>は${MEMORY_TIER_META[suggestedNext].en}に<ruby>挑戦<rt>ちょうせん</rt></ruby>できます。` }
+          : allTiersComplete
+            ? { en: 'Every memory tier is complete this week. The garden is ready for a fresh Sunday.', jp: 'すべての<ruby>段階<rt>だんかい</rt></ruby>が<ruby>今週<rt>こんしゅう</rt></ruby>は<ruby>完了<rt>かんりょう</rt></ruby>しました。<ruby>日曜日<rt>にちようび</rt></ruby>にまた<ruby>新<rt>あたら</rt></ruby>しく<ruby>始<rt>はじ</rt></ruby>まります。' }
+            : current === 'deep' && currentStats.complete
+            ? { en: 'Deep Memory is complete. You can revisit another tier or keep your eye on the next Sunday reset.', jp: 'Deep Memoryが<ruby>完了<rt>かんりょう</rt></ruby>しました。ほかの<ruby>段階<rt>だんかい</rt></ruby>を<ruby>見直<rt>みなお</rt></ruby>したり、<ruby>次<rt>つぎ</rt></ruby>の<ruby>日曜日<rt>にちようび</rt></ruby>を<ruby>待<rt>ま</rt></ruby>ったりできます。' }
+            : currentStats.complete
+              ? { en: `${meta.en} is complete. You can revisit it or explore another tier.`, jp: `${meta.en}は<ruby>完了<rt>かんりょう</rt></ruby>です。もう<ruby>一度<rt>いちど</rt></ruby><ruby>遊<rt>あそ</rt></ruby>ぶか、ほかの<ruby>段階<rt>だんかい</rt></ruby>を<ruby>選<rt>えら</rt></ruby>んで<ruby>探検<rt>たんけん</rt></ruby>しましょう。` }
+            : current === 'deep'
+              ? { en: 'Keep exploring Deep Memory. Complete all 24 clues to finish this tier for the week.', jp: 'Deep Memoryを<ruby>続<rt>つづ</rt></ruby>けよう。24の<ruby>手<rt>て</rt></ruby>がかりを<ruby>集<rt>あつ</rt></ruby>めると、<ruby>今週<rt>こんしゅう</rt></ruby>の<ruby>段階<rt>だんかい</rt></ruby>が<ruby>完了<rt>かんりょう</rt></ruby>します。' }
+              : { en: `Keep exploring ${meta.en}. Complete all 24 clues to see the next recommendation.`, jp: `${meta.en}を<ruby>続<rt>つづ</rt></ruby>けよう。24の<ruby>手<rt>て</rt></ruby>がかりを<ruby>集<rt>あつ</rt></ruby>めると、<ruby>次<rt>つぎ</rt></ruby>のおすすめが<ruby>見<rt>み</rt></ruby>えます。` };
         mount.innerHTML = `
           <div class="difficulty-card">
             <p class="difficulty-intro">Choose which memory tier to explore. Each tier keeps its own weekly progress.<small>どの<ruby>記憶<rt>きおく</rt></ruby>の<ruby>段階<rt>だんかい</rt></ruby>を<ruby>探<rt>さが</rt></ruby>すか<ruby>選<rt>えら</rt></ruby>んでね。それぞれの<ruby>記録<rt>きろく</rt></ruby>は<ruby>別<rt>べつ</rt></ruby>に<ruby>残<rt>のこ</rt></ruby>ります。</small></p>
@@ -328,10 +353,11 @@
               ${MEMORY_TIER_CHOICES.map(tier => {
                 const stats = weeklyTierStats(tier);
                 const state = weeklyTierState(stats);
-                return `<button type="button" class="difficulty-option${tier === current ? ' is-active' : ''}" data-memory-tier="${tier}" data-tier-state="${state.key}" aria-pressed="${tier === current}"><span class="difficulty-option-name">${esc(MEMORY_TIER_META[tier].en)}</span><small>${MEMORY_TIER_META[tier].jp}</small><span class="difficulty-progress">${stats.found} / ${stats.total} this week</span><span class="difficulty-progress-status">${state.en} · ${state.jp}</span></button>`;
+                return `<button type="button" class="difficulty-option${tier === current ? ' is-active' : ''}${tier === suggestedNext ? ' is-next' : ''}" data-memory-tier="${tier}" data-tier-state="${state.key}" aria-pressed="${tier === current}"><span class="difficulty-option-name">${esc(MEMORY_TIER_META[tier].en)}</span><small>${MEMORY_TIER_META[tier].jp}</small><span class="difficulty-progress">${stats.found} / ${stats.total} this week</span><span class="difficulty-progress-status">${state.en} · ${state.jp}</span></button>`;
               }).join('')}
             </div>
             <p class="difficulty-note">${esc(meta.note)}<small>${meta.noteJP}</small></p>
+            <p class="tier-next-step" role="status">${readiness.en}<small>${readiness.jp}</small></p>
             <p class="difficulty-note" style="margin-top:8px;opacity:.78">Each tier has its own 24-clue weekly track. Finish Starter, then choose Case or Deep when you’re ready.<small>それぞれの<ruby>段階<rt>だんかい</rt></ruby>に、<ruby>別々<rt>べつべつ</rt></ruby>の<ruby>手<rt>て</rt></ruby>がかりがあります。まず Starter、その<ruby>後<rt>あと</rt></ruby>で Case や Deep に<ruby>挑戦<rt>ちょうせん</rt></ruby>できます。</small></p>
           </div>`;
         mount.querySelectorAll('[data-memory-tier]').forEach(button => {
