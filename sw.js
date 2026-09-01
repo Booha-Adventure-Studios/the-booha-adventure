@@ -10,7 +10,7 @@ const CURRENT_CACHES = {
   // Profile consolidation Pass 1: ship the canonical progress page and its
   // moved progress renderer to returning players.
   // Grimmerglen Pass 2 changes the lifetime-counter profile markup.
-  pages:  'booha-pages-2026-395',
+  pages:  'booha-pages-2026-396',
   // js/ is served cache-first (see ASSET_PREFIXES below), so once a device
   // caches a script it never re-fetches it until this string changes.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
@@ -126,7 +126,7 @@ const CURRENT_CACHES = {
   // furigana so Japanese readings do not look like duplicate sentences.
   // Grimmerglen Pass 1 adds replay-safe lifetime counters to the shared save
   // layer and world runtime; invalidate the cache-first JavaScript bundle.
-  assets: 'booha-assets-2026-479',
+  assets: 'booha-assets-2026-480',
   decks:  'booha-decks-2026-310',
 };
 
