@@ -358,7 +358,7 @@
           story: item.story
         };
         exercises[type][tier] = Object.assign({}, base, {
-          options: tier === 'start' ? item.full : tier === 'case' ? item.partial : item.full,
+          options: tier === 'start' ? item.full : tier === 'case' ? item.partial : null,
           optionsVisible: tier === 'start',
           helpText: tier === 'deep' ? item.jp : null,
           helpReadings: tier === 'deep' ? item.readings : null

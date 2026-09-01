@@ -48,7 +48,7 @@ assert(replay.includes('renderMariettaMemorySuccess(object, { memoryComplete })'
 
 assert(data.includes('answerEn: item.target') && data.includes('answerJp: item.jp'),
   'memory exercises must expose the full answer for replay');
-assert(data.includes("options: tier === 'start' ? item.full : tier === 'case' ? item.partial : item.full") && data.includes('helpText: tier === \'deep\' ? item.jp : null'),
+assert(data.includes("options: tier === 'start' ? item.full : tier === 'case' ? item.partial : null") && data.includes('helpText: tier === \'deep\' ? item.jp : null'),
   'each tier must retain its authored helper choices and the Deep optional furigana help');
 assert(typing.includes("input.addEventListener('copy'"),
   'typing input must block copying');

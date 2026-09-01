@@ -15,7 +15,7 @@ const verify = fs.readFileSync(path.join(root, 'verify.sh'), 'utf8');
 
 assert(data.includes('Object.keys(MEMORY_TIERS)'), 'exercise builder must consume the tiered authoring source');
 assert(data.includes("['start', 'case', 'deep'].forEach(tier =>"), 'exercise builder must create all three tiers');
-assert(data.includes("options: tier === 'start' ? item.full : tier === 'case' ? item.partial : item.full"), 'each tier must receive its intended helper choices');
+assert(data.includes("options: tier === 'start' ? item.full : tier === 'case' ? item.partial : null"), 'each tier must receive its intended helper choices');
 assert(data.includes('optionsVisible: tier === \'start\''), 'only Starter helpers may be visible immediately');
 assert(data.includes('accepted: [item.target.replace'), 'each tier must expose its own accepted answer');
 
