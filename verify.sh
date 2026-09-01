@@ -803,6 +803,13 @@ else
   bad "Grimmerglen Pass 10F dance-lock audit failed"
 fi
 
+echo "[content] Grimmerglen Content Pass 1 audit"
+if node tests/grimmerglen-content-pass1-audit.cjs >/dev/null 2>&1; then
+  ok "Grimmerglen Starter, Case, and Deep authoring records pass"
+else
+  bad "Grimmerglen Content Pass 1 audit failed"
+fi
+
 echo "[94/98] Grimmerglen navigation audit"
 if node tests/grimmerglen-navigation-audit.cjs >/dev/null 2>&1; then
   ok "Grimmerglen grid links, boundary arrows, and help-gated movement contracts pass"
