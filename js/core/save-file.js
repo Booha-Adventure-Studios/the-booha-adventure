@@ -67,6 +67,16 @@ const BoohaSaveFile = (() => {
       pageState:   {},   // { [pageId]: { visited, spawnPoint, ... } }
       weekData:    {},   // legacy — kept for migration safety
 
+      // ── Grimmerglen — permanent running totals ─────────────────────────
+      // Per-object records remain separate and capped at three; these
+      // counters record the player's full history, including replays.
+      grimmerglen: {
+        cluesReturnedTotal:    0,
+        memoriesRestoredTotal: 0,
+        roomVisitsTotal:       0,
+        gardenVisitsTotal:     0,
+      },
+
       // ── Meta — permanent counters ────────────────────────────────────────
      meta: {
         lastWeeklyKey:  '',      // occurrence key, e.g. "2026-08-30|august-w4"
@@ -228,6 +238,44 @@ const BoohaSaveFile = (() => {
     if (current.grimmerglen.mariettaIntroSkipped === undefined) current.grimmerglen.mariettaIntroSkipped = false;
   }
 
+  function _ensureGrimmerglenLifetime(save) {
+    if (!save.grimmerglen || typeof save.grimmerglen !== 'object' || Array.isArray(save.grimmerglen)) {
+      save.grimmerglen = {};
+    }
+    const root = save.grimmerglen;
+    const objects = root.objects && typeof root.objects === 'object' && !Array.isArray(root.objects)
+      ? root.objects : {};
+    const foundLowerBound = Object.values(objects).reduce((sum, entry) => {
+      const found = Number.isInteger(entry?.found) ? Math.max(0, Math.min(3, entry.found)) : 0;
+      return sum + found;
+    }, 0);
+    const restoredLowerBound = Object.values(objects).reduce((sum, entry) => {
+      const found = Number.isInteger(entry?.found) ? Math.max(0, Math.min(3, entry.found)) : 0;
+      return sum + (found >= 3 ? 1 : 0);
+    }, 0);
+    const visitedRooms = root.visitedRooms && typeof root.visitedRooms === 'object' && !Array.isArray(root.visitedRooms)
+      ? root.visitedRooms : {};
+
+    // These fields are backfilled without a version bump so current-version
+    // saves receive the same protection as older saves. Existing capped
+    // records provide a conservative lower bound; future replays are counted
+    // exactly by the live world.
+    if (!Number.isSafeInteger(root.cluesReturnedTotal) || root.cluesReturnedTotal < 0) {
+      root.cluesReturnedTotal = foundLowerBound;
+    }
+    if (!Number.isSafeInteger(root.memoriesRestoredTotal) || root.memoriesRestoredTotal < 0) {
+      root.memoriesRestoredTotal = restoredLowerBound;
+    }
+    if (!Number.isSafeInteger(root.roomVisitsTotal) || root.roomVisitsTotal < 0) {
+      root.roomVisitsTotal = Object.keys(visitedRooms).length;
+    }
+    if (!Number.isSafeInteger(root.gardenVisitsTotal) || root.gardenVisitsTotal < 0) {
+      // There is no reliable historical marker for entering the world, so
+      // start this new counter at zero rather than inventing visits.
+      root.gardenVisitsTotal = 0;
+    }
+  }
+
   // ── Migrate legacy saves → current schema ────────────────────────────────
   function _migrate(save) {
     if (!save.version || save.version < 1) {
@@ -259,6 +307,7 @@ const BoohaSaveFile = (() => {
       };
     }
     _ensureWeeklyWorlds(save);
+    _ensureGrimmerglenLifetime(save);
     if (!save.collection || typeof save.collection !== 'object' || Array.isArray(save.collection)) {
       save.collection = {};
     }

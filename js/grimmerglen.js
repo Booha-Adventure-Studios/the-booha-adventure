@@ -1537,6 +1537,18 @@
     } catch (_) {}
   }
 
+  // A garden visit is an entry into Grimmerglen from Karasuki, not a room
+  // transition or an in-garden page refresh. This remains separate from the
+  // roomVisitsTotal counter.
+  function markGrimmerglenGardenVisited() {
+    try {
+      const d = readGrimmerglen();
+      if (!Number.isSafeInteger(d.gardenVisitsTotal) || d.gardenVisitsTotal < 0) d.gardenVisitsTotal = 0;
+      d.gardenVisitsTotal += 1;
+      writeGrimmerglen(d);
+    } catch (_) {}
+  }
+
   function getGrimmerglenObjectsProgress() {
     const selected = getSelectedGrimmerglenTierProgress();
     if (objectProgressCache && objectProgressCacheTier === selected.tier) return objectProgressCache;
@@ -1643,12 +1655,23 @@
     const weekly = ensureWeeklyGrimmerglen(data);
     const selectedTier = getSelectedGrimmerglenTier(data);
     const selectedProgress = weekly.tierProgress[selectedTier];
+    const wasWeeklyMemoryComplete = Number(selectedProgress.objects?.[type]?.found) >= 3;
     selectedProgress.objects = weeklyStored;
     selectedProgress.objectSlots = weeklySlots;
     selectedProgress.carriedObjectId = null;
     syncLegacyGrimmerglenWeeklyFields(weekly, selectedProgress);
     data.grimmerglen.objects = lifetimeStored;
     data.grimmerglen.objectSlots = lifetimeSlots;
+    if (!Number.isSafeInteger(data.grimmerglen.cluesReturnedTotal) || data.grimmerglen.cluesReturnedTotal < 0) {
+      data.grimmerglen.cluesReturnedTotal = Object.values(lifetimeStored).reduce((sum, entry) => sum + entry.found, 0);
+    }
+    data.grimmerglen.cluesReturnedTotal += 1;
+    if (!wasWeeklyMemoryComplete && selectedProgress.objects[type]?.found >= 3) {
+      if (!Number.isSafeInteger(data.grimmerglen.memoriesRestoredTotal) || data.grimmerglen.memoriesRestoredTotal < 0) {
+        data.grimmerglen.memoriesRestoredTotal = Object.values(lifetimeStored).filter(entry => entry.found >= 3).length;
+      }
+      data.grimmerglen.memoriesRestoredTotal += 1;
+    }
     data.grimmerglen.weeklyReplayInitialized = true;
     const ok = window.BoohaSaveFile && typeof window.BoohaSaveFile.save === 'function'
       ? window.BoohaSaveFile.save(data)
@@ -2761,6 +2784,7 @@
     buildApp();
     fitStage();
     resizeCanvas();
+    if (state.spawnId === 'fromKarasuki') markGrimmerglenGardenVisited();
     setRoom(state.roomId, state.spawnId, null);
     restoreGrimmerglenCarriedObject();
     bindInput();

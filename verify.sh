@@ -873,6 +873,13 @@ else
   bad "Grimmerglen tier-readiness Pass 6 audit failed"
 fi
 
+echo "[lifetime] Grimmerglen lifetime counters audit"
+if node tests/grimmerglen-lifetime-counters-audit.cjs >/dev/null 2>&1; then
+  ok "Grimmerglen lifetime counters migrate, increment, and survive weekly reset"
+else
+  bad "Grimmerglen lifetime counters audit failed"
+fi
+
 echo "[content] Grimmerglen memory-assistance audit"
 if node tests/grimmerglen-memory-assistance-audit.cjs >/dev/null 2>&1; then
   ok "Grimmerglen memory returns use full, partial, and hint-only assistance"
