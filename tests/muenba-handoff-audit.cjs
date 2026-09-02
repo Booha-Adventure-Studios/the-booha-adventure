@@ -18,7 +18,8 @@ function section(startNeedle, endNeedle) {
 
 const caseSession = section('function beginCaptureSession(ghost)', '  function captureBox');
 assert(caseSession.includes("ghostRoleFor(ghost) !== 'hunt-target'"), 'only the assigned hunt ghost may open a case session');
-assert(caseSession.includes('const caseData = caseForGhost(ghost && ghost.id);'), 'a hunt capture must resolve its authored case');
+assert(caseSession.includes('const huntTarget = getMuenbaHuntTarget();'), 'a hunt capture must resolve the canonical target');
+assert(caseSession.includes('const caseData = huntTarget.caseData;'), 'a hunt capture must resolve its authored case context');
 assert(caseSession.includes("phase: caseData && !caseRecordComplete(caseData) ? 'case-intro' : 'ready'"), 'unfinished cases must open the reading flow before rhythm');
 assert(caseSession.includes('state.moving = false;'), 'opening a case must pause room movement');
 
@@ -36,7 +37,8 @@ assert(nuppiBoard.includes("eyebrow.textContent = 'ENERGY TRAIL WAITING';"), 'Nu
 
 const huntCard = section('function renderNuppiHuntCard()', '  function focusLobbyControl');
 assert(huntCard.includes('const returningEnergy = pendingOrbs > 0;'), 'the hunt card must distinguish return-trip state');
-assert(huntCard.includes('const ghost = returningEnergy ? null : nextNuppiHuntGhost();'), 'return-trip state must not present a new ghost target');
+assert(huntCard.includes('const huntTarget = returningEnergy ? null : getMuenbaHuntTarget();'), 'return-trip state must not present a new ghost target');
+assert(huntCard.includes('const ghost = huntTarget ? huntTarget.ghost : null;'), 'the hunt card must render the canonical target');
 assert(huntCard.includes("const huntTitle = returningEnergy\n      ? 'Return your energy to Nuppi'"), 'the return-trip card must explain its action');
 assert(huntCard.includes("const huntButton = returningEnergy ? 'Return to Nuppi'"), 'the return-trip action must be named explicitly');
 assert(huntCard.includes('openPendingOrbRecovery();'), 'the handoff must still open the durable recovery flow');

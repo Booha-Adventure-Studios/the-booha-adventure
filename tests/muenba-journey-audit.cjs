@@ -62,8 +62,9 @@ for (const caseId of data.caseOrder) {
 // 2. Hunt target -> case session. A target must be the currently assigned
 // ghost, and removing it from the world must not consume any save progress.
 assert(sessionSource.includes("ghostRoleFor(ghost) !== 'hunt-target'"), 'only hunt-target ghosts may open a case');
-assert(sessionSource.includes('ghost.id !== currentHuntGhostId()'), 'capture must reject a non-current hunt ghost');
-assert(sessionSource.includes('caseData = caseForGhost(ghost && ghost.id)'), 'capture must resolve the ghost case');
+assert(sessionSource.includes('const huntTarget = getMuenbaHuntTarget();'), 'capture must resolve the canonical hunt target');
+assert(sessionSource.includes('ghost.id !== huntTarget.ghost.id'), 'capture must reject a non-current hunt ghost');
+assert(sessionSource.includes('const caseData = huntTarget.caseData;'), 'capture must resolve the target case context');
 assert(sessionSource.includes("phase: caseData && !caseRecordComplete(caseData) ? 'case-intro' : 'ready'"), 'new cases must begin at the case intro');
 assert(sessionSource.includes('activeGhost = null'), 'the captured target must leave the room while the session is open');
 assert(sessionSource.includes('state.moving = false'), 'opening a case must pause room movement');

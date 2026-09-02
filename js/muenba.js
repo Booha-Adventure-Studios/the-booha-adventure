@@ -1154,6 +1154,7 @@
     if (!world.ghostsFound || typeof world.ghostsFound !== 'object' || Array.isArray(world.ghostsFound)) world.ghostsFound = {};
     if (!Array.isArray(world.huntGhostOrder)) world.huntGhostOrder = [];
     if (world.activeCaseId === undefined) world.activeCaseId = null;
+    if (world.activeHuntGhostId === undefined) world.activeHuntGhostId = null;
     world.activeCaseRecoveryDone = world.activeCaseRecoveryDone === true;
     if (!Number.isFinite(world.orbsPending) || world.orbsPending < 0) world.orbsPending = 0;
     world.huntAccepted = world.huntAccepted === true;
@@ -1416,9 +1417,10 @@
     const weekly = readMuenbaWeekly();
     const returnTripActive = Number(weekly.orbsPending) > 0;
     const weeklyFound = weekly.ghostsFound;
-    const activeCaseGhost = activeMuenbaCaseGhost();
+    const huntTarget = getMuenbaHuntTarget();
+    const activeCaseGhost = huntTarget && huntTarget.ghost;
     const activeCaseGhostId = activeCaseGhost && activeCaseGhost.id;
-    const tierNeedsSelection = !activeCaseGhost && unfinishedMuenbaModeExcept(getMuenbaReadingDifficulty());
+    const tierNeedsSelection = !huntTarget && unfinishedMuenbaModeExcept(getMuenbaReadingDifficulty());
     const availableGhosts = tierNeedsSelection
       ? []
       : GHOSTS.filter(ghost => ghost.id === activeCaseGhostId || !weeklyFound || !weeklyFound[ghost.id]);
@@ -2106,9 +2108,7 @@
     const mode = getMuenbaReadingDifficulty();
     const cases = randomizedMuenbaCases();
     const activeCase = typeof weekly.activeCaseId === 'string'
-      ? cases.find(caseData =>
-        caseData.id === weekly.activeCaseId && !caseModeIsComplete(caseData, mode)
-      ) || null
+      ? cases.find(caseData => caseData.id === weekly.activeCaseId) || null
       : null;
     if (activeCase) {
       // Older saves may have migrated an active case id without the recovery
@@ -2138,6 +2138,47 @@
     return null;
   }
 
+  // The one target resolver for Muenba's weekly hunt. Case progress is
+  // lifetime/content state; the weekly target can still be a ghost whose
+  // authored case is complete in every reading tier.
+  function getMuenbaHuntTarget({ activeOnly = false } = {}) {
+    const weekly = readMuenbaWeekly();
+    const cases = randomizedMuenbaCases();
+    const byGhostId = new Map(GHOSTS.map(ghost => [ghost.id, ghost]));
+    const pinnedCase = activeMuenbaCase();
+    if (pinnedCase) {
+      const ghost = byGhostId.get(pinnedCase.ghostId);
+      if (ghost) return { caseData: pinnedCase, ghost };
+    }
+
+    if (typeof weekly.activeHuntGhostId === 'string') {
+      const ghost = byGhostId.get(weekly.activeHuntGhostId);
+      if (ghost) {
+        const caseData = cases.find(candidate => candidate.ghostId === ghost.id) || null;
+        return { caseData, ghost };
+      }
+    }
+
+    if (activeOnly) return null;
+
+    const mode = getMuenbaReadingDifficulty();
+    const nextCase = cases.find(caseData => !caseModeIsComplete(caseData, mode)) || null;
+    if (nextCase) {
+      const ghost = byGhostId.get(nextCase.ghostId);
+      if (ghost) return { caseData: nextCase, ghost };
+    }
+
+    // A completed reading tier must still allow the weekly ghost hunt. If
+    // another tier remains unfinished, the profile remains the explicit tier
+    // selector rather than silently switching content modes.
+    if (unfinishedMuenbaModeExcept(mode)) return null;
+    const weeklyFound = weekly.ghostsFound || {};
+    const ghost = getMuenbaHuntGhostOrder()
+      .map(ghostId => byGhostId.get(ghostId))
+      .find(candidate => candidate && !weeklyFound[candidate.id]) || null;
+    return ghost ? { caseData: null, ghost } : null;
+  }
+
   function availableMuenbaGhostsThisWeek() {
     const weeklyFound = readMuenbaWeekly().ghostsFound;
     const activeCaseGhost = activeMuenbaCaseGhost();
@@ -2151,18 +2192,13 @@
   // the same case unfinished. Its target ghost must return even when
   // The weekly ghost bucket already contains that ghost id.
   function activeMuenbaCaseGhost() {
-    const nextCase = nextMuenbaCase();
-    return nextCase ? GHOSTS.find(ghost => ghost.id === nextCase.ghostId) || null : null;
+    const target = getMuenbaHuntTarget();
+    return target && target.caseData ? target.ghost : null;
   }
 
   function nextMuenbaHuntGhost() {
-    const activeCaseGhost = activeMuenbaCaseGhost();
-    if (activeCaseGhost) return activeCaseGhost;
-    // Do not silently turn a completed selected tier into a case-less
-    // rhythm hunt while another reading tier still has authored stories.
-    // The player must choose that next tier from the profile first.
-    if (unfinishedMuenbaModeExcept(getMuenbaReadingDifficulty())) return null;
-    return availableMuenbaGhostsThisWeek()[0] || null;
+    const target = getMuenbaHuntTarget();
+    return target ? target.ghost : null;
   }
 
   function currentHuntGhostId() {
@@ -2171,13 +2207,13 @@
     // clickable during the return trip and keeps every other ghost on the
     // danger-encounter path.
     if (Number(readMuenbaWeekly().orbsPending) > 0) return null;
-    const ghost = nextMuenbaHuntGhost();
-    return ghost ? ghost.id : null;
+    const target = getMuenbaHuntTarget();
+    return target ? target.ghost.id : null;
   }
 
   function caseForGhost(ghostId) {
-    const next = nextMuenbaCase();
-    return next && next.ghostId === ghostId ? next : null;
+    const target = getMuenbaHuntTarget();
+    return target && target.ghost.id === ghostId ? target.caseData : null;
   }
 
   // Weekly hunt availability is separate from lifetime case memory. Once a
@@ -2233,13 +2269,14 @@
   // scene while the session is open and respawned on cancel, so a failed or
   // abandoned attempt remains a soft miss rather than consuming the target.
   function beginCaptureSession(ghost) {
-    if (!ghost || ghostRoleFor(ghost) !== 'hunt-target' || ghost.id !== currentHuntGhostId()) {
+    const huntTarget = getMuenbaHuntTarget();
+    if (!ghost || !huntTarget || ghostRoleFor(ghost) !== 'hunt-target' || ghost.id !== huntTarget.ghost.id) {
       state.captureResolving = false;
       return;
     }
     captureOpen = true;
     if (captureOverlay) captureOverlay.setAttribute('aria-hidden', 'false');
-    const caseData = caseForGhost(ghost && ghost.id);
+    const caseData = huntTarget.caseData;
     const caseDifficulty = caseData ? getMuenbaReadingDifficulty() : null;
     captureSession = {
       ghost,
@@ -6833,7 +6870,8 @@
     const name = getPlayerFirstName();
     const pendingOrbs = Math.max(0, Number(readMuenbaWeekly().orbsPending) || 0);
     const returningEnergy = pendingOrbs > 0;
-    const ghost = returningEnergy ? null : nextNuppiHuntGhost();
+    const huntTarget = returningEnergy ? null : getMuenbaHuntTarget();
+    const ghost = huntTarget ? huntTarget.ghost : null;
     const needsTierSelection = !returningEnergy && !ghost && !allMuenbaCaseModesComplete();
     const ghostName = ghost ? ghost.name : 'the next ghost';
     const ghostFindJp = ghost
@@ -6985,14 +7023,14 @@
     const name = getPlayerFirstName();
     const weekly = readMuenbaWeekly();
     const pending = Number(weekly.orbsPending) > 0;
-    const acceptedCase = !pending ? activeMuenbaCase() : null;
-    const waitingForCase = !!acceptedCase;
+    const huntTarget = !pending && weekly.huntAccepted === true
+      ? getMuenbaHuntTarget({ activeOnly: true })
+      : null;
+    const waitingForCase = !!huntTarget;
     const needsTierSelection = !pending && !waitingForCase && !allMuenbaCaseModesComplete();
     const selectedMode = getMuenbaReadingDifficulty();
     const selectedModeLabel = MUENBA_MEMORY_MODE_LABELS[selectedMode] || MUENBA_MEMORY_MODE_LABELS.start;
-    const waitingGhost = acceptedCase
-      ? GHOSTS.find(ghost => ghost.id === acceptedCase.ghostId) || null
-      : null;
+    const waitingGhost = huntTarget ? huntTarget.ghost : null;
     const waitingGhostName = waitingGhost ? waitingGhost.name : 'the next ghost';
     const waitingLine = name
       ? `I'm waiting, ${name}. Find ${waitingGhostName}, then come back here.`
