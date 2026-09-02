@@ -52,9 +52,22 @@ for (let i = 1; i <= 9; i += 1) {
   assert(bytes.subarray(0, 4).toString('ascii') === 'RIFF', `${relative} must remain a WebP file`);
   assert(bytes.subarray(8, 12).toString('ascii') === 'WEBP', `${relative} must have a WebP signature`);
   assert(bytes.length < 700 * 1024, `${relative} must stay below the Pass 3 700 KiB room budget`);
-  const info = childProcess.execFileSync('webpinfo', [file], { encoding: 'utf8' });
-  assert(info.includes('Chunk VP8  '), `${relative} must use lossy VP8 encoding after re-encode`);
-  assert(info.includes('Width: 1536') && info.includes('Height: 1024'), `${relative} dimensions must remain 1536x1024`);
+  // Read the RIFF chunk directly instead of shelling out to webpinfo: the CI
+  // image installs ffmpeg, but does not guarantee the optional WebP tools.
+  const chunks = [];
+  for (let offset = 12; offset + 8 <= bytes.length;) {
+    const type = bytes.subarray(offset, offset + 4).toString('ascii');
+    const size = bytes.readUInt32LE(offset + 4);
+    chunks.push(type);
+    offset += 8 + size + (size % 2);
+  }
+  assert(chunks.includes('VP8 '), `${relative} must use lossy VP8 encoding after re-encode`);
+  assert(!chunks.includes('VP8L'), `${relative} must not regress to lossless VP8L encoding`);
+  const dimensions = childProcess.execFileSync('ffprobe', [
+    '-v', 'error', '-select_streams', 'v:0', '-show_entries', 'stream=width,height',
+    '-of', 'default=nw=1:nk=1', file,
+  ], { encoding: 'utf8' }).trim().split(/\s+/).map(Number);
+  assert(dimensions[0] === 1536 && dimensions[1] === 1024, `${relative} dimensions must remain 1536x1024`);
 }
 
 assert(sw.includes('booha-assets-2026-501'), 'Pass 3 asset changes must bump the asset cache');
