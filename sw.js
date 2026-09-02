@@ -5,7 +5,7 @@
 // ============================================================
 
 const CURRENT_CACHES = {
-  // Muenba weekly/lifetime profile pass: ship the clarified hunt status and
+  // Muenba Pass C/D profile pass: ship the clarified hunt status and
   // invalidate the cache-first profile/runtime files together.
   // Profile consolidation Pass 1: ship the canonical progress page and its
   // moved progress renderer to returning players.
