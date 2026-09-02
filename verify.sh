@@ -1020,6 +1020,13 @@ else
   bad "Muenba target recovery audit failed"
 fi
 
+echo "[weekly] Muenba target consistency audit"
+if node tests/muenba-target-consistency-audit.cjs >/dev/null 2>&1; then
+  ok "Muenba Pass 6 target consistency contracts pass"
+else
+  bad "Muenba target consistency audit failed"
+fi
+
 echo "[weekly] Muenba profile weekly audit"
 if node tests/muenba-profile-weekly-audit.cjs >/dev/null 2>&1; then
   ok "Muenba weekly versus lifetime profile labels pass"
