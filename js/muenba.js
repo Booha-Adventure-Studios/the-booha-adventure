@@ -516,16 +516,29 @@
   // path, no new files) rather than a new character for the lobby host.
   const nuppiLobbyImg = new Image();
   nuppiLobbyImg.src = 'assets/img/wanderers/nuppi-2.webp';
-  const music = new Audio('assets/img/muenba/Muenba_BGM.mp3');
-  music.preload = 'auto';
+  // Keep long tracks source-less until the state that needs them begins.
+  // Setting preload=none alone is only a browser hint; withholding src makes
+  // the entry path genuinely request-free while preserving first-gesture
+  // playback below.
+  function makeDeferredMuenbaAudio(src) {
+    const audio = new Audio();
+    audio.preload = 'none';
+    audio.dataset.src = src;
+    return audio;
+  }
+
+  function ensureMuenbaAudioSource(audio) {
+    if (audio && !audio.src && audio.dataset.src) audio.src = audio.dataset.src;
+    return audio;
+  }
+
+  const music = makeDeferredMuenbaAudio('assets/img/muenba/Muenba_BGM.mp3');
   music.loop = true;
   music.volume = MUENBA_MUSIC_VOLUME;
-  const dangerRhythmMusic = new Audio('assets/img/muenba/rhythm.mp3');
-  dangerRhythmMusic.preload = 'auto';
+  const dangerRhythmMusic = makeDeferredMuenbaAudio('assets/img/muenba/rhythm.mp3');
   dangerRhythmMusic.loop = true;
   dangerRhythmMusic.volume = MUENBA_DANGER_RHYTHM_VOLUME;
-  const muenbaDance = new Audio('assets/img/muenba/muenba_dance.mp3');
-  muenbaDance.preload = 'auto';
+  const muenbaDance = makeDeferredMuenbaAudio('assets/img/muenba/muenba_dance.mp3');
   muenbaDance.loop = false;
   muenbaDance.volume = 0.72;
   let dangerScreamPreloadStarted = false;
@@ -534,8 +547,7 @@
   // media-element scheduling when two notes land close together.
   function makeRhythmSfxPool(src, volume, size = 3) {
     return Array.from({ length: size }, () => {
-      const audio = new Audio(src);
-      audio.preload = 'auto';
+      const audio = makeDeferredMuenbaAudio(src);
       audio.volume = volume;
       return audio;
     });
@@ -741,6 +753,7 @@
     primeDangerScreamSamples();
     if (state.musicStarted && !music.paused && !music.ended) return;
     state.musicStarted = true;
+    ensureMuenbaAudioSource(music);
     if (music.ended) music.currentTime = 0;
     try {
       const playResult = music.play();
@@ -846,6 +859,7 @@
     pauseWorldMusicForCapture();
     const token = ++dangerRhythmPlayToken;
     try {
+      ensureMuenbaAudioSource(dangerRhythmMusic);
       if (reset) dangerRhythmMusic.currentTime = 0;
       const playResult = dangerRhythmMusic.play();
       if (playResult && typeof playResult.then === 'function') {
@@ -4086,6 +4100,7 @@
       : rhythmHitSfxIndex++ % pool.length;
     const sound = pool[index];
     try {
+      ensureMuenbaAudioSource(sound);
       sound.pause();
       sound.currentTime = 0;
       sound.play().catch(() => {});
@@ -4925,6 +4940,7 @@
     }
     try { music.pause(); } catch (_) {}
     try {
+      ensureMuenbaAudioSource(muenbaDance);
       muenbaDance.currentTime = 0;
       muenbaDance.play().catch(() => {});
     } catch (_) {}
