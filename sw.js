@@ -133,7 +133,7 @@ const CURRENT_CACHES = {
   // Muenba Pass 1 repairs target state, Pass 2 clears pins after capture, and
   // Pass 3 pins the card's exact ghost, Pass 4 restores legacy portraits,
   // Pass 5 preserves targets across tier changes, and Pass 6 checks identity.
-  assets: 'booha-assets-2026-497',
+  assets: 'booha-assets-2026-498',
   decks:  'booha-decks-2026-310',
 };
 
