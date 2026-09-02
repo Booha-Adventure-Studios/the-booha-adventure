@@ -32,6 +32,9 @@ const roomPopupEnd = source.indexOf('\n  function openRoomNuppiPopup()', roomPop
 const roomPopup = source.slice(roomPopupStart, roomPopupEnd);
 assert(roomPopup.includes('const acceptedCase = !pending ? activeMuenbaCase() : null;'), 'the room popup must hide the target during pending handoff');
 assert(roomPopup.includes('const waitingForCase = !!acceptedCase;'), 'the room popup must show a target only for an accepted active case');
+assert(roomPopup.includes('aria-labelledby="muenba-room-hunt-target-title muenba-room-hunt-target-name"'), 'the target card must expose both its instruction and ghost name');
+assert(roomPopup.includes('class="muenba-room-hunt-target-portrait" src="${escapeHtml(waitingGhost.img)}" alt=""'), 'the target portrait must not make screen readers announce the ghost twice');
+assert(source.includes('@media (max-width:360px)'), 'the target card must include a narrow-phone layout guard');
 
 const exitStart = source.indexOf('function getAvailableExit(now)');
 const exitEnd = source.indexOf('\n  function transitionTo(', exitStart);
