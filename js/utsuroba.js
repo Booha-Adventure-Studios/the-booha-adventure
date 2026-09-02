@@ -30,13 +30,20 @@
 
   let lastTickTime = 0;
   let SPEED        = BASE_SPEED;
+  let rafHandle    = null;
+  let pageHidden   = document.hidden;
+  let worldInitialized = false;
 
   const MAX_DPR = Math.min(window.devicePixelRatio || 1, 2);
 
-  let perfTier       = 'high';
+  const LOW_POWER_HINT = Boolean(
+    (typeof navigator !== 'undefined' && navigator.connection && navigator.connection.saveData)
+    || (typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+  );
+  let perfTier       = LOW_POWER_HINT ? 'low' : 'high';
   let perfFrameCount = 0;
   let perfFirstTime  = 0;
-  let shadowsEnabled = true;
+  let shadowsEnabled = perfTier !== 'low';
 
   const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
   const NPP_RADIUS    = isTouchDevice ? 58 : 40;
@@ -3348,18 +3355,35 @@
       state.exitingToKarasuki ||
       state.celebrating       ||
       drifterPanelOpen        ||
+      readingJournalOpen      ||
       convergenceOpen        ||
       gardenOpen              ||
+      utsuProfileOpen         ||
       weeklyChallengeOpen    ||
       (window.UtsurobaReading && window.UtsurobaReading.isOpen()) ||
       isExitPopOpen()
     );
   }
 
+  // Keep the canvas static while a DOM panel owns the foreground. The
+  // celebration itself is intentionally not included: it is canvas-native
+  // motion and should continue until its thank-you panel appears.
+  function staticFrameOverlayOpen() {
+    return drifterPanelOpen || convergenceOpen || gardenOpen || weeklyChallengeOpen
+      || readingJournalOpen || (window.UtsurobaReading && window.UtsurobaReading.isOpen())
+      || isExitPopOpen() || utsuProfileOpen;
+  }
+
   /* ═══════════════════════════════════════════
      MAIN LOOP
   ═══════════════════════════════════════════ */
+  function scheduleUtsurobaFrame() {
+    if (worldInitialized && !pageHidden && !rafHandle) rafHandle = requestAnimationFrame(tick);
+  }
+
   function tick(now) {
+    rafHandle = null;
+    if (pageHidden) return;
     updatePerfTier(now);
     const dt = Math.min(50, Math.max(8, now-(lastTickTime||now)));
     lastTickTime = now; SPEED = BASE_SPEED * (dt/TARGET_DT);
@@ -3372,8 +3396,8 @@
         if (unlocked) { const exit = getNPPExit(now); if (exit) { state.clickTarget=null; state.moving=false; transitionTo(exit); } }
       }
     }
-    drawFrame(now);
-    requestAnimationFrame(tick);
+    if (!staticFrameOverlayOpen()) drawFrame(now);
+    scheduleUtsurobaFrame();
   }
 
   /* ═══════════════════════════════════════════
@@ -3461,8 +3485,20 @@
     bindInput();
     window.addEventListener('resize', () => { fitStage(); resizeCanvas(); });
     markVisited();
-    requestAnimationFrame(tick);
+    worldInitialized = true;
+    scheduleUtsurobaFrame();
   }
+
+  document.addEventListener('visibilitychange', () => {
+    pageHidden = document.hidden;
+    if (pageHidden) {
+      if (rafHandle) cancelAnimationFrame(rafHandle);
+      rafHandle = null;
+      return;
+    }
+    lastTickTime = 0;
+    scheduleUtsurobaFrame();
+  });
 
   // The save is keyed on booha_userid, which token.js writes only after its
   // async verify returns. init() reads and writes immediately (markVisited,
