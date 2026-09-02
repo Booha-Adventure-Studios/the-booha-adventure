@@ -70,6 +70,6 @@ for (let i = 1; i <= 9; i += 1) {
   assert(dimensions[0] === 1536 && dimensions[1] === 1024, `${relative} dimensions must remain 1536x1024`);
 }
 
-assert(sw.includes('booha-assets-2026-501'), 'Pass 3 asset changes must bump the asset cache');
+assert(sw.includes('booha-assets-2026-502'), 'Pass 3 asset changes must bump the asset cache');
 
 console.log('Pass 3 asset-weight audit passed: dead masters are absent, long-form audio is 128 kbps, and Grimmerglen room WebPs fit the size budget.');

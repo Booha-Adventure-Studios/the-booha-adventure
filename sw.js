@@ -135,7 +135,10 @@ const CURRENT_CACHES = {
   // Pass 5 preserves targets across tier changes, and Pass 6 checks identity.
   // Pass 6 hardens profile rendering/day-record repaint and enforces media
   // budgets; invalidate the cache-first JavaScript bundle.
-  assets: 'booha-assets-2026-501',
+  // Pass 4 follow-up: Muenba room images/glow canvases are now bounded to
+  // the current neighborhood, matching Grimmerglen; invalidate the
+  // cache-first JavaScript bundle.
+  assets: 'booha-assets-2026-502',
   decks:  'booha-decks-2026-310',
 };
 
