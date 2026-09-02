@@ -120,6 +120,7 @@ const BoohaSaveFile = (() => {
         ghostsFound: {},
         huntGhostOrder: [],
         activeCaseId: null,
+        activeCaseRecoveryDone: false,
         orbsPending: 0,
         huntAccepted: false,
       },
@@ -194,6 +195,7 @@ const BoohaSaveFile = (() => {
     if (!current.muenba.ghostsFound || typeof current.muenba.ghostsFound !== 'object' || Array.isArray(current.muenba.ghostsFound)) current.muenba.ghostsFound = {};
     if (!Array.isArray(current.muenba.huntGhostOrder)) current.muenba.huntGhostOrder = [];
     if (current.muenba.activeCaseId === undefined) current.muenba.activeCaseId = null;
+    current.muenba.activeCaseRecoveryDone = current.muenba.activeCaseRecoveryDone === true;
     if (!Number.isFinite(current.muenba.orbsPending) || current.muenba.orbsPending < 0) current.muenba.orbsPending = 0;
 
     if (!current.grimmerglen || typeof current.grimmerglen !== 'object' || Array.isArray(current.grimmerglen)) current.grimmerglen = {};
