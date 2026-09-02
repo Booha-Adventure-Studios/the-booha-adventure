@@ -86,6 +86,13 @@
     .difficulty-option.is-active .difficulty-progress,.difficulty-option.is-active .difficulty-progress-status { color:#fff4fa; }
     .difficulty-note { margin:12px 2px 0; color:#765e6c; font-size:.76rem; line-height:1.5; }
     .difficulty-note small { display:block; margin-top:4px; color:var(--muted); font-size:.9em; }
+    .difficulty-help { margin:12px 2px 0; padding-top:9px; border-top:1px dashed rgba(104,70,119,.2); }
+    .difficulty-help summary { display:flex; align-items:center; justify-content:space-between; gap:8px; color:#765e6c; font-size:.7rem; font-weight:900; cursor:pointer; list-style:none; }
+    .difficulty-help summary::-webkit-details-marker { display:none; }
+    .difficulty-help summary small { display:block; margin-top:2px; color:var(--muted); font-size:.88em; font-weight:700; }
+    .difficulty-help summary::after { content:'+'; color:#b97a9b; font-size:.9rem; line-height:1; }
+    .difficulty-help[open] summary::after { content:'−'; }
+    .difficulty-help .difficulty-note { margin:8px 0 0; }
     .tier-next-step { margin:12px 2px 0; padding:10px 12px; border-left:3px solid #e5b85b; border-radius:0 12px 12px 0; color:#785735; background:rgba(255,246,209,.68); font-size:.75rem; font-weight:850; line-height:1.5; }
     .tier-next-step small { display:block; margin-top:3px; color:#9a7850; font-size:.88em; font-weight:700; }
     .memories { display:grid; grid-template-columns:repeat(4,1fr); gap:13px; }
@@ -370,7 +377,7 @@
             </div>
             <p class="difficulty-note">${esc(meta.note)}<small>${meta.noteJP}</small></p>
             <p class="tier-next-step" role="status">${readiness.en}<small>${readiness.jp}</small></p>
-            <p class="difficulty-note" style="margin-top:8px;opacity:.78">Each tier has its own 24-clue weekly track. Finish Starter, then choose Case or Deep when you’re ready.<small>それぞれの<ruby>段階<rt>だんかい</rt></ruby>に、<ruby>別々<rt>べつべつ</rt></ruby>の<ruby>手<rt>て</rt></ruby>がかりがあります。まず Starter、その<ruby>後<rt>あと</rt></ruby>で Case や Deep に<ruby>挑戦<rt>ちょうせん</rt></ruby>できます。</small></p>
+            <details class="difficulty-help"><summary><span>How do memory tiers work?<small><ruby>記憶<rt>きおく</rt></ruby>の<ruby>段階<rt>だんかい</rt></ruby>のしくみ</small></span></summary><div><p class="difficulty-note">Each tier has its own 24-clue weekly track. Finish Starter, then choose Case or Deep when you’re ready.<small>それぞれの<ruby>段階<rt>だんかい</rt></ruby>に、<ruby>別々<rt>べつべつ</rt></ruby>の<ruby>手<rt>て</rt></ruby>がかりがあります。まず Starter、その<ruby>後<rt>あと</rt></ruby>で Case や Deep に<ruby>挑戦<rt>ちょうせん</rt></ruby>できます。</small></p></div></details>
           </div>`;
         mount.querySelectorAll('[data-memory-tier]').forEach(button => {
           button.addEventListener('click', () => setMemoryTierPreference(button.dataset.memoryTier));
