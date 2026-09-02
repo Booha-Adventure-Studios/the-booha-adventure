@@ -228,6 +228,28 @@ const DECK_PATTERNS = [
   /\.json$/,
 ];
 
+// Cache each URL independently. Cache.addAll() rejects the whole operation
+// when one request fails, which can leave an otherwise valid cache empty after
+// a typo, removed file, or transient install-time network error.
+async function cacheOne(cache, url) {
+  const response = await fetch(url, { cache: 'no-store' });
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  await cache.put(url, response.clone());
+}
+
+async function cacheUrlsIndividually(cache, urls, label) {
+  const results = await Promise.allSettled(urls.map((url) => cacheOne(cache, url)));
+  const failures = results
+    .map((result, index) => result.status === 'rejected'
+      ? { url: urls[index], error: String(result.reason) }
+      : null)
+    .filter(Boolean);
+  if (failures.length) {
+    console.warn(`[SW] ${label}: ${failures.length} URL(s) could not be cached`, failures);
+  }
+  return failures;
+}
+
 // ============================================================
 //  INSTALL — pre-cache core files - Keep chacking this
 // ============================================================
@@ -235,7 +257,7 @@ self.addEventListener('install', (event) => {
   const precachePages = caches.open(PAGE_CACHE)
     .then((cache) => {
       console.log('[SW] Pre-caching core files');
-      return cache.addAll(CORE_FILES);
+      return cacheUrlsIndividually(cache, CORE_FILES, 'Core files');
     })
     .catch((err) => {
       console.warn('[SW] Some core files could not be cached:', err);
@@ -243,7 +265,7 @@ self.addEventListener('install', (event) => {
   const precacheAssets = caches.open(ASSET_CACHE)
     .then((cache) => {
       console.log('[SW] Pre-caching index image assets');
-      return cache.addAll(CORE_ASSETS);
+      return cacheUrlsIndividually(cache, CORE_ASSETS, 'Core assets');
     })
     .catch((err) => {
       console.warn('[SW] Some index image assets could not be cached:', err);
@@ -391,9 +413,13 @@ self.addEventListener('message', (event) => {
   }
 
   if (event.data?.type === 'CACHE_URLS') {
-    const urls = event.data.payload ?? [];
+    const urls = Array.isArray(event.data.payload)
+      ? event.data.payload.filter((url) => typeof url === 'string')
+      : [];
     event.waitUntil(
-      caches.open(ASSET_CACHE).then((cache) => cache.addAll(urls))
+      caches.open(ASSET_CACHE)
+        .then((cache) => cacheUrlsIndividually(cache, urls, 'Runtime assets'))
+        .catch((err) => console.warn('[SW] Runtime assets could not be cached:', err))
     );
   }
 });

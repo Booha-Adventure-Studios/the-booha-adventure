@@ -1104,6 +1104,13 @@ else
   bad "Sync weekly-world audit failed"
 fi
 
+echo "[service-worker] Pass 1 precache resilience audit"
+if node tests/service-worker-precache-audit.cjs >/dev/null 2>&1; then
+  ok "Service-worker install and runtime precache resilience contracts pass"
+else
+  bad "Service-worker Pass 1 precache resilience audit failed"
+fi
+
 # ── Summary ──────────────────────────────────────────────────
 echo "───────────────────────────────────"
 echo "✅ $PASS passed   ⚠️  $WARN warnings   ❌ $FAIL failed"
