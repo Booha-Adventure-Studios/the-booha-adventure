@@ -140,10 +140,9 @@
     .hero-copy small { display: block; margin-top: 6px; color: var(--quiet); font-size: .82em; }
 
     .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 16px 0 28px; }
-    .stat { min-height: 106px; padding: 17px 13px; border: 1px solid var(--line); border-radius: 16px; background: rgba(9,24,18,.7); }
+    .stat { min-height: 92px; padding: 15px 13px; border: 1px solid var(--line); border-radius: 16px; background: rgba(9,24,18,.7); }
     .stat-value { color: var(--gold); font-size: clamp(1.65rem, 5vw, 2.5rem); line-height: 1; }
     .stat-label { margin-top: 9px; color: var(--muted); font: 700 .65rem/1.4 var(--sans); letter-spacing: .08em; text-transform: uppercase; }
-    .stat-jp { display: block; margin-top: 3px; color: var(--quiet); font: .75rem/1.4 var(--font); }
 
     .weekly-hunt { margin-top: 16px; padding: 18px 20px; border: 1px solid rgba(143,220,178,.34); border-radius: 6px 18px 6px 18px; background: linear-gradient(120deg, rgba(19,55,39,.72), rgba(9,24,18,.74)); }
     .weekly-hunt-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; }
@@ -504,16 +503,16 @@
 
           <section class="weekly-hunt" aria-labelledby="weekly-hunt-heading">
             <div class="weekly-hunt-heading"><h2 id="weekly-hunt-heading">This Week's Hunt</h2><span>Fresh every Sunday</span></div>
-            <p class="weekly-hunt-copy">The hunt resets weekly, while your case memories and lifetime ledger stay saved.<small>今週の<ruby>探索<rt>たんさく</rt></ruby>は<ruby>毎週日曜日<rt>まいしゅうにちようび</rt></ruby>にリセットされ、<ruby>事件<rt>じけん</rt></ruby>の<ruby>記憶<rt>きおく</rt></ruby>は<ruby>残<rt>のこ</rt></ruby>ります。</small></p>
+            <p class="weekly-hunt-copy">Weekly hunt; lifetime memory stays saved.<small>今週の<ruby>探索<rt>たんさく</rt></ruby>は<ruby>毎週日曜日<rt>まいしゅうにちようび</rt></ruby>にリセットされ、<ruby>記憶<rt>きおく</rt></ruby>は<ruby>残<rt>のこ</rt></ruby>ります。</small></p>
             <div class="weekly-hunt-progress"><progress max="${Math.max(ghosts.length, 1)}" value="${weeklyFoundCount}" aria-label="${weeklyFoundCount} of ${ghosts.length} ghosts found this week"></progress><span class="weekly-hunt-count">${weeklyFoundCount} / ${ghosts.length}</span></div>
             <p class="weekly-hunt-legend">${weeklyRemainingCount ? `${weeklyRemainingCount} ghost${weeklyRemainingCount === 1 ? '' : 's'} available to find again this week.` : 'All ghosts found this week.'}</p>
           </section>
 
           <section class="stats" aria-label="Muenba totals">
-            <div class="stat"><div class="stat-value">${totalCaptures}</div><div class="stat-label">Lifetime captures</div><span class="stat-jp"><ruby>今<rt>いま</rt></ruby>までの<ruby>捕獲<rt>ほかく</rt></ruby></span></div>
-            <div class="stat"><div class="stat-value">${orbs}</div><div class="stat-label">Lifetime orbs</div><span class="stat-jp"><ruby>今<rt>いま</rt></ruby>までのエネルギー</span></div>
-            <div class="stat"><div class="stat-value">${caseSettles}</div><div class="stat-label">Lifetime case records</div><span class="stat-jp"><ruby>事件<rt>じけん</rt></ruby>の<ruby>記録<rt>きろく</rt></ruby></span></div>
-            <div class="stat"><div class="stat-value">${rooms}</div><div class="stat-label">Lifetime rooms visited</div><span class="stat-jp"><ruby>今<rt>いま</rt></ruby>までに<ruby>訪<rt>おとず</rt></ruby>れた<ruby>部屋<rt>へや</rt></ruby></span></div>
+            <div class="stat"><div class="stat-value">${totalCaptures}</div><div class="stat-label">Captures</div></div>
+            <div class="stat"><div class="stat-value">${orbs}</div><div class="stat-label">Orbs</div></div>
+            <div class="stat"><div class="stat-value">${caseSettles}</div><div class="stat-label">Cases</div></div>
+            <div class="stat"><div class="stat-value">${rooms}</div><div class="stat-label">Rooms</div></div>
           </section>
 
           <section class="section">
