@@ -48,7 +48,7 @@ assert(runtime.includes('lineWidth = 4.8'),
   'the arrow directional core must remain present');
 assert(saveFile.includes('worlds:            _defaultWeeklyWorlds()'),
   'weekly reset must continue to recreate transient world state');
-assert(/pages:\s+'booha-pages-2026-399'/.test(serviceWorker),
+assert(/pages:\s+'booha-pages-2026-400'/.test(serviceWorker),
   'the current profile page cache must remain active');
 assert(/assets:\s+'booha-assets-2026-483'/.test(serviceWorker),
   'the current runtime asset cache must remain active');

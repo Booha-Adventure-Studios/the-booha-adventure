@@ -1020,6 +1020,13 @@ else
   bad "Muenba profile weekly audit failed"
 fi
 
+echo "[profile] Muenba Pass A1 profile audit"
+if node tests/muenba-profile-a1-audit.cjs >/dev/null 2>&1; then
+  ok "Muenba compact case-record and spoiler-safe profile contracts pass"
+else
+  bad "Muenba Pass A1 profile audit failed"
+fi
+
 echo "[weekly] Muenba tier-routing audit"
 if node tests/muenba-tier-routing-audit.cjs >/dev/null 2>&1; then
   ok "Muenba selected-tier completion and case routing pass"

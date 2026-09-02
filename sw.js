@@ -10,7 +10,7 @@ const CURRENT_CACHES = {
   // Profile consolidation Pass 1: ship the canonical progress page and its
   // moved progress renderer to returning players.
   // Grimmerglen Pass 2 changes the lifetime-counter profile markup.
-  pages:  'booha-pages-2026-399',
+  pages:  'booha-pages-2026-400',
   // js/ is served cache-first (see ASSET_PREFIXES below), so once a device
   // caches a script it never re-fetches it until this string changes.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first

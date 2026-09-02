@@ -189,10 +189,17 @@
     .case-record-card { padding: 16px; border-left: 3px solid var(--gold); background: rgba(216,201,139,.06); }
     .case-record-card.is-next { border-left-color: var(--moss); background: rgba(143,220,178,.07); }
     .case-record-card.is-locked { border-left-color: rgba(143,220,178,.2); opacity: .72; }
+    .case-record-card.is-settled { border-left-color: var(--gold); }
     .case-record-card h3 { margin: 0; color: #fff5d5; font-size: 1.05rem; font-weight: 400; }
     .case-record-card small { display: block; margin-top: 5px; color: var(--quiet); font: .68rem/1.4 var(--sans); letter-spacing: .06em; text-transform: uppercase; }
-    .case-record-card small.case-memory-progress { color: #b9d9c8; font-size: .62rem; letter-spacing: .04em; }
-    .case-record-card ol { margin: 13px 0 0; padding-left: 21px; color: #f2e8c7; }
+    .case-record-card .case-memory-badge { display: inline-block; width: fit-content; margin-top: 9px; padding: 4px 7px; border: 1px solid rgba(216,201,139,.45); border-radius: 999px; color: #e9d993; font-size: .59rem; letter-spacing: .08em; }
+    .case-record-card.is-next .case-memory-badge { border-color: rgba(143,220,178,.45); color: var(--moss); }
+    .case-record-resolution { margin: 11px 0 0; color: #f2e8c7; font-size: .9rem; line-height: 1.5; }
+    .case-record-review { margin-top: 12px; border-top: 1px solid rgba(216,201,139,.2); padding-top: 9px; }
+    .case-record-review summary { cursor: pointer; color: var(--muted); font: 700 .66rem/1.4 var(--sans); letter-spacing: .06em; text-transform: uppercase; }
+    .case-record-review summary::marker { color: var(--gold); }
+    .case-record-review summary small { display: inline; margin: 0 0 0 7px; color: var(--quiet); font: .78rem var(--font); letter-spacing: 0; text-transform: none; }
+    .case-record-card ol { margin: 11px 0 0; padding-left: 21px; color: #f2e8c7; }
     .case-record-card li { margin: 7px 0; padding-left: 4px; font-size: .86rem; line-height: 1.5; }
     .case-queue-copy { margin: 13px 0 0; color: var(--muted); font-size: .88rem; line-height: 1.55; }
     .case-queue-copy small { margin-top: 7px; color: var(--quiet); font-size: .84em; letter-spacing: 0; text-transform: none; }
@@ -422,44 +429,38 @@
               const isCompleted = completedIds.has(caseData.id);
               const isNext = nextCase && nextCase.id === caseData.id;
               const isCurrentModeComplete = modeComplete(record, currentMemory);
-              const ghost = ghosts.find(candidate => candidate.id === caseData.ghostId);
-              if (isCompleted) {
-                const mode = caseData[record.difficulty] || caseData.fresh;
-                const modeProgress = memoryModes.map(modeName => `${memoryModeLabel(modeName)} ${modeComplete(record, modeName) ? 'complete' : 'open'}`).join(' · ');
-                return `<article class="case-record-card">
+              if (isCompleted || isCurrentModeComplete) {
+                const settledMode = isCompleted
+                  ? (caseData[record.difficulty] || caseData.deep || caseData.fresh)
+                  : (caseData[currentMemory] || caseData.fresh);
+                const settledModeLabel = isCompleted ? 'All memory modes' : memoryModeLabel(currentMemory);
+                const resolution = settledMode?.resolution || 'This case memory is settled.';
+                const reviewLabel = isCompleted ? 'Review all clues' : 'Review clues';
+                const reviewJp = isCompleted ? 'すべての手がかりを見る' : '手がかりを見る';
+                const clueMarkup = (settledMode?.clues || []).map(clue => `<li><strong>${esc(clue.title)}</strong><br>${esc(clue.text)}</li>`).join('');
+                return `<article class="case-record-card is-settled">
                   <h3>${esc(caseData.title)}</h3>
-                  <small>Case ${index + 1} · all memory modes complete · case settled</small>
-                  <small class="case-memory-progress">${esc(modeProgress)}</small>
-                  <ol>${(mode?.clues || []).map(clue => `<li><strong>${esc(clue.title)}</strong><br>${esc(clue.text)}</li>`).join('')}</ol>
-                </article>`;
-              }
-              // Pass 13: settled at the currently-selected memory tier but
-              // not every tier yet — the hunt is strictly sequential, so
-              // this can only be true for a case already passed in the
-              // queue. Previously there was no branch for this state, so a
-              // case like this fell all the way through to "waiting" below
-              // and wrongly claimed it hadn't opened yet.
-              if (isCurrentModeComplete) {
-                const mode = caseData[currentMemory] || caseData.fresh;
-                const modeProgress = memoryModes.map(modeName => `${memoryModeLabel(modeName)} ${modeComplete(record, modeName) ? 'complete' : 'open'}`).join(' · ');
-                return `<article class="case-record-card">
-                  <h3>${esc(caseData.title)}</h3>
-                  <small>Case ${index + 1} · settled at ${esc(memoryModeLabel(currentMemory))}</small>
-                  <small class="case-memory-progress">${esc(modeProgress)}</small>
-                  <ol>${(mode?.clues || []).map(clue => `<li><strong>${esc(clue.title)}</strong><br>${esc(clue.text)}</li>`).join('')}</ol>
+                  <small>Case ${index + 1} · SETTLED</small>
+                  <span class="case-memory-badge">${esc(settledModeLabel)}</span>
+                  <p class="case-record-resolution">${esc(resolution)}</p>
+                  <details class="case-record-review">
+                    <summary>${reviewLabel}<small>${reviewJp}</small></summary>
+                    <ol>${clueMarkup}</ol>
+                  </details>
                 </article>`;
               }
               if (isNext) {
                 return `<article class="case-record-card is-next">
                   <h3>${esc(caseData.title)}</h3>
-                  <small>Case ${index + 1} · ${esc(memoryModeLabel(currentMemory))} · ${esc(ghost?.name || caseData.ghostId)}</small>
-                  <p class="case-queue-copy">Find ${esc(ghost?.name || caseData.ghostId)} in Muenba to open this case.<small>ムエンバで<ruby>幽霊<rt>ゆうれい</rt></ruby>を<ruby>探<rt>さが</rt></ruby>して、この<ruby>事件<rt>じけん</rt></ruby>を<ruby>開<rt>ひら</rt></ruby>こう。</small></p>
+                  <small>Case ${index + 1} · NEXT</small>
+                  <span class="case-memory-badge">${esc(memoryModeLabel(currentMemory))}</span>
+                  <p class="case-queue-copy">Find the next ghost in Muenba to open this case.<small>ムエンバで<ruby>次<rt>つぎ</rt></ruby>の<ruby>幽霊<rt>ゆうれい</rt></ruby>を<ruby>探<rt>さが</rt></ruby>して、この<ruby>事件<rt>じけん</rt></ruby>を<ruby>開<rt>ひら</rt></ruby>こう。</small></p>
                 </article>`;
               }
               return `<article class="case-record-card is-locked">
                 <h3>${esc(caseData.title)}</h3>
-                <small>Case ${index + 1} · waiting</small>
-                <p class="case-queue-copy">This case will open after the earlier case is settled.</p>
+                <small>Case ${index + 1} · WAITING</small>
+                <p class="case-queue-copy">Waiting for the earlier case.<small>前の<ruby>事件<rt>じけん</rt></ruby>を<ruby>待<rt>ま</rt></ruby>っています。</small></p>
               </article>`;
             }).join('')}</div>`
           : `<p class="journal-empty">No case records yet.<small>Complete a ghost case to place its English record here.</small></p>`;
