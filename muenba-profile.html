@@ -143,11 +143,13 @@
     .stat { min-height: 92px; padding: 15px 13px; border: 1px solid var(--line); border-radius: 16px; background: rgba(9,24,18,.7); }
     .stat-value { color: var(--gold); font-size: clamp(1.65rem, 5vw, 2.5rem); line-height: 1; }
     .stat-label { margin-top: 9px; color: var(--muted); font: 700 .65rem/1.4 var(--sans); letter-spacing: .08em; text-transform: uppercase; }
+    .stat-label small { display: block; margin-top: 3px; color: var(--quiet); font: 400 .72rem/1.2 var(--font); letter-spacing: 0; text-transform: none; }
 
     .weekly-hunt { margin-top: 16px; padding: 18px 20px; border: 1px solid rgba(143,220,178,.34); border-radius: 6px 18px 6px 18px; background: linear-gradient(120deg, rgba(19,55,39,.72), rgba(9,24,18,.74)); }
     .weekly-hunt-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; }
     .weekly-hunt-heading h2 { margin: 0; color: #f4fff8; font-size: 1.15rem; font-weight: 400; }
     .weekly-hunt-heading span { color: var(--moss); font: 700 .66rem/1.4 var(--sans); letter-spacing: .08em; text-transform: uppercase; }
+    .weekly-hunt-heading span small { display: block; margin-top: 2px; color: var(--quiet); font: 400 .7rem/1.2 var(--font); letter-spacing: 0; text-transform: none; }
     .weekly-hunt-copy { margin: 8px 0 14px; color: var(--muted); font-size: .84rem; line-height: 1.5; }
     .weekly-hunt-copy small { display: block; margin-top: 4px; color: var(--quiet); font-size: .9em; }
     .weekly-hunt-progress { display: flex; align-items: center; gap: 12px; }
@@ -192,7 +194,9 @@
     .case-record-card.is-settled { border-left-color: var(--gold); }
     .case-record-card h3 { margin: 0; color: #fff5d5; font-size: 1.05rem; font-weight: 400; }
     .case-record-card small { display: block; margin-top: 5px; color: var(--quiet); font: .68rem/1.4 var(--sans); letter-spacing: .06em; text-transform: uppercase; }
+    .case-record-card .case-status-jp { display: inline; margin-left: 7px; color: var(--quiet); font: .78rem var(--font); letter-spacing: 0; text-transform: none; }
     .case-record-card .case-memory-badge { display: inline-block; width: fit-content; margin-top: 9px; padding: 4px 7px; border: 1px solid rgba(216,201,139,.45); border-radius: 999px; color: #e9d993; font-size: .59rem; letter-spacing: .08em; }
+    .case-memory-badge small { display: inline; margin-left: 6px; color: var(--quiet); font: .72rem var(--font); letter-spacing: 0; text-transform: none; }
     .case-record-card.is-next .case-memory-badge { border-color: rgba(143,220,178,.45); color: var(--moss); }
     .case-record-resolution { margin: 11px 0 0; color: #f2e8c7; font-size: .9rem; line-height: 1.5; }
     .case-record-review { margin-top: 12px; border-top: 1px solid rgba(216,201,139,.2); padding-top: 9px; }
@@ -203,6 +207,7 @@
     .case-record-card li { margin: 7px 0; padding-left: 4px; font-size: .86rem; line-height: 1.5; }
     .case-queue-copy { margin: 13px 0 0; color: var(--muted); font-size: .88rem; line-height: 1.55; }
     .case-queue-copy small { margin-top: 7px; color: var(--quiet); font-size: .84em; letter-spacing: 0; text-transform: none; }
+    .weekly-hunt-legend small, .ghost-memory-current small, .journal-entry h3 small small, .orb-label small, .orb-note small { display: block; margin-top: 3px; color: var(--quiet); font: 400 .76rem/1.35 var(--font); letter-spacing: 0; text-transform: none; }
     .difficulty-card { padding: 17px 19px; border: 1px solid rgba(118,151,143,.34); border-radius: 6px 18px 6px 18px; background: rgba(4,11,11,.86); box-shadow: inset 0 0 28px rgba(0,0,0,.24); }
     .difficulty-intro { margin: 0 0 13px; color: var(--muted); font-size: .86rem; line-height: 1.55; }
     .difficulty-intro small { display: block; margin-top: 5px; color: var(--quiet); font-size: .9em; }
@@ -440,8 +445,8 @@
                 const clueMarkup = (settledMode?.clues || []).map(clue => `<li><strong>${esc(clue.title)}</strong><br>${esc(clue.text)}</li>`).join('');
                 return `<article class="case-record-card is-settled">
                   <h3>${esc(caseData.title)}</h3>
-                  <small>Case ${index + 1} · SETTLED</small>
-                  <span class="case-memory-badge">${esc(settledModeLabel)}</span>
+                  <small>Case ${index + 1} · SETTLED<span class="case-status-jp"><ruby>解決<rt>かいけつ</rt></ruby></span></small>
+                  <span class="case-memory-badge">${esc(settledModeLabel)}<small><ruby>完了<rt>かんりょう</rt></ruby></small></span>
                   <p class="case-record-resolution">${esc(resolution)}</p>
                   <details class="case-record-review">
                     <summary>${reviewLabel}<small>${reviewJp}</small></summary>
@@ -452,18 +457,18 @@
               if (isNext) {
                 return `<article class="case-record-card is-next">
                   <h3>${esc(caseData.title)}</h3>
-                  <small>Case ${index + 1} · NEXT</small>
-                  <span class="case-memory-badge">${esc(memoryModeLabel(currentMemory))}</span>
+                  <small>Case ${index + 1} · NEXT<span class="case-status-jp"><ruby>次<rt>つぎ</rt></ruby></span></small>
+                  <span class="case-memory-badge">${esc(memoryModeLabel(currentMemory))}<small><ruby>進行中<rt>しんこうちゅう</rt></ruby></small></span>
                   <p class="case-queue-copy">Find the next ghost in Muenba to open this case.<small>ムエンバで<ruby>次<rt>つぎ</rt></ruby>の<ruby>幽霊<rt>ゆうれい</rt></ruby>を<ruby>探<rt>さが</rt></ruby>して、この<ruby>事件<rt>じけん</rt></ruby>を<ruby>開<rt>ひら</rt></ruby>こう。</small></p>
                 </article>`;
               }
               return `<article class="case-record-card is-locked">
                 <h3>${esc(caseData.title)}</h3>
-                <small>Case ${index + 1} · WAITING</small>
+                <small>Case ${index + 1} · WAITING<span class="case-status-jp"><ruby>待機中<rt>たいきちゅう</rt></ruby></span></small>
                 <p class="case-queue-copy">Waiting for the earlier case.<small>前の<ruby>事件<rt>じけん</rt></ruby>を<ruby>待<rt>ま</rt></ruby>っています。</small></p>
               </article>`;
             }).join('')}</div>`
-          : `<p class="journal-empty">No case records yet.<small>Complete a ghost case to place its English record here.</small></p>`;
+          : `<p class="journal-empty">No case records yet.<small>Complete a ghost case to place its English record here.</small><small>まだ<ruby>事件<rt>じけん</rt></ruby>の<ruby>記録<rt>きろく</rt></ruby>はありません。</small></p>`;
 
         const ghostCards = ghosts.map(ghost => {
           const ghostCase = caseOrder.find(caseData => caseData.ghostId === ghost.id);
@@ -482,7 +487,7 @@
             <p class="ghost-personality">${esc(ghost.personality || '')}</p>
             <p class="ghost-personality-jp">${ghost.personalityJp || ''}</p>
             <p class="ghost-state">${weeklyFound ? 'Found this week' : 'Available this week'}<small>${weeklyFound ? '<ruby>今週<rt>こんしゅう</rt></ruby>みつけた' : '<ruby>今週<rt>こんしゅう</rt></ruby>はまだ'}</small></p>
-            <p class="ghost-memory-current" title="${esc(memoryModeLabel(currentMemory))}">Memory: ${currentModeComplete ? 'settled' : 'open'}<small>${esc(memoryModeLabel(currentMemory))}</small></p>
+            <p class="ghost-memory-current" title="${esc(memoryModeLabel(currentMemory))}">Memory: ${currentModeComplete ? 'settled' : 'open'}<small>${esc(memoryModeLabel(currentMemory))} · ${currentModeComplete ? '<ruby>完了<rt>かんりょう</rt></ruby>' : '<ruby>未完了<rt>みかんりょう</rt></ruby>'}</small></p>
           </article>`;
         }).join('');
 
@@ -491,7 +496,7 @@
               const ghost = ghosts.find(g => g.id === entry.ghostId);
               const caseData = entry.caseId ? cases[entry.caseId] : null;
               return `<article class="journal-entry">
-                <h3>${esc(caseData?.title || ghost?.name || entry.ghostId || 'Unknown ghost')}<small>${caseData ? 'Case settled' : 'Caught'}</small></h3>
+                <h3>${esc(caseData?.title || ghost?.name || entry.ghostId || 'Unknown ghost')}<small>${caseData ? 'Case settled<small><ruby>事件<rt>じけん</rt></ruby>を<ruby>解決<rt>かいけつ</rt></ruby></small>' : 'Caught<small><ruby>捕<rt>つか</rt></ruby>まえた</small>'}</small></h3>
                 ${caseData ? `<p class="journal-case-ghost">${esc(ghost?.name || '')} · ${esc(memoryModeLabel(entry.caseDifficulty || 'fresh'))}</p>` : ''}
                 <p class="journal-meta">${esc(entry.capturedAt ? new Date(entry.capturedAt).toLocaleDateString() : '')}</p>
               </article>`;
@@ -502,21 +507,21 @@
           ${difficultyMarkup()}
 
           <section class="weekly-hunt" aria-labelledby="weekly-hunt-heading">
-            <div class="weekly-hunt-heading"><h2 id="weekly-hunt-heading">This Week's Hunt</h2><span>Fresh every Sunday</span></div>
+            <div class="weekly-hunt-heading"><h2 id="weekly-hunt-heading">This Week's Hunt</h2><span>Fresh every Sunday<small><ruby>毎週日曜日<rt>まいしゅうにちようび</rt></ruby>にリセット</small></span></div>
             <p class="weekly-hunt-copy">Weekly hunt; lifetime memory stays saved.<small>今週の<ruby>探索<rt>たんさく</rt></ruby>は<ruby>毎週日曜日<rt>まいしゅうにちようび</rt></ruby>にリセットされ、<ruby>記憶<rt>きおく</rt></ruby>は<ruby>残<rt>のこ</rt></ruby>ります。</small></p>
             <div class="weekly-hunt-progress"><progress max="${Math.max(ghosts.length, 1)}" value="${weeklyFoundCount}" aria-label="${weeklyFoundCount} of ${ghosts.length} ghosts found this week"></progress><span class="weekly-hunt-count">${weeklyFoundCount} / ${ghosts.length}</span></div>
-            <p class="weekly-hunt-legend">${weeklyRemainingCount ? `${weeklyRemainingCount} ghost${weeklyRemainingCount === 1 ? '' : 's'} available to find again this week.` : 'All ghosts found this week.'}</p>
+            <p class="weekly-hunt-legend">${weeklyRemainingCount ? `${weeklyRemainingCount} ghost${weeklyRemainingCount === 1 ? '' : 's'} available to find again this week.` : 'All ghosts found this week.'}<small>${weeklyRemainingCount ? `今週はあと${weeklyRemainingCount}<ruby>体<rt>たい</rt></ruby>の<ruby>幽霊<rt>ゆうれい</rt></ruby>を<ruby>探<rt>さが</rt></ruby>せます。` : '今週の<ruby>幽霊<rt>ゆうれい</rt></ruby>は<ruby>全部<rt>ぜんぶ</rt></ruby>見つけました。'}</small></p>
           </section>
 
           <section class="stats" aria-label="Muenba totals">
-            <div class="stat"><div class="stat-value">${totalCaptures}</div><div class="stat-label">Captures</div></div>
-            <div class="stat"><div class="stat-value">${orbs}</div><div class="stat-label">Orbs</div></div>
-            <div class="stat"><div class="stat-value">${caseSettles}</div><div class="stat-label">Cases</div></div>
-            <div class="stat"><div class="stat-value">${rooms}</div><div class="stat-label">Rooms</div></div>
+            <div class="stat"><div class="stat-value">${totalCaptures}</div><div class="stat-label">Captures<small><ruby>捕獲<rt>ほかく</rt></ruby></small></div></div>
+            <div class="stat"><div class="stat-value">${orbs}</div><div class="stat-label">Orbs<small>オーブ</small></div></div>
+            <div class="stat"><div class="stat-value">${caseSettles}</div><div class="stat-label">Cases<small><ruby>事件<rt>じけん</rt></ruby></small></div></div>
+            <div class="stat"><div class="stat-value">${rooms}</div><div class="stat-label">Rooms<small><ruby>部屋<rt>へや</rt></ruby></small></div></div>
           </section>
 
           <section class="section">
-            <div class="section-heading"><h2>The Ghosts</h2><p>Weekly hunt · lifetime memory</p></div>
+            <div class="section-heading"><h2>The Ghosts</h2><p>Weekly hunt · lifetime memory<br><ruby>今週<rt>こんしゅう</rt></ruby>の<ruby>探索<rt>たんさく</rt></ruby>・<ruby>記憶<rt>きおく</rt></ruby></p></div>
             <div class="ghost-grid">${ghostCards || '<p class="journal-empty">The ledger is quiet.</p>'}</div>
           </section>
 
@@ -527,7 +532,7 @@
 
           <section class="section lower-grid">
             <div class="panel"><div class="section-heading"><h2>Hunt Journal</h2><p><ruby>探索<rt>たんさく</rt></ruby>ノート</p></div>${journalMarkup}</div>
-            <div class="panel"><div class="section-heading"><h2>Energy Orbs</h2><p>エネルギー</p></div><div class="orb-count">${orbs}</div><div class="orb-label">orbs returned to Nuppi</div><p class="orb-note">Every ghost you catch leaves a trail of these behind — bring them all back before the trail goes cold.</p></div>
+            <div class="panel"><div class="section-heading"><h2>Energy Orbs</h2><p>エネルギー</p></div><div class="orb-count">${orbs}</div><div class="orb-label">orbs returned to Nuppi<small>ヌーピーに<ruby>返<rt>かえ</rt></ruby>したオーブ</small></div><p class="orb-note">Every ghost you catch leaves a trail of these behind — bring them all back before the trail goes cold.<small>幽霊を<ruby>捕<rt>つか</rt></ruby>まえるとオーブが<ruby>残<rt>のこ</rt></ruby>ります。<ruby>消<rt>き</rt></ruby>える<ruby>前<rt>まえ</rt></ruby>に<ruby>全部<rt>ぜんぶ</rt></ruby>ヌーピーへ<ruby>届<rt>とど</rt></ruby>けましょう。</small></p></div>
           </section>`;
 
         host.querySelectorAll('[data-muenba-difficulty]').forEach(button => {

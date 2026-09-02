@@ -2418,7 +2418,11 @@
       void checkPanel.offsetWidth;
       checkPanel.classList.add('muenba-case-wrong-state');
       const hint = checkPanel.querySelector('.muenba-case-check-lock-hint');
-      if (hint) hint.textContent = 'Not quite. Read the record again, then try once more.';
+      if (hint) setCaseDirectionText(
+        hint,
+        'Not quite. Read the record again, then try once more.',
+        '<ruby>記録<rt>きろく</rt></ruby>をもう<ruby>一度<rt>いちど</rt></ruby><ruby>読<rt>よ</rt></ruby>んで、もう<ruby>一度<rt>いちど</rt></ruby><ruby>試<rt>ため</rt></ruby>しましょう。'
+      );
     } else if (box) {
       const feedback = document.createElement('div');
       feedback.className = 'muenba-case-direction muenba-case-feedback muenba-case-feedback-shake';
@@ -2465,7 +2469,7 @@
 
     const label = document.createElement('div');
     label.className = 'muenba-case-check-lock-label';
-    label.textContent = 'CHECK LOCKED';
+    label.innerHTML = 'CHECK LOCKED<small><ruby>確認<rt>かくにん</rt></ruby>はロック<ruby>中<rt>ちゅう</rt></ruby></small>';
     panel.appendChild(label);
 
     const question = renderCaseDirection(
@@ -2476,11 +2480,13 @@
     );
     question.setAttribute('aria-hidden', 'true');
 
-    const lockHint = document.createElement('p');
-    lockHint.className = 'muenba-case-check-lock-hint';
-    lockHint.textContent = 'Read the complete record first.';
+    const lockHint = renderCaseDirection(
+      panel,
+      'Read the complete record first.',
+      'まず<ruby>記録<rt>きろく</rt></ruby>を<ruby>最後<rt>さいご</rt></ruby>まで<ruby>読<rt>よ</rt></ruby>みましょう。',
+      'muenba-case-check-lock-hint'
+    );
     lockHint.setAttribute('aria-live', 'polite');
-    panel.appendChild(lockHint);
 
     const choices = document.createElement('div');
     choices.className = 'muenba-case-choices muenba-case-choices-locked';
@@ -2506,7 +2512,11 @@
         playUiSfx('buttonPress');
         event.preventDefault();
         if (panel.classList.contains('is-locked')) {
-          lockHint.textContent = 'Keep reading. The answers unlock when the record is complete.';
+          setCaseDirectionText(
+            lockHint,
+            'Keep reading. The answers unlock when the record is complete.',
+            '<ruby>読<rt>よ</rt></ruby>み<ruby>続<rt>つづ</rt></ruby>けましょう。<ruby>記録<rt>きろく</rt></ruby>が<ruby>終<rt>お</rt></ruby>わると<ruby>答<rt>こた</rt></ruby>えが<ruby>開<rt>ひら</rt></ruby>きます。'
+          );
           return;
         }
         handleCaseClueAnswer(index, answerSet, mode, button, panel);
@@ -2524,21 +2534,28 @@
     checkPanel.panel.classList.remove('is-locked');
     checkPanel.panel.classList.add('is-unlocked');
     checkPanel.panel.setAttribute('aria-label', 'Record question choices');
-    checkPanel.panel.querySelector('.muenba-case-check-lock-label').textContent = 'CHECK';
+    checkPanel.panel.querySelector('.muenba-case-check-lock-label').innerHTML = 'CHECK<small><ruby>確認<rt>かくにん</rt></ruby></small>';
     const unlockedQuestion = checkPanel.panel.querySelector('.muenba-case-question-locked');
     if (unlockedQuestion) {
       unlockedQuestion.classList.remove('muenba-case-question-locked');
       unlockedQuestion.removeAttribute('aria-hidden');
     }
-    checkPanel.lockHint.textContent = 'The record is complete. Choose the best answer.';
+    setCaseDirectionText(
+      checkPanel.lockHint,
+      'The record is complete. Choose the best answer.',
+      '<ruby>記録<rt>きろく</rt></ruby>が<ruby>終<rt>お</rt></ruby>わりました。いちばん<ruby>合<rt>あ</rt></ruby>う<ruby>答<rt>こた</rt></ruby>えを<ruby>選<rt>えら</rt></ruby>びましょう。'
+    );
     checkPanel.panel.querySelectorAll('.muenba-case-choice').forEach(button => {
       button.classList.remove('muenba-case-choice-locked');
       button.disabled = false;
       button.setAttribute('aria-disabled', 'false');
       button.setAttribute('tabindex', '0');
     });
-    const status = readStatus && readStatus.querySelector('.muenba-case-direction-en');
-    if (status) status.textContent = 'CHECK UNLOCKED. Choose an answer.';
+    if (readStatus) setCaseDirectionText(
+      readStatus,
+      'CHECK UNLOCKED. Choose an answer.',
+      '<ruby>確認<rt>かくにん</rt></ruby>が<ruby>開<rt>ひら</rt></ruby>きました。<ruby>答<rt>こた</rt></ruby>えを<ruby>選<rt>えら</rt></ruby>びましょう。'
+    );
     playCaseUnlockCue();
     focusCaptureControl('.muenba-case-choice[aria-disabled="false"]');
   }
@@ -2752,6 +2769,46 @@
     }
     box.appendChild(direction);
     return direction;
+  }
+
+  function setCaseDirectionText(direction, english, japaneseHtml) {
+    if (!direction) return;
+    const en = direction.querySelector('.muenba-case-direction-en');
+    if (en) en.textContent = english || '';
+    const hasJapanese = typeof japaneseHtml === 'string' && japaneseHtml.trim();
+    let jp = direction.querySelector('.muenba-case-direction-jp');
+    if (hasJapanese) {
+      if (!jp) {
+        jp = document.createElement('p');
+        jp.className = 'muenba-case-direction-jp';
+        direction.appendChild(jp);
+      }
+      jp.innerHTML = japaneseHtml;
+    } else if (jp) {
+      jp.remove();
+    }
+  }
+
+  function renderMuenbaMetric(box, className, english, japaneseHtml) {
+    const metric = document.createElement('p');
+    metric.className = className;
+    const en = document.createElement('span');
+    en.className = 'muenba-metric-en';
+    en.textContent = english;
+    const jp = document.createElement('small');
+    jp.className = 'muenba-metric-jp';
+    jp.innerHTML = japaneseHtml;
+    metric.append(en, jp);
+    box.appendChild(metric);
+    return metric;
+  }
+
+  function setMuenbaMetric(metric, english, japaneseHtml) {
+    if (!metric) return;
+    const en = metric.querySelector('.muenba-metric-en');
+    const jp = metric.querySelector('.muenba-metric-jp');
+    if (en) en.textContent = english;
+    if (jp) jp.innerHTML = japaneseHtml;
   }
 
   function caseActionButton(label, japaneseHtml, id, handler) {
@@ -3632,7 +3689,7 @@
     if (!practice && Number.isInteger(rhythm.difficultyTier)) {
       const tier = document.createElement('p');
       tier.className = 'muenba-rhythm-tier';
-      tier.textContent = `Haunting level ${rhythm.difficultyTier + 1} · ${rhythm.difficultyLabel}`;
+      tier.innerHTML = `Haunting level ${rhythm.difficultyTier + 1} · ${rhythm.difficultyLabel}<small><ruby>怪異<rt>かいい</rt></ruby>レベル ${rhythm.difficultyTier + 1}</small>`;
       box.appendChild(tier);
     }
 
@@ -3645,25 +3702,31 @@
       );
     }
 
-    const status = document.createElement('p');
-    status.className = 'muenba-rhythm-status';
-    status.textContent = 'Get ready…';
+    const status = renderCaseDirection(
+      box,
+      'Get ready…',
+      '<ruby>準備<rt>じゅんび</rt></ruby>しよう…',
+      'muenba-rhythm-status'
+    );
     status.setAttribute('aria-live', 'polite');
     status.setAttribute('role', 'status');
-    box.appendChild(status);
     rhythm.statusEl = status;
 
-    const accuracy = document.createElement('p');
-    accuracy.className = 'muenba-rhythm-accuracy';
-    accuracy.textContent = 'Accuracy: 0%';
-    box.appendChild(accuracy);
+    const accuracy = renderMuenbaMetric(
+      box,
+      'muenba-rhythm-accuracy',
+      'Accuracy: 0%',
+      '<ruby>正確<rt>せいかく</rt></ruby>さ: 0%'
+    );
     rhythm.accuracyEl = accuracy;
 
-    const combo = document.createElement('p');
-    combo.className = 'muenba-rhythm-combo';
-    combo.textContent = 'Combo: 0';
+    const combo = renderMuenbaMetric(
+      box,
+      'muenba-rhythm-combo',
+      'Combo: 0',
+      '<ruby>連続<rt>れんぞく</rt></ruby>: 0'
+    );
     combo.setAttribute('aria-live', 'polite');
-    box.appendChild(combo);
     rhythm.comboEl = combo;
 
     const energy = document.createElement('div');
@@ -3675,7 +3738,7 @@
     energy.setAttribute('aria-valuenow', '0');
     const energyLabel = document.createElement('span');
     energyLabel.className = 'muenba-rhythm-energy-label';
-    energyLabel.textContent = 'GHOST ENERGY';
+    energyLabel.innerHTML = 'GHOST ENERGY<small><ruby>幽霊<rt>ゆうれい</rt></ruby>のエネルギー</small>';
     const energyTrack = document.createElement('span');
     energyTrack.className = 'muenba-rhythm-energy-track';
     const energyFill = document.createElement('span');
@@ -3805,7 +3868,11 @@
         captureSession.phase = 'playing';
         showRhythmFeedback('GO!', 'go');
       } else if (rhythm.statusEl) {
-        rhythm.statusEl.textContent = String(Math.max(1, Math.ceil(remaining / 600)));
+        setCaseDirectionText(
+          rhythm.statusEl,
+          String(Math.max(1, Math.ceil(remaining / 600))),
+          '<ruby>準備<rt>じゅんび</rt></ruby>…'
+        );
       }
     }
 
@@ -3970,9 +4037,17 @@
     while (rhythm.nextIndex < rhythm.chart.length && rhythm.resolvedIndices.has(rhythm.nextIndex)) {
       rhythm.nextIndex += 1;
     }
-    if (rhythm.accuracyEl) rhythm.accuracyEl.textContent = `Accuracy: ${rhythmAccuracy(rhythm)}%`;
+    setMuenbaMetric(
+      rhythm.accuracyEl,
+      `Accuracy: ${rhythmAccuracy(rhythm)}%`,
+      `<ruby>正確<rt>せいかく</rt></ruby>さ: ${rhythmAccuracy(rhythm)}%`
+    );
     if (rhythm.comboEl) {
-      rhythm.comboEl.textContent = rhythm.combo >= 2 ? `${rhythm.combo} COMBO` : 'Combo: 0';
+      const comboText = rhythm.combo >= 2 ? `${rhythm.combo} COMBO` : 'Combo: 0';
+      const comboJp = rhythm.combo >= 2
+        ? `${rhythm.combo}<ruby>連続<rt>れんぞく</rt></ruby>`
+        : '<ruby>連続<rt>れんぞく</rt></ruby>: 0';
+      setMuenbaMetric(rhythm.comboEl, comboText, comboJp);
       rhythm.comboEl.classList.toggle('is-hot', rhythm.combo >= 3);
     }
     if (rhythm.energyFillEl) {
@@ -4000,8 +4075,19 @@
     const comboText = (kind === 'perfect' || kind === 'good') && rhythm.combo >= 2
       ? ` · ${rhythm.combo} COMBO`
       : '';
-    rhythm.statusEl.textContent = `${text}${comboText}`;
-    rhythm.statusEl.className = `muenba-rhythm-status ${kind || ''}`;
+    const statusJapanese = {
+      go: '<ruby>始<rt>はじ</rt></ruby>めよう！',
+      perfect: '<ruby>完璧<rt>かんぺき</rt></ruby>！',
+      good: 'いいね！',
+      early: '<ruby>早<rt>はや</rt></ruby>すぎます・<ruby>後<rt>あと</rt></ruby>でタップ',
+      late: '<ruby>遅<rt>おそ</rt></ruby>いです・<ruby>早<rt>はや</rt></ruby>くタップ',
+      miss: '<ruby>違<rt>ちが</rt></ruby>うレーン',
+      decoy: '<ruby>偽物<rt>にせもの</rt></ruby>の<ruby>音符<rt>おんぷ</rt></ruby>・<ruby>押<rt>お</rt></ruby>さないで'
+    }[kind] || 'リズムの<ruby>判定<rt>はんてい</rt></ruby>';
+    const comboJapanese = comboText ? `・${rhythm.combo}<ruby>連続<rt>れんぞく</rt></ruby>` : '';
+    setCaseDirectionText(rhythm.statusEl, `${text}${comboText}`, `${statusJapanese}${comboJapanese}`);
+    rhythm.statusEl.classList.remove('perfect', 'good', 'go', 'miss', 'early', 'late', 'decoy');
+    if (kind) rhythm.statusEl.classList.add(kind);
     if (rhythm.feedbackEl) {
       const feedbackLabel = {
         go: 'GO!',
@@ -4012,7 +4098,16 @@
         miss: 'MISS',
         decoy: 'FAKE NOTE'
       }[kind] || text;
-      rhythm.feedbackEl.textContent = feedbackLabel;
+      const feedbackJapanese = {
+        go: '<ruby>開始<rt>かいし</rt></ruby>！',
+        perfect: '<ruby>完璧<rt>かんぺき</rt></ruby>',
+        good: 'いいね',
+        early: '<ruby>早<rt>はや</rt></ruby>すぎ',
+        late: '<ruby>遅<rt>おそ</rt></ruby>い',
+        miss: '<ruby>ミス</ruby>',
+        decoy: '<ruby>偽物<rt>にせもの</rt></ruby>'
+      }[kind] || 'リズム';
+      rhythm.feedbackEl.innerHTML = `<span class="muenba-rhythm-feedback-en">${feedbackLabel}</span><small class="muenba-rhythm-feedback-jp">${feedbackJapanese}</small>`;
       rhythm.feedbackEl.className = `muenba-rhythm-feedback ${kind || ''}`;
       void rhythm.feedbackEl.offsetWidth;
       rhythm.feedbackEl.classList.add('is-visible');
@@ -4208,9 +4303,12 @@
       : 'もう<ruby>一度<rt>いちど</rt></ruby><ruby>練習<rt>れんしゅう</rt></ruby>しよう';
     box.appendChild(jp);
 
-    const p = document.createElement('p');
-    p.textContent = `Practice accuracy: ${accuracy}%. Your hunt progress did not change.`;
-    box.appendChild(p);
+    renderCaseDirection(
+      box,
+      `Practice accuracy: ${accuracy}%. Your hunt progress did not change.`,
+      `<ruby>練習<rt>れんしゅう</rt></ruby>の<ruby>正確<rt>せいかく</rt></ruby>さは${accuracy}%です。<ruby>探索<rt>たんさく</rt></ruby>の<ruby>記録<rt>きろく</rt></ruby>は<ruby>変<rt>か</rt></ruby>わりません。`,
+      'muenba-rhythm-practice-summary'
+    );
     renderCaseDirection(
       box,
       'Try the easy chart again, or return to the ghost rhythm.',
@@ -4327,7 +4425,6 @@
       captureOverlay.classList.add('muenba-rhythm-mode');
     }
     const ghost = captureSession.ghost;
-    const p = document.createElement('p');
     const danger = !!captureSession.danger;
     const carriedEnergyLost = danger && captureSession.carriedEnergyLost === true;
     const noNewEnergy = !danger && captureSession.noNewEnergy === true;
@@ -4363,14 +4460,25 @@
     // caught Booha — it was never his hunt target, so this never leads to
     // a capture reward (see finishRhythmCapture()/dismissDangerGhost()).
     const dangerCanHide = danger && captureSession.dangerCanHide === true;
-    p.textContent = message || (carriedEnergyLost
+    const resultText = message || (carriedEnergyLost
       ? 'The angry ghosts took the energy orbs. Your hunt starts again.'
       : noNewEnergy
       ? 'The energy for this hunt is already safe.'
       : danger
       ? `Accuracy: ${accuracy}%. ${success ? 'The angry ghost lost its nerve and slipped away. It will not bother you again for now.' : dangerCanHide ? 'The angry ghost knocked Booha back. Hide, try again, or give up and retreat to Nuppi.' : 'The angry ghost knocked Booha back. Try the danger rhythm again, or give up and retreat to Nuppi.'}`
       : `Accuracy: ${accuracy}%. ${success ? 'The capture is ready for the reward step.' : 'The ghost is still waiting for you.'}`);
-    box.appendChild(p);
+    const resultJapanese = message === 'The rhythm was good, but the capture could not be saved. Please try again.'
+      ? 'リズムはよかったですが、<ruby>捕獲<rt>ほかく</rt></ruby>を<ruby>保存<rt>ほぞん</rt></ruby>できませんでした。もう<ruby>一度<rt>いちど</rt></ruby><ruby>試<rt>ため</rt></ruby>しましょう。'
+      : message === 'The hunt is complete, but there is no new energy to return this week.'
+      ? '<ruby>探索<rt>たんさく</rt></ruby>は<ruby>完了<rt>かんりょう</rt></ruby>しましたが、<ruby>今週<rt>こんしゅう</rt></ruby>に<ruby>戻<rt>もど</rt></ruby>す<ruby>新<rt>あたら</rt></ruby>しいエネルギーはありません。'
+      : carriedEnergyLost
+      ? '<ruby>怒<rt>おこ</rt></ruby>った<ruby>幽霊<rt>ゆうれい</rt></ruby>にオーブを<ruby>取<rt>と</rt></ruby>られました。もう<ruby>一度<rt>いちど</rt></ruby><ruby>探索<rt>たんさく</rt></ruby>を<ruby>始<rt>はじ</rt></ruby>めましょう。'
+      : noNewEnergy
+      ? 'この<ruby>探索<rt>たんさく</rt></ruby>のエネルギーはもう<ruby>安全<rt>あんぜん</rt></ruby>です。'
+      : danger
+      ? (success ? '<ruby>正確<rt>せいかく</rt></ruby>さは' + accuracy + '%。<ruby>怒<rt>おこ</rt></ruby>った<ruby>幽霊<rt>ゆうれい</rt></ruby>は<ruby>逃<rt>に</rt></ruby>げました。' : '<ruby>正確<rt>せいかく</rt></ruby>さは' + accuracy + '%。<ruby>怒<rt>おこ</rt></ruby>った<ruby>幽霊<rt>ゆうれい</rt></ruby>に<ruby>押<rt>お</rt></ruby>し<ruby>戻<rt>もど</rt></ruby>されました。')
+      : `<ruby>正確<rt>せいかく</rt></ruby>さは${accuracy}%です。${success ? '<ruby>報酬<rt>ほうしゅう</rt></ruby>を<ruby>受<rt>う</rt></ruby>け<ruby>取<rt>と</rt></ruby>る<ruby>準備<rt>じゅんび</rt></ruby>ができました。' : '<ruby>幽霊<rt>ゆうれい</rt></ruby>はまだ<ruby>待<rt>ま</rt></ruby>っています。'}`;
+    renderCaseDirection(box, resultText, resultJapanese, 'muenba-rhythm-result-summary');
 
     if (captureSession.rhythm && captureSession.rhythm.bestCombo >= 2) {
       const combo = document.createElement('p');
@@ -4484,11 +4592,13 @@
     box.appendChild(orbList);
     reward.orbListEl = orbList;
 
-    const status = document.createElement('p');
-    status.className = 'muenba-orb-release-status';
-    status.textContent = `Energy released: 0 / ${reward.total}`;
+    const status = renderMuenbaMetric(
+      box,
+      'muenba-orb-release-status',
+      `Energy released: 0 / ${reward.total}`,
+      `エネルギーを<ruby>解放<rt>かいほう</rt></ruby>: 0 / ${reward.total}`
+    );
     status.setAttribute('aria-live', 'polite');
-    box.appendChild(status);
     reward.statusEl = status;
 
     renderCaseDirection(
@@ -4522,7 +4632,11 @@
     if (!captureSession || captureSession.phase !== 'reward' || !captureSession.reward) return;
     const reward = captureSession.reward;
     if (reward.revealed >= reward.total) {
-      if (reward.statusEl) reward.statusEl.textContent = `Energy released: ${reward.total} / ${reward.total}`;
+      setMuenbaMetric(
+        reward.statusEl,
+        `Energy released: ${reward.total} / ${reward.total}`,
+        `エネルギーを<ruby>解放<rt>かいほう</rt></ruby>: ${reward.total} / ${reward.total}`
+      );
       if (reward.actionsEl && !reward.actionsEl.children.length) {
         reward.actionsEl.appendChild(captureButton('Return to Nuppi', 'ヌーピーのところへ<ruby>戻<rt>もど</rt></ruby>る', 'muenba-capture-return', leaveCaptureForNuppi));
         focusCaptureControl('#muenba-capture-return');
@@ -4536,7 +4650,11 @@
     orb.setAttribute('aria-label', `Energy orb ${reward.revealed + 1}`);
     reward.orbListEl.appendChild(orb);
     reward.revealed += 1;
-    if (reward.statusEl) reward.statusEl.textContent = `Energy released: ${reward.revealed} / ${reward.total}`;
+    setMuenbaMetric(
+      reward.statusEl,
+      `Energy released: ${reward.revealed} / ${reward.total}`,
+      `エネルギーを<ruby>解放<rt>かいほう</rt></ruby>: ${reward.revealed} / ${reward.total}`
+    );
     reward.revealTimer = window.setTimeout(releaseNextOrb, 520);
   }
 
@@ -5056,13 +5174,17 @@
       .muenba-case-check-panel.is-locked { border-color:rgba(170,150,255,.28); background:rgba(25,22,51,.34); box-shadow:none; }
       .muenba-case-check-panel.is-unlocked { border-color:rgba(206,190,255,.72); background:linear-gradient(135deg,rgba(83,61,155,.22),rgba(38,29,81,.28)); box-shadow:0 0 28px rgba(100,77,184,.24); }
       .muenba-case-check-lock-label { margin:0 0 8px; color:#c9baff; font:900 .7rem/1.35 ui-monospace,monospace; letter-spacing:.14em; text-align:left; }
+      .muenba-case-check-lock-label small { display:block; margin-top:3px; color:#9b91c1; font:400 .78rem/1.4 Georgia,'Times New Roman',serif; letter-spacing:0; }
       .muenba-case-check-panel.is-locked .muenba-case-check-lock-label { color:rgba(201,186,255,.52); }
       .muenba-case-check-panel .muenba-case-question { margin:0 0 11px; }
       .muenba-case-question-locked { border-color:rgba(170,150,255,.22) !important; background:rgba(30,25,64,.22) !important; box-shadow:none !important; animation:none !important; }
       .muenba-case-question-locked .muenba-case-direction-en { color:rgba(238,234,255,.34) !important; text-shadow:none !important; }
       .muenba-case-question-locked .muenba-case-direction-jp { color:rgba(201,186,255,.3) !important; }
-      .muenba-case-check-lock-hint { margin:0 0 10px; color:#9b91c1; font:600 .76rem/1.45 system-ui,-apple-system,sans-serif; text-align:left; }
-      .muenba-case-check-panel.is-unlocked .muenba-case-check-lock-hint { color:#d8d0ff; }
+      .muenba-case-check-lock-hint { margin:0 0 10px; padding:8px 10px; border-color:rgba(174,145,255,.2); background:rgba(89,65,151,.06); }
+      .muenba-case-check-lock-hint .muenba-case-direction-en { color:#9b91c1; font:600 .76rem/1.45 system-ui,-apple-system,sans-serif; }
+      .muenba-case-check-lock-hint .muenba-case-direction-jp { color:#8178a8; font-size:.76rem; }
+      .muenba-case-check-panel.is-unlocked .muenba-case-check-lock-hint { border-color:rgba(174,145,255,.36); background:rgba(89,65,151,.12); }
+      .muenba-case-check-panel.is-unlocked .muenba-case-check-lock-hint .muenba-case-direction-en { color:#d8d0ff; }
       .muenba-case-choices-locked { margin-top:10px; }
       .muenba-case-choice-locked { border-color:rgba(174,145,255,.2) !important; background:rgba(89,65,151,.07) !important; color:rgba(242,237,255,.34) !important; cursor:not-allowed; filter:saturate(.45); }
       .muenba-case-choice-locked .muenba-case-choice-number { border-color:rgba(174,145,255,.2); color:rgba(231,221,255,.34); background:rgba(89,65,151,.08); }
@@ -5156,11 +5278,14 @@
       .muenba-danger-box .muenba-rhythm-note.is-miss { border-color:#ff7180; background:rgba(83,7,19,.8); }
       .muenba-capture-orbs { margin-top:-6px; color:#9ccbb6; font-size:.82rem; letter-spacing:.05em; }
       .muenba-capture-action { touch-action:manipulation; }
-      .muenba-rhythm-status { min-height:1.5em; margin:2px 0 2px !important; color:#d8f2e2 !important; font:700 1.08rem/1.4 ui-monospace,monospace !important; text-align:center !important; letter-spacing:.08em; }
+      .muenba-rhythm-status { min-height:1.5em; margin:2px 0 2px !important; padding:0; border:0; background:none; color:#d8f2e2 !important; text-align:center !important; letter-spacing:.08em; }
+      .muenba-rhythm-status .muenba-case-direction-en { color:inherit !important; font:700 1.08rem/1.25 ui-monospace,monospace !important; text-align:center; }
+      .muenba-rhythm-status .muenba-case-direction-jp { color:#a8cbbb; font-size:.73rem; line-height:1.25; text-align:center; }
       .muenba-rhythm-status.perfect, .muenba-rhythm-status.good, .muenba-rhythm-status.go { color:#8fe0ad !important; }
       .muenba-rhythm-status.miss, .muenba-rhythm-status.early, .muenba-rhythm-status.late { color:#e8b0b8 !important; }
       .muenba-rhythm-status.decoy { color:#ffe09b !important; }
       .muenba-rhythm-tier { margin:0 0 7px !important; color:#d8c98b !important; font:700 .68rem/1.35 ui-monospace,monospace !important; letter-spacing:.08em; text-align:center !important; text-transform:uppercase; }
+      .muenba-rhythm-tier small { display:block; margin-top:3px; color:#a99d75; font:400 .72rem/1.3 Georgia,'Times New Roman',serif; letter-spacing:0; text-transform:none; }
       .muenba-rhythm-help-button { position:absolute; top:10px; left:10px; z-index:8; display:grid; place-items:center; width:30px; height:30px; padding:0; border:1px solid rgba(216,201,139,.72); border-radius:50%; color:#fff5d5; background:rgba(40,32,12,.72); box-shadow:0 0 14px rgba(216,201,139,.28); font:900 17px/1 Georgia,'Times New Roman',serif; cursor:pointer; }
       .muenba-rhythm-help-button:hover, .muenba-rhythm-help-button:focus-visible { border-color:#fff1ae; background:rgba(126,111,48,.58); box-shadow:0 0 24px rgba(216,201,139,.48); outline:none; }
       .muenba-rhythm-help-box { border-color:rgba(216,201,139,.54); box-shadow:0 24px 80px rgba(0,0,0,.82),0 0 60px rgba(126,111,48,.22),inset 0 0 70px rgba(0,0,0,.58); }
@@ -5170,10 +5295,13 @@
       .muenba-rhythm-result-failure { border-color:rgba(255,135,67,.8) !important; animation:muenbaRhythmResultShake .28s ease-out; }
       @keyframes muenbaRhythmResultShake { 20% { transform:translateX(-4px); } 50% { transform:translateX(4px); } 80% { transform:translateX(-2px); } }
       .muenba-rhythm-accuracy { margin:0 0 7px !important; color:#9ccbb6 !important; font:700 .72rem/1.4 ui-monospace,monospace !important; text-align:center !important; letter-spacing:.08em; }
+      .muenba-metric-en, .muenba-metric-jp { display:block; }
+      .muenba-metric-jp { margin-top:2px; color:#91ad9e; font:400 .7rem/1.25 Georgia,'Times New Roman',serif; letter-spacing:0; text-transform:none; }
       .muenba-rhythm-combo { min-height:1.2em; margin:0 0 4px !important; color:#ffb347 !important; font:900 .9rem/1.2 ui-monospace,monospace !important; letter-spacing:.14em; text-align:center !important; text-shadow:0 0 12px rgba(255,145,45,.38); text-transform:uppercase; }
       .muenba-rhythm-combo.is-hot { color:#c9ff54 !important; animation:muenbaRhythmComboPop .28s ease-out; text-shadow:0 0 16px rgba(164,255,58,.75); }
       .muenba-rhythm-energy { display:flex; align-items:center; gap:8px; margin:0 auto 7px; width:min(100%,360px); }
-      .muenba-rhythm-energy-label { flex:0 0 auto; color:#88b8ff; font:900 .58rem/1 ui-monospace,monospace; letter-spacing:.1em; }
+      .muenba-rhythm-energy-label { display:flex; flex:0 0 auto; flex-direction:column; align-items:flex-start; gap:2px; color:#88b8ff; font:900 .58rem/1 ui-monospace,monospace; letter-spacing:.1em; }
+      .muenba-rhythm-energy-label small { color:#a4badf; font:400 .66rem/1.1 Georgia,'Times New Roman',serif; letter-spacing:0; }
       .muenba-rhythm-energy-track { position:relative; flex:1; height:7px; overflow:hidden; border:1px solid rgba(137,184,255,.5); border-radius:99px; background:rgba(7,13,29,.86); box-shadow:inset 0 0 7px rgba(40,21,93,.8); }
       .muenba-rhythm-energy-fill { display:block; width:0; height:100%; border-radius:inherit; background:linear-gradient(90deg,#8c5bff,#26e6a0,#d8ff4f); box-shadow:0 0 14px rgba(112,255,170,.72); transition:width .18s ease-out; }
       .muenba-rhythm-board { position:relative; display:grid; grid-template-columns:1fr 1fr; gap:8px; height:clamp(160px,32vh,250px); min-height:0; margin:8px 0 6px; padding:5px; border:1px solid rgba(143,104,255,.28); border-radius:18px; background:radial-gradient(circle at 50% 100%,rgba(255,122,27,.1),transparent 48%),rgba(5,5,19,.64); box-shadow:inset 0 0 24px rgba(68,35,143,.26); }
@@ -5188,6 +5316,8 @@
       .muenba-rhythm-rail { position:absolute; inset:29px 0 0; pointer-events:none; }
       .muenba-rhythm-hit-line { position:absolute; z-index:5; left:8px; right:8px; top:calc(100% - 45px); height:3px; border-radius:99px; background:#ffab45; box-shadow:0 0 10px rgba(255,134,35,.72),0 0 24px rgba(255,91,20,.4); pointer-events:none; }
       .muenba-rhythm-feedback { position:absolute; z-index:10; left:50%; top:calc(100% - 82px); min-width:96px; padding:4px 9px; border:1px solid rgba(255,213,133,.72); border-radius:999px; color:#fff4ce; background:rgba(38,24,8,.9); box-shadow:0 0 20px rgba(255,153,46,.38); font:900 .7rem/1.2 ui-monospace,monospace; letter-spacing:.12em; text-align:center; opacity:0; pointer-events:none; transform:translate(-50%,8px); }
+      .muenba-rhythm-feedback-en, .muenba-rhythm-feedback-jp { display:block; }
+      .muenba-rhythm-feedback-jp { margin-top:2px; color:#e1cda0; font:400 .68rem/1.2 Georgia,'Times New Roman',serif; letter-spacing:0; }
       .muenba-rhythm-feedback.is-visible { animation:muenbaRhythmFeedback .62s ease-out both; }
       .muenba-rhythm-feedback.perfect { border-color:#b6ff86; color:#eaffce; box-shadow:0 0 24px rgba(132,255,94,.54); }
       .muenba-rhythm-feedback.good { border-color:#8fd7ff; color:#dff4ff; box-shadow:0 0 22px rgba(73,177,255,.44); }

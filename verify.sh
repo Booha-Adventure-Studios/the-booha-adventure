@@ -1048,6 +1048,13 @@ else
   bad "Muenba Pass B popup-shell audit failed"
 fi
 
+echo "[language] Muenba Pass C language-consistency audit"
+if node tests/muenba-language-consistency-audit.cjs >/dev/null 2>&1; then
+  ok "Muenba bilingual instructional and status contracts pass"
+else
+  bad "Muenba Pass C language-consistency audit failed"
+fi
+
 echo "[weekly] Muenba tier-routing audit"
 if node tests/muenba-tier-routing-audit.cjs >/dev/null 2>&1; then
   ok "Muenba selected-tier completion and case routing pass"
