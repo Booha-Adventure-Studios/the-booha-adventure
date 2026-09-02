@@ -5575,7 +5575,7 @@
       .muenba-nuppi-status-card p,
       .muenba-nuppi-success-card p,
       .muenba-nuppi-next-card p { margin:0; color:#dae9df; font-size:.9rem; line-height:1.5; }
-      .muenba-room-hunt-target { margin:0 0 14px; padding:12px 14px 13px; border:1px solid rgba(216,201,139,.48); border-radius:14px; background:linear-gradient(145deg,rgba(126,111,48,.17),rgba(35,34,17,.24)); box-shadow:inset 0 0 20px rgba(216,201,139,.04),0 0 18px rgba(216,201,139,.08); text-align:left; }
+      .muenba-room-hunt-target { box-sizing:border-box; width:100%; margin:0 0 14px; padding:12px 14px 13px; border:1px solid rgba(216,201,139,.48); border-radius:14px; background:linear-gradient(145deg,rgba(126,111,48,.17),rgba(35,34,17,.24)); box-shadow:inset 0 0 20px rgba(216,201,139,.04),0 0 18px rgba(216,201,139,.08); text-align:left; }
       .muenba-room-hunt-target-label { margin:0; color:#f1d78d; font:900 .65rem/1.35 ui-monospace,monospace; letter-spacing:.15em; text-transform:uppercase; }
       .muenba-room-hunt-target-label-jp { margin:3px 0 9px; color:#c5b778; font-size:.78rem; line-height:1.45; }
       .muenba-room-hunt-target-body { display:flex; align-items:center; gap:12px; min-width:0; }
@@ -5886,6 +5886,11 @@
         .muenba-mission-hint-toggle { min-height:42px; }
         .muenba-room-hunt-target { padding:11px 12px 12px; }
         .muenba-room-hunt-target-portrait { flex-basis:64px; width:64px; height:64px; }
+      }
+      @media (max-width:360px) {
+        .muenba-room-hunt-target-body { gap:8px; }
+        .muenba-room-hunt-target-portrait { flex-basis:56px; width:56px; height:56px; }
+        .muenba-room-hunt-target-label { letter-spacing:.11em; }
       }
       @media (prefers-reduced-motion: reduce) { .muenba-orb-release, .muenba-hunt-ghost-portrait, .muenba-gold-action, .muenba-read-ready { animation:none !important; } }
       @media (prefers-reduced-motion: reduce) { #muenba-fade, .muenba-return-box, #muenba-return-overlay, .muenba-lobby-box, #muenba-lobby-overlay, #muenba-capture-overlay { transition:none !important; } .muenba-lobby-portrait, #muenba-hide, #muenba-celebration-status, .muenba-rhythm-board, .muenba-rhythm-combo, .muenba-rhythm-feedback, .muenba-rhythm-receptor, .muenba-rhythm-result-failure, .muenba-case-question, .muenba-case-question::before, .muenba-case-feedback-shake, .muenba-case-read-status, .muenba-energy-warning, .muenba-case-clue.muenba-reading-complete > .muenba-case-reading-status, .muenba-case-clue.muenba-reading-complete > .muenba-case-check-panel { animation:none !important; } .muenba-case-choice, .muenba-case-action, .muenba-capture-action { transition:none !important; } .muenba-rhythm-energy-fill { transition:none !important; } #muenba-profile-link { transition:none !important; } }
@@ -6992,12 +6997,12 @@
           ? 'プロフィールで<ruby>別<rt>べつ</rt></ruby>の<ruby>読<rt>よ</rt></ruby>み<ruby>方<rt>かた</rt></ruby>を<ruby>選<rt>えら</rt></ruby>ぶと、<ruby>英語<rt>えいご</rt></ruby>の<ruby>事件<rt>じけん</rt></ruby>を<ruby>続<rt>つづ</rt></ruby>けられるよ。'
           : 'ヌーピーはここで<ruby>待<rt>ま</rt></ruby>っているよ。';
     const huntTargetHTML = waitingForCase && waitingGhost
-      ? `<section class="muenba-room-hunt-target" aria-labelledby="muenba-room-hunt-target-title">
+      ? `<section class="muenba-room-hunt-target" aria-labelledby="muenba-room-hunt-target-title muenba-room-hunt-target-name">
           <div id="muenba-room-hunt-target-title" class="muenba-room-hunt-target-label">FIND THIS GHOST</div>
           <p class="muenba-room-hunt-target-label-jp">この<ruby>幽霊<rt>ゆうれい</rt></ruby>を<ruby>見<rt>み</rt></ruby>つけよう</p>
           <div class="muenba-room-hunt-target-body">
-            <img class="muenba-room-hunt-target-portrait" src="${escapeHtml(waitingGhost.img)}" alt="${escapeHtml(waitingGhostName)}">
-            <div class="muenba-room-hunt-target-copy"><h3>${escapeHtml(waitingGhostName)}</h3><p>${escapeHtml(waitingGhost.kana || '')}</p></div>
+            <img class="muenba-room-hunt-target-portrait" src="${escapeHtml(waitingGhost.img)}" alt="">
+            <div class="muenba-room-hunt-target-copy"><h3 id="muenba-room-hunt-target-name">${escapeHtml(waitingGhostName)}</h3><p>${escapeHtml(waitingGhost.kana || '')}</p></div>
           </div>
         </section>`
       : '';
