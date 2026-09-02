@@ -18,6 +18,8 @@ assert(muenba.includes('if (Number(weekly.orbsPending) <= 0)'),
   'legacy-target recovery must require that no energy handoff is pending');
 assert(muenba.includes('patch.activeCaseId = recoveredCase.id'),
   'legacy accepted hunts must persist the recovered active case id');
+assert(muenba.includes('patch.activeHuntGhostId = recoveredGhost.id'),
+  'legacy completed-tier hunts must persist the recovered weekly ghost id');
 assert(muenba.includes('weekly.activeCaseId = null;'),
   'successful capture must clear the accepted target');
 assert(muenba.includes('weekly.activeHuntGhostId = null;'),
@@ -30,9 +32,9 @@ assert(muenba.includes('function acceptMuenbaHunt(target)'),
   'hunt acceptance must receive the target shown on the card');
 assert(muenba.includes('activeHuntGhostId: knownGhost.id'),
   'hunt acceptance must persist the displayed ghost id');
-assert(muenba.includes('const huntTarget = !pending && weekly.huntAccepted === true'),
+assert(muenba.includes('const huntAccepted = !pending && weekly.huntAccepted === true;'),
   'the room popup must use the canonical target and remain empty during handoff');
-assert(serviceWorker.includes("assets: 'booha-assets-2026-490'"),
+assert(serviceWorker.includes("assets: 'booha-assets-2026-491'"),
   'the target-recovery runtime must be shipped through the current asset cache');
 
 console.log('Muenba target recovery audit passed: legacy accepted hunts, handoff safety, completion cleanup, and cache delivery are covered.');
