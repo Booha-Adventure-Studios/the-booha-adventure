@@ -26,9 +26,13 @@ assert(saveFile.includes('activeHuntGhostId: null'),
   'weekly Muenba state must include a canonical case-less hunt target slot');
 assert(muenba.includes('function getMuenbaHuntTarget({ activeOnly = false } = {})'),
   'Nuppi, capture, and spawn paths must share one target resolver');
+assert(muenba.includes('function acceptMuenbaHunt(target)'),
+  'hunt acceptance must receive the target shown on the card');
+assert(muenba.includes('activeHuntGhostId: knownGhost.id'),
+  'hunt acceptance must persist the displayed ghost id');
 assert(muenba.includes('const huntTarget = !pending && weekly.huntAccepted === true'),
   'the room popup must use the canonical target and remain empty during handoff');
-assert(serviceWorker.includes("assets: 'booha-assets-2026-489'"),
+assert(serviceWorker.includes("assets: 'booha-assets-2026-490'"),
   'the target-recovery runtime must be shipped through the current asset cache');
 
 console.log('Muenba target recovery audit passed: legacy accepted hunts, handoff safety, completion cleanup, and cache delivery are covered.');
