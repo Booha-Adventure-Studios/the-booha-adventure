@@ -11,13 +11,13 @@ const root = path.join(__dirname, '..');
 const runtime = fs.readFileSync(path.join(root, 'js', 'grimmerglen.js'), 'utf8');
 const serviceWorker = fs.readFileSync(path.join(root, 'sw.js'), 'utf8');
 
-assert(runtime.includes("id=\"mg-help-btn\">I'll help Marietta!"), 'quest briefing must expose an explicit help decision');
+assert(runtime.includes("id=\"mg-help-btn\">${mariettaButtonLabel(\"I'll help Marietta!\", 'マリエッタを手伝う')"), 'quest briefing must expose an explicit help decision');
 assert(runtime.includes('helpBtn.addEventListener(\'click\', acceptMariettaHelp)'), 'only the help button may start the help flow');
 assert(runtime.includes('function acceptMariettaHelp()'), 'help decision handler must exist');
 assert(runtime.includes('state.helpAccepted = true;'), 'help decision must be recorded before tutorial entry');
 assert(runtime.includes('function renderMariettaMemoryHint(onConfirmed)'), 'help flow must expose a separate memory hint screen');
 assert(runtime.includes('id="mg-hint-ok-btn"'), 'memory hint must have an explicit OK action');
-assert(runtime.includes('OK! / わかった！'), 'memory hint action must use the requested OK label');
+assert(runtime.includes("mariettaButtonLabel('OK!', 'わかった！')"), 'memory hint action must use the shared bilingual OK label');
 assert(runtime.includes('Marietta is so happy you\'re here!'), 'welcome card must keep the English welcome line');
 assert(runtime.includes('I am trying to remember something...'), 'welcome card must keep the memory lead');
 assert(runtime.includes('startGrimmerglenTutorial();'), 'help decision must enter the tutorial for unfinished players');

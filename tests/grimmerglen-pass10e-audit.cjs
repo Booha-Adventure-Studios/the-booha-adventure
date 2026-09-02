@@ -29,7 +29,7 @@ const exerciseEnd = runtime.indexOf('function renderMariettaMemoryReplay(', exer
 assert(exerciseStart >= 0 && exerciseEnd > exerciseStart, 'memory exercise renderer must be present');
 const exercise = runtime.slice(exerciseStart, exerciseEnd);
 assert.match(exercise, /const recheckHTML = returnNumber === 3/, 'replay control must be limited to the third memory return');
-assert.match(exercise, /Check again \/ \$\{furiJP\(/, 'final replay control must say Check again');
+assert.match(exercise, /mariettaButtonLabel\('Check again', 'もう一度確認する'/, 'final replay control must say Check again with furigana');
 assert.match(exercise, /mg-memory-recheck/, 'final replay control must have dedicated button styling');
 
 const successStart = runtime.indexOf('function renderMariettaMemorySuccess(');
