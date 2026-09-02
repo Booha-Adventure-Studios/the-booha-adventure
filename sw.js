@@ -131,8 +131,9 @@ const CURRENT_CACHES = {
   // Grimmerglen Pass 1 adds replay-safe lifetime counters to the shared save
   // layer and world runtime; invalidate the cache-first JavaScript bundle.
   // Muenba Pass 1 repairs target state, Pass 2 clears pins after capture, and
-  // Pass 3 pins the card's exact ghost; invalidate stale cache-first scripts.
-  assets: 'booha-assets-2026-490',
+  // Pass 3 pins the card's exact ghost and Pass 4 restores legacy portraits;
+  // invalidate stale cache-first scripts for returning players.
+  assets: 'booha-assets-2026-491',
   decks:  'booha-decks-2026-310',
 };
 

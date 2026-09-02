@@ -2134,7 +2134,18 @@
       const patch = { activeCaseRecoveryDone: true };
       if (Number(weekly.orbsPending) <= 0) {
         const recoveredCase = cases.find(caseData => !caseModeIsComplete(caseData, mode)) || null;
-        if (recoveredCase) patch.activeCaseId = recoveredCase.id;
+        if (recoveredCase) {
+          patch.activeCaseId = recoveredCase.id;
+        } else if (!unfinishedMuenbaModeExcept(mode)) {
+          // Older completed-tier saves had no case id to recover. Preserve
+          // their accepted weekly hunt by repairing the first still-available
+          // ghost target instead of leaving Nuppi with a generic wait screen.
+          const weeklyFound = weekly.ghostsFound || {};
+          const recoveredGhost = getMuenbaHuntGhostOrder()
+            .map(ghostId => GHOSTS.find(ghost => ghost.id === ghostId))
+            .find(ghost => ghost && !weeklyFound[ghost.id]) || null;
+          if (recoveredGhost) patch.activeHuntGhostId = recoveredGhost.id;
+        }
       }
       writeMuenbaWeekly(patch);
       return patch.activeCaseId
@@ -2148,10 +2159,12 @@
   // lifetime/content state; the weekly target can still be a ghost whose
   // authored case is complete in every reading tier.
   function getMuenbaHuntTarget({ activeOnly = false } = {}) {
-    const weekly = readMuenbaWeekly();
     const cases = randomizedMuenbaCases();
     const byGhostId = new Map(GHOSTS.map(ghost => [ghost.id, ghost]));
     const pinnedCase = activeMuenbaCase();
+    // activeMuenbaCase() may repair a legacy save, so read weekly state after
+    // that resolver has had a chance to persist the recovered target.
+    const weekly = readMuenbaWeekly();
     if (pinnedCase) {
       const ghost = byGhostId.get(pinnedCase.ghostId);
       if (ghost) return { caseData: pinnedCase, ghost };
@@ -7043,10 +7056,14 @@
     const name = getPlayerFirstName();
     const weekly = readMuenbaWeekly();
     const pending = Number(weekly.orbsPending) > 0;
-    const huntTarget = !pending && weekly.huntAccepted === true
+    const huntAccepted = !pending && weekly.huntAccepted === true;
+    const huntTarget = huntAccepted
       ? getMuenbaHuntTarget({ activeOnly: true })
       : null;
-    const waitingForCase = !!huntTarget;
+    // The target card is the mandatory visual reminder while an accepted hunt
+    // is live. If a legacy target cannot be recovered, keep Nuppi's generic
+    // status rather than previewing a future hunt before acceptance.
+    const waitingForCase = huntAccepted && !!huntTarget;
     const needsTierSelection = !pending && !waitingForCase && !allMuenbaCaseModesComplete();
     const selectedMode = getMuenbaReadingDifficulty();
     const selectedModeLabel = MUENBA_MEMORY_MODE_LABELS[selectedMode] || MUENBA_MEMORY_MODE_LABELS.start;
