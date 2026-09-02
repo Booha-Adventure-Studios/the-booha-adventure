@@ -7072,6 +7072,7 @@
     const selectedMode = getMuenbaReadingDifficulty();
     const selectedModeLabel = MUENBA_MEMORY_MODE_LABELS[selectedMode] || MUENBA_MEMORY_MODE_LABELS.start;
     const waitingGhost = huntTarget ? huntTarget.ghost : null;
+    const waitingGhostId = waitingGhost ? waitingGhost.id : '';
     const waitingGhostName = waitingGhost ? waitingGhost.name : 'the next ghost';
     const waitingLine = name
       ? `I'm waiting, ${name}. Find ${waitingGhostName}, then come back here.`
@@ -7106,11 +7107,11 @@
           ? 'プロフィールで<ruby>別<rt>べつ</rt></ruby>の<ruby>読<rt>よ</rt></ruby>み<ruby>方<rt>かた</rt></ruby>を<ruby>選<rt>えら</rt></ruby>ぶと、<ruby>英語<rt>えいご</rt></ruby>の<ruby>事件<rt>じけん</rt></ruby>を<ruby>続<rt>つづ</rt></ruby>けられるよ。'
           : 'ヌーピーはここで<ruby>待<rt>ま</rt></ruby>っているよ。';
     const huntTargetHTML = waitingForCase && waitingGhost
-      ? `<section class="muenba-room-hunt-target" aria-labelledby="muenba-room-hunt-target-title muenba-room-hunt-target-name">
+      ? `<section class="muenba-room-hunt-target" data-muenba-target-ghost="${escapeHtml(waitingGhostId)}" aria-labelledby="muenba-room-hunt-target-title muenba-room-hunt-target-name">
           <div id="muenba-room-hunt-target-title" class="muenba-room-hunt-target-label">FIND THIS GHOST</div>
           <p class="muenba-room-hunt-target-label-jp">この<ruby>幽霊<rt>ゆうれい</rt></ruby>を<ruby>見<rt>み</rt></ruby>つけよう</p>
           <div class="muenba-room-hunt-target-body">
-            <img class="muenba-room-hunt-target-portrait" src="${escapeHtml(waitingGhost.img)}" alt="">
+            <img class="muenba-room-hunt-target-portrait" src="${escapeHtml(waitingGhost.img)}" alt="${escapeHtml(waitingGhostName)}">
             <div class="muenba-room-hunt-target-copy"><h3 id="muenba-room-hunt-target-name">${escapeHtml(waitingGhostName)}</h3><p>${escapeHtml(waitingGhost.kana || '')}</p></div>
           </div>
         </section>`
@@ -7127,7 +7128,7 @@
           <p>${copy}</p>
           <p class="jp-line">${copyJp}</p>
         </section>
-        <section class="muenba-nuppi-status-card${pending ? ' is-ready' : ''}" aria-live="polite">
+        <section class="muenba-nuppi-status-card${pending ? ' is-ready' : ''}"${waitingGhost ? ` data-muenba-status-ghost="${escapeHtml(waitingGhostId)}"` : ''} aria-live="polite">
           <div class="muenba-nuppi-card-label">NUPPI STATUS</div>
           <p>${statusCopy}</p>
           <p class="jp-line">${statusCopyJp}</p>

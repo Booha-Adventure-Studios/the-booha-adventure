@@ -43,7 +43,7 @@ assert(roomPopup.includes('const huntAccepted = !pending && weekly.huntAccepted 
 assert(roomPopup.includes('const waitingForCase = huntAccepted && !!huntTarget;'), 'the room popup must treat the accepted target card as mandatory');
 assert(roomPopup.includes('getMuenbaHuntTarget({ activeOnly: true })'), 'the room popup must show only an accepted active target');
 assert(roomPopup.includes('aria-labelledby="muenba-room-hunt-target-title muenba-room-hunt-target-name"'), 'the target card must expose both its instruction and ghost name');
-assert(roomPopup.includes('class="muenba-room-hunt-target-portrait" src="${escapeHtml(waitingGhost.img)}" alt=""'), 'the target portrait must not make screen readers announce the ghost twice');
+assert(roomPopup.includes('class="muenba-room-hunt-target-portrait" src="${escapeHtml(waitingGhost.img)}" alt="${escapeHtml(waitingGhostName)}"'), 'the target portrait must provide accessible ghost text');
 assert(source.includes('@media (max-width:360px)'), 'the target card must include a narrow-phone layout guard');
 
 const exitStart = source.indexOf('function getAvailableExit(now)');
