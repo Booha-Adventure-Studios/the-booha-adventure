@@ -2700,6 +2700,7 @@
       .grimmerglen-change-copy { margin:14px 0 3px; color:#764b83; font:700 1rem/1.5 Georgia,'Times New Roman',serif; }
       .grimmerglen-change-box button { display:inline-flex; flex-direction:column; align-items:center; gap:3px; min-width:min(310px,100%); margin-top:11px; padding:13px 24px 12px; border:2px solid rgba(224,85,158,.72); border-radius:999px; color:#6c2c58; background:linear-gradient(135deg,#ff9fc9,#d9c2ff 54%,#aee6ff); box-shadow:0 0 22px rgba(255,159,194,.42),inset 0 0 12px rgba(255,255,255,.7); font:900 1rem/1.15 system-ui,-apple-system,sans-serif; cursor:pointer; transition:transform .15s ease,filter .15s ease; }
       .grimmerglen-change-box button:hover,.grimmerglen-change-box button:focus-visible { transform:translateY(-2px) scale(1.02); filter:saturate(1.12) brightness(1.04); outline:none; }
+      .grimmerglen-change-box button:focus-visible { outline:3px solid rgba(216,93,154,.72); outline-offset:4px; }
       .grimmerglen-change-box button:disabled { cursor:wait; opacity:.86; transform:none; }
       .grimmerglen-change-box button small { font:700 .73rem/1.3 system-ui,-apple-system,sans-serif; color:#8a4c86; }
       @media (prefers-reduced-motion: reduce) { .grimmerglen-change-box { animation:none; } .grimmerglen-change-box button { transition:none; } }
@@ -2717,11 +2718,13 @@
       .grimmerglen-return-box ruby { ruby-position:over; } .grimmerglen-return-box rt { font-size:.72em; }
       .grimmerglen-return-actions { display:flex; gap:10px; justify-content:center; }
       .grimmerglen-return-actions button { flex:1; max-width:150px; padding:9px 14px; border-radius:999px; font:700 12px ui-monospace,monospace; letter-spacing:.04em; cursor:pointer; }
+      .grimmerglen-return-actions button:focus-visible { outline:3px solid rgba(224,85,158,.72); outline-offset:4px; }
       #grimmerglen-return-yes { background:linear-gradient(135deg,#ff8fc0,#ffd166); border:1px solid rgba(224,85,158,.7); color:#5a1638; }
       #grimmerglen-return-no { background:transparent; border:1px solid rgba(224,85,158,.4); color:#a9548a; }
       .utsu-card#grimmerglen-marietta-panel .dp-btn.no { color:#a9548a; border-color:rgba(224,85,158,.4); }
       #grimmerglen-marietta-panel { bottom:max(8px,calc(env(safe-area-inset-bottom,0px) + var(--grimmerglen-keyboard-inset,0px))); max-height:min(620px,calc(var(--grimmerglen-viewport-height,100dvh) - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 16px)); overflow-x:hidden; overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; padding-bottom:max(12px,env(safe-area-inset-bottom,0px)); }
       #grimmerglen-marietta-panel .dp-btn { display:inline-flex; flex-direction:column; align-items:center; gap:3px; text-align:center; }
+      #grimmerglen-marietta-panel .dp-btn:focus-visible { outline:3px solid rgba(216,93,154,.62); outline-offset:3px; }
       #grimmerglen-marietta-panel .mg-btn-en { display:block; }
       #grimmerglen-marietta-panel .mg-btn-jp { display:block; color:inherit; font-size:.82em; font-weight:400; letter-spacing:0; line-height:1.35; }
       #grimmerglen-marietta-panel .mg-btn-jp ruby { ruby-position:over; }
