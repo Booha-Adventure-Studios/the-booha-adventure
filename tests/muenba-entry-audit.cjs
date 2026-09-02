@@ -61,7 +61,9 @@ assert(runtime.includes("if (window.BOOHA_READY) init();"), 'Muenba must boot im
 assert(runtime.includes("document.addEventListener('booha:ready', init, { once: true })"), 'Muenba must wait for the shared ready event when needed');
 assert(runtime.includes('if (!worldGateOpen())'), 'locked players must stop before building the world');
 assert(runtime.includes('buildApp();'), 'Muenba init must build the live world');
-assert(runtime.includes('openNuppiLobbyAfterEntry();'), 'Muenba init must enter through the lobby flow');
+assert(runtime.includes('function clickCheckNuppi(worldX, worldY)'), 'Muenba must retain the in-world Nuppi hit target');
+assert(runtime.includes('openRoomNuppiPopup();'), 'clicking Nuppi must open the room popup');
+assert(!runtime.includes('openNuppiLobbyAfterEntry'), 'Muenba entry must not auto-open Nuppi dialogue');
 assert(!runtime.includes('injectDevPanel()'), 'Muenba must not add a duplicate developer panel');
 
 // 3. The Karasuki portal must point to this page, preserve the return room,
