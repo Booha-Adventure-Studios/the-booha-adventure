@@ -1154,6 +1154,7 @@
     if (!world.ghostsFound || typeof world.ghostsFound !== 'object' || Array.isArray(world.ghostsFound)) world.ghostsFound = {};
     if (!Array.isArray(world.huntGhostOrder)) world.huntGhostOrder = [];
     if (world.activeCaseId === undefined) world.activeCaseId = null;
+    world.activeCaseRecoveryDone = world.activeCaseRecoveryDone === true;
     if (!Number.isFinite(world.orbsPending) || world.orbsPending < 0) world.orbsPending = 0;
     world.huntAccepted = world.huntAccepted === true;
     return world;
@@ -1180,7 +1181,8 @@
     const acceptedCase = nextMuenbaCase();
     if (!writeMuenbaWeekly({
       huntAccepted: true,
-      activeCaseId: acceptedCase ? acceptedCase.id : null
+      activeCaseId: acceptedCase ? acceptedCase.id : null,
+      activeCaseRecoveryDone: true
     })) return false;
     state.navigationUnlocked = true;
     state.inputLocked = false;
@@ -2101,11 +2103,39 @@
   // a new hunt has already begun.
   function activeMuenbaCase() {
     const weekly = readMuenbaWeekly();
-    if (typeof weekly.activeCaseId !== 'string') return null;
     const mode = getMuenbaReadingDifficulty();
-    return randomizedMuenbaCases().find(caseData =>
-      caseData.id === weekly.activeCaseId && !caseModeIsComplete(caseData, mode)
-    ) || null;
+    const cases = randomizedMuenbaCases();
+    const activeCase = typeof weekly.activeCaseId === 'string'
+      ? cases.find(caseData =>
+        caseData.id === weekly.activeCaseId && !caseModeIsComplete(caseData, mode)
+      ) || null
+      : null;
+    if (activeCase) {
+      // Older saves may have migrated an active case id without the recovery
+      // marker. Marking it done here prevents a later capture/handoff from
+      // treating the next case as the same legacy hunt.
+      if (weekly.huntAccepted === true && !weekly.activeCaseRecoveryDone) {
+        writeMuenbaWeekly({ activeCaseRecoveryDone: true });
+      }
+      return activeCase;
+    }
+    // Pass 1 recovery: Pass 2 began persisting activeCaseId, so an older
+    // accepted hunt can arrive with huntAccepted=true but no pinned case.
+    // Recover it once from the same week-stable order. If energy is already
+    // pending, the old hunt has already been captured; mark the repair as
+    // complete without inventing a new target.
+    if (weekly.huntAccepted === true && !weekly.activeCaseRecoveryDone) {
+      const patch = { activeCaseRecoveryDone: true };
+      if (Number(weekly.orbsPending) <= 0) {
+        const recoveredCase = cases.find(caseData => !caseModeIsComplete(caseData, mode)) || null;
+        if (recoveredCase) patch.activeCaseId = recoveredCase.id;
+      }
+      writeMuenbaWeekly(patch);
+      return patch.activeCaseId
+        ? cases.find(caseData => caseData.id === patch.activeCaseId) || null
+        : null;
+    }
+    return null;
   }
 
   function availableMuenbaGhostsThisWeek() {
