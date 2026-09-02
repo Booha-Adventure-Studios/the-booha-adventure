@@ -14,12 +14,15 @@ assert(saveFile.includes('huntAccepted: false'), 'weekly Muenba schema must defa
 assert(saveFile.includes('activeCaseRecoveryDone: false'), 'weekly Muenba schema must track one-time legacy target recovery');
 assert(source.includes('world.huntAccepted = world.huntAccepted === true;'), 'weekly Muenba acceptance must be normalized as a boolean');
 
-const acceptStart = source.indexOf('function acceptMuenbaHunt()');
+const acceptStart = source.indexOf('function acceptMuenbaHunt(target)');
 const acceptEnd = source.indexOf('\n  function resetMuenbaWeeklyNavigation()', acceptStart);
 assert(acceptStart >= 0 && acceptEnd > acceptStart, 'Muenba must expose a dedicated hunt-acceptance transition');
 const acceptBlock = source.slice(acceptStart, acceptEnd);
 assert(acceptBlock.includes('huntAccepted: true'), 'accepting a hunt must persist weekly acceptance');
 assert(acceptBlock.includes('activeCaseId: acceptedCase ? acceptedCase.id : null'), 'accepting a hunt must pin the accepted case in weekly state');
+assert(acceptBlock.includes('activeHuntGhostId: knownGhost.id'), 'accepting a hunt must pin the exact card ghost in weekly state');
+assert(acceptBlock.includes('const acceptedTarget = target && target.ghost ? target : getMuenbaHuntTarget();'), 'acceptance must use the card target instead of recalculating the next case');
+assert(acceptBlock.includes('invalidateGhostRoomMap();'), 'acceptance must refresh ghost placement for the new target');
 assert(acceptBlock.includes('state.navigationUnlocked = true;'), 'accepting a hunt must unlock room navigation immediately');
 
 const caseStart = source.indexOf('function nextMuenbaCase()');
@@ -55,9 +58,9 @@ assert(source.slice(arrowsStart, arrowsEnd).includes("if (state.roomId === MUENB
 const huntStart = source.indexOf('function renderNuppiHuntCard()');
 const huntEnd = source.indexOf('\n  function focusLobbyControl(', huntStart);
 const hunt = source.slice(huntStart, huntEnd);
-assert(hunt.indexOf('acceptMuenbaHunt()') > hunt.indexOf("if (needsTierSelection)"),
+assert(hunt.indexOf('acceptMuenbaHunt(huntTarget)') > hunt.indexOf("if (needsTierSelection)"),
   'the hunt card must accept the hunt before closing the lobby');
-assert(hunt.indexOf('acceptMuenbaHunt()') < hunt.indexOf('closeNuppiLobby()'),
+assert(hunt.indexOf('acceptMuenbaHunt(huntTarget)') < hunt.indexOf('closeNuppiLobby()'),
   'the room gate must unlock before the hunt card closes');
 
 assert(source.includes("document.addEventListener('booha:weeklyReset', resetMuenbaWeeklyNavigation);"),
