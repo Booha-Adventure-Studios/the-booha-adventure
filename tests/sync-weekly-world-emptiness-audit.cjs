@@ -14,6 +14,8 @@ assert(syncClient.includes('const hasItems = value =>'),
   'sync must keep array-entry checks separate from object-entry checks');
 assert(syncClient.includes('w.worlds?.muenba?.activeCaseId'),
   'sync must preserve an in-progress weekly Muenba case');
+assert(syncClient.includes('w.worlds?.muenba?.activeHuntGhostId'),
+  'sync must preserve an in-progress weekly Muenba hunt target');
 assert(syncClient.includes('hasEntries(d.collection.wanderers) || hasItems(d.collection.wanderers)'),
   'sync must recognize the configured object-shaped wanderer collection');
 assert(syncClient.includes('const utsuroba = d.utsuroba || {}'),
