@@ -23,6 +23,17 @@
   const TARGET_DT       = 1000 / 60;
   let   lastTickTime    = 0;
   let   SPEED           = BASE_SPEED;
+  let   rafHandle       = null;
+  let   pageHidden      = document.hidden;
+  let   worldInitialized = false;
+  const LOW_POWER_HINT  = Boolean(
+    (typeof navigator !== 'undefined' && navigator.connection && navigator.connection.saveData)
+    || (typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+  );
+  let   perfTier        = LOW_POWER_HINT ? 'low' : 'high';
+  let   perfFrameCount  = 0;
+  let   perfFirstTime   = 0;
+  let   shadowsEnabled  = perfTier !== 'low';
 
   const PORTAL = { x: 357, y: 342, r: 40, href: "adventure-profile.html" };
   const PAGE_ID = 'karasuki';
@@ -4609,7 +4620,8 @@ const HAPPY_HOUSE_PORTAL = {
   // Android phones can report very high DPR values.
   // A huge internal canvas + gradients/shadows = laggy Booha.
   const rawDpr = window.devicePixelRatio || 1;
-  const dpr = IS_PHONE ? Math.min(rawDpr, 1.5) : Math.min(rawDpr, 2);
+  const dprCap = perfTier === 'low' ? 1 : (IS_PHONE ? 1.5 : 2);
+  const dpr = Math.min(rawDpr, dprCap);
 
   canvas.style.width = WORLD_W + "px";
   canvas.style.height = WORLD_H + "px";
@@ -4734,10 +4746,12 @@ const HAPPY_HOUSE_PORTAL = {
      TRAIL
   ═══════════════════════════════════════════ */
   function addTrailParticle(x, y, now) {
-    if (now - state.lastTrailT < 45) return; state.lastTrailT = now;
+    const interval = perfTier === 'low' ? 90 : 45;
+    const maxTrail = perfTier === 'low' ? 30 : TRAIL_MAX;
+    if (now - state.lastTrailT < interval) return; state.lastTrailT = now;
     const [col1, col2] = roomColorPair(state.roomId);
     trail.push({ x: x + (Math.random()-0.5)*10, y: y + GHOST_R*0.55 + (Math.random()-0.5)*8, vx: (Math.random()-0.5)*0.4, vy: -Math.random()*0.5, life: 1, size: 2+Math.random()*4.5, color: Math.random()>0.5?col1:col2 });
-    if (trail.length > TRAIL_MAX) trail.shift();
+    if (trail.length > maxTrail) trail.shift();
   }
 
   /* ═══════════════════════════════════════════
@@ -4887,7 +4901,8 @@ const HAPPY_HOUSE_PORTAL = {
       ctx.save();
       ctx.globalAlpha=0.80+pulse*0.18; ctx.strokeStyle="#ff8ae2"; ctx.lineWidth=1; ctx.setLineDash([3,3]);
       ctx.beginPath(); ctx.moveTo(p.x-14,p.y); ctx.lineTo(p.x+14,p.y); ctx.moveTo(p.x,p.y-14); ctx.lineTo(p.x,p.y+14); ctx.stroke(); ctx.setLineDash([]);
-      ctx.globalAlpha=1; ctx.fillStyle="#ff4fc8"; ctx.shadowBlur=8; ctx.shadowColor="#ff8ae2";
+      ctx.globalAlpha=1; ctx.fillStyle="#ff4fc8";
+      if (shadowsEnabled) { ctx.shadowBlur=8; ctx.shadowColor="#ff8ae2"; }
       ctx.beginPath(); ctx.arc(p.x,p.y,4,0,Math.PI*2); ctx.fill(); ctx.shadowBlur=0;
       ctx.font="bold 10px monospace"; const tw=ctx.measureText(p.label).width; const bx=p.x+10, by=p.y-18;
       ctx.globalAlpha=0.88; ctx.fillStyle="rgba(0,0,0,.75)"; ctx.beginPath(); ctx.roundRect(bx-4,by-11,tw+10,15,5); ctx.fill();
@@ -4910,9 +4925,11 @@ const HAPPY_HOUSE_PORTAL = {
     }
     for (let i=trail.length-1;i>=0;i--) {
       const p=trail[i];
-      const gr=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.size*2.4);
-      gr.addColorStop(0,p.color); gr.addColorStop(1,"transparent");
-      ctx.globalAlpha=p.life*0.48; ctx.fillStyle=gr; ctx.beginPath(); ctx.arc(p.x,p.y,p.size*2.4,0,Math.PI*2); ctx.fill();
+      if (shadowsEnabled) {
+        const gr=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.size*2.4);
+        gr.addColorStop(0,p.color); gr.addColorStop(1,"transparent");
+        ctx.globalAlpha=p.life*0.48; ctx.fillStyle=gr; ctx.beginPath(); ctx.arc(p.x,p.y,p.size*2.4,0,Math.PI*2); ctx.fill();
+      }
       ctx.globalAlpha=p.life*0.90; ctx.fillStyle="#fff"; ctx.beginPath(); ctx.arc(p.x,p.y,p.size*0.3,0,Math.PI*2); ctx.fill();
       ctx.globalAlpha=1; p.life-=0.022; p.x+=p.vx; p.y+=p.vy;
     }
@@ -4974,10 +4991,35 @@ const HAPPY_HOUSE_PORTAL = {
     );
   }
 
+  function updatePerfTier(now) {
+    if (perfTier === 'low') return;
+    perfFrameCount += 1;
+    if (perfFrameCount === 1) { perfFirstTime = now; return; }
+    if (perfFrameCount === 90) {
+      const averageFps = 89 / ((now - perfFirstTime) / 1000);
+      if (averageFps < 40) {
+        perfTier = 'low';
+        shadowsEnabled = false;
+        resizeCanvas();
+      }
+    }
+  }
+
+  function staticFrameOverlayOpen() {
+    return anyModalOpen();
+  }
+
+  function scheduleKarasukiFrame() {
+    if (worldInitialized && !pageHidden && !rafHandle) rafHandle = requestAnimationFrame(tick);
+  }
+
   /* ═══════════════════════════════════════════
      MAIN LOOP
   ═══════════════════════════════════════════ */
 function tick(now) {
+  rafHandle = null;
+  if (pageHidden) return;
+  updatePerfTier(now);
   // Keep motion stable on Android when frames stutter.
   // 32ms max = about a 30fps floor.
   const dt = Math.min(32, Math.max(8, now - (lastTickTime || now)));
@@ -5030,8 +5072,8 @@ function tick(now) {
     }
   }
 
-  drawFrame(now);
-  requestAnimationFrame(tick);
+  if (!staticFrameOverlayOpen()) drawFrame(now);
+  scheduleKarasukiFrame();
 }
 
   /* ═══════════════════════════════════════════
@@ -5741,8 +5783,20 @@ function drawObserver(now) {
     initOrbs(); updateTrailHud(); renderInitialRoom(); initWanderers(); initNuppi(); bindInput();
     
     window.addEventListener("resize",()=>{ fitStage(); resizeCanvas(); });
-    requestAnimationFrame(tick);
+    worldInitialized = true;
+    scheduleKarasukiFrame();
   }
+
+  document.addEventListener('visibilitychange', () => {
+    pageHidden = document.hidden;
+    if (pageHidden) {
+      if (rafHandle) cancelAnimationFrame(rafHandle);
+      rafHandle = null;
+      return;
+    }
+    lastTickTime = 0;
+    scheduleKarasukiFrame();
+  });
 
   // The save is keyed on booha_userid, which token.js writes only after its
   // async verify returns. init() reads the quest, wanderers and vitality

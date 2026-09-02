@@ -83,6 +83,10 @@
   const TOUCH_DEVICE = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
   const REDUCED_MOTION = typeof window.matchMedia === 'function'
     && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const LOW_POWER_HINT = Boolean(
+    (typeof navigator !== 'undefined' && navigator.connection && navigator.connection.saveData)
+    || REDUCED_MOTION
+  );
 
   const state = {
     roomId: DATA.rooms[requestedRoom] ? requestedRoom : DATA.startRoom,
@@ -115,6 +119,13 @@
   };
 
   let app, stage, roomLayer, atmosphereCanvas, atmosphereCtx, actorCanvas, actorCtx, fadeEl, currentBg;
+  let rafHandle = null;
+  let pageHidden = document.hidden;
+  let worldInitialized = false;
+  let perfTier = LOW_POWER_HINT ? 'low' : 'high';
+  let perfFrameCount = 0;
+  let perfFirstTime = 0;
+  let shadowsEnabled = perfTier !== 'low';
   let devPanel, devReadout, devMousePoint = null;
   let entryDrift = null;
   let mariettaPanel = null, mariettaPanelOpen = false, mariettaPanelCooldown = 0;
@@ -328,7 +339,7 @@
     sparkles.length = 0;
     edgeLeaves.length = 0;
     const seed = Number(roomId.slice(-2)) || 1;
-    const count = 10;
+    const count = perfTier === 'low' ? 5 : 10;
     for (let i = 0; i < count; i++) {
       sparkles.push({
         x: (Math.sin(seed * 13.1 + i * 7.7) * .5 + .5) * WORLD_W,
@@ -343,9 +354,11 @@
     // instead of clustering in a few corners.
     const EDGE_LEAF_COUNT = 72;
     const leavesPerSide = EDGE_LEAF_COUNT / 4;
-    for (let i = 0; i < EDGE_LEAF_COUNT; i++) {
+    const activeLeafCount = perfTier === 'low' ? 36 : EDGE_LEAF_COUNT;
+    const activeLeavesPerSide = activeLeafCount / 4;
+    for (let i = 0; i < activeLeafCount; i++) {
       const side = i % 4;
-      const lane = (Math.floor(i / 4) + .5) / leavesPerSide;
+      const lane = (Math.floor(i / 4) + .5) / activeLeavesPerSide;
       const inset = 28 + ((seed * 19 + i * 23) % 105);
       edgeLeaves.push({
         side,
@@ -792,7 +805,7 @@
   }
 
   function spawnGrimmerglenDanceSparkle(now) {
-    if (REDUCED_MOTION) return;
+    if (REDUCED_MOTION || perfTier === 'low') return;
     const colors = ['#ff9fc2', '#ffe066', '#b8a4ff', '#8fe6c4', '#ffffff'];
     const angle = Math.random() * Math.PI * 2;
     const radius = 18 + Math.random() * 60;
@@ -821,8 +834,10 @@
       actorCtx.save();
       actorCtx.globalAlpha = sparkle.life * twinkle;
       actorCtx.fillStyle = sparkle.color;
-      actorCtx.shadowColor = sparkle.color;
-      actorCtx.shadowBlur = 10;
+      if (shadowsEnabled) {
+        actorCtx.shadowColor = sparkle.color;
+        actorCtx.shadowBlur = 10;
+      }
       actorCtx.beginPath();
       actorCtx.arc(sparkle.x, sparkle.y, sparkle.size, 0, Math.PI * 2);
       actorCtx.fill();
@@ -1195,6 +1210,29 @@
       drawCarriedObject(now);
     }
     drawBoohaTransformFX(now);
+  }
+
+  function updatePerfTier(now) {
+    if (perfTier === 'low') return;
+    perfFrameCount += 1;
+    if (perfFrameCount === 1) { perfFirstTime = now; return; }
+    if (perfFrameCount === 90) {
+      const averageFps = 89 / ((now - perfFirstTime) / 1000);
+      if (averageFps < 40) {
+        perfTier = 'low';
+        shadowsEnabled = false;
+        resizeCanvas();
+        reseedSparkles(state.roomId);
+      }
+    }
+  }
+
+  function staticFrameOverlayOpen() {
+    return mariettaPanelOpen || returnPortalOpen || boohaChangePromptOpen;
+  }
+
+  function scheduleGrimmerglenFrame() {
+    if (worldInitialized && !pageHidden && !rafHandle) rafHandle = window.requestAnimationFrame(tick);
   }
 
 
@@ -2676,7 +2714,7 @@
   }
 
   function resizeCanvas() {
-    const maxDpr = TOUCH_DEVICE ? 1.5 : 2;
+    const maxDpr = perfTier === 'low' ? 1 : (TOUCH_DEVICE ? 1.5 : 2);
     const dpr = Math.min(maxDpr, Math.max(1, window.devicePixelRatio || 1));
     for (const canvas of [atmosphereCanvas, actorCanvas]) {
       canvas.width = Math.round(WORLD_W * dpr);
@@ -2868,6 +2906,9 @@
   }
 
   function tick(now) {
+    rafHandle = null;
+    if (pageHidden) return;
+    updatePerfTier(now);
     const dt = Math.min(50, Math.max(8, now - (state.lastTickTime || now)));
     state.lastTickTime = now;
     state.speed = BASE_SPEED * (dt / TARGET_DT);
@@ -2880,8 +2921,8 @@
       checkReturnPortalProximity(now);
       if (DEV_MODE) updateDevReadout();
     }
-    drawFrame(now);
-    window.requestAnimationFrame(tick);
+    if (!staticFrameOverlayOpen()) drawFrame(now);
+    scheduleGrimmerglenFrame();
   }
 
   // Grimmerglen opens after the shared nine-game weekly gate. DEV_MODE / the
@@ -2935,9 +2976,21 @@
       // reload; preserve item layout while keeping every item reachable.
       constrainObjectLayoutToViewport();
     });
-    window.requestAnimationFrame(tick);
+    worldInitialized = true;
+    scheduleGrimmerglenFrame();
     triggerBoohaTransformIfNeeded();
   }
+
+  document.addEventListener('visibilitychange', () => {
+    pageHidden = document.hidden;
+    if (pageHidden) {
+      if (rafHandle) window.cancelAnimationFrame(rafHandle);
+      rafHandle = null;
+      return;
+    }
+    state.lastTickTime = 0;
+    scheduleGrimmerglenFrame();
+  });
 
   if (window.BOOHA_READY) init();
   else document.addEventListener('booha:ready', init, { once: true });

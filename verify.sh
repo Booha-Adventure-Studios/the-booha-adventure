@@ -1118,6 +1118,13 @@ else
   bad "Grimmerglen Pass 4 memory-cache audit failed"
 fi
 
+echo "[performance] Pass 5 adaptive low-power audit"
+if node tests/adaptive-low-power-audit.cjs >/dev/null 2>&1; then
+  ok "Adaptive low-power, hidden-page, and static-overlay contracts pass"
+else
+  bad "Adaptive low-power, hidden-page, and static-overlay contracts failed"
+fi
+
 # ── Summary ──────────────────────────────────────────────────
 echo "───────────────────────────────────"
 echo "✅ $PASS passed   ⚠️  $WARN warnings   ❌ $FAIL failed"

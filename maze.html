@@ -1574,12 +1574,26 @@ function playBgMusic(){
   
 const FADE_MS=520;
 
+// The Maze is a full-viewport canvas with several animated glow layers.
+// Keep its backing store bounded on high-DPR devices, then fall back to a
+// single-pixel ratio if the first 90 frames show sustained frame pressure.
+const MAZE_LOW_POWER_HINT = Boolean(
+  (typeof navigator !== 'undefined' && navigator.connection && navigator.connection.saveData)
+  || (typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+);
+let mazePerfTier = MAZE_LOW_POWER_HINT ? 'low' : 'high';
+let mazePerfFrameCount = 0;
+let mazePerfFirstTime = 0;
+let pageHidden = document.hidden;
+
 // Canvas
 const ctx=canvas.getContext('2d');
 let cssW=1,cssH=1;
 
+function mazeDprCap(){ return mazePerfTier === 'low' ? 1 : 1.5; }
+
 function resizeCanvas(){
-  const dpr=window.devicePixelRatio||1;
+  const dpr=Math.min(window.devicePixelRatio||1,mazeDprCap());
   const rect=document.getElementById('stage').getBoundingClientRect();
   cssW=rect.width||window.innerWidth; cssH=rect.height||window.innerHeight;
   canvas.style.width=cssW+'px'; canvas.style.height=cssH+'px';
@@ -2001,6 +2015,7 @@ function easeOutCubic(t){return 1-Math.pow(1-t,3);}
 function easeInOutCubic(t){return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;}
 
 function addTrail(ix,iy){
+  if(mazePerfTier==='low'&&Math.random()>.5)return;
   const c=Math.random()>.55?monthSecondary(activeWeek):monthPrimary(activeWeek);
   trail.push({ix,iy,life:1,size:1.8+Math.random()*4.5,color:c,dx:(Math.random()-.5)*.28,dy:-Math.random()*.36});
   if(trail.length>100)trail.shift();
@@ -2241,8 +2256,25 @@ function drawFrame(now){
   }
 }
 
-function loop(now){drawFrame(now);rafHandle=requestAnimationFrame(loop);}
-function startLoop(){if(!rafHandle)rafHandle=requestAnimationFrame(loop);}
+function updateMazePerfTier(now){
+  if(mazePerfTier==='low')return;
+  mazePerfFrameCount+=1;
+  if(mazePerfFrameCount===1){mazePerfFirstTime=now;return;}
+  if(mazePerfFrameCount===90){
+    const averageFps=89/((now-mazePerfFirstTime)/1000);
+    if(averageFps<40){mazePerfTier='low';resizeCanvas();}
+  }
+}
+
+function scheduleMazeFrame(){if(!pageHidden&&!rafHandle)rafHandle=requestAnimationFrame(loop);}
+function loop(now){
+  rafHandle=null;
+  if(pageHidden)return;
+  updateMazePerfTier(now);
+  if(!popupOpen())drawFrame(now);
+  scheduleMazeFrame();
+}
+function startLoop(){scheduleMazeFrame();}
 
 const HIT_R=40;
 function hitTest(clientX,clientY){
@@ -2662,12 +2694,17 @@ function fadeOut(){
 }
 
 document.addEventListener('visibilitychange',()=>{
+  pageHidden=document.hidden;
   if(document.hidden){
+    if(rafHandle)cancelAnimationFrame(rafHandle);
+    rafHandle=null;
     try{toMazeVideo.pause();}catch(e){}
     if(!mazeLaunched)try{bgMusic.pause();}catch(e){}
   } else {
+    mazePerfFirstTime=0;
     if(videoPlayed&&!o2shown)try{loadMediaSource(toMazeVideo);toMazeVideo.play();}catch(e){}
     if(mazeLaunched)try{bgMusic.loop=true;bgMusic.volume=.65;playBgMusic().catch(()=>{});}catch(e){}
+    if(mazeStarted)startLoop();
   }
 });
 
