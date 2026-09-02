@@ -428,6 +428,7 @@ const BoohaAdventureLog = (() => {
   } else {
     document.addEventListener('booha:ready', init, { once: true });
   }
+  document.addEventListener('booha:dayRecorded', init);
 
   return { init, _test: { inferCurriculum, weekStatus, streak, fmtMs, recentFullWeekAverage } };
 })();

@@ -131,6 +131,12 @@
     node.dataset.profileValue = next;
   }
 
+  function showRenderFallback(host, label, error) {
+    console.error(`[ProfileProgress] ${label} section failed:`, error);
+    if (!host) return;
+    host.innerHTML = `<div class="profile-render-fallback" role="status"><strong>${label} is temporarily unavailable.</strong><small>Try refreshing this page.</small></div>`;
+  }
+
   function renderHighlights() {
     const host = document.getElementById('profile-highlights');
     if (!host || !window.BoohaDayRecord) return;
@@ -208,14 +214,23 @@
     const R = BoohaAdventure.registry;
     if (!S || !U || !R) return;
 
-    renderHighlights();
+    try {
+      renderHighlights();
+    } catch (error) {
+      showRenderFallback(document.getElementById('profile-highlights'), 'Highlights', error);
+    }
 
-    changedValue(document.getElementById('total-stars'), `${S.weeklyStars()}/${27 * 3}`);
-    changedValue(document.getElementById('total-completed'), `${S.weeklyCompleted()}/27`);
-    changedValue(document.getElementById('total-alltime'), S.allTimeStars());
+    try {
+      changedValue(document.getElementById('total-stars'), `${S.weeklyStars()}/${27 * 3}`);
+      changedValue(document.getElementById('total-completed'), `${S.weeklyCompleted()}/27`);
+      changedValue(document.getElementById('total-alltime'), S.allTimeStars());
+    } catch (error) {
+      showRenderFallback(totalBar, 'Totals', error);
+    }
 
-    cont.textContent = '';
-    R.CURRICULUMS.forEach(curriculum => {
+    try {
+      cont.textContent = '';
+      R.CURRICULUMS.forEach(curriculum => {
       const info = CURR_INFO[curriculum];
       const summary = S.weeklySummaryFor(curriculum);
       const pct = summary.totalGames > 0 ? Math.round(summary.completed / summary.totalGames * 100) : 0;
@@ -255,16 +270,20 @@
             </div>
           </div>
         </div>`;
-      cont.appendChild(wrap);
-      initAccordion(triggerId, bodyId);
-    });
+        cont.appendChild(wrap);
+        initAccordion(triggerId, bodyId);
+      });
 
-    requestAnimationFrame(() => document.querySelectorAll('.prog-fill[data-target]').forEach(node => {
-      node.style.width = `${node.dataset.target}%`;
-    }));
+      requestAnimationFrame(() => document.querySelectorAll('.prog-fill[data-target]').forEach(node => {
+        node.style.width = `${node.dataset.target}%`;
+      }));
+    } catch (error) {
+      showRenderFallback(cont, 'Curriculum progress', error);
+    }
 
-    grid.textContent = '';
-    [...U.getAll()].sort((a, b) => b.unlocked - a.unlocked).forEach(unlock => {
+    try {
+      grid.textContent = '';
+      [...U.getAll()].sort((a, b) => b.unlocked - a.unlocked).forEach(unlock => {
       const meta = uMeta(unlock.id);
       const chip = document.createElement('div');
       chip.className = `u-chip ${unlock.unlocked ? 'earned' : ''}`;
@@ -275,14 +294,18 @@
           <div class="u-jp">${escapeHTML(meta.jp)}　<span class="u-k">${furiKanji(meta.k)}</span></div>
           <div class="u-desc">${escapeHTML(unlock.description)}</div>
         </div>`;
-      grid.appendChild(chip);
-    });
+        grid.appendChild(chip);
+      });
+    } catch (error) {
+      showRenderFallback(grid, 'Achievements', error);
+    }
   }
 
   function boot() {
     render();
     initAccordion('acc-achievements-trigger', 'acc-achievements-body');
     document.addEventListener('booha:saved', render);
+    document.addEventListener('booha:dayRecorded', render);
     document.addEventListener('booha:reset', render);
     document.addEventListener('booha:weeklyReset', render);
   }

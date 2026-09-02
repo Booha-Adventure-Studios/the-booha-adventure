@@ -1132,6 +1132,13 @@ else
   bad "Pass 3 asset-weight audit failed"
 fi
 
+echo "[profile/performance] Pass 6 hardening and budgets audit"
+if node tests/pass6-hardening-budget-audit.cjs >/dev/null 2>&1; then
+  ok "Profile fail-soft rendering, day-record repaint, and performance budgets pass"
+else
+  bad "Pass 6 profile/performance audit failed"
+fi
+
 # ── Summary ──────────────────────────────────────────────────
 echo "───────────────────────────────────"
 echo "✅ $PASS passed   ⚠️  $WARN warnings   ❌ $FAIL failed"

@@ -24,6 +24,6 @@ assert(runtime.includes('startGrimmerglenTutorial();'), 'help decision must ente
 assert(runtime.includes('if (!state.helpAccepted) return;'), 'navigation unlock must reject non-help paths');
 assert(runtime.includes('unlockGrimmerglenNavigation();'), 'completed help flow must unlock navigation');
 assert(runtime.includes('id=\"mg-tutorial-done-btn\"'), 'tutorial must have an explicit completion action');
-assert(/assets:\s+'booha-assets-2026-500'/.test(serviceWorker), 'asset cache must be bumped for the current Muenba canonical target gateway');
+assert(/assets:\s+'booha-assets-2026-501'/.test(serviceWorker), 'asset cache must be bumped for the current Muenba canonical target gateway');
 
 console.log('Grimmerglen Pass 9C audit passed: the explicit help choice owns tutorial entry and navigation unlock.');
