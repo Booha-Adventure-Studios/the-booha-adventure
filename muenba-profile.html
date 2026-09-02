@@ -325,6 +325,9 @@
           const data = getSave();
           if (!data.muenba || typeof data.muenba !== 'object') data.muenba = {};
           if (data.muenba.readingDifficulty === value) return;
+          // An accepted hunt belongs to the weekly world, not to this profile
+          // control. Leave activeCaseId/activeHuntGhostId untouched so a tier
+          // change changes only the case text used when the target is opened.
           data.muenba.readingDifficulty = value;
           if (window.BoohaAdventure && BoohaAdventure.save) BoohaAdventure.save.save(data);
         } catch (_) {}
@@ -348,8 +351,16 @@
           }
         };
         const description = descriptions[current] || descriptions.start;
-        const note = description.note;
-        const noteJP = description.noteJP;
+        const weeklyMuenba = getSave().weekly?.worlds?.muenba;
+        const huntInProgress = weeklyMuenba?.huntAccepted === true
+          && Number(weeklyMuenba.orbsPending) <= 0
+          && (typeof weeklyMuenba.activeCaseId === 'string' || typeof weeklyMuenba.activeHuntGhostId === 'string');
+        const note = huntInProgress
+          ? 'Your current hunt target stays the same when you change levels. The new level applies when you open that ghost case.'
+          : description.note;
+        const noteJP = huntInProgress
+          ? '探索中の<ruby>幽霊<rt>ゆうれい</rt></ruby>は、<ruby>読<rt>よ</rt></ruby>み<ruby>方<rt>かた</rt></ruby>を<ruby>変<rt>か</rt></ruby>えても<ruby>変<rt>か</rt></ruby>わりません。<ruby>事件<rt>じけん</rt></ruby>を<ruby>開<rt>ひら</rt></ruby>くと<ruby>新<rt>あたら</rt></ruby>しい<ruby>読<rt>よ</rt></ruby>み<ruby>方<rt>かた</rt></ruby>が<ruby>使<rt>つか</rt></ruby>われます。'
+          : description.noteJP;
         return `<section class="section">
           <div class="section-heading"><h2>How It Reads</h2><p><ruby>読<rt>よ</rt></ruby>み<ruby>方<rt>かた</rt></ruby></p></div>
           <div class="difficulty-card">
