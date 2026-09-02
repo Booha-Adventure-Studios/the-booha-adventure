@@ -6901,21 +6901,6 @@
     lobbyOverlay.classList.add('open');
   }
 
-  // Pass 9I: the entry drift is part of Muenba's arrival beat. Wait until
-  // Booha has reached the center before opening Nuppi's lobby so the modal
-  // cannot hide or pause a player who is still locked at the doorway spawn.
-  function openNuppiLobbyAfterEntry() {
-    if (!entryDrift) {
-      openNuppiLobby();
-      return;
-    }
-    const waitForArrival = () => {
-      if (!entryDrift) openNuppiLobby();
-      else window.requestAnimationFrame(waitForArrival);
-    };
-    window.requestAnimationFrame(waitForArrival);
-  }
-
   function closeNuppiLobby() {
     lobbyOpen = false;
     playUiSfx('popupClose');
@@ -7560,7 +7545,8 @@
     bindInput();
     window.addEventListener('resize', () => { fitStage(); resizeCanvas(); });
     window.requestAnimationFrame(tick);
-    openNuppiLobbyAfterEntry();
+    // Nuppi's dialogue is player-invoked from his room hit target. Entry and
+    // profile-return flows should leave Booha in free roam without a modal.
   }
 
   if (window.BOOHA_READY) init();
