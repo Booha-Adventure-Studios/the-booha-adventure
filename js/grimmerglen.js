@@ -1138,6 +1138,10 @@
     return renderer ? renderer(text, readings || {}) : text;
   }
 
+  function mariettaButtonLabel(en, jp, readings = MARIETTA_UI_READINGS) {
+    return `<span class="mg-btn-en">${escapeHTML(en)}</span><small class="mg-btn-jp">${furiJP(jp, readings)}</small>`;
+  }
+
   // Short UI readings use the same term-level convention as authored prose.
   // Keeping each reading on its word prevents the ruby annotation from
   // looking like a second copy of the whole Japanese sentence.
@@ -1151,6 +1155,8 @@
     '道': 'みち',
     '今週': 'こんしゅう',
     'もう一度': 'もういちど',
+    '聞く': 'きく',
+    '探し続ける': 'さがしつづける',
     '見る': 'みる',
     '踊ろう': 'おどろう',
   };
@@ -1197,8 +1203,8 @@
           <p class="dp-line-jp mg-welcome-jp">${furiJP('マリエッタは、あなたが来てくれてとても嬉しいです！', MARIETTA_UI_READINGS)}</p>
           <p class="dp-line-en mg-memory-lead">${story ? 'I am trying to remember something...' : 'The memories are all safe now.'}</p>
           <div class="dp-btns">
-            <button class="dp-btn yes" id="mg-help-btn">I'll help Marietta! / ${furiJP('マリエッタを手伝う', MARIETTA_UI_READINGS)}</button>
-            <button class="dp-btn no" id="mg-leave-btn">Leave Grimmerglen / ${furiJP('グリマーグレンを出る', MARIETTA_UI_READINGS)}</button>
+            <button class="dp-btn yes" id="mg-help-btn">${mariettaButtonLabel("I'll help Marietta!", 'マリエッタを手伝う')}</button>
+            <button class="dp-btn no" id="mg-leave-btn">${mariettaButtonLabel('Leave Grimmerglen', 'グリマーグレンを出る')}</button>
           </div>
         </div>
       </div>`;
@@ -1311,8 +1317,8 @@
           <div class="dp-divider"></div>
           <div id="mg-dialogue-lines"></div>
           <div id="mg-dialogue-actions" class="dp-btns" style="opacity:0;transition:opacity .3s;">
-            <button class="dp-btn yes" id="mg-dialogue-close-btn">Got it! / わかった！</button>
-            ${allowSkip ? `<button class="dp-btn no" id="mg-dialogue-skip-btn">Skip this week's hello / ${furiJP('今週はあいさつをスキップ', { '今週': 'こんしゅう' })}</button>` : ''}
+            <button class="dp-btn yes" id="mg-dialogue-close-btn">${mariettaButtonLabel('Got it!', 'わかった！')}</button>
+            ${allowSkip ? `<button class="dp-btn no" id="mg-dialogue-skip-btn">${mariettaButtonLabel("Skip this week's hello", '今週はあいさつをスキップ', { '今週': 'こんしゅう' })}</button>` : ''}
           </div>
         </div>
       </div>`;
@@ -1824,7 +1830,7 @@
           <p class="dp-line-en">You did it! Now, let's go find what I forgot.</p>
           <p class="dp-line-jp">${furiJP('できたね！さあ、わたしが忘れたものを見つけに行こう。', GRIMMERGLEN_TUTORIAL_READINGS)}</p>
           <div class="dp-btns">
-            <button class="dp-btn yes" id="mg-tutorial-done-btn">Let's go! / ${furiJP('行こう！', GRIMMERGLEN_TUTORIAL_READINGS)}</button>
+            <button class="dp-btn yes" id="mg-tutorial-done-btn">${mariettaButtonLabel("Let's go!", '行こう！', GRIMMERGLEN_TUTORIAL_READINGS)}</button>
           </div>
         </div>
       </div>`;
@@ -1853,8 +1859,8 @@
           <p class="dp-line-en">Want to try a little practice with me?</p>
           <p class="dp-line-jp">${furiJP('少し、いっしょに練習してみる？', GRIMMERGLEN_TUTORIAL_READINGS)}</p>
           <div class="dp-btns">
-            <button class="dp-btn yes" id="mg-tutorial-yes-btn">Yes, let's try! / ${furiJP('うん、やってみる！', GRIMMERGLEN_TUTORIAL_READINGS)}</button>
-            <button class="dp-btn no" id="mg-tutorial-no-btn">Not right now / ${furiJP('今はやめておく', GRIMMERGLEN_TUTORIAL_READINGS)}</button>
+            <button class="dp-btn yes" id="mg-tutorial-yes-btn">${mariettaButtonLabel("Yes, let's try!", 'うん、やってみる！', GRIMMERGLEN_TUTORIAL_READINGS)}</button>
+            <button class="dp-btn no" id="mg-tutorial-no-btn">${mariettaButtonLabel('Not right now', '今はやめておく', GRIMMERGLEN_TUTORIAL_READINGS)}</button>
           </div>
         </div>
       </div>`;
@@ -1895,7 +1901,7 @@
           <p class="dp-line-en mg-memory-hint-en">${escapeHTML(story.en)}</p>
           <p class="dp-line-jp mg-memory-hint-jp">${furiJP(story.jp, story.readings)}</p>
           <div class="dp-btns">
-            <button class="dp-btn yes" id="mg-hint-ok-btn" type="button">OK! / わかった！</button>
+            <button class="dp-btn yes" id="mg-hint-ok-btn" type="button">${mariettaButtonLabel('OK!', 'わかった！')}</button>
           </div>
         </div>
       </div>`;
@@ -1993,8 +1999,8 @@
           <p class="dp-line-en">Do you want to give the item to Marietta?</p>
           <p class="dp-line-jp">${furiJP('このアイテムをマリエッタに渡す？', { '渡す': 'わたす' })}</p>
           <div class="dp-btns">
-            <button class="dp-btn yes" id="mg-give-item-btn" type="button">Give it to Marietta / 渡す</button>
-            <button class="dp-btn no" id="mg-keep-item-btn" type="button">Not yet / まだだよ</button>
+            <button class="dp-btn yes" id="mg-give-item-btn" type="button">${mariettaButtonLabel('Give it to Marietta', '渡す', { '渡す': 'わたす' })}</button>
+            <button class="dp-btn no" id="mg-keep-item-btn" type="button">${mariettaButtonLabel('Not yet', 'まだだよ')}</button>
           </div>
         </div>
       </div>`;
@@ -2016,7 +2022,7 @@
           <p class="dp-line-en">What is this thing? Were you even listening to me? He he!</p>
           <p class="dp-line-jp">${furiJP('これは何？ちゃんと聞いていたの？ふふ！', { '何': 'なに', '聞いて': 'きいて' })}</p>
           ${story ? `<p class="dp-line-en mg-memory-story">${escapeHTML(story.en)}</p><p class="dp-line-jp mg-memory-story">${furiJP(story.jp, story.readings)}</p>` : ''}
-          <div class="dp-btns"><button class="dp-btn yes" id="mg-memory-try-again" type="button">I’ll listen again / もう一度聞く</button></div>
+          <div class="dp-btns"><button class="dp-btn yes" id="mg-memory-try-again" type="button">${mariettaButtonLabel('I’ll listen again', 'もう一度聞く', { 'もう一度': 'もういちど', '聞く': 'きく' })}</button></div>
         </div>
       </div>`;
     mariettaPanel.querySelector('#mg-memory-try-again')?.addEventListener('click', renderMariettaQuestBriefing);
@@ -2037,7 +2043,7 @@
         ? { en: 'Choose a partial clue, or ask for a hint, then type the memory.', jp: '短い手がかりを選ぶか、ヒントを聞いてから、記憶をタイプしてね。', readings: { '短い': 'みじかい', '手がかり': 'てがかり', '選ぶ': 'えらぶ', '聞いて': 'きいて', '記憶': 'きおく' } }
         : { en: 'Type the whole memory. Ask for a hint if you need help.', jp: '記憶を全部タイプしてね。助けが必要ならヒントを聞いてね。', readings: { '記憶': 'きおく', '全部': 'ぜんぶ', '助け': 'たすけ', '必要': 'ひつよう', '聞いて': 'きいて' } };
     const recheckHTML = returnNumber === 3
-      ? `<div class="dp-btns mg-memory-recheck-wrap"><button class="dp-btn no mg-memory-recheck" id="mg-memory-see-again" type="button">Check again / ${furiJP('もう一度確認する', { '確認する': 'かくにんする' })}</button></div>`
+      ? `<div class="dp-btns mg-memory-recheck-wrap"><button class="dp-btn no mg-memory-recheck" id="mg-memory-see-again" type="button">${mariettaButtonLabel('Check again', 'もう一度確認する', { 'もう一度': 'もういちど', '確認する': 'かくにんする' })}</button></div>`
       : '';
     const returnExercise = Object.assign({}, exercise, {
       options: returnNumber === 1 ? authoredMemory.full : returnNumber === 2 ? authoredMemory.partial : null,
@@ -2093,7 +2099,7 @@
           </div>
           <div class="mg-memory-replay-scroll-cue" role="note" aria-label="Scroll down to close">↓ <span>Scroll down to close / ${furiJP('下へスクロール', { '下へ': 'したへ' })}</span> ↓</div>
           <div class="dp-btns">
-            <button class="dp-btn no" id="mg-memory-replay-close" type="button">Close / ${furiJP('閉じる', MARIETTA_UI_READINGS)}</button>
+            <button class="dp-btn no" id="mg-memory-replay-close" type="button">${mariettaButtonLabel('Close', '閉じる')}</button>
           </div>
         </div>
       </div>`;
@@ -2155,7 +2161,7 @@
               <p class="mg-memory-celebration-copy">You did it! You found my memory! Thank you!</p>
               <p class="mg-memory-celebration-jp">${furiJP('できた！わたしの記憶を見つけてくれて、ありがとう！', { '記憶': 'きおく', '見つけてくれて': 'みつけてくれて' })}</p>
               <div class="dp-btns">
-                <button class="dp-btn yes" id="mg-memory-done" type="button">Let's dance! / ${furiJP('踊ろう！', MARIETTA_UI_READINGS)}</button>
+                <button class="dp-btn yes" id="mg-memory-done" type="button">${mariettaButtonLabel("Let's dance!", '踊ろう！')}</button>
               </div>
             </div>
           ` : `
@@ -2167,7 +2173,7 @@
             ${remainingCue}
             ${nextHintHTML}
             <div class="dp-btns">
-              <button class="dp-btn yes" id="mg-memory-done" type="button">Keep exploring / 探し続ける</button>
+              <button class="dp-btn yes" id="mg-memory-done" type="button">${mariettaButtonLabel('Keep exploring', '探し続ける')}</button>
             </div>
           `}
         </div>
@@ -2694,6 +2700,11 @@
       #grimmerglen-return-yes { background:linear-gradient(135deg,#ff8fc0,#ffd166); border:1px solid rgba(224,85,158,.7); color:#5a1638; }
       #grimmerglen-return-no { background:transparent; border:1px solid rgba(224,85,158,.4); color:#a9548a; }
       .utsu-card#grimmerglen-marietta-panel .dp-btn.no { color:#a9548a; border-color:rgba(224,85,158,.4); }
+      #grimmerglen-marietta-panel .dp-btn { display:inline-flex; flex-direction:column; align-items:center; gap:3px; text-align:center; }
+      #grimmerglen-marietta-panel .mg-btn-en { display:block; }
+      #grimmerglen-marietta-panel .mg-btn-jp { display:block; color:inherit; font-size:.82em; font-weight:400; letter-spacing:0; line-height:1.35; }
+      #grimmerglen-marietta-panel .mg-btn-jp ruby { ruby-position:over; }
+      #grimmerglen-marietta-panel .mg-btn-jp rt { font-size:.68em; color:#a07851; }
       #grimmerglen-marietta-panel .mg-guide-title{font-size:clamp(.72rem,1.7vw,.86rem);font-weight:800;letter-spacing:.16em;color:#9a7850;margin-bottom:4px;}
       #grimmerglen-marietta-panel .mg-character-name{font-size:clamp(1.15rem,2.8vw,1.45rem);font-weight:700;margin-bottom:4px;}
       #grimmerglen-marietta-panel .mg-character-name span{font-weight:400;color:#9a7850;}

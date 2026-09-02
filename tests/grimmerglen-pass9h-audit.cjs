@@ -25,7 +25,7 @@ assert(success.includes('mg-memory-celebration'), 'final card must have the cute
 assert(success.includes('mg-memory-celebration-stars'), 'final card must include the decorative stars and heart');
 assert(success.includes('mg-memory-celebration-copy'), 'final card must style the celebration copy');
 assert(success.includes('mg-memory-celebration-jp'), 'final card must style the Japanese translation');
-assert(success.includes("Let's dance! / ${furiJP('踊ろう！', MARIETTA_UI_READINGS)}"), 'final card must offer a furigana Let’s dance action');
+assert(success.includes("mariettaButtonLabel(\"Let's dance!\", '踊ろう！')"), 'final card must offer a furigana Let’s dance action');
 assert(!success.includes('id="mg-memory-see-again"'), 'final Let’s dance card must not offer See again');
 assert(success.includes('startGrimmerglenCelebration()'), 'Let’s dance must launch the existing dance celebration');
 assert(replay.includes('mg-memory-replay-scroll-cue'), 'memory replay must include a visible scroll cue');
