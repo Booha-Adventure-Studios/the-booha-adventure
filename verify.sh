@@ -1125,6 +1125,13 @@ else
   bad "Adaptive low-power, hidden-page, and static-overlay contracts failed"
 fi
 
+echo "[assets] Pass 3 weight audit"
+if node tests/asset-weight-audit.cjs >/dev/null 2>&1; then
+  ok "Unused masters, audio bitrates, and Grimmerglen room WebP weights pass"
+else
+  bad "Pass 3 asset-weight audit failed"
+fi
+
 # ── Summary ──────────────────────────────────────────────────
 echo "───────────────────────────────────"
 echo "✅ $PASS passed   ⚠️  $WARN warnings   ❌ $FAIL failed"
