@@ -39,7 +39,8 @@ assert(activeCaseBlock.includes('Number(weekly.orbsPending) <= 0'), 'legacy reco
 const roomPopupStart = source.indexOf('function renderRoomNuppiPopup()');
 const roomPopupEnd = source.indexOf('\n  function openRoomNuppiPopup()', roomPopupStart);
 const roomPopup = source.slice(roomPopupStart, roomPopupEnd);
-assert(roomPopup.includes('const huntTarget = !pending && weekly.huntAccepted === true'), 'the room popup must hide the target during pending handoff');
+assert(roomPopup.includes('const huntAccepted = !pending && weekly.huntAccepted === true;'), 'the room popup must gate the target on an accepted non-pending hunt');
+assert(roomPopup.includes('const waitingForCase = huntAccepted && !!huntTarget;'), 'the room popup must treat the accepted target card as mandatory');
 assert(roomPopup.includes('getMuenbaHuntTarget({ activeOnly: true })'), 'the room popup must show only an accepted active target');
 assert(roomPopup.includes('aria-labelledby="muenba-room-hunt-target-title muenba-room-hunt-target-name"'), 'the target card must expose both its instruction and ghost name');
 assert(roomPopup.includes('class="muenba-room-hunt-target-portrait" src="${escapeHtml(waitingGhost.img)}" alt=""'), 'the target portrait must not make screen readers announce the ghost twice');
