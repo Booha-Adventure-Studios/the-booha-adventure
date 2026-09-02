@@ -4477,7 +4477,6 @@
       } else {
         mu.caseProgress.completedCaseIds = mu.caseProgress.completedCaseIds.filter(caseId => caseId !== caseData.id);
       }
-      weekly.activeCaseId = null;
       journalEntry.caseId = caseData.id;
       journalEntry.caseDifficulty = captureSession.caseDifficulty;
       journalEntry.caseCompletedAt = completedAt;
@@ -4489,6 +4488,13 @@
       // there's no risk of double-counting the same tier twice).
       mu.caseRecordsSettled += 1;
     }
+    // Pass 2: a successful capture ends the weekly hunt target even when the
+    // case was already complete at this reading tier and no case record was
+    // newly settled. Clear both target representations before persisting the
+    // reward so Nuppi cannot continue waiting for the old ghost.
+    weekly.activeCaseId = null;
+    weekly.activeHuntGhostId = null;
+    weekly.activeCaseRecoveryDone = true;
     // This counter is deliberately permanent. Weekly ghost availability may
     // reset, but every successful capture makes future rhythm charts harder.
     mu.rhythm.capturesCompleted += 1;
@@ -4761,6 +4767,14 @@
       return false;
     }
     state.handoffResolving = true;
+    // The capture commit should already have cleared the hunt pin. Repair a
+    // malformed or legacy save before the handoff can expose another hint.
+    if (weekly.activeCaseId !== null || weekly.activeHuntGhostId !== null) {
+      console.error('[Muenba] Clearing a stale hunt pin before energy handoff.');
+      weekly.activeCaseId = null;
+      weekly.activeHuntGhostId = null;
+      weekly.activeCaseRecoveryDone = true;
+    }
     const collected = Number.isInteger(mu.orbsCollected) ? mu.orbsCollected : 0;
     mu.orbsCollected = collected + pending;
     weekly.orbsPending = 0;
@@ -7119,6 +7133,11 @@
 
   function openNuppiAfterHandoff(deposited) {
     if (!lobbyOverlay) return;
+    const weeklyAfterHandoff = readMuenbaWeekly();
+    console.assert(
+      weeklyAfterHandoff.activeCaseId === null && weeklyAfterHandoff.activeHuntGhostId === null,
+      '[Muenba] A completed handoff must not expose a stale hunt target.'
+    );
     const nextGhost = nextNuppiHuntGhost();
     const canContinue = !!nextGhost;
     const needsTierSelection = !canContinue && !allMuenbaCaseModesComplete();
