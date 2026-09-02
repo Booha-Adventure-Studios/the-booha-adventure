@@ -130,7 +130,9 @@ const CURRENT_CACHES = {
   // furigana so Japanese readings do not look like duplicate sentences.
   // Grimmerglen Pass 1 adds replay-safe lifetime counters to the shared save
   // layer and world runtime; invalidate the cache-first JavaScript bundle.
-  assets: 'booha-assets-2026-486',
+  // Muenba Pass 1 repairs legacy accepted-hunt target state in the save layer
+  // and runtime; invalidate stale cache-first scripts for returning players.
+  assets: 'booha-assets-2026-487',
   decks:  'booha-decks-2026-310',
 };
 
