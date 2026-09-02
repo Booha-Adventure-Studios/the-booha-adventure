@@ -4961,9 +4961,9 @@
       /* Return-to-Karasuki confirm popup — matches the locked-world screen's
          parchment-less, dark-cemetery styling so it reads as part of this
          world rather than a generic browser dialog. */
-      #muenba-return-overlay { position:fixed; inset:0; z-index:200; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,0); transition:background .35s ease; }
+      #muenba-return-overlay { position:fixed; inset:0; z-index:200; display:none; align-items:center; justify-content:center; overflow:hidden; overscroll-behavior:contain; background:rgba(0,0,0,0); transition:background .35s ease; }
       #muenba-return-overlay.open { display:flex; background:rgba(0,0,0,.82); }
-      .muenba-return-box { box-sizing:border-box; width:min(420px,calc(100% - 40px)); padding:26px 24px 24px; border:1px solid rgba(111,166,145,.45); border-radius:16px; background:linear-gradient(155deg,rgba(8,27,20,.97),rgba(1,4,4,.98)); box-shadow:0 24px 70px rgba(0,0,0,.72),0 0 45px rgba(16,65,45,.26),inset 0 0 60px rgba(0,0,0,.55); text-align:center; font-family:Georgia,'Times New Roman',serif; color:#e0eee8; transform:scale(.94); opacity:0; transition:transform .3s cubic-bezier(.34,1.56,.64,1),opacity .25s ease; }
+      .muenba-return-box { box-sizing:border-box; width:min(420px,calc(100% - 40px)); max-height:calc(100dvh - 40px); overflow-x:hidden; overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; padding:26px 24px 24px; border:1px solid rgba(111,166,145,.45); border-radius:16px; background:linear-gradient(155deg,rgba(8,27,20,.97),rgba(1,4,4,.98)); box-shadow:0 24px 70px rgba(0,0,0,.72),0 0 45px rgba(16,65,45,.26),inset 0 0 60px rgba(0,0,0,.55); text-align:center; font-family:Georgia,'Times New Roman',serif; color:#e0eee8; transform:scale(.94); opacity:0; transition:transform .3s cubic-bezier(.34,1.56,.64,1),opacity .25s ease; }
       #muenba-return-overlay.open .muenba-return-box { transform:scale(1); opacity:1; }
       .muenba-return-box h2 { margin:0 0 4px; font-size:1.2rem; font-weight:400; letter-spacing:.06em; text-transform:uppercase; }
       .muenba-return-box .jp { margin:0 0 16px; color:#aac2b5; font-size:.85rem; letter-spacing:.1em; }
@@ -4988,9 +4988,9 @@
          return prompt, just roomier: it holds a portrait plus a few lines
          of text instead of a one-line question. Shows every time the
          player enters Muenba (Pass 3b). */
-      #muenba-lobby-overlay { position:fixed; inset:0; z-index:210; display:none; align-items:flex-start; justify-content:center; overflow-y:auto; background:rgba(0,0,0,0); transition:background .4s ease; padding:max(20px,env(safe-area-inset-top,0px)) max(20px,env(safe-area-inset-right,0px)) max(20px,env(safe-area-inset-bottom,0px)) max(20px,env(safe-area-inset-left,0px)); box-sizing:border-box; }
+      #muenba-lobby-overlay { position:fixed; inset:0; z-index:210; display:none; align-items:flex-start; justify-content:center; overflow:hidden; overscroll-behavior:contain; background:rgba(0,0,0,0); transition:background .4s ease; padding:max(20px,env(safe-area-inset-top,0px)) max(20px,env(safe-area-inset-right,0px)) max(20px,env(safe-area-inset-bottom,0px)) max(20px,env(safe-area-inset-left,0px)); box-sizing:border-box; }
       #muenba-lobby-overlay.open { display:flex; background:rgba(0,0,0,.86); }
-      .muenba-lobby-box { position:relative; box-sizing:border-box; width:min(480px,100%); max-height:calc(100vh - 40px); max-height:calc(100dvh - 40px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px)); margin:0 auto; overflow-y:auto; padding:28px 26px 26px; border:1px solid rgba(111,166,145,.45); border-radius:18px; background:linear-gradient(155deg,rgba(8,27,20,.97),rgba(1,4,4,.98)); box-shadow:0 24px 70px rgba(0,0,0,.75),0 0 55px rgba(16,65,45,.28),inset 0 0 70px rgba(0,0,0,.58); text-align:center; font-family:Georgia,'Times New Roman',serif; color:#e0eee8; transform:scale(.94); opacity:0; transition:transform .32s cubic-bezier(.34,1.56,.64,1),opacity .26s ease; }
+      .muenba-lobby-box { position:relative; box-sizing:border-box; width:min(480px,100%); max-height:calc(100vh - 40px); max-height:calc(100dvh - 40px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px)); margin:0 auto; overflow-x:hidden; overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; padding:28px 26px 26px; border:1px solid rgba(111,166,145,.45); border-radius:18px; background:linear-gradient(155deg,rgba(8,27,20,.97),rgba(1,4,4,.98)); box-shadow:0 24px 70px rgba(0,0,0,.75),0 0 55px rgba(16,65,45,.28),inset 0 0 70px rgba(0,0,0,.58); text-align:center; font-family:Georgia,'Times New Roman',serif; color:#e0eee8; transform:scale(.94); opacity:0; transition:transform .32s cubic-bezier(.34,1.56,.64,1),opacity .26s ease; }
       #muenba-lobby-overlay.open .muenba-lobby-box { transform:scale(1); opacity:1; }
       .muenba-lobby-portrait { display:block; width:96px; height:96px; object-fit:contain; margin:0 auto 12px; filter:drop-shadow(0 0 16px rgba(122,180,151,.3)); animation:muenbaNuppiTalk 2.8s ease-in-out infinite; transform-origin:50% 86%; }
       @keyframes muenbaNuppiTalk { 0%,100% { transform:translateY(0) rotate(-1deg); } 25% { transform:translateY(-3px) rotate(1deg); } 52% { transform:translateY(1px) rotate(0deg); } 76% { transform:translateY(-2px) rotate(-1deg); } }
@@ -5135,7 +5135,7 @@
       /* Capture session overlay — reuses .muenba-lobby-box for
          the card shell and adds the two-lane
          rhythm board inside that modal. */
-      #muenba-capture-overlay { position:fixed; inset:0; z-index:215; display:none; align-items:flex-start; justify-content:center; overflow-y:auto; background:rgba(0,0,0,0); transition:background .4s ease; padding:max(20px,env(safe-area-inset-top,0px)) max(20px,env(safe-area-inset-right,0px)) max(20px,env(safe-area-inset-bottom,0px)) max(20px,env(safe-area-inset-left,0px)); box-sizing:border-box; }
+      #muenba-capture-overlay { position:fixed; inset:0; z-index:215; display:none; align-items:flex-start; justify-content:center; overflow:hidden; overscroll-behavior:contain; background:rgba(0,0,0,0); transition:background .4s ease; padding:max(20px,env(safe-area-inset-top,0px)) max(20px,env(safe-area-inset-right,0px)) max(20px,env(safe-area-inset-bottom,0px)) max(20px,env(safe-area-inset-left,0px)); box-sizing:border-box; }
       #muenba-capture-overlay.open { display:flex; background:rgba(0,0,0,.86); }
       #muenba-capture-overlay.danger.open { background:rgba(90,0,12,.9); animation:muenbaDangerFlash .38s steps(2,end) infinite; }
       #muenba-capture-overlay.open .muenba-lobby-box { transform:scale(1); opacity:1; }
@@ -5176,8 +5176,8 @@
       .muenba-rhythm-energy-label { flex:0 0 auto; color:#88b8ff; font:900 .58rem/1 ui-monospace,monospace; letter-spacing:.1em; }
       .muenba-rhythm-energy-track { position:relative; flex:1; height:7px; overflow:hidden; border:1px solid rgba(137,184,255,.5); border-radius:99px; background:rgba(7,13,29,.86); box-shadow:inset 0 0 7px rgba(40,21,93,.8); }
       .muenba-rhythm-energy-fill { display:block; width:0; height:100%; border-radius:inherit; background:linear-gradient(90deg,#8c5bff,#26e6a0,#d8ff4f); box-shadow:0 0 14px rgba(112,255,170,.72); transition:width .18s ease-out; }
-      .muenba-rhythm-board { position:relative; display:grid; grid-template-columns:1fr 1fr; gap:8px; height:250px; margin:8px 0 6px; padding:5px; border:1px solid rgba(143,104,255,.28); border-radius:18px; background:radial-gradient(circle at 50% 100%,rgba(255,122,27,.1),transparent 48%),rgba(5,5,19,.64); box-shadow:inset 0 0 24px rgba(68,35,143,.26); }
-      .muenba-rhythm-lane { position:relative; min-width:0; height:250px; overflow:hidden; padding:0; border:1px solid rgba(156,203,182,.35); border-radius:14px; color:#f2f7ff; background:linear-gradient(180deg,rgba(25,55,44,.58),rgba(5,15,12,.86)); cursor:pointer; touch-action:none; user-select:none; }
+      .muenba-rhythm-board { position:relative; display:grid; grid-template-columns:1fr 1fr; gap:8px; height:clamp(160px,32vh,250px); min-height:0; margin:8px 0 6px; padding:5px; border:1px solid rgba(143,104,255,.28); border-radius:18px; background:radial-gradient(circle at 50% 100%,rgba(255,122,27,.1),transparent 48%),rgba(5,5,19,.64); box-shadow:inset 0 0 24px rgba(68,35,143,.26); }
+      .muenba-rhythm-lane { position:relative; min-width:0; min-height:0; height:100%; overflow:hidden; padding:0; border:1px solid rgba(156,203,182,.35); border-radius:14px; color:#f2f7ff; background:linear-gradient(180deg,rgba(25,55,44,.58),rgba(5,15,12,.86)); cursor:pointer; touch-action:none; user-select:none; }
       .muenba-rhythm-don { border-color:rgba(117,255,154,.74); background:linear-gradient(180deg,rgba(20,116,84,.7),rgba(5,35,30,.94)); box-shadow:inset 0 0 28px rgba(39,255,145,.12),0 0 13px rgba(39,255,145,.1); }
       .muenba-rhythm-kat { border-color:rgba(197,118,255,.72); background:linear-gradient(180deg,rgba(86,35,125,.74),rgba(27,9,51,.95)); box-shadow:inset 0 0 28px rgba(190,85,255,.14),0 0 13px rgba(190,85,255,.12); }
       .muenba-rhythm-rim { border-color:rgba(102,183,255,.72); background:linear-gradient(180deg,rgba(28,78,139,.76),rgba(7,25,58,.95)); box-shadow:inset 0 0 28px rgba(52,159,255,.14),0 0 13px rgba(52,159,255,.12); }
@@ -5598,8 +5598,8 @@
       html.muenba-phone-portrait .muenba-case-check-panel { padding:15px 12px 14px; }
       html.muenba-phone-portrait .muenba-case-check-panel .muenba-case-question { padding:16px 13px 15px; }
       html.muenba-phone-portrait .muenba-case-choice { min-height:58px; padding:13px 11px 13px 9px; font-size:clamp(.94rem,4.4vw,1.05rem) !important; }
-      html.muenba-phone-portrait .muenba-rhythm-board { height:min(42dvh,250px); min-height:190px; margin:7px 0 5px; gap:6px; padding:4px; }
-      html.muenba-phone-portrait .muenba-rhythm-lane { height:100%; }
+      html.muenba-phone-portrait .muenba-rhythm-board { height:clamp(160px,32vh,250px); min-height:0; margin:7px 0 5px; gap:6px; padding:4px; }
+      html.muenba-phone-portrait .muenba-rhythm-lane { height:100%; min-height:0; }
       html.muenba-phone-portrait .muenba-rhythm-note { min-width:30px; min-height:30px; }
       html.muenba-phone-portrait .muenba-lobby-actions,
       html.muenba-phone-portrait .muenba-case-actions { gap:8px; }
@@ -5613,8 +5613,8 @@
       html.muenba-phone-portrait #muenba-capture-overlay.muenba-rhythm-mode { overscroll-behavior:contain; }
       html.muenba-phone-portrait #muenba-capture-overlay.muenba-rhythm-mode .muenba-lobby-box { padding:16px 10px 14px; }
       html.muenba-phone-portrait #muenba-capture-overlay.muenba-rhythm-mode .muenba-rhythm-halloween-box h2 { margin-bottom:2px; font-size:clamp(1.15rem,6vw,1.5rem); }
-      html.muenba-phone-portrait #muenba-capture-overlay.muenba-rhythm-mode .muenba-rhythm-board { height:min(42dvh,250px); min-height:190px; margin:7px 0 5px; gap:6px; padding:4px; }
-      html.muenba-phone-portrait #muenba-capture-overlay.muenba-rhythm-mode .muenba-rhythm-lane { height:100%; min-height:190px; }
+      html.muenba-phone-portrait #muenba-capture-overlay.muenba-rhythm-mode .muenba-rhythm-board { height:clamp(160px,32vh,250px); min-height:0; margin:7px 0 5px; gap:6px; padding:4px; }
+      html.muenba-phone-portrait #muenba-capture-overlay.muenba-rhythm-mode .muenba-rhythm-lane { height:100%; min-height:0; }
       html.muenba-phone-portrait #muenba-capture-overlay.muenba-rhythm-mode .muenba-rhythm-lane-label { font-size:.52rem; letter-spacing:.01em; }
       html.muenba-phone-portrait #muenba-capture-overlay.muenba-rhythm-mode .muenba-rhythm-note { width:34px; height:34px; min-width:30px; min-height:30px; font-size:.9rem; }
       html.muenba-phone-portrait #muenba-capture-overlay.muenba-rhythm-mode .muenba-rhythm-help-button { top:8px; left:8px; }
