@@ -62,7 +62,7 @@ assert(index.indexOf('<script src="js/utsu-sfx.js"></script>') < index.indexOf('
 // The shared helper creates its context only from a sound call, and static
 // index art plus the helper must be covered by the asset cache.
 assert(/function ensureCtx\(\)[\s\S]*?if \(!ctx\) ctx = new AC\(\);/.test(sfx), 'shared SFX context must be lazy');
-assert(sw.includes('cache.addAll(CORE_ASSETS)'), 'service worker must precache static index assets');
+assert(sw.includes('cacheUrlsIndividually(cache, CORE_ASSETS'), 'service worker must precache static index assets');
 imageNames.concat('utsu-sfx').forEach((name) => {
   const assetPath = name === 'utsu-sfx' ? 'js/utsu-sfx.js' : `assets/img/${name}.webp`;
   assert(sw.includes(assetPath), `service worker must cover ${assetPath}`);

@@ -35,6 +35,6 @@ assert(!index.includes('assets/img/pre-boo.png'), 'index Pre-Boo reference must 
 assert(!index.includes('assets/img/boo-tree.png'), 'index Boo-tree reference must use WebP');
 assert(!index.includes('assets/img/cont-tree.png'), 'index Boo-continuum reference must use WebP');
 assert(sw.includes('const CORE_ASSETS = ['), 'service worker needs a static asset precache list');
-assert(sw.includes('cache.addAll(CORE_ASSETS)'), 'static asset precache must target the asset cache');
+assert(sw.includes('cacheUrlsIndividually(cache, CORE_ASSETS'), 'static asset precache must target the asset cache');
 
 console.log('Index 22A+22B performance audit passed: six WebP references, removed PNG sources, and correct asset precaching.');
