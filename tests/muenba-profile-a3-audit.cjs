@@ -12,7 +12,7 @@ assert(statsStart >= 0 && statsEnd > statsStart, 'Muenba lifetime stats section 
 const stats = profile.slice(statsStart, statsEnd);
 
 for (const label of ['Captures', 'Orbs', 'Cases', 'Rooms']) {
-  assert(stats.includes(`>${label}</div>`), `lifetime stats must retain the short ${label} label`);
+  assert(stats.includes(`>${label}<small>`), `lifetime stats must retain the short ${label} label`);
 }
 for (const oldLabel of ['Lifetime captures', 'Lifetime orbs', 'Lifetime case records', 'Lifetime rooms visited']) {
   assert(!stats.includes(oldLabel), `lifetime stats must not repeat the long label: ${oldLabel}`);
