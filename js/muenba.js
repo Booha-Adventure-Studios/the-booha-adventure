@@ -1174,17 +1174,23 @@
   // Pass 29B: accepting Nuppi's hunt is the explicit unlock for the rest of
   // Muenba. Keep it in weekly state so room navigation opens for the current
   // hunt and automatically closes again at the next weekly rollover.
-  function acceptMuenbaHunt() {
-    // Pin the case at the same moment the hunt is accepted. The target is
-    // already derived from the week-stable order, but storing its case id
-    // prevents a profile visit, reload, or another state read from silently
-    // choosing a different story before the player returns to the cemetery.
-    const acceptedCase = nextMuenbaCase();
+  function acceptMuenbaHunt(target) {
+    // Pass 3: accept exactly what the hunt card rendered. Do not recalculate
+    // nextMuenbaCase() here: an old activeCaseId, profile visit, or tier read
+    // must not replace the ghost the player just chose to hunt.
+    const acceptedTarget = target && target.ghost ? target : getMuenbaHuntTarget();
+    const ghost = acceptedTarget && acceptedTarget.ghost;
+    const acceptedCase = acceptedTarget && acceptedTarget.caseData;
+    const knownGhost = ghost && GHOSTS.find(candidate => candidate.id === ghost.id);
+    const validCase = !acceptedCase || acceptedCase.ghostId === ghost.id;
+    if (!knownGhost || !validCase) return false;
     if (!writeMuenbaWeekly({
       huntAccepted: true,
       activeCaseId: acceptedCase ? acceptedCase.id : null,
+      activeHuntGhostId: knownGhost.id,
       activeCaseRecoveryDone: true
     })) return false;
+    invalidateGhostRoomMap();
     state.navigationUnlocked = true;
     state.inputLocked = false;
     state.clickTarget = null;
@@ -6929,7 +6935,7 @@
         window.location.href = 'muenba-profile.html';
         return;
       }
-      if (ghost && !returningEnergy && !acceptMuenbaHunt()) return;
+      if (ghost && !returningEnergy && !acceptMuenbaHunt(huntTarget)) return;
       closeNuppiLobby();
       if (readMuenbaWeekly().orbsPending > 0) openPendingOrbRecovery();
       });
