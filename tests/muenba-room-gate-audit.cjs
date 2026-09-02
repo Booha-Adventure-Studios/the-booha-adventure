@@ -26,6 +26,12 @@ const caseEnd = source.indexOf('\n  function availableMuenbaGhostsThisWeek()', c
 const caseBlock = source.slice(caseStart, caseEnd);
 assert(caseBlock.includes('weekly.activeCaseId'), 'Muenba case resolution must consult the persisted active case');
 assert(caseBlock.includes('caseData.id === weekly.activeCaseId'), 'Muenba must keep the accepted case when it remains unfinished');
+assert(source.includes('function activeMuenbaCase()'), 'Muenba must expose an accepted-case-only resolver for the room reminder');
+const roomPopupStart = source.indexOf('function renderRoomNuppiPopup()');
+const roomPopupEnd = source.indexOf('\n  function openRoomNuppiPopup()', roomPopupStart);
+const roomPopup = source.slice(roomPopupStart, roomPopupEnd);
+assert(roomPopup.includes('const acceptedCase = !pending ? activeMuenbaCase() : null;'), 'the room popup must hide the target during pending handoff');
+assert(roomPopup.includes('const waitingForCase = !!acceptedCase;'), 'the room popup must show a target only for an accepted active case');
 
 const exitStart = source.indexOf('function getAvailableExit(now)');
 const exitEnd = source.indexOf('\n  function transitionTo(', exitStart);
