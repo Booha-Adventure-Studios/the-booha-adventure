@@ -7068,7 +7068,16 @@
     // is live. If a legacy target cannot be recovered, keep Nuppi's generic
     // status rather than previewing a future hunt before acceptance.
     const waitingForCase = huntAccepted && !!huntTarget;
-    const needsTierSelection = !pending && !waitingForCase && !allMuenbaCaseModesComplete();
+    // Pass 1 (fix): Muenba entry no longer opens Nuppi's lobby automatically,
+    // and this popup used to have no way to ever offer a first hunt -- only
+    // the post-handoff screen could reach acceptMuenbaHunt(). When nothing is
+    // accepted yet, ask the same resolver the case board/hunt card use so
+    // Nuppi can offer (and this popup can lead into accepting) whatever hunt
+    // is actually available, instead of only ever reacting to one that's
+    // already pinned.
+    const offerTarget = !pending && !huntAccepted ? getMuenbaHuntTarget() : null;
+    const canOfferHunt = !!offerTarget;
+    const needsTierSelection = !pending && !waitingForCase && !canOfferHunt && !allMuenbaCaseModesComplete();
     const selectedMode = getMuenbaReadingDifficulty();
     const selectedModeLabel = MUENBA_MEMORY_MODE_LABELS[selectedMode] || MUENBA_MEMORY_MODE_LABELS.start;
     const waitingGhost = huntTarget ? huntTarget.ghost : null;
@@ -7080,32 +7089,44 @@
     const waitingLineJp = waitingGhost
       ? `${waitingGhost.kana}を<ruby>見<rt>み</rt></ruby>つけて、ここに<ruby>戻<rt>もど</rt></ruby>ってきてね。`
       : '<ruby>次<rt>つぎ</rt></ruby>の<ruby>幽霊<rt>ゆうれい</rt></ruby>を<ruby>見<rt>み</rt></ruby>つけて、ここに<ruby>戻<rt>もど</rt></ruby>ってきてね。';
+    const offerLine = name ? `I have a case for you, ${name}.` : 'I have a case for you.';
+    const offerLineJp = 'あなたのための<ruby>事件<rt>じけん</rt></ruby>があるよ。';
     const copy = pending
       ? 'The ghost energy is waiting here. Nuppi is ready for the handoff.'
       : waitingForCase
         ? waitingLine
-        : needsTierSelection
-          ? `${selectedModeLabel} is complete. Choose another reading level to continue the English cases.`
-          : 'Nuppi is here when you are ready.';
+        : canOfferHunt
+          ? offerLine
+          : needsTierSelection
+            ? `${selectedModeLabel} is complete. Choose another reading level to continue the English cases.`
+            : 'Nuppi is here when you are ready.';
     const statusCopy = pending
       ? 'Your energy orbs are ready to return here.'
       : waitingForCase
         ? `Find ${waitingGhostName}, then bring the energy home.`
-        : needsTierSelection
-          ? 'Open your Muenba profile and choose a level with unfinished cases.'
-          : 'Nuppi will be here when you need him.';
+        : canOfferHunt
+          ? 'Open the case file to see which ghost you are looking for.'
+          : needsTierSelection
+            ? 'Open your Muenba profile and choose a level with unfinished cases.'
+            : 'Nuppi will be here when you need him.';
     const statusCopyJp = pending
       ? '<ruby>集<rt>あつ</rt></ruby>めたエネルギーオーブをここへ<ruby>返<rt>かえ</rt></ruby>せます。'
       : waitingForCase
         ? `${waitingGhost ? waitingGhost.kana : '幽霊'}を<ruby>見<rt>み</rt></ruby>つけて、エネルギーをここへ<ruby>持<rt>も</rt></ruby>ってきてね。`
-        : 'ヌーピーは<ruby>必要<rt>ひつよう</rt></ruby>なとき、ここにいるよ。';
+        : canOfferHunt
+          ? '<ruby>事件<rt>じけん</rt></ruby>ファイルを<ruby>開<rt>ひら</rt></ruby>いて、<ruby>探<rt>さが</rt></ruby>す<ruby>幽霊<rt>ゆうれい</rt></ruby>を<ruby>確認<rt>かくにん</rt></ruby>しよう。'
+          : needsTierSelection
+            ? 'プロフィールで、まだ<ruby>終<rt>お</rt></ruby>わっていない<ruby>読<rt>よ</rt></ruby>み<ruby>方<rt>かた</rt></ruby>を<ruby>選<rt>えら</rt></ruby>ぼう。'
+            : 'ヌーピーは<ruby>必要<rt>ひつよう</rt></ruby>なとき、ここにいるよ。';
     const copyJp = pending
       ? '<ruby>幽霊<rt>ゆうれい</rt></ruby>のエネルギーはここで<ruby>待<rt>ま</rt></ruby>っています。ヌーピーは<ruby>受<rt>う</rt></ruby>け<ruby>取<rt>と</rt></ruby>る<ruby>準備<rt>じゅんび</rt></ruby>ができています。'
         : waitingForCase
         ? waitingLineJp
-        : needsTierSelection
-          ? 'プロフィールで<ruby>別<rt>べつ</rt></ruby>の<ruby>読<rt>よ</rt></ruby>み<ruby>方<rt>かた</rt></ruby>を<ruby>選<rt>えら</rt></ruby>ぶと、<ruby>英語<rt>えいご</rt></ruby>の<ruby>事件<rt>じけん</rt></ruby>を<ruby>続<rt>つづ</rt></ruby>けられるよ。'
-          : 'ヌーピーはここで<ruby>待<rt>ま</rt></ruby>っているよ。';
+        : canOfferHunt
+          ? offerLineJp
+          : needsTierSelection
+            ? 'プロフィールで<ruby>別<rt>べつ</rt></ruby>の<ruby>読<rt>よ</rt></ruby>み<ruby>方<rt>かた</rt></ruby>を<ruby>選<rt>えら</rt></ruby>ぶと、<ruby>英語<rt>えいご</rt></ruby>の<ruby>事件<rt>じけん</rt></ruby>を<ruby>続<rt>つづ</rt></ruby>けられるよ。'
+            : 'ヌーピーはここで<ruby>待<rt>ま</rt></ruby>っているよ。';
     const huntTargetHTML = waitingForCase && waitingGhost
       ? `<section class="muenba-room-hunt-target" data-muenba-target-ghost="${escapeHtml(waitingGhostId)}" aria-labelledby="muenba-room-hunt-target-title muenba-room-hunt-target-name">
           <div id="muenba-room-hunt-target-title" class="muenba-room-hunt-target-label">FIND THIS GHOST</div>
@@ -7135,17 +7156,20 @@
         </section>
         <div class="muenba-lobby-actions">
           ${pending ? '<button id="muenba-room-nuppi-handoff" class="muenba-capture-action" type="button"><span>Hand over energy</span><small>エネルギーを<ruby>渡<rt>わた</rt></ruby>す</small></button>' : ''}
+          ${canOfferHunt ? '<button id="muenba-room-nuppi-accept" class="muenba-capture-action" type="button"><span>Accept hint</span><small>ヒントを<ruby>受<rt>う</rt></ruby>ける</small></button>' : ''}
           ${needsTierSelection ? '<button id="muenba-room-nuppi-profile" class="muenba-capture-action" type="button"><span>Choose reading level</span><small><ruby>読<rt>よ</rt></ruby>み<ruby>方<rt>かた</rt></ruby>を<ruby>選<rt>えら</rt></ruby>ぶ</small></button>' : ''}
           <button id="muenba-room-nuppi-close" type="button"><span>Back to the hunt</span><small><ruby>探索<rt>たんさく</rt></ruby>に<ruby>戻<rt>もど</rt></ruby>る</small></button>
         </div>
       </div>`;
     const handoff = lobbyOverlay.querySelector('#muenba-room-nuppi-handoff');
     if (handoff) addMuenbaButtonSfx(handoff).addEventListener('click', () => depositOrbsAtNuppi());
+    const accept = lobbyOverlay.querySelector('#muenba-room-nuppi-accept');
+    if (accept) addMuenbaButtonSfx(accept).addEventListener('click', () => renderNuppiCaseBoard());
     const profile = lobbyOverlay.querySelector('#muenba-room-nuppi-profile');
     if (profile) addMuenbaButtonSfx(profile).addEventListener('click', () => { window.location.href = 'muenba-profile.html'; });
     addMuenbaButtonSfx(lobbyOverlay.querySelector('#muenba-room-nuppi-close'))
       .addEventListener('click', closeNuppiLobby);
-    focusLobbyControl(pending ? '#muenba-room-nuppi-handoff' : needsTierSelection ? '#muenba-room-nuppi-profile' : '#muenba-room-nuppi-close');
+    focusLobbyControl(pending ? '#muenba-room-nuppi-handoff' : canOfferHunt ? '#muenba-room-nuppi-accept' : needsTierSelection ? '#muenba-room-nuppi-profile' : '#muenba-room-nuppi-close');
   }
 
   function openRoomNuppiPopup() {
