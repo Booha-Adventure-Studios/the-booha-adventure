@@ -161,7 +161,7 @@ assert(serviceWorker.includes('`${BASE}/js/`'), 'service worker must cache Grimm
 assert(serviceWorker.includes('`${BASE}/assets/`'), 'service worker must cache Grimmerglen art at runtime');
 assert(serviceWorker.includes('${BASE}/assets/img/grimmerglen/grimmerglen_bgm.mp3'), 'service worker must precache Grimmerglen BGM');
 assert(serviceWorker.includes('${BASE}/assets/img/grimmerglen/grimmerglen_dance.mp3'), 'service worker must precache Grimmerglen dance music');
-assert(/pages:\s+'booha-pages-2026-400'/.test(serviceWorker), 'page cache must be bumped for the Muenba Pass A1 profile update');
+assert(/pages:\s+'booha-pages-2026-401'/.test(serviceWorker), 'page cache must be bumped for the Muenba Pass A2 profile update');
 assert(serviceWorker.includes('grimmerglen/dance/marietta_dance_'), 'service worker must precache Marietta dance art');
 assert(serviceWorker.includes('grimmerglen/dance/booha_grimmerglen_dance_'), 'service worker must precache Booha dance art');
 assert(serviceWorker.includes('room_${String(index + 1).padStart(2, \'0\')}.webp'), 'service worker must cover the generated room sequence');

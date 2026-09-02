@@ -10,7 +10,7 @@ const CURRENT_CACHES = {
   // Profile consolidation Pass 1: ship the canonical progress page and its
   // moved progress renderer to returning players.
   // Grimmerglen Pass 2 changes the lifetime-counter profile markup.
-  pages:  'booha-pages-2026-400',
+  pages:  'booha-pages-2026-401',
   // js/ is served cache-first (see ASSET_PREFIXES below), so once a device
   // caches a script it never re-fetches it until this string changes.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
@@ -64,6 +64,8 @@ const CURRENT_CACHES = {
   // Muenba 28G completes the popup/hunt UI sound pass: direct controls now
   // Muenba 29A/B restores profile-link clicks and gates Muenba room_01 until
   // the weekly hunt is explicitly accepted.
+  // Muenba Pass A2 compacts the profile ghost cards and keeps memory status
+  // focused on the currently selected reading mode.
   // use the central button cue and Nuppi opens use the bespoke Nuppi cue.
   // Destruction goofy-SFX v3: modal-synthesis rewrite of the pull/creak,
   // block hit/break, and bounce sounds (static-partial materials vs.

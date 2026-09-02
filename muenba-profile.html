@@ -162,20 +162,21 @@
     .section-heading p { margin: 0; color: var(--quiet); font: .63rem/1.4 var(--sans); letter-spacing: .12em; text-transform: uppercase; text-align: right; }
 
     .ghost-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
-    .ghost-card { min-height: 174px; padding: 14px; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); position: relative; overflow: hidden; text-align: center; }
+    .ghost-card { min-height: 176px; padding: 12px 11px 11px; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); position: relative; overflow: hidden; text-align: center; }
     .ghost-card.is-weekly-found { border-color: rgba(143,220,178,.55); background: linear-gradient(145deg, rgba(28,68,50,.78), var(--panel)); }
     .ghost-card::after { content: ""; position: absolute; width: 86px; height: 86px; right: -28px; bottom: -30px; border-radius: 50%; background: radial-gradient(circle, rgba(143,220,178,.13), transparent 70%); pointer-events: none; }
-    .ghost-avatar { width: 62px; height: 62px; object-fit: contain; margin: 2px auto 8px; display: block; filter: grayscale(.85) brightness(.75); opacity: .5; }
+    .ghost-avatar { width: 68px; height: 68px; object-fit: contain; margin: 0 auto 5px; display: block; filter: grayscale(.85) brightness(.75); opacity: .5; }
     .is-weekly-found .ghost-avatar { filter: none; opacity: 1; }
     .ghost-name { margin: 0; color: #f2fff7; font-size: .95rem; font-weight: 400; line-height: 1.2; }
-    .ghost-name-kana { margin: 4px 0 0; color: var(--quiet); font: .72rem/1.25 var(--muenba-display); letter-spacing: .1em; }
-    .ghost-personality { min-height: 34px; margin: 8px 0 0; color: var(--muted); font-size: .72rem; line-height: 1.4; }
-    .ghost-state { margin: 12px 0 0; color: var(--quiet); font: 700 .61rem/1.4 var(--sans); letter-spacing: .08em; text-transform: uppercase; }
-    .ghost-state-jp { margin: 3px 0 0; color: var(--quiet); font: .72rem/1.35 var(--font); }
-    .ghost-memory-current { margin: 9px 0 0; color: var(--gold); font: 700 .64rem/1.35 var(--sans); letter-spacing: .04em; }
-    .ghost-memory-progress { margin: 4px 0 0; color: var(--quiet); font: .61rem/1.4 var(--sans); letter-spacing: .02em; }
+    .ghost-name-kana { margin: 3px 0 0; color: var(--quiet); font: .7rem/1.2 var(--muenba-display); letter-spacing: .1em; }
+    .ghost-personality { min-height: 2.65em; margin: 6px 0 0; color: var(--muted); font-size: .68rem; line-height: 1.32; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .ghost-personality-jp { min-height: 1.35em; margin: 2px 0 0; color: var(--quiet); font: .67rem/1.3 var(--font); display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+    .ghost-state { margin: 7px 0 0; color: var(--quiet); font: 700 .59rem/1.3 var(--sans); letter-spacing: .06em; text-transform: uppercase; }
+    .ghost-state small { display: inline; margin-left: 4px; color: var(--quiet); font: .72rem var(--font); letter-spacing: 0; text-transform: none; }
+    .ghost-memory-current { margin: 6px 0 0; color: var(--gold); font: 700 .63rem/1.3 var(--sans); letter-spacing: .04em; }
+    .ghost-memory-current small { display: block; margin-top: 2px; color: var(--quiet); font: .61rem/1.25 var(--sans); letter-spacing: .02em; }
     .is-weekly-found .ghost-state { color: var(--moss); }
-    .is-weekly-found .ghost-state-jp { color: rgba(143,220,178,.72); }
+    .is-weekly-found .ghost-state small { color: rgba(143,220,178,.72); }
     .ghost-card:not(.is-weekly-found) .ghost-state { color: var(--gold); }
 
     .lower-grid { display: grid; grid-template-columns: 1.25fr .75fr; gap: 16px; }
@@ -475,17 +476,14 @@
           // capture — previously every found-at-least-once ghost stayed lit
           // up on every tier, even ones you hadn't actually solved there.
           const isFound = !!currentModeComplete;
-          const modeProgress = ghostCase
-            ? memoryModes.map(modeName => `${memoryModeLabel(modeName)}: ${modeComplete(ghostRecord, modeName) ? 'complete' : 'open'}`).join(' · ')
-            : 'No case memory assigned yet';
           return `<article class="ghost-card${isFound ? ' has-lifetime-memory' : ''}${weeklyFound ? ' is-weekly-found' : ''}">
             <img class="ghost-avatar" src="${esc(ghost.img)}" alt="">
             <h3 class="ghost-name">${esc(ghost.name)}</h3>
             <p class="ghost-name-kana">${esc(ghost.kana || '')}</p>
             <p class="ghost-personality">${esc(ghost.personality || '')}</p>
-            <p class="ghost-state">${weeklyFound ? 'Found this week' : 'Available this week'}</p>
-            <p class="ghost-state-jp">${weeklyFound ? '<ruby>今週<rt>こんしゅう</rt></ruby>みつけた' : '<ruby>今週<rt>こんしゅう</rt></ruby>はまだ'}</p>
-            ${ghostCase ? `<p class="ghost-memory-current">Lifetime ${esc(memoryModeLabel(currentMemory))} · ${currentModeComplete ? 'complete' : 'open'}</p><p class="ghost-memory-progress">${esc(modeProgress)}</p>` : '<p class="ghost-memory-progress">Lifetime case memory not opened yet</p>'}
+            <p class="ghost-personality-jp">${ghost.personalityJp || ''}</p>
+            <p class="ghost-state">${weeklyFound ? 'Found this week' : 'Available this week'}<small>${weeklyFound ? '<ruby>今週<rt>こんしゅう</rt></ruby>みつけた' : '<ruby>今週<rt>こんしゅう</rt></ruby>はまだ'}</small></p>
+            <p class="ghost-memory-current" title="${esc(memoryModeLabel(currentMemory))}">Memory: ${currentModeComplete ? 'settled' : 'open'}<small>${esc(memoryModeLabel(currentMemory))}</small></p>
           </article>`;
         }).join('');
 
