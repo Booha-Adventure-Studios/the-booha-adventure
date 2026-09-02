@@ -6542,9 +6542,27 @@
     return image;
   }
 
+  function getRoomExits(roomId) {
+    return (DATA.rooms[roomId]?.exits || []).filter(exit => exit && DATA.rooms[exit.to]);
+  }
+
+  // Keep decoded room art bounded to the room the player sees and its direct
+  // exits. The service-worker cache still retains fetched responses, so a
+  // later return remains network-cheap without retaining every decoded
+  // bitmap in this page's JavaScript heap.
+  function trimRoomCachesToNeighborhood(roomId) {
+    const keep = new Set([roomId, ...getRoomExits(roomId).map(exit => exit.to)]);
+    for (const cachedRoomId of imageCache.keys()) {
+      if (!keep.has(cachedRoomId)) imageCache.delete(cachedRoomId);
+    }
+    for (const cachedRoomId of roomGlowCache.keys()) {
+      if (!keep.has(cachedRoomId)) roomGlowCache.delete(cachedRoomId);
+    }
+  }
+
   function preloadAdjacent(roomId) {
     getImage(roomId);
-    for (const exit of DATA.rooms[roomId].exits || []) getImage(exit.to);
+    for (const exit of getRoomExits(roomId)) getImage(exit.to);
   }
 
   function getSpawn(room, spawnId) {
@@ -6553,6 +6571,7 @@
 
   function showRoom(roomId) {
     preloadAdjacent(roomId);
+    trimRoomCachesToNeighborhood(roomId);
     const image = getImage(roomId);
     roomLayer.replaceChildren(image);
     image.className = 'muenba-bg';
