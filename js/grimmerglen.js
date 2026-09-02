@@ -2615,6 +2615,26 @@
     stage.style.transform = `translate(-50%, -50%) scale(${scale})`;
   }
 
+  function updateGrimmerglenViewportMetrics() {
+    const viewport = window.visualViewport;
+    const viewportHeight = Number(viewport?.height) || Number(window.innerHeight) || 1;
+    const viewportOffsetTop = Number(viewport?.offsetTop) || 0;
+    const layoutHeight = Number(window.innerHeight) || viewportHeight;
+    const keyboardInset = Math.max(0, layoutHeight - viewportHeight - viewportOffsetTop);
+    document.documentElement.style.setProperty('--grimmerglen-viewport-height', `${Math.max(1, Math.round(viewportHeight))}px`);
+    document.documentElement.style.setProperty('--grimmerglen-keyboard-inset', `${Math.round(keyboardInset)}px`);
+  }
+
+  function bindGrimmerglenViewportMetrics() {
+    const refresh = () => updateGrimmerglenViewportMetrics();
+    refresh();
+    window.addEventListener('resize', refresh, { passive: true });
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', refresh, { passive: true });
+      window.visualViewport.addEventListener('scroll', refresh, { passive: true });
+    }
+  }
+
   function buildApp() {
     app = document.createElement('div');
     app.id = 'grimmerglen-app';
@@ -2668,9 +2688,9 @@
       .grimmerglen-rotate-title { font-family:system-ui,-apple-system,sans-serif; font-size:clamp(18px,5vw,28px); font-weight:900; letter-spacing:.02em; color:#a3306e; margin:0; }
       .grimmerglen-rotate-sub { font-size:14px; color:#c46b96; margin:0; line-height:1.7; }
       @media (prefers-reduced-motion: reduce) { .grimmerglen-rotate-phone, .grimmerglen-rotate-bar { animation:none; } }
-      #grimmerglen-change-overlay { position:fixed; inset:0; z-index:9400; display:none; align-items:center; justify-content:center; padding:24px; box-sizing:border-box; background:rgba(92,54,112,.38); }
+      #grimmerglen-change-overlay { position:fixed; inset:0; z-index:9400; display:none; align-items:center; justify-content:center; overflow:hidden; overscroll-behavior:contain; padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,calc(env(safe-area-inset-bottom,0px) + var(--grimmerglen-keyboard-inset,0px))) max(16px,env(safe-area-inset-left,0px)); box-sizing:border-box; background:rgba(92,54,112,.38); }
       #grimmerglen-change-overlay.open { display:flex; }
-      .grimmerglen-change-box { box-sizing:border-box; width:min(510px,calc(100% - 12px)); padding:28px 26px 26px; border:2px solid rgba(255,255,255,.78); border-radius:28px; background:linear-gradient(155deg,rgba(255,248,253,.98),rgba(238,229,255,.98) 52%,rgba(225,247,255,.98)); box-shadow:0 25px 80px rgba(92,54,112,.25),0 0 42px rgba(255,159,194,.52),inset 0 0 45px rgba(255,255,255,.78); text-align:center; color:#703b70; animation:grimmerglenChangePop .42s cubic-bezier(.34,1.56,.64,1) both; }
+      .grimmerglen-change-box { box-sizing:border-box; width:min(510px,calc(100% - 12px)); max-height:calc(var(--grimmerglen-viewport-height,100dvh) - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 20px); overflow-x:hidden; overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; padding:28px 26px 26px; border:2px solid rgba(255,255,255,.78); border-radius:28px; background:linear-gradient(155deg,rgba(255,248,253,.98),rgba(238,229,255,.98) 52%,rgba(225,247,255,.98)); box-shadow:0 25px 80px rgba(92,54,112,.25),0 0 42px rgba(255,159,194,.52),inset 0 0 45px rgba(255,255,255,.78); text-align:center; color:#703b70; animation:grimmerglenChangePop .42s cubic-bezier(.34,1.56,.64,1) both; }
       @keyframes grimmerglenChangePop { from { opacity:0; transform:scale(.84) rotate(-2deg); } to { opacity:1; transform:scale(1) rotate(0deg); } }
       .grimmerglen-change-stars { margin:0 0 9px; color:#d886c2; font-size:19px; letter-spacing:.08em; text-shadow:0 0 12px rgba(255,159,194,.65); }
       .grimmerglen-change-kicker { margin:0 0 7px; color:#b06a94; font:800 .7rem/1.3 ui-monospace,monospace; letter-spacing:.15em; text-transform:uppercase; }
@@ -2686,9 +2706,9 @@
       #grimmerglen-dev { position:fixed; left:10px; bottom:10px; z-index:9500; display:flex; flex-direction:column; gap:6px; padding:8px 10px; background:rgba(0,0,0,.72); border-radius:10px; font:11px ui-monospace,monospace; color:#fff; }
       #grimmerglen-dev select { font:11px ui-monospace,monospace; }
       #grimmerglen-dev button { font:11px ui-monospace,monospace; cursor:pointer; margin-top:2px; }
-      #grimmerglen-return-overlay { position:fixed; inset:0; z-index:9300; display:none; align-items:center; justify-content:center; background:rgba(120,40,80,0); transition:background .35s ease; }
+      #grimmerglen-return-overlay { position:fixed; inset:0; z-index:9300; display:none; align-items:center; justify-content:center; overflow:hidden; overscroll-behavior:contain; padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,calc(env(safe-area-inset-bottom,0px) + var(--grimmerglen-keyboard-inset,0px))) max(16px,env(safe-area-inset-left,0px)); background:rgba(120,40,80,0); transition:background .35s ease; }
       #grimmerglen-return-overlay.open { display:flex; background:rgba(120,40,80,.4); }
-      .grimmerglen-return-box { box-sizing:border-box; width:min(420px,calc(100% - 40px)); padding:26px 24px 24px; border:1px solid rgba(255,150,190,.55); border-radius:16px; background:linear-gradient(155deg,rgba(255,244,249,.98),rgba(255,228,239,.99)); box-shadow:0 24px 70px rgba(224,85,158,.2),0 0 45px rgba(255,150,190,.28),inset 0 0 60px rgba(255,255,255,.6); text-align:center; font-family:Georgia,'Times New Roman',serif; color:#7a1f4b; transform:scale(.94); opacity:0; transition:transform .3s cubic-bezier(.34,1.56,.64,1),opacity .25s ease; }
+      .grimmerglen-return-box { box-sizing:border-box; width:min(420px,calc(100% - 40px)); max-height:calc(var(--grimmerglen-viewport-height,100dvh) - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 20px); overflow-x:hidden; overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; padding:26px 24px 24px; border:1px solid rgba(255,150,190,.55); border-radius:16px; background:linear-gradient(155deg,rgba(255,244,249,.98),rgba(255,228,239,.99)); box-shadow:0 24px 70px rgba(224,85,158,.2),0 0 45px rgba(255,150,190,.28),inset 0 0 60px rgba(255,255,255,.6); text-align:center; font-family:Georgia,'Times New Roman',serif; color:#7a1f4b; transform:scale(.94); opacity:0; transition:transform .3s cubic-bezier(.34,1.56,.64,1),opacity .25s ease; }
       #grimmerglen-return-overlay.open .grimmerglen-return-box { transform:scale(1); opacity:1; }
       .grimmerglen-return-box h2 { margin:0 0 4px; font-size:1.2rem; font-weight:400; letter-spacing:.06em; text-transform:uppercase; color:#a3306e; }
       .grimmerglen-return-box .jp { margin:0 0 16px; color:#c07aa3; font-size:.85rem; letter-spacing:.1em; }
@@ -2700,6 +2720,7 @@
       #grimmerglen-return-yes { background:linear-gradient(135deg,#ff8fc0,#ffd166); border:1px solid rgba(224,85,158,.7); color:#5a1638; }
       #grimmerglen-return-no { background:transparent; border:1px solid rgba(224,85,158,.4); color:#a9548a; }
       .utsu-card#grimmerglen-marietta-panel .dp-btn.no { color:#a9548a; border-color:rgba(224,85,158,.4); }
+      #grimmerglen-marietta-panel { bottom:max(8px,calc(env(safe-area-inset-bottom,0px) + var(--grimmerglen-keyboard-inset,0px))); max-height:min(620px,calc(var(--grimmerglen-viewport-height,100dvh) - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 16px)); overflow-x:hidden; overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; padding-bottom:max(12px,env(safe-area-inset-bottom,0px)); }
       #grimmerglen-marietta-panel .dp-btn { display:inline-flex; flex-direction:column; align-items:center; gap:3px; text-align:center; }
       #grimmerglen-marietta-panel .mg-btn-en { display:block; }
       #grimmerglen-marietta-panel .mg-btn-jp { display:block; color:inherit; font-size:.82em; font-weight:400; letter-spacing:0; line-height:1.35; }
@@ -2819,6 +2840,7 @@
     }
     injectStyles();
     buildApp();
+    bindGrimmerglenViewportMetrics();
     fitStage();
     resizeCanvas();
     if (state.spawnId === 'fromKarasuki') markGrimmerglenGardenVisited();
