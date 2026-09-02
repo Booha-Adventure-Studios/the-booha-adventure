@@ -2090,12 +2090,22 @@
   function nextMuenbaCase() {
     const mode = getMuenbaReadingDifficulty();
     const cases = randomizedMuenbaCases();
-    const weekly = readMuenbaWeekly();
-    const activeCase = typeof weekly.activeCaseId === 'string'
-      ? cases.find(caseData => caseData.id === weekly.activeCaseId && !caseModeIsComplete(caseData, mode))
-      : null;
+    const activeCase = activeMuenbaCase();
     if (activeCase) return activeCase;
     return cases.find(caseData => !caseModeIsComplete(caseData, mode)) || null;
+  }
+
+  // The active case is the accepted hunt, not merely the next authored case.
+  // Keeping this separate from nextMuenbaCase() lets the profile and case
+  // board preview what is available without making the room popup claim that
+  // a new hunt has already begun.
+  function activeMuenbaCase() {
+    const weekly = readMuenbaWeekly();
+    if (typeof weekly.activeCaseId !== 'string') return null;
+    const mode = getMuenbaReadingDifficulty();
+    return randomizedMuenbaCases().find(caseData =>
+      caseData.id === weekly.activeCaseId && !caseModeIsComplete(caseData, mode)
+    ) || null;
   }
 
   function availableMuenbaGhostsThisWeek() {
@@ -6938,12 +6948,16 @@
   function renderRoomNuppiPopup() {
     if (!lobbyOverlay) return;
     const name = getPlayerFirstName();
-    const pending = Number(readMuenbaWeekly().orbsPending) > 0;
-    const waitingForCase = !pending && !!nextMuenbaCase();
+    const weekly = readMuenbaWeekly();
+    const pending = Number(weekly.orbsPending) > 0;
+    const acceptedCase = !pending ? activeMuenbaCase() : null;
+    const waitingForCase = !!acceptedCase;
     const needsTierSelection = !pending && !waitingForCase && !allMuenbaCaseModesComplete();
     const selectedMode = getMuenbaReadingDifficulty();
     const selectedModeLabel = MUENBA_MEMORY_MODE_LABELS[selectedMode] || MUENBA_MEMORY_MODE_LABELS.start;
-    const waitingGhost = waitingForCase ? nextNuppiHuntGhost() : null;
+    const waitingGhost = acceptedCase
+      ? GHOSTS.find(ghost => ghost.id === acceptedCase.ghostId) || null
+      : null;
     const waitingGhostName = waitingGhost ? waitingGhost.name : 'the next ghost';
     const waitingLine = name
       ? `I'm waiting, ${name}. Find ${waitingGhostName}, then come back here.`
