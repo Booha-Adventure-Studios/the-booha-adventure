@@ -458,6 +458,20 @@
     return (DATA.rooms[roomId]?.exits || []).filter(exit => exit && DATA.rooms[exit.to]);
   }
 
+  // Keep decoded room art bounded to the room the player sees and its direct
+  // exits. The service-worker cache still retains fetched responses, so a
+  // later return remains network-cheap without retaining every decoded
+  // bitmap in this page's JavaScript heap.
+  function trimRoomCachesToNeighborhood(roomId) {
+    const keep = new Set([roomId, ...getRoomExits(roomId).map(exit => exit.to)]);
+    for (const cachedRoomId of imageCache.keys()) {
+      if (!keep.has(cachedRoomId)) imageCache.delete(cachedRoomId);
+    }
+    for (const cachedRoomId of roomGlowCache.keys()) {
+      if (!keep.has(cachedRoomId)) roomGlowCache.delete(cachedRoomId);
+    }
+  }
+
   function preloadAdjacent(roomId) {
     getImage(roomId);
     for (const exit of getRoomExits(roomId)) getImage(exit.to);
@@ -469,10 +483,45 @@
 
   function showRoom(roomId) {
     preloadAdjacent(roomId);
+    trimRoomCachesToNeighborhood(roomId);
     const image = getImage(roomId);
     roomLayer.replaceChildren(image);
     image.className = DATA.roomClass || 'grimmerglen-bg';
     currentBg = image;
+  }
+
+  // Avoid revealing a newly selected room while its background is still
+  // decoding. Safari can report the image as loaded before its first paint,
+  // so prefer decode() when available, but always retain a bounded fallback
+  // for older browsers and failed/unsupported decode promises.
+  function waitForGrimmerglenImage(image, timeoutMs = 1600) {
+    if (!image) return Promise.resolve(false);
+    if (image.complete) {
+      if (image.naturalWidth === 0) return Promise.resolve(false);
+      return typeof image.decode === 'function'
+        ? image.decode().then(() => true).catch(() => true)
+        : Promise.resolve(true);
+    }
+    return new Promise(resolve => {
+      let settled = false;
+      let timer = 0;
+      const settle = ready => {
+        if (settled) return;
+        settled = true;
+        window.clearTimeout(timer);
+        image.removeEventListener('load', onLoad);
+        image.removeEventListener('error', onError);
+        resolve(ready);
+      };
+      const onLoad = () => {
+        if (typeof image.decode !== 'function') { settle(true); return; }
+        image.decode().then(() => settle(true)).catch(() => settle(true));
+      };
+      const onError = () => settle(false);
+      image.addEventListener('load', onLoad, { once: true });
+      image.addEventListener('error', onError, { once: true });
+      timer = window.setTimeout(() => settle(image.naturalWidth > 0), timeoutMs);
+    });
   }
 
   function updateGrimmerglenProfilePortal() {
@@ -633,9 +682,11 @@
     fadeEl.style.opacity = '1';
     window.setTimeout(() => {
       setRoom(exit.to, exit.spawn, exit.dir);
-      fadeEl.style.transition = `opacity ${FADE_MS / 2}ms ease-out`;
-      fadeEl.style.opacity = '0';
-      window.setTimeout(() => { state.transitioning = false; }, FADE_MS / 2 + 30);
+      waitForGrimmerglenImage(currentBg).then(() => {
+        fadeEl.style.transition = `opacity ${FADE_MS / 2}ms ease-out`;
+        fadeEl.style.opacity = '0';
+        window.setTimeout(() => { state.transitioning = false; }, FADE_MS / 2 + 30);
+      });
     }, FADE_MS / 2 + 20);
   }
 
