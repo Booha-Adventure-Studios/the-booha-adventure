@@ -56,6 +56,16 @@ assert(commit.includes('if (captureSession.rewardCommitted)'), 'capture commits 
 assert(commit.includes('weekly.orbsPending += rewardCount'), 'successful captures must persist pending energy');
 assert(commit.includes('if (!writeSave(d)) return null;'), 'failed writes must not report a successful reward');
 assert(commit.includes('captureSession.rewardCommitted = true;'), 'the commit guard must arm only after the save succeeds');
+assert(commit.includes('weekly.activeCaseId = null;'), 'successful capture must always clear the weekly case pin');
+assert(commit.includes('weekly.activeHuntGhostId = null;'), 'successful capture must always clear the weekly ghost pin');
+
+const deposit = section('function depositOrbsAtNuppi()', '  let muenbaDanceSparkles');
+assert(deposit.includes('weekly.activeCaseId !== null || weekly.activeHuntGhostId !== null'), 'handoff must detect stale hunt pins before offering another hint');
+assert(deposit.includes('weekly.activeCaseId = null;'), 'handoff must repair a stale case pin');
+assert(deposit.includes('weekly.activeHuntGhostId = null;'), 'handoff must repair a stale ghost pin');
+
+const nextHint = section('function openNuppiAfterHandoff(deposited)', '  function drawNuppi');
+assert(nextHint.includes('weeklyAfterHandoff.activeCaseId === null && weeklyAfterHandoff.activeHuntGhostId === null'), 'next hint must be gated on cleared hunt pins');
 
 const finish = section('function finishRhythmCapture()', '  function renderPracticeResult');
 assert(finish.includes('if (captureSession.practice)'), 'practice must exit before permanent capture accounting');
