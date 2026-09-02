@@ -17,8 +17,15 @@ const acceptStart = source.indexOf('function acceptMuenbaHunt()');
 const acceptEnd = source.indexOf('\n  function resetMuenbaWeeklyNavigation()', acceptStart);
 assert(acceptStart >= 0 && acceptEnd > acceptStart, 'Muenba must expose a dedicated hunt-acceptance transition');
 const acceptBlock = source.slice(acceptStart, acceptEnd);
-assert(acceptBlock.includes('writeMuenbaWeekly({ huntAccepted: true })'), 'accepting a hunt must persist weekly acceptance');
+assert(acceptBlock.includes('huntAccepted: true'), 'accepting a hunt must persist weekly acceptance');
+assert(acceptBlock.includes('activeCaseId: acceptedCase ? acceptedCase.id : null'), 'accepting a hunt must pin the accepted case in weekly state');
 assert(acceptBlock.includes('state.navigationUnlocked = true;'), 'accepting a hunt must unlock room navigation immediately');
+
+const caseStart = source.indexOf('function nextMuenbaCase()');
+const caseEnd = source.indexOf('\n  function availableMuenbaGhostsThisWeek()', caseStart);
+const caseBlock = source.slice(caseStart, caseEnd);
+assert(caseBlock.includes('weekly.activeCaseId'), 'Muenba case resolution must consult the persisted active case');
+assert(caseBlock.includes('caseData.id === weekly.activeCaseId'), 'Muenba must keep the accepted case when it remains unfinished');
 
 const exitStart = source.indexOf('function getAvailableExit(now)');
 const exitEnd = source.indexOf('\n  function transitionTo(', exitStart);
